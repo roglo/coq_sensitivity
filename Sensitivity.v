@@ -2401,9 +2401,9 @@ Qed.
 Theorem bs_ge_s : ∀ n f, block_sensitivity n f ≥ sensitivity n f.
 Proof.
 intros.
+unfold block_sensitivity, sensitivity.
 Inspect 1.
 ...
-unfold block_sensitivity, sensitivity.
 rewrite map_loc_sens.
 unfold local_block_sensitivity.
 unfold pre_partitions.
