@@ -1,5 +1,6 @@
 # OVERVIEW
 Sensitivity Conjecture in Coq
+Proved by Hao Huang
 
 Work in progress...
 
