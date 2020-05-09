@@ -2398,162 +2398,24 @@ etransitivity; [ | apply fold_right_max_ge ].
 apply Nat.le_max_l.
 Qed.
 
+(* bs(f) ≥ s(f) *)
+
 Theorem bs_ge_s : ∀ n f, block_sensitivity n f ≥ sensitivity n f.
 Proof.
 intros.
 unfold block_sensitivity, sensitivity.
 unfold "≥".
-Inspect 1.
-Search (fold_right max).
-Search (fold_right _ _ (map _ _)).
-...
-etransitivity; [ | apply fold_right_max_ge ].
-...
-rewrite map_loc_sens.
-unfold local_block_sensitivity.
-unfold pre_partitions.
-unfold dispatch.
-Print loc_bl_sens_list.
-...
-unfold local_block_sensitivity, local_sensitivity.
-...
-1→0 = 0 radix 1
-2→1 = 01 radix 2
-3→5 = 012 radix 3
-4→27 = 0123 radix 4
-1*n^2 + 2*n^1 + 3*n^0
-(n-1)n^0+(n-2)n^1+(n-3)^n^2+...+1*n^(n-2)+0*n^(n-1)
-  Σ (i=0,n-1) i*n^(n-1-i)
-= Σ (i=0,n-1) (n-1-i)*n^i
-
-map (λ i, [i]) (seq 0 n) = nth ... (pre_partitions n) []
-...
+remember (seq 0 (2 ^ n)) as l; clear Heql.
+induction l as [| a]; [ easy | cbn ].
+etransitivity. {
+  apply Nat.max_le_compat_l.
+  apply IHl.
+} {
+  apply Nat.max_le_compat_r.
+  apply x_bs_ge_s.
 }
-apply in_split in H.
-destruct H as (l1 & l2 & Hll).
-rewrite Hll.
-(* prove that the "map (λ i, [i]) (seq 0 n)" has the maximum length *)
-...
-(* previous attempt to prove
-    map (λ i, [i]) (seq 0 n) ∈ pre_partitions n *)
-  unfold pre_partitions.
-  assert (H : map (λ i, [i]) (seq 0 n) = dispatch n (seq 0 n)). {
-    unfold dispatch.
-    rewrite List_filter_all_true. 2: {
-      intros a Ha.
-      clear - Ha.
-      destruct a; [ exfalso | easy ].
-      assert (H : ∀ i s n r, length r = n → [] ∉ disp_loop i (seq s n) r). {
-        clear.
-        intros i s n r Hr Ha.
-        revert i s r Hr Ha.
-        induction n; intros i s r Hr Ha. {
-          now apply length_zero_iff_nil in Hr; subst r.
-        }
-        cbn in Ha.
-...
-destruct n. {
-  cbn in Ha.
-  destruct r as [| r1]; [ easy | ].
-  destruct r; [ | easy ].
-  cbn in Ha.
-  destruct s. {
-    cbn in Ha.
-    now destruct Ha.
-  }
-  cbn in Ha.
-  destruct Ha as [Ha| Ha]. {
-...
-  unfold set_nth in Ha.
-...
-        specialize (IHn (i + 1) (S s)) as H1.
-        specialize (H1 (set_nth s r (i :: nth s r []))).
-...
-        assert (H : length (set_nth s r (i :: nth s r [])) = n). {
-Print set_nth.
-Theorem glop {A} : ∀ i (l : list A) v, length (set_nth i l v) = length l.
-Proof.
-intros.
-revert i v.
-induction l as [| a]; intros. {
-  cbn.
-  unfold set_nth.
-(* ouais non c'est faux *)
-...
-rewrite glop.
-...
+Qed.
 
-        destruct r as [| a]; [ easy | ].
-        cbn in Hr.
-        apply Nat.succ_inj in Hr.
-        specialize (IHn (i + 1) (S s) r Hr) as H1.
-Print set_nth.
-...
-      assert
-        (H : ∀ s n r1 r2,
-         (∀ l, l ∈ r1 → l ≠ [])
-         → length r2 = n
-         → [] ∉ disp_loop s (seq s n) (r1 ++ r2)). {
-        clear.
-        intros s * Hr1 Hr2 Ha.
-        revert s r1 r2 Hr1 Hr2 Ha.
-        induction n; intros s *; intros. {
-          cbn in Ha.
-          apply length_zero_iff_nil in Hr2; subst r2.
-          rewrite app_nil_r in Ha.
-          now specialize (Hr1 _ Ha).
-        }
-        cbn in Ha.
-        destruct r2 as [| a r2]; [ easy | ].
-        cbn in Hr2.
-        apply Nat.succ_inj in Hr2.
-        specialize (IHn (S n) r1 r2 Hr1 Hr2) as H1.
-...
-      destruct n; [ easy | ].
-      cbn in Ha.
-      destruct n; [ now destruct Ha | ].
-      cbn in Ha.
-  Ha : [] ∈ disp_loop 0 (seq 0 n) (repeat [] n)
-  Ha : [] ∈ disp_loop 1 (seq 1 n) ([0] :: repeat [] n)
-  Ha : [] ∈ disp_loop 2 (seq 2 n) ([0] :: [1] :: repeat [] n)
-      destruct n. {
-        cbn in Ha.
-
-      cbn in Ha.
-...
-      assert (H : ∀ i l a r, [] ∉ disp_loop i l (a :: r)). {
-        clear.
-        intros * Ha.
-        revert i a r Ha.
-        induction l as [| b l]; intros.
-cbn in Ha.
-
-    induction n; [ easy | ].
-    rewrite <- Nat.add_1_r.
-    rewrite seq_app.
-    rewrite map_app.
-    rewrite IHn.
-    rewrite Nat.add_0_l.
-    rewrite disp_loop_app.
-    rewrite seq_length, Nat.add_0_l.
-Print dispatch.
-...
-    replace (repeat [] (n + 1)) with (repeat ([] : list nat) n ++ [[]]). 2: {
-      clear.
-      induction n; [ easy | cbn ].
-      now rewrite IHn.
-    }
-    cbn.
-Print disp_loop.
-...
-    rewrite disp_loop_app.
-...
-
-Theorem bs_ge_s : ∀ n f, bs n f ≥ s n f.
-Proof.
-intros.
-unfold bs, s.
-unfold block_sensitivity, sensitivity.
 ...
 
 (* testing... *)
