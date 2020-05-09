@@ -2402,7 +2402,12 @@ Theorem bs_ge_s : ∀ n f, block_sensitivity n f ≥ sensitivity n f.
 Proof.
 intros.
 unfold block_sensitivity, sensitivity.
+unfold "≥".
 Inspect 1.
+Search (fold_right max).
+Search (fold_right _ _ (map _ _)).
+...
+etransitivity; [ | apply fold_right_max_ge ].
 ...
 rewrite map_loc_sens.
 unfold local_block_sensitivity.
