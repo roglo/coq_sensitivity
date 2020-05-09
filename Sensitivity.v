@@ -1680,8 +1680,8 @@ Qed.
 (* Theorem 1.3. (Gotsman and Linial [9]) The following are equivalent
    for any monotone function h : ℕ → ℝ.
    (a) For any induced subgraph H of Q^n with |V(H)| ≠ 2^(n-1), we have
-      Γ(H) ≥ h(n).
-   (b) For any boolean function f, we have s(f) ≥ sqrt(deg(f)).
+       Γ(H) ≥ h(n).
+   (b) For any boolean function f, we have s(f) ≥ √(deg(f)).
 *)
 
 ...
