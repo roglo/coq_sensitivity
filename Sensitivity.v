@@ -1677,14 +1677,14 @@ etransitivity. {
 }
 Qed.
 
-(* Theorem 1.3. (Gotsman and Linial [9]) The following are equivalent
-   for any monotone function h : ℕ → ℝ.
-   (a) For any induced subgraph H of Q^n with |V(H)| ≠ 2^(n-1), we have
-       Γ(H) ≥ h(n).
-   (b) For any boolean function f, we have s(f) ≥ √(deg(f)).
+(* Given a n×n matrix A, a principal submatrix of A is obtained by deleting
+   the same set of rows and columns from A.
 
-   where Γ(H) = max {Δ(H), Δ(Q^n-H)},
-   Q^n-H denoting the subgraph of Q^n induced on the vertex set V(Q^n)\V(H).
+  Lemma 2.1. (Cauchy’s Interlace Theorem) Let A be a symmetric n×n matrix,
+     and B be a m×m principal submatrix of A, for some m < n. If the
+     eigenvalues of A are λ₁ ≥ λ₂ ≥ … ≥ λ_n, and the eigenvalues of B
+     are µ₁ ≥ µ₂ ≥ … ≥ µ_m, then for all 1 ≤ i ≤ m,
+             λ_i ≥ µ_i ≥ λ_{i+n-m}.
 *)
 
 ...
