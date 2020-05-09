@@ -1682,6 +1682,9 @@ Qed.
    (a) For any induced subgraph H of Q^n with |V(H)| ≠ 2^(n-1), we have
        Γ(H) ≥ h(n).
    (b) For any boolean function f, we have s(f) ≥ √(deg(f)).
+
+   where Γ(H) = max (Δ(H), Δ(Q^n-H)),
+   Q^n-H denoting the subgraph of Q^n induced on the vertex set V(Q^n)\V(H).
 *)
 
 ...
