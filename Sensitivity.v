@@ -1685,6 +1685,7 @@ Qed.
              λ_i ≥ µ_i ≥ λ_{i+n-m}.
 *)
 
+(*
 Add LoadPath "../../math-comp/master".
 From mathcomp Require Import all_algebra.
 (*
@@ -1695,6 +1696,23 @@ Unset Printing Implicit Defensive.
 Check poly.
 Print ringType.
 Print GRing.Ring.type.
+*)
+
+Require Import Ring2 Rsummation.
+
+Record matrix {A} := { matel : nat → nat → A }.
+
+Check rng_mul.
+
+Fixpoint det {A} {R : ring A} {n : nat} (M : @matrix A) : A :=
+  match n with
+  | 0 => 1%Rng
+  | S n' => (Σ (i = 0, n'), (- (1)) ^ i * matel M n' i * @det A R n' M)%Rng
+  end.
+
+Print det.
+
+Definition charac_polyn {A} {n : nat} (M : @matrix A) := det (M - x * I).
 
 ...
 
