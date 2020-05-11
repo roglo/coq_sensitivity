@@ -79,8 +79,6 @@ Definition Δ sg := vΔ (sg_vert sg).
 
 (* sensitivity *)
 
-Search (nat → nat → nat).
-
 Definition Nat_togglebit x i :=
   if Nat.testbit x i then Nat.clearbit x i else Nat.setbit x i.
 
@@ -572,7 +570,7 @@ split. {
     rewrite Nat.add_succ_comm, Nat.add_1_r.
     now apply IHl.
   }
-  replace i with (i + 0) at 1 by easy.
+  replace i with (i + 0) at 1 by apply Nat.add_0_r.
   apply H.
 }
 split. {
@@ -1686,6 +1684,17 @@ Qed.
      are µ₁ ≥ µ₂ ≥ … ≥ µ_m, then for all 1 ≤ i ≤ m,
              λ_i ≥ µ_i ≥ λ_{i+n-m}.
 *)
+
+Add LoadPath "../../math-comp/master".
+From mathcomp Require Import all_algebra.
+(*
+Set Implicit Arguments.
+*)
+Unset Strict Implicit.
+Unset Printing Implicit Defensive.
+Check poly.
+Print ringType.
+Print GRing.Ring.type.
 
 ...
 
