@@ -1702,12 +1702,12 @@ Require Import Ring2 Rsummation Rpolynomial2.
 
 Record matrix {A} := { matel : nat → nat → A }.
 
-Check rng_mul.
+...
 
 Fixpoint det {A} {R : ring A} (n : nat) (M : @matrix A) : A :=
   match n with
   | 0 => 1%Rng
-  | S n' => (Σ (i = 0, n'), (- (1)) ^ i * matel M n' i * @det A R n' M)%Rng
+  | S n' => (Σ (i = 0, n'), ((- (1)) ^ i) * matel M n' i * @det A R n' M)%Rng
   end.
 
 Print det.
@@ -1728,9 +1728,9 @@ Compute (let _ := Z_ring in det 2 (mat_of_list [[1; 2]; [3; 4]]%Z)).
   | -1 -4 |
   | 0  4  | = -4
 *)
+Compute (let _ := Z_ring in let i := 0 in ((-1) ^ Z.of_nat i * matel (mat_of_list [[-1; 0]; [-4; 4]]%Z) 1 i)%Z).
 Compute (let _ := Z_ring in det 2 (mat_of_list [[-1; 0]; [-4; 4]]%Z)).
 (* pas ok: 4 *)
-
 ...
 
 (*
