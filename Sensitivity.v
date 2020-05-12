@@ -1698,19 +1698,49 @@ Print ringType.
 Print GRing.Ring.type.
 *)
 
-Require Import Ring2 Rsummation.
+Require Import Ring2 Rsummation Rpolynomial2.
 
 Record matrix {A} := { matel : nat → nat → A }.
 
 Check rng_mul.
 
-Fixpoint det {A} {R : ring A} {n : nat} (M : @matrix A) : A :=
+Fixpoint det {A} {R : ring A} (n : nat) (M : @matrix A) : A :=
   match n with
   | 0 => 1%Rng
   | S n' => (Σ (i = 0, n'), (- (1)) ^ i * matel M n' i * @det A R n' M)%Rng
   end.
 
 Print det.
+
+Require Import ZArith.
+
+Definition mat_of_list ll :=
+  {| matel i j := nth i (nth j ll []) 0%Z |}.
+
+(*
+  | 1 3 |
+  | 2 4 | = -2
+*)
+Compute (let _ := Z_ring in det 2 (mat_of_list [[1; 2]; [3; 4]]%Z)).
+(* ok *)
+
+(*
+  | -1 -4 |
+  | 0  4  | = -4
+*)
+Compute (let _ := Z_ring in det 2 (mat_of_list [[-1; 0]; [-4; 4]]%Z)).
+(* pas ok: 4 *)
+
+...
+
+(*
+  | -1 -4 -1 |
+  |  0  4 -5 | = -31
+  | -3 -5 -4 |
+*)
+Compute (let _ := Z_ring in det 3 (mat_of_list [[-1; 0; -3]; [-4; 4; -5]; [-1; -5; -4]])%Z).
+(* pas ok: 8 *)
+...
 
 Definition charac_polyn {A} {n : nat} (M : @matrix A) := det (M - x * I).
 
