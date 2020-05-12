@@ -1708,8 +1708,8 @@ Fixpoint next_perm_step_2 n dec c a b aft :=
   | S n' =>
       match aft with
       | d :: l =>
-  n :: [45] ++ rev dec ++ [45] ++ [c] ++ [45] ++ [a] ++ [45] ++ [b] ++ [45] ++ l
-      | [] => rev dec ++ [b] ++ [c] ++ [a]
+  n :: [45] ++ rev dec ++ [45] ++ [c] ++ [45] ++ [a] ++ [45] ++ [b] ++ [45] ++ [d] ++ [45] ++ l
+      | [] => rev dec ++ [b; c; a]
       end
   end.
 
@@ -1727,7 +1727,7 @@ Fixpoint next_perm_step_1 n bef aft :=
             end
       | [a] =>
           match bef with
-          | b :: l => rev l ++ [a] ++ [b]
+          | b :: l => rev l ++ [a; b]
           | [] => [43]
           end
       | [] => [44]
@@ -1739,7 +1739,7 @@ Definition next_perm l := next_perm_step_1 (length l) [] l.
 Definition s1 := next_perm (seq 1 10). Compute s1.
 Definition s2 := next_perm s1. Compute s2.
 Definition s3 := next_perm s2. Compute s3.
-Compute (s1, s2, s3).
+Compute (seq 1 10, s1, s2, s3).
 
 ...
 
