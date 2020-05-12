@@ -1702,8 +1702,16 @@ Require Import Ring2 Rsummation Rpolynomial2.
 
 Record matrix {A} := { matel : nat → nat → A }.
 
-Fixpoint next_perm_step_2 n dec aft :=
-  n :: 45 :: rev dec ++ [45] ++ aft.
+Fixpoint next_perm_step_2 n dec c a b aft :=
+  match n with
+  | 0 => []
+  | S n' =>
+      match aft with
+      | d :: l =>
+  n :: [45] ++ rev dec ++ [45] ++ [c] ++ [45] ++ [a] ++ [45] ++ [b] ++ [45] ++ l
+      | [] => rev dec ++ [b] ++ [c] ++ [a]
+      end
+  end.
 
 Fixpoint next_perm_step_1 n bef aft :=
   match n with
@@ -1712,7 +1720,11 @@ Fixpoint next_perm_step_1 n bef aft :=
       match aft with
       | a :: b :: l =>
           if lt_dec a b then next_perm_step_1 n' (a :: bef) (b :: l)
-          else next_perm_step_2 n' (a :: bef) (b :: l)
+          else
+            match bef with
+            | c :: l' => next_perm_step_2 n' l' c a b l
+            | [] => [45]
+            end
       | [a] =>
           match bef with
           | b :: l => rev l ++ [a] ++ [b]
@@ -1726,9 +1738,6 @@ Definition next_perm l := next_perm_step_1 (length l) [] l.
 
 Definition s1 := next_perm (seq 1 10). Compute s1.
 Definition s2 := next_perm s1. Compute s2.
-Compute (s1, s2).
-...
-
 Definition s3 := next_perm s2. Compute s3.
 Compute (s1, s2, s3).
 
