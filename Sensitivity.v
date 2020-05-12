@@ -1708,7 +1708,12 @@ Fixpoint next_perm_step_2 n dec c a b aft :=
   | S n' =>
       match aft with
       | d :: l =>
+          if lt_dec b d then rev dec ++ [c; a; d; b] ++ l
+(*
   n :: [45] ++ rev dec ++ [45] ++ [c] ++ [45] ++ [a] ++ [45] ++ [b] ++ [45] ++ [d] ++ [45] ++ l
+       [2; 45; 1; 2; 3; 4; 5; 6; 45; 7; 45; 9; 45; 8; 45; 10; 45])
+*)
+          else [48]
       | [] => rev dec ++ [b; c; a]
       end
   end.
@@ -1739,7 +1744,9 @@ Definition next_perm l := next_perm_step_1 (length l) [] l.
 Definition s1 := next_perm (seq 1 10). Compute s1.
 Definition s2 := next_perm s1. Compute s2.
 Definition s3 := next_perm s2. Compute s3.
-Compute (seq 1 10, s1, s2, s3).
+Definition s4 := next_perm s3.
+Compute (seq 1 10, s1, s2, s3, s4).
+(* non *)
 
 ...
 
