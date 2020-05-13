@@ -1702,51 +1702,23 @@ Require Import Ring2 Rsummation Rpolynomial2.
 
 Record matrix {A} := { matel : nat → nat → A }.
 
-Fixpoint next_perm_step_2 n dec c a b aft :=
-  match n with
+Fixpoint insert_at {A} pos (a : A) ll :=
+  match pos with
   | 0 => []
-  | S n' =>
-      match aft with
-      | d :: l =>
-          if lt_dec b d then rev dec ++ [c; a; d; b] ++ l
-(*
-  n :: [45] ++ rev dec ++ [45] ++ [c] ++ [45] ++ [a] ++ [45] ++ [b] ++ [45] ++ [d] ++ [45] ++ l
-       [2; 45; 1; 2; 3; 4; 5; 6; 45; 7; 45; 9; 45; 8; 45; 10; 45])
-*)
-          else [48]
-      | [] => rev dec ++ [b; c; a]
-      end
+  | S p =>
+      insert_at p a ll ++
+      map (λ l, firstn p l ++ [a] ++ skipn p l) ll
   end.
 
-Fixpoint next_perm_step_1 n bef aft :=
-  match n with
-  | 0 => []
-  | S n' =>
-      match aft with
-      | a :: b :: l =>
-          if lt_dec a b then next_perm_step_1 n' (a :: bef) (b :: l)
-          else
-            match bef with
-            | c :: l' => next_perm_step_2 n' l' c a b l
-            | [] => [45]
-            end
-      | [a] =>
-          match bef with
-          | b :: l => rev l ++ [a; b]
-          | [] => [43]
-          end
-      | [] => [44]
-      end
-  end.
+Fixpoint all_perm {A} (l : list A) :=
+  match l with
+  | [] => [[]]
+  | a :: l =>
+      let ll := all_perm l in
+      insert_at (S (length l)) a ll
+ end.
 
-Definition next_perm l := next_perm_step_1 (length l) [] l.
-
-Definition s1 := next_perm (seq 1 10). Compute s1.
-Definition s2 := next_perm s1. Compute s2.
-Definition s3 := next_perm s2. Compute s3.
-Definition s4 := next_perm s3.
-Compute (seq 1 10, s1, s2, s3, s4).
-(* non *)
+Compute (all_perm [1; 2; 3; 4]).
 
 ...
 
