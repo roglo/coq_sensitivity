@@ -1702,31 +1702,45 @@ Require Import Ring2 Rsummation Rpolynomial2.
 
 Record matrix {A} := { matel : nat → nat → A }.
 
-Fixpoint insert_at {A} pos (a : A) ll :=
-  match pos with
+Fixpoint insert_at {A} it pos (a : A) σ σll :=
+  match it with
   | 0 => []
-  | S p =>
-      insert_at p a ll ++
-      map (λ l, firstn p l ++ [a] ++ skipn p l) ll
+  | S it' =>
+      map
+        (λ σl,
+         let (σ1, l) := (σl : (bool * list A)) in
+         (xorb σ σ1, firstn pos l ++ [a] ++ skipn pos l)) σll ++
+      insert_at it' (S pos) a (negb σ) σll
   end.
 
 Fixpoint all_perm {A} (l : list A) :=
   match l with
-  | [] => [[]]
+  | [] => [(false, [])]
   | a :: l =>
-      let ll := all_perm l in
-      insert_at (S (length l)) a ll
+      let σll := all_perm l in
+      insert_at (S (length l)) 0 a false σll
  end.
 
-Compute (all_perm [1; 2; 3; 4]).
+Compute (all_perm [1; 2; 3]).
 
-...
+Definition det {A} {R : ring A} (n : nat) (M : @matrix A) (*: A*) :=
+  let allp := all_perm (seq 0 n) in
+(allp,
+  (Σ (i = 0, length allp - 1),
+     let '(σ, l) := nth i allp (false, []) in
+     rng_mul
+       (if σ then rng_opp 1%Rng else 1%Rng)
+       (rng_convol_mul ...
 
+       (fold_left (λ a j, rng_mul a (matel M ... i j)) l 1%Rng))%Rng).
+
+(*
 Fixpoint det {A} {R : ring A} (n : nat) (M : @matrix A) : A :=
   match n with
   | 0 => 1%Rng
   | S n' => (Σ (i = 0, n'), ((- (1)) ^ i) * matel M n' i * @det A R n' M)%Rng
   end.
+*)
 
 Print det.
 
@@ -1740,7 +1754,7 @@ Definition mat_of_list ll :=
   | 2 4 | = -2
 *)
 Compute (let _ := Z_ring in det 2 (mat_of_list [[1; 2]; [3; 4]]%Z)).
-(* ok *)
+...
 
 (*
   | -1 -4 |
