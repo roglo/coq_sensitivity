@@ -1723,15 +1723,14 @@ Fixpoint all_perm {A} (l : list A) :=
 
 Compute (all_perm [1; 2; 3]).
 
-Definition det {A} {R : ring A} (n : nat) (M : @matrix A) (*: A*) :=
+Definition det {A} {R : ring A} (n : nat) (M : @matrix A) : A :=
   let allp := all_perm (seq 0 n) in
-(allp,
   (Σ (ip = 0, length allp - 1),
      let '(σ, l) := nth ip allp (false, []) in
+     let ll := combine (seq 0 n) l in
      rng_mul
        (if σ then rng_opp 1%Rng else 1%Rng)
-       (rng_convol_mul ... (* et non pas fold_left *)
-       (fold_left (λ a j, rng_mul a (matel M ... i j)) l 1%Rng))%Rng).
+       (fold_left (λ a ij, rng_mul a (matel M (fst ij) (snd ij))) ll 1%Rng))%Rng.
 
 (*
 Fixpoint det {A} {R : ring A} (n : nat) (M : @matrix A) : A :=
@@ -1753,16 +1752,14 @@ Definition mat_of_list ll :=
   | 2 4 | = -2
 *)
 Compute (let _ := Z_ring in det 2 (mat_of_list [[1; 2]; [3; 4]]%Z)).
-...
+(* ok *)
 
 (*
   | -1 -4 |
   | 0  4  | = -4
 *)
-Compute (let _ := Z_ring in let i := 0 in ((-1) ^ Z.of_nat i * matel (mat_of_list [[-1; 0]; [-4; 4]]%Z) 1 i)%Z).
 Compute (let _ := Z_ring in det 2 (mat_of_list [[-1; 0]; [-4; 4]]%Z)).
-(* pas ok: 4 *)
-...
+(* ok *)
 
 (*
   | -1 -4 -1 |
@@ -1770,7 +1767,7 @@ Compute (let _ := Z_ring in det 2 (mat_of_list [[-1; 0]; [-4; 4]]%Z)).
   | -3 -5 -4 |
 *)
 Compute (let _ := Z_ring in det 3 (mat_of_list [[-1; 0; -3]; [-4; 4; -5]; [-1; -5; -4]])%Z).
-(* pas ok: 8 *)
+(* ok *)
 ...
 
 Definition charac_polyn {A} {n : nat} (M : @matrix A) := det (M - x * I).
