@@ -1702,6 +1702,16 @@ Require Import Ring2 Rsummation Rpolynomial2.
 
 Record matrix {A} := { matel : nat → nat → A }.
 
+Require Import ZArith.
+
+Definition mat_of_list ll :=
+  {| matel i j := nth i (nth j ll []) 0%Z |}.
+
+Definition mat_mul {T} {R : ring T} n A B :=
+  {| matel i k := (Σ (j = 0, n), matel A i j * matel B j k)%Rng |}.
+
+...
+
 Fixpoint insert_at {A} it pos (a : A) σ σll :=
   match it with
   | 0 => []
@@ -1742,11 +1752,6 @@ Fixpoint det {A} {R : ring A} (n : nat) (M : @matrix A) : A :=
 
 Print det.
 
-Require Import ZArith.
-
-Definition mat_of_list ll :=
-  {| matel i j := nth i (nth j ll []) 0%Z |}.
-
 (*
   | 1 3 |
   | 2 4 | = -2
@@ -1768,6 +1773,7 @@ Compute (let _ := Z_ring in det 2 (mat_of_list [[-1; 0]; [-4; 4]]%Z)).
 *)
 Compute (let _ := Z_ring in det 3 (mat_of_list [[-1; 0; -3]; [-4; 4; -5]; [-1; -5; -4]])%Z).
 (* ok *)
+
 ...
 
 Definition charac_polyn {A} {n : nat} (M : @matrix A) := det (M - x * I).
