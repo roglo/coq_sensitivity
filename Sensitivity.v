@@ -1726,12 +1726,11 @@ Compute (all_perm [1; 2; 3]).
 Definition det {A} {R : ring A} (n : nat) (M : @matrix A) (*: A*) :=
   let allp := all_perm (seq 0 n) in
 (allp,
-  (Σ (i = 0, length allp - 1),
-     let '(σ, l) := nth i allp (false, []) in
+  (Σ (ip = 0, length allp - 1),
+     let '(σ, l) := nth ip allp (false, []) in
      rng_mul
        (if σ then rng_opp 1%Rng else 1%Rng)
-       (rng_convol_mul ...
-
+       (rng_convol_mul ... (* et non pas fold_left *)
        (fold_left (λ a j, rng_mul a (matel M ... i j)) l 1%Rng))%Rng).
 
 (*
