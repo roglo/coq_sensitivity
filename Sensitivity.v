@@ -1657,7 +1657,7 @@ etransitivity; [ | apply fold_right_max_ge ].
 apply Nat.le_max_l.
 Qed.
 
-(* bs(f) ≥ s(f) *)
+(* "Obviously, bs(f) ≥ s(f)" *)
 
 Theorem bs_ge_s : ∀ n f, block_sensitivity n f ≥ sensitivity n f.
 Proof.
@@ -1675,14 +1675,14 @@ etransitivity. {
 }
 Qed.
 
-(* Given a n×n matrix A, a principal submatrix of A is obtained by deleting
-   the same set of rows and columns from A.
+(* "Given a n×n matrix A, a principal submatrix of A is obtained by deleting
+    the same set of rows and columns from A.
 
-  Lemma 2.1. (Cauchy’s Interlace Theorem) Let A be a symmetric n×n matrix,
-     and B be a m×m principal submatrix of A, for some m < n. If the
-     eigenvalues of A are λ₁ ≥ λ₂ ≥ … ≥ λ_n, and the eigenvalues of B
-     are µ₁ ≥ µ₂ ≥ … ≥ µ_m, then for all 1 ≤ i ≤ m,
-             λ_i ≥ µ_i ≥ λ_{i+n-m}.
+   Lemma 2.1. (Cauchy’s Interlace Theorem) Let A be a symmetric n×n matrix,
+      and B be a m×m principal submatrix of A, for some m < n. If the
+      eigenvalues of A are λ₁ ≥ λ₂ ≥ … ≥ λ_n, and the eigenvalues of B
+      are µ₁ ≥ µ₂ ≥ … ≥ µ_m, then for all 1 ≤ i ≤ m,
+              λ_i ≥ µ_i ≥ λ_{i+n-m}."
 *)
 
 (*
@@ -1782,13 +1782,13 @@ Compute (let _ := Z_ring in det 3 (mat_of_list 0%Z [[-1; 0; -3]; [-4; 4; -5]; [-
 (* ok *)
 
 (*
-  Lemma 2.2. We define a sequence of symmetric square matrices
-  iteratively as follows,
-              ⌈ 0 1 ⌉           ⌈ A_{n-1}   I       ⌉
-        A₁ =  ⌋ 1 0 ⌊    A_n =  ⌋ I        -A_{n-1} ⌊
+  "Lemma 2.2. We define a sequence of symmetric square matrices
+   iteratively as follows,
+               ⌈ 0 1 ⌉           ⌈ A_{n-1}   I       ⌉
+         A₁ =  ⌋ 1 0 ⌊    A_n =  ⌋ I        -A_{n-1} ⌊
 
-   Then An is a 2^n × 2 ^n matrix whose eigenvalues are √n of
-   multiplicity 2^{n-1}, and -√n of multiplicity 2^{n-1}.
+    Then An is a 2^n × 2 ^n matrix whose eigenvalues are √n of
+    multiplicity 2^{n-1}, and -√n of multiplicity 2^{n-1}."
 *)
 
 Fixpoint mat_lemma_2 n :=
@@ -1811,6 +1811,11 @@ Compute (list_of_mat 2 2 (mat_lemma_2 0)).
 Compute (list_of_mat 4 4 (mat_lemma_2 1)).
 Compute (list_of_mat 8 8 (mat_lemma_2 2)).
 Compute (list_of_mat 16 16 (mat_lemma_2 3)).
+
+(* "We prove by induction that A_n^2 = nI" *)
+
+Lemma lemma_2_A_n_2_eq_n_I (R := Z_ring) : ∀ n,
+  mat_mul (2 ^ n) (mat_lemma_2 n) (mat_lemma_2 n) = mat_lemma_2 n.
 
 ...
 
