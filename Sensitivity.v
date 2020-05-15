@@ -1837,6 +1837,9 @@ induction n; intros. {
   destruct j; [ easy | flia Hj ].
 }
 remember (S n) as sn; cbn - [ summation ]; subst sn.
+rewrite Nat.add_0_r.
+unfold mat_mul in IHn.
+cbn - [ "^" summation ] in IHn.
 ...
 
 Definition charac_polyn {A} {n : nat} (M : @matrix A) := det (M - x * I).
