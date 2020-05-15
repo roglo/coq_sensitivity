@@ -1812,15 +1812,31 @@ Compute (list_of_mat 4 4 (A 1)).
 Compute (list_of_mat 8 8 (A 2)).
 Compute (list_of_mat 16 16 (A 3)).
 
+Close Scope Z.
+
 (* "We prove by induction that A_n^2 = nI" *)
 
 Definition nI n :=
   {| matel i j := if Nat.eq_dec i j then Z.of_nat n else 0%Z |}.
 
-Lemma lemma_2_A_n_2_eq_n_I (R := Z_ring) : ∀ n,
-  mat_mul (2 ^ n) (A n) (A n) = nI n.
+Lemma lemma_2_A_n_2_eq_n_I (R := Z_ring) : ∀ n i j,
+  (i < 2 ^ S n)%nat → (j < 2 ^ S n)%nat
+  → matel (mat_mul (2 ^ S n) (A n) (A n)) i j = matel (nI (S n)) i j.
 Proof.
-
+intros * Hi Hj.
+revert i j Hi Hj.
+induction n; intros. {
+  cbn in Hi, Hj; cbn.
+  destruct i. {
+    cbn.
+    destruct j; [ easy | cbn ].
+    destruct j; [ easy | flia Hj ].
+  }
+  destruct i; [ cbn | flia Hi ].
+  destruct j; [ easy | ].
+  destruct j; [ easy | flia Hj ].
+}
+remember (S n) as sn; cbn - [ summation ]; subst sn.
 ...
 
 Definition charac_polyn {A} {n : nat} (M : @matrix A) := det (M - x * I).
