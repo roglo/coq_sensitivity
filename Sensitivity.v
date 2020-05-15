@@ -1791,6 +1791,16 @@ Compute (let _ := Z_ring in det 3 (mat_of_list 0%Z [[-1; 0; -3]; [-4; 4; -5]; [-
    multiplicity 2^{n-1}, and -√n of multiplicity 2^{n-1}.
 *)
 
+Fixpoint mat_lemma_2 n :=
+  match n with
+  | 0 => mat_of_list 0%Z [[0; 1]; [1; 0]]%Z
+  | S n' =>
+      {| matel i j := ...
+  end.
+
+Compute (list_of_mat 2 2 (mat_lemma_2 0)).
+Compute (list_of_mat 3 3 (mat_lemma_2 1)).
+
 ...
 
 Definition charac_polyn {A} {n : nat} (M : @matrix A) := det (M - x * I).
