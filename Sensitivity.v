@@ -1795,11 +1795,19 @@ Fixpoint mat_lemma_2 n :=
   match n with
   | 0 => mat_of_list 0%Z [[0; 1]; [1; 0]]%Z
   | S n' =>
-      {| matel i j := ...
+      {| matel i j :=
+           if lt_dec i (2 ^ n) then
+             if lt_dec j (2 ^ n) then matel (mat_lemma_2 n') i j
+             else if Nat.eq_dec (i + 2 ^ n) j then 1%Z else 0%Z
+           else
+             if lt_dec j (2 ^ n) then
+               if Nat.eq_dec i (j + 2 ^ n) then 1%Z else 0%Z
+             else matel (mat_lemma_2 n') (i - 2 ^ n) (j - 2 ^ n) |}
   end.
 
 Compute (list_of_mat 2 2 (mat_lemma_2 0)).
-Compute (list_of_mat 3 3 (mat_lemma_2 1)).
+Compute (list_of_mat 4 4 (mat_lemma_2 1)).
+Compute (list_of_mat 8 8 (mat_lemma_2 2)).
 
 ...
 
