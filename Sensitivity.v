@@ -1798,10 +1798,10 @@ Fixpoint mat_lemma_2 n :=
       {| matel i j :=
            if lt_dec i (2 ^ n) then
              if lt_dec j (2 ^ n) then matel (mat_lemma_2 n') i j
-             else if Nat.eq_dec (i + 2 ^ n) j then 1%Z else 0%Z
+             else if Nat.eq_dec i (j - 2 ^ n) then 1%Z else 0%Z
            else
              if lt_dec j (2 ^ n) then
-               if Nat.eq_dec i (j + 2 ^ n) then 1%Z else 0%Z
+               if Nat.eq_dec (i - 2 ^ n) j then 1%Z else 0%Z
              else matel (mat_lemma_2 n') (i - 2 ^ n) (j - 2 ^ n) |}
   end.
 
