@@ -1802,7 +1802,7 @@ Fixpoint A n :=
            else
              if lt_dec j (2 ^ n) then
                if Nat.eq_dec (i - 2 ^ n) j then 1%Z else 0%Z
-             else matel (A n') (i - 2 ^ n) (j - 2 ^ n) |}
+             else (- matel (A n') (i - 2 ^ n) (j - 2 ^ n))%Z |}
   end.
 
 Open Scope Z.
@@ -1840,6 +1840,9 @@ remember (S n) as sn; cbn - [ summation ]; subst sn.
 rewrite Nat.add_0_r.
 unfold mat_mul in IHn.
 cbn - [ "^" summation ] in IHn.
+Open Scope Z.
+Compute (let '(n, i, j) := (3, 0, 3)%nat in matel (mat_mul (2 ^ S n)%nat (A n) (A n)) i j = matel (nI (S n)) i j).
+Compute (let n := 3%nat in list_of_mat (2 ^ S n)%nat (2 ^ S n) (mat_mul (2 ^ S n) (A n) (A n))).
 ...
 
 Definition charac_polyn {A} {n : nat} (M : @matrix A) := det (M - x * I).
