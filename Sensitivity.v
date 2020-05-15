@@ -1805,9 +1805,12 @@ Fixpoint mat_lemma_2 n :=
              else matel (mat_lemma_2 n') (i - 2 ^ n) (j - 2 ^ n) |}
   end.
 
+Open Scope Z.
+
 Compute (list_of_mat 2 2 (mat_lemma_2 0)).
 Compute (list_of_mat 4 4 (mat_lemma_2 1)).
 Compute (list_of_mat 8 8 (mat_lemma_2 2)).
+Compute (list_of_mat 16 16 (mat_lemma_2 3)).
 
 ...
 
