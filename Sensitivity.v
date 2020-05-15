@@ -1833,6 +1833,10 @@ induction n; intros. {
   destruct j; [ easy | ].
   destruct j; [ easy | flia Hj ].
 }
+remember (A (S n)) as a eqn:Ha.
+cbn in Ha.
+...
+cbn - [ "^" summation ].
 remember (S n) as sn; cbn - [ summation ]; subst sn.
 (*
 rewrite Nat.add_0_r.
