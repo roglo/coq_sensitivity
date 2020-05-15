@@ -1781,6 +1781,16 @@ Compute (let _ := Z_ring in det 2 (mat_of_list 0%Z [[-1; 0]; [-4; 4]]%Z)).
 Compute (let _ := Z_ring in det 3 (mat_of_list 0%Z [[-1; 0; -3]; [-4; 4; -5]; [-1; -5; -4]])%Z).
 (* ok *)
 
+(*
+  Lemma 2.2. We define a sequence of symmetric square matrices
+  iteratively as follows,
+              ⌈ 0 1 ⌉           ⌈ A_{n-1}   I       ⌉
+        A₁ =  ⌋ 1 0 ⌊    A_n =  ⌋ I        -A_{n-1} ⌊
+
+   Then An is a 2^n × 2 ^n matrix whose eigenvalues are √n of
+   multiplicity 2^{n-1}, and -√n of multiplicity 2^{n-1}.
+*)
+
 ...
 
 Definition charac_polyn {A} {n : nat} (M : @matrix A) := det (M - x * I).
