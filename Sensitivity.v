@@ -1702,13 +1702,19 @@ Require Import Ring2 Rsummation Rpolynomial2.
 
 Record matrix {A} := { matel : nat → nat → A }.
 
-Require Import ZArith.
+Definition mat_of_list {A} (d : A) ll :=
+  {| matel i j := nth i (nth j ll []) d |}.
 
-Definition mat_of_list ll :=
-  {| matel i j := nth i (nth j ll []) 0%Z |}.
+Definition list_of_mat {A} nrow ncol (M : @matrix A) :=
+  map (λ row, map (λ col, matel M row col) (seq 0 ncol)) (seq 0 nrow).
 
 Definition mat_mul {T} {R : ring T} n A B :=
   {| matel i k := (Σ (j = 0, n), matel A i j * matel B j k)%Rng |}.
+
+Require Import ZArith.
+
+Compute (let _ := Z_ring in list_of_mat 3 3 (mat_mul 3 (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]))%Z).
+Compute (let _ := Z_ring in list_of_mat 4 4 (mat_mul 4 (mat_of_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]; [13; 14;15; 16]]))%Z).
 
 ...
 
