@@ -1793,24 +1793,25 @@ Compute (let _ := Z_ring in det 3 (mat_of_list 0%Z [[-1; 0; -3]; [-4; 4; -5]; [-
 
 Fixpoint A n :=
   match n with
-  | 0 => mat_of_list 0%Z [[0; 1]; [1; 0]]%Z
+  | 0 => mat_of_list 0%Z []
+  | 1 => mat_of_list 0%Z [[0; 1]; [1; 0]]%Z
   | S n' =>
       {| matel i j :=
-           if lt_dec i (2 ^ n) then
-             if lt_dec j (2 ^ n) then matel (A n') i j
-             else if Nat.eq_dec i (j - 2 ^ n) then 1%Z else 0%Z
+           if lt_dec i (2 ^ n') then
+             if lt_dec j (2 ^ n') then matel (A n') i j
+             else if Nat.eq_dec i (j - 2 ^ n') then 1%Z else 0%Z
            else
-             if lt_dec j (2 ^ n) then
-               if Nat.eq_dec (i - 2 ^ n) j then 1%Z else 0%Z
-             else (- matel (A n') (i - 2 ^ n) (j - 2 ^ n))%Z |}
+             if lt_dec j (2 ^ n') then
+               if Nat.eq_dec (i - 2 ^ n') j then 1%Z else 0%Z
+             else (- matel (A n') (i - 2 ^ n') (j - 2 ^ n'))%Z |}
   end.
 
 Open Scope Z.
 
-Compute (list_of_mat 2 2 (A 0)).
-Compute (list_of_mat 4 4 (A 1)).
-Compute (list_of_mat 8 8 (A 2)).
-Compute (list_of_mat 16 16 (A 3)).
+Compute (list_of_mat 2 2 (A 1)).
+Compute (list_of_mat 4 4 (A 2)).
+Compute (list_of_mat 8 8 (A 3)).
+Compute (list_of_mat 16 16 (A 4)).
 
 Close Scope Z.
 
@@ -1820,29 +1821,28 @@ Definition nI n :=
   {| matel i j := if Nat.eq_dec i j then Z.of_nat n else 0%Z |}.
 
 Lemma lemma_2_A_n_2_eq_n_I (R := Z_ring) : ∀ n i j,
-  (i < 2 ^ S n)%nat → (j < 2 ^ S n)%nat
-  → matel (mat_mul (2 ^ S n) (A n) (A n)) i j = matel (nI (S n)) i j.
+  (i < 2 ^ n)%nat → (j < 2 ^ n)%nat
+  → matel (mat_mul (2 ^ n) (A n) (A n)) i j = matel (nI n) i j.
 Proof.
 intros * Hi Hj.
 revert i j Hi Hj.
 induction n; intros. {
   cbn in Hi, Hj; cbn.
-  destruct i. {
-    cbn.
-    destruct j; [ easy | cbn ].
-    destruct j; [ easy | flia Hj ].
-  }
+  destruct i; [ now destruct j | ].
   destruct i; [ cbn | flia Hi ].
   destruct j; [ easy | ].
   destruct j; [ easy | flia Hj ].
 }
 remember (S n) as sn; cbn - [ summation ]; subst sn.
+(*
 rewrite Nat.add_0_r.
 unfold mat_mul in IHn.
 cbn - [ "^" summation ] in IHn.
+*)
 Open Scope Z.
-Compute (let '(n, i, j) := (3, 0, 3)%nat in matel (mat_mul (2 ^ S n)%nat (A n) (A n)) i j = matel (nI (S n)) i j).
-Compute (let n := 3%nat in list_of_mat (2 ^ S n)%nat (2 ^ S n) (mat_mul (2 ^ S n) (A n) (A n))).
+Compute  (let '(n, i, j) := (3, 0, 2)%nat in matel (mat_mul (2 ^ n) (A n) (A n)) i j = matel (nI n) i j).
+Compute (let n := 0%nat in list_of_mat (2 ^ n)%nat (2 ^ n) (mat_mul (2 ^ n) (A n) (A n))).
+
 ...
 
 Definition charac_polyn {A} {n : nat} (M : @matrix A) := det (M - x * I).
