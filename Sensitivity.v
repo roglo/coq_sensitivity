@@ -1719,8 +1719,6 @@ Require Import ZArith.
 Compute (let _ := Z_ring in list_of_mat 3 3 (mat_mul 3 (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]))%Z).
 Compute (let _ := Z_ring in list_of_mat 4 3 (mat_transp (mat_mul 4 (mat_transp (mat_of_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])) (mat_transp (mat_of_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]; [13; 14;15; 16]]))))%Z).
 
-...
-
 Fixpoint insert_at {A} it pos (a : A) σ σll :=
   match it with
   | 0 => []
@@ -1765,14 +1763,14 @@ Print det.
   | 1 3 |
   | 2 4 | = -2
 *)
-Compute (let _ := Z_ring in det 2 (mat_of_list [[1; 2]; [3; 4]]%Z)).
+Compute (let _ := Z_ring in det 2 (mat_of_list 0%Z [[1; 2]; [3; 4]]%Z)).
 (* ok *)
 
 (*
   | -1 -4 |
   | 0  4  | = -4
 *)
-Compute (let _ := Z_ring in det 2 (mat_of_list [[-1; 0]; [-4; 4]]%Z)).
+Compute (let _ := Z_ring in det 2 (mat_of_list 0%Z [[-1; 0]; [-4; 4]]%Z)).
 (* ok *)
 
 (*
@@ -1780,7 +1778,7 @@ Compute (let _ := Z_ring in det 2 (mat_of_list [[-1; 0]; [-4; 4]]%Z)).
   |  0  4 -5 | = -31
   | -3 -5 -4 |
 *)
-Compute (let _ := Z_ring in det 3 (mat_of_list [[-1; 0; -3]; [-4; 4; -5]; [-1; -5; -4]])%Z).
+Compute (let _ := Z_ring in det 3 (mat_of_list 0%Z [[-1; 0; -3]; [-4; 4; -5]; [-1; -5; -4]])%Z).
 (* ok *)
 
 ...
