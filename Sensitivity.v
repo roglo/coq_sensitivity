@@ -1839,9 +1839,7 @@ rewrite Nat.add_0_r.
 unfold mat_mul in IHn.
 cbn - [ "^" summation ] in IHn.
 *)
-Open Scope Z.
-Compute  (let '(n, i, j) := (3, 0, 2)%nat in matel (mat_mul (2 ^ n) (A n) (A n)) i j = matel (nI n) i j).
-Compute (let n := 0%nat in list_of_mat (2 ^ n)%nat (2 ^ n) (mat_mul (2 ^ n) (A n) (A n))).
+Compute (let n := 3%nat in list_of_mat (2 ^ n)%nat (2 ^ n) (mat_mul (2 ^ n) (A n) (A n))).
 
 ...
 
