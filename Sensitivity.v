@@ -1836,6 +1836,63 @@ apply Nat.nlt_ge in Hin.
 now rewrite IHn.
 Qed.
 
+Theorem A_symm : ∀ n i j, matel (A n) i j = matel (A n) j i.
+Proof.
+intros.
+revert i j.
+induction n; intros; cbn. {
+  do 2 rewrite match_id.
+  rewrite nth_overflow; [ | cbn; flia ].
+  rewrite nth_overflow; [ easy | cbn; flia ].
+}
+destruct n. {
+  cbn.
+  destruct i. {
+    destruct j; [ easy | cbn ].
+    destruct j; [ easy | cbn ].
+    do 2 rewrite match_id.
+    rewrite nth_overflow; [ easy | cbn; flia ].
+  }
+  destruct j. {
+    cbn.
+    destruct i; [ easy | cbn ].
+    do 2 rewrite match_id.
+    rewrite nth_overflow; [ easy | cbn; flia ].
+  }
+  destruct i. {
+    cbn.
+    destruct j; [ easy | ].
+    do 2 rewrite match_id.
+    rewrite nth_overflow; [ easy | cbn; flia ].
+  }
+  destruct j. {
+    cbn.
+    do 2 rewrite match_id.
+    rewrite nth_overflow; [ easy | cbn; flia ].
+  }
+  now do 2 rewrite match_id.
+}
+remember (S n) as n1 eqn:Hn1; cbn.
+destruct (lt_dec i (2 ^ n1)) as [Hin| Hin]. {
+  rewrite IHn.
+  destruct (lt_dec j (2 ^ n1)) as [Hjn| Hn]; [ easy | ].
+  destruct (Nat.eq_dec i (j - 2 ^ n1)) as [Hij| Hij]. {
+    rewrite <- Hij; cbn.
+    now destruct (Nat.eq_dec i i).
+  }
+  destruct (Nat.eq_dec (j - 2 ^ n1) i) as [Hji| Hji]; [ | easy ].
+  now symmetry in Hji.
+}
+rewrite IHn.
+destruct (lt_dec j (2 ^ n1)) as [Hjn| Hjn]; [ | easy ].
+destruct (Nat.eq_dec (i - 2 ^ n1) j) as [Hij| Hij]. {
+  rewrite Hij; cbn.
+  now destruct (Nat.eq_dec j j).
+}
+destruct (Nat.eq_dec j (i - 2 ^ n1)) as [Hji| Hji]; [ | easy ].
+now symmetry in Hji.
+Qed.
+
 (* "We prove by induction that A_n^2 = nI" *)
 
 Definition nI n :=
@@ -1876,6 +1933,7 @@ rewrite Nat.add_0_r.
 rewrite Zpos_P_of_succ_nat.
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   subst j.
+  cbn - [ summation ].
 ...
 subst a.
 remember (S (S n)) as ssn; cbn - [ summation ]; subst ssn.
