@@ -1815,6 +1815,27 @@ Compute (list_of_mat 16 16 (A 4)).
 
 Close Scope Z.
 
+Theorem A_i_i : ∀ n i, matel (A n) i i = 0%Z.
+Proof.
+intros.
+revert i.
+induction n; intros; cbn. {
+  rewrite match_id.
+  rewrite nth_overflow; [ easy | cbn; flia ].
+}
+destruct n. {
+  cbn.
+  destruct i; [ easy | cbn ].
+  destruct i; [ easy | cbn ].
+  rewrite match_id.
+  rewrite nth_overflow; [ easy | cbn; flia ].
+}
+remember (S n) as n1 eqn:Hn1; cbn.
+destruct (lt_dec i (2 ^ n1)) as [Hin| Hin]; [ easy | ].
+apply Nat.nlt_ge in Hin.
+now rewrite IHn.
+Qed.
+
 (* "We prove by induction that A_n^2 = nI" *)
 
 Definition nI n :=
@@ -1853,6 +1874,8 @@ remember (S n) as n1 eqn:Hn1.
 cbn - [ mat_mul summation ].
 rewrite Nat.add_0_r.
 rewrite Zpos_P_of_succ_nat.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  subst j.
 ...
 subst a.
 remember (S (S n)) as ssn; cbn - [ summation ]; subst ssn.
