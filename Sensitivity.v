@@ -1835,6 +1835,29 @@ induction n; intros. {
 }
 remember (A (S n)) as a eqn:Ha.
 cbn in Ha.
+destruct n. {
+  subst a; cbn in Hi, Hj |-*.
+  destruct i. {
+    cbn.
+    destruct j; [ easy | cbn ].
+    destruct j; [ easy | cbn ].
+    now destruct j.
+  }
+  destruct i; [ | flia Hi ].
+  do 2 rewrite Z.mul_0_l, Z.add_0_l.
+  rewrite Z.mul_1_l, Z.add_0_r.
+  destruct j; [ easy | ].
+  destruct j; [ easy | flia Hj ].
+}
+remember (S n) as n1 eqn:Hn1.
+cbn - [ mat_mul summation ].
+rewrite Nat.add_0_r.
+rewrite Zpos_P_of_succ_nat.
+...
+subst a.
+remember (S (S n)) as ssn; cbn - [ summation ]; subst ssn.
+rewrite Nat.add_0_r.
+destruct (lt_dec i (2 ^ n + 2 ^ n)) as [Hin| Hin]. {
 ...
 cbn - [ "^" summation ].
 remember (S n) as sn; cbn - [ summation ]; subst sn.
