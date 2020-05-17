@@ -1932,8 +1932,10 @@ cbn - [ mat_mul summation ].
 rewrite Nat.add_0_r.
 rewrite Zpos_P_of_succ_nat.
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-  subst j.
+  subst j; clear Hj.
   cbn - [ summation ].
+Compute (list_of_mat 8 8 (A 3)).
+Compute (list_of_mat 4 4 (A 3)).
 ...
 subst a.
 remember (S (S n)) as ssn; cbn - [ summation ]; subst ssn.
