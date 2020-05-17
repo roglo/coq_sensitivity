@@ -1903,6 +1903,39 @@ Lemma lemma_2_A_n_2_eq_n_I (R := Z_ring) : ∀ n i j,
   → matel (mat_mul (2 ^ n) (A n) (A n)) i j = matel (nI n) i j.
 Proof.
 intros * Hi Hj.
+destruct n. {
+  cbn in Hi, Hj; cbn.
+  destruct i; [ now destruct j | ].
+  destruct i; [ cbn | flia Hi ].
+  destruct j; [ easy | ].
+  destruct j; [ easy | flia Hj ].
+}
+remember (A (S n)) as a eqn:Ha.
+cbn - [ summation ].
+rewrite Nat.add_0_r.
+rename j into k.
+subst a.
+revert i k Hi Hj.
+induction n; intros. {
+  cbn in Hi, Hj.
+  cbn; rewrite Z.add_0_r.
+  destruct i. {
+    cbn; rewrite Z.add_0_r.
+    destruct k; [ easy | cbn ].
+    destruct k; [ easy | flia Hj ].
+  }
+  destruct i; [ | flia Hi ].
+  destruct k; [ easy | ].
+  destruct k; [ easy | flia Hj ].
+}
+remember (S n) as n1.
+remember (A (S n1)) as a eqn:Ha; cbn - [ summation ].
+destruct n1; [ easy | ].
+apply Nat.succ_inj in Heqn1; subst n1.
+Print A.
+(* A (S n) from A n ? *)
+...
+intros * Hi Hj.
 revert i j Hi Hj.
 induction n; intros. {
   cbn in Hi, Hj; cbn.
