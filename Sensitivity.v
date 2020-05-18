@@ -1942,7 +1942,10 @@ destruct n. {
 }
 remember (A (S n)) as a eqn:Ha.
 remember (S n) as sn; cbn - [ summation ]; subst sn.
-rewrite (summation_split (2 ^ n - 1)).
+rewrite (summation_split (2 ^ n - 1)). 2: {
+  split; [ flia | ].
+  cbn; flia.
+}
 rewrite Nat.sub_add. 2: {
   now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
 }
@@ -1978,16 +1981,17 @@ destruct (lt_dec j (2 ^ n)) as [Hjn| Hjn]. {
     clear H.
     destruct (lt_dec j (2 ^ n)) as [H| H]; [ easy | flia Hjn H ].
   }
-  rewrite (summation_shift (2 ^ n)).
+  rewrite (summation_shift (2 ^ n)); [ | cbn; flia ].
   replace (2 ^ S n - 2 ^ n) with (2 ^ n) by (cbn; flia).
   replace
     (Σ (i0 = 0, 2 ^ n), f i (2 ^ n + i0)%nat * f (2 ^ n + i0)%nat j)%Rng
     with
       (Σ (k = 0, 2 ^ n),
-       f i (2 ^ n + k)%nat *
+       (if lt_dec i (2 ^ n) then if Nat.eq_dec i k then 1%Z else 0%Z
+        else (- matel (A n) (i - 2 ^ n) k)%Z) *
        (if Nat.eq_dec k j then 1%Z else 0%Z))%Rng. 2: {
     apply summation_compat.
-    intros k Hk; cbn; f_equal; subst f.
+    intros k Hk; cbn. subst f.
     destruct (lt_dec (2 ^ n + k) (2 ^ n)) as [H| H]; [ flia Hk H | clear H ].
     rewrite Nat.add_comm, Nat.add_sub.
     destruct (lt_dec j (2 ^ n)) as [H| H]; [ easy | flia Hjn H].
