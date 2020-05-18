@@ -1985,13 +1985,12 @@ destruct (lt_dec j (2 ^ n)) as [Hjn| Hjn]. {
     with
       (Σ (k = 0, 2 ^ n),
        f i (2 ^ n + k)%nat *
-       (if lt_dec j (2 ^ n)
-           then if Nat.eq_dec k j then 1%Z else 0%Z
-           else (- matel (A n) k (j - 2 ^ n))%Z))%Rng. 2: {
+       (if Nat.eq_dec k j then 1%Z else 0%Z))%Rng. 2: {
     apply summation_compat.
     intros k Hk; cbn; f_equal; subst f.
     destruct (lt_dec (2 ^ n + k) (2 ^ n)) as [H| H]; [ flia Hk H | clear H ].
-    now rewrite Nat.add_comm, Nat.add_sub.
+    rewrite Nat.add_comm, Nat.add_sub.
+    destruct (lt_dec j (2 ^ n)) as [H| H]; [ easy | flia Hjn H].
   }
 ...
 cbn - [ summation ].
