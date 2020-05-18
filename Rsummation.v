@@ -347,6 +347,41 @@ rewrite <- summation_aux_succ_first.
 rewrite <- Nat.sub_succ_l; [ reflexivity | assumption ].
 Qed.
 
+Theorem summation_empty : ∀ g b k,
+  k < b → (Σ (i = b, k), g i = 0)%Rng.
+Proof.
+intros * Hkb.
+unfold summation.
+now replace (S k - b) with 0 by flia Hkb.
+Qed.
+
+Theorem summation_split : ∀ g b j k,
+  b ≤ j ≤ k
+  → (Σ (i = b, k), g i = Σ (i = b, j), g i + Σ (i = j+1, k), g i)%Rng.
+Proof.
+intros * (Hbj, Hjk).
+unfold summation.
+remember (S j - b) as len1 eqn:Hlen1.
+remember (S k - b) as len2 eqn:Hlen2.
+move len2 before len1.
+replace (S k - (j + 1)) with (len2 - len1) by flia Hlen1 Hlen2 Hbj.
+replace (j + 1) with (b + len1) by flia Hlen1 Hbj.
+assert (Hll : len1 ≤ len2) by flia Hlen1 Hlen2 Hjk.
+clear - Hll.
+revert b len2 Hll.
+induction len1; intros. {
+  cbn.
+  now rewrite rng_add_0_l, Nat.add_0_r, Nat.sub_0_r.
+}
+cbn.
+destruct len2; [ flia Hll | ].
+apply Nat.succ_le_mono in Hll.
+cbn.
+rewrite IHlen1; [ | easy ].
+rewrite rng_add_assoc.
+now rewrite Nat.add_succ_comm.
+Qed.
+
 Theorem summation_add_distr : ∀ g h b k,
   (Σ (i = b, k), (g i + h i) =
    Σ (i = b, k), g i + Σ (i = b, k), h i)%Rng.
