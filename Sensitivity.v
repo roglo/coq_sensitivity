@@ -1791,6 +1791,7 @@ Compute (let _ := Z_ring in det 3 (mat_of_list 0%Z [[-1; 0; -3]; [-4; 4; -5]; [-
     multiplicity 2^{n-1}, and -√n of multiplicity 2^{n-1}."
 *)
 
+(*
 (* attempt to make matrices of matrices in order to be able to manipulate
    the A_n function of A_{n-1} like above... but it seems to be complicated;
    first, I need to use the multiplication of such matrices (mat_mul) but
@@ -1817,6 +1818,8 @@ Theorem even_submat_mul : ∀ T (R : ring T) n (M M' : @matrix T) i j,
          if lt_dec j n then matel (matel MM 1 0) (i - n) j
          else matel (matel MM 1 1) (i - n) (j - n).
 ...
+(* not convincing... but I keep it to return to it later, perhaps *)
+*)
 
 Fixpoint A n :=
   match n with
@@ -1963,6 +1966,11 @@ remember (A (S n1)) as a eqn:Ha; cbn - [ summation ].
 destruct n1; [ easy | ].
 apply Nat.succ_inj in Heqn1; subst n1.
 Print A.
+remember (S n) as n1; cbn in Ha; subst n1.
+subst a.
+remember (S n) as n1; cbn - [ summation A ]; subst n1.
+destruct (lt_dec i (2 ^ S n)) as [Hin| Hin]. {
+...
 (* A (S n) from A n ? *)
 ...
 intros * Hi Hj.
