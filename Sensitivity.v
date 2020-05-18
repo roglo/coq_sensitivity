@@ -1791,22 +1791,24 @@ Compute (let _ := Z_ring in det 3 (mat_of_list 0%Z [[-1; 0; -3]; [-4; 4; -5]; [-
     multiplicity 2^{n-1}, and -√n of multiplicity 2^{n-1}."
 *)
 
-Definition submat {T} (M : @matrix T) istart jstart :=
-  {| matel i j := matel M (i + istart) (j + jstart) |}.
-
 (* attempt to make matrices of matrices in order to be able to manipulate
    the A_n function of A_{n-1} like above... but it seems to be complicated;
    first, I need to use the multiplication of such matrices (mat_mul) but
    for that, I need to build mat_ring, a lot of proofs to do! *)
+
+Axiom mat_ring : ∀ T, ring (@matrix T).
+
+Definition submat {T} (M : @matrix T) istart jstart :=
+  {| matel i j := matel M (i + istart) (j + jstart) |}.
 
 Theorem even_submat_mul : ∀ T (R : ring T) n (M M' : @matrix T) i j,
   i < 2 * n
   → j < 2 * n
   → matel (mat_mul n M M') i j =
        matel
-         (@mat_mul (@matrix T) mat_ring 2
-            {| matel i1 j1 := matel (@submat T M 0 0) i1 j1 |}
-            {| matel i1 j1 := matel (@submat T M' 0 0) i1 j1 |}) i j.
+         (@mat_mul (@matrix T) (mat_ring T) 2
+            {| matel i1 j1 := @submat T M i1 j1 |}
+            {| matel i1 j1 := @submat T M' i1 j1 |}) i j.
 ...
 
 Fixpoint A n :=
