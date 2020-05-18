@@ -1805,10 +1805,17 @@ Theorem even_submat_mul : ∀ T (R : ring T) n (M M' : @matrix T) i j,
   i < 2 * n
   → j < 2 * n
   → matel (mat_mul n M M') i j =
-       matel
-         (@mat_mul (@matrix T) (mat_ring T) 2
+       let MM :=
+         @mat_mul (@matrix T) (mat_ring T) 2
             {| matel i1 j1 := @submat T M i1 j1 |}
-            {| matel i1 j1 := @submat T M' i1 j1 |}) i j.
+            {| matel i1 j1 := @submat T M' i1 j1 |}
+       in
+       if lt_dec i n then
+         if lt_dec j n then matel (matel MM 0 0) i j
+         else matel (matel MM 0 1) i (j - n)
+       else
+         if lt_dec j n then matel (matel MM 1 0) (i - n) j
+         else matel (matel MM 1 1) (i - n) (j - n).
 ...
 
 Fixpoint A n :=
