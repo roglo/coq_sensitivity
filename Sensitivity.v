@@ -1959,17 +1959,20 @@ induction n; intros. {
   destruct k; [ easy | flia Hj ].
 }
 remember (S n) as n1.
+(*
 Compute (let '(i, k, n1) := (2, 2, 4) in (Σ (j = 0, 2 ^ n1 + 2 ^ n1), (matel (A (S n1)) i j * matel (A (S n1)) j k)%Z)%Rng = (if Nat.eq_dec i k then Z.pos (Pos.of_succ_nat n1) else 0%Z)).
 Compute (let '(i, k, n1) := (0, 0, 3) in map (λ j, (matel (A (S n1)) i j * matel (A (S n1)) j k)%Z) (seq 0 (2 ^ n1 + 2 ^ n1))).
 Compute (let '(i, k, n1) := (1, 1, 3) in map (λ j, (matel (A (S n1)) i j * matel (A (S n1)) j k)%Z) (seq 0 (2 ^ n1 + 2 ^ n1))).
+*)
 remember (A (S n1)) as a eqn:Ha; cbn - [ summation ].
 destruct n1; [ easy | ].
 apply Nat.succ_inj in Heqn1; subst n1.
-Print A.
-remember (S n) as n1; cbn in Ha; subst n1.
 subst a.
 remember (S n) as n1; cbn - [ summation A ]; subst n1.
 destruct (lt_dec i (2 ^ S n)) as [Hin| Hin]. {
+  rewrite (summation_split (2 ^ n)).
+  rename i into j.
+  remember (S n) as n1; cbn - [ summation ]; subst n1.
 ...
 (* A (S n) from A n ? *)
 ...
