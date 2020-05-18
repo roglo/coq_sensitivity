@@ -1941,6 +1941,14 @@ destruct n. {
   destruct j; [ easy | flia Hj ].
 }
 remember (A (S n)) as a eqn:Ha.
+remember (S n) as sn; cbn - [ summation ]; subst sn.
+rewrite (summation_split (2 ^ n)).
+change
+  ((Σ (k = 0, 2 ^ n), (matel a i k * matel a k j) +
+   Σ (k = 2 ^ n + 1, 2 ^ S n), (matel a i k * matel a k j)) =
+   if Nat.eq_dec i j then Z.of_nat (S n) else 0)%Rng.
+cbn in Ha.
+...
 cbn - [ summation ].
 rewrite Nat.add_0_r.
 rename j into k.
