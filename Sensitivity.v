@@ -2032,6 +2032,20 @@ destruct (lt_dec j (2 ^ n)) as [Hjn| Hjn]. {
       }
       rewrite Z.add_1_r.
       rewrite Nat2Z.inj_succ; f_equal.
+      clear Hi.
+      destruct n; [ easy | clear Hnz ].
+      destruct n. {
+        cbn in Hin; cbn.
+        destruct i; [ easy | ].
+        destruct i; [ easy | flia Hin ].
+      }
+      destruct n. {
+        cbn in Hin.
+        destruct i; [ easy | ].
+        destruct i; [ easy | ].
+        destruct i; [ easy | ].
+        destruct i; [ easy | flia Hin ].
+      }
 ...
 
 Definition charac_polyn {A} {n : nat} (M : @matrix A) := det (M - x * I).
