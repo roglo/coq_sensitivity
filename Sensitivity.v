@@ -1999,6 +1999,10 @@ destruct (lt_dec j (2 ^ n)) as [Hjn| Hjn]. {
     rewrite Nat.add_comm, Nat.add_sub.
     destruct (lt_dec j (2 ^ n)) as [H| H]; [ easy | flia Hjn H].
   }
+  clear f Hf.
+  destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
+    destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+      subst j; clear Hj Hjn.
 ...
 cbn - [ summation ].
 rewrite Nat.add_0_r.
