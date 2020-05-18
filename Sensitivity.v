@@ -2003,91 +2003,35 @@ destruct (lt_dec j (2 ^ n)) as [Hjn| Hjn]. {
   destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     destruct (Nat.eq_dec i j) as [Hij| Hij]. {
       subst j; clear Hj Hjn.
-...
-cbn - [ summation ].
-rewrite Nat.add_0_r.
-rename j into k.
-subst a.
-revert i k Hi Hj.
-induction n; intros. {
-  cbn in Hi, Hj.
-  cbn; rewrite Z.add_0_r.
-  destruct i. {
-    cbn; rewrite Z.add_0_r.
-    destruct k; [ easy | cbn ].
-    destruct k; [ easy | flia Hj ].
-  }
-  destruct i; [ | flia Hi ].
-  destruct k; [ easy | ].
-  destruct k; [ easy | flia Hj ].
-}
-remember (S n) as n1.
-(*
-Compute (let '(i, k, n1) := (2, 2, 4) in (Σ (j = 0, 2 ^ n1 + 2 ^ n1), (matel (A (S n1)) i j * matel (A (S n1)) j k)%Z)%Rng = (if Nat.eq_dec i k then Z.pos (Pos.of_succ_nat n1) else 0%Z)).
-Compute (let '(i, k, n1) := (0, 0, 3) in map (λ j, (matel (A (S n1)) i j * matel (A (S n1)) j k)%Z) (seq 0 (2 ^ n1 + 2 ^ n1))).
-Compute (let '(i, k, n1) := (1, 1, 3) in map (λ j, (matel (A (S n1)) i j * matel (A (S n1)) j k)%Z) (seq 0 (2 ^ n1 + 2 ^ n1))).
-*)
-remember (A (S n1)) as a eqn:Ha; cbn - [ summation ].
-destruct n1; [ easy | ].
-apply Nat.succ_inj in Heqn1; subst n1.
-subst a.
-remember (S n) as n1; cbn - [ summation A ]; subst n1.
-destruct (lt_dec i (2 ^ S n)) as [Hin| Hin]. {
-  rewrite (summation_split (2 ^ n)).
-  rename i into j.
-  remember (S n) as n1; cbn - [ summation ]; subst n1.
-...
-(* A (S n) from A n ? *)
-...
-intros * Hi Hj.
-revert i j Hi Hj.
-induction n; intros. {
-  cbn in Hi, Hj; cbn.
-  destruct i; [ now destruct j | ].
-  destruct i; [ cbn | flia Hi ].
-  destruct j; [ easy | ].
-  destruct j; [ easy | flia Hj ].
-}
-remember (A (S n)) as a eqn:Ha.
-cbn in Ha.
-destruct n. {
-  subst a; cbn in Hi, Hj |-*.
-  destruct i. {
-    cbn.
-    destruct j; [ easy | cbn ].
-    destruct j; [ easy | cbn ].
-    now destruct j.
-  }
-  destruct i; [ | flia Hi ].
-  do 2 rewrite Z.mul_0_l, Z.add_0_l.
-  rewrite Z.mul_1_l, Z.add_0_r.
-  destruct j; [ easy | ].
-  destruct j; [ easy | flia Hj ].
-}
-remember (S n) as n1 eqn:Hn1.
-cbn - [ mat_mul summation ].
-rewrite Nat.add_0_r.
-rewrite Zpos_P_of_succ_nat.
-destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-  subst j; clear Hj.
-  cbn - [ summation ].
-Compute (list_of_mat 8 8 (A 3)).
-Compute (list_of_mat 4 4 (A 3)).
-...
-subst a.
-remember (S (S n)) as ssn; cbn - [ summation ]; subst ssn.
-rewrite Nat.add_0_r.
-destruct (lt_dec i (2 ^ n + 2 ^ n)) as [Hin| Hin]. {
-...
-cbn - [ "^" summation ].
-remember (S n) as sn; cbn - [ summation ]; subst sn.
-(*
-rewrite Nat.add_0_r.
-unfold mat_mul in IHn.
-cbn - [ "^" summation ] in IHn.
-*)
-Compute (let n := 3%nat in list_of_mat (2 ^ n)%nat (2 ^ n) (mat_mul (2 ^ n) (A n) (A n))).
-
+      replace
+        (Σ (k = 0, 2 ^ n),
+         (if Nat.eq_dec i k then 1%Z else 0%Z) *
+         (if Nat.eq_dec k i then 1%Z else 0%Z))%Rng with 1%Z. 2: {
+        rewrite (summation_split i). 2: {
+          split; [ flia | ].
+          now apply Nat.lt_le_incl.
+        }
+        destruct i. {
+          rewrite summation_only_one, Nat.add_0_l.
+          rewrite all_0_summation_0; [ easy | ].
+          intros j Hj.
+          destruct (Nat.eq_dec 0 j) as [H| H]; [ flia Hj H | easy ].
+        }
+        rewrite summation_split_last; [ | flia ].
+        rewrite all_0_summation_0. 2: {
+          intros j Hj.
+          destruct (Nat.eq_dec (S i) j) as [H| H]; [ flia Hj H | clear H ].
+          destruct (Nat.eq_dec j (S i)) as [H| H]; [ flia Hj H | easy ].
+        }
+        rewrite all_0_summation_0. 2: {
+          intros j Hj.
+          destruct (Nat.eq_dec (S i) j) as [H| H]; [ flia Hj H | clear H ].
+          destruct (Nat.eq_dec j (S i)) as [H| H]; [ flia Hj H | easy ].
+        }
+        now destruct (Nat.eq_dec (S i) (S i)).
+      }
+      rewrite Z.add_1_r.
+      rewrite Nat2Z.inj_succ; f_equal.
 ...
 
 Definition charac_polyn {A} {n : nat} (M : @matrix A) := det (M - x * I).
