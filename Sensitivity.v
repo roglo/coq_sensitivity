@@ -2033,6 +2033,8 @@ destruct (lt_dec j (2 ^ n)) as [Hjn| Hjn]. {
       rewrite Z.add_1_r.
       rewrite Nat2Z.inj_succ; f_equal.
       clear Hi.
+(* il faut le couper en deux, hein *)
+...
       destruct n; [ easy | clear Hnz ].
       destruct n. {
         cbn in Hin; cbn.
