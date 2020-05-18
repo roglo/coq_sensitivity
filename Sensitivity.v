@@ -1784,12 +1784,30 @@ Compute (let _ := Z_ring in det 3 (mat_of_list 0%Z [[-1; 0; -3]; [-4; 4; -5]; [-
 (*
   "Lemma 2.2. We define a sequence of symmetric square matrices
    iteratively as follows,
-               ⌈ 0 1 ⌉           ⌈ A_{n-1}   I       ⌉
-         A₁ =  ⌋ 1 0 ⌊    A_n =  ⌋ I        -A_{n-1} ⌊
+               ⌈ 0 1 ⌉          ⌈ A_{n-1}   I       ⌉
+         A₁ =  ⌊ 1 0 ⌋   A_n =  ⌊ I        -A_{n-1} ⌋
 
     Then An is a 2^n × 2 ^n matrix whose eigenvalues are √n of
     multiplicity 2^{n-1}, and -√n of multiplicity 2^{n-1}."
 *)
+
+Definition submat {T} (M : @matrix T) istart jstart :=
+  {| matel i j := matel M (i + istart) (j + jstart) |}.
+
+(* attempt to make matrices of matrices in order to be able to manipulate
+   the A_n function of A_{n-1} like above... but it seems to be complicated;
+   first, I need to use the multiplication of such matrices (mat_mul) but
+   for that, I need to build mat_ring, a lot of proofs to do! *)
+
+Theorem even_submat_mul : ∀ T (R : ring T) n (M M' : @matrix T) i j,
+  i < 2 * n
+  → j < 2 * n
+  → matel (mat_mul n M M') i j =
+       matel
+         (@mat_mul (@matrix T) mat_ring 2
+            {| matel i1 j1 := matel (@submat T M 0 0) i1 j1 |}
+            {| matel i1 j1 := matel (@submat T M' 0 0) i1 j1 |}) i j.
+...
 
 Fixpoint A n :=
   match n with
@@ -1929,6 +1947,9 @@ induction n; intros. {
   destruct k; [ easy | flia Hj ].
 }
 remember (S n) as n1.
+Compute (let '(i, k, n1) := (2, 2, 4) in (Σ (j = 0, 2 ^ n1 + 2 ^ n1), (matel (A (S n1)) i j * matel (A (S n1)) j k)%Z)%Rng = (if Nat.eq_dec i k then Z.pos (Pos.of_succ_nat n1) else 0%Z)).
+Compute (let '(i, k, n1) := (0, 0, 3) in map (λ j, (matel (A (S n1)) i j * matel (A (S n1)) j k)%Z) (seq 0 (2 ^ n1 + 2 ^ n1))).
+Compute (let '(i, k, n1) := (1, 1, 3) in map (λ j, (matel (A (S n1)) i j * matel (A (S n1)) j k)%Z) (seq 0 (2 ^ n1 + 2 ^ n1))).
 remember (A (S n1)) as a eqn:Ha; cbn - [ summation ].
 destruct n1; [ easy | ].
 apply Nat.succ_inj in Heqn1; subst n1.
