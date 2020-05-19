@@ -2046,30 +2046,42 @@ Compute (let (n, i) := (3, 5) in map (λ k, (matel (A n) i k * matel (A n) k i)%
          now rewrite A_symm.
        }
        destruct n; [ easy | clear Hnz ].
-       rewrite (summation_split (2 ^ n - 1)).
-       rewrite Nat.sub_add. 2: {
-         now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-       }
-       destruct n. {
+       revert i Hin.
+       induction n; intros. {
          cbn in Hin.
          destruct i; [ easy | ].
          destruct i; [ easy | flia Hin ].
        }
-       remember (S (S n)) as sn2; remember (S n) as sn; cbn - [ summation ]; subst sn sn2.
+       remember (2 ^ S (S n)) as n1; remember (S n) as n2.
+       cbn - [ summation ]; subst.
+       remember (2 ^ S (S n)) as n1; remember (S n) as n2.
+       cbn - [ summation ]; subst.
+       destruct (lt_dec i (2 ^ S n)) as [Hisn| Hisn]. {
+       rewrite (summation_split (2 ^ S n - 1)). 2: {
+         split; [ flia | cbn; flia ].
+       }
+       rewrite Nat.sub_add. 2: {
+         now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+       }
+       replace (Σ (_ = _, _), _)%Rng with
+           (Σ (k = 0, 2 ^ S n - 1),
+            matel (A (S n)) i k * matel (A (S n)) i k)%Rng. 2: {
+         apply summation_compat.
+         intros k Hk.
+         assert (Hz : 2 ^ S n ≠ 0) by now apply Nat.pow_nonzero.
+         destruct (lt_dec k (2 ^ S n)) as [H| H]; [ easy | flia Hk H Hz ].
+       }
+       rewrite IHn; [ | easy ].
+       replace (Σ (_ = _, _), _)%Rng with
+           (Σ (k = 2 ^ S n, 2 ^ S (S n) - 1),
+            ((if Nat.eq_dec i (k - 2 ^ S n) then 1 else 0) *
+             (if Nat.eq_dec i (k - 2 ^ S n) then 1 else 0)))%Rng. 2: {
+         apply summation_compat.
+         intros k Hk.
+         destruct (lt_dec k (2 ^ S n)) as [H| H]; [ flia Hk H | easy ].
+       }
 ...
-      destruct n; [ easy | clear Hnz ].
-      destruct n. {
-        cbn in Hin; cbn.
-        destruct i; [ easy | ].
-        destruct i; [ easy | flia Hin ].
-      }
-      destruct n. {
-        cbn in Hin.
-        destruct i; [ easy | ].
-        destruct i; [ easy | ].
-        destruct i; [ easy | ].
-        destruct i; [ easy | flia Hin ].
-      }
+       rewrite (summation_shift (2 ^ S n)).
 ...
 
 Definition charac_polyn {A} {n : nat} (M : @matrix A) := det (M - x * I).
