@@ -2257,6 +2257,19 @@ Compute (let '(i, j, n) := (0, 1, 3) in map (λ k, (matel (A n) i k * matel (A n
         }
         rewrite IHn; [ | easy | easy | easy ].
         rewrite Nat.sub_add; [ | flia Hz ].
+        replace (Σ (_ = _, _), _)%Rng with
+          (Σ (k = 2 ^ S n, 2 ^ S n + 2 ^ S n - 1),
+           ((if Nat.eq_dec i (k - 2 ^ S n) then 1 else 0) *
+            (if Nat.eq_dec j (k - 2 ^ S n) then 1 else 0)))%Rng. 2: {
+          apply summation_compat; intros k Hk.
+          destruct (lt_dec k (2 ^ S n)) as [H| H]; [ flia Hk H | easy ].
+        }
+        rewrite all_0_summation_0; [ easy | ].
+        intros k Hk.
+        destruct (Nat.eq_dec i (k - 2 ^ S n)) as [Hikn| Hikn]; [ | easy ].
+        destruct (Nat.eq_dec j (k - 2 ^ S n)) as [Hjkn| Hjkn]; [ | easy ].
+        now rewrite <- Hjkn in Hikn.
+      }
 ...
     destruct (lt_dec i j) as [Hilj| H]. {
       rewrite (summation_split i); [ | flia Hin ].
