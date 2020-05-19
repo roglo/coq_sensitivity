@@ -2213,24 +2213,26 @@ Compute (let (n, i) := (3, 5) in map (λ k, (matel (A n) i k * matel (A n) k i)%
     clear H.
     rewrite rng_mul_0_l, rng_add_0_r.
 Compute (let '(i, j, n) := (1, 2, 3) in map (λ k, (matel (A n) i k * matel (A n) k j)%Rng) (seq 0 8)).
+Compute (let '(i, j, n) := (2, 1, 3) in map (λ k, (matel (A n) i k * matel (A n) k j)%Rng) (seq 0 8)).
 Compute (let '(i, j, n) := (0, 1, 3) in map (λ k, (matel (A n) i k * matel (A n) k j)%Rng) (seq 0 8)).
-     destruct (lt_dec i j) as [Hilj| H]. {
-       rewrite (summation_split i); [ | flia Hin ].
-       destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
-         subst i.
-         rewrite summation_only_one.
-         rewrite A_i_i, rng_mul_0_l, rng_add_0_l.
-         destruct (Nat.eq_dec 0 0) as [H| H]; [ clear H | easy ].
-         destruct (Nat.eq_dec 0 j) as [H| H]; [ easy | clear H ].
-         rewrite rng_mul_0_r, rng_add_0_l.
-         replace (Σ (_ = _, _), _)%Rng with
-           (Σ (i = 1, 2 ^ n - 1),
-            matel (A n) 0 i * matel (A n) i j)%Rng. 2: {
-           apply summation_compat.
-           intros k Hk.
-           destruct (Nat.eq_dec 0 k) as [H| H]; [ flia Hk H | ].
-           now rewrite rng_mul_0_l, rng_add_0_r.
-         }
+...
+    destruct (lt_dec i j) as [Hilj| H]. {
+      rewrite (summation_split i); [ | flia Hin ].
+      destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+        subst i.
+        rewrite summation_only_one.
+        rewrite A_i_i, rng_mul_0_l, rng_add_0_l.
+        destruct (Nat.eq_dec 0 0) as [H| H]; [ clear H | easy ].
+        destruct (Nat.eq_dec 0 j) as [H| H]; [ easy | clear H ].
+        rewrite rng_mul_0_r, rng_add_0_l.
+        replace (Σ (_ = _, _), _)%Rng with
+            (Σ (i = 1, 2 ^ n - 1),
+             matel (A n) 0 i * matel (A n) i j)%Rng. 2: {
+          apply summation_compat.
+          intros k Hk.
+          destruct (Nat.eq_dec 0 k) as [H| H]; [ flia Hk H | ].
+          now rewrite rng_mul_0_l, rng_add_0_r.
+        }
 ...
 
 Definition charac_polyn {A} {n : nat} (M : @matrix A) := det (M - x * I).
