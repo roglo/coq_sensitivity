@@ -2229,6 +2229,19 @@ Compute (let '(i, j, n) := (0, 1, 3) in map (λ k, (matel (A n) i k * matel (A n
       rewrite rng_mul_0_l, rng_add_0_r.
       now rewrite (A_symm _ k).
     }
+    clear Hi Hj.
+    destruct n; [ easy | clear Hnz ].
+    revert i j Hin Hjn Hij.
+    induction n; intros. {
+      cbn in Hin, Hjn.
+      destruct i. {
+        destruct j; [ easy | ].
+        destruct j; [ easy | flia Hjn ].
+      }
+      destruct i; [ | flia Hin ].
+      destruct j; [ easy | ].
+      destruct j; [ easy | flia Hjn ].
+    }
 ...
     destruct (lt_dec i j) as [Hilj| H]. {
       rewrite (summation_split i); [ | flia Hin ].
