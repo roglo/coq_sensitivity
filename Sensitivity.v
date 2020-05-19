@@ -2124,6 +2124,14 @@ Compute (let (n, i) := (3, 5) in map (λ k, (matel (A n) i k * matel (A n) k i)%
            destruct (lt_dec k (2 ^ S n)) as [H| H]; [ easy | flia Hk H Hz ].
          }
 ...
+         rewrite (summation_split (i - 2 ^ S n)). (*2: {
+           split; [ flia | ].
+           apply -> Nat.succ_le_mono.
+           apply Nat.sub_le_mono_r.
+           remember (S n) as sn; cbn; subst sn.
+           flia Hisn.
+         }*)
+...
 
 Definition charac_polyn {A} {n : nat} (M : @matrix A) := det (M - x * I).
 
