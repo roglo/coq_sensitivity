@@ -2033,7 +2033,29 @@ destruct (lt_dec j (2 ^ n)) as [Hjn| Hjn]. {
       rewrite Z.add_1_r.
       rewrite Nat2Z.inj_succ; f_equal.
       clear Hi.
-(* il faut le couper en deux, hein *)
+Compute (let (n, i) := (3, 7) in (Σ (k = 0, 2 ^ n - 1), matel (A n) i k * matel (A n) k i)%Rng = Z.of_nat n).
+Compute (let (n, i) := (3, 7) in map (λ k, (matel (A n) i k * matel (A n) k i)%Rng) (seq 0 (2 ^ n))).
+Compute (let (n, i) := (3, 6) in map (λ k, (matel (A n) i k * matel (A n) k i)%Rng) (seq 0 (2 ^ n))).
+Compute (let (n, i) := (3, 5) in map (λ k, (matel (A n) i k * matel (A n) k i)%Rng) (seq 0 (2 ^ n))).
+       replace
+         ((Σ (k = 0, 2 ^ n - 1), matel (A n) i k * matel (A n) k i)%Rng)
+       with
+         ((Σ (k = 0, 2 ^ n - 1), matel (A n) i k * matel (A n) i k)%Rng). 2: {
+         apply summation_compat.
+         intros j Hj.
+         now rewrite A_symm.
+       }
+       destruct n; [ easy | clear Hnz ].
+       rewrite (summation_split (2 ^ n - 1)).
+       rewrite Nat.sub_add. 2: {
+         now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+       }
+       destruct n. {
+         cbn in Hin.
+         destruct i; [ easy | ].
+         destruct i; [ easy | flia Hin ].
+       }
+       remember (S (S n)) as sn2; remember (S n) as sn; cbn - [ summation ]; subst sn sn2.
 ...
       destruct n; [ easy | clear Hnz ].
       destruct n. {
