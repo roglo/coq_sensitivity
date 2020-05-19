@@ -2106,7 +2106,23 @@ Compute (let (n, i) := (3, 5) in map (λ k, (matel (A n) i k * matel (A n) k i)%
          }
          cbn.
          now rewrite Pos.add_1_r.
-       }
+       } {
+         apply Nat.nlt_ge in Hisn.
+         rewrite (summation_split (2 ^ S n - 1)). 2: {
+           split; [ flia | cbn; flia ].
+         }
+         rewrite Nat.sub_add. 2: {
+           now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+         }
+         replace (Σ (_ = _, _), _)%Rng with
+             (Σ (k = 0, 2 ^ S n - 1),
+              (if Nat.eq_dec (i - 2 ^ S n) k then 1 else 0) *
+              (if Nat.eq_dec (i - 2 ^ S n) k then 1 else 0))%Rng. 2: {
+           apply summation_compat.
+           intros k Hk.
+           assert (Hz : 2 ^ S n ≠ 0) by now apply Nat.pow_nonzero.
+           destruct (lt_dec k (2 ^ S n)) as [H| H]; [ easy | flia Hk H Hz ].
+         }
 ...
 
 Definition charac_polyn {A} {n : nat} (M : @matrix A) := det (M - x * I).
