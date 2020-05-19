@@ -2156,12 +2156,55 @@ Compute (let (n, i) := (3, 5) in map (λ k, (matel (A n) i k * matel (A n) k i)%
            rewrite IHn; [ | now apply Nat.neq_0_lt_0, Nat.pow_nonzero ].
            symmetry; apply Zpos_P_of_succ_nat.
          }
-         rewrite (summation_split (i - 2 ^ S (n) - 1)).
+         remember (S n) as sn; cbn in Hin; subst sn.
+         rewrite (summation_split (i - 2 ^ S (n) - 1)). 2: {
+           split; [ flia | flia Hin ].
+         }
          rewrite all_0_summation_0. 2: {
            intros k Hk.
            destruct (Nat.eq_dec (i - 2 ^ S n) k) as [H| H]; [ | easy ].
            flia Hisn Hiz Hk H.
          }
+         rewrite Nat.sub_add; [ | flia Hisn Hiz ].
+         rewrite summation_split_first; [ | flia Hin ].
+         destruct (Nat.eq_dec (i - 2 ^ S n) (i - 2 ^ S n)) as [H| H]. 2: {
+           easy.
+         }
+         clear H.
+         rewrite all_0_summation_0. 2: {
+           intros k Hk.
+           destruct (Nat.eq_dec (i - 2 ^ S n) k) as [H| H]; [ | easy ].
+           flia Hisn Hiz Hk H.
+         }
+         replace (Σ (_ = _, _), _)%Rng with
+             (Σ (k = 2 ^ S n, 2 ^ S (S n) - 1),
+              ((matel (A (S n)) (i - 2 ^ S n) (k - 2 ^ S n)) *
+               (matel (A (S n)) (i - 2 ^ S n) (k - 2 ^ S n))))%Rng. 2: {
+           apply summation_compat.
+           intros k Hk.
+           destruct (lt_dec k (2 ^ S n)) as [H| H]; [ flia Hk H | ].
+           rewrite rng_mul_opp_l, rng_mul_opp_r.
+           now rewrite rng_opp_involutive.
+         }
+         rewrite summation_shift; [ | cbn; flia ].
+         replace (2 ^ S (S n) - 1 - 2 ^ S n) with (2 ^ S n - 1). 2: {
+           cbn; flia.
+         }
+         replace (Σ (_ = _, _), _)%Rng with
+           (Σ (k = 0, 2 ^ S n - 1),
+            matel (A (S n)) (i - 2 ^ S n) k *
+            matel (A (S n)) (i - 2 ^ S n) k)%Rng. 2: {
+           apply summation_compat.
+           intros k Hk.
+           now rewrite Nat.add_comm, Nat.add_sub.
+         }
+         rewrite IHn; [ | flia Hin ].
+         rewrite Z.mul_1_l, Z.add_0_r, Z.add_1_l.
+         symmetry; apply Zpos_P_of_succ_nat.
+       }
+    }
+    rewrite all_0_summation_0. 2: {
+      intros k Hk.
 ...
 
 Definition charac_polyn {A} {n : nat} (M : @matrix A) := det (M - x * I).
