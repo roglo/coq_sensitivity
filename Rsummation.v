@@ -356,7 +356,7 @@ now replace (S k - b) with 0 by flia Hkb.
 Qed.
 
 Theorem summation_split : ∀ j g b k,
-  b ≤ j ≤ k
+  b ≤ S j ≤ S k
   → (Σ (i = b, k), g i = Σ (i = b, j), g i + Σ (i = j+1, k), g i)%Rng.
 Proof.
 intros * (Hbj, Hjk).
