@@ -2216,19 +2216,18 @@ Compute (let '(i, j, n) := (1, 2, 3) in map (λ k, (matel (A n) i k * matel (A n
 Compute (let '(i, j, n) := (2, 1, 3) in map (λ k, (matel (A n) i k * matel (A n) k j)%Rng) (seq 0 8)).
 Compute (let '(i, j, n) := (0, 1, 3) in map (λ k, (matel (A n) i k * matel (A n) k j)%Rng) (seq 0 8)).
     replace (Σ (_ = _, _), _)%Rng with
-      (Σ (k = 0, 2 ^ n - 1),
-       (matel (A n) i k * matel (A n) j k +
-        (if Nat.eq_dec i k then 1%Z else 0%Z) *
-        (if Nat.eq_dec j k then 1%Z else 0%Z)))%Rng. 2: {
+      (Σ (k = 0, 2 ^ n - 1), matel (A n) i k * matel (A n) j k)%Rng. 2: {
       apply summation_compat.
       intros k Hk.
-      rewrite (A_symm _ j); f_equal; f_equal.
-      destruct (Nat.eq_dec j k) as [Hjk| Hjk]. {
-        symmetry in Hjk.
-        now destruct (Nat.eq_dec k j).
+      destruct (Nat.eq_dec i k) as [Hik| Hik]. {
+        destruct (Nat.eq_dec k j) as [Hkj| Hkj]. {
+          now rewrite Hik in Hij.
+        }
+        rewrite rng_mul_0_r, rng_add_0_r.
+        now rewrite (A_symm _ k).
       }
-      destruct (Nat.eq_dec k j) as [H| H]; [ | easy ].
-      now symmetry in H.
+      rewrite rng_mul_0_l, rng_add_0_r.
+      now rewrite (A_symm _ k).
     }
 ...
     destruct (lt_dec i j) as [Hilj| H]. {
