@@ -2123,14 +2123,39 @@ Compute (let (n, i) := (3, 5) in map (λ k, (matel (A n) i k * matel (A n) k i)%
            assert (Hz : 2 ^ S n ≠ 0) by now apply Nat.pow_nonzero.
            destruct (lt_dec k (2 ^ S n)) as [H| H]; [ easy | flia Hk H Hz ].
          }
-...
-         rewrite (summation_split (i - 2 ^ S n)). (*2: {
-           split; [ flia | ].
-           apply -> Nat.succ_le_mono.
-           apply Nat.sub_le_mono_r.
-           remember (S n) as sn; cbn; subst sn.
-           flia Hisn.
-         }*)
+         destruct (Nat.eq_dec i (2 ^ S n)) as [Hiz| Hiz]. {
+           rewrite Hiz, Nat.sub_diag.
+           rewrite summation_split_first; [ | flia ].
+           destruct (Nat.eq_dec 0 0) as [H| H]; [ clear H | easy ].
+           rewrite all_0_summation_0. 2: {
+             intros k Hk.
+             destruct (Nat.eq_dec 0 k) as [H| H]; [ flia Hk H | easy ].
+           }
+           replace (Σ (_ = _, _), _)%Rng with
+               (Σ (k = 2 ^ S n, 2 ^ S (S n) - 1),
+                ((matel (A (S n)) 0 (k - 2 ^ S n)) *
+                 (matel (A (S n)) 0 (k - 2 ^ S n))))%Rng. 2: {
+             apply summation_compat.
+             intros k Hk.
+             destruct (lt_dec k (2 ^ S n)) as [H| H]; [ flia Hk H | ].
+             rewrite rng_mul_opp_l, rng_mul_opp_r.
+             now rewrite rng_opp_involutive.
+           }
+           rewrite summation_shift; [ | cbn; flia ].
+           replace (2 ^ S (S n) - 1 - 2 ^ S n) with (2 ^ S n - 1). 2: {
+             cbn; flia.
+           }
+           replace (Σ (_ = _, _), _)%Rng with
+             (Σ (k = 0, 2 ^ S n - 1),
+              matel (A (S n)) 0 k * matel (A (S n)) 0 k)%Rng. 2: {
+             apply summation_compat.
+             intros k Hk.
+             now rewrite Nat.add_comm, Nat.add_sub.
+           }
+           rewrite Z.mul_1_l, Z.add_0_r, Z.add_1_l.
+           rewrite IHn; [ | now apply Nat.neq_0_lt_0, Nat.pow_nonzero ].
+           symmetry; apply Zpos_P_of_succ_nat.
+         }
 ...
 
 Definition charac_polyn {A} {n : nat} (M : @matrix A) := det (M - x * I).
