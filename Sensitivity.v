@@ -2156,6 +2156,12 @@ Compute (let (n, i) := (3, 5) in map (λ k, (matel (A n) i k * matel (A n) k i)%
            rewrite IHn; [ | now apply Nat.neq_0_lt_0, Nat.pow_nonzero ].
            symmetry; apply Zpos_P_of_succ_nat.
          }
+         rewrite (summation_split (i - 2 ^ S (n) - 1)).
+         rewrite all_0_summation_0. 2: {
+           intros k Hk.
+           destruct (Nat.eq_dec (i - 2 ^ S n) k) as [H| H]; [ | easy ].
+           flia Hisn Hiz Hk H.
+         }
 ...
 
 Definition charac_polyn {A} {n : nat} (M : @matrix A) := det (M - x * I).
