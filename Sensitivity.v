@@ -2242,6 +2242,18 @@ Compute (let '(i, j, n) := (0, 1, 3) in map (λ k, (matel (A n) i k * matel (A n
       destruct j; [ easy | ].
       destruct j; [ easy | flia Hjn ].
     }
+    remember (S n) as sn; cbn - [ summation ]; subst sn.
+    remember (S n) as sn; cbn - [ summation ]; subst sn.
+    rewrite Nat.add_0_r.
+    destruct (lt_dec i (2 ^ S n)) as [Hisn| Hisn]. {
+      destruct (lt_dec j (2 ^ S n)) as [Hjsn| Hjsn]. {
+        rewrite (summation_split (2 ^ S n - 1)).
+        replace (Σ (_ = _, _), _)%Rng with
+          (Σ (k = 0, 2 ^ S n - 1),
+           ((matel (A (S n)) i k) * (matel (A (S n)) j k)))%Rng. 2: {
+          apply summation_compat; intros k Hk.
+          assert (Hz : 2 ^ S n ≠ 0) by now apply Nat.pow_nonzero.
+          destruct (lt_dec k (2 ^ S n)) as [H| H]; [ | flia Hk Hz H ].
 ...
     destruct (lt_dec i j) as [Hilj| H]. {
       rewrite (summation_split i); [ | flia Hin ].
