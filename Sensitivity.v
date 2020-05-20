@@ -2311,6 +2311,41 @@ Compute (let '(i, j, n) := (0, 1, 3) in map (λ k, (matel (A n) i k * matel (A n
         clear j Hjn Hij Hjsn Hl.
         rename l into j; rename Hlsn into Hjsn.
         move Hjsn before Hisn.
+        destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+          subst j.
+          apply all_0_summation_0.
+          intros k Hk.
+          apply Z.sub_diag.
+        }
+        destruct (lt_dec i j) as [Hlij| Hlij]. {
+          destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+            subst i.
+            rewrite summation_split_first; [ | flia ].
+            rewrite A_i_i, rng_mul_0_l, Z.sub_0_l.
+            destruct (Nat.eq_dec 0 0) as [H| H]; [ clear H | easy ].
+            rewrite rng_mul_1_r.
+            rewrite (summation_split (j - 1)) by flia Hjsn.
+            rewrite all_0_summation_0. 2: {
+              intros k Hk.
+              destruct (Nat.eq_dec j k) as [H| Hjk]; [ flia H Hk | ].
+              destruct (Nat.eq_dec 0 k) as [H| H]; [ flia H Hk | ].
+              now rewrite <- rng_mul_sub_distr_r, rng_mul_0_r.
+            }
+            rewrite Nat.sub_add; [ | easy ].
+            rewrite summation_split_first; [ | flia Hjsn ].
+            destruct (Nat.eq_dec j j) as [H| H]; [ clear H | easy ].
+            rewrite A_i_i, rng_mul_0_l, rng_sub_0_r.
+            rewrite all_0_summation_0. 2: {
+              intros k Hk.
+              destruct (Nat.eq_dec j k) as [H| H]; [ flia Hk H | clear H ].
+              destruct (Nat.eq_dec 0 k) as [H| H]; [ flia Hk H | clear H ].
+              now rewrite <- rng_mul_sub_distr_r, rng_mul_0_r.
+            }
+            rewrite rng_add_0_l, rng_mul_1_r, rng_add_0_r.
+            rewrite A_symm.
+            apply rng_add_opp_l.
+          }
+          rewrite (summation_split (i - 1)).
 ...
 
 Definition charac_polyn {A} {n : nat} (M : @matrix A) := det (M - x * I).
