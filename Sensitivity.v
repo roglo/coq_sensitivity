@@ -2344,8 +2344,8 @@ Compute (let '(i, j, n) := (0, 1, 3) in map (λ k, (matel (A n) i k * matel (A n
             rewrite rng_add_0_l, rng_mul_1_r, rng_add_0_r.
             rewrite A_symm.
             apply rng_add_opp_l.
-          }
-          rewrite (summation_split (i - 1)).
+          } {
+            rewrite (summation_split (i - 1)).
 ...
 
 Definition charac_polyn {A} {n : nat} (M : @matrix A) := det (M - x * I).
