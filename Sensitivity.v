@@ -1700,6 +1700,10 @@ Print GRing.Ring.type.
 
 Require Import Ring2 Rsummation Rpolynomial2.
 
+(* the type "matrix" defines infinite sized matrices; the limited size
+   is given by functions such that mat_mul which, multiplying a m×n
+   matrix with a n×p matrix, n is given as parameter of mat_mul *)
+
 Record matrix A := { matel : nat → nat → A }.
 
 Arguments matel {_}.
@@ -1862,7 +1866,7 @@ Fixpoint A {T} {ro : ring_op T} n :=
   | 0 => mat_of_list 0%Rng []
   | 1 => mat_of_list 0%Rng [[0; 1]; [1; 0]]%Rng
   | S n' =>
-      even_mat_of_mat_mat 2
+      even_mat_of_mat_mat (2 ^ n')
         {| matel i j :=
              if Nat.eq_dec i 0 then
                if Nat.eq_dec j 0 then A n' else I
@@ -1916,27 +1920,6 @@ Compute (list_of_mat 4 4 (old_A 2)).
 Compute (list_of_mat 4 4 (let _ := Z_ring_op in A 2)).
 Compute (list_of_mat 8 8 (old_A 3)).
 Compute (list_of_mat 8 8 (let _ := Z_ring_op in A 3)).
-...
-     = [[0; 1; 1; 0;  1; 0; 0; 0];
-        [1; 0; 0; 1;  0; 1; 0; 0];
-        [1; 0; 0; -1; 0; 0; 1; 0];
-        [0; 1; -1; 0; 0; 0; 0; 1];
-        [1; 0; 0; 0;  0; -1; -1; 0];
-        [0; 1; 0; 0; -1; 0; 0; -1];
-        [0; 0; 1; 0; -1; 0; 0; 1];
-        [0; 0; 0; 1;  0; -1; 1; 0]]
-     : list (list Z)
-...
-le new A est faux (regarder le I)
-     = [[0; 1; 1; 0;   1; 0; 1; 0];
-        [1; 0; 0; 1;   0; 1; 0; 1];
-        [1; 0; 0; -1;  0; -1; 0; -1];
-        [0; 1; -1; 0; -1; 0; -1; 0];
-        [1; 0; 0; -1;  0; -1; 0; -1];
-        [0; 1; -1; 0; -1; 0; -1; 0];
-        [1; 0; 0; -1;  0; -1; 0; -1];
-        [0; 1; -1; 0; -1; 0; -1; 0]]
-     : list (list Z)
 Compute (list_of_mat 16 16 (old_A 4)).
 Compute (list_of_mat 16 16 (let _ := Z_ring_op in A 4)).
 
