@@ -1830,19 +1830,27 @@ rewrite <- Nat.div_mod; [ | easy ].
 easy.
 Qed.
 
-Definition eqmt_of_eqt T (eqt : T → T → Prop) M1 M2 :=
-  ∀ i j, eqt (matel M1 i j) (matel M2 i j).
+Definition eqmt_of_eqt T (eqt : T → T → Prop) n M1 M2 :=
+  ∀ i j, i < n → j < n → eqt (matel M1 i j) (matel M2 i j).
 
 Theorem mat_mat_even_mat : ∀ T eqt (MM : matrix (matrix T)) n,
-  n ≠ 0
-  → mat_eq (eqmt_of_eqt T eqt)
+  Equivalence eqt
+  → n ≠ 0
+  → mat_eq (eqmt_of_eqt T eqt n)
        (mat_mat_of_even_mat n (even_mat_of_mat_mat n MM)) MM.
 Proof.
-intros * Hnz i j k l; cbn.
+intros * Heq Hnz i j k l Hk Hl; cbn.
 rewrite Nat.div_add; [ | easy ].
 rewrite Nat.div_add; [ | easy ].
 rewrite Nat.mod_add; [ | easy ].
 rewrite Nat.mod_add; [ | easy ].
+rewrite Nat.div_small; [ | easy ].
+rewrite Nat.div_small; [ | easy ].
+rewrite Nat.mod_small; [ | easy ].
+rewrite Nat.mod_small; [ | easy ].
+easy.
+Qed.
+
 ...
 
 Axiom mat_ring : ∀ T, ring (matrix T).
