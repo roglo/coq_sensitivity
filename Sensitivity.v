@@ -1888,6 +1888,8 @@ Definition mat_ring_op {T} {ro : ring_op T} n :=
 
 ...
 
+(* previous version: worked, but had to be terminated *)
+
 Fixpoint A n :=
   match n with
   | 0 => mat_of_list 0%Z []
