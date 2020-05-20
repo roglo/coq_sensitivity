@@ -1857,11 +1857,10 @@ Definition I {T} {ro : ring_op T} :=
 Definition mat_opp {T} {ro : ring_op T} (M : matrix T) :=
   {| matel i j := rng_opp (matel M i j) |}.
 
-Fixpoint A n :=
-  let _ := Z_ring_op in
+Fixpoint A {T} {ro : ring_op T} n :=
   match n with
-  | 0 => mat_of_list 0%Z []
-  | 1 => mat_of_list 0%Z [[0; 1]; [1; 0]]%Z
+  | 0 => mat_of_list 0%Rng []
+  | 1 => mat_of_list 0%Rng [[0; 1]; [1; 0]]%Rng
   | S n' =>
       even_mat_of_mat_mat 2
         {| matel i j :=
@@ -1870,9 +1869,6 @@ Fixpoint A n :=
              else
                if Nat.eq_dec j 0 then I else mat_opp (A n') |}
   end.
-
-(* let _ := Z_ring... do I limit "I" and "mat_opp" to ℤ or do I keep
-   them to any ring? *)
 
 Definition zero_mat {T} {ro : ring_op T} := {| matel _ _ := rng_zero |}.
 
