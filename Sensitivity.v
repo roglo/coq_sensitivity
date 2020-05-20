@@ -1882,31 +1882,63 @@ Definition mat_ring_op {T} {ro : ring_op T} n :=
      rng_mul := mat_mul n;
      rng_opp := mat_opp |}.
 
-...
+Open Scope Z_scope.
+
+Compute (list_of_mat 2 2 (let _ := Z_ring_op in A 1)).
+Compute (list_of_mat 4 4 (let _ := Z_ring_op in A 2)).
+Compute (list_of_mat 8 8 (let _ := Z_ring_op in A 3)).
+Compute (list_of_mat 16 16 (let _ := Z_ring_op in A 4)).
+
+Close Scope Z_scope.
 
 (* previous version: worked, but had to be terminated *)
 
-Fixpoint A n :=
+Fixpoint old_A n :=
   match n with
   | 0 => mat_of_list 0%Z []
   | 1 => mat_of_list 0%Z [[0; 1]; [1; 0]]%Z
   | S n' =>
       {| matel i j :=
            if lt_dec i (2 ^ n') then
-             if lt_dec j (2 ^ n') then matel (A n') i j
+             if lt_dec j (2 ^ n') then matel (old_A n') i j
              else if Nat.eq_dec i (j - 2 ^ n') then 1%Z else 0%Z
            else
              if lt_dec j (2 ^ n') then
                if Nat.eq_dec (i - 2 ^ n') j then 1%Z else 0%Z
-             else (- matel (A n') (i - 2 ^ n') (j - 2 ^ n'))%Z |}
+             else (- matel (old_A n') (i - 2 ^ n') (j - 2 ^ n'))%Z |}
   end.
 
 Open Scope Z.
 
-Compute (list_of_mat 2 2 (A 1)).
-Compute (list_of_mat 4 4 (A 2)).
-Compute (list_of_mat 8 8 (A 3)).
-Compute (list_of_mat 16 16 (A 4)).
+Compute (list_of_mat 2 2 (old_A 1)).
+Compute (list_of_mat 2 2 (let _ := Z_ring_op in A 1)).
+Compute (list_of_mat 4 4 (old_A 2)).
+Compute (list_of_mat 4 4 (let _ := Z_ring_op in A 2)).
+Compute (list_of_mat 8 8 (old_A 3)).
+Compute (list_of_mat 8 8 (let _ := Z_ring_op in A 3)).
+...
+     = [[0; 1; 1; 0;  1; 0; 0; 0];
+        [1; 0; 0; 1;  0; 1; 0; 0];
+        [1; 0; 0; -1; 0; 0; 1; 0];
+        [0; 1; -1; 0; 0; 0; 0; 1];
+        [1; 0; 0; 0;  0; -1; -1; 0];
+        [0; 1; 0; 0; -1; 0; 0; -1];
+        [0; 0; 1; 0; -1; 0; 0; 1];
+        [0; 0; 0; 1;  0; -1; 1; 0]]
+     : list (list Z)
+...
+le new A est faux (regarder le I)
+     = [[0; 1; 1; 0;   1; 0; 1; 0];
+        [1; 0; 0; 1;   0; 1; 0; 1];
+        [1; 0; 0; -1;  0; -1; 0; -1];
+        [0; 1; -1; 0; -1; 0; -1; 0];
+        [1; 0; 0; -1;  0; -1; 0; -1];
+        [0; 1; -1; 0; -1; 0; -1; 0];
+        [1; 0; 0; -1;  0; -1; 0; -1];
+        [0; 1; -1; 0; -1; 0; -1; 0]]
+     : list (list Z)
+Compute (list_of_mat 16 16 (old_A 4)).
+Compute (list_of_mat 16 16 (let _ := Z_ring_op in A 4)).
 
 Close Scope Z.
 
