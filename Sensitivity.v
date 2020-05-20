@@ -2302,6 +2302,15 @@ Compute (let '(i, j, n) := (0, 1, 3) in map (λ k, (matel (A n) i k * matel (A n
           rewrite Nat.add_comm, Nat.add_sub.
           now rewrite (rng_mul_comm (matel _ (j - _) _)).
         }
+        remember (j - 2 ^ S n) as l eqn:Hl.
+        assert (Hlsn : l < 2 ^ S n). {
+          remember (S n) as sn; cbn in Hjn; subst sn.
+          flia Hl Hjn.
+        }
+        move l before j.
+        clear j Hjn Hij Hjsn Hl.
+        rename l into j; rename Hlsn into Hjsn.
+        move Hjsn before Hisn.
 ...
 
 Definition charac_polyn {A} {n : nat} (M : @matrix A) := det (M - x * I).
