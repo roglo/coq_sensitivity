@@ -2269,24 +2269,37 @@ Compute (let '(i, j, n) := (0, 1, 3) in map (λ k, (matel (A n) i k * matel (A n
         destruct (Nat.eq_dec i (k - 2 ^ S n)) as [Hikn| Hikn]; [ | easy ].
         destruct (Nat.eq_dec j (k - 2 ^ S n)) as [Hjkn| Hjkn]; [ | easy ].
         now rewrite <- Hjkn in Hikn.
-      }
-...
-    destruct (lt_dec i j) as [Hilj| H]. {
-      rewrite (summation_split i); [ | flia Hin ].
-      destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
-        subst i.
-        rewrite summation_only_one.
-        rewrite A_i_i, rng_mul_0_l, rng_add_0_l.
-        destruct (Nat.eq_dec 0 0) as [H| H]; [ clear H | easy ].
-        destruct (Nat.eq_dec 0 j) as [H| H]; [ easy | clear H ].
-        rewrite rng_mul_0_r, rng_add_0_l.
+      } {
+        apply Nat.nlt_ge in Hjsn.
+        rewrite (summation_split (2 ^ S n - 1)) by flia.
+        assert (Hz : 2 ^ S n ≠ 0) by now apply Nat.pow_nonzero.
         replace (Σ (_ = _, _), _)%Rng with
-            (Σ (i = 1, 2 ^ n - 1),
-             matel (A n) 0 i * matel (A n) i j)%Rng. 2: {
-          apply summation_compat.
-          intros k Hk.
-          destruct (Nat.eq_dec 0 k) as [H| H]; [ flia Hk H | ].
-          now rewrite rng_mul_0_l, rng_add_0_r.
+          (Σ (k = 0, 2 ^ S n - 1),
+           ((matel (A (S n)) i k) *
+            (if Nat.eq_dec (j - 2 ^ S n) k then 1 else 0)))%Rng. 2: {
+          apply summation_compat; intros k Hk.
+          destruct (lt_dec k (2 ^ S n)) as [H| H]; [ easy | flia Hk Hz H ].
+        }
+        rewrite Nat.sub_add; [ | flia Hz ].
+        replace (Σ (_ = 2 ^ S n, _), _)%Rng with
+          (Σ (k = 2 ^ S n, 2 ^ S n + 2 ^ S n - 1),
+           ((if Nat.eq_dec i (k - 2 ^ S n) then 1 else 0) *
+            (- matel (A (S n)) (j - 2 ^ S n) (k - 2 ^ S n))))%Rng. 2: {
+          apply summation_compat; intros k Hk.
+          destruct (lt_dec k (2 ^ S n)) as [H| H]; [ flia Hk H | easy ].
+        }
+        rewrite (summation_shift (2 ^ S n)); [ | flia ].
+        rewrite Nat_sub_sub_swap, Nat.add_sub.
+        rewrite <- summation_add_distr.
+        replace (Σ (_ = _, _), _)%Rng with
+          (Σ (k = 0, 2 ^ S n - 1),
+           (matel (A (S n)) i k *
+            (if Nat.eq_dec (j - 2 ^ S n) k then 1 else 0) -
+           (if Nat.eq_dec i k then 1 else 0) *
+            matel (A (S n)) (j - 2 ^ S n) k))%Rng. 2: {
+          apply summation_compat; intros k Hk.
+          rewrite rng_mul_opp_r, fold_rng_sub.
+          now rewrite Nat.add_comm, Nat.add_sub.
         }
 ...
 
