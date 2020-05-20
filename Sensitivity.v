@@ -1983,10 +1983,15 @@ Qed.
 Definition nI n :=
   {| matel i j := if Nat.eq_dec i j then Z.of_nat n else 0%Z |}.
 
+Definition fin_mat_eq {T} (eqt : T → T → Prop) u v (M M' : matrix T) :=
+  ∀ i j, i < u → j < v → eqt (matel M i j) (matel M' i j).
+
 Lemma lemma_2_A_n_2_eq_n_I (R := Z_ring_op) : ∀ n,
-  mat_eq eq (mat_mul (2 ^ n) (A n) (A n)) (nI n).
+  fin_mat_eq eq (2 ^ n) (2 ^ n)
+    (mat_mul (2 ^ n) (A n) (A n)) (nI n).
 Proof.
-intros * i j.
+intros * i j Hi Hj.
+...
 destruct n. {
   cbn.
   do 2 rewrite match_id; cbn.
@@ -2016,7 +2021,9 @@ induction n; intros. {
   rewrite nth_overflow; [ | cbn; flia ].
   destruct (Nat.eq_dec _ _) as [Hssi| Hssi]; [ | easy ].
   cbn.
+Print mat_eq.
 (* oops... *)
+...
 (* I think i and j are supposed to be less than 2^n *)
 ...
 
