@@ -1980,19 +1980,44 @@ Qed.
 
 (* "We prove by induction that A_n^2 = nI" *)
 
-... juste copié de la version précédente...
-... à voir...
-
 Definition nI n :=
   {| matel i j := if Nat.eq_dec i j then Z.of_nat n else 0%Z |}.
 
-Lemma lemma_2_A_n_2_eq_n_I (R := Z_ring) : ∀ n i j,
-  (i < 2 ^ n)%nat → (j < 2 ^ n)%nat
-  → matel (mat_mul (2 ^ n) (A n) (A n)) i j = matel (nI n) i j.
+Lemma lemma_2_A_n_2_eq_n_I (R := Z_ring_op) : ∀ n,
+  mat_eq eq (mat_mul (2 ^ n) (A n) (A n)) (nI n).
 Proof.
-intros * Hi Hj.
+intros * i j.
 destruct n. {
-
+  cbn.
+  do 2 rewrite match_id; cbn.
+  now destruct (Nat.eq_dec i j).
+}
+revert i j.
+induction n; intros. {
+  cbn.
+  destruct i. {
+    destruct j; [ easy | ].
+    destruct j; [ easy | cbn ].
+    rewrite match_id.
+    rewrite nth_overflow; [ easy | cbn; flia ].
+  }
+  destruct i. {
+    destruct j; [ easy | ].
+    destruct j; [ easy | cbn ].
+    rewrite match_id.
+    rewrite nth_overflow; [ easy | cbn; flia ].
+  }
+  rewrite match_id.
+  destruct j; [ easy | ].
+  destruct j; [ easy | ].
+  rewrite match_id.
+  rewrite nth_overflow; [ | cbn; flia ].
+  rewrite nth_overflow; [ | cbn; flia ].
+  rewrite nth_overflow; [ | cbn; flia ].
+  destruct (Nat.eq_dec _ _) as [Hssi| Hssi]; [ | easy ].
+  cbn.
+(* oops... *)
+(* I think i and j are supposed to be less than 2^n *)
 ...
 
 (* previous version: worked, but had to be terminated *)
