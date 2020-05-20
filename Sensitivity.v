@@ -1874,11 +1874,17 @@ Fixpoint A n :=
 (* let _ := Z_ring... do I limit id_mat and mat_opp to ℤ or do I keep
    them to any ring? *)
 
-Print ring_theory.
-...
+Definition zero_mat {T} {ro : ring_op T} := {| matel _ _ := rng_zero |}.
 
-Axiom mat_ring_op : ∀ T, ring_op (matrix T).
-...
+Definition mat_add {T} {ro : ring_op T} A B :=
+  {| matel i j := (matel A i j + matel B i j)%Rng |}.
+
+Definition mat_ring_op {T} {ro : ring_op T} n :=
+  {| rng_zero := zero_mat;
+     rng_one := id_mat;
+     rng_add := mat_add;
+     rng_mul := mat_mul n;
+     rng_opp := mat_opp |}.
 
 ...
 
