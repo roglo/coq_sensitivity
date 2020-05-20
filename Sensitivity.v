@@ -2295,11 +2295,12 @@ Compute (let '(i, j, n) := (0, 1, 3) in map (λ k, (matel (A n) i k * matel (A n
           (Σ (k = 0, 2 ^ S n - 1),
            (matel (A (S n)) i k *
             (if Nat.eq_dec (j - 2 ^ S n) k then 1 else 0) -
-           (if Nat.eq_dec i k then 1 else 0) *
-            matel (A (S n)) (j - 2 ^ S n) k))%Rng. 2: {
+           (matel (A (S n)) (j - 2 ^ S n) k *
+            (if Nat.eq_dec i k then 1 else 0))))%Rng. 2: {
           apply summation_compat; intros k Hk.
           rewrite rng_mul_opp_r, fold_rng_sub.
-          now rewrite Nat.add_comm, Nat.add_sub.
+          rewrite Nat.add_comm, Nat.add_sub.
+          now rewrite (rng_mul_comm (matel _ (j - _) _)).
         }
 ...
 
