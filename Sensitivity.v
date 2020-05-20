@@ -1822,33 +1822,27 @@ Theorem even_mat_mat_mat : ∀ T eqt (M : matrix T) n,
   → n ≠ 0
   → mat_eq eqt (even_mat_of_mat_mat n (mat_mat_of_even_mat n M)) M.
 Proof.
-intros * Heq Hnz i j.
-cbn; setoid_rewrite Nat.add_comm.
+intros * Heq Hnz i j; cbn.
+setoid_rewrite Nat.add_comm.
 setoid_rewrite Nat.mul_comm.
 rewrite <- Nat.div_mod; [ | easy ].
 rewrite <- Nat.div_mod; [ | easy ].
 easy.
 Qed.
 
-Definition eqmt_of_eqt T (eqt : T → T → Prop) : matrix T → matrix T → Prop.
-Proof.
-intros M1 M2.
-...
+Definition eqmt_of_eqt T (eqt : T → T → Prop) M1 M2 :=
+  ∀ i j, eqt (matel M1 i j) (matel M2 i j).
 
-Theorem mat_mat_even_mat : ∀ T eqmt (MM : matrix (matrix T)) n,
-  mat_eq eqmt (mat_mat_of_even_mat n (even_mat_of_mat_mat n MM)) MM.
+Theorem mat_mat_even_mat : ∀ T eqt (MM : matrix (matrix T)) n,
+  n ≠ 0
+  → mat_eq (eqmt_of_eqt T eqt)
+       (mat_mat_of_even_mat n (even_mat_of_mat_mat n MM)) MM.
 Proof.
-intros * i j.
-cbn.
-unfold submat.
-cbn.
-...
-cbn; setoid_rewrite Nat.add_comm.
-setoid_rewrite Nat.mul_comm.
-rewrite <- Nat.div_mod; [ | easy ].
-now rewrite <- Nat.div_mod.
-Qed.
-
+intros * Hnz i j k l; cbn.
+rewrite Nat.div_add; [ | easy ].
+rewrite Nat.div_add; [ | easy ].
+rewrite Nat.mod_add; [ | easy ].
+rewrite Nat.mod_add; [ | easy ].
 ...
 
 Axiom mat_ring : ∀ T, ring (matrix T).
