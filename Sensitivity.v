@@ -1991,40 +1991,22 @@ Lemma lemma_2_A_n_2_eq_n_I (R := Z_ring_op) : ∀ n,
     (mat_mul (2 ^ n) (A n) (A n)) (nI n).
 Proof.
 intros * i j Hi Hj.
-...
 destruct n. {
   cbn.
   do 2 rewrite match_id; cbn.
   now destruct (Nat.eq_dec i j).
 }
-revert i j.
+revert i j Hi Hj.
 induction n; intros. {
-  cbn.
+  cbn in Hi, Hj |-*.
   destruct i. {
     destruct j; [ easy | ].
-    destruct j; [ easy | cbn ].
-    rewrite match_id.
-    rewrite nth_overflow; [ easy | cbn; flia ].
+    destruct j; [ easy | flia Hj ].
   }
-  destruct i. {
-    destruct j; [ easy | ].
-    destruct j; [ easy | cbn ].
-    rewrite match_id.
-    rewrite nth_overflow; [ easy | cbn; flia ].
-  }
-  rewrite match_id.
+  destruct i; [ | flia Hi ].
   destruct j; [ easy | ].
-  destruct j; [ easy | ].
-  rewrite match_id.
-  rewrite nth_overflow; [ | cbn; flia ].
-  rewrite nth_overflow; [ | cbn; flia ].
-  rewrite nth_overflow; [ | cbn; flia ].
-  destruct (Nat.eq_dec _ _) as [Hssi| Hssi]; [ | easy ].
-  cbn.
-Print mat_eq.
-(* oops... *)
-...
-(* I think i and j are supposed to be less than 2^n *)
+  destruct j; [ easy | flia Hj ].
+}
 ...
 
 (* previous version: worked, but had to be terminated *)
