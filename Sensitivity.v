@@ -1895,6 +1895,33 @@ Compute (list_of_mat 16 16 (let _ := Z_ring_op in A 4)).
 
 Close Scope Z_scope.
 
+Context {T : Type}.
+Context {ro : ring_op T}.
+Context {rp : ring_prop}.
+
+Theorem A_i_i : ∀ n i, matel (A n) i i = 0%Rng.
+Proof.
+intros.
+revert i.
+induction n; intros; cbn. {
+  rewrite match_id.
+  rewrite nth_overflow; [ easy | cbn; flia ].
+}
+destruct n. {
+  cbn.
+  destruct i; [ easy | cbn ].
+  destruct i; [ easy | cbn ].
+  rewrite match_id.
+  rewrite nth_overflow; [ easy | cbn; flia ].
+}
+remember (S n) as n1 eqn:Hn1; cbn.
+destruct (Nat.eq_dec (i / 2 ^ n1) 0) as [Hin| Hin]; [ easy | cbn ].
+rewrite IHn.
+apply rng_opp_0.
+Qed.
+
+...
+
 (* previous version: worked, but had to be terminated *)
 
 Fixpoint old_A n :=
