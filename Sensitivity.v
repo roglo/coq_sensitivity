@@ -1830,6 +1830,11 @@ rewrite <- Nat.div_mod; [ | easy ].
 easy.
 Qed.
 
+Definition eqmt_of_eqt T (eqt : T → T → Prop) : matrix T → matrix T → Prop.
+Proof.
+intros M1 M2.
+...
+
 Theorem mat_mat_even_mat : ∀ T eqmt (MM : matrix (matrix T)) n,
   mat_eq eqmt (mat_mat_of_even_mat n (even_mat_of_mat_mat n MM)) MM.
 Proof.
