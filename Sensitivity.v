@@ -1700,15 +1700,17 @@ Print GRing.Ring.type.
 
 Require Import Ring2 Rsummation Rpolynomial2.
 
-Record matrix {A} := { matel : nat → nat → A }.
+Record matrix A := { matel : nat → nat → A }.
+
+Arguments matel {_}.
 
 Definition mat_of_list {A} (d : A) ll :=
   {| matel i j := nth i (nth j ll []) d |}.
 
-Definition list_of_mat {A} nrow ncol (M : @matrix A) :=
+Definition list_of_mat {A} nrow ncol (M : matrix A) :=
   map (λ row, map (λ col, matel M row col) (seq 0 ncol)) (seq 0 nrow).
 
-Definition mat_transp {T} (M : @matrix T) :=
+Definition mat_transp {T} (M : matrix T) :=
   {| matel i j := matel M j i |}.
 
 Definition mat_mul {T} {R : ring T} n A B :=
@@ -1740,7 +1742,7 @@ Fixpoint all_perm {A} (l : list A) :=
 
 Compute (all_perm [1; 2; 3]).
 
-Definition det {A} {R : ring A} (n : nat) (M : @matrix A) : A :=
+Definition det {A} {R : ring A} (n : nat) (M : matrix A) : A :=
   let allp := all_perm (seq 0 n) in
   (Σ (ip = 0, length allp - 1),
      let '(σ, l) := nth ip allp (false, []) in
@@ -1750,7 +1752,7 @@ Definition det {A} {R : ring A} (n : nat) (M : @matrix A) : A :=
        (fold_left (λ a ij, rng_mul a (matel M (fst ij) (snd ij))) ll 1%Rng))%Rng.
 
 (*
-Fixpoint det {A} {R : ring A} (n : nat) (M : @matrix A) : A :=
+Fixpoint det {A} {R : ring A} (n : nat) (M : matrix A) : A :=
   match n with
   | 0 => 1%Rng
   | S n' => (Σ (i = 0, n'), ((- (1)) ^ i) * matel M n' i * @det A R n' M)%Rng
@@ -1795,21 +1797,56 @@ Compute (let _ := Z_ring in det 3 (mat_of_list 0%Z [[-1; 0; -3]; [-4; 4; -5]; [-
 (* attempt to make matrices of matrices in order to be able to manipulate
    the A_n function of A_{n-1} like above... *)
 
-Definition submat {T} (M : @matrix T) istart jstart :=
+Require Import Equivalence.
+
+Definition mat_eq {T} (eqt : T → T → Prop) (M M' : matrix T) :=
+  ∀ i j, eqt (matel M i j) (matel M' i j).
+
+Definition submat {T} (M : matrix T) istart jstart :=
   {| matel i j := matel M (i + istart) (j + jstart) |}.
 
 (* "mat_mat_of_even_mat M n" returns a matrix of sub matrices
    of M of size n×n *)
 
-Definition mat_mat_of_even_mat {T} n (M : @matrix T) :=
+Definition mat_mat_of_even_mat {T} n (M : matrix T) :=
   {| matel i j := submat M (i * n) (j * n) |}.
 
-Set Printing Implicit.
+Definition even_mat_of_mat_mat {T} n (MM : matrix (matrix T)) :=
+  {| matel i j := matel (matel MM (i / n) (j / n)) (i mod n) (j mod n) |}.
+
 Print mat_mat_of_even_mat.
+Print even_mat_of_mat_mat.
+
+Theorem even_mat_mat_mat : ∀ T eqt (M : matrix T) n,
+  Equivalence eqt
+  → n ≠ 0
+  → mat_eq eqt (even_mat_of_mat_mat n (mat_mat_of_even_mat n M)) M.
+Proof.
+intros * Heq Hnz i j.
+cbn; setoid_rewrite Nat.add_comm.
+setoid_rewrite Nat.mul_comm.
+rewrite <- Nat.div_mod; [ | easy ].
+rewrite <- Nat.div_mod; [ | easy ].
+easy.
+Qed.
+
+Theorem mat_mat_even_mat : ∀ T eqmt (MM : matrix (matrix T)) n,
+  mat_eq eqmt (mat_mat_of_even_mat n (even_mat_of_mat_mat n MM)) MM.
+Proof.
+intros * i j.
+cbn.
+unfold submat.
+cbn.
+...
+cbn; setoid_rewrite Nat.add_comm.
+setoid_rewrite Nat.mul_comm.
+rewrite <- Nat.div_mod; [ | easy ].
+now rewrite <- Nat.div_mod.
+Qed.
 
 ...
 
-Axiom mat_ring : ∀ T, ring (@matrix T).
+Axiom mat_ring : ∀ T, ring (matrix T).
 
 ...
 
@@ -2341,7 +2378,7 @@ Compute (let '(i, j, n) := (0, 1, 3) in map (λ k, (matel (A n) i k * matel (A n
 (* terminable... mais interminable... *)
 ...
 
-Definition charac_polyn {A} {n : nat} (M : @matrix A) := det (M - x * I).
+Definition charac_polyn {A} {n : nat} (M : matrix A) := det (M - x * I).
 
 ...
 
