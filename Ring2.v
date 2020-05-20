@@ -2,6 +2,35 @@
 
 Require Import Utf8.
 
+Class ring_op A :=
+  { rng_zero : A;
+    rng_one : A;
+    rng_add : A → A → A;
+    rng_mul : A → A → A;
+    rng_opp : A → A }.
+
+Class ring_prop {A} {ro : ring_op A} :=
+  { rng_1_neq_0 : rng_one ≠ rng_zero;
+    rng_eq_dec : ∀ a b : A, {a = b} + {a ≠ b};
+    rng_add_comm : ∀ a b, rng_add a b = rng_add b a;
+    rng_add_assoc : ∀ a b c,
+      rng_add a (rng_add b c) = rng_add (rng_add a b) c;
+    rng_add_0_l : ∀ a, rng_add rng_zero a = a;
+    rng_add_opp_l : ∀ a, rng_add (rng_opp a) a = rng_zero;
+    rng_mul_comm : ∀ a b, rng_mul a b = rng_mul b a;
+    rng_mul_assoc : ∀ a b c,
+      rng_mul a (rng_mul b c) = rng_mul (rng_mul a b) c;
+    rng_mul_1_l : ∀ a, rng_mul rng_one a = a;
+    rng_mul_add_distr_l : ∀ a b c,
+      rng_mul a (rng_add b c) = rng_add (rng_mul a b) (rng_mul a c) }.
+
+(*
+Class ring A :=
+  { rng_op : ring_op A;
+    rng_prop : ring_prop }.
+*)
+
+(*
 Class ring A :=
   { rng_zero : A;
     rng_one : A;
@@ -21,12 +50,15 @@ Class ring A :=
     rng_mul_1_l : ∀ a, rng_mul rng_one a = a;
     rng_mul_add_distr_l : ∀ a b c,
       rng_mul a (rng_add b c) = rng_add (rng_mul a b) (rng_mul a c) }.
+*)
 
-Definition rng_sub {A} {R : ring A} a b := rng_add a (rng_opp b).
+Definition rng_sub {A} {R : ring_op A} a b := rng_add a (rng_opp b).
 
 Declare Scope ring_scope.
 Delimit Scope ring_scope with Rng.
+(*
 Bind Scope ring_scope with ring.
+*)
 Notation "a + b" := (rng_add a b) : ring_scope.
 Notation "a - b" := (rng_sub a b) : ring_scope.
 Notation "a * b" := (rng_mul a b) : ring_scope.
@@ -34,9 +66,9 @@ Notation "- a" := (rng_opp a) : ring_scope.
 Notation "0" := rng_zero : ring_scope.
 Notation "1" := rng_one : ring_scope.
 
-Arguments rng_eq_dec {_} {_} _%Rng _%Rng.
+Arguments rng_eq_dec {_} {_} {_} _%Rng _%Rng.
 
-Fixpoint rng_power {A} {R : ring A} a n :=
+Fixpoint rng_power {A} {R : ring_op A} a n :=
   match n with
   | O => 1%Rng
   | S m => (a * rng_power a m)%Rng
@@ -47,7 +79,8 @@ Notation "a ^ b" := (rng_power a b) : ring_scope.
 Section ring_theorems.
 
 Context {A : Type}.
-Context {r : ring A}.
+Context {ro : ring_op A}.
+Context {rp : ring_prop}.
 
 Theorem rng_add_opp_r : ∀ x, (x - x = 0)%Rng.
 Proof.

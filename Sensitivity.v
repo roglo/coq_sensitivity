@@ -1713,13 +1713,13 @@ Definition list_of_mat {A} nrow ncol (M : matrix A) :=
 Definition mat_transp {T} (M : matrix T) :=
   {| matel i j := matel M j i |}.
 
-Definition mat_mul {T} {R : ring T} n A B :=
+Definition mat_mul {T} {ro : ring_op T} n A B :=
   {| matel i k := (Σ (j = 0, n), matel A i j * matel B j k)%Rng |}.
 
 Require Import ZArith.
 
-Compute (let _ := Z_ring in list_of_mat 3 3 (mat_mul 3 (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]))%Z).
-Compute (let _ := Z_ring in list_of_mat 4 3 (mat_transp (mat_mul 4 (mat_transp (mat_of_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])) (mat_transp (mat_of_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]; [13; 14;15; 16]]))))%Z).
+Compute (let _ := Z_ring_op in list_of_mat 3 3 (mat_mul 3 (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]))%Z).
+Compute (let _ := Z_ring_op in list_of_mat 4 3 (mat_transp (mat_mul 4 (mat_transp (mat_of_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])) (mat_transp (mat_of_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]; [13; 14;15; 16]]))))%Z).
 
 Fixpoint insert_at {A} it pos (a : A) σ σll :=
   match it with
@@ -1742,7 +1742,7 @@ Fixpoint all_perm {A} (l : list A) :=
 
 Compute (all_perm [1; 2; 3]).
 
-Definition det {A} {R : ring A} (n : nat) (M : matrix A) : A :=
+Definition det {A} {ro : ring_op A} (n : nat) (M : matrix A) : A :=
   let allp := all_perm (seq 0 n) in
   (Σ (ip = 0, length allp - 1),
      let '(σ, l) := nth ip allp (false, []) in
@@ -1765,14 +1765,14 @@ Print det.
   | 1 3 |
   | 2 4 | = -2
 *)
-Compute (let _ := Z_ring in det 2 (mat_of_list 0%Z [[1; 2]; [3; 4]]%Z)).
+Compute (let _ := Z_ring_op in det 2 (mat_of_list 0%Z [[1; 2]; [3; 4]]%Z)).
 (* ok *)
 
 (*
   | -1 -4 |
   | 0  4  | = -4
 *)
-Compute (let _ := Z_ring in det 2 (mat_of_list 0%Z [[-1; 0]; [-4; 4]]%Z)).
+Compute (let _ := Z_ring_op in det 2 (mat_of_list 0%Z [[-1; 0]; [-4; 4]]%Z)).
 (* ok *)
 
 (*
@@ -1780,7 +1780,7 @@ Compute (let _ := Z_ring in det 2 (mat_of_list 0%Z [[-1; 0]; [-4; 4]]%Z)).
   |  0  4 -5 | = -31
   | -3 -5 -4 |
 *)
-Compute (let _ := Z_ring in det 3 (mat_of_list 0%Z [[-1; 0; -3]; [-4; 4; -5]; [-1; -5; -4]])%Z).
+Compute (let _ := Z_ring_op in det 3 (mat_of_list 0%Z [[-1; 0; -3]; [-4; 4; -5]; [-1; -5; -4]])%Z).
 (* ok *)
 
 (*
@@ -1851,14 +1851,14 @@ rewrite Nat.mod_small; [ | easy ].
 easy.
 Qed.
 
-Definition id_mat {T} {R : ring T} :=
+Definition id_mat {T} {ro : ring_op T} :=
   {| matel i j := if Nat.eq_dec i j then rng_one else rng_zero |}.
 
-Definition mat_opp {T} {R : ring T} (M : matrix T) :=
+Definition mat_opp {T} {ro : ring_op T} (M : matrix T) :=
   {| matel i j := rng_opp (matel M i j) |}.
 
 Fixpoint A n :=
-  let _ := Z_ring in
+  let _ := Z_ring_op in
   match n with
   | 0 => mat_of_list 0%Z []
   | 1 => mat_of_list 0%Z [[0; 1]; [1; 0]]%Z
@@ -1877,7 +1877,9 @@ Fixpoint A n :=
 Print ring_theory.
 ...
 
-Axiom mat_ring : ∀ T, ring (matrix T).
+Axiom mat_ring_op : ∀ T, ring_op (matrix T).
+...
+
 ...
 
 Fixpoint A n :=

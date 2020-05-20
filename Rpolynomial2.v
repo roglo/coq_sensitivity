@@ -10,17 +10,18 @@ Require Import Misc Ring2 Rsummation.
 
 (* definition of a polynomial *)
 
-Definition rng_eqb {A} {rng : ring A} (a b : A) :=
+Definition rng_eqb {A} {ro : ring_op A} {rp : ring_prop} (a b : A) :=
   if rng_eq_dec a b then true else false.
 
 (* (lap : list as polynomial) *)
-Record poly A {rng : ring A} := mkpoly
+Record poly A {ro : ring_op A} {rp : ring_prop} := mkpoly
   { lap : list A;
     lap_prop : rng_eqb (last lap 1%Rng) 0%Rng = false }.
 
-Arguments lap {A} {rng}.
+Arguments lap {A} {ro} {rp}.
 
-Theorem eq_poly_eq {A} {rng : ring A} : ∀ p1 p2, p1 = p2 ↔ lap p1 = lap p2.
+Theorem eq_poly_eq {A} {ro : ring_op A} {rp : ring_prop} :
+  ∀ p1 p2, p1 = p2 ↔ lap p1 = lap p2.
 Proof.
 intros.
 split; [ now intros; subst p1 | ].
@@ -31,7 +32,7 @@ cbn in Hll; subst la; f_equal.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
-Theorem eq_poly_prop {A} {rng : ring A} : ∀ la,
+Theorem eq_poly_prop {A} {ro : ring_op A} {rp : ring_prop} : ∀ la,
   rng_eqb (last la 1%Rng) 0%Rng = false ↔ last la 1%Rng ≠ 0%Rng.
 Proof.
 intros.
@@ -39,9 +40,9 @@ unfold rng_eqb.
 now destruct (rng_eq_dec (last la 1%Rng) 0%Rng).
 Qed.
 
-Arguments mkpoly {_} {_}.
+Arguments mkpoly {_} {_} {_}.
 
-Theorem lap_1_0_prop {A} {rng : ring A} :
+Theorem lap_1_0_prop {A} {ro : ring_op A} {rp : ring_prop} :
   rng_eqb (last [] 1%Rng) 0%Rng = false.
 Proof.
 cbn.
@@ -50,18 +51,20 @@ destruct (rng_eq_dec 1%Rng 0%Rng); [ | easy ].
 now apply rng_1_neq_0 in e.
 Qed.
 
-Definition poly_zero {α} {r : ring α} := mkpoly [] lap_1_0_prop.
-Definition poly_one {α} {r : ring α} := mkpoly [1%Rng] lap_1_0_prop.
+Definition poly_zero {α} {ro : ring_op α} {rp : ring_prop} :=
+  mkpoly [] lap_1_0_prop.
+Definition poly_one {α} {ro : ring_op α} {rp : ring_prop} :=
+  mkpoly [1%Rng] lap_1_0_prop.
 
 (* normalization *)
 
-Fixpoint strip_0s {A} {rng : ring A} la :=
+Fixpoint strip_0s {A} {ro : ring_op A} {rp : ring_prop} la :=
   match la with
   | [] => []
   | a :: la' => if rng_eq_dec a 0%Rng then strip_0s la' else la
   end.
 
-Lemma strip_0s_app {A} {rng : ring A} : ∀ la lb,
+Lemma strip_0s_app {A} {ro : ring_op A} {rp : ring_prop} : ∀ la lb,
   strip_0s (la ++ lb) =
   match strip_0s la with
   | [] => strip_0s lb
@@ -74,9 +77,9 @@ induction la as [| a]; intros; [ easy | cbn ].
 destruct (rng_eq_dec a 0%Rng) as [Haz| Haz]; [ apply IHla | easy ].
 Qed.
 
-Definition lap_norm {A} {rng : ring A} la := rev (strip_0s (rev la)).
+Definition lap_norm {A} {ro : ring_op A} {rp : ring_prop} la := rev (strip_0s (rev la)).
 
-Theorem poly_norm_prop {A} {rng : ring A} : ∀ la,
+Theorem poly_norm_prop {A} {ro : ring_op A} {rp : ring_prop} : ∀ la,
   last (lap_norm la) 1%Rng ≠ 0%Rng.
 Proof.
 intros.
@@ -92,7 +95,7 @@ rewrite List_last_app.
 now rewrite List_last_app in IHla.
 Qed.
 
-Definition poly_norm {A} {rng : ring A} la :=
+Definition poly_norm {A} {ro : ring_op A} {rp : ring_prop} la :=
   mkpoly (lap_norm la) (proj2 (eq_poly_prop _) (poly_norm_prop la)).
 
 (**)
@@ -101,13 +104,16 @@ Require Import ZArith.
 Theorem Z_1_neq_0 : (1 ≠ 0)%Z.
 Proof. easy. Qed.
 
-Definition Z_ring : ring Z :=
+Definition Z_ring_op : ring_op Z :=
   {| rng_zero := 0%Z;
      rng_one := 1%Z;
      rng_add := Z.add;
      rng_mul := Z.mul;
-     rng_opp := Z.opp;
-     rng_1_neq_0 := Z_1_neq_0;
+     rng_opp := Z.opp |}.
+
+Definition Z_ring_prop :=
+  let _ := Z_ring_op in
+  {| rng_1_neq_0 := Z_1_neq_0;
      rng_eq_dec := Z.eq_dec;
      rng_add_comm := Z.add_comm;
      rng_add_assoc := Z.add_assoc;
@@ -119,7 +125,7 @@ Definition Z_ring : ring Z :=
      rng_mul_add_distr_l := Z.mul_add_distr_l |}.
 
 (* allows to use ring theorems on Z *)
-Canonical Structure Z_ring.
+Canonical Structure Z_ring_prop.
 
 (*
 Compute (@lap_norm Z Z_ring [3; 4; 0; 5; 0; 0; 0]%Z).
@@ -128,7 +134,7 @@ Compute (@lap_norm Z Z_ring [3; 4; 0; 5; 0; 0; 0]%Z).
 
 (* addition *)
 
-Fixpoint lap_add {α} {r : ring α} al1 al2 :=
+Fixpoint lap_add {α} {ro : ring_op α} {rp : ring_prop} al1 al2 :=
   match al1 with
   | [] => al2
   | a1 :: bl1 =>
@@ -138,16 +144,16 @@ Fixpoint lap_add {α} {r : ring α} al1 al2 :=
       end
   end.
 
-Definition lap_opp {α} {r : ring α} la := List.map rng_opp la.
-Definition lap_sub {A} {rng : ring A} la lb := lap_add la (lap_opp lb).
+Definition lap_opp {α} {ro : ring_op α} {rp : ring_prop} la := List.map rng_opp la.
+Definition lap_sub {A} {ro : ring_op A} {rp : ring_prop} la lb := lap_add la (lap_opp lb).
 
-Definition poly_add {A} {rng : ring A} p1 p2 :=
+Definition poly_add {A} {ro : ring_op A} {rp : ring_prop} p1 p2 :=
   poly_norm (lap_add (lap p1) (lap p2)).
 
-Definition poly_opp {α} {r : ring α} pol :=
+Definition poly_opp {α} {ro : ring_op α} {rp : ring_prop} pol :=
   poly_norm (lap_opp (lap pol)).
 
-Definition poly_sub {α} {r : ring α} p1 p2 :=
+Definition poly_sub {α} {ro : ring_op α} {rp : ring_prop} p1 p2 :=
   poly_add p1 (poly_opp p2).
 
 (*
@@ -157,7 +163,7 @@ Compute (@poly_add Z Z_ring (poly_norm [3;4;5]%Z) (poly_norm [2;3;-5]%Z)).
 
 (* multiplication *)
 
-Fixpoint lap_convol_mul {α} {r : ring α} al1 al2 i len :=
+Fixpoint lap_convol_mul {α} {ro : ring_op α} {rp : ring_prop} al1 al2 i len :=
   match len with
   | O => []
   | S len1 =>
@@ -165,7 +171,7 @@ Fixpoint lap_convol_mul {α} {r : ring α} al1 al2 i len :=
       lap_convol_mul al1 al2 (S i) len1
   end.
 
-Definition lap_mul {α} {R : ring α} la lb :=
+Definition lap_mul {α} {ro : ring_op α} {rp : ring_prop} la lb :=
   match la with
   | [] => []
   | _ =>
@@ -175,7 +181,7 @@ Definition lap_mul {α} {R : ring α} la lb :=
       end
   end.
 
-Definition poly_mul {A} {rng : ring A} p1 p2 :=
+Definition poly_mul {A} {ro : ring_op A} {rp : ring_prop} p1 p2 :=
   poly_norm (lap_mul (lap p1) (lap p2)).
 
 (*
@@ -185,13 +191,13 @@ Compute (@poly_mul Z Z_ring (poly_norm [3;4;5]%Z) (poly_norm [2;3;-4;5]%Z)).
 
 (* power *)
 
-Fixpoint lap_power {α} {r : ring α} la n :=
+Fixpoint lap_power {α} {ro : ring_op α} {rp : ring_prop} la n :=
   match n with
   | O => [1%Rng]
   | S m => lap_mul la (lap_power la m)
   end.
 
-Definition poly_power {A} {rng : ring A} pol n :=
+Definition poly_power {A} {ro : ring_op A} {rp : ring_prop} pol n :=
   poly_norm (lap_power (lap pol) n).
 
 (*
@@ -200,10 +206,10 @@ Compute (@poly_power Z Z_ring (poly_norm [1; -1]%Z) 4).
 
 (* composition *)
 
-Definition lap_compose {α} {r : ring α} la lb :=
+Definition lap_compose {α} {ro : ring_op α} {rp : ring_prop} la lb :=
   List.fold_right (λ c accu, lap_add (lap_mul accu lb) [c]) [] la.
 
-Definition lap_compose2 {α} {r : ring α} la lb :=
+Definition lap_compose2 {α} {ro : ring_op α} {rp : ring_prop} la lb :=
   List.fold_right
     (λ i accu,
      lap_add accu (lap_mul [List.nth i la 0] (lap_power lb i)))%Rng
@@ -217,7 +223,7 @@ Fixpoint list_pad {α} n (zero : α) rem :=
   | S n1 => zero :: list_pad n1 zero rem
   end.
 
-Theorem xpow_norm {A} {rng : ring A} : ∀ i,
+Theorem xpow_norm {A} {ro : ring_op A} {rp : ring_prop} : ∀ i,
   rng_eqb (last (repeat 0%Rng i ++ [1%Rng]) 1%Rng) 0%Rng = false.
 Proof.
 intros.
@@ -227,7 +233,7 @@ destruct (rng_eq_dec 1 0) as [H| H]; [ | easy ].
 now apply rng_1_neq_0 in H.
 Qed.
 
-Definition xpow {α} {r : ring α} i :=
+Definition xpow {α} {ro : ring_op α} {rp : ring_prop} i :=
   mkpoly (repeat 0%Rng i ++ [1%Rng]) (xpow_norm i).
 
 Declare Scope lap_scope.
@@ -239,7 +245,7 @@ Notation "a - b" := (lap_sub a b) : lap_scope.
 Notation "a * b" := (lap_mul a b) : lap_scope.
 Notation "a ^ b" := (lap_power a b) : lap_scope.
 
-Definition list_nth_def_0 {α} {R : ring α} n l := List.nth n l 0%Rng.
+Definition list_nth_def_0 {α} {ro : ring_op α} {rp : ring_prop} n l := List.nth n l 0%Rng.
 
 Declare Scope poly_scope.
 Delimit Scope poly_scope with pol.
@@ -254,10 +260,10 @@ Notation "'ⓧ'" := (xpow 1) (at level 30, format "'ⓧ'") : poly_scope.
 
 (* *)
 
-Theorem lap_convol_mul_comm : ∀ α (R : ring α) l1 l2 i len,
+Theorem lap_convol_mul_comm : ∀ α {ro : ring_op α} {rp : ring_prop} l1 l2 i len,
   lap_convol_mul l1 l2 i len = lap_convol_mul l2 l1 i len.
 Proof.
-intros α R l1 l2 i len.
+intros.
 revert i.
 induction len; intros; [ reflexivity | simpl ].
 rewrite IHlen; f_equal.
@@ -270,10 +276,10 @@ rewrite Nat_sub_sub_distr; [ idtac | easy ].
 rewrite Nat.sub_diag, Nat.add_0_l; reflexivity.
 Qed.
 
-Theorem lap_convol_mul_nil_l : ∀ α (R : ring α) l i len,
+Theorem lap_convol_mul_nil_l : ∀ α {ro : ring_op α} {rp : ring_prop} l i len,
   lap_norm (lap_convol_mul [] l i len) = [].
 Proof.
-intros α R l i len.
+intros.
 unfold lap_norm.
 revert i.
 induction len; intros; [ reflexivity | ].
@@ -289,19 +295,19 @@ intros k (_, Hk).
 now rewrite match_id, rng_mul_0_l.
 Qed.
 
-Theorem lap_convol_mul_nil_r : ∀ α (R : ring α) l i len,
+Theorem lap_convol_mul_nil_r : ∀ α {ro : ring_op α} {rp : ring_prop} l i len,
   lap_norm (lap_convol_mul l [] i len) = [].
 Proof.
-intros α R l i len.
+intros.
 rewrite lap_convol_mul_comm.
 apply lap_convol_mul_nil_l.
 Qed.
 
-Theorem list_nth_lap_eq : ∀ α (r : ring α) la lb,
+Theorem list_nth_lap_eq : ∀ α {ro : ring_op α} {rp : ring_prop} la lb,
   (∀ i, (List.nth i la 0 = List.nth i lb 0)%Rng)
   → lap_norm la = lap_norm lb.
 Proof.
-intros α r la lb Hi.
+intros * Hi.
 unfold lap_norm; f_equal.
 revert lb Hi.
 induction la as [| a]; intros. {
@@ -421,17 +427,17 @@ induction la as [| a]; intros. {
 }
 Qed.
 
-Theorem fold_lap_norm {A} {rng : ring A} :
+Theorem fold_lap_norm {A} {ro : ring_op A} {rp : ring_prop} :
   ∀ la, rev (strip_0s (rev la)) = lap_norm la.
 Proof. easy. Qed.
 
-Theorem lap_add_0_l {α} {r : ring α} : ∀ la, lap_add [] la = la.
+Theorem lap_add_0_l {α} {ro : ring_op α} {rp : ring_prop} : ∀ la, lap_add [] la = la.
 Proof. easy. Qed.
 
-Theorem lap_add_0_r {α} {r : ring α} : ∀ la, lap_add la [] = la.
+Theorem lap_add_0_r {α} {ro : ring_op α} {rp : ring_prop} : ∀ la, lap_add la [] = la.
 Proof. intros; now destruct la. Qed.
 
-Theorem poly_add_0_l {α} {r : ring α} : ∀ p, (0 + p)%pol = p.
+Theorem poly_add_0_l {α} {ro : ring_op α} {rp : ring_prop} : ∀ p, (0 + p)%pol = p.
 Proof.
 intros (la, lapr).
 apply eq_poly_eq; cbn.
@@ -454,16 +460,16 @@ rewrite IHla; cbn. {
 }
 Qed.
 
-Theorem lap_mul_0_l {α} {r : ring α} : ∀ la, lap_norm (lap_mul [] la) = [].
+Theorem lap_mul_0_l {α} {ro : ring_op α} {rp : ring_prop} : ∀ la, lap_norm (lap_mul [] la) = [].
 Proof. easy. Qed.
 
-Theorem lap_mul_0_r {α} {r : ring α} : ∀ la, lap_norm (lap_mul la []) = [].
+Theorem lap_mul_0_r {α} {ro : ring_op α} {rp : ring_prop} : ∀ la, lap_norm (lap_mul la []) = [].
 Proof. now intros; destruct la. Qed.
 
 Section lap.
 
 Context {α : Type}.
-Context {r : ring α}.
+Context {ro : ring_op α} {rp : ring_prop}.
 
 Theorem strip_0s_idemp : ∀ la, strip_0s (strip_0s la) = strip_0s la.
 Proof.
@@ -1512,7 +1518,7 @@ Qed.
 
 End lap.
 
-Lemma lap_add_opp_l {α} {r : ring α} : ∀ la, lap_norm (- la + la)%lap = [].
+Lemma lap_add_opp_l {α} {ro : ring_op α} {rp : ring_prop} : ∀ la, lap_norm (- la + la)%lap = [].
 Proof.
 intros.
 unfold lap_norm.
@@ -1527,7 +1533,7 @@ rewrite rng_add_opp_l.
 now destruct (rng_eq_dec 0 0).
 Qed.
 
-Theorem poly_add_opp_l {α} {r : ring α} : ∀ p, (- p + p)%pol = 0%pol.
+Theorem poly_add_opp_l {α} {ro : ring_op α} {rp : ring_prop} : ∀ p, (- p + p)%pol = 0%pol.
 Proof.
 intros p.
 unfold "+"%pol; cbn.
@@ -1536,7 +1542,7 @@ rewrite lap_add_norm_idemp_l.
 apply lap_add_opp_l.
 Qed.
 
-Theorem poly_add_opp_r {α} {r : ring α} : ∀ p, (p - p)%pol = 0%pol.
+Theorem poly_add_opp_r {α} {ro : ring_op α} {rp : ring_prop} : ∀ p, (p - p)%pol = 0%pol.
 Proof.
 intros p.
 unfold poly_sub.
@@ -1544,10 +1550,10 @@ rewrite poly_add_comm.
 apply poly_add_opp_l.
 Qed.
 
-Theorem poly_1_neq_0 {A} {rng : ring A} : 1%pol ≠ 0%pol.
+Theorem poly_1_neq_0 {A} {ro : ring_op A} {rp : ring_prop} : 1%pol ≠ 0%pol.
 Proof. easy. Qed.
 
-Fixpoint lap_eqb {A} {rng : ring A} la lb :=
+Fixpoint lap_eqb {A} {ro : ring_op A} {rp : ring_prop} la lb :=
   match la with
   | [] =>
       match lb with
@@ -1561,7 +1567,7 @@ Fixpoint lap_eqb {A} {rng : ring A} la lb :=
       end
   end.
 
-Theorem lap_eqb_eq {A} {rng : ring A} : ∀ la lb,
+Theorem lap_eqb_eq {A} {ro : ring_op A} {rp : ring_prop} : ∀ la lb,
   lap_eqb la lb = true ↔ la = lb.
 Proof.
 intros.
@@ -1579,7 +1585,7 @@ destruct (rng_eq_dec a b) as [Hab| Hab]. {
 }
 Qed.
 
-Theorem lap_eqb_neq {A} {rng : ring A} : ∀ la lb,
+Theorem lap_eqb_neq {A} {ro : ring_op A} {rp : ring_prop} : ∀ la lb,
   lap_eqb la lb = false ↔ la ≠ lb.
 Proof.
 intros.
@@ -1604,7 +1610,7 @@ destruct (rng_eq_dec a b) as [Hab| Hab]. {
 }
 Qed.
 
-Lemma lap_eq_dec {A} {rng : ring A} : ∀ la lb : list A,
+Lemma lap_eq_dec {A} {ro : ring_op A} {rp : ring_prop} : ∀ la lb : list A,
   {la = lb} + {la ≠ lb}.
 Proof.
 intros.
@@ -1616,7 +1622,7 @@ destruct lab. {
 }
 Qed.
 
-Theorem poly_eq_dec {A} {rng : ring A} : ∀ pa pb : poly _,
+Theorem poly_eq_dec {A} {ro : ring_op A} {rp : ring_prop} : ∀ pa pb : poly _,
   {pa = pb} + {pa ≠ pb}.
 Proof.
 intros (la, lapr) (lb, lbpr).
@@ -1629,13 +1635,17 @@ destruct (lap_eq_dec la lb) as [Hll| Hll]. {
 }
 Qed.
 
-Definition polynomial_ring {α} {r : ring α} : ring (poly α) :=
+Definition polynomial_ring_op {α} {ro : ring_op α} {rp : ring_prop} :
+  ring_op (poly α) :=
   {| rng_zero := poly_zero;
      rng_one := poly_one;
      rng_add := poly_add;
      rng_mul := poly_mul;
-     rng_opp := poly_opp;
-     rng_1_neq_0 := poly_1_neq_0;
+     rng_opp := poly_opp |}.
+
+Definition polynomial_ring_prop {α} {ro : ring_op α} {rp : ring_prop} :=
+  let _ := polynomial_ring_op in
+  {| rng_1_neq_0 := poly_1_neq_0;
      rng_eq_dec := poly_eq_dec;
      rng_add_comm := poly_add_comm;
      rng_add_assoc := poly_add_assoc;
@@ -1647,12 +1657,12 @@ Definition polynomial_ring {α} {r : ring α} : ring (poly α) :=
      rng_mul_add_distr_l := poly_mul_add_distr_l |}.
 
 (* allows to use ring theorems on polynomials *)
-Canonical Structure polynomial_ring.
+Canonical Structure polynomial_ring_prop.
 
 (* *)
 
-Definition eval_lap {α} {R : ring α} la x :=
+Definition eval_lap {α} {ro : ring_op α} {rp : ring_prop} la x :=
   (List.fold_right (λ c accu, accu * x + c) 0 la)%Rng.
 
-Definition eval_poly {α} {R : ring α} pol :=
+Definition eval_poly {α} {ro : ring_op α} {rp : ring_prop} pol :=
   eval_lap (lap pol).

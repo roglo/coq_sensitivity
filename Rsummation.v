@@ -6,13 +6,13 @@ Require Import Utf8 Arith.
 Import List.
 Require Import Misc Ring2.
 
-Fixpoint summation_aux {α} {r : ring α} b len g :=
+Fixpoint summation_aux {α} {r : ring_op α} b len g :=
   match len with
   | O => 0%Rng
   | S len₁ => (g b + summation_aux (S b) len₁ g)%Rng
   end.
 
-Definition summation {α} {r : ring α} b e g := summation_aux b (S e - b) g.
+Definition summation {α} {r : ring_op α} b e g := summation_aux b (S e - b) g.
 
 (* the notation Σ have different implentations for historical reasons;
    here with "summation", but elsewhere with "fold_left"; I'd like to
@@ -25,7 +25,8 @@ Notation "'Σ' ( i = b , e ) , g" :=
   (at level 45, i at level 0, b at level 60, e at level 60) : ring_scope.
 *)
 
-Theorem fold_left_rng_add_fun_from_0 {A} {rng : ring A} : ∀ a l (f : nat → _),
+Theorem fold_left_rng_add_fun_from_0 {A} {ro : ring_op A} {rp : ring_prop} :
+  ∀ a l (f : nat → _),
   (fold_left (λ c i, c + f i) l a =
    a + fold_left (λ c i, c + f i) l 0)%Rng.
 Proof.
@@ -36,7 +37,9 @@ rewrite IHl; symmetry; rewrite IHl.
 rewrite rng_add_0_l.
 apply rng_add_assoc.
 Qed.
-Theorem fold_left_is_summation {A} {rng : ring A} : ∀ b e g,
+
+Theorem fold_left_is_summation {A} {ro : ring_op A} {rp : ring_prop} :
+  ∀ b e g,
   (fold_left (λ c i, c + g i) (seq b (S e - b)) 0 =
    summation b e g)%Rng.
 Proof.
@@ -54,7 +57,8 @@ Qed.
 Section theorems_summation.
 
 Context {α : Type}.
-Context {r : ring α}.
+Context {ro : ring_op α}.
+Context {rp : ring_prop}.
 
 Open Scope nat_scope.
 
@@ -367,7 +371,7 @@ move len2 before len1.
 replace (S k - (j + 1)) with (len2 - len1) by flia Hlen1 Hlen2 Hbj.
 replace (j + 1) with (b + len1) by flia Hlen1 Hbj.
 assert (Hll : len1 ≤ len2) by flia Hlen1 Hlen2 Hjk.
-clear - Hll.
+clear - rp Hll.
 revert b len2 Hll.
 induction len1; intros. {
   cbn.
