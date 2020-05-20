@@ -1978,6 +1978,21 @@ destruct (Nat.eq_dec (i / 2 ^ n1) 0) as [Hin| Hin]. {
 }
 Qed.
 
+(* "We prove by induction that A_n^2 = nI" *)
+
+... juste copié de la version précédente...
+... à voir...
+
+Definition nI n :=
+  {| matel i j := if Nat.eq_dec i j then Z.of_nat n else 0%Z |}.
+
+Lemma lemma_2_A_n_2_eq_n_I (R := Z_ring) : ∀ n i j,
+  (i < 2 ^ n)%nat → (j < 2 ^ n)%nat
+  → matel (mat_mul (2 ^ n) (A n) (A n)) i j = matel (nI n) i j.
+Proof.
+intros * Hi Hj.
+destruct n. {
+
 ...
 
 (* previous version: worked, but had to be terminated *)
