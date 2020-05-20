@@ -1791,35 +1791,20 @@ Compute (let _ := Z_ring in det 3 (mat_of_list 0%Z [[-1; 0; -3]; [-4; 4; -5]; [-
     multiplicity 2^{n-1}, and -√n of multiplicity 2^{n-1}."
 *)
 
-(*
+(**)
 (* attempt to make matrices of matrices in order to be able to manipulate
-   the A_n function of A_{n-1} like above... but it seems to be complicated;
-   first, I need to use the multiplication of such matrices (mat_mul) but
-   for that, I need to build mat_ring, a lot of proofs to do! *)
-
-Axiom mat_ring : ∀ T, ring (@matrix T).
+   the A_n function of A_{n-1} like above... *)
 
 Definition submat {T} (M : @matrix T) istart jstart :=
   {| matel i j := matel M (i + istart) (j + jstart) |}.
 
-Theorem even_submat_mul : ∀ T (R : ring T) n (M M' : @matrix T) i j,
-  i < 2 * n
-  → j < 2 * n
-  → matel (mat_mul n M M') i j =
-       let MM :=
-         @mat_mul (@matrix T) (mat_ring T) 2
-            {| matel i1 j1 := @submat T M i1 j1 |}
-            {| matel i1 j1 := @submat T M' i1 j1 |}
-       in
-       if lt_dec i n then
-         if lt_dec j n then matel (matel MM 0 0) i j
-         else matel (matel MM 0 1) i (j - n)
-       else
-         if lt_dec j n then matel (matel MM 1 0) (i - n) j
-         else matel (matel MM 1 1) (i - n) (j - n).
+Definition mat_mat_of_even_mat {T} hs (M : @matrix T) :=
+  {| matel i j := submat M (i * hs) (j * hs) |}.
+
+Set Printing Implicit.
+Print mat_mat_of_even_mat.
+
 ...
-(* not convincing... but I keep it to return to it later, perhaps *)
-*)
 
 Fixpoint A n :=
   match n with
@@ -2346,6 +2331,7 @@ Compute (let '(i, j, n) := (0, 1, 3) in map (λ k, (matel (A n) i k * matel (A n
             apply rng_add_opp_l.
           } {
             rewrite (summation_split (i - 1)).
+(* terminable... mais interminable... *)
 ...
 
 Definition charac_polyn {A} {n : nat} (M : @matrix A) := det (M - x * I).
