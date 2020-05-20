@@ -2007,6 +2007,11 @@ induction n; intros. {
   destruct j; [ easy | ].
   destruct j; [ easy | flia Hj ].
 }
+remember (2 ^ S (S n)) as ssn.
+remember (S n) as sn; cbn - [ mat_mul nI ]; subst sn ssn.
+unfold even_mat_of_mat_mat.
+remember (2 ^ S (S n)) as ssn; remember (S n) as sn; cbn - [ mat_mul nI ]; subst sn ssn.
+(* mouais... c'est pas si évident... *)
 ...
 
 (* previous version: worked, but had to be terminated *)
