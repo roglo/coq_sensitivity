@@ -1851,6 +1851,29 @@ rewrite Nat.mod_small; [ | easy ].
 easy.
 Qed.
 
+Definition id_mat {T} {R : ring T} :=
+  {| matel i j := if Nat.eq_dec i j then rng_one else rng_zero |}.
+
+Definition mat_opp {T} {R : ring T} (M : matrix T) :=
+  {| matel i j := rng_opp (matel M i j) |}.
+
+Fixpoint A n :=
+  let _ := Z_ring in
+  match n with
+  | 0 => mat_of_list 0%Z []
+  | 1 => mat_of_list 0%Z [[0; 1]; [1; 0]]%Z
+  | S n' =>
+      even_mat_of_mat_mat 2
+        {| matel i j :=
+             if Nat.eq_dec i 0 then
+               if Nat.eq_dec j 0 then A n' else id_mat
+             else
+               if Nat.eq_dec j 0 then id_mat else mat_opp (A n') |}
+  end.
+
+(* let _ := Z_ring... do I limit id_mat and mat_opp to ℤ or do I keep
+   them to any ring? *)
+
 ...
 
 Axiom mat_ring : ∀ T, ring (matrix T).
