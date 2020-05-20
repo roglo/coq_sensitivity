@@ -1798,11 +1798,18 @@ Compute (let _ := Z_ring in det 3 (mat_of_list 0%Z [[-1; 0; -3]; [-4; 4; -5]; [-
 Definition submat {T} (M : @matrix T) istart jstart :=
   {| matel i j := matel M (i + istart) (j + jstart) |}.
 
-Definition mat_mat_of_even_mat {T} hs (M : @matrix T) :=
-  {| matel i j := submat M (i * hs) (j * hs) |}.
+(* "mat_mat_of_even_mat M n" returns a matrix of sub matrices
+   of M of size n×n *)
+
+Definition mat_mat_of_even_mat {T} n (M : @matrix T) :=
+  {| matel i j := submat M (i * n) (j * n) |}.
 
 Set Printing Implicit.
 Print mat_mat_of_even_mat.
+
+...
+
+Axiom mat_ring : ∀ T, ring (@matrix T).
 
 ...
 
