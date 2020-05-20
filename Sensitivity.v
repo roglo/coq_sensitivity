@@ -1920,6 +1920,64 @@ rewrite IHn.
 apply rng_opp_0.
 Qed.
 
+Theorem I_symm : ∀ i j, matel I i j = matel I j i.
+Proof.
+intros; cbn.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  symmetry in Hij.
+  now destruct (Nat.eq_dec j i).
+} {
+  apply Nat.neq_sym in Hij.
+  now destruct (Nat.eq_dec j i).
+}
+Qed.
+
+Theorem A_symm : ∀ n i j, matel (A n) i j = matel (A n) j i.
+Proof.
+intros.
+revert i j.
+induction n; intros; cbn. {
+  do 2 rewrite match_id.
+  rewrite nth_overflow; [ | cbn; flia ].
+  rewrite nth_overflow; [ easy | cbn; flia ].
+}
+destruct n. {
+  cbn.
+  destruct i. {
+    destruct j; [ easy | cbn ].
+    destruct j; [ easy | cbn ].
+    do 2 rewrite match_id.
+    rewrite nth_overflow; [ easy | cbn; flia ].
+  }
+  destruct j. {
+    cbn.
+    destruct i; [ easy | cbn ].
+    do 2 rewrite match_id.
+    rewrite nth_overflow; [ easy | cbn; flia ].
+  }
+  destruct i. {
+    cbn.
+    destruct j; [ easy | ].
+    do 2 rewrite match_id.
+    rewrite nth_overflow; [ easy | cbn; flia ].
+  }
+  destruct j. {
+    cbn.
+    do 2 rewrite match_id.
+    rewrite nth_overflow; [ easy | cbn; flia ].
+  }
+  now do 2 rewrite match_id.
+}
+remember (S n) as n1 eqn:Hn1; cbn.
+destruct (Nat.eq_dec (i / 2 ^ n1) 0) as [Hin| Hin]. {
+  destruct (Nat.eq_dec (j / 2 ^ n1) 0) as [Hjn| Hjn]; [ apply IHn | ].
+  apply I_symm.
+} {
+  destruct (Nat.eq_dec (j / 2 ^ n1) 0) as [Hjn| Hjn]; [ apply I_symm | ].
+  now cbn; rewrite IHn.
+}
+Qed.
+
 ...
 
 (* previous version: worked, but had to be terminated *)
