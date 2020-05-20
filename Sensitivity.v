@@ -1851,7 +1851,7 @@ rewrite Nat.mod_small; [ | easy ].
 easy.
 Qed.
 
-Definition id_mat {T} {ro : ring_op T} :=
+Definition I {T} {ro : ring_op T} :=
   {| matel i j := if Nat.eq_dec i j then rng_one else rng_zero |}.
 
 Definition mat_opp {T} {ro : ring_op T} (M : matrix T) :=
@@ -1866,12 +1866,12 @@ Fixpoint A n :=
       even_mat_of_mat_mat 2
         {| matel i j :=
              if Nat.eq_dec i 0 then
-               if Nat.eq_dec j 0 then A n' else id_mat
+               if Nat.eq_dec j 0 then A n' else I
              else
-               if Nat.eq_dec j 0 then id_mat else mat_opp (A n') |}
+               if Nat.eq_dec j 0 then I else mat_opp (A n') |}
   end.
 
-(* let _ := Z_ring... do I limit id_mat and mat_opp to ℤ or do I keep
+(* let _ := Z_ring... do I limit "I" and "mat_opp" to ℤ or do I keep
    them to any ring? *)
 
 Definition zero_mat {T} {ro : ring_op T} := {| matel _ _ := rng_zero |}.
@@ -1881,7 +1881,7 @@ Definition mat_add {T} {ro : ring_op T} A B :=
 
 Definition mat_ring_op {T} {ro : ring_op T} n :=
   {| rng_zero := zero_mat;
-     rng_one := id_mat;
+     rng_one := I;
      rng_add := mat_add;
      rng_mul := mat_mul n;
      rng_opp := mat_opp |}.
