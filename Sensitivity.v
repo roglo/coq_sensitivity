@@ -1874,6 +1874,14 @@ Fixpoint A n :=
 (* let _ := Z_ring... do I limit id_mat and mat_opp to ℤ or do I keep
    them to any ring? *)
 
+Search ring_theory.
+
+Check BoolTheory.
+...
+
+Require Import setoid_ring.Ring.
+About BoolTheory.
+Add Ring toto : A.
 ...
 
 Axiom mat_ring : ∀ T, ring (matrix T).
