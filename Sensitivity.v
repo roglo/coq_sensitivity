@@ -1720,6 +1720,8 @@ Definition mat_transp {T} (M : matrix T) :=
 Definition mat_mul {T} {ro : ring_op T} n A B :=
   {| matel i k := (Σ (j = 0, n - 1), matel A i j * matel B j k)%Rng |}.
 
+Definition mat_sqr {T} {ro : ring_op T} n A := mat_mul n A A.
+
 Require Import ZArith.
 
 Compute (let _ := Z_ring_op in list_of_mat 3 3 (mat_mul 3 (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]))%Z).
@@ -1993,19 +1995,15 @@ Definition fin_mat_eq {T} (eqt : T → T → Prop) u v (M M' : matrix T) :=
 
 Lemma sqr_An1_from_sqr_An (R := Z_ring_op) : ∀ n,
   fin_mat_eq eq (2 ^ S n) (2 ^ S n)
-    (mat_mul (2 ^ S n) (A (S n)) (A (S n)))
+    (mat_sqr (2 ^ S n) (A (S n)))
     (even_mat_of_mat_mat (2 ^ n)
        {| matel i j :=
            if Nat.eq_dec i 0 then
-             if Nat.eq_dec j 0 then
-               mat_add (mat_mul (2 ^ n) (A n) (A n)) I
-             else
-               zero_mat
+             if Nat.eq_dec j 0 then mat_add (mat_sqr (2 ^ n) (A n)) I
+             else zero_mat
            else
-             if Nat.eq_dec j 0 then
-               zero_mat
-             else
-               mat_add (mat_mul (2 ^ n) (A n) (A n)) I |}).
+             if Nat.eq_dec j 0 then zero_mat
+             else mat_add (mat_sqr (2 ^ n) (A n)) I |}).
 Proof.
 intros * i j Hi Hj.
 destruct n. {
