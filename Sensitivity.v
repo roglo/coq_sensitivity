@@ -2030,7 +2030,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     }
     remember (S n) as sn; cbn - [ mat_sqr "^" I mat_add ]; subst sn.
     unfold even_mat_of_mat_mat.
-    remember (S n) as sn; cbn - [ mat_sqr "/" "^" ]; subst sn.
+    remember (S n) as sn; cbn - [ mat_sqr "/" "^" I mat_add ]; subst sn.
 ...
     replace (matel _ _ _) with
  (matel
