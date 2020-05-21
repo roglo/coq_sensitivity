@@ -1897,6 +1897,8 @@ Compute (list_of_mat 16 16 (let _ := Z_ring_op in A 4)).
 
 Close Scope Z_scope.
 
+Section glop.
+
 Context {T : Type}.
 Context {ro : ring_op T}.
 Context {rp : ring_prop}.
@@ -1980,6 +1982,8 @@ destruct (Nat.eq_dec (i / 2 ^ n1) 0) as [Hin| Hin]. {
 }
 Qed.
 
+End glop.
+
 (* "We prove by induction that A_n^2 = nI" *)
 
 Definition nI n :=
@@ -2031,26 +2035,24 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     remember (S n) as sn; cbn - [ mat_sqr "^" I mat_add ]; subst sn.
     unfold even_mat_of_mat_mat.
     remember (S n) as sn; cbn - [ mat_sqr "/" "^" I mat_add ]; subst sn.
-...
-    replace (matel _ _ _) with
- (matel
-    (mat_sqr (2 ^ S (S n))
-       {|
-       matel := λ i0 j0 : nat,
-                  matel
-                    (if Nat.eq_dec (i0 / 2 ^ S n) 0
-                     then if Nat.eq_dec (j0 / 2 ^ S n) 0 then A (S n) else I
-                     else
-                      if Nat.eq_dec (j0 / 2 ^ S n) 0
-                      then I
-                      else mat_opp (A (S n))) (i0 mod 2 ^ S n)
-                    (j0 mod 2 ^ S n) |}) i j).
-...
-    destruct n. {
-      cbn in Hin, Hjn.
-      destruct i. {
-        destruct j. {
-          cbn.
+cbn - [ summation "^" A I ].
+rewrite Nat.div_small; [ | easy ].
+rewrite Nat.div_small; [ | easy ].
+rewrite Nat.mod_small; [ | easy ].
+rewrite Nat.mod_small; [ | easy ].
+destruct (Nat.eq_dec 0 0) as [H| H]; [ clear H | easy ].
+erewrite (summation_split (2 ^ S n - 1)).
+replace (Σ (_ = _, _), _)%Rng with
+  (Σ (k = 0, 2 ^ S n - 1),
+   (matel (A (S n)) i k * matel (A (S n)) j k))%Rng. 2: {
+  apply summation_compat; intros k Hk.
+  assert (Hz : 2 ^ S n ≠ 0) by now apply Nat.pow_nonzero.
+  rewrite Nat.div_small; [ | flia Hz Hk ].
+  rewrite Nat.mod_small; [ | flia Hz Hk ].
+  destruct (Nat.eq_dec _ _) as [H| H]; [ clear H | easy ].
+  now rewrite (A_symm _ j).
+}
+rewrite Nat.sub_add.
 ...
 intros * i j Hi Hj.
 destruct n. {
