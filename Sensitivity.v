@@ -2006,6 +2006,24 @@ Lemma sqr_An1_from_sqr_An (R := Z_ring_op) : ∀ n,
              else mat_add (mat_sqr (2 ^ n) (A n)) I |}).
 Proof.
 intros * i j Hi Hj.
+unfold even_mat_of_mat_mat.
+remember (S n) as sn.
+cbn - [ mat_sqr "/" ]; subst sn.
+destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
+  destruct (Nat.eq_dec (i / 2 ^ n) 0) as [H| H]. 2: {
+    now rewrite Nat.div_small in H.
+  }
+  clear H.
+  rewrite Nat.mod_small; [ | easy ].
+  destruct (lt_dec j (2 ^ n)) as [Hjn| Hjn]. {
+    destruct (Nat.eq_dec (j / 2 ^ n) 0) as [H| H]. 2: {
+      now rewrite Nat.div_small in H.
+    }
+    clear H.
+    rewrite Nat.mod_small; [ | easy ].
+    clear Hi Hj.
+...
+intros * i j Hi Hj.
 destruct n. {
   cbn in Hi, Hj.
   rewrite Nat.pow_0_r, Nat.pow_1_r.
@@ -2018,6 +2036,24 @@ destruct n. {
   destruct j; [ easy | ].
   destruct j; [ easy | flia Hj ].
 }
+(**)
+unfold even_mat_of_mat_mat.
+remember (S (S n)) as ssn.
+remember (S n) as sn.
+cbn - [ mat_sqr "/" ]; subst sn ssn.
+destruct (lt_dec i (2 ^ S n)) as [Hin| Hin]. {
+  destruct (Nat.eq_dec (i / 2 ^ S n) 0) as [H| H]. 2: {
+    now rewrite Nat.div_small in H.
+  }
+  clear H.
+  rewrite Nat.mod_small; [ | easy ].
+  destruct (lt_dec j (2 ^ S n)) as [Hjn| Hjn]. {
+    destruct (Nat.eq_dec (j / 2 ^ S n) 0) as [H| H]. 2: {
+      now rewrite Nat.div_small in H.
+    }
+    clear H.
+    rewrite Nat.mod_small; [ | easy ].
+...
 destruct n. {
   cbn in Hi, Hj.
   destruct i. {
