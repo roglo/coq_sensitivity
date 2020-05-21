@@ -2009,6 +2009,7 @@ induction n; intros. {
 }
 remember (2 ^ S (S n)) as ssn.
 remember (S n) as sn; cbn - [ mat_mul nI ]; subst sn ssn.
+...
 Print mat_mul.
 Theorem glop {ro : ring_op Z} : ∀ n (rro := mat_ring_op n),
   ∀ MM1 MM2,
@@ -2023,6 +2024,7 @@ remember (2 * n) as n2; cbn - [ summation ]; subst n2.
 ...
 rewrite Nat.pow_succ_r.
 rewrite glop.
+remember (2 * S n) as n2; cbn - [ summation ]; subst n2.
 ...
 unfold even_mat_of_mat_mat.
 remember (2 ^ S (S n)) as ssn; remember (S n) as sn; cbn - [ mat_mul nI ]; subst sn ssn.
