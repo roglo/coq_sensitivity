@@ -1991,7 +1991,7 @@ Definition fin_mat_eq {T} (eqt : T → T → Prop) u v (M M' : matrix T) :=
     (A_{n+1})^2 =  ⌊ 0           (A_n)^2+I  ⌋
 *)
 
-Lemma glop (R := Z_ring_op) : ∀ n,
+Lemma sqr_An1_from_sqr_An (R := Z_ring_op) : ∀ n,
   fin_mat_eq eq (2 ^ S n) (2 ^ S n)
     (mat_mul (2 ^ S n) (A (S n)) (A (S n)))
     (even_mat_of_mat_mat (2 ^ n)
@@ -2022,15 +2022,30 @@ destruct n. {
 }
 destruct n. {
   cbn in Hi, Hj.
-  cbn - [ even_mat_of_mat_mat ].
   destruct i. {
-    destruct j. {
-      cbn.
-Compute (let n := 1 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in mat_mul (2 ^ S n) (A (S n)) (A (S n)))).
-Compute (let n := 1 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in mat_add (mat_mul (2 ^ n) (A n) (A n)) I)).
-Compute (let n := 1 in list_of_mat (2 ^ S n) (2 ^ S n) (let _ := Z_ring_op in mat_add (mat_mul (2 ^ S n) (A (S n)) (A (S n))) zero_mat)).
-Compute (let n := 2 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in (A n))).
-Compute (let n := 3 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in (mat_mul (2 ^ n) (A n) (A n)))).
+    destruct j; [ easy | ].
+    destruct j; [ easy | ].
+    destruct j; [ easy | ].
+    destruct j; [ easy | flia Hj ].
+  }
+  destruct i. {
+    destruct j; [ easy | ].
+    destruct j; [ easy | ].
+    destruct j; [ easy | ].
+    destruct j; [ easy | flia Hj ].
+  }
+  destruct i. {
+    destruct j; [ easy | ].
+    destruct j; [ easy | ].
+    destruct j; [ easy | ].
+    destruct j; [ easy | flia Hj ].
+  }
+  destruct i; [ | flia Hi ].
+  destruct j; [ easy | ].
+  destruct j; [ easy | ].
+  destruct j; [ easy | ].
+  destruct j; [ easy | flia Hj ].
+}
 ...
 
 Lemma lemma_2_A_n_2_eq_n_I (R := Z_ring_op) : ∀ n,
