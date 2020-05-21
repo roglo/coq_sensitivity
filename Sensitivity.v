@@ -2022,10 +2022,12 @@ destruct n. {
 }
 destruct n. {
   cbn in Hi, Hj.
-  cbn - [even_mat_of_mat_mat ].
+  cbn - [ even_mat_of_mat_mat ].
   destruct i. {
     destruct j. {
       cbn.
+Compute (let n := 1 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in mat_mul (2 ^ S n) (A (S n)) (A (S n)))).
+Compute (let n := 1 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in mat_add (mat_mul (2 ^ n) (A n) (A n)) I)).
 (* no *)
 ...
 
