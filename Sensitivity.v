@@ -1855,6 +1855,8 @@ rewrite Nat.mod_small; [ | easy ].
 easy.
 Qed.
 
+Definition zero_mat {T} {ro : ring_op T} := {| matel _ _ := rng_zero |}.
+
 Definition I {T} {ro : ring_op T} :=
   {| matel i j := if Nat.eq_dec i j then rng_one else rng_zero |}.
 
@@ -1873,8 +1875,6 @@ Fixpoint A {T} {ro : ring_op T} n :=
              else
                if Nat.eq_dec j 0 then I else mat_opp (A n') |}
   end.
-
-Definition zero_mat {T} {ro : ring_op T} := {| matel _ _ := rng_zero |}.
 
 Definition mat_add {T} {ro : ring_op T} A B :=
   {| matel i j := (matel A i j + matel B i j)%Rng |}.
@@ -1985,6 +1985,49 @@ Definition nI n :=
 
 Definition fin_mat_eq {T} (eqt : T → T → Prop) u v (M M' : matrix T) :=
   ∀ i j, i < u → j < v → eqt (matel M i j) (matel M' i j).
+
+(*
+                   ⌈ (A_n)^2+I   0          ⌉
+    (A_{n+1})^2 =  ⌊ 0           (A_n)^2+I  ⌋
+*)
+
+Lemma glop (R := Z_ring_op) : ∀ n,
+  fin_mat_eq eq (2 ^ S n) (2 ^ S n)
+    (mat_mul (2 ^ S n) (A (S n)) (A (S n)))
+    (even_mat_of_mat_mat (2 ^ n)
+       {| matel i j :=
+           if Nat.eq_dec i 0 then
+             if Nat.eq_dec j 0 then
+               mat_add (mat_mul (2 ^ n) (A n) (A n)) I
+             else
+               zero_mat
+           else
+             if Nat.eq_dec j 0 then
+               zero_mat
+             else
+               mat_add (mat_mul (2 ^ n) (A n) (A n)) I |}).
+Proof.
+intros * i j Hi Hj.
+destruct n. {
+  cbn in Hi, Hj.
+  rewrite Nat.pow_0_r, Nat.pow_1_r.
+  cbn - [even_mat_of_mat_mat ].
+  destruct i. {
+    destruct j; [ easy | ].
+    destruct j; [ easy | flia Hj ].
+  }
+  destruct i; [ | flia Hi ].
+  destruct j; [ easy | ].
+  destruct j; [ easy | flia Hj ].
+}
+destruct n. {
+  cbn in Hi, Hj.
+  cbn - [even_mat_of_mat_mat ].
+  destruct i. {
+    destruct j. {
+      cbn.
+(* no *)
+...
 
 Lemma lemma_2_A_n_2_eq_n_I (R := Z_ring_op) : ∀ n,
   fin_mat_eq eq (2 ^ n) (2 ^ n)
