@@ -2010,14 +2010,17 @@ induction n; intros. {
 remember (2 ^ S (S n)) as ssn.
 remember (S n) as sn; cbn - [ mat_mul nI ]; subst sn ssn.
 Print mat_mul.
-Theorem glop {T} {ro : ring_op T} : ∀ n (rro := mat_ring_op n),
+Theorem glop {ro : ring_op Z} : ∀ n (rro := mat_ring_op n),
   ∀ MM1 MM2,
   mat_eq eq
     (mat_mul (2 * n)
        (even_mat_of_mat_mat n MM1)
        (even_mat_of_mat_mat n MM2))
-    (even_mat_of_mat_mat n (mat_mul n MM1 MM2)).
-Admitted.
+    (even_mat_of_mat_mat n (mat_mul 1 MM1 MM2)).
+Proof.
+intros * i j.
+remember (2 * n) as n2; cbn - [ summation ]; subst n2.
+...
 rewrite Nat.pow_succ_r.
 rewrite glop.
 ...
