@@ -1996,8 +1996,10 @@ destruct n. {
   do 2 rewrite match_id; cbn.
   now destruct (Nat.eq_dec i j).
 }
-revert i j Hi Hj.
+remember (A (S n)) as asn eqn:Hasn.
+revert asn i j Hasn Hi Hj.
 induction n; intros. {
+  subst asn.
   cbn in Hi, Hj |-*.
   destruct i. {
     destruct j; [ easy | ].
@@ -2008,7 +2010,10 @@ induction n; intros. {
   destruct j; [ easy | flia Hj ].
 }
 remember (2 ^ S (S n)) as ssn.
-remember (S n) as sn; cbn - [ mat_mul nI ]; subst sn ssn.
+remember (S n) as sn.
+cbn - [ mat_mul nI ].
+cbn in Hasn.
+subst sn ssn.
 ...
 Print mat_mul.
 Theorem glop {ro : ring_op Z} : ∀ n (rro := mat_ring_op n),
