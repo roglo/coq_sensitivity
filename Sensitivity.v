@@ -1718,7 +1718,7 @@ Definition mat_transp {T} (M : matrix T) :=
   {| matel i j := matel M j i |}.
 
 Definition mat_mul {T} {ro : ring_op T} n A B :=
-  {| matel i k := (Σ (j = 0, n), matel A i j * matel B j k)%Rng |}.
+  {| matel i k := (Σ (j = 0, n - 1), matel A i j * matel B j k)%Rng |}.
 
 Require Import ZArith.
 
@@ -2029,9 +2029,8 @@ destruct n. {
 Compute (let n := 1 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in mat_mul (2 ^ S n) (A (S n)) (A (S n)))).
 Compute (let n := 1 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in mat_add (mat_mul (2 ^ n) (A n) (A n)) I)).
 Compute (let n := 1 in list_of_mat (2 ^ S n) (2 ^ S n) (let _ := Z_ring_op in mat_add (mat_mul (2 ^ S n) (A (S n)) (A (S n))) zero_mat)).
-Compute (let n := 2 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in (mat_mul (2 ^ n) (A n) (A n)))).
-Compute (let n := 2 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in (mat_mul (2 ^ n) (A n) I))).
-(* no *)
+Compute (let n := 2 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in (A n))).
+Compute (let n := 3 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in (mat_mul (2 ^ n) (A n) (A n)))).
 ...
 
 Lemma lemma_2_A_n_2_eq_n_I (R := Z_ring_op) : ∀ n,
