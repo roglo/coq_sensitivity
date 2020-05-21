@@ -2022,6 +2022,35 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     clear H.
     rewrite Nat.mod_small; [ | easy ].
     clear Hi Hj.
+    revert i j Hin Hjn.
+    induction n; intros. {
+      cbn in Hin, Hjn.
+      destruct i; [ | flia Hin ].
+      destruct j; [ easy | flia Hjn ].
+    }
+    remember (S n) as sn; cbn - [ mat_sqr "^" I mat_add ]; subst sn.
+    unfold even_mat_of_mat_mat.
+    remember (S n) as sn; cbn - [ mat_sqr "/" "^" ]; subst sn.
+...
+    replace (matel _ _ _) with
+ (matel
+    (mat_sqr (2 ^ S (S n))
+       {|
+       matel := λ i0 j0 : nat,
+                  matel
+                    (if Nat.eq_dec (i0 / 2 ^ S n) 0
+                     then if Nat.eq_dec (j0 / 2 ^ S n) 0 then A (S n) else I
+                     else
+                      if Nat.eq_dec (j0 / 2 ^ S n) 0
+                      then I
+                      else mat_opp (A (S n))) (i0 mod 2 ^ S n)
+                    (j0 mod 2 ^ S n) |}) i j).
+...
+    destruct n. {
+      cbn in Hin, Hjn.
+      destruct i. {
+        destruct j. {
+          cbn.
 ...
 intros * i j Hi Hj.
 destruct n. {
