@@ -2290,7 +2290,7 @@ Definition fin_mat_eq {T} (eqt : T → T → Prop) u v (M M' : matrix T) :=
     (A_{n+1})^2 =  ⌊ 0           (A_n)^2+I  ⌋
 *)
 
-Lemma sqr_An1_from_sqr_An (R := Z_ring_op) : ∀ n,
+Lemma sqr_An1_from_sqr_An (ro := Z_ring_op) (rp := Z_ring_prop) : ∀ n,
   fin_mat_eq eq (2 ^ S n) (2 ^ S n)
     (mat_sqr (2 ^ S n) (A (S n)))
     (even_mat_of_mat_mat (2 ^ n)
@@ -2319,7 +2319,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     }
     clear H.
     rewrite Nat.mod_small; [ | easy ].
-    now eapply mat_sqr_A_up_left.
+    now apply mat_sqr_A_up_left.
   }
   apply Nat.nlt_ge in Hjn.
   rewrite (Nat_div_less_small 1) by now rewrite Nat.mul_1_l.
@@ -2335,7 +2335,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
   rename k into j; rename H into Hjn.
   move j before i.
   move Hjn before Hin; clear Hi Hz.
-  now erewrite mat_sqr_A_up_right.
+  now rewrite mat_sqr_A_up_right.
 }
 apply Nat.nlt_ge in Hin.
 rewrite (Nat_div_less_small 1) by now rewrite Nat.mul_1_l.
@@ -2357,8 +2357,8 @@ destruct (lt_dec j (2 ^ n)) as [Hjn| Hjn]. {
   rename k into i; rename H into Hin.
   move i after j.
   move Hin after Hjn; clear Hj Hz.
-  erewrite A_sqr_symm.
-  now erewrite mat_sqr_A_up_right.
+  rewrite A_sqr_symm.
+  now rewrite mat_sqr_A_up_right.
 }
 apply Nat.nlt_ge in Hjn.
 rewrite (Nat_div_less_small 1). 2: {
@@ -2373,7 +2373,7 @@ rewrite Nat.mul_1_l.
 destruct (Nat.eq_dec 1 0) as [H| H]; [ easy | clear H ].
 rewrite Nat.pow_succ_r in Hi; [ | flia ].
 rewrite Nat.pow_succ_r in Hj; [ | flia ].
-erewrite <- mat_sqr_A_up_left; [ | flia Hi | flia Hj ].
+rewrite <- mat_sqr_A_up_left; [ | flia Hi | flia Hj ].
 cbn - [ summation "^" A ].
 ...
   rewrite Nat.mod_small; [ | easy ].
@@ -2462,7 +2462,7 @@ cbn - [ summation "^" A ].
     }
     erewrite all_0_summation_0; [ easy | ].
     intros k Hk.
-    eapply rng_mul_eq_0.
+    apply rng_mul_eq_0.
     destruct (Nat.eq_dec i k) as [Hik| Hik]. {
       destruct (Nat.eq_dec j k) as [Hjk| Hjk]; [ congruence | ].
       right.
