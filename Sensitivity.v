@@ -2023,7 +2023,9 @@ destruct (Nat.eq_dec 1 0) as [H| H]; [ easy | clear H].
 rewrite Nat.mod_small; [ | easy ].
 rewrite Nat_mod_add_same_r; [ | easy ].
 rewrite Nat.mod_small; [ | easy ].
-rewrite (summation_split (2 ^ S n - 1)).
+rewrite (summation_split (2 ^ S n - 1)). 2: {
+  rewrite (Nat.pow_succ_r _ (S n)); flia.
+}
 replace (Σ (_ = _, _), _)%Rng with
   (Σ (k = 0, 2 ^ S n - 1), matel (A (S n)) i k * matel I k j)%Rng. 2: {
   apply summation_compat; intros k Hk.
@@ -2031,7 +2033,7 @@ replace (Σ (_ = _, _), _)%Rng with
   rewrite Nat.mod_small; [ | flia Hz Hk ].
   now destruct (Nat.eq_dec 0 0).
 }
-rewrite (summation_split (j - 1)).
+rewrite (summation_split (j - 1)) by flia Hjn.
 destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
   subst j.
   rewrite Nat.sub_0_l, Nat.add_0_l.
@@ -2042,6 +2044,7 @@ destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
     rewrite I_i_j; [ | flia Hk ].
     apply rng_mul_0_r.
   }
+  rewrite rng_add_0_r.
   rewrite Nat.sub_add; [ | now apply Nat.neq_0_lt_0 ].
   replace (Σ (_ = _, _), _)%Rng with
     (Σ (k = 0, 2 ^ S n - 1),
@@ -2057,6 +2060,57 @@ destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
     rewrite (Nat_mod_less_small 1); [ | flia Hk Hz ].
     now rewrite Nat.mul_1_l, Nat.add_comm, Nat.add_sub.
   }
+  destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+    subst i.
+    rewrite A_i_i, rng_add_0_l.
+    rewrite summation_split_first; [ | flia ].
+    rewrite I_i_i, rng_mul_1_l.
+    rewrite all_0_summation_0. 2: {
+      intros k Hk.
+      rewrite I_i_j; [ | flia Hk ].
+      apply rng_mul_0_l.
+    }
+    rewrite rng_add_0_r.
+    cbn - [ A ].
+    rewrite A_i_i.
+    apply rng_opp_0.
+  }
+  rewrite (summation_split (i - 1)). 2: {
+    split; [ flia | flia Hin Hiz ].
+  }
+  rewrite all_0_summation_0. 2: {
+    intros k Hk.
+    rewrite I_i_j; [ | flia Hiz Hk ].
+    apply rng_mul_0_l.
+  }
+  rewrite rng_add_0_l.
+  rewrite Nat.sub_add; [ | flia Hiz ].
+  rewrite summation_split_first; [ | flia Hin ].
+  rewrite I_i_i, rng_mul_1_l, rng_add_assoc.
+  unfold mat_opp at 1.
+  cbn - [ A summation "^" ].
+  rewrite fold_rng_sub, rng_add_opp_r, rng_add_0_l.
+  apply all_0_summation_0.
+  intros k Hk.
+  destruct (Nat.eq_dec i k) as [H| H]; [ flia Hk H | ].
+  apply rng_mul_0_l.
+}
+rewrite Nat.sub_add; [ | flia Hjz ].
+rewrite all_0_summation_0. 2: {
+  intros k Hk.
+  rewrite I_i_j; [ | flia Hjz Hk ].
+  apply rng_mul_0_r.
+}
+rewrite rng_add_0_l.
+rewrite summation_split_first; [ | flia Hjn ].
+rewrite I_i_i, rng_mul_1_r.
+rewrite all_0_summation_0. 2: {
+  intros k Hk.
+  rewrite I_i_j; [ | flia Hjz Hk ].
+  apply rng_mul_0_r.
+}
+rewrite Nat.sub_add; [ | flia Hz ].
+rewrite rng_add_0_r.
 ...
 intros * Hin Hjn.
 cbn - [ mat_sqr "^" ].
