@@ -1903,6 +1903,12 @@ Context {T : Type}.
 Context {ro : ring_op T}.
 Context {rp : ring_prop}.
 
+Theorem I_i_i : ∀ i, matel I i i = 1%Rng.
+Proof.
+intros; cbn.
+now destruct (Nat.eq_dec i i).
+Qed.
+
 Theorem A_i_i : ∀ n i, matel (A n) i i = 0%Rng.
 Proof.
 intros.
@@ -2051,12 +2057,11 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     assert (Hz : 2 ^ S n ≠ 0) by now apply Nat.pow_nonzero.
     replace (Σ (_ = _, _), _)%Rng with
         (Σ (k = 0, 2 ^ S n - 1),
-         (matel (A (S n)) i k * matel (A (S n)) j k))%Rng. 2: {
+         (matel (A (S n)) i k * matel (A (S n)) k j))%Rng. 2: {
       apply summation_compat; intros k Hk.
       rewrite Nat.div_small; [ | flia Hz Hk ].
       rewrite Nat.mod_small; [ | flia Hz Hk ].
-      destruct (Nat.eq_dec _ _) as [H| H]; [ clear H | easy ].
-      now rewrite (A_symm _ j).
+      now destruct (Nat.eq_dec _ _).
     }
     rewrite Nat.sub_add; [ | flia Hz ].
     replace (Σ (_ = 2 ^ S n, _), _)%Rng with
@@ -2076,7 +2081,11 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       }
       now rewrite Nat.mul_1_l, (I_symm _ j).
     }
+    cbn - [ summation A I "^" ].
+    f_equal.
     destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+      subst j.
+      rewrite I_i_i.
 ...
 intros * i j Hi Hj.
 destruct n. {
