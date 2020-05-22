@@ -2384,7 +2384,15 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     cbn in Hi, Hin.
     now replace i with 1 by flia Hi Hin.
   }
-  replace (Σ (_ = 2 ^ n, _), _)%Rng with 1%Rng. 2: {
+  assert (Hz : 2 ^ n ≠ 0) by now apply Nat.pow_nonzero.
+...
+  replace (Σ (_ = 2 ^ n, _), _)%Rng with 0%Rng. 2: {
+    rewrite (summation_split i).
+    replace i with (S (i - 1)) at 1 by flia Hin Hz.
+    rewrite summation_split_last by flia Hin Hz.
+    replace (S (i - 1)) with i at 1 by flia Hin Hz.
+    rewrite A_diag.
+...
     cbn - [ summation "^" ].
     destruct n; [ easy | ].
     unfold even_mat_of_mat_mat.
