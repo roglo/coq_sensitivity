@@ -1994,6 +1994,31 @@ destruct (Nat.eq_dec (i / 2 ^ n1) 0) as [Hin| Hin]. {
 }
 Qed.
 
+Theorem mat_sqr_A_up_right : ∀ n i j,
+  i < 2 ^ n
+  → j < 2 ^ n
+  → matel (mat_sqr (2 ^ S n) (A (S n))) i (j + 2 ^ n) = 0%Rng.
+Proof.
+intros * Hin Hjn.
+remember (S n) as sn; cbn - [ summation "^" ]; subst sn.
+Search A.
+...
+intros * Hin Hjn.
+cbn - [ mat_sqr "^" ].
+destruct n. {
+  cbn in Hin, Hjn.
+  apply Nat.lt_1_r in Hin.
+  apply Nat.lt_1_r in Hjn.
+  subst i j; cbn.
+  rewrite rng_mul_0_l, rng_mul_0_r.
+  now do 2 rewrite rng_add_0_l.
+}
+unfold even_mat_of_mat_mat.
+remember (S n) as sn; cbn - [ summation "^" ]; subst sn.
+
+remember (S n) as sn; cbn - [ mat_sqr "^" ]; subst sn.
+...
+
 End glop.
 
 (* "We prove by induction that A_n^2 = nI" *)
@@ -2150,6 +2175,9 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
   rename k into j; rename H into Hjn.
   move j before i.
   move Hjn before Hin; clear Hi Hz.
+...
+  now erewrite mat_sqr_A_up_right.
+}
 ...
   rewrite Nat.mul_1_l.
   cbn - [ A summation "^" ].
