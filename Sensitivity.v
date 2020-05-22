@@ -2061,7 +2061,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     rewrite Nat.sub_add; [ | flia Hz ].
     replace (Σ (_ = 2 ^ S n, _), _)%Rng with
       (Σ (k = 2 ^ S n, 2 ^ S (S n) - 1),
-       matel I i (k - 2 ^ S n) * matel I (k - 2 ^ S n) j)%Rng. 2: {
+       matel I i (k - 2 ^ S n) * matel I j (k - 2 ^ S n))%Rng. 2: {
       apply summation_compat; intros k Hk.
       rewrite (Nat_div_less_small 1). 2: {
         rewrite Nat.mul_1_l, Nat.add_1_r.
@@ -2074,12 +2074,9 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
         rewrite (Nat.pow_succ_r _ (S n)) in Hk; [ | flia ].
         flia Hz Hk.
       }
-      now rewrite Nat.mul_1_l.
+      now rewrite Nat.mul_1_l, (I_symm _ j).
     }
-...
-    replace (Σ (_ = 2 ^ S n, _), _)%Rng with
-      (Σ (k = 2 ^ S n, 2 ^ S (S n) - 1),
-       matel I i (k mod 2 ^ S n) * matel I (k mod 2 ^ S n) j)%Rng.
+    destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 ...
 intros * i j Hi Hj.
 destruct n. {
