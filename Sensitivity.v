@@ -2038,8 +2038,11 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     clear H.
     rewrite Nat.mod_small; [ | easy ].
     clear Hi Hj.
+(*
     revert i j Hin Hjn.
     induction n; intros. {
+*)
+    destruct n; intros. {
       cbn in Hin, Hjn.
       destruct i; [ | flia Hin ].
       destruct j; [ easy | flia Hjn ].
@@ -2092,16 +2095,6 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     destruct (Nat.eq_dec i j) as [Hij| Hij]. {
       subst j.
       rewrite I_i_i.
-      destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
-        subst i.
-        rewrite summation_split_first; [ | cbn; flia ].
-        rewrite Nat.sub_diag, I_i_i.
-        erewrite all_0_summation_0. 2: {
-          intros k Hk.
-          rewrite I_i_j; [ easy | flia Hk ].
-        }
-        easy.
-      }
       erewrite (summation_split (i + 2 ^ S n - 1)). 2: {
         split; [ flia | ].
         apply -> Nat.succ_le_mono.
@@ -2112,7 +2105,51 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
         intros k Hk.
         rewrite I_i_j; [ easy | flia Hk Hz ].
       }
-
+      rewrite Nat.sub_add; [ | flia Hz ].
+      rewrite summation_split_first. 2: {
+        rewrite (Nat.pow_succ_r _ (S n)); [ | flia ].
+        flia Hin.
+      }
+      rewrite Nat.add_sub, I_i_i.
+      erewrite all_0_summation_0. 2: {
+        intros k Hk.
+        rewrite I_i_j; [ easy | flia Hk Hz ].
+      }
+      easy.
+    }
+    rewrite I_i_j; [ | easy ].
+    rewrite summation_shift; [ | rewrite (Nat.pow_succ_r _ (S n)); flia Hz ].
+    replace (Σ (_ = _, _), _)%Rng with
+      ((Σ (k = 0, 2 ^ S (S n) - 1 - 2 ^ S n),
+        matel I i k * matel I j k)%Rng). 2: {
+      apply summation_compat; intros k Hk.
+      now rewrite Nat.add_comm, Nat.add_sub.
+    }
+    erewrite all_0_summation_0; [ easy | ].
+    intros k Hk.
+    eapply rng_mul_eq_0.
+    destruct (Nat.eq_dec i k) as [Hik| Hik]. {
+      destruct (Nat.eq_dec j k) as [Hjk| Hjk]; [ congruence | ].
+      right.
+      now apply I_i_j.
+    }
+    left.
+    now apply I_i_j.
+  }
+  apply Nat.nlt_ge in Hjn.
+  rewrite (Nat_div_less_small 1) by now rewrite Nat.mul_1_l.
+  destruct (Nat.eq_dec 1 0) as [H| H]; [ easy | clear H].
+  cbn - [ A summation "^" ].
+...
+  erewrite all_0_summation_0; [ easy | ].
+  intros k Hk.
+  cbn - [ A ].
+  apply Z.mul_eq_0.
+  destruct (Nat.eq_dec i k) as [Hik| Hik]. {
+    subst k; left.
+    now erewrite A_i_i.
+  }
+Compute (list_of_mat 8 8 (let _ := Z_ring_op in A 3)).
 ...
 intros * i j Hi Hj.
 destruct n. {
