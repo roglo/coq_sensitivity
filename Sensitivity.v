@@ -2386,7 +2386,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   }
   assert (Hz : 2 ^ n ≠ 0) by now apply Nat.pow_nonzero.
   replace (Σ (_ = _, _), _)%Rng with 1%Rng. 2: {
-    rewrite (summation_split (i - 2 ^ n)).
+    rewrite (summation_split (i - 2 ^ n)) by flia Hi.
     destruct (Nat.eq_dec i (2 ^ n)) as [Hien| Hien]. {
       replace (i - 2 ^ n) with 0 by flia Hien.
       rewrite Nat.add_0_l.
@@ -2421,11 +2421,9 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
       rewrite Nat.mod_0_l; [ | easy ].
       now destruct (Nat.eq_dec 0 0).
     }
-...
-    replace i with (S (i - 1)) at 1 by flia Hin Hz.
+    replace (i - 2 ^ n) with (S (i - 2 ^ n - 1)) at 1 by flia Hin Hien.
     rewrite summation_split_last by flia Hin Hz.
-    replace (S (i - 1)) with i at 1 by flia Hin Hz.
-    rewrite A_diag.
+    replace (S (i - 2 ^ n - 1)) with (i - 2 ^ n) at 1 by flia Hin Hien.
 ...
     cbn - [ summation "^" ].
     destruct n; [ easy | ].
