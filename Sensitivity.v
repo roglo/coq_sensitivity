@@ -2423,118 +2423,28 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     }
     replace (i - 2 ^ n) with (S (i - 2 ^ n - 1)) at 1 by flia Hin Hien.
     rewrite summation_split_last by flia Hin Hz.
-    replace (S (i - 2 ^ n - 1)) with (i - 2 ^ n) at 1 by flia Hin Hien.
-...
-    cbn - [ summation "^" ].
-    destruct n; [ easy | ].
-    unfold even_mat_of_mat_mat.
-    cbn - [ summation "^" mat_opp I ].
-    rewrite (Nat_div_less_small 1).
-    rewrite (Nat_mod_less_small 1).
-    destruct (Nat.eq_dec 1 0) as [H| H]; [ easy | clear H ].
-    rewrite Nat.mul_1_l.
-...
-  rewrite Nat.mod_small; [ | easy ].
-    clear Hi Hj.
-    destruct n; intros. {
-      cbn in Hin, Hjn.
-      destruct i; [ | flia Hin ].
-      destruct j; [ easy | flia Hjn ].
-    }
-    remember (S n) as sn; cbn - [ mat_sqr "^" I mat_add ]; subst sn.
-    unfold even_mat_of_mat_mat.
-    remember (S n) as sn; cbn - [ mat_sqr "/" "^" I mat_add ]; subst sn.
-    cbn - [ summation "^" A I ].
-    rewrite Nat.div_small; [ | easy ].
-    rewrite Nat.div_small; [ | easy ].
-    rewrite Nat.mod_small; [ | easy ].
-    rewrite Nat.mod_small; [ | easy ].
-    destruct (Nat.eq_dec 0 0) as [H| H]; [ clear H | easy ].
-    erewrite (summation_split (2 ^ S n - 1)). 2: {
-      split; [ flia | ].
-      apply -> Nat.succ_le_mono.
-      apply Nat.sub_le_mono_r.
-      apply Nat.pow_le_mono_r; [ easy | flia ].
-    }
-    assert (Hz : 2 ^ S n ≠ 0) by now apply Nat.pow_nonzero.
-    replace (Σ (_ = _, _), _)%Rng with
-        (Σ (k = 0, 2 ^ S n - 1),
-         (matel (A (S n)) i k * matel (A (S n)) k j))%Rng. 2: {
-      apply summation_compat; intros k Hk.
-      rewrite Nat.div_small; [ | flia Hz Hk ].
-      rewrite Nat.mod_small; [ | flia Hz Hk ].
-      now destruct (Nat.eq_dec _ _).
-    }
-    rewrite Nat.sub_add; [ | flia Hz ].
-    replace (Σ (_ = 2 ^ S n, _), _)%Rng with
-      (Σ (k = 2 ^ S n, 2 ^ S (S n) - 1),
-       matel I i (k - 2 ^ S n) * matel I j (k - 2 ^ S n))%Rng. 2: {
-      apply summation_compat; intros k Hk.
+    replace (S (i - 2 ^ n - 1)) with (i - 2 ^ n) by flia Hin Hien.
+    rewrite (A_symm _ _ i).
+    replace (matel (A (S n)) i (i - 2 ^ n)) with 1%Rng. 2: {
+      cbn.
+      destruct n; [ easy | ].
+      unfold even_mat_of_mat_mat.
+      cbn - [ A "mod" "/" "^" ].
       rewrite (Nat_div_less_small 1). 2: {
-        rewrite Nat.mul_1_l, Nat.add_1_r.
-        rewrite (Nat.pow_succ_r _ (S n)) in Hk; [ | flia ].
-        flia Hz Hk.
+        split; [ flia Hin | ].
+        now cbn in Hi; cbn.
       }
       destruct (Nat.eq_dec 1 0) as [H| H]; [ easy | clear H ].
+      rewrite Nat.div_small by flia Hi.
+      destruct (Nat.eq_dec 0 0) as [H| H]; [ clear H | easy ].
       rewrite (Nat_mod_less_small 1). 2: {
-        rewrite Nat.mul_1_l, Nat.add_1_r.
-        rewrite (Nat.pow_succ_r _ (S n)) in Hk; [ | flia ].
-        flia Hz Hk.
+        split; [ flia Hin | ].
+        now cbn in Hi; cbn.
       }
-      now rewrite Nat.mul_1_l, (I_symm _ j).
+      rewrite Nat.mod_small by flia Hi.
+      now rewrite Nat.mul_1_l, I_diag.
     }
-    cbn - [ summation A I "^" ].
-    f_equal.
-    destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-      subst j.
-      rewrite I_diag.
-      erewrite (summation_split (i + 2 ^ S n - 1)). 2: {
-        split; [ flia | ].
-        apply -> Nat.succ_le_mono.
-        apply Nat.sub_le_mono_r.
-        rewrite (Nat.pow_succ_r _ (S n)); [ flia Hin | flia ].
-      }
-      erewrite all_0_summation_0. 2: {
-        intros k Hk.
-        rewrite I_ndiag; [ easy | flia Hk Hz ].
-      }
-      rewrite Nat.sub_add; [ | flia Hz ].
-      rewrite summation_split_first. 2: {
-        rewrite (Nat.pow_succ_r _ (S n)); [ | flia ].
-        flia Hin.
-      }
-      rewrite Nat.add_sub, I_diag.
-      erewrite all_0_summation_0. 2: {
-        intros k Hk.
-        rewrite I_ndiag; [ easy | flia Hk Hz ].
-      }
-      easy.
-    }
-    rewrite I_ndiag; [ | easy ].
-    rewrite summation_shift; [ | rewrite (Nat.pow_succ_r _ (S n)); flia Hz ].
-    replace (Σ (_ = _, _), _)%Rng with
-      ((Σ (k = 0, 2 ^ S (S n) - 1 - 2 ^ S n),
-        matel I i k * matel I j k)%Rng). 2: {
-      apply summation_compat; intros k Hk.
-      now rewrite Nat.add_comm, Nat.add_sub.
-    }
-    erewrite all_0_summation_0; [ easy | ].
-    intros k Hk.
-    apply rng_mul_eq_0.
-    destruct (Nat.eq_dec i k) as [Hik| Hik]. {
-      destruct (Nat.eq_dec j k) as [Hjk| Hjk]; [ congruence | ].
-      right.
-      now apply I_ndiag.
-    }
-    left.
-    now apply I_ndiag.
-...
-  Hj : j < 2 ^ S n
-  Hi : i < 2 ^ S n
-  Hin : i < 2 ^ n
-  ============================
-  matel (mat_sqr (2 ^ S n) (A (S n))) i j =
-  matel (if Nat.eq_dec (j / 2 ^ n) 0 then mat_add (mat_sqr (2 ^ n) (A n)) I else zero_mat) i (j mod 2 ^ n)
+    rewrite Z.mul_1_l.
 ...
   rewrite Nat.mul_1_l.
   cbn - [ A summation "^" ].
