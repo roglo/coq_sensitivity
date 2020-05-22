@@ -2035,24 +2035,51 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     remember (S n) as sn; cbn - [ mat_sqr "^" I mat_add ]; subst sn.
     unfold even_mat_of_mat_mat.
     remember (S n) as sn; cbn - [ mat_sqr "/" "^" I mat_add ]; subst sn.
-cbn - [ summation "^" A I ].
-rewrite Nat.div_small; [ | easy ].
-rewrite Nat.div_small; [ | easy ].
-rewrite Nat.mod_small; [ | easy ].
-rewrite Nat.mod_small; [ | easy ].
-destruct (Nat.eq_dec 0 0) as [H| H]; [ clear H | easy ].
-erewrite (summation_split (2 ^ S n - 1)).
-replace (Σ (_ = _, _), _)%Rng with
-  (Σ (k = 0, 2 ^ S n - 1),
-   (matel (A (S n)) i k * matel (A (S n)) j k))%Rng. 2: {
-  apply summation_compat; intros k Hk.
-  assert (Hz : 2 ^ S n ≠ 0) by now apply Nat.pow_nonzero.
-  rewrite Nat.div_small; [ | flia Hz Hk ].
-  rewrite Nat.mod_small; [ | flia Hz Hk ].
-  destruct (Nat.eq_dec _ _) as [H| H]; [ clear H | easy ].
-  now rewrite (A_symm _ j).
-}
-rewrite Nat.sub_add.
+(**)
+    cbn - [ summation "^" A I ].
+    rewrite Nat.div_small; [ | easy ].
+    rewrite Nat.div_small; [ | easy ].
+    rewrite Nat.mod_small; [ | easy ].
+    rewrite Nat.mod_small; [ | easy ].
+    destruct (Nat.eq_dec 0 0) as [H| H]; [ clear H | easy ].
+    erewrite (summation_split (2 ^ S n - 1)). 2: {
+      split; [ flia | ].
+      apply -> Nat.succ_le_mono.
+      apply Nat.sub_le_mono_r.
+      apply Nat.pow_le_mono_r; [ easy | flia ].
+    }
+    assert (Hz : 2 ^ S n ≠ 0) by now apply Nat.pow_nonzero.
+    replace (Σ (_ = _, _), _)%Rng with
+        (Σ (k = 0, 2 ^ S n - 1),
+         (matel (A (S n)) i k * matel (A (S n)) j k))%Rng. 2: {
+      apply summation_compat; intros k Hk.
+      rewrite Nat.div_small; [ | flia Hz Hk ].
+      rewrite Nat.mod_small; [ | flia Hz Hk ].
+      destruct (Nat.eq_dec _ _) as [H| H]; [ clear H | easy ].
+      now rewrite (A_symm _ j).
+    }
+    rewrite Nat.sub_add; [ | flia Hz ].
+    replace (Σ (_ = 2 ^ S n, _), _)%Rng with
+      (Σ (k = 2 ^ S n, 2 ^ S (S n) - 1),
+       matel I i (k - 2 ^ S n) * matel I (k - 2 ^ S n) j)%Rng. 2: {
+      apply summation_compat; intros k Hk.
+      rewrite (Nat_div_less_small 1). 2: {
+        rewrite Nat.mul_1_l, Nat.add_1_r.
+        rewrite (Nat.pow_succ_r _ (S n)) in Hk; [ | flia ].
+        flia Hz Hk.
+      }
+      destruct (Nat.eq_dec 1 0) as [H| H]; [ easy | clear H ].
+      rewrite (Nat_mod_less_small 1). 2: {
+        rewrite Nat.mul_1_l, Nat.add_1_r.
+        rewrite (Nat.pow_succ_r _ (S n)) in Hk; [ | flia ].
+        flia Hz Hk.
+      }
+      now rewrite Nat.mul_1_l.
+    }
+...
+    replace (Σ (_ = 2 ^ S n, _), _)%Rng with
+      (Σ (k = 2 ^ S n, 2 ^ S (S n) - 1),
+       matel I i (k mod 2 ^ S n) * matel I (k mod 2 ^ S n) j)%Rng.
 ...
 intros * i j Hi Hj.
 destruct n. {
