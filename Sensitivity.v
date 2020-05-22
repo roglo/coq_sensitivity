@@ -2385,9 +2385,43 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     now replace i with 1 by flia Hi Hin.
   }
   assert (Hz : 2 ^ n ≠ 0) by now apply Nat.pow_nonzero.
+  replace (Σ (_ = _, _), _)%Rng with 1%Rng. 2: {
+    rewrite (summation_split (i - 2 ^ n)).
+    destruct (Nat.eq_dec i (2 ^ n)) as [Hien| Hien]. {
+      replace (i - 2 ^ n) with 0 by flia Hien.
+      rewrite Nat.add_0_l.
+      rewrite summation_only_one.
+      rewrite all_0_summation_0. 2: {
+        intros k Hk.
+        cbn - [ A ].
+        apply Z.mul_eq_0; left.
+        cbn.
+        destruct n; [ easy | ].
+        unfold even_mat_of_mat_mat.
+        cbn - [ A "^" ].
+        rewrite Hien.
+        rewrite Nat.div_same; [ | easy ].
+        rewrite Nat.mod_same; [ | easy ].
+        destruct (Nat.eq_dec 1 0) as [H| H]; [ easy | clear H ].
+        rewrite Nat.div_small; [ | flia Hk ].
+        rewrite Nat.mod_small; [ | flia Hk ].
+        destruct (Nat.eq_dec 0 0) as [H| H]; [ clear H | easy ].
+        rewrite I_ndiag; [ easy | flia Hk ].
+      }
+      rewrite rng_add_0_r.
+      cbn.
+      destruct n; [ easy | ].
+      unfold even_mat_of_mat_mat.
+      cbn - [ A "^" ].
+      rewrite Hien.
+      rewrite Nat.div_same; [ | easy ].
+      rewrite Nat.mod_same; [ | easy ].
+      destruct (Nat.eq_dec 1 0) as [H| H]; [ easy | clear H ].
+      rewrite Nat.div_0_l; [ | easy ].
+      rewrite Nat.mod_0_l; [ | easy ].
+      now destruct (Nat.eq_dec 0 0).
+    }
 ...
-  replace (Σ (_ = 2 ^ n, _), _)%Rng with 0%Rng. 2: {
-    rewrite (summation_split i).
     replace i with (S (i - 1)) at 1 by flia Hin Hz.
     rewrite summation_split_last by flia Hin Hz.
     replace (S (i - 1)) with i at 1 by flia Hin Hz.
