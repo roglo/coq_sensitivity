@@ -453,6 +453,35 @@ rewrite <- Nat.mul_sub_distr_r.
 now rewrite Nat.div_mul.
 Qed.
 
+Theorem Nat_mod_add_same_l : ∀ a b, a ≠ 0 → (a + b) mod a = b mod a.
+Proof.
+intros * Ha.
+rewrite <- Nat.add_mod_idemp_l; [ | easy ].
+now rewrite Nat.mod_same.
+Qed.
+
+Theorem Nat_mod_add_same_r : ∀ a b, b ≠ 0 → (a + b) mod b = a mod b.
+Proof.
+intros * Ha.
+rewrite <- Nat.add_mod_idemp_r; [ | easy ].
+now rewrite Nat.mod_same, Nat.add_0_r.
+Qed.
+
+Theorem Nat_div_add_same_l : ∀ a b, a ≠ 0 → (a + b) / a = 1 + b / a.
+Proof.
+intros * Ha.
+replace a with (1 * a) at 1 by apply Nat.mul_1_l.
+rewrite Nat.add_comm.
+rewrite Nat.div_add; [ apply Nat.add_comm | easy ].
+Qed.
+
+Theorem Nat_div_add_same_r : ∀ a b, b ≠ 0 → (a + b) / b = a / b + 1.
+Proof.
+intros * Ha.
+replace b with (1 * b) at 1 by apply Nat.mul_1_l.
+now rewrite Nat.div_add.
+Qed.
+
 Theorem Nat_sub_succ_1 : ∀ n, S n - 1 = n.
 Proof. now intros; rewrite Nat.sub_succ, Nat.sub_0_r. Qed.
 

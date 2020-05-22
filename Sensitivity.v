@@ -2001,7 +2001,28 @@ Theorem mat_sqr_A_up_right : ∀ n i j,
 Proof.
 intros * Hin Hjn.
 remember (S n) as sn; cbn - [ summation "^" ]; subst sn.
-Search A.
+revert i j Hin Hjn.
+induction n; intros. {
+  cbn in Hin, Hjn.
+  apply Nat.lt_1_r in Hin.
+  apply Nat.lt_1_r in Hjn.
+  subst i j; cbn.
+  rewrite rng_mul_0_l, rng_mul_0_r.
+  now do 2 rewrite rng_add_0_l.
+}
+remember (S n) as sn; cbn - [ summation "^" ]; subst sn.
+unfold even_mat_of_mat_mat.
+remember (S n) as sn; cbn - [ summation "^" ]; subst sn.
+rewrite Nat.div_small; [ | easy ].
+destruct (Nat.eq_dec 0 0) as [H| H]; [ clear H | easy ].
+assert (Hz : 2 ^ S n ≠ 0) by now apply Nat.pow_nonzero.
+rewrite Nat_div_add_same_r; [ | easy ].
+rewrite Nat.div_small; [ | easy ].
+rewrite Nat.add_0_l.
+destruct (Nat.eq_dec 1 0) as [H| H]; [ easy | clear H].
+rewrite Nat.mod_small; [ | easy ].
+rewrite Nat_mod_add_same_r; [ | easy ].
+rewrite Nat.mod_small; [ | easy ].
 ...
 intros * Hin Hjn.
 cbn - [ mat_sqr "^" ].
