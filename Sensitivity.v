@@ -1909,6 +1909,12 @@ intros; cbn.
 now destruct (Nat.eq_dec i i).
 Qed.
 
+Theorem I_i_j : ∀ i j, i ≠ j → matel I i j = 0%Rng.
+Proof.
+intros * Hij; cbn.
+now destruct (Nat.eq_dec i j).
+Qed.
+
 Theorem A_i_i : ∀ n i, matel (A n) i i = 0%Rng.
 Proof.
 intros.
@@ -2086,6 +2092,27 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     destruct (Nat.eq_dec i j) as [Hij| Hij]. {
       subst j.
       rewrite I_i_i.
+      destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+        subst i.
+        rewrite summation_split_first; [ | cbn; flia ].
+        rewrite Nat.sub_diag, I_i_i.
+        erewrite all_0_summation_0. 2: {
+          intros k Hk.
+          rewrite I_i_j; [ easy | flia Hk ].
+        }
+        easy.
+      }
+      erewrite (summation_split (i + 2 ^ S n - 1)). 2: {
+        split; [ flia | ].
+        apply -> Nat.succ_le_mono.
+        apply Nat.sub_le_mono_r.
+        rewrite (Nat.pow_succ_r _ (S n)); [ flia Hin | flia ].
+      }
+      erewrite all_0_summation_0. 2: {
+        intros k Hk.
+        rewrite I_i_j; [ easy | flia Hk Hz ].
+      }
+
 ...
 intros * i j Hi Hj.
 destruct n. {
