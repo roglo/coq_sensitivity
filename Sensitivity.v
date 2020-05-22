@@ -2111,6 +2111,21 @@ rewrite all_0_summation_0. 2: {
 }
 rewrite Nat.sub_add; [ | flia Hz ].
 rewrite rng_add_0_r.
+replace (Σ (_ = _, _), _)%Rng with
+  (Σ (k = 0, 2 ^ S n - 1),
+   matel I i k * matel (mat_opp (A (S n))) k j)%Rng. 2: {
+  rewrite (summation_shift (2 ^ S n)). 2: {
+    rewrite (Nat.pow_succ_r _ (S n)); [ flia Hz | flia ].
+  }
+  rewrite Nat_sub_sub_swap.
+  replace (2 ^ S (S n) - 2 ^ S n) with (2 ^ S n) by (cbn; flia).
+  apply summation_compat; intros k Hk.
+  rewrite (Nat_div_less_small 1); [ | flia Hk Hz ].
+  destruct (Nat.eq_dec 1 0) as [H| H]; [ easy | clear H].
+  rewrite (Nat_mod_less_small 1); [ | flia Hk Hz ].
+  now rewrite Nat.mul_1_l, Nat.add_comm, Nat.add_sub.
+}
+rewrite (summation_split (i - 1)).
 ...
 intros * Hin Hjn.
 cbn - [ mat_sqr "^" ].
