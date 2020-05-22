@@ -2138,8 +2138,30 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
   }
   apply Nat.nlt_ge in Hjn.
   rewrite (Nat_div_less_small 1) by now rewrite Nat.mul_1_l.
+  rewrite (Nat_mod_less_small 1) by now rewrite Nat.mul_1_l.
   destruct (Nat.eq_dec 1 0) as [H| H]; [ easy | clear H].
+  unfold zero_mat.
+  cbn - [ A mat_sqr "^" ].
+  assert (Hz : 2 ^ n ≠ 0) by now apply Nat.pow_nonzero.
+  replace j with (j - 2 ^ n + 2 ^ n) by now apply Nat.sub_add.
+  remember (j - 2 ^ n) as k eqn:Hk.
+  assert (H : k < 2 ^ n) by (cbn in Hj; flia Hj Hk).
+  clear j Hj Hjn Hk.
+  rename k into j; rename H into Hjn.
+  move j before i.
+  move Hjn before Hin; clear Hi Hz.
+...
+  rewrite Nat.mul_1_l.
   cbn - [ A summation "^" ].
+  erewrite (summation_split i).
+  destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+    subst i.
+    erewrite summation_only_one.
+    erewrite A_i_i.
+    rewrite Z.mul_0_l, Nat.add_0_l.
+    erewrite (summation_split j).
+    replace j with (S (j - 1)) at 1 by flia Hz Hjn.
+    erewrite summation_split_last.
 ...
   erewrite all_0_summation_0; [ easy | ].
   intros k Hk.
