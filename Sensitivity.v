@@ -2445,6 +2445,31 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
       now rewrite Nat.mul_1_l, I_diag.
     }
     rewrite Z.mul_1_l.
+    rewrite all_0_summation_0. 2: {
+      intros k Hk.
+      cbn - [ A ].
+      apply Z.mul_eq_0; left.
+      cbn.
+      destruct n; [ easy | ].
+      unfold even_mat_of_mat_mat.
+      cbn - [ A "^" ].
+      rewrite (Nat_div_less_small 1). 2: {
+        split; [ flia Hin | easy ].
+      }
+      destruct (Nat.eq_dec 1 0) as [H| H]; [ easy | clear H ].
+      rewrite Nat.div_small by flia Hi Hk.
+      destruct (Nat.eq_dec 0 0) as [H| H]; [ clear H | easy ].
+      rewrite (Nat_mod_less_small 1). 2: {
+        split; [ flia Hin | easy ].
+      }
+      rewrite Nat.mul_1_l.
+      rewrite Nat.mod_small by flia Hi Hk.
+      rewrite I_ndiag; [ easy | ].
+      flia Hk Hin Hien.
+    }
+    rewrite rng_add_0_l.
+    rewrite all_0_summation_0. 2: {
+      intros k Hk.
 ...
   rewrite Nat.mul_1_l.
   cbn - [ A summation "^" ].
