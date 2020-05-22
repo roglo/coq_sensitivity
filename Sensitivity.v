@@ -2375,6 +2375,24 @@ rewrite Nat.pow_succ_r in Hi; [ | flia ].
 rewrite Nat.pow_succ_r in Hj; [ | flia ].
 rewrite <- mat_sqr_A_up_left; [ | flia Hi | flia Hj ].
 cbn - [ summation "^" A ].
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  subst j.
+  rewrite (summation_split (2 ^ n - 1)).
+  rewrite Nat.sub_add.
+  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+    subst n.
+    cbn in Hi, Hin.
+    now replace i with 1 by flia Hi Hin.
+  }
+  replace (Σ (_ = 2 ^ n, _), _)%Rng with 1%Rng. 2: {
+    cbn - [ summation "^" ].
+    destruct n; [ easy | ].
+    unfold even_mat_of_mat_mat.
+    cbn - [ summation "^" mat_opp I ].
+    rewrite (Nat_div_less_small 1).
+    rewrite (Nat_mod_less_small 1).
+    destruct (Nat.eq_dec 1 0) as [H| H]; [ easy | clear H ].
+    rewrite Nat.mul_1_l.
 ...
   rewrite Nat.mod_small; [ | easy ].
     clear Hi Hj.
