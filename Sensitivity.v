@@ -1897,25 +1897,25 @@ Compute (list_of_mat 16 16 (let _ := Z_ring_op in A 4)).
 
 Close Scope Z_scope.
 
-Section glop.
+Section I_A_theorems.
 
 Context {T : Type}.
 Context {ro : ring_op T}.
 Context {rp : ring_prop}.
 
-Theorem I_i_i : ∀ i, matel I i i = 1%Rng.
+Theorem I_diag : ∀ i, matel I i i = 1%Rng.
 Proof.
 intros; cbn.
 now destruct (Nat.eq_dec i i).
 Qed.
 
-Theorem I_i_j : ∀ i j, i ≠ j → matel I i j = 0%Rng.
+Theorem I_ndiag : ∀ i j, i ≠ j → matel I i j = 0%Rng.
 Proof.
 intros * Hij; cbn.
 now destruct (Nat.eq_dec i j).
 Qed.
 
-Theorem A_i_i : ∀ n i, matel (A n) i i = 0%Rng.
+Theorem A_diag : ∀ n i, matel (A n) i i = 0%Rng.
 Proof.
 intros.
 revert i.
@@ -2038,10 +2038,10 @@ destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
   subst j.
   rewrite Nat.sub_0_l, Nat.add_0_l.
   rewrite summation_only_one.
-  rewrite I_i_i, rng_mul_1_r.
+  rewrite I_diag, rng_mul_1_r.
   rewrite all_0_summation_0. 2: {
     intros k Hk.
-    rewrite I_i_j; [ | flia Hk ].
+    rewrite I_ndiag; [ | flia Hk ].
     apply rng_mul_0_r.
   }
   rewrite rng_add_0_r.
@@ -2062,17 +2062,17 @@ destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
   }
   destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
     subst i.
-    rewrite A_i_i, rng_add_0_l.
+    rewrite A_diag, rng_add_0_l.
     rewrite summation_split_first; [ | flia ].
-    rewrite I_i_i, rng_mul_1_l.
+    rewrite I_diag, rng_mul_1_l.
     rewrite all_0_summation_0. 2: {
       intros k Hk.
-      rewrite I_i_j; [ | flia Hk ].
+      rewrite I_ndiag; [ | flia Hk ].
       apply rng_mul_0_l.
     }
     rewrite rng_add_0_r.
     cbn - [ A ].
-    rewrite A_i_i.
+    rewrite A_diag.
     apply rng_opp_0.
   }
   rewrite (summation_split (i - 1)). 2: {
@@ -2080,13 +2080,13 @@ destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
   }
   rewrite all_0_summation_0. 2: {
     intros k Hk.
-    rewrite I_i_j; [ | flia Hiz Hk ].
+    rewrite I_ndiag; [ | flia Hiz Hk ].
     apply rng_mul_0_l.
   }
   rewrite rng_add_0_l.
   rewrite Nat.sub_add; [ | flia Hiz ].
   rewrite summation_split_first; [ | flia Hin ].
-  rewrite I_i_i, rng_mul_1_l, rng_add_assoc.
+  rewrite I_diag, rng_mul_1_l, rng_add_assoc.
   unfold mat_opp at 1.
   cbn - [ A summation "^" ].
   rewrite fold_rng_sub, rng_add_opp_r, rng_add_0_l.
@@ -2098,15 +2098,15 @@ destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
 rewrite Nat.sub_add; [ | flia Hjz ].
 rewrite all_0_summation_0. 2: {
   intros k Hk.
-  rewrite I_i_j; [ | flia Hjz Hk ].
+  rewrite I_ndiag; [ | flia Hjz Hk ].
   apply rng_mul_0_r.
 }
 rewrite rng_add_0_l.
 rewrite summation_split_first; [ | flia Hjn ].
-rewrite I_i_i, rng_mul_1_r.
+rewrite I_diag, rng_mul_1_r.
 rewrite all_0_summation_0. 2: {
   intros k Hk.
-  rewrite I_i_j; [ | flia Hjz Hk ].
+  rewrite I_ndiag; [ | flia Hjz Hk ].
   apply rng_mul_0_r.
 }
 rewrite Nat.sub_add; [ | flia Hz ].
@@ -2125,25 +2125,40 @@ replace (Σ (_ = _, _), _)%Rng with
   rewrite (Nat_mod_less_small 1); [ | flia Hk Hz ].
   now rewrite Nat.mul_1_l, Nat.add_comm, Nat.add_sub.
 }
-rewrite (summation_split (i - 1)).
-...
-intros * Hin Hjn.
-cbn - [ mat_sqr "^" ].
-destruct n. {
-  cbn in Hin, Hjn.
-  apply Nat.lt_1_r in Hin.
-  apply Nat.lt_1_r in Hjn.
-  subst i j; cbn.
-  rewrite rng_mul_0_l, rng_mul_0_r.
-  now do 2 rewrite rng_add_0_l.
+rewrite (summation_split (i - 1)) by flia Hin.
+destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+  subst i.
+  rewrite Nat.sub_0_l, Nat.add_0_l.
+  rewrite summation_only_one.
+  rewrite I_diag, rng_mul_1_l.
+  rewrite rng_add_assoc.
+  unfold mat_opp at 1.
+  cbn - [ A summation "^" mat_opp I ].
+  rewrite fold_rng_sub, rng_add_opp_r, rng_add_0_l.
+  apply all_0_summation_0.
+  intros k Hk.
+  rewrite I_ndiag; [ | flia Hk ].
+  apply rng_mul_0_l.
 }
-unfold even_mat_of_mat_mat.
-remember (S n) as sn; cbn - [ summation "^" ]; subst sn.
+rewrite all_0_summation_0. 2: {
+  intros k Hk.
+  rewrite I_ndiag; [ | flia Hiz Hk ].
+  apply rng_mul_0_l.
+}
+rewrite rng_add_0_l.
+rewrite Nat.sub_add; [ | flia Hiz ].
+rewrite summation_split_first; [ | flia Hin ].
+rewrite I_diag, rng_mul_1_l, rng_add_assoc.
+unfold mat_opp at 1.
+cbn - [ A summation "^" mat_opp I ].
+rewrite fold_rng_sub, rng_add_opp_r, rng_add_0_l.
+apply all_0_summation_0.
+intros k Hk.
+rewrite I_ndiag; [ | flia Hk ].
+apply rng_mul_0_l.
+Qed.
 
-remember (S n) as sn; cbn - [ mat_sqr "^" ]; subst sn.
-...
-
-End glop.
+End I_A_theorems.
 
 (* "We prove by induction that A_n^2 = nI" *)
 
@@ -2243,7 +2258,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     f_equal.
     destruct (Nat.eq_dec i j) as [Hij| Hij]. {
       subst j.
-      rewrite I_i_i.
+      rewrite I_diag.
       erewrite (summation_split (i + 2 ^ S n - 1)). 2: {
         split; [ flia | ].
         apply -> Nat.succ_le_mono.
@@ -2252,21 +2267,21 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       }
       erewrite all_0_summation_0. 2: {
         intros k Hk.
-        rewrite I_i_j; [ easy | flia Hk Hz ].
+        rewrite I_ndiag; [ easy | flia Hk Hz ].
       }
       rewrite Nat.sub_add; [ | flia Hz ].
       rewrite summation_split_first. 2: {
         rewrite (Nat.pow_succ_r _ (S n)); [ | flia ].
         flia Hin.
       }
-      rewrite Nat.add_sub, I_i_i.
+      rewrite Nat.add_sub, I_diag.
       erewrite all_0_summation_0. 2: {
         intros k Hk.
-        rewrite I_i_j; [ easy | flia Hk Hz ].
+        rewrite I_ndiag; [ easy | flia Hk Hz ].
       }
       easy.
     }
-    rewrite I_i_j; [ | easy ].
+    rewrite I_ndiag; [ | easy ].
     rewrite summation_shift; [ | rewrite (Nat.pow_succ_r _ (S n)); flia Hz ].
     replace (Σ (_ = _, _), _)%Rng with
       ((Σ (k = 0, 2 ^ S (S n) - 1 - 2 ^ S n),
@@ -2280,10 +2295,10 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     destruct (Nat.eq_dec i k) as [Hik| Hik]. {
       destruct (Nat.eq_dec j k) as [Hjk| Hjk]; [ congruence | ].
       right.
-      now apply I_i_j.
+      now apply I_ndiag.
     }
     left.
-    now apply I_i_j.
+    now apply I_ndiag.
   }
   apply Nat.nlt_ge in Hjn.
   rewrite (Nat_div_less_small 1) by now rewrite Nat.mul_1_l.
@@ -2299,7 +2314,6 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
   rename k into j; rename H into Hjn.
   move j before i.
   move Hjn before Hin; clear Hi Hz.
-...
   now erewrite mat_sqr_A_up_right.
 }
 ...
@@ -2309,7 +2323,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
   destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
     subst i.
     erewrite summation_only_one.
-    erewrite A_i_i.
+    erewrite A_diag.
     rewrite Z.mul_0_l, Nat.add_0_l.
     erewrite (summation_split j).
     replace j with (S (j - 1)) at 1 by flia Hz Hjn.
@@ -2321,7 +2335,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
   apply Z.mul_eq_0.
   destruct (Nat.eq_dec i k) as [Hik| Hik]. {
     subst k; left.
-    now erewrite A_i_i.
+    now erewrite A_diag.
   }
 Compute (list_of_mat 8 8 (let _ := Z_ring_op in A 3)).
 ...
@@ -2465,7 +2479,7 @@ Compute (list_of_mat 16 16 (let _ := Z_ring_op in A 4)).
 
 Close Scope Z.
 
-Theorem A_i_i : ∀ n i, matel (A n) i i = 0%Z.
+Theorem A_diag : ∀ n i, matel (A n) i i = 0%Z.
 Proof.
 intros.
 revert i.
@@ -2941,7 +2955,7 @@ Compute (let '(i, j, n) := (0, 1, 3) in map (λ k, (matel (A n) i k * matel (A n
           destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
             subst i.
             rewrite summation_split_first; [ | flia ].
-            rewrite A_i_i, rng_mul_0_l, Z.sub_0_l.
+            rewrite A_diag, rng_mul_0_l, Z.sub_0_l.
             destruct (Nat.eq_dec 0 0) as [H| H]; [ clear H | easy ].
             rewrite rng_mul_1_r.
             rewrite (summation_split (j - 1)) by flia Hjsn.
@@ -2954,7 +2968,7 @@ Compute (let '(i, j, n) := (0, 1, 3) in map (λ k, (matel (A n) i k * matel (A n
             rewrite Nat.sub_add; [ | easy ].
             rewrite summation_split_first; [ | flia Hjsn ].
             destruct (Nat.eq_dec j j) as [H| H]; [ clear H | easy ].
-            rewrite A_i_i, rng_mul_0_l, rng_sub_0_r.
+            rewrite A_diag, rng_mul_0_l, rng_sub_0_r.
             rewrite all_0_summation_0. 2: {
               intros k Hk.
               destruct (Nat.eq_dec j k) as [H| H]; [ flia Hk H | clear H ].
