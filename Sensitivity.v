@@ -1892,6 +1892,9 @@ Definition mat_ring_op {T} {ro : ring_op T} n :=
    I need the extensionality of the functions and, perhaps, of
    functions of a nat up to n *)
 
+Axiom extens_eq_sqr_mat : ∀ T n (M1 M2 : matrix T),
+  eqmt_of_eqt T eq n M1 M2 → M1 = M2.
+
 (*
 Axiom extensionality : ∀ A B (f g : A → B), (∀ x, f x = g x) → f = g.
 *)
@@ -1913,6 +1916,12 @@ Theorem mat_eq_dec {T} {ro : ring_op T} {rp : ring_prop} (n : nat)
   {M1 = M2} + {M1 ≠ M2}.
 Proof.
 intros.
+specialize (extens_eq_sqr_mat T n M1 M2) as H1.
+assert (H : eqmt_of_eqt T eq n M1 M2). {
+  intros i j Hi Hj.
+...
+}
+specialize (H1 H).
 ...
 
 Definition mat_ring_prop {T} {ro : ring_op T} {rp : ring_prop} n :=
