@@ -1895,10 +1895,6 @@ Definition mat_ring_op {T} {ro : ring_op T} n :=
 Axiom extens_eq_sqr_mat : ∀ T n (M1 M2 : matrix T),
   eqmt_of_eqt T eq n M1 M2 → M1 = M2.
 
-(*
-Axiom extensionality : ∀ A B (f g : A → B), (∀ x, f x = g x) → f = g.
-*)
-
 Theorem mat_1_neq_0 {T} {ro : ring_op T} {rp : ring_prop} :
   I ≠ zero_mat.
 Proof.
@@ -1911,35 +1907,23 @@ specialize (H1 0 0).
 now apply rng_1_neq_0 in H1.
 Qed.
 
-Theorem mat_eq_dec {T} {ro : ring_op T} {rp : ring_prop} (n : nat)
-        (M1 M2 : matrix T) :
+Theorem mat_eq_dec {T} (n : nat) (M1 M2 : matrix T) :
   {M1 = M2} + {M1 ≠ M2}.
 Proof.
 intros.
-assert
-  (H1 : ∀ i j, i < n → j < n →
-   { matel M1 i j = matel M2 i j } + { matel M1 i j ≠ matel M2 i j }). {
-  intros * Hi Hj.
-  apply rng_eq_dec.
+induction n. {
+  left.
+  apply (extens_eq_sqr_mat T 0).
+  now intros i j Hi Hj.
 }
-Print eqmt_of_eqt.
-specialize (extens_eq_sqr_mat T n M1 M2) as H2.
-unfold eqmt_of_eqt in H2.
-...
-intros.
-specialize (extens_eq_sqr_mat T n M1 M2) as H1.
-assert (H : eqmt_of_eqt T eq n M1 M2). {
-  intros i j Hi Hj.
-...
-}
-specialize (H1 H).
-...
+apply IHn.
+Qed.
 
 Definition mat_ring_prop {T} {ro : ring_op T} {rp : ring_prop} n :=
   let mro := mat_ring_op n in
   {| rng_1_neq_0 := mat_1_neq_0;
-     rng_eq_dec := mat_eq_dec n |}.
-     rng_add_comm := Z.add_comm;
+     rng_eq_dec := mat_eq_dec n;
+     rng_add_comm := Z.add_comm |}.
      rng_add_assoc := Z.add_assoc;
      rng_add_0_l := Z.add_0_l;
      rng_add_opp_l := Z.add_opp_diag_l;
