@@ -1888,20 +1888,37 @@ Definition mat_ring_op {T} {ro : ring_op T} n :=
      rng_mul := mat_mul n;
      rng_opp := mat_opp |}.
 
+(* attempt to define the ring of matrices (of size n), but I think
+   I need the extensionality of the functions and, perhaps, of
+   functions of a nat up to n *)
+
+(*
+Axiom extensionality : ∀ A B (f g : A → B), (∀ x, f x = g x) → f = g.
+*)
+
 Theorem mat_1_neq_0 {T} {ro : ring_op T} {rp : ring_prop} :
   I ≠ zero_mat.
 Proof.
-unfold I, zero_mat.
-cbn.
-(* mouais, c'est pas un ring dans le sens où je l'ai défini : car il
-   suppose l'égalité de Leibnitz, qui ne s'applique pas aux fonctions.
-   Ou alors, je mets l'axiome d'extentionalité... *)
+intros H.
+assert (H1 : ∀ i j, matel I i j = matel zero_mat i j). {
+  intros i j.
+  now rewrite H.
+}
+specialize (H1 0 0).
+now apply rng_1_neq_0 in H1.
+Qed.
+
+Theorem mat_eq_dec {T} {ro : ring_op T} {rp : ring_prop} (n : nat)
+        (M1 M2 : matrix T) :
+  {M1 = M2} + {M1 ≠ M2}.
+Proof.
+intros.
 ...
 
-Definition mat_ring_prop {T} {ro : ring_op T} {rp : ring_prop} :=
-  let _ := mat_ring_op in
+Definition mat_ring_prop {T} {ro : ring_op T} {rp : ring_prop} n :=
+  let mro := mat_ring_op n in
   {| rng_1_neq_0 := mat_1_neq_0;
-     rng_eq_dec := Z.eq_dec;
+     rng_eq_dec := mat_eq_dec n |}.
      rng_add_comm := Z.add_comm;
      rng_add_assoc := Z.add_assoc;
      rng_add_0_l := Z.add_0_l;
@@ -1910,6 +1927,8 @@ Definition mat_ring_prop {T} {ro : ring_op T} {rp : ring_prop} :=
      rng_mul_assoc := Z.mul_assoc;
      rng_mul_1_l := Z.mul_1_l;
      rng_mul_add_distr_l := Z.mul_add_distr_l |}.
+
+(* end attempt *)
 
 Canonical Structure mat_ring_op.
 Canonical Structure mat_ring_prop.
