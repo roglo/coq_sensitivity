@@ -1916,6 +1916,15 @@ Theorem mat_eq_dec {T} {ro : ring_op T} {rp : ring_prop} (n : nat)
   {M1 = M2} + {M1 ≠ M2}.
 Proof.
 intros.
+assert
+  (H : ∀ i j, i < n → j < n →
+   { matel M1 i j = matel M2 i j } + { matel M1 i j ≠ matel M2 i j }). {
+  intros * Hi Hj.
+  apply rng_eq_dec.
+}
+Print eqmt_of_eqt.
+...
+intros.
 specialize (extens_eq_sqr_mat T n M1 M2) as H1.
 assert (H : eqmt_of_eqt T eq n M1 M2). {
   intros i j Hi Hj.
