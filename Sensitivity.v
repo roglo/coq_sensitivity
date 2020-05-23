@@ -1895,6 +1895,24 @@ Definition mat_ring_op {T} {ro : ring_op T} n :=
 Axiom extens_eq_sqr_mat : ∀ T n (M1 M2 : matrix T),
   eqmt_of_eqt T eq n M1 M2 → M1 = M2.
 
+Theorem glop : False.
+Proof.
+set (ro := Z_ring_op).
+assert (H : I = zero_mat). {
+  apply (extens_eq_sqr_mat Z 0).
+  now intros i j Hi Hj.
+}
+unfold I, zero_mat in H.
+apply (f_equal matel) in H.
+cbn in H.
+apply (f_equal (λ f, f 0 0)) in H.
+now destruct (Nat.eq_dec 0 0).
+Qed.
+
+(* oops *)
+
+...
+
 Theorem mat_1_neq_0 {T} {ro : ring_op T} {rp : ring_prop} :
   I ≠ zero_mat.
 Proof.
@@ -1911,13 +1929,12 @@ Theorem mat_eq_dec {T} (n : nat) (M1 M2 : matrix T) :
   {M1 = M2} + {M1 ≠ M2}.
 Proof.
 intros.
-induction n. {
-  left.
-  apply (extens_eq_sqr_mat T 0).
-  now intros i j Hi Hj.
-}
-apply IHn.
+left.
+apply (extens_eq_sqr_mat T 0).
+now intros i j Hi Hj.
 Qed.
+
+...
 
 Definition mat_ring_prop {T} {ro : ring_op T} {rp : ring_prop} n :=
   let mro := mat_ring_op n in
