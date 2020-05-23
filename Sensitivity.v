@@ -1909,7 +1909,10 @@ now destruct (Nat.eq_dec 0 0).
 Qed.
 
 (* oops *)
-
+(* but this is normal: I use extens_eq_sqr_mat with n=0, which is not
+   the size of I & zero_mat; if you limit their sizes to 0, it is
+   normal that they are equal!
+   I should find a system to prevent the (my) use of this situation. *)
 ...
 
 Theorem mat_1_neq_0 {T} {ro : ring_op T} {rp : ring_prop} :
