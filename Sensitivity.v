@@ -1888,6 +1888,32 @@ Definition mat_ring_op {T} {ro : ring_op T} n :=
      rng_mul := mat_mul n;
      rng_opp := mat_opp |}.
 
+Theorem mat_1_neq_0 {T} {ro : ring_op T} {rp : ring_prop} :
+  I ≠ zero_mat.
+Proof.
+unfold I, zero_mat.
+cbn.
+(* mouais, c'est pas un ring dans le sens où je l'ai défini : car il
+   suppose l'égalité de Leibnitz, qui ne s'applique pas aux fonctions.
+   Ou alors, je mets l'axiome d'extentionalité... *)
+...
+
+Definition mat_ring_prop {T} {ro : ring_op T} {rp : ring_prop} :=
+  let _ := mat_ring_op in
+  {| rng_1_neq_0 := mat_1_neq_0;
+     rng_eq_dec := Z.eq_dec;
+     rng_add_comm := Z.add_comm;
+     rng_add_assoc := Z.add_assoc;
+     rng_add_0_l := Z.add_0_l;
+     rng_add_opp_l := Z.add_opp_diag_l;
+     rng_mul_comm := Z.mul_comm;
+     rng_mul_assoc := Z.mul_assoc;
+     rng_mul_1_l := Z.mul_1_l;
+     rng_mul_add_distr_l := Z.mul_add_distr_l |}.
+
+Canonical Structure mat_ring_op.
+Canonical Structure mat_ring_prop.
+
 Open Scope Z_scope.
 
 Compute (list_of_mat 2 2 (let _ := Z_ring_op in A 1)).
@@ -2289,6 +2315,31 @@ Definition fin_mat_eq {T} (eqt : T → T → Prop) u v (M M' : matrix T) :=
                    ⌈ (A_n)^2+I   0          ⌉
     (A_{n+1})^2 =  ⌊ 0           (A_n)^2+I  ⌋
 *)
+
+Check mat_ring_op.
+...
+Check mat_ring_prop.
+
+Lemma glop (ro := Z_ring_op) (rp := Z_ring_prop) :
+  ∀ n (mro := mat_ring_op n) (mrp := mat_ring_prop) ,
+  fin_mat_eq (eqmt_of_eqt Z eq n) 2 2
+    (mat_sqr (2 ^ S n) (A (S n)))
+    {| matel i j :=
+        if Nat.eq_dec i 0 then
+          if Nat.eq_dec j 0 then mat_add (mat_sqr (2 ^ n) (A n)) I
+          else zero_mat
+        else
+          if Nat.eq_dec j 0 then zero_mat
+          else mat_add (mat_sqr (2 ^ n) (A n)) I |}.
+Proof.
+intros * i j Hi Hj.
+destruct i. {
+  destruct j. {
+    cbn - [ summation "^" ].
+    destruct n. {
+      cbn.
+      rewrite rng_mul_0_l.
+...
 
 Lemma sqr_An1_from_sqr_An (ro := Z_ring_op) (rp := Z_ring_prop) : ∀ n,
   fin_mat_eq eq (2 ^ S n) (2 ^ S n)
