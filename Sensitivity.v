@@ -2377,8 +2377,12 @@ rewrite <- mat_sqr_A_up_left; [ | flia Hi | flia Hj ].
 cbn - [ summation "^" A ].
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   subst j.
-  rewrite (summation_split (2 ^ n - 1)).
-  rewrite Nat.sub_add.
+  rewrite (summation_split (2 ^ n - 1)). 2: {
+    split; [ flia | cbn; flia ].
+  }
+  rewrite Nat.sub_add. 2: {
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  }
   destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
     subst n.
     cbn in Hi, Hin.
@@ -2469,7 +2473,24 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     }
     rewrite rng_add_0_l.
     rewrite all_0_summation_0. 2: {
-      intros k Hk.
+      intros k Hk; cbn.
+      replace n with (S (n - 1)) at 1 2 by flia Hnz.
+      unfold even_mat_of_mat_mat; cbn.
+      rewrite (Nat_div_less_small 1). 2: {
+        split; [ flia Hin | easy ].
+      }
+      rewrite Nat.div_small; [ | flia Hk ].
+      destruct (Nat.eq_dec 1 0) as [H| H]; [ easy | clear H ].
+      destruct (Nat.eq_dec 0 0) as [H| H]; [ clear H | easy ].
+      rewrite (Nat_mod_less_small 1). 2: {
+        split; [ flia Hin | easy ].
+      }
+      rewrite Nat.mod_small; [ | flia Hk ].
+      rewrite I_ndiag; [ | flia Hk ].
+      apply rng_mul_0_l.
+    }
+    now rewrite rng_add_0_r.
+  }
 ...
   rewrite Nat.mul_1_l.
   cbn - [ A summation "^" ].

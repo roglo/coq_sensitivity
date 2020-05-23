@@ -125,6 +125,7 @@ Definition Z_ring_prop :=
      rng_mul_add_distr_l := Z.mul_add_distr_l |}.
 
 (* allows to use ring theorems on Z *)
+Canonical Structure Z_ring_op.
 Canonical Structure Z_ring_prop.
 
 (*
