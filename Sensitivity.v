@@ -1904,7 +1904,6 @@ assert (H : I = zero_mat). {
 }
 unfold I, zero_mat in H.
 apply (f_equal matel) in H.
-cbn in H.
 apply (f_equal (λ f, f 0 0)) in H.
 now destruct (Nat.eq_dec 0 0).
 Qed.
