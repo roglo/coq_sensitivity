@@ -2491,6 +2491,8 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     }
     now rewrite rng_add_0_r.
   }
+Compute (let n := 5 in let i := 2 ^ n + 2 ^ n - 3 in (Σ (i0 = 2 ^ n, 2 ^ S n - 1), (matel (A (S n)) i i0 * matel (A (S n)) i0 i))%Rng).
+  replace (Σ (_ = _, _), _)%Rng with (Z.of_nat n). 2: {
 ...
   rewrite Nat.mul_1_l.
   cbn - [ A summation "^" ].
