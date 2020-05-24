@@ -2382,8 +2382,10 @@ Fixpoint A_mat_opp {T} {ro : ring_op T} M :=
 
 Print mat_of_list.
 
-Definition A_mat_of_list {A} (ll : list (list (A_matrix A))) :
-  matrix (A_matrix A).
+Definition A_mat_of_list {A} (d : A) (ll : list (list (A_matrix A))) :
+  matrix (A_matrix A) :=
+  {| matel i j := nth i (nth j [] ll) [] |}. (G1 A {| matel i j := d |}) |}.
+
 ...
 
 Fixpoint A' {T} {ro : ring_op T} n :=
