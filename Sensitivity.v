@@ -2372,10 +2372,12 @@ Inductive A_matrix T :=
   | G1 : matrix T → A_matrix T
   | G2 : matrix (A_matrix T) → A_matrix T.
 
+...
+
 Fixpoint A_mat_opp {T} {ro : ring_op T} M :=
   match M with
   | G1 _ m => G1 T (mat_opp m)
-  | G2 _ m => G2 T m
+  | G2 _ m => G2 T (A_mat_opp m)
   end.
 
 Definition A_mat_of_list {T} (d : T) (ll : list (list (A_matrix T))) :
@@ -2408,6 +2410,10 @@ Compute (list_of_mat 2 2 (let _ := Z_ring_op in A 1)).
 Compute (list_of_A_mat 2 2 (let _ := Z_ring_op in A' 1)).
 Compute (list_of_mat 4 4 (let _ := Z_ring_op in A 2)).
 Compute (list_of_A_mat 4 4 (let _ := Z_ring_op in A' 2)).
+...
+     = [[0%Z; 1%Z; 1%Z; 0%Z]; [1%Z; 0%Z; 0%Z; 1%Z];
+       [1%Z; 0%Z; 0%Z; (-1)%Z]; [0%Z; 1%Z; (-1)%Z; 0%Z]]
+     : list (list Z)
 ...
 Compute (list_of_mat 8 8 (let _ := Z_ring_op in A 3)).
 Compute (list_of_mat 16 16 (let _ := Z_ring_op in A 4)).
