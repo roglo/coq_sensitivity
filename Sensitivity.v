@@ -2393,7 +2393,35 @@ destruct i. {
   square matrices of size 2, but the type of A_n is then
        square_matrix 2 (square_matrix 2 (square_matrix 2 ...
   ... therefore, it would not work :-)...
+  ... or by an inductive type, perhaps?
 *)
+
+Inductive A_matrix T :=
+  | G1 : matrix T → A_matrix T
+  | G2 : matrix (A_matrix T) → A_matrix T.
+
+Print mat_opp.
+
+Fixpoint A_mat_opp {T} {ro : ring_op T} M :=
+  match M with
+  | G1 _ m => G1 T (mat_opp m)
+  | G2 _ m => G2 T m
+  end.
+
+Fixpoint A' {T} {ro : ring_op T} n :=
+  match n with
+  | 0 => G1 T (mat_of_list 0%Rng [])
+  | 1 => G1 T (mat_of_list 0%Rng [[0; 1]; [1; 0]]%Rng)
+  | S n' => G2 T (mat_of_list [] [[A' n'; G1 T I]; [G1 T I; A_mat_opp (A' n')]])
+  end.
+
+      even_mat_of_mat_mat (2 ^ n')
+        {| matel i j :=
+             if Nat.eq_dec i 0 then
+               if Nat.eq_dec j 0 then A' n' else I
+             else
+               if Nat.eq_dec j 0 then I else mat_opp (A' n') |}
+  end.
 
 ...
 
