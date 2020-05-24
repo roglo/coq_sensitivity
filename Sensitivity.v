@@ -2372,19 +2372,15 @@ Inductive A_matrix T :=
   | G1 : matrix T → A_matrix T
   | G2 : matrix (A_matrix T) → A_matrix T.
 
-Print mat_opp.
-
 Fixpoint A_mat_opp {T} {ro : ring_op T} M :=
   match M with
   | G1 _ m => G1 T (mat_opp m)
   | G2 _ m => G2 T m
   end.
 
-Print mat_of_list.
-
-Definition A_mat_of_list {A} (d : A) (ll : list (list (A_matrix A))) :
-  matrix (A_matrix A) :=
-  {| matel i j := nth i (nth j ll []) (G1 A {| matel i j := d |}) |}.
+Definition A_mat_of_list {T} (d : T) (ll : list (list (A_matrix T))) :
+  matrix (A_matrix T) :=
+  {| matel i j := nth i (nth j ll []) (G1 T {| matel i j := d |}) |}.
 
 Fixpoint A' {T} {ro : ring_op T} n :=
   match n with
@@ -2395,8 +2391,28 @@ Fixpoint A' {T} {ro : ring_op T} n :=
          (A_mat_of_list 0%Rng [[A' n'; G1 T I]; [G1 T I; A_mat_opp (A' n')]])
   end.
 
-Print A'.
+Print fold_left.
 
+Fixpoint list_of_A_mat {T} nrow ncol (M : A_matrix T) :=
+  match M with
+  | G1 _ m =>
+      map (λ row, map (λ col, matel m row col) (seq 0 ncol)) (seq 0 nrow)
+  | G2 _ m =>
+      match matel m 0 0 with
+      | G1 _ m1 =>
+          map (λ row, map (λ col, matel m1 row col) (seq 0 ncol)) (seq 0 nrow)
+      | G2 _ m1 =>
+          []
+      end
+  end.
+
+Compute (list_of_mat 2 2 (let _ := Z_ring_op in A 1)).
+Compute (list_of_A_mat 2 2 (let _ := Z_ring_op in A' 1)).
+Compute (list_of_mat 4 4 (let _ := Z_ring_op in A 2)).
+Compute (list_of_A_mat 4 4 (let _ := Z_ring_op in A' 2)).
+...
+Compute (list_of_mat 8 8 (let _ := Z_ring_op in A 3)).
+Compute (list_of_mat 16 16 (let _ := Z_ring_op in A 4)).
 ...
 
 (*
