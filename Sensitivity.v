@@ -2384,16 +2384,18 @@ Print mat_of_list.
 
 Definition A_mat_of_list {A} (d : A) (ll : list (list (A_matrix A))) :
   matrix (A_matrix A) :=
-  {| matel i j := nth i (nth j [] ll) [] |}. (G1 A {| matel i j := d |}) |}.
-
-...
+  {| matel i j := nth i (nth j ll []) (G1 A {| matel i j := d |}) |}.
 
 Fixpoint A' {T} {ro : ring_op T} n :=
   match n with
   | 0 => G1 T (mat_of_list 0%Rng [])
   | 1 => G1 T (mat_of_list 0%Rng [[0; 1]; [1; 0]]%Rng)
-  | S n' => G2 T (A_mat_of_list [[A' n'; G1 T I]; [G1 T I; A_mat_opp (A' n')]])
+  | S n' =>
+       G2 T
+         (A_mat_of_list 0%Rng [[A' n'; G1 T I]; [G1 T I; A_mat_opp (A' n')]])
   end.
+
+Print A'.
 
 ...
 
