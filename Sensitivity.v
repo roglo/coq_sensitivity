@@ -2391,8 +2391,6 @@ Fixpoint A' {T} {ro : ring_op T} n :=
          (A_mat_of_list 0%Rng [[A' n'; G1 T I]; [G1 T I; A_mat_opp (A' n')]])
   end.
 
-Print fold_left.
-
 Fixpoint list_of_A_mat {T} nrow ncol (M : A_matrix T) :=
   match M with
   | G1 _ m =>
