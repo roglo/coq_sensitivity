@@ -2357,6 +2357,50 @@ Definition nI n :=
 Definition fin_mat_eq {T} (eqt : T → T → Prop) u v (M M' : matrix T) :=
   ∀ i j, i < u → j < v → eqt (matel M i j) (matel M' i j).
 
+(* trying to prove
+                   ⌈ (A_n)^2+I   0          ⌉
+    (A_{n+1})^2 =  ⌊ 0           (A_n)^2+I  ⌋
+
+  with matrices Z, I advanced much but I should rather prove it with
+  square matrices of size 2, but the type of A_n is then
+       square_matrix 2 (square_matrix 2 (square_matrix 2 ...
+  ... therefore, it would not work :-)...
+  ... or by an inductive type, perhaps?
+*)
+
+Inductive A_matrix T :=
+  | G1 : matrix T → A_matrix T
+  | G2 : matrix (A_matrix T) → A_matrix T.
+
+Print mat_opp.
+
+Fixpoint A_mat_opp {T} {ro : ring_op T} M :=
+  match M with
+  | G1 _ m => G1 T (mat_opp m)
+  | G2 _ m => G2 T m
+  end.
+
+Print mat_of_list.
+
+...
+
+Fixpoint A' {T} {ro : ring_op T} n :=
+  match n with
+  | 0 => G1 T (mat_of_list 0%Rng [])
+  | 1 => G1 T (mat_of_list 0%Rng [[0; 1]; [1; 0]]%Rng)
+  | S n' => G2 T (mat_of_list [] [[A' n'; G1 T I]; [G1 T I; A_mat_opp (A' n')]])
+  end.
+
+      even_mat_of_mat_mat (2 ^ n')
+        {| matel i j :=
+             if Nat.eq_dec i 0 then
+               if Nat.eq_dec j 0 then A' n' else I
+             else
+               if Nat.eq_dec j 0 then I else mat_opp (A' n') |}
+  end.
+
+...
+
 (*
                    ⌈ (A_n)^2+I   0          ⌉
     (A_{n+1})^2 =  ⌊ 0           (A_n)^2+I  ⌋
@@ -2384,44 +2428,6 @@ destruct i. {
       rewrite rng_mul_0_l.
 ...
 *)
-
-(* trying to prove
-                   ⌈ (A_n)^2+I   0          ⌉
-    (A_{n+1})^2 =  ⌊ 0           (A_n)^2+I  ⌋
-
-  with matrices Z, I advanced much but I should rather prove it with
-  square matrices of size 2, but the type of A_n is then
-       square_matrix 2 (square_matrix 2 (square_matrix 2 ...
-  ... therefore, it would not work :-)...
-  ... or by an inductive type, perhaps?
-*)
-
-Inductive A_matrix T :=
-  | G1 : matrix T → A_matrix T
-  | G2 : matrix (A_matrix T) → A_matrix T.
-
-Print mat_opp.
-
-Fixpoint A_mat_opp {T} {ro : ring_op T} M :=
-  match M with
-  | G1 _ m => G1 T (mat_opp m)
-  | G2 _ m => G2 T m
-  end.
-
-Fixpoint A' {T} {ro : ring_op T} n :=
-  match n with
-  | 0 => G1 T (mat_of_list 0%Rng [])
-  | 1 => G1 T (mat_of_list 0%Rng [[0; 1]; [1; 0]]%Rng)
-  | S n' => G2 T (mat_of_list [] [[A' n'; G1 T I]; [G1 T I; A_mat_opp (A' n')]])
-  end.
-
-      even_mat_of_mat_mat (2 ^ n')
-        {| matel i j :=
-             if Nat.eq_dec i 0 then
-               if Nat.eq_dec j 0 then A' n' else I
-             else
-               if Nat.eq_dec j 0 then I else mat_opp (A' n') |}
-  end.
 
 ...
 
