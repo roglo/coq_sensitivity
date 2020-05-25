@@ -2374,8 +2374,8 @@ Inductive mmatrix T :=
   | G1 : matrix T → mmatrix T
   | G2 : matrix (mmatrix T) → mmatrix T.
 
-Fixpoint mmat_opp {T} {ro : ring_op T} SM :=
-  match SM with
+Fixpoint mmat_opp {T} {ro : ring_op T} MM :=
+  match MM with
   | G1 _ M => G1 T (mat_opp M)
   | G2 _ mm => G2 T {| matel i j := mmat_opp (matel mm i j) |}
   end.
@@ -2392,15 +2392,15 @@ Fixpoint A' {T} {ro : ring_op T} n :=
        G2 T (mmat_of_list 0%Rng [[A' n'; G1 T I]; [G1 T I; mmat_opp (A' n')]])
   end.
 
-Fixpoint list_of_mmat {T} nrow ncol (SM : mmatrix T) :=
-  match SM with
+Fixpoint list_of_mmat {T} nrow ncol (MM : mmatrix T) :=
+  match MM with
   | G1 _ M =>
       map (λ row, map (λ col, matel M row col) (seq 0 ncol)) (seq 0 nrow)
-  | G2 _ sm =>
-      match matel sm 0 0 with
+  | G2 _ mm =>
+      match matel mm 0 0 with
       | G1 _ M =>
           map (λ row, map (λ col, matel M row col) (seq 0 ncol)) (seq 0 nrow)
-      | G2 _ sm1 =>
+      | G2 _ mm1 =>
           []
       end
   end.
