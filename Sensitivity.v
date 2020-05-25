@@ -2384,7 +2384,7 @@ Fixpoint mmat_opp {T} {ro : ring_op T} MM :=
   end.
 
 Definition mmat_of_list {T} (d : T) (ll : list (list (mmatrix T))) :
-  matrix (mmatrix T) :=
+    matrix (mmatrix T) :=
   {| matel i j := nth i (nth j ll []) (MM_1 {| matel i j := d |}) |}.
 
 Fixpoint A' {T} {ro : ring_op T} n :=
@@ -2413,6 +2413,7 @@ Compute (let n := 1 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in A n)).
 Compute (let n := 1 in list_of_mmat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in A' n)).
 Compute (let n := 2 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in A n)).
 Compute (let n := 2 in list_of_mmat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in A' n)).
+Compute (let n := 2 in (let _ := Z_ring_op in A' n)).
 ...
      = [[0; 1; 1; 0];
         [1; 0; 0; 1];
