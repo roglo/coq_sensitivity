@@ -2371,36 +2371,39 @@ Definition fin_mat_eq {T} (eqt : T → T → Prop) u v (M M' : matrix T) :=
 (* matrix of sub-matrices *)
 
 Inductive mmatrix T :=
-  | G1 : matrix T → mmatrix T
-  | G2 : matrix (mmatrix T) → mmatrix T.
+  | MM_1 : matrix T → mmatrix T
+  | MM_M : matrix (mmatrix T) → mmatrix T.
+
+Arguments MM_1 {_}.
+Arguments MM_M {_}.
 
 Fixpoint mmat_opp {T} {ro : ring_op T} MM :=
   match MM with
-  | G1 _ M => G1 T (mat_opp M)
-  | G2 _ mm => G2 T {| matel i j := mmat_opp (matel mm i j) |}
+  | MM_1 M => MM_1 (mat_opp M)
+  | MM_M mm => MM_M {| matel i j := mmat_opp (matel mm i j) |}
   end.
 
 Definition mmat_of_list {T} (d : T) (ll : list (list (mmatrix T))) :
   matrix (mmatrix T) :=
-  {| matel i j := nth i (nth j ll []) (G1 T {| matel i j := d |}) |}.
+  {| matel i j := nth i (nth j ll []) (MM_1 {| matel i j := d |}) |}.
 
 Fixpoint A' {T} {ro : ring_op T} n :=
   match n with
-  | 0 => G1 T (mat_of_list 0%Rng [])
-  | 1 => G1 T (mat_of_list 0%Rng [[0; 1]; [1; 0]]%Rng)
+  | 0 => MM_1 (mat_of_list 0%Rng [])
+  | 1 => MM_1 (mat_of_list 0%Rng [[0; 1]; [1; 0]]%Rng)
   | S n' =>
-       G2 T (mmat_of_list 0%Rng [[A' n'; G1 T I]; [G1 T I; mmat_opp (A' n')]])
+       MM_M (mmat_of_list 0%Rng [[A' n'; MM_1 I]; [MM_1 I; mmat_opp (A' n')]])
   end.
 
 Fixpoint list_of_mmat {T} nrow ncol (MM : mmatrix T) :=
   match MM with
-  | G1 _ M =>
+  | MM_1 M =>
       map (λ row, map (λ col, matel M row col) (seq 0 ncol)) (seq 0 nrow)
-  | G2 _ mm =>
+  | MM_M mm =>
       match matel mm 0 0 with
-      | G1 _ M =>
+      | MM_1 M =>
           map (λ row, map (λ col, matel M row col) (seq 0 ncol)) (seq 0 nrow)
-      | G2 _ mm1 =>
+      | MM_M mm1 =>
           []
       end
   end.
