@@ -2371,7 +2371,7 @@ Definition fin_mat_eq {T} (eqt : T → T → Prop) u v (M M' : matrix T) :=
 (* matrix of sub-matrices *)
 
 Inductive mmatrix T :=
-  | MM_1 : matrix T → mmatrix T
+  | MM_1 : nat → nat → matrix T → mmatrix T
   | MM_M : nat → nat → matrix (mmatrix T) → mmatrix T.
 
 Arguments MM_1 {_}.
@@ -2379,30 +2379,35 @@ Arguments MM_M {_}.
 
 Fixpoint mmat_opp {T} {ro : ring_op T} MM :=
   match MM with
-  | MM_1 M => MM_1 (mat_opp M)
+  | MM_1 r c M => MM_1 r c (mat_opp M)
   | MM_M r c mm => MM_M r c {| matel i j := mmat_opp (matel mm i j) |}
   end.
 
 Definition mmat_of_list {T} (d : T) (ll : list (list (mmatrix T))) :
     matrix (mmatrix T) :=
-  {| matel i j := nth i (nth j ll []) (MM_1 {| matel i j := d |}) |}.
+  {| matel i j :=
+       nth i (nth j ll [])
+         (MM_1 (length ll) (fold_left max (map (@length _) ll) 0)
+            {| matel i j := d |}) |}.
 
 Fixpoint A' {T} {ro : ring_op T} n :=
   match n with
-  | 0 => MM_1 (mat_of_list 0%Rng [])
-  | 1 => MM_1 (mat_of_list 0%Rng [[0; 1]; [1; 0]]%Rng)
+  | 0 => MM_1 0 0 (mat_of_list 0%Rng [])
+  | 1 => MM_1 2 2 (mat_of_list 0%Rng [[0; 1]; [1; 0]]%Rng)
   | S n' =>
        MM_M 2 2
-         (mmat_of_list 0%Rng [[A' n'; MM_1 I]; [MM_1 I; mmat_opp (A' n')]])
+         (mmat_of_list 0%Rng
+            [[A' n'; MM_1 (2 ^ n) (2 ^ n) I];
+             [MM_1 (2 ^ n) (2 ^ n) I; mmat_opp (A' n')]])
   end.
 
-Fixpoint list_of_mmat {T} nrow ncol (MM : mmatrix T) :=
+Fixpoint list_of_mmat {T} (MM : mmatrix T) :=
   match MM with
-  | MM_1 M =>
+  | MM_1 nrow ncol M =>
       map (λ row, map (λ col, matel M row col) (seq 0 ncol)) (seq 0 nrow)
   | MM_M nrow ncol mm =>
       match matel mm 0 0 with
-      | MM_1 M =>
+      | MM_1 nrow ncol M =>
           map (λ row, map (λ col, matel M row col) (seq 0 ncol)) (seq 0 nrow)
       | MM_M nrow1 ncol1 mm1 =>
           []
@@ -2410,10 +2415,9 @@ Fixpoint list_of_mmat {T} nrow ncol (MM : mmatrix T) :=
   end.
 
 Compute (let n := 1 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in A n)).
-Compute (let n := 1 in list_of_mmat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in A' n)).
+Compute (let n := 1 in list_of_mmat (let _ := Z_ring_op in A' n)).
 Compute (let n := 2 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in A n)).
-Compute (let n := 2 in list_of_mmat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in A' n)).
-Compute (let n := 2 in (let _ := Z_ring_op in A' n)).
+Compute (let n := 2 in list_of_mmat (let _ := Z_ring_op in A' n)).
 ...
      = [[0; 1; 1; 0];
         [1; 0; 0; 1];
