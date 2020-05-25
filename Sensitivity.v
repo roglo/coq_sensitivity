@@ -2372,7 +2372,7 @@ Definition fin_mat_eq {T} (eqt : T → T → Prop) u v (M M' : matrix T) :=
 
 Inductive mmatrix T :=
   | MM_1 : matrix T → mmatrix T
-  | MM_M : matrix (mmatrix T) → mmatrix T.
+  | MM_M : nat → nat → matrix (mmatrix T) → mmatrix T.
 
 Arguments MM_1 {_}.
 Arguments MM_M {_}.
@@ -2380,7 +2380,7 @@ Arguments MM_M {_}.
 Fixpoint mmat_opp {T} {ro : ring_op T} MM :=
   match MM with
   | MM_1 M => MM_1 (mat_opp M)
-  | MM_M mm => MM_M {| matel i j := mmat_opp (matel mm i j) |}
+  | MM_M r c mm => MM_M r c {| matel i j := mmat_opp (matel mm i j) |}
   end.
 
 Definition mmat_of_list {T} (d : T) (ll : list (list (mmatrix T))) :
@@ -2392,18 +2392,19 @@ Fixpoint A' {T} {ro : ring_op T} n :=
   | 0 => MM_1 (mat_of_list 0%Rng [])
   | 1 => MM_1 (mat_of_list 0%Rng [[0; 1]; [1; 0]]%Rng)
   | S n' =>
-       MM_M (mmat_of_list 0%Rng [[A' n'; MM_1 I]; [MM_1 I; mmat_opp (A' n')]])
+       MM_M 2 2
+         (mmat_of_list 0%Rng [[A' n'; MM_1 I]; [MM_1 I; mmat_opp (A' n')]])
   end.
 
 Fixpoint list_of_mmat {T} nrow ncol (MM : mmatrix T) :=
   match MM with
   | MM_1 M =>
       map (λ row, map (λ col, matel M row col) (seq 0 ncol)) (seq 0 nrow)
-  | MM_M mm =>
+  | MM_M nrow ncol mm =>
       match matel mm 0 0 with
       | MM_1 M =>
           map (λ row, map (λ col, matel M row col) (seq 0 ncol)) (seq 0 nrow)
-      | MM_M mm1 =>
+      | MM_M nrow1 ncol1 mm1 =>
           []
       end
   end.
