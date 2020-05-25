@@ -2368,20 +2368,20 @@ Definition fin_mat_eq {T} (eqt : T → T → Prop) u v (M M' : matrix T) :=
   ... or by an inductive type, perhaps?
 *)
 
-Inductive A_matrix T :=
-  | G1 : matrix T → A_matrix T
-  | G2 : matrix (A_matrix T) → A_matrix T.
+(* matrix of sub-matrices *)
 
-...
+Inductive smatrix T :=
+  | G1 : matrix T → smatrix T
+  | G2 : matrix (smatrix T) → smatrix T.
 
-Fixpoint A_mat_opp {T} {ro : ring_op T} M :=
+Fixpoint smat_opp {T} {ro : ring_op T} M :=
   match M with
   | G1 _ m => G1 T (mat_opp m)
-  | G2 _ m => G2 T (A_mat_opp m)
+  | G2 _ m => G2 T {| matel i j := smat_opp (matel m i j) |}
   end.
 
-Definition A_mat_of_list {T} (d : T) (ll : list (list (A_matrix T))) :
-  matrix (A_matrix T) :=
+Definition smat_of_list {T} (d : T) (ll : list (list (smatrix T))) :
+  matrix (smatrix T) :=
   {| matel i j := nth i (nth j ll []) (G1 T {| matel i j := d |}) |}.
 
 Fixpoint A' {T} {ro : ring_op T} n :=
@@ -2389,11 +2389,10 @@ Fixpoint A' {T} {ro : ring_op T} n :=
   | 0 => G1 T (mat_of_list 0%Rng [])
   | 1 => G1 T (mat_of_list 0%Rng [[0; 1]; [1; 0]]%Rng)
   | S n' =>
-       G2 T
-         (A_mat_of_list 0%Rng [[A' n'; G1 T I]; [G1 T I; A_mat_opp (A' n')]])
+       G2 T (smat_of_list 0%Rng [[A' n'; G1 T I]; [G1 T I; smat_opp (A' n')]])
   end.
 
-Fixpoint list_of_A_mat {T} nrow ncol (M : A_matrix T) :=
+Fixpoint list_of_smat {T} nrow ncol (M : smatrix T) :=
   match M with
   | G1 _ m =>
       map (λ row, map (λ col, matel m row col) (seq 0 ncol)) (seq 0 nrow)
@@ -2407,9 +2406,9 @@ Fixpoint list_of_A_mat {T} nrow ncol (M : A_matrix T) :=
   end.
 
 Compute (list_of_mat 2 2 (let _ := Z_ring_op in A 1)).
-Compute (list_of_A_mat 2 2 (let _ := Z_ring_op in A' 1)).
+Compute (list_of_smat 2 2 (let _ := Z_ring_op in A' 1)).
 Compute (list_of_mat 4 4 (let _ := Z_ring_op in A 2)).
-Compute (list_of_A_mat 4 4 (let _ := Z_ring_op in A' 2)).
+Compute (list_of_smat 4 4 (let _ := Z_ring_op in A' 2)).
 ...
      = [[0%Z; 1%Z; 1%Z; 0%Z]; [1%Z; 0%Z; 0%Z; 1%Z];
        [1%Z; 0%Z; 0%Z; (-1)%Z]; [0%Z; 1%Z; (-1)%Z; 0%Z]]
