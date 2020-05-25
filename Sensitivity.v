@@ -2374,10 +2374,10 @@ Inductive smatrix T :=
   | G1 : matrix T → smatrix T
   | G2 : matrix (smatrix T) → smatrix T.
 
-Fixpoint smat_opp {T} {ro : ring_op T} M :=
-  match M with
-  | G1 _ m => G1 T (mat_opp m)
-  | G2 _ m => G2 T {| matel i j := smat_opp (matel m i j) |}
+Fixpoint smat_opp {T} {ro : ring_op T} SM :=
+  match SM with
+  | G1 _ M => G1 T (mat_opp M)
+  | G2 _ sm => G2 T {| matel i j := smat_opp (matel sm i j) |}
   end.
 
 Definition smat_of_list {T} (d : T) (ll : list (list (smatrix T))) :
@@ -2392,15 +2392,15 @@ Fixpoint A' {T} {ro : ring_op T} n :=
        G2 T (smat_of_list 0%Rng [[A' n'; G1 T I]; [G1 T I; smat_opp (A' n')]])
   end.
 
-Fixpoint list_of_smat {T} nrow ncol (M : smatrix T) :=
-  match M with
-  | G1 _ m =>
-      map (λ row, map (λ col, matel m row col) (seq 0 ncol)) (seq 0 nrow)
-  | G2 _ m =>
-      match matel m 0 0 with
-      | G1 _ m1 =>
-          map (λ row, map (λ col, matel m1 row col) (seq 0 ncol)) (seq 0 nrow)
-      | G2 _ m1 =>
+Fixpoint list_of_smat {T} nrow ncol (SM : smatrix T) :=
+  match SM with
+  | G1 _ M =>
+      map (λ row, map (λ col, matel M row col) (seq 0 ncol)) (seq 0 nrow)
+  | G2 _ sm =>
+      match matel sm 0 0 with
+      | G1 _ M =>
+          map (λ row, map (λ col, matel M row col) (seq 0 ncol)) (seq 0 nrow)
+      | G2 _ sm1 =>
           []
       end
   end.
