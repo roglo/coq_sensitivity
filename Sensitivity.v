@@ -2397,12 +2397,6 @@ Arguments vecel {_}.
        vncol(0) = 7 ; vncol(1) = 2 ; vncol(2) = 13 ; vncol(3) = 12
 *)
 
-... not sure the description above is correct
-    must vnrow be the number of rows or the number of sub-matrices ?
-    if they are simple matrices (case MM_1 below), ok, it must be the
-    number of rows; but what if it is a matrix of matrices?
-...
-
 Inductive mmatrix T :=
   | MM_1 : matrix T → mmatrix T
   | MM_M : vector nat → vector nat → matrix (mmatrix T) → mmatrix T.
@@ -2431,11 +2425,12 @@ Fixpoint A' {T} {ro : ring_op T} n :=
              [MM_1 I; mmat_opp (A' n')]])
   end.
 
-Fixpoint mmat_number_of_rows {T} nrow (MM : matrix T) :=
+Fixpoint mmat_number_of_rows {T} nrow (MM : mmatrix T) :=
   match MM with
   | MM_1 M => nrow
   | MM_M vnrow vncol mm =>
-      Σ (i = 0, nrow - 1), mmat_number_of_rows (matel mm i 0)
+      Σ (i = 0, nrow - 1), mmat_number_of_rows (vecel vnrow i) (matel mm i 0)
+  end.
 
 ...
      ^ ---------------------------------------
