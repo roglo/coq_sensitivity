@@ -2372,7 +2372,30 @@ Record vector A := { vecel : nat → A }.
 
 Arguments vecel {_}.
 
-(* matrix of sub-matrices *)
+(* matrix of sub-matrices
+   - MM_1 : matrix alone
+   - MM_M vnrow vncol MM :
+        MM : matrix of matrices
+        vnrow(i) : number of rows of the sub-matrices at row i
+        vncol(i) : number of cols of the sub-matrices at col i
+
+  so that all sub-matrices are correctement calées les unes à
+  côté des autres
+
+  e.g.
+
+    ---------------------------------------
+    |       |  |             |            |  : vnrow(0) = 1
+    ---------------------------------------
+    |       |  |             |            |
+    |       |  |             |            |  : vnrow(1) = 3
+    |       |  |             |            |
+    ---------------------------------------
+     <-----> <> <-----------> <---------->
+        7    2       13            12
+
+       vncol(0) = 7 ; vncol(1) = 2 ; vncol(2) = 13 ; vncol(3) = 12
+*)
 
 Inductive mmatrix T :=
   | MM_1 : matrix T → mmatrix T
@@ -2401,6 +2424,12 @@ Fixpoint A' {T} {ro : ring_op T} n :=
             [[A' n'; MM_1 I];
              [MM_1 I; mmat_opp (A' n')]])
   end.
+
+Fixpoint mmat_row_of_index {T} (MM : matrix T) i :=
+  match MM with
+  | MM_1 M => i
+  | MM_M vnrow vncol mm =>
+...
 
 Fixpoint mmatel {T} {MM : mmatrix T} i j :=
   match MM with
