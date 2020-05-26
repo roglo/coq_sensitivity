@@ -2402,6 +2402,12 @@ Fixpoint A' {T} {ro : ring_op T} n :=
              [MM_1 I; mmat_opp (A' n')]])
   end.
 
+Fixpoint mmatel {T} {MM : mmatrix T} i j :=
+  match MM with
+  | MM_1 M => matel M i j
+  | MM_M vnrow vncol mm =>
+...
+
 Fixpoint mat_of_mmat {T} (MM : mmatrix T) :=
   match MM with
   | MM_1 M => M
