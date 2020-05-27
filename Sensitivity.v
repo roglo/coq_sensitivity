@@ -2440,7 +2440,8 @@ Fixpoint glop {T} lev nrow (MM : mmatrix T) :=
         (map (λ i, glop (lev + 1) (vecel vnrow i) (matel mm i 0)) (seq 0 nrow))
   end.
 
-Compute (let nrow := 5 in glop 42 nrow (A' 3)).
+Compute (let nrow := 2 in glop 42 nrow (A' 3)).
+...
 Compute (let nrow := 2 in mmat_number_of_rows nrow (A' 3)).
 
 ...
