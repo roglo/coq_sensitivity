@@ -2432,6 +2432,19 @@ Fixpoint mmat_number_of_rows {T} nrow (MM : mmatrix T) :=
       Σ (i = 0, nrow - 1), mmat_number_of_rows (vecel vnrow i) (matel mm i 0)
   end.
 
+Fixpoint glop {T} lev nrow (MM : mmatrix T) :=
+  match MM with
+  | MM_1 M => [(lev, nrow)]
+  | MM_M vnrow vncol mm =>
+      concat
+        (map (λ i, glop (lev + 1) (vecel vnrow i) (matel mm i 0)) (seq 0 nrow))
+  end.
+
+Compute (let nrow := 4 in glop 42 nrow (A' 3)).
+Compute (let nrow := 2 in mmat_number_of_rows nrow (A' 3)).
+
+...
+
 (* but I wrote "matel mm i 0": why, "0"? it supposes that if I take another
    value (less thatn "vncol i", perhaps, it is supposed to give the same
    result? so, there is some implicit property in my f... model? *)
