@@ -26,7 +26,7 @@ value mat_opp m = { matel i j = - (matel m i j) }.
 value rec mmat_opp mm =
   match mm with
   | MM_1 m → MM_1 (mat_opp m)
-  | MM_M r c mm → MM_M r c { matel i j = mmat_opp (matel mm i j) }
+  | MM_M r c mm -> MM_M r c { matel i j = mmat_opp (matel mm i j) }
   end.
 
 value rec aM' n =
