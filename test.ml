@@ -46,11 +46,16 @@ value rec aM' n =
   end.
 
 value rec mmat_number_of_rows nrow (mm : mmatrix 'a) =
+let _ = Printf.printf "mmat_number_of_rows %d\n%!" nrow in
   match mm with
   | MM_1 _ -> nrow
   | MM_M vnrow vncol mm ->
       List.fold_left
         (fun acc i ->
+let _ = Printf.printf "acc %d\n%!" acc in
            acc + mmat_number_of_rows (vecel vnrow i) (matel mm i 0))
         0 (seq 0 nrow)
   end.
+
+let nrow = 2 in mmat_number_of_rows nrow (aM' 3).
+(* should be 8 *)
