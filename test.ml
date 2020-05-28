@@ -3,14 +3,18 @@ type nat = int;
 type vector 'a = { vecel : nat → 'a }.
 type matrix 'a = { matel : nat → nat → 'a };
 
+value vecel m = m.vecel.
 value matel m = m.matel.
+
+value nth i l d =
+  try List.nth l i with [ Failure _ → d ].
+
+value rec seq start len =
+  if len ≤ 0 then [] else [start :: seq (start + 1) (len - 1)].
 
 type mmatrix 'a =
   [ MM_1 of matrix 'a
   | MM_M of vector nat and vector nat and matrix (mmatrix 'a) ].
-
-value nth i l d =
-  try List.nth l i with [ Failure _ → d ].
 
 value mat_of_list d ll =
   { matel i j = nth i (nth j ll []) d }.
@@ -39,4 +43,14 @@ value rec aM' n =
          (mmat_of_list 0
             [[aM' n'; MM_1 mI];
              [MM_1 mI; mmat_opp (aM' n')]])
+  end.
+
+value rec mmat_number_of_rows nrow (mm : mmatrix 'a) =
+  match mm with
+  | MM_1 _ -> nrow
+  | MM_M vnrow vncol mm ->
+      List.fold_left
+        (fun acc i ->
+           acc + mmat_number_of_rows (vecel vnrow i) (matel mm i 0))
+        0 (seq 0 nrow)
   end.

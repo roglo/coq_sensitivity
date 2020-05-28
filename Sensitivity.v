@@ -2432,6 +2432,10 @@ Fixpoint mmat_number_of_rows {T} nrow (MM : mmatrix T) :=
       Σ (i = 0, nrow - 1), mmat_number_of_rows (vecel vnrow i) (matel mm i 0)
   end.
 
+Compute (let nrow := 2 in mmat_number_of_rows nrow (A' 3)).
+
+...
+
 Fixpoint glop {T} lev nrow (MM : mmatrix T) :=
   match MM with
   | MM_1 M => [(lev, nrow)]
