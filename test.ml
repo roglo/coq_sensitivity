@@ -7,7 +7,7 @@ value matel m = m.matel.
 
 type mmatrix 'a =
   [ MM_1 of matrix 'a
-  | MM_M of vector nat and vector nat and (mmatrix 'a) ].
+  | MM_M of vector nat and vector nat and matrix (mmatrix 'a) ].
 
 value nth i l d =
   try List.nth l i with [ Failure _ → d ].
