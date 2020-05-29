@@ -2408,73 +2408,40 @@ Definition mat_vertic_concat {T} '(r1, c1, m1) '(r2, c2, m2) :
    {| matel i j :=
        if lt_dec i r1 then matel m1 i j else matel m2 (i - r1) j |}).
 
-Fixpoint mat_of_mmat mm :=
-  match mm with
-  | MM_1 r c m => (r, c, m)
+Fixpoint mat_of_mmat {T} (d : T) MM :=
+  match MM with
+  | MM_1 r c M => (r, c, M)
   | MM_M nr nc mm =>
       List.fold_left
         (λ acc r,
 	   mat_vertic_concat acc
              (List.fold_left
                  (λ acc c,
-                    mat_horiz_concat acc (mat_of_mmat (matel mm r c)))
-                 (seq 0 nc) (0, 0, {| matel _ _ := 0 |})))
-        (seq 0 nr) (0, 0, {| matel _ _ := 0 |})
+                    mat_horiz_concat acc (mat_of_mmat d (matel mm r c)))
+                 (seq 0 nc) (0, 0, {| matel _ _ := d |})))
+        (seq 0 nr) (0, 0, {| matel _ _ := d |})
   end.
 
-Definition list_of_mat2 {T} '(n, c, m) : list (list (matrix T)) :=
-  list_of_mat n c m.
+Definition list_of_mat2 {T} '(n, c, M) : list (list (matrix T)) :=
+  list_of_mat n c M.
 
-(*
-Compute list_of_mat2 (mat_of_mmat (A' 2)).
-*)
-
-...
+Definition list_of_mmat {T} d (MM : mmatrix T) :=
+  let '(r, c, M) := mat_of_mmat d MM in
+  list_of_mat r c M.
 
 Compute (let n := 1 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in A n)).
-Compute (let n := 1 in list_of_mmat (let _ := Z_ring_op in A' n)).
+Compute (let n := 1 in list_of_mmat 0%Z (let _ := Z_ring_op in A' n)).
 Compute (let n := 2 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in A n)).
-Compute (let n := 2 in list_of_mmat (let _ := Z_ring_op in A' n)).
-...
-     = [[0; 1; 1; 0];
-        [1; 0; 0; 1];
-        [1; 0; 0; (-1)];
-        [0; 1; (-1); 0]]
-     : list (list Z)
-...
-Compute (list_of_mat 8 8 (let _ := Z_ring_op in A 3)).
-Compute (list_of_mat 16 16 (let _ := Z_ring_op in A 4)).
-...
-
-(*
-                   ⌈ (A_n)^2+I   0          ⌉
-    (A_{n+1})^2 =  ⌊ 0           (A_n)^2+I  ⌋
-*)
-
-(*
-Lemma glop (ro := Z_ring_op) (rp := Z_ring_prop) :
-  ∀ n (mro := mat_ring_op n) (mrp := mat_ring_prop) ,
-  fin_mat_eq (eqmt_of_eqt Z eq n) 2 2
-    (mat_sqr (2 ^ S n) (A (S n)))
-    {| matel i j :=
-        if Nat.eq_dec i 0 then
-          if Nat.eq_dec j 0 then mat_add (mat_sqr (2 ^ n) (A n)) I
-          else zero_mat
-        else
-          if Nat.eq_dec j 0 then zero_mat
-          else mat_add (mat_sqr (2 ^ n) (A n)) I |}.
-Proof.
-intros * i j Hi Hj.
-destruct i. {
-  destruct j. {
-    cbn - [ summation "^" ].
-    destruct n. {
-      cbn.
-      rewrite rng_mul_0_l.
-...
-*)
+Compute (let n := 2 in list_of_mmat 0%Z (let _ := Z_ring_op in A' n)).
+Compute (let n := 3 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in A n)).
+Compute (let n := 3 in list_of_mmat 0%Z (let _ := Z_ring_op in A' n)).
+Open Scope Z_scope.
+Compute (let n := 4%nat in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in A n)).
+Compute (let n := 4%nat in list_of_mmat 0%Z (let _ := Z_ring_op in A' n)).
+Close Scope Z_scope.
 
 ...
+
 
 Lemma sqr_An1_from_sqr_An (ro := Z_ring_op) (rp := Z_ring_prop) : ∀ n,
   fin_mat_eq eq (2 ^ S n) (2 ^ S n)
