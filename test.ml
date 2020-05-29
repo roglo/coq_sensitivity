@@ -33,7 +33,7 @@ value rec mmat_opp mm =
   | MM_M r c mm -> MM_M r c { matel i j = mmat_opp (matel mm i j) }
   end.
 
-value rec aM' n =
+value rec mA n =
   match n with
   | 0 → MM_1 (mat_of_list 0 [])
   | 1 → MM_1 (mat_of_list 0 [[0; 1]; [1; 0]])
@@ -41,21 +41,30 @@ value rec aM' n =
        let n' = n - 1 in
        MM_M {vecel _ = 2 } {vecel _ = 2}
          (mmat_of_list 0
-            [[aM' n'; MM_1 mI];
-             [MM_1 mI; mmat_opp (aM' n')]])
+            [[mA n'; MM_1 mI];
+             [MM_1 mI; mmat_opp (mA n')]])
   end.
 
-value rec mmat_number_of_rows nrow (mm : mmatrix 'a) =
-let _ = Printf.printf "mmat_number_of_rows %d\n%!" nrow in
+value rec mmat_number_of_rows lev nrow (mm : mmatrix 'a) =
+let _ = Printf.printf "mmat_number_of_rows %d %d\n%!" lev nrow in
   match mm with
   | MM_1 _ -> nrow
   | MM_M vnrow vncol mm ->
       List.fold_left
         (fun acc i ->
 let _ = Printf.printf "acc %d\n%!" acc in
-           acc + mmat_number_of_rows (vecel vnrow i) (matel mm i 0))
+let r = (
+           acc + mmat_number_of_rows (lev + 1) (vecel vnrow i) (matel mm i 0))
+in let _ = Printf.printf "res %d\n%!" r in r)
         0 (seq 0 nrow)
   end.
 
-let nrow = 2 in mmat_number_of_rows nrow (aM' 3).
+let nrow = 2 in mmat_number_of_rows 42 nrow (mA 3).
 (* should be 8 *)
+
+value un_m1 mm = match mm with [ MM_1 m -> m | MM_M _ _ _ -> failwith "1" ].
+value un_mm mm = match mm with [ MM_1 _ -> failwith "m" | MM_M _ _ mm -> mm ].
+
+value doseq f = List.map f (seq 0 2).
+
+let n = 2 in doseq (fun i1 → doseq (fun i2 → doseq (fun i3 -> doseq (fun i4 → matel (un_m1 (matel (un_mm (mA n)) i1 i2)) i3 i4)))).
