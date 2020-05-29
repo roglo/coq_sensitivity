@@ -2361,151 +2361,75 @@ Definition fin_mat_eq {T} (eqt : T → T → Prop) u v (M M' : matrix T) :=
                    ⌈ (A_n)^2+I   0          ⌉
     (A_{n+1})^2 =  ⌊ 0           (A_n)^2+I  ⌋
 
-  with matrices Z, I advanced much but I should rather prove it with
-  square matrices of size 2, but the type of A_n is then
-       square_matrix 2 (square_matrix 2 (square_matrix 2 ...
-  ... therefore, it would not work :-)...
-  ... or by an inductive type, perhaps?
+  with matrices (and sub-matrices)
 *)
 
-Record vector A := { vecel : nat → A }.
-
-Arguments vecel {_}.
-
 (* matrix of sub-matrices
-   - MM_1 : matrix alone
-   - MM_M vnrow vncol MM :
-        MM : matrix of matrices
-        vnrow(i) : number of rows of the sub-matrices at row i
-        vncol(i) : number of cols of the sub-matrices at col i
-
-  so that all sub-matrices are correctement calées les unes à
-  côté des autres
-
-  e.g.
-
-    ---------------------------------------
-    |       |  |             |            |  : vnrow(0) = 1
-    ---------------------------------------
-    |       |  |             |            |
-    |       |  |             |            |  : vnrow(1) = 3
-    |       |  |             |            |
-    ---------------------------------------
-     <-----> <> <-----------> <---------->
-        7    2       13            12
-
-       vncol(0) = 7 ; vncol(1) = 2 ; vncol(2) = 13 ; vncol(3) = 12
+   - MM_1 r c : matrix alone with r rows and c columns
+   - MM_M r c MM : matrix of matrices with r rows and c columns
 *)
 
 Inductive mmatrix T :=
-  | MM_1 : matrix T → mmatrix T
-  | MM_M : vector nat → vector nat → matrix (mmatrix T) → mmatrix T.
+  | MM_1 : nat → nat → matrix T → mmatrix T
+  | MM_M : nat → nat → matrix (mmatrix T) → mmatrix T.
 
 Arguments MM_1 {_}.
 Arguments MM_M {_}.
 
 Fixpoint mmat_opp {T} {ro : ring_op T} MM :=
   match MM with
-  | MM_1 M => MM_1 (mat_opp M)
+  | MM_1 r c M => MM_1 r c (mat_opp M)
   | MM_M r c mm => MM_M r c {| matel i j := mmat_opp (matel mm i j) |}
   end.
 
 Definition mmat_of_list {T} (d : T) (ll : list (list (mmatrix T))) :
     matrix (mmatrix T) :=
-  {| matel i j := nth i (nth j ll []) (MM_1 {| matel i j := d |}) |}.
+  {| matel i j := nth i (nth j ll []) (MM_1 0 0 {| matel i j := d |}) |}.
 
 Fixpoint A' {T} {ro : ring_op T} n :=
   match n with
-  | 0 => MM_1 (mat_of_list 0%Rng [])
-  | 1 => MM_1 (mat_of_list 0%Rng [[0; 1]; [1; 0]]%Rng)
+  | 0 => MM_1 1 1 zero_mat
   | S n' =>
-       MM_M {| vecel _ := 2 |} {| vecel _ := 2 |}
+       MM_M 2 2
          (mmat_of_list 0%Rng
-            [[A' n'; MM_1 I];
-             [MM_1 I; mmat_opp (A' n')]])
+            [[A' n'; MM_1 (2 ^ n') (2 ^ n') I];
+             [MM_1 (2 ^ n') (2 ^ n') I; mmat_opp (A' n')]])
   end.
 
-Fixpoint mmat_number_of_rows {T} nrow (MM : mmatrix T) :=
-  match MM with
-  | MM_1 M => nrow
-  | MM_M vnrow vncol mm =>
-      Σ (i = 0, nrow - 1), mmat_number_of_rows (vecel vnrow i) (matel mm i 0)
+Definition mat_horiz_concat {T} '(r1, c1, m1) '(r2, c2, m2) :
+    (nat * nat * matrix T) :=
+  (max r1 r2, c1 + c2,
+   {| matel i j :=
+       if lt_dec j c1 then matel m1 i j else matel m2 i (j - c1) |}).
+
+Definition mat_vertic_concat {T} '(r1, c1, m1) '(r2, c2, m2) :
+    (nat * nat * matrix T) :=
+  (r1 + r2, max c1 c2,
+   {| matel i j :=
+       if lt_dec i r1 then matel m1 i j else matel m2 (i - r1) j |}).
+
+Fixpoint mat_of_mmat mm :=
+  match mm with
+  | MM_1 r c m => (r, c, m)
+  | MM_M nr nc mm =>
+      List.fold_left
+        (λ acc r,
+	   mat_vertic_concat acc
+             (List.fold_left
+                 (λ acc c,
+                    mat_horiz_concat acc (mat_of_mmat (matel mm r c)))
+                 (seq 0 nc) (0, 0, {| matel _ _ := 0 |})))
+        (seq 0 nr) (0, 0, {| matel _ _ := 0 |})
   end.
 
-Compute (let nrow := 2 in mmat_number_of_rows nrow (A' 3)).
-Check A.
+Definition list_of_mat2 {T} '(n, c, m) : list (list (matrix T)) :=
+  list_of_mat n c m.
 
-Compute (list_of_mat 8 8 (let _ := Z_ring_op in A 3)).
-Compute (list_of_mat 16 16 (let _ := Z_ring_op in A 16)).
-...
-
-Fixpoint glop {T} lev nrow (MM : mmatrix T) :=
-  match MM with
-  | MM_1 M => [(lev, nrow)]
-  | MM_M vnrow vncol mm =>
-      concat
-        (map (λ i, glop (lev + 1) (vecel vnrow i) (matel mm i 0)) (seq 0 nrow))
-  end.
-
-Compute (let nrow := 2 in glop 42 nrow (A' 3)).
-...
-Compute (let nrow := 2 in mmat_number_of_rows nrow (A' 3)).
+(*
+Compute list_of_mat2 (mat_of_mmat (A' 2)).
+*)
 
 ...
-
-(* but I wrote "matel mm i 0": why, "0"? it supposes that if I take another
-   value (less thatn "vncol i", perhaps, it is supposed to give the same
-   result? so, there is some implicit property in my f... model? *)
-
-...
-     ^ ---------------------------------------
-     : |       |  |             |            |  : vnrow(0) = 1
-     :  ---------------------------------------
-nrow : |       |  |             |            |
-     : |       |  |             |            |  : vnrow(1) = 3
-     : |       |  |             |            |
-     v ---------------------------------------
-        <-----> <> <-----------> <---------->
-         7    2       13            12
-
-       vncol(0) = 7 ; vncol(1) = 2 ; vncol(2) = 13 ; vncol(3) = 12
-...
-
-Fixpoint mmat_row_of_index {T} nrow (MM : matrix T) i :=
-  match MM with
-  | MM_1 M => i
-  | MM_M vnrow vncol mm =>
-...
-
-Fixpoint mmatel {T} {MM : mmatrix T} i j :=
-  match MM with
-  | MM_1 M => matel M i j
-  | MM_M vnrow vncol mm =>
-...
-
-Fixpoint mat_of_mmat {T} (MM : mmatrix T) :=
-  match MM with
-  | MM_1 M => M
-  | MM_M vnrow vncol mm =>
-...
-      let x := map (λ row, map (λ col, mat_of_mmat (matel mm row col)) (seq 0 ncol)) (seq 0 nrow) in
-...
-      x
-  end.
-...
-
-Fixpoint list_of_mmat {T} (MM : mmatrix T) :=
-  match MM with
-  | MM_1 nrow ncol M =>
-      map (λ row, map (λ col, matel M row col) (seq 0 ncol)) (seq 0 nrow)
-  | MM_M nrow ncol mm =>
-      match matel mm 0 0 with
-      | MM_1 nrow ncol M =>
-          map (λ row, map (λ col, matel M row col) (seq 0 ncol)) (seq 0 nrow)
-      | MM_M nrow1 ncol1 mm1 =>
-          []
-      end
-  end.
 
 Compute (let n := 1 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in A n)).
 Compute (let n := 1 in list_of_mmat (let _ := Z_ring_op in A' n)).

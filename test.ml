@@ -36,8 +36,7 @@ value rec mmat_opp mm =
 
 value rec mA n =
   match n with
-  | 0 → MM_1 0 0 (mat_of_list 0 [])
-  | 1 → MM_1 2 2 (mat_of_list 0 [[0; 1]; [1; 0]])
+  | 0 → MM_1 1 1 (mat_of_list 0 [])
   | _ →
        let n' = n - 1 in
        MM_M 2 2
