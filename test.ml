@@ -68,3 +68,8 @@ value un_mm mm = match mm with [ MM_1 _ -> failwith "m" | MM_M _ _ mm -> mm ].
 value doseq f = List.map f (seq 0 2).
 
 let n = 2 in doseq (fun i1 → doseq (fun i2 → doseq (fun i3 -> doseq (fun i4 → matel (un_m1 (matel (un_mm (mA n)) i1 i2)) i3 i4)))).
+
+let n = 3 in un_m1 (matel (un_mm (matel (un_mm (mA n)) 0 0)) 0 0);
+let n = 3 in matel (un_m1 (matel (un_mm (mA n)) 0 1)) 0 0;
+let n = 3 in doseq (fun i1 → doseq (fun i2 → un_m1 (matel (un_mm (matel (un_mm (mA n)) i1 i2)) 0 0)));
+let n = 3 in matel (un_m1 (matel (un_mm (matel (un_mm (mA n)) 0 0)) 0 0)) 0 0;
