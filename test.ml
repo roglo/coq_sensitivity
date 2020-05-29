@@ -55,4 +55,19 @@ value rec mmat_number_of_rows (mm : mmatrix 'a) =
   end.
 
 mmat_number_of_rows (mA 3).
-(* should be 8 *)
+(* 8 *)
+
+...
+
+value rec mat_of_mmat mm =
+  match mm with
+  | MM_1 _ _ m -> m
+  | MM_M nr nc mm ->
+      let mll =
+	List.map
+	  (fun r ->
+	     List.map
+	        (fun c -> mat_of_mmat (matel mm r c)) (seq 0 nc)) (seq 0 nr)
+      in
+      { matel i j = nth i (nth j mll []) { matel _ _ = 0 } }
+  end.
