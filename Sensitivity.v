@@ -2442,14 +2442,37 @@ Close Scope Z_scope.
 
 (* "We prove by induction that A_n^2 = nI" *)
 
-...
+Definition mmat_mul {T} {ro : ring_op T} {mro : ring_op (mmatrix T)}
+    (A B : mmatrix T) :=
+  match A with
+  | MM_1 ra ca MA =>
+      match B with
+      | MM_1 rb cb MB =>
+          if Nat.eq_dec ca rb then MM_1 ra cb (mat_mul ca MA MB)
+          else MM_1 0 0 zero_mat
+      | MM_M rb cb MMB => MM_1 0 0 zero_mat
+      end
+  | MM_M ra ca MMA =>
+      match B with
+      | MM_1 rb cb MB => MM_1 0 0 zero_mat
+      | MM_M rb cb MMB =>
+          if Nat.eq_dec ca rb then MM_M ra cb (mat_mul ca MMA MMB)
+          else MM_1 0 0 zero_mat
+      end
+  end.
 
-Definition mmat_mul {T} {ro : ring_op T} n A B :=
-  {| matel i k := (Σ (j = 0, n - 1), matel A i j * matel B j k)%Rng |}.
+(* TODO: a definition of this not using mat_of_mmat *)
 
-Lemma lemma_2_A_n_2_eq_n_I (ro := Z_ring_op) : ∀ n i j,
+Definition mmatel {T} {ro : ring_op T} MM i j :=
+  matel (snd (mat_of_mmat 0%Z MM)) i j.
+
+....
+
+Lemma lemma_2_A_n_2_eq_n_I (ro := Z_ring_op) (mro : ring_op (mmatrix Z)) :
+  ∀ n i j,
   (i < 2 ^ n)%nat → (j < 2 ^ n)%nat
-  → matel (mmat_mul (2 ^ n) (A' n) (A' n)) i j = matel (nI n) i j.
+  → matel (snd (mat_of_mmat 0%Z (mmat_mul (A' n) (A' n)))) i j =
+     matel (nI n) i j.
 Proof.
 intros * Hi Hj.
 ...
