@@ -57,17 +57,32 @@ value rec mmat_number_of_rows (mm : mmatrix 'a) =
 mmat_number_of_rows (mA 3).
 (* 8 *)
 
-...
+value concat_matrices (r1, c1, m1) (r2, c2, m2) =
+  (max r1 r2, c1 + c2,
+   { matel i j =
+       if i < max r1 r2 then
+	 if j < c1 then matel m1 i j
+         else matel m2 i (j - c1)
+       else 0 }).
 
 value rec mat_of_mmat mm =
   match mm with
-  | MM_1 _ _ m -> m
+  | MM_1 r c m -> (r, c, m)
   | MM_M nr nc mm ->
-      let mll =
-	List.map
-	  (fun r ->
-	     List.map
-	        (fun c -> mat_of_mmat (matel mm r c)) (seq 0 nc)) (seq 0 nr)
-      in
-      { matel i j = nth i (nth j mll []) { matel _ _ = 0 } }
+      List.fold_left
+        (fun acc r ->
+           List.fold_left
+              (fun acc c ->
+                 concat_matrices acc (mat_of_mmat (matel mm r c)))
+              acc (seq 0 nc))
+        (0, 0, {matel _ _ = 0}) (seq 0 nr)
   end.
+
+value list_of_mat nrow ncol m =
+  List.map
+    (fun row ->
+       List.map (fun col -> matel m row col) (seq 0 ncol)) (seq 0 nrow).
+
+value list_of_mat2 (n, c, m) = list_of_mat n c m;
+
+list_of_mat2 (mat_of_mmat (mA 2));
