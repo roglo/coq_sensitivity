@@ -57,7 +57,7 @@ value rec mmat_number_of_rows (mm : mmatrix 'a) =
 mmat_number_of_rows (mA 3).
 (* 8 *)
 
-value concat_matrices (r1, c1, m1) (r2, c2, m2) =
+value mat_horiz_concat (r1, c1, m1) (r2, c2, m2) =
   (max r1 r2, c1 + c2,
    { matel i j =
        if i < max r1 r2 then
@@ -73,7 +73,7 @@ value rec mat_of_mmat mm =
         (fun acc r ->
            List.fold_left
               (fun acc c ->
-                 concat_matrices acc (mat_of_mmat (matel mm r c)))
+                 mat_horiz_concat acc (mat_of_mmat (matel mm r c)))
               acc (seq 0 nc))
         (0, 0, {matel _ _ = 0}) (seq 0 nr)
   end.
