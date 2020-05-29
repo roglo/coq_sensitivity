@@ -2429,6 +2429,9 @@ Definition list_of_mmat {T} d (MM : mmatrix T) :=
   let '(r, c, M) := mat_of_mmat d MM in
   list_of_mat r c M.
 
+Definition mmatel {T} {ro : ring_op T} MM i j :=
+  matel (snd (mat_of_mmat 0%Z MM)) i j.
+
 Compute (let n := 1 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in A n)).
 Compute (let n := 1 in list_of_mmat 0%Z (let _ := Z_ring_op in A' n)).
 Compute (let n := 2 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in A n)).
@@ -2439,8 +2442,6 @@ Open Scope Z_scope.
 Compute (let n := 4%nat in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in A n)).
 Compute (let n := 4%nat in list_of_mmat 0%Z (let _ := Z_ring_op in A' n)).
 Close Scope Z_scope.
-
-(* "We prove by induction that A_n^2 = nI" *)
 
 Definition mmat_mul {T} {ro : ring_op T} {mro : ring_op (mmatrix T)}
     (A B : mmatrix T) :=
@@ -2461,20 +2462,17 @@ Definition mmat_mul {T} {ro : ring_op T} {mro : ring_op (mmatrix T)}
       end
   end.
 
-(* TODO: a definition of this not using mat_of_mmat *)
-
-Definition mmatel {T} {ro : ring_op T} MM i j :=
-  matel (snd (mat_of_mmat 0%Z MM)) i j.
-
-....
+(* "We prove by induction that A_n^2 = nI" *)
 
 Lemma lemma_2_A_n_2_eq_n_I (ro := Z_ring_op) (mro : ring_op (mmatrix Z)) :
   ∀ n i j,
   (i < 2 ^ n)%nat → (j < 2 ^ n)%nat
-  → matel (snd (mat_of_mmat 0%Z (mmat_mul (A' n) (A' n)))) i j =
-     matel (nI n) i j.
+  → mmatel (mmat_mul (A' n) (A' n)) i j = matel (nI n) i j.
 Proof.
 intros * Hi Hj.
+unfold mmatel.
+induction n; [ now cbn; destruct (Nat.eq_dec i j) | ].
+cbn - [ nI ].
 ...
 
 Lemma sqr_An1_from_sqr_An (ro := Z_ring_op) (rp := Z_ring_prop) : ∀ n,
