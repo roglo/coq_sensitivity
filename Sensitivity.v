@@ -2433,7 +2433,10 @@ Fixpoint mmat_number_of_rows {T} nrow (MM : mmatrix T) :=
   end.
 
 Compute (let nrow := 2 in mmat_number_of_rows nrow (A' 3)).
+Check A.
 
+Compute (list_of_mat 8 8 (let _ := Z_ring_op in A 3)).
+Compute (list_of_mat 16 16 (let _ := Z_ring_op in A 16)).
 ...
 
 Fixpoint glop {T} lev nrow (MM : mmatrix T) :=

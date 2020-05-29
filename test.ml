@@ -60,10 +60,12 @@ mmat_number_of_rows (mA 3).
 value mat_horiz_concat (r1, c1, m1) (r2, c2, m2) =
   (max r1 r2, c1 + c2,
    { matel i j =
-       if i < max r1 r2 then
-	 if j < c1 then matel m1 i j
-         else matel m2 i (j - c1)
-       else 0 }).
+       if j < c1 then matel m1 i j else matel m2 i (j - c1) }).
+
+value mat_vertic_concat (r1, c1, m1) (r2, c2, m2) =
+  (r1 + r2, max c1 c2,
+   { matel i j =
+       if i < r1 then matel m1 i j else matel m2 (i - r1) j }).
 
 value rec mat_of_mmat mm =
   match mm with
@@ -71,10 +73,11 @@ value rec mat_of_mmat mm =
   | MM_M nr nc mm ->
       List.fold_left
         (fun acc r ->
-           List.fold_left
-              (fun acc c ->
-                 mat_horiz_concat acc (mat_of_mmat (matel mm r c)))
-              acc (seq 0 nc))
+	   mat_vertic_concat acc
+             (List.fold_left
+                 (fun acc c ->
+                    mat_horiz_concat acc (mat_of_mmat (matel mm r c)))
+                 (0, 0, {matel _ _ = 0}) (seq 0 nc)))
         (0, 0, {matel _ _ = 0}) (seq 0 nr)
   end.
 
@@ -85,4 +88,5 @@ value list_of_mat nrow ncol m =
 
 value list_of_mat2 (n, c, m) = list_of_mat n c m;
 
+mat_of_mmat (mA 2);
 list_of_mat2 (mat_of_mmat (mA 2));
