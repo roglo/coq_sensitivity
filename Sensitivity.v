@@ -2440,8 +2440,19 @@ Compute (let n := 4%nat in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in A 
 Compute (let n := 4%nat in list_of_mmat 0%Z (let _ := Z_ring_op in A' n)).
 Close Scope Z_scope.
 
+(* "We prove by induction that A_n^2 = nI" *)
+
 ...
 
+Definition mmat_mul {T} {ro : ring_op T} n A B :=
+  {| matel i k := (Σ (j = 0, n - 1), matel A i j * matel B j k)%Rng |}.
+
+Lemma lemma_2_A_n_2_eq_n_I (ro := Z_ring_op) : ∀ n i j,
+  (i < 2 ^ n)%nat → (j < 2 ^ n)%nat
+  → matel (mmat_mul (2 ^ n) (A' n) (A' n)) i j = matel (nI n) i j.
+Proof.
+intros * Hi Hj.
+...
 
 Lemma sqr_An1_from_sqr_An (ro := Z_ring_op) (rp := Z_ring_prop) : ∀ n,
   fin_mat_eq eq (2 ^ S n) (2 ^ S n)
