@@ -2432,6 +2432,12 @@ Definition list_of_mmat {T} d (MM : mmatrix T) :=
 Definition mmatel {T} {ro : ring_op T} MM i j :=
   matel (snd (mat_of_mmat 0%Z MM)) i j.
 
+Fixpoint mmatel' {T} {ro : ring_op T} MM i j :=
+  match MM with
+  | MM_1 nr nc M => matel M i j
+  | MM_M nr nc mm => ...
+...
+
 Compute (let n := 1 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in A n)).
 Compute (let n := 1 in list_of_mmat 0%Z (let _ := Z_ring_op in A' n)).
 Compute (let n := 2 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in A n)).
