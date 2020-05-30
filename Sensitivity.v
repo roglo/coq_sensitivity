@@ -2472,7 +2472,9 @@ Proof.
 intros * Hi Hj.
 unfold mmatel.
 induction n; [ now cbn; destruct (Nat.eq_dec i j) | ].
-cbn - [ nI ].
+cbn - [ nI mmat_mul ].
+unfold mmat_mul.
+destruct (Nat.eq_dec 2 2) as [H| H]; [ clear H | easy ].
 ...
 
 Lemma sqr_An1_from_sqr_An (ro := Z_ring_op) (rp := Z_ring_prop) : ∀ n,
