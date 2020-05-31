@@ -2432,11 +2432,13 @@ Definition list_of_mmat {T} d (MM : mmatrix T) :=
 Definition mmatel {T} {ro : ring_op T} MM i j :=
   matel (snd (mat_of_mmat 0%Z MM)) i j.
 
+(*
 Fixpoint mmatel' {T} {ro : ring_op T} MM i j :=
   match MM with
   | MM_1 nr nc M => matel M i j
   | MM_M nr nc mm => ...
 ...
+*)
 
 Compute (let n := 1 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in A n)).
 Compute (let n := 1 in list_of_mmat 0%Z (let _ := Z_ring_op in A' n)).
@@ -2475,6 +2477,14 @@ Lemma lemma_2_A_n_2_eq_n_I (ro := Z_ring_op) (mro : ring_op (mmatrix Z)) :
   (i < 2 ^ n)%nat → (j < 2 ^ n)%nat
   → mmatel (mmat_mul (A' n) (A' n)) i j = matel (nI n) i j.
 Proof.
+intros * Hi Hj.
+unfold mmat_mul.
+remember (A' n) as an eqn:Han; symmetry in Han.
+destruct an as [ra ca MA| ra ca MMA]. {
+  destruct (Nat.eq_dec ca ra) as [Hcra| Hcra]. {
+    subst ca.
+    cbn - [ summation ].
+...
 intros * Hi Hj.
 unfold mmatel.
 induction n; [ now cbn; destruct (Nat.eq_dec i j) | ].
