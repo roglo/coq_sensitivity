@@ -2470,6 +2470,30 @@ Definition mmat_mul {T} {ro : ring_op T} {mro : ring_op (mmatrix T)}
       end
   end.
 
+Theorem A'_is_MM_1 (ro := Z_ring_op) : ∀ n r c M,
+  A' n = MM_1 r c M → n = 0 ∧ r = 1 ∧ c = 1 ∧
+  M = zero_mat.
+Proof.
+intros * HA.
+destruct n; [ | easy ].
+cbn in HA.
+now injection HA; clear HA; intros; subst.
+Qed.
+
+Theorem A'_is_MM_M (ro := Z_ring_op) : ∀ n r c MM,
+  A' n = MM_M r c MM → n ≠ 0 ∧ r = 2 ∧ c = 2 ∧
+  MM =
+    mmat_of_list 0%Rng
+      [[A' (n - 1); MM_1 (2 ^ (n - 1)) (2 ^ (n - 1)) I];
+      [MM_1 (2 ^ (n - 1)) (2 ^ (n - 1)) I; mmat_opp (A' (n - 1))]].
+Proof.
+intros * HA.
+destruct n; [ easy | ].
+rewrite Nat.sub_succ, Nat.sub_0_r.
+cbn in HA.
+now injection HA; clear HA; intros; subst.
+Qed.
+
 (* "We prove by induction that A_n^2 = nI" *)
 
 Lemma lemma_2_A_n_2_eq_n_I (ro := Z_ring_op) (mro : ring_op (mmatrix Z)) :
@@ -2481,9 +2505,14 @@ intros * Hi Hj.
 unfold mmat_mul.
 remember (A' n) as an eqn:Han; symmetry in Han.
 destruct an as [ra ca MA| ra ca MMA]. {
-  destruct (Nat.eq_dec ca ra) as [Hcra| Hcra]. {
-    subst ca.
-    cbn - [ summation ].
+  apply A'_is_MM_1 in Han.
+  destruct Han as (Hn & Hra & Hca & HMA).
+  subst; cbn.
+  now destruct (Nat.eq_dec i j).
+}
+apply A'_is_MM_M in Han.
+destruct Han as (Hnz & Hra & Hca & HMMA).
+subst ra ca; cbn - [ nI ].
 ...
 intros * Hi Hj.
 unfold mmatel.
