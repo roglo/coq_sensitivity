@@ -2513,6 +2513,15 @@ destruct an as [ra ca MA| ra ca MMA]. {
 apply A'_is_MM_M in Han.
 destruct Han as (Hnz & Hra & Hca & HMMA).
 subst ra ca; cbn - [ nI ].
+subst MMA.
+destruct n; [ easy | clear Hnz ].
+cbn - [ nI ].
+rewrite Nat.sub_0_r.
+induction n. {
+  cbn in Hi, Hj.
+  destruct i. {
+    destruct j. {
+      cbn.
 ...
 intros * Hi Hj.
 unfold mmatel.
