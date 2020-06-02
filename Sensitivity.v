@@ -2525,6 +2525,7 @@ Qed.
 
 (* "We prove by induction that A_n^2 = nI" *)
 
+(*
 Lemma lemma_2_A_n_2_eq_n_I (ro := Z_ring_op) (mro : ring_op (mmatrix Z)) :
   ∀ n i j,
   (i < 2 ^ n)%nat → (j < 2 ^ n)%nat
@@ -2565,6 +2566,7 @@ cbn - [ nI mmat_mul ].
 unfold mmat_mul.
 destruct (Nat.eq_dec 2 2) as [H| H]; [ clear H | easy ].
 ...
+*)
 
 Lemma sqr_An1_from_sqr_An (ro := Z_ring_op) (rp := Z_ring_prop) : ∀ n,
   fin_mat_eq eq (2 ^ S n) (2 ^ S n)
@@ -2778,6 +2780,11 @@ Compute (let n := 5 in let i := 2 ^ n in (Σ (j = 0, 2 ^ S n - 1),
     apply summation_compat; intros k Hk.
     now rewrite (Nat.add_comm k).
   }
+(* ah, putain, c'est décourageant... j'ai exploré plein de pistes qui n'ont pas
+   l'air de fonctionner bien ; il reste celle-là, mais faut encore pas mal
+   réfléchir et, en plus, je ne suis même pas sûr que ce théorème va bien
+   fonctionner par la suite ; et ne suis pas content de son énoncé, pas facile
+   à lire ; mon code est un peu en bordel en plus *)
 ...
   replace (Σ (_ = _, _), _)%Rng with (Z.of_nat n). 2: {
 ...
@@ -2912,8 +2919,12 @@ remember (2 ^ S (S n)) as ssn; remember (S n) as sn; cbn - [ mat_mul nI ]; subst
 Print mat_mul.
 (* mouais... c'est pas si évident... *)
 ...
+*)
 
 (* previous version: worked, but had to be terminated *)
+
+Print A.
+...
 
 Fixpoint old_A n :=
   match n with
