@@ -2543,11 +2543,10 @@ apply A'_is_MM_M in Han.
 destruct Han as (Hnz & Hra & Hca & HMMA).
 subst ra ca; cbn - [ nI ].
 subst MMA.
-destruct i. {
-  destruct j. {
-    cbn - [ nI ].
-    unfold mat_mul.
-    cbn - [ nI mmat_of_list ].
+unfold mat_mul.
+cbn - [ nI mmat_of_list ].
+rename i into im.
+rename j into jm.
 ...
 destruct n; [ easy | clear Hnz ].
 cbn - [ nI ].
