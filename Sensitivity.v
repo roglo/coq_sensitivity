@@ -2432,6 +2432,7 @@ Definition list_of_mmat {T} d (MM : mmatrix T) :=
 Definition mmatel {T} {ro : ring_op T} MM i j :=
   matel (snd (mat_of_mmat 0%Z MM)) i j.
 
+(*
 Fixpoint mmat_nrows {T} {ro : ring_op T} (MM : mmatrix T) :=
   match MM with
   | MM_1 nr _ _ => nr
@@ -2466,6 +2467,7 @@ Fixpoint mmatel' {T} {ro : ring_op T} (MM : mmatrix T) i j :=
   end.
 
 ...
+*)
 
 Compute (let n := 1 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in A n)).
 Compute (let n := 1 in list_of_mmat 0%Z (let _ := Z_ring_op in A' n)).
@@ -2548,7 +2550,13 @@ induction n. {
   cbn in Hi, Hj.
   destruct i. {
     destruct j. {
-      cbn.
+      unfold mat_mul; cbn.
+(* pas l'air si simple ; je ne sais pas d'où vient fondamentalement
+   le problème, mais j'aimerais bien pouvoir raisonner directement
+   en matrices sans avoir à devoir accéder aux éléments (qui ferait
+   perdre tout l'intérêt de cette approche) ; bon, en attendant, je
+   vais revenir à la version que j'avais avant, avec plein de cas,
+   mais au moins un chemin à suivre (mardi 2 juin 2020) *)
 ...
 intros * Hi Hj.
 unfold mmatel.
