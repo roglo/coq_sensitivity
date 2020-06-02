@@ -2432,13 +2432,39 @@ Definition list_of_mmat {T} d (MM : mmatrix T) :=
 Definition mmatel {T} {ro : ring_op T} MM i j :=
   matel (snd (mat_of_mmat 0%Z MM)) i j.
 
+Fixpoint mmat_nrows {T} {ro : ring_op T} (MM : mmatrix T) :=
+  match MM with
+  | MM_1 nr _ _ => nr
+  | MM_M nr _ mm => Σ (i = 0, nr - 1), mmat_nrows (matel mm i 0)
+  end.
+
+Fixpoint mmat_ncols {T} {ro : ring_op T} (MM : mmatrix T) :=
+  match MM with
+  | MM_1 _ nc _ => nc
+  | MM_M _ nc mm => Σ (j = 0, nc - 1), mmat_ncols (matel mm 0 j)
+  end.
+
 (*
-Fixpoint mmatel' {T} {ro : ring_op T} MM i j :=
+Fixpoint mmatel_col_loop {T} {ro : ring_op T} MM im jm i j :=
+  if lt_dec j (mmat_ncols (matel MM im jm)) then mmatel' (matel MM im jm) i j
+  else if lt_dec (j - mmat_ncols (matel MM im jm)) (mmat_ncols (matel MM im (jm + 1))) then
+    mmatl_col_loop MM im (jm + 1)
+  else rng_zero.
+*)
+
+Definition mmat_which_row {T} (nr : nat) (mm : matrix (mmatrix T)) (i : nat) := (0, 0).
+Definition mmat_which_col {T} (nc : nat) (mm : matrix (mmatrix T)) (j : nat) := (0, 0).
+
+Fixpoint mmatel' {T} {ro : ring_op T} (MM : mmatrix T) i j :=
   match MM with
   | MM_1 nr nc M => matel M i j
-  | MM_M nr nc mm => ...
+  | MM_M nr nc mm =>
+      let (nrows_bef, im) := mmat_which_row nr mm i in
+      let (ncols_bef, jm) := mmat_which_col nr mm j in
+      mmatel' (matel mm im jm) (i - nrows_bef) (j - ncols_bef)
+  end.
+
 ...
-*)
 
 Compute (let n := 1 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in A n)).
 Compute (let n := 1 in list_of_mmat 0%Z (let _ := Z_ring_op in A' n)).
