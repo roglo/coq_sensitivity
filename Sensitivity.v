@@ -2525,7 +2525,6 @@ Qed.
 
 (* "We prove by induction that A_n^2 = nI" *)
 
-(*
 Lemma lemma_2_A_n_2_eq_n_I (ro := Z_ring_op) (mro : ring_op (mmatrix Z)) :
   ∀ n i j,
   (i < 2 ^ n)%nat → (j < 2 ^ n)%nat
@@ -2544,6 +2543,12 @@ apply A'_is_MM_M in Han.
 destruct Han as (Hnz & Hra & Hca & HMMA).
 subst ra ca; cbn - [ nI ].
 subst MMA.
+destruct i. {
+  destruct j. {
+    cbn - [ nI ].
+    unfold mat_mul.
+    cbn - [ nI mmat_of_list ].
+...
 destruct n; [ easy | clear Hnz ].
 cbn - [ nI ].
 rewrite Nat.sub_0_r.
@@ -2551,13 +2556,6 @@ induction n. {
   cbn in Hi, Hj.
   destruct i. {
     destruct j. {
-      unfold mat_mul; cbn.
-(* pas l'air si simple ; je ne sais pas d'où vient fondamentalement
-   le problème, mais j'aimerais bien pouvoir raisonner directement
-   en matrices sans avoir à devoir accéder aux éléments (qui ferait
-   perdre tout l'intérêt de cette approche) ; bon, en attendant, je
-   vais revenir à la version que j'avais avant, avec plein de cas,
-   mais au moins un chemin à suivre (mardi 2 juin 2020) *)
 ...
 intros * Hi Hj.
 unfold mmatel.
@@ -2566,7 +2564,6 @@ cbn - [ nI mmat_mul ].
 unfold mmat_mul.
 destruct (Nat.eq_dec 2 2) as [H| H]; [ clear H | easy ].
 ...
-*)
 
 Lemma sqr_An1_from_sqr_An (ro := Z_ring_op) (rp := Z_ring_prop) : ∀ n,
   fin_mat_eq eq (2 ^ S n) (2 ^ S n)
