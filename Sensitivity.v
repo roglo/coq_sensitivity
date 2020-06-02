@@ -2784,7 +2784,7 @@ Compute (let n := 5 in let i := 2 ^ n in (Σ (j = 0, 2 ^ S n - 1),
    l'air de fonctionner bien ; il reste celle-là, mais faut encore pas mal
    réfléchir et, en plus, je ne suis même pas sûr que ce théorème va bien
    fonctionner par la suite ; et ne suis pas content de son énoncé, pas facile
-   à lire ; mon code est un peu en bordel en plus *)
+   à lire ; mon code est un peu en bordel en plus (mardi 2 juin 2020 10h51 *)
 ...
   replace (Σ (_ = _, _), _)%Rng with (Z.of_nat n). 2: {
 ...
