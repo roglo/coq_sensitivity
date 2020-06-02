@@ -2444,15 +2444,16 @@ Fixpoint mmat_ncols {T} {ro : ring_op T} (MM : mmatrix T) :=
   | MM_M _ nc mm => Σ (j = 0, nc - 1), mmat_ncols (matel mm 0 j)
   end.
 
-(*
-Fixpoint mmatel_col_loop {T} {ro : ring_op T} MM im jm i j :=
-  if lt_dec j (mmat_ncols (matel MM im jm)) then mmatel' (matel MM im jm) i j
-  else if lt_dec (j - mmat_ncols (matel MM im jm)) (mmat_ncols (matel MM im (jm + 1))) then
-    mmatl_col_loop MM im (jm + 1)
-  else rng_zero.
-*)
+Fixpoint mmat_which_row {T} nr (mm : matrix (mmatrix T)) (i im : nat) :=
+  match nr with
+  | 0 => (0, 0) (* should not happen *)
+  | S nr' =>
+      match matel mm im 0 with
+      | MM_1 nr' _ M =>
+          if lt_dec i nr' then im
+          else mmat_which_row mm ...
+...
 
-Definition mmat_which_row {T} (nr : nat) (mm : matrix (mmatrix T)) (i : nat) := (0, 0).
 Definition mmat_which_col {T} (nc : nat) (mm : matrix (mmatrix T)) (j : nat) := (0, 0).
 
 Fixpoint mmatel' {T} {ro : ring_op T} (MM : mmatrix T) i j :=
