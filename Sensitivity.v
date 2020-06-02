@@ -2408,6 +2408,8 @@ Definition mat_vertic_concat {T} '(r1, c1, m1) '(r2, c2, m2) :
    {| matel i j :=
        if lt_dec i r1 then matel m1 i j else matel m2 (i - r1) j |}).
 
+...
+
 Fixpoint mat_of_mmat {T} (d : T) MM :=
   match MM with
   | MM_1 r c M => (r, c, M)
@@ -2545,8 +2547,55 @@ subst ra ca; cbn - [ nI ].
 subst MMA.
 unfold mat_mul.
 cbn - [ nI mmat_of_list ].
-rename i into im.
-rename j into jm.
+rename i into im; rename j into jm.
+rename Hi into Him; rename Hj into Hjm.
+transitivity
+  (mmatel
+    (MM_M 2 2
+       {|
+       matel := λ i k : nat,
+                  ((if Nat.eq_dec i 0 then A' (n - 1)
+                    else
+                      matel
+                        (mmat_of_list 0%Z
+                           [[A' (n - 1); MM_1 (2 ^ (n - 1)) (2 ^ (n - 1)) I];
+                           [MM_1 (2 ^ (n - 1)) (2 ^ (n - 1)) I; mmat_opp (A' (n - 1))]])
+                        i 0) *
+                   matel
+                     (mmat_of_list 0%Z
+                        [[A' (n - 1); MM_1 (2 ^ (n - 1)) (2 ^ (n - 1)) I];
+                        [MM_1 (2 ^ (n - 1)) (2 ^ (n - 1)) I; mmat_opp (A' (n - 1))]]) 0 k +
+                   (matel
+                      (mmat_of_list 0%Z
+                         [[A' (n - 1); MM_1 (2 ^ (n - 1)) (2 ^ (n - 1)) I];
+                         [MM_1 (2 ^ (n - 1)) (2 ^ (n - 1)) I; mmat_opp (A' (n - 1))]]) i 1 *
+                    matel
+                      (mmat_of_list 0%Z
+                         [[A' (n - 1); MM_1 (2 ^ (n - 1)) (2 ^ (n - 1)) I];
+                         [MM_1 (2 ^ (n - 1)) (2 ^ (n - 1)) I; mmat_opp (A' (n - 1))]]) 1 k + 0))%Rng |}) im jm).
+...
+Print mmatel.
+Theorem glop (ro := Z_ring_op) : ∀ MMM1 MMM2 r c i j,
+  (∀ i j, i < r → j < c → matel MMM1 i j = matel MMM2 i j)
+  → mmatel (MM_M r c MMM1) i j = mmatel (MM_M r c MMM2) i j.
+Proof.
+intros * HMMM.
+revert c HMMM.
+induction r; intros; [ easy | ].
+destruct r. {
+  destruct c; [ easy | ].
+  destruct c. {
+    unfold mmatel.
+    cbn.
+    unfold mat_of_mmat.
+...
+apply glop.
+intros i j Hi Hj.
+cbn - [ mmat_of_list ].
+destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+  now subst i.
+}
+easy.
 ...
 destruct n; [ easy | clear Hnz ].
 cbn - [ nI ].
