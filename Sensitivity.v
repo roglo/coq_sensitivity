@@ -2408,8 +2408,6 @@ Definition mat_vertic_concat {T} '(r1, c1, m1) '(r2, c2, m2) :
    {| matel i j :=
        if lt_dec i r1 then matel m1 i j else matel m2 (i - r1) j |}).
 
-...
-
 Fixpoint mat_of_mmat {T} (d : T) MM :=
   match MM with
   | MM_1 r c M => (r, c, M)
@@ -2434,7 +2432,7 @@ Definition list_of_mmat {T} d (MM : mmatrix T) :=
 Definition mmatel {T} {ro : ring_op T} MM i j :=
   matel (snd (mat_of_mmat 0%Z MM)) i j.
 
-(*
+(**)
 Fixpoint mmat_nrows {T} {ro : ring_op T} (MM : mmatrix T) :=
   match MM with
   | MM_1 nr _ _ => nr
@@ -2446,6 +2444,8 @@ Fixpoint mmat_ncols {T} {ro : ring_op T} (MM : mmatrix T) :=
   | MM_1 _ nc _ => nc
   | MM_M _ nc mm => Σ (j = 0, nc - 1), mmat_ncols (matel mm 0 j)
   end.
+
+...
 
 Fixpoint mmat_which_row {T} nr (mm : matrix (mmatrix T)) (i im : nat) :=
   match nr with
@@ -2469,7 +2469,7 @@ Fixpoint mmatel' {T} {ro : ring_op T} (MM : mmatrix T) i j :=
   end.
 
 ...
-*)
+(**)
 
 Compute (let n := 1 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in A n)).
 Compute (let n := 1 in list_of_mmat 0%Z (let _ := Z_ring_op in A' n)).
