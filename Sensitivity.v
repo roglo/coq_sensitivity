@@ -2438,10 +2438,23 @@ Fixpoint mmat_which_row {T} nr (mm : matrix (mmatrix T)) (i im : nat) :=
 *)
 
 (**)
+Fixpoint number_of_rows_upto {T} im vr (MMM : matrix (mmatrix T)) :=
+  match im with
+  | 0 => 0
+  | S im' =>
+      match matel MMM im' 0 with
+      | MM_1 _ => vecel vr im
+      | MM_M vr' _ mmm => ...
+      end
+  end.
+...
+
 Fixpoint mmat_which_row {T} it (vr : vector nat) (MMM : matrix (mmatrix T)) (i im : nat) :=
   match it with
   | 0 => (0, 0)
   | S it' =>
+      let nr := number_of_rows_up_to im vr MMM in
+...
       match matel MMM im 0 with
       | MM_1 M =>
           let nr := vecel vr im in
