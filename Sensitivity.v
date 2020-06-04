@@ -2446,6 +2446,9 @@ Fixpoint mmat_ncols {T} {ro : ring_op T} (MM : mmatrix T) :=
   end.
 
 (**)
+(* trying to have another definition of mmatel because the one I have
+   above (with mat_of_mmat, therefore with mat_vertic_concat & horiz)
+   are difficult to use in proofs. *)
 ...
 Fixpoint mmat_which_row {T} nr (mm : matrix (mmatrix T)) (i im : nat) :=
   match nr with
