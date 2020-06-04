@@ -2449,11 +2449,11 @@ Fixpoint number_of_rows_upto {T} it im vr (MMM : matrix (mmatrix T)) :=
   end.
 ...
 
-Fixpoint mmat_which_row {T} it (vr : vector nat) (MMM : matrix (mmatrix T)) (i im : nat) :=
+Fixpoint mmat_which_row {T} it vlen (vr : vector nat) (MMM : matrix (mmatrix T)) (i im : nat) :=
   match it with
   | 0 => (0, 0)
   | S it' =>
-      let nr := number_of_rows_up_to max_nb_of_rows im vr MMM in
+      let nr := number_of_rows_up_to (max_nb_of_rows vlen vr MMM) im vr MMM in
 ...
       match matel MMM im 0 with
       | MM_1 M =>
