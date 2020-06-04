@@ -2419,41 +2419,33 @@ Fixpoint A' {T} {ro : ring_op T} n :=
              [MM_1 I; mmat_opp (A' n')]])
   end.
 
-(*
-Fixpoint mmat_which_row {T} nr (mm : matrix (mmatrix T)) (i im : nat) :=
-  match nr with
-  | 0 => (0, 0) (* should not happen *)
-  | S nr' =>
-      match matel mm im 0 with
-      | MM_1 r _ M =>
-          if lt_dec i r then (0, im)
-          else
-            let (nrows_bef, ir) := mmat_which_row nr' mm (i - r) (S im) in
-            (r + nrows_bef, ir)
-      | MM_M r _ MMM =>
-          ...
-      end
-  end.
-...
-*)
-
 (**)
+Fixpoint max_nb_of_rows vlen vr MMM :=
+(* shit, I don't have a maximum number of iterations *)
+...
+
 Fixpoint number_of_rows_upto {T} it im vr (MMM : matrix (mmatrix T)) :=
   match it with
   | 0 => 0
-  | S it =>
-      match matel MMM (im - 1) 0 with
-      | MM_1 _ => vecel vr im
-      | MM_M vr' _ mmm => ...
+  | S it' =>
+      match im with
+      | 0 => 0
+      | S im' =>
+          match matel MMM im' 0 with
+          | MM_1 _ => vecel vr im
+          | MM_M vr' _ MMM' => number_of_rows_upto it' (vecel vr im) vr' MMM'
+          end +
+          number_of_rows_upto it' im' vr MMM
       end
   end.
-...
 
 Fixpoint mmat_which_row {T} it vlen (vr : vector nat) (MMM : matrix (mmatrix T)) (i im : nat) :=
   match it with
   | 0 => (0, 0)
   | S it' =>
-      let nr := number_of_rows_up_to (max_nb_of_rows vlen vr MMM) im vr MMM in
+      let nr := number_of_rows_upto (max_nb_of_rows vlen vr MMM) im vr MMM in
+      (0, 0)
+  end.
 ...
       match matel MMM im 0 with
       | MM_1 M =>
