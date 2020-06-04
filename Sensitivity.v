@@ -1836,13 +1836,13 @@ rewrite <- Nat.div_mod; [ | easy ].
 easy.
 Qed.
 
-Definition eqmt_of_eqt T (eqt : T → T → Prop) n M1 M2 :=
-  ∀ i j, i < n → j < n → eqt (matel M1 i j) (matel M2 i j).
+Definition eqmt_of_eqt T (eqt : T → T → Prop) r c M1 M2 :=
+  ∀ i j, i < r → j < c → eqt (matel M1 i j) (matel M2 i j).
 
 Theorem mat_mat_even_mat : ∀ T eqt (MM : matrix (matrix T)) n,
   Equivalence eqt
   → n ≠ 0
-  → mat_eq (eqmt_of_eqt T eqt n)
+  → mat_eq (eqmt_of_eqt T eqt n n)
        (mat_mat_of_even_mat n (even_mat_of_mat_mat n MM)) MM.
 Proof.
 intros * Heq Hnz i j k l Hk Hl; cbn.
@@ -2522,6 +2522,35 @@ cbn in HA.
 now injection HA; clear HA; intros; subst.
 Qed.
 
+Fixpoint mmat_eq {T} eqt (MM1 MM2 : mmatrix T) :=
+  match MM1 with
+  | MM_1 r1 c1 M1 =>
+      match MM2 with
+      | MM_1 r2 c2 M2 =>
+          ∀ i j, i < min r1 r2 → j < min c1 c2 → eqt (matel M1 i j) (matel M2 i j)
+      | MM_M r2 c2 MM'2 =>
+          False
+      end
+  | MM_M r1 c1 MM'1 =>
+      match MM2 with
+      | MM_1 r2 c2 M2 =>
+          False
+      | MM_M r2 c2 MM'2 =>
+          ∀ i j, mmat_eq eqt (matel MM'1 i j) (matel MM'2 i j)
+      end
+  end.
+
+Theorem mmat_eq_matel (ro := Z_ring_op) : ∀ MMM1 MMM2 r c,
+  (∀ i j, i < r → j < c → mmat_eq eq (matel MMM1 i j) (matel MMM2 i j))
+  → ∀ im jm, mmatel (MM_M r c MMM1) im jm = mmatel (MM_M r c MMM2) im jm.
+Proof.
+intros * HMM *.
+unfold mmatel.
+Print mat_of_mmat.
+(* ah la la... j'aime pas ces mat_vertic_concat et mat_horiz_concat ;
+   comment raisonner avec ces trucs-là ? *)
+...
+
 (* "We prove by induction that A_n^2 = nI" *)
 
 Lemma lemma_2_A_n_2_eq_n_I (ro := Z_ring_op) (mro : ring_op (mmatrix Z)) :
@@ -2546,6 +2575,26 @@ unfold mat_mul.
 cbn - [ nI mmat_of_list ].
 rename i into im; rename j into jm.
 rename Hi into Him; rename Hj into Hjm.
+Check mmatel.
+Print MM_M.
+...
+etransitivity.
+apply mmat_eq_matel.
+intros * Hi Hj.
+cbn - [ mmat_of_list ].
+Print mmat_eq.
+...
+
+Theorem glop (ro := Z_ring_op) : ∀ MMM1 MMM2 r c,
+  (∀ i j, i < r → j < c → matel MMM1 i j = matel MMM2 i j)
+  → ∀ im jm, mmatel (MM_M r c MMM1) im jm = mmatel (MM_M r c MMM2) im jm.
+Proof.
+intros * HMM *.
+Check (matel MMM1 0 0).
+Print mat_eq.
+Search mat_eq.
+Print eqmt_of_eqt.
+Check @mat_eq.
 ...
 transitivity
   (mmatel
