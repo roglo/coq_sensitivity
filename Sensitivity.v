@@ -2612,6 +2612,7 @@ transitivity
                       (mmat_of_list 0%Z
                          [[A' (n - 1); MM_1 (2 ^ (n - 1)) (2 ^ (n - 1)) I];
                          [MM_1 (2 ^ (n - 1)) (2 ^ (n - 1)) I; mmat_opp (A' (n - 1))]]) 1 k + 0))%Rng |}) im jm).
+(* essayons déjà avec ça : vais-je y arriver ? *)
 ...
 destruct n; [ easy | clear Hnz ].
 cbn - [ nI ].
