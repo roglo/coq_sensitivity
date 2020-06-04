@@ -2613,6 +2613,10 @@ transitivity
                          [[A' (n - 1); MM_1 (2 ^ (n - 1)) (2 ^ (n - 1)) I];
                          [MM_1 (2 ^ (n - 1)) (2 ^ (n - 1)) I; mmat_opp (A' (n - 1))]]) 1 k + 0))%Rng |}) im jm).
 (* essayons déjà avec ça : vais-je y arriver ? *)
+unfold mmatel; cbn.
+(* c'est pas le pied, comme on disait à l'époque ;
+   encore à cause ce ce mat_vertic_concat, pas bien facile à utiliser ;
+   faudrait une autre définition de mmatel *)
 ...
 destruct n; [ easy | clear Hnz ].
 cbn - [ nI ].
