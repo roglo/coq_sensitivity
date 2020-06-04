@@ -2540,6 +2540,7 @@ Fixpoint mmat_eq {T} eqt (MM1 MM2 : mmatrix T) :=
       end
   end.
 
+(*
 Theorem mmat_eq_matel (ro := Z_ring_op) : ∀ MMM1 MMM2 r c,
   (∀ i j, i < r → j < c → mmat_eq eq (matel MMM1 i j) (matel MMM2 i j))
   → ∀ im jm, mmatel (MM_M r c MMM1) im jm = mmatel (MM_M r c MMM2) im jm.
@@ -2550,6 +2551,7 @@ Print mat_of_mmat.
 (* ah la la... j'aime pas ces mat_vertic_concat et mat_horiz_concat ;
    comment raisonner avec ces trucs-là ? *)
 ...
+*)
 
 (* "We prove by induction that A_n^2 = nI" *)
 
