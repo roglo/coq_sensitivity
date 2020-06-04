@@ -2579,6 +2579,7 @@ rename i into im; rename j into jm.
 rename Hi into Him; rename Hj into Hjm.
 Check mmatel.
 Print MM_M.
+(*
 ...
 etransitivity.
 apply mmat_eq_matel.
@@ -2586,18 +2587,7 @@ intros * Hi Hj.
 cbn - [ mmat_of_list ].
 Print mmat_eq.
 ...
-
-Theorem glop (ro := Z_ring_op) : ∀ MMM1 MMM2 r c,
-  (∀ i j, i < r → j < c → matel MMM1 i j = matel MMM2 i j)
-  → ∀ im jm, mmatel (MM_M r c MMM1) im jm = mmatel (MM_M r c MMM2) im jm.
-Proof.
-intros * HMM *.
-Check (matel MMM1 0 0).
-Print mat_eq.
-Search mat_eq.
-Print eqmt_of_eqt.
-Check @mat_eq.
-...
+*)
 transitivity
   (mmatel
     (MM_M 2 2
@@ -2622,29 +2612,6 @@ transitivity
                       (mmat_of_list 0%Z
                          [[A' (n - 1); MM_1 (2 ^ (n - 1)) (2 ^ (n - 1)) I];
                          [MM_1 (2 ^ (n - 1)) (2 ^ (n - 1)) I; mmat_opp (A' (n - 1))]]) 1 k + 0))%Rng |}) im jm).
-...
-Print mmatel.
-Theorem glop (ro := Z_ring_op) : ∀ MMM1 MMM2 r c i j,
-  (∀ i j, i < r → j < c → matel MMM1 i j = matel MMM2 i j)
-  → mmatel (MM_M r c MMM1) i j = mmatel (MM_M r c MMM2) i j.
-Proof.
-intros * HMMM.
-revert c HMMM.
-induction r; intros; [ easy | ].
-destruct r. {
-  destruct c; [ easy | ].
-  destruct c. {
-    unfold mmatel.
-    cbn.
-    unfold mat_of_mmat.
-...
-apply glop.
-intros i j Hi Hj.
-cbn - [ mmat_of_list ].
-destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
-  now subst i.
-}
-easy.
 ...
 destruct n; [ easy | clear Hnz ].
 cbn - [ nI ].
