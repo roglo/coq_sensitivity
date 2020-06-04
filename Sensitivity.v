@@ -2449,15 +2449,21 @@ Fixpoint mmat_ncols {T} {ro : ring_op T} (MM : mmatrix T) :=
 (* trying to have another definition of mmatel because the one I have
    above (with mat_of_mmat, therefore with mat_vertic_concat & horiz)
    are difficult to use in proofs. *)
-...
 Fixpoint mmat_which_row {T} nr (mm : matrix (mmatrix T)) (i im : nat) :=
   match nr with
   | 0 => (0, 0) (* should not happen *)
   | S nr' =>
       match matel mm im 0 with
-      | MM_1 nr' _ M =>
-          if lt_dec i nr' then im
-          else mmat_which_row mm ...
+      | MM_1 r _ M =>
+          if lt_dec i r then (0, im)
+          else
+            let (nrows_bef, ir) := mmat_which_row nr' mm (i - r) (S im) in
+            (r + nrows_bef, ir)
+      | MM_M r _ MMM =>
+          ...
+      end
+  end.
+...
 
 Definition mmat_which_col {T} (nc : nat) (mm : matrix (mmatrix T)) (j : nat) := (0, 0).
 
@@ -2465,8 +2471,8 @@ Fixpoint mmatel' {T} {ro : ring_op T} (MM : mmatrix T) i j :=
   match MM with
   | MM_1 nr nc M => matel M i j
   | MM_M nr nc mm =>
-      let (nrows_bef, im) := mmat_which_row nr mm i in
-      let (ncols_bef, jm) := mmat_which_col nr mm j in
+      let (nrows_bef, im) := mmat_which_row nr mm i 0 in
+      let (ncols_bef, jm) := mmat_which_col nr mm j 0 in
       mmatel' (matel mm im jm) (i - nrows_bef) (j - ncols_bef)
   end.
 (**)
