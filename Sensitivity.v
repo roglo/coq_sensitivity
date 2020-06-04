@@ -2546,6 +2546,7 @@ unfold mat_mul.
 cbn - [ nI mmat_of_list ].
 rename i into im; rename j into jm.
 rename Hi into Him; rename Hj into Hjm.
+...
 transitivity
   (mmatel
     (MM_M 2 2
