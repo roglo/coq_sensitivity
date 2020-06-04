@@ -2445,7 +2445,8 @@ Fixpoint mmat_ncols {T} {ro : ring_op T} (MM : mmatrix T) :=
   | MM_M _ nc mm => Σ (j = 0, nc - 1), mmat_ncols (matel mm 0 j)
   end.
 
-(*
+(**)
+...
 Fixpoint mmat_which_row {T} nr (mm : matrix (mmatrix T)) (i im : nat) :=
   match nr with
   | 0 => (0, 0) (* should not happen *)
@@ -2465,8 +2466,7 @@ Fixpoint mmatel' {T} {ro : ring_op T} (MM : mmatrix T) i j :=
       let (ncols_bef, jm) := mmat_which_col nr mm j in
       mmatel' (matel mm im jm) (i - nrows_bef) (j - ncols_bef)
   end.
-
-*)
+(**)
 
 Compute (let n := 1 in list_of_mat (2 ^ n) (2 ^ n) (let _ := Z_ring_op in A n)).
 Compute (let n := 1 in list_of_mmat 0%Z (let _ := Z_ring_op in A' n)).
