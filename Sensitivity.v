@@ -2427,6 +2427,11 @@ Fixpoint mmat_nb_of_rows {T} vlen (MM : mmatrix T) :=
       Σ (i = 0, vlen - 1), mmat_nb_of_rows (vecel vr i) (matel MMM i 0)
   end.
 
+Compute (mmat_nb_of_rows 2 (A' 2)).
+(* should be 8 *)
+
+...
+
 Fixpoint mmat_nb_of_cols {T} vlen (MM : mmatrix T) :=
   match MM with
   | MM_1 _ => vlen

@@ -1,50 +1,60 @@
 type nat = int;
-
-type matrix 'a = { matel : nat → nat → 'a };
-
-value matel m = m.matel.
-
 value nth i l d =
   try List.nth l i with [ Failure _ → d ].
-
 value rec seq start len =
   if len ≤ 0 then [] else [start :: seq (start + 1) (len - 1)].
-
 value rec pow a b =
   if b ≤ 0 then 1 else a * pow a (b - 1).
 
-type mmatrix 'a =
-  [ MM_1 of nat and nat and matrix 'a
-  | MM_M of nat and nat and matrix (mmatrix 'a) ].
+type matrix 'a = { matel : nat → nat → 'a };
+type vector 'a = { vecel : nat → 'a }.
+
+value matel m = m.matel.
+value vecel v = v.vecel.
 
 value mat_of_list d ll =
   { matel i j = nth i (nth j ll []) d }.
 
-value mmat_of_list d (ll : list (list (mmatrix 'a))) :
-    matrix (mmatrix 'a) =
-  { matel i j = nth i (nth j ll []) (MM_1 0 0 { matel i j = d }) }.
+value mat_opp m = { matel i j = - (matel m i j) }.
 
 value mI = { matel i j = if i = j then 1 else 0 }.
 
-value mat_opp m = { matel i j = - (matel m i j) }.
+type mmatrix 'a =
+  [ MM_1 of matrix 'a
+  | MM_M of vector nat and vector nat and matrix (mmatrix 'a) ].
 
 value rec mmat_opp mm =
   match mm with
-  | MM_1 r c m → MM_1 r c (mat_opp m)
-  | MM_M r c mm -> MM_M r c { matel i j = mmat_opp (matel mm i j) }
+  | MM_1 m → MM_1 (mat_opp m)
+  | MM_M vr vc mm -> MM_M vr vc { matel i j = mmat_opp (matel mm i j) }
   end.
+
+value mmat_of_list d (ll : list (list (mmatrix 'a))) :
+    matrix (mmatrix 'a) =
+  { matel i j = nth i (nth j ll []) (MM_1 { matel i j = d }) }.
 
 value rec mA n =
   match n with
-  | 0 → MM_1 1 1 (mat_of_list 0 [])
+  | 0 → MM_1 (mat_of_list 0 [])
   | _ →
        let n' = n - 1 in
-       MM_M 2 2
+       MM_M {vecel _ = 2} {vecel _ = 2}
          (mmat_of_list 0
-            [[mA n'; MM_1 (pow 2 n') (pow 2 n') mI];
-             [MM_1 (pow 2 n') (pow 2 n') mI; mmat_opp (mA n')]])
+            [[mA n'; MM_1 mI];
+             [MM_1 mI; mmat_opp (mA n')]])
   end.
 
+value rec mmat_nb_of_rows vlen (mm : mmatrix 'a) =
+  match mm with
+  | MM_1 _ -> vlen
+  | MM_M vr _ mmm ->
+      List.fold_left
+        (fun accu i ->
+           accu + mmat_nb_of_rows (vecel vr i) (matel mmm i 0))
+        0 (seq 0 vlen)
+  end.
+
+(*
 value rec mmat_number_of_rows (mm : mmatrix 'a) =
   match mm with
   | MM_1 r _ _ -> r
@@ -89,3 +99,4 @@ value list_of_mat2 (n, c, m) = list_of_mat n c m;
 
 mat_of_mmat (mA 2);
 list_of_mat2 (mat_of_mmat (mA 2));
+*)
