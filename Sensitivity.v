@@ -2437,11 +2437,11 @@ Fixpoint mmat_nb_of_cols_ub {T} vlen (MM : mmatrix T) :=
       (vecel vc i + mmat_nb_of_cols_ub (vecel vc i) (matel MMM i 0))
   end.
 
-Compute (let n := 0 in mmat_nb_of_rows_ub 2 (A n)). (* = 2 bad *)
-Compute (let n := 1 in mmat_nb_of_rows_ub 2 (A n)). (* = 2 *)
-Compute (let n := 2 in mmat_nb_of_rows_ub 2 (A n)). (* = 4 *)
-Compute (let n := 3 in mmat_nb_of_rows_ub 2 (A n)). (* = 6 bad *)
-Compute (let n := 4 in mmat_nb_of_rows_ub 2 (A n)). (* = 8 bad *)
+Compute (let n := 0 in mmat_nb_of_rows_ub 2 (A n)).
+Compute (let n := 1 in mmat_nb_of_rows_ub 2 (A n)).
+Compute (let n := 2 in mmat_nb_of_rows_ub 2 (A n)).
+Compute (let n := 3 in mmat_nb_of_rows_ub 2 (A n)).
+Compute (let n := 4 in mmat_nb_of_rows_ub 2 (A n)).
 
 Definition mmmat_nb_of_rows_ub {T} nr (MMM : matrix (mmatrix T)) :=
   match nr with
@@ -2476,6 +2476,36 @@ Compute
 
 (* with ub, it should be possible to compute the real value; but I have to
    prove that this so-called ub is indeed an upper bound *)
+
+Fixpoint mmat_nb_of_rows_loop {T} it vlen (MM : mmatrix T) :=
+  match it with
+  | 0 => 42 (* should not happen *)
+  | S it' =>
+      match MM with
+      | MM_1 _ => vlen
+      | MM_M vr _ MMM =>
+          Σ (i = 0, vlen - 1),
+          mmat_nb_of_rows_loop it' (vecel vr i) (matel MMM i 0)
+      end
+  end.
+
+Definition mmat_nb_of_rows {T} vlen (MM : mmatrix T) :=
+  mmat_nb_of_rows_loop (mmat_nb_of_rows_ub vlen MM) vlen MM.
+
+
+Definition mmmat_nb_of_rows {T} nr (MMM : matrix (mmatrix T)) :=
+  match nr with
+  | 0 => 0
+  | S nr' => Σ (i = 0, nr'), mmat_nb_of_rows nr (matel MMM i 0)
+  end.
+
+Compute (let n := 0 in mmat_nb_of_rows 1 (A n)).
+Compute (let n := 1 in mmat_nb_of_rows 2 (A n)).
+Compute (let n := 2 in mmat_nb_of_rows 2 (A n)).
+Compute (let n := 3 in mmat_nb_of_rows 2 (A n)). (* shit *)
+...
+
+Compute (let n := 4 in mmat_nb_of_rows 2 (A n)).
 ...
 
 Definition mmmat_nb_of_rows {T} vlen vr (MMM : matrix (mmatrix T)) :=
