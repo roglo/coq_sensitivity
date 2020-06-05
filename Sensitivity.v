@@ -2465,12 +2465,20 @@ Compute
 (* mmm : matrix (mmatrix nat) *)
 Compute
   (let mmm :=
-     let stdm k := MM_1 {|matel i j := 100 * k + 10 * i + j|} in
-     mmat_of_list 0 [[stdm 0; stdm 1; stdm 2]; [stdm 3; stdm 4; stdm 5]; [stdm 6; stdm 7; stdm 8]]
+     let fm k := MM_1 {|matel i j := 100 * k + 10 * i + j|} in
+     mmat_of_list 0 [[fm 0; fm 1; fm 2]; [fm 3; fm 4; fm 5]; [fm 6; fm 7; fm 8]]
+   in
+   (mmmat_nb_of_rows 3 {| vecel i := match i with 0 => 2 | 1 => 4 | _ => 1 end |} mmm,
+    mmmat_nb_of_cols 3 {| vecel i := match i with 0 => 3 | 1 => 2 | _ => 4 end |} mmm)).
+Compute
+  (let mmm :=
+     let fm k := MM_1 {|matel i j := 100 * k + 10 * i + j|} in
+     mmat_of_list 0 [[MM_M {| vecel i := 2 |} {| vecel j := match j with 0 => 2 | _ => 1 end |} {| matel i j := match j with 0 => fm 0 | _ => fm 1 end |}; fm 1; fm 2]; [fm 3; fm 4; fm 5]; [fm 6; fm 7; fm 8]]
    in
    (mmmat_nb_of_rows 3 {| vecel i := match i with 0 => 2 | 1 => 4 | _ => 1 end |} mmm,
     mmmat_nb_of_cols 3 {| vecel i := match i with 0 => 3 | 1 => 2 | _ => 4 end |} mmm)).
 
+(* pfff... même l'exemple, c'est compliqué *)
 ...
 
 Fixpoint number_of_rows_upto {T} it im vr (MMM : matrix (mmatrix T)) :=
