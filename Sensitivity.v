@@ -2474,6 +2474,8 @@ Compute
    in
    (mmmat_nb_of_rows_ub 3 mmm, mmmat_nb_of_cols_ub 3 mmm)).
 
+(* with ub, it should be possible to compute the real value; but I have to
+   prove that this so-called ub is indeed an upper bound *)
 ...
 
 Definition mmmat_nb_of_rows {T} vlen vr (MMM : matrix (mmatrix T)) :=
