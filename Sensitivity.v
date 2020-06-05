@@ -2421,39 +2421,58 @@ Fixpoint A {T} {ro : ring_op T} n :=
   end.
 
 (**)
-Fixpoint mmat_nb_of_rows {T} vlen (MM : mmatrix T) :=
+Fixpoint mmat_nb_of_rows_ub {T} vlen (MM : mmatrix T) :=
   match MM with
   | MM_1 _ => vlen
   | MM_M vr _ MMM =>
-      Σ (i = 0, vlen - 1), mmat_nb_of_rows (vecel vr i) (matel MMM i 0)
+      Σ (i = 0, vlen - 1),
+      (vecel vr i + mmat_nb_of_rows_ub (vecel vr i) (matel MMM i 0))
   end.
 
-Compute (let n := 0 in mmat_nb_of_rows (2 ^ n) (A n)). (* = 1 *)
-Compute (let n := 1 in mmat_nb_of_rows (2 ^ n) (A n)). (* = 2 *)
-Compute (let n := 2 in mmat_nb_of_rows (2 ^ n) (A n)). (* = 8 *)
-Compute (let n := 3 in mmat_nb_of_rows (2 ^ n) (A n)). (* = 18 *)
-Compute (let n := 4 in mmat_nb_of_rows (2 ^ n) (A n)). (* = 36 *)
+Fixpoint mmat_nb_of_cols_ub {T} vlen (MM : mmatrix T) :=
+  match MM with
+  | MM_1 _ => vlen
+  | MM_M _ vc MMM =>
+      Σ (i = 0, vlen - 1),
+      (vecel vc i + mmat_nb_of_cols_ub (vecel vc i) (matel MMM i 0))
+  end.
 
-(* oui, bon, ça donne une borne sup, en fait, c'est d'ailleurs + ou - ce
-   que je voulais ; l'ennui, c'est qu'il faut que je donne 2 ^ n en
-   paramètre, ce qui est justement non seulement une borne sup mais
-   en plus la valeur exacte ; à quoi ça sert, tout ça, je vous le
-   demande *)
+Compute (let n := 0 in mmat_nb_of_rows_ub 2 (A n)). (* = 2 bad *)
+Compute (let n := 1 in mmat_nb_of_rows_ub 2 (A n)). (* = 2 *)
+Compute (let n := 2 in mmat_nb_of_rows_ub 2 (A n)). (* = 4 *)
+Compute (let n := 3 in mmat_nb_of_rows_ub 2 (A n)). (* = 6 bad *)
+Compute (let n := 4 in mmat_nb_of_rows_ub 2 (A n)). (* = 8 bad *)
 
-(* moralité : on ne peut calculer, à partir d'une "mmatrice" :
-   - ni le nombre de sous-matrices par lignes ou par colonnes
-   - ni le nombre de lignes et de colonnes totaux en y replaçant
-     les sous-matrices et recursivement jusqu'aux matrices de
-     base.
-   D'autre part, on ne peut pas donner de borne supérieure au nombre
-   de lignes et de colonnes totaux, ce qui permettrait d'en calculer
-   les valeurs. Le calcul de ces bornes supérieures supposent...
-   de connaître déjà les valeurs.
-     Il faut donc les savoir et les fournir d'avance aux algorithmes,
-   de la même manière qu'il faut donner, pour un produit de matrices,
-   le nombre de colonnes de la première matrice (= nombre de lignes
-   de la deuxième).
-*)
+Definition mmmat_nb_of_rows_ub {T} nr (MMM : matrix (mmatrix T)) :=
+  match nr with
+  | 0 => 0
+  | S nr' => Σ (i = 0, nr'), mmat_nb_of_rows_ub nr (matel MMM i 0)
+  end.
+
+Definition mmmat_nb_of_cols_ub {T} nc (MMM : matrix (mmatrix T)) :=
+  match nc with
+  | 0 => 0
+  | S nc' => Σ (j = 0, nc'), mmat_nb_of_cols_ub nc (matel MMM 0 j)
+  end.
+
+Compute
+  (let mmm :=
+     let fm k := MM_1 {|matel i j := 100 * k + 10 * i + j|} in
+     mmat_of_list 0 [[fm 0; fm 1; fm 2]; [fm 3; fm 4; fm 5]; [fm 6; fm 7; fm 8]]
+   in
+   mmmat_nb_of_rows_ub 3 mmm). (* 9 ≥ 7 : ok *)
+Compute
+  (let mmm :=
+     let fm k := MM_1 {|matel i j := 100 * k + 10 * i + j|} in
+     mmat_of_list 0 [[fm 0; fm 1; fm 2]; [fm 3; fm 4; fm 5]; [fm 6; fm 7; fm 8]]
+   in
+   mmmat_nb_of_cols_ub 3 mmm). (* 9 ≥ 9 *)
+Compute
+  (let mmm :=
+     let fm k := MM_1 {|matel i j := 100 * k + 10 * i + j|} in
+     mmat_of_list 0 [[MM_M {| vecel i := 2 |} {| vecel j := match j with 0 => 2 | _ => 1 end |} {| matel i j := match j with 0 => fm 0 | _ => fm 1 end |}; fm 1; fm 2]; [fm 3; fm 4; fm 5]; [fm 6; fm 7; fm 8]]
+   in
+   (mmmat_nb_of_rows_ub 3 mmm, mmmat_nb_of_cols_ub 3 mmm)).
 
 ...
 
