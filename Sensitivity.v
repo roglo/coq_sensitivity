@@ -2434,6 +2434,12 @@ Compute (let n := 2 in mmat_nb_of_rows (2 ^ n) (A n)). (* = 8 *)
 Compute (let n := 3 in mmat_nb_of_rows (2 ^ n) (A n)). (* = 18 *)
 Compute (let n := 4 in mmat_nb_of_rows (2 ^ n) (A n)). (* = 36 *)
 
+(* oui, bon, ça donne une borne sup, en fait, c'est d'ailleurs + ou - ce
+   que je voulais ; l'ennui, c'est qu'il faut que je donne 2 ^ n en
+   paramètre, ce qui est justement non seulement une borne sup mais
+   en plus la valeur exacte ; à quoi ça sert, tout ça, je vous le
+   demande *)
+
 ...
 
 Definition mmmat_nb_of_rows {T} vlen vr (MMM : matrix (mmatrix T)) :=
