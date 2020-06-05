@@ -2427,11 +2427,49 @@ Fixpoint mmat_nb_of_rows {T} vlen (MM : mmatrix T) :=
       Σ (i = 0, vlen - 1), mmat_nb_of_rows (vecel vr i) (matel MMM i 0)
   end.
 
+Fixpoint mmat_nb_of_cols {T} vlen (MM : mmatrix T) :=
+  match MM with
+  | MM_1 _ => vlen
+  | MM_M _ vc MMM =>
+      Σ (j = 0, vlen - 1), mmat_nb_of_cols (vecel vc j) (matel MMM 0 j)
+  end.
+
 Definition mmmat_nb_of_rows {T} vlen vr (MMM : matrix (mmatrix T)) :=
   match vlen with
   | 0 => 0
-  | S vlen' => mmat_nb_of_rows (vecel vr vlen') (matel MMM vlen' 0)
+  | S vlen' => Σ (i = 0, vlen'), mmat_nb_of_rows (vecel vr i) (matel MMM i 0)
   end.
+
+Definition mmmat_nb_of_cols {T} vlen vc (MMM : matrix (mmatrix T)) :=
+  match vlen with
+  | 0 => 0
+  | S vlen' => Σ (j = 0, vlen'), mmat_nb_of_cols (vecel vc j) (matel MMM 0 j)
+  end.
+
+Definition list_of_mmat_mat {T} r c (MM : mmatrix T) :=
+  match MM with
+  | MM_1 M => list_of_mat r c M
+  | MM_M _ _ _ => []
+  end.
+
+Compute
+  (let mmm :=
+     let stdm k := MM_1 {|matel i j := 100 * k + 10 * i + j|} in
+     mmat_of_list 0 [[stdm 0; stdm 1; stdm 2]; [stdm 3; stdm 4; stdm 5]; [stdm 6; stdm 7; stdm 8]]
+   in
+   let mml := list_of_mat 3 3 mmm in
+   let f r c i j := list_of_mmat_mat r c (nth i (nth j mml []) (MM_1 {|matel _ _ := 0|})) in
+   [[f 2 3 0 0; f 2 2 0 1; f 2 4 0 2];
+    [f 4 3 1 0; f 4 2 1 1; f 4 4 1 2];
+    [f 1 3 2 0; f 1 2 2 1; f 1 4 2 2]]).
+(* mmm : matrix (mmatrix nat) *)
+Compute
+  (let mmm :=
+     let stdm k := MM_1 {|matel i j := 100 * k + 10 * i + j|} in
+     mmat_of_list 0 [[stdm 0; stdm 1; stdm 2]; [stdm 3; stdm 4; stdm 5]; [stdm 6; stdm 7; stdm 8]]
+   in
+   (mmmat_nb_of_rows 3 {| vecel i := match i with 0 => 2 | 1 => 4 | _ => 1 end |} mmm,
+    mmmat_nb_of_cols 3 {| vecel i := match i with 0 => 3 | 1 => 2 | _ => 4 end |} mmm)).
 
 ...
 
