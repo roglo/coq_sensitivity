@@ -2440,6 +2440,21 @@ Compute (let n := 4 in mmat_nb_of_rows (2 ^ n) (A n)). (* = 36 *)
    en plus la valeur exacte ; à quoi ça sert, tout ça, je vous le
    demande *)
 
+(* moralité : on ne peut calculer, à partir d'une "mmatrice" :
+   - ni le nombre de sous-matrices par lignes ou par colonnes
+   - ni le nombre de lignes et de colonnes totaux en y replaçant
+     les sous-matrices et recursivement jusqu'aux matrices de
+     base.
+   D'autre part, on ne peut pas donner de borne supérieure au nombre
+   de lignes et de colonnes totaux, ce qui permettrait d'en calculer
+   les valeurs. Le calcul de ces bornes supérieures supposent...
+   de connaître déjà les valeurs.
+     Il faut donc les savoir et les fournir d'avance aux algorithmes,
+   de la même manière qu'il faut donner, pour un produit de matrices,
+   le nombre de colonnes de la première matrice (= nombre de lignes
+   de la deuxième).
+*)
+
 ...
 
 Definition mmmat_nb_of_rows {T} vlen vr (MMM : matrix (mmatrix T)) :=
