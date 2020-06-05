@@ -54,6 +54,9 @@ value rec mmat_nb_of_rows vlen (mm : mmatrix 'a) =
         0 (seq 0 vlen)
   end.
 
+mmat_nb_of_rows 2 (mA 1).
+(* 2 *)
+
 (*
 value rec mmat_number_of_rows (mm : mmatrix 'a) =
   match mm with
@@ -62,9 +65,6 @@ value rec mmat_number_of_rows (mm : mmatrix 'a) =
       List.fold_left
         (fun acc i -> acc + mmat_number_of_rows (matel mm i 0)) 0 (seq 0 r)
   end.
-
-mmat_number_of_rows (mA 3).
-(* 8 *)
 
 value mat_horiz_concat (r1, c1, m1) (r2, c2, m2) =
   (max r1 r2, c1 + c2,
