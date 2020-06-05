@@ -1865,7 +1865,7 @@ Definition I {T} {ro : ring_op T} :=
 Definition mat_opp {T} {ro : ring_op T} (M : matrix T) :=
   {| matel i j := rng_opp (matel M i j) |}.
 
-Fixpoint A {T} {ro : ring_op T} n :=
+Fixpoint old_A {T} {ro : ring_op T} n :=
   match n with
   | 0 => mat_of_list 0%Rng []
   | 1 => mat_of_list 0%Rng [[0; 1]; [1; 0]]%Rng
@@ -1873,9 +1873,9 @@ Fixpoint A {T} {ro : ring_op T} n :=
       even_mat_of_mat_mat (2 ^ n')
         {| matel i j :=
              if Nat.eq_dec i 0 then
-               if Nat.eq_dec j 0 then A n' else I
+               if Nat.eq_dec j 0 then old_A n' else I
              else
-               if Nat.eq_dec j 0 then I else mat_opp (A n') |}
+               if Nat.eq_dec j 0 then I else mat_opp (old_A n') |}
   end.
 
 Definition mat_add {T} {ro : ring_op T} A B :=
@@ -1962,10 +1962,10 @@ Canonical Structure mat_ring_prop.
 
 Open Scope Z_scope.
 
-Compute (list_of_mat 2 2 (let _ := Z_ring_op in A 1)).
-Compute (list_of_mat 4 4 (let _ := Z_ring_op in A 2)).
-Compute (list_of_mat 8 8 (let _ := Z_ring_op in A 3)).
-Compute (list_of_mat 16 16 (let _ := Z_ring_op in A 4)).
+Compute (list_of_mat 2 2 (let _ := Z_ring_op in old_A 1)).
+Compute (list_of_mat 4 4 (let _ := Z_ring_op in old_A 2)).
+Compute (list_of_mat 8 8 (let _ := Z_ring_op in old_A 3)).
+Compute (list_of_mat 16 16 (let _ := Z_ring_op in old_A 4)).
 
 Close Scope Z_scope.
 
@@ -1987,7 +1987,7 @@ intros * Hij; cbn.
 now destruct (Nat.eq_dec i j).
 Qed.
 
-Theorem A_diag : ∀ n i, matel (A n) i i = 0%Rng.
+Theorem A_diag : ∀ n i, matel (old_A n) i i = 0%Rng.
 Proof.
 intros.
 revert i.
@@ -2020,7 +2020,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 }
 Qed.
 
-Theorem A_symm : ∀ n i j, matel (A n) i j = matel (A n) j i.
+Theorem A_symm : ∀ n i j, matel (old_A n) i j = matel (old_A n) j i.
 Proof.
 intros.
 revert i j.
@@ -2069,8 +2069,8 @@ Qed.
 Theorem mat_sqr_A_up_left : ∀ n i j,
   i < 2 ^ n
   → j < 2 ^ n
-  → matel (mat_sqr (2 ^ S n) (A (S n))) i j =
-    matel (mat_add (mat_sqr (2 ^ n) (A n)) I) i j.
+  → matel (mat_sqr (2 ^ S n) (old_A (S n))) i j =
+    matel (mat_add (mat_sqr (2 ^ n) (old_A n)) I) i j.
 Proof.
 intros * Hin Hjn.
 destruct n; intros. {
@@ -2085,7 +2085,7 @@ destruct n; intros. {
 remember (S n) as sn; cbn - [ mat_sqr "^" I mat_add ]; subst sn.
 unfold even_mat_of_mat_mat.
 remember (S n) as sn; cbn - [ mat_sqr "/" "^" I mat_add ]; subst sn.
-cbn - [ summation "^" A I ].
+cbn - [ summation "^" old_A I ].
 rewrite Nat.div_small; [ | easy ].
 rewrite Nat.div_small; [ | easy ].
 rewrite Nat.mod_small; [ | easy ].
@@ -2100,7 +2100,7 @@ erewrite (summation_split (2 ^ S n - 1)). 2: {
 assert (Hz : 2 ^ S n ≠ 0) by now apply Nat.pow_nonzero.
 replace (Σ (_ = _, _), _)%Rng with
     (Σ (k = 0, 2 ^ S n - 1),
-     (matel (A (S n)) i k * matel (A (S n)) k j))%Rng. 2: {
+     (matel (old_A (S n)) i k * matel (old_A (S n)) k j))%Rng. 2: {
   apply summation_compat; intros k Hk.
   rewrite Nat.div_small; [ | flia Hz Hk ].
   rewrite Nat.mod_small; [ | flia Hz Hk ].
@@ -2124,7 +2124,7 @@ replace (Σ (_ = 2 ^ S n, _), _)%Rng with
   }
   now rewrite Nat.mul_1_l, (I_symm _ j).
 }
-cbn - [ summation A I "^" ].
+cbn - [ summation old_A I "^" ].
 f_equal.
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   subst j.
@@ -2176,7 +2176,7 @@ Qed.
 Theorem mat_sqr_A_up_right : ∀ n i j,
   i < 2 ^ n
   → j < 2 ^ n
-  → matel (mat_sqr (2 ^ S n) (A (S n))) i (j + 2 ^ n) = 0%Rng.
+  → matel (mat_sqr (2 ^ S n) (old_A (S n))) i (j + 2 ^ n) = 0%Rng.
 Proof.
 intros * Hin Hjn.
 remember (S n) as sn; cbn - [ summation "^" ]; subst sn.
@@ -2206,7 +2206,7 @@ rewrite (summation_split (2 ^ S n - 1)). 2: {
   rewrite (Nat.pow_succ_r _ (S n)); flia.
 }
 replace (Σ (_ = _, _), _)%Rng with
-  (Σ (k = 0, 2 ^ S n - 1), matel (A (S n)) i k * matel I k j)%Rng. 2: {
+  (Σ (k = 0, 2 ^ S n - 1), matel (old_A (S n)) i k * matel I k j)%Rng. 2: {
   apply summation_compat; intros k Hk.
   rewrite Nat.div_small; [ | flia Hz Hk ].
   rewrite Nat.mod_small; [ | flia Hz Hk ].
@@ -2227,7 +2227,7 @@ destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
   rewrite Nat.sub_add; [ | now apply Nat.neq_0_lt_0 ].
   replace (Σ (_ = _, _), _)%Rng with
     (Σ (k = 0, 2 ^ S n - 1),
-     matel I i k * matel (mat_opp (A (S n))) k 0)%Rng. 2: {
+     matel I i k * matel (mat_opp (old_A (S n))) k 0)%Rng. 2: {
     rewrite (summation_shift (2 ^ S n)). 2: {
       rewrite (Nat.pow_succ_r _ (S n)); [ flia Hz | flia ].
     }
@@ -2250,7 +2250,7 @@ destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
       apply rng_mul_0_l.
     }
     rewrite rng_add_0_r.
-    cbn - [ A ].
+    cbn - [ old_A ].
     rewrite A_diag.
     apply rng_opp_0.
   }
@@ -2267,7 +2267,7 @@ destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
   rewrite summation_split_first; [ | flia Hin ].
   rewrite I_diag, rng_mul_1_l, rng_add_assoc.
   unfold mat_opp at 1.
-  cbn - [ A summation "^" ].
+  cbn - [ old_A summation "^" ].
   rewrite fold_rng_sub, rng_add_opp_r, rng_add_0_l.
   apply all_0_summation_0.
   intros k Hk.
@@ -2292,7 +2292,7 @@ rewrite Nat.sub_add; [ | flia Hz ].
 rewrite rng_add_0_r.
 replace (Σ (_ = _, _), _)%Rng with
   (Σ (k = 0, 2 ^ S n - 1),
-   matel I i k * matel (mat_opp (A (S n))) k j)%Rng. 2: {
+   matel I i k * matel (mat_opp (old_A (S n))) k j)%Rng. 2: {
   rewrite (summation_shift (2 ^ S n)). 2: {
     rewrite (Nat.pow_succ_r _ (S n)); [ flia Hz | flia ].
   }
@@ -2312,7 +2312,7 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   rewrite I_diag, rng_mul_1_l.
   rewrite rng_add_assoc.
   unfold mat_opp at 1.
-  cbn - [ A summation "^" mat_opp I ].
+  cbn - [ old_A summation "^" mat_opp I ].
   rewrite fold_rng_sub, rng_add_opp_r, rng_add_0_l.
   apply all_0_summation_0.
   intros k Hk.
@@ -2329,7 +2329,7 @@ rewrite Nat.sub_add; [ | flia Hiz ].
 rewrite summation_split_first; [ | flia Hin ].
 rewrite I_diag, rng_mul_1_l, rng_add_assoc.
 unfold mat_opp at 1.
-cbn - [ A summation "^" mat_opp I ].
+cbn - [ old_A summation "^" mat_opp I ].
 rewrite fold_rng_sub, rng_add_opp_r, rng_add_0_l.
 apply all_0_summation_0.
 intros k Hk.
@@ -2338,7 +2338,7 @@ apply rng_mul_0_l.
 Qed.
 
 Theorem A_sqr_symm : ∀ n i j,
-  matel (mat_sqr (2 ^ n) (A n)) i j = matel (mat_sqr (2 ^ n) (A n)) j i.
+  matel (mat_sqr (2 ^ n) (old_A n)) i j = matel (mat_sqr (2 ^ n) (old_A n)) j i.
 Proof.
 intros; cbn - [ summation ].
 apply summation_compat; intros k Hk.
@@ -2409,14 +2409,15 @@ Definition mmat_of_list {T} (d : T) (ll : list (list (mmatrix T))) :
     matrix (mmatrix T) :=
   {| matel i j := nth i (nth j ll []) (MM_1 {| matel i j := d |}) |}.
 
-Fixpoint A' {T} {ro : ring_op T} n :=
+Fixpoint A {T} {ro : ring_op T} n :=
   match n with
   | 0 => MM_1 (mat_of_list 0%Rng [])
+  | 1 => MM_1 (mat_of_list 0%Rng [[0; 1]; [1; 0]]%Rng)
   | S n' =>
        MM_M {| vecel _ := 2 |} {| vecel _ := 2 |}
          (mmat_of_list 0%Rng
-            [[A' n'; MM_1 I];
-             [MM_1 I; mmat_opp (A' n')]])
+            [[A n'; MM_1 I];
+             [MM_1 I; mmat_opp (A n')]])
   end.
 
 (**)
@@ -2427,10 +2428,19 @@ Fixpoint mmat_nb_of_rows {T} vlen (MM : mmatrix T) :=
       Σ (i = 0, vlen - 1), mmat_nb_of_rows (vecel vr i) (matel MMM i 0)
   end.
 
-Compute (mmat_nb_of_rows 2 (A' 2)).
-(* should be 8 *)
+Compute (let n := 0 in mmat_nb_of_rows (2 ^ n) (A n)). (* = 1 *)
+Compute (let n := 1 in mmat_nb_of_rows (2 ^ n) (A n)). (* = 2 *)
+Compute (let n := 2 in mmat_nb_of_rows (2 ^ n) (A n)). (* = 8 *)
+Compute (let n := 3 in mmat_nb_of_rows (2 ^ n) (A n)). (* = 18 *)
+Compute (let n := 4 in mmat_nb_of_rows (2 ^ n) (A n)). (* = 36 *)
 
 ...
+
+Definition mmmat_nb_of_rows {T} vlen vr (MMM : matrix (mmatrix T)) :=
+  match vlen with
+  | 0 => 0
+  | S vlen' => Σ (i = 0, vlen'), mmat_nb_of_rows (vecel vr i) (matel MMM i 0)
+  end.
 
 Fixpoint mmat_nb_of_cols {T} vlen (MM : mmatrix T) :=
   match MM with
@@ -2439,22 +2449,17 @@ Fixpoint mmat_nb_of_cols {T} vlen (MM : mmatrix T) :=
       Σ (j = 0, vlen - 1), mmat_nb_of_cols (vecel vc j) (matel MMM 0 j)
   end.
 
-Definition mmmat_nb_of_rows {T} vlen vr (MMM : matrix (mmatrix T)) :=
-  match vlen with
-  | 0 => 0
-  | S vlen' => Σ (i = 0, vlen'), mmat_nb_of_rows (vecel vr i) (matel MMM i 0)
+Definition list_of_mmat_mat {T} r c (MM : mmatrix T) :=
+  match MM with
+  | MM_1 M => list_of_mat r c M
+  | MM_M _ _ _ => []
   end.
+
 
 Definition mmmat_nb_of_cols {T} vlen vc (MMM : matrix (mmatrix T)) :=
   match vlen with
   | 0 => 0
   | S vlen' => Σ (j = 0, vlen'), mmat_nb_of_cols (vecel vc j) (matel MMM 0 j)
-  end.
-
-Definition list_of_mmat_mat {T} r c (MM : mmatrix T) :=
-  match MM with
-  | MM_1 M => list_of_mat r c M
-  | MM_M _ _ _ => []
   end.
 
 Compute
