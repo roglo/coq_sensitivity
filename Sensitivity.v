@@ -2492,7 +2492,6 @@ Fixpoint mmat_nb_of_rows_loop {T} it vlen (MM : mmatrix T) :=
 Definition mmat_nb_of_rows {T} vlen (MM : mmatrix T) :=
   mmat_nb_of_rows_loop (mmat_nb_of_rows_ub vlen MM) vlen MM.
 
-
 Definition mmmat_nb_of_rows {T} nr (MMM : matrix (mmatrix T)) :=
   match nr with
   | 0 => 0
@@ -2502,7 +2501,9 @@ Definition mmmat_nb_of_rows {T} nr (MMM : matrix (mmatrix T)) :=
 Compute (let n := 0 in mmat_nb_of_rows 1 (A n)).
 Compute (let n := 1 in mmat_nb_of_rows 2 (A n)).
 Compute (let n := 2 in mmat_nb_of_rows 2 (A n)).
-Compute (let n := 3 in mmat_nb_of_rows 2 (A n)). (* shit *)
+
+Compute (let n := 3 in mmat_nb_of_rows 2 (A n)). (* shit, 6 *)
+Compute (let n := 3 in mmat_nb_of_rows_ub 2 (A n)). (* 14 *)
 ...
 
 Compute (let n := 4 in mmat_nb_of_rows 2 (A n)).
