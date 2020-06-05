@@ -2420,6 +2420,21 @@ Fixpoint A' {T} {ro : ring_op T} n :=
   end.
 
 (**)
+Fixpoint mmat_nb_of_rows {T} vlen (MM : mmatrix T) :=
+  match MM with
+  | MM_1 _ => vlen
+  | MM_M vr _ MMM =>
+      Σ (i = 0, vlen - 1), mmat_nb_of_rows (vecel vr i) (matel MMM i 0)
+  end.
+
+Definition mmmat_nb_of_rows {T} vlen vr (MMM : matrix (mmatrix T)) :=
+  match vlen with
+  | 0 => 0
+  | S vlen' => mmat_nb_of_rows (vecel vr vlen') (matel MMM vlen' 0)
+  end.
+
+...
+
 Fixpoint number_of_rows_upto {T} it im vr (MMM : matrix (mmatrix T)) :=
   match it with
   | 0 => 0
@@ -2435,6 +2450,16 @@ Fixpoint number_of_rows_upto {T} it im vr (MMM : matrix (mmatrix T)) :=
       end
   end.
 
+...
+
+Fixpoint mmat_nb_of_rows_ub {T} vlen (MM : mmatrix T) :=
+  vlen +
+  match MM with
+  | MM_1 _ => 0
+  | MM_M vr _ MMM =>
+      Σ (i = 0, vlen - 1), mmat_nb_of_rows_ub (vecel vr i) (matel MMM i 0)
+  end.
+...
 (* "Recursive definition of nb_of_rows_ub is ill-formed." *)
 ...
 Fixpoint nb_of_rows_ub {T} vlen vr (MMM : matrix (mmatrix T)) {struct MMM} :=
