@@ -2435,15 +2435,22 @@ Fixpoint number_of_rows_upto {T} it im vr (MMM : matrix (mmatrix T)) :=
       end
   end.
 
-Fixpoint max_nb_of_rows vlen vr MMM :=
-(* shit, I don't have a maximum number of iterations *)
+(* "Recursive definition of nb_of_rows_ub is ill-formed." *)
+...
+Fixpoint nb_of_rows_ub {T} vlen vr (MMM : matrix (mmatrix T)) {struct MMM} :=
+  vlen +
+  Σ (i = 0, vlen - 1),
+    match matel MMM i 0 with
+    | MM_1 _ => vecel vr i
+    | MM_M vr' _ MMM' => nb_of_rows_ub (vecel vr i) vr' MMM'
+    end.
 ...
 
 Fixpoint mmat_which_row {T} it vlen (vr : vector nat) (MMM : matrix (mmatrix T)) (i im : nat) :=
   match it with
   | 0 => (0, 0)
   | S it' =>
-      let nr := number_of_rows_upto (max_nb_of_rows vlen vr MMM) im vr MMM in
+      let nr := number_of_rows_upto (nb_of_rows_ub vlen vr MMM) im vr MMM in
       (0, 0)
   end.
 ...
