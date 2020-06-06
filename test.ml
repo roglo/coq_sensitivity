@@ -1,6 +1,5 @@
 type nat = int;
-value nth i l d =
-  try List.nth l i with [ Failure _ → d ].
+value nth i l d = try List.nth l i with [ Failure _ → d ].
 value rec seq start len =
   if len ≤ 0 then [] else [start :: seq (start + 1) (len - 1)].
 value rec pow a b =
@@ -36,6 +35,7 @@ value mmat_of_list d (ll : list (list (mmatrix 'a))) :
 value rec mA n =
   match n with
   | 0 → MM_1 (mat_of_list 0 [])
+  | 1 → MM_1 (mat_of_list 0 [[0; 1]; [1; 0]])
   | _ →
        let n' = n - 1 in
        MM_M {vecel _ = 2} {vecel _ = 2}
@@ -44,6 +44,24 @@ value rec mA n =
              [MM_1 mI; mmat_opp (mA n')]])
   end.
 
+value rec mmat_nb_of_rows_ub vlen (mm : mmatrix 'a) =
+  match mm with
+  | MM_1 _ -> vlen
+  | MM_M vr _ mmm ->
+      List.fold_left
+        (fun accu i ->
+           accu + vecel vr i +
+	     mmat_nb_of_rows_ub (vecel vr i) (matel mmm i 0))
+	0 (seq 0 vlen)
+  end.
+
+let n = 0 in mmat_nb_of_rows_ub 2 (mA n).
+let n = 1 in mmat_nb_of_rows_ub 2 (mA n).
+let n = 2 in mmat_nb_of_rows_ub 2 (mA n).
+let n = 3 in mmat_nb_of_rows_ub 2 (mA n).
+let n = 4 in mmat_nb_of_rows_ub 2 (mA n).
+
+(*
 value rec mmat_nb_of_rows vlen (mm : mmatrix 'a) =
   match mm with
   | MM_1 _ -> vlen
@@ -57,7 +75,6 @@ value rec mmat_nb_of_rows vlen (mm : mmatrix 'a) =
 mmat_nb_of_rows 2 (mA 1).
 (* 2 *)
 
-(*
 value rec mmat_number_of_rows (mm : mmatrix 'a) =
   match mm with
   | MM_1 r _ _ -> r

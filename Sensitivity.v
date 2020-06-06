@@ -2412,7 +2412,9 @@ Definition mmat_of_list {T} (d : T) (ll : list (list (mmatrix T))) :
 Fixpoint A {T} {ro : ring_op T} n :=
   match n with
   | 0 => MM_1 (mat_of_list 0%Rng [])
+(*
   | 1 => MM_1 (mat_of_list 0%Rng [[0; 1]; [1; 0]]%Rng)
+*)
   | S n' =>
        MM_M {| vecel _ := 2 |} {| vecel _ := 2 |}
          (mmat_of_list 0%Rng
@@ -2503,7 +2505,8 @@ Compute (let n := 1 in mmat_nb_of_rows 2 (A n)).
 Compute (let n := 2 in mmat_nb_of_rows 2 (A n)).
 
 Compute (let n := 3 in mmat_nb_of_rows 2 (A n)). (* shit, 6 *)
-Compute (let n := 3 in mmat_nb_of_rows_ub 2 (A n)). (* 14 *)
+Compute (let n := 3 in mmat_nb_of_rows_ub 2 (A n)).
+  (* 14 ou 20, selon que A a le cas "1 => ..." ou non *)
 ...
 
 Compute (let n := 4 in mmat_nb_of_rows 2 (A n)).
