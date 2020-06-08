@@ -1824,15 +1824,13 @@ Definition mat_el {T} {r c} (M : matrix r c T) i j d :=
 
 Print mat_el.
 
+(*
 Require Import ZArith.
 
 Compute (let (i, j) := (0, 0) in let _ := Z_ring_op in mat_el (mat_of_list 0%Z [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]%Z : matrix 3 3 Z) i j 0%Z).
-
-...
+*)
 
 Compute (let (i, j) := (0, 0) in mat_el (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat) i j 0).
-Check mat_el.
-
 ...
 
 Check nth.
