@@ -1803,9 +1803,12 @@ assert (HVV : V1 = V2). {
   destruct i; [ now rewrite Haa | ].
   now apply IHV1.
 }
-...
-cbn in HMM; subst V2; f_equal.
+subst V2; f_equal.
 apply UIP_nat.
+Qed.
+
+Inspect 1.
+
 ...
 
 (* old version *)
