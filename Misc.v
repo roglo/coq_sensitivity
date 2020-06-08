@@ -1448,6 +1448,25 @@ remember (b :: l) as l'; cbn; subst l'.
 apply IHl.
 Qed.
 
+Theorem List_eq_iff : ∀ A (l1 l2 : list A),
+  l1 = l2 ↔ (length l1 = length l2 ∧ ∀ d i, nth i l1 d = nth i l2 d).
+Proof.
+split; [ now intros; subst l2 | ].
+intros (Hlen & Hll).
+revert l2 Hlen Hll.
+induction l1 as [| a1]; intros. {
+  symmetry in Hlen.
+  now apply length_zero_iff_nil in Hlen.
+}
+destruct l2 as [| a2]; [ easy | ].
+cbn in Hlen.
+apply Nat.succ_inj in Hlen.
+f_equal; [ apply (Hll a1 0) | ].
+apply IHl1; [ easy | ].
+intros.
+now specialize (Hll d (S i)).
+Qed.
+
 Theorem NoDup_app_app_swap {A} : ∀ l1 l2 l3 : list A,
   NoDup (l1 ++ l2 ++ l3) → NoDup (l1 ++ l3 ++ l2).
 Proof.
