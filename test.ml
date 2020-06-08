@@ -1,4 +1,18 @@
 type nat = int;
+
+type vector 'a =
+  { vec_list : list 'a;
+    vec_length : nat }.
+
+value vec_list v = v.vec_list;
+
+value vec_of_list (l : list 'a) =
+  { vec_list = l; vec_length = List.length l }.
+
+type matrix 'a =
+  { mat_vec : vector (vector 'a) }.
+
+(*
 value nth i l d = try List.nth l i with [ Failure _ → d ].
 value rec seq start len =
   if len ≤ 0 then [] else [start :: seq (start + 1) (len - 1)].
@@ -61,7 +75,7 @@ let n = 2 in mmat_nb_of_rows_ub 2 (mA n).
 let n = 3 in mmat_nb_of_rows_ub 2 (mA n).
 let n = 4 in mmat_nb_of_rows_ub 2 (mA n).
 
-(*
+(**)
 value rec mmat_nb_of_rows vlen (mm : mmatrix 'a) =
   match mm with
   | MM_1 _ -> vlen
