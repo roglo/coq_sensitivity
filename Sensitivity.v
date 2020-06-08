@@ -1704,15 +1704,15 @@ Require Import Ring2 Rsummation Rpolynomial2.
    their equality is equivalent to the equality of the lists *)
 
 Record vector (siz : nat) T :=
-  { vec_el : list T;
-    vec_length : length vec_el = siz }.
+  { vec_list : list T;
+    vec_length : length vec_list = siz }.
 
-Arguments vec_el {_} {_}.
+Arguments vec_list {_} {_}.
 
 (* works for vectors *)
 
 Theorem vec_eq_eq : ∀ T siz (V1 V2 : vector siz T),
-  V1 = V2 ↔ vec_el V1 = vec_el V2.
+  V1 = V2 ↔ vec_list V1 = vec_list V2.
 Proof.
 intros.
 split; [ now intros; subst V2 | ].
@@ -1725,14 +1725,14 @@ apply UIP_nat.
 Qed.
 
 Definition vec_of_list {T} (l : list T) :=
-  {| vec_el := l; vec_length := eq_refl |}.
+  {| vec_list := l; vec_length := eq_refl |}.
 
 (* trying for matrices *)
 
 Record matrix nrow ncol T :=
-  { mat_el : vector nrow (vector ncol T) }.
+  { mat_vec : vector nrow (vector ncol T) }.
 
-Arguments mat_el {_} {_} {_}.
+Arguments mat_vec {_} {_} {_}.
 
 Theorem vec_of_some_list_prop : ∀ T (d : T) (ll : list (list T)) l,
   length (firstn (length (hd [] ll)) (l ++ repeat d (length (hd [] ll)))) =
@@ -1751,7 +1751,7 @@ Qed.
 Definition vec_of_list_list {T} (d : T) (ll : list (list T)) :=
   map
     (λ l,
-     {| vec_el :=
+     {| vec_list :=
           firstn (length (hd [] ll)) (l ++ repeat d (length (hd [] ll)));
         vec_length := vec_of_some_list_prop T d ll l |})
     ll.
@@ -1764,7 +1764,7 @@ now rewrite map_length.
 Qed.
 
 Definition list_of_mat {T nrow ncol} (M : matrix nrow ncol T) :=
-  map vec_el (vec_el (mat_el M)).
+  map vec_list (vec_list (mat_vec M)).
 
 Theorem mat_eq_eq : ∀ T nrow ncol (M1 M2 : matrix nrow ncol T),
   M1 = M2 ↔ list_of_mat M1 = list_of_mat M2.
@@ -1809,10 +1809,26 @@ Compute (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat).
 
 Definition vec_mul {T} {ro : ring_op T} len (V1 V2 : vector len T) :=
   fold_left rng_add
-    (map (λ xy, (fst xy * snd xy)%Rng) (combine (vec_el V1) (vec_el V2))) 0%Rng.
+    (map (λ xy, (fst xy * snd xy)%Rng) (combine (vec_list V1) (vec_list V2)))
+    0%Rng.
 
-Definition mat_mul {T} {r cr c} (M1 : matrix r cr T) (M2 : matrix cr c T) :
-    matrix r c T.
+Definition mat_mul {T} {ro : ring_op T} {r cr c}
+    (M1 : matrix r cr T) (M2 : matrix cr c T) : matrix r c T.
+Check @vec_list.
+Check (map (λ i, nth i (vec_list (mat_vec M1)) 0%Rng) (seq 0 cr)).
+destruct M1 as (M1).
+destruct M2 as (M2).
+split.
+Check vec_of_list.
+Check list_of_vec.
+...
+Definition mat_row {T r c} (M : matrix r c T) i :=
+  map (λ j, mat_el M1
+...
+Check (vec_el (mat_vec M1)).
+Definition mat_el {T r c} (M : matrix r c T) (i j : nat) : T.
+...
+
 destruct M1 as ((V1 & P1)).
 destruct M2 as ((V2 & P2)).
 move V2 before V1.
@@ -1820,8 +1836,8 @@ split.
 Print vector.
 assert (list T).
 Search vector.
-...
-Check (map (λ i, nth i (vec_el V1)
+
+Check (map (λ i, map (λ k, (Σ (j = 0, cr - 1), nth i (vec_el V1) 0%Rng * 
 ...
 apply {| vec_el :=
 Search vector.
