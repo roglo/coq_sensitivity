@@ -1742,6 +1742,10 @@ Definition glop {T} (d : T) (ll : list (list T)) :=
 Definition mat_of_list {T} (d : T) (ll : list (list T)) : matrix (length ll) (length (hd [] ll)) T.
 split.
 remember (vec_of_list (glop d ll)) as v eqn:Hv.
+enough (length (hd [] ll) = length (hd [] (glop d ll))).
+rewrite H.
+...
+exists (glop d ll).
 ...
 
 Definition mat_of_list {T} (d : T) (ll : list (list T)) : matrix (length ll) (length (hd [] ll)) T.
