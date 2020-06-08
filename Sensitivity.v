@@ -1756,7 +1756,9 @@ Definition vec_of_list_list {T} (d : T) (ll : list (list T)) :=
         vec_length := vec_of_some_list_prop T d ll l |})
     ll.
 
-Definition mat_of_list {T} (d : T) (ll : list (list T)) : matrix (length ll) (length (hd [] ll)) T.
+Definition mat_of_list {T} (d : T) (ll : list (list T)) :
+  matrix (length ll) (length (hd [] ll)) T.
+Proof.
 split.
 exists (vec_of_list_list d ll).
 unfold vec_of_list_list.
@@ -1806,6 +1808,34 @@ apply UIP_nat.
 Qed.
 
 Compute (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat).
+
+Definition vec_el {T} {len} (V : vector len T) i d :=
+  nth i (vec_list V) d.
+
+Definition vec_repeat {T} len (d : T) : vector len T.
+Proof.
+set (V := vec_of_list (repeat d len)).
+rewrite repeat_length in V.
+apply V.
+Qed.
+
+Definition mat_el {T} {r c} (M : matrix r c T) i j d :=
+  nth i (vec_list (nth j (vec_list (mat_vec M)) (vec_repeat c d))) d.
+
+Print mat_el.
+
+Require Import ZArith.
+
+Compute (let (i, j) := (0, 0) in let _ := Z_ring_op in mat_el (mat_of_list 0%Z [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]%Z : matrix 3 3 Z) i j 0%Z).
+
+...
+
+Compute (let (i, j) := (0, 0) in mat_el (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat) i j 0).
+Check mat_el.
+
+...
+
+Check nth.
 
 Definition vec_mul {T} {ro : ring_op T} len (V1 V2 : vector len T) :=
   fold_left rng_add
