@@ -1705,7 +1705,7 @@ Require Import Ring2 Rsummation Rpolynomial2.
 
 Record vector (siz : nat) T :=
   { vec_el : list T;
-    vec_prop : length vec_el = siz }.
+    vec_length : length vec_el = siz }.
 
 Arguments vec_el {_} {_}.
 
@@ -1725,7 +1725,7 @@ apply UIP_nat.
 Qed.
 
 Definition vec_of_list {T} (l : list T) :=
-  {| vec_el := l; vec_prop := eq_refl |}.
+  {| vec_el := l; vec_length := eq_refl |}.
 
 (* trying for matrices *)
 
@@ -1751,8 +1751,9 @@ Qed.
 Definition vec_of_list_list {T} (d : T) (ll : list (list T)) :=
   map
     (λ l,
-     {| vec_el := firstn (length (hd [] ll)) (l ++ repeat d (length (hd [] ll)));
-        vec_prop := vec_of_some_list_prop T d ll l |})
+     {| vec_el :=
+          firstn (length (hd [] ll)) (l ++ repeat d (length (hd [] ll)));
+        vec_length := vec_of_some_list_prop T d ll l |})
     ll.
 
 Definition mat_of_list {T} (d : T) (ll : list (list T)) : matrix (length ll) (length (hd [] ll)) T.
@@ -1798,12 +1799,16 @@ move V2 before V1.
 unfold list_of_mat in HMM.
 cbn in HMM.
 f_equal.
-assert (V1 = V2). {
+assert (HVV : V1 = V2). {
   apply List_eq_iff.
   split; [ congruence | ].
-  intros.
-...
+  intros dv i.
   apply vec_eq_eq.
+  apply List_eq_iff.
+  do 2 rewrite vec_length.
+  split; [ easy | ].
+  intros d j.
+  move d before dv.
 ...
 cbn in HMM; subst V2; f_equal.
 apply UIP_nat.
