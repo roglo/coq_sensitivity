@@ -1,16 +1,47 @@
 type nat = int;
+value rec firstn n l =
+  match n with
+  | 0 -> []
+  | _ ->
+      let n0 = n - 1 in
+      match l with
+      | [] -> []
+      | [a :: l0] -> [a :: firstn n0 l0]
+      end
+  end.
+value length = List.length;
+value hd l d = try List.hd l with [ Failure _ → d ];
+value rec repeat x n =
+  match n with
+  | 0 -> []
+  | _ -> [x :: repeat x (n - 1)]
+  end.
 
 type vector 'a =
-  { vec_list : list 'a;
-    vec_length : nat }.
+  { vec_list : list 'a }.
 
 value vec_list v = v.vec_list;
 
 value vec_of_list (l : list 'a) =
-  { vec_list = l; vec_length = List.length l }.
+  { vec_list = l }.
 
 type matrix 'a =
   { mat_vec : vector (vector 'a) }.
+
+value mat_vec v = v.mat_vec;
+
+value vec_of_list_list (d : 'a) (ll : list (list 'a)) =
+  List.map
+    (fun l →
+     { vec_list =
+         firstn (length (hd [] ll))
+	   (List.append l (repeat d (length (hd [] ll)))) })
+    ll.
+
+value mat_of_list d ll =
+  { mat_vec = { vec_list = vec_of_list_list d ll } }.
+
+mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]];
 
 (*
 value nth i l d = try List.nth l i with [ Failure _ → d ].

@@ -1763,7 +1763,11 @@ split.
 exists (vec_of_list_list d ll).
 unfold vec_of_list_list.
 now rewrite map_length.
-Qed.
+Defined.
+
+Print mat_of_list.
+
+...
 
 Definition list_of_mat {T nrow ncol} (M : matrix nrow ncol T) :=
   map vec_list (vec_list (mat_vec M)).
@@ -1832,7 +1836,7 @@ Compute (let (i, j) := (0, 0) in let _ := Z_ring_op in mat_el (mat_of_list 0%Z [
 
 Compute (let (i, j) := (0, 0) in (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat)).
 Print mat_of_list.
-Compute (let (i, j) := (0, 0) in mat_el (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat) i j 0).
+Compute (let (i, j) := (1, 0) in mat_el (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat) i j 0).
 ...
 
 Check nth.
