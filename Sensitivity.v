@@ -1734,7 +1734,7 @@ Record matrix nrow ncol T :=
 
 Arguments mat_vec {_} {_} {_}.
 
-Theorem vec_of_some_list_prop : ∀ T (d : T) (ll : list (list T)) l,
+Theorem vec_of_some_list_prop : ∀ {T} {d : T} {ll : list (list T)} {l},
   length (firstn (length (hd [] ll)) (l ++ repeat d (length (hd [] ll)))) =
   length (hd [] ll).
 Proof.
@@ -1753,21 +1753,28 @@ Definition vec_of_list_list {T} (d : T) (ll : list (list T)) :=
     (λ l,
      {| vec_list :=
           firstn (length (hd [] ll)) (l ++ repeat d (length (hd [] ll)));
-        vec_length := vec_of_some_list_prop T d ll l |})
+        vec_length := vec_of_some_list_prop (*T d ll l*) |})
     ll.
+
+Print vec_of_list_list.
+
+Theorem vec_of_list_list_length : ∀ {T} {d : T} {ll : list (list T)},
+  length (vec_of_list_list d ll) = length ll.
+Proof.
+intros.
+unfold vec_of_list_list.
+now rewrite map_length.
+Qed.
 
 Definition mat_of_list {T} (d : T) (ll : list (list T)) :
   matrix (length ll) (length (hd [] ll)) T.
 Proof.
 split.
 exists (vec_of_list_list d ll).
-unfold vec_of_list_list.
-now rewrite map_length.
+apply vec_of_list_list_length.
 Defined.
 
 Print mat_of_list.
-
-...
 
 Definition list_of_mat {T nrow ncol} (M : matrix nrow ncol T) :=
   map vec_list (vec_list (mat_vec M)).
@@ -1812,6 +1819,8 @@ apply UIP_nat.
 Qed.
 
 Compute (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat).
+
+...
 
 Definition vec_el {T} {len} (V : vector len T) i d :=
   nth i (vec_list V) d.
