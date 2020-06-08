@@ -1720,9 +1720,12 @@ intros HVV.
 destruct V1 as (V1 & P1).
 destruct V2 as (V2 & P2).
 move V2 before V1.
-simpl in HVV; subst V2; f_equal.
+cbn in HVV; subst V2; f_equal.
 apply UIP_nat.
 Qed.
+
+Definition vec_of_list {T} (l : list T) :=
+  {| vec_el := l; vec_prop := eq_refl |}.
 
 (* trying for matrices *)
 
@@ -1731,25 +1734,79 @@ Record matrix nrow ncol T :=
 
 Arguments mat_el {_} {_} {_}.
 
-Definition vec_of_list {T} (l : list T) :=
-  {| vec_el := l; vec_prop := eq_refl |}.
+Theorem vec_of_some_list_prop : ∀ T (d : T) (ll : list (list T)) l,
+  length (firstn (length (hd [] ll)) (l ++ repeat d (length (hd [] ll)))) =
+  length (hd [] ll).
+Proof.
+intros.
+rewrite firstn_length.
+rewrite app_length.
+rewrite repeat_length.
+remember (length (hd [] ll)) as len eqn:Hlen.
+replace len with (0 + len) at 1 by easy.
+rewrite Nat.add_min_distr_r.
+now rewrite Nat.min_0_l.
+Qed.
 
-Check repeat.
-
-Definition glop {T} (d : T) (ll : list (list T)) :=
-  map (λ l, firstn (length (hd [] ll)) (l ++ repeat d (length (hd [] ll)))) ll.
+Definition vec_of_list_list {T} (d : T) (ll : list (list T)) :=
+  map
+    (λ l,
+     {| vec_el := firstn (length (hd [] ll)) (l ++ repeat d (length (hd [] ll)));
+        vec_prop := vec_of_some_list_prop T d ll l |})
+    ll.
 
 Definition mat_of_list {T} (d : T) (ll : list (list T)) : matrix (length ll) (length (hd [] ll)) T.
 split.
-remember (vec_of_list (glop d ll)) as v eqn:Hv.
-enough (length (hd [] ll) = length (hd [] (glop d ll))).
-rewrite H.
-...
-exists (glop d ll).
-...
+exists (vec_of_list_list d ll).
+unfold vec_of_list_list.
+now rewrite map_length.
+Qed.
 
-Definition mat_of_list {T} (d : T) (ll : list (list T)) : matrix (length ll) (length (hd [] ll)) T.
+Compute (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat).
 
+Definition list_of_mat {T nrow ncol} (M : matrix nrow ncol T) :=
+  map vec_el (vec_el (mat_el M)).
+
+Theorem List_eq_iff : ∀ A (l1 l2 : list A),
+  l1 = l2 ↔ (length l1 = length l2 ∧ ∀ d i, nth i l1 d = nth i l2 d).
+Proof.
+split; [ now intros; subst l2 | ].
+intros (Hlen & Hll).
+revert l2 Hlen Hll.
+induction l1 as [| a1]; intros. {
+  symmetry in Hlen.
+  now apply length_zero_iff_nil in Hlen.
+}
+destruct l2 as [| a2]; [ easy | ].
+cbn in Hlen.
+apply Nat.succ_inj in Hlen.
+f_equal; [ apply (Hll a1 0) | ].
+apply IHl1; [ easy | ].
+intros.
+now specialize (Hll d (S i)).
+Qed.
+
+Theorem mat_eq_eq : ∀ T nrow ncol (M1 M2 : matrix nrow ncol T),
+  M1 = M2 ↔ list_of_mat M1 = list_of_mat M2.
+Proof.
+intros.
+split; [ now intros; subst M2 | ].
+intros HMM.
+destruct M1 as ((V1 & P1)).
+destruct M2 as ((V2 & P2)).
+move V2 before V1.
+unfold list_of_mat in HMM.
+cbn in HMM.
+f_equal.
+assert (V1 = V2). {
+  apply List_eq_iff.
+  split; [ congruence | ].
+  intros.
+...
+  apply vec_eq_eq.
+...
+cbn in HMM; subst V2; f_equal.
+apply UIP_nat.
 ...
 
 (* old version *)
