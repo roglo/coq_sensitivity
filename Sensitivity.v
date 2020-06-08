@@ -1700,6 +1700,55 @@ Print GRing.Ring.type.
 
 Require Import Ring2 Rsummation Rpolynomial2.
 
+(* attempt to define vectors and matrices as lists of given sizes so that
+   their equality is equivalent to the equality of the lists *)
+
+Record vector (siz : nat) T :=
+  { vec_el : list T;
+    vec_prop : length vec_el = siz }.
+
+Arguments vec_el {_} {_}.
+
+(* works for vectors *)
+
+Theorem vec_eq_eq : ∀ T siz (V1 V2 : vector siz T),
+  V1 = V2 ↔ vec_el V1 = vec_el V2.
+Proof.
+intros.
+split; [ now intros; subst V2 | ].
+intros HVV.
+destruct V1 as (V1 & P1).
+destruct V2 as (V2 & P2).
+move V2 before V1.
+simpl in HVV; subst V2; f_equal.
+apply UIP_nat.
+Qed.
+
+(* trying for matrices *)
+
+Record matrix nrow ncol T :=
+  { mat_el : vector nrow (vector ncol T) }.
+
+Arguments mat_el {_} {_} {_}.
+
+Definition vec_of_list {T} (l : list T) :=
+  {| vec_el := l; vec_prop := eq_refl |}.
+
+Check repeat.
+
+Definition glop {T} (d : T) (ll : list (list T)) :=
+  map (λ l, firstn (length (hd [] ll)) (l ++ repeat d (length (hd [] ll)))) ll.
+
+Definition mat_of_list {T} (d : T) (ll : list (list T)) : matrix (length ll) (length (hd [] ll)) T.
+split.
+remember (vec_of_list (glop d ll)) as v eqn:Hv.
+...
+
+Definition mat_of_list {T} (d : T) (ll : list (list T)) : matrix (length ll) (length (hd [] ll)) T.
+
+...
+
+(* old version *)
 (* the type "matrix" defines infinite sized matrices; the limited size
    is given by functions such that mat_mul which, multiplying a m×n
    matrix with a n×p matrix, n is given as parameter of mat_mul *)
