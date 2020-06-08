@@ -1812,13 +1812,33 @@ Definition vec_mul {T} {ro : ring_op T} len (V1 V2 : vector len T) :=
     (map (λ xy, (fst xy * snd xy)%Rng) (combine (vec_list V1) (vec_list V2)))
     0%Rng.
 
+Definition mat_transp {T r c} (M : matrix r c T) : matrix c r T.
+destruct M as ((V, P)).
+split.
+Check vec_list.
+...
+
 Definition mat_mul {T} {ro : ring_op T} {r cr c}
     (M1 : matrix r cr T) (M2 : matrix cr c T) : matrix r c T.
+remember (mat_transp M1) as M1T eqn:HM1T.
+
+destruct M1 as ((V1, P1)).
+destruct M2 as ((V2, P2)).
+move V2 before V1.
+...
 Check @vec_list.
 Check (map (λ i, nth i (vec_list (mat_vec M1)) 0%Rng) (seq 0 cr)).
-destruct M1 as (M1).
+
 destruct M2 as (M2).
+
+
 split.
+Check vec_list.
+
+
+apply vec_list in M1.
+apply vec_list in M2.
+
 Check vec_of_list.
 Check list_of_vec.
 ...
