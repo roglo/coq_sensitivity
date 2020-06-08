@@ -1810,13 +1810,6 @@ Compute (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat).
 Definition vec_mul {T} {ro : ring_op T} len (V1 V2 : vector len T) :=
   fold_left rng_add
     (map (λ xy, (fst xy * snd xy)%Rng) (combine (vec_el V1) (vec_el V2))) 0%Rng.
-Search combine.
-...
-exists (Σ (i = 0, len - 1), nth i (vec_el V1) d * nth i (vec_el V2) d)%Rng.
-destruct V1 as (V1, P1).
-destruct V2 as (V2, P2).
-move V2 before V1.
-...
 
 Definition mat_mul {T} {r cr c} (M1 : matrix r cr T) (M2 : matrix cr c T) :
     matrix r c T.
@@ -1824,6 +1817,13 @@ destruct M1 as ((V1 & P1)).
 destruct M2 as ((V2 & P2)).
 move V2 before V1.
 split.
+Print vector.
+assert (list T).
+Search vector.
+...
+Check (map (λ i, nth i (vec_el V1)
+...
+apply {| vec_el :=
 Search vector.
 ...
 
