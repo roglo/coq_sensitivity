@@ -1803,12 +1803,25 @@ assert (HVV : V1 = V2). {
   apply List_eq_iff.
   split; [ congruence | ].
   intros dv i.
+  rewrite <- P2 in P1.
+  clear nrow P2.
   apply vec_eq_eq.
   apply List_eq_iff.
-  do 2 rewrite vec_length.
-  split; [ easy | ].
+  split; [ now do 2 rewrite vec_length | ].
   intros d j.
   move d before dv.
+  revert i j V2 P1 HMM.
+  induction V1 as [| a1]; intros. {
+    symmetry in P1; apply length_zero_iff_nil in P1.
+    now subst V2.
+  }
+  destruct V2 as [| a2]; [ easy | cbn in P1 ].
+  apply Nat.succ_inj in P1.
+  cbn in HMM; cbn.
+  injection HMM; clear HMM; intros HVV Haa.
+  destruct i; [ now rewrite Haa | ].
+  now apply IHV1.
+}
 ...
 cbn in HMM; subst V2; f_equal.
 apply UIP_nat.
