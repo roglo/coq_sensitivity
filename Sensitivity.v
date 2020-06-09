@@ -1767,16 +1767,10 @@ now rewrite map_length.
 Qed.
 
 Definition mat_of_list {T} (d : T) (ll : list (list T)) :
-  matrix (length ll) (length (hd [] ll)) T.
-Proof.
-split.
-exists (vec_of_list_list d ll).
-apply vec_of_list_list_length.
-Defined.
-
-Print mat_of_list.
-
-...
+    matrix (length ll) (length (hd [] ll)) T :=
+  {| mat_vec :=
+       {| vec_list := vec_of_list_list d ll;
+          vec_length := vec_of_list_list_length |} |}.
 
 Definition list_of_mat {T nrow ncol} (M : matrix nrow ncol T) :=
   map vec_list (vec_list (mat_vec M)).
