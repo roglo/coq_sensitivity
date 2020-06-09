@@ -1716,6 +1716,40 @@ Fixpoint vec_of_list T (l : list T) : vector T (length l) :=
   | a :: l' => Vcons a (vec_of_list l')
   end.
 
+Print repeat.
+
+Definition repeat_length' :=
+λ (A : Type) (x : A) (n : nat),
+  nat_ind (λ n0 : nat, length (repeat x n0) = n0) eq_refl
+    (λ (k : nat) (Hrec : length (repeat x k) = k), eq_ind_r (λ n0 : nat, S n0 = S k) eq_refl Hrec) n
+     : length (repeat x n) = n.
+
+Definition vec_of_list_fixed T (d : T) (l : list T) n : vector T n.
+Proof.
+set (v := vec_of_list (firstn n (l ++ repeat d n))).
+rewrite firstn_length in v.
+rewrite app_length in v.
+rewrite repeat_length' in v.
+replace n with (0 + n) in v by easy.
+rewrite Nat.add_assoc in v.
+rewrite Nat.add_min_distr_r in v.
+rewrite Nat.min_0_l in v.
+apply v.
+Defined.
+
+Compute (vec_of_list_fixed 42 [3; 17; 22] 5).
+
+...
+
+Definition vec_of_list_fixed T d (l : list T) n : vector T n :=
+  match l return (vector T n) with
+  | [] =>
+       match repeat_length d n return (vector T n) with
+       | eq_refl => vec_of_list (repeat d n)
+       end
+  | a :: l' => Vcons a (vec_of_list l')
+  end.
+
 (* matrices *)
 
 Record matrix T nrow ncol :=
