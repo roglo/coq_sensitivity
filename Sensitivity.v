@@ -1833,14 +1833,6 @@ Defined.
 Definition mat_el {T} {r c} (M : matrix r c T) i j d : T :=
   nth j (vec_list (nth i (vec_list (mat_vec M)) (vec_repeat c d))) d.
 
-Print mat_el.
-
-(*
-Require Import ZArith.
-
-Compute (let (i, j) := (0, 0) in let _ := Z_ring_op in mat_el (mat_of_list 0%Z [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]%Z : matrix 3 3 Z) i j 0%Z).
-*)
-
 Compute (let (i, j) := (2, 0) in mat_el (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat) i j 42).
 
 Definition vec_mul {T} {ro : ring_op T} len (V1 V2 : vector len T) :=
@@ -1848,13 +1840,15 @@ Definition vec_mul {T} {ro : ring_op T} len (V1 V2 : vector len T) :=
     (map (λ xy, (fst xy * snd xy)%Rng) (combine (vec_list V1) (vec_list V2)))
     0%Rng.
 
-Definition mat_transp {T} {ro : ring_op T} {r c} (M : matrix r c T) : matrix c r T.
+Definition mat_transp {T} {r c} (d : T) (M : matrix r c T) : matrix c r T.
 Proof.
 destruct (Nat.eq_dec c 0) as [Hcz| Hcz]. {
   subst c.
-  apply {| mat_vec := vec_repeat 0 (vec_repeat r 0%Rng) |}.
+  apply {| mat_vec := vec_repeat 0 (vec_repeat r d) |}.
 }
-set (M' := mat_of_list 0%Rng (map (λ i, map (λ j, mat_el M j i 0%Rng) (seq 0 r)) (seq 0 c))).
+set
+  (M' :=
+   mat_of_list d (map (λ i, map (λ j, mat_el M j i d) (seq 0 r)) (seq 0 c))).
 rewrite map_length, seq_length in M'.
 destruct c; [ easy | ].
 cbn in M'.
@@ -1862,9 +1856,14 @@ rewrite map_length, seq_length in M'.
 apply M'.
 Defined.
 
+Compute (mat_transp 0 (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat)).
+Compute (let (i, j) := (0, 0) in mat_el (mat_transp 0 (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]])) i j 42).
+
+...
+
 Definition mat_mul {T} {ro : ring_op T} {r cr c}
     (M1 : matrix r cr T) (M2 : matrix cr c T) : matrix r c T.
-remember (mat_transp M1) as TM1 eqn:HTM1.
+remember (mat_transp 0%Rng M1) as TM1 eqn:HTM1.
 destruct M1 as ((V1, P1)).
 destruct M2 as ((V2, P2)).
 move V2 before V1.
