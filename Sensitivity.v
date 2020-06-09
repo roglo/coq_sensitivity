@@ -1850,25 +1850,21 @@ Definition vec_mul {T} {ro : ring_op T} len (V1 V2 : vector len T) :=
 
 Definition mat_transp {T} {ro : ring_op T} {r c} (M : matrix r c T) : matrix c r T.
 Proof.
-Print matrix.
-destruct c. {
-  set (M' := {| mat_vec :=
-...
+destruct (Nat.eq_dec c 0) as [Hcz| Hcz]. {
+  subst c.
+  apply {| mat_vec := vec_repeat 0 (vec_repeat r 0%Rng) |}.
+}
 set (M' := mat_of_list 0%Rng (map (λ i, map (λ j, mat_el M j i 0%Rng) (seq 0 r)) (seq 0 c))).
 rewrite map_length, seq_length in M'.
-destruct c. {
-  cbn in M'.
-...
-}
+destruct c; [ easy | ].
 cbn in M'.
 rewrite map_length, seq_length in M'.
 apply M'.
-...
+Defined.
 
 Definition mat_mul {T} {ro : ring_op T} {r cr c}
     (M1 : matrix r cr T) (M2 : matrix cr c T) : matrix r c T.
-remember (mat_transp M1) as M1T eqn:HM1T.
-
+remember (mat_transp M1) as TM1 eqn:HTM1.
 destruct M1 as ((V1, P1)).
 destruct M2 as ((V2, P2)).
 move V2 before V1.
