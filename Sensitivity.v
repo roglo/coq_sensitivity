@@ -1851,22 +1851,17 @@ Compute (list_list_transpose 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]).
 
 Definition mat_transpose {T} {r c} (d : T) (M : matrix r c T) : matrix c r T.
 Proof.
-destruct (Nat.eq_dec r 0) as [Hrz| Hrz]. {
-  subst r.
+destruct r. {
   apply {| mat_vec := vec_repeat c (vec_repeat 0 d) |}.
 }
-destruct (Nat.eq_dec c 0) as [Hcz| Hcz]. {
-  subst c.
-  apply {| mat_vec := vec_repeat 0 (vec_repeat r d) |}.
+destruct c. {
+  apply {| mat_vec := vec_repeat 0 (vec_repeat (S r) d) |}.
 }
 set (M' := mat_of_list d (list_list_transpose d (list_of_mat M))).
 unfold list_list_transpose in M'.
 rewrite map_length, seq_length in M'.
 rewrite list_of_mat_length in M'.
-destruct r; [ easy | ].
-destruct c; [ easy | ].
 destruct M as ((V, P)).
-cbn in M'.
 destruct V as [| a]; [ easy | ].
 cbn in M'.
 rewrite vec_length in M'.
@@ -1875,50 +1870,27 @@ rewrite map_length, seq_length in M'.
 apply M'.
 Defined.
 
-...
-
 Definition mat_mul {T} {ro : ring_op T} {r cr c}
     (M1 : matrix r cr T) (M2 : matrix cr c T) : matrix r c T.
-remember (mat_transp 0%Rng M1) as TM1 eqn:HTM1.
-destruct M1 as ((V1, P1)).
-destruct M2 as ((V2, P2)).
-move V2 before V1.
-...
-Check @vec_list.
-Check (map (λ i, nth i (vec_list (mat_vec M1)) 0%Rng) (seq 0 cr)).
+Proof.
+destruct r. {
+  apply {| mat_vec := vec_repeat 0 (vec_repeat c 0%Rng) |}.
+}
+set
+  (M :=
+   mat_of_list 0%Rng
+     (map
+        (λ k,
+         map
+           (λ i,
+            Σ (j = 0, cr - 1), mat_el M1 i j 0 * mat_el M2 j k 0)%Rng
+           (seq 0 c))
+        (seq 0 (S r)))).
+cbn - [ summation ] in M.
+do 2 rewrite map_length, seq_length in M.
+apply M.
+Show Proof.
 
-destruct M2 as (M2).
-
-
-split.
-Check vec_list.
-
-
-apply vec_list in M1.
-apply vec_list in M2.
-
-Check vec_of_list.
-Check list_of_vec.
-...
-Definition mat_row {T r c} (M : matrix r c T) i :=
-  map (λ j, mat_el M1
-...
-Check (vec_el (mat_vec M1)).
-Definition mat_el {T r c} (M : matrix r c T) (i j : nat) : T.
-...
-
-destruct M1 as ((V1 & P1)).
-destruct M2 as ((V2 & P2)).
-move V2 before V1.
-split.
-Print vector.
-assert (list T).
-Search vector.
-
-Check (map (λ i, map (λ k, (Σ (j = 0, cr - 1), nth i (vec_el V1) 0%Rng * 
-...
-apply {| vec_el :=
-Search vector.
 ...
 
 Definition mat_mul {T} {ro : ring_op T} n A B :=
