@@ -1767,10 +1767,14 @@ split.
 set (r := length ll).
 set (c := fold_left (λ a l, max a (length l)) ll 0).
 set (ll' := map (λ l, firstn c (l ++ repeat d c)) ll).
-specialize (vec_of_list ll') as v.
-unfold ll' in v.
-rewrite map_length in v.
-fold r in v.
+set (v := vec_of_list ll').
+unfold r.
+replace (length ll) with (length ll'). 2: {
+  unfold ll'.
+  now rewrite map_length.
+}
+clear r.
+set (r := length ll') in *.
 ...
 
 Definition mat_of_list {T} (d : T) (ll : list (list T)) :
