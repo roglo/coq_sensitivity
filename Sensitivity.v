@@ -1856,6 +1856,24 @@ Definition list_list_transpose {T} d (ll : list (list T)) : list (list T) :=
 Compute (list_list_transpose 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]).
 
 Definition mat_transpose {T} {r c} (d : T) (M : matrix r c T) : matrix c r T.
+destruct (Nat.eq_dec r 0) as [Hrz| Hrz]. {
+  subst r.
+  apply {| mat_vec := vec_repeat c (vec_repeat 0 d) |}.
+}
+set (M' := mat_of_list d (list_list_transpose d (list_of_mat M))).
+unfold list_list_transpose in M'.
+rewrite map_length, seq_length in M'.
+rewrite list_of_mat_length in M'.
+destruct r; [ easy | ].
+destruct M as ((V, P)).
+cbn in M'.
+destruct V as [| a]; [ easy | ].
+cbn in M'.
+rewrite vec_length in M'.
+Search (hd _ (map _ _)).
+cbn in P.
+...
+
 destruct (Nat.eq_dec c 0) as [Hcz| Hcz]. {
   subst c.
   apply {| mat_vec := vec_repeat 0 (vec_repeat r d) |}.
@@ -1867,6 +1885,10 @@ rewrite list_of_mat_length in M'.
 destruct c; [ easy | ].
 destruct M as ((V, P)).
 cbn in M'.
+Search vec_list.
+destruct V as [| a]. {
+  cbn in M'.
+  cbn in P; subst r.
 ...
 
 Definition mat_transpose {T} {r c} (d : T) (M : matrix r c T) : matrix c r T :=
