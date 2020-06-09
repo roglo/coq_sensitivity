@@ -1729,7 +1729,13 @@ Definition mat_of_list {T} (d : T) (ll : list (list T)) :
     matrix T (length ll) (length (hd [] ll)).
 split.
 Show Proof.
-specialize (vec_of_list ll) as v.
+set (r := length ll).
+set (c := length (hd [] ll)).
+set (ll' := map (λ l, firstn c (l ++ repeat d c)) ll).
+specialize (vec_of_list ll') as v.
+unfold ll' in v.
+rewrite map_length in v.
+fold r in v.
 ...
 
 Definition mat_of_list {T} (d : T) (ll : list (list T)) :
