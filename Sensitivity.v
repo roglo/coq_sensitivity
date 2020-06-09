@@ -1710,8 +1710,6 @@ Record vector (siz : nat) T :=
 
 Arguments vec_list {_} {_}.
 
-(* works for vectors *)
-
 Theorem vec_eq_eq : ∀ T siz (V1 V2 : vector siz T),
   V1 = V2 ↔ vec_list V1 = vec_list V2.
 Proof.
@@ -1728,7 +1726,7 @@ Qed.
 Definition vec_of_list {T} (l : list T) :=
   {| vec_list := l; vec_length := eq_refl |}.
 
-(* trying for matrices *)
+(* matrices *)
 
 Record matrix nrow ncol T :=
   { mat_vec : vector nrow (vector ncol T) }.
@@ -1749,7 +1747,8 @@ rewrite Nat.add_min_distr_r.
 now rewrite Nat.min_0_l.
 Qed.
 
-Definition vec_of_list_list {T} (d : T) (ll : list (list T)) :=
+Definition vec_list_of_list_list {T} (d : T) (ll : list (list T)) :
+    list (vector (length (hd [] ll)) T) :=
   map
     (λ l,
      {| vec_list :=
@@ -1757,20 +1756,18 @@ Definition vec_of_list_list {T} (d : T) (ll : list (list T)) :=
         vec_length := vec_of_some_list_prop (*T d ll l*) |})
     ll.
 
-Print vec_of_list_list.
-
 Theorem vec_of_list_list_length : ∀ {T} {d : T} {ll : list (list T)},
-  length (vec_of_list_list d ll) = length ll.
+  length (vec_list_of_list_list d ll) = length ll.
 Proof.
 intros.
-unfold vec_of_list_list.
+unfold vec_list_of_list_list.
 now rewrite map_length.
 Qed.
 
 Definition mat_of_list {T} (d : T) (ll : list (list T)) :
     matrix (length ll) (length (hd [] ll)) T :=
   {| mat_vec :=
-       {| vec_list := vec_of_list_list d ll;
+       {| vec_list := vec_list_of_list_list d ll;
           vec_length := vec_of_list_list_length |} |}.
 
 Definition list_of_mat {T nrow ncol} (M : matrix nrow ncol T) :=
