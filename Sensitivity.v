@@ -1832,10 +1832,17 @@ Definition vec_repeat {T} len (d : T) : vector len T :=
   | eq_refl => vec_of_list (repeat d len)
   end.
 
-Definition mat_el {T} {r c} (M : matrix r c T) i j d : T :=
-  nth j (vec_list (nth i (vec_list (mat_vec M)) (vec_repeat c d))) d.
+Definition list_list_el {T} d (ll : list (list T)) i j : T :=
+  nth j (nth i ll []) d.
 
-Compute (let (i, j) := (2, 0) in mat_el (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat) i j 42).
+Compute (let (i, j) := (2, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j).
+Compute (let (i, j) := (7, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j).
+
+Definition mat_el {T} {r c} d (M : matrix r c T) i j : T :=
+  list_list_el d (list_of_mat M) i j.
+
+Compute (let (i, j) := (2, 1) in mat_el 42 (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat) i j).
+Compute (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat).
 
 Definition vec_mul {T} {ro : ring_op T} len (V1 V2 : vector len T) :=
   fold_left rng_add
@@ -1870,6 +1877,29 @@ rewrite map_length, seq_length in M'.
 apply M'.
 Defined.
 
+Definition list_list_mul {T} {ro : ring_op T} r cr c (ll1 ll2 : list (list T)) :=
+  map
+    (λ k,
+     map
+       (λ i,
+        Σ (j = 0, cr - 1),
+        list_list_el 0 ll1 i j * list_list_el 0 ll2 j k)%Rng
+       (seq 0 c))
+    (seq 0 r).
+
+Require Import ZArith.
+
+Print Z_ring_op.
+
+Compute (let _ := Z_ring_op in list_list_mul 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]])%Z.
+
+Print Z_ring_op.
+
+(* for testing, should be interesting to have summation Σ for nat, i.e. for a
+   set with just addition and multiplication: semiring *)
+
+...
+
 Definition mat_mul {T} {ro : ring_op T} {r cr c}
     (M1 : matrix r cr T) (M2 : matrix cr c T) : matrix r c T.
 Proof.
@@ -1889,7 +1919,7 @@ set
 cbn - [ summation ] in M.
 do 2 rewrite map_length, seq_length in M.
 apply M.
-Show Proof.
+Defined.
 
 ...
 
