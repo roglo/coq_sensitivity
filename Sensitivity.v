@@ -1776,6 +1776,8 @@ Defined.
 
 Print mat_of_list.
 
+...
+
 Definition list_of_mat {T nrow ncol} (M : matrix nrow ncol T) :=
   map vec_list (vec_list (mat_vec M)).
 
@@ -1831,12 +1833,10 @@ Compute (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat).
 Definition vec_el {T} {len} (V : vector len T) i d : T :=
   nth i (vec_list V) d.
 
-Definition vec_repeat {T} len (d : T) : vector len T.
-Proof.
-set (V := vec_of_list (repeat d len)).
-rewrite repeat_length in V.
-apply V.
-Defined.
+Definition vec_repeat {T} len (d : T) : vector len T :=
+  match repeat_length d len with
+  | eq_refl => vec_of_list (repeat d len)
+  end.
 
 Definition mat_el {T} {r c} (M : matrix r c T) i j d : T :=
   nth j (vec_list (nth i (vec_list (mat_vec M)) (vec_repeat c d))) d.
@@ -1856,58 +1856,30 @@ Definition list_list_transpose {T} d (ll : list (list T)) : list (list T) :=
 Compute (list_list_transpose 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]).
 
 Definition mat_transpose {T} {r c} (d : T) (M : matrix r c T) : matrix c r T.
+Proof.
 destruct (Nat.eq_dec r 0) as [Hrz| Hrz]. {
   subst r.
   apply {| mat_vec := vec_repeat c (vec_repeat 0 d) |}.
+}
+destruct (Nat.eq_dec c 0) as [Hcz| Hcz]. {
+  subst c.
+  apply {| mat_vec := vec_repeat 0 (vec_repeat r d) |}.
 }
 set (M' := mat_of_list d (list_list_transpose d (list_of_mat M))).
 unfold list_list_transpose in M'.
 rewrite map_length, seq_length in M'.
 rewrite list_of_mat_length in M'.
 destruct r; [ easy | ].
+destruct c; [ easy | ].
 destruct M as ((V, P)).
 cbn in M'.
 destruct V as [| a]; [ easy | ].
 cbn in M'.
 rewrite vec_length in M'.
-Search (hd _ (map _ _)).
-cbn in P.
-...
-
-destruct (Nat.eq_dec c 0) as [Hcz| Hcz]. {
-  subst c.
-  apply {| mat_vec := vec_repeat 0 (vec_repeat r d) |}.
-}
-set (M' := mat_of_list d (list_list_transpose d (list_of_mat M))).
-unfold list_list_transpose in M'.
-rewrite map_length, seq_length in M'.
-rewrite list_of_mat_length in M'.
-destruct c; [ easy | ].
-destruct M as ((V, P)).
-cbn in M'.
-Search vec_list.
-destruct V as [| a]. {
-  cbn in M'.
-  cbn in P; subst r.
-...
-
-Definition mat_transpose {T} {r c} (d : T) (M : matrix r c T) : matrix c r T :=
-destruct (Nat.eq_dec c 0) as [Hcz| Hcz]. {
-  subst c.
-  apply {| mat_vec := vec_repeat 0 (vec_repeat r d) |}.
-}
-set
-  (M' :=
-   mat_of_list d (map (λ i, map (λ j, mat_el M j i d) (seq 0 r)) (seq 0 c))).
-rewrite map_length, seq_length in M'.
-destruct c; [ easy | ].
 cbn in M'.
 rewrite map_length, seq_length in M'.
 apply M'.
 Defined.
-
-Compute (mat_transp 0 (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat)).
-Compute (let (i, j) := (0, 0) in mat_el (mat_transp 0 (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]])) i j 42).
 
 ...
 
