@@ -3,6 +3,8 @@
    https://eccc.weizmann.ac.il/report/2020/002/?fbclid=IwAR19mpxfIuoSaWq3HO8MdV8i8x_xlvwMKHjfElzBUK0GditlyaLeJiC8gJY *)
 
 Set Nested Proofs Allowed.
+Set Implicit Arguments.
+
 Require Import Utf8 Arith.
 Import List List.ListNotations.
 Require Import Misc.
@@ -841,7 +843,7 @@ destruct b; [ easy | ].
 specialize ((proj1 (nat_in_list_false_iff _ _)) Hb a) as H1.
 exfalso; apply H1; clear H1; [ | easy ].
 apply in_seq in Ha; destruct Ha as (_, Ha); cbn in Ha.
-specialize (in_nth_find_all_loop_eqb_if a l 0 Ha) as H1.
+specialize (in_nth_find_all_loop_eqb_if l 0 Ha) as H1.
 now rewrite Nat.add_0_r in H1.
 Qed.
 
@@ -1072,7 +1074,7 @@ split. {
   split. {
     split. {
       apply Nat.nlt_ge; intros Hij.
-      specialize (not_in_nth_find_all_loop _ f l _ _ Hij) as H1.
+      specialize (not_in_nth_find_all_loop f l Hij) as H1.
       now apply H1; rewrite Hfl; left.
     }
     revert i j Hfl.
@@ -1113,9 +1115,8 @@ split. {
     remember (j - i) as ji eqn:Hji; symmetry in Hji.
     destruct ji. {
       apply Nat.sub_0_le in Hji.
-      specialize (not_in_nth_find_all_loop _ f l j (i + 1)) as H1.
       assert (H : j < i + 1) by flia Hji.
-      specialize (H1 H); clear H.
+      specialize (not_in_nth_find_all_loop f l H) as H1; clear H.
       rewrite Hfl in H1.
       now exfalso; apply H1; left.
     }
@@ -1134,7 +1135,7 @@ split. {
     specialize (IHl (i + 1) Hfl).
     assert (Hij : i + 1 ≤ j). {
       apply Nat.nlt_ge; intros Hij.
-      specialize (not_in_nth_find_all_loop _ f l _ _ Hij) as H1.
+      specialize (not_in_nth_find_all_loop f l Hij) as H1.
       now apply H1; rewrite Hfl; left.
     }
     replace (j + 1 - (i + 1)) with (j - i) in IHl by flia Hij.
@@ -1194,7 +1195,7 @@ Theorem eq_nth_find_all_cons : ∀ A f j (d : A) l l',
     nth_find_all_loop f (skipn (j + 1) l) (j + 1) = l'.
 Proof.
 intros.
-specialize (eq_nth_find_all_loop_cons _ f j d l l' 0) as H1.
+specialize (eq_nth_find_all_loop_cons f j d l l' 0) as H1.
 cbn in H1.
 do 2 rewrite Nat.sub_0_r in H1.
 unfold nth_find_all.
@@ -1259,7 +1260,7 @@ Theorem in_nth_nth_find : ∀ ll j,
   → j ∈ nth (nth_find (nat_in_list j) ll) ll [].
 Proof.
 intros * Huni Hi.
-specialize (in_nth_nth_find_loop ll j 0 Huni Hi) as H1.
+specialize (in_nth_nth_find_loop ll 0 Huni Hi) as H1.
 now rewrite Nat.sub_0_r in H1.
 Qed.
 
@@ -1629,7 +1630,7 @@ assert (Hjll : nth j ll [] = map (λ i, [i]) (seq 0 n)). {
   apply map_ext_in_iff.
   intros a Ha.
   unfold nth_find_all.
-  apply (eq_nth_find_all_loop_cons _ _ _ 0).
+  apply (eq_nth_find_all_loop_cons _ _ 0).
   rewrite seq_length, Nat.sub_0_r, Nat.sub_0_r; cbn.
   apply in_seq in Ha.
   split; [ easy | ]; destruct Ha as (_, Ha); cbn in Ha.
@@ -1827,10 +1828,28 @@ Compute (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat).
 Definition vec_el {T} {len} (V : vector len T) i d : T :=
   nth i (vec_list V) d.
 
+Definition repeat_length' :=
+λ (A : Type) (x : A) (n : nat),
+  nat_ind (λ n0 : nat, length (repeat x n0) = n0) eq_refl
+    (λ (k : nat) (Hrec : length (repeat x k) = k), eq_ind_r (λ n0 : nat, S n0 = S k) eq_refl Hrec) n
+     : length (repeat x n) = n.
+
+Check repeat_length'.
+
 Definition vec_repeat {T} len (d : T) : vector len T :=
   match repeat_length d len with
   | eq_refl => vec_of_list (repeat d len)
   end.
+
+Definition vec_repeat' {T} len (d : T) : vector len T :=
+  match repeat_length' d len with
+  | eq_refl => vec_of_list (repeat d len)
+  end.
+
+Compute (vec_repeat 3 0).
+Compute (vec_repeat' 3 0).
+
+...
 
 Definition list_list_el {T} d (ll : list (list T)) i j : T :=
   nth j (nth i ll []) d.
