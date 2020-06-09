@@ -1701,37 +1701,45 @@ Print GRing.Ring.type.
 
 Require Import Ring2 Rsummation Rpolynomial2.
 
-(* attempt to define vectors and matrices as lists of given sizes so that
-   their equality is equivalent to the equality of the lists *)
+(* attempt to define vectors and matrices with dependent types *)
 
-Record vector (siz : nat) T :=
-  { vec_list : list T;
-    vec_length : length vec_list = siz }.
+Inductive vector (T : Type) : nat -> Type :=
+  | Vnil : vector T 0
+  | Vcons : ∀ n : nat, T -> vector T n -> vector T (S n).
 
-Arguments vec_list {_} {_}.
+Check (Vcons 3 (Vnil _)).
+Check (Vnil nat).
 
-Theorem vec_eq_eq : ∀ T siz (V1 V2 : vector siz T),
-  V1 = V2 ↔ vec_list V1 = vec_list V2.
-Proof.
-intros.
-split; [ now intros; subst V2 | ].
-intros HVV.
-destruct V1 as (V1 & P1).
-destruct V2 as (V2 & P2).
-move V2 before V1.
-cbn in HVV; subst V2; f_equal.
-apply UIP_nat.
-Qed.
-
-Definition vec_of_list {T} (l : list T) :=
-  {| vec_list := l; vec_length := eq_refl |}.
+Fixpoint vec_of_list T (l : list T) : vector T (length l) :=
+  match l return (vector T (length l)) with
+  | [] => Vnil T
+  | a :: l' => Vcons a (vec_of_list l')
+  end.
 
 (* matrices *)
 
-Record matrix nrow ncol T :=
-  { mat_vec : vector nrow (vector ncol T) }.
+Record matrix T nrow ncol :=
+  { mat_vec : vector (vector T ncol) nrow }.
 
+(*
 Arguments mat_vec {_} {_} {_}.
+*)
+
+Definition mat_of_list {T} (d : T) (ll : list (list T)) :
+    matrix T (length ll) (length (hd [] ll)).
+split.
+Show Proof.
+specialize (vec_of_list ll) as v.
+...
+
+Definition mat_of_list {T} (d : T) (ll : list (list T)) :
+    matrix T (length ll) (length (hd [] ll)) :=
+  {| mat_vec := vec_of_list (map (λ l, vec_of_list l) ll) |}.
+       {| vec_list := vec_list_of_list_list d ll;
+          vec_length := vec_of_list_list_length |} |}.
+
+
+...
 
 Theorem vec_of_some_list_prop : ∀ {T} {d : T} {ll : list (list T)} {l},
   length (firstn (length (hd [] ll)) (l ++ repeat d (length (hd [] ll)))) =
