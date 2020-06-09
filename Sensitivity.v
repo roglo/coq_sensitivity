@@ -1724,6 +1724,7 @@ Definition repeat_length' :=
     (λ (k : nat) (Hrec : length (repeat x k) = k), eq_ind_r (λ n0 : nat, S n0 = S k) eq_refl Hrec) n
      : length (repeat x n) = n.
 
+(*
 Definition vec_of_list_fixed T (d : T) (l : list T) n : vector T n.
 Proof.
 set (v := vec_of_list (firstn n (l ++ repeat d n))).
@@ -1749,6 +1750,7 @@ Definition vec_of_list_fixed T d (l : list T) n : vector T n :=
        end
   | a :: l' => Vcons a (vec_of_list l')
   end.
+*)
 
 (* matrices *)
 
@@ -1760,11 +1762,10 @@ Arguments mat_vec {_} {_} {_}.
 *)
 
 Definition mat_of_list {T} (d : T) (ll : list (list T)) :
-    matrix T (length ll) (length (hd [] ll)).
+    matrix T (length ll) (fold_left (λ a l, max a (length l)) ll 0).
 split.
-Show Proof.
 set (r := length ll).
-set (c := length (hd [] ll)).
+set (c := fold_left (λ a l, max a (length l)) ll 0).
 set (ll' := map (λ l, firstn c (l ++ repeat d c)) ll).
 specialize (vec_of_list ll') as v.
 unfold ll' in v.
