@@ -1897,10 +1897,12 @@ Locate "Σ".
 
 Definition list_list_transpose {T} d (ll : list (list T)) : list (list T) :=
   let r := length ll in
-  let c := length (List.hd [] ll) in
+  let c := vec_list_length ll in
   map (λ i, map (λ j, nth i (nth j ll []) d) (seq 0 r)) (seq 0 c).
 
 Compute (list_list_transpose 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]).
+
+Require Import Init.Nat.
 
 Definition mat_transpose {T} {r c} (d : T) (M : matrix r c T) : matrix c r T.
 Proof.
@@ -1912,15 +1914,15 @@ destruct c. {
 }
 set (M' := mat_of_list d (list_list_transpose d (list_of_mat M))).
 unfold list_list_transpose in M'.
-...
 rewrite map_length, seq_length in M'.
-rewrite map_map in M'.
 rewrite list_of_mat_length in M'.
+...
 destruct M as ((V, P)).
 destruct V as [| a]; [ easy | ].
 cbn in M'.
 rewrite vec_length in M'.
 cbn in M'.
+...
 rewrite map_length, seq_length in M'.
 Search (map (λ _, S _)).
 ...
