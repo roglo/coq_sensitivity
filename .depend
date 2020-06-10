@@ -10,5 +10,5 @@ SRsummation.vio: SRsummation.v Semiring.vio
 SRsummation.vo SRsummation.glob SRsummation.v.beautified SRsummation.required_vo: SRsummation.v Semiring.vo
 Semiring.vio: Semiring.v 
 Semiring.vo Semiring.glob Semiring.v.beautified Semiring.required_vo: Semiring.v 
-Sensitivity.vio: Sensitivity.v Misc.vio Ring2.vio Rsummation.vio Rpolynomial2.vio
-Sensitivity.vo Sensitivity.glob Sensitivity.v.beautified Sensitivity.required_vo: Sensitivity.v Misc.vo Ring2.vo Rsummation.vo Rpolynomial2.vo
+Sensitivity.vio: Sensitivity.v Misc.vio Semiring.vio SRsummation.vio
+Sensitivity.vo Sensitivity.glob Sensitivity.v.beautified Sensitivity.required_vo: Sensitivity.v Misc.vo Semiring.vo SRsummation.vo

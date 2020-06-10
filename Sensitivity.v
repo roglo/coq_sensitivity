@@ -1699,7 +1699,10 @@ Print ringType.
 Print GRing.Ring.type.
 *)
 
+(*
 Require Import Ring2 Rsummation Rpolynomial2.
+*)
+Require Import Semiring SRsummation.
 
 (* attempt to define vectors and matrices as lists of given sizes so that
    their equality is equivalent to the equality of the lists *)
@@ -1858,10 +1861,10 @@ Definition mat_el {T} {r c} d (M : matrix r c T) i j : T :=
 Compute (let (i, j) := (2, 1) in mat_el 42 (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat) i j).
 Compute (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat).
 
-Definition vec_mul {T} {ro : ring_op T} len (V1 V2 : vector len T) :=
-  fold_left rng_add
-    (map (λ xy, (fst xy * snd xy)%Rng) (combine (vec_list V1) (vec_list V2)))
-    0%Rng.
+Definition vec_mul {T} {ro : sring_op T} len (V1 V2 : vector len T) :=
+  fold_left srng_add
+    (map (λ xy, (fst xy * snd xy)%Srng) (combine (vec_list V1) (vec_list V2)))
+    0%Srng.
 
 Definition list_list_transpose {T} d (ll : list (list T)) : list (list T) :=
   let r := length ll in
@@ -1891,26 +1894,25 @@ rewrite map_length, seq_length in M'.
 apply M'.
 Defined.
 
-Definition list_list_mul {T} {ro : ring_op T} r cr c (ll1 ll2 : list (list T)) :=
+Check list_list_el.
+
+Definition list_list_mul {T} {ro : sring_op T} r cr c (ll1 ll2 : list (list T)) :=
   map
     (λ k,
      map
        (λ i,
         Σ (j = 0, cr - 1),
-        list_list_el 0 ll1 i j * list_list_el 0 ll2 j k)%Rng
+        list_list_el 0 ll1 i j * list_list_el 0 ll2 j k)%Srng
        (seq 0 c))
     (seq 0 r).
 
-Require Import ZArith.
+Definition nat_sring_op : sring_op nat :=
+  {| srng_zero := 0;
+     srng_one := 1;
+     srng_add := Nat.add;
+     srng_mul := Nat.mul |}.
 
-Print Z_ring_op.
-
-Compute (let _ := Z_ring_op in list_list_mul 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]])%Z.
-
-Print Z_ring_op.
-
-(* for testing, should be interesting to have summation Σ for nat, i.e. for a
-   set with just addition and multiplication: semiring *)
+Compute (let _ := nat_sring_op in list_list_mul 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
 
 ...
 
