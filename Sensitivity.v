@@ -1736,28 +1736,27 @@ Record matrix nrow ncol T :=
 
 Arguments mat_vec {_} {_} {_}.
 
+Definition vec_list_length {T} ll :=
+  fold_left max (map (length (A:=T)) ll) 0.
+
 Theorem vec_listp : ∀ {T} {d : T} {ll : list (list T)} {l},
-  length
-    (firstn (fold_left Init.Nat.max (map (length (A:=T)) ll) 0)
-       (l ++ repeat d (fold_left Init.Nat.max (map (length (A:=T)) ll) 0))) =
-  fold_left Init.Nat.max (map (length (A:=T)) ll) 0.
+  length (firstn (vec_list_length ll) (l ++ repeat d (vec_list_length ll))) =
+  vec_list_length ll.
 Proof.
 intros.
 rewrite firstn_length.
 rewrite app_length.
 rewrite repeat_length.
-set (m := fold_left max (map (@length _) ll) 0).
-replace m with (0 + m) at 1 by easy.
+replace (vec_list_length ll) with (0 + vec_list_length ll) at 1 by easy.
 now rewrite Nat.add_min_distr_r.
 Qed.
 
 Definition vec_list_of_list_list {T} (d : T) (ll : list (list T)) :
-    list (vector (fold_left max (map (@length _) ll) 0) T) :=
+    list (vector (vec_list_length ll) T) :=
   map
     (λ l,
      {| vec_list :=
-          firstn (fold_left max (map (@length _) ll) 0)
-             (l ++ repeat d (fold_left max (map (@length _) ll) 0));
+          firstn (vec_list_length ll) (l ++ repeat d (vec_list_length ll));
         vec_length := vec_listp |})
     ll.
 
@@ -1795,7 +1794,7 @@ now rewrite map_length.
 Qed.
 
 Definition mat_of_list {T} (d : T) (ll : list (list T)) :
-    matrix (length ll) (fold_left max (map (@length _) ll) 0) T :=
+    matrix (length ll) (vec_list_length ll) T :=
   {| mat_vec :=
        {| vec_list := vec_list_of_list_list d ll;
           vec_length := vec_of_list_list_length |} |}.
@@ -1893,6 +1892,9 @@ Definition vec_mul {T} {ro : sring_op T} len (V1 V2 : vector len T) :=
     (map (λ xy, (fst xy * snd xy)%Srng) (combine (vec_list V1) (vec_list V2)))
     0%Srng.
 
+Print vec_mul.
+Locate "Σ".
+
 Definition list_list_transpose {T} d (ll : list (list T)) : list (list T) :=
   let r := length ll in
   let c := length (List.hd [] ll) in
@@ -1910,6 +1912,7 @@ destruct c. {
 }
 set (M' := mat_of_list d (list_list_transpose d (list_of_mat M))).
 unfold list_list_transpose in M'.
+...
 rewrite map_length, seq_length in M'.
 rewrite map_map in M'.
 rewrite list_of_mat_length in M'.
