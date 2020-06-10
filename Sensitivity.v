@@ -1904,6 +1904,21 @@ Compute (list_list_transpose 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]).
 
 Require Import Init.Nat.
 
+Theorem vec_list_length_list_of_mat : ∀ T r c (M : matrix r c T),
+  r ≠ 0
+  → vec_list_length (list_of_mat M) = c.
+Proof.
+intros * Hrz.
+destruct M as ((V, P)); cbn.
+rewrite <- P in Hrz; clear r P.
+rewrite map_map.
+destruct V as [| v]; [ easy | clear Hrz; cbn ].
+rewrite vec_length; clear v.
+induction V as [| v]; [ easy | cbn ].
+rewrite vec_length.
+now rewrite Nat.max_l.
+Qed.
+
 Definition mat_transpose {T} {r c} (d : T) (M : matrix r c T) : matrix c r T.
 Proof.
 destruct r. {
@@ -1916,18 +1931,8 @@ set (M' := mat_of_list d (list_list_transpose d (list_of_mat M))).
 unfold list_list_transpose in M'.
 rewrite map_length, seq_length in M'.
 rewrite list_of_mat_length in M'.
+rewrite vec_list_length_list_of_mat in M'; [ | easy ].
 ...
-destruct M as ((V, P)).
-destruct V as [| a]; [ easy | ].
-cbn in M'.
-rewrite vec_length in M'.
-cbn in M'.
-...
-rewrite map_length, seq_length in M'.
-Search (map (λ _, S _)).
-...
-apply M'.
-Defined.
 
 Check list_list_el.
 
