@@ -1791,6 +1791,79 @@ Definition vec_of_list_min_len_rep T d n (l : list T) :
 Compute (vec_of_list_len_firstn_rep 42 7 [5; 3; 19]).
 Compute (vec_of_list_min_len_rep 42 7 [5; 3; 19]).
 
+Print repeat.
+Print vec_of_list.
+
+Fixpoint vec_repeat T (d : T) n :=
+  match n with
+  | 0 => Vnil T
+  | S n' => Vcons d (vec_repeat d n')
+  end.
+
+Theorem add_succ_comm : ∀ a b, a + S b = S a + b.
+Proof.
+intros.
+revert b.
+induction a; intros; [ easy | cbn ].
+now rewrite IHa.
+Defined.
+
+Print repeat_length'.
+
+Definition vec_ext (T : Type) (d : T) (n : nat) (v : vector T n) m : vector T (n + m).
+Proof.
+revert m.
+induction v; intros; [ apply (vec_repeat d) | ].
+destruct m. {
+  rewrite Nat.add_0_r.
+...
+
+Fixpoint vec_ext (T : Type) (d : T) (n : nat) (v : vector T n) m :=
+  match v with
+  | Vnil _ => vec_of_list (repeat d m)
+  | Vcons a v' =>
+      match m with
+      | 0 => v
+      | S m' => Vcons a (vec_ext d v' m')
+      end
+  end.
+
+Definition vec_ext (T : Type) (d : T) (n : nat) (v : vector T n) m : vector T (n + m).
+Definition vec_ext (T : Type) (d : T) (n : nat) (v : vector T n) m : vector T (n + m).
+Proof.
+revert m.
+induction v; intros. {
+  apply (vec_repeat d m).
+}
+rewrite <- add_succ_comm.
+
+...
+specialize (IHv (S m)).
+now rewrite add_succ_comm in IHv.
+Defined.
+
+Compute (vec_of_list [17; 1; 8]).
+Compute (vec_ext 42 (vec_of_list [17; 1; 8]) 4).
+
+...
+
+Fixpoint vec_ext (T : Type) (d : T) (n : nat) (v : vector T n) m :=
+  match v with
+  | Vnil _ => vec_of_list (repeat d m)
+  | Vcons a v' => Vcons a (vec_ext d v' m)
+  end.
+
+Fixpoint vec_of_fixed_list (T : Type) (d : T) (n : nat) (l : list T) :=
+  match n with
+  | 0 => Vnil T
+  | S n' =>
+      match l with
+      | [] => vec_of_fixed_list d n' []
+...
+
+Definition vec_of_fixed_list (T : Type) (d : T) (n : nat) (l : list T) : vector T n.
+...
+
 Definition vec_of_fixed_list (T : Type) (d : T) (n : nat) (l : list T) : vector T n :=
   let v2 :=
     match repeat_length d n in (_ = m) return vector T (min n (length l + m)) with
@@ -1813,7 +1886,20 @@ Definition vec_of_fixed_list (T : Type) (d : T) (n : nat) (l : list T) : vector 
   v6.
 
 Print vec_of_fixed_list.
+
+...
+
 Compute (vec_of_fixed_list 42 7 [5; 3; 19]).
+
+Definition glop (T : Type) (d : T) (ll : list (list T)) :=
+  let r := length ll in
+  let c := fold_left (λ (a : nat) (l : list T), Init.Nat.max a (length l)) ll 0 in
+  let vl := map (λ l : list T, vec_of_fixed_list d c l) ll in
+  vec_of_list vl.
+
+Print glop.
+
+Compute (glop 42 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
 
 Definition mat_of_list {T} (d : T) (ll : list (list T)) :
     matrix T (length ll) (fold_left (λ a l, max a (length l)) ll 0).
