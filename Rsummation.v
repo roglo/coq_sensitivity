@@ -1,6 +1,7 @@
-(* Fsummation.v *)
-
 (* summations on a ring *)
+(* I also made SRsummation.v for sommations in a semiring (not having
+   opposite) which is more general; normally, this Rsummation.v should
+   disappear one day *)
 
 Require Import Utf8 Arith.
 Import List.
