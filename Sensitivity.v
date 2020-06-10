@@ -1716,13 +1716,14 @@ Fixpoint vec_of_list T (l : list T) : vector T (length l) :=
   | a :: l' => Vcons a (vec_of_list l')
   end.
 
-Print repeat.
+(* matrices *)
 
-Definition repeat_length' :=
-λ (A : Type) (x : A) (n : nat),
-  nat_ind (λ n0 : nat, length (repeat x n0) = n0) eq_refl
-    (λ (k : nat) (Hrec : length (repeat x k) = k), eq_ind_r (λ n0 : nat, S n0 = S k) eq_refl Hrec) n
-     : length (repeat x n) = n.
+Record matrix T nrow ncol :=
+  { mat_vec : vector (vector T ncol) nrow }.
+
+(*
+Arguments mat_vec {_} {_} {_}.
+*)
 
 (*
 Definition vec_of_list_fixed T (d : T) (l : list T) n : vector T n.
@@ -1752,29 +1753,38 @@ Definition vec_of_list_fixed T d (l : list T) n : vector T n :=
   end.
 *)
 
-(* matrices *)
+Print repeat.
 
-Record matrix T nrow ncol :=
-  { mat_vec : vector (vector T ncol) nrow }.
+Definition repeat_length' :=
+λ (A : Type) (x : A) (n : nat),
+  nat_ind (λ n0 : nat, length (repeat x n0) = n0) eq_refl
+    (λ (k : nat) (Hrec : length (repeat x k) = k), eq_ind_r (λ n0 : nat, S n0 = S k) eq_refl Hrec) n
+     : length (repeat x n) = n.
 
-(*
-Arguments mat_vec {_} {_} {_}.
-*)
+Definition vec_of_fixed_list T (d : T) (n : nat) (l : list T) : vector T n.
+set (v := vec_of_list (firstn n (l ++ repeat d n))).
+rewrite firstn_length in v.
+rewrite app_length in v.
+rewrite repeat_length' in v.
+replace n with (0 + n) in v by easy.
+rewrite Nat.add_assoc in v.
+rewrite Nat.add_min_distr_r in v.
+rewrite Nat.min_0_l in v.
+apply v.
+Defined.
 
 Definition mat_of_list {T} (d : T) (ll : list (list T)) :
     matrix T (length ll) (fold_left (λ a l, max a (length l)) ll 0).
 split.
 set (r := length ll).
 set (c := fold_left (λ a l, max a (length l)) ll 0).
-set (ll' := map (λ l, firstn c (l ++ repeat d c)) ll).
-set (v := vec_of_list ll').
-unfold r.
-replace (length ll) with (length ll'). 2: {
-  unfold ll'.
-  now rewrite map_length.
-}
-clear r.
-set (r := length ll') in *.
+set (vl := map (λ l, vec_of_fixed_list d c l) ll).
+set (v := vec_of_list vl).
+unfold vl in v.
+rewrite map_length in v.
+fold r in v.
+apply v.
+Show Proof.
 ...
 
 Definition mat_of_list {T} (d : T) (ll : list (list T)) :
