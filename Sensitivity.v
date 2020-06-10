@@ -1825,6 +1825,19 @@ Defined.
 
 Compute (vec_size_add_comm _ _ (vec_app (vec_of_list [3; 4]) (vec_of_list [8; 52; 34])) : vector nat 5).
 
+About VectorDef.t.
+About Vector.t.
+
+Print VectorDef.t.
+Print Vector.t.
+...
+Inductive t (A : Type) : nat → Type :=
+    nil : VectorDef.t A 0
+  | cons : A → ∀ n : nat, VectorDef.t A n → VectorDef.t A (S n)
+Inductive t (A : Type) : nat → Type :=
+    nil : Vector.t A 0
+  | cons : A → ∀ n : nat, Vector.t A n → Vector.t A (S n)
+
 ...
 
 Fixpoint vec_rev (T : Type) (n : nat) (v : vector T n) : vector T n :=
