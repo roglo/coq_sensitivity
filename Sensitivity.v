@@ -1830,6 +1830,10 @@ About Vector.t.
 
 Print VectorDef.t.
 Print Vector.t.
+
+Search (Vector.t _ (_ + _)).
+Search (VectorDef.t _ (_ + _)).
+
 ...
 Inductive t (A : Type) : nat → Type :=
     nil : VectorDef.t A 0
