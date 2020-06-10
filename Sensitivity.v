@@ -1736,8 +1736,13 @@ Record matrix nrow ncol T :=
 
 Arguments mat_vec {_} {_} {_}.
 
+Definition max_list_list_length T (ll : list (list T)) :=
+  fold_left (λ a l, max a (length l)) ll 0.
+
+(*
 Definition max_list_list_length {T} ll :=
   fold_left max (map (length (A:=T)) ll) 0.
+*)
 
 Theorem vec_listp : ∀ {T} {d : T} {ll : list (list T)} {l},
   length
@@ -1915,7 +1920,6 @@ Proof.
 intros * Hrz.
 destruct M as ((V, P)); cbn.
 rewrite <- P in Hrz; clear r P.
-rewrite map_map.
 destruct V as [| v]; [ easy | clear Hrz; cbn ].
 rewrite vec_length; clear v.
 induction V as [| v]; [ easy | cbn ].
@@ -1936,6 +1940,8 @@ unfold list_list_transpose in M'.
 rewrite map_length, seq_length in M'.
 rewrite list_of_mat_length in M'.
 rewrite max_list_list_length_list_of_mat in M'; [ | easy ].
+unfold max_list_list_length in M'.
+rewrite List_fold_left_map in M'.
 ...
 cbn in M'.
 rewrite map_length, seq_length in M'.
