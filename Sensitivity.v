@@ -1773,7 +1773,136 @@ rewrite Nat.min_0_l in v.
 apply v.
 Defined.
 
-Print vec_of_fixed_list.
+Definition vec_of_list_len_firstn_rep T d n (l : list T) :
+    vector T (length (firstn n (l ++ repeat d n))) :=
+  vec_of_list (firstn n (l ++ repeat d n)).
+
+Fixpoint firstn_length (A : Type) (n : nat) :
+    ∀ l : list A, length (firstn n l) = min n (length l) :=
+  match n with
+   | 0 =>
+       λ l,
+       match l return length (firstn 0 l) = min 0 (length l) with
+       | [] => eq_refl
+       | _ :: _ => eq_refl
+       end
+   | S n' =>
+       λ (l : list A),
+       match l return length (firstn (S n') l) = min (S n') (length l) with
+       | [] => eq_refl
+       | a :: l' => f_equal_nat _ _ _ _ (firstn_length n' l')
+       end
+   end.
+
+Definition vec_of_list_min_len_rep T d n (l : list T) :
+    vector T (min n (length (l ++ repeat d n))) :=
+  match firstn_length n (l ++ repeat d n) in (_ = m) return (vector T m) with
+  | eq_refl => vec_of_list_len_firstn_rep d n l
+  end.
+
+Compute (vec_of_list_len_firstn_rep 42 7 [5; 3; 19]).
+Compute (vec_of_list_min_len_rep 42 7 [5; 3; 19]).
+
+Definition vec_of_fixed_list' (T : Type) (d : T) (n : nat) (l : list T) : vector T n :=
+  let v2 :=
+    match repeat_length d n in (_ = m) return vector T (min n (length l + m)) with
+    | eq_refl =>
+        match app_length l (repeat d n) in (_ = m) return (vector T (min n m)) with
+        | eq_refl => vec_of_list_min_len_rep d n l
+        end
+    end
+  in
+  let H : 0 + n = n := eq_refl in
+  let v3 := eq_rect_r (λ n0 : nat, vector T (Init.Nat.min n0 (length l + n0))) v2 H in
+  let v4 :=
+    eq_rect (length l + (0 + n)) (λ n0 : nat, vector T (Init.Nat.min (0 + n) n0)) v3 (length l + 0 + n)
+      (Nat.add_assoc (length l) 0 n) in
+  let v5 :=
+    eq_rect (Nat.min (0 + n) (length l + 0 + n)) (λ n0 : nat, vector T n0) v4 (Nat.min 0 (length l + 0) + n)
+      (Nat.add_min_distr_r 0 (length l + 0) n) in
+  let v6 := eq_rect (Nat.min 0 (length l + 0)) (λ n0 : nat, vector T (n0 + n)) v5 0 (Nat.min_0_l (length l + 0))
+    in
+  v6.
+
+Print vec_of_fixed_list'.
+Compute (vec_of_fixed_list 42 7 [5; 3; 19]).
+Compute (vec_of_fixed_list' 42 7 [5; 3; 19]).
+
+...
+  let v0 :=
+    eq_rect (length (firstn n (l ++ repeat d n))) (λ n0 : nat, vector T n0) v
+      (Init.Nat.min n (length (l ++ repeat d n))) (firstn_length n (l ++ repeat d n)) in
+...
+  let v0 :=
+    match  (firstn_length n (l ++ repeat d n)) in (_ = m) return (vector T m) with
+    | eq_refl => v
+    end
+  in
+...
+
+Definition vec_of_fixed_list' (T : Type) (d : T) (n : nat) (l : list T) : vector T n :=
+  let v := vec_of_list (firstn n (l ++ repeat d n)) in
+  let v0 :=
+    match  (firstn_length n (l ++ repeat d n)) in (_ = m) return (vector T m) with
+    | eq_refl => v
+    end
+  in
+  let v1 :=
+    eq_rect (length (l ++ repeat d n)) (λ n0 : nat, vector T (Init.Nat.min n n0)) v0
+      (length l + length (repeat d n)) (app_length l (repeat d n)) in
+  let v2 :=
+    eq_rect (length (repeat d n)) (λ n0 : nat, vector T (Init.Nat.min n (length l + n0))) v1 n (repeat_length d n)
+    in
+  let H : 0 + n = n := eq_refl in
+  let v3 := eq_rect_r (λ n0 : nat, vector T (Init.Nat.min n0 (length l + n0))) v2 H in
+  let v4 :=
+    eq_rect (length l + (0 + n)) (λ n0 : nat, vector T (Init.Nat.min (0 + n) n0)) v3 (length l + 0 + n)
+      (Nat.add_assoc (length l) 0 n) in
+  let v5 :=
+    eq_rect (Nat.min (0 + n) (length l + 0 + n)) (λ n0 : nat, vector T n0) v4 (Nat.min 0 (length l + 0) + n)
+      (Nat.add_min_distr_r 0 (length l + 0) n) in
+  let v6 := eq_rect (Nat.min 0 (length l + 0)) (λ n0 : nat, vector T (n0 + n)) v5 0 (Nat.min_0_l (length l + 0))
+    in
+  v6.
+
+Print vec_of_fixed_list'.
+
+...
+  let v0 :=
+    match  (firstn_length n (l ++ repeat d n)) in (_ = m) return (vector T m) with
+    | eq_refl => v
+    end
+  in
+...
+  let v0 :=
+    eq_rect (length (firstn n (l ++ repeat d n))) (λ n0 : nat, vector T n0) v
+      (Init.Nat.min n (length (l ++ repeat d n))) (firstn_length n (l ++ repeat d n)) in
+...
+
+Definition vec_of_fixed_list' (T : Type) (d : T) (n : nat) (l : list T) : vector T n :=
+  let v := vec_of_list (firstn n (l ++ repeat d n)) in
+  let v0 :=
+    eq_rect (length (firstn n (l ++ repeat d n))) (λ n0 : nat, vector T n0) v
+      (Init.Nat.min n (length (l ++ repeat d n))) (firstn_length n (l ++ repeat d n)) in
+  let v1 :=
+    eq_rect (length (l ++ repeat d n)) (λ n0 : nat, vector T (Init.Nat.min n n0)) v0
+      (length l + length (repeat d n)) (app_length l (repeat d n)) in
+  let v2 :=
+    eq_rect (length (repeat d n)) (λ n0 : nat, vector T (Init.Nat.min n (length l + n0))) v1 n (repeat_length d n)
+    in
+  let H : 0 + n = n := eq_refl in
+  let v3 := eq_rect_r (λ n0 : nat, vector T (Init.Nat.min n0 (length l + n0))) v2 H in
+  let v4 :=
+    eq_rect (length l + (0 + n)) (λ n0 : nat, vector T (Init.Nat.min (0 + n) n0)) v3 (length l + 0 + n)
+      (Nat.add_assoc (length l) 0 n) in
+  let v5 :=
+    eq_rect (Nat.min (0 + n) (length l + 0 + n)) (λ n0 : nat, vector T n0) v4 (Nat.min 0 (length l + 0) + n)
+      (Nat.add_min_distr_r 0 (length l + 0) n) in
+  let v6 := eq_rect (Nat.min 0 (length l + 0)) (λ n0 : nat, vector T (n0 + n)) v5 0 (Nat.min_0_l (length l + 0))
+    in
+  v6.
+
+Print vec_of_fixed_list'.
 
 ...
 
