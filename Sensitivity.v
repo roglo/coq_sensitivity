@@ -1817,13 +1817,13 @@ Fixpoint vec_app (T : Type) (m n : nat) (v : vector T m) (w : vector T n) :
   | Vcons a v' => Vcons a (vec_app v' w)
   end.
 
-Compute (vec_app (vec_of_list [3; 4]) (vec_of_list [8; 52; 34])).
+Compute (vec_app (vec_of_list [3; 4]) (vec_of_list [8; 52; 34]) : vector nat 5).
 
 Definition vec_size_add_comm (T : Type) (m n : nat) (v : vector T (m + n)) : vector T (n + m).
 now rewrite Nat.add_comm.
 Defined.
 
-Compute (vec_size_add_comm _ _ (vec_app (vec_of_list [3; 4]) (vec_of_list [8; 52; 34]))).
+Compute (vec_size_add_comm _ _ (vec_app (vec_of_list [3; 4]) (vec_of_list [8; 52; 34])) : vector nat 5).
 
 ...
 
