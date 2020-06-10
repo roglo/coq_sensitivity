@@ -1701,271 +1701,39 @@ Print GRing.Ring.type.
 
 Require Import Ring2 Rsummation Rpolynomial2.
 
-(* attempt to define vectors and matrices with dependent types *)
+(* attempt to define vectors and matrices as lists of given sizes so that
+   their equality is equivalent to the equality of the lists *)
 
-Inductive vector (T : Type) : nat -> Type :=
-  | Vnil : vector T 0
-  | Vcons : ∀ n : nat, T -> vector T n -> vector T (S n).
+Record vector (siz : nat) T :=
+  { vec_list : list T;
+    vec_length : length vec_list = siz }.
 
-Check (Vcons 3 (Vnil _)).
-Check (Vnil nat).
+Arguments vec_list {_} {_}.
 
-Fixpoint vec_of_list T (l : list T) : vector T (length l) :=
-  match l return (vector T (length l)) with
-  | [] => Vnil T
-  | a :: l' => Vcons a (vec_of_list l')
-  end.
+Theorem vec_eq_eq : ∀ T siz (V1 V2 : vector siz T),
+  V1 = V2 ↔ vec_list V1 = vec_list V2.
+Proof.
+intros.
+split; [ now intros; subst V2 | ].
+intros HVV.
+destruct V1 as (V1 & P1).
+destruct V2 as (V2 & P2).
+move V2 before V1.
+cbn in HVV; subst V2; f_equal.
+apply UIP_nat.
+Qed.
+
+Definition vec_of_list {T} (l : list T) :=
+  {| vec_list := l; vec_length := eq_refl |}.
 
 (* matrices *)
 
-Record matrix T nrow ncol :=
-  { mat_vec : vector (vector T ncol) nrow }.
+Record matrix nrow ncol T :=
+  { mat_vec : vector nrow (vector ncol T) }.
 
-(*
 Arguments mat_vec {_} {_} {_}.
-*)
 
-(*
-Definition vec_of_list_fixed T (d : T) (l : list T) n : vector T n.
-Proof.
-set (v := vec_of_list (firstn n (l ++ repeat d n))).
-rewrite firstn_length in v.
-rewrite app_length in v.
-rewrite repeat_length' in v.
-replace n with (0 + n) in v by easy.
-rewrite Nat.add_assoc in v.
-rewrite Nat.add_min_distr_r in v.
-rewrite Nat.min_0_l in v.
-apply v.
-Defined.
-
-Compute (vec_of_list_fixed 42 [3; 17; 22] 5).
-
-...
-
-Definition vec_of_list_fixed T d (l : list T) n : vector T n :=
-  match l return (vector T n) with
-  | [] =>
-       match repeat_length d n return (vector T n) with
-       | eq_refl => vec_of_list (repeat d n)
-       end
-  | a :: l' => Vcons a (vec_of_list l')
-  end.
-*)
-
-Print repeat.
-
-Definition repeat_length' :=
-λ (A : Type) (x : A) (n : nat),
-  nat_ind (λ n0 : nat, length (repeat x n0) = n0) eq_refl
-    (λ (k : nat) (Hrec : length (repeat x k) = k), eq_ind_r (λ n0 : nat, S n0 = S k) eq_refl Hrec) n
-     : length (repeat x n) = n.
-
-Definition vec_of_list_len_firstn_rep T d n (l : list T) :
-    vector T (length (firstn n (l ++ repeat d n))) :=
-  vec_of_list (firstn n (l ++ repeat d n)).
-
-Fixpoint firstn_length (A : Type) (n : nat) :
-    ∀ l : list A, length (firstn n l) = min n (length l) :=
-  match n with
-   | 0 =>
-       λ l,
-       match l return length (firstn 0 l) = min 0 (length l) with
-       | [] => eq_refl
-       | _ :: _ => eq_refl
-       end
-   | S n' =>
-       λ (l : list A),
-       match l return length (firstn (S n') l) = min (S n') (length l) with
-       | [] => eq_refl
-       | a :: l' => f_equal_nat _ _ _ _ (firstn_length n' l')
-       end
-   end.
-
-Definition vec_of_list_min_len_rep T d n (l : list T) :
-    vector T (min n (length (l ++ repeat d n))) :=
-  match firstn_length n (l ++ repeat d n) in (_ = m) return (vector T m) with
-  | eq_refl => vec_of_list_len_firstn_rep d n l
-  end.
-
-Compute (vec_of_list_len_firstn_rep 42 7 [5; 3; 19]).
-Compute (vec_of_list_min_len_rep 42 7 [5; 3; 19]).
-
-Print repeat.
-Print vec_of_list.
-
-Fixpoint vec_repeat T (d : T) n :=
-  match n with
-  | 0 => Vnil T
-  | S n' => Vcons d (vec_repeat d n')
-  end.
-
-Theorem add_succ_comm : ∀ a b, a + S b = S a + b.
-Proof.
-intros.
-revert b.
-induction a; intros; [ easy | cbn ].
-now rewrite IHa.
-Defined.
-
-Print repeat_length'.
-
-Fixpoint vec_app (T : Type) (m n : nat) (v : vector T m) (w : vector T n) :
-    vector T (m + n) :=
-  match v with
-  | Vnil _ => w
-  | Vcons a v' => Vcons a (vec_app v' w)
-  end.
-
-Compute (vec_app (vec_of_list [3; 4]) (vec_of_list [8; 52; 34]) : vector nat 5).
-
-Definition vec_size_add_comm (T : Type) (m n : nat) (v : vector T (m + n)) : vector T (n + m).
-now rewrite Nat.add_comm.
-Defined.
-
-Compute (vec_size_add_comm _ _ (vec_app (vec_of_list [3; 4]) (vec_of_list [8; 52; 34])) : vector nat 5).
-
-About VectorDef.t.
-About Vector.t.
-
-Print VectorDef.t.
-Print Vector.t.
-
-Search (Vector.t _ (_ + _)).
-Search (VectorDef.t _ (_ + _)).
-
-...
-Inductive t (A : Type) : nat → Type :=
-    nil : VectorDef.t A 0
-  | cons : A → ∀ n : nat, VectorDef.t A n → VectorDef.t A (S n)
-Inductive t (A : Type) : nat → Type :=
-    nil : Vector.t A 0
-  | cons : A → ∀ n : nat, Vector.t A n → Vector.t A (S n)
-
-...
-
-Fixpoint vec_rev (T : Type) (n : nat) (v : vector T n) : vector T n :=
-  match v with
-  | Vnil _ => Vnil T
-  | Vcons a v' => vec_app (vec_rev v') (Vcons a (Vnil T))
-  end.
-...
-
-Definition vec_ext (T : Type) (d : T) (n : nat) (v : vector T n) m : vector T (n + m).
-Proof.
-revert m.
-induction v; intros; [ apply (vec_repeat d) | ].
-destruct m. {
-  rewrite Nat.add_0_r.
-...
-
-Fixpoint vec_ext (T : Type) (d : T) (n : nat) (v : vector T n) m :=
-  match v with
-  | Vnil _ => vec_of_list (repeat d m)
-  | Vcons a v' =>
-      match m with
-      | 0 => v
-      | S m' => Vcons a (vec_ext d v' m')
-      end
-  end.
-
-Definition vec_ext (T : Type) (d : T) (n : nat) (v : vector T n) m : vector T (n + m).
-Definition vec_ext (T : Type) (d : T) (n : nat) (v : vector T n) m : vector T (n + m).
-Proof.
-revert m.
-induction v; intros. {
-  apply (vec_repeat d m).
-}
-rewrite <- add_succ_comm.
-
-...
-specialize (IHv (S m)).
-now rewrite add_succ_comm in IHv.
-Defined.
-
-Compute (vec_of_list [17; 1; 8]).
-Compute (vec_ext 42 (vec_of_list [17; 1; 8]) 4).
-
-...
-
-Fixpoint vec_ext (T : Type) (d : T) (n : nat) (v : vector T n) m :=
-  match v with
-  | Vnil _ => vec_of_list (repeat d m)
-  | Vcons a v' => Vcons a (vec_ext d v' m)
-  end.
-
-Fixpoint vec_of_fixed_list (T : Type) (d : T) (n : nat) (l : list T) :=
-  match n with
-  | 0 => Vnil T
-  | S n' =>
-      match l with
-      | [] => vec_of_fixed_list d n' []
-...
-
-Definition vec_of_fixed_list (T : Type) (d : T) (n : nat) (l : list T) : vector T n.
-...
-
-Definition vec_of_fixed_list (T : Type) (d : T) (n : nat) (l : list T) : vector T n :=
-  let v2 :=
-    match repeat_length d n in (_ = m) return vector T (min n (length l + m)) with
-    | eq_refl =>
-        match app_length l (repeat d n) in (_ = m) return (vector T (min n m)) with
-        | eq_refl => vec_of_list_min_len_rep d n l
-        end
-    end
-  in
-  let H : 0 + n = n := eq_refl in
-  let v3 := eq_rect_r (λ n0 : nat, vector T (Init.Nat.min n0 (length l + n0))) v2 H in
-  let v4 :=
-    eq_rect (length l + (0 + n)) (λ n0 : nat, vector T (Init.Nat.min (0 + n) n0)) v3 (length l + 0 + n)
-      (Nat.add_assoc (length l) 0 n) in
-  let v5 :=
-    eq_rect (Nat.min (0 + n) (length l + 0 + n)) (λ n0 : nat, vector T n0) v4 (Nat.min 0 (length l + 0) + n)
-      (Nat.add_min_distr_r 0 (length l + 0) n) in
-  let v6 := eq_rect (Nat.min 0 (length l + 0)) (λ n0 : nat, vector T (n0 + n)) v5 0 (Nat.min_0_l (length l + 0))
-    in
-  v6.
-
-Print vec_of_fixed_list.
-
-...
-
-Compute (vec_of_fixed_list 42 7 [5; 3; 19]).
-
-Definition glop (T : Type) (d : T) (ll : list (list T)) :=
-  let r := length ll in
-  let c := fold_left (λ (a : nat) (l : list T), Init.Nat.max a (length l)) ll 0 in
-  let vl := map (λ l : list T, vec_of_fixed_list d c l) ll in
-  vec_of_list vl.
-
-Print glop.
-
-Compute (glop 42 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
-
-Definition mat_of_list {T} (d : T) (ll : list (list T)) :
-    matrix T (length ll) (fold_left (λ a l, max a (length l)) ll 0).
-split.
-set (r := length ll).
-set (c := fold_left (λ a l, max a (length l)) ll 0).
-set (vl := map (λ l, vec_of_fixed_list d c l) ll).
-set (v := vec_of_list vl).
-unfold vl in v.
-rewrite map_length in v.
-fold r in v.
-apply v.
-Show Proof.
-...
-
-Definition mat_of_list {T} (d : T) (ll : list (list T)) :
-    matrix T (length ll) (length (hd [] ll)) :=
-  {| mat_vec := vec_of_list (map (λ l, vec_of_list l) ll) |}.
-       {| vec_list := vec_list_of_list_list d ll;
-          vec_length := vec_of_list_list_length |} |}.
-
-
-...
-
-Theorem vec_of_some_list_prop : ∀ {T} {d : T} {ll : list (list T)} {l},
+Theorem vec_listp : ∀ {T} {d : T} {ll : list (list T)} {l},
   length (firstn (length (hd [] ll)) (l ++ repeat d (length (hd [] ll)))) =
   length (hd [] ll).
 Proof.
@@ -1985,7 +1753,7 @@ Definition vec_list_of_list_list {T} (d : T) (ll : list (list T)) :
     (λ l,
      {| vec_list :=
           firstn (length (hd [] ll)) (l ++ repeat d (length (hd [] ll)));
-        vec_length := vec_of_some_list_prop (*T d ll l*) |})
+        vec_length := vec_listp (*T d ll l*) |})
     ll.
 
 Theorem vec_of_list_list_length : ∀ {T} {d : T} {ll : list (list T)},
@@ -2077,8 +1845,6 @@ Definition vec_repeat' {T} len (d : T) : vector len T :=
 
 Compute (vec_repeat 3 0).
 Compute (vec_repeat' 3 0).
-
-...
 
 Definition list_list_el {T} d (ll : list (list T)) i j : T :=
   nth j (nth i ll []) d.
