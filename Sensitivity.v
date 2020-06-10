@@ -1765,13 +1765,17 @@ Definition vec_of_fixed_list T (d : T) (n : nat) (l : list T) : vector T n.
 set (v := vec_of_list (firstn n (l ++ repeat d n))).
 rewrite firstn_length in v.
 rewrite app_length in v.
-rewrite repeat_length' in v.
+rewrite repeat_length in v.
 replace n with (0 + n) in v by easy.
 rewrite Nat.add_assoc in v.
 rewrite Nat.add_min_distr_r in v.
 rewrite Nat.min_0_l in v.
 apply v.
 Defined.
+
+Print vec_of_fixed_list.
+
+...
 
 Definition mat_of_list {T} (d : T) (ll : list (list T)) :
     matrix T (length ll) (fold_left (λ a l, max a (length l)) ll 0).
