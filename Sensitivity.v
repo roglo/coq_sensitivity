@@ -1810,7 +1810,8 @@ Defined.
 
 Print repeat_length'.
 
-Fixpoint vec_app (T : Type) (m n : nat) (v : vector T m) (w : vector T n) : vector T (m + n) :=
+Fixpoint vec_app (T : Type) (m n : nat) (v : vector T m) (w : vector T n) :
+    vector T (m + n) :=
   match v with
   | Vnil _ => w
   | Vcons a v' => Vcons a (vec_app v' w)
@@ -1819,8 +1820,11 @@ Fixpoint vec_app (T : Type) (m n : nat) (v : vector T m) (w : vector T n) : vect
 Compute (vec_app (vec_of_list [3; 4]) (vec_of_list [8; 52; 34])).
 
 Definition vec_size_add_comm (T : Type) (m n : nat) (v : vector T (m + n)) : vector T (n + m).
-revert n v.
-induction m; intros. {
+now rewrite Nat.add_comm.
+Defined.
+
+Compute (vec_size_add_comm _ _ (vec_app (vec_of_list [3; 4]) (vec_of_list [8; 52; 34]))).
+
 ...
 
 Fixpoint vec_rev (T : Type) (n : nat) (v : vector T n) : vector T n :=
