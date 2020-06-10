@@ -1936,6 +1936,7 @@ unfold list_list_transpose in M'.
 rewrite map_length, seq_length in M'.
 rewrite list_of_mat_length in M'.
 rewrite max_list_list_length_list_of_mat in M'; [ | easy ].
+...
 cbn in M'.
 rewrite map_length, seq_length in M'.
 ...
