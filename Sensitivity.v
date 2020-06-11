@@ -1736,53 +1736,20 @@ Proof.
 intros.
 split; [ now intros; subst M2 | ].
 intros HMM.
-...
-destruct M1 as ((V1 & P1)).
-destruct M2 as ((V2 & P2)).
-move V2 before V1.
-unfold list_of_mat in HMM.
-cbn in HMM.
-f_equal.
-assert (HVV : V1 = V2). {
-  apply List_eq_iff.
-  split; [ congruence | ].
-  intros dv i.
-  rewrite <- P2 in P1.
-  clear nrow P2.
-  apply vec_eq_eq.
-  apply List_eq_iff.
-  split; [ now do 2 rewrite vec_length | ].
-  intros d j.
-  move d before dv.
-  revert i j V2 P1 HMM.
-  induction V1 as [| a1]; intros. {
-    symmetry in P1; apply length_zero_iff_nil in P1.
-    now subst V2.
-  }
-  destruct V2 as [| a2]; [ easy | cbn in P1 ].
-  apply Nat.succ_inj in P1.
-  cbn in HMM; cbn.
-  injection HMM; clear HMM; intros HVV Haa.
-  destruct i; [ now rewrite Haa | ].
-  now apply IHV1.
-}
-subst V2; f_equal.
-apply UIP_nat.
+destruct M1 as (l1, r1, c1).
+destruct M2 as (l2, r2, c2).
+move r2 before r1.
+cbn in HMM; subst l2.
+f_equal; apply UIP_nat.
 Qed.
 
 Theorem list_of_mat_length : ∀ {T r c} (M : matrix r c T),
   length (list_of_mat M) = r.
-Proof.
-intros.
-destruct M as ((V, P)); cbn.
-now rewrite map_length.
-Qed.
+Proof. now intros; destruct M. Qed.
 
-Compute (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat).
+Compute (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat).
 
-Definition vec_el {T} {len} (V : vector len T) i d : T :=
-  nth i (vec_list V) d.
-
+(*
 Definition repeat_length' :=
 λ (A : Type) (x : A) (n : nat),
   nat_ind (λ n0 : nat, length (repeat x n0) = n0) eq_refl
@@ -1803,6 +1770,7 @@ Definition vec_repeat' {T} len (d : T) : vector len T :=
 
 Compute (vec_repeat 3 0).
 Compute (vec_repeat' 3 0).
+*)
 
 Definition list_list_el {T} d (ll : list (list T)) i j : T :=
   nth j (nth i ll []) d.
@@ -1813,29 +1781,18 @@ Compute (let (i, j) := (7, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9
 Definition mat_el T r c d (M : matrix r c T) i j : T :=
   list_list_el d (list_of_mat M) i j.
 
-Compute (let (i, j) := (2, 1) in mat_el 42 (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat) i j).
-Compute (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat).
-
-Definition vec_mul {T} {ro : sring_op T} len (V1 V2 : vector len T) :=
-  fold_left srng_add
-    (map (λ xy, (fst xy * snd xy)%Srng) (combine (vec_list V1) (vec_list V2)))
-    0%Srng.
-
-Print vec_mul.
-Locate "Σ".
+Compute (let (i, j) := (2, 1) in mat_el 42 (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat) i j).
+Compute (let (i, j) := (7, 1) in mat_el 42 (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat) i j).
+Compute (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat).
 
 Definition list_list_transpose {T} d (ll : list (list T)) : list (list T) :=
   let r := length ll in
   let c := list_list_ncols ll in
   map (λ i, map (λ j, list_list_el d ll j i) (seq 0 r)) (seq 0 c).
-(*
-  map (λ i, map (λ j, nth i (nth j ll []) d) (seq 0 r)) (seq 0 c).
-*)
 
 Compute (list_list_transpose 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]).
 
-Require Import Init.Nat.
-
+(*
 Theorem list_list_ncols_list_of_mat : ∀ T r c (M : matrix r c T),
   r ≠ 0
   → list_list_ncols (list_of_mat M) = c.
@@ -1847,16 +1804,44 @@ unfold list_list_ncols.
 destruct V as [| v]; [ easy | clear Hrz; cbn ].
 apply vec_length.
 Qed.
+*)
 
-Definition mat_transpose {T} {r c} (d : T) (M : matrix r c T) : matrix c r T.
+Theorem mat_nrows_transpose : ∀ T r c d (M : matrix r c T),
+  list_list_nrows (list_list_transpose d (list_of_mat M)) = c.
 Proof.
+intros.
+destruct M as (l, r1, c1); cbn.
+unfold list_list_nrows, list_list_transpose.
+now rewrite map_length, seq_length.
+Qed.
+
+Theorem mat_ncols_transpose : ∀ T r c d (M : matrix r c T),
+  list_list_ncols (list_list_transpose d (list_of_mat M)) = r.
+Proof.
+intros.
+destruct M as (l, r1, c1); cbn.
+unfold list_list_ncols, list_list_transpose.
+...
+
+Definition mat_transpose T r c (d : T) (M : matrix r c T) : matrix c r T.
+Proof.
+intros.
+apply
+  {| mat_list := list_list_transpose d (list_of_mat M);
+     mat_nrows := mat_nrows_transpose d M;
+     mat_ncols := mat_ncols_transpose d M |}.
+...
+(*
 destruct r. {
   apply {| mat_vec := vec_repeat c (vec_repeat 0 d) |}.
 }
 destruct c. {
   apply {| mat_vec := vec_repeat 0 (vec_repeat (S r) d) |}.
 }
-set (M' := mat_of_list d (list_list_transpose d (list_of_mat M))).
+*)
+set (M' := mat_of_list (list_list_transpose d (list_of_mat M))).
+Print mat_of_list.
+
 unfold list_list_transpose in M'.
 rewrite map_length, seq_length in M'.
 rewrite list_of_mat_length in M'.
