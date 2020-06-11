@@ -1736,13 +1736,13 @@ Record matrix nrow ncol T :=
 
 Arguments mat_vec {_} {_} {_}.
 
+(*
 Definition list_list_ncols T (ll : list (list T)) :=
   fold_left (λ a l, max a (length l)) ll 0.
-
-(*
-Definition list_list_ncols {T} ll :=
-  fold_left max (map (length (A:=T)) ll) 0.
 *)
+Definition list_list_ncols T (ll : list (list T)) :=
+  length (hd [] ll).
+(**)
 
 Theorem vec_listp : ∀ {T} {d : T} {ll : list (list T)} {l},
   length
@@ -1923,11 +1923,9 @@ Proof.
 intros * Hrz.
 destruct M as ((V, P)); cbn.
 rewrite <- P in Hrz; clear r P.
+unfold list_list_ncols.
 destruct V as [| v]; [ easy | clear Hrz; cbn ].
-rewrite vec_length; clear v.
-induction V as [| v]; [ easy | cbn ].
-rewrite vec_length.
-now rewrite Nat.max_l.
+apply vec_length.
 Qed.
 
 Definition mat_transpose {T} {r c} (d : T) (M : matrix r c T) : matrix c r T.
@@ -1944,6 +1942,7 @@ rewrite map_length, seq_length in M'.
 rewrite list_of_mat_length in M'.
 rewrite list_list_ncols_list_of_mat in M'; [ | easy ].
 unfold list_list_ncols in M'.
+...
 rewrite List_fold_left_map in M'.
 replace (fold_left _ _ _) with
   (fold_left (λ c _, max c (S r)) (seq 0 (S c)) 0) in M'. 2: {
