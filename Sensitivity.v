@@ -1704,112 +1704,31 @@ Require Import Ring2 Rsummation Rpolynomial2.
 *)
 Require Import Semiring SRsummation.
 
-(* attempt to define vectors and matrices as lists of given sizes so that
-   their equality is equivalent to the equality of the lists *)
-
-Record vector (siz : nat) T :=
-  { vec_list : list T;
-    vec_length : length vec_list = siz }.
-
-Arguments vec_list {_} {_}.
-
-Theorem vec_eq_eq : ∀ T siz (V1 V2 : vector siz T),
-  V1 = V2 ↔ vec_list V1 = vec_list V2.
-Proof.
-intros.
-split; [ now intros; subst V2 | ].
-intros HVV.
-destruct V1 as (V1 & P1).
-destruct V2 as (V2 & P2).
-move V2 before V1.
-cbn in HVV; subst V2; f_equal.
-apply UIP_nat.
-Qed.
-
-Definition vec_of_list {T} (l : list T) :=
-  {| vec_list := l; vec_length := eq_refl |}.
-
 (* matrices *)
 
-Record matrix nrow ncol T :=
-  { mat_vec : vector nrow (vector ncol T) }.
+Definition list_list_nrows T (ll : list (list T)) :=
+  length ll.
 
-Arguments mat_vec {_} {_} {_}.
-
-(*
-Definition list_list_ncols T (ll : list (list T)) :=
-  fold_left (λ a l, max a (length l)) ll 0.
-*)
 Definition list_list_ncols T (ll : list (list T)) :=
   length (hd [] ll).
-(**)
 
-Theorem vec_listp : ∀ {T} {d : T} {ll : list (list T)} {l},
-  length
-    (firstn (list_list_ncols ll)
-       (l ++ repeat d (list_list_ncols ll))) =
-  list_list_ncols ll.
-Proof.
-intros.
-rewrite firstn_length.
-rewrite app_length.
-rewrite repeat_length.
-remember (list_list_ncols ll) as m eqn:Hm.
-replace m with (0 + m) at 1 by easy.
-now rewrite Nat.add_min_distr_r.
-Qed.
+Record matrix nrows ncols T :=
+  { mat_list : list (list T);
+    mat_nrows : list_list_nrows mat_list = nrows;
+    mat_ncols : list_list_ncols mat_list = ncols }.
 
-Definition vec_list_of_list_list {T} (d : T) (ll : list (list T)) :
-    list (vector (list_list_ncols ll) T) :=
-  map
-    (λ l,
-     {| vec_list :=
-          firstn (list_list_ncols ll)
-            (l ++ repeat d (list_list_ncols ll));
-        vec_length := vec_listp |})
-    ll.
+Print matrix.
 
 (*
-Theorem vec_listp : ∀ {T} {d : T} {ll : list (list T)} {l},
-  length (firstn (length (hd [] ll)) (l ++ repeat d (length (hd [] ll)))) =
-  length (hd [] ll).
-Proof.
-intros.
-rewrite firstn_length.
-rewrite app_length.
-rewrite repeat_length.
-remember (length (hd [] ll)) as len eqn:Hlen.
-replace len with (0 + len) at 1 by easy.
-rewrite Nat.add_min_distr_r.
-now rewrite Nat.min_0_l.
-Qed.
-
-Definition vec_list_of_list_list {T} (d : T) (ll : list (list T)) :
-    list (vector (length (hd [] ll)) T) :=
-  map
-    (λ l,
-     {| vec_list :=
-          firstn (length (hd [] ll)) (l ++ repeat d (length (hd [] ll)));
-        vec_length := vec_listp (*T d ll l*) |})
-    ll.
+Arguments mat_list {_} {_} {_}.
 *)
 
-Theorem vec_of_list_list_length : ∀ {T} {d : T} {ll : list (list T)},
-  length (vec_list_of_list_list d ll) = length ll.
-Proof.
-intros.
-unfold vec_list_of_list_list.
-now rewrite map_length.
-Qed.
-
-Definition mat_of_list T (d : T) (ll : list (list T)) :
-    matrix (length ll) (list_list_ncols ll) T :=
-  {| mat_vec :=
-       {| vec_list := vec_list_of_list_list d ll;
-          vec_length := vec_of_list_list_length |} |}.
+Definition mat_of_list T (ll : list (list T)) :
+    matrix (list_list_nrows ll) (list_list_ncols ll) T :=
+  {| mat_list := ll; mat_nrows := eq_refl; mat_ncols := eq_refl |}.
 
 Definition list_of_mat T nrow ncol (M : matrix nrow ncol T) :=
-  map vec_list (vec_list (mat_vec M)).
+  mat_list M.
 
 Theorem mat_eq_eq : ∀ T nrow ncol (M1 M2 : matrix nrow ncol T),
   M1 = M2 ↔ list_of_mat M1 = list_of_mat M2.
@@ -1817,6 +1736,7 @@ Proof.
 intros.
 split; [ now intros; subst M2 | ].
 intros HMM.
+...
 destruct M1 as ((V1 & P1)).
 destruct M2 as ((V2 & P2)).
 move V2 before V1.
