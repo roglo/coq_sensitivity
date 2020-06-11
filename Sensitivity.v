@@ -1802,13 +1802,13 @@ unfold vec_list_of_list_list.
 now rewrite map_length.
 Qed.
 
-Definition mat_of_list {T} (d : T) (ll : list (list T)) :
+Definition mat_of_list T (d : T) (ll : list (list T)) :
     matrix (length ll) (max_list_list_length ll) T :=
   {| mat_vec :=
        {| vec_list := vec_list_of_list_list d ll;
           vec_length := vec_of_list_list_length |} |}.
 
-Definition list_of_mat {T nrow ncol} (M : matrix nrow ncol T) :=
+Definition list_of_mat T nrow ncol (M : matrix nrow ncol T) :=
   map vec_list (vec_list (mat_vec M)).
 
 Theorem mat_eq_eq : ∀ T nrow ncol (M1 M2 : matrix nrow ncol T),
@@ -1907,7 +1907,10 @@ Locate "Σ".
 Definition list_list_transpose {T} d (ll : list (list T)) : list (list T) :=
   let r := length ll in
   let c := max_list_list_length ll in
+  map (λ i, map (λ j, list_list_el d ll j i) (seq 0 r)) (seq 0 c).
+(*
   map (λ i, map (λ j, nth i (nth j ll []) d) (seq 0 r)) (seq 0 c).
+*)
 
 Compute (list_list_transpose 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]).
 
@@ -1968,7 +1971,7 @@ rewrite fold_left_app.
 now rewrite <- IHc.
 Defined.
 
-Definition list_list_mul {T} {ro : sring_op T} r cr c (ll1 ll2 : list (list T)) :=
+Definition list_list_mul T {ro : sring_op T} r cr c (ll1 ll2 : list (list T)) :=
   map
     (λ k,
      map
@@ -1989,6 +1992,19 @@ Compute (let _ := nat_sring_op in list_list_mul 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7;
 Definition mat_mul {T} {ro : sring_op T} {r cr c}
     (M1 : matrix r cr T) (M2 : matrix cr c T) : matrix r c T.
 Proof.
+set
+  (M :=
+   mat_of_list 0%Srng
+     (list_list_mul r cr c (list_of_mat M1) (list_of_mat M2))).
+unfold list_list_mul in M.
+rewrite map_length, seq_length in M.
+...
+rewrite max_list_list_length_list_of_mat in M.
+Search max_list_list_length.
+Check max_list_list_length_list_of_mat.
+Search matrix.
+Print mat_of_list.
+...
 destruct r. {
   apply {| mat_vec := vec_repeat 0 (vec_repeat c 0%Srng) |}.
 }
