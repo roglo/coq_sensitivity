@@ -1979,15 +1979,15 @@ set
      (list_list_mul (S r) cr c (list_of_mat M1) (list_of_mat M2))).
 unfold list_list_mul in M.
 rewrite map_length, seq_length in M.
-remember (seq 0 (S r)) as s eqn:Hs.
-rewrite <- (Nat.add_1_l r), seq_app, Nat.add_0_l in Hs; subst s.
+replace (seq 0 (S r)) with (seq 0 1 ++ seq 1 r) in M by easy.
 cbn in M.
 rewrite map_length, seq_length in M.
 apply M.
 Defined.
 
-(*
+(**)
 Compute (let _ := nat_sring_op in mat_mul (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]])).
+(*
 -> too many opaque theorems
 *)
 
