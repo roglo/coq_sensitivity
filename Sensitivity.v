@@ -1942,32 +1942,11 @@ rewrite map_length, seq_length in M'.
 rewrite list_of_mat_length in M'.
 rewrite list_list_ncols_list_of_mat in M'; [ | easy ].
 unfold list_list_ncols in M'.
-...
-rewrite List_fold_left_map in M'.
-replace (fold_left _ _ _) with
-  (fold_left (λ c _, max c (S r)) (seq 0 (S c)) 0) in M'. 2: {
-  apply List_fold_left_ext_in.
-  intros a b Ha.
-  now rewrite map_length, seq_length.
-}
-replace (fold_left _ _ _) with
-  (fold_left (λ _ _, S r) (seq 0 (S c)) 0) in M'. 2: {
-  clear.
-  induction c; [ easy | ].
-  rewrite <- (Nat.add_1_r (S c)), seq_app, Nat.add_0_l.
-  do 2 rewrite fold_left_app.
-  rewrite <- IHc; cbn.
-  symmetry; apply max_r; clear.
-  induction c; [ easy | ].
-  rewrite <- (Nat.add_1_r c), seq_app.
-  now rewrite fold_left_app.
-}
-replace (fold_left _ _ _) with (S r) in M'; [ easy | ].
-symmetry; clear.
-induction c; [ easy | ].
-rewrite <- (Nat.add_1_r (S c)), seq_app, Nat.add_0_l.
-rewrite fold_left_app.
-now rewrite <- IHc.
+remember (seq 0 (S c)) as s eqn:Hs.
+rewrite <- (Nat.add_1_l c), seq_app, Nat.add_0_l in Hs; subst s.
+cbn in M'.
+rewrite map_length, seq_length in M'.
+apply M'.
 Defined.
 
 Definition list_list_mul T {ro : sring_op T} r cr c (ll1 ll2 : list (list T)) :=
@@ -1991,45 +1970,26 @@ Compute (let _ := nat_sring_op in list_list_mul 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7;
 Definition mat_mul {T} {ro : sring_op T} {r cr c}
     (M1 : matrix r cr T) (M2 : matrix cr c T) : matrix r c T.
 Proof.
-set
-  (M :=
-   mat_of_list 0%Srng
-     (list_list_mul r cr c (list_of_mat M1) (list_of_mat M2))).
-unfold list_list_mul in M.
-rewrite map_length, seq_length in M.
-unfold list_list_ncols in M.
-Search list_of_mat.
-...
-rewrite list_list_ncols_list_of_mat in M.
-Search list_list_ncols.
-Check list_list_ncols_list_of_mat.
-Search matrix.
-Print mat_of_list.
-...
 destruct r. {
   apply {| mat_vec := vec_repeat 0 (vec_repeat c 0%Srng) |}.
 }
 set
   (M :=
    mat_of_list 0%Srng
-     (map
-        (λ k,
-         map
-           (λ i,
-            Σ (j = 0, cr - 1), mat_el 0 M1 i j * mat_el 0 M2 j k)%Srng
-           (seq 0 c))
-        (seq 0 (S r)))).
-Locate "Σ".
-cbn - [ sub ] in M.
-do 2 rewrite map_length, seq_length in M.
-...
+     (list_list_mul (S r) cr c (list_of_mat M1) (list_of_mat M2))).
+unfold list_list_mul in M.
+rewrite map_length, seq_length in M.
+remember (seq 0 (S r)) as s eqn:Hs.
+rewrite <- (Nat.add_1_l r), seq_app, Nat.add_0_l in Hs; subst s.
+cbn in M.
+rewrite map_length, seq_length in M.
 apply M.
 Defined.
 
-...
-
-Definition mat_mul {T} {ro : ring_op T} n A B :=
-  {| matel i k := (Σ (j = 0, n - 1), matel A i j * matel B j k)%Rng |}.
+(*
+Compute (let _ := nat_sring_op in mat_mul (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]])).
+-> too many opaque theorems
+*)
 
 ...
 
