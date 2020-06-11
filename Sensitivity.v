@@ -1835,9 +1835,7 @@ Definition mat_transpose T r c (d : T) (Hcz : c ≠ 0) (M : matrix r c T) :
      mat_nrows := mat_nrows_transpose;
      mat_ncols := mat_ncols_transpose Hcz |}.
 
-Compute (mat_transpose 0 (Nat.neq_succ_0 _) (mat_of_list [[1; 2; 3; 4; 7]; [5; 6; 7; 8]; [9; 10; 11; 12]]) : matrix 5 3 nat).
-
-...
+Compute (mat_transpose 0 (Nat.neq_succ_0 _) (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) : matrix 4 3 nat).
 
 Definition list_list_mul T {ro : sring_op T} r cr c (ll1 ll2 : list (list T)) :=
   map
@@ -1857,6 +1855,9 @@ Definition nat_sring_op : sring_op nat :=
 
 Compute (let _ := nat_sring_op in list_list_mul 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
 
+Tactic Notation "transparent" "assert" "(" ident(H) ":" lconstr(type) ")" :=
+  unshelve (refine (let H := (_ : type) in _)).
+
 Definition my_seq_length len :=
   nat_ind (λ len0 : nat, ∀ start : nat, length (seq start len0) = len0) (λ _ : nat, eq_refl)
     (λ (len0 : nat) (IHlen : ∀ start : nat, length (seq start len0) = len0) (start : nat),
@@ -1866,6 +1867,43 @@ Definition my_map_length A B (f : A → B) l :=
   list_ind (λ l0 : list A, length (map f l0) = length l0) eq_refl
     (λ (a : A) (l0 : list A) (IHl : length (map f l0) = length l0),
        f_equal_nat nat S (length (map f l0)) (length l0) IHl) l.
+
+Definition mat_mul {T} {ro : sring_op T} {r cr c}
+    (M1 : matrix r cr T) (M2 : matrix cr c T) : matrix r c T.
+Proof.
+destruct (Nat.eq_dec r 0) as [Hrz| Hrz]. {
+  subst r.
+  destruct M1 as (l1, c1, r1).
+  destruct M2 as (l2, c2, r2).
+  unfold list_list_nrows in c1, c2.
+  apply length_zero_iff_nil in c1; subst l1.
+  cbn in r1; subst cr.
+  apply length_zero_iff_nil in c2; subst l2.
+  unfold list_list_ncols in r2.
+  subst c; cbn.
+  now exists [].
+}
+set
+  (M := mat_of_list (list_list_mul r cr c (list_of_mat M1) (list_of_mat M2))).
+destruct M1 as (l1, c1, r1).
+destruct M2 as (l2, c2, r2).
+move l2 before l1.
+move c2 before c1.
+cbn in M.
+unfold list_list_nrows in M.
+unfold list_list_ncols in M.
+assert (Hr : length (list_list_mul r cr c l1 l2) = r). {
+  unfold list_list_mul.
+  now rewrite my_map_length, my_seq_length.
+}
+assert (Hc : length (hd [] (list_list_mul r cr c l1 l2)) = c). {
+  unfold list_list_mul.
+  cbn.
+  destruct r; [ easy | clear Hrz ].
+...
+unfold list_list_mul in M.
+cbn in M.
+...
 
 Definition mat_mul {T} {ro : sring_op T} {r cr c}
     (M1 : matrix r cr T) (M2 : matrix cr c T) :=
