@@ -1855,63 +1855,6 @@ Definition nat_sring_op : sring_op nat :=
 
 Compute (let _ := nat_sring_op in list_list_mul 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
 
-Tactic Notation "transparent" "assert" "(" ident(H) ":" lconstr(type) ")" :=
-  unshelve (refine (let H := (_ : type) in _)).
-
-Definition my_seq_length len :=
-  nat_ind (λ len0 : nat, ∀ start : nat, length (seq start len0) = len0) (λ _ : nat, eq_refl)
-    (λ (len0 : nat) (IHlen : ∀ start : nat, length (seq start len0) = len0) (start : nat),
-       f_equal_nat nat S (length (seq (S start) len0)) len0 (IHlen (S start))) len.
-
-Definition my_map_length A B (f : A → B) l :=
-  list_ind (λ l0 : list A, length (map f l0) = length l0) eq_refl
-    (λ (a : A) (l0 : list A) (IHl : length (map f l0) = length l0),
-       f_equal_nat nat S (length (map f l0)) (length l0) IHl) l.
-
-Definition my_add_succ_r :=
-  λ n m : nat,
-  match n as n0 return (n0 + S m = S (n0 + m)) with
-  | 0 => eq_refl
-  | S n0 => eq_sym (plus_n_Sm (S n0) m)
-  end.
-
-Definition my_plus_n_O :=
-  λ n : nat,
-  nat_ind (λ n0 : nat, n0 = n0 + 0) eq_refl
-    (λ (n0 : nat) (IHn : n0 = n0 + 0), f_equal_nat nat S n0 (n0 + 0) IHn) n.
-
-Definition my_add_0_r :=
-  λ n : nat,
-  match n as n0 return (n0 + 0 = n0) with
-  | 0 => eq_refl
-  | S n0 => eq_sym (my_plus_n_O (S n0))
-  end.
-
-Definition my_seq_app len1 :=
-  nat_ind (λ len2 : nat, ∀ len3 start : nat, seq start (len2 + len3) = seq start len2 ++ seq (start + len2) len3)
-    (λ len2 start : nat, eq_ind_r (λ n : nat, seq start len2 = seq n len2) eq_refl (my_add_0_r start))
-    (λ (len1' : nat) (IHlen : ∀ len2 start : nat,
-                                seq start (len1' + len2) = seq start len1' ++ seq (start + len1') len2)
-       (len2 start : nat),
-       eq_ind_r (λ n : nat, start :: seq (S start) (len1' + len2) = start :: seq (S start) len1' ++ seq n len2)
-         (eq_ind_r (λ l : list nat, start :: l = start :: seq (S start) len1' ++ seq (S (start + len1')) len2)
-            eq_refl (IHlen len2 (S start))) (my_add_succ_r start len1')) len1.
-
-Theorem length_list_list_mul :
-  ∀ T (ro : sring_op T) r cr c (l1 l2 : list (list T)),
-  length (list_list_mul r cr c l1 l2) = r.
-Proof.
-intros.
-unfold list_list_mul.
-Print my_map_length.
-rewrite my_map_length.
-Show Proof.
-...
-rewrite my_map_length, my_seq_length.
-Show Proof.
-Print my_seq_length.
-...
-
 Definition mat_mul {T} {ro : sring_op T} {r cr c}
     (M1 : matrix r cr T) (M2 : matrix cr c T) : matrix r c T.
 Proof.
@@ -1936,21 +1879,18 @@ move c2 before c1.
 cbn in M.
 unfold list_list_nrows in M.
 unfold list_list_ncols in M.
-transparent assert (Hr : length (list_list_mul r cr c l1 l2) = r). {
+assert (Hr : length (list_list_mul r cr c l1 l2) = r). {
   unfold list_list_mul.
-  now rewrite my_map_length, my_seq_length.
+  now rewrite map_length, seq_length.
 }
-...
-transparent assert (Hc : length (hd [] (list_list_mul r cr c l1 l2)) = c). {
+assert (Hc : length (hd [] (list_list_mul r cr c l1 l2)) = c). {
   unfold list_list_mul.
   destruct r; [ easy | clear Hrz ].
   replace (S r) with (1 + r) by easy.
-  rewrite my_seq_app.
+  rewrite seq_app.
   cbn - [ Nat.sub ].
-  rewrite my_map_length.
-  apply my_seq_length.
+  now rewrite map_length, seq_length.
 }
-
 rewrite Hr, Hc in M.
 apply M.
 Defined.
