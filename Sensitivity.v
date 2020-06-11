@@ -1890,7 +1890,7 @@ Definition list_list_el {T} d (ll : list (list T)) i j : T :=
 Compute (let (i, j) := (2, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j).
 Compute (let (i, j) := (7, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j).
 
-Definition mat_el {T} {r c} d (M : matrix r c T) i j : T :=
+Definition mat_el T r c d (M : matrix r c T) i j : T :=
   list_list_el d (list_of_mat M) i j.
 
 Compute (let (i, j) := (2, 1) in mat_el 42 (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat) i j).
@@ -1942,12 +1942,31 @@ rewrite list_of_mat_length in M'.
 rewrite max_list_list_length_list_of_mat in M'; [ | easy ].
 unfold max_list_list_length in M'.
 rewrite List_fold_left_map in M'.
-...
-cbn in M'.
-rewrite map_length, seq_length in M'.
-...
-
-Check list_list_el.
+replace (fold_left _ _ _) with
+  (fold_left (λ c _, max c (S r)) (seq 0 (S c)) 0) in M'. 2: {
+  apply List_fold_left_ext_in.
+  intros a b Ha.
+  now rewrite map_length, seq_length.
+}
+replace (fold_left _ _ _) with
+  (fold_left (λ _ _, S r) (seq 0 (S c)) 0) in M'. 2: {
+  clear.
+  induction c; [ easy | ].
+  rewrite <- (Nat.add_1_r (S c)), seq_app, Nat.add_0_l.
+  do 2 rewrite fold_left_app.
+  rewrite <- IHc; cbn.
+  symmetry; apply max_r; clear.
+  induction c; [ easy | ].
+  rewrite <- (Nat.add_1_r c), seq_app.
+  now rewrite fold_left_app.
+}
+replace (fold_left _ _ _) with (S r) in M'; [ easy | ].
+symmetry; clear.
+induction c; [ easy | ].
+rewrite <- (Nat.add_1_r (S c)), seq_app, Nat.add_0_l.
+rewrite fold_left_app.
+now rewrite <- IHc.
+Defined.
 
 Definition list_list_mul {T} {ro : sring_op T} r cr c (ll1 ll2 : list (list T)) :=
   map
@@ -1967,26 +1986,26 @@ Definition nat_sring_op : sring_op nat :=
 
 Compute (let _ := nat_sring_op in list_list_mul 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
 
-...
-
-Definition mat_mul {T} {ro : ring_op T} {r cr c}
+Definition mat_mul {T} {ro : sring_op T} {r cr c}
     (M1 : matrix r cr T) (M2 : matrix cr c T) : matrix r c T.
 Proof.
 destruct r. {
-  apply {| mat_vec := vec_repeat 0 (vec_repeat c 0%Rng) |}.
+  apply {| mat_vec := vec_repeat 0 (vec_repeat c 0%Srng) |}.
 }
 set
   (M :=
-   mat_of_list 0%Rng
+   mat_of_list 0%Srng
      (map
         (λ k,
          map
            (λ i,
-            Σ (j = 0, cr - 1), mat_el M1 i j 0 * mat_el M2 j k 0)%Rng
+            Σ (j = 0, cr - 1), mat_el 0 M1 i j * mat_el 0 M2 j k)%Srng
            (seq 0 c))
         (seq 0 (S r)))).
-cbn - [ summation ] in M.
+Locate "Σ".
+cbn - [ sub ] in M.
 do 2 rewrite map_length, seq_length in M.
+...
 apply M.
 Defined.
 
