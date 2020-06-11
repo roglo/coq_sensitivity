@@ -1967,6 +1967,26 @@ Definition nat_sring_op : sring_op nat :=
 
 Compute (let _ := nat_sring_op in list_list_mul 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
 
+Definition my_seq_length len :=
+  nat_ind (λ len0 : nat, ∀ start : nat, length (seq start len0) = len0) (λ _ : nat, eq_refl)
+    (λ (len0 : nat) (IHlen : ∀ start : nat, length (seq start len0) = len0) (start : nat),
+       f_equal_nat nat S (length (seq (S start) len0)) len0 (IHlen (S start))) len.
+
+Definition my_map_length A B (f : A → B) l :=
+  list_ind (λ l0 : list A, length (map f l0) = length l0) eq_refl
+    (λ (a : A) (l0 : list A) (IHl : length (map f l0) = length l0),
+       f_equal_nat nat S (length (map f l0)) (length l0) IHl) l.
+
+Definition mat_mul {T} {ro : sring_op T} {r cr c}
+    (M1 : matrix r cr T) (M2 : matrix cr c T) :=
+  mat_of_list 0%Srng
+    (list_list_mul (S r) cr c (list_of_mat M1) (list_of_mat M2)).
+
+Print mat_mul.
+Print matrix.
+
+...
+
 Definition mat_mul {T} {ro : sring_op T} {r cr c}
     (M1 : matrix r cr T) (M2 : matrix cr c T) : matrix r c T.
 Proof.
@@ -1978,18 +1998,14 @@ set
    mat_of_list 0%Srng
      (list_list_mul (S r) cr c (list_of_mat M1) (list_of_mat M2))).
 unfold list_list_mul in M.
-rewrite map_length, seq_length in M.
-replace (seq 0 (S r)) with (seq 0 1 ++ seq 1 r) in M by easy.
 cbn in M.
-rewrite map_length, seq_length in M.
-apply M.
+do 2 rewrite my_map_length in M.
+do 2 rewrite my_seq_length in M.
+easy.
 Defined.
 
-(**)
-Compute (let _ := nat_sring_op in mat_mul (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]])).
-(*
--> too many opaque theorems
-*)
+Compute (let _ := nat_sring_op in mat_mul (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) : matrix 3 3 _).
+Print mat_mul.
 
 ...
 
