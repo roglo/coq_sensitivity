@@ -1868,6 +1868,16 @@ Definition my_map_length A B (f : A → B) l :=
     (λ (a : A) (l0 : list A) (IHl : length (map f l0) = length l0),
        f_equal_nat nat S (length (map f l0)) (length l0) IHl) l.
 
+Definition my_seq_app len1 :=
+  nat_ind (λ len2 : nat, ∀ len3 start : nat, seq start (len2 + len3) = seq start len2 ++ seq (start + len2) len3)
+    (λ len2 start : nat, eq_ind_r (λ n : nat, seq start len2 = seq n len2) eq_refl (Nat.add_0_r start))
+    (λ (len1' : nat) (IHlen : ∀ len2 start : nat,
+                                seq start (len1' + len2) = seq start len1' ++ seq (start + len1') len2)
+       (len2 start : nat),
+       eq_ind_r (λ n : nat, start :: seq (S start) (len1' + len2) = start :: seq (S start) len1' ++ seq n len2)
+         (eq_ind_r (λ l : list nat, start :: l = start :: seq (S start) len1' ++ seq (S (start + len1')) len2)
+            eq_refl (IHlen len2 (S start))) (Nat.add_succ_r start len1')) len1.
+
 Definition mat_mul {T} {ro : sring_op T} {r cr c}
     (M1 : matrix r cr T) (M2 : matrix cr c T) : matrix r c T.
 Proof.
@@ -1892,52 +1902,24 @@ move c2 before c1.
 cbn in M.
 unfold list_list_nrows in M.
 unfold list_list_ncols in M.
-assert (Hr : length (list_list_mul r cr c l1 l2) = r). {
+transparent assert (Hr : length (list_list_mul r cr c l1 l2) = r). {
   unfold list_list_mul.
   now rewrite my_map_length, my_seq_length.
 }
-assert (Hc : length (hd [] (list_list_mul r cr c l1 l2)) = c). {
+transparent assert (Hc : length (hd [] (list_list_mul r cr c l1 l2)) = c). {
   unfold list_list_mul.
-  cbn.
   destruct r; [ easy | clear Hrz ].
-...
-unfold list_list_mul in M.
-cbn in M.
-...
-
-Definition mat_mul {T} {ro : sring_op T} {r cr c}
-    (M1 : matrix r cr T) (M2 : matrix cr c T) :=
-  mat_of_list 0%Srng
-    (list_list_mul (S r) cr c (list_of_mat M1) (list_of_mat M2)).
-
-Print mat_mul.
-Print matrix.
-
-Definition mat_mul' {T} {ro : sring_op T} {r cr c}
-    (M1 : matrix r cr T) (M2 : matrix cr c T) : matrix r c T.
-Proof.
-destruct r. {
-  apply {| mat_vec := vec_repeat 0 (vec_repeat c 0%Srng) |}.
+  replace (S r) with (1 + r) by easy.
+  rewrite my_seq_app.
+  cbn - [ Nat.sub ].
+  rewrite map_length.
+  apply my_seq_length.
 }
-set
-  (M :=
-   mat_of_list 0%Srng
-     (list_list_mul (S r) cr c (list_of_mat M1) (list_of_mat M2))).
-unfold list_list_mul in M.
-cbn in M.
-do 2 rewrite my_map_length in M.
-do 2 rewrite my_seq_length in M.
-easy.
+rewrite Hr, Hc in M.
+apply M.
 Defined.
 
-Compute (let _ := nat_sring_op in mat_mul (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]])).
-Compute (let _ := nat_sring_op in mat_mul' (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) : matrix 3 3 nat).
-Print mat_mul.
-
-(* mat_mul does not produce a "matrix r c T"; the bounds are complicated;
-   OTOH, mat_mul' is complicated, therefore proofs over mat_mul are going to be
-   painful *)
-(* how to choose? *)
+Compute (let _ := nat_sring_op in mat_mul (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]])).
 
 ...
 
