@@ -1998,6 +1998,8 @@ set
      (list_list_mul r cr c (list_of_mat M1) (list_of_mat M2))).
 unfold list_list_mul in M.
 rewrite map_length, seq_length in M.
+unfold max_list_list_length in M.
+Search list_of_mat.
 ...
 rewrite max_list_list_length_list_of_mat in M.
 Search max_list_list_length.
