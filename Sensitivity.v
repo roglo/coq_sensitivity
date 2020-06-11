@@ -1806,7 +1806,7 @@ apply vec_length.
 Qed.
 *)
 
-Theorem mat_nrows_transpose : ∀ T r c d (M : matrix r c T),
+Theorem mat_nrows_transpose : ∀ {T r c d} {M : matrix r c T},
   list_list_nrows (list_list_transpose d (list_of_mat M)) = c.
 Proof.
 intros.
@@ -1815,44 +1815,29 @@ unfold list_list_nrows, list_list_transpose.
 now rewrite map_length, seq_length.
 Qed.
 
-Theorem mat_ncols_transpose : ∀ T r c d (M : matrix r c T),
-  list_list_ncols (list_list_transpose d (list_of_mat M)) = r.
+Theorem mat_ncols_transpose : ∀ {T r c d} {M : matrix r c T},
+  c ≠ 0
+  → list_list_ncols (list_list_transpose d (list_of_mat M)) = r.
 Proof.
-intros.
+intros * Hcz.
 destruct M as (l, r1, c1); cbn.
-unfold list_list_ncols, list_list_transpose.
-...
+unfold list_list_transpose.
+unfold list_list_nrows in r1.
+rewrite r1, c1.
+unfold list_list_ncols in c1 |-*.
+destruct c; [ easy | clear Hcz; cbn ].
+now rewrite map_length, seq_length.
+Qed.
 
-Definition mat_transpose T r c (d : T) (M : matrix r c T) : matrix c r T.
-Proof.
-intros.
-apply
+Definition mat_transpose T r c (d : T) (Hcz : c ≠ 0) (M : matrix r c T) :
+    matrix c r T :=
   {| mat_list := list_list_transpose d (list_of_mat M);
-     mat_nrows := mat_nrows_transpose d M;
-     mat_ncols := mat_ncols_transpose d M |}.
-...
-(*
-destruct r. {
-  apply {| mat_vec := vec_repeat c (vec_repeat 0 d) |}.
-}
-destruct c. {
-  apply {| mat_vec := vec_repeat 0 (vec_repeat (S r) d) |}.
-}
-*)
-set (M' := mat_of_list (list_list_transpose d (list_of_mat M))).
-Print mat_of_list.
+     mat_nrows := mat_nrows_transpose;
+     mat_ncols := mat_ncols_transpose Hcz |}.
 
-unfold list_list_transpose in M'.
-rewrite map_length, seq_length in M'.
-rewrite list_of_mat_length in M'.
-rewrite list_list_ncols_list_of_mat in M'; [ | easy ].
-unfold list_list_ncols in M'.
-remember (seq 0 (S c)) as s eqn:Hs.
-rewrite <- (Nat.add_1_l c), seq_app, Nat.add_0_l in Hs; subst s.
-cbn in M'.
-rewrite map_length, seq_length in M'.
-apply M'.
-Defined.
+Compute (mat_transpose 0 (Nat.neq_succ_0 _) (mat_of_list [[1; 2; 3; 4; 7]; [5; 6; 7; 8]; [9; 10; 11; 12]]) : matrix 5 3 nat).
+
+...
 
 Definition list_list_mul T {ro : sring_op T} r cr c (ll1 ll2 : list (list T)) :=
   map
