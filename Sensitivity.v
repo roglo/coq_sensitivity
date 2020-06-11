@@ -1985,9 +1985,7 @@ Definition mat_mul {T} {ro : sring_op T} {r cr c}
 Print mat_mul.
 Print matrix.
 
-...
-
-Definition mat_mul {T} {ro : sring_op T} {r cr c}
+Definition mat_mul' {T} {ro : sring_op T} {r cr c}
     (M1 : matrix r cr T) (M2 : matrix cr c T) : matrix r c T.
 Proof.
 destruct r. {
@@ -2004,8 +2002,14 @@ do 2 rewrite my_seq_length in M.
 easy.
 Defined.
 
-Compute (let _ := nat_sring_op in mat_mul (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) : matrix 3 3 _).
+Compute (let _ := nat_sring_op in mat_mul (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]])).
+Compute (let _ := nat_sring_op in mat_mul' (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) : matrix 3 3 nat).
 Print mat_mul.
+
+(* mat_mul does not produce a "matrix r c T"; the bounds are complicated;
+   OTOH, mat_mul' is complicated, therefore proofs over mat_mul are going to be
+   painful *)
+(* how to choose? *)
 
 ...
 
