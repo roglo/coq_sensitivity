@@ -1736,36 +1736,36 @@ Record matrix nrow ncol T :=
 
 Arguments mat_vec {_} {_} {_}.
 
-Definition max_list_list_length T (ll : list (list T)) :=
+Definition list_list_ncols T (ll : list (list T)) :=
   fold_left (λ a l, max a (length l)) ll 0.
 
 (*
-Definition max_list_list_length {T} ll :=
+Definition list_list_ncols {T} ll :=
   fold_left max (map (length (A:=T)) ll) 0.
 *)
 
 Theorem vec_listp : ∀ {T} {d : T} {ll : list (list T)} {l},
   length
-    (firstn (max_list_list_length ll)
-       (l ++ repeat d (max_list_list_length ll))) =
-  max_list_list_length ll.
+    (firstn (list_list_ncols ll)
+       (l ++ repeat d (list_list_ncols ll))) =
+  list_list_ncols ll.
 Proof.
 intros.
 rewrite firstn_length.
 rewrite app_length.
 rewrite repeat_length.
-remember (max_list_list_length ll) as m eqn:Hm.
+remember (list_list_ncols ll) as m eqn:Hm.
 replace m with (0 + m) at 1 by easy.
 now rewrite Nat.add_min_distr_r.
 Qed.
 
 Definition vec_list_of_list_list {T} (d : T) (ll : list (list T)) :
-    list (vector (max_list_list_length ll) T) :=
+    list (vector (list_list_ncols ll) T) :=
   map
     (λ l,
      {| vec_list :=
-          firstn (max_list_list_length ll)
-            (l ++ repeat d (max_list_list_length ll));
+          firstn (list_list_ncols ll)
+            (l ++ repeat d (list_list_ncols ll));
         vec_length := vec_listp |})
     ll.
 
@@ -1803,7 +1803,7 @@ now rewrite map_length.
 Qed.
 
 Definition mat_of_list T (d : T) (ll : list (list T)) :
-    matrix (length ll) (max_list_list_length ll) T :=
+    matrix (length ll) (list_list_ncols ll) T :=
   {| mat_vec :=
        {| vec_list := vec_list_of_list_list d ll;
           vec_length := vec_of_list_list_length |} |}.
@@ -1906,7 +1906,7 @@ Locate "Σ".
 
 Definition list_list_transpose {T} d (ll : list (list T)) : list (list T) :=
   let r := length ll in
-  let c := max_list_list_length ll in
+  let c := list_list_ncols ll in
   map (λ i, map (λ j, list_list_el d ll j i) (seq 0 r)) (seq 0 c).
 (*
   map (λ i, map (λ j, nth i (nth j ll []) d) (seq 0 r)) (seq 0 c).
@@ -1916,9 +1916,9 @@ Compute (list_list_transpose 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]).
 
 Require Import Init.Nat.
 
-Theorem max_list_list_length_list_of_mat : ∀ T r c (M : matrix r c T),
+Theorem list_list_ncols_list_of_mat : ∀ T r c (M : matrix r c T),
   r ≠ 0
-  → max_list_list_length (list_of_mat M) = c.
+  → list_list_ncols (list_of_mat M) = c.
 Proof.
 intros * Hrz.
 destruct M as ((V, P)); cbn.
@@ -1942,8 +1942,8 @@ set (M' := mat_of_list d (list_list_transpose d (list_of_mat M))).
 unfold list_list_transpose in M'.
 rewrite map_length, seq_length in M'.
 rewrite list_of_mat_length in M'.
-rewrite max_list_list_length_list_of_mat in M'; [ | easy ].
-unfold max_list_list_length in M'.
+rewrite list_list_ncols_list_of_mat in M'; [ | easy ].
+unfold list_list_ncols in M'.
 rewrite List_fold_left_map in M'.
 replace (fold_left _ _ _) with
   (fold_left (λ c _, max c (S r)) (seq 0 (S c)) 0) in M'. 2: {
@@ -1998,12 +1998,12 @@ set
      (list_list_mul r cr c (list_of_mat M1) (list_of_mat M2))).
 unfold list_list_mul in M.
 rewrite map_length, seq_length in M.
-unfold max_list_list_length in M.
+unfold list_list_ncols in M.
 Search list_of_mat.
 ...
-rewrite max_list_list_length_list_of_mat in M.
-Search max_list_list_length.
-Check max_list_list_length_list_of_mat.
+rewrite list_list_ncols_list_of_mat in M.
+Search list_list_ncols.
+Check list_list_ncols_list_of_mat.
 Search matrix.
 Print mat_of_list.
 ...
