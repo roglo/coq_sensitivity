@@ -1706,8 +1706,10 @@ Require Import Semiring SRsummation.
 
 (* matrices *)
 
-Record matrix (nrows ncols : nat) T :=
-  { mat_list : list (list T) }.
+Record matrix T :=
+  { mat_list : list (list T);
+    mat_nrows : nat;
+    mat_ncols : nat }.
 
 Definition list_list_nrows T (ll : list (list T)) :=
   length ll.
@@ -1715,17 +1717,12 @@ Definition list_list_nrows T (ll : list (list T)) :=
 Definition list_list_ncols T (ll : list (list T)) :=
   length (hd [] ll).
 
-Definition mat_of_list T (ll : list (list T)) :
-    matrix (list_list_nrows ll) (list_list_ncols ll) T :=
-  {| mat_list := ll |}.
+Definition mat_of_list T (ll : list (list T)) : matrix T :=
+  {| mat_list := ll;
+     mat_nrows := list_list_nrows ll;
+     mat_ncols := list_list_ncols ll |}.
 
 Compute (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
-Compute (mat_of_list [[1; 2; 3; 4]; [5; 6]; [7; 8; 9]] : matrix 3 4 nat).
-
-Definition list_of_mat T nrow ncol (M : matrix nrow ncol T) :=
-  mat_list M.
-
-Compute (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat).
 
 Definition list_list_el {T} d (ll : list (list T)) i j : T :=
   nth j (nth i ll []) d.
@@ -1733,31 +1730,32 @@ Definition list_list_el {T} d (ll : list (list T)) i j : T :=
 Compute (let (i, j) := (2, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j).
 Compute (let (i, j) := (7, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j).
 
-Definition mat_el T r c d (M : matrix r c T) i j : T :=
-  list_list_el d (list_of_mat M) i j.
+Definition mat_el T d (M : matrix T) i j : T :=
+  list_list_el d (mat_list M) i j.
 
-Compute (let (i, j) := (2, 1) in mat_el 42 (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat) i j).
-Compute (let (i, j) := (7, 1) in mat_el 42 (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat) i j).
-Compute (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat).
+Compute (let (i, j) := (2, 1) in mat_el 42 (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix nat) i j).
+Compute (let (i, j) := (7, 1) in mat_el 42 (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix nat) i j).
+Compute (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix nat).
 
 Definition list_list_transpose {T} d (ll : list (list T)) : list (list T) :=
-  let r := length ll in
+  let r := list_list_nrows ll in
   let c := list_list_ncols ll in
   map (λ i, map (λ j, list_list_el d ll j i) (seq 0 r)) (seq 0 c).
 
 Compute (list_list_transpose 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]).
 
-Definition mat_transpose T r c (d : T) (Hcz : c ≠ 0) (M : matrix r c T) :
-    matrix c r T :=
-  {| mat_list := list_list_transpose d (list_of_mat M) |}.
+Definition mat_transpose T (d : T) (M : matrix T) : matrix T :=
+  {| mat_list := list_list_transpose d (mat_list M);
+     mat_nrows := mat_ncols M;
+     mat_ncols := mat_nrows M |}.
 
-Compute (mat_transpose 0 (Nat.neq_succ_0 _) (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) : matrix 4 3 nat).
+Compute (mat_transpose 0 (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
 
 Definition list_list_mul T {ro : sring_op T} r cr c (ll1 ll2 : list (list T)) :=
   map
-    (λ k,
+    (λ i,
      map
-       (λ i,
+       (λ k,
         Σ (j = 0, cr - 1),
         list_list_el 0 ll1 i j * list_list_el 0 ll2 j k)%Srng
        (seq 0 c))
@@ -1769,18 +1767,31 @@ Definition nat_sring_op : sring_op nat :=
      srng_add := Nat.add;
      srng_mul := Nat.mul |}.
 
+Compute (let _ := nat_sring_op in list_list_mul 3 4 2 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] [[1; 2]; [3; 4]; [5; 6]; [0; 0]]).
+
 Compute (let _ := nat_sring_op in list_list_mul 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
 
-Definition mat_mul {T} {ro : sring_op T} {r cr c}
-    (M1 : matrix r cr T) (M2 : matrix cr c T) : matrix r c T :=
-  {| mat_list := list_list_mul r cr c (mat_list M1) (mat_list M2) |}.
+(* multiplication of matrices is always defined, even if the # of columns
+   of the first matrice is not equal to the # of rows of the second one;
+   in that case, the result has not sense; theorems likely have to add the
+   condition among its hypotheses *)
 
-Compute (let _ := nat_sring_op in mat_mul (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]])).
+Definition mat_mul {T} {ro : sring_op T} (M1 M2 : matrix T) : matrix T :=
+  {| mat_list :=
+       list_list_mul (mat_nrows M1) (mat_ncols M1) (mat_ncols M2) (mat_list M1)
+         (mat_list M2);
+     mat_nrows := mat_nrows M1;
+     mat_ncols := mat_ncols M2 |}.
 
-Compute (let _ := nat_sring_op in mat_mul (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) : matrix 3 3 nat).
+Compute (let _ := nat_sring_op in mat_mul (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]; [0; 0]])).
 
-Definition mat_nrows T r c (M : matrix r c T) := r.
-Definition mat_ncols T r c (M : matrix r c T) := c.
+...
+
+Compute (let _ := nat_sring_op in mat_mul (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]])).
+Compute (let _ := nat_sring_op in mat_mul (mat_of_list [[1; 2]; [3; 4]; [5; 6]])
+  (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
+
+...
 
 Compute (let _ := nat_sring_op in mat_ncols (mat_mul (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]))).
 
