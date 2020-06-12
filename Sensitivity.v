@@ -1727,29 +1727,6 @@ Definition list_of_mat T nrow ncol (M : matrix nrow ncol T) :=
 
 Compute (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat).
 
-(*
-Definition repeat_length' :=
-λ (A : Type) (x : A) (n : nat),
-  nat_ind (λ n0 : nat, length (repeat x n0) = n0) eq_refl
-    (λ (k : nat) (Hrec : length (repeat x k) = k), eq_ind_r (λ n0 : nat, S n0 = S k) eq_refl Hrec) n
-     : length (repeat x n) = n.
-
-Check repeat_length'.
-
-Definition vec_repeat {T} len (d : T) : vector len T :=
-  match repeat_length d len with
-  | eq_refl => vec_of_list (repeat d len)
-  end.
-
-Definition vec_repeat' {T} len (d : T) : vector len T :=
-  match repeat_length' d len with
-  | eq_refl => vec_of_list (repeat d len)
-  end.
-
-Compute (vec_repeat 3 0).
-Compute (vec_repeat' 3 0).
-*)
-
 Definition list_list_el {T} d (ll : list (list T)) i j : T :=
   nth j (nth i ll []) d.
 
@@ -1769,20 +1746,6 @@ Definition list_list_transpose {T} d (ll : list (list T)) : list (list T) :=
   map (λ i, map (λ j, list_list_el d ll j i) (seq 0 r)) (seq 0 c).
 
 Compute (list_list_transpose 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]).
-
-(*
-Theorem list_list_ncols_list_of_mat : ∀ T r c (M : matrix r c T),
-  r ≠ 0
-  → list_list_ncols (list_of_mat M) = c.
-Proof.
-intros * Hrz.
-destruct M as ((V, P)); cbn.
-rewrite <- P in Hrz; clear r P.
-unfold list_list_ncols.
-destruct V as [| v]; [ easy | clear Hrz; cbn ].
-apply vec_length.
-Qed.
-*)
 
 Definition mat_transpose T r c (d : T) (Hcz : c ≠ 0) (M : matrix r c T) :
     matrix c r T :=
@@ -1816,11 +1779,13 @@ Compute (let _ := nat_sring_op in mat_mul (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7
 
 Compute (let _ := nat_sring_op in mat_mul (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) : matrix 3 3 nat).
 
-...
+(* matrices of matrices *)
 
-Inductive mmatrix T :=
-  | MM_1 : matrix T → mmatrix T
-  | MM_M : vector nat → vector nat → matrix (mmatrix T) → mmatrix T.
+Inductive mmatrix r c T :=
+  | MM_1 : matrix r c T → mmatrix 1 1 T
+  | MM_M : matrix r c (mmatrix T) → mmatrix T.
+
+...
 
 Arguments MM_1 {_}.
 Arguments MM_M {_}.
