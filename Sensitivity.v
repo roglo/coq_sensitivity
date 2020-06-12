@@ -1706,46 +1706,24 @@ Require Import Semiring SRsummation.
 
 (* matrices *)
 
+Record matrix (nrows ncols : nat) T :=
+  { mat_list : list (list T) }.
+
 Definition list_list_nrows T (ll : list (list T)) :=
   length ll.
 
 Definition list_list_ncols T (ll : list (list T)) :=
   length (hd [] ll).
 
-Record matrix nrows ncols T :=
-  { mat_list : list (list T);
-    mat_nrows : list_list_nrows mat_list = nrows;
-    mat_ncols : list_list_ncols mat_list = ncols }.
-
-Print matrix.
-
-(*
-Arguments mat_list {_} {_} {_}.
-*)
-
 Definition mat_of_list T (ll : list (list T)) :
     matrix (list_list_nrows ll) (list_list_ncols ll) T :=
-  {| mat_list := ll; mat_nrows := eq_refl; mat_ncols := eq_refl |}.
+  {| mat_list := ll |}.
+
+Compute (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
+Compute (mat_of_list [[1; 2; 3; 4]; [5; 6]; [7; 8; 9]] : matrix 3 4 nat).
 
 Definition list_of_mat T nrow ncol (M : matrix nrow ncol T) :=
   mat_list M.
-
-Theorem mat_eq_eq : ∀ T nrow ncol (M1 M2 : matrix nrow ncol T),
-  M1 = M2 ↔ list_of_mat M1 = list_of_mat M2.
-Proof.
-intros.
-split; [ now intros; subst M2 | ].
-intros HMM.
-destruct M1 as (l1, r1, c1).
-destruct M2 as (l2, r2, c2).
-move r2 before r1.
-cbn in HMM; subst l2.
-f_equal; apply UIP_nat.
-Qed.
-
-Theorem list_of_mat_length : ∀ {T r c} (M : matrix r c T),
-  length (list_of_mat M) = r.
-Proof. now intros; destruct M. Qed.
 
 Compute (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix 3 3 nat).
 
@@ -1806,34 +1784,9 @@ apply vec_length.
 Qed.
 *)
 
-Theorem mat_nrows_transpose : ∀ {T r c d} {M : matrix r c T},
-  list_list_nrows (list_list_transpose d (list_of_mat M)) = c.
-Proof.
-intros.
-destruct M as (l, r1, c1); cbn.
-unfold list_list_nrows, list_list_transpose.
-now rewrite map_length, seq_length.
-Qed.
-
-Theorem mat_ncols_transpose : ∀ {T r c d} {M : matrix r c T},
-  c ≠ 0
-  → list_list_ncols (list_list_transpose d (list_of_mat M)) = r.
-Proof.
-intros * Hcz.
-destruct M as (l, r1, c1); cbn.
-unfold list_list_transpose.
-unfold list_list_nrows in r1.
-rewrite r1, c1.
-unfold list_list_ncols in c1 |-*.
-destruct c; [ easy | clear Hcz; cbn ].
-now rewrite map_length, seq_length.
-Qed.
-
 Definition mat_transpose T r c (d : T) (Hcz : c ≠ 0) (M : matrix r c T) :
     matrix c r T :=
-  {| mat_list := list_list_transpose d (list_of_mat M);
-     mat_nrows := mat_nrows_transpose;
-     mat_ncols := mat_ncols_transpose Hcz |}.
+  {| mat_list := list_list_transpose d (list_of_mat M) |}.
 
 Compute (mat_transpose 0 (Nat.neq_succ_0 _) (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) : matrix 4 3 nat).
 
@@ -1856,46 +1809,12 @@ Definition nat_sring_op : sring_op nat :=
 Compute (let _ := nat_sring_op in list_list_mul 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
 
 Definition mat_mul {T} {ro : sring_op T} {r cr c}
-    (M1 : matrix r cr T) (M2 : matrix cr c T) : matrix r c T.
-Proof.
-destruct (Nat.eq_dec r 0) as [Hrz| Hrz]. {
-  subst r.
-  destruct M1 as (l1, c1, r1).
-  destruct M2 as (l2, c2, r2).
-  unfold list_list_nrows in c1, c2.
-  apply length_zero_iff_nil in c1; subst l1.
-  cbn in r1; subst cr.
-  apply length_zero_iff_nil in c2; subst l2.
-  unfold list_list_ncols in r2.
-  subst c; cbn.
-  now exists [].
-}
-set
-  (M := mat_of_list (list_list_mul r cr c (list_of_mat M1) (list_of_mat M2))).
-destruct M1 as (l1, c1, r1).
-destruct M2 as (l2, c2, r2).
-move l2 before l1.
-move c2 before c1.
-cbn in M.
-unfold list_list_nrows in M.
-unfold list_list_ncols in M.
-assert (Hr : length (list_list_mul r cr c l1 l2) = r). {
-  unfold list_list_mul.
-  now rewrite map_length, seq_length.
-}
-assert (Hc : length (hd [] (list_list_mul r cr c l1 l2)) = c). {
-  unfold list_list_mul.
-  destruct r; [ easy | clear Hrz ].
-  replace (S r) with (1 + r) by easy.
-  rewrite seq_app.
-  cbn - [ Nat.sub ].
-  now rewrite map_length, seq_length.
-}
-rewrite Hr, Hc in M.
-apply M.
-Defined.
+    (M1 : matrix r cr T) (M2 : matrix cr c T) : matrix r c T :=
+  {| mat_list := list_list_mul r cr c (mat_list M1) (mat_list M2) |}.
 
 Compute (let _ := nat_sring_op in mat_mul (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]])).
+
+Compute (let _ := nat_sring_op in mat_mul (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) : matrix 3 3 nat).
 
 ...
 
