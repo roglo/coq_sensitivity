@@ -1788,15 +1788,13 @@ Compute (let _ := nat_sring_op in mat_mul (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 
 Compute (let _ := nat_sring_op in mat_mul (mat_of_list [[1; 2]; [3; 4]; [5; 6]])
   (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
 
-...
-
 Compute (let _ := nat_sring_op in mat_ncols (mat_mul (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]))).
 
 (* matrices of matrices *)
 
-Inductive mmatrix r c T :=
-  | MM_1 : matrix r c T → mmatrix 1 1 T
-  | MM_M : matrix r c (mmatrix T) → mmatrix T.
+Inductive mmatrix T :=
+  | MM_1 : matrix T → mmatrix T
+  | MM_M : matrix (mmatrix T) → mmatrix T.
 
 ...
 
