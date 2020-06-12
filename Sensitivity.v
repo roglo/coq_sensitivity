@@ -1818,6 +1818,38 @@ Compute (let _ := nat_sring_op in mat_mul (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7
 
 ...
 
+Inductive mmatrix T :=
+  | MM_1 : matrix T → mmatrix T
+  | MM_M : vector nat → vector nat → matrix (mmatrix T) → mmatrix T.
+
+Arguments MM_1 {_}.
+Arguments MM_M {_}.
+
+Fixpoint mmat_opp {T} {ro : ring_op T} MM :=
+  match MM with
+  | MM_1 M => MM_1 (mat_opp M)
+  | MM_M vr vc mm => MM_M vr vc {| matel i j := mmat_opp (matel mm i j) |}
+  end.
+
+Definition mmat_of_list {T} (d : T) (ll : list (list (mmatrix T))) :
+    matrix (mmatrix T) :=
+  {| matel i j := nth i (nth j ll []) (MM_1 {| matel i j := d |}) |}.
+
+Fixpoint A {T} {ro : ring_op T} n :=
+  match n with
+  | 0 => MM_1 (mat_of_list 0%Rng [])
+(*
+  | 1 => MM_1 (mat_of_list 0%Rng [[0; 1]; [1; 0]]%Rng)
+*)
+  | S n' =>
+       MM_M {| vecel _ := 2 |} {| vecel _ := 2 |}
+         (mmat_of_list 0%Rng
+            [[A n'; MM_1 I];
+             [MM_1 I; mmat_opp (A n')]])
+  end.
+
+...
+
 (* old version *)
 (* the type "matrix" defines infinite sized matrices; the limited size
    is given by functions such that mat_mul which, multiplying a m×n
