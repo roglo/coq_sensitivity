@@ -1807,6 +1807,43 @@ Inductive mmatrix T :=
 Arguments MM_1 {_}.
 Arguments MM_M {_}.
 
+Definition void_mat T :=
+  {| mat_list := ([] : list (list T)); mat_nrows := 0; mat_ncols := 0 |}.
+Definition void_mmat T :=
+  MM_1 (void_mat T).
+
+...
+
+Fixpoint mmat_nrows_ub {T} (MM : mmatrix T) :=
+  match MM with
+  | MM_1 M => mat_nrows M
+  | MM_M MMM =>
+      mat_nrows MMM +
+      Σ (i = 0, mat_nrows MMM - 1),
+        mmat_nrows_ub (mat_el (void_mmat _) MMM i 0)
+  end.
+
+Fixpoint nrows_ub T (MMM : matrix (mmatrix T)) {struct MMM} :=
+  mat_nrows MMM +
+  Σ (i = 0, mat_nrows MMM - 1),
+    match mat_el (void_mmat _) MMM i 0 with
+    | MM_1 M => mat_nrows M
+    | MM_M MMM' => nrows_ub MMM'
+    end.
+
+Fixpoint mmat_nrows T it (MM : mmatrix T) :=
+  match it with
+  | 0 => 42
+  | S it' =>
+      match MM with
+      | MM_1 M => mat_nrows M
+      | MM_M MMM =>
+          fold_left (λ n mm, n + mmat_nrows it' mm) (hd [] (mat_list MMM)) 0
+      end
+  end.
+
+...
+
 Fixpoint mmat_opp T {ro : ring_op T} MM : mmatrix T :=
   match MM with
   | MM_1 M => MM_1 (mat_opp M)
@@ -1856,7 +1893,8 @@ Compute (let _ := Z_ring_op in A 1).
 Compute (let _ := Z_ring_op in A 2).
 Compute (let _ := Z_ring_op in A 3).
 
-Definition mmat_which_row T (it : nat) (mm : matrix (mmatrix T)) (i im : nat) := (0, 0).
+Definition mmat_which_row T (it : nat) (mm : matrix (mmatrix T)) (i im : nat) :=
+  (0, 0).
 
 Definition mmat_which_col T (it : nat) (mm : matrix (mmatrix T)) (j jm : nat) := (0, 0).
 
