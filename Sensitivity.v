@@ -1791,7 +1791,7 @@ Compute (let _ := nat_sring_op in mat_mul (mat_of_list [[1; 2]; [3; 4]; [5; 6]])
 Compute (let _ := nat_sring_op in mat_ncols (mat_mul (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]))).
 
 Definition list_list_opp T {ro : ring_op T} (ll : list (list T)) :=
-  map (map (λ a, rng_opp a)) ll.
+  map (map rng_opp) ll.
 
 Definition mat_opp T {ro : ring_op T} (M : matrix T) :=
   {| mat_list := list_list_opp (mat_list M);
@@ -1807,13 +1807,17 @@ Inductive mmatrix T :=
 Arguments MM_1 {_}.
 Arguments MM_M {_}.
 
-...
-
 Fixpoint mmat_opp T {ro : ring_op T} MM : mmatrix T :=
   match MM with
   | MM_1 M => MM_1 (mat_opp M)
-  | MM_M mm => MM_M (mmat_opp mm)
+  | MM_M MMM =>
+      MM_M
+        {| mat_list := map (map (λ mm, mmat_opp mm)) (mat_list MMM);
+           mat_nrows := mat_nrows MMM;
+           mat_ncols := mat_ncols MMM |}
   end.
+
+...
 
 Definition mmat_of_list {T} (d : T) (ll : list (list (mmatrix T))) :
     matrix (mmatrix T) :=
