@@ -1812,17 +1812,7 @@ Definition void_mat T :=
 Definition void_mmat T :=
   MM_1 (void_mat T).
 
-...
-
-Fixpoint mmat_nrows_ub {T} (MM : mmatrix T) :=
-  match MM with
-  | MM_1 M => mat_nrows M
-  | MM_M MMM =>
-      mat_nrows MMM +
-      Σ (i = 0, mat_nrows MMM - 1),
-        mmat_nrows_ub (mat_el (void_mmat _) MMM i 0)
-  end.
-
+(*
 Fixpoint nrows_ub T (MMM : matrix (mmatrix T)) {struct MMM} :=
   mat_nrows MMM +
   Σ (i = 0, mat_nrows MMM - 1),
@@ -1830,19 +1820,7 @@ Fixpoint nrows_ub T (MMM : matrix (mmatrix T)) {struct MMM} :=
     | MM_1 M => mat_nrows M
     | MM_M MMM' => nrows_ub MMM'
     end.
-
-Fixpoint mmat_nrows T it (MM : mmatrix T) :=
-  match it with
-  | 0 => 42
-  | S it' =>
-      match MM with
-      | MM_1 M => mat_nrows M
-      | MM_M MMM =>
-          fold_left (λ n mm, n + mmat_nrows it' mm) (hd [] (mat_list MMM)) 0
-      end
-  end.
-
-...
+*)
 
 Fixpoint mmat_opp T {ro : ring_op T} MM : mmatrix T :=
   match MM with
@@ -1888,10 +1866,29 @@ Fixpoint A T {ro : ring_op T} n :=
 
 Require Import ZArith.
 
+Fixpoint mmat_nrows T it (MM : mmatrix T) :=
+  match it with
+  | 0 => 0
+  | S it' =>
+      match MM with
+      | MM_1 M => mat_nrows M
+      | MM_M MMM =>
+          fold_left (λ n mm, n + mmat_nrows it' mm) (hd [] (mat_list MMM)) 0
+      end
+  end.
+
 Compute (let _ := Z_ring_op in A 0).
 Compute (let _ := Z_ring_op in A 1).
 Compute (let _ := Z_ring_op in A 2).
 Compute (let _ := Z_ring_op in A 3).
+Compute (let n := 0 in let _ := Z_ring_op in mmat_nrows (S n) (A n)).
+Compute (let n := 1 in let _ := Z_ring_op in mmat_nrows (S n) (A n)).
+Compute (let n := 2 in let _ := Z_ring_op in mmat_nrows (S n) (A n)).
+Compute (let n := 3 in let _ := Z_ring_op in mmat_nrows (S n) (A n)).
+Compute (let n := 4 in let _ := Z_ring_op in mmat_nrows (S n) (A n)).
+Compute (let n := 5 in let _ := Z_ring_op in mmat_nrows (S n) (A n)).
+
+...
 
 Definition mmat_which_row T (it : nat) (mm : matrix (mmatrix T)) (i im : nat) :=
   (0, 0).
