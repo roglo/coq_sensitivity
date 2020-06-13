@@ -1836,7 +1836,7 @@ Definition list_list_I T {ro : ring_op T} n :=
 Definition I T {ro : ring_op T} n :=
   {| mat_list := list_list_I n; mat_nrows := n; mat_ncols := n |}.
 
-Fixpoint A {T} {ro : ring_op T} n :=
+Fixpoint A T {ro : ring_op T} n :=
   match n with
   | 0 => MM_1 (mat_of_list [[0%Rng]])
 (*
@@ -1855,6 +1855,31 @@ Compute (let _ := Z_ring_op in A 0).
 Compute (let _ := Z_ring_op in A 1).
 Compute (let _ := Z_ring_op in A 2).
 Compute (let _ := Z_ring_op in A 3).
+
+...
+
+Definition mmat_which_row {T} it (nc : vector nat) (mm : matrix (mmatrix T)) (i im : nat) := (0, 0).
+
+Definition mmat_which_col {T} it (nc : vector nat) (mm : matrix (mmatrix T)) (j jm : nat) := (0, 0).
+
+Fixpoint mmat_el {T} {ro : ring_op T} (MM : mmatrix T) i j :=
+  match MM with
+  | MM_1 M => mat_el M i j
+  | MM_M mm =>
+      let (nrows_bef, im) := mmat_which_row (S i) vr mm i 0 in
+      let (ncols_bef, jm) := mmat_which_col (S j) vc mm j 0 in
+      mmatel' (matel mm im jm) (i - nrows_bef) (j - ncols_bef)
+  end.
+...
+
+(* "We prove by induction that A_n^2 = nI" *)
+
+Lemma lemma_2_A_n_2_eq_n_I (ro := Z_ring_op) (mro : ring_op (mmatrix Z)) :
+  ∀ n i j,
+  (i < 2 ^ n)%nat → (j < 2 ^ n)%nat
+  → mmat_el (mmat_mul (A' n) (A' n)) i j = mat_el (nI n) i j.
+Proof.
+intros * Hi Hj.
 
 ...
 
