@@ -328,9 +328,29 @@ Proof. now intros; cbn; rewrite srng_mul_1_r. Qed.
 
 End sring_theorems.
 
+(* Rings *)
+
 Class ring_op A :=
   { rng_sring : sring_op A;
     rng_opp : A → A }.
 
 Definition rng_sub A {R : ring_op A} (S := rng_sring) a b :=
   srng_add a (rng_opp b).
+
+Declare Scope ring_scope.
+
+Delimit Scope ring_scope with Rng.
+Notation "0" := (@srng_zero _ rng_sring) : ring_scope.
+Notation "1" := (@srng_one _ rng_sring) : ring_scope.
+
+(* Ring of integers *)
+
+Require Import ZArith.
+
+Definition Z_ring_op : ring_op Z :=
+  {| rng_sring :=
+       {| srng_zero := 0%Z;
+          srng_one := 1%Z;
+          srng_add := Z.add;
+          srng_mul := Z.mul |};
+     rng_opp := Z.opp |}.

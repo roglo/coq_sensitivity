@@ -1817,45 +1817,44 @@ Fixpoint mmat_opp T {ro : ring_op T} MM : mmatrix T :=
            mat_ncols := mat_ncols MMM |}
   end.
 
-Definition mmat_of_list {T} (d : T) (ll : list (list (mmatrix T))) :
+Definition mmat_of_list T (ll : list (list (mmatrix T))) :
     matrix (mmatrix T) :=
   {| mat_list := ll;
      mat_nrows := list_list_nrows ll;
      mat_ncols := list_list_ncols ll |}.
 
-...
+Definition list_list_I T {ro : ring_op T} n :=
+  map
+    (λ i,
+     map
+       (λ j,
+        if Nat.eq_dec i j then @srng_one T rng_sring
+        else @srng_zero T rng_sring)
+       (seq 0 n))
+    (seq 0 n).
 
-Definition I {T} {ro : ring_op T} :=
-  {| matel i j := if Nat.eq_dec i j then rng_one else rng_zero |}.
+Definition I T {ro : ring_op T} n :=
+  {| mat_list := list_list_I n; mat_nrows := n; mat_ncols := n |}.
 
 Fixpoint A {T} {ro : ring_op T} n :=
   match n with
-  | 0 => MM_1 (mat_of_list [[0]])
+  | 0 => MM_1 (mat_of_list [[0%Rng]])
+(*
+  | 1 => MM_1 (mat_of_list [[0%Rng; 1%Rng]; [1%Rng; 0%Rng]])
+*)
   | S n' =>
        MM_M
          (mmat_of_list
-            [[A n'; MM_1 I];
-             [MM_1 I; mmat_opp (A n')]])
+            [[A n'; MM_1 (I (2 ^ n'))];
+             [MM_1 (I (2 ^ n')); mmat_opp (A n')]])
   end.
 
-...
+Require Import ZArith.
 
-Definition mmat_of_list {T} (d : T) (ll : list (list (mmatrix T))) :
-    matrix (mmatrix T) :=
-  {| matel i j := nth i (nth j ll []) (MM_1 {| matel i j := d |}) |}.
-
-Fixpoint A {T} {ro : ring_op T} n :=
-  match n with
-  | 0 => MM_1 (mat_of_list 0%Rng [])
-(*
-  | 1 => MM_1 (mat_of_list 0%Rng [[0; 1]; [1; 0]]%Rng)
-*)
-  | S n' =>
-       MM_M {| vecel _ := 2 |} {| vecel _ := 2 |}
-         (mmat_of_list 0%Rng
-            [[A n'; MM_1 I];
-             [MM_1 I; mmat_opp (A n')]])
-  end.
+Compute (let _ := Z_ring_op in A 0).
+Compute (let _ := Z_ring_op in A 1).
+Compute (let _ := Z_ring_op in A 2).
+Compute (let _ := Z_ring_op in A 3).
 
 ...
 
