@@ -1790,27 +1790,13 @@ Compute (let _ := nat_sring_op in mat_mul (mat_of_list [[1; 2]; [3; 4]; [5; 6]])
 
 Compute (let _ := nat_sring_op in mat_ncols (mat_mul (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]))).
 
-(* ah oui mais non : un semi-anneau n'a pas d'opposé *)
-(* faut que j'utilise les anneaux.
-   J'en ai bien une définition mais, le mieux, c'est que ce soit
-   une extension des semi-anneaux. Mais en tant qu'extension, ça
-   va pas parce que, dans les semi-anneaux, le fait que 0 soit
-   absorbant est un axiome, alors que dans les anneaux, c'est une
-   conséquence de l'opposé et de la distributivité.
-     Faudrait alors que je définisse la notion de semi-semi-anneau
-   dans laquelle la propriété d'absorption de 0 n'y soit pas.
-     Un anneau serait alors une sur-structure des semi-semi-anneaux
-   mais pas des anneaux.
-     Ou alors je m'en fiche et je dis que c'est un détail. *)
-...
-Definition list_list_opp T {ro : sring_op T} (ll : list (list T)) :=
-  map (map (λ a, srng_opp a)) ll.
+Definition list_list_opp T {ro : ring_op T} (ll : list (list T)) :=
+  map (map (λ a, rng_opp a)) ll.
 
-Definition mat_opp T (M : matrix T) :=
-  {| mat_list := list_list_opp (mat_list M) |}.
-
-Definition mat_opp {T} {ro : sring_op T} (M : matrix T) :=
-  {| matel i j := rng_opp (matel M i j) |}.
+Definition mat_opp T {ro : ring_op T} (M : matrix T) :=
+  {| mat_list := list_list_opp (mat_list M);
+     mat_nrows := mat_nrows M;
+     mat_ncols := mat_ncols M |}.
 
 (* matrices of matrices *)
 
@@ -1821,10 +1807,12 @@ Inductive mmatrix T :=
 Arguments MM_1 {_}.
 Arguments MM_M {_}.
 
-Fixpoint mmat_opp {T} {ro : sring_op T} MM :=
+...
+
+Fixpoint mmat_opp T {ro : ring_op T} MM : mmatrix T :=
   match MM with
   | MM_1 M => MM_1 (mat_opp M)
-  | MM_M vr vc mm => MM_M vr vc {| matel i j := mmat_opp (matel mm i j) |}
+  | MM_M mm => MM_M (mmat_opp mm)
   end.
 
 Definition mmat_of_list {T} (d : T) (ll : list (list (mmatrix T))) :

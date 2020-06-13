@@ -327,3 +327,10 @@ Proof. now intros; cbn; rewrite srng_mul_1_r. Qed.
 *)
 
 End sring_theorems.
+
+Class ring_op A :=
+  { rng_sring : sring_op A;
+    rng_opp : A → A }.
+
+Definition rng_sub A {R : ring_op A} (S := rng_sring) a b :=
+  srng_add a (rng_opp b).
