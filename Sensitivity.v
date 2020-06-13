@@ -1856,19 +1856,17 @@ Compute (let _ := Z_ring_op in A 1).
 Compute (let _ := Z_ring_op in A 2).
 Compute (let _ := Z_ring_op in A 3).
 
-...
+Definition mmat_which_row T (it : nat) (mm : matrix (mmatrix T)) (i im : nat) := (0, 0).
 
-Definition mmat_which_row {T} it (nc : vector nat) (mm : matrix (mmatrix T)) (i im : nat) := (0, 0).
+Definition mmat_which_col T (it : nat) (mm : matrix (mmatrix T)) (j jm : nat) := (0, 0).
 
-Definition mmat_which_col {T} it (nc : vector nat) (mm : matrix (mmatrix T)) (j jm : nat) := (0, 0).
-
-Fixpoint mmat_el {T} {ro : ring_op T} (MM : mmatrix T) i j :=
+Fixpoint mmat_el T dmm {ro : ring_op T} (MM : mmatrix T) i j {struct MM} :=
   match MM with
-  | MM_1 M => mat_el M i j
+  | MM_1 M => mat_el 0%Rng M i j
   | MM_M mm =>
-      let (nrows_bef, im) := mmat_which_row (S i) vr mm i 0 in
-      let (ncols_bef, jm) := mmat_which_col (S j) vc mm j 0 in
-      mmatel' (matel mm im jm) (i - nrows_bef) (j - ncols_bef)
+      let (nrows_bef, im) := mmat_which_row (S i) mm i 0 in
+      let (ncols_bef, jm) := mmat_which_col (S j) mm j 0 in
+      mmat_el dmm (mat_el dmm mm im jm) (i - nrows_bef) (j - ncols_bef)
   end.
 ...
 
