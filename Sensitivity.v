@@ -1790,16 +1790,16 @@ Compute (let _ := nat_sring_op in mat_mul (mat_of_list [[1; 2]; [3; 4]; [5; 6]])
 
 Compute (let _ := nat_sring_op in mat_ncols (mat_mul (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]))).
 
-(* ah oui mais non : un sous-anneau n'a pas d'opposé *)
+(* ah oui mais non : un semi-anneau n'a pas d'opposé *)
 (* faut que j'utilise les anneaux.
    J'en ai bien une définition mais, le mieux, c'est que ce soit
-   une extension des sous-anneaux. Mais en tant qu'extension, ça
-   va pas parce que, dans les sous-anneaux, le fait que 0 soit
+   une extension des semi-anneaux. Mais en tant qu'extension, ça
+   va pas parce que, dans les semi-anneaux, le fait que 0 soit
    absorbant est un axiome, alors que dans les anneaux, c'est une
    conséquence de l'opposé et de la distributivité.
-     Faudrait alors que je définisse la notion de sous-sous-anneau
+     Faudrait alors que je définisse la notion de semi-semi-anneau
    dans laquelle la propriété d'absorption de 0 n'y soit pas.
-     Un anneau serait alors une sur-structure des sous-sous-anneaux
+     Un anneau serait alors une sur-structure des semi-semi-anneaux
    mais pas des anneaux.
      Ou alors je m'en fiche et je dis que c'est un détail. *)
 ...
