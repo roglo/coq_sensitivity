@@ -1817,6 +1817,27 @@ Fixpoint mmat_opp T {ro : ring_op T} MM : mmatrix T :=
            mat_ncols := mat_ncols MMM |}
   end.
 
+Definition mmat_of_list {T} (d : T) (ll : list (list (mmatrix T))) :
+    matrix (mmatrix T) :=
+  {| mat_list := ll;
+     mat_nrows := list_list_nrows ll;
+     mat_ncols := list_list_ncols ll |}.
+
+...
+
+Definition I {T} {ro : ring_op T} :=
+  {| matel i j := if Nat.eq_dec i j then rng_one else rng_zero |}.
+
+Fixpoint A {T} {ro : ring_op T} n :=
+  match n with
+  | 0 => MM_1 (mat_of_list [[0]])
+  | S n' =>
+       MM_M
+         (mmat_of_list
+            [[A n'; MM_1 I];
+             [MM_1 I; mmat_opp (A n')]])
+  end.
+
 ...
 
 Definition mmat_of_list {T} (d : T) (ll : list (list (mmatrix T))) :
