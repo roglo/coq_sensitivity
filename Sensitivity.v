@@ -1897,10 +1897,16 @@ Fixpoint mmat_which_row T {ro : sring_op T} (it : nat) (MMM : matrix (mmatrix T)
   match it with
   | 0 => (42, 43)
   | S it' =>
-      let nr := mmat_nrows 500 (mat_el (void_mmat _) MMM im 0) in
-      if lt_dec i nr then mmat_which_row it' MMM i im
+      let curr_MM := mat_el (void_mmat _) MMM im 0 in
+      let nr := mmat_nrows 500 curr_MM in
+      if lt_dec i nr then
+        match curr_MM with
+        | MM_1 M => (0, i)
+        | MM_M MMM' => mmat_which_row it' MMM' i 0
+        end
       else
-        let (nrows_bef, im') := mmat_which_row it' MMM (i - nr .... ah oui mais non (S im) in
+        let (nrows_bef, ir) := mmat_which_row it' MMM (i - nr) (S im) in
+        (nr + nrows_bef, ir)
   end.
 
 Definition mat_which_row T {ro : sring_op T} (MM : mmatrix T) i :=
@@ -1914,6 +1920,7 @@ Require Import ZArith.
 Compute (let _ := Z_ring_op in A 2).
 Compute (let _ := Z_ring_op in mmat_nrows 500 (A 2)).
 Compute (let _ := Z_ring_op in mat_which_row (A 2) 0).
+Compute (let _ := Z_ring_op in mat_which_row (A 2) 1).
 
 ...
 
