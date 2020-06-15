@@ -1854,9 +1854,9 @@ Definition I T {ro : ring_op T} n :=
 Fixpoint A T {ro : ring_op T} n :=
   match n with
   | 0 => MM_1 (mat_of_list [[0%Rng]])
-(*
+(**)
   | 1 => MM_1 (mat_of_list [[0%Rng; 1%Rng]; [1%Rng; 0%Rng]])
-*)
+(**)
   | S n' =>
        MM_M
          (mmat_of_list
@@ -1888,11 +1888,6 @@ Compute (let n := 3 in let _ := Z_ring_op in mmat_nrows (S n) (A n)).
 Compute (let n := 4 in let _ := Z_ring_op in mmat_nrows (S n) (A n)).
 Compute (let n := 5 in let _ := Z_ring_op in mmat_nrows (S n) (A n)).
 
-(* pffff.... c'est compliqué, tout ça...
-   pourtant faut que je le fasse...
-   ou alors, essayer d'y réfléchir sur du papier...
-*)
-
 Fixpoint mmat_which_row T {ro : sring_op T} (it : nat) (MMM : matrix (mmatrix T)) (i im : nat) :=
   match it with
   | 0 => (42, 43)
@@ -1921,10 +1916,12 @@ Compute (let _ := Z_ring_op in A 2).
 Compute (let _ := Z_ring_op in mmat_nrows 500 (A 2)).
 Compute (let _ := Z_ring_op in mat_which_row (A 2) 0).
 Compute (let _ := Z_ring_op in mat_which_row (A 2) 1).
-
-...
+Compute (let _ := Z_ring_op in mat_which_row (A 2) 2).
+Compute (let _ := Z_ring_op in mat_which_row (A 2) 3).
 
 Definition mmat_which_col T (it : nat) (mm : matrix (mmatrix T)) (j jm : nat) := (0, 0).
+
+... (* le problème, c'est le nombre d'itérations max *)
 
 Fixpoint mmat_el T dmm {ro : ring_op T} (MM : mmatrix T) i j {struct MM} :=
   match MM with
