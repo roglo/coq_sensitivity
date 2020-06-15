@@ -1888,12 +1888,20 @@ Compute (let n := 3 in let _ := Z_ring_op in mmat_nrows (S n) (A n)).
 Compute (let n := 4 in let _ := Z_ring_op in mmat_nrows (S n) (A n)).
 Compute (let n := 5 in let _ := Z_ring_op in mmat_nrows (S n) (A n)).
 
+(* pffff.... c'est compliqué, tout ça...
+   pourtant faut que je le fasse...
+   ou alors, essayer d'y réfléchir sur du papier...
+*)
+
+...
+
 Fixpoint mmat_which_row T {ro : sring_op T} (it : nat) (MMM : matrix (mmatrix T)) (i im : nat) :=
   match it with
   | 0 => (0, 0)
   | S it' =>
       let nr := mmat_nrows (S im) (mat_el (void_mmat _) MMM i 0) in
-      if lt_dec i nr then (nr, 42)
+      if lt_dec i nr then
+        match mat_el (void_mmat _) MMM ... with
       else (nr, nr)
   end.
 
