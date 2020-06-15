@@ -1888,10 +1888,27 @@ Compute (let n := 3 in let _ := Z_ring_op in mmat_nrows (S n) (A n)).
 Compute (let n := 4 in let _ := Z_ring_op in mmat_nrows (S n) (A n)).
 Compute (let n := 5 in let _ := Z_ring_op in mmat_nrows (S n) (A n)).
 
-...
+Fixpoint mmat_which_row T {ro : sring_op T} (it : nat) (MMM : matrix (mmatrix T)) (i im : nat) :=
+  match it with
+  | 0 => (0, 0)
+  | S it' =>
+      let nr := mmat_nrows (S im) (mat_el (void_mmat _) MMM i 0) in
+      if lt_dec i nr then (nr, 42)
+      else (nr, nr)
+  end.
 
-Definition mmat_which_row T (it : nat) (mm : matrix (mmatrix T)) (i im : nat) :=
-  (0, 0).
+Definition mat_which_row T {ro : sring_op T} (MM : mmatrix T) i :=
+  match MM with
+  | MM_1 M => (0, i)
+  | MM_M MMM => mmat_which_row (S i) MMM i 0
+  end.
+
+Require Import ZArith.
+
+Compute (let _ := Z_ring_op in A 1).
+Compute (let _ := Z_ring_op in mat_which_row (A 1) 0).
+
+...
 
 Definition mmat_which_col T (it : nat) (mm : matrix (mmatrix T)) (j jm : nat) := (0, 0).
 
