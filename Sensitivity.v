@@ -1879,7 +1879,7 @@ Definition mmat_mul T {ro : sring_op T} {mro : sring_op (mmatrix T)}
       end
   end.
 
-Definition mat_of_mmat T MM
+Definition mat_of_mmat T (MM : mmatrix T) := 42.
 (* perhaps doing that, I could prove A_n^2 = nI easier *)
 
 ...
