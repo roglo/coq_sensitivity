@@ -1921,7 +1921,8 @@ Compute (let _ := Z_ring_op in mat_which_row (A 2) 3).
 
 Definition mmat_which_col T (it : nat) (mm : matrix (mmatrix T)) (j jm : nat) := (0, 0).
 
-... (* le problème, c'est le nombre d'itérations max *)
+... (* le problème, c'est le nombre d'itérations max
+       pour A, ça va, mais dans le cas général ? *)
 
 Fixpoint mmat_el T dmm {ro : ring_op T} (MM : mmatrix T) i j {struct MM} :=
   match MM with
