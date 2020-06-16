@@ -1879,6 +1879,16 @@ Definition mmat_mul T {ro : sring_op T} {mro : sring_op (mmatrix T)}
       end
   end.
 
+Require Import ZArith.
+Print Z_ring_op.
+
+Definition mmat_sring_op T : sring_op (mmatrix T).
+...
+
+Search mmatrix.
+
+Compute (let ro := @rng_sring Z Z_ring_op in mmat_mul (A 2) (A 2)).
+
 Definition mat_of_mmat T (MM : mmatrix T) := 42.
 (* perhaps doing that, I could prove A_n^2 = nI easier *)
 
