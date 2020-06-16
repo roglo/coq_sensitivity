@@ -1864,7 +1864,22 @@ Fixpoint A T {ro : ring_op T} n :=
              [MM_1 (I (2 ^ n')); mmat_opp (A n')]])
   end.
 
-Definition mat_of_mmat ...
+Definition mmat_mul T {ro : sring_op T} {mro : sring_op (mmatrix T)}
+    (A B : mmatrix T) :=
+  match A with
+  | MM_1 MA =>
+      match B with
+      | MM_1 MB => MM_1 (mat_mul MA MB)
+      | MM_M MMB => MM_1 (void_mat _)
+      end
+  | MM_M MMA =>
+      match B with
+      | MM_1 MB => MM_1 (void_mat _)
+      | MM_M MMB => MM_M (mat_mul MMA MMB)
+      end
+  end.
+
+Definition mat_of_mmat T MM
 (* perhaps doing that, I could prove A_n^2 = nI easier *)
 
 ...
@@ -1874,7 +1889,7 @@ Definition mat_of_mmat ...
 Theorem lemma_2_A_n_2_eq_n_I T (ro : ring_op T) (mro : ring_op (mmatrix T)) :
   ∀ n i j,
   (i < 2 ^ n)%nat → (j < 2 ^ n)%nat
-  → mmat_el (mmat_mul (A' n) (A' n)) i j = mat_el (nI n) i j.
+  → mat_el (mat_of_mmat (mmat_mul (A' n) (A' n))) i j = mat_el (nI n) i j.
 Proof.
 intros * Hi Hj.
 
