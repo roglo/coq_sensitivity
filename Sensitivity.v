@@ -1888,41 +1888,40 @@ Compute (let n := 3 in let _ := Z_ring_op in mmat_nrows (S n) (A n)).
 Compute (let n := 4 in let _ := Z_ring_op in mmat_nrows (S n) (A n)).
 Compute (let n := 5 in let _ := Z_ring_op in mmat_nrows (S n) (A n)).
 
-Fixpoint mmat_which_row T {ro : sring_op T} (it : nat) (MMM : matrix (mmatrix T)) (i im : nat) :=
+Fixpoint mmat_which_row T {ro : sring_op T} it tot_nrows (MMM : matrix (mmatrix T)) i im :=
   match it with
   | 0 => (42, 43)
   | S it' =>
       let curr_MM := mat_el (void_mmat _) MMM im 0 in
-      let nr := mmat_nrows 500 curr_MM in
+      let nr := mmat_nrows tot_nrows curr_MM in
       if lt_dec i nr then
         match curr_MM with
         | MM_1 M => (0, i)
-        | MM_M MMM' => mmat_which_row it' MMM' i 0
+        | MM_M MMM' => mmat_which_row it' tot_nrows MMM' i 0
         end
       else
-        let (nrows_bef, ir) := mmat_which_row it' MMM (i - nr) (S im) in
+        let (nrows_bef, ir) := mmat_which_row it' tot_nrows MMM (i - nr) (S im) in
         (nr + nrows_bef, ir)
   end.
 
-Definition mat_which_row T {ro : sring_op T} (MM : mmatrix T) i :=
+Definition mat_which_row T {ro : sring_op T} tot_nrows (MM : mmatrix T) i :=
   match MM with
   | MM_1 M => (0, i)
-  | MM_M MMM => mmat_which_row 500 MMM i 0
+  | MM_M MMM => mmat_which_row tot_nrows tot_nrows MMM i 0
   end.
 
 Require Import ZArith.
 
 Compute (let _ := Z_ring_op in A 2).
 Compute (let _ := Z_ring_op in mmat_nrows 500 (A 2)).
-Compute (let _ := Z_ring_op in mat_which_row (A 2) 0).
-Compute (let _ := Z_ring_op in mat_which_row (A 2) 1).
-Compute (let _ := Z_ring_op in mat_which_row (A 2) 2).
-Compute (let _ := Z_ring_op in mat_which_row (A 2) 3).
+Compute (let _ := Z_ring_op in mat_which_row 4 (A 2) 0).
+Compute (let _ := Z_ring_op in mat_which_row 4 (A 2) 1).
+Compute (let _ := Z_ring_op in mat_which_row 4 (A 2) 2).
+Compute (let _ := Z_ring_op in mat_which_row 4 (A 2) 3).
 
 Definition mmat_which_col T (it : nat) (mm : matrix (mmatrix T)) (j jm : nat) := (0, 0).
 
-... (* le problème, c'est le nombre d'itérations max
-       pour A, ça va, mais dans le cas général ? *)
+...
 
 Fixpoint mmat_el T dmm {ro : ring_op T} (MM : mmatrix T) i j {struct MM} :=
   match MM with
