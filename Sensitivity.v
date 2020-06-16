@@ -197,7 +197,7 @@ Arguments nth_find [A]%type_scope _%function_scope _%list_scope.
 
 (**)
 
-Lemma nth_find_nth_find_all_loop : ∀ A (f : A → bool) l i,
+Theorem nth_find_nth_find_all_loop : ∀ A (f : A → bool) l i,
   nth_find_loop f l i =
     match nth_find_all_loop f l i with
     | [] => i + length l
@@ -367,7 +367,7 @@ Compute (locate_list (dispatch_list [1; 2; 0])).
 Definition in_nth_list_of_pre_part n j i :=
   i mod n ^ (n - j) / n ^ (n - j - 1).
 
-Lemma not_in_nth_find_loop : ∀ A f (l : list A) i j,
+Theorem not_in_nth_find_loop : ∀ A f (l : list A) i j,
   i < j → i ≠ nth_find_loop f l j.
 Proof.
 intros * Hij.
@@ -379,7 +379,7 @@ destruct (f a); [ flia Hij H1 | ].
 now specialize (IHl i (j + 1) Hij1).
 Qed.
 
-Lemma not_in_nth_find_all_loop : ∀ A f (l : list A) i j,
+Theorem not_in_nth_find_all_loop : ∀ A f (l : list A) i j,
   i < j → i ∉ nth_find_all_loop f l j.
 Proof.
 intros * Hij.
@@ -394,7 +394,7 @@ destruct (f a). {
 now specialize (IHl i (j + 1) Hij1).
 Qed.
 
-Lemma in_nth_find_all_loop_eqb : ∀ l i k b,
+Theorem in_nth_find_all_loop_eqb : ∀ l i k b,
   b ∈ nth_find_all_loop (Nat.eqb i) l k
   → k ≤ b
   → nth (b - k) l 0 = i.
@@ -429,7 +429,7 @@ specialize (H1 H); clear H.
 now replace (b - (k + 1)) with bk in H1 by flia Hbk1.
 Qed.
 
-Lemma in_nth_find_all_loop_eqb_if : ∀ a l d,
+Theorem in_nth_find_all_loop_eqb_if : ∀ a l d,
   a < length l
   → a + d ∈ nth_find_all_loop (Nat.eqb (nth a l 0)) l d.
 Proof.
@@ -452,7 +452,7 @@ apply Nat.succ_lt_mono in Hal.
 now apply IHl.
 Qed.
 
-Lemma in_flat_map_nth_find_all_loop_eq : ∀ l j k len b,
+Theorem in_flat_map_nth_find_all_loop_eq : ∀ l j k len b,
   b ∈ flat_map (λ i, nth_find_all_loop (Nat.eqb i) l k) (seq j len)
   → k ≤ b
   → j ≤ nth (b - k) l 0 < j + len.
@@ -465,7 +465,7 @@ rewrite Hik.
 now apply in_seq in Hi.
 Qed.
 
-Lemma flat_map_nth_find_all_loop_cons : ∀ a l k i len,
+Theorem flat_map_nth_find_all_loop_cons : ∀ a l k i len,
   a < i ∨ i + len ≤ a
   → flat_map (λ j, nth_find_all_loop (Nat.eqb j) (a :: l) k) (seq i len) =
     flat_map (λ j, nth_find_all_loop (Nat.eqb j) l (k + 1)) (seq i len).
@@ -720,7 +720,7 @@ split. {
 }
 Qed.
 
-Lemma nth_find_loop_map : ∀ A B f (g : A → B) i l,
+Theorem nth_find_loop_map : ∀ A B f (g : A → B) i l,
   nth_find_loop f (map g l) i =
   nth_find_loop (λ a, f (g a)) l i.
 Proof.
@@ -847,7 +847,7 @@ specialize (in_nth_find_all_loop_eqb_if l 0 Ha) as H1.
 now rewrite Nat.add_0_r in H1.
 Qed.
 
-Lemma to_radix_loop_length : ∀ it n i, length (to_radix_loop it n i) = it.
+Theorem to_radix_loop_length : ∀ it n i, length (to_radix_loop it n i) = it.
 Proof.
 intros.
 revert n i.
@@ -855,7 +855,7 @@ induction it; intros; [ easy | cbn ].
 now rewrite IHit.
 Qed.
 
-Lemma in_to_radix_loop : ∀ it n i a,
+Theorem in_to_radix_loop : ∀ it n i a,
   n ≠ 0
   → a ∈ to_radix_loop it n i
   → a < n.
@@ -953,7 +953,7 @@ Definition pre_partition_in n j k i :=
 Compute (let n := 3 in let j := 1 in let k := 2 in map (λ i, (i, dispatch n i))
 (filter (pre_partition_in n j k) (seq 0 (n ^ n)))).
 
-Lemma nth_find_all_loop_app : ∀ A f (l1 l2 : list A) i,
+Theorem nth_find_all_loop_app : ∀ A f (l1 l2 : list A) i,
   nth_find_all_loop f (l1 ++ l2) i =
   nth_find_all_loop f l1 i ++ nth_find_all_loop f l2 (i + length l1).
 Proof.
@@ -1061,7 +1061,7 @@ Theorem eq_nth_find_all_nil : ∀ A f (l : list A),
   nth_find_all f l = [] ↔ ∀ i, i ∈ l → f i = false.
 Proof. intros; apply eq_nth_find_all_loop_nil. Qed.
 
-Lemma eq_nth_find_all_loop_cons : ∀ A f j (d : A) l l' i,
+Theorem eq_nth_find_all_loop_cons : ∀ A f j (d : A) l l' i,
   nth_find_all_loop f l i = j :: l' ↔
     i ≤ j < i + length l ∧
     (∀ k, i + k < j → f (nth k l d) = false) ∧
@@ -1212,7 +1212,7 @@ split. {
 }
 Qed.
 
-Lemma in_nth_nth_find_loop : ∀ ll i d,
+Theorem in_nth_nth_find_loop : ∀ ll i d,
   (∀ i, i < length ll → ∃ l : list nat, l ∈ ll ∧ i ∈ l)
   → i < length ll
   → i ∈ nth (nth_find_loop (nat_in_list i) ll d - d) ll [].
@@ -1313,7 +1313,7 @@ f_equal.
 now apply IHll.
 Qed.
 
-Lemma eq_nth_find_all_loop_iff : ∀ A f (d : A) l l1 i,
+Theorem eq_nth_find_all_loop_iff : ∀ A f (d : A) l l1 i,
   nth_find_all_loop f l i = l1 ↔
     match l1 with
     | [] => (∀ j, j ∈ l → f j = false)
@@ -1384,7 +1384,7 @@ rewrite <- Nat.mul_add_distr_r.
 now replace (1 + (n - 1)) with n by flia Hnz.
 Qed.
 
-Lemma fold_left_horner_eval_sum : ∀ k n a x,
+Theorem fold_left_horner_eval_sum : ∀ k n a x,
   fold_left (λ acc i : nat, acc * x + a (n + k - i))
     (seq (S k) n) (Σ (i = 0, k), a (n + i) * x ^ i) =
   fold_left (λ c i : nat, c + a (n + k - i) * x ^ (n + k - i))
@@ -1679,7 +1679,7 @@ Qed.
 (* "Given a n×n matrix A, a principal submatrix of A is obtained by deleting
     the same set of rows and columns from A.
 
-   Lemma 2.1. (Cauchy’s Interlace Theorem) Let A be a symmetric n×n matrix,
+   Theorem 2.1. (Cauchy’s Interlace Theorem) Let A be a symmetric n×n matrix,
       and B be a m×m principal submatrix of A, for some m < n. If the
       eigenvalues of A are λ₁ ≥ λ₂ ≥ … ≥ λ_n, and the eigenvalues of B
       are µ₁ ≥ µ₂ ≥ … ≥ µ_m, then for all 1 ≤ i ≤ m,
@@ -1864,6 +1864,22 @@ Fixpoint A T {ro : ring_op T} n :=
              [MM_1 (I (2 ^ n')); mmat_opp (A n')]])
   end.
 
+Definition mat_of_mmat ...
+(* perhaps doing that, I could prove A_n^2 = nI easier *)
+
+...
+
+(* "We prove by induction that A_n^2 = nI" *)
+
+Theorem lemma_2_A_n_2_eq_n_I T (ro : ring_op T) (mro : ring_op (mmatrix T)) :
+  ∀ n i j,
+  (i < 2 ^ n)%nat → (j < 2 ^ n)%nat
+  → mmat_el (mmat_mul (A' n) (A' n)) i j = mat_el (nI n) i j.
+Proof.
+intros * Hi Hj.
+
+...
+
 Require Import ZArith.
 
 Fixpoint mmat_nrows T it (MM : mmatrix T) :=
@@ -1935,7 +1951,7 @@ Fixpoint mmat_el T dmm {ro : ring_op T} (MM : mmatrix T) i j {struct MM} :=
 
 (* "We prove by induction that A_n^2 = nI" *)
 
-Lemma lemma_2_A_n_2_eq_n_I (ro := Z_ring_op) (mro : ring_op (mmatrix Z)) :
+Theorem lemma_2_A_n_2_eq_n_I (ro := Z_ring_op) (mro : ring_op (mmatrix Z)) :
   ∀ n i j,
   (i < 2 ^ n)%nat → (j < 2 ^ n)%nat
   → mmat_el (mmat_mul (A' n) (A' n)) i j = mat_el (nI n) i j.
@@ -2035,7 +2051,7 @@ Compute (let _ := Z_ring_op in det 3 (mat_of_list 0%Z [[-1; 0; -3]; [-4; 4; -5];
 (* ok *)
 
 (*
-  "Lemma 2.2. We define a sequence of symmetric square matrices
+  "Theorem 2.2. We define a sequence of symmetric square matrices
    iteratively as follows,
                ⌈ 0 1 ⌉          ⌈ A_{n-1}   I       ⌉
          A₁ =  ⌊ 1 0 ⌋   A_n =  ⌊ I        -A_{n-1} ⌋
@@ -3022,7 +3038,7 @@ Print mat_of_mmat.
 
 (* "We prove by induction that A_n^2 = nI" *)
 
-Lemma lemma_2_A_n_2_eq_n_I (ro := Z_ring_op) (mro : ring_op (mmatrix Z)) :
+Theorem lemma_2_A_n_2_eq_n_I (ro := Z_ring_op) (mro : ring_op (mmatrix Z)) :
   ∀ n i j,
   (i < 2 ^ n)%nat → (j < 2 ^ n)%nat
   → mmatel (mmat_mul (A' n) (A' n)) i j = matel (nI n) i j.
@@ -3101,7 +3117,7 @@ unfold mmat_mul.
 destruct (Nat.eq_dec 2 2) as [H| H]; [ clear H | easy ].
 ...
 
-Lemma sqr_An1_from_sqr_An (ro := Z_ring_op) (rp := Z_ring_prop) : ∀ n,
+Theorem sqr_An1_from_sqr_An (ro := Z_ring_op) (rp := Z_ring_prop) : ∀ n,
   fin_mat_eq eq (2 ^ S n) (2 ^ S n)
     (mat_sqr (2 ^ S n) (A (S n)))
     (even_mat_of_mat_mat (2 ^ n)
@@ -3402,7 +3418,7 @@ destruct n. {
 }
 ...
 
-Lemma lemma_2_A_n_2_eq_n_I (R := Z_ring_op) : ∀ n,
+Theorem lemma_2_A_n_2_eq_n_I (R := Z_ring_op) : ∀ n,
   fin_mat_eq eq (2 ^ n) (2 ^ n)
     (mat_mul (2 ^ n) (A n) (A n)) (nI n).
 Proof.
@@ -3570,7 +3586,7 @@ Qed.
 Definition nI n :=
   {| matel i j := if Nat.eq_dec i j then Z.of_nat n else 0%Z |}.
 
-Lemma lemma_2_A_n_2_eq_n_I (R := Z_ring) : ∀ n i j,
+Theorem lemma_2_A_n_2_eq_n_I (R := Z_ring) : ∀ n i j,
   (i < 2 ^ n)%nat → (j < 2 ^ n)%nat
   → matel (mat_mul (2 ^ n) (A n) (A n)) i j = matel (nI n) i j.
 Proof.
