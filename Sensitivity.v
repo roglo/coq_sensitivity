@@ -1751,7 +1751,7 @@ Definition mat_transpose T (d : T) (M : matrix T) : matrix T :=
 
 Compute (mat_transpose 0 (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
 
-Definition list_list_mul T {ro : sring_op T} r cr c (ll1 ll2 : list (list T)) :=
+Definition list_list_mul T {ro : semiring_op T} r cr c (ll1 ll2 : list (list T)) :=
   map
     (λ i,
      map
@@ -1761,34 +1761,34 @@ Definition list_list_mul T {ro : sring_op T} r cr c (ll1 ll2 : list (list T)) :=
        (seq 0 c))
     (seq 0 r).
 
-Definition nat_sring_op : sring_op nat :=
+Definition nat_semiring_op : semiring_op nat :=
   {| srng_zero := 0;
      srng_one := 1;
      srng_add := Nat.add;
      srng_mul := Nat.mul |}.
 
-Compute (let _ := nat_sring_op in list_list_mul 3 4 2 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] [[1; 2]; [3; 4]; [5; 6]; [0; 0]]).
+Compute (let _ := nat_semiring_op in list_list_mul 3 4 2 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] [[1; 2]; [3; 4]; [5; 6]; [0; 0]]).
 
-Compute (let _ := nat_sring_op in list_list_mul 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
+Compute (let _ := nat_semiring_op in list_list_mul 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
 
 (* multiplication of matrices is always defined, even if the # of columns
    of the first matrice is not equal to the # of rows of the second one;
    in that case, the result has not sense; theorems likely have to add the
    condition among its hypotheses *)
 
-Definition mat_mul {T} {ro : sring_op T} (M1 M2 : matrix T) : matrix T :=
+Definition mat_mul {T} {ro : semiring_op T} (M1 M2 : matrix T) : matrix T :=
   {| mat_list :=
        list_list_mul (mat_nrows M1) (mat_ncols M1) (mat_ncols M2) (mat_list M1)
          (mat_list M2);
      mat_nrows := mat_nrows M1;
      mat_ncols := mat_ncols M2 |}.
 
-Compute (let _ := nat_sring_op in mat_mul (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]; [0; 0]])).
-Compute (let _ := nat_sring_op in mat_mul (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]])).
-Compute (let _ := nat_sring_op in mat_mul (mat_of_list [[1; 2]; [3; 4]; [5; 6]])
+Compute (let _ := nat_semiring_op in mat_mul (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]; [0; 0]])).
+Compute (let _ := nat_semiring_op in mat_mul (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]])).
+Compute (let _ := nat_semiring_op in mat_mul (mat_of_list [[1; 2]; [3; 4]; [5; 6]])
   (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
 
-Compute (let _ := nat_sring_op in mat_ncols (mat_mul (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]))).
+Compute (let _ := nat_semiring_op in mat_ncols (mat_mul (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]))).
 
 Definition list_list_opp T {ro : ring_op T} (ll : list (list T)) :=
   map (map rng_opp) ll.
@@ -1843,8 +1843,8 @@ Definition list_list_I T {ro : ring_op T} n :=
     (λ i,
      map
        (λ j,
-        if Nat.eq_dec i j then @srng_one T rng_sring
-        else @srng_zero T rng_sring)
+        if Nat.eq_dec i j then @srng_one T rng_semiring
+        else @srng_zero T rng_semiring)
        (seq 0 n))
     (seq 0 n).
 
@@ -1864,7 +1864,7 @@ Fixpoint A T {ro : ring_op T} n :=
              [MM_1 (I (2 ^ n')); mmat_opp (A n')]])
   end.
 
-Definition mmat_mul T {ro : sring_op T} {mro : sring_op (mmatrix T)}
+Definition mmat_mul T {ro : semiring_op T} {mro : semiring_op (mmatrix T)}
     (A B : mmatrix T) :=
   match A with
   | MM_1 MA =>
@@ -1882,12 +1882,17 @@ Definition mmat_mul T {ro : sring_op T} {mro : sring_op (mmatrix T)}
 Require Import ZArith.
 Print Z_ring_op.
 
-Definition mmat_sring_op T : sring_op (mmatrix T).
-...
-
+Print semiring_op.
 Search mmatrix.
 
-Compute (let ro := @rng_sring Z Z_ring_op in mmat_mul (A 2) (A 2)).
+Definition mmat_semiring_op T : semiring_op (mmatrix T) :=
+  {| srng_zero := void_mmat _;
+     srng_one := ...
+...
+
+Compute (let ro := @rng_semiring Z Z_ring_op in mmat_mul (A 2) (A 2)).
+
+Search mmatrix.
 
 Definition mat_of_mmat T (MM : mmatrix T) := 42.
 (* perhaps doing that, I could prove A_n^2 = nI easier *)
@@ -1929,7 +1934,7 @@ Compute (let n := 3 in let _ := Z_ring_op in mmat_nrows (S n) (A n)).
 Compute (let n := 4 in let _ := Z_ring_op in mmat_nrows (S n) (A n)).
 Compute (let n := 5 in let _ := Z_ring_op in mmat_nrows (S n) (A n)).
 
-Fixpoint mmat_which_row T {ro : sring_op T} it tot_nrows (MMM : matrix (mmatrix T)) i im :=
+Fixpoint mmat_which_row T {ro : semiring_op T} it tot_nrows (MMM : matrix (mmatrix T)) i im :=
   match it with
   | 0 => (42, 43)
   | S it' =>
@@ -1945,7 +1950,7 @@ Fixpoint mmat_which_row T {ro : sring_op T} it tot_nrows (MMM : matrix (mmatrix 
         (nr + nrows_bef, ir)
   end.
 
-Definition mat_which_row T {ro : sring_op T} tot_nrows (MM : mmatrix T) i :=
+Definition mat_which_row T {ro : semiring_op T} tot_nrows (MM : mmatrix T) i :=
   match MM with
   | MM_1 M => (0, i)
   | MM_M MMM => mmat_which_row tot_nrows tot_nrows MMM i 0

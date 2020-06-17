@@ -2,21 +2,21 @@
 
 Require Import Utf8.
 
-Class sring_op A :=
+Class semiring_op A :=
   { srng_zero : A;
     srng_one : A;
     srng_add : A → A → A;
     srng_mul : A → A → A }.
 
-Declare Scope sring_scope.
-Delimit Scope sring_scope with Srng.
-Notation "a + b" := (srng_add a b) : sring_scope.
-Notation "a * b" := (srng_mul a b) : sring_scope.
-Notation "0" := srng_zero : sring_scope.
-Notation "1" := srng_one : sring_scope.
+Declare Scope semiring_scope.
+Delimit Scope semiring_scope with Srng.
+Notation "a + b" := (srng_add a b) : semiring_scope.
+Notation "a * b" := (srng_mul a b) : semiring_scope.
+Notation "0" := srng_zero : semiring_scope.
+Notation "1" := srng_one : semiring_scope.
 
 (*
-Class sring_prop {A} {ro : ring_op A} :=
+Class semiring_prop {A} {ro : ring_op A} :=
   { srng_1_neq_0 : (1 ≠ 0)%Rng;
     srng_eq_dec : ∀ a b : A, {a = b} + {a ≠ b};
     srng_add_comm : ∀ a b : A, (a + b = b + a)%Rng;
@@ -31,18 +31,18 @@ Class sring_prop {A} {ro : ring_op A} :=
 Arguments srng_eq_dec {_} {_} {_} _%Rng _%Rng.
 *)
 
-Fixpoint srng_power {A} {R : sring_op A} a n :=
+Fixpoint srng_power {A} {R : semiring_op A} a n :=
   match n with
   | O => 1%Srng
   | S m => (a * srng_power a m)%Srng
   end.
 
-Notation "a ^ b" := (srng_power a b) : sring_scope.
+Notation "a ^ b" := (srng_power a b) : semiring_scope.
 
-Section sring_theorems.
+Section semiring_theorems.
 
 Context {A : Type}.
-Context {ro : sring_op A}.
+Context {ro : semiring_op A}.
 (*
 Context {rp : ring_prop}.
 *)
@@ -326,29 +326,29 @@ Theorem srng_pow_1_r : ∀ a, (a ^ 1 = a)%Srng.
 Proof. now intros; cbn; rewrite srng_mul_1_r. Qed.
 *)
 
-End sring_theorems.
+End semiring_theorems.
 
 (* Rings *)
 
 Class ring_op A :=
-  { rng_sring : sring_op A;
+  { rng_semiring : semiring_op A;
     rng_opp : A → A }.
 
-Definition rng_sub A {R : ring_op A} (S := rng_sring) a b :=
+Definition rng_sub A {R : ring_op A} (S := rng_semiring) a b :=
   srng_add a (rng_opp b).
 
 Declare Scope ring_scope.
 
 Delimit Scope ring_scope with Rng.
-Notation "0" := (@srng_zero _ rng_sring) : ring_scope.
-Notation "1" := (@srng_one _ rng_sring) : ring_scope.
+Notation "0" := (@srng_zero _ rng_semiring) : ring_scope.
+Notation "1" := (@srng_one _ rng_semiring) : ring_scope.
 
 (* Ring of integers *)
 
 Require Import ZArith.
 
 Definition Z_ring_op : ring_op Z :=
-  {| rng_sring :=
+  {| rng_semiring :=
        {| srng_zero := 0%Z;
           srng_one := 1%Z;
           srng_add := Z.add;

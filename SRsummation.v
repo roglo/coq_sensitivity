@@ -6,4 +6,4 @@ Import List.
 
 Notation "'Σ' ( i = b , e ) , g" :=
   (fold_left (λ c i, (c + g)%Srng) (seq b (S e - b)) 0%Srng)
-  (at level 45, i at level 0, b at level 60, e at level 60) : sring_scope.
+  (at level 45, i at level 0, b at level 60, e at level 60) : semiring_scope.
