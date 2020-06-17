@@ -1751,7 +1751,16 @@ Definition mat_transpose T (d : T) (M : matrix T) : matrix T :=
 
 Compute (mat_transpose 0 (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
 
-Definition list_list_mul T {ro : semiring_op T} r cr c (ll1 ll2 : list (list T)) :=
+Definition list_list_add T {ro : semiring_op T} r c
+    (ll1 ll2 : list (list T)) :=
+  map
+    (λ i,
+     map (λ j, list_list_el 0 ll1 i j + list_list_el 0 ll2 i j)%Srng
+       (seq 0 c))
+    (seq 0 r).
+
+Definition list_list_mul T {ro : semiring_op T} r cr c
+    (ll1 ll2 : list (list T)) :=
   map
     (λ i,
      map
@@ -1771,10 +1780,21 @@ Compute (let _ := nat_semiring_op in list_list_mul 3 4 2 [[1; 2; 3; 4]; [5; 6; 7
 
 Compute (let _ := nat_semiring_op in list_list_mul 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
 
+(* multiplication of matrices is always defined, even if the resp # of
+   rows (columns) of the first matrix is not equal to the # of rows
+   (columns) of ths second one ; in that case, the result has no sense *)
+
 (* multiplication of matrices is always defined, even if the # of columns
    of the first matrice is not equal to the # of rows of the second one;
    in that case, the result has not sense; theorems likely have to add the
    condition among its hypotheses *)
+
+Definition mat_add T {so : semiring_op T} (M1 M2 : matrix T) : matrix T :=
+  {| mat_list :=
+       list_list_add (mat_nrows M1) (mat_ncols M1) (mat_list M1)
+         (mat_list M2);
+     mat_nrows := mat_nrows M1;
+     mat_ncols := mat_ncols M1 |}.
 
 Definition mat_mul {T} {ro : semiring_op T} (M1 M2 : matrix T) : matrix T :=
   {| mat_list :=
@@ -1864,6 +1884,21 @@ Fixpoint A T {ro : ring_op T} n :=
              [MM_1 (I (2 ^ n')); mmat_opp (A n')]])
   end.
 
+Definition mmat_add T {ro : semiring_op T} {mro : semiring_op (mmatrix T)}
+    (A B : mmatrix T) :=
+  match A with
+  | MM_1 MA =>
+      match B with
+      | MM_1 MB => MM_1 (mat_add MA MB)
+      | MM_M MMB => MM_1 (void_mat _)
+      end
+  | MM_M MMA =>
+      match B with
+      | MM_1 MB => MM_1 (void_mat _)
+      | MM_M MMB => MM_M (mat_add MMA MMB)
+      end
+  end.
+
 Definition mmat_mul T {ro : semiring_op T} {mro : semiring_op (mmatrix T)}
     (A B : mmatrix T) :=
   match A with
@@ -1879,16 +1914,31 @@ Definition mmat_mul T {ro : semiring_op T} {mro : semiring_op (mmatrix T)}
       end
   end.
 
-Require Import ZArith.
-Print Z_ring_op.
+Definition mat_id T {so : semiring_op T} r c :=
+   {| mat_list :=
+        map
+          (λ i,
+           map
+             (λ j, if Nat.eq_dec i j then 1%Srng else 0%Srng) (seq 0 c))
+          (seq 0 r);
+      mat_nrows := r;
+      mat_ncols := c |}.
 
-Print semiring_op.
-Search mmatrix.
-
-Definition mmat_semiring_op T : semiring_op (mmatrix T) :=
-  {| srng_zero := void_mmat _;
-     srng_one := ...
 ...
+
+Definition mmat_semiring_op T {so : semiring_op T} r c :
+    semiring_op (mmatrix T) :=
+  {| srng_zero := void_mmat _;
+     srng_one := MM_1 (mat_id r c);
+     srng_add := mmat_add |}.
+
+...
+
+ {mro : semiring_op (mmatrix T)}
+
+...
+
+Require Import ZArith.
 
 Compute (let ro := @rng_semiring Z Z_ring_op in mmat_mul (A 2) (A 2)).
 
