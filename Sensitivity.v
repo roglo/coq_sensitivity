@@ -1884,8 +1884,7 @@ Fixpoint A T {ro : ring_op T} n :=
              [MM_1 (I (2 ^ n')); mmat_opp (A n')]])
   end.
 
-Definition mmat_add T {ro : semiring_op T} {mro : semiring_op (mmatrix T)}
-    (A B : mmatrix T) :=
+Fixpoint mmat_add T {ro : semiring_op T} (A B : mmatrix T) :=
   match A with
   | MM_1 MA =>
       match B with
@@ -1895,12 +1894,13 @@ Definition mmat_add T {ro : semiring_op T} {mro : semiring_op (mmatrix T)}
   | MM_M MMA =>
       match B with
       | MM_1 MB => MM_1 (void_mat _)
-      | MM_M MMB => MM_M (mat_add MMA MMB)
+      | MM_M MMB => MM_M (mmat_add MMA MMB)
       end
   end.
 
-Definition mmat_mul T {ro : semiring_op T} {mro : semiring_op (mmatrix T)}
-    (A B : mmatrix T) :=
+...
+
+Fixpoint mmat_mul T {ro : semiring_op T} (A B : mmatrix T) :=
   match A with
   | MM_1 MA =>
       match B with
@@ -1910,7 +1910,7 @@ Definition mmat_mul T {ro : semiring_op T} {mro : semiring_op (mmatrix T)}
   | MM_M MMA =>
       match B with
       | MM_1 MB => MM_1 (void_mat _)
-      | MM_M MMB => MM_M (mat_mul MMA MMB)
+      | MM_M MMB => MM_M (mmat_mul MMA MMB)
       end
   end.
 
