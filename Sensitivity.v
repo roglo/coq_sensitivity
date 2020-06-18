@@ -1832,16 +1832,6 @@ Definition void_mat T :=
 Definition void_mmat T :=
   MM_1 (void_mat T).
 
-(*
-Fixpoint nrows_ub T (MMM : matrix (mmatrix T)) {struct MMM} :=
-  mat_nrows MMM +
-  Σ (i = 0, mat_nrows MMM - 1),
-    match mat_el (void_mmat _) MMM i 0 with
-    | MM_1 M => mat_nrows M
-    | MM_M MMM' => nrows_ub MMM'
-    end.
-*)
-
 Fixpoint mmat_opp T {ro : ring_op T} MM : mmatrix T :=
   match MM with
   | MM_1 M => MM_1 (mat_opp M)
