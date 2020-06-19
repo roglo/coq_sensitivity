@@ -347,10 +347,12 @@ Notation "1" := (@srng_one _ rng_semiring) : ring_scope.
 
 Require Import ZArith.
 
+Definition Z_semiring_op : semiring_op Z :=
+  {| srng_zero := 0%Z;
+     srng_one := 1%Z;
+     srng_add := Z.add;
+     srng_mul := Z.mul |}.
+
 Definition Z_ring_op : ring_op Z :=
-  {| rng_semiring :=
-       {| srng_zero := 0%Z;
-          srng_one := 1%Z;
-          srng_add := Z.add;
-          srng_mul := Z.mul |};
+  {| rng_semiring := Z_semiring_op;
      rng_opp := Z.opp |}.
