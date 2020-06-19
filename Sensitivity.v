@@ -1827,10 +1827,10 @@ Inductive mmatrix T :=
 Arguments MM_1 {_}.
 Arguments MM_M {_}.
 
-Definition void_mat T :=
+Definition void_mat {T} : matrix T :=
   {| mat_list := ([] : list (list T)); mat_nrows := 0; mat_ncols := 0 |}.
-Definition void_mmat T :=
-  MM_1 (void_mat T).
+Definition void_mmat {T} : mmatrix T :=
+  MM_1 void_mat.
 
 Fixpoint mmat_opp T {ro : ring_op T} MM : mmatrix T :=
   match MM with
@@ -1876,23 +1876,33 @@ Fixpoint A T {ro : ring_op T} n :=
 
 Fixpoint mmat_add_loop T it zero add (A B : mmatrix T) :=
   match it with
-  | 0 => void_mmat _
+  | 0 => void_mmat
   | S it' =>
       match A with
       | MM_1 MA =>
           match B with
           | MM_1 MB => MM_1 (mat_add zero add MA MB)
-          | MM_M MMB => MM_1 (void_mat _)
+          | MM_M MMB => MM_1 void_mat
           end
       | MM_M MMA =>
           match B with
-          | MM_1 MB => MM_1 (void_mat _)
+          | MM_1 MB => MM_1 void_mat
           | MM_M MMB =>
-              MM_M
-                (mat_add (void_mmat _) (mmat_add_loop it' zero add) MMA MMB)
+              MM_M (mat_add void_mmat (mmat_add_loop it' zero add) MMA MMB)
           end
       end
   end.
+
+Definition mmat_depth T (MMM : matrix (mmatrix T)) :=
+  mat_el void_mmat MMM 0 0.
+
+Fixpoint mmat_depth T (MM : mmatrix T) :=
+  match MM with
+  | MM_1 M => 1
+  | MM_M MMM => 1 + mmat_depth (mat_el void_mmat MMM 0 0)
+  end.
+
+...
 
 (* would be better with a true max iterations instead of 42 :-) *)
 Definition mmat_add T {so : semiring_op T} (A B : mmatrix T) :=
