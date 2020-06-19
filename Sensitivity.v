@@ -1699,9 +1699,6 @@ Print ringType.
 Print GRing.Ring.type.
 *)
 
-(*
-Require Import Ring2 Rsummation Rpolynomial2.
-*)
 Require Import Semiring SRsummation.
 
 (* matrices *)

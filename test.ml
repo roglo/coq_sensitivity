@@ -10,59 +10,30 @@ value rec firstn n l =
       end
   end.
 value length = List.length;
-value hd l d = try List.hd l with [ Failure _ → d ];
+value hd d l = try List.hd l with [ Failure _ → d ];
 value rec repeat x n =
   match n with
   | 0 -> []
   | _ -> [x :: repeat x (n - 1)]
   end.
 
-type vector 'a =
-  { vec_list : list 'a }.
-
-value vec_list v = v.vec_list;
-
-value vec_of_list (l : list 'a) =
-  { vec_list = l }.
-
 type matrix 'a =
-  { mat_vec : vector (vector 'a) }.
+  { mat_list : list (list 'a);
+    mat_nrows : nat;
+    mat_ncols : nat }.
 
-value mat_vec v = v.mat_vec;
+value list_list_nrows (ll  : list (list 'a)) =
+  length ll.
 
-value vec_of_list_list (d : 'a) (ll : list (list 'a)) =
-  List.map
-    (fun l →
-     { vec_list =
-         firstn (length (hd [] ll))
-	   (List.append l (repeat d (length (hd [] ll)))) })
-    ll.
+value list_list_ncols (ll  : list (list 'a)) =
+  length (hd [] ll).
 
-value mat_of_list d ll =
-  { mat_vec = { vec_list = vec_of_list_list d ll } }.
-
-mat_of_list 0 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]];
+value mat_of_list (ll : list (list 'a)) : matrix 'a =
+  { mat_list = ll;
+    mat_nrows = list_list_nrows ll;
+    mat_ncols = list_list_ncols ll }.
 
 (*
-value nth i l d = try List.nth l i with [ Failure _ → d ].
-value rec seq start len =
-  if len ≤ 0 then [] else [start :: seq (start + 1) (len - 1)].
-value rec pow a b =
-  if b ≤ 0 then 1 else a * pow a (b - 1).
-
-type matrix 'a = { matel : nat → nat → 'a };
-type vector 'a = { vecel : nat → 'a }.
-
-value matel m = m.matel.
-value vecel v = v.vecel.
-
-value mat_of_list d ll =
-  { matel i j = nth i (nth j ll []) d }.
-
-value mat_opp m = { matel i j = - (matel m i j) }.
-
-value mI = { matel i j = if i = j then 1 else 0 }.
-
 type mmatrix 'a =
   [ MM_1 of matrix 'a
   | MM_M of vector nat and vector nat and matrix (mmatrix 'a) ].
