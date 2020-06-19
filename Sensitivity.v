@@ -1874,7 +1874,7 @@ Fixpoint A T {ro : ring_op T} n :=
              [MM_1 (I (2 ^ n')); mmat_opp (A n')]])
   end.
 
-Fixpoint mmat_add T it zero add (A B : mmatrix T) :=
+Fixpoint mmat_add_loop T it zero add (A B : mmatrix T) :=
   match it with
   | 0 => void_mmat _
   | S it' =>
@@ -1888,26 +1888,17 @@ Fixpoint mmat_add T it zero add (A B : mmatrix T) :=
           match B with
           | MM_1 MB => MM_1 (void_mat _)
           | MM_M MMB =>
-              MM_M (mat_add (void_mmat _) (mmat_add it' zero add) MMA MMB)
+              MM_M
+                (mat_add (void_mmat _) (mmat_add_loop it' zero add) MMA MMB)
           end
       end
   end.
 
-...
+(* would be better with a true max iterations instead of 42 :-) *)
+Definition mmat_add T {so : semiring_op T} (A B : mmatrix T) :=
+  mmat_add_loop 42 srng_zero srng_add A B.
 
-Fixpoint mmat_add T {ro : semiring_op T} (A B : mmatrix T) :=
-  match A with
-  | MM_1 MA =>
-      match B with
-      | MM_1 MB => MM_1 (mat_add MA MB)
-      | MM_M MMB => MM_1 (void_mat _)
-      end
-  | MM_M MMA =>
-      match B with
-      | MM_1 MB => MM_1 (void_mat _)
-      | MM_M MMB => MM_M (mmat_add MMA MMB)
-      end
-  end.
+Print mmat_add.
 
 ...
 
