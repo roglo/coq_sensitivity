@@ -1751,11 +1751,11 @@ Definition mat_transpose T (d : T) (M : matrix T) : matrix T :=
 
 Compute (mat_transpose 0 (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
 
-Definition list_list_add T {ro : semiring_op T} r c
+Definition list_list_add T zero (add : T → T → T) r c
     (ll1 ll2 : list (list T)) :=
   map
     (λ i,
-     map (λ j, list_list_el 0 ll1 i j + list_list_el 0 ll2 i j)%Srng
+     map (λ j, add (list_list_el zero ll1 i j) (list_list_el zero ll2 i j))
        (seq 0 c))
     (seq 0 r).
 
@@ -1789,9 +1789,9 @@ Compute (let _ := nat_semiring_op in list_list_mul 3 3 3 [[1; 2; 3]; [4; 5; 6]; 
    in that case, the result has not sense; theorems likely have to add the
    condition among its hypotheses *)
 
-Definition mat_add T {so : semiring_op T} (M1 M2 : matrix T) : matrix T :=
+Definition mat_add T zero add (M1 M2 : matrix T) : matrix T :=
   {| mat_list :=
-       list_list_add (mat_nrows M1) (mat_ncols M1) (mat_list M1)
+       list_list_add zero add (mat_nrows M1) (mat_ncols M1) (mat_list M1)
          (mat_list M2);
      mat_nrows := mat_nrows M1;
      mat_ncols := mat_ncols M1 |}.
@@ -1874,6 +1874,27 @@ Fixpoint A T {ro : ring_op T} n :=
              [MM_1 (I (2 ^ n')); mmat_opp (A n')]])
   end.
 
+Fixpoint mmat_add T it zero add (A B : mmatrix T) :=
+  match it with
+  | 0 => void_mmat _
+  | S it' =>
+      match A with
+      | MM_1 MA =>
+          match B with
+          | MM_1 MB => MM_1 (mat_add zero add MA MB)
+          | MM_M MMB => MM_1 (void_mat _)
+          end
+      | MM_M MMA =>
+          match B with
+          | MM_1 MB => MM_1 (void_mat _)
+          | MM_M MMB =>
+              MM_M (mat_add (void_mmat _) (mmat_add it' zero add) MMA MMB)
+          end
+      end
+  end.
+
+...
+
 Fixpoint mmat_add T {ro : semiring_op T} (A B : mmatrix T) :=
   match A with
   | MM_1 MA =>
@@ -1887,6 +1908,24 @@ Fixpoint mmat_add T {ro : semiring_op T} (A B : mmatrix T) :=
       | MM_M MMB => MM_M (mmat_add MMA MMB)
       end
   end.
+
+...
+
+
+Definition mmatll_add T (r c : nat) (A B : list (list (mmatrix T))) :=
+  map
+    (λ i,
+     map
+       (λ j, nth j (nth i A []) (void_mmat _))
+       (seq 0 c))
+    (seq 0 r).
+
+Inspect 1.
+
+...
+
+Definition mmmat_add T (A B : matrix (mmatrix T)) :=
+  42.
 
 ...
 
