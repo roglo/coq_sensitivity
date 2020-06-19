@@ -1959,13 +1959,15 @@ Fixpoint mmat_mul_loop T it {so : semiring_op T} (MM1 MM2 : mmatrix T) :=
   end.
 
 Definition mmat_mul T {so : semiring_op T} (MM1 MM2 : mmatrix T) :=
-  mmat_mul_loop (mmat_depth MM1) MM1 MM2.
+  mmat_mul_loop (mmat_depth MM1 + 42) MM1 MM2.
 
 Require Import ZArith.
 
 Compute (let ro := Z_semiring_op in @mmat_mul Z ro (A 0) (A 0)).
 Compute (let ro := @rng_semiring Z Z_ring_op in @mmat_mul Z ro (A 0) (A 0)).
 (* pas terrible... *)
+Compute (let ro := @rng_semiring Z Z_ring_op in @mmat_mul Z ro (A 1) (A 1)).
+(* faut que je le fasse en ocaml *)
 
 ...
 
