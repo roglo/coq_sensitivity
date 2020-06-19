@@ -1706,7 +1706,7 @@ Require Import Semiring SRsummation.
 
 (* matrices *)
 
-Record matrix T :=
+Record matrix T := mk_mat
   { mat_list : list (list T);
     mat_nrows : nat;
     mat_ncols : nat }.
@@ -1724,7 +1724,7 @@ Definition mat_of_list T (ll : list (list T)) : matrix T :=
 
 Compute (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
 
-Definition list_list_el {T} d (ll : list (list T)) i j : T :=
+Definition list_list_el T d (ll : list (list T)) i j : T :=
   nth j (nth i ll []) d.
 
 Compute (let (i, j) := (2, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j).
@@ -1864,15 +1864,38 @@ Definition I T {ro : ring_op T} n :=
 Fixpoint A T {ro : ring_op T} n :=
   match n with
   | 0 => MM_1 (mat_of_list [[0%Rng]])
-(**)
+(*
   | 1 => MM_1 (mat_of_list [[0%Rng; 1%Rng]; [1%Rng; 0%Rng]])
-(**)
+*)
   | S n' =>
        MM_M
          (mmat_of_list
             [[A n'; MM_1 (I (2 ^ n'))];
              [MM_1 (I (2 ^ n')); mmat_opp (A n')]])
   end.
+
+Fixpoint mmat_depth T (MM : mmatrix T) :=
+  match MM with
+  | MM_1 _ => 1
+  | MM_M MMM =>
+      match MMM with
+      | mk_mat [] _ _ => 0
+      | mk_mat (MMl :: _) _ _ =>
+          match MMl with
+          | [] => 0
+          | MM :: _ => 1 + mmat_depth MM
+          end
+      end
+  end.
+
+Compute (mmat_depth (A 0)).
+Compute (mmat_depth (A 1)).
+Compute (mmat_depth (A 2)).
+Compute (mmat_depth (A 3)).
+Compute (mmat_depth (A 4)).
+
+Definition mmmat_depth T (MMM : matrix (mmatrix T)) :=
+  mmat_depth (mat_el void_mmat MMM 0 0).
 
 Fixpoint mmat_add_loop T it zero add (A B : mmatrix T) :=
   match it with
@@ -1893,40 +1916,8 @@ Fixpoint mmat_add_loop T it zero add (A B : mmatrix T) :=
       end
   end.
 
-Definition mmat_depth T (MMM : matrix (mmatrix T)) :=
-  mat_el void_mmat MMM 0 0.
-
-Fixpoint mmat_depth T (MM : mmatrix T) :=
-  match MM with
-  | MM_1 M => 1
-  | MM_M MMM => 1 + mmat_depth (mat_el void_mmat MMM 0 0)
-  end.
-
-...
-
-(* would be better with a true max iterations instead of 42 :-) *)
 Definition mmat_add T {so : semiring_op T} (A B : mmatrix T) :=
-  mmat_add_loop 42 srng_zero srng_add A B.
-
-Print mmat_add.
-
-...
-
-
-Definition mmatll_add T (r c : nat) (A B : list (list (mmatrix T))) :=
-  map
-    (λ i,
-     map
-       (λ j, nth j (nth i A []) (void_mmat _))
-       (seq 0 c))
-    (seq 0 r).
-
-Inspect 1.
-
-...
-
-Definition mmmat_add T (A B : matrix (mmatrix T)) :=
-  42.
+  mmat_add_loop (mmat_depth A) srng_zero srng_add A B.
 
 ...
 
@@ -2085,13 +2076,13 @@ Definition mat_of_list {A} (d : A) ll :=
 Definition list_of_mat {A} nrow ncol (M : matrix A) :=
   map (λ row, map (λ col, matel M row col) (seq 0 ncol)) (seq 0 nrow).
 
-Definition mat_transp {T} (M : matrix T) :=
+Definition mat_transp T (M : matrix T) :=
   {| matel i j := matel M j i |}.
 
-Definition mat_mul {T} {ro : ring_op T} n A B :=
+Definition mat_mul T {ro : ring_op T} n A B :=
   {| matel i k := (Σ (j = 0, n - 1), matel A i j * matel B j k)%Rng |}.
 
-Definition mat_sqr {T} {ro : ring_op T} n A := mat_mul n A A.
+Definition mat_sqr T {ro : ring_op T} n A := mat_mul n A A.
 
 Require Import ZArith.
 
