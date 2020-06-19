@@ -1907,18 +1907,18 @@ Compute (mmat_depth (A 4)).
 Definition mmmat_depth T (MMM : matrix (mmatrix T)) :=
   mmat_depth (mat_el void_mmat MMM 0 0).
 
-Fixpoint mmat_add_loop T it zero add (A B : mmatrix T) :=
+Fixpoint mmat_add_loop T it zero add (MM1 MM2 : mmatrix T) :=
   match it with
   | 0 => void_mmat
   | S it' =>
-      match A with
+      match MM1 with
       | MM_1 MA =>
-          match B with
+          match MM2 with
           | MM_1 MB => MM_1 (mat_add zero add MA MB)
           | MM_M MMB => void_mmat
           end
       | MM_M MMA =>
-          match B with
+          match MM2 with
           | MM_1 MB => void_mmat
           | MM_M MMB =>
               MM_M (mat_add void_mmat (mmat_add_loop it' zero add) MMA MMB)
@@ -1926,58 +1926,46 @@ Fixpoint mmat_add_loop T it zero add (A B : mmatrix T) :=
       end
   end.
 
-Definition mmat_add T {so : semiring_op T} (A B : mmatrix T) :=
-  mmat_add_loop (mmat_depth A) srng_zero srng_add A B.
+Check A.
 
-...
+Definition mmat_add T {so : semiring_op T} (MM1 MM2 : mmatrix T) :=
+  mmat_add_loop (mmat_depth MM1) srng_zero srng_add MM1 MM2.
 
-Fixpoint mmat_mul_loop T it {so : semiring_op T} (A B : mmatrix T) :=
+Fixpoint mmat_mul_loop T it {so : semiring_op T} (MM1 MM2 : mmatrix T) :=
   match it with
   | 0 => void_mmat
   | S it' =>
-      match A with
+      match MM1 with
       | MM_1 MA =>
-          match B with
+          match MM2 with
           | MM_1 MB => MM_1 (mat_mul MA MB)
           | MM_M MMB => void_mmat
           end
       | MM_M MMA =>
-          match B with
+          match MM2 with
           | MM_1 MB => void_mmat
           | MM_M MMB =>
-              MM_M (mat_mul (mmat_mul_loop it') MMA MMB)
-(*
-              MM_M (mat_mul one_mmat (mmat_mul_loop it' one mul) MMA MMB)
-*)
+              let mso :=
+                {| srng_zero := void_mmat;
+                   srng_one :=
+                     one_mmat srng_zero srng_one
+                       (mat_nrows MMA) (mat_ncols MMB);
+                   srng_add := @mmat_add T so;
+                   srng_mul := mmat_mul_loop it'|}
+              in
+              MM_M (mat_mul MMA MMB)
           end
       end
   end.
 
-...
+Definition mmat_mul T {so : semiring_op T} (MM1 MM2 : mmatrix T) :=
+  mmat_mul_loop (mmat_depth MM1) MM1 MM2.
 
-Fixpoint mmat_mul T {ro : semiring_op T} (A B : mmatrix T) :=
-  match A with
-  | MM_1 MA =>
-      match B with
-      | MM_1 MB => MM_1 (mat_mul MA MB)
-      | MM_M MMB => MM_1 void_mat
-      end
-  | MM_M MMA =>
-      match B with
-      | MM_1 MB => MM_1 void_mat
-      | MM_M MMB => MM_M (mmat_mul MMA MMB)
-      end
-  end.
 
-Definition mat_id T {so : semiring_op T} r c :=
-   {| mat_list :=
-        map
-          (λ i,
-           map
-             (λ j, if Nat.eq_dec i j then 1%Srng else 0%Srng) (seq 0 c))
-          (seq 0 r);
-      mat_nrows := r;
-      mat_ncols := c |}.
+Require Import ZArith.
+
+Compute (let ro := @rng_semiring Z Z_ring_op in mmat_mul (A 4) (A 4)).
+(* pas terrible... *)
 
 ...
 
@@ -1992,10 +1980,6 @@ Definition mmat_semiring_op T {so : semiring_op T} r c :
  {mro : semiring_op (mmatrix T)}
 
 ...
-
-Require Import ZArith.
-
-Compute (let ro := @rng_semiring Z Z_ring_op in mmat_mul (A 2) (A 2)).
 
 Search mmatrix.
 
