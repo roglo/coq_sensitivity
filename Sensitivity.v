@@ -1796,10 +1796,10 @@ Definition mat_add T zero add (M1 M2 : matrix T) : matrix T :=
      mat_nrows := mat_nrows M1;
      mat_ncols := mat_ncols M1 |}.
 
-Definition mat_mul {T} {ro : semiring_op T} (M1 M2 : matrix T) : matrix T :=
+Definition mat_mul {T} {so : semiring_op T} (M1 M2 : matrix T) : matrix T :=
   {| mat_list :=
-       list_list_mul (mat_nrows M1) (mat_ncols M1) (mat_ncols M2) (mat_list M1)
-         (mat_list M2);
+       list_list_mul (mat_nrows M1) (mat_ncols M1) (mat_ncols M2)
+         (mat_list M1) (mat_list M2);
      mat_nrows := mat_nrows M1;
      mat_ncols := mat_ncols M2 |}.
 
@@ -1831,6 +1831,16 @@ Definition void_mat {T} : matrix T :=
   {| mat_list := ([] : list (list T)); mat_nrows := 0; mat_ncols := 0 |}.
 Definition void_mmat {T} : mmatrix T :=
   MM_1 void_mat.
+
+Definition one_list_list {T} zero one r c : list (list T) :=
+  map
+    (λ i, map (λ j, if Nat.eq_dec i j then one else zero) (seq 0 c))
+    (seq 0 r).
+Definition one_mat {T} zero one r c : matrix T :=
+  {| mat_list := one_list_list zero one r c;
+     mat_nrows := r; mat_ncols := c |}.
+Definition one_mmat {T} zero one r c : mmatrix T :=
+  MM_1 (one_mat zero one r c).
 
 Fixpoint mmat_opp T {ro : ring_op T} MM : mmatrix T :=
   match MM with
@@ -1919,6 +1929,32 @@ Fixpoint mmat_add_loop T it zero add (A B : mmatrix T) :=
 Definition mmat_add T {so : semiring_op T} (A B : mmatrix T) :=
   mmat_add_loop (mmat_depth A) srng_zero srng_add A B.
 
+Print one_mat.
+
+...
+
+Fixpoint mmat_mul_loop T it {so : semiring_op T} (A B : mmatrix T) :=
+  match it with
+  | 0 => one_mmat srng_zero srng_one
+  | S it' =>
+      match A with
+      | MM_1 MA =>
+          match B with
+          | MM_1 MB => MM_1 (mat_mul MA MB)
+          | MM_M MMB => MM_1 one_mat
+          end
+      | MM_M MMA =>
+          match B with
+          | MM_1 MB => MM_1 one_mat
+          | MM_M MMB =>
+              MM_M (mat_mul one_mmat (mmat_mul_loop it') MMA MMB)
+(*
+              MM_M (mat_mul one_mmat (mmat_mul_loop it' one mul) MMA MMB)
+*)
+          end
+      end
+  end.
+
 ...
 
 Fixpoint mmat_mul T {ro : semiring_op T} (A B : mmatrix T) :=
@@ -1926,11 +1962,11 @@ Fixpoint mmat_mul T {ro : semiring_op T} (A B : mmatrix T) :=
   | MM_1 MA =>
       match B with
       | MM_1 MB => MM_1 (mat_mul MA MB)
-      | MM_M MMB => MM_1 (void_mat _)
+      | MM_M MMB => MM_1 void_mat
       end
   | MM_M MMA =>
       match B with
-      | MM_1 MB => MM_1 (void_mat _)
+      | MM_1 MB => MM_1 void_mat
       | MM_M MMB => MM_M (mmat_mul MMA MMB)
       end
   end.
