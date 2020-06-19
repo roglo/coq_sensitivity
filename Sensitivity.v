@@ -1915,11 +1915,11 @@ Fixpoint mmat_add_loop T it zero add (A B : mmatrix T) :=
       | MM_1 MA =>
           match B with
           | MM_1 MB => MM_1 (mat_add zero add MA MB)
-          | MM_M MMB => MM_1 void_mat
+          | MM_M MMB => void_mmat
           end
       | MM_M MMA =>
           match B with
-          | MM_1 MB => MM_1 void_mat
+          | MM_1 MB => void_mmat
           | MM_M MMB =>
               MM_M (mat_add void_mmat (mmat_add_loop it' zero add) MMA MMB)
           end
@@ -1929,25 +1929,23 @@ Fixpoint mmat_add_loop T it zero add (A B : mmatrix T) :=
 Definition mmat_add T {so : semiring_op T} (A B : mmatrix T) :=
   mmat_add_loop (mmat_depth A) srng_zero srng_add A B.
 
-Print one_mat.
-
 ...
 
 Fixpoint mmat_mul_loop T it {so : semiring_op T} (A B : mmatrix T) :=
   match it with
-  | 0 => one_mmat srng_zero srng_one
+  | 0 => void_mmat
   | S it' =>
       match A with
       | MM_1 MA =>
           match B with
           | MM_1 MB => MM_1 (mat_mul MA MB)
-          | MM_M MMB => MM_1 one_mat
+          | MM_M MMB => void_mmat
           end
       | MM_M MMA =>
           match B with
-          | MM_1 MB => MM_1 one_mat
+          | MM_1 MB => void_mmat
           | MM_M MMB =>
-              MM_M (mat_mul one_mmat (mmat_mul_loop it') MMA MMB)
+              MM_M (mat_mul (mmat_mul_loop it') MMA MMB)
 (*
               MM_M (mat_mul one_mmat (mmat_mul_loop it' one mul) MMA MMB)
 *)
