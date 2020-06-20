@@ -1891,7 +1891,7 @@ Fixpoint mmat_depth T (MM : mmatrix T) :=
       | mk_mat (MMl :: _) _ _ =>
           match MMl with
           | [] => 0
-          | MM :: _ => 1 + mmat_depth MM
+          | MM' :: _ => 1 + mmat_depth MM'
           end
       end
   end.

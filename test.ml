@@ -220,13 +220,13 @@ value mI (ro : ring_op 'a) n =
 value rec mA (ro : ring_op 'a) n =
   match n with
   | 0 → MM_1 (mat_of_list [[srng_zero (rng_semiring ro)]])
-(**)
+(*
   | 1 →
       MM_1
         (mat_of_list
 	   [[srng_zero (rng_semiring ro); srng_one (rng_semiring ro)];
 	    [srng_one (rng_semiring ro); srng_zero (rng_semiring ro)]])
-(**)
+*)
   | _ →
        let n' = n - 1 in
        MM_M
@@ -235,37 +235,27 @@ value rec mA (ro : ring_op 'a) n =
              [MM_1 (mI ro (nat_pow 2 n')); mmat_opp ro (mA ro n')]])
   end.
 
-(*
-value rec mA n =
-  match n with
-  | 0 → MM_1 (mat_of_list 0 [])
-  | 1 → MM_1 (mat_of_list 0 [[0; 1]; [1; 0]])
-  | _ →
-       let n' = n - 1 in
-       MM_M {vecel _ = 2} {vecel _ = 2}
-         (mmat_of_list 0
-            [[mA n'; MM_1 mI];
-             [MM_1 mI; mmat_opp (mA n')]])
-  end.
-
-value rec mmat_nb_of_rows_ub vlen (mm : mmatrix 'a) =
+value rec mmat_depth (mm : mmatrix 'a) =
   match mm with
-  | MM_1 _ -> vlen
-  | MM_M vr _ mmm ->
-      List.fold_left
-        (fun accu i ->
-           accu + vecel vr i +
-	     mmat_nb_of_rows_ub (vecel vr i) (matel mmm i 0))
-	0 (seq 0 vlen)
+  | MM_1 _ → 1
+  | MM_M mmm →
+      match mmm with
+      | {mat_list = []} → 0
+      | {mat_list = [mml :: _]} →
+          match mml with
+          | [] → 0
+          | [mm' :: _] → 1 + mmat_depth mm'
+          end
+      end
   end.
 
-let n = 0 in mmat_nb_of_rows_ub 2 (mA n).
-let n = 1 in mmat_nb_of_rows_ub 2 (mA n).
-let n = 2 in mmat_nb_of_rows_ub 2 (mA n).
-let n = 3 in mmat_nb_of_rows_ub 2 (mA n).
-let n = 4 in mmat_nb_of_rows_ub 2 (mA n).
+mmat_depth (mA int_ring_op 0).
+mmat_depth (mA int_ring_op 1).
+mmat_depth (mA int_ring_op 2).
+mmat_depth (mA int_ring_op 3).
+mmat_depth (mA int_ring_op 4).
 
-(**)
+(*
 value rec mmat_nb_of_rows vlen (mm : mmatrix 'a) =
   match mm with
   | MM_1 _ -> vlen
