@@ -74,6 +74,15 @@ value mat_transpose (d : 'a) (m : matrix 'a) : matrix 'a =
 
 mat_transpose 0 (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]).
 
+value list_list_add zero (add : 'a → 'a → 'a) r c
+    (ll1 : list (list 'a)) (ll2 : list (list 'a)) =
+  map
+    (fun i →
+     map
+	(fun j → add (list_list_el zero ll1 i j) (list_list_el zero ll2 i j))
+       (seq 0 c))
+    (seq 0 r).
+
 (*
 type mmatrix 'a =
   [ MM_1 of matrix 'a
