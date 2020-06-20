@@ -32,6 +32,12 @@ type semiring_op 'a =
     srng_add : 'a → 'a → 'a;
     srng_mul : 'a → 'a → 'a }.
 
+type ring_op 'a =
+  { rng_semiring : semiring_op 'a;
+    rng_opp : 'a → 'a }.
+
+value rng_opp ro = ro.rng_opp.
+
 (**)
 
 type matrix 'a =
@@ -116,11 +122,42 @@ let so = nat_semiring_op in list_list_mul so 3 4 2 [[1; 2; 3; 4]; [5; 6; 7; 8]; 
 
 let so = nat_semiring_op in list_list_mul so 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]].
 
-(*
+value mat_add zero add (m1 : matrix 'a) (m2 : matrix 'a) : matrix 'a =
+  { mat_list =
+      list_list_add zero add (mat_nrows m1) (mat_ncols m1) (mat_list m1)
+        (mat_list m2);
+    mat_nrows = mat_nrows m1;
+    mat_ncols = mat_ncols m1 }.
+
+value mat_mul (ro : semiring_op 'a) (m1 : matrix 'a) (m2 : matrix 'a) :
+    matrix 'a =
+  { mat_list =
+      list_list_mul ro (mat_nrows m1) (mat_ncols m1) (mat_ncols m2)
+        (mat_list m1) (mat_list m2);
+    mat_nrows = mat_nrows m1;
+    mat_ncols = mat_ncols m2 }.
+
+let so = nat_semiring_op in mat_mul so (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]; [0; 0]]).
+let so = nat_semiring_op in mat_mul so (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]]).
+let so = nat_semiring_op in mat_mul so (mat_of_list [[1; 2]; [3; 4]; [5; 6]]) (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]).
+
+let so = nat_semiring_op in mat_ncols (mat_mul so (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]])).
+
+value list_list_opp (ro : ring_op 'a) (ll : list (list 'a)) =
+  map (map (rng_opp ro)) ll.
+
+value mat_opp (ro : ring_op 'a) (m : matrix 'a) =
+  { mat_list = list_list_opp ro (mat_list m);
+    mat_nrows = mat_nrows m;
+    mat_ncols = mat_ncols m }.
+
+(* matrices of matrices *)
+
 type mmatrix 'a =
   [ MM_1 of matrix 'a
-  | MM_M of vector nat and vector nat and matrix (mmatrix 'a) ].
+  | MM_M of matrix (mmatrix 'a) ].
 
+(*
 value rec mmat_opp mm =
   match mm with
   | MM_1 m → MM_1 (mat_opp m)
