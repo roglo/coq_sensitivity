@@ -99,11 +99,22 @@ value list_list_mul (ro : semiring_op 'a) r cr c
        (fun k →
 	List.fold_left
 	  (fun a j →
-           ro.srng_add (list_list_el ro.srng_zero ll1 i j)
-	     (list_list_el ro.srng_zero ll2 j k))
-	  0 (seq 0 cr))
+           ro.srng_add a
+             (ro.srng_mul (list_list_el ro.srng_zero ll1 i j)
+                (list_list_el ro.srng_zero ll2 j k)))
+	  ro.srng_zero (seq 0 cr))
        (seq 0 c))
     (seq 0 r).
+
+value nat_semiring_op : semiring_op nat =
+  { srng_zero = 0;
+    srng_one = 1;
+    srng_add = \+;
+    srng_mul = \* }.
+
+let so = nat_semiring_op in list_list_mul so 3 4 2 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] [[1; 2]; [3; 4]; [5; 6]; [0; 0]].
+
+let so = nat_semiring_op in list_list_mul so 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]].
 
 (*
 type mmatrix 'a =
