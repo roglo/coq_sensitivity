@@ -32,10 +32,14 @@ type semiring_op 'a =
     srng_add : 'a → 'a → 'a;
     srng_mul : 'a → 'a → 'a }.
 
+value srng_zero so = so.srng_zero.
+value srng_one so = so.srng_one.
+
 type ring_op 'a =
   { rng_semiring : semiring_op 'a;
     rng_opp : 'a → 'a }.
 
+value rng_semiring ro = ro.rng_semiring.
 value rng_opp ro = ro.rng_opp.
 
 (**)
@@ -118,6 +122,10 @@ value nat_semiring_op : semiring_op nat =
     srng_add = \+;
     srng_mul = \* }.
 
+value int_ring_op : ring_op int =
+  { rng_semiring = nat_semiring_op;
+    rng_opp i = - i }.
+
 let so = nat_semiring_op in list_list_mul so 3 4 2 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] [[1; 2]; [3; 4]; [5; 6]; [0; 0]].
 
 let so = nat_semiring_op in list_list_mul so 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]].
@@ -182,11 +190,23 @@ value rec mmat_opp (ro : ring_op 'a) mm : mmatrix 'a =
           mat_ncols = mat_ncols mmm }
   end.
 
-(*
-value mmat_of_list d (ll : list (list (mmatrix 'a))) :
+value mmat_of_list (ll : list (list (mmatrix 'a))) :
     matrix (mmatrix 'a) =
-  { matel i j = nth i (nth j ll []) (MM_1 { matel i j = d }) }.
+  { mat_list = ll;
+    mat_nrows = list_list_nrows ll;
+    mat_ncols = list_list_ncols ll }.
 
+value list_list_I (ro : ring_op 'a) n =
+  map
+    (fun i →
+     map
+       (fun j →
+        if i = j then srng_one (rng_semiring ro)
+        else srng_zero (rng_semiring ro))
+       (seq 0 n))
+    (seq 0 n).
+
+(*
 value rec mA n =
   match n with
   | 0 → MM_1 (mat_of_list 0 [])
