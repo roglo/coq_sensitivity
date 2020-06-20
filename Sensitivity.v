@@ -1732,7 +1732,6 @@ Definition mat_el T d (M : matrix T) i j : T :=
 
 Compute (let (i, j) := (2, 1) in mat_el 42 (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix nat) i j).
 Compute (let (i, j) := (7, 1) in mat_el 42 (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix nat) i j).
-Compute (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix nat).
 
 Definition list_list_transpose {T} d (ll : list (list T)) : list (list T) :=
   let r := list_list_nrows ll in

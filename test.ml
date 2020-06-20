@@ -12,6 +12,12 @@ value rec firstn n l =
 value length = List.length;
 value hd d l = try List.hd l with [ Failure _ → d ];
 value nth n l d = try List.nth l n with [ Failure _ → d ].
+value map = List.map.
+value rec seq (start : nat) (len : nat) : list nat =
+  match len with
+  | 0 → []
+  | _ → let len0 = len - 1 in [start :: seq (start + 1) len0]
+  end.
 value rec repeat x n =
   match n with
   | 0 -> []
@@ -34,6 +40,8 @@ value mat_of_list (ll : list (list 'a)) : matrix 'a =
     mat_nrows = list_list_nrows ll;
     mat_ncols = list_list_ncols ll }.
 
+value mat_list ll = ll.mat_list;
+
 mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]].
 
 value list_list_el d (ll : list (list 'a)) i j =
@@ -41,6 +49,19 @@ value list_list_el d (ll : list (list 'a)) i j =
 
 let (i, j) = (2, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j.
 let (i, j) = (7, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j.
+
+value mat_el d (m : matrix 'a) i j =
+  list_list_el d (mat_list m) i j.
+
+let (i, j) = (2, 1) in mat_el 42 (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix nat) i j.
+let (i, j) = (7, 1) in mat_el 42 (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix nat) i j.
+
+value list_list_transpose d (ll : list (list 'a)) : list (list 'a) =
+  let r = list_list_nrows ll in
+  let c = list_list_ncols ll in
+  map (fun i → map (fun j → list_list_el d ll j i) (seq 0 r)) (seq 0 c).
+
+list_list_transpose 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]].
 
 (*
 type mmatrix 'a =
