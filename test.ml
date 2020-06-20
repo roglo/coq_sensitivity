@@ -162,13 +162,27 @@ value void_mat : matrix 'a =
 value void_mmat : mmatrix 'a =
   MM_1 void_mat.
 
-(*
-value rec mmat_opp mm =
+value one_list_list zero one r c : list (list 'a) =
+  map
+    (fun i → map (fun j → if i = j then one else zero) (seq 0 c))
+    (seq 0 r).
+value one_mat zero one r c : matrix 'a =
+  { mat_list = one_list_list zero one r c;
+    mat_nrows = r; mat_ncols = c }.
+value one_mmat zero one r c : mmatrix 'a =
+  MM_1 (one_mat zero one r c).
+
+value rec mmat_opp (ro : ring_op 'a) mm : mmatrix 'a =
   match mm with
-  | MM_1 m → MM_1 (mat_opp m)
-  | MM_M vr vc mm -> MM_M vr vc { matel i j = mmat_opp (matel mm i j) }
+  | MM_1 m → MM_1 (mat_opp ro m)
+  | MM_M mmm →
+      MM_M
+        { mat_list = map (map (mmat_opp ro)) (mat_list mmm);
+          mat_nrows = mat_nrows mmm;
+          mat_ncols = mat_ncols mmm }
   end.
 
+(*
 value mmat_of_list d (ll : list (list (mmatrix 'a))) :
     matrix (mmatrix 'a) =
   { matel i j = nth i (nth j ll []) (MM_1 { matel i j = d }) }.
