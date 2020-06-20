@@ -24,10 +24,16 @@ value rec repeat x n =
   | _ -> [x :: repeat x (n - 1)]
   end.
 
+(* *)
+
 type matrix 'a =
   { mat_list : list (list 'a);
     mat_nrows : nat;
     mat_ncols : nat }.
+
+value mat_list ll = ll.mat_list;
+value mat_nrows ll = ll.mat_nrows;
+value mat_ncols ll = ll.mat_ncols;
 
 value list_list_nrows (ll  : list (list 'a)) =
   length ll.
@@ -39,8 +45,6 @@ value mat_of_list (ll : list (list 'a)) : matrix 'a =
   { mat_list = ll;
     mat_nrows = list_list_nrows ll;
     mat_ncols = list_list_ncols ll }.
-
-value mat_list ll = ll.mat_list;
 
 mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]].
 
@@ -62,6 +66,13 @@ value list_list_transpose d (ll : list (list 'a)) : list (list 'a) =
   map (fun i → map (fun j → list_list_el d ll j i) (seq 0 r)) (seq 0 c).
 
 list_list_transpose 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]].
+
+value mat_transpose (d : 'a) (m : matrix 'a) : matrix 'a =
+  { mat_list = list_list_transpose d (mat_list m);
+    mat_nrows = mat_ncols m;
+    mat_ncols = mat_nrows m }.
+
+mat_transpose 0 (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]).
 
 (*
 type mmatrix 'a =
