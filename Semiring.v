@@ -15,6 +15,10 @@ Notation "a * b" := (srng_mul a b) : semiring_scope.
 Notation "0" := srng_zero : semiring_scope.
 Notation "1" := srng_one : semiring_scope.
 
+(* borrowed from Ring2.v because, now, I want to start with
+   semirings, and define rings later from semirings; this way,
+   summations with syntax Σ can be defined (later) on semirings,
+   more general than rings, and testable on type nat *)
 (*
 Class semiring_prop {A} {ro : ring_op A} :=
   { srng_1_neq_0 : (1 ≠ 0)%Rng;

@@ -26,6 +26,14 @@ value rec repeat x n =
 
 (* *)
 
+type semiring_op 'a =
+  { srng_zero : 'a;
+    srng_one : 'a;
+    srng_add : 'a → 'a → 'a;
+    srng_mul : 'a → 'a → 'a }.
+
+(**)
+
 type matrix 'a =
   { mat_list : list (list 'a);
     mat_nrows : nat;
@@ -80,6 +88,20 @@ value list_list_add zero (add : 'a → 'a → 'a) r c
     (fun i →
      map
 	(fun j → add (list_list_el zero ll1 i j) (list_list_el zero ll2 i j))
+       (seq 0 c))
+    (seq 0 r).
+
+value list_list_mul (ro : semiring_op 'a) r cr c
+    (ll1 : list (list 'a)) (ll2 : list (list 'a)) =
+  map
+    (fun i →
+     map
+       (fun k →
+	List.fold_left
+	  (fun a j →
+           ro.srng_add (list_list_el ro.srng_zero ll1 i j)
+	     (list_list_el ro.srng_zero ll2 j k))
+	  0 (seq 0 cr))
        (seq 0 c))
     (seq 0 r).
 
