@@ -11,6 +11,7 @@ value rec firstn n l =
   end.
 value length = List.length;
 value hd d l = try List.hd l with [ Failure _ → d ];
+value nth n l d = try List.nth l n with [ Failure _ → d ].
 value rec repeat x n =
   match n with
   | 0 -> []
@@ -32,6 +33,14 @@ value mat_of_list (ll : list (list 'a)) : matrix 'a =
   { mat_list = ll;
     mat_nrows = list_list_nrows ll;
     mat_ncols = list_list_ncols ll }.
+
+mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]].
+
+value list_list_el d (ll : list (list 'a)) i j =
+  nth j (nth i ll []) d.
+
+let (i, j) = (2, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j.
+let (i, j) = (7, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j.
 
 (*
 type mmatrix 'a =
