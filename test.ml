@@ -157,6 +157,11 @@ type mmatrix 'a =
   [ MM_1 of matrix 'a
   | MM_M of matrix (mmatrix 'a) ].
 
+value void_mat : matrix 'a =
+  { mat_list = ([] : list (list 'a)); mat_nrows = 0; mat_ncols = 0 }.
+value void_mmat : mmatrix 'a =
+  MM_1 void_mat.
+
 (*
 value rec mmat_opp mm =
   match mm with
