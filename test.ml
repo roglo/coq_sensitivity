@@ -39,6 +39,7 @@ type semiring_op 'a =
 
 value srng_zero so = so.srng_zero.
 value srng_one so = so.srng_one.
+value srng_add so = so.srng_add.
 
 type ring_op 'a =
   { rng_semiring : semiring_op 'a;
@@ -255,38 +256,33 @@ mmat_depth (mA int_ring_op 2).
 mmat_depth (mA int_ring_op 3).
 mmat_depth (mA int_ring_op 4).
 
+value mmmat_depth (mmm : matrix (mmatrix 'a)) =
+  mmat_depth (mat_el void_mmat mmm 0 0).
+
+value rec mmat_add_loop it zero add (mm1 : mmatrix 'a) (mm2 : mmatrix 'a) =
+  match it with
+  | 0 → void_mmat
+  | _ →
+      let it' = it - 1 in
+      match mm1 with
+      | MM_1 ma →
+          match mm2 with
+          | MM_1 mb → MM_1 (mat_add zero add ma mb)
+          | MM_M mmb → void_mmat
+          end
+      | MM_M mma →
+          match mm2 with
+          | MM_1 mb → void_mmat
+          | MM_M mmb →
+              MM_M (mat_add void_mmat (mmat_add_loop it' zero add) mma mmb)
+          end
+      end
+  end.
+
+value mmat_add (so : semiring_op 'a) (mm1 : mmatrix 'a) (mm2 : mmatrix 'a) =
+  mmat_add_loop (mmat_depth mm1) (srng_zero so) (srng_add so) mm1 mm2.
+
 (*
-value rec mmat_nb_of_rows vlen (mm : mmatrix 'a) =
-  match mm with
-  | MM_1 _ -> vlen
-  | MM_M vr _ mmm ->
-      List.fold_left
-        (fun accu i ->
-           accu + mmat_nb_of_rows (vecel vr i) (matel mmm i 0))
-        0 (seq 0 vlen)
-  end.
-
-mmat_nb_of_rows 2 (mA 1).
-(* 2 *)
-
-value rec mmat_number_of_rows (mm : mmatrix 'a) =
-  match mm with
-  | MM_1 r _ _ -> r
-  | MM_M r _ mm ->
-      List.fold_left
-        (fun acc i -> acc + mmat_number_of_rows (matel mm i 0)) 0 (seq 0 r)
-  end.
-
-value mat_horiz_concat (r1, c1, m1) (r2, c2, m2) =
-  (max r1 r2, c1 + c2,
-   { matel i j =
-       if j < c1 then matel m1 i j else matel m2 i (j - c1) }).
-
-value mat_vertic_concat (r1, c1, m1) (r2, c2, m2) =
-  (r1 + r2, max c1 c2,
-   { matel i j =
-       if i < r1 then matel m1 i j else matel m2 (i - r1) j }).
-
 value rec mat_of_mmat mm =
   match mm with
   | MM_1 r c m -> (r, c, m)

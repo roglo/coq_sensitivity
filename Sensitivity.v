@@ -1924,8 +1924,6 @@ Fixpoint mmat_add_loop T it zero add (MM1 MM2 : mmatrix T) :=
       end
   end.
 
-Check A.
-
 Definition mmat_add T {so : semiring_op T} (MM1 MM2 : mmatrix T) :=
   mmat_add_loop (mmat_depth MM1) srng_zero srng_add MM1 MM2.
 
