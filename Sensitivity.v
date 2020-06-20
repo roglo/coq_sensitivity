@@ -1865,13 +1865,15 @@ Definition list_list_I T {ro : ring_op T} n :=
     (seq 0 n).
 
 Definition I T {ro : ring_op T} n :=
-  {| mat_list := list_list_I n; mat_nrows := n; mat_ncols := n |}.
+  {| mat_list := list_list_I n;
+     mat_nrows := n;
+     mat_ncols := n |}.
 
 Fixpoint A T {ro : ring_op T} n :=
   match n with
   | 0 => MM_1 (mat_of_list [[0%Rng]])
 (*
-  | 1 => MM_1 (mat_of_list [[0%Rng; 1%Rng]; [1%Rng; 0%Rng]])
+  | 1 => MM_1 (mat_of_list [[0; 1]; [1; 0]]%Rng)
 *)
   | S n' =>
        MM_M

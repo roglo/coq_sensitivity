@@ -23,6 +23,11 @@ value rec repeat x n =
   | 0 -> []
   | _ -> [x :: repeat x (n - 1)]
   end.
+value rec nat_pow n m : nat =
+  match m with
+  | 0 → 1
+  | _ → n * nat_pow n (m - 1)
+  end.
 
 (* *)
 
@@ -205,6 +210,30 @@ value list_list_I (ro : ring_op 'a) n =
         else srng_zero (rng_semiring ro))
        (seq 0 n))
     (seq 0 n).
+
+
+value mI (ro : ring_op 'a) n =
+  { mat_list = list_list_I ro n;
+    mat_nrows = n;
+    mat_ncols = n }.
+
+value rec mA (ro : ring_op 'a) n =
+  match n with
+  | 0 → MM_1 (mat_of_list [[srng_zero (rng_semiring ro)]])
+(**)
+  | 1 →
+      MM_1
+        (mat_of_list
+	   [[srng_zero (rng_semiring ro); srng_one (rng_semiring ro)];
+	    [srng_one (rng_semiring ro); srng_zero (rng_semiring ro)]])
+(**)
+  | _ →
+       let n' = n - 1 in
+       MM_M
+         (mmat_of_list
+            [[mA ro n'; MM_1 (mI ro (nat_pow 2 n'))];
+             [MM_1 (mI ro (nat_pow 2 n')); mmat_opp ro (mA ro n')]])
+  end.
 
 (*
 value rec mA n =
