@@ -361,6 +361,13 @@ let ro = int_ring_op in let so = nat_semiring_op in mmat_mul so (mA ro 1) (mA ro
 let ro = int_ring_op in let so = nat_semiring_op in mmat_mul so (mA ro 2) (mA ro 2).
 *)
 
+value glopaa = match glopa.val with [ Some a -> a ].
+42;
+42;
+glopaa.
+mat_mul (glop nat_semiring_op 2 2) glopaa glopaa;
+
+
 (*
 value rec mat_of_mmat mm =
   match mm with
