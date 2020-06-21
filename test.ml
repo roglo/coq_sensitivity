@@ -282,6 +282,43 @@ value rec mmat_add_loop it zero add (mm1 : mmatrix 'a) (mm2 : mmatrix 'a) =
 value mmat_add (so : semiring_op 'a) (mm1 : mmatrix 'a) (mm2 : mmatrix 'a) =
   mmat_add_loop (mmat_depth mm1) (srng_zero so) (srng_add so) mm1 mm2.
 
+value rec mmat_mul_loop it (so : semiring_op 'a) (mm1 : mmatrix 'a)
+    (mm2 : mmatrix 'a) =
+  match it with
+  | 0 → void_mmat
+  | _ →
+      let it' = it - 1 in
+      match mm1 with
+      | MM_1 ma ->
+          match mm2 with
+          | MM_1 mb -> MM_1 (mat_mul so ma mb)
+          | MM_M mmb -> void_mmat
+          end
+      | MM_M mma ->
+          match mm2 with
+          | MM_1 mb -> void_mmat
+          | MM_M mmb ->
+              let mso =
+                { srng_zero = void_mmat;
+                  srng_one =
+                    one_mmat (srng_zero so) (srng_one so)
+                      (mat_nrows mma) (mat_ncols mmb);
+                  srng_add = mmat_add so;
+                  srng_mul = mmat_mul_loop it' so }
+              in
+              MM_M (mat_mul mso mma mmb)
+          end
+      end
+  end.
+
+value mmat_mul (so : semiring_op 'a) mm1 mm2 =
+  mmat_mul_loop (mmat_depth mm1 + 42) so mm1 mm2.
+
+let ro = int_ring_op in let so = nat_semiring_op in mmat_mul so (mA ro 0) (mA ro 0).
+let ro = int_ring_op in let so = nat_semiring_op in mmat_mul so (mA ro 1) (mA ro 1).
+let ro = int_ring_op in let so = nat_semiring_op in mmat_mul so (mA ro 2) (mA ro 2).
+(* pas terrible... *)
+
 (*
 value rec mat_of_mmat mm =
   match mm with
