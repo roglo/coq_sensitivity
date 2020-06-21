@@ -335,12 +335,19 @@ let _ = trace_mat (fun x → Printf.eprintf " x") void_mmat mmmb in
                     one_mmat (srng_zero so) (srng_one so)
                       (mat_nrows mmma) (mat_ncols mmmb);
                   srng_add = mmat_add so;
-                  srng_mul = mmat_mul_loop it' so }
+                  srng_mul = mmat_mul_loop (it' + 42) so }
               in
               MM_M (mat_mul mso mmma mmmb)
           end
       end
   end.
+
+value glop so r c =
+  { srng_zero = void_mmat;
+    srng_one = one_mmat (srng_zero so) (srng_one so) r c;
+    srng_add = mmat_add so;
+    srng_mul = mmat_mul_loop 42 so }
+;
 
 value mmat_mul (so : semiring_op 'a) mm1 mm2 =
   mmat_mul_loop (mmat_depth mm1 + 42) so mm1 mm2.
