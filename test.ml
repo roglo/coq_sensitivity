@@ -282,6 +282,24 @@ value rec mmat_add_loop it zero add (mm1 : mmatrix 'a) (mm2 : mmatrix 'a) =
 value mmat_add (so : semiring_op 'a) (mm1 : mmatrix 'a) (mm2 : mmatrix 'a) =
   mmat_add_loop (mmat_depth mm1) (srng_zero so) (srng_add so) mm1 mm2.
 
+value trace_list_list trace_el zero r c ll =
+  List.iter
+    (fun i -> do {
+       List.iter
+         (fun j → trace_el (list_list_el zero ll i j))
+         (seq 0 c);
+       Printf.eprintf "\n%!"
+     })
+    (seq 0 r).
+
+value trace_mat trace_el zero m = do {
+  Printf.eprintf "mat %d row %d col\n%!" m.mat_nrows m.mat_ncols;
+  trace_list_list trace_el zero m.mat_nrows m.mat_ncols m.mat_list
+};
+
+value glopa = ref None;
+value glopb = ref None;
+
 value rec mmat_mul_loop it (so : semiring_op 'a) (mm1 : mmatrix 'a)
     (mm2 : mmatrix 'a) =
   match it with
@@ -298,22 +316,28 @@ let _ = Printf.eprintf "pourri 3\n%!" in
 let _ = Printf.eprintf "pourri 2\n%!" in
               void_mmat
           end
-      | MM_M mma ->
+      | MM_M mmma ->
           match mm2 with
           | MM_1 mb ->
 let _ = Printf.eprintf "pourri 1\n%!" in
               void_mmat
-          | MM_M mmb ->
+          | MM_M mmmb ->
 let _ = Printf.eprintf "ah ouais ouais\n%!" in
+let _ = glopa.val := Some mmma in
+let _ = glopb.val := Some mmmb in
+(*
+let _ = trace_mat (fun x → Printf.eprintf " %d" x) void_mmat mmma in
+let _ = trace_mat (fun x → Printf.eprintf " x") void_mmat mmmb in
+*)
               let mso =
                 { srng_zero = void_mmat;
                   srng_one =
                     one_mmat (srng_zero so) (srng_one so)
-                      (mat_nrows mma) (mat_ncols mmb);
+                      (mat_nrows mmma) (mat_ncols mmmb);
                   srng_add = mmat_add so;
                   srng_mul = mmat_mul_loop it' so }
               in
-              MM_M (mat_mul mso mma mmb)
+              MM_M (mat_mul mso mmma mmmb)
           end
       end
   end.
