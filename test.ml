@@ -311,7 +311,9 @@ let _ = Printf.eprintf "pourri 3\n%!" in
       match mm1 with
       | MM_1 ma ->
           match mm2 with
-          | MM_1 mb -> MM_1 (mat_mul so ma mb)
+          | MM_1 mb ->
+let _ = Printf.eprintf "MM_1 mb\n%!" in
+	      MM_1 (mat_mul so ma mb)
           | MM_M mmb ->
 let _ = Printf.eprintf "pourri 2\n%!" in
               void_mmat
