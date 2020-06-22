@@ -410,3 +410,8 @@ mso1.srng_add mso1.srng_zero
   (mso1.srng_mul
      (MM_1 {mat_list=[[2]]; mat_nrows=1; mat_ncols=1})
      (MM_1 {mat_list=[[3]]; mat_nrows=1; mat_ncols=1}));
+
+(* le problème vient de mso1.srng_zero, qui est une matrice 2x2
+   et que l'addition crée alors une matrice 2x2 aussi *)
+(* mais comment faire ? même mso1.srng_one ne va pas non plus *)
+(* ces multiplications de sous-matrices ne fonctionnent pas *)
