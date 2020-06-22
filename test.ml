@@ -339,11 +339,14 @@ value rec mmat_mul_loop it (so : semiring_op 'a) (mm1 : mmatrix 'a)
 value mmat_mul (so : semiring_op 'a) mm1 mm2 =
   mmat_mul_loop (mmat_depth mm1) so mm1 mm2.
 
-value mso so r c =
-  { srng_zero = zero_mmat (srng_zero so) r c;
-    srng_one = one_mmat (srng_zero so) (srng_one so) r c;
+value mso so sz =
+  { srng_zero = zero_mmat (srng_zero so) sz sz;
+    srng_one = one_mmat (srng_zero so) (srng_one so) sz sz;
     srng_add = mmat_add so;
-    srng_mul = mmat_mul_loop 42 so }
+    srng_mul = mmat_mul so }
+(*
+    srng_mul = mmat_mul_loop 42 so } (* 42: à voir *)
+*)
 ;
 
 (* *)
@@ -381,7 +384,9 @@ mat_mul mso1
        MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]];
    mat_nrows = 2; mat_ncols = 2};
 
-list_list_mul mso1 2 2 2
+42;
+
+list_list_mul (mso nat_semiring_op 2) 2 2 2
   [[MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
     MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}];
    [MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
@@ -390,28 +395,3 @@ list_list_mul mso1 2 2 2
     MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}];
    [MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
     MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]];
-
-list_list_el mso1.srng_zero
-  [[MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
-    MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}];
-   [MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
-    MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]] 0 0;
-list_list_el mso1.srng_zero
-  [[MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
-    MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}];
-   [MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
-    MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]] 0 1;
-
-mso1.srng_mul
-  (MM_1 {mat_list=[[2]]; mat_nrows=1; mat_ncols=1})
-  (MM_1 {mat_list=[[3]]; mat_nrows=1; mat_ncols=1});
-
-mso1.srng_add mso1.srng_zero
-  (mso1.srng_mul
-     (MM_1 {mat_list=[[2]]; mat_nrows=1; mat_ncols=1})
-     (MM_1 {mat_list=[[3]]; mat_nrows=1; mat_ncols=1}));
-
-(* le problème vient de mso1.srng_zero, qui est une matrice 2x2
-   et que l'addition crée alors une matrice 2x2 aussi *)
-(* mais comment faire ? même mso1.srng_one ne va pas non plus *)
-(* ces multiplications de sous-matrices ne fonctionnent pas *)
