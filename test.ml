@@ -117,9 +117,18 @@ value list_list_mul (ro : semiring_op 'a) r cr c
        (fun k →
 	List.fold_left
 	  (fun a j →
+let _ = eprintf "list_list_mul 1 i %d j %d k %d ...\n%!" i j k in
+let r =
            ro.srng_add a
+(let r = (
              (ro.srng_mul (list_list_el ro.srng_zero ll1 i j)
                 (list_list_el ro.srng_zero ll2 j k)))
+in
+let _ = eprintf "list_list_mul 1 mul ok; now add\n%!" in
+r)
+in
+let _ = eprintf "list_list_mul 1 add ok\n%!" in
+r)
 	  ro.srng_zero (seq 0 cr))
        (seq 0 c))
     (seq 0 r).
@@ -155,12 +164,18 @@ let _ = failwith (sprintf "mat_add (%d, %d) (%d, %d)" (mat_nrows m1) (mat_ncols 
 value mat_mul (ro : semiring_op 'a) (m1 : matrix 'a) (m2 : matrix 'a) :
     matrix 'a =
   if mat_ncols m1 = mat_nrows m2 then
+let _ = eprintf "mat_mul 2 ...\n%!" in
+let r =
     { mat_list =
         list_list_mul ro (mat_nrows m1) (mat_ncols m1) (mat_ncols m2)
           (mat_list m1) (mat_list m2);
       mat_nrows = mat_nrows m1;
       mat_ncols = mat_ncols m2 }
+in
+let _ = eprintf "mat_mul 2 ok\n%!" in
+r
   else
+let _ = eprintf "mat_mul 3\n%!" in
 let _ = failwith (sprintf "mat_mul (%d, %d) (%d, %d)" (mat_nrows m1) (mat_ncols m1) (mat_nrows m2) (mat_ncols m2)) in
     mat_err.
 
@@ -332,7 +347,13 @@ value rec mmat_mul_loop it (so : semiring_op 'a) (mm1 : mmatrix 'a)
       match mm1 with
       | MM_1 ma ->
           match mm2 with
-          | MM_1 mb -> MM_1 (mat_mul so ma mb)
+          | MM_1 mb ->
+let _ = eprintf "mmat_mul_loop 1 ...\n%!" in
+let r =
+	      MM_1 (mat_mul so ma mb)
+in
+let _ = eprintf "mmat_mul_loop 1 ok\n%!" in
+r
           | MM_M mmb -> void_mmat
           end
       | MM_M mmma ->
@@ -349,7 +370,12 @@ value rec mmat_mul_loop it (so : semiring_op 'a) (mm1 : mmatrix 'a)
                   srng_add = mmat_add so;
                   srng_mul = mmat_mul_loop it' so }
               in
+let _ = eprintf "mmat_mul_loop 2 ...\n%!" in
+let r =
               MM_M (mat_mul mso mmma mmmb)
+in
+let _ = eprintf "mmat_mul_loop 2 ok\n%!" in
+r
           end
       end
   end.
@@ -380,6 +406,7 @@ value m =
 let so = nat_semiring_op in
 mmat_mul_loop 2 so m m;
 
+(*
 46;
 
 value mso1 =
@@ -414,3 +441,4 @@ list_list_mul (mso nat_semiring_op 2) 2 2 2
     MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}];
    [MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
     MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]];
+*)
