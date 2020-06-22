@@ -360,14 +360,14 @@ value m =
 let so = nat_semiring_op in
 mmat_mul_loop 2 so m m;
 
-value mso =
+value mso1 =
   let so = nat_semiring_op in
   { srng_zero = zero_mmat (srng_zero so) 2 2;
     srng_one = one_mmat (srng_zero so) (srng_one so) 2 2;
     srng_add = mmat_add so;
     srng_mul = mmat_mul_loop 42 so }
 ;
-mat_mul mso
+mat_mul mso1
   {mat_list =
      [[MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
        MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}];
@@ -381,7 +381,7 @@ mat_mul mso
        MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]];
    mat_nrows = 2; mat_ncols = 2};
 
-list_list_mul mso 2 2 2
+list_list_mul mso1 2 2 2
   [[MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
     MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}];
    [MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
@@ -391,22 +391,22 @@ list_list_mul mso 2 2 2
    [MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
     MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]];
 
-list_list_el mso.srng_zero
+list_list_el mso1.srng_zero
   [[MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
     MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}];
    [MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
     MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]] 0 0;
-list_list_el mso.srng_zero
+list_list_el mso1.srng_zero
   [[MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
     MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}];
    [MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
     MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]] 0 1;
 
-mso.srng_mul
+mso1.srng_mul
   (MM_1 {mat_list=[[2]]; mat_nrows=1; mat_ncols=1})
   (MM_1 {mat_list=[[3]]; mat_nrows=1; mat_ncols=1});
 
-mso.srng_add mso.srng_zero
-  (mso.srng_mul
+mso1.srng_add mso1.srng_zero
+  (mso1.srng_mul
      (MM_1 {mat_list=[[2]]; mat_nrows=1; mat_ncols=1})
      (MM_1 {mat_list=[[3]]; mat_nrows=1; mat_ncols=1}));
