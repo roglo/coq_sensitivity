@@ -1,3 +1,5 @@
+open Printf.
+
 type nat = int;
 value rec firstn n l =
   match n with
@@ -136,24 +138,40 @@ let so = nat_semiring_op in list_list_mul so 3 4 2 [[1; 2; 3; 4]; [5; 6; 7; 8]; 
 
 let so = nat_semiring_op in list_list_mul so 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]].
 
+value mat_err : matrix 'a =
+  { mat_list = []; mat_nrows = 0; mat_ncols = 0 }.
+
 value mat_add zero add (m1 : matrix 'a) (m2 : matrix 'a) : matrix 'a =
-  { mat_list =
-      list_list_add zero add (mat_nrows m1) (mat_ncols m1) (mat_list m1)
-        (mat_list m2);
-    mat_nrows = mat_nrows m1;
-    mat_ncols = mat_ncols m1 }.
+  if mat_nrows m1 = mat_nrows m2 && mat_ncols m1 = mat_ncols m2 then
+    { mat_list =
+        list_list_add zero add (mat_nrows m1) (mat_ncols m1) (mat_list m1)
+          (mat_list m2);
+      mat_nrows = mat_nrows m1;
+      mat_ncols = mat_ncols m1 }
+  else
+let _ = failwith (sprintf "mat_add (%d, %d) (%d, %d)" (mat_nrows m1) (mat_ncols m1) (mat_nrows m2) (mat_ncols m2)) in
+    mat_err.
 
 value mat_mul (ro : semiring_op 'a) (m1 : matrix 'a) (m2 : matrix 'a) :
     matrix 'a =
-  { mat_list =
-      list_list_mul ro (mat_nrows m1) (mat_ncols m1) (mat_ncols m2)
-        (mat_list m1) (mat_list m2);
-    mat_nrows = mat_nrows m1;
-    mat_ncols = mat_ncols m2 }.
+  if mat_ncols m1 = mat_nrows m2 then
+    { mat_list =
+        list_list_mul ro (mat_nrows m1) (mat_ncols m1) (mat_ncols m2)
+          (mat_list m1) (mat_list m2);
+      mat_nrows = mat_nrows m1;
+      mat_ncols = mat_ncols m2 }
+  else
+let _ = failwith (sprintf "mat_mul (%d, %d) (%d, %d)" (mat_nrows m1) (mat_ncols m1) (mat_nrows m2) (mat_ncols m2)) in
+    mat_err.
 
+42;
 let so = nat_semiring_op in mat_mul so (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]; [0; 0]]).
+43;
+(*
 let so = nat_semiring_op in mat_mul so (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]]).
+44;
 let so = nat_semiring_op in mat_mul so (mat_of_list [[1; 2]; [3; 4]; [5; 6]]) (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]).
+*)
 
 let so = nat_semiring_op in mat_ncols (mat_mul so (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]])).
 
@@ -344,9 +362,6 @@ value mso so sz =
     srng_one = one_mmat (srng_zero so) (srng_one so) sz sz;
     srng_add = mmat_add so;
     srng_mul = mmat_mul so }
-(*
-    srng_mul = mmat_mul_loop 42 so } (* 42: à voir *)
-*)
 ;
 
 (* *)
@@ -360,8 +375,12 @@ value m =
         MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]];
      mat_nrows=2; mat_ncols=2};
 
+45;
+
 let so = nat_semiring_op in
 mmat_mul_loop 2 so m m;
+
+46;
 
 value mso1 =
   let so = nat_semiring_op in
