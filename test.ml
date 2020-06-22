@@ -390,3 +390,33 @@ list_list_mul mso 2 2 2
     MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}];
    [MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
     MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]];
+
+list_list_el mso.srng_zero
+  [[MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
+    MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}];
+   [MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
+    MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]] 0 0;
+list_list_el mso.srng_zero
+  [[MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
+    MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}];
+   [MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
+    MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]] 0 1;
+
+mso.srng_mul
+  (MM_1 {mat_list=[[2]]; mat_nrows=1; mat_ncols=1})
+  (MM_1 {mat_list=[[3]]; mat_nrows=1; mat_ncols=1});
+
+value list_list_mul (ro : semiring_op 'a) r cr c
+    (ll1 : list (list 'a)) (ll2 : list (list 'a)) =
+  map
+    (fun i →
+     map
+       (fun k →
+	List.fold_left
+	  (fun a j →
+           ro.srng_add a
+             (ro.srng_mul (list_list_el ro.srng_zero ll1 i j)
+                (list_list_el ro.srng_zero ll2 j k)))
+	  ro.srng_zero (seq 0 cr))
+       (seq 0 c))
+    (seq 0 r).
