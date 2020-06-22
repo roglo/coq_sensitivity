@@ -176,6 +176,14 @@ value void_mat : matrix 'a =
 value void_mmat : mmatrix 'a =
   MM_1 void_mat.
 
+value zero_list_list zero r c : list (list 'a) =
+  map (fun i → map (fun j → zero) (seq 0 c)) (seq 0 r).
+value zero_mat zero r c : matrix 'a =
+  { mat_list = zero_list_list zero r c;
+    mat_nrows = r; mat_ncols = c }.
+value zero_mmat zero r c : mmatrix 'a =
+  MM_1 (zero_mat zero r c).
+
 value one_list_list zero one r c : list (list 'a) =
   map
     (fun i → map (fun j → if i = j then one else zero) (seq 0 c))
@@ -261,18 +269,24 @@ value mmmat_depth (mmm : matrix (mmatrix 'a)) =
 
 value rec mmat_add_loop it zero add (mm1 : mmatrix 'a) (mm2 : mmatrix 'a) =
   match it with
-  | 0 → void_mmat
+  | 0 →
+let _ = Printf.eprintf "caca 3\n%!" in
+      void_mmat
   | _ →
       let it' = it - 1 in
       match mm1 with
       | MM_1 ma →
           match mm2 with
           | MM_1 mb → MM_1 (mat_add zero add ma mb)
-          | MM_M mmb → void_mmat
+          | MM_M mmb →
+let _ = Printf.eprintf "caca 1\n%!" in
+	      void_mmat
           end
       | MM_M mma →
           match mm2 with
-          | MM_1 mb → void_mmat
+          | MM_1 mb →
+let _ = Printf.eprintf "caca 2\n%!" in
+              void_mmat
           | MM_M mmb →
               MM_M (mat_add void_mmat (mmat_add_loop it' zero add) mma mmb)
           end
@@ -313,6 +327,8 @@ let _ = Printf.eprintf "pourri 3\n%!" in
           match mm2 with
           | MM_1 mb ->
 let _ = Printf.eprintf "MM_1 mb\n%!" in
+let _ = glopa.val := Some ma in
+let _ = glopb.val := Some mb in
 	      MM_1 (mat_mul so ma mb)
           | MM_M mmb ->
 let _ = Printf.eprintf "pourri 2\n%!" in
@@ -325,9 +341,9 @@ let _ = Printf.eprintf "pourri 1\n%!" in
               void_mmat
           | MM_M mmmb ->
 let _ = Printf.eprintf "ah ouais ouais\n%!" in
+(*
 let _ = glopa.val := Some mmma in
 let _ = glopb.val := Some mmmb in
-(*
 let _ = trace_mat (fun x → Printf.eprintf " %d" x) void_mmat mmma in
 let _ = trace_mat (fun x → Printf.eprintf " x") void_mmat mmmb in
 *)
@@ -345,7 +361,7 @@ let _ = trace_mat (fun x → Printf.eprintf " x") void_mmat mmmb in
   end.
 
 value glop so r c =
-  { srng_zero = void_mmat;
+  { srng_zero = zero_mmat (srng_zero so) r c;
     srng_one = one_mmat (srng_zero so) (srng_one so) r c;
     srng_add = mmat_add so;
     srng_mul = mmat_mul_loop 42 so }
@@ -356,42 +372,87 @@ value mmat_mul (so : semiring_op 'a) mm1 mm2 =
 
 (*
 let ro = int_ring_op in let so = nat_semiring_op in mmat_mul so (mA ro 0) (mA ro 0).
-*)
 let ro = int_ring_op in mA ro 1;
 let ro = int_ring_op in let so = nat_semiring_op in mmat_mul so (mA ro 1) (mA ro 1).
-(*
 let ro = int_ring_op in let so = nat_semiring_op in mmat_mul so (mA ro 2) (mA ro 2).
 *)
 
-value glopaa = match glopa.val with [ Some a -> a ].
-42;
-42;
-glopaa.
-mat_mul (glop nat_semiring_op 2 2) glopaa glopaa;
+(* *)
 
+value mso so r c =
+  { srng_zero = zero_mmat (srng_zero so) r c;
+    srng_one = one_mmat (srng_zero so) (srng_one so) r c;
+    srng_add = mmat_add so;
+    srng_mul = mmat_mul_loop 42 so }
+;
 
 (*
-value rec mat_of_mmat mm =
-  match mm with
-  | MM_1 r c m -> (r, c, m)
-  | MM_M nr nc mm ->
-      List.fold_left
-        (fun acc r ->
-	   mat_vertic_concat acc
-             (List.fold_left
-                 (fun acc c ->
-                    mat_horiz_concat acc (mat_of_mmat (matel mm r c)))
-                 (0, 0, {matel _ _ = 0}) (seq 0 nc)))
-        (0, 0, {matel _ _ = 0}) (seq 0 nr)
-  end.
+value m1 =
+  [[MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
+    MM_1 {mat_list=[[2]]; mat_nrows=1; mat_ncols=1}]];
+value m2 =
+  [[MM_1 {mat_list=[[3]]; mat_nrows=1; mat_ncols=1}];
+   [MM_1 {mat_list=[[4]]; mat_nrows=1; mat_ncols=1}]];
 
-value list_of_mat nrow ncol m =
-  List.map
-    (fun row ->
-       List.map (fun col -> matel m row col) (seq 0 ncol)) (seq 0 nrow).
+value ro = mso nat_semiring_op 1 1;
+  map
+    (fun i →
+     map
+       (fun k →
+	List.fold_left
+	  (fun a j →
+           ro.srng_add a
+             (ro.srng_mul (list_list_el ro.srng_zero m1 i j)
+                (list_list_el ro.srng_zero m2 j k)))
+	  ro.srng_zero (seq 0 2))
+       (seq 0 1))
+    (seq 0 1);
 
-value list_of_mat2 (n, c, m) = list_of_mat n c m;
+ro.srng_add ro.srng_zero (ro.srng_mul (list_list_el ro.srng_zero m1 0 0) (list_list_el ro.srng_zero m2 0 0));
 
-mat_of_mmat (mA 2);
-list_of_mat2 (mat_of_mmat (mA 2));
+value x1 = MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
+value x2 = MM_1 {mat_list=[[3]]; mat_nrows=1; mat_ncols=1};
+
+ro.srng_add ro.srng_zero (ro.srng_mul x1 x2);
 *)
+
+(*
+list_list_mul (mso nat_semiring_op 1 1) 1 2 1 m1 m2;
+
+value list_list_mul (ro : semiring_op 'a) r cr c
+    (ll1 : list (list 'a)) (ll2 : list (list 'a)) =
+  map
+    (fun i →
+     map
+       (fun k →
+	List.fold_left
+	  (fun a j →
+           ro.srng_add a
+             (ro.srng_mul (list_list_el ro.srng_zero ll1 i j)
+                (list_list_el ro.srng_zero ll2 j k)))
+	  ro.srng_zero (seq 0 cr))
+       (seq 0 c))
+    (seq 0 r).
+*)
+
+(*
+list_list_mul (mso nat_semiring_op 2 2) 2 2 2
+  [[MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
+    MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}];
+   [MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
+    MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]]
+  [[MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
+    MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}];
+   [MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
+    MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]];
+*)
+
+value m =
+  {mat_list=
+    [[MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
+      MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}];
+     [MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
+      MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]];
+    mat_nrows=2; mat_ncols=2}.
+
+mat_mul (mso nat_semiring_op 2 2) m m;
