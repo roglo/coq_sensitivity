@@ -368,7 +368,6 @@ value m =
 let so = nat_semiring_op in
 mmat_mul_loop 2 so m m;
 
-(*
 46;
 
 value mso1 =
@@ -403,4 +402,3 @@ list_list_mul (mso nat_semiring_op 2) 2 2 2
     MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}];
    [MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
     MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]];
-*)
