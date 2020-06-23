@@ -409,8 +409,9 @@ list_list_mul (mso nat_semiring_op 2) 2 2 2
    [MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
     MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]];
 
-42;
 let n = 1 in mmat_mul nat_semiring_op (mA int_ring_op n) (mA int_ring_op n);
+42;
+let n = 2 in mA int_ring_op n;
 43;
 let n = 2 in mmat_mul nat_semiring_op (mA int_ring_op n) (mA int_ring_op n);
 44;
