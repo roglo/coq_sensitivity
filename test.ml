@@ -115,12 +115,17 @@ value list_list_mul (ro : semiring_op 'a) r cr c
     (fun i →
      map
        (fun k →
-        List.fold_left ro.srng_add ro.srng_zero
-          (map
-             (fun j →
-              ro.srng_mul (list_list_el ro.srng_zero ll1 i j)
-                (list_list_el ro.srng_zero ll2 j k))
-             (seq 0 cr)))
+        let vl =
+          map
+            (fun j →
+             ro.srng_mul (list_list_el ro.srng_zero ll1 i j)
+               (list_list_el ro.srng_zero ll2 j k))
+            (seq 0 cr)
+        in
+	match vl with
+        | [] → ro.srng_zero
+        | [v :: vl'] → List.fold_left ro.srng_add v vl'
+        end)
        (seq 0 c))
     (seq 0 r).
 
@@ -149,25 +154,17 @@ value mat_add zero add (m1 : matrix 'a) (m2 : matrix 'a) : matrix 'a =
       mat_nrows = mat_nrows m1;
       mat_ncols = mat_ncols m1 }
   else
-let _ = failwith (sprintf "mat_add (%d, %d) (%d, %d)" (mat_nrows m1) (mat_ncols m1) (mat_nrows m2) (mat_ncols m2)) in
     mat_err.
 
 value mat_mul (ro : semiring_op 'a) (m1 : matrix 'a) (m2 : matrix 'a) :
     matrix 'a =
   if mat_ncols m1 = mat_nrows m2 then
-let _ = eprintf "mat_mul 2 ...\n%!" in
-let r =
     { mat_list =
         list_list_mul ro (mat_nrows m1) (mat_ncols m1) (mat_ncols m2)
           (mat_list m1) (mat_list m2);
       mat_nrows = mat_nrows m1;
       mat_ncols = mat_ncols m2 }
-in
-let _ = eprintf "mat_mul 2 ok\n%!" in
-r
   else
-let _ = eprintf "mat_mul 3\n%!" in
-let _ = failwith (sprintf "mat_mul (%d, %d) (%d, %d)" (mat_nrows m1) (mat_ncols m1) (mat_nrows m2) (mat_ncols m2)) in
     mat_err.
 
 42;
@@ -314,21 +311,6 @@ value rec mmat_add_loop it zero add (mm1 : mmatrix 'a) (mm2 : mmatrix 'a) =
 value mmat_add (so : semiring_op 'a) (mm1 : mmatrix 'a) (mm2 : mmatrix 'a) =
   mmat_add_loop (mmat_depth mm1) (srng_zero so) (srng_add so) mm1 mm2.
 
-value trace_list_list trace_el zero r c ll =
-  List.iter
-    (fun i -> do {
-       List.iter
-         (fun j → trace_el (list_list_el zero ll i j))
-         (seq 0 c);
-       Printf.eprintf "\n%!"
-     })
-    (seq 0 r).
-
-value trace_mat trace_el zero m = do {
-  Printf.eprintf "mat %d row %d col\n%!" m.mat_nrows m.mat_ncols;
-  trace_list_list trace_el zero m.mat_nrows m.mat_ncols m.mat_list
-};
-
 value rec mmat_mul_loop it (so : semiring_op 'a) (mm1 : mmatrix 'a)
     (mm2 : mmatrix 'a) =
   match it with
@@ -338,13 +320,7 @@ value rec mmat_mul_loop it (so : semiring_op 'a) (mm1 : mmatrix 'a)
       match mm1 with
       | MM_1 ma ->
           match mm2 with
-          | MM_1 mb ->
-let _ = eprintf "mmat_mul_loop 1 ...\n%!" in
-let r =
-	      MM_1 (mat_mul so ma mb)
-in
-let _ = eprintf "mmat_mul_loop 1 ok\n%!" in
-r
+          | MM_1 mb -> MM_1 (mat_mul so ma mb)
           | MM_M mmb -> void_mmat
           end
       | MM_M mmma ->
@@ -361,12 +337,7 @@ r
                   srng_add = mmat_add so;
                   srng_mul = mmat_mul_loop it' so }
               in
-let _ = eprintf "mmat_mul_loop 2 ...\n%!" in
-let r =
               MM_M (mat_mul mso mmma mmmb)
-in
-let _ = eprintf "mmat_mul_loop 2 ok\n%!" in
-r
           end
       end
   end.
