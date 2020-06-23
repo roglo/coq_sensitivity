@@ -111,27 +111,23 @@ value list_list_add zero (add : 'a → 'a → 'a) r c
 
 value list_list_mul (ro : semiring_op 'a) r cr c
     (ll1 : list (list 'a)) (ll2 : list (list 'a)) =
-  map
-    (fun i →
-     map
-       (fun k →
-	List.fold_left
-	  (fun a j →
-let _ = eprintf "list_list_mul 1 i %d j %d k %d ...\n%!" i j k in
-let r =
-           ro.srng_add a
-(let r = (
-             (ro.srng_mul (list_list_el ro.srng_zero ll1 i j)
-                (list_list_el ro.srng_zero ll2 j k)))
-in
-let _ = eprintf "list_list_mul 1 mul ok; now add\n%!" in
-r)
-in
-let _ = eprintf "list_list_mul 1 add ok\n%!" in
-r)
-	  ro.srng_zero (seq 0 cr))
-       (seq 0 c))
-    (seq 0 r).
+  match cr with
+  | 0 → []
+  | _ →
+      let cr' = cr - 1 in
+      map
+        (fun i →
+         map
+           (fun k →
+            List.fold_left ro.srng_add ro.srng_zero
+	      (map
+		 (fun j →
+                    ro.srng_mul (list_list_el ro.srng_zero ll1 i j)
+                      (list_list_el ro.srng_zero ll2 j k))
+		 (seq 0 cr)))
+           (seq 0 c))
+        (seq 0 r)
+  end.
 
 value nat_semiring_op : semiring_op nat =
   { srng_zero = 0;
