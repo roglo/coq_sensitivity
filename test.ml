@@ -242,11 +242,60 @@ value list_list_I (ro : ring_op 'a) n =
     (seq 0 n).
 
 
-value mI (ro : ring_op 'a) n =
+value mI_gen (ro : ring_op 'a) n =
   MM_1
     { mat_list = list_list_I ro n;
       mat_nrows = n;
       mat_ncols = n }.
+
+value mI2 (ro : ring_op 'a) =
+  MM_M
+    {mat_list=
+      [[MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
+        MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}];
+       [MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
+        MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}]];
+     mat_nrows = 2; mat_ncols = 2}.
+
+value mI4 (ro : ring_op 'a) =
+  MM_M
+    {mat_list=
+      [[MM_M
+          {mat_list=
+            [[MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
+              MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}];
+             [MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
+              MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}]];
+           mat_nrows=2; mat_ncols=2};
+        MM_M
+          {mat_list=
+            [[MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
+              MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}];
+             [MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
+              MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]];
+           mat_nrows=2; mat_ncols=2}];
+       [MM_M
+          {mat_list=
+            [[MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
+              MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}];
+             [MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
+              MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]];
+           mat_nrows=2; mat_ncols=2};
+        MM_M
+          {mat_list=
+            [[MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
+              MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}];
+             [MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
+              MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}]];
+           mat_nrows=2; mat_ncols=2}]];
+     mat_nrows=2; mat_ncols=2};
+
+value mI (ro : ring_op 'a) n =
+  match n with
+  | 2 → mI2 ro
+  | 4 → mI4 ro
+  | _ → mI_gen ro n
+  end.
 
 value rec mA (ro : ring_op 'a) n =
   match n with
@@ -404,8 +453,12 @@ list_list_mul (mso nat_semiring_op 2) 2 2 2
     MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]];
 
 let n = 1 in mmat_mul nat_semiring_op (mA int_ring_op n) (mA int_ring_op n);
-42;
 let n = 2 in mA int_ring_op n;
-43;
 let n = 2 in mmat_mul nat_semiring_op (mA int_ring_op n) (mA int_ring_op n);
+42;
+let n = 3 in mA int_ring_op n;
+43;
+let n = 3 in mmat_mul nat_semiring_op (mA int_ring_op n) (mA int_ring_op n);
 44;
+
+value mat_of_mmat mm = ...
