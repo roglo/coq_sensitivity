@@ -116,11 +116,11 @@ value list_list_mul (ro : semiring_op 'a) r cr c
      map
        (fun k →
         List.fold_left ro.srng_add ro.srng_zero
-	      (map
-		 (fun j →
-                ro.srng_mul (list_list_el ro.srng_zero ll1 i j)
-                  (list_list_el ro.srng_zero ll2 j k))
-		 (seq 0 cr)))
+          (map
+             (fun j →
+              ro.srng_mul (list_list_el ro.srng_zero ll1 i j)
+                (list_list_el ro.srng_zero ll2 j k))
+             (seq 0 cr)))
        (seq 0 c))
     (seq 0 r).
 
