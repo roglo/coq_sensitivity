@@ -243,9 +243,10 @@ value list_list_I (ro : ring_op 'a) n =
 
 
 value mI (ro : ring_op 'a) n =
-  { mat_list = list_list_I ro n;
-    mat_nrows = n;
-    mat_ncols = n }.
+  MM_1
+    { mat_list = list_list_I ro n;
+      mat_nrows = n;
+      mat_ncols = n }.
 
 value rec mA (ro : ring_op 'a) n =
   match n with
@@ -261,8 +262,8 @@ value rec mA (ro : ring_op 'a) n =
        let n' = n - 1 in
        MM_M
          (mmat_of_list
-            [[mA ro n'; MM_1 (mI ro (nat_pow 2 n'))];
-             [MM_1 (mI ro (nat_pow 2 n')); mmat_opp ro (mA ro n')]])
+            [[mA ro n'; mI ro (nat_pow 2 n')];
+             [mI ro (nat_pow 2 n'); mmat_opp ro (mA ro n')]])
   end.
 
 value rec mmat_depth (mm : mmatrix 'a) =
