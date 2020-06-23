@@ -251,13 +251,6 @@ value mI (ro : ring_op 'a) n =
 value rec mA (ro : ring_op 'a) n =
   match n with
   | 0 → MM_1 (mat_of_list [[srng_zero (rng_semiring ro)]])
-(*
-  | 1 →
-      MM_1
-        (mat_of_list
-	   [[srng_zero (rng_semiring ro); srng_one (rng_semiring ro)];
-	    [srng_one (rng_semiring ro); srng_zero (rng_semiring ro)]])
-*)
   | _ →
        let n' = n - 1 in
        MM_M
