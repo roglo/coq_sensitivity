@@ -2008,6 +2008,9 @@ Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in A 1).
 Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mmat (A 2)).
 
 Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mmat (mmat_mul (A 0) (A 0))).
+
+(* wrong result: however ocaml version is correct...
+   I must have copied it wrongly *)
 Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mmat (mmat_mul (A 1) (A 1))).
 
 ...
