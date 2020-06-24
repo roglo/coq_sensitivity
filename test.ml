@@ -386,7 +386,7 @@ let _ = failwith (sprintf "mat_add_loop MM_1+MM_M") in
 let _ = failwith (sprintf "mat_add_loop MM_M(%d,%d)+MM_1(%d,%d)" (mat_nrows mma) (mat_ncols mma) (mat_nrows mb) (mat_ncols mb)) in
               mmat_err
           | MM_M mmb →
-              MM_M (mat_add mmat_zero (mmat_add_loop it' zero add) mma mmb)
+              MM_M (mat_add mmat_err (mmat_add_loop it' zero add) mma mmb)
           end
       end
   end.
@@ -428,6 +428,16 @@ value rec mmat_mul_loop it (so : semiring_op 'a) (mm1 : mmatrix 'a)
 value mmat_mul (so : semiring_op 'a) mm1 mm2 =
   mmat_mul_loop (mmat_depth mm1) so mm1 mm2.
 
+let ro = int_ring_op in let so = nat_semiring_op in
+mat_of_mmat (mmat_mul so (mA ro 0) (mA ro 0)).
+
+let ro = int_ring_op in let so = nat_semiring_op in
+mat_of_mmat (mmat_mul so (mA ro 1) (mA ro 1)).
+
+let ro = int_ring_op in let so = nat_semiring_op in
+mat_of_mmat (mmat_mul so (mA ro 2) (mA ro 2)).
+
+(*
 value mso so sz =
   { srng_zero = zero_mmat (srng_zero so) sz sz;
     srng_one = one_mmat (srng_zero so) (srng_one so) sz sz;
@@ -494,3 +504,4 @@ let n = 3 in mA int_ring_op n;
 43;
 let n = 3 in mmat_mul nat_semiring_op (mA int_ring_op n) (mA int_ring_op n);
 44;
+*)

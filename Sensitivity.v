@@ -1857,6 +1857,14 @@ Definition mat_err {T} : matrix T :=
 Definition mmat_err {T} : mmatrix T :=
   MM_1 mat_err.
 
+Definition zero_list_list {T} zero r c : list (list T) :=
+  map (λ i, map (λ j, zero) (seq 0 c)) (seq 0 r).
+Definition zero_mat {T} zero r c : matrix T :=
+  {| mat_list := zero_list_list zero r c;
+     mat_nrows := r; mat_ncols := c |}.
+Definition zero_mmat {T} zero r c : mmatrix T :=
+  MM_1 (zero_mat zero r c).
+
 Definition one_list_list {T} zero one r c : list (list T) :=
   map
     (λ i, map (λ j, if Nat.eq_dec i j then one else zero) (seq 0 c))
@@ -1940,8 +1948,6 @@ Compute (mmat_depth (A 4)).
 Definition mmmat_depth T (MMM : matrix (mmatrix T)) :=
   mmat_depth (mat_el mmat_err MMM 0 0).
 
-...
-
 Fixpoint mmat_add_loop T it zero add (MM1 MM2 : mmatrix T) :=
   match it with
   | 0 => mmat_err
@@ -1956,7 +1962,7 @@ Fixpoint mmat_add_loop T it zero add (MM1 MM2 : mmatrix T) :=
           match MM2 with
           | MM_1 MB => mmat_err
           | MM_M MMB =>
-              MM_M (mat_add mmat_err... (mmat_add_loop it' zero add) MMA MMB)
+              MM_M (mat_add mmat_err (mmat_add_loop it' zero add) MMA MMB)
           end
       end
   end.
@@ -1966,20 +1972,22 @@ Definition mmat_add T {so : semiring_op T} (MM1 MM2 : mmatrix T) :=
 
 Fixpoint mmat_mul_loop T it {so : semiring_op T} (MM1 MM2 : mmatrix T) :=
   match it with
-  | 0 => void_mmat
+  | 0 => mmat_err
   | S it' =>
       match MM1 with
       | MM_1 MA =>
           match MM2 with
           | MM_1 MB => MM_1 (mat_mul MA MB)
-          | MM_M MMB => void_mmat
+          | MM_M MMB => mmat_err
           end
       | MM_M MMA =>
           match MM2 with
-          | MM_1 MB => void_mmat
+          | MM_1 MB => mmat_err
           | MM_M MMB =>
               let mso :=
-                {| srng_zero := void_mmat;
+                {| srng_zero :=
+                     zero_mmat srng_zero
+                       (mat_nrows MMA) (mat_ncols MMB);
                    srng_one :=
                      one_mmat srng_zero srng_one
                        (mat_nrows MMA) (mat_ncols MMB);
@@ -1992,13 +2000,16 @@ Fixpoint mmat_mul_loop T it {so : semiring_op T} (MM1 MM2 : mmatrix T) :=
   end.
 
 Definition mmat_mul T {so : semiring_op T} (MM1 MM2 : mmatrix T) :=
-  mmat_mul_loop (mmat_depth MM1 + 42) MM1 MM2.
+  mmat_mul_loop (mmat_depth MM1) MM1 MM2.
 
 Require Import ZArith.
+Open Scope Z_scope.
 
 Compute (let ro := Z_ring_op in let so := Z_semiring_op in @mmat_mul Z so (A 0) (A 0)).
 Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in @mmat_mul Z so (A 0) (A 0)).
-Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in @mmat_mul Z so (A 1) (A 1)).
+Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mmat (@mmat_mul Z so (A 1) (A 1))).
+...
+
 Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in @mmat_mul Z so (A 2) (A 2)).
 
 ...
