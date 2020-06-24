@@ -461,10 +461,10 @@ let n = 3 in mA int_ring_op n;
 let n = 3 in mmat_mul nat_semiring_op (mA int_ring_op n) (mA int_ring_op n);
 44;
 
-value rec mat_of_mmat mm =
+value rec list_list_of_mmat mm =
   match mm with
   | MM_1 m → List.concat m.mat_list
   | MM_M mmm →
-      List.concat (List.concat (map (map mat_of_mmat) mmm.mat_list))
+      List.concat (List.concat (map (map list_list_of_mmat) mmm.mat_list))
   end.
-mat_of_mmat (mA int_ring_op 2);
+list_list_of_mmat (mA int_ring_op 2);
