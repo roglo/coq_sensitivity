@@ -1784,7 +1784,6 @@ Definition list_list_mul T {ro : semiring_op T} r cr c
       v1+v2+v3+...+vn
    c'est cette première somme 0+ qui fait déconner
    le truc *)
-...
 (*
 Definition list_list_mul T {ro : semiring_op T} r cr c
     (ll1 ll2 : list (list T)) :=
@@ -1808,6 +1807,9 @@ Compute (let _ := nat_semiring_op in list_list_mul 3 4 2 [[1; 2; 3; 4]; [5; 6; 7
 
 Compute (let _ := nat_semiring_op in list_list_mul 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
 
+Definition mat_err {T} : matrix T :=
+  {| mat_list := []; mat_nrows := 0; mat_ncols := 0 |}.
+
 (* multiplication of matrices is always defined, even if the resp # of
    rows (columns) of the first matrix is not equal to the # of rows
    (columns) of ths second one ; in that case, the result has no sense *)
@@ -1818,18 +1820,24 @@ Compute (let _ := nat_semiring_op in list_list_mul 3 3 3 [[1; 2; 3]; [4; 5; 6]; 
    condition among its hypotheses *)
 
 Definition mat_add T zero add (M1 M2 : matrix T) : matrix T :=
-  {| mat_list :=
-       list_list_add zero add (mat_nrows M1) (mat_ncols M1) (mat_list M1)
-         (mat_list M2);
-     mat_nrows := mat_nrows M1;
-     mat_ncols := mat_ncols M1 |}.
+  if Nat.eq_dec (mat_nrows M1) (mat_nrows M2) then
+    if Nat.eq_dec (mat_ncols M1) (mat_ncols M2) then
+      {| mat_list :=
+           list_list_add zero add (mat_nrows M1) (mat_ncols M1) (mat_list M1)
+             (mat_list M2);
+         mat_nrows := mat_nrows M1;
+         mat_ncols := mat_ncols M1 |}
+    else mat_err
+  else mat_err.
 
 Definition mat_mul {T} {so : semiring_op T} (M1 M2 : matrix T) : matrix T :=
-  {| mat_list :=
-       list_list_mul (mat_nrows M1) (mat_ncols M1) (mat_ncols M2)
-         (mat_list M1) (mat_list M2);
-     mat_nrows := mat_nrows M1;
-     mat_ncols := mat_ncols M2 |}.
+  if Nat.eq_dec (mat_ncols M1) (mat_nrows M2) then
+    {| mat_list :=
+         list_list_mul (mat_nrows M1) (mat_ncols M1) (mat_ncols M2)
+           (mat_list M1) (mat_list M2);
+       mat_nrows := mat_nrows M1;
+       mat_ncols := mat_ncols M2 |}
+  else mat_err.
 
 Compute (let _ := nat_semiring_op in mat_mul (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]; [0; 0]])).
 Compute (let _ := nat_semiring_op in mat_mul (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]])).
@@ -1882,9 +1890,6 @@ Fixpoint list_list_of_mmat T (MM : mmatrix T) : list (list T) :=
 
 Definition mat_of_mmat T (mm : mmatrix T) : matrix T :=
   mat_of_list (list_list_of_mmat mm).
-
-Definition mat_err {T} : matrix T :=
-  {| mat_list := []; mat_nrows := 0; mat_ncols := 0 |}.
 
 Definition mmat_err {T} : mmatrix T :=
   MM_1 mat_err.
