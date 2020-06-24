@@ -1851,10 +1851,11 @@ Fixpoint list_list_of_mmat T (MM : mmatrix T) : list (list T) :=
 Definition mat_of_mmat T (mm : mmatrix T) : matrix T :=
   mat_of_list (list_list_of_mmat mm).
 
-Definition void_mat {T} : matrix T :=
-  {| mat_list := ([] : list (list T)); mat_nrows := 0; mat_ncols := 0 |}.
-Definition void_mmat {T} : mmatrix T :=
-  MM_1 void_mat.
+Definition mat_err {T} : matrix T :=
+  {| mat_list := []; mat_nrows := 0; mat_ncols := 0 |}.
+
+Definition mmat_err {T} : mmatrix T :=
+  MM_1 mat_err.
 
 Definition one_list_list {T} zero one r c : list (list T) :=
   map
@@ -1937,25 +1938,25 @@ Compute (mmat_depth (A 3)).
 Compute (mmat_depth (A 4)).
 
 Definition mmmat_depth T (MMM : matrix (mmatrix T)) :=
-  mmat_depth (mat_el void_mmat MMM 0 0).
+  mmat_depth (mat_el mmat_err MMM 0 0).
 
-... (* voir à partir de test.ml *)
+...
 
 Fixpoint mmat_add_loop T it zero add (MM1 MM2 : mmatrix T) :=
   match it with
-  | 0 => void_mmat
+  | 0 => mmat_err
   | S it' =>
       match MM1 with
       | MM_1 MA =>
           match MM2 with
           | MM_1 MB => MM_1 (mat_add zero add MA MB)
-          | MM_M MMB => void_mmat
+          | MM_M MMB => mmat_err
           end
       | MM_M MMA =>
           match MM2 with
-          | MM_1 MB => void_mmat
+          | MM_1 MB => mmat_err
           | MM_M MMB =>
-              MM_M (mat_add void_mmat (mmat_add_loop it' zero add) MMA MMB)
+              MM_M (mat_add mmat_err... (mmat_add_loop it' zero add) MMA MMB)
           end
       end
   end.

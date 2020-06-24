@@ -386,7 +386,7 @@ let _ = failwith (sprintf "mat_add_loop MM_1+MM_M") in
 let _ = failwith (sprintf "mat_add_loop MM_M(%d,%d)+MM_1(%d,%d)" (mat_nrows mma) (mat_ncols mma) (mat_nrows mb) (mat_ncols mb)) in
               mmat_err
           | MM_M mmb →
-              MM_M (mat_add mmat_err (mmat_add_loop it' zero add) mma mmb)
+              MM_M (mat_add mmat_zero (mmat_add_loop it' zero add) mma mmb)
           end
       end
   end.
