@@ -461,10 +461,35 @@ let n = 3 in mA int_ring_op n;
 let n = 3 in mmat_mul nat_semiring_op (mA int_ring_op n) (mA int_ring_op n);
 44;
 
-value rec list_list_of_mmat mm =
+value rec concat_list_list ll1 ll2 =
+  match ll1 with
+  | [] → ll2
+  | [l1 :: ll1'] →
+       match ll2 with
+       | [] → ll1
+       | [l2 :: ll2'] → [l1 @ l2 :: concat_list_list ll1' ll2']
+       end
+  end.
+
+value rec concat_list_list_list lll =
+  match lll with
+  | [] → []
+  | [ll] → ll
+  | [ll1; ll2 :: lll'] →
+      concat_list_list_list [concat_list_list ll1 ll2 :: lll']
+  end.
+
+value rec list_list_of_mmat (mm : mmatrix int) : list (list int) =
   match mm with
-  | MM_1 m → List.concat m.mat_list
+  | MM_1 m → m.mat_list
   | MM_M mmm →
-      List.concat (List.concat (map (map list_list_of_mmat) mmm.mat_list))
+      let ll =
+        map
+          (fun mml →
+             let lll = map list_list_of_mmat mml in
+             concat_list_list_list lll)
+          mmm.mat_list
+      in
+      List.concat ll
   end.
 list_list_of_mmat (mA int_ring_op 2);
