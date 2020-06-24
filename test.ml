@@ -319,6 +319,7 @@ value mI4 (ro : ring_op 'a) =
      mat_nrows=2; mat_ncols=2};
 
 value mI (ro : ring_op 'a) n =
+(**)
   mI_gen ro n.
 (*
   match n with
@@ -438,6 +439,12 @@ let ro = int_ring_op in let so = nat_semiring_op in
 mat_of_mmat (mmat_mul so (mA ro 2) (mA ro 2)).
 
 (*
+let ro = int_ring_op in let so = nat_semiring_op in
+mat_of_mmat (mmat_mul so (mA ro 3) (mA ro 3)).
+
+let ro = int_ring_op in let so = nat_semiring_op in
+mat_of_mmat (mmat_mul so (mA ro 4) (mA ro 4)).
+
 value mso so sz =
   { srng_zero = zero_mmat (srng_zero so) sz sz;
     srng_one = one_mmat (srng_zero so) (srng_one so) sz sz;
