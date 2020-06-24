@@ -266,8 +266,8 @@ value rec mIZ_2_pow (ro : ring_op 'a) u n =
       let n' = n - 1 in
       MM_M
         {mat_list =
-	   [[mIZ_2_pow ro 1 n'; mIZ_2_pow ro 0 n'];
-	    [mIZ_2_pow ro 0 n'; mIZ_2_pow ro 1 n']];
+	   [[mIZ_2_pow ro u n'; mIZ_2_pow ro 0 n'];
+	    [mIZ_2_pow ro 0 n'; mIZ_2_pow ro u n']];
          mat_nrows = 2; mat_ncols = 2}
   end.
 
@@ -384,10 +384,10 @@ mat_of_mmat (mmat_mul so (mA ro 2) (mA ro 2)).
 let ro = int_ring_op in let so = nat_semiring_op in
 mat_of_mmat (mmat_mul so (mA ro 3) (mA ro 3)).
 
-(*
 let ro = int_ring_op in let so = nat_semiring_op in
 mat_of_mmat (mmat_mul so (mA ro 4) (mA ro 4)).
 
+(*
 value mso so sz =
   { srng_zero = zero_mmat (srng_zero so) sz sz;
     srng_one = one_mmat (srng_zero so) (srng_one so) sz sz;
