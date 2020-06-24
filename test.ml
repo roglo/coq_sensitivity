@@ -371,8 +371,7 @@ value rec mmat_mul_loop it (so : semiring_op 'a) (mm1 : mmatrix 'a)
 value mmat_mul (so : semiring_op 'a) mm1 mm2 =
   mmat_mul_loop (mmat_depth mm1) so mm1 mm2.
 
-let ro = int_ring_op in let so = nat_semiring_op in
-mat_of_mmat (mmat_mul so (mA ro 0) (mA ro 0)).
+let ro = int_ring_op in let so = nat_semiring_op in mat_of_mmat (mmat_mul so (mA ro 0) (mA ro 0)).
 
 let ro = int_ring_op in let so = nat_semiring_op in
 mat_of_mmat (mmat_mul so (mA ro 1) (mA ro 1)).
@@ -380,7 +379,6 @@ mat_of_mmat (mmat_mul so (mA ro 1) (mA ro 1)).
 let ro = int_ring_op in let so = nat_semiring_op in
 mat_of_mmat (mmat_mul so (mA ro 2) (mA ro 2)).
 
-(* wrong result *)
 let ro = int_ring_op in let so = nat_semiring_op in
 mat_of_mmat (mmat_mul so (mA ro 3) (mA ro 3)).
 

@@ -1891,21 +1891,16 @@ Definition mmat_of_list T (ll : list (list (mmatrix T))) :
      mat_nrows := list_list_nrows ll;
      mat_ncols := list_list_ncols ll |}.
 
-Definition list_list_I T {ro : ring_op T} n :=
-  map
-    (λ i,
-     map
-       (λ j,
-        if Nat.eq_dec i j then @srng_one T rng_semiring
-        else @srng_zero T rng_semiring)
-       (seq 0 n))
-    (seq 0 n).
-
-Definition I T {ro : ring_op T} n :=
-  MM_1
-    {| mat_list := list_list_I n;
-       mat_nrows := n;
-       mat_ncols := n |}.
+Fixpoint IZ_2_pow T {ro : ring_op T} u n :=
+  match n with
+  | 0 => MM_1 {| mat_list := [[u]]; mat_nrows := 1; mat_ncols := 1 |}
+  | S n' =>
+      MM_M
+        {| mat_list :=
+             [[IZ_2_pow u n'; IZ_2_pow 0%Rng n'];
+              [IZ_2_pow 0%Rng n'; IZ_2_pow u n']];
+           mat_nrows := 2; mat_ncols := 2 |}
+  end.
 
 Fixpoint A T {ro : ring_op T} n :=
   match n with
@@ -1913,8 +1908,8 @@ Fixpoint A T {ro : ring_op T} n :=
   | S n' =>
        MM_M
          (mmat_of_list
-            [[A n'; I (2 ^ n')];
-             [I (2 ^ n'); mmat_opp (A n')]])
+            [[A n'; IZ_2_pow 1%Rng n'];
+             [IZ_2_pow 1%Rng n'; mmat_opp (A n')]])
   end.
 
 (*
@@ -1980,21 +1975,21 @@ Fixpoint mmat_mul_loop T it {so : semiring_op T} (MM1 MM2 : mmatrix T) :=
           | MM_1 MB => MM_1 (mat_mul MA MB)
           | MM_M MMB => mmat_err
           end
-      | MM_M MMA =>
+      | MM_M MMMA =>
           match MM2 with
           | MM_1 MB => mmat_err
-          | MM_M MMB =>
+          | MM_M MMMB =>
               let mso :=
                 {| srng_zero :=
                      zero_mmat srng_zero
-                       (mat_nrows MMA) (mat_ncols MMB);
+                       (mat_nrows MMMA) (mat_ncols MMMB);
                    srng_one :=
                      one_mmat srng_zero srng_one
-                       (mat_nrows MMA) (mat_ncols MMB);
+                       (mat_nrows MMMA) (mat_ncols MMMB);
                    srng_add := @mmat_add T so;
                    srng_mul := mmat_mul_loop it' |}
               in
-              MM_M (mat_mul MMA MMB)
+              MM_M (mat_mul MMMA MMMB)
           end
       end
   end.
@@ -2005,13 +2000,19 @@ Definition mmat_mul T {so : semiring_op T} (MM1 MM2 : mmatrix T) :=
 Require Import ZArith.
 Open Scope Z_scope.
 
-Compute (let ro := Z_ring_op in let so := Z_semiring_op in @mmat_mul Z so (A 0) (A 0)).
-Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in @mmat_mul Z so (A 0) (A 0)).
-Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mmat (@mmat_mul Z so (A 1) (A 1))).
+Check mmat_mul.
+Check mat_of_mmat.
+
+Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in A 0).
+Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in A 1).
+Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mmat (A 2)).
+
+Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mmat (mmat_mul (A 0) (A 0))).
+Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mmat (mmat_mul (A 1) (A 1))).
+
 ...
 
-Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in @mmat_mul Z so (A 2) (A 2)).
-
+Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mmat (mmat_mul (A 2) (A 2))).
 ...
 
 Definition mmat_semiring_op T {so : semiring_op T} r c :
