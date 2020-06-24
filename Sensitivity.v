@@ -1823,6 +1823,34 @@ Inductive mmatrix T :=
 Arguments MM_1 {_}.
 Arguments MM_M {_}.
 
+Fixpoint concat_list_in_list T (ll1 ll2 : list (list T)) :=
+  match ll1 with
+  | [] => ll2
+  | l1 :: ll1' =>
+       match ll2 with
+       | [] => ll1
+       | l2 :: ll2' => app l1 l2 :: concat_list_in_list ll1' ll2'
+       end
+  end.
+
+Definition concat_list_list_list T (lll : list (list (list T))) :=
+  fold_left (@concat_list_in_list T) lll [].
+
+Fixpoint list_list_of_mmat T (MM : mmatrix T) : list (list T) :=
+  match MM with
+  | MM_1 M => mat_list M
+  | MM_M MMM =>
+      let ll :=
+        map
+          (λ MMl, concat_list_list_list (map (@list_list_of_mmat T) MMl))
+          (mat_list MMM)
+      in
+      List.concat ll
+  end.
+
+Definition mat_of_mmat T (mm : mmatrix T) : matrix T :=
+  mat_of_list (list_list_of_mmat mm).
+
 Definition void_mat {T} : matrix T :=
   {| mat_list := ([] : list (list T)); mat_nrows := 0; mat_ncols := 0 |}.
 Definition void_mmat {T} : mmatrix T :=
@@ -1865,22 +1893,28 @@ Definition list_list_I T {ro : ring_op T} n :=
     (seq 0 n).
 
 Definition I T {ro : ring_op T} n :=
-  {| mat_list := list_list_I n;
-     mat_nrows := n;
-     mat_ncols := n |}.
+  MM_1
+    {| mat_list := list_list_I n;
+       mat_nrows := n;
+       mat_ncols := n |}.
 
 Fixpoint A T {ro : ring_op T} n :=
   match n with
   | 0 => MM_1 (mat_of_list [[0%Rng]])
-(*
-  | 1 => MM_1 (mat_of_list [[0; 1]; [1; 0]]%Rng)
-*)
   | S n' =>
        MM_M
          (mmat_of_list
-            [[A n'; MM_1 (I (2 ^ n'))];
-             [MM_1 (I (2 ^ n')); mmat_opp (A n')]])
+            [[A n'; I (2 ^ n')];
+             [I (2 ^ n'); mmat_opp (A n')]])
   end.
+
+(*
+Require Import ZArith.
+Search mmatrix.
+Open Scope Z_scope.
+
+Compute (mat_of_mmat (@A _ Z_ring_op 4)).
+*)
 
 Fixpoint mmat_depth T (MM : mmatrix T) :=
   match MM with
@@ -1904,6 +1938,8 @@ Compute (mmat_depth (A 4)).
 
 Definition mmmat_depth T (MMM : matrix (mmatrix T)) :=
   mmat_depth (mat_el void_mmat MMM 0 0).
+
+... (* voir à partir de test.ml *)
 
 Fixpoint mmat_add_loop T it zero add (MM1 MM2 : mmatrix T) :=
   match it with

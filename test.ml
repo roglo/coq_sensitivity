@@ -204,13 +204,8 @@ value rec concat_list_in_list ll1 ll2 =
        end
   end.
 
-value rec concat_list_list_list lll =
-  match lll with
-  | [] → []
-  | [ll] → ll
-  | [ll1; ll2 :: lll'] →
-      concat_list_list_list [concat_list_in_list ll1 ll2 :: lll']
-  end.
+value concat_list_list_list lll =
+  List.fold_left concat_list_in_list [] lll.
 
 value rec list_list_of_mmat (mm : mmatrix 'a) : list (list 'a) =
   match mm with
