@@ -194,6 +194,39 @@ type mmatrix 'a =
   [ MM_1 of matrix 'a
   | MM_M of matrix (mmatrix 'a) ].
 
+value rec concat_list_in_list ll1 ll2 =
+  match ll1 with
+  | [] → ll2
+  | [l1 :: ll1'] →
+       match ll2 with
+       | [] → ll1
+       | [l2 :: ll2'] → [l1 @ l2 :: concat_list_in_list ll1' ll2']
+       end
+  end.
+
+value rec concat_list_list_list lll =
+  match lll with
+  | [] → []
+  | [ll] → ll
+  | [ll1; ll2 :: lll'] →
+      concat_list_list_list [concat_list_in_list ll1 ll2 :: lll']
+  end.
+
+value rec list_list_of_mmat (mm : mmatrix 'a) : list (list 'a) =
+  match mm with
+  | MM_1 m → m.mat_list
+  | MM_M mmm →
+      let ll =
+        map
+          (fun mml → concat_list_list_list (map list_list_of_mmat mml))
+          mmm.mat_list
+      in
+      List.concat ll
+  end.
+
+value mat_of_mmat (mm : mmatrix 'a) : matrix 'a =
+  mat_of_list (list_list_of_mmat mm).
+
 value mmat_err : mmatrix 'a =
   MM_1 mat_err;
 
@@ -291,11 +324,14 @@ value mI4 (ro : ring_op 'a) =
      mat_nrows=2; mat_ncols=2};
 
 value mI (ro : ring_op 'a) n =
+  mI_gen ro n.
+(*
   match n with
   | 2 → mI2 ro
   | 4 → mI4 ro
   | _ → mI_gen ro n
   end.
+*)
 
 value rec mA (ro : ring_op 'a) n =
   match n with
@@ -307,6 +343,9 @@ value rec mA (ro : ring_op 'a) n =
             [[mA ro n'; mI ro (nat_pow 2 n')];
              [mI ro (nat_pow 2 n'); mmat_opp ro (mA ro n')]])
   end.
+
+list_list_of_mmat (mA int_ring_op 2);
+mat_of_mmat (mA int_ring_op 2);
 
 value rec mmat_depth (mm : mmatrix 'a) =
   match mm with
@@ -460,39 +499,3 @@ let n = 3 in mA int_ring_op n;
 43;
 let n = 3 in mmat_mul nat_semiring_op (mA int_ring_op n) (mA int_ring_op n);
 44;
-
-value rec concat_list_in_list ll1 ll2 =
-  match ll1 with
-  | [] → ll2
-  | [l1 :: ll1'] →
-       match ll2 with
-       | [] → ll1
-       | [l2 :: ll2'] → [l1 @ l2 :: concat_list_in_list ll1' ll2']
-       end
-  end.
-
-value rec concat_list_list_list lll =
-  match lll with
-  | [] → []
-  | [ll] → ll
-  | [ll1; ll2 :: lll'] →
-      concat_list_list_list [concat_list_in_list ll1 ll2 :: lll']
-  end.
-
-value rec list_list_of_mmat (mm : mmatrix 'a) : list (list 'a) =
-  match mm with
-  | MM_1 m → m.mat_list
-  | MM_M mmm →
-      let ll =
-        map
-          (fun mml → concat_list_list_list (map list_list_of_mmat mml))
-          mmm.mat_list
-      in
-      List.concat ll
-  end.
-list_list_of_mmat (mA int_ring_op 2);
-
-value mat_of_mmat (mm : mmatrix 'a) : matrix 'a =
-  mat_of_list (list_list_of_mmat mm).
-
-mat_of_mmat (mA int_ring_op 2);
