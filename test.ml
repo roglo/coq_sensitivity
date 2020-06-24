@@ -485,9 +485,7 @@ value rec list_list_of_mmat (mm : mmatrix 'a) : list (list 'a) =
   | MM_M mmm →
       let ll =
         map
-          (fun mml →
-             let lll = map list_list_of_mmat mml in
-             concat_list_list_list lll)
+          (fun mml → concat_list_list_list (map list_list_of_mmat mml))
           mmm.mat_list
       in
       List.concat ll
