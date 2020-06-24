@@ -259,90 +259,17 @@ value mmat_of_list (ll : list (list (mmatrix 'a))) :
     mat_nrows = list_list_nrows ll;
     mat_ncols = list_list_ncols ll }.
 
-value list_list_I (ro : ring_op 'a) n =
-  map
-    (fun i →
-     map
-       (fun j →
-        if i = j then srng_one (rng_semiring ro)
-        else srng_zero (rng_semiring ro))
-       (seq 0 n))
-    (seq 0 n).
-
-value glop (ro : ring_op _) n =
-  map
-    (fun i →
-     MM_M
-       {mat_list =
-          [[MM_1
-              (map
-                 (fun j →
-                  {mat_list =
-                     [[if i = j then srng_one (rng_semiring ro)
-                       else srng_zero (rng_semiring ro)]];
-                  mat_nrows = 1; mat_ncols = 1})
-                 (seq 0 n))]];
-         mat_nrows = 2; mat_ncols = 2})
-    (seq 0 n).
-
-value mI_gen (ro : ring_op 'a) n =
-  MM_1
-    { mat_list = list_list_I ro n;
-      mat_nrows = n;
-      mat_ncols = n }.
-
-value mI2 (ro : ring_op 'a) =
-  MM_M
-    {mat_list=
-      [[MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
-        MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}];
-       [MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
-        MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}]];
-     mat_nrows = 2; mat_ncols = 2}.
-
-value mI4 (ro : ring_op 'a) =
-  MM_M
-    {mat_list=
-      [[MM_M
-          {mat_list=
-            [[MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
-              MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}];
-             [MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
-              MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}]];
-           mat_nrows=2; mat_ncols=2};
-        MM_M
-          {mat_list=
-            [[MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
-              MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}];
-             [MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
-              MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]];
-           mat_nrows=2; mat_ncols=2}];
-       [MM_M
-          {mat_list=
-            [[MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
-              MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}];
-             [MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
-              MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]];
-           mat_nrows=2; mat_ncols=2};
-        MM_M
-          {mat_list=
-            [[MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
-              MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}];
-             [MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
-              MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}]];
-           mat_nrows=2; mat_ncols=2}]];
-     mat_nrows=2; mat_ncols=2};
-
-value mI (ro : ring_op 'a) n =
-(**)
-  mI_gen ro n.
-(*
+value rec mIZ_2_pow (ro : ring_op 'a) u n =
   match n with
-  | 2 → mI2 ro
-  | 4 → mI4 ro
-  | _ → mI_gen ro n
+  | 0 → MM_1 {mat_list = [[u]]; mat_nrows = 1; mat_ncols = 1}
+  | _ →
+      let n' = n - 1 in
+      MM_M
+        {mat_list =
+	   [[mIZ_2_pow ro 1 n'; mIZ_2_pow ro 0 n'];
+	    [mIZ_2_pow ro 0 n'; mIZ_2_pow ro 1 n']];
+         mat_nrows = 2; mat_ncols = 2}
   end.
-*)
 
 value rec mA (ro : ring_op 'a) n =
   match n with
@@ -351,8 +278,8 @@ value rec mA (ro : ring_op 'a) n =
        let n' = n - 1 in
        MM_M
          (mmat_of_list
-            [[mA ro n'; mI ro (nat_pow 2 n')];
-             [mI ro (nat_pow 2 n'); mmat_opp ro (mA ro n')]])
+            [[mA ro n'; mIZ_2_pow ro 1 n'];
+             [mIZ_2_pow ro 1 n'; mmat_opp ro (mA ro n')]])
   end.
 
 list_list_of_mmat (mA int_ring_op 2);
@@ -453,10 +380,11 @@ mat_of_mmat (mmat_mul so (mA ro 1) (mA ro 1)).
 let ro = int_ring_op in let so = nat_semiring_op in
 mat_of_mmat (mmat_mul so (mA ro 2) (mA ro 2)).
 
-(*
+(* wrong result *)
 let ro = int_ring_op in let so = nat_semiring_op in
 mat_of_mmat (mmat_mul so (mA ro 3) (mA ro 3)).
 
+(*
 let ro = int_ring_op in let so = nat_semiring_op in
 mat_of_mmat (mmat_mul so (mA ro 4) (mA ro 4)).
 
