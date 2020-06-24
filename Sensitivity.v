@@ -1756,6 +1756,37 @@ Definition list_list_add T zero (add : T → T → T) r c
     (seq 0 r).
 
 Definition list_list_mul T {ro : semiring_op T} r cr c
+    (ll1 : list (list T)) (ll2 : list (list T)) :=
+  map
+    (λ i,
+     map
+       (λ k,
+        let vl :=
+          map
+            (λ j,
+             srng_mul (list_list_el srng_zero ll1 i j)
+               (list_list_el srng_zero ll2 j k))
+            (seq 0 cr)
+        in
+	match vl with
+        | [] => srng_zero
+        | v :: vl' => List.fold_left srng_add vl' v
+        end)
+       (seq 0 c))
+    (seq 0 r).
+
+(* why is this version below false? *)
+(* ah oui, c'est parce que Σ part de 0, et le 0 n'est
+   pas correct, il n'a pas la bonne taille *)
+(* tandis que la version ci-dessus ne calcule pas
+      0+v1+v2+v3...+vn
+   mais
+      v1+v2+v3+...+vn
+   c'est cette première somme 0+ qui fait déconner
+   le truc *)
+...
+(*
+Definition list_list_mul T {ro : semiring_op T} r cr c
     (ll1 ll2 : list (list T)) :=
   map
     (λ i,
@@ -1765,6 +1796,7 @@ Definition list_list_mul T {ro : semiring_op T} r cr c
         list_list_el 0 ll1 i j * list_list_el 0 ll2 j k)%Srng
        (seq 0 c))
     (seq 0 r).
+*)
 
 Definition nat_semiring_op : semiring_op nat :=
   {| srng_zero := 0;
@@ -2008,14 +2040,9 @@ Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in A 1).
 Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mmat (A 2)).
 
 Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mmat (mmat_mul (A 0) (A 0))).
-
-(* wrong result: however ocaml version is correct...
-   I must have copied it wrongly *)
 Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mmat (mmat_mul (A 1) (A 1))).
-
-...
-
 Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mmat (mmat_mul (A 2) (A 2))).
+Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mmat (mmat_mul (A 3) (A 3))).
 ...
 
 Definition mmat_semiring_op T {so : semiring_op T} r c :
