@@ -269,6 +269,21 @@ value list_list_I (ro : ring_op 'a) n =
        (seq 0 n))
     (seq 0 n).
 
+value glop (ro : ring_op _) n =
+  map
+    (fun i →
+     MM_M
+       {mat_list =
+          [[MM_1
+              (map
+                 (fun j →
+                  {mat_list =
+                     [[if i = j then srng_one (rng_semiring ro)
+                       else srng_zero (rng_semiring ro)]];
+                  mat_nrows = 1; mat_ncols = 1})
+                 (seq 0 n))]];
+         mat_nrows = 2; mat_ncols = 2})
+    (seq 0 n).
 
 value mI_gen (ro : ring_op 'a) n =
   MM_1
