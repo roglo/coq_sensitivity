@@ -322,22 +322,22 @@ value mmat_add (so : semiring_op 'a) (mm1 : mmatrix 'a) (mm2 : mmatrix 'a) =
   mmat_add_loop (mmat_depth mm1) (srng_zero so) (srng_add so) mm1 mm2.
 
 Fixpoint mmat_mul_loop it (so : semiring_op 'a) (mm1 : mmatrix 'a)
-    (mm2 : mmatrix 'a) =
+    (mm2 : mmatrix 'a) :=
   match it with
-  | 0 → mmat_err
-  | _ →
-      let it' = it - 1 in
+  | 0 => mmat_err
+  | _ =>
+      let it' := it - 1 in
       match mm1 with
-      | MM_1 ma ->
+      | MM_1 ma =>
           match mm2 with
-          | MM_1 mb -> MM_1 (mat_mul so ma mb)
-          | MM_M mmb -> mmat_err
+          | MM_1 mb => MM_1 (mat_mul so ma mb)
+          | MM_M mmb => mmat_err
           end
-      | MM_M mmma ->
+      | MM_M mmma =>
           match mm2 with
-          | MM_1 mb -> mmat_err
-          | MM_M mmmb ->
-              let mso =
+          | MM_1 mb => mmat_err
+          | MM_M mmmb =>
+              let mso :=
                 { srng_zero = mmat_err;
                   srng_one = mmat_err;
                   srng_add = mmat_add so;
