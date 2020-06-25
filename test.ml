@@ -167,8 +167,7 @@ value mat_err : matrix 'a =
   { mat_list = []; mat_nrows = 0; mat_ncols = 0 }.
 
 value mat_add zero add (m1 : matrix 'a) (m2 : matrix 'a) : matrix 'a =
-  if mat_nrows m1 = 0 then m2
-  else if mat_nrows m1 = mat_nrows m2 && mat_ncols m1 = mat_ncols m2 then
+  if mat_nrows m1 = mat_nrows m2 && mat_ncols m1 = mat_ncols m2 then
     { mat_list =
         list_list_add zero add (mat_nrows m1) (mat_ncols m1) (mat_list m1)
           (mat_list m2);
