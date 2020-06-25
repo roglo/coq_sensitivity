@@ -6,10 +6,12 @@
 open Pcaml;
 
 EXTEND
-  GLOBAL: str_item;
+  GLOBAL: str_item expr;
   str_item:
     [ [ "Fixpoint"; l = V (LIST1 coq_binding SEP "and") →
-          <:str_item< value rec $_list:l$ >> ] ]
+          <:str_item< value rec $_list:l$ >>
+      | "Definition"; l = V (LIST1 coq_binding SEP "and") →
+          <:str_item< value $_list:l$ >> ] ]
   ;
   coq_binding:
     [ [ p = ipatt; LIST0 GIDENT; e = coq_fun_binding → (p, e) ] ]
@@ -44,5 +46,20 @@ EXTEND
               (p, e) ]
         in
         (p, <:vala< None >>, e) ] ]
+  ;
+  expr: LEVEL "simple"
+    [ [ "{|"; lel = V (LIST1 coq_label_expr SEP ";"); "|}" →
+          <:expr< { $_list:lel$ } >> ] ]
+  ;
+  coq_label_expr:
+    [ [ i = patt_label_ident; e = coq_fun_binding → (i, e) ] ]
+  ;
+  patt_label_ident:
+    [ LEFTA
+      [ p1 = SELF; "."; p2 = SELF → <:patt< $p1$ . $p2$ >> ]
+    | "simple" RIGHTA
+      [ i = V UIDENT → <:patt< $_uid:i$ >>
+      | i = V LIDENT → <:patt< $_lid:i$ >>
+      | "_" → <:patt< _ >> ] ]
   ;
 END;
