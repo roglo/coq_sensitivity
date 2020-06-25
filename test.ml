@@ -131,6 +131,24 @@ value list_list_mul (ro : semiring_op 'a) r cr c
        (seq 0 c))
     (seq 0 r).
 
+(* other version *)
+value list_list_mul (ro : semiring_op 'a) r cr c
+    (ll1 : list (list 'a)) (ll2 : list (list 'a)) =
+  map
+    (fun i →
+     map
+       (fun k →
+        let vl =
+          map
+            (fun j →
+             ro.srng_mul (list_list_el ro.srng_zero ll1 i j)
+               (list_list_el ro.srng_zero ll2 j k))
+            (seq 0 cr)
+        in
+	List.fold_left ro.srng_add ro.srng_zero vl)
+       (seq 0 c))
+    (seq 0 r).
+
 value nat_semiring_op : semiring_op nat =
   { srng_zero = 0;
     srng_one = 1;
@@ -149,7 +167,8 @@ value mat_err : matrix 'a =
   { mat_list = []; mat_nrows = 0; mat_ncols = 0 }.
 
 value mat_add zero add (m1 : matrix 'a) (m2 : matrix 'a) : matrix 'a =
-  if mat_nrows m1 = mat_nrows m2 && mat_ncols m1 = mat_ncols m2 then
+  if mat_nrows m1 = 0 then m2
+  else if mat_nrows m1 = mat_nrows m2 && mat_ncols m1 = mat_ncols m2 then
     { mat_list =
         list_list_add zero add (mat_nrows m1) (mat_ncols m1) (mat_list m1)
           (mat_list m2);
@@ -301,10 +320,11 @@ let _ = failwith (sprintf "mat_add_loop it=0") in
       let it' = it - 1 in
       match mm1 with
       | MM_1 ma →
+if mat_nrows ma = 0 then mm2 else
           match mm2 with
           | MM_1 mb → MM_1 (mat_add zero add ma mb)
           | MM_M mmb →
-let _ = failwith (sprintf "mat_add_loop MM_1+MM_M") in
+let _ = failwith (sprintf "mat_add_loop MM_1(%d,%d)+MM_M(%d,%d)" (mat_nrows ma) (mat_ncols ma) (mat_nrows mmb) (mat_ncols mmb)) in
               mmat_err
           end
       | MM_M mma →
