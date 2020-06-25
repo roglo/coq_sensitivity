@@ -1,3 +1,5 @@
+#load "pa_coq.cmo";
+
 open Printf.
 
 type nat = int;
@@ -319,7 +321,7 @@ let _ = failwith (sprintf "mat_add_loop MM_M(%d,%d)+MM_1(%d,%d)" (mat_nrows mma)
 value mmat_add (so : semiring_op 'a) (mm1 : mmatrix 'a) (mm2 : mmatrix 'a) =
   mmat_add_loop (mmat_depth mm1) (srng_zero so) (srng_add so) mm1 mm2.
 
-value rec mmat_mul_loop it (so : semiring_op 'a) (mm1 : mmatrix 'a)
+Fixpoint mmat_mul_loop it (so : semiring_op 'a) (mm1 : mmatrix 'a)
     (mm2 : mmatrix 'a) =
   match it with
   | 0 → mmat_err

@@ -1,7 +1,10 @@
 TARGET=Misc.vo Semiring.vo SRsummation.vo Ring2.vo Rsummation.vo Rpolynomial2.vo
 FILESFORDEP=`LC_ALL=C ls *.v`
 
-all: $(TARGET)
+all: pa_coq.cmo $(TARGET)
+
+pa_coq.cmo: pa_coq.ml
+	ocamlc -I $$(camlp5 -where) -pp camlp5r -c $<
 
 clean:
 	rm -f *.glob *.vo *.cm[iox] *.out *.o *.vok *.vos
