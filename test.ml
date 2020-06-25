@@ -225,24 +225,6 @@ value mat_of_mmat (mm : mmatrix 'a) : matrix 'a =
 value mmat_err : mmatrix 'a =
   MM_1 mat_err;
 
-value zero_list_list zero r c : list (list 'a) =
-  map (fun i → map (fun j → zero) (seq 0 c)) (seq 0 r).
-value zero_mat zero r c : matrix 'a =
-  { mat_list = zero_list_list zero r c;
-    mat_nrows = r; mat_ncols = c }.
-value zero_mmat zero r c : mmatrix 'a =
-  MM_1 (zero_mat zero r c).
-
-value one_list_list zero one r c : list (list 'a) =
-  map
-    (fun i → map (fun j → if i = j then one else zero) (seq 0 c))
-    (seq 0 r).
-value one_mat zero one r c : matrix 'a =
-  { mat_list = one_list_list zero one r c;
-    mat_nrows = r; mat_ncols = c }.
-value one_mmat zero one r c : mmatrix 'a =
-  MM_1 (one_mat zero one r c).
-
 value rec mmat_opp (ro : ring_op 'a) mm : mmatrix 'a =
   match mm with
   | MM_1 m → MM_1 (mat_opp ro m)
@@ -354,12 +336,8 @@ value rec mmat_mul_loop it (so : semiring_op 'a) (mm1 : mmatrix 'a)
           | MM_1 mb -> mmat_err
           | MM_M mmmb ->
               let mso =
-                { srng_zero =
-                    zero_mmat (srng_zero so)
-		      (mat_nrows mmma) (mat_ncols mmmb);
-                  srng_one =
-                    one_mmat (srng_zero so) (srng_one so)
-                      (mat_nrows mmma) (mat_ncols mmmb);
+                { srng_zero = mmat_err;
+                  srng_one = mmat_err;
                   srng_add = mmat_add so;
                   srng_mul = mmat_mul_loop it' so }
               in
@@ -373,17 +351,13 @@ value mmat_mul (so : semiring_op 'a) mm1 mm2 =
 
 let ro = int_ring_op in let so = nat_semiring_op in mat_of_mmat (mmat_mul so (mA ro 0) (mA ro 0)).
 
-let ro = int_ring_op in let so = nat_semiring_op in
-mat_of_mmat (mmat_mul so (mA ro 1) (mA ro 1)).
+let ro = int_ring_op in let so = nat_semiring_op in mat_of_mmat (mmat_mul so (mA ro 1) (mA ro 1)).
 
-let ro = int_ring_op in let so = nat_semiring_op in
-mat_of_mmat (mmat_mul so (mA ro 2) (mA ro 2)).
+let ro = int_ring_op in let so = nat_semiring_op in mat_of_mmat (mmat_mul so (mA ro 2) (mA ro 2)).
 
-let ro = int_ring_op in let so = nat_semiring_op in
-mat_of_mmat (mmat_mul so (mA ro 3) (mA ro 3)).
+let ro = int_ring_op in let so = nat_semiring_op in mat_of_mmat (mmat_mul so (mA ro 3) (mA ro 3)).
 
-let ro = int_ring_op in let so = nat_semiring_op in
-mat_of_mmat (mmat_mul so (mA ro 4) (mA ro 4)).
+let ro = int_ring_op in let so = nat_semiring_op in mat_of_mmat (mmat_mul so (mA ro 4) (mA ro 4)).
 
 (*
 value mso so sz =
