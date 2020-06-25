@@ -124,27 +124,6 @@ value list_list_mul (ro : semiring_op 'a) r cr c
                (list_list_el ro.srng_zero ll2 j k))
             (seq 0 cr)
         in
-	match vl with
-        | [] → ro.srng_zero
-        | [v :: vl'] → List.fold_left ro.srng_add v vl'
-        end)
-       (seq 0 c))
-    (seq 0 r).
-
-(* other version *)
-value list_list_mul (ro : semiring_op 'a) r cr c
-    (ll1 : list (list 'a)) (ll2 : list (list 'a)) =
-  map
-    (fun i →
-     map
-       (fun k →
-        let vl =
-          map
-            (fun j →
-             ro.srng_mul (list_list_el ro.srng_zero ll1 i j)
-               (list_list_el ro.srng_zero ll2 j k))
-            (seq 0 cr)
-        in
 	List.fold_left ro.srng_add ro.srng_zero vl)
        (seq 0 c))
     (seq 0 r).
