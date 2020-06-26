@@ -336,6 +336,18 @@ let _ = failwith (sprintf "mat_add_loop MM_M(%d,%d)+MM_1(%d,%d)" (mat_nrows mma)
 value mmat_add (so : semiring_op 'a) (mm1 : mmatrix 'a) (mm2 : mmatrix 'a) =
   mmat_add_loop (mmat_depth mm1) (srng_zero so) (srng_add so) mm1 mm2.
 
+Definition mmat_nrows mm :=
+  match mm with
+  | MM_1 m => mat_nrows m
+  | MM_M mmm => mat_nrows mmm
+  end.
+
+Definition mmat_ncols mm :=
+  match mm with
+  | MM_1 m => mat_ncols m
+  | MM_M mmm => mat_ncols mmm
+  end.
+
 Fixpoint mmat_mul_loop it (so : semiring_op 'a) (mm1 : mmatrix 'a)
     (mm2 : mmatrix 'a) :=
   match it with
@@ -356,7 +368,12 @@ let _ := printf "(mat_nrows mmma) %d (mat_ncols mmmb) %d\n%!" (mat_nrows mmma) (
               let mso :=
                {| srng_zero :=
 		     zero_mmat (srng_zero so)
+(*
                        (mat_nrows mmma) (mat_ncols mmmb);
+*)
+(mmat_nrows (mat_el mmat_err mmma 0 0))
+(mmat_ncols (mat_el mmat_err mmmb 0 0));
+(**)
                    srng_one := mmat_err;
                    srng_add := mmat_add so;
                    srng_mul := mmat_mul_loop it' so;
