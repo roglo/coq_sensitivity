@@ -147,7 +147,7 @@ let so = nat_semiring_op in list_list_mul so 3 4 2 [[1; 2; 3; 4]; [5; 6; 7; 8]; 
 
 let so = nat_semiring_op in list_list_mul so 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]].
 
-value mat_err : matrix 'a =
+value void_mat : matrix 'a =
   { mat_list = []; mat_nrows = 0; mat_ncols = 0 }.
 
 value mat_add zero add (m1 : matrix 'a) (m2 : matrix 'a) : matrix 'a =
@@ -159,7 +159,7 @@ value mat_add zero add (m1 : matrix 'a) (m2 : matrix 'a) : matrix 'a =
       mat_ncols = mat_ncols m1 }
   else
 let _ = failwith (sprintf "mat_add (%d,%d) (%d,%d)" (mat_nrows m1) (mat_ncols m1) (mat_nrows m2) (mat_ncols m2)) in
-    mat_err.
+    void_mat.
 
 value mat_mul (ro : semiring_op 'a) (m1 : matrix 'a) (m2 : matrix 'a) :
     matrix 'a =
@@ -171,7 +171,7 @@ value mat_mul (ro : semiring_op 'a) (m1 : matrix 'a) (m2 : matrix 'a) :
       mat_ncols = mat_ncols m2 }
   else
 let _ = failwith (sprintf "mat_mul (%d,%d) (%d,%d)" (mat_nrows m1) (mat_ncols m1) (mat_nrows m2) (mat_ncols m2)) in
-    mat_err.
+    void_mat.
 
 42;
 let so = nat_semiring_op in mat_mul so (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]; [0; 0]]).
@@ -226,8 +226,8 @@ value rec list_list_of_mmat (mm : mmatrix 'a) : list (list 'a) =
 value mat_of_mmat (mm : mmatrix 'a) : matrix 'a =
   mat_of_list (list_list_of_mmat mm).
 
-value mmat_err : mmatrix 'a =
-  MM_1 mat_err;
+value void_mmat : mmatrix 'a =
+  MM_1 void_mat;
 
 Definition zero_list_list zero r c : list (list 'a) :=
   map (λ i, map (λ j, zero) (seq 0 c)) (seq 0 r).
@@ -300,13 +300,13 @@ mmat_depth (mA int_ring_op 3).
 mmat_depth (mA int_ring_op 4).
 
 value mmmat_depth (mmm : matrix (mmatrix 'a)) =
-  mmat_depth (mat_el mmat_err mmm 0 0).
+  mmat_depth (mat_el void_mmat mmm 0 0).
 
 value rec mmat_add_loop it zero add (mm1 : mmatrix 'a) (mm2 : mmatrix 'a) =
   match it with
   | 0 →
 let _ = failwith (sprintf "mat_add_loop it=0") in
-      mmat_err
+      void_mmat
   | _ →
       let it' = it - 1 in
       match mm1 with
@@ -315,15 +315,15 @@ let _ = failwith (sprintf "mat_add_loop it=0") in
           | MM_1 mb → MM_1 (mat_add zero add ma mb)
           | MM_M mmb →
 let _ = failwith (sprintf "mat_add_loop MM_1(%d,%d)+MM_M(%d,%d)" (mat_nrows ma) (mat_ncols ma) (mat_nrows mmb) (mat_ncols mmb)) in
-              mmat_err
+              void_mmat
           end
       | MM_M mma →
           match mm2 with
           | MM_1 mb →
 let _ = failwith (sprintf "mat_add_loop MM_M(%d,%d)+MM_1(%d,%d)" (mat_nrows mma) (mat_ncols mma) (mat_nrows mb) (mat_ncols mb)) in
-              mmat_err
+              void_mmat
           | MM_M mmb →
-              MM_M (mat_add mmat_err (mmat_add_loop it' zero add) mma mmb)
+              MM_M (mat_add void_mmat (mmat_add_loop it' zero add) mma mmb)
           end
       end
   end.
@@ -346,22 +346,22 @@ Definition mmat_ncols mm :=
 Fixpoint mmat_mul_loop it (so : semiring_op 'a) (mm1 : mmatrix 'a)
     (mm2 : mmatrix 'a) :=
   match it with
-  | 0 => mmat_err
+  | 0 => void_mmat
   | _ =>
       let it' := it - 1 in
       match mm1 with
       | MM_1 ma =>
           match mm2 with
           | MM_1 mb => MM_1 (mat_mul so ma mb)
-          | MM_M mmb => mmat_err
+          | MM_M mmb => void_mmat
           end
       | MM_M mmma =>
           match mm2 with
-          | MM_1 mb => mmat_err
+          | MM_1 mb => void_mmat
           | MM_M mmmb =>
               let mso :=
-               {| srng_zero := mmat_err;
-                   srng_one := mmat_err;
+               {| srng_zero := void_mmat;
+                   srng_one := void_mmat;
                    srng_add := mmat_add so;
                    srng_mul := mmat_mul_loop it' so;
 	           srng_to_string mm :=
