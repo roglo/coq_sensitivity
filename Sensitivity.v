@@ -1990,6 +1990,7 @@ Fixpoint mmat_mul_loop T it {so : semiring_op T} (MM1 MM2 : mmatrix T) :=
 Definition mmat_mul T {so : semiring_op T} (MM1 MM2 : mmatrix T) :=
   mmat_mul_loop (mmat_depth MM1) MM1 MM2.
 
+(*
 Require Import ZArith.
 Open Scope Z_scope.
 
@@ -2004,33 +2005,24 @@ Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mm
 Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mmat (mmat_mul (A 1) (A 1))).
 Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mmat (mmat_mul (A 2) (A 2))).
 Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mmat (mmat_mul (A 3) (A 3))).
-...
-
-Definition mmat_semiring_op T {so : semiring_op T} r c :
-    semiring_op (mmatrix T) :=
-  {| srng_zero := void_mmat _;
-     srng_one := MM_1 (mat_id r c);
-     srng_add := mmat_add |}.
-
-...
-
- {mro : semiring_op (mmatrix T)}
-
-...
-
-Search mmatrix.
-
-Definition mat_of_mmat T (MM : mmatrix T) := 42.
-(* perhaps doing that, I could prove A_n^2 = nI easier *)
-
-...
+*)
 
 (* "We prove by induction that A_n^2 = nI" *)
 
-Theorem lemma_2_A_n_2_eq_n_I T (ro : ring_op T) (mro : ring_op (mmatrix T)) :
-  ∀ n i j,
+Theorem lemma_2_A_n_2_eq_n_I T (ro : ring_op T) (so := rng_semiring) :
+  ∀ (n i j : nat),
   (i < 2 ^ n)%nat → (j < 2 ^ n)%nat
-  → mat_el (mat_of_mmat (mmat_mul (A' n) (A' n))) i j = mat_el (nI n) i j.
+  → mat_el 0%Rng (mat_of_mmat (mmat_mul (A n) (A n))) i j =
+     mat_el 0%Rng (mat_of_mmat (IZ_2_pow 1%Rng n)) i j.
+Proof.
+intros * Hi Hj.
+...
+
+Theorem lemma_2_A_n_2_eq_n_I T (ro : ring_op T) (mro : ring_op (mmatrix T)) :
+  ∀ (n i j : nat),
+  (i < 2 ^ n)%nat → (j < 2 ^ n)%nat
+  → mat_el 0 (mat_of_mmat (mmat_mul (A n) (A n))) i j =
+     mat_el 0 (mat_of_mmat (IZ_2_pow 1%Rng n)) i j.
 Proof.
 intros * Hi Hj.
 
