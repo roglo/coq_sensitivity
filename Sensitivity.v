@@ -1775,28 +1775,6 @@ Definition list_list_mul T {ro : semiring_op T} r cr c
        (seq 0 c))
     (seq 0 r).
 
-(* why is this version below false? *)
-(* ah oui, c'est parce que Σ part de 0, et le 0 n'est
-   pas correct, il n'a pas la bonne taille *)
-(* tandis que la version ci-dessus ne calcule pas
-      0+v1+v2+v3...+vn
-   mais
-      v1+v2+v3+...+vn
-   c'est cette première somme 0+ qui fait déconner
-   le truc *)
-(*
-Definition list_list_mul T {ro : semiring_op T} r cr c
-    (ll1 ll2 : list (list T)) :=
-  map
-    (λ i,
-     map
-       (λ k,
-        Σ (j = 0, cr - 1),
-        list_list_el 0 ll1 i j * list_list_el 0 ll2 j k)%Srng
-       (seq 0 c))
-    (seq 0 r).
-*)
-
 Definition nat_semiring_op : semiring_op nat :=
   {| srng_zero := 0;
      srng_one := 1;
@@ -1807,7 +1785,7 @@ Compute (let _ := nat_semiring_op in list_list_mul 3 4 2 [[1; 2; 3; 4]; [5; 6; 7
 
 Compute (let _ := nat_semiring_op in list_list_mul 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
 
-Definition mat_err {T} : matrix T :=
+Definition void_mat {T} : matrix T :=
   {| mat_list := []; mat_nrows := 0; mat_ncols := 0 |}.
 
 (* multiplication of matrices is always defined, even if the resp # of
@@ -1827,8 +1805,8 @@ Definition mat_add T zero add (M1 M2 : matrix T) : matrix T :=
              (mat_list M2);
          mat_nrows := mat_nrows M1;
          mat_ncols := mat_ncols M1 |}
-    else mat_err
-  else mat_err.
+    else void_mat
+  else void_mat.
 
 Definition mat_mul {T} {so : semiring_op T} (M1 M2 : matrix T) : matrix T :=
   if Nat.eq_dec (mat_ncols M1) (mat_nrows M2) then
@@ -1837,7 +1815,7 @@ Definition mat_mul {T} {so : semiring_op T} (M1 M2 : matrix T) : matrix T :=
            (mat_list M1) (mat_list M2);
        mat_nrows := mat_nrows M1;
        mat_ncols := mat_ncols M2 |}
-  else mat_err.
+  else void_mat.
 
 Compute (let _ := nat_semiring_op in mat_mul (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]; [0; 0]])).
 Compute (let _ := nat_semiring_op in mat_mul (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]])).
@@ -1891,26 +1869,8 @@ Fixpoint list_list_of_mmat T (MM : mmatrix T) : list (list T) :=
 Definition mat_of_mmat T (mm : mmatrix T) : matrix T :=
   mat_of_list (list_list_of_mmat mm).
 
-Definition mmat_err {T} : mmatrix T :=
-  MM_1 mat_err.
-
-Definition zero_list_list {T} zero r c : list (list T) :=
-  map (λ i, map (λ j, zero) (seq 0 c)) (seq 0 r).
-Definition zero_mat {T} zero r c : matrix T :=
-  {| mat_list := zero_list_list zero r c;
-     mat_nrows := r; mat_ncols := c |}.
-Definition zero_mmat {T} zero r c : mmatrix T :=
-  MM_1 (zero_mat zero r c).
-
-Definition one_list_list {T} zero one r c : list (list T) :=
-  map
-    (λ i, map (λ j, if Nat.eq_dec i j then one else zero) (seq 0 c))
-    (seq 0 r).
-Definition one_mat {T} zero one r c : matrix T :=
-  {| mat_list := one_list_list zero one r c;
-     mat_nrows := r; mat_ncols := c |}.
-Definition one_mmat {T} zero one r c : mmatrix T :=
-  MM_1 (one_mat zero one r c).
+Definition void_mmat {T} : mmatrix T :=
+  MM_1 void_mat.
 
 Fixpoint mmat_opp T {ro : ring_op T} MM : mmatrix T :=
   match MM with
@@ -1978,23 +1938,23 @@ Compute (mmat_depth (A 3)).
 Compute (mmat_depth (A 4)).
 
 Definition mmmat_depth T (MMM : matrix (mmatrix T)) :=
-  mmat_depth (mat_el mmat_err MMM 0 0).
+  mmat_depth (mat_el void_mmat MMM 0 0).
 
 Fixpoint mmat_add_loop T it zero add (MM1 MM2 : mmatrix T) :=
   match it with
-  | 0 => mmat_err
+  | 0 => void_mmat
   | S it' =>
       match MM1 with
       | MM_1 MA =>
           match MM2 with
           | MM_1 MB => MM_1 (mat_add zero add MA MB)
-          | MM_M MMB => mmat_err
+          | MM_M MMB => void_mmat
           end
       | MM_M MMA =>
           match MM2 with
-          | MM_1 MB => mmat_err
+          | MM_1 MB => void_mmat
           | MM_M MMB =>
-              MM_M (mat_add mmat_err (mmat_add_loop it' zero add) MMA MMB)
+              MM_M (mat_add void_mmat (mmat_add_loop it' zero add) MMA MMB)
           end
       end
   end.
@@ -2004,25 +1964,21 @@ Definition mmat_add T {so : semiring_op T} (MM1 MM2 : mmatrix T) :=
 
 Fixpoint mmat_mul_loop T it {so : semiring_op T} (MM1 MM2 : mmatrix T) :=
   match it with
-  | 0 => mmat_err
+  | 0 => void_mmat
   | S it' =>
       match MM1 with
       | MM_1 MA =>
           match MM2 with
           | MM_1 MB => MM_1 (mat_mul MA MB)
-          | MM_M MMB => mmat_err
+          | MM_M MMB => void_mmat
           end
       | MM_M MMMA =>
           match MM2 with
-          | MM_1 MB => mmat_err
+          | MM_1 MB => void_mmat
           | MM_M MMMB =>
               let mso :=
-                {| srng_zero :=
-                     zero_mmat srng_zero
-                       (mat_nrows MMMA) (mat_ncols MMMB);
-                   srng_one :=
-                     one_mmat srng_zero srng_one
-                       (mat_nrows MMMA) (mat_ncols MMMB);
+                {| srng_zero := void_mmat;
+                   srng_one := void_mmat;
                    srng_add := @mmat_add T so;
                    srng_mul := mmat_mul_loop it' |}
               in
