@@ -48,8 +48,15 @@ EXTEND
         (p, <:vala< None >>, e) ] ]
   ;
   expr: LEVEL "simple"
-    [ [ "{|"; lel = V (LIST1 coq_label_expr SEP ";"); "|}" →
+    [ [ GIDENT "λ"; p = ipatt; e = coq_fun_def →
+          <:expr< fun $p$ → $e$ >>
+      | "{|"; lel = V (LIST1 coq_label_expr SEP ";"); "|}" →
           <:expr< { $_list:lel$ } >> ] ]
+  ;
+  coq_fun_def:
+    [ RIGHTA
+      [ p = ipatt; e = SELF -> <:expr< fun $p$ -> $e$ >>
+      | ","; e = coq_expr -> e ] ]
   ;
   coq_label_expr:
     [ [ i = patt_label_ident; e = coq_fun_binding → (i, e) ] ]

@@ -39,7 +39,8 @@ type semiring_op 'a =
   { srng_zero : 'a;
     srng_one : 'a;
     srng_add : 'a → 'a → 'a;
-    srng_mul : 'a → 'a → 'a }.
+    srng_mul : 'a → 'a → 'a;
+    srng_to_string : 'a → string }.
 
 value srng_zero so = so.srng_zero.
 value srng_one so = so.srng_one.
@@ -124,7 +125,12 @@ value list_list_mul (ro : semiring_op 'a) r cr c
                (list_list_el ro.srng_zero ll2 j k))
             (seq 0 cr)
         in
+let _ = printf "list_list_mul\n%!" in
+let _ = List.iter (fun x → printf "→ %s\n" (ro.srng_to_string x)) vl in
+let r = (
 	List.fold_left ro.srng_add ro.srng_zero vl)
+in
+let _ = printf "ok\n%!" in r)
        (seq 0 c))
     (seq 0 r).
 
@@ -132,7 +138,8 @@ value nat_semiring_op : semiring_op nat =
   { srng_zero = 0;
     srng_one = 1;
     srng_add = \+;
-    srng_mul = \* }.
+    srng_mul = \*;
+    srng_to_string x = string_of_int x }.
 
 value int_ring_op : ring_op int =
   { rng_semiring = nat_semiring_op;
@@ -224,6 +231,14 @@ value mat_of_mmat (mm : mmatrix 'a) : matrix 'a =
 value mmat_err : mmatrix 'a =
   MM_1 mat_err;
 
+Definition zero_list_list zero r c : list (list 'a) :=
+  map (λ i, map (λ j, zero) (seq 0 c)) (seq 0 r).
+Definition zero_mat zero r c : matrix 'a :=
+  {| mat_list := zero_list_list zero r c;
+     mat_nrows := r; mat_ncols := c |}.
+Definition zero_mmat zero r c : mmatrix 'a :=
+  MM_1 (zero_mat zero r c).
+
 value rec mmat_opp (ro : ring_op 'a) mm : mmatrix 'a =
   match mm with
   | MM_1 m → MM_1 (mat_opp ro m)
@@ -298,7 +313,9 @@ let _ = failwith (sprintf "mat_add_loop it=0") in
       let it' = it - 1 in
       match mm1 with
       | MM_1 ma →
+(*
 if mat_nrows ma = 0 then mm2 else
+*)
           match mm2 with
           | MM_1 mb → MM_1 (mat_add zero add ma mb)
           | MM_M mmb →
@@ -335,11 +352,21 @@ Fixpoint mmat_mul_loop it (so : semiring_op 'a) (mm1 : mmatrix 'a)
           match mm2 with
           | MM_1 mb => mmat_err
           | MM_M mmmb =>
+let _ := printf "(mat_nrows mmma) %d (mat_ncols mmmb) %d\n%!" (mat_nrows mmma) (mat_ncols mmmb) in
               let mso :=
-                {| srng_zero := mmat_err;
+               {| srng_zero :=
+		     zero_mmat (srng_zero so)
+                       (mat_nrows mmma) (mat_ncols mmmb);
                    srng_one := mmat_err;
                    srng_add := mmat_add so;
-                   srng_mul := mmat_mul_loop it' so |}
+                   srng_mul := mmat_mul_loop it' so;
+	           srng_to_string mm :=
+		     match mm with
+                     | MM_1 m =>
+                          sprintf "MM_1(%d,%d)" m.mat_nrows m.mat_ncols
+		     | MM_M mmm =>
+                          sprintf "MM_M(%d,%d)" mmm.mat_nrows mmm.mat_ncols
+                     end |}
               in
               MM_M (mat_mul mso mmma mmmb)
           end
