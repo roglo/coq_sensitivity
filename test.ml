@@ -112,25 +112,23 @@ value list_list_add zero (add : 'a → 'a → 'a) r c
        (seq 0 c))
     (seq 0 r).
 
-value list_list_mul (ro : semiring_op 'a) r cr c
-    (ll1 : list (list 'a)) (ll2 : list (list 'a)) =
+Definition list_list_mul (ro : semiring_op 'a) r cr c
+    (ll1 : list (list 'a)) (ll2 : list (list 'a)) :=
   map
-    (fun i →
+    (λ i,
      map
-       (fun k →
-        let vl =
+       (λ k,
+        let vl :=
           map
-            (fun j →
+            (λ j,
              ro.srng_mul (list_list_el ro.srng_zero ll1 i j)
                (list_list_el ro.srng_zero ll2 j k))
             (seq 0 cr)
         in
-let _ = printf "list_list_mul\n%!" in
-let _ = List.iter (fun x → printf "→ %s\n" (ro.srng_to_string x)) vl in
-let r = (
-	List.fold_left ro.srng_add ro.srng_zero vl)
-in
-let _ = printf "ok\n%!" in r)
+	match vl with
+        | [] => srng_zero ro
+        | [v :: vl'] => List.fold_left ro.srng_add v vl'
+        end)
        (seq 0 c))
     (seq 0 r).
 
@@ -313,9 +311,6 @@ let _ = failwith (sprintf "mat_add_loop it=0") in
       let it' = it - 1 in
       match mm1 with
       | MM_1 ma →
-(*
-if mat_nrows ma = 0 then mm2 else
-*)
           match mm2 with
           | MM_1 mb → MM_1 (mat_add zero add ma mb)
           | MM_M mmb →
@@ -364,16 +359,8 @@ Fixpoint mmat_mul_loop it (so : semiring_op 'a) (mm1 : mmatrix 'a)
           match mm2 with
           | MM_1 mb => mmat_err
           | MM_M mmmb =>
-let _ := printf "(mat_nrows mmma) %d (mat_ncols mmmb) %d\n%!" (mat_nrows mmma) (mat_ncols mmmb) in
               let mso :=
-               {| srng_zero :=
-		     zero_mmat (srng_zero so)
-(*
-                       (mat_nrows mmma) (mat_ncols mmmb);
-*)
-(mmat_nrows (mat_el mmat_err mmma 0 0))
-(mmat_ncols (mat_el mmat_err mmmb 0 0));
-(**)
+               {| srng_zero := mmat_err;
                    srng_one := mmat_err;
                    srng_add := mmat_add so;
                    srng_mul := mmat_mul_loop it' so;
