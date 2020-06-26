@@ -2016,6 +2016,30 @@ Theorem lemma_2_A_n_2_eq_n_I T (ro : ring_op T) (so := rng_semiring) :
      mat_el 0%Rng (mat_of_mmat (IZ_2_pow 1%Rng n)) i j.
 Proof.
 intros * Hi Hj.
+Require Import ZArith.
+Compute (let ro := Z_ring_op in let so := rng_semiring in let n := 3 in mmat_mul (A n) (A n)).
+Compute (let ro := Z_ring_op in let so := rng_semiring in let n := 3 in IZ_2_pow 1%Rng n).
+Definition mat_ext_mul_l T (so : semiring_op T) v M :=
+  {| mat_list := map (map (srng_mul v)) (mat_list M);
+     mat_nrows := mat_nrows M;
+     mat_ncols := mat_ncols M |}.
+...
+Fixpoint mmat_ext_mul_l T it (so : semiring_op T) v MM :=
+  match it with
+  | 0 => void_mmat
+  | S it' =>
+      match MM with
+      | MM_1 M => MM_1 (@mat_ext_mul_l T so v M)
+      | MM_M MMM =>
+          let mso :=
+            {| srng_zero := void_mmat;
+               srng_one := void_mmat;
+               srng_add := @mmat_add T so;
+               srng_mul := mmat_mul_loop it' |}
+          in
+          MM_M (mmat_ext_mul_l it' mso v MMM)
+      end
+  end.
 ...
 
 Theorem lemma_2_A_n_2_eq_n_I T (ro : ring_op T) (mro : ring_op (mmatrix T)) :
