@@ -2009,104 +2009,44 @@ Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mm
 
 (* "We prove by induction that A_n^2 = nI" *)
 
-Theorem lemma_2_A_n_2_eq_n_I T (ro : ring_op T) (so := rng_semiring) :
-  ∀ (n i j : nat),
-  (i < 2 ^ n)%nat → (j < 2 ^ n)%nat
-  → mat_el 0%Rng (mat_of_mmat (mmat_mul (A n) (A n))) i j =
-     mat_el 0%Rng (mat_of_mmat (IZ_2_pow 1%Rng n)) i j.
-Proof.
-intros * Hi Hj.
-Require Import ZArith.
-Compute (let ro := Z_ring_op in let so := rng_semiring in let n := 3 in mmat_mul (A n) (A n)).
-Compute (let ro := Z_ring_op in let so := rng_semiring in let n := 3 in IZ_2_pow 1%Rng n).
-Definition mat_ext_mul_l T (so : semiring_op T) v M :=
+Definition mat_ext_mul_l T {so : semiring_op T} v M :=
   {| mat_list := map (map (srng_mul v)) (mat_list M);
      mat_nrows := mat_nrows M;
      mat_ncols := mat_ncols M |}.
-Fixpoint mmat_ext_mul_l T it (so : semiring_op T) v MM :=
+
+Fixpoint mmat_ext_mul_l_loop T it {so : semiring_op T} v MM :=
   match it with
   | 0 => void_mmat
   | S it' =>
       match MM with
       | MM_1 M => MM_1 (@mat_ext_mul_l T so v M)
       | MM_M MMM =>
-          let mso :=
-            {| srng_zero := void_mmat;
-               srng_one := void_mmat;
-               srng_add := @mmat_add T so;
-               srng_mul := @mmat_mul T so |}
-          in
-          MM_M (mmat_ext_mul_l it' so v (@mat_ext_mul MMM))
+          MM_M
+            {| mat_list :=
+                 map (map (mmat_ext_mul_l_loop it' v)) (mat_list MMM);
+               mat_nrows := mat_nrows MMM;
+               mat_ncols := mat_ncols MMM |}
       end
   end.
-...
 
-Theorem lemma_2_A_n_2_eq_n_I T (ro : ring_op T) (mro : ring_op (mmatrix T)) :
+Definition mmat_ext_mul_l T {so : semiring_op T} v MMM :=
+  mmat_ext_mul_l_loop (mmat_depth MMM) v MMM.
+
+...
+(* should create a function mat_mul_nat_l...
+   with a multiplication of x by a nat n would be x+x+x...+x n times *)
+...
+Theorem lemma_2_A_n_2_eq_n_I T (ro : ring_op T) (so := rng_semiring) :
   ∀ (n i j : nat),
   (i < 2 ^ n)%nat → (j < 2 ^ n)%nat
-  → mat_el 0 (mat_of_mmat (mmat_mul (A n) (A n))) i j =
-     mat_el 0 (mat_of_mmat (IZ_2_pow 1%Rng n)) i j.
+  → mat_el 0%Rng (mat_of_mmat (mmat_mul (A n) (A n))) i j =
+     mat_el 0%Rng
+       (mat_of_mmat (mmat_ext_mul_l n (IZ_2_pow 1%Rng n))) i j.
 Proof.
 intros * Hi Hj.
-
-...
-
 Require Import ZArith.
-
-Fixpoint mmat_nrows T it (MM : mmatrix T) :=
-  match it with
-  | 0 => 0
-  | S it' =>
-      match MM with
-      | MM_1 M => mat_nrows M
-      | MM_M MMM =>
-          fold_left (λ n mm, n + mmat_nrows it' mm) (hd [] (mat_list MMM)) 0
-      end
-  end.
-
-Compute (let _ := Z_ring_op in A 0).
-Compute (let _ := Z_ring_op in A 1).
-Compute (let _ := Z_ring_op in A 2).
-Compute (let _ := Z_ring_op in A 3).
-Compute (let n := 0 in let _ := Z_ring_op in mmat_nrows (S n) (A n)).
-Compute (let n := 1 in let _ := Z_ring_op in mmat_nrows (S n) (A n)).
-Compute (let n := 2 in let _ := Z_ring_op in mmat_nrows (S n) (A n)).
-Compute (let n := 3 in let _ := Z_ring_op in mmat_nrows (S n) (A n)).
-Compute (let n := 4 in let _ := Z_ring_op in mmat_nrows (S n) (A n)).
-Compute (let n := 5 in let _ := Z_ring_op in mmat_nrows (S n) (A n)).
-
-Fixpoint mmat_which_row T {ro : semiring_op T} it tot_nrows (MMM : matrix (mmatrix T)) i im :=
-  match it with
-  | 0 => (42, 43)
-  | S it' =>
-      let curr_MM := mat_el (void_mmat _) MMM im 0 in
-      let nr := mmat_nrows tot_nrows curr_MM in
-      if lt_dec i nr then
-        match curr_MM with
-        | MM_1 M => (0, i)
-        | MM_M MMM' => mmat_which_row it' tot_nrows MMM' i 0
-        end
-      else
-        let (nrows_bef, ir) := mmat_which_row it' tot_nrows MMM (i - nr) (S im) in
-        (nr + nrows_bef, ir)
-  end.
-
-Definition mat_which_row T {ro : semiring_op T} tot_nrows (MM : mmatrix T) i :=
-  match MM with
-  | MM_1 M => (0, i)
-  | MM_M MMM => mmat_which_row tot_nrows tot_nrows MMM i 0
-  end.
-
-Require Import ZArith.
-
-Compute (let _ := Z_ring_op in A 2).
-Compute (let _ := Z_ring_op in mmat_nrows 500 (A 2)).
-Compute (let _ := Z_ring_op in mat_which_row 4 (A 2) 0).
-Compute (let _ := Z_ring_op in mat_which_row 4 (A 2) 1).
-Compute (let _ := Z_ring_op in mat_which_row 4 (A 2) 2).
-Compute (let _ := Z_ring_op in mat_which_row 4 (A 2) 3).
-
-Definition mmat_which_col T (it : nat) (mm : matrix (mmatrix T)) (j jm : nat) := (0, 0).
+Compute (let ro := Z_ring_op in let so := rng_semiring in let n := 3 in mmat_mul (A n) (A n)).
+Compute (let ro := Z_ring_op in let so := rng_semiring in let n := 3 in mmat_ext_mul_l (Z.of_nat n) (IZ_2_pow 1%Rng n)).
 
 ...
 
