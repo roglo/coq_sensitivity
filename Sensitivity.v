@@ -2023,7 +2023,6 @@ Definition mat_ext_mul_l T (so : semiring_op T) v M :=
   {| mat_list := map (map (srng_mul v)) (mat_list M);
      mat_nrows := mat_nrows M;
      mat_ncols := mat_ncols M |}.
-
 Fixpoint mmat_ext_mul_l T it (so : semiring_op T) v MM :=
   match it with
   | 0 => void_mmat
@@ -2037,7 +2036,7 @@ Fixpoint mmat_ext_mul_l T it (so : semiring_op T) v MM :=
                srng_add := @mmat_add T so;
                srng_mul := @mmat_mul T so |}
           in
-          MM_M (mmat_ext_mul_l it' mso v MMM)
+          MM_M (mmat_ext_mul_l it' so v (@mat_ext_mul MMM))
       end
   end.
 ...
