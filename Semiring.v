@@ -21,7 +21,8 @@ Class semiring_prop A {so : semiring_op A} :=
     srng_add_0_l : ∀ a : A, (0 + a)%Srng = a;
     srng_mul_comm : ∀ a b : A, (a * b = b * a)%Srng;
     srng_mul_1_l : ∀ a : A, (1 * a)%Srng = a;
-    srng_mul_add_distr_l : ∀ a b c : A, (a * (b + c) = a * b + a * c)%Srng }.
+    srng_mul_add_distr_l : ∀ a b c : A, (a * (b + c) = a * b + a * c)%Srng;
+    srng_mul_0_l : ∀ a, (0 * a = a)%Srng }.
 
 Fixpoint srng_power {A} {R : semiring_op A} a n :=
   match n with

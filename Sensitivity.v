@@ -2043,22 +2043,29 @@ Fixpoint mmat_nat_mul_l_loop T it {so : semiring_op T} n MM :=
 Definition mmat_nat_mul_l T {so : semiring_op T} n MMM :=
   mmat_nat_mul_l_loop (mmat_depth MMM) n MMM.
 
+Context {T : Type}.
+Context (ro : ring_op T).
+Context (so := @rng_semiring T ro).
+Context (rp : @semiring_prop T so).
+
 (* "We prove by induction that A_n^2 = nI" *)
 
-Theorem lemma_2_A_n_2_eq_n_I T (ro : ring_op T) (so := rng_semiring) : ∀ n,
-  mmat_mul (A n) (A n) = mmat_nat_mul_l n (I_2_pow n).
+Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
+  @mmat_mul T so (A n) (A n) = @mmat_nat_mul_l T so n (I_2_pow n).
 Proof.
 intros.
-destruct n. {
+induction n. {
   cbn; f_equal.
   unfold mat_nat_mul_l; cbn; f_equal; f_equal; f_equal.
-...
-  rewrite srng_mul_0_l.
-...
-Require Import ZArith.
-Compute (let ro := Z_ring_op in let so := rng_semiring in let n := 3 in mmat_mul (A n) (A n)).
-Compute (let ro := Z_ring_op in let so := rng_semiring in let n := 3 in mmat_nat_mul_l n (I_2_pow n)).
-
+  rewrite (@srng_mul_0_l T so); [ easy | ].
+  apply rp.
+}
+cbn; f_equal; f_equal.
+f_equal. {
+  f_equal. {
+    unfold mmat_mul in IHn.
+    unfold mmat_nat_mul_l in IHn.
+    rewrite IHn.
 ...
 
 Fixpoint mmat_el T dmm {ro : ring_op T} (MM : mmatrix T) i j {struct MM} :=
