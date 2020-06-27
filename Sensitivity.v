@@ -1899,14 +1899,16 @@ Fixpoint IZ_2_pow T {ro : ring_op T} u n :=
            mat_nrows := 2; mat_ncols := 2 |}
   end.
 
+Definition I_2_pow T {ro : ring_op T} := IZ_2_pow 1%Rng.
+
 Fixpoint A T {ro : ring_op T} n :=
   match n with
   | 0 => MM_1 (mat_of_list [[0%Rng]])
   | S n' =>
        MM_M
          (mmat_of_list
-            [[A n'; IZ_2_pow 1%Rng n'];
-             [IZ_2_pow 1%Rng n'; mmat_opp (A n')]])
+            [[A n'; I_2_pow n'];
+             [I_2_pow n'; mmat_opp (A n')]])
   end.
 
 (*
@@ -2007,46 +2009,54 @@ Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mm
 Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mmat (mmat_mul (A 3) (A 3))).
 *)
 
-(* "We prove by induction that A_n^2 = nI" *)
+Fixpoint mul_nat_l T {so : semiring_op T} n v :=
+  match n with
+  | 0 => srng_zero
+  | S n' => (Σ (i = 0, n'), v)%Srng
+  end.
 
-Definition mat_ext_mul_l T {so : semiring_op T} v M :=
-  {| mat_list := map (map (srng_mul v)) (mat_list M);
+(*
+Require Import ZArith.
+Compute (let _ := @rng_semiring Z Z_ring_op in mul_nat_l 7 (-4)%Z).
+*)
+
+Definition mat_nat_mul_l T {so : semiring_op T} n M :=
+  {| mat_list := map (map (mul_nat_l n)) (mat_list M);
      mat_nrows := mat_nrows M;
      mat_ncols := mat_ncols M |}.
 
-Fixpoint mmat_ext_mul_l_loop T it {so : semiring_op T} v MM :=
+Fixpoint mmat_nat_mul_l_loop T it {so : semiring_op T} n MM :=
   match it with
   | 0 => void_mmat
   | S it' =>
       match MM with
-      | MM_1 M => MM_1 (@mat_ext_mul_l T so v M)
+      | MM_1 M => MM_1 (@mat_nat_mul_l T so n M)
       | MM_M MMM =>
           MM_M
             {| mat_list :=
-                 map (map (mmat_ext_mul_l_loop it' v)) (mat_list MMM);
+                 map (map (mmat_nat_mul_l_loop it' n)) (mat_list MMM);
                mat_nrows := mat_nrows MMM;
                mat_ncols := mat_ncols MMM |}
       end
   end.
 
-Definition mmat_ext_mul_l T {so : semiring_op T} v MMM :=
-  mmat_ext_mul_l_loop (mmat_depth MMM) v MMM.
+Definition mmat_nat_mul_l T {so : semiring_op T} n MMM :=
+  mmat_nat_mul_l_loop (mmat_depth MMM) n MMM.
 
-...
-(* should create a function mat_mul_nat_l...
-   with a multiplication of x by a nat n would be x+x+x...+x n times *)
-...
-Theorem lemma_2_A_n_2_eq_n_I T (ro : ring_op T) (so := rng_semiring) :
-  ∀ (n i j : nat),
-  (i < 2 ^ n)%nat → (j < 2 ^ n)%nat
-  → mat_el 0%Rng (mat_of_mmat (mmat_mul (A n) (A n))) i j =
-     mat_el 0%Rng
-       (mat_of_mmat (mmat_ext_mul_l n (IZ_2_pow 1%Rng n))) i j.
+(* "We prove by induction that A_n^2 = nI" *)
+
+Theorem lemma_2_A_n_2_eq_n_I T (ro : ring_op T) (so := rng_semiring) : ∀ n,
+  mmat_mul (A n) (A n) = mmat_nat_mul_l n (I_2_pow n).
 Proof.
-intros * Hi Hj.
+intros.
+destruct n. {
+  cbn; f_equal.
+  unfold mat_nat_mul_l; cbn; f_equal; f_equal; f_equal.
+About ring_op.
+...
 Require Import ZArith.
 Compute (let ro := Z_ring_op in let so := rng_semiring in let n := 3 in mmat_mul (A n) (A n)).
-Compute (let ro := Z_ring_op in let so := rng_semiring in let n := 3 in mmat_ext_mul_l (Z.of_nat n) (IZ_2_pow 1%Rng n)).
+Compute (let ro := Z_ring_op in let so := rng_semiring in let n := 3 in mmat_nat_mul_l n (I_2_pow n)).
 
 ...
 

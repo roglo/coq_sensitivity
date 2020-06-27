@@ -15,6 +15,67 @@ Notation "a * b" := (srng_mul a b) : semiring_scope.
 Notation "0" := srng_zero : semiring_scope.
 Notation "1" := srng_one : semiring_scope.
 
+Class semiring_prop {A} {ro : semiring_op A} :=
+  { srng_1_neq_0 : (1 ≠ 0)%Srng;
+    srng_eq_dec : ∀ a b : A, {a = b} + {a ≠ b};
+    srng_add_comm : ∀ a b : A, (a + b = b + a)%Srng;
+    srng_add_assoc : ∀ a b c : A, (a + (b + c) = (a + b) + c)%Srng;
+    srng_add_0_l : ∀ a : A, (0 + a)%Srng = a;
+    srng_mul_comm : ∀ a b : A, (a * b = b * a)%Srng;
+    srng_mul_assoc : ∀ a b c : A, (a * (b * c) = (a * b) * c)%Srng;
+    srng_mul_1_l : ∀ a : A, (1 * a)%Srng = a;
+    srng_mul_add_distr_l : ∀ a b c : A, (a * (b + c) = a * b + a * c)%Srng }.
+
+Arguments srng_eq_dec {_} {_} {_} _%Srng _%Srng.
+
+(* what about subtraction, multiplication by 0, distributivity with
+   subtraction? → conflict in definition of rings where these axioms
+   are theorem. What do I do? *)
+
+Fixpoint srng_power {A} {R : semiring_op A} a n :=
+  match n with
+  | O => 1%Srng
+  | S m => (a * srng_power a m)%Srng
+  end.
+
+Notation "a ^ b" := (srng_power a b) : semiring_scope.
+
+Section semiring_theorems.
+
+Context {A : Type}.
+Context {ro : semiring_op A}.
+
+End semiring_theorems.
+
+(* Rings *)
+
+Class ring_op A :=
+  { rng_semiring : semiring_op A;
+    rng_opp : A → A }.
+
+Definition rng_sub A {R : ring_op A} (S := rng_semiring) a b :=
+  srng_add a (rng_opp b).
+
+Declare Scope ring_scope.
+
+Delimit Scope ring_scope with Rng.
+Notation "0" := (@srng_zero _ rng_semiring) : ring_scope.
+Notation "1" := (@srng_one _ rng_semiring) : ring_scope.
+
+(* Ring of integers *)
+
+Require Import ZArith.
+
+Definition Z_semiring_op : semiring_op Z :=
+  {| srng_zero := 0%Z;
+     srng_one := 1%Z;
+     srng_add := Z.add;
+     srng_mul := Z.mul |}.
+
+Definition Z_ring_op : ring_op Z :=
+  {| rng_semiring := Z_semiring_op;
+     rng_opp := Z.opp |}.
+
 (* borrowed from Ring2.v because, now, I want to start with
    semirings, and define rings later from semirings; this way,
    summations with syntax Σ can be defined (later) on semirings,
@@ -35,18 +96,6 @@ Class semiring_prop {A} {ro : ring_op A} :=
 Arguments srng_eq_dec {_} {_} {_} _%Rng _%Rng.
 *)
 
-Fixpoint srng_power {A} {R : semiring_op A} a n :=
-  match n with
-  | O => 1%Srng
-  | S m => (a * srng_power a m)%Srng
-  end.
-
-Notation "a ^ b" := (srng_power a b) : semiring_scope.
-
-Section semiring_theorems.
-
-Context {A : Type}.
-Context {ro : semiring_op A}.
 (*
 Context {rp : ring_prop}.
 *)
@@ -329,34 +378,3 @@ Qed.
 Theorem srng_pow_1_r : ∀ a, (a ^ 1 = a)%Srng.
 Proof. now intros; cbn; rewrite srng_mul_1_r. Qed.
 *)
-
-End semiring_theorems.
-
-(* Rings *)
-
-Class ring_op A :=
-  { rng_semiring : semiring_op A;
-    rng_opp : A → A }.
-
-Definition rng_sub A {R : ring_op A} (S := rng_semiring) a b :=
-  srng_add a (rng_opp b).
-
-Declare Scope ring_scope.
-
-Delimit Scope ring_scope with Rng.
-Notation "0" := (@srng_zero _ rng_semiring) : ring_scope.
-Notation "1" := (@srng_one _ rng_semiring) : ring_scope.
-
-(* Ring of integers *)
-
-Require Import ZArith.
-
-Definition Z_semiring_op : semiring_op Z :=
-  {| srng_zero := 0%Z;
-     srng_one := 1%Z;
-     srng_add := Z.add;
-     srng_mul := Z.mul |}.
-
-Definition Z_ring_op : ring_op Z :=
-  {| rng_semiring := Z_semiring_op;
-     rng_opp := Z.opp |}.
