@@ -2048,11 +2048,37 @@ Context (ro : ring_op T).
 Context (so := @rng_semiring T ro).
 Context (rp : @semiring_prop T so).
 
+Theorem mmat_depth_A : ∀ n, mmat_depth (A n) = S n.
+Proof.
+intros.
+induction n; [ easy | cbn ].
+now rewrite IHn.
+Qed.
+
+Theorem mmat_depth_I_2_pow : ∀ n, mmat_depth (I_2_pow n) = S n.
+Proof.
+intros.
+induction n; [ easy | cbn ].
+now rewrite IHn.
+Qed.
+
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
   @mmat_mul T so (A n) (A n) = @mmat_nat_mul_l T so n (I_2_pow n).
 Proof.
+intros.
+unfold mmat_mul, mmat_nat_mul_l.
+rewrite mmat_depth_A, mmat_depth_I_2_pow.
+induction n. {
+  cbn; f_equal.
+  unfold mat_nat_mul_l; cbn; f_equal; f_equal; f_equal.
+  rewrite (@srng_mul_0_l T so); [ easy | ].
+  apply rp.
+}
+remember (S n) as sn; cbn; subst sn.
+...
+
 intros.
 induction n. {
   cbn; f_equal.
