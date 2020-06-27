@@ -15,22 +15,13 @@ Notation "a * b" := (srng_mul a b) : semiring_scope.
 Notation "0" := srng_zero : semiring_scope.
 Notation "1" := srng_one : semiring_scope.
 
-Class semiring_prop {A} {ro : semiring_op A} :=
-  { srng_1_neq_0 : (1 ≠ 0)%Srng;
-    srng_eq_dec : ∀ a b : A, {a = b} + {a ≠ b};
-    srng_add_comm : ∀ a b : A, (a + b = b + a)%Srng;
+Class semiring_prop A {so : semiring_op A} :=
+  { srng_add_comm : ∀ a b : A, (a + b = b + a)%Srng;
     srng_add_assoc : ∀ a b c : A, (a + (b + c) = (a + b) + c)%Srng;
     srng_add_0_l : ∀ a : A, (0 + a)%Srng = a;
     srng_mul_comm : ∀ a b : A, (a * b = b * a)%Srng;
-    srng_mul_assoc : ∀ a b c : A, (a * (b * c) = (a * b) * c)%Srng;
     srng_mul_1_l : ∀ a : A, (1 * a)%Srng = a;
     srng_mul_add_distr_l : ∀ a b c : A, (a * (b + c) = a * b + a * c)%Srng }.
-
-Arguments srng_eq_dec {_} {_} {_} _%Srng _%Srng.
-
-(* what about subtraction, multiplication by 0, distributivity with
-   subtraction? → conflict in definition of rings where these axioms
-   are theorem. What do I do? *)
 
 Fixpoint srng_power {A} {R : semiring_op A} a n :=
   match n with
@@ -43,7 +34,28 @@ Notation "a ^ b" := (srng_power a b) : semiring_scope.
 Section semiring_theorems.
 
 Context {A : Type}.
-Context {ro : semiring_op A}.
+Context {so : semiring_op A}.
+Context {sp : semiring_prop A}.
+
+Theorem srng_add_0_r : ∀ a, (a + 0 = a)%Srng.
+Proof.
+intros a; simpl.
+rewrite srng_add_comm.
+apply srng_add_0_l.
+Qed.
+
+Theorem srng_mul_add_distr_r : ∀ x y z,
+  ((x + y) * z = x * z + y * z)%Srng.
+Proof.
+intros x y z; simpl.
+rewrite srng_mul_comm.
+rewrite srng_mul_add_distr_l.
+rewrite srng_mul_comm.
+assert (H : srng_mul z y = srng_mul y z). {
+ apply srng_mul_comm.
+}
+now rewrite H.
+Qed.
 
 End semiring_theorems.
 
@@ -61,6 +73,70 @@ Declare Scope ring_scope.
 Delimit Scope ring_scope with Rng.
 Notation "0" := (@srng_zero _ rng_semiring) : ring_scope.
 Notation "1" := (@srng_one _ rng_semiring) : ring_scope.
+Notation "- a" := (@rng_opp _ _ a) : ring_scope.
+Notation "a + b" := (@srng_add _ rng_semiring a b) : ring_scope.
+Notation "a - b" := (@rng_sub _ _ a b) : ring_scope.
+Notation "a * b" := (@srng_mul _ rng_semiring a b) : ring_scope.
+
+Class ring_prop A {so : ring_op A} :=
+  { rng_add_opp_l : ∀ a : A, (- a + a = 0)%Rng }.
+
+Section ring_theorems.
+
+Context {A : Type}.
+Context {ro : ring_op A}.
+Context (so := @rng_semiring A ro).
+Context {sp : @semiring_prop A so}.
+Context {rp : @ring_prop A ro}.
+
+Theorem rng_sub_compat_l : ∀ a b c,
+  (a = b)%Rng → (a - c = b - c)%Rng.
+Proof.
+intros a b c Hab.
+now rewrite Hab.
+Qed.
+
+Theorem fold_rng_sub : ∀ a b, (a + - b)%Rng = (a - b)%Rng.
+Proof. intros; easy. Qed.
+
+Theorem rng_add_opp_r : ∀ x, (x - x = 0)%Rng.
+Proof.
+intros x; unfold rng_sub; rewrite srng_add_comm.
+apply rng_add_opp_l.
+Qed.
+
+Theorem rng_add_sub : ∀ a b, (a + b - b = a)%Rng.
+Proof.
+intros.
+unfold rng_sub.
+rewrite <- srng_add_assoc.
+rewrite fold_rng_sub.
+rewrite rng_add_opp_r.
+apply srng_add_0_r.
+Qed.
+
+Theorem rng_add_reg_r : ∀ a b c, (a + c = b + c)%Rng → (a = b)%Rng.
+Proof.
+intros a b c Habc; simpl in Habc; simpl.
+eapply rng_sub_compat_l with (c := c) in Habc.
+now do 2 rewrite rng_add_sub in Habc.
+Qed.
+
+Theorem rng_mul_0_l : ∀ a, (0 * a = 0)%Rng.
+Proof.
+intros a.
+assert (H : (0 * a + a = a)%Rng). {
+ transitivity ((0 * a + 1 * a)%Rng). {
+   now rewrite srng_mul_1_l.
+ }
+ rewrite <- srng_mul_add_distr_r.
+ now rewrite srng_add_0_l, srng_mul_1_l.
+}
+apply rng_add_reg_r with (c := a).
+now rewrite srng_add_0_l.
+Qed.
+
+End ring_theorems.
 
 (* Ring of integers *)
 
@@ -170,7 +246,7 @@ apply srng_add_0_l.
 Qed.
 
 Theorem fold_srng_sub : ∀ a b, (a + - b)%Srng = (a - b)%Srng.
-Proof. intros; easy. Qed.
+Proof. intros; easy. Qed.T
 
 Theorem srng_add_sub : ∀ a b, (a + b - b = a)%Srng.
 Proof.
@@ -182,7 +258,7 @@ rewrite srng_add_opp_r.
 apply srng_add_0_r.
 Qed.
 
-Theorem srng_sub_add : ∀ a b, (a - b + b = a)%Srng.
+heorem srng_sub_add : ∀ a b, (a - b + b = a)%Srng.
 Proof.
 intros.
 unfold srng_sub.
@@ -239,21 +315,6 @@ assert (srng_mul z y = srng_mul y z) as H.
  apply srng_mul_comm.
 
  rewrite H; reflexivity.
-Qed.
-
-Theorem srng_mul_0_l : ∀ a, (0 * a = 0)%Srng.
-Proof.
-intros a.
-assert ((0 * a + a = a)%Srng) as H.
- transitivity ((0 * a + 1 * a)%Srng).
-  rewrite srng_mul_1_l; reflexivity.
-
-  rewrite <- srng_mul_add_distr_r.
-  rewrite srng_add_0_l, srng_mul_1_l.
-  reflexivity.
-
- apply srng_add_reg_r with (c := a).
- rewrite srng_add_0_l; assumption.
 Qed.
 
 Theorem srng_mul_0_r : ∀ a, (a * 0 = 0)%Srng.

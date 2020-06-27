@@ -2052,7 +2052,8 @@ intros.
 destruct n. {
   cbn; f_equal.
   unfold mat_nat_mul_l; cbn; f_equal; f_equal; f_equal.
-About ring_op.
+...
+  rewrite srng_mul_0_l.
 ...
 Require Import ZArith.
 Compute (let ro := Z_ring_op in let so := rng_semiring in let n := 3 in mmat_mul (A n) (A n)).
