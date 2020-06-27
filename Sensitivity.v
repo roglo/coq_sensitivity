@@ -2070,6 +2070,29 @@ Proof.
 intros.
 unfold mmat_mul, mmat_nat_mul_l.
 rewrite mmat_depth_A, mmat_depth_I_2_pow.
+destruct n. {
+  cbn; f_equal.
+  unfold mat_nat_mul_l; cbn; f_equal; f_equal; f_equal.
+  rewrite (@srng_mul_0_l T so); [ easy | ].
+  apply rp.
+}
+destruct n. {
+  cbn; f_equal; f_equal.
+  f_equal. {
+    f_equal. {
+      f_equal.
+      unfold mat_nat_mul_l; cbn; f_equal.
+      rewrite srng_mul_0_l.
+      now rewrite srng_mul_1_l.
+    }
+    f_equal; f_equal.
+    unfold mat_nat_mul_l; cbn; f_equal.
+    rewrite srng_mul_0_l.
+(* aïe aïe aïe *)
+...
+intros.
+unfold mmat_mul, mmat_nat_mul_l.
+rewrite mmat_depth_A, mmat_depth_I_2_pow.
 induction n. {
   cbn; f_equal.
   unfold mat_nat_mul_l; cbn; f_equal; f_equal; f_equal.
