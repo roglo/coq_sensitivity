@@ -2064,6 +2064,11 @@ Qed.
 
 (* "We prove by induction that A_n^2 = nI" *)
 
+(*
+Require Import ZArith.
+Compute (let n := 2 in let so := Z_semiring_op in let ro := Z_ring_op in mmat_mul (A n) (A n) = mmat_nat_mul_l n (I_2_pow n)).
+*)
+
 Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
   @mmat_mul T so (A n) (A n) = @mmat_nat_mul_l T so n (I_2_pow n).
 Proof.
