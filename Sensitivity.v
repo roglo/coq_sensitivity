@@ -2046,7 +2046,8 @@ Definition mmat_nat_mul_l T {so : semiring_op T} n MMM :=
 Context {T : Type}.
 Context (ro : ring_op T).
 Context (so := @rng_semiring T ro).
-Context (rp : @semiring_prop T so).
+Context (rp : @ring_prop T ro).
+Context (sp : @semiring_prop T so).
 
 Theorem mmat_depth_A : ∀ n, mmat_depth (A n) = S n.
 Proof.
@@ -2079,20 +2080,17 @@ destruct n. {
   cbn; f_equal.
   unfold mat_nat_mul_l; cbn; f_equal; f_equal; f_equal.
   rewrite (@srng_mul_0_l T so); [ easy | ].
-  apply rp.
+  apply sp.
 }
 destruct n. {
   cbn; f_equal; f_equal.
-  f_equal. {
-    f_equal. {
-      f_equal.
-      unfold mat_nat_mul_l; cbn; f_equal.
-      rewrite srng_mul_0_l.
-      now rewrite srng_mul_1_l.
-    }
-    f_equal; f_equal.
-    unfold mat_nat_mul_l; cbn; f_equal.
-    rewrite srng_mul_0_l.
+  unfold mat_nat_mul_l; cbn.
+  rewrite rng_opp_0.
+  do 2 rewrite srng_mul_0_l.
+  do 2 rewrite srng_mul_1_l.
+  do 3 rewrite srng_add_0_l.
+  now rewrite srng_add_0_r.
+}
 ...
 intros.
 unfold mmat_mul, mmat_nat_mul_l.

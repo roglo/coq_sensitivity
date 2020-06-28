@@ -137,6 +137,15 @@ apply rng_add_reg_r with (c := a).
 now rewrite srng_add_0_l.
 Qed.
 
+Theorem rng_opp_0 : (- 0 = 0)%Rng.
+Proof.
+transitivity (0 + - 0)%Rng. {
+  symmetry.
+  apply srng_add_0_l.
+}
+apply rng_add_opp_r.
+Qed.
+
 End ring_theorems.
 
 (* Ring of integers *)
