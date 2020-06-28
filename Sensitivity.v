@@ -2092,6 +2092,12 @@ destruct n. {
   now rewrite srng_add_0_r.
 }
 ...
+destruct n. {
+  cbn.
+  do 5 rewrite srng_mul_0_l.
+  do 5 rewrite srng_mul_1_l.
+  do 11 rewrite srng_add_0_l.
+...
 intros.
 unfold mmat_mul, mmat_nat_mul_l.
 rewrite mmat_depth_A, mmat_depth_I_2_pow.
