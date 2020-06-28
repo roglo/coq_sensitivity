@@ -2009,10 +2009,10 @@ Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mm
 Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mmat (mmat_mul (A 3) (A 3))).
 *)
 
-Fixpoint mul_nat_l T {so : semiring_op T} n v :=
+Definition rng_mul_nat_l T {ro : ring_op T} n v :=
   match n with
-  | 0 => srng_zero
-  | S n' => (Σ (i = 0, n'), v)%Srng
+  | 0 => 0%Rng
+  | S n' => (Σ (_ = 0, n'), v)%Rng
   end.
 
 (*
@@ -2020,17 +2020,17 @@ Require Import ZArith.
 Compute (let _ := @rng_semiring Z Z_ring_op in mul_nat_l 7 (-4)%Z).
 *)
 
-Definition mat_nat_mul_l T {so : semiring_op T} n M :=
-  {| mat_list := map (map (mul_nat_l n)) (mat_list M);
+Definition mat_nat_mul_l T {ro : ring_op T} n M :=
+  {| mat_list := map (map (rng_mul_nat_l n)) (mat_list M);
      mat_nrows := mat_nrows M;
      mat_ncols := mat_ncols M |}.
 
-Fixpoint mmat_nat_mul_l_loop T it {so : semiring_op T} n MM :=
+Fixpoint mmat_nat_mul_l_loop T it {ro : ring_op T} n MM :=
   match it with
   | 0 => void_mmat
   | S it' =>
       match MM with
-      | MM_1 M => MM_1 (@mat_nat_mul_l T so n M)
+      | MM_1 M => MM_1 (mat_nat_mul_l n M)
       | MM_M MMM =>
           MM_M
             {| mat_list :=
@@ -2040,13 +2040,15 @@ Fixpoint mmat_nat_mul_l_loop T it {so : semiring_op T} n MM :=
       end
   end.
 
-Definition mmat_nat_mul_l T {so : semiring_op T} n MMM :=
+Definition mmat_nat_mul_l T {ro : ring_op T} n MMM :=
   mmat_nat_mul_l_loop (mmat_depth MMM) n MMM.
 
 Context {T : Type}.
 Context (ro : ring_op T).
+(*
 Context (so := @rng_semiring T ro).
 Context (rp : @semiring_prop T so).
+*)
 
 Theorem mmat_depth_A : ∀ n, mmat_depth (A n) = S n.
 Proof.
@@ -2069,8 +2071,10 @@ Require Import ZArith.
 Compute (let n := 2 in let so := Z_semiring_op in let ro := Z_ring_op in mmat_mul (A n) (A n) = mmat_nat_mul_l n (I_2_pow n)).
 *)
 
+...
+
 Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
-  @mmat_mul T so (A n) (A n) = @mmat_nat_mul_l T so n (I_2_pow n).
+  @mmat_mul T ro (A n) (A n) = @mmat_nat_mul_l T ro n (I_2_pow n).
 Proof.
 intros.
 unfold mmat_mul, mmat_nat_mul_l.
