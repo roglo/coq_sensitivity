@@ -2132,6 +2132,42 @@ symmetry in Hrc.
 now destruct (Nat.eq_dec (mat_ncols M) (mat_nrows M)).
 Qed.
 
+Theorem mat_nrows_A_I_2_pow_MM_1 : ∀ n M IM,
+  A n = MM_1 M
+  → I_2_pow n = MM_1 IM
+  → mat_nrows M = mat_nrows IM.
+Proof.
+intros * HAn HIn.
+destruct n; [ | easy ].
+cbn in HAn, HIn.
+injection HAn; clear HAn; intros; subst M.
+injection HIn; clear HIn; intros; subst IM; easy.
+Qed.
+
+Theorem mat_ncols_A_I_2_pow_MM_1 : ∀ n M IM,
+  A n = MM_1 M
+  → I_2_pow n = MM_1 IM
+  → mat_ncols M = mat_ncols IM.
+Proof.
+intros * HAn HIn.
+destruct n; [ | easy ].
+cbn in HAn, HIn.
+injection HAn; clear HAn; intros; subst M.
+injection HIn; clear HIn; intros; subst IM; easy.
+Qed.
+
+Theorem mat_nrows_A_I_2_pow_MM_M : ∀ n MMM IMMM,
+  A n = MM_M MMM
+  → I_2_pow n = MM_M IMMM
+  → mat_nrows MMM = mat_nrows IMMM.
+Proof.
+intros * HAn HIn.
+destruct n; [ easy | ].
+cbn in HAn, HIn.
+injection HAn; clear HAn; intros; subst MMM.
+injection HIn; clear HIn; intros; subst IMMM; easy.
+Qed.
+
 Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
   @mmat_mul T so (A n) (A n) = @mmat_nat_mul_l T so n (I_2_pow n).
 Proof.
@@ -2151,13 +2187,8 @@ destruct An as [M| MMM]. {
   destruct (Nat.eq_dec (mat_nrows M) (mat_nrows M)) as [H| ]; [ | easy ].
   clear H.
   rewrite <- (I_2_pow_MM_1_nrows_ncols n HIn).
-  assert (HMI : mat_nrows M = mat_nrows IM). {
-    destruct n; [ | easy ].
-    cbn in HAn, HIn.
-    injection HAn; clear HAn; intros; subst M.
-    injection HIn; clear HIn; intros; subst IM; easy.
-  }
-  f_equal; [ | easy | easy ].
+  rewrite (mat_nrows_A_I_2_pow_MM_1 n HAn HIn).
+  f_equal.
   destruct n; [ | easy ].
   cbn in HAn, HIn.
   injection HAn; clear HAn; intros; subst M.
@@ -2170,18 +2201,12 @@ destruct An as [M| MMM]. {
   destruct (Nat.eq_dec (mat_nrows MMM) (mat_nrows MMM)) as [H| ]; [ | easy ].
   clear H.
   rewrite <- (I_2_pow_MM_M_nrows_ncols n HIn).
-  assert (HMI : mat_nrows MMM = mat_nrows IMMM). {
-    destruct n; [ easy | ].
-    cbn in HAn, HIn.
-    injection HAn; clear HAn; intros; subst MMM.
-    injection HIn; clear HIn; intros; subst IMMM; easy.
-  }
-  f_equal; [ | easy | easy ].
+  rewrite (mat_nrows_A_I_2_pow_MM_M n HAn HIn).
+  f_equal.
   destruct n; [ easy | ].
   cbn in HAn, HIn.
   injection HAn; clear HAn; intros; subst MMM.
   injection HIn; clear HIn; intros; subst IMMM.
-  rewrite HMI.
   cbn - [ list_list_mul mmat_nat_mul_l_loop ].
   cbn - [ mmat_add ].
   f_equal. {
@@ -2195,6 +2220,19 @@ destruct An as [M| MMM]. {
           unfold mat_add.
           rewrite mat_sqr_nrows; [ | now rewrite (A_MM_1_nrows_ncols n HAn) ].
           rewrite mat_sqr_ncols; [ | now rewrite (A_MM_1_nrows_ncols n HAn) ].
+          rewrite mat_sqr_nrows. 2: {
+            now rewrite (I_2_pow_MM_1_nrows_ncols n HIn).
+          }
+          rewrite mat_sqr_ncols. 2: {
+            now rewrite (I_2_pow_MM_1_nrows_ncols n HIn).
+          }
+          rewrite (mat_nrows_A_I_2_pow_MM_1 n HAn HIn).
+          rewrite (mat_ncols_A_I_2_pow_MM_1 n HAn HIn).
+          remember (mat_nrows M) as m.
+          destruct (Nat.eq_dec m m) as [H| ]; [ subst m; clear H | easy ].
+          remember (mat_ncols M) as m.
+          destruct (Nat.eq_dec m m) as [H| ]; [ subst m; clear H | easy ].
+          f_equal.
 ...
 intros.
 unfold mmat_mul, mmat_nat_mul_l.
