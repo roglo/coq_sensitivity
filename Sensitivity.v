@@ -2065,16 +2065,9 @@ induction n; [ easy | cbn ].
 now rewrite IHn.
 Qed.
 
-(* "We prove by induction that A_n^2 = nI" *)
-
-(*
-Require Import ZArith.
-Compute (let n := 2 in let so := Z_semiring_op in let ro := Z_ring_op in mmat_mul (A n) (A n) = mmat_nat_mul_l n (I_2_pow n)).
-*)
-
-Theorem A_MM_1_nrows_ncols : ∀ n M,
+Theorem A_MM_1_nrows : ∀ n M,
   A n = MM_1 M
-  → mat_nrows M = mat_ncols M.
+  → mat_nrows M = 1.
 Proof.
 intros * HAn.
 destruct n; [ | easy ].
@@ -2082,9 +2075,29 @@ cbn in HAn.
 now injection HAn; clear HAn; intros; subst M.
 Qed.
 
-Theorem A_MM_M_nrows_ncols : ∀ n MMM,
+Theorem A_MM_1_ncols : ∀ n M,
+  A n = MM_1 M
+  → mat_ncols M = 1.
+Proof.
+intros * HAn.
+destruct n; [ | easy ].
+cbn in HAn.
+now injection HAn; clear HAn; intros; subst M.
+Qed.
+
+Theorem A_MM_M_nrows : ∀ n MMM,
   A n = MM_M MMM
-  → mat_nrows MMM = mat_ncols MMM.
+  → mat_nrows MMM = 2.
+Proof.
+intros * HAn.
+destruct n; [ easy | ].
+cbn in HAn.
+now injection HAn; clear HAn; intros; subst MMM.
+Qed.
+
+Theorem A_MM_M_ncols : ∀ n MMM,
+  A n = MM_M MMM
+  → mat_ncols MMM = 2.
 Proof.
 intros * HAn.
 destruct n; [ easy | ].
@@ -2094,20 +2107,17 @@ Qed.
 
 Theorem I_2_pow_MM_1_nrows : ∀ n M,
   I_2_pow n = MM_1 M
-  → mat_nrows M = 2.
+  → mat_nrows M = 1.
 Proof.
 intros * HIM.
 destruct n; [ | easy ].
 cbn in HIM.
-...
 now injection HIM; clear HIM; intros; subst M.
 Qed.
 
-...
-
-Theorem I_2_pow_MM_1_nrows_ncols : ∀ n M,
+Theorem I_2_pow_MM_1_ncols : ∀ n M,
   I_2_pow n = MM_1 M
-  → mat_nrows M = mat_ncols M.
+  → mat_ncols M = 1.
 Proof.
 intros * HIM.
 destruct n; [ | easy ].
@@ -2115,9 +2125,19 @@ cbn in HIM.
 now injection HIM; clear HIM; intros; subst M.
 Qed.
 
-Theorem I_2_pow_MM_M_nrows_ncols : ∀ n MMM,
+Theorem I_2_pow_MM_M_nrows : ∀ n MMM,
   I_2_pow n = MM_M MMM
-  → mat_nrows MMM = mat_ncols MMM.
+  → mat_nrows MMM = 2.
+Proof.
+intros * HIM.
+destruct n; [ easy | ].
+cbn in HIM.
+now injection HIM; clear HIM; intros; subst MMM.
+Qed.
+
+Theorem I_2_pow_MM_M_ncols : ∀ n MMM,
+  I_2_pow n = MM_M MMM
+  → mat_ncols MMM = 2.
 Proof.
 intros * HIM.
 destruct n; [ easy | ].
@@ -2181,6 +2201,8 @@ injection HAn; clear HAn; intros; subst MMM.
 injection HIn; clear HIn; intros; subst IMMM; easy.
 Qed.
 
+(* "We prove by induction that A_n^2 = nI" *)
+
 Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
   @mmat_mul T so (A n) (A n) = @mmat_nat_mul_l T so n (I_2_pow n).
 Proof.
@@ -2196,12 +2218,11 @@ destruct An as [M| MMM]. {
   destruct In as [IM| IMMM]; [ f_equal | now destruct n ].
   unfold mat_nat_mul_l.
   unfold mat_mul.
-  rewrite <- (A_MM_1_nrows_ncols n HAn).
-  destruct (Nat.eq_dec (mat_nrows M) (mat_nrows M)) as [H| ]; [ | easy ].
-  clear H.
-  rewrite <- (I_2_pow_MM_1_nrows_ncols n HIn).
-  rewrite (mat_nrows_A_I_2_pow_MM_1 n HAn HIn).
-  f_equal.
+  rewrite (A_MM_1_nrows _ HAn).
+  rewrite (A_MM_1_ncols _ HAn).
+  rewrite (I_2_pow_MM_1_nrows _ HIn).
+  rewrite (I_2_pow_MM_1_ncols _ HIn).
+  cbn; f_equal.
   destruct n; [ | easy ].
   cbn in HAn, HIn.
   injection HAn; clear HAn; intros; subst M.
@@ -2210,12 +2231,11 @@ destruct An as [M| MMM]. {
 } {
   destruct In as [IM| IMMM]; [ now destruct n | f_equal ].
   unfold mat_mul.
-  rewrite <- (A_MM_M_nrows_ncols n HAn).
-  destruct (Nat.eq_dec (mat_nrows MMM) (mat_nrows MMM)) as [H| ]; [ | easy ].
-  clear H.
-  rewrite <- (I_2_pow_MM_M_nrows_ncols n HIn).
-  rewrite (mat_nrows_A_I_2_pow_MM_M n HAn HIn).
-  f_equal.
+  rewrite (A_MM_M_nrows _ HAn).
+  rewrite (A_MM_M_ncols _ HAn).
+  rewrite (I_2_pow_MM_M_nrows _ HIn).
+  rewrite (I_2_pow_MM_M_ncols _ HIn).
+  cbn - [ list_list_mul ]; f_equal.
   destruct n; [ easy | ].
   cbn in HAn, HIn.
   injection HAn; clear HAn; intros; subst MMM.
@@ -2231,30 +2251,31 @@ destruct An as [M| MMM]. {
         destruct In as [M| MMM]. {
           cbn; unfold mat_nat_mul_l; f_equal.
           unfold mat_add.
-          rewrite mat_sqr_nrows; [ | now rewrite (A_MM_1_nrows_ncols n HAn) ].
-          rewrite mat_sqr_ncols; [ | now rewrite (A_MM_1_nrows_ncols n HAn) ].
           rewrite mat_sqr_nrows. 2: {
-            now rewrite (I_2_pow_MM_1_nrows_ncols n HIn).
+            now rewrite (A_MM_1_nrows _ HAn), (A_MM_1_ncols _ HAn).
           }
+          rewrite (A_MM_1_nrows _ HAn).
           rewrite mat_sqr_ncols. 2: {
-            now rewrite (I_2_pow_MM_1_nrows_ncols n HIn).
+            now rewrite (A_MM_1_nrows _ HAn), (A_MM_1_ncols _ HAn).
           }
-          rewrite (mat_nrows_A_I_2_pow_MM_1 n HAn HIn).
-          rewrite (mat_ncols_A_I_2_pow_MM_1 n HAn HIn).
-          remember (mat_nrows M) as m.
-          destruct (Nat.eq_dec m m) as [H| ]; [ subst m; clear H | easy ].
-          remember (mat_ncols M) as m.
-          destruct (Nat.eq_dec m m) as [H| ]; [ subst m; clear H | easy ].
-          f_equal.
+          rewrite (A_MM_1_ncols _ HAn).
+          rewrite mat_sqr_nrows. 2: {
+            rewrite (I_2_pow_MM_1_nrows _ HIn), (I_2_pow_MM_1_ncols _ HIn).
+            easy.
+          }
+          rewrite (I_2_pow_MM_1_nrows _ HIn).
+          rewrite mat_sqr_ncols. 2: {
+            rewrite (I_2_pow_MM_1_nrows _ HIn), (I_2_pow_MM_1_ncols _ HIn).
+            easy.
+          }
+          rewrite (I_2_pow_MM_1_ncols _ HIn).
+          cbn; f_equal.
           unfold mat_mul.
-          destruct (Nat.eq_dec (mat_ncols MA) (mat_nrows MA)) as [HA| HA]. {
-            cbn.
-            destruct (Nat.eq_dec (mat_ncols M) (mat_nrows M)) as [HMM| HMM]. {
-              cbn.
-              rewrite (mat_nrows_A_I_2_pow_MM_1 n HAn HIn).
-              rewrite (mat_ncols_A_I_2_pow_MM_1 n HAn HIn).
-Search I_2_pow.
-              rewrite (
+          rewrite (A_MM_1_nrows _ HAn).
+          rewrite (A_MM_1_ncols _ HAn).
+          rewrite (I_2_pow_MM_1_nrows _ HIn).
+          rewrite (I_2_pow_MM_1_ncols _ HIn).
+          cbn.
 ...
 intros.
 unfold mmat_mul, mmat_nat_mul_l.
