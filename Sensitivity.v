@@ -2248,34 +2248,31 @@ destruct An as [M| MMM]. {
       remember (I_2_pow n) as In eqn:HIn; symmetry in HIn.
       move In before An.
       destruct An as [MA | MMMA]. {
-        destruct In as [M| MMM]. {
-          cbn; unfold mat_nat_mul_l; f_equal.
-          unfold mat_add.
-          rewrite mat_sqr_nrows. 2: {
-            now rewrite (A_MM_1_nrows _ HAn), (A_MM_1_ncols _ HAn).
-          }
-          rewrite (A_MM_1_nrows _ HAn).
-          rewrite mat_sqr_ncols. 2: {
-            now rewrite (A_MM_1_nrows _ HAn), (A_MM_1_ncols _ HAn).
-          }
-          rewrite (A_MM_1_ncols _ HAn).
-          rewrite mat_sqr_nrows. 2: {
-            rewrite (I_2_pow_MM_1_nrows _ HIn), (I_2_pow_MM_1_ncols _ HIn).
-            easy.
-          }
-          rewrite (I_2_pow_MM_1_nrows _ HIn).
-          rewrite mat_sqr_ncols. 2: {
-            rewrite (I_2_pow_MM_1_nrows _ HIn), (I_2_pow_MM_1_ncols _ HIn).
-            easy.
-          }
-          rewrite (I_2_pow_MM_1_ncols _ HIn).
-          cbn; f_equal.
-          unfold mat_mul.
-          rewrite (A_MM_1_nrows _ HAn).
-          rewrite (A_MM_1_ncols _ HAn).
-          rewrite (I_2_pow_MM_1_nrows _ HIn).
-          rewrite (I_2_pow_MM_1_ncols _ HIn).
-          cbn.
+        destruct In as [M| MMM]; [ | now destruct n ].
+        destruct n; [ | easy ].
+        cbn in HAn, HIn.
+        injection HAn; clear HAn; intros; subst MA.
+        injection HIn; clear HIn; intros; subst M.
+        unfold mat_nat_mul_l.
+        cbn; f_equal; f_equal.
+        now rewrite srng_mul_0_l, srng_mul_1_l.
+      }
+      destruct n; [ easy | ].
+      destruct In as [M| MMM]; [ now destruct n | ].
+      cbn in HAn, HIn.
+      injection HAn; clear HAn; intros; subst MMMA.
+      injection HIn; clear HIn; intros; subst MMM.
+      remember (S n) as sn.
+      cbn; f_equal; f_equal.
+Print mmat_add.
+...
+      subst sn.
+Search mmat_depth.
+...
+      f_equal. {
+        f_equal. {
+...
+        now rewrite srng_mul_0_l, srng_mul_1_l.
 ...
 intros.
 unfold mmat_mul, mmat_nat_mul_l.
