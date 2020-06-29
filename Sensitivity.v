@@ -2043,6 +2043,8 @@ Fixpoint mmat_nat_mul_l_loop T it {so : semiring_op T} n MM :=
 Definition mmat_nat_mul_l T {so : semiring_op T} n MMM :=
   mmat_nat_mul_l_loop (mmat_depth MMM) n MMM.
 
+Section Sensitivity.
+
 Context {T : Type}.
 Context (ro : ring_op T).
 Context (so := @rng_semiring T ro).
@@ -2070,9 +2072,130 @@ Require Import ZArith.
 Compute (let n := 2 in let so := Z_semiring_op in let ro := Z_ring_op in mmat_mul (A n) (A n) = mmat_nat_mul_l n (I_2_pow n)).
 *)
 
+Theorem A_MM_1_nrows_ncols : ∀ n M,
+  A n = MM_1 M
+  → mat_nrows M = mat_ncols M.
+Proof.
+intros * HAn.
+destruct n; [ | easy ].
+cbn in HAn.
+now injection HAn; clear HAn; intros; subst M.
+Qed.
+
+Theorem A_MM_M_nrows_ncols : ∀ n MMM,
+  A n = MM_M MMM
+  → mat_nrows MMM = mat_ncols MMM.
+Proof.
+intros * HAn.
+destruct n; [ easy | ].
+cbn in HAn.
+now injection HAn; clear HAn; intros; subst MMM.
+Qed.
+
+Theorem I_2_pow_MM_1_nrows_ncols : ∀ n M,
+  I_2_pow n = MM_1 M
+  → mat_nrows M = mat_ncols M.
+Proof.
+intros * HIM.
+destruct n; [ | easy ].
+cbn in HIM.
+now injection HIM; clear HIM; intros; subst M.
+Qed.
+
+Theorem I_2_pow_MM_M_nrows_ncols : ∀ n MMM,
+  I_2_pow n = MM_M MMM
+  → mat_nrows MMM = mat_ncols MMM.
+Proof.
+intros * HIM.
+destruct n; [ easy | ].
+cbn in HIM.
+now injection HIM; clear HIM; intros; subst MMM.
+Qed.
+
+Theorem mat_sqr_nrows : ∀ M (s := so),
+  mat_nrows M = mat_ncols M
+  → mat_nrows (mat_mul M M) = mat_nrows M.
+Proof.
+intros * Hrc; subst s.
+unfold mat_mul.
+symmetry in Hrc.
+now destruct (Nat.eq_dec (mat_ncols M) (mat_nrows M)).
+Qed.
+
+Theorem mat_sqr_ncols : ∀ M (s := so),
+  mat_nrows M = mat_ncols M
+  → mat_ncols (mat_mul M M) = mat_ncols M.
+Proof.
+intros * Hrc; subst s.
+unfold mat_mul.
+symmetry in Hrc.
+now destruct (Nat.eq_dec (mat_ncols M) (mat_nrows M)).
+Qed.
+
 Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
   @mmat_mul T so (A n) (A n) = @mmat_nat_mul_l T so n (I_2_pow n).
 Proof.
+intros.
+unfold mmat_mul, mmat_nat_mul_l.
+rewrite mmat_depth_A, mmat_depth_I_2_pow.
+cbn.
+unfold mat_nat_mul_l.
+remember (A n) as An eqn:HAn; symmetry in HAn.
+remember (I_2_pow n) as In eqn:HIn; symmetry in HIn.
+move In before An.
+destruct An as [M| MMM]. {
+  destruct In as [IM| IMMM]; [ f_equal | now destruct n ].
+  unfold mat_nat_mul_l.
+  unfold mat_mul.
+  rewrite <- (A_MM_1_nrows_ncols n HAn).
+  destruct (Nat.eq_dec (mat_nrows M) (mat_nrows M)) as [H| ]; [ | easy ].
+  clear H.
+  rewrite <- (I_2_pow_MM_1_nrows_ncols n HIn).
+  assert (HMI : mat_nrows M = mat_nrows IM). {
+    destruct n; [ | easy ].
+    cbn in HAn, HIn.
+    injection HAn; clear HAn; intros; subst M.
+    injection HIn; clear HIn; intros; subst IM; easy.
+  }
+  f_equal; [ | easy | easy ].
+  destruct n; [ | easy ].
+  cbn in HAn, HIn.
+  injection HAn; clear HAn; intros; subst M.
+  injection HIn; clear HIn; intros; subst IM; cbn.
+  now rewrite srng_mul_0_l.
+} {
+  destruct In as [IM| IMMM]; [ now destruct n | f_equal ].
+  unfold mat_mul.
+  rewrite <- (A_MM_M_nrows_ncols n HAn).
+  destruct (Nat.eq_dec (mat_nrows MMM) (mat_nrows MMM)) as [H| ]; [ | easy ].
+  clear H.
+  rewrite <- (I_2_pow_MM_M_nrows_ncols n HIn).
+  assert (HMI : mat_nrows MMM = mat_nrows IMMM). {
+    destruct n; [ easy | ].
+    cbn in HAn, HIn.
+    injection HAn; clear HAn; intros; subst MMM.
+    injection HIn; clear HIn; intros; subst IMMM; easy.
+  }
+  f_equal; [ | easy | easy ].
+  destruct n; [ easy | ].
+  cbn in HAn, HIn.
+  injection HAn; clear HAn; intros; subst MMM.
+  injection HIn; clear HIn; intros; subst IMMM.
+  rewrite HMI.
+  cbn - [ list_list_mul mmat_nat_mul_l_loop ].
+  cbn - [ mmat_add ].
+  f_equal. {
+    f_equal. {
+      remember (A n) as An eqn:HAn; symmetry in HAn.
+      remember (I_2_pow n) as In eqn:HIn; symmetry in HIn.
+      move In before An.
+      destruct An as [MA | MMMA]. {
+        destruct In as [M| MMM]. {
+          cbn; unfold mat_nat_mul_l; f_equal.
+          unfold mat_add.
+          rewrite mat_sqr_nrows; [ | now rewrite (A_MM_1_nrows_ncols n HAn) ].
+          rewrite mat_sqr_ncols; [ | now rewrite (A_MM_1_nrows_ncols n HAn) ].
+...
 intros.
 unfold mmat_mul, mmat_nat_mul_l.
 rewrite mmat_depth_A, mmat_depth_I_2_pow.
