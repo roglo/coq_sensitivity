@@ -2092,6 +2092,19 @@ cbn in HAn.
 now injection HAn; clear HAn; intros; subst MMM.
 Qed.
 
+Theorem I_2_pow_MM_1_nrows : ∀ n M,
+  I_2_pow n = MM_1 M
+  → mat_nrows M = 2.
+Proof.
+intros * HIM.
+destruct n; [ | easy ].
+cbn in HIM.
+...
+now injection HIM; clear HIM; intros; subst M.
+Qed.
+
+...
+
 Theorem I_2_pow_MM_1_nrows_ncols : ∀ n M,
   I_2_pow n = MM_1 M
   → mat_nrows M = mat_ncols M.
@@ -2233,6 +2246,15 @@ destruct An as [M| MMM]. {
           remember (mat_ncols M) as m.
           destruct (Nat.eq_dec m m) as [H| ]; [ subst m; clear H | easy ].
           f_equal.
+          unfold mat_mul.
+          destruct (Nat.eq_dec (mat_ncols MA) (mat_nrows MA)) as [HA| HA]. {
+            cbn.
+            destruct (Nat.eq_dec (mat_ncols M) (mat_nrows M)) as [HMM| HMM]. {
+              cbn.
+              rewrite (mat_nrows_A_I_2_pow_MM_1 n HAn HIn).
+              rewrite (mat_ncols_A_I_2_pow_MM_1 n HAn HIn).
+Search I_2_pow.
+              rewrite (
 ...
 intros.
 unfold mmat_mul, mmat_nat_mul_l.
