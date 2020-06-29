@@ -2264,15 +2264,8 @@ destruct An as [M| MMM]. {
       injection HIn; clear HIn; intros; subst MMM.
       remember (S n) as sn.
       cbn; f_equal; f_equal.
-Print mmat_add.
-...
-      subst sn.
-Search mmat_depth.
-...
       f_equal. {
         f_equal. {
-...
-        now rewrite srng_mul_0_l, srng_mul_1_l.
 ...
 intros.
 unfold mmat_mul, mmat_nat_mul_l.
