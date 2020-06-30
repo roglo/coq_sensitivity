@@ -2276,18 +2276,24 @@ destruct An as [M| MMM]. {
           remember (A n) as An eqn:HAn; symmetry in HAn.
           remember (I_2_pow n) as In eqn:HIn; symmetry in HIn.
           move In before An; move HIn before HAn.
+          remember (IZ_2_pow 0%Rng n) as Zn eqn:HZn; symmetry in HZn.
           destruct An as [MA| MMMA]. {
             cbn in Hma; subst ma.
-            destruct In as [MI| MMMI]. {
-              cbn in Hmi; subst mi; cbn.
-              remember (IZ_2_pow 0%Rng n) as Zn eqn:HZn; symmetry in HZn.
-              destruct Zn as [MZ| MMMZ]. {
-                destruct n; [ | easy ].
-                cbn in HAn, HIn, HZn.
-                injection HAn; intros; subst MA.
-                injection HIn; intros; subst MI.
-                injection HZn; intros; subst MZ.
-                cbn; f_equal.
+            destruct n; [ | easy ].
+            injection HAn; clear HAn; intros; subst MA.
+            destruct In as [MI| MMMI]; [ | easy ].
+            cbn in Hmi; subst mi; cbn.
+            injection HIn; clear HIn; intros; subst MI.
+            destruct Zn as [MZ| MMMZ]; [ | easy ].
+            cbn in HZn.
+            injection HZn; clear HZn; intros; subst MZ.
+            cbn; f_equal.
+            unfold mat_nat_mul_l; cbn; f_equal.
+            rewrite srng_mul_0_l.
+            rewrite srng_mul_1_l.
+            now rewrite srng_add_0_r.
+          } {
+            cbn in Hma.
 ...
 intros.
 unfold mmat_mul, mmat_nat_mul_l.
