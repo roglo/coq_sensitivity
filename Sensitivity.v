@@ -2293,7 +2293,16 @@ destruct An as [M| MMM]. {
             rewrite srng_mul_1_l.
             now rewrite srng_add_0_r.
           } {
-            cbn in Hma.
+            destruct n; [ easy | ].
+            cbn in HAn.
+            destruct In as [MI| MMMI]; [ easy | ].
+            destruct Zn as [MZ| MMMZ]; [ easy | ].
+            injection HAn; clear HAn; intros; subst MMMA.
+            injection HIn; clear HIn; intros; subst MMMI.
+            injection HZn; clear HZn; intros; subst MMMZ.
+            cbn in Hma, Hmi.
+            subst ma mi; cbn.
+            f_equal; f_equal.
 ...
 intros.
 unfold mmat_mul, mmat_nat_mul_l.
