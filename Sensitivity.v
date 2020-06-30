@@ -2277,6 +2277,7 @@ destruct An as [M| MMM]. {
           remember (I_2_pow n) as In eqn:HIn; symmetry in HIn.
           move In before An; move HIn before HAn.
           remember (IZ_2_pow 0%Rng n) as Zn eqn:HZn; symmetry in HZn.
+          move Zn before In; move HZn before HIn.
           destruct An as [MA| MMMA]. {
             cbn in Hma; subst ma.
             destruct n; [ | easy ].
@@ -2293,6 +2294,10 @@ destruct An as [M| MMM]. {
             rewrite srng_mul_1_l.
             now rewrite srng_add_0_r.
           } {
+(**)
+            destruct In as [MI| MMMI]; [ now destruct n | ].
+            destruct Zn as [MZ| MMMZ]; [ now destruct n | ].
+...
             destruct n; [ easy | ].
             cbn in HAn.
             destruct In as [MI| MMMI]; [ easy | ].
