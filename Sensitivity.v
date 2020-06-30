@@ -2327,6 +2327,7 @@ destruct An as [M| MMM]. {
                 move MZ before MI.
                 f_equal.
                 unfold mat_add.
+                unfold mat_nat_mul_l; cbn.
                 rewrite mat_sqr_nrows. 2: {
                   now rewrite (A_MM_1_nrows n HAn), (A_MM_1_ncols n HAn).
                 }
@@ -2355,7 +2356,7 @@ destruct An as [M| MMM]. {
                 rewrite (IZ_2_pow_MM_1_ncols _ _ HIn).
                 rewrite (IZ_2_pow_MM_1_nrows _ _ HZn).
                 rewrite (IZ_2_pow_MM_1_ncols _ _ HZn).
-                cbn.
+                cbn; f_equal.
 ...
 intros.
 unfold mmat_mul, mmat_nat_mul_l.
