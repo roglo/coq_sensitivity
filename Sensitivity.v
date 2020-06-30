@@ -2297,6 +2297,17 @@ destruct An as [M| MMM]. {
 (**)
             destruct In as [MI| MMMI]; [ now destruct n | ].
             destruct Zn as [MZ| MMMZ]; [ now destruct n | ].
+            unfold mat_mul in Hma, Hmi.
+            rewrite (A_MM_M_nrows _ HAn) in Hma.
+            rewrite (A_MM_M_ncols _ HAn) in Hma.
+            cbn in Hma.
+            rewrite (IZ_2_pow_MM_M_nrows _ _ HIn) in Hmi.
+            rewrite (IZ_2_pow_MM_M_ncols _ _ HIn) in Hmi.
+            cbn in Hmi.
+            subst mi; cbn.
+            rewrite (IZ_2_pow_MM_M_nrows _ _ HIn).
+            rewrite (IZ_2_pow_MM_M_ncols _ _ HIn).
+            subst ma; cbn.
 ...
             destruct n; [ easy | ].
             cbn in HAn.
