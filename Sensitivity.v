@@ -2279,8 +2279,33 @@ destruct An as [M| MMM]. {
           destruct An as [MA| MMMA]. {
             cbn in Hma; subst ma.
             destruct In as [MI| MMMI]. {
-              cbn in Hmi; subst mi.
-cbn.
+              cbn in Hmi; subst mi; cbn.
+              remember (IZ_2_pow 0%Rng n) as Zn eqn:HZn; symmetry in HZn.
+              destruct Zn as [MZ| MMMZ]. {
+                move MZ before MI.
+                f_equal.
+                unfold mat_add.
+                rewrite mat_sqr_nrows. 2: {
+                  now rewrite (A_MM_1_nrows n HAn), (A_MM_1_ncols n HAn).
+                }
+                rewrite mat_sqr_ncols. 2: {
+                  now rewrite (A_MM_1_nrows n HAn), (A_MM_1_ncols n HAn).
+                }
+                rewrite (A_MM_1_nrows n HAn).
+                rewrite (A_MM_1_ncols n HAn).
+                rewrite mat_sqr_nrows. 2: {
+                  rewrite (I_2_pow_MM_1_nrows n HIn).
+                  rewrite (I_2_pow_MM_1_ncols n HIn).
+                  easy.
+                }
+                rewrite mat_sqr_ncols. 2: {
+                  rewrite (I_2_pow_MM_1_nrows n HIn).
+                  rewrite (I_2_pow_MM_1_ncols n HIn).
+                  easy.
+                }
+                rewrite (I_2_pow_MM_1_nrows n HIn).
+                rewrite (I_2_pow_MM_1_ncols n HIn).
+                cbn.
 ...
 intros.
 unfold mmat_mul, mmat_nat_mul_l.
