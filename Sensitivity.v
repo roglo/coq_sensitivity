@@ -2105,6 +2105,47 @@ cbn in HAn.
 now injection HAn; clear HAn; intros; subst MMM.
 Qed.
 
+Theorem IZ_2_pow_MM_1_nrows : ∀ u n M,
+  IZ_2_pow u n = MM_1 M
+  → mat_nrows M = 1.
+Proof.
+intros * HIM.
+destruct n; [ | easy ].
+cbn in HIM.
+now injection HIM; clear HIM; intros; subst M.
+Qed.
+
+Theorem IZ_2_pow_MM_1_ncols : ∀ u n M,
+  IZ_2_pow u n = MM_1 M
+  → mat_ncols M = 1.
+Proof.
+intros * HIM.
+destruct n; [ | easy ].
+cbn in HIM.
+now injection HIM; clear HIM; intros; subst M.
+Qed.
+
+Theorem IZ_2_pow_MM_M_nrows : ∀ u n MMM,
+  IZ_2_pow u n = MM_M MMM
+  → mat_nrows MMM = 2.
+Proof.
+intros * HIM.
+destruct n; [ easy | ].
+cbn in HIM.
+now injection HIM; clear HIM; intros; subst MMM.
+Qed.
+
+Theorem IZ_2_pow_MM_M_ncols : ∀ u n MMM,
+  IZ_2_pow u n = MM_M MMM
+  → mat_ncols MMM = 2.
+Proof.
+intros * HIM.
+destruct n; [ easy | ].
+cbn in HIM.
+now injection HIM; clear HIM; intros; subst MMM.
+Qed.
+
+(*
 Theorem I_2_pow_MM_1_nrows : ∀ n M,
   I_2_pow n = MM_1 M
   → mat_nrows M = 1.
@@ -2144,6 +2185,7 @@ destruct n; [ easy | ].
 cbn in HIM.
 now injection HIM; clear HIM; intros; subst MMM.
 Qed.
+*)
 
 Theorem mat_sqr_nrows : ∀ M (s := so),
   mat_nrows M = mat_ncols M
@@ -2220,8 +2262,8 @@ destruct An as [M| MMM]. {
   unfold mat_mul.
   rewrite (A_MM_1_nrows _ HAn).
   rewrite (A_MM_1_ncols _ HAn).
-  rewrite (I_2_pow_MM_1_nrows _ HIn).
-  rewrite (I_2_pow_MM_1_ncols _ HIn).
+  rewrite (IZ_2_pow_MM_1_nrows _ _ HIn).
+  rewrite (IZ_2_pow_MM_1_ncols _ _ HIn).
   cbn; f_equal.
   destruct n; [ | easy ].
   cbn in HAn, HIn.
@@ -2233,8 +2275,8 @@ destruct An as [M| MMM]. {
   unfold mat_mul.
   rewrite (A_MM_M_nrows _ HAn).
   rewrite (A_MM_M_ncols _ HAn).
-  rewrite (I_2_pow_MM_M_nrows _ HIn).
-  rewrite (I_2_pow_MM_M_ncols _ HIn).
+  rewrite (IZ_2_pow_MM_M_nrows _ _ HIn).
+  rewrite (IZ_2_pow_MM_M_ncols _ _ HIn).
   cbn - [ list_list_mul ]; f_equal.
   destruct n; [ easy | ].
   cbn in HAn, HIn.
@@ -2291,20 +2333,28 @@ destruct An as [M| MMM]. {
                 rewrite mat_sqr_ncols. 2: {
                   now rewrite (A_MM_1_nrows n HAn), (A_MM_1_ncols n HAn).
                 }
-                rewrite (A_MM_1_nrows n HAn).
-                rewrite (A_MM_1_ncols n HAn).
                 rewrite mat_sqr_nrows. 2: {
-                  rewrite (I_2_pow_MM_1_nrows n HIn).
-                  rewrite (I_2_pow_MM_1_ncols n HIn).
-                  easy.
+                  rewrite (IZ_2_pow_MM_1_nrows _ _ HIn).
+                  now rewrite (IZ_2_pow_MM_1_ncols _ _ HIn).
                 }
                 rewrite mat_sqr_ncols. 2: {
-                  rewrite (I_2_pow_MM_1_nrows n HIn).
-                  rewrite (I_2_pow_MM_1_ncols n HIn).
-                  easy.
+                  rewrite (IZ_2_pow_MM_1_nrows _ _ HIn).
+                  now rewrite (IZ_2_pow_MM_1_ncols _ _ HIn).
                 }
-                rewrite (I_2_pow_MM_1_nrows n HIn).
-                rewrite (I_2_pow_MM_1_ncols n HIn).
+                rewrite mat_sqr_nrows. 2: {
+                  rewrite (IZ_2_pow_MM_1_nrows _ _ HZn).
+                  now rewrite (IZ_2_pow_MM_1_ncols _ _ HZn).
+                }
+                rewrite mat_sqr_ncols. 2: {
+                  rewrite (IZ_2_pow_MM_1_nrows _ _ HZn).
+                  now rewrite (IZ_2_pow_MM_1_ncols _ _ HZn).
+                }
+                rewrite (A_MM_1_nrows n HAn).
+                rewrite (A_MM_1_ncols n HAn).
+                rewrite (IZ_2_pow_MM_1_nrows _ _ HIn).
+                rewrite (IZ_2_pow_MM_1_ncols _ _ HIn).
+                rewrite (IZ_2_pow_MM_1_nrows _ _ HZn).
+                rewrite (IZ_2_pow_MM_1_ncols _ _ HZn).
                 cbn.
 ...
 intros.
