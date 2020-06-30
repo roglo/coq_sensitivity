@@ -2324,39 +2324,11 @@ destruct An as [M| MMM]. {
               cbn in Hmi; subst mi; cbn.
               remember (IZ_2_pow 0%Rng n) as Zn eqn:HZn; symmetry in HZn.
               destruct Zn as [MZ| MMMZ]. {
-                move MZ before MI.
-                f_equal.
-                unfold mat_add.
-                unfold mat_nat_mul_l; cbn.
-                rewrite mat_sqr_nrows. 2: {
-                  now rewrite (A_MM_1_nrows n HAn), (A_MM_1_ncols n HAn).
-                }
-                rewrite mat_sqr_ncols. 2: {
-                  now rewrite (A_MM_1_nrows n HAn), (A_MM_1_ncols n HAn).
-                }
-                rewrite mat_sqr_nrows. 2: {
-                  rewrite (IZ_2_pow_MM_1_nrows _ _ HIn).
-                  now rewrite (IZ_2_pow_MM_1_ncols _ _ HIn).
-                }
-                rewrite mat_sqr_ncols. 2: {
-                  rewrite (IZ_2_pow_MM_1_nrows _ _ HIn).
-                  now rewrite (IZ_2_pow_MM_1_ncols _ _ HIn).
-                }
-                rewrite mat_sqr_nrows. 2: {
-                  rewrite (IZ_2_pow_MM_1_nrows _ _ HZn).
-                  now rewrite (IZ_2_pow_MM_1_ncols _ _ HZn).
-                }
-                rewrite mat_sqr_ncols. 2: {
-                  rewrite (IZ_2_pow_MM_1_nrows _ _ HZn).
-                  now rewrite (IZ_2_pow_MM_1_ncols _ _ HZn).
-                }
-                unfold mat_mul; cbn.
-                rewrite (A_MM_1_nrows n HAn).
-                rewrite (A_MM_1_ncols n HAn).
-                rewrite (IZ_2_pow_MM_1_nrows _ _ HIn).
-                rewrite (IZ_2_pow_MM_1_ncols _ _ HIn).
-                rewrite (IZ_2_pow_MM_1_nrows _ _ HZn).
-                rewrite (IZ_2_pow_MM_1_ncols _ _ HZn).
+                destruct n; [ | easy ].
+                cbn in HAn, HIn, HZn.
+                injection HAn; intros; subst MA.
+                injection HIn; intros; subst MI.
+                injection HZn; intros; subst MZ.
                 cbn; f_equal.
 ...
 intros.
