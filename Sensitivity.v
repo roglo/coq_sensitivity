@@ -2350,6 +2350,7 @@ destruct An as [M| MMM]. {
                   rewrite (IZ_2_pow_MM_1_nrows _ _ HZn).
                   now rewrite (IZ_2_pow_MM_1_ncols _ _ HZn).
                 }
+                unfold mat_mul; cbn.
                 rewrite (A_MM_1_nrows n HAn).
                 rewrite (A_MM_1_ncols n HAn).
                 rewrite (IZ_2_pow_MM_1_nrows _ _ HIn).
