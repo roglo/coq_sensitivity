@@ -2266,6 +2266,21 @@ destruct An as [M| MMM]. {
       cbn; f_equal; f_equal.
       f_equal. {
         f_equal. {
+          subst sn.
+          remember (mmat_depth (mmat_mul_loop (S n) (A n) (A n)))
+            as ma eqn:Hma.
+          remember (mmat_depth (mmat_mul_loop (S n) (I_2_pow n) (I_2_pow n)))
+            as mi eqn:Hmi.
+          cbn in Hma, Hmi.
+          move mi before ma.
+          remember (A n) as An eqn:HAn; symmetry in HAn.
+          remember (I_2_pow n) as In eqn:HIn; symmetry in HIn.
+          move In before An; move HIn before HAn.
+          destruct An as [MA| MMMA]. {
+            cbn in Hma; subst ma.
+            destruct In as [MI| MMMI]. {
+              cbn in Hmi; subst mi.
+cbn.
 ...
 intros.
 unfold mmat_mul, mmat_nat_mul_l.
