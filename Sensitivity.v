@@ -2145,48 +2145,6 @@ cbn in HIM.
 now injection HIM; clear HIM; intros; subst MMM.
 Qed.
 
-(*
-Theorem I_2_pow_MM_1_nrows : ∀ n M,
-  I_2_pow n = MM_1 M
-  → mat_nrows M = 1.
-Proof.
-intros * HIM.
-destruct n; [ | easy ].
-cbn in HIM.
-now injection HIM; clear HIM; intros; subst M.
-Qed.
-
-Theorem I_2_pow_MM_1_ncols : ∀ n M,
-  I_2_pow n = MM_1 M
-  → mat_ncols M = 1.
-Proof.
-intros * HIM.
-destruct n; [ | easy ].
-cbn in HIM.
-now injection HIM; clear HIM; intros; subst M.
-Qed.
-
-Theorem I_2_pow_MM_M_nrows : ∀ n MMM,
-  I_2_pow n = MM_M MMM
-  → mat_nrows MMM = 2.
-Proof.
-intros * HIM.
-destruct n; [ easy | ].
-cbn in HIM.
-now injection HIM; clear HIM; intros; subst MMM.
-Qed.
-
-Theorem I_2_pow_MM_M_ncols : ∀ n MMM,
-  I_2_pow n = MM_M MMM
-  → mat_ncols MMM = 2.
-Proof.
-intros * HIM.
-destruct n; [ easy | ].
-cbn in HIM.
-now injection HIM; clear HIM; intros; subst MMM.
-Qed.
-*)
-
 Theorem mat_sqr_nrows : ∀ M (s := so),
   mat_nrows M = mat_ncols M
   → mat_nrows (mat_mul M M) = mat_nrows M.
