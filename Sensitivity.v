@@ -2065,6 +2065,27 @@ induction n; [ easy | cbn ].
 now rewrite IHn.
 Qed.
 
+Theorem mmat_depth_mmat_mul_loop : ∀ it n,
+  S n ≤ it
+  → mmat_depth (@mmat_mul_loop T it so (A n) (A n)) = S n.
+Proof.
+intros * Hit.
+revert n Hit.
+induction it; intros; [ easy | cbn ].
+destruct n; [ easy | ].
+apply Nat.succ_le_mono in Hit.
+cbn; f_equal.
+rewrite IHit; [ cbn | easy ].
+remember (mmat_mul_loop it (A n) (A n)) as AA eqn:HAA; symmetry in HAA.
+remember (mmat_mul_loop it (I_2_pow n) (I_2_pow n)) as II eqn:HII.
+symmetry in HII.
+move II before AA.
+destruct AA as [MA| MMMA]. {
+  destruct II as [MI| MMMI]. {
+    destruct n; [ easy | ].
+    cbn in HAA.
+...
+
 Theorem A_MM_1_nrows : ∀ n M,
   A n = MM_1 M
   → mat_nrows M = 1.
@@ -2234,6 +2255,8 @@ injection HIsn; clear HIsn; intros HI.
 subst MMMI; cbn.
 f_equal. {
   f_equal. {
+...
+rewrite mmat_depth_mmat_mul_loop.
 ...
 intros.
 unfold mmat_mul, mmat_nat_mul_l.
