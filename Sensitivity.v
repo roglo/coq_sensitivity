@@ -2209,6 +2209,34 @@ Proof.
 intros.
 unfold mmat_mul, mmat_nat_mul_l.
 rewrite mmat_depth_A, mmat_depth_I_2_pow.
+destruct n. {
+  cbn; unfold mat_nat_mul_l; cbn.
+  now rewrite srng_mul_0_l.
+}
+remember (S n) as sn eqn:Hsn; cbn.
+remember (A sn) as Asn eqn:HAsn; symmetry in HAsn.
+remember (I_2_pow sn) as Isn eqn:HIsn; symmetry in HIsn.
+move Isn before Asn.
+destruct Asn as [MA| MMMA]; [ now subst sn | ].
+destruct Isn as [MI| MMMI]; [ now subst sn | ].
+f_equal.
+unfold mat_mul.
+rewrite (A_MM_M_nrows _ HAsn).
+rewrite (A_MM_M_ncols _ HAsn).
+rewrite (IZ_2_pow_MM_M_nrows _ _ HIsn).
+rewrite (IZ_2_pow_MM_M_ncols _ _ HIsn).
+cbn - [ list_list_mul ]; f_equal.
+rewrite Hsn in HAsn; cbn in HAsn.
+injection HAsn; clear HAsn; intros HA.
+subst MMMA; cbn - [ list_list_mul ].
+rewrite Hsn in HIsn; cbn in HIsn.
+injection HIsn; clear HIsn; intros HI.
+subst MMMI.
+cbn - [ list_list_mul ].
+...
+intros.
+unfold mmat_mul, mmat_nat_mul_l.
+rewrite mmat_depth_A, mmat_depth_I_2_pow.
 cbn.
 unfold mat_nat_mul_l.
 remember (A n) as An eqn:HAn; symmetry in HAn.
