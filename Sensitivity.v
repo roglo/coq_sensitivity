@@ -2083,7 +2083,15 @@ move II before AA.
 destruct AA as [MA| MMMA]. {
   destruct II as [MI| MMMI]. {
     destruct n; [ easy | ].
-    cbn in HAA.
+    destruct it; [ easy | now destruct n ].
+  } {
+    destruct n; [ easy | now destruct it ].
+  }
+} {
+  destruct II as [MI| MMMI]. {
+    destruct n; [ easy | ].
+    destruct it; [ easy | now destruct n ].
+  } {
 ...
 
 Theorem A_MM_1_nrows : ∀ n M,
