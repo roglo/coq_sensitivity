@@ -2231,8 +2231,9 @@ injection HAsn; clear HAsn; intros HA.
 subst MMMA; cbn - [ list_list_mul ].
 rewrite Hsn in HIsn; cbn in HIsn.
 injection HIsn; clear HIsn; intros HI.
-subst MMMI.
-cbn - [ list_list_mul ].
+subst MMMI; cbn.
+f_equal. {
+  f_equal. {
 ...
 intros.
 unfold mmat_mul, mmat_nat_mul_l.
