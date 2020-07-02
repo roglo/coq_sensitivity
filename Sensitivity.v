@@ -1900,6 +1900,7 @@ Fixpoint IZ_2_pow T {ro : ring_op T} u n :=
   end.
 
 Definition I_2_pow T {ro : ring_op T} := IZ_2_pow 1%Rng.
+Definition Z_2_pow T {ro : ring_op T} := IZ_2_pow 0%Rng.
 
 Fixpoint A T {ro : ring_op T} n :=
   match n with
@@ -2092,6 +2093,13 @@ destruct AA as [MA| MMMA]. {
     destruct n; [ easy | ].
     destruct it; [ easy | now destruct n ].
   } {
+    destruct it; [ easy | ].
+    destruct n; [ easy | ].
+    cbn - [ mat_mul ] in HAA.
+    cbn - [ mat_mul ] in HII.
+    injection HAA; clear HAA; intros; subst MMMA.
+    injection HII; clear HII; intros; subst MMMI.
+    replace (IZ_2_pow 0%Rng n) with (Z_2_pow n) by easy.
 ...
 
 Theorem A_MM_1_nrows : ∀ n M,
