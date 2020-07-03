@@ -2066,6 +2066,7 @@ induction n; [ easy | cbn ].
 now rewrite IHn.
 Qed.
 
+(*
 Theorem mmat_depth_mmat_mul_loop_IZ_IZ : ∀ it u n,
   S n ≤ it
   → mmat_depth (@mmat_mul_loop T so it (IZ_2_pow u n) (IZ_2_pow u n)) = S n.
@@ -2130,6 +2131,7 @@ destruct AA as [MA| MMMA]. {
     remember (mat_mul x x) as y eqn:Hy; subst x.
     cbn in Hy.
 ...
+*)
 
 Theorem A_MM_1_nrows : ∀ n M,
   A n = MM_1 M
@@ -2267,6 +2269,25 @@ injection HAn; clear HAn; intros; subst MMM.
 injection HIn; clear HIn; intros; subst IMMM; easy.
 Qed.
 
+Theorem mmat_mul_loop_1_l : ∀ it n M,
+  S n ≤ it
+  → @mmat_mul_loop T so it (I_2_pow n) M = M.
+Proof.
+intros * Hit.
+revert n Hit.
+induction it; intros; [ easy | ].
+cbn.
+remember (I_2_pow n) as MI eqn:HMI; symmetry in HMI.
+destruct MI as [MI| MMMI]. {
+  destruct n; [ | easy ].
+  cbn in HMI.
+  injection HMI; clear HMI; intros; subst MI.
+  destruct M as [M| MMM]. {
+    f_equal.
+    unfold mat_mul.
+    cbn - [ Nat.eq_dec ].
+...
+
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
@@ -2300,6 +2321,8 @@ injection HIsn; clear HIsn; intros HI.
 subst MMMI; cbn.
 f_equal. {
   f_equal. {
+...
+rewrite mmat_mul_loop_1_l.
 ...
 rewrite mmat_depth_mmat_mul_loop.
 ...
