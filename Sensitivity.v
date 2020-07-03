@@ -2281,22 +2281,10 @@ Definition mmat_ncols T (MM : mmatrix T) :=
   | MM_M MMM => mat_ncols MMM
   end.
 
-(*
-Print mmat_add_loop.
-
-Theorem mmat_add_loop_sqr_Z_2_pow : ∀ it n,
-  S n ≤ it
-  → @mmat_add_loop T it zero add (Z_2_pow n) (Z_2_pow n) = Z_2_pow n.
-Proof.
-intros * Hit.
-...
-*)
-Print mmat_add.
-Print mmat_add_loop.
-
 Theorem fold_mmat_add : ∀ (MM1 MM2 : mmatrix T),
-  @mmat_add_loop T (mmat_depth MM1) 0%Srng srng_add MM1 MM2 = @mmat_add T so MM1 MM2.
-...
+  mmat_add_loop (@mmat_depth T MM1) (@srng_zero T so) (@srng_add T so) MM1 MM2 =
+  @mmat_add T so MM1 MM2.
+Proof. easy. Qed.
 
 Theorem mmat_mul_loop_sqr_Z_2_pow : ∀ it n,
   S n ≤ it
@@ -2319,9 +2307,12 @@ destruct MZ as [MZ| MMMZ]. {
   cbn in HMZ.
   injection HMZ; clear HMZ; intros; subst MMMZ.
   cbn; f_equal.
+  rewrite fold_mmat_add.
   f_equal. {
     f_equal. {
       rewrite IHit; [ | easy ].
+(* lemme à faire *)
+...
       unfold Z_2_pow at 1.
       rewrite mmat_depth_IZ_2_pow.
       clear it IHit Hit.
@@ -2334,13 +2325,19 @@ destruct MZ as [MZ| MMMZ]. {
       f_equal.
       cbn - [ mmat_add_loop ].
       now rewrite IHn.
+    } {
+      f_equal.
+      rewrite IHit; [ | easy ].
+      unfold Z_2_pow at 1.
+      rewrite fold_mmat_add.
+      clear - sp.
+      induction n; cbn; [ now rewrite srng_add_0_l | ].
+      now rewrite fold_mmat_add, IHn.
     }
-    f_equal.
-    rewrite IHit; [ | easy ].
-    unfold Z_2_pow at 1.
-...
+  } {
     rewrite fold_mmat_add.
-    rewrite mmat_depth_IZ_2_pow.
+    rewrite IHit; [ | easy ].
+    f_equal; f_equal. {
 ...
 
 Theorem mmat_mul_loop_sqr_I_2_pow : ∀ it n,
