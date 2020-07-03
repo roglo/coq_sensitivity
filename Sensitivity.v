@@ -2269,9 +2269,21 @@ injection HAn; clear HAn; intros; subst MMM.
 injection HIn; clear HIn; intros; subst IMMM; easy.
 Qed.
 
-Theorem mmat_mul_loop_1_l : ∀ it n M,
+Definition mmat_nrows T (MM : mmatrix T) :=
+  match MM with
+  | MM_1 M => mat_nrows M
+  | MM_M MMM => mat_nrows MMM
+  end.
+
+Definition mmat_ncols T (MM : mmatrix T) :=
+  match MM with
+  | MM_1 M => mat_ncols M
+  | MM_M MMM => mat_ncols MMM
+  end.
+
+Theorem mmat_mul_loop_sqr_I_2_pow : ∀ it n,
   S n ≤ it
-  → @mmat_mul_loop T so it (I_2_pow n) M = M.
+  → @mmat_mul_loop T so it (I_2_pow n) (I_2_pow n) = I_2_pow n.
 Proof.
 intros * Hit.
 revert n Hit.
@@ -2282,10 +2294,20 @@ destruct MI as [MI| MMMI]. {
   destruct n; [ | easy ].
   cbn in HMI.
   injection HMI; clear HMI; intros; subst MI.
-  destruct M as [M| MMM]. {
-    f_equal.
-    unfold mat_mul.
-    cbn - [ Nat.eq_dec ].
+  cbn.
+  now rewrite srng_mul_1_l.
+} {
+  destruct n; [ easy | ].
+  apply Nat.succ_le_mono in Hit.
+  f_equal.
+  cbn in HMI.
+  injection HMI; clear HMI; intros; subst MMMI.
+  cbn; f_equal.
+  f_equal. {
+    f_equal. {
+      rewrite IHit; [ | easy ].
+      rewrite mmat_depth_I_2_pow.
+      cbn.
 ...
 
 (* "We prove by induction that A_n^2 = nI" *)
@@ -2321,6 +2343,8 @@ injection HIsn; clear HIsn; intros HI.
 subst MMMI; cbn.
 f_equal. {
   f_equal. {
+...
+    rewrite mmat_mul_loop_sqr_I_2_pow.
 ...
 rewrite mmat_mul_loop_1_l.
 ...
