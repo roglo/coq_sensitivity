@@ -2059,7 +2059,7 @@ induction n; [ easy | cbn ].
 now rewrite IHn.
 Qed.
 
-Theorem mmat_depth_I_2_pow : ∀ n, mmat_depth (I_2_pow n) = S n.
+Theorem mmat_depth_IZ_2_pow : ∀ u n, mmat_depth (IZ_2_pow u n) = S n.
 Proof.
 intros.
 induction n; [ easy | cbn ].
@@ -2281,6 +2281,68 @@ Definition mmat_ncols T (MM : mmatrix T) :=
   | MM_M MMM => mat_ncols MMM
   end.
 
+(*
+Print mmat_add_loop.
+
+Theorem mmat_add_loop_sqr_Z_2_pow : ∀ it n,
+  S n ≤ it
+  → @mmat_add_loop T it zero add (Z_2_pow n) (Z_2_pow n) = Z_2_pow n.
+Proof.
+intros * Hit.
+...
+*)
+Print mmat_add.
+Print mmat_add_loop.
+
+Theorem fold_mmat_add : ∀ (MM1 MM2 : mmatrix T),
+  @mmat_add_loop T (mmat_depth MM1) 0%Srng srng_add MM1 MM2 = @mmat_add T so MM1 MM2.
+...
+
+Theorem mmat_mul_loop_sqr_Z_2_pow : ∀ it n,
+  S n ≤ it
+  → @mmat_mul_loop T so it (Z_2_pow n) (Z_2_pow n) = Z_2_pow n.
+Proof.
+intros * Hit.
+revert n Hit.
+induction it; intros; [ easy | cbn ].
+remember (Z_2_pow n) as MZ eqn:HMZ; symmetry in HMZ.
+destruct MZ as [MZ| MMMZ]. {
+  destruct n; [ | easy ].
+  cbn in HMZ.
+  injection HMZ; clear HMZ; intros; subst MZ.
+  cbn.
+  now rewrite srng_mul_0_l.
+} {
+  destruct n; [ easy | ].
+  apply Nat.succ_le_mono in Hit.
+  f_equal.
+  cbn in HMZ.
+  injection HMZ; clear HMZ; intros; subst MMMZ.
+  cbn; f_equal.
+  f_equal. {
+    f_equal. {
+      rewrite IHit; [ | easy ].
+      unfold Z_2_pow at 1.
+      rewrite mmat_depth_IZ_2_pow.
+      clear it IHit Hit.
+      induction n; [ now cbn; rewrite srng_add_0_l | ].
+      remember (S n) as sn; cbn; subst sn.
+      remember (Z_2_pow (S n)) as MM eqn:HMM.
+      destruct MM as [M| MMM]; [ easy | ].
+      cbn in HMM.
+      injection HMM; clear HMM; intros; subst MMM.
+      f_equal.
+      cbn - [ mmat_add_loop ].
+      now rewrite IHn.
+    }
+    f_equal.
+    rewrite IHit; [ | easy ].
+    unfold Z_2_pow at 1.
+...
+    rewrite fold_mmat_add.
+    rewrite mmat_depth_IZ_2_pow.
+...
+
 Theorem mmat_mul_loop_sqr_I_2_pow : ∀ it n,
   S n ≤ it
   → @mmat_mul_loop T so it (I_2_pow n) (I_2_pow n) = I_2_pow n.
@@ -2308,6 +2370,7 @@ destruct MI as [MI| MMMI]. {
       rewrite IHit; [ | easy ].
       rewrite mmat_depth_I_2_pow.
       cbn.
+      rewrite IHit.
 ...
 
 (* "We prove by induction that A_n^2 = nI" *)
