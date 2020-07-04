@@ -2286,33 +2286,25 @@ Theorem fold_mmat_add : ∀ (MM1 MM2 : mmatrix T),
   @mmat_add T so MM1 MM2.
 Proof. easy. Qed.
 
-Theorem mmat_add_0_r : ∀ MM n,
-  mmat_depth MM = mmat_depth (Z_2_pow n)
-  → @mmat_add T so MM (Z_2_pow n) = MM.
+Theorem mmat_add_IZ_0_r : ∀ u n,
+  @mmat_add T so (IZ_2_pow u n) (Z_2_pow n) = IZ_2_pow u n.
 Proof.
-intros * Hdep.
+intros.
 unfold mmat_add.
-unfold Z_2_pow at 1.
-rewrite Hdep.
 unfold Z_2_pow.
 rewrite mmat_depth_IZ_2_pow.
-induction n. {
-  cbn.
-  destruct MM as [M| MMM]. {
-    f_equal.
-    unfold mat_add; cbn.
-...
-induction n; [ now cbn; rewrite srng_add_0_l | ].
+revert u.
+induction n; intros; [ now cbn; rewrite srng_add_0_r | ].
 remember (S n) as sn; cbn; subst sn.
-remember (Z_2_pow (S n)) as MM eqn:HMM.
+remember (IZ_2_pow u (S n)) as MM eqn:HMM; symmetry in HMM.
 destruct MM as [M| MMM]; [ easy | ].
-cbn in HMM.
-injection HMM; clear HMM; intros; subst MMM.
+remember (IZ_2_pow 0%Rng (S n)) as MM eqn:HMM'; symmetry in HMM'.
+destruct MM as [M'| MMM']; [ easy | ].
 f_equal.
-cbn - [ mmat_add_loop ].
-now rewrite IHn.
-Qed.
-
+injection HMM; clear HMM; intros; subst MMM.
+injection HMM'; clear HMM'; intros; subst MMM'.
+cbn; f_equal; f_equal. {
+  f_equal. {
 ...
 
 Theorem mmat_add_sqr_Z_2_pow : ∀ n,
