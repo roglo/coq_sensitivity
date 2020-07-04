@@ -2372,6 +2372,8 @@ destruct MI as [MI| MMMI]. {
       rewrite IHit; [ | easy ].
       rewrite fold_Z_2_pow.
       rewrite mmat_mul_loop_sqr_Z_2_pow; [ | easy ].
+      rewrite fold_mmat_add.
+(* c'est faux, ça *)
 ...
       rewrite mmat_depth_I_2_pow.
       cbn.
