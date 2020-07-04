@@ -2286,6 +2286,24 @@ Theorem fold_mmat_add : ∀ (MM1 MM2 : mmatrix T),
   @mmat_add T so MM1 MM2.
 Proof. easy. Qed.
 
+Theorem mmat_add_sqr_Z_2_pow : ∀ n,
+  @mmat_add T so (Z_2_pow n) (Z_2_pow n) = Z_2_pow n.
+Proof.
+intros.
+unfold mmat_add.
+unfold Z_2_pow at 1.
+rewrite mmat_depth_IZ_2_pow.
+induction n; [ now cbn; rewrite srng_add_0_l | ].
+remember (S n) as sn; cbn; subst sn.
+remember (Z_2_pow (S n)) as MM eqn:HMM.
+destruct MM as [M| MMM]; [ easy | ].
+cbn in HMM.
+injection HMM; clear HMM; intros; subst MMM.
+f_equal.
+cbn - [ mmat_add_loop ].
+now rewrite IHn.
+Qed.
+
 Theorem mmat_mul_loop_sqr_Z_2_pow : ∀ it n,
   S n ≤ it
   → @mmat_mul_loop T so it (Z_2_pow n) (Z_2_pow n) = Z_2_pow n.
@@ -2311,35 +2329,21 @@ destruct MZ as [MZ| MMMZ]. {
   f_equal. {
     f_equal. {
       rewrite IHit; [ | easy ].
-clear - sp.
-(* lemme à faire *)
-      unfold mmat_add.
-      unfold Z_2_pow at 1.
-      rewrite mmat_depth_IZ_2_pow.
-      induction n; [ now cbn; rewrite srng_add_0_l | ].
-      remember (S n) as sn; cbn; subst sn.
-      remember (Z_2_pow (S n)) as MM eqn:HMM.
-      destruct MM as [M| MMM]; [ easy | ].
-      cbn in HMM.
-      injection HMM; clear HMM; intros; subst MMM.
-      f_equal.
-      cbn - [ mmat_add_loop ].
-      now rewrite IHn.
-...
+      apply mmat_add_sqr_Z_2_pow.
     } {
       f_equal.
       rewrite IHit; [ | easy ].
-      unfold Z_2_pow at 1.
-      rewrite fold_mmat_add.
-      clear - sp.
-      induction n; cbn; [ now rewrite srng_add_0_l | ].
-      now rewrite fold_mmat_add, IHn.
+      apply mmat_add_sqr_Z_2_pow.
     }
   } {
-    rewrite fold_mmat_add.
     rewrite IHit; [ | easy ].
-    f_equal; f_equal. {
-...
+    now rewrite mmat_add_sqr_Z_2_pow.
+  }
+}
+Qed.
+
+Theorem fold_Z_2_pow : ∀ n, IZ_2_pow 0%Rng n = Z_2_pow n.
+Proof. easy. Qed.
 
 Theorem mmat_mul_loop_sqr_I_2_pow : ∀ it n,
   S n ≤ it
@@ -2366,6 +2370,9 @@ destruct MI as [MI| MMMI]. {
   f_equal. {
     f_equal. {
       rewrite IHit; [ | easy ].
+      rewrite fold_Z_2_pow.
+      rewrite mmat_mul_loop_sqr_Z_2_pow; [ | easy ].
+...
       rewrite mmat_depth_I_2_pow.
       cbn.
       rewrite IHit.
