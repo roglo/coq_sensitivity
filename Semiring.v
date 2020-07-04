@@ -45,6 +45,13 @@ rewrite srng_add_comm.
 apply srng_add_0_l.
 Qed.
 
+Theorem srng_mul_0_r : ∀ a, (a * 0 = 0)%Srng.
+Proof.
+intros a; simpl.
+rewrite srng_mul_comm, srng_mul_0_l.
+reflexivity.
+Qed.
+
 Theorem srng_mul_add_distr_r : ∀ x y z,
   ((x + y) * z = x * z + y * z)%Srng.
 Proof.
