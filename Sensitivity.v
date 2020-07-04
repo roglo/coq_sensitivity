@@ -2311,11 +2311,11 @@ destruct MZ as [MZ| MMMZ]. {
   f_equal. {
     f_equal. {
       rewrite IHit; [ | easy ].
+clear - sp.
 (* lemme à faire *)
-...
+      unfold mmat_add.
       unfold Z_2_pow at 1.
       rewrite mmat_depth_IZ_2_pow.
-      clear it IHit Hit.
       induction n; [ now cbn; rewrite srng_add_0_l | ].
       remember (S n) as sn; cbn; subst sn.
       remember (Z_2_pow (S n)) as MM eqn:HMM.
@@ -2325,6 +2325,7 @@ destruct MZ as [MZ| MMMZ]. {
       f_equal.
       cbn - [ mmat_add_loop ].
       now rewrite IHn.
+...
     } {
       f_equal.
       rewrite IHit; [ | easy ].
