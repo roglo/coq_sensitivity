@@ -2286,6 +2286,35 @@ Theorem fold_mmat_add : ∀ (MM1 MM2 : mmatrix T),
   @mmat_add T so MM1 MM2.
 Proof. easy. Qed.
 
+Theorem mmat_add_0_r : ∀ MM n,
+  mmat_depth MM = mmat_depth (Z_2_pow n)
+  → @mmat_add T so MM (Z_2_pow n) = MM.
+Proof.
+intros * Hdep.
+unfold mmat_add.
+unfold Z_2_pow at 1.
+rewrite Hdep.
+unfold Z_2_pow.
+rewrite mmat_depth_IZ_2_pow.
+induction n. {
+  cbn.
+  destruct MM as [M| MMM]. {
+    f_equal.
+    unfold mat_add; cbn.
+...
+induction n; [ now cbn; rewrite srng_add_0_l | ].
+remember (S n) as sn; cbn; subst sn.
+remember (Z_2_pow (S n)) as MM eqn:HMM.
+destruct MM as [M| MMM]; [ easy | ].
+cbn in HMM.
+injection HMM; clear HMM; intros; subst MMM.
+f_equal.
+cbn - [ mmat_add_loop ].
+now rewrite IHn.
+Qed.
+
+...
+
 Theorem mmat_add_sqr_Z_2_pow : ∀ n,
   @mmat_add T so (Z_2_pow n) (Z_2_pow n) = Z_2_pow n.
 Proof.
@@ -2373,7 +2402,7 @@ destruct MI as [MI| MMMI]. {
       rewrite fold_Z_2_pow.
       rewrite mmat_mul_loop_sqr_Z_2_pow; [ | easy ].
       rewrite fold_mmat_add.
-(* c'est faux, ça *)
+Search mmat_add.
 ...
       rewrite mmat_depth_I_2_pow.
       cbn.
