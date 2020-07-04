@@ -2286,7 +2286,14 @@ Theorem fold_mmat_add : ∀ (MM1 MM2 : mmatrix T),
   @mmat_add T so MM1 MM2.
 Proof. easy. Qed.
 
-Theorem mmat_add_IZ_0_r : ∀ u n,
+Theorem mmat_add_comm : ∀ M1 M2,
+  @mmat_add T so M1 M2 = @mmat_add T so M2 M1.
+Proof.
+intros.
+unfold mmat_add.
+...
+
+Theorem mmat_add_IZ_Z_2_pow : ∀ u n,
   @mmat_add T so (IZ_2_pow u n) (Z_2_pow n) = IZ_2_pow u n.
 Proof.
 intros.
@@ -2333,26 +2340,48 @@ destruct MZ as [MZ| MMMZ]. {
   rewrite IHit; [ | easy ].
   rewrite IHit; [ | easy ].
   f_equal; f_equal. {
-    f_equal; [ apply mmat_add_IZ_0_r | ].
-    f_equal; apply mmat_add_IZ_0_r.
+    f_equal; [ apply mmat_add_IZ_Z_2_pow | ].
+    f_equal; apply mmat_add_IZ_Z_2_pow.
   } {
     unfold Z_2_pow at 1 3.
-    now rewrite mmat_add_IZ_0_r.
+    now rewrite mmat_add_IZ_Z_2_pow.
   }
 }
 Qed.
 
-(*
-Theorem mmat_mul_loop_sqr_Z_2_pow : ∀ it n,
+Theorem mmat_mul_loop_Z_IZ_2_pow : ∀ it u n,
   S n ≤ it
-  → @mmat_mul_loop T so it (Z_2_pow n) (Z_2_pow n) = Z_2_pow n.
+  → @mmat_mul_loop T so it (Z_2_pow n) (IZ_2_pow u n) = Z_2_pow n.
 Proof.
 intros * Hit.
-unfold Z_2_pow at 1.
-apply mmat_mul_loop_IZ_Z_2_pow.
-Inspect 1.
+revert n u Hit.
+induction it; intros; [ easy | cbn ].
+remember (IZ_2_pow u n) as MZ eqn:HMZ; symmetry in HMZ.
+destruct MZ as [MZ| MMMZ]. {
+  destruct n; [ | easy ].
+  cbn in HMZ.
+  injection HMZ; clear HMZ; intros; subst MZ.
+  cbn.
+  now rewrite srng_mul_0_l.
+} {
+  destruct n; [ easy | ].
+  apply Nat.succ_le_mono in Hit.
+  f_equal.
+  cbn in HMZ.
+  injection HMZ; clear HMZ; intros; subst MMMZ.
+  cbn; f_equal.
+  do 2 rewrite fold_mmat_add.
+  rewrite IHit; [ | easy ].
+  rewrite IHit; [ | easy ].
+  f_equal; f_equal. {
+    f_equal; [ apply mmat_add_IZ_Z_2_pow | ].
+    f_equal; apply mmat_add_IZ_Z_2_pow.
+  } {
+    unfold Z_2_pow at 1 3.
+    now rewrite mmat_add_IZ_Z_2_pow.
+  }
+}
 Qed.
-*)
 
 Theorem fold_Z_2_pow : ∀ n, IZ_2_pow 0%Rng n = Z_2_pow n.
 Proof. easy. Qed.
@@ -2379,9 +2408,26 @@ destruct MI as [MI| MMMI]. {
   cbn in HMI.
   injection HMI; clear HMI; intros; subst MMMI.
   cbn; f_equal.
+  rewrite IHit; [ | easy ].
+  do 4 rewrite fold_mmat_add.
+  rewrite fold_Z_2_pow.
+  unfold Z_2_pow at 1.
+  unfold I_2_pow.
+  rewrite mmat_mul_loop_IZ_Z_2_pow; [ | easy ].
+  rewrite mmat_mul_loop_IZ_Z_2_pow; [ | easy ].
+  rewrite mmat_mul_loop_Z_IZ_2_pow; [ | easy ].
+  unfold Z_2_pow at 2.
+  do 2 rewrite mmat_add_IZ_Z_2_pow.
+  unfold Z_2_pow at 3.
+  rewrite mmat_mul_loop_IZ_Z_2_pow; [ | easy ].
+  unfold Z_2_pow at 1.
+  rewrite mmat_add_IZ_Z_2_pow.
+...
+  rewrite mmat_add_comm.
+  now rewrite mmat_add_IZ_Z_2_pow.
+...
   f_equal. {
     f_equal. {
-      rewrite IHit; [ | easy ].
       rewrite fold_Z_2_pow.
       unfold Z_2_pow at 1.
       rewrite mmat_mul_loop_IZ_Z_2_pow; [ | easy ].
@@ -2391,14 +2437,12 @@ destruct MI as [MI| MMMI]. {
       f_equal.
       rewrite fold_mmat_add.
       rewrite fold_Z_2_pow.
-      unfold Z_2_pow at 2.
-(* faire un mmat_mul_loop_comm *)
-...
+      unfold I_2_pow.
       rewrite mmat_mul_loop_IZ_Z_2_pow; [ | easy ].
-...
-...
-unfold I_2_pow.
-rewrite mmat_mul_loop_IZ_Z_2_pow; [ | easy ].
+      rewrite mmat_mul_loop_Z_IZ_2_pow; [ | easy ].
+      apply mmat_add_IZ_0_r.
+    }
+  } {
 ...
 
 (* "We prove by induction that A_n^2 = nI" *)
