@@ -2286,32 +2286,65 @@ Theorem fold_mmat_add : ∀ (MM1 MM2 : mmatrix T),
   @mmat_add T so MM1 MM2.
 Proof. easy. Qed.
 
-Theorem mat_add_comm : ∀ MA MB (_ := so),
+Theorem list_list_add_comm :
+  ∀ T (so : semiring_op T) (sp : semiring_prop T),
+  ∀ (lla llb : list (list T)) r c,
+  list_list_add 0%Srng srng_add r c lla llb =
+  list_list_add 0%Srng srng_add r c llb lla.
+Proof.
+intros.
+apply map_ext_in.
+intros i Hi.
+apply map_ext_in.
+intros j Hj.
+apply srng_add_comm.
+Qed.
+
+Theorem mat_add_comm : ∀ T (so : semiring_op T) (sp : semiring_prop T),
+  ∀ (MA MB : matrix T),
   mat_add 0%Srng srng_add MA MB =
   mat_add 0%Srng srng_add MB MA.
 Proof.
 intros.
 unfold mat_add.
-...
+destruct (Nat.eq_dec (mat_nrows MA) (mat_nrows MB)) as [RAB| RAB]. {
+  symmetry in RAB.
+  destruct (Nat.eq_dec (mat_nrows MB) (mat_nrows MA)) as [H| ]; [ | easy ].
+  clear H.
+  destruct (Nat.eq_dec (mat_ncols MA) (mat_ncols MB)) as [CAB| CAB]. {
+    symmetry in CAB.
+    destruct (Nat.eq_dec (mat_ncols MB) (mat_ncols MA)) as [H| ]; [ | easy ].
+    clear H.
+    now rewrite list_list_add_comm, RAB, CAB.
+  } {
+    destruct (Nat.eq_dec (mat_ncols MB) (mat_ncols MA)) as [H| ]; [ | easy ].
+    now symmetry in H.
+  }
+} {
+  destruct (Nat.eq_dec (mat_nrows MB) (mat_nrows MA)) as [H| ]; [ | easy ].
+  now symmetry in H.
+}
+Qed.
 
-Theorem mmat_add_comm : ∀ MA MB,
-  mmat_depth MA = mmat_depth MB
-  → @mmat_add T so MA MB = @mmat_add T so MB MA.
+Theorem mmat_add_comm : ∀ MMA MMB,
+  mmat_depth MMA = mmat_depth MMB
+  → @mmat_add T so MMA MMB = @mmat_add T so MMB MMA.
 Proof.
 intros * Hdep.
 unfold mmat_add.
-remember (mmat_depth MA) as it eqn:Hit.
+remember (mmat_depth MMA) as it eqn:Hit.
 rewrite <- Hdep.
 clear Hit Hdep.
 destruct it; [ easy | cbn ].
-destruct MA as [MA| MMMA]. {
-  destruct MB as [MB| MMMB]; [ | easy ].
+destruct MMA as [MA| MMMA]. {
+  destruct MMB as [MB| MMMB]; [ | easy ].
   f_equal.
-Set Printing Implicit.
-...
+  now apply mat_add_comm.
 } {
-  destruct M2 as [MB| MMMB]; [ easy | ].
+  destruct MMB as [MB| MMMB]; [ easy | ].
   f_equal.
+...
+  apply mat_add_comm.
 ...
 }
 ...
