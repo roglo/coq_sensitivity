@@ -2286,11 +2286,34 @@ Theorem fold_mmat_add : ∀ (MM1 MM2 : mmatrix T),
   @mmat_add T so MM1 MM2.
 Proof. easy. Qed.
 
-Theorem mmat_add_comm : ∀ M1 M2,
-  @mmat_add T so M1 M2 = @mmat_add T so M2 M1.
+Theorem mat_add_comm : ∀ MA MB (_ := so),
+  mat_add 0%Srng srng_add MA MB =
+  mat_add 0%Srng srng_add MB MA.
 Proof.
 intros.
+unfold mat_add.
+...
+
+Theorem mmat_add_comm : ∀ MA MB,
+  mmat_depth MA = mmat_depth MB
+  → @mmat_add T so MA MB = @mmat_add T so MB MA.
+Proof.
+intros * Hdep.
 unfold mmat_add.
+remember (mmat_depth MA) as it eqn:Hit.
+rewrite <- Hdep.
+clear Hit Hdep.
+destruct it; [ easy | cbn ].
+destruct MA as [MA| MMMA]. {
+  destruct MB as [MB| MMMB]; [ | easy ].
+  f_equal.
+Set Printing Implicit.
+...
+} {
+  destruct M2 as [MB| MMMB]; [ easy | ].
+  f_equal.
+...
+}
 ...
 
 Theorem mmat_add_IZ_Z_2_pow : ∀ u n,
