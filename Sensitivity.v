@@ -2326,6 +2326,7 @@ destruct (Nat.eq_dec (mat_nrows MA) (mat_nrows MB)) as [RAB| RAB]. {
 }
 Qed.
 
+(* trop compliqué : à voir plus tard, peut-être
 Theorem mmat_add_comm : ∀ MMA MMB,
   mmat_depth MMA = mmat_depth MMB
   → @mmat_add T so MMA MMB = @mmat_add T so MMB MMA.
@@ -2343,11 +2344,20 @@ destruct MMA as [MA| MMMA]. {
 } {
   destruct MMB as [MB| MMMB]; [ easy | ].
   f_equal.
-...
+Print semiring_op.
+Print void_mmat.
+Set Printing Implicit.
+  remember so as sso.
+  remember
+    {| srng_zero := @void_mmat T;
+       srng_one := @void_mmat T;
+       srng_add := @mmat_add_loop T it 0%Srng (@srng_add T so);
+       srng_mul := @mmat_add_loop T it 0%Srng (@srng_add T so) |}.
+Print semiring_prop.
   apply mat_add_comm.
 ...
 }
-...
+*)
 
 Theorem mmat_add_IZ_Z_2_pow : ∀ u n,
   @mmat_add T so (IZ_2_pow u n) (Z_2_pow n) = IZ_2_pow u n.
@@ -2358,6 +2368,28 @@ unfold Z_2_pow.
 rewrite mmat_depth_IZ_2_pow.
 revert u.
 induction n; intros; [ now cbn; rewrite srng_add_0_r | ].
+remember (S n) as sn; cbn; subst sn.
+remember (IZ_2_pow u (S n)) as MM eqn:HMM; symmetry in HMM.
+destruct MM as [M| MMM]; [ easy | ].
+remember (IZ_2_pow 0%Rng (S n)) as MM eqn:HMM'; symmetry in HMM'.
+destruct MM as [M'| MMM']; [ easy | ].
+move MMM' before MMM.
+f_equal.
+injection HMM; clear HMM; intros; subst MMM.
+injection HMM'; clear HMM'; intros; subst MMM'.
+remember (S n) as sn; cbn; subst sn.
+now do 2 rewrite IHn.
+Qed.
+
+Theorem mmat_add_Z_IZ_2_pow : ∀ u n,
+  @mmat_add T so (Z_2_pow n) (IZ_2_pow u n) = IZ_2_pow u n.
+Proof.
+intros.
+unfold mmat_add.
+unfold Z_2_pow.
+rewrite mmat_depth_IZ_2_pow.
+revert u.
+induction n; intros; [ now cbn; rewrite srng_add_0_l | ].
 remember (S n) as sn; cbn; subst sn.
 remember (IZ_2_pow u (S n)) as MM eqn:HMM; symmetry in HMM.
 destruct MM as [M| MMM]; [ easy | ].
@@ -2478,28 +2510,9 @@ destruct MI as [MI| MMMI]. {
   rewrite mmat_mul_loop_IZ_Z_2_pow; [ | easy ].
   unfold Z_2_pow at 1.
   rewrite mmat_add_IZ_Z_2_pow.
-...
-  rewrite mmat_add_comm.
-  now rewrite mmat_add_IZ_Z_2_pow.
-...
-  f_equal. {
-    f_equal. {
-      rewrite fold_Z_2_pow.
-      unfold Z_2_pow at 1.
-      rewrite mmat_mul_loop_IZ_Z_2_pow; [ | easy ].
-      rewrite fold_mmat_add.
-      apply mmat_add_IZ_0_r.
-    } {
-      f_equal.
-      rewrite fold_mmat_add.
-      rewrite fold_Z_2_pow.
-      unfold I_2_pow.
-      rewrite mmat_mul_loop_IZ_Z_2_pow; [ | easy ].
-      rewrite mmat_mul_loop_Z_IZ_2_pow; [ | easy ].
-      apply mmat_add_IZ_0_r.
-    }
-  } {
-...
+  now rewrite mmat_add_Z_IZ_2_pow.
+}
+Qed.
 
 (* "We prove by induction that A_n^2 = nI" *)
 
@@ -2508,7 +2521,9 @@ Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
 Proof.
 intros.
 unfold mmat_mul, mmat_nat_mul_l.
-rewrite mmat_depth_A, mmat_depth_I_2_pow.
+rewrite mmat_depth_A.
+unfold I_2_pow at 1.
+rewrite mmat_depth_IZ_2_pow.
 destruct n. {
   cbn; unfold mat_nat_mul_l; cbn.
   now rewrite srng_mul_0_l.
@@ -2534,12 +2549,50 @@ injection HIsn; clear HIsn; intros HI.
 subst MMMI; cbn.
 f_equal. {
   f_equal. {
+    rewrite mmat_mul_loop_sqr_I_2_pow; [ | now subst sn ].
+Search mmat_depth.
+Theorem mmat_depth_mmat_mul_loop_A_A : ∀ it n (sso := so),
+  S n ≤ it
+  → mmat_depth (mmat_mul_loop it (A n) (A n)) = mmat_depth (A n).
+Proof.
+intros * Hit; subst sso.
+revert n Hit.
+induction it; intros; [ easy | cbn ].
+destruct n; [ easy | cbn ].
+apply Nat.succ_le_mono in Hit.
+f_equal.
+rewrite IHit; [ | easy ].
+rewrite mmat_depth_A.
+rewrite mmat_mul_loop_sqr_I_2_pow; [ cbn | easy ].
+remember (mmat_mul_loop it (A n) (A n)) as MM eqn:HMM; symmetry in HMM.
+destruct MM as [M| MMM]. {
+  destruct n; [ easy | exfalso ].
+  cbn in HMM.
+  now destruct it.
+} {
+(**)
+  remember (I_2_pow n) as MM eqn:HMM'; symmetry in HMM'.
+  destruct MM as [M| MMM']; [ now destruct n | ].
+  move MMM' before MMM.
+  cbn.
+  clear - it HMM HMM'.
+  revert MMM MMM' HMM HMM'.
+  induction n; intros; [ easy | ].
+  cbn.
 ...
-    rewrite mmat_mul_loop_sqr_I_2_pow.
-...
-rewrite mmat_mul_loop_1_l.
-...
-rewrite mmat_depth_mmat_mul_loop.
+  destruct n; [ easy | ].
+  cbn in HMM.
+  remember (I_2_pow (S n)) as MM eqn:HMM'; symmetry in HMM'.
+  cbn in HMM'.
+  destruct MM as [M| MMM']; [ easy | ].
+  injection HMM'; clear HMM'; intros HMM'.
+  destruct it; [ easy | ].
+  apply Nat.succ_le_mono in Hit.
+  cbn - [ mmat_add ] in HMM.
+  injection HMM; clear HMM; intros HMM; subst MMM.
+  subst MMM'; cbn.
+  f_equal.
+  rewrite mmat_mul_loop_sqr_I_2_pow; [ | easy ].
 ...
 intros.
 unfold mmat_mul, mmat_nat_mul_l.
