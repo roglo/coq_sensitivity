@@ -2534,6 +2534,7 @@ induction MM as [M| MMM]; intros. {
   cbn - [ mmat_add ] in HMM.
   injection HMM; clear HMM; intros; subst MMM.
   cbn; f_equal.
+  rewrite mmat_mul_loop_sqr_I_2_pow; [ | easy ].
 ...
 intros * Hit.
 revert n Hit.
