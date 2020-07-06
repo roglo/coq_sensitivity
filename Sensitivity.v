@@ -2522,7 +2522,11 @@ intros * Hit; subst s.
 remember (mmat_mul_loop _ _ _) as MM eqn:HMM.
 symmetry in HMM.
 revert it n Hit HMM.
-induction MM as [M| MMM
+induction MM as [M| MMM]; intros. {
+  cbn; symmetry.
+  destruct n; [ easy | now destruct it ].
+} {
+  cbn.
 ...
 intros * Hit.
 revert n Hit.
