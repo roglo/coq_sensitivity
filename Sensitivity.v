@@ -2535,8 +2535,11 @@ induction MM as [M| MMM]; intros. {
   injection HMM; clear HMM; intros; subst MMM.
   cbn; f_equal.
   rewrite mmat_mul_loop_sqr_I_2_pow; [ | easy ].
-Search (mmat_depth (mmat_add _ _)).
-Print mmat_add_loop.
+  clear - Hit.
+  revert n Hit.
+  induction it; intros; [ easy | ].
+  destruct n; [ easy | ].
+  cbn; f_equal.
 ...
 Theorem chuis_pas_sur (_ := so) : ∀ MA MB,
   mmat_depth (mmat_add MA MB) = mmat_depth MA.
