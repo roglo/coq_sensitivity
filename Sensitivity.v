@@ -2514,43 +2514,6 @@ destruct MI as [MI| MMMI]. {
 }
 Qed.
 
-(* "We prove by induction that A_n^2 = nI" *)
-
-Theorem lemma_2_A_n_2_eq_n_I : ∀ n (_ := so),
-  mmat_mul (A n) (A n) = mmat_nat_mul_l n (I_2_pow n).
-Proof.
-intros.
-unfold mmat_mul, mmat_nat_mul_l.
-rewrite mmat_depth_A.
-unfold I_2_pow at 1.
-rewrite mmat_depth_IZ_2_pow.
-destruct n. {
-  cbn; unfold mat_nat_mul_l; cbn.
-  now rewrite srng_mul_0_l.
-}
-remember (S n) as sn eqn:Hsn; cbn.
-remember (A sn) as Asn eqn:HAsn; symmetry in HAsn.
-remember (I_2_pow sn) as Isn eqn:HIsn; symmetry in HIsn.
-move Isn before Asn.
-destruct Asn as [MA| MMMA]; [ now subst sn | ].
-destruct Isn as [MI| MMMI]; [ now subst sn | ].
-f_equal.
-unfold mat_mul.
-rewrite (A_MM_M_nrows _ HAsn).
-rewrite (A_MM_M_ncols _ HAsn).
-rewrite (IZ_2_pow_MM_M_nrows _ _ HIsn).
-rewrite (IZ_2_pow_MM_M_ncols _ _ HIsn).
-cbn - [ list_list_mul ]; f_equal.
-rewrite Hsn in HAsn; cbn in HAsn.
-injection HAsn; clear HAsn; intros HA.
-subst MMMA; cbn - [ list_list_mul ].
-rewrite Hsn in HIsn; cbn in HIsn.
-injection HIsn; clear HIsn; intros HI.
-subst MMMI; cbn.
-f_equal. {
-  f_equal. {
-    rewrite mmat_mul_loop_sqr_I_2_pow; [ | now subst sn ].
-Search mmat_depth.
 Theorem mmat_depth_mmat_mul_loop_A_A : ∀ it n (sso := so),
   S n ≤ it
   → mmat_depth (mmat_mul_loop it (A n) (A n)) = mmat_depth (A n).
@@ -2598,6 +2561,45 @@ destruct MM as [M| MMM]. {
   subst MMM'; cbn.
   f_equal.
   rewrite mmat_mul_loop_sqr_I_2_pow; [ | easy ].
+...
+
+(* "We prove by induction that A_n^2 = nI" *)
+
+Theorem lemma_2_A_n_2_eq_n_I : ∀ n (_ := so),
+  mmat_mul (A n) (A n) = mmat_nat_mul_l n (I_2_pow n).
+Proof.
+intros.
+unfold mmat_mul, mmat_nat_mul_l.
+rewrite mmat_depth_A.
+unfold I_2_pow at 1.
+rewrite mmat_depth_IZ_2_pow.
+destruct n. {
+  cbn; unfold mat_nat_mul_l; cbn.
+  now rewrite srng_mul_0_l.
+}
+remember (S n) as sn eqn:Hsn; cbn.
+remember (A sn) as Asn eqn:HAsn; symmetry in HAsn.
+remember (I_2_pow sn) as Isn eqn:HIsn; symmetry in HIsn.
+move Isn before Asn.
+destruct Asn as [MA| MMMA]; [ now subst sn | ].
+destruct Isn as [MI| MMMI]; [ now subst sn | ].
+f_equal.
+unfold mat_mul.
+rewrite (A_MM_M_nrows _ HAsn).
+rewrite (A_MM_M_ncols _ HAsn).
+rewrite (IZ_2_pow_MM_M_nrows _ _ HIsn).
+rewrite (IZ_2_pow_MM_M_ncols _ _ HIsn).
+cbn - [ list_list_mul ]; f_equal.
+rewrite Hsn in HAsn; cbn in HAsn.
+injection HAsn; clear HAsn; intros HA.
+subst MMMA; cbn - [ list_list_mul ].
+rewrite Hsn in HIsn; cbn in HIsn.
+injection HIsn; clear HIsn; intros HI.
+subst MMMI; cbn.
+f_equal. {
+  f_equal. {
+    rewrite mmat_mul_loop_sqr_I_2_pow; [ | now subst sn ].
+Search mmat_depth.
 ...
 intros.
 unfold mmat_mul, mmat_nat_mul_l.
