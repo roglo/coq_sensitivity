@@ -2539,7 +2539,12 @@ induction MM as [M| MMM]; intros. {
   revert n Hit.
   induction it; intros; [ easy | ].
   destruct n; [ easy | ].
-  cbn; f_equal.
+  apply Nat.succ_le_mono in Hit.
+  destruct (Nat.eq_dec (S n) it) as [Hsi| Hsi]. {
+    rewrite Hsi.
+    cbn - [ mmat_add ].
+    remember (A it) as MM eqn:HMM; symmetry in HMM.
+    destruct MM as [M| MMM]; [ now destruct it | ].
 ...
 Theorem chuis_pas_sur (_ := so) : ∀ MA MB,
   mmat_depth (mmat_add MA MB) = mmat_depth MA.
