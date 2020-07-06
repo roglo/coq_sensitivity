@@ -2526,7 +2526,14 @@ induction MM as [M| MMM]; intros. {
   cbn; symmetry.
   destruct n; [ easy | now destruct it ].
 } {
-  cbn.
+  cbn; symmetry.
+  revert n MMM Hit HMM.
+  induction it; intros; [ easy | ].
+  destruct n; [ easy | ].
+  apply Nat.succ_le_mono in Hit.
+  cbn - [ mmat_add ] in HMM.
+  injection HMM; clear HMM; intros; subst MMM.
+  cbn; f_equal.
 ...
 intros * Hit.
 revert n Hit.
