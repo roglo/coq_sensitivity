@@ -2548,9 +2548,6 @@ revert MA Hit.
 induction it; intros. {
   destruct MA as [MA| MMMA]; [ easy | exfalso ].
   cbn in Hit.
-  admit.
-}
-cbn.
 ...
 intros * Hit.
 revert n Hit.
