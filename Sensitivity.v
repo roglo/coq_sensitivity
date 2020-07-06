@@ -2516,8 +2516,8 @@ Qed.
 
 (* "We prove by induction that A_n^2 = nI" *)
 
-Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
-  @mmat_mul T so (A n) (A n) = @mmat_nat_mul_l T so n (I_2_pow n).
+Theorem lemma_2_A_n_2_eq_n_I : ∀ n (_ := so),
+  mmat_mul (A n) (A n) = mmat_nat_mul_l n (I_2_pow n).
 Proof.
 intros.
 unfold mmat_mul, mmat_nat_mul_l.
@@ -2575,6 +2575,11 @@ destruct MM as [M| MMM]. {
   destruct MM as [M| MMM']; [ now destruct n | ].
   move MMM' before MMM.
   cbn.
+(**)
+  destruct n; [ easy | ].
+  cbn in HMM.
+  cbn in HMM'.
+...
   clear - it HMM HMM'.
   revert MMM MMM' HMM HMM'.
   induction n; intros; [ easy | ].
