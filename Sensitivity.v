@@ -2514,11 +2514,17 @@ destruct MI as [MI| MMMI]. {
 }
 Qed.
 
-Theorem mmat_depth_mmat_mul_loop_A_A : ∀ it n (sso := so),
+Theorem mmat_depth_mmat_mul_loop_A_A : ∀ it n (_ := so),
   S n ≤ it
   → mmat_depth (mmat_mul_loop it (A n) (A n)) = mmat_depth (A n).
 Proof.
-intros * Hit; subst sso.
+intros * Hit; subst s.
+remember (mmat_mul_loop _ _ _) as MM eqn:HMM.
+symmetry in HMM.
+revert it n Hit HMM.
+induction MM as [M| MMM
+...
+intros * Hit.
 revert n Hit.
 induction it; intros; [ easy | cbn ].
 destruct n; [ easy | cbn ].
