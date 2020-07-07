@@ -2533,13 +2533,16 @@ destruct MM as [M| MMM]. {
   cbn.
   f_equal.
   apply Nat.succ_le_mono in Hit.
+  rewrite mmat_mul_loop_sqr_I_2_pow; [ | easy ].
 (**)
   revert n Hit.
   induction it; intros; [ easy | cbn ].
   rewrite fold_mmat_add.
   destruct n; [ easy | ].
+  apply Nat.succ_le_mono in Hit.
   cbn; f_equal.
-  do 3 rewrite fold_mmat_add.
+  do 2 rewrite fold_mmat_add.
+  rewrite mmat_mul_loop_sqr_I_2_pow; [ | easy ].
 ...
   remember (mmat_mul_loop _ _ _) as MM eqn:HMM.
   symmetry in HMM.
