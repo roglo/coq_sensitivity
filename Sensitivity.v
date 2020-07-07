@@ -2514,30 +2514,56 @@ destruct MI as [MI| MMMI]. {
 }
 Qed.
 
-Fixpoint mmat_have_same_struct T d (MMA MMB : mmatrix T) :=
-  match MMA with
-  | MM_1 MA =>
-      match MMB with
-      | MM_1 _ => true
-      | MM_M _ => false
-      end
-  | MM_M MMMA =>
-      match MMB with
-      | MM_1 _ => false
-      | MM_M MMMB =>
-          mmat_have_same_struct d (mat_el d MMMA 0 0) (mat_el d MMMB 0 0)
+Fixpoint mmat_hss it (MMA MMB : mmatrix T) :=
+  match it with
+  | 0 => false
+  | S it' =>
+      match MMA with
+      | MM_1 MA =>
+          match MMB with
+          | MM_1 _ => true
+          | MM_M _ => false
+          end
+      | MM_M MMMA =>
+          match MMB with
+          | MM_1 _ => false
+          | MM_M MMMB =>
+              fold_left
+                (λ b i,
+                   fold_left
+                     (λ b j, b &&
+                        mmat_hss it'
+                          (mat_el void_mmat MMMA 0 0)
+                          (mat_el void_mmat MMMB 0 0))
+                     (seq 0 (mat_ncols MMMA)) b)
+                (seq 0 (mat_nrows MMMA)) true
+          end
       end
   end.
 
-...
+Definition mmat_have_same_struct MMA MMB :=
+  mmat_hss (mmat_depth MMA) MMA MMB.
 
-Theorem mmat_depth_add (s := so) : ∀ MA MB,
-  mmat_have_same_struct MA MB = true
-  → mmat_depth (mmat_add MA MB) = mmat_depth MA.
+Compute (mmat_have_same_struct (A 4) (I_2_pow 4)).
+Compute (mmat_hss 10 (A 4) (I_2_pow 4)).
+
+
+Theorem mmat_depth_add (s := so) : ∀ MMA MMB,
+  mmat_have_same_struct MMA MMB = true
+  → mmat_depth (mmat_add MMA MMB) = mmat_depth MMA.
 Proof.
 intros * HAB; subst s.
 unfold mmat_add.
-Print mmat_add_loop.
+unfold mmat_have_same_struct in HAB.
+remember (mmat_depth MMA) as it eqn:Hit.
+assert (H : mmat_depth MMA ≤ it) by flia Hit.
+clear Hit; rename H into Hit.
+revert MMA MMB HAB Hit.
+induction it; intros; [ easy | ].
+cbn in HAB; cbn.
+destruct MMA as [MA| MMMA]. {
+  destruct MMB as [MB| MMMB]; [ clear HAB | easy ].
+  cbn; cbn in Hit.
 ...
 
 Theorem mmat_depth_mmat_mul_loop_A_A : ∀ it n (_ := so),
