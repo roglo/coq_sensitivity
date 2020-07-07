@@ -2547,7 +2547,7 @@ Definition mmat_have_same_struct MMA MMB :=
 Compute (mmat_have_same_struct (A 4) (I_2_pow 4)).
 Compute (mmat_hss 10 (A 4) (I_2_pow 4)).
 
-
+(*
 Theorem mmat_depth_add (s := so) : ∀ MMA MMB,
   mmat_have_same_struct MMA MMB = true
   → mmat_depth (mmat_add MMA MMB) = mmat_depth MMA.
@@ -2556,10 +2556,6 @@ intros * HAB; subst s.
 unfold mmat_add.
 unfold mmat_have_same_struct in HAB.
 remember (mmat_depth MMA) as it eqn:Hit.
-(*
-assert (H : mmat_depth MMA ≤ it) by flia Hit.
-clear Hit; rename H into Hit.
-*)
 revert MMA MMB HAB Hit.
 induction it; intros; [ easy | ].
 cbn in HAB; cbn.
@@ -2567,6 +2563,7 @@ destruct MMA as [MA| MMMA]; [ now destruct MMB | ].
 destruct MMB as [MB| MMMB]; [ easy | ].
 cbn in Hit.
 ...
+*)
 
 Theorem mmat_depth_mmat_mul_loop_A_A : ∀ it n (_ := so),
   S n ≤ it
