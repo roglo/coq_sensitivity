@@ -2514,6 +2514,13 @@ destruct MI as [MI| MMMI]. {
 }
 Qed.
 
+Theorem mmat_depth_add (s := so) : ∀ MA MB,
+  mmat_depth (mmat_add MA MB) = mmat_depth MA.
+Proof.
+intros; subst s.
+unfold mmat_add.
+...
+
 Theorem mmat_depth_mmat_mul_loop_A_A : ∀ it n (_ := so),
   S n ≤ it
   → mmat_depth (mmat_mul_loop it (A n) (A n)) = mmat_depth (A n).
@@ -2543,6 +2550,9 @@ destruct MM as [M| MMM]. {
   cbn; f_equal.
   do 2 rewrite fold_mmat_add.
   rewrite mmat_mul_loop_sqr_I_2_pow; [ | easy ].
+...
+rewrite mmat_depth_add.
+now apply IHit.
 ...
   remember (mmat_mul_loop _ _ _) as MM eqn:HMM.
   symmetry in HMM.
