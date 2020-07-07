@@ -2556,14 +2556,16 @@ intros * HAB; subst s.
 unfold mmat_add.
 unfold mmat_have_same_struct in HAB.
 remember (mmat_depth MMA) as it eqn:Hit.
+(*
 assert (H : mmat_depth MMA ≤ it) by flia Hit.
 clear Hit; rename H into Hit.
+*)
 revert MMA MMB HAB Hit.
 induction it; intros; [ easy | ].
 cbn in HAB; cbn.
-destruct MMA as [MA| MMMA]. {
-  destruct MMB as [MB| MMMB]; [ clear HAB | easy ].
-  cbn; cbn in Hit.
+destruct MMA as [MA| MMMA]; [ now destruct MMB | ].
+destruct MMB as [MB| MMMB]; [ easy | ].
+cbn in Hit.
 ...
 
 Theorem mmat_depth_mmat_mul_loop_A_A : ∀ it n (_ := so),
