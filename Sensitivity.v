@@ -1747,12 +1747,14 @@ Definition mat_transpose T (d : T) (M : matrix T) : matrix T :=
 
 Compute (mat_transpose 0 (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
 
-Definition list_list_add T zero (add : T → T → T) r c
+Definition list_list_add T {so : semiring_op T} r c
     (ll1 ll2 : list (list T)) :=
   map
     (λ i,
-     map (λ j, add (list_list_el zero ll1 i j) (list_list_el zero ll2 i j))
-       (seq 0 c))
+       map
+         (λ j,
+            (list_list_el 0 ll1 i j + list_list_el 0 ll2 i j)%Srng)
+         (seq 0 c))
     (seq 0 r).
 
 Definition list_list_mul T {ro : semiring_op T} r cr c
@@ -1797,11 +1799,11 @@ Definition void_mat {T} : matrix T :=
    in that case, the result has not sense; theorems likely have to add the
    condition among its hypotheses *)
 
-Definition mat_add T zero add (M1 M2 : matrix T) : matrix T :=
+Definition mat_add T {so : semiring_op T} (M1 M2 : matrix T) : matrix T :=
   if Nat.eq_dec (mat_nrows M1) (mat_nrows M2) then
     if Nat.eq_dec (mat_ncols M1) (mat_ncols M2) then
       {| mat_list :=
-           list_list_add zero add (mat_nrows M1) (mat_ncols M1) (mat_list M1)
+           list_list_add (mat_nrows M1) (mat_ncols M1) (mat_list M1)
              (mat_list M2);
          mat_nrows := mat_nrows M1;
          mat_ncols := mat_ncols M1 |}
@@ -1943,27 +1945,32 @@ Compute (mmat_depth (A 4)).
 Definition mmmat_depth T (MMM : matrix (mmatrix T)) :=
   mmat_depth (mat_el void_mmat MMM 0 0).
 
-Fixpoint mmat_add_loop T it zero add (MM1 MM2 : mmatrix T) :=
+Fixpoint mmat_add_loop T {so : semiring_op T} it (MM1 MM2 : mmatrix T) :=
   match it with
   | 0 => void_mmat
   | S it' =>
       match MM1 with
       | MM_1 MA =>
           match MM2 with
-          | MM_1 MB => MM_1 (mat_add zero add MA MB)
+          | MM_1 MB => MM_1 (mat_add MA MB)
           | MM_M MMB => void_mmat
           end
       | MM_M MMA =>
           match MM2 with
           | MM_1 MB => void_mmat
           | MM_M MMB =>
-              MM_M (mat_add void_mmat (mmat_add_loop it' zero add) MMA MMB)
+              let sso :=
+                {| srng_zero := void_mmat; srng_one := void_mmat;
+                   srng_add := mmat_add_loop it';
+                   srng_mul := mmat_add_loop it' |}
+              in
+              MM_M (mat_add MMA MMB)
           end
       end
   end.
 
 Definition mmat_add T {so : semiring_op T} (MM1 MM2 : mmatrix T) :=
-  mmat_add_loop (mmat_depth MM1) srng_zero srng_add MM1 MM2.
+  mmat_add_loop (mmat_depth MM1) MM1 MM2.
 
 Fixpoint mmat_mul_loop T {so : semiring_op T} it (MM1 MM2 : mmatrix T) :=
   match it with
@@ -2281,16 +2288,13 @@ Definition mmat_ncols T (MM : mmatrix T) :=
   | MM_M MMM => mat_ncols MMM
   end.
 
-Theorem fold_mmat_add : ∀ (MM1 MM2 : mmatrix T),
-  mmat_add_loop (@mmat_depth T MM1) (@srng_zero T so) (@srng_add T so) MM1 MM2 =
-  @mmat_add T so MM1 MM2.
+Theorem fold_mmat_add (_ := so) : ∀ (MM1 MM2 : mmatrix T),
+  mmat_add_loop (mmat_depth MM1) MM1 MM2 = mmat_add MM1 MM2.
 Proof. easy. Qed.
 
-Theorem list_list_add_comm :
-  ∀ T (so : semiring_op T) (sp : semiring_prop T),
+Theorem list_list_add_comm (_ := so) :
   ∀ (lla llb : list (list T)) r c,
-  list_list_add 0%Srng srng_add r c lla llb =
-  list_list_add 0%Srng srng_add r c llb lla.
+  list_list_add r c lla llb = list_list_add r c llb lla.
 Proof.
 intros.
 apply map_ext_in.
@@ -2300,10 +2304,8 @@ intros j Hj.
 apply srng_add_comm.
 Qed.
 
-Theorem mat_add_comm : ∀ T (so : semiring_op T) (sp : semiring_prop T),
-  ∀ (MA MB : matrix T),
-  mat_add 0%Srng srng_add MA MB =
-  mat_add 0%Srng srng_add MB MA.
+Theorem mat_add_comm (_ := so) : ∀ (MA MB : matrix T),
+  mat_add MA MB = mat_add MB MA.
 Proof.
 intros.
 unfold mat_add.
