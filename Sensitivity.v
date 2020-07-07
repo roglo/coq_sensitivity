@@ -2514,7 +2514,7 @@ destruct MI as [MI| MMMI]. {
 }
 Qed.
 
-Fixpoint mmat_have_same_struct MMA MMB :=
+Fixpoint mmat_have_same_struct T d (MMA MMB : mmatrix T) :=
   match MMA with
   | MM_1 MA =>
       match MMB with
@@ -2524,7 +2524,8 @@ Fixpoint mmat_have_same_struct MMA MMB :=
   | MM_M MMMA =>
       match MMB with
       | MM_1 _ => false
-      | MM_M MMMB => mmat_have_same_struct MMMA MMMB
+      | MM_M MMMB =>
+          mmat_have_same_struct d (mat_el d MMMA 0 0) (mat_el d MMMB 0 0)
       end
   end.
 
