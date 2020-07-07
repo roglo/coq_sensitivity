@@ -2518,27 +2518,22 @@ Qed.
 
 Fixpoint mmat_hss it (MMA MMB : mmatrix T) :=
   match it with
-  | 0 => false
+  | 0 => False
   | S it' =>
       match MMA with
       | MM_1 MA =>
           match MMB with
-          | MM_1 _ => true
-          | MM_M _ => false
+          | MM_1 _ => True
+          | MM_M _ => False
           end
       | MM_M MMMA =>
           match MMB with
-          | MM_1 _ => false
+          | MM_1 _ => False
           | MM_M MMMB =>
-              fold_left
-                (λ b i,
-                   fold_left
-                     (λ b j, b &&
-                        mmat_hss it'
-                          (mat_el void_mmat MMMA 0 0)
-                          (mat_el void_mmat MMMB 0 0))
-                     (seq 0 (mat_ncols MMMA)) b)
-                (seq 0 (mat_nrows MMMA)) true
+              ∀ i j, i < mat_nrows MMMA → j < mat_ncols MMMA →
+              mmat_hss it'
+                (mat_el void_mmat MMMA 0 0)
+                (mat_el void_mmat MMMB 0 0)
           end
       end
   end.
@@ -2547,6 +2542,7 @@ Definition mmat_have_same_struct MMA MMB :=
   mmat_hss (mmat_depth MMA) MMA MMB.
 
 Compute (mmat_have_same_struct (A 4) (I_2_pow 4)).
+Compute (mmat_have_same_struct (A 4) (I_2_pow 3)).
 Compute (mmat_hss 10 (A 4) (I_2_pow 4)).
 
 (*
@@ -2566,6 +2562,24 @@ destruct MMB as [MB| MMMB]; [ easy | ].
 cbn in Hit.
 ...
 *)
+
+Theorem glop (_ := so) : ∀ it n MM,
+  mmat_have_same_struct (mmat_mul_loop it (A n) (A n)) MM
+  → S n ≤ it
+  → mmat_depth (A n) =
+     mmat_depth (mmat_add (mmat_mul_loop it (A n) (A n)) MM).
+Proof.
+intros * Hss Hit.
+revert n MM Hss Hit.
+induction it; intros; [ easy | ].
+destruct n; [ now destruct MM | ].
+apply Nat.succ_le_mono in Hit.
+cbn.
+do 4 rewrite fold_mmat_add.
+destruct MM as [M| MMM]; [ easy | ].
+cbn in Hss; cbn.
+rewrite fold_mmat_add in Hss.
+...
 
 Theorem mmat_depth_mmat_mul_loop_A_A : ∀ it n (_ := so),
   S n ≤ it
@@ -2587,6 +2601,7 @@ destruct MM as [M| MMM]. {
   f_equal.
   apply Nat.succ_le_mono in Hit.
   rewrite mmat_mul_loop_sqr_I_2_pow; [ | easy ].
+...
 (**)
   revert n Hit.
   induction it; intros; [ easy | cbn ].
