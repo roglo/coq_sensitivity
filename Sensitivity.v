@@ -2514,11 +2514,29 @@ destruct MI as [MI| MMMI]. {
 }
 Qed.
 
+Fixpoint mmat_have_same_struct MMA MMB :=
+  match MMA with
+  | MM_1 MA =>
+      match MMB with
+      | MM_1 _ => true
+      | MM_M _ => false
+      end
+  | MM_M MMMA =>
+      match MMB with
+      | MM_1 _ => false
+      | MM_M MMMB => mmat_have_same_struct MMMA MMMB
+      end
+  end.
+
+...
+
 Theorem mmat_depth_add (s := so) : ∀ MA MB,
-  mmat_depth (mmat_add MA MB) = mmat_depth MA.
+  mmat_have_same_struct MA MB = true
+  → mmat_depth (mmat_add MA MB) = mmat_depth MA.
 Proof.
-intros; subst s.
+intros * HAB; subst s.
 unfold mmat_add.
+Print mmat_add_loop.
 ...
 
 Theorem mmat_depth_mmat_mul_loop_A_A : ∀ it n (_ := so),
