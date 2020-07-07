@@ -2532,22 +2532,30 @@ destruct MM as [M| MMM]. {
   injection HMM; clear HMM; intros; subst MMM.
   cbn.
   f_equal.
+  apply Nat.succ_le_mono in Hit.
+(**)
+  revert n Hit.
+  induction it; intros; [ easy | cbn ].
+  rewrite fold_mmat_add.
+  destruct n; [ easy | ].
+  cbn; f_equal.
+  do 3 rewrite fold_mmat_add.
+...
   remember (mmat_mul_loop _ _ _) as MM eqn:HMM.
   symmetry in HMM.
   destruct MM as [M| MMM]. {
     destruct it; [ flia Hit | ].
     destruct n; [ easy | now destruct it ].
   } {
-    apply Nat.succ_le_mono in Hit.
     revert n Hit MMM HMM.
     induction it; intros; [ easy | ].
     destruct n; [ easy | ].
     cbn - [ mmat_add ] in HMM.
     injection HMM; clear HMM; intros; subst MMM.
     cbn; f_equal.
-    apply Nat.succ_le_mono in Hit.
     do 2 rewrite fold_mmat_add.
     rewrite mmat_mul_loop_IZ_Z_2_pow; [ | easy ].
+    erewrite IHit; [ | easy | ].
 ...
   revert n MMM Hit HMM.
   induction it; intros; [ easy | ].
