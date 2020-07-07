@@ -2521,12 +2521,12 @@ Proof.
 intros * Hit; subst s.
 remember (mmat_mul_loop _ _ _) as MM eqn:HMM.
 symmetry in HMM.
-revert it n Hit HMM.
-induction MM as [M| MMM]; intros. {
+destruct MM as [M| MMM]. {
   cbn; symmetry.
   destruct n; [ easy | now destruct it ].
 } {
   cbn; symmetry.
+...
   revert n MMM Hit HMM.
   induction it; intros; [ easy | ].
   destruct n; [ easy | ].
