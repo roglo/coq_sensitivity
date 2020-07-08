@@ -1945,19 +1945,13 @@ Compute (mmat_depth (A 4)).
 Definition mmmat_depth T (MMM : matrix (mmatrix T)) :=
   mmat_depth (mat_el void_mmat MMM 0 0).
 
-Definition mmmat_add_loop' T {so : semiring_op (mmatrix T)} MMMA MMMB :=
+Definition mmmat_add T {so : semiring_op (mmatrix T)} MMMA MMMB :=
   mat_add MMMA MMMB.
-
-...
-
-Check mmmat_add_loop'.
 
 Definition sso T (so : semiring_op (mmatrix T)) :=
   {| srng_zero := void_mat; srng_one := void_mat;
-     srng_add := @mmmat_add_loop' T so;
-     srng_mul := @mmmat_add_loop' T so |}.
-
-Print sso.
+     srng_add := @mmmat_add T so;
+     srng_mul := @mmmat_add T so |}.
 
 Definition mmat_add_loop T {so : semiring_op T} (MM1 MM2 : mmatrix T) :=
   match MM1 with
@@ -1970,12 +1964,7 @@ Definition mmat_add_loop T {so : semiring_op T} (MM1 MM2 : mmatrix T) :=
       match MM2 with
       | MM_1 MB => void_mmat
       | MM_M MMMB =>
-          let sso :=
-            {| srng_zero := void_mmat; srng_one := void_mmat;
-               srng_add := mmmat_add_loop';
-               srng_mul := mmmat_add_loop' |}
-          in
-          MM_M (mmmat_add_loop' MMMA MMMB)
+          MM_M (mmmat_add MMMA MMMB)
       end
   end.
 
