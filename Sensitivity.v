@@ -2716,15 +2716,18 @@ destruct MM as [M| MMM]. {
 Theorem lemma_2_A_n_2_eq_n_I : ∀ n (_ := so),
   mmat_mul (A n) (A n) = mmat_nat_mul_l n (I_2_pow n).
 Proof.
-intros.
+intros; subst s.
 unfold mmat_mul, mmat_nat_mul_l.
 rewrite mmat_depth_A.
 unfold I_2_pow at 1.
 rewrite mmat_depth_IZ_2_pow.
-destruct n. {
+ induction n. {
   cbn; unfold mat_nat_mul_l; cbn.
   now rewrite srng_mul_0_l.
 }
+(**)
+remember (S n) as sn eqn:Hsn; cbn; subst sn.
+...
 remember (S n) as sn eqn:Hsn; cbn.
 remember (A sn) as Asn eqn:HAsn; symmetry in HAsn.
 remember (I_2_pow sn) as Isn eqn:HIsn; symmetry in HIsn.
