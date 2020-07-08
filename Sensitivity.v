@@ -1972,6 +1972,11 @@ Fixpoint mmat_add_loop T {so : semiring_op T} it (MM1 MM2 : mmatrix T) :=
 Definition mmat_add T {so : semiring_op T} (MM1 MM2 : mmatrix T) :=
   mmat_add_loop (mmat_depth MM1) MM1 MM2.
 
+...
+
+(* problem of this implementation: the recursive call mmat_mul_loop
+   is inside an implicit argument; makes induction proofs difficult
+   to make *)
 Fixpoint mmat_mul_loop T {so : semiring_op T} it (MM1 MM2 : mmatrix T) :=
   match it with
   | 0 => void_mmat
@@ -2711,6 +2716,16 @@ destruct MM as [M| MMM]. {
 ...
 *)
 
+Theorem glop (_ := so) : ∀ it n,
+  S n < it
+  → mmat_mul_loop it (A n) (A n) = mmat_nat_mul_l_loop it n (I_2_pow n).
+Proof.
+intros * Hit; subst s.
+revert n Hit.
+induction it; intros; [ easy | ].
+cbn.
+...
+
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I : ∀ n (_ := so),
@@ -2721,12 +2736,14 @@ unfold mmat_mul, mmat_nat_mul_l.
 rewrite mmat_depth_A.
 unfold I_2_pow at 1.
 rewrite mmat_depth_IZ_2_pow.
+...
  induction n. {
   cbn; unfold mat_nat_mul_l; cbn.
   now rewrite srng_mul_0_l.
 }
 (**)
 remember (S n) as sn eqn:Hsn; cbn; subst sn.
+Print mmat_nat_mul_l.
 ...
 remember (S n) as sn eqn:Hsn; cbn.
 remember (A sn) as Asn eqn:HAsn; symmetry in HAsn.
