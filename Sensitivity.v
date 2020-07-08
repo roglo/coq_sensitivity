@@ -1945,6 +1945,30 @@ Compute (mmat_depth (A 4)).
 Definition mmmat_depth T (MMM : matrix (mmatrix T)) :=
   mmat_depth (mat_el void_mmat MMM 0 0).
 
+...
+
+Fixpoint mmmat_add_loop' T {so : semiring_op T} (it : nat) (MMMA MMMB : matrix (mmatrix T)) : matrix (mmatrix T) :=
+  match it with
+  | 0 => void_mat
+  | S it' => void_mat
+  end.
+
+Definition mmat_add_loop T {so : semiring_op T} (MM1 MM2 : mmatrix T) :=
+  match MM1 with
+  | MM_1 MA =>
+      match MM2 with
+      | MM_1 MB => MM_1 (mat_add MA MB)
+      | MM_M MMB => void_mmat
+      end
+  | MM_M MMMA =>
+      match MM2 with
+      | MM_1 MB => void_mmat
+      | MM_M MMMB => MM_M (mmmat_add_loop' (mmat_depth MM1) MMMA MMMB)
+      end
+  end.
+
+...
+
 Fixpoint mmat_add_loop T {so : semiring_op T} it (MM1 MM2 : mmatrix T) :=
   match it with
   | 0 => void_mmat
