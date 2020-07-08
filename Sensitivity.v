@@ -2574,7 +2574,8 @@ revert n MM Hss Hit.
 induction it; intros; [ easy | ].
 destruct n; [ now destruct MM | ].
 apply Nat.succ_le_mono in Hit.
-cbn.
+remember (S n) as sn; cbn - [ mmat_add ]; subst sn.
+...
 do 4 rewrite fold_mmat_add.
 destruct MM as [M| MMM]; [ easy | ].
 cbn in Hss; cbn.
