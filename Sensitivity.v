@@ -2563,11 +2563,11 @@ cbn in Hit.
 ...
 *)
 
-Theorem glop (_ := so) : ∀ it n MM,
+Theorem mmat_depth_add (_ := so) : ∀ it n MM,
   mmat_have_same_struct (mmat_mul_loop it (A n) (A n)) MM
   → S n ≤ it
-  → mmat_depth (A n) =
-     mmat_depth (mmat_add (mmat_mul_loop it (A n) (A n)) MM).
+  → mmat_depth (mmat_add (mmat_mul_loop it (A n) (A n)) MM) =
+     mmat_depth (A n).
 Proof.
 intros * Hss Hit.
 revert n MM Hss Hit.
