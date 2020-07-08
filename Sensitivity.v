@@ -1947,11 +1947,25 @@ Definition mmmat_depth T (MMM : matrix (mmatrix T)) :=
 
 ...
 
-Fixpoint mmmat_add_loop' T {so : semiring_op T} (it : nat) (MMMA MMMB : matrix (mmatrix T)) : matrix (mmatrix T) :=
-  match it with
-  | 0 => void_mat
-  | S it' => void_mat
-  end.
+Fixpoint mmmat_add_loop' T {so : semiring_op T} (MMMA MMMB : matrix (mmatrix T)) : matrix (mmatrix T) :=
+  if Nat.eq_dec (mat_nrows MMMA) (mat_nrows MMMB) then
+    if Nat.eq_dec (mat_ncols MMMA) (mat_ncols MMMB) then
+      {| mat_list :=
+           map
+             (λ i,
+                map
+                  (λ j,
+                     mmmat_add_loop'
+                       (list_list_el void_mmat (mat_list MMMA) i j)
+                       (list_list_el void_mmat (mat_list MMMB) i j))
+                  (seq 0 (mat_ncols MMMA)))
+             (seq 0 (mat_nrows MMMA));
+         mat_nrows := mat_nrows MMMA;
+         mat_ncols := mat_ncols MMMA |}
+    else void_mat
+  else void_mat.
+
+...
 
 Definition mmat_add_loop T {so : semiring_op T} (MM1 MM2 : mmatrix T) :=
   match MM1 with
