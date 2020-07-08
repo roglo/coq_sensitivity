@@ -2563,6 +2563,7 @@ cbn in Hit.
 ...
 *)
 
+(*
 Theorem mmat_depth_add (_ := so) : ∀ it n MM,
   mmat_have_same_struct (mmat_mul_loop it (A n) (A n)) MM
   → S n ≤ it
@@ -2581,7 +2582,9 @@ destruct MM as [M| MMM]; [ easy | ].
 cbn in Hss; cbn.
 rewrite fold_mmat_add in Hss.
 ...
+*)
 
+(*
 Theorem mmat_depth_mmat_mul_loop_A_A : ∀ it n (_ := so),
   S n ≤ it
   → mmat_depth (mmat_mul_loop it (A n) (A n)) = mmat_depth (A n).
@@ -2706,6 +2709,7 @@ destruct MM as [M| MMM]. {
   f_equal.
   rewrite mmat_mul_loop_sqr_I_2_pow; [ | easy ].
 ...
+*)
 
 (* "We prove by induction that A_n^2 = nI" *)
 
@@ -2743,7 +2747,8 @@ subst MMMI; cbn.
 f_equal. {
   f_equal. {
     rewrite mmat_mul_loop_sqr_I_2_pow; [ | now subst sn ].
-Search mmat_depth.
+    subst sn.
+    remember (mmat_depth _) as it eqn:Hit.
 ...
 intros.
 unfold mmat_mul, mmat_nat_mul_l.
