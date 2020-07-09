@@ -2076,28 +2076,6 @@ induction n; [ easy | cbn ].
 now rewrite IHn.
 Qed.
 
-(*
-Theorem A_MM_1_nrows : ∀ n M,
-  A n = MM_1 M
-  → mat_nrows M = 1.
-Proof.
-intros * HAn.
-destruct n; [ | easy ].
-cbn in HAn.
-now injection HAn; clear HAn; intros; subst M.
-Qed.
-
-Theorem A_MM_1_ncols : ∀ n M,
-  A n = MM_1 M
-  → mat_ncols M = 1.
-Proof.
-intros * HAn.
-destruct n; [ | easy ].
-cbn in HAn.
-now injection HAn; clear HAn; intros; subst M.
-Qed.
-*)
-
 Theorem A_MM_M_nrows : ∀ n MMM,
   A n = MM_M MMM
   → mat_nrows MMM = 2.
@@ -2117,28 +2095,6 @@ destruct n; [ easy | ].
 cbn in HAn.
 now injection HAn; clear HAn; intros; subst MMM.
 Qed.
-
-(*
-Theorem IZ_2_pow_MM_1_nrows : ∀ u n M,
-  IZ_2_pow u n = MM_1 M
-  → mat_nrows M = 1.
-Proof.
-intros * HIM.
-destruct n; [ | easy ].
-cbn in HIM.
-now injection HIM; clear HIM; intros; subst M.
-Qed.
-
-Theorem IZ_2_pow_MM_1_ncols : ∀ u n M,
-  IZ_2_pow u n = MM_1 M
-  → mat_ncols M = 1.
-Proof.
-intros * HIM.
-destruct n; [ | easy ].
-cbn in HIM.
-now injection HIM; clear HIM; intros; subst M.
-Qed.
-*)
 
 Theorem IZ_2_pow_MM_M_nrows : ∀ u n MMM,
   IZ_2_pow u n = MM_M MMM
@@ -2179,34 +2135,6 @@ unfold mat_mul.
 symmetry in Hrc.
 now destruct (Nat.eq_dec (mat_ncols M) (mat_nrows M)).
 Qed.
-
-(*
-Theorem mat_nrows_A_I_2_pow_MM_1 : ∀ n M IM,
-  A n = MM_1 M
-  → I_2_pow n = MM_1 IM
-  → mat_nrows M = mat_nrows IM.
-Proof.
-intros * HAn HIn.
-destruct n; [ | easy ].
-cbn in HAn, HIn.
-injection HAn; clear HAn; intros; subst M.
-injection HIn; clear HIn; intros; subst IM; easy.
-Qed.
-*)
-
-(*
-Theorem mat_ncols_A_I_2_pow_MM_1 : ∀ n M IM,
-  A n = MM_1 M
-  → I_2_pow n = MM_1 IM
-  → mat_ncols M = mat_ncols IM.
-Proof.
-intros * HAn HIn.
-destruct n; [ | easy ].
-cbn in HAn, HIn.
-injection HAn; clear HAn; intros; subst M.
-injection HIn; clear HIn; intros; subst IM; easy.
-Qed.
-*)
 
 Theorem mat_nrows_A_I_2_pow_MM_M : ∀ n MMM IMMM,
   A n = MM_M MMM
@@ -2271,39 +2199,6 @@ destruct (Nat.eq_dec (mat_nrows MA) (mat_nrows MB)) as [RAB| RAB]. {
   now symmetry in H.
 }
 Qed.
-
-(* trop compliqué : à voir plus tard, peut-être
-Theorem mmat_add_comm : ∀ MMA MMB,
-  mmat_depth MMA = mmat_depth MMB
-  → @mmat_add T so MMA MMB = @mmat_add T so MMB MMA.
-Proof.
-intros * Hdep.
-unfold mmat_add.
-remember (mmat_depth MMA) as it eqn:Hit.
-rewrite <- Hdep.
-clear Hit Hdep.
-destruct it; [ easy | cbn ].
-destruct MMA as [MA| MMMA]. {
-  destruct MMB as [MB| MMMB]; [ | easy ].
-  f_equal.
-  now apply mat_add_comm.
-} {
-  destruct MMB as [MB| MMMB]; [ easy | ].
-  f_equal.
-Print semiring_op.
-Print void_mmat.
-Set Printing Implicit.
-  remember so as sso.
-  remember
-    {| srng_zero := @void_mmat T;
-       srng_one := @void_mmat T;
-       srng_add := @mmat_add_loop T it 0%Srng (@srng_add T so);
-       srng_mul := @mmat_add_loop T it 0%Srng (@srng_add T so) |}.
-Print semiring_prop.
-  apply mat_add_comm.
-...
-}
-*)
 
 Theorem mmat_add_IZ_Z_2_pow : ∀ u n,
   @mmat_add T so (IZ_2_pow u n) (Z_2_pow n) = IZ_2_pow u n.
