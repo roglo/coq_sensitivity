@@ -1834,8 +1834,6 @@ Definition mat_opp T {ro : ring_op T} (M : matrix T) :=
      mat_nrows := mat_nrows M;
      mat_ncols := mat_ncols M |}.
 
-... (* todo : see block matrices *)
-
 (* matrices of matrices *)
 
 Inductive mmatrix T :=
@@ -2419,7 +2417,19 @@ f_equal; f_equal; f_equal. {
       rewrite IHn.
       now rewrite srng_add_0_l.
     } {
-      cbn.
+      remember (mmat_depth _) as md eqn:Hmd; symmetry in Hmd.
+      destruct md. {
+        destruct n; [ easy | ].
+        now injection HMM; clear HMM; intros; subst MMM.
+      }
+      cbn; f_equal.
+      destruct MMM as (ll, r, c); cbn.
+      unfold mat_add.
+      cbn - [ Nat.eq_dec ].
+      destruct (Nat.eq_dec r r) as [H| ]; [ clear H | easy ].
+      destruct (Nat.eq_dec c c) as [H| ]; [ clear H | easy ].
+      f_equal.
+Search (map _ _ = map _ _).
 ...
 
 (* "We prove by induction that A_n^2 = nI" *)
