@@ -1834,6 +1834,8 @@ Definition mat_opp T {ro : ring_op T} (M : matrix T) :=
      mat_nrows := mat_nrows M;
      mat_ncols := mat_ncols M |}.
 
+... (* todo : see block matrices *)
+
 (* matrices of matrices *)
 
 Inductive mmatrix T :=
