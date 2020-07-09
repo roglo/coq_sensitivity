@@ -2430,14 +2430,27 @@ now apply IHit.
 Qed.
 
 Theorem glop (_ := so) : ∀ it n M,
-  S n ≤ it
+  mmat_have_same_struct (I_2_pow n) M
+  → S n ≤ it
   → mmat_mul_loop it (I_2_pow n) M = M.
 Proof.
-intros * Hit.
-revert n M Hit.
+intros * Hss Hit.
+revert n M Hss Hit.
 induction it; intros; [ easy | cbn ].
-destruct n; cbn.
-2: {
+destruct n. {
+  cbn in Hss.
+  destruct M as [x| MMM]; [ cbn | easy ].
+  now rewrite srng_mul_1_l.
+}
+destruct M as [x| MMM]; [ easy | ].
+cbn; f_equal.
+cbn in Hss.
+unfold mat_mul.
+cbn - [ Nat.eq_dec ].
+Search mmat_depth.
+unfold I_2_pow in Hss.
+rewrite mmat_depth_IZ_2_pow in Hss.
+cbn in Hss.
 ...
 
 Theorem mmat_mul_loop_sqr_A (_ := so) : ∀ it n,
