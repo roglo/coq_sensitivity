@@ -2371,8 +2371,8 @@ Fixpoint mmat_hss (_ := so) it (MMA MMB : mmatrix T) :=
           | MM_M MMMB =>
               ∀ i j, i < mat_nrows MMMA → j < mat_ncols MMMA →
               mmat_hss it'
-                (mat_el void_mmat MMMA 0 0)
-                (mat_el void_mmat MMMB 0 0)
+                (mat_el void_mmat MMMA i j)
+                (mat_el void_mmat MMMB i j)
           end
       end
   end.
@@ -2447,7 +2447,7 @@ cbn; f_equal.
 cbn in Hss.
 unfold mat_mul.
 cbn - [ Nat.eq_dec ].
-Search mmat_depth.
+...
 unfold I_2_pow in Hss.
 rewrite mmat_depth_IZ_2_pow in Hss.
 cbn in Hss.
