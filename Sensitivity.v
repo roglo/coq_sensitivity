@@ -2384,8 +2384,39 @@ Compute (mmat_have_same_struct (A 4) (I_2_pow 4)).
 Compute (mmat_have_same_struct (A 4) (I_2_pow 3)).
 Compute (mmat_hss 10 (A 4) (I_2_pow 4)).
 
-Theorem glop (_ := so) : ∀ it n,
-  S n < it
+Theorem mmat_add_loop_nat_mul_l_loop (_ := so) : ∀ it it' u n k,
+  S n ≤ it
+  → S n ≤ it'
+  → mmat_add_loop it' (mmat_nat_mul_l_loop it k (IZ_2_pow u n))
+       (IZ_2_pow u n) =
+     mmat_nat_mul_l_loop it (S k) (IZ_2_pow u n).
+Proof.
+intros * Hit Hit'.
+revert n u it k Hit Hit'.
+induction it'; intros; [ easy | cbn ].
+apply Nat.succ_le_mono in Hit'.
+destruct it; [ easy | ].
+apply Nat.succ_le_mono in Hit.
+cbn.
+destruct n; cbn. 2: {
+  rewrite IHit'; [ now rewrite IHit' | easy | easy ].
+} {
+  f_equal.
+  rewrite srng_add_0_l.
+  clear - sp.
+  induction k; [ cbn; apply srng_add_0_l | ].
+  rewrite <- Nat.add_1_r.
+  rewrite seq_app.
+  rewrite fold_left_app.
+  rewrite <- IHk; cbn.
+  rewrite Nat.add_1_r; cbn.
+  rewrite IHk.
+  now rewrite srng_add_0_l.
+}
+Qed.
+
+Theorem mmat_mul_loop_sqr_A (_ := so) : ∀ it n,
+  S n ≤ it
   → mmat_mul_loop it (A n) (A n) = mmat_nat_mul_l_loop it n (I_2_pow n).
 Proof.
 intros * Hit; subst s.
@@ -2401,35 +2432,10 @@ f_equal; f_equal; f_equal. {
     rewrite mmat_mul_loop_sqr_I_2_pow; [ | flia Hit ].
     destruct it; [ easy | ].
     apply Nat.succ_le_mono in Hit.
-    cbn.
-    remember (I_2_pow n) as MM eqn:HMM; symmetry in HMM.
-    destruct MM as [x| MMM]. {
-      cbn.
-      f_equal.
-      rewrite srng_add_0_l.
-      clear - sp.
-      induction n; [ cbn; apply srng_add_0_l | ].
-      rewrite <- Nat.add_1_r.
-      rewrite seq_app.
-      rewrite fold_left_app.
-      rewrite <- IHn; cbn.
-      rewrite Nat.add_1_r; cbn.
-      rewrite IHn.
-      now rewrite srng_add_0_l.
+    apply mmat_add_loop_nat_mul_l_loop. {
+      now apply -> Nat.succ_le_mono.
     } {
-      remember (mmat_depth _) as md eqn:Hmd; symmetry in Hmd.
-      destruct md. {
-        destruct n; [ easy | ].
-        now injection HMM; clear HMM; intros; subst MMM.
-      }
-      cbn; f_equal.
-      destruct MMM as (ll, r, c); cbn.
-      unfold mat_add.
-      cbn - [ Nat.eq_dec ].
-      destruct (Nat.eq_dec r r) as [H| ]; [ clear H | easy ].
-      destruct (Nat.eq_dec c c) as [H| ]; [ clear H | easy ].
-      f_equal.
-Search (map _ _ = map _ _).
+Search mmat_depth.
 ...
 
 (* "We prove by induction that A_n^2 = nI" *)
@@ -2442,6 +2448,8 @@ unfold mmat_mul, mmat_nat_mul_l.
 rewrite mmat_depth_A.
 unfold I_2_pow at 1.
 rewrite mmat_depth_IZ_2_pow.
+...
+apply glop.
 ...
  induction n. {
   cbn; unfold mat_nat_mul_l; cbn.
