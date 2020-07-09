@@ -2429,6 +2429,17 @@ cbn; f_equal.
 now apply IHit.
 Qed.
 
+Theorem glop (_ := so) : ∀ it n M,
+  S n ≤ it
+  → mmat_mul_loop it (I_2_pow n) M = M.
+Proof.
+intros * Hit.
+revert n M Hit.
+induction it; intros; [ easy | cbn ].
+destruct n; cbn.
+2: {
+...
+
 Theorem mmat_mul_loop_sqr_A (_ := so) : ∀ it n,
   S n ≤ it
   → mmat_mul_loop it (A n) (A n) = mmat_nat_mul_l_loop it n (I_2_pow n).
@@ -2455,6 +2466,13 @@ f_equal; f_equal; f_equal. {
     }
   } {
     f_equal.
+Inspect 2.
+Search (mmat_mul_loop).
+...
+
+unfold I_2_pow.
+unfold mmat_add.
+rewrite mmat_add_loop_nat_mul_l_loop.
 ...
 
 (* "We prove by induction that A_n^2 = nI" *)
