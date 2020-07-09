@@ -1840,7 +1840,7 @@ Inductive mmatrix T :=
   | MM_1 : T → mmatrix T
   | MM_M : matrix (mmatrix T) → mmatrix T.
 
-Arguments MM_1 {_}.
+Arguments MM_1 {_} a%Srng.
 Arguments MM_M {_}.
 
 Fixpoint concat_list_in_list T (ll1 ll2 : list (list T)) :=
@@ -2496,7 +2496,24 @@ Proof.
 intros * Hit; subst s.
 revert n Hit.
 induction it; intros; [ easy | ].
+destruct n; [ now cbn; rewrite srng_mul_0_l | ].
 cbn.
+do 4 rewrite fold_mmat_add.
+apply Nat.succ_le_mono in Hit.
+f_equal; f_equal; f_equal. {
+  f_equal. {
+    rewrite IHit; [ | easy ].
+    rewrite mmat_mul_loop_sqr_I_2_pow; [ | flia Hit ].
+    destruct it; [ easy | ].
+    apply Nat.succ_le_mono in Hit.
+    cbn.
+    remember (I_2_pow n) as MM eqn:HMM; symmetry in HMM.
+    destruct MM as [x| MMM]. {
+      cbn.
+      f_equal.
+      rewrite srng_add_0_l.
+      clear - sp.
+      induction n; [ cbn; apply srng_add_0_l | ].
 ...
 
 (* "We prove by induction that A_n^2 = nI" *)
