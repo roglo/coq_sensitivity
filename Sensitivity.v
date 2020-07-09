@@ -2514,6 +2514,10 @@ f_equal; f_equal; f_equal. {
       rewrite srng_add_0_l.
       clear - sp.
       induction n; [ cbn; apply srng_add_0_l | ].
+      rewrite <- Nat.add_1_r.
+      rewrite seq_app.
+      rewrite fold_left_app.
+      rewrite <- IHn; cbn.
 ...
 
 (* "We prove by induction that A_n^2 = nI" *)
