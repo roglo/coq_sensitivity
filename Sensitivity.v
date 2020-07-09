@@ -2415,6 +2415,20 @@ destruct n; cbn. 2: {
 }
 Qed.
 
+Theorem mmat_depth_nat_mul_l_IZ_2_pow (_ := so) : ∀ it u k n,
+  S n ≤ it
+  → mmat_depth (mmat_nat_mul_l_loop it k (IZ_2_pow u n)) =
+     mmat_depth (IZ_2_pow u n).
+Proof.
+intros * Hit.
+revert u k n Hit.
+induction it; intros; [ easy | ].
+destruct n; [ easy | ].
+apply Nat.succ_le_mono in Hit.
+cbn; f_equal.
+now apply IHit.
+Qed.
+
 Theorem mmat_mul_loop_sqr_A (_ := so) : ∀ it n,
   S n ≤ it
   → mmat_mul_loop it (A n) (A n) = mmat_nat_mul_l_loop it n (I_2_pow n).
@@ -2435,7 +2449,12 @@ f_equal; f_equal; f_equal. {
     apply mmat_add_loop_nat_mul_l_loop. {
       now apply -> Nat.succ_le_mono.
     } {
-Search mmat_depth.
+      unfold I_2_pow.
+      rewrite mmat_depth_nat_mul_l_IZ_2_pow; [ | flia Hit ].
+      now rewrite mmat_depth_IZ_2_pow.
+    }
+  } {
+    f_equal.
 ...
 
 (* "We prove by induction that A_n^2 = nI" *)
