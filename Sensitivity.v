@@ -2473,20 +2473,20 @@ Qed.
 
 (* if this theorem works, it would allow to cancel other theorems
    not so general *)
-Theorem glop (_ := so) : ∀ it n M,
-  mmat_have_same_struct (I_2_pow n) M
+Theorem glop (_ := so) : ∀ it n MM,
+  mmat_have_same_struct (I_2_pow n) MM
   → S n ≤ it
-  → mmat_mul_loop it (I_2_pow n) M = M.
+  → mmat_mul_loop it (I_2_pow n) MM = MM.
 Proof.
 intros * Hss Hit.
-revert n M Hss Hit.
+revert n MM Hss Hit.
 induction it; intros; [ easy | cbn ].
 destruct n. {
   cbn in Hss.
-  destruct M as [x| MMM]; [ cbn | easy ].
+  destruct MM as [x| MMM]; [ cbn | easy ].
   now rewrite srng_mul_1_l.
 }
-destruct M as [x| MMM]; [ easy | ].
+destruct MM as [x| MMM]; [ easy | ].
 cbn; f_equal.
 cbn in Hss.
 unfold mat_mul.
