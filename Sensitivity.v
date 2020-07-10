@@ -2431,6 +2431,46 @@ cbn; f_equal.
 now apply IHit.
 Qed.
 
+Theorem mmat_hss_trans (_ := so) : ∀ it MMA MMB MMC,
+  mmat_hss it MMA MMB → mmat_hss it MMB MMC → mmat_hss it MMA MMC.
+Proof.
+intros * HAB HBC.
+revert MMA MMB MMC HAB HBC.
+induction it; intros; [ easy | cbn ].
+cbn in HAB, HBC.
+destruct MMA as [xa| MMMA]; [ now destruct MMB | ].
+destruct MMC as [xc| MMMC]; [ now destruct MMB | ].
+destruct MMB as [xb| MMMB]; [ easy | ].
+destruct HAB as (Hrab & Hcab & HAB).
+destruct HBC as (Hrbc & Hcbc & HBC).
+split; [ congruence | ].
+split; [ congruence | ].
+intros * Hi Hj.
+apply IHit with (MMB := mat_el void_mmat MMMB i j); [ now apply HAB | ].
+apply HBC; congruence.
+Qed.
+
+Theorem mmat_hss_IZ_2_pow : ∀ u v n it,
+  S n ≤ it → mmat_hss it (IZ_2_pow u n) (IZ_2_pow v n).
+Proof.
+intros * Hit.
+revert u v n Hit.
+induction it; intros; [ easy | cbn ].
+destruct n; [ easy | cbn ].
+apply Nat.succ_le_mono in Hit.
+split; [ easy | ].
+split; [ easy | ].
+intros * Hi Hj.
+destruct i. {
+  destruct j; [ now apply IHit | ].
+  destruct j; [ cbn | flia Hj ].
+  now apply IHit.
+}
+destruct i; [ cbn | flia Hi ].
+destruct j; [ now apply IHit | ].
+destruct j; [ now apply IHit | flia Hj ].
+Qed.
+
 (* if this theorem works, it would allow to cancel other theorems
    not so general *)
 Theorem glop (_ := so) : ∀ it n M,
@@ -2456,15 +2496,11 @@ rewrite <- Hr, <- Hc; cbn.
 do 4 rewrite fold_mmat_add.
 rewrite fold_Z_2_pow.
 apply Nat.succ_le_mono in Hit.
-assert
-  (Hss1 :
-     mmat_have_same_struct (I_2_pow n)
-       (list_list_el void_mmat (mat_list MMM) 0 0)). {
+rewrite IHit; [ | | easy ]. 2: {
   now specialize (Hss 0 0 (Nat.lt_0_succ _) (Nat.lt_0_succ _)) as H1.
 }
-rewrite IHit; [ | easy | easy ].
 rewrite IHit; [ | | easy ]. 2: {
-  specialize (Hss 0 1 Nat.lt_0_2 (Nat.lt_1_2)) as H1.
+  specialize (Hss 0 1 Nat.lt_0_2 Nat.lt_1_2) as H1.
   cbn in H1.
   unfold mmat_have_same_struct.
   unfold I_2_pow at 2.
@@ -2473,16 +2509,25 @@ rewrite IHit; [ | | easy ]. 2: {
   unfold I_2_pow at 1.
   rewrite mmat_depth_IZ_2_pow in H1.
   rewrite mmat_depth_IZ_2_pow.
-...
-  cbn in H1; cbn.
-...
-
-rewrite IHit; [ | easy | easy ].
-rewrite IHit; [ | easy | easy ].
-...
-rewrite IHit; [ | | easy ].
-rewrite IHit; [ | | easy ].
-rewrite IHit; [ | | easy ].
+  apply mmat_hss_trans with (MMB := Z_2_pow n); [ | easy ].
+  now apply mmat_hss_IZ_2_pow.
+}
+rewrite IHit; [ | | easy ]. 2: {
+  specialize (Hss 1 0 Nat.lt_1_2 Nat.lt_0_2) as H1.
+  cbn in H1.
+  unfold mmat_have_same_struct.
+  unfold I_2_pow at 2.
+  unfold mat_el in H1.
+  unfold I_2_pow in H1 at 1.
+  unfold I_2_pow at 1.
+  rewrite mmat_depth_IZ_2_pow in H1.
+  rewrite mmat_depth_IZ_2_pow.
+  apply mmat_hss_trans with (MMB := Z_2_pow n); [ | easy ].
+  now apply mmat_hss_IZ_2_pow.
+}
+rewrite IHit; [ | | easy ]. 2: {
+  now specialize (Hss 1 1 Nat.lt_1_2 Nat.lt_1_2) as H1.
+}
 destruct MMM as (ll, r, c); cbn.
 cbn in Hr, Hc; subst r c.
 f_equal.
@@ -2494,8 +2539,6 @@ destruct ll as [| l]. {
   rewrite mmat_depth_IZ_2_pow in H1.
   cbn in H1.
   destruct n; [ clear H1 | easy ].
-...
-  cbn in Hss.
 ...
 unfold I_2_pow in Hss.
 rewrite mmat_depth_IZ_2_pow in Hss.
