@@ -2479,6 +2479,16 @@ Theorem glop (_ := so) : ∀ it n MM,
   → mmat_mul_loop it (I_2_pow n) MM = MM.
 Proof.
 intros * Hss Hit.
+destruct MM as [x| MMM]; [ admit | ].
+destruct MMM as (ll, r, c); cbn.
+destruct ll as [| l]. {
+  cbn.
+  destruct it; [ easy | cbn ].
+  destruct n; [ easy | cbn ].
+cbn in Hss.
+...
+
+intros * Hss Hit.
 revert n MM Hss Hit.
 induction it; intros; [ easy | cbn ].
 destruct n. {
