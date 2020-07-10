@@ -2449,33 +2449,65 @@ destruct n. {
 destruct M as [x| MMM]; [ easy | ].
 cbn; f_equal.
 cbn in Hss.
-destruct Hss as (Hr & Hc & Hss).
 unfold mat_mul.
 cbn - [ Nat.eq_dec ].
+destruct Hss as (Hr & Hc & Hss).
 rewrite <- Hr, <- Hc; cbn.
 do 4 rewrite fold_mmat_add.
 rewrite fold_Z_2_pow.
 apply Nat.succ_le_mono in Hit.
-rewrite IHit; [ | | easy ]. 2: {
+assert
+  (Hss1 : ∀ i j, i < 2 → j < 2 →
+     mmat_have_same_struct (I_2_pow n)
+       (list_list_el void_mmat (mat_list MMM) i j)). {
+  intros * Hi Hj.
   unfold mmat_have_same_struct.
   unfold I_2_pow at 1.
   rewrite mmat_depth_IZ_2_pow.
-...
-  destruct n. {
+  cbn.
+  destruct MMM as (ll, r, c).
+  cbn in Hr, Hc, Hss; cbn; subst r c.
+  destruct ll as [| l]. {
     cbn.
-    remember (list_list_el _ _ _ _) as MM eqn:HMM.
-    destruct MM as [| MMM']; [ easy | exfalso ].
-    destruct MMM as (ll, r, c).
-    cbn in HMM, Hr, Hc; subst r c.
+    cbn in Hss.
+    specialize (Hss i j Hi Hj) as H1.
+    destruct n; cbn. {
+      destruct i; [ now destruct j | ].
+      now destruct j.
+    }
+    cbn in H1.
+    destruct i; cbn in H1. {
+      destruct j; [ easy | ].
+      cbn in H1.
+      destruct j; [ easy | flia Hj ].
+    } {
+      destruct i; [ | flia Hi ].
+      destruct j; [ easy | ].
+      destruct j; [ easy | flia Hj ].
+    }
+  } {
+    cbn.
+    destruct l as [| MM]. {
+      cbn.
+      specialize (Hss i j Hi Hj) as H1.
 ...
-    clear - HMM.
-    induction ll as [| l]; [ easy | ].
-    cbn in HMM.
-    destruct ll as [| l']; cbn in IHll. {
-      destruct l as [| x]; [ easy | ].
-      cbn in HMM.
-      destruct x as [M| MMM]; [ easy | ].
-      injection HMM; clear HMM; intros; subst MMM'.
+      destruct n; [ easy | cbn ].
+      now specialize (Hss 0 0 (Nat.lt_0_succ _) (Nat.lt_0_succ _)) as H1.
+    } {
+      cbn.
+      specialize (Hss 0 0 (Nat.lt_0_succ _) (Nat.lt_0_succ _)) as H1.
+      cbn in H1.
+      unfold I_2_pow in H1 at 1.
+      now rewrite mmat_depth_IZ_2_pow in H1.
+    }
+  }
+}
+rewrite IHit; [ | easy | easy ].
+rewrite IHit; [ | | easy ].
+...
+
+rewrite IHit; [ | easy | easy ].
+rewrite IHit; [ | easy | easy ].
 ...
 rewrite IHit; [ | | easy ].
 rewrite IHit; [ | | easy ].
