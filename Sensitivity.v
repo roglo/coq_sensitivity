@@ -2498,6 +2498,15 @@ Theorem mmat_is_norm_mat_el (_ := so) : ∀ MMM i j,
   mmat_is_norm (MM_M MMM)
   → mmat_is_norm (mat_el void_mmat MMM i j).
 Proof.
+intros * Hmn.
+destruct MMM as (ll, r, c).
+destruct ll as [| l]; [ easy | ].
+destruct l as [| MM]; [ easy | ].
+cbn in Hmn; cbn.
+destruct Hmn as (Hmn & H1).
+unfold mat_is_norm in Hmn.
+cbn in Hmn.
+destruct Hmn; subst r c.
 ...
 
 (* if this theorem works, it would allow to cancel other theorems
