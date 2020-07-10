@@ -2456,7 +2456,27 @@ rewrite <- Hr, <- Hc; cbn.
 do 4 rewrite fold_mmat_add.
 rewrite fold_Z_2_pow.
 apply Nat.succ_le_mono in Hit.
-rewrite IHit; [ | | easy ].
+rewrite IHit; [ | | easy ]. 2: {
+  unfold mmat_have_same_struct.
+  unfold I_2_pow at 1.
+  rewrite mmat_depth_IZ_2_pow.
+...
+  destruct n. {
+    cbn.
+    remember (list_list_el _ _ _ _) as MM eqn:HMM.
+    destruct MM as [| MMM']; [ easy | exfalso ].
+    destruct MMM as (ll, r, c).
+    cbn in HMM, Hr, Hc; subst r c.
+...
+    clear - HMM.
+    induction ll as [| l]; [ easy | ].
+    cbn in HMM.
+    destruct ll as [| l']; cbn in IHll. {
+      destruct l as [| x]; [ easy | ].
+      cbn in HMM.
+      destruct x as [M| MMM]; [ easy | ].
+      injection HMM; clear HMM; intros; subst MMM'.
+...
 rewrite IHit; [ | | easy ].
 rewrite IHit; [ | | easy ].
 rewrite IHit; [ | | easy ].
@@ -2471,6 +2491,7 @@ destruct ll as [| l]. {
   rewrite mmat_depth_IZ_2_pow in H1.
   cbn in H1.
   destruct n; [ clear H1 | easy ].
+...
   cbn in Hss.
 ...
 unfold I_2_pow in Hss.
