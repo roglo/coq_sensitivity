@@ -2475,11 +2475,20 @@ Definition mat_is_norm T (M : matrix T) :=
   list_list_nrows (mat_list M) = mat_nrows M ∧
   list_list_ncols (mat_list M) = mat_ncols M.
 
-Definition mmat_is_norm T (MM : mmatrix T) :=
-  match MM with
-  | MM_1 _ => True
-  | MM_M MMM => mat_is_norm MMM
+Fixpoint mmat_is_norm_loop (_ := so) it (MM : mmatrix T) :=
+  match it with
+  | 0 => False
+  | S it' =>
+      match MM with
+      | MM_1 _ => True
+      | MM_M MMM =>
+          mat_is_norm MMM ∧
+          ∀ i j, i < mat_nrows MMM → j < mat_nrows MMM →
+          mmat_is_norm_loop it' (mat_el void_mmat MMM i j)
+      end
   end.
+
+Definition mmat_is_norm MM := mmat_is_norm_loop (mmat_depth MM) MM.
 
 (* if this theorem works, it would allow to cancel other theorems
    not so general *)
@@ -2509,6 +2518,7 @@ rewrite fold_Z_2_pow.
 apply Nat.succ_le_mono in Hit.
 rewrite IHit; [ | | | easy ]; cycle 1. {
   unfold mmat_is_norm.
+  cbn in Hmn.
 ...
 rewrite IHit; [ | | easy ]. 2: {
   now specialize (Hss 0 0 (Nat.lt_0_succ _) (Nat.lt_0_succ _)) as H1.
