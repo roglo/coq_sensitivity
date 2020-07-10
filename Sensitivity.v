@@ -2469,6 +2469,12 @@ rewrite IHit; [ | | easy ]. 2: {
   unfold mmat_have_same_struct.
   unfold I_2_pow at 2.
   unfold mat_el in H1.
+  unfold I_2_pow in H1 at 1.
+  unfold I_2_pow at 1.
+  rewrite mmat_depth_IZ_2_pow in H1.
+  rewrite mmat_depth_IZ_2_pow.
+...
+  cbn in H1; cbn.
 ...
 
 rewrite IHit; [ | easy | easy ].
