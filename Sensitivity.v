@@ -2490,6 +2490,16 @@ Fixpoint mmat_is_norm_loop (_ := so) it (MM : mmatrix T) :=
 
 Definition mmat_is_norm MM := mmat_is_norm_loop (mmat_depth MM) MM.
 
+Theorem fold_mat_el : ∀ T (d : T) M i j,
+  list_list_el d (mat_list M) i j = mat_el d M i j.
+Proof. easy. Qed.
+
+Theorem mmat_is_norm_mat_el (_ := so) : ∀ MMM i j,
+  mmat_is_norm (MM_M MMM)
+  → mmat_is_norm (mat_el void_mmat MMM i j).
+Proof.
+...
+
 (* if this theorem works, it would allow to cancel other theorems
    not so general *)
 Theorem glop (_ := so) : ∀ it n MM,
@@ -2517,6 +2527,10 @@ do 4 rewrite fold_mmat_add.
 rewrite fold_Z_2_pow.
 apply Nat.succ_le_mono in Hit.
 rewrite IHit; [ | | | easy ]; cycle 1. {
+  rewrite fold_mat_el.
+...
+now apply mmat_is_norm_mat_el.
+...
   unfold mmat_is_norm.
   cbn in Hmn.
 ...
