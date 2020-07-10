@@ -2471,25 +2471,26 @@ destruct j; [ now apply IHit | ].
 destruct j; [ now apply IHit | flia Hj ].
 Qed.
 
+Definition mat_is_norm T (M : matrix T) :=
+  list_list_nrows (mat_list M) = mat_nrows M ∧
+  list_list_ncols (mat_list M) = mat_ncols M.
+
+Definition mmat_is_norm T (MM : mmatrix T) :=
+  match MM with
+  | MM_1 _ => True
+  | MM_M MMM => mat_is_norm MMM
+  end.
+
 (* if this theorem works, it would allow to cancel other theorems
    not so general *)
 Theorem glop (_ := so) : ∀ it n MM,
-  mmat_have_same_struct (I_2_pow n) MM
+  mmat_is_norm MM
+  → mmat_have_same_struct (I_2_pow n) MM
   → S n ≤ it
   → mmat_mul_loop it (I_2_pow n) MM = MM.
 Proof.
-intros * Hss Hit.
-destruct MM as [x| MMM]; [ admit | ].
-destruct MMM as (ll, r, c); cbn.
-destruct ll as [| l]. {
-  cbn.
-  destruct it; [ easy | cbn ].
-  destruct n; [ easy | cbn ].
-cbn in Hss.
-...
-
-intros * Hss Hit.
-revert n MM Hss Hit.
+intros * Hmn Hss Hit.
+revert n MM Hmn Hss Hit.
 induction it; intros; [ easy | cbn ].
 destruct n. {
   cbn in Hss.
@@ -2506,6 +2507,9 @@ rewrite <- Hr, <- Hc; cbn.
 do 4 rewrite fold_mmat_add.
 rewrite fold_Z_2_pow.
 apply Nat.succ_le_mono in Hit.
+rewrite IHit; [ | | | easy ]; cycle 1. {
+  unfold mmat_is_norm.
+...
 rewrite IHit; [ | | easy ]. 2: {
   now specialize (Hss 0 0 (Nat.lt_0_succ _) (Nat.lt_0_succ _)) as H1.
 }
