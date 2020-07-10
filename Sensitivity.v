@@ -2369,6 +2369,8 @@ Fixpoint mmat_hss (_ := so) it (MMA MMB : mmatrix T) :=
           match MMB with
           | MM_1 _ => False
           | MM_M MMMB =>
+              mat_nrows MMMA = mat_nrows MMMB ∧
+              mat_ncols MMMA = mat_ncols MMMB ∧
               ∀ i j, i < mat_nrows MMMA → j < mat_ncols MMMA →
               mmat_hss it'
                 (mat_el void_mmat MMMA i j)
@@ -2429,6 +2431,8 @@ cbn; f_equal.
 now apply IHit.
 Qed.
 
+(* if this theorem works, it would allow to cancel other theorems
+   not so general *)
 Theorem glop (_ := so) : ∀ it n M,
   mmat_have_same_struct (I_2_pow n) M
   → S n ≤ it
@@ -2445,8 +2449,29 @@ destruct n. {
 destruct M as [x| MMM]; [ easy | ].
 cbn; f_equal.
 cbn in Hss.
+destruct Hss as (Hr & Hc & Hss).
 unfold mat_mul.
 cbn - [ Nat.eq_dec ].
+rewrite <- Hr, <- Hc; cbn.
+do 4 rewrite fold_mmat_add.
+rewrite fold_Z_2_pow.
+apply Nat.succ_le_mono in Hit.
+rewrite IHit; [ | | easy ].
+rewrite IHit; [ | | easy ].
+rewrite IHit; [ | | easy ].
+rewrite IHit; [ | | easy ].
+destruct MMM as (ll, r, c); cbn.
+cbn in Hr, Hc; subst r c.
+f_equal.
+destruct ll as [| l]. {
+  exfalso; cbn in Hss.
+  specialize (Hss 0 0 (Nat.lt_0_succ _) (Nat.lt_0_succ _)) as H1.
+  cbn in H1.
+  unfold I_2_pow in H1 at 1.
+  rewrite mmat_depth_IZ_2_pow in H1.
+  cbn in H1.
+  destruct n; [ clear H1 | easy ].
+  cbn in Hss.
 ...
 unfold I_2_pow in Hss.
 rewrite mmat_depth_IZ_2_pow in Hss.
