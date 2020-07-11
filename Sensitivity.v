@@ -2493,7 +2493,6 @@ Theorem fold_mat_el : ∀ T (d : T) M i j,
   list_list_el d (mat_list M) i j = mat_el d M i j.
 Proof. easy. Qed.
 
-(*
 Theorem mmat_is_norm_mat_el (_ := so) : ∀ MMM i j,
   mmat_is_norm (MM_M MMM)
   → mmat_is_norm (mat_el void_mmat MMM i j).
@@ -2519,9 +2518,7 @@ destruct (lt_dec j (S (length l))) as [Hj| Hj]. 2: {
   destruct j; [ easy | ].
   rewrite nth_overflow with (n := S j); [ easy | ].
   destruct i; cbn; [ easy | ].
-}
 ...
-*)
 
 (* if this theorem works, it would allow to cancel other theorems
    not so general *)
