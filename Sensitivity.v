@@ -1725,35 +1725,47 @@ Definition void_mat {T} : matrix T :=
   {| mat_list := []; mat_nrows := 0; mat_ncols := 0;
      mat_prop := void_mat_prop T |}.
 
-Theorem mat_of_list_prop : ∀ T ll,
-  length ll = list_list_nrows ll ∧
-   (∀ r : list T, r ∈ ll → length r = list_list_ncols ll).
+Theorem mat_of_list_prop : ∀ T (ll : list (list T)),
+  Forall (eq (length (hd [] ll))) (map (length (A:=T)) ll)
+  → length ll = list_list_nrows ll ∧
+     ∀ r : list T, r ∈ ll → length r = list_list_ncols ll.
 Proof.
-intros.
+intros * Hfa.
 split; [ easy | ].
-intros r Hr.
+intros * Hr.
+specialize (proj1 (Forall_forall _ _) Hfa) as H1.
+clear Hfa.
 unfold list_list_ncols.
-Abort.
-
-Definition list_all_same_length T (ll : list (list T)) :=
-  match ll with
-  | [] => True
-  | l1 :: ll' => Forall (λ l2, length l1 = length l2) ll'
-  end.
-
-(* ouais, y a une histoire de décidabilité de merde, là *)
+remember (hd [] ll) as l1; clear Heql1.
+induction ll as [| l2]; [ easy | ].
+destruct Hr as [Hr| Hr]. {
+  subst l2; symmetry.
+  apply H1; cbn.
+  now left.
+} {
+  apply IHll; [ easy | ].
+  intros x Hx.
+  apply H1; cbn.
+  now right.
+}
+Qed.
 
 Definition mat_of_list T (ll : list (list T)) : matrix T :=
-  if list_all_same_length ll then
-    {| mat_list := ll;
-       mat_nrows := list_list_nrows ll;
-       mat_ncols := list_list_ncols ll;
-       mat_prop := 42 |}
-  else void_mat.
-
-...
+  match
+    Forall_dec (eq (length (hd [] ll))) (Nat.eq_dec (length (hd [] ll)))
+      (map (@length _) ll)
+  with
+  | left P =>
+      {| mat_list := ll;
+         mat_nrows := list_list_nrows ll;
+         mat_ncols := list_list_ncols ll;
+         mat_prop := mat_of_list_prop ll P |}
+  | right _ => void_mat
+  end.
 
 Compute (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
+
+...
 
 Definition list_list_el T d (ll : list (list T)) i j : T :=
   nth j (nth i ll []) d.
