@@ -1706,7 +1706,10 @@ Require Import Semiring SRsummation.
 Record matrix T := mk_mat
   { mat_list : list (list T);
     mat_nrows : nat;
-    mat_ncols : nat }.
+    mat_ncols : nat;
+    mat_prop :
+      length mat_list = mat_nrows ∧
+      ∀ r, r ∈ mat_list → length r = mat_ncols }.
 
 Definition list_list_nrows T (ll : list (list T)) :=
   length ll.
@@ -1714,10 +1717,41 @@ Definition list_list_nrows T (ll : list (list T)) :=
 Definition list_list_ncols T (ll : list (list T)) :=
   length (hd [] ll).
 
+Theorem void_mat_prop : ∀ T,
+  length ([] : list T) = 0 ∧ (∀ r : list T, r ∈ [] → length r = 0).
+Proof. easy. Qed.
+
+Definition void_mat {T} : matrix T :=
+  {| mat_list := []; mat_nrows := 0; mat_ncols := 0;
+     mat_prop := void_mat_prop T |}.
+
+Theorem mat_of_list_prop : ∀ T ll,
+  length ll = list_list_nrows ll ∧
+   (∀ r : list T, r ∈ ll → length r = list_list_ncols ll).
+Proof.
+intros.
+split; [ easy | ].
+intros r Hr.
+unfold list_list_ncols.
+Abort.
+
+Definition list_all_same_length T (ll : list (list T)) :=
+  match ll with
+  | [] => True
+  | l1 :: ll' => Forall (λ l2, length l1 = length l2) ll'
+  end.
+
+(* ouais, y a une histoire de décidabilité de merde, là *)
+
 Definition mat_of_list T (ll : list (list T)) : matrix T :=
-  {| mat_list := ll;
-     mat_nrows := list_list_nrows ll;
-     mat_ncols := list_list_ncols ll |}.
+  if list_all_same_length ll then
+    {| mat_list := ll;
+       mat_nrows := list_list_nrows ll;
+       mat_ncols := list_list_ncols ll;
+       mat_prop := 42 |}
+  else void_mat.
+
+...
 
 Compute (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
 
@@ -1786,9 +1820,6 @@ Definition nat_semiring_op : semiring_op nat :=
 Compute (let _ := nat_semiring_op in list_list_mul 3 4 2 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] [[1; 2]; [3; 4]; [5; 6]; [0; 0]]).
 
 Compute (let _ := nat_semiring_op in list_list_mul 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
-
-Definition void_mat {T} : matrix T :=
-  {| mat_list := []; mat_nrows := 0; mat_ncols := 0 |}.
 
 (* multiplication of matrices is always defined, even if the resp # of
    rows (columns) of the first matrix is not equal to the # of rows
