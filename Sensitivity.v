@@ -2502,11 +2502,12 @@ intros * Hmn.
 destruct MMM as (ll, r, c).
 destruct ll as [| l]; [ easy | ].
 destruct l as [| MM]; [ easy | ].
-cbn in Hmn; cbn.
+cbn in Hmn |-*.
 destruct Hmn as (Hmn & H1).
 unfold mat_is_norm in Hmn.
 cbn in Hmn.
 destruct Hmn; subst r c.
+unfold mmat_is_norm.
 ...
 
 (* if this theorem works, it would allow to cancel other theorems
