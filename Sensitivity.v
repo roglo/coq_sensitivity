@@ -2483,8 +2483,7 @@ Fixpoint mmat_is_norm_loop (_ := so) it (MM : mmatrix T) :=
       | MM_1 _ => True
       | MM_M MMM =>
           mat_is_norm MMM ∧
-          ∀ i j, i < mat_nrows MMM → j < mat_nrows MMM →
-          mmat_is_norm_loop it' (mat_el void_mmat MMM i j)
+          mmat_is_norm_loop it' (mat_el void_mmat MMM 0 0)
       end
   end.
 
@@ -2494,6 +2493,7 @@ Theorem fold_mat_el : ∀ T (d : T) M i j,
   list_list_el d (mat_list M) i j = mat_el d M i j.
 Proof. easy. Qed.
 
+(*
 Theorem mmat_is_norm_mat_el (_ := so) : ∀ MMM i j,
   mmat_is_norm (MM_M MMM)
   → mmat_is_norm (mat_el void_mmat MMM i j).
@@ -2502,13 +2502,26 @@ intros * Hmn.
 destruct MMM as (ll, r, c).
 destruct ll as [| l]; [ easy | ].
 destruct l as [| MM]; [ easy | ].
-cbn in Hmn |-*.
 destruct Hmn as (Hmn & H1).
+cbn - [ mmat_is_norm ] in Hmn |-*.
 unfold mat_is_norm in Hmn.
-cbn in Hmn.
+cbn in Hmn, H1.
 destruct Hmn; subst r c.
-unfold mmat_is_norm.
+destruct (lt_dec i (S (length ll))) as [Hi| Hi]. 2: {
+  apply Nat.nlt_ge in Hi.
+  destruct i; [ easy | ].
+  apply Nat.succ_le_mono in Hi.
+  rewrite nth_overflow with (n := i); [ | easy ].
+  now destruct j.
+}
+destruct (lt_dec j (S (length l))) as [Hj| Hj]. 2: {
+  apply Nat.nlt_ge in Hj.
+  destruct j; [ easy | ].
+  rewrite nth_overflow with (n := S j); [ easy | ].
+  destruct i; cbn; [ easy | ].
+}
 ...
+*)
 
 (* if this theorem works, it would allow to cancel other theorems
    not so general *)
@@ -2544,10 +2557,13 @@ now apply mmat_is_norm_mat_el.
   unfold mmat_is_norm.
   cbn in Hmn.
 ...
-rewrite IHit; [ | | easy ]. 2: {
+rewrite IHit; [ | | easy ]. 2: *) {
   now specialize (Hss 0 0 (Nat.lt_0_succ _) (Nat.lt_0_succ _)) as H1.
 }
-rewrite IHit; [ | | easy ]. 2: {
+rewrite IHit; [ | | | easy ]. cycle 1. {
+  rewrite fold_mat_el.
+...
+} {
   specialize (Hss 0 1 Nat.lt_0_2 Nat.lt_1_2) as H1.
   cbn in H1.
   unfold mmat_have_same_struct.
