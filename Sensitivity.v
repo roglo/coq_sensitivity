@@ -2493,9 +2493,9 @@ Theorem fold_mat_el : ∀ T (d : T) M i j,
   list_list_el d (mat_list M) i j = mat_el d M i j.
 Proof. easy. Qed.
 
-Theorem mmat_is_norm_mat_el (_ := so) : ∀ MMM i j,
+Theorem mmat_is_norm_mat_el_0_0 (_ := so) : ∀ MMM,
   mmat_is_norm (MM_M MMM)
-  → mmat_is_norm (mat_el void_mmat MMM i j).
+  → mmat_is_norm (mat_el void_mmat MMM 0 0).
 Proof.
 intros * Hmn.
 destruct MMM as (ll, r, c).
@@ -2505,20 +2505,8 @@ destruct Hmn as (Hmn & H1).
 cbn - [ mmat_is_norm ] in Hmn |-*.
 unfold mat_is_norm in Hmn.
 cbn in Hmn, H1.
-destruct Hmn; subst r c.
-destruct (lt_dec i (S (length ll))) as [Hi| Hi]. 2: {
-  apply Nat.nlt_ge in Hi.
-  destruct i; [ easy | ].
-  apply Nat.succ_le_mono in Hi.
-  rewrite nth_overflow with (n := i); [ | easy ].
-  now destruct j.
-}
-destruct (lt_dec j (S (length l))) as [Hj| Hj]. 2: {
-  apply Nat.nlt_ge in Hj.
-  destruct j; [ easy | ].
-  rewrite nth_overflow with (n := S j); [ easy | ].
-  destruct i; cbn; [ easy | ].
-...
+now destruct Hmn; subst r c.
+Qed.
 
 (* if this theorem works, it would allow to cancel other theorems
    not so general *)
@@ -2548,16 +2536,11 @@ rewrite fold_Z_2_pow.
 apply Nat.succ_le_mono in Hit.
 rewrite IHit; [ | | | easy ]; cycle 1. {
   rewrite fold_mat_el.
-...
-now apply mmat_is_norm_mat_el.
-...
-  unfold mmat_is_norm.
-  cbn in Hmn.
-...
-rewrite IHit; [ | | easy ]. 2: *) {
+  now apply mmat_is_norm_mat_el_0_0.
+} {
   now specialize (Hss 0 0 (Nat.lt_0_succ _) (Nat.lt_0_succ _)) as H1.
 }
-rewrite IHit; [ | | | easy ]. cycle 1. {
+rewrite IHit; [ | | | easy ]; cycle 1. {
   rewrite fold_mat_el.
 ...
 } {
