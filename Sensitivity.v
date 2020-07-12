@@ -1712,6 +1712,7 @@ Record matrix T := mk_mat
   { mat_def : matrix_def T;
     mat_prop :
       length (mat_list mat_def) = mat_nrows mat_def ∧
+      (mat_list mat_def = [] → mat_ncols mat_def = 0) ∧
       ∀ r, r ∈ mat_list mat_def → length r = mat_ncols mat_def }.
 
 Definition list_list_nrows T (ll : list (list T)) :=
@@ -1720,22 +1721,27 @@ Definition list_list_nrows T (ll : list (list T)) :=
 Definition list_list_ncols T (ll : list (list T)) :=
   length (hd [] ll).
 
-Theorem void_mat_prop : ∀ T,
-  length ([] : list T) = 0 ∧ (∀ r : list T, r ∈ [] → length r = 0).
+Theorem void_mat_prop : ∀ T
+  (md :=
+     {| mat_list := ([] : list (list T)); mat_nrows := 0; mat_ncols := 0 |}),
+  length (mat_list md) = mat_nrows md
+  ∧ (mat_list md = [] → mat_ncols md = 0)
+    ∧ (∀ r, r ∈ mat_list md → length r = mat_ncols md).
 Proof. easy. Qed.
 
 Definition void_mat {T} : matrix T :=
-  {| mat_def :=
-       {| mat_list := []; mat_nrows := 0; mat_ncols := 0 |};
+  {| mat_def := {| mat_list := []; mat_nrows := 0; mat_ncols := 0 |};
      mat_prop := void_mat_prop T |}.
 
 Theorem mat_of_list_prop : ∀ T (ll : list (list T)),
   Forall (eq (length (hd [] ll))) (map (length (A:=T)) ll)
   → length ll = list_list_nrows ll ∧
+     (ll = [] → list_list_ncols ll = 0) ∧
      ∀ r : list T, r ∈ ll → length r = list_list_ncols ll.
 Proof.
 intros * Hfa.
 split; [ easy | ].
+split; [ now intros; subst ll | ].
 intros * Hr.
 specialize (proj1 (Forall_forall _ _) Hfa) as H1.
 clear Hfa.
@@ -1808,12 +1814,9 @@ split. {
   cbn; unfold list_list_transpose.
   rewrite map_length, seq_length.
   unfold list_list_ncols.
-  destruct M as (Md, (Mr, Mc)); cbn.
+  destruct M as (Md, (Mr & Mc1 & Mc2)); cbn.
   remember (mat_list Md) as ll eqn:Hll; symmetry in Hll.
-  destruct ll as [| l]. {
-    cbn.
-    destruct Md as (ll, r, c).
-    cbn in Hll, Mr, Mc; cbn.
+  destruct ll as [| l]; [ now symmetry; apply Mc1 | ].
 ...
   apply Mc.
   remember (mat_list Md) as ll eqn:Hll; symmetry in Hll.
