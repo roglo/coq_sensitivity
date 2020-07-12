@@ -1713,8 +1713,7 @@ Record matrix T := mk_mat
     mat_prop :
       length (mat_list mat_def) = mat_nrows mat_def ∧
       (∀ r, r ∈ mat_list mat_def → length r = mat_ncols mat_def) ∧
-      (mat_list mat_def = [] ↔ mat_nrows mat_def = 0) ∧
-      (mat_list mat_def = [] ↔ mat_ncols mat_def = 0) }.
+      (mat_nrows mat_def = 0 ↔ mat_ncols mat_def = 0) }.
 
 Definition list_list_nrows T (ll : list (list T)) :=
   length ll.
@@ -1723,74 +1722,59 @@ Definition list_list_ncols T (ll : list (list T)) :=
   length (hd [] ll).
 
 Theorem void_mat_prop : ∀ T
-  (md :=
-     {| mat_list := ([] : list (list T)); mat_nrows := 0; mat_ncols := 0 |}),
-  length (mat_list md) = mat_nrows md
-  ∧ (mat_nrows md = 0 ↔ mat_ncols md = 0)
-    ∧ (∀ r, r ∈ mat_list md → length r = mat_ncols md).
+  (Md := mk_mat_def ([] : list (list T)) 0 0),
+  length (mat_list Md) = mat_nrows Md ∧
+  (∀ r, r ∈ mat_list Md → length r = mat_ncols Md) ∧
+  (mat_nrows Md = 0 ↔ mat_ncols Md = 0).
 Proof. easy. Qed.
-
-...
 
 Definition void_mat {T} : matrix T :=
   {| mat_def := {| mat_list := []; mat_nrows := 0; mat_ncols := 0 |};
      mat_prop := void_mat_prop T |}.
-
-Theorem mat_of_list_prop : ∀ T (ll : list (list T)),
-  Forall (eq (length (hd [] ll))) (map (length (A:=T)) ll)
-  → length ll = list_list_nrows ll ∧
-     (list_list_nrows ll = 0 ↔ list_list_ncols ll = 0) ∧
-     ∀ r : list T, r ∈ ll → length r = list_list_ncols ll.
-Proof.
-intros * Hfa.
-split; [ easy | ].
-split. {
-  unfold list_list_nrows, list_list_ncols.
-  split; intros H1. {
-    now apply length_zero_iff_nil in H1; subst ll.
-  } {
-    apply length_zero_iff_nil in H1.
-    destruct ll as [| l]; [ easy | ].
-    cbn in H1; subst l; exfalso.
-    cbn in Hfa.
-...
-
- [ now intros; subst ll | ].
-intros * Hr.
-specialize (proj1 (Forall_forall _ _) Hfa) as H1.
-clear Hfa.
-unfold list_list_ncols.
-remember (hd [] ll) as l1; clear Heql1.
-induction ll as [| l2]; [ easy | ].
-destruct Hr as [Hr| Hr]. {
-  subst l2; symmetry.
-  apply H1; cbn.
-  now left.
-} {
-  apply IHll; [ easy | ].
-  intros x Hx.
-  apply H1; cbn.
-  now right.
-}
-Qed.
 
 Definition mat_def_of_list T (ll : list (list T)) : matrix_def T :=
   {| mat_list := ll;
      mat_nrows := list_list_nrows ll;
      mat_ncols := list_list_ncols ll |}.
 
+Theorem mat_of_list_prop : ∀ T (x : T) l (ll : list (list T)),
+  Forall (eq (length (x :: l))) (map (length (A:=T)) ll)
+ → length ((x :: l) :: ll) = length ((x :: l) :: ll) ∧
+    (∀ r, r ∈ (x :: l) :: ll → length r = length (x :: l)) ∧
+    (length ((x :: l) :: ll) = 0 ↔ length (x :: l) = 0).
+Proof.
+intros * Hfa.
+split; [ easy | ].
+split; [ | easy ].
+intros * Hr.
+specialize (proj1 (Forall_forall _ _) Hfa) as H1.
+unfold list_list_ncols.
+destruct Hr as [Hr| Hr]; [ now subst r | ].
+cbn; symmetry.
+apply H1.
+apply in_map_iff.
+now exists r.
+Qed.
+
 Definition mat_of_list T (ll : list (list T)) : matrix T :=
-  match
-    Forall_dec (eq (length (hd [] ll))) (Nat.eq_dec (length (hd [] ll)))
-      (map (@length _) ll)
-  with
-  | left P =>
-      {| mat_def := mat_def_of_list ll;
-         mat_prop := mat_of_list_prop ll P |}
-  | right _ => void_mat
+  match ll with
+  | [] | [] :: _ => void_mat
+  | (x :: l) :: ll' =>
+      match
+        Forall_dec (eq (length (x :: l))) (Nat.eq_dec (length (x :: l)))
+          (map (@length _) ll')
+      with
+      | left P =>
+          {| mat_def := mat_def_of_list ((x :: l) :: ll');
+             mat_prop := @mat_of_list_prop T x l ll' P |}
+      | right _ => void_mat
+      end
   end.
 
 Compute (mat_def_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
+Compute (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
+
+...
 
 Definition list_list_el T d (ll : list (list T)) i j : T :=
   nth j (nth i ll []) d.
