@@ -1774,8 +1774,6 @@ Definition mat_of_list T (ll : list (list T)) : matrix T :=
 Compute (mat_def_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
 Compute (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
 
-...
-
 Definition list_list_el T d (ll : list (list T)) i j : T :=
   nth j (nth i ll []) d.
 
@@ -1803,11 +1801,11 @@ Definition mat_def_transpose T (d : T) (M : matrix_def T) : matrix_def T :=
 Theorem mat_transpose_prop : ∀ T d M,
   length (mat_list (mat_def_transpose d (mat_def M))) =
   mat_nrows (mat_def_transpose d (mat_def M))
-  ∧ (mat_list (mat_def_transpose d (mat_def M)) = []
-     → mat_ncols (mat_def_transpose d (mat_def M)) = 0)
   ∧ (∀ r : list T,
        r ∈ mat_list (mat_def_transpose d (mat_def M))
-       → length r = mat_ncols (mat_def_transpose d (mat_def M))).
+       → length r = mat_ncols (mat_def_transpose d (mat_def M)))
+    ∧ (mat_nrows (mat_def_transpose d (mat_def M)) = 0
+       ↔ mat_ncols (mat_def_transpose d (mat_def M)) = 0).
 Proof.
 intros.
 split. {
@@ -1816,24 +1814,14 @@ split. {
   unfold list_list_ncols.
   destruct M as (Md, (Mr & Mc1 & Mc2)); cbn.
   remember (mat_list Md) as ll eqn:Hll; symmetry in Hll.
-  destruct ll as [| l]; [ now symmetry; apply Mc1 | ].
-  apply Mc2.
+  destruct ll as [| l]. {
+    cbn; symmetry.
+    now apply Mc2; symmetry.
+  }
+  apply Mc1.
   now left.
 }
 split. {
-  intros H1.
-  cbn.
-  destruct M as (Md, (Mr & Mc1 & Mc2)); cbn in H1; cbn.
-  remember (mat_list Md) as ll eqn:Hll; symmetry in Hll.
-  destruct ll as [| l]; [ easy | exfalso ].
-  cbn in H1.
-  apply map_eq_nil in H1.
-  destruct l; [ | easy ].
-  clear Mc1 H1.
-  cbn in Mr.
-(* ah bin ouais mais toutes les colonnes sont vides *)
-...
-} {
   intros * Hr.
   cbn in Hr; cbn.
   destruct M as (Md, (Mr & Mc1 & Mc2)); cbn in Hr; cbn.
@@ -1845,6 +1833,9 @@ split. {
   destruct Hr as (r' & Hr & Hr').
   subst r; cbn; f_equal.
   now rewrite map_length, seq_length.
+} {
+  destruct M as (Md, (Mr & Mc1 & Mc2)).
+  now split; intros; apply Mc2.
 }
 Qed.
 
@@ -1852,6 +1843,7 @@ Definition mat_transpose T (d : T) (M : matrix T) : matrix T :=
   {| mat_def := mat_def_transpose d (mat_def M);
      mat_prop := mat_transpose_prop d M |}.
 
+Compute (mat_def_transpose 0 (mat_def_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
 Compute (mat_transpose 0 (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
 
 Definition list_list_add T {so : semiring_op T} r c
@@ -1894,14 +1886,7 @@ Compute (let _ := nat_semiring_op in list_list_mul 3 4 2 [[1; 2; 3; 4]; [5; 6; 7
 
 Compute (let _ := nat_semiring_op in list_list_mul 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
 
-(* multiplication of matrices is always defined, even if the resp # of
-   rows (columns) of the first matrix is not equal to the # of rows
-   (columns) of ths second one ; in that case, the result has no sense *)
-
-(* multiplication of matrices is always defined, even if the # of columns
-   of the first matrice is not equal to the # of rows of the second one;
-   in that case, the result has not sense; theorems likely have to add the
-   condition among its hypotheses *)
+...
 
 Definition mat_add T {so : semiring_op T} (M1 M2 : matrix T) : matrix T :=
   if Nat.eq_dec (mat_nrows M1) (mat_nrows M2) then
