@@ -1703,13 +1703,16 @@ Require Import Semiring SRsummation.
 
 (* matrices *)
 
-Record matrix T := mk_mat
+Record matrix_def T := mk_mat_def
   { mat_list : list (list T);
     mat_nrows : nat;
-    mat_ncols : nat;
+    mat_ncols : nat }.
+
+Record matrix T := mk_mat
+  { mat_def : matrix_def T;
     mat_prop :
-      length mat_list = mat_nrows ∧
-      ∀ r, r ∈ mat_list → length r = mat_ncols }.
+      length (mat_list mat_def) = mat_nrows mat_def ∧
+      ∀ r, r ∈ mat_list mat_def → length r = mat_ncols mat_def }.
 
 Definition list_list_nrows T (ll : list (list T)) :=
   length ll.
@@ -1722,7 +1725,8 @@ Theorem void_mat_prop : ∀ T,
 Proof. easy. Qed.
 
 Definition void_mat {T} : matrix T :=
-  {| mat_list := []; mat_nrows := 0; mat_ncols := 0;
+  {| mat_def :=
+       {| mat_list := []; mat_nrows := 0; mat_ncols := 0 |};
      mat_prop := void_mat_prop T |}.
 
 Theorem mat_of_list_prop : ∀ T (ll : list (list T)),
@@ -1750,22 +1754,23 @@ destruct Hr as [Hr| Hr]. {
 }
 Qed.
 
+Definition mat_def_of_list T (ll : list (list T)) : matrix_def T :=
+  {| mat_list := ll;
+     mat_nrows := list_list_nrows ll;
+     mat_ncols := list_list_ncols ll |}.
+
 Definition mat_of_list T (ll : list (list T)) : matrix T :=
   match
     Forall_dec (eq (length (hd [] ll))) (Nat.eq_dec (length (hd [] ll)))
       (map (@length _) ll)
   with
   | left P =>
-      {| mat_list := ll;
-         mat_nrows := list_list_nrows ll;
-         mat_ncols := list_list_ncols ll;
+      {| mat_def := mat_def_of_list ll;
          mat_prop := mat_of_list_prop ll P |}
   | right _ => void_mat
   end.
 
-Compute (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
-
-...
+Compute (mat_def_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
 
 Definition list_list_el T d (ll : list (list T)) i j : T :=
   nth j (nth i ll []) d.
@@ -1774,7 +1779,7 @@ Compute (let (i, j) := (2, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9
 Compute (let (i, j) := (7, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j).
 
 Definition mat_el T d (M : matrix T) i j : T :=
-  list_list_el d (mat_list M) i j.
+  list_list_el d (mat_list (mat_def M)) i j.
 
 Compute (let (i, j) := (2, 1) in mat_el 42 (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix nat) i j).
 Compute (let (i, j) := (7, 1) in mat_el 42 (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix nat) i j).
@@ -1786,10 +1791,39 @@ Definition list_list_transpose {T} d (ll : list (list T)) : list (list T) :=
 
 Compute (list_list_transpose 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]).
 
-Definition mat_transpose T (d : T) (M : matrix T) : matrix T :=
+Definition mat_def_transpose T (d : T) (M : matrix_def T) : matrix_def T :=
   {| mat_list := list_list_transpose d (mat_list M);
      mat_nrows := mat_ncols M;
      mat_ncols := mat_nrows M |}.
+
+Theorem mat_transpose_prop : ∀ T d M,
+  length (mat_list (mat_def_transpose d (mat_def M))) =
+  mat_nrows (mat_def_transpose d (mat_def M))
+  ∧ (∀ r : list T,
+       r ∈ mat_list (mat_def_transpose d (mat_def M))
+       → length r = mat_ncols (mat_def_transpose d (mat_def M))).
+Proof.
+intros.
+split. {
+  cbn; unfold list_list_transpose.
+  rewrite map_length, seq_length.
+  unfold list_list_ncols.
+  destruct M as (Md, (Mr, Mc)); cbn.
+  remember (mat_list Md) as ll eqn:Hll; symmetry in Hll.
+  destruct ll as [| l]. {
+    cbn.
+    destruct Md as (ll, r, c).
+    cbn in Hll, Mr, Mc; cbn.
+...
+  apply Mc.
+  remember (mat_list Md) as ll eqn:Hll; symmetry in Hll.
+  destruct ll as [| l]. {
+    cbn.
+...
+
+Definition mat_transpose T (d : T) (M : matrix T) : matrix T :=
+  {| mat_def := mat_def_transpose d (mat_def M);
+     mat_prop := mat_transpose_prop d M |}.
 
 Compute (mat_transpose 0 (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
 
