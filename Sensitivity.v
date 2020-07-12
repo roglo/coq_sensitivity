@@ -1721,6 +1721,9 @@ Definition list_list_nrows T (ll : list (list T)) :=
 Definition list_list_ncols T (ll : list (list T)) :=
   length (hd [] ll).
 
+Definition void_mat_def {T} : matrix_def T :=
+  {| mat_list := []; mat_nrows := 0; mat_ncols := 0 |}.
+
 Theorem void_mat_prop : ∀ T
   (Md := mk_mat_def ([] : list (list T)) 0 0),
   length (mat_list Md) = mat_nrows Md ∧
@@ -1729,8 +1732,7 @@ Theorem void_mat_prop : ∀ T
 Proof. easy. Qed.
 
 Definition void_mat {T} : matrix T :=
-  {| mat_def := {| mat_list := []; mat_nrows := 0; mat_ncols := 0 |};
-     mat_prop := void_mat_prop T |}.
+  {| mat_def := void_mat_def; mat_prop := void_mat_prop T |}.
 
 Definition mat_def_of_list T (ll : list (list T)) : matrix_def T :=
   {| mat_list := ll;
@@ -1886,9 +1888,8 @@ Compute (let _ := nat_semiring_op in list_list_mul 3 4 2 [[1; 2; 3; 4]; [5; 6; 7
 
 Compute (let _ := nat_semiring_op in list_list_mul 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
 
-...
-
-Definition mat_add T {so : semiring_op T} (M1 M2 : matrix T) : matrix T :=
+Definition mat_def_add T {so : semiring_op T} (M1 M2 : matrix_def T) :
+    matrix_def T :=
   if Nat.eq_dec (mat_nrows M1) (mat_nrows M2) then
     if Nat.eq_dec (mat_ncols M1) (mat_ncols M2) then
       {| mat_list :=
@@ -1896,8 +1897,51 @@ Definition mat_add T {so : semiring_op T} (M1 M2 : matrix T) : matrix T :=
              (mat_list M2);
          mat_nrows := mat_nrows M1;
          mat_ncols := mat_ncols M1 |}
-    else void_mat
-  else void_mat.
+    else void_mat_def
+  else void_mat_def.
+
+Theorem mat_add_prop : ∀ T {so : semiring_op T} MA MB,
+  length (mat_list (mat_def_add (mat_def MA) (mat_def MB))) =
+  mat_nrows (mat_def_add (mat_def MA) (mat_def MB))
+  ∧ (∀ r : list T,
+       r ∈ mat_list (mat_def_add (mat_def MA) (mat_def MB))
+       → length r = mat_ncols (mat_def_add (mat_def MA) (mat_def MB)))
+    ∧ (mat_nrows (mat_def_add (mat_def MA) (mat_def MB)) = 0
+       ↔ mat_ncols (mat_def_add (mat_def MA) (mat_def MB)) = 0).
+Proof.
+intros.
+split. {
+  unfold mat_def_add; cbn.
+  destruct (Nat.eq_dec (mat_nrows (mat_def MA)) (mat_nrows (mat_def MB)))
+    as [Hrr| Hrr]; [ | easy ].
+  destruct (Nat.eq_dec (mat_ncols (mat_def MA)) (mat_ncols (mat_def MB)))
+    as [Hcc| Hcc]; [ | easy ].
+  cbn; unfold list_list_add.
+  now rewrite map_length, seq_length.
+}
+split. {
+  intros * Hr.
+  unfold mat_def_add; cbn.
+  unfold mat_def_add in Hr.
+  destruct (Nat.eq_dec (mat_nrows (mat_def MA)) (mat_nrows (mat_def MB)))
+    as [Hrr| Hrr]; [ | easy ].
+  destruct (Nat.eq_dec (mat_ncols (mat_def MA)) (mat_ncols (mat_def MB)))
+    as [Hcc| Hcc]; [ | easy ].
+  cbn in Hr; cbn.
+  unfold list_list_add in Hr.
+  apply in_map_iff in Hr.
+  destruct Hr as (i & Him & Hi).
+  subst r.
+  now rewrite map_length, seq_length.
+}
+split; intros H1. {
+  unfold mat_def_add in H1 |-*.
+...
+
+Definition mat_add T {so : semiring_op T} (MA MB : matrix T) : matrix T :=
+  {| mat_def := mat_def_add (mat_def MA) (mat_def MB);
+     mat_prop := mat_add_prop MA MB |}.
+...
 
 Definition mat_mul {T} {so : semiring_op T} (M1 M2 : matrix T) : matrix T :=
   if Nat.eq_dec (mat_ncols M1) (mat_nrows M2) then
