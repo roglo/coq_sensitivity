@@ -1712,7 +1712,7 @@ Record matrix T := mk_mat
   { mat_def : matrix_def T;
     mat_prop :
       length (mat_list mat_def) = mat_nrows mat_def ∧
-      (mat_list mat_def = [] → mat_ncols mat_def = 0) ∧
+      (mat_nrows mat_def = 0 ↔ mat_ncols mat_def = 0) ∧
       ∀ r, r ∈ mat_list mat_def → length r = mat_ncols mat_def }.
 
 Definition list_list_nrows T (ll : list (list T)) :=
@@ -1725,7 +1725,7 @@ Theorem void_mat_prop : ∀ T
   (md :=
      {| mat_list := ([] : list (list T)); mat_nrows := 0; mat_ncols := 0 |}),
   length (mat_list md) = mat_nrows md
-  ∧ (mat_list md = [] → mat_ncols md = 0)
+  ∧ (mat_nrows md = 0 ↔ mat_ncols md = 0)
     ∧ (∀ r, r ∈ mat_list md → length r = mat_ncols md).
 Proof. easy. Qed.
 
@@ -1736,12 +1736,23 @@ Definition void_mat {T} : matrix T :=
 Theorem mat_of_list_prop : ∀ T (ll : list (list T)),
   Forall (eq (length (hd [] ll))) (map (length (A:=T)) ll)
   → length ll = list_list_nrows ll ∧
-     (ll = [] → list_list_ncols ll = 0) ∧
+     (list_list_nrows ll = 0 ↔ list_list_ncols ll = 0) ∧
      ∀ r : list T, r ∈ ll → length r = list_list_ncols ll.
 Proof.
 intros * Hfa.
 split; [ easy | ].
-split; [ now intros; subst ll | ].
+split. {
+  unfold list_list_nrows, list_list_ncols.
+  split; intros H1. {
+    now apply length_zero_iff_nil in H1; subst ll.
+  } {
+    apply length_zero_iff_nil in H1.
+    destruct ll as [| l]; [ easy | ].
+    cbn in H1; subst l; exfalso.
+    cbn in Hfa.
+...
+
+ [ now intros; subst ll | ].
 intros * Hr.
 specialize (proj1 (Forall_forall _ _) Hfa) as H1.
 clear Hfa.
