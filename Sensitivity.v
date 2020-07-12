@@ -1712,8 +1712,9 @@ Record matrix T := mk_mat
   { mat_def : matrix_def T;
     mat_prop :
       length (mat_list mat_def) = mat_nrows mat_def ∧
-      (mat_nrows mat_def = 0 ↔ mat_ncols mat_def = 0) ∧
-      ∀ r, r ∈ mat_list mat_def → length r = mat_ncols mat_def }.
+      (∀ r, r ∈ mat_list mat_def → length r = mat_ncols mat_def) ∧
+      (mat_list mat_def = [] ↔ mat_nrows mat_def = 0) ∧
+      (mat_list mat_def = [] ↔ mat_ncols mat_def = 0) }.
 
 Definition list_list_nrows T (ll : list (list T)) :=
   length ll.
@@ -1728,6 +1729,8 @@ Theorem void_mat_prop : ∀ T
   ∧ (mat_nrows md = 0 ↔ mat_ncols md = 0)
     ∧ (∀ r, r ∈ mat_list md → length r = mat_ncols md).
 Proof. easy. Qed.
+
+...
 
 Definition void_mat {T} : matrix T :=
   {| mat_def := {| mat_list := []; mat_nrows := 0; mat_ncols := 0 |};
