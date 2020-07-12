@@ -1805,6 +1805,8 @@ Definition mat_def_transpose T (d : T) (M : matrix_def T) : matrix_def T :=
 Theorem mat_transpose_prop : ∀ T d M,
   length (mat_list (mat_def_transpose d (mat_def M))) =
   mat_nrows (mat_def_transpose d (mat_def M))
+  ∧ (mat_list (mat_def_transpose d (mat_def M)) = []
+     → mat_ncols (mat_def_transpose d (mat_def M)) = 0)
   ∧ (∀ r : list T,
        r ∈ mat_list (mat_def_transpose d (mat_def M))
        → length r = mat_ncols (mat_def_transpose d (mat_def M))).
@@ -1817,12 +1819,36 @@ split. {
   destruct M as (Md, (Mr & Mc1 & Mc2)); cbn.
   remember (mat_list Md) as ll eqn:Hll; symmetry in Hll.
   destruct ll as [| l]; [ now symmetry; apply Mc1 | ].
-...
-  apply Mc.
+  apply Mc2.
+  now left.
+}
+split. {
+  intros H1.
+  cbn.
+  destruct M as (Md, (Mr & Mc1 & Mc2)); cbn in H1; cbn.
   remember (mat_list Md) as ll eqn:Hll; symmetry in Hll.
-  destruct ll as [| l]. {
-    cbn.
+  destruct ll as [| l]; [ easy | exfalso ].
+  cbn in H1.
+  apply map_eq_nil in H1.
+  destruct l; [ | easy ].
+  clear Mc1 H1.
+  cbn in Mr.
+(* ah bin ouais mais toutes les colonnes sont vides *)
 ...
+} {
+  intros * Hr.
+  cbn in Hr; cbn.
+  destruct M as (Md, (Mr & Mc1 & Mc2)); cbn in Hr; cbn.
+  remember (mat_list Md) as ll eqn:Hll; symmetry in Hll.
+  destruct ll as [| l]; [ easy | ].
+  rewrite <- Mr.
+  cbn in Hr.
+  apply in_map_iff in Hr.
+  destruct Hr as (r' & Hr & Hr').
+  subst r; cbn; f_equal.
+  now rewrite map_length, seq_length.
+}
+Qed.
 
 Definition mat_transpose T (d : T) (M : matrix T) : matrix T :=
   {| mat_def := mat_def_transpose d (mat_def M);
