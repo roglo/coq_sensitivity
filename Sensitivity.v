@@ -2243,7 +2243,7 @@ Definition mmat_def_of_list T (ll : list (list (mmatrix T))) :
 
 Theorem mmat_prop_of_list : ∀ T (ll : list (list (mmatrix T))),
   matrix_prop (mmat_def_of_list ll).
-Admitted.
+...
 
 Definition mmat_of_list T (ll : list (list (mmatrix T))) :
     matrix (mmatrix T) :=
@@ -2263,7 +2263,7 @@ Fixpoint IZ_2_pow_def T {ro : ring_op T} u n :=
 
 Theorem IZ_2_pow_prop : ∀ T {ro : ring_op T} u n,
   mmatrix_prop (IZ_2_pow_def u n).
-Admitted.
+...
 
 Definition IZ_2_pow T {ro : ring_op T} u n : mmatrix T :=
   {| mmat_def := IZ_2_pow_def u n;
