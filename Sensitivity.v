@@ -1732,9 +1732,6 @@ Definition list_list_nrows T (ll : list (list T)) :=
 Definition list_list_ncols T (ll : list (list T)) :=
   length (hd [] ll).
 
-Definition void_mat_def {T} : matrix_def T :=
-  {| mat_list := []; mat_nrows := 0; mat_ncols := 0 |}.
-
 Theorem matrix_eq_eq {T} : ∀ (MA MB : matrix T),
   MA = MB ↔ mat_def MA = mat_def MB.
 Proof.
@@ -1758,11 +1755,10 @@ f_equal. {
 }
 Qed.
 
-Theorem void_mat_prop : ∀ T
-  (Md := mk_mat_def ([] : list (list T)) 0 0),
-  length (mat_list Md) = mat_nrows Md ∧
-  all_lists_same_length (mat_ncols Md) (mat_list Md) = true ∧
-  zero_together (mat_nrows Md) (mat_ncols Md) = true.
+Definition void_mat_def {T} : matrix_def T :=
+  {| mat_list := []; mat_nrows := 0; mat_ncols := 0 |}.
+
+Theorem void_mat_prop : ∀ T, matrix_prop (void_mat_def : matrix_def T).
 Proof. easy. Qed.
 
 Definition void_mat {T} : matrix T :=
@@ -1773,23 +1769,26 @@ Definition mat_def_of_list T (ll : list (list T)) : matrix_def T :=
      mat_nrows := list_list_nrows ll;
      mat_ncols := list_list_ncols ll |}.
 
-Theorem mat_of_list_prop : ∀ T (x : T) l (ll : list (list T)),
-  Forall (eq (length (x :: l))) (map (length (A:=T)) ll)
- → length ((x :: l) :: ll) = length ((x :: l) :: ll) ∧
-    (∀ r, r ∈ (x :: l) :: ll → length r = length (x :: l)) ∧
-    (length ((x :: l) :: ll) = 0 ↔ length (x :: l) = 0).
+Theorem mat_of_list_prop : ∀ T x l1 ll1,
+  Forall (eq (length (x :: l1))) (map (length (A:=T)) ll1)
+  → matrix_prop (mat_def_of_list ((x :: l1) :: ll1) : matrix_def T).
 Proof.
 intros * Hfa.
 split; [ easy | ].
 split; [ | easy ].
-intros * Hr.
+cbn; rewrite Nat.eqb_refl.
+induction ll1 as [| l2]; [ easy | ].
 specialize (proj1 (Forall_forall _ _) Hfa) as H1.
-unfold list_list_ncols.
-destruct Hr as [Hr| Hr]; [ now subst r | ].
-cbn; symmetry.
+cbn in H1; cbn.
+specialize (H1 (length l2) (or_introl eq_refl)) as H2.
+rewrite <- H2; cbn.
+rewrite Nat.eqb_refl.
+apply IHll1.
+cbn in Hfa; cbn.
+apply Forall_forall.
+intros y Hy.
 apply H1.
-apply in_map_iff.
-now exists r.
+now right.
 Qed.
 
 Definition mat_of_list T (ll : list (list T)) : matrix T :=
@@ -1802,12 +1801,10 @@ Definition mat_of_list T (ll : list (list T)) : matrix T :=
       with
       | left P =>
           {| mat_def := mat_def_of_list ((x :: l) :: ll');
-             mat_prop := @mat_of_list_prop T x l ll' P |}
+             mat_prop := mat_of_list_prop ll' P |}
       | right _ => void_mat
       end
   end.
-
-...
 
 Compute (mat_def_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
 Compute (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
@@ -1837,23 +1834,38 @@ Definition mat_def_transpose T (d : T) (M : matrix_def T) : matrix_def T :=
      mat_ncols := mat_nrows M |}.
 
 Theorem mat_transpose_prop : ∀ T d M,
-  length (mat_list (mat_def_transpose d (mat_def M))) =
-  mat_nrows (mat_def_transpose d (mat_def M))
-  ∧ (∀ r : list T,
-       r ∈ mat_list (mat_def_transpose d (mat_def M))
-       → length r = mat_ncols (mat_def_transpose d (mat_def M)))
-    ∧ (mat_nrows (mat_def_transpose d (mat_def M)) = 0
-       ↔ mat_ncols (mat_def_transpose d (mat_def M)) = 0).
+  matrix_prop (mat_def_transpose d (mat_def M) : matrix_def T).
 Proof.
 intros.
 split. {
   cbn; unfold list_list_transpose.
   rewrite map_length, seq_length.
   unfold list_list_ncols.
-  destruct M as (Md, (Mr & Mc1 & Mc2)); cbn.
+  destruct M as (Md, (Hr & Hc1 & Hc2)); cbn.
+  destruct (mat_list Md) as [| l ll]. {
+    cbn; symmetry.
+    unfold zero_together in Hc2.
+    rewrite <- Hr in Hc2; cbn in Hc2.
+    now destruct (mat_ncols Md).
+  } {
+    cbn in Hc1; cbn.
+    clear - Hc1.
+    revert l Hc1.
+    induction ll as [| l1]; intros. {
+      cbn in Hc1.
+      now apply Nat.eqb_eq in Hc1.
+    } {
+      cbn in Hc1.
+      apply IHll.
+Search (fold_left _ _ (_ && _)).
+...
+      apply -> Bool.andb_true_iff in Hc1.
+...
+  remember (mat_list Md) as ll eqn:Hll; symmetry in Hll.
   remember (mat_list Md) as ll eqn:Hll; symmetry in Hll.
   destruct ll as [| l]. {
     cbn; symmetry.
+(*
     now apply Mc2; symmetry.
   }
   apply Mc1.
@@ -1876,6 +1888,7 @@ split. {
   now split; intros; apply Mc2.
 }
 Qed.
+*)
 
 Definition mat_transpose T (d : T) (M : matrix T) : matrix T :=
   {| mat_def := mat_def_transpose d (mat_def M);
