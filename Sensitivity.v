@@ -1833,7 +1833,7 @@ Definition mat_def_transpose T (d : T) (M : matrix_def T) : matrix_def T :=
      mat_nrows := mat_ncols M;
      mat_ncols := mat_nrows M |}.
 
-Theorem mat_transpose_prop : ∀ T d M,
+Theorem mat_prop_transpose : ∀ T d M,
   matrix_prop (mat_def_transpose d (mat_def M) : matrix_def T).
 Proof.
 intros.
@@ -1914,7 +1914,7 @@ Qed.
 
 Definition mat_transpose T (d : T) (M : matrix T) : matrix T :=
   {| mat_def := mat_def_transpose d (mat_def M);
-     mat_prop := mat_transpose_prop d M |}.
+     mat_prop := mat_prop_transpose d M |}.
 
 Compute (mat_def_transpose 0 (mat_def_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
 Compute (mat_transpose 0 (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
@@ -1971,7 +1971,7 @@ Definition mat_def_add T {so : semiring_op T} (M1 M2 : matrix_def T) :
     else void_mat_def
   else void_mat_def.
 
-Theorem mat_add_prop : ∀ T {so : semiring_op T} MA MB,
+Theorem mat_prop_add : ∀ T {so : semiring_op T} MA MB,
   matrix_prop (mat_def_add (mat_def MA) (mat_def MB)).
 Proof.
 intros.
@@ -2027,7 +2027,7 @@ Qed.
 
 Definition mat_add T {so : semiring_op T} (MA MB : matrix T) : matrix T :=
   {| mat_def := mat_def_add (mat_def MA) (mat_def MB);
-     mat_prop := mat_add_prop MA MB |}.
+     mat_prop := mat_prop_add MA MB |}.
 
 Definition mat_def_mul {T} {so : semiring_op T} (M1 M2 : matrix_def T) : matrix_def T :=
   if Nat.eq_dec (mat_ncols M1) (mat_nrows M2) then
@@ -2038,7 +2038,7 @@ Definition mat_def_mul {T} {so : semiring_op T} (M1 M2 : matrix_def T) : matrix_
        mat_ncols := mat_ncols M2 |}
   else void_mat_def.
 
-Theorem mat_mul_prop : ∀ T {so : semiring_op T} MA MB,
+Theorem mat_prop_mul : ∀ T {so : semiring_op T} MA MB,
   matrix_prop (mat_def_mul (mat_def MA) (mat_def MB)).
 Proof.
 intros.
@@ -2087,7 +2087,7 @@ Qed.
 
 Definition mat_mul T {so : semiring_op T} (MA MB : matrix T) : matrix T :=
   {| mat_def := mat_def_mul (mat_def MA) (mat_def MB);
-     mat_prop := mat_mul_prop MA MB |}.
+     mat_prop := mat_prop_mul MA MB |}.
 
 Compute (let _ := nat_semiring_op in mat_mul (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]; [0; 0]])).
 Compute (let _ := nat_semiring_op in mat_mul (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]])).
@@ -2103,6 +2103,14 @@ Definition mat_def_opp T {ro : ring_op T} (M : matrix_def T) :=
   {| mat_list := list_list_opp (mat_list M);
      mat_nrows := mat_nrows M;
      mat_ncols := mat_ncols M |}.
+
+Theorem mat_prop_opp : ∀ T {ro : ring_op T} (M : matrix T),
+  matrix_prop (mat_def_opp (mat_def M)).
+...
+
+Definition mat_opp T {ro : ring_op T} (M : matrix T) :=
+  {| mat_def := mat_def_opp (mat_def M);
+     mat_prop := mat_prop_opp M |}.
 
 ...
 
