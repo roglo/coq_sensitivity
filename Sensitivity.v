@@ -2146,7 +2146,7 @@ Inductive mmatrix_def T :=
 
 Inductive mmatrix T :=
   | MM_1 : T → mmatrix T
-  | MM_M : matrix (mmatrix T) → mmatrix T.
+  | MM_M : matrix_def (mmatrix T) → mmatrix T.
 
 ...
 
