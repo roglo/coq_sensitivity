@@ -1936,7 +1936,24 @@ split. {
 }
 split; intros H1. {
   unfold mat_def_add in H1 |-*.
-...
+  destruct (Nat.eq_dec (mat_nrows (mat_def MA)) (mat_nrows (mat_def MB)))
+    as [Hrr| Hrr]; [ | easy ].
+  destruct (Nat.eq_dec (mat_ncols (mat_def MA)) (mat_ncols (mat_def MB)))
+    as [Hcc| Hcc]; [ | easy ].
+  cbn in H1; cbn.
+  destruct MA as (Md, (Mr & Mc1 & Mc2)); cbn in H1; cbn.
+  now apply Mc2.
+} {
+  unfold mat_def_add in H1 |-*.
+  destruct (Nat.eq_dec (mat_nrows (mat_def MA)) (mat_nrows (mat_def MB)))
+    as [Hrr| Hrr]; [ | easy ].
+  destruct (Nat.eq_dec (mat_ncols (mat_def MA)) (mat_ncols (mat_def MB)))
+    as [Hcc| Hcc]; [ | easy ].
+  cbn in H1; cbn.
+  destruct MA as (Md, (Mr & Mc1 & Mc2)); cbn in H1; cbn.
+  now apply Mc2.
+}
+Qed.
 
 Definition mat_add T {so : semiring_op T} (MA MB : matrix T) : matrix T :=
   {| mat_def := mat_def_add (mat_def MA) (mat_def MB);
