@@ -1876,35 +1876,41 @@ split. {
   }
 }
 split. {
-...
-  remember (mat_list Md) as ll eqn:Hll; symmetry in Hll.
-  remember (mat_list Md) as ll eqn:Hll; symmetry in Hll.
-  destruct ll as [| l]. {
-    cbn; symmetry.
-(*
-    now apply Mc2; symmetry.
+  unfold all_lists_same_length.
+  unfold mat_def_transpose; cbn.
+  unfold list_list_transpose.
+  rewrite List_fold_left_map.
+  etransitivity. {
+    apply List_fold_left_ext_in.
+    intros b c Hb.
+    rewrite map_length, seq_length.
+    unfold list_list_nrows.
+    easy.
   }
-  apply Mc1.
-  now left.
-}
-split. {
-  intros * Hr.
-  cbn in Hr; cbn.
-  destruct M as (Md, (Mr & Mc1 & Mc2)); cbn in Hr; cbn.
-  remember (mat_list Md) as ll eqn:Hll; symmetry in Hll.
-  destruct ll as [| l]; [ easy | ].
-  rewrite <- Mr.
-  cbn in Hr.
-  apply in_map_iff in Hr.
-  destruct Hr as (r' & Hr & Hr').
-  subst r; cbn; f_equal.
-  now rewrite map_length, seq_length.
+  unfold list_list_ncols.
+  destruct M as (Md, (Hr & Hc1 & Hc2)); cbn.
+  rewrite Hr, Nat.eqb_refl.
+  etransitivity. {
+    apply List_fold_left_ext_in.
+    intros b c Hb.
+    rewrite Bool.andb_true_r.
+    easy.
+  }
+  remember (length (hd [] (mat_list Md))) as len eqn:Hlen.
+  clear.
+  induction len; [ easy | ].
+  rewrite <- Nat.add_1_r.
+  rewrite seq_app.
+  rewrite fold_left_app.
+  now rewrite IHlen.
 } {
-  destruct M as (Md, (Mr & Mc1 & Mc2)).
-  now split; intros; apply Mc2.
+  unfold zero_together.
+  unfold mat_def_transpose; cbn.
+  destruct M as (Md, (Hr & Hc1 & Hc2)); cbn.
+  unfold zero_together in Hc2.
+  now destruct (mat_nrows Md), (mat_ncols Md).
 }
 Qed.
-*)
 
 Definition mat_transpose T (d : T) (M : matrix T) : matrix T :=
   {| mat_def := mat_def_transpose d (mat_def M);
@@ -1966,13 +1972,7 @@ Definition mat_def_add T {so : semiring_op T} (M1 M2 : matrix_def T) :
   else void_mat_def.
 
 Theorem mat_add_prop : ∀ T {so : semiring_op T} MA MB,
-  length (mat_list (mat_def_add (mat_def MA) (mat_def MB))) =
-  mat_nrows (mat_def_add (mat_def MA) (mat_def MB))
-  ∧ (∀ r : list T,
-       r ∈ mat_list (mat_def_add (mat_def MA) (mat_def MB))
-       → length r = mat_ncols (mat_def_add (mat_def MA) (mat_def MB)))
-    ∧ (mat_nrows (mat_def_add (mat_def MA) (mat_def MB)) = 0
-       ↔ mat_ncols (mat_def_add (mat_def MA) (mat_def MB)) = 0).
+  matrix_prop (mat_def_add (mat_def MA) (mat_def MB)).
 Proof.
 intros.
 split. {
@@ -1985,6 +1985,8 @@ split. {
   now rewrite map_length, seq_length.
 }
 split. {
+  unfold all_lists_same_length.
+...
   intros * Hr.
   unfold mat_def_add; cbn.
   unfold mat_def_add in Hr.
@@ -2019,6 +2021,7 @@ split; intros H1. {
   now apply Mc2.
 }
 Qed.
+*)
 
 Definition mat_add T {so : semiring_op T} (MA MB : matrix T) : matrix T :=
   {| mat_def := mat_def_add (mat_def MA) (mat_def MB);
