@@ -2140,6 +2140,10 @@ Definition mat_opp T {ro : ring_op T} (M : matrix T) :=
 
 (* block matrices *)
 
+Inductive mmatrix_def T : nat → Type :=
+  | MM_1 : T → mmatrix_def T 0
+  | MM_M : ∀ n, matrix_def (mmatrix_def T n) → mmatrix_def T (S n).
+
 Inductive mmatrix_def T :=
   | MM_1 : T → mmatrix_def T
   | MM_M : matrix_def (mmatrix_def T) → mmatrix_def T.
