@@ -1986,42 +1986,44 @@ split. {
 }
 split. {
   unfold all_lists_same_length.
-...
-  intros * Hr.
-  unfold mat_def_add; cbn.
-  unfold mat_def_add in Hr.
+  unfold mat_def_add.
+  unfold list_list_add.
   destruct (Nat.eq_dec (mat_nrows (mat_def MA)) (mat_nrows (mat_def MB)))
     as [Hrr| Hrr]; [ | easy ].
   destruct (Nat.eq_dec (mat_ncols (mat_def MA)) (mat_ncols (mat_def MB)))
     as [Hcc| Hcc]; [ | easy ].
-  cbn in Hr; cbn.
-  unfold list_list_add in Hr.
-  apply in_map_iff in Hr.
-  destruct Hr as (i & Him & Hi).
-  subst r.
-  now rewrite map_length, seq_length.
-}
-split; intros H1. {
-  unfold mat_def_add in H1 |-*.
-  destruct (Nat.eq_dec (mat_nrows (mat_def MA)) (mat_nrows (mat_def MB)))
-    as [Hrr| Hrr]; [ | easy ].
-  destruct (Nat.eq_dec (mat_ncols (mat_def MA)) (mat_ncols (mat_def MB)))
-    as [Hcc| Hcc]; [ | easy ].
-  cbn in H1; cbn.
-  destruct MA as (Md, (Mr & Mc1 & Mc2)); cbn in H1; cbn.
-  now apply Mc2.
+  cbn.
+  rewrite List_fold_left_map.
+  etransitivity. {
+    apply List_fold_left_ext_in.
+    intros b c Hb.
+    rewrite map_length, seq_length.
+    rewrite Nat.eqb_refl.
+    rewrite Bool.andb_true_r.
+    easy.
+  }
+  remember (mat_nrows (mat_def MA)) as len.
+  clear.
+  induction len; [ easy | ].
+  rewrite <- Nat.add_1_r.
+  rewrite seq_app.
+  rewrite fold_left_app.
+  now rewrite IHlen.
 } {
-  unfold mat_def_add in H1 |-*.
+  unfold zero_together.
+  unfold mat_def_add; cbn.
   destruct (Nat.eq_dec (mat_nrows (mat_def MA)) (mat_nrows (mat_def MB)))
     as [Hrr| Hrr]; [ | easy ].
   destruct (Nat.eq_dec (mat_ncols (mat_def MA)) (mat_ncols (mat_def MB)))
     as [Hcc| Hcc]; [ | easy ].
-  cbn in H1; cbn.
-  destruct MA as (Md, (Mr & Mc1 & Mc2)); cbn in H1; cbn.
-  now apply Mc2.
+  cbn.
+  destruct MB as (Md, (Hr & Hc1 & Hc2)); cbn.
+  cbn in Hrr, Hcc.
+  unfold zero_together in Hc2.
+  rewrite <- Hrr, <- Hcc in Hc2.
+  now destruct (mat_nrows (mat_def MA)), (mat_ncols (mat_def MA)).
 }
 Qed.
-*)
 
 Definition mat_add T {so : semiring_op T} (MA MB : matrix T) : matrix T :=
   {| mat_def := mat_def_add (mat_def MA) (mat_def MB);
