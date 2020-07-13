@@ -2064,7 +2064,6 @@ split. {
     rewrite Bool.andb_true_r.
     easy.
   }
-...
   remember (mat_nrows (mat_def MA)) as len.
   clear.
   induction len; [ easy | ].
@@ -2074,41 +2073,38 @@ split. {
   now rewrite IHlen.
 } {
   unfold zero_together.
-  unfold mat_def_add; cbn.
-  destruct (Nat.eq_dec (mat_nrows (mat_def MA)) (mat_nrows (mat_def MB)))
-    as [Hrr| Hrr]; [ | easy ].
-  destruct (Nat.eq_dec (mat_ncols (mat_def MA)) (mat_ncols (mat_def MB)))
-    as [Hcc| Hcc]; [ | easy ].
-  cbn.
-  destruct MB as (Md, (Hr & Hc1 & Hc2)); cbn.
-  cbn in Hrr, Hcc.
-  unfold zero_together in Hc2.
-  rewrite <- Hrr, <- Hcc in Hc2.
-  now destruct (mat_nrows (mat_def MA)), (mat_ncols (mat_def MA)).
+  unfold mat_def_mul; cbn.
+  destruct (Nat.eq_dec (mat_ncols (mat_def MA)) (mat_nrows (mat_def MB)))
+    as [Hrr| Hrr]; [ cbn | easy ].
+  destruct MA as (Mda, (Hra & Hc1a & Hc2a)); cbn.
+  destruct MB as (Mdb, (Hrb & Hc1b & Hc2b)); cbn.
+  cbn in Hrr.
+  unfold zero_together in Hc2a, Hc2b.
+  rewrite <- Hrr in Hc2b.
+  now destruct (mat_nrows Mda), (mat_ncols Mda), (mat_ncols Mdb).
 }
 Qed.
-...
 
 Definition mat_mul T {so : semiring_op T} (MA MB : matrix T) : matrix T :=
   {| mat_def := mat_def_mul (mat_def MA) (mat_def MB);
      mat_prop := mat_mul_prop MA MB |}.
-
-...
 
 Compute (let _ := nat_semiring_op in mat_mul (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]; [0; 0]])).
 Compute (let _ := nat_semiring_op in mat_mul (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]])).
 Compute (let _ := nat_semiring_op in mat_mul (mat_of_list [[1; 2]; [3; 4]; [5; 6]])
   (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
 
-Compute (let _ := nat_semiring_op in mat_ncols (mat_mul (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]))).
+Compute (let _ := nat_semiring_op in mat_ncols (mat_def (mat_mul (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]])))).
 
 Definition list_list_opp T {ro : ring_op T} (ll : list (list T)) :=
   map (map rng_opp) ll.
 
-Definition mat_opp T {ro : ring_op T} (M : matrix T) :=
+Definition mat_def_opp T {ro : ring_op T} (M : matrix_def T) :=
   {| mat_list := list_list_opp (mat_list M);
      mat_nrows := mat_nrows M;
      mat_ncols := mat_ncols M |}.
+
+...
 
 (* matrices of matrices *)
 
