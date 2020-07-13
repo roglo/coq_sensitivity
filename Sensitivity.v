@@ -2106,19 +2106,49 @@ Definition mat_def_opp T {ro : ring_op T} (M : matrix_def T) :=
 
 Theorem mat_prop_opp : ∀ T {ro : ring_op T} (M : matrix T),
   matrix_prop (mat_def_opp (mat_def M)).
-...
+Proof.
+intros.
+split. {
+  unfold mat_def_opp; cbn.
+  unfold list_list_opp; cbn.
+  rewrite map_length.
+  apply M.
+}
+split. {
+  unfold all_lists_same_length.
+  unfold mat_def_opp.
+  unfold list_list_opp.
+  cbn.
+  destruct M as (Md, (Hr & Hc & Hrc)); cbn.
+  unfold all_lists_same_length in Hc.
+  clear Hr.
+  induction (mat_list Md) as [| l1 ll1]; [ easy | ].
+  cbn in Hc; cbn.
+  rewrite map_length.
+  remember (length l1 =? mat_ncols Md) as b eqn:Hb; symmetry in Hb.
+  destruct b; [ now apply IHll1 | exfalso ].
+  clear - Hc.
+  now induction ll1.
+} {
+  now destruct M as (Md, (Hr & Hc & Hrc)).
+}
+Qed.
 
 Definition mat_opp T {ro : ring_op T} (M : matrix T) :=
   {| mat_def := mat_def_opp (mat_def M);
      mat_prop := mat_prop_opp M |}.
 
-...
+(* block matrices *)
 
-(* matrices of matrices *)
+Inductive mmatrix_def T :=
+  | MMD_1 : T → mmatrix_def T
+  | MMD_M : matrix_def (mmatrix_def T) → mmatrix_def T.
 
 Inductive mmatrix T :=
   | MM_1 : T → mmatrix T
   | MM_M : matrix (mmatrix T) → mmatrix T.
+
+...
 
 Arguments MM_1 {_} a%Srng.
 Arguments MM_M {_}.
