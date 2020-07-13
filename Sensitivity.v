@@ -2144,9 +2144,13 @@ Inductive mmatrix_def T :=
   | MMD_1 : T → mmatrix_def T
   | MMD_M : matrix_def (mmatrix_def T) → mmatrix_def T.
 
-Inductive mmatrix T :=
-  | MM_1 : T → mmatrix T
-  | MM_M : matrix_def (mmatrix T) → mmatrix T.
+Inductive mmatrix' T :=
+  | MM_1 : T → mmatrix' T
+  | MM_M : matrix_def (mmatrix' T) → mmatrix' T.
+
+Record mmatrix T :=
+  { mmat_def : mmatrix_def T;
+    mmat_prop : bool }.
 
 ...
 
