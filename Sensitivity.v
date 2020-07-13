@@ -2235,36 +2235,57 @@ Definition mmat_opp T {ro : ring_op T} (MM : mmatrix T) : mmatrix T :=
   {| mmat_def := mmat_def_opp (mmat_def MM);
      mmat_prop := mmat_prop_opp MM |}.
 
-...
-
-Definition mmat_of_list T (ll : list (list (mmatrix T))) :
-    matrix (mmatrix T) :=
+Definition mmat_def_of_list T (ll : list (list (mmatrix T))) :
+    matrix_def (mmatrix T) :=
   {| mat_list := ll;
      mat_nrows := list_list_nrows ll;
      mat_ncols := list_list_ncols ll |}.
 
-Fixpoint IZ_2_pow T {ro : ring_op T} u n :=
+Theorem mmat_prop_of_list : ∀ T (ll : list (list (mmatrix T))),
+  matrix_prop (mmat_def_of_list ll).
+Admitted.
+
+Definition mmat_of_list T (ll : list (list (mmatrix T))) :
+    matrix (mmatrix T) :=
+  {| mat_def := mmat_def_of_list ll;
+     mat_prop := mmat_prop_of_list ll |}.
+
+Fixpoint IZ_2_pow_def T {ro : ring_op T} u n :=
   match n with
   | 0 => MM_1 u
   | S n' =>
       MM_M
         {| mat_list :=
-             [[IZ_2_pow u n'; IZ_2_pow 0%Rng n'];
-              [IZ_2_pow 0%Rng n'; IZ_2_pow u n']];
+             [[IZ_2_pow_def u n'; IZ_2_pow_def 0%Rng n'];
+              [IZ_2_pow_def 0%Rng n'; IZ_2_pow_def u n']];
            mat_nrows := 2; mat_ncols := 2 |}
   end.
+
+Theorem IZ_2_pow_prop : ∀ T {ro : ring_op T} u n,
+  mmatrix_prop (IZ_2_pow_def u n).
+Admitted.
+
+Definition IZ_2_pow T {ro : ring_op T} u n : mmatrix T :=
+  {| mmat_def := IZ_2_pow_def u n;
+     mmat_prop := IZ_2_pow_prop u n |}.
+
+
+Definition I_2_pow_def T {ro : ring_op T} := IZ_2_pow_def 1%Rng.
+Definition Z_2_pow_def T {ro : ring_op T} := IZ_2_pow_def 0%Rng.
 
 Definition I_2_pow T {ro : ring_op T} := IZ_2_pow 1%Rng.
 Definition Z_2_pow T {ro : ring_op T} := IZ_2_pow 0%Rng.
 
-Fixpoint A T {ro : ring_op T} n :=
+...
+
+Fixpoint A_def T {ro : ring_op T} n : mmatrix_def T :=
   match n with
   | 0 => MM_1 0%Rng
   | S n' =>
        MM_M
-         (mmat_of_list
-            [[A n'; I_2_pow n'];
-             [I_2_pow n'; mmat_opp (A n')]])
+         (mmat_def_of_list
+            [[A_def n'; I_2_pow_def n'];
+             [I_2_pow_def n'; mmat_def_opp (A_def n')]])
   end.
 
 (*
