@@ -1726,6 +1726,21 @@ Definition list_list_ncols T (ll : list (list T)) :=
 Definition void_mat_def {T} : matrix_def T :=
   {| mat_list := []; mat_nrows := 0; mat_ncols := 0 |}.
 
+Theorem matrix_eq_eq {T} : ∀ (MA MB : matrix T),
+  MA = MB ↔ mat_def MA = mat_def MB.
+Proof.
+intros.
+split; intros HMM; [ now subst | ].
+destruct MA as (Mda, (Mra & Mca1 & Mca2)); cbn.
+destruct MB as (Mdb, (Mrb & Mcb1 & Mcb2)); cbn.
+cbn in HMM; subst Mdb.
+f_equal.
+move Mrb before Mra.
+move Mcb1 before Mca1.
+f_equal; [ apply UIP_nat | ].
+f_equal. {
+...
+
 Theorem void_mat_prop : ∀ T
   (Md := mk_mat_def ([] : list (list T)) 0 0),
   length (mat_list Md) = mat_nrows Md ∧
