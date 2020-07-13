@@ -1708,9 +1708,12 @@ Record matrix_def T := mk_mat_def
     mat_nrows : nat;
     mat_ncols : nat }.
 
+Definition all_lists_same_length T len (ll : list (list T)) :=
+  fold_left (λ b l1, b && Nat.eqb (length l1) len) ll true.
+
 Definition matrix_prop T (md : matrix_def T) :=
   length (mat_list md) = mat_nrows md ∧
-  (∀ r, r ∈ mat_list md → length r = mat_ncols md) ∧
+  all_lists_same_length (mat_ncols md) (mat_list md) = true ∧
   (mat_nrows md = 0 ↔ mat_ncols md = 0).
 
 Record matrix T := mk_mat
@@ -1739,7 +1742,10 @@ move Mrb before Mra.
 move Mcb1 before Mca1.
 f_equal; [ apply UIP_nat | ].
 f_equal. {
-Check Logic.Eqdep_dec.eq_proofs_unicity.
+  apply Eqdep_dec.UIP_dec.
+  intros b1 b2.
+  now destruct b1, b2; [ left | right | right | left ].
+} {
 ...
 
 Theorem void_mat_prop : ∀ T
