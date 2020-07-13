@@ -2141,18 +2141,18 @@ Definition mat_opp T {ro : ring_op T} (M : matrix T) :=
 (* block matrices *)
 
 Inductive mmatrix_def T :=
-  | MMD_1 : T → mmatrix_def T
-  | MMD_M : matrix_def (mmatrix_def T) → mmatrix_def T.
+  | MM_1 : T → mmatrix_def T
+  | MM_M : matrix_def (mmatrix_def T) → mmatrix_def T.
 
-Inductive mmatrix' T :=
-  | MM_1 : T → mmatrix' T
-  | MM_M : matrix_def (mmatrix' T) → mmatrix' T.
+Definition mmatrix_prop T (mmd : mmatrix_def T) :=
+  match mmd with
+  | MM_1 x => True
+  | MM_M MMM => matrix_prop MMM
+  end.
 
 Record mmatrix T :=
   { mmat_def : mmatrix_def T;
-    mmat_prop : bool }.
-
-...
+    mmat_prop : mmatrix_prop mmat_def }.
 
 Arguments MM_1 {_} a%Srng.
 Arguments MM_M {_}.
@@ -2170,33 +2170,72 @@ Fixpoint concat_list_in_list T (ll1 ll2 : list (list T)) :=
 Definition concat_list_list_list T (lll : list (list (list T))) :=
   fold_left (@concat_list_in_list T) lll [].
 
-Fixpoint list_list_of_mmat T (MM : mmatrix T) : list (list T) :=
+Fixpoint list_list_of_mmat_def T (MM : mmatrix_def T) : list (list T) :=
   match MM with
   | MM_1 x => [[x]]
   | MM_M MMM =>
       let ll :=
         map
-          (λ MMl, concat_list_list_list (map (@list_list_of_mmat T) MMl))
+          (λ MMl, concat_list_list_list (map (@list_list_of_mmat_def T) MMl))
           (mat_list MMM)
       in
       List.concat ll
   end.
 
-Definition mat_of_mmat T (mm : mmatrix T) : matrix T :=
-  mat_of_list (list_list_of_mmat mm).
+Definition mat_def_of_mmat_def T (MM : mmatrix_def T) : matrix_def T :=
+  mat_def_of_list (list_list_of_mmat_def MM).
 
-Definition void_mmat T {so : semiring_op T} : mmatrix T :=
+Definition mat_of_mmat T (MM : mmatrix T) : matrix T :=
+  mat_of_list (list_list_of_mmat_def (mmat_def MM)).
+
+Definition void_mmat_def T {so : semiring_op T} : mmatrix_def T :=
   MM_1 0%Srng.
 
-Fixpoint mmat_opp T {ro : ring_op T} MM : mmatrix T :=
+Theorem void_mmat_prop T {so : semiring_op T} : mmatrix_prop void_mmat_def.
+Proof. easy. Qed.
+
+Definition void_mmat T {so : semiring_op T} : mmatrix T :=
+  {| mmat_def := void_mmat_def;
+     mmat_prop := void_mmat_prop |}.
+
+Fixpoint mmat_def_opp T {ro : ring_op T} MM : mmatrix_def T :=
   match MM with
   | MM_1 x => MM_1 (- x)%Rng
   | MM_M MMM =>
       MM_M
-        {| mat_list := map (map (λ mm, mmat_opp mm)) (mat_list MMM);
+        {| mat_list := map (map (λ mm, mmat_def_opp mm)) (mat_list MMM);
            mat_nrows := mat_nrows MMM;
            mat_ncols := mat_ncols MMM |}
   end.
+
+Theorem mmat_prop_opp : ∀ T {ro : ring_op T} (MM : mmatrix T),
+  mmatrix_prop (mmat_def_opp (mmat_def MM)).
+Proof.
+intros.
+unfold mmatrix_prop.
+destruct MM as (MM, MP); cbn.
+destruct MM as [x| MMM]; [ easy | cbn ].
+destruct MMM as (ll, r, c); cbn in MP; cbn.
+unfold matrix_prop in MP; cbn in MP.
+unfold matrix_prop; cbn.
+rewrite map_length.
+split; [ easy | ].
+split; [ | easy ].
+rewrite List_fold_left_map.
+etransitivity. {
+  apply List_fold_left_ext_in.
+  intros ll' b Hll'.
+  rewrite map_length.
+  easy.
+}
+easy.
+Qed.
+
+Definition mmat_opp T {ro : ring_op T} (MM : mmatrix T) : mmatrix T :=
+  {| mmat_def := mmat_def_opp (mmat_def MM);
+     mmat_prop := mmat_prop_opp MM |}.
+
+...
 
 Definition mmat_of_list T (ll : list (list (mmatrix T))) :
     matrix (mmatrix T) :=
