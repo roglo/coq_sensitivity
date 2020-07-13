@@ -2144,6 +2144,10 @@ Inductive mmatrix_def T :=
   | MM_1 : T → mmatrix_def T
   | MM_M : matrix_def (mmatrix_def T) → mmatrix_def T.
 
+...
+
+(* this mmatrix_prop is not enough: must be for all matrices inside *)
+
 Definition mmatrix_prop T (mmd : mmatrix_def T) :=
   match mmd with
   | MM_1 x => True
