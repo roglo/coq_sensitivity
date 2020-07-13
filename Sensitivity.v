@@ -1708,12 +1708,14 @@ Record matrix_def T := mk_mat_def
     mat_nrows : nat;
     mat_ncols : nat }.
 
+Definition matrix_prop T (md : matrix_def T) :=
+  length (mat_list md) = mat_nrows md ∧
+  (∀ r, r ∈ mat_list md → length r = mat_ncols md) ∧
+  (mat_nrows md = 0 ↔ mat_ncols md = 0).
+
 Record matrix T := mk_mat
   { mat_def : matrix_def T;
-    mat_prop :
-      length (mat_list mat_def) = mat_nrows mat_def ∧
-      (∀ r, r ∈ mat_list mat_def → length r = mat_ncols mat_def) ∧
-      (mat_nrows mat_def = 0 ↔ mat_ncols mat_def = 0) }.
+    mat_prop : matrix_prop mat_def }.
 
 Definition list_list_nrows T (ll : list (list T)) :=
   length ll.
