@@ -1739,6 +1739,7 @@ move Mrb before Mra.
 move Mcb1 before Mca1.
 f_equal; [ apply UIP_nat | ].
 f_equal. {
+Check Logic.Eqdep_dec.eq_proofs_unicity.
 ...
 
 Theorem void_mat_prop : ∀ T
