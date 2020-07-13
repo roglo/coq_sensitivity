@@ -1711,10 +1711,16 @@ Record matrix_def T := mk_mat_def
 Definition all_lists_same_length T len (ll : list (list T)) :=
   fold_left (λ b l1, b && Nat.eqb (length l1) len) ll true.
 
+Definition zero_together a b :=
+  match a with
+  | 0 => match b with 0 => true | S _ => false end
+  | S _ => match b with 0 => false | S _ => true end
+  end.
+
 Definition matrix_prop T (md : matrix_def T) :=
   length (mat_list md) = mat_nrows md ∧
   all_lists_same_length (mat_ncols md) (mat_list md) = true ∧
-  (mat_nrows md = 0 ↔ mat_ncols md = 0).
+  zero_together (mat_nrows md) (mat_ncols md) = true.
 
 Record matrix T := mk_mat
   { mat_def : matrix_def T;
@@ -1746,13 +1752,17 @@ f_equal. {
   intros b1 b2.
   now destruct b1, b2; [ left | right | right | left ].
 } {
-...
+  apply Eqdep_dec.UIP_dec.
+  intros b1 b2.
+  now destruct b1, b2; [ left | right | right | left ].
+}
+Qed.
 
 Theorem void_mat_prop : ∀ T
   (Md := mk_mat_def ([] : list (list T)) 0 0),
   length (mat_list Md) = mat_nrows Md ∧
-  (∀ r, r ∈ mat_list Md → length r = mat_ncols Md) ∧
-  (mat_nrows Md = 0 ↔ mat_ncols Md = 0).
+  all_lists_same_length (mat_ncols Md) (mat_list Md) = true ∧
+  zero_together (mat_nrows Md) (mat_ncols Md) = true.
 Proof. easy. Qed.
 
 Definition void_mat {T} : matrix T :=
@@ -1796,6 +1806,8 @@ Definition mat_of_list T (ll : list (list T)) : matrix T :=
       | right _ => void_mat
       end
   end.
+
+...
 
 Compute (mat_def_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
 Compute (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
