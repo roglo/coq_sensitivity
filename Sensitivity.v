@@ -1857,9 +1857,25 @@ split. {
     } {
       cbn in Hc1.
       apply IHll.
-Search (fold_left _ _ (_ && _)).
-...
-      apply -> Bool.andb_true_iff in Hc1.
+      remember (length l =? mat_ncols Md) as b1.
+      remember (length l1 =? mat_ncols Md) as b2.
+      clear - Hc1.
+      revert b1 b2 Hc1.
+      induction ll as [| l1]; intros; cbn. {
+        cbn in Hc1.
+        now apply -> Bool.andb_true_iff in Hc1.
+      } {
+        cbn in Hc1.
+        apply (IHll _ b2).
+        rewrite <- Hc1.
+        f_equal.
+        do 2 rewrite <- Bool.andb_assoc; f_equal.
+        apply Bool.andb_comm.
+      }
+    }
+  }
+}
+split. {
 ...
   remember (mat_list Md) as ll eqn:Hll; symmetry in Hll.
   remember (mat_list Md) as ll eqn:Hll; symmetry in Hll.
