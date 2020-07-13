@@ -2028,16 +2028,72 @@ Qed.
 Definition mat_add T {so : semiring_op T} (MA MB : matrix T) : matrix T :=
   {| mat_def := mat_def_add (mat_def MA) (mat_def MB);
      mat_prop := mat_add_prop MA MB |}.
-...
 
-Definition mat_mul {T} {so : semiring_op T} (M1 M2 : matrix T) : matrix T :=
+Definition mat_def_mul {T} {so : semiring_op T} (M1 M2 : matrix_def T) : matrix_def T :=
   if Nat.eq_dec (mat_ncols M1) (mat_nrows M2) then
     {| mat_list :=
          list_list_mul (mat_nrows M1) (mat_ncols M1) (mat_ncols M2)
            (mat_list M1) (mat_list M2);
        mat_nrows := mat_nrows M1;
        mat_ncols := mat_ncols M2 |}
-  else void_mat.
+  else void_mat_def.
+
+Theorem mat_mul_prop : ∀ T {so : semiring_op T} MA MB,
+  matrix_prop (mat_def_mul (mat_def MA) (mat_def MB)).
+Proof.
+intros.
+split. {
+  unfold mat_def_mul; cbn.
+  destruct (Nat.eq_dec (mat_ncols (mat_def MA)) (mat_nrows (mat_def MB)))
+    as [Hrr| Hrr]; [ cbn | easy ].
+  unfold list_list_mul.
+  now rewrite map_length, seq_length.
+}
+split. {
+  unfold all_lists_same_length.
+  unfold mat_def_mul.
+  unfold list_list_mul.
+  destruct (Nat.eq_dec (mat_ncols (mat_def MA)) (mat_nrows (mat_def MB)))
+    as [Hrr| Hrr]; [ cbn | easy ].
+  rewrite List_fold_left_map.
+  etransitivity. {
+    apply List_fold_left_ext_in.
+    intros b c Hb.
+    rewrite map_length, seq_length.
+    rewrite Nat.eqb_refl.
+    rewrite Bool.andb_true_r.
+    easy.
+  }
+...
+  remember (mat_nrows (mat_def MA)) as len.
+  clear.
+  induction len; [ easy | ].
+  rewrite <- Nat.add_1_r.
+  rewrite seq_app.
+  rewrite fold_left_app.
+  now rewrite IHlen.
+} {
+  unfold zero_together.
+  unfold mat_def_add; cbn.
+  destruct (Nat.eq_dec (mat_nrows (mat_def MA)) (mat_nrows (mat_def MB)))
+    as [Hrr| Hrr]; [ | easy ].
+  destruct (Nat.eq_dec (mat_ncols (mat_def MA)) (mat_ncols (mat_def MB)))
+    as [Hcc| Hcc]; [ | easy ].
+  cbn.
+  destruct MB as (Md, (Hr & Hc1 & Hc2)); cbn.
+  cbn in Hrr, Hcc.
+  unfold zero_together in Hc2.
+  rewrite <- Hrr, <- Hcc in Hc2.
+  now destruct (mat_nrows (mat_def MA)), (mat_ncols (mat_def MA)).
+}
+Qed.
+...
+
+Definition mat_mul T {so : semiring_op T} (MA MB : matrix T) : matrix T :=
+  {| mat_def := mat_def_mul (mat_def MA) (mat_def MB);
+     mat_prop := mat_mul_prop MA MB |}.
+
+...
 
 Compute (let _ := nat_semiring_op in mat_mul (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]; [0; 0]])).
 Compute (let _ := nat_semiring_op in mat_mul (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]])).
