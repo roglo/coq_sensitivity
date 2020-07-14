@@ -2032,20 +2032,27 @@ Theorem mat_prop_mul : ∀ T {so : semiring_op T} MA MB,
   matrix_prop (mat_def_mul (mat_def MA) (mat_def MB)).
 Proof.
 intros.
-...
+destruct MA as (Mda, Mpa); cbn.
+destruct MB as (Mdb, Mpb); cbn.
+unfold matrix_prop, matrix_is_norm in Mpa, Mpb.
+apply Bool.andb_true_iff in Mpa.
+apply Bool.andb_true_iff in Mpb.
+destruct Mpa as (Mpa & Hrca).
+destruct Mpb as (Mpb & Hrcb).
+apply Bool.andb_true_iff in Mpa.
+apply Bool.andb_true_iff in Mpb.
+destruct Mpa as (Hra & Hca).
+destruct Mpb as (Hrb & Hcb).
+apply Nat.eqb_eq in Hra.
+apply Nat.eqb_eq in Hrb.
+unfold mat_def_mul.
+destruct (Nat.eq_dec (mat_ncols Mda) (mat_nrows Mdb))
+  as [Hrr| Hrr]; [ | easy ].
+unfold matrix_prop, matrix_is_norm; cbn.
+unfold list_list_mul; cbn.
+rewrite map_length, seq_length, Nat.eqb_refl, Bool.andb_true_l.
+apply Bool.andb_true_iff.
 split. {
-  unfold mat_def_mul; cbn.
-  destruct (Nat.eq_dec (mat_ncols (mat_def MA)) (mat_nrows (mat_def MB)))
-    as [Hrr| Hrr]; [ cbn | easy ].
-  unfold list_list_mul.
-  now rewrite map_length, seq_length.
-}
-split. {
-  unfold all_lists_same_length.
-  unfold mat_def_mul.
-  unfold list_list_mul.
-  destruct (Nat.eq_dec (mat_ncols (mat_def MA)) (mat_nrows (mat_def MB)))
-    as [Hrr| Hrr]; [ cbn | easy ].
   rewrite List_fold_left_map.
   etransitivity. {
     apply List_fold_left_ext_in.
@@ -2055,23 +2062,16 @@ split. {
     rewrite Bool.andb_true_r.
     easy.
   }
-  remember (mat_nrows (mat_def MA)) as len.
   clear.
-  induction len; [ easy | ].
+  induction (mat_nrows Mda) as [| len]; [ easy | ].
   rewrite <- Nat.add_1_r.
   rewrite seq_app.
   rewrite fold_left_app.
   now rewrite IHlen.
 } {
   unfold zero_together.
-  unfold mat_def_mul; cbn.
-  destruct (Nat.eq_dec (mat_ncols (mat_def MA)) (mat_nrows (mat_def MB)))
-    as [Hrr| Hrr]; [ cbn | easy ].
-  destruct MA as (Mda, (Hra & Hc1a & Hc2a)); cbn.
-  destruct MB as (Mdb, (Hrb & Hc1b & Hc2b)); cbn.
-  cbn in Hrr.
-  unfold zero_together in Hc2a, Hc2b.
-  rewrite <- Hrr in Hc2b.
+  unfold zero_together in Hrca, Hrcb.
+  rewrite <- Hrr in Hrcb.
   now destruct (mat_nrows Mda), (mat_ncols Mda), (mat_ncols Mdb).
 }
 Qed.
@@ -2099,18 +2099,19 @@ Theorem mat_prop_opp : ∀ T {ro : ring_op T} (M : matrix T),
   matrix_prop (mat_def_opp (mat_def M)).
 Proof.
 intros.
-split. {
+unfold matrix_prop, matrix_is_norm.
+apply Bool.andb_true_iff.
+destruct M as (Md, Mp); cbn.
+unfold matrix_prop, matrix_is_norm in Mp.
+apply Bool.andb_true_iff in Mp.
+destruct Mp as (Mp & Hrc).
+apply Bool.andb_true_iff in Mp.
+destruct Mp as (Hr & Hc).
+split; [ apply Bool.andb_true_iff; split | easy ]. {
   unfold mat_def_opp; cbn.
   unfold list_list_opp; cbn.
-  rewrite map_length.
-  apply M.
-}
-split. {
-  unfold all_lists_same_length.
-  unfold mat_def_opp.
-  unfold list_list_opp.
-  cbn.
-  destruct M as (Md, (Hr & Hc & Hrc)); cbn.
+  now rewrite map_length.
+} {
   unfold all_lists_same_length in Hc.
   clear Hr.
   induction (mat_list Md) as [| l1 ll1]; [ easy | ].
@@ -2120,8 +2121,6 @@ split. {
   destruct b; [ now apply IHll1 | exfalso ].
   clear - Hc.
   now induction ll1.
-} {
-  now destruct M as (Md, (Hr & Hc & Hrc)).
 }
 Qed.
 
@@ -2159,15 +2158,15 @@ Fixpoint bmatrix_is_norm_loop T it (bmd : bmatrix_def T) :=
       match bmd with
       | BM_1 _ => true
       | BM_M BMM =>
-        fold_left
-          (λ b i,
-           fold_left
-             (λ b j,
-                b &&
-                matrix_prop ...
-                bmatrix_is_norm_loop it' (mat_def_el void_bmat_def BMM i j))
-             (seq 0 (mat_ncols BMM)) b)
-          (seq 0 (mat_nrows BMM)) true
+          matrix_is_norm BMM &&
+          fold_left
+            (λ b i,
+             fold_left
+               (λ b j,
+                  b &&
+                  bmatrix_is_norm_loop it' (mat_def_el void_bmat_def BMM i j))
+               (seq 0 (mat_ncols BMM)) b)
+            (seq 0 (mat_nrows BMM)) true
       end
   end.
 
