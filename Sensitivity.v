@@ -2253,6 +2253,23 @@ unfold bmatrix_prop, bmatrix_is_norm.
 destruct BM as (Md, Mp); cbn.
 unfold bmatrix_prop, bmatrix_is_norm in Mp.
 rewrite bmat_depth_opp.
+remember (bmat_depth Md) as len; clear Heqlen.
+revert Md Mp.
+induction len; intros; [ easy | ].
+cbn in Mp; cbn.
+destruct Md as [x| BMM]; [ easy | ].
+cbn.
+apply Bool.andb_true_iff in Mp.
+destruct Mp as (Hn, Hp).
+unfold matrix_is_norm in Hn.
+apply Bool.andb_true_iff in Hn.
+destruct Hn as (Hr, Hrc).
+apply Bool.andb_true_iff in Hr.
+destruct Hr as (Hr, Hc).
+apply Bool.andb_true_iff.
+split; [ apply Bool.andb_true_iff; cbn; split | ]. {
+  apply Bool.andb_true_iff.
+  split; [ now rewrite map_length | ].
 ...
 apply Bool.andb_true_iff.
 unfold matrix_prop, matrix_is_norm in Mp.
