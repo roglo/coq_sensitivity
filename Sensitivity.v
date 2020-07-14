@@ -2234,20 +2234,16 @@ Fixpoint bmat_def_opp T {ro : ring_op T} BM : bmatrix_def T :=
 Theorem bmat_depth_opp : ∀ T {ro : ring_op T} BM,
   bmat_depth (bmat_def_opp BM) = bmat_depth BM.
 Proof.
+fix H 3.
 intros.
-destruct BM as [x| MBM]; [ easy | cbn ].
+destruct BM as [x| MBM]; [ reflexivity | cbn ].
 destruct MBM as (ll, r, c); cbn.
 clear r c.
 destruct ll as [| l1 ll1]; [ easy | cbn ].
 destruct l1 as [| BM]; [ easy | cbn ].
 f_equal.
-...
-Print bmat_depth.
-...
-destruct ll as [| l1 ll1]; [ easy | cbn ].
-cbn.
-Print bmat_depth.
-...
+apply H.
+Qed.
 
 Theorem bmat_prop_opp : ∀ T {ro : ring_op T} (BM : bmatrix T),
   bmatrix_prop (bmat_def_opp (bmat_def BM)).
@@ -2256,8 +2252,6 @@ intros.
 unfold bmatrix_prop, bmatrix_is_norm.
 destruct BM as (Md, Mp); cbn.
 unfold bmatrix_prop, bmatrix_is_norm in Mp.
-Search bmat_depth.
-...
 rewrite bmat_depth_opp.
 ...
 apply Bool.andb_true_iff.
