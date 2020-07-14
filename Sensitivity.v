@@ -2231,10 +2231,46 @@ Fixpoint bmat_def_opp T {ro : ring_op T} BM : bmatrix_def T :=
            mat_ncols := mat_ncols MMM |}
   end.
 
-Theorem bmat_prop_opp : ∀ T {ro : ring_op T} (MM : bmatrix T),
-  bmatrix_prop (bmat_def_opp (bmat_def MM)).
+Theorem bmat_depth_opp : ∀ T {ro : ring_op T} BM,
+  bmat_depth (bmat_def_opp BM) = bmat_depth BM.
 Proof.
 intros.
+Print bmat_depth.
+...
+
+induction BM as [x| MBM]; [ easy | cbn ].
+destruct MBM as (ll, r, c); cbn.
+destruct ll as [| l1 ll1]; [ easy | cbn ].
+destruct l1 as [| BM]; [ easy | cbn ].
+f_equal.
+
+cbn.
+
+Print bmat_depth.
+
+...
+
+Theorem bmat_prop_opp : ∀ T {ro : ring_op T} (BM : bmatrix T),
+  bmatrix_prop (bmat_def_opp (bmat_def BM)).
+Proof.
+intros.
+unfold bmatrix_prop, bmatrix_is_norm.
+destruct BM as (Md, Mp); cbn.
+unfold bmatrix_prop, bmatrix_is_norm in Mp.
+Search bmat_depth.
+...
+rewrite bmat_depth_opp.
+...
+apply Bool.andb_true_iff.
+unfold matrix_prop, matrix_is_norm in Mp.
+apply Bool.andb_true_iff in Mp.
+destruct Mp as (Mp & Hrc).
+apply Bool.andb_true_iff in Mp.
+destruct Mp as (Hr & Hc).
+split; [ apply Bool.andb_true_iff; split | easy ]. {
+  unfold mat_def_opp; cbn.
+  unfold list_list_opp; cbn.
+  now rewrite map_length.
 ...
 unfold mmatrix_prop.
 destruct MM as (MM, MP); cbn.
