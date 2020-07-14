@@ -1971,63 +1971,55 @@ Theorem mat_prop_add : ∀ T {so : semiring_op T} MA MB,
   matrix_prop (mat_def_add (mat_def MA) (mat_def MB)).
 Proof.
 intros.
-(* cf mat_prop_transpose above *)
-...
-split. {
-  unfold mat_def_add; cbn.
-  destruct (Nat.eq_dec (mat_nrows (mat_def MA)) (mat_nrows (mat_def MB)))
-    as [Hrr| Hrr]; [ | easy ].
-  destruct (Nat.eq_dec (mat_ncols (mat_def MA)) (mat_ncols (mat_def MB)))
-    as [Hcc| Hcc]; [ | easy ].
-  cbn; unfold list_list_add.
-  now rewrite map_length, seq_length.
+destruct MA as (Mda, Mpa); cbn.
+destruct MB as (Mdb, Mpb); cbn.
+unfold matrix_prop, matrix_is_norm in Mpa, Mpb.
+apply Bool.andb_true_iff in Mpa.
+apply Bool.andb_true_iff in Mpb.
+destruct Mpa as (Mpa & Hrca).
+destruct Mpb as (Mpb & Hrcb).
+apply Bool.andb_true_iff in Mpa.
+apply Bool.andb_true_iff in Mpb.
+destruct Mpa as (Hra & Hca).
+destruct Mpb as (Hrb & Hcb).
+apply Nat.eqb_eq in Hra.
+apply Nat.eqb_eq in Hrb.
+unfold mat_def_add.
+destruct (Nat.eq_dec (mat_nrows Mda) (mat_nrows Mdb))
+  as [Hrr| Hrr]; [ | easy ].
+destruct (Nat.eq_dec (mat_ncols Mda) (mat_ncols Mdb))
+  as [Hcc| Hcc]; [ | easy ].
+unfold matrix_prop, matrix_is_norm; cbn.
+unfold list_list_add; cbn.
+rewrite map_length, seq_length, Nat.eqb_refl, Bool.andb_true_l.
+unfold zero_together.
+unfold zero_together in Hrcb.
+rewrite <- Hrr, <- Hcc in Hrcb.
+rewrite Hrcb.
+rewrite Bool.andb_true_r.
+rewrite List_fold_left_map.
+etransitivity. {
+  apply List_fold_left_ext_in.
+  intros b c Hb.
+  rewrite map_length, seq_length.
+  rewrite Nat.eqb_refl.
+  rewrite Bool.andb_true_r.
+  easy.
 }
-split. {
-  unfold all_lists_same_length.
-  unfold mat_def_add.
-  unfold list_list_add.
-  destruct (Nat.eq_dec (mat_nrows (mat_def MA)) (mat_nrows (mat_def MB)))
-    as [Hrr| Hrr]; [ | easy ].
-  destruct (Nat.eq_dec (mat_ncols (mat_def MA)) (mat_ncols (mat_def MB)))
-    as [Hcc| Hcc]; [ | easy ].
-  cbn.
-  rewrite List_fold_left_map.
-  etransitivity. {
-    apply List_fold_left_ext_in.
-    intros b c Hb.
-    rewrite map_length, seq_length.
-    rewrite Nat.eqb_refl.
-    rewrite Bool.andb_true_r.
-    easy.
-  }
-  remember (mat_nrows (mat_def MA)) as len.
-  clear.
-  induction len; [ easy | ].
-  rewrite <- Nat.add_1_r.
-  rewrite seq_app.
-  rewrite fold_left_app.
-  now rewrite IHlen.
-} {
-  unfold zero_together.
-  unfold mat_def_add; cbn.
-  destruct (Nat.eq_dec (mat_nrows (mat_def MA)) (mat_nrows (mat_def MB)))
-    as [Hrr| Hrr]; [ | easy ].
-  destruct (Nat.eq_dec (mat_ncols (mat_def MA)) (mat_ncols (mat_def MB)))
-    as [Hcc| Hcc]; [ | easy ].
-  cbn.
-  destruct MB as (Md, (Hr & Hc1 & Hc2)); cbn.
-  cbn in Hrr, Hcc.
-  unfold zero_together in Hc2.
-  rewrite <- Hrr, <- Hcc in Hc2.
-  now destruct (mat_nrows (mat_def MA)), (mat_ncols (mat_def MA)).
-}
+clear.
+induction (mat_nrows Mda) as [| len]; [ easy | ].
+rewrite <- Nat.add_1_r.
+rewrite seq_app.
+rewrite fold_left_app.
+now rewrite IHlen.
 Qed.
 
 Definition mat_add T {so : semiring_op T} (MA MB : matrix T) : matrix T :=
   {| mat_def := mat_def_add (mat_def MA) (mat_def MB);
      mat_prop := mat_prop_add MA MB |}.
 
-Definition mat_def_mul {T} {so : semiring_op T} (M1 M2 : matrix_def T) : matrix_def T :=
+Definition mat_def_mul {T} {so : semiring_op T} (M1 M2 : matrix_def T) :
+    matrix_def T :=
   if Nat.eq_dec (mat_ncols M1) (mat_nrows M2) then
     {| mat_list :=
          list_list_mul (mat_nrows M1) (mat_ncols M1) (mat_ncols M2)
@@ -2040,6 +2032,7 @@ Theorem mat_prop_mul : ∀ T {so : semiring_op T} MA MB,
   matrix_prop (mat_def_mul (mat_def MA) (mat_def MB)).
 Proof.
 intros.
+...
 split. {
   unfold mat_def_mul; cbn.
   destruct (Nat.eq_dec (mat_ncols (mat_def MA)) (mat_nrows (mat_def MB)))
