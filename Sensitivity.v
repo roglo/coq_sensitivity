@@ -2235,19 +2235,18 @@ Theorem bmat_depth_opp : ∀ T {ro : ring_op T} BM,
   bmat_depth (bmat_def_opp BM) = bmat_depth BM.
 Proof.
 intros.
-Print bmat_depth.
-...
-
-induction BM as [x| MBM]; [ easy | cbn ].
+destruct BM as [x| MBM]; [ easy | cbn ].
 destruct MBM as (ll, r, c); cbn.
+clear r c.
 destruct ll as [| l1 ll1]; [ easy | cbn ].
 destruct l1 as [| BM]; [ easy | cbn ].
 f_equal.
-
-cbn.
-
+...
 Print bmat_depth.
-
+...
+destruct ll as [| l1 ll1]; [ easy | cbn ].
+cbn.
+Print bmat_depth.
 ...
 
 Theorem bmat_prop_opp : ∀ T {ro : ring_op T} (BM : bmatrix T),
