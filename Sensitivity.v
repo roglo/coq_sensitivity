@@ -1717,10 +1717,13 @@ Definition zero_together a b :=
   | S _ => match b with 0 => false | S _ => true end
   end.
 
+Definition matrix_is_norm T (md : matrix_def T) :=
+  Nat.eqb (length (mat_list md)) (mat_nrows md) &&
+  all_lists_same_length (mat_ncols md) (mat_list md) &&
+  zero_together (mat_nrows md) (mat_ncols md).
+
 Definition matrix_prop T (md : matrix_def T) :=
-  length (mat_list md) = mat_nrows md ∧
-  all_lists_same_length (mat_ncols md) (mat_list md) = true ∧
-  zero_together (mat_nrows md) (mat_ncols md) = true.
+  matrix_is_norm md = true.
 
 Record matrix T := mk_mat
   { mat_def : matrix_def T;
@@ -1737,22 +1740,13 @@ Theorem matrix_eq_eq {T} : ∀ (MA MB : matrix T),
 Proof.
 intros.
 split; intros HMM; [ now subst | ].
-destruct MA as (Mda, (Mra & Mca1 & Mca2)); cbn.
-destruct MB as (Mdb, (Mrb & Mcb1 & Mcb2)); cbn.
+destruct MA as (Mda, Mpa).
+destruct MB as (Mdb, Mpb).
 cbn in HMM; subst Mdb.
 f_equal.
-move Mrb before Mra.
-move Mcb1 before Mca1.
-f_equal; [ apply UIP_nat | ].
-f_equal. {
-  apply Eqdep_dec.UIP_dec.
-  intros b1 b2.
-  now destruct b1, b2; [ left | right | right | left ].
-} {
-  apply Eqdep_dec.UIP_dec.
-  intros b1 b2.
-  now destruct b1, b2; [ left | right | right | left ].
-}
+apply Eqdep_dec.UIP_dec.
+intros b1 b2.
+now destruct b1, b2; [ left | right | right | left ].
 Qed.
 
 Definition void_mat_def {T} : matrix_def T :=
@@ -1774,9 +1768,9 @@ Theorem mat_of_list_prop : ∀ T x l1 ll1,
   → matrix_prop (mat_def_of_list ((x :: l1) :: ll1) : matrix_def T).
 Proof.
 intros * Hfa.
-split; [ easy | ].
-split; [ | easy ].
-cbn; rewrite Nat.eqb_refl.
+unfold matrix_prop, matrix_is_norm; cbn.
+rewrite Nat.eqb_refl, Bool.andb_true_l.
+rewrite Nat.eqb_refl, Bool.andb_true_r.
 induction ll1 as [| l2]; [ easy | ].
 specialize (proj1 (Forall_forall _ _) Hfa) as H1.
 cbn in H1; cbn.
@@ -1815,8 +1809,11 @@ Definition list_list_el T d (ll : list (list T)) i j : T :=
 Compute (let (i, j) := (2, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j).
 Compute (let (i, j) := (7, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j).
 
+Definition mat_def_el T d (M : matrix_def T) i j : T :=
+  list_list_el d (mat_list M) i j.
+
 Definition mat_el T d (M : matrix T) i j : T :=
-  list_list_el d (mat_list (mat_def M)) i j.
+  mat_def_el d (mat_def M) i j.
 
 Compute (let (i, j) := (2, 1) in mat_el 42 (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix nat) i j).
 Compute (let (i, j) := (7, 1) in mat_el 42 (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] : matrix nat) i j).
@@ -1837,45 +1834,46 @@ Theorem mat_prop_transpose : ∀ T d M,
   matrix_prop (mat_def_transpose d (mat_def M) : matrix_def T).
 Proof.
 intros.
-split. {
+destruct M as (Md, Mp); cbn.
+unfold matrix_prop, matrix_is_norm in Mp.
+apply Bool.andb_true_iff in Mp.
+destruct Mp as (Mp & Hrc).
+apply Bool.andb_true_iff in Mp.
+destruct Mp as (Hr & Hc).
+apply Nat.eqb_eq in Hr.
+apply Bool.andb_true_iff; split; [ apply Bool.andb_true_iff; split | ]. {
   cbn; unfold list_list_transpose.
   rewrite map_length, seq_length.
   unfold list_list_ncols.
-  destruct M as (Md, (Hr & Hc1 & Hc2)); cbn.
   destruct (mat_list Md) as [| l ll]. {
     cbn; symmetry.
-    unfold zero_together in Hc2.
-    rewrite <- Hr in Hc2; cbn in Hc2.
+    unfold zero_together in Hrc.
+    rewrite <- Hr in Hrc; cbn in Hrc.
     now destruct (mat_ncols Md).
   } {
-    cbn in Hc1; cbn.
-    clear - Hc1.
-    revert l Hc1.
-    induction ll as [| l1]; intros. {
-      cbn in Hc1.
-      now apply Nat.eqb_eq in Hc1.
+    cbn in Hc; cbn.
+    clear - Hc.
+    revert l Hc.
+    induction ll as [| l1]; intros; [ easy | ].
+    cbn in Hc.
+    apply IHll.
+    remember (length l =? mat_ncols Md) as b1.
+    remember (length l1 =? mat_ncols Md) as b2.
+    clear - Hc.
+    revert b1 b2 Hc.
+    induction ll as [| l1]; intros; cbn. {
+      cbn in Hc.
+      now apply -> Bool.andb_true_iff in Hc.
     } {
-      cbn in Hc1.
-      apply IHll.
-      remember (length l =? mat_ncols Md) as b1.
-      remember (length l1 =? mat_ncols Md) as b2.
-      clear - Hc1.
-      revert b1 b2 Hc1.
-      induction ll as [| l1]; intros; cbn. {
-        cbn in Hc1.
-        now apply -> Bool.andb_true_iff in Hc1.
-      } {
-        cbn in Hc1.
-        apply (IHll _ b2).
-        rewrite <- Hc1.
-        f_equal.
-        do 2 rewrite <- Bool.andb_assoc; f_equal.
-        apply Bool.andb_comm.
-      }
+      cbn in Hc.
+      apply (IHll _ b2).
+      rewrite <- Hc.
+      f_equal.
+      do 2 rewrite <- Bool.andb_assoc; f_equal.
+      apply Bool.andb_comm.
     }
   }
-}
-split. {
+} {
   unfold all_lists_same_length.
   unfold mat_def_transpose; cbn.
   unfold list_list_transpose.
@@ -1888,7 +1886,6 @@ split. {
     easy.
   }
   unfold list_list_ncols.
-  destruct M as (Md, (Hr & Hc1 & Hc2)); cbn.
   rewrite Hr, Nat.eqb_refl.
   etransitivity. {
     apply List_fold_left_ext_in.
@@ -1906,8 +1903,7 @@ split. {
 } {
   unfold zero_together.
   unfold mat_def_transpose; cbn.
-  destruct M as (Md, (Hr & Hc1 & Hc2)); cbn.
-  unfold zero_together in Hc2.
+  unfold zero_together in Hrc.
   now destruct (mat_nrows Md), (mat_ncols Md).
 }
 Qed.
@@ -1975,6 +1971,8 @@ Theorem mat_prop_add : ∀ T {so : semiring_op T} MA MB,
   matrix_prop (mat_def_add (mat_def MA) (mat_def MB)).
 Proof.
 intros.
+(* cf mat_prop_transpose above *)
+...
 split. {
   unfold mat_def_add; cbn.
   destruct (Nat.eq_dec (mat_nrows (mat_def MA)) (mat_nrows (mat_def MB)))
@@ -2140,30 +2138,60 @@ Definition mat_opp T {ro : ring_op T} (M : matrix T) :=
 
 (* block matrices *)
 
-Inductive mmatrix_def T : nat → Type :=
-  | MM_1 : T → mmatrix_def T 0
-  | MM_M : ∀ n, matrix_def (mmatrix_def T n) → mmatrix_def T (S n).
+Inductive bmatrix_def T :=
+  | BM_1 : T → bmatrix_def T
+  | BM_M : matrix_def (bmatrix_def T) → bmatrix_def T.
 
-Inductive mmatrix_def T :=
-  | MM_1 : T → mmatrix_def T
-  | MM_M : matrix_def (mmatrix_def T) → mmatrix_def T.
-
-...
-
-(* this mmatrix_prop is not enough: must be for all matrices inside *)
-
-Definition mmatrix_prop T (mmd : mmatrix_def T) :=
-  match mmd with
-  | MM_1 x => True
-  | MM_M MMM => matrix_prop MMM
+Fixpoint bmat_depth T (BM : bmatrix_def T) :=
+  match BM with
+  | BM_1 _ => 1
+  | BM_M BMM =>
+      match BMM with
+      | mk_mat_def [] _ _ => 0
+      | mk_mat_def (BMl :: _) _ _ =>
+          match BMl with
+          | [] => 0
+          | BM' :: _ => 1 + bmat_depth BM'
+          end
+      end
   end.
 
-Record mmatrix T :=
-  { mmat_def : mmatrix_def T;
-    mmat_prop : mmatrix_prop mmat_def }.
+Definition void_bmat_def {T} : bmatrix_def T :=
+  BM_M void_mat_def.
 
-Arguments MM_1 {_} a%Srng.
-Arguments MM_M {_}.
+Fixpoint bmatrix_is_norm_loop T it (bmd : bmatrix_def T) :=
+  match it with
+  | 0 => false
+  | S it' =>
+      match bmd with
+      | BM_1 _ => true
+      | BM_M BMM =>
+        fold_left
+          (λ b i,
+           fold_left
+             (λ b j,
+                b &&
+                matrix_prop ...
+                bmatrix_is_norm_loop it' (mat_def_el void_bmat_def BMM i j))
+             (seq 0 (mat_ncols BMM)) b)
+          (seq 0 (mat_nrows BMM)) true
+      end
+  end.
+
+Definition bmatrix_is_norm T (bmd : bmatrix_def T) :=
+  bmatrix_is_norm_loop (bmat_depth bmd) bmd.
+
+Definition bmatrix_prop T (bmd : bmatrix_def T) :=
+  bmatrix_is_norm bmd = true.
+
+Record bmatrix T :=
+  { bmat_def : bmatrix_def T;
+    bmat_prop : bmatrix_prop bmat_def }.
+
+Arguments BM_1 {_} a%Srng.
+Arguments BM_M {_}.
+
+...
 
 Fixpoint concat_list_in_list T (ll1 ll2 : list (list T)) :=
   match ll1 with
