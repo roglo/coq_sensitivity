@@ -2267,9 +2267,35 @@ destruct Hn as (Hr, Hrc).
 apply Bool.andb_true_iff in Hr.
 destruct Hr as (Hr, Hc).
 apply Bool.andb_true_iff.
-split; [ apply Bool.andb_true_iff; cbn; split | ]. {
+split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
   apply Bool.andb_true_iff.
   split; [ now rewrite map_length | ].
+  rewrite List_fold_left_map.
+  etransitivity. {
+    apply List_fold_left_ext_in.
+    intros BM b HBM.
+    now rewrite map_length.
+  }
+  easy.
+} {
+  etransitivity. {
+    apply List_fold_left_ext_in.
+    intros i b Hi.
+    apply List_fold_left_ext_in.
+    intros j c Hj.
+    apply in_seq in Hi.
+    cbn in Hi; destruct Hi as (_, Hi).
+    apply Nat.eqb_eq in Hr.
+    erewrite List_map_nth_in; [ | congruence ].
+    unfold all_lists_same_length in Hc.
+    erewrite List_map_nth_in.
+...
+  rewrite <- Hp at 2.
+  apply List_fold_left_ext_in.
+  intros i b Hi.
+  apply List_fold_left_ext_in.
+  intros j c Hj.
+  f_equal.
 ...
 apply Bool.andb_true_iff.
 unfold matrix_prop, matrix_is_norm in Mp.
