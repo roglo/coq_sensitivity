@@ -2317,14 +2317,82 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
   etransitivity. {
     apply List_fold_left_ext_in.
     intros j b' Hj.
-    erewrite List_map_nth_in; [ | easy ].
-    erewrite List_map_nth_in. 2: {
+    rewrite List_map_nth_in with (a := []); [ | easy ].
+    rewrite List_map_nth_in with (a := void_bmat_def). 2: {
       apply in_seq in Hj.
       cbn in Hj; destruct Hj as (_, Hj).
       unfold all_lists_same_length in Hc.
-...
-    rewrite IHlen.
+      clear Hb Hp.
+      revert r Hr'.
+      induction ll as [| l2]; intros; [ easy | ].
+      destruct r. {
+        cbn in Hc; cbn.
+        clear IHll.
+        clear Hr'.
+        revert l2 Hc.
+        induction ll as [| l3]; intros. {
+          cbn in Hc.
+          apply Nat.eqb_eq in Hc.
+          congruence.
+        }
+        cbn in Hc.
+        apply IHll.
+        destruct (length l3 =? c). {
+          now rewrite Bool.andb_true_r in Hc.
+        } {
+          rewrite Bool.andb_false_r in Hc.
+          exfalso.
+          clear - Hc.
+          induction ll; [ easy | ].
+          cbn in Hc; congruence.
+        }
+      }
+      cbn in Hr'; cbn.
+      apply Nat.succ_le_mono in Hr'.
+      apply IHll; [ | easy ].
+      cbn in Hc.
+      destruct (length l2 =? c); [ easy | ].
+      exfalso; clear - Hc.
+      induction ll; [ easy | cbn in Hc; congruence ].
+    }
     easy.
+  }
+  etransitivity. {
+    apply List_fold_left_ext_in.
+    clear Hb Hc.
+    intros j b' Hj.
+    rewrite IHlen; intros; [ easy | ].
+    apply in_seq in Hj.
+    cbn in Hj; destruct Hj as (_, Hj).
+    destruct b. {
+      revert c j Hj Hp.
+      induction ll; intros; [ easy | ].
+      destruct r. {
+        cbn in Hp; cbn.
+...
+      cbn.
+        destruct j. {
+          rewrite <- Nat.add_1_r in Hp.
+          rewrite seq_app in Hp.
+          rewrite fold_left_app in Hp.
+          cbn in Hp.
+          apply Bool.andb_true_iff in Hp.
+        cbn in Hp.
+      induction c; intros; [ easy | cbn ].
+      destruct j. {
+        cbn.
+      apply IHc.
+...
+    destruct b. {
+      clear Hb Hc.
+      revert j Hj.
+      induction ll as [| l2]; intros; [ easy | ].
+      destruct r. {
+        cbn.
+...
+        apply IHll.
+    apply Hp.
+  }
 }
 ...
     clear - Hb Hp.
