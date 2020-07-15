@@ -2279,8 +2279,13 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
   easy.
 } {
 (**)
-  clear Hr Hrc.
-  induction (mat_nrows BMM) as [| i]; [ easy | ].
+  clear Hrc.
+  destruct BMM as (ll, r, c).
+  cbn in Hc, Hp, Hr |-*.
+  apply Nat.eqb_eq in Hr.
+  assert (Hr' : r ≤ length ll) by flia Hr.
+  clear Hr.
+  induction r; [ easy | ].
   rewrite <- Nat.add_1_r in Hp.
   rewrite seq_app in Hp.
   rewrite fold_left_app in Hp.
@@ -2291,24 +2296,36 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
         fold_left
           (λ (b0 : bool) (j : nat),
            b0 &&
-              bmatrix_is_norm_loop len (mat_def_el void_bmat_def BMM i j))
-          (seq 0 (mat_ncols BMM)) b) (seq 0 i) true) as b eqn:Hb.
+              bmatrix_is_norm_loop len (nth j (nth i ll []) void_bmat_def))
+          (seq 0 c) b) (seq 0 r) true) as b eqn:Hb.
   rewrite <- Nat.add_1_r.
   rewrite seq_app.
   rewrite fold_left_app.
   cbn.
-  rewrite IHi. 2: {
+  rewrite IHr; [ | | flia Hr' ]. 2: {
     destruct b; [ easy | exfalso ].
     clear - Hp.
-    induction (mat_ncols BMM) as [| j]; [ easy | ].
+    induction c; [ easy | ].
     rewrite <- Nat.add_1_r in Hp.
     rewrite seq_app in Hp.
     rewrite fold_left_app in Hp.
     cbn in Hp.
     apply Bool.andb_true_iff in Hp.
-    apply IHj, Hp.
+    apply IHc, Hp.
   }
-  clear IHi.
+  clear IHr.
+  etransitivity. {
+    apply List_fold_left_ext_in.
+    intros j b' Hj.
+    erewrite List_map_nth_in; [ | easy ].
+    erewrite List_map_nth_in. 2: {
+      apply in_seq in Hj.
+      cbn in Hj; destruct Hj as (_, Hj).
+      unfold all_lists_same_length in Hc.
+...
+    rewrite IHlen.
+    easy.
+}
 ...
     clear - Hb Hp.
     destruct BMM as (ll, r, c).
