@@ -2278,6 +2278,28 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
   }
   easy.
 } {
+(**)
+  clear Hr Hrc.
+  induction (mat_nrows BMM) as [| i]; [ easy | ].
+  rewrite <- Nat.add_1_r in Hp.
+  rewrite seq_app in Hp.
+  rewrite fold_left_app in Hp.
+  cbn in Hp.
+  remember
+    (fold_left
+       (λ (b : bool) (i : nat),
+        fold_left
+          (λ (b0 : bool) (j : nat),
+           b0 &&
+              bmatrix_is_norm_loop len (mat_def_el void_bmat_def BMM i j))
+          (seq 0 (mat_ncols BMM)) b) (seq 0 i) true) as b eqn:Hb.
+  rewrite <- Nat.add_1_r.
+  rewrite seq_app.
+  rewrite fold_left_app.
+  cbn.
+  rewrite IHi. 2: {
+    subst b.
+...
   etransitivity. {
     apply List_fold_left_ext_in.
     intros i b Hi.
