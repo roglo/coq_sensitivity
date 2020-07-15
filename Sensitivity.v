@@ -2298,7 +2298,21 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
   rewrite fold_left_app.
   cbn.
   rewrite IHi. 2: {
-    subst b.
+    clear - Hb.
+    destruct BMM as (ll, r, c).
+    cbn in Hb.
+    induction ll as [| l1 ll1]. {
+      destruct i; [ easy | ].
+      rewrite <- Nat.add_1_r in Hb.
+      rewrite seq_app in Hb.
+      rewrite fold_left_app in Hb.
+      cbn in Hb.
+...
+
+unfold bmatrix_prop, bmatrix_is_norm in Mp.
+rewrite bmat_depth_opp.
+remember (bmat_depth Md) as len; clear Heqlen.
+revert Md Mp.
 ...
   etransitivity. {
     apply List_fold_left_ext_in.
