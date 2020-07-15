@@ -2298,7 +2298,19 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
   rewrite fold_left_app.
   cbn.
   rewrite IHi. 2: {
-    clear - Hb.
+    destruct b; [ easy | exfalso ].
+    clear - Hp.
+    induction (mat_ncols BMM) as [| j]; [ easy | ].
+    rewrite <- Nat.add_1_r in Hp.
+    rewrite seq_app in Hp.
+    rewrite fold_left_app in Hp.
+    cbn in Hp.
+    apply Bool.andb_true_iff in Hp.
+    apply IHj, Hp.
+  }
+  clear IHi.
+...
+    clear - Hb Hp.
     destruct BMM as (ll, r, c).
     cbn in Hb.
     induction ll as [| l1 ll1]. {
@@ -2306,7 +2318,8 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
       rewrite <- Nat.add_1_r in Hb.
       rewrite seq_app in Hb.
       rewrite fold_left_app in Hb.
-      cbn in Hb.
+      cbn in Hb, Hp.
+      destruct b; [ easy | exfalso ].
 ...
 
 unfold bmatrix_prop, bmatrix_is_norm in Mp.
