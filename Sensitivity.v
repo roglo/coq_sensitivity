@@ -2287,8 +2287,18 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
     cbn in Hi; destruct Hi as (_, Hi).
     apply Nat.eqb_eq in Hr.
     erewrite List_map_nth_in; [ | congruence ].
+    easy.
+  }
+...
     unfold all_lists_same_length in Hc.
-    erewrite List_map_nth_in.
+...
+    erewrite List_map_nth_in. 2: {
+      revert i Hi.
+      induction (mat_list BMM) as [| l1 ll1]; intros. {
+        cbn in Hr.
+        now rewrite <- Hr in Hi.
+      }
+      cbn.
 ...
   rewrite <- Hp at 2.
   apply List_fold_left_ext_in.
