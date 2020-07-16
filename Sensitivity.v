@@ -2245,13 +2245,48 @@ f_equal.
 apply H.
 Qed.
 
-Theorem fold_left_fold_left_true : ∀ A B (f : A → B → _) li lj,
+Theorem fold_left_and_true : ∀ A (f : A → _) li,
+  fold_left (λ bi i, bi && f i) li true = true
+  ↔ ∀ i, i ∈ li → f i = true.
+Proof.
+intros.
+split; intros Hij. {
+  intros * Hi.
+  revert i Hi.
+  induction li as [| j]; intros; [ easy | ].
+  cbn in Hi.
+  destruct Hi as [Hi| Hi]. {
+    subst j.
+    cbn in Hij.
+    destruct (f i); [ easy | exfalso ].
+    clear - Hij.
+    now induction li.
+  } {
+    apply IHli; [ | easy ].
+    cbn in Hij.
+    destruct (f j); [ easy | exfalso ].
+    clear - Hij.
+    now induction li.
+  }
+} {
+  induction li as [| j]; [ easy | cbn ].
+  rewrite Hij; [ | now left ].
+  apply IHli.
+  intros i Hi.
+  now apply Hij; right.
+}
+Qed.
+
+Theorem fold_left_fold_left_and_true : ∀ A B (f : A → B → _) li lj,
   fold_left (λ bi i, fold_left (λ bj j, bj && f i j) lj bi) li true = true
   ↔ ∀ i j, i ∈ li → j ∈ lj → f i j = true.
 Proof.
 intros.
 split; intros Hij. {
   intros * Hi Hj.
+  apply -> fold_left_and_true; [ | apply Hj ].
+...
+
   revert lj i j Hi Hj Hij.
   induction li as [| i2]; intros; [ easy | ].
   cbn in Hij.
