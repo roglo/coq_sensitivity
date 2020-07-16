@@ -2311,6 +2311,56 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
     }
     easy.
   }
+(*
+  revert r c Hr Hc Hrc Hp.
+  induction ll as [| l1]; intros; [ now subst r | ].
+  etransitivity. {
+    apply List_fold_left_ext_in.
+    intros i b Hi.
+    apply in_seq in Hi; cbn in Hi; destruct Hi as (_, Hi).
+    rewrite <- Hr in Hi.
+    apply List_fold_left_ext_in.
+    intros j b' Hj.
+    apply in_seq in Hj; cbn in Hj; destruct Hj as (_, Hj).
+...
+    rewrite List_map_nth_in with (a := []); [ | easy ].
+    apply List_fold_left_ext_in.
+    intros j b' Hj.
+    apply in_seq in Hj; cbn in Hj; destruct Hj as (_, Hj).
+...
+*)
+  revert c ll Hr Hc Hrc Hp.
+  induction r; intros; [ easy | ].
+  rewrite <- Nat.add_1_r.
+  rewrite seq_app.
+  rewrite fold_left_app; cbn.
+  destruct ll as [| l1]; [ easy | cbn in Hr ].
+  apply Nat.succ_inj in Hr.
+...
+  destruct ll as [| l2]. {
+    cbn in Hr; subst r; cbn.
+    cbn in Hp.
+    etransitivity. {
+      apply List_fold_left_ext_in.
+      intros j b Hj.
+      apply in_seq in Hj; cbn in Hj; destruct Hj as (_, Hj).
+      rewrite IHlen; [ easy | ].
+      clear - Hj Hp.
+      revert j Hj.
+      induction c; intros; [ easy | ].
+      rewrite <- Nat.add_1_r in Hp.
+      rewrite seq_app in Hp.
+      rewrite fold_left_app in Hp; cbn in Hp.
+      apply Bool.andb_true_iff in Hp.
+      destruct (Nat.eq_dec j c) as [Hjc| Hjc]; [ now subst j | ].
+      apply IHc; [ easy | flia Hj Hjc ].
+    }
+    clear.
+    induction c; [ easy | ].
+    rewrite <- Nat.add_1_r, seq_app, fold_left_app.
+    now rewrite IHc.
+  }
+  rewrite IHr.
 ...
     intros j b' Hj.
     apply in_seq in Hj; cbn in Hj; destruct Hj as (_, Hj).
