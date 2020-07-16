@@ -2279,6 +2279,67 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
   easy.
 } {
 (**)
+  destruct BMM as (ll, r, c).
+  cbn in Hr, Hc, Hrc, Hp |-*.
+  apply Nat.eqb_eq in Hr.
+  etransitivity. {
+    apply List_fold_left_ext_in.
+    intros i b Hi.
+    apply in_seq in Hi; cbn in Hi; destruct Hi as (_, Hi).
+    rewrite <- Hr in Hi.
+    rewrite List_map_nth_in with (a := []); [ | easy ].
+    apply List_fold_left_ext_in.
+    intros j b' Hj.
+    apply in_seq in Hj; cbn in Hj; destruct Hj as (_, Hj).
+    rewrite List_map_nth_in with (a := void_bmat_def). 2: {
+      clear - Hc Hi Hj.
+...
+    intros j b' Hj.
+    apply in_seq in Hj; cbn in Hj; destruct Hj as (_, Hj).
+    rewrite <- Hr in Hj.
+    rewrite List_map_nth_in with (a := []); [ | easy ].
+    apply List_fold_left_ext_in.
+...
+    rewrite List_map_nth_in with (a := void_bmat_def). 2: {
+      apply in_seq in Hj.
+      cbn in Hj; destruct Hj as (_, Hj).
+      unfold all_lists_same_length in Hc.
+      clear Hb Hp.
+      revert r Hr'.
+      induction ll as [| l2]; intros; [ easy | ].
+      destruct r. {
+        cbn in Hc; cbn.
+        clear IHll.
+        clear Hr'.
+        revert l2 Hc.
+        induction ll as [| l3]; intros. {
+          cbn in Hc.
+          apply Nat.eqb_eq in Hc.
+          congruence.
+        }
+        cbn in Hc.
+        apply IHll.
+        destruct (length l3 =? c). {
+          now rewrite Bool.andb_true_r in Hc.
+        } {
+          rewrite Bool.andb_false_r in Hc.
+          exfalso.
+          clear - Hc.
+          induction ll; [ easy | ].
+          cbn in Hc; congruence.
+        }
+      }
+      cbn in Hr'; cbn.
+      apply Nat.succ_le_mono in Hr'.
+      apply IHll; [ | easy ].
+      cbn in Hc.
+      destruct (length l2 =? c); [ easy | ].
+      exfalso; clear - Hc.
+      induction ll; [ easy | cbn in Hc; congruence ].
+    }
+    easy.
+  }
+...
   clear Hrc.
   destruct BMM as (ll, r, c).
   cbn in Hc, Hp, Hr |-*.
