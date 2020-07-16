@@ -2245,6 +2245,15 @@ f_equal.
 apply H.
 Qed.
 
+Theorem fold_left_fold_left_true : ∀ A B (f : A → B → _) li lj,
+  fold_left (λ bi i, fold_left (λ bj j, bj && f i j) lj bi) li true = true
+  ↔ ∀ i j, i ∈ li → j ∈ lj → f i j = true.
+Proof.
+intros.
+split; intros Hij. {
+  intros * Hi Hj.
+...
+
 Theorem bmat_prop_opp : ∀ T {ro : ring_op T} (BM : bmatrix T),
   bmatrix_prop (bmat_def_opp (bmat_def BM)).
 Proof.
@@ -2311,6 +2320,10 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
     }
     easy.
   }
+...
+  apply fold_left_fold_left_true.
+  specialize (proj1 (fold_left_fold_left_true _ _ _) Hp) as Hp'.
+  cbn in Hp'.
 ...
   clear Hr Hrc.
   revert r c Hc Hp.
