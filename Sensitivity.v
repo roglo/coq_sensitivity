@@ -2526,7 +2526,8 @@ Theorem bmatrix_is_norm_loop_enough_iter : ∀ T (BM : bmatrix_def T) it,
   → bmatrix_is_norm_loop it BM = true.
 Proof.
 intros * Hit Hnl.
-induction it. {
+revert BM Hit Hnl.
+induction it; intros. {
   apply Nat.le_0_r in Hit.
   rewrite Hit in Hnl.
   easy.
@@ -2534,14 +2535,20 @@ induction it. {
 destruct BM as [x| BMM]; [ easy | ].
 cbn in Hit, Hnl; cbn.
 destruct BMM as (ll, r, c).
-cbn.
 destruct ll as [| l1]. {
   cbn in Hnl.
   apply Bool.andb_true_iff in Hnl.
   destruct Hnl as (Hnl, H1).
   destruct r; [ now destruct c | easy ].
 }
-
+destruct l1 as [| bmd]; [ easy | ].
+cbn in Hnl, IHit; cbn.
+apply Bool.andb_true_iff in Hnl.
+apply Bool.andb_true_iff.
+destruct Hnl as (Hnl1, Hnl2).
+split; [ easy | ].
+(* mmm... il me semble que j'ai déjà prouvé quelque chose de
+   similaire plus haut... faut que je regarde ça *)
 ...
 specialize (proj1 (fold_left_fold_left_and_true _ _ _) H1) as H2.
     cbn in H2.
