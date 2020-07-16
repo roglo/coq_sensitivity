@@ -2428,16 +2428,22 @@ Definition bmat_opp T {ro : ring_op T} (BM : bmatrix T) : bmatrix T :=
   {| bmat_def := bmat_def_opp (bmat_def BM);
      bmat_prop := bmat_prop_opp BM |}.
 
-Definition bmat_def_of_list T (ll : list (list (bmatrix T))) :
+Definition bmat_def_of_list_bmat_def T (ll : list (list (bmatrix_def T))) :
+    matrix_def (bmatrix_def T) :=
+  {| mat_list := ll;
+     mat_nrows := list_list_nrows ll;
+     mat_ncols := list_list_ncols ll |}.
+
+Definition bmat_def_of_list_bmat T (ll : list (list (bmatrix T))) :
     matrix_def (bmatrix T) :=
   {| mat_list := ll;
      mat_nrows := list_list_nrows ll;
      mat_ncols := list_list_ncols ll |}.
 
-Theorem bmat_prop_of_list : ∀ T (ll : list (list (bmatrix T))),
+Theorem bmat_prop_of_list_bmat : ∀ T (ll : list (list (bmatrix T))),
   all_lists_same_length (list_list_ncols ll) ll = true
   → zero_together (list_list_nrows ll) (list_list_ncols ll) = true
-  → matrix_prop (bmat_def_of_list ll).
+  → matrix_prop (bmat_def_of_list_bmat ll).
 Proof.
 intros * Hsl Hzt.
 unfold matrix_prop, matrix_is_norm.
@@ -2446,12 +2452,12 @@ split; [ apply Bool.andb_true_iff; split | easy ]; [ | easy ].
 now apply Nat.eqb_eq.
 Qed.
 
-Definition bmat_of_list T (ll : list (list (bmatrix T)))
+Definition bmat_of_list_bmat T (ll : list (list (bmatrix T)))
   (Hsl : all_lists_same_length (list_list_ncols ll) ll = true)
   (Hzt : zero_together (list_list_nrows ll) (list_list_ncols ll) = true) :
     matrix (bmatrix T) :=
-  {| mat_def := bmat_def_of_list ll;
-     mat_prop := bmat_prop_of_list ll Hsl Hzt|}.
+  {| mat_def := bmat_def_of_list_bmat ll;
+     mat_prop := bmat_prop_of_list_bmat ll Hsl Hzt|}.
 
 Fixpoint IZ_2_pow_def T {ro : ring_op T} u n :=
   match n with
@@ -2496,17 +2502,24 @@ Definition Z_2_pow_def T {ro : ring_op T} := IZ_2_pow_def 0%Rng.
 Definition I_2_pow T {ro : ring_op T} := IZ_2_pow 1%Rng.
 Definition Z_2_pow T {ro : ring_op T} := IZ_2_pow 0%Rng.
 
-...
-
 Fixpoint A_def T {ro : ring_op T} n : bmatrix_def T :=
   match n with
   | 0 => BM_1 0%Rng
   | S n' =>
        BM_M
-         (bmat_def_of_list
+         (bmat_def_of_list_bmat_def
             [[A_def n'; I_2_pow_def n'];
              [I_2_pow_def n'; bmat_def_opp (A_def n')]])
   end.
+
+Theorem A_prop : ∀ T {ro : ring_op T} n, bmatrix_prop (A_def n).
+Proof.
+intros.
+...
+
+Definition A T {ro : ring_op T} n : bmatrix T :=
+  {| bmat_def := A_def n;
+     bmat_prop := 42 |}.
 
 ...
 
