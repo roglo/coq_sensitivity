@@ -2252,6 +2252,22 @@ Proof.
 intros.
 split; intros Hij. {
   intros * Hi Hj.
+  revert lj i j Hi Hj Hij.
+  induction li as [| i2]; intros; [ easy | ].
+  cbn in Hij.
+  destruct Hi as [Hi| Hi]. {
+    subst i2.
+    replace (fold_left _ lj _) with true in Hij. 2: {
+      revert j Hj.
+      clear Hij.
+      induction lj; intros; [ easy | cbn ].
+      destruct Hj as [Hj| Hj]. {
+        subst a.
+...
+    remember (f i2 a) as b eqn:Hb; symmetry in Hb.
+    destruct b; [ easy | ].
+
+    apply IHli with (lj := lj); [ | easy | ].
 ...
 
 Theorem bmat_prop_opp : ∀ T {ro : ring_op T} (BM : bmatrix T),
