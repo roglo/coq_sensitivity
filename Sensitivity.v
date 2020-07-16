@@ -2435,58 +2435,60 @@ Definition bmat_def_of_list T (ll : list (list (bmatrix T))) :
      mat_ncols := list_list_ncols ll |}.
 
 Theorem bmat_prop_of_list : ∀ T (ll : list (list (bmatrix T))),
-  matrix_prop (bmat_def_of_list ll).
+  all_lists_same_length (list_list_ncols ll) ll = true
+  → zero_together (list_list_nrows ll) (list_list_ncols ll) = true
+  → matrix_prop (bmat_def_of_list ll).
 Proof.
-intros.
+intros * Hsl Hzt.
 unfold matrix_prop, matrix_is_norm.
 apply Bool.andb_true_iff.
-split; [ apply Bool.andb_true_iff; split | ]. {
-  now apply Nat.eqb_eq.
-} {
-  unfold bmat_def_of_list.
-  cbn - [ all_lists_same_length ].
-...
-} {
-  unfold bmat_def_of_list.
-  cbn - [ zero_together ].
-...
-  unfold bmat_def_of_list; cbn.
-  apply fold_left_and_true.
-  intros l1 Hl1.
-  apply Nat.eqb_eq.
-  unfold list_list_ncols.
-  revert l1 Hl1.
-  induction ll as [| l2]; intros; [ easy | cbn ].
-  destruct Hl1 as [Hl1| Hl1]; [ congruence | ].
-  specialize (IHll _ Hl1).
-  destruct ll as [| l3]; [ easy | ].
-  cbn in IHll.
-...
+split; [ apply Bool.andb_true_iff; split | easy ]; [ | easy ].
+now apply Nat.eqb_eq.
+Qed.
 
-Definition bmat_of_list T (ll : list (list (bmatrix T))) :
+Definition bmat_of_list T (ll : list (list (bmatrix T)))
+  (Hsl : all_lists_same_length (list_list_ncols ll) ll = true)
+  (Hzt : zero_together (list_list_nrows ll) (list_list_ncols ll) = true) :
     matrix (bmatrix T) :=
   {| mat_def := bmat_def_of_list ll;
-     mat_prop := bmat_prop_of_list ll |}.
+     mat_prop := bmat_prop_of_list ll Hsl Hzt|}.
 
 Fixpoint IZ_2_pow_def T {ro : ring_op T} u n :=
   match n with
-  | 0 => MM_1 u
+  | 0 => BM_1 u
   | S n' =>
-      MM_M
+      BM_M
         {| mat_list :=
              [[IZ_2_pow_def u n'; IZ_2_pow_def 0%Rng n'];
               [IZ_2_pow_def 0%Rng n'; IZ_2_pow_def u n']];
            mat_nrows := 2; mat_ncols := 2 |}
   end.
 
+Theorem bmat_depth_IZ_2_pow T {ro : ring_op T} : ∀ u n,
+  bmat_depth (IZ_2_pow_def u n) = S n.
+Proof.
+intros.
+induction n; [ easy | cbn ].
+now rewrite IHn.
+Qed.
+
 Theorem IZ_2_pow_prop : ∀ T {ro : ring_op T} u n,
-  mmatrix_prop (IZ_2_pow_def u n).
-...
+  bmatrix_prop (IZ_2_pow_def u n).
+Proof.
+intros.
+unfold bmatrix_prop, bmatrix_is_norm.
+revert u.
+induction n; intros; [ easy | cbn ].
+rewrite IHn.
+rewrite bmat_depth_IZ_2_pow.
+specialize (IHn 0%Rng).
+rewrite bmat_depth_IZ_2_pow in IHn.
+now rewrite IHn.
+Qed.
 
-Definition IZ_2_pow T {ro : ring_op T} u n : mmatrix T :=
-  {| mmat_def := IZ_2_pow_def u n;
-     mmat_prop := IZ_2_pow_prop u n |}.
-
+Definition IZ_2_pow T {ro : ring_op T} u n : bmatrix T :=
+  {| bmat_def := IZ_2_pow_def u n;
+     bmat_prop := IZ_2_pow_prop u n |}.
 
 Definition I_2_pow_def T {ro : ring_op T} := IZ_2_pow_def 1%Rng.
 Definition Z_2_pow_def T {ro : ring_op T} := IZ_2_pow_def 0%Rng.
@@ -2496,15 +2498,17 @@ Definition Z_2_pow T {ro : ring_op T} := IZ_2_pow 0%Rng.
 
 ...
 
-Fixpoint A_def T {ro : ring_op T} n : mmatrix_def T :=
+Fixpoint A_def T {ro : ring_op T} n : bmatrix_def T :=
   match n with
-  | 0 => MM_1 0%Rng
+  | 0 => BM_1 0%Rng
   | S n' =>
-       MM_M
-         (mmat_def_of_list
+       BM_M
+         (bmat_def_of_list
             [[A_def n'; I_2_pow_def n'];
-             [I_2_pow_def n'; mmat_def_opp (A_def n')]])
+             [I_2_pow_def n'; bmat_def_opp (A_def n')]])
   end.
+
+...
 
 (*
 Require Import ZArith.
@@ -2513,20 +2517,6 @@ Open Scope Z_scope.
 
 Compute (mat_of_mmat (@A _ Z_ring_op 4)).
 *)
-
-Fixpoint mmat_depth T (MM : mmatrix T) :=
-  match MM with
-  | MM_1 _ => 1
-  | MM_M MMM =>
-      match MMM with
-      | mk_mat [] _ _ => 0
-      | mk_mat (MMl :: _) _ _ =>
-          match MMl with
-          | [] => 0
-          | MM' :: _ => 1 + mmat_depth MM'
-          end
-      end
-  end.
 
 Compute (mmat_depth (A 0)).
 Compute (mmat_depth (A 1)).
@@ -2655,13 +2645,6 @@ Context (rp : @ring_prop T ro).
 Context (sp : @semiring_prop T so).
 
 Theorem mmat_depth_A : ∀ n, mmat_depth (A n) = S n.
-Proof.
-intros.
-induction n; [ easy | cbn ].
-now rewrite IHn.
-Qed.
-
-Theorem mmat_depth_IZ_2_pow : ∀ u n, mmat_depth (IZ_2_pow u n) = S n.
 Proof.
 intros.
 induction n; [ easy | cbn ].
