@@ -2284,6 +2284,62 @@ Proof.
 intros.
 split; intros Hij. {
   intros * Hi Hj.
+  induction li; [ easy | ].
+  destruct Hi as [Hi| Hi]. {
+    cbn in Hij; subst a.
+    remember (fold_left _ lj true) as b eqn:Hb.
+    symmetry in Hb.
+    destruct b. {
+      clear - Hb Hj.
+      induction lj as [| k]; [ easy | ].
+      cbn in Hb.
+      destruct Hj as [Hj| Hj]. {
+        subst k.
+        destruct (f i j); [ easy | exfalso ].
+        clear - Hb.
+        now induction lj.
+      } {
+        apply IHlj; [ | easy ].
+        destruct (f i k); [ easy | exfalso ].
+        clear - Hb.
+        now induction lj.
+      }
+    } {
+      exfalso; clear - Hij.
+      induction li; [ easy | ].
+      cbn in Hij.
+      remember (fold_left _ lj false) as b eqn:Hb.
+      symmetry in Hb.
+      destruct b; [ now clear - Hb; induction lj | ].
+      congruence.
+    }
+  } {
+    apply IHli; [ | easy ].
+    cbn in Hij.
+    remember (fold_left _ lj true) as b eqn:Hb.
+    symmetry in Hb.
+    destruct b; [ easy | ].
+    clear - Hij; induction li; [ easy | ].
+    cbn in Hij; cbn.
+    remember (fold_left _ lj false) as b eqn:Hb.
+    symmetry in Hb.
+    destruct b; [ now exfalso; clear - Hb; induction lj | ].
+    exfalso; clear - Hij; induction li; [ easy | ].
+    cbn in Hij.
+    remember (fold_left _ lj false) as b eqn:Hb.
+    symmetry in Hb.
+    destruct b; [ now exfalso; clear - Hb; induction lj | ].
+    now apply IHli.
+  }
+} {
+  induction li as [| k]; [ easy | cbn ].
+  remember (fold_left _ lj true) as b eqn:Hb.
+  symmetry in Hb.
+  destruct b. {
+    apply IHli; intros * Hi Hj.
+    apply Hij; [ now right | easy ].
+  } {
+...
   apply -> fold_left_and_true; [ | apply Hj ].
 ...
 
