@@ -2424,26 +2424,49 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
 }
 Qed.
 
-Definition mmat_opp T {ro : ring_op T} (BM : bmatrix T) : bmatrix T :=
+Definition bmat_opp T {ro : ring_op T} (BM : bmatrix T) : bmatrix T :=
   {| bmat_def := bmat_def_opp (bmat_def BM);
      bmat_prop := bmat_prop_opp BM |}.
 
-...
-
-Definition mmat_def_of_list T (ll : list (list (mmatrix T))) :
-    matrix_def (mmatrix T) :=
+Definition bmat_def_of_list T (ll : list (list (bmatrix T))) :
+    matrix_def (bmatrix T) :=
   {| mat_list := ll;
      mat_nrows := list_list_nrows ll;
      mat_ncols := list_list_ncols ll |}.
 
-Theorem mmat_prop_of_list : ∀ T (ll : list (list (mmatrix T))),
-  matrix_prop (mmat_def_of_list ll).
+Theorem bmat_prop_of_list : ∀ T (ll : list (list (bmatrix T))),
+  matrix_prop (bmat_def_of_list ll).
+Proof.
+intros.
+unfold matrix_prop, matrix_is_norm.
+apply Bool.andb_true_iff.
+split; [ apply Bool.andb_true_iff; split | ]. {
+  now apply Nat.eqb_eq.
+} {
+  unfold bmat_def_of_list.
+  cbn - [ all_lists_same_length ].
+...
+} {
+  unfold bmat_def_of_list.
+  cbn - [ zero_together ].
+...
+  unfold bmat_def_of_list; cbn.
+  apply fold_left_and_true.
+  intros l1 Hl1.
+  apply Nat.eqb_eq.
+  unfold list_list_ncols.
+  revert l1 Hl1.
+  induction ll as [| l2]; intros; [ easy | cbn ].
+  destruct Hl1 as [Hl1| Hl1]; [ congruence | ].
+  specialize (IHll _ Hl1).
+  destruct ll as [| l3]; [ easy | ].
+  cbn in IHll.
 ...
 
-Definition mmat_of_list T (ll : list (list (mmatrix T))) :
-    matrix (mmatrix T) :=
-  {| mat_def := mmat_def_of_list ll;
-     mat_prop := mmat_prop_of_list ll |}.
+Definition bmat_of_list T (ll : list (list (bmatrix T))) :
+    matrix (bmatrix T) :=
+  {| mat_def := bmat_def_of_list ll;
+     mat_prop := bmat_prop_of_list ll |}.
 
 Fixpoint IZ_2_pow_def T {ro : ring_op T} u n :=
   match n with
