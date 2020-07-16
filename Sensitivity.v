@@ -2512,9 +2512,46 @@ Fixpoint A_def T {ro : ring_op T} n : bmatrix_def T :=
              [I_2_pow_def n'; bmat_def_opp (A_def n')]])
   end.
 
+Theorem bmat_depth_A T {ro : ring_op T} : ∀ n,
+  bmat_depth (A_def n) = S n.
+Proof.
+intros.
+induction n; [ easy | cbn ].
+now rewrite IHn.
+Qed.
+
 Theorem A_prop : ∀ T {ro : ring_op T} n, bmatrix_prop (A_def n).
 Proof.
 intros.
+unfold bmatrix_prop, bmatrix_is_norm.
+rewrite bmat_depth_A.
+remember (S n) as len.
+assert (Hlen : S n ≤ len) by flia Heqlen; clear Heqlen.
+revert len Hlen.
+induction n; intros; cbn; [ now destruct len | cbn ].
+destruct len; [ easy | cbn ].
+apply Nat.succ_le_mono in Hlen.
+rewrite IHn; [ | easy ].
+replace (bmatrix_is_norm_loop len (I_2_pow_def n)) with true. 2: {
+  symmetry; unfold I_2_pow_def.
+  specialize (IZ_2_pow_prop 1%Rng n) as H1.
+  unfold bmatrix_prop, bmatrix_is_norm in H1.
+  rewrite bmat_depth_IZ_2_pow in H1.
+Search IZ_2_pow_def.
+...
+  clear - Hlen H1.
+  revert n Hlen H1.
+  induction len; intros; [ easy | ].
+  cbn in H1; cbn.
+  destruct (IZ_2_pow_def 1%Rng n) as [x| BMM]; [ easy | ].
+  apply Bool.andb_true_iff in H1.
+  apply Bool.andb_true_iff.
+  destruct H1 as (Hn, H1).
+  split; [ easy | ].
+  apply fold_left_fold_left_and_true.
+  intros * Hi Hj.
+  apply IHlen.
+
 ...
 
 Definition A T {ro : ring_op T} n : bmatrix T :=
