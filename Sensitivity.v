@@ -2293,6 +2293,24 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
     apply in_seq in Hj; cbn in Hj; destruct Hj as (_, Hj).
     rewrite List_map_nth_in with (a := void_bmat_def). 2: {
       clear - Hc Hi Hj.
+      revert i j Hi Hj.
+      induction ll as [| l]; intros; [ easy | ].
+      cbn in Hc.
+      remember (length l =? c) as b eqn:Hb; symmetry in Hb.
+      destruct b. {
+        apply Nat.eqb_eq in Hb.
+        cbn in Hi; cbn.
+        destruct i; [ now rewrite <- Hb in Hj | ].
+        apply Nat.succ_lt_mono in Hi.
+        now apply IHll.
+      } {
+        exfalso; clear - Hc.
+        induction ll as [| l]; [ easy | cbn in Hc ].
+        now apply IHll.
+      }
+    }
+    easy.
+  }
 ...
     intros j b' Hj.
     apply in_seq in Hj; cbn in Hj; destruct Hj as (_, Hj).
