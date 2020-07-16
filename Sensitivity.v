@@ -2311,6 +2311,7 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
     }
     easy.
   }
+...
 (*
   revert r c Hr Hc Hrc Hp.
   induction ll as [| l1]; intros; [ now subst r | ].
