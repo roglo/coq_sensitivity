@@ -2646,6 +2646,24 @@ Fixpoint bmat_def_add_loop T {so : semiring_op T} it (MM1 MM2 : bmatrix_def T) :
 Definition bmat_def_add T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
   bmat_def_add_loop (bmat_depth MM1) MM1 MM2.
 
+Theorem bmat_prop_add : ∀ T {so : semiring_op T} BMA BMB,
+  bmatrix_prop (bmat_def_add (bmat_def BMA) (bmat_def BMB)).
+Proof.
+intros.
+unfold bmat_def_add.
+unfold bmatrix_prop, bmatrix_is_norm.
+destruct BMA as (BMDA, BMPA).
+destruct BMB as (BMDB, BMPB).
+move BMDB before BMDA.
+cbn.
+...
+
+Definition bmat_add T {so : semiring_op T} (BMA BMB : bmatrix T) :=
+  {| bmat_def := bmat_def_add (bmat_def BMA) (bmat_def BMB);
+     bmat_prop := bmat_prop_add BMA BMB |}.
+
+...
+
 Fixpoint bmat_def_mul_loop T {so : semiring_op T} it (MM1 MM2 : bmatrix_def T) :=
   match it with
   | 0 => void_bmat_def
