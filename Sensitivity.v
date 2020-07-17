@@ -2384,7 +2384,6 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
   }
   easy.
 } {
-(**)
   destruct BMM as (ll, r, c).
   cbn in Hr, Hc, Hrc, Hp |-*.
   apply Nat.eqb_eq in Hr.
@@ -2542,20 +2541,33 @@ destruct ll as [| l1]. {
   destruct r; [ now destruct c | easy ].
 }
 destruct l1 as [| bmd]; [ easy | ].
+apply Nat.succ_le_mono in Hit.
 cbn in Hnl, IHit; cbn.
 apply Bool.andb_true_iff in Hnl.
 apply Bool.andb_true_iff.
 destruct Hnl as (Hnl1, Hnl2).
 split; [ easy | ].
-(* mmm... il me semble que j'ai déjà prouvé quelque chose de
-   similaire plus haut... faut que je regarde ça *)
+apply fold_left_fold_left_and_true.
+intros * Hi Hj.
+specialize (proj1 (fold_left_fold_left_and_true _ _ _) Hnl2) as H1.
+cbn in H1.
+apply IHit. {
+  destruct i. {
+    destruct j; [ easy | cbn ].
+    etransitivity; [ | apply Hit ].
 ...
-specialize (proj1 (fold_left_fold_left_and_true _ _ _) H1) as H2.
-    cbn in H2.
+clear - Hnl1.
+induction l1; cbn. {
+  rewrite match_id.
 ...
-    rewrite <- Nat.add_1_r in H1.
-    rewrite seq_app in H1.
-  now rewrite IHlen.
+}
+...
+    unfold matrix_is_norm in Hnl1.
+    cbn - [ all_lists_same_length zero_together ] in Hnl1.
+    apply Bool.andb_true_iff in Hnl1.
+    destruct Hnl1 as (Hll1, Hzt1).
+    apply Bool.andb_true_iff in Hll1.
+    destruct Hll1 as (Hll1, Hsl1).
 ...
 
 Theorem A_prop : ∀ T {ro : ring_op T} n, bmatrix_prop (A_def n).
