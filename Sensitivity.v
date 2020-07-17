@@ -2601,48 +2601,49 @@ Definition A T {ro : ring_op T} {rp : ring_prop T} {sp : @semiring_prop T (@rng_
   {| bmat_def := A_def n;
      bmat_prop := A_prop n |}.
 
-...
-
 (*
 Require Import ZArith.
-Search mmatrix.
 Open Scope Z_scope.
 
-Compute (mat_of_mmat (@A _ Z_ring_op 4)).
+About Z_ring_op.
+Compute (mat_of_bmat (@A _ Z_ring_op Z_ring_prop Z_semiring_prop 4)).
 *)
 
-Compute (mmat_depth (A 0)).
-Compute (mmat_depth (A 1)).
-Compute (mmat_depth (A 2)).
-Compute (mmat_depth (A 3)).
-Compute (mmat_depth (A 4)).
+Compute (bmat_depth (A_def 0)).
+Compute (bmat_depth (A_def 1)).
+Compute (bmat_depth (A_def 2)).
+Compute (bmat_depth (A_def 3)).
+Compute (bmat_depth (A_def 4)).
 
-Definition mmmat_depth T {so : semiring_op T} (MMM : matrix (mmatrix T)) :=
-  mmat_depth (mat_el void_mmat MMM 0 0).
+Definition mbmat_depth T {so : semiring_op T} (MMM : matrix (bmatrix T)) :=
+  bmat_depth (bmat_def (mat_el (void_bmat T) MMM 0 0)).
 
-Fixpoint mmat_add_loop T {so : semiring_op T} it (MM1 MM2 : mmatrix T) :=
+Fixpoint bmat_def_add_loop T {so : semiring_op T} it (MM1 MM2 : bmatrix_def T) :=
   match it with
-  | 0 => void_mmat
+  | 0 => void_bmat_def
   | S it' =>
       match MM1 with
-      | MM_1 xa =>
+      | BM_1 xa =>
           match MM2 with
-          | MM_1 xb => MM_1 (xa + xb)%Srng
-          | MM_M MMB => void_mmat
+          | BM_1 xb => BM_1 (xa + xb)%Srng
+          | BM_M MMB => void_bmat_def
           end
-      | MM_M MMA =>
+      | BM_M MMA =>
           match MM2 with
-          | MM_1 MB => void_mmat
-          | MM_M MMB =>
+          | BM_1 MB => void_bmat_def
+          | BM_M MMB =>
               let sso :=
-                {| srng_zero := void_mmat; srng_one := void_mmat;
-                   srng_add := mmat_add_loop it';
-                   srng_mul := mmat_add_loop it' |}
+                {| srng_zero := void_bmat_def;
+                   srng_one := void_bmat_def;
+                   srng_add := bmat_def_add_loop it';
+                   srng_mul := bmat_def_add_loop it' |}
               in
-              MM_M (mat_add MMA MMB)
+              BM_M (mat_def_add MMA MMB)
           end
       end
   end.
+
+...
 
 Definition mmat_add T {so : semiring_op T} (MM1 MM2 : mmatrix T) :=
   mmat_add_loop (mmat_depth MM1) MM1 MM2.

@@ -190,6 +190,21 @@ Definition Z_ring_op : ring_op Z :=
   {| rng_semiring := Z_semiring_op;
      rng_opp := Z.opp |}.
 
+Canonical Structure Z_semiring_op.
+Canonical Structure Z_ring_op.
+
+Definition Z_semiring_prop : semiring_prop Z :=
+  {| srng_add_comm := Z.add_comm;
+     srng_add_assoc := Z.add_assoc;
+     srng_add_0_l := Z.add_0_l;
+     srng_mul_comm := Z.mul_comm;
+     srng_mul_1_l := Z.mul_1_l;
+     srng_mul_add_distr_l := Z.mul_add_distr_l;
+     srng_mul_0_l := Z.mul_0_l |}.
+
+Definition Z_ring_prop : ring_prop Z :=
+  {| rng_add_opp_l := Z.add_opp_diag_l |}.
+
 (* borrowed from Ring2.v because, now, I want to start with
    semirings, and define rings later from semirings; this way,
    summations with syntax Σ can be defined (later) on semirings,
