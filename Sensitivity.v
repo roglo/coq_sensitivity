@@ -2643,49 +2643,50 @@ Fixpoint bmat_def_add_loop T {so : semiring_op T} it (MM1 MM2 : bmatrix_def T) :
       end
   end.
 
-...
+Definition bmat_def_add T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
+  bmat_def_add_loop (bmat_depth MM1) MM1 MM2.
 
-Definition mmat_add T {so : semiring_op T} (MM1 MM2 : mmatrix T) :=
-  mmat_add_loop (mmat_depth MM1) MM1 MM2.
-
-(* problem of this implementation: the recursive call mmat_mul_loop
-   is inside an implicit argument; makes induction proofs difficult
-   to make *)
-Fixpoint mmat_mul_loop T {so : semiring_op T} it (MM1 MM2 : mmatrix T) :=
+Fixpoint bmat_def_mul_loop T {so : semiring_op T} it (MM1 MM2 : bmatrix_def T) :=
   match it with
-  | 0 => void_mmat
+  | 0 => void_bmat_def
   | S it' =>
       match MM1 with
-      | MM_1 xa =>
+      | BM_1 xa =>
           match MM2 with
-          | MM_1 xb => MM_1 (xa * xb)%Srng
-          | MM_M MMB => void_mmat
+          | BM_1 xb => BM_1 (xa * xb)%Srng
+          | BM_M MMB => void_bmat_def
           end
-      | MM_M MMMA =>
+      | BM_M MMMA =>
           match MM2 with
-          | MM_1 MB => void_mmat
-          | MM_M MMMB =>
+          | BM_1 MB => void_bmat_def
+          | BM_M MMMB =>
               let mso :=
-                {| srng_zero := void_mmat;
-                   srng_one := void_mmat;
-                   srng_add := @mmat_add T so;
-                   srng_mul := mmat_mul_loop it' |}
+                {| srng_zero := void_bmat_def;
+                   srng_one := void_bmat_def;
+                   srng_add := @bmat_def_add T so;
+                   srng_mul := bmat_def_mul_loop it' |}
               in
-              MM_M (mat_mul MMMA MMMB)
+              BM_M (mat_def_mul MMMA MMMB)
           end
       end
   end.
 
-Definition mmat_mul T {so : semiring_op T} (MM1 MM2 : mmatrix T) :=
-  mmat_mul_loop (mmat_depth MM1) MM1 MM2.
+Definition bmat_def_mul T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
+  bmat_def_mul_loop (bmat_depth MM1) MM1 MM2.
 
-(*
+(**)
 Require Import ZArith.
 Open Scope Z_scope.
 
-Check mmat_mul.
-Check mat_of_mmat.
+Check bmat_def_mul.
+Check mat_of_bmat.
 
+Check A.
+
+Compute (let ro := Z_ring_op in let so := Z_semiring_op in let ro := Z_ring_prop in A_def 0).
+Compute (let ro := Z_ring_op in let so := Z_semiring_op in let ro := Z_ring_prop in A_def 1).
+Compute (let ro := Z_ring_op in let so := Z_semiring_op in let ro := Z_ring_prop in mat_of_bmat (A 2)).
+...
 Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in A 0).
 Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in A 1).
 Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mmat (A 2)).
@@ -2694,7 +2695,7 @@ Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mm
 Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mmat (mmat_mul (A 1) (A 1))).
 Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mmat (mmat_mul (A 2) (A 2))).
 Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mmat (mmat_mul (A 3) (A 3))).
-*)
+(**)
 
 Definition rng_mul_nat_l T {so : semiring_op T} n v :=
   match n with
