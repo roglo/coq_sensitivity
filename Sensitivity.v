@@ -2656,6 +2656,91 @@ destruct BMA as (BMDA, BMPA).
 destruct BMB as (BMDB, BMPB).
 move BMDB before BMDA.
 cbn.
+destruct BMDA as [ta| MDA]; [ now destruct BMDB | ].
+destruct BMDB as [tb| MDB]. {
+  destruct MDA as (lla, ra, ca).
+  destruct lla as [| la]; [ easy | now destruct la ].
+} {
+  destruct MDA as (lla, ra, ca).
+  destruct MDB as (llb, rb, cb).
+  destruct lla as [| la]. {
+    unfold bmatrix_prop, bmatrix_is_norm in BMPA.
+    cbn in BMPA.
+    apply Bool.andb_true_iff in BMPA.
+    destruct BMPA as (MAN, MAP).
+    unfold matrix_is_norm in MAN; cbn in MAN.
+    destruct ra; [ | easy ].
+    destruct ca; [ | easy ].
+    clear MAN.
+    destruct llb as [| lb]. {
+      unfold bmatrix_prop, bmatrix_is_norm in BMPB.
+      cbn in BMPB.
+      apply Bool.andb_true_iff in BMPB.
+      destruct BMPB as (MBN, MBP).
+      unfold matrix_is_norm in MBN; cbn in MBP.
+      destruct rb; [ | easy ].
+      destruct cb; [ | easy ].
+      easy.
+    } {
+      unfold bmatrix_prop, bmatrix_is_norm in BMPB.
+      cbn in BMPB.
+      destruct lb as [| b]; [ easy | cbn ].
+      cbn in BMPB.
+      apply Bool.andb_true_iff in BMPB.
+      destruct BMPB as (MNB, MNLB).
+      unfold matrix_is_norm in MNB.
+      cbn in MNB.
+      apply Bool.andb_true_iff in MNB.
+      destruct MNB as (MNB, MNB3).
+      apply Bool.andb_true_iff in MNB.
+      destruct MNB as (MNB1, MNB2).
+      destruct rb; [ easy | ].
+      destruct cb; [ easy | ].
+      easy.
+    }
+  } {
+    unfold bmatrix_prop, bmatrix_is_norm in BMPA.
+    cbn in BMPA.
+    destruct la as [| a]; [ easy | cbn ].
+    cbn in BMPA.
+    apply Bool.andb_true_iff in BMPA.
+    destruct BMPA as (MNA, MNLA).
+    unfold matrix_is_norm in MNA.
+    cbn in MNA.
+    apply Bool.andb_true_iff in MNA.
+    destruct MNA as (MNA, MNA3).
+    apply Bool.andb_true_iff in MNA.
+    destruct MNA as (MNA1, MNA2).
+    destruct ra; [ easy | ].
+    destruct ca; [ easy | ].
+    destruct llb as [| lb]. {
+      unfold bmatrix_prop, bmatrix_is_norm in BMPB.
+      cbn in BMPB.
+      apply Bool.andb_true_iff in BMPB.
+      destruct BMPB as (MBN, MBP).
+      unfold matrix_is_norm in MBN; cbn in MBP.
+      destruct rb; [ | easy ].
+      destruct cb; [ | easy ].
+      easy.
+    } {
+      unfold bmatrix_prop, bmatrix_is_norm in BMPB.
+      cbn in BMPB.
+      destruct lb as [| b]; [ easy | cbn ].
+      cbn in BMPB.
+      apply Bool.andb_true_iff in BMPB.
+      destruct BMPB as (MNB, MNLB).
+      unfold matrix_is_norm in MNB.
+      cbn in MNB.
+      apply Bool.andb_true_iff in MNB.
+      destruct MNB as (MNB, MNB3).
+      apply Bool.andb_true_iff in MNB.
+      destruct MNB as (MNB1, MNB2).
+      destruct rb; [ easy | ].
+      destruct cb; [ easy | ].
+      unfold mat_def_add.
+      cbn - [ Nat.eq_dec ].
+      destruct (Nat.eq_dec (S ra) (S rb)) as [Hrr| Hrr]. {
+        destruct (Nat.eq_dec (S ca) (S cb)) as [Hcc| Hcc]. {
 ...
 
 Definition bmat_add T {so : semiring_op T} (BMA BMB : bmatrix T) :=
