@@ -2519,69 +2519,16 @@ induction n; [ easy | cbn ].
 now rewrite IHn.
 Qed.
 
-(*
-Theorem bmatrix_is_norm_loop_enough_iter : ∀ T (BM : bmatrix_def T) it,
-  bmat_depth BM ≤ it
-  → bmatrix_is_norm_loop (bmat_depth BM) BM = true
-  → bmatrix_is_norm_loop it BM = true.
+Theorem bmatrix_is_norm_loop_IZ_2_pow : ∀ T {ro : ring_op T} len u n,
+  S n ≤ len → bmatrix_is_norm_loop len (IZ_2_pow_def u n) = true.
 Proof.
-intros * Hit Hnl.
-revert BM Hit Hnl.
-induction it; intros. {
-  apply Nat.le_0_r in Hit.
-  rewrite Hit in Hnl.
-  easy.
-}
-destruct BM as [x| BMM]; [ easy | ].
-cbn in Hit, Hnl; cbn.
-destruct BMM as (ll, r, c).
-destruct ll as [| l1]. {
-  cbn in Hnl.
-  apply Bool.andb_true_iff in Hnl.
-  destruct Hnl as (Hnl, H1).
-  destruct r; [ now destruct c | easy ].
-}
-destruct l1 as [| bmd]; [ easy | ].
-apply Nat.succ_le_mono in Hit.
-cbn in Hnl, IHit; cbn.
-apply Bool.andb_true_iff in Hnl.
-apply Bool.andb_true_iff.
-destruct Hnl as (Hnl1, Hnl2).
-split; [ easy | ].
-apply fold_left_fold_left_and_true.
-intros * Hi Hj.
-specialize (proj1 (fold_left_fold_left_and_true _ _ _) Hnl2) as H1.
-cbn in H1.
-apply IHit. {
-  destruct i. {
-    destruct j; [ easy | cbn ].
-Print bmat_depth.
-...
-    etransitivity; [ | apply Hit ].
-clear - Hnl1.
-unfold matrix_is_norm in Hnl1.
-cbn - [ all_lists_same_length zero_together ] in Hnl1.
-    apply Bool.andb_true_iff in Hnl1.
-    destruct Hnl1 as (Hll1, Hzt1).
-    apply Bool.andb_true_iff in Hll1.
-    destruct Hll1 as (Hll1, Hsl1).
-destruct r; [ easy | ].
-apply Nat.eqb_eq in Hll1.
-Print bmat_depth.
-...
-induction l1; cbn. {
-  rewrite match_id.
-...
-}
-...
-    unfold matrix_is_norm in Hnl1.
-    cbn - [ all_lists_same_length zero_together ] in Hnl1.
-    apply Bool.andb_true_iff in Hnl1.
-    destruct Hnl1 as (Hll1, Hzt1).
-    apply Bool.andb_true_iff in Hll1.
-    destruct Hll1 as (Hll1, Hsl1).
-...
-*)
+intros * Hlen.
+revert u n Hlen.
+induction len; intros; [ easy | ].
+apply Nat.succ_le_mono in Hlen.
+destruct n; [ easy | cbn ].
+rewrite IHlen; [ now rewrite IHlen | easy ].
+Qed.
 
 Theorem A_prop : ∀ T {ro : ring_op T} n, bmatrix_prop (A_def n).
 Proof.
@@ -2595,59 +2542,9 @@ induction n; intros; cbn; [ now destruct len | cbn ].
 destruct len; [ easy | cbn ].
 apply Nat.succ_le_mono in Hlen.
 rewrite IHn; [ | easy ].
-replace (bmatrix_is_norm_loop len (I_2_pow_def n)) with true. 2: {
-  symmetry; unfold I_2_pow_def.
-(**)
-  destruct len; [ easy | ].
-  apply Nat.succ_le_mono in Hlen.
-  destruct n; [ easy | ].
-  cbn.
-  specialize (IZ_2_pow_prop 1%Rng n) as H1.
-  unfold bmatrix_prop, bmatrix_is_norm in H1.
-  rewrite bmat_depth_IZ_2_pow in H1.
-...
-  specialize (IZ_2_pow_prop 1%Rng n) as H1.
-  unfold bmatrix_prop, bmatrix_is_norm in H1.
-  rewrite bmat_depth_IZ_2_pow in H1.
-clear IHn.
-revert n Hlen H1.
-induction len; intros; [ easy | ].
-cbn in H1; cbn.
-apply Nat.succ_le_mono in Hlen.
-destruct n; [ easy | ].
-cbn.
-Search bmatrix_is_norm_loop.
-...
-remember (IZ_2_pow_def 1%Rng n) as BM eqn:HBM.
-symmetry in HBM.
-destruct BM as [x| BMM]; [ easy | ].
-apply Bool.andb_true_iff in H1.
-apply Bool.andb_true_iff.
-destruct H1 as (H1, H2).
-split; [ easy | ].
-apply fold_left_fold_left_and_true.
-intros * Hi Hj.
-specialize (proj1 (fold_left_fold_left_and_true _ _ _) H2) as H3.
-cbn in H3.
-...
-apply bmatrix_is_norm_loop_enough_iter.
-now rewrite bmat_depth_IZ_2_pow.
-
-Search IZ_2_pow_def.
-...
-  clear - Hlen H1.
-  revert n Hlen H1.
-  induction len; intros; [ easy | ].
-  cbn in H1; cbn.
-  destruct (IZ_2_pow_def 1%Rng n) as [x| BMM]; [ easy | ].
-  apply Bool.andb_true_iff in H1.
-  apply Bool.andb_true_iff.
-  destruct H1 as (Hn, H1).
-  split; [ easy | ].
-  apply fold_left_fold_left_and_true.
-  intros * Hi Hj.
-  apply IHlen.
-
+unfold I_2_pow_def.
+rewrite bmatrix_is_norm_loop_IZ_2_pow; [ cbn | easy ].
+Search bmat_def_opp.
 ...
 
 Definition A T {ro : ring_op T} n : bmatrix T :=
