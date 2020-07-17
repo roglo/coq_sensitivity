@@ -2530,6 +2530,18 @@ destruct n; [ easy | cbn ].
 rewrite IHlen; [ now rewrite IHlen | easy ].
 Qed.
 
+Theorem bmatrix_is_norm_loop_opp_IZ_2_pow : ∀ T {ro : ring_op T} len u n,
+  S n ≤ len
+  → bmatrix_is_norm_loop len (bmat_def_opp (IZ_2_pow_def u n)) = true.
+Proof.
+intros * Hlen.
+revert u n Hlen.
+induction len; intros; [ easy | ].
+apply Nat.succ_le_mono in Hlen.
+destruct n; [ easy | cbn ].
+rewrite IHlen; [ now rewrite IHlen | easy ].
+Qed.
+
 Theorem A_prop : ∀ T {ro : ring_op T} n, bmatrix_prop (A_def n).
 Proof.
 intros.
@@ -2544,7 +2556,17 @@ apply Nat.succ_le_mono in Hlen.
 rewrite IHn; [ | easy ].
 unfold I_2_pow_def.
 rewrite bmatrix_is_norm_loop_IZ_2_pow; [ cbn | easy ].
-Search bmat_def_opp.
+...
+rewrite <- (IHn len); [ | easy ].
+clear - Hlen.
+revert n Hlen.
+induction len; intros; [ easy | ].
+apply Nat.succ_le_mono in Hlen.
+destruct n; [ easy | ].
+cbn.
+rewrite IHlen.
+unfold I_2_pow_def.
+rewrite bmatrix_is_norm_loop_opp_IZ_2_pow; [ | easy ].
 ...
 
 Definition A T {ro : ring_op T} n : bmatrix T :=
