@@ -93,8 +93,7 @@ Section ring_theorems.
 
 Context {A : Type}.
 Context {ro : ring_op A}.
-Context (so := @rng_semiring A ro).
-Context {sp : @semiring_prop A so}.
+Context {sp : @semiring_prop A (@rng_semiring A ro)}.
 Context {rp : @ring_prop A ro}.
 
 Theorem rng_sub_compat_l : ∀ a b c,
@@ -150,6 +149,28 @@ transitivity (0 + - 0)%Rng. {
   symmetry.
   apply srng_add_0_l.
 }
+apply rng_add_opp_r.
+Qed.
+
+Theorem rng_add_move_0_r : ∀ a b, (a + b = 0)%Rng ↔ (a = - b)%Rng.
+Proof.
+intros a b.
+split; intros H. {
+  apply rng_sub_compat_l with (c := b) in H.
+  rewrite rng_add_sub in H.
+  unfold rng_sub in H.
+  now rewrite srng_add_0_l in H.
+} {
+  rewrite H.
+  now rewrite rng_add_opp_l.
+}
+Qed.
+
+Theorem rng_opp_involutive : ∀ x, (- - x)%Rng = x.
+Proof.
+intros.
+symmetry.
+apply rng_add_move_0_r.
 apply rng_add_opp_r.
 Qed.
 
@@ -222,13 +243,6 @@ Theorem srng_add_compat : ∀ a b c d,
 Proof.
 intros a b c d Hab Hcd.
 rewrite Hab, Hcd; reflexivity.
-Qed.
-
-Theorem srng_sub_compat_l : ∀ a b c,
-  (a = b)%Srng → (a - c = b - c)%Srng.
-Proof.
-intros a b c Hab.
-now rewrite Hab.
 Qed.
 
 Theorem srng_sub_compat_r : ∀ a b c,
@@ -395,19 +409,6 @@ rewrite srng_opp_0.
 apply srng_add_0_r.
 Qed.
 
-Theorem srng_add_move_0_r : ∀ a b, (a + b = 0)%Srng ↔ (a = - b)%Srng.
-Proof.
-intros a b.
-split; intros H.
- apply srng_sub_compat_l with (c := b) in H.
- rewrite srng_add_sub in H.
- unfold srng_sub in H.
- now rewrite srng_add_0_l in H.
-
- rewrite H.
- rewrite srng_add_opp_l; reflexivity.
-Qed.
-
 Theorem srng_opp_inj_wd : ∀ a b, (- a = - b)%Srng ↔ (a = b)%Srng.
 Proof.
 intros a b; split; intros H.
@@ -419,14 +420,6 @@ intros a b; split; intros H.
  apply srng_add_opp_r.
 
  rewrite H; reflexivity.
-Qed.
-
-Theorem srng_opp_involutive : ∀ x, (- - x)%Srng = x.
-Proof.
-intros.
-symmetry.
-apply srng_add_move_0_r.
-apply srng_add_opp_r.
 Qed.
 
 Theorem srng_add_add_swap : ∀ n m p, (n + m + p = n + p + m)%Srng.

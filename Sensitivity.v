@@ -2542,7 +2542,28 @@ destruct n; [ easy | cbn ].
 rewrite IHlen; [ now rewrite IHlen | easy ].
 Qed.
 
-Theorem A_prop : ∀ T {ro : ring_op T} n, bmatrix_prop (A_def n).
+Theorem bmat_def_opp_involutive : ∀ T {ro : ring_op T} {rp : ring_prop T}
+ (so := @rng_semiring T ro) {sp : semiring_prop T} BM,
+  bmat_def_opp (bmat_def_opp BM) = BM.
+Proof.
+intros.
+revert BM.
+fix HBM 1.
+destruct BM as [x| BMM]. {
+  now cbn; rewrite rng_opp_involutive.
+} {
+  destruct BMM as (ll, r, c); cbn; f_equal; f_equal.
+  induction ll as [| l]; [ easy | cbn ].
+  f_equal; [ | easy ].
+  clear IHll.
+  induction l as [| x]; [ easy | cbn ].
+  f_equal; [ | easy ].
+  apply HBM.
+}
+Qed.
+
+Theorem A_prop : ∀ T {ro : ring_op T} {rp : ring_prop T} {sp : @semiring_prop T (@rng_semiring T ro)},
+  ∀ n, bmatrix_prop (A_def n).
 Proof.
 intros.
 unfold bmatrix_prop, bmatrix_is_norm.
@@ -2556,22 +2577,29 @@ apply Nat.succ_le_mono in Hlen.
 rewrite IHn; [ | easy ].
 unfold I_2_pow_def.
 rewrite bmatrix_is_norm_loop_IZ_2_pow; [ cbn | easy ].
-...
-rewrite <- (IHn len); [ | easy ].
-clear - Hlen.
-revert n Hlen.
+specialize (IHn _ Hlen) as H1.
+clear IHn.
+revert n Hlen H1.
 induction len; intros; [ easy | ].
 apply Nat.succ_le_mono in Hlen.
 destruct n; [ easy | ].
-cbn.
-rewrite IHlen.
+cbn in H1; cbn.
+apply Bool.andb_true_iff in H1.
+destruct H1 as (H1, H4).
+apply Bool.andb_true_iff in H1.
+destruct H1 as (H1, H3).
+apply Bool.andb_true_iff in H1.
+destruct H1 as (H1, H2).
+rewrite H4; cbn.
 unfold I_2_pow_def.
-rewrite bmatrix_is_norm_loop_opp_IZ_2_pow; [ | easy ].
-...
+rewrite bmatrix_is_norm_loop_opp_IZ_2_pow; [ cbn | easy ].
+now rewrite bmat_def_opp_involutive.
+Qed.
 
-Definition A T {ro : ring_op T} n : bmatrix T :=
+Definition A T {ro : ring_op T} {rp : ring_prop T} {sp : @semiring_prop T (@rng_semiring T ro)}
+    n : bmatrix T :=
   {| bmat_def := A_def n;
-     bmat_prop := 42 |}.
+     bmat_prop := A_prop n |}.
 
 ...
 
