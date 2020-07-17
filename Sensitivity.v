@@ -2685,13 +2685,11 @@ Check A.
 
 Compute (let ro := Z_ring_op in let so := Z_semiring_op in let ro := Z_ring_prop in A_def 0).
 Compute (let ro := Z_ring_op in let so := Z_semiring_op in let ro := Z_ring_prop in A_def 1).
-Compute (let ro := Z_ring_op in let so := Z_semiring_op in let ro := Z_ring_prop in mat_of_bmat (A 2)).
+Compute (let ro := Z_ring_op in let so := Z_semiring_op in let rp := Z_semiring_prop in let ro := Z_ring_prop in mat_of_bmat (A 2)).
 ...
-Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in A 0).
-Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in A 1).
-Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mmat (A 2)).
-
-Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mmat (mmat_mul (A 0) (A 0))).
+Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_bmat_def (bmat_def_mul (A_def 0) (A_def 0))).
+...
+Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_bmat (mmat_mul (A 0) (A 0))).
 Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mmat (mmat_mul (A 1) (A 1))).
 Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mmat (mmat_mul (A 2) (A 2))).
 Compute (let ro := Z_ring_op in let so := @rng_semiring Z Z_ring_op in mat_of_mmat (mmat_mul (A 3) (A 3))).
