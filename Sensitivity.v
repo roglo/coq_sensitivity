@@ -2597,6 +2597,15 @@ apply Nat.succ_le_mono in Hlen.
 rewrite IHn; [ | easy ].
 replace (bmatrix_is_norm_loop len (I_2_pow_def n)) with true. 2: {
   symmetry; unfold I_2_pow_def.
+(**)
+  destruct len; [ easy | ].
+  apply Nat.succ_le_mono in Hlen.
+  destruct n; [ easy | ].
+  cbn.
+  specialize (IZ_2_pow_prop 1%Rng n) as H1.
+  unfold bmatrix_prop, bmatrix_is_norm in H1.
+  rewrite bmat_depth_IZ_2_pow in H1.
+...
   specialize (IZ_2_pow_prop 1%Rng n) as H1.
   unfold bmatrix_prop, bmatrix_is_norm in H1.
   rewrite bmat_depth_IZ_2_pow in H1.
