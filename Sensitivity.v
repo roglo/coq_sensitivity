@@ -2554,9 +2554,19 @@ cbn in H1.
 apply IHit. {
   destruct i. {
     destruct j; [ easy | cbn ].
-    etransitivity; [ | apply Hit ].
 ...
+    etransitivity; [ | apply Hit ].
 clear - Hnl1.
+unfold matrix_is_norm in Hnl1.
+cbn - [ all_lists_same_length zero_together ] in Hnl1.
+    apply Bool.andb_true_iff in Hnl1.
+    destruct Hnl1 as (Hll1, Hzt1).
+    apply Bool.andb_true_iff in Hll1.
+    destruct Hll1 as (Hll1, Hsl1).
+destruct r; [ easy | ].
+apply Nat.eqb_eq in Hll1.
+Print bmat_depth.
+...
 induction l1; cbn. {
   rewrite match_id.
 ...
