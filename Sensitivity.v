@@ -1832,31 +1832,6 @@ Theorem mat_of_list_prop : ∀ T x l1 ll1,
   → matrix_prop (mat_def_of_list ((x :: l1) :: ll1) : matrix_def T).
 Proof.
 intros * Hfa.
-unfold matrix_prop.
-apply matrix_is_norm_prop.
-split; [ easy | | ]. {
-  intros l2 Hl2.
-  specialize (proj1 (Forall_forall _ _) Hfa) as H1.
-  cbn in H1; cbn.
-  symmetry; apply H1.
-  cbn in Hl2.
-  destruct Hl2 as [Hl2| Hl2]; cbn in Hl2. {
-    subst l2; cbn.
-    cbn in Hfa.
-...
-specialize (H1 (length l1) (or_introl eq_refl)) as H2.
-rewrite <- H2; cbn.
-rewrite Nat.eqb_refl.
-apply IHll1.
-cbn in Hfa; cbn.
-apply Forall_forall.
-intros y Hy.
-apply H1.
-now right.
-Qed.
-
-...
-intros * Hfa.
 unfold matrix_prop, matrix_is_norm; cbn.
 rewrite Nat.eqb_refl, Bool.andb_true_l.
 rewrite Nat.eqb_refl, Bool.andb_true_r.
@@ -1922,6 +1897,57 @@ Definition mat_def_transpose T (d : T) (M : matrix_def T) : matrix_def T :=
 Theorem mat_prop_transpose : ∀ T d M,
   matrix_prop (mat_def_transpose d (mat_def M) : matrix_def T).
 Proof.
+intros.
+destruct M as (Md, Mp); cbn.
+apply matrix_is_norm_prop in Mp.
+apply matrix_is_norm_prop.
+destruct Mp as (Hr, Hc, Hrc).
+split. {
+  cbn; unfold list_list_transpose.
+  rewrite map_length, seq_length.
+  unfold list_list_ncols.
+  destruct (mat_list Md) as [| l ll]. {
+    cbn; symmetry.
+    now apply Hrc.
+  } {
+    now apply Hc; left.
+  }
+} {
+...
+  unfold all_lists_same_length.
+  unfold mat_def_transpose; cbn.
+  unfold list_list_transpose.
+  rewrite List_fold_left_map.
+  etransitivity. {
+    apply List_fold_left_ext_in.
+    intros b c Hb.
+    rewrite map_length, seq_length.
+    unfold list_list_nrows.
+    easy.
+  }
+  unfold list_list_ncols.
+  rewrite Hr, Nat.eqb_refl.
+  etransitivity. {
+    apply List_fold_left_ext_in.
+    intros b c Hb.
+    rewrite Bool.andb_true_r.
+    easy.
+  }
+  remember (length (hd [] (mat_list Md))) as len eqn:Hlen.
+  clear.
+  induction len; [ easy | ].
+  rewrite <- Nat.add_1_r.
+  rewrite seq_app.
+  rewrite fold_left_app.
+  now rewrite IHlen.
+} {
+  unfold zero_together.
+  unfold mat_def_transpose; cbn.
+  unfold zero_together in Hrc.
+  now destruct (mat_nrows Md), (mat_ncols Md).
+}
+
+...
 intros.
 destruct M as (Md, Mp); cbn.
 unfold matrix_prop, matrix_is_norm in Mp.
