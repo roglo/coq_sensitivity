@@ -1722,9 +1722,12 @@ Definition matrix_is_norm T (md : matrix_def T) :=
   all_lists_same_length (mat_ncols md) (mat_list md) &&
   zero_together (mat_nrows md) (mat_ncols md).
 
+(* coherence property of matrices: computable and returning a bool
+   to make proof unique *)
 Definition matrix_prop T (md : matrix_def T) :=
   matrix_is_norm md = true.
 
+(* definition of matrices *)
 Record matrix T := mk_mat
   { mat_def : matrix_def T;
     mat_prop : matrix_prop mat_def }.
@@ -1799,6 +1802,8 @@ Definition list_list_nrows T (ll : list (list T)) :=
 Definition list_list_ncols T (ll : list (list T)) :=
   length (hd [] ll).
 
+(* equality in matrix is equivalent to equality of matrix_def
+   thanks to unicity of proof of its coherence properties *)
 Theorem matrix_eq_eq {T} : ∀ (MA MB : matrix T),
   MA = MB ↔ mat_def MA = mat_def MB.
 Proof.
@@ -2190,28 +2195,50 @@ Fixpoint bmatrix_is_norm_loop T it (bmd : bmatrix_def T) :=
 Definition bmatrix_is_norm T (bmd : bmatrix_def T) :=
   bmatrix_is_norm_loop (bmat_depth bmd) bmd.
 
+(* coherence properties of block matrices: computable and returning a bool
+   to make proof unique *)
 Definition bmatrix_prop T (bmd : bmatrix_def T) :=
   bmatrix_is_norm bmd = true.
 
+(* definition of block matrices *)
 Record bmatrix T :=
   { bmat_def : bmatrix_def T;
     bmat_prop : bmatrix_prop bmat_def }.
 
-Print matrix_norm_prop.
-
-... à voir...
-
-Record bmatrix_norm_prop T (bmd : bmatrix_def T) :=
-  { bmat_list_nrows :
+Fixpoint bmatrix_norm_prop_loop T it (bmd : bmatrix_def T) :=
+  match it with
+  | 0 => False
+  | S it' =>
       match bmd with
       | BM_1 _ => True
-      | BM_M BMM => matrix_is_norm BMM
-      end }.
-...
+      | BM_M BMM =>
+          matrix_norm_prop BMM ∧
+          ∀ rows, rows ∈ mat_list BMM →
+          ∀ bmd', bmd' ∈ rows → bmatrix_norm_prop_loop it' bmd'
+      end
+  end.
 
-    bmat_list_ncols : ∀ c, c ∈ mat_list md → length c = mat_ncols md;
-    bmat_zero_nrows_ncols : mat_nrows md = 0 ↔ mat_ncols md = 0 }.
+Definition bmatrix_norm_prop T (bmd : bmatrix_def T) :=
+  bmatrix_norm_prop_loop (bmat_depth bmd) bmd.
 
+Theorem bmatrix_is_norm_prop : ∀ T (bmd : bmatrix_def T),
+  bmatrix_is_norm bmd = true ↔ bmatrix_norm_prop bmd.
+Proof.
+intros.
+split; intros Hbmd. {
+  unfold bmatrix_is_norm in Hbmd.
+  unfold bmatrix_norm_prop.
+  remember (bmat_depth bmd) as len eqn:Hlen; clear Hlen.
+  revert bmd Hbmd.
+  induction len; intros; [ easy | ].
+  cbn in Hbmd; cbn.
+  destruct bmd as [| BMM]; [ easy | ].
+  apply Bool.andb_true_iff in Hbmd.
+  destruct Hbmd as (H1, H2).
+  apply matrix_is_norm_prop in H1.
+  split; [ easy | ].
+  intros * Hrows * Hbmd'.
+  apply IHlen.
 ...
 
 Arguments BM_1 {_} a%Srng.
