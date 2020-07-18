@@ -2341,7 +2341,37 @@ split; intros Hbmd. {
   specialize (H3 H); clear H.
   now rewrite Hrows, Hbmd' in H3.
 } {
-...
+  unfold bmatrix_is_norm.
+  unfold bmatrix_norm_prop in Hbmd.
+  remember (bmat_depth bmd) as len eqn:Hlen; clear Hlen.
+  revert bmd Hbmd.
+  induction len; intros; [ easy | ].
+  cbn in Hbmd; cbn.
+  destruct bmd as [| BMM]; [ easy | ].
+  apply Bool.andb_true_iff.
+  destruct Hbmd as (H1, H2).
+  split; [ now apply matrix_is_norm_prop | ].
+  destruct H1 as (Hr, Hc, Hrc).
+  apply fold_left_fold_left_and_true.
+  intros i j Hi Hj.
+  destruct BMM as (ll, r, c).
+  cbn in Hr, Hc, Hrc, H2, Hi, Hj; cbn.
+  apply in_seq in Hi; cbn in Hi; destruct Hi as (_, Hi).
+  apply in_seq in Hj; cbn in Hj; destruct Hj as (_, Hj).
+  specialize (H2 (nth i ll [])).
+  assert (H : nth i ll [] ∈ ll). {
+    apply nth_In; congruence.
+  }
+  specialize (H2 H (nth j (nth i ll []) void_bmat_def)); clear H.
+  assert (H : nth j (nth i ll []) void_bmat_def ∈ nth i ll []). {
+    apply nth_In.
+    rewrite Hc; [ easy | ].
+    apply nth_In; congruence.
+  }
+  specialize (H2 H); clear H.
+  now apply IHlen.
+}
+Qed.
 
 Arguments BM_1 {_} a%Srng.
 Arguments BM_M {_}.
@@ -2377,12 +2407,13 @@ Definition mat_def_of_bmat_def T (BM : bmatrix_def T) : matrix_def T :=
 Definition mat_of_bmat T (BM : bmatrix T) : matrix T :=
   mat_of_list (list_list_of_bmat_def (bmat_def BM)).
 
-Theorem void_bmat_prop T : bmatrix_prop (void_bmat_def : bmatrix_def T).
+Theorem void_bmat_coh_prop T :
+  bmatrix_coh_prop (void_bmat_def : bmatrix_def T).
 Proof. easy. Qed.
 
 Definition void_bmat T : bmatrix T :=
   {| bmat_def := void_bmat_def;
-     bmat_prop := void_bmat_prop T |}.
+     bmat_coh_prop := void_bmat_coh_prop T |}.
 
 Fixpoint bmat_def_opp T {ro : ring_op T} BM : bmatrix_def T :=
   match BM with
@@ -2440,13 +2471,13 @@ split; intros Hij. {
 }
 Qed.
 
-Theorem bmat_prop_opp : ∀ T {ro : ring_op T} (BM : bmatrix T),
-  bmatrix_prop (bmat_def_opp (bmat_def BM)).
+Theorem bmat_coh_prop_opp : ∀ T {ro : ring_op T} (BM : bmatrix T),
+  bmatrix_coh_prop (bmat_def_opp (bmat_def BM)).
 Proof.
 intros.
-unfold bmatrix_prop, bmatrix_is_norm.
+unfold bmatrix_coh_prop, bmatrix_is_norm.
 destruct BM as (Md, Mp); cbn.
-unfold bmatrix_prop, bmatrix_is_norm in Mp.
+unfold bmatrix_coh_prop, bmatrix_is_norm in Mp.
 rewrite bmat_depth_opp.
 remember (bmat_depth Md) as len; clear Heqlen.
 revert Md Mp.
@@ -2514,7 +2545,7 @@ Qed.
 
 Definition bmat_opp T {ro : ring_op T} (BM : bmatrix T) : bmatrix T :=
   {| bmat_def := bmat_def_opp (bmat_def BM);
-     bmat_prop := bmat_prop_opp BM |}.
+     bmat_coh_prop := bmat_coh_prop_opp BM |}.
 
 Definition bmat_def_of_list_bmat_def T (ll : list (list (bmatrix_def T))) :
     matrix_def (bmatrix_def T) :=
@@ -2528,13 +2559,13 @@ Definition bmat_def_of_list_bmat T (ll : list (list (bmatrix T))) :
      mat_nrows := list_list_nrows ll;
      mat_ncols := list_list_ncols ll |}.
 
-Theorem bmat_prop_of_list_bmat : ∀ T (ll : list (list (bmatrix T))),
+Theorem bmat_coh_prop_of_list_bmat : ∀ T (ll : list (list (bmatrix T))),
   all_lists_same_length (list_list_ncols ll) ll = true
   → zero_together (list_list_nrows ll) (list_list_ncols ll) = true
-  → matrix_prop (bmat_def_of_list_bmat ll).
+  → matrix_coh_prop (bmat_def_of_list_bmat ll).
 Proof.
 intros * Hsl Hzt.
-unfold matrix_prop, matrix_is_norm.
+unfold matrix_coh_prop, matrix_is_norm.
 apply Bool.andb_true_iff.
 split; [ apply Bool.andb_true_iff; split | easy ]; [ | easy ].
 now apply Nat.eqb_eq.
@@ -2545,7 +2576,7 @@ Definition bmat_of_list_bmat T (ll : list (list (bmatrix T)))
   (Hzt : zero_together (list_list_nrows ll) (list_list_ncols ll) = true) :
     matrix (bmatrix T) :=
   {| mat_def := bmat_def_of_list_bmat ll;
-     mat_prop := bmat_prop_of_list_bmat ll Hsl Hzt|}.
+     mat_coh_prop := bmat_coh_prop_of_list_bmat ll Hsl Hzt|}.
 
 Fixpoint IZ_2_pow_def T {ro : ring_op T} u n :=
   match n with
@@ -2566,11 +2597,11 @@ induction n; [ easy | cbn ].
 now rewrite IHn.
 Qed.
 
-Theorem IZ_2_pow_prop : ∀ T {ro : ring_op T} u n,
-  bmatrix_prop (IZ_2_pow_def u n).
+Theorem IZ_2_pow_coh_prop : ∀ T {ro : ring_op T} u n,
+  bmatrix_coh_prop (IZ_2_pow_def u n).
 Proof.
 intros.
-unfold bmatrix_prop, bmatrix_is_norm.
+unfold bmatrix_coh_prop, bmatrix_is_norm.
 revert u.
 induction n; intros; [ easy | cbn ].
 rewrite IHn.
@@ -2582,7 +2613,7 @@ Qed.
 
 Definition IZ_2_pow T {ro : ring_op T} u n : bmatrix T :=
   {| bmat_def := IZ_2_pow_def u n;
-     bmat_prop := IZ_2_pow_prop u n |}.
+     bmat_coh_prop := IZ_2_pow_coh_prop u n |}.
 
 Definition I_2_pow_def T {ro : ring_op T} := IZ_2_pow_def 1%Rng.
 Definition Z_2_pow_def T {ro : ring_op T} := IZ_2_pow_def 0%Rng.
@@ -2651,11 +2682,13 @@ destruct BM as [x| BMM]. {
 }
 Qed.
 
-Theorem A_prop : ∀ T {ro : ring_op T} {rp : ring_prop T} {sp : @semiring_prop T (@rng_semiring T ro)},
-  ∀ n, bmatrix_prop (A_def n).
+Theorem A_coh_prop :
+  ∀ T {ro : ring_op T} {rp : ring_prop T}
+    {sp : @semiring_prop T (@rng_semiring T ro)},
+  ∀ n, bmatrix_coh_prop (A_def n).
 Proof.
 intros.
-unfold bmatrix_prop, bmatrix_is_norm.
+unfold bmatrix_coh_prop, bmatrix_is_norm.
 rewrite bmat_depth_A.
 remember (S n) as len.
 assert (Hlen : S n ≤ len) by flia Heqlen; clear Heqlen.
@@ -2688,7 +2721,7 @@ Qed.
 Definition A T {ro : ring_op T} {rp : ring_prop T} {sp : @semiring_prop T (@rng_semiring T ro)}
     n : bmatrix T :=
   {| bmat_def := A_def n;
-     bmat_prop := A_prop n |}.
+     bmat_coh_prop := A_coh_prop n |}.
 
 (*
 Require Import ZArith.
@@ -2735,13 +2768,12 @@ Fixpoint bmat_def_add_loop T {so : semiring_op T} it (MM1 MM2 : bmatrix_def T) :
 Definition bmat_def_add T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
   bmat_def_add_loop (bmat_depth MM1) MM1 MM2.
 
-Theorem bmat_prop_add : ∀ T {so : semiring_op T} BMA BMB,
-  bmatrix_prop (bmat_def_add (bmat_def BMA) (bmat_def BMB)).
+Theorem bmat_coh_prop_add : ∀ T {so : semiring_op T} BMA BMB,
+  bmatrix_coh_prop (bmat_def_add (bmat_def BMA) (bmat_def BMB)).
 Proof.
 intros.
-unfold bmatrix_prop, bmatrix_is_norm.
-...
-apply matrix_is_norm_prop.
+apply bmatrix_is_norm_prop.
+unfold bmatrix_norm_prop.
 ...
 intros.
 unfold bmat_def_add.
