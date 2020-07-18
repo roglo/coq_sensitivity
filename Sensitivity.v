@@ -2774,6 +2774,33 @@ Proof.
 intros.
 apply bmatrix_is_norm_prop.
 unfold bmatrix_norm_prop.
+destruct BMA as (BMDA, BMPA).
+destruct BMB as (BMDB, BMPB).
+move BMDB before BMDA.
+cbn.
+destruct BMDA as [ta| MDA]; [ now destruct BMDB | ].
+destruct BMDB as [tb| MDB]. {
+  destruct MDA as (lla, ra, ca).
+  destruct lla as [| la]; [ easy | now destruct la ].
+} {
+  destruct MDA as (lla, ra, ca).
+  destruct MDB as (llb, rb, cb).
+  destruct lla as [| la]. {
+    cbn.
+    apply bmatrix_is_norm_prop in BMPA.
+    apply bmatrix_is_norm_prop in BMPB.
+    cbn in BMPA, BMPB.
+    destruct BMPA as (HAP, HArc).
+    destruct HAP as (Har, Hac, Harc).
+    cbn in Har, Hac, Harc.
+    subst ra.
+    specialize (proj1 Harc (eq_refl _)); intros; subst ca.
+    clear Harc.
+    unfold mat_def_add.
+    cbn - [ Nat.eq_dec ].
+    destruct (Nat.eq_dec 0 rb) as [Hrb| Hrb]; [ | easy ].
+    now destruct (Nat.eq_dec 0 cb).
+  } {
 ...
 intros.
 unfold bmat_def_add.
