@@ -2317,12 +2317,30 @@ split; intros Hbmd. {
   clear H2; cbn in H3.
   destruct BMM as (ll, r, c).
   cbn in H1, Hrows, H3.
-...
-  clear H1.
-  revert rows bmd' Hrows Hbmd'.
-  induction ll as [| l]; intros; [ easy | ].
-  destruct Hrows as [Hrows| Hrows]. {
-    subst l.
+  apply In_nth with (d := []) in Hrows.
+  destruct Hrows as (i & Hi & Hrows).
+  apply In_nth with (d := void_bmat_def) in Hbmd'.
+  destruct Hbmd' as (j & Hj & Hbmd').
+  specialize (H3 i j).
+  destruct H1 as (Hr, Hc, Hrc).
+  cbn in Hr, Hc, Hrc.
+  assert (H : i ∈ seq 0 r). {
+    subst r.
+    apply in_seq.
+    split; [ flia | easy ].
+  }
+  specialize (H3 H); clear H.
+  assert (H : j ∈ seq 0 c). {
+    apply in_seq.
+    rewrite <- (Hc rows). 2: {
+      subst rows.
+      now apply nth_In.
+    }
+    split; [ flia | easy ].
+  }
+  specialize (H3 H); clear H.
+  now rewrite Hrows, Hbmd' in H3.
+} {
 ...
 
 Arguments BM_1 {_} a%Srng.
