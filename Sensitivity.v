@@ -1913,113 +1913,15 @@ split. {
     now apply Hc; left.
   }
 } {
-...
-  unfold all_lists_same_length.
   unfold mat_def_transpose; cbn.
   unfold list_list_transpose.
-  rewrite List_fold_left_map.
-  etransitivity. {
-    apply List_fold_left_ext_in.
-    intros b c Hb.
-    rewrite map_length, seq_length.
-    unfold list_list_nrows.
-    easy.
-  }
-  unfold list_list_ncols.
-  rewrite Hr, Nat.eqb_refl.
-  etransitivity. {
-    apply List_fold_left_ext_in.
-    intros b c Hb.
-    rewrite Bool.andb_true_r.
-    easy.
-  }
-  remember (length (hd [] (mat_list Md))) as len eqn:Hlen.
-  clear.
-  induction len; [ easy | ].
-  rewrite <- Nat.add_1_r.
-  rewrite seq_app.
-  rewrite fold_left_app.
-  now rewrite IHlen.
+  intros l Hl.
+  apply in_map_iff in Hl.
+  destruct Hl as (len & Hl & Hlen).
+  subst l; cbn.
+  now rewrite map_length, seq_length.
 } {
-  unfold zero_together.
-  unfold mat_def_transpose; cbn.
-  unfold zero_together in Hrc.
-  now destruct (mat_nrows Md), (mat_ncols Md).
-}
-
-...
-intros.
-destruct M as (Md, Mp); cbn.
-unfold matrix_prop, matrix_is_norm in Mp.
-apply Bool.andb_true_iff in Mp.
-destruct Mp as (Mp & Hrc).
-apply Bool.andb_true_iff in Mp.
-destruct Mp as (Hr & Hc).
-apply Nat.eqb_eq in Hr.
-apply Bool.andb_true_iff; split; [ apply Bool.andb_true_iff; split | ]. {
-  cbn; unfold list_list_transpose.
-  rewrite map_length, seq_length.
-  unfold list_list_ncols.
-  destruct (mat_list Md) as [| l ll]. {
-    cbn; symmetry.
-    unfold zero_together in Hrc.
-    rewrite <- Hr in Hrc; cbn in Hrc.
-    now destruct (mat_ncols Md).
-  } {
-    cbn in Hc; cbn.
-    clear - Hc.
-    revert l Hc.
-    induction ll as [| l1]; intros; [ easy | ].
-    cbn in Hc.
-    apply IHll.
-    remember (length l =? mat_ncols Md) as b1.
-    remember (length l1 =? mat_ncols Md) as b2.
-    clear - Hc.
-    revert b1 b2 Hc.
-    induction ll as [| l1]; intros; cbn. {
-      cbn in Hc.
-      now apply -> Bool.andb_true_iff in Hc.
-    } {
-      cbn in Hc.
-      apply (IHll _ b2).
-      rewrite <- Hc.
-      f_equal.
-      do 2 rewrite <- Bool.andb_assoc; f_equal.
-      apply Bool.andb_comm.
-    }
-  }
-} {
-  unfold all_lists_same_length.
-  unfold mat_def_transpose; cbn.
-  unfold list_list_transpose.
-  rewrite List_fold_left_map.
-  etransitivity. {
-    apply List_fold_left_ext_in.
-    intros b c Hb.
-    rewrite map_length, seq_length.
-    unfold list_list_nrows.
-    easy.
-  }
-  unfold list_list_ncols.
-  rewrite Hr, Nat.eqb_refl.
-  etransitivity. {
-    apply List_fold_left_ext_in.
-    intros b c Hb.
-    rewrite Bool.andb_true_r.
-    easy.
-  }
-  remember (length (hd [] (mat_list Md))) as len eqn:Hlen.
-  clear.
-  induction len; [ easy | ].
-  rewrite <- Nat.add_1_r.
-  rewrite seq_app.
-  rewrite fold_left_app.
-  now rewrite IHlen.
-} {
-  unfold zero_together.
-  unfold mat_def_transpose; cbn.
-  unfold zero_together in Hrc.
-  now destruct (mat_nrows Md), (mat_ncols Md).
+  easy.
 }
 Qed.
 
@@ -2294,6 +2196,23 @@ Definition bmatrix_prop T (bmd : bmatrix_def T) :=
 Record bmatrix T :=
   { bmat_def : bmatrix_def T;
     bmat_prop : bmatrix_prop bmat_def }.
+
+Print matrix_norm_prop.
+
+... à voir...
+
+Record bmatrix_norm_prop T (bmd : bmatrix_def T) :=
+  { bmat_list_nrows :
+      match bmd with
+      | BM_1 _ => True
+      | BM_M BMM => matrix_is_norm BMM
+      end }.
+...
+
+    bmat_list_ncols : ∀ c, c ∈ mat_list md → length c = mat_ncols md;
+    bmat_zero_nrows_ncols : mat_nrows md = 0 ↔ mat_ncols md = 0 }.
+
+...
 
 Arguments BM_1 {_} a%Srng.
 Arguments BM_M {_}.
@@ -2764,6 +2683,11 @@ Definition bmat_def_add T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
 Theorem bmat_prop_add : ∀ T {so : semiring_op T} BMA BMB,
   bmatrix_prop (bmat_def_add (bmat_def BMA) (bmat_def BMB)).
 Proof.
+intros.
+unfold bmatrix_prop, bmatrix_is_norm.
+...
+apply matrix_is_norm_prop.
+...
 intros.
 unfold bmat_def_add.
 unfold bmatrix_prop, bmatrix_is_norm.
