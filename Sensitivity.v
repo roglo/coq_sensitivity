@@ -2785,11 +2785,11 @@ destruct BMDB as [tb| MDB]. {
 } {
   destruct MDA as (lla, ra, ca).
   destruct MDB as (llb, rb, cb).
+  apply bmatrix_is_norm_prop in BMPA.
+  apply bmatrix_is_norm_prop in BMPB.
+  cbn in BMPA, BMPB.
   destruct lla as [| la]. {
     cbn.
-    apply bmatrix_is_norm_prop in BMPA.
-    apply bmatrix_is_norm_prop in BMPB.
-    cbn in BMPA, BMPB.
     destruct BMPA as (HAP, HArc).
     destruct HAP as (Har, Hac, Harc).
     cbn in Har, Hac, Harc.
@@ -2801,6 +2801,29 @@ destruct BMDB as [tb| MDB]. {
     destruct (Nat.eq_dec 0 rb) as [Hrb| Hrb]; [ | easy ].
     now destruct (Nat.eq_dec 0 cb).
   } {
+    destruct la as [| bmd']; [ easy | ].
+    cbn in BMPA; cbn.
+    destruct BMPA as (HAP, HArc).
+    destruct HAP as (Har, Hac, Harc).
+    cbn in Har, Hac, Harc.
+    destruct llb as [| lb]. {
+      cbn in BMPB.
+      destruct BMPB as (HBP, HBrc).
+      destruct HBP as (Hbr, Hbc, Hbrc).
+      cbn in Hbr, Hbc, Hbrc.
+      subst rb.
+      specialize (proj1 Hbrc (eq_refl _)); intros; subst cb.
+      clear Hbrc.
+      unfold mat_def_add.
+      cbn - [ Nat.eq_dec ].
+      destruct (Nat.eq_dec ra 0) as [Hra| Hra]; [ | easy ].
+      now subst ra.
+    } {
+      destruct lb as [| bmd'']; [ easy | ].
+      cbn in BMPB; cbn.
+      destruct BMPB as (HBP, HBrc).
+      destruct HBP as (Hbr, Hbc, Hbrc).
+      cbn in Hbr, Hbc, Hbrc.
 ...
 intros.
 unfold bmat_def_add.
