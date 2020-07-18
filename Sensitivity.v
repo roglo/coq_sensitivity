@@ -2801,7 +2801,7 @@ destruct BMDB as [tb| MDB]. {
     destruct (Nat.eq_dec 0 rb) as [Hrb| Hrb]; [ | easy ].
     now destruct (Nat.eq_dec 0 cb).
   } {
-    destruct la as [| bmd']; [ easy | ].
+    destruct la as [| bmda]; [ easy | ].
     cbn in BMPA; cbn.
     destruct BMPA as (HAP, HArc).
     destruct HAP as (Har, Hac, Harc).
@@ -2819,11 +2819,16 @@ destruct BMDB as [tb| MDB]. {
       destruct (Nat.eq_dec ra 0) as [Hra| Hra]; [ | easy ].
       now subst ra.
     } {
-      destruct lb as [| bmd'']; [ easy | ].
+      destruct lb as [| bmdb]; [ easy | ].
       cbn in BMPB; cbn.
       destruct BMPB as (HBP, HBrc).
       destruct HBP as (Hbr, Hbc, Hbrc).
       cbn in Hbr, Hbc, Hbrc.
+      unfold mat_def_add.
+      cbn - [ Nat.eq_dec list_list_add ].
+      destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
+      destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
+      move Hrr at top; move Hcc at top; subst rb cb.
 ...
 intros.
 unfold bmat_def_add.
