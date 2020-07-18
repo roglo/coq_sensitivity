@@ -1724,13 +1724,13 @@ Definition matrix_is_norm T (md : matrix_def T) :=
 
 (* coherence property of matrices: computable and returning a bool
    to make proof unique *)
-Definition matrix_prop T (md : matrix_def T) :=
+Definition matrix_coh_prop T (md : matrix_def T) :=
   matrix_is_norm md = true.
 
 (* definition of matrices *)
 Record matrix T := mk_mat
   { mat_def : matrix_def T;
-    mat_prop : matrix_prop mat_def }.
+    mat_coh_prop : matrix_coh_prop mat_def }.
 
 Record matrix_norm_prop T (md : matrix_def T) :=
   { mat_list_nrows : length (mat_list md) = mat_nrows md;
@@ -1821,23 +1821,23 @@ Qed.
 Definition void_mat_def {T} : matrix_def T :=
   {| mat_list := []; mat_nrows := 0; mat_ncols := 0 |}.
 
-Theorem void_mat_prop : ∀ T, matrix_prop (void_mat_def : matrix_def T).
+Theorem void_mat_prop : ∀ T, matrix_coh_prop (void_mat_def : matrix_def T).
 Proof. easy. Qed.
 
 Definition void_mat {T} : matrix T :=
-  {| mat_def := void_mat_def; mat_prop := void_mat_prop T |}.
+  {| mat_def := void_mat_def; mat_coh_prop := void_mat_prop T |}.
 
 Definition mat_def_of_list T (ll : list (list T)) : matrix_def T :=
   {| mat_list := ll;
      mat_nrows := list_list_nrows ll;
      mat_ncols := list_list_ncols ll |}.
 
-Theorem mat_of_list_prop : ∀ T x l1 ll1,
+Theorem mat_of_list_coh_prop : ∀ T x l1 ll1,
   Forall (eq (length (x :: l1))) (map (length (A:=T)) ll1)
-  → matrix_prop (mat_def_of_list ((x :: l1) :: ll1) : matrix_def T).
+  → matrix_coh_prop (mat_def_of_list ((x :: l1) :: ll1) : matrix_def T).
 Proof.
 intros * Hfa.
-unfold matrix_prop, matrix_is_norm; cbn.
+unfold matrix_coh_prop, matrix_is_norm; cbn.
 rewrite Nat.eqb_refl, Bool.andb_true_l.
 rewrite Nat.eqb_refl, Bool.andb_true_r.
 induction ll1 as [| l2]; [ easy | ].
@@ -1864,7 +1864,7 @@ Definition mat_of_list T (ll : list (list T)) : matrix T :=
       with
       | left P =>
           {| mat_def := mat_def_of_list ((x :: l) :: ll');
-             mat_prop := mat_of_list_prop ll' P |}
+             mat_coh_prop := mat_of_list_coh_prop ll' P |}
       | right _ => void_mat
       end
   end.
@@ -1899,8 +1899,8 @@ Definition mat_def_transpose T (d : T) (M : matrix_def T) : matrix_def T :=
      mat_nrows := mat_ncols M;
      mat_ncols := mat_nrows M |}.
 
-Theorem mat_prop_transpose : ∀ T d M,
-  matrix_prop (mat_def_transpose d (mat_def M) : matrix_def T).
+Theorem mat_coh_prop_transpose : ∀ T d M,
+  matrix_coh_prop (mat_def_transpose d (mat_def M) : matrix_def T).
 Proof.
 intros.
 destruct M as (Md, Mp); cbn.
@@ -1932,7 +1932,7 @@ Qed.
 
 Definition mat_transpose T (d : T) (M : matrix T) : matrix T :=
   {| mat_def := mat_def_transpose d (mat_def M);
-     mat_prop := mat_prop_transpose d M |}.
+     mat_coh_prop := mat_coh_prop_transpose d M |}.
 
 Compute (mat_def_transpose 0 (mat_def_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
 Compute (mat_transpose 0 (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
@@ -1989,13 +1989,13 @@ Definition mat_def_add T {so : semiring_op T} (M1 M2 : matrix_def T) :
     else void_mat_def
   else void_mat_def.
 
-Theorem mat_prop_add : ∀ T {so : semiring_op T} MA MB,
-  matrix_prop (mat_def_add (mat_def MA) (mat_def MB)).
+Theorem mat_coh_prop_add : ∀ T {so : semiring_op T} MA MB,
+  matrix_coh_prop (mat_def_add (mat_def MA) (mat_def MB)).
 Proof.
 intros.
 destruct MA as (Mda, Mpa); cbn.
 destruct MB as (Mdb, Mpb); cbn.
-unfold matrix_prop, matrix_is_norm in Mpa, Mpb.
+unfold matrix_coh_prop, matrix_is_norm in Mpa, Mpb.
 apply Bool.andb_true_iff in Mpa.
 apply Bool.andb_true_iff in Mpb.
 destruct Mpa as (Mpa & Hrca).
@@ -2011,7 +2011,7 @@ destruct (Nat.eq_dec (mat_nrows Mda) (mat_nrows Mdb))
   as [Hrr| Hrr]; [ | easy ].
 destruct (Nat.eq_dec (mat_ncols Mda) (mat_ncols Mdb))
   as [Hcc| Hcc]; [ | easy ].
-unfold matrix_prop, matrix_is_norm; cbn.
+unfold matrix_coh_prop, matrix_is_norm; cbn.
 unfold list_list_add; cbn.
 rewrite map_length, seq_length, Nat.eqb_refl, Bool.andb_true_l.
 unfold zero_together.
@@ -2038,7 +2038,7 @@ Qed.
 
 Definition mat_add T {so : semiring_op T} (MA MB : matrix T) : matrix T :=
   {| mat_def := mat_def_add (mat_def MA) (mat_def MB);
-     mat_prop := mat_prop_add MA MB |}.
+     mat_coh_prop := mat_coh_prop_add MA MB |}.
 
 Definition mat_def_mul {T} {so : semiring_op T} (M1 M2 : matrix_def T) :
     matrix_def T :=
@@ -2050,13 +2050,13 @@ Definition mat_def_mul {T} {so : semiring_op T} (M1 M2 : matrix_def T) :
        mat_ncols := mat_ncols M2 |}
   else void_mat_def.
 
-Theorem mat_prop_mul : ∀ T {so : semiring_op T} MA MB,
-  matrix_prop (mat_def_mul (mat_def MA) (mat_def MB)).
+Theorem mat_coh_prop_mul : ∀ T {so : semiring_op T} MA MB,
+  matrix_coh_prop (mat_def_mul (mat_def MA) (mat_def MB)).
 Proof.
 intros.
 destruct MA as (Mda, Mpa); cbn.
 destruct MB as (Mdb, Mpb); cbn.
-unfold matrix_prop, matrix_is_norm in Mpa, Mpb.
+unfold matrix_coh_prop, matrix_is_norm in Mpa, Mpb.
 apply Bool.andb_true_iff in Mpa.
 apply Bool.andb_true_iff in Mpb.
 destruct Mpa as (Mpa & Hrca).
@@ -2070,7 +2070,7 @@ apply Nat.eqb_eq in Hrb.
 unfold mat_def_mul.
 destruct (Nat.eq_dec (mat_ncols Mda) (mat_nrows Mdb))
   as [Hrr| Hrr]; [ | easy ].
-unfold matrix_prop, matrix_is_norm; cbn.
+unfold matrix_coh_prop, matrix_is_norm; cbn.
 unfold list_list_mul; cbn.
 rewrite map_length, seq_length, Nat.eqb_refl, Bool.andb_true_l.
 apply Bool.andb_true_iff.
@@ -2100,7 +2100,7 @@ Qed.
 
 Definition mat_mul T {so : semiring_op T} (MA MB : matrix T) : matrix T :=
   {| mat_def := mat_def_mul (mat_def MA) (mat_def MB);
-     mat_prop := mat_prop_mul MA MB |}.
+     mat_coh_prop := mat_coh_prop_mul MA MB |}.
 
 Compute (let _ := nat_semiring_op in mat_mul (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]; [0; 0]])).
 Compute (let _ := nat_semiring_op in mat_mul (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]])).
@@ -2117,14 +2117,14 @@ Definition mat_def_opp T {ro : ring_op T} (M : matrix_def T) :=
      mat_nrows := mat_nrows M;
      mat_ncols := mat_ncols M |}.
 
-Theorem mat_prop_opp : ∀ T {ro : ring_op T} (M : matrix T),
-  matrix_prop (mat_def_opp (mat_def M)).
+Theorem mat_coh_prop_opp : ∀ T {ro : ring_op T} (M : matrix T),
+  matrix_coh_prop (mat_def_opp (mat_def M)).
 Proof.
 intros.
-unfold matrix_prop, matrix_is_norm.
+unfold matrix_coh_prop, matrix_is_norm.
 apply Bool.andb_true_iff.
 destruct M as (Md, Mp); cbn.
-unfold matrix_prop, matrix_is_norm in Mp.
+unfold matrix_coh_prop, matrix_is_norm in Mp.
 apply Bool.andb_true_iff in Mp.
 destruct Mp as (Mp & Hrc).
 apply Bool.andb_true_iff in Mp.
@@ -2148,7 +2148,7 @@ Qed.
 
 Definition mat_opp T {ro : ring_op T} (M : matrix T) :=
   {| mat_def := mat_def_opp (mat_def M);
-     mat_prop := mat_prop_opp M |}.
+     mat_coh_prop := mat_coh_prop_opp M |}.
 
 (* block matrices *)
 
@@ -2197,13 +2197,13 @@ Definition bmatrix_is_norm T (bmd : bmatrix_def T) :=
 
 (* coherence properties of block matrices: computable and returning a bool
    to make proof unique *)
-Definition bmatrix_prop T (bmd : bmatrix_def T) :=
+Definition bmatrix_coh_prop T (bmd : bmatrix_def T) :=
   bmatrix_is_norm bmd = true.
 
 (* definition of block matrices *)
 Record bmatrix T :=
   { bmat_def : bmatrix_def T;
-    bmat_prop : bmatrix_prop bmat_def }.
+    bmat_coh_prop : bmatrix_coh_prop bmat_def }.
 
 Fixpoint bmatrix_norm_prop_loop T it (bmd : bmatrix_def T) :=
   match it with
