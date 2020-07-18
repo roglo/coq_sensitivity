@@ -1729,6 +1729,70 @@ Record matrix T := mk_mat
   { mat_def : matrix_def T;
     mat_prop : matrix_prop mat_def }.
 
+Record matrix_norm_prop T (md : matrix_def T) :=
+  { mat_list_nrows : length (mat_list md) = mat_nrows md;
+    mat_list_ncols : ∀ c, c ∈ mat_list md → length c = mat_ncols md;
+    mat_zero_nrows_ncols : mat_nrows md = 0 ↔ mat_ncols md = 0 }.
+
+Theorem matrix_is_norm_prop : ∀ T (md : matrix_def T),
+  matrix_is_norm md = true ↔ matrix_norm_prop md.
+Proof.
+intros.
+split; intros Hmd. {
+  unfold matrix_is_norm in Hmd.
+  apply Bool.andb_true_iff in Hmd.
+  destruct Hmd as (Hmd, H3).
+  apply Bool.andb_true_iff in Hmd.
+  destruct Hmd as (H1, H2).
+  split; [ now apply Nat.eqb_eq in H1 | | ]. {
+    intros c Hc.
+    unfold all_lists_same_length in H2.
+    clear H1.
+    induction (mat_list md) as [| l1 ll1]; [ easy | ].
+    destruct Hc as [Hc| Hc]. {
+      subst l1; cbn in H2.
+      remember (length c =? mat_ncols md) as b eqn:Hb; symmetry in Hb.
+      destruct b; [ now apply Nat.eqb_eq in Hb | ].
+      exfalso; clear - H2.
+      now induction ll1.
+    } {
+      apply IHll1; [ | easy ].
+      cbn in H2.
+      remember (length l1 =? mat_ncols md) as b eqn:Hb; symmetry in Hb.
+      destruct b; [ easy | ].
+      exfalso; clear - H2.
+      now induction ll1.
+    }
+  } {
+    unfold zero_together in H3.
+    now destruct (mat_nrows md), (mat_ncols md).
+  }
+} {
+  destruct Hmd as (H1, H2, H3).
+  unfold matrix_is_norm.
+  apply Bool.andb_true_iff.
+  split; [ apply Bool.andb_true_iff; split | ]. {
+    now apply Nat.eqb_eq.
+  } {
+    unfold all_lists_same_length.
+    clear H1.
+    induction (mat_list md) as [| l1 ll1]; [ easy | cbn ].
+    rewrite H2; [ | now left ].
+    rewrite Nat.eqb_refl.
+    apply IHll1.
+    intros * Hc.
+    now apply H2; right.
+  } {
+    unfold zero_together.
+    destruct (mat_nrows md), (mat_ncols md); [ easy | | | easy ]. {
+      now specialize (proj1 H3 (Nat.eq_refl 0)).
+    } {
+      now specialize (proj2 H3 (Nat.eq_refl 0)).
+    }
+  }
+}
+Qed.
+
 Definition list_list_nrows T (ll : list (list T)) :=
   length ll.
 
@@ -1767,6 +1831,31 @@ Theorem mat_of_list_prop : ∀ T x l1 ll1,
   Forall (eq (length (x :: l1))) (map (length (A:=T)) ll1)
   → matrix_prop (mat_def_of_list ((x :: l1) :: ll1) : matrix_def T).
 Proof.
+intros * Hfa.
+unfold matrix_prop.
+apply matrix_is_norm_prop.
+split; [ easy | | ]. {
+  intros l2 Hl2.
+  specialize (proj1 (Forall_forall _ _) Hfa) as H1.
+  cbn in H1; cbn.
+  symmetry; apply H1.
+  cbn in Hl2.
+  destruct Hl2 as [Hl2| Hl2]; cbn in Hl2. {
+    subst l2; cbn.
+    cbn in Hfa.
+...
+specialize (H1 (length l1) (or_introl eq_refl)) as H2.
+rewrite <- H2; cbn.
+rewrite Nat.eqb_refl.
+apply IHll1.
+cbn in Hfa; cbn.
+apply Forall_forall.
+intros y Hy.
+apply H1.
+now right.
+Qed.
+
+...
 intros * Hfa.
 unfold matrix_prop, matrix_is_norm; cbn.
 rewrite Nat.eqb_refl, Bool.andb_true_l.
