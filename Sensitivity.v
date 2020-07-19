@@ -2799,12 +2799,12 @@ Definition bmat_def_add T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
   bmat_def_add_loop (bmat_depth MM1) MM1 MM2.
 
 Theorem list_list_add_add2 : ∀ T {so : semiring_op T} (MA MB : matrix_def T),
-  matrix_coh_prop MA
-  → matrix_coh_prop MA
+  matrix_norm_prop MA
+  → matrix_norm_prop MB
   → list_list_add (mat_nrows MA) (mat_ncols MA) (mat_list MA) (mat_list MB) =
      list_list_add2 (mat_list MA) (mat_list MB).
 Proof.
-Admitted.
+...
 
 Theorem bmat_coh_prop_add : ∀ T {so : semiring_op T} BMA BMB,
   bmatrix_coh_prop (bmat_def_add (bmat_def BMA) (bmat_def BMB)).
@@ -2841,9 +2841,11 @@ destruct BMDB as [tb| MDB]. {
   } {
     destruct la as [| bmda]; [ easy | ].
     cbn in BMPA; cbn - [ bmat_def_add_loop ].
+(*
     destruct BMPA as (HAP, HArc).
     destruct HAP as (Har, Hac, Harc).
     cbn in Har, Hac, Harc.
+*)
     destruct llb as [| lb]. {
       cbn in BMPB.
       destruct BMPB as (HBP, HBrc).
@@ -2855,25 +2857,44 @@ destruct BMDB as [tb| MDB]. {
       unfold mat_def_add.
       cbn - [ Nat.eq_dec ].
       destruct (Nat.eq_dec ra 0) as [Hra| Hra]; [ | easy ].
+      destruct BMPA as (HAP, HArc).
+      destruct HAP as (Har, Hac, Harc).
+      cbn in Har, Hac, Harc.
       now subst ra.
     } {
       destruct lb as [| bmdb]; [ easy | ].
-      cbn in BMPB.
+      destruct BMPA as (HAP, HArc).
       destruct BMPB as (HBP, HBrc).
+(*
+      cbn in BMPB.
       destruct HBP as (Hbr, Hbc, Hbrc).
       cbn in Hbr, Hbc, Hbrc; cbn.
+*)
       unfold mat_def_add.
-remember (mk_mat_def _ _ _) as MA.
-remember (mk_mat_def _ rb _) as MB.
-Print semiring_op.
-remember {| srng_zero := void_bmat_def; srng_one := void_bmat_def; srng_add := @bmat_def_add T so; srng_mul := @bmat_def_add T so |} as mso.
-  specialize (@list_list_add_add2 _ mso MA MB) as H1.
-...
+remember (mk_mat_def _ _ _) as MA eqn:HMA.
+remember (mk_mat_def _ rb _) as MB eqn:HMB.
+move MB before MA.
+move HMB before HMA.
+remember
+        {|
+        srng_zero := @void_bmat_def T;
+        srng_one := @void_bmat_def T;
+        srng_add := @bmat_def_add_loop T so (@bmat_depth T bmda);
+        srng_mul := @bmat_def_add_loop T so (@bmat_depth T bmda) |} as mso.
+  specialize (@list_list_add_add2 _ mso MA MB HAP HBP) as H1.
+    destruct HAP as (Har, Hac, Harc).
+      destruct HBP as (Hbr, Hbc, Hbrc).
+    rewrite HMA, HMB in H1.
+    cbn - [ list_list_add ] in H1.
+    cbn.
+      unfold mat_def_add.
+rewrite HMA, HMB.
       cbn - [ Nat.eq_dec list_list_add ].
       destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
       destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
       move Hrr at top; move Hcc at top; subst rb cb.
-Check list_list_add_add2.
+rewrite <- Heqmso.
+rewrite H1.
 ...
 intros.
 unfold bmat_def_add.
