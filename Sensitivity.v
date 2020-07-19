@@ -1937,6 +1937,16 @@ Definition mat_transpose T (d : T) (M : matrix T) : matrix T :=
 Compute (mat_def_transpose 0 (mat_def_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
 Compute (mat_transpose 0 (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
 
+(*
+Definition list_list_add T zero (add : T → T → T) r c ll1 ll2 :=
+  map
+    (λ i,
+       map
+         (λ j, add (list_list_el zero ll1 i j) (list_list_el zero ll2 i j))
+         (seq 0 c))
+    (seq 0 r).
+*)
+
 Definition list_list_add T {so : semiring_op T} r c
     (ll1 ll2 : list (list T)) :=
   map
@@ -1946,6 +1956,26 @@ Definition list_list_add T {so : semiring_op T} r c
             (list_list_el 0 ll1 i j + list_list_el 0 ll2 i j)%Srng)
          (seq 0 c))
     (seq 0 r).
+
+Fixpoint list_add T {so : semiring_op T} (l1 l2 : list T) :=
+  match l1 with
+  | e1 :: l'1 =>
+      match l2 with
+      | e2 :: l'2 => (e1 + e2)%Srng :: list_add l'1 l'2
+      | [] => []
+      end
+  | [] => []
+  end.
+
+Fixpoint list_list_add2 T {so : semiring_op T} (ll1 ll2 : list (list T)) :=
+  match ll1 with
+   | l1 :: ll'1 =>
+       match ll2 with
+       | l2 :: ll'2 => list_add l1 l2 :: list_list_add2 ll'1 ll'2
+       | [] => []
+       end
+  | [] => []
+  end.
 
 Definition list_list_mul T {ro : semiring_op T} r cr c
     (ll1 : list (list T)) (ll2 : list (list T)) :=
@@ -2768,6 +2798,14 @@ Fixpoint bmat_def_add_loop T {so : semiring_op T} it (MM1 MM2 : bmatrix_def T) :
 Definition bmat_def_add T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
   bmat_def_add_loop (bmat_depth MM1) MM1 MM2.
 
+Theorem list_list_add_add2 : ∀ T {so : semiring_op T} (MA MB : matrix_def T),
+  matrix_coh_prop MA
+  → matrix_coh_prop MA
+  → list_list_add (mat_nrows MA) (mat_ncols MA) (mat_list MA) (mat_list MB) =
+     list_list_add2 (mat_list MA) (mat_list MB).
+Proof.
+Admitted.
+
 Theorem bmat_coh_prop_add : ∀ T {so : semiring_op T} BMA BMB,
   bmatrix_coh_prop (bmat_def_add (bmat_def BMA) (bmat_def BMB)).
 Proof.
@@ -2802,7 +2840,7 @@ destruct BMDB as [tb| MDB]. {
     now destruct (Nat.eq_dec 0 cb).
   } {
     destruct la as [| bmda]; [ easy | ].
-    cbn in BMPA; cbn.
+    cbn in BMPA; cbn - [ bmat_def_add_loop ].
     destruct BMPA as (HAP, HArc).
     destruct HAP as (Har, Hac, Harc).
     cbn in Har, Hac, Harc.
@@ -2813,22 +2851,29 @@ destruct BMDB as [tb| MDB]. {
       cbn in Hbr, Hbc, Hbrc.
       subst rb.
       specialize (proj1 Hbrc (eq_refl _)); intros; subst cb.
-      clear Hbrc.
+      clear Hbrc; cbn.
       unfold mat_def_add.
       cbn - [ Nat.eq_dec ].
       destruct (Nat.eq_dec ra 0) as [Hra| Hra]; [ | easy ].
       now subst ra.
     } {
       destruct lb as [| bmdb]; [ easy | ].
-      cbn in BMPB; cbn.
+      cbn in BMPB.
       destruct BMPB as (HBP, HBrc).
       destruct HBP as (Hbr, Hbc, Hbrc).
-      cbn in Hbr, Hbc, Hbrc.
+      cbn in Hbr, Hbc, Hbrc; cbn.
       unfold mat_def_add.
+remember (mk_mat_def _ _ _) as MA.
+remember (mk_mat_def _ rb _) as MB.
+Print semiring_op.
+remember {| srng_zero := void_bmat_def; srng_one := void_bmat_def; srng_add := @bmat_def_add T so; srng_mul := @bmat_def_add T so |} as mso.
+  specialize (@list_list_add_add2 _ mso MA MB) as H1.
+...
       cbn - [ Nat.eq_dec list_list_add ].
       destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
       destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
       move Hrr at top; move Hcc at top; subst rb cb.
+Check list_list_add_add2.
 ...
 intros.
 unfold bmat_def_add.
