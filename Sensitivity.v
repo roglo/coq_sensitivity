@@ -2925,6 +2925,33 @@ destruct BMDB as [tb| MDB]. {
               now apply IHla.
             }
           } {
+            destruct Hap as (Har, Hac, Harc).
+            destruct Hbp as (Hbr, Hbc, Hbrc).
+            cbn in Har, Hac, Harc.
+            cbn in Hbr, Hbc, Hbrc.
+            destruct ca. {
+              now specialize (proj2 Harc eq_refl); intros; subst ra.
+            }
+            clear - Hac Hbc Hc.
+            revert a b c ca la lb llb Hac Hbc Hc.
+            induction lla as [| la1]; intros; [ easy | ].
+            destruct llb as [| lb1]; [ easy | ].
+            cbn in Hc.
+            destruct Hc as [Hc| Hc]. {
+              revert la lb lb1 Hbc Hc Hac.
+              induction la1 as [| a1]; intros. {
+                now apply Hac; right; left.
+              } {
+                destruct lb1 as [| b1]. {
+                  now apply Hbc; right; left.
+                } {
+                  subst c; cbn.
+                  cbn in IHla1.
+...
+                  apply IHla1 with (la := la) (lb := lb) (lb2 := lb1). {
+                    intros c Hc.
+                    destruct Hc as [Hc| Hc]. {
+                      subst c; cbn.
 ...
 (*
     destruct BMPA as (HAP, HArc).
