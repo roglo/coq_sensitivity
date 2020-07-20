@@ -1937,18 +1937,6 @@ Definition mat_transpose T (d : T) (M : matrix T) : matrix T :=
 Compute (mat_def_transpose 0 (mat_def_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
 Compute (mat_transpose 0 (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
 
-(*
-Definition list_list_add T {so : semiring_op T} r c
-    (ll1 ll2 : list (list T)) :=
-  map
-    (λ i,
-       map
-         (λ j,
-            (list_list_el 0 ll1 i j + list_list_el 0 ll2 i j)%Srng)
-         (seq 0 c))
-    (seq 0 r).
-*)
-
 Fixpoint list_add T {so : semiring_op T} (l1 l2 : list T) :=
   match l1 with
   | e1 :: l'1 =>
@@ -2821,73 +2809,6 @@ Fixpoint bmat_def_add_loop T {so : semiring_op T} it (MM1 MM2 : bmatrix_def T) :
 
 Definition bmat_def_add T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
   bmat_def_add_loop (bmat_depth MM1) MM1 MM2.
-
-(*
-Theorem list_list_add_add2 :
-  ∀ T {ro : semiring_op T} r c (lla llb : list (list T)),
-  length lla = r
-  → length llb = r
-  → (∀ la, la ∈ lla → length la = c)
-  → (∀ lb, lb ∈ llb → length lb = c)
-  → list_list_add r c lla llb = list_list_add2 lla llb.
-Proof.
-intros * Hra Hrb Hca Hcb.
-revert r c llb Hra Hrb Hca Hcb.
-induction lla as [| la]; intros. {
-  subst r.
-  now apply length_zero_iff_nil in Hrb; subst llb.
-} {
-  cbn.
-  destruct llb as [| lb]; [ now subst r | cbn ].
-  cbn in Hra, Hrb, Hca, Hcb.
-  induction la as [| a]. {
-    specialize (Hca [] (or_introl eq_refl)) as H1.
-    subst c; cbn.
-    specialize (Hcb lb (or_introl eq_refl)) as H1.
-    cbn in H1.
-    apply length_zero_iff_nil in H1; subst lb.
-    rewrite <- Hra; cbn.
-    f_equal.
-    destruct r; [ easy | ].
-    apply Nat.succ_inj in Hra.
-    apply Nat.succ_inj in Hrb.
-...
-    rewrite <- IHlla with (r := r) (c := 0); try easy. {
-      destruct r. {
-        apply length_zero_iff_nil in Hra.
-        apply length_zero_iff_nil in Hrb.
-        now subst lla llb.
-      } {
-        cbn.
-        rewrite Hra; cbn.
-        f_equal.
-        (* oui, non *)
-...
-*)
-
-(*
-Theorem list_list_add_add2 : ∀ T {so : semiring_op T} (MA MB : matrix_def T),
-  matrix_norm_prop MA
-  → matrix_norm_prop MB
-  → list_list_add (mat_nrows MA) (mat_ncols MA) (mat_list MA) (mat_list MB) =
-     list_list_add2 (mat_list MA) (mat_list MB).
-Proof.
-intros * HNPA HNPB.
-destruct MA as (lla, ra, ca).
-destruct MB as (llb, rb, cb).
-destruct HNPA as (Hra, Hca, Hrca).
-destruct HNPB as (Hrb, Hcb, Hrcb).
-cbn in *.
-subst ra rb.
-revert ca cb llb Hca Hrca Hcb Hrcb.
-induction lla as [| la]; intros; [ easy | ].
-cbn - [ seq ].
-rewrite <- Nat.add_1_r.
-rewrite seq_app, map_app; cbn.
-destruct llb as [| lb]. {
-  clear cb Hcb Hrcb; exfalso.
-...
-*)
 
 Theorem bmat_coh_prop_add : ∀ T {so : semiring_op T} BMA BMB,
   bmatrix_coh_prop (bmat_def_add (bmat_def BMA) (bmat_def BMB)).
