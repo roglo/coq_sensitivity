@@ -2922,8 +2922,36 @@ destruct BMDB as [tb| MDB]. {
     destruct (Nat.eq_dec 0 rb) as [Hrb| Hrb]; [ | easy ].
     now destruct (Nat.eq_dec 0 cb).
   } {
-    destruct la as [| bmda]; [ easy | ].
+    destruct la as [| a]; [ easy | ].
     cbn in BMPA; cbn - [ bmat_def_add_loop ].
+    destruct BMPA as (Hap, Harc').
+    destruct llb as [| lb]. {
+      cbn; unfold mat_def_add.
+      cbn - [ Nat.eq_dec ].
+      destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
+      subst rb.
+      destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
+      cbn in BMPB.
+      destruct BMPB as (Hbp, Hbrc').
+      destruct Hbp as (Hbr, Hbc, Hbrc).
+      cbn in Hbr.
+      now subst ra cb.
+    } {
+      cbn; unfold mat_def_add.
+      cbn - [ Nat.eq_dec ].
+      destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
+      subst rb.
+      destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
+      subst cb.
+      destruct lb as [| b]; [ easy | ].
+      cbn in BMPB.
+      destruct BMPB as (Hbp, Hbrc').
+      cbn; split. {
+        split; cbn. {
+          destruct ra. {
+            now destruct Hap as (Har, Hac, Harc).
+          }
+          f_equal.
 ...
 (*
     destruct BMPA as (HAP, HArc).
