@@ -2861,8 +2861,8 @@ destruct BMDB as [tb| MDB]. {
       destruct BMPB as (Hbp, Hbrc').
       destruct Hap as (Har, Hac, Harc).
       destruct Hbp as (Hbr, Hbc, Hbrc).
-      cbn in Har, Hac, Harc.
-      cbn in Hbr, Hbc, Hbrc.
+      cbn - [ In ] in Har, Hac, Harc.
+      cbn - [ In ] in Hbr, Hbc, Hbrc.
       cbn.
       unfold mat_def_add.
       cbn - [ Nat.eq_dec ].
@@ -2873,6 +2873,14 @@ destruct BMDB as [tb| MDB]. {
       move Hbc before Hac.
       clear Hbrc.
       split. {
+        split. {
+          cbn.
+          destruct ra; [ easy | ].
+          apply Nat.succ_inj in Har.
+          apply Nat.succ_inj in Hbr.
+          f_equal.
+          destruct ca; [ now specialize (proj2 Harc eq_refl) | ].
+          clear Harc.
 ...
       revert lla ra ca lb llb rb cb BMPA BMPB.
       induction la as [| a]; intros; [ easy | ].
