@@ -2855,7 +2855,25 @@ destruct BMDB as [tb| MDB]. {
       destruct BMPB as (Hbp, Hbrc').
       easy.
     } {
+      destruct la as [| a]; [ easy | ].
+      destruct lb as [| b]; [ easy | ].
+      destruct BMPA as (Hap, Harc').
+      destruct BMPB as (Hbp, Hbrc').
+      destruct Hap as (Har, Hac, Harc).
+      destruct Hbp as (Hbr, Hbc, Hbrc).
+      cbn in Har, Hac, Harc.
+      cbn in Hbr, Hbc, Hbrc.
       cbn.
+      unfold mat_def_add.
+      cbn - [ Nat.eq_dec ].
+      destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
+      destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
+      move Hrr at top; move Hcc at top; subst rb cb.
+      move Hbr before Har.
+      move Hbc before Hac.
+      clear Hbrc.
+      split. {
+...
       revert lla ra ca lb llb rb cb BMPA BMPB.
       induction la as [| a]; intros; [ easy | ].
       destruct lb as [| b]; [ easy | ].
