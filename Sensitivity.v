@@ -2856,6 +2856,17 @@ destruct BMDB as [tb| MDB]. {
       easy.
     } {
       cbn.
+      revert lla ra ca lb llb rb cb BMPA BMPB.
+      induction la as [| a]; intros; [ easy | ].
+      destruct lb as [| b]; [ easy | ].
+      cbn in BMPA, BMPB.
+      destruct BMPA as (Hap, Harc').
+      destruct BMPB as (Hbp, Hbrc').
+      destruct Hap as (Har, Hac, Harc).
+      destruct Hbp as (Hbr, Hbc, Hbrc).
+      cbn in Har, Hac, Harc.
+      cbn in Hbr, Hbc, Hbrc.
+      cbn.
 ...
     destruct la as [| a]; [ easy | ].
     cbn in BMPA; cbn - [ bmat_def_add_loop ].
