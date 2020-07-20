@@ -2059,83 +2059,35 @@ split; cbn; [ | | easy ]. {
     destruct ca. {
       now specialize (Hca (a :: la) (or_introl eq_refl)).
     } {
+      cbn in IHla.
       f_equal.
-...
-  revert llb Hcb Hrr Hrcb Hc.
-  induction lla as [| la]; intros; [ easy | ].
-  destruct llb as [| lb]; [ easy | ].
-  cbn in Hc.
-  destruct Hc as [Hc| Hc]. {
-  clear - Hra Hrr Hc.
-  revert Hra Hrr Hc.
-...
-
-unfold matrix_coh_prop, matrix_is_norm in Mpa, Mpb.
-apply Bool.andb_true_iff in Mpa.
-apply Bool.andb_true_iff in Mpb.
-destruct Mpa as (Mpa & Hrca).
-destruct Mpb as (Mpb & Hrcb).
-apply Bool.andb_true_iff in Mpa.
-apply Bool.andb_true_iff in Mpb.
-destruct Mpa as (Hra & Hca).
-destruct Mpb as (Hrb & Hcb).
-apply Nat.eqb_eq in Hra.
-apply Nat.eqb_eq in Hrb.
-unfold mat_def_add.
-destruct (Nat.eq_dec (mat_nrows Mda) (mat_nrows Mdb))
-  as [Hrr| Hrr]; [ | easy ].
-destruct (Nat.eq_dec (mat_ncols Mda) (mat_ncols Mdb))
-  as [Hcc| Hcc]; [ | easy ].
-unfold matrix_coh_prop.
-apply matrix_is_norm_prop.
-split; cbn. {
-  destruct Mda as (lla, ra, ca).
-  destruct Mdb as (llb, rb, cb).
-  cbn in Hrb, Hcc; subst rb cb.
-  cbn in Hra, Hrr |-*.
-  clear - Hra Hrr.
-  revert ra llb Hra Hrr.
-  induction lla as [| la]; intros; [ easy | cbn ].
-  destruct llb as [| lb]; [ easy | cbn ].
-  destruct ra; [ easy | ].
-  cbn in Hra, Hrr.
-  apply Nat.succ_inj in Hra.
-  apply Nat.succ_inj in Hrr.
-  f_equal.
-  now apply IHlla.
-} {
-  intros c Hc.
-...
-} {
-...
-...
-  apply IHlla; try easy.
-
-
-
-unfold matrix_coh_prop, matrix_is_norm; cbn.
-unfold list_list_add; cbn.
-rewrite map_length, seq_length, Nat.eqb_refl, Bool.andb_true_l.
-unfold zero_together.
-unfold zero_together in Hrcb.
-rewrite <- Hrr, <- Hcc in Hrcb.
-rewrite Hrcb.
-rewrite Bool.andb_true_r.
-rewrite List_fold_left_map.
-etransitivity. {
-  apply List_fold_left_ext_in.
-  intros b c Hb.
-  rewrite map_length, seq_length.
-  rewrite Nat.eqb_refl.
-  rewrite Bool.andb_true_r.
-  easy.
+      specialize (Hca (a :: la) (or_introl eq_refl)) as H1.
+      specialize (Hcb (b :: lb) (or_introl eq_refl)) as H2.
+      cbn in H1, H2.
+      apply Nat.succ_inj in H1.
+      apply Nat.succ_inj in H2.
+      clear - H1 H2.
+      revert ca lb H1 H2.
+      induction la as [| a]; intros; [ easy | cbn ].
+      destruct lb as [| b]; [ easy | cbn ].
+      destruct ca; [ easy | f_equal ].
+      cbn in H1, H2.
+      apply Nat.succ_inj in H1.
+      apply Nat.succ_inj in H2.
+      now apply IHla.
+    }
+  } {
+    cbn in Hrr.
+    apply Nat.succ_inj in Hrr.
+    apply IHlla with (llb := llb); [ | | easy | easy ]. {
+      intros d Hd.
+      now apply Hca; right.
+    } {
+      intros d Hd.
+      now apply Hcb; right.
+    }
+  }
 }
-clear.
-induction (mat_nrows Mda) as [| len]; [ easy | ].
-rewrite <- Nat.add_1_r.
-rewrite seq_app.
-rewrite fold_left_app.
-now rewrite IHlen.
 Qed.
 
 Definition mat_add T {so : semiring_op T} (MA MB : matrix T) : matrix T :=
@@ -2870,6 +2822,7 @@ Fixpoint bmat_def_add_loop T {so : semiring_op T} it (MM1 MM2 : bmatrix_def T) :
 Definition bmat_def_add T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
   bmat_def_add_loop (bmat_depth MM1) MM1 MM2.
 
+(*
 Theorem list_list_add_add2 :
   ∀ T {ro : semiring_op T} r c (lla llb : list (list T)),
   length lla = r
@@ -2910,6 +2863,7 @@ induction lla as [| la]; intros. {
         f_equal.
         (* oui, non *)
 ...
+*)
 
 (*
 Theorem list_list_add_add2 : ∀ T {so : semiring_op T} (MA MB : matrix_def T),
@@ -2970,6 +2924,7 @@ destruct BMDB as [tb| MDB]. {
   } {
     destruct la as [| bmda]; [ easy | ].
     cbn in BMPA; cbn - [ bmat_def_add_loop ].
+...
 (*
     destruct BMPA as (HAP, HArc).
     destruct HAP as (Har, Hac, Harc).
