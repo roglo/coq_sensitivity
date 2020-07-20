@@ -2952,6 +2952,58 @@ destruct BMDB as [tb| MDB]. {
             now destruct Hap as (Har, Hac, Harc).
           }
           f_equal.
+          clear - Hap Hbp.
+          destruct Hap as (Har, Hac, Harc).
+          destruct Hbp as (Hbr, Hbc, Hbrc).
+          cbn in Har, Hac, Harc.
+          cbn in Hbr, Hbc, Hbrc.
+          apply Nat.succ_inj in Har.
+          apply Nat.succ_inj in Hbr.
+          clear - Har Hbr.
+          revert a ra llb Har Hbr.
+          induction lla as [| la]; intros; [ easy | ].
+          destruct llb as [| lb]; [ easy | ].
+          destruct ra; [ easy | cbn ].
+          cbn in Har, Hbr; f_equal.
+          apply Nat.succ_inj in Har.
+          apply Nat.succ_inj in Hbr.
+          now apply IHlla.
+        } {
+          intros c Hc.
+          destruct Hc as [Hc| Hc]. {
+            subst c; cbn.
+            destruct ca. {
+              exfalso.
+              destruct Hap as (Har, Hac, Harc).
+              destruct Hbp as (Hbr, Hbc, Hbrc).
+              cbn in Har, Hac, Harc.
+              cbn in Hbr, Hbc, Hbrc.
+              destruct ra; [ easy | ].
+              now specialize (proj2 Harc eq_refl).
+            } {
+              f_equal.
+              destruct Hap as (Har, Hac, Harc).
+              destruct Hbp as (Hbr, Hbc, Hbrc).
+              cbn in Har, Hac, Harc.
+              cbn in Hbr, Hbc, Hbrc.
+              clear ra Har Harc Hbr Hbrc Harc' Hbrc'.
+              specialize (Hac (a :: la) (or_introl eq_refl)).
+              specialize (Hbc (b :: lb) (or_introl eq_refl)).
+              cbn in Hac, Hbc.
+              apply Nat.succ_inj in Hac.
+              apply Nat.succ_inj in Hbc.
+              clear - Hac Hbc.
+              revert ca lb Hac Hbc.
+              induction la as [| aa]; intros; [ easy | ].
+              destruct lb as [| b]; [ easy | ].
+              destruct ca; [ easy | ].
+              cbn in Hac, Hbc.
+              apply Nat.succ_inj in Hac.
+              apply Nat.succ_inj in Hbc.
+              cbn; f_equal.
+              now apply IHla.
+            }
+          } {
 ...
 (*
     destruct BMPA as (HAP, HArc).
