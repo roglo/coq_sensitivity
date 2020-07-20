@@ -2041,6 +2041,22 @@ split; cbn; [ | | easy ]. {
   now apply IHlla.
 } {
   intros c Hc.
+  subst ra.
+...
+  clear Hrca Hrcb.
+  revert c ca llb Hca Hcb Hrr Hc.
+  induction lla as [| la]; intros; [ easy | ].
+  destruct llb as [| lb]; [ easy | ].
+  cbn in Hc.
+  destruct Hc as [Hc| Hc]. {
+...
+  revert llb Hcb Hrr Hrcb Hc.
+  induction lla as [| la]; intros; [ easy | ].
+  destruct llb as [| lb]; [ easy | ].
+  cbn in Hc.
+  destruct Hc as [Hc| Hc]. {
+  clear - Hra Hrr Hc.
+  revert Hra Hrr Hc.
 ...
 
 unfold matrix_coh_prop, matrix_is_norm in Mpa, Mpb.
