@@ -2843,13 +2843,29 @@ destruct BMDB as [tb| MDB]. {
     destruct (Nat.eq_dec 0 rb) as [Hrb| Hrb]; [ | easy ].
     now destruct (Nat.eq_dec 0 cb).
   } {
-    destruct la as [| a]; [ easy | ].
-    cbn in BMPA; cbn - [ bmat_def_add_loop ].
-    destruct BMPA as (Hap, Harc').
     destruct llb as [| lb]. {
+      destruct la as [| a]; [ easy | ].
       cbn; unfold mat_def_add.
       cbn - [ Nat.eq_dec ].
       destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
+      destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
+      cbn in BMPA, BMPB.
+      subst rb cb; cbn.
+      destruct BMPA as (Hap, Harc').
+      destruct BMPB as (Hbp, Hbrc').
+      easy.
+    } {
+      cbn.
+...
+    destruct la as [| a]; [ easy | ].
+    cbn in BMPA; cbn - [ bmat_def_add_loop ].
+    destruct BMPA as (Hap, Harc').
+...
+      cbn in BMPA; cbn - [ bmat_def_add_loop ].
+      destruct BMPA as (Hap, Harc').
+cbn.
+      cbn - [ Nat.eq_dec ].
+...
       subst rb.
       destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
       cbn in BMPB.
