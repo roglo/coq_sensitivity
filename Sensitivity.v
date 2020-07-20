@@ -2042,13 +2042,24 @@ split; cbn; [ | | easy ]. {
 } {
   intros c Hc.
   subst ra.
-...
   clear Hrca Hrcb.
   revert c ca llb Hca Hcb Hrr Hc.
   induction lla as [| la]; intros; [ easy | ].
   destruct llb as [| lb]; [ easy | ].
   cbn in Hc.
   destruct Hc as [Hc| Hc]. {
+    cbn in Hrr; apply Nat.succ_inj in Hrr.
+    revert lb Hcb Hc.
+    induction la as [| a]; intros; [ now apply Hca; left | ].
+    destruct lb as [| b]; [ now apply Hcb; left | ].
+    cbn in Hc.
+    destruct c as [| c lc]; [ easy | ].
+    injection Hc; clear Hc; intros; subst c lc.
+    cbn.
+    destruct ca. {
+      now specialize (Hca (a :: la) (or_introl eq_refl)).
+    } {
+      f_equal.
 ...
   revert llb Hcb Hrr Hrcb Hc.
   induction lla as [| la]; intros; [ easy | ].
