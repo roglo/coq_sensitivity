@@ -1938,15 +1938,6 @@ Compute (mat_def_transpose 0 (mat_def_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 1
 Compute (mat_transpose 0 (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
 
 (*
-Definition list_list_add T zero (add : T → T → T) r c ll1 ll2 :=
-  map
-    (λ i,
-       map
-         (λ j, add (list_list_el zero ll1 i j) (list_list_el zero ll2 i j))
-         (seq 0 c))
-    (seq 0 r).
-*)
-
 Definition list_list_add T {so : semiring_op T} r c
     (ll1 ll2 : list (list T)) :=
   map
@@ -1956,6 +1947,7 @@ Definition list_list_add T {so : semiring_op T} r c
             (list_list_el 0 ll1 i j + list_list_el 0 ll2 i j)%Srng)
          (seq 0 c))
     (seq 0 r).
+*)
 
 Fixpoint list_add T {so : semiring_op T} (l1 l2 : list T) :=
   match l1 with
@@ -1967,11 +1959,11 @@ Fixpoint list_add T {so : semiring_op T} (l1 l2 : list T) :=
   | [] => []
   end.
 
-Fixpoint list_list_add2 T {so : semiring_op T} (ll1 ll2 : list (list T)) :=
+Fixpoint list_list_add T {so : semiring_op T} (ll1 ll2 : list (list T)) :=
   match ll1 with
    | l1 :: ll'1 =>
        match ll2 with
-       | l2 :: ll'2 => list_add l1 l2 :: list_list_add2 ll'1 ll'2
+       | l2 :: ll'2 => list_add l1 l2 :: list_list_add ll'1 ll'2
        | [] => []
        end
   | [] => []
@@ -2011,9 +2003,7 @@ Definition mat_def_add T {so : semiring_op T} (M1 M2 : matrix_def T) :
     matrix_def T :=
   if Nat.eq_dec (mat_nrows M1) (mat_nrows M2) then
     if Nat.eq_dec (mat_ncols M1) (mat_ncols M2) then
-      {| mat_list :=
-           list_list_add (mat_nrows M1) (mat_ncols M1) (mat_list M1)
-             (mat_list M2);
+      {| mat_list := list_list_add (mat_list M1) (mat_list M2);
          mat_nrows := mat_nrows M1;
          mat_ncols := mat_ncols M1 |}
     else void_mat_def
@@ -2025,6 +2015,34 @@ Proof.
 intros.
 destruct MA as (Mda, Mpa); cbn.
 destruct MB as (Mdb, Mpb); cbn.
+move Mdb before Mda.
+apply matrix_is_norm_prop in Mpa.
+apply matrix_is_norm_prop in Mpb.
+apply matrix_is_norm_prop.
+unfold mat_def_add.
+destruct Mpa as (Hra, Hca, Hrca).
+destruct Mpb as (Hrb, Hcb, Hrcb).
+destruct Mda as (lla, ra, ca).
+destruct Mdb as (llb, rb, cb).
+cbn - [ Nat.eq_dec ] in *.
+destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
+destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
+subst rb cb.
+split; cbn; [ | | easy ]. {
+  clear - Hra Hrr.
+  revert ra llb Hra Hrr.
+  induction lla as [| la]; intros; [ easy | cbn ].
+  destruct llb as [| lb]; [ easy | cbn ].
+  destruct ra; [ easy | ].
+  cbn in Hra, Hrr.
+  apply Nat.succ_inj in Hra.
+  apply Nat.succ_inj in Hrr.
+  f_equal.
+  now apply IHlla.
+} {
+  intros c Hc.
+...
+
 unfold matrix_coh_prop, matrix_is_norm in Mpa, Mpb.
 apply Bool.andb_true_iff in Mpa.
 apply Bool.andb_true_iff in Mpb.
@@ -2041,6 +2059,33 @@ destruct (Nat.eq_dec (mat_nrows Mda) (mat_nrows Mdb))
   as [Hrr| Hrr]; [ | easy ].
 destruct (Nat.eq_dec (mat_ncols Mda) (mat_ncols Mdb))
   as [Hcc| Hcc]; [ | easy ].
+unfold matrix_coh_prop.
+apply matrix_is_norm_prop.
+split; cbn. {
+  destruct Mda as (lla, ra, ca).
+  destruct Mdb as (llb, rb, cb).
+  cbn in Hrb, Hcc; subst rb cb.
+  cbn in Hra, Hrr |-*.
+  clear - Hra Hrr.
+  revert ra llb Hra Hrr.
+  induction lla as [| la]; intros; [ easy | cbn ].
+  destruct llb as [| lb]; [ easy | cbn ].
+  destruct ra; [ easy | ].
+  cbn in Hra, Hrr.
+  apply Nat.succ_inj in Hra.
+  apply Nat.succ_inj in Hrr.
+  f_equal.
+  now apply IHlla.
+} {
+  intros c Hc.
+...
+} {
+...
+...
+  apply IHlla; try easy.
+
+
+
 unfold matrix_coh_prop, matrix_is_norm; cbn.
 unfold list_list_add; cbn.
 rewrite map_length, seq_length, Nat.eqb_refl, Bool.andb_true_l.
@@ -2826,6 +2871,7 @@ induction lla as [| la]; intros. {
     destruct r; [ easy | ].
     apply Nat.succ_inj in Hra.
     apply Nat.succ_inj in Hrb.
+...
     rewrite <- IHlla with (r := r) (c := 0); try easy. {
       destruct r. {
         apply length_zero_iff_nil in Hra.
