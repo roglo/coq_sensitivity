@@ -2941,6 +2941,14 @@ destruct BMDB as [tb| MDB]. {
                     }
                   } {
                     intros la1 Hla1.
+                    destruct Hla1 as [Hla1| Hla1]. {
+                      subst la1; cbn; f_equal.
+                      specialize (Hac (a :: a2 :: la)) as H1.
+                      specialize (H1 (or_introl eq_refl)); cbn in H1.
+                      now do 2 apply Nat.succ_inj in H1.
+                    } {
+                      specialize (Hac la1 (or_intror Hla1)) as H1.
+(* aïe aïe aïe *)
 ...
       cbn - [ Nat.eq_dec ].
 ...
