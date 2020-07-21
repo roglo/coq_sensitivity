@@ -2873,7 +2873,7 @@ destruct BMDB as [tb| MDB]. {
       move Hbc before Hac.
       clear Hbrc.
       split. {
-        split. {
+        split; [ | | easy ]. {
           cbn.
           destruct ra; [ easy | ].
           apply Nat.succ_inj in Har.
@@ -2995,104 +2995,13 @@ destruct BMDB as [tb| MDB]. {
             }
           }
         }
-...
-                apply (IHla1 _ _ b la1 lb _ lla llb). {
-                  intros lc Hlc.
-                  destruct Hlc as [Hlc| [Hlc| Hlc]]. {
-                    subst lc; cbn; f_equal.
-...
-                    specialize (Hac (a :: la) (or_introl eq_refl)).
-                    cbn in Hac.
-                    apply Nat.succ_inj in Hac.
-...
-              apply (IHlla a b la lb []). {
-                intros la2 Hla2.
-                destruct Hla2 as [Hla2| Hla2]. {
-                  now subst la2; apply Hac; left.
-                } {
-                  now apply Hac; right; right.
-                }
-              } {
-                intros lb2 Hlb2.
-                destruct Hlb2 as [Hlb2| Hlb2]. {
-                  now subst lb2; apply Hbc; left.
-                } {
-                  now apply Hbc; right; right.
-                }
-              }
-...
-            revert ra llb Har Hbr Harc Hbc Hbrn Hlc2.
-            induction lla as [| la1]; intros; [ easy | ].
-            destruct llb as [| lb1]; [ easy | ].
-            cbn in Har, Hbr |-*.
-            destruct ra; [ easy | ].
-            apply Nat.succ_inj in Har.
-            apply Nat.succ_inj in Hbr.
-            f_equal.
-            cbn in Hlc2.
-            destruct Hlc2 as [Hlc2| Hlc2]. {
-              subst lc2.
-              apply IHlla with (ra := ra) (llb := llb). {
-                intros lc Hlc.
-                cbn in Hlc.
-                destruct Hlc as [Hlc| Hlc]. {
-                  subst lc; cbn.
-...
-                } {
-                  apply Hac.
-                  now right; right.
-                }
-              } {
-                intros lc Hlc c Hc.
-                cbn in Hlc.
-                destruct Hlc as [Hlc| Hlc]. {
-                  subst lc.
-                  destruct Hc as [Hc| Hc]. {
-                    subst c.
-                    apply (Harn (a :: la)); [ now left | now left ].
-                  } {
-                    apply (Harn (a :: la)); [ now left | now right ].
-                  }
-                } {
-                  apply (Harn lc); [ now right; right | easy ].
-                }
-              } {
-                easy.
-              } {
-                easy.
-              } {
-...
-            clear Harc.
-            clear ra Har Hbr.
-            specialize (Hac (a :: la) (or_introl eq_refl)).
-            specialize (Hbc (b :: lb) (or_introl eq_refl)).
-            cbn in Hac, Hbc.
-            apply Nat.succ_inj in Hac.
-            apply Nat.succ_inj in Hbc.
-            specialize (Harn (a :: la) (or_introl eq_refl)).
-            specialize (Hbrn (b :: lb) (or_introl eq_refl)).
-            clear lla llb.
-            revert a b ca lb Hac Hbc Harn Hbrn.
-            induction la as [| a1]; intros; [ easy | ].
-            destruct lb as [| b1]; [ easy | ].
-            cbn in Hac, Hbc |-*.
-            destruct ca; [ easy | ].
-            apply Nat.succ_inj in Hac.
-            apply Nat.succ_inj in Hbc.
-            f_equal.
-            apply IHla with (b := b); [ easy | easy | | ]. {
-              intros a2 Ha2.
-              apply Harn.
-              destruct Ha2 as [Ha2| Ha2]; [ now subst a2; left | ].
-              now right; right.
-            } {
-              intros b2 Hb2.
-              apply Hbrn.
-              destruct Hb2 as [Hb2| Hb2]; [ now subst b2; left | ].
-              now right; right.
-            }
-  ============================
-  length (list_add la1 lb1) = ca
+      } {
+        cbn.
+        intros lc Hlc c Hc.
+        destruct Hlc as [Hlc| Hlc]. {
+          subst lc; cbn in Hc.
+          destruct Hc as [Hc| Hc]. {
+            rewrite Hc.
 ...
       subst rb.
       destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
