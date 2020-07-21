@@ -2913,7 +2913,7 @@ destruct BMDB as [tb| MDB]. {
             subst la2; cbn.
             destruct ca; [ now rewrite (proj2 Harc) in Har | f_equal ].
             clear Harc.
-            revert ca lb Hac Hbc Hbrn.
+            revert ca lb lla Hac Hbc Har Harn Hbrn.
             induction la as [| a2]; intros. {
               specialize (Hac [a] (or_introl eq_refl)) as H1.
               now apply Nat.succ_inj in H1.
@@ -2929,7 +2929,15 @@ destruct BMDB as [tb| MDB]. {
                   now specialize (Hac (a :: a2 :: la) (or_introl eq_refl)).
                 } {
                   f_equal.
-                  apply IHla. {
+                  apply IHla with (lla := lla). {
+                    intros la1 Hla1.
+                    destruct Hla1 as [Hla1| Hla1]. {
+                      subst la1; cbn; f_equal.
+                      specialize (Hac (a :: a2 :: la)) as H1.
+                      specialize (H1 (or_introl eq_refl)); cbn in H1.
+                      now do 2 apply Nat.succ_inj in H1.
+                    } {
+...
                     intros la1 Hla1 a1 Ha1.
                     destruct Hla1 as [Hla1| Hla1]. {
                       subst la1.
