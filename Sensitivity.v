@@ -2857,12 +2857,12 @@ destruct BMDB as [tb| MDB]. {
     } {
       destruct la as [| a]; [ easy | ].
       destruct lb as [| b]; [ easy | ].
-      destruct BMPA as (Hap, Harc').
-      destruct BMPB as (Hbp, Hbrc').
+      destruct BMPA as (Hap, Harn).
+      destruct BMPB as (Hbp, Hbrn).
       destruct Hap as (Har, Hac, Harc).
       destruct Hbp as (Hbr, Hbc, Hbrc).
-      cbn - [ In ] in Har, Hac, Harc.
-      cbn - [ In ] in Hbr, Hbc, Hbrc.
+      cbn - [ In ] in Har, Hac, Harc, Harn.
+      cbn - [ In ] in Hbr, Hbc, Hbrc, Hbrn.
       cbn.
       unfold mat_def_add.
       cbn - [ Nat.eq_dec ].
@@ -2881,6 +2881,40 @@ destruct BMDB as [tb| MDB]. {
           f_equal.
           destruct ca; [ now specialize (proj2 Harc eq_refl) | ].
           clear Harc.
+          revert ra llb Har Hbr Hbc Hbrn.
+          induction lla as [| la2]; intros; [ easy | cbn ].
+          destruct llb as [| lb2]; [ easy | cbn ].
+          destruct ra; [ easy | ].
+          cbn in Har, Hbr.
+          apply Nat.succ_inj in Har.
+          apply Nat.succ_inj in Hbr.
+          f_equal.
+          apply IHlla; [ | | easy | easy | | ]. {
+            intros c Hc.
+            apply Hac.
+            destruct Hc as [Hc| Hc]; [ now left | now right; right ].
+          } {
+            intros la3 Hla3 a3 Ha3.
+            apply Harn with (rows := la3); [ | easy ].
+            destruct Hla3 as [Hla3| Hla3]; [ now left | now right; right ].
+          } {
+            intros la3 Hla3.
+            apply Hbc.
+            destruct Hla3 as [Hla3| Hla3]; [ now left | now right; right ].
+          } {
+            intros la3 Hla3 a3 Ha3.
+            apply Hbrn with (rows := la3); [ | easy ].
+            destruct Hla3 as [Hla3| Hla3]; [ now left | now right; right ].
+          }
+        } {
+          cbn - [ In ].
+          intros la2 Hla2.
+          destruct Hla2 as [Hla2| Hla2]. {
+            subst la2; cbn.
+            destruct ca; [ now rewrite (proj2 Harc) in Har | f_equal ].
+            clear Harc.
+            induction la as [| a2]. {
+              cbn.
 ...
       revert lla ra ca lb llb rb cb BMPA BMPB.
       induction la as [| a]; intros; [ easy | ].
