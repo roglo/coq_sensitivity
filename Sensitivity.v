@@ -2913,28 +2913,35 @@ destruct BMDB as [tb| MDB]. {
             subst la2; cbn.
             destruct ca; [ now rewrite (proj2 Harc) in Har | f_equal ].
             clear Harc.
-            induction la as [| a2]. {
-              cbn.
+            revert ca lb Hac Hbc Hbrn.
+            induction la as [| a2]; intros. {
+              specialize (Hac [a] (or_introl eq_refl)) as H1.
+              now apply Nat.succ_inj in H1.
+            } {
+              destruct lb as [| b2]. {
+                specialize (Hbc [b] (or_introl eq_refl)) as H1.
+                specialize (Hac (a :: a2 :: la) (or_introl eq_refl)) as H2.
+                cbn in H1, H2.
+                now rewrite <- H2 in H1.
+              } {
+                cbn.
+                destruct ca. {
+                  now specialize (Hac (a :: a2 :: la) (or_introl eq_refl)).
+                } {
+                  f_equal.
+                  apply IHla. {
+                    intros la1 Hla1 a1 Ha1.
+                    destruct Hla1 as [Hla1| Hla1]. {
+                      subst la1.
+                      apply (Harn (a :: a2 :: la)); [ now left | ].
+                      destruct Ha1 as [Ha1| Ha1]; [ now subst a1; left | ].
+                      now right; right.
+                    } {
+                      apply (Harn la1); [ now right | easy ].
+                    }
+                  } {
+                    intros la1 Hla1.
 ...
-      revert lla ra ca lb llb rb cb BMPA BMPB.
-      induction la as [| a]; intros; [ easy | ].
-      destruct lb as [| b]; [ easy | ].
-      cbn in BMPA, BMPB.
-      destruct BMPA as (Hap, Harc').
-      destruct BMPB as (Hbp, Hbrc').
-      destruct Hap as (Har, Hac, Harc).
-      destruct Hbp as (Hbr, Hbc, Hbrc).
-      cbn in Har, Hac, Harc.
-      cbn in Hbr, Hbc, Hbrc.
-      cbn.
-...
-    destruct la as [| a]; [ easy | ].
-    cbn in BMPA; cbn - [ bmat_def_add_loop ].
-    destruct BMPA as (Hap, Harc').
-...
-      cbn in BMPA; cbn - [ bmat_def_add_loop ].
-      destruct BMPA as (Hap, Harc').
-cbn.
       cbn - [ Nat.eq_dec ].
 ...
       subst rb.
