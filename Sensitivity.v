@@ -2908,9 +2908,9 @@ destruct BMDB as [tb| MDB]. {
           }
         } {
           cbn - [ In ].
-          intros la2 Hla2.
-          destruct Hla2 as [Hla2| Hla2]. {
-            subst la2; cbn.
+          intros lc2 Hlc2.
+          destruct Hlc2 as [Hlc2| Hlc2]. {
+            subst lc2; cbn.
             destruct ca; [ now rewrite (proj2 Harc) in Har | f_equal ].
             clear Harc.
             clear ra Har Hbr.
@@ -2942,6 +2942,86 @@ destruct BMDB as [tb| MDB]. {
               now right; right.
             }
           } {
+            destruct ra; [ easy | ].
+            destruct ca. {
+              now specialize (proj2 Harc eq_refl).
+            }
+            clear Harc.
+            apply Nat.succ_inj in Har.
+            apply Nat.succ_inj in Hbr.
+...
+            revert ra llb Har Hbr Harc Hbc Hbrn Hlc2.
+            induction lla as [| la1]; intros; [ easy | ].
+            destruct llb as [| lb1]; [ easy | ].
+            cbn in Har, Hbr |-*.
+            destruct ra; [ easy | ].
+            apply Nat.succ_inj in Har.
+            apply Nat.succ_inj in Hbr.
+            f_equal.
+            cbn in Hlc2.
+            destruct Hlc2 as [Hlc2| Hlc2]. {
+              subst lc2.
+              apply IHlla with (ra := ra) (llb := llb). {
+                intros lc Hlc.
+                cbn in Hlc.
+                destruct Hlc as [Hlc| Hlc]. {
+                  subst lc; cbn.
+...
+                } {
+                  apply Hac.
+                  now right; right.
+                }
+              } {
+                intros lc Hlc c Hc.
+                cbn in Hlc.
+                destruct Hlc as [Hlc| Hlc]. {
+                  subst lc.
+                  destruct Hc as [Hc| Hc]. {
+                    subst c.
+                    apply (Harn (a :: la)); [ now left | now left ].
+                  } {
+                    apply (Harn (a :: la)); [ now left | now right ].
+                  }
+                } {
+                  apply (Harn lc); [ now right; right | easy ].
+                }
+              } {
+                easy.
+              } {
+                easy.
+              } {
+...
+            clear Harc.
+            clear ra Har Hbr.
+            specialize (Hac (a :: la) (or_introl eq_refl)).
+            specialize (Hbc (b :: lb) (or_introl eq_refl)).
+            cbn in Hac, Hbc.
+            apply Nat.succ_inj in Hac.
+            apply Nat.succ_inj in Hbc.
+            specialize (Harn (a :: la) (or_introl eq_refl)).
+            specialize (Hbrn (b :: lb) (or_introl eq_refl)).
+            clear lla llb.
+            revert a b ca lb Hac Hbc Harn Hbrn.
+            induction la as [| a1]; intros; [ easy | ].
+            destruct lb as [| b1]; [ easy | ].
+            cbn in Hac, Hbc |-*.
+            destruct ca; [ easy | ].
+            apply Nat.succ_inj in Hac.
+            apply Nat.succ_inj in Hbc.
+            f_equal.
+            apply IHla with (b := b); [ easy | easy | | ]. {
+              intros a2 Ha2.
+              apply Harn.
+              destruct Ha2 as [Ha2| Ha2]; [ now subst a2; left | ].
+              now right; right.
+            } {
+              intros b2 Hb2.
+              apply Hbrn.
+              destruct Hb2 as [Hb2| Hb2]; [ now subst b2; left | ].
+              now right; right.
+            }
+  ============================
+  length (list_add la1 lb1) = ca
 ...
       subst rb.
       destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
