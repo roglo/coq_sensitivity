@@ -3002,6 +3002,27 @@ destruct BMDB as [tb| MDB]. {
           subst lc; cbn in Hc.
           destruct Hc as [Hc| Hc]. {
             rewrite Hc.
+            move b before a; move lb before la.
+            move c before b.
+            destruct a as [xa| MMMa]. {
+              destruct b as [xb| MMMb]; [ now subst c | ].
+              now subst c.
+            } {
+              subst c; cbn.
+              destruct MMMa as (lla1, ra1, ca1).
+              cbn - [ In ] in Harn.
+              destruct lla1 as [| la1]. {
+                cbn.
+                destruct b as [xb| MMMb]; [ easy | cbn ].
+                destruct MMMb as (llb1, rb1, cb1).
+                unfold mat_def_add; cbn - [ Nat.eq_dec ].
+                destruct (Nat.eq_dec ra1 rb1) as [Hrr| Hrr]; [ | easy ].
+                destruct (Nat.eq_dec ca1 cb1) as [Hcc| Hcc]; [ | easy ].
+                subst rb1 cb1.
+                cbn; split. {
+                  split. {
+                    destruct ra1; [ easy | exfalso ].
+cbn in Hac.
 ...
       subst rb.
       destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
