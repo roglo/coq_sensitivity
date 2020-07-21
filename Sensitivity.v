@@ -2913,6 +2913,65 @@ destruct BMDB as [tb| MDB]. {
             subst la2; cbn.
             destruct ca; [ now rewrite (proj2 Harc) in Har | f_equal ].
             clear Harc.
+            clear ra Har Hbr.
+...
+            revert ca lb Hac Hbc Hbrn.
+            induction la as [| a1]; intros. {
+              specialize (Hac [a] (or_introl eq_refl)) as H1.
+              now apply Nat.succ_inj in H1.
+            } {
+              destruct lb as [| b1]. {
+                specialize (Hbc [b] (or_introl eq_refl)) as H1.
+                specialize (Hac (a :: a1 :: la) (or_introl eq_refl)) as H2.
+                cbn in H1, H2.
+                now rewrite <- H2 in H1.
+              } {
+                cbn.
+                destruct ca. {
+                  now specialize (Hac (a :: a1 :: la) (or_introl eq_refl)).
+                } {
+                  f_equal.
+                  apply IHla. {
+                    intros la2 Hla2 a2 Ha2.
+                    destruct Hla2 as [Hla2| Hla2]. {
+                      subst la2.
+                      apply (Harn (a :: a1 :: la)); [ now left | ].
+                      destruct Ha2 as [Ha2| Ha2]; [ now subst a2; left | ].
+                      now right; right.
+                    } {
+                      apply (Harn la2); [ now right | easy ].
+                    }
+                  } {
+...
+                    intros la1 Hla1.
+                    destruct Hla1 as [Hla1| Hla1]. {
+                      subst la1; cbn; f_equal.
+                      specialize (Hac (a :: a1 :: la)) as H1.
+                      specialize (H1 (or_introl eq_refl)).
+                      now do 2 apply Nat.succ_inj in H1.
+                    } {
+                      apply In_nth with (d := []) in Hla1.
+                      destruct Hla1 as (n & Hn & Hla1).
+                      subst la1.
+...
+                      eapply Harn; [ | apply Ha2 ].
+                      right.
+                      now apply nth_In.
+...
+                      now subst a2; left.
+                    } {
+                      now right; right.
+                    }
+                  } {
+                    intros la1 Hla1.
+                    destruct Hla1 as [Hla1| Hla1]. {
+                      subst la1; cbn; f_equal.
+                      specialize (Hac (a :: a1 :: la)) as H1.
+                      specialize (H1 (or_introl eq_refl)).
+                      cbn in H1.
+                      now do 2 apply Nat.succ_inj in H1.
+                    } {
+...
             revert ca lb lla Hac Hbc Har Harn Hbrn.
             induction la as [| a2]; intros. {
               specialize (Hac [a] (or_introl eq_refl)) as H1.
