@@ -2950,7 +2950,7 @@ destruct BMDB as [tb| MDB]. {
             apply Nat.succ_inj in Har.
             apply Nat.succ_inj in Hbr.
             clear - Hac Hbc Hlc2.
-            revert a llb lc2 Hac Hbc Hlc2.
+            revert llb lc2 Hbc Hlc2.
             induction lla as [| la1]; intros; [ easy | ].
             destruct llb as [| lb1]; [ easy | ].
             cbn in Hlc2.
@@ -2971,7 +2971,7 @@ destruct BMDB as [tb| MDB]. {
               }
               now apply IHla1.
             } {
-              apply (IHlla a llb); [ | | easy ]. {
+              apply IHlla with (llb := llb); [ | | easy ]. {
                 intros lc Hlc.
                 destruct Hlc as [Hlc| Hlc]. {
                   subst lc; cbn; f_equal.
