@@ -2950,13 +2950,62 @@ destruct BMDB as [tb| MDB]. {
             apply Nat.succ_inj in Har.
             apply Nat.succ_inj in Hbr.
             clear - Hac Hbc Hlc2.
-            revert a b la lb llb lc2 Hac Hbc Hlc2.
+            revert a llb lc2 Hac Hbc Hlc2.
             induction lla as [| la1]; intros; [ easy | ].
             destruct llb as [| lb1]; [ easy | ].
             cbn in Hlc2.
             destruct Hlc2 as [Hlc2| Hlc2]. {
               subst lc2.
-              apply (IHlla a b la lb llb). {
+              clear - Hac Hbc.
+              specialize (Hac la1 (or_intror (or_introl eq_refl))).
+              specialize (Hbc lb1 (or_intror (or_introl eq_refl))).
+              revert ca lb1 Hac Hbc.
+              induction la1 as [| a1]; intros; [ easy | ].
+              destruct lb1 as [| b1]; intros; [ easy | ].
+              cbn in Hac, Hbc |-*.
+              apply Nat.succ_inj in Hac.
+              apply Nat.succ_inj in Hbc.
+              f_equal.
+              destruct ca. {
+                now apply length_zero_iff_nil in Hac; subst la1.
+              }
+              now apply IHla1.
+            } {
+              apply (IHlla a llb); [ | | easy ]. {
+                intros lc Hlc.
+                destruct Hlc as [Hlc| Hlc]. {
+                  subst lc; cbn; f_equal.
+                  specialize (Hac (a :: la) (or_introl eq_refl)).
+                  cbn in Hac.
+                  now apply Nat.succ_inj in Hac.
+                } {
+                  now apply Hac; right; right.
+                }
+              } {
+                intros lc Hlc.
+                destruct Hlc as [Hlc| Hlc]. {
+                  subst lc; cbn; f_equal.
+                  specialize (Hbc (b :: lb) (or_introl eq_refl)).
+                  cbn in Hbc.
+                  now apply Nat.succ_inj in Hbc.
+                } {
+                  now apply Hbc; right; right.
+                }
+              }
+            }
+          }
+        }
+...
+                apply (IHla1 _ _ b la1 lb _ lla llb). {
+                  intros lc Hlc.
+                  destruct Hlc as [Hlc| [Hlc| Hlc]]. {
+                    subst lc; cbn; f_equal.
+...
+                    specialize (Hac (a :: la) (or_introl eq_refl)).
+                    cbn in Hac.
+                    apply Nat.succ_inj in Hac.
+...
+              apply (IHlla a b la lb []). {
                 intros la2 Hla2.
                 destruct Hla2 as [Hla2| Hla2]. {
                   now subst la2; apply Hac; left.
