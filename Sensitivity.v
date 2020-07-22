@@ -3138,7 +3138,29 @@ destruct BMDB as [tb| MDB]. {
                                 cbn in Harn.
                                 now destruct Harn as ((H1, H2, H3), H4).
                               } {
-                                cbn; intros a Ha.
+                                cbn; intros la4 Hla4.
+                                destruct Hla3 as [Hla3| Hla3]. {
+                                  subst la3.
+                                  destruct Ha3 as [Ha3| Ha3]. {
+                                    injection Ha3; clear Ha3; intros.
+                                    subst ll r c.
+                                    destruct Hla4 as [Hla4| Hla4]. {
+                                      subst la4; cbn.
+                                      specialize (Harn _ (or_introl eq_refl)).
+                                      specialize (Harn _ (or_introl eq_refl)).
+                                      cbn in Harn.
+                                      destruct Harn as ((H1, H2, H3), H4).
+                                      cbn in H1, H2, H3, H4.
+                                      now specialize (H2 _ (or_introl eq_refl)).
+                                    }
+                                    specialize (Harn _ (or_introl eq_refl)).
+                                    specialize (Harn _ (or_introl eq_refl)).
+                                    cbn in Harn.
+                                    destruct Harn as ((H1, H2, H3), H4).
+                                    cbn in H1, H2, H3, H4.
+                                    now specialize
+                                      (H2 _ (or_intror (or_intror Hla4))).
+                                  }
 ...
 
 Definition bmat_add T {so : semiring_op T} (BMA BMB : bmatrix T) :=
