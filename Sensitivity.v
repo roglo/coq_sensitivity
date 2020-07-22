@@ -3020,9 +3020,15 @@ destruct BMDB as [tb| MDB]. {
                 destruct (Nat.eq_dec ca1 cb1) as [Hcc| Hcc]; [ | easy ].
                 subst rb1 cb1.
                 cbn; split. {
-                  split. {
+                  split; [ | easy | ]. {
                     destruct ra1; [ easy | exfalso ].
-cbn in Hac.
+                    remember (BM_M _) as a eqn:Ha in Harn.
+                    specialize (Harn (a :: la) (or_introl eq_refl) a).
+                    specialize (Harn (or_introl eq_refl)); subst a.
+                    cbn in Harn.
+                    now destruct Harn as ((H1, H2, H3), H4).
+                  } {
+                    cbn.
 ...
       subst rb.
       destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
