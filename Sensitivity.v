@@ -2810,6 +2810,42 @@ Fixpoint bmat_def_add_loop T {so : semiring_op T} it (MM1 MM2 : bmatrix_def T) :
 Definition bmat_def_add T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
   bmat_def_add_loop (bmat_depth MM1) MM1 MM2.
 
+Theorem length_list_list_add :
+  ∀ T {so : semiring_op T} {mso : semiring_op (bmatrix_def T)},
+  ∀ (a b : bmatrix_def T) la lb lla llb ra ca,
+  length lla = ra
+  → length llb = ra
+  → (∀ c, c ∈ (a :: la) :: lla → length c = S ca)
+  → (∀ c, c ∈ (b :: lb) :: llb → length c = S ca)
+  → (∀ rows, rows ∈ (b :: lb) :: llb →
+      ∀ bmd', bmd' ∈ rows → bmatrix_norm_prop_loop (bmat_depth b) bmd')
+  → length (list_list_add lla llb) = ra.
+Proof.
+intros * so mso.
+intros * Har Hbr Hac Hbc Hbrn.
+revert ra llb Har Hbr Hbc Hbrn.
+induction lla as [| la2]; intros; [ easy | cbn ].
+destruct llb as [| lb2]; [ easy | cbn ].
+destruct ra; [ easy | ].
+cbn in Har, Hbr.
+apply Nat.succ_inj in Har.
+apply Nat.succ_inj in Hbr.
+f_equal.
+apply IHlla; [ | easy | easy | | ]. {
+  intros c Hc.
+  apply Hac.
+  destruct Hc as [Hc| Hc]; [ now left | now right; right ].
+} {
+  intros la3 Hla3.
+  apply Hbc.
+  destruct Hla3 as [Hla3| Hla3]; [ now left | now right; right ].
+} {
+  intros la3 Hla3 a3 Ha3.
+  apply Hbrn with (rows := la3); [ | easy ].
+  destruct Hla3 as [Hla3| Hla3]; [ now left | now right; right ].
+}
+Qed.
+
 Theorem bmat_coh_prop_add : ∀ T {so : semiring_op T} BMA BMB,
   bmatrix_coh_prop (bmat_def_add (bmat_def BMA) (bmat_def BMB)).
 Proof.
@@ -2875,37 +2911,14 @@ destruct BMDB as [tb| MDB]. {
       split. {
         split; [ | | easy ]. {
           cbn.
+          clear Harn.
           destruct ra; [ easy | ].
           apply Nat.succ_inj in Har.
           apply Nat.succ_inj in Hbr.
           f_equal.
           destruct ca; [ now specialize (proj2 Harc eq_refl) | ].
           clear Harc.
-          revert ra llb Har Hbr Hbc Hbrn.
-          induction lla as [| la2]; intros; [ easy | cbn ].
-          destruct llb as [| lb2]; [ easy | cbn ].
-          destruct ra; [ easy | ].
-          cbn in Har, Hbr.
-          apply Nat.succ_inj in Har.
-          apply Nat.succ_inj in Hbr.
-          f_equal.
-          apply IHlla; [ | | easy | easy | | ]. {
-            intros c Hc.
-            apply Hac.
-            destruct Hc as [Hc| Hc]; [ now left | now right; right ].
-          } {
-            intros la3 Hla3 a3 Ha3.
-            apply Harn with (rows := la3); [ | easy ].
-            destruct Hla3 as [Hla3| Hla3]; [ now left | now right; right ].
-          } {
-            intros la3 Hla3.
-            apply Hbc.
-            destruct Hla3 as [Hla3| Hla3]; [ now left | now right; right ].
-          } {
-            intros la3 Hla3 a3 Ha3.
-            apply Hbrn with (rows := la3); [ | easy ].
-            destruct Hla3 as [Hla3| Hla3]; [ now left | now right; right ].
-          }
+          now apply (length_list_list_add Har Hbr Hac Hbc).
         } {
           cbn - [ In ].
           intros lc2 Hlc2.
@@ -3074,6 +3087,34 @@ destruct BMDB as [tb| MDB]. {
                           now destruct Harn as ((H1, H2, H3), H4).
                         } {
                           f_equal.
+...
+revert ra1 Hac Hbc Harn Hbrn.
+induction lla1 as [| la2]; intros. {
+  destruct ra1; [ easy | exfalso ].
+...
+(*
+revert ra llb Har Hbr Hbc Hbrn.
+induction lla as [| la2]; intros; [ easy | cbn ].
+*)
+destruct llb as [| lb2]; [ easy | cbn ].
+destruct ra; [ easy | ].
+cbn in Har, Hbr.
+apply Nat.succ_inj in Har.
+apply Nat.succ_inj in Hbr.
+f_equal.
+apply IHlla; [ | easy | easy | | ]. {
+  intros c Hc.
+  apply Hac.
+  destruct Hc as [Hc| Hc]; [ now left | now right; right ].
+} {
+  intros la3 Hla3.
+  apply Hbc.
+  destruct Hla3 as [Hla3| Hla3]; [ now left | now right; right ].
+} {
+  intros la3 Hla3 a3 Ha3.
+  apply Hbrn with (rows := la3); [ | easy ].
+  destruct Hla3 as [Hla3| Hla3]; [ now left | now right; right ].
+}
 ...
       subst rb.
       destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
