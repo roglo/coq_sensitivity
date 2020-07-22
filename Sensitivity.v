@@ -3088,7 +3088,7 @@ destruct BMDB as [tb| MDB]. {
                         } {
                           f_equal.
                           clear Hac Hbc.
-                          revert ra1 llb1 Harn Hbrn. (* Hac Hbc Hbrn. *)
+                          revert ra1 llb1 Harn Hbrn.
                           induction lla1 as [| la2 lla2]; intros. {
                             destruct ra1; [ easy | exfalso ].
                             remember (BM_M _) as a eqn:Ha in Harn.
