@@ -3036,6 +3036,30 @@ destruct BMDB as [tb| MDB]. {
                 }
               } {
                 destruct la1 as [| a1]; [ easy | cbn ].
+                destruct b as [xb| MMMb]; [ easy | cbn ].
+                destruct MMMb as (llb1, rb1, cb1).
+                unfold mat_def_add; cbn - [ Nat.eq_dec ].
+                destruct (Nat.eq_dec ra1 rb1) as [Hrr| Hrr]; [ | easy ].
+                destruct (Nat.eq_dec ca1 cb1) as [Hcc| Hcc]; [ | easy ].
+                subst rb1 cb1.
+                destruct llb1 as [| lb1]. {
+                  cbn; split; [ | easy ].
+                  split; [ | easy | ]. {
+                    destruct ra1; [ easy | exfalso ].
+...
+                    remember (BM_M _) as a eqn:Ha in Harn.
+                    specialize (Harn (a :: la) (or_introl eq_refl) a).
+                    specialize (Harn (or_introl eq_refl)); subst a.
+                    cbn in Harn.
+                    destruct Harn as ((H1, H2, H3), H4).
+                    cbn in H1, H2, H3, H4.
+                  } {
+                    remember (BM_M _) as a eqn:Ha in Harn.
+                    specialize (Harn (a :: la) (or_introl eq_refl) a).
+                    specialize (Harn (or_introl eq_refl)); subst a.
+                    cbn in Harn.
+                    now destruct Harn as ((H1, H2, H3), H4).
+                  }
 ...
       subst rb.
       destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
