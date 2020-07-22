@@ -3046,20 +3046,34 @@ destruct BMDB as [tb| MDB]. {
                   cbn; split; [ | easy ].
                   split; [ | easy | ]. {
                     destruct ra1; [ easy | exfalso ].
-...
-                    remember (BM_M _) as a eqn:Ha in Harn.
-                    specialize (Harn (a :: la) (or_introl eq_refl) a).
-                    specialize (Harn (or_introl eq_refl)); subst a.
-                    cbn in Harn.
-                    destruct Harn as ((H1, H2, H3), H4).
-                    cbn in H1, H2, H3, H4.
+                    remember (BM_M _) as b eqn:Hb in Hbrn.
+                    specialize (Hbrn (b :: lb) (or_introl eq_refl) b).
+                    specialize (Hbrn (or_introl eq_refl)); subst b.
+                    cbn in Hbrn.
+                    now destruct Hbrn as ((H1, H2, H3), H4).
                   } {
-                    remember (BM_M _) as a eqn:Ha in Harn.
-                    specialize (Harn (a :: la) (or_introl eq_refl) a).
-                    specialize (Harn (or_introl eq_refl)); subst a.
-                    cbn in Harn.
-                    now destruct Harn as ((H1, H2, H3), H4).
+                    remember (BM_M _) as b eqn:Hb in Hbrn.
+                    specialize (Hbrn (b :: lb) (or_introl eq_refl) b).
+                    specialize (Hbrn (or_introl eq_refl)); subst b.
+                    cbn in Hbrn.
+                    now destruct Hbrn as ((H1, H2, H3), H4).
                   }
+                } {
+                  destruct lb1 as [| b1]. {
+                    remember (BM_M _) as b eqn:Hb in Hbrn.
+                    specialize (Hbrn (b :: lb) (or_introl eq_refl) b).
+                    now specialize (Hbrn (or_introl eq_refl)); subst b.
+                  } {
+                    cbn; split. {
+                      split; cbn. {
+                        destruct ra1; [ exfalso | ]. {
+                          remember (BM_M _) as a eqn:Ha in Harn.
+                          specialize (Harn (a :: la) (or_introl eq_refl) a).
+                          specialize (Harn (or_introl eq_refl)); subst a.
+                          cbn in Harn.
+                          now destruct Harn as ((H1, H2, H3), H4).
+                        } {
+                          f_equal.
 ...
       subst rb.
       destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
