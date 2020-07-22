@@ -3087,6 +3087,31 @@ destruct BMDB as [tb| MDB]. {
                           now destruct Harn as ((H1, H2, H3), H4).
                         } {
                           f_equal.
+                          clear Hac Hbc.
+                          revert ra1 llb1 Harn Hbrn. (* Hac Hbc Hbrn. *)
+                          induction lla1 as [| la2 lla2]; intros. {
+                            destruct ra1; [ easy | exfalso ].
+                            remember (BM_M _) as a eqn:Ha in Harn.
+                            specialize (Harn (a :: la) (or_introl eq_refl)).
+                            specialize (Harn a (or_introl eq_refl)); subst a.
+                            now destruct Harn as ((H1, H2, H3), H4).
+                          }
+                          destruct llb1 as [| lb2]. {
+                            destruct ra1; [ easy | exfalso ].
+                            remember (BM_M _) as b eqn:Hb in Hbrn.
+                            specialize (Hbrn (b :: lb) (or_introl eq_refl)).
+                            specialize (Hbrn b (or_introl eq_refl)); subst b.
+                            now destruct Hbrn as ((H1, H2, H3), H4).
+                          }
+                          destruct ra1; [ exfalso | ]. {
+                            remember (BM_M _) as a eqn:Ha in Harn.
+                            specialize (Harn (a :: la) (or_introl eq_refl)).
+                            specialize (Harn a (or_introl eq_refl)); subst a.
+                            now destruct Harn as ((H1, H2, H3), H4).
+                          }
+                          cbn; f_equal.
+                          apply IHlla2. {
+                            intros la3 Hla3 a3 Ha3.
 ...
 revert ra1 Hac Hbc Harn Hbrn.
 induction lla1 as [| la2]; intros. {
