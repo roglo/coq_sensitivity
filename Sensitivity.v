@@ -2933,10 +2933,13 @@ destruct BMA as (BMDA, BMPA).
 destruct BMB as (BMDB, BMPB).
 move BMDB before BMDA.
 cbn.
+(*
 rewrite fold_bmatrix_norm_prop.
+rewrite fold_bmat_def_add.
+*)
 apply bmatrix_is_norm_prop in BMPA.
 apply bmatrix_is_norm_prop in BMPB.
-destruct BMDA as [ta| MDA]; [ now destruct BMDB | ].
+destruct BMDA as [ta| MDA]; intros; [ now destruct BMDB | ].
 destruct BMDB as [tb| MDB]. {
   destruct MDA as (lla, ra, ca).
   destruct lla as [| la]; [ easy | now destruct la ].
@@ -2982,6 +2985,49 @@ move Hrr at top; subst rb cb.
 move H1b before H1a.
 move H2b before H2a.
 split. {
+  split; [ | | easy ]. {
+    cbn; f_equal.
+    eapply length_list_list_add; [ easy | easy | easy | | | ].
+    apply H2a.
+    apply H2b.
+    apply H4b.
+  } {
+    intros lc Hlc; cbn.
+    cbn - [ In ] in Hlc.
+    destruct Hlc as [Hlc| Hlc]. {
+      subst lc; cbn; apply eq_S.
+      apply length_list_add. {
+        specialize (H2a _ (or_introl eq_refl)) as H1.
+        cbn in H1.
+        now apply Nat.succ_inj in H1.
+      } {
+        specialize (H2b _ (or_introl eq_refl)) as H1.
+        cbn in H1.
+        now apply Nat.succ_inj in H1.
+      }
+    }
+    eapply length_col_list_list_add; [ apply H2a | apply H2b | ].
+    apply Hlc.
+  }
+}
+intros lc Hlc c Hc.
+cbn - [ In ] in Hlc.
+destruct Hlc as [Hlc| Hlc]. {
+  subst lc.
+  destruct Hc as [Hc| Hc]. {
+    subst c; cbn.
+    rewrite fold_bmatrix_norm_prop.
+    rewrite fold_bmat_def_add.
+    destruct a as [xa| Ma]; [ now destruct b | ].
+    destruct b as [xb| Mb]. {
+      destruct Ma as (la1, ra1, ca1).
+      destruct la1 as [| a1]; [ easy | now destruct a1 ].
+    }
+...
+    cbn.
+    destruct Ma as (la1, ra1, ca1).
+    destruct Mb as (lb1, rb1, cb1).
+    destruct la1 as [| a1]. {
 ...
 intros.
 apply bmatrix_is_norm_prop.
