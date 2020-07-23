@@ -2935,6 +2935,8 @@ move BMDB before BMDA.
 cbn.
 rewrite fold_bmatrix_norm_prop.
 rewrite fold_bmat_def_add.
+revert BMDA BMDB BMPA BMPB.
+fix IHBMDA 1; intros.
 apply bmatrix_is_norm_prop in BMPA.
 apply bmatrix_is_norm_prop in BMPB.
 destruct BMDA as [ta| MDA]; intros; [ now destruct BMDB | ].
@@ -3016,16 +3018,26 @@ destruct Hlc as [Hlc| Hlc]. {
     subst c; cbn.
     rewrite fold_bmatrix_norm_prop.
     rewrite fold_bmat_def_add.
-... (* almost like the beginning *)
-    destruct a as [xa| Ma]; [ now destruct b | ].
-    destruct b as [xb| Mb]. {
-      destruct Ma as (la1, ra1, ca1).
-      destruct la1 as [| a1]; [ easy | now destruct a1 ].
+    apply IHBMDA. {
+      apply bmatrix_is_norm_prop.
+      destruct a as [ta| MDA]; [ easy | ].
+      specialize (H4a _ (or_introl eq_refl)).
+      specialize (H4a _ (or_introl eq_refl)).
+      easy.
+    } {
+      apply bmatrix_is_norm_prop.
+      destruct b as [tb| MDB]; [ easy | ].
+      specialize (H4b _ (or_introl eq_refl)).
+      specialize (H4b _ (or_introl eq_refl)).
+      easy.
     }
-    cbn.
-    destruct Ma as (la1, ra1, ca1).
-    destruct Mb as (lb1, rb1, cb1).
-    destruct la1 as [| a1]. {
+  }
+  rewrite fold_bmat_def_add.
+  destruct la as [| a1]; [ easy | ].
+  destruct lb as [| b1]; [ easy | ].
+  cbn - [ In ] in Hc.
+  destruct Hc as [Hc| Hc]. {
+    subst c.
 ...
 intros.
 apply bmatrix_is_norm_prop.
