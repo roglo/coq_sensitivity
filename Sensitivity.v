@@ -2846,6 +2846,23 @@ apply IHlla; [ | easy | easy | | ]. {
 }
 Qed.
 
+Theorem length_list_add : ∀ T {so : semiring_op T} la lb ca,
+  length la = ca
+  → length lb = ca
+  → length (list_add la lb) = ca.
+Proof.
+intros * Hac Hbc.
+revert ca lb Hac Hbc.
+induction la as [| a1]; intros; [ easy | ].
+destruct lb as [| b1]; [ easy | ].
+cbn in Hac, Hbc |-*.
+destruct ca; [ easy | ].
+apply Nat.succ_inj in Hac.
+apply Nat.succ_inj in Hbc.
+f_equal.
+now apply IHla.
+Qed.
+
 Theorem bmat_coh_prop_add : ∀ T {so : semiring_op T} BMA BMB,
   bmatrix_coh_prop (bmat_def_add (bmat_def BMA) (bmat_def BMB)).
 Proof.
@@ -2925,35 +2942,12 @@ destruct BMDB as [tb| MDB]. {
           destruct Hlc2 as [Hlc2| Hlc2]. {
             subst lc2; cbn.
             destruct ca; [ now rewrite (proj2 Harc) in Har | f_equal ].
-            clear Harc.
-            clear ra Har Hbr.
             specialize (Hac (a :: la) (or_introl eq_refl)).
             specialize (Hbc (b :: lb) (or_introl eq_refl)).
             cbn in Hac, Hbc.
             apply Nat.succ_inj in Hac.
             apply Nat.succ_inj in Hbc.
-            specialize (Harn (a :: la) (or_introl eq_refl)).
-            specialize (Hbrn (b :: lb) (or_introl eq_refl)).
-            clear lla llb.
-            revert a b ca lb Hac Hbc Harn Hbrn.
-            induction la as [| a1]; intros; [ easy | ].
-            destruct lb as [| b1]; [ easy | ].
-            cbn in Hac, Hbc |-*.
-            destruct ca; [ easy | ].
-            apply Nat.succ_inj in Hac.
-            apply Nat.succ_inj in Hbc.
-            f_equal.
-            apply IHla with (b := b); [ easy | easy | | ]. {
-              intros a2 Ha2.
-              apply Harn.
-              destruct Ha2 as [Ha2| Ha2]; [ now subst a2; left | ].
-              now right; right.
-            } {
-              intros b2 Hb2.
-              apply Hbrn.
-              destruct Hb2 as [Hb2| Hb2]; [ now subst b2; left | ].
-              now right; right.
-            }
+            now apply length_list_add.
           } {
             destruct ra; [ easy | ].
             destruct ca. {
@@ -2963,6 +2957,8 @@ destruct BMDB as [tb| MDB]. {
             apply Nat.succ_inj in Har.
             apply Nat.succ_inj in Hbr.
             clear - Hac Hbc Hlc2.
+(* lemma to do *)
+...
             revert llb lc2 Hbc Hlc2.
             induction lla as [| la1]; intros; [ easy | ].
             destruct llb as [| lb1]; [ easy | ].
