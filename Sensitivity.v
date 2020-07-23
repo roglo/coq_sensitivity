@@ -2863,6 +2863,59 @@ f_equal.
 now apply IHla.
 Qed.
 
+Theorem length_col_list_list_add :
+  ∀ T {so : semiring_op T} ca (a b : T) la lb lla llb lc,
+  (∀ c, c ∈ (a :: la) :: lla → length c = S ca)
+  → (∀ c, c ∈ (b :: lb) :: llb → length c = S ca)
+  → lc ∈ list_list_add lla llb
+  → length lc = S ca.
+Proof.
+intros * Hac Hbc Hlc.
+revert llb lc Hbc Hlc.
+induction lla as [| la1]; intros; [ easy | ].
+destruct llb as [| lb1]; [ easy | ].
+cbn in Hlc.
+destruct Hlc as [Hlc| Hlc]. {
+  subst lc.
+  clear - Hac Hbc.
+  specialize (Hac la1 (or_intror (or_introl eq_refl))).
+  specialize (Hbc lb1 (or_intror (or_introl eq_refl))).
+  revert ca lb1 Hac Hbc.
+  induction la1 as [| a1]; intros; [ easy | ].
+  destruct lb1 as [| b1]; intros; [ easy | ].
+  cbn in Hac, Hbc |-*.
+  apply Nat.succ_inj in Hac.
+  apply Nat.succ_inj in Hbc.
+  f_equal.
+  destruct ca. {
+    now apply length_zero_iff_nil in Hac; subst la1.
+  }
+  now apply IHla1.
+} {
+  apply IHlla with (llb := llb); [ | | easy ]. {
+    intros lc1 Hlc1.
+    destruct Hlc1 as [Hlc1| Hlc1]. {
+      subst lc1; cbn; f_equal.
+      specialize (Hac (a :: la) (or_introl eq_refl)).
+      cbn in Hac.
+      now apply Nat.succ_inj in Hac.
+    } {
+      now apply Hac; right; right.
+    }
+  } {
+    intros lc1 Hlc1.
+    destruct Hlc1 as [Hlc1| Hlc1]. {
+      subst lc1; cbn; f_equal.
+      specialize (Hbc (b :: lb) (or_introl eq_refl)).
+      cbn in Hbc.
+      now apply Nat.succ_inj in Hbc.
+    } {
+      now apply Hbc; right; right.
+    }
+  }
+}
+Qed.
+
 Theorem bmat_coh_prop_add : ∀ T {so : semiring_op T} BMA BMB,
   bmatrix_coh_prop (bmat_def_add (bmat_def BMA) (bmat_def BMB)).
 Proof.
@@ -2957,51 +3010,13 @@ destruct BMDB as [tb| MDB]. {
             apply Nat.succ_inj in Har.
             apply Nat.succ_inj in Hbr.
             clear - Hac Hbc Hlc2.
-(* lemma to do *)
-...
-            revert llb lc2 Hbc Hlc2.
-            induction lla as [| la1]; intros; [ easy | ].
-            destruct llb as [| lb1]; [ easy | ].
-            cbn in Hlc2.
-            destruct Hlc2 as [Hlc2| Hlc2]. {
-              subst lc2.
-              clear - Hac Hbc.
-              specialize (Hac la1 (or_intror (or_introl eq_refl))).
-              specialize (Hbc lb1 (or_intror (or_introl eq_refl))).
-              revert ca lb1 Hac Hbc.
-              induction la1 as [| a1]; intros; [ easy | ].
-              destruct lb1 as [| b1]; intros; [ easy | ].
-              cbn in Hac, Hbc |-*.
-              apply Nat.succ_inj in Hac.
-              apply Nat.succ_inj in Hbc.
-              f_equal.
-              destruct ca. {
-                now apply length_zero_iff_nil in Hac; subst la1.
-              }
-              now apply IHla1.
-            } {
-              apply IHlla with (llb := llb); [ | | easy ]. {
-                intros lc Hlc.
-                destruct Hlc as [Hlc| Hlc]. {
-                  subst lc; cbn; f_equal.
-                  specialize (Hac (a :: la) (or_introl eq_refl)).
-                  cbn in Hac.
-                  now apply Nat.succ_inj in Hac.
-                } {
-                  now apply Hac; right; right.
-                }
-              } {
-                intros lc Hlc.
-                destruct Hlc as [Hlc| Hlc]. {
-                  subst lc; cbn; f_equal.
-                  specialize (Hbc (b :: lb) (or_introl eq_refl)).
-                  cbn in Hbc.
-                  now apply Nat.succ_inj in Hbc.
-                } {
-                  now apply Hbc; right; right.
-                }
-              }
-            }
+            remember
+              {| srng_zero := @void_bmat_def T;
+                 srng_one := @void_bmat_def T;
+                 srng_add := @bmat_def_add_loop T so (@bmat_depth T a);
+                 srng_mul := @bmat_def_add_loop T so (@bmat_depth T a) |}
+              as mso.
+            now apply (@length_col_list_list_add _ mso ca a b la lb lla llb).
           }
         }
       } {
