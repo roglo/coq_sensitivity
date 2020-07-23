@@ -2933,10 +2933,8 @@ destruct BMA as (BMDA, BMPA).
 destruct BMB as (BMDB, BMPB).
 move BMDB before BMDA.
 cbn.
-(*
 rewrite fold_bmatrix_norm_prop.
 rewrite fold_bmat_def_add.
-*)
 apply bmatrix_is_norm_prop in BMPA.
 apply bmatrix_is_norm_prop in BMPB.
 destruct BMDA as [ta| MDA]; intros; [ now destruct BMDB | ].
@@ -3018,12 +3016,12 @@ destruct Hlc as [Hlc| Hlc]. {
     subst c; cbn.
     rewrite fold_bmatrix_norm_prop.
     rewrite fold_bmat_def_add.
+... (* almost like the beginning *)
     destruct a as [xa| Ma]; [ now destruct b | ].
     destruct b as [xb| Mb]. {
       destruct Ma as (la1, ra1, ca1).
       destruct la1 as [| a1]; [ easy | now destruct a1 ].
     }
-...
     cbn.
     destruct Ma as (la1, ra1, ca1).
     destruct Mb as (lb1, rb1, cb1).
