@@ -2946,8 +2946,11 @@ destruct BMDB as [tb| MDB]. {
 }
 destruct MDA as (lla, ra, ca).
 destruct MDB as (llb, rb, cb).
-cbn in BMPA, BMPB; cbn.
-destruct lla as [| la]. {
+revert ra ca llb rb cb BMPA BMPB.
+(*
+cbn in BMPA, BMPB.
+*)
+induction lla as [| la]; intros. {
   cbn in BMPA.
   destruct BMPA as ((H1a, H2a, H3a), H4a).
   cbn - [ In ] in H1a, H2a, H3a, H4a; subst ra.
@@ -2958,7 +2961,7 @@ destruct lla as [| la]. {
   destruct (Nat.eq_dec 0 rb) as [Hrb| Hrb]; [ | easy ].
   now destruct (Nat.eq_dec 0 cb).
 }
-destruct la as [| a]; [ easy | cbn ].
+destruct la as [| a]; [ easy | ].
 destruct BMPA as ((H1a, H2a, H3a), H4a).
 cbn - [ In ] in H1a, H2a, H3a, H4a.
 destruct ra; [ easy | ].
@@ -2976,6 +2979,7 @@ destruct rb; [ easy | ].
 apply Nat.succ_inj in H1b.
 destruct cb; [ now specialize (proj2 H3b eq_refl) | ].
 clear H3b.
+cbn.
 unfold mat_def_add; cbn - [ Nat.eq_dec ].
 destruct (Nat.eq_dec (S ra) (S rb)) as [Hrr| Hrr]; [ | easy ].
 destruct (Nat.eq_dec (S ca) (S cb)) as [Hcc| Hcc]; [ | easy ].
@@ -3038,6 +3042,8 @@ destruct Hlc as [Hlc| Hlc]. {
   cbn - [ In ] in Hc.
   destruct Hc as [Hc| Hc]. {
     subst c.
+    destruct a1 as [xa| Ma]. {
+      destruct b1 as [xb| Mb].
 ...
 intros.
 apply bmatrix_is_norm_prop.
