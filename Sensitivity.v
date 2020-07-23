@@ -2255,8 +2255,8 @@ Fixpoint bmatrix_norm_prop_loop T it (bmd : bmatrix_def T) :=
       | BM_1 _ => True
       | BM_M BMM =>
           matrix_norm_prop BMM ∧
-          ∀ rows, rows ∈ mat_list BMM →
-          ∀ bmd', bmd' ∈ rows → bmatrix_norm_prop_loop it' bmd'
+          ∀ ld, ld ∈ mat_list BMM →
+          ∀ d, d ∈ ld → bmatrix_norm_prop_loop it' d
       end
   end.
 
@@ -2353,7 +2353,7 @@ split; intros Hbmd. {
   destruct Hbmd as (H1, H2).
   apply matrix_is_norm_prop in H1.
   split; [ easy | ].
-  intros * Hrows * Hbmd'.
+  intros ld Hrows d Hbmd'.
   apply IHlen; clear IHlen.
   specialize (proj1 (fold_left_fold_left_and_true _ _ _) H2) as H3.
   clear H2; cbn in H3.
@@ -2374,8 +2374,8 @@ split; intros Hbmd. {
   specialize (H3 H); clear H.
   assert (H : j ∈ seq 0 c). {
     apply in_seq.
-    rewrite <- (Hc rows). 2: {
-      subst rows.
+    rewrite <- (Hc ld). 2: {
+      subst ld.
       now apply nth_In.
     }
     split; [ flia | easy ].
@@ -2916,6 +2916,14 @@ destruct Hlc as [Hlc| Hlc]. {
 }
 Qed.
 
+Theorem fold_bmat_def_add : ∀ T {so : semiring_op T} BMA BMB,
+  bmat_def_add_loop (bmat_depth BMA) BMA BMB = bmat_def_add BMA BMB.
+Proof. easy. Qed.
+
+Theorem fold_bmatrix_norm_prop : ∀ T (BMD : bmatrix_def T),
+  bmatrix_norm_prop_loop (bmat_depth BMD) BMD = bmatrix_norm_prop BMD.
+Proof. easy. Qed.
+
 Theorem bmat_coh_prop_add : ∀ T {so : semiring_op T} BMA BMB,
   bmatrix_coh_prop (bmat_def_add (bmat_def BMA) (bmat_def BMB)).
 Proof.
@@ -3006,10 +3014,8 @@ destruct BMDB as [tb| MDB]. {
             destruct ca. {
               now specialize (proj2 Harc eq_refl).
             }
-            clear Harc.
             apply Nat.succ_inj in Har.
             apply Nat.succ_inj in Hbr.
-            clear - Hac Hbc Hlc2.
             remember
               {| srng_zero := @void_bmat_def T;
                  srng_one := @void_bmat_def T;
@@ -3026,152 +3032,165 @@ destruct BMDB as [tb| MDB]. {
           subst lc; cbn in Hc.
           destruct Hc as [Hc| Hc]. {
             rewrite Hc.
+            rewrite fold_bmat_def_add in Hc.
+            rewrite fold_bmatrix_norm_prop.
             move b before a; move lb before la.
             move c before b.
             destruct a as [xa| MMMa]. {
               destruct b as [xb| MMMb]; [ now subst c | ].
               now subst c.
-            } {
-              subst c; cbn.
-              destruct MMMa as (lla1, ra1, ca1).
-              cbn - [ In ] in Harn.
-              destruct lla1 as [| la1]. {
-                cbn.
-                destruct b as [xb| MMMb]; [ easy | cbn ].
-                destruct MMMb as (llb1, rb1, cb1).
-                unfold mat_def_add; cbn - [ Nat.eq_dec ].
-                destruct (Nat.eq_dec ra1 rb1) as [Hrr| Hrr]; [ | easy ].
-                destruct (Nat.eq_dec ca1 cb1) as [Hcc| Hcc]; [ | easy ].
-                subst rb1 cb1.
-                cbn; split; [ | easy ].
-                split; [ | easy | ]. {
-                  destruct ra1; [ easy | exfalso ].
-                  remember (BM_M _) as a eqn:Ha in Harn.
-                  specialize (Harn (a :: la) (or_introl eq_refl) a).
-                  specialize (Harn (or_introl eq_refl)); subst a.
-                  cbn in Harn.
-                  now destruct Harn as ((H1, H2, H3), H4).
-                } {
+            }
+            subst c; cbn.
+            destruct MMMa as (lla1, ra1, ca1).
+            cbn - [ In ] in Harn.
+            destruct lla1 as [| la1]. {
+              cbn.
+              rewrite fold_bmatrix_norm_prop.
+              destruct b as [xb| MMMb]; [ easy | cbn ].
+              destruct MMMb as (llb1, rb1, cb1).
+              unfold mat_def_add; cbn - [ Nat.eq_dec ].
+              destruct (Nat.eq_dec ra1 rb1) as [Hrr| Hrr]; [ | easy ].
+              destruct (Nat.eq_dec ca1 cb1) as [Hcc| Hcc]; [ | easy ].
+              subst rb1 cb1.
+              cbn; split; [ | easy ].
+              split; [ | easy | ]. {
+                destruct ra1; [ easy | exfalso ].
+                remember (BM_M _) as a eqn:Ha in Harn.
+                specialize (Harn (a :: la) (or_introl eq_refl) a).
+                specialize (Harn (or_introl eq_refl)); subst a.
+                cbn in Harn.
+                now destruct Harn as ((H1, H2, H3), H4).
+              } {
+                remember (BM_M _) as a eqn:Ha in Harn.
+                specialize (Harn (a :: la) (or_introl eq_refl) a).
+                specialize (Harn (or_introl eq_refl)); subst a.
+                cbn in Harn.
+                now destruct Harn as ((H1, H2, H3), H4).
+              }
+            }
+            destruct la1 as [| a1]; [ easy | cbn ].
+            destruct b as [xb| MMMb]; [ easy | cbn ].
+            destruct MMMb as (llb1, rb1, cb1).
+            unfold mat_def_add; cbn - [ Nat.eq_dec ].
+            destruct (Nat.eq_dec ra1 rb1) as [Hrr| Hrr]; [ | easy ].
+            destruct (Nat.eq_dec ca1 cb1) as [Hcc| Hcc]; [ | easy ].
+            subst rb1 cb1.
+            destruct llb1 as [| lb1]. {
+              cbn; split; [ | easy ].
+              split; [ | easy | ]. {
+                destruct ra1; [ easy | exfalso ].
+                remember (BM_M _) as b eqn:Hb in Hbrn.
+                specialize (Hbrn (b :: lb) (or_introl eq_refl) b).
+                specialize (Hbrn (or_introl eq_refl)); subst b.
+                cbn in Hbrn.
+                now destruct Hbrn as ((H1, H2, H3), H4).
+              } {
+                remember (BM_M _) as b eqn:Hb in Hbrn.
+                specialize (Hbrn (b :: lb) (or_introl eq_refl) b).
+                specialize (Hbrn (or_introl eq_refl)); subst b.
+                cbn in Hbrn.
+                now destruct Hbrn as ((H1, H2, H3), H4).
+              }
+            }
+            destruct lb1 as [| b1]. {
+              remember (BM_M _) as b eqn:Hb in Hbrn.
+              specialize (Hbrn (b :: lb) (or_introl eq_refl) b).
+              now specialize (Hbrn (or_introl eq_refl)); subst b.
+            }
+            cbn; split. {
+              split; cbn. {
+                destruct ra1; [ exfalso | ]. {
                   remember (BM_M _) as a eqn:Ha in Harn.
                   specialize (Harn (a :: la) (or_introl eq_refl) a).
                   specialize (Harn (or_introl eq_refl)); subst a.
                   cbn in Harn.
                   now destruct Harn as ((H1, H2, H3), H4).
                 }
-              } {
-                destruct la1 as [| a1]; [ easy | cbn ].
-                destruct b as [xb| MMMb]; [ easy | cbn ].
-                destruct MMMb as (llb1, rb1, cb1).
-                unfold mat_def_add; cbn - [ Nat.eq_dec ].
-                destruct (Nat.eq_dec ra1 rb1) as [Hrr| Hrr]; [ | easy ].
-                destruct (Nat.eq_dec ca1 cb1) as [Hcc| Hcc]; [ | easy ].
-                subst rb1 cb1.
-                destruct llb1 as [| lb1]. {
-                  cbn; split; [ | easy ].
-                  split; [ | easy | ]. {
-                    destruct ra1; [ easy | exfalso ].
-                    remember (BM_M _) as b eqn:Hb in Hbrn.
-                    specialize (Hbrn (b :: lb) (or_introl eq_refl) b).
-                    specialize (Hbrn (or_introl eq_refl)); subst b.
-                    cbn in Hbrn.
-                    now destruct Hbrn as ((H1, H2, H3), H4).
-                  } {
-                    remember (BM_M _) as b eqn:Hb in Hbrn.
-                    specialize (Hbrn (b :: lb) (or_introl eq_refl) b).
-                    specialize (Hbrn (or_introl eq_refl)); subst b.
-                    cbn in Hbrn.
-                    now destruct Hbrn as ((H1, H2, H3), H4).
-                  }
+                f_equal.
+(**)
+                eapply length_list_list_add; [ easy | | | | | ]. {
+                  specialize (Harn _ (or_introl eq_refl)).
+                  specialize (Harn _ (or_introl eq_refl)).
+                  cbn in Harn.
+                  destruct Harn as ((H1, H2, H3), H4).
+                  cbn in H1.
+                  now apply Nat.succ_inj in H1.
                 } {
-                  destruct lb1 as [| b1]. {
-                    remember (BM_M _) as b eqn:Hb in Hbrn.
-                    specialize (Hbrn (b :: lb) (or_introl eq_refl) b).
-                    now specialize (Hbrn (or_introl eq_refl)); subst b.
-                  } {
-                    cbn; split. {
-                      split; cbn. {
-                        destruct ra1; [ exfalso | ]. {
-                          remember (BM_M _) as a eqn:Ha in Harn.
-                          specialize (Harn (a :: la) (or_introl eq_refl) a).
-                          specialize (Harn (or_introl eq_refl)); subst a.
+...
+                clear Hac Hbc.
+                revert ra1 llb1 Harn Hbrn.
+                induction lla1 as [| la2 lla2]; intros. {
+                  destruct ra1; [ easy | exfalso ].
+                  remember (BM_M _) as a eqn:Ha in Harn.
+                  specialize (Harn (a :: la) (or_introl eq_refl)).
+                  specialize (Harn a (or_introl eq_refl)); subst a.
+                  now destruct Harn as ((H1, H2, H3), H4).
+                }
+                destruct llb1 as [| lb2]. {
+                  destruct ra1; [ easy | exfalso ].
+                  remember (BM_M _) as b eqn:Hb in Hbrn.
+                  specialize (Hbrn (b :: lb) (or_introl eq_refl)).
+                  specialize (Hbrn b (or_introl eq_refl)); subst b.
+                  now destruct Hbrn as ((H1, H2, H3), H4).
+                }
+                destruct ra1; [ exfalso | ]. {
+                  remember (BM_M _) as a eqn:Ha in Harn.
+                  specialize (Harn (a :: la) (or_introl eq_refl)).
+                  specialize (Harn a (or_introl eq_refl)); subst a.
+                  now destruct Harn as ((H1, H2, H3), H4).
+                }
+                cbn; f_equal.
+                apply IHlla2. {
+                  intros la3 Hla3 a3 Ha3.
+                  destruct a3 as [x| MBM]; [ easy | cbn ].
+                  split. {
+                    destruct MBM as (ll, r, c); cbn.
+                    split. {
+                      destruct Hla3 as [Hla3| Hla3]. {
+                        subst la3.
+                        destruct Ha3 as [Ha3| Ha3]. {
+                          injection Ha3; clear Ha3; intros; subst ll r c.
+                          cbn; f_equal.
+                          specialize (Harn _ (or_introl eq_refl)).
+                          specialize (Harn _ (or_introl eq_refl)).
+                          cbn in Harn.
+                          destruct Harn as ((H1, H2, H3), H4).
+                          cbn in H1.
+                          now do 2 apply Nat.succ_inj in H1.
+                        } {
+                          specialize (Harn _ (or_introl eq_refl)).
+                          specialize (Harn _ (or_intror Ha3)).
                           cbn in Harn.
                           now destruct Harn as ((H1, H2, H3), H4).
-                        } {
-                          f_equal.
-                          clear Hac Hbc.
-                          revert ra1 llb1 Harn Hbrn.
-                          induction lla1 as [| la2 lla2]; intros. {
-                            destruct ra1; [ easy | exfalso ].
-                            remember (BM_M _) as a eqn:Ha in Harn.
-                            specialize (Harn (a :: la) (or_introl eq_refl)).
-                            specialize (Harn a (or_introl eq_refl)); subst a.
-                            now destruct Harn as ((H1, H2, H3), H4).
+                        }
+                      }
+                      specialize (Harn _ (or_intror Hla3) _ Ha3).
+                      cbn in Harn.
+                      now destruct Harn as ((H1, H2, H3), H4).
+                    } {
+                      cbn; intros la4 Hla4.
+                      destruct Hla3 as [Hla3| Hla3]. {
+                        subst la3.
+                        destruct Ha3 as [Ha3| Ha3]. {
+                          injection Ha3; clear Ha3; intros.
+                          subst ll r c.
+                          destruct Hla4 as [Hla4| Hla4]. {
+                            subst la4; cbn.
+                            specialize (Harn _ (or_introl eq_refl)).
+                            specialize (Harn _ (or_introl eq_refl)).
+                            cbn in Harn.
+                            destruct Harn as ((H1, H2, H3), H4).
+                            cbn in H1, H2, H3, H4.
+                            now specialize (H2 _ (or_introl eq_refl)).
                           }
-                          destruct llb1 as [| lb2]. {
-                            destruct ra1; [ easy | exfalso ].
-                            remember (BM_M _) as b eqn:Hb in Hbrn.
-                            specialize (Hbrn (b :: lb) (or_introl eq_refl)).
-                            specialize (Hbrn b (or_introl eq_refl)); subst b.
-                            now destruct Hbrn as ((H1, H2, H3), H4).
-                          }
-                          destruct ra1; [ exfalso | ]. {
-                            remember (BM_M _) as a eqn:Ha in Harn.
-                            specialize (Harn (a :: la) (or_introl eq_refl)).
-                            specialize (Harn a (or_introl eq_refl)); subst a.
-                            now destruct Harn as ((H1, H2, H3), H4).
-                          }
-                          cbn; f_equal.
-                          apply IHlla2. {
-                            intros la3 Hla3 a3 Ha3.
-                            destruct a3 as [x| MBM]; [ easy | cbn ].
-                            split. {
-                              destruct MBM as (ll, r, c); cbn.
-                              split. {
-                                destruct Hla3 as [Hla3| Hla3]. {
-                                  subst la3.
-                                  destruct Ha3 as [Ha3| Ha3]. {
-                                    injection Ha3; clear Ha3; intros; subst ll r c.
-                                    cbn; f_equal.
-                                    specialize (Harn _ (or_introl eq_refl)).
-                                    specialize (Harn _ (or_introl eq_refl)).
-                                    cbn in Harn.
-                                    destruct Harn as ((H1, H2, H3), H4).
-                                    cbn in H1.
-                                    now do 2 apply Nat.succ_inj in H1.
-                                  } {
-                                    specialize (Harn _ (or_introl eq_refl)).
-                                    specialize (Harn _ (or_intror Ha3)).
-                                    cbn in Harn.
-                                    now destruct Harn as ((H1, H2, H3), H4).
-                                  }
-                                }
-                                specialize (Harn _ (or_intror Hla3) _ Ha3).
-                                cbn in Harn.
-                                now destruct Harn as ((H1, H2, H3), H4).
-                              } {
-                                cbn; intros la4 Hla4.
-                                destruct Hla3 as [Hla3| Hla3]. {
-                                  subst la3.
-                                  destruct Ha3 as [Ha3| Ha3]. {
-                                    injection Ha3; clear Ha3; intros.
-                                    subst ll r c.
-                                    destruct Hla4 as [Hla4| Hla4]. {
-                                      subst la4; cbn.
-                                      specialize (Harn _ (or_introl eq_refl)).
-                                      specialize (Harn _ (or_introl eq_refl)).
-                                      cbn in Harn.
-                                      destruct Harn as ((H1, H2, H3), H4).
-                                      cbn in H1, H2, H3, H4.
-                                      now specialize (H2 _ (or_introl eq_refl)).
-                                    }
-                                    specialize (Harn _ (or_introl eq_refl)).
-                                    specialize (Harn _ (or_introl eq_refl)).
-                                    cbn in Harn.
-                                    destruct Harn as ((H1, H2, H3), H4).
-                                    cbn in H1, H2, H3, H4.
-                                    now specialize
-                                      (H2 _ (or_intror (or_intror Hla4))).
-                                  }
+                          specialize (Harn _ (or_introl eq_refl)).
+                          specialize (Harn _ (or_introl eq_refl)).
+                          cbn in Harn.
+                          destruct Harn as ((H1, H2, H3), H4).
+                          cbn in H1, H2, H3, H4.
+                          now specialize
+                              (H2 _ (or_intror (or_intror Hla4))).
+                        }
 ...
 
 Definition bmat_add T {so : semiring_op T} (BMA BMB : bmatrix T) :=
