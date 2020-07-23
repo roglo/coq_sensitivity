@@ -2929,6 +2929,62 @@ Theorem bmat_coh_prop_add : ∀ T {so : semiring_op T} BMA BMB,
 Proof.
 intros.
 apply bmatrix_is_norm_prop.
+destruct BMA as (BMDA, BMPA).
+destruct BMB as (BMDB, BMPB).
+move BMDB before BMDA.
+cbn.
+rewrite fold_bmatrix_norm_prop.
+apply bmatrix_is_norm_prop in BMPA.
+apply bmatrix_is_norm_prop in BMPB.
+destruct BMDA as [ta| MDA]; [ now destruct BMDB | ].
+destruct BMDB as [tb| MDB]. {
+  destruct MDA as (lla, ra, ca).
+  destruct lla as [| la]; [ easy | now destruct la ].
+}
+destruct MDA as (lla, ra, ca).
+destruct MDB as (llb, rb, cb).
+cbn in BMPA, BMPB; cbn.
+destruct lla as [| la]. {
+  cbn in BMPA.
+  destruct BMPA as ((H1a, H2a, H3a), H4a).
+  cbn - [ In ] in H1a, H2a, H3a, H4a; subst ra.
+  specialize (proj1 H3a eq_refl); intros; subst ca.
+  clear H2a H3a H4a; cbn.
+  unfold mat_def_add.
+  cbn - [ Nat.eq_dec ].
+  destruct (Nat.eq_dec 0 rb) as [Hrb| Hrb]; [ | easy ].
+  now destruct (Nat.eq_dec 0 cb).
+}
+destruct la as [| a]; [ easy | cbn ].
+destruct BMPA as ((H1a, H2a, H3a), H4a).
+cbn - [ In ] in H1a, H2a, H3a, H4a.
+destruct ra; [ easy | ].
+apply Nat.succ_inj in H1a.
+destruct ca; [ now specialize (proj2 H3a eq_refl) | ].
+clear H3a.
+destruct llb as [| lb]. {
+  destruct BMPB as ((H1b, H2b, H3b), H4b).
+  now cbn - [ In ] in H1b, H2b, H3b, H4b; subst rb.
+}
+destruct lb as [| b]; [ easy | ].
+destruct BMPB as ((H1b, H2b, H3b), H4b).
+cbn - [ In ] in H1b, H2b, H3b, H4b.
+destruct rb; [ easy | ].
+apply Nat.succ_inj in H1b.
+destruct cb; [ now specialize (proj2 H3b eq_refl) | ].
+clear H3b.
+unfold mat_def_add; cbn - [ Nat.eq_dec ].
+destruct (Nat.eq_dec (S ra) (S rb)) as [Hrr| Hrr]; [ | easy ].
+destruct (Nat.eq_dec (S ca) (S cb)) as [Hcc| Hcc]; [ | easy ].
+apply Nat.succ_inj in Hrr.
+apply Nat.succ_inj in Hcc.
+move Hrr at top; subst rb cb.
+move H1b before H1a.
+move H2b before H2a.
+split. {
+...
+intros.
+apply bmatrix_is_norm_prop.
 unfold bmatrix_norm_prop.
 destruct BMA as (BMDA, BMPA).
 destruct BMB as (BMDB, BMPB).
@@ -3106,7 +3162,7 @@ destruct BMDB as [tb| MDB]. {
             destruct Hb1 as ((Hb1, Hb2, Hb3), Hb4).
             cbn - [ In ] in Ha1, Ha2, Ha3, Ha4.
             cbn - [ In ] in Hb1, Hb2, Hb3, Hb4.
-            cbn; split. {
+            cbn - [ In ]; split. {
               split; cbn - [ In ]; [ | | easy ]. {
                 destruct ra1; [ easy | ].
                 apply Nat.succ_inj in Ha1; f_equal.
@@ -3142,6 +3198,13 @@ destruct BMDB as [tb| MDB]. {
               }
             } {
               intros lc Hlc c Hc.
+              rewrite fold_bmat_def_add in Hlc.
+              rewrite fold_bmat_def_add.
+              destruct Hlc as [Hlc| Hlc]. {
+                subst lc.
+                destruct Hc as [Hc| Hc]. {
+                  subst c.
+                  rewrite fold_bmatrix_norm_prop.
 ...
 
 Definition bmat_add T {so : semiring_op T} (BMA BMB : bmatrix T) :=
