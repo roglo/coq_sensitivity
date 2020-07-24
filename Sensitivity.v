@@ -2931,6 +2931,76 @@ Theorem bmat_coh_prop_add_gen : ∀ T {so : semiring_op T} ita itn BMA BMB,
        (bmat_def_add_loop ita (bmat_def BMA) (bmat_def BMB)).
 Proof.
 intros * Hita Hitn.
+revert ita Hita Hitn.
+induction itn; intros. {
+  cbn.
+  apply Nat.le_0_r in Hitn.
+  induction ita; [ easy | ].
+  cbn in Hitn, Hita.
+  destruct BMA as (BMDA, BMPA).
+  destruct BMB as (BMDB, BMPB).
+  move BMDB before BMDA.
+  cbn in *.
+  destruct BMDA as [ta| MDA]; intros; [ now destruct BMDB | ].
+  destruct BMDB as [tb| MDB]. {
+    destruct MDA as (lla, ra, ca).
+    destruct lla as [| la]; [ easy | now destruct la ].
+  }
+  cbn in *.
+  destruct MDA as (lla, ra, ca).
+  destruct MDB as (llb, rb, cb).
+  unfold mat_def_add in Hitn.
+  cbn - [ Nat.eq_dec ] in Hitn.
+  destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
+  destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
+  destruct lla as [| la]; [ easy | ].
+  destruct llb as [| lb]; [ easy | ].
+  cbn in Hitn.
+  remember (list_add la lb) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc; [ | easy ].
+  destruct la as [| a]; [ easy | now destruct lb ].
+}
+cbn.
+remember (bmat_def_add_loop ita _ _) as BMD eqn:HBMD.
+symmetry in HBMD.
+destruct BMD as [| MBM]; [ easy | ].
+split. {
+  induction ita. {
+    cbn.
+    apply Nat.le_0_r in Hita.
+    destruct BMA as (BMDA, BMPA); cbn in HBMD.
+    unfold void_bmat_def in HBMD.
+    now injection HBMD; clear HBMD; intros; subst MBM.
+  }
+  cbn in HBMD.
+...
+induction ita; [ easy | cbn ].
+destruct BMA as (BMDA, BMPA).
+destruct BMB as (BMDB, BMPB).
+move BMDB before BMDA.
+cbn in *.
+destruct BMDA as [ta| MDA]; intros; [ now destruct BMDB | ].
+destruct BMDB as [tb| MDB]. {
+  destruct MDA as (lla, ra, ca).
+  destruct lla as [| la]; [ easy | now destruct la ].
+}
+cbn in *.
+destruct MDA as (lla, ra, ca).
+destruct MDB as (llb, rb, cb).
+unfold mat_def_add in Hitn.
+cbn - [ Nat.eq_dec ] in Hitn.
+destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]. {
+  destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]. {
+    cbn in *.
+...
+destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
+  destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
+  destruct lla as [| la]; [ easy | ].
+  destruct llb as [| lb]; [ easy | ].
+  cbn in Hitn.
+  remember (list_add la lb) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc; [ | easy ].
+  destruct la as [| a]; [ easy | now destruct lb ].
 ...
 
 Theorem bmat_coh_prop_add : ∀ T {so : semiring_op T} BMA BMB,
