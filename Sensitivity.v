@@ -3021,15 +3021,10 @@ destruct c as [xc| Mc]. {
   cbn - [ In ] in Hlc.
   cbn in Hitn.
   destruct Hlc as [Hlc| Hlc]. {
-    subst lc.
-    cbn in BMPA, BMPB.
     destruct la as [| a]; [ easy | ].
     destruct lb as [| b]; [ easy | ].
-    cbn in Hitn.
     apply Nat.succ_le_mono in Hitn.
-    apply Nat.le_0_r in Hitn.
     destruct ita; [ easy | ].
-    cbn in Hitn.
     destruct a as [xa| Ma]; [ now destruct b | ].
     destruct b as [xb| Mb]; [ easy | ].
     cbn in Hitn.
@@ -3051,6 +3046,21 @@ destruct c as [xc| Mc]. {
     cbn in HM.
     injection HM; clear HM; intros H1 HM; subst llm.
     destruct la1 as [| a1]. {
+      destruct BMPA as ((H1a, H2a, H3a), H4a).
+      cbn - [ In ] in H1a, H2a, H3a, H4a.
+      specialize (H4a _ (or_introl eq_refl)).
+      specialize (H4a _ (or_introl eq_refl)).
+      easy.
+    }
+    destruct lb1 as [| b1]. {
+      destruct BMPB as ((H1b, H2b, H3b), H4b).
+      cbn - [ In ] in H1b, H2b, H3b, H4b.
+      specialize (H4b _ (or_introl eq_refl)).
+      specialize (H4b _ (or_introl eq_refl)).
+      easy.
+    }
+    easy.
+  }
 ...
 intros * Hita Hitn.
 revert ita Hita Hitn.
