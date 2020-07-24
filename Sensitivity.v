@@ -2939,6 +2939,10 @@ destruct BMB as (BMDB, BMPB).
 cbn in Hitn; cbn.
 destruct BMDA as [ta| MDA]; [ now destruct BMDB, itn | ].
 destruct BMDB as [tb| MDB]; [ now destruct itn | ].
+move MDB before MDA.
+cbn - [ bmat_depth ] in Hita.
+apply bmatrix_is_norm_prop in BMPA.
+apply bmatrix_is_norm_prop in BMPB.
 revert MDA MDB BMPA BMPB Hitn Hita.
 induction itn; intros. {
   apply Nat.le_0_r in Hitn; cbn.
@@ -2959,11 +2963,16 @@ induction itn; intros. {
 }
 cbn.
 split. {
-...
   destruct MDA as (lla, ra, ca).
   destruct MDB as (llb, rb, cb); cbn.
-  cbn in Hitn, Hita.
-Check mat_coh_prop_add.
+  unfold mat_def_add.
+  cbn - [ Nat.eq_dec ].
+  destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
+  destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
+  subst rb cb.
+  destruct lla as [| la]; [ now cbn in BMPA | ].
+  destruct llb as [| lb]; [ now cbn in BMPB | ].
+  cbn in BMPA, BMPB; cbn.
 ...
 intros * Hita Hitn.
 revert ita Hita Hitn.
