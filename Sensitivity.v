@@ -2924,9 +2924,23 @@ Theorem fold_bmatrix_norm_prop : ∀ T (BMD : bmatrix_def T),
   bmatrix_norm_prop_loop (bmat_depth BMD) BMD = bmatrix_norm_prop BMD.
 Proof. easy. Qed.
 
+Theorem bmat_coh_prop_add_gen : ∀ T {so : semiring_op T} ita itn BMA BMB,
+  bmat_depth (bmat_def BMA) ≤ ita
+  → bmat_depth (bmat_def_add_loop ita (bmat_def BMA) (bmat_def BMB)) ≤ itn
+  → bmatrix_norm_prop_loop itn
+       (bmat_def_add_loop ita (bmat_def BMA) (bmat_def BMB)).
+Proof.
+intros * Hita Hitn.
+...
+
 Theorem bmat_coh_prop_add : ∀ T {so : semiring_op T} BMA BMB,
   bmatrix_coh_prop (bmat_def_add (bmat_def BMA) (bmat_def BMB)).
 Proof.
+intros.
+apply bmatrix_is_norm_prop.
+...
+now apply bmat_coh_prop_add_gen.
+...
 intros.
 apply bmatrix_is_norm_prop.
 destruct BMA as (BMDA, BMPA).
@@ -3043,7 +3057,7 @@ destruct Hlc as [Hlc| Hlc]. {
   destruct Hc as [Hc| Hc]. {
     subst c.
     destruct a1 as [xa| Ma]. {
-      destruct b1 as [xb| Mb].
+      destruct b1 as [xb| Mb]. {
 ...
 intros.
 apply bmatrix_is_norm_prop.
