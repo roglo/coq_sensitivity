@@ -3016,13 +3016,22 @@ destruct c as [xc| Mc]. {
   destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
   destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
   subst rb cb.
-  destruct lla as [| la]; [ now cbn in BMPA | ].
+  cbn in Hlc.
+clear - Hlc Hc BMPA BMPB Hitn.
+revert llb BMPB Hitn Hlc.
+  induction lla as [| la]; intros; [ now cbn in BMPA | ].
   destruct llb as [| lb]; [ now cbn in BMPB | ].
   cbn - [ In ] in Hlc.
   cbn in Hitn.
   destruct Hlc as [Hlc| Hlc]. {
     destruct la as [| a]; [ easy | ].
     destruct lb as [| b]; [ easy | ].
+(*
+...
+cbn in Hitn.
+...
+*)
+    cbn in Hitn.
     apply Nat.succ_le_mono in Hitn.
     destruct ita; [ easy | ].
     destruct a as [xa| Ma]; [ now destruct b | ].
@@ -3061,6 +3070,39 @@ destruct c as [xc| Mc]. {
     }
     easy.
   }
+remember
+             {|
+             srng_zero := @void_bmat_def T;
+             srng_one := @void_bmat_def T;
+             srng_add := @bmat_def_add_loop T so ita;
+             srng_mul := @bmat_def_add_loop T so ita |} as mso eqn:Hmso.
+assert (match list_list_add lla llb with
+                | [] => 1
+                | [] :: _ => 0
+                | (BM' :: _) :: _ => S (bmat_depth BM')
+                end ≤ 1). {
+  remember (list_list_add lla llb) as llc eqn:Hllc.
+  symmetry in Hllc.
+  destruct llc as [| lc1]; [ easy | ].
+  destruct lc1 as [| c1]; [ flia | ].
+  apply -> Nat.succ_le_mono.
+...
+  apply IHlla with (llb := llb) (ita := ita); [ | | | easy ].
+3: {
+  remember (list_list_add lla llb) as llc eqn:Hllc.
+  symmetry in Hllc.
+  destruct llc as [| lc1]; [ easy | ].
+  destruct lc1 as [| c1]; [ flia | ].
+  apply -> Nat.succ_le_mono.
+  destruct Hlc as [Hlc| Hlc]. {
+    subst lc.
+    destruct Hc as [Hc| Hc]. {
+      subst c1.
+      cbn; exfalso.
+...
+  destruct lla as [| la1]; [ easy | ].
+  destruct llb as [| lb1]; [ easy | ].
+  cbn - [ In ] in Hlc.
 ...
 intros * Hita Hitn.
 revert ita Hita Hitn.
