@@ -2973,6 +2973,40 @@ split. {
   destruct lla as [| la]; [ now cbn in BMPA | ].
   destruct llb as [| lb]; [ now cbn in BMPB | ].
   cbn in BMPA, BMPB; cbn.
+  destruct la as [| a]; [ easy | ].
+  destruct lb as [| b]; [ easy | ].
+  destruct BMPA as ((H1a, H2a, H3a), H4a).
+  destruct BMPB as ((H1b, H2b, H3b), H4b).
+  cbn - [ In ] in H1a, H2a, H3a, H4a.
+  cbn - [ In ] in H1b, H2b, H3b, H4b.
+  move H1b before H1a; move H2b before H2a.
+  move H3b before H3a; move H3b before H3a.
+  destruct ra; [ easy | ].
+  apply Nat.succ_inj in H1a.
+  apply Nat.succ_inj in H1b.
+  destruct ca; [ now specialize (proj2 H3a eq_refl) | ].
+  split; cbn - [ In ]; [ | | easy ]. {
+    f_equal.
+    eapply length_list_list_add; [ easy | easy | easy | | | ].
+    apply H2a.
+    apply H2b.
+    apply H4b.
+  }
+  intros lc Hlc.
+  destruct Hlc as [Hlc| Hlc]. {
+    subst lc; cbn; f_equal.
+    specialize (H2a _ (or_introl eq_refl)).
+    specialize (H2b _ (or_introl eq_refl)).
+    cbn in H2a, H2b.
+    apply Nat.succ_inj in H2a.
+    apply Nat.succ_inj in H2b.
+    now apply length_list_add.
+  }
+  eapply length_col_list_list_add; [ apply H2a | apply H2b | ].
+  apply Hlc.
+}
+intros lc Hlc c Hc.
+destruct c as [xc| Mc]. {
 ...
 intros * Hita Hitn.
 revert ita Hita Hitn.
