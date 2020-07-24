@@ -3007,6 +3007,50 @@ split. {
 }
 intros lc Hlc c Hc.
 destruct c as [xc| Mc]. {
+  destruct itn; [ cbn | easy ].
+  destruct MDA as (lla, ra, ca).
+  destruct MDB as (llb, rb, cb); cbn.
+  unfold mat_def_add in Hlc.
+  unfold mat_def_add in Hitn.
+  cbn - [ Nat.eq_dec ] in Hlc, Hitn.
+  destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
+  destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
+  subst rb cb.
+  destruct lla as [| la]; [ now cbn in BMPA | ].
+  destruct llb as [| lb]; [ now cbn in BMPB | ].
+  cbn - [ In ] in Hlc.
+  cbn in Hitn.
+  destruct Hlc as [Hlc| Hlc]. {
+    subst lc.
+    cbn in BMPA, BMPB.
+    destruct la as [| a]; [ easy | ].
+    destruct lb as [| b]; [ easy | ].
+    cbn in Hitn.
+    apply Nat.succ_le_mono in Hitn.
+    apply Nat.le_0_r in Hitn.
+    destruct ita; [ easy | ].
+    cbn in Hitn.
+    destruct a as [xa| Ma]; [ now destruct b | ].
+    destruct b as [xb| Mb]; [ easy | ].
+    cbn in Hitn.
+    remember (mat_def_add Ma Mb) as M eqn:HM.
+    symmetry in HM.
+    destruct M as (llm, rm, cm).
+    destruct llm as [| lm]; [ easy | ].
+    destruct lm; [ | easy ].
+    unfold mat_def_add in HM.
+    destruct Ma as (lla1, ra1, ca1).
+    destruct Mb as (llb1, rb1, cb1).
+    cbn - [ Nat.eq_dec ] in HM.
+    destruct (Nat.eq_dec ra1 rb1) as [Hrr| Hrr]; [ | easy ].
+    destruct (Nat.eq_dec ca1 cb1) as [Hcc| Hcc]; [ | easy ].
+    subst rb1 cb1.
+    injection HM; clear HM; intros H1 H2 HM; subst ra1 ca1.
+    destruct lla1 as [| la1]; [ easy | ].
+    destruct llb1 as [| lb1]; [ easy | ].
+    cbn in HM.
+    injection HM; clear HM; intros H1 HM; subst llm.
+    destruct la1 as [| a1]. {
 ...
 intros * Hita Hitn.
 revert ita Hita Hitn.
