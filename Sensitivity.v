@@ -2931,6 +2931,41 @@ Theorem bmat_coh_prop_add_gen : ∀ T {so : semiring_op T} ita itn BMA BMB,
        (bmat_def_add_loop ita (bmat_def BMA) (bmat_def BMB)).
 Proof.
 intros * Hita Hitn.
+revert itn BMA BMB Hitn Hita.
+induction ita; intros; [ now destruct itn | ].
+cbn in Hitn; cbn.
+destruct BMA as (BMDA, BMPA).
+destruct BMB as (BMDB, BMPB).
+cbn in Hitn; cbn.
+destruct BMDA as [ta| MDA]; [ now destruct BMDB, itn | ].
+destruct BMDB as [tb| MDB]; [ now destruct itn | ].
+revert MDA MDB BMPA BMPB Hitn Hita.
+induction itn; intros. {
+  apply Nat.le_0_r in Hitn; cbn.
+  cbn in Hitn, Hita.
+  destruct MDA as (lla, ra, ca).
+  destruct MDB as (llb, rb, cb).
+  unfold mat_def_add in Hitn.
+  cbn - [ Nat.eq_dec ] in Hitn.
+  destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
+  destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
+  subst rb cb.
+  destruct lla as [| la]; [ easy | ].
+  destruct llb as [| lb]; [ easy | ].
+  cbn in Hitn.
+  remember (list_add la lb) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc; [ | easy ].
+  destruct la as [| a]; [ easy | now destruct lb ].
+}
+cbn.
+split. {
+...
+  destruct MDA as (lla, ra, ca).
+  destruct MDB as (llb, rb, cb); cbn.
+  cbn in Hitn, Hita.
+Check mat_coh_prop_add.
+...
+intros * Hita Hitn.
 revert ita Hita Hitn.
 induction itn; intros. {
   cbn.
