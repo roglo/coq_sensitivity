@@ -3075,7 +3075,7 @@ revert ra ca llb BMPA BMPB Hitn Hlc.
     cbn in H1a, H2a, H3a, H4a.
     now specialize (proj2 H3a eq_refl) as H1.
   }
-  apply IHlla with (llb := llb) (ra := ra) (ca := ca); [ | | | easy ]. {
+  apply IHlla with (llb := llb) (ra := ra) (ca := S ca); [ | | | easy ]. {
     destruct la as [| a]; [ easy | ].
     destruct BMPA as ((H1a, H2a, H3a), H4a).
     cbn - [ In ] in H1a, H2a, H3a, H4a; cbn.
@@ -3096,7 +3096,6 @@ revert ra ca llb BMPA BMPB Hitn Hlc.
       } {
         cbn - [ In ].
         intros lc1 Hlc1.
-...
         apply H2a.
         destruct Hlc1 as [Hlc1| Hlc1]. {
           now subst lc1; right; left.
@@ -3104,8 +3103,11 @@ revert ra ca llb BMPA BMPB Hitn Hlc.
         now right; right.
       } {
         cbn.
-        split; [ intros Hnr | intros Hnc ]. {
-          cbn.
+        split; [ | easy ].
+        now intros; subst ra.
+      }
+    }
+    intros lc1 Hlc1 c1 Hc1.
 ...
   apply IHlla with (llb := llb). ; [ | | | easy ].
 3: {
