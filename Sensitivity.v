@@ -3018,7 +3018,7 @@ destruct c as [xc| Mc]. {
   subst rb cb.
   cbn in Hlc.
 clear - Hlc Hc BMPA BMPB Hitn.
-revert ra llb BMPA BMPB Hitn Hlc.
+revert ra ca llb BMPA BMPB Hitn Hlc.
   induction lla as [| la]; intros; [ now cbn in BMPA | ].
   destruct llb as [| lb]; [ now cbn in BMPB | ].
   cbn - [ In ] in Hlc.
@@ -3069,7 +3069,13 @@ revert ra llb BMPA BMPB Hitn Hlc.
     destruct la as [| a]; [ easy | ].
     now destruct BMPA as ((H1a, H2a, H3a), H4a).
   }
-  apply IHlla with (llb := llb) (ra := ra); [ | | | easy ]. {
+  destruct ca. {
+    destruct la as [| a]; [ easy | ].
+    destruct BMPA as ((H1a, H2a, H3a), H4a).
+    cbn in H1a, H2a, H3a, H4a.
+    now specialize (proj2 H3a eq_refl) as H1.
+  }
+  apply IHlla with (llb := llb) (ra := ra) (ca := ca); [ | | | easy ]. {
     destruct la as [| a]; [ easy | ].
     destruct BMPA as ((H1a, H2a, H3a), H4a).
     cbn - [ In ] in H1a, H2a, H3a, H4a; cbn.
@@ -3088,6 +3094,18 @@ revert ra llb BMPA BMPB Hitn Hlc.
         cbn in H1a; cbn.
         now apply Nat.succ_inj in H1a.
       } {
+        cbn - [ In ].
+        intros lc1 Hlc1.
+...
+        apply H2a.
+        destruct Hlc1 as [Hlc1| Hlc1]. {
+          now subst lc1; right; left.
+        }
+        now right; right.
+      } {
+        cbn.
+        split; [ intros Hnr | intros Hnc ]. {
+          cbn.
 ...
   apply IHlla with (llb := llb). ; [ | | | easy ].
 3: {
