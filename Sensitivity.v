@@ -3017,6 +3017,7 @@ destruct c as [xc| Mc]. {
   destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
   subst rb cb.
   cbn in Hlc.
+...
 clear - Hlc Hc BMPA BMPB Hitn.
 revert llb BMPB Hitn Hlc.
   induction lla as [| la]; intros; [ now cbn in BMPA | ].
@@ -3070,6 +3071,26 @@ cbn in Hitn.
     }
     easy.
   }
+  apply IHlla with (llb := llb); [ | | | easy ]. {
+...
+    destruct la as [| a]; [ easy | ].
+    destruct BMPA as ((H1a, H2a, H3a), H4a).
+    cbn - [ In ] in H1a, H2a, H3a, H4a; cbn.
+    destruct lla as [| la1]; [ easy | ].
+    destruct la1 as [| a1]. {
+      specialize (H2a _ (or_intror (or_introl eq_refl))).
+      symmetry in H2a.
+      clear - H1a H2a H3a.
+      cbn in H1a, H2a.
+      specialize (proj2 H3a H2a) as H1.
+      now subst ra.
+    }
+    cbn - [ In ].
+    split. {
+      split. {
+clear - H1a H2a H3a H4a.
+cbn in H1a; cbn.
+...
 remember
              {|
              srng_zero := @void_bmat_def T;
@@ -3087,7 +3108,7 @@ assert (match list_list_add lla llb with
   destruct lc1 as [| c1]; [ flia | ].
   apply -> Nat.succ_le_mono.
 ...
-  apply IHlla with (llb := llb) (ita := ita); [ | | | easy ].
+  apply IHlla with (llb := llb). ; [ | | | easy ].
 3: {
   remember (list_list_add lla llb) as llc eqn:Hllc.
   symmetry in Hllc.
