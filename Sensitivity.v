@@ -2922,14 +2922,6 @@ Theorem bmat_coh_prop_add_gen : ∀ T add ita itn (BMA BMB : bmatrix T),
   → bmatrix_norm_prop_loop itn
        (bmat_def_add_loop add ita (bmat_def BMA) (bmat_def BMB)).
 Proof.
-(*
-Theorem bmat_coh_prop_add_gen : ∀ T add ita itn (BMA BMB : bmatrix T),
-  bmat_depth (bmat_def BMA) ≤ ita
-  → bmat_depth (bmat_def_add_loop add ita (bmat_def BMA) (bmat_def BMB)) ≤ itn
-  → bmatrix_norm_prop_loop itn
-       (bmat_def_add_loop add ita (bmat_def BMA) (bmat_def BMB)).
-Proof.
-*)
 intros * Hita Hitn.
 revert add itn BMA BMB Hitn Hita.
 induction ita; intros; [ now destruct itn | ].
@@ -3115,6 +3107,17 @@ revert ra ca llb BMPA BMPB Hitn Hlc.
       subst lc1.
       destruct Hc1 as [Hc1| Hc1]. {
         subst c1.
+        specialize (H4a _ (or_intror (or_introl eq_refl))) as H1.
+        specialize (H1 _ (or_introl eq_refl)).
+Search bmat_depth.
+Print bmat_depth.
+(* ah oui mais ça le fait que pour le premier ; qu'est-ce qui me garantit
+   que bmat_depth est le même pour les suivants ? *)
+...
+        cbn in Hlc.
+        destruct llb as [| lb1]; [ easy | ].
+        destruct lb1 as [| b1]. {
+          destruct Hlc as [Hlc| Hlc]; [ now subst lc | ].
 ...
   apply IHlla with (llb := llb). ; [ | | | easy ].
 3: {
