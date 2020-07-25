@@ -2855,13 +2855,11 @@ f_equal.
 now apply IHla.
 Qed.
 
-...
-
 Theorem length_col_list_list_add :
-  ∀ T {so : semiring_op T} ca (a b : T) la lb lla llb lc,
+  ∀ T add ca (a b : T) la lb lla llb lc,
   (∀ c, c ∈ (a :: la) :: lla → length c = S ca)
   → (∀ c, c ∈ (b :: lb) :: llb → length c = S ca)
-  → lc ∈ list_list_add lla llb
+  → lc ∈ list_list_add add lla llb
   → length lc = S ca.
 Proof.
 intros * Hac Hbc Hlc.
@@ -2910,22 +2908,30 @@ destruct Hlc as [Hlc| Hlc]. {
 }
 Qed.
 
-Theorem fold_bmat_def_add : ∀ T {so : semiring_op T} BMA BMB,
-  bmat_def_add_loop (bmat_depth BMA) BMA BMB = bmat_def_add BMA BMB.
+Theorem fold_bmat_def_add : ∀ T add (BMA BMB : bmatrix_def T),
+  bmat_def_add_loop add (bmat_depth BMA) BMA BMB = bmat_def_add add BMA BMB.
 Proof. easy. Qed.
 
 Theorem fold_bmatrix_norm_prop : ∀ T (BMD : bmatrix_def T),
   bmatrix_norm_prop_loop (bmat_depth BMD) BMD = bmatrix_norm_prop BMD.
 Proof. easy. Qed.
 
-Theorem bmat_coh_prop_add_gen : ∀ T {so : semiring_op T} ita itn BMA BMB,
+Theorem bmat_coh_prop_add_gen : ∀ T add ita itn (BMA BMB : bmatrix T),
   bmat_depth (bmat_def BMA) ≤ ita
-  → bmat_depth (bmat_def_add_loop ita (bmat_def BMA) (bmat_def BMB)) ≤ itn
+  → bmat_depth (bmat_def_add_loop add ita (bmat_def BMA) (bmat_def BMB)) ≤ itn
   → bmatrix_norm_prop_loop itn
-       (bmat_def_add_loop ita (bmat_def BMA) (bmat_def BMB)).
+       (bmat_def_add_loop add ita (bmat_def BMA) (bmat_def BMB)).
 Proof.
+(*
+Theorem bmat_coh_prop_add_gen : ∀ T add ita itn (BMA BMB : bmatrix T),
+  bmat_depth (bmat_def BMA) ≤ ita
+  → bmat_depth (bmat_def_add_loop add ita (bmat_def BMA) (bmat_def BMB)) ≤ itn
+  → bmatrix_norm_prop_loop itn
+       (bmat_def_add_loop add ita (bmat_def BMA) (bmat_def BMB)).
+Proof.
+*)
 intros * Hita Hitn.
-revert itn BMA BMB Hitn Hita.
+revert add itn BMA BMB Hitn Hita.
 induction ita; intros; [ now destruct itn | ].
 cbn in Hitn; cbn.
 destruct BMA as (BMDA, BMPA).
@@ -2937,7 +2943,7 @@ move MDB before MDA.
 cbn - [ bmat_depth ] in Hita.
 apply bmatrix_is_norm_prop in BMPA.
 apply bmatrix_is_norm_prop in BMPB.
-revert MDA MDB BMPA BMPB Hitn Hita.
+revert add MDA MDB BMPA BMPB Hitn Hita.
 induction itn; intros. {
   apply Nat.le_0_r in Hitn; cbn.
   cbn in Hitn, Hita.
@@ -2951,7 +2957,7 @@ induction itn; intros. {
   destruct lla as [| la]; [ easy | ].
   destruct llb as [| lb]; [ easy | ].
   cbn in Hitn.
-  remember (list_add la lb) as lc eqn:Hlc; symmetry in Hlc.
+  remember (list_add _ la lb) as lc eqn:Hlc; symmetry in Hlc.
   destruct lc; [ | easy ].
   destruct la as [| a]; [ easy | now destruct lb ].
 }
@@ -2981,7 +2987,7 @@ split. {
   destruct ca; [ now specialize (proj2 H3a eq_refl) | ].
   split; cbn - [ In ]; [ | | easy ]. {
     f_equal.
-    eapply length_list_list_add; [ easy | easy | easy | | | ].
+    eapply length_list_list_add; [ easy | easy | | | ].
     apply H2a.
     apply H2b.
     apply H4b.
@@ -3020,18 +3026,13 @@ revert llb BMPB Hitn Hlc.
   destruct Hlc as [Hlc| Hlc]. {
     destruct la as [| a]; [ easy | ].
     destruct lb as [| b]; [ easy | ].
-(*
-...
-cbn in Hitn.
-...
-*)
     cbn in Hitn.
     apply Nat.succ_le_mono in Hitn.
     destruct ita; [ easy | ].
     destruct a as [xa| Ma]; [ now destruct b | ].
     destruct b as [xb| Mb]; [ easy | ].
     cbn in Hitn.
-    remember (mat_def_add Ma Mb) as M eqn:HM.
+    remember (mat_def_add _ Ma Mb) as M eqn:HM.
     symmetry in HM.
     destruct M as (llm, rm, cm).
     destruct llm as [| lm]; [ easy | ].
@@ -3190,9 +3191,20 @@ destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
   destruct lc; [ | easy ].
   destruct la as [| a]; [ easy | now destruct lb ].
 ...
+*)
 
-Theorem bmat_coh_prop_add : ∀ T {so : semiring_op T} BMA BMB,
-  bmatrix_coh_prop (bmat_def_add (bmat_def BMA) (bmat_def BMB)).
+Theorem bmat_coh_prop_add : ∀ T add (BMA BMB : bmatrix T),
+  bmatrix_coh_prop (bmat_def_add add (bmat_def BMA) (bmat_def BMB)).
+Proof.
+intros.
+apply bmatrix_is_norm_prop.
+...
+now apply bmat_coh_prop_add_gen.
+...
+
+(*
+
+  bmatrix_coh_prop (bmat_def_add add (bmat_def BMA) (bmat_def BMB)).
 Proof.
 intros.
 apply bmatrix_is_norm_prop.
@@ -3540,10 +3552,12 @@ destruct BMDB as [tb| MDB]. {
                   subst c.
                   rewrite fold_bmatrix_norm_prop.
 ...
+*)
 
-Definition bmat_add T {so : semiring_op T} (BMA BMB : bmatrix T) :=
-  {| bmat_def := bmat_def_add (bmat_def BMA) (bmat_def BMB);
-     bmat_prop := bmat_prop_add BMA BMB |}.
+Definition bmat_add T add (BMA BMB : bmatrix T) :=
+  {| bmat_def := bmat_def_add add (bmat_def BMA) (bmat_def BMB);
+     bmat_coh_prop := 42 |}.
+     bmat_coh_prop := bmat_coh_prop_add BMA BMB |}.
 
 ...
 
