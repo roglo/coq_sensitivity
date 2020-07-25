@@ -3017,7 +3017,10 @@ destruct c as [xc| Mc]. {
   destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
   subst rb cb.
   cbn in Hlc.
+(*
 clear - Hlc Hc BMPA BMPB Hitn.
+*)
+clear Hita.
 revert ra ca llb BMPA BMPB Hitn Hlc.
   induction lla as [| la]; intros; [ now cbn in BMPA | ].
   destruct llb as [| lb]; [ now cbn in BMPB | ].
@@ -3108,6 +3111,10 @@ revert ra ca llb BMPA BMPB Hitn Hlc.
       }
     }
     intros lc1 Hlc1 c1 Hc1.
+    destruct Hlc1 as [Hlc1| Hlc1]. {
+      subst lc1.
+      destruct Hc1 as [Hc1| Hc1]. {
+        subst c1.
 ...
   apply IHlla with (llb := llb). ; [ | | | easy ].
 3: {
