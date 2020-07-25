@@ -1937,21 +1937,21 @@ Definition mat_transpose T (d : T) (M : matrix T) : matrix T :=
 Compute (mat_def_transpose 0 (mat_def_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
 Compute (mat_transpose 0 (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
 
-Fixpoint list_add T {so : semiring_op T} (l1 l2 : list T) :=
+Fixpoint list_add T (add : T → T → T) (l1 l2 : list T) :=
   match l1 with
   | e1 :: l'1 =>
       match l2 with
-      | e2 :: l'2 => (e1 + e2)%Srng :: list_add l'1 l'2
+      | e2 :: l'2 => add e1 e2 :: list_add add l'1 l'2
       | [] => []
       end
   | [] => []
   end.
 
-Fixpoint list_list_add T {so : semiring_op T} (ll1 ll2 : list (list T)) :=
+Fixpoint list_list_add T (add : T → T → T) (ll1 ll2 : list (list T)) :=
   match ll1 with
    | l1 :: ll'1 =>
        match ll2 with
-       | l2 :: ll'2 => list_add l1 l2 :: list_list_add ll'1 ll'2
+       | l2 :: ll'2 => list_add add l1 l2 :: list_list_add add ll'1 ll'2
        | [] => []
        end
   | [] => []
@@ -1987,18 +1987,18 @@ Compute (let _ := nat_semiring_op in list_list_mul 3 4 2 [[1; 2; 3; 4]; [5; 6; 7
 
 Compute (let _ := nat_semiring_op in list_list_mul 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
 
-Definition mat_def_add T {so : semiring_op T} (M1 M2 : matrix_def T) :
+Definition mat_def_add T (add : T → T → T) (M1 M2 : matrix_def T) :
     matrix_def T :=
   if Nat.eq_dec (mat_nrows M1) (mat_nrows M2) then
     if Nat.eq_dec (mat_ncols M1) (mat_ncols M2) then
-      {| mat_list := list_list_add (mat_list M1) (mat_list M2);
+      {| mat_list := list_list_add add (mat_list M1) (mat_list M2);
          mat_nrows := mat_nrows M1;
          mat_ncols := mat_ncols M1 |}
     else void_mat_def
   else void_mat_def.
 
-Theorem mat_coh_prop_add : ∀ T {so : semiring_op T} MA MB,
-  matrix_coh_prop (mat_def_add (mat_def MA) (mat_def MB)).
+Theorem mat_coh_prop_add : ∀ T add (MA MB : matrix T),
+  matrix_coh_prop (mat_def_add add (mat_def MA) (mat_def MB)).
 Proof.
 intros.
 destruct MA as (Mda, Mpa); cbn.
@@ -2078,9 +2078,9 @@ split; cbn; [ | | easy ]. {
 }
 Qed.
 
-Definition mat_add T {so : semiring_op T} (MA MB : matrix T) : matrix T :=
-  {| mat_def := mat_def_add (mat_def MA) (mat_def MB);
-     mat_coh_prop := mat_coh_prop_add MA MB |}.
+Definition mat_add T add (MA MB : matrix T) : matrix T :=
+  {| mat_def := mat_def_add add (mat_def MA) (mat_def MB);
+     mat_coh_prop := mat_coh_prop_add add MA MB |}.
 
 Definition mat_def_mul {T} {so : semiring_op T} (M1 M2 : matrix_def T) :
     matrix_def T :=
@@ -2782,46 +2782,38 @@ Compute (bmat_depth (A_def 4)).
 Definition mbmat_depth T {so : semiring_op T} (MMM : matrix (bmatrix T)) :=
   bmat_depth (bmat_def (mat_el (void_bmat T) MMM 0 0)).
 
-Fixpoint bmat_def_add_loop T {so : semiring_op T} it (MM1 MM2 : bmatrix_def T) :=
+Fixpoint bmat_def_add_loop T add it (MM1 MM2 : bmatrix_def T) :=
   match it with
   | 0 => void_bmat_def
   | S it' =>
       match MM1 with
       | BM_1 xa =>
           match MM2 with
-          | BM_1 xb => BM_1 (xa + xb)%Srng
+          | BM_1 xb => BM_1 (add xa xb)
           | BM_M MMB => void_bmat_def
           end
       | BM_M MMA =>
           match MM2 with
           | BM_1 MB => void_bmat_def
           | BM_M MMB =>
-              let sso :=
-                {| srng_zero := void_bmat_def;
-                   srng_one := void_bmat_def;
-                   srng_add := bmat_def_add_loop it';
-                   srng_mul := bmat_def_add_loop it' |}
-              in
-              BM_M (mat_def_add MMA MMB)
+              BM_M (mat_def_add (bmat_def_add_loop add it') MMA MMB)
           end
       end
   end.
 
-Definition bmat_def_add T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
-  bmat_def_add_loop (bmat_depth MM1) MM1 MM2.
+Definition bmat_def_add T add (MM1 MM2 : bmatrix_def T) :=
+  bmat_def_add_loop add (bmat_depth MM1) MM1 MM2.
 
 Theorem length_list_list_add :
-  ∀ T {so : semiring_op T} {mso : semiring_op (bmatrix_def T)},
-  ∀ (a b : bmatrix_def T) la lb lla llb ra ca,
+  ∀ T add (a b : bmatrix_def T) la lb lla llb ra ca,
   length lla = ra
   → length llb = ra
   → (∀ c, c ∈ (a :: la) :: lla → length c = S ca)
   → (∀ c, c ∈ (b :: lb) :: llb → length c = S ca)
   → (∀ rows, rows ∈ (b :: lb) :: llb →
       ∀ bmd', bmd' ∈ rows → bmatrix_norm_prop_loop (bmat_depth b) bmd')
-  → length (list_list_add lla llb) = ra.
+  → length (list_list_add add lla llb) = ra.
 Proof.
-intros * so mso.
 intros * Har Hbr Hac Hbc Hbrn.
 revert ra llb Har Hbr Hbc Hbrn.
 induction lla as [| la2]; intros; [ easy | cbn ].
@@ -2846,10 +2838,10 @@ apply IHlla; [ | easy | easy | | ]. {
 }
 Qed.
 
-Theorem length_list_add : ∀ T {so : semiring_op T} la lb ca,
+Theorem length_list_add : ∀ T add (la lb : list T) ca,
   length la = ca
   → length lb = ca
-  → length (list_add la lb) = ca.
+  → length (list_add add la lb) = ca.
 Proof.
 intros * Hac Hbc.
 revert ca lb Hac Hbc.
@@ -2862,6 +2854,8 @@ apply Nat.succ_inj in Hbc.
 f_equal.
 now apply IHla.
 Qed.
+
+...
 
 Theorem length_col_list_list_add :
   ∀ T {so : semiring_op T} ca (a b : T) la lb lla llb lc,
@@ -3017,7 +3011,6 @@ destruct c as [xc| Mc]. {
   destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
   subst rb cb.
   cbn in Hlc.
-...
 clear - Hlc Hc BMPA BMPB Hitn.
 revert llb BMPB Hitn Hlc.
   induction lla as [| la]; intros; [ now cbn in BMPA | ].
