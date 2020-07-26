@@ -2467,6 +2467,7 @@ Require Import Init.Nat.
 Theorem bmat_depth_opp : ∀ T {ro : ring_op T} BM,
   bmat_depth (bmat_def_opp BM) = bmat_depth BM.
 Proof.
+(*
 intros.
 destruct BM as [x| MBM]; [ reflexivity | cbn ].
 f_equal.
@@ -2481,7 +2482,7 @@ destruct l as [| a1]. {
 revert ll IHll.
 induction l as [| a]; intros; [ easy | cbn ].
 ...
-
+*)
 fix H 3.
 intros.
 destruct BM as [x| MBM]; [ reflexivity | cbn ].
