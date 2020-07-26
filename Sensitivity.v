@@ -2247,6 +2247,13 @@ Record bmatrix T :=
   { bmat_def : bmatrix_def T;
     bmat_coh_prop : bmatrix_coh_prop bmat_def }.
 
+...
+
+Print bmat_depth.
+
+(* must add the fact that the depths of all elements of the block
+   matrix must be the same? *)
+
 Fixpoint bmatrix_norm_prop_loop T it (bmd : bmatrix_def T) :=
   match it with
   | 0 => False
