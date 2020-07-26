@@ -2207,25 +2207,6 @@ Fixpoint bmat_depth T (BM : bmatrix_def T) :=
         (map (map (@bmat_depth _)) (mat_list BMM)) 0
   end.
 
-Set Printing Implicit.
-Print bmat_depth.
-
-...
-
-Fixpoint bmat_depth T (BM : bmatrix_def T) :=
-  match BM with
-  | BM_1 _ => 1
-  | BM_M BMM =>
-      match BMM with
-      | mk_mat_def [] _ _ => 1
-      | mk_mat_def (BMl :: _) _ _ =>
-          match BMl with
-          | [] => 0
-          | BM' :: _ => 1 + bmat_depth BM'
-          end
-      end
-  end.
-
 Definition void_bmat_def {T} : bmatrix_def T :=
   BM_M void_mat_def.
 
@@ -2481,19 +2462,41 @@ Fixpoint bmat_def_opp T {ro : ring_op T} BM : bmatrix_def T :=
            mat_ncols := mat_ncols MMM |}
   end.
 
+Require Import Init.Nat.
+
 Theorem bmat_depth_opp : ∀ T {ro : ring_op T} BM,
   bmat_depth (bmat_def_opp BM) = bmat_depth BM.
 Proof.
+intros.
+destruct BM as [x| MBM]; [ reflexivity | cbn ].
+f_equal.
+...
+destruct MBM as (ll, r, c).
+cbn; clear r c.
+induction ll as [| l]; [ easy | cbn ].
+destruct l as [| a]; [ easy | cbn ].
+destruct l as [| a1]. {
+  cbn.
+  rewrite <- IHll.
+revert ll IHll.
+induction l as [| a]; intros; [ easy | cbn ].
+...
+
 fix H 3.
 intros.
 destruct BM as [x| MBM]; [ reflexivity | cbn ].
-destruct MBM as (ll, r, c); cbn.
-clear r c.
-destruct ll as [| l1 ll1]; [ easy | cbn ].
-destruct l1 as [| BM]; [ easy | cbn ].
 f_equal.
+do 3 rewrite List_fold_left_map.
+apply List_fold_left_ext_in.
+intros la a Ha.
+do 3 rewrite List_fold_left_map.
+apply List_fold_left_ext_in.
+intros b n Hb.
+f_equal.
+Guarded.
 apply H.
-Qed.
+Guarded.
+...
 
 Theorem fold_left_and_true : ∀ A (f : A → _) li,
   fold_left (λ bi i, bi && f i) li true = true
