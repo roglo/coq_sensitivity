@@ -2202,6 +2202,20 @@ Fixpoint bmat_depth T (BM : bmatrix_def T) :=
   match BM with
   | BM_1 _ => 1
   | BM_M BMM =>
+      1 +
+      fold_left (λ m la, fold_left max la m)
+        (map (map (@bmat_depth _)) (mat_list BMM)) 0
+  end.
+
+Set Printing Implicit.
+Print bmat_depth.
+
+...
+
+Fixpoint bmat_depth T (BM : bmatrix_def T) :=
+  match BM with
+  | BM_1 _ => 1
+  | BM_M BMM =>
       match BMM with
       | mk_mat_def [] _ _ => 1
       | mk_mat_def (BMl :: _) _ _ =>
@@ -2246,13 +2260,6 @@ Definition bmatrix_coh_prop T (bmd : bmatrix_def T) :=
 Record bmatrix T :=
   { bmat_def : bmatrix_def T;
     bmat_coh_prop : bmatrix_coh_prop bmat_def }.
-
-...
-
-Print bmat_depth.
-
-(* must add the fact that the depths of all elements of the block
-   matrix must be the same? *)
 
 Fixpoint bmatrix_norm_prop_loop T it (bmd : bmatrix_def T) :=
   match it with
