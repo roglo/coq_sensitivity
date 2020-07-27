@@ -2467,25 +2467,12 @@ Require Import Init.Nat.
 Theorem bmat_depth_opp : ∀ T {ro : ring_op T} BM,
   bmat_depth (bmat_def_opp BM) = bmat_depth BM.
 Proof.
-(*
+fix IHb 3.
 intros.
 destruct BM as [x| MBM]; [ reflexivity | cbn ].
-f_equal.
-...
 destruct MBM as (ll, r, c).
-cbn; clear r c.
-induction ll as [| l]; [ easy | cbn ].
-destruct l as [| a]; [ easy | cbn ].
-destruct l as [| a1]. {
-  cbn.
-  rewrite <- IHll.
-revert ll IHll.
-induction l as [| a]; intros; [ easy | cbn ].
-...
-*)
-fix H 3.
-intros.
-destruct BM as [x| MBM]; [ reflexivity | cbn ].
+cbn.
+clear r c.
 f_equal.
 do 3 rewrite List_fold_left_map.
 apply List_fold_left_ext_in.
@@ -2495,7 +2482,7 @@ apply List_fold_left_ext_in.
 intros b n Hb.
 f_equal.
 Guarded.
-apply H.
+apply IHb.
 Guarded.
 ...
 
