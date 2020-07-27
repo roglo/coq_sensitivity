@@ -2198,6 +2198,28 @@ Inductive bmatrix_def T :=
   | BM_1 : T → bmatrix_def T
   | BM_M : matrix_def (bmatrix_def T) → bmatrix_def T.
 
+Theorem bmatrix_ind : ∀ T (P : bmatrix_def T → Prop),
+  (∀ t, P (BM_1 t))
+  → (∀ M, (∀ la, la ∈ mat_list M → ∀ a, a ∈ la → P a) → P (BM_M M))
+  → ∀ BM, P BM.
+Proof.
+fix IHB 5.
+intros * H1 HM *.
+destruct BM as [x| M]; [ apply H1 | ].
+apply HM.
+intros la Hla a Ha.
+destruct M as (ll, r, c).
+cbn in Hla.
+clear r c.
+induction ll as [| l]; [ contradiction | ].
+destruct Hla as [Hla| Hla]; [ | apply IHll, Hla ].
+subst la; clear IHll.
+induction l as [| b]; [ contradiction | ].
+destruct Ha as [Ha| Ha]; [ | apply IHl, Ha ].
+subst a.
+now apply IHB.
+Qed.
+
 Fixpoint bmat_depth T (BM : bmatrix_def T) :=
   match BM with
   | BM_1 _ => 1
@@ -2464,63 +2486,20 @@ Fixpoint bmat_def_opp T {ro : ring_op T} BM : bmatrix_def T :=
 
 Require Import Init.Nat.
 
-Theorem bmatrix_ind : ∀ T (P : bmatrix_def T → Prop),
-  (∀ t, P (BM_1 t))
-  → (∀ M, (∀ la, la ∈ mat_list M → ∀ a, a ∈ la → P a) → P (BM_M M))
-  → ∀ BM, P BM.
-Proof.
-fix IHB 5.
-intros * H1 HM *.
-destruct BM as [x| M]; [ apply H1 | ].
-apply HM.
-intros la Hla a Ha.
-destruct M as (ll, r, c).
-cbn in Hla.
-clear r c.
-induction ll as [| l]; [ contradiction | ].
-destruct Hla as [Hla| Hla]; [ | apply IHll, Hla ].
-subst la; clear IHll.
-destruct a as [x| M]; [ apply H1 | ].
-apply HM.
-intros la Hla b Hb.
-...
-induction la as [| a1]; [ contradiction | ].
-destruct Hb as [Hb| Hb]. {
-  subst a1.
-...
-induction la as [| d]; [ easy | ].
-destruct Hb as [Hb| Hb]. {
-  subst d.
-...
-induction l as [| b]; [ easy | ].
-destruct Ha as [Ha| Ha]. {
-...
-
 Theorem bmat_depth_opp : ∀ T {ro : ring_op T} BM,
   bmat_depth (bmat_def_opp BM) = bmat_depth BM.
 Proof.
 intros.
-induction BM using bmatrix_ind; [ easy | ].
-...
-
-fix IHb 3.
-intros.
-destruct BM as [x| MBM]; [ reflexivity | cbn ].
-destruct MBM as (ll, r, c); cbn.
-clear r c.
+induction BM as [x| M IHBM] using bmatrix_ind; [ easy | ].
+destruct M as (ll, r, c); cbn.
 f_equal; f_equal.
 rewrite map_map.
-etransitivity. {
-  apply map_ext_in.
-  intros a Ha.
-  rewrite map_map.
-  reflexivity.
-}
-induction ll as [| l1]; intros; [ easy | cbn ].
-f_equal; [ | apply IHll ].
-induction l1 as [| a1]; intros; [ easy | cbn ].
-f_equal; [ | apply IHl1 ].
-apply IHb.
+apply map_ext_in.
+intros la Hla.
+rewrite map_map.
+apply map_ext_in.
+intros a Ha.
+apply IHBM with (la := la); [ apply Hla | apply Ha ].
 Qed.
 
 Theorem fold_left_and_true : ∀ A (f : A → _) li,
@@ -2758,6 +2737,35 @@ Theorem bmat_def_opp_involutive : ∀ T {ro : ring_op T} {rp : ring_prop T}
  (so := @rng_semiring T ro) {sp : semiring_prop T} BM,
   bmat_def_opp (bmat_def_opp BM) = BM.
 Proof.
+intros.
+induction BM as [x| M IHBM] using bmatrix_ind. {
+  now cbn; rewrite rng_opp_involutive.
+} {
+  destruct M as (ll, r, c); cbn; f_equal; f_equal.
+  cbn in IHBM.
+  rewrite map_map.
+...
+intros.
+induction BM as [x| M IHBM] using bmatrix_ind. {
+  now cbn; rewrite rng_opp_involutive.
+} {
+  destruct M as (ll, r, c); cbn; f_equal; f_equal.
+  rewrite map_map.
+  etransitivity. {
+    apply map_ext_in.
+    intros la Hla.
+    rewrite map_map.
+    apply map_ext_in.
+    intros a Ha.
+    erewrite IHBM; [ easy | apply Hla | apply Ha ].
+  }
+  clear IHBM.
+  induction ll as [| l]; [ easy | cbn ].
+  f_equal; [ | apply IHll ].
+  induction l as [| a]; [ easy | cbn ].
+  f_equal; apply IHl.
+}
+...
 intros.
 revert BM.
 fix HBM 1.
