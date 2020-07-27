@@ -2935,6 +2935,19 @@ Theorem bmatrix_norm_prop_loop_enough_iter : ∀ T (bmd : bmatrix_def T) it,
   → bmatrix_norm_prop_loop it bmd
   → bmatrix_norm_prop_loop (bmat_depth bmd) bmd.
 Proof.
+fix IHbmd 2.
+intros * Hd Hp.
+revert it Hd Hp.
+induction bmd; intros; [ easy | ].
+cbn in Hd, Hp; cbn.
+destruct it; [ easy | ].
+apply Nat.succ_le_mono in Hd.
+cbn in Hp.
+destruct Hp as (Hmp, Hbp).
+split; [ easy | ].
+Guarded.
+intros la Hla a Ha.
+...
 intros * Hd Hp.
 revert bmd Hd Hp.
 induction it; intros. {
@@ -2947,9 +2960,10 @@ split; [ easy | ].
 intros la Hla a Ha.
 cbn in Hd.
 apply Nat.succ_le_mono in Hd.
+...
 specialize (Hbp la Hla a Ha) as H1.
 assert (H : bmat_depth a ≤ it). {
-  admit.
+...
 }
 ...
 specialize (IHit H H1); clear H.
