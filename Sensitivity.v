@@ -3008,11 +3008,23 @@ split. {
     apply H2a.
     apply H2b.
     intros lc Hlc c Hc.
-    specialize (H4b _ (or_introl eq_refl)).
-    specialize (H4b _ (or_introl eq_refl)).
-    do 2 rewrite List_fold_left_map in H4b.
-    cbn in H4b.
-    remember (fold_left _ _ _) as x eqn:Hx in H4b.
+    destruct Hlc as [Hlc| Hlc]. {
+      subst lc.
+      destruct Hc as [Hc| Hc]. {
+        subst c.
+        specialize (H4b _ (or_introl eq_refl)).
+        specialize (H4b _ (or_introl eq_refl)).
+        do 2 rewrite List_fold_left_map in H4b.
+        cbn in H4b.
+        remember (fold_left _ _ _) as x eqn:Hx in H4b.
+        replace x with (bmat_depth b) in H4b; [ easy | ].
+        subst x; symmetry.
+        etransitivity. {
+          apply List_fold_left_ext_in.
+          intros d n Hd.
+          rewrite List_fold_left_map.
+          easy.
+        }
 ...
     apply H4b.
   }
