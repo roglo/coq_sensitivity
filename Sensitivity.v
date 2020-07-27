@@ -2978,16 +2978,26 @@ split. {
   subst rb cb.
   destruct lla as [| la]; [ now cbn in BMPA | ].
   destruct llb as [| lb]; [ now cbn in BMPB | ].
-  cbn in BMPA, BMPB; cbn.
-...
-  destruct la as [| a]; [ easy | ].
-  destruct lb as [| b]; [ easy | ].
+  cbn - [ In ] in BMPA, BMPB; cbn.
   destruct BMPA as ((H1a, H2a, H3a), H4a).
   destruct BMPB as ((H1b, H2b, H3b), H4b).
   cbn - [ In ] in H1a, H2a, H3a, H4a.
   cbn - [ In ] in H1b, H2b, H3b, H4b.
   move H1b before H1a; move H2b before H2a.
   move H3b before H3a; move H3b before H3a.
+  clear H3b.
+  destruct la as [| a]. {
+    specialize (H2a _ (or_introl eq_refl)).
+    cbn in H2a; subst ca.
+    specialize (proj2 H3a eq_refl) as H1.
+    now subst ra.
+  }
+  destruct lb as [| b]. {
+    specialize (H2b _ (or_introl eq_refl)).
+    cbn in H2b; subst ca.
+    specialize (proj2 H3a eq_refl) as H1.
+    now subst ra.
+  }
   destruct ra; [ easy | ].
   apply Nat.succ_inj in H1a.
   apply Nat.succ_inj in H1b.
@@ -2997,6 +3007,13 @@ split. {
     eapply length_list_list_add; [ easy | easy | | | ].
     apply H2a.
     apply H2b.
+    intros lc Hlc c Hc.
+    specialize (H4b _ (or_introl eq_refl)).
+    specialize (H4b _ (or_introl eq_refl)).
+    do 2 rewrite List_fold_left_map in H4b.
+    cbn in H4b.
+    remember (fold_left _ _ _) as x eqn:Hx in H4b.
+...
     apply H4b.
   }
   intros lc Hlc.
