@@ -2743,7 +2743,23 @@ induction BM as [x| M IHBM] using bmatrix_ind. {
 } {
   destruct M as (ll, r, c); cbn; f_equal; f_equal.
   cbn in IHBM.
-  rewrite map_map.
+  induction ll as [| l]; [ easy | cbn ].
+  f_equal. 2: {
+    apply IHll.
+    intros la Hla a Ha.
+    apply IHBM with (la := la); [ now right | easy ].
+  }
+  clear IHll.
+  induction l as [| x]; [ easy | cbn ].
+  f_equal. 2: {
+    apply IHl.
+    intros la Hla a Ha.
+    destruct Hla as [Hla| Hla]. {
+      subst l.
+      apply IHBM with (la0 := x :: la); [ now left | now right ].
+    }
+    apply IHBM with (la := la); [ now right | easy ].
+  }
 ...
 intros.
 induction BM as [x| M IHBM] using bmatrix_ind. {
