@@ -3016,7 +3016,13 @@ split. {
         specialize (H4b _ (or_introl eq_refl)).
         do 2 rewrite List_fold_left_map in H4b.
         cbn in H4b.
+(**)
+        clear - H4b.
+        destruct b as [xb| Mb]; [ easy | ].
+        cbn in H4b; cbn.
+...
         remember (fold_left _ _ _) as x eqn:Hx in H4b.
+...
         assert (H : bmat_depth b ≤ x). {
           subst x.
 ...
