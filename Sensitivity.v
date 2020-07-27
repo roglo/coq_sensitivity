@@ -2641,9 +2641,10 @@ Theorem bmat_depth_IZ_2_pow T {ro : ring_op T} : ∀ u n,
   bmat_depth (IZ_2_pow_def u n) = S n.
 Proof.
 intros.
-induction n; [ easy | cbn ].
-...
-now rewrite IHn.
+revert u.
+induction n; intros; [ easy | cbn ].
+do 2 rewrite IHn.
+now do 3 rewrite Nat.max_id.
 Qed.
 
 Theorem IZ_2_pow_coh_prop : ∀ T {ro : ring_op T} u n,
@@ -2653,6 +2654,7 @@ intros.
 unfold bmatrix_coh_prop, bmatrix_is_norm.
 revert u.
 induction n; intros; [ easy | cbn ].
+...
 rewrite IHn.
 rewrite bmat_depth_IZ_2_pow.
 specialize (IHn 0%Rng).
