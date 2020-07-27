@@ -2485,8 +2485,6 @@ induction l1 as [| a1]; intros; [ easy | ].
 cbn.
 rewrite IHl1.
 f_equal.
-clear.
-f_equal.
 f_equal.
 ...
 fix IHb 3.
