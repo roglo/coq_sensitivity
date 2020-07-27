@@ -3017,6 +3017,11 @@ split. {
         do 2 rewrite List_fold_left_map in H4b.
         cbn in H4b.
         remember (fold_left _ _ _) as x eqn:Hx in H4b.
+        assert (H : bmat_depth b ≤ x). {
+          subst x.
+...
+        }
+...
         replace x with (bmat_depth b) in H4b; [ easy | ].
         subst x; symmetry.
         etransitivity. {
@@ -3618,7 +3623,7 @@ destruct BMDB as [tb| MDB]. {
 Definition bmat_add T add (BMA BMB : bmatrix T) :=
   {| bmat_def := bmat_def_add add (bmat_def BMA) (bmat_def BMB);
      bmat_coh_prop := 42 |}.
-     bmat_coh_prop := bmat_coh_prop_add BMA BMB |}.
+     bmat_coh_prop := bmat_coh_prop_add add BMA BMB |}.
 
 ...
 
