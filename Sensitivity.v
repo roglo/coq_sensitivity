@@ -2479,6 +2479,7 @@ clear Heqm.
 revert m.
 induction ll as [| l1]; intros; [ easy | cbn ].
 rewrite IHll.
+(**)
 clear IHll.
 revert ll m.
 induction l1 as [| a1]; intros; [ easy | ].
@@ -2486,6 +2487,22 @@ cbn.
 rewrite IHl1.
 f_equal.
 f_equal.
+f_equal.
+destruct a1 as [x| MBM]; [ reflexivity | cbn ].
+destruct MBM as (ll1, r, c).
+cbn.
+clear r c.
+f_equal.
+do 3 rewrite List_fold_left_map.
+remember 0 as m'.
+clear Heqm'.
+revert m'.
+induction ll1 as [| l2]; intros; [ easy | cbn ].
+rewrite IHll1.
+clear IHll1.
+revert ll1 m'.
+induction l2 as [| a1]; intros; [ easy | cbn ].
+rewrite IHl2.
 ...
 fix IHb 3.
 intros.
