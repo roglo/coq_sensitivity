@@ -2930,6 +2930,31 @@ Theorem fold_bmatrix_norm_prop : ∀ T (BMD : bmatrix_def T),
   bmatrix_norm_prop_loop (bmat_depth BMD) BMD = bmatrix_norm_prop BMD.
 Proof. easy. Qed.
 
+Theorem bmatrix_norm_prop_loop_enough_iter : ∀ T (bmd : bmatrix_def T) it,
+  bmat_depth bmd ≤ it
+  → bmatrix_norm_prop_loop it bmd
+  → bmatrix_norm_prop_loop (bmat_depth bmd) bmd.
+Proof.
+intros * Hd Hp.
+revert bmd Hd Hp.
+induction it; intros. {
+  now apply Nat.le_0_r in Hd; rewrite Hd.
+}
+cbn in Hp.
+destruct bmd as [xb| Mb]; [ easy | cbn ].
+destruct Hp as (Hmp, Hbp).
+split; [ easy | ].
+intros la Hla a Ha.
+cbn in Hd.
+apply Nat.succ_le_mono in Hd.
+specialize (Hbp la Hla a Ha) as H1.
+assert (H : bmat_depth a ≤ it). {
+  admit.
+}
+...
+specialize (IHit H H1); clear H.
+...
+
 Theorem bmat_coh_prop_add_gen : ∀ T add ita itn (BMA BMB : bmatrix T),
   bmat_depth (bmat_def BMA) ≤ ita
   → bmat_depth (bmat_def_add_loop add ita (bmat_def BMA) (bmat_def BMB)) ≤ itn
@@ -3017,9 +3042,7 @@ split. {
         do 2 rewrite List_fold_left_map in H4b.
         cbn in H4b.
 ...
-        remember (fold_left _ _ _) as x eqn:Hx in H4b.
-        assert (H : bmat_depth b ≤ x). {
-          subst x.
+        apply bmatrix_norm_prop_loop_enough_iter in H4b; [ easy | ].
 ...
         }
         destruct b as [xb| Mb]; [ easy | ].
