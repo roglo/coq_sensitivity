@@ -2749,7 +2749,6 @@ induction BM as [x| M IHBM] using bmatrix_ind. {
     intros la Hla a Ha.
     apply IHBM with (la := la); [ now right | easy ].
   }
-  clear IHll.
   induction l as [| x]; [ easy | cbn ].
   f_equal. 2: {
     apply IHl.
@@ -2760,6 +2759,9 @@ induction BM as [x| M IHBM] using bmatrix_ind. {
     }
     apply IHBM with (la := la); [ now right | easy ].
   }
+  apply IHBM with (la := x :: l); [ now left | now left ].
+}
+Qed.
 ...
 intros.
 induction BM as [x| M IHBM] using bmatrix_ind. {
