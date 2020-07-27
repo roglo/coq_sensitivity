@@ -2654,12 +2654,13 @@ intros.
 unfold bmatrix_coh_prop, bmatrix_is_norm.
 revert u.
 induction n; intros; [ easy | cbn ].
-...
-rewrite IHn.
-rewrite bmat_depth_IZ_2_pow.
-specialize (IHn 0%Rng).
-rewrite bmat_depth_IZ_2_pow in IHn.
-now rewrite IHn.
+do 2 rewrite bmat_depth_IZ_2_pow.
+do 3 rewrite Nat.max_id.
+specialize (IHn 0%Rng) as H1.
+rewrite bmat_depth_IZ_2_pow in H1.
+specialize (IHn u) as H2.
+rewrite bmat_depth_IZ_2_pow in H2.
+now rewrite H1, H2.
 Qed.
 
 Definition IZ_2_pow T {ro : ring_op T} u n : bmatrix T :=
@@ -2687,7 +2688,11 @@ Theorem bmat_depth_A T {ro : ring_op T} : ∀ n,
 Proof.
 intros.
 induction n; [ easy | cbn ].
-now rewrite IHn.
+rewrite bmat_depth_opp.
+rewrite IHn.
+unfold I_2_pow_def.
+rewrite bmat_depth_IZ_2_pow.
+now do 3 rewrite Nat.max_id.
 Qed.
 
 Theorem bmatrix_is_norm_loop_IZ_2_pow : ∀ T {ro : ring_op T} len u n,
@@ -2974,6 +2979,7 @@ split. {
   destruct lla as [| la]; [ now cbn in BMPA | ].
   destruct llb as [| lb]; [ now cbn in BMPB | ].
   cbn in BMPA, BMPB; cbn.
+...
   destruct la as [| a]; [ easy | ].
   destruct lb as [| b]; [ easy | ].
   destruct BMPA as ((H1a, H2a, H3a), H4a).
