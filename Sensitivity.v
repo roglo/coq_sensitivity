@@ -2464,9 +2464,45 @@ Fixpoint bmat_def_opp T {ro : ring_op T} BM : bmatrix_def T :=
 
 Require Import Init.Nat.
 
+Theorem bmatrix_ind : ∀ T (P : bmatrix_def T → Prop),
+  (∀ t, P (BM_1 t))
+  → (∀ M, (∀ la, la ∈ mat_list M → ∀ a, a ∈ la → P a) → P (BM_M M))
+  → ∀ BM, P BM.
+Proof.
+fix IHB 5.
+intros * H1 HM *.
+destruct BM as [x| M]; [ apply H1 | ].
+apply HM.
+intros la Hla a Ha.
+destruct M as (ll, r, c).
+cbn in Hla.
+clear r c.
+induction ll as [| l]; [ contradiction | ].
+destruct Hla as [Hla| Hla]; [ | apply IHll, Hla ].
+subst la; clear IHll.
+destruct a as [x| M]; [ apply H1 | ].
+apply HM.
+intros la Hla b Hb.
+...
+induction la as [| a1]; [ contradiction | ].
+destruct Hb as [Hb| Hb]. {
+  subst a1.
+...
+induction la as [| d]; [ easy | ].
+destruct Hb as [Hb| Hb]. {
+  subst d.
+...
+induction l as [| b]; [ easy | ].
+destruct Ha as [Ha| Ha]. {
+...
+
 Theorem bmat_depth_opp : ∀ T {ro : ring_op T} BM,
   bmat_depth (bmat_def_opp BM) = bmat_depth BM.
 Proof.
+intros.
+induction BM using bmatrix_ind; [ easy | ].
+...
+
 fix IHb 3.
 intros.
 destruct BM as [x| MBM]; [ reflexivity | cbn ].
@@ -2935,6 +2971,11 @@ Theorem bmatrix_norm_prop_loop_enough_iter : ∀ T (bmd : bmatrix_def T) it,
   → bmatrix_norm_prop_loop it bmd
   → bmatrix_norm_prop_loop (bmat_depth bmd) bmd.
 Proof.
+intros * Hd Hp.
+Print bmatrix_def.
+induction bmd; [ easy | ].
+...
+
 fix IHbmd 2.
 intros * Hd Hp.
 revert it Hd Hp.
