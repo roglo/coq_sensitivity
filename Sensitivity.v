@@ -2761,44 +2761,24 @@ induction BM as [x| M IHBM] using bmatrix_ind. {
   }
   apply IHBM with (la := x :: l); [ now left | now left ].
 }
-Qed.
-...
-intros.
-induction BM as [x| M IHBM] using bmatrix_ind. {
-  now cbn; rewrite rng_opp_involutive.
-} {
-  destruct M as (ll, r, c); cbn; f_equal; f_equal.
-  rewrite map_map.
-  etransitivity. {
-    apply map_ext_in.
-    intros la Hla.
-    rewrite map_map.
-    apply map_ext_in.
-    intros a Ha.
-    erewrite IHBM; [ easy | apply Hla | apply Ha ].
-  }
-  clear IHBM.
-  induction ll as [| l]; [ easy | cbn ].
-  f_equal; [ | apply IHll ].
-  induction l as [| a]; [ easy | cbn ].
-  f_equal; apply IHl.
-}
 ...
 intros.
 revert BM.
-fix HBM 1.
-destruct BM as [x| BMM]. {
+fix IHBM 1.
+destruct BM as [x| M]. {
   now cbn; rewrite rng_opp_involutive.
 } {
-  destruct BMM as (ll, r, c); cbn; f_equal; f_equal.
+  destruct M as (ll, r, c); cbn; f_equal; f_equal.
   induction ll as [| l]; [ easy | cbn ].
   f_equal; [ | easy ].
   clear IHll.
   induction l as [| x]; [ easy | cbn ].
   f_equal; [ | easy ].
-  apply HBM.
+  apply IHBM.
 }
 Qed.
+
+...
 
 Theorem A_coh_prop :
   ∀ T {ro : ring_op T} {rp : ring_prop T}
