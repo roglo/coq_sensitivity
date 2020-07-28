@@ -2955,7 +2955,7 @@ Theorem fold_bmatrix_norm_prop : ∀ T (BMD : bmatrix_def T),
   bmatrix_norm_prop_loop (bmat_depth BMD) BMD = bmatrix_norm_prop BMD.
 Proof. easy. Qed.
 
-Theorem glop : ∀ T (M : matrix_def (bmatrix_def T)) la a,
+Theorem bmat_depth_decr : ∀ T (M : matrix_def (bmatrix_def T)) la a,
   la ∈ mat_list M
   → a ∈ la
   → bmat_depth a < bmat_depth (BM_M M).
@@ -2982,104 +2982,39 @@ destruct Hla as [Hla| Hla]. 2: {
 } {
   subst l; clear - Ha.
   apply Nat.lt_succ_r.
-  revert a Ha.
-  induction la as [| b]; intros; [ easy | cbn ].
+  assert
+    (H : ∀ a b ll, a ≤ b → a ≤ fold_left (λ n l, fold_left max l n) ll b). {
+    clear; intros * Hab.
+    revert b Hab.
+    induction ll as [| l]; intros; [ easy | cbn ].
+    apply IHll.
+    revert b Hab.
+    induction l as [| c]; intros; [ easy | cbn ].
+    apply IHl.
+    now apply Nat.max_le_iff; left.
+  }
+  apply H; clear H.
+  remember 0 as k; clear Heqk.
+  revert a k Ha.
+  induction la as [| b]; intros; [ easy | ].
   destruct Ha as [Ha| Ha]. {
-    subst b.
-...
-    clear.
-    remember (bmat_depth a) as x; clear a Heqx.
-    induction la as [| b]. {
-      revert x.
-      induction ll as [| lb]; intros; [ easy | cbn ].
-      cbn in IHll.
-...
-      etransitivity; [ apply IHll | ].
-    induction ll as [| lb]. {
-      cbn; revert x.
-      induction la as [| b]; intros; [ easy | cbn ].
-      destruct (le_dec x (bmat_depth b)) as [Hab| Hab]. {
-        rewrite Nat.max_r; [ | easy ].
-        etransitivity; [ apply Hab | apply IHla ].
-      } {
-        apply Nat.nle_gt, Nat.lt_le_incl in Hab.
-        rewrite Nat.max_l; [ | easy ].
-        apply IHla.
-      }
-    } {
-      cbn; clear.
-
-      eapply le_trans; [ apply IHll | ].
-      clear IHll.
-...
-    remember (fold_left max _ _) as x eqn:Hx in |-*.
-    apply le_trans with (m := x). {
-      subst x; clear; revert a.
-      induction la as [| b]; intros; [ easy | cbn ].
-      destruct (le_dec (bmat_depth a) (bmat_depth b)) as [Hab| Hab]. {
-        rewrite Nat.max_r; [ | easy ].
-        etransitivity; [ apply Hab | apply IHla ].
-      } {
-        apply Nat.nle_gt, Nat.lt_le_incl in Hab.
-        rewrite Nat.max_l; [ | easy ].
-        apply IHla.
-      }
-    } {
-...
-      clear; revert x.
-      induction ll as [| l]; intros; [ easy | cbn ].
-      eapply le_trans; [ apply IHll | ].
-      Search (fold_left _ _ _ ≤ fold_left _ _ _).
-...
-
-Theorem glop : ∀ T (M : matrix_def (bmatrix_def T)) la a,
-  la ∈ mat_list M
-  → a ∈ la
-  → bmat_depth (BM_M M) = 1 + bmat_depth a.
-Proof.
-(* non, c'est faux: "bmat_depth a" peut être plus petit ! *)
-...
-intros * Hla Ha.
-cbn; f_equal.
-destruct M as (ll, r, c).
-cbn in Hla; cbn.
-clear r c.
-revert a la Hla Ha.
-induction ll as [| l]; intros; [ easy | cbn ].
-destruct Hla as [Hla| Hla]. 2: {
-...
-revert ll la Hla Ha.
-induction a as [x| M] using bmatrix_ind; intros. {
+    subst b; cbn.
+    assert (H : ∀ a b l, a ≤ b → a ≤ fold_left max l b). {
+      clear; intros * Hab.
+      revert b Hab.
+      induction l as [| c]; intros; [ easy | cbn ].
+      apply IHl.
+      now apply Nat.max_le_iff; left.
+    }
+    apply H.
+    now apply Nat.max_le_iff; right.
+  }
   cbn.
-  destruct ll as [| l]; [ easy | cbn ].
-  destruct Hla as [Hla| Hla]. {
-    subst l.
-...
-
-remember 0 as k.
-assert (Hk : k ≤ bmat_depth a) by flia Heqk.
-clear Heqk.
-revert a la Hla Ha k Hk.
-induction ll as [| l]; intros; [ easy | ].
-destruct Hla as [Hla| Hla]. 2: {
-  cbn.
-...
-  apply IHll with (la := la); [ easy | easy | ].
-
-
-  apply (IHll _ _ la).
+  now apply IHla.
 }
-subst l; cbn.
-...
-  apply (IHll _ la); [ easy | easy | ].
-  subst l; cbn.
-cbn in Hp.
-destruct Hp as (Hn, Hp).
-specialize (Hp _ Hla _ Ha) as H1.
-cbn in Hn, Hla, H1 |-*.
-...
+Qed.
 
-Theorem glop' : ∀ T (bmd : bmatrix_def T) it,
+Theorem glop : ∀ T (bmd : bmatrix_def T) it,
   bmatrix_norm_prop_loop (bmat_depth bmd) bmd
   → bmatrix_norm_prop_loop (bmat_depth bmd + it) bmd.
 Proof.
