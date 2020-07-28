@@ -2747,7 +2747,7 @@ induction BM as [x| M IHBM] using bmatrix_ind. {
   f_equal. 2: {
     apply IHll.
     intros la Hla a Ha.
-    apply IHBM with (la := la); [ now right | easy ].
+    apply (IHBM la); [ now right | easy ].
   }
   induction l as [| x]; [ easy | cbn ].
   f_equal. 2: {
@@ -2755,30 +2755,13 @@ induction BM as [x| M IHBM] using bmatrix_ind. {
     intros la Hla a Ha.
     destruct Hla as [Hla| Hla]. {
       subst l.
-      apply IHBM with (la0 := x :: la); [ now left | now right ].
+      apply (IHBM (x :: la)); [ now left | now right ].
     }
-    apply IHBM with (la := la); [ now right | easy ].
+    apply (IHBM la); [ now right | easy ].
   }
-  apply IHBM with (la := x :: l); [ now left | now left ].
-}
-...
-intros.
-revert BM.
-fix IHBM 1.
-destruct BM as [x| M]. {
-  now cbn; rewrite rng_opp_involutive.
-} {
-  destruct M as (ll, r, c); cbn; f_equal; f_equal.
-  induction ll as [| l]; [ easy | cbn ].
-  f_equal; [ | easy ].
-  clear IHll.
-  induction l as [| x]; [ easy | cbn ].
-  f_equal; [ | easy ].
-  apply IHBM.
+  apply (IHBM (x :: l)); [ now left | now left ].
 }
 Qed.
-
-...
 
 Theorem A_coh_prop :
   ∀ T {ro : ring_op T} {rp : ring_prop T}
@@ -2978,10 +2961,9 @@ Theorem bmatrix_norm_prop_loop_enough_iter : ∀ T (bmd : bmatrix_def T) it,
   → bmatrix_norm_prop_loop (bmat_depth bmd) bmd.
 Proof.
 intros * Hd Hp.
-Print bmatrix_def.
-induction bmd; [ easy | ].
+induction bmd as [x| M IHBM] using bmatrix_ind; [ easy | ].
+cbn in Hd.
 ...
-
 fix IHbmd 2.
 intros * Hd Hp.
 revert it Hd Hp.
