@@ -2955,10 +2955,51 @@ Theorem fold_bmatrix_norm_prop : ∀ T (BMD : bmatrix_def T),
   bmatrix_norm_prop_loop (bmat_depth BMD) BMD = bmatrix_norm_prop BMD.
 Proof. easy. Qed.
 
-Theorem glop : ∀ T (bmd : bmatrix_def T) it,
+Theorem glop : ∀ T (M : matrix_def (bmatrix_def T)) la a,
+  bmatrix_norm_prop (BM_M M)
+  → la ∈ mat_list M
+  → a ∈ la
+  → bmat_depth (BM_M M) = 1 + bmat_depth a.
+Proof.
+intros * Hp Hla Ha.
+cbn; f_equal.
+cbn in Hp.
+destruct Hp as (Hn, Hp).
+...
+
+Theorem glop' : ∀ T (bmd : bmatrix_def T) it,
   bmatrix_norm_prop_loop (bmat_depth bmd) bmd
   → bmatrix_norm_prop_loop (bmat_depth bmd + it) bmd.
 Proof.
+intros * Hp.
+induction bmd as [x| M IHbmd] using bmatrix_ind; [ easy | ].
+split; [ now cbn in Hp | ].
+intros la Hla a Ha; cbn.
+...
+specialize (glop _ _ Hp Hla Ha) as H1.
+cbn in H1.
+apply Nat.succ_inj in H1.
+rewrite H1.
+destruct Hp as (Hn, Hp).
+cbn in Hp.
+rewrite H1 in Hp.
+apply (IHbmd la); [ easy | easy | ].
+now apply (Hp la).
+...
+intros * Hp.
+destruct it; [ now rewrite Nat.add_0_r | ].
+destruct it. {
+  rewrite Nat.add_1_r; cbn.
+  destruct bmd as [x| M]; [ easy | ].
+  cbn in Hp.
+  destruct Hp as (Hn, Hp).
+  split; [ easy | ].
+  intros la Hla a Ha; cbn.
+  destruct a as [x| M']; [ easy | ].
+  split. {
+    destruct Hn as (Hr, Hc, Hrc).
+    split. {
+...
 intros * Hp.
 revert it Hp.
 induction bmd as [x| M IHBM] using bmatrix_ind; intros; [ easy | ].
@@ -2977,7 +3018,6 @@ rewrite Nat.add_assoc in Hbp.
 specialize (IHBM la Hla a Ha (S it + (x - bmat_depth a))) as H1.
 specialize (Hbp la Hla a Ha) as H2.
 specialize (H1 H2); clear H2.
-
 ...
 
 Theorem glop : ∀ T (bmd : bmatrix_def T) it,
