@@ -2960,11 +2960,17 @@ Theorem glop : ∀ T (M : matrix_def (bmatrix_def T)) la a,
   → a ∈ la
   → bmat_depth (BM_M M) = 1 + bmat_depth a.
 Proof.
+(* non, c'est faux: "bmat_depth a" peut être plus petit ! *)
+...
 intros * Hla Ha.
 cbn; f_equal.
 destruct M as (ll, r, c).
 cbn in Hla; cbn.
 clear r c.
+revert a la Hla Ha.
+induction ll as [| l]; intros; [ easy | cbn ].
+destruct Hla as [Hla| Hla]. 2: {
+...
 revert ll la Hla Ha.
 induction a as [x| M] using bmatrix_ind; intros. {
   cbn.
