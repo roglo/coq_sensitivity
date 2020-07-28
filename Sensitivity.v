@@ -2958,6 +2958,38 @@ Proof. easy. Qed.
 Theorem glop : ∀ T (M : matrix_def (bmatrix_def T)) la a,
   la ∈ mat_list M
   → a ∈ la
+  → bmat_depth a < bmat_depth (BM_M M).
+Proof.
+intros * Hla Ha.
+destruct M as (ll, r, c).
+cbn in Hla; cbn.
+clear r c.
+revert a la Hla Ha.
+induction ll as [| l]; intros; [ easy | cbn ].
+destruct Hla as [Hla| Hla]. 2: {
+  eapply lt_le_trans; [ now apply (IHll _ la) | ].
+  apply -> Nat.succ_le_mono.
+  remember (fold_left max _ _) as k.
+  remember 0 as n in |-*.
+  assert (Hn : n ≤ k) by (subst n; flia).
+  clear - Hn; revert n k Hn.
+  induction ll as [| l]; intros; [ easy | cbn ].
+  apply IHll; clear IHll.
+  revert n k Hn.
+  induction l as [| a]; intros; [ easy | cbn ].
+  apply IHl.
+  now apply Nat.max_le_compat_r.
+} {
+  subst l; clear - Ha.
+  revert a Ha.
+  induction la as [| b]; intros; [ easy | cbn ].
+  destruct Ha as [Ha| Ha]. {
+    subst b.
+...
+
+Theorem glop : ∀ T (M : matrix_def (bmatrix_def T)) la a,
+  la ∈ mat_list M
+  → a ∈ la
   → bmat_depth (BM_M M) = 1 + bmat_depth a.
 Proof.
 (* non, c'est faux: "bmat_depth a" peut être plus petit ! *)
