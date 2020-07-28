@@ -2956,15 +2956,44 @@ Theorem fold_bmatrix_norm_prop : ∀ T (BMD : bmatrix_def T),
 Proof. easy. Qed.
 
 Theorem glop : ∀ T (M : matrix_def (bmatrix_def T)) la a,
-  bmatrix_norm_prop (BM_M M)
-  → la ∈ mat_list M
+  la ∈ mat_list M
   → a ∈ la
   → bmat_depth (BM_M M) = 1 + bmat_depth a.
 Proof.
-intros * Hp Hla Ha.
+intros * Hla Ha.
 cbn; f_equal.
+destruct M as (ll, r, c).
+cbn in Hla; cbn.
+clear r c.
+revert ll la Hla Ha.
+induction a as [x| M] using bmatrix_ind; intros. {
+  cbn.
+  destruct ll as [| l]; [ easy | cbn ].
+  destruct Hla as [Hla| Hla]. {
+    subst l.
+...
+
+remember 0 as k.
+assert (Hk : k ≤ bmat_depth a) by flia Heqk.
+clear Heqk.
+revert a la Hla Ha k Hk.
+induction ll as [| l]; intros; [ easy | ].
+destruct Hla as [Hla| Hla]. 2: {
+  cbn.
+...
+  apply IHll with (la := la); [ easy | easy | ].
+
+
+  apply (IHll _ _ la).
+}
+subst l; cbn.
+...
+  apply (IHll _ la); [ easy | easy | ].
+  subst l; cbn.
 cbn in Hp.
 destruct Hp as (Hn, Hp).
+specialize (Hp _ Hla _ Ha) as H1.
+cbn in Hn, Hla, H1 |-*.
 ...
 
 Theorem glop' : ∀ T (bmd : bmatrix_def T) it,
