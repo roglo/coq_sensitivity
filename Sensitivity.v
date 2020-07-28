@@ -2986,6 +2986,32 @@ destruct Hla as [Hla| Hla]. 2: {
   induction la as [| b]; intros; [ easy | cbn ].
   destruct Ha as [Ha| Ha]. {
     subst b.
+...
+    clear.
+    remember (bmat_depth a) as x; clear a Heqx.
+    induction la as [| b]. {
+      revert x.
+      induction ll as [| lb]; intros; [ easy | cbn ].
+      cbn in IHll.
+...
+      etransitivity; [ apply IHll | ].
+    induction ll as [| lb]. {
+      cbn; revert x.
+      induction la as [| b]; intros; [ easy | cbn ].
+      destruct (le_dec x (bmat_depth b)) as [Hab| Hab]. {
+        rewrite Nat.max_r; [ | easy ].
+        etransitivity; [ apply Hab | apply IHla ].
+      } {
+        apply Nat.nle_gt, Nat.lt_le_incl in Hab.
+        rewrite Nat.max_l; [ | easy ].
+        apply IHla.
+      }
+    } {
+      cbn; clear.
+
+      eapply le_trans; [ apply IHll | ].
+      clear IHll.
+...
     remember (fold_left max _ _) as x eqn:Hx in |-*.
     apply le_trans with (m := x). {
       subst x; clear; revert a.
