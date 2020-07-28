@@ -2955,14 +2955,68 @@ Theorem fold_bmatrix_norm_prop : ∀ T (BMD : bmatrix_def T),
   bmatrix_norm_prop_loop (bmat_depth BMD) BMD = bmatrix_norm_prop BMD.
 Proof. easy. Qed.
 
+Theorem glop : ∀ T (bmd : bmatrix_def T) it,
+  bmatrix_norm_prop_loop (bmat_depth bmd) bmd
+  → bmatrix_norm_prop_loop (bmat_depth bmd + it) bmd.
+Proof.
+intros * Hp.
+revert it Hp.
+induction bmd as [x| M IHBM] using bmatrix_ind; intros; [ easy | ].
+destruct it; [ now rewrite Nat.add_0_r | ].
+cbn in Hp; cbn.
+destruct Hp as (Hmp, Hbp).
+split; [ easy | ].
+intros la Hla a Ha.
+remember (fold_left _ _ _) as x.
+replace x with (bmat_depth a + (x - bmat_depth a)) in Hbp.
+specialize (IHBM la Hla a Ha (x - bmat_depth a)) as H1.
+...
+rewrite Nat.add_succ_r in Hbp.
+rewrite <- Nat.add_succ_l in Hbp.
+rewrite Nat.add_assoc in Hbp.
+specialize (IHBM la Hla a Ha (S it + (x - bmat_depth a))) as H1.
+specialize (Hbp la Hla a Ha) as H2.
+specialize (H1 H2); clear H2.
+
+...
+
+Theorem glop : ∀ T (bmd : bmatrix_def T) it,
+  bmatrix_norm_prop_loop (it + bmat_depth bmd) bmd
+  → bmatrix_norm_prop_loop (bmat_depth bmd) bmd.
+Proof.
+intros * Hp.
+revert it Hp.
+induction bmd as [x| M IHBM] using bmatrix_ind; intros; [ easy | ].
+destruct it; [ easy | ].
+cbn in Hp; cbn.
+destruct Hp as (Hmp, Hbp).
+split; [ easy | ].
+intros la Hla a Ha.
+remember (fold_left _ _ _) as x.
+replace x with ((x - bmat_depth a) + bmat_depth a) in Hbp.
+rewrite Nat.add_succ_r in Hbp.
+rewrite <- Nat.add_succ_l in Hbp.
+rewrite Nat.add_assoc in Hbp.
+specialize (IHBM la Hla a Ha (S it + (x - bmat_depth a))) as H1.
+specialize (Hbp la Hla a Ha) as H2.
+specialize (H1 H2); clear H2.
+...
+
 Theorem bmatrix_norm_prop_loop_enough_iter : ∀ T (bmd : bmatrix_def T) it,
   bmat_depth bmd ≤ it
   → bmatrix_norm_prop_loop it bmd
   → bmatrix_norm_prop_loop (bmat_depth bmd) bmd.
 Proof.
 intros * Hd Hp.
-induction bmd as [x| M IHBM] using bmatrix_ind; [ easy | ].
+revert it Hd Hp.
+induction bmd as [x| M IHBM] using bmatrix_ind; intros; [ easy | ].
 cbn in Hd.
+destruct it; [ easy | ].
+apply Nat.succ_le_mono in Hd.
+cbn in Hp; cbn.
+destruct Hp as (Hmp, Hbp).
+split; [ easy | ].
+intros la Hla a Ha.
 ...
 fix IHbmd 2.
 intros * Hd Hp.
