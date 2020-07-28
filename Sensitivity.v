@@ -3014,6 +3014,7 @@ destruct Hla as [Hla| Hla]. 2: {
 }
 Qed.
 
+(*
 Theorem glop : ∀ T (bmd : bmatrix_def T) it,
   bmatrix_norm_prop_loop (bmat_depth bmd) bmd
   → bmatrix_norm_prop_loop (bmat_depth bmd + it) bmd.
@@ -3088,6 +3089,7 @@ specialize (IHBM la Hla a Ha (S it + (x - bmat_depth a))) as H1.
 specialize (Hbp la Hla a Ha) as H2.
 specialize (H1 H2); clear H2.
 ...
+*)
 
 Theorem bmatrix_norm_prop_loop_enough_iter : ∀ T (bmd : bmatrix_def T) it,
   bmat_depth bmd ≤ it
@@ -3104,6 +3106,11 @@ cbn in Hp; cbn.
 destruct Hp as (Hmp, Hbp).
 split; [ easy | ].
 intros la Hla a Ha.
+specialize (bmat_depth_decr M la a Hla Ha) as H1.
+apply Nat.lt_le_incl in H1.
+specialize (IHBM la Hla a Ha _ H1) as H2.
+specialize (Hbp la Hla a Ha) as H3.
+(* ouais, je sais pas *)
 ...
 fix IHbmd 2.
 intros * Hd Hp.
