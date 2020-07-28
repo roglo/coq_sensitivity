@@ -2981,10 +2981,29 @@ destruct Hla as [Hla| Hla]. 2: {
   now apply Nat.max_le_compat_r.
 } {
   subst l; clear - Ha.
+  apply Nat.lt_succ_r.
   revert a Ha.
   induction la as [| b]; intros; [ easy | cbn ].
   destruct Ha as [Ha| Ha]. {
     subst b.
+    remember (fold_left max _ _) as x eqn:Hx in |-*.
+    apply le_trans with (m := x). {
+      subst x; clear; revert a.
+      induction la as [| b]; intros; [ easy | cbn ].
+      destruct (le_dec (bmat_depth a) (bmat_depth b)) as [Hab| Hab]. {
+        rewrite Nat.max_r; [ | easy ].
+        etransitivity; [ apply Hab | apply IHla ].
+      } {
+        apply Nat.nle_gt, Nat.lt_le_incl in Hab.
+        rewrite Nat.max_l; [ | easy ].
+        apply IHla.
+      }
+    } {
+...
+      clear; revert x.
+      induction ll as [| l]; intros; [ easy | cbn ].
+      eapply le_trans; [ apply IHll | ].
+      Search (fold_left _ _ _ ≤ fold_left _ _ _).
 ...
 
 Theorem glop : ∀ T (M : matrix_def (bmatrix_def T)) la a,
