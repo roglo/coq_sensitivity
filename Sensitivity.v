@@ -3119,22 +3119,21 @@ apply (IHBM la); [ easy | easy | | ]. {
 *)
   assert
     (H2 : ∀ k,
-     k ≤ bmat_depth a
-     → bmatrix_norm_prop_loop
-         (fold_left (λ (m : nat) (la : list nat), fold_left max la m)
-            (map (map (bmat_depth (T:=T))) ll) k) a
+     bmatrix_norm_prop_loop
+       (fold_left (λ (m : nat) (la : list nat), fold_left max la m)
+          (map (map (bmat_depth (T:=T))) ll) k) a
      → bmatrix_norm_prop_loop
           (fold_left
              (λ (m : nat) (la : list (bmatrix_def T)),
                 fold_left max (map (bmat_depth (T:=T)) la) m) ll k) a). {
     clear.
-    intros k Hk H1.
-    revert a k Hk H1.
+    intros * H1.
+    revert a k H1.
     induction ll as [| la]; intros; [ easy | cbn ].
     cbn in H1.
-...
+    now apply IHll.
   }
-  specialize (H2 0 (Nat.le_0_l _) H1).
+  specialize (H2 0 H1).
   clear H1; rename H2 into H1.
 ...
   revert la a Hla Ha H1.
