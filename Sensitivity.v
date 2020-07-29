@@ -2282,8 +2282,55 @@ Proof.
 intros.
 split; intros Hll. {
   intros * Hla Ha.
-(* il faut sûrement une version plus générale *)
+  remember (f a) as fa eqn:Hfa; symmetry in Hfa.
+  destruct fa; [ easy | exfalso ].
+  revert la a Hla Ha Hll Hfa.
+  induction ll as [| lb]; intros; [ easy | ].
+  cbn in Hll.
+  assert
+    (H : ∀ a la k,
+        a ∈ la → f a = false → fold_left (λ b a, b && f a) la k = false). {
+    clear; intros * Ha Hfa.
+    revert a k Ha Hfa.
+    induction la as [| b]; intros; [ easy | cbn ].
+    destruct Ha as [Ha| Ha]. {
+      subst b.
+      rewrite Hfa; rewrite Bool.andb_false_r.
+      now clear; induction la.
+    } {
+      now apply (IHla a).
+    }
+  }
+  destruct Hla as [Hla| Hla]. {
+    subst lb.
+    rewrite (H a) in Hll; [ | easy | easy ].
+    clear IHll.
+    revert a Ha Hfa.
+    induction ll as [| lb]; intros; [ easy | ].
+    cbn in Hll.
 ...
+    rewrite (H a) in Hll; [ | | ].
+...
+    replace (fold_left (λ bj a, bj && f a) la true) with false in Hll. 2: {
+      symmetry.
+      clear - Ha Hfa.
+      revert a Ha Hfa.
+      induction la as [| b]; intros; [ easy | cbn ].
+      destruct Ha as [Ha| Ha]. {
+        subst b; rewrite Hfa; clear.
+        now induction la.
+      } {
+
+        clear - Ha Hfa.
+        remember (f b) as k; clear b Heqk.
+        revert k.
+        induction la as [| b]; intros; [ easy | ].
+        cbn.
+        destruct Ha as [Ha| Ha]. {
+          subst b.
+...
+
+(* il faut sûrement une version plus générale *)
 (*
   apply in_split in Hla.
   apply in_split in Ha.
