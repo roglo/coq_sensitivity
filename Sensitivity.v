@@ -3120,26 +3120,39 @@ apply (IHBM la); [ easy | easy | | ]. {
   assert
     (H2 : ∀ k,
      bmatrix_norm_prop_loop
-       (fold_left (λ (m : nat) (la : list nat), fold_left max la m)
+       (fold_left (λ m la, fold_left max la m)
           (map (map (bmat_depth (T:=T))) ll) k) a
      → bmatrix_norm_prop_loop
           (fold_left
-             (λ (m : nat) (la : list (bmatrix_def T)),
-                fold_left max (map (bmat_depth (T:=T)) la) m) ll k) a). {
+             (λ m la,
+                fold_left (λ m l, max m (bmat_depth l)) la m) ll k) a). {
     clear.
     intros * H1.
     revert a k H1.
     induction ll as [| la]; intros; [ easy | cbn ].
     cbn in H1.
-    now apply IHll.
+    apply IHll.
+    clear IHll.
+    revert ll a k H1.
+    induction la as [| b]; intros; [ easy | cbn ].
+    now apply IHla.
   }
   specialize (H2 0 H1).
   clear H1; rename H2 into H1.
-...
-  revert la a Hla Ha H1.
+  remember 0 as k; clear Heqk.
+  revert la a k Hla Ha H1.
   induction ll as [| lb]; intros; [ easy | cbn ].
   destruct Hla as [Hla| Hla]. 2: {
-    apply (IHll la); [ easy | easy | ].
+    eapply (IHll la); [ easy | easy | apply H1 ].
+  }
+  subst lb.
+  cbn in H1.
+  clear IHll.
+...
+  revert ll a k Ha H1.
+  induction la as [| b]; intros; [ easy | ].
+  destruct Ha as [Ha| Ha]. {
+    subst b.
     cbn in H1.
 ...
   revert ll a Hla Ha H1.
