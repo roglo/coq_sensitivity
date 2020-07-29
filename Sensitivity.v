@@ -3093,6 +3093,64 @@ specialize (H1 H2); clear H2.
 
 Theorem bmatrix_norm_prop_loop_enough_iter : ∀ T (bmd : bmatrix_def T) it,
   bmat_depth bmd ≤ it
+  → bmatrix_norm_prop_loop (bmat_depth bmd) bmd
+  → bmatrix_norm_prop_loop it bmd.
+Proof.
+intros * Hd Hp.
+revert it Hd Hp.
+induction bmd as [x| M IHBM] using bmatrix_ind; intros; [ now destruct it | ].
+destruct it; [ now apply Nat.le_0_r in Hd | ].
+cbn in Hp; cbn.
+destruct Hp as (Hn, Hp).
+split; [ easy | ].
+intros la Hla a Ha.
+apply (IHBM la); [ easy | easy | | ]. {
+  specialize (bmat_depth_decr M la a Hla Ha) as H1.
+  flia Hd H1.
+} {
+  specialize (Hp la Hla a Ha) as H1.
+  clear - a la Ha Hla H1.
+  destruct M as (ll, r, c).
+  cbn in Hla, H1; clear r c.
+(* ce bins', avant le "a", "(map (map (bmat_depth (T:=T))) ll) 0",
+   faudrait pouvoir le généraliser *)
+(*
+  rewrite List_fold_left_map.
+*)
+  assert
+    (H2 : ∀ k,
+     k ≤ bmat_depth a
+     → bmatrix_norm_prop_loop
+         (fold_left (λ (m : nat) (la : list nat), fold_left max la m)
+            (map (map (bmat_depth (T:=T))) ll) k) a
+     → bmatrix_norm_prop_loop
+          (fold_left
+             (λ (m : nat) (la : list (bmatrix_def T)),
+                fold_left max (map (bmat_depth (T:=T)) la) m) ll k) a). {
+    clear.
+    intros k Hk H1.
+    revert a k Hk H1.
+    induction ll as [| la]; intros; [ easy | cbn ].
+    cbn in H1.
+...
+  }
+  specialize (H2 0 (Nat.le_0_l _) H1).
+  clear H1; rename H2 into H1.
+...
+  revert la a Hla Ha H1.
+  induction ll as [| lb]; intros; [ easy | cbn ].
+  destruct Hla as [Hla| Hla]. 2: {
+    apply (IHll la); [ easy | easy | ].
+    cbn in H1.
+...
+  revert ll a Hla Ha H1.
+  induction la as [| b]; intros; [ easy | cbn ].
+  destruct Ha as [Ha| Ha]. {
+    subst b.
+...
+
+Theorem bmatrix_norm_prop_loop_enough_iter : ∀ T (bmd : bmatrix_def T) it,
+  bmat_depth bmd ≤ it
   → bmatrix_norm_prop_loop it bmd
   → bmatrix_norm_prop_loop (bmat_depth bmd) bmd.
 Proof.
