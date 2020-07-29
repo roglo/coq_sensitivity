@@ -2282,6 +2282,39 @@ Proof.
 intros.
 split; intros Hll. {
   intros * Hla Ha.
+...
+  apply in_split in Hla.
+  apply in_split in Ha.
+  destruct Hla as (ll1 & ll2 & Hla).
+  destruct Ha as (l1 & l2 & Ha).
+  subst ll la.
+  revert ll1 a l1 l2 Hll.
+  induction ll2 as [| l3]; intros; cbn in Hll. 2: {
+    specialize (IHll2 ll1 a l1) as H1.
+
+  revert ll2 a l1 l2 Hll.
+  induction ll1 as [| l3]; intros; cbn in Hll. 2: {
+
+
+  revert ll1 ll2 a l1 Hll.
+  induction l2 as [| b]; intros; cbn in Hll. 2: {
+    cbn in Hll.
+
+  revert ll1 ll2 a l2 Hll.
+  induction l1 as [| b]; intros; cbn in Hll. 2: {
+    cbn in Hll.
+...
+    specialize (IHl1 (ll1 ++ [[b]]) ll2 a l2) as H1.
+    cbn in H1.
+
+...
+  revert ll2 a l1 l2 Hll.
+  induction ll1 as [| la]; intros; cbn in Hll. {
+    revert ll2 a l2 Hll.
+    induction l1 as [| b]; intros; cbn in Hll. {
+      destruct (f a); [ easy | exfalso ].
+      induction l2 as [|
+...
   assert
     (H : ∀ a la ll k,
        la ∈ ll
