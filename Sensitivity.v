@@ -2282,20 +2282,49 @@ Proof.
 intros.
 split; intros Hll. {
   intros * Hla Ha.
-  revert la a Hla Ha.
+(* il faut sûrement une version plus générale *)
+...
+(*
+  apply in_split in Hla.
+  apply in_split in Ha.
+  destruct Hla as (ll1 & ll2 & Hla).
+  destruct Ha as (l1 & l2 & Ha).
+  subst ll la.
+  revert ll2 a l1 l2 Hll.
+  induction ll1 as [| la]; intros; cbn in Hll. {
+    revert ll2 a l2 Hll.
+    induction l1 as [| b]; intros; cbn in Hll. {
+      destruct (f a); [ easy | exfalso ].
+      induction l2 as [|
+...
+*)
+  remember (f a) as fa eqn:Hfa; symmetry in Hfa.
+  destruct fa; [ easy | exfalso ].
+  revert a ll Hll Hla Ha Hfa.
   induction ll as [| lb]; intros; [ easy | ].
   cbn in Hll.
   destruct Hla as [Hla| Hla]. {
     subst lb.
-    remember (f a) as fa eqn:Hfa; symmetry in Hfa.
-    destruct fa; [ easy | exfalso ].
     clear IHll.
-    revert a Ha Hfa.
+    revert a ll Ha Hll Hfa.
     induction la as [| b]; intros; [ easy | ].
     cbn in Hll.
     destruct Ha as [Ha| Ha]. {
       subst b.
       rewrite Hfa in Hll.
+      clear - Hll.
+      revert la Hll.
+      induction ll as [| lb]; intros; cbn in Hll. {
+        induction la as [| a]; [ easy | cbn in Hll ].
+        congruence.
+      }
+      revert lb ll IHll Hll.
+      induction la as [| b]; intros; cbn in *. {
+        now apply (IHll lb).
+      }
+      now apply (IHla lb ll).
+    }
+    apply (IHla a ll); [ easy | | easy ].
 ...
   intros * Hi Hj.
   induction li; [ easy | ].
