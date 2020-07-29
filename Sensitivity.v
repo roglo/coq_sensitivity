@@ -2354,24 +2354,20 @@ split; intros Hij. {
 }
 Qed.
 
-Theorem bmatrix_is_norm_prop : ∀ T (bmd : bmatrix_def T),
-  bmatrix_is_norm bmd = true ↔ bmatrix_norm_prop bmd.
+Theorem bmatrix_is_norm_prop_loop : ∀ T (bmd : bmatrix_def T) it,
+  bmatrix_is_norm_loop it bmd = true ↔ bmatrix_norm_prop_loop it bmd.
 Proof.
 intros.
 split; intros Hbmd. {
-  unfold bmatrix_is_norm in Hbmd.
-  unfold bmatrix_norm_prop.
-  remember (bmat_depth bmd) as len eqn:Hlen; clear Hlen.
   revert bmd Hbmd.
-  induction len; intros; [ easy | ].
-  cbn in Hbmd; cbn.
+  induction it; intros; [ easy | cbn ].
   destruct bmd as [| BMM]; [ easy | ].
+  cbn in Hbmd.
   apply Bool.andb_true_iff in Hbmd.
   destruct Hbmd as (H1, H2).
-  apply matrix_is_norm_prop in H1.
-  split; [ easy | ].
+  split; [ now apply matrix_is_norm_prop in H1 | ].
   intros ld Hrows d Hbmd'.
-  apply IHlen; clear IHlen.
+  apply IHit; clear IHit.
   specialize (proj1 (fold_left_fold_left_and_true _ _ _) H2) as H3.
   clear H2; cbn in H3.
   destruct BMM as (ll, r, c).
@@ -2381,6 +2377,7 @@ split; intros Hbmd. {
   apply In_nth with (d := void_bmat_def) in Hbmd'.
   destruct Hbmd' as (j & Hj & Hbmd').
   specialize (H3 i j).
+  apply matrix_is_norm_prop in H1.
   destruct H1 as (Hr, Hc, Hrc).
   cbn in Hr, Hc, Hrc.
   assert (H : i ∈ seq 0 r). {
@@ -2400,11 +2397,8 @@ split; intros Hbmd. {
   specialize (H3 H); clear H.
   now rewrite Hrows, Hbmd' in H3.
 } {
-  unfold bmatrix_is_norm.
-  unfold bmatrix_norm_prop in Hbmd.
-  remember (bmat_depth bmd) as len eqn:Hlen; clear Hlen.
   revert bmd Hbmd.
-  induction len; intros; [ easy | ].
+  induction it; intros; [ easy | ].
   cbn in Hbmd; cbn.
   destruct bmd as [| BMM]; [ easy | ].
   apply Bool.andb_true_iff.
@@ -2428,8 +2422,15 @@ split; intros Hbmd. {
     apply nth_In; congruence.
   }
   specialize (H2 H); clear H.
-  now apply IHlen.
+  now apply IHit.
 }
+Qed.
+
+Theorem bmatrix_is_norm_prop : ∀ T (bmd : bmatrix_def T),
+  bmatrix_is_norm bmd = true ↔ bmatrix_norm_prop bmd.
+Proof.
+intros.
+apply bmatrix_is_norm_prop_loop.
 Qed.
 
 Arguments BM_1 {_} a%Srng.
@@ -3091,11 +3092,37 @@ specialize (H1 H2); clear H2.
 ...
 *)
 
+Check bmatrix_is_norm_prop_loop.
+
+Theorem bmatrix_is_norm_prop_loop_enough_iter : ∀ T (bmd : bmatrix_def T) it,
+  bmat_depth bmd ≤ it
+  → bmatrix_is_norm_loop (bmat_depth bmd) bmd = bmatrix_is_norm_loop it bmd.
+Proof.
+intros * Hit.
+...
+
+(*
+Theorem glop : ∀ T (bmd : bmatrix_def T) it,
+  bmat_depth bmd ≤ it
+  → bmatrix_is_norm_loop it bmd = bmatrix_is_norm_loop (bmat_depth bmd) bmd.
+Proof.
+intros * Hit.
+Check bmatrix_is_norm_prop_loop.
+Search bmatrix_is_norm_loop.
+...
+*)
+
 Theorem bmatrix_norm_prop_loop_enough_iter : ∀ T (bmd : bmatrix_def T) it,
   bmat_depth bmd ≤ it
   → bmatrix_norm_prop_loop (bmat_depth bmd) bmd
   → bmatrix_norm_prop_loop it bmd.
 Proof.
+intros * Hd Hp.
+apply bmatrix_is_norm_prop_loop in Hp.
+apply bmatrix_is_norm_prop_loop.
+rewrite <- Hp; symmetry.
+now apply bmatrix_is_norm_prop_loop_enough_iter.
+...
 intros * Hd Hp.
 revert it Hd Hp.
 induction bmd as [x| M IHBM] using bmatrix_ind; intros; [ now destruct it | ].
@@ -3148,6 +3175,7 @@ apply (IHBM la); [ easy | easy | | ]. {
   subst lb.
   cbn in H1.
   clear IHll.
+Inspect 3.
 ...
   revert ll a k Ha H1.
   induction la as [| b]; intros; [ easy | ].
