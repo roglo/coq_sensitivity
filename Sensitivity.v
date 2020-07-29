@@ -3099,6 +3099,24 @@ Theorem bmatrix_is_norm_prop_loop_enough_iter : ∀ T (bmd : bmatrix_def T) it,
   → bmatrix_is_norm_loop (bmat_depth bmd) bmd = bmatrix_is_norm_loop it bmd.
 Proof.
 intros * Hit.
+revert it Hit.
+induction bmd as [x| M IHBM] using bmatrix_ind; intros; [ now destruct it | ].
+destruct it; [ now apply Nat.le_0_r in Hit | ].
+cbn in Hit; cbn.
+apply Nat.succ_le_mono in Hit.
+remember (matrix_is_norm M) as b eqn:Hb.
+symmetry in Hb.
+destruct b; [ cbn | easy ].
+...
+
+apply (IHBM la); [ easy | easy | | ]. {
+  specialize (bmat_depth_decr M la a Hla Ha) as H1.
+  flia Hd H1.
+} {
+  specialize (Hp la Hla a Ha) as H1.
+  clear - a la Ha Hla H1.
+  destruct M as (ll, r, c).
+  cbn in Hla, H1; clear r c.
 ...
 
 (*
