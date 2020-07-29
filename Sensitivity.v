@@ -2282,10 +2282,48 @@ Proof.
 intros.
 split; intros Hll. {
   intros * Hla Ha.
-  destruct ll as [| lb]; [ easy | ].
+  remember (f a) as b eqn:Hb; symmetry in Hb.
+  destruct b; [ easy | exfalso ].
+  destruct ll as [| la1]; [ easy | ].
   cbn in Hll.
   destruct Hla as [Hla| Hla]. {
-    subst lb.
+    subst la1.
+    revert a Ha Hb.
+    induction la as [| a1]; intros; [ easy | ].
+    cbn in Hll.
+    assert (Hfl :
+      fold_left
+        (λ (b1 : bool) (la : list A),
+           fold_left (λ (b2 : bool) (a : A), b2 && f a) la b1) ll
+        (fold_left (λ (b2 : bool) (a : A), b2 && f a) la false) = true
+      → False). {
+      clear; intros Hll.
+      replace (fold_left _ la false) with false in Hll. 2: {
+        clear.
+        induction la as [| a]; [ easy | ].
+        now cbn; rewrite <- IHla.
+      }
+      clear la.
+      induction ll as [| la]; [ easy | ].
+      cbn in Hll.
+      replace (fold_left _ la false) with false in Hll. 2: {
+        clear.
+        induction la as [| a]; [ easy | ].
+        now cbn; rewrite <- IHla.
+      }
+      easy.
+    }
+    destruct Ha as [Ha| Ha]. {
+      subst a1.
+      rewrite Hb in Hll.
+      clear a Hb.
+      clear - Hll Hfl.
+      now specialize (Hfl Hll).
+    }
+    eapply IHla; [ | apply Ha | apply Hb ].
+    remember (f a1) as b1 eqn:Hb1; symmetry in Hb1.
+    now destruct b1.
+  }
 ...
 
 Theorem old_fold_left_fold_left_and_true : ∀ A B (f : A → B → _) li lj,
