@@ -2241,13 +2241,8 @@ Fixpoint bmatrix_is_norm_loop T it (bmd : bmatrix_def T) :=
       | BM_M BMM =>
           matrix_is_norm BMM &&
           fold_left
-            (λ b i,
-             fold_left
-               (λ b j,
-                  b &&
-                  bmatrix_is_norm_loop it' (mat_def_el void_bmat_def BMM i j))
-               (seq 0 (mat_ncols BMM)) b)
-            (seq 0 (mat_nrows BMM)) true
+            (λ b r, fold_left (λ b c, b && bmatrix_is_norm_loop it' c) r b)
+            (mat_list BMM) true
       end
   end.
 
@@ -2280,7 +2275,97 @@ Fixpoint bmatrix_norm_prop_loop T it (bmd : bmatrix_def T) :=
 Definition bmatrix_norm_prop T (bmd : bmatrix_def T) :=
   bmatrix_norm_prop_loop (bmat_depth bmd) bmd.
 
-Theorem fold_left_fold_left_and_true : ∀ A B (f : A → B → _) li lj,
+Theorem fold_left_fold_left_and_true : ∀ A (f : A → bool) ll,
+  fold_left (λ bi la, fold_left (λ bj a, bj && f a) la bi) ll true = true
+  ↔ (∀ (la : list A) (a : A), la ∈ ll → a ∈ la → f a = true).
+Proof.
+intros.
+split; intros Hll. {
+  intros * Hla Ha.
+  revert la a Hla Ha.
+  induction ll as [| lb]; intros; [ easy | ].
+  cbn in Hll.
+  destruct Hla as [Hla| Hla]. {
+    subst lb.
+    remember (f a) as fa eqn:Hfa; symmetry in Hfa.
+    destruct fa; [ easy | exfalso ].
+    clear IHll.
+    revert a Ha Hfa.
+    induction la as [| b]; intros; [ easy | ].
+    cbn in Hll.
+    destruct Ha as [Ha| Ha]. {
+      subst b.
+      rewrite Hfa in Hll.
+...
+  intros * Hi Hj.
+  induction li; [ easy | ].
+  destruct Hi as [Hi| Hi]. {
+    cbn in Hij; subst a.
+    remember (fold_left _ lj true) as b eqn:Hb.
+    symmetry in Hb.
+    destruct b. {
+      clear - Hb Hj.
+      induction lj as [| k]; [ easy | ].
+      cbn in Hb.
+      destruct Hj as [Hj| Hj]. {
+        subst k.
+        destruct (f i j); [ easy | exfalso ].
+        clear - Hb.
+        now induction lj.
+      } {
+        apply IHlj; [ | easy ].
+        destruct (f i k); [ easy | exfalso ].
+        clear - Hb.
+        now induction lj.
+      }
+    } {
+      exfalso; clear - Hij.
+      induction li; [ easy | ].
+      cbn in Hij.
+      remember (fold_left _ lj false) as b eqn:Hb.
+      symmetry in Hb.
+      destruct b; [ now clear - Hb; induction lj | ].
+      congruence.
+    }
+  } {
+    apply IHli; [ | easy ].
+    cbn in Hij.
+    remember (fold_left _ lj true) as b eqn:Hb.
+    symmetry in Hb.
+    destruct b; [ easy | ].
+    clear - Hij; induction li; [ easy | ].
+    cbn in Hij; cbn.
+    remember (fold_left _ lj false) as b eqn:Hb.
+    symmetry in Hb.
+    destruct b; [ now exfalso; clear - Hb; induction lj | ].
+    exfalso; clear - Hij; induction li; [ easy | ].
+    cbn in Hij.
+    remember (fold_left _ lj false) as b eqn:Hb.
+    symmetry in Hb.
+    destruct b; [ now exfalso; clear - Hb; induction lj | ].
+    now apply IHli.
+  }
+} {
+  induction li as [| k]; [ easy | cbn ].
+  remember (fold_left _ lj true) as b eqn:Hb.
+  symmetry in Hb.
+  destruct b. {
+    apply IHli; intros * Hi Hj.
+    apply Hij; [ now right | easy ].
+  } {
+    exfalso.
+    clear IHli.
+    induction lj; [ easy | ].
+    cbn in Hb.
+    rewrite Hij in Hb; [ | now left | now left ].
+    apply IHlj; [ | easy ].
+    intros * Hi Hj.
+    apply Hij; [ easy | now right ].
+  }
+}
+...
+
+Theorem old_fold_left_fold_left_and_true : ∀ A B (f : A → B → _) li lj,
   fold_left (λ bi i, fold_left (λ bj j, bj && f i j) lj bi) li true = true
   ↔ ∀ i j, i ∈ li → j ∈ lj → f i j = true.
 Proof.
@@ -2368,6 +2453,10 @@ split; intros Hbmd. {
   split; [ now apply matrix_is_norm_prop in H1 | ].
   intros ld Hrows d Hbmd'.
   apply IHit; clear IHit.
+Check old_fold_left_fold_left_and_true.
+...
+  specialize (proj1 (glop_fold_left_fold_left_and_true _ _) H2) as H3.
+...
   specialize (proj1 (fold_left_fold_left_and_true _ _ _) H2) as H3.
   clear H2; cbn in H3.
   destruct BMM as (ll, r, c).
