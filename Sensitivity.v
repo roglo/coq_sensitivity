@@ -2612,6 +2612,26 @@ split. {
   now apply Hc; left.
 }
 intros la Hla a Ha.
+destruct M as (ll, r, c).
+cbn in Hr, Hc, Hrc, Md, Hla.
+destruct len. {
+  cbn in IHlen, Md; cbn.
+  destruct ll as [| lb]; [ easy | ].
+  cbn - [ In ] in Hla, Hr.
+  destruct Hla as [Hla| Hla]. {
+    subst la.
+    destruct lb as [| b]; [ easy | ].
+    eapply Md; [ now left | now left ].
+  }
+  destruct lb as [| b]. {
+    specialize (Hc _ (or_introl eq_refl)) as H1.
+    subst r c.
+    cbn in Hrc.
+    now specialize (proj2 Hrc eq_refl) as H1.
+  }
+  now specialize (Md _ (or_introl eq_refl) b (or_introl eq_refl)).
+}
+cbn.
 ...
 intros.
 unfold bmatrix_coh.
