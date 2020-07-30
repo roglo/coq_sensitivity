@@ -2324,6 +2324,39 @@ split; intros Hll. {
     remember (f a1) as b1 eqn:Hb1; symmetry in Hb1.
     now destruct b1.
   }
+  remember (fold_left _ la1 true) as k; clear la1 Heqk.
+  revert la a k Hll Hla Ha Hb.
+  induction ll as [| la1]; intros; [ easy | cbn in Hll ].
+  destruct Hla as [Hla| Hla]. {
+    subst la1; clear IHll.
+    replace (fold_left _ la k) with false in Hll. 2: {
+      clear - Ha Hb.
+      revert la a k Ha Hb.
+      induction la as [| a1]; intros; [ easy | cbn ].
+      destruct Ha as [Ha| Ha]. {
+        subst a1; rewrite Hb, Bool.andb_false_r.
+        now clear; induction la.
+      }
+      now apply (IHla a).
+    }
+    clear - Hll.
+    induction ll as [| la]; [ easy | cbn in Hll ].
+    replace (fold_left _ la false) with false in Hll; [ easy | ].
+    now clear; induction la.
+  }
+  eapply (IHll la a); [ apply Hll | easy | easy | easy ].
+} {
+  induction ll as [| lb]; [ easy | cbn ].
+  assert (Hll' : ∀ la a, la ∈ ll → a ∈ la → f a = true). {
+    clear - Hll.
+    intros la a Hla Ha.
+    apply (Hll la); [ now right | easy ].
+  }
+  specialize (IHll Hll').
+  replace (fold_left _ lb true) with true. 2: {
+    clear - Hll'.
+    revert ll Hll'.
+    induction lb as [| a]; intros; [ easy | cbn ].
 ...
 
 Theorem old_fold_left_fold_left_and_true : ∀ A B (f : A → B → _) li lj,
