@@ -2347,17 +2347,33 @@ split; intros Hll. {
   eapply (IHll la a); [ apply Hll | easy | easy | easy ].
 } {
   induction ll as [| lb]; [ easy | cbn ].
-  assert (Hll' : ∀ la a, la ∈ ll → a ∈ la → f a = true). {
-    clear - Hll.
-    intros la a Hla Ha.
-    apply (Hll la); [ now right | easy ].
-  }
-  specialize (IHll Hll').
   replace (fold_left _ lb true) with true. 2: {
-    clear - Hll'.
-    revert ll Hll'.
+    clear IHll.
+    revert ll Hll.
     induction lb as [| a]; intros; [ easy | cbn ].
+    rewrite (Hll (a :: lb)); [ | now left | now left ].
+    apply (IHlb ll).
+    intros la1 a1 Hla1 Ha1.
+    destruct Hla1 as [Hla1| Hla1]. {
+      subst la1.
+      apply (Hll (a :: lb)); [ now left | now right ].
+    }
+    apply (Hll la1); [ now right | easy ].
+  }
+  apply IHll.
+  intros * Hla Ha.
+  apply (Hll la); [ now right | easy ].
+}
+Qed.
+
+Inspect 1.
+
 ...
+
+(* voir si on peut pas le démontrer, pour courtement, par la
+   version bool ci-dessus, fold_left_fold_left_and_true *)
+(* ou alors, bon, on le prouve pas, ça sert peut-être à rien,
+   du coup *)
 
 Theorem old_fold_left_fold_left_and_true : ∀ A B (f : A → B → _) li lj,
   fold_left (λ bi i, fold_left (λ bj j, bj && f i j) lj bi) li true = true
