@@ -2358,15 +2358,11 @@ split; intros Hll. {
 }
 Qed.
 
-Inspect 1.
-
-...
-
 (* voir si on peut pas le démontrer, pour courtement, par la
    version bool ci-dessus, fold_left_fold_left_and_true *)
 (* ou alors, bon, on le prouve pas, ça sert peut-être à rien,
    du coup *)
-
+(*
 Theorem old_fold_left_fold_left_and_true : ∀ A B (f : A → B → _) li lj,
   fold_left (λ bi i, fold_left (λ bj j, bj && f i j) lj bi) li true = true
   ↔ ∀ i j, i ∈ li → j ∈ lj → f i j = true.
@@ -2440,9 +2436,10 @@ split; intros Hij. {
   }
 }
 Qed.
+*)
 
 Theorem bmatrix_is_norm_prop_loop : ∀ T (bmd : bmatrix_def T) it,
-  bmatrix_is_norm_loop it bmd = true ↔ bmatrix_norm_prop_loop it bmd.
+  bmatrix_coh_loop it bmd = true ↔ bmatrix_coh_prop_loop it bmd.
 Proof.
 intros.
 split; intros Hbmd. {
@@ -2455,40 +2452,10 @@ split; intros Hbmd. {
   split; [ now apply matrix_is_norm_prop in H1 | ].
   intros ld Hrows d Hbmd'.
   apply IHit; clear IHit.
-Check old_fold_left_fold_left_and_true.
-...
-  specialize (proj1 (glop_fold_left_fold_left_and_true _ _) H2) as H3.
-...
-  specialize (proj1 (fold_left_fold_left_and_true _ _ _) H2) as H3.
-  clear H2; cbn in H3.
-  destruct BMM as (ll, r, c).
-  cbn in H1, Hrows, H3.
-  apply In_nth with (d := []) in Hrows.
-  destruct Hrows as (i & Hi & Hrows).
-  apply In_nth with (d := void_bmat_def) in Hbmd'.
-  destruct Hbmd' as (j & Hj & Hbmd').
-  specialize (H3 i j).
-  apply matrix_is_norm_prop in H1.
-  destruct H1 as (Hr, Hc, Hrc).
-  cbn in Hr, Hc, Hrc.
-  assert (H : i ∈ seq 0 r). {
-    subst r.
-    apply in_seq.
-    split; [ flia | easy ].
-  }
-  specialize (H3 H); clear H.
-  assert (H : j ∈ seq 0 c). {
-    apply in_seq.
-    rewrite <- (Hc ld). 2: {
-      subst ld.
-      now apply nth_In.
-    }
-    split; [ flia | easy ].
-  }
-  specialize (H3 H); clear H.
-  now rewrite Hrows, Hbmd' in H3.
+  eapply fold_left_fold_left_and_true; [ apply H2 | apply Hrows | easy ].
 } {
   revert bmd Hbmd.
+...
   induction it; intros; [ easy | ].
   cbn in Hbmd; cbn.
   destruct bmd as [| BMM]; [ easy | ].
