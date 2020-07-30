@@ -2632,6 +2632,7 @@ destruct len. {
   now specialize (Md _ (or_introl eq_refl) b (or_introl eq_refl)).
 }
 cbn.
+destruct a as [x| M]; [ easy | ].
 ...
 intros.
 unfold bmatrix_coh.
