@@ -1736,7 +1736,7 @@ Record matrix T := mk_mat
   { mat_def : matrix_def T;
     mat_coh_prop : matrix_coh mat_def = true }.
 
-Theorem matrix_is_norm_prop : ∀ T (md : matrix_def T),
+Theorem matrix_coh_equiv_prop : ∀ T (md : matrix_def T),
   matrix_coh md = true ↔ matrix_coh_prop md.
 Proof.
 intros.
@@ -1901,8 +1901,8 @@ Theorem mat_coh_prop_transpose : ∀ T d M,
 Proof.
 intros.
 destruct M as (Md, Mp); cbn.
-apply matrix_is_norm_prop in Mp.
-apply matrix_is_norm_prop.
+apply matrix_coh_equiv_prop in Mp.
+apply matrix_coh_equiv_prop.
 destruct Mp as (Hr, Hc, Hrc).
 split. {
   cbn; unfold list_list_transpose.
@@ -2001,9 +2001,9 @@ intros.
 destruct MA as (Mda, Mpa); cbn.
 destruct MB as (Mdb, Mpb); cbn.
 move Mdb before Mda.
-apply matrix_is_norm_prop in Mpa.
-apply matrix_is_norm_prop in Mpb.
-apply matrix_is_norm_prop.
+apply matrix_coh_equiv_prop in Mpa.
+apply matrix_coh_equiv_prop in Mpb.
+apply matrix_coh_equiv_prop.
 unfold mat_def_add.
 destruct Mpa as (Hra, Hca, Hrca).
 destruct Mpb as (Hrb, Hcb, Hrcb).
@@ -2438,7 +2438,7 @@ split; intros Hij. {
 Qed.
 *)
 
-Theorem bmatrix_is_norm_prop_loop : ∀ T (bmd : bmatrix_def T) it,
+Theorem bmatrix_coh_equiv_prop_loop : ∀ T (bmd : bmatrix_def T) it,
   bmatrix_coh_loop it bmd = true ↔ bmatrix_coh_prop_loop it bmd.
 Proof.
 intros.
@@ -2449,46 +2449,32 @@ split; intros Hbmd. {
   cbn in Hbmd.
   apply Bool.andb_true_iff in Hbmd.
   destruct Hbmd as (H1, H2).
-  split; [ now apply matrix_is_norm_prop in H1 | ].
+  split; [ now apply matrix_coh_equiv_prop in H1 | ].
   intros ld Hrows d Hbmd'.
   apply IHit; clear IHit.
   eapply fold_left_fold_left_and_true; [ apply H2 | apply Hrows | easy ].
 } {
   revert bmd Hbmd.
-...
   induction it; intros; [ easy | ].
   cbn in Hbmd; cbn.
   destruct bmd as [| BMM]; [ easy | ].
   apply Bool.andb_true_iff.
   destruct Hbmd as (H1, H2).
-  split; [ now apply matrix_is_norm_prop | ].
+  split; [ now apply matrix_coh_equiv_prop | ].
   destruct H1 as (Hr, Hc, Hrc).
   apply fold_left_fold_left_and_true.
   intros i j Hi Hj.
   destruct BMM as (ll, r, c).
   cbn in Hr, Hc, Hrc, H2, Hi, Hj; cbn.
-  apply in_seq in Hi; cbn in Hi; destruct Hi as (_, Hi).
-  apply in_seq in Hj; cbn in Hj; destruct Hj as (_, Hj).
-  specialize (H2 (nth i ll [])).
-  assert (H : nth i ll [] ∈ ll). {
-    apply nth_In; congruence.
-  }
-  specialize (H2 H (nth j (nth i ll []) void_bmat_def)); clear H.
-  assert (H : nth j (nth i ll []) void_bmat_def ∈ nth i ll []). {
-    apply nth_In.
-    rewrite Hc; [ easy | ].
-    apply nth_In; congruence.
-  }
-  specialize (H2 H); clear H.
-  now apply IHit.
+  now apply IHit, (H2 i).
 }
 Qed.
 
-Theorem bmatrix_is_norm_prop : ∀ T (bmd : bmatrix_def T),
-  bmatrix_is_norm bmd = true ↔ bmatrix_norm_prop bmd.
+Theorem bmatrix_coh_equiv_prop : ∀ T (bmd : bmatrix_def T),
+  bmatrix_coh bmd = true ↔ bmatrix_coh_prop bmd.
 Proof.
 intros.
-apply bmatrix_is_norm_prop_loop.
+apply bmatrix_coh_equiv_prop_loop.
 Qed.
 
 Arguments BM_1 {_} a%Srng.
@@ -2526,7 +2512,7 @@ Definition mat_of_bmat T (BM : bmatrix T) : matrix T :=
   mat_of_list (list_list_of_bmat_def (bmat_def BM)).
 
 Theorem void_bmat_coh_prop T :
-  bmatrix_coh (void_bmat_def : bmatrix_def T).
+  bmatrix_coh (void_bmat_def : bmatrix_def T) = true.
 Proof. easy. Qed.
 
 Definition void_bmat T : bmatrix T :=
@@ -2594,12 +2580,12 @@ split; intros Hij. {
 Qed.
 
 Theorem bmat_coh_prop_opp : ∀ T {ro : ring_op T} (BM : bmatrix T),
-  bmatrix_coh (bmat_def_opp (bmat_def BM)).
+  bmatrix_coh (bmat_def_opp (bmat_def BM)) = true.
 Proof.
 intros.
-unfold bmatrix_coh, bmatrix_is_norm.
+unfold bmatrix_coh.
 destruct BM as (Md, Mp); cbn.
-unfold bmatrix_coh, bmatrix_is_norm in Mp.
+unfold bmatrix_coh in Mp.
 rewrite bmat_depth_opp.
 remember (bmat_depth Md) as len; clear Heqlen.
 revert Md Mp.
@@ -2609,7 +2595,6 @@ destruct Md as [x| BMM]; [ easy | ].
 cbn.
 apply Bool.andb_true_iff in Mp.
 destruct Mp as (Hn, Hp).
-unfold matrix_is_norm in Hn.
 apply Bool.andb_true_iff in Hn.
 destruct Hn as (Hr, Hrc).
 apply Bool.andb_true_iff in Hr.
@@ -2632,6 +2617,7 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
   etransitivity. {
     apply List_fold_left_ext_in.
     intros i b Hi.
+...
     apply in_seq in Hi; cbn in Hi; destruct Hi as (_, Hi).
     rewrite <- Hr in Hi.
     rewrite List_map_nth_in with (a := []); [ | easy ].
@@ -3150,9 +3136,9 @@ specialize (H1 H2); clear H2.
 ...
 *)
 
-Check bmatrix_is_norm_prop_loop.
+Check bmatrix_coh_equiv_prop_loop.
 
-Theorem bmatrix_is_norm_prop_loop_enough_iter : ∀ T (bmd : bmatrix_def T) it,
+Theorem bmatrix_coh_equiv_prop_loop_enough_iter : ∀ T (bmd : bmatrix_def T) it,
   bmat_depth bmd ≤ it
   → bmatrix_is_norm_loop (bmat_depth bmd) bmd = bmatrix_is_norm_loop it bmd.
 Proof.
@@ -3183,7 +3169,7 @@ Theorem glop : ∀ T (bmd : bmatrix_def T) it,
   → bmatrix_is_norm_loop it bmd = bmatrix_is_norm_loop (bmat_depth bmd) bmd.
 Proof.
 intros * Hit.
-Check bmatrix_is_norm_prop_loop.
+Check bmatrix_coh_equiv_prop_loop.
 Search bmatrix_is_norm_loop.
 ...
 *)
@@ -3194,10 +3180,10 @@ Theorem bmatrix_norm_prop_loop_enough_iter : ∀ T (bmd : bmatrix_def T) it,
   → bmatrix_norm_prop_loop it bmd.
 Proof.
 intros * Hd Hp.
-apply bmatrix_is_norm_prop_loop in Hp.
-apply bmatrix_is_norm_prop_loop.
+apply bmatrix_coh_equiv_prop_loop in Hp.
+apply bmatrix_coh_equiv_prop_loop.
 rewrite <- Hp; symmetry.
-now apply bmatrix_is_norm_prop_loop_enough_iter.
+now apply bmatrix_coh_equiv_prop_loop_enough_iter.
 ...
 intros * Hd Hp.
 revert it Hd Hp.
@@ -3337,8 +3323,8 @@ destruct BMDA as [ta| MDA]; [ now destruct BMDB, itn | ].
 destruct BMDB as [tb| MDB]; [ now destruct itn | ].
 move MDB before MDA.
 cbn - [ bmat_depth ] in Hita.
-apply bmatrix_is_norm_prop in BMPA.
-apply bmatrix_is_norm_prop in BMPB.
+apply bmatrix_coh_equiv_prop in BMPA.
+apply bmatrix_coh_equiv_prop in BMPB.
 revert add MDA MDB BMPA BMPB Hitn Hita.
 induction itn; intros. {
   apply Nat.le_0_r in Hitn; cbn.
@@ -3669,7 +3655,7 @@ Theorem bmat_coh_prop_add : ∀ T add (BMA BMB : bmatrix T),
   bmatrix_coh (bmat_def_add add (bmat_def BMA) (bmat_def BMB)).
 Proof.
 intros.
-apply bmatrix_is_norm_prop.
+apply bmatrix_coh_equiv_prop.
 ...
 now apply bmat_coh_prop_add_gen.
 ...
@@ -3679,12 +3665,12 @@ now apply bmat_coh_prop_add_gen.
   bmatrix_coh (bmat_def_add add (bmat_def BMA) (bmat_def BMB)).
 Proof.
 intros.
-apply bmatrix_is_norm_prop.
+apply bmatrix_coh_equiv_prop.
 ...
 now apply bmat_coh_prop_add_gen.
 ...
 intros.
-apply bmatrix_is_norm_prop.
+apply bmatrix_coh_equiv_prop.
 destruct BMA as (BMDA, BMPA).
 destruct BMB as (BMDB, BMPB).
 move BMDB before BMDA.
@@ -3693,8 +3679,8 @@ rewrite fold_bmatrix_norm_prop.
 rewrite fold_bmat_def_add.
 revert BMDA BMDB BMPA BMPB.
 fix IHBMDA 1; intros.
-apply bmatrix_is_norm_prop in BMPA.
-apply bmatrix_is_norm_prop in BMPB.
+apply bmatrix_coh_equiv_prop in BMPA.
+apply bmatrix_coh_equiv_prop in BMPB.
 destruct BMDA as [ta| MDA]; intros; [ now destruct BMDB | ].
 destruct BMDB as [tb| MDB]. {
   destruct MDA as (lla, ra, ca).
@@ -3779,13 +3765,13 @@ destruct Hlc as [Hlc| Hlc]. {
     rewrite fold_bmatrix_norm_prop.
     rewrite fold_bmat_def_add.
     apply IHBMDA. {
-      apply bmatrix_is_norm_prop.
+      apply bmatrix_coh_equiv_prop.
       destruct a as [ta| MDA]; [ easy | ].
       specialize (H4a _ (or_introl eq_refl)).
       specialize (H4a _ (or_introl eq_refl)).
       easy.
     } {
-      apply bmatrix_is_norm_prop.
+      apply bmatrix_coh_equiv_prop.
       destruct b as [tb| MDB]; [ easy | ].
       specialize (H4b _ (or_introl eq_refl)).
       specialize (H4b _ (or_introl eq_refl)).
@@ -3802,7 +3788,7 @@ destruct Hlc as [Hlc| Hlc]. {
       destruct b1 as [xb| Mb]. {
 ...
 intros.
-apply bmatrix_is_norm_prop.
+apply bmatrix_coh_equiv_prop.
 unfold bmatrix_norm_prop.
 destruct BMA as (BMDA, BMPA).
 destruct BMB as (BMDB, BMPB).
@@ -3815,8 +3801,8 @@ destruct BMDB as [tb| MDB]. {
 } {
   destruct MDA as (lla, ra, ca).
   destruct MDB as (llb, rb, cb).
-  apply bmatrix_is_norm_prop in BMPA.
-  apply bmatrix_is_norm_prop in BMPB.
+  apply bmatrix_coh_equiv_prop in BMPA.
+  apply bmatrix_coh_equiv_prop in BMPB.
   cbn in BMPA, BMPB.
   destruct lla as [| la]. {
     cbn.
