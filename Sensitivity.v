@@ -2579,7 +2579,7 @@ split; intros Hij. {
 }
 Qed.
 
-Theorem bmat_coh_prop_opp : ∀ T {ro : ring_op T} (BM : bmatrix T),
+Theorem bmat_coh_opp : ∀ T {ro : ring_op T} (BM : bmatrix T),
   bmatrix_coh (bmat_def_opp (bmat_def BM)) = true.
 Proof.
 intros.
