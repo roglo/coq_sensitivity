@@ -1618,7 +1618,7 @@ assert (Hjll : nth j ll [] = map (λ i, [i]) (seq 0 n)). {
     rewrite Hj.
     apply fold_left_mul_seq_lt.
   }
-  rewrite (List_map_nth_in _ 0) by now rewrite seq_length.
+  rewrite (List_map_nth_in _ _ _ 0) by now rewrite seq_length.
   rewrite seq_nth; [ cbn | easy ].
   unfold dispatch.
   rewrite Hj.
@@ -2614,9 +2614,14 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
   destruct BMM as (ll, r, c).
   cbn in Hr, Hc, Hrc, Hp |-*.
   apply Nat.eqb_eq in Hr.
+...
   etransitivity. {
     apply List_fold_left_ext_in.
-    intros i b Hi.
+    intros la b Hi.
+...
+apply List_fold_left_ext_in.
+intros a b' Hj.
+Check List_map_nth_in.
 ...
     apply in_seq in Hi; cbn in Hi; destruct Hi as (_, Hi).
     rewrite <- Hr in Hi.
