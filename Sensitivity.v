@@ -2598,26 +2598,20 @@ destruct Mp as ((Hr, Hc, Hrc), Md).
 split. {
   split; cbn; [ now rewrite map_length | | easy ].
   intros la Hla.
-...
-  specialize (Hc (map (@bmat_def_opp T ro) la)) as H1.
-  rewrite map_length in H1; apply H1; clear H1.
-  apply (In_nth _ _ []) in Hla.
-  rewrite map_length in Hla.
-  destruct Hla as (n & Hn & Hla).
-  subst la.
-  rewrite (List_map_nth_in _ _ _ []); [ | easy ].
-  rewrite map_map.
-...
-  replace (map _ _) with (map (λ x, x) (nth n (mat_list M) [])). 2: {
-    apply map_ext_in_iff.
-    intros a Ha.
-...
-    rewrite bmat_def_opp_involutive.
-...
   destruct M as (ll, r, c).
-  cbn in Hr, Hc, Hrc, Md, Hn |-*.
-...
-  apply Hc.
+  cbn in *.
+  clear - Hc Hla.
+  induction ll as [| lb]; [ easy | cbn ].
+  destruct Hla as [Hla| Hla]. 2: {
+    apply IHll; [ | easy ].
+    intros b Hb.
+    now apply Hc; right.
+  }
+  subst la.
+  rewrite map_length.
+  now apply Hc; left.
+}
+intros la Hla a Ha.
 ...
 intros.
 unfold bmatrix_coh.
