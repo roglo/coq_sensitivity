@@ -2583,6 +2583,43 @@ Theorem bmat_coh_prop_opp : ∀ T {ro : ring_op T} (BM : bmatrix T),
   bmatrix_coh (bmat_def_opp (bmat_def BM)) = true.
 Proof.
 intros.
+apply bmatrix_coh_equiv_prop.
+unfold bmatrix_coh_prop.
+rewrite bmat_depth_opp.
+destruct BM as (Md, Mp); cbn.
+apply bmatrix_coh_equiv_prop in Mp.
+unfold bmatrix_coh_prop in Mp.
+remember (bmat_depth Md) as len; clear Heqlen.
+revert Md Mp.
+induction len; intros; [ easy | ].
+cbn in Mp; cbn.
+destruct Md as [x| M];  [ easy | cbn ].
+destruct Mp as ((Hr, Hc, Hrc), Md).
+split. {
+  split; cbn; [ now rewrite map_length | | easy ].
+  intros la Hla.
+...
+  specialize (Hc (map (@bmat_def_opp T ro) la)) as H1.
+  rewrite map_length in H1; apply H1; clear H1.
+  apply (In_nth _ _ []) in Hla.
+  rewrite map_length in Hla.
+  destruct Hla as (n & Hn & Hla).
+  subst la.
+  rewrite (List_map_nth_in _ _ _ []); [ | easy ].
+  rewrite map_map.
+...
+  replace (map _ _) with (map (λ x, x) (nth n (mat_list M) [])). 2: {
+    apply map_ext_in_iff.
+    intros a Ha.
+...
+    rewrite bmat_def_opp_involutive.
+...
+  destruct M as (ll, r, c).
+  cbn in Hr, Hc, Hrc, Md, Hn |-*.
+...
+  apply Hc.
+...
+intros.
 unfold bmatrix_coh.
 destruct BM as (Md, Mp); cbn.
 unfold bmatrix_coh in Mp.
