@@ -2646,6 +2646,8 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
         cbn in H1.
         assert (H : ola ∈ ll). {
           rewrite Hola.
+          rewrite Hlai, <- Hla.
+(* needs involutive *)
 ...
         cbn in H1.
 ......
