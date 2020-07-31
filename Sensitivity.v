@@ -2630,6 +2630,7 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
     assert (Hlai : la = nth i (ll1 ++ la :: ll2) []). {
       now rewrite Hill1; clear; induction ll1.
     }
+    rewrite List_fold_left_map.
     apply List_fold_left_ext_in.
     intros a b' Ha.
     apply in_split in Ha.
@@ -2648,39 +2649,15 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
       }
       apply (f_equal (@length _)) in Ha.
       rewrite app_length in Ha; cbn in Ha.
-      rewrite map_length in Ha.
       rewrite Ha; flia.
-    }
-...
-    apply in_seq in Hi; cbn in Hi; destruct Hi as (_, Hi).
-    rewrite <- Hr in Hi.
-    rewrite List_map_nth_in with (a := []); [ | easy ].
-    apply List_fold_left_ext_in.
-    intros j b' Hj.
-    apply in_seq in Hj; cbn in Hj; destruct Hj as (_, Hj).
-    rewrite List_map_nth_in with (a := void_bmat_def). 2: {
-      clear - Hc Hi Hj.
-      revert i j Hi Hj.
-      induction ll as [| l]; intros; [ easy | ].
-      cbn in Hc.
-      remember (length l =? c) as b eqn:Hb; symmetry in Hb.
-      destruct b. {
-        apply Nat.eqb_eq in Hb.
-        cbn in Hi; cbn.
-        destruct i; [ now rewrite <- Hb in Hj | ].
-        apply Nat.succ_lt_mono in Hi.
-        now apply IHll.
-      } {
-        exfalso; clear - Hc.
-        induction ll as [| l]; [ easy | cbn in Hc ].
-        now apply IHll.
-      }
     }
     easy.
   }
   apply fold_left_fold_left_and_true.
   intros * Hi Hj.
   apply IHlen.
+Check fold_left_fold_left_and_true.
+...
   now apply (proj1 (fold_left_fold_left_and_true _ _ _) Hp).
 }
 
