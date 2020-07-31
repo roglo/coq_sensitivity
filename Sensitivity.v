@@ -2615,7 +2615,7 @@ intros la Hla a Ha.
 destruct M as (ll, r, c).
 cbn in Hr, Hc, Hrc, Md, Hla.
 destruct len. {
-  cbn in IHlen, Md; cbn.
+  cbn in Md; cbn.
   destruct ll as [| lb]; [ easy | ].
   cbn - [ In ] in Hla, Hr.
   destruct Hla as [Hla| Hla]. {
@@ -2631,8 +2631,12 @@ destruct len. {
   }
   now specialize (Md _ (or_introl eq_refl) b (or_introl eq_refl)).
 }
-cbn.
-destruct a as [x| M]; [ easy | ].
+specialize (Md la) as H1.
+(* il faudrait plutôt que je fasse (Md (map (map opp) ll)) un truc
+   comme ça, mais ça suppose ensuite d'avoir le fait que opp est
+   involutif, prouvé après et supposant les propriétés du ring
+   en hypothèse en plus ; pourquoi je n'en avais pas besoin avant,
+   dans la version précédente de mon modèle ? *)
 ...
 intros.
 unfold bmatrix_coh.
@@ -2710,7 +2714,7 @@ Qed.
 
 Definition bmat_opp T {ro : ring_op T} (BM : bmatrix T) : bmatrix T :=
   {| bmat_def := bmat_def_opp (bmat_def BM);
-     bmat_coh_prop := bmat_coh_prop_opp BM |}.
+     bmat_coh_prop := bmat_coh_opp BM |}.
 
 Definition bmat_def_of_list_bmat_def T (ll : list (list (bmatrix_def T))) :
     matrix_def (bmatrix_def T) :=
