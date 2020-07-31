@@ -2615,7 +2615,7 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
   destruct BMM as (ll, r, c).
   cbn in Hr, Hc, Hrc, Hp |-*.
   apply Nat.eqb_eq in Hr.
-...
+  rewrite List_fold_left_map.
   etransitivity. {
     apply List_fold_left_ext_in.
     intros la b Hla.
@@ -2625,7 +2625,6 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
     assert (Hi : i < r). {
       subst i; rewrite <- Hr.
       apply (f_equal (@length _)) in Hla.
-      rewrite map_length in Hla.
       rewrite Hla, app_length; cbn; flia.
     }
     assert (Hlai : la = nth i (ll1 ++ la :: ll2) []). {
@@ -2638,38 +2637,20 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
     remember (length l1) as j eqn:Hjl1.
     assert (Hj : j < c). {
       subst j.
-...
+      replace c with (length la). 2: {
+        specialize (proj1 (fold_left_and_true _ _) Hc la) as H1.
+        assert (H : la ∈ ll). {
+          rewrite Hla.
+          now apply in_or_app; right; left.
+        }
+        specialize (H1 H); clear H; cbn in H1.
+        now apply Nat.eqb_eq in H1.
+      }
       apply (f_equal (@length _)) in Ha.
       rewrite app_length in Ha; cbn in Ha.
-...
-      apply (f_equal (@length _)) in Hla.
-      rewrite map_length in Hla.
-      rewrite app_length in Hla; cbn in Hla.
-...
-      replace c with (length la). 2: {
-        rewrite Ha.
-...
-        specialize (proj1 (fold_left_and_true _ _) Hc) as H1.
-        remember (map (@bmat_def_opp _ _) la) as ola eqn:Hola.
-        specialize (H1 ola).
-        cbn in H1.
-        assert (H : ola ∈ ll). {
-          rewrite Hola.
-          rewrite Hlai, <- Hla.
-(* needs involutive *)
-...
-        cbn in H1.
-......
-      subst j; rewrite <- Hr.
-      apply (f_equal (@length _)) in Ha.
-      rewrite map_length in Hla.
-      rewrite Hla, app_length; cbn; flia.
+      rewrite map_length in Ha.
+      rewrite Ha; flia.
     }
-    assert (Hlai : la = nth i (l1 ++ la :: l2) []). {
-      now rewrite Hil1; clear; induction l1.
-
-    }
-    apply List_fold_left_ext_in.
 ...
     apply in_seq in Hi; cbn in Hi; destruct Hi as (_, Hi).
     rewrite <- Hr in Hi.
