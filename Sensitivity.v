@@ -2617,7 +2617,21 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
   apply Nat.eqb_eq in Hr.
   etransitivity. {
     apply List_fold_left_ext_in.
-    intros i b Hi.
+    intros la b Hla.
+    apply in_split in Hla.
+    destruct Hla as (l1 & l2 & Hla).
+    remember (length l1) as i eqn:Hil1.
+    assert (Hi : i < r). {
+      subst i; rewrite <- Hr.
+      apply (f_equal (@length _)) in Hla.
+      rewrite map_length in Hla.
+      rewrite Hla, app_length; cbn; flia.
+    }
+    assert (Hlai : la = nth i (l1 ++ la :: l2) []). {
+      now rewrite Hil1; clear; induction l1.
+
+    }
+    rewrite Hlai, <- Hla.
 ...
     apply in_seq in Hi; cbn in Hi; destruct Hi as (_, Hi).
     rewrite <- Hr in Hi.
