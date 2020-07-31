@@ -3202,8 +3202,7 @@ split. {
         specialize (H4b _ (or_introl eq_refl)).
         do 2 rewrite List_fold_left_map in H4b.
         cbn in H4b.
-...
-        apply bmatrix_norm_prop_loop_enough_iter in H4b; [ easy | ].
+        apply bmatrix_coh_prop_loop_enough_iter in H4b; [ easy | ].
 ...
         }
         destruct b as [xb| Mb]; [ easy | ].
