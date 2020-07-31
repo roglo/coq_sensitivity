@@ -2638,6 +2638,16 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
     remember (length l1) as j eqn:Hjl1.
     assert (Hj : j < c). {
       subst j.
+      replace c with (length la). 2: {
+        rewrite Ha.
+        specialize (proj1 (fold_left_and_true _ _) Hc) as H1.
+        remember (map (@bmat_def_opp _ _) la) as ola eqn:Hola.
+        specialize (H1 ola).
+        cbn in H1.
+        assert (H : ola ∈ ll). {
+          rewrite Hola.
+...
+        cbn in H1.
 ......
       subst j; rewrite <- Hr.
       apply (f_equal (@length _)) in Ha.
