@@ -2582,6 +2582,76 @@ Qed.
 Theorem bmat_coh_opp : ∀ T {ro : ring_op T} (BM : bmatrix T),
   bmatrix_coh (bmat_def_opp (bmat_def BM)) = true.
 Proof.
+(* reprise à partir d'une vieille version, pour voir *)
+intros.
+unfold bmatrix_coh_prop.
+destruct BM as (Md, Mp); cbn.
+unfold bmatrix_coh in Mp.
+rewrite bmat_depth_opp.
+remember (bmat_depth Md) as len; clear Heqlen.
+revert Md Mp.
+induction len; intros; [ easy | ].
+cbn in Mp; cbn.
+destruct Md as [x| BMM]; [ easy | ].
+cbn.
+apply Bool.andb_true_iff in Mp.
+destruct Mp as (Hn, Hp).
+apply Bool.andb_true_iff in Hn.
+destruct Hn as (Hr, Hrc).
+apply Bool.andb_true_iff in Hr.
+destruct Hr as (Hr, Hc).
+apply Bool.andb_true_iff.
+split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
+  apply Bool.andb_true_iff.
+  split; [ now rewrite map_length | ].
+  rewrite List_fold_left_map.
+  etransitivity. {
+    apply List_fold_left_ext_in.
+    intros BM b HBM.
+    now rewrite map_length.
+  }
+  easy.
+} {
+  destruct BMM as (ll, r, c).
+  cbn in Hr, Hc, Hrc, Hp |-*.
+  apply Nat.eqb_eq in Hr.
+  etransitivity. {
+    apply List_fold_left_ext_in.
+    intros i b Hi.
+...
+    apply in_seq in Hi; cbn in Hi; destruct Hi as (_, Hi).
+    rewrite <- Hr in Hi.
+    rewrite List_map_nth_in with (a := []); [ | easy ].
+    apply List_fold_left_ext_in.
+    intros j b' Hj.
+    apply in_seq in Hj; cbn in Hj; destruct Hj as (_, Hj).
+    rewrite List_map_nth_in with (a := void_bmat_def). 2: {
+      clear - Hc Hi Hj.
+      revert i j Hi Hj.
+      induction ll as [| l]; intros; [ easy | ].
+      cbn in Hc.
+      remember (length l =? c) as b eqn:Hb; symmetry in Hb.
+      destruct b. {
+        apply Nat.eqb_eq in Hb.
+        cbn in Hi; cbn.
+        destruct i; [ now rewrite <- Hb in Hj | ].
+        apply Nat.succ_lt_mono in Hi.
+        now apply IHll.
+      } {
+        exfalso; clear - Hc.
+        induction ll as [| l]; [ easy | cbn in Hc ].
+        now apply IHll.
+      }
+    }
+    easy.
+  }
+  apply fold_left_fold_left_and_true.
+  intros * Hi Hj.
+  apply IHlen.
+  now apply (proj1 (fold_left_fold_left_and_true _ _ _) Hp).
+}
+
+...
 intros.
 apply bmatrix_coh_equiv_prop.
 unfold bmatrix_coh_prop.
