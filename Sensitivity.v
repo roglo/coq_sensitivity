@@ -1618,7 +1618,7 @@ assert (Hjll : nth j ll [] = map (λ i, [i]) (seq 0 n)). {
     rewrite Hj.
     apply fold_left_mul_seq_lt.
   }
-  rewrite (List_map_nth_in _ _ _ 0) by now rewrite seq_length.
+  rewrite (List_map_nth_in _ 0) by now rewrite seq_length.
   rewrite seq_nth; [ cbn | easy ].
   unfold dispatch.
   rewrite Hj.
@@ -2615,6 +2615,7 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
   destruct BMM as (ll, r, c).
   cbn in Hr, Hc, Hrc, Hp |-*.
   apply Nat.eqb_eq in Hr.
+...
   etransitivity. {
     apply List_fold_left_ext_in.
     intros la b Hla.
@@ -2629,7 +2630,6 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
     }
     assert (Hlai : la = nth i (ll1 ++ la :: ll2) []). {
       now rewrite Hill1; clear; induction ll1.
-
     }
     apply List_fold_left_ext_in.
     intros a b' Ha.
@@ -2638,6 +2638,7 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
     remember (length l1) as j eqn:Hjl1.
     assert (Hj : j < c). {
       subst j.
+...
       apply (f_equal (@length _)) in Ha.
       rewrite app_length in Ha; cbn in Ha.
 ...

@@ -1,6 +1,8 @@
 (* Theorems of general usage, which could be (or not) in Coq library *)
 
 Set Nested Proofs Allowed.
+Set Implicit Arguments.
+
 Require Import Utf8 Arith Psatz Sorted Permutation Decidable.
 Import List List.ListNotations.
 
@@ -880,7 +882,7 @@ rewrite <- Nat.mul_add_distr_l; f_equal.
 do 2 rewrite Nat.sub_succ.
 replace (n - 0) with n by now rewrite Nat.sub_0_r.
 replace (S n - 0) with (S n) at 2 by now rewrite Nat.sub_0_r.
-rewrite (summation_split_last _ (S n)); [ | flia | flia ].
+rewrite (@summation_split_last _ (S n)); [ | flia | flia ].
 rewrite Nat.sub_succ.
 replace (n - 0) with n by now rewrite Nat.sub_0_r.
 replace (S (S n) - S n - 1) with 0 by flia.
