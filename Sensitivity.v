@@ -3203,6 +3203,40 @@ split. {
         do 2 rewrite List_fold_left_map in H4b.
         cbn in H4b.
         apply bmatrix_coh_prop_loop_enough_iter in H4b; [ easy | ].
+        remember (bmat_depth b) as i; clear.
+        revert i.
+        induction llb as [| la]; intros. {
+          revert i.
+          induction lb as [| a]; intros; [ easy | cbn ].
+          cbn in IHlb.
+          destruct (le_dec i (bmat_depth a)) as [Hia| Hia]. {
+            rewrite Nat.max_r; [ | easy ].
+            etransitivity; [ | apply IHlb ].
+            easy.
+          } {
+            apply Nat.nle_gt, Nat.lt_le_incl in Hia.
+            now rewrite Nat.max_l.
+          }
+        }
+        cbn.
+        revert i la llb IHllb.
+        induction lb as [| a]; intros. {
+          cbn in IHllb; cbn.
+          etransitivity; [ | apply IHllb ].
+          clear; revert i.
+          induction la as [| a]; intros; [ easy | cbn ].
+          etransitivity; [ | apply IHla ].
+          apply Nat.le_max_l.
+        }
+        cbn.
+        etransitivity. 2: {
+          apply IHlb.
+          intros j.
+          cbn in IHllb.
+          destruct (le_dec j (bmat_depth a)) as [Hja| Hja]. {
+...
+          etransitivity; [ apply IHllb | ].
+            rewrite Nat.max_r; [ | easy ].
 ...
         }
         destruct b as [xb| Mb]; [ easy | ].
