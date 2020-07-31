@@ -3123,6 +3123,7 @@ Theorem bmat_coh_prop_add_gen : ∀ T add ita itn (BMA BMB : bmatrix T),
        (bmat_def_add_loop add ita (bmat_def BMA) (bmat_def BMB)).
 Proof.
 intros * Hita Hitn.
+...
 revert add itn BMA BMB Hitn Hita.
 induction ita; intros; [ now destruct itn | ].
 cbn in Hitn; cbn.
@@ -3229,6 +3230,7 @@ split. {
           apply Nat.le_max_l.
         }
         cbn.
+...
         etransitivity. 2: {
           apply IHlb.
           intros j.
@@ -3495,7 +3497,7 @@ destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
 *)
 
 Theorem bmat_coh_prop_add : ∀ T add (BMA BMB : bmatrix T),
-  bmatrix_coh (bmat_def_add add (bmat_def BMA) (bmat_def BMB)).
+  bmatrix_coh (bmat_def_add add (bmat_def BMA) (bmat_def BMB)) = true.
 Proof.
 intros.
 apply bmatrix_coh_equiv_prop.
@@ -3854,10 +3856,10 @@ destruct BMDB as [tb| MDB]. {
                   rewrite fold_bmatrix_norm_prop.
 ...
 *)
+*)
 
 Definition bmat_add T add (BMA BMB : bmatrix T) :=
   {| bmat_def := bmat_def_add add (bmat_def BMA) (bmat_def BMB);
-     bmat_coh_prop := 42 |}.
      bmat_coh_prop := bmat_coh_prop_add add BMA BMB |}.
 
 ...
