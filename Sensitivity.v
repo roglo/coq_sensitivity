@@ -3068,85 +3068,6 @@ destruct Hla as [Hla| Hla]. 2: {
 }
 Qed.
 
-(*
-Theorem glop : ∀ T (bmd : bmatrix_def T) it,
-  bmatrix_norm_prop_loop (bmat_depth bmd) bmd
-  → bmatrix_norm_prop_loop (bmat_depth bmd + it) bmd.
-Proof.
-intros * Hp.
-induction bmd as [x| M IHbmd] using bmatrix_ind; [ easy | ].
-split; [ now cbn in Hp | ].
-intros la Hla a Ha; cbn.
-...
-specialize (glop _ _ Hp Hla Ha) as H1.
-cbn in H1.
-apply Nat.succ_inj in H1.
-rewrite H1.
-destruct Hp as (Hn, Hp).
-cbn in Hp.
-rewrite H1 in Hp.
-apply (IHbmd la); [ easy | easy | ].
-now apply (Hp la).
-...
-intros * Hp.
-destruct it; [ now rewrite Nat.add_0_r | ].
-destruct it. {
-  rewrite Nat.add_1_r; cbn.
-  destruct bmd as [x| M]; [ easy | ].
-  cbn in Hp.
-  destruct Hp as (Hn, Hp).
-  split; [ easy | ].
-  intros la Hla a Ha; cbn.
-  destruct a as [x| M']; [ easy | ].
-  split. {
-    destruct Hn as (Hr, Hc, Hrc).
-    split. {
-...
-intros * Hp.
-revert it Hp.
-induction bmd as [x| M IHBM] using bmatrix_ind; intros; [ easy | ].
-destruct it; [ now rewrite Nat.add_0_r | ].
-cbn in Hp; cbn.
-destruct Hp as (Hmp, Hbp).
-split; [ easy | ].
-intros la Hla a Ha.
-remember (fold_left _ _ _) as x.
-replace x with (bmat_depth a + (x - bmat_depth a)) in Hbp.
-specialize (IHBM la Hla a Ha (x - bmat_depth a)) as H1.
-...
-rewrite Nat.add_succ_r in Hbp.
-rewrite <- Nat.add_succ_l in Hbp.
-rewrite Nat.add_assoc in Hbp.
-specialize (IHBM la Hla a Ha (S it + (x - bmat_depth a))) as H1.
-specialize (Hbp la Hla a Ha) as H2.
-specialize (H1 H2); clear H2.
-...
-
-Theorem glop : ∀ T (bmd : bmatrix_def T) it,
-  bmatrix_norm_prop_loop (it + bmat_depth bmd) bmd
-  → bmatrix_norm_prop_loop (bmat_depth bmd) bmd.
-Proof.
-intros * Hp.
-revert it Hp.
-induction bmd as [x| M IHBM] using bmatrix_ind; intros; [ easy | ].
-destruct it; [ easy | ].
-cbn in Hp; cbn.
-destruct Hp as (Hmp, Hbp).
-split; [ easy | ].
-intros la Hla a Ha.
-remember (fold_left _ _ _) as x.
-replace x with ((x - bmat_depth a) + bmat_depth a) in Hbp.
-rewrite Nat.add_succ_r in Hbp.
-rewrite <- Nat.add_succ_l in Hbp.
-rewrite Nat.add_assoc in Hbp.
-specialize (IHBM la Hla a Ha (S it + (x - bmat_depth a))) as H1.
-specialize (Hbp la Hla a Ha) as H2.
-specialize (H1 H2); clear H2.
-...
-*)
-
-Check bmatrix_coh_equiv_prop_loop.
-
 Theorem bmatrix_coh_equiv_prop_loop_enough_iter : ∀ T (bmd : bmatrix_def T) it,
   bmat_depth bmd ≤ it
   → bmatrix_coh_loop (bmat_depth bmd) bmd = bmatrix_coh_loop it bmd.
@@ -3160,165 +3081,45 @@ apply Nat.succ_le_mono in Hit.
 remember (matrix_coh M) as b eqn:Hb.
 symmetry in Hb.
 destruct b; [ cbn | easy ].
-...
-
-apply (IHBM la); [ easy | easy | | ]. {
+apply List_fold_left_ext_in.
+intros la b Hla.
+apply List_fold_left_ext_in.
+intros a b' Ha.
+f_equal.
+rewrite <- (IHBM la); [ | easy | easy | ]. {
+  apply (IHBM la); [ easy | easy | ].
+  etransitivity; [ | apply Hit ].
   specialize (bmat_depth_decr M la a Hla Ha) as H1.
-  flia Hd H1.
+  now apply -> Nat.lt_succ_r in H1.
 } {
-  specialize (Hp la Hla a Ha) as H1.
-  clear - a la Ha Hla H1.
-  destruct M as (ll, r, c).
-  cbn in Hla, H1; clear r c.
-...
-
-(*
-Theorem glop : ∀ T (bmd : bmatrix_def T) it,
-  bmat_depth bmd ≤ it
-  → bmatrix_is_norm_loop it bmd = bmatrix_is_norm_loop (bmat_depth bmd) bmd.
-Proof.
-intros * Hit.
-Check bmatrix_coh_equiv_prop_loop.
-Search bmatrix_is_norm_loop.
-...
-*)
-
-Theorem bmatrix_norm_prop_loop_enough_iter : ∀ T (bmd : bmatrix_def T) it,
-  bmat_depth bmd ≤ it
-  → bmatrix_norm_prop_loop (bmat_depth bmd) bmd
-  → bmatrix_norm_prop_loop it bmd.
-Proof.
-intros * Hd Hp.
-apply bmatrix_coh_equiv_prop_loop in Hp.
-apply bmatrix_coh_equiv_prop_loop.
-rewrite <- Hp; symmetry.
-now apply bmatrix_coh_equiv_prop_loop_enough_iter.
-...
-intros * Hd Hp.
-revert it Hd Hp.
-induction bmd as [x| M IHBM] using bmatrix_ind; intros; [ now destruct it | ].
-destruct it; [ now apply Nat.le_0_r in Hd | ].
-cbn in Hp; cbn.
-destruct Hp as (Hn, Hp).
-split; [ easy | ].
-intros la Hla a Ha.
-apply (IHBM la); [ easy | easy | | ]. {
   specialize (bmat_depth_decr M la a Hla Ha) as H1.
-  flia Hd H1.
-} {
-  specialize (Hp la Hla a Ha) as H1.
-  clear - a la Ha Hla H1.
-  destruct M as (ll, r, c).
-  cbn in Hla, H1; clear r c.
-(* ce bins', avant le "a", "(map (map (bmat_depth (T:=T))) ll) 0",
-   faudrait pouvoir le généraliser *)
-(*
-  rewrite List_fold_left_map.
-*)
-  assert
-    (H2 : ∀ k,
-     bmatrix_norm_prop_loop
-       (fold_left (λ m la, fold_left max la m)
-          (map (map (bmat_depth (T:=T))) ll) k) a
-     → bmatrix_norm_prop_loop
-          (fold_left
-             (λ m la,
-                fold_left (λ m l, max m (bmat_depth l)) la m) ll k) a). {
-    clear.
-    intros * H1.
-    revert a k H1.
-    induction ll as [| la]; intros; [ easy | cbn ].
-    cbn in H1.
-    apply IHll.
-    clear IHll.
-    revert ll a k H1.
-    induction la as [| b]; intros; [ easy | cbn ].
-    now apply IHla.
-  }
-  specialize (H2 0 H1).
-  clear H1; rename H2 into H1.
-  remember 0 as k; clear Heqk.
-  revert la a k Hla Ha H1.
-  induction ll as [| lb]; intros; [ easy | cbn ].
-  destruct Hla as [Hla| Hla]. 2: {
-    eapply (IHll la); [ easy | easy | apply H1 ].
-  }
-  subst lb.
-  cbn in H1.
-  clear IHll.
-Inspect 3.
-...
-  revert ll a k Ha H1.
-  induction la as [| b]; intros; [ easy | ].
-  destruct Ha as [Ha| Ha]. {
-    subst b.
-    cbn in H1.
-...
-  revert ll a Hla Ha H1.
-  induction la as [| b]; intros; [ easy | cbn ].
-  destruct Ha as [Ha| Ha]. {
-    subst b.
-...
+  now apply -> Nat.lt_succ_r in H1.
+}
+Qed.
 
-Theorem bmatrix_norm_prop_loop_enough_iter : ∀ T (bmd : bmatrix_def T) it,
+Theorem bmatrix_coh_prop_loop_enough_iter : ∀ T (bmd : bmatrix_def T) it,
   bmat_depth bmd ≤ it
-  → bmatrix_norm_prop_loop it bmd
-  → bmatrix_norm_prop_loop (bmat_depth bmd) bmd.
+  → bmatrix_coh_prop_loop (bmat_depth bmd) bmd
+  ↔ bmatrix_coh_prop_loop it bmd.
 Proof.
-intros * Hd Hp.
-revert it Hd Hp.
-induction bmd as [x| M IHBM] using bmatrix_ind; intros; [ easy | ].
-cbn in Hd.
-destruct it; [ easy | ].
-apply Nat.succ_le_mono in Hd.
-cbn in Hp; cbn.
-destruct Hp as (Hmp, Hbp).
-split; [ easy | ].
-intros la Hla a Ha.
-specialize (bmat_depth_decr M la a Hla Ha) as H1.
-apply Nat.lt_le_incl in H1.
-specialize (IHBM la Hla a Ha _ H1) as H2.
-specialize (Hbp la Hla a Ha) as H3.
-(* ouais, je sais pas *)
-...
-fix IHbmd 2.
-intros * Hd Hp.
-revert it Hd Hp.
-induction bmd; intros; [ easy | ].
-cbn in Hd, Hp; cbn.
-destruct it; [ easy | ].
-apply Nat.succ_le_mono in Hd.
-cbn in Hp.
-destruct Hp as (Hmp, Hbp).
-split; [ easy | ].
-Guarded.
-intros la Hla a Ha.
-...
-intros * Hd Hp.
-revert bmd Hd Hp.
-induction it; intros. {
-  now apply Nat.le_0_r in Hd; rewrite Hd.
+intros * Hd.
+split; intros Hp. {
+  apply bmatrix_coh_equiv_prop_loop in Hp.
+  apply bmatrix_coh_equiv_prop_loop.
+  rewrite <- Hp; symmetry.
+  now apply bmatrix_coh_equiv_prop_loop_enough_iter.
+} {
+  apply bmatrix_coh_equiv_prop_loop in Hp.
+  apply bmatrix_coh_equiv_prop_loop.
+  rewrite <- Hp.
+  now apply bmatrix_coh_equiv_prop_loop_enough_iter.
 }
-cbn in Hp.
-destruct bmd as [xb| Mb]; [ easy | cbn ].
-destruct Hp as (Hmp, Hbp).
-split; [ easy | ].
-intros la Hla a Ha.
-cbn in Hd.
-apply Nat.succ_le_mono in Hd.
-...
-specialize (Hbp la Hla a Ha) as H1.
-assert (H : bmat_depth a ≤ it). {
-...
-}
-...
-specialize (IHit H H1); clear H.
-...
+Qed.
 
 Theorem bmat_coh_prop_add_gen : ∀ T add ita itn (BMA BMB : bmatrix T),
   bmat_depth (bmat_def BMA) ≤ ita
   → bmat_depth (bmat_def_add_loop add ita (bmat_def BMA) (bmat_def BMB)) ≤ itn
-  → bmatrix_norm_prop_loop itn
+  → bmatrix_coh_prop_loop itn
        (bmat_def_add_loop add ita (bmat_def BMA) (bmat_def BMB)).
 Proof.
 intros * Hita Hitn.
