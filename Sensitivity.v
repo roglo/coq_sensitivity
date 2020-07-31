@@ -2590,7 +2590,7 @@ destruct BM as (Md, Mp); cbn.
 apply bmatrix_coh_equiv_prop in Mp.
 unfold bmatrix_coh_prop in Mp.
 remember (bmat_depth Md) as len; clear Heqlen.
-revert Md Mp.
+revert T ro Md Mp.
 induction len; intros; [ easy | ].
 cbn in Mp; cbn.
 destruct Md as [x| M];  [ easy | cbn ].
@@ -2631,12 +2631,22 @@ destruct len. {
   }
   now specialize (Md _ (or_introl eq_refl) b (or_introl eq_refl)).
 }
+(*
 specialize (Md la) as H1.
 (* il faudrait plutôt que je fasse (Md (map (map opp) ll)) un truc
    comme ça, mais ça suppose ensuite d'avoir le fait que opp est
    involutif, prouvé après et supposant les propriétés du ring
    en hypothèse en plus ; pourquoi je n'en avais pas besoin avant,
    dans la version précédente de mon modèle ? *)
+*)
+cbn.
+destruct a as [| M]; [ easy | ].
+split. {
+  split. {
+    destruct M as (ll', r', c').
+    cbn.
+...
+specialize (IHlen
 ...
 intros.
 unfold bmatrix_coh.
