@@ -2656,149 +2656,7 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
   apply fold_left_fold_left_and_true.
   intros * Hi Hj.
   apply IHlen.
-Check fold_left_fold_left_and_true.
-...
-  now apply (proj1 (fold_left_fold_left_and_true _ _ _) Hp).
-}
-
-...
-intros.
-apply bmatrix_coh_equiv_prop.
-unfold bmatrix_coh_prop.
-rewrite bmat_depth_opp.
-destruct BM as (Md, Mp); cbn.
-apply bmatrix_coh_equiv_prop in Mp.
-unfold bmatrix_coh_prop in Mp.
-remember (bmat_depth Md) as len; clear Heqlen.
-revert T ro Md Mp.
-induction len; intros; [ easy | ].
-cbn in Mp; cbn.
-destruct Md as [x| M];  [ easy | cbn ].
-destruct Mp as ((Hr, Hc, Hrc), Md).
-split. {
-  split; cbn; [ now rewrite map_length | | easy ].
-  intros la Hla.
-  destruct M as (ll, r, c).
-  cbn in *.
-  clear - Hc Hla.
-  induction ll as [| lb]; [ easy | cbn ].
-  destruct Hla as [Hla| Hla]. 2: {
-    apply IHll; [ | easy ].
-    intros b Hb.
-    now apply Hc; right.
-  }
-  subst la.
-  rewrite map_length.
-  now apply Hc; left.
-}
-intros la Hla a Ha.
-destruct M as (ll, r, c).
-cbn in Hr, Hc, Hrc, Md, Hla.
-destruct len. {
-  cbn in Md; cbn.
-  destruct ll as [| lb]; [ easy | ].
-  cbn - [ In ] in Hla, Hr.
-  destruct Hla as [Hla| Hla]. {
-    subst la.
-    destruct lb as [| b]; [ easy | ].
-    eapply Md; [ now left | now left ].
-  }
-  destruct lb as [| b]. {
-    specialize (Hc _ (or_introl eq_refl)) as H1.
-    subst r c.
-    cbn in Hrc.
-    now specialize (proj2 Hrc eq_refl) as H1.
-  }
-  now specialize (Md _ (or_introl eq_refl) b (or_introl eq_refl)).
-}
-(*
-specialize (Md la) as H1.
-(* il faudrait plutôt que je fasse (Md (map (map opp) ll)) un truc
-   comme ça, mais ça suppose ensuite d'avoir le fait que opp est
-   involutif, prouvé après et supposant les propriétés du ring
-   en hypothèse en plus ; pourquoi je n'en avais pas besoin avant,
-   dans la version précédente de mon modèle ? *)
-*)
-cbn.
-destruct a as [| M]; [ easy | ].
-split. {
-  split. {
-    destruct M as (ll', r', c').
-    cbn.
-...
-specialize (IHlen
-...
-intros.
-unfold bmatrix_coh.
-destruct BM as (Md, Mp); cbn.
-unfold bmatrix_coh in Mp.
-rewrite bmat_depth_opp.
-remember (bmat_depth Md) as len; clear Heqlen.
-revert Md Mp.
-induction len; intros; [ easy | ].
-cbn in Mp; cbn.
-destruct Md as [x| BMM]; [ easy | ].
-cbn.
-apply Bool.andb_true_iff in Mp.
-destruct Mp as (Hn, Hp).
-apply Bool.andb_true_iff in Hn.
-destruct Hn as (Hr, Hrc).
-apply Bool.andb_true_iff in Hr.
-destruct Hr as (Hr, Hc).
-apply Bool.andb_true_iff.
-split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
-  apply Bool.andb_true_iff.
-  split; [ now rewrite map_length | ].
-  rewrite List_fold_left_map.
-  etransitivity. {
-    apply List_fold_left_ext_in.
-    intros BM b HBM.
-    now rewrite map_length.
-  }
-  easy.
-} {
-  destruct BMM as (ll, r, c).
-  cbn in Hr, Hc, Hrc, Hp |-*.
-  apply Nat.eqb_eq in Hr.
-...
-  etransitivity. {
-    apply List_fold_left_ext_in.
-    intros la b Hi.
-...
-apply List_fold_left_ext_in.
-intros a b' Hj.
-Check List_map_nth_in.
-...
-    apply in_seq in Hi; cbn in Hi; destruct Hi as (_, Hi).
-    rewrite <- Hr in Hi.
-    rewrite List_map_nth_in with (a := []); [ | easy ].
-    apply List_fold_left_ext_in.
-    intros j b' Hj.
-    apply in_seq in Hj; cbn in Hj; destruct Hj as (_, Hj).
-    rewrite List_map_nth_in with (a := void_bmat_def). 2: {
-      clear - Hc Hi Hj.
-      revert i j Hi Hj.
-      induction ll as [| l]; intros; [ easy | ].
-      cbn in Hc.
-      remember (length l =? c) as b eqn:Hb; symmetry in Hb.
-      destruct b. {
-        apply Nat.eqb_eq in Hb.
-        cbn in Hi; cbn.
-        destruct i; [ now rewrite <- Hb in Hj | ].
-        apply Nat.succ_lt_mono in Hi.
-        now apply IHll.
-      } {
-        exfalso; clear - Hc.
-        induction ll as [| l]; [ easy | cbn in Hc ].
-        now apply IHll.
-      }
-    }
-    easy.
-  }
-  apply fold_left_fold_left_and_true.
-  intros * Hi Hj.
-  apply IHlen.
-  now apply (proj1 (fold_left_fold_left_and_true _ _ _) Hp).
+  now apply (proj1 (fold_left_fold_left_and_true _ _) Hp la).
 }
 Qed.
 
@@ -2821,10 +2679,10 @@ Definition bmat_def_of_list_bmat T (ll : list (list (bmatrix T))) :
 Theorem bmat_coh_prop_of_list_bmat : ∀ T (ll : list (list (bmatrix T))),
   all_lists_same_length (list_list_ncols ll) ll = true
   → zero_together (list_list_nrows ll) (list_list_ncols ll) = true
-  → matrix_coh (bmat_def_of_list_bmat ll).
+  → matrix_coh (bmat_def_of_list_bmat ll) = true.
 Proof.
 intros * Hsl Hzt.
-unfold matrix_coh, matrix_is_norm.
+unfold matrix_coh.
 apply Bool.andb_true_iff.
 split; [ apply Bool.andb_true_iff; split | easy ]; [ | easy ].
 now apply Nat.eqb_eq.
@@ -2859,10 +2717,10 @@ now do 3 rewrite Nat.max_id.
 Qed.
 
 Theorem IZ_2_pow_coh_prop : ∀ T {ro : ring_op T} u n,
-  bmatrix_coh (IZ_2_pow_def u n).
+  bmatrix_coh (IZ_2_pow_def u n) = true.
 Proof.
 intros.
-unfold bmatrix_coh, bmatrix_is_norm.
+unfold bmatrix_coh.
 revert u.
 induction n; intros; [ easy | cbn ].
 do 2 rewrite bmat_depth_IZ_2_pow.
@@ -2907,7 +2765,7 @@ now do 3 rewrite Nat.max_id.
 Qed.
 
 Theorem bmatrix_is_norm_loop_IZ_2_pow : ∀ T {ro : ring_op T} len u n,
-  S n ≤ len → bmatrix_is_norm_loop len (IZ_2_pow_def u n) = true.
+  S n ≤ len → bmatrix_coh_loop len (IZ_2_pow_def u n) = true.
 Proof.
 intros * Hlen.
 revert u n Hlen.
@@ -2919,7 +2777,7 @@ Qed.
 
 Theorem bmatrix_is_norm_loop_opp_IZ_2_pow : ∀ T {ro : ring_op T} len u n,
   S n ≤ len
-  → bmatrix_is_norm_loop len (bmat_def_opp (IZ_2_pow_def u n)) = true.
+  → bmatrix_coh_loop len (bmat_def_opp (IZ_2_pow_def u n)) = true.
 Proof.
 intros * Hlen.
 revert u n Hlen.
@@ -2962,10 +2820,10 @@ Qed.
 Theorem A_coh_prop :
   ∀ T {ro : ring_op T} {rp : ring_prop T}
     {sp : @semiring_prop T (@rng_semiring T ro)},
-  ∀ n, bmatrix_coh (A_def n).
+  ∀ n, bmatrix_coh (A_def n) = true.
 Proof.
 intros.
-unfold bmatrix_coh, bmatrix_is_norm.
+unfold bmatrix_coh.
 rewrite bmat_depth_A.
 remember (S n) as len.
 assert (Hlen : S n ≤ len) by flia Heqlen; clear Heqlen.
@@ -3046,7 +2904,7 @@ Theorem length_list_list_add :
   → (∀ c, c ∈ (a :: la) :: lla → length c = S ca)
   → (∀ c, c ∈ (b :: lb) :: llb → length c = S ca)
   → (∀ rows, rows ∈ (b :: lb) :: llb →
-      ∀ bmd', bmd' ∈ rows → bmatrix_norm_prop_loop (bmat_depth b) bmd')
+      ∀ bmd', bmd' ∈ rows → bmatrix_coh_prop_loop (bmat_depth b) bmd')
   → length (list_list_add add lla llb) = ra.
 Proof.
 intros * Har Hbr Hac Hbc Hbrn.
@@ -3148,7 +3006,7 @@ Theorem fold_bmat_def_add : ∀ T add (BMA BMB : bmatrix_def T),
 Proof. easy. Qed.
 
 Theorem fold_bmatrix_norm_prop : ∀ T (BMD : bmatrix_def T),
-  bmatrix_norm_prop_loop (bmat_depth BMD) BMD = bmatrix_norm_prop BMD.
+  bmatrix_coh_prop_loop (bmat_depth BMD) BMD = bmatrix_coh_prop BMD.
 Proof. easy. Qed.
 
 Theorem bmat_depth_decr : ∀ T (M : matrix_def (bmatrix_def T)) la a,
@@ -3291,7 +3149,7 @@ Check bmatrix_coh_equiv_prop_loop.
 
 Theorem bmatrix_coh_equiv_prop_loop_enough_iter : ∀ T (bmd : bmatrix_def T) it,
   bmat_depth bmd ≤ it
-  → bmatrix_is_norm_loop (bmat_depth bmd) bmd = bmatrix_is_norm_loop it bmd.
+  → bmatrix_coh_loop (bmat_depth bmd) bmd = bmatrix_coh_loop it bmd.
 Proof.
 intros * Hit.
 revert it Hit.
@@ -3299,7 +3157,7 @@ induction bmd as [x| M IHBM] using bmatrix_ind; intros; [ now destruct it | ].
 destruct it; [ now apply Nat.le_0_r in Hit | ].
 cbn in Hit; cbn.
 apply Nat.succ_le_mono in Hit.
-remember (matrix_is_norm M) as b eqn:Hb.
+remember (matrix_coh M) as b eqn:Hb.
 symmetry in Hb.
 destruct b; [ cbn | easy ].
 ...
