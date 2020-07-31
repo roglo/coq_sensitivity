@@ -2619,11 +2619,28 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
     apply List_fold_left_ext_in.
     intros la b Hla.
     apply in_split in Hla.
-    destruct Hla as (l1 & l2 & Hla).
-    remember (length l1) as i eqn:Hil1.
+    destruct Hla as (ll1 & ll2 & Hla).
+    remember (length ll1) as i eqn:Hill1.
     assert (Hi : i < r). {
       subst i; rewrite <- Hr.
       apply (f_equal (@length _)) in Hla.
+      rewrite map_length in Hla.
+      rewrite Hla, app_length; cbn; flia.
+    }
+    assert (Hlai : la = nth i (ll1 ++ la :: ll2) []). {
+      now rewrite Hill1; clear; induction ll1.
+
+    }
+    apply List_fold_left_ext_in.
+    intros a b' Ha.
+    apply in_split in Ha.
+    destruct Ha as (l1 & l2 & Ha).
+    remember (length l1) as j eqn:Hjl1.
+    assert (Hj : j < c). {
+      subst j.
+......
+      subst j; rewrite <- Hr.
+      apply (f_equal (@length _)) in Ha.
       rewrite map_length in Hla.
       rewrite Hla, app_length; cbn; flia.
     }
@@ -2631,7 +2648,7 @@ split; [ apply Bool.andb_true_iff; cbn; split | ]; [ | easy | ]. {
       now rewrite Hil1; clear; induction l1.
 
     }
-    rewrite Hlai, <- Hla.
+    apply List_fold_left_ext_in.
 ...
     apply in_seq in Hi; cbn in Hi; destruct Hi as (_, Hi).
     rewrite <- Hr in Hi.
