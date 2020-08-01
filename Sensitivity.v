@@ -3138,6 +3138,8 @@ cbn - [ bmat_depth ] in Hita.
 revert add MDA MDB BMPA BMPB Hitn Hita.
 induction itn; intros; [ easy | ].
 cbn.
+apply Bool.andb_true_iff.
+split. {
 ...
 (* version trying to prove it with the prop version *)
 intros * Hita Hitn.
