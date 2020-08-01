@@ -3122,8 +3122,25 @@ Theorem bmat_coh_prop_add_gen : ∀ T add ita itn (BMA BMB : bmatrix T),
   → bmatrix_coh_prop_loop itn
        (bmat_def_add_loop add ita (bmat_def BMA) (bmat_def BMB)).
 Proof.
+(* version trying to prove it with the computed version *)
 intros * Hita Hitn.
+apply bmatrix_coh_equiv_prop_loop.
+revert add itn BMA BMB Hitn Hita.
+induction ita; intros; [ now destruct itn | ].
+cbn in Hitn; cbn.
+destruct BMA as (BMDA, BMPA).
+destruct BMB as (BMDB, BMPB).
+cbn in Hitn; cbn.
+destruct BMDA as [ta| MDA]; [ now destruct BMDB, itn | ].
+destruct BMDB as [tb| MDB]; [ now destruct itn | ].
+move MDB before MDA.
+cbn - [ bmat_depth ] in Hita.
+revert add MDA MDB BMPA BMPB Hitn Hita.
+induction itn; intros; [ easy | ].
+cbn.
 ...
+(* version trying to prove it with the prop version *)
+intros * Hita Hitn.
 revert add itn BMA BMB Hitn Hita.
 induction ita; intros; [ now destruct itn | ].
 cbn in Hitn; cbn.
