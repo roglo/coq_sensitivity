@@ -3140,6 +3140,12 @@ induction itn; intros; [ easy | ].
 cbn.
 apply Bool.andb_true_iff.
 split. {
+  specialize (@mat_coh_prop_add (bmatrix T)) as H1.
+...
+  cbn in BMPA.
+  apply Bool.andb_true_iff in BMPA.
+  destruct BMPA as (MPA, BMPA).
+  specialize (H1 _ (mk_mat MDA MPA)).
 ...
 (* version trying to prove it with the prop version *)
 intros * Hita Hitn.
