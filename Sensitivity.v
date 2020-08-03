@@ -3140,7 +3140,15 @@ induction itn; intros; [ easy | ].
 cbn.
 apply Bool.andb_true_iff.
 split. {
-  specialize (@mat_coh_prop_add (bmatrix T)) as H1.
+  specialize (@mat_coh_prop_add (bmatrix_def T)) as H1.
+  specialize (H1 (bmat_def_add add)).
+  cbn in BMPA, BMPB.
+  apply Bool.andb_true_iff in BMPA.
+  apply Bool.andb_true_iff in BMPB.
+  destruct BMPA as (MPA, BMPA).
+  destruct BMPB as (MPB, BMPB).
+  specialize (H1 (mk_mat MDA MPA) (mk_mat MDB MPB)).
+  cbn in H1.
 ...
   cbn in BMPA.
   apply Bool.andb_true_iff in BMPA.
