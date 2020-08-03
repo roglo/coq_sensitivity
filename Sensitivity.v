@@ -3156,6 +3156,11 @@ destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
 cbn; subst rb cb.
 apply Bool.andb_true_iff.
 split. {
+  apply matrix_coh_equiv_prop in H1.
+  destruct H1 as (Hr, Hc, Hrc).
+  cbn in Hr, Hc, Hrc.
+  apply matrix_coh_equiv_prop.
+  split; cbn; [ | | easy ]. {
 ...
 (* version trying to prove it with the prop version *)
 intros * Hita Hitn.
