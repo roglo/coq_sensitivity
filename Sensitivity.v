@@ -3140,6 +3140,7 @@ induction itn; intros; [ easy | ].
 cbn.
 apply Bool.andb_true_iff.
 split. {
+...
   specialize (@mat_coh_prop_add (bmatrix_def T)) as H1.
   specialize (H1 (bmat_def_add add)).
   cbn in BMPA, BMPB.
