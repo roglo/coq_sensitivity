@@ -3149,6 +3149,7 @@ unfold mat_def_add in H1.
 cbn - [ Nat.eq_dec ] in H1.
 destruct MDA as (lla, ra, ca).
 destruct MDB as (llb, rb, cb).
+move llb before lla.
 unfold mat_def_add.
 cbn - [ Nat.eq_dec ] in H1 |-*.
 destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
@@ -3163,6 +3164,32 @@ split. {
   split; cbn; [ | | easy ]. {
     cbn in Hita.
     apply Nat.succ_le_mono in Hita.
+    clear - Hita Hr.
+    revert ra llb Hr.
+    induction lla as [| la]; intros; [ easy | ].
+    destruct llb as [| lb]; [ easy | ].
+    cbn in Hr; cbn.
+    destruct ra; [ easy | ].
+    apply Nat.succ_inj in Hr.
+    apply eq_S.
+    apply IHlla; [ | easy ].
+    cbn in Hita.
+    clear - Hita.
+    etransitivity; [ | apply Hita ].
+    remember (fold_left max (map _ _) _) as k; clear.
+    remember 0 as j.
+    assert (Hjk : j ≤ k) by (subst j; flia).
+    clear - Hjk.
+    revert j k Hjk.
+    induction lla as [| la]; intros; [ easy | cbn ].
+    apply IHlla.
+    clear - Hjk.
+    revert j k Hjk.
+    induction la as [| a]; intros; [ easy | cbn ].
+    apply IHla.
+    now apply Nat.max_le_compat_r.
+  } {
+    intros la Hla.
 ...
 (* version trying to prove it with the prop version *)
 intros * Hita Hitn.
