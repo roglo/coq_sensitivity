@@ -3136,10 +3136,15 @@ destruct BMDB as [tb| MDB]; [ now destruct itn | ].
 move MDB before MDA.
 cbn - [ bmat_depth ] in Hita.
 revert add MDA MDB BMPA BMPB Hitn Hita.
-induction itn; intros; [ easy | ].
-cbn.
+induction itn; intros; [ easy | cbn ].
+destruct MDA as (lla, ra, ca).
+destruct MDB as (llb, rb, cb).
+unfold mat_def_add.
+cbn - [ Nat.eq_dec ].
+destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
+destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
+cbn; subst rb cb.
 apply Bool.andb_true_iff.
-split. {
 ...
   specialize (@mat_coh_prop_add (bmatrix_def T)) as H1.
   specialize (H1 (bmat_def_add add)).
