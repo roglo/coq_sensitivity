@@ -3202,6 +3202,16 @@ split. {
       left.
       cbn in Hita.
       clear - Hita Hla.
+Theorem glop : ∀ T (add : T → T → T) ita Ma Mb,
+  bmat_depth Ma ≤ ita
+  → bmat_def_add_loop add ita Ma Mb = bmat_def_add add Ma Mb.
+(* cf
+Theorem bmatrix_coh_prop_loop_enough_iter : ∀ T (bmd : bmatrix_def T) it,
+  bmat_depth bmd ≤ it
+  → bmatrix_coh_prop_loop (bmat_depth bmd) bmd
+  ↔ bmatrix_coh_prop_loop it bmd.
+*)
+(* oui, mais bon, faut vérifier d'abord que ce serait utile *)
 ...
 (* version trying to prove it with the prop version *)
 intros * Hita Hitn.
@@ -3576,6 +3586,7 @@ destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
   destruct la as [| a]; [ easy | now destruct lb ].
 ...
 *)
+
 
 Theorem bmat_coh_prop_add : ∀ T add (BMA BMB : bmatrix T),
   bmatrix_coh (bmat_def_add add (bmat_def BMA) (bmat_def BMB)) = true.
