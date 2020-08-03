@@ -3161,6 +3161,8 @@ split. {
   cbn in Hr, Hc, Hrc.
   apply matrix_coh_equiv_prop.
   split; cbn; [ | | easy ]. {
+    cbn in Hita.
+    apply Nat.succ_le_mono in Hita.
 ...
 (* version trying to prove it with the prop version *)
 intros * Hita Hitn.
