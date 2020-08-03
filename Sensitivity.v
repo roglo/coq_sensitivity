@@ -3190,6 +3190,18 @@ split. {
     now apply Nat.max_le_compat_r.
   } {
     intros la Hla.
+    apply Hc.
+    cbn in Hita.
+    apply Nat.succ_le_mono in Hita.
+    clear - Hita Hla.
+    revert la llb Hla.
+    induction lla as [| la1]; intros; [ easy | ].
+    destruct llb as [| lb]; [ easy | ].
+    cbn - [ In ] in Hla |-*.
+    destruct Hla as [Hla| Hla]. {
+      left.
+      cbn in Hita.
+      clear - Hita Hla.
 ...
 (* version trying to prove it with the prop version *)
 intros * Hita Hitn.
