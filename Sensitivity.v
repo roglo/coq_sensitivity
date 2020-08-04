@@ -3199,6 +3199,26 @@ f_equal. {
       symmetry.
       apply (IHMa (a :: la)); [ now left | now left | ].
       clear - Hd Hki.
+      destruct (le_dec (bmat_depth a) k) as [Hak| Hak]. {
+        now transitivity k.
+      }
+      apply Nat.nle_gt in Hak.
+      rewrite Nat.max_r in Hd; [ | now apply Nat.lt_le_incl ].
+...
+      clear - Hd.
+      remember (bmat_depth a) as k eqn:Hk; clear Hk.
+      induction la as [| a1]. {
+        cbn in Hd.
+        clear - Hd.
+        induction lla as [| la]; intros; [ easy | ].
+        cbn in Hd.
+        apply IHlla.
+        etransitivity; [ | apply Hd ].
+        clear.
+        revert k.
+        induction la as [| a]; intros; [ easy | cbn ].
+        destruct (le_dec k (bmat_depth a)) as [Hka| Hka]. {
+          rewrite Nat.max_r; [ | easy ].
 ... (* merde, faut réfléchir *)
       destruct (le_dec k (bmat_depth a)) as [Hka| Hka]. {
         rewrite Nat.max_r in Hd; [ | easy ].
