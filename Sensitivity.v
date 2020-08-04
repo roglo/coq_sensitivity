@@ -3116,6 +3116,21 @@ split; intros Hp. {
 }
 Qed.
 
+Theorem bmat_def_add_loop_enough_iter : ∀ T (add : T → T → T) ita Ma Mb,
+  bmat_depth Ma ≤ ita
+  → bmat_def_add_loop add ita Ma Mb = bmat_def_add add Ma Mb.
+Proof.
+intros * Hd.
+unfold bmat_def_add.
+revert ita Mb Hd.
+induction Ma as [xa| Ma IHMa] using bmatrix_ind; intros. {
+  now destruct Mb, ita.
+}
+destruct Mb as [xb| Mb]; [ now destruct ita | ].
+destruct ita; [ easy | cbn ].
+f_equal.
+...
+
 Theorem bmat_coh_prop_add_gen : ∀ T add ita itn (BMA BMB : bmatrix T),
   bmat_depth (bmat_def BMA) ≤ ita
   → bmat_depth (bmat_def_add_loop add ita (bmat_def BMA) (bmat_def BMB)) ≤ itn
@@ -3202,16 +3217,20 @@ split. {
       left.
       cbn in Hita.
       clear - Hita Hla.
-Theorem glop : ∀ T (add : T → T → T) ita Ma Mb,
-  bmat_depth Ma ≤ ita
-  → bmat_def_add_loop add ita Ma Mb = bmat_def_add add Ma Mb.
-(* cf
-Theorem bmatrix_coh_prop_loop_enough_iter : ∀ T (bmd : bmatrix_def T) it,
-  bmat_depth bmd ≤ it
-  → bmatrix_coh_prop_loop (bmat_depth bmd) bmd
-  ↔ bmatrix_coh_prop_loop it bmd.
-*)
-(* oui, mais bon, faut vérifier d'abord que ce serait utile *)
+      subst la.
+      revert lla lb Hita.
+      induction la1 as [| a]; intros; [ easy | ].
+      destruct lb as [| b]; [ easy | cbn ].
+      f_equal. {
+        symmetry.
+        apply bmat_def_add_loop_enough_iter.
+        cbn in Hita.
+        ...
+      }
+... suite ok
+      apply (IHla1 lla).
+      cbn in Hita.
+(* mouais, ça devrait le faire *)
 ...
 (* version trying to prove it with the prop version *)
 intros * Hita Hitn.
