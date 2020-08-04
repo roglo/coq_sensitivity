@@ -3204,6 +3204,19 @@ f_equal. {
       }
       apply Nat.nle_gt in Hak.
       rewrite Nat.max_r in Hd; [ | now apply Nat.lt_le_incl ].
+      remember (fold_left max (map (bmat_depth (T:=T)) la) (bmat_depth a)) as
+        x eqn:Hx.
+      assert (Hle : x ≤ ita). {
+        clear - Hd.
+        etransitivity; [ | apply Hd ].
+        clear Hd.
+        revert x.
+        induction lla; intros; [ easy | cbn ].
+        etransitivity; [ | apply IHlla ].
+        induction a; [ easy | cbn ].
+        destruct (le_dec x (bmat_depth a)) as [Hxa| Hxa]. {
+          rewrite Nat.max_r; [ | easy ].
+          etransitivity; [ apply IHlla | ].
 ...
       clear - Hd.
       remember (bmat_depth a) as k eqn:Hk; clear Hk.
