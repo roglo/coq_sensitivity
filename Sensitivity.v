@@ -3187,8 +3187,9 @@ induction lla as [| la]; intros; [ easy | ].
 cbn in Hd |-*.
 destruct llb as [| lb]; [ easy | ].
 f_equal. {
-  remember 0 as k eqn:Hk in Hd |-*; clear Hk.
-  revert k lb Hd.
+  remember 0 as k eqn:Hk in Hd |-*.
+  assert (Hki : k ≤ ita) by flia Hk; clear Hk.
+  revert k lb Hd Hki.
   induction la as [| a]; intros; [ easy | ].
   destruct lb as [| b]; [ easy | ].
   cbn in Hd |-*.
@@ -3197,9 +3198,30 @@ f_equal. {
     rewrite (IHMa (a :: la)); [ | now left | now left | ]. {
       symmetry.
       apply (IHMa (a :: la)); [ now left | now left | ].
+      clear - Hd Hki.
+... (* merde, faut réfléchir *)
+      destruct (le_dec k (bmat_depth a)) as [Hka| Hka]. {
+        rewrite Nat.max_r in Hd; [ | easy ].
+        clear - Hd Hki.
+        revert a la ita k Hd Hki.
+        induction lla as [| la1]; intros. {
+          cbn in Hd.
+          clear - Hd.
+          revert a ita Hd.
+          induction la as [| a1]; intros; [ easy | ].
+          cbn in Hd.
+          apply IHla.
+          destruct (le_dec (bmat_depth a) (bmat_depth a1)) as [Haa| Haa]. {
+            rewrite Nat.max_r in Hd; [ | easy ].
+            clear - Hd Haa.
+            induction la as [| a2]; cbn. {
+              cbn in Hd.
+              now transitivity (bmat_depth a1).
+            }
+            cbn in Hd.
 ...
     }
-    admit.
+...
   }
   apply IHla. {
     intros la1 Hla1 a1 Ha1 ita1 Mb Hita1.
