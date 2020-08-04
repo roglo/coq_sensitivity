@@ -3120,6 +3120,7 @@ Theorem bmat_def_add_loop_enough_iter : ∀ T (add : T → T → T) ita Ma Mb,
   bmat_depth Ma ≤ ita
   → bmat_def_add_loop add ita Ma Mb = bmat_def_add add Ma Mb.
 Proof.
+(*
 intros * Hd.
 unfold bmat_def_add.
 revert Ma Mb Hd.
@@ -3151,7 +3152,16 @@ f_equal. {
   cbn in Hd |-*.
   f_equal. {
     rewrite IHita.
+  ============================
+  bmat_def_add_loop add (bmat_depth a) a b =
+  bmat_def_add_loop add
+    (fold_left (λ (m : nat) (la0 : list nat), fold_left max la0 m) (map (map (bmat_depth (T:=T))) lla)
+       (fold_left max (map (bmat_depth (T:=T)) la) (bmat_depth a))) a b
+
+subgoal 2 (ID 2642) is:
+ bmat_depth a ≤ ita
 ...
+*)
 intros * Hd.
 unfold bmat_def_add.
 revert ita Mb Hd.
@@ -3163,6 +3173,36 @@ destruct ita; [ easy | cbn ].
 cbn in Hd.
 apply Nat.succ_le_mono in Hd.
 f_equal.
+destruct Ma as (lla, ra, ca).
+cbn in IHMa, Hd |-*.
+destruct Mb as (llb, rb, cb).
+unfold mat_def_add.
+cbn - [ Nat.eq_dec ].
+destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
+destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
+subst rb cb.
+f_equal; clear ra ca.
+revert llb ita Hd.
+induction lla as [| la]; intros; [ easy | ].
+cbn in Hd |-*.
+destruct llb as [| lb]; [ easy | ].
+f_equal. {
+  remember 0 as k eqn:Hk in Hd |-*; clear Hk.
+  revert k lb Hd.
+  induction la as [| a]; intros; [ easy | ].
+  destruct lb as [| b]; [ easy | ].
+  cbn in Hd |-*.
+  f_equal. {
+    symmetry.
+    rewrite (IHMa (a :: la)); [ | now left | now left | ]. {
+      symmetry.
+      apply (IHMa (a :: la)); [ now left | now left | ].
+...
+    }
+    admit.
+  }
+  apply IHla. {
+    intros la1 Hla1 a1 Ha1 ita1 Mb Hita1.
 ...
   IHita : ∀ Ma Mb : bmatrix_def T,
             bmat_depth Ma ≤ ita → bmat_def_add_loop add ita Ma Mb = bmat_def_add_loop add (bmat_depth Ma) Ma Mb
