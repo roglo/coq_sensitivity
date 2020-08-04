@@ -3122,13 +3122,58 @@ Theorem bmat_def_add_loop_enough_iter : ∀ T (add : T → T → T) ita Ma Mb,
 Proof.
 intros * Hd.
 unfold bmat_def_add.
+revert Ma Mb Hd.
+induction ita; intros; cbn. {
+  apply Nat.le_0_r in Hd.
+  now rewrite Hd.
+}
+destruct Ma as [xa| Ma]; [ now destruct Mb | ].
+destruct Mb as [xb| Mb]; [ easy | cbn ].
+cbn in Hd.
+apply Nat.succ_le_mono in Hd.
+f_equal.
+destruct Ma as (lla, ra, ca).
+cbn in Hd |-*.
+destruct Mb as (llb, rb, cb).
+unfold mat_def_add.
+cbn - [ Nat.eq_dec ].
+destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
+destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
+subst rb cb.
+f_equal; clear ra ca.
+revert llb.
+induction lla as [| la]; intros; [ easy | ].
+cbn in Hd |-*.
+destruct llb as [| lb]; [ easy | ].
+f_equal. {
+  destruct la as [| a]; [ easy | ].
+  destruct lb as [| b]; [ easy | ].
+  cbn in Hd |-*.
+  f_equal. {
+    rewrite IHita.
+...
+intros * Hd.
+unfold bmat_def_add.
 revert ita Mb Hd.
 induction Ma as [xa| Ma IHMa] using bmatrix_ind; intros. {
   now destruct Mb, ita.
 }
 destruct Mb as [xb| Mb]; [ now destruct ita | ].
 destruct ita; [ easy | cbn ].
+cbn in Hd.
+apply Nat.succ_le_mono in Hd.
 f_equal.
+...
+  IHita : ∀ Ma Mb : bmatrix_def T,
+            bmat_depth Ma ≤ ita → bmat_def_add_loop add ita Ma Mb = bmat_def_add_loop add (bmat_depth Ma) Ma Mb
+vs
+  IHMa : ∀ la : list (bmatrix_def T),
+           la ∈ mat_list Ma
+           → ∀ a : bmatrix_def T,
+               a ∈ la
+               → ∀ (ita : nat) (Mb : bmatrix_def T),
+                   bmat_depth a ≤ ita → bmat_def_add_loop add ita a Mb = bmat_def_add_loop add (bmat_depth a) a Mb
+
 ...
 
 Theorem bmat_coh_prop_add_gen : ∀ T add ita itn (BMA BMB : bmatrix T),
