@@ -3116,6 +3116,17 @@ split; intros Hp. {
 }
 Qed.
 
+Theorem list_add_add_compat : ∀ T (add1 add2 : T → T → T),
+  (∀ la lb, add1 la lb = add2 la lb)
+  → ∀ la lb, list_add add1 la lb = list_add add2 la lb.
+Proof.
+intros * Hadd *.
+revert lb.
+induction la as [| a]; intros; [ easy | cbn ].
+destruct lb as [| b]; [ easy | cbn ].
+now rewrite Hadd, IHla.
+Qed.
+
 Theorem bmat_def_add_loop_enough_iter : ∀ T (add : T → T → T) ita Ma Mb,
   bmat_depth Ma ≤ ita
   → bmat_def_add_loop add ita Ma Mb = bmat_def_add add Ma Mb.
@@ -3191,10 +3202,16 @@ f_equal. {
     transitivity k; [ easy | ].
     apply Nat.le_max_l.
   }
-  rewrite IHla.
+  rewrite IHla. {
+    apply list_add_add_compat.
+    intros Ma Mb.
 ...
-  apply IHla. {
-    intros la1 Hla1 a1 Ha1 ita1 Mb Hita1.
+Theorem bmat_def_add_loop_enough_iter : ∀ T (add : T → T → T) ita Ma Mb,
+  bmat_depth Ma ≤ ita
+  → bmat_def_add_loop add ita Ma Mb = bmat_def_add add Ma Mb.
+...
+rewrite bmat_def_add_loop_enough_iter.
+rewrite bmat_def_add_loop_enough_iter.
 ...
 
 Theorem bmat_coh_prop_add_gen : ∀ T add ita itn (BMA BMB : bmatrix T),
