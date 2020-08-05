@@ -3209,6 +3209,27 @@ f_equal. {
       rewrite Nat.max_r in Hd; [ | now apply Nat.lt_le_incl ].
       clear k Hki Hak.
 *)
+      induction lla as [| la1]. {
+        cbn in Hd.
+        remember (bmat_depth a) as k; clear a Heqk.
+        revert k Hd.
+        induction la as [| a1]; intros; [ easy | ].
+        cbn in Hd.
+        apply IHla.
+        destruct (le_dec k (bmat_depth a1)) as [Hka| Hka]. {
+          rewrite Nat.max_r in Hd; [ | easy ].
+...
+          etransitivity; [ | apply Hd ].
+          clear - Hka.
+          revert k Hka.
+          induction la as [| a2]; intros; [ easy | cbn ].
+          etransitivity; [ apply IHla | ]. {
+...
+            etransitivity; [ | apply Hka ].
+Search (max _ _ ≤ _).
+apply Nat.max_lub_iff.
+            apply Nat.max_le_compat_l.
+
 ...
       remember (fold_left max (map (bmat_depth (T:=T)) la) (bmat_depth a)) as
         x eqn:Hx.
