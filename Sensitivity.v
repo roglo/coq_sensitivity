@@ -3198,88 +3198,27 @@ f_equal. {
       apply (IHMa (a :: la)); [ now left | now left | ].
       clear - Hd.
       remember (bmat_depth a) as k; clear a Heqk.
-      revert k Hd.
+      remember (fold_left max (map (bmat_depth (T:=T)) la) k) as x eqn:Hx.
+      assert (Hki : k ≤ x). {
+        subst x; clear; revert k.
+        induction la as [| a]; intros; [ easy | cbn ].
+        etransitivity; [ | apply IHla ].
+        apply Nat.le_max_l.
+      }
+      clear Hx.
+      revert x k Hd Hki.
       induction lla as [| la1]; intros. {
         cbn in Hd.
-        revert k Hd.
-        induction la as [| a1]; intros; [ easy | ].
-        cbn in Hd.
-        destruct (le_dec k (bmat_depth a1)) as [Hka| Hka]. {
-          rewrite Nat.max_r in Hd; [ | easy ].
-          etransitivity; [ apply Hka | ].
-          now apply IHla.
-        }
-        apply Nat.nle_gt, Nat.lt_le_incl in Hka.
-        rewrite Nat.max_l in Hd; [ | easy ].
-        now apply IHla.
+        now transitivity x.
       }
       cbn in Hd.
-...
-      apply IHlla.
-...
-        apply IHla.
-...
-          etransitivity; [ | apply Hd ].
-          clear - Hka.
-          revert k Hka.
-          induction la as [| a2]; intros; [ easy | cbn ].
-          etransitivity; [ apply IHla | ]. {
-...
-            etransitivity; [ | apply Hka ].
-Search (max _ _ ≤ _).
-apply Nat.max_lub_iff.
-            apply Nat.max_le_compat_l.
-
-...
-      remember (fold_left max (map (bmat_depth (T:=T)) la) (bmat_depth a)) as
-        x eqn:Hx.
-      assert (Hle : x ≤ ita). {
-        clear - Hd.
-        etransitivity; [ | apply Hd ].
-        clear Hd.
-        revert x.
-        induction lla; intros; [ easy | cbn ].
-        etransitivity; [ | apply IHlla ].
-        induction a; [ easy | cbn ].
-        destruct (le_dec x (bmat_depth a)) as [Hxa| Hxa]. {
-          rewrite Nat.max_r; [ | easy ].
-          etransitivity; [ apply IHlla | ].
-...
-      clear - Hd.
-      remember (bmat_depth a) as k eqn:Hk; clear Hk.
-      induction la as [| a1]. {
-        cbn in Hd.
-        clear - Hd.
-        induction lla as [| la]; intros; [ easy | ].
-        cbn in Hd.
-        apply IHlla.
-        etransitivity; [ | apply Hd ].
-        clear.
-        revert k.
-        induction la as [| a]; intros; [ easy | cbn ].
-        destruct (le_dec k (bmat_depth a)) as [Hka| Hka]. {
-          rewrite Nat.max_r; [ | easy ].
-... (* merde, faut réfléchir *)
-      destruct (le_dec k (bmat_depth a)) as [Hka| Hka]. {
-        rewrite Nat.max_r in Hd; [ | easy ].
-        clear - Hd Hki.
-        revert a la ita k Hd Hki.
-        induction lla as [| la1]; intros. {
-          cbn in Hd.
-          clear - Hd.
-          revert a ita Hd.
-          induction la as [| a1]; intros; [ easy | ].
-          cbn in Hd.
-          apply IHla.
-          destruct (le_dec (bmat_depth a) (bmat_depth a1)) as [Haa| Haa]. {
-            rewrite Nat.max_r in Hd; [ | easy ].
-            clear - Hd Haa.
-            induction la as [| a2]; cbn. {
-              cbn in Hd.
-              now transitivity (bmat_depth a1).
-            }
-            cbn in Hd.
-...
+      eapply IHlla; [ apply Hd | ].
+      clear - Hki.
+      revert x Hki.
+      induction la1 as [| a la]; intros; [ easy | cbn ].
+      apply IHla.
+      transitivity x; [ easy | ].
+      apply Max.le_max_l.
     }
 ...
   }
