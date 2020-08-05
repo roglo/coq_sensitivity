@@ -3149,8 +3149,20 @@ f_equal. {
   induction la as [| a]; intros; [ easy | ].
   destruct lb as [| b]; [ easy | ].
   cbn in Hd |-*.
+  remember (fold_left max (map (bmat_depth (T:=T)) la) (bmat_depth a)) as k
+    eqn:Hk.
+  assert (Hki : bmat_depth a ≤ k). {
+    subst k; clear.
+    remember (bmat_depth a) as k; clear Heqk.
+    revert k.
+    induction la as [| a1]; intros; [ easy | cbn ].
+    etransitivity; [ | apply IHla ].
+    apply Nat.le_max_l.
+  }
+  clear Hk.
   f_equal. {
     symmetry.
+(*
     remember (fold_left max (map (bmat_depth (T:=T)) la) (bmat_depth a)) as k
       eqn:Hk.
     assert (Hki : bmat_depth a ≤ k). {
@@ -3162,6 +3174,7 @@ f_equal. {
       apply Nat.le_max_l.
     }
     clear Hk.
+*)
     rewrite (IHMa (a :: la)); [ | now left | now left | ]. {
       symmetry.
       apply (IHMa (a :: la)); [ now left | now left | ].
@@ -3191,6 +3204,7 @@ f_equal. {
     transitivity k; [ easy | ].
     apply Nat.le_max_l.
   }
+  rewrite IHla.
 ...
   apply IHla. {
     intros la1 Hla1 a1 Ha1 ita1 Mb Hita1.
