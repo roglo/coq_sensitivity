@@ -3116,15 +3116,21 @@ split; intros Hp. {
 }
 Qed.
 
-Theorem list_add_add_compat : ∀ T (add1 add2 : T → T → T),
-  (∀ la lb, add1 la lb = add2 la lb)
-  → ∀ la lb, list_add add1 la lb = list_add add2 la lb.
+Theorem list_add_add_compat_iff : ∀ T (add1 add2 : T → T → T),
+  (∀ a b, add1 a b = add2 a b)
+  ↔ ∀ la lb, list_add add1 la lb = list_add add2 la lb.
 Proof.
-intros * Hadd *.
-revert lb.
-induction la as [| a]; intros; [ easy | cbn ].
-destruct lb as [| b]; [ easy | cbn ].
-now rewrite Hadd, IHla.
+intros.
+split; intros Hadd *. {
+  revert lb.
+  induction la as [| a]; intros; [ easy | cbn ].
+  destruct lb as [| b]; [ easy | cbn ].
+  now rewrite Hadd, IHla.
+} {
+  specialize (Hadd [a] [b]) as H1.
+  cbn in H1.
+  now injection H1.
+}
 Qed.
 
 Theorem bmat_def_add_loop_enough_iter : ∀ T (add : T → T → T) ita Ma Mb,
@@ -3163,7 +3169,7 @@ f_equal. {
   f_equal. {
     symmetry.
     remember (fold_left max (map (bmat_depth (T:=T)) la) (bmat_depth a)) as k
-                                                                              eqn:Hk.
+      eqn:Hk.
     assert (Hki : bmat_depth a ≤ k). {
       subst k; clear.
       remember (bmat_depth a) as k; clear Heqk.
@@ -3172,7 +3178,6 @@ f_equal. {
       etransitivity; [ | apply IHla ].
       apply Nat.le_max_l.
     }
-    clear Hk.
     rewrite (IHMa (a :: la)); [ | now left | now left | ]. {
       symmetry.
       apply (IHMa (a :: la)); [ now left | now left | ].
@@ -3202,7 +3207,14 @@ f_equal. {
     transitivity k; [ easy | ].
     apply Nat.le_max_l.
   }
-  apply list_add_add_compat.
+rewrite IHla. {
+  apply -> list_add_add_compat_iff.
+  intros Ma Mb.
+  remember (fold_left _ _ _) as ita' eqn:Hita' in Hd.
+  rewrite <- Hita'.
+(* il manque une information, là *)
+...
+  apply -> list_add_add_compat_iff.
   intros Ma Mb.
   remember (fold_left _ _ _) as ita' eqn:Hita' in Hd.
   rewrite <- Hita'.
@@ -3210,8 +3222,12 @@ Theorem bmat_def_add_loop_enough_iter : ∀ T (add : T → T → T) ita Ma Mb,
   bmat_depth Ma ≤ ita
   → bmat_def_add_loop add ita Ma Mb = bmat_def_add add Ma Mb.
 ...
-rewrite bmat_def_add_loop_enough_iter.
-rewrite bmat_def_add_loop_enough_iter.
+assert (H : bmat_depth Ma ≤ ita'). {
+  rewrite Hita'.
+...
+}
+rewrite bmat_def_add_loop_enough_iter; [ | transitivity ita' ]; [ | | easy ].
+rewrite bmat_def_add_loop_enough_iter; [ easy | ].
 ...
 
 Theorem bmat_coh_prop_add_gen : ∀ T add ita itn (BMA BMB : bmatrix T),
