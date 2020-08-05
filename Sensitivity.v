@@ -3187,11 +3187,7 @@ induction lla as [| la]; intros; [ easy | ].
 cbn in Hd |-*.
 destruct llb as [| lb]; [ easy | ].
 f_equal. {
-(*
-  remember 0 as k eqn:Hk in Hd |-*.
-  assert (Hki : k ≤ ita) by flia Hk; clear Hk.
-*)
-  revert (*k*) lb Hd (*Hki*).
+  revert lb Hd.
   induction la as [| a]; intros; [ easy | ].
   destruct lb as [| b]; [ easy | ].
   cbn in Hd |-*.
@@ -3200,24 +3196,24 @@ f_equal. {
     rewrite (IHMa (a :: la)); [ | now left | now left | ]. {
       symmetry.
       apply (IHMa (a :: la)); [ now left | now left | ].
-      clear - Hd (*Hki*).
-(*
-      destruct (le_dec (bmat_depth a) k) as [Hak| Hak]. {
-        now transitivity k.
-      }
-      apply Nat.nle_gt in Hak.
-      rewrite Nat.max_r in Hd; [ | now apply Nat.lt_le_incl ].
-      clear k Hki Hak.
-*)
+      clear - Hd.
       induction lla as [| la1]. {
         cbn in Hd.
         remember (bmat_depth a) as k; clear a Heqk.
         revert k Hd.
         induction la as [| a1]; intros; [ easy | ].
         cbn in Hd.
-        apply IHla.
         destruct (le_dec k (bmat_depth a1)) as [Hka| Hka]. {
           rewrite Nat.max_r in Hd; [ | easy ].
+          etransitivity; [ apply Hka | ].
+          now apply IHla.
+        }
+        apply Nat.nle_gt, Nat.lt_le_incl in Hka.
+        rewrite Nat.max_l in Hd; [ | easy ].
+        now apply IHla.
+      }
+...
+        apply IHla.
 ...
           etransitivity; [ | apply Hd ].
           clear - Hka.
