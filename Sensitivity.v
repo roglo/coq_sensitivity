@@ -3204,6 +3204,7 @@ f_equal. {
       }
       apply Nat.nle_gt in Hak.
       rewrite Nat.max_r in Hd; [ | now apply Nat.lt_le_incl ].
+...
       remember (fold_left max (map (bmat_depth (T:=T)) la) (bmat_depth a)) as
         x eqn:Hx.
       assert (Hle : x ≤ ita). {
