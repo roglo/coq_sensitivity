@@ -3197,9 +3197,10 @@ f_equal. {
       symmetry.
       apply (IHMa (a :: la)); [ now left | now left | ].
       clear - Hd.
-      induction lla as [| la1]. {
+      remember (bmat_depth a) as k; clear a Heqk.
+      revert k Hd.
+      induction lla as [| la1]; intros. {
         cbn in Hd.
-        remember (bmat_depth a) as k; clear a Heqk.
         revert k Hd.
         induction la as [| a1]; intros; [ easy | ].
         cbn in Hd.
@@ -3212,6 +3213,9 @@ f_equal. {
         rewrite Nat.max_l in Hd; [ | easy ].
         now apply IHla.
       }
+      cbn in Hd.
+...
+      apply IHlla.
 ...
         apply IHla.
 ...
