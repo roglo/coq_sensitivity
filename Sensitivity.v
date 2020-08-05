@@ -3193,20 +3193,22 @@ f_equal. {
   cbn in Hd |-*.
   f_equal. {
     symmetry.
+    remember (fold_left max (map (bmat_depth (T:=T)) la) (bmat_depth a)) as x
+      eqn:Hx.
+    assert (Hki : bmat_depth a ≤ x). {
+      subst x; clear.
+      remember (bmat_depth a) as k; clear Heqk.
+      revert k.
+      induction la as [| a1]; intros; [ easy | cbn ].
+      etransitivity; [ | apply IHla ].
+      apply Nat.le_max_l.
+    }
+    clear Hx.
     rewrite (IHMa (a :: la)); [ | now left | now left | ]. {
       symmetry.
       apply (IHMa (a :: la)); [ now left | now left | ].
-      clear - Hd.
-      remember (bmat_depth a) as k; clear a Heqk.
-      remember (fold_left max (map (bmat_depth (T:=T)) la) k) as x eqn:Hx.
-      assert (Hki : k ≤ x). {
-        subst x; clear; revert k.
-        induction la as [| a]; intros; [ easy | cbn ].
-        etransitivity; [ | apply IHla ].
-        apply Nat.le_max_l.
-      }
-      clear Hx.
-      revert x k Hd Hki.
+      clear - Hd Hki.
+      revert x Hd Hki.
       induction lla as [| la1]; intros. {
         cbn in Hd.
         now transitivity x.
@@ -3215,11 +3217,12 @@ f_equal. {
       eapply IHlla; [ apply Hd | ].
       clear - Hki.
       revert x Hki.
-      induction la1 as [| a la]; intros; [ easy | cbn ].
-      apply IHla.
+      induction la1 as [| a1]; intros; [ easy | cbn ].
+      apply IHla1.
       transitivity x; [ easy | ].
       apply Max.le_max_l.
     }
+    clear - Hki.
 ...
   }
   apply IHla. {
