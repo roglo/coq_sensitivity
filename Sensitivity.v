@@ -3160,33 +3160,16 @@ apply IHnl.
 now apply Nat.max_le_compat_r.
 Qed.
 
-Theorem fold_left_fold_left_max_le : ∀ nll nl a b,
+Theorem fold_left_fold_left_max_le : ∀ nll a b,
   a ≤ b
-  → fold_left (λ m nl, fold_left max nl m) nll (fold_left max nl a) ≤
-     fold_left (λ m nl, fold_left max nl m) nll (fold_left max nl b).
+  → fold_left (λ m nl, fold_left max nl m) nll a ≤
+     fold_left (λ m nl, fold_left max nl m) nll b.
 Proof.
 intros * Hab.
-revert nl a b Hab.
-induction nll as [| nl1]; intros. {
-  destruct nl as [| n]; [ easy | cbn ].
-  destruct (le_dec b n) as [Hbn| Hbn]. {
-    rewrite (Nat.max_r b); [ | easy ].
-    rewrite (Nat.max_r a); [ easy | ].
-    now transitivity b.
-  }
-  apply Nat.nle_gt, Nat.lt_le_incl in Hbn.
-  rewrite (Nat.max_l b); [ | easy ].
-  destruct (le_dec a n) as [Han| Han]. {
-    rewrite Nat.max_r; [ | easy ].
-    now apply fold_left_max_le.
-  }
-  apply Nat.nle_gt, Nat.lt_le_incl in Han.
-  rewrite (Nat.max_l a); [ | easy ].
-  now apply fold_left_max_le.
-}
-cbn.
-do 2 rewrite <- fold_left_app.
-now apply IHnll.
+revert a b Hab.
+induction nll as [| nl]; intros; [ easy | cbn ].
+apply IHnll.
+now apply fold_left_max_le.
 Qed.
 
 Theorem fold_left_max_swap : ∀ nl m n,
@@ -3347,6 +3330,7 @@ f_equal. {
       etransitivity; [ apply IHlla, Hma | ].
       rewrite fold_left_fold_left_max_swap.
       apply fold_left_fold_left_max_le.
+      apply fold_left_max_le.
       apply Nat.le_0_l.
     }
     rewrite (IHMa (a :: la)); [ | now left | now right | ]. {
@@ -3354,6 +3338,7 @@ f_equal. {
       rewrite (IHMa (a :: la)); [ easy | now left | now right | ].
       etransitivity; [ apply Hdle | ].
       apply fold_left_fold_left_max_le.
+      apply fold_left_max_le.
       apply Nat.le_0_l.
     }
     apply Hdle.
@@ -3367,6 +3352,7 @@ f_equal. {
   }
   etransitivity; [ | apply Hd ].
   apply fold_left_fold_left_max_le.
+  apply fold_left_max_le.
   apply Nat.le_0_l.
 }
 rewrite IHlla. {
@@ -3383,7 +3369,10 @@ rewrite IHlla. {
   intros la1 Hlla a Ha it1 Mb Hit1.
   apply (IHMa la1); [ now right | easy | easy ].
 }
-...
+etransitivity; [ | apply Hd ].
+apply fold_left_fold_left_max_le.
+apply Nat.le_0_l.
+Qed.
 
 Theorem bmat_coh_prop_add_gen : ∀ T add ita itn (BMA BMB : bmatrix T),
   bmat_depth (bmat_def BMA) ≤ ita
@@ -3472,7 +3461,6 @@ split. {
       destruct lb as [| b]; [ easy | cbn ].
       f_equal. {
         symmetry.
-...
         apply bmat_def_add_loop_enough_iter.
         cbn in Hita.
         ...
