@@ -3317,6 +3317,7 @@ f_equal. {
   apply fold_left_fold_left_max_le.
   apply Nat.le_0_l.
 }
+rewrite IHlla.
 ...
 
 Theorem bmat_coh_prop_add_gen : ∀ T add ita itn (BMA BMB : bmatrix T),
