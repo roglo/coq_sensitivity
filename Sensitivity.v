@@ -3380,21 +3380,9 @@ rewrite IHlla. {
     now apply (bmat_depth_le_fold_left _ la1).
   }
 } {
-(*
-  ============================
-  ∀ la0 : list (bmatrix_def T),
-    la0 ∈ lla
-    → ∀ a : bmatrix_def T,
-        a ∈ la0
-        → ∀ (it0 : nat) (Mb : bmatrix_def T),
-            bmat_depth a ≤ it0 → bmat_def_add_loop add it0 a Mb = bmat_def_add_loop add (bmat_depth a) a Mb
-*)
-...
+  intros la1 Hlla a Ha it1 Mb Hit1.
+  apply (IHMa la1); [ now right | easy | easy ].
 }
-(*
-  ============================
-  fold_left (λ (m : nat) (la0 : list nat), fold_left max la0 m) (map (map (bmat_depth (T:=T))) lla) 0 ≤ it
-*)
 ...
 
 Theorem bmat_coh_prop_add_gen : ∀ T add ita itn (BMA BMB : bmatrix T),
@@ -3403,7 +3391,6 @@ Theorem bmat_coh_prop_add_gen : ∀ T add ita itn (BMA BMB : bmatrix T),
   → bmatrix_coh_prop_loop itn
        (bmat_def_add_loop add ita (bmat_def BMA) (bmat_def BMB)).
 Proof.
-(* version trying to prove it with the computed version *)
 intros * Hita Hitn.
 apply bmatrix_coh_equiv_prop_loop.
 revert add itn BMA BMB Hitn Hita.
@@ -3464,13 +3451,7 @@ split. {
     revert j k Hjk.
     induction lla as [| la]; intros; [ easy | cbn ].
     apply IHlla.
-    clear - Hjk.
-    revert j k Hjk.
-    induction la as [| a]; intros; [ easy | cbn ].
-    apply IHla.
-(* voir fold_left_max_le *)
-...
-    now apply Nat.max_le_compat_r.
+    now eapply fold_left_max_le.
   } {
     intros la Hla.
     apply Hc.
@@ -3491,6 +3472,7 @@ split. {
       destruct lb as [| b]; [ easy | cbn ].
       f_equal. {
         symmetry.
+...
         apply bmat_def_add_loop_enough_iter.
         cbn in Hita.
         ...
@@ -3873,7 +3855,6 @@ destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
   destruct la as [| a]; [ easy | now destruct lb ].
 ...
 *)
-
 
 Theorem bmat_coh_prop_add : ∀ T add (BMA BMB : bmatrix T),
   bmatrix_coh (bmat_def_add add (bmat_def BMA) (bmat_def BMB)) = true.
