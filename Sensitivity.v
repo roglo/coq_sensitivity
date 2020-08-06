@@ -3463,9 +3463,28 @@ split. {
         symmetry.
         apply bmat_def_add_loop_enough_iter.
         cbn in Hita.
-        ...
+        etransitivity; [ | apply Hita ].
+        clear.
+        rename la1 into la.
+        remember (bmat_depth a) as k; clear.
+        revert k la.
+        induction lla as [| la1]; intros. {
+          cbn; revert k.
+          induction la as [| a]; intros; [ easy | cbn ].
+          etransitivity; [ apply IHla | ].
+          apply fold_left_max_le.
+          apply Nat.le_max_l.
+        }
+        cbn.
+        etransitivity; [ apply IHlla with (la := la1) | ].
+        apply fold_left_fold_left_max_le.
+        apply fold_left_max_le.
+        clear; revert k.
+        induction la as [| a]; intros; [ easy | cbn ].
+        etransitivity; [ apply IHla | ].
+        apply fold_left_max_le.
+        apply Nat.le_max_l.
       }
-... suite ok
       apply (IHla1 lla).
       cbn in Hita.
 (* mouais, ça devrait le faire *)
