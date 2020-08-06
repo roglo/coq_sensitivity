@@ -3130,11 +3130,49 @@ intros a' b' Ha' Hb'.
 now apply Hadd; right.
 Qed.
 
-Theorem fold_left_fold_left_max_le : ∀ nll nl k,
-  fold_left (λ m nl, fold_left max nl m) nll (fold_left max nl 0) ≤
-  fold_left (λ m nl, fold_left max nl m) nll (fold_left max nl k).
+Theorem fold_left_max_le : ∀ nl n k,
+  n ≤ k
+  → fold_left max nl n ≤ fold_left max nl k.
 Proof.
-intros.
+intros * Hkn.
+revert n k Hkn.
+induction nl as [| n1]; intros; [ easy | cbn ].
+apply IHnl.
+now apply Nat.max_le_compat_r.
+Qed.
+
+Theorem fold_left_fold_left_max_le : ∀ nll nl a b,
+  a ≤ b
+  → fold_left (λ m nl, fold_left max nl m) nll (fold_left max nl a) ≤
+     fold_left (λ m nl, fold_left max nl m) nll (fold_left max nl b).
+Proof.
+intros * Hab.
+revert nl a b Hab.
+induction nll as [| nl1]; intros. {
+  destruct nl as [| n]; [ easy | cbn ].
+  destruct (le_dec b n) as [Hbn| Hbn]. {
+    rewrite (Nat.max_r b); [ | easy ].
+    rewrite (Nat.max_r a); [ easy | ].
+    now transitivity b.
+  }
+  apply Nat.nle_gt, Nat.lt_le_incl in Hbn.
+  rewrite (Nat.max_l b); [ | easy ].
+  destruct (le_dec a n) as [Han| Han]. {
+    rewrite Nat.max_r; [ | easy ].
+    now apply fold_left_max_le.
+  }
+  apply Nat.nle_gt, Nat.lt_le_incl in Han.
+  rewrite (Nat.max_l a); [ | easy ].
+  now apply fold_left_max_le.
+}
+cbn.
+do 2 rewrite <- fold_left_app.
+now apply IHnll.
+Qed.
+
+Theorem fold_left_fold_left_max_swap : ∀ nl1 nl2 m,
+  fold_left max nl1 (fold_left max nl2 m) =
+  fold_left max nl2 (fold_left max nl1 m).
 ...
 
 Theorem bmat_def_add_loop_enough_iter : ∀ T (add : T → T → T) it Ma Mb,
@@ -3220,6 +3258,33 @@ f_equal. {
            fold_left (λ (m : nat) (la0 : list nat), fold_left max la0 m)
              (map (map (bmat_depth (T:=T))) lla)
              (fold_left max (map (bmat_depth (T:=T)) la) 0)). {
+      clear - Hma.
+      revert la Ma Hma.
+      induction lla as [| la1]; intros; cbn. {
+        revert Ma Hma.
+        induction la as [| a]; intros; [ easy | cbn ].
+        destruct Hma as [Hma| Hma]. {
+          subst a; clear.
+          remember (bmat_depth Ma) as n; clear.
+          revert n.
+          induction la as [| a]; intros; [ easy | cbn ].
+          etransitivity; [ | apply IHla ].
+          apply Nat.le_max_l.
+        }
+        etransitivity; [ now apply IHla | ].
+        apply fold_left_max_le.
+        apply Nat.le_0_l.
+      }
+      etransitivity; [ apply IHlla, Hma | ].
+...
+rewrite fold_left_fold_left_max_swap.
+      apply fold_left_fold_left_max_le.
+...
+      apply fold_left_fold_left_max_le.
+      etransitivity. {
+        apply fold_left_fold_left_max_le.
+        apply (Nat.le_0_l (fold_left max (map (bmat_depth (T:=T)) la1) 0)).
+      }
 ...
     }
     rewrite (IHMa (a :: la)); [ | now left | now right | ]. {
@@ -3238,7 +3303,6 @@ f_equal. {
     apply (IHMa la1); [ now right | easy | easy ].
   }
   etransitivity; [ | apply Hd ].
-  clear.
   apply fold_left_fold_left_max_le.
 }
 ...
@@ -3314,6 +3378,8 @@ split. {
     revert j k Hjk.
     induction la as [| a]; intros; [ easy | cbn ].
     apply IHla.
+(* voir fold_left_max_le *)
+...
     now apply Nat.max_le_compat_r.
   } {
     intros la Hla.
