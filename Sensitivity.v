@@ -3116,35 +3116,39 @@ split; intros Hp. {
 }
 Qed.
 
-Theorem list_add_add_compat_iff : ∀ T (add1 add2 : T → T → T),
-  (∀ a b, add1 a b = add2 a b)
-  ↔ ∀ la lb, list_add add1 la lb = list_add add2 la lb.
+Theorem list_add_add_compat : ∀ T (add1 add2 : T → T → T) la lb,
+  (∀ a b, a ∈ la → b ∈ lb → add1 a b = add2 a b)
+  → list_add add1 la lb = list_add add2 la lb.
 Proof.
-intros.
-split; intros Hadd *. {
-  revert lb.
-  induction la as [| a]; intros; [ easy | cbn ].
-  destruct lb as [| b]; [ easy | cbn ].
-  now rewrite Hadd, IHla.
-} {
-  specialize (Hadd [a] [b]) as H1.
-  cbn in H1.
-  now injection H1.
-}
+intros * Hadd.
+revert lb Hadd.
+induction la as [| a]; intros; [ easy | cbn ].
+destruct lb as [| b]; [ easy | cbn ].
+f_equal; [ now apply Hadd; left | ].
+apply IHla.
+intros a' b' Ha' Hb'.
+now apply Hadd; right.
 Qed.
 
-Theorem bmat_def_add_loop_enough_iter : ∀ T (add : T → T → T) ita Ma Mb,
-  bmat_depth Ma ≤ ita
-  → bmat_def_add_loop add ita Ma Mb = bmat_def_add add Ma Mb.
+Theorem fold_left_fold_left_max_le : ∀ nll nl k,
+  fold_left (λ m nl, fold_left max nl m) nll (fold_left max nl 0) ≤
+  fold_left (λ m nl, fold_left max nl m) nll (fold_left max nl k).
+Proof.
+intros.
+...
+
+Theorem bmat_def_add_loop_enough_iter : ∀ T (add : T → T → T) it Ma Mb,
+  bmat_depth Ma ≤ it
+  → bmat_def_add_loop add it Ma Mb = bmat_def_add add Ma Mb.
 Proof.
 intros * Hd.
 unfold bmat_def_add.
-revert ita Mb Hd.
+revert it Mb Hd.
 induction Ma as [xa| Ma IHMa] using bmatrix_ind; intros. {
-  now destruct Mb, ita.
+  now destruct Mb, it.
 }
-destruct Mb as [xb| Mb]; [ now destruct ita | ].
-destruct ita; [ easy | cbn ].
+destruct Mb as [xb| Mb]; [ now destruct it | ].
+destruct it; [ easy | cbn ].
 cbn in Hd.
 apply Nat.succ_le_mono in Hd.
 f_equal.
@@ -3157,7 +3161,7 @@ destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
 destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
 subst rb cb.
 f_equal; clear ra ca.
-revert llb ita Hd.
+revert llb it Hd.
 induction lla as [| la]; intros; [ easy | ].
 cbn in Hd |-*.
 destruct llb as [| lb]; [ easy | ].
@@ -3207,27 +3211,36 @@ f_equal. {
     transitivity k; [ easy | ].
     apply Nat.le_max_l.
   }
-rewrite IHla. {
-  apply -> list_add_add_compat_iff.
-  intros Ma Mb.
-  remember (fold_left _ _ _) as ita' eqn:Hita' in Hd.
-  rewrite <- Hita'.
-(* il manque une information, là *)
+  rewrite IHla. {
+    apply list_add_add_compat.
+    intros Ma Mb Hma Hmb.
+    assert
+      (Hdle :
+         bmat_depth Ma ≤
+           fold_left (λ (m : nat) (la0 : list nat), fold_left max la0 m)
+             (map (map (bmat_depth (T:=T))) lla)
+             (fold_left max (map (bmat_depth (T:=T)) la) 0)). {
 ...
-  apply -> list_add_add_compat_iff.
-  intros Ma Mb.
-  remember (fold_left _ _ _) as ita' eqn:Hita' in Hd.
-  rewrite <- Hita'.
-Theorem bmat_def_add_loop_enough_iter : ∀ T (add : T → T → T) ita Ma Mb,
-  bmat_depth Ma ≤ ita
-  → bmat_def_add_loop add ita Ma Mb = bmat_def_add add Ma Mb.
-...
-assert (H : bmat_depth Ma ≤ ita'). {
-  rewrite Hita'.
-...
+    }
+    rewrite (IHMa (a :: la)); [ | now left | now right | ]. {
+      symmetry.
+      rewrite (IHMa (a :: la)); [ easy | now left | now right | ].
+      etransitivity; [ apply Hdle | ].
+      apply fold_left_fold_left_max_le.
+    }
+    apply Hdle.
+  } {
+    intros la1 Hla1 a1 Ha1 it1 Mb Hmb.
+    destruct Hla1 as [Hla1| Hla1]. {
+      subst la1.
+      apply (IHMa (a :: la)); [ now left | now right | easy ].
+    }
+    apply (IHMa la1); [ now right | easy | easy ].
+  }
+  etransitivity; [ | apply Hd ].
+  clear.
+  apply fold_left_fold_left_max_le.
 }
-rewrite bmat_def_add_loop_enough_iter; [ | transitivity ita' ]; [ | | easy ].
-rewrite bmat_def_add_loop_enough_iter; [ easy | ].
 ...
 
 Theorem bmat_coh_prop_add_gen : ∀ T add ita itn (BMA BMB : bmatrix T),
