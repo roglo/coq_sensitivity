@@ -3211,6 +3211,39 @@ etransitivity; [ | apply IHnl1 ].
 now rewrite fold_left_max_swap.
 Qed.
 
+Theorem bmat_depth_le_fold_left : ∀ T lla la a k,
+  la ∈ lla
+  → a ∈ la
+  → bmat_depth a
+       ≤ fold_left
+           (λ m la1, fold_left max la1 m) (map (map (bmat_depth (T:=T))) lla)
+           k.
+Proof.
+intros * Hla Ha.
+revert a la Ha Hla k.
+induction lla as [| la1]; intros; [ easy | cbn ].
+destruct Hla as [Hla| Hla]. {
+  subst la1.
+  clear - Ha.
+  revert k.
+  induction lla as [| la1]; intros. {
+    cbn.
+    revert a k Ha.
+    induction la as [| a1]; intros; [ easy | cbn ].
+    destruct Ha as [Ha| Ha]. {
+      subst a1; cbn.
+      rewrite <- fold_left_max_swap.
+      apply Nat.le_max_r.
+    }
+    now apply IHla.
+  }
+  cbn.
+  rewrite fold_left_fold_left_max_swap.
+  now apply IHlla.
+}
+now apply (IHlla _ la).
+Qed.
+
 Theorem bmat_def_add_loop_enough_iter : ∀ T (add : T → T → T) it Ma Mb,
   bmat_depth Ma ≤ it
   → bmat_def_add_loop add it Ma Mb = bmat_def_add add Ma Mb.
@@ -3342,21 +3375,9 @@ rewrite IHlla. {
     rewrite (IHMa la1); [ | now right | easy | ]. {
       symmetry.
       rewrite (IHMa la1); [ easy | now right | easy | ].
-      (* devrait le faire *)
-(*
-  ============================
-  bmat_depth a
-  ≤ fold_left (λ (m : nat) (la0 : list nat), fold_left max la0 m) (map (map (bmat_depth (T:=T))) lla)
-      (fold_left max (map (bmat_depth (T:=T)) la) 0)
-*)
-...
+      now apply (bmat_depth_le_fold_left _ la1).
     }
-(*
-  ============================
-  bmat_depth a
-  ≤ fold_left (λ (m : nat) (la0 : list nat), fold_left max la0 m) (map (map (bmat_depth (T:=T))) lla) 0
-*)
-...
+    now apply (bmat_depth_le_fold_left _ la1).
   }
 } {
 (*
