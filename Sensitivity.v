@@ -3130,6 +3130,25 @@ intros a' b' Ha' Hb'.
 now apply Hadd; right.
 Qed.
 
+Theorem list_list_add_add_compat : ∀ T (add1 add2 : T → T → T) lla llb,
+  (∀ la lb, la ∈ lla → lb ∈ llb →
+   ∀ a b, a ∈ la → b ∈ lb → add1 a b = add2 a b)
+  → list_list_add add1 lla llb = list_list_add add2 lla llb.
+Proof.
+intros * Hadd.
+revert llb Hadd.
+induction lla as [| la]; intros; [ easy | cbn ].
+destruct llb as [| lb]; [ easy | cbn ].
+f_equal. {
+  apply list_add_add_compat.
+  intros * Ha Hb.
+  apply (Hadd la lb); [ now left | now left | easy | easy ].
+}
+apply IHlla.
+intros la1 lb1 Hla1 Hlb1 * Ha Hb.
+apply (Hadd la1 lb1); [ now right | now right | easy | easy ].
+Qed.
+
 Theorem fold_left_max_le : ∀ nl n k,
   n ≤ k
   → fold_left max nl n ≤ fold_left max nl k.
@@ -3317,7 +3336,44 @@ f_equal. {
   apply fold_left_fold_left_max_le.
   apply Nat.le_0_l.
 }
-rewrite IHlla.
+rewrite IHlla. {
+  apply list_list_add_add_compat. {
+    intros la1 lb1 Hla1 Hlb1 a b Ha Hb.
+    rewrite (IHMa la1); [ | now right | easy | ]. {
+      symmetry.
+      rewrite (IHMa la1); [ easy | now right | easy | ].
+      (* devrait le faire *)
+(*
+  ============================
+  bmat_depth a
+  ≤ fold_left (λ (m : nat) (la0 : list nat), fold_left max la0 m) (map (map (bmat_depth (T:=T))) lla)
+      (fold_left max (map (bmat_depth (T:=T)) la) 0)
+*)
+...
+    }
+(*
+  ============================
+  bmat_depth a
+  ≤ fold_left (λ (m : nat) (la0 : list nat), fold_left max la0 m) (map (map (bmat_depth (T:=T))) lla) 0
+*)
+...
+  }
+} {
+(*
+  ============================
+  ∀ la0 : list (bmatrix_def T),
+    la0 ∈ lla
+    → ∀ a : bmatrix_def T,
+        a ∈ la0
+        → ∀ (it0 : nat) (Mb : bmatrix_def T),
+            bmat_depth a ≤ it0 → bmat_def_add_loop add it0 a Mb = bmat_def_add_loop add (bmat_depth a) a Mb
+*)
+...
+}
+(*
+  ============================
+  fold_left (λ (m : nat) (la0 : list nat), fold_left max la0 m) (map (map (bmat_depth (T:=T))) lla) 0 ≤ it
+*)
 ...
 
 Theorem bmat_coh_prop_add_gen : ∀ T add ita itn (BMA BMB : bmatrix T),
