@@ -3170,10 +3170,27 @@ do 2 rewrite <- fold_left_app.
 now apply IHnll.
 Qed.
 
+Theorem fold_left_max_swap : ∀ nl m n,
+  max (fold_left max nl m) n = fold_left max nl (max m n).
+Proof.
+intros.
+revert m n.
+induction nl as [| n']; intros; [ easy | cbn ].
+etransitivity; [ apply IHnl | ].
+do 2 rewrite <- Nat.max_assoc.
+now rewrite (Nat.max_comm n').
+Qed.
+
 Theorem fold_left_fold_left_max_swap : ∀ nl1 nl2 m,
   fold_left max nl1 (fold_left max nl2 m) =
   fold_left max nl2 (fold_left max nl1 m).
-...
+Proof.
+intros.
+revert nl2 m.
+induction nl1 as [| n1]; intros; [ easy | cbn ].
+etransitivity; [ | apply IHnl1 ].
+now rewrite fold_left_max_swap.
+Qed.
 
 Theorem bmat_def_add_loop_enough_iter : ∀ T (add : T → T → T) it Ma Mb,
   bmat_depth Ma ≤ it
@@ -3276,22 +3293,16 @@ f_equal. {
         apply Nat.le_0_l.
       }
       etransitivity; [ apply IHlla, Hma | ].
-...
-rewrite fold_left_fold_left_max_swap.
+      rewrite fold_left_fold_left_max_swap.
       apply fold_left_fold_left_max_le.
-...
-      apply fold_left_fold_left_max_le.
-      etransitivity. {
-        apply fold_left_fold_left_max_le.
-        apply (Nat.le_0_l (fold_left max (map (bmat_depth (T:=T)) la1) 0)).
-      }
-...
+      apply Nat.le_0_l.
     }
     rewrite (IHMa (a :: la)); [ | now left | now right | ]. {
       symmetry.
       rewrite (IHMa (a :: la)); [ easy | now left | now right | ].
       etransitivity; [ apply Hdle | ].
       apply fold_left_fold_left_max_le.
+      apply Nat.le_0_l.
     }
     apply Hdle.
   } {
@@ -3304,6 +3315,7 @@ rewrite fold_left_fold_left_max_swap.
   }
   etransitivity; [ | apply Hd ].
   apply fold_left_fold_left_max_le.
+  apply Nat.le_0_l.
 }
 ...
 
