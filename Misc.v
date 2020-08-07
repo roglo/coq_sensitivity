@@ -1044,6 +1044,18 @@ setoid_rewrite Nat.mul_comm in Hab.
 now apply Nat_mul_mod_cancel_r in Hab.
 Qed.
 
+Theorem Nat_eq_max_0 : ∀ a b, max a b = 0 → a = 0 ∧ b = 0.
+Proof.
+intros * Hm.
+destruct (le_dec a b) as [H| H]. {
+  rewrite Nat.max_r in Hm; [ | easy ].
+  now subst b; apply Nat.le_0_r in H.
+}
+apply Nat.nle_gt, Nat.lt_le_incl in H.
+rewrite Nat.max_l in Hm; [ | easy ].
+now subst a; apply Nat.le_0_r in H.
+Qed.
+
 Definition Nat_le_neq_lt : ∀ x y : nat, x ≤ y → x ≠ y → (x < y)%nat :=
   λ x y Hxy Hnxy,
   match le_lt_eq_dec x y Hxy with

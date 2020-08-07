@@ -3374,6 +3374,42 @@ apply fold_left_fold_left_max_le.
 apply Nat.le_0_l.
 Qed.
 
+Theorem eq_fold_left_max_0 : ∀ ln m,
+  fold_left max ln m = 0
+  → m = 0 ∧ ∀ n, n ∈ ln → n = 0.
+Proof.
+intros * Hln.
+revert m Hln.
+induction ln as [| n]; intros; [ easy | cbn in Hln ].
+specialize (IHln _ Hln).
+destruct IHln as (Hm, Hn).
+apply Nat_eq_max_0 in Hm.
+destruct Hm as (Hmz, Hnz); subst m n.
+split; [ easy | ].
+intros n Hnn.
+destruct Hnn as [Hnn| Hnn]; [ easy | ].
+apply Hn, Hnn.
+Qed.
+Theorem eq_fold_left_fold_left_max_0 : ∀ lln m,
+  fold_left (λ m ln, fold_left max ln m) lln m = 0
+  → m = 0 ∧ ∀ ln n, ln ∈ lln → n ∈ ln → n = 0.
+Proof.
+intros * Hlln.
+revert m Hlln.
+induction lln as [| ln]; intros; [ easy | cbn in Hlln ].
+specialize (IHlln _ Hlln) as H1.
+destruct H1 as (H1, H3).
+apply eq_fold_left_max_0 in H1.
+destruct H1 as (H1, H2).
+split; [ easy | ].
+intros ln1 n Hln Hn.
+destruct Hln as [Hln| Hln]. {
+  subst ln1.
+  now apply H2.
+}
+now apply (H3 ln1).
+Qed.
+
 Theorem bmat_coh_prop_add_gen : ∀ T add ita itn (BMA BMB : bmatrix T),
   bmat_depth (bmat_def BMA) ≤ ita
   → bmat_depth (bmat_def_add_loop add ita (bmat_def BMA) (bmat_def BMB)) ≤ itn
@@ -3509,17 +3545,47 @@ destruct H1 as (Hr, Hc, Hrc).
 cbn in Hr, Hc, Hrc.
 cbn in Hitn.
 apply Nat.succ_le_mono in Hitn.
-apply bmatrix_coh_equiv_prop_loop.
 destruct a as [xa| Ma]. {
   destruct itn; [ cbn | easy ].
   apply Nat.le_0_r in Hitn.
-Theorem glop : ∀ lln m,
-  fold_left (λ m ln, fold_left max ln m) lln m = 0
-  → m = 0 ∧ ∀ ln n, ln ∈ lln → n ∈ ln → n = 0.
-Admitted.
-apply glop in Hitn.
-destruct Hitn as (_, Hitn); cbn in Hitn.
-cbn in IHitn.
+  apply eq_fold_left_fold_left_max_0 in Hitn.
+  destruct Hitn as (_, Hitn); cbn in Hitn.
+  cbn in IHitn.
+  unfold mat_def_add in Hitn.
+  cbn - [ Nat.eq_dec ] in Hitn.
+  destruct (Nat.eq_dec ra ra) as [Hrr| Hrr]; [ clear Hrr | easy ].
+  destruct (Nat.eq_dec ca ca) as [Hcc| Hcc]; [ clear Hcc | easy ].
+  cbn in Hitn.
+  assert
+    (Hz : ∀ lc c,
+       lc ∈ list_list_add (bmat_def_add_loop add ita) lla llb
+       → c ∈ lc
+       → bmat_depth c = 0). {
+    clear Hc; intros lc c Hlc Hc.
+    apply (Hitn (map (@bmat_depth _) lc)). {
+      remember (list_list_add _ _ _) as llc in Hlc |-*.
+      clear - Hlc Hc.
+      revert lc Hlc Hc.
+      induction llc as [| lc1]; intros; [ easy | ].
+      cbn - [ In ].
+      destruct Hlc as [Hlc| Hlc]. {
+        subst lc1.
+        now left.
+      }
+      right.
+      now apply IHllc.
+    }
+    clear - Hc.
+    revert c Hc.
+    induction lc as [| c1]; intros; [ easy | ].
+    destruct Hc as [Hc| Hc]. {
+      now subst c; left.
+    }
+    right.
+    now apply IHlc.
+  }
+  now specialize (Hz _ _ Hla Ha).
+}
 ...
 
 Theorem bmat_coh_prop_add : ∀ T add (BMA BMB : bmatrix T),
