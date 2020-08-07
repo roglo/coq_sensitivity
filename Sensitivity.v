@@ -3431,26 +3431,25 @@ cbn - [ bmat_depth ] in Hita.
 revert add MDA MDB BMPA BMPB Hitn Hita.
 induction itn; intros; [ easy | cbn ].
 apply Bool.andb_true_iff.
-specialize (@mat_coh_prop_add (bmatrix_def T)) as H1.
-specialize (H1 (bmat_def_add add)).
-cbn in BMPA, BMPB.
-apply Bool.andb_true_iff in BMPA.
-apply Bool.andb_true_iff in BMPB.
-destruct BMPA as (MPA, BMPA).
-destruct BMPB as (MPB, BMPB).
-specialize (H1 (mk_mat MDA MPA) (mk_mat MDB MPB)).
-unfold mat_def_add in H1.
-cbn - [ Nat.eq_dec ] in H1.
-destruct MDA as (lla, ra, ca).
-destruct MDB as (llb, rb, cb).
-move llb before lla.
-unfold mat_def_add.
 split. {
+  cbn in BMPA, BMPB.
+  apply Bool.andb_true_iff in BMPA.
+  apply Bool.andb_true_iff in BMPB.
+  destruct BMPA as (MPA, BMPA).
+  destruct BMPB as (MPB, BMPB).
+  specialize (@mat_coh_prop_add (bmatrix_def T)) as H1.
+  specialize (H1 (bmat_def_add add)).
+  specialize (H1 (mk_mat MDA MPA) (mk_mat MDB MPB)).
+  unfold mat_def_add in H1.
+  cbn - [ Nat.eq_dec ] in H1.
+  destruct MDA as (lla, ra, ca).
+  destruct MDB as (llb, rb, cb).
+  move llb before lla.
+  unfold mat_def_add.
   cbn - [ Nat.eq_dec ] in H1 |-*.
   destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
   destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
   cbn; subst rb cb.
-(**)
   apply matrix_coh_equiv_prop in H1.
   destruct H1 as (Hr, Hc, Hrc).
   cbn in Hr, Hc, Hrc.
@@ -3540,6 +3539,18 @@ split. {
 apply fold_left_fold_left_and_true.
 intros lab ab Hlab Hab.
 destruct ab as [xab| Mab]. {
+  cbn in BMPA, BMPB.
+  apply Bool.andb_true_iff in BMPA.
+  apply Bool.andb_true_iff in BMPB.
+  destruct BMPA as (MPA, BMPA).
+  destruct BMPB as (MPB, BMPB).
+  specialize (@mat_coh_prop_add (bmatrix_def T)) as H1.
+  specialize (H1 (bmat_def_add add)).
+  specialize (H1 (mk_mat MDA MPA) (mk_mat MDB MPB)).
+  destruct MDA as (lla, ra, ca).
+  destruct MDB as (llb, rb, cb).
+  move llb before lla.
+  unfold mat_def_add in Hlab.
   cbn - [ Nat.eq_dec ] in H1, Hlab |-*.
   destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
   destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
