@@ -3510,6 +3510,16 @@ cbn in Hr, Hc, Hrc.
 cbn in Hitn.
 apply Nat.succ_le_mono in Hitn.
 apply bmatrix_coh_equiv_prop_loop.
+destruct a as [xa| Ma]. {
+  destruct itn; [ cbn | easy ].
+  apply Nat.le_0_r in Hitn.
+Theorem glop : ∀ lln m,
+  fold_left (λ m ln, fold_left max ln m) lln m = 0
+  → m = 0 ∧ ∀ ln n, ln ∈ lln → n ∈ ln → n = 0.
+Admitted.
+apply glop in Hitn.
+destruct Hitn as (_, Hitn); cbn in Hitn.
+cbn in IHitn.
 ...
 
 Theorem bmat_coh_prop_add : ∀ T add (BMA BMB : bmatrix T),
