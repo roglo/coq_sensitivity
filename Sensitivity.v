@@ -3390,6 +3390,7 @@ intros n Hnn.
 destruct Hnn as [Hnn| Hnn]; [ easy | ].
 apply Hn, Hnn.
 Qed.
+
 Theorem eq_fold_left_fold_left_max_0 : ∀ lln m,
   fold_left (λ m ln, fold_left max ln m) lln m = 0
   → m = 0 ∧ ∀ ln n, ln ∈ lln → n ∈ ln → n = 0.
@@ -3599,7 +3600,7 @@ destruct ab as [xab| Mab]. {
        lc ∈ list_list_add (bmat_def_add_loop add ita) lla llb
        → c ∈ lc
        → bmat_depth c = 0). {
-    clear Hc; intros lc c Hlc Hc.
+    clear - Hitn(*Hc*); intros lc c Hlc Hc.
     apply (Hitn (map (@bmat_depth _) lc)). {
       remember (list_list_add _ _ _) as llc in Hlc |-*.
       clear - Hlc Hc.
@@ -3627,6 +3628,11 @@ destruct ab as [xab| Mab]. {
 destruct itn. (* pour voir *) {
   exfalso.
   cbn in Hitn.
+  apply Nat.succ_le_mono in Hitn.
+  apply Nat.le_0_r in Hitn.
+  apply eq_fold_left_fold_left_max_0 in Hitn.
+  destruct Hitn as (_, Hitn).
+Check Hz.
 ...
 specialize (IHita add (S itn) BMA BMB) as H1.
 rewrite HBMDA, HBMDB in H1.
