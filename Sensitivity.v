@@ -3624,6 +3624,23 @@ destruct ab as [xab| Mab]. {
   }
   now specialize (Hz _ _ Hlab Hab).
 }
+destruct itn. (* pour voir *) {
+  exfalso.
+  cbn in Hitn.
+...
+specialize (IHita add (S itn) BMA BMB) as H1.
+rewrite HBMDA, HBMDB in H1.
+assert (H : bmat_depth (bmat_def_add_loop add ita (BM_M MDA) (BM_M MDB)) ≤ S itn). {
+  etransitivity; [ | apply Hitn ].
+  apply Nat.lt_le_incl.
+  apply (bmat_depth_decr _ lab); [ easy | ].
+...
+remember (mat_def_add (bmat_def_add_loop add ita) MDA MDB) as M eqn:HM.
+cbn in H1.
+rewrite <- HM in H1.
+Search bmat_depth.
+Check bmatrix_coh_prop_loop_enough_iter.
+...
 (*
 apply bmatrix_coh_equiv_prop_loop.
 *)
