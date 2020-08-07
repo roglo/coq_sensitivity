@@ -3420,6 +3420,29 @@ intros * Hita Hitn.
 apply bmatrix_coh_equiv_prop_loop.
 revert add itn BMA BMB Hitn Hita.
 induction ita; intros; [ now destruct itn | ].
+revert add BMA BMB Hitn Hita.
+induction itn; intros. {
+  cbn in Hitn.
+  destruct BMA as (BMDA, BMPA).
+  destruct BMB as (BMDB, BMPB).
+  now destruct BMDA, BMDB.
+}
+cbn in Hitn; cbn.
+remember (bmat_def BMA) as BMDA eqn:HBMDA.
+remember (bmat_def BMB) as BMDB eqn:HBMDB.
+remember (bmat_coh_prop BMA) as BMPA eqn:HBMPA.
+remember (bmat_coh_prop BMB) as BMPB eqn:HBMPB.
+move BMDB before BMDA.
+move BMPB before BMPA.
+symmetry in HBMDA, HBMDB.
+symmetry in HBMPA, HBMPB.
+destruct BMDA as [ta| MDA]; [ now destruct BMDB, itn | ].
+destruct BMDB as [tb| MDB]; [ now destruct itn | ].
+cbn in BMPA.
+clear HBMPA HBMPB.
+rewrite HBMDA in BMPA.
+rewrite HBMDB in BMPB.
+(*
 cbn in Hitn; cbn.
 destruct BMA as (BMDA, BMPA).
 destruct BMB as (BMDB, BMPB).
@@ -3428,8 +3451,7 @@ destruct BMDA as [ta| MDA]; [ now destruct BMDB, itn | ].
 destruct BMDB as [tb| MDB]; [ now destruct itn | ].
 move MDB before MDA.
 cbn - [ bmat_depth ] in Hita.
-revert add MDA MDB BMPA BMPB Hitn Hita.
-induction itn; intros; [ easy | cbn ].
+*)
 apply Bool.andb_true_iff.
 split. {
   cbn in BMPA, BMPB.
@@ -3602,6 +3624,38 @@ destruct ab as [xab| Mab]. {
   }
   now specialize (Hz _ _ Hlab Hab).
 }
+(*
+apply bmatrix_coh_equiv_prop_loop.
+*)
+specialize (IHitn add BMA BMB) as H1.
+cbn in H1.
+rewrite HBMDA, HBMDB in H1.
+remember (mat_def_add (bmat_def_add_loop add ita) MDA MDB) as M eqn:HM.
+assert (H : bmat_depth (BM_M M) ≤ itn). {
+  destruct (Nat.eq_dec (bmat_depth (BM_M M)) (S itn)) as [Hdi| Hdi]. 2: {
+    flia Hitn Hdi.
+  }
+  exfalso.
+Check bmat_depth_decr.
+...
+  specialize (bmat_depth_decr _ _ _ Hlab Hab) as H2.
+  rewrite Hdi in H2.
+Check bmat_depth_decr.
+rewrite <- Hdi in H2.
+apply Nat.nle_gt in H2.
+apply H2.
+apply Nat.lt_le_incl.
+eapply bmat_depth_decr.
+eapply...
+  apply (bmat_depth_decr _ lab); [ easy | ].
+...
+  apply Nat.succ_le_mono.
+  etransitivity; [ | apply Hitn ].
+  apply (bmat_depth_decr _ lab); [ easy | ].
+  cbn.
+Check bmat_depth_decr.
+Search bmat_depth.
+cbn in H1.
 ...
 
 Theorem bmat_coh_prop_add : ∀ T add (BMA BMB : bmatrix T),
