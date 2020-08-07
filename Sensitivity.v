@@ -3540,12 +3540,12 @@ cbn in BMPA, BMPB.
 specialize (proj1 (fold_left_fold_left_and_true _ _) BMPA) as H2.
 apply matrix_coh_equiv_prop in H1.
 apply fold_left_fold_left_and_true.
-intros * Hla Ha.
+intros lab ab Hlab Hab.
 destruct H1 as (Hr, Hc, Hrc).
 cbn in Hr, Hc, Hrc.
 cbn in Hitn.
 apply Nat.succ_le_mono in Hitn.
-destruct a as [xa| Ma]. {
+destruct ab as [xab| Mab]. {
   destruct itn; [ cbn | easy ].
   apply Nat.le_0_r in Hitn.
   apply eq_fold_left_fold_left_max_0 in Hitn.
@@ -3584,7 +3584,7 @@ destruct a as [xa| Ma]. {
     right.
     now apply IHlc.
   }
-  now specialize (Hz _ _ Hla Ha).
+  now specialize (Hz _ _ Hlab Hab).
 }
 ...
 
