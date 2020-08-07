@@ -3500,6 +3500,16 @@ split. {
     apply Nat.le_0_l.
   }
 }
+cbn in BMPA, BMPB.
+specialize (proj1 (fold_left_fold_left_and_true _ _) BMPA) as H2.
+apply matrix_coh_equiv_prop in H1.
+apply fold_left_fold_left_and_true.
+intros * Hla Ha.
+destruct H1 as (Hr, Hc, Hrc).
+cbn in Hr, Hc, Hrc.
+cbn in Hitn.
+apply Nat.succ_le_mono in Hitn.
+apply bmatrix_coh_equiv_prop_loop.
 ...
 
 Theorem bmat_coh_prop_add : ∀ T add (BMA BMB : bmatrix T),
