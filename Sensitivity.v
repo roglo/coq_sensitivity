@@ -3578,7 +3578,7 @@ destruct ab as [xab| Mab]. {
   destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
   destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
   cbn; subst rb cb.
-  cbn in BMPA, BMPB.
+  cbn in BMPA.
   specialize (proj1 (fold_left_fold_left_and_true _ _) BMPA) as H2.
   apply matrix_coh_equiv_prop in H1.
   destruct H1 as (Hr, Hc, Hrc).
