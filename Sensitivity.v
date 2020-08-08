@@ -3587,20 +3587,19 @@ destruct ab as [xab| Mab]. {
   apply Nat.succ_le_mono in Hitn.
   destruct itn; [ cbn | easy ].
   apply Nat.le_0_r in Hitn.
-  apply eq_fold_left_fold_left_max_0 in Hitn.
-  destruct Hitn as (_, Hitn); cbn in Hitn.
-  cbn in IHitn.
-  unfold mat_def_add in Hitn.
-  cbn - [ Nat.eq_dec ] in Hitn.
-  destruct (Nat.eq_dec ra ra) as [Hrr| Hrr]; [ clear Hrr | easy ].
-  destruct (Nat.eq_dec ca ca) as [Hcc| Hcc]; [ clear Hcc | easy ].
-  cbn in Hitn.
   assert
     (Hz : ∀ lc c,
        lc ∈ list_list_add (bmat_def_add_loop add ita) lla llb
        → c ∈ lc
        → bmat_depth c = 0). {
-    clear - Hitn(*Hc*); intros lc c Hlc Hc.
+    clear - Hitn; intros lc c Hlc Hc.
+    apply eq_fold_left_fold_left_max_0 in Hitn.
+    destruct Hitn as (_, Hitn); cbn in Hitn.
+    unfold mat_def_add in Hitn.
+    cbn - [ Nat.eq_dec ] in Hitn.
+    destruct (Nat.eq_dec ra ra) as [Hrr| Hrr]; [ clear Hrr | easy ].
+    destruct (Nat.eq_dec ca ca) as [Hcc| Hcc]; [ clear Hcc | easy ].
+    cbn in Hitn.
     apply (Hitn (map (@bmat_depth _) lc)). {
       remember (list_list_add _ _ _) as llc in Hlc |-*.
       clear - Hlc Hc.
@@ -3630,6 +3629,7 @@ destruct itn. (* pour voir *) {
   cbn in Hitn.
   apply Nat.succ_le_mono in Hitn.
   apply Nat.le_0_r in Hitn.
+...
   apply eq_fold_left_fold_left_max_0 in Hitn.
   destruct Hitn as (_, Hitn).
 Check Hz.
