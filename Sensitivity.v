@@ -3562,6 +3562,7 @@ split. {
 apply fold_left_fold_left_and_true.
 intros lab ab Hlab Hab.
 destruct ab as [xab| Mab]. {
+  clear - BMPA BMPB add Hlab Hitn Hab.
   cbn in BMPA, BMPB.
   apply Bool.andb_true_iff in BMPA.
   apply Bool.andb_true_iff in BMPB.
