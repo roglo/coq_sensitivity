@@ -3649,7 +3649,17 @@ destruct itn. (* pour voir *) {
   specialize (H1 _ (or_introl eq_refl)).
   now destruct ab.
 }
-cbn.
+apply bmatrix_coh_equiv_prop_loop.
+split. {
+  apply bmatrix_coh_equiv_prop_loop in BMPA.
+  apply bmatrix_coh_equiv_prop_loop in BMPB.
+  destruct BMPA as (MPA, BMPA).
+  destruct BMPB as (MPB, BMPB).
+  cbn in BMPA, BMPB.
+  move MPB before MPA.
+  destruct MPA as (Har, Hac, Harc).
+  destruct MPB as (Hbr, Hbc, Hbrc).
+  split. {
 ...
 
 Theorem bmat_coh_prop_add : ∀ T add (BMA BMB : bmatrix T),
