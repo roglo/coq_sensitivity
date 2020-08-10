@@ -3627,27 +3627,29 @@ destruct ab as [xab| Mab]. {
 }
 destruct itn. (* pour voir *) {
   exfalso.
+  clear - Hitn Hlab Hab.
   cbn in Hitn.
   apply Nat.succ_le_mono in Hitn.
   apply Nat.le_0_r in Hitn.
   apply eq_fold_left_fold_left_max_0 in Hitn.
   destruct Hitn as (_, Hitn).
-  unfold mat_def_add in Hitn.
-  cbn - [ Nat.eq_dec ] in Hitn.
+  unfold mat_def_add in Hitn, Hlab.
   destruct MDA as (lla, ra, ca).
   destruct MDB as (llb, rb, cb).
-  move llb before lla.
-  unfold mat_def_add in Hlab.
-  cbn - [ Nat.eq_dec ] in Hitn, Hlab |-*.
+  cbn - [ Nat.eq_dec ] in Hitn, Hlab.
   destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
   destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
-  subst rb cb; cbn in Hlab.
-  cbn in Hitn, Hita.
+  subst rb cb; cbn in Hitn, Hlab.
   specialize (Hitn (map (@bmat_depth _) lab)) as H1.
-  generalize Hlab; intros H.
-  apply in_map with (f := map (bmat_depth (T := T))) in H.
-  specialize (H1 H); clear H.
-(* bmat_depth always ≠ 0, contradiction *)
+  apply in_map with (f := map (bmat_depth (T := T))) in Hlab.
+  specialize (H1 Hlab).
+  (* bmat_depth always ≠ 0, contradiction *)
+  destruct lab as [| ab]; [ easy | ].
+  cbn - [ In ] in H1.
+  specialize (H1 _ (or_introl eq_refl)).
+  now destruct ab.
+}
+cbn.
 ...
 
 Theorem bmat_coh_prop_add : ∀ T add (BMA BMB : bmatrix T),
