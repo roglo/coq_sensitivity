@@ -3674,13 +3674,21 @@ split. {
     cbn.
     destruct ita. {
       cbn in Hlab.
+Print void_bmat_def.
+Print void_mat_def.
+unfold void_bmat_def in Hlab.
+unfold void_mat_def in Hlab.
+destruct lla as [| la]; [ easy | ].
+destruct llb as [| lb]; [ easy | ].
+cbn - [ In ] in Hlab.
+...
       clear - Hlab Hab.
-      revert llb Hlab.
+      revert llb rab cab lab llab Hlab Hab.
       induction lla as [| la]; intros; [ easy | ].
       destruct llb as [| lb]; [ easy | ].
       cbn - [ In ] in Hlab.
       destruct Hlab as [Hlab| Hlab]. {
-        revert lb Hlab.
+        revert lb lla llb lab llab rab cab Hlab Hab IHlla.
         induction la as [| a]; intros; [ now cbn in Hlab; subst lab | ].
         destruct lb as [| b]; [ now cbn in Hlab; subst lab | ].
         cbn in Hlab.
