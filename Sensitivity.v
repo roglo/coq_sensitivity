@@ -3660,6 +3660,11 @@ split. {
   destruct MPA as (Har, Hac, Harc).
   destruct MPB as (Hbr, Hbc, Hbrc).
   split. {
+    destruct MDA as (lla, ra, ca).
+    destruct MDB as (llb, rb, cb).
+    move llb before lla.
+    cbn in Har, Hac, Harc, Hbr, Hbc, Hbrc.
+    cbn in BMPA, BMPB.
 ...
 
 Theorem bmat_coh_prop_add : ∀ T add (BMA BMB : bmatrix T),
