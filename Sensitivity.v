@@ -3393,7 +3393,7 @@ Qed.
 
 Theorem eq_fold_left_fold_left_max_0 : ∀ lln m,
   fold_left (λ m ln, fold_left max ln m) lln m = 0
-  → m = 0 ∧ ∀ ln n, ln ∈ lln → n ∈ ln → n = 0.
+  → m = 0 ∧ ∀ ln, ln ∈ lln → ∀ n, n ∈ ln → n = 0.
 Proof.
 intros * Hlln.
 revert m Hlln.
@@ -3403,7 +3403,7 @@ destruct H1 as (H1, H3).
 apply eq_fold_left_max_0 in H1.
 destruct H1 as (H1, H2).
 split; [ easy | ].
-intros ln1 n Hln Hn.
+intros ln1 Hln n Hn.
 destruct Hln as [Hln| Hln]. {
   subst ln1.
   now apply H2.
@@ -3630,56 +3630,23 @@ destruct itn. (* pour voir *) {
   cbn in Hitn.
   apply Nat.succ_le_mono in Hitn.
   apply Nat.le_0_r in Hitn.
-...
   apply eq_fold_left_fold_left_max_0 in Hitn.
   destruct Hitn as (_, Hitn).
-Check Hz.
-...
-specialize (IHita add (S itn) BMA BMB) as H1.
-rewrite HBMDA, HBMDB in H1.
-assert (H : bmat_depth (bmat_def_add_loop add ita (BM_M MDA) (BM_M MDB)) ≤ S itn). {
-  etransitivity; [ | apply Hitn ].
-  apply Nat.lt_le_incl.
-  apply (bmat_depth_decr _ lab); [ easy | ].
-...
-remember (mat_def_add (bmat_def_add_loop add ita) MDA MDB) as M eqn:HM.
-cbn in H1.
-rewrite <- HM in H1.
-Search bmat_depth.
-Check bmatrix_coh_prop_loop_enough_iter.
-...
-(*
-apply bmatrix_coh_equiv_prop_loop.
-*)
-specialize (IHitn add BMA BMB) as H1.
-cbn in H1.
-rewrite HBMDA, HBMDB in H1.
-remember (mat_def_add (bmat_def_add_loop add ita) MDA MDB) as M eqn:HM.
-assert (H : bmat_depth (BM_M M) ≤ itn). {
-  destruct (Nat.eq_dec (bmat_depth (BM_M M)) (S itn)) as [Hdi| Hdi]. 2: {
-    flia Hitn Hdi.
-  }
-  exfalso.
-Check bmat_depth_decr.
-...
-  specialize (bmat_depth_decr _ _ _ Hlab Hab) as H2.
-  rewrite Hdi in H2.
-Check bmat_depth_decr.
-rewrite <- Hdi in H2.
-apply Nat.nle_gt in H2.
-apply H2.
-apply Nat.lt_le_incl.
-eapply bmat_depth_decr.
-eapply...
-  apply (bmat_depth_decr _ lab); [ easy | ].
-...
-  apply Nat.succ_le_mono.
-  etransitivity; [ | apply Hitn ].
-  apply (bmat_depth_decr _ lab); [ easy | ].
-  cbn.
-Check bmat_depth_decr.
-Search bmat_depth.
-cbn in H1.
+  unfold mat_def_add in Hitn.
+  cbn - [ Nat.eq_dec ] in Hitn.
+  destruct MDA as (lla, ra, ca).
+  destruct MDB as (llb, rb, cb).
+  move llb before lla.
+  unfold mat_def_add in Hlab.
+  cbn - [ Nat.eq_dec ] in Hitn, Hlab |-*.
+  destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
+  destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
+  subst rb cb; cbn in Hlab.
+  cbn in Hitn, Hita.
+  specialize (Hitn (map (@bmat_depth _) lab)) as H1.
+  generalize Hlab; intros H.
+  apply in_map with (f := map (bmat_depth (T := T))) in H.
+  specialize (H1 H); clear H.
 ...
 
 Theorem bmat_coh_prop_add : ∀ T add (BMA BMB : bmatrix T),
