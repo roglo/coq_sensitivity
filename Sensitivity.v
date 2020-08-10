@@ -3669,37 +3669,25 @@ split. {
     cbn - [ Nat.eq_dec ] in Hitn, Hlab.
     destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
     destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
-    subst rb cb; cbn in Hitn, Hlab.
-    apply Nat.succ_le_mono in Hitn.
-    move Hitn before Hlab.
+    subst rb cb; cbn in Hlab.
     destruct Mab as (llab, rab, cab).
     cbn.
     destruct ita. {
-      cbn in Hitn, Hlab.
-      destruct lla as [| la]; [ easy | ].
+      cbn in Hlab.
+      clear - Hlab Hab.
+      revert llb Hlab.
+      induction lla as [| la]; intros; [ easy | ].
       destruct llb as [| lb]; [ easy | ].
-      cbn - [ In ] in Hitn, Hlab.
+      cbn - [ In ] in Hlab.
       destruct Hlab as [Hlab| Hlab]. {
-        destruct la as [| a]; [ now cbn in Hlab; subst lab | ].
+        revert lb Hlab.
+        induction la as [| a]; intros; [ now cbn in Hlab; subst lab | ].
         destruct lb as [| b]; [ now cbn in Hlab; subst lab | ].
         cbn in Hlab.
         subst lab.
-        unfold void_bmat_def in Hab.
         destruct Hab as [Hab| Hab]. {
           injection Hab; clear Hab; intros H1 H2 H3.
           now subst cab rab llab.
-        }
-        clear - Hab.
-        induction llab as [| lab]; cbn in Hab |-*. {
-          destruct rab; [ easy | exfalso ].
-          revert lb Hab.
-          induction la as [| a]; intros; [ easy | ].
-          destruct lb as [| b]; [ easy | ].
-          cbn - [ In ] in Hab.
-          destruct Hab as [Hab| Hab]. {
-            now injection Hab; clear Hab; intros H1 H2.
-          }
-          now apply (IHla lb).
         }
 ...
   specialize (Hitn (map (@bmat_depth _) lab)) as H1.
