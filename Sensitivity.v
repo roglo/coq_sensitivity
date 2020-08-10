@@ -3647,6 +3647,7 @@ destruct itn. (* pour voir *) {
   generalize Hlab; intros H.
   apply in_map with (f := map (bmat_depth (T := T))) in H.
   specialize (H1 H); clear H.
+(* bmat_depth always ≠ 0, contradiction *)
 ...
 
 Theorem bmat_coh_prop_add : ∀ T add (BMA BMB : bmatrix T),
