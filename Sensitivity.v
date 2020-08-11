@@ -3421,6 +3421,7 @@ intros * Hita Hitn.
 apply bmatrix_coh_equiv_prop_loop.
 revert add itn BMA BMB Hitn Hita.
 induction ita; intros; [ now destruct itn | ].
+(*
 revert add BMA BMB Hitn Hita.
 induction itn; intros. {
   cbn in Hitn.
@@ -3428,40 +3429,55 @@ induction itn; intros. {
   destruct BMB as (BMDB, BMPB).
   now destruct BMDA, BMDB.
 }
+*)
 cbn in Hitn; cbn.
 remember (bmat_def BMA) as BMDA eqn:HBMDA.
 remember (bmat_def BMB) as BMDB eqn:HBMDB.
+(*
 remember (bmat_coh_prop BMA) as BMPA eqn:HBMPA.
 remember (bmat_coh_prop BMB) as BMPB eqn:HBMPB.
+*)
 move BMDB before BMDA.
+(*
 move BMPB before BMPA.
+*)
 symmetry in HBMDA, HBMDB.
+(*
 symmetry in HBMPA, HBMPB.
+*)
 destruct BMDA as [ta| MDA]; [ now destruct BMDB, itn | ].
 destruct BMDB as [tb| MDB]; [ now destruct itn | ].
+(*
 cbn in BMPA.
 clear HBMPA HBMPB.
 rewrite HBMDA in BMPA.
 rewrite HBMDB in BMPB.
-(*
-cbn in Hitn; cbn.
-destruct BMA as (BMDA, BMPA).
-destruct BMB as (BMDB, BMPB).
-cbn in Hitn; cbn.
-destruct BMDA as [ta| MDA]; [ now destruct BMDB, itn | ].
-destruct BMDB as [tb| MDB]; [ now destruct itn | ].
-move MDB before MDA.
-cbn - [ bmat_depth ] in Hita.
 *)
+cbn in Hita.
+apply Nat.succ_le_mono in Hita.
+revert add MDA MDB BMA BMB Hita HBMDA HBMDB Hitn.
+induction itn; intros; [ easy | cbn ].
+(**)
 apply Bool.andb_true_iff.
 split. {
+(*
   cbn in BMPA, BMPB.
   apply Bool.andb_true_iff in BMPA.
   apply Bool.andb_true_iff in BMPB.
   destruct BMPA as (MPA, BMPA).
   destruct BMPB as (MPB, BMPB).
+*)
   specialize (@mat_coh_prop_add (bmatrix_def T)) as H1.
   specialize (H1 (bmat_def_add add)).
+  set (BMPA := bmat_coh_prop BMA).
+  set (BMPB := bmat_coh_prop BMB).
+  rewrite HBMDA in BMPA.
+  rewrite HBMDB in BMPB.
+  cbn in BMPA, BMPB.
+  apply Bool.andb_true_iff in BMPA.
+  apply Bool.andb_true_iff in BMPB.
+  destruct BMPA as (MPA, BMPA).
+  destruct BMPB as (MPB, BMPB).
   specialize (H1 (mk_mat MDA MPA) (mk_mat MDB MPB)).
   unfold mat_def_add in H1.
   cbn - [ Nat.eq_dec ] in H1.
@@ -3479,7 +3495,9 @@ split. {
   apply matrix_coh_equiv_prop.
   split; cbn; [ | | easy ]. {
     cbn in Hita.
+(*
     apply Nat.succ_le_mono in Hita.
+*)
     clear - Hita Hr.
     revert ra llb Hr.
     induction lla as [| la]; intros; [ easy | ].
@@ -3504,7 +3522,9 @@ split. {
     intros la Hla.
     apply Hc.
     cbn in Hita.
+(*
     apply Nat.succ_le_mono in Hita.
+*)
     clear - Hita Hla.
     revert la llb Hla.
     induction lla as [| la1]; intros; [ easy | ].
@@ -3562,12 +3582,17 @@ split. {
 apply fold_left_fold_left_and_true.
 intros lab ab Hlab Hab.
 destruct ab as [xab| Mab]. {
-  clear - BMPA BMPB add Hlab Hitn Hab.
+  set (BMPA := bmat_coh_prop BMA).
+  set (BMPB := bmat_coh_prop BMB).
+  rewrite HBMDA in BMPA.
+  rewrite HBMDB in BMPB.
   cbn in BMPA, BMPB.
   apply Bool.andb_true_iff in BMPA.
   apply Bool.andb_true_iff in BMPB.
   destruct BMPA as (MPA, BMPA).
   destruct BMPB as (MPB, BMPB).
+  clear - BMPA BMPB MPA MPB add Hlab Hitn Hab.
+  cbn in BMPA, BMPB.
   specialize (@mat_coh_prop_add (bmatrix_def T)) as H1.
   specialize (H1 (bmat_def_add add)).
   specialize (H1 (mk_mat MDA MPA) (mk_mat MDB MPB)).
@@ -3625,6 +3650,37 @@ destruct ab as [xab| Mab]. {
   }
   now specialize (Hz _ _ Hlab Hab).
 }
+(**)
+destruct MDA as (lla, ra, ca).
+destruct MDB as (llb, rb, cb).
+move llb before lla.
+destruct lla as [| la]. {
+  unfold mat_def_add in Hlab.
+  cbn - [ Nat.eq_dec ] in Hlab.
+  destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
+  now destruct (Nat.eq_dec ca cb).
+}
+destruct la as [| a]. {
+  unfold mat_def_add in Hlab, Hitn.
+  cbn - [ Nat.eq_dec ] in Hlab, Hitn.
+  destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
+  destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
+  subst rb cb.
+  cbn in Hlab.
+  destruct llb as [| lb]; [ easy | ].
+  destruct Hlab as [Hlab| Hlab]; [ now subst lab | ].
+  cbn in Hlab, Hitn.
+  apply Nat.succ_le_mono in Hitn.
+  cbn in Hita.
+...
+}
+destruct Mab as (llab, rab, cab).
+...
+destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
+  destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
+  subst rb cb; cbn in Hitn, Hlab.
+  specialize (Hitn (map (@bmat_depth _) lab)) as H1.
+...
 destruct itn. (* pour voir *) {
   exfalso.
   clear - Hitn Hlab Hab.
@@ -3651,11 +3707,24 @@ destruct itn. (* pour voir *) {
 }
 apply bmatrix_coh_equiv_prop_loop.
 split. {
+  set (BMPA := bmat_coh_prop BMA).
+  set (BMPB := bmat_coh_prop BMB).
+  rewrite HBMDA in BMPA.
+  rewrite HBMDB in BMPB.
+  cbn in BMPA, BMPB.
+  apply Bool.andb_true_iff in BMPA.
+  apply Bool.andb_true_iff in BMPB.
+  destruct BMPA as (MPA, BMPA).
+  destruct BMPB as (MPB, BMPB).
+(*
   apply bmatrix_coh_equiv_prop_loop in BMPA.
   apply bmatrix_coh_equiv_prop_loop in BMPB.
   destruct BMPA as (MPA, BMPA).
   destruct BMPB as (MPB, BMPB).
   cbn in BMPA, BMPB.
+*)
+  apply matrix_coh_equiv_prop in MPA.
+  apply matrix_coh_equiv_prop in MPB.
   move MPB before MPA.
   destruct MPA as (Har, Hac, Harc).
   destruct MPB as (Hbr, Hbc, Hbrc).
@@ -3670,8 +3739,26 @@ split. {
     destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
     destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
     subst rb cb; cbn in Hlab.
-    destruct Mab as (llab, rab, cab).
-    cbn.
+    destruct Mab as (llab, rab, cab); cbn.
+(**)
+    cbn in Hita.
+    specialize (IHitn add) as H1.
+    specialize (H1 (mk_mat_def lla ra ca) (mk_mat_def llb ra ca)).
+    cbn - [ bmatrix_coh bmat_depth bmatrix_coh_loop ] in H1.
+    move Hita before H1.
+    specialize (H1 BMA BMB Hita HBMDA HBMDB).
+    cbn in H1.
+...
+  IHitn : ∀ (add : T → T → T) (MDA MDB : matrix_def (bmatrix_def T)) (BMA BMB : bmatrix T),
+...
+destruct lla as [| la]; [ easy | ].
+cbn in Hita.
+destruct la as [| a]. {
+  cbn in Hita.
+...
+}
+cbn in Hita.
+...
     destruct ita. {
       cbn in Hlab.
 Print void_bmat_def.
@@ -3683,29 +3770,27 @@ destruct llb as [| lb]; [ easy | ].
 cbn - [ In ] in Hlab.
 ...
       clear - Hlab Hab.
-      revert llb rab cab lab llab Hlab Hab.
+      revert llb lab llab Hlab Hab.
       induction lla as [| la]; intros; [ easy | ].
       destruct llb as [| lb]; [ easy | ].
       cbn - [ In ] in Hlab.
       destruct Hlab as [Hlab| Hlab]. {
-        revert lb lla llb lab llab rab cab Hlab Hab IHlla.
-        induction la as [| a]; intros; [ now cbn in Hlab; subst lab | ].
-        destruct lb as [| b]; [ now cbn in Hlab; subst lab | ].
-        cbn in Hlab.
         subst lab.
+        revert lb llab Hab.
+        induction la as [| a]; intros; [ easy | ].
+        destruct lb as [| b]; [ easy | ].
+        cbn - [ In ] in Hab.
         destruct Hab as [Hab| Hab]. {
-          injection Hab; clear Hab; intros H1 H2 H3.
-          now subst cab rab llab.
-        }
+          now injection Hab; intros; subst llab rab cab.
+        }        
+        now apply (IHla lb).
+      }
+      now apply (IHlla llb lab).
+    }
 ...
-  specialize (Hitn (map (@bmat_depth _) lab)) as H1.
-  apply in_map with (f := map (bmat_depth (T := T))) in Hlab.
-  specialize (H1 Hlab).
-  (* bmat_depth always ≠ 0, contradiction *)
-  destruct lab as [| ab]; [ easy | ].
-  cbn - [ In ] in H1.
-  specialize (H1 _ (or_introl eq_refl)).
-  now destruct ab.
+    destruct lla as [| la]; [ easy | ].
+    destruct llb as [| lb]; [ easy | ].
+    cbn in Hlab.
 ...
 
 Theorem bmat_coh_prop_add : ∀ T add (BMA BMB : bmatrix T),
