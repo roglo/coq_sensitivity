@@ -3454,11 +3454,15 @@ destruct itn; [ easy | ].
 apply Nat.succ_le_mono in Hitn; cbn.
 split. {
   destruct ita; cbn. {
+    apply Nat.le_0_r in Hita.
+    apply eq_fold_left_fold_left_max_0 in Hita.
+    destruct Hita as (_, Hita).
+...
     unfold mat_def_add.
-    cbn.
-    destruct (Nat.eq_dec (mat_nrows BMAD) r) as [Hrr| Hrr]; [ | easy ].
-    destruct (Nat.eq_dec (mat_ncols BMAD) c) as [Hcc| Hcc]; [ | easy ].
     destruct BMAD as (lla, ra, ca).
+    cbn - [ Nat.eq_dec ].
+    destruct (Nat.eq_dec ra r) as [Hrr| Hrr]; [ | easy ].
+    destruct (Nat.eq_dec ca c) as [Hcc| Hcc]; [ | easy ].
     cbn in Hrr, Hcc |-*.
     subst r c.
 cbn in BMAP.
