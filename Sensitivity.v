@@ -3430,10 +3430,24 @@ Theorem bmat_coh_prop_add_gen : ∀ T add ita itn (BMA BMB : bmatrix T),
 Proof.
 intros * Hita Hitn.
 destruct BMA as (BMAD, BMAP).
+cbn in Hita, Hitn |-*.
+apply bmatrix_coh_equiv_prop in BMAP.
 revert ita itn BMAP BMB Hita Hitn.
 induction BMAD as [| BMAD IHBMAD] using bmatrix_ind; intros. {
-  cbn in Hita, Hitn |-*.
-  clear BMAP.
+  cbn in Hita, Hitn |-*; clear BMAP.
+  destruct ita; [ easy | clear Hita ].
+  cbn in Hitn |-*.
+  destruct BMB as (BMBD, BMBP).
+  cbn in Hitn |-*.
+  now destruct BMBD, itn.
+}
+cbn in Hita, Hitn |-*.
+destruct ita; [ easy | ].
+cbn in Hitn |-*.
+apply Nat.succ_le_mono in Hita.
+destruct BMB as (BMBD, BMBP).
+cbn in Hitn |-*.
+destruct BMBD as [xb| Mb]; [ now destruct itn | ].
 ...
 intros * Hita Hitn.
 apply bmatrix_coh_equiv_prop_loop.
