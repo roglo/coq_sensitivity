@@ -2217,6 +2217,17 @@ subst a.
 now apply IHB.
 Qed.
 
+Theorem matrix_bmatrix_ind : ∀ T P,
+  (∀ r c, P (mk_mat_def [] r c))
+  → (∀ ll r c, P (mk_mat_def ll r c) → ∀ l, P (mk_mat_def (l :: ll) r c))
+  → ∀ M : matrix_def (bmatrix_def T), P M.
+Proof.
+intros * Hnil Hcons M.
+destruct M as (ll, r, c).
+induction ll as [| l]; [ apply Hnil | ].
+apply Hcons, IHll.
+Qed.
+
 Fixpoint bmat_depth T (BM : bmatrix_def T) :=
   match BM with
   | BM_1 _ => 1
@@ -3421,52 +3432,19 @@ intros * Hita Hitn.
 apply bmatrix_coh_equiv_prop_loop.
 revert add itn BMA BMB Hitn Hita.
 induction ita; intros; [ now destruct itn | ].
-(*
-revert add BMA BMB Hitn Hita.
-induction itn; intros. {
-  cbn in Hitn.
-  destruct BMA as (BMDA, BMPA).
-  destruct BMB as (BMDB, BMPB).
-  now destruct BMDA, BMDB.
-}
-*)
 cbn in Hitn; cbn.
 remember (bmat_def BMA) as BMDA eqn:HBMDA.
 remember (bmat_def BMB) as BMDB eqn:HBMDB.
-(*
-remember (bmat_coh_prop BMA) as BMPA eqn:HBMPA.
-remember (bmat_coh_prop BMB) as BMPB eqn:HBMPB.
-*)
 move BMDB before BMDA.
-(*
-move BMPB before BMPA.
-*)
 symmetry in HBMDA, HBMDB.
-(*
-symmetry in HBMPA, HBMPB.
-*)
 destruct BMDA as [ta| MDA]; [ now destruct BMDB, itn | ].
 destruct BMDB as [tb| MDB]; [ now destruct itn | ].
-(*
-cbn in BMPA.
-clear HBMPA HBMPB.
-rewrite HBMDA in BMPA.
-rewrite HBMDB in BMPB.
-*)
 cbn in Hita.
 apply Nat.succ_le_mono in Hita.
 revert add MDA MDB BMA BMB Hita HBMDA HBMDB Hitn.
 induction itn; intros; [ easy | cbn ].
-(**)
 apply Bool.andb_true_iff.
 split. {
-(*
-  cbn in BMPA, BMPB.
-  apply Bool.andb_true_iff in BMPA.
-  apply Bool.andb_true_iff in BMPB.
-  destruct BMPA as (MPA, BMPA).
-  destruct BMPB as (MPB, BMPB).
-*)
   specialize (@mat_coh_prop_add (bmatrix_def T)) as H1.
   specialize (H1 (bmat_def_add add)).
   set (BMPA := bmat_coh_prop BMA).
@@ -3495,9 +3473,6 @@ split. {
   apply matrix_coh_equiv_prop.
   split; cbn; [ | | easy ]. {
     cbn in Hita.
-(*
-    apply Nat.succ_le_mono in Hita.
-*)
     clear - Hita Hr.
     revert ra llb Hr.
     induction lla as [| la]; intros; [ easy | ].
@@ -3522,9 +3497,6 @@ split. {
     intros la Hla.
     apply Hc.
     cbn in Hita.
-(*
-    apply Nat.succ_le_mono in Hita.
-*)
     clear - Hita Hla.
     revert la llb Hla.
     induction lla as [| la1]; intros; [ easy | ].
@@ -3651,6 +3623,14 @@ destruct ab as [xab| Mab]. {
   now specialize (Hz _ _ Hlab Hab).
 }
 (**)
+Check bmatrix_ind.
+...
+revert ita itn Hita Hitn Hlab IHita IHitn.
+induction MDA as [| ll r c IHMDA] using matrix_bmatrix_ind; intros.
+2: {
+...
+}
+...
 destruct MDA as (lla, ra, ca).
 destruct MDB as (llb, rb, cb).
 move llb before lla.
