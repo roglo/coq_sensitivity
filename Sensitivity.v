@@ -3448,6 +3448,22 @@ apply Nat.succ_le_mono in Hita.
 destruct BMB as (BMBD, BMBP).
 cbn in Hitn |-*.
 destruct BMBD as [xb| Mb]; [ now destruct itn | ].
+destruct Mb as (ll, r, c).
+cbn in Hitn |-*.
+destruct itn; [ easy | ].
+apply Nat.succ_le_mono in Hitn; cbn.
+split. {
+  destruct ita; cbn. {
+    unfold mat_def_add.
+    cbn.
+    destruct (Nat.eq_dec (mat_nrows BMAD) r) as [Hrr| Hrr]; [ | easy ].
+    destruct (Nat.eq_dec (mat_ncols BMAD) c) as [Hcc| Hcc]; [ | easy ].
+    destruct BMAD as (lla, ra, ca).
+    cbn in Hrr, Hcc |-*.
+    subst r c.
+cbn in BMAP.
+    destruct lla as [| la]; cbn; [ | ]. {
+      split; cbn.
 ...
 intros * Hita Hitn.
 apply bmatrix_coh_equiv_prop_loop.
