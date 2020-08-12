@@ -3385,33 +3385,33 @@ apply fold_left_fold_left_max_le.
 apply Nat.le_0_l.
 Qed.
 
-Theorem eq_fold_left_max_0 : ∀ ln m,
-  fold_left max ln m = 0
-  → m = 0 ∧ ∀ n, n ∈ ln → n = 0.
+Theorem le_fold_left_max : ∀ ln m k,
+  fold_left max ln m ≤ k
+  → m ≤ k ∧ ∀ n, n ∈ ln → n ≤ k.
 Proof.
 intros * Hln.
-revert m Hln.
+revert m k Hln.
 induction ln as [| n]; intros; [ easy | cbn in Hln ].
-specialize (IHln _ Hln).
+specialize (IHln _ _ Hln).
 destruct IHln as (Hm, Hn).
-apply Nat_eq_max_0 in Hm.
-destruct Hm as (Hmz, Hnz); subst m n.
+apply Nat.max_lub_iff in Hm.
+destruct Hm as (Hmz, Hnz).
 split; [ easy | ].
-intros n Hnn.
-destruct Hnn as [Hnn| Hnn]; [ easy | ].
-apply Hn, Hnn.
+intros p Hpp.
+destruct Hpp as [Hpp| Hpp]; [ now subst p | ].
+apply Hn, Hpp.
 Qed.
 
-Theorem eq_fold_left_fold_left_max_0 : ∀ lln m,
-  fold_left (λ m ln, fold_left max ln m) lln m = 0
-  → m = 0 ∧ ∀ ln, ln ∈ lln → ∀ n, n ∈ ln → n = 0.
+Theorem le_fold_left_fold_left_max : ∀ lln m k,
+  fold_left (λ m ln, fold_left max ln m) lln m ≤ k
+  → m ≤ k ∧ ∀ ln, ln ∈ lln → ∀ n, n ∈ ln → n ≤ k.
 Proof.
 intros * Hlln.
-revert m Hlln.
+revert m k Hlln.
 induction lln as [| ln]; intros; [ easy | cbn in Hlln ].
-specialize (IHlln _ Hlln) as H1.
+specialize (IHlln _ _ Hlln) as H1.
 destruct H1 as (H1, H3).
-apply eq_fold_left_max_0 in H1.
+apply le_fold_left_max in H1.
 destruct H1 as (H1, H2).
 split; [ easy | ].
 intros ln1 Hln n Hn.
@@ -3421,6 +3421,34 @@ destruct Hln as [Hln| Hln]. {
 }
 now apply (H3 ln1).
 Qed.
+
+(*
+Theorem eq_fold_left_max_0 : ∀ ln m,
+  fold_left max ln m = 0
+  → m = 0 ∧ ∀ n, n ∈ ln → n = 0.
+Proof.
+intros * Hln.
+apply Nat.le_0_r in Hln.
+specialize (le_fold_left_max ln m Hln) as H1.
+split; [ now apply Nat.le_0_r | ].
+intros n Hn.
+now apply Nat.le_0_r, H1.
+Qed.
+
+Theorem eq_fold_left_fold_left_max_0 : ∀ lln m,
+  fold_left (λ m ln, fold_left max ln m) lln m = 0
+  → m = 0 ∧ ∀ ln, ln ∈ lln → ∀ n, n ∈ ln → n = 0.
+Proof.
+intros * Hlln.
+apply Nat.le_0_r in Hlln.
+apply le_fold_left_fold_left_max in Hlln.
+destruct Hlln as (H1, H2).
+apply Nat.le_0_r in H1.
+split; [ easy | ].
+intros ln Hln n Hn.
+now apply Nat.le_0_r, (H2 ln).
+Qed.
+*)
 
 Theorem bmat_coh_prop_add_gen : ∀ T add ita itn (BMA BMB : bmatrix T),
   bmat_depth (bmat_def BMA) ≤ ita
@@ -3443,8 +3471,12 @@ induction BMAD as [| BMAD IHBMAD] using bmatrix_ind; intros. {
 }
 cbn in Hita, Hitn |-*.
 destruct ita; [ easy | ].
-cbn in Hitn |-*.
 apply Nat.succ_le_mono in Hita.
+apply le_fold_left_fold_left_max in Hita.
+destruct Hita as (_, Hita).
+...
+apply eq_fold_left_fold_left_max_0 in Hita.
+cbn in Hitn |-*.
 destruct BMB as (BMBD, BMBP).
 cbn in Hitn |-*.
 destruct BMBD as [xb| Mb]; [ now destruct itn | ].
