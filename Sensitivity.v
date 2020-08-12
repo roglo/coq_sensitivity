@@ -2949,54 +2949,38 @@ now apply IHla.
 Qed.
 
 Theorem length_col_list_list_add :
-  ∀ T add ca (a b : T) la lb lla llb lc,
-  (∀ c, c ∈ (a :: la) :: lla → length c = S ca)
-  → (∀ c, c ∈ (b :: lb) :: llb → length c = S ca)
+  ∀ T add ca (lla llb : list (list (bmatrix_def T))) lc,
+  (∀ c, c ∈ lla → length c = ca)
+  → (∀ c, c ∈ llb → length c = ca)
   → lc ∈ list_list_add add lla llb
-  → length lc = S ca.
+  → length lc = ca.
 Proof.
 intros * Hac Hbc Hlc.
 revert llb lc Hbc Hlc.
 induction lla as [| la1]; intros; [ easy | ].
 destruct llb as [| lb1]; [ easy | ].
-cbn in Hlc.
+cbn - [ In ] in Hlc.
 destruct Hlc as [Hlc| Hlc]. {
   subst lc.
   clear - Hac Hbc.
-  specialize (Hac la1 (or_intror (or_introl eq_refl))).
-  specialize (Hbc lb1 (or_intror (or_introl eq_refl))).
+  specialize (Hac _ (or_introl eq_refl)).
+  specialize (Hbc _ (or_introl eq_refl)).
   revert ca lb1 Hac Hbc.
   induction la1 as [| a1]; intros; [ easy | ].
   destruct lb1 as [| b1]; intros; [ easy | ].
   cbn in Hac, Hbc |-*.
+  destruct ca; [ easy | ].
   apply Nat.succ_inj in Hac.
   apply Nat.succ_inj in Hbc.
   f_equal.
-  destruct ca. {
-    now apply length_zero_iff_nil in Hac; subst la1.
-  }
   now apply IHla1.
 } {
   apply IHlla with (llb := llb); [ | | easy ]. {
     intros lc1 Hlc1.
-    destruct Hlc1 as [Hlc1| Hlc1]. {
-      subst lc1; cbn; f_equal.
-      specialize (Hac (a :: la) (or_introl eq_refl)).
-      cbn in Hac.
-      now apply Nat.succ_inj in Hac.
-    } {
-      now apply Hac; right; right.
-    }
+    now apply Hac; right.
   } {
     intros lc1 Hlc1.
-    destruct Hlc1 as [Hlc1| Hlc1]. {
-      subst lc1; cbn; f_equal.
-      specialize (Hbc (b :: lb) (or_introl eq_refl)).
-      cbn in Hbc.
-      now apply Nat.succ_inj in Hbc.
-    } {
-      now apply Hbc; right; right.
-    }
+    now apply Hbc; right.
   }
 }
 Qed.
@@ -3511,6 +3495,10 @@ destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]. {
         now apply length_list_list_add with (ca := ca).
       } {
         intros lc Hlc.
+        rewrite Hab; cbn.
+        rewrite Hab in Hlc; cbn in Hlc.
+        now apply length_col_list_list_add with (ca := ca) in Hlc.
+      }
 ...
     destruct lla as [| la]. {
       cbn in Har; subst ra.
