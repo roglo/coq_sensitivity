@@ -3499,6 +3499,10 @@ destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]. {
         rewrite Hab in Hlc; cbn in Hlc.
         now apply length_col_list_list_add with (ca := ca) in Hlc.
       }
+      now rewrite Hab.
+    }
+    intros lc Hlc c Hc.
+    rewrite Hab in Hlc; cbn in Hlc.
 ...
     destruct lla as [| la]. {
       cbn in Har; subst ra.
