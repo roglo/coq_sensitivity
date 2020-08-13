@@ -3439,60 +3439,62 @@ induction ab as [| ab IHab] using bmatrix_ind; intros. {
 cbn in Hitn.
 destruct itn; [ easy | cbn ].
 apply Nat.succ_le_mono in Hitn.
-destruct ita. {
-  cbn in Hab.
-  now injection Hab; intros; subst ab.
-}
 destruct BMA as (BMAD, BMAP).
 destruct BMB as (BMBD, BMBP).
 move BMBD before BMAD.
-cbn in Hita, Hab.
-destruct BMAD as [xa| Ma]. {
-  destruct BMBD as [xb| Mb]; [ easy | ].
-  now injection Hab; clear Hab; intros; subst ab.
-}
-destruct BMBD as [xb| Mb]. {
-  now injection Hab; clear Hab; intros; subst ab.
-}
-injection Hab; clear Hab; intros Hab.
 cbn in Hita.
-apply Nat.succ_le_mono in Hita.
-apply fold_left_fold_left_max_le_if in Hita.
-destruct Hita as (_, Hita).
-assert (H : ∀ l, l ∈ mat_list Ma → ∀ M, M ∈ l → bmat_depth M ≤ ita). {
-  intros l Hl M HM.
-  apply (Hita (map (@bmat_depth _) l)); [ now apply in_map | ].
-  now apply in_map.
-}
-move H before Hita; clear Hita; rename H into Hita.
-apply fold_left_fold_left_max_le_if in Hitn.
-destruct Hitn as (_, Hitn).
-assert (H : ∀ l, l ∈ mat_list ab → ∀ M, M ∈ l → bmat_depth M ≤ itn). {
-  intros l Hl M HM.
-  apply (Hitn (map (@bmat_depth _) l)); [ now apply in_map | ].
-  now apply in_map.
-}
-move H before Hitn; clear Hitn; rename H into Hitn.
+cbn - [ bmat_def_add_loop ] in Hab.
 apply bmatrix_coh_equiv_prop in BMAP.
 apply bmatrix_coh_equiv_prop in BMBP.
-destruct BMAP as (H1a, H2a).
-destruct BMBP as (H1b, H2b).
-move H1b before H1a.
-destruct H1a as (Har, Hac, Harc).
-destruct H1b as (Hbr, Hbc, Hbrc).
-move Hbr before Har.
-move Hbc before Hac.
-cbn in H2a, H2b.
-destruct Ma as (lla, ra, ca).
-destruct Mb as (llb, rb, cb).
-cbn in *.
-unfold mat_def_add in Hab.
-cbn - [ Nat.eq_dec ] in Hab.
-destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | now subst ab ].
-destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | now subst ab ].
-move Hrr at top; move Hcc at top.
-subst rb cb.
 split. {
+  destruct ita. {
+    cbn in Hab.
+    now injection Hab; intros; subst ab.
+  }
+  cbn in Hab.
+  destruct BMAD as [xa| Ma]. {
+    destruct BMBD as [xb| Mb]; [ easy | ].
+    now injection Hab; clear Hab; intros; subst ab.
+  }
+  destruct BMBD as [xb| Mb]. {
+    now injection Hab; clear Hab; intros; subst ab.
+  }
+  injection Hab; clear Hab; intros Hab.
+  cbn in Hita.
+  apply Nat.succ_le_mono in Hita.
+  apply fold_left_fold_left_max_le_if in Hita.
+  destruct Hita as (_, Hita).
+  assert (H : ∀ l, l ∈ mat_list Ma → ∀ M, M ∈ l → bmat_depth M ≤ ita). {
+    intros l Hl M HM.
+    apply (Hita (map (@bmat_depth _) l)); [ now apply in_map | ].
+    now apply in_map.
+  }
+  move H before Hita; clear Hita; rename H into Hita.
+  apply fold_left_fold_left_max_le_if in Hitn.
+  destruct Hitn as (_, Hitn).
+  assert (H : ∀ l, l ∈ mat_list ab → ∀ M, M ∈ l → bmat_depth M ≤ itn). {
+    intros l Hl M HM.
+    apply (Hitn (map (@bmat_depth _) l)); [ now apply in_map | ].
+    now apply in_map.
+  }
+  move H before Hitn; clear Hitn; rename H into Hitn.
+  destruct BMAP as (H1a, H2a).
+  destruct BMBP as (H1b, H2b).
+  move H1b before H1a.
+  destruct H1a as (Har, Hac, Harc).
+  destruct H1b as (Hbr, Hbc, Hbrc).
+  move Hbr before Har.
+  move Hbc before Hac.
+  cbn in H2a, H2b.
+  destruct Ma as (lla, ra, ca).
+  destruct Mb as (llb, rb, cb).
+  cbn in *.
+  unfold mat_def_add in Hab.
+  cbn - [ Nat.eq_dec ] in Hab.
+  destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | now subst ab ].
+  destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | now subst ab ].
+  move Hrr at top; move Hcc at top.
+  subst rb cb.
   split. {
     rewrite Hab; cbn.
     now apply length_list_list_add with (ca := ca).
@@ -3505,17 +3507,21 @@ split. {
   now rewrite Hab.
 }
 intros lc Hlc c Hc.
-rewrite Hab in Hlc; cbn in Hlc.
-destruct lla as [| la]; [ easy | ].
+move c before BMBD.
+induction BMAD as [xa| Ma IHBMAD] using bmatrix_ind; intros. {
+  destruct ita; [ easy | ].
+  cbn in Hab.
+  destruct BMBD as [xb| Mb]; [ easy | ].
+  now injection Hab; clear Hab; intros H; subst ab.
+}
+...
+induction lla as [| la]; intros; [ easy | ].
 destruct llb as [| lb]; [ easy | ].
 cbn in Har, Hbr.
 cbn - [ In ] in Hlc.
 destruct Hlc as [Hlc| Hlc]. {
   subst lc.
-(**)
-apply in_split in Hc.
-(* truc comme ça, ouais, peut-être *)
-...
+  clear IHlla.
   revert lb Hbc H2b Hab Hc.
   induction la as [| a]; intros; [ easy | ].
   destruct lb as [| b]; [ easy | ].
@@ -3564,8 +3570,7 @@ apply in_split in Hc.
     }
     easy.
   }
-  (* il faut que je trouve le bon BMA, BMB pour c ; bon, y a sûrement une
-     induction à faire sur "list_add (bmat_def_add_loop add ita) la lb" *)
+  apply IHla with (lb := lb).
 ...
   remember (bmat_def_add_loop add ita a b :: list_add (bmat_def_add_loop add ita) la lb) as lc eqn:Hlc.
   apply (IHab lc) with (ita := ita) (BMA := mk_bmat a Ha) (BMB := mk_bmat b Hb). {
