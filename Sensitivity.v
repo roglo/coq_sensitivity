@@ -3473,6 +3473,53 @@ assert (H : ∀ l, l ∈ mat_list ab → ∀ M, M ∈ l → bmat_depth M ≤ itn
   now apply in_map.
 }
 move H before Hitn; clear Hitn; rename H into Hitn.
+apply bmatrix_coh_equiv_prop in BMAP.
+apply bmatrix_coh_equiv_prop in BMBP.
+destruct BMAP as (H1a, H2a).
+destruct BMBP as (H1b, H2b).
+move H1b before H1a.
+destruct H1a as (Har, Hac, Harc).
+destruct H1b as (Hbr, Hbc, Hbrc).
+move Hbr before Har.
+move Hbc before Hac.
+cbn in H2a, H2b.
+destruct Ma as (lla, ra, ca).
+destruct Mb as (llb, rb, cb).
+cbn in *.
+unfold mat_def_add in Hab.
+cbn - [ Nat.eq_dec ] in Hab.
+destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | now subst ab ].
+destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | now subst ab ].
+move Hrr at top; move Hcc at top.
+subst rb cb.
+split. {
+  split. {
+    rewrite Hab; cbn.
+    now apply length_list_list_add with (ca := ca).
+  } {
+    intros lc Hlc.
+    rewrite Hab; cbn.
+    rewrite Hab in Hlc; cbn in Hlc.
+    now apply length_col_list_list_add with (ca := ca) in Hlc.
+  }
+  now rewrite Hab.
+}
+intros lc Hlc c Hc.
+rewrite Hab in Hlc; cbn in Hlc.
+destruct lla as [| la]; [ easy | ].
+destruct llb as [| lb]; [ easy | ].
+cbn - [ In ] in Hlc.
+destruct Hlc as [Hlc| Hlc]. {
+  subst lc.
+  destruct la as [| a]; [ easy | ].
+  destruct lb as [| b]; [ easy | ].
+  cbn - [ In ] in Hc.
+  destruct Hc as [Hc| Hc]. {
+    subst c.
+    cbn in Hab.
+...
+    eapply (IHab la) with (ita := ita). {
+      rewrite Hab; cbn - [ In ].
 ...
 intros * Hita Hitn.
 destruct BMA as (BMAD, BMAP).
