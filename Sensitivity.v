@@ -3430,6 +3430,51 @@ Theorem bmat_coh_prop_add_gen : ∀ T add ita itn (BMA BMB : bmatrix T),
        (bmat_def_add_loop add ita (bmat_def BMA) (bmat_def BMB)).
 Proof.
 intros * Hita Hitn.
+remember (bmat_def_add_loop add ita (bmat_def BMA) (bmat_def BMB)) as ab
+  eqn:Hab.
+revert ita itn BMA BMB Hita Hitn Hab.
+induction ab as [| ab IHab] using bmatrix_ind; intros. {
+  now destruct itn.
+}
+cbn in Hitn.
+destruct itn; [ easy | cbn ].
+apply Nat.succ_le_mono in Hitn.
+destruct ita. {
+  cbn in Hab.
+  now injection Hab; intros; subst ab.
+}
+destruct BMA as (BMAD, BMAP).
+destruct BMB as (BMBD, BMBP).
+move BMBD before BMAD.
+cbn in Hita, Hab.
+destruct BMAD as [xa| Ma]. {
+  destruct BMBD as [xb| Mb]; [ easy | ].
+  now injection Hab; clear Hab; intros; subst ab.
+}
+destruct BMBD as [xb| Mb]. {
+  now injection Hab; clear Hab; intros; subst ab.
+}
+injection Hab; clear Hab; intros Hab.
+cbn in Hita.
+apply Nat.succ_le_mono in Hita.
+apply le_fold_left_fold_left_max in Hita.
+destruct Hita as (_, Hita).
+assert (H : ∀ l, l ∈ mat_list Ma → ∀ M, M ∈ l → bmat_depth M ≤ ita). {
+  intros l Hl M HM.
+  apply (Hita (map (@bmat_depth _) l)); [ now apply in_map | ].
+  now apply in_map.
+}
+move H before Hita; clear Hita; rename H into Hita.
+apply le_fold_left_fold_left_max in Hitn.
+destruct Hitn as (_, Hitn).
+assert (H : ∀ l, l ∈ mat_list ab → ∀ M, M ∈ l → bmat_depth M ≤ itn). {
+  intros l Hl M HM.
+  apply (Hitn (map (@bmat_depth _) l)); [ now apply in_map | ].
+  now apply in_map.
+}
+move H before Hitn; clear Hitn; rename H into Hitn.
+...
+intros * Hita Hitn.
 destruct BMA as (BMAD, BMAP).
 cbn in Hita, Hitn |-*.
 apply bmatrix_coh_equiv_prop in BMAP.
