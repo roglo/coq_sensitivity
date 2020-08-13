@@ -3518,6 +3518,20 @@ destruct BMBD as [xb| Mb]. {
   destruct ita; [ easy | ].
   now injection Hab; clear Hab; intros; subst ab.
 }
+destruct Ma as (lla, ra, ca).
+destruct Mb as (llb, rb, cb).
+move llb before lla.
+destruct ita; [ easy | ].
+cbn in Hita, Hab.
+apply Nat.succ_le_mono in Hita.
+injection Hab; clear Hab; intros Hab.
+unfold mat_def_add in Hab.
+cbn - [ Nat.eq_dec ] in Hab.
+destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | now subst ab ].
+destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | now subst ab ].
+subst rb cb.
+subst ab.
+cbn in Hitn, Hlc.
 ...
 intros lc Hlc c Hc.
 move c before BMBD.
