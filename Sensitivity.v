@@ -3529,8 +3529,34 @@ destruct Hlc as [Hlc| Hlc]. {
       apply Nat_le_fold_left_fold_left_max.
       now apply Nat_le_fold_left_max.
     }
-...
-    apply (IHab la) with (ita := ita) (BMA := mk_bmat a Ha) (BMB := mk_bmat b Hb). {
+    assert (Hb : bmatrix_coh b = true). {
+      specialize (H2b _ (or_introl eq_refl)).
+      specialize (H2b _ (or_introl eq_refl)).
+      cbn in H2b.
+      apply bmatrix_coh_equiv_prop.
+      unfold bmatrix_coh_prop.
+      apply bmatrix_coh_prop_loop_enough_iter in H2b; [ easy | ].
+      apply Nat_le_fold_left_fold_left_max.
+      now apply Nat_le_fold_left_max.
+    }
+    remember
+      (bmat_def_add_loop add ita a b ::
+       list_add (bmat_def_add_loop add ita) la lb)
+      as lc eqn:Hlc.
+    apply (IHab lc) with (ita := ita) (BMA := mk_bmat a Ha) (BMB := mk_bmat b Hb). {
+      rewrite Hab; cbn - [ In ].
+      now left.
+    } {
+      subst lc; now left.
+    } {
+      apply (Hita (a :: la)); now left.
+    } {
+      apply (Hitn lc). {
+        rewrite Hab; cbn - [ In ].
+        now left.
+      }
+      rewrite Hlc; now left.
+    }
 ...
 intros * Hita Hitn.
 destruct BMA as (BMAD, BMAP).
