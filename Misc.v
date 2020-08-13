@@ -1056,6 +1056,27 @@ rewrite Nat.max_l in Hm; [ | easy ].
 now subst a; apply Nat.le_0_r in H.
 Qed.
 
+Theorem Nat_le_fold_left_max : ∀ ln n k,
+  n ≤ k → n ≤ fold_left max ln k.
+Proof.
+intros * Hnk.
+revert k Hnk.
+induction ln as [| m]; intros; [ easy | ].
+apply IHln.
+transitivity k; [ easy | ].
+apply Nat.le_max_l.
+Qed.
+
+Theorem Nat_le_fold_left_fold_left_max : ∀ lln n k,
+  n ≤ k → n ≤ fold_left (λ m ln, fold_left max ln m) lln k.
+Proof.
+intros * Hnk.
+revert k Hnk.
+induction lln as [| ln]; intros; [ easy | cbn ].
+apply IHlln.
+now apply Nat_le_fold_left_max.
+Qed.
+
 Definition Nat_le_neq_lt : ∀ x y : nat, x ≤ y → x ≠ y → (x < y)%nat :=
   λ x y Hxy Hnxy,
   match le_lt_eq_dec x y Hxy with
