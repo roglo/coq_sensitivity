@@ -2258,7 +2258,7 @@ Definition bmatrix_coh T (bmd : bmatrix_def T) :=
   bmatrix_coh_loop (bmat_depth bmd) bmd.
 
 (* definition of block matrices *)
-Record bmatrix T :=
+Record bmatrix T := mk_bmat
   { bmat_def : bmatrix_def T;
     bmat_coh_prop : bmatrix_coh bmat_def = true }.
 
@@ -3178,7 +3178,7 @@ etransitivity; [ | apply IHnl1 ].
 now rewrite fold_left_max_swap.
 Qed.
 
-Theorem bmat_depth_le_fold_left : ∀ T lla la a k,
+Theorem bmat_depth_le_fold_left_fold_left_max : ∀ T lla la a k,
   la ∈ lla
   → a ∈ la
   → bmat_depth a
@@ -3345,9 +3345,9 @@ rewrite IHlla. {
     rewrite (IHMa la1); [ | now right | easy | ]. {
       symmetry.
       rewrite (IHMa la1); [ easy | now right | easy | ].
-      now apply (bmat_depth_le_fold_left _ la1).
+      now apply (bmat_depth_le_fold_left_fold_left_max _ la1).
     }
-    now apply (bmat_depth_le_fold_left _ la1).
+    now apply (bmat_depth_le_fold_left_fold_left_max _ la1).
   }
 } {
   intros la1 Hlla a Ha it1 Mb Hit1.
@@ -3508,17 +3508,32 @@ intros lc Hlc c Hc.
 rewrite Hab in Hlc; cbn in Hlc.
 destruct lla as [| la]; [ easy | ].
 destruct llb as [| lb]; [ easy | ].
+cbn in Har, Hbr.
 cbn - [ In ] in Hlc.
 destruct Hlc as [Hlc| Hlc]. {
   subst lc.
   destruct la as [| a]; [ easy | ].
   destruct lb as [| b]; [ easy | ].
+  move b before a.
+  move lb before la.
   cbn - [ In ] in Hc.
   destruct Hc as [Hc| Hc]. {
     subst c.
-    cbn in Hab.
+Print bmatrix.
+Check (mk_bmat a).
+assert (bmatrix_coh a = true). {
+  specialize (H2a _ (or_introl eq_refl)).
+  specialize (H2a _ (or_introl eq_refl)).
+  cbn in H2a.
+  apply bmatrix_coh_equiv_prop.
+  unfold bmatrix_coh_prop.
+  apply bmatrix_coh_prop_loop_enough_iter in H2a; [ easy | ].
+  clear.
+Search (_ ≤ fold_left _ _ _).
 ...
-    eapply (IHab la) with (ita := ita). {
+  etransitivity; [ | apply fold_left_fold_left_max_le ].
+...
+    apply (IHab la) with (ita := ita) (BMA := mk_mat a... {
       rewrite Hab; cbn - [ In ].
 ...
 intros * Hita Hitn.
