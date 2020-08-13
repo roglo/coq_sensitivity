@@ -3532,6 +3532,26 @@ destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | now subst ab ].
 subst rb cb.
 subst ab.
 cbn in Hitn, Hlc.
+induction lla as [| la]; [ easy | ].
+destruct llb as [| lb]; [ easy | ].
+cbn - [ In ] in Hlc.
+destruct Hlc as [Hlc| Hlc]. {
+  clear IHlla.
+  subst lc.
+  induction la as [| a]; [ easy | ].
+  destruct lb as [| b]; [ easy | ].
+  cbn - [ In ] in Hc.
+  destruct Hc as [Hc| Hc]. {
+    clear IHla.
+    symmetry in Hc.
+    apply fold_left_fold_left_max_le_if in Hita.
+    destruct Hita as (_, Hita).
+...
+    destruct a as [xa| Ma]. {
+      destruct b as [xb| Mb]. {
+        destruct ita. {
+          subst c; cbn.
+          destruct itn; [ cbn | easy ].
 ...
 intros lc Hlc c Hc.
 move c before BMBD.
