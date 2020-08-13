@@ -3512,7 +3512,12 @@ cbn in Har, Hbr.
 cbn - [ In ] in Hlc.
 destruct Hlc as [Hlc| Hlc]. {
   subst lc.
-  destruct la as [| a]; [ easy | ].
+(**)
+apply in_split in Hc.
+(* truc comme ça, ouais, peut-être *)
+...
+  revert lb Hbc H2b Hab Hc.
+  induction la as [| a]; intros; [ easy | ].
   destruct lb as [| b]; [ easy | ].
   move b before a.
   move lb before la.
@@ -3559,6 +3564,8 @@ destruct Hlc as [Hlc| Hlc]. {
     }
     easy.
   }
+  (* il faut que je trouve le bon BMA, BMB pour c ; bon, y a sûrement une
+     induction à faire sur "list_add (bmat_def_add_loop add ita) la lb" *)
 ...
   remember (bmat_def_add_loop add ita a b :: list_add (bmat_def_add_loop add ita) la lb) as lc eqn:Hlc.
   apply (IHab lc) with (ita := ita) (BMA := mk_bmat a Ha) (BMB := mk_bmat b Hb). {
