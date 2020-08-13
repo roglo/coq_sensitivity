@@ -3509,6 +3509,15 @@ split. {
 (**)
 intros lc Hlc c Hc.
 specialize (IHab lc Hlc c Hc).
+destruct BMAD as [xa| Ma]. {
+  destruct BMBD as [xb| Mb]; [ now destruct ita | ].
+  destruct ita; [ easy | ].
+  now injection Hab; clear Hab; intros; subst ab.
+}
+destruct BMBD as [xb| Mb]. {
+  destruct ita; [ easy | ].
+  now injection Hab; clear Hab; intros; subst ab.
+}
 ...
 intros lc Hlc c Hc.
 move c before BMBD.
