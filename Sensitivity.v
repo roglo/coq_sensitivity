@@ -3506,14 +3506,38 @@ split. {
   }
   now rewrite Hab.
 }
+(**)
+intros lc Hlc c Hc.
+specialize (IHab lc Hlc c Hc).
+...
 intros lc Hlc c Hc.
 move c before BMBD.
+revert ita Hita Hab.
+revert BMBD BMBP.
 induction BMAD as [xa| Ma IHBMAD] using bmatrix_ind; intros. {
   destruct ita; [ easy | ].
   cbn in Hab.
   destruct BMBD as [xb| Mb]; [ easy | ].
   now injection Hab; clear Hab; intros H; subst ab.
 }
+destruct ita; [ easy | ].
+cbn in Hita.
+apply Nat.succ_le_mono in Hita.
+cbn in Hab.
+destruct BMBD as [xb| Mb]. {
+  injection Hab; clear Hab; intros.
+  now subst ab.
+}
+injection Hab; clear Hab; intros Hab.
+destruct Ma as (lla, ra, ca).
+destruct Mb as (llb, rb, cb).
+cbn in IHBMAD.
+unfold mat_def_add in Hab.
+cbn - [ Nat.eq_dec ] in Hab.
+destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | now subst ab ].
+destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | now subst ab ].
+subst rb cb.
+specialize (IHab lc Hlc c Hc).
 ...
 induction lla as [| la]; intros; [ easy | ].
 destruct llb as [| lb]; [ easy | ].
