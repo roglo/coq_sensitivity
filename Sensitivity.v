@@ -3534,12 +3534,14 @@ subst ab.
 cbn in Hitn, Hlc.
 induction lla as [| la]; [ easy | ].
 destruct llb as [| lb]; [ easy | ].
+move lb before la.
 cbn - [ In ] in Hlc.
 destruct Hlc as [Hlc| Hlc]. {
   clear IHlla.
   subst lc.
   induction la as [| a]; [ easy | ].
   destruct lb as [| b]; [ easy | ].
+  move b before a.
   cbn - [ In ] in Hc.
   destruct Hc as [Hc| Hc]. {
     clear IHla.
@@ -3553,11 +3555,42 @@ destruct Hlc as [Hlc| Hlc]. {
     specialize (Hita _ (or_introl eq_refl)).
     specialize (Hita _ (or_introl eq_refl)).
     destruct a as [xa| Ma]. {
-      cbn in Hita.
-      destruct ita; [ easy | clear Hita ].
-      cbn in Hc, Hitn; subst c.
-      now destruct b, itn.
+      subst c.
+      destruct ita; [ easy | now destruct b, itn ].
     }
+    destruct b as [xb| Mb]. {
+      subst c.
+      destruct ita; [ easy | now destruct itn ].
+    }
+    specialize (IHab ita itn).
+    assert (Ha : bmatrix_coh (BM_M Ma) = true). {
+      destruct BMAP as (H1a, H2a).
+      specialize (H2a _ (or_introl eq_refl)).
+      specialize (H2a _ (or_introl eq_refl)).
+      cbn in H2a.
+      apply bmatrix_coh_equiv_prop.
+      unfold bmatrix_coh_prop.
+      apply bmatrix_coh_prop_loop_enough_iter in H2a; [ easy | ].
+      apply Nat_le_fold_left_fold_left_max.
+      now apply Nat_le_fold_left_max.
+    }
+    specialize (IHab (mk_bmat (BM_M Ma) Ha)).
+    assert (Hb : bmatrix_coh (BM_M Mb) = true). {
+      destruct BMBP as (H1b, H2b).
+      specialize (H2b _ (or_introl eq_refl)).
+      specialize (H2b _ (or_introl eq_refl)).
+      cbn in H2b.
+      apply bmatrix_coh_equiv_prop.
+      unfold bmatrix_coh_prop.
+      apply bmatrix_coh_prop_loop_enough_iter in H2b; [ easy | ].
+      apply Nat_le_fold_left_fold_left_max.
+      now apply Nat_le_fold_left_max.
+    }
+    specialize (IHab (mk_bmat (BM_M Mb) Hb)).
+    cbn - [ bmat_depth ] in IHab.
+    rewrite <- Hc in Hitn.
+    now specialize (IHab Hita Hitn Hc).
+  }
 ...
 intros lc Hlc c Hc.
 move c before BMBD.
