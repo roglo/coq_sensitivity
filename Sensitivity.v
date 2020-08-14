@@ -3662,7 +3662,33 @@ revert lb Hitn Hc H2b.
     }
     eapply Hitn; [ | apply Hn ].
     now right.
+  } {
+    easy.
+  } {
+    intros ld Hld d Hd.
+    destruct Hld as [Hld| Hld]. {
+      subst ld.
+      specialize (H2b _ (or_introl eq_refl)).
+      specialize (H2b _ (or_intror Hd)).
+      cbn in H2b.
+      apply bmatrix_coh_prop_loop_enough_iter in H2b. 2: {
+        apply Nat_le_fold_left_fold_left_max.
+        now apply bmat_depth_le_fold_left_max.
+      }
+      apply bmatrix_coh_prop_loop_enough_iter; [ | easy ].
+      apply Nat_le_fold_left_fold_left_max.
+      now apply bmat_depth_le_fold_left_max.
+    }
+    move H2b at bottom.
+    specialize (H2b _ (or_intror Hld) _ Hd).
+    cbn in H2b.
+    apply bmatrix_coh_prop_loop_enough_iter in H2b. 2: {
+      now apply bmat_depth_le_fold_left_fold_left_max with (la := ld).
+    }
+    apply bmatrix_coh_prop_loop_enough_iter; [ | easy ].
+    now apply bmat_depth_le_fold_left_fold_left_max with (la := ld).
   }
+}
 ...
 intros lc Hlc c Hc.
 move c before BMBD.
