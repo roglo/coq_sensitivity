@@ -3539,7 +3539,8 @@ cbn - [ In ] in Hlc.
 destruct Hlc as [Hlc| Hlc]. {
   clear IHlla.
   subst lc.
-  induction la as [| a]; [ easy | ].
+  revert ra ca BMAP BMBP.
+  induction la as [| a]; intros; [ easy | ].
   destruct lb as [| b]; [ easy | ].
   move b before a.
   cbn - [ In ] in Hc.
@@ -3591,6 +3592,37 @@ destruct Hlc as [Hlc| Hlc]. {
     rewrite <- Hc in Hitn.
     now specialize (IHab Hita Hitn Hc).
   }
+  destruct ca. {
+    exfalso.
+    cbn - [ In ] in BMAP.
+    destruct BMAP as (H1a, H2a).
+    destruct H1a as (Har, Hac, Harc).
+    cbn - [ In ] in Har, Hac, Harc.
+    now rewrite (proj2 Harc eq_refl) in Har.
+  }
+  destruct ra. {
+    exfalso.
+    cbn - [ In ] in BMAP.
+    destruct BMAP as (H1a, H2a).
+    now destruct H1a as (Har, Hac, Harc).
+  }
+...
+  apply IHla with (ra := S ra) (ca := ca). 4: {
+    cbn - [ In ] in BMAP |-*.
+    destruct BMAP as (H1a, H2a).
+    destruct H1a as (Har, Hac, Harc).
+    cbn - [ In ] in Har, Hac, Harc.
+    split. {
+      split; [ easy | | ]. {
+        cbn - [ In ].
+        intros d Hd.
+        destruct Hd as [Hd| Hd]. {
+          subst d.
+          specialize (Hac _ (or_introl eq_refl)).
+          cbn in Hac.
+          now apply Nat.succ_inj in Hac.
+        }
+        specialize (Hac _ (or_intror Hd)).
 ...
 intros lc Hlc c Hc.
 move c before BMBD.
