@@ -3716,6 +3716,24 @@ apply IHlla with (ra := ra) (ca := ca) (llb := llb). {
 } {
   easy.
 } {
+  destruct BMAP as (H1a, H2a).
+  destruct H1a as (Har, Hac, Harc).
+  cbn - [ In ] in Har, Hac, Harc.
+  apply Nat.succ_inj in Har.
+  destruct ca. {
+    now specialize (proj2 Harc eq_refl).
+  }
+  split. {
+    split; cbn; [ easy | | ]. {
+      intros la1 Hla1.
+      now apply Hac; right.
+    }
+    split; intros Ha; [ exfalso | easy ].
+    move Ha at top; subst ra.
+    apply length_zero_iff_nil in Har.
+    now rewrite Har in Hlc.
+  }
+  intros ld Hld d Hd; cbn.
 ...
 }
 ...
