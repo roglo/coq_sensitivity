@@ -3631,7 +3631,6 @@ revert lb Hitn Hc H2b.
       specialize (H2a _ (or_introl eq_refl)).
       specialize (H2a _ (or_intror Hd)).
       cbn in H2a.
-      clear - H2a Hd.
       apply bmatrix_coh_prop_loop_enough_iter in H2a. 2: {
         apply Nat_le_fold_left_fold_left_max.
         now apply bmat_depth_le_fold_left_max.
@@ -3640,6 +3639,15 @@ revert lb Hitn Hc H2b.
       apply Nat_le_fold_left_fold_left_max.
       now apply bmat_depth_le_fold_left_max.
     }
+    move H2a at bottom.
+    specialize (H2a _ (or_intror Hld) _ Hd).
+    cbn in H2a.
+    apply bmatrix_coh_prop_loop_enough_iter in H2a. 2: {
+      now apply bmat_depth_le_fold_left_fold_left_max with (la := ld).
+    }
+    apply bmatrix_coh_prop_loop_enough_iter; [ | easy ].
+    now apply bmat_depth_le_fold_left_fold_left_max with (la := ld).
+  } {
 ...
 intros lc Hlc c Hc.
 move c before BMBD.
