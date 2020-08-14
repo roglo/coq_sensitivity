@@ -3178,6 +3178,21 @@ etransitivity; [ | apply IHnl1 ].
 now rewrite fold_left_max_swap.
 Qed.
 
+Theorem bmat_depth_le_fold_left_max : ∀ T a la k,
+  a ∈ la
+  → bmat_depth a ≤ fold_left max (map (bmat_depth (T:=T)) la) k.
+Proof.
+intros * Ha.
+revert a k Ha.
+induction la as [| a1]; intros; [ easy | cbn ].
+destruct Ha as [Ha| Ha]. {
+  subst a1; cbn.
+  rewrite <- fold_left_max_swap.
+  apply Nat.le_max_r.
+}
+now apply IHla.
+Qed.
+
 Theorem bmat_depth_le_fold_left_fold_left_max : ∀ T lla la a k,
   la ∈ lla
   → a ∈ la
@@ -3194,15 +3209,7 @@ destruct Hla as [Hla| Hla]. {
   clear - Ha.
   revert k.
   induction lla as [| la1]; intros. {
-    cbn.
-    revert a k Ha.
-    induction la as [| a1]; intros; [ easy | cbn ].
-    destruct Ha as [Ha| Ha]. {
-      subst a1; cbn.
-      rewrite <- fold_left_max_swap.
-      apply Nat.le_max_r.
-    }
-    now apply IHla.
+    now apply bmat_depth_le_fold_left_max.
   }
   cbn.
   rewrite fold_left_fold_left_max_swap.
@@ -3618,38 +3625,21 @@ revert lb Hitn Hc H2b.
     }
     now apply (Hita _ (or_intror Hln)).
   } {
-...
-  destruct ca. {
-    exfalso.
-    cbn - [ In ] in BMAP.
-    destruct BMAP as (H1a, H2a).
-    destruct H1a as (Har, Hac, Harc).
-    cbn - [ In ] in Har, Hac, Harc.
-    now rewrite (proj2 Harc eq_refl) in Har.
-  }
-  destruct ra. {
-    exfalso.
-    cbn - [ In ] in BMAP.
-    destruct BMAP as (H1a, H2a).
-    now destruct H1a as (Har, Hac, Harc).
-  }
-...
-  apply IHla with (ra := S ra) (ca := ca). 4: {
-    cbn - [ In ] in BMAP |-*.
-    destruct BMAP as (H1a, H2a).
-    destruct H1a as (Har, Hac, Harc).
-    cbn - [ In ] in Har, Hac, Harc.
-    split. {
-      split; [ easy | | ]. {
-        cbn - [ In ].
-        intros d Hd.
-        destruct Hd as [Hd| Hd]. {
-          subst d.
-          specialize (Hac _ (or_introl eq_refl)).
-          cbn in Hac.
-          now apply Nat.succ_inj in Hac.
-        }
-        specialize (Hac _ (or_intror Hd)).
+    intros ld Hld d Hd.
+    destruct Hld as [Hld| Hld]. {
+      subst ld.
+      specialize (H2a _ (or_introl eq_refl)).
+      specialize (H2a _ (or_intror Hd)).
+      cbn in H2a.
+      clear - H2a Hd.
+      apply bmatrix_coh_prop_loop_enough_iter in H2a. 2: {
+        apply Nat_le_fold_left_fold_left_max.
+        now apply bmat_depth_le_fold_left_max.
+      }
+      apply bmatrix_coh_prop_loop_enough_iter; [ | easy ].
+      apply Nat_le_fold_left_fold_left_max.
+      now apply bmat_depth_le_fold_left_max.
+    }
 ...
 intros lc Hlc c Hc.
 move c before BMBD.
