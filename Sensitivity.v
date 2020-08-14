@@ -3648,6 +3648,21 @@ revert lb Hitn Hc H2b.
     apply bmatrix_coh_prop_loop_enough_iter; [ | easy ].
     now apply bmat_depth_le_fold_left_fold_left_max with (la := ld).
   } {
+    move Hitn at bottom.
+    apply fold_left_fold_left_max_le_iff in Hitn.
+    apply fold_left_fold_left_max_le_iff.
+    split; [ easy | ].
+    destruct Hitn as (_, Hitn).
+    intros ln Hln n Hn.
+    cbn - [ In ] in Hln.
+    destruct Hln as [Hln| Hln]. {
+      subst ln.
+      specialize (Hitn _ (or_introl eq_refl)).
+      apply (Hitn _ (or_intror Hn)).
+    }
+    eapply Hitn; [ | apply Hn ].
+    now right.
+  }
 ...
 intros lc Hlc c Hc.
 move c before BMBD.
