@@ -3076,6 +3076,54 @@ Theorem mat_coh_prop_mul : ∀ T (zero : T) add mul MA MB,
   matrix_coh (mat_def_mul zero add mul (mat_def MA) (mat_def MB)) = true.
 Proof.
 intros.
+intros.
+destruct MA as (Mda, Mpa); cbn.
+destruct MB as (Mdb, Mpb); cbn.
+unfold matrix_coh in Mpa, Mpb.
+apply Bool.andb_true_iff in Mpa.
+apply Bool.andb_true_iff in Mpb.
+destruct Mpa as (Mpa & Hrca).
+destruct Mpb as (Mpb & Hrcb).
+apply Bool.andb_true_iff in Mpa.
+apply Bool.andb_true_iff in Mpb.
+destruct Mpa as (Hra & Hca).
+destruct Mpb as (Hrb & Hcb).
+apply Nat.eqb_eq in Hra.
+apply Nat.eqb_eq in Hrb.
+unfold mat_def_mul.
+destruct (Nat.eq_dec (mat_ncols Mda) (mat_nrows Mdb))
+  as [Hrr| Hrr]; [ | easy ].
+unfold matrix_coh; cbn.
+unfold list_list_mul; cbn.
+apply Bool.andb_true_iff.
+split. {
+  apply Bool.andb_true_iff.
+  split. {
+Print list_list_mul_transp.
+(* peut-être que list_list_mul_transp peut être remplacé par
+   un fold_left ? *)
+...
+  rewrite List_fold_left_map.
+  etransitivity. {
+    apply List_fold_left_ext_in.
+    intros b c Hb.
+    rewrite map_length, seq_length.
+    rewrite Nat.eqb_refl.
+    rewrite Bool.andb_true_r.
+    easy.
+  }
+  clear.
+  induction (mat_nrows Mda) as [| len]; [ easy | ].
+  rewrite <- Nat.add_1_r.
+  rewrite seq_app.
+  rewrite fold_left_app.
+  now rewrite IHlen.
+} {
+  unfold zero_together.
+  unfold zero_together in Hrca, Hrcb.
+  rewrite <- Hrr in Hrcb.
+  now destruct (mat_nrows Mda), (mat_ncols Mda), (mat_ncols Mdb).
+}
 ...
 
 Definition mat_mul T (zero : T) add mul (MA MB : matrix T) : matrix T :=
