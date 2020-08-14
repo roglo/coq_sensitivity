@@ -3375,53 +3375,50 @@ destruct Hpp as [Hpp| Hpp]; [ now subst p | ].
 apply Hn, Hpp.
 Qed.
 
-Theorem fold_left_fold_left_max_le_if : ∀ lln m k,
+Theorem fold_left_fold_left_max_le_iff : ∀ lln m k,
   fold_left (λ m ln, fold_left max ln m) lln m ≤ k
-  → m ≤ k ∧ ∀ ln, ln ∈ lln → ∀ n, n ∈ ln → n ≤ k.
+  ↔ m ≤ k ∧ ∀ ln, ln ∈ lln → ∀ n, n ∈ ln → n ≤ k.
 Proof.
-intros * Hlln.
-revert m k Hlln.
-induction lln as [| ln]; intros; [ easy | cbn in Hlln ].
-specialize (IHlln _ _ Hlln) as H1.
-destruct H1 as (H1, H3).
-apply fold_left_max_le_if in H1.
-destruct H1 as (H1, H2).
-split; [ easy | ].
-intros ln1 Hln n Hn.
-destruct Hln as [Hln| Hln]. {
-  subst ln1.
-  now apply H2.
+intros.
+split. {
+  intros Hlln.
+  revert m k Hlln.
+  induction lln as [| ln]; intros; [ easy | cbn in Hlln ].
+  specialize (IHlln _ _ Hlln) as H1.
+  destruct H1 as (H1, H3).
+  apply fold_left_max_le_if in H1.
+  destruct H1 as (H1, H2).
+  split; [ easy | ].
+  intros ln1 Hln n Hn.
+  destruct Hln as [Hln| Hln]. {
+    subst ln1.
+    now apply H2.
+  }
+  now apply (H3 ln1).
+} {
+  intros (Hmk, Hln).
+  revert m k Hmk Hln.
+  induction lln as [| ln]; intros; [ easy | cbn ].
+  apply IHlln. {
+    clear - Hmk Hln.
+    revert m k lln Hmk Hln.
+    induction ln as [| n]; intros; [ easy | cbn ].
+    apply IHln with (lln := lln). {
+      apply Nat.max_lub; [ easy | ].
+      now apply (Hln (n :: ln)); left.
+    }
+    intros ln1 Hln1 n1 Hn1.
+    destruct Hln1 as [Hln1| Hln1]. {
+      subst ln1.
+      apply (Hln _ (or_introl eq_refl)).
+      now right.
+    }
+    now apply (Hln _ (or_intror Hln1)).
+  }
+  intros ln1 Hln1 n Hn.
+  now apply (Hln _ (or_intror Hln1)).
 }
-now apply (H3 ln1).
 Qed.
-
-(*
-Theorem eq_fold_left_max_0 : ∀ ln m,
-  fold_left max ln m = 0
-  → m = 0 ∧ ∀ n, n ∈ ln → n = 0.
-Proof.
-intros * Hln.
-apply Nat.le_0_r in Hln.
-specialize (le_fold_left_max ln m Hln) as H1.
-split; [ now apply Nat.le_0_r | ].
-intros n Hn.
-now apply Nat.le_0_r, H1.
-Qed.
-
-Theorem eq_fold_left_fold_left_max_0 : ∀ lln m,
-  fold_left (λ m ln, fold_left max ln m) lln m = 0
-  → m = 0 ∧ ∀ ln, ln ∈ lln → ∀ n, n ∈ ln → n = 0.
-Proof.
-intros * Hlln.
-apply Nat.le_0_r in Hlln.
-apply le_fold_left_fold_left_max in Hlln.
-destruct Hlln as (H1, H2).
-apply Nat.le_0_r in H1.
-split; [ easy | ].
-intros ln Hln n Hn.
-now apply Nat.le_0_r, (H2 ln).
-Qed.
-*)
 
 Theorem bmat_coh_prop_add_gen : ∀ T add ita itn (BMA BMB : bmatrix T),
   bmat_depth (bmat_def BMA) ≤ ita
@@ -3462,7 +3459,7 @@ split. {
   injection Hab; clear Hab; intros Hab.
   cbn in Hita.
   apply Nat.succ_le_mono in Hita.
-  apply fold_left_fold_left_max_le_if in Hita.
+  apply fold_left_fold_left_max_le_iff in Hita.
   destruct Hita as (_, Hita).
   assert (H : ∀ l, l ∈ mat_list Ma → ∀ M, M ∈ l → bmat_depth M ≤ ita). {
     intros l Hl M HM.
@@ -3470,7 +3467,7 @@ split. {
     now apply in_map.
   }
   move H before Hita; clear Hita; rename H into Hita.
-  apply fold_left_fold_left_max_le_if in Hitn.
+  apply fold_left_fold_left_max_le_iff in Hitn.
   destruct Hitn as (_, Hitn).
   assert (H : ∀ l, l ∈ mat_list ab → ∀ M, M ∈ l → bmat_depth M ≤ itn). {
     intros l Hl M HM.
@@ -3532,16 +3529,30 @@ destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | now subst ab ].
 subst rb cb.
 subst ab.
 cbn in Hitn, Hlc.
-revert ra ca llb ita itn BMAP BMBP Hita Hitn Hlc.
+revert ra ca BMAP BMBP.
 induction lla as [| la]; intros; [ easy | ].
 destruct llb as [| lb]; [ easy | ].
 move lb before la.
 cbn - [ In ] in Hlc.
 destruct Hlc as [Hlc| Hlc]. {
   subst lc.
-  revert ra ca BMAP BMBP IHlla.
-  revert lla llb Hita Hitn.
-  revert lb Hc.
+  destruct BMAP as (H1a, H2a).
+  destruct BMBP as (H1b, H2b).
+  cbn - [ In ] in H2a, H2b.
+  destruct H1a as (Har, Hac, Harc).
+  destruct H1b as (Hbr, Hbc, Hbrc).
+  cbn - [ In ] in Har, Hac, Harc.
+  cbn - [ In ] in Hbr, Hbc, Hbrc.
+  destruct ca. {
+    now rewrite (proj2 Harc eq_refl) in Har.
+  }
+  clear Harc Hbrc.
+  move Hbr before Har.
+  move Hbc before Hac.
+clear Hac Hbc Har Hbr.
+clear ra ca.
+clear IHlla.
+revert lb Hitn Hc H2b.
   induction la as [| a]; intros; [ easy | ].
   destruct lb as [| b]; [ easy | ].
   move b before a.
@@ -3549,11 +3560,11 @@ destruct Hlc as [Hlc| Hlc]. {
   destruct Hc as [Hc| Hc]. {
     clear IHla.
     symmetry in Hc.
-    apply fold_left_fold_left_max_le_if in Hitn.
+    apply fold_left_fold_left_max_le_iff in Hitn.
     destruct Hitn as (_, Hitn).
     specialize (Hitn _ (or_introl eq_refl)).
     specialize (Hitn _ (or_introl eq_refl)).
-    apply fold_left_fold_left_max_le_if in Hita.
+    apply fold_left_fold_left_max_le_iff in Hita.
     destruct Hita as (_, Hita).
     specialize (Hita _ (or_introl eq_refl)).
     specialize (Hita _ (or_introl eq_refl)).
@@ -3567,7 +3578,6 @@ destruct Hlc as [Hlc| Hlc]. {
     }
     specialize (IHab ita itn).
     assert (Ha : bmatrix_coh (BM_M Ma) = true). {
-      destruct BMAP as (H1a, H2a).
       specialize (H2a _ (or_introl eq_refl)).
       specialize (H2a _ (or_introl eq_refl)).
       cbn in H2a.
@@ -3579,7 +3589,6 @@ destruct Hlc as [Hlc| Hlc]. {
     }
     specialize (IHab (mk_bmat (BM_M Ma) Ha)).
     assert (Hb : bmatrix_coh (BM_M Mb) = true). {
-      destruct BMBP as (H1b, H2b).
       specialize (H2b _ (or_introl eq_refl)).
       specialize (H2b _ (or_introl eq_refl)).
       cbn in H2b.
@@ -3594,7 +3603,21 @@ destruct Hlc as [Hlc| Hlc]. {
     rewrite <- Hc in Hitn.
     now specialize (IHab Hita Hitn Hc).
   }
-  specialize (IHla lb Hc).
+  apply IHla with (lb := lb). {
+    clear - Hita.
+    apply fold_left_fold_left_max_le_iff in Hita.
+    destruct Hita as (_, Hita).
+    apply fold_left_fold_left_max_le_iff.
+    split; [ flia | ].
+    intros ln Hln n Hn.
+    cbn - [ In ] in Hita, Hln.
+    destruct Hln as [Hln| Hln]. {
+      subst ln.
+      apply (Hita _ (or_introl eq_refl)).
+      now right.
+    }
+    now apply (Hita _ (or_intror Hln)).
+  } {
 ...
   destruct ca. {
     exfalso.
