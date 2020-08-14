@@ -1954,7 +1954,40 @@ Fixpoint list_list_add T (add : T → T → T) (ll1 ll2 : list (list T)) :=
   | [] => []
   end.
 
-Definition list_list_mul T {ro : semiring_op T} r cr c
+Fixpoint list_mul T zero (add : T → T → T) mul (l1 l2 : list T) :=
+  match l1 with
+  | e1 :: l'1 =>
+      match l2 with
+      | e2 :: l'2 => add (mul e1 e2) (list_mul zero add mul l'1 l'2)
+      | [] => zero
+      end
+  | [] => zero
+  end.
+
+...
+
+Fixpoint list_list_mul_transp T zero add mul (ll1 tll2 : list (list T)) :=
+  match ll1 with
+  | l1 :: ll'1 =>
+      match tll2 with
+      | tl2 :: tll'2 =>
+          (list_mul zero add mul l1 tl2 ::
+           list_list_mul_transp zero add mul ll1 tll'2) ::
+          list_list_mul_transp zero add mul ll'1 tll2
+      | [] => []
+      end
+  | [] => []
+  end.
+
+Definition list_list_mul T (zero : T) add mul ll1 ll2 :=
+  list_list_mul_transp zero add mul ll1 (list_list_transpose zero ll2).
+
+Check list_list_mul.
+
+...
+
+(* old *)
+Definition old_list_list_mul T {ro : semiring_op T} r cr c
     (ll1 : list (list T)) (ll2 : list (list T)) :=
   map
     (λ i,
@@ -1980,9 +2013,23 @@ Definition nat_semiring_op : semiring_op nat :=
      srng_add := Nat.add;
      srng_mul := Nat.mul |}.
 
-Compute (let _ := nat_semiring_op in list_list_mul 3 4 2 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] [[1; 2]; [3; 4]; [5; 6]; [0; 0]]).
+Definition list_list_mul' T {ro : semiring_op T} (r cr c : nat) ll1 ll2 :=
+  list_list_mul srng_zero srng_add srng_mul ll1 ll2.
 
-Compute (let _ := nat_semiring_op in list_list_mul 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
+Check old_list_list_mul.
+Check list_list_mul'.
+
+...
+
+Compute (let _ := nat_semiring_op in list_list_mul' 3 4 2 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] [[1; 2]; [3; 4]; [5; 6]; [0; 0]]).
+
+Compute (let _ := nat_semiring_op in old_list_list_mul 3 4 2 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] [[1; 2]; [3; 4]; [5; 6]; [0; 0]]).
+
+Compute (let _ := nat_semiring_op in list_list_mul' 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
+
+Compute (let _ := nat_semiring_op in old_list_list_mul 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
+
+...
 
 Definition mat_def_add T (add : T → T → T) (M1 M2 : matrix_def T) :
     matrix_def T :=
@@ -2079,6 +2126,33 @@ Definition mat_add T add (MA MB : matrix T) : matrix T :=
   {| mat_def := mat_def_add add (mat_def MA) (mat_def MB);
      mat_coh_prop := mat_coh_prop_add add MA MB |}.
 
+...
+
+(*
+Definition mat_def_add T (add : T → T → T) (M1 M2 : matrix_def T) :
+    matrix_def T :=
+  if Nat.eq_dec (mat_nrows M1) (mat_nrows M2) then
+    if Nat.eq_dec (mat_ncols M1) (mat_ncols M2) then
+      {| mat_list := list_list_add add (mat_list M1) (mat_list M2);
+         mat_nrows := mat_nrows M1;
+         mat_ncols := mat_ncols M1 |}
+    else void_mat_def
+  else void_mat_def.
+*)
+
+Definition mat_def_mul T (mul : T → T → T) (M1 M2 : matrix_def T) :
+    matrix_def T :=
+  if Nat.eq_dec (mat_ncols M1) (mat_nrows M2) then
+    {| mat_list :=
+         list_list_mul (mat_nrows M1) (mat_ncols M1) (mat_ncols M2)
+           (mat_list M1) (mat_list M2);
+       mat_nrows := mat_nrows M1;
+       mat_ncols := mat_ncols M2 |}
+  else void_mat_def.
+
+...
+
+(* old *)
 Definition mat_def_mul {T} {so : semiring_op T} (M1 M2 : matrix_def T) :
     matrix_def T :=
   if Nat.eq_dec (mat_ncols M1) (mat_nrows M2) then
@@ -2088,6 +2162,7 @@ Definition mat_def_mul {T} {so : semiring_op T} (M1 M2 : matrix_def T) :
        mat_nrows := mat_nrows M1;
        mat_ncols := mat_ncols M2 |}
   else void_mat_def.
+
 
 Theorem mat_coh_prop_mul : ∀ T {so : semiring_op T} MA MB,
   matrix_coh (mat_def_mul (mat_def MA) (mat_def MB)) = true.
@@ -3783,8 +3858,55 @@ Definition bmat_add T add (BMA BMB : bmatrix T) :=
   {| bmat_def := bmat_def_add add (bmat_def BMA) (bmat_def BMB);
      bmat_coh_prop := bmat_coh_prop_add add BMA BMB |}.
 
+
+(*
+Fixpoint bmat_def_add_loop T add it (MM1 MM2 : bmatrix_def T) :=
+  match it with
+  | 0 => void_bmat_def
+  | S it' =>
+      match MM1 with
+      | BM_1 xa =>
+          match MM2 with
+          | BM_1 xb => BM_1 (add xa xb)
+          | BM_M MMB => void_bmat_def
+          end
+      | BM_M MMA =>
+          match MM2 with
+          | BM_1 MB => void_bmat_def
+          | BM_M MMB =>
+              BM_M (mat_def_add (bmat_def_add_loop add it') MMA MMB)
+          end
+      end
+  end.
+*)
+
+Check mat_def_add.
+Check mat_def_mul.
+
 ...
 
+Fixpoint bmat_def_mul_loop T mul it (MM1 MM2 : bmatrix_def T) :=
+  match it with
+  | 0 => void_bmat_def
+  | S it' =>
+      match MM1 with
+      | BM_1 xa =>
+          match MM2 with
+          | BM_1 xb => BM_1 (xa * xb)%Srng
+          | BM_M MMB => void_bmat_def
+          end
+      | BM_M MMMA =>
+          match MM2 with
+          | BM_1 MB => void_bmat_def
+          | BM_M MMMB =>
+              BM_M (mat_def_mul MMMA MMMB)
+          end
+      end
+  end.
+
+...
+
+(* old *)
 Fixpoint bmat_def_mul_loop T {so : semiring_op T} it (MM1 MM2 : bmatrix_def T) :=
   match it with
   | 0 => void_bmat_def
