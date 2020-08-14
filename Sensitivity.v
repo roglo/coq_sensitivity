@@ -3081,68 +3081,73 @@ Theorem mat_coh_prop_mul : ∀ T (zero : T) add mul MA MB,
   matrix_coh (mat_def_mul zero add mul (mat_def MA) (mat_def MB)) = true.
 Proof.
 intros.
-intros.
+apply matrix_coh_equiv_prop.
 destruct MA as (Mda, Mpa); cbn.
 destruct MB as (Mdb, Mpb); cbn.
-unfold matrix_coh in Mpa, Mpb.
-apply Bool.andb_true_iff in Mpa.
-apply Bool.andb_true_iff in Mpb.
-destruct Mpa as (Mpa & Hrca).
-destruct Mpb as (Mpb & Hrcb).
-apply Bool.andb_true_iff in Mpa.
-apply Bool.andb_true_iff in Mpb.
-destruct Mpa as (Hra & Hca).
-destruct Mpb as (Hrb & Hcb).
-apply Nat.eqb_eq in Hra.
-apply Nat.eqb_eq in Hrb.
 unfold mat_def_mul.
-destruct (Nat.eq_dec (mat_ncols Mda) (mat_nrows Mdb))
-  as [Hrr| Hrr]; [ | easy ].
-unfold matrix_coh; cbn.
-unfold list_list_mul; cbn.
-apply Bool.andb_true_iff.
-split. {
-  apply Bool.andb_true_iff.
-  split. {
-    rewrite map_length.
-    now apply Nat.eqb_eq.
-  }
-...
-  rewrite List_fold_left_map.
-  etransitivity. {
-    apply List_fold_left_ext_in.
-    intros b c Hb.
-    rewrite map_length, seq_length.
-    rewrite Nat.eqb_refl.
-    rewrite Bool.andb_true_r.
-    easy.
-  }
-  clear.
-  induction (mat_nrows Mda) as [| len]; [ easy | ].
-  rewrite <- Nat.add_1_r.
-  rewrite seq_app.
-  rewrite fold_left_app.
-  now rewrite IHlen.
+destruct Mda as (lla, ra, ca).
+destruct Mdb as (llb, rb, cb).
+move llb before lla.
+move rb before ca.
+move cb before rb.
+apply matrix_coh_equiv_prop in Mpa.
+apply matrix_coh_equiv_prop in Mpb.
+destruct Mpa as (Har, Hac, Harc).
+destruct Mpb as (Hbr, Hbc, Hbrc).
+cbn in Har, Hac, Harc.
+cbn in Hbr, Hbc, Hbrc.
+move Hbr before Har.
+move Hbc before Hac.
+cbn - [ Nat.eq_dec ].
+destruct (Nat.eq_dec ca rb) as [Hcr| Hcr]; [ | easy ].
+move Hcr at top; subst rb.
+split; cbn. {
+  now rewrite map_length.
 } {
-  unfold zero_together.
-  unfold zero_together in Hrca, Hrcb.
-  rewrite <- Hrr in Hrcb.
-  now destruct (mat_nrows Mda), (mat_ncols Mda), (mat_ncols Mdb).
+  intros c Hc.
+  apply in_map_iff in Hc.
+  destruct Hc as (l1 & Hc & Hl1).
+  subst c.
+  rewrite map_length.
+  destruct llb as [| lb]. {
+    cbn in Hbr |-*; subst ca.
+    now symmetry; apply Hbrc.
+  }
+  cbn.
+  rewrite map_length, seq_length.
+  now apply Hbc; left.
 }
-...
+split; intros H. {
+  now apply Hbrc, Harc.
+} {
+  now apply Harc, Hbrc.
+}
+Qed.
 
 Definition mat_mul T (zero : T) add mul (MA MB : matrix T) : matrix T :=
   {| mat_def := mat_def_mul zero add mul (mat_def MA) (mat_def MB);
      mat_coh_prop := mat_coh_prop_mul zero add mul MA MB |}.
 
-...
+Definition mat_mul' T {ro : semiring_op T} :=
+  mat_mul srng_zero srng_add srng_mul.
 
-Compute (let _ := nat_semiring_op in mat_mul (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]; [0; 0]])).
-Compute (let _ := nat_semiring_op in mat_mul (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]])).
-Compute (let _ := nat_semiring_op in mat_mul (mat_of_list [[1; 2]; [3; 4]; [5; 6]])
+Compute (let _ := nat_semiring_op in old_mat_mul (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]; [0; 0]])).
+Compute (let _ := nat_semiring_op in mat_mul' (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]; [0; 0]])).
+
+Compute (let _ := nat_semiring_op in old_mat_mul (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]])).
+Compute (let _ := nat_semiring_op in mat_mul' (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]])).
+
+Compute (let _ := nat_semiring_op in old_mat_mul (mat_of_list [[1; 2]; [3; 4]; [5; 6]])
+  (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
+Compute (let _ := nat_semiring_op in mat_mul' (mat_of_list [[1; 2]; [3; 4]; [5; 6]])
   (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
 
-Compute (let _ := nat_semiring_op in mat_ncols (mat_def (mat_mul (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]])))).
+Compute (let _ := nat_semiring_op in mat_ncols (mat_def (old_mat_mul (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]])))).
+Compute (let _ := nat_semiring_op in mat_ncols (mat_def (mat_mul' (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]])))).
+
+...
+
+(* opposite: to be moved after addition and before multiplication *)
 
 Definition list_list_opp T {ro : ring_op T} (ll : list (list T)) :=
   map (map rng_opp) ll.
@@ -3197,86 +3202,6 @@ destruct M as (ll, r, c).
 induction ll as [| l]; [ apply Hnil | ].
 apply Hcons, IHll.
 Qed.
-
-(* voir si on peut pas le démontrer, pour courtement, par la
-   version bool ci-dessus, fold_left_fold_left_and_true *)
-(* ou alors, bon, on le prouve pas, ça sert peut-être à rien,
-   du coup *)
-(*
-Theorem old_fold_left_fold_left_and_true : ∀ A B (f : A → B → _) li lj,
-  fold_left (λ bi i, fold_left (λ bj j, bj && f i j) lj bi) li true = true
-  ↔ ∀ i j, i ∈ li → j ∈ lj → f i j = true.
-Proof.
-intros.
-split; intros Hij. {
-  intros * Hi Hj.
-  induction li; [ easy | ].
-  destruct Hi as [Hi| Hi]. {
-    cbn in Hij; subst a.
-    remember (fold_left _ lj true) as b eqn:Hb.
-    symmetry in Hb.
-    destruct b. {
-      clear - Hb Hj.
-      induction lj as [| k]; [ easy | ].
-      cbn in Hb.
-      destruct Hj as [Hj| Hj]. {
-        subst k.
-        destruct (f i j); [ easy | exfalso ].
-        clear - Hb.
-        now induction lj.
-      } {
-        apply IHlj; [ | easy ].
-        destruct (f i k); [ easy | exfalso ].
-        clear - Hb.
-        now induction lj.
-      }
-    } {
-      exfalso; clear - Hij.
-      induction li; [ easy | ].
-      cbn in Hij.
-      remember (fold_left _ lj false) as b eqn:Hb.
-      symmetry in Hb.
-      destruct b; [ now clear - Hb; induction lj | ].
-      congruence.
-    }
-  } {
-    apply IHli; [ | easy ].
-    cbn in Hij.
-    remember (fold_left _ lj true) as b eqn:Hb.
-    symmetry in Hb.
-    destruct b; [ easy | ].
-    clear - Hij; induction li; [ easy | ].
-    cbn in Hij; cbn.
-    remember (fold_left _ lj false) as b eqn:Hb.
-    symmetry in Hb.
-    destruct b; [ now exfalso; clear - Hb; induction lj | ].
-    exfalso; clear - Hij; induction li; [ easy | ].
-    cbn in Hij.
-    remember (fold_left _ lj false) as b eqn:Hb.
-    symmetry in Hb.
-    destruct b; [ now exfalso; clear - Hb; induction lj | ].
-    now apply IHli.
-  }
-} {
-  induction li as [| k]; [ easy | cbn ].
-  remember (fold_left _ lj true) as b eqn:Hb.
-  symmetry in Hb.
-  destruct b. {
-    apply IHli; intros * Hi Hj.
-    apply Hij; [ now right | easy ].
-  } {
-    exfalso.
-    clear IHli.
-    induction lj; [ easy | ].
-    cbn in Hb.
-    rewrite Hij in Hb; [ | now left | now left ].
-    apply IHlj; [ | easy ].
-    intros * Hi Hj.
-    apply Hij; [ easy | now right ].
-  }
-}
-Qed.
-*)
 
 Arguments BM_1 {_} a%Srng.
 Arguments BM_M {_}.
