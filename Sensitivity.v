@@ -2858,6 +2858,10 @@ Fixpoint list_mul T zero (add : T → T → T) mul (l1 l2 : list T) :=
   | [] => zero
   end.
 
+Definition list_list_mul T zero add mul (ll1 ll2 : list (list T)) :=
+  map (λ l1, map (list_mul zero add mul l1) (list_list_transpose zero ll2))
+    ll1.
+(*
 Fixpoint list_list_mul_transp T zero add mul (ll1 tll2 : list (list T)) :=
   match ll1 with
   | l1 :: ll'1 =>
@@ -2868,6 +2872,7 @@ Fixpoint list_list_mul_transp T zero add mul (ll1 tll2 : list (list T)) :=
 
 Definition list_list_mul T (zero : T) add mul ll1 ll2 :=
   list_list_mul_transp zero add mul ll1 (list_list_transpose zero ll2).
+*)
 
 (* old *)
 Definition old_list_list_mul T {ro : semiring_op T} r cr c
@@ -3099,9 +3104,9 @@ apply Bool.andb_true_iff.
 split. {
   apply Bool.andb_true_iff.
   split. {
-Print list_list_mul_transp.
-(* peut-être que list_list_mul_transp peut être remplacé par
-   un fold_left ? *)
+    rewrite map_length.
+    now apply Nat.eqb_eq.
+  }
 ...
   rewrite List_fold_left_map.
   etransitivity. {
