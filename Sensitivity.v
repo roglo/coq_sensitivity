@@ -3734,7 +3734,13 @@ apply IHlla with (ra := ra) (ca := ca) (llb := llb). {
     now rewrite Har in Hlc.
   }
   intros ld Hld d Hd; cbn.
-...
+  cbn - [ In ] in H2a, Hld.
+  specialize (H2a _ (or_intror Hld) _ Hd).
+  apply bmatrix_coh_prop_loop_enough_iter in H2a. 2: {
+    now apply bmat_depth_le_fold_left_fold_left_max with (la := ld).
+  }
+  apply bmatrix_coh_prop_loop_enough_iter; [ | easy ].
+  now apply bmat_depth_le_fold_left_fold_left_max with (la := ld).
 }
 ...
 intros lc Hlc c Hc.
