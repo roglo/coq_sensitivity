@@ -3544,14 +3544,20 @@ destruct Hlc as [Hlc| Hlc]. {
   destruct Hc as [Hc| Hc]. {
     clear IHla.
     symmetry in Hc.
+    apply fold_left_fold_left_max_le_if in Hitn.
+    destruct Hitn as (_, Hitn).
+    specialize (Hitn _ (or_introl eq_refl)).
+    specialize (Hitn _ (or_introl eq_refl)).
     apply fold_left_fold_left_max_le_if in Hita.
     destruct Hita as (_, Hita).
-...
+    specialize (Hita _ (or_introl eq_refl)).
+    specialize (Hita _ (or_introl eq_refl)).
     destruct a as [xa| Ma]. {
-      destruct b as [xb| Mb]. {
-        destruct ita. {
-          subst c; cbn.
-          destruct itn; [ cbn | easy ].
+      cbn in Hita.
+      destruct ita; [ easy | clear Hita ].
+      cbn in Hc, Hitn; subst c.
+      now destruct b, itn.
+    }
 ...
 intros lc Hlc c Hc.
 move c before BMBD.
