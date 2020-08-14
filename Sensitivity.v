@@ -3537,6 +3537,7 @@ subst rb cb.
 subst ab.
 cbn in Hitn, Hlc.
 revert ra ca BMAP BMBP.
+revert llb Hitn Hlc.
 induction lla as [| la]; intros; [ easy | ].
 destruct llb as [| lb]; [ easy | ].
 move lb before la.
@@ -3556,10 +3557,10 @@ destruct Hlc as [Hlc| Hlc]. {
   clear Harc Hbrc.
   move Hbr before Har.
   move Hbc before Hac.
-clear Hac Hbc Har Hbr.
-clear ra ca.
-clear IHlla.
-revert lb Hitn Hc H2b.
+  clear Hac Hbc Har Hbr.
+  clear ra ca.
+  clear IHlla.
+  revert lb Hitn Hc H2b.
   induction la as [| a]; intros; [ easy | ].
   destruct lb as [| b]; [ easy | ].
   move b before a.
@@ -3688,6 +3689,34 @@ revert lb Hitn Hc H2b.
     apply bmatrix_coh_prop_loop_enough_iter; [ | easy ].
     now apply bmat_depth_le_fold_left_fold_left_max with (la := ld).
   }
+}
+destruct ra. {
+  cbn - [ In ] in BMAP.
+  destruct BMAP as (H1a, H2a).
+  now destruct H1a as (Har, Hac, Harc).
+}
+apply IHlla with (ra := ra) (ca := ca) (llb := llb). {
+  move Hita at bottom.
+  cbn in Hita.
+  apply fold_left_fold_left_max_le_iff in Hita.
+  apply fold_left_fold_left_max_le_iff.
+  split; [ flia | ].
+  intros ln Hln n Hn.
+  destruct Hita as (Hita, Hni).
+  now apply (Hni ln).
+} {
+  move Hitn at bottom.
+  cbn in Hitn.
+  apply fold_left_fold_left_max_le_iff in Hitn.
+  apply fold_left_fold_left_max_le_iff.
+  split; [ flia | ].
+  intros ln Hln n Hn.
+  destruct Hitn as (Hitn, Hni).
+  now apply (Hni ln).
+} {
+  easy.
+} {
+...
 }
 ...
 intros lc Hlc c Hc.
