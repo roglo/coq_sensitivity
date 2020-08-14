@@ -3532,14 +3532,16 @@ destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | now subst ab ].
 subst rb cb.
 subst ab.
 cbn in Hitn, Hlc.
-induction lla as [| la]; [ easy | ].
+revert ra ca llb ita itn BMAP BMBP Hita Hitn Hlc.
+induction lla as [| la]; intros; [ easy | ].
 destruct llb as [| lb]; [ easy | ].
 move lb before la.
 cbn - [ In ] in Hlc.
 destruct Hlc as [Hlc| Hlc]. {
-  clear IHlla.
   subst lc.
-  revert ra ca BMAP BMBP.
+  revert ra ca BMAP BMBP IHlla.
+  revert lla llb Hita Hitn.
+  revert lb Hc.
   induction la as [| a]; intros; [ easy | ].
   destruct lb as [| b]; [ easy | ].
   move b before a.
@@ -3592,6 +3594,8 @@ destruct Hlc as [Hlc| Hlc]. {
     rewrite <- Hc in Hitn.
     now specialize (IHab Hita Hitn Hc).
   }
+  specialize (IHla lb Hc).
+...
   destruct ca. {
     exfalso.
     cbn - [ In ] in BMAP.
