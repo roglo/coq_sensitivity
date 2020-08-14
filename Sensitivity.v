@@ -2406,6 +2406,91 @@ Definition mat_def_add T (add : T → T → T) (M1 M2 : matrix_def T) :
     else void_mat_def
   else void_mat_def.
 
+Theorem mat_coh_prop_add : ∀ T add (MA MB : matrix T),
+  matrix_coh (mat_def_add add (mat_def MA) (mat_def MB)) = true.
+Proof.
+intros.
+destruct MA as (Mda, Mpa); cbn.
+destruct MB as (Mdb, Mpb); cbn.
+move Mdb before Mda.
+apply matrix_coh_equiv_prop in Mpa.
+apply matrix_coh_equiv_prop in Mpb.
+apply matrix_coh_equiv_prop.
+unfold mat_def_add.
+destruct Mpa as (Hra, Hca, Hrca).
+destruct Mpb as (Hrb, Hcb, Hrcb).
+destruct Mda as (lla, ra, ca).
+destruct Mdb as (llb, rb, cb).
+cbn - [ Nat.eq_dec ] in *.
+destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
+destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
+subst rb cb.
+split; cbn; [ | | easy ]. {
+  clear - Hra Hrr.
+  revert ra llb Hra Hrr.
+  induction lla as [| la]; intros; [ easy | cbn ].
+  destruct llb as [| lb]; [ easy | cbn ].
+  destruct ra; [ easy | ].
+  cbn in Hra, Hrr.
+  apply Nat.succ_inj in Hra.
+  apply Nat.succ_inj in Hrr.
+  f_equal.
+  now apply IHlla.
+} {
+  intros c Hc.
+  subst ra.
+  clear Hrca Hrcb.
+  revert c ca llb Hca Hcb Hrr Hc.
+  induction lla as [| la]; intros; [ easy | ].
+  destruct llb as [| lb]; [ easy | ].
+  cbn in Hc.
+  destruct Hc as [Hc| Hc]. {
+    cbn in Hrr; apply Nat.succ_inj in Hrr.
+    revert lb Hcb Hc.
+    induction la as [| a]; intros; [ now apply Hca; left | ].
+    destruct lb as [| b]; [ now apply Hcb; left | ].
+    cbn in Hc.
+    destruct c as [| c lc]; [ easy | ].
+    injection Hc; clear Hc; intros; subst c lc.
+    cbn.
+    destruct ca. {
+      now specialize (Hca (a :: la) (or_introl eq_refl)).
+    } {
+      cbn in IHla.
+      f_equal.
+      specialize (Hca (a :: la) (or_introl eq_refl)) as H1.
+      specialize (Hcb (b :: lb) (or_introl eq_refl)) as H2.
+      cbn in H1, H2.
+      apply Nat.succ_inj in H1.
+      apply Nat.succ_inj in H2.
+      clear - H1 H2.
+      revert ca lb H1 H2.
+      induction la as [| a]; intros; [ easy | cbn ].
+      destruct lb as [| b]; [ easy | cbn ].
+      destruct ca; [ easy | f_equal ].
+      cbn in H1, H2.
+      apply Nat.succ_inj in H1.
+      apply Nat.succ_inj in H2.
+      now apply IHla.
+    }
+  } {
+    cbn in Hrr.
+    apply Nat.succ_inj in Hrr.
+    apply IHlla with (llb := llb); [ | | easy | easy ]. {
+      intros d Hd.
+      now apply Hca; right.
+    } {
+      intros d Hd.
+      now apply Hcb; right.
+    }
+  }
+}
+Qed.
+
+Definition mat_add T add (MA MB : matrix T) : matrix T :=
+  {| mat_def := mat_def_add add (mat_def MA) (mat_def MB);
+     mat_coh_prop := mat_coh_prop_add add MA MB |}.
+
 (* addition of block matrices *)
 
 Fixpoint bmat_def_add_loop T add it (MM1 MM2 : bmatrix_def T) :=
@@ -2861,18 +2946,6 @@ Fixpoint list_mul T zero (add : T → T → T) mul (l1 l2 : list T) :=
 Definition list_list_mul T zero add mul (ll1 ll2 : list (list T)) :=
   map (λ l1, map (list_mul zero add mul l1) (list_list_transpose zero ll2))
     ll1.
-(*
-Fixpoint list_list_mul_transp T zero add mul (ll1 tll2 : list (list T)) :=
-  match ll1 with
-  | l1 :: ll'1 =>
-      map (list_mul zero add mul l1) tll2 ::
-      list_list_mul_transp zero add mul ll'1 tll2
-  | [] => []
-  end.
-
-Definition list_list_mul T (zero : T) add mul ll1 ll2 :=
-  list_list_mul_transp zero add mul ll1 (list_list_transpose zero ll2).
-*)
 
 (* old *)
 Definition old_list_list_mul T {ro : semiring_op T} r cr c
@@ -2908,103 +2981,6 @@ Compute (let _ := nat_semiring_op in list_list_mul' 3 4 2 [[1; 2; 3; 4]; [5; 6; 
 Compute (let _ := nat_semiring_op in old_list_list_mul 3 4 2 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] [[1; 2]; [3; 4]; [5; 6]; [0; 0]]).
 Compute (let _ := nat_semiring_op in list_list_mul' 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
 Compute (let _ := nat_semiring_op in old_list_list_mul 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
-
-Theorem mat_coh_prop_add : ∀ T add (MA MB : matrix T),
-  matrix_coh (mat_def_add add (mat_def MA) (mat_def MB)) = true.
-Proof.
-intros.
-destruct MA as (Mda, Mpa); cbn.
-destruct MB as (Mdb, Mpb); cbn.
-move Mdb before Mda.
-apply matrix_coh_equiv_prop in Mpa.
-apply matrix_coh_equiv_prop in Mpb.
-apply matrix_coh_equiv_prop.
-unfold mat_def_add.
-destruct Mpa as (Hra, Hca, Hrca).
-destruct Mpb as (Hrb, Hcb, Hrcb).
-destruct Mda as (lla, ra, ca).
-destruct Mdb as (llb, rb, cb).
-cbn - [ Nat.eq_dec ] in *.
-destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
-destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
-subst rb cb.
-split; cbn; [ | | easy ]. {
-  clear - Hra Hrr.
-  revert ra llb Hra Hrr.
-  induction lla as [| la]; intros; [ easy | cbn ].
-  destruct llb as [| lb]; [ easy | cbn ].
-  destruct ra; [ easy | ].
-  cbn in Hra, Hrr.
-  apply Nat.succ_inj in Hra.
-  apply Nat.succ_inj in Hrr.
-  f_equal.
-  now apply IHlla.
-} {
-  intros c Hc.
-  subst ra.
-  clear Hrca Hrcb.
-  revert c ca llb Hca Hcb Hrr Hc.
-  induction lla as [| la]; intros; [ easy | ].
-  destruct llb as [| lb]; [ easy | ].
-  cbn in Hc.
-  destruct Hc as [Hc| Hc]. {
-    cbn in Hrr; apply Nat.succ_inj in Hrr.
-    revert lb Hcb Hc.
-    induction la as [| a]; intros; [ now apply Hca; left | ].
-    destruct lb as [| b]; [ now apply Hcb; left | ].
-    cbn in Hc.
-    destruct c as [| c lc]; [ easy | ].
-    injection Hc; clear Hc; intros; subst c lc.
-    cbn.
-    destruct ca. {
-      now specialize (Hca (a :: la) (or_introl eq_refl)).
-    } {
-      cbn in IHla.
-      f_equal.
-      specialize (Hca (a :: la) (or_introl eq_refl)) as H1.
-      specialize (Hcb (b :: lb) (or_introl eq_refl)) as H2.
-      cbn in H1, H2.
-      apply Nat.succ_inj in H1.
-      apply Nat.succ_inj in H2.
-      clear - H1 H2.
-      revert ca lb H1 H2.
-      induction la as [| a]; intros; [ easy | cbn ].
-      destruct lb as [| b]; [ easy | cbn ].
-      destruct ca; [ easy | f_equal ].
-      cbn in H1, H2.
-      apply Nat.succ_inj in H1.
-      apply Nat.succ_inj in H2.
-      now apply IHla.
-    }
-  } {
-    cbn in Hrr.
-    apply Nat.succ_inj in Hrr.
-    apply IHlla with (llb := llb); [ | | easy | easy ]. {
-      intros d Hd.
-      now apply Hca; right.
-    } {
-      intros d Hd.
-      now apply Hcb; right.
-    }
-  }
-}
-Qed.
-
-Definition mat_add T add (MA MB : matrix T) : matrix T :=
-  {| mat_def := mat_def_add add (mat_def MA) (mat_def MB);
-     mat_coh_prop := mat_coh_prop_add add MA MB |}.
-
-(*
-Definition mat_def_add T (add : T → T → T) (M1 M2 : matrix_def T) :
-    matrix_def T :=
-  if Nat.eq_dec (mat_nrows M1) (mat_nrows M2) then
-    if Nat.eq_dec (mat_ncols M1) (mat_ncols M2) then
-      {| mat_list := list_list_add add (mat_list M1) (mat_list M2);
-         mat_nrows := mat_nrows M1;
-         mat_ncols := mat_ncols M1 |}
-    else void_mat_def
-  else void_mat_def.
-*)
 
 Definition mat_def_mul T zero (add mul : T → T → T) (M1 M2 : matrix_def T) :
     matrix_def T :=
@@ -3144,6 +3120,31 @@ Compute (let _ := nat_semiring_op in mat_mul' (mat_of_list [[1; 2]; [3; 4]; [5; 
 
 Compute (let _ := nat_semiring_op in mat_ncols (mat_def (old_mat_mul (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]])))).
 Compute (let _ := nat_semiring_op in mat_ncols (mat_def (mat_mul' (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]])))).
+
+(* multiplication of block matrices *)
+
+Print bmat_def_add_loop.
+
+...
+
+Fixpoint bmat_def_mul_loop T mul it (MM1 MM2 : bmatrix_def T) :=
+  match it with
+  | 0 => void_bmat_def
+  | S it' =>
+      match MM1 with
+      | BM_1 xa =>
+          match MM2 with
+          | BM_1 xb => BM_1 (xa * xb)%Srng
+          | BM_M MMB => void_bmat_def
+          end
+      | BM_M MMMA =>
+          match MM2 with
+          | BM_1 MB => void_bmat_def
+          | BM_M MMMB =>
+              BM_M (mat_def_mul MMMA MMMB)
+          end
+      end
+  end.
 
 ...
 
@@ -3855,27 +3856,6 @@ Fixpoint bmat_def_add_loop T add it (MM1 MM2 : bmatrix_def T) :=
 
 Check mat_def_add.
 Check mat_def_mul.
-
-...
-
-Fixpoint bmat_def_mul_loop T mul it (MM1 MM2 : bmatrix_def T) :=
-  match it with
-  | 0 => void_bmat_def
-  | S it' =>
-      match MM1 with
-      | BM_1 xa =>
-          match MM2 with
-          | BM_1 xb => BM_1 (xa * xb)%Srng
-          | BM_M MMB => void_bmat_def
-          end
-      | BM_M MMMA =>
-          match MM2 with
-          | BM_1 MB => void_bmat_def
-          | BM_M MMMB =>
-              BM_M (mat_def_mul MMMA MMMB)
-          end
-      end
-  end.
 
 ...
 
