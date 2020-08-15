@@ -3177,13 +3177,31 @@ Fixpoint old_bmat_def_mul_loop T {so : semiring_op T} it
 Definition old_bmat_def_mul T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
   old_bmat_def_mul_loop (bmat_depth MM1) MM1 MM2.
 
-Print bmat_add.
+Theorem bmat_coh_prop_mul_gen : ∀ T zero add mul ita itn (BMA BMB : bmatrix T),
+  bmat_depth (bmat_def BMA) ≤ ita
+  → bmat_depth
+       (bmat_def_mul_loop zero add mul ita (bmat_def BMA) (bmat_def BMB)) ≤ itn
+  → bmatrix_coh_prop_loop itn
+       (bmat_def_mul_loop zero add mul ita (bmat_def BMA) (bmat_def BMB)).
+Proof.
+intros * Hita Hitn.
+remember (bmat_def_mul_loop zero add mul ita (bmat_def BMA) (bmat_def BMB))
+  as ab eqn:Hab.
+revert ita itn BMA BMB Hita Hitn Hab.
+induction ab as [| ab IHab] using bmatrix_ind; intros. {
+  now destruct itn.
+}
+...
 
 Theorem bmat_coh_prop_mul : ∀ T zero (add mul : T → T → T) BMA BMB,
   bmatrix_coh (bmat_def_mul zero add mul (bmat_def BMA) (bmat_def BMB)) =
   true.
 Proof.
+intros.
+apply bmatrix_coh_equiv_prop.
 ...
+now apply bmat_coh_prop_mul_gen.
+Qed.
 
 Definition bmat_mul T zero (add mul : T → T → T) (BMA BMB : bmatrix T) :=
   {| bmat_def := bmat_def_mul zero add mul (bmat_def BMA) (bmat_def BMB);
@@ -4959,32 +4977,6 @@ Definition mat_ring_op {T} {ro : ring_op T} n :=
 *)
 
 (*
-(* attempt to define the ring of matrices (of size n), but I think
-   I need the extensionality of the functions and, perhaps, of
-   functions of a nat up to n *)
-
-Axiom extens_eq_sqr_mat : ∀ T n (M1 M2 : matrix T),
-  eqmt_of_eqt T eq n M1 M2 → M1 = M2.
-
-Theorem glop : False.
-Proof.
-set (ro := Z_ring_op).
-assert (H : I = zero_mat). {
-  apply (extens_eq_sqr_mat Z 0).
-  now intros i j Hi Hj.
-}
-unfold I, zero_mat in H.
-apply (f_equal matel) in H.
-apply (f_equal (λ f, f 0 0)) in H.
-now destruct (Nat.eq_dec 0 0).
-Qed.
-
-(* oops *)
-(* but this is normal: I use extens_eq_sqr_mat with n=0, which is not
-   the size of I & zero_mat; if you limit their sizes to 0, it is
-   normal that they are equal!
-   I should find a system to prevent the (my) use of this situation. *)
-...
 
 Theorem mat_1_neq_0 {T} {ro : ring_op T} {rp : ring_prop} :
   I ≠ zero_mat.
