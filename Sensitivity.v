@@ -3197,30 +3197,28 @@ Definition bmat_def_of_list_bmat_def T (ll : list (list (bmatrix_def T))) :
      mat_nrows := list_list_nrows ll;
      mat_ncols := list_list_ncols ll |}.
 
-Fixpoint IZ_2_pow_def T (zero u : T) n :=
+Fixpoint IZ_2_pow_def T {so : semiring_op T} (u : T) n :=
   match n with
   | 0 => BM_1 u
   | S n' =>
       BM_M
         {| mat_list :=
-             [[IZ_2_pow_def zero u n'; IZ_2_pow_def zero zero n'];
-              [IZ_2_pow_def zero zero n'; IZ_2_pow_def zero u n']];
+             [[IZ_2_pow_def u n'; IZ_2_pow_def 0%Srng n'];
+              [IZ_2_pow_def 0%Srng n'; IZ_2_pow_def u n']];
            mat_nrows := 2; mat_ncols := 2 |}
   end.
 
-Definition I_2_pow_def T (zero one : T) := IZ_2_pow_def zero one.
-Definition Z_2_pow_def T (zero one : T) := IZ_2_pow_def zero zero.
+Definition I_2_pow_def T {so : semiring_op T} := IZ_2_pow_def 1%Srng.
+Definition Z_2_pow_def T {so : semiring_op T} := IZ_2_pow_def 0%Srng.
 
-Fixpoint A_def T (zero one : T) (add mul : T → T → T) opp n : bmatrix_def T :=
+Fixpoint A_def T {ro : ring_op T} (so := rng_semiring) n : bmatrix_def T :=
   match n with
-  | 0 => BM_1 zero
+  | 0 => BM_1 0%Srng
   | S n' =>
        BM_M
          (bmat_def_of_list_bmat_def
-            [[A_def zero one add mul opp n';
-              I_2_pow_def zero one n'];
-             [I_2_pow_def zero one n';
-              bmat_def_opp opp (A_def zero one add mul opp n')]])
+            [[A_def n'; I_2_pow_def n'];
+             [I_2_pow_def n'; bmat_def_opp rng_opp (A_def n')]])
   end.
 
 ...
