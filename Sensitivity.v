@@ -2493,27 +2493,28 @@ Definition mat_add T add (MA MB : matrix T) : matrix T :=
 
 (* addition of block matrices *)
 
-Fixpoint bmat_def_add_loop T add it (MM1 MM2 : bmatrix_def T) :=
+Fixpoint bmat_def_add_loop T {so : semiring_op T} it
+    (MM1 MM2 : bmatrix_def T) :=
   match it with
   | 0 => void_bmat_def
   | S it' =>
       match MM1 with
       | BM_1 xa =>
           match MM2 with
-          | BM_1 xb => BM_1 (add xa xb)
+          | BM_1 xb => BM_1 (xa + xb)%Srng
           | BM_M MMB => void_bmat_def
           end
       | BM_M MMA =>
           match MM2 with
           | BM_1 MB => void_bmat_def
           | BM_M MMB =>
-              BM_M (mat_def_add (bmat_def_add_loop add it') MMA MMB)
+              BM_M (mat_def_add (bmat_def_add_loop it') MMA MMB)
           end
       end
   end.
 
-Definition bmat_def_add T add (MM1 MM2 : bmatrix_def T) :=
-  bmat_def_add_loop add (bmat_depth MM1) MM1 MM2.
+Definition bmat_def_add T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
+  bmat_def_add_loop (bmat_depth MM1) MM1 MM2.
 
 Theorem length_list_list_add :
   ∀ (T : Type) (add : bmatrix_def T → bmatrix_def T → bmatrix_def T)
@@ -2575,15 +2576,15 @@ destruct Hlc as [Hlc| Hlc]. {
 }
 Qed.
 
-Theorem bmat_coh_prop_add_gen : ∀ T add ita itn (BMA BMB : bmatrix T),
+Theorem bmat_coh_prop_add_gen : ∀ T {so : semiring_op T} ita itn
+    (BMA BMB : bmatrix T),
   bmat_depth (bmat_def BMA) ≤ ita
-  → bmat_depth (bmat_def_add_loop add ita (bmat_def BMA) (bmat_def BMB)) ≤ itn
+  → bmat_depth (bmat_def_add_loop ita (bmat_def BMA) (bmat_def BMB)) ≤ itn
   → bmatrix_coh_prop_loop itn
-       (bmat_def_add_loop add ita (bmat_def BMA) (bmat_def BMB)).
+       (bmat_def_add_loop ita (bmat_def BMA) (bmat_def BMB)).
 Proof.
 intros * Hita Hitn.
-remember (bmat_def_add_loop add ita (bmat_def BMA) (bmat_def BMB)) as ab
-  eqn:Hab.
+remember (bmat_def_add_loop ita (bmat_def BMA) (bmat_def BMB)) as ab eqn:Hab.
 revert ita itn BMA BMB Hita Hitn Hab.
 induction ab as [| ab IHab] using bmatrix_ind; intros. {
   now destruct itn.
@@ -2919,17 +2920,17 @@ apply IHlla with (ra := ra) (ca := ca) (llb := llb). {
 }
 Qed.
 
-Theorem bmat_coh_prop_add : ∀ T add (BMA BMB : bmatrix T),
-  bmatrix_coh (bmat_def_add add (bmat_def BMA) (bmat_def BMB)) = true.
+Theorem bmat_coh_prop_add : ∀ T {so : semiring_op T} (BMA BMB : bmatrix T),
+  bmatrix_coh (bmat_def_add (bmat_def BMA) (bmat_def BMB)) = true.
 Proof.
 intros.
 apply bmatrix_coh_equiv_prop.
 now apply bmat_coh_prop_add_gen.
 Qed.
 
-Definition bmat_add T add (BMA BMB : bmatrix T) :=
-  {| bmat_def := bmat_def_add add (bmat_def BMA) (bmat_def BMB);
-     bmat_coh_prop := bmat_coh_prop_add add BMA BMB |}.
+Definition bmat_add T {so : semiring_op T} (BMA BMB : bmatrix T) :=
+  {| bmat_def := bmat_def_add (bmat_def BMA) (bmat_def BMB);
+     bmat_coh_prop := bmat_coh_prop_add BMA BMB |}.
 
 (* multiplication *)
 
@@ -3139,7 +3140,7 @@ Fixpoint bmat_def_mul_loop T {so : semiring_op T} (it : nat)
           | BM_1 _ => void_bmat_def
           | BM_M MMB =>
               BM_M
-                (mat_def_mul void_bmat_def (bmat_def_add srng_add)
+                (mat_def_mul void_bmat_def (@bmat_def_add T so)
                    (bmat_def_mul_loop it') MMA MMB)
           end
       end
@@ -3166,7 +3167,7 @@ Fixpoint old_bmat_def_mul_loop T {so : semiring_op T} it
               let mso :=
                 {| srng_zero := void_bmat_def;
                    srng_one := void_bmat_def;
-                   srng_add := @bmat_def_add T srng_add;
+                   srng_add := @bmat_def_add T so;
                    srng_mul := old_bmat_def_mul_loop it' |}
               in
               BM_M (old_mat_def_mul MMMA MMMB)
