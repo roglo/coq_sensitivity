@@ -3177,14 +3177,28 @@ Fixpoint old_bmat_def_mul_loop T {so : semiring_op T} it
 Definition old_bmat_def_mul T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
   old_bmat_def_mul_loop (bmat_depth MM1) MM1 MM2.
 
+Print bmat_add.
+
+Theorem bmat_coh_prop_mul : ∀ T zero (add mul : T → T → T) BMA BMB,
+  bmatrix_coh (bmat_def_mul zero add mul (bmat_def BMA) (bmat_def BMB)) =
+  true.
+Proof.
+...
+
+Definition bmat_mul T zero (add mul : T → T → T) (BMA BMB : bmatrix T) :=
+  {| bmat_def := bmat_def_mul zero add mul (bmat_def BMA) (bmat_def BMB);
+     bmat_coh_prop := bmat_coh_prop_mul zero add mul BMA BMB |}.
+
+...
+
 (* opposite *)
 
-Fixpoint bmat_def_opp T (opp : T → T) BM : bmatrix_def T :=
+Fixpoint bmat_def_opp T {ro : ring_op T} BM : bmatrix_def T :=
   match BM with
-  | BM_1 x => BM_1 (opp x)
+  | BM_1 x => BM_1 (- x)%Rng
   | BM_M MMM =>
       BM_M
-        {| mat_list := map (map (λ mm, bmat_def_opp opp mm)) (mat_list MMM);
+        {| mat_list := map (map (λ mm, bmat_def_opp mm)) (mat_list MMM);
            mat_nrows := mat_nrows MMM;
            mat_ncols := mat_ncols MMM |}
   end.
@@ -3218,8 +3232,19 @@ Fixpoint A_def T {ro : ring_op T} (so := rng_semiring) n : bmatrix_def T :=
        BM_M
          (bmat_def_of_list_bmat_def
             [[A_def n'; I_2_pow_def n'];
-             [I_2_pow_def n'; bmat_def_opp rng_opp (A_def n')]])
+             [I_2_pow_def n'; bmat_def_opp (A_def n')]])
   end.
+
+(* "We prove by induction that A_n^2 = nI" *)
+
+Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
+  bmat_mul (A n) (A n) = mmat_nat_mul_l n (I_2_pow n).
+Proof.
+intros; subst s.
+unfold mmat_mul, mmat_nat_mul_l.
+rewrite mmat_depth_A.
+unfold I_2_pow at 1.
+rewrite mmat_depth_IZ_2_pow.
 
 ...
 Theorem IZ_2_pow_coh_prop : ∀ T {ro : ring_op T} u n,
