@@ -2659,7 +2659,6 @@ split. {
   }
   now rewrite Hab.
 }
-(**)
 intros lc Hlc c Hc.
 specialize (IHab lc Hlc c Hc).
 destruct BMAD as [xa| Ma]. {
@@ -3297,6 +3296,264 @@ split. {
   }
   rewrite Hab; cbn.
   split; intros H; [ now apply Hbrc, Harc | now apply Harc, Hbrc ].
+}
+intros lc Hlc c Hc.
+specialize (IHab lc Hlc c Hc).
+destruct BMAD as [xa| Ma]. {
+  destruct BMBD as [xb| Mb]; [ now destruct ita | ].
+  destruct ita; [ easy | ].
+  now injection Hab; clear Hab; intros; subst ab.
+}
+destruct BMBD as [xb| Mb]. {
+  destruct ita; [ easy | ].
+  now injection Hab; clear Hab; intros; subst ab.
+}
+destruct Ma as (lla, ra, ca).
+destruct Mb as (llb, rb, cb).
+move llb before lla.
+destruct ita; [ easy | ].
+cbn in Hita, Hab.
+apply Nat.succ_le_mono in Hita.
+injection Hab; clear Hab; intros Hab.
+unfold mat_def_mul in Hab.
+cbn - [ Nat.eq_dec list_list_mul ] in Hab.
+destruct (Nat.eq_dec ca rb) as [Hcr| Hcr]; [ | now subst ab ].
+subst rb.
+subst ab.
+cbn in Hitn, Hlc.
+revert ra ca BMAP BMBP.
+revert llb Hitn Hlc.
+induction lla as [| la]; intros; [ easy | ].
+...
+destruct llb as [| lb]; [ easy | ].
+move lb before la.
+cbn - [ In ] in Hlc.
+destruct Hlc as [Hlc| Hlc]. {
+  subst lc.
+  destruct BMAP as (H1a, H2a).
+  destruct BMBP as (H1b, H2b).
+  cbn - [ In ] in H2a, H2b.
+  destruct H1a as (Har, Hac, Harc).
+  destruct H1b as (Hbr, Hbc, Hbrc).
+  cbn - [ In ] in Har, Hac, Harc.
+  cbn - [ In ] in Hbr, Hbc, Hbrc.
+  destruct ca. {
+    now rewrite (proj2 Harc eq_refl) in Har.
+  }
+  clear Harc Hbrc.
+  move Hbr before Har.
+  move Hbc before Hac.
+  clear Hac Hbc Har Hbr.
+  clear ra ca.
+  clear IHlla.
+  revert lb Hitn Hc H2b.
+  induction la as [| a]; intros; [ easy | ].
+  destruct lb as [| b]; [ easy | ].
+  move b before a.
+  cbn - [ In ] in Hc.
+  destruct Hc as [Hc| Hc]. {
+    clear IHla.
+    symmetry in Hc.
+    apply fold_left_fold_left_max_le_iff in Hitn.
+    destruct Hitn as (_, Hitn).
+    specialize (Hitn _ (or_introl eq_refl)).
+    specialize (Hitn _ (or_introl eq_refl)).
+    apply fold_left_fold_left_max_le_iff in Hita.
+    destruct Hita as (_, Hita).
+    specialize (Hita _ (or_introl eq_refl)).
+    specialize (Hita _ (or_introl eq_refl)).
+    destruct a as [xa| Ma]. {
+      subst c.
+      destruct ita; [ easy | now destruct b, itn ].
+    }
+    destruct b as [xb| Mb]. {
+      subst c.
+      destruct ita; [ easy | now destruct itn ].
+    }
+    specialize (IHab ita itn).
+    assert (Ha : bmatrix_coh (BM_M Ma) = true). {
+      specialize (H2a _ (or_introl eq_refl)).
+      specialize (H2a _ (or_introl eq_refl)).
+      cbn in H2a.
+      apply bmatrix_coh_equiv_prop.
+      unfold bmatrix_coh_prop.
+      apply bmatrix_coh_prop_loop_enough_iter in H2a; [ easy | ].
+      apply Nat_le_fold_left_fold_left_max.
+      now apply Nat_le_fold_left_max.
+    }
+    specialize (IHab (mk_bmat (BM_M Ma) Ha)).
+    assert (Hb : bmatrix_coh (BM_M Mb) = true). {
+      specialize (H2b _ (or_introl eq_refl)).
+      specialize (H2b _ (or_introl eq_refl)).
+      cbn in H2b.
+      apply bmatrix_coh_equiv_prop.
+      unfold bmatrix_coh_prop.
+      apply bmatrix_coh_prop_loop_enough_iter in H2b; [ easy | ].
+      apply Nat_le_fold_left_fold_left_max.
+      now apply Nat_le_fold_left_max.
+    }
+    specialize (IHab (mk_bmat (BM_M Mb) Hb)).
+    cbn - [ bmat_depth ] in IHab.
+    rewrite <- Hc in Hitn.
+    now specialize (IHab Hita Hitn Hc).
+  }
+  apply IHla with (lb := lb). {
+    clear - Hita.
+    apply fold_left_fold_left_max_le_iff in Hita.
+    destruct Hita as (_, Hita).
+    apply fold_left_fold_left_max_le_iff.
+    split; [ flia | ].
+    intros ln Hln n Hn.
+    cbn - [ In ] in Hita, Hln.
+    destruct Hln as [Hln| Hln]. {
+      subst ln.
+      apply (Hita _ (or_introl eq_refl)).
+      now right.
+    }
+    now apply (Hita _ (or_intror Hln)).
+  } {
+    intros ld Hld d Hd.
+    destruct Hld as [Hld| Hld]. {
+      subst ld.
+      specialize (H2a _ (or_introl eq_refl)).
+      specialize (H2a _ (or_intror Hd)).
+      cbn in H2a.
+      apply bmatrix_coh_prop_loop_enough_iter in H2a. 2: {
+        apply Nat_le_fold_left_fold_left_max.
+        now apply bmat_depth_le_fold_left_max.
+      }
+      apply bmatrix_coh_prop_loop_enough_iter; [ | easy ].
+      apply Nat_le_fold_left_fold_left_max.
+      now apply bmat_depth_le_fold_left_max.
+    }
+    move H2a at bottom.
+    specialize (H2a _ (or_intror Hld) _ Hd).
+    cbn in H2a.
+    apply bmatrix_coh_prop_loop_enough_iter in H2a. 2: {
+      now apply bmat_depth_le_fold_left_fold_left_max with (la := ld).
+    }
+    apply bmatrix_coh_prop_loop_enough_iter; [ | easy ].
+    now apply bmat_depth_le_fold_left_fold_left_max with (la := ld).
+  } {
+    move Hitn at bottom.
+    apply fold_left_fold_left_max_le_iff in Hitn.
+    apply fold_left_fold_left_max_le_iff.
+    split; [ easy | ].
+    destruct Hitn as (_, Hitn).
+    intros ln Hln n Hn.
+    cbn - [ In ] in Hln.
+    destruct Hln as [Hln| Hln]. {
+      subst ln.
+      specialize (Hitn _ (or_introl eq_refl)).
+      apply (Hitn _ (or_intror Hn)).
+    }
+    eapply Hitn; [ | apply Hn ].
+    now right.
+  } {
+    easy.
+  } {
+    intros ld Hld d Hd.
+    destruct Hld as [Hld| Hld]. {
+      subst ld.
+      specialize (H2b _ (or_introl eq_refl)).
+      specialize (H2b _ (or_intror Hd)).
+      cbn in H2b.
+      apply bmatrix_coh_prop_loop_enough_iter in H2b. 2: {
+        apply Nat_le_fold_left_fold_left_max.
+        now apply bmat_depth_le_fold_left_max.
+      }
+      apply bmatrix_coh_prop_loop_enough_iter; [ | easy ].
+      apply Nat_le_fold_left_fold_left_max.
+      now apply bmat_depth_le_fold_left_max.
+    }
+    move H2b at bottom.
+    specialize (H2b _ (or_intror Hld) _ Hd).
+    cbn in H2b.
+    apply bmatrix_coh_prop_loop_enough_iter in H2b. 2: {
+      now apply bmat_depth_le_fold_left_fold_left_max with (la := ld).
+    }
+    apply bmatrix_coh_prop_loop_enough_iter; [ | easy ].
+    now apply bmat_depth_le_fold_left_fold_left_max with (la := ld).
+  }
+}
+destruct ra. {
+  cbn - [ In ] in BMAP.
+  destruct BMAP as (H1a, H2a).
+  now destruct H1a as (Har, Hac, Harc).
+}
+apply IHlla with (ra := ra) (ca := ca) (llb := llb). {
+  move Hita at bottom.
+  cbn in Hita.
+  apply fold_left_fold_left_max_le_iff in Hita.
+  apply fold_left_fold_left_max_le_iff.
+  split; [ flia | ].
+  intros ln Hln n Hn.
+  destruct Hita as (Hita, Hni).
+  now apply (Hni ln).
+} {
+  move Hitn at bottom.
+  cbn in Hitn.
+  apply fold_left_fold_left_max_le_iff in Hitn.
+  apply fold_left_fold_left_max_le_iff.
+  split; [ flia | ].
+  intros ln Hln n Hn.
+  destruct Hitn as (Hitn, Hni).
+  now apply (Hni ln).
+} {
+  easy.
+} {
+  destruct BMAP as (H1a, H2a).
+  destruct H1a as (Har, Hac, Harc).
+  cbn - [ In ] in Har, Hac, Harc.
+  apply Nat.succ_inj in Har.
+  destruct ca. {
+    now specialize (proj2 Harc eq_refl).
+  }
+  split. {
+    split; cbn; [ easy | | ]. {
+      intros la1 Hla1.
+      now apply Hac; right.
+    }
+    split; intros Ha; [ exfalso | easy ].
+    move Ha at top; subst ra.
+    apply length_zero_iff_nil in Har.
+    now rewrite Har in Hlc.
+  }
+  intros ld Hld d Hd; cbn.
+  cbn - [ In ] in H2a, Hld.
+  specialize (H2a _ (or_intror Hld) _ Hd).
+  apply bmatrix_coh_prop_loop_enough_iter in H2a. 2: {
+    now apply bmat_depth_le_fold_left_fold_left_max with (la := ld).
+  }
+  apply bmatrix_coh_prop_loop_enough_iter; [ | easy ].
+  now apply bmat_depth_le_fold_left_fold_left_max with (la := ld).
+} {
+  destruct BMBP as (H1b, H2b).
+  destruct H1b as (Hbr, Hbc, Hbrc).
+  cbn - [ In ] in Hbr, Hbc, Hbrc.
+  apply Nat.succ_inj in Hbr.
+  destruct ca. {
+    now specialize (proj2 Hbrc eq_refl).
+  }
+  split. {
+    split; cbn; [ easy | | ]. {
+      intros lb1 Hlb1.
+      now apply Hbc; right.
+    }
+    split; intros Hb; [ exfalso | easy ].
+    move Hb at top; subst ra.
+    apply length_zero_iff_nil in Hbr.
+    rewrite Hbr in Hlc.
+    now destruct lla.
+  }
+  intros ld Hld d Hd; cbn.
+  cbn - [ In ] in H2b, Hld.
+  specialize (H2b _ (or_intror Hld) _ Hd).
+  apply bmatrix_coh_prop_loop_enough_iter in H2b. 2: {
+    now apply bmat_depth_le_fold_left_fold_left_max with (la := ld).
+  }
+  apply bmatrix_coh_prop_loop_enough_iter; [ | easy ].
+  now apply bmat_depth_le_fold_left_fold_left_max with (la := ld).
 }
 ...
 
