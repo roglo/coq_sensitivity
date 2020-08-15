@@ -7,6 +7,7 @@ Set Implicit Arguments.
 
 Require Import Utf8 Arith.
 Import List List.ListNotations.
+Require Import Init.Nat.
 Require Import Misc.
 
 (* adjacent vertices of a cube graph in any dimension;
@@ -3355,6 +3356,45 @@ destruct Hlc as [Hlc| Hlc]. {
   clear ra ca.
   clear IHlla.
   revert lb Hitn Hc H2b.
+  induction la as [| a]; intros. {
+    cbn - [ list_list_transpose ] in Hc.
+    apply in_map_iff in Hc.
+    destruct Hc as (la & Hla & Hc).
+    subst c.
+    destruct itn; [ cbn | easy ].
+...
+    apply fold_left_fold_left_max_le_iff in Hitn.
+    destruct Hitn as (_, Hitn).
+    cbn - [ In list_list_transpose ] in Hitn.
+    specialize (Hitn _ (or_introl eq_refl)).
+    cbn in Hitn.
+...
+(*
+    apply Nat.le_0_r in Hitn.
+cbn - [ list_list_transpose ] in Hitn.
+Theorem glop : ∀ lln k,
+  fold_left (λ m ln, fold_left max ln m) lln k = 0
+  → k = 0 ∧ ∀ ln, ln ∈ lln → ∀ n, n ∈ ln → n = 0.
+Admitted.
+specialize (glop _ _ Hitn) as H1.
+destruct H1 as (H1, H2).
+  assert (H : ∀ l, l ∈ mat_list ab → ∀ M, M ∈ l → bmat_depth M ≤ itn). {
+    intros l Hl M HM.
+    apply (Hitn (map (@bmat_depth _) l)); [ now apply in_map | ].
+    now apply in_map.
+  }
+Search (fold_left max).
+*)
+...
+    cbn - [ list_list_transpose ] in Hitn.
+  apply fold_left_fold_left_max_le_iff in Hitn.
+  destruct Hitn as (_, Hitn).
+  assert (H : ∀ l, l ∈ mat_list ab → ∀ M, M ∈ l → bmat_depth M ≤ itn). {
+    intros l Hl M HM.
+    apply (Hitn (map (@bmat_depth _) l)); [ now apply in_map | ].
+    now apply in_map.
+  }
+*)
 ...
   induction la as [| a]; intros; [ easy | ].
   destruct lb as [| b]; [ easy | ].
@@ -3756,8 +3796,6 @@ Proof. easy. Qed.
 Definition void_bmat T : bmatrix T :=
   {| bmat_def := void_bmat_def;
      bmat_coh_prop := void_bmat_coh_prop T |}.
-
-Require Import Init.Nat.
 
 Theorem bmat_depth_opp : ∀ T {ro : ring_op T} BM,
   bmat_depth (bmat_def_opp BM) = bmat_depth BM.
