@@ -3178,6 +3178,46 @@ Fixpoint old_bmat_def_mul_loop T {so : semiring_op T} it
 Definition old_bmat_def_mul T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
   old_bmat_def_mul_loop (bmat_depth MM1) MM1 MM2.
 
+Theorem length_col_list_list_mul :
+  ∀ T zero add mul cb (lla llb : list (list (bmatrix_def T))) lc,
+  (∀ c, c ∈ llb → length c = cb)
+  → lc ∈ list_list_mul zero add mul lla llb
+  → length lc = cb.
+Proof.
+intros * Hbc Hlc.
+revert llb lc Hbc Hlc.
+induction lla as [| la1]; intros; [ easy | ].
+destruct llb as [| lb1]. {
+  cbn - [ In ] in Hlc.
+...
+destruct llb as [| lb1]; [ easy | ].
+cbn - [ In ] in Hlc.
+destruct Hlc as [Hlc| Hlc]. {
+  subst lc.
+  clear - Hac Hbc.
+  specialize (Hac _ (or_introl eq_refl)).
+  specialize (Hbc _ (or_introl eq_refl)).
+  revert ca lb1 Hac Hbc.
+  induction la1 as [| a1]; intros; [ easy | ].
+  destruct lb1 as [| b1]; intros; [ easy | ].
+  cbn in Hac, Hbc |-*.
+  destruct ca; [ easy | ].
+  apply Nat.succ_inj in Hac.
+  apply Nat.succ_inj in Hbc.
+  f_equal.
+  now apply IHla1.
+} {
+  apply IHlla with (llb := llb); [ | | easy ]. {
+    intros lc1 Hlc1.
+    now apply Hac; right.
+  } {
+    intros lc1 Hlc1.
+    now apply Hbc; right.
+  }
+}
+Qed.
+*)
+
 Theorem bmat_coh_prop_mul_gen : ∀ T {so : semiring_op T} ita itn
     (BMA BMB : bmatrix T),
   bmat_depth (bmat_def BMA) ≤ ita
@@ -3255,9 +3295,8 @@ split. {
     intros lc Hlc.
     rewrite Hab; cbn.
     rewrite Hab in Hlc; cbn in Hlc.
-Check length_col_list_list_add.
 ...
-    now apply length_col_list_list_add with (ca := ca) in Hlc.
+    eapply length_col_list_list_mul; [ apply Hbc | apply Hlc ].
   }
   now rewrite Hab.
 }
