@@ -3193,32 +3193,17 @@ destruct llb as [| lb1]. {
 }
 clear Hll.
 cbn - [ In list_list_transpose ] in Hlc.
-...
 destruct Hlc as [Hlc| Hlc]. {
   subst lc.
-  clear - Hac Hbc.
-  specialize (Hac _ (or_introl eq_refl)).
-  specialize (Hbc _ (or_introl eq_refl)).
-  revert ca lb1 Hac Hbc.
-  induction la1 as [| a1]; intros; [ easy | ].
-  destruct lb1 as [| b1]; intros; [ easy | ].
-  cbn in Hac, Hbc |-*.
-  destruct ca; [ easy | ].
-  apply Nat.succ_inj in Hac.
-  apply Nat.succ_inj in Hbc.
-  f_equal.
-  now apply IHla1.
+  rewrite map_length; cbn.
+  rewrite map_length, seq_length.
+  now apply Hbc; left.
 } {
-  apply IHlla with (llb := llb); [ | | easy ]. {
-    intros lc1 Hlc1.
-    now apply Hac; right.
-  } {
-    intros lc1 Hlc1.
-    now apply Hbc; right.
-  }
+  apply IHlla with (llb := lb1 :: llb); [ easy | easy | ].
+  split; intros H; [ | easy ].
+  now subst lla.
 }
 Qed.
-*)
 
 Theorem bmat_coh_prop_mul_gen : ∀ T {so : semiring_op T} ita itn
     (BMA BMB : bmatrix T),
@@ -3310,8 +3295,8 @@ split. {
       now apply length_zero_iff_nil in H.
     }
   }
-...
-  now rewrite Hab.
+  rewrite Hab; cbn.
+  split; intros H; [ now apply Hbrc, Harc | now apply Harc, Hbrc ].
 }
 ...
 
