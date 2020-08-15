@@ -3123,30 +3123,30 @@ Compute (let _ := nat_semiring_op in mat_ncols (mat_def (mat_mul' (mat_of_list [
 
 (* multiplication of block matrices *)
 
-Fixpoint bmat_def_mul_loop T zero (add mul : T → T → T) (it : nat)
+Fixpoint bmat_def_mul_loop T {so : semiring_op T} (it : nat)
   (MM1 MM2 : bmatrix_def T) {struct it} : bmatrix_def T :=
   match it with
-  | 0 => zero
+  | 0 => void_bmat_def
   | S it' =>
       match MM1 with
       | BM_1 xa =>
           match MM2 with
-          | BM_1 xb => BM_1 (mul xa xb)
-          | BM_M _ => zero
+          | BM_1 xb => BM_1 (xa * xb)%Srng
+          | BM_M _ => void_bmat_def
           end
       | BM_M MMA =>
           match MM2 with
-          | BM_1 _ => zero
+          | BM_1 _ => void_bmat_def
           | BM_M MMB =>
               BM_M
-                (mat_def_mul zero (bmat_def_add add)
-                   (bmat_def_mul_loop zero add mul it') MMA MMB)
+                (mat_def_mul void_bmat_def (bmat_def_add srng_add)
+                   (bmat_def_mul_loop it') MMA MMB)
           end
       end
   end.
 
-Definition bmat_def_mul T zero add mul (MM1 MM2 : bmatrix_def T) :=
-  bmat_def_mul_loop zero add mul (bmat_depth MM1) MM1 MM2.
+Definition bmat_def_mul T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
+  bmat_def_mul_loop (bmat_depth MM1) MM1 MM2.
 
 Fixpoint old_bmat_def_mul_loop T {so : semiring_op T} it
      (MM1 MM2 : bmatrix_def T) :=
@@ -3177,16 +3177,15 @@ Fixpoint old_bmat_def_mul_loop T {so : semiring_op T} it
 Definition old_bmat_def_mul T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
   old_bmat_def_mul_loop (bmat_depth MM1) MM1 MM2.
 
-Theorem bmat_coh_prop_mul_gen : ∀ T zero add mul ita itn (BMA BMB : bmatrix T),
+Theorem bmat_coh_prop_mul_gen : ∀ T {so : semiring_op T} ita itn
+    (BMA BMB : bmatrix T),
   bmat_depth (bmat_def BMA) ≤ ita
-  → bmat_depth
-       (bmat_def_mul_loop zero add mul ita (bmat_def BMA) (bmat_def BMB)) ≤ itn
+  → bmat_depth (bmat_def_mul_loop ita (bmat_def BMA) (bmat_def BMB)) ≤ itn
   → bmatrix_coh_prop_loop itn
-       (bmat_def_mul_loop zero add mul ita (bmat_def BMA) (bmat_def BMB)).
+       (bmat_def_mul_loop ita (bmat_def BMA) (bmat_def BMB)).
 Proof.
 intros * Hita Hitn.
-remember (bmat_def_mul_loop zero add mul ita (bmat_def BMA) (bmat_def BMB))
-  as ab eqn:Hab.
+remember (bmat_def_mul_loop ita (bmat_def BMA) (bmat_def BMB)) as ab eqn:Hab.
 revert ita itn BMA BMB Hita Hitn Hab.
 induction ab as [| ab IHab] using bmatrix_ind; intros. {
   now destruct itn.
@@ -3203,8 +3202,13 @@ apply bmatrix_coh_equiv_prop in BMBP.
 split. {
   destruct ita. {
     cbn in Hab.
-    destruct zero; [ easy | ].
-    injection Hab; clear Hab; intros; subst m.
+    now injection Hab; intros; subst ab.
+  }
+  cbn in Hab.
+  destruct BMAD as [xa| Ma]. {
+    destruct BMBD as [xb| Mb]; [ easy | ].
+    now injection Hab; clear Hab; intros; subst ab.
+  }
 ...
 
 Theorem bmat_coh_prop_mul : ∀ T zero (add mul : T → T → T) BMA BMB,
