@@ -3181,17 +3181,19 @@ Definition old_bmat_def_mul T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
 Theorem length_col_list_list_mul :
   ∀ T zero add mul cb (lla llb : list (list (bmatrix_def T))) lc,
   (∀ c, c ∈ llb → length c = cb)
+  → (lla = [] ↔ llb = [])
   → lc ∈ list_list_mul zero add mul lla llb
   → length lc = cb.
 Proof.
-intros * Hbc Hlc.
-revert llb lc Hbc Hlc.
+intros * Hbc Hll Hlc.
+revert llb lc Hbc Hlc Hll.
 induction lla as [| la1]; intros; [ easy | ].
 destruct llb as [| lb1]. {
-  cbn - [ In ] in Hlc.
+  now specialize (proj2 Hll eq_refl).
+}
+clear Hll.
+cbn - [ In list_list_transpose ] in Hlc.
 ...
-destruct llb as [| lb1]; [ easy | ].
-cbn - [ In ] in Hlc.
 destruct Hlc as [Hlc| Hlc]. {
   subst lc.
   clear - Hac Hbc.
@@ -3295,9 +3297,20 @@ split. {
     intros lc Hlc.
     rewrite Hab; cbn.
     rewrite Hab in Hlc; cbn in Hlc.
-...
-    eapply length_col_list_list_mul; [ apply Hbc | apply Hlc ].
+    eapply length_col_list_list_mul; [ apply Hbc | | apply Hlc ].
+    clear - Har Hbr Harc Hbrc.
+    subst ra ca.
+    split; intros Hll. {
+      subst lla.
+      specialize (proj1 Harc eq_refl) as H.
+      now apply length_zero_iff_nil in H.
+    } {
+      subst llb.
+      specialize (proj2 Harc eq_refl) as H.
+      now apply length_zero_iff_nil in H.
+    }
   }
+...
   now rewrite Hab.
 }
 ...
