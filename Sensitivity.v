@@ -3324,6 +3324,8 @@ cbn in Hitn, Hlc.
 revert ra ca BMAP BMBP.
 revert llb Hitn Hlc.
 induction lla as [| la]; intros; [ easy | ].
+destruct llb as [| lb]. {
+  cbn - [ In ] in Hlc.
 ...
 destruct llb as [| lb]; [ easy | ].
 move lb before la.
