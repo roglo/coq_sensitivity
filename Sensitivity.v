@@ -3177,9 +3177,75 @@ Fixpoint old_bmat_def_mul_loop T {so : semiring_op T} it
 Definition old_bmat_def_mul T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
   old_bmat_def_mul_loop (bmat_depth MM1) MM1 MM2.
 
-...
+(* opposite *)
 
-(* opposite: to be moved after addition and before multiplication *)
+Fixpoint bmat_def_opp T (opp : T → T) BM : bmatrix_def T :=
+  match BM with
+  | BM_1 x => BM_1 (opp x)
+  | BM_M MMM =>
+      BM_M
+        {| mat_list := map (map (λ mm, bmat_def_opp opp mm)) (mat_list MMM);
+           mat_nrows := mat_nrows MMM;
+           mat_ncols := mat_ncols MMM |}
+  end.
+
+(* sequence "An" *)
+
+Definition bmat_def_of_list_bmat_def T (ll : list (list (bmatrix_def T))) :
+    matrix_def (bmatrix_def T) :=
+  {| mat_list := ll;
+     mat_nrows := list_list_nrows ll;
+     mat_ncols := list_list_ncols ll |}.
+
+Fixpoint IZ_2_pow_def T (zero u : T) n :=
+  match n with
+  | 0 => BM_1 u
+  | S n' =>
+      BM_M
+        {| mat_list :=
+             [[IZ_2_pow_def zero u n'; IZ_2_pow_def zero zero n'];
+              [IZ_2_pow_def zero zero n'; IZ_2_pow_def zero u n']];
+           mat_nrows := 2; mat_ncols := 2 |}
+  end.
+
+Definition I_2_pow_def T (zero one : T) := IZ_2_pow_def zero one.
+Definition Z_2_pow_def T (zero one : T) := IZ_2_pow_def zero zero.
+
+Fixpoint A_def T (zero one : T) (add mul : T → T → T) opp n : bmatrix_def T :=
+  match n with
+  | 0 => BM_1 zero
+  | S n' =>
+       BM_M
+         (bmat_def_of_list_bmat_def
+            [[A_def zero one add mul opp n';
+              I_2_pow_def zero one n'];
+             [I_2_pow_def zero one n';
+              bmat_def_opp opp (A_def zero one add mul opp n')]])
+  end.
+
+...
+Theorem IZ_2_pow_coh_prop : ∀ T {ro : ring_op T} u n,
+  bmatrix_coh (IZ_2_pow_def u n) = true.
+Proof.
+intros.
+unfold bmatrix_coh.
+revert u.
+induction n; intros; [ easy | cbn ].
+do 2 rewrite bmat_depth_IZ_2_pow.
+do 3 rewrite Nat.max_id.
+specialize (IHn 0%Rng) as H1.
+rewrite bmat_depth_IZ_2_pow in H1.
+specialize (IHn u) as H2.
+rewrite bmat_depth_IZ_2_pow in H2.
+now rewrite H1, H2.
+Qed.
+
+Definition IZ_2_pow T {ro : ring_op T} u n : bmatrix T :=
+  {| bmat_def := IZ_2_pow_def u n;
+     bmat_coh_prop := IZ_2_pow_coh_prop u n |}.
+
+Definition I_2_pow T {ro : ring_op T} := IZ_2_pow 1%Rng.
+Definition Z_2_pow T {ro : ring_op T} := IZ_2_pow 0%Rng.
 
 Definition list_list_opp T {ro : ring_op T} (ll : list (list T)) :=
   map (map rng_opp) ll.
@@ -3276,16 +3342,6 @@ Proof. easy. Qed.
 Definition void_bmat T : bmatrix T :=
   {| bmat_def := void_bmat_def;
      bmat_coh_prop := void_bmat_coh_prop T |}.
-
-Fixpoint bmat_def_opp T {ro : ring_op T} BM : bmatrix_def T :=
-  match BM with
-  | BM_1 x => BM_1 (- x)%Rng
-  | BM_M MMM =>
-      BM_M
-        {| mat_list := map (map (λ mm, bmat_def_opp mm)) (mat_list MMM);
-           mat_nrows := mat_nrows MMM;
-           mat_ncols := mat_ncols MMM |}
-  end.
 
 Require Import Init.Nat.
 
@@ -3422,12 +3478,6 @@ Definition bmat_opp T {ro : ring_op T} (BM : bmatrix T) : bmatrix T :=
   {| bmat_def := bmat_def_opp (bmat_def BM);
      bmat_coh_prop := bmat_coh_opp BM |}.
 
-Definition bmat_def_of_list_bmat_def T (ll : list (list (bmatrix_def T))) :
-    matrix_def (bmatrix_def T) :=
-  {| mat_list := ll;
-     mat_nrows := list_list_nrows ll;
-     mat_ncols := list_list_ncols ll |}.
-
 Definition bmat_def_of_list_bmat T (ll : list (list (bmatrix T))) :
     matrix_def (bmatrix T) :=
   {| mat_list := ll;
@@ -3453,17 +3503,6 @@ Definition bmat_of_list_bmat T (ll : list (list (bmatrix T)))
   {| mat_def := bmat_def_of_list_bmat ll;
      mat_coh_prop := bmat_coh_prop_of_list_bmat ll Hsl Hzt|}.
 
-Fixpoint IZ_2_pow_def T {ro : ring_op T} u n :=
-  match n with
-  | 0 => BM_1 u
-  | S n' =>
-      BM_M
-        {| mat_list :=
-             [[IZ_2_pow_def u n'; IZ_2_pow_def 0%Rng n'];
-              [IZ_2_pow_def 0%Rng n'; IZ_2_pow_def u n']];
-           mat_nrows := 2; mat_ncols := 2 |}
-  end.
-
 Theorem bmat_depth_IZ_2_pow T {ro : ring_op T} : ∀ u n,
   bmat_depth (IZ_2_pow_def u n) = S n.
 Proof.
@@ -3473,42 +3512,6 @@ induction n; intros; [ easy | cbn ].
 do 2 rewrite IHn.
 now do 3 rewrite Nat.max_id.
 Qed.
-
-Theorem IZ_2_pow_coh_prop : ∀ T {ro : ring_op T} u n,
-  bmatrix_coh (IZ_2_pow_def u n) = true.
-Proof.
-intros.
-unfold bmatrix_coh.
-revert u.
-induction n; intros; [ easy | cbn ].
-do 2 rewrite bmat_depth_IZ_2_pow.
-do 3 rewrite Nat.max_id.
-specialize (IHn 0%Rng) as H1.
-rewrite bmat_depth_IZ_2_pow in H1.
-specialize (IHn u) as H2.
-rewrite bmat_depth_IZ_2_pow in H2.
-now rewrite H1, H2.
-Qed.
-
-Definition IZ_2_pow T {ro : ring_op T} u n : bmatrix T :=
-  {| bmat_def := IZ_2_pow_def u n;
-     bmat_coh_prop := IZ_2_pow_coh_prop u n |}.
-
-Definition I_2_pow_def T {ro : ring_op T} := IZ_2_pow_def 1%Rng.
-Definition Z_2_pow_def T {ro : ring_op T} := IZ_2_pow_def 0%Rng.
-
-Definition I_2_pow T {ro : ring_op T} := IZ_2_pow 1%Rng.
-Definition Z_2_pow T {ro : ring_op T} := IZ_2_pow 0%Rng.
-
-Fixpoint A_def T {ro : ring_op T} n : bmatrix_def T :=
-  match n with
-  | 0 => BM_1 0%Rng
-  | S n' =>
-       BM_M
-         (bmat_def_of_list_bmat_def
-            [[A_def n'; I_2_pow_def n'];
-             [I_2_pow_def n'; bmat_def_opp (A_def n')]])
-  end.
 
 Theorem bmat_depth_A T {ro : ring_op T} : ∀ n,
   bmat_depth (A_def n) = S n.
