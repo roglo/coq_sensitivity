@@ -3244,17 +3244,19 @@ split. {
   destruct Mb as (llb, rb, cb).
   cbn in *.
   unfold mat_def_mul in Hab.
-  cbn - [ Nat.eq_dec ] in Hab.
+  cbn - [ Nat.eq_dec list_list_mul ] in Hab.
   destruct (Nat.eq_dec ca rb) as [Hcr| Hcr]; [ | now subst ab ].
   move Hcr at top; subst rb.
   split. {
     rewrite Hab; cbn.
-...
-    now apply length_list_list_mul with (ca := ca).
+    unfold list_list_mul.
+    now rewrite map_length.
   } {
     intros lc Hlc.
     rewrite Hab; cbn.
     rewrite Hab in Hlc; cbn in Hlc.
+Check length_col_list_list_add.
+...
     now apply length_col_list_list_add with (ca := ca) in Hlc.
   }
   now rewrite Hab.
