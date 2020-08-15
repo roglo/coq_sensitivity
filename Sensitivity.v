@@ -3191,6 +3191,20 @@ revert ita itn BMA BMB Hita Hitn Hab.
 induction ab as [| ab IHab] using bmatrix_ind; intros. {
   now destruct itn.
 }
+cbn in Hitn.
+destruct itn; [ easy | cbn ].
+apply Nat.succ_le_mono in Hitn.
+destruct BMA as (BMAD, BMAP).
+destruct BMB as (BMBD, BMBP).
+move BMBD before BMAD.
+cbn in Hita, Hab.
+apply bmatrix_coh_equiv_prop in BMAP.
+apply bmatrix_coh_equiv_prop in BMBP.
+split. {
+  destruct ita. {
+    cbn in Hab.
+    destruct zero; [ easy | ].
+    injection Hab; clear Hab; intros; subst m.
 ...
 
 Theorem bmat_coh_prop_mul : ∀ T zero (add mul : T → T → T) BMA BMB,
