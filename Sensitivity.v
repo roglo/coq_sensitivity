@@ -3123,11 +3123,33 @@ Compute (let _ := nat_semiring_op in mat_ncols (mat_def (mat_mul' (mat_of_list [
 
 (* multiplication of block matrices *)
 
-Print bmat_def_add_loop.
+Fixpoint bmat_def_mul_loop T zero (add mul : T → T → T) (it : nat)
+  (MM1 MM2 : bmatrix_def T) {struct it} : bmatrix_def T :=
+  match it with
+  | 0 => zero
+  | S it' =>
+      match MM1 with
+      | BM_1 xa =>
+          match MM2 with
+          | BM_1 xb => BM_1 (mul xa xb)
+          | BM_M _ => zero
+          end
+      | BM_M MMA =>
+          match MM2 with
+          | BM_1 _ => zero
+          | BM_M MMB =>
+              BM_M
+                (mat_def_mul zero (bmat_def_add add)
+                   (bmat_def_mul_loop zero add mul it') MMA MMB)
+          end
+      end
+  end.
 
-...
+Definition bmat_def_mul T zero add mul (MM1 MM2 : bmatrix_def T) :=
+  bmat_def_mul_loop zero add mul (bmat_depth MM1) MM1 MM2.
 
-Fixpoint bmat_def_mul_loop T mul it (MM1 MM2 : bmatrix_def T) :=
+Fixpoint old_bmat_def_mul_loop T {so : semiring_op T} it
+     (MM1 MM2 : bmatrix_def T) :=
   match it with
   | 0 => void_bmat_def
   | S it' =>
@@ -3141,10 +3163,19 @@ Fixpoint bmat_def_mul_loop T mul it (MM1 MM2 : bmatrix_def T) :=
           match MM2 with
           | BM_1 MB => void_bmat_def
           | BM_M MMMB =>
-              BM_M (mat_def_mul MMMA MMMB)
+              let mso :=
+                {| srng_zero := void_bmat_def;
+                   srng_one := void_bmat_def;
+                   srng_add := @bmat_def_add T srng_add;
+                   srng_mul := old_bmat_def_mul_loop it' |}
+              in
+              BM_M (old_mat_def_mul MMMA MMMB)
           end
       end
   end.
+
+Definition old_bmat_def_mul T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
+  old_bmat_def_mul_loop (bmat_depth MM1) MM1 MM2.
 
 ...
 
@@ -3858,35 +3889,6 @@ Check mat_def_add.
 Check mat_def_mul.
 
 ...
-
-(* old *)
-Fixpoint bmat_def_mul_loop T {so : semiring_op T} it (MM1 MM2 : bmatrix_def T) :=
-  match it with
-  | 0 => void_bmat_def
-  | S it' =>
-      match MM1 with
-      | BM_1 xa =>
-          match MM2 with
-          | BM_1 xb => BM_1 (xa * xb)%Srng
-          | BM_M MMB => void_bmat_def
-          end
-      | BM_M MMMA =>
-          match MM2 with
-          | BM_1 MB => void_bmat_def
-          | BM_M MMMB =>
-              let mso :=
-                {| srng_zero := void_bmat_def;
-                   srng_one := void_bmat_def;
-                   srng_add := @bmat_def_add T so;
-                   srng_mul := bmat_def_mul_loop it' |}
-              in
-              BM_M (mat_def_mul MMMA MMMB)
-          end
-      end
-  end.
-
-Definition bmat_def_mul T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
-  bmat_def_mul_loop (bmat_depth MM1) MM1 MM2.
 
 (**)
 Require Import ZArith.
