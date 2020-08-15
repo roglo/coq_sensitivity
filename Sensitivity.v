@@ -3326,10 +3326,16 @@ revert llb Hitn Hlc.
 induction lla as [| la]; intros; [ easy | ].
 destruct llb as [| lb]. {
   cbn - [ In ] in Hlc.
-...
-destruct llb as [| lb]; [ easy | ].
+  enough (lc = []) by now subst lc.
+  destruct Hlc as [Hlc| Hlc]; [ easy | ].
+  clear - Hlc.
+  induction lla as [| la]; [ easy | ].
+  cbn - [ In ] in Hlc.
+  destruct Hlc as [Hlc| Hlc]; [ easy | ].
+  apply IHlla, Hlc.
+}
 move lb before la.
-cbn - [ In ] in Hlc.
+cbn - [ In list_list_transpose ] in Hlc.
 destruct Hlc as [Hlc| Hlc]. {
   subst lc.
   destruct BMAP as (H1a, H2a).
@@ -3349,6 +3355,7 @@ destruct Hlc as [Hlc| Hlc]. {
   clear ra ca.
   clear IHlla.
   revert lb Hitn Hc H2b.
+...
   induction la as [| a]; intros; [ easy | ].
   destruct lb as [| b]; [ easy | ].
   move b before a.
