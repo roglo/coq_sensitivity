@@ -3671,7 +3671,46 @@ destruct Hlc as [Hlc| Hlc]. {
              (seq 1 (@length (list (bmatrix_def T)) llb))))).
     rewrite fold_bmat_def_add in Hc.
     rewrite <- bmat_def_add_loop_enough_iter with (it := ita) in Hc. 2: {
-Search (_ → bmat_depth _ ≤ _).
+cbn.
+clear - Hita.
+destruct ita. {
+  apply Nat.le_0_r in Hita.
+  now apply bmat_depth_neq_0 in Hita.
+}
+cbn in Hita |-*.
+apply -> Nat.succ_le_mono.
+apply Nat.succ_le_mono in Hita.
+(*
+revert Ma Mb Hita.
+induction ita; intros. {
+  admit.
+}
+*)
+apply fold_left_fold_left_max_le_iff.
+apply fold_left_fold_left_max_le_iff in Hita.
+split; [ easy | ].
+destruct Hita as (_, Hita).
+intros ln Hln n Hn.
+unfold mat_def_mul in Hln.
+destruct (Nat.eq_dec (mat_ncols Ma) (mat_nrows Mb)) as [Hcr| Hcr]. {
+  cbn in Hln.
+  apply in_map_iff in Hln.
+  destruct Hln as (la & Hln & Hla).
+  subst ln.
+  unfold list_list_mul in Hla.
+  cbn in Hla.
+  apply in_map_iff in Hla.
+  destruct Hla as (lb & Hla & Hlb).
+  subst la.
+  rewrite map_map in Hn.
+  apply in_map_iff in Hn.
+  destruct Hn as (a & Hn & Ha).
+  subst n.
+Search (bmat_depth _ = _).
+Print list_mul.
+eapply Hita.
+...
+apply (Hita ln); [ | easy ].
 ...
     rewrite <- Hc in H1.
 ...
