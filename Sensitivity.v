@@ -3413,10 +3413,28 @@ destruct Hlc as [Hlc| Hlc]. {
     }
     destruct b as [xb| Mb]. {
       subst c.
-...
-      destruct ita; [ easy | now destruct itn ].
+      destruct itn. {
+        apply Nat.le_0_r in Hitn.
+        now apply bmat_depth_neq_0 in Hitn.
+      }
+      cbn.
+      destruct ita. {
+        cbn.
+        apply Nat.le_0_r in Hita.
+        now apply bmat_depth_neq_0 in Hita.
+      }
+      cbn.
+      remember (list_mul la _) as ab eqn:Hab.
+      symmetry in Hab.
+      destruct ab as [xab| Mab]; [ easy | cbn ].
+      unfold mat_def_add.
+      destruct (Nat.eq_dec (mat_nrows _) (mat_nrows _)); [ | easy ].
+      now destruct (Nat.eq_dec (mat_ncols _) (mat_ncols _)).
     }
     specialize (IHab ita itn).
+    cbn in Hitn, Hc.
+    rewrite <- Hc in Hitn.
+...
     assert (Ha : bmatrix_coh (BM_M Ma) = true). {
       specialize (H2a _ (or_introl eq_refl)).
       specialize (H2a _ (or_introl eq_refl)).
@@ -3427,7 +3445,6 @@ destruct Hlc as [Hlc| Hlc]. {
       apply Nat_le_fold_left_fold_left_max.
       now apply Nat_le_fold_left_max.
     }
-    specialize (IHab (mk_bmat (BM_M Ma) Ha)).
     assert (Hb : bmatrix_coh (BM_M Mb) = true). {
       specialize (H2b _ (or_introl eq_refl)).
       specialize (H2b _ (or_introl eq_refl)).
@@ -3438,9 +3455,12 @@ destruct Hlc as [Hlc| Hlc]. {
       apply Nat_le_fold_left_fold_left_max.
       now apply Nat_le_fold_left_max.
     }
+...
+    specialize (IHab (mk_bmat (BM_M Ma) Ha)).
     specialize (IHab (mk_bmat (BM_M Mb) Hb)).
     cbn - [ bmat_depth ] in IHab.
-    rewrite <- Hc in Hitn.
+    specialize (IHab Hita Hitn).
+...
     now specialize (IHab Hita Hitn Hc).
   }
   apply IHla with (lb := lb). {
@@ -3601,11 +3621,9 @@ apply IHlla with (ra := ra) (ca := ca) (llb := llb). {
   apply bmatrix_coh_prop_loop_enough_iter; [ | easy ].
   now apply bmat_depth_le_fold_left_fold_left_max with (la := ld).
 }
-...
 
-Theorem bmat_coh_prop_mul : ∀ T zero (add mul : T → T → T) BMA BMB,
-  bmatrix_coh (bmat_def_mul zero add mul (bmat_def BMA) (bmat_def BMB)) =
-  true.
+Theorem bmat_coh_prop_mul : ∀ T {so : semiring_op T} BMA BMB,
+  bmatrix_coh (bmat_def_mul (bmat_def BMA) (bmat_def BMB)) = true.
 Proof.
 intros.
 apply bmatrix_coh_equiv_prop.
