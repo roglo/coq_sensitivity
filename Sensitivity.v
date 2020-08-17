@@ -2940,18 +2940,18 @@ Definition bmat_add T {so : semiring_op T} (BMA BMB : bmatrix T) :=
 
 (* multiplication *)
 
-Fixpoint list_mul T zero (add : T → T → T) mul (l1 l2 : list T) :=
+Fixpoint list_mul T {so : semiring_op T} (l1 l2 : list T) :=
   match l1 with
   | e1 :: l'1 =>
       match l2 with
-      | e2 :: l'2 => add (mul e1 e2) (list_mul zero add mul l'1 l'2)
-      | [] => zero
+      | e2 :: l'2 => (e1 * e2 + list_mul l'1 l'2)%Srng
+      | [] => 0%Srng
       end
-  | [] => zero
+  | [] => 0%Srng
   end.
 
-Definition list_list_mul T zero add mul (ll1 ll2 : list (list T)) :=
-  map (λ l1, map (list_mul zero add mul l1) (list_list_transpose zero ll2))
+Definition list_list_mul T {so : semiring_op T} (ll1 ll2 : list (list T)) :=
+  map (λ l1, map (list_mul l1) (list_list_transpose srng_zero ll2))
     ll1.
 
 (* old *)
@@ -2982,17 +2982,17 @@ Definition nat_semiring_op : semiring_op nat :=
      srng_mul := Nat.mul |}.
 
 Definition list_list_mul' T {ro : semiring_op T} (r cr c : nat) ll1 ll2 :=
-  list_list_mul srng_zero srng_add srng_mul ll1 ll2.
+  list_list_mul ll1 ll2.
 
 Compute (let _ := nat_semiring_op in list_list_mul' 3 4 2 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] [[1; 2]; [3; 4]; [5; 6]; [0; 0]]).
 Compute (let _ := nat_semiring_op in old_list_list_mul 3 4 2 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] [[1; 2]; [3; 4]; [5; 6]; [0; 0]]).
 Compute (let _ := nat_semiring_op in list_list_mul' 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
 Compute (let _ := nat_semiring_op in old_list_list_mul 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
 
-Definition mat_def_mul T zero (add mul : T → T → T) (M1 M2 : matrix_def T) :
+Definition mat_def_mul T {so : semiring_op T} (M1 M2 : matrix_def T) :
     matrix_def T :=
   if Nat.eq_dec (mat_ncols M1) (mat_nrows M2) then
-    {| mat_list := list_list_mul zero add mul (mat_list M1) (mat_list M2);
+    {| mat_list := list_list_mul (mat_list M1) (mat_list M2);
        mat_nrows := mat_nrows M1;
        mat_ncols := mat_ncols M2 |}
   else void_mat_def.
@@ -3060,8 +3060,8 @@ Definition old_mat_mul T {so : semiring_op T} (MA MB : matrix T) : matrix T :=
   {| mat_def := old_mat_def_mul (mat_def MA) (mat_def MB);
      mat_coh_prop := old_mat_coh_prop_mul MA MB |}.
 
-Theorem mat_coh_prop_mul : ∀ T (zero : T) add mul MA MB,
-  matrix_coh (mat_def_mul zero add mul (mat_def MA) (mat_def MB)) = true.
+Theorem mat_coh_prop_mul : ∀ T {so : semiring_op T} MA MB,
+  matrix_coh (mat_def_mul (mat_def MA) (mat_def MB)) = true.
 Proof.
 intros.
 apply matrix_coh_equiv_prop.
@@ -3107,26 +3107,23 @@ split; intros H. {
 }
 Qed.
 
-Definition mat_mul T (zero : T) add mul (MA MB : matrix T) : matrix T :=
-  {| mat_def := mat_def_mul zero add mul (mat_def MA) (mat_def MB);
-     mat_coh_prop := mat_coh_prop_mul zero add mul MA MB |}.
-
-Definition mat_mul' T {ro : semiring_op T} :=
-  mat_mul srng_zero srng_add srng_mul.
+Definition mat_mul T {so : semiring_op T} (MA MB : matrix T) : matrix T :=
+  {| mat_def := mat_def_mul (mat_def MA) (mat_def MB);
+     mat_coh_prop := mat_coh_prop_mul MA MB |}.
 
 Compute (let _ := nat_semiring_op in old_mat_mul (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]; [0; 0]])).
-Compute (let _ := nat_semiring_op in mat_mul' (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]; [0; 0]])).
+Compute (let _ := nat_semiring_op in mat_mul (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]; [0; 0]])).
 
 Compute (let _ := nat_semiring_op in old_mat_mul (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]])).
-Compute (let _ := nat_semiring_op in mat_mul' (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]])).
+Compute (let _ := nat_semiring_op in mat_mul (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list [[1; 2]; [3; 4]; [5; 6]])).
 
 Compute (let _ := nat_semiring_op in old_mat_mul (mat_of_list [[1; 2]; [3; 4]; [5; 6]])
   (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
-Compute (let _ := nat_semiring_op in mat_mul' (mat_of_list [[1; 2]; [3; 4]; [5; 6]])
+Compute (let _ := nat_semiring_op in mat_mul (mat_of_list [[1; 2]; [3; 4]; [5; 6]])
   (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
 
 Compute (let _ := nat_semiring_op in mat_ncols (mat_def (old_mat_mul (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]])))).
-Compute (let _ := nat_semiring_op in mat_ncols (mat_def (mat_mul' (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]])))).
+Compute (let _ := nat_semiring_op in mat_ncols (mat_def (mat_mul (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]) (mat_of_list [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]])))).
 
 (* multiplication of block matrices *)
 
@@ -3145,9 +3142,13 @@ Fixpoint bmat_def_mul_loop T {so : semiring_op T} (it : nat)
           match MM2 with
           | BM_1 _ => void_bmat_def
           | BM_M MMB =>
-              BM_M
-                (mat_def_mul void_bmat_def (@bmat_def_add T so)
-                   (bmat_def_mul_loop it') MMA MMB)
+              let bso :=
+                {| srng_zero := void_bmat_def;
+                   srng_one := void_bmat_def;
+                   srng_add := @bmat_def_add T so;
+                   srng_mul := bmat_def_mul_loop it' |}
+              in
+              BM_M (mat_def_mul MMA MMB)
           end
       end
   end.
@@ -3185,10 +3186,10 @@ Definition old_bmat_def_mul T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
   old_bmat_def_mul_loop (bmat_depth MM1) MM1 MM2.
 
 Theorem length_col_list_list_mul :
-  ∀ T zero add mul cb (lla llb : list (list (bmatrix_def T))) lc,
+  ∀ T {so : semiring_op (bmatrix_def T)} cb (lla llb : list (list (bmatrix_def T))) lc,
   (∀ c, c ∈ llb → length c = cb)
   → (lla = [] ↔ llb = [])
-  → lc ∈ list_list_mul zero add mul lla llb
+  → lc ∈ list_list_mul lla llb
   → length lc = cb.
 Proof.
 intros * Hbc Hll Hlc.
@@ -3402,8 +3403,17 @@ destruct Hlc as [Hlc| Hlc]. {
         now apply bmat_depth_neq_0 in Hitn.
       }
       cbn.
-      destruct b. {
-        cbn.
+      destruct b; [ now destruct (list_mul la _) | ].
+      remember (list_mul la _) as ab eqn:Hab.
+      symmetry in Hab.
+      destruct ab as [xab| Mab]; [ easy | cbn ].
+Print mat_def_add.
+Theorem glop : ∀ T (M : matrix_def (bmatrix_def T)),
+  mat_def_add (λ _ _, void_bmat_def) void_mat_def M = void_mat_def.
+(* version plus générale, peut-être ? *)
+...
+Theorem mat_def_add_as_void : ∀ T (MA MB : matrix_def T) x,
+  @mat_def_add T (λ _ _, x) MA MB = x.
 ...
       destruct ita; [ easy | now destruct b, itn ].
     }
