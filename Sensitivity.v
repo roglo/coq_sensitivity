@@ -2584,6 +2584,28 @@ destruct Hlc as [Hlc| Hlc]. {
 Qed.
 
 Theorem bmat_coh_prop_add_gen : ∀ T {so : semiring_op T} ita itn
+    (BMA BMB : bmatrix_def T),
+  bmatrix_coh_prop BMA
+  → bmatrix_coh_prop BMB
+  → bmat_depth BMA ≤ ita
+  → bmat_depth (bmat_def_add_loop ita BMA BMB) ≤ itn
+  → bmatrix_coh_prop_loop itn (bmat_def_add_loop ita BMA BMB).
+Proof.
+intros * BMAP BMBP Hita Hitn.
+remember (bmat_def_add_loop ita BMA BMB) as ab eqn:Hab.
+revert ita itn BMA BMB BMAP BMBP Hita Hitn Hab.
+induction ab as [| ab IHab] using bmatrix_ind; intros. {
+  now destruct itn.
+}
+cbn in Hitn.
+destruct itn; [ easy | cbn ].
+apply Nat.succ_le_mono in Hitn.
+rename BMA into BMAD.
+rename BMB into BMBD.
+move BMBD before BMAD.
+(*
+...
+Theorem bmat_coh_prop_add_gen' : ∀ T {so : semiring_op T} ita itn
     (BMA BMB : bmatrix T),
   bmat_depth (bmat_def BMA) ≤ ita
   → bmat_depth (bmat_def_add_loop ita (bmat_def BMA) (bmat_def BMB)) ≤ itn
@@ -2602,10 +2624,13 @@ apply Nat.succ_le_mono in Hitn.
 destruct BMA as (BMAD, BMAP).
 destruct BMB as (BMBD, BMBP).
 move BMBD before BMAD.
+*)
 cbn in Hita.
 cbn - [ bmat_def_add_loop ] in Hab.
+(*
 apply bmatrix_coh_equiv_prop in BMAP.
 apply bmatrix_coh_equiv_prop in BMBP.
+*)
 split. {
   destruct ita. {
     cbn in Hab.
@@ -2750,7 +2775,6 @@ destruct Hlc as [Hlc| Hlc]. {
       apply Nat_le_fold_left_fold_left_max.
       now apply Nat_le_fold_left_max.
     }
-    specialize (IHab (mk_bmat (BM_M Ma) Ha)).
     assert (Hb : bmatrix_coh (BM_M Mb) = true). {
       specialize (H2b _ (or_introl eq_refl)).
       specialize (H2b _ (or_introl eq_refl)).
@@ -2761,7 +2785,9 @@ destruct Hlc as [Hlc| Hlc]. {
       apply Nat_le_fold_left_fold_left_max.
       now apply Nat_le_fold_left_max.
     }
-    specialize (IHab (mk_bmat (BM_M Mb) Hb)).
+    apply bmatrix_coh_equiv_prop in Ha.
+    apply bmatrix_coh_equiv_prop in Hb.
+    specialize (IHab (BM_M Ma) (BM_M Mb) Ha Hb).
     cbn - [ bmat_depth ] in IHab.
     rewrite <- Hc in Hitn.
     now specialize (IHab Hita Hitn Hc).
@@ -2931,7 +2957,13 @@ Theorem bmat_coh_prop_add : ∀ T {so : semiring_op T} (BMA BMB : bmatrix T),
 Proof.
 intros.
 apply bmatrix_coh_equiv_prop.
-now apply bmat_coh_prop_add_gen.
+apply bmat_coh_prop_add_gen; [ | | easy | easy ]. {
+  apply bmatrix_coh_equiv_prop.
+  now destruct BMA.
+} {
+  apply bmatrix_coh_equiv_prop.
+  now destruct BMB.
+}
 Qed.
 
 Definition bmat_add T {so : semiring_op T} (BMA BMB : bmatrix T) :=
@@ -3434,6 +3466,9 @@ destruct Hlc as [Hlc| Hlc]. {
     specialize (IHab ita itn).
     cbn in Hitn, Hc.
     rewrite <- Hc in Hitn.
+Check bmat_coh_prop_add_gen.
+(* mmm.... la récursion IHab ne fonctionne pas ici : on a c qui est un add
+   tandis qu'on réclame un mul *)
 ...
     assert (Ha : bmatrix_coh (BM_M Ma) = true). {
       specialize (H2a _ (or_introl eq_refl)).
