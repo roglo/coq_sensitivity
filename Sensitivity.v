@@ -1940,6 +1940,12 @@ Fixpoint bmatrix_coh_prop_loop T it (bmd : bmatrix_def T) :=
 Definition bmatrix_coh_prop T (bmd : bmatrix_def T) :=
   bmatrix_coh_prop_loop (bmat_depth bmd) bmd.
 
+Theorem bmat_depth_neq_0 : ∀ T (M : bmatrix_def T), bmat_depth M ≠ 0.
+Proof.
+intros.
+now destruct M.
+Qed.
+
 Theorem fold_left_fold_left_and_true : ∀ A (f : A → bool) ll,
   fold_left (λ b1 la, fold_left (λ b2 a, b2 && f a) la b1) ll true = true
   ↔ (∀ (la : list A) (a : A), la ∈ ll → a ∈ la → f a = true).
@@ -3376,7 +3382,7 @@ destruct Hlc as [Hlc| Hlc]. {
   }
   destruct lb as [| b]; [ easy | ].
   move b before a.
-  cbn - [ In ] in Hc.
+  cbn - [ In list_list_transpose ] in Hc.
   destruct Hc as [Hc| Hc]. {
     clear IHla.
     symmetry in Hc.
@@ -3390,6 +3396,14 @@ destruct Hlc as [Hlc| Hlc]. {
     specialize (Hita _ (or_introl eq_refl)).
     destruct a as [xa| Ma]. {
       subst c.
+      destruct ita; [ easy | ].
+      destruct itn. {
+        apply Nat.le_0_r in Hitn.
+        now apply bmat_depth_neq_0 in Hitn.
+      }
+      cbn.
+      destruct b. {
+        cbn.
 ...
       destruct ita; [ easy | now destruct b, itn ].
     }
