@@ -3695,19 +3695,21 @@ unfold mat_def_mul in Hln.
 destruct (Nat.eq_dec (mat_ncols Ma) (mat_nrows Mb)) as [Hcr| Hcr]. {
   cbn in Hln.
   apply in_map_iff in Hln.
-  destruct Hln as (la & Hln & Hla).
+  destruct Hln as (l & Hln & Hl).
   subst ln.
-  unfold list_list_mul in Hla.
-  cbn in Hla.
-  apply in_map_iff in Hla.
-  destruct Hla as (lb & Hla & Hlb).
-  subst la.
+  unfold list_list_mul in Hl.
+  cbn in Hl.
+  apply in_map_iff in Hl.
+  destruct Hl as (la & Hl & Hla).
+  subst l.
   rewrite map_map in Hn.
   apply in_map_iff in Hn.
-  destruct Hn as (a & Hn & Ha).
+  destruct Hn as (lb & Hn & Hlb).
   subst n.
+  move lb before la.
 Search (bmat_depth _ = _).
 Print list_mul.
+...
 eapply Hita.
 ...
 apply (Hita ln); [ | easy ].
