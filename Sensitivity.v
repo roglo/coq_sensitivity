@@ -3407,18 +3407,13 @@ destruct Hlc as [Hlc| Hlc]. {
       remember (list_mul la _) as ab eqn:Hab.
       symmetry in Hab.
       destruct ab as [xab| Mab]; [ easy | cbn ].
-Print mat_def_add.
-Theorem glop : ∀ T (M : matrix_def (bmatrix_def T)),
-  mat_def_add (λ _ _, void_bmat_def) void_mat_def M = void_mat_def.
-(* version plus générale, peut-être ? *)
-...
-Theorem mat_def_add_as_void : ∀ T (MA MB : matrix_def T) x,
-  @mat_def_add T (λ _ _, x) MA MB = x.
-...
-      destruct ita; [ easy | now destruct b, itn ].
+      unfold mat_def_add.
+      destruct (Nat.eq_dec (mat_nrows _) (mat_nrows _)); [ | easy ].
+      now destruct (Nat.eq_dec (mat_ncols _) (mat_ncols _)).
     }
     destruct b as [xb| Mb]. {
       subst c.
+...
       destruct ita; [ easy | now destruct itn ].
     }
     specialize (IHab ita itn).
