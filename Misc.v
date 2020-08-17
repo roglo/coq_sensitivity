@@ -1077,6 +1077,29 @@ apply IHlln.
 now apply Nat_le_fold_left_max.
 Qed.
 
+Theorem Nat_fold_left_max_le : ∀ nl n k,
+  n ≤ k
+  → fold_left max nl n ≤ fold_left max nl k.
+Proof.
+intros * Hkn.
+revert n k Hkn.
+induction nl as [| n1]; intros; [ easy | cbn ].
+apply IHnl.
+now apply Nat.max_le_compat_r.
+Qed.
+
+Theorem Nat_fold_left_fold_left_max_le : ∀ nll a b,
+  a ≤ b
+  → fold_left (λ m nl, fold_left max nl m) nll a ≤
+     fold_left (λ m nl, fold_left max nl m) nll b.
+Proof.
+intros * Hab.
+revert a b Hab.
+induction nll as [| nl]; intros; [ easy | cbn ].
+apply IHnll.
+now apply Nat_fold_left_max_le.
+Qed.
+
 Definition Nat_le_neq_lt : ∀ x y : nat, x ≤ y → x ≠ y → (x < y)%nat :=
   λ x y Hxy Hnxy,
   match le_lt_eq_dec x y Hxy with
