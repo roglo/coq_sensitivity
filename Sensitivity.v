@@ -3362,41 +3362,18 @@ destruct Hlc as [Hlc| Hlc]. {
     destruct Hc as (la & Hla & Hc).
     subst c.
     destruct itn; [ cbn | easy ].
-...
     apply fold_left_fold_left_max_le_iff in Hitn.
     destruct Hitn as (_, Hitn).
     cbn - [ In list_list_transpose ] in Hitn.
     specialize (Hitn _ (or_introl eq_refl)).
-    cbn in Hitn.
-...
-(*
-    apply Nat.le_0_r in Hitn.
-cbn - [ list_list_transpose ] in Hitn.
-Theorem glop : ∀ lln k,
-  fold_left (λ m ln, fold_left max ln m) lln k = 0
-  → k = 0 ∧ ∀ ln, ln ∈ lln → ∀ n, n ∈ ln → n = 0.
-Admitted.
-specialize (glop _ _ Hitn) as H1.
-destruct H1 as (H1, H2).
-  assert (H : ∀ l, l ∈ mat_list ab → ∀ M, M ∈ l → bmat_depth M ≤ itn). {
-    intros l Hl M HM.
-    apply (Hitn (map (@bmat_depth _) l)); [ now apply in_map | ].
-    now apply in_map.
+    remember (map _ _) as mp eqn:Hmp in Hitn.
+    destruct mp; [ now destruct lb | ].
+    specialize (Hitn _ (or_introl eq_refl)).
+    cbn in Hmp.
+    destruct lb as [| b]; [ easy | ].
+    cbn in Hmp.
+    now injection Hmp; intros; subst n.
   }
-Search (fold_left max).
-*)
-...
-    cbn - [ list_list_transpose ] in Hitn.
-  apply fold_left_fold_left_max_le_iff in Hitn.
-  destruct Hitn as (_, Hitn).
-  assert (H : ∀ l, l ∈ mat_list ab → ∀ M, M ∈ l → bmat_depth M ≤ itn). {
-    intros l Hl M HM.
-    apply (Hitn (map (@bmat_depth _) l)); [ now apply in_map | ].
-    now apply in_map.
-  }
-*)
-...
-  induction la as [| a]; intros; [ easy | ].
   destruct lb as [| b]; [ easy | ].
   move b before a.
   cbn - [ In ] in Hc.
@@ -3413,6 +3390,7 @@ Search (fold_left max).
     specialize (Hita _ (or_introl eq_refl)).
     destruct a as [xa| Ma]. {
       subst c.
+...
       destruct ita; [ easy | now destruct b, itn ].
     }
     destruct b as [xb| Mb]. {
