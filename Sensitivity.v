@@ -3721,8 +3721,6 @@ destruct Hlc as [Hlc| Hlc]. {
         }
         cbn.
         rewrite fold_bmat_def_add.
-Search bmat_depth.
-Search (bmat_depth (bmat_def_add _ _)).
 ...
 
 Theorem bmat_coh_prop_mul : ∀ T {so : semiring_op T} BMA BMB,
