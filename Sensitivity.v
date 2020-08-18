@@ -3678,9 +3678,10 @@ destruct Hlc as [Hlc| Hlc]. {
         revert lb Hlb.
         revert Ma Hita H2a Hcr Hla1.
         induction la1 as [| a1]; intros. {
+          clear - H2a Hla1.
           cbn.
           destruct Ma as (lla1, ra1, ca1).
-          cbn in Hita, Hcr, Hla1, H2a.
+          cbn in (*Hita, Hcr, *)Hla1, H2a.
           specialize (H2a _ (or_introl eq_refl)).
           specialize (H2a _ (or_introl eq_refl)).
           clear - H2a Hla1.
@@ -3721,6 +3722,14 @@ destruct Hlc as [Hlc| Hlc]. {
         }
         cbn.
         rewrite fold_bmat_def_add.
+Theorem glop : ∀ T (so : semiring_op T) MA MB it,
+  bmatrix_coh_prop MA
+  → bmatrix_coh_prop MB
+  → bmat_depth MA ≤ it
+  → bmat_depth MB ≤ it
+  → bmat_depth (bmat_def_add MA MB) ≤ it.
+(* bon mais, admettons, si j'arrive à prouver ça, comment je prouve
+   tout ce qui s'ensuit, moi ? *)
 ...
 
 Theorem bmat_coh_prop_mul : ∀ T {so : semiring_op T} BMA BMB,
