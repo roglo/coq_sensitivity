@@ -3713,6 +3713,8 @@ destruct (Nat.eq_dec (mat_ncols Ma) (mat_nrows Mb)) as [Hcr| Hcr]. {
     cbn in Hita, Hcr, Hla1, H2a.
     specialize (H2a _ (or_introl eq_refl)).
     specialize (H2a _ (or_introl eq_refl)).
+    clear - H2a Hla1.
+    exfalso.
     destruct lla1 as [| la1]; [ easy | ].
     destruct Hla1 as [Hla1| Hla1]. {
       subst la1.
