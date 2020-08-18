@@ -2607,34 +2607,8 @@ apply Nat.succ_le_mono in Hitn.
 rename BMA into BMAD.
 rename BMB into BMBD.
 move BMBD before BMAD.
-(*
-...
-Theorem bmat_coh_prop_add_gen' : ∀ T {so : semiring_op T} ita itn
-    (BMA BMB : bmatrix T),
-  bmat_depth (bmat_def BMA) ≤ ita
-  → bmat_depth (bmat_def_add_loop ita (bmat_def BMA) (bmat_def BMB)) ≤ itn
-  → bmatrix_coh_prop_loop itn
-       (bmat_def_add_loop ita (bmat_def BMA) (bmat_def BMB)).
-Proof.
-intros * Hita Hitn.
-remember (bmat_def_add_loop ita (bmat_def BMA) (bmat_def BMB)) as ab eqn:Hab.
-revert ita itn BMA BMB Hita Hitn Hab.
-induction ab as [| ab IHab] using bmatrix_ind; intros. {
-  now destruct itn.
-}
-cbn in Hitn.
-destruct itn; [ easy | cbn ].
-apply Nat.succ_le_mono in Hitn.
-destruct BMA as (BMAD, BMAP).
-destruct BMB as (BMBD, BMBP).
-move BMBD before BMAD.
-*)
 cbn in Hita.
 cbn - [ bmat_def_add_loop ] in Hab.
-(*
-apply bmatrix_coh_equiv_prop in BMAP.
-apply bmatrix_coh_equiv_prop in BMBP.
-*)
 split. {
   destruct ita. {
     cbn in Hab.
@@ -3738,6 +3712,17 @@ destruct Hlc as [Hlc| Hlc]. {
         }
         destruct lb as [| b]. {
           cbn.
+          destruct Mb as (llb, rb, cb).
+          cbn in Hlb.
+          destruct llb as [| lb]; [ easy | ].
+          cbn - [ In ] in Hlb.
+          apply in_map_iff in Hlb.
+          now destruct Hlb.
+        }
+        cbn.
+        rewrite fold_bmat_def_add.
+Search bmat_depth.
+Search (bmat_depth (bmat_def_add _ _)).
 ...
 
 Theorem bmat_coh_prop_mul : ∀ T {so : semiring_op T} BMA BMB,
