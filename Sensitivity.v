@@ -3731,6 +3731,24 @@ destruct (Nat.eq_dec (mat_ncols Ma) (mat_nrows Mb)) as [Hcr| Hcr]. {
       apply Nat_le_fold_left_fold_left_max.
       now apply Nat_le_fold_left_max.
     }
+    destruct lla1 as [| la2]; [ easy | ].
+    destruct Hla1 as [Hla1| Hla1]. {
+      subst la2.
+      cbn in H2a.
+      rewrite <- bmatrix_coh_prop_loop_enough_iter in H2a. {
+        cbn in H2a.
+        destruct H2a as (H2a, H3a).
+        destruct H2a as (Hra, Hca, Hrca).
+        cbn in Hra, Hca, Hrca.
+        specialize (Hca _ (or_intror (or_introl eq_refl))).
+        subst ca1.
+        now rewrite (proj2 Hrca eq_refl) in Hra.
+      }
+      cbn.
+      remember (fold_left _ _ (fold_left _ _ 0)) as x.
+      apply Nat_le_fold_left_fold_left_max.
+      now apply Nat_le_fold_left_max.
+    }
 ...
 
 Theorem bmat_coh_prop_mul : ∀ T {so : semiring_op T} BMA BMB,
