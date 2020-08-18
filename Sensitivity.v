@@ -3701,7 +3701,9 @@ destruct Hlc as [Hlc| Hlc]. {
         destruct Hn as (lb & Hn & Hlb).
         subst n.
         move lb before la1.
-        induction la1 as [| a1]. {
+        revert lb Hlb.
+        revert Ma Hita H2a Hcr Hla1.
+        induction la1 as [| a1]; intros. {
           cbn.
           destruct Ma as (lla1, ra1, ca1).
           cbn in Hita, Hcr, Hla1, H2a.
@@ -3734,6 +3736,8 @@ destruct Hlc as [Hlc| Hlc]. {
           apply Nat_le_fold_left_fold_left_max.
           now apply Nat_le_fold_left_max.
         }
+        destruct lb as [| b]. {
+          cbn.
 ...
 
 Theorem bmat_coh_prop_mul : ∀ T {so : semiring_op T} BMA BMB,
