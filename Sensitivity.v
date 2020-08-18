@@ -3671,86 +3671,69 @@ destruct Hlc as [Hlc| Hlc]. {
              (seq 1 (@length (list (bmatrix_def T)) llb))))).
     rewrite fold_bmat_def_add in Hc.
     rewrite <- bmat_def_add_loop_enough_iter with (it := ita) in Hc. 2: {
-cbn.
-clear - Hita H2a.
-destruct ita. {
-  apply Nat.le_0_r in Hita.
-  now apply bmat_depth_neq_0 in Hita.
-}
-cbn in Hita |-*.
-apply -> Nat.succ_le_mono.
-apply Nat.succ_le_mono in Hita.
-(*
-revert Ma Mb Hita.
-induction ita; intros. {
-  admit.
-}
-*)
-apply fold_left_fold_left_max_le_iff.
-apply fold_left_fold_left_max_le_iff in Hita.
-split; [ easy | ].
-destruct Hita as (_, Hita).
-intros ln Hln n Hn.
-unfold mat_def_mul in Hln.
-destruct (Nat.eq_dec (mat_ncols Ma) (mat_nrows Mb)) as [Hcr| Hcr]. {
-  cbn in Hln.
-  apply in_map_iff in Hln.
-  destruct Hln as (l & Hln & Hl).
-  subst ln.
-  unfold list_list_mul in Hl.
-  cbn in Hl.
-  apply in_map_iff in Hl.
-  destruct Hl as (la1 & Hl & Hla1).
-  subst l.
-  rewrite map_map in Hn.
-  apply in_map_iff in Hn.
-  destruct Hn as (lb & Hn & Hlb).
-  subst n.
-  move lb before la1.
-  induction la1 as [| a1]. {
-    cbn.
-    destruct Ma as (lla1, ra1, ca1).
-    cbn in Hita, Hcr, Hla1, H2a.
-    specialize (H2a _ (or_introl eq_refl)).
-    specialize (H2a _ (or_introl eq_refl)).
-    clear - H2a Hla1.
-    exfalso.
-    destruct lla1 as [| la1]; [ easy | ].
-    destruct Hla1 as [Hla1| Hla1]. {
-      subst la1.
-      cbn in H2a.
-      rewrite <- bmatrix_coh_prop_loop_enough_iter in H2a. {
-        cbn in H2a.
-        destruct H2a as (H2a, H3a).
-        destruct H2a as (Hra, Hca, Hrca).
-        cbn in Hra, Hca, Hrca.
-        specialize (Hca _ (or_introl eq_refl)).
-        subst ca1.
-        now rewrite (proj2 Hrca eq_refl) in Hra.
-      }
       cbn.
-      remember (fold_left _ _ 0) as x.
-      apply Nat_le_fold_left_fold_left_max.
-      now apply Nat_le_fold_left_max.
-    }
-    destruct lla1 as [| la2]; [ easy | ].
-    destruct Hla1 as [Hla1| Hla1]. {
-      subst la2.
-      cbn in H2a.
-      rewrite <- bmatrix_coh_prop_loop_enough_iter in H2a. {
-        cbn in H2a.
-        destruct H2a as (H2a, H3a).
-        destruct H2a as (Hra, Hca, Hrca).
-        cbn in Hra, Hca, Hrca.
-        specialize (Hca _ (or_intror (or_introl eq_refl))).
-        subst ca1.
-        now rewrite (proj2 Hrca eq_refl) in Hra.
+      clear - Hita H2a.
+      destruct ita. {
+        apply Nat.le_0_r in Hita.
+        now apply bmat_depth_neq_0 in Hita.
       }
-      cbn.
-      remember (fold_left _ _ (fold_left _ _ 0)) as x.
-      apply Nat_le_fold_left_fold_left_max.
-      now apply Nat_le_fold_left_max.
-    }
+      cbn in Hita |-*.
+      apply -> Nat.succ_le_mono.
+      apply Nat.succ_le_mono in Hita.
+      apply fold_left_fold_left_max_le_iff.
+      apply fold_left_fold_left_max_le_iff in Hita.
+      split; [ easy | ].
+      destruct Hita as (_, Hita).
+      intros ln Hln n Hn.
+      unfold mat_def_mul in Hln.
+      destruct (Nat.eq_dec (mat_ncols Ma) (mat_nrows Mb)) as [Hcr| Hcr]. {
+        cbn in Hln.
+        apply in_map_iff in Hln.
+        destruct Hln as (l & Hln & Hl).
+        subst ln.
+        unfold list_list_mul in Hl.
+        cbn in Hl.
+        apply in_map_iff in Hl.
+        destruct Hl as (la1 & Hl & Hla1).
+        subst l.
+        rewrite map_map in Hn.
+        apply in_map_iff in Hn.
+        destruct Hn as (lb & Hn & Hlb).
+        subst n.
+        move lb before la1.
+        induction la1 as [| a1]. {
+          cbn.
+          destruct Ma as (lla1, ra1, ca1).
+          cbn in Hita, Hcr, Hla1, H2a.
+          specialize (H2a _ (or_introl eq_refl)).
+          specialize (H2a _ (or_introl eq_refl)).
+          clear - H2a Hla1.
+          exfalso.
+          rewrite <- bmatrix_coh_prop_loop_enough_iter in H2a. {
+            cbn in H2a.
+            destruct H2a as (H2a, H3a).
+            destruct H2a as (Hra, Hca, Hrca).
+            cbn in Hra, Hca, Hrca.
+            assert (ca1 = 0). {
+              clear - Hca Hla1.
+              induction lla1 as [| la]; [ easy | ].
+              destruct Hla1 as [Hla1| Hla1]. {
+                subst la.
+                now specialize (Hca _ (or_introl eq_refl)).
+              }
+              apply IHlla1; [ | easy ].
+              intros c Hc.
+              now apply Hca; right.
+            }
+            subst ca1.
+            rewrite (proj2 Hrca eq_refl) in Hra.
+            now apply length_zero_iff_nil in Hra; subst lla1.
+          }
+          cbn.
+          remember (fold_left _ _ 0) as x.
+          apply Nat_le_fold_left_fold_left_max.
+          now apply Nat_le_fold_left_max.
+        }
 ...
 
 Theorem bmat_coh_prop_mul : ∀ T {so : semiring_op T} BMA BMB,
