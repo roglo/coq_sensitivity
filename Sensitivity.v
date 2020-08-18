@@ -3672,7 +3672,7 @@ destruct Hlc as [Hlc| Hlc]. {
     rewrite fold_bmat_def_add in Hc.
     rewrite <- bmat_def_add_loop_enough_iter with (it := ita) in Hc. 2: {
 cbn.
-clear - Hita.
+clear - Hita H2a.
 destruct ita. {
   apply Nat.le_0_r in Hita.
   now apply bmat_depth_neq_0 in Hita.
@@ -3700,15 +3700,28 @@ destruct (Nat.eq_dec (mat_ncols Ma) (mat_nrows Mb)) as [Hcr| Hcr]. {
   unfold list_list_mul in Hl.
   cbn in Hl.
   apply in_map_iff in Hl.
-  destruct Hl as (la & Hl & Hla).
+  destruct Hl as (la1 & Hl & Hla1).
   subst l.
   rewrite map_map in Hn.
   apply in_map_iff in Hn.
   destruct Hn as (lb & Hn & Hlb).
   subst n.
-  move lb before la.
-Search (bmat_depth _ = _).
-Print list_mul.
+  move lb before la1.
+  induction la1 as [| a1]. {
+    cbn.
+    destruct Ma as (lla1, ra1, ca1).
+    cbn in Hita, Hcr, Hla1, H2a.
+    specialize (H2a _ (or_introl eq_refl)).
+    specialize (H2a _ (or_introl eq_refl)).
+    destruct lla1 as [| la1]; [ easy | ].
+    destruct Hla1 as [Hla1| Hla1]. {
+      subst la1.
+      cbn in H2a.
+      apply (Hita []).
+2: {
+Print bmatrix_coh_prop_loop.
+rewrite <- bmatrix_coh_prop_loop_enough_iter in H2a.
+cbn in H2a.
 ...
 eapply Hita.
 ...
