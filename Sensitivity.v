@@ -2607,6 +2607,10 @@ move BMBD before BMAD.
 destruct itn; [ easy | cbn ].
 split. {
   clear IHab itn Hitn.
+  symmetry in Hab.
+(* faire un lemme *)
+...
+  symmetry in Hab.
   destruct ita. {
     cbn in Hab.
     now injection Hab; intros; subst ab.
@@ -3416,6 +3420,10 @@ cbn in Hita, Hab.
 apply bmatrix_coh_equiv_prop in BMAP.
 apply bmatrix_coh_equiv_prop in BMBP.
 split. {
+  clear IHab itn Hitn.
+  symmetry in Hab.
+(* faire un lemme *)
+  symmetry in Hab.
   destruct ita. {
     cbn in Hab.
     now injection Hab; intros; subst ab.
@@ -3439,14 +3447,6 @@ split. {
     now apply in_map.
   }
   move H before Hita; clear Hita; rename H into Hita.
-  apply fold_left_fold_left_max_le_iff in Hitn.
-  destruct Hitn as (_, Hitn).
-  assert (H : ∀ l, l ∈ mat_list ab → ∀ M, M ∈ l → bmat_depth M ≤ itn). {
-    intros l Hl M HM.
-    apply (Hitn (map (@bmat_depth _) l)); [ now apply in_map | ].
-    now apply in_map.
-  }
-  move H before Hitn; clear Hitn; rename H into Hitn.
   destruct BMAP as (H1a, H2a).
   destruct BMBP as (H1b, H2b).
   move H1b before H1a.
