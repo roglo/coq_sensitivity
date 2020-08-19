@@ -3322,20 +3322,6 @@ Compute (let _ := nat_semiring_op in mat_ncols (mat_def (mat_mul (mat_of_list [[
 
 (* multiplication of block matrices *)
 
-Print void_bmat_def.
-Print void_mat_def.
-.... (* aie aie aie... faut que ça soit de la taille non pas de MMA, mais
-        du produit MMA*MMB, c'est la merde. Ou alors je me démerde pour
-        faire une multiplication list_list_mul qui n'utilise pas 0 *)
-
-Fixpoint bmat_zero_same_size_as T {so : semiring_op T} BM : bmatrix_def T :=
-  match BM with
-  | BM_1 _ => BM_1 0%Srng
-  | BM_M M =>
-      BM_M (map (λ
-
-  BM_M (mk_mat_def [] 0 0).
-
 Fixpoint bmat_def_mul_loop T {so : semiring_op T} (it : nat)
   (MM1 MM2 : bmatrix_def T) {struct it} : bmatrix_def T :=
   match it with
@@ -3352,7 +3338,7 @@ Fixpoint bmat_def_mul_loop T {so : semiring_op T} (it : nat)
           | BM_1 _ => void_bmat_def
           | BM_M MMB =>
               let bso :=
-                {| srng_zero := bmat_zero_same_size_as///
+                {| srng_zero := void_bmat_def;
                    srng_one := void_bmat_def;
                    srng_add := @bmat_def_add T so;
                    srng_mul := bmat_def_mul_loop it' |}
@@ -3361,8 +3347,6 @@ Fixpoint bmat_def_mul_loop T {so : semiring_op T} (it : nat)
           end
       end
   end.
-
-...
 
 Definition bmat_def_mul T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
   bmat_def_mul_loop (bmat_depth MM1) MM1 MM2.
@@ -3401,7 +3385,8 @@ Definition old_bmat_def_mul T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
   old_bmat_def_mul_loop (bmat_depth MM1) MM1 MM2.
 
 Theorem length_col_list_list_mul :
-  ∀ T {so : semiring_op (bmatrix_def T)} cb (lla llb : list (list (bmatrix_def T))) lc,
+  ∀ T {so : semiring_op (bmatrix_def T)} cb
+     (lla llb : list (list (bmatrix_def T))) lc,
   (∀ c, c ∈ llb → length c = cb)
   → (lla = [] ↔ llb = [])
   → lc ∈ list_list_mul lla llb
