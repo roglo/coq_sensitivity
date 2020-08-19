@@ -2602,13 +2602,11 @@ induction ab as [| ab IHab] using bmatrix_ind; intros. {
   now destruct itn.
 }
 cbn in Hitn.
-destruct itn; [ easy | cbn ].
-apply Nat.succ_le_mono in Hitn.
 rename BMA into BMAD.
 rename BMB into BMBD.
 move BMBD before BMAD.
-cbn in Hita.
-cbn - [ bmat_def_add_loop ] in Hab.
+destruct itn; [ easy | cbn ].
+apply Nat.succ_le_mono in Hitn.
 split. {
   clear IHab.
   destruct ita. {
