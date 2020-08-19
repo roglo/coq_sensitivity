@@ -2606,8 +2606,7 @@ rename BMB into BMBD.
 move BMBD before BMAD.
 destruct itn; [ easy | cbn ].
 split. {
-  clear IHab.
-  clear itn Hitn.
+  clear IHab itn Hitn.
   destruct ita. {
     cbn in Hab.
     now injection Hab; intros; subst ab.
