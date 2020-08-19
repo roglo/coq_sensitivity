@@ -2393,14 +2393,20 @@ Fixpoint list_add T (add : T → T → T) (l1 l2 : list T) :=
   | [] => []
   end.
 
-Fixpoint list_list_add T (add : T → T → T) (ll1 ll2 : list (list T)) :=
+Fixpoint list_list_add_loop T (add : T → T → T) (ll1 ll2 : list (list T)) :=
   match ll1 with
    | l1 :: ll'1 =>
        match ll2 with
-       | l2 :: ll'2 => list_add add l1 l2 :: list_list_add add ll'1 ll'2
+       | l2 :: ll'2 => list_add add l1 l2 :: list_list_add_loop add ll'1 ll'2
        | [] => []
        end
   | [] => []
+  end.
+
+Definition list_list_add T (add : T → T → T) (ll1 ll2 : list (list T)) :=
+  match ll1 with
+  | [] => ll2
+  | _ => list_list_add_loop add ll1 ll2
   end.
 
 Definition mat_def_add T (add : T → T → T) (M1 M2 : matrix_def T) :
@@ -2434,6 +2440,11 @@ destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
 subst rb cb.
 split; cbn; [ | | easy ]. {
   clear - Hra Hrr.
+  unfold list_list_add.
+  destruct lla as [| la1]; [ easy | ].
+  remember (la1 :: lla) as x.
+  clear la1 lla Heqx.
+  rename x into lla.
   revert ra llb Hra Hrr.
   induction lla as [| la]; intros; [ easy | cbn ].
   destruct llb as [| lb]; [ easy | cbn ].
@@ -2447,6 +2458,14 @@ split; cbn; [ | | easy ]. {
   intros c Hc.
   subst ra.
   clear Hrca Hrcb.
+  unfold list_list_add in Hc.
+  destruct lla as [| la]. {
+    cbn in Hrr; symmetry in Hrr.
+    now apply length_zero_iff_nil in Hrr; subst llb.
+  }
+  remember (la :: lla) as x.
+  clear la lla Heqx.
+  rename x into lla.
   revert c ca llb Hca Hcb Hrr Hc.
   induction lla as [| la]; intros; [ easy | ].
   destruct llb as [| lb]; [ easy | ].
@@ -2536,6 +2555,11 @@ Theorem length_list_list_add :
     → length (list_list_add add lla llb) = ra.
 Proof.
 intros * Har Hbr Hac.
+unfold list_list_add.
+destruct lla as [| la]; [ now subst ra | ].
+remember (la :: lla) as x.
+clear la lla Heqx.
+rename x into lla.
 revert ra llb Har Hbr.
 induction lla as [| la2]; intros; [ easy | cbn ].
 destruct llb as [| lb2]; [ easy | cbn ].
@@ -2558,6 +2582,11 @@ Theorem length_col_list_list_add :
   → length lc = ca.
 Proof.
 intros * Hac Hbc Hlc.
+unfold list_list_add in Hlc.
+destruct lla as [| la]; [ now apply Hbc | ].
+remember (la :: lla) as x.
+clear la lla Heqx.
+rename x into lla.
 revert llb lc Hbc Hlc.
 induction lla as [| la1]; intros; [ easy | ].
 destruct llb as [| lb1]; [ easy | ].
@@ -2699,6 +2728,21 @@ destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | now subst ab ].
 subst rb cb.
 subst ab.
 cbn in Hitn, Hlc.
+unfold list_list_add in Hlc.
+destruct lla as [| la]. {
+  destruct BMAP as (H1a, H2a).
+  destruct BMBP as (H1b, H2b).
+  cbn - [ In ] in H2a, H2b.
+  destruct H1a as (Har, Hac, Harc).
+  destruct H1b as (Hbr, Hbc, Hbrc).
+  cbn - [ In ] in Har, Hac, Harc.
+  cbn - [ In ] in Hbr, Hbc, Hbrc.
+  subst ra.
+  now apply length_zero_iff_nil in Hbr; subst llb.
+}
+remember (la :: lla) as x.
+clear la lla Heqx.
+rename x into lla.
 revert ra ca BMAP BMBP.
 revert llb Hitn Hlc.
 induction lla as [| la]; intros; [ easy | ].
@@ -2875,6 +2919,8 @@ apply IHlla with (ra := ra) (ca := ca) (llb := llb). {
   apply fold_left_fold_left_max_le_iff.
   split; [ flia | ].
   intros ln Hln n Hn.
+  unfold list_list_add in Hln.
+  destruct lla as [| la1]; [ easy | ].
   destruct Hitn as (Hitn, Hni).
   now apply (Hni ln).
 } {
@@ -2967,10 +3013,10 @@ intros a' b' Ha' Hb'.
 now apply Hadd; right.
 Qed.
 
-Theorem list_list_add_add_compat : ∀ T (add1 add2 : T → T → T) lla llb,
+Theorem list_list_add_loop_add_compat : ∀ T (add1 add2 : T → T → T) lla llb,
   (∀ la lb, la ∈ lla → lb ∈ llb →
    ∀ a b, a ∈ la → b ∈ lb → add1 a b = add2 a b)
-  → list_list_add add1 lla llb = list_list_add add2 lla llb.
+  → list_list_add_loop add1 lla llb = list_list_add_loop add2 lla llb.
 Proof.
 intros * Hadd.
 revert llb Hadd.
@@ -3010,6 +3056,11 @@ destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
 destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
 subst rb cb.
 f_equal; clear ra ca.
+unfold list_list_add.
+destruct lla as [| la]; [ easy | ].
+remember (la :: lla) as x.
+clear la lla Heqx.
+rename x into lla.
 revert llb it Hd.
 induction lla as [| la]; intros; [ easy | ].
 cbn in Hd |-*.
@@ -3115,7 +3166,7 @@ f_equal. {
   apply Nat.le_0_l.
 }
 rewrite IHlla. {
-  apply list_list_add_add_compat. {
+  apply list_list_add_loop_add_compat. {
     intros la1 lb1 Hla1 Hlb1 a b Ha Hb.
     rewrite (IHMa la1); [ | now right | easy | ]. {
       symmetry.
@@ -3565,8 +3616,10 @@ destruct Hlc as [Hlc| Hlc]. {
   clear Harc Hbrc.
   move Hbr before Har.
   move Hbc before Hac.
-  clear Hac Hbc Har Hbr.
+  clear (*Hac*) Hbc (*Har*) Hbr.
+(*
   clear ra ca.
+*)
   clear IHlla.
   revert lb Hitn Hc H2b.
   induction la as [| a]; intros. {
@@ -3614,7 +3667,11 @@ destruct Hlc as [Hlc| Hlc]. {
       symmetry in Hab.
       destruct ab as [xab| Mab]; [ easy | cbn ].
       unfold mat_def_add.
-      destruct (Nat.eq_dec (mat_nrows _) (mat_nrows _)); [ | easy ].
+      destruct (Nat.eq_dec (mat_nrows _) (mat_nrows _)) as [Hrr| ]; [ | easy ].
+      destruct (Nat.eq_dec (mat_ncols _) (mat_ncols _)) as [Hcc| ]; [ | easy ].
+      unfold list_list_add; cbn.
+Check Harc.
+...
       now destruct (Nat.eq_dec (mat_ncols _) (mat_ncols _)).
     }
     destruct b as [xb| Mb]. {
