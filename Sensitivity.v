@@ -2601,14 +2601,14 @@ revert ita itn BMA BMB BMAP BMBP Hita Hitn Hab.
 induction ab as [| ab IHab] using bmatrix_ind; intros. {
   now destruct itn.
 }
-cbn in Hitn.
 rename BMA into BMAD.
 rename BMB into BMBD.
 move BMBD before BMAD.
 destruct itn; [ easy | cbn ].
-apply Nat.succ_le_mono in Hitn.
 split. {
   clear IHab.
+  cbn in Hitn.
+  apply Nat.succ_le_mono in Hitn.
   destruct ita. {
     cbn in Hab.
     now injection Hab; intros; subst ab.
@@ -2669,6 +2669,8 @@ split. {
   now rewrite Hab.
 }
 intros lc Hlc c Hc.
+cbn in Hitn.
+apply Nat.succ_le_mono in Hitn.
 specialize (IHab lc Hlc c Hc).
 destruct BMAD as [xa| Ma]. {
   destruct BMBD as [xb| Mb]; [ now destruct ita | ].
