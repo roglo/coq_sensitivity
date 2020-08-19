@@ -3624,6 +3624,8 @@ destruct Hlc as [Hlc| Hlc]. {
     specialize (IHab ita itn).
     cbn in Hitn, Hc.
     rewrite <- Hc in Hitn.
+    rewrite fold_bmat_def_add in Hc.
+...
     specialize
       (@bmat_coh_prop_add_gen _ _ ita itn
          (bmat_def_mul_loop ita (BM_M Ma) (BM_M Mb)))
@@ -3643,7 +3645,7 @@ destruct Hlc as [Hlc| Hlc]. {
                   | S m => @nth (list (bmatrix_def T)) m llb []
                   end (@void_bmat_def T))
              (seq 1 (@length (list (bmatrix_def T)) llb))))).
-    rewrite fold_bmat_def_add in Hc.
+...
     rewrite <- bmat_def_add_loop_enough_iter with (it := ita) in Hc. 2: {
       cbn.
       clear - Hita H2a.
