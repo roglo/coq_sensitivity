@@ -3835,6 +3835,45 @@ Fixpoint A_def T {ro : ring_op T} (so := rng_semiring) n : bmatrix_def T :=
              [I_2_pow_def n'; bmat_def_opp (A_def n')]])
   end.
 
+Require Import ZArith.
+Open Scope Z_scope.
+
+About Z_ring_op.
+Compute (let n := 2%nat in let _ := Z_ring_op in let _ := rng_semiring in A_def n).
+
+Fixpoint concat_list_in_list T (ll1 ll2 : list (list T)) :=
+  match ll1 with
+  | [] => ll2
+  | l1 :: ll1' =>
+       match ll2 with
+       | [] => ll1
+       | l2 :: ll2' => app l1 l2 :: concat_list_in_list ll1' ll2'
+       end
+  end.
+
+Definition concat_list_list_list T (lll : list (list (list T))) :=
+  fold_left (@concat_list_in_list T) lll [].
+
+Fixpoint list_list_of_bmat_def T (MM : bmatrix_def T) : list (list T) :=
+  match MM with
+  | BM_1 x => [[x]]
+  | BM_M MMM =>
+      let ll :=
+        map
+          (λ MMl, concat_list_list_list (map (@list_list_of_bmat_def T) MMl))
+          (mat_list MMM)
+      in
+      List.concat ll
+  end.
+
+Compute (let n := 2%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat_def (A_def n)).
+Compute (let n := 2%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat_def (bmat_def_mul (A_def n) (A_def n))).
+Compute (let n := 2%nat in let _ := Z_ring_op in let _ := rng_semiring in (bmat_def_mul (A_def n) (A_def n))).
+Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in (bmat_depth (A_def n))).
+(* hou la la, mais c'est faux, tout ça ! *)
+
+...
+
 Definition rng_mul_nat_l T {so : semiring_op T} n v :=
   match n with
   | 0 => 0%Srng
@@ -3916,6 +3955,12 @@ f_equal. {
         move xi before xa.
         exfalso.
         unfold bmat_def_mul in IHn.
+        cbn in IHn.
+        injection IHn; clear IHn; intros IHn.
+        destruct n; [ | easy ].
+        cbn in Han, Hin.
+        injection Han; clear Han; intros; subst xa.
+        injection Hin; clear Hin; intros; subst xi.
         cbn in IHn.
 ...
 
