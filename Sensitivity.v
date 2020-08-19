@@ -3621,11 +3621,16 @@ destruct Hlc as [Hlc| Hlc]. {
       destruct (Nat.eq_dec (mat_nrows _) (mat_nrows _)); [ | easy ].
       now destruct (Nat.eq_dec (mat_ncols _) (mat_ncols _)).
     }
-    specialize (IHab ita itn).
     cbn in Hitn, Hc.
     rewrite <- Hc in Hitn.
     rewrite fold_bmat_def_add in Hc.
+    (* must find my BMA and BMB... *)
+    assert (
+      ∃ (BMA BMB : bmatrix T),
+      bmat_def_mul_loop ita (bmat_def BMA) (bmat_def BMB) = c). {
+      rewrite Hc.
 ...
+    specialize (IHab ita itn).
     specialize
       (@bmat_coh_prop_add_gen _ _ ita itn
          (bmat_def_mul_loop ita (BM_M Ma) (BM_M Mb)))
