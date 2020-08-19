@@ -187,6 +187,16 @@ let so = nat_semiring_op in list_list_mul so 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8;
 value void_mat : matrix 'a =
   { mat_list = []; mat_nrows = 0; mat_ncols = 0 }.
 
+Definition mat_def_add (add : 'a → 'a → 'a) (vM1 vM2 : matrix 'a) :
+    matrix 'a :=
+  if (mat_nrows vM1) = (mat_nrows vM2) then
+    if (mat_ncols vM1) = (mat_ncols vM2) then
+      {| mat_list := list_list_add' add (mat_list vM1) (mat_list vM2);
+         mat_nrows := mat_nrows vM1;
+         mat_ncols := mat_ncols vM1 |}
+    else void_mat
+  else void_mat.
+
 value mat_add zero add (m1 : matrix 'a) (m2 : matrix 'a) : matrix 'a =
   if mat_nrows m1 = mat_nrows m2 && mat_ncols m1 = mat_ncols m2 then
     { mat_list =
@@ -196,6 +206,16 @@ value mat_add zero add (m1 : matrix 'a) (m2 : matrix 'a) : matrix 'a =
       mat_ncols = mat_ncols m1 }
   else
 let _ = failwith (sprintf "mat_add (%d,%d) (%d,%d)" (mat_nrows m1) (mat_ncols m1) (mat_nrows m2) (mat_ncols m2)) in
+    void_mat.
+
+Definition mat_mul' (so : semiring_op 'a) (m1 m2 : matrix 'a) :
+    matrix 'a :=
+  if (mat_ncols m1) = (mat_nrows m2) then
+    {| mat_list := list_list_mul' so (mat_list m1) (mat_list m2);
+       mat_nrows := mat_nrows m1;
+       mat_ncols := mat_ncols m2 |}
+  else
+let _ = failwith (sprintf "mat_mul' (%d,%d) (%d,%d)" (mat_nrows m1) (mat_ncols m1) (mat_nrows m2) (mat_ncols m2)) in
     void_mat.
 
 value mat_mul (ro : semiring_op 'a) (m1 : matrix 'a) (m2 : matrix 'a) :
@@ -229,11 +249,15 @@ value mat_opp (ro : ring_op 'a) (m : matrix 'a) =
     mat_nrows = mat_nrows m;
     mat_ncols = mat_ncols m }.
 
-(* matrices of matrices *)
+(* block matrices *)
 
-type mmatrix 'a =
-  [ MM_1 of matrix 'a
-  | MM_M of matrix (mmatrix 'a) ].
+type bmatrix_def 'a =
+  [ BMD_1 of 'a
+  | BMD_M of matrix (bmatrix_def 'a) ].
+
+type bmatrix 'a =
+  [ BM_1 of matrix 'a
+  | BM_M of matrix (bmatrix 'a) ].
 
 value rec concat_list_in_list ll1 ll2 =
   match ll1 with
@@ -248,54 +272,57 @@ value rec concat_list_in_list ll1 ll2 =
 value concat_list_list_list lll =
   List.fold_left concat_list_in_list [] lll.
 
-value rec list_list_of_mmat (mm : mmatrix 'a) : list (list 'a) =
+value rec list_list_of_bmat (mm : bmatrix 'a) : list (list 'a) =
   match mm with
-  | MM_1 m → m.mat_list
-  | MM_M mmm →
+  | BM_1 m → m.mat_list
+  | BM_M mmm →
       let ll =
         map
-          (fun mml → concat_list_list_list (map list_list_of_mmat mml))
+          (fun mml → concat_list_list_list (map list_list_of_bmat mml))
           mmm.mat_list
       in
       List.concat ll
   end.
 
-value mat_of_mmat (mm : mmatrix 'a) : matrix 'a =
-  mat_of_list (list_list_of_mmat mm).
+value mat_of_bmat (mm : bmatrix 'a) : matrix 'a =
+  mat_of_list (list_list_of_bmat mm).
 
-value void_mmat : mmatrix 'a =
-  MM_1 void_mat;
+value void_bmat : bmatrix 'a =
+  BM_1 void_mat;
+
+value void_bmat_def : bmatrix_def 'a =
+  BMD_1 void_mat;
 
 Definition zero_list_list zero r c : list (list 'a) :=
   map (λ i, map (λ j, zero) (seq 0 c)) (seq 0 r).
 Definition zero_mat zero r c : matrix 'a :=
   {| mat_list := zero_list_list zero r c;
      mat_nrows := r; mat_ncols := c |}.
-Definition zero_mmat zero r c : mmatrix 'a :=
-  MM_1 (zero_mat zero r c).
+Definition zero_bmat zero r c : bmatrix 'a :=
+  BM_1 (zero_mat zero r c).
 
-value rec mmat_opp (ro : ring_op 'a) mm : mmatrix 'a =
+value rec bmat_opp (ro : ring_op 'a) mm : bmatrix 'a =
   match mm with
-  | MM_1 m → MM_1 (mat_opp ro m)
-  | MM_M mmm →
-      MM_M
-        { mat_list = map (map (mmat_opp ro)) (mat_list mmm);
+  | BM_1 m → BM_1 (mat_opp ro m)
+  | BM_M mmm →
+      BM_M
+        { mat_list = map (map (bmat_opp ro)) (mat_list mmm);
           mat_nrows = mat_nrows mmm;
           mat_ncols = mat_ncols mmm }
   end.
 
-value mmat_of_list (ll : list (list (mmatrix 'a))) :
-    matrix (mmatrix 'a) =
+value bmat_of_list (ll : list (list (bmatrix 'a))) :
+    matrix (bmatrix 'a) =
   { mat_list = ll;
     mat_nrows = list_list_nrows ll;
     mat_ncols = list_list_ncols ll }.
 
 value rec mIZ_2_pow (ro : ring_op 'a) u n =
   match n with
-  | 0 → MM_1 {mat_list = [[u]]; mat_nrows = 1; mat_ncols = 1}
+  | 0 → BM_1 {mat_list = [[u]]; mat_nrows = 1; mat_ncols = 1}
   | _ →
       let n' = n - 1 in
-      MM_M
+      BM_M
         {mat_list =
 	   [[mIZ_2_pow ro u n'; mIZ_2_pow ro 0 n'];
 	    [mIZ_2_pow ro 0 n'; mIZ_2_pow ro u n']];
@@ -304,194 +331,256 @@ value rec mIZ_2_pow (ro : ring_op 'a) u n =
 
 value rec mA (ro : ring_op 'a) n =
   match n with
-  | 0 → MM_1 (mat_of_list [[srng_zero (rng_semiring ro)]])
+  | 0 → BM_1 (mat_of_list [[srng_zero (rng_semiring ro)]])
   | _ →
        let n' = n - 1 in
-       MM_M
-         (mmat_of_list
+       BM_M
+         (bmat_of_list
             [[mA ro n'; mIZ_2_pow ro 1 n'];
-             [mIZ_2_pow ro 1 n'; mmat_opp ro (mA ro n')]])
+             [mIZ_2_pow ro 1 n'; bmat_opp ro (mA ro n')]])
   end.
 
-list_list_of_mmat (mA int_ring_op 2);
-mat_of_mmat (mA int_ring_op 2);
+list_list_of_bmat (mA int_ring_op 2);
+mat_of_bmat (mA int_ring_op 2);
 
-value rec mmat_depth (mm : mmatrix 'a) =
+Fixpoint bmat_depth' (vBM : bmatrix_def 'a) :=
+  match vBM with
+  | BMD_1 _ => 1
+  | BMD_M vBMM =>
+      1 +
+      List.fold_left (λ m la, List.fold_left max m la)
+        0 (List.map (List.map (bmat_depth')) (mat_list vBMM))
+  end.
+
+value rec bmat_depth (mm : bmatrix 'a) =
   match mm with
-  | MM_1 _ → 1
-  | MM_M mmm →
+  | BM_1 _ → 1
+  | BM_M mmm →
       match mmm with
       | {mat_list = []} → 0
       | {mat_list = [mml :: _]} →
           match mml with
           | [] → 0
-          | [mm' :: _] → 1 + mmat_depth mm'
+          | [mm' :: _] → 1 + bmat_depth mm'
           end
       end
   end.
 
-mmat_depth (mA int_ring_op 0).
-mmat_depth (mA int_ring_op 1).
-mmat_depth (mA int_ring_op 2).
-mmat_depth (mA int_ring_op 3).
-mmat_depth (mA int_ring_op 4).
+bmat_depth (mA int_ring_op 0).
+bmat_depth (mA int_ring_op 1).
+bmat_depth (mA int_ring_op 2).
+bmat_depth (mA int_ring_op 3).
+bmat_depth (mA int_ring_op 4).
 
-value mmmat_depth (mmm : matrix (mmatrix 'a)) =
-  mmat_depth (mat_el void_mmat mmm 0 0).
+value mbmat_depth (mmm : matrix (bmatrix 'a)) =
+  bmat_depth (mat_el void_bmat mmm 0 0).
 
-value rec mmat_add_loop it zero add (mm1 : mmatrix 'a) (mm2 : mmatrix 'a) =
+Fixpoint bmat_def_add_loop (so : semiring_op 'a) it
+    (vMM1 vMM2 : bmatrix_def 'a) :=
+  match it with
+  | 0 => void_bmat_def
+  | S it' =>
+      match vMM1 with
+      | BMD_1 xa =>
+          match vMM2 with
+          | BMD_1 xb => BMD_1 (so.srng_add xa xb)
+          | BMD_M vMMB => void_bmat_def
+          end
+      | BMD_M vMMA =>
+          match vMM2 with
+          | BMD_1 vMB => void_bmat_def
+          | BMD_M vMMB =>
+              BMD_M (mat_def_add (bmat_def_add_loop so it') vMMA vMMB)
+          end
+      end
+  end.
+
+Definition bmat_def_add (so : semiring_op 'a) (vMM1 vMM2 : bmatrix_def 'a) :=
+  bmat_def_add_loop so (bmat_depth' vMM1) vMM1 vMM2.
+
+value rec bmat_add_loop it zero add (mm1 : bmatrix 'a) (mm2 : bmatrix 'a) =
   match it with
   | 0 →
 let _ = failwith (sprintf "mat_add_loop it=0") in
-      void_mmat
+      void_bmat
   | _ →
       let it' = it - 1 in
       match mm1 with
-      | MM_1 ma →
+      | BM_1 ma →
           match mm2 with
-          | MM_1 mb → MM_1 (mat_add zero add ma mb)
-          | MM_M mmb →
-let _ = failwith (sprintf "mat_add_loop MM_1(%d,%d)+MM_M(%d,%d)" (mat_nrows ma) (mat_ncols ma) (mat_nrows mmb) (mat_ncols mmb)) in
-              void_mmat
+          | BM_1 mb → BM_1 (mat_add zero add ma mb)
+          | BM_M mmb →
+let _ = failwith (sprintf "mat_add_loop BM_1(%d,%d)+BM_M(%d,%d)" (mat_nrows ma) (mat_ncols ma) (mat_nrows mmb) (mat_ncols mmb)) in
+              void_bmat
           end
-      | MM_M mma →
+      | BM_M mma →
           match mm2 with
-          | MM_1 mb →
-let _ = failwith (sprintf "mat_add_loop MM_M(%d,%d)+MM_1(%d,%d)" (mat_nrows mma) (mat_ncols mma) (mat_nrows mb) (mat_ncols mb)) in
-              void_mmat
-          | MM_M mmb →
-              MM_M (mat_add void_mmat (mmat_add_loop it' zero add) mma mmb)
+          | BM_1 mb →
+let _ = failwith (sprintf "mat_add_loop BM_M(%d,%d)+BM_1(%d,%d)" (mat_nrows mma) (mat_ncols mma) (mat_nrows mb) (mat_ncols mb)) in
+              void_bmat
+          | BM_M mmb →
+              BM_M (mat_add void_bmat (bmat_add_loop it' zero add) mma mmb)
           end
       end
   end.
 
-value mmat_add (so : semiring_op 'a) (mm1 : mmatrix 'a) (mm2 : mmatrix 'a) =
-  mmat_add_loop (mmat_depth mm1) (srng_zero so) (srng_add so) mm1 mm2.
+value bmat_add (so : semiring_op 'a) (mm1 : bmatrix 'a) (mm2 : bmatrix 'a) =
+  bmat_add_loop (bmat_depth mm1) (srng_zero so) (srng_add so) mm1 mm2.
 
-Definition mmat_nrows mm :=
+Definition bmat_nrows mm :=
   match mm with
-  | MM_1 m => mat_nrows m
-  | MM_M mmm => mat_nrows mmm
+  | BM_1 m => mat_nrows m
+  | BM_M mmm => mat_nrows mmm
   end.
 
-Definition mmat_ncols mm :=
+Definition bmat_ncols mm :=
   match mm with
-  | MM_1 m => mat_ncols m
-  | MM_M mmm => mat_ncols mmm
+  | BM_1 m => mat_ncols m
+  | BM_M mmm => mat_ncols mmm
   end.
 
-Fixpoint mmat_mul_loop it (so : semiring_op 'a) (mm1 : mmatrix 'a)
-    (mm2 : mmatrix 'a) :=
+Fixpoint bmat_mul_loop' (so : semiring_op 'a) (it : nat)
+  (vMM1 vMM2 : bmatrix_def 'a) : bmatrix_def 'a :=
   match it with
-  | 0 => void_mmat
+  | 0 => void_bmat_def
+  | S it' =>
+      match vMM1 with
+      | BMD_1 xa =>
+          match vMM2 with
+          | BMD_1 xb => BMD_1 (so.srng_mul xa xb)
+          | BMD_M _ => void_bmat_def
+          end
+      | BMD_M vMMA =>
+          match vMM2 with
+          | BMD_1 _ => void_bmat_def
+          | BMD_M vMMB =>
+              let bso :=
+                {| srng_zero := void_bmat_def;
+                   srng_one := void_bmat_def;
+                   srng_add := bmat_def_add so;
+                   srng_mul := bmat_mul_loop' so it';
+		   srng_to_string _ := failwith "srng_to_string bmat_mul" |}
+              in
+              BMD_M (mat_mul' bso vMMA vMMB)
+          end
+      end
+  end.
+
+Definition bmat_def_mul' (so : semiring_op 'a) (vMM1 vMM2 : bmatrix_def 'a) :=
+  bmat_mul_loop' so (bmat_depth' vMM1) vMM1 vMM2.
+
+Fixpoint bmat_mul_loop it (so : semiring_op 'a) (mm1 : bmatrix 'a)
+    (mm2 : bmatrix 'a) :=
+  match it with
+  | 0 => void_bmat
   | _ =>
       let it' := it - 1 in
       match mm1 with
-      | MM_1 ma =>
+      | BM_1 ma =>
           match mm2 with
-          | MM_1 mb => MM_1 (mat_mul so ma mb)
-          | MM_M mmb => void_mmat
+          | BM_1 mb => BM_1 (mat_mul so ma mb)
+          | BM_M mmb => void_bmat
           end
-      | MM_M mmma =>
+      | BM_M mmma =>
           match mm2 with
-          | MM_1 mb => void_mmat
-          | MM_M mmmb =>
+          | BM_1 mb => void_bmat
+          | BM_M mmmb =>
               let mso :=
-               {| srng_zero := void_mmat;
-                   srng_one := void_mmat;
-                   srng_add := mmat_add so;
-                   srng_mul := mmat_mul_loop it' so;
+               {| srng_zero := void_bmat;
+                   srng_one := void_bmat;
+                   srng_add := bmat_add so;
+                   srng_mul := bmat_mul_loop it' so;
 	           srng_to_string mm :=
 		     match mm with
-                     | MM_1 m =>
-                          sprintf "MM_1(%d,%d)" m.mat_nrows m.mat_ncols
-		     | MM_M mmm =>
-                          sprintf "MM_M(%d,%d)" mmm.mat_nrows mmm.mat_ncols
+                     | BM_1 m =>
+                          sprintf "BM_1(%d,%d)" m.mat_nrows m.mat_ncols
+		     | BM_M mmm =>
+                          sprintf "BM_M(%d,%d)" mmm.mat_nrows mmm.mat_ncols
                      end |}
               in
-              MM_M (mat_mul mso mmma mmmb)
+              BM_M (mat_mul mso mmma mmmb)
           end
       end
   end.
 
-Definition mmat_mul (so : semiring_op 'a) mm1 mm2 :=
-  mmat_mul_loop (mmat_depth mm1) so mm1 mm2.
+Definition bmat_mul (so : semiring_op 'a) mm1 mm2 :=
+  bmat_mul_loop (bmat_depth mm1) so mm1 mm2.
 
-let ro = int_ring_op in let so = nat_semiring_op in mat_of_mmat (mmat_mul so (mA ro 0) (mA ro 0)).
+let ro = int_ring_op in let so = nat_semiring_op in mat_of_bmat (bmat_mul so (mA ro 0) (mA ro 0)).
 
-let ro = int_ring_op in let so = nat_semiring_op in mat_of_mmat (mmat_mul so (mA ro 1) (mA ro 1)).
+let ro = int_ring_op in let so = nat_semiring_op in mat_of_bmat (bmat_mul so (mA ro 1) (mA ro 1)).
 
-let ro = int_ring_op in let so = nat_semiring_op in mat_of_mmat (mmat_mul so (mA ro 2) (mA ro 2)).
+let ro = int_ring_op in let so = nat_semiring_op in mat_of_bmat (bmat_mul so (mA ro 2) (mA ro 2)).
 
-let ro = int_ring_op in let so = nat_semiring_op in mat_of_mmat (mmat_mul so (mA ro 3) (mA ro 3)).
+let ro = int_ring_op in let so = nat_semiring_op in mat_of_bmat (bmat_mul so (mA ro 3) (mA ro 3)).
 
-let ro = int_ring_op in let so = nat_semiring_op in mat_of_mmat (mmat_mul so (mA ro 4) (mA ro 4)).
+let ro = int_ring_op in let so = nat_semiring_op in mat_of_bmat (bmat_mul so (mA ro 4) (mA ro 4)).
 
 (*
 value mso so sz =
-  { srng_zero = zero_mmat (srng_zero so) sz sz;
-    srng_one = one_mmat (srng_zero so) (srng_one so) sz sz;
-    srng_add = mmat_add so;
-    srng_mul = mmat_mul so }
+  { srng_zero = zero_bmat (srng_zero so) sz sz;
+    srng_one = one_bmat (srng_zero so) (srng_one so) sz sz;
+    srng_add = bmat_add so;
+    srng_mul = bmat_mul so }
 ;
 
 (* *)
 
 value m =
-  MM_M
+  BM_M
     {mat_list=
-      [[MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
-        MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}];
-       [MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
-        MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]];
+      [[BM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
+        BM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}];
+       [BM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
+        BM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]];
      mat_nrows=2; mat_ncols=2};
 
 45;
 
 let so = nat_semiring_op in
-mmat_mul_loop 2 so m m;
+bmat_mul_loop 2 so m m;
 
 46;
 
 value mso1 =
   let so = nat_semiring_op in
-  { srng_zero = zero_mmat (srng_zero so) 2 2;
-    srng_one = one_mmat (srng_zero so) (srng_one so) 2 2;
-    srng_add = mmat_add so;
-    srng_mul = mmat_mul_loop 42 so }
+  { srng_zero = zero_bmat (srng_zero so) 2 2;
+    srng_one = one_bmat (srng_zero so) (srng_one so) 2 2;
+    srng_add = bmat_add so;
+    srng_mul = bmat_mul_loop 42 so }
 ;
 mat_mul mso1
   {mat_list =
-     [[MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
-       MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}];
-      [MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
-       MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]];
+     [[BM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
+       BM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}];
+      [BM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
+       BM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]];
    mat_nrows = 2; mat_ncols = 2}
   {mat_list =
-     [[MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
-       MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}];
-      [MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
-       MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]];
+     [[BM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
+       BM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}];
+      [BM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
+       BM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]];
    mat_nrows = 2; mat_ncols = 2};
 
 42;
 
 list_list_mul (mso nat_semiring_op 2) 2 2 2
-  [[MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
-    MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}];
-   [MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
-    MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]]
-  [[MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
-    MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}];
-   [MM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
-    MM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]];
+  [[BM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
+    BM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}];
+   [BM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
+    BM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]]
+  [[BM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1};
+    BM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1}];
+   [BM_1 {mat_list=[[1]]; mat_nrows=1; mat_ncols=1};
+    BM_1 {mat_list=[[0]]; mat_nrows=1; mat_ncols=1}]];
 
-let n = 1 in mmat_mul nat_semiring_op (mA int_ring_op n) (mA int_ring_op n);
+let n = 1 in bmat_mul nat_semiring_op (mA int_ring_op n) (mA int_ring_op n);
 let n = 2 in mA int_ring_op n;
-let n = 2 in mmat_mul nat_semiring_op (mA int_ring_op n) (mA int_ring_op n);
+let n = 2 in bmat_mul nat_semiring_op (mA int_ring_op n) (mA int_ring_op n);
 42;
 let n = 3 in mA int_ring_op n;
 43;
-let n = 3 in mmat_mul nat_semiring_op (mA int_ring_op n) (mA int_ring_op n);
+let n = 3 in bmat_mul nat_semiring_op (mA int_ring_op n) (mA int_ring_op n);
 44;
 *)

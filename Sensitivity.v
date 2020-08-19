@@ -3868,6 +3868,7 @@ Fixpoint list_list_of_bmat_def T (MM : bmatrix_def T) : list (list T) :=
 
 Compute (let n := 2%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat_def (A_def n)).
 Compute (let n := 2%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat_def (bmat_def_mul (A_def n) (A_def n))).
+...
 Compute (let n := 2%nat in let _ := Z_ring_op in let _ := rng_semiring in (bmat_def_mul (A_def n) (A_def n))).
 Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in (bmat_depth (A_def n))).
 (* hou la la, mais c'est faux, tout ça ! *)
