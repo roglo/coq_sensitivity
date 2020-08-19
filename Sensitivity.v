@@ -2610,6 +2610,7 @@ move BMBD before BMAD.
 cbn in Hita.
 cbn - [ bmat_def_add_loop ] in Hab.
 split. {
+  clear IHab.
   destruct ita. {
     cbn in Hab.
     now injection Hab; intros; subst ab.
