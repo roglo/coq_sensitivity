@@ -103,6 +103,26 @@ value mat_transpose (d : 'a) (m : matrix 'a) : matrix 'a =
 
 mat_transpose 0 (mat_of_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]).
 
+Fixpoint list_add (add : 'a → 'a → 'a) (l1 l2 : list 'a) :=
+  match l1 with
+  | [e1 :: l'1] =>
+      match l2 with
+      | [e2 :: l'2] => [add e1 e2 :: list_add add l'1 l'2]
+      | [] => []
+      end
+  | [] => []
+  end.
+
+Fixpoint list_list_add' (add : 'a → 'a → 'a) (ll1 ll2 : list (list 'a)) :=
+  match ll1 with
+   | [l1 :: ll'1] =>
+       match ll2 with
+       | [l2 :: ll'2] => [list_add add l1 l2 :: list_list_add' add ll'1 ll'2]
+       | [] => []
+       end
+  | [] => []
+  end.
+
 value list_list_add zero (add : 'a → 'a → 'a) r c
     (ll1 : list (list 'a)) (ll2 : list (list 'a)) =
   map
@@ -111,6 +131,30 @@ value list_list_add zero (add : 'a → 'a → 'a) r c
 	(fun j → add (list_list_el zero ll1 i j) (list_list_el zero ll2 i j))
        (seq 0 c))
     (seq 0 r).
+
+value nat_semiring_op : semiring_op nat =
+  { srng_zero = 0;
+    srng_one = 1;
+    srng_add = \+;
+    srng_mul = \*;
+    srng_to_string x = string_of_int x }.
+
+let so = nat_semiring_op in list_list_add' so.srng_add [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] [[1; 2]; [3; 4]; [5; 6]; [0; 0]].
+let so = nat_semiring_op in list_list_add so.srng_zero so.srng_add 3 2 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] [[1; 2]; [3; 4]; [5; 6]; [0; 0]].
+
+Fixpoint list_mul (so : semiring_op 'a) (l1 l2 : list 'a) : 'a :=
+  match l1 with
+  | [e1 :: l'1] =>
+      match l2 with
+      | [e2 :: l'2] => so.srng_add (so.srng_mul e1 e2) (list_mul so l'1 l'2)
+      | [] => so.srng_zero
+      end
+  | [] => so.srng_zero
+  end.
+
+Definition list_list_mul' (so : semiring_op 'a) (ll1 ll2 : list (list 'a)) :=
+  map (λ l1, map (list_mul so l1) (list_list_transpose so.srng_zero ll2))
+    ll1.
 
 Definition list_list_mul (ro : semiring_op 'a) r cr c
     (ll1 : list (list 'a)) (ll2 : list (list 'a)) :=
@@ -131,13 +175,6 @@ Definition list_list_mul (ro : semiring_op 'a) r cr c
         end)
        (seq 0 c))
     (seq 0 r).
-
-value nat_semiring_op : semiring_op nat =
-  { srng_zero = 0;
-    srng_one = 1;
-    srng_add = \+;
-    srng_mul = \*;
-    srng_to_string x = string_of_int x }.
 
 value int_ring_op : ring_op int =
   { rng_semiring = nat_semiring_op;
