@@ -3629,6 +3629,7 @@ destruct Hlc as [Hlc| Hlc]. {
       ∃ (BMA BMB : bmatrix T),
       bmat_def_mul_loop ita (bmat_def BMA) (bmat_def BMB) = c). {
       rewrite Hc.
+      destruct ita; [ easy | cbn ].
 ...
     specialize (IHab ita itn).
     specialize
