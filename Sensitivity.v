@@ -3432,6 +3432,9 @@ apply bmatrix_coh_equiv_prop in BMBP.
 split. {
   clear IHab itn Hitn.
   symmetry in Hab.
+...
+  now apply (bmat_mul_loop_matrix_coh_prop BMAD BMBD BMAP BMBP Hita Hab).
+...
 (* faire un lemme *)
   symmetry in Hab.
   destruct ita. {
