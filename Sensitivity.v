@@ -3351,6 +3351,10 @@ Fixpoint bmat_def_mul_loop T {so : semiring_op T} (it : nat)
 Definition bmat_def_mul T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
   bmat_def_mul_loop (bmat_depth MM1) MM1 MM2.
 
+Theorem fold_bmat_def_mul : ∀ T {so : semiring_op T} (MA MB : bmatrix_def T),
+  bmat_def_mul_loop (bmat_depth MA) MA MB = bmat_def_mul MA MB.
+Proof. easy. Qed.
+
 Fixpoint old_bmat_def_mul_loop T {so : semiring_op T} it
      (MM1 MM2 : bmatrix_def T) :=
   match it with
@@ -3641,6 +3645,12 @@ destruct Hlc as [Hlc| Hlc]. {
       bmat_def_mul_loop ita (bmat_def BMA) (bmat_def BMB) = c). {
       rewrite Hc.
       destruct ita; [ easy | cbn ].
+Abort.
+(* à reprendre plus tard *)
+(* pour l'instant, je suppose que le lemme de la suite des matrices A
+   n'a besoin que de bmatrix_def et pas de bmatrix ; mais faut voir si
+   c'est vrai *)
+(*
 ...
     specialize (IHab ita itn).
     specialize
@@ -3763,8 +3773,7 @@ Qed.
 Definition bmat_mul T zero (add mul : T → T → T) (BMA BMB : bmatrix T) :=
   {| bmat_def := bmat_def_mul zero add mul (bmat_def BMA) (bmat_def BMB);
      bmat_coh_prop := bmat_coh_prop_mul zero add mul BMA BMB |}.
-
-...
+*)
 
 (* opposite *)
 
@@ -3777,6 +3786,22 @@ Fixpoint bmat_def_opp T {ro : ring_op T} BM : bmatrix_def T :=
            mat_nrows := mat_nrows MMM;
            mat_ncols := mat_ncols MMM |}
   end.
+
+Theorem bmat_depth_opp : ∀ T {ro : ring_op T} BM,
+  bmat_depth (bmat_def_opp BM) = bmat_depth BM.
+Proof.
+intros.
+induction BM as [x| M IHBM] using bmatrix_ind; [ easy | ].
+destruct M as (ll, r, c); cbn.
+f_equal; f_equal.
+rewrite map_map.
+apply map_ext_in.
+intros la Hla.
+rewrite map_map.
+apply map_ext_in.
+intros a Ha.
+apply IHBM with (la := la); [ apply Hla | apply Ha ].
+Qed.
 
 (* sequence "An" *)
 
@@ -3810,6 +3835,90 @@ Fixpoint A_def T {ro : ring_op T} (so := rng_semiring) n : bmatrix_def T :=
              [I_2_pow_def n'; bmat_def_opp (A_def n')]])
   end.
 
+Definition rng_mul_nat_l T {so : semiring_op T} n v :=
+  match n with
+  | 0 => 0%Srng
+  | S n' => (Σ (_ = 0, n'), v)%Srng
+  end.
+
+Fixpoint bmat_nat_mul_l_loop T it {so : semiring_op T} n BM :=
+  match it with
+  | 0 => void_bmat_def
+  | S it' =>
+      match BM with
+      | BM_1 x => BM_1 (rng_mul_nat_l n x)
+      | BM_M M =>
+          BM_M
+            {| mat_list := map (map (bmat_nat_mul_l_loop it' n)) (mat_list M);
+               mat_nrows := mat_nrows M;
+               mat_ncols := mat_ncols M |}
+      end
+  end.
+
+Definition bmat_nat_mul_l T {so : semiring_op T} n BM :=
+  bmat_nat_mul_l_loop (bmat_depth BM) n BM.
+
+Theorem bmat_depth_IZ_2_pow : ∀ T {ro : ring_op T} (so := rng_semiring) u n,
+  bmat_depth (IZ_2_pow_def u n) = S n.
+Proof.
+intros.
+revert u.
+induction n; intros; [ easy | cbn ].
+do 2 rewrite IHn.
+now do 3 rewrite Nat.max_id.
+Qed.
+
+Theorem bmat_depth_I_2_pow : ∀ T {ro : ring_op T} (so := rng_semiring) n,
+  bmat_depth (I_2_pow_def n) = S n.
+Proof.
+intros.
+apply bmat_depth_IZ_2_pow.
+Qed.
+
+Theorem bmat_depth_A T {ro : ring_op T} : ∀ n,
+  bmat_depth (A_def n) = S n.
+Proof.
+intros.
+induction n; [ easy | cbn ].
+rewrite bmat_depth_opp.
+rewrite IHn.
+rewrite bmat_depth_I_2_pow.
+now do 3 rewrite Nat.max_id.
+Qed.
+
+(* "We prove by induction that A_n^2 = nI" *)
+(* trying if it is true with A_def instead of A *)
+
+Theorem lemma_2_A_n_2_eq_n_I :
+    ∀ T {ro : ring_op T} (so := rng_semiring) {rp : semiring_prop T} n,
+  bmat_def_mul (A_def n) (A_def n) = bmat_nat_mul_l n (I_2_pow_def n).
+Proof.
+intros.
+induction n; [ now cbn; rewrite srng_mul_0_l | ].
+cbn; f_equal; f_equal.
+f_equal. {
+  f_equal. {
+    unfold so.
+    do 2 rewrite fold_bmat_def_add.
+    rewrite bmat_depth_I_2_pow.
+    rewrite bmat_depth_IZ_2_pow.
+    rewrite bmat_depth_opp.
+    rewrite bmat_depth_A.
+    do 3 rewrite Nat.max_id.
+    cbn.
+    remember (A_def n) as an eqn:Han.
+    symmetry in Han.
+    destruct an as [xa| Ma]. {
+      cbn.
+      remember (I_2_pow_def n) as i2n eqn:Hin.
+      symmetry in Hin.
+      destruct i2n as [xi| Mi]. {
+        move xi before xa.
+        exfalso.
+        unfold bmat_def_mul in IHn.
+        cbn in IHn.
+...
+
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
@@ -3820,8 +3929,8 @@ unfold mmat_mul, mmat_nat_mul_l.
 rewrite mmat_depth_A.
 unfold I_2_pow at 1.
 rewrite mmat_depth_IZ_2_pow.
-
 ...
+
 Theorem IZ_2_pow_coh_prop : ∀ T {ro : ring_op T} u n,
   bmatrix_coh (IZ_2_pow_def u n) = true.
 Proof.
@@ -3940,22 +4049,6 @@ Proof. easy. Qed.
 Definition void_bmat T : bmatrix T :=
   {| bmat_def := void_bmat_def;
      bmat_coh_prop := void_bmat_coh_prop T |}.
-
-Theorem bmat_depth_opp : ∀ T {ro : ring_op T} BM,
-  bmat_depth (bmat_def_opp BM) = bmat_depth BM.
-Proof.
-intros.
-induction BM as [x| M IHBM] using bmatrix_ind; [ easy | ].
-destruct M as (ll, r, c); cbn.
-f_equal; f_equal.
-rewrite map_map.
-apply map_ext_in.
-intros la Hla.
-rewrite map_map.
-apply map_ext_in.
-intros a Ha.
-apply IHBM with (la := la); [ apply Hla | apply Ha ].
-Qed.
 
 Theorem fold_left_and_true : ∀ A (f : A → _) li,
   fold_left (λ bi i, bi && f i) li true = true
@@ -4098,28 +4191,6 @@ Definition bmat_of_list_bmat T (ll : list (list (bmatrix T)))
     matrix (bmatrix T) :=
   {| mat_def := bmat_def_of_list_bmat ll;
      mat_coh_prop := bmat_coh_prop_of_list_bmat ll Hsl Hzt|}.
-
-Theorem bmat_depth_IZ_2_pow T {ro : ring_op T} : ∀ u n,
-  bmat_depth (IZ_2_pow_def u n) = S n.
-Proof.
-intros.
-revert u.
-induction n; intros; [ easy | cbn ].
-do 2 rewrite IHn.
-now do 3 rewrite Nat.max_id.
-Qed.
-
-Theorem bmat_depth_A T {ro : ring_op T} : ∀ n,
-  bmat_depth (A_def n) = S n.
-Proof.
-intros.
-induction n; [ easy | cbn ].
-rewrite bmat_depth_opp.
-rewrite IHn.
-unfold I_2_pow_def.
-rewrite bmat_depth_IZ_2_pow.
-now do 3 rewrite Nat.max_id.
-Qed.
 
 Theorem bmatrix_is_norm_loop_IZ_2_pow : ∀ T {ro : ring_op T} len u n,
   S n ≤ len → bmatrix_coh_loop len (IZ_2_pow_def u n) = true.
