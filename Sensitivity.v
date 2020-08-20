@@ -3963,7 +3963,19 @@ f_equal. {
     f_equal.
     cbn in IHn.
     injection IHn; clear IHn; intros IHn.
-Set Printing Implicit.
+remember (@fold_left nat (list nat)
+                           (λ (m : nat) (la : list nat),
+                              @fold_left nat nat max la m)
+                           (@map (list (bmatrix_def T))
+                              (list nat)
+                              (@map (bmatrix_def T) nat (@bmat_depth T))
+                              (@mat_list (bmatrix_def T) Ma)) 0)
+as m.
+(* perhaps I can prove that m or n are enough iter? *)
+...
+cbn.
+...
+Check bmat_def_mul_loop_enough_iter.
     rewrite IHn.
 ...
   IHn : @mat_def_mul (bmatrix_def T)
