@@ -3963,15 +3963,13 @@ f_equal. {
     f_equal.
     cbn in IHn.
     injection IHn; clear IHn; intros IHn.
-remember (@fold_left nat (list nat)
-                           (λ (m : nat) (la : list nat),
-                              @fold_left nat nat max la m)
-                           (@map (list (bmatrix_def T))
-                              (list nat)
-                              (@map (bmatrix_def T) nat (@bmat_depth T))
-                              (@mat_list (bmatrix_def T) Ma)) 0)
-as m.
-(* perhaps I can prove that m or n are enough iter? *)
+    remember
+      (fold_left (λ m la, fold_left max la m)
+         (map (map (bmat_depth (T:=T))) (mat_list Ma)) 0)
+    as m eqn:Hm.
+Set Printing Implicit.
+Print bmat_def_mul_loop.
+...
 enough (m = n).
 subst n.
 unfold so in IHn.
