@@ -3967,19 +3967,20 @@ f_equal. {
       (fold_left (λ m la, fold_left max la m)
          (map (map (bmat_depth (T:=T))) (mat_list Ma)) 0)
     as m eqn:Hm.
-Set Printing Implicit.
-Print bmat_def_mul_loop.
-...
-enough (m = n).
-subst n.
-unfold so in IHn.
+Theorem glop : ∀ T {ro : ring_op T} (so := rng_semiring) bso1 bso2 MA MB it,
+  @srng_mul _ bso1 = bmat_def_mul_loop it
+  → @srng_mul _ bso2 = bmat_def_mul_loop (bmat_depth (BM_M MA))
+  → bmat_depth (BM_M MA) ≤ it
+  → @mat_def_mul _ bso1 MA MB = @mat_def_mul _ bso2 MA MB.
+Proof.
+Admitted.
+erewrite glop with (it := m) in IHn; cycle 1. {
+  easy.
+} {
+  cbn.
+  Set Printing Implicit.
+erewrite glop with (it := n).
 rewrite IHn.
-cbn.
-...
-cbn.
-...
-Check bmat_def_mul_loop_enough_iter.
-    rewrite IHn.
 ...
   IHn : @mat_def_mul (bmatrix_def T)
           {|
