@@ -3927,6 +3927,17 @@ rewrite bmat_depth_I_2_pow.
 now do 3 rewrite Nat.max_id.
 Qed.
 
+Theorem bmat_def_mul_loop_enough_iter : ∀ T {ro : ring_op T},
+  ∀ (so := rng_semiring) it1 it2 bso1 bso2 MA MB,
+  @srng_mul _ bso1 = bmat_def_mul_loop it1
+  → @srng_mul _ bso2 = bmat_def_mul_loop it2
+  → bmat_depth (BM_M MA) ≤ S it1
+  → bmat_depth (BM_M MA) ≤ S it2
+  → @mat_def_mul _ bso1 MA MB = @mat_def_mul _ bso2 MA MB.
+Proof.
+intros * Hit1 Hit2 Hd1 Hd2.
+...
+
 (* "We prove by induction that A_n^2 = nI" *)
 (* trying if it is true with A_def instead of A *)
 
@@ -3967,41 +3978,17 @@ f_equal. {
       (fold_left (λ m la, fold_left max la m)
          (map (map (bmat_depth (T:=T))) (mat_list Ma)) 0)
     as m eqn:Hm.
-Theorem glop : ∀ T {ro : ring_op T} (so := rng_semiring) bso1 bso2 MA MB it,
-  @srng_mul _ bso1 = bmat_def_mul_loop it
-  → @srng_mul _ bso2 = bmat_def_mul_loop (bmat_depth (BM_M MA))
-  → bmat_depth (BM_M MA) ≤ it
-  → @mat_def_mul _ bso1 MA MB = @mat_def_mul _ bso2 MA MB.
-Proof.
-Admitted.
-erewrite glop with (it := m) in IHn; cycle 1. {
-  easy.
-} {
-  cbn.
-  Set Printing Implicit.
-erewrite glop with (it := n).
-rewrite IHn.
-...
-  IHn : @mat_def_mul (bmatrix_def T)
-          {|
-          srng_zero := @void_bmat_def T;
+    set (rec_sring n :=
+       {| srng_zero := @void_bmat_def T;
           srng_one := @void_bmat_def T;
           srng_add := @bmat_def_add T (@rng_semiring T ro);
-          srng_mul := @bmat_def_mul_loop T (@rng_semiring T ro)
-                        (@fold_left nat (list nat)
-                           (λ (m : nat) (la : list nat),
-                              @fold_left nat nat max la m)
-                           (@map (list (bmatrix_def T)) 
-                              (list nat)
-                              (@map (bmatrix_def T) nat (@bmat_depth T))
-                              (@mat_list (bmatrix_def T) Ma)) 0) |} Ma Ma =
+          srng_mul := @bmat_def_mul_loop T (@rng_semiring T ro) n |}).
+    rewrite (@bmat_def_mul_enough_iter _ ro m n _ (rec_sring n)) in IHn;
+      [ | easy | easy | now rewrite Hm | ]. 2: {
+      replace (S n) with (bmat_depth (A_def n)) by apply bmat_depth_A.
+      now rewrite Han.
+    }
 ...
-    (@mat_def_mul (bmatrix_def T)
-       {|
-       srng_zero := @void_bmat_def T;
-       srng_one := @void_bmat_def T;
-       srng_add := @bmat_def_add T (@rng_semiring T ro);
-       srng_mul := @bmat_def_mul_loop T (@rng_semiring T ro) n |} Ma Ma)
 
 (* "We prove by induction that A_n^2 = nI" *)
 
