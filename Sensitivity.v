@@ -3972,6 +3972,11 @@ remember (@fold_left nat (list nat)
                               (@mat_list (bmatrix_def T) Ma)) 0)
 as m.
 (* perhaps I can prove that m or n are enough iter? *)
+enough (m = n).
+subst n.
+unfold so in IHn.
+rewrite IHn.
+cbn.
 ...
 cbn.
 ...
