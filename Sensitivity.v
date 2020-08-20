@@ -3929,14 +3929,35 @@ Qed.
 
 Theorem bmat_def_mul_loop_enough_iter : ∀ T {ro : ring_op T},
   ∀ (so := rng_semiring) it1 it2 bso1 bso2 MA MB,
-  @srng_mul _ bso1 = bmat_def_mul_loop it1
+  @srng_zero _ bso1 = @srng_zero _ bso2
+  → @srng_mul _ bso1 = bmat_def_mul_loop it1
   → @srng_mul _ bso2 = bmat_def_mul_loop it2
   → bmat_depth (BM_M MA) ≤ S it1
   → bmat_depth (BM_M MA) ≤ S it2
   → @mat_def_mul _ bso1 MA MB = @mat_def_mul _ bso2 MA MB.
 Proof.
-intros * Hit1 Hit2 Hd1 Hd2.
+intros * Hzz Hit1 Hit2 Hd1 Hd2.
+cbn in Hd1, Hd2.
+apply Nat.succ_le_mono in Hd1.
+apply Nat.succ_le_mono in Hd2.
+destruct MA as (lla, ra, ca).
+destruct MB as (llb, rb, cb).
+unfold mat_def_mul.
+cbn in Hd1, Hd2.
+cbn - [ Nat.eq_dec ].
+destruct (Nat.eq_dec ca rb) as [Hcr| Hcr]; [ | easy ].
+clear rb Hcr.
+f_equal.
+apply map_ext_in_iff.
+intros la Hla.
+destruct llb as [| lb]; [ easy | cbn ].
+do 2 rewrite map_map.
+apply map_ext_in_iff.
+intros i Hi; cbn.
+destruct la as [| a]; [ easy | ].
+Set Printing All.
 ...
+Unset Printing Implicit.
 
 (* "We prove by induction that A_n^2 = nI" *)
 (* trying if it is true with A_def instead of A *)
@@ -3983,8 +4004,8 @@ f_equal. {
           srng_one := @void_bmat_def T;
           srng_add := @bmat_def_add T (@rng_semiring T ro);
           srng_mul := @bmat_def_mul_loop T (@rng_semiring T ro) n |}).
-    rewrite (@bmat_def_mul_enough_iter _ ro m n _ (rec_sring n)) in IHn;
-      [ | easy | easy | now rewrite Hm | ]. 2: {
+    rewrite (@bmat_def_mul_loop_enough_iter _ ro m n _ (rec_sring n)) in IHn;
+      [ | easy | easy | easy | now rewrite Hm | ]. 2: {
       replace (S n) with (bmat_depth (A_def n)) by apply bmat_depth_A.
       now rewrite Han.
     }
