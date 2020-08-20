@@ -2393,20 +2393,14 @@ Fixpoint list_add T (add : T → T → T) (l1 l2 : list T) :=
   | [] => []
   end.
 
-Fixpoint list_list_add_loop T (add : T → T → T) (ll1 ll2 : list (list T)) :=
+Fixpoint list_list_add T (add : T → T → T) (ll1 ll2 : list (list T)) :=
   match ll1 with
    | l1 :: ll'1 =>
        match ll2 with
-       | l2 :: ll'2 => list_add add l1 l2 :: list_list_add_loop add ll'1 ll'2
+       | l2 :: ll'2 => list_add add l1 l2 :: list_list_add add ll'1 ll'2
        | [] => []
        end
   | [] => []
-  end.
-
-Definition list_list_add T (add : T → T → T) (ll1 ll2 : list (list T)) :=
-  match ll1 with
-  | [] => ll2
-  | _ => list_list_add_loop add ll1 ll2
   end.
 
 Definition mat_def_add T (add : T → T → T) (M1 M2 : matrix_def T) :
@@ -2440,11 +2434,6 @@ destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
 subst rb cb.
 split; cbn; [ | | easy ]. {
   clear - Hra Hrr.
-  unfold list_list_add.
-  destruct lla as [| la1]; [ easy | ].
-  remember (la1 :: lla) as x.
-  clear la1 lla Heqx.
-  rename x into lla.
   revert ra llb Hra Hrr.
   induction lla as [| la]; intros; [ easy | cbn ].
   destruct llb as [| lb]; [ easy | cbn ].
@@ -2458,14 +2447,6 @@ split; cbn; [ | | easy ]. {
   intros c Hc.
   subst ra.
   clear Hrca Hrcb.
-  unfold list_list_add in Hc.
-  destruct lla as [| la]. {
-    cbn in Hrr; symmetry in Hrr.
-    now apply length_zero_iff_nil in Hrr; subst llb.
-  }
-  remember (la :: lla) as x.
-  clear la lla Heqx.
-  rename x into lla.
   revert c ca llb Hca Hcb Hrr Hc.
   induction lla as [| la]; intros; [ easy | ].
   destruct llb as [| lb]; [ easy | ].
@@ -2555,11 +2536,6 @@ Theorem length_list_list_add :
     → length (list_list_add add lla llb) = ra.
 Proof.
 intros * Har Hbr Hac.
-unfold list_list_add.
-destruct lla as [| la]; [ now subst ra | ].
-remember (la :: lla) as x.
-clear la lla Heqx.
-rename x into lla.
 revert ra llb Har Hbr.
 induction lla as [| la2]; intros; [ easy | cbn ].
 destruct llb as [| lb2]; [ easy | cbn ].
@@ -2582,11 +2558,6 @@ Theorem length_col_list_list_add :
   → length lc = ca.
 Proof.
 intros * Hac Hbc Hlc.
-unfold list_list_add in Hlc.
-destruct lla as [| la]; [ now apply Hbc | ].
-remember (la :: lla) as x.
-clear la lla Heqx.
-rename x into lla.
 revert llb lc Hbc Hlc.
 induction lla as [| la1]; intros; [ easy | ].
 destruct llb as [| lb1]; [ easy | ].
@@ -2728,21 +2699,6 @@ destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | now subst ab ].
 subst rb cb.
 subst ab.
 cbn in Hitn, Hlc.
-unfold list_list_add in Hlc.
-destruct lla as [| la]. {
-  destruct BMAP as (H1a, H2a).
-  destruct BMBP as (H1b, H2b).
-  cbn - [ In ] in H2a, H2b.
-  destruct H1a as (Har, Hac, Harc).
-  destruct H1b as (Hbr, Hbc, Hbrc).
-  cbn - [ In ] in Har, Hac, Harc.
-  cbn - [ In ] in Hbr, Hbc, Hbrc.
-  subst ra.
-  now apply length_zero_iff_nil in Hbr; subst llb.
-}
-remember (la :: lla) as x.
-clear la lla Heqx.
-rename x into lla.
 revert ra ca BMAP BMBP.
 revert llb Hitn Hlc.
 induction lla as [| la]; intros; [ easy | ].
@@ -2919,8 +2875,6 @@ apply IHlla with (ra := ra) (ca := ca) (llb := llb). {
   apply fold_left_fold_left_max_le_iff.
   split; [ flia | ].
   intros ln Hln n Hn.
-  unfold list_list_add in Hln.
-  destruct lla as [| la1]; [ easy | ].
   destruct Hitn as (Hitn, Hni).
   now apply (Hni ln).
 } {
@@ -3013,10 +2967,10 @@ intros a' b' Ha' Hb'.
 now apply Hadd; right.
 Qed.
 
-Theorem list_list_add_loop_add_compat : ∀ T (add1 add2 : T → T → T) lla llb,
+Theorem list_list_add_add_compat : ∀ T (add1 add2 : T → T → T) lla llb,
   (∀ la lb, la ∈ lla → lb ∈ llb →
    ∀ a b, a ∈ la → b ∈ lb → add1 a b = add2 a b)
-  → list_list_add_loop add1 lla llb = list_list_add_loop add2 lla llb.
+  → list_list_add add1 lla llb = list_list_add add2 lla llb.
 Proof.
 intros * Hadd.
 revert llb Hadd.
@@ -3056,11 +3010,6 @@ destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]; [ | easy ].
 destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]; [ | easy ].
 subst rb cb.
 f_equal; clear ra ca.
-unfold list_list_add.
-destruct lla as [| la]; [ easy | ].
-remember (la :: lla) as x.
-clear la lla Heqx.
-rename x into lla.
 revert llb it Hd.
 induction lla as [| la]; intros; [ easy | ].
 cbn in Hd |-*.
@@ -3166,7 +3115,7 @@ f_equal. {
   apply Nat.le_0_l.
 }
 rewrite IHlla. {
-  apply list_list_add_loop_add_compat. {
+  apply list_list_add_add_compat. {
     intros la1 lb1 Hla1 Hlb1 a b Ha Hb.
     rewrite (IHMa la1); [ | now right | easy | ]. {
       symmetry.
@@ -3186,14 +3135,18 @@ Qed.
 
 (* multiplication *)
 
-Fixpoint list_mul T {so : semiring_op T} (l1 l2 : list T) :=
-  match l1 with
-  | e1 :: l'1 =>
-      match l2 with
-      | e2 :: l'2 => (e1 * e2 + list_mul l'1 l'2)%Srng
-      | [] => 0%Srng
-      end
-  | [] => 0%Srng
+Fixpoint list_mul_loop T (add mul : T → T → T) a (l1 l2 : list T) :=
+  match (l1, l2) with
+  | (e1 :: l'1, e2 :: l'2) => list_mul_loop add mul (add a (mul e1 e2)) l'1 l'2
+  | _ => a
+  end.
+
+Definition list_mul T {so : semiring_op T} (l1 l2 : list T) :=
+  match (l1, l2) with
+  | (e1 :: l'1, e2 :: l'2) =>
+      list_mul_loop srng_add srng_mul (e1 * e2)%Srng l'1 l'2
+  | _ =>
+      0%Srng
   end.
 
 Definition list_list_mul T {so : semiring_op T} (ll1 ll2 : list (list T)) :=
@@ -3616,10 +3569,8 @@ destruct Hlc as [Hlc| Hlc]. {
   clear Harc Hbrc.
   move Hbr before Har.
   move Hbc before Hac.
-  clear (*Hac*) Hbc (*Har*) Hbr.
-(*
+  clear Hac Hbc Har Hbr.
   clear ra ca.
-*)
   clear IHlla.
   revert lb Hitn Hc H2b.
   induction la as [| a]; intros. {
@@ -3662,16 +3613,18 @@ destruct Hlc as [Hlc| Hlc]. {
         now apply bmat_depth_neq_0 in Hitn.
       }
       cbn.
+Abort.
+(* à reprendre plus tard *)
+(* pour l'instant, je suppose que le lemme de la suite des matrices A
+   n'a besoin que de bmatrix_def et pas de bmatrix ; mais faut voir si
+   c'est vrai *)
+(*
       destruct b; [ now destruct (list_mul la _) | ].
       remember (list_mul la _) as ab eqn:Hab.
       symmetry in Hab.
       destruct ab as [xab| Mab]; [ easy | cbn ].
       unfold mat_def_add.
-      destruct (Nat.eq_dec (mat_nrows _) (mat_nrows _)) as [Hrr| ]; [ | easy ].
-      destruct (Nat.eq_dec (mat_ncols _) (mat_ncols _)) as [Hcc| ]; [ | easy ].
-      unfold list_list_add; cbn.
-Check Harc.
-...
+      destruct (Nat.eq_dec (mat_nrows _) (mat_nrows _)); [ | easy ].
       now destruct (Nat.eq_dec (mat_ncols _) (mat_ncols _)).
     }
     destruct b as [xb| Mb]. {
@@ -3703,12 +3656,6 @@ Check Harc.
       bmat_def_mul_loop ita (bmat_def BMA) (bmat_def BMB) = c). {
       rewrite Hc.
       destruct ita; [ easy | cbn ].
-Abort.
-(* à reprendre plus tard *)
-(* pour l'instant, je suppose que le lemme de la suite des matrices A
-   n'a besoin que de bmatrix_def et pas de bmatrix ; mais faut voir si
-   c'est vrai *)
-(*
 ...
     specialize (IHab ita itn).
     specialize
@@ -3894,7 +3841,9 @@ Fixpoint A_def T {ro : ring_op T} (so := rng_semiring) n : bmatrix_def T :=
   end.
 
 Require Import ZArith.
+(*
 Open Scope Z_scope.
+*)
 
 About Z_ring_op.
 Compute (let n := 2%nat in let _ := Z_ring_op in let _ := rng_semiring in A_def n).
@@ -3924,13 +3873,8 @@ Fixpoint list_list_of_bmat_def T (MM : bmatrix_def T) : list (list T) :=
       List.concat ll
   end.
 
-Compute (let n := 2%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat_def (A_def n)).
-Compute (let n := 2%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat_def (bmat_def_mul (A_def n) (A_def n))).
-Compute (let n := 2%nat in let _ := Z_ring_op in let _ := rng_semiring in (bmat_def_mul (A_def n) (A_def n))).
-Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in (bmat_depth (A_def n))).
-(* hou la la, mais c'est faux, tout ça ! *)
-
-...
+Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat_def (A_def n)).
+Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat_def (bmat_def_mul (A_def n) (A_def n))).
 
 Definition rng_mul_nat_l T {so : semiring_op T} n v :=
   match n with
@@ -3996,7 +3940,7 @@ cbn; f_equal; f_equal.
 f_equal. {
   f_equal. {
     unfold so.
-    do 2 rewrite fold_bmat_def_add.
+    rewrite fold_bmat_def_add.
     rewrite bmat_depth_I_2_pow.
     rewrite bmat_depth_IZ_2_pow.
     rewrite bmat_depth_opp.
@@ -4004,23 +3948,44 @@ f_equal. {
     do 3 rewrite Nat.max_id.
     cbn.
     remember (A_def n) as an eqn:Han.
-    symmetry in Han.
+    remember (I_2_pow_def n) as i2n eqn:Hin.
+    symmetry in Han, Hin.
     destruct an as [xa| Ma]. {
-      cbn.
-      remember (I_2_pow_def n) as i2n eqn:Hin.
-      symmetry in Hin.
-      destruct i2n as [xi| Mi]. {
-        move xi before xa.
-        exfalso.
-        unfold bmat_def_mul in IHn.
-        cbn in IHn.
-        injection IHn; clear IHn; intros IHn.
-        destruct n; [ | easy ].
-        cbn in Han, Hin.
-        injection Han; clear Han; intros; subst xa.
-        injection Hin; clear Hin; intros; subst xi.
-        cbn in IHn.
+      destruct i2n as [xi| Mi]; [ | easy ].
+      move xi before xa.
+      destruct n; [ | easy ].
+      injection Han; clear Han; intros; subst xa; cbn.
+      injection Hin; clear Hin; intros; subst xi; cbn.
+      now rewrite srng_mul_0_l, srng_mul_1_l.
+    }
+    destruct i2n as [xi| Mi]; [ easy | ].
+    move Mi before Ma; cbn.
+    f_equal.
+    cbn in IHn.
+    injection IHn; clear IHn; intros IHn.
+Set Printing Implicit.
+    rewrite IHn.
 ...
+  IHn : @mat_def_mul (bmatrix_def T)
+          {|
+          srng_zero := @void_bmat_def T;
+          srng_one := @void_bmat_def T;
+          srng_add := @bmat_def_add T (@rng_semiring T ro);
+          srng_mul := @bmat_def_mul_loop T (@rng_semiring T ro)
+                        (@fold_left nat (list nat)
+                           (λ (m : nat) (la : list nat),
+                              @fold_left nat nat max la m)
+                           (@map (list (bmatrix_def T)) 
+                              (list nat)
+                              (@map (bmatrix_def T) nat (@bmat_depth T))
+                              (@mat_list (bmatrix_def T) Ma)) 0) |} Ma Ma =
+...
+    (@mat_def_mul (bmatrix_def T)
+       {|
+       srng_zero := @void_bmat_def T;
+       srng_one := @void_bmat_def T;
+       srng_add := @bmat_def_add T (@rng_semiring T ro);
+       srng_mul := @bmat_def_mul_loop T (@rng_semiring T ro) n |} Ma Ma)
 
 (* "We prove by induction that A_n^2 = nI" *)
 
