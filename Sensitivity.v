@@ -4068,6 +4068,7 @@ f_equal. {
           srng_one := @void_bmat_def T;
           srng_add := @bmat_def_add T (@rng_semiring T ro);
           srng_mul := @bmat_def_mul_loop T (@rng_semiring T ro) n |}).
+    fold (rec_sring n).
 ...
     rewrite (@bmat_def_mul_loop_enough_iter _ ro m n _ (rec_sring n)) in IHn;
       [ | easy | easy | easy | easy | now rewrite Hm | ]. 2: {
