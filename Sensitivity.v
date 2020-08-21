@@ -4004,6 +4004,20 @@ induction la as [| a1]. {
   rewrite Hit1, Hit2.
   destruct b as [xb| Mb]; [ easy | cbn ].
   f_equal.
+  unfold mat_def_mul.
+  destruct (Nat.eq_dec (mat_ncols Ma) (mat_nrows Mb)) as [Hcr| Hcr];
+    [ | easy ].
+  f_equal.
+  unfold list_list_mul.
+  apply map_ext_in_iff.
+  intros la Hla.
+  apply map_ext_in_iff.
+  intros lb1 Hlb1.
+  move lb1 before la.
+  unfold list_mul.
+  destruct la as [| a]; [ easy | ].
+  destruct lb1 as [| b]; [ easy | ].
+  cbn.
 ...
 Unset Printing Implicit.
 *)
