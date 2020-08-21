@@ -4023,6 +4023,14 @@ Abort. (*
 Unset Printing Implicit.
 *)
 
+Theorem bmat_def_sqr_loop_I_2_pow_def :
+    ∀ T {so : semiring_op T } {sp : semiring_prop T} n,
+  @bmat_def_mul_loop T so (S n) (@I_2_pow_def T so n) (@I_2_pow_def T so n) =
+  @I_2_pow_def T so n.
+Proof.
+intros.
+...
+
 (* "We prove by induction that A_n^2 = nI" *)
 (* trying if it is true with A_def instead of A *)
 
@@ -4041,12 +4049,25 @@ rewrite bmat_depth_IZ_2_pow.
 rewrite bmat_depth_opp.
 rewrite bmat_depth_A.
 do 3 rewrite Nat.max_id.
+...
+rewrite bmat_def_sqr_loop_I_2_pow_def; [ | easy ].
+...
 replace
-  (@bmat_def_mul_loop T (@rng_semiring T ro) (S n) (@I_2_pow_def T (@rng_semiring T ro) n)
+  (@bmat_def_mul_loop T (@rng_semiring T ro) (S n)
+     (@I_2_pow_def T (@rng_semiring T ro) n)
      (@I_2_pow_def T (@rng_semiring T ro) n))
 with
   (@I_2_pow_def T (@rng_semiring T ro) n). 2: {
   clear - rp.
+
+
+  T : Type
+  n : nat
+  ro : ring_op T
+  rp : semiring_prop T
+  ============================
+  I_2_pow_def n = bmat_def_mul_loop (S n) (I_2_pow_def n) (I_2_pow_def n)
+
   induction n; [ now cbn; rewrite srng_mul_1_l | ].
   remember (S n) as sn; cbn; subst sn.
   remember (I_2_pow_def (S n)) as isn eqn:Hisn.
