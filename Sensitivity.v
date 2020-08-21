@@ -4074,16 +4074,34 @@ f_equal. {
     progress fold so in Hin.
 Search mat_def_mul.
 assert (@mat_def_mul (bmatrix_def T) (rec_sring n) Mi Mi = Mi). {
-  destruct Mi as (lli, ri, ci).
-  cbn in IHn.
-  unfold mat_def_mul; cbn - [ Nat.eq_dec ].
-  destruct n; [ easy | ].
+  clear - Hin rp.
+  subst rec_sring.
+  revert Mi Hin.
+  induction n; intros; [ easy | ].
   cbn in Hin.
-  injection Hin; clear Hin; intros; subst lli ri ci.
-  cbn.
+  injection Hin; clear Hin; intros; subst Mi.
+...
+  destruct Mi as (lli, ri, ci).
+  unfold mat_def_mul; cbn.
   f_equal; f_equal. {
     f_equal. {
-...
+      remember (I_2_pow_def n) as M eqn:HM.
+      symmetry in HM.
+      destruct M as [xm| mm]. {
+        cbn.
+        destruct n; [ | easy ].
+        injection HM; clear HM; intros; subst xm.
+        cbn.
+        rewrite srng_mul_1_l, srng_mul_0_l.
+        now rewrite srng_add_0_r.
+      }
+      destruct n; [ easy | ].
+      cbn in HM.
+      injection HM; clear HM; intros; subst mm.
+      cbn.
+      f_equal; f_equal; f_equal. {
+        f_equal.
+....
 
 enough (m = n).
 subst n.
