@@ -3943,12 +3943,47 @@ apply Nat.succ_le_mono in Hd1.
 apply Nat.succ_le_mono in Hd2.
 destruct MA as (lla, ra, ca).
 destruct MB as (llb, rb, cb).
+move llb before lla.
 unfold mat_def_mul.
 cbn in Hd1, Hd2.
 cbn - [ Nat.eq_dec ].
 destruct (Nat.eq_dec ca rb) as [Hcr| Hcr]; [ | easy ].
 clear rb Hcr.
 f_equal.
+apply fold_left_fold_left_max_le_iff in Hd1.
+apply fold_left_fold_left_max_le_iff in Hd2.
+destruct Hd1 as (_, Hd1).
+destruct Hd2 as (_, Hd2).
+induction lla as [| la]; intros; [ easy | cbn ].
+rewrite IHlla; cycle 1. {
+  intros ln Hln n Hn.
+  apply (Hd1 ln); [ | easy ].
+  cbn - [ In ].
+  now right.
+} {
+  intros ln Hln n Hn.
+  apply (Hd2 ln); [ | easy ].
+  cbn - [ In ].
+  now right.
+}
+f_equal.
+rewrite Hzz.
+apply map_ext_in_iff.
+intros lb Hlb.
+move lb before la.
+unfold list_mul.
+destruct la as [| a]; [ easy | ].
+destruct lb as [| b]; [ easy | ].
+move b before a.
+rewrite Haa.
+induction la as [| a1]. {
+  cbn.
+  rewrite Hit1, Hit2.
+  induction a as [xa| Ma IHa] using bmatrix_ind. {
+    cbn.
+    destruct b as [xb| Mb]. {
+      cbn in Hd1, Hd2.
+...
 apply map_ext_in_iff.
 intros la Hla.
 destruct llb as [| lb]; [ easy | cbn ].
@@ -3960,6 +3995,7 @@ apply in_seq in Hi.
 destruct Hi as (_, Hi); cbn in Hi.
 rewrite Hit1, Hit2.
 rewrite Haa, Hzz.
+
 Set Printing Implicit.
 ...
 rename bso1 into bbbbbbbbbbbbbbbbso1.
