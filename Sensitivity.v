@@ -4018,6 +4018,7 @@ induction la as [| a1]. {
   destruct la as [| a]; [ easy | ].
   destruct lb1 as [| b]; [ easy | ].
   cbn.
+Abort. (*
 ...
 Unset Printing Implicit.
 *)
@@ -4067,6 +4068,7 @@ f_equal. {
           srng_one := @void_bmat_def T;
           srng_add := @bmat_def_add T (@rng_semiring T ro);
           srng_mul := @bmat_def_mul_loop T (@rng_semiring T ro) n |}).
+...
     rewrite (@bmat_def_mul_loop_enough_iter _ ro m n _ (rec_sring n)) in IHn;
       [ | easy | easy | easy | easy | now rewrite Hm | ]. 2: {
       replace (S n) with (bmat_depth (A_def n)) by apply bmat_depth_A.
