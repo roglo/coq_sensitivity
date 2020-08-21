@@ -3955,7 +3955,15 @@ do 2 rewrite map_map.
 apply map_ext_in_iff.
 intros i Hi; cbn.
 destruct la as [| a]; [ easy | ].
-Set Printing All.
+apply in_seq in Hi.
+destruct Hi as (_, Hi); cbn in Hi.
+rewrite Hit1, Hit2.
+Set Printing Implicit.
+rename bso1 into bbbbbbbbbbbbbbbbso1.
+rename bso2 into bbbbbbbbbbbbbbbbso2.
+(* le add, c'est censé être le même, ou pas ? *)
+...
+apply nth_In with (d := void_bmat_def) in Hi.
 ...
 Unset Printing Implicit.
 
