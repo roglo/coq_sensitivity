@@ -4031,8 +4031,60 @@ Theorem lemma_2_A_n_2_eq_n_I :
   bmat_def_mul (A_def n) (A_def n) = bmat_nat_mul_l n (I_2_pow_def n).
 Proof.
 intros.
-induction n; [ now cbn; rewrite srng_mul_0_l | ].
+subst so.
+revert ro rp.
+induction n; intros; [ now cbn; rewrite srng_mul_0_l | ].
 cbn; f_equal; f_equal.
+do 4 rewrite fold_bmat_def_add.
+rewrite bmat_depth_I_2_pow.
+rewrite bmat_depth_IZ_2_pow.
+rewrite bmat_depth_opp.
+rewrite bmat_depth_A.
+do 3 rewrite Nat.max_id.
+replace
+  (@bmat_def_mul_loop T (@rng_semiring T ro) (S n) (@I_2_pow_def T (@rng_semiring T ro) n)
+     (@I_2_pow_def T (@rng_semiring T ro) n))
+with
+  (@I_2_pow_def T (@rng_semiring T ro) n). 2: {
+  clear - rp.
+  induction n; [ now cbn; rewrite srng_mul_1_l | ].
+  remember (S n) as sn; cbn; subst sn.
+  remember (I_2_pow_def (S n)) as isn eqn:Hisn.
+  symmetry in Hisn.
+  destruct isn as [xi| Mi]; [ easy | ].
+  cbn in Hisn.
+  injection Hisn; clear Hisn; intros; subst Mi.
+  f_equal.
+  unfold mat_def_mul.
+  cbn - [ list_list_mul ].
+  f_equal; f_equal; f_equal.
+  rewrite IHn.
+...
+Search (I_2_pow_def).
+Set Printing Implicit.
+...
+f_equal. {
+  f_equal. {
+...
+    cbn.
+    remember (A_def n) as an eqn:Han.
+    remember (I_2_pow_def n) as i2n eqn:Hin.
+    symmetry in Han, Hin.
+    destruct an as [xa| Ma]. {
+      destruct i2n as [xi| Mi]; [ | easy ].
+      move xi before xa.
+      destruct n; [ | easy ].
+      injection Han; clear Han; intros; subst xa; cbn.
+      injection Hin; clear Hin; intros; subst xi; cbn.
+      now rewrite srng_mul_0_l, srng_mul_1_l.
+    }
+    destruct i2n as [xi| Mi]; [ easy | ].
+    move Mi before Ma; cbn.
+    f_equal.
+    cbn in IHn.
+    injection IHn; clear IHn; intros IHn.
+...
+
 f_equal. {
   f_equal. {
     unfold so.
