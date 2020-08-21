@@ -3930,13 +3930,14 @@ Qed.
 Theorem bmat_def_mul_loop_enough_iter : ∀ T {ro : ring_op T},
   ∀ (so := rng_semiring) it1 it2 bso1 bso2 MA MB,
   @srng_zero _ bso1 = @srng_zero _ bso2
+  → @srng_add _ bso1 = @srng_add _ bso2
   → @srng_mul _ bso1 = bmat_def_mul_loop it1
   → @srng_mul _ bso2 = bmat_def_mul_loop it2
   → bmat_depth (BM_M MA) ≤ S it1
   → bmat_depth (BM_M MA) ≤ S it2
   → @mat_def_mul _ bso1 MA MB = @mat_def_mul _ bso2 MA MB.
 Proof.
-intros * Hzz Hit1 Hit2 Hd1 Hd2.
+intros * Hzz Haa Hit1 Hit2 Hd1 Hd2.
 cbn in Hd1, Hd2.
 apply Nat.succ_le_mono in Hd1.
 apply Nat.succ_le_mono in Hd2.
@@ -3958,14 +3959,14 @@ destruct la as [| a]; [ easy | ].
 apply in_seq in Hi.
 destruct Hi as (_, Hi); cbn in Hi.
 rewrite Hit1, Hit2.
+rewrite Haa, Hzz.
 Set Printing Implicit.
+...
 rename bso1 into bbbbbbbbbbbbbbbbso1.
 rename bso2 into bbbbbbbbbbbbbbbbso2.
-(* le add, c'est censé être le même, ou pas ? *)
-...
-apply nth_In with (d := void_bmat_def) in Hi.
 ...
 Unset Printing Implicit.
+*)
 
 (* "We prove by induction that A_n^2 = nI" *)
 (* trying if it is true with A_def instead of A *)
@@ -4013,7 +4014,7 @@ f_equal. {
           srng_add := @bmat_def_add T (@rng_semiring T ro);
           srng_mul := @bmat_def_mul_loop T (@rng_semiring T ro) n |}).
     rewrite (@bmat_def_mul_loop_enough_iter _ ro m n _ (rec_sring n)) in IHn;
-      [ | easy | easy | easy | now rewrite Hm | ]. 2: {
+      [ | easy | easy | easy | easy | now rewrite Hm | ]. 2: {
       replace (S n) with (bmat_depth (A_def n)) by apply bmat_depth_A.
       now rewrite Han.
     }
