@@ -3978,28 +3978,32 @@ move b before a.
 rewrite Haa.
 induction la as [| a1]. {
   cbn.
-  rewrite Hit1, Hit2.
-  induction a as [xa| Ma IHa] using bmatrix_ind. {
+  clear IHlla.
+  revert it1 it2 Hit1 Hit2 Hd1 Hd2.
+  induction a as [xa| Ma IHa] using bmatrix_ind; intros. {
     cbn.
-    destruct b as [xb| Mb]. {
-      cbn in Hd1, Hd2.
-...
-apply map_ext_in_iff.
-intros la Hla.
-destruct llb as [| lb]; [ easy | cbn ].
-do 2 rewrite map_map.
-apply map_ext_in_iff.
-intros i Hi; cbn.
-destruct la as [| a]; [ easy | ].
-apply in_seq in Hi.
-destruct Hi as (_, Hi); cbn in Hi.
-rewrite Hit1, Hit2.
-rewrite Haa, Hzz.
-
-Set Printing Implicit.
-...
-rename bso1 into bbbbbbbbbbbbbbbbso1.
-rename bso2 into bbbbbbbbbbbbbbbbso2.
+    destruct it1. {
+      specialize (Hd1 _ (or_introl eq_refl)).
+      now specialize (Hd1 _ (or_introl eq_refl)).
+    }
+    destruct it2. {
+      specialize (Hd2 _ (or_introl eq_refl)).
+      now specialize (Hd2 _ (or_introl eq_refl)).
+    }
+    rewrite Hit1, Hit2.
+    now destruct b.
+  }
+  destruct it1. {
+    specialize (Hd1 _ (or_introl eq_refl)).
+    now specialize (Hd1 _ (or_introl eq_refl)).
+  }
+  destruct it2. {
+    specialize (Hd2 _ (or_introl eq_refl)).
+    now specialize (Hd2 _ (or_introl eq_refl)).
+  }
+  rewrite Hit1, Hit2.
+  destruct b as [xb| Mb]; [ easy | cbn ].
+  f_equal.
 ...
 Unset Printing Implicit.
 *)
