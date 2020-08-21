@@ -4066,11 +4066,30 @@ f_equal. {
     set (rec_sring n :=
        {| srng_zero := @void_bmat_def T;
           srng_one := @void_bmat_def T;
-          srng_add := @bmat_def_add T (@rng_semiring T ro);
-          srng_mul := @bmat_def_mul_loop T (@rng_semiring T ro) n |}).
-    progress fold (rec_sring n).
+          srng_add := @bmat_def_add T so;
+          srng_mul := @bmat_def_mul_loop T so n |}).
     progress fold so.
-Set Printing Implicit.
+    progress fold (rec_sring n).
+    progress fold (rec_sring m) in IHn.
+    progress fold so in Hin.
+Search mat_def_mul.
+assert (@mat_def_mul (bmatrix_def T) (rec_sring n) Mi Mi = Mi). {
+  destruct Mi as (lli, ri, ci).
+  cbn in IHn.
+  unfold mat_def_mul; cbn - [ Nat.eq_dec ].
+  destruct n; [ easy | ].
+  cbn in Hin.
+  injection Hin; clear Hin; intros; subst lli ri ci.
+  cbn.
+  f_equal; f_equal. {
+    f_equal. {
+...
+
+enough (m = n).
+subst n.
+rewrite IHn.
+cbn.
+Unset Printing Implicit.
 ...
     rewrite (@bmat_def_mul_loop_enough_iter _ ro m n _ (rec_sring n)) in IHn;
       [ | easy | easy | easy | easy | now rewrite Hm | ]. 2: {
