@@ -4135,10 +4135,37 @@ intros.
 now apply bmat_def_mul_loop_I_IZ_2_pow_def.
 Qed.
 
+Theorem fold_tagada : ∀ T {ro : ring_op T} (so := rng_semiring)
+    (MA MB : bmatrix_def T) n,
+  match MA with
+  | BM_1 xa =>
+      match MB with
+      | BM_1 xb => BM_1 (xa * xb)%Rng
+      | BM_M _ => void_bmat_def
+      end
+  | BM_M MMA =>
+      match MB with
+      | BM_1 _ => void_bmat_def
+      | BM_M MMB =>
+          let bso :=
+            {| srng_zero := @void_bmat_def T;
+               srng_one := @void_bmat_def T;
+               srng_add := @bmat_def_add T (@rng_semiring T ro);
+               srng_mul := @bmat_def_mul_loop T (@rng_semiring T ro) n |}
+           in
+           BM_M (mat_def_mul MMA MMB)
+      end
+  end = bmat_def_mul_loop (S n) MA MB.
+Proof.
+easy.
+Qed.
+
 Theorem bmat_def_loop_add_A_Z_2_pow :
-    ∀ T {so : ring_op T} (so := rng_semiring) {sp : semiring_prop T} n,
+    ∀ T {ro : ring_op T} (so := rng_semiring) {sp : semiring_prop T} n,
   bmat_def_add_loop (S n) (A_def n) (Z_2_pow_def n) = A_def n.
-Admitted.
+Proof.
+intros; cbn.
+...
 
 Theorem bmat_def_loop_mul_I_2_pow_A_def :
     ∀ T {ro : ring_op T} (so := rng_semiring) {sp : semiring_prop T} n,
@@ -4159,7 +4186,7 @@ cbn in H.
 progress unfold so in H.
 rewrite H; clear H.
 rewrite bmat_depth_I_2_pow.
-(* interminable *)
+do 3 rewrite fold_tagada.
 ...
 
 (* "We prove by induction that A_n^2 = nI" *)
