@@ -4136,6 +4136,11 @@ Theorem bmat_def_loop_mul_I_2_pow_A_def :
   bmat_def_mul_loop (S n) (I_2_pow_def n) (A_def n) = A_def n.
 Proof.
 intros.
+(* c'est con, parce qu'il suffirait que prouver que I est l'élément
+   neutre de la multiplication. Sauf que, c'est pas si simple, parce
+   que, dans ce cas, il faudrait que j'ajoute des contraintes dans le
+   type de matrices par blocs que j'utilise pour m'assurer que les lois
+   de composition sont correctes et bien internes *)
 ...
 
 (* "We prove by induction that A_n^2 = nI" *)
