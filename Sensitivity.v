@@ -3899,7 +3899,7 @@ Fixpoint bmat_nat_mul_l_loop T it {so : semiring_op T} n BM :=
 Definition bmat_nat_mul_l T {so : semiring_op T} n BM :=
   bmat_nat_mul_l_loop (bmat_depth BM) n BM.
 
-Theorem bmat_depth_IZ_2_pow : ∀ T {ro : ring_op T} (so := rng_semiring) u n,
+Theorem bmat_depth_IZ_2_pow : ∀ T {ro : semiring_op T} u n,
   bmat_depth (IZ_2_pow_def u n) = S n.
 Proof.
 intros.
@@ -3909,8 +3909,15 @@ do 2 rewrite IHn.
 now do 3 rewrite Nat.max_id.
 Qed.
 
-Theorem bmat_depth_I_2_pow : ∀ T {ro : ring_op T} (so := rng_semiring) n,
+Theorem bmat_depth_I_2_pow : ∀ T {so : semiring_op T} n,
   bmat_depth (I_2_pow_def n) = S n.
+Proof.
+intros.
+apply bmat_depth_IZ_2_pow.
+Qed.
+
+Theorem bmat_depth_Z_2_pow : ∀ T {so : semiring_op T} n,
+  bmat_depth (Z_2_pow_def n) = S n.
 Proof.
 intros.
 apply bmat_depth_IZ_2_pow.
@@ -4023,12 +4030,88 @@ Abort. (*
 Unset Printing Implicit.
 *)
 
-Theorem bmat_def_sqr_loop_I_2_pow_def :
-    ∀ T {so : semiring_op T } {sp : semiring_prop T} n,
-  @bmat_def_mul_loop T so (S n) (@I_2_pow_def T so n) (@I_2_pow_def T so n) =
-  @I_2_pow_def T so n.
+(*
+Theorem bmat_def_twice_loop_Z_2_pow_def :
+  ∀ T {so : semiring_op T } {sp : semiring_prop T} n,
+  bmat_def_add_loop (S n) (Z_2_pow_def n) (Z_2_pow_def n) = Z_2_pow_def n.
+Proof.
+intros; cbn.
+induction n; [ now cbn; rewrite srng_add_0_l | cbn ].
+f_equal; f_equal.
+now rewrite IHn.
+Qed.
+
+Theorem bmat_def_sqr_loop_Z_2_pow_def :
+  ∀ T {so : semiring_op T } {sp : semiring_prop T} n,
+  bmat_def_mul_loop (S n) (Z_2_pow_def n) (Z_2_pow_def n) = Z_2_pow_def n.
+Proof.
+intros; cbn.
+induction n; [ now cbn; rewrite srng_mul_0_l | cbn ].
+f_equal; f_equal.
+rewrite IHn.
+rewrite bmat_depth_Z_2_pow.
+now rewrite bmat_def_twice_loop_Z_2_pow_def.
+Qed.
+*)
+
+Theorem fold_Z_2_pow_def : ∀ T {so : semiring_op T} n,
+  IZ_2_pow_def 0%Srng n = Z_2_pow_def n.
+Proof. easy. Qed.
+
+Theorem bmat_def_loop_mul_Z_IZ_2_pow_def :
+    ∀ T {so : semiring_op T } {sp : semiring_prop T} n u,
+  bmat_def_mul_loop (S n) (Z_2_pow_def n) (IZ_2_pow_def u n) =
+  Z_2_pow_def n.
 Proof.
 intros.
+revert u.
+induction n; intros; cbn; [ now rewrite srng_mul_0_l | ].
+f_equal; f_equal.
+specialize (IHn 0%Srng) as H1.
+cbn in H1; rewrite H1; clear H1.
+specialize (IHn u) as H1.
+cbn in H1; rewrite H1; clear H1.
+rewrite bmat_depth_Z_2_pow.
+unfold Z_2_pow_def at 2.
+specialize (IHn 0%Srng) as H1.
+Set Printing Implicit.
+...
+cbn in H1; cbn.
+...
+specialize (bmat_def_sqr_loop_Z_2_pow_def n) as H1.
+cbn in H1; rewrite H1.
+...
+
+Theorem bmat_def_loop_mul_I_IZ_2_pow_def :
+    ∀ T {so : semiring_op T } {sp : semiring_prop T} n u,
+  bmat_def_mul_loop (S n) (I_2_pow_def n) (IZ_2_pow_def u n) =
+  IZ_2_pow_def u n.
+Proof.
+intros; cbn.
+revert u.
+induction n; intros; cbn; [ now rewrite srng_mul_1_l | cbn ].
+f_equal; f_equal.
+do 2 rewrite IHn.
+rewrite fold_Z_2_pow_def.
+specialize (bmat_def_sqr_loop_Z_2_pow_def n) as H1.
+cbn in H1; rewrite H1.
+...
+
+Theorem bmat_def_sqr_loop_I_2_pow_def :
+    ∀ T {so : semiring_op T } {sp : semiring_prop T} n,
+  bmat_def_mul_loop (S n) (I_2_pow_def n) (I_2_pow_def n) = I_2_pow_def n.
+Proof.
+intros.
+...
+now apply bmat_def_loop_mul_I_IZ_2_pow_def.
+...
+cbn.
+induction n; [ now cbn; rewrite srng_mul_1_l | cbn ].
+f_equal; f_equal.
+rewrite IHn.
+rewrite fold_Z_2_pow_def.
+specialize (bmat_def_sqr_loop_Z_2_pow_def n) as H1.
+cbn in H1; rewrite H1.
 ...
 
 (* "We prove by induction that A_n^2 = nI" *)
@@ -4932,9 +5015,6 @@ destruct MZ as [MZ| MMMZ]. {
   }
 }
 Qed.
-
-Theorem fold_Z_2_pow : ∀ n, IZ_2_pow 0%Rng n = Z_2_pow n.
-Proof. easy. Qed.
 
 Theorem mmat_mul_loop_sqr_I_2_pow : ∀ it n,
   S n ≤ it
