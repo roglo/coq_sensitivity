@@ -4135,6 +4135,11 @@ intros.
 now apply bmat_def_mul_loop_I_IZ_2_pow_def.
 Qed.
 
+Theorem bmat_def_loop_add_A_Z_2_pow :
+    ∀ T {so : ring_op T} (so := rng_semiring) {sp : semiring_prop T} n,
+  bmat_def_add_loop (S n) (A_def n) (Z_2_pow_def n) = A_def n.
+Admitted.
+
 Theorem bmat_def_loop_mul_I_2_pow_A_def :
     ∀ T {ro : ring_op T} (so := rng_semiring) {sp : semiring_prop T} n,
   bmat_def_mul_loop (S n) (I_2_pow_def n) (A_def n) = A_def n.
@@ -4145,7 +4150,16 @@ cbn in IHn; cbn.
 rewrite IHn, bmat_depth_A; cbn.
 specialize (bmat_def_mul_loop_Z_IZ_2_pow_def 1%Rng n) as H.
 cbn in H; unfold Z_2_pow_def in H.
-rewrite fold_I_2_pow_def in H; rewrite H.
+rewrite fold_I_2_pow_def in H; rewrite H; clear H.
+specialize (bmat_def_loop_add_A_Z_2_pow n) as H.
+cbn in H; unfold Z_2_pow_def in H.
+unfold so; rewrite H; clear H.
+specialize (bmat_def_loop_sqr_I_2_pow_def n) as H.
+cbn in H.
+progress unfold so in H.
+rewrite H; clear H.
+rewrite bmat_depth_I_2_pow.
+(* interminable *)
 ...
 
 (* "We prove by induction that A_n^2 = nI" *)
