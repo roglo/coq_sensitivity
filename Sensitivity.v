@@ -4030,30 +4030,6 @@ Abort. (*
 Unset Printing Implicit.
 *)
 
-(*
-Theorem bmat_def_twice_loop_Z_2_pow_def :
-  ∀ T {so : semiring_op T } {sp : semiring_prop T} n,
-  bmat_def_add_loop (S n) (Z_2_pow_def n) (Z_2_pow_def n) = Z_2_pow_def n.
-Proof.
-intros; cbn.
-induction n; [ now cbn; rewrite srng_add_0_l | cbn ].
-f_equal; f_equal.
-now rewrite IHn.
-Qed.
-
-Theorem bmat_def_sqr_loop_Z_2_pow_def :
-  ∀ T {so : semiring_op T } {sp : semiring_prop T} n,
-  bmat_def_mul_loop (S n) (Z_2_pow_def n) (Z_2_pow_def n) = Z_2_pow_def n.
-Proof.
-intros; cbn.
-induction n; [ now cbn; rewrite srng_mul_0_l | cbn ].
-f_equal; f_equal.
-rewrite IHn.
-rewrite bmat_depth_Z_2_pow.
-now rewrite bmat_def_twice_loop_Z_2_pow_def.
-Qed.
-*)
-
 Theorem fold_Z_2_pow_def : ∀ T {so : semiring_op T} n,
   IZ_2_pow_def 0%Srng n = Z_2_pow_def n.
 Proof. easy. Qed.
@@ -4066,6 +4042,22 @@ Proof.
 intros.
 revert u.
 induction n; intros; cbn; [ now rewrite srng_add_0_l | ].
+f_equal; f_equal.
+specialize (IHn 0%Srng) as H1.
+cbn in H1; rewrite H1; clear H1.
+specialize (IHn u) as H1.
+cbn in H1; rewrite H1; clear H1.
+easy.
+Qed.
+
+Theorem bmat_def_add_loop_IZ_Z_2_pow_def :
+    ∀ T {so : semiring_op T } {sp : semiring_prop T} u n,
+  bmat_def_add_loop (S n) (IZ_2_pow_def u n) (Z_2_pow_def n) =
+  IZ_2_pow_def u n.
+Proof.
+intros.
+revert u.
+induction n; intros; cbn; [ now rewrite srng_add_0_r | ].
 f_equal; f_equal.
 specialize (IHn 0%Srng) as H1.
 cbn in H1; rewrite H1; clear H1.
@@ -4124,25 +4116,20 @@ rewrite fold_Z_2_pow_def at 1 2 3.
 specialize (bmat_def_mul_loop_Z_IZ_2_pow_def 0%Srng n) as H1.
 cbn in H1; rewrite H1; clear H1.
 unfold Z_2_pow_def.
+rewrite bmat_depth_IZ_2_pow.
 rewrite bmat_def_add_loop_Z_IZ_2_pow_def; [ | easy ].
-...
+rewrite bmat_def_add_loop_Z_IZ_2_pow_def; [ | easy ].
+rewrite bmat_def_add_loop_IZ_Z_2_pow_def; [ | easy ].
+easy.
+Qed.
 
-Theorem bmat_def_sqr_loop_I_2_pow_def :
+Theorem bmat_def_loop_sqr_I_2_pow_def :
     ∀ T {so : semiring_op T } {sp : semiring_prop T} n,
   bmat_def_mul_loop (S n) (I_2_pow_def n) (I_2_pow_def n) = I_2_pow_def n.
 Proof.
 intros.
-...
-now apply bmat_def_loop_mul_I_IZ_2_pow_def.
-...
-cbn.
-induction n; [ now cbn; rewrite srng_mul_1_l | cbn ].
-f_equal; f_equal.
-rewrite IHn.
-rewrite fold_Z_2_pow_def.
-specialize (bmat_def_sqr_loop_Z_2_pow_def n) as H1.
-cbn in H1; rewrite H1.
-...
+now apply bmat_def_mul_loop_I_IZ_2_pow_def.
+Qed.
 
 (* "We prove by induction that A_n^2 = nI" *)
 (* trying if it is true with A_def instead of A *)
@@ -4162,63 +4149,8 @@ rewrite bmat_depth_IZ_2_pow.
 rewrite bmat_depth_opp.
 rewrite bmat_depth_A.
 do 3 rewrite Nat.max_id.
+rewrite bmat_def_loop_sqr_I_2_pow_def; [ | easy ].
 ...
-rewrite bmat_def_sqr_loop_I_2_pow_def; [ | easy ].
-...
-replace
-  (@bmat_def_mul_loop T (@rng_semiring T ro) (S n)
-     (@I_2_pow_def T (@rng_semiring T ro) n)
-     (@I_2_pow_def T (@rng_semiring T ro) n))
-with
-  (@I_2_pow_def T (@rng_semiring T ro) n). 2: {
-  clear - rp.
-
-
-  T : Type
-  n : nat
-  ro : ring_op T
-  rp : semiring_prop T
-  ============================
-  I_2_pow_def n = bmat_def_mul_loop (S n) (I_2_pow_def n) (I_2_pow_def n)
-
-  induction n; [ now cbn; rewrite srng_mul_1_l | ].
-  remember (S n) as sn; cbn; subst sn.
-  remember (I_2_pow_def (S n)) as isn eqn:Hisn.
-  symmetry in Hisn.
-  destruct isn as [xi| Mi]; [ easy | ].
-  cbn in Hisn.
-  injection Hisn; clear Hisn; intros; subst Mi.
-  f_equal.
-  unfold mat_def_mul.
-  cbn - [ list_list_mul ].
-  f_equal; f_equal; f_equal.
-  rewrite IHn.
-...
-Search (I_2_pow_def).
-Set Printing Implicit.
-...
-f_equal. {
-  f_equal. {
-...
-    cbn.
-    remember (A_def n) as an eqn:Han.
-    remember (I_2_pow_def n) as i2n eqn:Hin.
-    symmetry in Han, Hin.
-    destruct an as [xa| Ma]. {
-      destruct i2n as [xi| Mi]; [ | easy ].
-      move xi before xa.
-      destruct n; [ | easy ].
-      injection Han; clear Han; intros; subst xa; cbn.
-      injection Hin; clear Hin; intros; subst xi; cbn.
-      now rewrite srng_mul_0_l, srng_mul_1_l.
-    }
-    destruct i2n as [xi| Mi]; [ easy | ].
-    move Mi before Ma; cbn.
-    f_equal.
-    cbn in IHn.
-    injection IHn; clear IHn; intros IHn.
-...
-
 f_equal. {
   f_equal. {
     unfold so.
