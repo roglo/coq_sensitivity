@@ -4059,7 +4059,7 @@ Theorem fold_Z_2_pow_def : ∀ T {so : semiring_op T} n,
 Proof. easy. Qed.
 
 Theorem bmat_def_add_loop_Z_IZ_2_pow_def :
-    ∀ T {so : semiring_op T } {sp : semiring_prop T} n u,
+    ∀ T {so : semiring_op T } {sp : semiring_prop T} u n,
   bmat_def_add_loop (S n) (Z_2_pow_def n) (IZ_2_pow_def u n) =
   IZ_2_pow_def u n.
 Proof.
@@ -4075,7 +4075,7 @@ easy.
 Qed.
 
 Theorem bmat_def_mul_loop_Z_IZ_2_pow_def :
-    ∀ T {so : semiring_op T } {sp : semiring_prop T} n u,
+    ∀ T {so : semiring_op T } {sp : semiring_prop T} u n,
   bmat_def_mul_loop (S n) (Z_2_pow_def n) (IZ_2_pow_def u n) =
   Z_2_pow_def n.
 Proof.
@@ -4093,7 +4093,7 @@ now rewrite bmat_def_add_loop_Z_IZ_2_pow_def.
 Qed.
 
 Theorem bmat_def_mul_loop_I_IZ_2_pow_def :
-    ∀ T {so : semiring_op T } {sp : semiring_prop T} n u,
+    ∀ T {so : semiring_op T } {sp : semiring_prop T} u n,
   bmat_def_mul_loop (S n) (I_2_pow_def n) (IZ_2_pow_def u n) =
   IZ_2_pow_def u n.
 Proof.
@@ -4103,12 +4103,28 @@ induction n; intros; cbn; [ now rewrite srng_mul_1_l | cbn ].
 f_equal; f_equal.
 specialize (IHn u) as H1.
 cbn in H1; rewrite H1; clear H1.
-specialize (bmat_def_mul_loop_Z_IZ_2_pow_def 0%Srng) as H1.
-...
-rewrite IHn.
-rewrite fold_Z_2_pow_def.
-specialize (bmat_def_sqr_loop_Z_2_pow_def n) as H1.
-cbn in H1; rewrite H1.
+rewrite bmat_depth_IZ_2_pow.
+specialize (IHn 0%Srng) as H1.
+cbn in H1; rewrite H1; clear H1.
+rewrite bmat_depth_IZ_2_pow.
+rewrite fold_Z_2_pow_def at 1 3.
+specialize (bmat_def_mul_loop_Z_IZ_2_pow_def 0%Srng n) as H1.
+cbn in H1; rewrite H1; clear H1.
+rewrite fold_Z_2_pow_def at 1.
+specialize (bmat_def_mul_loop_Z_IZ_2_pow_def u n) as H1.
+cbn in H1; rewrite H1; clear H1.
+rewrite fold_Z_2_pow_def at 1.
+specialize (bmat_def_mul_loop_Z_IZ_2_pow_def u n) as H1.
+cbn in H1; rewrite H1; clear H1.
+rewrite bmat_depth_Z_2_pow.
+rewrite fold_Z_2_pow_def at 1.
+specialize (bmat_def_mul_loop_Z_IZ_2_pow_def u n) as H1.
+cbn in H1; rewrite H1; clear H1.
+rewrite fold_Z_2_pow_def at 1 2 3.
+specialize (bmat_def_mul_loop_Z_IZ_2_pow_def 0%Srng n) as H1.
+cbn in H1; rewrite H1; clear H1.
+unfold Z_2_pow_def.
+rewrite bmat_def_add_loop_Z_IZ_2_pow_def; [ | easy ].
 ...
 
 Theorem bmat_def_sqr_loop_I_2_pow_def :
