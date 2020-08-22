@@ -4135,6 +4135,7 @@ Theorem bmat_def_loop_mul_I_2_pow_A_def :
     ∀ T {ro : ring_op T} (so := rng_semiring) {sp : semiring_prop T} n,
   bmat_def_mul_loop (S n) (I_2_pow_def n) (A_def n) = A_def n.
 Proof.
+intros.
 ...
 
 (* "We prove by induction that A_n^2 = nI" *)
