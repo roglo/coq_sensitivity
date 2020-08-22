@@ -4034,6 +4034,10 @@ Theorem fold_Z_2_pow_def : ∀ T {so : semiring_op T} n,
   IZ_2_pow_def 0%Srng n = Z_2_pow_def n.
 Proof. easy. Qed.
 
+Theorem fold_I_2_pow_def : ∀ T {so : semiring_op T} n,
+  IZ_2_pow_def 1%Srng n = I_2_pow_def n.
+Proof. easy. Qed.
+
 Theorem bmat_def_add_loop_Z_IZ_2_pow_def :
     ∀ T {so : semiring_op T } {sp : semiring_prop T} u n,
   bmat_def_add_loop (S n) (Z_2_pow_def n) (IZ_2_pow_def u n) =
@@ -4136,11 +4140,12 @@ Theorem bmat_def_loop_mul_I_2_pow_A_def :
   bmat_def_mul_loop (S n) (I_2_pow_def n) (A_def n) = A_def n.
 Proof.
 intros.
-(* c'est con, parce qu'il suffirait que prouver que I est l'élément
-   neutre de la multiplication. Sauf que, c'est pas si simple, parce
-   que, dans ce cas, il faudrait que j'ajoute des contraintes dans le
-   type de matrices par blocs que j'utilise pour m'assurer que les lois
-   de composition sont correctes et bien internes *)
+induction n; [ now cbn; rewrite srng_mul_0_r | ].
+cbn in IHn; cbn.
+rewrite IHn, bmat_depth_A; cbn.
+specialize (bmat_def_mul_loop_Z_IZ_2_pow_def 1%Rng n) as H.
+cbn in H; unfold Z_2_pow_def in H.
+rewrite fold_I_2_pow_def in H; rewrite H.
 ...
 
 (* "We prove by induction that A_n^2 = nI" *)
