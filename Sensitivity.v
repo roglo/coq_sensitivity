@@ -4131,6 +4131,12 @@ intros.
 now apply bmat_def_mul_loop_I_IZ_2_pow_def.
 Qed.
 
+Theorem bmat_def_loop_mul_I_2_pow_A_def :
+    ∀ T {ro : ring_op T} (so := rng_semiring) {sp : semiring_prop T} n,
+  bmat_def_mul_loop (S n) (I_2_pow_def n) (A_def n) = A_def n.
+Proof.
+...
+
 (* "We prove by induction that A_n^2 = nI" *)
 (* trying if it is true with A_def instead of A *)
 
@@ -4150,6 +4156,7 @@ rewrite bmat_depth_opp.
 rewrite bmat_depth_A.
 do 3 rewrite Nat.max_id.
 rewrite bmat_def_loop_sqr_I_2_pow_def; [ | easy ].
+rewrite bmat_def_loop_mul_I_2_pow_A_def; [ | easy ].
 ...
 f_equal. {
   f_equal. {
