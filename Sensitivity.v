@@ -4058,7 +4058,23 @@ Theorem fold_Z_2_pow_def : ∀ T {so : semiring_op T} n,
   IZ_2_pow_def 0%Srng n = Z_2_pow_def n.
 Proof. easy. Qed.
 
-Theorem bmat_def_loop_mul_Z_IZ_2_pow_def :
+Theorem bmat_def_add_loop_Z_IZ_2_pow_def :
+    ∀ T {so : semiring_op T } {sp : semiring_prop T} n u,
+  bmat_def_add_loop (S n) (Z_2_pow_def n) (IZ_2_pow_def u n) =
+  IZ_2_pow_def u n.
+Proof.
+intros.
+revert u.
+induction n; intros; cbn; [ now rewrite srng_add_0_l | ].
+f_equal; f_equal.
+specialize (IHn 0%Srng) as H1.
+cbn in H1; rewrite H1; clear H1.
+specialize (IHn u) as H1.
+cbn in H1; rewrite H1; clear H1.
+easy.
+Qed.
+
+Theorem bmat_def_mul_loop_Z_IZ_2_pow_def :
     ∀ T {so : semiring_op T } {sp : semiring_prop T} n u,
   bmat_def_mul_loop (S n) (Z_2_pow_def n) (IZ_2_pow_def u n) =
   Z_2_pow_def n.
@@ -4072,26 +4088,24 @@ cbn in H1; rewrite H1; clear H1.
 specialize (IHn u) as H1.
 cbn in H1; rewrite H1; clear H1.
 rewrite bmat_depth_Z_2_pow.
-unfold Z_2_pow_def at 2.
-specialize (IHn 0%Srng) as H1.
-Set Printing Implicit.
-...
-cbn in H1; cbn.
-...
-specialize (bmat_def_sqr_loop_Z_2_pow_def n) as H1.
-cbn in H1; rewrite H1.
-...
+unfold Z_2_pow_def at 2 4 6 8.
+now rewrite bmat_def_add_loop_Z_IZ_2_pow_def.
+Qed.
 
-Theorem bmat_def_loop_mul_I_IZ_2_pow_def :
+Theorem bmat_def_mul_loop_I_IZ_2_pow_def :
     ∀ T {so : semiring_op T } {sp : semiring_prop T} n u,
   bmat_def_mul_loop (S n) (I_2_pow_def n) (IZ_2_pow_def u n) =
   IZ_2_pow_def u n.
 Proof.
-intros; cbn.
+intros.
 revert u.
 induction n; intros; cbn; [ now rewrite srng_mul_1_l | cbn ].
 f_equal; f_equal.
-do 2 rewrite IHn.
+specialize (IHn u) as H1.
+cbn in H1; rewrite H1; clear H1.
+specialize (bmat_def_mul_loop_Z_IZ_2_pow_def 0%Srng) as H1.
+...
+rewrite IHn.
 rewrite fold_Z_2_pow_def.
 specialize (bmat_def_sqr_loop_Z_2_pow_def n) as H1.
 cbn in H1; rewrite H1.
