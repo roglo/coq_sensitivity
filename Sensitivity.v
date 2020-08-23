@@ -4160,11 +4160,19 @@ Proof.
 easy.
 Qed.
 
-Theorem bmat_def_loop_add_A_Z_2_pow :
+Theorem bmat_def_add_loop_A_Z_2_pow :
     ∀ T {ro : ring_op T} (so := rng_semiring) {sp : semiring_prop T} n,
   bmat_def_add_loop (S n) (A_def n) (Z_2_pow_def n) = A_def n.
 Proof.
-intros; cbn.
+intros.
+induction n; [ now cbn; rewrite srng_add_0_l | ].
+cbn in IHn |-*.
+rewrite IHn.
+specialize (bmat_def_add_loop_IZ_Z_2_pow_def 1%Srng n) as H.
+cbn in H.
+unfold so in H |-*.
+rewrite fold_I_2_pow_def in H.
+rewrite H; clear H.
 ...
 
 Theorem bmat_def_loop_mul_I_2_pow_A_def :
@@ -4178,6 +4186,7 @@ rewrite IHn, bmat_depth_A; cbn.
 specialize (bmat_def_mul_loop_Z_IZ_2_pow_def 1%Rng n) as H.
 cbn in H; unfold Z_2_pow_def in H.
 rewrite fold_I_2_pow_def in H; rewrite H; clear H.
+...
 specialize (bmat_def_loop_add_A_Z_2_pow n) as H.
 cbn in H; unfold Z_2_pow_def in H.
 unfold so; rewrite H; clear H.
@@ -4186,6 +4195,7 @@ cbn in H.
 progress unfold so in H.
 rewrite H; clear H.
 rewrite bmat_depth_I_2_pow.
+...
 do 3 rewrite fold_tagada.
 ...
 
