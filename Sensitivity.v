@@ -4068,6 +4068,29 @@ Theorem fold_I_2_pow_def : ∀ T {so : semiring_op T} n,
   IZ_2_pow_def 1%Srng n = I_2_pow_def n.
 Proof. easy. Qed.
 
+Definition has_same_bmat_def_struct MA MB :=
+...
+
+Theorem bmat_def_add_loop_Z_pow_def_l :
+    ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
+  has_same_bmat_def_struct (Z_2_pow_def n) M
+  → bmat_def_add_loop (S n) (Z_2_pow_def n) M = M.
+Proof.
+intros * Hss.
+induction n; intros; cbn. {
+  destruct M as [x| M]; [ now rewrite srng_add_0_l | ].
+...
+induction n; intros; cbn; [ now rewrite srng_add_0_l | ].
+f_equal; f_equal.
+specialize (IHn 0%Srng) as H1.
+cbn in H1; rewrite H1; clear H1.
+specialize (IHn u) as H1.
+cbn in H1; rewrite H1; clear H1.
+easy.
+Qed.
+
+...
+
 Theorem bmat_def_add_loop_Z_IZ_2_pow_def :
     ∀ T {so : semiring_op T } {sp : semiring_prop T} u n,
   bmat_def_add_loop (S n) (Z_2_pow_def n) (IZ_2_pow_def u n) =
