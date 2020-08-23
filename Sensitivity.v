@@ -4167,12 +4167,20 @@ Proof.
 intros.
 induction n; [ now cbn; rewrite srng_add_0_l | ].
 cbn in IHn |-*.
+unfold bmat_def_of_list_bmat_def; cbn.
+f_equal; f_equal.
 rewrite IHn.
 specialize (bmat_def_add_loop_IZ_Z_2_pow_def 1%Srng n) as H.
 cbn in H.
 unfold so in H |-*.
 rewrite fold_I_2_pow_def in H.
 rewrite H; clear H.
+f_equal; f_equal; f_equal; f_equal.
+Search bmat_def_opp.
+Print bmat_def_opp.
+...
+unfold so in IHn |-*.
+rewrite IHn.
 ...
 
 Theorem bmat_def_loop_mul_I_2_pow_A_def :
