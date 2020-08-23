@@ -3808,6 +3808,36 @@ intros a Ha.
 apply IHBM with (la := la); [ apply Hla | apply Ha ].
 Qed.
 
+Theorem bmat_def_opp_involutive : ∀ T {ro : ring_op T} {rp : ring_prop T}
+ (so := @rng_semiring T ro) {sp : semiring_prop T} BM,
+  bmat_def_opp (bmat_def_opp BM) = BM.
+Proof.
+intros.
+induction BM as [x| M IHBM] using bmatrix_ind. {
+  now cbn; rewrite rng_opp_involutive.
+} {
+  destruct M as (ll, r, c); cbn; f_equal; f_equal.
+  cbn in IHBM.
+  induction ll as [| l]; [ easy | cbn ].
+  f_equal. 2: {
+    apply IHll.
+    intros la Hla a Ha.
+    apply (IHBM la); [ now right | easy ].
+  }
+  induction l as [| x]; [ easy | cbn ].
+  f_equal. 2: {
+    apply IHl.
+    intros la Hla a Ha.
+    destruct Hla as [Hla| Hla]. {
+      subst l.
+      apply (IHBM (x :: la)); [ now left | now right ].
+    }
+    apply (IHBM la); [ now right | easy ].
+  }
+  apply (IHBM (x :: l)); [ now left | now left ].
+}
+Qed.
+
 (* sequence "An" *)
 
 Definition bmat_def_of_list_bmat_def T (ll : list (list (bmatrix_def T))) :
@@ -4176,11 +4206,15 @@ unfold so in H |-*.
 rewrite fold_I_2_pow_def in H.
 rewrite H; clear H.
 f_equal; f_equal; f_equal; f_equal.
-Search bmat_def_opp.
-Print bmat_def_opp.
-...
-unfold so in IHn |-*.
+clear IHn.
+induction n; [ now cbn; rewrite srng_add_0_r | cbn ].
+f_equal; f_equal.
 rewrite IHn.
+f_equal. {
+  f_equal; f_equal.
+(*
+rewrite bmat_def_opp_involutive; [ | | easy ].
+*)
 ...
 
 Theorem bmat_def_loop_mul_I_2_pow_A_def :
@@ -4605,36 +4639,6 @@ induction len; intros; [ easy | ].
 apply Nat.succ_le_mono in Hlen.
 destruct n; [ easy | cbn ].
 rewrite IHlen; [ now rewrite IHlen | easy ].
-Qed.
-
-Theorem bmat_def_opp_involutive : ∀ T {ro : ring_op T} {rp : ring_prop T}
- (so := @rng_semiring T ro) {sp : semiring_prop T} BM,
-  bmat_def_opp (bmat_def_opp BM) = BM.
-Proof.
-intros.
-induction BM as [x| M IHBM] using bmatrix_ind. {
-  now cbn; rewrite rng_opp_involutive.
-} {
-  destruct M as (ll, r, c); cbn; f_equal; f_equal.
-  cbn in IHBM.
-  induction ll as [| l]; [ easy | cbn ].
-  f_equal. 2: {
-    apply IHll.
-    intros la Hla a Ha.
-    apply (IHBM la); [ now right | easy ].
-  }
-  induction l as [| x]; [ easy | cbn ].
-  f_equal. 2: {
-    apply IHl.
-    intros la Hla a Ha.
-    destruct Hla as [Hla| Hla]. {
-      subst l.
-      apply (IHBM (x :: la)); [ now left | now right ].
-    }
-    apply (IHBM la); [ now right | easy ].
-  }
-  apply (IHBM (x :: l)); [ now left | now left ].
-}
 Qed.
 
 Theorem A_coh_prop :
