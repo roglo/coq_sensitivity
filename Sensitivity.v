@@ -4131,40 +4131,40 @@ Fixpoint has_same_bmat_def_struct T (MA MB : bmatrix_def T) :=
   match MA with
   | BM_1 xa =>
       match MB with
-      | BM_1 xb => true
-      | BM_M MMB => false
+      | BM_1 xb => True
+      | BM_M MMB => False
       end
   | BM_M MMA =>
       match MB with
-      | BM_1 xb => false
+      | BM_1 xb => False
       | BM_M MMB =>
           let fix has_same_list_struct la lb :=
             match (la, lb) with
             | (a :: la', b :: lb') =>
-                has_same_bmat_def_struct a b &&
+                has_same_bmat_def_struct a b ∧
                 has_same_list_struct la' lb'
-            | ([], []) => true
-            | _ => false
+            | ([], []) => True
+            | _ => False
             end
           in
           let fix has_same_list_list_struct lla llb :=
             match (lla, llb) with
             | (la :: lla', lb :: llb') =>
-                has_same_list_struct la lb &&
+                has_same_list_struct la lb ∧
                 has_same_list_list_struct lla' llb'
-            | ([], []) => true
-            | _ => false
+            | ([], []) => True
+            | _ => False
             end
           in
-          Nat.eqb (mat_nrows MMA) (mat_nrows MMB) &&
-          Nat.eqb (mat_ncols MMA) (mat_ncols MMB) &&
+          mat_nrows MMA = mat_nrows MMB ∧
+          mat_ncols MMA = mat_ncols MMB ∧
           has_same_list_list_struct (mat_list MMA) (mat_list MMB)
         end
   end.
 
 Theorem bmat_def_add_Z_2_pow_def_l :
     ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
-  has_same_bmat_def_struct (Z_2_pow_def n) M = true
+  has_same_bmat_def_struct (Z_2_pow_def n) M
   → bmat_def_add (Z_2_pow_def n) M = M.
 Proof.
 intros * sp * Hss.
@@ -4178,46 +4178,21 @@ destruct M as [x| M]; [ easy | f_equal ].
 destruct M as (ll, r, c).
 cbn - [ Nat.eq_dec ].
 cbn in Hss.
-destruct (Nat.eq_dec 2 r) as [Hrr| Hrr]. {
-  subst r; cbn in Hss.
-  destruct (Nat.eq_dec 2 c) as [Hcc| Hcc]. {
-    subst c; cbn in Hss.
-    f_equal.
-    destruct ll as [| l1]; [ easy | ].
-    f_equal. {
-      destruct l1 as [| e1]; [ easy | ].
-      apply Bool.andb_true_iff in Hss.
-      destruct Hss as (Hss, H2).
-      apply Bool.andb_true_iff in Hss.
-      destruct Hss as (Hss, H1).
-      f_equal; [ now apply IHn | ].
-      destruct l1 as [| e2]; [ easy | ].
-      apply Bool.andb_true_iff in H1.
-      f_equal; [ now apply IHn | ].
-      now destruct l1.
-    }
-    destruct ll as [| l2]; [ easy | ].
-    f_equal. {
-      destruct l2 as [| e2]; [ easy | ].
-... mouais, peut-être qu'il faudrait une version "Prop" finalement...
-      f_equal. {
-        apply IHn.
+destruct Hss as (Hr & Hc & Hss).
+subst r c; cbn; f_equal.
+destruct ll as [| l]; [ easy | ].
+destruct Hss as (Hss1 & Hss2).
+destruct l as [| e1]; [ easy | ].
+destruct Hss1 as (Hss11, Hss12).
+rewrite IHn; [ | easy ].
+destruct l as [| e2]; [ easy | ].
+destruct Hss12 as (Hss121, Hss122).
+rewrite IHn; [ | easy ].
+destruct l; [ f_equal | easy ].
+destruct ll as [| l1]; [ easy | ].
+destruct Hss2 as (Hss21, Hss22).
+destruct l1 as [| e3]; [ easy | ].
 ...
-    destruct ll as [| l2]. {
-      now rewrite Bool.andb_false_r in Hss.
-    }
-
-    rewrite Bool.andb_false_r in Hss.
-    now rewrite Bool.andb_false_r in Hss.
-  }
-  destruct c; [ now rewrite Bool.andb_false_l in Hss | ].
-  destruct c; [ now rewrite Bool.andb_false_l in Hss | ].
-  destruct c; [ easy | now rewrite Bool.andb_false_l in Hss ].
-}
-destruct r; [ now rewrite Bool.andb_false_l in Hss | ].
-destruct r; [ now rewrite Bool.andb_false_l in Hss | ].
-destruct r; [ easy | now rewrite Bool.andb_false_l in Hss ].
-Qed.
 
 Theorem Z_IZ_2_pow_def_have_same_struct : ∀ T {so : semiring_op T} u n,
   has_same_bmat_def_struct (Z_2_pow_def n) (IZ_2_pow_def u n) = true.
