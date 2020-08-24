@@ -4268,6 +4268,33 @@ destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]. {
     subst cb.
     destruct (Nat.eq_dec ca ca) as [H| H]; [ clear H | easy ].
     f_equal; f_equal.
+set (toto :=
+  (fix list_list_add (ll1 ll2 : list (list (bmatrix_def T))) {struct ll1} :
+     list (list (bmatrix_def T)) :=
+     match ll1 with
+     | [] => []
+     | l1 :: ll'1 =>
+         match ll2 with
+         | [] => []
+         | l2 :: ll'2 =>
+             (fix list_add (l0 l3 : list (bmatrix_def T)) {struct l0} :
+                list (bmatrix_def T) :=
+                match l0 with
+                | [] => []
+                | e1 :: l'1 =>
+                    match l3 with
+                    | [] => []
+                    | e2 :: l'2 => bmat_def_add e1 e2 :: list_add l'1 l'2
+                    end
+                end) l1 l2 :: list_list_add ll'1 ll'2
+         end
+     end)).
+  revert llb.
+  induction lla as [| la]; intros; [ now destruct llb | ].
+  cbn.
+  destruct llb as [| lb]; [ easy | ].
+  cbn.
+  f_equal; [ | apply IHlla ].
 ...
 
 Theorem bmat_def_add_Z_IZ_2_pow :
