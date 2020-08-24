@@ -2547,11 +2547,7 @@ Fixpoint bmat_def_add T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
       end
   end.
 
-Inspect 1.
-Print bmat_def_add.
-
-...
-
+(*
 Fixpoint bmat_def_add_loop T {so : semiring_op T} it
     (MM1 MM2 : bmatrix_def T) :=
   match it with
@@ -2578,6 +2574,7 @@ Definition bmat_def_add T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
 Theorem fold_bmat_def_add : ∀ T {so : semiring_op T} (MA MB : bmatrix_def T),
   bmat_def_add_loop (bmat_depth MA) MA MB = bmat_def_add MA MB.
 Proof. easy. Qed.
+*)
 
 Theorem length_list_list_add :
   ∀ (T : Type) (add : bmatrix_def T → bmatrix_def T → bmatrix_def T)
@@ -2639,6 +2636,7 @@ destruct Hlc as [Hlc| Hlc]. {
 }
 Qed.
 
+(*
 Theorem bmat_add_loop_matrix_coh_prop :
   ∀ T {so : semiring_op T} ita BMAD BMBD ab,
   bmatrix_coh_prop BMAD
@@ -2700,7 +2698,9 @@ split. {
 }
 now rewrite Hab.
 Qed.
+*)
 
+(*
 Theorem bmat_coh_prop_add_gen : ∀ T {so : semiring_op T} ita itn
     (BMA BMB : bmatrix_def T),
   bmatrix_coh_prop BMA
@@ -2986,7 +2986,9 @@ apply IHlla with (ra := ra) (ca := ca) (llb := llb). {
   now apply bmat_depth_le_fold_left_fold_left_max with (la := ld).
 }
 Qed.
+*)
 
+(*
 Theorem bmat_coh_prop_add : ∀ T {so : semiring_op T} (BMA BMB : bmatrix T),
   bmatrix_coh (bmat_def_add (bmat_def BMA) (bmat_def BMB)) = true.
 Proof.
@@ -3000,10 +3002,13 @@ apply bmat_coh_prop_add_gen; [ | | easy | easy ]. {
   now destruct BMB.
 }
 Qed.
+*)
 
+(*
 Definition bmat_add T {so : semiring_op T} (BMA BMB : bmatrix T) :=
   {| bmat_def := bmat_def_add (bmat_def BMA) (bmat_def BMB);
      bmat_coh_prop := bmat_coh_prop_add BMA BMB |}.
+*)
 
 Theorem list_add_add_compat : ∀ T (add1 add2 : T → T → T) la lb,
   (∀ a b, a ∈ la → b ∈ lb → add1 a b = add2 a b)
@@ -3038,6 +3043,7 @@ intros la1 lb1 Hla1 Hlb1 * Ha Hb.
 apply (Hadd la1 lb1); [ now right | now right | easy | easy ].
 Qed.
 
+(*
 Theorem bmat_def_add_loop_enough_iter : ∀ T {ro : semiring_op T} it Ma Mb,
   bmat_depth Ma ≤ it
   → bmat_def_add_loop it Ma Mb = bmat_def_add Ma Mb.
@@ -3184,6 +3190,7 @@ etransitivity; [ | apply Hd ].
 apply Nat_fold_left_fold_left_max_le.
 apply Nat.le_0_l.
 Qed.
+*)
 
 (* multiplication *)
 
@@ -4135,6 +4142,8 @@ Fixpoint has_same_list_list_struct T test_el (lla llb : list (list T)) :=
   | _ => false
   end.
 
+... inliner liest lists
+
 Fixpoint has_same_bmat_def_struct_loop T it (MA MB : bmatrix_def T) :=
   match it with
   | 0 => false
@@ -4159,6 +4168,36 @@ Fixpoint has_same_bmat_def_struct_loop T it (MA MB : bmatrix_def T) :=
 
 Definition has_same_bmat_def_struct T (MA MB : bmatrix_def T) :=
   has_same_bmat_def_struct_loop (bmat_depth MA) MA MB = true.
+
+Theorem bmat_def_add_loop_Z_pow_def_l :
+    ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
+  has_same_bmat_def_struct (Z_2_pow_def n) M
+  → bmat_def_add (Z_2_pow_def n) M = M.
+Proof.
+intros * sp * Hss.
+revert M Hss.
+induction n; intros. {
+  cbn.
+  destruct M as [x| M]; [ now rewrite srng_add_0_l | easy ].
+}
+cbn - [ Nat.eq_dec ].
+destruct M as [x| M]; [ easy | f_equal ].
+destruct M as (ll, r, c).
+cbn - [ Nat.eq_dec ].
+cbn in Hss.
+unfold has_same_bmat_def_struct in Hss.
+cbn in Hss.
+...
+destruct (Nat.eq_dec 2 r) as [Hrr| Hrr]. {
+  subst r.
+  destruct (Nat.eq_dec 2 c) as [Hcc| Hcc]. {
+    subst c.
+    f_equal.
+    destruct ll as [| l1]; [ easy | ].
+    destruct l1 as [| e1]; [ easy | ].
+    cbn.
+    rewrite IHn.
+...
 
 Theorem bmat_def_add_loop_Z_pow_def_l :
     ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
