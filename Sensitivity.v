@@ -2498,7 +2498,36 @@ Definition mat_add T add (MA MB : matrix T) : matrix T :=
   {| mat_def := mat_def_add add (mat_def MA) (mat_def MB);
      mat_coh_prop := mat_coh_prop_add add MA MB |}.
 
+Fixpoint bmat_op_map_loop T U it (fz : U) fxx fxm fmx fmm
+    (MA MB : bmatrix_def T) :=
+  match it with
+  | 0 => fz
+  | S it' =>
+      match MA with
+      | BM_1 xa =>
+          match MB with
+          | BM_1 xb => fxx xa xb
+          | BM_M MMB => fxm xa MMB
+          end
+      | BM_M MMA =>
+          match MB with
+          | BM_1 xb => fmx MMA xb
+          | BM_M MMB => fmm (bmat_op_map_loop it' fz fxx fxm fmx fmm) MMA MMB
+          end
+      end
+  end.
+
+Definition bmat_op_map T U (fz : U) fxx fxm fmx fmm (MA MB : bmatrix_def T) :=
+  bmat_op_map_loop (bmat_depth MA) fz fxx fxm fmx fmm MA MB.
+
 (* addition of block matrices *)
+
+Definition bmat_def_add' T {so : semiring_op T} :=
+  bmat_op_map void_bmat_def (λ xa xb, BM_1 (xa + xb)%Srng)
+    (λ xa mb, void_bmat_def) (λ ma xb, void_bmat_def)
+    (λ f ma mb, BM_M (mat_def_add f ma mb)).
+
+...
 
 Fixpoint bmat_def_add_loop T {so : semiring_op T} it
     (MM1 MM2 : bmatrix_def T) :=
