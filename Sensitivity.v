@@ -4189,30 +4189,16 @@ f_equal. {
   f_equal; [ now apply IHn | ].
   now destruct l1.
 }
-...
-destruct Hss as (Hss1 & Hss2).
-destruct l as [| e1]; [ easy | ].
-destruct Hss1 as (Hss11, Hss12).
-rewrite IHn; [ | easy ].
-destruct l as [| e2]; [ easy | ].
-destruct Hss12 as (Hss121, Hss122).
-rewrite IHn; [ | easy ].
-destruct l; [ f_equal | easy ].
-destruct ll as [| l1]; [ easy | ].
-destruct Hss2 as (Hss21, Hss22).
-destruct l1 as [| e3]; [ easy | ].
-...
-
-Theorem Z_IZ_2_pow_def_have_same_struct : ∀ T {so : semiring_op T} u n,
-  has_same_bmat_def_struct (Z_2_pow_def n) (IZ_2_pow_def u n) = true.
-Proof.
-intros.
-revert u.
-induction n; intros; [ easy | cbn ].
-rewrite IHn.
-cbn.
-rewrite Bool.andb_false_r.
-...
+destruct ll as [| l2]; [ easy | ].
+f_equal. {
+  destruct l2 as [| e2]; [ easy | ].
+  f_equal; [ now apply IHn | ].
+  destruct l2 as [| e3]; [ easy | ].
+  f_equal; [ now apply IHn | ].
+  now destruct l2.
+}
+now destruct ll.
+Qed.
 
 Theorem bmat_def_add_Z_IZ_2_pow_def :
     ∀ T {so : semiring_op T } {sp : semiring_prop T} u n,
@@ -4221,16 +4207,10 @@ Theorem bmat_def_add_Z_IZ_2_pow_def :
 Proof.
 intros.
 apply bmat_def_add_Z_2_pow_def_l; [ easy | ].
-...
-revert u.
-induction n; intros; cbn; [ now rewrite srng_add_0_l | ].
-f_equal; f_equal.
-specialize (IHn 0%Srng) as H1.
-cbn in H1; rewrite H1; clear H1.
-specialize (IHn u) as H1.
-cbn in H1; rewrite H1; clear H1.
-easy.
+now revert u; induction n.
 Qed.
+
+...
 
 Theorem bmat_def_add_loop_IZ_Z_2_pow_def :
     ∀ T {so : semiring_op T } {sp : semiring_prop T} u n,
