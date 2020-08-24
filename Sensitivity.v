@@ -4295,6 +4295,22 @@ set (toto :=
   destruct llb as [| lb]; [ easy | ].
   cbn.
   f_equal; [ | apply IHlla ].
+set (titi :=   (fix list_add (l0 l3 : list (bmatrix_def T)) {struct l0} :
+     list (bmatrix_def T) :=
+     match l0 with
+     | [] => []
+     | e1 :: l'1 =>
+         match l3 with
+         | [] => []
+         | e2 :: l'2 => bmat_def_add e1 e2 :: list_add l'1 l'2
+         end
+     end)).
+  revert lb.
+  induction la as [| a]; intros; [ now destruct lb | ].
+  cbn.
+  destruct lb as [| b]; [ easy | ].
+  cbn.
+  rewrite IHla; f_equal.
 ...
 
 Theorem bmat_def_add_Z_IZ_2_pow :
