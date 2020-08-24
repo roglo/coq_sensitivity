@@ -4180,7 +4180,16 @@ cbn - [ Nat.eq_dec ].
 cbn in Hss.
 destruct Hss as (Hr & Hc & Hss).
 subst r c; cbn; f_equal.
-destruct ll as [| l]; [ easy | ].
+destruct ll as [| l1]; [ easy | ].
+destruct Hss as (H1 & H2).
+f_equal. {
+  destruct l1 as [| e1]; [ easy | ].
+  f_equal; [ now apply IHn | ].
+  destruct l1 as [| e2]; [ easy | ].
+  f_equal; [ now apply IHn | ].
+  now destruct l1.
+}
+...
 destruct Hss as (Hss1 & Hss2).
 destruct l as [| e1]; [ easy | ].
 destruct Hss1 as (Hss11, Hss12).
