@@ -4213,7 +4213,7 @@ Fixpoint has_same_bmat_def_struct T (MA MB : bmatrix_def T) :=
         end
   end.
 
-Theorem bmat_def_add_Z_2_pow_def_l :
+Theorem bmat_def_add_Z_2_pow_l :
     ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
   has_same_bmat_def_struct (Z_2_pow_def n) M
   → bmat_def_add (Z_2_pow_def n) M = M.
@@ -4251,7 +4251,29 @@ f_equal. {
 now destruct ll.
 Qed.
 
-Theorem bmat_def_add_Z_IZ_2_pow_def :
+Theorem bmat_def_add_comm :
+    ∀ T {so : semiring_op T } {sp : semiring_prop T} MA MB,
+  bmat_def_add MA MB = bmat_def_add MB MA.
+Proof.
+intros.
+destruct MA as [xa| ma]. {
+  destruct MB as [xb| mb]; [ | easy ].
+  now cbn; rewrite srng_add_comm.
+}
+destruct MB as [xb| mb]; [ easy | ].
+destruct ma as (lla, ra, ca).
+destruct mb as (llb, rb, cb).
+cbn - [ Nat.eq_dec ].
+destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]. {
+  subst rb.
+  destruct (Nat.eq_dec ra ra) as [H| H]; [ clear H | easy ].
+  destruct (Nat.eq_dec ca cb) as [Hcc| Hcc]. {
+    subst cb.
+    destruct (Nat.eq_dec ca ca) as [H| H]; [ clear H | easy ].
+    f_equal; f_equal.
+...
+
+Theorem bmat_def_add_Z_IZ_2_pow :
     ∀ T {so : semiring_op T } {sp : semiring_prop T} u n,
   bmat_def_add (Z_2_pow_def n) (IZ_2_pow_def u n) =
   IZ_2_pow_def u n.
@@ -4263,12 +4285,13 @@ Qed.
 
 ...
 
-Theorem bmat_def_add_loop_IZ_Z_2_pow_def :
+Theorem bmat_def_add_IZ_Z_2_pow_def :
     ∀ T {so : semiring_op T } {sp : semiring_prop T} u n,
-  bmat_def_add_loop (S n) (IZ_2_pow_def u n) (Z_2_pow_def n) =
+  bmat_def_add (IZ_2_pow_def u n) (Z_2_pow_def n) =
   IZ_2_pow_def u n.
 Proof.
 intros.
+...
 revert u.
 induction n; intros; cbn; [ now rewrite srng_add_0_r | ].
 f_equal; f_equal.
