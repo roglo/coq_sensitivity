@@ -2513,7 +2513,7 @@ Fixpoint bmat_def_add_loop T {so : semiring_op T} it
           end
       | BM_M MMA =>
           match MM2 with
-          | BM_1 MB => void_bmat_def
+          | BM_1 xb => void_bmat_def
           | BM_M MMB =>
               BM_M (mat_def_add (bmat_def_add_loop it') MMA MMB)
           end
@@ -4068,8 +4068,30 @@ Theorem fold_I_2_pow_def : ∀ T {so : semiring_op T} n,
   IZ_2_pow_def 1%Srng n = I_2_pow_def n.
 Proof. easy. Qed.
 
-Definition has_same_bmat_def_struct MA MB :=
+Fixpoint has_same_bmat_def_struct_loop T it (MA MB : bmatrix_def T) :=
+  match it with
+  | 0 => false
+  | S it' =>
+      match MA with
+      | BM_1 xa =>
+          match MB with
+          | BM_1 xb => true
+          | BM_M MMB => false
+          end
+      | BM_M MMA =>
+          match MB with
+          | BM_1 xb => false
+          | BM_M MMB =>
+              Nat.eqb (mat_nrows MMA) (mat_nrows MMB) &&
+              Nat.eqb (mat_ncols MMA) (mat_ncols MMB) &&
 ...
+              fold_left
+                (λ b r, fold_left (λ b c, b && has_same_bmat_def_struct_loop it' MMA MMB
+            (mat_list BMM) true
+...
+          end
+      end
+  end.
 
 Theorem bmat_def_add_loop_Z_pow_def_l :
     ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
