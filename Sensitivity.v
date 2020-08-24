@@ -4248,18 +4248,41 @@ f_equal. {
 now destruct ll.
 Qed.
 
+Definition list_list_add_spe T {so : semiring_op T} :=
+  fix f (ll1 ll2 : list (list (bmatrix_def T))) :=
+  match ll1 with
+  | [] => []
+  | l1 :: ll'1 =>
+    match ll2 with
+    | [] => []
+    | l2 :: ll'2 =>
+      (fix list_add (l0 l3 : list (bmatrix_def T)) {struct l0} :
+         list (bmatrix_def T) :=
+         match l0 with
+         | [] => []
+         | e1 :: l'1 =>
+           match l3 with
+           | [] => []
+           | e2 :: l'2 => bmat_def_add e1 e2 :: list_add l'1 l'2
+           end
+         end) l1 l2 :: f ll'1 ll'2
+    end
+  end.
+
 Theorem bmat_def_add_comm :
     ∀ T {so : semiring_op T } {sp : semiring_prop T} MA MB,
   bmat_def_add MA MB = bmat_def_add MB MA.
 Proof.
 intros.
-destruct MA as [xa| ma]. {
+revert MB.
+induction MA as [xa| ma IHMA] using bmatrix_ind; intros. {
   destruct MB as [xb| mb]; [ | easy ].
   now cbn; rewrite srng_add_comm.
 }
 destruct MB as [xb| mb]; [ easy | ].
 destruct ma as (lla, ra, ca).
 destruct mb as (llb, rb, cb).
+cbn in IHMA.
 cbn - [ Nat.eq_dec ].
 destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]. {
   subst rb.
@@ -4268,49 +4291,47 @@ destruct (Nat.eq_dec ra rb) as [Hrr| Hrr]. {
     subst cb.
     destruct (Nat.eq_dec ca ca) as [H| H]; [ clear H | easy ].
     f_equal; f_equal.
-set (toto :=
-  (fix list_list_add (ll1 ll2 : list (list (bmatrix_def T))) {struct ll1} :
-     list (list (bmatrix_def T)) :=
-     match ll1 with
-     | [] => []
-     | l1 :: ll'1 =>
-         match ll2 with
-         | [] => []
-         | l2 :: ll'2 =>
-             (fix list_add (l0 l3 : list (bmatrix_def T)) {struct l0} :
-                list (bmatrix_def T) :=
-                match l0 with
-                | [] => []
-                | e1 :: l'1 =>
-                    match l3 with
-                    | [] => []
-                    | e2 :: l'2 => bmat_def_add e1 e2 :: list_add l'1 l'2
-                    end
-                end) l1 l2 :: list_list_add ll'1 ll'2
-         end
-     end)).
-  revert llb.
-  induction lla as [| la]; intros; [ now destruct llb | ].
-  cbn.
-  destruct llb as [| lb]; [ easy | ].
-  cbn.
-  f_equal; [ | apply IHlla ].
-set (titi :=   (fix list_add (l0 l3 : list (bmatrix_def T)) {struct l0} :
-     list (bmatrix_def T) :=
-     match l0 with
-     | [] => []
-     | e1 :: l'1 =>
-         match l3 with
-         | [] => []
-         | e2 :: l'2 => bmat_def_add e1 e2 :: list_add l'1 l'2
-         end
-     end)).
-  revert lb.
-  induction la as [| a]; intros; [ now destruct lb | ].
-  cbn.
-  destruct lb as [| b]; [ easy | ].
-  cbn.
-  rewrite IHla; f_equal.
+    fold (@list_list_add_spe T so).
+    revert llb.
+    induction lla as [| la]; intros; [ now destruct llb | ].
+    cbn.
+    destruct llb as [| lb]; [ easy | ].
+    cbn.
+    f_equal. {
+      set
+        (titi :=
+           fix list_add (l0 l3 : list (bmatrix_def T)) {struct l0} :
+             list (bmatrix_def T) :=
+             match l0 with
+             | [] => []
+             | e1 :: l'1 =>
+               match l3 with
+               | [] => []
+               | e2 :: l'2 => bmat_def_add e1 e2 :: list_add l'1 l'2
+               end
+             end).
+      revert lb.
+      induction la as [| a]; intros; [ now destruct lb | cbn ].
+      destruct lb as [| b]; [ easy | ].
+      cbn.
+      f_equal; [ now apply (IHMA (a :: la)); left | ].
+      apply IHla; cbn - [ In ].
+      intros la1 Hla1 a1 Ha1 b1.
+      destruct Hla1 as [Hla1| Hla1]. {
+        subst la1.
+        apply (IHMA (a :: la)); [ now left | now right ].
+      }
+      apply (IHMA la1); [ now right | easy ].
+    }
+    apply IHlla.
+    intros la1 Hla1 a1 Ha1 b1.
+    apply (IHMA la1); [ now right | easy ].
+  }
+  destruct (Nat.eq_dec cb ca) as [H| H]; [ now symmetry in H | easy ].
+}
+destruct (Nat.eq_dec rb ra) as [H| H]; [ now symmetry in H | easy ].
+Qed.
+
 ...
 
 Theorem bmat_def_add_Z_IZ_2_pow :
