@@ -3385,6 +3385,50 @@ Compute (let _ := nat_semiring_op in mat_ncols (mat_def (mat_mul (mat_of_list [[
 
 (* multiplication of block matrices *)
 
+Fixpoint bmat_def_mul T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
+  match MM1 with
+  | BM_1 xa =>
+      match MM2 with
+      | BM_1 xb => BM_1 (xa * xb)%Srng
+      | BM_M _ => void_bmat_def
+      end
+  | BM_M MMA =>
+      match MM2 with
+      | BM_1 _ => void_bmat_def
+      | BM_M MMB =>
+          let fix list_mul_loop a l1 l2 :=
+            match (l1, l2) with
+            | (e1 :: l'1, e2 :: l'2) =>
+                list_mul_loop (bmat_def_add a (bmat_def_mul e1 e2)) l'1 l'2
+            | _ => a
+            end
+          in
+          let list_mul l1 l2 :=
+            match (l1, l2) with
+            | (e1 :: l'1, e2 :: l'2) =>
+                list_mul_loop (bmat_def_mul e1 e2) l'1 l'2
+            | _ =>
+                void_bmat_def
+            end
+          in
+          let list_list_mul ll1 ll2 :=
+            map
+              (λ l1,
+                 map (list_mul l1)
+                   (list_list_transpose void_bmat_def ll2)) ll1
+          in
+          let r :=
+            if Nat.eq_dec (mat_ncols MMA) (mat_nrows MMB) then
+              {| mat_list := list_list_mul (mat_list MMA) (mat_list MMB);
+                 mat_nrows := mat_nrows MMA;
+                 mat_ncols := mat_ncols MMB |}
+            else void_mat_def
+          in
+          BM_M r
+      end
+  end.
+
+(*
 Fixpoint bmat_def_mul_loop T {so : semiring_op T} (it : nat)
   (MM1 MM2 : bmatrix_def T) {struct it} : bmatrix_def T :=
   match it with
@@ -3417,6 +3461,7 @@ Definition bmat_def_mul T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
 Theorem fold_bmat_def_mul : ∀ T {so : semiring_op T} (MA MB : bmatrix_def T),
   bmat_def_mul_loop (bmat_depth MA) MA MB = bmat_def_mul MA MB.
 Proof. easy. Qed.
+*)
 
 Fixpoint old_bmat_def_mul_loop T {so : semiring_op T} it
      (MM1 MM2 : bmatrix_def T) :=
@@ -3475,6 +3520,7 @@ destruct Hlc as [Hlc| Hlc]. {
 }
 Qed.
 
+(*
 Theorem bmat_mul_loop_matrix_coh_prop :
   ∀ T {so : semiring_op T} ita BMAD BMBD ab,
   bmatrix_coh_prop BMAD
@@ -3547,7 +3593,9 @@ split. {
 rewrite Hab; cbn.
 split; intros H; [ now apply Hbrc, Harc | now apply Harc, Hbrc ].
 Qed.
+*)
 
+(*
 Theorem bmat_coh_prop_mul_gen : ∀ T {so : semiring_op T} ita itn
     (BMA BMB : bmatrix T),
   bmat_depth (bmat_def BMA) ≤ ita
@@ -3824,6 +3872,7 @@ Theorem glop : ∀ T (so : semiring_op T) MA MB it,
 (* bon mais, admettons, si j'arrive à prouver ça, comment je prouve
    tout ce qui s'ensuit, moi ? *)
 ...
+*)
 
 Theorem bmat_coh_prop_mul : ∀ T {so : semiring_op T} BMA BMB,
   bmatrix_coh (bmat_def_mul (bmat_def BMA) (bmat_def BMB)) = true.
@@ -4023,6 +4072,7 @@ rewrite bmat_depth_I_2_pow.
 now do 3 rewrite Nat.max_id.
 Qed.
 
+(*
 Theorem bmat_def_mul_loop_enough_iter : ∀ T {ro : ring_op T},
   ∀ (so := rng_semiring) it1 it2 bso1 bso2 MA MB,
   @srng_zero _ bso1 = @srng_zero _ bso2
@@ -4117,6 +4167,7 @@ induction la as [| a1]. {
 Abort. (*
 ...
 Unset Printing Implicit.
+*)
 *)
 
 Theorem fold_Z_2_pow_def : ∀ T {so : semiring_op T} n,
