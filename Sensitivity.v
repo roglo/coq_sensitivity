@@ -4068,6 +4068,21 @@ Theorem fold_I_2_pow_def : ∀ T {so : semiring_op T} n,
   IZ_2_pow_def 1%Srng n = I_2_pow_def n.
 Proof. easy. Qed.
 
+Fixpoint has_same_list_struct T test_el (la lb : list T) :=
+  match (la, lb) with
+  | (a :: la', b :: lb') =>
+      test_el a b && has_same_list_struct test_el la' lb'
+  | _ => false
+  end.
+
+Fixpoint has_same_list_list_struct T test_el (lla llb : list (list T)) :=
+  match (lla, llb) with
+  | (la :: lla', lb :: llb') =>
+      has_same_list_struct test_el la lb &&
+      has_same_list_list_struct test_el lla' llb'
+  | _ => false
+  end.
+
 Fixpoint has_same_bmat_def_struct_loop T it (MA MB : bmatrix_def T) :=
   match it with
   | 0 => false
@@ -4084,23 +4099,25 @@ Fixpoint has_same_bmat_def_struct_loop T it (MA MB : bmatrix_def T) :=
           | BM_M MMB =>
               Nat.eqb (mat_nrows MMA) (mat_nrows MMB) &&
               Nat.eqb (mat_ncols MMA) (mat_ncols MMB) &&
-...
-              fold_left
-                (λ b r, fold_left (λ b c, b && has_same_bmat_def_struct_loop it' MMA MMB
-            (mat_list BMM) true
-...
+              has_same_list_list_struct (has_same_bmat_def_struct_loop it')
+                (mat_list MMA) (mat_list MMB)
           end
       end
   end.
+
+Definition has_same_bmat_def_struct T (MA MB : bmatrix_def T) :=
+  has_same_bmat_def_struct_loop (bmat_depth MA) MA MB = true.
 
 Theorem bmat_def_add_loop_Z_pow_def_l :
     ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
   has_same_bmat_def_struct (Z_2_pow_def n) M
   → bmat_def_add_loop (S n) (Z_2_pow_def n) M = M.
 Proof.
-intros * Hss.
+intros * sp * Hss.
+revert M Hss.
 induction n; intros; cbn. {
-  destruct M as [x| M]; [ now rewrite srng_add_0_l | ].
+  destruct M as [x| M]; [ now rewrite srng_add_0_l | easy ].
+}
 ...
 induction n; intros; cbn; [ now rewrite srng_add_0_l | ].
 f_equal; f_equal.
