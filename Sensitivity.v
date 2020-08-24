@@ -2498,7 +2498,18 @@ Definition mat_add T add (MA MB : matrix T) : matrix T :=
   {| mat_def := mat_def_add add (mat_def MA) (mat_def MB);
      mat_coh_prop := mat_coh_prop_add add MA MB |}.
 
-Fixpoint bmat_op_map_loop T U it (fz : U) fxx fxm fmx fmm
+(* iterator for operations on values of type bmatrix_def *)
+
+Class bmat_def_op T U :=
+  { fz : U;
+    fxx : T → T → U;
+    fxm : T → matrix_def (bmatrix_def T) → U;
+    fmx : matrix_def (bmatrix_def T) → T → U;
+    fmm :
+      (bmatrix_def T → bmatrix_def T → U)
+      → matrix_def (bmatrix_def T) → matrix_def (bmatrix_def T) → U }.
+
+Fixpoint bmat_def_op_iter_loop T U (op_rec : bmat_def_op T U) it
     (MA MB : bmatrix_def T) :=
   match it with
   | 0 => fz
@@ -2512,23 +2523,28 @@ Fixpoint bmat_op_map_loop T U it (fz : U) fxx fxm fmx fmm
       | BM_M MMA =>
           match MB with
           | BM_1 xb => fmx MMA xb
-          | BM_M MMB => fmm (bmat_op_map_loop it' fz fxx fxm fmx fmm) MMA MMB
+          | BM_M MMB => fmm (@bmat_def_op_iter_loop T U op_rec it') MMA MMB
           end
       end
   end.
 
-Definition bmat_op_map T U (fz : U) fxx fxm fmx fmm (MA MB : bmatrix_def T) :=
-  bmat_op_map_loop (bmat_depth MA) fz fxx fxm fmx fmm MA MB.
+Definition bmat_def_op_iter T U (op_rec : bmat_def_op T U)
+    (MA MB : bmatrix_def T) :=
+  bmat_def_op_iter_loop op_rec (bmat_depth MA) MA MB.
 
 (* addition of block matrices *)
 
-Definition bmat_def_add' T {so : semiring_op T} :=
-  bmat_op_map void_bmat_def (λ xa xb, BM_1 (xa + xb)%Srng)
-    (λ xa mb, void_bmat_def) (λ ma xb, void_bmat_def)
-    (λ f ma mb, BM_M (mat_def_add f ma mb)).
+Definition bmat_def_add T {so : semiring_op T} :=
+  bmat_def_op_iter
+    {| fz := void_bmat_def;
+       fxx xa xb := BM_1 (xa + xb)%Srng;
+       fxm xa mb := void_bmat_def;
+       fmx ma xb := void_bmat_def;
+       fmm f ma mb := BM_M (mat_def_add f ma mb) |}.
 
 ...
 
+(*
 Fixpoint bmat_def_add_loop T {so : semiring_op T} it
     (MM1 MM2 : bmatrix_def T) :=
   match it with
@@ -2555,6 +2571,7 @@ Definition bmat_def_add T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
 Theorem fold_bmat_def_add : ∀ T {so : semiring_op T} (MA MB : bmatrix_def T),
   bmat_def_add_loop (bmat_depth MA) MA MB = bmat_def_add MA MB.
 Proof. easy. Qed.
+*)
 
 Theorem length_list_list_add :
   ∀ (T : Type) (add : bmatrix_def T → bmatrix_def T → bmatrix_def T)
@@ -2616,6 +2633,7 @@ destruct Hlc as [Hlc| Hlc]. {
 }
 Qed.
 
+(*
 Theorem bmat_add_loop_matrix_coh_prop :
   ∀ T {so : semiring_op T} ita BMAD BMBD ab,
   bmatrix_coh_prop BMAD
@@ -2981,6 +2999,7 @@ Qed.
 Definition bmat_add T {so : semiring_op T} (BMA BMB : bmatrix T) :=
   {| bmat_def := bmat_def_add (bmat_def BMA) (bmat_def BMB);
      bmat_coh_prop := bmat_coh_prop_add BMA BMB |}.
+*)
 
 Theorem list_add_add_compat : ∀ T (add1 add2 : T → T → T) la lb,
   (∀ a b, a ∈ la → b ∈ lb → add1 a b = add2 a b)
@@ -3014,6 +3033,12 @@ apply IHlla.
 intros la1 lb1 Hla1 Hlb1 * Ha Hb.
 apply (Hadd la1 lb1); [ now right | now right | easy | easy ].
 Qed.
+
+Theorem bmat_def_op_map_loop_enough_iter : ∀ T U {ro : semiring_op T} it (fz : U) fxx fxm fmx fmm (Ma Mb : bmatrix_def T),
+  bmat_depth Ma ≤ it
+  → bmat_def_op_map_loop it fz fxx fxm fmx fmm Ma Mb = bmat_def_op_map fz fxx fxm fmx fmm Ma Mb.
+Proof.
+...
 
 Theorem bmat_def_add_loop_enough_iter : ∀ T {ro : semiring_op T} it Ma Mb,
   bmat_depth Ma ≤ it
