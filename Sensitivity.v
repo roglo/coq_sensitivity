@@ -2500,9 +2500,6 @@ Definition mat_add T add (MA MB : matrix T) : matrix T :=
 
 (* addition of block matrices *)
 
-(* no more need to use a maximun of iterations here, but the code
-   of list_list and list_list_add had to be inlined *)
-
 Fixpoint bmat_def_add T {so : semiring_op T} (MM1 MM2 : bmatrix_def T) :=
   match MM1 with
   | BM_1 xa =>
