@@ -2102,6 +2102,59 @@ Qed.
 Theorem has_same_bmat_struct_symm : ∀ T, symmetric _ (@has_same_bmat_struct T).
 Proof.
 intros * MA MB HMM.
+revert MB HMM.
+induction MA as [xa| ma IHMA] using bmatrix_ind2; intros; [ now destruct MB | ].
+destruct MB as [xb| mb]; [ easy | ].
+cbn in HMM |-*.
+destruct ma as (lla); destruct mb as (llb).
+cbn in IHMA, HMM |-*.
+set (titi := fix has_same_list_struct (la0 lb0 : list (bmatrix T)) {struct la0} : Prop :=
+                       match la0 with
+                       | [] => match lb0 with
+                               | [] => True
+                               | _ :: _ => False
+                               end
+                       | a :: la' =>
+                           match lb0 with
+                           | [] => False
+                           | b :: lb' => has_same_bmat_struct a b ∧ has_same_list_struct la' lb'
+                           end
+                       end).
+set (toto :=
+  fix has_same_list_list_struct (lla0 llb0 : list (list (bmatrix T))) {struct lla0} : Prop :=
+     match lla0 with
+     | [] => match llb0 with
+             | [] => True
+             | _ :: _ => False
+             end
+     | la :: lla' =>
+         match llb0 with
+         | [] => False
+         | lb :: llb' => titi la lb ∧ has_same_list_list_struct lla' llb'
+         end
+     end).
+fold titi toto in HMM.
+revert llb HMM.
+induction lla as [| la]; intros; [ now destruct llb | ].
+destruct llb as [| lb]; [ easy | ].
+cbn in HMM |-*.
+split. {
+  destruct HMM as (Hlab, Hllab).
+  revert lb Hlab.
+  induction la as [| a]; intros; [ now destruct lb | ].
+  destruct lb as [| b]; [ easy | ].
+  cbn in Hlab |-*.
+  split. {
+    apply (IHMA _ (or_introl eq_refl)); [ now left | easy ].
+  }
+  apply IHla; [ | easy ].
+  intros la1 Hla1 a1 Ha1 b1 Hab.
+  destruct Hla1 as [Hla1| Hla1]. {
+    subst la1.
+    apply (IHMA _ (or_introl eq_refl)); [ now right | easy ].
+  }
+  now apply (IHMA _ (or_intror Hla1)).
+}
 ...
 
 Theorem has_same_bmat_struct_trans : ∀ T, transitive _ (@has_same_bmat_struct T).
