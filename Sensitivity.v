@@ -2429,8 +2429,8 @@ cbn in Hss.
 cbn; f_equal.
 destruct ll as [| l1]; [ easy | ].
 destruct Hss as (H1 & H2).
+destruct l1 as [| e1]; [ easy | cbn ].
 f_equal. {
-  destruct l1 as [| e1]; [ easy | cbn ].
   f_equal. {
     destruct ll as [| l2]; [ easy | cbn ].
     rewrite IHn; [ | easy ].
@@ -2440,6 +2440,13 @@ f_equal. {
       transitivity (I_2_pow n); [ | easy ].
       apply has_same_bmat_struct_IZ_IZ.
     }
+    destruct l2 as [| e2]; [ easy | cbn ].
+    transitivity (Z_2_pow n); [ | easy ].
+    apply has_same_bmat_struct_IZ_IZ.
+  }
+  destruct l1 as [| e2]; [ easy | cbn ].
+  f_equal. {
+    destruct ll as [| l2]; [ easy | cbn ].
 ...
   f_equal; [ now apply IHn | ].
   destruct l1 as [| e2]; [ easy | ].
