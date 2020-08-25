@@ -1757,12 +1757,14 @@ Qed.
 
 (* transposition *)
 
-Definition list_list_transpose {T} d (ll : list (list T)) : list (list T) :=
-  let r := list_list_nrows ll in
-  let c := list_list_ncols ll in
-  map (λ i, map (λ j, list_list_el d ll j i) (seq 0 r)) (seq 0 c).
+Fixpoint list_list_transp_loop T it d (ll : list (list T)) :=
+  match it with
+  | 0 => []
+  | S it' => map (hd d) ll :: list_list_transp_loop it' d (map (@tl _) ll)
+  end.
 
-...
+Definition list_list_transpose T d (ll : list (list T)) :=
+  list_list_transp_loop (length (hd [] ll)) d ll.
 
 Compute (list_list_transpose 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]).
 
@@ -2164,6 +2166,29 @@ f_equal. {
 now destruct ll.
 Qed.
 
+Theorem bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
+  has_same_bmat_struct (I_2_pow n) M
+  → bmat_mul (Z_2_pow n) M = Z_2_pow n.
+Proof.
+intros * sp * Hss.
+revert M Hss.
+induction n; intros; cbn. {
+  destruct M as [xm| mm]; [ now rewrite srng_mul_0_l | easy ].
+}
+destruct M as [xm| mm]; [ easy | ].
+f_equal; f_equal.
+destruct mm as (ll).
+destruct ll as [| l1]; [ easy | ].
+destruct l1 as [| e1]; [ now cbn in Hss | ].
+cbn in Hss.
+f_equal. {
+  cbn.
+  f_equal. {
+    destruct ll as [| l2]; [ easy | cbn ].
+    rewrite IHn; [ | easy ].
+    rewrite IHn. 2: {
+...
+
 Theorem bmat_mul_1_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
   has_same_bmat_struct (I_2_pow n) M
   → bmat_mul (I_2_pow n) M = M.
@@ -2183,9 +2208,11 @@ cbn; f_equal.
 destruct ll as [| l1]; [ easy | ].
 destruct Hss as (H1 & H2).
 f_equal. {
-  destruct l1 as [| e1]; [ easy | ].
-...
+  destruct l1 as [| e1]; [ easy | cbn ].
   f_equal. {
+    destruct ll as [| l2]; [ easy | cbn ].
+    rewrite IHn; [ | easy ].
+    rewrite bmat_mul_0_l.
 ...
   f_equal; [ now apply IHn | ].
   destruct l1 as [| e2]; [ easy | ].
