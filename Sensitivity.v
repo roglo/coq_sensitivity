@@ -1999,6 +1999,10 @@ Fixpoint IZ_2_pow T {so : semiring_op T} (u : T) n :=
 Definition I_2_pow T {so : semiring_op T} := IZ_2_pow 1%Srng.
 Definition Z_2_pow T {so : semiring_op T} := IZ_2_pow 0%Srng.
 
+Theorem fold_Z_2_pow : ∀ T {so : semiring_op T} n,
+  IZ_2_pow 0%Srng n = Z_2_pow n.
+Proof. easy. Qed.
+
 Fixpoint A T {ro : ring_op T} (so := rng_semiring) n : bmatrix T :=
   match n with
   | 0 => BM_1 0%Srng
@@ -2320,6 +2324,29 @@ f_equal. {
 now destruct ll.
 Qed.
 
+Theorem bmat_add_0_r : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
+  has_same_bmat_struct (Z_2_pow n) M
+  → bmat_add M (Z_2_pow n) = M.
+Proof.
+intros * sp * Hss.
+rewrite bmat_add_comm; [ | easy ].
+now apply bmat_add_0_l.
+Qed.
+
+Theorem has_same_bmat_struct_IZ_IZ : ∀ T {so : semiring_op T} u v n,
+  has_same_bmat_struct (IZ_2_pow u n) (IZ_2_pow v n).
+Proof.
+intros.
+revert u v.
+induction n; intros; [ easy | cbn ].
+split. {
+  split; [ apply IHn | easy ].
+}
+split; [ | easy ].
+split; [ | easy ].
+apply IHn.
+Qed.
+
 Theorem bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
   has_same_bmat_struct (I_2_pow n) M
   → bmat_mul (Z_2_pow n) M = Z_2_pow n.
@@ -2343,7 +2370,46 @@ f_equal. {
     rewrite IHn. 2: {
       destruct l2 as [| e2]; [ easy | cbn ].
       transitivity (Z_2_pow n); [ | easy ].
-...
+      apply has_same_bmat_struct_IZ_IZ.
+    }
+    apply bmat_add_0_l; [ easy | ].
+    apply has_same_bmat_struct_IZ_IZ.
+  }
+  destruct ll as [| l2]; [ easy | ].
+  cbn.
+  destruct l1 as [| e2]; [ easy | cbn ].
+  f_equal. {
+    rewrite IHn. 2: {
+      transitivity (Z_2_pow n); [ | easy ].
+      apply has_same_bmat_struct_IZ_IZ.
+    }
+    rewrite IHn; [ now apply bmat_add_0_l | ].
+    destruct l2 as [| e3]; [ easy | now destruct l2 ].
+  }
+  destruct ll as [| l3]; [ now destruct l1 | easy ].
+}
+cbn.
+destruct ll as [| l2]; [ easy | cbn ].
+f_equal; f_equal. {
+  rewrite IHn; [ | easy ].
+  rewrite IHn; [ now apply bmat_add_0_l | ].
+  destruct l2 as [| e2]; [ easy | cbn ].
+  transitivity (Z_2_pow n); [ | easy ].
+  apply has_same_bmat_struct_IZ_IZ.
+}
+destruct ll as [| l3]; [ cbn | easy ].
+destruct l1 as [| e2]; [ easy | cbn ].
+f_equal; [ | now destruct l1 ].
+rewrite IHn. 2: {
+  transitivity (Z_2_pow n); [ | easy ].
+  apply has_same_bmat_struct_IZ_IZ.
+}
+rewrite IHn. {
+  apply bmat_add_0_l; [ easy | ].
+  apply has_same_bmat_struct_IZ_IZ.
+}
+destruct l2 as [| e3]; [ easy | now destruct l2 ].
+Qed.
 
 Theorem bmat_mul_1_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
   has_same_bmat_struct (I_2_pow n) M
@@ -2368,7 +2434,12 @@ f_equal. {
   f_equal. {
     destruct ll as [| l2]; [ easy | cbn ].
     rewrite IHn; [ | easy ].
-    rewrite bmat_mul_0_l.
+    rewrite fold_Z_2_pow.
+    rewrite bmat_mul_0_l; [ | easy | ]. {
+      apply bmat_add_0_r; [ easy | ].
+      transitivity (I_2_pow n); [ | easy ].
+      apply has_same_bmat_struct_IZ_IZ.
+    }
 ...
   f_equal; [ now apply IHn | ].
   destruct l1 as [| e2]; [ easy | ].
