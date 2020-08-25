@@ -2062,7 +2062,7 @@ Fixpoint bmat_nat_mul_l T {so : semiring_op T} n BM :=
       BM_M {| mat_list := map (map (bmat_nat_mul_l n)) (mat_list M) |}
   end.
 
-Fixpoint has_same_bmat_struct T (MA MB : bmatrix T) :=
+Fixpoint have_same_bmat_struct T (MA MB : bmatrix T) :=
   match MA with
   | BM_1 xa =>
       match MB with
@@ -2080,7 +2080,7 @@ Fixpoint has_same_bmat_struct T (MA MB : bmatrix T) :=
                 match lb with
                 | [] => False
                 | b :: lb' =>
-                    has_same_bmat_struct a b ∧
+                    have_same_bmat_struct a b ∧
                     has_same_list_struct la' lb'
                 end
             end
@@ -2109,7 +2109,7 @@ Definition has_same_list_struct T :=
         match lb with
         | [] => False
         | b :: lb' =>
-            has_same_bmat_struct a b ∧
+            have_same_bmat_struct a b ∧
             has_same_list_struct la' lb'
         end
     end.
@@ -2129,7 +2129,7 @@ Definition has_same_list_list_struct T :=
 
 Require Import Relations.
 
-Theorem has_same_bmat_struct_refl : ∀ T, reflexive _ (@has_same_bmat_struct T).
+Theorem have_same_bmat_struct_refl : ∀ T, reflexive _ (@have_same_bmat_struct T).
 Proof.
 intros * M.
 induction M as [x| M IHM] using bmatrix_ind2; [ easy | cbn ].
@@ -2157,7 +2157,7 @@ intros la Hla a Ha.
 apply (IHM la); [ now right | easy ].
 Qed.
 
-Theorem has_same_bmat_struct_symm : ∀ T, symmetric _ (@has_same_bmat_struct T).
+Theorem have_same_bmat_struct_symm : ∀ T, symmetric _ (@have_same_bmat_struct T).
 Proof.
 intros * MA MB HMM.
 revert MB HMM.
@@ -2196,8 +2196,8 @@ intros la1 Hla1 a1 Ha1 b1 Hab.
 now apply (IHMA _ (or_intror Hla1)).
 Qed.
 
-Theorem has_same_bmat_struct_trans : ∀ T,
-  transitive _ (@has_same_bmat_struct T).
+Theorem have_same_bmat_struct_trans : ∀ T,
+  transitive _ (@have_same_bmat_struct T).
 Proof.
 intros * MA MB MC HAB HBC.
 revert MB MC HAB HBC.
@@ -2244,11 +2244,11 @@ intros la1 Hla1 a1 Ha1 b1 c1 Hab Hbc.
 now apply (IHMA _ (or_intror Hla1)) with (MB := b1).
 Qed.
 
-Add Parametric Relation T : _ (@has_same_bmat_struct T)
- reflexivity proved by (@has_same_bmat_struct_refl T)
- symmetry proved by (@has_same_bmat_struct_symm T)
- transitivity proved by (@has_same_bmat_struct_trans T)
- as has_same_bmat_struct_equivalence.
+Add Parametric Relation T : _ (@have_same_bmat_struct T)
+ reflexivity proved by (@have_same_bmat_struct_refl T)
+ symmetry proved by (@have_same_bmat_struct_symm T)
+ transitivity proved by (@have_same_bmat_struct_trans T)
+ as have_same_bmat_struct_equivalence.
 
 Theorem bmat_add_comm :
     ∀ T {so : semiring_op T } {sp : semiring_prop T} MA MB,
@@ -2289,7 +2289,7 @@ apply (IHMA la1); [ now right | easy ].
 Qed.
 
 Theorem bmat_add_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
-  has_same_bmat_struct (Z_2_pow n) M
+  have_same_bmat_struct (Z_2_pow n) M
   → bmat_add (Z_2_pow n) M = M.
 Proof.
 intros * sp * Hss.
@@ -2325,7 +2325,7 @@ now destruct ll.
 Qed.
 
 Theorem bmat_add_0_r : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
-  has_same_bmat_struct (Z_2_pow n) M
+  have_same_bmat_struct (Z_2_pow n) M
   → bmat_add M (Z_2_pow n) = M.
 Proof.
 intros * sp * Hss.
@@ -2333,8 +2333,8 @@ rewrite bmat_add_comm; [ | easy ].
 now apply bmat_add_0_l.
 Qed.
 
-Theorem has_same_bmat_struct_IZ_IZ : ∀ T {so : semiring_op T} u v n,
-  has_same_bmat_struct (IZ_2_pow u n) (IZ_2_pow v n).
+Theorem have_same_bmat_struct_IZ_IZ : ∀ T {so : semiring_op T} u v n,
+  have_same_bmat_struct (IZ_2_pow u n) (IZ_2_pow v n).
 Proof.
 intros.
 revert u v.
@@ -2348,7 +2348,7 @@ apply IHn.
 Qed.
 
 Theorem bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
-  has_same_bmat_struct (I_2_pow n) M
+  have_same_bmat_struct (I_2_pow n) M
   → bmat_mul (Z_2_pow n) M = Z_2_pow n.
 Proof.
 intros * sp * Hss.
@@ -2370,10 +2370,10 @@ f_equal. {
     rewrite IHn. 2: {
       destruct l2 as [| e2]; [ easy | cbn ].
       transitivity (Z_2_pow n); [ | easy ].
-      apply has_same_bmat_struct_IZ_IZ.
+      apply have_same_bmat_struct_IZ_IZ.
     }
     apply bmat_add_0_l; [ easy | ].
-    apply has_same_bmat_struct_IZ_IZ.
+    apply have_same_bmat_struct_IZ_IZ.
   }
   destruct ll as [| l2]; [ easy | ].
   cbn.
@@ -2381,7 +2381,7 @@ f_equal. {
   f_equal. {
     rewrite IHn. 2: {
       transitivity (Z_2_pow n); [ | easy ].
-      apply has_same_bmat_struct_IZ_IZ.
+      apply have_same_bmat_struct_IZ_IZ.
     }
     rewrite IHn; [ now apply bmat_add_0_l | ].
     destruct l2 as [| e3]; [ easy | now destruct l2 ].
@@ -2395,24 +2395,24 @@ f_equal; f_equal. {
   rewrite IHn; [ now apply bmat_add_0_l | ].
   destruct l2 as [| e2]; [ easy | cbn ].
   transitivity (Z_2_pow n); [ | easy ].
-  apply has_same_bmat_struct_IZ_IZ.
+  apply have_same_bmat_struct_IZ_IZ.
 }
 destruct ll as [| l3]; [ cbn | easy ].
 destruct l1 as [| e2]; [ easy | cbn ].
 f_equal; [ | now destruct l1 ].
 rewrite IHn. 2: {
   transitivity (Z_2_pow n); [ | easy ].
-  apply has_same_bmat_struct_IZ_IZ.
+  apply have_same_bmat_struct_IZ_IZ.
 }
 rewrite IHn. {
   apply bmat_add_0_l; [ easy | ].
-  apply has_same_bmat_struct_IZ_IZ.
+  apply have_same_bmat_struct_IZ_IZ.
 }
 destruct l2 as [| e3]; [ easy | now destruct l2 ].
 Qed.
 
 Theorem bmat_mul_1_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
-  has_same_bmat_struct (I_2_pow n) M
+  have_same_bmat_struct (I_2_pow n) M
   → bmat_mul (I_2_pow n) M = M.
 Proof.
 intros * sp * Hss.
@@ -2438,27 +2438,39 @@ f_equal. {
     rewrite bmat_mul_0_l; [ | easy | ]. {
       apply bmat_add_0_r; [ easy | ].
       transitivity (I_2_pow n); [ | easy ].
-      apply has_same_bmat_struct_IZ_IZ.
+      apply have_same_bmat_struct_IZ_IZ.
     }
     destruct l2 as [| e2]; [ easy | cbn ].
     transitivity (Z_2_pow n); [ | easy ].
-    apply has_same_bmat_struct_IZ_IZ.
+    apply have_same_bmat_struct_IZ_IZ.
   }
   destruct l1 as [| e2]; [ easy | cbn ].
+  f_equal; [ | now destruct l1 ].
+  destruct ll as [| l2]; [ easy | cbn ].
+  rewrite IHn. 2: {
+    transitivity (Z_2_pow n); [ | easy ].
+    apply have_same_bmat_struct_IZ_IZ.
+  }
+  rewrite fold_Z_2_pow.
+  rewrite bmat_mul_0_l; [ now apply bmat_add_0_r | easy | ].
+  destruct l2 as [| e3]; [ easy | now destruct l2 ].
+}
+destruct l1 as [| e2]; [ easy | cbn ].
+destruct ll as [| l2]; [ easy | cbn ].
+f_equal. {
+  destruct l1 as [| e3]. {
+    cbn.
+    rewrite fold_Z_2_pow.
+    rewrite bmat_mul_0_l; [ | easy | easy ].
+    rewrite bmat_mul_0_l; [ | easy | ]. 2: {
+      transitivity (Z_2_pow n); [ | easy ].
+      apply have_same_bmat_struct_IZ_IZ.
+    }
+    rewrite IHn. 2: {
+...
   f_equal. {
     destruct ll as [| l2]; [ easy | cbn ].
     rewrite IHn. 2: {
-      transitivity (Z_2_pow n); [ | easy ].
-      apply has_same_bmat_struct_IZ_IZ.
-    }
-    rewrite fold_Z_2_pow.
-    rewrite bmat_mul_0_l; [ now apply bmat_add_0_r | easy | ].
-    destruct l2 as [| e3]; [ easy | now destruct l2 ].
-  }
-  cbn.
-  destruct l1 as [| e3]; [ easy | cbn ].
-  f_equal. {
-    destruct ll as [| l2]; [ easy | cbn ].
 ...
   f_equal; [ now apply IHn | ].
   destruct l1 as [| e2]; [ easy | ].
