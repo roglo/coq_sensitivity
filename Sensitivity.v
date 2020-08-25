@@ -2447,6 +2447,18 @@ f_equal. {
   destruct l1 as [| e2]; [ easy | cbn ].
   f_equal. {
     destruct ll as [| l2]; [ easy | cbn ].
+    rewrite IHn. 2: {
+      transitivity (Z_2_pow n); [ | easy ].
+      apply has_same_bmat_struct_IZ_IZ.
+    }
+    rewrite fold_Z_2_pow.
+    rewrite bmat_mul_0_l; [ now apply bmat_add_0_r | easy | ].
+    destruct l2 as [| e3]; [ easy | now destruct l2 ].
+  }
+  cbn.
+  destruct l1 as [| e3]; [ easy | cbn ].
+  f_equal. {
+    destruct ll as [| l2]; [ easy | cbn ].
 ...
   f_equal; [ now apply IHn | ].
   destruct l1 as [| e2]; [ easy | ].
