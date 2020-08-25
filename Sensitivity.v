@@ -1704,7 +1704,7 @@ Require Import Semiring SRsummation.
 
 (* matrices *)
 
-Record matrix T := mk_mat_def
+Record matrix T := mk_mat
   { mat_list : list (list T) }.
 
 Definition list_list_nrows T (ll : list (list T)) :=
@@ -1713,7 +1713,7 @@ Definition list_list_nrows T (ll : list (list T)) :=
 Definition list_list_ncols T (ll : list (list T)) :=
   length (hd [] ll).
 
-Definition void_mat_def {T} : matrix T :=
+Definition void_mat {T} : matrix T :=
   {| mat_list := [] |}.
 
 Definition list_list_el T d (ll : list (list T)) i j : T :=
@@ -1722,7 +1722,7 @@ Definition list_list_el T d (ll : list (list T)) i j : T :=
 Compute (let (i, j) := (2, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j).
 Compute (let (i, j) := (7, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j).
 
-Definition mat_def_el T d (M : matrix T) i j : T :=
+Definition mat_el T d (M : matrix T) i j : T :=
   list_list_el d (mat_list M) i j.
 
 (* block matrices *)
@@ -1732,9 +1732,9 @@ Inductive bmatrix T :=
   | BM_M : matrix (bmatrix T) → bmatrix T.
 
 Definition void_bmat {T} : bmatrix T :=
-  BM_M void_mat_def.
+  BM_M void_mat.
 
-Theorem bmatrix_def_ind : ∀ T (P : bmatrix T → Prop),
+Theorem bmatrix_ind2 : ∀ T (P : bmatrix T → Prop),
   (∀ t, P (BM_1 t))
   → (∀ M, (∀ la, la ∈ mat_list M → ∀ a, a ∈ la → P a) → P (BM_M M))
   → ∀ BM, P BM.
@@ -1762,12 +1762,14 @@ Definition list_list_transpose {T} d (ll : list (list T)) : list (list T) :=
   let c := list_list_ncols ll in
   map (λ i, map (λ j, list_list_el d ll j i) (seq 0 r)) (seq 0 c).
 
+...
+
 Compute (list_list_transpose 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]).
 
-Definition mat_def_transpose T (d : T) (M : matrix T) : matrix T :=
+Definition mat_transpose T (d : T) (M : matrix T) : matrix T :=
   {| mat_list := list_list_transpose d (mat_list M) |}.
 
-Compute (mat_def_transpose 0 (mk_mat_def [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
+Compute (mat_transpose 0 (mk_mat [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
 
 (* addition *)
 
@@ -1791,7 +1793,7 @@ Fixpoint list_list_add T (add : T → T → T) (ll1 ll2 : list (list T)) :=
   | [] => []
   end.
 
-Definition mat_def_add T (add : T → T → T) (M1 M2 : matrix T) :
+Definition mat_add T (add : T → T → T) (M1 M2 : matrix T) :
     matrix T :=
   {| mat_list := list_list_add add (mat_list M1) (mat_list M2) |}.
 
@@ -1835,41 +1837,6 @@ Fixpoint bmat_add T {so : semiring_op T} (MM1 MM2 : bmatrix T) :=
       end
   end.
 
-(*
-Theorem list_add_add_compat : ∀ T (add1 add2 : T → T → T) la lb,
-  (∀ a b, a ∈ la → b ∈ lb → add1 a b = add2 a b)
-  → list_add add1 la lb = list_add add2 la lb.
-Proof.
-intros * Hadd.
-revert lb Hadd.
-induction la as [| a]; intros; [ easy | cbn ].
-destruct lb as [| b]; [ easy | cbn ].
-f_equal; [ now apply Hadd; left | ].
-apply IHla.
-intros a' b' Ha' Hb'.
-now apply Hadd; right.
-Qed.
-
-Theorem list_list_add_add_compat : ∀ T (add1 add2 : T → T → T) lla llb,
-  (∀ la lb, la ∈ lla → lb ∈ llb →
-   ∀ a b, a ∈ la → b ∈ lb → add1 a b = add2 a b)
-  → list_list_add add1 lla llb = list_list_add add2 lla llb.
-Proof.
-intros * Hadd.
-revert llb Hadd.
-induction lla as [| la]; intros; [ easy | cbn ].
-destruct llb as [| lb]; [ easy | cbn ].
-f_equal. {
-  apply list_add_add_compat.
-  intros * Ha Hb.
-  apply (Hadd la lb); [ now left | now left | easy | easy ].
-}
-apply IHlla.
-intros la1 lb1 Hla1 Hlb1 * Ha Hb.
-apply (Hadd la1 lb1); [ now right | now right | easy | easy ].
-Qed.
-*)
-
 (* multiplication *)
 
 Fixpoint list_mul_loop T (add mul : T → T → T) a (l1 l2 : list T) :=
@@ -1906,12 +1873,12 @@ Definition mat_def_mul T {so : semiring_op T} (M1 M2 : matrix T) :
     matrix T :=
   {| mat_list := list_list_mul (mat_list M1) (mat_list M2) |}.
 
-Compute (let _ := nat_semiring_op in mat_def_mul (mk_mat_def [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mk_mat_def [[1; 2]; [3; 4]; [5; 6]; [0; 0]])).
+Compute (let _ := nat_semiring_op in mat_def_mul (mk_mat [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mk_mat [[1; 2]; [3; 4]; [5; 6]; [0; 0]])).
 
-Compute (let _ := nat_semiring_op in mat_def_mul (mk_mat_def [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mk_mat_def [[1; 2]; [3; 4]; [5; 6]])).
+Compute (let _ := nat_semiring_op in mat_def_mul (mk_mat [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mk_mat [[1; 2]; [3; 4]; [5; 6]])).
 
-Compute (let _ := nat_semiring_op in mat_def_mul (mk_mat_def [[1; 2]; [3; 4]; [5; 6]])
-  (mk_mat_def [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
+Compute (let _ := nat_semiring_op in mat_def_mul (mk_mat [[1; 2]; [3; 4]; [5; 6]])
+  (mk_mat [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
 
 (* multiplication of block matrices *)
 
@@ -1968,7 +1935,7 @@ Theorem bmat_opp_involutive : ∀ T {ro : ring_op T} {rp : ring_prop T}
   bmat_opp (bmat_opp BM) = BM.
 Proof.
 intros.
-induction BM as [x| M IHBM] using bmatrix_def_ind. {
+induction BM as [x| M IHBM] using bmatrix_ind2. {
   now cbn; rewrite rng_opp_involutive.
 } {
   destruct M as (ll); cbn; f_equal; f_equal.
@@ -1995,27 +1962,27 @@ Qed.
 
 (* sequence "An" *)
 
-Fixpoint IZ_2_pow_def T {so : semiring_op T} (u : T) n :=
+Fixpoint IZ_2_pow T {so : semiring_op T} (u : T) n :=
   match n with
   | 0 => BM_1 u
   | S n' =>
       BM_M
         {| mat_list :=
-             [[IZ_2_pow_def u n'; IZ_2_pow_def 0%Srng n'];
-              [IZ_2_pow_def 0%Srng n'; IZ_2_pow_def u n']] |}
+             [[IZ_2_pow u n'; IZ_2_pow 0%Srng n'];
+              [IZ_2_pow 0%Srng n'; IZ_2_pow u n']] |}
   end.
 
-Definition I_2_pow_def T {so : semiring_op T} := IZ_2_pow_def 1%Srng.
-Definition Z_2_pow_def T {so : semiring_op T} := IZ_2_pow_def 0%Srng.
+Definition I_2_pow T {so : semiring_op T} := IZ_2_pow 1%Srng.
+Definition Z_2_pow T {so : semiring_op T} := IZ_2_pow 0%Srng.
 
-Fixpoint A_def T {ro : ring_op T} (so := rng_semiring) n : bmatrix T :=
+Fixpoint A T {ro : ring_op T} (so := rng_semiring) n : bmatrix T :=
   match n with
   | 0 => BM_1 0%Srng
   | S n' =>
        BM_M
          {| mat_list :=
-            [[A_def n'; I_2_pow_def n'];
-             [I_2_pow_def n'; bmat_opp (A_def n')]] |}
+            [[A n'; I_2_pow n'];
+             [I_2_pow n'; bmat_opp (A n')]] |}
   end.
 
 Require Import ZArith.
@@ -2024,7 +1991,7 @@ Open Scope Z_scope.
 *)
 
 About Z_ring_op.
-Compute (let n := 2%nat in let _ := Z_ring_op in let _ := rng_semiring in A_def n).
+Compute (let n := 2%nat in let _ := Z_ring_op in let _ := rng_semiring in A n).
 
 Fixpoint concat_list_in_list T (ll1 ll2 : list (list T)) :=
   match ll1 with
@@ -2051,8 +2018,8 @@ Fixpoint list_list_of_bmat T (MM : bmatrix T) : list (list T) :=
       List.concat ll
   end.
 
-Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (A_def n)).
-Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (bmat_mul (A_def n) (A_def n))).
+Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (A n)).
+Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (bmat_mul (A n) (A n))).
 
 Definition rng_mul_nat_l T {so : semiring_op T} n v :=
   match n with
@@ -2060,58 +2027,12 @@ Definition rng_mul_nat_l T {so : semiring_op T} n v :=
   | S n' => (Σ (_ = 0, n'), v)%Srng
   end.
 
-...
-
-Fixpoint bmat_nat_mul_l_loop T it {so : semiring_op T} n BM :=
-  match it with
-  | 0 => void_bmat
-  | S it' =>
-      match BM with
-      | BM_1 x => BM_1 (rng_mul_nat_l n x)
-      | BM_M M =>
-          BM_M
-            {| mat_list := map (map (bmat_nat_mul_l_loop it' n)) (mat_list M) |}
-      end
+Fixpoint bmat_nat_mul_l T {so : semiring_op T} n BM :=
+  match BM with
+  | BM_1 x => BM_1 (rng_mul_nat_l n x)
+  | BM_M M =>
+      BM_M {| mat_list := map (map (bmat_nat_mul_l n)) (mat_list M) |}
   end.
-
-Definition bmat_nat_mul_l T {so : semiring_op T} n BM :=
-  bmat_nat_mul_l_loop (bmat_depth BM) n BM.
-
-Theorem bmat_depth_IZ_2_pow : ∀ T {ro : semiring_op T} u n,
-  bmat_depth (IZ_2_pow_def u n) = S n.
-Proof.
-intros.
-revert u.
-induction n; intros; [ easy | cbn ].
-do 2 rewrite IHn.
-now do 3 rewrite Nat.max_id.
-Qed.
-
-Theorem bmat_depth_I_2_pow : ∀ T {so : semiring_op T} n,
-  bmat_depth (I_2_pow_def n) = S n.
-Proof.
-intros.
-apply bmat_depth_IZ_2_pow.
-Qed.
-
-Theorem bmat_depth_Z_2_pow : ∀ T {so : semiring_op T} n,
-  bmat_depth (Z_2_pow_def n) = S n.
-Proof.
-intros.
-apply bmat_depth_IZ_2_pow.
-Qed.
-
-Theorem bmat_depth_A T {ro : ring_op T} : ∀ n,
-  bmat_depth (A_def n) = S n.
-Proof.
-intros.
-induction n; [ easy | cbn ].
-rewrite bmat_depth_opp.
-rewrite IHn.
-rewrite bmat_depth_I_2_pow.
-now do 3 rewrite Nat.max_id.
-Qed.
-*)
 
 Fixpoint has_same_bmat_struct T (MA MB : bmatrix T) :=
   match MA with
@@ -2146,50 +2067,13 @@ Fixpoint has_same_bmat_struct T (MA MB : bmatrix T) :=
         end
   end.
 
-Theorem bmat_add_Z_2_pow_l :
-    ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
-  has_same_bmat_struct (Z_2_pow_def n) M
-  → bmat_add (Z_2_pow_def n) M = M.
-Proof.
-intros * sp * Hss.
-revert M Hss.
-induction n; intros. {
-  cbn.
-  destruct M as [x| M]; [ now rewrite srng_add_0_l | easy ].
-}
-cbn - [ Nat.eq_dec ].
-destruct M as [x| M]; [ easy | f_equal ].
-destruct M as (ll).
-cbn - [ Nat.eq_dec ].
-cbn in Hss.
-cbn; f_equal.
-destruct ll as [| l1]; [ easy | ].
-destruct Hss as (H1 & H2).
-f_equal. {
-  destruct l1 as [| e1]; [ easy | ].
-  f_equal; [ now apply IHn | ].
-  destruct l1 as [| e2]; [ easy | ].
-  f_equal; [ now apply IHn | ].
-  now destruct l1.
-}
-destruct ll as [| l2]; [ easy | ].
-f_equal. {
-  destruct l2 as [| e2]; [ easy | ].
-  f_equal; [ now apply IHn | ].
-  destruct l2 as [| e3]; [ easy | ].
-  f_equal; [ now apply IHn | ].
-  now destruct l2.
-}
-now destruct ll.
-Qed.
-
 Theorem bmat_add_comm :
     ∀ T {so : semiring_op T } {sp : semiring_prop T} MA MB,
   bmat_add MA MB = bmat_add MB MA.
 Proof.
 intros.
 revert MB.
-induction MA as [xa| ma IHMA] using bmatrix_def_ind; intros. {
+induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
   destruct MB as [xb| mb]; [ | easy ].
   now cbn; rewrite srng_add_comm.
 }
@@ -2244,56 +2128,80 @@ set (toto := fix list_list_add (ll1 ll2 : list (list (bmatrix T))) {struct ll1} 
     apply (IHMA la1); [ now right | easy ].
 Qed.
 
-Theorem bmat_add_Z_IZ_2_pow :
-    ∀ T {so : semiring_op T } {sp : semiring_prop T} u n,
-  bmat_add (Z_2_pow_def n) (IZ_2_pow_def u n) =
-  IZ_2_pow_def u n.
+Theorem bmat_add_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
+  has_same_bmat_struct (Z_2_pow n) M
+  → bmat_add (Z_2_pow n) M = M.
 Proof.
-intros.
-apply bmat_add_Z_2_pow_l; [ easy | ].
-now revert u; induction n.
+intros * sp * Hss.
+revert M Hss.
+induction n; intros. {
+  cbn.
+  destruct M as [x| M]; [ now rewrite srng_add_0_l | easy ].
+}
+cbn - [ Nat.eq_dec ].
+destruct M as [x| M]; [ easy | f_equal ].
+destruct M as (ll).
+cbn - [ Nat.eq_dec ].
+cbn in Hss.
+cbn; f_equal.
+destruct ll as [| l1]; [ easy | ].
+destruct Hss as (H1 & H2).
+f_equal. {
+  destruct l1 as [| e1]; [ easy | ].
+  f_equal; [ now apply IHn | ].
+  destruct l1 as [| e2]; [ easy | ].
+  f_equal; [ now apply IHn | ].
+  now destruct l1.
+}
+destruct ll as [| l2]; [ easy | ].
+f_equal. {
+  destruct l2 as [| e2]; [ easy | ].
+  f_equal; [ now apply IHn | ].
+  destruct l2 as [| e3]; [ easy | ].
+  f_equal; [ now apply IHn | ].
+  now destruct l2.
+}
+now destruct ll.
 Qed.
 
-Theorem bmat_add_IZ_Z_2_pow_def :
-    ∀ T {so : semiring_op T } {sp : semiring_prop T} u n,
-  bmat_add (IZ_2_pow_def u n) (Z_2_pow_def n) =
-  IZ_2_pow_def u n.
+Theorem bmat_mul_1_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
+  has_same_bmat_struct (I_2_pow n) M
+  → bmat_mul (I_2_pow n) M = M.
 Proof.
-intros.
+intros * sp * Hss.
+revert M Hss.
+induction n; intros. {
+  cbn.
+  destruct M as [x| M]; [ now rewrite srng_mul_1_l | easy ].
+}
+cbn - [ Nat.eq_dec ].
+destruct M as [x| M]; [ easy | f_equal ].
+destruct M as (ll).
+cbn - [ Nat.eq_dec ].
+cbn in Hss.
+cbn; f_equal.
+destruct ll as [| l1]; [ easy | ].
+destruct Hss as (H1 & H2).
+f_equal. {
+  destruct l1 as [| e1]; [ easy | ].
 ...
-revert u.
-induction n; intros; cbn; [ now rewrite srng_add_0_r | ].
-f_equal; f_equal.
-specialize (IHn 0%Srng) as H1.
-cbn in H1; rewrite H1; clear H1.
-specialize (IHn u) as H1.
-cbn in H1; rewrite H1; clear H1.
-easy.
-Qed.
-
-Theorem bmat_mul_loop_Z_IZ_2_pow_def :
-    ∀ T {so : semiring_op T } {sp : semiring_prop T} u n,
-  bmat_mul_loop (S n) (Z_2_pow_def n) (IZ_2_pow_def u n) =
-  Z_2_pow_def n.
-Proof.
-intros.
-revert u.
-induction n; intros; cbn; [ now rewrite srng_mul_0_l | ].
-f_equal; f_equal.
-specialize (IHn 0%Srng) as H1.
-cbn in H1; rewrite H1; clear H1.
-specialize (IHn u) as H1.
-cbn in H1; rewrite H1; clear H1.
-rewrite bmat_depth_Z_2_pow.
-unfold Z_2_pow_def at 2 4 6 8.
-now rewrite bmat_add_loop_Z_IZ_2_pow_def.
-Qed.
-
-Theorem bmat_mul_loop_I_IZ_2_pow_def :
-    ∀ T {so : semiring_op T } {sp : semiring_prop T} u n,
-  bmat_mul_loop (S n) (I_2_pow_def n) (IZ_2_pow_def u n) =
-  IZ_2_pow_def u n.
-Proof.
+  f_equal. {
+...
+  f_equal; [ now apply IHn | ].
+  destruct l1 as [| e2]; [ easy | ].
+  f_equal; [ now apply IHn | ].
+  now destruct l1.
+}
+destruct ll as [| l2]; [ easy | ].
+f_equal. {
+  destruct l2 as [| e2]; [ easy | ].
+  f_equal; [ now apply IHn | ].
+  destruct l2 as [| e3]; [ easy | ].
+  f_equal; [ now apply IHn | ].
+  now destruct l2.
+}
+now destruct ll.
+...
 intros.
 revert u.
 induction n; intros; cbn; [ now rewrite srng_mul_1_l | cbn ].
@@ -2304,36 +2212,36 @@ rewrite bmat_depth_IZ_2_pow.
 specialize (IHn 0%Srng) as H1.
 cbn in H1; rewrite H1; clear H1.
 rewrite bmat_depth_IZ_2_pow.
-rewrite fold_Z_2_pow_def at 1 3.
-specialize (bmat_mul_loop_Z_IZ_2_pow_def 0%Srng n) as H1.
+rewrite fold_Z_2_pow at 1 3.
+specialize (bmat_mul_loop_Z_IZ_2_pow 0%Srng n) as H1.
 cbn in H1; rewrite H1; clear H1.
-rewrite fold_Z_2_pow_def at 1.
-specialize (bmat_mul_loop_Z_IZ_2_pow_def u n) as H1.
+rewrite fold_Z_2_pow at 1.
+specialize (bmat_mul_loop_Z_IZ_2_pow u n) as H1.
 cbn in H1; rewrite H1; clear H1.
-rewrite fold_Z_2_pow_def at 1.
-specialize (bmat_mul_loop_Z_IZ_2_pow_def u n) as H1.
+rewrite fold_Z_2_pow at 1.
+specialize (bmat_mul_loop_Z_IZ_2_pow u n) as H1.
 cbn in H1; rewrite H1; clear H1.
 rewrite bmat_depth_Z_2_pow.
-rewrite fold_Z_2_pow_def at 1.
-specialize (bmat_mul_loop_Z_IZ_2_pow_def u n) as H1.
+rewrite fold_Z_2_pow at 1.
+specialize (bmat_mul_loop_Z_IZ_2_pow u n) as H1.
 cbn in H1; rewrite H1; clear H1.
-rewrite fold_Z_2_pow_def at 1 2 3.
-specialize (bmat_mul_loop_Z_IZ_2_pow_def 0%Srng n) as H1.
+rewrite fold_Z_2_pow at 1 2 3.
+specialize (bmat_mul_loop_Z_IZ_2_pow 0%Srng n) as H1.
 cbn in H1; rewrite H1; clear H1.
-unfold Z_2_pow_def.
+unfold Z_2_pow.
 rewrite bmat_depth_IZ_2_pow.
-rewrite bmat_add_loop_Z_IZ_2_pow_def; [ | easy ].
-rewrite bmat_add_loop_Z_IZ_2_pow_def; [ | easy ].
-rewrite bmat_add_loop_IZ_Z_2_pow_def; [ | easy ].
+rewrite bmat_add_loop_Z_IZ_2_pow; [ | easy ].
+rewrite bmat_add_loop_Z_IZ_2_pow; [ | easy ].
+rewrite bmat_add_loop_IZ_Z_2_pow; [ | easy ].
 easy.
 Qed.
 
-Theorem bmat_loop_sqr_I_2_pow_def :
+Theorem bmat_loop_sqr_I_2_pow :
     ∀ T {so : semiring_op T } {sp : semiring_prop T} n,
-  bmat_mul_loop (S n) (I_2_pow_def n) (I_2_pow_def n) = I_2_pow_def n.
+  bmat_mul_loop (S n) (I_2_pow n) (I_2_pow n) = I_2_pow n.
 Proof.
 intros.
-now apply bmat_mul_loop_I_IZ_2_pow_def.
+now apply bmat_mul_loop_I_IZ_2_pow.
 Qed.
 
 Theorem fold_tagada : ∀ T {ro : ring_op T} (so := rng_semiring)
@@ -2363,7 +2271,7 @@ Qed.
 
 Theorem bmat_add_loop_A_Z_2_pow :
     ∀ T {ro : ring_op T} (so := rng_semiring) {sp : semiring_prop T} n,
-  bmat_add_loop (S n) (A_def n) (Z_2_pow_def n) = A_def n.
+  bmat_add_loop (S n) (A_def n) (Z_2_pow n) = A_def n.
 Proof.
 intros.
 induction n; [ now cbn; rewrite srng_add_0_l | ].
@@ -2371,10 +2279,10 @@ cbn in IHn |-*.
 unfold bmat_of_list_bmat; cbn.
 f_equal; f_equal.
 rewrite IHn.
-specialize (bmat_add_loop_IZ_Z_2_pow_def 1%Srng n) as H.
+specialize (bmat_add_loop_IZ_Z_2_pow 1%Srng n) as H.
 cbn in H.
 unfold so in H |-*.
-rewrite fold_I_2_pow_def in H.
+rewrite fold_I_2_pow in H.
 rewrite H; clear H.
 f_equal; f_equal; f_equal; f_equal.
 clear IHn.
@@ -2390,20 +2298,20 @@ rewrite bmat_opp_involutive; [ | | easy ].
 
 Theorem bmat_loop_mul_I_2_pow_A_def :
     ∀ T {ro : ring_op T} (so := rng_semiring) {sp : semiring_prop T} n,
-  bmat_mul_loop (S n) (I_2_pow_def n) (A_def n) = A_def n.
+  bmat_mul_loop (S n) (I_2_pow n) (A_def n) = A_def n.
 Proof.
 intros.
 induction n; [ now cbn; rewrite srng_mul_0_r | ].
 cbn in IHn; cbn.
 rewrite IHn, bmat_depth_A; cbn.
-specialize (bmat_mul_loop_Z_IZ_2_pow_def 1%Rng n) as H.
-cbn in H; unfold Z_2_pow_def in H.
-rewrite fold_I_2_pow_def in H; rewrite H; clear H.
+specialize (bmat_mul_loop_Z_IZ_2_pow 1%Rng n) as H.
+cbn in H; unfold Z_2_pow in H.
+rewrite fold_I_2_pow in H; rewrite H; clear H.
 ...
 specialize (bmat_loop_add_A_Z_2_pow n) as H.
-cbn in H; unfold Z_2_pow_def in H.
+cbn in H; unfold Z_2_pow in H.
 unfold so; rewrite H; clear H.
-specialize (bmat_loop_sqr_I_2_pow_def n) as H.
+specialize (bmat_loop_sqr_I_2_pow n) as H.
 cbn in H.
 progress unfold so in H.
 rewrite H; clear H.
@@ -2417,7 +2325,7 @@ do 3 rewrite fold_tagada.
 
 Theorem lemma_2_A_n_2_eq_n_I :
     ∀ T {ro : ring_op T} (so := rng_semiring) {rp : semiring_prop T} n,
-  bmat_mul (A_def n) (A_def n) = bmat_nat_mul_l n (I_2_pow_def n).
+  bmat_mul (A_def n) (A_def n) = bmat_nat_mul_l n (I_2_pow n).
 Proof.
 intros.
 subst so.
@@ -2430,7 +2338,7 @@ rewrite bmat_depth_IZ_2_pow.
 rewrite bmat_depth_opp.
 rewrite bmat_depth_A.
 do 3 rewrite Nat.max_id.
-rewrite bmat_loop_sqr_I_2_pow_def; [ | easy ].
+rewrite bmat_loop_sqr_I_2_pow; [ | easy ].
 rewrite bmat_loop_mul_I_2_pow_A_def; [ | easy ].
 ...
 f_equal. {
@@ -2444,7 +2352,7 @@ f_equal. {
     do 3 rewrite Nat.max_id.
     cbn.
     remember (A_def n) as an eqn:Han.
-    remember (I_2_pow_def n) as i2n eqn:Hin.
+    remember (I_2_pow n) as i2n eqn:Hin.
     symmetry in Han, Hin.
     destruct an as [xa| Ma]. {
       destruct i2n as [xi| Mi]; [ | easy ].
@@ -2485,7 +2393,7 @@ assert (@mat_def_mul (bmatrix T) (rec_sring n) Mi Mi = Mi). {
   unfold mat_def_mul; cbn.
   f_equal; f_equal. {
     f_equal. {
-      remember (I_2_pow_def n) as M eqn:HM.
+      remember (I_2_pow n) as M eqn:HM.
       symmetry in HM.
       destruct M as [xm| mm]. {
         cbn.
@@ -2529,7 +2437,7 @@ rewrite mmat_depth_IZ_2_pow.
 ...
 
 Theorem IZ_2_pow_coh_prop : ∀ T {ro : ring_op T} u n,
-  bmatrix_coh (IZ_2_pow_def u n) = true.
+  bmatrix_coh (IZ_2_pow u n) = true.
 Proof.
 intros.
 unfold bmatrix_coh.
@@ -2545,7 +2453,7 @@ now rewrite H1, H2.
 Qed.
 
 Definition IZ_2_pow T {ro : ring_op T} u n : bmatrix T :=
-  {| bmat := IZ_2_pow_def u n;
+  {| bmat := IZ_2_pow u n;
      bmat_coh_prop := IZ_2_pow_coh_prop u n |}.
 
 Definition I_2_pow T {ro : ring_op T} := IZ_2_pow 1%Rng.
@@ -2790,7 +2698,7 @@ Definition bmat_of_list_bmat T (ll : list (list (bmatrix T)))
      mat_coh_prop := bmat_coh_prop_of_list_bmat ll Hsl Hzt|}.
 
 Theorem bmatrix_is_norm_loop_IZ_2_pow : ∀ T {ro : ring_op T} len u n,
-  S n ≤ len → bmatrix_coh_loop len (IZ_2_pow_def u n) = true.
+  S n ≤ len → bmatrix_coh_loop len (IZ_2_pow u n) = true.
 Proof.
 intros * Hlen.
 revert u n Hlen.
@@ -2802,7 +2710,7 @@ Qed.
 
 Theorem bmatrix_is_norm_loop_opp_IZ_2_pow : ∀ T {ro : ring_op T} len u n,
   S n ≤ len
-  → bmatrix_coh_loop len (bmat_opp (IZ_2_pow_def u n)) = true.
+  → bmatrix_coh_loop len (bmat_opp (IZ_2_pow u n)) = true.
 Proof.
 intros * Hlen.
 revert u n Hlen.
@@ -2827,7 +2735,7 @@ induction n; intros; cbn; [ now destruct len | cbn ].
 destruct len; [ easy | cbn ].
 apply Nat.succ_le_mono in Hlen.
 rewrite IHn; [ | easy ].
-unfold I_2_pow_def.
+unfold I_2_pow.
 rewrite bmatrix_is_norm_loop_IZ_2_pow; [ cbn | easy ].
 specialize (IHn _ Hlen) as H1.
 clear IHn.
@@ -2843,7 +2751,7 @@ destruct H1 as (H1, H3).
 apply Bool.andb_true_iff in H1.
 destruct H1 as (H1, H2).
 rewrite H4; cbn.
-unfold I_2_pow_def.
+unfold I_2_pow.
 rewrite bmatrix_is_norm_loop_opp_IZ_2_pow; [ cbn | easy ].
 now rewrite bmat_opp_involutive.
 Qed.
