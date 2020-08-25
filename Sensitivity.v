@@ -2069,6 +2069,52 @@ Fixpoint has_same_bmat_struct T (MA MB : bmatrix T) :=
         end
   end.
 
+Require Import Relations.
+
+Theorem has_same_bmat_struct_refl : ∀ T, reflexive _ (@has_same_bmat_struct T).
+Proof.
+intros * M.
+induction M as [x| M IHM] using bmatrix_ind2; [ easy | cbn ].
+destruct M as (ll); cbn.
+cbn in IHM.
+induction ll as [| l1]; [ easy | cbn ].
+split. {
+  revert ll IHM IHll.
+  induction l1 as [| e1]; intros; [ easy | cbn ].
+  split; [ now apply (IHM (e1 :: l1)); left | ].
+  apply (IHl1 ll). {
+    intros la Hla a Ha.
+    cbn - [ In ] in Hla.
+    destruct Hla as [Hla| Hla]. {
+      subst la.
+      apply (IHM (e1 :: l1)); [ now left | now right ].
+    }
+    apply (IHM la); [ now right | easy ].
+  }
+  intros H1.
+  now apply IHll.
+}
+apply IHll.
+intros la Hla a Ha.
+apply (IHM la); [ now right | easy ].
+Qed.
+
+Theorem has_same_bmat_struct_symm : ∀ T, symmetric _ (@has_same_bmat_struct T).
+Proof.
+intros * MA MB HMM.
+...
+
+Theorem has_same_bmat_struct_trans : ∀ T, transitive _ (@has_same_bmat_struct T).
+...
+
+Add Parametric Relation T : _ (@has_same_bmat_struct T)
+ reflexivity proved by (@has_same_bmat_struct_refl T)
+ symmetry proved by (@has_same_bmat_struct_symm T)
+ transitivity proved by (@has_same_bmat_struct_trans T)
+ as has_same_bmat_struct_equivalence.
+
+...
+
 Theorem bmat_add_comm :
     ∀ T {so : semiring_op T } {sp : semiring_prop T} MA MB,
   bmat_add MA MB = bmat_add MB MA.
@@ -2187,6 +2233,10 @@ f_equal. {
     destruct ll as [| l2]; [ easy | cbn ].
     rewrite IHn; [ | easy ].
     rewrite IHn. 2: {
+      destruct l2 as [| e2]; [ easy | ].
+      cbn.
+...
+      transitivity (Z_2_pow n).
 ...
 
 Theorem bmat_mul_1_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
