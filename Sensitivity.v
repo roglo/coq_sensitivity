@@ -2215,14 +2215,36 @@ destruct llb as [| lb]; [ easy | ].
 destruct llc as [| lc]; [ easy | ].
 cbn in HAB, HBC |-*.
 split. {
-...
+  destruct HAB as (Hlab, Hllab).
+  destruct HBC as (Hlbc, Hllbc).
+  revert lb lc Hlab Hlbc.
+  induction la as [| a]; intros; [ now destruct lb | ].
+  destruct lb as [| b]; [ easy | ].
+  destruct lc as [| c]; [ easy | ].
+  cbn in Hlab, Hlbc |-*.
+  split. {
+    apply (IHMA _ (or_introl eq_refl)) with (MB := b); [ | easy | easy ].
+    now left.
+  }
+  apply IHla with (lb := lb); [ | easy | easy ].
+  intros la1 Hla1 a1 Ha1 b1 c1 Hab Hbc.
+  destruct Hla1 as [Hla1| Hla1]. {
+    subst la1.
+    apply (IHMA _ (or_introl eq_refl)) with (MB := b1); [ | easy | easy ].
+    now right.
+  }
+  now apply (IHMA _ (or_intror Hla1)) with (MB := b1).
+}
+apply IHlla with (llb := llb); [ | easy | easy ].
+intros la1 Hla1 a1 Ha1 b1 c1 Hab Hbc.
+now apply (IHMA _ (or_intror Hla1)) with (MB := b1).
+Qed.
 
 Add Parametric Relation T : _ (@has_same_bmat_struct T)
  reflexivity proved by (@has_same_bmat_struct_refl T)
  symmetry proved by (@has_same_bmat_struct_symm T)
  transitivity proved by (@has_same_bmat_struct_trans T)
  as has_same_bmat_struct_equivalence.
-...
 
 Theorem bmat_add_comm :
     ∀ T {so : semiring_op T } {sp : semiring_prop T} MA MB,
@@ -2319,10 +2341,8 @@ f_equal. {
     destruct ll as [| l2]; [ easy | cbn ].
     rewrite IHn; [ | easy ].
     rewrite IHn. 2: {
-      destruct l2 as [| e2]; [ easy | ].
-      cbn.
-...
-      transitivity (Z_2_pow n).
+      destruct l2 as [| e2]; [ easy | cbn ].
+      transitivity (Z_2_pow n); [ | easy ].
 ...
 
 Theorem bmat_mul_1_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
