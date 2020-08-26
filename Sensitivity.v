@@ -2826,7 +2826,40 @@ fold (@has_same_list_struct T) in Hss.
 fold (@has_same_list_list_struct T) in Hss.
 fold (@bmat_list_add T so).
 fold (@bmat_list_list_add T so).
-...
+destruct M as (ll).
+cbn in IHM, Hss |-*.
+revert n Hss.
+induction ll as [| l]; intros; [ easy | cbn ].
+f_equal. {
+  destruct l as [| a]; intros; [ now cbn in Hss | cbn ].
+  f_equal. {
+    apply (IHM (a :: l)); [ now left | now left | ].
+    now cbn in Hss.
+  }
+  cbn in Hss.
+  destruct l as [| a1]; [ easy | ].
+  cbn in Hss |-*.
+  f_equal; [ | now destruct l ].
+  apply (IHM (a :: a1 :: l)); [ now left | now right; left | easy ].
+}
+cbn in Hss.
+destruct ll as [| l1]; [ easy | cbn ].
+destruct ll as [| l2]; [ cbn | now cbn in Hss ].
+cbn in Hss.
+f_equal.
+destruct l1 as [| a1]; [ easy | cbn ].
+cbn in Hss.
+f_equal. {
+  apply (IHM (a1 :: l1)); [ now right; left | now left | easy ].
+}
+destruct l1 as [| a2]; [ easy | cbn ].
+f_equal. {
+  apply (IHM (a1 :: a2 :: l1)); [ now right; left | now right; left | ].
+  now cbn in Hss.
+}
+cbn in Hss.
+now destruct l1.
+Qed.
 
 (* "We prove by induction that A_n^2 = nI" *)
 
@@ -2855,25 +2888,27 @@ f_equal. {
     now apply bmat_add_nat_mul_l_succ.
   }
   f_equal. {
-...
-subst so.
-rewrite bmat_add_opp_r with (n := 42).
-...
-
-    clear IHn.
-    induction n; cbn; [ now rewrite rng_opp_0 | ].
-    f_equal; f_equal.
-    f_equal. {
-      f_equal. {
-        admit.
-      }
-      f_equal.
+    subst so.
+    rewrite (bmat_add_opp_r _ n). 2: {
+      symmetry.
+      apply have_same_bmat_struct_IZ_A.
+    }
+    remember (S n) as k; clear Heqk.
+    clear - sp.
+    revert k.
+    induction n; intros. {
+      cbn; f_equal.
+      unfold rng_mul_nat_l.
+      destruct k; [ easy | ].
+      symmetry.
+      now apply all_0_srng_summation_0.
+    }
+    now cbn; rewrite (IHn k).
   }
-  rewrite IHn.
-
+}
+f_equal.
+f_equal. {
 ...
-
-(* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
   bmat_mul (A n) (A n) = mmat_nat_mul_l n (I_2_pow n).
