@@ -2765,6 +2765,46 @@ do 3 rewrite fold_tagada.
 ...
 *)
 
+Theorem bmat_add_nat_mul_l_succ : ∀ T {so : semiring_op T}
+    {sp : semiring_prop T} n M,
+  bmat_nat_mul_l (S n) M = bmat_add (bmat_nat_mul_l n M) M.
+Proof.
+intros.
+induction M as [x| M IHM] using bmatrix_ind2. {
+  remember (S n) as sn; cbn; subst sn.
+  f_equal.
+  revert x.
+  induction n; intros; [ easy | ].
+  remember (S n) as sn; cbn; subst sn.
+  rewrite <- (Nat.add_1_r n) at 1.
+  rewrite seq_app; cbn.
+  rewrite srng_add_0_l.
+  apply fold_left_app.
+}
+cbn.
+f_equal; f_equal.
+fold (@bmat_list_add T so).
+fold (@bmat_list_list_add T so).
+destruct M as (ll); cbn in IHM |-*.
+induction ll as [| l]; [ easy | cbn ].
+f_equal. 2: {
+  apply IHll.
+  intros la Hla a Ha.
+  apply (IHM la); [ now right | easy ].
+}
+induction l as [| a]; [ easy | cbn ].
+f_equal. 2: {
+  apply IHl.
+  intros la Hla a1 Ha1.
+  destruct Hla as [Hla| Hla]. {
+    subst la.
+    apply (IHM (a :: l)); [ now left | now right ].
+  }
+  apply (IHM la); [ now right | easy ].
+}
+now apply (IHM (a :: l)); left.
+Qed.
+
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I :
@@ -2788,6 +2828,12 @@ rewrite bmat_mul_1_l; [ | easy | ]. 2: {
 rewrite bmat_mul_1_l; [ | easy | ]. 2: {
   apply have_same_bmat_struct_IZ_A.
 }
+f_equal. {
+  f_equal. {
+    symmetry.
+    now apply bmat_add_nat_mul_l_succ.
+  }
+  f_equal. {
 ...
 
 (* "We prove by induction that A_n^2 = nI" *)
