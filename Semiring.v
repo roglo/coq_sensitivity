@@ -52,6 +52,13 @@ rewrite srng_mul_comm, srng_mul_0_l.
 reflexivity.
 Qed.
 
+Theorem srng_mul_1_r : ∀ a, (a * 1 = a)%Srng.
+Proof.
+intros a; simpl.
+rewrite srng_mul_comm, srng_mul_1_l.
+reflexivity.
+Qed.
+
 Theorem srng_mul_add_distr_r : ∀ x y z,
   ((x + y) * z = x * z + y * z)%Srng.
 Proof.
@@ -230,13 +237,6 @@ Context {rp : ring_prop}.
 *)
 
 (*
-Theorem srng_mul_1_r : ∀ a, (a * 1 = a)%Srng.
-Proof.
-intros a; simpl.
-rewrite srng_mul_comm, srng_mul_1_l.
-reflexivity.
-Qed.
-
 Theorem srng_add_compat_l : ∀ a b c,
   (a = b)%Srng → (c + a = c + b)%Srng.
 Proof.

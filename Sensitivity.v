@@ -2407,8 +2407,7 @@ f_equal. {
     apply bmat_add_0_l; [ easy | ].
     apply have_same_bmat_struct_IZ_IZ.
   }
-  destruct ll as [| l2]; [ easy | ].
-  cbn.
+  destruct ll as [| l2]; [ easy | cbn ].
   destruct l1 as [| e2]; [ easy | cbn ].
   f_equal. {
     rewrite IHn. 2: {
@@ -2441,6 +2440,58 @@ rewrite IHn. {
   apply have_same_bmat_struct_IZ_IZ.
 }
 destruct l2 as [| e3]; [ easy | now destruct l2 ].
+Qed.
+
+(*
+Theorem bmat_list_mul_0_r : ∀ T {so : semiring_op T} n l M,
+  bmat_list_mul M l [Z_2_pow n] = M.
+Proof.
+intros.
+induction l as [| a]; [ easy | cbn ].
+destruct l as [| a1]; cbn.
+...
+*)
+
+Theorem bmat_mul_0_r : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
+  have_same_bmat_struct (I_2_pow n) M
+  → bmat_mul M (Z_2_pow n) = Z_2_pow n.
+Proof.
+intros * sp * Hss.
+revert M Hss.
+induction n; intros; cbn. {
+  destruct M as [xm| mm]; [ now cbn; rewrite srng_mul_0_r | easy ].
+}
+destruct M as [xm| mm]; [ easy | ].
+f_equal; f_equal.
+destruct mm as (ll).
+destruct ll as [| l1]; [ easy | ].
+destruct l1 as [| e1]; [ now cbn in Hss | ].
+cbn in Hss |-*.
+fold (@bmat_list_mul T so).
+f_equal; f_equal.
+f_equal. {
+  rewrite IHn; [ | easy ].
+  destruct l1 as [| e2]; [ easy | cbn ].
+  destruct l1; [ cbn | easy ].
+  rewrite IHn. 2: {
+    transitivity (Z_2_pow n); [ | easy ].
+    apply have_same_bmat_struct_IZ_IZ.
+  }
+  now rewrite bmat_add_0_l.
+}
+destruct ll as [| l2]; [ easy | cbn ].
+destruct l1 as [| e2]; [ easy | cbn ].
+f_equal. {
+  destruct l2 as [| e3]; [ easy | ].
+  rewrite IHn. 2: {
+    transitivity (Z_2_pow n); [ | easy ].
+    apply have_same_bmat_struct_IZ_IZ.
+  }
+  destruct l2 as [| e4]; [ easy | cbn ].
+  rewrite IHn; [ | easy ].
+  rewrite bmat_add_0_l; [ now destruct l2 | easy | easy ].
+}
+destruct ll as [| l3]; [ now destruct l1 | easy ].
 Qed.
 
 Theorem bmat_mul_1_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
@@ -2525,6 +2576,90 @@ Theorem bmat_mul_1_r : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
   → bmat_mul M (I_2_pow n) = M.
 Proof.
 intros * sp * Hss.
+revert M Hss.
+induction n; intros. {
+  cbn.
+  destruct M as [x| M]; [ now cbn; rewrite srng_mul_1_r | easy ].
+}
+cbn - [ Nat.eq_dec ].
+destruct M as [x| M]; [ easy | f_equal ].
+destruct M as (ll); cbn.
+fold (@bmat_list_mul T so).
+cbn in Hss.
+cbn; f_equal.
+destruct ll as [| l1]; [ easy | ].
+destruct Hss as (H1 & H2).
+destruct l1 as [| e1]; [ easy | cbn ].
+f_equal. {
+  f_equal. {
+    destruct ll as [| l2]; [ easy | cbn ].
+    rewrite IHn; [ | easy ].
+    rewrite fold_Z_2_pow.
+    rewrite bmat_mul_0_r; [ | easy | easy ].
+    destruct l1 as [| e2]; [ easy | cbn ].
+    destruct l1; [ cbn | easy ].
+    rewrite bmat_mul_0_r; [ | easy | ]. 2: {
+      transitivity (Z_2_pow n); [ | easy ].
+      apply have_same_bmat_struct_IZ_IZ.
+    }
+    rewrite IHn. 2: {
+      transitivity (Z_2_pow n); [ | easy ].
+      apply have_same_bmat_struct_IZ_IZ.
+    }
+    rewrite bmat_add_0_r; [ | easy | ]. 2: {
+      transitivity (I_2_pow n); [ | easy ].
+      apply have_same_bmat_struct_IZ_IZ.
+    }
+    rewrite bmat_add_0_l; [ | easy | ]. 2: {
+      transitivity (Z_2_pow n); [ | easy ].
+      apply have_same_bmat_struct_IZ_IZ.
+    }
+    easy.
+  }
+  destruct l1 as [| e2]; [ easy | cbn ].
+...
+  f_equal; [ | now destruct l1 ].
+  destruct ll as [| l2]; [ easy | cbn ].
+  rewrite IHn. 2: {
+    transitivity (Z_2_pow n); [ | easy ].
+    apply have_same_bmat_struct_IZ_IZ.
+  }
+  rewrite fold_Z_2_pow.
+  rewrite bmat_mul_0_l; [ now apply bmat_add_0_r | easy | ].
+  destruct l2 as [| e3]; [ easy | now destruct l2 ].
+}
+destruct l1 as [| e2]; [ easy | cbn ].
+destruct ll as [| l2]; [ easy | cbn ].
+f_equal; [ | now destruct ll ].
+destruct l1 as [| e3]; [ cbn | easy ].
+rewrite fold_Z_2_pow.
+rewrite bmat_mul_0_l; [ | easy | easy ].
+rewrite bmat_mul_0_l; [ | easy | ]. 2: {
+  transitivity (Z_2_pow n); [ | easy ].
+  apply have_same_bmat_struct_IZ_IZ.
+}
+rewrite IHn. 2: {
+  destruct l2 as [| e3]; [ easy | cbn ].
+  transitivity (Z_2_pow n); [ | easy ].
+  apply have_same_bmat_struct_IZ_IZ.
+}
+rewrite bmat_add_0_l; [ | easy | ]. 2: {
+  destruct l2 as [| e3]; [ easy | cbn ].
+  transitivity (Z_2_pow n); [ | easy ].
+  apply have_same_bmat_struct_IZ_IZ.
+}
+rewrite IHn. 2: {
+  destruct l2 as [| e3]; [ easy | now destruct l2 ].
+}
+rewrite bmat_add_0_l; [ | easy | ]. 2: {
+  destruct l2 as [| e3]; [ easy | cbn ].
+  destruct l2 as [| e4]; [ easy | cbn ].
+  transitivity (I_2_pow n); [ | easy ].
+  apply have_same_bmat_struct_IZ_IZ.
+}
+destruct l2 as [| e3]; [ easy | cbn ].
+destruct l2 as [| e4]; [ easy | now destruct l2 ].
+Qed.
 ...
 
 (*
