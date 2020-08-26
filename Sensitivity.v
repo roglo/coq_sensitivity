@@ -2876,10 +2876,20 @@ induction n; intros. {
 now cbn; rewrite IHn.
 Qed.
 
+Theorem bmat_mul_sqr_opp : ∀ T {ro : ring_op T} (so := rng_semiring) M,
+  bmat_mul (bmat_opp M) (bmat_opp M) = bmat_mul M M.
+Proof.
+intros.
+induction M as [x| M IHM] using bmatrix_ind2. {
+  cbn.
+Search ((- _)%Rng).
+...
+
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I :
-    ∀ T {ro : ring_op T} (so := rng_semiring) {rp : ring_prop T} {sp : semiring_prop T} n,
+    ∀ T {ro : ring_op T} (so := rng_semiring),
+    ∀ {rp : ring_prop T} {sp : semiring_prop T} n,
   bmat_mul (A n) (A n) = bmat_nat_mul_l n (I_2_pow n).
 Proof.
 intros.
@@ -2924,6 +2934,8 @@ rewrite bmat_add_nat_mul_l_succ; [ | easy ].
 rewrite bmat_add_comm; [ | easy ].
 f_equal.
 rewrite <- IHn.
+...
+apply bmat_mul_sqr_opp.
 ...
 
 Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
