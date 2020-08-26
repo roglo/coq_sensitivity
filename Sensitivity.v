@@ -2320,46 +2320,6 @@ intros la1 Hla1 a1 Ha1 b1.
 apply (IHMA la1); [ now right | easy ].
 Qed.
 
-Theorem bmat_mul_comm :
-    ∀ T {so : semiring_op T } {sp : semiring_prop T} MA MB,
-  bmat_mul MA MB = bmat_mul MB MA.
-Proof.
-intros.
-revert MB.
-induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
-  destruct MB as [xb| mb]; [ | easy ].
-  now cbn; rewrite srng_mul_comm.
-}
-destruct MB as [xb| mb]; [ easy | ].
-destruct ma as (lla).
-destruct mb as (llb).
-cbn in IHMA |-*.
-f_equal; f_equal.
-fold (@bmat_list_mul T so).
-fold (@bmat_list_list_mul T so lla llb).
-fold (@bmat_list_list_mul T so llb lla).
-...
-revert llb.
-induction lla as [| la]; intros; [ now destruct llb | cbn ].
-destruct llb as [| lb]; [ easy | cbn ].
-f_equal. {
-  revert lb.
-  induction la as [| a]; intros; [ now destruct lb | cbn ].
-  destruct lb as [| b]; [ easy | cbn ].
-  f_equal; [ now apply (IHMA (a :: la)); left | ].
-  apply IHla; cbn - [ In ].
-  intros la1 Hla1 a1 Ha1 b1.
-  destruct Hla1 as [Hla1| Hla1]. {
-    subst la1.
-    apply (IHMA (a :: la)); [ now left | now right ].
-  }
-  apply (IHMA la1); [ now right | easy ].
-}
-apply IHlla.
-intros la1 Hla1 a1 Ha1 b1.
-apply (IHMA la1); [ now right | easy ].
-Qed.
-
 Theorem bmat_add_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
   have_same_bmat_struct (Z_2_pow n) M
   → bmat_add (Z_2_pow n) M = M.
@@ -2565,8 +2525,6 @@ Theorem bmat_mul_1_r : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
   → bmat_mul M (I_2_pow n) = M.
 Proof.
 intros * sp * Hss.
-...
-rewrite bmat_mul_comm.
 ...
 
 (*
