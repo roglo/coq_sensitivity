@@ -2379,6 +2379,38 @@ split; [ | easy ].
 apply IHn.
 Qed.
 
+Theorem have_same_bmat_struct_opp_r : ∀ T {ro : ring_op T} M,
+  have_same_bmat_struct M (bmat_opp M).
+Proof.
+intros.
+induction M as [| M IHM] using bmatrix_ind2; [ easy | cbn ].
+destruct M as (lla).
+cbn in IHM |-*.
+fold (@has_same_list_struct T).
+fold (@has_same_list_list_struct T).
+induction lla as [| la]; [ easy | cbn ].
+...
+
+Theorem have_same_bmat_struct_IZ_A : ∀ T {ro : ring_op T} (so := rng_semiring)
+    u n,
+  have_same_bmat_struct (IZ_2_pow u n) (A n).
+Proof.
+intros.
+revert u.
+induction n; intros; [ easy | cbn ].
+split. {
+  split; [ easy | ].
+  split; [ | easy ].
+  apply have_same_bmat_struct_IZ_IZ.
+}
+split; [ | easy ].
+split; [ apply have_same_bmat_struct_IZ_IZ | ].
+split; [ | easy ].
+transitivity (A n); [ easy | ].
+...
+apply have_same_bmat_struct_opp_r.
+...
+
 Theorem bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
   have_same_bmat_struct (I_2_pow n) M
   → bmat_mul (Z_2_pow n) M = Z_2_pow n.
@@ -2632,10 +2664,6 @@ rewrite bmat_add_0_l; [ | easy | ]. 2: {
 easy.
 Qed.
 
-Inspect 1.
-
-...
-
 (*
 Theorem bmat_loop_sqr_I_2_pow :
     ∀ T {so : semiring_op T } {sp : semiring_prop T} n,
@@ -2734,8 +2762,11 @@ revert ro rp.
 induction n; intros; [ now cbn; rewrite srng_mul_0_l | ].
 cbn; f_equal; f_equal.
 rewrite IHn; [ | easy ].
+rewrite bmat_mul_1_r; [ | easy | easy ].
+rewrite bmat_mul_1_r; [ | easy | ]. 2: {
+Check have_same_bmat_struct_IZ_IZ.
 ...
-rewrite bmat_mul_1_r.
+apply have_same_bmat_struct_IZ_A.
 ...
 do 4 rewrite fold_bmat_add.
 rewrite bmat_depth_I_2_pow.
