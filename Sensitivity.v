@@ -2876,46 +2876,24 @@ induction n; intros. {
 now cbn; rewrite IHn.
 Qed.
 
-Theorem bmat_mul_sqr_opp : ∀ T {ro : ring_op T} (so := rng_semiring) M,
+Theorem bmat_mul_sqr_opp :
+  ∀ T {ro : ring_op T} (so := rng_semiring)
+       {sp : semiring_prop T} {rp : ring_prop T} M,
   bmat_mul (bmat_opp M) (bmat_opp M) = bmat_mul M M.
 Proof.
 intros.
 induction M as [x| M IHM] using bmatrix_ind2. {
   cbn.
   f_equal.
-Search ((- _)%Rng).
-Search (- _ * _)%Z.
-Theorem rng_mul_opp_l :
-  ∀ T {ro : ring_op T} (so := rng_semiring)
-       {sp : semiring_prop T} {rp : ring_prop T} a b,
-  (- a * b = - (a * b))%Rng.
-Proof.
-intros.
-Print Z.mul_opp_l.
-specialize (srng_mul_add_distr_r (- a)%Rng a b) as H.
-unfold so in H.
-rewrite rng_add_opp_l in H.
-rewrite srng_mul_0_l in H.
-Print Z.mul_opp_l.
-...
-(0 * b - a * b = (0 - a) * b)
-
-Check Z.add_opp_diag_l.
-cbn in H.
-specialize (rng_add_opp_l a) as H1.
-rewrite H1 in H.
-...
-rewrite srng_add_0_l in H.
-rewrite srng_mul_0_l in H.
-rewrite srng_add_0_l in H.
-symmetry in H.
-...
-Theorem rng_mul_opp_opp : ∀ T (ro : ring_op T) a b,
-  (- a * - b = a * b)%Rng.
-Proof.
-About Z.mul_opp_opp.
-Print Z.mul_opp_opp.
-Check Z.mul_opp_l.
+  now apply rng_mul_opp_opp.
+}
+destruct M as (ll); cbn.
+f_equal; f_equal.
+fold (@bmat_list_mul T so).
+remember (map (map (λ mm, bmat_opp mm)) ll) as ll1.
+fold (@bmat_list_list_mul T so ll1 ll1).
+fold (@bmat_list_list_mul T so ll ll).
+subst ll1.
 ...
 
 (* "We prove by induction that A_n^2 = nI" *)

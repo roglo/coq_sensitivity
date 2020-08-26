@@ -181,6 +181,34 @@ apply rng_add_move_0_r.
 apply rng_add_opp_r.
 Qed.
 
+Theorem rng_mul_opp_l : ∀ a b, (- a * b = - (a * b))%Rng.
+Proof.
+intros.
+set (so := rng_semiring).
+specialize (srng_mul_add_distr_r (- a)%Rng a b) as H.
+unfold so in H.
+rewrite rng_add_opp_l in H.
+rewrite srng_mul_0_l in H.
+symmetry in H.
+now apply rng_add_move_0_r in H.
+Qed.
+
+Theorem rng_mul_opp_r : ∀ a b, (a * - b = - (a * b))%Rng.
+Proof.
+intros.
+rewrite srng_mul_comm.
+rewrite rng_mul_opp_l.
+now rewrite srng_mul_comm.
+Qed.
+
+Theorem rng_mul_opp_opp : ∀ a b, (- a * - b = a * b)%Rng.
+Proof.
+intros.
+rewrite rng_mul_opp_l.
+rewrite rng_mul_opp_r.
+apply rng_opp_involutive.
+Qed.
+
 End ring_theorems.
 
 (* Ring of integers *)
