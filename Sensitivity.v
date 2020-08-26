@@ -2457,69 +2457,40 @@ f_equal. {
 }
 destruct l1 as [| e2]; [ easy | cbn ].
 destruct ll as [| l2]; [ easy | cbn ].
-f_equal. {
-  destruct l1 as [| e3]. {
-    cbn.
-    rewrite fold_Z_2_pow.
-    rewrite bmat_mul_0_l; [ | easy | easy ].
-    rewrite bmat_mul_0_l; [ | easy | ]. 2: {
-      transitivity (Z_2_pow n); [ | easy ].
-      apply have_same_bmat_struct_IZ_IZ.
-    }
-    rewrite IHn. 2: {
-...
-  f_equal. {
-    destruct ll as [| l2]; [ easy | cbn ].
-    rewrite IHn. 2: {
-...
-  f_equal; [ now apply IHn | ].
-  destruct l1 as [| e2]; [ easy | ].
-  f_equal; [ now apply IHn | ].
-  now destruct l1.
+f_equal; [ | now destruct ll ].
+destruct l1 as [| e3]; [ cbn | easy ].
+rewrite fold_Z_2_pow.
+rewrite bmat_mul_0_l; [ | easy | easy ].
+rewrite bmat_mul_0_l; [ | easy | ]. 2: {
+  transitivity (Z_2_pow n); [ | easy ].
+  apply have_same_bmat_struct_IZ_IZ.
 }
-destruct ll as [| l2]; [ easy | ].
-f_equal. {
-  destruct l2 as [| e2]; [ easy | ].
-  f_equal; [ now apply IHn | ].
-  destruct l2 as [| e3]; [ easy | ].
-  f_equal; [ now apply IHn | ].
-  now destruct l2.
+rewrite IHn. 2: {
+  destruct l2 as [| e3]; [ easy | cbn ].
+  transitivity (Z_2_pow n); [ | easy ].
+  apply have_same_bmat_struct_IZ_IZ.
 }
-now destruct ll.
-...
-intros.
-revert u.
-induction n; intros; cbn; [ now rewrite srng_mul_1_l | cbn ].
-f_equal; f_equal.
-specialize (IHn u) as H1.
-cbn in H1; rewrite H1; clear H1.
-rewrite bmat_depth_IZ_2_pow.
-specialize (IHn 0%Srng) as H1.
-cbn in H1; rewrite H1; clear H1.
-rewrite bmat_depth_IZ_2_pow.
-rewrite fold_Z_2_pow at 1 3.
-specialize (bmat_mul_loop_Z_IZ_2_pow 0%Srng n) as H1.
-cbn in H1; rewrite H1; clear H1.
-rewrite fold_Z_2_pow at 1.
-specialize (bmat_mul_loop_Z_IZ_2_pow u n) as H1.
-cbn in H1; rewrite H1; clear H1.
-rewrite fold_Z_2_pow at 1.
-specialize (bmat_mul_loop_Z_IZ_2_pow u n) as H1.
-cbn in H1; rewrite H1; clear H1.
-rewrite bmat_depth_Z_2_pow.
-rewrite fold_Z_2_pow at 1.
-specialize (bmat_mul_loop_Z_IZ_2_pow u n) as H1.
-cbn in H1; rewrite H1; clear H1.
-rewrite fold_Z_2_pow at 1 2 3.
-specialize (bmat_mul_loop_Z_IZ_2_pow 0%Srng n) as H1.
-cbn in H1; rewrite H1; clear H1.
-unfold Z_2_pow.
-rewrite bmat_depth_IZ_2_pow.
-rewrite bmat_add_loop_Z_IZ_2_pow; [ | easy ].
-rewrite bmat_add_loop_Z_IZ_2_pow; [ | easy ].
-rewrite bmat_add_loop_IZ_Z_2_pow; [ | easy ].
-easy.
+rewrite bmat_add_0_l; [ | easy | ]. 2: {
+  destruct l2 as [| e3]; [ easy | cbn ].
+  transitivity (Z_2_pow n); [ | easy ].
+  apply have_same_bmat_struct_IZ_IZ.
+}
+rewrite IHn. 2: {
+  destruct l2 as [| e3]; [ easy | now destruct l2 ].
+}
+rewrite bmat_add_0_l; [ | easy | ]. 2: {
+  destruct l2 as [| e3]; [ easy | cbn ].
+  destruct l2 as [| e4]; [ easy | cbn ].
+  transitivity (I_2_pow n); [ | easy ].
+  apply have_same_bmat_struct_IZ_IZ.
+}
+destruct l2 as [| e3]; [ easy | cbn ].
+destruct l2 as [| e4]; [ easy | now destruct l2 ].
 Qed.
+
+Inspect 1.
+
+...
 
 Theorem bmat_loop_sqr_I_2_pow :
     ∀ T {so : semiring_op T } {sp : semiring_prop T} n,
