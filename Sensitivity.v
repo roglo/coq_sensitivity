@@ -2890,10 +2890,17 @@ induction M as [x| M IHM] using bmatrix_ind2. {
 destruct M as (ll); cbn.
 f_equal; f_equal.
 fold (@bmat_list_mul T so).
-remember (map (map (λ mm, bmat_opp mm)) ll) as ll1.
+set (ll1 := map (map (λ mm, bmat_opp mm)) ll).
 fold (@bmat_list_list_mul T so ll1 ll1).
 fold (@bmat_list_list_mul T so ll ll).
-subst ll1.
+induction ll as [| l1]; intros; [ now subst ll1 | ].
+cbn - [ hd ].
+cbn in ll1.
+fold ll1.
+Print bmat_list_list_mul.
+fold (@bmat_list_list_mul T so ll (l1 :: ll)).
+fold (@bmat_list_list_mul T so ((map (map (λ mm, bmat_opp mm)) ll)) ll1).
+f_equal. {
 ...
 
 (* "We prove by induction that A_n^2 = nI" *)
