@@ -2861,6 +2861,21 @@ cbn in Hss.
 now destruct l1.
 Qed.
 
+Theorem bmat_nat_mul_0_r : ∀ T {so : semiring_op T} {sp : semiring_prop T}
+    k n,
+  bmat_nat_mul_l k (Z_2_pow n) = Z_2_pow n.
+Proof.
+intros.
+revert k.
+induction n; intros. {
+  cbn; f_equal.
+  unfold rng_mul_nat_l.
+  destruct k; [ easy | ].
+  now apply all_0_srng_summation_0.
+}
+now cbn; rewrite IHn.
+Qed.
+
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I :
@@ -2882,32 +2897,33 @@ rewrite bmat_mul_1_l; [ | easy | ]. 2: {
 rewrite bmat_mul_1_l; [ | easy | ]. 2: {
   apply have_same_bmat_struct_IZ_A.
 }
+rewrite fold_Z_2_pow.
+rewrite bmat_nat_mul_0_r; [ | easy ].
 f_equal. {
   f_equal. {
     symmetry.
     now apply bmat_add_nat_mul_l_succ.
   }
-  f_equal. {
-    subst so.
-    rewrite (bmat_add_opp_r _ n). 2: {
-      symmetry.
-      apply have_same_bmat_struct_IZ_A.
-    }
-    remember (S n) as k; clear Heqk.
-    clear - sp.
-    revert k.
-    induction n; intros. {
-      cbn; f_equal.
-      unfold rng_mul_nat_l.
-      destruct k; [ easy | ].
-      symmetry.
-      now apply all_0_srng_summation_0.
-    }
-    now cbn; rewrite (IHn k).
-  }
+  f_equal.
+  apply bmat_add_opp_r; [ easy | easy | ].
+  symmetry.
+  apply have_same_bmat_struct_IZ_A.
 }
 f_equal.
 f_equal. {
+  rewrite bmat_mul_1_r; [ | easy | ]. 2: {
+    transitivity (A n); [ apply have_same_bmat_struct_IZ_A | ].
+    apply have_same_bmat_struct_opp_r.
+  }
+  apply bmat_add_opp_r; [ easy | easy | ].
+  symmetry.
+  apply have_same_bmat_struct_IZ_A.
+}
+f_equal.
+rewrite bmat_add_nat_mul_l_succ; [ | easy ].
+rewrite bmat_add_comm; [ | easy ].
+f_equal.
+rewrite <- IHn.
 ...
 
 Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
