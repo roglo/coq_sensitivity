@@ -2389,7 +2389,23 @@ cbn in IHM |-*.
 fold (@has_same_list_struct T).
 fold (@has_same_list_list_struct T).
 induction lla as [| la]; [ easy | cbn ].
-...
+split. 2: {
+  apply IHlla.
+  intros la1 Hla1 a1 Ha1.
+  apply (IHM la1); [ now right | easy ].
+}
+induction la as [| a]; [ easy | cbn ].
+split. {
+  now apply (IHM _ (or_introl eq_refl)); left.
+}
+apply IHla.
+intros la1 Hla1 a1 Ha1.
+destruct Hla1 as [Hla1| Hla1]. {
+  subst la1.
+  now apply (IHM _ (or_introl eq_refl)); right.
+}
+now apply (IHM _ (or_intror Hla1)).
+Qed.
 
 Theorem have_same_bmat_struct_IZ_A : ∀ T {ro : ring_op T} (so := rng_semiring)
     u n,
@@ -2407,9 +2423,8 @@ split; [ | easy ].
 split; [ apply have_same_bmat_struct_IZ_IZ | ].
 split; [ | easy ].
 transitivity (A n); [ easy | ].
-...
 apply have_same_bmat_struct_opp_r.
-...
+Qed.
 
 Theorem bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
   have_same_bmat_struct (I_2_pow n) M
@@ -2764,9 +2779,8 @@ cbn; f_equal; f_equal.
 rewrite IHn; [ | easy ].
 rewrite bmat_mul_1_r; [ | easy | easy ].
 rewrite bmat_mul_1_r; [ | easy | ]. 2: {
-Check have_same_bmat_struct_IZ_IZ.
-...
-apply have_same_bmat_struct_IZ_A.
+  apply have_same_bmat_struct_IZ_A.
+}
 ...
 do 4 rewrite fold_bmat_add.
 rewrite bmat_depth_I_2_pow.
