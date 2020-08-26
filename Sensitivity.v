@@ -2781,6 +2781,13 @@ rewrite bmat_mul_1_r; [ | easy | easy ].
 rewrite bmat_mul_1_r; [ | easy | ]. 2: {
   apply have_same_bmat_struct_IZ_A.
 }
+rewrite bmat_mul_1_l; [ | easy | ]. 2: {
+  transitivity (A n); [ | apply have_same_bmat_struct_opp_r ].
+  apply have_same_bmat_struct_IZ_A.
+}
+rewrite bmat_mul_1_l; [ | easy | ]. 2: {
+  apply have_same_bmat_struct_IZ_A.
+}
 ...
 
 (* "We prove by induction that A_n^2 = nI" *)
