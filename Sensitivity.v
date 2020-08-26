@@ -2805,18 +2805,39 @@ f_equal. 2: {
 now apply (IHM (a :: l)); left.
 Qed.
 
+Theorem bmat_add_opp_r : ∀ T {ro : ring_op T} (so := rng_semiring)
+    {rp : ring_prop T} {sp : semiring_prop T} M n,
+  have_same_bmat_struct M (Z_2_pow n)
+  → bmat_add M (bmat_opp M) = Z_2_pow n.
+Proof.
+intros * rp sp * Hss.
+revert n Hss.
+induction M as [x| M IHM] using bmatrix_ind2; intros. {
+  cbn.
+  subst so.
+  rewrite fold_rng_sub.
+  rewrite rng_add_opp_r.
+  now destruct n.
+}
+destruct n; [ easy | cbn ].
+f_equal; f_equal.
+cbn in Hss.
+fold (@has_same_list_struct T) in Hss.
+fold (@has_same_list_list_struct T) in Hss.
+fold (@bmat_list_add T so).
+fold (@bmat_list_list_add T so).
+...
+
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I :
-    ∀ T {ro : ring_op T} (so := rng_semiring) {rp : semiring_prop T} n,
+    ∀ T {ro : ring_op T} (so := rng_semiring) {rp : ring_prop T} {sp : semiring_prop T} n,
   bmat_mul (A n) (A n) = bmat_nat_mul_l n (I_2_pow n).
 Proof.
 intros.
-subst so.
-revert ro rp.
 induction n; intros; [ now cbn; rewrite srng_mul_0_l | ].
 cbn; f_equal; f_equal.
-rewrite IHn; [ | easy ].
+rewrite IHn.
 rewrite bmat_mul_1_r; [ | easy | easy ].
 rewrite bmat_mul_1_r; [ | easy | ]. 2: {
   apply have_same_bmat_struct_IZ_A.
@@ -2835,8 +2856,21 @@ f_equal. {
   }
   f_equal. {
 ...
-Theorem bmat_add_opp_r : bmat_add M (bmat_opp M) = ...
-Search (bmat_add _ (bmat_opp _)).
+subst so.
+rewrite bmat_add_opp_r with (n := 42).
+...
+
+    clear IHn.
+    induction n; cbn; [ now rewrite rng_opp_0 | ].
+    f_equal; f_equal.
+    f_equal. {
+      f_equal. {
+        admit.
+      }
+      f_equal.
+  }
+  rewrite IHn.
+
 ...
 
 (* "We prove by induction that A_n^2 = nI" *)
