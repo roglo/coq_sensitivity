@@ -2835,6 +2835,9 @@ f_equal. {
   }
   f_equal. {
 ...
+Theorem bmat_add_opp_r : bmat_add M (bmat_opp M) = ...
+Search (bmat_add _ (bmat_opp _)).
+...
 
 (* "We prove by induction that A_n^2 = nI" *)
 
