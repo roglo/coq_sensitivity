@@ -3207,7 +3207,32 @@ assert (∀ ll1 ll2,
     progress fold (@bmat_list_list_mul T so ll2 (l2 :: ll2)).
     f_equal. 2: {
       cbn.
- ...
+ Print bmat_list_list_mul.
+assert (∀ ll1 ll2,
+  bmat_list_list_mul (map list_opp ll1) ll2 =
+  map list_opp (bmat_list_list_mul ll1 ll2)). {
+clear; intros.
+revert ll2.
+induction ll1 as [| l1]; intros; [ easy | cbn ].
+progress fold (@bmat_list_list_mul T so ll1 ll2).
+progress fold (@bmat_list_list_mul T so (map list_opp ll1) ll2).
+f_equal; [ | apply IHll1 ].
+progress fold (bmat_list_mul (list_opp l1)).
+progress fold (bmat_list_mul l1).
+remember (list_list_transpose void_bmat ll2) as ll.
+clear.
+revert ll.
+destruct l1 as [| e1]; intros; cbn. {
+  induction ll as [| l1]; [ easy | now cbn; f_equal ].
+}
+induction ll as [| l2]; cbn; [ easy | ].
+destruct l2 as [| e2]; cbn. {
+  f_equal.
+  now destruct ll.
+}
+f_equal; [ | easy ].
+clear.
+...
 
 (* "We prove by induction that A_n^2 = nI" *)
 
