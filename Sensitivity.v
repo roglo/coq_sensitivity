@@ -3159,35 +3159,39 @@ f_equal. 2: {
   progress fold
     (@bmat_list_list_mul T so (map f ll) (f l1 :: f l2 :: map f ll)).
   progress fold (@bmat_list_list_mul T so ll (l1 :: l2 :: ll)).
-  f_equal. 2: {
+  cbn - [ list_list_transpose ] in IHll.
+  progress fold (@bmat_list_list_mul T so (map f ll) (f l2 :: map f ll))
+    in IHll.
+  progress fold (@bmat_list_list_mul T so ll (l2 :: ll)) in IHll.
+  set (toto l2 := λ l3 : list (bmatrix T),
+                match l2 with
+                | [] => void_bmat
+                | e1 :: l'1 =>
+                    match l3 with
+                    | [] => void_bmat
+                    | e2 :: l'2 => bmat_list_mul (e1 * e2)%BM l'1 l'2
+                    end
+                end).
+  Print bmat_list_mul.
 ...
-f_equal. {
-  cbn.
-  rewrite map_length.
-  destruct l1 as [| e1]; [ easy | cbn ].
-  f_equal. {
-    rewrite (IHM (e1 :: l1)); [ | now left | now left ].
-    apply (bmat_list_mul_eq_compat void_bmat). {
-      now rewrite map_length.
-    } {
-      now do 3 rewrite map_length.
-    }
-    intros.
-    revert i.
-    induction l1 as [| a2]; intros; cbn. {
-      rewrite match_id.
-      now do 2 rewrite bmat_mul_void_l.
-    }
-    destruct i. {
-      destruct ll as [| l2]. {
-        cbn.
-        apply bmat_mul_void_r_compat.
-        symmetry.
-        apply have_same_bmat_struct_opp_r.
-      }
-      cbn.
-Search (bmat_mul (bmat_opp _)).
-
+(*
+  progress fold (bmat_list_mul void_bmat (f l2)).
+*)
+  progress fold (toto (f l2)).
+  progress fold (toto l2).
+  progress fold (toto (f l2)) in IHll.
+  progress fold (toto l2) in IHll.
+  f_equal. 2: {
+    destruct ll as [| l3]; [ easy | ].
+    cbn - [ list_list_transpose ] in IHll |-*.
+    progress fold (@bmat_list_list_mul T so (map f ll) (f l1 :: f l2 :: f l3 :: map f ll)).
+    progress fold (@bmat_list_list_mul T so (map f ll) (f l2 :: f l3 :: map f ll)) in IHll.
+    progress fold (@bmat_list_list_mul T so ll (l1 :: l2 :: l3 :: ll)).
+    progress fold (@bmat_list_list_mul T so ll (l2 :: l3 :: ll)) in IHll.
+    progress fold (toto (f l3)).
+    progress fold (toto (f l3)) in IHll.
+    progress fold (toto l3).
+    progress fold (toto l3) in IHll.
 ...
 
 (* "We prove by induction that A_n^2 = nI" *)
