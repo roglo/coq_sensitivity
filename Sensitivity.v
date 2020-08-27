@@ -1961,6 +1961,18 @@ Definition bmat_list_mul T {so : semiring_op T} :=
         end
     end.
 
+Definition glop T {so : semiring_op T} (l1 l2 : list (bmatrix T)) :=
+  match l1 with
+  | [] => void_bmat
+  | e1 :: l'1 =>
+      match l2 with
+      | [] => void_bmat
+      | e2 :: l'2 => bmat_list_mul (bmat_mul e1 e2) l'1 l'2
+      end
+  end.
+
+...
+
 Definition bmat_list_list_mul T {so : semiring_op T} ll1 ll2 :=
   map
     (λ l1,
@@ -2105,7 +2117,7 @@ Fixpoint have_same_bmat_struct T (MA MB : bmatrix T) :=
       match MB with
       | BM_1 xb => False
       | BM_M MMB =>
-          let fix has_same_list_struct la lb :=
+          let fix have_same_list_struct la lb :=
             match la with
             | [] => match lb with [] => True | _ :: _ => False end
             | a :: la' =>
@@ -2113,28 +2125,28 @@ Fixpoint have_same_bmat_struct T (MA MB : bmatrix T) :=
                 | [] => False
                 | b :: lb' =>
                     have_same_bmat_struct a b ∧
-                    has_same_list_struct la' lb'
+                    have_same_list_struct la' lb'
                 end
             end
           in
-          let fix has_same_list_list_struct lla llb :=
+          let fix have_same_list_list_struct lla llb :=
             match lla with
             | [] => match llb with [] => True | _ :: _ => False end
             | la :: lla' =>
                 match llb with
                 | [] => False
                 | lb :: llb' =>
-                    has_same_list_struct la lb ∧
-                    has_same_list_list_struct lla' llb'
+                    have_same_list_struct la lb ∧
+                    have_same_list_list_struct lla' llb'
                 end
             end
           in
-          has_same_list_list_struct (mat_list MMA) (mat_list MMB)
+          have_same_list_list_struct (mat_list MMA) (mat_list MMB)
         end
   end.
 
-Definition has_same_list_struct T :=
-  fix has_same_list_struct (la lb : list (bmatrix T)) :=
+Definition have_same_list_struct T :=
+  fix have_same_list_struct (la lb : list (bmatrix T)) :=
     match la with
     | [] => match lb with [] => True | _ :: _ => False end
     | a :: la' =>
@@ -2142,20 +2154,20 @@ Definition has_same_list_struct T :=
         | [] => False
         | b :: lb' =>
             have_same_bmat_struct a b ∧
-            has_same_list_struct la' lb'
+            have_same_list_struct la' lb'
         end
     end.
 
-Definition has_same_list_list_struct T :=
-  fix has_same_list_list_struct (lla llb : list (list (bmatrix T))) :=
+Definition have_same_list_list_struct T :=
+  fix have_same_list_list_struct (lla llb : list (list (bmatrix T))) :=
      match lla with
      | [] => match llb with [] => True | _ :: _ => False end
      | la :: lla' =>
          match llb with
          | [] => False
          | lb :: llb' =>
-             has_same_list_struct la lb ∧
-             has_same_list_list_struct lla' llb'
+             have_same_list_struct la lb ∧
+             have_same_list_list_struct lla' llb'
          end
      end.
 
@@ -2200,8 +2212,8 @@ destruct MB as [xb| mb]; [ easy | ].
 cbn in HMM |-*.
 destruct ma as (lla); destruct mb as (llb).
 cbn in IHMA, HMM |-*.
-fold (@has_same_list_struct T) in HMM |-*.
-fold (@has_same_list_list_struct T) in HMM |-*.
+fold (@have_same_list_struct T) in HMM |-*.
+fold (@have_same_list_list_struct T) in HMM |-*.
 revert llb HMM.
 induction lla as [| la]; intros; [ now destruct llb | ].
 destruct llb as [| lb]; [ easy | ].
@@ -2239,8 +2251,8 @@ induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
 destruct MB as [xb| mb]; [ easy | ].
 destruct MC as [xc| mc]; [ easy | ].
 cbn in HAB, HBC |-*.
-fold (@has_same_list_struct T) in HAB, HBC |-*.
-fold (@has_same_list_list_struct T) in HAB, HBC |-*.
+fold (@have_same_list_struct T) in HAB, HBC |-*.
+fold (@have_same_list_list_struct T) in HAB, HBC |-*.
 destruct ma as (lla).
 destruct mb as (llb).
 destruct mc as (llc).
@@ -2386,8 +2398,8 @@ intros.
 induction M as [| M IHM] using bmatrix_ind2; [ easy | cbn ].
 destruct M as (lla).
 cbn in IHM |-*.
-fold (@has_same_list_struct T).
-fold (@has_same_list_list_struct T).
+fold (@have_same_list_struct T).
+fold (@have_same_list_list_struct T).
 induction lla as [| la]; [ easy | cbn ].
 split. 2: {
   apply IHlla.
@@ -2822,8 +2834,8 @@ induction M as [x| M IHM] using bmatrix_ind2; intros. {
 destruct n; [ easy | cbn ].
 f_equal; f_equal.
 cbn in Hss.
-fold (@has_same_list_struct T) in Hss.
-fold (@has_same_list_list_struct T) in Hss.
+fold (@have_same_list_struct T) in Hss.
+fold (@have_same_list_list_struct T) in Hss.
 fold (@bmat_list_add T so).
 fold (@bmat_list_list_add T so).
 destruct M as (ll).
@@ -2874,6 +2886,66 @@ induction n; intros. {
   now apply all_0_srng_summation_0.
 }
 now cbn; rewrite IHn.
+Qed.
+
+Theorem bmat_mul_add_distr_l :
+  ∀ T (so : semiring_op T) {sp : semiring_prop T} MA MB MC,
+  have_same_bmat_struct MA MB
+  → have_same_bmat_struct MA MC
+  → bmat_mul MA (bmat_add MB MC) = bmat_add (bmat_mul MA MB) (bmat_mul MA MC).
+Proof.
+intros * sp * Hssab Hssac.
+revert MB MC Hssab Hssac.
+induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
+  destruct MB as [xb| mb]; [ cbn | now destruct MC ].
+  destruct MC as [xc| mc]; [ cbn | easy ].
+  now rewrite srng_mul_add_distr_l.
+}
+destruct MB as [xb| mb]; [ easy | ].
+destruct MC as [xc| mc]; [ easy | ].
+cbn.
+f_equal; f_equal.
+destruct ma as (lla).
+destruct mb as (llb).
+destruct mc as (llc).
+cbn.
+fold (@bmat_list_add T so).
+fold (@bmat_list_list_add T so).
+fold (@bmat_list_mul T so).
+fold (@bmat_list_list_mul T so lla (bmat_list_list_add llb llc)).
+fold (@bmat_list_list_mul T so lla llb).
+fold (@bmat_list_list_mul T so lla llc).
+revert llb llc Hssab Hssac.
+induction lla as [| la]; intros; [ easy | cbn ].
+f_equal. {
+Print bmat_list_list_mul.
+  fold (@bmat_list_list_mul T so (bmat_list_list_add llb llc)).
+  set (f := λ l2 : list (bmatrix T),
+       match la with
+       | [] => void_bmat
+       | e1 :: l'1 =>
+           match l2 with
+           | [] => void_bmat
+           | e2 :: l'2 => bmat_list_mul (bmat_mul e1 e2) l'1 l'2
+           end
+       end).
+Print bmat_list_list_mul.
+...
+
+Theorem bmat_mul_opp_l :
+  ∀ T {ro : ring_op T} (so := rng_semiring) MA MB,
+  bmat_mul (bmat_opp MA) MB = bmat_opp (bmat_mul MA MB).
+Proof.
+intros.
+Check srng_mul_add_distr_l.
+specialize (bmat_mul_add_distr_r (bmat_opp MA) MA MB) as H.
+...
+specialize (srng_mul_add_distr_r (- a)%Rng a b) as H.
+unfold so in H.
+rewrite rng_add_opp_l in H.
+rewrite srng_mul_0_l in H.
+symmetry in H.
+now apply rng_add_move_0_r in H.
 Qed.
 
 Theorem bmat_mul_sqr_opp :
