@@ -3193,7 +3193,21 @@ f_equal. 2: {
     progress fold (bmat_list_mul l3).
     progress fold (bmat_list_mul l3) in IHll.
     f_equal. 2: {
-...
+assert (∀ ll1 ll2,
+  bmat_list_list_mul (map list_opp ll2) (map list_opp (ll1 ++ ll2)) =
+  bmat_list_list_mul ll2 (ll1 ++ ll2)). {
+  clear.
+  intros.
+  revert ll2.
+  induction ll1 as [| l1]; intros; cbn. {
+    induction ll2 as [| l2]; [ easy | ].
+    cbn - [ list_list_transpose ].
+    rewrite <- map_cons.
+    progress fold (@bmat_list_list_mul T so (map list_opp ll2) (map list_opp (l2 :: ll2))).
+    progress fold (@bmat_list_list_mul T so ll2 (l2 :: ll2)).
+    f_equal. 2: {
+      cbn.
+ ...
 
 (* "We prove by induction that A_n^2 = nI" *)
 
