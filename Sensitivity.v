@@ -1917,14 +1917,13 @@ Fixpoint bmat_mul T {so : semiring_op T} (MM1 MM2 : bmatrix T) :=
       match MM2 with
       | BM_1 _ => void_bmat
       | BM_M MMB =>
-          let fix list_mul_loop a l1 l2 :=
+          let fix list_mul a l1 l2 :=
             match l1 with
             | [] => a
             | e1 :: l'1 =>
                 match l2 with
                 | [] => a
-                | e2 :: l'2 =>
-                    list_mul_loop (bmat_add a (bmat_mul e1 e2)) l'1 l'2
+                | e2 :: l'2 => list_mul (bmat_add a (bmat_mul e1 e2)) l'1 l'2
                 end
             end
           in
@@ -1938,7 +1937,7 @@ Fixpoint bmat_mul T {so : semiring_op T} (MM1 MM2 : bmatrix T) :=
                       | e1 :: l'1 =>
                           match l2 with
                           | [] => void_bmat
-                          | e2 :: l'2 => list_mul_loop (bmat_mul e1 e2) l'1 l'2
+                          | e2 :: l'2 => list_mul (bmat_mul e1 e2) l'1 l'2
                           end
                       end)
                    (list_list_transpose void_bmat ll2))
@@ -1951,32 +1950,16 @@ Fixpoint bmat_mul T {so : semiring_op T} (MM1 MM2 : bmatrix T) :=
       end
   end.
 
-Definition bmat_list_mul_loop T {so : semiring_op T} :=
-  fix list_mul_loop (a : bmatrix T) (l1 l2 : list (bmatrix T)) :=
+Definition bmat_list_mul T {so : semiring_op T} :=
+  fix list_mul (a : bmatrix T) (l1 l2 : list (bmatrix T)) :=
     match l1 with
     | [] => a
     | e1 :: l'1 =>
         match l2 with
         | [] => a
-        | e2 :: l'2 => list_mul_loop (bmat_add a (bmat_mul e1 e2)) l'1 l'2
+        | e2 :: l'2 => list_mul (bmat_add a (bmat_mul e1 e2)) l'1 l'2
         end
     end.
-
-(*
-Definition glop T {so : semiring_op T} (l1 l2 : list (bmatrix T)) :=
-  match l1 with
-  | [] => void_bmat
-  | e1 :: l'1 =>
-      match l2 with
-      | [] => void_bmat
-      | e2 :: l'2 => bmat_list_mul (bmat_mul e1 e2) l'1 l'2
-      end
-  end.
-
-Definition bmat_list_list_mul T {so : semiring_op T} ll1 ll2 :=
-  map (λ l1, map (glop l1) (list_list_transpose void_bmat ll2)) ll1.
-...
-*)
 
 Definition bmat_list_list_mul T {so : semiring_op T} ll1 ll2 :=
   map
@@ -1988,7 +1971,7 @@ Definition bmat_list_list_mul T {so : semiring_op T} ll1 ll2 :=
             | e1 :: l'1 =>
                 match l2 with
                 | [] => void_bmat
-                | e2 :: l'2 => bmat_list_mul_loop (bmat_mul e1 e2) l'1 l'2
+                | e2 :: l'2 => bmat_list_mul (bmat_mul e1 e2) l'1 l'2
                 end
             end)
          (list_list_transpose void_bmat ll2))
@@ -2531,7 +2514,7 @@ destruct mm as (ll).
 destruct ll as [| l1]; [ easy | ].
 destruct l1 as [| e1]; [ now cbn in Hss | ].
 cbn in Hss |-*.
-fold (@bmat_list_mul_loop T so).
+fold (@bmat_list_mul T so).
 f_equal; f_equal.
 f_equal. {
   rewrite IHn; [ | easy ].
@@ -2648,7 +2631,7 @@ induction n; intros. {
 cbn - [ Nat.eq_dec ].
 destruct M as [x| M]; [ easy | f_equal ].
 destruct M as (ll); cbn.
-fold (@bmat_list_mul_loop T so).
+fold (@bmat_list_mul T so).
 cbn in Hss.
 cbn; f_equal.
 destruct ll as [| l1]; [ easy | ].
@@ -2908,33 +2891,42 @@ induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
 }
 destruct MB as [xb| mb]; [ easy | ].
 destruct MC as [xc| mc]; [ easy | ].
+move mb before ma.
+move mc before mb.
+cbn in Hssab.
+progress fold (@have_same_list_struct T) in Hssab.
+progress fold (@have_same_list_list_struct T) in Hssab.
+cbn in Hssac.
+progress fold (@have_same_list_struct T) in Hssac.
+progress fold (@have_same_list_list_struct T) in Hssac.
 cbn.
 f_equal; f_equal.
 destruct ma as (lla).
 destruct mb as (llb).
 destruct mc as (llc).
-cbn.
-fold (@bmat_list_add T so).
-fold (@bmat_list_list_add T so).
-fold (@bmat_list_mul_loop T so).
-fold (@bmat_list_list_mul T so lla (bmat_list_list_add llb llc)).
-fold (@bmat_list_list_mul T so lla llb).
-fold (@bmat_list_list_mul T so lla llc).
+cbn in IHMA, Hssab, Hssac |-*.
+progress fold (@bmat_list_add T so).
+progress fold (@bmat_list_list_add T so).
+progress fold (@bmat_list_mul T so).
+progress fold (@bmat_list_list_mul T so lla (bmat_list_list_add llb llc)).
+progress fold (@bmat_list_list_mul T so lla llb).
+progress fold (@bmat_list_list_mul T so lla llc).
 revert llb llc Hssab Hssac.
 induction lla as [| la]; intros; [ easy | cbn ].
-f_equal. {
-Print bmat_list_list_mul.
-  fold (@bmat_list_list_mul T so (bmat_list_list_add llb llc)).
-  set (f := λ l2 : list (bmatrix T),
-       match la with
-       | [] => void_bmat
-       | e1 :: l'1 =>
-           match l2 with
-           | [] => void_bmat
-           | e2 :: l'2 => bmat_list_mul_loop (bmat_mul e1 e2) l'1 l'2
-           end
-       end).
-Print bmat_list_list_mul.
+progress fold (@bmat_list_list_mul T so lla (bmat_list_list_add llb llc)).
+progress fold (@bmat_list_list_mul T so lla llb).
+progress fold (@bmat_list_list_mul T so lla llc).
+f_equal. 2: {
+  cbn in Hssab, Hssac.
+  destruct llb as [| lb]; [ easy | ].
+  destruct llc as [| lc]; [ easy | ].
+  cbn.
+...
+  apply IHlla; cycle 1. {
+    destruct lla as [| la1]. {
+      destruct llb as [| lb1]. {
+        cbn in Hssab.
+cbn in Hssab.
 ...
 
 Theorem bmat_mul_opp_l :
@@ -2966,7 +2958,7 @@ induction M as [x| M IHM] using bmatrix_ind2. {
 }
 destruct M as (ll); cbn in IHM |-*.
 f_equal; f_equal.
-fold (@bmat_list_mul_loop T so).
+fold (@bmat_list_mul T so).
 set (ll1 := map (map (λ mm, bmat_opp mm)) ll).
 fold (@bmat_list_list_mul T so ll1 ll1).
 fold (@bmat_list_list_mul T so ll ll).
@@ -2977,14 +2969,14 @@ fold ll1.
 fold (@bmat_list_list_mul T so ll (l1 :: ll)).
 fold (@bmat_list_list_mul T so ((map (map (λ mm, bmat_opp mm)) ll)) ll1).
 f_equal. {
-Print bmat_list_mul_loop.
+Print bmat_list_mul.
 set (toto := λ l1 l2 : list (bmatrix T),
        match l1 with
        | [] => void_bmat
        | e1 :: l'1 =>
            match l2 with
            | [] => void_bmat
-           | e2 :: l'2 => bmat_list_mul_loop (bmat_mul e1 e2) l'1 l'2
+           | e2 :: l'2 => bmat_list_mul (bmat_mul e1 e2) l'1 l'2
            end
        end).
 fold (toto (map (λ mm, bmat_opp mm) l1)).
