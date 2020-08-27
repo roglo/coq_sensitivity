@@ -2945,13 +2945,40 @@ progress fold (@bmat_list_list_mul T so lla llc).
         cbn in Hssac.
         destruct llc as [| lc1]. {
 ...
+*)
 
 Theorem bmat_mul_opp_l :
-  ∀ T {ro : ring_op T} (so := rng_semiring) MA MB,
+  ∀ T {ro : ring_op T} (so := rng_semiring) (rp : ring_prop T) (sp : semiring_prop T) MA MB,
   bmat_mul (bmat_opp MA) MB = bmat_opp (bmat_mul MA MB).
 Proof.
 intros.
-Check srng_mul_add_distr_l.
+revert MB.
+destruct MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
+  destruct MB as [xb| mb]; [ cbn | easy ].
+  f_equal.
+  apply rng_mul_opp_l.
+}
+destruct MB as [xb| mb]; [ easy | cbn ].
+f_equal; f_equal.
+destruct ma as (lla).
+destruct mb as (llb).
+cbn in IHMA |-*.
+progress fold (@bmat_list_mul T so).
+progress fold (@bmat_list_list_mul T so (map (map (λ mm, bmat_opp mm)) lla) llb).
+progress fold (@bmat_list_list_mul T so lla llb).
+revert llb.
+induction lla as [| la1]; intros; [ easy | cbn ].
+f_equal. {
+  rewrite map_map.
+  apply map_ext_in_iff.
+  intros la2 Hla2.
+  destruct la2 as [| a2]; cbn. {
+    now destruct (map (λ mm, bmat_opp mm) la1), la1.
+  }
+  destruct la1 as [| a1]; [ easy | cbn ].
+  rewrite (IHMA (a1 :: la1)); [ | now left | now left ].
+...
+
 specialize (bmat_mul_add_distr_r (bmat_opp MA) MA MB) as H.
 ...
 specialize (srng_mul_add_distr_r (- a)%Rng a b) as H.
@@ -2961,7 +2988,8 @@ rewrite srng_mul_0_l in H.
 symmetry in H.
 now apply rng_add_move_0_r in H.
 Qed.
-*)
+
+...
 
 Theorem bmat_list_mul_eq_compat : ∀ T {so : semiring_op T} d l1 l2 l3 l4 a,
   length l1 = length l3
@@ -3070,6 +3098,8 @@ f_equal. {
         apply have_same_bmat_struct_opp_r.
       }
       cbn.
+Search (bmat_mul (bmat_opp _)).
+
 ...
 
 (* "We prove by induction that A_n^2 = nI" *)
