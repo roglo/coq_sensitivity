@@ -3021,6 +3021,12 @@ progress fold (@bmat_list_mul T so).
 set (ll1 := map (map (λ mm, bmat_opp mm)) ll).
 progress fold (@bmat_list_list_mul T so ll1 ll1).
 progress fold (@bmat_list_list_mul T so ll ll).
+subst ll1.
+induction ll as [| l1]; intros; [ easy | ].
+cbn - [ hd ].
+progress fold (@bmat_list_list_mul T so ll (l1 :: ll)).
+...
+progress fold (@bmat_list_list_mul T so ((map (map (λ mm, bmat_opp mm)) ll))).
 ...
 induction ll as [| l1]; intros; [ now subst ll1 | ].
 cbn - [ hd ].
