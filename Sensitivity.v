@@ -2963,7 +2963,7 @@ now apply rng_add_move_0_r in H.
 Qed.
 *)
 
-Theorem bmat_list_mul_compat : ∀ T {so : semiring_op T} d l1 l2 l3 l4 a,
+Theorem bmat_list_mul_eq_compat : ∀ T {so : semiring_op T} d l1 l2 l3 l4 a,
   length l1 = length l3
   → length l2 = length l4
   → (∀ i, bmat_mul (nth i l1 d) (nth i l2 d) = bmat_mul (nth i l3 d) (nth i l4 d))
@@ -2991,19 +2991,6 @@ intros.
 now induction M.
 Qed.
 
-(*
-Theorem bmat_mul_void_r : ∀ T {so : semiring_op T} M, bmat_mul M void_bmat = void_bmat.
-Proof.
-intros.
-induction M as [| M IHM] using bmatrix_ind2; [ easy | cbn ].
-unfold void_bmat; f_equal.
-destruct M as (ll); cbn in IHM |-*.
-induction ll as [| l1]; [ easy | exfalso ].
-destruct ll as [| l2]. {
-  cbn in IHll.
-...
-*)
-
 Theorem bmat_mul_sqr_opp :
   ∀ T {ro : ring_op T} (so := rng_semiring)
        {sp : semiring_prop T} {rp : ring_prop T} M,
@@ -3025,6 +3012,37 @@ subst ll1.
 induction ll as [| l1]; intros; [ easy | ].
 cbn - [ hd ].
 progress fold (@bmat_list_list_mul T so ll (l1 :: ll)).
+progress fold (@bmat_list_list_mul T so
+  (map (map (λ mm : bmatrix T, bmat_opp mm)) ll)
+  (map (λ mm : bmatrix T, bmat_opp mm) l1 :: map (map (λ mm : bmatrix T, bmat_opp mm)) ll)).
+f_equal. {
+  cbn.
+  rewrite map_length.
+  destruct l1 as [| e1]; [ easy | cbn ].
+  f_equal. {
+    rewrite (IHM (e1 :: l1)); [ | now left | now left ].
+    apply (bmat_list_mul_eq_compat void_bmat). {
+      now rewrite map_length.
+    } {
+      now do 3 rewrite map_length.
+    }
+    intros.
+...
+Check bmat_list_mul_eq_compat.
+Print bmat_list_mul.
+Print bmat_mul.
+Theorem bmat_mul_eq_compat : ∀ T {so : semiring_op T} MA MB MC MD,
+  bmat_mul MA MB = bmat_mul MC MD.
+Proof.
+intros.
+Print bmat_mul.
+Check bmat_list_mul_eq_compat.
+...
+    revert i.
+    induction l1 as [| a2]; intros; cbn. {
+      rewrite match_id.
+      now do 2 rewrite bmat_mul_void_l.
+    }
 ...
 progress fold (@bmat_list_list_mul T so ((map (map (λ mm, bmat_opp mm)) ll))).
 ...
