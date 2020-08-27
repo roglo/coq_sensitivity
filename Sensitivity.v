@@ -2960,6 +2960,7 @@ progress fold (@bmat_list_list_mul T so lla llc).
 ...
 *)
 
+(*
 Theorem bmat_mul_add_distr_r :
   ∀ T (so : semiring_op T) {sp : semiring_prop T} MA MB MC,
   have_same_bmat_struct MA MC
@@ -3007,7 +3008,9 @@ progress fold (@bmat_list_list_mul T so lla (lc1 :: llc)).
 progress fold (@bmat_list_list_mul T so llb (lc1 :: llc)).
 f_equal. 2: {
 ...
+*)
 
+(*
 Theorem bmat_mul_opp_l :
   ∀ T {ro : ring_op T} (so := rng_semiring) (rp : ring_prop T) (sp : semiring_prop T) MA MB,
   have_same_bmat_struct MA MB
@@ -3017,7 +3020,6 @@ intros * rp sp * Hss.
 ...
 specialize (@bmat_mul_add_distr_r T so sp MA (bmat_opp MA) MB Hss) as H1.
 ...
-
 intros.
 revert MB.
 destruct MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
@@ -3069,8 +3071,8 @@ rewrite srng_mul_0_l in H.
 symmetry in H.
 now apply rng_add_move_0_r in H.
 Qed.
-
 ...
+*)
 
 Theorem bmat_list_mul_eq_compat : ∀ T {so : semiring_op T} d l1 l2 l3 l4 a,
   length l1 = length l3
@@ -3143,17 +3145,22 @@ induction M as [x| M IHM] using bmatrix_ind2. {
 }
 destruct M as (ll); cbn in IHM |-*.
 f_equal; f_equal.
+set (f := map (λ mm, (- mm)%BM)).
 progress fold (@bmat_list_mul T so).
-set (ll1 := map (map (λ mm, bmat_opp mm)) ll).
-progress fold (@bmat_list_list_mul T so ll1 ll1).
+progress fold (@bmat_list_list_mul T so (map f ll) (map f ll)).
 progress fold (@bmat_list_list_mul T so ll ll).
-subst ll1.
 induction ll as [| l1]; intros; [ easy | ].
 cbn - [ hd ].
 progress fold (@bmat_list_list_mul T so ll (l1 :: ll)).
-progress fold (@bmat_list_list_mul T so
-  (map (map (λ mm : bmatrix T, bmat_opp mm)) ll)
-  (map (λ mm : bmatrix T, bmat_opp mm) l1 :: map (map (λ mm : bmatrix T, bmat_opp mm)) ll)).
+progress fold (@bmat_list_list_mul T so (map f ll) (f l1 :: map f ll)).
+f_equal. 2: {
+  destruct ll as [| l2]; [ easy | ].
+  cbn - [ list_list_transpose ].
+  progress fold
+    (@bmat_list_list_mul T so (map f ll) (f l1 :: f l2 :: map f ll)).
+  progress fold (@bmat_list_list_mul T so ll (l1 :: l2 :: ll)).
+  f_equal. 2: {
+...
 f_equal. {
   cbn.
   rewrite map_length.
