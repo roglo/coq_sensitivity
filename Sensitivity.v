@@ -2887,7 +2887,7 @@ induction M as [x| M IHM] using bmatrix_ind2. {
   f_equal.
   now apply rng_mul_opp_opp.
 }
-destruct M as (ll); cbn.
+destruct M as (ll); cbn in IHM |-*.
 f_equal; f_equal.
 fold (@bmat_list_mul T so).
 set (ll1 := map (map (λ mm, bmat_opp mm)) ll).
@@ -2897,10 +2897,27 @@ induction ll as [| l1]; intros; [ now subst ll1 | ].
 cbn - [ hd ].
 cbn in ll1.
 fold ll1.
-Print bmat_list_list_mul.
 fold (@bmat_list_list_mul T so ll (l1 :: ll)).
 fold (@bmat_list_list_mul T so ((map (map (λ mm, bmat_opp mm)) ll)) ll1).
 f_equal. {
+Print bmat_list_mul.
+set (toto := λ l1 l2 : list (bmatrix T),
+       match l1 with
+       | [] => void_bmat
+       | e1 :: l'1 =>
+           match l2 with
+           | [] => void_bmat
+           | e2 :: l'2 => bmat_list_mul (bmat_mul e1 e2) l'1 l'2
+           end
+       end).
+fold (toto (map (λ mm, bmat_opp mm) l1)).
+fold (toto l1).
+induction l1 as [| a1]; [ easy | cbn ].
+f_equal. {
+  rewrite (IHM (a1 :: l1)); [ | now left | now left ].
+...
+  ll1 := map (λ mm : bmatrix T, bmat_opp mm) (a1 :: l1)
+         :: map (map (λ mm : bmatrix T, bmat_opp mm)) ll
 ...
 
 (* "We prove by induction that A_n^2 = nI" *)
