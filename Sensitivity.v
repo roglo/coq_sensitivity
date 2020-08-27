@@ -1961,6 +1961,16 @@ Definition bmat_list_mul T {so : semiring_op T} :=
         end
     end.
 
+Definition bmat_list_mul_start T {so : semiring_op T} l1 l2 :=
+  match l1 with
+  | [] => void_bmat
+  | e1 :: l'1 =>
+      match l2 with
+      | [] => void_bmat
+      | e2 :: l'2 => bmat_list_mul (bmat_mul e1 e2) l'1 l'2
+      end
+  end.
+
 Definition bmat_list_list_mul T {so : semiring_op T} ll1 ll2 :=
   map
     (λ l1,
@@ -3145,53 +3155,40 @@ induction M as [x| M IHM] using bmatrix_ind2. {
 }
 destruct M as (ll); cbn in IHM |-*.
 f_equal; f_equal.
-set (f := map (λ mm, (- mm)%BM)).
+set (list_opp := map (λ mm, (- mm)%BM)).
 progress fold (@bmat_list_mul T so).
-progress fold (@bmat_list_list_mul T so (map f ll) (map f ll)).
+progress fold (@bmat_list_list_mul T so (map list_opp ll) (map list_opp ll)).
 progress fold (@bmat_list_list_mul T so ll ll).
 induction ll as [| l1]; intros; [ easy | ].
 cbn - [ hd ].
 progress fold (@bmat_list_list_mul T so ll (l1 :: ll)).
-progress fold (@bmat_list_list_mul T so (map f ll) (f l1 :: map f ll)).
+progress fold (@bmat_list_list_mul T so (map list_opp ll) (list_opp l1 :: map list_opp ll)).
 f_equal. 2: {
   destruct ll as [| l2]; [ easy | ].
   cbn - [ list_list_transpose ].
   progress fold
-    (@bmat_list_list_mul T so (map f ll) (f l1 :: f l2 :: map f ll)).
+    (@bmat_list_list_mul T so (map list_opp ll) (list_opp l1 :: list_opp l2 :: map list_opp ll)).
   progress fold (@bmat_list_list_mul T so ll (l1 :: l2 :: ll)).
   cbn - [ list_list_transpose ] in IHll.
-  progress fold (@bmat_list_list_mul T so (map f ll) (f l2 :: map f ll))
+  progress fold (@bmat_list_list_mul T so (map list_opp ll) (list_opp l2 :: map list_opp ll))
     in IHll.
   progress fold (@bmat_list_list_mul T so ll (l2 :: ll)) in IHll.
-  set (toto l2 := λ l3 : list (bmatrix T),
-                match l2 with
-                | [] => void_bmat
-                | e1 :: l'1 =>
-                    match l3 with
-                    | [] => void_bmat
-                    | e2 :: l'2 => bmat_list_mul (e1 * e2)%BM l'1 l'2
-                    end
-                end).
-  Print bmat_list_mul.
-...
-(*
-  progress fold (bmat_list_mul void_bmat (f l2)).
-*)
-  progress fold (toto (f l2)).
-  progress fold (toto l2).
-  progress fold (toto (f l2)) in IHll.
-  progress fold (toto l2) in IHll.
+  progress fold (bmat_list_mul_start (list_opp l2)).
+  progress fold (bmat_list_mul_start l2).
+  progress fold (bmat_list_mul_start (list_opp l2)) in IHll.
+  progress fold (bmat_list_mul_start l2) in IHll.
   f_equal. 2: {
     destruct ll as [| l3]; [ easy | ].
     cbn - [ list_list_transpose ] in IHll |-*.
-    progress fold (@bmat_list_list_mul T so (map f ll) (f l1 :: f l2 :: f l3 :: map f ll)).
-    progress fold (@bmat_list_list_mul T so (map f ll) (f l2 :: f l3 :: map f ll)) in IHll.
+    progress fold (@bmat_list_list_mul T so (map list_opp ll) (list_opp l1 :: list_opp l2 :: list_opp l3 :: map list_opp ll)).
+    progress fold (@bmat_list_list_mul T so (map list_opp ll) (list_opp l2 :: list_opp l3 :: map list_opp ll)) in IHll.
     progress fold (@bmat_list_list_mul T so ll (l1 :: l2 :: l3 :: ll)).
     progress fold (@bmat_list_list_mul T so ll (l2 :: l3 :: ll)) in IHll.
-    progress fold (toto (f l3)).
-    progress fold (toto (f l3)) in IHll.
-    progress fold (toto l3).
-    progress fold (toto l3) in IHll.
+    progress fold (bmat_list_mul_start (list_opp l3)).
+    progress fold (bmat_list_mul_start (list_opp l3)) in IHll.
+    progress fold (bmat_list_mul_start l3).
+    progress fold (bmat_list_mul_start l3) in IHll.
+    f_equal. 2: {
 ...
 
 (* "We prove by induction that A_n^2 = nI" *)
