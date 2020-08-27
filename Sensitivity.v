@@ -2016,6 +2016,19 @@ induction BM as [x| M IHBM] using bmatrix_ind2. {
 }
 Qed.
 
+Declare Scope BM_scope.
+Delimit Scope BM_scope with BM.
+
+Module bmatrix_Notations.
+
+Notation "a + b" := (bmat_add a b) : BM_scope.
+Notation "a * b" := (bmat_mul a b) : BM_scope.
+Notation "- a" := (bmat_opp a) : BM_scope.
+
+End bmatrix_Notations.
+
+Import bmatrix_Notations.
+
 (* sequence "An" *)
 
 Fixpoint IZ_2_pow T {so : semiring_op T} (u : T) n :=
@@ -2947,10 +2960,64 @@ progress fold (@bmat_list_list_mul T so lla llc).
 ...
 *)
 
+Theorem bmat_mul_add_distr_r :
+  ∀ T (so : semiring_op T) {sp : semiring_prop T} MA MB MC,
+  have_same_bmat_struct MA MC
+  → have_same_bmat_struct MB MC
+  → ((MA + MB) * MC = MA * MC + MB * MC)%BM.
+Proof.
+intros * sp * Hssac Hssbc.
+revert MA MB Hssac Hssbc.
+induction MC as [xc| mc IHMC] using bmatrix_ind2; intros. {
+  destruct MA as [xa| ma]; [ | easy ].
+  destruct MB as [xb| mb]; [ cbn | easy ].
+  now rewrite srng_mul_add_distr_r.
+}
+destruct MA as [xa| ma]; [ easy | ].
+destruct MB as [xb| mb]; [ easy | ].
+move ma after mc.
+move mb after mc.
+cbn in Hssac.
+progress fold (@have_same_list_struct T) in Hssac.
+progress fold (@have_same_list_list_struct T) in Hssac.
+cbn in Hssbc.
+progress fold (@have_same_list_struct T) in Hssbc.
+progress fold (@have_same_list_list_struct T) in Hssbc.
+destruct ma as (lla).
+destruct mb as (llb).
+destruct mc as (llc).
+cbn in IHMC, Hssac, Hssbc |-*.
+f_equal; f_equal.
+progress fold (@bmat_list_add T so).
+progress fold (@bmat_list_list_add T so).
+progress fold (@bmat_list_mul T so).
+progress fold (@bmat_list_list_mul T so (bmat_list_list_add lla llb) llc).
+progress fold (@bmat_list_list_mul T so lla llc).
+progress fold (@bmat_list_list_mul T so llb llc).
+revert lla llb Hssac Hssbc.
+induction llc as [| lc1]; intros; [ now destruct lla | ].
+destruct lla as [| la1]; [ easy | ].
+destruct llb as [| lb1]; [ easy | ].
+cbn in Hssac, Hssbc.
+destruct Hssac as (Hssac, Hsslac).
+destruct Hssbc as (Hssbc, Hsslbc).
+cbn - [ list_list_transpose ].
+progress fold (@bmat_list_list_mul T so (bmat_list_list_add lla llb) (lc1 :: llc)).
+progress fold (@bmat_list_list_mul T so lla (lc1 :: llc)).
+progress fold (@bmat_list_list_mul T so llb (lc1 :: llc)).
+f_equal. 2: {
+...
+
 Theorem bmat_mul_opp_l :
   ∀ T {ro : ring_op T} (so := rng_semiring) (rp : ring_prop T) (sp : semiring_prop T) MA MB,
-  bmat_mul (bmat_opp MA) MB = bmat_opp (bmat_mul MA MB).
+  have_same_bmat_struct MA MB
+  → bmat_mul (bmat_opp MA) MB = bmat_opp (bmat_mul MA MB).
 Proof.
+intros * rp sp * Hss.
+...
+specialize (@bmat_mul_add_distr_r T so sp MA (bmat_opp MA) MB Hss) as H1.
+...
+
 intros.
 revert MB.
 destruct MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
@@ -2983,12 +3050,14 @@ destruct la2 as [| a2]; cbn. {
 }
 destruct la1 as [| a1]; [ easy | cbn ].
 rewrite (IHMA (a1 :: la1)); [ | now left | now left ].
-...
-clear Hla2.
 remember (bmat_mul a1 a2) as k; clear Heqk.
+clear Hla2.
 revert k la2.
 induction la1 as [| a3]; intros; [ easy | cbn ].
 destruct la2 as [| a4]; [ easy | cbn ].
+Inspect 1.
+...
+rewrite <- bmat_mul_add_distr_l.
 ...
 
 specialize (bmat_mul_add_distr_r (bmat_opp MA) MA MB) as H.
