@@ -2968,15 +2968,27 @@ progress fold (@bmat_list_list_mul T so (map (map (λ mm, bmat_opp mm)) lla) llb
 progress fold (@bmat_list_list_mul T so lla llb).
 revert llb.
 induction lla as [| la1]; intros; [ easy | cbn ].
-f_equal. {
-  rewrite map_map.
-  apply map_ext_in_iff.
-  intros la2 Hla2.
-  destruct la2 as [| a2]; cbn. {
-    now destruct (map (λ mm, bmat_opp mm) la1), la1.
-  }
-  destruct la1 as [| a1]; [ easy | cbn ].
-  rewrite (IHMA (a1 :: la1)); [ | now left | now left ].
+f_equal. 2: {
+  progress fold (@bmat_list_list_mul T so (map (map (λ mm, bmat_opp mm)) lla) llb).
+  progress fold (@bmat_list_list_mul T so lla llb).
+  apply IHlla.
+  intros la Hla a Ha b.
+  apply (IHMA la); [ now right | easy ].
+}
+rewrite map_map.
+apply map_ext_in_iff.
+intros la2 Hla2.
+destruct la2 as [| a2]; cbn. {
+  now destruct (map (λ mm, bmat_opp mm) la1), la1.
+}
+destruct la1 as [| a1]; [ easy | cbn ].
+rewrite (IHMA (a1 :: la1)); [ | now left | now left ].
+...
+clear Hla2.
+remember (bmat_mul a1 a2) as k; clear Heqk.
+revert k la2.
+induction la1 as [| a3]; intros; [ easy | cbn ].
+destruct la2 as [| a4]; [ easy | cbn ].
 ...
 
 specialize (bmat_mul_add_distr_r (bmat_opp MA) MA MB) as H.
