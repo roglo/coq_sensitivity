@@ -1163,9 +1163,9 @@ remember (l ++ [a]) as l' eqn:Hl'.
 destruct l'; [ now destruct l | apply IHl ].
 Qed.
 
-Theorem List_map_fun {A} : ∀ l l' (f : nat → A),
+Theorem List_map_fun : ∀ A B d l l' (f : A → B),
   length l = length l'
-  → (∀ i, f (nth i l 0) = f (nth i l' 0))
+  → (∀ i, f (nth i l d) = f (nth i l' d))
   → map f l = map f l'.
 Proof.
 intros * Hlen Hf.

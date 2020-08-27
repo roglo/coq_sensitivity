@@ -2985,10 +2985,40 @@ intros i.
 now specialize (Hmm (S i)) as H2.
 Qed.
 
-Theorem bmat_mul_void_l : ∀ T {so : semiring_op T} M, bmat_mul void_bmat M = void_bmat.
+Theorem bmat_mul_void_l : ∀ T {so : semiring_op T} M,
+  bmat_mul void_bmat M = void_bmat.
 Proof.
 intros.
 now induction M.
+Qed.
+
+Theorem bmat_mul_void_r_compat : ∀ T {so : semiring_op T} MA MB,
+  have_same_bmat_struct MA MB
+  → bmat_mul MA void_bmat = bmat_mul MB void_bmat.
+Proof.
+intros * Hss.
+revert MB Hss.
+induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
+  now destruct MB.
+}
+destruct MB as [xb| mb]; [ easy | cbn ].
+f_equal; f_equal.
+apply List_map_fun; [ apply [] | | easy ].
+destruct ma as (lla).
+destruct mb as (llb).
+move llb before lla.
+cbn in IHMA |-*.
+cbn in Hss.
+fold (@have_same_list_struct T) in Hss.
+fold (@have_same_list_list_struct T) in Hss.
+revert llb Hss.
+induction lla as [| la]; intros; [ now destruct llb | cbn ].
+destruct llb as [| lb]; [ easy | cbn ].
+f_equal.
+cbn in Hss.
+apply IHlla; [ | easy ].
+intros la1 Hla1 a1 Ha1 b1 Hab1.
+apply (IHMA la1); [ now right | easy | easy ].
 Qed.
 
 Theorem bmat_mul_sqr_opp :
@@ -3027,79 +3057,19 @@ f_equal. {
       now do 3 rewrite map_length.
     }
     intros.
-...
-Check bmat_list_mul_eq_compat.
-Print bmat_list_mul.
-Print bmat_mul.
-Theorem bmat_mul_eq_compat : ∀ T {so : semiring_op T} MA MB MC MD,
-  bmat_mul MA MB = bmat_mul MC MD.
-Proof.
-intros.
-Print bmat_mul.
-Check bmat_list_mul_eq_compat.
-...
     revert i.
     induction l1 as [| a2]; intros; cbn. {
       rewrite match_id.
       now do 2 rewrite bmat_mul_void_l.
     }
-...
-progress fold (@bmat_list_list_mul T so ((map (map (λ mm, bmat_opp mm)) ll))).
-...
-induction ll as [| l1]; intros; [ now subst ll1 | ].
-cbn - [ hd ].
-cbn in ll1.
-progress fold ll1.
-progress fold (@bmat_list_list_mul T so ll (l1 :: ll)).
-progress fold (@bmat_list_list_mul T so ((map (map (λ mm, bmat_opp mm)) ll)) ll1).
-f_equal. {
-...
-  destruct l1 as [| a1]; [ easy | cbn ].
-  f_equal. {
-    rewrite (IHM (a1 :: l1)); [ | now left | now left ].
-    apply (bmat_list_mul_compat void_bmat). {
-      now rewrite map_length.
-    } {
-      now do 3 rewrite map_length.
-    }
-    intros.
-    revert i.
-    induction l1 as [| a2]; intros; cbn. {
-      rewrite match_id.
-      now do 2 rewrite bmat_mul_void_l.
-    }
-    destruct i; cbn. {
-      clear - IHM.
-      induction ll as [| l2]; cbn. {
-        induction a2 as [x| M IHM'] using bmatrix_ind2; [ easy | cbn ].
-        f_equal; f_equal.
-        destruct M as (ll); cbn.
-        clear IHM'.
-        induction ll as [| l2]; cbn; [ easy | cbn ].
-        f_equal; apply IHll.
-        intros la Hla a Ha.
-        destruct Hla as [Hla| Hla]; [ | easy ].
-        subst la.
-        destruct Ha as [Ha| Ha]. {
-          subst a1.
-          now apply (IHM _ (or_introl eq_refl)); left.
-        }
-        destruct Ha as [Ha| Ha]. {
-          subst a; cbn.
-          f_equal; f_equal.
-          progress fold (@bmat_list_mul T so).
-          progress fold (@bmat_list_list_mul T so (map (map (λ mm, bmat_opp mm)) ll) (map (map (λ mm, bmat_opp mm)) ll)).
-          progress fold (@bmat_list_list_mul T so ll ll).
-...
+    destruct i. {
+      destruct ll as [| l2]. {
+        cbn.
+        apply bmat_mul_void_r_compat.
+        symmetry.
+        apply have_same_bmat_struct_opp_r.
       }
-      induction l1 as [| e1]; cbn. {
-        induction a2 as [x| M IHM] using bmatrix_ind2; [ easy | cbn ].
-        f_equal; f_equal.
-        destruct M as (ll'); cbn in IHM |-*.
-        clear IHM IHll.
-        induction ll' as [| l1]; cbn; [ easy | cbn ].
-        f_equal; apply IHll'.
-      }
+      cbn.
 ...
 
 (* "We prove by induction that A_n^2 = nI" *)
