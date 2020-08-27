@@ -3161,17 +3161,19 @@ progress fold (@bmat_list_list_mul T so (map list_opp ll) (map list_opp ll)).
 progress fold (@bmat_list_list_mul T so ll ll).
 induction ll as [| l1]; intros; [ easy | ].
 cbn - [ hd ].
+rewrite <- map_cons.
 progress fold (@bmat_list_list_mul T so ll (l1 :: ll)).
-progress fold (@bmat_list_list_mul T so (map list_opp ll) (list_opp l1 :: map list_opp ll)).
+progress fold (@bmat_list_list_mul T so (map list_opp ll) (map list_opp (l1 :: ll))).
 f_equal. 2: {
   destruct ll as [| l2]; [ easy | ].
   cbn - [ list_list_transpose ].
-  progress fold
-    (@bmat_list_list_mul T so (map list_opp ll) (list_opp l1 :: list_opp l2 :: map list_opp ll)).
-  progress fold (@bmat_list_list_mul T so ll (l1 :: l2 :: ll)).
   cbn - [ list_list_transpose ] in IHll.
-  progress fold (@bmat_list_list_mul T so (map list_opp ll) (list_opp l2 :: map list_opp ll))
-    in IHll.
+  do 2 rewrite <- map_cons.
+  rewrite <- map_cons in IHll.
+  progress fold
+    (@bmat_list_list_mul T so (map list_opp ll) (map list_opp (l1 :: l2 :: ll))).
+  progress fold (@bmat_list_list_mul T so ll (l1 :: l2 :: ll)).
+  progress fold (@bmat_list_list_mul T so (map list_opp ll) (map list_opp (l2 :: ll))) in IHll.
   progress fold (@bmat_list_list_mul T so ll (l2 :: ll)) in IHll.
   progress fold (bmat_list_mul (list_opp l2)).
   progress fold (bmat_list_mul l2).
@@ -3180,8 +3182,10 @@ f_equal. 2: {
   f_equal. 2: {
     destruct ll as [| l3]; [ easy | ].
     cbn - [ list_list_transpose ] in IHll |-*.
-    progress fold (@bmat_list_list_mul T so (map list_opp ll) (list_opp l1 :: list_opp l2 :: list_opp l3 :: map list_opp ll)).
-    progress fold (@bmat_list_list_mul T so (map list_opp ll) (list_opp l2 :: list_opp l3 :: map list_opp ll)) in IHll.
+    do 3 rewrite <- map_cons.
+    do 2 rewrite <- map_cons in IHll.
+    progress fold (@bmat_list_list_mul T so (map list_opp ll) (map list_opp (l1 :: l2 :: l3 :: ll))).
+    progress fold (@bmat_list_list_mul T so (map list_opp ll) (map list_opp (l2 :: l3 :: ll))) in IHll.
     progress fold (@bmat_list_list_mul T so ll (l1 :: l2 :: l3 :: ll)).
     progress fold (@bmat_list_list_mul T so ll (l2 :: l3 :: ll)) in IHll.
     progress fold (bmat_list_mul (list_opp l3)).
