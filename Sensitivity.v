@@ -1961,7 +1961,7 @@ Definition bmat_list_mul_loop T {so : semiring_op T} :=
         end
     end.
 
-Definition bmat_list_mul_start T {so : semiring_op T} l1 l2 :=
+Definition bmat_list_mul T {so : semiring_op T} l1 l2 :=
   match l1 with
   | [] => void_bmat
   | e1 :: l'1 =>
@@ -3173,10 +3173,10 @@ f_equal. 2: {
   progress fold (@bmat_list_list_mul T so (map list_opp ll) (list_opp l2 :: map list_opp ll))
     in IHll.
   progress fold (@bmat_list_list_mul T so ll (l2 :: ll)) in IHll.
-  progress fold (bmat_list_mul_start (list_opp l2)).
-  progress fold (bmat_list_mul_start l2).
-  progress fold (bmat_list_mul_start (list_opp l2)) in IHll.
-  progress fold (bmat_list_mul_start l2) in IHll.
+  progress fold (bmat_list_mul (list_opp l2)).
+  progress fold (bmat_list_mul l2).
+  progress fold (bmat_list_mul (list_opp l2)) in IHll.
+  progress fold (bmat_list_mul l2) in IHll.
   f_equal. 2: {
     destruct ll as [| l3]; [ easy | ].
     cbn - [ list_list_transpose ] in IHll |-*.
@@ -3184,10 +3184,10 @@ f_equal. 2: {
     progress fold (@bmat_list_list_mul T so (map list_opp ll) (list_opp l2 :: list_opp l3 :: map list_opp ll)) in IHll.
     progress fold (@bmat_list_list_mul T so ll (l1 :: l2 :: l3 :: ll)).
     progress fold (@bmat_list_list_mul T so ll (l2 :: l3 :: ll)) in IHll.
-    progress fold (bmat_list_mul_start (list_opp l3)).
-    progress fold (bmat_list_mul_start (list_opp l3)) in IHll.
-    progress fold (bmat_list_mul_start l3).
-    progress fold (bmat_list_mul_start l3) in IHll.
+    progress fold (bmat_list_mul (list_opp l3)).
+    progress fold (bmat_list_mul (list_opp l3)) in IHll.
+    progress fold (bmat_list_mul l3).
+    progress fold (bmat_list_mul l3) in IHll.
     f_equal. 2: {
 ...
 
