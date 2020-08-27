@@ -2920,13 +2920,18 @@ f_equal. 2: {
   cbn in Hssab, Hssac.
   destruct llb as [| lb]; [ easy | ].
   destruct llc as [| lc]; [ easy | ].
+  move lb before la.
+  move lc before lb.
+  move llb before lla.
+  move llc before llb.
   cbn.
 ...
   apply IHlla; cycle 1. {
     destruct lla as [| la1]. {
       destruct llb as [| lb1]. {
         cbn in Hssab.
-cbn in Hssab.
+        cbn in Hssac.
+        destruct llc as [| lc1]. {
 ...
 
 Theorem bmat_mul_opp_l :
