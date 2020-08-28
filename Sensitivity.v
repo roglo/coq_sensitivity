@@ -1954,6 +1954,8 @@ Print list_list_of_mat.
 
 ...
 
+(* bon, problème : Coq ne trouve pas l'argument décroissant de ce Fixpoint *)
+
 Fixpoint list_list_of_bmat T (MM : bmatrix T) : list (list T) :=
   match MM with
   | BM_1 x => [[x]]
