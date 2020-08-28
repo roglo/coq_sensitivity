@@ -1803,11 +1803,11 @@ Fixpoint bmat_add T {so : semiring_op T} d (MM1 MM2 : bmatrix T) :=
   | BM_1 xa =>
       match MM2 with
       | BM_1 xb => BM_1 (xa + xb)%Srng
-      | BM_M MMB => void_bmat d
+      | BM_M MMB => d
       end
   | BM_M MMA =>
       match MM2 with
-      | BM_1 xb => void_bmat d
+      | BM_1 xb => d
       | BM_M MMB =>
           let r :=
             {| mat_el i j := bmat_add d (mat_el MMA i j) (mat_el MMB i j);
@@ -1840,11 +1840,11 @@ Fixpoint bmat_mul T {so : semiring_op T} d (MM1 MM2 : bmatrix T) :=
   | BM_1 xa =>
       match MM2 with
       | BM_1 xb => BM_1 (xa * xb)%Srng
-      | BM_M _ => void_bmat d
+      | BM_M _ => d
       end
   | BM_M MMA =>
       match MM2 with
-      | BM_1 _ => void_bmat d
+      | BM_1 _ => d
       | BM_M MMB =>
           let r :=
             {| mat_el i j := bmat_mul d (mat_el MMA i j) (mat_el MMB i j);
@@ -1950,7 +1950,28 @@ Fixpoint concat_list_in_list T (ll1 ll2 : list (list T)) :=
 Definition concat_list_list_list T (lll : list (list (list T))) :=
   fold_left (@concat_list_in_list T) lll [].
 
-Print list_list_of_mat.
+Fixpoint list_list_of_bmat T (MM : bmatrix T) : list (list T) :=
+  match MM with
+  | BM_1 x => [[x]]
+  | BM_M MMM =>
+      let ll :=
+        map
+          (λ i,
+             map
+               (λ j,
+                  list_list_of_bmat (mat_el MMM i j)) (seq 0 (mat_ncols MMM)))
+          (seq 0 (mat_nrows MMM))
+      in
+      List.concat (List.concat ll)
+  end.
+
+Print bmat_mul.
+
+Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (A n)).
+Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (bmat_mul (BM_1 42%Z) (A n) (A n))).
+
+(* mmm... j'ai l'impression que bmat_mul ne fonctionne pas ; c'est pas le
+   résultat attendu *)
 
 ...
 
@@ -1963,7 +1984,7 @@ Fixpoint list_list_of_bmat T (MM : bmatrix T) : list (list T) :=
       let ll :=
         map
           (λ MMl, concat_list_list_list (map (@list_list_of_bmat T) MMl))
-          (list_list_of_mat MMM)
+          (map (λ i, map (λ j, mat_el MMM i j) (seq 0 (mat_ncols MMM))) (seq 0 (mat_nrows MMM)))
       in
       List.concat ll
   end.
