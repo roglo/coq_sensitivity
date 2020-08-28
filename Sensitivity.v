@@ -1835,9 +1835,6 @@ Compute (let _ := nat_semiring_op in list_list_of_mat (mat_mul (mat_of_list_list
 
 (* multiplication of block matrices *)
 
-... voir à décomposer le fold_left ci-dessous pour ne pas partir de zéro
-    comme dans la version master
-
 Fixpoint bmat_mul T {so : semiring_op T} d (MM1 MM2 : bmatrix T) :=
   match MM1 with
   | BM_1 xa =>
@@ -1849,18 +1846,22 @@ Fixpoint bmat_mul T {so : semiring_op T} d (MM1 MM2 : bmatrix T) :=
       match MM2 with
       | BM_1 _ => d
       | BM_M MMB =>
+          let fix mul_loop it i j k :=
+            match it with
+            | 0 => d
+            | S it' =>
+                 bmat_add d (bmat_mul d (mat_el MMA i j) (mat_el MMB j k))
+                   (mul_loop it' i (j + 1) k)
+            end
+          in
           let r :=
-            {| mat_el i k :=
-                 fold_left (λ c j, bmat_add d c (bmat_mul d (mat_el MMA i j) (mat_el MMB j k)))
-                   (seq 0 (mat_ncols MMA)) srng_zero;
+            {| mat_el i k := mul_loop (mat_ncols MMA) i 0 k;
                mat_nrows := mat_nrows MMA;
                mat_ncols := mat_ncols MMB |}
           in
           BM_M r
       end
   end.
-
-...
 
 (* opposite *)
 
