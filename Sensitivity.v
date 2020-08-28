@@ -1745,6 +1745,8 @@ Definition mat_of_list_list T d (ll : list (list T)) :=
 
 Compute (let (i, j) := (2, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j).
 Compute (let (i, j) := (7, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j).
+Compute (let (i, j) := (1, 3) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j).
+Compute (list_list_of_mat (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
 
 (* block matrices *)
 
@@ -1818,18 +1820,20 @@ Fixpoint bmat_add T {so : semiring_op T} d (MM1 MM2 : bmatrix T) :=
       end
   end.
 
+Definition nat_semiring_op : semiring_op nat :=
+  {| srng_zero := 0;
+     srng_one := 1;
+     srng_add := Nat.add;
+     srng_mul := Nat.mul |}.
+
+Compute (let _ := nat_semiring_op in list_list_of_mat (mat_add add (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list_list 0 [[1; 2]; [3; 4]; [5; 6]; [7; 8]]))).
+
 (* multiplication *)
 
 Definition mat_mul T {so : semiring_op T} (MA MB : matrix T) :=
   {| mat_el i k := (Σ (j = 0, mat_ncols MA), mat_el MA i j * mat_el MB j k)%Srng;
      mat_nrows := mat_nrows MA;
      mat_ncols := mat_ncols MB |}.
-
-Definition nat_semiring_op : semiring_op nat :=
-  {| srng_zero := 0;
-     srng_one := 1;
-     srng_add := Nat.add;
-     srng_mul := Nat.mul |}.
 
 Compute (let _ := nat_semiring_op in list_list_of_mat (mat_mul (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list_list 0 [[1; 2]; [3; 4]; [5; 6]; [7; 8]]))).
 
@@ -1846,16 +1850,21 @@ Fixpoint bmat_mul T {so : semiring_op T} d (MM1 MM2 : bmatrix T) :=
       match MM2 with
       | BM_1 _ => d
       | BM_M MMB =>
-          let fix mul_loop it i j k :=
+          let fix mat_el_mul_loop it a i j k :=
             match it with
-            | 0 => d
+            | 0 => a
             | S it' =>
-                 bmat_add d (bmat_mul d (mat_el MMA i j) (mat_el MMB j k))
-                   (mul_loop it' i (j + 1) k)
+                 mat_el_mul_loop it'
+                   (bmat_add d a (bmat_mul d (mat_el MMA i j) (mat_el MMB j k)))
+                   i (j + 1) k
             end
           in
+          let mat_el_mul i k :=
+            mat_el_mul_loop (mat_ncols MMA - 1)
+              (bmat_mul d (mat_el MMA i 0) (mat_el MMB 0 k)) i 1 k
+           in
           let r :=
-            {| mat_el i k := mul_loop (mat_ncols MMA) i 0 k;
+            {| mat_el i k := mat_el_mul i k;
                mat_nrows := mat_nrows MMA;
                mat_ncols := mat_ncols MMB |}
           in
@@ -1965,46 +1974,25 @@ Fixpoint list_list_of_bmat T (MM : bmatrix T) : list (list T) :=
       let ll :=
         map
           (λ i,
-             map
-               (λ j,
-                  list_list_of_bmat (mat_el MMM i j)) (seq 0 (mat_ncols MMM)))
+             concat_list_list_list
+               (map (λ j, list_list_of_bmat (mat_el MMM i j))
+                  (seq 0 (mat_ncols MMM))))
           (seq 0 (mat_nrows MMM))
-      in
-      List.concat (List.concat ll)
-  end.
-
-Print bmat_mul.
-
-Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (A n)).
-Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (bmat_mul (BM_1 42%Z) (A n) (A n))).
-
-(* mmm... j'ai l'impression que bmat_mul ne fonctionne pas ; c'est pas le
-   résultat attendu *)
-
-...
-
-(* bon, problème : Coq ne trouve pas l'argument décroissant de ce Fixpoint *)
-
-Fixpoint list_list_of_bmat T (MM : bmatrix T) : list (list T) :=
-  match MM with
-  | BM_1 x => [[x]]
-  | BM_M MMM =>
-      let ll :=
-        map
-          (λ MMl, concat_list_list_list (map (@list_list_of_bmat T) MMl))
-          (map (λ i, map (λ j, mat_el MMM i j) (seq 0 (mat_ncols MMM))) (seq 0 (mat_nrows MMM)))
       in
       List.concat ll
   end.
 
+Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (I_2_pow n)).
 Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (A n)).
-Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (bmat_mul (A n) (A n))).
+Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (bmat_mul (BM_1 42%Z) (A n) (A n))).
 
 Definition rng_mul_nat_l T {so : semiring_op T} n v :=
   match n with
   | 0 => 0%Srng
   | S n' => (Σ (_ = 0, n'), v)%Srng
   end.
+
+...
 
 Fixpoint bmat_nat_mul_l T {so : semiring_op T} n BM :=
   match BM with
