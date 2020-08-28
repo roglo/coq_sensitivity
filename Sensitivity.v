@@ -1715,7 +1715,14 @@ Fixpoint List_map2 A B C (f : A → B → C) la lb :=
 (* matrices *)
 
 Record matrix T := mk_mat
-  { mat_list : list (list T) }.
+  { mat_el : nat → nat → T;
+    mat_nrows : nat;
+    mat_ncols : nat }.
+
+Definition void_mat {T} d : matrix T :=
+  {| mat_el i j := d;
+     mat_nrows := 0;
+     mat_ncols := 0 |}.
 
 Definition list_list_nrows T (ll : list (list T)) :=
   length ll.
@@ -1723,17 +1730,17 @@ Definition list_list_nrows T (ll : list (list T)) :=
 Definition list_list_ncols T (ll : list (list T)) :=
   length (hd [] ll).
 
-Definition void_mat {T} : matrix T :=
-  {| mat_list := [] |}.
+Definition list_list_of_mat T (M : matrix T) : list (list T) :=
+  map (λ i, map (mat_el M i) (seq 0 (mat_ncols M))) (seq 0 (mat_nrows M)).
 
 Definition list_list_el T d (ll : list (list T)) i j : T :=
   nth j (nth i ll []) d.
 
+Definition mat_of_list_list T d (ll : list (list T)) :=
+  mk_mat (list_list_el d ll) (list_list_nrows ll) (list_list_ncols ll).
+
 Compute (let (i, j) := (2, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j).
 Compute (let (i, j) := (7, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j).
-
-Definition mat_el T d (M : matrix T) i j : T :=
-  list_list_el d (mat_list M) i j.
 
 (* block matrices *)
 
@@ -1741,141 +1748,76 @@ Inductive bmatrix T :=
   | BM_1 : T → bmatrix T
   | BM_M : matrix (bmatrix T) → bmatrix T.
 
-Definition void_bmat {T} : bmatrix T :=
-  BM_M void_mat.
+Definition void_bmat {T} d : bmatrix T :=
+  BM_M (void_mat d).
 
 Theorem bmatrix_ind2 : ∀ T (P : bmatrix T → Prop),
   (∀ t, P (BM_1 t))
-  → (∀ M, (∀ la, la ∈ mat_list M → ∀ a, a ∈ la → P a) → P (BM_M M))
+  → (∀ M, (∀ i j, i < mat_nrows M → j < mat_ncols M → P (mat_el M i j)) → P (BM_M M))
   → ∀ BM, P BM.
 Proof.
 fix IHB 5.
 intros * H1 HM *.
 destruct BM as [x| M]; [ apply H1 | ].
 apply HM.
-intros la Hla a Ha.
-destruct M as (ll).
-cbn in Hla.
-induction ll as [| l]; [ contradiction | ].
-destruct Hla as [Hla| Hla]; [ | apply IHll, Hla ].
-subst la; clear IHll.
-induction l as [| b]; [ contradiction | ].
-destruct Ha as [Ha| Ha]; [ | apply IHl, Ha ].
-subst a.
+intros * Hi Hj.
+destruct M as (f, r, c); cbn in Hi, Hj |-*.
+remember (f i j) as BM eqn:HBM.
+symmetry in HBM.
+destruct BM as [x| M]; [ apply H1 | ].
+apply HM.
+intros k l Hk Hl.
 now apply IHB.
 Qed.
 
 (* transposition *)
 
-Fixpoint list_list_transp_loop T it d (ll : list (list T)) :=
-  match it with
-  | 0 => []
-  | S it' => map (hd d) ll :: list_list_transp_loop it' d (map (@tl _) ll)
-  end.
+Definition mat_transpose T (M : matrix T) : matrix T :=
+  {| mat_el i j := mat_el M j i;
+     mat_nrows := mat_ncols M;
+     mat_ncols := mat_nrows M |}.
 
-Definition list_list_transpose T d (ll : list (list T)) :=
-  list_list_transp_loop (length (hd [] ll)) d ll.
-
-Compute (list_list_transpose 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]).
-
-Definition mat_transpose T (d : T) (M : matrix T) : matrix T :=
-  {| mat_list := list_list_transpose d (mat_list M) |}.
-
-Compute (mat_transpose 0 (mk_mat [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
+Compute
+  (list_list_of_mat
+     (mat_transpose
+        (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]))).
 
 (* addition *)
 
-Definition list_add T (add : T → T → T) (l1 l2 : list T) :=
-  List_map2 add l1 l2.
-
-Definition list_list_add T (add : T → T → T) (ll1 ll2 : list (list T)) :=
-  List_map2 (list_add add) ll1 ll2.
-
 Definition mat_add T (add : T → T → T) (M1 M2 : matrix T) :
     matrix T :=
-  {| mat_list := list_list_add add (mat_list M1) (mat_list M2) |}.
+  {| mat_el i j := add (mat_el M1 i j) (mat_el M2 i j);
+     mat_nrows := mat_nrows M1;
+     mat_ncols := mat_ncols M1 |}.
 
 (* addition of block matrices *)
 
-Fixpoint bmat_add T {so : semiring_op T} (MM1 MM2 : bmatrix T) :=
+Fixpoint bmat_add T {so : semiring_op T} d (MM1 MM2 : bmatrix T) :=
   match MM1 with
   | BM_1 xa =>
       match MM2 with
       | BM_1 xb => BM_1 (xa + xb)%Srng
-      | BM_M MMB => void_bmat
+      | BM_M MMB => void_bmat d
       end
   | BM_M MMA =>
       match MM2 with
-      | BM_1 xb => void_bmat
+      | BM_1 xb => void_bmat d
       | BM_M MMB =>
-          let fix list_add l1 l2 :=
-            match l1 with
-            | [] => []
-            | e1 :: l'1 =>
-                match l2 with
-                | [] => []
-                | e2 :: l'2 => bmat_add e1 e2 :: list_add l'1 l'2
-                end
-            end
-          in
-          let fix list_list_add ll1 ll2 :=
-            match ll1 with
-            | [] => []
-            | l1 :: ll'1 =>
-                match ll2 with
-                | [] => []
-                | l2 :: ll'2 => list_add l1 l2 :: list_list_add ll'1 ll'2
-                end
-            end
-          in
           let r :=
-            {| mat_list := list_list_add (mat_list MMA) (mat_list MMB) |}
+            {| mat_el i j := bmat_add d (mat_el MMA i j) (mat_el MMB i j);
+               mat_nrows := mat_nrows MMA;
+               mat_ncols := mat_ncols MMA |}
           in
           BM_M r
       end
   end.
 
-Definition bmat_list_add T {so : semiring_op T} :=
-  fix list_add (l1 l2 : list (bmatrix T)) :=
-    match l1 with
-    | [] => []
-    | e1 :: l'1 =>
-        match l2 with
-        | [] => []
-        | e2 :: l'2 => bmat_add e1 e2 :: list_add l'1 l'2
-        end
-    end.
-
-Definition bmat_list_list_add T {so : semiring_op T} :=
-  fix list_list_add (ll1 ll2 : list (list (bmatrix T))) :=
-    match ll1 with
-    | [] => []
-    | l1 :: ll'1 =>
-        match ll2 with
-        | [] => []
-        | l2 :: ll'2 => bmat_list_add l1 l2 :: list_list_add ll'1 ll'2
-        end
-    end.
-
 (* multiplication *)
 
-Fixpoint list_mul_loop T (add mul : T → T → T) a (l1 l2 : list T) :=
-  match (l1, l2) with
-  | (e1 :: l'1, e2 :: l'2) => list_mul_loop add mul (add a (mul e1 e2)) l'1 l'2
-  | _ => a
-  end.
-
-Definition list_mul T {so : semiring_op T} (l1 l2 : list T) :=
-  match (l1, l2) with
-  | (e1 :: l'1, e2 :: l'2) =>
-      list_mul_loop srng_add srng_mul (e1 * e2)%Srng l'1 l'2
-  | _ =>
-      0%Srng
-  end.
-
-Definition list_list_mul T {so : semiring_op T} (ll1 ll2 : list (list T)) :=
-  map (λ l1, map (list_mul l1) (list_list_transpose srng_zero ll2))
-    ll1.
+Definition mat_mul T {so : semiring_op T} (MA MB : matrix T) :=
+  {| mat_el i k := (Σ (j = 0, mat_ncols MA), mat_el MA i j * mat_el MB j k)%Srng;
+     mat_nrows := mat_nrows MA;
+     mat_ncols := mat_ncols MB |}.
 
 Definition nat_semiring_op : semiring_op nat :=
   {| srng_zero := 0;
@@ -1883,105 +1825,29 @@ Definition nat_semiring_op : semiring_op nat :=
      srng_add := Nat.add;
      srng_mul := Nat.mul |}.
 
-Definition list_list_mul' T {ro : semiring_op T} (r cr c : nat) ll1 ll2 :=
-  list_list_mul ll1 ll2.
-
-Compute (let _ := nat_semiring_op in list_list_mul' 3 4 2 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] [[1; 2]; [3; 4]; [5; 6]; [0; 0]]).
-Compute (let _ := nat_semiring_op in list_list_mul' 3 3 3 [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]] [[1; 2; 3]; [4; 5; 6]; [7; 8; 9]]).
-
-Definition mat_def_mul T {so : semiring_op T} (M1 M2 : matrix T) :
-    matrix T :=
-  {| mat_list := list_list_mul (mat_list M1) (mat_list M2) |}.
-
-Compute (let _ := nat_semiring_op in mat_def_mul (mk_mat [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mk_mat [[1; 2]; [3; 4]; [5; 6]; [0; 0]])).
-
-Compute (let _ := nat_semiring_op in mat_def_mul (mk_mat [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mk_mat [[1; 2]; [3; 4]; [5; 6]])).
-
-Compute (let _ := nat_semiring_op in mat_def_mul (mk_mat [[1; 2]; [3; 4]; [5; 6]])
-  (mk_mat [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
+Compute (let _ := nat_semiring_op in list_list_of_mat (mat_mul (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list_list 0 [[1; 2]; [3; 4]; [5; 6]; [7; 8]]))).
 
 (* multiplication of block matrices *)
 
-Fixpoint bmat_mul T {so : semiring_op T} (MM1 MM2 : bmatrix T) :=
+Fixpoint bmat_mul T {so : semiring_op T} d (MM1 MM2 : bmatrix T) :=
   match MM1 with
   | BM_1 xa =>
       match MM2 with
       | BM_1 xb => BM_1 (xa * xb)%Srng
-      | BM_M _ => void_bmat
+      | BM_M _ => void_bmat d
       end
   | BM_M MMA =>
       match MM2 with
-      | BM_1 _ => void_bmat
+      | BM_1 _ => void_bmat d
       | BM_M MMB =>
-          let fix list_mul_loop a l1 l2 :=
-            match l1 with
-            | [] => a
-            | e1 :: l'1 =>
-                match l2 with
-                | [] => a
-                | e2 :: l'2 => list_mul_loop (bmat_add a (bmat_mul e1 e2)) l'1 l'2
-                end
-            end
-          in
-          let list_list_mul ll1 ll2 :=
-            map
-              (λ l1,
-                 map
-                   (λ l2,
-                      match l1 with
-                      | [] => void_bmat
-                      | e1 :: l'1 =>
-                          match l2 with
-                          | [] => void_bmat
-                          | e2 :: l'2 => list_mul_loop (bmat_mul e1 e2) l'1 l'2
-                          end
-                      end)
-                   (list_list_transpose void_bmat ll2))
-              ll1
-          in
           let r :=
-            {| mat_list := list_list_mul (mat_list MMA) (mat_list MMB) |}
+            {| mat_el i j := bmat_mul d (mat_el MMA i j) (mat_el MMB i j);
+               mat_nrows := mat_nrows MMA;
+               mat_ncols := mat_ncols MMA |}
           in
           BM_M r
       end
   end.
-
-Definition bmat_list_mul_loop T {so : semiring_op T} :=
-  fix list_mul (a : bmatrix T) (l1 l2 : list (bmatrix T)) :=
-    match l1 with
-    | [] => a
-    | e1 :: l'1 =>
-        match l2 with
-        | [] => a
-        | e2 :: l'2 => list_mul (bmat_add a (bmat_mul e1 e2)) l'1 l'2
-        end
-    end.
-
-Definition bmat_list_mul T {so : semiring_op T} l1 l2 :=
-  match l1 with
-  | [] => void_bmat
-  | e1 :: l'1 =>
-      match l2 with
-      | [] => void_bmat
-      | e2 :: l'2 => bmat_list_mul_loop (bmat_mul e1 e2) l'1 l'2
-      end
-  end.
-
-Definition bmat_list_list_mul T {so : semiring_op T} ll1 ll2 :=
-  map
-    (λ l1,
-       map
-         (λ l2,
-            match l1 with
-            | [] => void_bmat
-            | e1 :: l'1 =>
-                match l2 with
-                | [] => void_bmat
-                | e2 :: l'2 => bmat_list_mul_loop (bmat_mul e1 e2) l'1 l'2
-                end
-            end)
-         (list_list_transpose void_bmat ll2))
-    ll1.
 
 (* opposite *)
 
@@ -1989,17 +1855,28 @@ Fixpoint bmat_opp T {ro : ring_op T} BM : bmatrix T :=
   match BM with
   | BM_1 x => BM_1 (- x)%Rng
   | BM_M MMM =>
-      BM_M {| mat_list := map (map (λ mm, bmat_opp mm)) (mat_list MMM) |}
+      let M :=
+         {| mat_el i j := bmat_opp (mat_el MMM i j);
+            mat_nrows := mat_nrows MMM;
+            mat_ncols := mat_ncols MMM |}
+      in
+      BM_M M
   end.
 
 Theorem bmat_opp_involutive : ∀ T {ro : ring_op T} {rp : ring_prop T}
- (so := @rng_semiring T ro) {sp : semiring_prop T} BM,
+  (so := @rng_semiring T ro) {sp : semiring_prop T} BM,
   bmat_opp (bmat_opp BM) = BM.
 Proof.
 intros.
 induction BM as [x| M IHBM] using bmatrix_ind2. {
   now cbn; rewrite rng_opp_involutive.
 } {
+  destruct M as (f, r, c).
+  cbn in IHBM |-*.
+  f_equal; f_equal.
+  (* problem: need extensional equality;
+     version with list (list T) does not require that. *)
+...
   destruct M as (ll); cbn; f_equal; f_equal.
   cbn in IHBM.
   induction ll as [| l]; [ easy | cbn ].
