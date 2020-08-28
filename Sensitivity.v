@@ -3212,6 +3212,7 @@ assert (∀ ll1 ll2,
   bmat_list_list_mul (map list_opp ll1) ll2 =
   map list_opp (bmat_list_list_mul ll1 ll2)). {
 clear; intros.
+Print bmat_list_list_mul.
 revert ll2.
 induction ll1 as [| l1]; intros; [ easy | cbn ].
 progress fold (@bmat_list_list_mul T so ll1 ll2).
@@ -3219,6 +3220,16 @@ progress fold (@bmat_list_list_mul T so (map list_opp ll1) ll2).
 f_equal; [ | apply IHll1 ].
 progress fold (bmat_list_mul (list_opp l1)).
 progress fold (bmat_list_mul l1).
+revert l1.
+induction ll2 as [| l2]; intros; [ easy | ].
+revert l2.
+induction l1 as [| e1]; intros. {
+  cbn.
+  revert ll2 IHll2.
+  induction l2 as [| e2]; intros; [ easy | ].
+  cbn; f_equal.
+...
+
 remember (list_list_transpose void_bmat ll2) as ll.
 clear.
 revert ll.
