@@ -3004,6 +3004,8 @@ progress fold (@bmat_list_mul_loop T so).
 progress fold (@bmat_list_list_mul T so (bmat_list_list_add lla llb) llc).
 progress fold (@bmat_list_list_mul T so lla llc).
 progress fold (@bmat_list_list_mul T so llb llc).
+Abort. (*
+...
 revert lla llb Hssac Hssbc.
 induction llc as [| lc1]; intros; [ now destruct lla | ].
 destruct lla as [| la1]; [ easy | ].
@@ -3017,6 +3019,7 @@ progress fold (@bmat_list_list_mul T so lla (lc1 :: llc)).
 progress fold (@bmat_list_list_mul T so llb (lc1 :: llc)).
 f_equal. 2: {
 ...
+*)
 
 (*
 Theorem bmat_mul_opp_l :
@@ -3140,6 +3143,41 @@ intros la1 Hla1 a1 Ha1 b1 Hab1.
 apply (IHMA la1); [ now right | easy | easy ].
 Qed.
 
+Theorem bmat_mul_opp_opp :
+  ∀ T {ro : ring_op T} (so := rng_semiring)
+       {sp : semiring_prop T} {rp : ring_prop T} MA MB,
+  bmat_mul (bmat_opp MA) (bmat_opp MB) = bmat_mul MA MB.
+Proof.
+intros.
+revert MB.
+induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
+  destruct MB as [xb| mb]; [ cbn | easy ].
+  f_equal.
+  now apply rng_mul_opp_opp.
+}
+destruct MB as [xb| mb]; [ easy | cbn ].
+f_equal; f_equal.
+destruct ma as (lla).
+destruct mb as (llb).
+cbn in IHMA |-*.
+set (list_opp := map (λ mm, (- mm)%BM)).
+progress fold (@bmat_list_mul_loop T so).
+progress fold (@bmat_list_list_mul T so (map list_opp lla) (map list_opp llb)).
+progress fold (@bmat_list_list_mul T so lla llb).
+revert llb.
+induction lla as [| la]; intros; [ easy | cbn ].
+progress fold (@bmat_list_list_mul T so (map list_opp lla) (map list_opp llb)).
+progress fold (@bmat_list_list_mul T so lla llb).
+f_equal. 2: {
+  apply IHlla.
+  intros la1 Hla1 a1 Ha1 b1.
+  apply (IHMA la1); [ now right | easy ].
+}
+Print bmat_list_mul.
+progress fold (@bmat_list_mul T so (list_opp la)).
+progress fold (@bmat_list_mul T so la).
+...
+
 Theorem bmat_mul_sqr_opp :
   ∀ T {ro : ring_op T} (so := rng_semiring)
        {sp : semiring_prop T} {rp : ring_prop T} M,
@@ -3157,6 +3195,7 @@ set (list_opp := map (λ mm, (- mm)%BM)).
 progress fold (@bmat_list_mul_loop T so).
 progress fold (@bmat_list_list_mul T so (map list_opp ll) (map list_opp ll)).
 progress fold (@bmat_list_list_mul T so ll ll).
+...
 induction ll as [| l1]; intros; [ easy | ].
 cbn - [ hd ].
 rewrite <- map_cons.
@@ -3191,6 +3230,20 @@ f_equal. 2: {
     progress fold (bmat_list_mul l3).
     progress fold (bmat_list_mul l3) in IHll.
     f_equal. 2: {
+...
+assert (∀ ll1 ll2,
+  bmat_list_list_mul (map list_opp ll1) ll2 =
+  map list_opp (bmat_list_list_mul ll1 ll2)). {
+clear; intros.
+Print bmat_list_list_mul.
+revert ll2.
+induction ll1 as [| l1]; intros; [ easy | cbn ].
+progress fold (@bmat_list_list_mul T so ll1 ll2).
+progress fold (@bmat_list_list_mul T so (map list_opp ll1) ll2).
+f_equal; [ | apply IHll1 ].
+progress fold (bmat_list_mul (list_opp l1)).
+progress fold (bmat_list_mul l1).
+...
 assert (∀ ll1 ll2,
   bmat_list_list_mul (map list_opp ll2) (map list_opp (ll1 ++ ll2)) =
   bmat_list_list_mul ll2 (ll1 ++ ll2)). {
@@ -3206,18 +3259,7 @@ assert (∀ ll1 ll2,
     f_equal. 2: {
       cbn.
  Print bmat_list_list_mul.
-assert (∀ ll1 ll2,
-  bmat_list_list_mul (map list_opp ll1) ll2 =
-  map list_opp (bmat_list_list_mul ll1 ll2)). {
-clear; intros.
-Print bmat_list_list_mul.
-revert ll2.
-induction ll1 as [| l1]; intros; [ easy | cbn ].
-progress fold (@bmat_list_list_mul T so ll1 ll2).
-progress fold (@bmat_list_list_mul T so (map list_opp ll1) ll2).
-f_equal; [ | apply IHll1 ].
-progress fold (bmat_list_mul (list_opp l1)).
-progress fold (bmat_list_mul l1).
+...
 revert l1.
 induction ll2 as [| l2]; intros; [ easy | ].
 revert l2.
