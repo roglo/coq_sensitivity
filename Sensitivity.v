@@ -1992,14 +1992,17 @@ Definition rng_mul_nat_l T {so : semiring_op T} n v :=
   | S n' => (Σ (_ = 0, n'), v)%Srng
   end.
 
-...
-
 Fixpoint bmat_nat_mul_l T {so : semiring_op T} n BM :=
   match BM with
   | BM_1 x => BM_1 (rng_mul_nat_l n x)
   | BM_M M =>
-      BM_M {| mat_list := map (map (bmat_nat_mul_l n)) (mat_list M) |}
+      BM_M
+        {| mat_el i j := bmat_nat_mul_l n (mat_el M i j);
+           mat_nrows := mat_nrows M;
+           mat_ncols := mat_ncols M |}
   end.
+
+...
 
 Fixpoint have_same_bmat_struct T (MA MB : bmatrix T) :=
   match MA with
