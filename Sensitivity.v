@@ -1950,6 +1950,8 @@ Fixpoint concat_list_in_list T (ll1 ll2 : list (list T)) :=
 Definition concat_list_list_list T (lll : list (list (list T))) :=
   fold_left (@concat_list_in_list T) lll [].
 
+Print list_list_of_mat.
+
 ...
 
 Fixpoint list_list_of_bmat T (MM : bmatrix T) : list (list T) :=
@@ -1959,7 +1961,7 @@ Fixpoint list_list_of_bmat T (MM : bmatrix T) : list (list T) :=
       let ll :=
         map
           (λ MMl, concat_list_list_list (map (@list_list_of_bmat T) MMl))
-          (mat_list MMM)
+          (list_list_of_mat MMM)
       in
       List.concat ll
   end.
