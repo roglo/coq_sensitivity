@@ -1702,6 +1702,16 @@ Print GRing.Ring.type.
 
 Require Import Semiring SRsummation.
 
+Fixpoint List_map2 A B C (f : A → B → C) la lb :=
+  match la with
+  | a :: la' =>
+      match lb with
+      | b :: lb' => f a b :: List_map2 f la' lb'
+      | [] => []
+      end
+  | [] => []
+  end.
+
 (* matrices *)
 
 Record matrix T := mk_mat
@@ -1775,25 +1785,11 @@ Compute (mat_transpose 0 (mk_mat [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]))
 
 (* addition *)
 
-Fixpoint list_add T (add : T → T → T) (l1 l2 : list T) :=
-  match l1 with
-  | e1 :: l'1 =>
-      match l2 with
-      | e2 :: l'2 => add e1 e2 :: list_add add l'1 l'2
-      | [] => []
-      end
-  | [] => []
-  end.
+Definition list_add T (add : T → T → T) (l1 l2 : list T) :=
+  List_map2 add l1 l2.
 
-Fixpoint list_list_add T (add : T → T → T) (ll1 ll2 : list (list T)) :=
-  match ll1 with
-   | l1 :: ll'1 =>
-       match ll2 with
-       | l2 :: ll'2 => list_add add l1 l2 :: list_list_add add ll'1 ll'2
-       | [] => []
-       end
-  | [] => []
-  end.
+Definition list_list_add T (add : T → T → T) (ll1 ll2 : list (list T)) :=
+  List_map2 (list_add add) ll1 ll2.
 
 Definition mat_add T (add : T → T → T) (M1 M2 : matrix T) :
     matrix T :=
@@ -1840,15 +1836,15 @@ Fixpoint bmat_add T {so : semiring_op T} (MM1 MM2 : bmatrix T) :=
   end.
 
 Definition bmat_list_add T {so : semiring_op T} :=
- fix list_add (l1 l2 : list (bmatrix T)) :=
-   match l1 with
-   | [] => []
-   | e1 :: l'1 =>
-       match l2 with
-       | [] => []
-       | e2 :: l'2 => bmat_add e1 e2 :: list_add l'1 l'2
-       end
-   end.
+  fix list_add (l1 l2 : list (bmatrix T)) :=
+    match l1 with
+    | [] => []
+    | e1 :: l'1 =>
+        match l2 with
+        | [] => []
+        | e2 :: l'2 => bmat_add e1 e2 :: list_add l'1 l'2
+        end
+    end.
 
 Definition bmat_list_list_add T {so : semiring_op T} :=
   fix list_list_add (ll1 ll2 : list (list (bmatrix T))) :=
@@ -3004,7 +3000,7 @@ progress fold (@bmat_list_mul_loop T so).
 progress fold (@bmat_list_list_mul T so (bmat_list_list_add lla llb) llc).
 progress fold (@bmat_list_list_mul T so lla llc).
 progress fold (@bmat_list_list_mul T so llb llc).
-Abort. (*
+Abort. (* à continuer...
 ...
 revert lla llb Hssac Hssbc.
 induction llc as [| lc1]; intros; [ now destruct lla | ].
@@ -3143,6 +3139,31 @@ intros la1 Hla1 a1 Ha1 b1 Hab1.
 apply (IHMA la1); [ now right | easy | easy ].
 Qed.
 
+Theorem list_list_transpose_cons : ∀ T (d : T) l ll,
+  list_list_transpose d (l :: ll) =
+  List_map2 (λ a1 l1, a1 :: l1) l (list_list_transpose d ll).
+Proof.
+intros.
+cbn.
+revert ll.
+induction l as [| x]; intros; [ easy | ].
+cbn; rewrite IHl.
+clear IHl.
+revert l.
+induction ll as [| l1]; intros; cbn.
+...
+
+Theorem list_list_transpose_opp : ∀ T {ro : ring_op T} d ll,
+  list_list_transpose void_bmat (map (map (λ mm, (- mm)%BM)) ll) =
+  map (map (λ mm, (- mm)%BM)) (list_list_transpose d ll).
+Proof.
+intros.
+set (list_opp := map (λ mm, (- mm)%BM)).
+induction ll as [| l]; [ easy | ].
+cbn - [ list_list_transpose ].
+
+...
+
 Theorem bmat_mul_opp_opp :
   ∀ T {ro : ring_op T} (so := rng_semiring)
        {sp : semiring_prop T} {rp : ring_prop T} MA MB,
@@ -3176,6 +3197,10 @@ f_equal. 2: {
 Print bmat_list_mul.
 progress fold (@bmat_list_mul T so (list_opp la)).
 progress fold (@bmat_list_mul T so la).
+unfold list_opp.
+...
+rewrite (list_list_transpose_opp void_bmat).
+fold list_opp.
 ...
 
 Theorem bmat_mul_sqr_opp :
