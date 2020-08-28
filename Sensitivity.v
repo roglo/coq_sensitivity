@@ -2002,6 +2002,48 @@ Fixpoint bmat_nat_mul_l T {so : semiring_op T} n BM :=
            mat_ncols := mat_ncols M |}
   end.
 
+Fixpoint have_same_bmat_struct T (MA MB : bmatrix T) :=
+  match MA with
+  | BM_1 xa =>
+      match MB with
+      | BM_1 xb => True
+      | BM_M MMB => False
+      end
+  | BM_M MMA =>
+      match MB with
+      | BM_1 xb => False
+      | BM_M MMB =>
+          mat_nrows MMA = mat_nrows MMB ∧
+          mat_ncols MMA = mat_ncols MMB ∧
+...
+          let fix have_same_list_struct la lb :=
+            match la with
+            | [] => match lb with [] => True | _ :: _ => False end
+            | a :: la' =>
+                match lb with
+                | [] => False
+                | b :: lb' =>
+                    have_same_bmat_struct a b ∧
+                    have_same_list_struct la' lb'
+                end
+            end
+          in
+          let fix have_same_list_list_struct lla llb :=
+            match lla with
+            | [] => match llb with [] => True | _ :: _ => False end
+            | la :: lla' =>
+                match llb with
+                | [] => False
+                | lb :: llb' =>
+                    have_same_list_struct la lb ∧
+                    have_same_list_list_struct lla' llb'
+                end
+            end
+          in
+          have_same_list_list_struct (mat_list MMA) (mat_list MMB)
+        end
+  end.
+
 ...
 
 Fixpoint have_same_bmat_struct T (MA MB : bmatrix T) :=
