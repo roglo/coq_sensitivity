@@ -1719,6 +1719,10 @@ Record matrix T := mk_mat
     mat_nrows : nat;
     mat_ncols : nat }.
 
+(* function extensionality required for matrices *)
+Axiom matrix_eq : ∀ T (MA MB : matrix T),
+  (∀ i j, mat_el MA i j = mat_el MB i j) → MA = MB.
+
 Definition void_mat {T} d : matrix T :=
   {| mat_el i j := d;
      mat_nrows := 0;
@@ -1748,25 +1752,27 @@ Inductive bmatrix T :=
   | BM_1 : T → bmatrix T
   | BM_M : matrix (bmatrix T) → bmatrix T.
 
-Definition void_bmat {T} d : bmatrix T :=
+Print void_mat.
+
+Definition void_bmat T d : bmatrix T :=
   BM_M (void_mat d).
 
 Theorem bmatrix_ind2 : ∀ T (P : bmatrix T → Prop),
   (∀ t, P (BM_1 t))
-  → (∀ M, (∀ i j, i < mat_nrows M → j < mat_ncols M → P (mat_el M i j)) → P (BM_M M))
+  → (∀ M, (∀ i j, P (mat_el M i j)) → P (BM_M M))
   → ∀ BM, P BM.
 Proof.
 fix IHB 5.
 intros * H1 HM *.
 destruct BM as [x| M]; [ apply H1 | ].
 apply HM.
-intros * Hi Hj.
-destruct M as (f, r, c); cbn in Hi, Hj |-*.
+intros.
+destruct M as (f, r, c); cbn.
 remember (f i j) as BM eqn:HBM.
 symmetry in HBM.
 destruct BM as [x| M]; [ apply H1 | ].
 apply HM.
-intros k l Hk Hl.
+intros k l.
 now apply IHB.
 Qed.
 
@@ -1873,29 +1879,11 @@ induction BM as [x| M IHBM] using bmatrix_ind2. {
 } {
   destruct M as (f, r, c).
   cbn in IHBM |-*.
-  f_equal; f_equal.
-  (* problem: need extensional equality;
-     version with list (list T) does not require that. *)
-...
-  destruct M as (ll); cbn; f_equal; f_equal.
-  cbn in IHBM.
-  induction ll as [| l]; [ easy | cbn ].
-  f_equal. 2: {
-    apply IHll.
-    intros la Hla a Ha.
-    apply (IHBM la); [ now right | easy ].
-  }
-  induction l as [| x]; [ easy | cbn ].
-  f_equal. 2: {
-    apply IHl.
-    intros la Hla a Ha.
-    destruct Hla as [Hla| Hla]. {
-      subst l.
-      apply (IHBM (x :: la)); [ now left | now right ].
-    }
-    apply (IHBM la); [ now right | easy ].
-  }
-  apply (IHBM (x :: l)); [ now left | now left ].
+  f_equal.
+  apply matrix_eq.
+  apply IHBM.
+  (* faut-il ajouter la condition d'égalité du nombre de lignes et
+     de colonnes dans l'axiome matrix_eq ? *)
 }
 Qed.
 
@@ -1919,9 +1907,9 @@ Fixpoint IZ_2_pow T {so : semiring_op T} (u : T) n :=
   | 0 => BM_1 u
   | S n' =>
       BM_M
-        {| mat_list :=
-             [[IZ_2_pow u n'; IZ_2_pow 0%Srng n'];
-              [IZ_2_pow 0%Srng n'; IZ_2_pow u n']] |}
+        (mat_of_list_list (void_bmat (BM_1 0%Srng))
+           [[IZ_2_pow u n'; IZ_2_pow 0%Srng n'];
+            [IZ_2_pow 0%Srng n'; IZ_2_pow u n']])
   end.
 
 Definition I_2_pow T {so : semiring_op T} := IZ_2_pow 1%Srng.
@@ -1936,9 +1924,9 @@ Fixpoint A T {ro : ring_op T} (so := rng_semiring) n : bmatrix T :=
   | 0 => BM_1 0%Srng
   | S n' =>
        BM_M
-         {| mat_list :=
+         (mat_of_list_list (void_bmat (BM_1 0%Srng))
             [[A n'; I_2_pow n'];
-             [I_2_pow n'; bmat_opp (A n')]] |}
+             [I_2_pow n'; bmat_opp (A n')]])
   end.
 
 Require Import ZArith.
@@ -1961,6 +1949,8 @@ Fixpoint concat_list_in_list T (ll1 ll2 : list (list T)) :=
 
 Definition concat_list_list_list T (lll : list (list (list T))) :=
   fold_left (@concat_list_in_list T) lll [].
+
+...
 
 Fixpoint list_list_of_bmat T (MM : bmatrix T) : list (list T) :=
   match MM with
