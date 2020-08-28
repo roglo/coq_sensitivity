@@ -2970,7 +2970,6 @@ progress fold (@bmat_list_list_mul T so lla llc).
 ...
 *)
 
-(*
 Theorem bmat_mul_add_distr_r :
   ∀ T (so : semiring_op T) {sp : semiring_prop T} MA MB MC,
   have_same_bmat_struct MA MC
@@ -3001,7 +3000,7 @@ cbn in IHMC, Hssac, Hssbc |-*.
 f_equal; f_equal.
 progress fold (@bmat_list_add T so).
 progress fold (@bmat_list_list_add T so).
-progress fold (@bmat_list_mul T so).
+progress fold (@bmat_list_mul_loop T so).
 progress fold (@bmat_list_list_mul T so (bmat_list_list_add lla llb) llc).
 progress fold (@bmat_list_list_mul T so lla llc).
 progress fold (@bmat_list_list_mul T so llb llc).
@@ -3018,7 +3017,6 @@ progress fold (@bmat_list_list_mul T so lla (lc1 :: llc)).
 progress fold (@bmat_list_list_mul T so llb (lc1 :: llc)).
 f_equal. 2: {
 ...
-*)
 
 (*
 Theorem bmat_mul_opp_l :
