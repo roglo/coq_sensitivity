@@ -1855,6 +1855,10 @@ Fixpoint bmat_mul T {so : semiring_op T} d (MM1 MM2 : bmatrix T) :=
       end
   end.
 
+(* je pense que cette multiplication n'est pas correcte... faut réfléchir... *)
+
+...
+
 (* opposite *)
 
 Fixpoint bmat_opp T {ro : ring_op T} BM : bmatrix T :=
