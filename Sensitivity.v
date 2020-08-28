@@ -1721,7 +1721,11 @@ Record matrix T := mk_mat
 
 (* function extensionality required for matrices *)
 Axiom matrix_eq : ∀ T (MA MB : matrix T),
-  (∀ i j, mat_el MA i j = mat_el MB i j) → MA = MB.
+  mat_nrows MA = mat_nrows MB
+  → mat_ncols MA = mat_ncols MB
+  → (∀ i j, i < mat_nrows MA → j < mat_ncols MB →
+      mat_el MA i j = mat_el MB i j)
+  → MA = MB.
 
 Definition void_mat {T} d : matrix T :=
   {| mat_el i j := d;
@@ -1897,10 +1901,9 @@ induction BM as [x| M IHBM] using bmatrix_ind2. {
   destruct M as (f, r, c).
   cbn in IHBM |-*.
   f_equal.
-  apply matrix_eq.
+  apply matrix_eq; cbn; [ easy | easy | ].
+  intros * Hi Hj.
   apply IHBM.
-  (* faut-il ajouter la condition d'égalité du nombre de lignes et
-     de colonnes dans l'axiome matrix_eq ? *)
 }
 Qed.
 
