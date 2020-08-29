@@ -1805,19 +1805,19 @@ Definition mat_add T (add : T → T → T) (M1 M2 : matrix T) :
 
 (* addition of block matrices *)
 
-Fixpoint bmat_add T {so : semiring_op T} d (MM1 MM2 : bmatrix T) :=
+Fixpoint bmat_add T {so : semiring_op T} (MM1 MM2 : bmatrix T) :=
   match MM1 with
   | BM_1 xa =>
       match MM2 with
       | BM_1 xb => BM_1 (xa + xb)%Srng
-      | BM_M MMB => d
+      | BM_M MMB => BM_1 0%Srng
       end
   | BM_M MMA =>
       match MM2 with
-      | BM_1 xb => d
+      | BM_1 xb => BM_1 0%Srng
       | BM_M MMB =>
           let r :=
-            {| mat_el i j := bmat_add d (mat_el MMA i j) (mat_el MMB i j);
+            {| mat_el i j := bmat_add (mat_el MMA i j) (mat_el MMB i j);
                mat_nrows := mat_nrows MMA;
                mat_ncols := mat_ncols MMA |}
           in
@@ -1844,29 +1844,29 @@ Compute (let _ := nat_semiring_op in list_list_of_mat (mat_mul (mat_of_list_list
 
 (* multiplication of block matrices *)
 
-Fixpoint bmat_mul T {so : semiring_op T} d (MM1 MM2 : bmatrix T) :=
+Fixpoint bmat_mul T {so : semiring_op T} (MM1 MM2 : bmatrix T) :=
   match MM1 with
   | BM_1 xa =>
       match MM2 with
       | BM_1 xb => BM_1 (xa * xb)%Srng
-      | BM_M _ => d
+      | BM_M _ => BM_1 0%Srng
       end
   | BM_M MMA =>
       match MM2 with
-      | BM_1 _ => d
+      | BM_1 _ => BM_1 0%Srng
       | BM_M MMB =>
           let fix mat_el_mul_loop it a i j k :=
             match it with
             | 0 => a
             | S it' =>
                  mat_el_mul_loop it'
-                   (bmat_add d a (bmat_mul d (mat_el MMA i j) (mat_el MMB j k)))
+                   (bmat_add a (bmat_mul (mat_el MMA i j) (mat_el MMB j k)))
                    i (j + 1) k
             end
           in
           let mat_el_mul i k :=
             mat_el_mul_loop (mat_ncols MMA - 1)
-              (bmat_mul d (mat_el MMA i 0) (mat_el MMB 0 k)) i 1 k
+              (bmat_mul (mat_el MMA i 0) (mat_el MMB 0 k)) i 1 k
            in
           let r :=
             {| mat_el i k := mat_el_mul i k;
@@ -1908,20 +1908,18 @@ induction BM as [x| M IHBM] using bmatrix_ind2. {
 }
 Qed.
 
-(*
 Declare Scope BM_scope.
 Delimit Scope BM_scope with BM.
 
 Module bmatrix_Notations.
 
-Notation "a + b" := (bmat_add _ a b) : BM_scope.
-Notation "a * b" := (bmat_mul _ a b) : BM_scope.
+Notation "a + b" := (bmat_add a b) : BM_scope.
+Notation "a * b" := (bmat_mul a b) : BM_scope.
 Notation "- a" := (bmat_opp a) : BM_scope.
 
 End bmatrix_Notations.
 
 Import bmatrix_Notations.
-*)
 
 (* sequence "An" *)
 
@@ -1930,7 +1928,7 @@ Fixpoint IZ_2_pow T {so : semiring_op T} (u : T) n :=
   | 0 => BM_1 u
   | S n' =>
       BM_M
-        (mat_of_list_list (void_bmat (BM_1 0%Srng))
+        (mat_of_list_list (BM_1 u)
            [[IZ_2_pow u n'; IZ_2_pow 0%Srng n'];
             [IZ_2_pow 0%Srng n'; IZ_2_pow u n']])
   end.
@@ -1947,10 +1945,12 @@ Fixpoint A T {ro : ring_op T} (so := rng_semiring) n : bmatrix T :=
   | 0 => BM_1 0%Srng
   | S n' =>
        BM_M
-         (mat_of_list_list (void_bmat (BM_1 0%Srng))
+         (mat_of_list_list (BM_1 0%Srng)
             [[A n'; I_2_pow n'];
              [I_2_pow n'; bmat_opp (A n')]])
   end.
+
+Print A.
 
 Require Import ZArith.
 (*
@@ -1990,7 +1990,7 @@ Fixpoint list_list_of_bmat T (MM : bmatrix T) : list (list T) :=
 
 Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (I_2_pow n)).
 Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (A n)).
-Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (bmat_mul (BM_1 42%Z) (A n) (A n))).
+Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (bmat_mul (A n) (A n))).
 
 Definition rng_mul_nat_l T {so : semiring_op T} n v :=
   match n with
@@ -2090,9 +2090,9 @@ Add Parametric Relation T : _ (@have_same_bmat_struct T)
  as have_same_bmat_struct_equivalence.
 
 Theorem bmat_add_comm :
-    ∀ T {so : semiring_op T } {sp : semiring_prop T} d MA MB,
+    ∀ T {so : semiring_op T } {sp : semiring_prop T} MA MB,
   have_same_bmat_struct MA MB
-  → bmat_add d MA MB = bmat_add d MB MA.
+  → bmat_add MA MB = bmat_add MB MA.
 Proof.
 intros * sp * Hss.
 revert MB Hss.
@@ -2113,9 +2113,9 @@ apply IHMA; [ easy | easy | ].
 now apply Hss.
 Qed.
 
-Theorem bmat_add_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} d n M,
+Theorem bmat_add_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
   have_same_bmat_struct (Z_2_pow n) M
-  → bmat_add d (Z_2_pow n) M = M.
+  → bmat_add (Z_2_pow n) M = M.
 Proof.
 intros * sp * Hss.
 revert M Hss.
@@ -2139,9 +2139,9 @@ destruct j; [ now apply IHn | cbn ].
 destruct j; [ now apply IHn | flia Hj ].
 Qed.
 
-Theorem bmat_add_0_r : ∀ T {so : semiring_op T } {sp : semiring_prop T} d n M,
+Theorem bmat_add_0_r : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
   have_same_bmat_struct (Z_2_pow n) M
-  → bmat_add d M (Z_2_pow n) = M.
+  → bmat_add M (Z_2_pow n) = M.
 Proof.
 intros * sp * Hss.
 rewrite bmat_add_comm; [ | easy | easy ].
@@ -2199,9 +2199,9 @@ transitivity (A n); [ easy | ].
 apply have_same_bmat_struct_opp_r.
 Qed.
 
-Theorem bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} d n M,
+Theorem bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
   have_same_bmat_struct (I_2_pow n) M
-  → bmat_mul d (Z_2_pow n) M = Z_2_pow n.
+  → bmat_mul (Z_2_pow n) M = Z_2_pow n.
 Proof.
 intros * sp * Hss.
 revert M Hss.
@@ -2262,9 +2262,9 @@ rewrite IHn. 2: {
 now apply bmat_add_0_l.
 Qed.
 
-Theorem bmat_mul_0_r : ∀ T {so : semiring_op T } {sp : semiring_prop T} d n M,
+Theorem bmat_mul_0_r : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
   have_same_bmat_struct (I_2_pow n) M
-  → bmat_mul d M (Z_2_pow n) = Z_2_pow n.
+  → bmat_mul M (Z_2_pow n) = Z_2_pow n.
 Proof.
 intros * sp * Hss.
 revert M Hss.
