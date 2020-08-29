@@ -1765,7 +1765,8 @@ Definition void_bmat T d : bmatrix T :=
 
 Theorem bmatrix_ind2 : ∀ T (P : bmatrix T → Prop),
   (∀ t, P (BM_1 t))
-  → (∀ M, (∀ i j, P (mat_el M i j)) → P (BM_M M))
+  → (∀ M, (∀ i j, i < mat_nrows M → j < mat_ncols M → P (mat_el M i j))
+      → P (BM_M M))
   → ∀ BM, P BM.
 Proof.
 fix IHB 5.
@@ -1778,7 +1779,7 @@ remember (f i j) as BM eqn:HBM.
 symmetry in HBM.
 destruct BM as [x| M]; [ apply H1 | ].
 apply HM.
-intros k l.
+intros k l Hk Hl.
 now apply IHB.
 Qed.
 
@@ -1903,7 +1904,7 @@ induction BM as [x| M IHBM] using bmatrix_ind2. {
   f_equal.
   apply matrix_eq; cbn; [ easy | easy | ].
   intros * Hi Hj.
-  apply IHBM.
+  now apply IHBM.
 }
 Qed.
 
@@ -1912,8 +1913,8 @@ Delimit Scope BM_scope with BM.
 
 Module bmatrix_Notations.
 
-Notation "a + b" := (bmat_add a b) : BM_scope.
-Notation "a * b" := (bmat_mul a b) : BM_scope.
+Notation "a + b" := (bmat_add _ a b) : BM_scope.
+Notation "a * b" := (bmat_mul _ a b) : BM_scope.
 Notation "- a" := (bmat_opp a) : BM_scope.
 
 End bmatrix_Notations.
@@ -2018,133 +2019,27 @@ Fixpoint have_same_bmat_struct T (MA MB : bmatrix T) :=
       | BM_M MMB =>
           mat_nrows MMA = mat_nrows MMB ∧
           mat_ncols MMA = mat_ncols MMB ∧
-...
-          let fix have_same_list_struct la lb :=
-            match la with
-            | [] => match lb with [] => True | _ :: _ => False end
-            | a :: la' =>
-                match lb with
-                | [] => False
-                | b :: lb' =>
-                    have_same_bmat_struct a b ∧
-                    have_same_list_struct la' lb'
-                end
-            end
-          in
-          let fix have_same_list_list_struct lla llb :=
-            match lla with
-            | [] => match llb with [] => True | _ :: _ => False end
-            | la :: lla' =>
-                match llb with
-                | [] => False
-                | lb :: llb' =>
-                    have_same_list_struct la lb ∧
-                    have_same_list_list_struct lla' llb'
-                end
-            end
-          in
-          have_same_list_list_struct (mat_list MMA) (mat_list MMB)
-        end
-  end.
-
-...
-
-Fixpoint have_same_bmat_struct T (MA MB : bmatrix T) :=
-  match MA with
-  | BM_1 xa =>
-      match MB with
-      | BM_1 xb => True
-      | BM_M MMB => False
+          ∀ i j, i < mat_nrows MMA → j < mat_ncols MMA →
+          have_same_bmat_struct (mat_el MMA i j) (mat_el MMB i j)
       end
-  | BM_M MMA =>
-      match MB with
-      | BM_1 xb => False
-      | BM_M MMB =>
-          let fix have_same_list_struct la lb :=
-            match la with
-            | [] => match lb with [] => True | _ :: _ => False end
-            | a :: la' =>
-                match lb with
-                | [] => False
-                | b :: lb' =>
-                    have_same_bmat_struct a b ∧
-                    have_same_list_struct la' lb'
-                end
-            end
-          in
-          let fix have_same_list_list_struct lla llb :=
-            match lla with
-            | [] => match llb with [] => True | _ :: _ => False end
-            | la :: lla' =>
-                match llb with
-                | [] => False
-                | lb :: llb' =>
-                    have_same_list_struct la lb ∧
-                    have_same_list_list_struct lla' llb'
-                end
-            end
-          in
-          have_same_list_list_struct (mat_list MMA) (mat_list MMB)
-        end
   end.
-
-Definition have_same_list_struct T :=
-  fix have_same_list_struct (la lb : list (bmatrix T)) :=
-    match la with
-    | [] => match lb with [] => True | _ :: _ => False end
-    | a :: la' =>
-        match lb with
-        | [] => False
-        | b :: lb' =>
-            have_same_bmat_struct a b ∧
-            have_same_list_struct la' lb'
-        end
-    end.
-
-Definition have_same_list_list_struct T :=
-  fix have_same_list_list_struct (lla llb : list (list (bmatrix T))) :=
-     match lla with
-     | [] => match llb with [] => True | _ :: _ => False end
-     | la :: lla' =>
-         match llb with
-         | [] => False
-         | lb :: llb' =>
-             have_same_list_struct la lb ∧
-             have_same_list_list_struct lla' llb'
-         end
-     end.
 
 Require Import Relations.
 
-Theorem have_same_bmat_struct_refl : ∀ T, reflexive _ (@have_same_bmat_struct T).
+Theorem have_same_bmat_struct_refl : ∀ T,
+  reflexive _ (@have_same_bmat_struct T).
 Proof.
 intros * M.
 induction M as [x| M IHM] using bmatrix_ind2; [ easy | cbn ].
-destruct M as (ll); cbn.
-cbn in IHM.
-induction ll as [| l1]; [ easy | cbn ].
-split. {
-  revert ll IHM IHll.
-  induction l1 as [| e1]; intros; [ easy | cbn ].
-  split; [ now apply (IHM (e1 :: l1)); left | ].
-  apply (IHl1 ll). {
-    intros la Hla a Ha.
-    cbn - [ In ] in Hla.
-    destruct Hla as [Hla| Hla]. {
-      subst la.
-      apply (IHM (e1 :: l1)); [ now left | now right ].
-    }
-    apply (IHM la); [ now right | easy ].
-  }
-  intros H1.
-  now apply IHll.
-}
-apply IHll.
-intros la Hla a Ha.
-apply (IHM la); [ now right | easy ].
+destruct M as (ll, r, c); cbn in IHM |-*.
+split; [ easy | ].
+split; [ easy | ].
+intros i j Hi Hj.
+now apply IHM.
 Qed.
 
-Theorem have_same_bmat_struct_symm : ∀ T, symmetric _ (@have_same_bmat_struct T).
+Theorem have_same_bmat_struct_symm : ∀ T,
+  symmetric _ (@have_same_bmat_struct T).
 Proof.
 intros * MA MB HMM.
 revert MB HMM.
@@ -2153,34 +2048,14 @@ induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
 }
 destruct MB as [xb| mb]; [ easy | ].
 cbn in HMM |-*.
-destruct ma as (lla); destruct mb as (llb).
+destruct ma as (lla, ra, ca); destruct mb as (llb, rb, cb).
 cbn in IHMA, HMM |-*.
-fold (@have_same_list_struct T) in HMM |-*.
-fold (@have_same_list_list_struct T) in HMM |-*.
-revert llb HMM.
-induction lla as [| la]; intros; [ now destruct llb | ].
-destruct llb as [| lb]; [ easy | ].
-cbn in HMM |-*.
-split. {
-  destruct HMM as (Hlab, Hllab).
-  revert lb Hlab.
-  induction la as [| a]; intros; [ now destruct lb | ].
-  destruct lb as [| b]; [ easy | ].
-  cbn in Hlab |-*.
-  split. {
-    apply (IHMA _ (or_introl eq_refl)); [ now left | easy ].
-  }
-  apply IHla; [ | easy ].
-  intros la1 Hla1 a1 Ha1 b1 Hab.
-  destruct Hla1 as [Hla1| Hla1]. {
-    subst la1.
-    apply (IHMA _ (or_introl eq_refl)); [ now right | easy ].
-  }
-  now apply (IHMA _ (or_intror Hla1)).
-}
-apply IHlla; [ | easy ].
-intros la1 Hla1 a1 Ha1 b1 Hab.
-now apply (IHMA _ (or_intror Hla1)).
+destruct HMM as (Hrr & Hcc & Hss).
+subst rb cb.
+split; [ easy | ].
+split; [ easy | ].
+intros i j Hi Hj.
+now apply IHMA, Hss.
 Qed.
 
 Theorem have_same_bmat_struct_trans : ∀ T,
@@ -2194,41 +2069,16 @@ induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
 destruct MB as [xb| mb]; [ easy | ].
 destruct MC as [xc| mc]; [ easy | ].
 cbn in HAB, HBC |-*.
-fold (@have_same_list_struct T) in HAB, HBC |-*.
-fold (@have_same_list_list_struct T) in HAB, HBC |-*.
-destruct ma as (lla).
-destruct mb as (llb).
-destruct mc as (llc).
+destruct ma as (fa, ra, ca).
+destruct mb as (fb, rb, cb).
+destruct mc as (fc, rc, cc).
 cbn in IHMA, HAB, HBC |-*.
-revert llb llc HAB HBC.
-induction lla as [| la]; intros; [ now destruct llb | ].
-destruct llb as [| lb]; [ easy | ].
-destruct llc as [| lc]; [ easy | ].
-cbn in HAB, HBC |-*.
-split. {
-  destruct HAB as (Hlab, Hllab).
-  destruct HBC as (Hlbc, Hllbc).
-  revert lb lc Hlab Hlbc.
-  induction la as [| a]; intros; [ now destruct lb | ].
-  destruct lb as [| b]; [ easy | ].
-  destruct lc as [| c]; [ easy | ].
-  cbn in Hlab, Hlbc |-*.
-  split. {
-    apply (IHMA _ (or_introl eq_refl)) with (MB := b); [ | easy | easy ].
-    now left.
-  }
-  apply IHla with (lb := lb); [ | easy | easy ].
-  intros la1 Hla1 a1 Ha1 b1 c1 Hab Hbc.
-  destruct Hla1 as [Hla1| Hla1]. {
-    subst la1.
-    apply (IHMA _ (or_introl eq_refl)) with (MB := b1); [ | easy | easy ].
-    now right.
-  }
-  now apply (IHMA _ (or_intror Hla1)) with (MB := b1).
-}
-apply IHlla with (llb := llb); [ | easy | easy ].
-intros la1 Hla1 a1 Ha1 b1 c1 Hab Hbc.
-now apply (IHMA _ (or_intror Hla1)) with (MB := b1).
+destruct HAB as (Hrr & Hcc & Hab); subst rb cb.
+destruct HBC as (Hrr & Hcc & Hbc); subst rc cc.
+split; [ easy | ].
+split; [ easy | ].
+intros i j Hi Hj.
+now apply IHMA with (MB := fb i j); [ | | apply Hab | apply Hbc ].
 Qed.
 
 Add Parametric Relation T : _ (@have_same_bmat_struct T)
@@ -2238,46 +2088,32 @@ Add Parametric Relation T : _ (@have_same_bmat_struct T)
  as have_same_bmat_struct_equivalence.
 
 Theorem bmat_add_comm :
-    ∀ T {so : semiring_op T } {sp : semiring_prop T} MA MB,
-  bmat_add MA MB = bmat_add MB MA.
+    ∀ T {so : semiring_op T } {sp : semiring_prop T} d MA MB,
+  have_same_bmat_struct MA MB
+  → bmat_add d MA MB = bmat_add d MB MA.
 Proof.
-intros.
-revert MB.
+intros * sp * Hss.
+revert MB Hss.
 induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
   destruct MB as [xb| mb]; [ | easy ].
   now cbn; rewrite srng_add_comm.
 }
 destruct MB as [xb| mb]; [ easy | ].
-destruct ma as (lla).
-destruct mb as (llb).
-cbn in IHMA |-*.
-f_equal; f_equal.
-fold (@bmat_list_add T so).
-fold (@bmat_list_list_add T so).
-revert llb.
-induction lla as [| la]; intros; [ now destruct llb | cbn ].
-destruct llb as [| lb]; [ easy | cbn ].
-f_equal. {
-  revert lb.
-  induction la as [| a]; intros; [ now destruct lb | cbn ].
-  destruct lb as [| b]; [ easy | cbn ].
-  f_equal; [ now apply (IHMA (a :: la)); left | ].
-  apply IHla; cbn - [ In ].
-  intros la1 Hla1 a1 Ha1 b1.
-  destruct Hla1 as [Hla1| Hla1]. {
-    subst la1.
-    apply (IHMA (a :: la)); [ now left | now right ].
-  }
-  apply (IHMA la1); [ now right | easy ].
-}
-apply IHlla.
-intros la1 Hla1 a1 Ha1 b1.
-apply (IHMA la1); [ now right | easy ].
+cbn in Hss.
+destruct ma as (fa, ra, ca).
+destruct mb as (fb, rb, cb).
+cbn in IHMA, Hss |-*.
+destruct Hss as (Hrr & Hcc & Hss); subst rb cb.
+f_equal.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros * Hi Hj.
+apply IHMA; [ easy | easy | ].
+now apply Hss.
 Qed.
 
-Theorem bmat_add_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
+Theorem bmat_add_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} d n M,
   have_same_bmat_struct (Z_2_pow n) M
-  → bmat_add (Z_2_pow n) M = M.
+  → bmat_add d (Z_2_pow n) M = M.
 Proof.
 intros * sp * Hss.
 revert M Hss.
@@ -2285,6 +2121,8 @@ induction n; intros. {
   cbn.
   destruct M as [x| M]; [ now rewrite srng_add_0_l | easy ].
 }
+cbn.
+...
 cbn - [ Nat.eq_dec ].
 destruct M as [x| M]; [ easy | f_equal ].
 destruct M as (ll).
