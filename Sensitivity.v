@@ -2205,13 +2205,15 @@ Theorem bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
 Proof.
 intros * sp * Hss.
 revert M Hss.
-induction n; intros; cbn. {
+induction n; intros. {
+cbn.
   destruct M as [xm| mm]; [ now rewrite srng_mul_0_l | easy ].
 }
+cbn - [ mat_el ].
 destruct M as [xm| mm]; [ easy | ].
 cbn in Hss.
 destruct Hss as (Hr & Hc & Hss).
-f_equal.
+cbn; f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros * Hi Hj.
 destruct i. {
@@ -2268,20 +2270,36 @@ Theorem bmat_mul_0_r : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
 Proof.
 intros * sp * Hss.
 revert M Hss.
-induction n; intros; cbn. {
+induction n; intros. {
+cbn.
   destruct M as [xm| mm]; [ now cbn; rewrite srng_mul_0_r | easy ].
 }
 destruct M as [xm| mm]; [ easy | ].
 cbn in Hss.
 destruct Hss as (Hr & Hc & Hss).
 cbn; f_equal.
+set (mat_el_mul_loop := fix
+               mat_el_mul_loop (it : nat) (a : bmatrix T) 
+                               (i0 j k0 : nat) {struct it} : 
+               bmatrix T :=
+                 match it with
+                 | 0 => a
+                 | S it' =>
+                     mat_el_mul_loop it'
+                       (a +
+                        mat_el mm i0 j *
+                        nth k0
+                          match j with
+                          | 0 | 1 => [Z_2_pow n; Z_2_pow n]
+                          | S (S m) => match m with 0 => [] | _ => [] end
+                          end (BM_1 0%Srng))%BM i0 (j + 1) k0
+                 end).
 apply matrix_eq; cbn; [ easy | easy | ].
 intros * Hi Hj.
 rewrite <- Hr in Hi.
 destruct i. {
   destruct j. {
-    rewrite IHn; [ | now specialize (Hss _ _ Hi Hj) ].
-cbn.
+    rewrite IHn; [ cbn | now specialize (Hss _ _ Hi Hj) ].
 ...
     rewrite IHn. 2: {
       specialize (Hss 1 0 Nat.lt_1_2 Nat.lt_0_2) as H.
