@@ -2122,11 +2122,30 @@ induction n; intros. {
   destruct M as [x| M]; [ now rewrite srng_add_0_l | easy ].
 }
 cbn.
-...
-cbn - [ Nat.eq_dec ].
 destruct M as [x| M]; [ easy | f_equal ].
-destruct M as (ll).
-cbn - [ Nat.eq_dec ].
+destruct M as (f, r, c).
+cbn in Hss |-*.
+destruct Hss as (Hr & Hc & Hss); subst r c.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros * Hi Hj.
+specialize (Hss _ _ Hi Hj).
+destruct i. {
+  destruct j; cbn in Hss |-*. {
+    destruct n; cbn in Hss |-*. {
+      destruct (f 0 0); [ | easy ].
+      now rewrite srng_add_0_l.
+    }
+    remember (f 0 0) as m eqn:Hm; symmetry in Hm.
+    destruct m as [x| m]; [ easy | ].
+    destruct Hss as (Hr & Hc & Hss).
+    f_equal.
+    apply matrix_eq; cbn; [ easy | easy | ].
+    clear Hi Hj.
+    intros * Hi Hj.
+    rewrite <- Hc in Hj.
+    specialize (Hss _ _ Hi Hj).
+    destruct i; cbn in Hss |-*. {
+...
 cbn in Hss.
 cbn; f_equal.
 destruct ll as [| l1]; [ easy | ].
