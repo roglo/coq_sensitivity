@@ -2121,59 +2121,28 @@ induction n; intros. {
   cbn.
   destruct M as [x| M]; [ now rewrite srng_add_0_l | easy ].
 }
-cbn.
-destruct M as [x| M]; [ easy | f_equal ].
-destruct M as (f, r, c).
 cbn in Hss |-*.
-destruct Hss as (Hr & Hc & Hss); subst r c.
+destruct M as [x| M]; [ easy | f_equal ].
+destruct Hss as (Hr & Hc & Hss).
 apply matrix_eq; cbn; [ easy | easy | ].
 intros * Hi Hj.
-specialize (Hss _ _ Hi Hj).
+rewrite <- Hc in Hj.
+specialize (Hss _ _ Hi Hj) as H1.
 destruct i. {
-  destruct j; cbn in Hss |-*. {
-    destruct n; cbn in Hss |-*. {
-      destruct (f 0 0); [ | easy ].
-      now rewrite srng_add_0_l.
-    }
-    remember (f 0 0) as m eqn:Hm; symmetry in Hm.
-    destruct m as [x| m]; [ easy | ].
-    destruct Hss as (Hr & Hc & Hss).
-    f_equal.
-    apply matrix_eq; cbn; [ easy | easy | ].
-    clear Hi Hj.
-    intros * Hi Hj.
-    rewrite <- Hc in Hj.
-    specialize (Hss _ _ Hi Hj).
-    destruct i; cbn in Hss |-*. {
-...
-cbn in Hss.
-cbn; f_equal.
-destruct ll as [| l1]; [ easy | ].
-destruct Hss as (H1 & H2).
-f_equal. {
-  destruct l1 as [| e1]; [ easy | ].
-  f_equal; [ now apply IHn | ].
-  destruct l1 as [| e2]; [ easy | ].
-  f_equal; [ now apply IHn | ].
-  now destruct l1.
+  destruct j; [ now apply IHn | cbn ].
+  destruct j; [ now apply IHn | flia Hj ].
 }
-destruct ll as [| l2]; [ easy | ].
-f_equal. {
-  destruct l2 as [| e2]; [ easy | ].
-  f_equal; [ now apply IHn | ].
-  destruct l2 as [| e3]; [ easy | ].
-  f_equal; [ now apply IHn | ].
-  now destruct l2.
-}
-now destruct ll.
+destruct i; [ cbn | flia Hi ].
+destruct j; [ now apply IHn | cbn ].
+destruct j; [ now apply IHn | flia Hj ].
 Qed.
 
-Theorem bmat_add_0_r : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
+Theorem bmat_add_0_r : ∀ T {so : semiring_op T } {sp : semiring_prop T} d n M,
   have_same_bmat_struct (Z_2_pow n) M
-  → bmat_add M (Z_2_pow n) = M.
+  → bmat_add d M (Z_2_pow n) = M.
 Proof.
 intros * sp * Hss.
-rewrite bmat_add_comm; [ | easy ].
+rewrite bmat_add_comm; [ | easy | easy ].
 now apply bmat_add_0_l.
 Qed.
 
@@ -2183,12 +2152,16 @@ Proof.
 intros.
 revert u v.
 induction n; intros; [ easy | cbn ].
-split. {
-  split; [ apply IHn | easy ].
+split; [ easy | ].
+split; [ easy | ].
+intros i j Hi Hj.
+destruct i. {
+  destruct j; [ apply IHn | ].
+  destruct j; [ apply IHn | flia Hj ].
 }
-split; [ | easy ].
-split; [ | easy ].
-apply IHn.
+destruct i; [ | flia Hi ].
+destruct j; [ apply IHn | ].
+destruct j; [ apply IHn | flia Hj ].
 Qed.
 
 Theorem have_same_bmat_struct_opp_r : ∀ T {ro : ring_op T} M,
@@ -2196,6 +2169,7 @@ Theorem have_same_bmat_struct_opp_r : ∀ T {ro : ring_op T} M,
 Proof.
 intros.
 induction M as [| M IHM] using bmatrix_ind2; [ easy | cbn ].
+...
 destruct M as (lla).
 cbn in IHM |-*.
 fold (@have_same_list_struct T).
