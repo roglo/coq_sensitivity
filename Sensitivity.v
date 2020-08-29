@@ -2169,28 +2169,10 @@ Theorem have_same_bmat_struct_opp_r : ∀ T {ro : ring_op T} M,
 Proof.
 intros.
 induction M as [| M IHM] using bmatrix_ind2; [ easy | cbn ].
-...
-destruct M as (lla).
-cbn in IHM |-*.
-fold (@have_same_list_struct T).
-fold (@have_same_list_list_struct T).
-induction lla as [| la]; [ easy | cbn ].
-split. 2: {
-  apply IHlla.
-  intros la1 Hla1 a1 Ha1.
-  apply (IHM la1); [ now right | easy ].
-}
-induction la as [| a]; [ easy | cbn ].
-split. {
-  now apply (IHM _ (or_introl eq_refl)); left.
-}
-apply IHla.
-intros la1 Hla1 a1 Ha1.
-destruct Hla1 as [Hla1| Hla1]. {
-  subst la1.
-  now apply (IHM _ (or_introl eq_refl)); right.
-}
-now apply (IHM _ (or_intror Hla1)).
+split; [ easy | ].
+split; [ easy | ].
+intros * Hi Hj.
+now apply IHM.
 Qed.
 
 Theorem have_same_bmat_struct_IZ_A : ∀ T {ro : ring_op T} (so := rng_semiring)
@@ -2200,21 +2182,24 @@ Proof.
 intros.
 revert u.
 induction n; intros; [ easy | cbn ].
-split. {
-  split; [ easy | ].
-  split; [ | easy ].
+split; [ easy | ].
+split; [ easy | ].
+intros * Hi Hj.
+destruct i. {
+  destruct j; [ apply IHn | ].
+  destruct j; [ cbn | flia Hj ].
   apply have_same_bmat_struct_IZ_IZ.
 }
-split; [ | easy ].
-split; [ apply have_same_bmat_struct_IZ_IZ | ].
-split; [ | easy ].
+destruct i; [ | flia Hi ].
+destruct j; [ apply have_same_bmat_struct_IZ_IZ | ].
+destruct j; [ cbn | flia Hj ].
 transitivity (A n); [ easy | ].
 apply have_same_bmat_struct_opp_r.
 Qed.
 
-Theorem bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
+Theorem bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} d n M,
   have_same_bmat_struct (I_2_pow n) M
-  → bmat_mul (Z_2_pow n) M = Z_2_pow n.
+  → bmat_mul d (Z_2_pow n) M = Z_2_pow n.
 Proof.
 intros * sp * Hss.
 revert M Hss.
@@ -2222,6 +2207,7 @@ induction n; intros; cbn. {
   destruct M as [xm| mm]; [ now rewrite srng_mul_0_l | easy ].
 }
 destruct M as [xm| mm]; [ easy | ].
+...
 f_equal; f_equal.
 destruct mm as (ll).
 destruct ll as [| l1]; [ easy | ].
