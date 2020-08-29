@@ -1908,6 +1908,7 @@ induction BM as [x| M IHBM] using bmatrix_ind2. {
 }
 Qed.
 
+(*
 Declare Scope BM_scope.
 Delimit Scope BM_scope with BM.
 
@@ -1920,6 +1921,7 @@ Notation "- a" := (bmat_opp a) : BM_scope.
 End bmatrix_Notations.
 
 Import bmatrix_Notations.
+*)
 
 (* sequence "An" *)
 
@@ -2265,7 +2267,67 @@ Theorem bmat_mul_0_r : ∀ T {so : semiring_op T } {sp : semiring_prop T} d n M,
   → bmat_mul d M (Z_2_pow n) = Z_2_pow n.
 Proof.
 intros * sp * Hss.
+revert M Hss.
+induction n; intros; cbn. {
+  destruct M as [xm| mm]; [ now cbn; rewrite srng_mul_0_r | easy ].
+}
+destruct M as [xm| mm]; [ easy | ].
+cbn in Hss.
+destruct Hss as (Hr & Hc & Hss).
+cbn; f_equal.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros * Hi Hj.
+rewrite <- Hr in Hi.
+destruct i. {
+  destruct j. {
+    rewrite IHn; [ | now specialize (Hss _ _ Hi Hj) ].
+cbn.
 ...
+    rewrite IHn. 2: {
+      specialize (Hss 1 0 Nat.lt_1_2 Nat.lt_0_2) as H.
+      cbn in H.
+      transitivity (Z_2_pow n); [ | easy ].
+      apply have_same_bmat_struct_IZ_IZ.
+    }
+    now apply bmat_add_0_l.
+  }
+  destruct j; [ cbn | flia Hj ].
+  rewrite IHn. 2: {
+    specialize (Hss 0 1 Nat.lt_0_2 Nat.lt_1_2) as H.
+    cbn in H.
+    transitivity (Z_2_pow n); [ | easy ].
+    apply have_same_bmat_struct_IZ_IZ.
+  }
+  rewrite IHn. 2: {
+    now specialize (Hss 1 1 Nat.lt_1_2 Nat.lt_1_2).
+  }
+  now apply bmat_add_0_l.
+}
+destruct i; [ cbn | flia Hi ].
+destruct j. {
+  rewrite IHn. 2: {
+    now specialize (Hss 0 0 Nat.lt_0_2 Nat.lt_0_2).
+  }
+  rewrite IHn. 2: {
+    specialize (Hss 1 0 Nat.lt_1_2 Nat.lt_0_2) as H.
+    cbn in H.
+    transitivity (Z_2_pow n); [ | easy ].
+    apply have_same_bmat_struct_IZ_IZ.
+  }
+  now apply bmat_add_0_l.
+}
+destruct j; [ | flia Hj ].
+rewrite IHn. 2: {
+  specialize (Hss 0 1 Nat.lt_0_2 Nat.lt_1_2) as H; cbn in H.
+  transitivity (Z_2_pow n); [ | easy ].
+  apply have_same_bmat_struct_IZ_IZ.
+}
+rewrite IHn. 2: {
+  now specialize (Hss 1 1 Nat.lt_1_2 Nat.lt_1_2).
+}
+now apply bmat_add_0_l.
+...
+intros * sp * Hss.
 revert M Hss.
 induction n; intros; cbn. {
   destruct M as [xm| mm]; [ now cbn; rewrite srng_mul_0_r | easy ].
