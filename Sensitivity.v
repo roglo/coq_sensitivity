@@ -1790,17 +1790,17 @@ Definition mat_transpose T (M : matrix T) : matrix T :=
      mat_nrows := mat_ncols M;
      mat_ncols := mat_nrows M |}.
 
-...
-
 Fixpoint bmat_transpose T (BM : bmatrix T) : bmatrix T :=
   match BM with
   | BM_1 x => BM_1 x
-  | BM_M M => BM_M (mat_transpose (bmat_transpose M))
+  | BM_M M =>
+      let M' :=
+        {| mat_el i j := bmat_transpose (mat_el M j i);
+           mat_nrows := mat_ncols M;
+           mat_ncols := mat_nrows M |}
+      in
+      BM_M M'
   end.
-
-  {| mat_el i j := mat_el M j i;
-     mat_nrows := mat_ncols M;
-     mat_ncols := mat_nrows M |}.
 
 Compute
   (list_list_of_mat
@@ -2573,14 +2573,16 @@ fold
   (mat_el_mul_loop (λ i j, (mat_el ma i j + mat_el mb i j)%BM) (mat_el mc)).
 fold (mat_el_mul_loop (mat_el ma) (mat_el mc)).
 fold (mat_el_mul_loop (mat_el mb) (mat_el mc)).
-destruct ma as (lla, ra, ca).
-destruct mb as (llb, rb, cb).
-destruct mc as (llc, rc, cc).
+destruct ma as (fa, ra, ca).
+destruct mb as (fb, rb, cb).
+destruct mc as (fc, rc, cc).
 cbn in *.
-move llb before lla.
-move llc before llb.
+move fb before fa.
+move fc before fb.
 subst rc cc rb cb.
-destruct ca; [ flia Hj | ].
+destruct ca. {
+  cbn.
+...
 rewrite Nat.sub_succ, Nat.sub_0_r.
 apply Nat.succ_le_mono in Hj.
 destruct ca; cbn. {
