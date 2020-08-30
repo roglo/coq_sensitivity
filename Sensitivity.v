@@ -1790,6 +1790,18 @@ Definition mat_transpose T (M : matrix T) : matrix T :=
      mat_nrows := mat_ncols M;
      mat_ncols := mat_nrows M |}.
 
+...
+
+Fixpoint bmat_transpose T (BM : bmatrix T) : bmatrix T :=
+  match BM with
+  | BM_1 x => BM_1 x
+  | BM_M M => BM_M (mat_transpose (bmat_transpose M))
+  end.
+
+  {| mat_el i j := mat_el M j i;
+     mat_nrows := mat_ncols M;
+     mat_ncols := mat_nrows M |}.
+
 Compute
   (list_list_of_mat
      (mat_transpose
@@ -2530,8 +2542,8 @@ Qed.
 
 Theorem bmat_mul_add_distr_r :
   ∀ T (so : semiring_op T) {sp : semiring_prop T} MA MB MC,
-  have_same_bmat_struct MA MC
-  → have_same_bmat_struct MB MC
+  have_same_bmat_struct MA (bmat_transpose MC)
+  → have_same_bmat_struct MB (bmat_transpose MC)
   → ((MA + MB) * MC = MA * MC + MB * MC)%BM.
 Proof.
 intros * sp * Hssac Hssbc.
