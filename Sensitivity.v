@@ -2278,22 +2278,21 @@ destruct M as [xm| mm]; [ easy | ].
 cbn in Hss.
 destruct Hss as (Hr & Hc & Hss).
 cbn; f_equal.
-set (mat_el_mul_loop := fix
-               mat_el_mul_loop (it : nat) (a : bmatrix T) 
-                               (i0 j k0 : nat) {struct it} : 
-               bmatrix T :=
-                 match it with
-                 | 0 => a
-                 | S it' =>
-                     mat_el_mul_loop it'
-                       (a +
-                        mat_el mm i0 j *
-                        nth k0
-                          match j with
-                          | 0 | 1 => [Z_2_pow n; Z_2_pow n]
-                          | S (S m) => match m with 0 => [] | _ => [] end
-                          end (BM_1 0%Srng))%BM i0 (j + 1) k0
-                 end).
+set
+  (mat_el_mul_loop :=
+     fix mat_el_mul_loop it a i j k :=
+       match it with
+       | 0 => a
+       | S it' =>
+           mat_el_mul_loop it'
+             (a +
+              mat_el mm i j *
+              nth k
+                match j with
+                | 0 | 1 => [Z_2_pow n; Z_2_pow n]
+                | S (S m) => match m with 0 => [] | _ => [] end
+                end (BM_1 0%Srng))%BM i (j + 1) k
+       end).
 apply matrix_eq; cbn; [ easy | easy | ].
 intros * Hi Hj.
 rewrite <- Hr in Hi.
