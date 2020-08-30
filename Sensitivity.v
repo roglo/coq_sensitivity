@@ -2545,7 +2545,39 @@ destruct MA as [xa| ma]; [ easy | ].
 destruct MB as [xb| mb]; [ easy | ].
 move ma after mc.
 move mb after mc.
-cbn in Hssac.
+cbn in Hssac, Hssbc.
+destruct Hssac as (Hrac & Hcac & Hssac).
+destruct Hssbc as (Hrbc & Hcbc & Hssbc).
+cbn; f_equal.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros i j Hi Hj.
+Definition mat_el_mul_loop T {so : semiring_op T} f g :=
+  fix mat_el_mul_loop it a (i j k : nat) :=
+     match it with
+     | 0 => a
+     | S it' => mat_el_mul_loop it' (a + f i j * g j k)%BM i (j + 1) k
+     end.
+fold
+  (mat_el_mul_loop (λ i j, (mat_el ma i j + mat_el mb i j)%BM) (mat_el mc)).
+fold (mat_el_mul_loop (mat_el ma) (mat_el mc)).
+fold (mat_el_mul_loop (mat_el mb) (mat_el mc)).
+destruct ma as (lla, ra, ca).
+destruct mb as (llb, rb, cb).
+destruct mc as (llc, rc, cc).
+cbn in *.
+move llb before lla.
+move llc before llb.
+subst rc cc rb cb.
+destruct ca; [ flia Hj | ].
+rewrite Nat.sub_succ, Nat.sub_0_r.
+apply Nat.succ_le_mono in Hj.
+destruct ca; cbn. {
+  apply Nat.le_0_r in Hj; subst j.
+  apply IHMC; [ flia Hi | flia | | ]. {
+...
+    transitivity (lla 0 0). 2: {
+      apply Hssac; [ flia Hi | flia ].
+    }
 ...
 progress fold (@have_same_list_struct T) in Hssac.
 progress fold (@have_same_list_list_struct T) in Hssac.
