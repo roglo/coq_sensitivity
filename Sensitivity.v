@@ -2205,11 +2205,9 @@ Theorem bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
 Proof.
 intros * sp * Hss.
 revert M Hss.
-induction n; intros. {
-cbn.
+induction n; intros; cbn. {
   destruct M as [xm| mm]; [ now rewrite srng_mul_0_l | easy ].
 }
-cbn - [ mat_el ].
 destruct M as [xm| mm]; [ easy | ].
 cbn in Hss.
 destruct Hss as (Hr & Hc & Hss).
@@ -2220,7 +2218,7 @@ destruct i. {
   destruct j. {
     rewrite IHn; [ | now specialize (Hss _ _ Hi Hj) ].
     rewrite IHn. 2: {
-      specialize (Hss 1 0 Nat.lt_1_2 Nat.lt_0_2) as H.
+      specialize (Hss 1 0 Nat.lt_1_2 Hj) as H.
       cbn in H.
       transitivity (Z_2_pow n); [ | easy ].
       apply have_same_bmat_struct_IZ_IZ.
@@ -2229,23 +2227,23 @@ destruct i. {
   }
   destruct j; [ cbn | flia Hj ].
   rewrite IHn. 2: {
-    specialize (Hss 0 1 Nat.lt_0_2 Nat.lt_1_2) as H.
+    specialize (Hss 0 1 Hi Hj) as H.
     cbn in H.
     transitivity (Z_2_pow n); [ | easy ].
     apply have_same_bmat_struct_IZ_IZ.
   }
   rewrite IHn. 2: {
-    now specialize (Hss 1 1 Nat.lt_1_2 Nat.lt_1_2).
+    now specialize (Hss 1 1 Nat.lt_1_2 Hj).
   }
   now apply bmat_add_0_l.
 }
 destruct i; [ cbn | flia Hi ].
 destruct j. {
   rewrite IHn. 2: {
-    now specialize (Hss 0 0 Nat.lt_0_2 Nat.lt_0_2).
+    now specialize (Hss 0 0 Nat.lt_0_2 Hj).
   }
   rewrite IHn. 2: {
-    specialize (Hss 1 0 Nat.lt_1_2 Nat.lt_0_2) as H.
+    specialize (Hss 1 0 Hi Hj) as H.
     cbn in H.
     transitivity (Z_2_pow n); [ | easy ].
     apply have_same_bmat_struct_IZ_IZ.
@@ -2254,12 +2252,12 @@ destruct j. {
 }
 destruct j; [ | flia Hj ].
 rewrite IHn. 2: {
-  specialize (Hss 0 1 Nat.lt_0_2 Nat.lt_1_2) as H; cbn in H.
+  specialize (Hss 0 1 Nat.lt_0_2 Hj) as H; cbn in H.
   transitivity (Z_2_pow n); [ | easy ].
   apply have_same_bmat_struct_IZ_IZ.
 }
 rewrite IHn. 2: {
-  now specialize (Hss 1 1 Nat.lt_1_2 Nat.lt_1_2).
+  now specialize (Hss 1 1 Hi Hj).
 }
 now apply bmat_add_0_l.
 Qed.
@@ -2285,7 +2283,7 @@ destruct i. {
   destruct j. {
     rewrite IHn; [ cbn | now specialize (Hss _ _ Hi Hj) ].
     rewrite IHn. 2: {
-      specialize (Hss 0 1 Nat.lt_0_2 Nat.lt_1_2) as H.
+      specialize (Hss 0 1 Hi Nat.lt_1_2) as H.
       cbn in H.
       transitivity (Z_2_pow n); [ | easy ].
       apply have_same_bmat_struct_IZ_IZ.
@@ -2294,10 +2292,10 @@ destruct i. {
   }
   destruct j; [ cbn | flia Hj ].
   rewrite IHn. 2: {
-    now specialize (Hss 0 0 Nat.lt_0_2 Nat.lt_0_2).
+    now specialize (Hss 0 0 Hi Nat.lt_0_2).
   }
   rewrite IHn. 2: {
-    specialize (Hss 0 1 Nat.lt_0_2 Nat.lt_1_2) as H.
+    specialize (Hss 0 1 Hi Hj) as H.
     cbn in H.
     transitivity (Z_2_pow n); [ | easy ].
     apply have_same_bmat_struct_IZ_IZ.
@@ -2307,24 +2305,24 @@ destruct i. {
 destruct i; [ cbn | flia Hi ].
 destruct j. {
   rewrite IHn. 2: {
-    specialize (Hss 1 0 Nat.lt_1_2 Nat.lt_0_2) as H.
+    specialize (Hss 1 0 Hi Hj) as H.
     cbn in H.
     transitivity (Z_2_pow n); [ | easy ].
     apply have_same_bmat_struct_IZ_IZ.
   }
   rewrite IHn. 2: {
-    now specialize (Hss 1 1 Nat.lt_1_2 Nat.lt_1_2) as H; cbn in H.
+    now specialize (Hss 1 1 Hi Nat.lt_1_2) as H; cbn in H.
   }
   now apply bmat_add_0_l.
 }
 destruct j; [ | flia Hj ].
 rewrite IHn. 2: {
-  specialize (Hss 1 0 Nat.lt_1_2 Nat.lt_0_2) as H; cbn in H.
+  specialize (Hss 1 0 Hi Nat.lt_0_2) as H; cbn in H.
   transitivity (Z_2_pow n); [ | easy ].
   apply have_same_bmat_struct_IZ_IZ.
 }
 rewrite IHn. 2: {
-  now specialize (Hss 1 1 Nat.lt_1_2 Nat.lt_1_2).
+  now specialize (Hss 1 1 Hi Hj).
 }
 now apply bmat_add_0_l.
 Qed.
@@ -2346,6 +2344,27 @@ destruct Hss as (Hr & Hc & Hss).
 rewrite <- Hc.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros * Hi Hj.
+rewrite <- Hc in Hj.
+destruct i. {
+  cbn.
+  rewrite IHn. 2: {
+    specialize (Hss 0 j Hi Hj) as H; cbn in H.
+    destruct j; [ easy | ].
+    destruct j; [ | flia Hj ].
+    transitivity (Z_2_pow n); [ | easy ].
+    apply have_same_bmat_struct_IZ_IZ.
+  }
+  rewrite fold_Z_2_pow.
+  rewrite bmat_mul_0_l; [ | easy | ]. 2: {
+    specialize (Hss 1 j Nat.lt_1_2 Hj) as H; cbn in H.
+    destruct j. {
+      transitivity (Z_2_pow n); [ | easy ].
+      apply have_same_bmat_struct_IZ_IZ.
+    }
+    destruct j; [ easy | flia Hj ].
+  }
+  apply bmat_add_0_r; [ easy | ].
+  specialize (Hss 0 j Hi Hj) as H; cbn in H.
 ...
 cbn - [ Nat.eq_dec ].
 cbn in Hss.
