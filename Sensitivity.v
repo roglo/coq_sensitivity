@@ -2443,94 +2443,6 @@ transitivity (I_2_pow n); [ | easy ].
 apply have_same_bmat_struct_IZ_IZ.
 Qed.
 
-...
-
-(*
-Theorem bmat_loop_sqr_I_2_pow :
-    ∀ T {so : semiring_op T } {sp : semiring_prop T} n,
-  bmat_mul_loop (S n) (I_2_pow n) (I_2_pow n) = I_2_pow n.
-Proof.
-intros.
-now apply bmat_mul_loop_I_IZ_2_pow.
-Qed.
-
-Theorem fold_tagada : ∀ T {ro : ring_op T} (so := rng_semiring)
-    (MA MB : bmatrix T) n,
-  match MA with
-  | BM_1 xa =>
-      match MB with
-      | BM_1 xb => BM_1 (xa * xb)%Rng
-      | BM_M _ => void_bmat
-      end
-  | BM_M MMA =>
-      match MB with
-      | BM_1 _ => void_bmat
-      | BM_M MMB =>
-          let bso :=
-            {| srng_zero := @void_bmat T;
-               srng_one := @void_bmat T;
-               srng_add := @bmat_add T (@rng_semiring T ro);
-               srng_mul := @bmat_mul_loop T (@rng_semiring T ro) n |}
-           in
-           BM_M (mat_def_mul MMA MMB)
-      end
-  end = bmat_mul_loop (S n) MA MB.
-Proof.
-easy.
-Qed.
-
-Theorem bmat_add_loop_A_Z_2_pow :
-    ∀ T {ro : ring_op T} (so := rng_semiring) {sp : semiring_prop T} n,
-  bmat_add_loop (S n) (A_def n) (Z_2_pow n) = A_def n.
-Proof.
-intros.
-induction n; [ now cbn; rewrite srng_add_0_l | ].
-cbn in IHn |-*.
-unfold bmat_of_list_bmat; cbn.
-f_equal; f_equal.
-rewrite IHn.
-specialize (bmat_add_loop_IZ_Z_2_pow 1%Srng n) as H.
-cbn in H.
-unfold so in H |-*.
-rewrite fold_I_2_pow in H.
-rewrite H; clear H.
-f_equal; f_equal; f_equal; f_equal.
-clear IHn.
-induction n; [ now cbn; rewrite srng_add_0_r | cbn ].
-f_equal; f_equal.
-rewrite IHn.
-f_equal. {
-  f_equal; f_equal.
-(*
-rewrite bmat_opp_involutive; [ | | easy ].
-*)
-...
-
-Theorem bmat_loop_mul_I_2_pow_A_def :
-    ∀ T {ro : ring_op T} (so := rng_semiring) {sp : semiring_prop T} n,
-  bmat_mul_loop (S n) (I_2_pow n) (A_def n) = A_def n.
-Proof.
-intros.
-induction n; [ now cbn; rewrite srng_mul_0_r | ].
-cbn in IHn; cbn.
-rewrite IHn, bmat_depth_A; cbn.
-specialize (bmat_mul_loop_Z_IZ_2_pow 1%Rng n) as H.
-cbn in H; unfold Z_2_pow in H.
-rewrite fold_I_2_pow in H; rewrite H; clear H.
-...
-specialize (bmat_loop_add_A_Z_2_pow n) as H.
-cbn in H; unfold Z_2_pow in H.
-unfold so; rewrite H; clear H.
-specialize (bmat_loop_sqr_I_2_pow n) as H.
-cbn in H.
-progress unfold so in H.
-rewrite H; clear H.
-rewrite bmat_depth_I_2_pow.
-...
-do 3 rewrite fold_tagada.
-...
-*)
-
 Theorem bmat_add_nat_mul_l_succ : ∀ T {so : semiring_op T}
     {sp : semiring_prop T} n M,
   bmat_nat_mul_l (S n) M = bmat_add (bmat_nat_mul_l n M) M.
@@ -2548,27 +2460,8 @@ induction M as [x| M IHM] using bmatrix_ind2. {
   apply fold_left_app.
 }
 cbn.
-f_equal; f_equal.
-fold (@bmat_list_add T so).
-fold (@bmat_list_list_add T so).
-destruct M as (ll); cbn in IHM |-*.
-induction ll as [| l]; [ easy | cbn ].
-f_equal. 2: {
-  apply IHll.
-  intros la Hla a Ha.
-  apply (IHM la); [ now right | easy ].
-}
-induction l as [| a]; [ easy | cbn ].
-f_equal. 2: {
-  apply IHl.
-  intros la Hla a1 Ha1.
-  destruct Hla as [Hla| Hla]. {
-    subst la.
-    apply (IHM (a :: l)); [ now left | now right ].
-  }
-  apply (IHM la); [ now right | easy ].
-}
-now apply (IHM (a :: l)); left.
+f_equal.
+now apply matrix_eq.
 Qed.
 
 Theorem bmat_add_opp_r : ∀ T {ro : ring_op T} (so := rng_semiring)
@@ -2586,6 +2479,13 @@ induction M as [x| M IHM] using bmatrix_ind2; intros. {
   now destruct n.
 }
 destruct n; [ easy | cbn ].
+cbn in Hss.
+destruct Hss as (Hr & Hc & Hss).
+rewrite Hr, Hc.
+f_equal.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros * Hi Hj.
+...
 f_equal; f_equal.
 cbn in Hss.
 fold (@have_same_list_struct T) in Hss.
