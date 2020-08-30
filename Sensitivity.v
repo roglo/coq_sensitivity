@@ -2214,12 +2214,14 @@ destruct Hss as (Hr & Hc & Hss).
 cbn; f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros * Hi Hj.
-specialize (Hss _ _ Hi Hj) as Hij.
+specialize (Hss 0 0 Nat.lt_0_2 Nat.lt_0_2) as Hij00; cbn in Hij00.
+specialize (Hss 0 1 Nat.lt_0_2 Nat.lt_1_2) as Hij01; cbn in Hij01.
+specialize (Hss 1 0 Nat.lt_1_2 Nat.lt_0_2) as Hij10; cbn in Hij10.
+specialize (Hss 1 1 Nat.lt_1_2 Nat.lt_1_2) as Hij11; cbn in Hij11.
 destruct i. {
   destruct j. {
     rewrite IHn; [ | easy ].
     rewrite IHn. 2: {
-      specialize (Hss 1 0 Nat.lt_1_2 Hj) as H; cbn in H.
       transitivity (Z_2_pow n); [ | easy ].
       apply have_same_bmat_struct_IZ_IZ.
     }
@@ -2230,16 +2232,12 @@ destruct i. {
     transitivity (Z_2_pow n); [ | easy ].
     apply have_same_bmat_struct_IZ_IZ.
   }
-  rewrite IHn. 2: {
-    now specialize (Hss 1 1 Nat.lt_1_2 Hj).
-  }
+  rewrite IHn; [ | easy ].
   now apply bmat_add_0_l.
 }
 destruct i; [ cbn | flia Hi ].
 destruct j. {
-  rewrite IHn. 2: {
-    now specialize (Hss 0 0 Nat.lt_0_2 Hj).
-  }
+  rewrite IHn; [ | easy ].
   rewrite IHn. 2: {
     transitivity (Z_2_pow n); [ | easy ].
     apply have_same_bmat_struct_IZ_IZ.
@@ -2248,7 +2246,6 @@ destruct j. {
 }
 destruct j; [ | flia Hj ].
 rewrite IHn. 2: {
-  specialize (Hss 0 1 Nat.lt_0_2 Hj) as H; cbn in H.
   transitivity (Z_2_pow n); [ | easy ].
   apply have_same_bmat_struct_IZ_IZ.
 }
@@ -2273,22 +2270,21 @@ cbn; f_equal.
 rewrite <- Hr, <- Hc.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros * Hi Hj.
-specialize (Hss _ _ Hi Hj) as Hij.
+specialize (Hss 0 0 Nat.lt_0_2 Nat.lt_0_2) as Hij00; cbn in Hij00.
+specialize (Hss 0 1 Nat.lt_0_2 Nat.lt_1_2) as Hij01; cbn in Hij01.
+specialize (Hss 1 0 Nat.lt_1_2 Nat.lt_0_2) as Hij10; cbn in Hij10.
+specialize (Hss 1 1 Nat.lt_1_2 Nat.lt_1_2) as Hij11; cbn in Hij11.
 destruct i. {
   destruct j. {
     rewrite IHn; [ cbn | easy ].
     rewrite IHn. 2: {
-      specialize (Hss 0 1 Hi Nat.lt_1_2) as H.
-      cbn in H.
       transitivity (Z_2_pow n); [ | easy ].
       apply have_same_bmat_struct_IZ_IZ.
     }
     now apply bmat_add_0_l.
   }
   destruct j; [ cbn | flia Hj ].
-  rewrite IHn. 2: {
-    now specialize (Hss 0 0 Hi Nat.lt_0_2).
-  }
+  rewrite IHn; [ | easy ].
   rewrite IHn. 2: {
     transitivity (Z_2_pow n); [ | easy ].
     apply have_same_bmat_struct_IZ_IZ.
@@ -2301,14 +2297,11 @@ destruct j. {
     transitivity (Z_2_pow n); [ | easy ].
     apply have_same_bmat_struct_IZ_IZ.
   }
-  rewrite IHn. 2: {
-    now specialize (Hss 1 1 Hi Nat.lt_1_2) as H; cbn in H.
-  }
+  rewrite IHn; [ | easy ].
   now apply bmat_add_0_l.
 }
 destruct j; [ | flia Hj ].
 rewrite IHn. 2: {
-  specialize (Hss 1 0 Hi Nat.lt_0_2) as H; cbn in H.
   transitivity (Z_2_pow n); [ | easy ].
   apply have_same_bmat_struct_IZ_IZ.
 }
@@ -2334,7 +2327,10 @@ rewrite <- Hc.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros * Hi Hj.
 rewrite <- Hc in Hj.
-specialize (Hss _ _ Hi Hj) as Hij.
+specialize (Hss 0 0 Nat.lt_0_2 Nat.lt_0_2) as Hij00; cbn in Hij00.
+specialize (Hss 0 1 Nat.lt_0_2 Nat.lt_1_2) as Hij01; cbn in Hij01.
+specialize (Hss 1 0 Nat.lt_1_2 Nat.lt_0_2) as Hij10; cbn in Hij10.
+specialize (Hss 1 1 Nat.lt_1_2 Nat.lt_1_2) as Hij11; cbn in Hij11.
 destruct i. {
   cbn.
   rewrite IHn. 2: {
@@ -2345,7 +2341,6 @@ destruct i. {
   }
   rewrite fold_Z_2_pow.
   rewrite bmat_mul_0_l; [ | easy | ]. 2: {
-    specialize (Hss 1 j Nat.lt_1_2 Hj) as H; cbn in H.
     destruct j. {
       transitivity (Z_2_pow n); [ | easy ].
       apply have_same_bmat_struct_IZ_IZ.
@@ -2364,26 +2359,20 @@ destruct i. {
 destruct i; [ cbn | flia Hi ].
 rewrite fold_Z_2_pow.
 rewrite bmat_mul_0_l; [ | easy | ]. 2: {
-  destruct j. {
-    now specialize (Hss 0 0 Nat.lt_0_2 Hj).
-  }
+  destruct j; [ easy | ].
   destruct j; [ | flia Hj ].
-  specialize (Hss 0 1 Nat.lt_0_2 Hj) as H; cbn in H.
   transitivity (Z_2_pow n); [ | easy ].
   apply have_same_bmat_struct_IZ_IZ.
 }
 rewrite IHn. 2: {
   destruct j. {
-    specialize (Hss 1 0 Nat.lt_1_2 Hj) as H; cbn in H.
     transitivity (Z_2_pow n); [ | easy ].
     apply have_same_bmat_struct_IZ_IZ.
   }
   destruct j; [ easy | flia Hj ].
 }
 apply bmat_add_0_l; [ easy | ].
-destruct j. {
-  now specialize (Hss 0 0 Nat.lt_0_2 Hj).
-}
+destruct j; [ easy | ].
 destruct j; [ | flia Hj ].
 transitivity (I_2_pow n); [ | easy ].
 apply have_same_bmat_struct_IZ_IZ.
@@ -2407,13 +2396,15 @@ apply matrix_eq; cbn; [ easy | easy | ].
 intros * Hi Hj.
 rewrite <- Hr in Hi.
 rewrite <- Hc in Hj.
-specialize (Hss _ _ Hi Hj) as Hij.
+specialize (Hss 0 0 Nat.lt_0_2 Nat.lt_0_2) as Hij00; cbn in Hij00.
+specialize (Hss 0 1 Nat.lt_0_2 Nat.lt_1_2) as Hij01; cbn in Hij01.
+specialize (Hss 1 0 Nat.lt_1_2 Nat.lt_0_2) as Hij10; cbn in Hij10.
+specialize (Hss 1 1 Nat.lt_1_2 Nat.lt_1_2) as Hij11; cbn in Hij11.
 destruct i. {
   destruct j. {
     rewrite IHn; [ | easy ].
     rewrite fold_Z_2_pow.
     rewrite bmat_mul_0_r; [ | easy | ]. 2: {
-      specialize (Hss 0 1 Hi Nat.lt_1_2) as H; cbn in H.
       transitivity (Z_2_pow n); [ | easy ].
       apply have_same_bmat_struct_IZ_IZ.
     }
@@ -2423,11 +2414,8 @@ destruct i. {
   }
   destruct j; [ | flia Hj ].
   rewrite fold_Z_2_pow.
-  rewrite bmat_mul_0_r; [ | easy | ]. 2: {
-    now specialize (Hss 0 0 Hi Nat.lt_0_2).
-  }
+  rewrite bmat_mul_0_r; [ | easy | easy ].
   rewrite IHn. 2: {
-    specialize (Hss 0 1 Hi Nat.lt_1_2) as H; cbn in H.
     transitivity (Z_2_pow n); [ | easy ].
     apply have_same_bmat_struct_IZ_IZ.
   }
@@ -2440,15 +2428,12 @@ destruct j. {
     apply have_same_bmat_struct_IZ_IZ.
   }
   rewrite fold_Z_2_pow.
-  rewrite bmat_mul_0_r; [ | easy | ]. 2: {
-    now specialize (Hss 1 1 Hi Nat.lt_1_2).
-  }
+  rewrite bmat_mul_0_r; [ | easy | easy ].
   now apply bmat_add_0_r.
 }
 destruct j; [ | flia Hj ].
 rewrite fold_Z_2_pow.
 rewrite bmat_mul_0_r; [ | easy | ]. 2: {
-  specialize (Hss 1 0 Hi Nat.lt_0_2) as H; cbn in H.
   transitivity (Z_2_pow n); [ | easy ].
   apply have_same_bmat_struct_IZ_IZ.
 }
