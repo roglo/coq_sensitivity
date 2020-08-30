@@ -2481,50 +2481,27 @@ induction M as [x| M IHM] using bmatrix_ind2; intros. {
 destruct n; [ easy | cbn ].
 cbn in Hss.
 destruct Hss as (Hr & Hc & Hss).
-rewrite Hr, Hc.
+rewrite Hr, Hc in IHM, Hss |-*.
 f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros * Hi Hj.
-...
-f_equal; f_equal.
-cbn in Hss.
-fold (@have_same_list_struct T) in Hss.
-fold (@have_same_list_list_struct T) in Hss.
-fold (@bmat_list_add T so).
-fold (@bmat_list_list_add T so).
-destruct M as (ll).
-cbn in IHM, Hss |-*.
-revert n Hss.
-induction ll as [| l]; intros; [ easy | cbn ].
-f_equal. {
-  destruct l as [| a]; intros; [ now cbn in Hss | cbn ].
-  f_equal. {
-    apply (IHM (a :: l)); [ now left | now left | ].
-    now cbn in Hss.
+rewrite (IHM i j Hi Hj n). 2: {
+  specialize (Hss _ _ Hi Hj) as H; cbn in H.
+  destruct i. {
+    destruct j; [ easy | ].
+    destruct j; [ easy | flia Hj ].
   }
-  cbn in Hss.
-  destruct l as [| a1]; [ easy | ].
-  cbn in Hss |-*.
-  f_equal; [ | now destruct l ].
-  apply (IHM (a :: a1 :: l)); [ now left | now right; left | easy ].
+  destruct i; [ | flia Hi ].
+  destruct j; [ easy | ].
+  destruct j; [ easy | flia Hj ].
 }
-cbn in Hss.
-destruct ll as [| l1]; [ easy | cbn ].
-destruct ll as [| l2]; [ cbn | now cbn in Hss ].
-cbn in Hss.
-f_equal.
-destruct l1 as [| a1]; [ easy | cbn ].
-cbn in Hss.
-f_equal. {
-  apply (IHM (a1 :: l1)); [ now right; left | now left | easy ].
+destruct i. {
+  destruct j; [ easy | cbn ].
+  destruct j; [ easy | flia Hj ].
 }
-destruct l1 as [| a2]; [ easy | cbn ].
-f_equal. {
-  apply (IHM (a1 :: a2 :: l1)); [ now right; left | now right; left | ].
-  now cbn in Hss.
-}
-cbn in Hss.
-now destruct l1.
+destruct i; [ cbn | flia Hi ].
+destruct j; [ easy | cbn ].
+destruct j; [ easy | flia Hj ].
 Qed.
 
 Theorem bmat_nat_mul_0_r : ∀ T {so : semiring_op T} {sp : semiring_prop T}
@@ -2539,79 +2516,17 @@ induction n; intros. {
   destruct k; [ easy | ].
   now apply all_0_srng_summation_0.
 }
-now cbn; rewrite IHn.
-Qed.
-
-(*
-Theorem bmat_mul_add_distr_l :
-  ∀ T (so : semiring_op T) {sp : semiring_prop T} MA MB MC,
-  have_same_bmat_struct MA MB
-  → have_same_bmat_struct MA MC
-  → bmat_mul MA (bmat_add MB MC) = bmat_add (bmat_mul MA MB) (bmat_mul MA MC).
-Proof.
-intros * sp * Hssab Hssac.
-revert MB MC Hssab Hssac.
-induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
-  destruct MB as [xb| mb]; [ cbn | now destruct MC ].
-  destruct MC as [xc| mc]; [ cbn | easy ].
-  now rewrite srng_mul_add_distr_l.
+cbn; f_equal.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros * Hi Hj.
+destruct i. {
+  destruct j; [ easy | cbn ].
+  destruct j; [ easy | flia Hj ].
 }
-destruct MB as [xb| mb]; [ easy | ].
-destruct MC as [xc| mc]; [ easy | ].
-move mb before ma.
-move mc before mb.
-cbn in Hssab.
-progress fold (@have_same_list_struct T) in Hssab.
-progress fold (@have_same_list_list_struct T) in Hssab.
-cbn in Hssac.
-progress fold (@have_same_list_struct T) in Hssac.
-progress fold (@have_same_list_list_struct T) in Hssac.
-cbn.
-f_equal; f_equal.
-destruct ma as (lla).
-destruct mb as (llb).
-destruct mc as (llc).
-cbn in IHMA, Hssab, Hssac |-*.
-progress fold (@bmat_list_add T so).
-progress fold (@bmat_list_list_add T so).
-progress fold (@bmat_list_mul T so).
-progress fold (@bmat_list_list_mul T so lla (bmat_list_list_add llb llc)).
-progress fold (@bmat_list_list_mul T so lla llb).
-progress fold (@bmat_list_list_mul T so lla llc).
-revert llb llc Hssab Hssac.
-induction lla as [| la]; intros; [ easy | cbn ].
-progress fold (@bmat_list_list_mul T so lla (bmat_list_list_add llb llc)).
-progress fold (@bmat_list_list_mul T so lla llb).
-progress fold (@bmat_list_list_mul T so lla llc).
-f_equal. 2: {
-  cbn in Hssab, Hssac.
-  destruct llb as [| lb]; [ easy | ].
-  destruct llc as [| lc]; [ easy | ].
-  move lb before la.
-  move lc before lb.
-  move llb before lla.
-  move llc before llb.
-  cbn.
-  destruct lla as [| la1]; [ easy | ].
-...
-Print bmat_list_list_mul.
-
-  progress fold (@bmat_list_list_mul T so lla (bmat_list_list_add llb llc)).
-  progress fold (@bmat_list_mul T so).
-  progress fold (@bmat_list_add T so).
-progress fold (@bmat_list_list_add T so).
-progress fold (@bmat_list_list_mul T so lla (bmat_list_list_add llb llc)).
-progress fold (@bmat_list_list_mul T so lla llb).
-progress fold (@bmat_list_list_mul T so lla llc).
-...
-  apply IHlla; cycle 1. {
-    destruct lla as [| la1]. {
-      destruct llb as [| lb1]. {
-        cbn in Hssab.
-        cbn in Hssac.
-        destruct llc as [| lc1]. {
-...
-*)
+destruct i; [ | flia Hi ].
+destruct j; [ easy | cbn ].
+destruct j; [ easy | flia Hj ].
+Qed.
 
 Theorem bmat_mul_add_distr_r :
   ∀ T (so : semiring_op T) {sp : semiring_prop T} MA MB MC,
@@ -2631,6 +2546,7 @@ destruct MB as [xb| mb]; [ easy | ].
 move ma after mc.
 move mb after mc.
 cbn in Hssac.
+...
 progress fold (@have_same_list_struct T) in Hssac.
 progress fold (@have_same_list_list_struct T) in Hssac.
 cbn in Hssbc.
