@@ -2399,57 +2399,66 @@ induction n; intros. {
   cbn.
   destruct M as [x| M]; [ now cbn; rewrite srng_mul_1_r | easy ].
 }
-...
-cbn - [ Nat.eq_dec ].
-destruct M as [x| M]; [ easy | f_equal ].
-destruct M as (ll); cbn.
-fold (@bmat_list_mul_loop T so).
+destruct M as [x| M]; [ easy | cbn; f_equal ].
 cbn in Hss.
-cbn; f_equal.
-destruct ll as [| l1]; [ easy | ].
-destruct Hss as (H1 & H2).
-destruct l1 as [| e1]; [ easy | cbn ].
-f_equal.
-destruct l1 as [| e2]; [ easy | cbn ].
-destruct ll as [| l2]; [ easy | cbn ].
-destruct l2 as [| e3]; [ easy | cbn ].
-destruct l2 as [| e4]; [ easy | cbn ].
-destruct l2; [ cbn | easy ].
+destruct Hss as (Hr & Hc & Hss).
+rewrite <- Hc; cbn.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros * Hi Hj.
+rewrite <- Hr in Hi.
+rewrite <- Hc in Hj.
+specialize (Hss _ _ Hi Hj) as Hij.
+destruct i. {
+  destruct j. {
+    rewrite IHn; [ | easy ].
+    rewrite fold_Z_2_pow.
+    rewrite bmat_mul_0_r; [ | easy | ]. 2: {
+      specialize (Hss 0 1 Hi Nat.lt_1_2) as H; cbn in H.
+      transitivity (Z_2_pow n); [ | easy ].
+      apply have_same_bmat_struct_IZ_IZ.
+    }
+    apply bmat_add_0_r; [ easy | ].
+    transitivity (I_2_pow n); [ | easy ].
+    apply have_same_bmat_struct_IZ_IZ.
+  }
+  destruct j; [ | flia Hj ].
+  rewrite fold_Z_2_pow.
+  rewrite bmat_mul_0_r; [ | easy | ]. 2: {
+    now specialize (Hss 0 0 Hi Nat.lt_0_2).
+  }
+  rewrite IHn. 2: {
+    specialize (Hss 0 1 Hi Nat.lt_1_2) as H; cbn in H.
+    transitivity (Z_2_pow n); [ | easy ].
+    apply have_same_bmat_struct_IZ_IZ.
+  }
+  now apply bmat_add_0_l.
+}
+destruct i; [ cbn | flia Hi ].
+destruct j. {
+  rewrite IHn. 2: {
+    transitivity (Z_2_pow n); [ | easy ].
+    apply have_same_bmat_struct_IZ_IZ.
+  }
+  rewrite fold_Z_2_pow.
+  rewrite bmat_mul_0_r; [ | easy | ]. 2: {
+    now specialize (Hss 1 1 Hi Nat.lt_1_2).
+  }
+  now apply bmat_add_0_r.
+}
+destruct j; [ | flia Hj ].
 rewrite fold_Z_2_pow.
-destruct ll as [| l2]; [ cbn | easy ].
-destruct l1 as [| e5]; [ cbn | easy ].
 rewrite bmat_mul_0_r; [ | easy | ]. 2: {
+  specialize (Hss 1 0 Hi Nat.lt_0_2) as H; cbn in H.
   transitivity (Z_2_pow n); [ | easy ].
   apply have_same_bmat_struct_IZ_IZ.
 }
 rewrite IHn; [ | easy ].
-rewrite bmat_add_0_r; [ | easy | ]. 2: {
-  transitivity (I_2_pow n); [ | easy ].
-  apply have_same_bmat_struct_IZ_IZ.
-}
-rewrite bmat_mul_0_r; [ | easy | easy ].
-rewrite IHn. 2: {
-  transitivity (Z_2_pow n); [ | easy ].
-  apply have_same_bmat_struct_IZ_IZ.
-}
-rewrite bmat_add_0_l; [ | easy | easy ].
-rewrite bmat_mul_0_r; [ | easy | easy ].
-rewrite bmat_mul_0_r; [ | easy | ]. 2: {
-  transitivity (Z_2_pow n); [ | easy ].
-  apply have_same_bmat_struct_IZ_IZ.
-}
-rewrite IHn. 2: {
-  transitivity (Z_2_pow n); [ | easy ].
-  apply have_same_bmat_struct_IZ_IZ.
-}
-rewrite bmat_add_0_r; [ | easy | easy ].
-rewrite IHn; [ | easy ].
-rewrite bmat_add_0_l; [ | easy | ]. 2: {
-  transitivity (I_2_pow n); [ | easy ].
-  apply have_same_bmat_struct_IZ_IZ.
-}
-easy.
+apply bmat_add_0_l; [ easy | ].
+transitivity (I_2_pow n); [ | easy ].
+apply have_same_bmat_struct_IZ_IZ.
 Qed.
+
+...
 
 (*
 Theorem bmat_loop_sqr_I_2_pow :
