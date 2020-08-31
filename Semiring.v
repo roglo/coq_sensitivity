@@ -59,6 +59,14 @@ rewrite srng_mul_comm, srng_mul_1_l.
 reflexivity.
 Qed.
 
+Theorem srng_add_add_swap : ∀ n m p, (n + m + p = n + p + m)%Srng.
+Proof.
+intros n m p; simpl.
+do 2 rewrite <- srng_add_assoc.
+assert (m + p = p + m)%Srng as H by apply srng_add_comm.
+rewrite H; reflexivity.
+Qed.
+
 Theorem srng_mul_add_distr_r : ∀ x y z,
   ((x + y) * z = x * z + y * z)%Srng.
 Proof.
@@ -463,14 +471,6 @@ intros a b; split; intros H.
  apply srng_add_opp_r.
 
  rewrite H; reflexivity.
-Qed.
-
-Theorem srng_add_add_swap : ∀ n m p, (n + m + p = n + p + m)%Srng.
-Proof.
-intros n m p; simpl.
-do 2 rewrite <- srng_add_assoc.
-assert (m + p = p + m)%Srng as H by apply srng_add_comm.
-rewrite H; reflexivity.
 Qed.
 
 Theorem srng_mul_mul_swap : ∀ n m p, (n * m * p = n * p * m)%Srng.

@@ -2598,6 +2598,30 @@ Definition mat_el_mul_loop T {so : semiring_op T} f g :=
      | S it' => mat_el_mul_loop it' (a + f i j * g j k)%BM i (j + 1) k
      end.
 
+Theorem bmat_add_add_swap :
+  ∀ T (so : semiring_op T) {sp : semiring_prop T} MA MB MC,
+  have_same_bmat_struct MA MB
+  → have_same_bmat_struct MA MC
+  → (MA + MB + MC = MA + MC + MB)%BM.
+Proof.
+intros * sp * Hssab Hssac.
+revert MB MC Hssab Hssac.
+induction MC as [xc| mc IHMC] using bmatrix_ind2; intros. {
+  destruct MA as [xa| ma]; [ | easy ].
+  destruct MB as [xb| mb]; [ cbn | easy ].
+  rewrite srng_add_add_swap.
+}
+...
+
+Theorem bmat_add_assoc :
+  ∀ T (so : semiring_op T) {sp : semiring_prop T} MA MB MC,
+  have_same_bmat_struct MA MB
+  → have_same_bmat_struct MB MC
+  → (MA + (MB + MC) = (MA + MB) + MC)%BM.
+Proof.
+intros.
+...
+
 Theorem bmat_mul_add_distr_r :
   ∀ T (so : semiring_op T) {sp : semiring_prop T} MA MB MC,
   have_same_bmat_struct MA MB
