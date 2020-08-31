@@ -2732,15 +2732,18 @@ destruct ca; cbn. {
   }
   rewrite bmat_add_assoc; [ | easy | | ]; cycle 1. {
     cbn.
-...
     apply bmat_fit_for_add_add_l. {
+...
 Search (_ * _ = _ * _).
 Theorem bmat_fit_for_add_mul_cancel_l : ∀ T {so : semiring_op T} MA MB MC,
   bmat_fit_for_add MB MC
   → bmat_fit_for_add (MA * MB)%BM (MA * MC)%BM.
-Admitted.
-      transitivity (fa i 0 * fc 1 j)%BM.
-apply bmat_fit_for_add_mul_cancel_l.
+...
+      transitivity (fa i 0 * fc 1 j)%BM. {
+        apply bmat_fit_for_add_mul_cancel_l.
+...
+        transitivity (fa 1 j). {
+          symmetry.
 Search bmat_fit_for_add.
 apply IHMC.
 ...
