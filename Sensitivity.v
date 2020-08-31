@@ -2598,6 +2598,37 @@ Definition mat_el_mul_loop T {so : semiring_op T} f g :=
      | S it' => mat_el_mul_loop it' (a + f i j * g j k)%BM i (j + 1) k
      end.
 
+Theorem have_same_bmat_struct_add_l : ∀ T {so : semiring_op T} MA MB MC,
+  have_same_bmat_struct MA MC
+  → have_same_bmat_struct MB MC
+  → have_same_bmat_struct (MA + MB)%BM MC.
+Proof.
+intros * Hssac Hssbc.
+revert MA MB Hssac Hssbc.
+induction MC as [xc| mc IHMC] using bmatrix_ind2; intros. {
+  destruct MA; [ now destruct MB | easy ].
+}
+destruct MA as [xa| ma]; [ easy | ].
+destruct MB as [xb| mb]; [ easy | ].
+cbn in Hssac, Hssbc |-*.
+destruct Hssac as (Hrac & Hcac & Hssac).
+destruct Hssbc as (Hrbc & Hcbc & Hssbc).
+split; [ easy | ].
+split; [ easy | ].
+intros * Hi Hj.
+apply IHMC; [ | | now apply Hssac | ]. {
+  now rewrite Hrac in Hi.
+} {
+  now rewrite Hcac in Hj.
+} {
+  apply Hssbc. {
+    now rewrite Hrac, <- Hrbc in Hi.
+  } {
+    now rewrite Hcac, <- Hcbc in Hj.
+  }
+}
+Qed.
+
 Theorem bmat_add_add_swap :
   ∀ T (so : semiring_op T) {sp : semiring_prop T} MA MB MC,
   have_same_bmat_struct MA MB
@@ -2626,27 +2657,13 @@ Theorem bmat_add_assoc :
   → (MA + (MB + MC) = (MA + MB) + MC)%BM.
 Proof.
 intros * sp * Hssab Hssbc.
-revert MB MC Hssab Hssbc.
-induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
-  destruct MB as [xb| mb]; [ cbn | easy ].
-  destruct MC as [xc| mc]; [ cbn | easy ].
-  now rewrite srng_add_assoc.
+rewrite bmat_add_comm; [ | easy | ]. 2: {
+  symmetry.
+  apply have_same_bmat_struct_add_l; symmetry; [ easy | ].
+  now transitivity MB.
 }
-destruct MB as [xb| mb]; [ easy | ].
-destruct MC as [xc| mc]; [ easy | cbn ].
-f_equal.
-apply matrix_eq; [ easy | easy | cbn ].
-intros i j Hi Hj.
-apply IHMA; [ easy | easy | now apply Hssab | ].
-cbn in Hssab, Hssbc.
-destruct Hssab as (Hra & Hca & Hssab).
-destruct Hssbc as (Hrb & Hcb & Hssbc).
-transitivity (mat_el ma i j). {
-  now symmetry; apply Hssab.
-} {
-  transitivity (mat_el mb i j); [ now apply Hssab | ].
-  apply Hssbc; [ now rewrite <- Hra | now rewrite <- Hca ].
-}
+rewrite (bmat_add_comm MA MB); [ | easy ].
+apply bmat_add_add_swap; [ easy | easy | now symmetry ].
 Qed.
 
 Theorem bmat_mul_add_distr_r :
@@ -2715,6 +2732,15 @@ destruct ca; cbn. {
   }
   rewrite bmat_add_assoc; [ | easy | | ]; cycle 1. {
     cbn.
+    apply have_same_bmat_struct_add_l.
+
+Theorem have_same_bmat_struct_mul_l : ∀ T {so : semiring_op T} MA MB MC,
+  have_same_bmat_struct MA MC
+  → bmat_fit_for_mul MA MB
+  → have_same_bmat_struct (MA * MB)%BM MC.
+Proof.
+intros * Hssac Hssbc.
+(* ah bin non *)
 ...
 
 (*
