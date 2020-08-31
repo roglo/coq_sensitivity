@@ -1721,7 +1721,11 @@ Record matrix T := mk_mat
 
 (* function extensionality required for matrices *)
 Axiom matrix_eq : ∀ T (MA MB : matrix T),
-  (∀ i j, mat_el MA i j = mat_el MB i j) → MA = MB.
+  mat_nrows MA = mat_nrows MB
+  → mat_ncols MA = mat_ncols MB
+  → (∀ i j, i < mat_nrows MA → j < mat_ncols MB →
+      mat_el MA i j = mat_el MB i j)
+  → MA = MB.
 
 Definition void_mat {T} d : matrix T :=
   {| mat_el i j := d;
@@ -1761,7 +1765,8 @@ Definition void_bmat T d : bmatrix T :=
 
 Theorem bmatrix_ind2 : ∀ T (P : bmatrix T → Prop),
   (∀ t, P (BM_1 t))
-  → (∀ M, (∀ i j, P (mat_el M i j)) → P (BM_M M))
+  → (∀ M, (∀ i j, i < mat_nrows M → j < mat_ncols M → P (mat_el M i j))
+      → P (BM_M M))
   → ∀ BM, P BM.
 Proof.
 fix IHB 5.
@@ -1774,9 +1779,37 @@ remember (f i j) as BM eqn:HBM.
 symmetry in HBM.
 destruct BM as [x| M]; [ apply H1 | ].
 apply HM.
-intros k l.
+intros k l Hk Hl.
 now apply IHB.
 Qed.
+
+Fixpoint concat_list_in_list T (ll1 ll2 : list (list T)) :=
+  match ll1 with
+  | [] => ll2
+  | l1 :: ll1' =>
+       match ll2 with
+       | [] => ll1
+       | l2 :: ll2' => app l1 l2 :: concat_list_in_list ll1' ll2'
+       end
+  end.
+
+Definition concat_list_list_list T (lll : list (list (list T))) :=
+  fold_left (@concat_list_in_list T) lll [].
+
+Fixpoint list_list_of_bmat T (MM : bmatrix T) : list (list T) :=
+  match MM with
+  | BM_1 x => [[x]]
+  | BM_M MMM =>
+      let ll :=
+        map
+          (λ i,
+             concat_list_list_list
+               (map (λ j, list_list_of_bmat (mat_el MMM i j))
+                  (seq 0 (mat_ncols MMM))))
+          (seq 0 (mat_nrows MMM))
+      in
+      List.concat ll
+  end.
 
 (* transposition *)
 
@@ -1785,10 +1818,54 @@ Definition mat_transpose T (M : matrix T) : matrix T :=
      mat_nrows := mat_ncols M;
      mat_ncols := mat_nrows M |}.
 
+Fixpoint bmat_transpose T (BM : bmatrix T) : bmatrix T :=
+  match BM with
+  | BM_1 x => BM_1 x
+  | BM_M M =>
+      let M' :=
+        {| mat_el i j := bmat_transpose (mat_el M j i);
+           mat_nrows := mat_ncols M;
+           mat_ncols := mat_nrows M |}
+      in
+      BM_M M'
+  end.
+
 Compute
   (list_list_of_mat
      (mat_transpose
         (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]))).
+
+Compute
+  (list_list_of_bmat
+     (bmat_transpose
+        (BM_M
+           (mk_mat
+              (λ i j,
+               match (i, j) with
+               | (0, 0) =>
+                    BM_M
+                      (mk_mat
+                         (λ i j,
+                          match (i, j) with
+                          | (0, 0) => BM_1 1 | (0, 1) => BM_1 2 | (0, 2) => BM_1 3
+                          | (1, 0) => BM_1 4 | (1, 1) => BM_1 5 | _ => BM_1 6
+                          end) 2 3)
+               | (0, 1) => BM_1 10
+               | (1, 0) =>
+                   BM_M
+                     (mk_mat
+                        (λ i j,
+                         match j with
+                         | 0 => BM_1 7 | 1 => BM_1 8 | _ => BM_1 9
+                         end) 1 3)
+               | _ =>
+                    BM_M
+                      (mk_mat
+                         (λ i j,
+                          match i with 0 => BM_1 11 | _ => BM_1 12 end)
+                         2 1)
+               end)
+              2 2)))).
 
 (* addition *)
 
@@ -1800,19 +1877,19 @@ Definition mat_add T (add : T → T → T) (M1 M2 : matrix T) :
 
 (* addition of block matrices *)
 
-Fixpoint bmat_add T {so : semiring_op T} d (MM1 MM2 : bmatrix T) :=
+Fixpoint bmat_add T {so : semiring_op T} (MM1 MM2 : bmatrix T) :=
   match MM1 with
   | BM_1 xa =>
       match MM2 with
       | BM_1 xb => BM_1 (xa + xb)%Srng
-      | BM_M MMB => d
+      | BM_M MMB => BM_1 0%Srng
       end
   | BM_M MMA =>
       match MM2 with
-      | BM_1 xb => d
+      | BM_1 xb => BM_1 0%Srng
       | BM_M MMB =>
           let r :=
-            {| mat_el i j := bmat_add d (mat_el MMA i j) (mat_el MMB i j);
+            {| mat_el i j := bmat_add (mat_el MMA i j) (mat_el MMB i j);
                mat_nrows := mat_nrows MMA;
                mat_ncols := mat_ncols MMA |}
           in
@@ -1839,29 +1916,29 @@ Compute (let _ := nat_semiring_op in list_list_of_mat (mat_mul (mat_of_list_list
 
 (* multiplication of block matrices *)
 
-Fixpoint bmat_mul T {so : semiring_op T} d (MM1 MM2 : bmatrix T) :=
+Fixpoint bmat_mul T {so : semiring_op T} (MM1 MM2 : bmatrix T) :=
   match MM1 with
   | BM_1 xa =>
       match MM2 with
       | BM_1 xb => BM_1 (xa * xb)%Srng
-      | BM_M _ => d
+      | BM_M _ => BM_1 0%Srng
       end
   | BM_M MMA =>
       match MM2 with
-      | BM_1 _ => d
+      | BM_1 _ => BM_1 0%Srng
       | BM_M MMB =>
           let fix mat_el_mul_loop it a i j k :=
             match it with
             | 0 => a
             | S it' =>
                  mat_el_mul_loop it'
-                   (bmat_add d a (bmat_mul d (mat_el MMA i j) (mat_el MMB j k)))
+                   (bmat_add a (bmat_mul (mat_el MMA i j) (mat_el MMB j k)))
                    i (j + 1) k
             end
           in
           let mat_el_mul i k :=
             mat_el_mul_loop (mat_ncols MMA - 1)
-              (bmat_mul d (mat_el MMA i 0) (mat_el MMB 0 k)) i 1 k
+              (bmat_mul (mat_el MMA i 0) (mat_el MMB 0 k)) i 1 k
            in
           let r :=
             {| mat_el i k := mat_el_mul i k;
@@ -1897,10 +1974,9 @@ induction BM as [x| M IHBM] using bmatrix_ind2. {
   destruct M as (f, r, c).
   cbn in IHBM |-*.
   f_equal.
-  apply matrix_eq.
-  apply IHBM.
-  (* faut-il ajouter la condition d'égalité du nombre de lignes et
-     de colonnes dans l'axiome matrix_eq ? *)
+  apply matrix_eq; cbn; [ easy | easy | ].
+  intros * Hi Hj.
+  now apply IHBM.
 }
 Qed.
 
@@ -1924,7 +2000,7 @@ Fixpoint IZ_2_pow T {so : semiring_op T} (u : T) n :=
   | 0 => BM_1 u
   | S n' =>
       BM_M
-        (mat_of_list_list (void_bmat (BM_1 0%Srng))
+        (mat_of_list_list (BM_1 u)
            [[IZ_2_pow u n'; IZ_2_pow 0%Srng n'];
             [IZ_2_pow 0%Srng n'; IZ_2_pow u n']])
   end.
@@ -1941,10 +2017,12 @@ Fixpoint A T {ro : ring_op T} (so := rng_semiring) n : bmatrix T :=
   | 0 => BM_1 0%Srng
   | S n' =>
        BM_M
-         (mat_of_list_list (void_bmat (BM_1 0%Srng))
+         (mat_of_list_list (BM_1 0%Srng)
             [[A n'; I_2_pow n'];
              [I_2_pow n'; bmat_opp (A n')]])
   end.
+
+Print A.
 
 Require Import ZArith.
 (*
@@ -1954,37 +2032,9 @@ Open Scope Z_scope.
 About Z_ring_op.
 Compute (let n := 2%nat in let _ := Z_ring_op in let _ := rng_semiring in A n).
 
-Fixpoint concat_list_in_list T (ll1 ll2 : list (list T)) :=
-  match ll1 with
-  | [] => ll2
-  | l1 :: ll1' =>
-       match ll2 with
-       | [] => ll1
-       | l2 :: ll2' => app l1 l2 :: concat_list_in_list ll1' ll2'
-       end
-  end.
-
-Definition concat_list_list_list T (lll : list (list (list T))) :=
-  fold_left (@concat_list_in_list T) lll [].
-
-Fixpoint list_list_of_bmat T (MM : bmatrix T) : list (list T) :=
-  match MM with
-  | BM_1 x => [[x]]
-  | BM_M MMM =>
-      let ll :=
-        map
-          (λ i,
-             concat_list_list_list
-               (map (λ j, list_list_of_bmat (mat_el MMM i j))
-                  (seq 0 (mat_ncols MMM))))
-          (seq 0 (mat_nrows MMM))
-      in
-      List.concat ll
-  end.
-
 Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (I_2_pow n)).
 Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (A n)).
-Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (bmat_mul (BM_1 42%Z) (A n) (A n))).
+Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (bmat_mul (A n) (A n))).
 
 Definition rng_mul_nat_l T {so : semiring_op T} n v :=
   match n with
@@ -1992,13 +2042,14 @@ Definition rng_mul_nat_l T {so : semiring_op T} n v :=
   | S n' => (Σ (_ = 0, n'), v)%Srng
   end.
 
-...
-
 Fixpoint bmat_nat_mul_l T {so : semiring_op T} n BM :=
   match BM with
   | BM_1 x => BM_1 (rng_mul_nat_l n x)
   | BM_M M =>
-      BM_M {| mat_list := map (map (bmat_nat_mul_l n)) (mat_list M) |}
+      BM_M
+        {| mat_el i j := bmat_nat_mul_l n (mat_el M i j);
+           mat_nrows := mat_nrows M;
+           mat_ncols := mat_ncols M |}
   end.
 
 Fixpoint have_same_bmat_struct T (MA MB : bmatrix T) :=
@@ -2012,91 +2063,29 @@ Fixpoint have_same_bmat_struct T (MA MB : bmatrix T) :=
       match MB with
       | BM_1 xb => False
       | BM_M MMB =>
-          let fix have_same_list_struct la lb :=
-            match la with
-            | [] => match lb with [] => True | _ :: _ => False end
-            | a :: la' =>
-                match lb with
-                | [] => False
-                | b :: lb' =>
-                    have_same_bmat_struct a b ∧
-                    have_same_list_struct la' lb'
-                end
-            end
-          in
-          let fix have_same_list_list_struct lla llb :=
-            match lla with
-            | [] => match llb with [] => True | _ :: _ => False end
-            | la :: lla' =>
-                match llb with
-                | [] => False
-                | lb :: llb' =>
-                    have_same_list_struct la lb ∧
-                    have_same_list_list_struct lla' llb'
-                end
-            end
-          in
-          have_same_list_list_struct (mat_list MMA) (mat_list MMB)
-        end
+          mat_nrows MMA = mat_nrows MMB ∧
+          mat_ncols MMA = mat_ncols MMB ∧
+          ∀ i j, i < mat_nrows MMA → j < mat_ncols MMA →
+          have_same_bmat_struct (mat_el MMA i j) (mat_el MMB i j)
+      end
   end.
-
-Definition have_same_list_struct T :=
-  fix have_same_list_struct (la lb : list (bmatrix T)) :=
-    match la with
-    | [] => match lb with [] => True | _ :: _ => False end
-    | a :: la' =>
-        match lb with
-        | [] => False
-        | b :: lb' =>
-            have_same_bmat_struct a b ∧
-            have_same_list_struct la' lb'
-        end
-    end.
-
-Definition have_same_list_list_struct T :=
-  fix have_same_list_list_struct (lla llb : list (list (bmatrix T))) :=
-     match lla with
-     | [] => match llb with [] => True | _ :: _ => False end
-     | la :: lla' =>
-         match llb with
-         | [] => False
-         | lb :: llb' =>
-             have_same_list_struct la lb ∧
-             have_same_list_list_struct lla' llb'
-         end
-     end.
 
 Require Import Relations.
 
-Theorem have_same_bmat_struct_refl : ∀ T, reflexive _ (@have_same_bmat_struct T).
+Theorem have_same_bmat_struct_refl : ∀ T,
+  reflexive _ (@have_same_bmat_struct T).
 Proof.
 intros * M.
 induction M as [x| M IHM] using bmatrix_ind2; [ easy | cbn ].
-destruct M as (ll); cbn.
-cbn in IHM.
-induction ll as [| l1]; [ easy | cbn ].
-split. {
-  revert ll IHM IHll.
-  induction l1 as [| e1]; intros; [ easy | cbn ].
-  split; [ now apply (IHM (e1 :: l1)); left | ].
-  apply (IHl1 ll). {
-    intros la Hla a Ha.
-    cbn - [ In ] in Hla.
-    destruct Hla as [Hla| Hla]. {
-      subst la.
-      apply (IHM (e1 :: l1)); [ now left | now right ].
-    }
-    apply (IHM la); [ now right | easy ].
-  }
-  intros H1.
-  now apply IHll.
-}
-apply IHll.
-intros la Hla a Ha.
-apply (IHM la); [ now right | easy ].
+destruct M as (ll, r, c); cbn in IHM |-*.
+split; [ easy | ].
+split; [ easy | ].
+intros i j Hi Hj.
+now apply IHM.
 Qed.
 
-Theorem have_same_bmat_struct_symm : ∀ T, symmetric _ (@have_same_bmat_struct T).
+Theorem have_same_bmat_struct_symm : ∀ T,
+  symmetric _ (@have_same_bmat_struct T).
 Proof.
 intros * MA MB HMM.
 revert MB HMM.
@@ -2105,34 +2094,14 @@ induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
 }
 destruct MB as [xb| mb]; [ easy | ].
 cbn in HMM |-*.
-destruct ma as (lla); destruct mb as (llb).
+destruct ma as (lla, ra, ca); destruct mb as (llb, rb, cb).
 cbn in IHMA, HMM |-*.
-fold (@have_same_list_struct T) in HMM |-*.
-fold (@have_same_list_list_struct T) in HMM |-*.
-revert llb HMM.
-induction lla as [| la]; intros; [ now destruct llb | ].
-destruct llb as [| lb]; [ easy | ].
-cbn in HMM |-*.
-split. {
-  destruct HMM as (Hlab, Hllab).
-  revert lb Hlab.
-  induction la as [| a]; intros; [ now destruct lb | ].
-  destruct lb as [| b]; [ easy | ].
-  cbn in Hlab |-*.
-  split. {
-    apply (IHMA _ (or_introl eq_refl)); [ now left | easy ].
-  }
-  apply IHla; [ | easy ].
-  intros la1 Hla1 a1 Ha1 b1 Hab.
-  destruct Hla1 as [Hla1| Hla1]. {
-    subst la1.
-    apply (IHMA _ (or_introl eq_refl)); [ now right | easy ].
-  }
-  now apply (IHMA _ (or_intror Hla1)).
-}
-apply IHlla; [ | easy ].
-intros la1 Hla1 a1 Ha1 b1 Hab.
-now apply (IHMA _ (or_intror Hla1)).
+destruct HMM as (Hrr & Hcc & Hss).
+subst rb cb.
+split; [ easy | ].
+split; [ easy | ].
+intros i j Hi Hj.
+now apply IHMA, Hss.
 Qed.
 
 Theorem have_same_bmat_struct_trans : ∀ T,
@@ -2146,41 +2115,16 @@ induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
 destruct MB as [xb| mb]; [ easy | ].
 destruct MC as [xc| mc]; [ easy | ].
 cbn in HAB, HBC |-*.
-fold (@have_same_list_struct T) in HAB, HBC |-*.
-fold (@have_same_list_list_struct T) in HAB, HBC |-*.
-destruct ma as (lla).
-destruct mb as (llb).
-destruct mc as (llc).
+destruct ma as (fa, ra, ca).
+destruct mb as (fb, rb, cb).
+destruct mc as (fc, rc, cc).
 cbn in IHMA, HAB, HBC |-*.
-revert llb llc HAB HBC.
-induction lla as [| la]; intros; [ now destruct llb | ].
-destruct llb as [| lb]; [ easy | ].
-destruct llc as [| lc]; [ easy | ].
-cbn in HAB, HBC |-*.
-split. {
-  destruct HAB as (Hlab, Hllab).
-  destruct HBC as (Hlbc, Hllbc).
-  revert lb lc Hlab Hlbc.
-  induction la as [| a]; intros; [ now destruct lb | ].
-  destruct lb as [| b]; [ easy | ].
-  destruct lc as [| c]; [ easy | ].
-  cbn in Hlab, Hlbc |-*.
-  split. {
-    apply (IHMA _ (or_introl eq_refl)) with (MB := b); [ | easy | easy ].
-    now left.
-  }
-  apply IHla with (lb := lb); [ | easy | easy ].
-  intros la1 Hla1 a1 Ha1 b1 c1 Hab Hbc.
-  destruct Hla1 as [Hla1| Hla1]. {
-    subst la1.
-    apply (IHMA _ (or_introl eq_refl)) with (MB := b1); [ | easy | easy ].
-    now right.
-  }
-  now apply (IHMA _ (or_intror Hla1)) with (MB := b1).
-}
-apply IHlla with (llb := llb); [ | easy | easy ].
-intros la1 Hla1 a1 Ha1 b1 c1 Hab Hbc.
-now apply (IHMA _ (or_intror Hla1)) with (MB := b1).
+destruct HAB as (Hrr & Hcc & Hab); subst rb cb.
+destruct HBC as (Hrr & Hcc & Hbc); subst rc cc.
+split; [ easy | ].
+split; [ easy | ].
+intros i j Hi Hj.
+now apply IHMA with (MB := fb i j); [ | | apply Hab | apply Hbc ].
 Qed.
 
 Add Parametric Relation T : _ (@have_same_bmat_struct T)
@@ -2191,40 +2135,26 @@ Add Parametric Relation T : _ (@have_same_bmat_struct T)
 
 Theorem bmat_add_comm :
     ∀ T {so : semiring_op T } {sp : semiring_prop T} MA MB,
-  bmat_add MA MB = bmat_add MB MA.
+  have_same_bmat_struct MA MB
+  → bmat_add MA MB = bmat_add MB MA.
 Proof.
-intros.
-revert MB.
+intros * sp * Hss.
+revert MB Hss.
 induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
   destruct MB as [xb| mb]; [ | easy ].
   now cbn; rewrite srng_add_comm.
 }
 destruct MB as [xb| mb]; [ easy | ].
-destruct ma as (lla).
-destruct mb as (llb).
-cbn in IHMA |-*.
-f_equal; f_equal.
-fold (@bmat_list_add T so).
-fold (@bmat_list_list_add T so).
-revert llb.
-induction lla as [| la]; intros; [ now destruct llb | cbn ].
-destruct llb as [| lb]; [ easy | cbn ].
-f_equal. {
-  revert lb.
-  induction la as [| a]; intros; [ now destruct lb | cbn ].
-  destruct lb as [| b]; [ easy | cbn ].
-  f_equal; [ now apply (IHMA (a :: la)); left | ].
-  apply IHla; cbn - [ In ].
-  intros la1 Hla1 a1 Ha1 b1.
-  destruct Hla1 as [Hla1| Hla1]. {
-    subst la1.
-    apply (IHMA (a :: la)); [ now left | now right ].
-  }
-  apply (IHMA la1); [ now right | easy ].
-}
-apply IHlla.
-intros la1 Hla1 a1 Ha1 b1.
-apply (IHMA la1); [ now right | easy ].
+cbn in Hss.
+destruct ma as (fa, ra, ca).
+destruct mb as (fb, rb, cb).
+cbn in IHMA, Hss |-*.
+destruct Hss as (Hrr & Hcc & Hss); subst rb cb.
+f_equal.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros * Hi Hj.
+apply IHMA; [ easy | easy | ].
+now apply Hss.
 Qed.
 
 Theorem bmat_add_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
@@ -2237,30 +2167,20 @@ induction n; intros. {
   cbn.
   destruct M as [x| M]; [ now rewrite srng_add_0_l | easy ].
 }
-cbn - [ Nat.eq_dec ].
+cbn in Hss |-*.
 destruct M as [x| M]; [ easy | f_equal ].
-destruct M as (ll).
-cbn - [ Nat.eq_dec ].
-cbn in Hss.
-cbn; f_equal.
-destruct ll as [| l1]; [ easy | ].
-destruct Hss as (H1 & H2).
-f_equal. {
-  destruct l1 as [| e1]; [ easy | ].
-  f_equal; [ now apply IHn | ].
-  destruct l1 as [| e2]; [ easy | ].
-  f_equal; [ now apply IHn | ].
-  now destruct l1.
+destruct Hss as (Hr & Hc & Hss).
+apply matrix_eq; cbn; [ easy | easy | ].
+intros * Hi Hj.
+rewrite <- Hc in Hj.
+specialize (Hss _ _ Hi Hj) as H1.
+destruct i. {
+  destruct j; [ now apply IHn | cbn ].
+  destruct j; [ now apply IHn | flia Hj ].
 }
-destruct ll as [| l2]; [ easy | ].
-f_equal. {
-  destruct l2 as [| e2]; [ easy | ].
-  f_equal; [ now apply IHn | ].
-  destruct l2 as [| e3]; [ easy | ].
-  f_equal; [ now apply IHn | ].
-  now destruct l2.
-}
-now destruct ll.
+destruct i; [ cbn | flia Hi ].
+destruct j; [ now apply IHn | cbn ].
+destruct j; [ now apply IHn | flia Hj ].
 Qed.
 
 Theorem bmat_add_0_r : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
@@ -2268,7 +2188,7 @@ Theorem bmat_add_0_r : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
   → bmat_add M (Z_2_pow n) = M.
 Proof.
 intros * sp * Hss.
-rewrite bmat_add_comm; [ | easy ].
+rewrite bmat_add_comm; [ | easy | easy ].
 now apply bmat_add_0_l.
 Qed.
 
@@ -2278,12 +2198,16 @@ Proof.
 intros.
 revert u v.
 induction n; intros; [ easy | cbn ].
-split. {
-  split; [ apply IHn | easy ].
+split; [ easy | ].
+split; [ easy | ].
+intros i j Hi Hj.
+destruct i. {
+  destruct j; [ apply IHn | ].
+  destruct j; [ apply IHn | flia Hj ].
 }
-split; [ | easy ].
-split; [ | easy ].
-apply IHn.
+destruct i; [ | flia Hi ].
+destruct j; [ apply IHn | ].
+destruct j; [ apply IHn | flia Hj ].
 Qed.
 
 Theorem have_same_bmat_struct_opp_r : ∀ T {ro : ring_op T} M,
@@ -2291,27 +2215,10 @@ Theorem have_same_bmat_struct_opp_r : ∀ T {ro : ring_op T} M,
 Proof.
 intros.
 induction M as [| M IHM] using bmatrix_ind2; [ easy | cbn ].
-destruct M as (lla).
-cbn in IHM |-*.
-fold (@have_same_list_struct T).
-fold (@have_same_list_list_struct T).
-induction lla as [| la]; [ easy | cbn ].
-split. 2: {
-  apply IHlla.
-  intros la1 Hla1 a1 Ha1.
-  apply (IHM la1); [ now right | easy ].
-}
-induction la as [| a]; [ easy | cbn ].
-split. {
-  now apply (IHM _ (or_introl eq_refl)); left.
-}
-apply IHla.
-intros la1 Hla1 a1 Ha1.
-destruct Hla1 as [Hla1| Hla1]. {
-  subst la1.
-  now apply (IHM _ (or_introl eq_refl)); right.
-}
-now apply (IHM _ (or_intror Hla1)).
+split; [ easy | ].
+split; [ easy | ].
+intros * Hi Hj.
+now apply IHM.
 Qed.
 
 Theorem have_same_bmat_struct_IZ_A : ∀ T {ro : ring_op T} (so := rng_semiring)
@@ -2321,14 +2228,17 @@ Proof.
 intros.
 revert u.
 induction n; intros; [ easy | cbn ].
-split. {
-  split; [ easy | ].
-  split; [ | easy ].
+split; [ easy | ].
+split; [ easy | ].
+intros * Hi Hj.
+destruct i. {
+  destruct j; [ apply IHn | ].
+  destruct j; [ cbn | flia Hj ].
   apply have_same_bmat_struct_IZ_IZ.
 }
-split; [ | easy ].
-split; [ apply have_same_bmat_struct_IZ_IZ | ].
-split; [ | easy ].
+destruct i; [ | flia Hi ].
+destruct j; [ apply have_same_bmat_struct_IZ_IZ | ].
+destruct j; [ cbn | flia Hj ].
 transitivity (A n); [ easy | ].
 apply have_same_bmat_struct_opp_r.
 Qed.
@@ -2343,68 +2253,49 @@ induction n; intros; cbn. {
   destruct M as [xm| mm]; [ now rewrite srng_mul_0_l | easy ].
 }
 destruct M as [xm| mm]; [ easy | ].
-f_equal; f_equal.
-destruct mm as (ll).
-destruct ll as [| l1]; [ easy | ].
-destruct l1 as [| e1]; [ now cbn in Hss | ].
 cbn in Hss.
-f_equal. {
-  cbn.
-  f_equal. {
-    destruct ll as [| l2]; [ easy | cbn ].
+destruct Hss as (Hr & Hc & Hss).
+cbn; f_equal.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros * Hi Hj.
+specialize (Hss 0 0 Nat.lt_0_2 Nat.lt_0_2) as Hij00; cbn in Hij00.
+specialize (Hss 0 1 Nat.lt_0_2 Nat.lt_1_2) as Hij01; cbn in Hij01.
+specialize (Hss 1 0 Nat.lt_1_2 Nat.lt_0_2) as Hij10; cbn in Hij10.
+specialize (Hss 1 1 Nat.lt_1_2 Nat.lt_1_2) as Hij11; cbn in Hij11.
+destruct i. {
+  destruct j. {
     rewrite IHn; [ | easy ].
     rewrite IHn. 2: {
-      destruct l2 as [| e2]; [ easy | cbn ].
       transitivity (Z_2_pow n); [ | easy ].
       apply have_same_bmat_struct_IZ_IZ.
     }
-    apply bmat_add_0_l; [ easy | ].
+    now apply bmat_add_0_l.
+  }
+  destruct j; [ cbn | flia Hj ].
+  rewrite IHn. 2: {
+    transitivity (Z_2_pow n); [ | easy ].
     apply have_same_bmat_struct_IZ_IZ.
   }
-  destruct ll as [| l2]; [ easy | cbn ].
-  destruct l1 as [| e2]; [ easy | cbn ].
-  f_equal. {
-    rewrite IHn. 2: {
-      transitivity (Z_2_pow n); [ | easy ].
-      apply have_same_bmat_struct_IZ_IZ.
-    }
-    rewrite IHn; [ now apply bmat_add_0_l | ].
-    destruct l2 as [| e3]; [ easy | now destruct l2 ].
-  }
-  destruct ll as [| l3]; [ now destruct l1 | easy ].
-}
-cbn.
-destruct ll as [| l2]; [ easy | cbn ].
-f_equal; f_equal. {
   rewrite IHn; [ | easy ].
-  rewrite IHn; [ now apply bmat_add_0_l | ].
-  destruct l2 as [| e2]; [ easy | cbn ].
-  transitivity (Z_2_pow n); [ | easy ].
-  apply have_same_bmat_struct_IZ_IZ.
+  now apply bmat_add_0_l.
 }
-destruct ll as [| l3]; [ cbn | easy ].
-destruct l1 as [| e2]; [ easy | cbn ].
-f_equal; [ | now destruct l1 ].
+destruct i; [ cbn | flia Hi ].
+destruct j. {
+  rewrite IHn; [ | easy ].
+  rewrite IHn. 2: {
+    transitivity (Z_2_pow n); [ | easy ].
+    apply have_same_bmat_struct_IZ_IZ.
+  }
+  now apply bmat_add_0_l.
+}
+destruct j; [ | flia Hj ].
 rewrite IHn. 2: {
   transitivity (Z_2_pow n); [ | easy ].
   apply have_same_bmat_struct_IZ_IZ.
 }
-rewrite IHn. {
-  apply bmat_add_0_l; [ easy | ].
-  apply have_same_bmat_struct_IZ_IZ.
-}
-destruct l2 as [| e3]; [ easy | now destruct l2 ].
+rewrite IHn; [ | easy ].
+now apply bmat_add_0_l.
 Qed.
-
-(*
-Theorem bmat_list_mul_0_r : ∀ T {so : semiring_op T} n l M,
-  bmat_list_mul M l [Z_2_pow n] = M.
-Proof.
-intros.
-induction l as [| a]; [ easy | cbn ].
-destruct l as [| a1]; cbn.
-...
-*)
 
 Theorem bmat_mul_0_r : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
   have_same_bmat_struct (I_2_pow n) M
@@ -2412,40 +2303,54 @@ Theorem bmat_mul_0_r : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
 Proof.
 intros * sp * Hss.
 revert M Hss.
-induction n; intros; cbn. {
+induction n; intros. {
+cbn.
   destruct M as [xm| mm]; [ now cbn; rewrite srng_mul_0_r | easy ].
 }
 destruct M as [xm| mm]; [ easy | ].
-f_equal; f_equal.
-destruct mm as (ll).
-destruct ll as [| l1]; [ easy | ].
-destruct l1 as [| e1]; [ now cbn in Hss | ].
-cbn in Hss |-*.
-fold (@bmat_list_mul_loop T so).
-f_equal; f_equal.
-f_equal. {
+cbn in Hss.
+destruct Hss as (Hr & Hc & Hss).
+cbn; f_equal.
+rewrite <- Hr, <- Hc.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros * Hi Hj.
+specialize (Hss 0 0 Nat.lt_0_2 Nat.lt_0_2) as Hij00; cbn in Hij00.
+specialize (Hss 0 1 Nat.lt_0_2 Nat.lt_1_2) as Hij01; cbn in Hij01.
+specialize (Hss 1 0 Nat.lt_1_2 Nat.lt_0_2) as Hij10; cbn in Hij10.
+specialize (Hss 1 1 Nat.lt_1_2 Nat.lt_1_2) as Hij11; cbn in Hij11.
+destruct i. {
+  destruct j. {
+    rewrite IHn; [ cbn | easy ].
+    rewrite IHn. 2: {
+      transitivity (Z_2_pow n); [ | easy ].
+      apply have_same_bmat_struct_IZ_IZ.
+    }
+    now apply bmat_add_0_l.
+  }
+  destruct j; [ cbn | flia Hj ].
   rewrite IHn; [ | easy ].
-  destruct l1 as [| e2]; [ easy | cbn ].
-  destruct l1; [ cbn | easy ].
   rewrite IHn. 2: {
     transitivity (Z_2_pow n); [ | easy ].
     apply have_same_bmat_struct_IZ_IZ.
   }
-  now rewrite bmat_add_0_l.
+  now apply bmat_add_0_l.
 }
-destruct ll as [| l2]; [ easy | cbn ].
-destruct l1 as [| e2]; [ easy | cbn ].
-f_equal. {
-  destruct l2 as [| e3]; [ easy | ].
+destruct i; [ cbn | flia Hi ].
+destruct j. {
   rewrite IHn. 2: {
     transitivity (Z_2_pow n); [ | easy ].
     apply have_same_bmat_struct_IZ_IZ.
   }
-  destruct l2 as [| e4]; [ easy | cbn ].
   rewrite IHn; [ | easy ].
-  rewrite bmat_add_0_l; [ now destruct l2 | easy | easy ].
+  now apply bmat_add_0_l.
 }
-destruct ll as [| l3]; [ now destruct l1 | easy ].
+destruct j; [ | flia Hj ].
+rewrite IHn. 2: {
+  transitivity (Z_2_pow n); [ | easy ].
+  apply have_same_bmat_struct_IZ_IZ.
+}
+rewrite IHn; [ | easy ].
+now apply bmat_add_0_l.
 Qed.
 
 Theorem bmat_mul_1_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
@@ -2458,71 +2363,63 @@ induction n; intros. {
   cbn.
   destruct M as [x| M]; [ now rewrite srng_mul_1_l | easy ].
 }
-cbn - [ Nat.eq_dec ].
+cbn.
 destruct M as [x| M]; [ easy | f_equal ].
-destruct M as (ll).
-cbn - [ Nat.eq_dec ].
 cbn in Hss.
-cbn; f_equal.
-destruct ll as [| l1]; [ easy | ].
-destruct Hss as (H1 & H2).
-destruct l1 as [| e1]; [ easy | cbn ].
-f_equal. {
-  f_equal. {
-    destruct ll as [| l2]; [ easy | cbn ].
-    rewrite IHn; [ | easy ].
-    rewrite fold_Z_2_pow.
-    rewrite bmat_mul_0_l; [ | easy | ]. {
-      apply bmat_add_0_r; [ easy | ].
-      transitivity (I_2_pow n); [ | easy ].
-      apply have_same_bmat_struct_IZ_IZ.
-    }
-    destruct l2 as [| e2]; [ easy | cbn ].
-    transitivity (Z_2_pow n); [ | easy ].
-    apply have_same_bmat_struct_IZ_IZ.
-  }
-  destruct l1 as [| e2]; [ easy | cbn ].
-  f_equal; [ | now destruct l1 ].
-  destruct ll as [| l2]; [ easy | cbn ].
+destruct Hss as (Hr & Hc & Hss).
+rewrite <- Hc.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros * Hi Hj.
+rewrite <- Hc in Hj.
+specialize (Hss 0 0 Nat.lt_0_2 Nat.lt_0_2) as Hij00; cbn in Hij00.
+specialize (Hss 0 1 Nat.lt_0_2 Nat.lt_1_2) as Hij01; cbn in Hij01.
+specialize (Hss 1 0 Nat.lt_1_2 Nat.lt_0_2) as Hij10; cbn in Hij10.
+specialize (Hss 1 1 Nat.lt_1_2 Nat.lt_1_2) as Hij11; cbn in Hij11.
+destruct i. {
+  cbn.
   rewrite IHn. 2: {
+    destruct j; [ easy | ].
+    destruct j; [ | flia Hj ].
     transitivity (Z_2_pow n); [ | easy ].
     apply have_same_bmat_struct_IZ_IZ.
   }
   rewrite fold_Z_2_pow.
-  rewrite bmat_mul_0_l; [ now apply bmat_add_0_r | easy | ].
-  destruct l2 as [| e3]; [ easy | now destruct l2 ].
+  rewrite bmat_mul_0_l; [ | easy | ]. 2: {
+    destruct j. {
+      transitivity (Z_2_pow n); [ | easy ].
+      apply have_same_bmat_struct_IZ_IZ.
+    }
+    destruct j; [ easy | flia Hj ].
+  }
+  apply bmat_add_0_r; [ easy | ].
+  destruct j. {
+    transitivity (I_2_pow n); [ | easy ].
+    apply have_same_bmat_struct_IZ_IZ.
+  }
+  destruct j; [ | flia Hj ].
+  transitivity (Z_2_pow n); [ | easy ].
+  apply have_same_bmat_struct_IZ_IZ.
 }
-destruct l1 as [| e2]; [ easy | cbn ].
-destruct ll as [| l2]; [ easy | cbn ].
-f_equal; [ | now destruct ll ].
-destruct l1 as [| e3]; [ cbn | easy ].
+destruct i; [ cbn | flia Hi ].
 rewrite fold_Z_2_pow.
-rewrite bmat_mul_0_l; [ | easy | easy ].
 rewrite bmat_mul_0_l; [ | easy | ]. 2: {
+  destruct j; [ easy | ].
+  destruct j; [ | flia Hj ].
   transitivity (Z_2_pow n); [ | easy ].
   apply have_same_bmat_struct_IZ_IZ.
 }
 rewrite IHn. 2: {
-  destruct l2 as [| e3]; [ easy | cbn ].
-  transitivity (Z_2_pow n); [ | easy ].
-  apply have_same_bmat_struct_IZ_IZ.
+  destruct j. {
+    transitivity (Z_2_pow n); [ | easy ].
+    apply have_same_bmat_struct_IZ_IZ.
+  }
+  destruct j; [ easy | flia Hj ].
 }
-rewrite bmat_add_0_l; [ | easy | ]. 2: {
-  destruct l2 as [| e3]; [ easy | cbn ].
-  transitivity (Z_2_pow n); [ | easy ].
-  apply have_same_bmat_struct_IZ_IZ.
-}
-rewrite IHn. 2: {
-  destruct l2 as [| e3]; [ easy | now destruct l2 ].
-}
-rewrite bmat_add_0_l; [ | easy | ]. 2: {
-  destruct l2 as [| e3]; [ easy | cbn ].
-  destruct l2 as [| e4]; [ easy | cbn ].
-  transitivity (I_2_pow n); [ | easy ].
-  apply have_same_bmat_struct_IZ_IZ.
-}
-destruct l2 as [| e3]; [ easy | cbn ].
-destruct l2 as [| e4]; [ easy | now destruct l2 ].
+apply bmat_add_0_l; [ easy | ].
+destruct j; [ easy | ].
+destruct j; [ | flia Hj ].
+transitivity (I_2_pow n); [ | easy ].
+apply have_same_bmat_struct_IZ_IZ.
 Qed.
 
 Theorem bmat_mul_1_r : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
@@ -2535,142 +2432,60 @@ induction n; intros. {
   cbn.
   destruct M as [x| M]; [ now cbn; rewrite srng_mul_1_r | easy ].
 }
-cbn - [ Nat.eq_dec ].
-destruct M as [x| M]; [ easy | f_equal ].
-destruct M as (ll); cbn.
-fold (@bmat_list_mul_loop T so).
+destruct M as [x| M]; [ easy | cbn; f_equal ].
 cbn in Hss.
-cbn; f_equal.
-destruct ll as [| l1]; [ easy | ].
-destruct Hss as (H1 & H2).
-destruct l1 as [| e1]; [ easy | cbn ].
-f_equal.
-destruct l1 as [| e2]; [ easy | cbn ].
-destruct ll as [| l2]; [ easy | cbn ].
-destruct l2 as [| e3]; [ easy | cbn ].
-destruct l2 as [| e4]; [ easy | cbn ].
-destruct l2; [ cbn | easy ].
+destruct Hss as (Hr & Hc & Hss).
+rewrite <- Hc; cbn.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros * Hi Hj.
+rewrite <- Hr in Hi.
+rewrite <- Hc in Hj.
+specialize (Hss 0 0 Nat.lt_0_2 Nat.lt_0_2) as Hij00; cbn in Hij00.
+specialize (Hss 0 1 Nat.lt_0_2 Nat.lt_1_2) as Hij01; cbn in Hij01.
+specialize (Hss 1 0 Nat.lt_1_2 Nat.lt_0_2) as Hij10; cbn in Hij10.
+specialize (Hss 1 1 Nat.lt_1_2 Nat.lt_1_2) as Hij11; cbn in Hij11.
+destruct i. {
+  destruct j. {
+    rewrite IHn; [ | easy ].
+    rewrite fold_Z_2_pow.
+    rewrite bmat_mul_0_r; [ | easy | ]. 2: {
+      transitivity (Z_2_pow n); [ | easy ].
+      apply have_same_bmat_struct_IZ_IZ.
+    }
+    apply bmat_add_0_r; [ easy | ].
+    transitivity (I_2_pow n); [ | easy ].
+    apply have_same_bmat_struct_IZ_IZ.
+  }
+  destruct j; [ | flia Hj ].
+  rewrite fold_Z_2_pow.
+  rewrite bmat_mul_0_r; [ | easy | easy ].
+  rewrite IHn. 2: {
+    transitivity (Z_2_pow n); [ | easy ].
+    apply have_same_bmat_struct_IZ_IZ.
+  }
+  now apply bmat_add_0_l.
+}
+destruct i; [ cbn | flia Hi ].
+destruct j. {
+  rewrite IHn. 2: {
+    transitivity (Z_2_pow n); [ | easy ].
+    apply have_same_bmat_struct_IZ_IZ.
+  }
+  rewrite fold_Z_2_pow.
+  rewrite bmat_mul_0_r; [ | easy | easy ].
+  now apply bmat_add_0_r.
+}
+destruct j; [ | flia Hj ].
 rewrite fold_Z_2_pow.
-destruct ll as [| l2]; [ cbn | easy ].
-destruct l1 as [| e5]; [ cbn | easy ].
 rewrite bmat_mul_0_r; [ | easy | ]. 2: {
   transitivity (Z_2_pow n); [ | easy ].
   apply have_same_bmat_struct_IZ_IZ.
 }
 rewrite IHn; [ | easy ].
-rewrite bmat_add_0_r; [ | easy | ]. 2: {
-  transitivity (I_2_pow n); [ | easy ].
-  apply have_same_bmat_struct_IZ_IZ.
-}
-rewrite bmat_mul_0_r; [ | easy | easy ].
-rewrite IHn. 2: {
-  transitivity (Z_2_pow n); [ | easy ].
-  apply have_same_bmat_struct_IZ_IZ.
-}
-rewrite bmat_add_0_l; [ | easy | easy ].
-rewrite bmat_mul_0_r; [ | easy | easy ].
-rewrite bmat_mul_0_r; [ | easy | ]. 2: {
-  transitivity (Z_2_pow n); [ | easy ].
-  apply have_same_bmat_struct_IZ_IZ.
-}
-rewrite IHn. 2: {
-  transitivity (Z_2_pow n); [ | easy ].
-  apply have_same_bmat_struct_IZ_IZ.
-}
-rewrite bmat_add_0_r; [ | easy | easy ].
-rewrite IHn; [ | easy ].
-rewrite bmat_add_0_l; [ | easy | ]. 2: {
-  transitivity (I_2_pow n); [ | easy ].
-  apply have_same_bmat_struct_IZ_IZ.
-}
-easy.
+apply bmat_add_0_l; [ easy | ].
+transitivity (I_2_pow n); [ | easy ].
+apply have_same_bmat_struct_IZ_IZ.
 Qed.
-
-(*
-Theorem bmat_loop_sqr_I_2_pow :
-    ∀ T {so : semiring_op T } {sp : semiring_prop T} n,
-  bmat_mul_loop (S n) (I_2_pow n) (I_2_pow n) = I_2_pow n.
-Proof.
-intros.
-now apply bmat_mul_loop_I_IZ_2_pow.
-Qed.
-
-Theorem fold_tagada : ∀ T {ro : ring_op T} (so := rng_semiring)
-    (MA MB : bmatrix T) n,
-  match MA with
-  | BM_1 xa =>
-      match MB with
-      | BM_1 xb => BM_1 (xa * xb)%Rng
-      | BM_M _ => void_bmat
-      end
-  | BM_M MMA =>
-      match MB with
-      | BM_1 _ => void_bmat
-      | BM_M MMB =>
-          let bso :=
-            {| srng_zero := @void_bmat T;
-               srng_one := @void_bmat T;
-               srng_add := @bmat_add T (@rng_semiring T ro);
-               srng_mul := @bmat_mul_loop T (@rng_semiring T ro) n |}
-           in
-           BM_M (mat_def_mul MMA MMB)
-      end
-  end = bmat_mul_loop (S n) MA MB.
-Proof.
-easy.
-Qed.
-
-Theorem bmat_add_loop_A_Z_2_pow :
-    ∀ T {ro : ring_op T} (so := rng_semiring) {sp : semiring_prop T} n,
-  bmat_add_loop (S n) (A_def n) (Z_2_pow n) = A_def n.
-Proof.
-intros.
-induction n; [ now cbn; rewrite srng_add_0_l | ].
-cbn in IHn |-*.
-unfold bmat_of_list_bmat; cbn.
-f_equal; f_equal.
-rewrite IHn.
-specialize (bmat_add_loop_IZ_Z_2_pow 1%Srng n) as H.
-cbn in H.
-unfold so in H |-*.
-rewrite fold_I_2_pow in H.
-rewrite H; clear H.
-f_equal; f_equal; f_equal; f_equal.
-clear IHn.
-induction n; [ now cbn; rewrite srng_add_0_r | cbn ].
-f_equal; f_equal.
-rewrite IHn.
-f_equal. {
-  f_equal; f_equal.
-(*
-rewrite bmat_opp_involutive; [ | | easy ].
-*)
-...
-
-Theorem bmat_loop_mul_I_2_pow_A_def :
-    ∀ T {ro : ring_op T} (so := rng_semiring) {sp : semiring_prop T} n,
-  bmat_mul_loop (S n) (I_2_pow n) (A_def n) = A_def n.
-Proof.
-intros.
-induction n; [ now cbn; rewrite srng_mul_0_r | ].
-cbn in IHn; cbn.
-rewrite IHn, bmat_depth_A; cbn.
-specialize (bmat_mul_loop_Z_IZ_2_pow 1%Rng n) as H.
-cbn in H; unfold Z_2_pow in H.
-rewrite fold_I_2_pow in H; rewrite H; clear H.
-...
-specialize (bmat_loop_add_A_Z_2_pow n) as H.
-cbn in H; unfold Z_2_pow in H.
-unfold so; rewrite H; clear H.
-specialize (bmat_loop_sqr_I_2_pow n) as H.
-cbn in H.
-progress unfold so in H.
-rewrite H; clear H.
-rewrite bmat_depth_I_2_pow.
-...
-do 3 rewrite fold_tagada.
-...
-*)
 
 Theorem bmat_add_nat_mul_l_succ : ∀ T {so : semiring_op T}
     {sp : semiring_prop T} n M,
@@ -2689,27 +2504,8 @@ induction M as [x| M IHM] using bmatrix_ind2. {
   apply fold_left_app.
 }
 cbn.
-f_equal; f_equal.
-fold (@bmat_list_add T so).
-fold (@bmat_list_list_add T so).
-destruct M as (ll); cbn in IHM |-*.
-induction ll as [| l]; [ easy | cbn ].
-f_equal. 2: {
-  apply IHll.
-  intros la Hla a Ha.
-  apply (IHM la); [ now right | easy ].
-}
-induction l as [| a]; [ easy | cbn ].
-f_equal. 2: {
-  apply IHl.
-  intros la Hla a1 Ha1.
-  destruct Hla as [Hla| Hla]. {
-    subst la.
-    apply (IHM (a :: l)); [ now left | now right ].
-  }
-  apply (IHM la); [ now right | easy ].
-}
-now apply (IHM (a :: l)); left.
+f_equal.
+now apply matrix_eq.
 Qed.
 
 Theorem bmat_add_opp_r : ∀ T {ro : ring_op T} (so := rng_semiring)
@@ -2727,45 +2523,29 @@ induction M as [x| M IHM] using bmatrix_ind2; intros. {
   now destruct n.
 }
 destruct n; [ easy | cbn ].
-f_equal; f_equal.
 cbn in Hss.
-fold (@have_same_list_struct T) in Hss.
-fold (@have_same_list_list_struct T) in Hss.
-fold (@bmat_list_add T so).
-fold (@bmat_list_list_add T so).
-destruct M as (ll).
-cbn in IHM, Hss |-*.
-revert n Hss.
-induction ll as [| l]; intros; [ easy | cbn ].
-f_equal. {
-  destruct l as [| a]; intros; [ now cbn in Hss | cbn ].
-  f_equal. {
-    apply (IHM (a :: l)); [ now left | now left | ].
-    now cbn in Hss.
-  }
-  cbn in Hss.
-  destruct l as [| a1]; [ easy | ].
-  cbn in Hss |-*.
-  f_equal; [ | now destruct l ].
-  apply (IHM (a :: a1 :: l)); [ now left | now right; left | easy ].
-}
-cbn in Hss.
-destruct ll as [| l1]; [ easy | cbn ].
-destruct ll as [| l2]; [ cbn | now cbn in Hss ].
-cbn in Hss.
+destruct Hss as (Hr & Hc & Hss).
+rewrite Hr, Hc in IHM, Hss |-*.
 f_equal.
-destruct l1 as [| a1]; [ easy | cbn ].
-cbn in Hss.
-f_equal. {
-  apply (IHM (a1 :: l1)); [ now right; left | now left | easy ].
+apply matrix_eq; cbn; [ easy | easy | ].
+intros * Hi Hj.
+rewrite (IHM i j Hi Hj n). 2: {
+  specialize (Hss _ _ Hi Hj) as H; cbn in H.
+  destruct i. {
+    destruct j; [ easy | ].
+    destruct j; [ easy | flia Hj ].
+  }
+  destruct i; [ | flia Hi ].
+  destruct j; [ easy | ].
+  destruct j; [ easy | flia Hj ].
 }
-destruct l1 as [| a2]; [ easy | cbn ].
-f_equal. {
-  apply (IHM (a1 :: a2 :: l1)); [ now right; left | now right; left | ].
-  now cbn in Hss.
+destruct i. {
+  destruct j; [ easy | cbn ].
+  destruct j; [ easy | flia Hj ].
 }
-cbn in Hss.
-now destruct l1.
+destruct i; [ cbn | flia Hi ].
+destruct j; [ easy | cbn ].
+destruct j; [ easy | flia Hj ].
 Qed.
 
 Theorem bmat_nat_mul_0_r : ∀ T {so : semiring_op T} {sp : semiring_prop T}
@@ -2780,84 +2560,22 @@ induction n; intros. {
   destruct k; [ easy | ].
   now apply all_0_srng_summation_0.
 }
-now cbn; rewrite IHn.
-Qed.
-
-(*
-Theorem bmat_mul_add_distr_l :
-  ∀ T (so : semiring_op T) {sp : semiring_prop T} MA MB MC,
-  have_same_bmat_struct MA MB
-  → have_same_bmat_struct MA MC
-  → bmat_mul MA (bmat_add MB MC) = bmat_add (bmat_mul MA MB) (bmat_mul MA MC).
-Proof.
-intros * sp * Hssab Hssac.
-revert MB MC Hssab Hssac.
-induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
-  destruct MB as [xb| mb]; [ cbn | now destruct MC ].
-  destruct MC as [xc| mc]; [ cbn | easy ].
-  now rewrite srng_mul_add_distr_l.
+cbn; f_equal.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros * Hi Hj.
+destruct i. {
+  destruct j; [ easy | cbn ].
+  destruct j; [ easy | flia Hj ].
 }
-destruct MB as [xb| mb]; [ easy | ].
-destruct MC as [xc| mc]; [ easy | ].
-move mb before ma.
-move mc before mb.
-cbn in Hssab.
-progress fold (@have_same_list_struct T) in Hssab.
-progress fold (@have_same_list_list_struct T) in Hssab.
-cbn in Hssac.
-progress fold (@have_same_list_struct T) in Hssac.
-progress fold (@have_same_list_list_struct T) in Hssac.
-cbn.
-f_equal; f_equal.
-destruct ma as (lla).
-destruct mb as (llb).
-destruct mc as (llc).
-cbn in IHMA, Hssab, Hssac |-*.
-progress fold (@bmat_list_add T so).
-progress fold (@bmat_list_list_add T so).
-progress fold (@bmat_list_mul T so).
-progress fold (@bmat_list_list_mul T so lla (bmat_list_list_add llb llc)).
-progress fold (@bmat_list_list_mul T so lla llb).
-progress fold (@bmat_list_list_mul T so lla llc).
-revert llb llc Hssab Hssac.
-induction lla as [| la]; intros; [ easy | cbn ].
-progress fold (@bmat_list_list_mul T so lla (bmat_list_list_add llb llc)).
-progress fold (@bmat_list_list_mul T so lla llb).
-progress fold (@bmat_list_list_mul T so lla llc).
-f_equal. 2: {
-  cbn in Hssab, Hssac.
-  destruct llb as [| lb]; [ easy | ].
-  destruct llc as [| lc]; [ easy | ].
-  move lb before la.
-  move lc before lb.
-  move llb before lla.
-  move llc before llb.
-  cbn.
-  destruct lla as [| la1]; [ easy | ].
-...
-Print bmat_list_list_mul.
-
-  progress fold (@bmat_list_list_mul T so lla (bmat_list_list_add llb llc)).
-  progress fold (@bmat_list_mul T so).
-  progress fold (@bmat_list_add T so).
-progress fold (@bmat_list_list_add T so).
-progress fold (@bmat_list_list_mul T so lla (bmat_list_list_add llb llc)).
-progress fold (@bmat_list_list_mul T so lla llb).
-progress fold (@bmat_list_list_mul T so lla llc).
-...
-  apply IHlla; cycle 1. {
-    destruct lla as [| la1]. {
-      destruct llb as [| lb1]. {
-        cbn in Hssab.
-        cbn in Hssac.
-        destruct llc as [| lc1]. {
-...
-*)
+destruct i; [ | flia Hi ].
+destruct j; [ easy | cbn ].
+destruct j; [ easy | flia Hj ].
+Qed.
 
 Theorem bmat_mul_add_distr_r :
   ∀ T (so : semiring_op T) {sp : semiring_prop T} MA MB MC,
-  have_same_bmat_struct MA MC
-  → have_same_bmat_struct MB MC
+  have_same_bmat_struct MA (bmat_transpose MC)
+  → have_same_bmat_struct MB (bmat_transpose MC)
   → ((MA + MB) * MC = MA * MC + MB * MC)%BM.
 Proof.
 intros * sp * Hssac Hssbc.
@@ -2871,7 +2589,43 @@ destruct MA as [xa| ma]; [ easy | ].
 destruct MB as [xb| mb]; [ easy | ].
 move ma after mc.
 move mb after mc.
-cbn in Hssac.
+cbn in Hssac, Hssbc.
+destruct Hssac as (Hrac & Hcac & Hssac).
+destruct Hssbc as (Hrbc & Hcbc & Hssbc).
+cbn; f_equal.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros i j Hi Hj.
+Definition mat_el_mul_loop T {so : semiring_op T} f g :=
+  fix mat_el_mul_loop it a (i j k : nat) :=
+     match it with
+     | 0 => a
+     | S it' => mat_el_mul_loop it' (a + f i j * g j k)%BM i (j + 1) k
+     end.
+fold
+  (mat_el_mul_loop (λ i j, (mat_el ma i j + mat_el mb i j)%BM) (mat_el mc)).
+fold (mat_el_mul_loop (mat_el ma) (mat_el mc)).
+fold (mat_el_mul_loop (mat_el mb) (mat_el mc)).
+destruct ma as (fa, ra, ca).
+destruct mb as (fb, rb, cb).
+destruct mc as (fc, rc, cc).
+cbn in *.
+move fb before fa.
+move fc before fb.
+subst rc cc rb cb.
+destruct ca. {
+  cbn.
+  admit.
+}
+rewrite Nat.sub_succ, Nat.sub_0_r.
+destruct ca; cbn. {
+  apply IHMC; [ flia Hi | easy | | ]. {
+...
+    apply Hssac.
+...
+    transitivity (lla 0 0). 2: {
+      apply Hssac; [ flia Hi | flia ].
+    }
+...
 progress fold (@have_same_list_struct T) in Hssac.
 progress fold (@have_same_list_list_struct T) in Hssac.
 cbn in Hssbc.
