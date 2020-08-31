@@ -2735,7 +2735,6 @@ destruct ca; cbn. {
     apply bmat_fit_for_add_add_l. {
 ...
       transitivity (fa i 0 * fc 1 j)%BM. {
-
 Theorem bmat_fit_for_add_mul_cancel_l : ∀ T {so : semiring_op T} MA MB MC,
   bmat_fit_for_add MB MC
   → bmat_fit_for_add (MA * MB)%BM (MA * MC)%BM.
