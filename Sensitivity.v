@@ -2666,6 +2666,34 @@ rewrite (bmat_add_comm MA MB); [ | easy ].
 apply bmat_add_add_swap; [ easy | easy | now symmetry ].
 Qed.
 
+Theorem bmat_fit_for_add_mul_cancel_l : ∀ T {so : semiring_op T} MA MB MC,
+  bmat_fit_for_add MB MC
+  → bmat_fit_for_add (MA * MB)%BM (MA * MC)%BM.
+Proof.
+intros * Hfa.
+revert MB MC Hfa.
+induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
+  now destruct MB, MC.
+}
+destruct MB as [xb| mb]; [ now destruct MC | ].
+destruct MC as [xc| mc]; [ easy | ].
+cbn in Hfa |-*.
+split; [ easy | ].
+split; [ easy | ].
+destruct Hfa as (Hrr & Hcc & Hfa).
+intros * Hi Hj.
+fold (mat_el_mul_loop (mat_el ma) (mat_el mb)).
+fold (mat_el_mul_loop (mat_el ma) (mat_el mc)).
+destruct ma as (fa, ra, ca).
+destruct mb as (fb, rb, cb).
+destruct mc as (fc, rc, cc).
+cbn in *.
+move fb before fa.
+move fc before fb.
+subst rc cc.
+destruct ca; cbn. {
+...
+
 Theorem bmat_mul_add_distr_r :
   ∀ T (so : semiring_op T) {sp : semiring_prop T} MA MB MC,
   bmat_fit_for_add MA MB
@@ -2735,9 +2763,6 @@ destruct ca; cbn. {
     apply bmat_fit_for_add_add_l. {
 ...
       transitivity (fa i 0 * fc 1 j)%BM. {
-Theorem bmat_fit_for_add_mul_cancel_l : ∀ T {so : semiring_op T} MA MB MC,
-  bmat_fit_for_add MB MC
-  → bmat_fit_for_add (MA * MB)%BM (MA * MC)%BM.
 ...
         apply bmat_fit_for_add_mul_cancel_l.
 ...
