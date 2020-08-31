@@ -2668,19 +2668,21 @@ Qed.
 
 Theorem bmat_fit_for_add_mul_cancel_l : ∀ T {so : semiring_op T} MA MB MC,
   bmat_fit_for_add MB MC
+  → bmat_fit_for_mul MA MB
   → bmat_fit_for_add (MA * MB)%BM (MA * MC)%BM.
 Proof.
-intros * Hfa.
-revert MB MC Hfa.
+intros * Hfa Hfm.
+revert MB MC Hfa Hfm.
 induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
   now destruct MB, MC.
 }
 destruct MB as [xb| mb]; [ now destruct MC | ].
 destruct MC as [xc| mc]; [ easy | ].
-cbn in Hfa |-*.
+cbn in Hfa, Hfm |-*.
 split; [ easy | ].
 split; [ easy | ].
 destruct Hfa as (Hrr & Hcc & Hfa).
+destruct Hfm as (Ha & Hab & Hfm).
 intros * Hi Hj.
 fold (mat_el_mul_loop (mat_el ma) (mat_el mb)).
 fold (mat_el_mul_loop (mat_el ma) (mat_el mc)).
@@ -2690,8 +2692,24 @@ destruct mc as (fc, rc, cc).
 cbn in *.
 move fb before fa.
 move fc before fb.
-subst rc cc.
+subst rc cc rb.
+destruct ca; [ easy | clear Ha; cbn ].
+rewrite Nat.sub_0_r.
 destruct ca; cbn. {
+  apply IHMA; [ easy | flia | | ]. {
+    apply Hfa; [ flia | easy ].
+  } {
+    apply Hfm; [ easy | easy | flia ].
+  }
+}
+destruct ca; cbn. {
+  apply bmat_fit_for_add_add_l. {
+    symmetry.
+    apply bmat_fit_for_add_add_l. {
+      apply IHMA; [ easy | flia | | ]. {
+        symmetry.
+        apply Hfa; [ flia | easy ].
+      } {
 ...
 
 Theorem bmat_mul_add_distr_r :
