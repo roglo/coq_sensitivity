@@ -2618,7 +2618,14 @@ destruct ca. {
 }
 rewrite Nat.sub_succ, Nat.sub_0_r.
 destruct ca; cbn. {
-  apply IHMC; [ flia Hi | easy | | ]. {
+  specialize (IHMC 0 i Nat.lt_0_1 Hi) as H1.
+  specialize (IHMC 0 j Nat.lt_0_1 Hj) as H2.
+  specialize (H1 (fa i 0) (fb i 0)).
+  specialize (H2 (fa i 0) (fb i 0)).
+  specialize (Hssac i 0 Hi Nat.lt_0_1) as H.
+  specialize (H1 H); clear H.
+  specialize (Hssbc i 0 Hi Nat.lt_0_1) as H.
+  specialize (H1 H); clear H.
 ...
     apply Hssac.
 ...
