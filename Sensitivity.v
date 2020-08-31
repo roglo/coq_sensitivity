@@ -2636,8 +2636,10 @@ subst rb cb rc.
 clear Hrcbc.
 destruct ca. {
   cbn.
-  admit. (* c'est faux, faudra que j'ajoute une hypothèse *)
+  (* c'est faux, faudra que j'ajoute une hypothèse *)...
+...
 }
+(* testing with first values of ca, to prepare an induction *)
 rewrite Nat.sub_succ, Nat.sub_0_r.
 destruct ca; cbn. {
   apply IHMC; [ flia | easy | | | ]. {
