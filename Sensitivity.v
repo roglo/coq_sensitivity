@@ -2606,12 +2606,18 @@ Theorem bmat_add_add_swap :
 Proof.
 intros * sp * Hssab Hssac.
 revert MB MC Hssab Hssac.
-induction MC as [xc| mc IHMC] using bmatrix_ind2; intros. {
-  destruct MA as [xa| ma]; [ | easy ].
+induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
   destruct MB as [xb| mb]; [ cbn | easy ].
-  rewrite srng_add_add_swap.
+  destruct MC as [xc| mc]; [ cbn | easy ].
+  now rewrite srng_add_add_swap.
 }
-...
+destruct MB as [xb| mb]; [ easy | ].
+destruct MC as [xc| mc]; [ easy | cbn ].
+f_equal.
+apply matrix_eq; [ easy | easy | cbn ].
+intros i j Hi Hj.
+apply IHMA; [ easy | easy | now apply Hssab | now apply Hssac ].
+Qed.
 
 Theorem bmat_add_assoc :
   ∀ T (so : semiring_op T) {sp : semiring_prop T} MA MB MC,
@@ -2619,8 +2625,29 @@ Theorem bmat_add_assoc :
   → have_same_bmat_struct MB MC
   → (MA + (MB + MC) = (MA + MB) + MC)%BM.
 Proof.
-intros.
-...
+intros * sp * Hssab Hssbc.
+revert MB MC Hssab Hssbc.
+induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
+  destruct MB as [xb| mb]; [ cbn | easy ].
+  destruct MC as [xc| mc]; [ cbn | easy ].
+  now rewrite srng_add_assoc.
+}
+destruct MB as [xb| mb]; [ easy | ].
+destruct MC as [xc| mc]; [ easy | cbn ].
+f_equal.
+apply matrix_eq; [ easy | easy | cbn ].
+intros i j Hi Hj.
+apply IHMA; [ easy | easy | now apply Hssab | ].
+cbn in Hssab, Hssbc.
+destruct Hssab as (Hra & Hca & Hssab).
+destruct Hssbc as (Hrb & Hcb & Hssbc).
+transitivity (mat_el ma i j). {
+  now symmetry; apply Hssab.
+} {
+  transitivity (mat_el mb i j); [ now apply Hssab | ].
+  apply Hssbc; [ now rewrite <- Hra | now rewrite <- Hca ].
+}
+Qed.
 
 Theorem bmat_mul_add_distr_r :
   ∀ T (so : semiring_op T) {sp : semiring_prop T} MA MB MC,
@@ -2686,7 +2713,8 @@ destruct ca; cbn. {
   } {
     apply Hfmbc; [ easy | easy | flia ].
   }
-(* I need associativity of addition *)
+  rewrite bmat_add_assoc; [ | easy | | ]; cycle 1. {
+    cbn.
 ...
 
 (*
