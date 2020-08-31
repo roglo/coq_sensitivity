@@ -2734,10 +2734,17 @@ destruct ca; cbn. {
     cbn.
     apply bmat_fit_for_add_add_l. {
 ...
-Search (_ * _ = _ * _).
+      transitivity (fa i 0 * fc 1 j)%BM. {
+
 Theorem bmat_fit_for_add_mul_cancel_l : ∀ T {so : semiring_op T} MA MB MC,
   bmat_fit_for_add MB MC
   → bmat_fit_for_add (MA * MB)%BM (MA * MC)%BM.
+...
+        apply bmat_fit_for_add_mul_cancel_l.
+...
+apply IHMC.
+...
+Search (_ * _ = _ * _).
 ...
       transitivity (fa i 0 * fc 1 j)%BM. {
         apply bmat_fit_for_add_mul_cancel_l.
