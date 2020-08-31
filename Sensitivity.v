@@ -2070,6 +2070,24 @@ Fixpoint have_same_bmat_struct T (MA MB : bmatrix T) :=
       end
   end.
 
+Fixpoint bmat_fit_for_mul T (MA MB : bmatrix T) :=
+  match MA with
+  | BM_1 xa =>
+      match MB with
+      | BM_1 xb => True
+      | BM_M MMB => False
+      end
+  | BM_M MMA =>
+      match MB with
+      | BM_1 xb => False
+      | BM_M MMB =>
+          mat_ncols MMA = mat_nrows MMB ∧
+          ∀ i, i < mat_nrows MMA →
+          ∀ j k, j < mat_ncols MMB → k < mat_ncols MMA →
+          bmat_fit_for_mul (mat_el MMA i k) (mat_el MMB k j)
+      end
+  end.
+
 Require Import Relations.
 
 Theorem have_same_bmat_struct_refl : ∀ T,
@@ -2572,14 +2590,22 @@ destruct j; [ easy | cbn ].
 destruct j; [ easy | flia Hj ].
 Qed.
 
+Definition mat_el_mul_loop T {so : semiring_op T} f g :=
+  fix mat_el_mul_loop it a (i j k : nat) :=
+     match it with
+     | 0 => a
+     | S it' => mat_el_mul_loop it' (a + f i j * g j k)%BM i (j + 1) k
+     end.
+
 Theorem bmat_mul_add_distr_r :
   ∀ T (so : semiring_op T) {sp : semiring_prop T} MA MB MC,
-  have_same_bmat_struct MA (bmat_transpose MC)
-  → have_same_bmat_struct MB (bmat_transpose MC)
+  have_same_bmat_struct MA MB
+  → bmat_fit_for_mul MA MC
+  → bmat_fit_for_mul MB MC
   → ((MA + MB) * MC = MA * MC + MB * MC)%BM.
 Proof.
-intros * sp * Hssac Hssbc.
-revert MA MB Hssac Hssbc.
+intros * sp * Hssab Hfmac Hfmbc.
+revert MA MB Hssab Hfmac Hfmbc.
 induction MC as [xc| mc IHMC] using bmatrix_ind2; intros. {
   destruct MA as [xa| ma]; [ | easy ].
   destruct MB as [xb| mb]; [ cbn | easy ].
@@ -2589,18 +2615,13 @@ destruct MA as [xa| ma]; [ easy | ].
 destruct MB as [xb| mb]; [ easy | ].
 move ma after mc.
 move mb after mc.
-cbn in Hssac, Hssbc.
-destruct Hssac as (Hrac & Hcac & Hssac).
-destruct Hssbc as (Hrbc & Hcbc & Hssbc).
+cbn in Hssab, Hfmac, Hfmbc.
+destruct Hssab as (Hrab & Hcab & Hssab).
+destruct Hfmac as (Hrcac & Hfmac).
+destruct Hfmbc as (Hrcbc & Hfmbc).
 cbn; f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros i j Hi Hj.
-Definition mat_el_mul_loop T {so : semiring_op T} f g :=
-  fix mat_el_mul_loop it a (i j k : nat) :=
-     match it with
-     | 0 => a
-     | S it' => mat_el_mul_loop it' (a + f i j * g j k)%BM i (j + 1) k
-     end.
 fold
   (mat_el_mul_loop (λ i j, (mat_el ma i j + mat_el mb i j)%BM) (mat_el mc)).
 fold (mat_el_mul_loop (mat_el ma) (mat_el mc)).
@@ -2611,60 +2632,39 @@ destruct mc as (fc, rc, cc).
 cbn in *.
 move fb before fa.
 move fc before fb.
-subst rc cc rb cb.
+subst rb cb rc.
+clear Hrcbc.
 destruct ca. {
   cbn.
-  admit.
+  admit. (* c'est faux, faudra que j'ajoute une hypothèse *)
 }
 rewrite Nat.sub_succ, Nat.sub_0_r.
 destruct ca; cbn. {
-  specialize (IHMC 0 i Nat.lt_0_1 Hi) as H1.
-  specialize (IHMC 0 j Nat.lt_0_1 Hj) as H2.
-  specialize (H1 (fa i 0) (fb i 0)).
-  specialize (H2 (fa i 0) (fb i 0)).
-  specialize (Hssac i 0 Hi Nat.lt_0_1) as H.
-  specialize (H1 H); clear H.
-  specialize (Hssbc i 0 Hi Nat.lt_0_1) as H.
-  specialize (H1 H); clear H.
+  apply IHMC; [ flia | easy | | | ]. {
+    apply Hssab; [ easy | flia ].
+  } {
+    apply Hfmac; [ easy | easy | flia ].
+  } {
+    apply Hfmbc; [ easy | easy | flia ].
+  }
+}
+destruct ca; cbn. {
+  rewrite IHMC; [ | flia | easy | | | ]; cycle 1. {
+    apply Hssab; [ easy | flia ].
+  } {
+    apply Hfmac; [ easy | easy | flia ].
+  } {
+    apply Hfmbc; [ easy | easy | flia ].
+  }
+  rewrite IHMC; [ | flia | easy | | | ]; cycle 1. {
+    apply Hssab; [ easy | flia ].
+  } {
+    apply Hfmac; [ easy | easy | flia ].
+  } {
+    apply Hfmbc; [ easy | easy | flia ].
+  }
+(* I need associativity of addition *)
 ...
-    apply Hssac.
-...
-    transitivity (lla 0 0). 2: {
-      apply Hssac; [ flia Hi | flia ].
-    }
-...
-progress fold (@have_same_list_struct T) in Hssac.
-progress fold (@have_same_list_list_struct T) in Hssac.
-cbn in Hssbc.
-progress fold (@have_same_list_struct T) in Hssbc.
-progress fold (@have_same_list_list_struct T) in Hssbc.
-destruct ma as (lla).
-destruct mb as (llb).
-destruct mc as (llc).
-cbn in IHMC, Hssac, Hssbc |-*.
-f_equal; f_equal.
-progress fold (@bmat_list_add T so).
-progress fold (@bmat_list_list_add T so).
-progress fold (@bmat_list_mul_loop T so).
-progress fold (@bmat_list_list_mul T so (bmat_list_list_add lla llb) llc).
-progress fold (@bmat_list_list_mul T so lla llc).
-progress fold (@bmat_list_list_mul T so llb llc).
-Abort. (* à continuer...
-...
-revert lla llb Hssac Hssbc.
-induction llc as [| lc1]; intros; [ now destruct lla | ].
-destruct lla as [| la1]; [ easy | ].
-destruct llb as [| lb1]; [ easy | ].
-cbn in Hssac, Hssbc.
-destruct Hssac as (Hssac, Hsslac).
-destruct Hssbc as (Hssbc, Hsslbc).
-cbn - [ list_list_transpose ].
-progress fold (@bmat_list_list_mul T so (bmat_list_list_add lla llb) (lc1 :: llc)).
-progress fold (@bmat_list_list_mul T so lla (lc1 :: llc)).
-progress fold (@bmat_list_list_mul T so llb (lc1 :: llc)).
-f_equal. 2: {
-...
-*)
 
 (*
 Theorem bmat_mul_opp_l :
