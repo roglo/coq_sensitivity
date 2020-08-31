@@ -3028,18 +3028,40 @@ apply (IHMA la1); [ now right | easy | easy ].
 Qed.
 
 Theorem list_list_transpose_cons : ∀ T (d : T) l ll,
-  list_list_transpose d (l :: ll) =
-  List_map2 (λ a1 l1, a1 :: l1) l (list_list_transpose d ll).
+  ll ≠ []
+  → (∀ l1, l1 ∈ ll → length l1 = length l)
+  → list_list_transpose d (l :: ll) =
+     List_map2 (λ a1 l1, a1 :: l1) l (list_list_transpose d ll).
 Proof.
-intros.
-cbn.
-revert ll.
-induction l as [| x]; intros; [ easy | ].
-cbn; rewrite IHl.
-clear IHl.
-revert l.
-induction ll as [| l1]; intros; cbn.
-...
+intros * Hll Hlenll; cbn.
+remember (length l) as len eqn:Hlen.
+symmetry in Hlen.
+revert l ll Hlen Hll Hlenll.
+induction len; intros. {
+  now apply length_zero_iff_nil in Hlen; subst l.
+}
+destruct l as [| a]; [ easy | ].
+cbn in Hlen |-*.
+apply Nat.succ_inj in Hlen.
+rewrite IHlen; [ | easy | now destruct ll | ]. 2: {
+  intros l1 Hl1.
+  clear Hll.
+  induction ll as [| l2]; [ easy | ].
+  cbn - [ In ] in Hl1.
+  destruct Hl1 as [Hl1| Hl1]. {
+    specialize (Hlenll l2 (or_introl eq_refl)) as H1.
+    destruct l2 as [| a2]; [ easy | ].
+    cbn in Hl1; subst l2.
+    now apply Nat.succ_inj in H1; rewrite <- H1.
+  }
+  apply IHll; [ | easy ].
+  intros l3 Hl3.
+  now apply Hlenll; right.
+}
+destruct ll as [| l1]; [ easy | clear Hll; cbn ].
+destruct l1 as [| a1]; [ | easy ].
+now specialize (Hlenll _ (or_introl eq_refl)).
+Qed.
 
 Theorem list_list_transpose_opp : ∀ T {ro : ring_op T} d ll,
   list_list_transpose void_bmat (map (map (λ mm, (- mm)%BM)) ll) =
@@ -3049,7 +3071,29 @@ intros.
 set (list_opp := map (λ mm, (- mm)%BM)).
 induction ll as [| l]; [ easy | ].
 cbn - [ list_list_transpose ].
-
+destruct ll as [| l1]. {
+  induction l as [| a]; [ easy | cbn ].
+  f_equal.
+  apply IHl.
+}
+rewrite list_list_transpose_cons; cycle 1. {
+  intros H.
+  now apply map_eq_nil in H.
+} {
+  intros l2 Hl2.
+  cbn in IHll.
+  induction l as [| a]. {
+    cbn.
+    apply in_map_iff in Hl2.
+    destruct Hl2 as (l3 & Hl3o & Hl3).
+    subst l2.
+    unfold list_opp.
+    rewrite map_length.
+    destruct Hl3 as [Hl3| Hl3]. {
+      subst l3.
+      destruct l1 as [| a1]; [ easy | exfalso ].
+      cbn in IHll.
+      injection IHll; clear IHll; intros H1 H2.
 ...
 
 Theorem bmat_mul_opp_opp :
