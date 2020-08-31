@@ -1939,7 +1939,7 @@ Fixpoint bmat_mul T {so : semiring_op T} (MM1 MM2 : bmatrix T) :=
           let mat_el_mul i k :=
             mat_el_mul_loop (mat_ncols MMA - 1)
               (bmat_mul (mat_el MMA i 0) (mat_el MMB 0 k)) i 1 k
-           in
+          in
           let r :=
             {| mat_el i k := mat_el_mul i k;
                mat_nrows := mat_nrows MMA;
@@ -2081,6 +2081,7 @@ Fixpoint bmat_fit_for_mul T (MA MB : bmatrix T) :=
       match MB with
       | BM_1 xb => False
       | BM_M MMB =>
+          mat_ncols MMA ≠ 0 ∧
           mat_ncols MMA = mat_nrows MMB ∧
           ∀ i, i < mat_nrows MMA →
           ∀ j k, j < mat_ncols MMB → k < mat_ncols MMA →
@@ -2617,8 +2618,8 @@ move ma after mc.
 move mb after mc.
 cbn in Hssab, Hfmac, Hfmbc.
 destruct Hssab as (Hrab & Hcab & Hssab).
-destruct Hfmac as (Hrcac & Hfmac).
-destruct Hfmbc as (Hrcbc & Hfmbc).
+destruct Hfmac as (Hca & Hrcac & Hfmac).
+destruct Hfmbc as (Hcb & Hrcbc & Hfmbc).
 cbn; f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros i j Hi Hj.
@@ -2633,12 +2634,8 @@ cbn in *.
 move fb before fa.
 move fc before fb.
 subst rb cb rc.
-clear Hrcbc.
-destruct ca. {
-  cbn.
-  (* c'est faux, faudra que j'ajoute une hypothèse *)...
-...
-}
+clear Hrcbc Hcb.
+destruct ca; [ easy | clear Hca ].
 (* testing with first values of ca, to prepare an induction *)
 rewrite Nat.sub_succ, Nat.sub_0_r.
 destruct ca; cbn. {
