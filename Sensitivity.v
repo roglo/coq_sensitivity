@@ -1783,6 +1783,34 @@ intros k l Hk Hl.
 now apply IHB.
 Qed.
 
+Fixpoint concat_list_in_list T (ll1 ll2 : list (list T)) :=
+  match ll1 with
+  | [] => ll2
+  | l1 :: ll1' =>
+       match ll2 with
+       | [] => ll1
+       | l2 :: ll2' => app l1 l2 :: concat_list_in_list ll1' ll2'
+       end
+  end.
+
+Definition concat_list_list_list T (lll : list (list (list T))) :=
+  fold_left (@concat_list_in_list T) lll [].
+
+Fixpoint list_list_of_bmat T (MM : bmatrix T) : list (list T) :=
+  match MM with
+  | BM_1 x => [[x]]
+  | BM_M MMM =>
+      let ll :=
+        map
+          (λ i,
+             concat_list_list_list
+               (map (λ j, list_list_of_bmat (mat_el MMM i j))
+                  (seq 0 (mat_ncols MMM))))
+          (seq 0 (mat_nrows MMM))
+      in
+      List.concat ll
+  end.
+
 (* transposition *)
 
 Definition mat_transpose T (M : matrix T) : matrix T :=
@@ -1806,6 +1834,38 @@ Compute
   (list_list_of_mat
      (mat_transpose
         (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]))).
+
+Compute
+  (list_list_of_bmat
+     (bmat_transpose
+        (BM_M
+           (mk_mat
+              (λ i j,
+               match (i, j) with
+               | (0, 0) =>
+                    BM_M
+                      (mk_mat
+                         (λ i j,
+                          match (i, j) with
+                          | (0, 0) => BM_1 1 | (0, 1) => BM_1 2 | (0, 2) => BM_1 3
+                          | (1, 0) => BM_1 4 | (1, 1) => BM_1 5 | _ => BM_1 6
+                          end) 2 3)
+               | (0, 1) => BM_1 10
+               | (1, 0) =>
+                   BM_M
+                     (mk_mat
+                        (λ i j,
+                         match j with
+                         | 0 => BM_1 7 | 1 => BM_1 8 | _ => BM_1 9
+                         end) 1 3)
+               | _ =>
+                    BM_M
+                      (mk_mat
+                         (λ i j,
+                          match i with 0 => BM_1 11 | _ => BM_1 12 end)
+                         2 1)
+               end)
+              2 2)))).
 
 (* addition *)
 
@@ -1971,34 +2031,6 @@ Open Scope Z_scope.
 
 About Z_ring_op.
 Compute (let n := 2%nat in let _ := Z_ring_op in let _ := rng_semiring in A n).
-
-Fixpoint concat_list_in_list T (ll1 ll2 : list (list T)) :=
-  match ll1 with
-  | [] => ll2
-  | l1 :: ll1' =>
-       match ll2 with
-       | [] => ll1
-       | l2 :: ll2' => app l1 l2 :: concat_list_in_list ll1' ll2'
-       end
-  end.
-
-Definition concat_list_list_list T (lll : list (list (list T))) :=
-  fold_left (@concat_list_in_list T) lll [].
-
-Fixpoint list_list_of_bmat T (MM : bmatrix T) : list (list T) :=
-  match MM with
-  | BM_1 x => [[x]]
-  | BM_M MMM =>
-      let ll :=
-        map
-          (λ i,
-             concat_list_list_list
-               (map (λ j, list_list_of_bmat (mat_el MMM i j))
-                  (seq 0 (mat_ncols MMM))))
-          (seq 0 (mat_nrows MMM))
-      in
-      List.concat ll
-  end.
 
 Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (I_2_pow n)).
 Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (A n)).
@@ -2582,12 +2614,13 @@ move fc before fb.
 subst rc cc rb cb.
 destruct ca. {
   cbn.
-...
+  admit.
+}
 rewrite Nat.sub_succ, Nat.sub_0_r.
-apply Nat.succ_le_mono in Hj.
 destruct ca; cbn. {
-  apply Nat.le_0_r in Hj; subst j.
-  apply IHMC; [ flia Hi | flia | | ]. {
+  apply IHMC; [ flia Hi | easy | | ]. {
+...
+    apply Hssac.
 ...
     transitivity (lla 0 0). 2: {
       apply Hssac; [ flia Hi | flia ].
