@@ -2857,7 +2857,6 @@ destruct ca; cbn. {
   rewrite bmat_add_assoc; [ | easy | | ]; cycle 1. {
     cbn.
     apply bmat_fit_for_add_add_l. {
-Print bmatrix.
 (* is it true (provable)? or is a hypothesis missing? *)
 ...
       specialize (Hfmac i Hi j 0 Hj Nat.lt_0_2) as H1.
