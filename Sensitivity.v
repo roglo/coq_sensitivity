@@ -2913,31 +2913,27 @@ destruct ca; cbn. {
       specialize (Hcc 0 j Nat.lt_0_2 Hj) as H2.
       specialize (Hcr i 1 Hi Nat.lt_1_2) as H3.
       specialize (Hcc 1 j Nat.lt_1_2 Hj) as H4.
-      remember (fa i 0) as MA.
-      remember (fa i 1) as MB.
-      remember (fc 0 j) as MC.
-      remember (fc 1 j) as MD.
-(*
-      clear - H1 H2 H3 H4.
-*)
-      revert MB MC MD H2 H3 H4 HeqMC HeqMB HeqMD.
-      induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
+      remember (fa i 0) as MA0.
+      remember (fa i 1) as MA1.
+      remember (fc 0 j) as MC0.
+      remember (fc 1 j) as MC1.
+      revert MA1 MC0 MC1 H2 H3 H4 HeqMA1 HeqMC0 HeqMC1.
+      induction MA0 as [xa0| ma0 IHMA] using bmatrix_ind2; intros. {
         clear H1; cbn.
-        destruct MC as [xc| mc]. {
+        destruct MC0 as [xc0| mc0]. {
           clear H2; cbn.
-          destruct MB as [xb| mb]; [ now destruct MD | ].
-          destruct MD as [xd| md]; [ easy | ].
+          destruct MA1 as [xa1| ma1]; [ now destruct MC1 | ].
+          destruct MC1 as [xc1| mc1]; [ easy | ].
           cbn in H3, H4 |-*.
           destruct H3 as (H1, H2).
           destruct H4 as (H3, H4).
-          move xc before xa.
-          move HeqMA before HeqMC.
-          move HeqMB before HeqMA.
+          move xc0 before xa0.
+          move HeqMA0 before HeqMA1.
           specialize (Hccbc 0 1 j Nat.lt_0_2 Nat.lt_1_2 Hj) as H5.
-          rewrite <- HeqMC, <- HeqMD in H5.
+          rewrite <- HeqMC0, <- HeqMC1 in H5.
           cbn in H5; symmetry in H5.
           specialize (Hcrbr i 0 1 Hi Nat.lt_0_2 Nat.lt_1_2) as H6.
-          rewrite <- HeqMA, <- HeqMB in H6.
+          rewrite <- HeqMA0, <- HeqMA1 in H6.
           cbn in H6; symmetry in H6.
 ...
 
