@@ -2777,6 +2777,12 @@ destruct ca; cbn. {
         }
       }
     }
+    remember (fa i 1 * fc 1 j)%BM as MA eqn:HMA.
+    remember (fa i 0 * fb 0 j)%BM as MB eqn:HMB.
+    symmetry in HMA, HMB.
+    move MB before MA.
+    destruct MA as [xa| ma]. {
+      destruct MB as [xb| mb]; [ easy | cbn ].
 ...
 
 Theorem bmat_mul_add_distr_r :
