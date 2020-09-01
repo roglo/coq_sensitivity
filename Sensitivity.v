@@ -2726,6 +2726,7 @@ apply IHMA with (MB := mat_el mb k j); [ easy | easy | | ]. {
 }
 Qed.
 
+(* à finir, si c'est finissable...
 Theorem bmat_fit_for_add_mul_cancel_l : ∀ T {so : semiring_op T} MA MB MC,
   bmat_fit_for_add MB MC
   → bmat_fit_for_mul MA MB
@@ -2777,6 +2778,7 @@ destruct ca; cbn. {
         }
       }
     }
+...
     remember (fa i 1 * fc 1 j)%BM as MA eqn:HMA.
     remember (fa i 0 * fb 0 j)%BM as MB eqn:HMB.
     symmetry in HMA, HMB.
@@ -2784,15 +2786,18 @@ destruct ca; cbn. {
     destruct MA as [xa| ma]. {
       destruct MB as [xb| mb]; [ easy | cbn ].
 ...
+*)
 
 Theorem bmat_mul_add_distr_r :
   ∀ T (so : semiring_op T) {sp : semiring_prop T} MA MB MC,
   bmat_fit_for_add MA MB
   → bmat_fit_for_mul MA MC
-  → bmat_fit_for_mul MB MC
   → ((MA + MB) * MC = MA * MC + MB * MC)%BM.
 Proof.
-intros * sp * Hssab Hfmac Hfmbc.
+intros * sp * Hssab Hfmac.
+assert (Hfmbc : bmat_fit_for_mul MB MC). {
+  apply (bmat_fit_for_add_mul_mul _ MA); [ now symmetry | easy ].
+}
 revert MA MB Hssab Hfmac Hfmbc.
 induction MC as [xc| mc IHMC] using bmatrix_ind2; intros. {
   destruct MA as [xa| ma]; [ | easy ].
