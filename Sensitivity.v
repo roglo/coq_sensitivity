@@ -2935,6 +2935,9 @@ destruct ca; cbn. {
           specialize (Hccbc 0 1 j Nat.lt_0_2 Nat.lt_1_2 Hj) as H5.
           rewrite <- HeqMC, <- HeqMD in H5.
           cbn in H5; symmetry in H5.
+          specialize (Hcrbr i 0 1 Hi Nat.lt_0_2 Nat.lt_1_2) as H6.
+          rewrite <- HeqMA, <- HeqMB in H6.
+          cbn in H6; symmetry in H6.
 ...
 
 (*
