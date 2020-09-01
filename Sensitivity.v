@@ -2932,6 +2932,9 @@ destruct ca; cbn. {
           destruct H4 as (H3, H4).
           move xc before xa.
           move HeqMA before HeqMC.
+          specialize (Hccbc 0 1 j Nat.lt_0_2 Nat.lt_1_2 Hj) as H5.
+          rewrite <- HeqMC, <- HeqMD in H5.
+          cbn in H5; symmetry in H5.
 ...
 
 (*
