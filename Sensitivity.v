@@ -2666,6 +2666,66 @@ rewrite (bmat_add_comm MA MB); [ | easy ].
 apply bmat_add_add_swap; [ easy | easy | now symmetry ].
 Qed.
 
+Theorem bmat_fit_for_add_mul_mul :
+  ∀ T {so : semiring_op T} (MA MB MC : bmatrix T),
+  bmat_fit_for_add MA MB
+  → bmat_fit_for_mul MB MC
+  → bmat_fit_for_mul MA MC.
+Proof.
+intros * so * Hfa Hfm.
+revert MB MC Hfa Hfm.
+induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
+  now destruct MB, MC.
+}
+destruct MB as [xb| mb]; [ now destruct MC | ].
+destruct MC as [xc| mc]; [ easy | ].
+cbn in Hfa, Hfm |-*.
+destruct Hfa as (Hrr & Hcc & Hfa).
+destruct Hfm as (Hb & Hbc & Hfm).
+rewrite <- Hcc in Hb, Hbc.
+split; [ easy | ].
+split; [ easy | ].
+intros * Hi * Hj Hk.
+move j before i; move k before j.
+apply IHMA with (MB := mat_el mb i k); [ easy | easy | | ]. {
+  now apply Hfa.
+} {
+  rewrite Hrr in Hi.
+  rewrite Hcc in Hk.
+  now apply Hfm.
+}
+Qed.
+
+Theorem bmat_fit_for_mul_add_mul :
+  ∀ T {so : semiring_op T} (MA MB MC : bmatrix T),
+  bmat_fit_for_mul MA MB
+  → bmat_fit_for_add MB MC
+  → bmat_fit_for_mul MA MC.
+Proof.
+intros * so * Hfa Hfm.
+revert MB MC Hfa Hfm.
+induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
+  now destruct MB, MC.
+}
+destruct MB as [xb| mb]; [ now destruct MC | ].
+destruct MC as [xc| mc]; [ easy | ].
+cbn in Hfa, Hfm |-*.
+destruct Hfa as (Hrr & Hcc & Hfa).
+destruct Hfm as (Hb & Hbc & Hfm).
+rewrite <- Hcc in Hb.
+split; [ easy | ].
+split; [ easy | ].
+intros * Hi * Hj Hk.
+move j before i; move k before j.
+rewrite <- Hbc in Hj.
+apply IHMA with (MB := mat_el mb k j); [ easy | easy | | ]. {
+  now apply Hfa.
+} {
+  rewrite Hcc in Hk.
+  now apply Hfm.
+}
+Qed.
+
 Theorem bmat_fit_for_add_mul_cancel_l : ∀ T {so : semiring_op T} MA MB MC,
   bmat_fit_for_add MB MC
   → bmat_fit_for_mul MA MB
@@ -2710,6 +2770,13 @@ destruct ca; cbn. {
         symmetry.
         apply Hfa; [ flia | easy ].
       } {
+        apply bmat_fit_for_mul_add_mul with (MB := fb 0 j); [ easy | | ]. {
+          apply Hfm; [ easy | easy | flia ].
+        } {
+          apply Hfa; [ flia | easy ].
+        }
+      }
+    }
 ...
 
 Theorem bmat_mul_add_distr_r :
