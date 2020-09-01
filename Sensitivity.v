@@ -2788,17 +2788,51 @@ destruct ca; cbn. {
 ...
 *)
 
+Definition bmat_nrows T (A : bmatrix T) :=
+  match A with
+  | BM_1 _ => 1
+  | BM_M M => mat_nrows M
+  end.
+
+Definition bmat_ncols T (A : bmatrix T) :=
+  match A with
+  | BM_1 _ => 1
+  | BM_M M => mat_ncols M
+  end.
+
+Fixpoint bmat_has_constant_nrows T (A : bmatrix T) :=
+  match A with
+  | BM_1 _ => True
+  | BM_M M =>
+      (∀ i j k, i < mat_nrows M → j < mat_ncols M → k < mat_ncols M →
+       bmat_nrows (mat_el M i j) = bmat_nrows (mat_el M i k)) ∧
+      (∀ i j, i < mat_nrows M → j < mat_ncols M →
+       bmat_has_constant_nrows (mat_el M i j))
+end.
+
+Fixpoint bmat_has_constant_ncols T (A : bmatrix T) :=
+  match A with
+  | BM_1 _ => True
+  | BM_M M =>
+      (∀ i j k, i < mat_nrows M → j < mat_nrows M → k < mat_ncols M →
+       bmat_ncols (mat_el M i k) = bmat_ncols (mat_el M j k)) ∧
+      (∀ i j, i < mat_nrows M → j < mat_ncols M →
+       bmat_has_constant_ncols (mat_el M i j))
+end.
+
 Theorem bmat_mul_add_distr_r :
   ∀ T (so : semiring_op T) {sp : semiring_prop T} MA MB MC,
-  bmat_fit_for_add MA MB
+  bmat_has_constant_nrows MA
+  → bmat_has_constant_ncols MC
+  → bmat_fit_for_add MA MB
   → bmat_fit_for_mul MA MC
   → ((MA + MB) * MC = MA * MC + MB * MC)%BM.
 Proof.
-intros * sp * Hssab Hfmac.
+intros * sp * Hcr Hcc Hssab Hfmac.
 assert (Hfmbc : bmat_fit_for_mul MB MC). {
   apply (bmat_fit_for_add_mul_mul _ MA); [ now symmetry | easy ].
 }
-revert MA MB Hssab Hfmac Hfmbc.
+revert MA MB Hcr Hssab Hfmac Hfmbc.
 induction MC as [xc| mc IHMC] using bmatrix_ind2; intros. {
   destruct MA as [xa| ma]; [ | easy ].
   destruct MB as [xb| mb]; [ cbn | easy ].
@@ -2808,7 +2842,9 @@ destruct MA as [xa| ma]; [ easy | ].
 destruct MB as [xb| mb]; [ easy | ].
 move ma after mc.
 move mb after mc.
-cbn in Hssab, Hfmac, Hfmbc.
+cbn in Hcr, Hcc, Hssab, Hfmac, Hfmbc.
+destruct Hcr as (Hcrbr & Hcr).
+destruct Hcc as (Hccbc & Hcc).
 destruct Hssab as (Hrab & Hcab & Hssab).
 destruct Hfmac as (Hca & Hrcac & Hfmac).
 destruct Hfmbc as (Hcb & Hrcbc & Hfmbc).
@@ -2831,7 +2867,11 @@ destruct ca; [ easy | clear Hca ].
 (* testing with first values of ca, to prepare an induction *)
 rewrite Nat.sub_succ, Nat.sub_0_r.
 destruct ca; cbn. {
-  apply IHMC; [ flia | easy | | | ]. {
+  apply IHMC; [ flia | easy | | | | | ]. {
+    apply Hcc; [ flia | easy ].
+  } {
+    apply Hcr; [ easy | flia ].
+  } {
     apply Hssab; [ easy | flia ].
   } {
     apply Hfmac; [ easy | easy | flia ].
@@ -2840,14 +2880,22 @@ destruct ca; cbn. {
   }
 }
 destruct ca; cbn. {
-  rewrite IHMC; [ | flia | easy | | | ]; cycle 1. {
+  rewrite IHMC; [ | flia | easy | | | | | ]; cycle 1. {
+    apply Hcc; [ flia | easy ].
+  } {
+    apply Hcr; [ easy | flia ].
+  } {
     apply Hssab; [ easy | flia ].
   } {
     apply Hfmac; [ easy | easy | flia ].
   } {
     apply Hfmbc; [ easy | easy | flia ].
   }
-  rewrite IHMC; [ | flia | easy | | | ]; cycle 1. {
+  rewrite IHMC; [ | flia | easy | | | | | ]; cycle 1. {
+    apply Hcc; [ flia | easy ].
+  } {
+    apply Hcr; [ easy | flia ].
+  } {
     apply Hssab; [ easy | flia ].
   } {
     apply Hfmac; [ easy | easy | flia ].
@@ -2857,49 +2905,8 @@ destruct ca; cbn. {
   rewrite bmat_add_assoc; [ | easy | | ]; cycle 1. {
     cbn.
     apply bmat_fit_for_add_add_l. {
-(* is it true (provable)? or is a hypothesis missing? *)
-...
-      specialize (Hfmac i Hi j 0 Hj Nat.lt_0_2) as H1.
-      specialize (Hfmac i Hi j 1 Hj Nat.lt_1_2) as H2.
-      remember (fa i 0) as ma0 eqn:Hma0.
-      remember (fc 0 j) as mc0 eqn:Hmc0.
-      remember (fa i 1) as ma1 eqn:Hma1.
-      remember (fc 1 j) as mc1 eqn:Hmc1.
-      move ma1 before ma0; move mc0 before ma1; move mc1 before mc0.
-      move H1 before H2.
-      symmetry in Hma0, Hmc0, Hma1, Hmc1.
-      destruct ma0 as [xa0| ma0]. {
-        cbn in H1 |-*.
-        destruct mc0 as [xc0| mc0]; [ clear H1 | easy ].
-        cbn in H2 |-*.
-        destruct ma1 as [xa1| ma1]; [ now destruct mc1 | ].
-        destruct mc1 as [xc1| mc1]; [ easy | ].
-        cbn in H2 |-*.
-        destruct H2 as (Hc1 & Hcr1 & H2).
-...
-      transitivity (fa i 0 * fc 1 j)%BM. {
-...
-        apply bmat_fit_for_add_mul_cancel_l.
-...
-apply IHMC.
-...
-Search (_ * _ = _ * _).
-...
-      transitivity (fa i 0 * fc 1 j)%BM. {
-        apply bmat_fit_for_add_mul_cancel_l.
-...
-        transitivity (fa 1 j). {
-          symmetry.
-Search bmat_fit_for_add.
-apply IHMC.
-...
-Theorem bmat_fit_for_add_mul_l : ∀ T {so : semiring_op T} MA MB MC,
-  bmat_fit_for_add MA MC
-  → bmat_fit_for_mul MA MB
-  → bmat_fit_for_add (MA * MB)%BM MC.
-Proof.
-intros * Hssac Hssbc.
-(* ah bin non *)
+      clear - Hcr Hcc. (* bon, c'est un peu osé, mais c'est pour dire
+                          que Hcr et Hcc sont censés faire le boulot *)
 ...
 
 (*
