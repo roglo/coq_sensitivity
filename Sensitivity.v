@@ -2857,6 +2857,23 @@ destruct ca; cbn. {
   rewrite bmat_add_assoc; [ | easy | | ]; cycle 1. {
     cbn.
     apply bmat_fit_for_add_add_l. {
+      specialize (Hfmac i Hi j 0 Hj Nat.lt_0_2) as H1.
+      specialize (Hfmac i Hi j 1 Hj Nat.lt_1_2) as H2.
+      remember (fa i 0) as ma0 eqn:Hma0.
+      remember (fc 0 j) as mc0 eqn:Hmc0.
+      remember (fa i 1) as ma1 eqn:Hma1.
+      remember (fc 1 j) as mc1 eqn:Hmc1.
+      move ma1 before ma0; move mc0 before ma1; move mc1 before mc0.
+      move H1 before H2.
+      symmetry in Hma0, Hmc0, Hma1, Hmc1.
+      destruct ma0 as [xa0| ma0]. {
+        cbn in H1 |-*.
+        destruct mc0 as [xc0| mc0]; [ clear H1 | easy ].
+        cbn in H2 |-*.
+        destruct ma1 as [xa1| ma1]; [ now destruct mc1 | ].
+        destruct mc1 as [xc1| mc1]; [ easy | ].
+        cbn in H2 |-*.
+        destruct H2 as (Hc1 & Hcr1 & H2).
 ...
       transitivity (fa i 0 * fc 1 j)%BM. {
 ...
