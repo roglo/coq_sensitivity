@@ -2788,16 +2788,18 @@ destruct ca; cbn. {
 ...
 *)
 
-Definition bmat_nrows T (A : bmatrix T) :=
-  match A with
-  | BM_1 _ => 1
-  | BM_M M => mat_nrows M
+Definition bmat_same_nrows T (MA MB : bmatrix T) :=
+  match (MA, MB) with
+  | (BM_1 _, BM_1 _) => True
+  | (BM_M ma, BM_M mb) => mat_nrows ma = mat_nrows mb
+  | _ => False
   end.
 
-Definition bmat_ncols T (A : bmatrix T) :=
-  match A with
-  | BM_1 _ => 1
-  | BM_M M => mat_ncols M
+Definition bmat_same_ncols T (MA MB : bmatrix T) :=
+  match (MA, MB) with
+  | (BM_1 _, BM_1 _) => True
+  | (BM_M ma, BM_M mb) => mat_ncols ma = mat_ncols mb
+  | _ => False
   end.
 
 Fixpoint bmat_has_constant_nrows T (A : bmatrix T) :=
@@ -2805,7 +2807,7 @@ Fixpoint bmat_has_constant_nrows T (A : bmatrix T) :=
   | BM_1 _ => True
   | BM_M M =>
       (∀ i j k, i < mat_nrows M → j < mat_ncols M → k < mat_ncols M →
-       bmat_nrows (mat_el M i j) = bmat_nrows (mat_el M i k)) ∧
+       bmat_same_nrows (mat_el M i j) (mat_el M i k)) ∧
       (∀ i j, i < mat_nrows M → j < mat_ncols M →
        bmat_has_constant_nrows (mat_el M i j))
 end.
@@ -2815,7 +2817,7 @@ Fixpoint bmat_has_constant_ncols T (A : bmatrix T) :=
   | BM_1 _ => True
   | BM_M M =>
       (∀ i j k, i < mat_nrows M → j < mat_nrows M → k < mat_ncols M →
-       bmat_ncols (mat_el M i k) = bmat_ncols (mat_el M j k)) ∧
+       bmat_same_ncols (mat_el M i k) (mat_el M j k)) ∧
       (∀ i j, i < mat_nrows M → j < mat_ncols M →
        bmat_has_constant_ncols (mat_el M i j))
 end.
@@ -2842,7 +2844,7 @@ destruct MA as [xa| ma]; [ easy | ].
 destruct MB as [xb| mb]; [ easy | ].
 move ma after mc.
 move mb after mc.
-cbn in Hcr, Hcc, Hssab, Hfmac, Hfmbc.
+cbn - [ bmat_same_nrows bmat_same_ncols ] in Hcr, Hcc, Hssab, Hfmac, Hfmbc.
 destruct Hcr as (Hcrbr & Hcr).
 destruct Hcc as (Hccbc & Hcc).
 destruct Hssab as (Hrab & Hcab & Hssab).
@@ -2858,7 +2860,7 @@ fold (mat_el_mul_loop (mat_el mb) (mat_el mc)).
 destruct ma as (fa, ra, ca).
 destruct mb as (fb, rb, cb).
 destruct mc as (fc, rc, cc).
-cbn in *.
+cbn - [ bmat_same_nrows bmat_same_ncols ] in *.
 move fb before fa.
 move fc before fb.
 subst rb cb rc.
@@ -2905,9 +2907,6 @@ destruct ca; cbn. {
   rewrite bmat_add_assoc; [ | easy | | ]; cycle 1. {
     cbn.
     apply bmat_fit_for_add_add_l. {
-(*
-      clear - Hfmac Hcr Hcc Hi Hj.
-*)
       (* lemma to do *)
       specialize (Hcr i 0 Hi Nat.lt_0_2) as H1.
       specialize (Hcc 0 j Nat.lt_0_2 Hj) as H2.
@@ -2917,24 +2916,29 @@ destruct ca; cbn. {
       remember (fa i 1) as MA1.
       remember (fc 0 j) as MC0.
       remember (fc 1 j) as MC1.
-      revert MA1 MC0 MC1 H2 H3 H4 HeqMA1 HeqMC0 HeqMC1.
+      revert MA1 MC0 MC1 H2 H3 H4 HeqMA0 HeqMA1 HeqMC0 HeqMC1.
       induction MA0 as [xa0| ma0 IHMA] using bmatrix_ind2; intros. {
         clear H1; cbn.
-        destruct MC0 as [xc0| mc0]. {
-          clear H2; cbn.
-          destruct MA1 as [xa1| ma1]; [ now destruct MC1 | ].
-          destruct MC1 as [xc1| mc1]; [ easy | ].
-          cbn in H3, H4 |-*.
-          destruct H3 as (H1, H2).
-          destruct H4 as (H3, H4).
-          move xc0 before xa0.
-          move HeqMA0 before HeqMA1.
-          specialize (Hccbc 0 1 j Nat.lt_0_2 Nat.lt_1_2 Hj) as H5.
-          rewrite <- HeqMC0, <- HeqMC1 in H5.
-          cbn in H5; symmetry in H5.
-          specialize (Hcrbr i 0 1 Hi Nat.lt_0_2 Nat.lt_1_2) as H6.
-          rewrite <- HeqMA0, <- HeqMA1 in H6.
-          cbn in H6; symmetry in H6.
+        destruct MA1 as [xa1| ma1]; [ now destruct MC0, MC1 | ].
+        specialize (Hcrbr i 0 1 Hi Nat.lt_0_2 Nat.lt_1_2) as H1.
+        now rewrite <- HeqMA0, <- HeqMA1 in H1.
+      }
+      destruct MA1 as [xa1| ma1]. {
+        clear H1; cbn.
+        specialize (Hcrbr i 0 1 Hi Nat.lt_0_2 Nat.lt_1_2) as H1.
+        now rewrite <- HeqMA0, <- HeqMA1 in H1.
+      }
+      destruct MC0 as [xc0| mc0]. {
+        destruct MC1 as [xc1| mc1]; [ easy | ].
+        clear H1.
+        specialize (Hccbc 0 1 j Nat.lt_0_2 Nat.lt_1_2 Hj) as H1.
+        now rewrite <- HeqMC0, <- HeqMC1 in H1; cbn in H1.
+      }
+      destruct MC1 as [xc1| mc1]. {
+        clear H1.
+        specialize (Hccbc 0 1 j Nat.lt_0_2 Nat.lt_1_2 Hj) as H1.
+        now rewrite <- HeqMC0, <- HeqMC1 in H1; cbn in H1.
+      }
 ...
 
 (*
