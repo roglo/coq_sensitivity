@@ -2939,6 +2939,20 @@ destruct ca; cbn. {
         specialize (Hccbc 0 1 j Nat.lt_0_2 Nat.lt_1_2 Hj) as H1.
         now rewrite <- HeqMC0, <- HeqMC1 in H1; cbn in H1.
       }
+      cbn.
+      split. {
+        specialize (Hcrbr i 0 1 Hi Nat.lt_0_2 Nat.lt_1_2) as H5.
+        cbn in H5.
+        now rewrite <- HeqMA0, <- HeqMA1 in H5.
+      }
+      split. {
+        specialize (Hccbc 0 1 j Nat.lt_0_2 Nat.lt_1_2 Hj) as H5.
+        cbn in H5.
+        now rewrite <- HeqMC0, <- HeqMC1 in H5.
+      }
+      intros i' j' Hi' Hj'.
+      fold (mat_el_mul_loop (mat_el ma0) (mat_el mc0)).
+      fold (mat_el_mul_loop (mat_el ma1) (mat_el mc1)).
 ...
 
 (*
