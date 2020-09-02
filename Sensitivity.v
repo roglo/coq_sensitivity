@@ -2888,6 +2888,7 @@ destruct rc; cbn. {
   } {
     apply Hc; [ flia | easy ].
   } {
+    specialize (Hac i 0) as H1.
 ...
 
 Theorem bmat_mul_add_distr_r :
