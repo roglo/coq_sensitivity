@@ -2937,10 +2937,37 @@ rewrite IHMC; [ | flia Hi | easy | ]. 2: {
     remember (fc 0 j) as BMc eqn:HBMc; symmetry in HBMc.
     destruct BMc as [xc| mc]; [ easy | cbn ].
     remember (fa i 0) as BMa eqn:HBMa; symmetry in HBMa.
-    remember (fb i 0) as BMb eqn:HBMb; symmetry in HBMb.
     destruct BMa as [xa| ma]. {
       cbn.
+      specialize (Hc 0 j) as H1.
+      assert (H : 0 < ra) by flia Hi.
+      specialize (H1 H Hj); clear H.
+      rewrite HBMc in H1; cbn in H1.
+      specialize (Hc 0 0) as H2.
+      assert (H : 0 < ra) by flia Hi.
+      specialize (H2 H H); clear H.
+      remember (fc 0 0) as BMc' eqn:HBMc'; symmetry in HBMc'.
+      destruct BMc' as [xc'| mc']; [ easy | ].
+      cbn in H1, H2.
+      specialize (Hc i 0 Hi) as H3.
+      assert (H : 0 < ra) by flia Hi.
+      specialize (H3 H); clear H.
+      remember (fc i 0) as BMc'' eqn:HBMc''; symmetry in HBMc''.
+      destruct BMc'' as [xc''| mc'']. {
+        specialize (Hc i 0 Hi) as H4.
+        assert (H : 0 < ra) by flia Hi.
+        specialize (H4 H); clear H.
+(* mouais, bon, j'ai l'impression que ce mat_nrows = 0, issu de bmat_nrows
+   n'est pas bon ; faut revoir les définitions *)
 ...
+        rewrite HBMc'' in H4; cbn in H4.
+...
+      specialize (Ha i 0 Hi) as H1.
+      assert (H : 0 < ra) by flia Hi.
+      specialize (H1 H); clear H.
+      rewrite HBMa in H1; cbn in H1.
+...
+      remember (fb i 0) as BMb eqn:HBMb; symmetry in HBMb.
       specialize (Hac i 0) as H1.
       rewrite HBMa in H1.
       destruct BMb as [xb| mb]. {
