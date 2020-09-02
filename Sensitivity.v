@@ -2831,24 +2831,63 @@ Fixpoint is_square_bmat T (M : bmatrix T) :=
       is_square_bmat (mat_el MM i j)
   end.
 
+Fixpoint bmat_have_same_struct T (BMA BMB : bmatrix T) :=
+  match (BMA, BMB) with
+  | (BM_1 _, BM_1 _) => True
+  | (BM_M ma, BM_M mb) =>
+       mat_nrows ma = mat_nrows mb ∧
+       mat_ncols ma = mat_ncols mb ∧
+       ∀ i j, bmat_have_same_struct (mat_el ma i j) (mat_el mb i j)
+  | _ => False
+  end.
+
 Theorem bmat_mul_add_distr_r :
   ∀ T (so : semiring_op T) {sp : semiring_prop T} (MA MB MC : bmatrix T),
   is_square_bmat MA
   → is_square_bmat MB
   → is_square_bmat MC
+  → bmat_have_same_struct MA MC
+  → bmat_have_same_struct MB MC
   → ((MA + MB) * MC = MA * MC + MB * MC)%BM.
 Proof.
-intros * sp * Ha Hb Hc.
-revert MA MB Ha Hb Hc.
+intros * sp * Ha Hb Hc Hac Hbc.
+revert MA MB Ha Hb Hc Hac Hbc.
 induction MC as [xc| mc IHMC] using bmatrix_ind2; intros. {
   clear Hc.
-  destruct MA as [xa| ma]. {
-    clear Ha; cbn.
-    destruct MB as [xb| mb]. {
-      clear Hb; cbn.
-      now rewrite srng_mul_add_distr_r.
-    }
-    cbn in Hb |-*.
+  destruct MA as [xa| ma]; [ | easy ].
+  destruct MB as [xb| mb]; [ | easy ].
+  clear Ha Hb Hac Hbc.
+  now cbn; rewrite srng_mul_add_distr_r.
+}
+destruct MA as [xa| ma]; [ easy | ].
+destruct MB as [xb| mb]; [ easy | ].
+cbn; f_equal.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros i j Hi Hj.
+destruct ma as (fa, ra, ca).
+destruct mb as (fb, rb, cb).
+destruct mc as (fc, rc, cc).
+cbn in *.
+destruct Ha as (H, Ha); subst ca.
+destruct Hb as (H, Hb); subst cb.
+destruct Hc as (H, Hc); subst cc.
+destruct Hac as (H1 & H2 & Hac); subst ra; clear H2.
+destruct Hbc as (H1 & H2 & Hbc); subst rb; clear H2.
+fold (mat_el_mul_loop (λ i j, (fa i j + fb i j)%BM) fc).
+fold (mat_el_mul_loop fa fc).
+fold (mat_el_mul_loop fb fc).
+move fa after fc; move fb after fc.
+move Hc before Hb.
+destruct rc; [ flia Hi | cbn ].
+rewrite Nat.sub_0_r.
+destruct rc; cbn. {
+  apply IHMC; [ flia | easy | | | | | ]. {
+    apply Ha; [ easy | flia ].
+  } {
+    apply Hb; [ easy | flia ].
+  } {
+    apply Hc; [ flia | easy ].
+  } {
 ...
 
 Theorem bmat_mul_add_distr_r :
