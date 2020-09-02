@@ -2839,6 +2839,16 @@ Theorem bmat_mul_add_distr_r :
   → ((MA + MB) * MC = MA * MC + MB * MC)%BM.
 Proof.
 intros * sp * Ha Hb Hc.
+revert MA MB Ha Hb Hc.
+induction MC as [xc| mc IHMC] using bmatrix_ind2; intros. {
+  clear Hc.
+  destruct MA as [xa| ma]. {
+    clear Ha; cbn.
+    destruct MB as [xb| mb]. {
+      clear Hb; cbn.
+      now rewrite srng_mul_add_distr_r.
+    }
+    cbn in Hb |-*.
 ...
 
 Theorem bmat_mul_add_distr_r :
