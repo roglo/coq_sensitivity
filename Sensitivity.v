@@ -2822,18 +2822,19 @@ Fixpoint bmat_has_constant_ncols T (A : bmatrix T) :=
        bmat_has_constant_ncols (mat_el M i j))
 end.
 
+Definition bmat_nrows T (M : bmatrix T) :=
+  match M with
+  | BM_1 _ => 0
+  | BM_M m => mat_nrows m
+  end.
+
 Fixpoint is_square_bmat T (M : bmatrix T) n :=
   match M with
   | BM_1 _ => True
   | BM_M MM =>
       mat_nrows MM = n ∧
       mat_ncols MM = n ∧
-      let n :=
-         match mat_el MM 0 0 with
-         | BM_1 _ => 0
-         | BM_M m => mat_nrows m
-         end
-      in
+      let n := bmat_nrows (mat_el MM 0 0) in
       ∀ i j, i < mat_nrows MM → j < mat_ncols MM →
       is_square_bmat (mat_el MM i j) n
   end.
@@ -2848,8 +2849,10 @@ Fixpoint bmat_have_same_struct T (BMA BMB : bmatrix T) :=
   | _ => False
   end.
 
+Print bmat_nrows.
+
 Definition bmat_fit_for_distr_r T (MA MB MC : bmatrix T) :=
-  let n := match MA with BM_1 _ => 0 | BM_M M => mat_nrows M end in
+  let n := bmat_nrows MA in
   is_square_bmat MA n ∧ is_square_bmat MB n ∧ is_square_bmat MC n ∧
   bmat_have_same_struct MA MC ∧ bmat_have_same_struct MB MC.
 
@@ -2904,7 +2907,7 @@ rewrite IHMC; [ | flia Hi | easy | ]. 2: {
       specialize (Hbc i 0) as H2.
       rewrite HBMa in H1.
       rewrite HBMb in H2.
-      cbn in H1, H2.
+      cbn in H1(*, H2*).
       now destruct (fc i 0).
     }
     move ma after mb.
@@ -2922,6 +2925,7 @@ rewrite IHMC; [ | flia Hi | easy | ]. 2: {
     destruct (fc i 0) as [x| M]; [ easy | ].
     destruct H4 as (H41 & H42 & H43).
     destruct H5 as (H51 & H52 & H53).
+    cbn.
     split; [ congruence | ].
     split; [ congruence | ].
     specialize (Hb i 0 Hi) as H1'.
@@ -2930,7 +2934,55 @@ rewrite IHMC; [ | flia Hi | easy | ]. 2: {
     now rewrite HBMb in H1'; cbn in H1'.
   }
   split. {
+    remember (fc 0 j) as BMc eqn:HBMc; symmetry in HBMc.
+    destruct BMc as [xc| mc]; [ easy | cbn ].
+    remember (fa i 0) as BMa eqn:HBMa; symmetry in HBMa.
+    remember (fb i 0) as BMb eqn:HBMb; symmetry in HBMb.
+    destruct BMa as [xa| ma]. {
+      cbn.
 ...
+      specialize (Hac i 0) as H1.
+      rewrite HBMa in H1.
+      destruct BMb as [xb| mb]. {
+        destruct (fc i 0); [ | easy ].
+        cbn.
+...
+        specialize (Hac i 0) as H1.
+        specialize (Hbc i 0) as H2.
+        rewrite HBMa in H1.
+        rewrite HBMb in H2.
+        cbn in H1, H2.
+...
+    }
+    move ma after mb.
+    specialize (Ha i 0 Hi) as H1.
+    assert (H : 0 < ra) by flia Hi.
+    specialize (H1 H); clear H.
+    rewrite HBMa in H1; cbn in H1.
+    destruct H1 as (H1 & H2 & H3).
+    rewrite <- H1 in H2.
+    specialize (Hac i 0) as H4.
+    specialize (Hbc i 0) as H5.
+    rewrite HBMa in H4.
+    rewrite HBMb in H5.
+    cbn in H4, H5.
+    destruct (fc i 0) as [x| M]; [ easy | ].
+    destruct H4 as (H41 & H42 & H43).
+    destruct H5 as (H51 & H52 & H53).
+    cbn.
+    split; [ congruence | ].
+    split; [ congruence | ].
+    specialize (Hb i 0 Hi) as H1'.
+    assert (H : 0 < ra) by flia Hi.
+    specialize (H1' H); clear H.
+    now rewrite HBMb in H1'; cbn in H1'.
+  }
+...
+  ============================
+  is_square_bmat (fb i 0) match fa i 0 with
+                          | BM_1 _ => 0
+                          | BM_M M => mat_nrows M
+                          end
 
 Theorem bmat_mul_add_distr_r :
   ∀ T (so : semiring_op T) {sp : semiring_prop T} (MA MB MC : bmatrix T) n,
