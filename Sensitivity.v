@@ -2822,6 +2822,25 @@ Fixpoint bmat_has_constant_ncols T (A : bmatrix T) :=
        bmat_has_constant_ncols (mat_el M i j))
 end.
 
+Fixpoint is_square_bmat T (M : bmatrix T) :=
+  match M with
+  | BM_1 _ => True
+  | BM_M MM =>
+      mat_nrows MM = mat_ncols MM ∧
+      ∀ i j, i < mat_nrows MM → j < mat_ncols MM →
+      is_square_bmat (mat_el MM i j)
+  end.
+
+Theorem bmat_mul_add_distr_r :
+  ∀ T (so : semiring_op T) {sp : semiring_prop T} (MA MB MC : bmatrix T),
+  is_square_bmat MA
+  → is_square_bmat MB
+  → is_square_bmat MC
+  → ((MA + MB) * MC = MA * MC + MB * MC)%BM.
+Proof.
+intros * sp * Ha Hb Hc.
+...
+
 Theorem bmat_mul_add_distr_r :
   ∀ T (so : semiring_op T) {sp : semiring_prop T} MA MB MC,
   bmat_has_constant_nrows MA
