@@ -2954,9 +2954,8 @@ rewrite IHMC; [ | flia Hi | easy | ]. 2: {
       specialize (H3 H); clear H.
       remember (fc i 0) as BMc'' eqn:HBMc''; symmetry in HBMc''.
       destruct BMc'' as [xc''| mc'']. {
-        specialize (Hc i 0 Hi) as H4.
-        assert (H : 0 < ra) by flia Hi.
-        specialize (H4 H); clear H.
+        clear H3.
+        move HBMc before HBMc''.
 (* mouais, bon, j'ai l'impression que ce mat_nrows = 0, issu de bmat_nrows
    n'est pas bon ; faut revoir les définitions *)
 ...
