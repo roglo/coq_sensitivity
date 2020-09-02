@@ -2878,25 +2878,29 @@ fold (mat_el_mul_loop fa fc).
 fold (mat_el_mul_loop fb fc).
 move fa after fc; move fb after fc.
 move Hc before Hb.
+rewrite IHMC.
+remember (fa i 0 * fc 0 j)%BM as x eqn:Hx.
+remember (fb i 0 * fc 0 j)%BM as y eqn:Hy.
+clear Hx Hy.
 destruct rc; [ flia Hi | cbn ].
 rewrite Nat.sub_0_r.
-destruct rc; cbn. {
-  apply Nat.lt_1_r in Hi.
-  apply Nat.lt_1_r in Hj.
-  subst i j.
-  specialize Nat.lt_0_1 as H.
-  apply IHMC; [ easy | easy | | | | | ]. {
-    now apply Ha.
-  } {
-    now apply Hb.
-  } {
-    now apply Hc.
-  } {
-    apply Hac.
-  } {
-    apply Hbc.
-  }
-}
+apply Nat.succ_le_mono in Hi.
+apply Nat.succ_le_mono in Hj.
+remember 1 as k; clear Heqk.
+revert x y k.
+induction rc; intros; [ easy | cbn ].
+rewrite IHMC.
+remember (x + y + (fa i k * fc k j + fb i k * fc k j))%BM as z eqn:Hz.
+rewrite bmat_add_assoc in Hz.
+rewrite (bmat_add_comm x) in Hz.
+rewrite <- (bmat_add_assoc y) in Hz.
+rewrite bmat_add_comm in Hz.
+rewrite bmat_add_assoc in Hz.
+rewrite (bmat_add_comm _ y) in Hz.
+rewrite bmat_add_comm in Hz.
+subst z.
+apply IHrc.
+(* truc genre *)
 ...
 
 Theorem bmat_mul_add_distr_r :
