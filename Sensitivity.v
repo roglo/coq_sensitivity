@@ -2878,7 +2878,19 @@ fold (mat_el_mul_loop fa fc).
 fold (mat_el_mul_loop fb fc).
 move fa after fc; move fb after fc.
 move Hc before Hb.
-rewrite IHMC.
+rewrite IHMC; [ | flia Hi | easy | | | | | ]; cycle 1. {
+  apply Ha; [ easy | flia Hi ].
+} {
+  apply Hb; [ easy | flia Hi ].
+} {
+  apply Hc; [ flia Hj | easy ].
+} {
+  specialize (Hac i 0) as H1.
+Print is_square_bmat.
+...
+  transitivity (fc i 0).
+...
+
 remember (fa i 0 * fc 0 j)%BM as x eqn:Hx.
 remember (fb i 0 * fc 0 j)%BM as y eqn:Hy.
 clear Hx Hy.
