@@ -2881,14 +2881,22 @@ move Hc before Hb.
 destruct rc; [ flia Hi | cbn ].
 rewrite Nat.sub_0_r.
 destruct rc; cbn. {
-  apply IHMC; [ flia | easy | | | | | ]. {
-    apply Ha; [ easy | flia ].
+  apply Nat.lt_1_r in Hi.
+  apply Nat.lt_1_r in Hj.
+  subst i j.
+  specialize Nat.lt_0_1 as H.
+  apply IHMC; [ easy | easy | | | | | ]. {
+    now apply Ha.
   } {
-    apply Hb; [ easy | flia ].
+    now apply Hb.
   } {
-    apply Hc; [ flia | easy ].
+    now apply Hc.
   } {
-    specialize (Hac i 0) as H1.
+    apply Hac.
+  } {
+    apply Hbc.
+  }
+}
 ...
 
 Theorem bmat_mul_add_distr_r :
