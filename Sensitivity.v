@@ -2828,7 +2828,7 @@ Definition bmat_nrows T (M : bmatrix T) :=
   | BM_M m => mat_nrows m
   end.
 
-Fixpoint is_square_bmat T sizes (M : bmatrix T) {struct M} :=
+Fixpoint is_square_bmat T sizes (M : bmatrix T) {struct sizes} :=
   match M with
   | BM_1 _ => sizes = []
   | BM_M MM =>
@@ -2855,7 +2855,8 @@ intros * sp * Hfit.
 revert MA MB Hfit.
 induction MC as [xc| mc IHMC] using bmatrix_ind2; intros. {
   destruct Hfit as (sizes & Ha & Hb & Hc).
-  cbn in Hc; subst sizes.
+  destruct sizes; [ | easy ].
+  cbn in Ha, Hb.
   destruct MA as [xa| ma]; [ | easy ].
   destruct MB as [xb| mb]; [ | easy ].
   now cbn; rewrite srng_mul_add_distr_r.
@@ -2863,10 +2864,10 @@ induction MC as [xc| mc IHMC] using bmatrix_ind2; intros. {
 destruct Hfit as (sizes & Ha & Hb & Hc).
 cbn in Hc.
 destruct sizes as [| size]; [ easy | ].
+cbn in Ha, Hb, Hc.
 destruct Hc as (Hcr & Hcc & Hc).
 destruct MA as [xa| ma]; [ easy | ].
 destruct MB as [xb| mb]; [ easy | ].
-cbn in Ha, Hb.
 destruct Ha as (Har & Hac & Ha).
 destruct Hb as (Hbr & Hbc & Hb).
 move Hbr before Har; move Hcr before Hbr.
@@ -2922,6 +2923,44 @@ destruct size. {
     apply Hc; [ flia | easy ].
   }
   rewrite bmat_add_assoc; [ | easy | | ]; cycle 1. {
+    apply bmat_fit_for_add_add_l. {
+      specialize (Ha i 0 Hi Nat.lt_0_2) as H1.
+      specialize (Hc 0 j Nat.lt_0_2 Hj) as H2.
+      specialize (Ha i 1 Hi Nat.lt_1_2) as H3.
+      specialize (Hc 1 j Nat.lt_1_2 Hj) as H4.
+      destruct sizes; cbn in H1, H2, H3, H4. {
+        destruct (fa i 0) as [xa0| ]; [ | easy ].
+        destruct (fa i 1) as [xa1| ]; [ | easy ].
+        destruct (fc 0 j) as [xc0| ]; [ | easy ].
+        now destruct (fc 1 j).
+      } {
+        destruct (fa i 0) as [| ma0]; [ easy | ].
+        destruct (fa i 1) as [| ma1]; [ easy | ].
+        destruct (fc 0 j) as [| mc0]; [ easy | ].
+        destruct (fc 1 j) as [| mc1]; [ easy | ].
+        destruct H1 as (Har0 & Hac0 & H1).
+        destruct H2 as (Hcr0 & Hcc0 & H2).
+        destruct H3 as (Har1 & Hac1 & H3).
+        destruct H4 as (Hcr1 & Hcc1 & H4).
+        destruct ma0 as (fa0, ra0, ca0).
+        destruct ma1 as (fa1, ra1, ca1).
+        destruct mc0 as (fc0, rc0, cc0).
+        destruct mc1 as (fc1, rc1, cc1).
+        cbn in *.
+        subst ra0 ca0 rc0 cc0 ra1 ca1 rc1 cc1.
+        split; [ easy | ].
+        split; [ easy | ].
+        clear i j Hi Hj.
+        move fa1 before fa0.
+        move fc0 before fa0.
+        move fc1 before fc0.
+        intros i j Hi Hj.
+        fold (mat_el_mul_loop fa0 fc0).
+        fold (mat_el_mul_loop fa1 fc1).
+        destruct n; [ easy | cbn ].
+        rewrite Nat.sub_0_r.
+(* mouais, bon, vaut peut-être mieux que je condamne bmat_add_assoc à avoir
+   la même contrainte ; donc supprimer bat_fit_for_add *)
 ...
 
 (*
