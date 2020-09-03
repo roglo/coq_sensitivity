@@ -2923,6 +2923,44 @@ destruct size. {
     apply Hc; [ flia | easy ].
   }
   rewrite bmat_add_assoc; [ | easy | | ]; cycle 1. {
+Theorem glop : ∀ T (MA MB : bmatrix T),
+  (∃ sizes, is_square_bmat sizes MA ∧ is_square_bmat sizes MB)
+  → bmat_fit_for_add MA MB.
+Proof.
+intros * (sizes & Ha & Hb).
+destruct sizes as [| size]; [ now destruct MA, MB | ].
+cbn in Ha, Hb.
+destruct MA as [xa| ma]; [ easy | ].
+destruct MB as [xb| mb]; [ easy | cbn ].
+destruct Ha as (Hra & Hca & Ha).
+destruct Hb as (Hrb & Hcb & Hb).
+split; [ congruence | ].
+split; [ congruence | ].
+intros * Hi Hj.
+destruct ma as (fa, ra, ca).
+destruct mb as (fb, rb, cb).
+cbn in *.
+subst ra ca rb cb.
+specialize (Ha i j Hi Hj) as H1.
+specialize (Hb i j Hi Hj) as H2.
+remember (fa i j) as ma eqn:Hma; symmetry in Hma.
+remember (fb i j) as mb eqn:Hmb; symmetry in Hmb.
+move mb before ma.
+move Hmb before Hma.
+destruct ma as [xa| ma]. {
+  destruct mb as [xb| mb]; [ easy | now destruct sizes ].
+}
+destruct mb as [xb| mb]; [ now destruct sizes | ].
+destruct sizes as [| size2]; [ easy | ].
+cbn in H1, H2 |-*.
+destruct H1 as (Hra & Hca & Ha').
+destruct H2 as (Hrb & Hcb & Hb').
+split; [ congruence | ].
+split; [ congruence | ].
+intros i' j' Hi' Hj'.
+...
+apply glop.
+...
     apply bmat_fit_for_add_add_l. {
       specialize (Ha i 0 Hi Nat.lt_0_2) as H1.
       specialize (Hc 0 j Nat.lt_0_2 Hj) as H2.
