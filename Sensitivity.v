@@ -2828,41 +2828,35 @@ Definition bmat_nrows T (M : bmatrix T) :=
   | BM_M m => mat_nrows m
   end.
 
-Definition is_aligned_rect_bmat :=
-λ (T : Type) (MM : matrix (bmatrix T)) (i j : nat),
-  let (p, b) := (mat_el MM i j, mat_el MM i i, mat_el MM j j) in
-  let (b0, b1) := p in
+(* condition for a block matrix to have sub-matrices that are
+   square in the diagonal, possibly rectangular otherwise but
+   with dimensions aligned with the square matrices of the same
+   indices ; this way, if two matrices have this property with
+   the same kind of sub-matrices, we can add and multiply them *)
+
+Definition is_aligned_rect_bmat T (MM : matrix (bmatrix T)) i j :=
   match mat_el MM i j with
-  | BM_1 _ => match mat_el MM i i with
-              | BM_1 _ => match mat_el MM j j with
-                          | BM_1 _ => True
-                          | BM_M _ => False
-                          end
-              | BM_M _ => False
-              end
+  | BM_1 _ =>
+      match mat_el MM i i with
+      | BM_1 _ =>
+          match mat_el MM j j with
+          | BM_1 _ => True
+          | BM_M _ => False
+          end
+      | BM_M _ => False
+      end
   | BM_M Mij =>
-      match b1 with
+      match mat_el MM i i with
       | BM_1 _ => False
       | BM_M Mii =>
-          match b with
+          match mat_el MM j j with
           | BM_1 _ => False
-          | BM_M Mjj => mat_nrows Mij = mat_nrows Mii ∧ mat_ncols Mij = mat_ncols Mjj
+          | BM_M Mjj =>
+              mat_nrows Mij = mat_nrows Mii ∧
+              mat_ncols Mij = mat_ncols Mjj
           end
       end
   end.
-
-...
-
-Definition is_aligned_rect_bmat T (MM : matrix (bmatrix T)) i j :=
-  match (mat_el MM i j, mat_el MM i i, mat_el MM j j) with
-  | (BM_1 _, BM_1 _, BM_1 _) => True
-  | (BM_M Mij, BM_M Mii, BM_M Mjj) =>
-      mat_nrows Mij = mat_nrows Mii ∧
-      mat_ncols Mij = mat_ncols Mjj
-  | _ => False
-  end.
-
-Print is_aligned_rect_bmat.
 
 Fixpoint is_square_bmat T (M : bmatrix T) :=
   match M with
@@ -2872,24 +2866,6 @@ Fixpoint is_square_bmat T (M : bmatrix T) :=
       (∀ i, i < mat_nrows MM → is_square_bmat (mat_el MM i i)) ∧
       (∀ i j, i < mat_nrows MM → j < mat_nrows MM →
        is_aligned_rect_bmat MM i j)
-  end.
-
-Print is_square_bmat.
-
-...
-
-       match mat_el MM i j with
-       | BM_1 _ =>
-
-...
-       mat_nrows (mat_el MM i j) = mat_nrows (mat_el MM i i) ∧
-       mat_ncols (mat_el MM i j) = mat_ncols (mat_el MM j j))
-  end.
-...
-
-      let n := bmat_nrows (mat_el MM 0 0) in
-      ∀ i j, i < mat_nrows MM → j < mat_ncols MM →
-      is_square_bmat (mat_el MM i j) n
   end.
 
 Fixpoint bmat_have_same_struct T (BMA BMB : bmatrix T) :=
@@ -2903,8 +2879,7 @@ Fixpoint bmat_have_same_struct T (BMA BMB : bmatrix T) :=
   end.
 
 Definition bmat_fit_for_distr_r T (MA MB MC : bmatrix T) :=
-  let n := bmat_nrows MA in
-  is_square_bmat MA n ∧ is_square_bmat MB n ∧ is_square_bmat MC n ∧
+  is_square_bmat MA ∧ is_square_bmat MB ∧ is_square_bmat MC ∧
   bmat_have_same_struct MA MC ∧ bmat_have_same_struct MB MC.
 
 Theorem bmat_mul_add_distr_r :
@@ -2933,13 +2908,18 @@ fold (mat_el_mul_loop fa fc).
 fold (mat_el_mul_loop fb fc).
 unfold bmat_fit_for_distr_r in Hfit; cbn in Hfit.
 destruct Hfit as (Ha & Hb & Hc & Hac & Hbc).
-destruct Ha as (_ & H & Ha); subst ca.
-destruct Hb as (H1 & H2 & Hb); subst rb cb.
-destruct Hc as (H1 & H2 & Hc); subst rc cc.
-destruct Hac as (_ & _ & Hac).
-destruct Hbc as (_ & _ & Hbc).
+destruct Ha as (H & Hsa & Ha); subst ca.
+destruct Hb as (H & Hsb & Hb); subst cb.
+destruct Hc as (H & Hsc & Hc); subst cc.
+destruct Hac as (H1 & H2 & Hac); subst ra; clear H2.
+destruct Hbc as (H1 & H2 & Hbc); subst rb; clear H2.
+move Hb before Ha; move Hc before Hb.
 rewrite IHMC; [ | flia Hi | easy | ]. 2: {
   split. {
+(* ouais, non, c'est plus compliqué que ça... *)
+(* bmat_fit_for_distr_r ne devrait pas imposer que les matrices
+   soient forcément carrées *)
+...
     remember (fa i 0) as BM eqn:HBM; symmetry in HBM.
     destruct BM as [x| M]; [ easy | cbn ].
     specialize (Ha i 0 Hi) as H1.
