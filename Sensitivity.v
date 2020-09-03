@@ -2888,6 +2888,86 @@ intros i j Hi Hj.
 apply IHsizes; [ now apply Ha | now apply Hb ].
 Qed.
 
+Theorem is_square_bmat_mul : ∀ T {so : semiring_op T} MA MB sizes,
+  is_square_bmat sizes MA
+  → is_square_bmat sizes MB
+  → is_square_bmat sizes (MA * MB)%BM.
+Proof.
+(*
+intros * Ha Hb.
+revert sizes MB Ha Hb.
+induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
+  destruct sizes; [ | easy ].
+  now destruct MB.
+}
+destruct sizes as [| size]; [ easy | ].
+destruct MB as [xb| mb]; [ easy | ].
+cbn in Ha, Hb |- *.
+destruct Ha as (Hra & Hca & Ha).
+destruct Hb as (Hrb & Hcb & Hb).
+split; [ easy | ].
+split; [ easy | ].
+intros i j Hi Hj.
+fold (mat_el_mul_loop (mat_el ma) (mat_el mb)).
+destruct ma as (fa, ra, ca).
+destruct mb as (fb, rb, cb).
+cbn in *.
+subst ra ca rb cb.
+destruct size; [ easy | cbn ].
+rewrite Nat.sub_0_r.
+destruct size; cbn. {
+  apply IHMA; [ easy | flia | | ]. {
+    apply Ha; [ easy | flia ].
+  } {
+    apply Hb; [ flia | easy ].
+  }
+}
+cbn.
+...
+*)
+intros * Ha Hb.
+revert MA MB Ha Hb.
+induction sizes as [| size]; intros; [ now destruct MA, MB | ].
+cbn in Ha, Hb |-*.
+destruct MA as [xa| ma]; [ easy | ].
+destruct MB as [xb| mb]; [ easy | cbn ].
+destruct Ha as (Hra & Hca & Ha).
+destruct Hb as (Hrb & Hcb & Hb).
+split; [ easy | ].
+split; [ easy | ].
+intros i j Hi Hj.
+fold (mat_el_mul_loop (mat_el ma) (mat_el mb)).
+destruct ma as (fa, ra, ca).
+destruct mb as (fb, rb, cb).
+cbn in *.
+subst ra ca rb cb.
+...
+destruct size; [ easy | cbn ].
+rewrite Nat.sub_0_r.
+revert i j Hi Hj.
+induction size; intros; cbn. {
+  apply IHsizes. {
+    apply Ha; [ easy | flia ].
+  } {
+    apply Hb; [ flia | easy ].
+  }
+}
+destruct size; cbn. {
+  apply is_square_bmat_add. {
+    apply IHsizes. {
+      apply Ha; [ easy | flia ].
+    } {
+      apply Hb; [ flia | easy ].
+    }
+  }
+  apply IHsizes. {
+    apply Ha; [ easy | flia ].
+  } {
+    apply Hb; [ flia | easy ].
+  }
+}
+...
+
 Theorem bmat_mul_add_distr_r :
   ∀ T (so : semiring_op T) {sp : semiring_prop T} (MA MB MC : bmatrix T),
   bmat_fit_for_distr MA MB MC
@@ -2970,25 +3050,6 @@ destruct size. {
     exists sizes.
     split. {
       apply is_square_bmat_add. {
-Theorem is_square_bmat_mul : ∀ T {so : semiring_op T} MA MB sizes,
-  is_square_bmat sizes MA
-  → is_square_bmat sizes MB
-  → is_square_bmat sizes (MA + MB)%BM.
-Proof.
-intros * Ha Hb.
-...
-revert MA MB Ha Hb.
-induction sizes as [| size]; intros; [ now destruct MA, MB | ].
-cbn in Ha, Hb |-*.
-destruct MA as [xa| ma]; [ easy | ].
-destruct MB as [xb| mb]; [ easy | cbn ].
-destruct Ha as (Hra & Hca & Ha).
-destruct Hb as (Hrb & Hcb & Hb).
-split; [ easy | ].
-split; [ easy | ].
-intros i j Hi Hj.
-apply IHsizes; [ now apply Ha | now apply Hb ].
-Qed.
 ...
     apply bmat_fit_for_add_add_l. {
       specialize (Ha i 0 Hi Nat.lt_0_2) as H1.
