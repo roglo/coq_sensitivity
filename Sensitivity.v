@@ -2828,12 +2828,65 @@ Definition bmat_nrows T (M : bmatrix T) :=
   | BM_M m => mat_nrows m
   end.
 
-Fixpoint is_square_bmat T (M : bmatrix T) n :=
+Definition is_aligned_rect_bmat :=
+λ (T : Type) (MM : matrix (bmatrix T)) (i j : nat),
+  let (p, b) := (mat_el MM i j, mat_el MM i i, mat_el MM j j) in
+  let (b0, b1) := p in
+  match mat_el MM i j with
+  | BM_1 _ => match mat_el MM i i with
+              | BM_1 _ => match mat_el MM j j with
+                          | BM_1 _ => True
+                          | BM_M _ => False
+                          end
+              | BM_M _ => False
+              end
+  | BM_M Mij =>
+      match b1 with
+      | BM_1 _ => False
+      | BM_M Mii =>
+          match b with
+          | BM_1 _ => False
+          | BM_M Mjj => mat_nrows Mij = mat_nrows Mii ∧ mat_ncols Mij = mat_ncols Mjj
+          end
+      end
+  end.
+
+...
+
+Definition is_aligned_rect_bmat T (MM : matrix (bmatrix T)) i j :=
+  match (mat_el MM i j, mat_el MM i i, mat_el MM j j) with
+  | (BM_1 _, BM_1 _, BM_1 _) => True
+  | (BM_M Mij, BM_M Mii, BM_M Mjj) =>
+      mat_nrows Mij = mat_nrows Mii ∧
+      mat_ncols Mij = mat_ncols Mjj
+  | _ => False
+  end.
+
+Print is_aligned_rect_bmat.
+
+Fixpoint is_square_bmat T (M : bmatrix T) :=
   match M with
   | BM_1 _ => True
   | BM_M MM =>
-      mat_nrows MM = n ∧
-      mat_ncols MM = n ∧
+      mat_nrows MM = mat_ncols MM ∧
+      (∀ i, i < mat_nrows MM → is_square_bmat (mat_el MM i i)) ∧
+      (∀ i j, i < mat_nrows MM → j < mat_nrows MM →
+       is_aligned_rect_bmat MM i j)
+  end.
+
+Print is_square_bmat.
+
+...
+
+       match mat_el MM i j with
+       | BM_1 _ =>
+
+...
+       mat_nrows (mat_el MM i j) = mat_nrows (mat_el MM i i) ∧
+       mat_ncols (mat_el MM i j) = mat_ncols (mat_el MM j j))
+  end.
+...
+
       let n := bmat_nrows (mat_el MM 0 0) in
       ∀ i j, i < mat_nrows MM → j < mat_ncols MM →
       is_square_bmat (mat_el MM i j) n
@@ -2848,8 +2901,6 @@ Fixpoint bmat_have_same_struct T (BMA BMB : bmatrix T) :=
        ∀ i j, bmat_have_same_struct (mat_el ma i j) (mat_el mb i j)
   | _ => False
   end.
-
-Print bmat_nrows.
 
 Definition bmat_fit_for_distr_r T (MA MB MC : bmatrix T) :=
   let n := bmat_nrows MA in
