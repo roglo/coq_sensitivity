@@ -2828,244 +2828,49 @@ Definition bmat_nrows T (M : bmatrix T) :=
   | BM_M m => mat_nrows m
   end.
 
-(* condition for a block matrix to have sub-matrices that are
-   square in the diagonal, possibly rectangular otherwise but
-   with dimensions aligned with the square matrices of the same
-   indices ; this way, if two matrices have this property with
-   the same kind of sub-matrices, we can add and multiply them *)
-
-Definition is_aligned_rect_bmat T (MM : matrix (bmatrix T)) i j :=
-  match mat_el MM i j with
-  | BM_1 _ =>
-      match mat_el MM i i with
-      | BM_1 _ =>
-          match mat_el MM j j with
-          | BM_1 _ => True
-          | BM_M _ => False
-          end
-      | BM_M _ => False
-      end
-  | BM_M Mij =>
-      match mat_el MM i i with
-      | BM_1 _ => False
-      | BM_M Mii =>
-          match mat_el MM j j with
-          | BM_1 _ => False
-          | BM_M Mjj =>
-              mat_nrows Mij = mat_nrows Mii ∧
-              mat_ncols Mij = mat_ncols Mjj
-          end
-      end
-  end.
-
-Fixpoint is_square_bmat T (M : bmatrix T) :=
+Fixpoint is_square_bmat T sizes (M : bmatrix T) {struct M} :=
   match M with
-  | BM_1 _ => True
+  | BM_1 _ => sizes = []
   | BM_M MM =>
-      mat_nrows MM = mat_ncols MM ∧
-      (∀ i, i < mat_nrows MM → is_square_bmat (mat_el MM i i)) ∧
-      (∀ i j, i < mat_nrows MM → j < mat_nrows MM →
-       is_aligned_rect_bmat MM i j)
+      match sizes with
+      | size :: sizes' =>
+          mat_nrows MM = size ∧
+          mat_ncols MM = size ∧
+          (∀ i j, i < size → j < size →
+           is_square_bmat sizes' (mat_el MM i j))
+      | [] => False
+      end
   end.
 
-Fixpoint bmat_have_same_struct T (BMA BMB : bmatrix T) :=
-  match (BMA, BMB) with
-  | (BM_1 _, BM_1 _) => True
-  | (BM_M ma, BM_M mb) =>
-       mat_nrows ma = mat_nrows mb ∧
-       mat_ncols ma = mat_ncols mb ∧
-       ∀ i j, bmat_have_same_struct (mat_el ma i j) (mat_el mb i j)
-  | _ => False
-  end.
-
-Definition bmat_fit_for_distr_r T (MA MB MC : bmatrix T) :=
-  is_square_bmat MA ∧ is_square_bmat MB ∧ is_square_bmat MC ∧
-  bmat_have_same_struct MA MC ∧ bmat_have_same_struct MB MC.
+Definition bmat_fit_for_distr T (MA MB MC : bmatrix T) :=
+  ∃ sizes,
+  is_square_bmat sizes MA ∧ is_square_bmat sizes MB ∧ is_square_bmat sizes MC.
 
 Theorem bmat_mul_add_distr_r :
   ∀ T (so : semiring_op T) {sp : semiring_prop T} (MA MB MC : bmatrix T),
-  bmat_fit_for_distr_r MA MB MC
+  bmat_fit_for_distr MA MB MC
   → ((MA + MB) * MC = MA * MC + MB * MC)%BM.
 Proof.
 intros * sp * Hfit.
 revert MA MB Hfit.
 induction MC as [xc| mc IHMC] using bmatrix_ind2; intros. {
-  destruct MA as [xa| ma]; [ | now destruct Hfit ].
-  destruct MB as [xb| mb]; [ | now destruct Hfit ].
-  now cbn; rewrite srng_mul_add_distr_r.
-}
-destruct MA as [xa| ma]; [ now destruct Hfit | ].
-destruct MB as [xb| mb]; [ now destruct Hfit | ].
-cbn; f_equal.
-apply matrix_eq; cbn; [ easy | easy | ].
-intros i j Hi Hj.
-destruct ma as (fa, ra, ca).
-destruct mb as (fb, rb, cb).
-destruct mc as (fc, rc, cc).
-cbn in *.
-fold (mat_el_mul_loop (λ i j, (fa i j + fb i j)%BM) fc).
-fold (mat_el_mul_loop fa fc).
-fold (mat_el_mul_loop fb fc).
-unfold bmat_fit_for_distr_r in Hfit; cbn in Hfit.
-destruct Hfit as (Ha & Hb & Hc & Hac & Hbc).
-destruct Ha as (H & Hsa & Ha); subst ca.
-destruct Hb as (H & Hsb & Hb); subst cb.
-destruct Hc as (H & Hsc & Hc); subst cc.
-destruct Hac as (H1 & H2 & Hac); subst ra; clear H2.
-destruct Hbc as (H1 & H2 & Hbc); subst rb; clear H2.
-move Hb before Ha; move Hc before Hb.
-rewrite IHMC; [ | flia Hi | easy | ]. 2: {
-  split. {
-(* ouais, non, c'est plus compliqué que ça... *)
-(* bmat_fit_for_distr_r ne devrait pas imposer que les matrices
-   soient forcément carrées *)
-...
-    remember (fa i 0) as BM eqn:HBM; symmetry in HBM.
-    destruct BM as [x| M]; [ easy | cbn ].
-    specialize (Ha i 0 Hi) as H1.
-    assert (H : 0 < ra) by flia Hi.
-    specialize (H1 H); clear H.
-    rewrite HBM in H1; cbn in H1.
-    destruct H1 as (H1 & H2 & H3).
-    now rewrite <- H1 in H2.
-  }
-  split. {
-    remember (fb i 0) as BMb eqn:HBMb; symmetry in HBMb.
-    destruct BMb as [xb| mb]; [ easy | cbn ].
-    remember (fa i 0) as BMa eqn:HBMa; symmetry in HBMa.
-    destruct BMa as [xa| ma]. {
-      specialize (Hac i 0) as H1.
-      specialize (Hbc i 0) as H2.
-      rewrite HBMa in H1.
-      rewrite HBMb in H2.
-      cbn in H1(*, H2*).
-      now destruct (fc i 0).
-    }
-    move ma after mb.
-    specialize (Ha i 0 Hi) as H1.
-    assert (H : 0 < ra) by flia Hi.
-    specialize (H1 H); clear H.
-    rewrite HBMa in H1; cbn in H1.
-    destruct H1 as (H1 & H2 & H3).
-    rewrite <- H1 in H2.
-    specialize (Hac i 0) as H4.
-    specialize (Hbc i 0) as H5.
-    rewrite HBMa in H4.
-    rewrite HBMb in H5.
-    cbn in H4, H5.
-    destruct (fc i 0) as [x| M]; [ easy | ].
-    destruct H4 as (H41 & H42 & H43).
-    destruct H5 as (H51 & H52 & H53).
-    cbn.
-    split; [ congruence | ].
-    split; [ congruence | ].
-    specialize (Hb i 0 Hi) as H1'.
-    assert (H : 0 < ra) by flia Hi.
-    specialize (H1' H); clear H.
-    now rewrite HBMb in H1'; cbn in H1'.
-  }
-  split. {
-    remember (fc 0 j) as BMc eqn:HBMc; symmetry in HBMc.
-    destruct BMc as [xc| mc]; [ easy | cbn ].
-    remember (fa i 0) as BMa eqn:HBMa; symmetry in HBMa.
-    destruct BMa as [xa| ma]. {
-      cbn.
-      specialize (Hc 0 j) as H1.
-      assert (H : 0 < ra) by flia Hi.
-      specialize (H1 H Hj); clear H.
-      rewrite HBMc in H1; cbn in H1.
-      specialize (Hc 0 0) as H2.
-      assert (H : 0 < ra) by flia Hi.
-      specialize (H2 H H); clear H.
-      remember (fc 0 0) as BMc' eqn:HBMc'; symmetry in HBMc'.
-      destruct BMc' as [xc'| mc']; [ easy | ].
-      cbn in H1, H2.
-      specialize (Hc i 0 Hi) as H3.
-      assert (H : 0 < ra) by flia Hi.
-      specialize (H3 H); clear H.
-      remember (fc i 0) as BMc'' eqn:HBMc''; symmetry in HBMc''.
-      destruct BMc'' as [xc''| mc'']. {
-        clear H3.
-        move HBMc before HBMc''.
-        specialize (Hc 0 j) as H3.
-        assert (H : 0 < ra) by flia Hi.
-        specialize (H3 H Hj); clear H.
-        rewrite HBMc in H3.
-        cbn in H3.
-(* mouais, bon, j'ai l'impression que ce mat_nrows = 0, issu de bmat_nrows
-   n'est pas bon ; faut revoir les définitions *)
-...
-        rewrite HBMc'' in H4; cbn in H4.
-...
-      specialize (Ha i 0 Hi) as H1.
-      assert (H : 0 < ra) by flia Hi.
-      specialize (H1 H); clear H.
-      rewrite HBMa in H1; cbn in H1.
-...
-      remember (fb i 0) as BMb eqn:HBMb; symmetry in HBMb.
-      specialize (Hac i 0) as H1.
-      rewrite HBMa in H1.
-      destruct BMb as [xb| mb]. {
-        destruct (fc i 0); [ | easy ].
-        cbn.
-...
-        specialize (Hac i 0) as H1.
-        specialize (Hbc i 0) as H2.
-        rewrite HBMa in H1.
-        rewrite HBMb in H2.
-        cbn in H1, H2.
-...
-    }
-    move ma after mb.
-    specialize (Ha i 0 Hi) as H1.
-    assert (H : 0 < ra) by flia Hi.
-    specialize (H1 H); clear H.
-    rewrite HBMa in H1; cbn in H1.
-    destruct H1 as (H1 & H2 & H3).
-    rewrite <- H1 in H2.
-    specialize (Hac i 0) as H4.
-    specialize (Hbc i 0) as H5.
-    rewrite HBMa in H4.
-    rewrite HBMb in H5.
-    cbn in H4, H5.
-    destruct (fc i 0) as [x| M]; [ easy | ].
-    destruct H4 as (H41 & H42 & H43).
-    destruct H5 as (H51 & H52 & H53).
-    cbn.
-    split; [ congruence | ].
-    split; [ congruence | ].
-    specialize (Hb i 0 Hi) as H1'.
-    assert (H : 0 < ra) by flia Hi.
-    specialize (H1' H); clear H.
-    now rewrite HBMb in H1'; cbn in H1'.
-  }
-...
-  ============================
-  is_square_bmat (fb i 0) match fa i 0 with
-                          | BM_1 _ => 0
-                          | BM_M M => mat_nrows M
-                          end
-
-Theorem bmat_mul_add_distr_r :
-  ∀ T (so : semiring_op T) {sp : semiring_prop T} (MA MB MC : bmatrix T) n,
-  is_square_bmat MA n
-  → is_square_bmat MB n
-  → is_square_bmat MC n
-  → bmat_have_same_struct MA MC
-  → bmat_have_same_struct MB MC
-  → ((MA + MB) * MC = MA * MC + MB * MC)%BM.
-Proof.
-intros * sp * Ha Hb Hc Hac Hbc.
-revert MA MB Ha Hb Hc Hac Hbc.
-induction MC as [xc| mc IHMC] using bmatrix_ind2; intros. {
-  clear Hc.
+  destruct Hfit as (sizes & Ha & Hb & Hc).
+  cbn in Hc; subst sizes.
   destruct MA as [xa| ma]; [ | easy ].
   destruct MB as [xb| mb]; [ | easy ].
-  clear Ha Hb Hac Hbc.
   now cbn; rewrite srng_mul_add_distr_r.
 }
+destruct Hfit as (sizes & Ha & Hb & Hc).
+cbn in Hc.
+destruct sizes as [| size]; [ easy | ].
+destruct Hc as (Hcr & Hcc & Hc).
 destruct MA as [xa| ma]; [ easy | ].
 destruct MB as [xb| mb]; [ easy | ].
+cbn in Ha, Hb.
+destruct Ha as (Har & Hac & Ha).
+destruct Hb as (Hbr & Hbc & Hb).
+move Hbr before Har; move Hcr before Hbr.
+move Hbc before Hac; move Hcc before Hbc.
 cbn; f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros i j Hi Hj.
@@ -3073,186 +2878,50 @@ destruct ma as (fa, ra, ca).
 destruct mb as (fb, rb, cb).
 destruct mc as (fc, rc, cc).
 cbn in *.
-destruct Ha as (H, Ha); subst ca.
-destruct Hb as (H, Hb); subst cb.
-destruct Hc as (H, Hc); subst cc.
-destruct Hac as (H1 & H2 & Hac); subst ra; clear H2.
-destruct Hbc as (H1 & H2 & Hbc); subst rb; clear H2.
+subst ra rb rc ca cb cc.
 fold (mat_el_mul_loop (λ i j, (fa i j + fb i j)%BM) fc).
 fold (mat_el_mul_loop fa fc).
 fold (mat_el_mul_loop fb fc).
-move fa after fc; move fb after fc.
-move Hc before Hb.
-rewrite IHMC; [ | flia Hi | easy | | | | | ]; cycle 1. {
-  apply Ha; [ easy | flia Hi ].
-} {
-  apply Hb; [ easy | flia Hi ].
-} {
-  apply Hc; [ flia Hj | easy ].
-} {
-  specialize (Hac i 0) as H1.
-Print is_square_bmat.
-...
-  transitivity (fc i 0).
-...
-
-remember (fa i 0 * fc 0 j)%BM as x eqn:Hx.
-remember (fb i 0 * fc 0 j)%BM as y eqn:Hy.
-clear Hx Hy.
-destruct rc; [ flia Hi | cbn ].
+destruct size; [ easy | cbn ].
 rewrite Nat.sub_0_r.
-apply Nat.succ_le_mono in Hi.
-apply Nat.succ_le_mono in Hj.
-remember 1 as k; clear Heqk.
-revert x y k.
-induction rc; intros; [ easy | cbn ].
-rewrite IHMC.
-remember (x + y + (fa i k * fc k j + fb i k * fc k j))%BM as z eqn:Hz.
-rewrite bmat_add_assoc in Hz.
-rewrite (bmat_add_comm x) in Hz.
-rewrite <- (bmat_add_assoc y) in Hz.
-rewrite bmat_add_comm in Hz.
-rewrite bmat_add_assoc in Hz.
-rewrite (bmat_add_comm _ y) in Hz.
-rewrite bmat_add_comm in Hz.
-subst z.
-apply IHrc.
-(* truc genre *)
-...
-
-Theorem bmat_mul_add_distr_r :
-  ∀ T (so : semiring_op T) {sp : semiring_prop T} MA MB MC,
-  bmat_has_constant_nrows MA
-  → bmat_has_constant_ncols MC
-  → bmat_fit_for_add MA MB
-  → bmat_fit_for_mul MA MC
-  → ((MA + MB) * MC = MA * MC + MB * MC)%BM.
-Proof.
-intros * sp * Hcr Hcc Hssab Hfmac.
-assert (Hfmbc : bmat_fit_for_mul MB MC). {
-  apply (bmat_fit_for_add_mul_mul _ MA); [ now symmetry | easy ].
+destruct size. {
+  cbn.
+  apply Nat.lt_1_r in Hi.
+  apply Nat.lt_1_r in Hj.
+  subst i j.
+  apply IHMC; [ flia | flia | ].
+  unfold bmat_fit_for_distr.
+  exists sizes.
+  split; [ apply Ha; flia | ].
+  split; [ apply Hb; flia | ].
+  apply Hc; flia.
 }
-revert MA MB Hcr Hssab Hfmac Hfmbc.
-induction MC as [xc| mc IHMC] using bmatrix_ind2; intros. {
-  destruct MA as [xa| ma]; [ | easy ].
-  destruct MB as [xb| mb]; [ cbn | easy ].
-  now rewrite srng_mul_add_distr_r.
-}
-destruct MA as [xa| ma]; [ easy | ].
-destruct MB as [xb| mb]; [ easy | ].
-move ma after mc.
-move mb after mc.
-cbn - [ bmat_same_nrows bmat_same_ncols ] in Hcr, Hcc, Hssab, Hfmac, Hfmbc.
-destruct Hcr as (Hcrbr & Hcr).
-destruct Hcc as (Hccbc & Hcc).
-destruct Hssab as (Hrab & Hcab & Hssab).
-destruct Hfmac as (Hca & Hrcac & Hfmac).
-destruct Hfmbc as (Hcb & Hrcbc & Hfmbc).
-cbn; f_equal.
-apply matrix_eq; cbn; [ easy | easy | ].
-intros i j Hi Hj.
-fold
-  (mat_el_mul_loop (λ i j, (mat_el ma i j + mat_el mb i j)%BM) (mat_el mc)).
-fold (mat_el_mul_loop (mat_el ma) (mat_el mc)).
-fold (mat_el_mul_loop (mat_el mb) (mat_el mc)).
-destruct ma as (fa, ra, ca).
-destruct mb as (fb, rb, cb).
-destruct mc as (fc, rc, cc).
-cbn - [ bmat_same_nrows bmat_same_ncols ] in *.
-move fb before fa.
-move fc before fb.
-subst rb cb rc.
-clear Hrcbc Hcb.
-destruct ca; [ easy | clear Hca ].
-(* testing with first values of ca, to prepare an induction *)
-rewrite Nat.sub_succ, Nat.sub_0_r.
-destruct ca; cbn. {
-  apply IHMC; [ flia | easy | | | | | ]. {
-    apply Hcc; [ flia | easy ].
-  } {
-    apply Hcr; [ easy | flia ].
-  } {
-    apply Hssab; [ easy | flia ].
-  } {
-    apply Hfmac; [ easy | easy | flia ].
-  } {
-    apply Hfmbc; [ easy | easy | flia ].
+cbn.
+rewrite IHMC; [ | flia | easy | ]. 2: {
+  unfold bmat_fit_for_distr.
+  exists sizes.
+  split. {
+    apply Ha; [ easy | flia ].
   }
-}
-destruct ca; cbn. {
-  rewrite IHMC; [ | flia | easy | | | | | ]; cycle 1. {
-    apply Hcc; [ flia | easy ].
-  } {
-    apply Hcr; [ easy | flia ].
-  } {
-    apply Hssab; [ easy | flia ].
-  } {
-    apply Hfmac; [ easy | easy | flia ].
-  } {
-    apply Hfmbc; [ easy | easy | flia ].
+  split. {
+    apply Hb; [ easy | flia ].
   }
-  rewrite IHMC; [ | flia | easy | | | | | ]; cycle 1. {
-    apply Hcc; [ flia | easy ].
-  } {
-    apply Hcr; [ easy | flia ].
-  } {
-    apply Hssab; [ easy | flia ].
-  } {
-    apply Hfmac; [ easy | easy | flia ].
-  } {
-    apply Hfmbc; [ easy | easy | flia ].
+  apply Hc; [ flia | easy ].
+}
+destruct size. {
+  cbn.
+  rewrite IHMC; [ | flia | easy | ]. 2: {
+    unfold bmat_fit_for_distr.
+    exists sizes.
+    split. {
+      apply Ha; [ easy | flia ].
+    }
+    split. {
+      apply Hb; [ easy | flia ].
+    }
+    apply Hc; [ flia | easy ].
   }
   rewrite bmat_add_assoc; [ | easy | | ]; cycle 1. {
-    cbn.
-    apply bmat_fit_for_add_add_l. {
-      (* lemma to do *)
-      specialize (Hcr i 0 Hi Nat.lt_0_2) as H1.
-      specialize (Hcc 0 j Nat.lt_0_2 Hj) as H2.
-      specialize (Hcr i 1 Hi Nat.lt_1_2) as H3.
-      specialize (Hcc 1 j Nat.lt_1_2 Hj) as H4.
-      remember (fa i 0) as MA0.
-      remember (fa i 1) as MA1.
-      remember (fc 0 j) as MC0.
-      remember (fc 1 j) as MC1.
-      revert MA1 MC0 MC1 H2 H3 H4 HeqMA0 HeqMA1 HeqMC0 HeqMC1.
-      induction MA0 as [xa0| ma0 IHMA] using bmatrix_ind2; intros. {
-        clear H1; cbn.
-        destruct MA1 as [xa1| ma1]; [ now destruct MC0, MC1 | ].
-        specialize (Hcrbr i 0 1 Hi Nat.lt_0_2 Nat.lt_1_2) as H1.
-        now rewrite <- HeqMA0, <- HeqMA1 in H1.
-      }
-      destruct MA1 as [xa1| ma1]. {
-        clear H1; cbn.
-        specialize (Hcrbr i 0 1 Hi Nat.lt_0_2 Nat.lt_1_2) as H1.
-        now rewrite <- HeqMA0, <- HeqMA1 in H1.
-      }
-      destruct MC0 as [xc0| mc0]. {
-        destruct MC1 as [xc1| mc1]; [ easy | ].
-        clear H1.
-        specialize (Hccbc 0 1 j Nat.lt_0_2 Nat.lt_1_2 Hj) as H1.
-        now rewrite <- HeqMC0, <- HeqMC1 in H1; cbn in H1.
-      }
-      destruct MC1 as [xc1| mc1]. {
-        clear H1.
-        specialize (Hccbc 0 1 j Nat.lt_0_2 Nat.lt_1_2 Hj) as H1.
-        now rewrite <- HeqMC0, <- HeqMC1 in H1; cbn in H1.
-      }
-      cbn.
-      split. {
-        specialize (Hcrbr i 0 1 Hi Nat.lt_0_2 Nat.lt_1_2) as H5.
-        cbn in H5.
-        now rewrite <- HeqMA0, <- HeqMA1 in H5.
-      }
-      split. {
-        specialize (Hccbc 0 1 j Nat.lt_0_2 Nat.lt_1_2 Hj) as H5.
-        cbn in H5.
-        now rewrite <- HeqMC0, <- HeqMC1 in H5.
-      }
-      intros i' j' Hi' Hj'.
-      fold (mat_el_mul_loop (mat_el ma0) (mat_el mc0)).
-      fold (mat_el_mul_loop (mat_el ma1) (mat_el mc1)).
-      specialize (Hcrbr i 0 1 Hi Nat.lt_0_2 Nat.lt_1_2) as H5.
-      rewrite <- HeqMA0, <- HeqMA1 in H5; cbn in H5.
 ...
 
 (*
