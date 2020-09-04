@@ -2936,6 +2936,8 @@ induction size; intros; cbn. {
     apply Hb; [ flia | easy ].
   }
 }
+Check is_square_bmat_add.
+...
 destruct size; cbn. {
   apply is_square_bmat_add. {
     apply IHsizes. {
