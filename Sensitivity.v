@@ -2936,7 +2936,32 @@ induction size; intros; cbn. {
     apply Hb; [ flia | easy ].
   }
 }
-Check is_square_bmat_add.
+Theorem glop : ∀ T {so : semiring_op T} {sp : semiring_prop T},
+  ∀ f x y (l : list nat),
+  bmat_fit_for_add x y
+  → (∀ i, bmat_fit_for_add y (f i))
+  → fold_left (λ a i, (a + f i)%BM) l (x + y)%BM =
+     (x + fold_left (λ a i, (a + f i)%BM) l y)%BM.
+Proof.
+intros * sp * Hxy Hyf.
+revert x y Hxy Hyf.
+induction l as [| b]; intros; [ easy | cbn ].
+rewrite <- bmat_add_assoc; [ | easy | easy | easy ].
+apply IHl. {
+  symmetry.
+  apply bmat_fit_for_add_add_l; [ now symmetry | ].
+  symmetry.
+  now transitivity y.
+} {
+  intros i.
+  apply bmat_fit_for_add_add_l; [ apply Hyf | ].
+  transitivity y.
+...
+    symmetry.
+    transitivity x; [ | easy ].
+    symmetry.
+...
+rewrite glop.
 ...
 destruct size; cbn. {
   apply is_square_bmat_add. {
