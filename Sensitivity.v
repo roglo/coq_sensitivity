@@ -2941,11 +2941,9 @@ destruct ma as (fa, ra, ca).
 destruct mb as (fb, rb, cb).
 cbn in *.
 subst ra ca rb cb.
-...
 destruct size; [ easy | cbn ].
 rewrite Nat.sub_0_r.
-revert i j Hi Hj.
-induction size; intros; cbn. {
+destruct size; cbn. {
   apply IHsizes. {
     apply Ha; [ easy | flia ].
   } {
@@ -2954,6 +2952,27 @@ induction size; intros; cbn. {
 }
 destruct size; cbn. {
   apply is_square_bmat_add. {
+    apply IHsizes. {
+      apply Ha; [ easy | flia ].
+    } {
+      apply Hb; [ flia | easy ].
+    }
+  }
+  apply IHsizes. {
+    apply Ha; [ easy | flia ].
+  } {
+    apply Hb; [ flia | easy ].
+  }
+}
+destruct size; cbn. {
+  apply is_square_bmat_add. {
+    apply is_square_bmat_add. {
+      apply IHsizes. {
+        apply Ha; [ easy | flia ].
+      } {
+        apply Hb; [ flia | easy ].
+      }
+    }
     apply IHsizes. {
       apply Ha; [ easy | flia ].
     } {
