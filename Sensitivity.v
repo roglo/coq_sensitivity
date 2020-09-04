@@ -2965,6 +2965,7 @@ induction size; intros; cbn. {
     apply Hb; [ flia | easy ].
   }
 }
+...
 rewrite fold_left_add_bmat_add; [ | easy | | ]; cycle 1. {
   apply square_bmat_fit_for_add.
   exists sizes.
