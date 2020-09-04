@@ -2907,26 +2907,29 @@ Qed.
 
 Theorem fold_left_add_bmat_add :
   ∀ T {so : semiring_op T} {sp : semiring_prop T},
-  ∀ f x y (l : list nat),
+  ∀ f x y sta len,
   bmat_fit_for_add x y
-  → (∀ i, bmat_fit_for_add y (f i))
-  → fold_left (λ a i, (a + f i)%BM) l (x + y)%BM =
-     (x + fold_left (λ a i, (a + f i)%BM) l y)%BM.
+  → (∀ i, i < sta + len → bmat_fit_for_add y (f i))
+  → fold_left (λ a i, (a + f i)%BM) (seq sta len) (x + y)%BM =
+     (x + fold_left (λ a i, (a + f i)%BM) (seq sta len) y)%BM.
 Proof.
 intros * sp * Hxy Hyf.
-revert x y Hxy Hyf.
-induction l as [| b]; intros; [ easy | cbn ].
-rewrite <- bmat_add_assoc; [ | easy | easy | easy ].
-apply IHl. {
+revert x y sta Hxy Hyf.
+induction len; intros; [ easy | cbn ].
+rewrite <- bmat_add_assoc; [ | easy | easy | ]. 2: {
+  apply Hyf; flia.
+}
+apply IHlen. {
   symmetry.
   apply bmat_fit_for_add_add_l; [ now symmetry | ].
   symmetry.
-  now transitivity y.
+  transitivity y; [ easy | ].
+  apply Hyf; flia.
 } {
-  intros i.
-  apply bmat_fit_for_add_add_l; [ apply Hyf | ].
-  transitivity y; [ | apply Hyf ].
-  symmetry; apply Hyf.
+  intros i Hi.
+  apply bmat_fit_for_add_add_l; [ apply Hyf; flia Hi | ].
+  transitivity y; [ | apply Hyf; flia Hi ].
+  symmetry; apply Hyf; flia.
 }
 Qed.
 
@@ -2979,7 +2982,7 @@ rewrite fold_left_add_bmat_add; [ | easy | | ]; cycle 1. {
     }
   }
 } {
-  intros j'.
+  intros j' Hj'.
   apply square_bmat_fit_for_add.
   exists sizes.
   split. {
@@ -2989,15 +2992,20 @@ rewrite fold_left_add_bmat_add; [ | easy | | ]; cycle 1. {
       apply Hb; [ flia | easy ].
     }
   } {
-...
     apply IHsizes. {
-      apply Ha; [ easy | ].
-...
-      apply Ha; [ | flia ].
+      apply Ha; [ easy | flia Hj' ].
     } {
-      apply Hb; [ flia | easy ].
+      apply Hb; [ flia Hj' | easy ].
     }
   }
+}
+apply is_square_bmat_add. {
+  apply IHsizes. {
+    apply Ha; [ easy | flia ].
+  } {
+    apply Hb; [ flia | easy ].
+  }
+}
 ...
 destruct size; cbn. {
   apply is_square_bmat_add. {
