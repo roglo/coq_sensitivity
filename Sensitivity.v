@@ -1927,6 +1927,15 @@ Fixpoint bmat_mul T {so : semiring_op T} (MM1 MM2 : bmatrix T) :=
       match MM2 with
       | BM_1 _ => BM_1 0%Srng
       | BM_M MMB =>
+          let mat_el_mul i k :=
+            fold_left
+              (λ acc j,
+                 bmat_add acc
+                   (bmat_mul (mat_el MMA i (j + 1)) (mat_el MMB (j + 1) k)))
+              (seq 0 (mat_ncols MMA - 1))
+              (bmat_mul (mat_el MMA i 0) (mat_el MMB 0 k))
+          in
+(*
           let fix mat_el_mul_loop it a i j k :=
             match it with
             | 0 => a
@@ -1940,6 +1949,7 @@ Fixpoint bmat_mul T {so : semiring_op T} (MM1 MM2 : bmatrix T) :=
             mat_el_mul_loop (mat_ncols MMA - 1)
               (bmat_mul (mat_el MMA i 0) (mat_el MMB 0 k)) i 1 k
           in
+*)
           let r :=
             {| mat_el i k := mat_el_mul i k;
                mat_nrows := mat_nrows MMA;
@@ -1948,6 +1958,13 @@ Fixpoint bmat_mul T {so : semiring_op T} (MM1 MM2 : bmatrix T) :=
           BM_M r
       end
   end.
+
+Definition mat_el_mul T {so : semiring_op T} MMA MMB i k :=
+  fold_left
+    (λ acc j,
+       bmat_add acc (bmat_mul (mat_el MMA i (j + 1)) (mat_el MMB (j + 1) k)))
+    (seq 0 (mat_ncols MMA - 1))
+    (bmat_mul (mat_el MMA i 0) (mat_el MMB 0 k)).
 
 (* opposite *)
 
@@ -2936,7 +2953,7 @@ destruct Hb as (Hrb & Hcb & Hb).
 split; [ easy | ].
 split; [ easy | ].
 intros i j Hi Hj.
-fold (mat_el_mul_loop (mat_el ma) (mat_el mb)).
+progress fold (mat_el_mul ma mb i j).
 destruct ma as (fa, ra, ca).
 destruct mb as (fb, rb, cb).
 cbn in *.
