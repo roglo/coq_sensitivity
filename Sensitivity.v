@@ -2905,12 +2905,38 @@ intros i j Hi Hj.
 apply IHsizes; [ now apply Ha | now apply Hb ].
 Qed.
 
-Theorem is_square_bmat_mul : ∀ T {so : semiring_op T} MA MB sizes,
+Theorem fold_left_add_bmat_add :
+  ∀ T {so : semiring_op T} {sp : semiring_prop T},
+  ∀ f x y (l : list nat),
+  bmat_fit_for_add x y
+  → (∀ i, bmat_fit_for_add y (f i))
+  → fold_left (λ a i, (a + f i)%BM) l (x + y)%BM =
+     (x + fold_left (λ a i, (a + f i)%BM) l y)%BM.
+Proof.
+intros * sp * Hxy Hyf.
+revert x y Hxy Hyf.
+induction l as [| b]; intros; [ easy | cbn ].
+rewrite <- bmat_add_assoc; [ | easy | easy | easy ].
+apply IHl. {
+  symmetry.
+  apply bmat_fit_for_add_add_l; [ now symmetry | ].
+  symmetry.
+  now transitivity y.
+} {
+  intros i.
+  apply bmat_fit_for_add_add_l; [ apply Hyf | ].
+  transitivity y; [ | apply Hyf ].
+  symmetry; apply Hyf.
+}
+Qed.
+
+Theorem is_square_bmat_mul : ∀ T {so : semiring_op T} {sp : semiring_prop T},
+  ∀ MA MB sizes,
   is_square_bmat sizes MA
   → is_square_bmat sizes MB
   → is_square_bmat sizes (MA * MB)%BM.
 Proof.
-intros * Ha Hb.
+intros * sp * Ha Hb.
 revert MA MB Ha Hb.
 induction sizes as [| size]; intros; [ now destruct MA, MB | ].
 cbn in Ha, Hb |-*.
@@ -2936,32 +2962,42 @@ induction size; intros; cbn. {
     apply Hb; [ flia | easy ].
   }
 }
-Theorem glop : ∀ T {so : semiring_op T} {sp : semiring_prop T},
-  ∀ f x y (l : list nat),
-  bmat_fit_for_add x y
-  → (∀ i, bmat_fit_for_add y (f i))
-  → fold_left (λ a i, (a + f i)%BM) l (x + y)%BM =
-     (x + fold_left (λ a i, (a + f i)%BM) l y)%BM.
-Proof.
-intros * sp * Hxy Hyf.
-revert x y Hxy Hyf.
-induction l as [| b]; intros; [ easy | cbn ].
-rewrite <- bmat_add_assoc; [ | easy | easy | easy ].
-apply IHl. {
-  symmetry.
-  apply bmat_fit_for_add_add_l; [ now symmetry | ].
-  symmetry.
-  now transitivity y.
+rewrite fold_left_add_bmat_add; [ | easy | | ]; cycle 1. {
+  apply square_bmat_fit_for_add.
+  exists sizes.
+  split. {
+    apply IHsizes. {
+      apply Ha; [ easy | flia ].
+    } {
+      apply Hb; [ flia | easy ].
+    }
+  } {
+    apply IHsizes. {
+      apply Ha; [ easy | flia ].
+    } {
+      apply Hb; [ flia | easy ].
+    }
+  }
 } {
-  intros i.
-  apply bmat_fit_for_add_add_l; [ apply Hyf | ].
-  transitivity y.
+  intros j'.
+  apply square_bmat_fit_for_add.
+  exists sizes.
+  split. {
+    apply IHsizes. {
+      apply Ha; [ easy | flia ].
+    } {
+      apply Hb; [ flia | easy ].
+    }
+  } {
 ...
-    symmetry.
-    transitivity x; [ | easy ].
-    symmetry.
+    apply IHsizes. {
+      apply Ha; [ easy | ].
 ...
-rewrite glop.
+      apply Ha; [ | flia ].
+    } {
+      apply Hb; [ flia | easy ].
+    }
+  }
 ...
 destruct size; cbn. {
   apply is_square_bmat_add. {
