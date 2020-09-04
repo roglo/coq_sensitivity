@@ -2971,6 +2971,34 @@ destruct size; cbn. {
     apply Hb; [ flia | easy ].
   }
 }
+destruct size; cbn. {
+  apply is_square_bmat_add. {
+    apply is_square_bmat_add. {
+      apply is_square_bmat_add. {
+        apply IHsizes. {
+          apply Ha; [ easy | flia ].
+        } {
+          apply Hb; [ flia | easy ].
+        }
+      }
+      apply IHsizes. {
+        apply Ha; [ easy | flia ].
+      } {
+        apply Hb; [ flia | easy ].
+      }
+    }
+    apply IHsizes. {
+      apply Ha; [ easy | flia ].
+    } {
+      apply Hb; [ flia | easy ].
+    }
+  }
+  apply IHsizes. {
+    apply Ha; [ easy | flia ].
+  } {
+    apply Hb; [ flia | easy ].
+  }
+}
 ...
 Theorem toto : ∀ T {so : semiring_op T} fa fb size sizes,
   (∀ i j, i < size + 1 → j < size + 1 → is_square_bmat sizes (fa i j))
