@@ -2928,6 +2928,7 @@ cbn in *.
 subst ra ca rb cb.
 destruct size; [ easy | cbn ].
 rewrite Nat.sub_0_r.
+revert i j Hi Hj.
 induction size; intros; cbn. {
   apply IHsizes. {
     apply Ha; [ easy | flia ].
@@ -2935,6 +2936,44 @@ induction size; intros; cbn. {
     apply Hb; [ flia | easy ].
   }
 }
+(**)
+...
+destruct (Nat.eq_dec i (S size)) as [His| His]. {
+  subst i.
+...
+destruct i. {
+  destruct j. {
+    assert (H : ∀ i j : nat, i < S size → j < S size → is_square_bmat sizes (fa i j)). {
+      intros i' j' Hi' Hj'.
+      apply Ha; [ flia Hi' | flia Hj' ].
+    }
+    specialize (IHsize H); clear H.
+    assert (H : ∀ i j : nat, i < S size → j < S size → is_square_bmat sizes (fb i j)). {
+      intros i' j' Hi' Hj'.
+      apply Hb; [ flia Hi' | flia Hj' ].
+    }
+    specialize (IHsize H); clear H.
+    specialize (IHsize (Nat.lt_0_succ _)).
+    specialize (IHsize (Nat.lt_0_succ _)).
+    destruct size. {
+      apply is_square_bmat_add; [ easy | ].
+      apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
+    }
+    replace (S size) with (1 + size) in IHsize by easy.
+    rewrite seq_app in IHsize.
+    cbn in IHsize.
+    replace (S size) with (size + 1) by flia.
+    rewrite seq_app.
+    cbn.
+    rewrite fold_left_app.
+    cbn.
+    apply is_square_bmat_add; [ easy | ].
+    apply IHsizes. {
+      apply Ha; [ easy | flia ].
+    } {
+      apply Hb; [ flia | easy ].
+    }
+  }
 ...
 destruct size; cbn. {
   apply is_square_bmat_add. {
