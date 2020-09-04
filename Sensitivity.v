@@ -2960,13 +2960,14 @@ cbn in *.
 subst ra ca rb cb.
 destruct size; [ easy | cbn ].
 rewrite Nat.sub_0_r.
-destruct size; cbn. {
+induction size; cbn. {
   apply IHsizes. {
     apply Ha; [ easy | flia ].
   } {
     apply Hb; [ flia | easy ].
   }
 }
+...
 destruct size; cbn. {
   apply is_square_bmat_add. {
     apply IHsizes. {
@@ -3002,6 +3003,19 @@ destruct size; cbn. {
     apply Hb; [ flia | easy ].
   }
 }
+Theorem toto : ∀ T {so : semiring_op T} fa fb size sizes,
+  (∀ i j, i < size + 1 → j < size + 1 → is_square_bmat sizes (fa i j))
+  → (∀ i j, i < size + 1 → j < size + 1 → is_square_bmat sizes (fb i j))
+  → ∀ i j, i < size + 1 → j < size + 1
+  → is_square_bmat sizes
+       (fold_left (λ acc k, (acc + fa i (k + 1)%nat * fb (k + 1)%nat j)%BM) 
+       (seq 0 size) (fa i 0 * fb 0 j)%BM).
+Proof.
+intros * Ha Hb * Hi Hj.
+...
+specialize (toto fa fb (3 + size) sizes) as H1.
+rewrite Nat.add_shuffle0 in H1.
+now specialize (H1 Ha Hb i j Hi Hj).
 ...
 
 Theorem bmat_mul_add_distr_r :
