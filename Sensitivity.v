@@ -2957,15 +2957,14 @@ cbn in *.
 subst ra ca rb cb.
 destruct size; [ easy | cbn ].
 rewrite Nat.sub_0_r.
-revert i j Hi Hj.
-induction size; intros; cbn. {
+(**)
+destruct size; cbn. {
   apply IHsizes. {
     apply Ha; [ easy | flia ].
   } {
     apply Hb; [ flia | easy ].
   }
 }
-...
 rewrite fold_left_add_bmat_add; [ | easy | | ]; cycle 1. {
   apply square_bmat_fit_for_add.
   exists sizes.
@@ -3000,14 +2999,80 @@ rewrite fold_left_add_bmat_add; [ | easy | | ]; cycle 1. {
     }
   }
 }
-apply is_square_bmat_add. {
-  apply IHsizes. {
-    apply Ha; [ easy | flia ].
+...
+assert (H : ∀ j, j < S size → is_square_bmat sizes (fa i j)). {
+  now intros; apply Ha.
+}
+move H before Ha; clear Ha; rename H into Ha.
+assert (H : ∀ i, i < S size → is_square_bmat sizes (fb i j)). {
+  now intros; apply Hb.
+}
+move H before Hb; clear Hb; rename H into Hb.
+move j before i; clear Hi Hj.
+destruct size; cbn. {
+  apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
+}
+rewrite fold_left_add_bmat_add; [ | easy | | ]; cycle 1. {
+  apply square_bmat_fit_for_add.
+  exists sizes.
+  split. {
+    apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
   } {
-    apply Hb; [ flia | easy ].
+    apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
+  }
+} {
+  intros j' Hj'.
+  apply square_bmat_fit_for_add.
+  exists sizes.
+  split. {
+    apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
+  } {
+    apply IHsizes; [ apply Ha; flia Hj' | apply Hb; flia Hj' ].
   }
 }
+assert (Hff : is_square_bmat sizes (fa i 0 * fb 0 j)%BM). {
+  apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
+}
+remember (fa i 0 * fb 0 j)%BM as x eqn:Hx; clear Hx.
+revert x Hff.
+induction size; intros; cbn. {
+  apply is_square_bmat_add; [ easy | ].
+  apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
+}
+rewrite fold_left_add_bmat_add; [ | easy | | ]; cycle 1. {
+  apply square_bmat_fit_for_add.
+  exists sizes.
+  split. {
+    apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
+  } {
+    apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
+  }
+} {
+  intros j' Hj'.
+  apply square_bmat_fit_for_add.
+  exists sizes.
+  split. {
+    apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
+  } {
+    apply IHsizes; [ apply Ha; flia Hj' | apply Hb; flia Hj' ].
+  }
+}
+rewrite bmat_add_assoc; [ | easy | | ]; cycle 1. {
+  apply square_bmat_fit_for_add.
+  exists sizes.
+  split; [ easy | ].
+  apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
+} {
 ...
+  apply square_bmat_fit_for_add.
+  exists sizes.
+  split. {
+    apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
+  } {
+...
+apply is_square_bmat_add; [ easy | ].
+  apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
+}
 destruct size; cbn. {
   apply is_square_bmat_add. {
     apply IHsizes. {
