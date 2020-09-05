@@ -3111,6 +3111,26 @@ rewrite <- bmat_add_assoc; [ | easy | | ]; cycle 1. {
   }
 }
 rewrite <- bmat_add_assoc; [ | easy | | ]; cycle 1. {
+  subst x.
+  apply square_bmat_fit_for_add.
+  exists sizes.
+  split. {
+    apply is_square_bmat_fold_left. {
+      intros * HMA HMB.
+      now apply is_square_bmat_mul.
+    } {
+      intros k Hk; apply Ha; flia Hk.
+    } {
+      intros k Hk; apply Hc; flia Hk.
+    }
+  } {
+    apply is_square_bmat_mul; [ easy | | ]. {
+      apply Ha; flia.
+    } {
+      apply Hc; flia.
+    }
+  }
+} {
 ...
 
 (*
