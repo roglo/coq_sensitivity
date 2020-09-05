@@ -3051,9 +3051,6 @@ rewrite IHMC; [ | flia | easy | ]. 2: {
   split; [ apply Hb; flia | ].
   apply Hc; flia.
 }
-(*
-specialize (IHMC i j Hi Hj).
-*)
 clear Hi Hj.
 induction size; [ easy | ].
 rewrite <- (Nat.add_1_r size).
