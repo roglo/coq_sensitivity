@@ -3238,15 +3238,20 @@ split. {
 }
 Qed.
 
-(*
 Theorem bmat_mul_opp_l :
-  ∀ T {ro : ring_op T} (so := rng_semiring) (rp : ring_prop T) (sp : semiring_prop T) MA MB,
-  bmat_fit_for_add MA MB
+  ∀ T {ro : ring_op T} (so := rng_semiring) (rp : ring_prop T)
+    (sp : semiring_prop T),
+  ∀ MA MB,
+  (∃ sizes, is_square_bmat sizes MA ∧ is_square_bmat sizes MB)
   → bmat_mul (bmat_opp MA) MB = bmat_opp (bmat_mul MA MB).
 Proof.
-intros * rp sp * Hss.
-...
-specialize (@bmat_mul_add_distr_r T so sp MA (bmat_opp MA) MB Hss) as H1.
+intros * rp sp * (sizes & Ha & Hb).
+specialize (@bmat_mul_add_distr_r T so sp MA (bmat_opp MA) MB) as H1.
+assert (H : bmat_fit_for_distr MA (- MA)%BM MB). {
+  exists sizes.
+  split; [ easy | ].
+  split; [ | easy ].
+Search (is_square_bmat _ (- _)%BM).
 ...
 intros.
 revert MB.
@@ -3300,10 +3305,8 @@ symmetry in H.
 now apply rng_add_move_0_r in H.
 Qed.
 ...
-*)
 
-...
-
+(*
 Theorem bmat_list_mul_eq_compat : ∀ T {so : semiring_op T} d l1 l2 l3 l4 a,
   length l1 = length l3
   → length l2 = length l4
@@ -3325,14 +3328,18 @@ apply IHl1; [ easy | easy | ].
 intros i.
 now specialize (Hmm (S i)) as H2.
 Qed.
+*)
 
+(*
 Theorem bmat_mul_void_l : ∀ T {so : semiring_op T} M,
   bmat_mul void_bmat M = void_bmat.
 Proof.
 intros.
 now induction M.
 Qed.
+*)
 
+(*
 Theorem bmat_mul_void_r_compat : ∀ T {so : semiring_op T} MA MB,
   bmat_fit_for_add MA MB
   → bmat_mul MA void_bmat = bmat_mul MB void_bmat.
@@ -3361,7 +3368,9 @@ apply IHlla; [ | easy ].
 intros la1 Hla1 a1 Ha1 b1 Hab1.
 apply (IHMA la1); [ now right | easy | easy ].
 Qed.
+*)
 
+(*
 Theorem list_list_transpose_cons : ∀ T (d : T) l ll,
   ll ≠ []
   → (∀ l1, l1 ∈ ll → length l1 = length l)
@@ -3397,7 +3406,9 @@ destruct ll as [| l1]; [ easy | clear Hll; cbn ].
 destruct l1 as [| a1]; [ | easy ].
 now specialize (Hlenll _ (or_introl eq_refl)).
 Qed.
+*)
 
+(*
 Theorem list_list_transpose_opp : ∀ T {ro : ring_op T} d ll,
   list_list_transpose void_bmat (map (map (λ mm, (- mm)%BM)) ll) =
   map (map (λ mm, (- mm)%BM)) (list_list_transpose d ll).
@@ -3430,6 +3441,7 @@ rewrite list_list_transpose_cons; cycle 1. {
       cbn in IHll.
       injection IHll; clear IHll; intros H1 H2.
 ...
+*)
 
 Theorem bmat_mul_opp_opp :
   ∀ T {ro : ring_op T} (so := rng_semiring)
@@ -3445,6 +3457,7 @@ induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
 }
 destruct MB as [xb| mb]; [ easy | cbn ].
 f_equal; f_equal.
+...
 destruct ma as (lla).
 destruct mb as (llb).
 cbn in IHMA |-*.
