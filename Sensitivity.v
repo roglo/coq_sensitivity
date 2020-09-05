@@ -3051,6 +3051,29 @@ rewrite IHMC; [ | flia | easy | ]. 2: {
   split; [ apply Hb; flia | ].
   apply Hc; flia.
 }
+replace
+  (fold_left
+    (λ (acc : bmatrix T) (j0 : nat),
+       (acc + (fa i (j0 + 1)%nat + fb i (j0 + 1)%nat) * fc (j0 + 1)%nat j)%BM)
+    (seq 0 size) (fa i 0 * fc 0 j + fb i 0 * fc 0 j)%BM)
+with
+  (fold_left
+    (λ (acc : bmatrix T) (j0 : nat),
+       (acc +
+        (fa i (j0 + 1)%nat * fc (j0 + 1)%nat j +
+         fb i (j0 + 1)%nat * fc (j0 + 1)%nat j))%BM)
+    (seq 0 size) (fa i 0 * fc 0 j + fb i 0 * fc 0 j)%BM). 2: {
+  apply List_fold_left_ext_in.
+  intros k M Hk.
+  f_equal.
+  apply in_seq in Hk.
+  symmetry.
+  apply IHMC; [ flia Hk | easy | ].
+  exists sizes.
+  split; [ apply Ha; flia Hk | ].
+  split; [ apply Hb; flia Hk | ].
+  apply Hc; flia Hk.
+}
 clear Hi Hj.
 induction size; [ easy | ].
 rewrite <- (Nat.add_1_r size).
@@ -3105,10 +3128,10 @@ rewrite <- bmat_add_assoc; [ | easy | | ]; cycle 1. {
       intros k Hk; apply Hc; flia Hk.
     }
   } {
-    apply square_bmat_mul; [ easy | | ]. {
-      apply square_bmat_add; [ apply Ha; flia | apply Hb; flia ].
+    apply square_bmat_add. {
+      apply square_bmat_mul; [ easy | apply Ha; flia | apply Hc; flia ].
     } {
-      apply Hc; flia.
+      apply square_bmat_mul; [ easy | apply Hb; flia | apply Hc; flia ].
     }
   }
 }
@@ -3153,27 +3176,7 @@ rewrite <- bmat_add_assoc; [ | easy | | ]; cycle 1. {
   }
 }
 f_equal.
-rewrite (bmat_add_comm (fa i _ * _)%BM). 2: {
-  apply square_bmat_fit_for_add.
-  exists sizes.
-  split. {
-    apply square_bmat_mul; [ easy | apply Ha; flia | apply Hc; flia ].
-  } {
-    apply square_bmat_add. {
-      subst y.
-      apply square_bmat_fold_left. {
-        now intros; apply square_bmat_mul.
-      } {
-        intros * H; apply Hb; flia H.
-      } {
-        intros * H; apply Hc; flia H.
-      }
-    } {
-      apply square_bmat_mul; [ easy | apply Hb; flia | apply Hc; flia ].
-    }
-  }
-}
-rewrite <- bmat_add_assoc; [ | easy | | ]; cycle 1. {
+rewrite bmat_add_comm; [ | easy | ]. 2: {
   apply square_bmat_fit_for_add.
   exists sizes.
   split. {
@@ -3186,6 +3189,19 @@ rewrite <- bmat_add_assoc; [ | easy | | ]; cycle 1. {
       intros * H; apply Hc; flia H.
     }
   } {
+    apply square_bmat_add. {
+      apply square_bmat_mul; [ easy | apply Ha; flia | apply Hc; flia ].
+    } {
+      apply square_bmat_mul; [ easy | apply Hb; flia | apply Hc; flia ].
+    }
+  }
+}
+rewrite <- bmat_add_assoc; [ | easy | | ]; cycle 1. {
+  apply square_bmat_fit_for_add.
+  exists sizes.
+  split. {
+    apply square_bmat_mul; [ easy | apply Ha; flia | apply Hc; flia ].
+  } {
     apply square_bmat_mul; [ easy | apply Hb; flia | apply Hc; flia ].
   }
 } {
@@ -3194,17 +3210,33 @@ rewrite <- bmat_add_assoc; [ | easy | | ]; cycle 1. {
   split. {
     apply square_bmat_mul; [ easy | apply Hb; flia | apply Hc; flia ].
   } {
-    apply square_bmat_mul; [ easy | apply Ha; flia | apply Hc; flia ].
+    subst y.
+    apply square_bmat_fold_left. {
+      now intros; apply square_bmat_mul.
+    } {
+      intros * H; apply Hb; flia H.
+    } {
+      intros * H; apply Hc; flia H.
+    }
   }
 }
 f_equal.
-rewrite bmat_add_comm; [ | easy | ]. 2: {
-  apply square_bmat_fit_for_add.
-  exists sizes.
-  split; [ apply Ha; flia | apply Hb; flia ].
+apply bmat_add_comm; [ easy | ].
+apply square_bmat_fit_for_add.
+exists sizes.
+split. {
+  apply square_bmat_mul; [ easy | apply Hb; flia | apply Hc; flia ].
+} {
+  subst y.
+  apply square_bmat_fold_left. {
+    now intros; apply square_bmat_mul.
+  } {
+    intros * H; apply Hb; flia H.
+  } {
+    intros * H; apply Hc; flia H.
+  }
 }
-apply IHMC; [ flia | | ].
-...
+Qed.
 
 (*
 Theorem bmat_mul_opp_l :
@@ -3269,6 +3301,8 @@ now apply rng_add_move_0_r in H.
 Qed.
 ...
 *)
+
+...
 
 Theorem bmat_list_mul_eq_compat : ∀ T {so : semiring_op T} d l1 l2 l3 l4 a,
   length l1 = length l3
