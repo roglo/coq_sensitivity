@@ -2336,6 +2336,17 @@ destruct size. {
   destruct i. {
     destruct k. {
       rewrite IHsizes; [ cbn | now apply Hss ].
+      assert (H : bmat_zero_like (fm 0 1) = bmat_zero_like (fm 1 0)). {
+        remember (fm 0 1) as BM eqn:HBM; symmetry in HBM.
+        induction BM as [x| M IHBM] using bmatrix_ind2. {
+          cbn.
+          specialize (Hss 0 1 Hi Nat.lt_1_2) as H1.
+          rewrite HBM in H1.
+          destruct sizes as [| size]; [ clear H1 | easy ].
+          specialize (Hss 1 0 Nat.lt_1_2 Hj) as H1.
+          cbn in H1.
+          now destruct (fm 1 0).
+        }
 ...
 
 Theorem bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
