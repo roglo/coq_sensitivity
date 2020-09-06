@@ -2279,7 +2279,7 @@ transitivity (A n); [ easy | ].
 apply bmat_fit_for_add_opp_r.
 Qed.
 
-Fixpoint is_square_bmat T sizes (M : bmatrix T) {struct sizes} :=
+Fixpoint is_square_bmat_loop T sizes (M : bmatrix T) {struct sizes} :=
   match M with
   | BM_1 _ => sizes = []
   | BM_M MM =>
@@ -2288,10 +2288,19 @@ Fixpoint is_square_bmat T sizes (M : bmatrix T) {struct sizes} :=
           mat_nrows MM = size ∧
           mat_ncols MM = size ∧
           (∀ i j, i < size → j < size →
-           is_square_bmat sizes' (mat_el MM i j))
+           is_square_bmat_loop sizes' (mat_el MM i j))
       | [] => False
       end
   end.
+
+Fixpoint sizes_of_bmatrix T (BM : bmatrix T) :=
+  match BM with
+  | BM_1 _ => []
+  | BM_M M => mat_nrows M :: sizes_of_bmatrix (mat_el M 0 0)
+  end.
+
+Definition is_square_bmat T (BM : bmatrix T) :=
+  is_square_bmat_loop (sizes_of_bmatrix BM) BM.
 
 Fixpoint bmat_zero_like T {so : semiring_op T} (BM : bmatrix T) :=
   match BM with
@@ -2304,11 +2313,23 @@ Fixpoint bmat_zero_like T {so : semiring_op T} (BM : bmatrix T) :=
       BM_M M'
   end.
 
-Theorem bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T},
-  ∀ BM sizes,
-  is_square_bmat sizes BM
+Theorem bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} BM,
+  is_square_bmat BM
   → bmat_mul (bmat_zero_like BM) BM = bmat_zero_like BM.
 Proof.
+intros * sp * Hss.
+induction BM as [x| M IHBM] using bmatrix_ind2. {
+  now cbn; rewrite srng_mul_0_l.
+}
+cbn in Hss |-*.
+destruct Hss as (_ & Hc & Hss).
+f_equal.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros i k Hi Hk.
+destruct M as (f, r, c); cbn in *; subst c.
+destruct r; [ easy | cbn ].
+rewrite Nat.sub_0_r.
+...
 intros * sp * Hss.
 revert BM Hss.
 induction sizes as [| size]; intros; cbn in Hss. {
