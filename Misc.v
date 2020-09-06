@@ -1823,3 +1823,16 @@ Fixpoint iter_merge {A} (le : A → A → bool) stack l :=
   end.
 
 Definition bsort {A} (le : A → A → bool) := iter_merge le [].
+
+(* *)
+
+Definition bool_of_sumbool {A B : Prop} (P : sumbool A B) :=
+  match P with
+  | left _ _ => true
+  | right _ _ => false
+  end.
+
+Definition sumbool_or {A B C D : Prop} (P : sumbool A B) (Q : sumbool C D) :=
+  orb (bool_of_sumbool P) (bool_of_sumbool Q).
+
+Notation "a ∨∨ b" := (sumbool_or a b) (at level 85, right associativity).
