@@ -2279,6 +2279,20 @@ transitivity (A n); [ easy | ].
 apply bmat_fit_for_add_opp_r.
 Qed.
 
+Fixpoint is_square_bmat T sizes (M : bmatrix T) {struct sizes} :=
+  match M with
+  | BM_1 _ => sizes = []
+  | BM_M MM =>
+      match sizes with
+      | size :: sizes' =>
+          mat_nrows MM = size ∧
+          mat_ncols MM = size ∧
+          (∀ i j, i < size → j < size →
+           is_square_bmat sizes' (mat_el MM i j))
+      | [] => False
+      end
+  end.
+
 Fixpoint bmat_zero_like T {so : semiring_op T} (BM : bmatrix T) :=
   match BM with
   | BM_1 _ => BM_1 0%Srng
@@ -2290,14 +2304,38 @@ Fixpoint bmat_zero_like T {so : semiring_op T} (BM : bmatrix T) :=
       BM_M M'
   end.
 
-Theorem bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} BM,
-  bmat_mul (bmat_zero_like BM) BM = bmat_zero_like BM.
+Theorem bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T},
+  ∀ BM sizes,
+  is_square_bmat sizes BM
+  → bmat_mul (bmat_zero_like BM) BM = bmat_zero_like BM.
 Proof.
-intros.
-destruct BM as [x| M]; [ now cbn; rewrite srng_mul_0_l | ].
-cbn; f_equal.
+intros * sp * Hss.
+revert BM Hss.
+induction sizes as [| size]; intros; cbn in Hss. {
+  destruct BM as [x| M]; [ clear Hss | easy ].
+  now cbn; rewrite srng_mul_0_l.
+}
+destruct BM as [x| M]; [ easy | ].
+destruct M as (fm, rm, cm).
+cbn in Hss |-*.
+destruct Hss as (Hr & Hc & Hss).
+subst rm cm.
+f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros * Hi Hj.
+rename j into k.
+destruct size; [ easy | cbn ].
+rewrite Nat.sub_0_r.
+destruct size. {
+  apply Nat.lt_1_r in Hi.
+  apply Nat.lt_1_r in Hj.
+  subst i k; cbn.
+  apply IHsizes, Hss; flia.
+}
+destruct size. {
+  destruct i. {
+    destruct k. {
+      rewrite IHsizes; [ cbn | now apply Hss ].
 ...
 
 Theorem bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
@@ -2881,20 +2919,6 @@ Definition bmat_nrows T (M : bmatrix T) :=
   match M with
   | BM_1 _ => 0
   | BM_M m => mat_nrows m
-  end.
-
-Fixpoint is_square_bmat T sizes (M : bmatrix T) {struct sizes} :=
-  match M with
-  | BM_1 _ => sizes = []
-  | BM_M MM =>
-      match sizes with
-      | size :: sizes' =>
-          mat_nrows MM = size ∧
-          mat_ncols MM = size ∧
-          (∀ i j, i < size → j < size →
-           is_square_bmat sizes' (mat_el MM i j))
-      | [] => False
-      end
   end.
 
 Definition bmat_fit_for_distr T (MA MB MC : bmatrix T) :=
