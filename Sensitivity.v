@@ -2346,27 +2346,38 @@ apply IHsizes.
 now apply HBM.
 Qed.
 
+Theorem eq_bmat_zero_like_BM_1 : ∀ T {so : semiring_op T} (BM : bmatrix T) x,
+  bmat_zero_like BM = BM_1 x → x = 0%Srng.
+Proof.
+intros * HBM.
+destruct BM as [y| M]; cbn in HBM; [ now injection HBM | easy ].
+Qed.
+
 Theorem bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} BM,
   is_square_bmat BM
   → bmat_mul (bmat_zero_like BM) BM = bmat_zero_like BM.
 Proof.
 intros * sp * Hss.
 specialize (square_bmat_zero_like BM Hss) as Hz.
-...
-unfold is_square_bmat in Hss.
+unfold is_square_bmat in Hss, Hz.
+rewrite sizes_of_bmat_zero_like in Hz.
 remember (sizes_of_bmatrix BM) as sizes eqn:Hsizes.
 symmetry in Hsizes.
-revert BM Hss Hsizes.
-induction sizes as [| size]; intros; cbn in Hss. {
+revert BM Hss Hz Hsizes.
+induction sizes as [| size]; intros; cbn in Hss, Hz. {
   destruct BM as [x| M]; [ clear Hss | easy ].
   now cbn; rewrite srng_mul_0_l.
 }
 destruct BM as [x| M]; [ easy | ].
+cbn in Hz.
 destruct M as (fm, rm, cm).
-cbn in Hss, Hsizes |-*.
+cbn in Hss, Hz, Hsizes |-*.
+destruct (zerop rm) as [Hrz| Hrz]; [ easy | ].
+destruct (zerop cm) as [Hcz| Hcz]; [ easy | cbn in Hsizes ].
 injection Hsizes; clear Hsizes; intros Hsizes Hsize.
 destruct Hss as (Hr & Hc & Hss).
-subst rm cm; clear Hsize.
+subst rm cm; clear Hsize Hcz.
+destruct Hz as (_ & _ & Hz).
 f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros * Hi Hj.
@@ -2377,24 +2388,31 @@ destruct size. {
   apply Nat.lt_1_r in Hi.
   apply Nat.lt_1_r in Hj.
   subst i k; cbn.
-  apply IHsizes; [ apply Hss; flia | easy ].
+  apply IHsizes; [ apply Hss; flia | apply Hz; flia | easy ].
 }
 destruct size. {
   destruct i. {
     destruct k. {
-      rewrite IHsizes; [ cbn | now apply Hss | easy ].
+      rewrite IHsizes; [ cbn | now apply Hss | now apply Hz | easy ].
       assert (H : bmat_zero_like (fm 0 1) = bmat_zero_like (fm 1 0)). {
-        remember (fm 0 1) as BM eqn:HBM; symmetry in HBM.
-        induction BM as [x| M IHBM] using bmatrix_ind2. {
-          cbn.
-          specialize (Hss 0 1 Hi Nat.lt_1_2) as H1.
-          rewrite HBM in H1.
-          destruct sizes as [| size]; [ clear H1 | easy ].
-          specialize (Hss 1 0 Nat.lt_1_2 Hj) as H1.
-          cbn in H1.
-          now destruct (fm 1 0).
+        specialize (Hz 0 1 Hi Nat.lt_1_2) as H1.
+        specialize (Hz 1 0 Nat.lt_1_2 Hj) as H2.
+        remember (bmat_zero_like (fm 0 1)) as x1 eqn:Hx1; symmetry in Hx1.
+        remember (bmat_zero_like (fm 1 0)) as x2 eqn:Hx2; symmetry in Hx2.
+        move x2 before x1; move Hx2 before Hx1.
+        clear IHsizes Hss Hsizes.
+        induction sizes as [| size]. {
+          cbn in H1, H2.
+          destruct x1 as [x1| ]; [ clear H1 | easy ].
+          destruct x2 as [x2| ]; [ clear H2 | easy ].
+          apply eq_bmat_zero_like_BM_1 in Hx1.
+          apply eq_bmat_zero_like_BM_1 in Hx2.
+          now subst x1 x2.
         }
-        cbn.
+        cbn in H1, H2.
+        destruct x1 as [| m1]; [ easy | ].
+        destruct x2 as [| m2]; [ easy | ].
+        apply IHsizes. {
 ...
 
 Theorem bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
