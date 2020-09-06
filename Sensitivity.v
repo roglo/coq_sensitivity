@@ -2317,7 +2317,10 @@ Theorem bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} BM,
   is_square_bmat BM
   → bmat_mul (bmat_zero_like BM) BM = bmat_zero_like BM.
 Proof.
+(*
 intros * sp * Hss.
+unfold is_square_bmat in Hss.
+...
 induction BM as [x| M IHBM] using bmatrix_ind2. {
   now cbn; rewrite srng_mul_0_l.
 }
@@ -2330,17 +2333,22 @@ destruct M as (f, r, c); cbn in *; subst c.
 destruct r; [ easy | cbn ].
 rewrite Nat.sub_0_r.
 ...
+*)
 intros * sp * Hss.
-revert BM Hss.
+unfold is_square_bmat in Hss.
+remember (sizes_of_bmatrix BM) as sizes eqn:Hsizes.
+symmetry in Hsizes.
+revert BM Hss Hsizes.
 induction sizes as [| size]; intros; cbn in Hss. {
   destruct BM as [x| M]; [ clear Hss | easy ].
   now cbn; rewrite srng_mul_0_l.
 }
 destruct BM as [x| M]; [ easy | ].
 destruct M as (fm, rm, cm).
-cbn in Hss |-*.
+cbn in Hss, Hsizes |-*.
+injection Hsizes; clear Hsizes; intros Hsizes Hsize.
 destruct Hss as (Hr & Hc & Hss).
-subst rm cm.
+subst rm cm; clear Hsize.
 f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros * Hi Hj.
@@ -2351,12 +2359,12 @@ destruct size. {
   apply Nat.lt_1_r in Hi.
   apply Nat.lt_1_r in Hj.
   subst i k; cbn.
-  apply IHsizes, Hss; flia.
+  apply IHsizes; [ apply Hss; flia | easy ].
 }
 destruct size. {
   destruct i. {
     destruct k. {
-      rewrite IHsizes; [ cbn | now apply Hss ].
+      rewrite IHsizes; [ cbn | now apply Hss | easy ].
       assert (H : bmat_zero_like (fm 0 1) = bmat_zero_like (fm 1 0)). {
         remember (fm 0 1) as BM eqn:HBM; symmetry in HBM.
         induction BM as [x| M IHBM] using bmatrix_ind2. {
@@ -2368,6 +2376,7 @@ destruct size. {
           cbn in H1.
           now destruct (fm 1 0).
         }
+        cbn.
 ...
 
 Theorem bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
@@ -2953,15 +2962,20 @@ Definition bmat_nrows T (M : bmatrix T) :=
   | BM_M m => mat_nrows m
   end.
 
+Print is_square_bmat.
+
 Definition bmat_fit_for_distr T (MA MB MC : bmatrix T) :=
   ∃ sizes,
-  is_square_bmat sizes MA ∧ is_square_bmat sizes MB ∧ is_square_bmat sizes MC.
+  is_square_bmat_loop sizes MA ∧
+  is_square_bmat_loop sizes MB ∧
+  is_square_bmat_loop sizes MC.
 
-Theorem square_bmat_fit_for_add : ∀ T (MA MB : bmatrix T),
-  (∃ sizes, is_square_bmat sizes MA ∧ is_square_bmat sizes MB)
+Theorem square_bmat_fit_for_add : ∀ T sizes (MA MB : bmatrix T),
+  is_square_bmat_loop sizes MA
+  → is_square_bmat_loop sizes MB
   → bmat_fit_for_add MA MB.
 Proof.
-intros * (sizes & Ha & Hb).
+intros * Ha Hb.
 revert MA MB Ha Hb.
 induction sizes as [| size]; intros; [ now destruct MA, MB | ].
 cbn in Ha, Hb.
@@ -2976,9 +2990,9 @@ apply IHsizes; [ apply Ha; congruence | apply Hb; congruence ].
 Qed.
 
 Theorem square_bmat_add : ∀ T {so : semiring_op T} MA MB sizes,
-  is_square_bmat sizes MA
-  → is_square_bmat sizes MB
-  → is_square_bmat sizes (MA + MB)%BM.
+  is_square_bmat_loop sizes MA
+  → is_square_bmat_loop sizes MB
+  → is_square_bmat_loop sizes (MA + MB)%BM.
 Proof.
 intros * Ha Hb.
 revert MA MB Ha Hb.
@@ -3025,12 +3039,12 @@ Qed.
 Theorem square_bmat_fold_left : ∀ T {so : semiring_op T},
   ∀ (fa fb : nat → nat → bmatrix T) size sizes i j,
   (∀ MA MB,
-   is_square_bmat sizes MA
-   → is_square_bmat sizes MB
-   → is_square_bmat sizes (MA * MB)%BM)
-  → (∀ j, j < S size → is_square_bmat sizes (fa i j))
-  → (∀ i, i < S size → is_square_bmat sizes (fb i j))
-  → is_square_bmat sizes
+   is_square_bmat_loop sizes MA
+   → is_square_bmat_loop sizes MB
+   → is_square_bmat_loop sizes (MA * MB)%BM)
+  → (∀ j, j < S size → is_square_bmat_loop sizes (fa i j))
+  → (∀ i, i < S size → is_square_bmat_loop sizes (fb i j))
+  → is_square_bmat_loop sizes
        (fold_left (λ a k, (a + fa i (k + 1)%nat * fb (k + 1)%nat j)%BM) 
        (seq 0 size) (fa i 0 * fb 0 j)%BM).
 Proof.
@@ -3056,9 +3070,9 @@ Qed.
 
 Theorem square_bmat_mul : ∀ T {so : semiring_op T} {sp : semiring_prop T},
   ∀ MA MB sizes,
-  is_square_bmat sizes MA
-  → is_square_bmat sizes MB
-  → is_square_bmat sizes (MA * MB)%BM.
+  is_square_bmat_loop sizes MA
+  → is_square_bmat_loop sizes MB
+  → is_square_bmat_loop sizes (MA * MB)%BM.
 Proof.
 intros * sp * Ha Hb.
 revert MA MB Ha Hb.
@@ -3078,11 +3092,11 @@ cbn in *.
 subst ra ca rb cb.
 destruct size; [ easy | cbn ].
 rewrite Nat.sub_0_r.
-assert (H : ∀ j, j < S size → is_square_bmat sizes (fa i j)). {
+assert (H : ∀ j, j < S size → is_square_bmat_loop sizes (fa i j)). {
   now intros; apply Ha.
 }
 move H before Ha; clear Ha; rename H into Ha.
-assert (H : ∀ i, i < S size → is_square_bmat sizes (fb i j)). {
+assert (H : ∀ i, i < S size → is_square_bmat_loop sizes (fb i j)). {
   now intros; apply Hb.
 }
 move H before Hb; clear Hb; rename H into Hb.
@@ -3126,15 +3140,15 @@ cbn in *.
 subst ra rb rc ca cb cc.
 destruct size; [ easy | cbn ].
 rewrite Nat.sub_0_r.
-assert (H : ∀ j, j < S size → is_square_bmat sizes (fa i j)). {
+assert (H : ∀ j, j < S size → is_square_bmat_loop sizes (fa i j)). {
   now intros; apply Ha.
 }
 move H before Ha; clear Ha; rename H into Ha.
-assert (H : ∀ j, j < S size → is_square_bmat sizes (fb i j)). {
+assert (H : ∀ j, j < S size → is_square_bmat_loop sizes (fb i j)). {
   now intros; apply Hb.
 }
 move H before Hb; clear Hb; rename H into Hb.
-assert (H : ∀ i, i < S size → is_square_bmat sizes (fc i j)). {
+assert (H : ∀ i, i < S size → is_square_bmat_loop sizes (fc i j)). {
   now intros; apply Hc.
 }
 move H before Hc; clear Hc; rename H into Hc.
@@ -3187,9 +3201,7 @@ remember (fold_left _ _ _) as x in |-*.
 remember (fold_left _ _ _) as y in |-*.
 rewrite <- bmat_add_assoc; [ | easy | | ]; cycle 1. {
   subst x y.
-  apply square_bmat_fit_for_add.
-  exists sizes.
-  split. {
+  apply (square_bmat_fit_for_add sizes). {
     apply square_bmat_fold_left. {
       intros * HMA HMB.
       now apply square_bmat_mul.
@@ -3210,9 +3222,7 @@ rewrite <- bmat_add_assoc; [ | easy | | ]; cycle 1. {
   }
 } {
   subst x y.
-  apply square_bmat_fit_for_add.
-  exists sizes.
-  split. {
+  apply (square_bmat_fit_for_add sizes). {
     apply square_bmat_fold_left. {
       intros * HMA HMB.
       now apply square_bmat_mul.
@@ -3231,9 +3241,7 @@ rewrite <- bmat_add_assoc; [ | easy | | ]; cycle 1. {
 }
 rewrite <- bmat_add_assoc; [ | easy | | ]; cycle 1. {
   subst x.
-  apply square_bmat_fit_for_add.
-  exists sizes.
-  split. {
+  apply (square_bmat_fit_for_add sizes). {
     apply square_bmat_fold_left. {
       intros * HMA HMB.
       now apply square_bmat_mul.
@@ -3250,9 +3258,7 @@ rewrite <- bmat_add_assoc; [ | easy | | ]; cycle 1. {
     }
   }
 } {
-  apply square_bmat_fit_for_add.
-  exists sizes.
-  split. {
+  apply (square_bmat_fit_for_add sizes). {
     apply square_bmat_mul; [ easy | apply Ha; flia | apply Hc; flia ].
   } {
     apply square_bmat_add. {
@@ -3271,9 +3277,7 @@ rewrite <- bmat_add_assoc; [ | easy | | ]; cycle 1. {
 }
 f_equal.
 rewrite bmat_add_comm; [ | easy | ]. 2: {
-  apply square_bmat_fit_for_add.
-  exists sizes.
-  split. {
+  apply (square_bmat_fit_for_add sizes). {
     subst y.
     apply square_bmat_fold_left. {
       now intros; apply square_bmat_mul.
@@ -3291,17 +3295,13 @@ rewrite bmat_add_comm; [ | easy | ]. 2: {
   }
 }
 rewrite <- bmat_add_assoc; [ | easy | | ]; cycle 1. {
-  apply square_bmat_fit_for_add.
-  exists sizes.
-  split. {
+  apply (square_bmat_fit_for_add sizes). {
     apply square_bmat_mul; [ easy | apply Ha; flia | apply Hc; flia ].
   } {
     apply square_bmat_mul; [ easy | apply Hb; flia | apply Hc; flia ].
   }
 } {
-  apply square_bmat_fit_for_add.
-  exists sizes.
-  split. {
+  apply (square_bmat_fit_for_add sizes). {
     apply square_bmat_mul; [ easy | apply Hb; flia | apply Hc; flia ].
   } {
     subst y.
@@ -3316,9 +3316,7 @@ rewrite <- bmat_add_assoc; [ | easy | | ]; cycle 1. {
 }
 f_equal.
 apply bmat_add_comm; [ easy | ].
-apply square_bmat_fit_for_add.
-exists sizes.
-split. {
+apply (square_bmat_fit_for_add sizes). {
   apply square_bmat_mul; [ easy | apply Hb; flia | apply Hc; flia ].
 } {
   subst y.
@@ -3333,7 +3331,7 @@ split. {
 Qed.
 
 Theorem square_bmat_opp : ∀ T {ro : ring_op T} (M : bmatrix T) sizes,
-  is_square_bmat sizes M → is_square_bmat sizes (- M)%BM.
+  is_square_bmat_loop sizes M → is_square_bmat_loop sizes (- M)%BM.
 Proof.
 intros * HM.
 revert M HM.
@@ -3351,7 +3349,7 @@ Theorem bmat_mul_opp_l :
   ∀ T {ro : ring_op T} (so := rng_semiring) (rp : ring_prop T)
     (sp : semiring_prop T),
   ∀ MA MB,
-  (∃ sizes, is_square_bmat sizes MA ∧ is_square_bmat sizes MB)
+  (∃ sizes, is_square_bmat_loop sizes MA ∧ is_square_bmat_loop sizes MB)
   → bmat_mul (bmat_opp MA) MB = bmat_opp (bmat_mul MA MB).
 Proof.
 intros * rp sp * (sizes & Ha & Hb).
