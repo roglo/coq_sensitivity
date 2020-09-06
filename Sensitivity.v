@@ -2279,6 +2279,27 @@ transitivity (A n); [ easy | ].
 apply bmat_fit_for_add_opp_r.
 Qed.
 
+Fixpoint bmat_zero_like T {so : semiring_op T} (BM : bmatrix T) :=
+  match BM with
+  | BM_1 _ => BM_1 0%Srng
+  | BM_M M =>
+      let M' :=
+        mk_mat (λ i j, bmat_zero_like (mat_el M i j))
+          (mat_nrows M) (mat_ncols M)
+      in
+      BM_M M'
+  end.
+
+Theorem bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} BM,
+  bmat_mul (bmat_zero_like BM) BM = bmat_zero_like BM.
+Proof.
+intros.
+destruct BM as [x| M]; [ now cbn; rewrite srng_mul_0_l | ].
+cbn; f_equal.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros * Hi Hj.
+...
+
 Theorem bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
   bmat_fit_for_add (I_2_pow n) M
   → bmat_mul (Z_2_pow n) M = Z_2_pow n.
@@ -2545,6 +2566,22 @@ now apply matrix_eq.
 Qed.
 
 Theorem bmat_add_opp_r : ∀ T {ro : ring_op T} (so := rng_semiring)
+    {rp : ring_prop T} {sp : semiring_prop T} M,
+  bmat_add M (bmat_opp M) = bmat_zero_like M.
+Proof.
+intros * rp sp *.
+induction M as [x| M IHM] using bmatrix_ind2; intros. {
+  cbn.
+  subst so.
+  rewrite fold_rng_sub.
+  now rewrite rng_add_opp_r.
+}
+cbn; f_equal.
+now apply matrix_eq.
+Qed.
+
+(*
+Theorem bmat_add_opp_r : ∀ T {ro : ring_op T} (so := rng_semiring)
     {rp : ring_prop T} {sp : semiring_prop T} M n,
   bmat_fit_for_add M (Z_2_pow n)
   → bmat_add M (bmat_opp M) = Z_2_pow n.
@@ -2583,6 +2620,7 @@ destruct i; [ cbn | flia Hi ].
 destruct j; [ easy | cbn ].
 destruct j; [ easy | flia Hj ].
 Qed.
+*)
 
 Theorem bmat_nat_mul_0_r : ∀ T {so : semiring_op T} {sp : semiring_prop T}
     k n,
@@ -3238,6 +3276,21 @@ split. {
 }
 Qed.
 
+Theorem square_bmat_opp : ∀ T {ro : ring_op T} (M : bmatrix T) sizes,
+  is_square_bmat sizes M → is_square_bmat sizes (- M)%BM.
+Proof.
+intros * HM.
+revert M HM.
+induction sizes as [| size]; intros; [ now destruct M | ].
+cbn in HM |-*.
+destruct M as [x| M]; [ easy | cbn ].
+destruct HM as (Hr & Hc & HM).
+split; [ easy | ].
+split; [ easy | ].
+intros i j Hi Hj.
+now apply IHsizes, HM.
+Qed.
+
 Theorem bmat_mul_opp_l :
   ∀ T {ro : ring_op T} (so := rng_semiring) (rp : ring_prop T)
     (sp : semiring_prop T),
@@ -3251,7 +3304,13 @@ assert (H : bmat_fit_for_distr MA (- MA)%BM MB). {
   exists sizes.
   split; [ easy | ].
   split; [ | easy ].
-Search (is_square_bmat _ (- _)%BM).
+  now apply square_bmat_opp.
+}
+specialize (H1 H); clear H.
+unfold so in H1.
+rewrite bmat_add_opp_r in H1; [ | easy | easy ].
+...
+rewrite bmat_mul_0_l in H1.
 ...
 intros.
 revert MB.
