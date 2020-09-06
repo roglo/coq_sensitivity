@@ -2333,14 +2333,24 @@ Proof.
 intros * HBM.
 unfold is_square_bmat in HBM |-*.
 rewrite sizes_of_bmat_zero_like.
-...
+remember (sizes_of_bmatrix BM) as sizes; clear Heqsizes.
+revert BM HBM.
+induction sizes as [| size]; intros; [ now destruct BM | ].
+cbn in HBM |-*.
+destruct BM as [x| M]; [ easy | cbn ].
+destruct HBM as (Hr & Hc & HBM).
+split; [ easy | ].
+split; [ easy | ].
+intros i j Hi Hj.
+apply IHsizes.
+now apply HBM.
+Qed.
 
 Theorem bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} BM,
   is_square_bmat BM
   → bmat_mul (bmat_zero_like BM) BM = bmat_zero_like BM.
 Proof.
 intros * sp * Hss.
-...
 specialize (square_bmat_zero_like BM Hss) as Hz.
 ...
 unfold is_square_bmat in Hss.
