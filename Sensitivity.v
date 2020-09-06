@@ -2313,28 +2313,40 @@ Fixpoint bmat_zero_like T {so : semiring_op T} (BM : bmatrix T) :=
       BM_M M'
   end.
 
+Theorem sizes_of_bmat_zero_like : ∀ T {so : semiring_op T} (BM : bmatrix T),
+  sizes_of_bmatrix (bmat_zero_like BM) = sizes_of_bmatrix BM.
+Proof.
+intros.
+induction BM as [x| M IHBM] using bmatrix_ind2; [ easy | cbn ].
+f_equal.
+apply IHBM.
+Print sizes_of_bmatrix.
+Print bmat_zero_like.
+...
+
 Theorem bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} BM,
   is_square_bmat BM
   → bmat_mul (bmat_zero_like BM) BM = bmat_zero_like BM.
 Proof.
-(*
 intros * sp * Hss.
-unfold is_square_bmat in Hss.
+Theorem glop : ∀ T {so : semiring_op T} (BM : bmatrix T),
+  is_square_bmat BM
+  → is_square_bmat (bmat_zero_like BM).
+Proof.
+intros * HBM.
+unfold is_square_bmat in HBM |-*.
 ...
-induction BM as [x| M IHBM] using bmatrix_ind2. {
-  now cbn; rewrite srng_mul_0_l.
-}
-cbn in Hss |-*.
-destruct Hss as (_ & Hc & Hss).
-f_equal.
-apply matrix_eq; cbn; [ easy | easy | ].
-intros i k Hi Hk.
-destruct M as (f, r, c); cbn in *; subst c.
-destruct r; [ easy | cbn ].
-rewrite Nat.sub_0_r.
+rewrite sizes_of_bmat_zero_like.
 ...
-*)
-intros * sp * Hss.
+induction BM as [x| M IHBM] using bmatrix_ind2; [ easy | cbn ].
+destruct HBM as (Hr & Hc & HBM).
+split; [ easy | ].
+split; [ easy | ].
+intros i j Hi Hj.
+unfold is_square_bmat in IHBM.
+...
+specialize (glop BM Hss) as Hz.
+...
 unfold is_square_bmat in Hss.
 remember (sizes_of_bmatrix BM) as sizes eqn:Hsizes.
 symmetry in Hsizes.
