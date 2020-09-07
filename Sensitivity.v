@@ -2353,7 +2353,38 @@ intros * HBM.
 destruct BM as [y| M]; cbn in HBM; [ now injection HBM | easy ].
 Qed.
 
-Theorem bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} BM,
+Theorem glop : ∀ T {so : semiring_op T} {sp : semiring_prop T} BMA BMB,
+  is_square_bmat BMA
+  → is_square_bmat BMB
+  → (bmat_zero_like BMA * BMB)%BM = bmat_zero_like (BMA * BMB)%BM.
+Proof.
+intros * sp * Ha Hb.
+revert BMB Hb.
+induction BMA as [xa| ma IHBMA] using bmatrix_ind2; intros; cbn. {
+  destruct BMB as [xb| mb]; [ | easy ].
+  now rewrite srng_mul_0_l.
+}
+destruct BMB as [xb| mb]; [ easy | ].
+cbn; f_equal.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros * Hi Hj.
+destruct ma as (fa, ra, ca).
+destruct mb as (fb, rb, cb).
+cbn in *.
+destruct (zerop ra) as [Hrra| Hrra]; [ easy | ].
+destruct (zerop ca) as [Hcca| Hcca]; [ easy | ].
+destruct (zerop rb) as [Hrrb| Hrrb]; [ easy | ].
+destruct (zerop cb) as [Hccb| Hccb]; [ easy | ].
+cbn in Ha, Hb.
+destruct Ha as (_ & _ & Ha).
+destruct Hb as (_ & _ & Hb).
+destruct ca; [ easy | cbn ].
+rewrite Nat.sub_0_r.
+rewrite IHBMA; [ | easy | easy | | ]. 2: {
+Search is_square_bmat.
+...
+
+Theorem bmat_mul_0_l : ∀ T {so : semiring_op T} {sp : semiring_prop T} BM,
   is_square_bmat BM
   → bmat_mul (bmat_zero_like BM) BM = bmat_zero_like BM.
 Proof.
@@ -2384,6 +2415,7 @@ intros * Hi Hj.
 rename j into k.
 destruct size; [ easy | cbn ].
 rewrite Nat.sub_0_r.
+...
 destruct size. {
   apply Nat.lt_1_r in Hi.
   apply Nat.lt_1_r in Hj.
