@@ -2353,13 +2353,39 @@ intros * HBM.
 destruct BM as [y| M]; cbn in HBM; [ now injection HBM | easy ].
 Qed.
 
+Theorem glop : ∀ T {so : semiring_op T} {sp : semiring_prop T},
+  ∀ (fa : nat → nat → bmatrix T) i,
+  is_square_bmat_loop (sizes_of_bmatrix (fa 0 0)) (fa i 0)
+  → sizes_of_bmatrix (fa i 0) = sizes_of_bmatrix (fa 0 0).
+Proof.
+intros * sp * Ha.
+...
+intros * sp * Ha.
+remember (fa 0 0) as BM eqn:HBM; symmetry in HBM.
+induction BM as [x| M IHBM] using bmatrix_ind2; [ now destruct (fa i 0) | ].
+rename i into k; cbn.
+destruct M as (f, r, c); cbn in *.
+destruct (zerop r) as [Hr| Hr]; [ now destruct (fa k 0) | ].
+destruct (zerop c) as [Hc| Hc]; [ now destruct (fa k 0) | ].
+cbn in Ha |-*.
+remember (fa k 0) as BMk eqn:HBMk; symmetry in HBMk.
+destruct BMk as [x| M]; [ easy | cbn ].
+destruct Ha as (Hrr & Hcr & Ha).
+rewrite Hrr, Hcr.
+destruct (zerop r) as [Hr'| Hr']; [ flia Hr Hr' | cbn ].
+f_equal.
+destruct M as (f', r', c'); cbn in *.
+subst r' c'; clear Hr'.
+destruct (zerop r) as [Hr'| Hr']; [ flia Hr Hr' | ].
+cbn in IHBM.
+...
+
 Theorem glop : ∀ T {so : semiring_op T} {sp : semiring_prop T} BMA BMB,
   is_square_bmat BMA
-  → is_square_bmat BMB
   → (bmat_zero_like BMA * BMB)%BM = bmat_zero_like (BMA * BMB)%BM.
 Proof.
-intros * sp * Ha Hb.
-revert BMB Hb.
+intros * sp * Ha.
+revert BMB.
 induction BMA as [xa| ma IHBMA] using bmatrix_ind2; intros; cbn. {
   destruct BMB as [xb| mb]; [ | easy ].
   now rewrite srng_mul_0_l.
@@ -2373,15 +2399,15 @@ destruct mb as (fb, rb, cb).
 cbn in *.
 destruct (zerop ra) as [Hrra| Hrra]; [ easy | ].
 destruct (zerop ca) as [Hcca| Hcca]; [ easy | ].
-destruct (zerop rb) as [Hrrb| Hrrb]; [ easy | ].
-destruct (zerop cb) as [Hccb| Hccb]; [ easy | ].
-cbn in Ha, Hb.
+cbn in Ha.
 destruct Ha as (_ & _ & Ha).
-destruct Hb as (_ & _ & Hb).
 destruct ca; [ easy | cbn ].
 rewrite Nat.sub_0_r.
-rewrite IHBMA; [ | easy | easy | | ]. 2: {
-Search is_square_bmat.
+rewrite IHBMA; [ | easy | easy | ]. 2: {
+  specialize (Ha i 0 Hi) as H1.
+  assert (H : 0 < ra) by flia Hi.
+  specialize (H1 H); clear H.
+Search sizes_of_bmatrix.
 ...
 
 Theorem bmat_mul_0_l : ∀ T {so : semiring_op T} {sp : semiring_prop T} BM,
