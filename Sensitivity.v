@@ -2361,7 +2361,12 @@ Theorem glop : ∀ T {so : semiring_op T} {sp : semiring_prop T},
      sizes_of_bmatrix (mat_el M i j) = sizes_of_bmatrix (mat_el M 0 0).
 Proof.
 intros * sp * Ha * Hi Hj.
-(* faut faire une induction de merde, là ; mais sur quoi ? *)
+unfold is_square_bmat in Ha.
+cbn in Ha.
+destruct (zerop (mat_nrows M)) as [Hrz| Hrz]; [ easy | ].
+destruct (zerop (mat_ncols M)) as [Hcz| Hcz]; [ easy | cbn in Ha ].
+destruct Ha as (_ & Hcr & Ha).
+rewrite Hcr in Hj.
 ...
 intros * sp * Ha * Hi Hj.
 destruct M as (f, r, c); cbn in *.
