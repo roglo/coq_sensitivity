@@ -2365,7 +2365,8 @@ destruct Hs as [Hs| Hs]; [ now rewrite Hs in Hrz | ].
 now apply (IHBM 0 0).
 Qed.
 
-Theorem glop : ∀ T {so : semiring_op T} {sp : semiring_prop T},
+Theorem sizes_of_bmatrix_mat_el :
+  ∀ T {so : semiring_op T} {sp : semiring_prop T},
   ∀ (M : matrix (bmatrix T)),
   is_square_bmat (BM_M M)
   → ∀ i j,
@@ -2373,8 +2374,6 @@ Theorem glop : ∀ T {so : semiring_op T} {sp : semiring_prop T},
      sizes_of_bmatrix (mat_el M i j) = sizes_of_bmatrix (mat_el M 0 0).
 Proof.
 intros * sp * Ha * Hi Hj.
-Print is_square_bmat_loop.
-Print sizes_of_bmatrix.
 cbn in Ha.
 destruct (zerop (mat_nrows M)) as [Hrz| Hrz]; [ easy | ].
 destruct (zerop (mat_ncols M)) as [Hcz| Hcz]; [ easy | cbn in Ha ].
@@ -2396,9 +2395,33 @@ destruct (zerop size) as [Hzs| Hzs]. {
 }
 cbn; f_equal.
 specialize (H1 0 0 Hzs Hzs) as H2.
-...
+specialize (no_zero_bmat_size (fa 0 0)) as H3.
+rewrite <- Hsizes in H3.
+clear Hsizes.
+clear Hm.
+revert M Hr Hc H1 H2.
+clear Ha Hzs.
+revert size H3.
+induction sizes as [| size1]; intros; [ now destruct (mat_el M 0 0) | ].
+cbn in H2.
+remember (mat_el M 0 0) as BM eqn:HBM; symmetry in HBM.
+destruct BM as [x| M']; [ easy | ].
+destruct H2 as (Hr' & Hc' & Hss); cbn.
+rewrite Hr', Hc'.
+destruct (zerop size1) as [Hs1| Hs1]. {
+  exfalso.
+  move Hs1 at top; subst size1.
+  now apply H3; right; left.
+}
+cbn; f_equal.
+apply (IHsizes size1); [ | easy | easy | easy | ]. {
+  intros H; apply H3.
+  destruct H as [H| H]; [ now right; left | now right; right ].
+} {
+  now apply Hss.
+}
+Qed.
 
-(*
 Theorem glip : ∀ T {so : semiring_op T} {sp : semiring_prop T} BMA BMB,
   is_square_bmat BMA
   → (bmat_zero_like BMA * BMB)%BM = bmat_zero_like (BMA * BMB)%BM.
@@ -2413,24 +2436,27 @@ destruct BMB as [xb| mb]; [ easy | ].
 cbn; f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros * Hi Hj.
-...
-specialize (glop _ Ha) as Haa.
+specialize (sizes_of_bmatrix_mat_el _ Ha) as Haa.
+cbn in Ha.
+destruct (zerop (mat_nrows ma)) as [Hzra| Hzra]; [ easy | ].
+destruct (zerop (mat_ncols ma)) as [Hzca| Hzca]; [ easy | ].
+cbn in Ha.
+destruct Ha as (Hrr & Hcr & Ha).
+rewrite Hcr in Haa.
+specialize (Haa i 0 Hi Hzra).
+rewrite IHBMA; [ | easy | easy | ]. 2: {
+  specialize (Ha i 0 Hi Hzra) as H1.
+  unfold is_square_bmat.
+  now rewrite Haa.
+}
 destruct ma as (fa, ra, ca).
 destruct mb as (fb, rb, cb).
 cbn in *.
-destruct (zerop ra) as [Hrra| Hrra]; [ easy | ].
-destruct (zerop ca) as [Hcca| Hcca]; [ easy | ].
-cbn in Ha.
-destruct Ha as (_ & _ & Ha).
-destruct ca; [ easy | cbn ].
+subst ca; clear Hrr Hzra Hzca.
+destruct ra; [ easy | cbn ].
 rewrite Nat.sub_0_r.
-rewrite IHBMA; [ | easy | easy | ]. 2: {
-  specialize (Ha i 0 Hi) as H1.
-  assert (H : 0 < ra) by flia Hi.
-  specialize (H1 H); clear H.
-  now rewrite Haa.
+destruct ra; [ easy | cbn ].
 ...
-*)
 
 Theorem bmat_mul_0_l : ∀ T {so : semiring_op T} {sp : semiring_prop T} BM,
   is_square_bmat BM
