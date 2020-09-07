@@ -2456,6 +2456,8 @@ subst ca; clear Hrr Hzra Hzca.
 destruct ra; [ easy | cbn ].
 rewrite Nat.sub_0_r.
 destruct ra; [ easy | ].
+destruct ra. {
+  cbn.
 ...
 
 Theorem bmat_mul_0_l : ∀ T {so : semiring_op T} {sp : semiring_prop T} BM,
