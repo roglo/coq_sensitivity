@@ -2367,8 +2367,17 @@ destruct (zerop (mat_ncols M)) as [Hcz| Hcz]; [ easy | cbn in Ha ].
 destruct Ha as (_ & Hcr & Ha).
 destruct M as (fa, ra, ca); cbn in *.
 subst ca; clear Hrz Hcz.
-remember (sizes_of_bmatrix (fa 0 0)) as sizes; clear Heqsizes.
-Print is_square_bmat_loop.
+remember (sizes_of_bmatrix (fa 0 0)) as sizes.
+specialize (Ha _ _ Hi Hj) as H1.
+destruct sizes as [| size]; [ now destruct (fa i j) | cbn in H1 ].
+remember (fa i j) as M eqn:Hm; symmetry in Hm.
+destruct M as [x| M]; [ easy | ].
+destruct H1 as (Hr & Hc & H1); cbn.
+rewrite Hr, Hc.
+destruct (zerop size) as [Hzs| Hzs]. {
+  move Hzs at top; subst size; exfalso.
+  cbn in Ha.
+  clear H1.
 ...
 intros * sp * Ha * Hi Hj.
 unfold is_square_bmat in Ha.
