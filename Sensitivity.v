@@ -2354,33 +2354,55 @@ destruct BM as [y| M]; cbn in HBM; [ now injection HBM | easy ].
 Qed.
 
 Theorem glop : ∀ T {so : semiring_op T} {sp : semiring_prop T},
-  ∀ (fa : nat → nat → bmatrix T) i,
-  is_square_bmat_loop (sizes_of_bmatrix (fa 0 0)) (fa i 0)
-  → sizes_of_bmatrix (fa i 0) = sizes_of_bmatrix (fa 0 0).
+  ∀ (M : matrix (bmatrix T)),
+  is_square_bmat (BM_M M)
+  → ∀ i j,
+     i < mat_nrows M → j < mat_ncols M →
+     sizes_of_bmatrix (mat_el M i j) = sizes_of_bmatrix (mat_el M 0 0).
 Proof.
-intros * sp * Ha.
+intros * sp * Ha * Hi Hj.
+(* faut faire une induction de merde, là ; mais sur quoi ? *)
 ...
-intros * sp * Ha.
-remember (fa 0 0) as BM eqn:HBM; symmetry in HBM.
-induction BM as [x| M IHBM] using bmatrix_ind2; [ now destruct (fa i 0) | ].
-rename i into k; cbn.
+intros * sp * Ha * Hi Hj.
 destruct M as (f, r, c); cbn in *.
-destruct (zerop r) as [Hr| Hr]; [ now destruct (fa k 0) | ].
-destruct (zerop c) as [Hc| Hc]; [ now destruct (fa k 0) | ].
-cbn in Ha |-*.
-remember (fa k 0) as BMk eqn:HBMk; symmetry in HBMk.
-destruct BMk as [x| M]; [ easy | cbn ].
-destruct Ha as (Hrr & Hcr & Ha).
-rewrite Hrr, Hcr.
-destruct (zerop r) as [Hr'| Hr']; [ flia Hr Hr' | cbn ].
-f_equal.
-destruct M as (f', r', c'); cbn in *.
-subst r' c'; clear Hr'.
-destruct (zerop r) as [Hr'| Hr']; [ flia Hr Hr' | ].
-cbn in IHBM.
+destruct (zerop r) as [Hr| Hr]; [ easy | ].
+destruct (zerop c) as [Hc| Hc]; [ easy | ].
+cbn in Ha.
+destruct Ha as (_ & Hcr & Ha); subst c.
+remember (f i j) as bmij eqn:Hbmij; symmetry in Hbmij.
+remember (f 0 0) as bmzz eqn:Hbmzz; symmetry in Hbmzz.
+move bmij after bmzz.
+move Hbmij after Hbmzz.
+destruct bmij as [xij| mij]. {
+  destruct bmzz as [xzz| mzz]; [ easy | cbn ].
+  cbn in Ha.
+  destruct (zerop (mat_nrows mzz)) as [Hrz| Hrz]; [ easy | ].
+  destruct (zerop (mat_ncols mzz)) as [Hcz| Hcz]; [ easy | ].
+  cbn in Ha |-*; exfalso.
+  specialize (Ha _ _ Hi Hj) as H1.
+  now rewrite Hbmij in H1.
+}
+destruct bmzz as [xzz| mzz]. {
+  cbn.
+  destruct (zerop (mat_nrows mij)) as [Hrij| Hrij]; [ easy | ].
+  destruct (zerop (mat_ncols mij)) as [Hcij| Hcij]; [ easy | exfalso ].
+  specialize (Ha i j Hi Hj) as H1.
+  now rewrite Hbmij in H1.
+}
+cbn.
+destruct (zerop (mat_nrows mij)) as [Hrij| Hrij]. {
+  destruct (zerop (mat_nrows mzz)) as [Hrzz| Hrzz]; [ easy | ].
+  destruct (zerop (mat_ncols mij)) as [Hcij| Hcij]. {
+    destruct (zerop (mat_ncols mzz)) as [Hczz| Hczz]; [ easy | exfalso ].
+...
+remember (sizes_of_bmatrix (f 0 0)) as sizes eqn:Hsizes.
+symmetry in Hsizes.
+induction sizes as [| size]. {
+  specialize (Ha 0 0 Hr Hr) as H1.
+  cbn in H1.
 ...
 
-Theorem glop : ∀ T {so : semiring_op T} {sp : semiring_prop T} BMA BMB,
+Theorem glip : ∀ T {so : semiring_op T} {sp : semiring_prop T} BMA BMB,
   is_square_bmat BMA
   → (bmat_zero_like BMA * BMB)%BM = bmat_zero_like (BMA * BMB)%BM.
 Proof.
@@ -2394,6 +2416,8 @@ destruct BMB as [xb| mb]; [ easy | ].
 cbn; f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros * Hi Hj.
+...
+specialize (glop _ Ha) as Haa.
 destruct ma as (fa, ra, ca).
 destruct mb as (fb, rb, cb).
 cbn in *.
@@ -2407,7 +2431,7 @@ rewrite IHBMA; [ | easy | easy | ]. 2: {
   specialize (Ha i 0 Hi) as H1.
   assert (H : 0 < ra) by flia Hi.
   specialize (H1 H); clear H.
-Search sizes_of_bmatrix.
+  now rewrite Haa.
 ...
 
 Theorem bmat_mul_0_l : ∀ T {so : semiring_op T} {sp : semiring_prop T} BM,
