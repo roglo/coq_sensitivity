@@ -2353,6 +2353,7 @@ intros * HBM.
 destruct BM as [y| M]; cbn in HBM; [ now injection HBM | easy ].
 Qed.
 
+(*
 Theorem glop : ∀ T {so : semiring_op T} {sp : semiring_prop T},
   ∀ (M : matrix (bmatrix T)),
   is_square_bmat (BM_M M)
@@ -2367,6 +2368,16 @@ destruct (zerop (mat_nrows M)) as [Hrz| Hrz]; [ easy | ].
 destruct (zerop (mat_ncols M)) as [Hcz| Hcz]; [ easy | cbn in Ha ].
 destruct Ha as (_ & Hcr & Ha).
 rewrite Hcr in Hj.
+specialize (Ha 0 0) as H1.
+assert (H : 0 < mat_nrows M) by flia Hi.
+specialize (H1 H H); clear H.
+specialize (Ha i j Hi Hj) as H2.
+remember (sizes_of_bmatrix (mat_el M 0 0)) as sizes eqn:Hsizes.
+symmetry in Hsizes.
+clear Ha.
+...
+induction sizes as [| size]; [ now destruct (mat_el M i j) | ].
+cbn in H1, H2.
 ...
 intros * sp * Ha * Hi Hj.
 destruct M as (f, r, c); cbn in *.
@@ -2438,6 +2449,7 @@ rewrite IHBMA; [ | easy | easy | ]. 2: {
   specialize (H1 H); clear H.
   now rewrite Haa.
 ...
+*)
 
 Theorem bmat_mul_0_l : ∀ T {so : semiring_op T} {sp : semiring_prop T} BM,
   is_square_bmat BM
