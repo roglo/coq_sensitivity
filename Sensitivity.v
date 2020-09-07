@@ -2353,7 +2353,6 @@ intros * HBM.
 destruct BM as [y| M]; cbn in HBM; [ now injection HBM | easy ].
 Qed.
 
-(*
 Theorem glop : ∀ T {so : semiring_op T} {sp : semiring_prop T},
   ∀ (M : matrix (bmatrix T)),
   is_square_bmat (BM_M M)
@@ -2361,6 +2360,16 @@ Theorem glop : ∀ T {so : semiring_op T} {sp : semiring_prop T},
      i < mat_nrows M → j < mat_ncols M →
      sizes_of_bmatrix (mat_el M i j) = sizes_of_bmatrix (mat_el M 0 0).
 Proof.
+intros * sp * Ha * Hi Hj.
+cbn in Ha.
+destruct (zerop (mat_nrows M)) as [Hrz| Hrz]; [ easy | ].
+destruct (zerop (mat_ncols M)) as [Hcz| Hcz]; [ easy | cbn in Ha ].
+destruct Ha as (_ & Hcr & Ha).
+destruct M as (fa, ra, ca); cbn in *.
+subst ca; clear Hrz Hcz.
+remember (sizes_of_bmatrix (fa 0 0)) as sizes; clear Heqsizes.
+Print is_square_bmat_loop.
+...
 intros * sp * Ha * Hi Hj.
 unfold is_square_bmat in Ha.
 cbn in Ha.
@@ -2418,6 +2427,7 @@ induction sizes as [| size]. {
   cbn in H1.
 ...
 
+(*
 Theorem glip : ∀ T {so : semiring_op T} {sp : semiring_prop T} BMA BMB,
   is_square_bmat BMA
   → (bmat_zero_like BMA * BMB)%BM = bmat_zero_like (BMA * BMB)%BM.
