@@ -2378,6 +2378,17 @@ destruct (zerop size) as [Hzs| Hzs]. {
   move Hzs at top; subst size; exfalso.
   cbn in Ha.
   clear H1.
+  specialize (Ha 0 0) as H1.
+  assert (H : 0 < ra) by flia Hi.
+  specialize (H1 H H); clear H.
+  destruct (fa 0 0); [ easy | ].
+  cbn in Heqsizes.
+  destruct (zerop (mat_nrows m)) as [Hrm| Hrm]; [ easy | ].
+  destruct (zerop (mat_ncols m)) as [Hcm| Hcm]; [ easy | ].
+  cbn in Heqsizes.
+  injection Heqsizes; clear Heqsizes; intros H3 H2.
+Print is_square_bmat.
+Print sizes_of_bmatrix.
 ...
 intros * sp * Ha * Hi Hj.
 unfold is_square_bmat in Ha.
