@@ -2390,6 +2390,7 @@ destruct size. {
   subst i k; cbn.
   apply IHsizes; [ apply Hss; flia | apply Hz; flia | easy ].
 }
+...
 destruct size. {
   destruct i. {
     destruct k. {
@@ -2401,7 +2402,8 @@ destruct size. {
         remember (bmat_zero_like (fm 1 0)) as x2 eqn:Hx2; symmetry in Hx2.
         move x2 before x1; move Hx2 before Hx1.
         clear IHsizes Hss Hsizes.
-        induction sizes as [| size]. {
+        revert x1 x2 H1 H2 Hx1 Hx2.
+        induction sizes as [| size]; intros. {
           cbn in H1, H2.
           destruct x1 as [x1| ]; [ clear H1 | easy ].
           destruct x2 as [x2| ]; [ clear H2 | easy ].
@@ -2412,7 +2414,7 @@ destruct size. {
         cbn in H1, H2.
         destruct x1 as [| m1]; [ easy | ].
         destruct x2 as [| m2]; [ easy | ].
-        apply IHsizes. {
+        apply IHsizes.
 ...
 
 Theorem bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
