@@ -1192,6 +1192,14 @@ apply Nat.succ_lt_mono in Hnl.
 now apply IHl.
 Qed.
 
+Theorem Nat_seq_succ_r : ∀ sta len,
+  seq sta (S len) = seq sta len ++ [sta + len].
+Proof.
+intros.
+rewrite <- Nat.add_1_r.
+now rewrite seq_app.
+Qed.
+
 Theorem List_firstn_seq : ∀ n start len,
   firstn n (seq start len) = seq start (min n len).
 Proof.
