@@ -2417,11 +2417,32 @@ apply (IHsizes _ size1); [ easy | now apply Hss | ]. {
 }
 Qed.
 
-Theorem glip : ∀ T {so : semiring_op T} {sp : semiring_prop T} BMA BMB,
+Theorem bmat_zero_like_add_distr :
+  ∀ T {so : semiring_op T} {sp : semiring_prop T},
+  ∀ BMA BMB,
+  bmat_zero_like (BMA + BMB)%BM =
+  (bmat_zero_like BMA + bmat_zero_like BMB)%BM.
+Proof.
+intros.
+revert BMB.
+induction BMA as [xa| ma IHBMA] using bmatrix_ind2; intros; cbn. {
+  destruct BMB as [xb| mb]; [ cbn | easy ].
+  now rewrite srng_add_0_l.
+}
+destruct BMB as [xb| mb]; [ easy | cbn ].
+f_equal.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros * Hi Hj.
+now apply IHBMA.
+Qed.
+
+Theorem bmat_zero_like_mul_distr_l :
+  ∀ T {so : semiring_op T} {sp : semiring_prop T} BMA BMB,
   is_square_bmat BMA
-  → (bmat_zero_like BMA * BMB)%BM = bmat_zero_like (BMA * BMB)%BM.
+  → bmat_zero_like (BMA * BMB)%BM = (bmat_zero_like BMA * BMB)%BM.
 Proof.
 intros * sp * Ha.
+symmetry.
 revert BMB.
 induction BMA as [xa| ma IHBMA] using bmatrix_ind2; intros; cbn. {
   destruct BMB as [xb| mb]; [ | easy ].
@@ -2438,9 +2459,8 @@ destruct (zerop (mat_ncols ma)) as [Hzca| Hzca]; [ easy | ].
 cbn in Ha.
 destruct Ha as (Hrr & Hcr & Ha).
 rewrite Hcr in Haa.
-specialize (Haa i 0 Hi Hzra).
 rewrite IHBMA; [ | easy | easy | ]. 2: {
-  specialize (Ha i 0 Hi Hzra) as H1.
+  specialize (Ha i 0 Hi Hzra) as H2.
   unfold is_square_bmat.
   now rewrite Haa.
 }
@@ -2451,6 +2471,14 @@ subst ca; clear Hrr Hzra Hzca.
 destruct ra; [ easy | cbn ].
 rewrite Nat.sub_0_r.
 destruct ra; [ easy | ].
+destruct ra. {
+  cbn.
+  rewrite IHBMA; [ | easy | flia | ]. 2: {
+    rewrite Haa; [ | easy | flia ].
+    apply Ha; [ easy | flia ].
+  }
+  now symmetry; apply bmat_zero_like_add_distr.
+}
 destruct ra. {
   cbn.
 ...
