@@ -2471,29 +2471,55 @@ subst ca; clear Hrr Hzra Hzca.
 destruct ra; [ easy | cbn ].
 rewrite Nat.sub_0_r.
 clear - IHBMA Hi Haa Ha sp.
+(*
+revert fa fb i j Hi IHBMA Ha Haa.
+induction ra; intros; [ easy | ].
+replace (S ra) with (ra + 1) by apply Nat.add_1_r.
+rewrite seq_app, fold_left_app; cbn.
+rewrite IHBMA; [ | easy | flia | ]. 2: {
+  rewrite Haa; [ | easy | flia ].
+  apply Ha; [ easy | flia ].
+}
+rewrite fold_left_app; cbn.
+rewrite bmat_zero_like_add_distr; [ | easy ].
+f_equal.
+...
+*)
+specialize (IHBMA i).
+specialize (Haa i).
+(*1*)
 destruct ra; [ easy | ].
-destruct ra. {
-  cbn.
-  rewrite IHBMA; [ | easy | flia | ]. 2: {
-    rewrite Haa; [ | easy | flia ].
-    apply Ha; [ easy | flia ].
-  }
-  now symmetry; apply bmat_zero_like_add_distr.
+replace (S ra) with (ra + 1) by apply Nat.add_1_r.
+rewrite seq_app, fold_left_app; cbn.
+rewrite IHBMA; [ | easy | flia | ]. 2: {
+  rewrite Haa; [ | easy | flia ].
+  apply Ha; [ easy | flia ].
 }
-destruct ra. {
-  cbn.
-  rewrite IHBMA; [ | easy | flia | ]. 2: {
-    rewrite Haa; [ | easy | flia ].
-    apply Ha; [ easy | flia ].
-  }
-  rewrite IHBMA; [ | easy | flia | ]. 2: {
-    rewrite Haa; [ | easy | flia ].
-    apply Ha; [ easy | flia ].
-  }
-  rewrite bmat_zero_like_add_distr; [ | easy ].
-  rewrite bmat_zero_like_add_distr; [ | easy ].
-  easy.
+rewrite fold_left_app; cbn.
+rewrite bmat_zero_like_add_distr; [ | easy ].
+f_equal.
+(*2*)
+destruct ra; [ easy | ].
+replace (S ra) with (ra + 1) by apply Nat.add_1_r.
+rewrite seq_app, fold_left_app; cbn.
+rewrite IHBMA; [ | easy | flia | ]. 2: {
+  rewrite Haa; [ | easy | flia ].
+  apply Ha; [ easy | flia ].
 }
+rewrite fold_left_app; cbn.
+rewrite bmat_zero_like_add_distr; [ | easy ].
+f_equal.
+(*3*)
+destruct ra; [ easy | ].
+replace (S ra) with (ra + 1) by apply Nat.add_1_r.
+rewrite seq_app, fold_left_app; cbn.
+rewrite IHBMA; [ | easy | flia | ]. 2: {
+  rewrite Haa; [ | easy | flia ].
+  apply Ha; [ easy | flia ].
+}
+rewrite fold_left_app; cbn.
+rewrite bmat_zero_like_add_distr; [ | easy ].
+f_equal.
 ...
 
 Theorem bmat_mul_0_l : ∀ T {so : semiring_op T} {sp : semiring_prop T} BM,
