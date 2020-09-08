@@ -2608,41 +2608,42 @@ split; [ easy | ].
 intros i j Hi Hj.
 destruct size; [ easy | cbn ].
 rewrite Nat.sub_0_r.
+assert (H : ∀ j, j < S size → is_square_bmat_loop sizes (fa i j)). {
+  intros k Hk.
+  now apply Ha.
+}
+move H before Ha; clear Ha; rename H into Ha.
+assert (H : ∀ i, i < S size → is_square_bmat_loop sizes (fb i j)). {
+  intros k Hk.
+  now apply Hb.
+}
+move H before Hb; clear Hb; rename H into Hb.
 (*1*)
 destruct size. {
-  cbn.
-  apply IHsizes. {
-    apply Ha; [ easy | flia ].
-  } {
-    apply Hb; [ flia | easy ].
-  }
+  apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
 }
 rewrite List_seq_succ_r; cbn.
 rewrite fold_left_app; cbn.
 apply is_square_bmat_loop_add. 2: {
-  apply IHsizes. {
-    apply Ha; [ easy | flia ].
-  } {
-    apply Hb; [ flia | easy ].
-  }
+  apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
 }
 (*2*)
 destruct size. {
-  cbn.
-  apply IHsizes. {
-    apply Ha; [ easy | flia ].
-  } {
-    apply Hb; [ flia | easy ].
-  }
+  apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
 }
 rewrite List_seq_succ_r; cbn.
 rewrite fold_left_app; cbn.
 apply is_square_bmat_loop_add. 2: {
-  apply IHsizes. {
-    apply Ha; [ easy | flia ].
-  } {
-    apply Hb; [ flia | easy ].
-  }
+  apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
+}
+(*3*)
+destruct size. {
+  apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
+}
+rewrite List_seq_succ_r; cbn.
+rewrite fold_left_app; cbn.
+apply is_square_bmat_loop_add. 2: {
+  apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
 }
 ...
 
