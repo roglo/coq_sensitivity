@@ -2587,6 +2587,65 @@ intros i j Hi Hj.
 apply IHsizes; [ now apply Ha | now apply Hb ].
 Qed.
 
+Theorem is_square_bmat_loop_mul : ∀ T {so : semiring_op T} BMA BMB sizes,
+  is_square_bmat_loop sizes BMA
+  → is_square_bmat_loop sizes BMB
+  → is_square_bmat_loop sizes (BMA * BMB)%BM.
+Proof.
+intros * Ha Hb.
+revert BMA BMB Ha Hb.
+induction sizes as [| size]; intros; cbn; [ now destruct BMA, BMB | ].
+cbn in Ha, Hb.
+destruct BMA as [xa| ma]; [ easy | ].
+destruct BMB as [xb| mb]; [ easy | ].
+destruct ma as (fa, ra, ca).
+destruct mb as (fb, rb, cb); cbn in *.
+destruct Ha as (Hra & Hca & Ha).
+destruct Hb as (Hrb & Hcb & Hb).
+subst ra ca rb cb.
+split; [ easy | ].
+split; [ easy | ].
+intros i j Hi Hj.
+destruct size; [ easy | cbn ].
+rewrite Nat.sub_0_r.
+(*1*)
+destruct size. {
+  cbn.
+  apply IHsizes. {
+    apply Ha; [ easy | flia ].
+  } {
+    apply Hb; [ flia | easy ].
+  }
+}
+rewrite List_seq_succ_r; cbn.
+rewrite fold_left_app; cbn.
+apply is_square_bmat_loop_add. 2: {
+  apply IHsizes. {
+    apply Ha; [ easy | flia ].
+  } {
+    apply Hb; [ flia | easy ].
+  }
+}
+(*2*)
+destruct size. {
+  cbn.
+  apply IHsizes. {
+    apply Ha; [ easy | flia ].
+  } {
+    apply Hb; [ flia | easy ].
+  }
+}
+rewrite List_seq_succ_r; cbn.
+rewrite fold_left_app; cbn.
+apply is_square_bmat_loop_add. 2: {
+  apply IHsizes. {
+    apply Ha; [ easy | flia ].
+  } {
+    apply Hb; [ flia | easy ].
+  }
+}
+...
+
 Theorem sizes_of_bmatrix_mul :
   ∀ T {so : semiring_op T} {sp : semiring_prop T},
   ∀ BMA BMB,
@@ -2643,6 +2702,7 @@ rewrite sizes_of_bmatrix_add; [ | easy | | | ]; cycle 1. {
     remember (fb 0 0) as BMB.
     clear - sp Ha Hb.
     move BMB before BMA.
+...
     revert BMA BMB Ha Hb.
     induction sizes as [| size]; intros; cbn; [ now destruct BMA, BMB | ].
     cbn in Ha, Hb.
@@ -2669,6 +2729,7 @@ rewrite sizes_of_bmatrix_add; [ | easy | | | ]; cycle 1. {
     rewrite List_seq_succ_r; cbn.
     rewrite fold_left_app; cbn.
     apply is_square_bmat_loop_add. 2: {
+      apply IHsizes. {
 ...
     rewrite IHBMA; [ | flia | flia | | | easy ]; cycle 1. {
       apply Ha; flia.
