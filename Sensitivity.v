@@ -2475,6 +2475,14 @@ clear - IHBMA Hi Haa Ha sp.
 specialize (IHBMA i ra Hi (Nat.lt_succ_diag_r _)).
 specialize (Haa i).
 *)
+assert (H :
+  ∀ j, j < S ra
+  → is_square_bmat_loop (sizes_of_bmatrix (fa i j)) (fa i j)
+  → ∀ BMB, (bmat_zero_like (fa i j) * BMB)%BM = bmat_zero_like (fa i j * BMB)%BM). {
+  intros k Hk H *.
+  now apply IHBMA.
+}
+move H before IHBMA; clear IHBMA; rename H into IHBMA.
 (*
 revert fa fb i j Hi IHBMA Ha Haa.
 induction ra; intros; [ easy | ].
@@ -2492,7 +2500,7 @@ f_equal.
 destruct ra; [ easy | ].
 rewrite Nat_seq_succ_r.
 rewrite fold_left_app; cbn.
-rewrite IHBMA; [ | easy | flia | ]. 2: {
+rewrite IHBMA; [ | flia | ]. 2: {
   rewrite Haa; [ | easy | flia ].
   apply Ha; [ easy | flia ].
 }
@@ -2503,7 +2511,7 @@ f_equal.
 destruct ra; [ easy | ].
 rewrite Nat_seq_succ_r.
 rewrite fold_left_app; cbn.
-rewrite IHBMA; [ | easy | flia | ]. 2: {
+rewrite IHBMA; [ | flia | ]. 2: {
   rewrite Haa; [ | easy | flia ].
   apply Ha; [ easy | flia ].
 }
@@ -2514,7 +2522,7 @@ f_equal.
 destruct ra; [ easy | ].
 rewrite Nat_seq_succ_r.
 rewrite fold_left_app; cbn.
-rewrite IHBMA; [ | easy | flia | ]. 2: {
+rewrite IHBMA; [ | flia | ]. 2: {
   rewrite Haa; [ | easy | flia ].
   apply Ha; [ easy | flia ].
 }
