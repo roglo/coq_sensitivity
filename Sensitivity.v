@@ -2493,23 +2493,10 @@ assert (H :
 }
 clear Haa; rename H into Haa.
 clear Hi.
-(*
-revert fa fb i j Hi IHBMA Ha Haa.
+revert fa fb i j IHBMA Ha Haa.
 induction ra; intros; [ easy | ].
 replace (S ra) with (ra + 1) by apply Nat.add_1_r.
 rewrite seq_app, fold_left_app; cbn.
-rewrite IHBMA; [ | easy | flia | ]. 2: {
-  rewrite Haa; [ | easy | flia ].
-  apply Ha; [ easy | flia ].
-}
-rewrite fold_left_app; cbn.
-rewrite bmat_zero_like_add_distr; [ | easy ].
-f_equal.
-*)
-(*1*)
-destruct ra; [ easy | ].
-rewrite Nat_seq_succ_r.
-rewrite fold_left_app; cbn.
 rewrite IHBMA; [ | flia | ]. 2: {
   rewrite Haa; [ | flia ].
   apply Ha; flia.
@@ -2517,28 +2504,18 @@ rewrite IHBMA; [ | flia | ]. 2: {
 rewrite fold_left_app; cbn.
 rewrite bmat_zero_like_add_distr; [ | easy ].
 f_equal.
-(*2*)
-destruct ra; [ easy | ].
-rewrite Nat_seq_succ_r.
-rewrite fold_left_app; cbn.
-rewrite IHBMA; [ | flia | ]. 2: {
-  rewrite Haa; [ | flia ].
-  apply Ha; flia.
+apply IHra. {
+  intros k Hk H *.
+  apply IHBMA; [ flia Hk | easy ].
+} {
+  intros k Hk.
+  apply Ha; flia Hk.
+} {
+  intros k Hk.
+  apply Haa; flia Hk.
 }
-rewrite fold_left_app; cbn.
-rewrite bmat_zero_like_add_distr; [ | easy ].
-f_equal.
-(*3*)
-destruct ra; [ easy | ].
-rewrite Nat_seq_succ_r.
-rewrite fold_left_app; cbn.
-rewrite IHBMA; [ | flia | ]. 2: {
-  rewrite Haa; [ | flia ].
-  apply Ha; flia.
-}
-rewrite fold_left_app; cbn.
-rewrite bmat_zero_like_add_distr; [ | easy ].
-f_equal.
+Qed.
+
 ...
 
 Theorem bmat_mul_0_l : ∀ T {so : semiring_op T} {sp : semiring_prop T} BM,
