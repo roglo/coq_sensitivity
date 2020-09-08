@@ -2529,8 +2529,8 @@ symmetry in Hsizes.
 revert BM Hss Hz Hsizes.
 induction sizes as [| size]; intros; [ now destruct BM | ].
 cbn in Hss, Hz.
-destruct BM as [x| M]; [ easy | cbn ].
-f_equal.
+destruct BM as [x| M]; [ easy | ].
+cbn; f_equal.
 apply matrix_eq; [ easy | easy | cbn ].
 intros * Hi Hj.
 ...
