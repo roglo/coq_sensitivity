@@ -2481,11 +2481,18 @@ assert (H :
 }
 move H before IHBMA; clear IHBMA; rename H into IHBMA.
 assert (H :
+  ∀ j, j < S ra → is_square_bmat_loop (sizes_of_bmatrix (fa 0 0)) (fa i j)). {
+  intros k Hk.
+  now apply Ha.
+}
+move H before Ha; clear Ha; rename H into Ha.
+assert (H :
   ∀ j, j < S ra → sizes_of_bmatrix (fa i j) = sizes_of_bmatrix (fa 0 0)). {
   intros k Hk.
   now apply Haa.
 }
 clear Haa; rename H into Haa.
+clear Hi.
 (*
 revert fa fb i j Hi IHBMA Ha Haa.
 induction ra; intros; [ easy | ].
@@ -2505,7 +2512,7 @@ rewrite Nat_seq_succ_r.
 rewrite fold_left_app; cbn.
 rewrite IHBMA; [ | flia | ]. 2: {
   rewrite Haa; [ | flia ].
-  apply Ha; [ easy | flia ].
+  apply Ha; flia.
 }
 rewrite fold_left_app; cbn.
 rewrite bmat_zero_like_add_distr; [ | easy ].
@@ -2516,7 +2523,7 @@ rewrite Nat_seq_succ_r.
 rewrite fold_left_app; cbn.
 rewrite IHBMA; [ | flia | ]. 2: {
   rewrite Haa; [ | flia ].
-  apply Ha; [ easy | flia ].
+  apply Ha; flia.
 }
 rewrite fold_left_app; cbn.
 rewrite bmat_zero_like_add_distr; [ | easy ].
@@ -2527,7 +2534,7 @@ rewrite Nat_seq_succ_r.
 rewrite fold_left_app; cbn.
 rewrite IHBMA; [ | flia | ]. 2: {
   rewrite Haa; [ | flia ].
-  apply Ha; [ easy | flia ].
+  apply Ha; flia.
 }
 rewrite fold_left_app; cbn.
 rewrite bmat_zero_like_add_distr; [ | easy ].
