@@ -2397,11 +2397,9 @@ cbn; f_equal.
 specialize (H1 0 0 Hzs Hzs) as H2.
 specialize (no_zero_bmat_size (fa 0 0)) as H3.
 rewrite <- Hsizes in H3.
-clear Hsizes.
-clear Hm.
-revert M Hr Hc H1 H2.
-clear Ha Hzs.
-revert size H3.
+clear Hsizes Hm Ha Hzs Hr Hc.
+clear i j Hi Hj fa ra sp.
+revert M size H1 H2 H3.
 induction sizes as [| size1]; intros; [ now destruct (mat_el M 0 0) | ].
 cbn in H2.
 remember (mat_el M 0 0) as BM eqn:HBM; symmetry in HBM.
@@ -2410,15 +2408,12 @@ destruct H2 as (Hr' & Hc' & Hss); cbn.
 rewrite Hr', Hc'.
 destruct (zerop size1) as [Hs1| Hs1]. {
   exfalso.
-  move Hs1 at top; subst size1.
-  now apply H3; right; left.
+  now apply H3; rewrite Hs1; right; left.
 }
 cbn; f_equal.
-apply (IHsizes size1); [ | easy | easy | easy | ]. {
+apply (IHsizes _ size1); [ easy | now apply Hss | ]. {
   intros H; apply H3.
   destruct H as [H| H]; [ now right; left | now right; right ].
-} {
-  now apply Hss.
 }
 Qed.
 
