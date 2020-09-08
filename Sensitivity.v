@@ -2516,12 +2516,34 @@ apply IHra. {
 }
 Qed.
 
+Theorem bmat_zero_like_sqr : ∀ T {so : semiring_op T} {sp : semiring_prop T} BM,
+  is_square_bmat BM
+  → bmat_zero_like (BM * BM)%BM = bmat_zero_like BM.
+Proof.
+intros * sp * Hss.
+specialize (square_bmat_zero_like BM Hss) as Hz.
+unfold is_square_bmat in Hss, Hz.
+rewrite sizes_of_bmat_zero_like in Hz.
+remember (sizes_of_bmatrix BM) as sizes eqn:Hsizes.
+symmetry in Hsizes.
+revert BM Hss Hz Hsizes.
+induction sizes as [| size]; intros; [ now destruct BM | ].
+cbn in Hss, Hz.
+destruct BM as [x| M]; [ easy | cbn ].
+f_equal.
+apply matrix_eq; [ easy | easy | cbn ].
+intros * Hi Hj.
 ...
 
 Theorem bmat_mul_0_l : ∀ T {so : semiring_op T} {sp : semiring_prop T} BM,
   is_square_bmat BM
   → bmat_mul (bmat_zero_like BM) BM = bmat_zero_like BM.
 Proof.
+intros * sp * Hss.
+rewrite <- bmat_zero_like_mul_distr_l; [ | easy | easy ].
+...
+now apply bmat_zero_like_sqr.
+...
 intros * sp * Hss.
 specialize (square_bmat_zero_like BM Hss) as Hz.
 unfold is_square_bmat in Hss, Hz.
@@ -2535,6 +2557,11 @@ induction sizes as [| size]; intros; cbn in Hss, Hz. {
 }
 destruct BM as [x| M]; [ easy | ].
 cbn in Hz.
+rewrite <- bmat_zero_like_mul_distr_l; [ | easy | ]. 2: {
+  unfold is_square_bmat.
+  now rewrite Hsizes.
+}
+...
 destruct M as (fm, rm, cm).
 cbn in Hss, Hz, Hsizes |-*.
 destruct (zerop rm) as [Hrz| Hrz]; [ easy | ].
@@ -2549,6 +2576,12 @@ intros * Hi Hj.
 rename j into k.
 destruct size; [ easy | cbn ].
 rewrite Nat.sub_0_r.
+rewrite <- bmat_zero_like_mul_distr_l; [ | easy | ]. 2: {
+  unfold is_square_bmat.
+Search sizes_of_bmatrix.
+  specialize (sizes_of_bmatrix_mat_el) as H1.
+
+  rewrite Hsizes.
 ...
 destruct size. {
   apply Nat.lt_1_r in Hi.
