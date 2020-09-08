@@ -2537,7 +2537,7 @@ intros * Hi Hj.
 
 Theorem bmat_mul_0_l : ∀ T {so : semiring_op T} {sp : semiring_prop T} BM,
   is_square_bmat BM
-  → bmat_mul (bmat_zero_like BM) BM = bmat_zero_like BM.
+  → (bmat_zero_like BM * BM)%BM = bmat_zero_like BM.
 Proof.
 intros * sp * Hss.
 rewrite <- bmat_zero_like_mul_distr_l; [ | easy | easy ].
