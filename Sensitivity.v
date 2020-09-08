@@ -2533,6 +2533,23 @@ destruct BM as [x| M]; [ easy | ].
 cbn; f_equal.
 apply matrix_eq; [ easy | easy | cbn ].
 intros * Hi Hj.
+cbn in Hz.
+destruct Hss as (Hr & Hc & Hss).
+destruct Hz as (_ & _ & Hz).
+destruct M as (f, r, c).
+cbn in *; subst r c.
+destruct (zerop size) as [H| H]; [ flia H Hi | cbn in Hsizes; clear H ].
+injection Hsizes; clear Hsizes; intros Hsizes.
+destruct size; [ easy | cbn ].
+rewrite Nat.sub_0_r.
+destruct size. {
+  apply Nat.lt_1_r in Hi.
+  apply Nat.lt_1_r in Hj.
+  subst i j; cbn.
+  apply IHsizes; [ apply Hss; flia | apply Hz; flia | easy ].
+}
+rewrite Nat_seq_succ_r; cbn.
+rewrite fold_left_app; cbn.
 ...
 
 Theorem bmat_mul_0_l : ∀ T {so : semiring_op T} {sp : semiring_prop T} BM,
