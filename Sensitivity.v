@@ -2602,14 +2602,49 @@ destruct ra. {
 }
 rewrite Nat_seq_succ_r; cbn.
 rewrite fold_left_app; cbn.
-destruct ra. {
-  cbn.
-...
-  rewrite sizes_of_bmatrix_add; [ | easy | | | ]; cycle 1. {
-    unfold is_square_bmat.
-    rewrite IHBMA; [ | flia | flia | | | easy ].
-Search is_square_bmat_loop.
-Search (is_square_bmat (_ * _)%BM).
+rewrite sizes_of_bmatrix_add; [ | easy | | | ]; cycle 1. {
+  unfold is_square_bmat.
+  destruct ra. {
+    cbn.
+    rewrite IHBMA; [ | flia | flia | | | easy ]; cycle 1. {
+      apply Ha; flia.
+    } {
+      apply Hb; flia.
+    }
+    rewrite <- Hss in Hb.
+    remember (sizes_of_bmatrix (fa 0 0)) as sizes; clear Heqsizes.
+    clear Hss.
+    induction sizes as [| size]. {
+      cbn in Ha, Hb |-*.
+      specialize (Ha 0 0 Nat.lt_0_2 Nat.lt_0_2).
+      specialize (Hb 0 0 Nat.lt_0_2 Nat.lt_0_2).
+      now destruct (fa 0 0), (fb 0 0).
+    }
+    cbn in Ha, Hb |-*.
+    specialize (Ha 0 0 Nat.lt_0_2 Nat.lt_0_2).
+    specialize (Hb 0 0 Nat.lt_0_2 Nat.lt_0_2).
+    remember (fa 0 0) as BMA eqn:HBMA.
+    remember (fb 0 0) as BMB eqn:HBMB.
+    symmetry in HBMA, HBMB.
+    move BMB before BMA.
+    move HBMB before HBMA.
+    destruct BMA as [xa| ma]; [ easy | ].
+    destruct BMB as [xb| mb]; [ easy | cbn ].
+    destruct Ha as (H1 & H2 & Ha).
+    destruct Hb as (H3 & H4 & Hb).
+    split; [ easy | ].
+    split; [ easy | ].
+    intros i j Hi Hj.
+    destruct ma as (fa', ra, ca).
+    destruct mb as (fb', rb, cb); cbn in *.
+    subst ra ca rb cb.
+    destruct size; [ easy | cbn ].
+    rewrite Nat.sub_0_r.
+    destruct size. {
+      cbn in IHsizes |-*.
+      apply Nat.lt_1_r in Hi.
+      apply Nat.lt_1_r in Hj.
+      subst i j.
 ...
 
 Theorem is_square_bmat_mul : ∀ T {so : semiring_op T} {sp : semiring_prop T},
