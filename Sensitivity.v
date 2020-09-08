@@ -2470,6 +2470,7 @@ cbn in *.
 subst ca; clear Hrr Hzra Hzca.
 destruct ra; [ easy | cbn ].
 rewrite Nat.sub_0_r.
+clear - IHBMA Hi Haa Ha sp.
 destruct ra; [ easy | ].
 destruct ra. {
   cbn.
@@ -2481,6 +2482,18 @@ destruct ra. {
 }
 destruct ra. {
   cbn.
+  rewrite IHBMA; [ | easy | flia | ]. 2: {
+    rewrite Haa; [ | easy | flia ].
+    apply Ha; [ easy | flia ].
+  }
+  rewrite IHBMA; [ | easy | flia | ]. 2: {
+    rewrite Haa; [ | easy | flia ].
+    apply Ha; [ easy | flia ].
+  }
+  rewrite bmat_zero_like_add_distr; [ | easy ].
+  rewrite bmat_zero_like_add_distr; [ | easy ].
+  easy.
+}
 ...
 
 Theorem bmat_mul_0_l : ∀ T {so : semiring_op T} {sp : semiring_prop T} BM,
