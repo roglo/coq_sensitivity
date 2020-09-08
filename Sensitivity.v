@@ -2529,6 +2529,42 @@ intros * Hi Hj.
 apply IHsizes; [ now apply Ha | now apply Hb ].
 Qed.
 
+Theorem sizes_of_bmatrix_add :
+  ∀ T {so : semiring_op T} {sp : semiring_prop T},
+  ∀ BMA BMB,
+  is_square_bmat BMA
+  → is_square_bmat BMB
+  → sizes_of_bmatrix BMA = sizes_of_bmatrix BMB
+  → sizes_of_bmatrix (BMA + BMB)%BM = sizes_of_bmatrix BMA.
+Proof.
+intros * sp * Ha Hb Hab.
+revert BMB Hb Hab.
+induction BMA as [xa| ma IHBMA] using bmatrix_ind2; intros. {
+  now destruct BMB.
+}
+destruct BMB as [xb| mb]; [ easy | cbn ].
+move mb before ma.
+cbn in Ha, Hb, Hab.
+destruct (zerop (mat_nrows ma)) as [Hrza| Hrza]; [ easy | ].
+destruct (zerop (mat_ncols ma)) as [Hcza| Hcza]; [ easy | ].
+destruct (zerop (mat_nrows mb)) as [Hrzb| Hrzb]; [ easy | ].
+destruct (zerop (mat_ncols mb)) as [Hczb| Hczb]; [ easy | ].
+cbn in Ha, Hb, Hab |-*.
+f_equal.
+destruct ma as (fa, ra, ca).
+destruct mb as (fb, rb, cb).
+cbn in *.
+destruct Ha as (_ & Hrca & Ha).
+destruct Hb as (_ & Hrcb & Hb).
+subst ca cb.
+injection Hab; clear Hab; intros Hss H2; subst rb.
+apply IHBMA; [ easy | easy | | | easy ]. {
+  now apply Ha.
+} {
+  now apply Hb.
+}
+Qed.
+
 Theorem sizes_of_bmatrix_mul :
   ∀ T {so : semiring_op T} {sp : semiring_prop T},
   ∀ BMA BMB,
@@ -2568,7 +2604,12 @@ rewrite Nat_seq_succ_r; cbn.
 rewrite fold_left_app; cbn.
 destruct ra. {
   cbn.
-Search (sizes_of_bmatrix (_ + _)%BM).
+...
+  rewrite sizes_of_bmatrix_add; [ | easy | | | ]; cycle 1. {
+    unfold is_square_bmat.
+    rewrite IHBMA; [ | flia | flia | | | easy ].
+Search is_square_bmat_loop.
+Search (is_square_bmat (_ * _)%BM).
 ...
 
 Theorem is_square_bmat_mul : ∀ T {so : semiring_op T} {sp : semiring_prop T},
