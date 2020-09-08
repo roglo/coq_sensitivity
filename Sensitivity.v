@@ -2471,8 +2471,10 @@ subst ca; clear Hrr Hzra Hzca.
 destruct ra; [ easy | cbn ].
 rewrite Nat.sub_0_r.
 clear - IHBMA Hi Haa Ha sp.
+(*
 specialize (IHBMA i ra Hi (Nat.lt_succ_diag_r _)).
 specialize (Haa i).
+*)
 (*
 revert fa fb i j Hi IHBMA Ha Haa.
 induction ra; intros; [ easy | ].
@@ -2486,27 +2488,33 @@ rewrite fold_left_app; cbn.
 rewrite bmat_zero_like_add_distr; [ | easy ].
 f_equal.
 *)
-Search (seq _ (S _)).
-...
 (*1*)
 destruct ra; [ easy | ].
 rewrite Nat_seq_succ_r.
 rewrite fold_left_app; cbn.
-rewrite Nat.add_1_r.
-rewrite IHBMA. 2: {
+rewrite IHBMA; [ | easy | flia | ]. 2: {
   rewrite Haa; [ | easy | flia ].
   apply Ha; [ easy | flia ].
 }
 rewrite fold_left_app; cbn.
 rewrite bmat_zero_like_add_distr; [ | easy ].
-rewrite Nat.add_1_r.
 f_equal.
 (*2*)
 destruct ra; [ easy | ].
 rewrite Nat_seq_succ_r.
 rewrite fold_left_app; cbn.
-rewrite Nat.add_1_r.
-rewrite IHBMA. 2: {
+rewrite IHBMA; [ | easy | flia | ]. 2: {
+  rewrite Haa; [ | easy | flia ].
+  apply Ha; [ easy | flia ].
+}
+rewrite fold_left_app; cbn.
+rewrite bmat_zero_like_add_distr; [ | easy ].
+f_equal.
+(*3*)
+destruct ra; [ easy | ].
+rewrite Nat_seq_succ_r.
+rewrite fold_left_app; cbn.
+rewrite IHBMA; [ | easy | flia | ]. 2: {
   rewrite Haa; [ | easy | flia ].
   apply Ha; [ easy | flia ].
 }
