@@ -1192,7 +1192,7 @@ apply Nat.succ_lt_mono in Hnl.
 now apply IHl.
 Qed.
 
-Theorem Nat_seq_succ_r : ∀ sta len,
+Theorem List_seq_succ_r : ∀ sta len,
   seq sta (S len) = seq sta len ++ [sta + len].
 Proof.
 intros.
