@@ -2618,8 +2618,10 @@ assert (H : ∀ i, i < S size → is_square_bmat_loop sizes (fb i j)). {
   now apply Hb.
 }
 move H before Hb; clear Hb; rename H into Hb.
-(*1*)
-destruct size. {
+clear Hi Hj.
+move j before i.
+(**)
+induction size. {
   apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
 }
 rewrite List_seq_succ_r; cbn.
@@ -2627,25 +2629,14 @@ rewrite fold_left_app; cbn.
 apply is_square_bmat_loop_add. 2: {
   apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
 }
-(*2*)
-destruct size. {
-  apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
+apply IHsize. {
+  intros k Hk.
+  apply Ha; flia Hk.
+} {
+  intros k Hk.
+  apply Hb; flia Hk.
 }
-rewrite List_seq_succ_r; cbn.
-rewrite fold_left_app; cbn.
-apply is_square_bmat_loop_add. 2: {
-  apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
-}
-(*3*)
-destruct size. {
-  apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
-}
-rewrite List_seq_succ_r; cbn.
-rewrite fold_left_app; cbn.
-apply is_square_bmat_loop_add. 2: {
-  apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
-}
-...
+Qed.
 
 Theorem sizes_of_bmatrix_mul :
   ∀ T {so : semiring_op T} {sp : semiring_prop T},
@@ -2677,7 +2668,6 @@ destruct Hb as (_ & Hrcb & Hb).
 subst ca cb.
 injection Hab; clear Hab; intros Hss H2; subst rb.
 clear Hcza Hrzb Hczb.
-(**)
 specialize (IHBMA 0 0 Hrza Hrza) as Hssab.
 specialize (Hssab (Ha 0 0 Hrza Hrza)).
 specialize (Hssab (fb 0 0)).
@@ -2693,84 +2683,11 @@ rewrite sizes_of_bmatrix_add; [ | easy | | | ]; cycle 1. {
   unfold is_square_bmat.
   destruct ra. {
     cbn.
-(**)
     rewrite Hssab.
-    rewrite <- Hss in Hb.
-    remember (sizes_of_bmatrix (fa 0 0)) as sizes; clear Heqsizes Hss Hssab.
-    specialize (Ha _ _ Nat.lt_0_2 Nat.lt_0_2).
-    specialize (Hb _ _ Nat.lt_0_2 Nat.lt_0_2).
-    remember (fa 0 0) as BMA.
-    remember (fb 0 0) as BMB.
-    clear - sp Ha Hb.
-    move BMB before BMA.
-...
-    revert BMA BMB Ha Hb.
-    induction sizes as [| size]; intros; cbn; [ now destruct BMA, BMB | ].
-    cbn in Ha, Hb.
-    destruct BMA as [xa| ma]; [ easy | ].
-    destruct BMB as [xb| mb]; [ easy | ].
-    destruct ma as (fa, ra, ca).
-    destruct mb as (fb, rb, cb); cbn in *.
-    destruct Ha as (Hra & Hca & Ha).
-    destruct Hb as (Hrb & Hcb & Hb).
-    subst ra ca rb cb.
-    split; [ easy | ].
-    split; [ easy | ].
-    intros i j Hi Hj.
-    destruct size; [ easy | cbn ].
-    rewrite Nat.sub_0_r.
-    destruct size. {
-      cbn.
-      apply IHsizes. {
-        apply Ha; [ easy | flia ].
-      } {
-        apply Hb; [ flia | easy ].
-      }
-    }
-    rewrite List_seq_succ_r; cbn.
-    rewrite fold_left_app; cbn.
-    apply is_square_bmat_loop_add. 2: {
-      apply IHsizes. {
-...
-    rewrite IHBMA; [ | flia | flia | | | easy ]; cycle 1. {
-      apply Ha; flia.
-    } {
-      apply Hb; flia.
-    }
-    rewrite <- Hss in Hb.
-    remember (sizes_of_bmatrix (fa 0 0)) as sizes; clear Heqsizes.
-    clear Hss.
-    induction sizes as [| size]. {
-      cbn in Ha, Hb |-*.
-      specialize (Ha 0 0 Nat.lt_0_2 Nat.lt_0_2).
-      specialize (Hb 0 0 Nat.lt_0_2 Nat.lt_0_2).
-      now destruct (fa 0 0), (fb 0 0).
-    }
-    cbn in Ha, Hb |-*.
-    specialize (Ha 0 0 Nat.lt_0_2 Nat.lt_0_2).
-    specialize (Hb 0 0 Nat.lt_0_2 Nat.lt_0_2).
-    remember (fa 0 0) as BMA eqn:HBMA.
-    remember (fb 0 0) as BMB eqn:HBMB.
-    symmetry in HBMA, HBMB.
-    move BMB before BMA.
-    move HBMB before HBMA.
-    destruct BMA as [xa| ma]; [ easy | ].
-    destruct BMB as [xb| mb]; [ easy | cbn ].
-    destruct Ha as (H1 & H2 & Ha).
-    destruct Hb as (H3 & H4 & Hb).
-    split; [ easy | ].
-    split; [ easy | ].
-    intros i j Hi Hj.
-    destruct ma as (fa', ra, ca).
-    destruct mb as (fb', rb, cb); cbn in *.
-    subst ra ca rb cb.
-    destruct size; [ easy | cbn ].
-    rewrite Nat.sub_0_r.
-    destruct size. {
-      cbn in IHsizes |-*.
-      apply Nat.lt_1_r in Hi.
-      apply Nat.lt_1_r in Hj.
-      subst i j.
+    apply is_square_bmat_loop_mul; [ apply Ha; flia | ].
+    rewrite Hss.
+    apply Hb; flia.
+  }
 ...
 
 Theorem is_square_bmat_mul : ∀ T {so : semiring_op T} {sp : semiring_prop T},
