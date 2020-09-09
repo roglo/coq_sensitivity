@@ -2638,36 +2638,53 @@ apply IHsize. {
 }
 Qed.
 
-...
-
-refaire avec une "seq" à la place de "l" parce que les hypothèses
-"∀ n, ..." ne peuvent pas être appliquées
-
 Theorem sizes_of_bmatrix_fold_left :
   ∀ T {so : semiring_op T} {sp : semiring_prop T},
-  ∀ BM (f : nat → _) l,
+  ∀ BM sta len f,
   is_square_bmat BM
-  → (∀ n, is_square_bmat (f n))
-  → (∀ n, sizes_of_bmatrix BM = sizes_of_bmatrix (f n))
-  → sizes_of_bmatrix (fold_left (λ acc j, (acc + f j)%BM) l BM) =
+  → (∀ n, sta ≤ n < sta + len → is_square_bmat (f n))
+  → (∀ n, sta ≤ n < sta + len → sizes_of_bmatrix BM = sizes_of_bmatrix (f n))
+  → sizes_of_bmatrix (fold_left (λ acc j, (acc + f j)%BM) (seq sta len) BM) =
     sizes_of_bmatrix BM.
 Proof.
 intros * sp * Hb Hf Hfb.
-revert BM Hb Hfb.
-induction l as [| n]; intros; [ easy | cbn ].
-rewrite IHl. 2: {
+revert sta BM Hf Hb Hfb.
+induction len; intros; [ easy | cbn ].
+rewrite IHlen; cycle 1. {
+  intros n Hn.
+  apply Hf; flia Hn.
+} {
   apply is_square_bmat_loop_add. {
-    now rewrite sizes_of_bmatrix_add.
+    rewrite sizes_of_bmatrix_add; [ easy | easy | easy | | ]. {
+      apply Hf; flia.
+    } {
+      apply Hfb; flia.
+    }
   } {
-    rewrite sizes_of_bmatrix_add; [ | easy | easy | easy | easy ].
-    rewrite (Hfb n).
-    apply Hf.
+    rewrite sizes_of_bmatrix_add; [ | easy | easy | | ]. {
+      rewrite (Hfb sta); [ | flia ].
+      apply Hf; flia.
+    } {
+      apply Hf; flia.
+    } {
+      apply Hfb; flia.
+    }
   }
 } {
-  now rewrite sizes_of_bmatrix_add.
+  intros * Hn.
+  rewrite sizes_of_bmatrix_add; [ | easy | easy | | ]. {
+    apply Hfb; flia Hn.
+  } {
+    apply Hf; flia.
+  } {
+    apply Hfb; flia.
+  }
 }
-intros m.
-now rewrite sizes_of_bmatrix_add.
+apply sizes_of_bmatrix_add; [ easy | easy | | ]. {
+  apply Hf; flia.
+} {
+  apply Hfb; flia.
+}
 Qed.
 
 Theorem sizes_of_bmatrix_mul :
@@ -2828,42 +2845,52 @@ rewrite sizes_of_bmatrix_add; [ easy | easy | | | ]; cycle 1. {
         apply is_square_bmat_loop_mul; [ apply Ha; flia | ].
         rewrite Hss; apply Hb; flia.
       } {
-        intros.
+        intros * Hn; cbn in Hn.
         unfold is_square_bmat.
-        rewrite IHBMA. {
+        rewrite IHBMA; [ | flia | flia Hn | | | ]. {
           apply is_square_bmat_loop_mul. {
-            rewrite Has; [ | flia | ].
-...
-        rewrite Hss; apply Hb; flia.
-...
-apply glop.
-...
-    clear IHra.
-    induction ra. {
-      cbn.
-      rewrite Hssab.
-      rewrite <- (Has 0 1); [ | flia | flia ].
-      symmetry.
-      apply IHBMA; [ flia | flia | | | ]. {
-        rewrite Has; [ | flia | flia ].
-...
-        apply Ha; flia.
+            rewrite Has; [ | flia | flia Hn ].
+            apply Ha; [ flia | flia Hn ].
+          } {
+            rewrite Has; [ | flia | flia Hn ].
+            rewrite Hss.
+            apply Hb; [ flia Hn | flia ].
+          }
+        } {
+          rewrite Has; [ | flia | flia Hn ].
+          apply Ha; [ flia | flia Hn ].
+        } {
+          unfold is_square_bmat.
+          rewrite Hbs; [ | flia Hn | flia ].
+          apply Hb; [ flia Hn | flia ].
+        } {
+          rewrite Has; [ | flia | flia Hn ].
+          rewrite Hbs; [ | flia Hn | flia ].
+          easy.
+        }
       } {
-        unfold is_square_bmat.
-        rewrite Hbs; [ | flia | flia ].
-        apply Hb; flia.
-      } {
-        rewrite Has; [ | flia | flia ].
-        rewrite Hbs; [ | flia | flia ].
-        easy.
+        intros n Hn.
+        rewrite IHBMA; [ | flia | flia Hn | | | easy ]; cycle 1. {
+          apply Ha; [ flia | flia Hn ].
+        } {
+          unfold is_square_bmat.
+          apply Hb; [ flia Hn | flia ].
+        }
+        rewrite IHBMA; [ | flia | flia Hn | | | ]; cycle 1. {
+          rewrite Has; [ | flia | flia Hn ].
+          apply Ha; [ flia | flia Hn ].
+        } {
+          unfold is_square_bmat.
+          rewrite Hbs; [ | flia Hn | flia ].
+          apply Hb; [ flia Hn | flia ].
+        } {
+          rewrite Has; [ | flia | flia Hn ].
+          rewrite Hbs; [ | flia Hn | flia ].
+          easy.
+        }
+        symmetry; apply Has; [ flia | flia Hn ].
       }
-    }
-    rewrite List_seq_succ_r; cbn.
-    rewrite fold_left_app; cbn.
-    rewrite sizes_of_bmatrix_add; [ | easy | | | ]; cycle 1. {
-    unfold is_square_bmat.
-...
-    rewrite IHBMA; [ | flia | flia | | | ]; cycle 1. {
+    } {
       rewrite Has; [ | flia | flia ].
       apply Ha; flia.
     } {
@@ -2875,35 +2902,41 @@ apply glop.
       rewrite Hbs; [ | flia | flia ].
       easy.
     }
-    rewrite Has; [ | flia | flia ].
+  }
+  unfold is_square_bmat.
+  rewrite sizes_of_bmatrix_fold_left; [ | easy | | | ]; cycle 1. {
+    unfold is_square_bmat.
+    rewrite Hssab.
     apply is_square_bmat_loop_mul; [ apply Ha; flia | ].
     rewrite Hss; apply Hb; flia.
   } {
-    clear IHra.
-    induction ra. {
-      cbn.
-      rewrite Hssab.
-      rewrite <- (Has 0 1); [ | flia | flia ].
-      symmetry.
-      apply IHBMA; [ flia | flia | | | ]. {
-        rewrite Has; [ | flia | flia ].
-        apply Ha; flia.
-      } {
-        unfold is_square_bmat.
-        rewrite Hbs; [ | flia | flia ].
-        apply Hb; flia.
-      } {
-        rewrite Has; [ | flia | flia ].
-        rewrite Hbs; [ | flia | flia ].
-        easy.
-      }
+    intros * Hn.
+    unfold is_square_bmat.
+    rewrite IHBMA; [ | flia | flia Hn | | | ]; cycle 1. {
+      rewrite Has; [ | flia | flia Hn ].
+      apply Ha; [ flia | flia Hn ].
+    } {
+      unfold is_square_bmat.
+      rewrite Hbs; [ | flia Hn | flia ].
+      apply Hb; [ flia Hn | flia ].
+    } {
+      rewrite Has; [ | flia | flia Hn ].
+      rewrite Hbs; [ | flia Hn | flia ].
+      easy.
     }
-    rewrite List_seq_succ_r; cbn.
-    rewrite fold_left_app; cbn.
-    rewrite sizes_of_bmatrix_add; [ | easy | | | ]; cycle 1. {
-
-    rewrite sizes_of_bmatrix_add.
-    rewrite IHra.
+    apply is_square_bmat_loop_mul. {
+      rewrite Has; [ | flia | flia Hn ].
+      apply Ha; [ flia | flia Hn ].
+    } {
+      rewrite Has; [ | flia | flia Hn ].
+      rewrite Hss.
+      apply Hb; [ flia Hn | flia ].
+    }
+  } {
+    intros * Hn.
+... suite
+  rewrite Hssab.
+  apply IHra.
 ... avant...
 destruct ra. {
   apply IHBMA; [ flia | flia | apply Ha; flia | apply Hb; flia | easy ].
