@@ -2670,6 +2670,7 @@ destruct Hb as (_ & Hrcb & Hb).
 subst ca cb.
 injection Hab; clear Hab; intros Hss H2; subst rb.
 clear Hcza Hrzb Hczb.
+...
 specialize (IHBMA 0 0 Hrza Hrza) as Hssab.
 specialize (Hssab (Ha 0 0 Hrza Hrza)).
 specialize (Hssab (fb 0 0)).
@@ -2735,7 +2736,7 @@ assert (Hsb :
 }
 rewrite sizes_of_bmatrix_add; [ | easy | | | ]; cycle 1. {
   unfold is_square_bmat.
-  destruct ra. {
+  induction ra. {
     cbn.
     rewrite Hssab.
     apply is_square_bmat_loop_mul; [ apply Ha; flia | ].
@@ -2744,6 +2745,28 @@ rewrite sizes_of_bmatrix_add; [ | easy | | | ]; cycle 1. {
   }
   rewrite List_seq_succ_r; cbn.
   rewrite fold_left_app; cbn.
+(**)
+  apply is_square_bmat_loop_add. 2: {
+    rewrite sizes_of_bmatrix_add; [ | easy | | | ]; cycle 1. {
+      clear IHra.
+      induction ra. {
+        cbn.
+        rewrite Hssab.
+        apply is_square_bmat_loop_mul; [ apply Ha; flia | ].
+        rewrite Hss; apply Hb; flia.
+      }
+      rewrite List_seq_succ_r; cbn.
+      rewrite fold_left_app; cbn.
+      apply is_square_bmat_loop_add. 2: {
+        apply is_square_bmat_loop_mul. 2: {
+          rewrite sizes_of_bmatrix_add; [ | easy | | | ]; cycle 1. {
+(* trop de cas *)
+...
+--- suite
+  rewrite sizes_of_bmatrix_add.
+... suite
+  apply IHra.
+... ancien
   destruct ra. {
     cbn.
     rewrite Hsb.
