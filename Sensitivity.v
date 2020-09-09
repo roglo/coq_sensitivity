@@ -2739,6 +2739,54 @@ rewrite sizes_of_bmatrix_add; [ easy | easy | | | ]; cycle 1. {
   unfold is_square_bmat.
   rewrite Hsm.
   clear IHra.
+  induction ra. {
+    cbn.
+    apply is_square_bmat_loop_mul; [ apply Ha; flia | ].
+    rewrite Hss; apply Hb; flia.
+  }
+  rewrite List_seq_succ_r; cbn.
+  rewrite fold_left_app; cbn.
+  apply is_square_bmat_loop_add. 2: {
+    apply is_square_bmat_loop_mul; [ apply Ha; flia | ].
+    rewrite Hss; apply Hb; flia.
+  }
+  apply IHra. {
+    intros i j Hi Hj H1 BMB Hbmb Hab.
+    apply IHBMA; [ flia Hi | flia Hj | easy | easy | easy ].
+  } {
+    intros i j Hi Hj.
+    apply Ha; [ flia Hi | flia Hj ].
+  } {
+    intros i j Hi Hj.
+    apply Hb; [ flia Hi | flia Hj ].
+  } {
+    intros i j Hi Hj.
+    apply Has; [ flia Hi | flia Hj ].
+  } {
+    intros i j Hi Hj.
+    apply Hbs; [ flia Hi | flia Hj ].
+  }
+  move Hsm at bottom.
+  rewrite List_seq_succ_r in Hsm; cbn in Hsm.
+  rewrite fold_left_app in Hsm; cbn in Hsm.
+  rewrite sizes_of_bmatrix_add in Hsm; [ easy | easy | | | ]; cycle 1. {
+    unfold is_square_bmat.
+    rewrite IHBMA; [ | flia | flia | | | ]; cycle 1. {
+      rewrite Has; [ | flia | flia ].
+      apply Ha; flia.
+    } {
+      unfold is_square_bmat.
+      rewrite Hbs; [ | flia | flia ].
+      apply Hb; flia.
+    } {
+      rewrite Has; [ | flia | flia ].
+      rewrite Hbs; [ | flia | flia ].
+      easy.
+    }
+    rewrite Has; [ | flia | flia ].
+    apply is_square_bmat_loop_mul; [ apply Ha; flia | ].
+    rewrite Hss; apply Hb; flia.
+  } {
 ... avant...
 destruct ra. {
   apply IHBMA; [ flia | flia | apply Ha; flia | apply Hb; flia | easy ].
