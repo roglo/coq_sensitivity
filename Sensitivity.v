@@ -2670,13 +2670,76 @@ destruct Hb as (_ & Hrcb & Hb).
 subst ca cb.
 injection Hab; clear Hab; intros Hss H2; subst rb.
 clear Hcza Hrzb Hczb.
-...
 specialize (IHBMA 0 0 Hrza Hrza) as Hssab.
 specialize (Hssab (Ha 0 0 Hrza Hrza)).
 specialize (Hssab (fb 0 0)).
 specialize (Hssab (Hb 0 0 Hrza Hrza) Hss).
 destruct ra; [ easy | clear Hrza; cbn ].
 rewrite Nat.sub_0_r.
+(**)
+induction ra. {
+  apply IHBMA; [ flia | flia | apply Ha; flia | apply Hb; flia | easy ].
+}
+rewrite List_seq_succ_r; cbn.
+rewrite fold_left_app; cbn.
+assert (Hsm :
+  sizes_of_bmatrix
+    (fold_left (λ acc j, (acc + fa 0 (j + 1)%nat * fb (j + 1)%nat 0)%BM)
+       (seq 0 ra) (fa 0 0 * fb 0 0)%BM) = sizes_of_bmatrix (fa 0 0)). {
+  apply IHra. {
+    intros i j Hi Hj H1 BMB Hbmb Hab.
+    apply IHBMA; [ flia Hi | flia Hj | easy | easy | easy ].
+  } {
+    intros i j Hi Hj.
+    apply Ha; [ flia Hi | flia Hj ].
+  } {
+    intros i j Hi Hj.
+    apply Hb; [ flia Hi | flia Hj ].
+  } {
+    intros i j Hi Hj.
+    apply Has; [ flia Hi | flia Hj ].
+  } {
+    intros i j Hi Hj.
+    apply Hbs; [ flia Hi | flia Hj ].
+  }
+}
+rewrite sizes_of_bmatrix_add; [ easy | easy | | | ]; cycle 1. {
+  unfold is_square_bmat.
+  rewrite IHBMA; [ | flia | flia | | | ]; cycle 1. {
+    rewrite Has; [ | flia | flia ].
+    apply Ha; flia.
+  } {
+    unfold is_square_bmat.
+    rewrite Hbs; [ | flia | flia ].
+    apply Hb; flia.
+  } {
+    rewrite Has; [ | flia | flia ].
+    rewrite Hbs; [ | flia | flia ].
+    easy.
+  }
+  rewrite Has; [ | flia | flia ].
+  apply is_square_bmat_loop_mul; [ apply Ha; flia | ].
+  rewrite Hss; apply Hb; flia.
+} {
+  rewrite IHBMA; [ | flia | flia | | | ]; cycle 1. {
+    rewrite Has; [ | flia | flia ].
+    apply Ha; [ flia | flia ].
+  } {
+    unfold is_square_bmat.
+    rewrite Hbs; [ | flia | flia ].
+    apply Hb; [ flia | flia ].
+  } {
+    rewrite Has; [ | flia | flia ].
+    rewrite Hbs; [ | flia | flia ].
+    easy.
+  }
+  rewrite Has; [ | flia | flia ].
+  apply Hsm.
+} {
+  unfold is_square_bmat.
+  rewrite Hsm.
+  clear IHra.
+... avant...
 destruct ra. {
   apply IHBMA; [ flia | flia | apply Ha; flia | apply Hb; flia | easy ].
 }
