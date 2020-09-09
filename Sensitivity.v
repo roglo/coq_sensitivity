@@ -2752,6 +2752,16 @@ rewrite sizes_of_bmatrix_add; [ | easy | | | ]; cycle 1. {
       rewrite Hss.
       apply Hb; flia.
     }
+    apply is_square_bmat_loop_mul; [ apply Ha; flia | ].
+    rewrite Hss.
+    apply Hb; flia.
+  }
+  destruct ra. {
+    cbn.
+    rewrite sizes_of_bmatrix_add; [ | easy | | | ]; cycle 1. {
+      apply is_square_bmat_loop_add.
+...
+    rewrite Hsb.
 ...
 
 Theorem is_square_bmat_mul : ∀ T {so : semiring_op T} {sp : semiring_prop T},
