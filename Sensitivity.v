@@ -2654,11 +2654,13 @@ induction BMA as [xa| ma IHBMA] using bmatrix_ind2; intros. {
 destruct BMB as [xb| mb]; [ easy | cbn ].
 move mb before ma.
 cbn in Ha, Hb, Hab.
+specialize (sizes_of_bmatrix_mat_el ma Ha) as Has.
+specialize (sizes_of_bmatrix_mat_el mb Hb) as Hbs.
 destruct (zerop (mat_nrows ma)) as [Hrza| Hrza]; [ easy | ].
 destruct (zerop (mat_ncols ma)) as [Hcza| Hcza]; [ easy | ].
 destruct (zerop (mat_nrows mb)) as [Hrzb| Hrzb]; [ easy | ].
 destruct (zerop (mat_ncols mb)) as [Hczb| Hczb]; [ easy | ].
-cbn in Ha, Hb, Hab |-*.
+cbn in Ha, Hb, Hab, Has, Hbs |-*.
 f_equal.
 destruct ma as (fa, ra, ca).
 destruct mb as (fb, rb, cb).
@@ -2679,6 +2681,58 @@ destruct ra. {
 }
 rewrite List_seq_succ_r; cbn.
 rewrite fold_left_app; cbn.
+assert (Hsb :
+  sizes_of_bmatrix (fa 0 0 * fb 0 0 + fa 0 1 * fb 1 0)%BM =
+  sizes_of_bmatrix (fa 0 0)). {
+  rewrite sizes_of_bmatrix_add; [ | easy | | | ]. {
+    now rewrite Hssab, Hss.
+  } {
+    unfold is_square_bmat.
+    rewrite Hssab.
+    apply is_square_bmat_loop_mul. {
+      apply Ha; flia.
+    } {
+      rewrite Hss.
+      apply Hb; flia.
+    }
+  } {
+    unfold is_square_bmat.
+    rewrite IHBMA; [ | flia | flia | | | ]; cycle 1. {
+      rewrite Has; [ | flia | flia ].
+      apply Ha; flia.
+    } {
+      unfold is_square_bmat.
+      rewrite Hbs; [ | flia | flia ].
+      apply Hb; flia.
+    } {
+      rewrite Has; [ | flia | flia ].
+      rewrite Hbs; [ | flia | flia ].
+      easy.
+    }
+    apply is_square_bmat_loop_mul. {
+      rewrite Has; [ | flia | flia ].
+      apply Ha; flia.
+    } {
+      rewrite Has; [ | flia | flia ].
+      rewrite Hss.
+      apply Hb; flia.
+    }
+  }
+  rewrite Hssab.
+  rewrite <- (Has 0 1); [ | flia | flia ].
+  symmetry.
+  apply IHBMA; [ flia | flia | | | ]. {
+    rewrite Has; [ | flia | flia ].
+    apply Ha; flia.
+  } {
+    unfold is_square_bmat.
+    rewrite Hbs; [ | flia | flia ].
+    apply Hb; flia.
+  }
+  rewrite Has; [ | flia | flia ].
+  rewrite Hbs; [ | flia | flia ].
+  easy.
+}
 rewrite sizes_of_bmatrix_add; [ | easy | | | ]; cycle 1. {
   unfold is_square_bmat.
   destruct ra. {
@@ -2692,22 +2746,12 @@ rewrite sizes_of_bmatrix_add; [ | easy | | | ]; cycle 1. {
   rewrite fold_left_app; cbn.
   destruct ra. {
     cbn.
+    rewrite Hsb.
     apply is_square_bmat_loop_add. 2: {
-      apply is_square_bmat_loop_mul. 2: {
-        rewrite sizes_of_bmatrix_add; [ | easy | | | ]. {
-          rewrite Hssab, Hss.
-          apply Hb; flia.
-        } {
-          unfold is_square_bmat.
-          rewrite Hssab.
-          apply is_square_bmat_loop_mul. {
-            apply Ha; flia.
-          } {
-            rewrite Hss.
-            apply Hb; flia.
-          }
-        } {
-          unfold is_square_bmat.
+      apply is_square_bmat_loop_mul; [ apply Ha; flia | ].
+      rewrite Hss.
+      apply Hb; flia.
+    }
 ...
 
 Theorem is_square_bmat_mul : ∀ T {so : semiring_op T} {sp : semiring_prop T},
