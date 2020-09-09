@@ -3290,10 +3290,9 @@ Theorem bmat_add_opp_r : ∀ T {ro : ring_op T} (so := rng_semiring)
   bmat_add M (bmat_opp M) = bmat_zero_like M.
 Proof.
 intros * rp sp *.
-...
 induction M as [x| M IHM] using bmatrix_ind2; intros. {
   cbn.
-  subst so.
+  unfold so.
   rewrite fold_rng_sub.
   now rewrite rng_add_opp_r.
 }
