@@ -2604,6 +2604,37 @@ intros i j Hi Hj.
 apply IHsizes; [ now apply Ha | now apply Hb ].
 Qed.
 
+Theorem bmat_add_0_l : ∀ T {so : semiring_op T} {sp : semiring_prop T} BM,
+  is_square_bmat BM
+  → (bmat_zero_like BM + BM)%BM = BM.
+Proof.
+intros * sp * Hss.
+induction BM as [x| M IHBM] using bmatrix_ind2. {
+  now cbn; rewrite srng_add_0_l.
+}
+cbn; f_equal.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros i j Hi Hj.
+apply IHBM; [ easy | easy | ].
+cbn in Hss.
+unfold is_square_bmat.
+destruct (zerop (mat_nrows M)) as [H| H]; [ flia Hi H | cbn in Hss; clear H ].
+destruct (zerop (mat_ncols M)) as [H| H]; [ flia Hj H | cbn in Hss; clear H ].
+destruct Hss as (_ & Hcr & Hss).
+erewrite sizes_of_bmatrix_mat_el; [ | easy | | easy | easy ]. {
+  rewrite Hcr in Hj.
+  now apply Hss.
+} {
+  cbn; rewrite Hcr.
+  destruct (zerop (mat_nrows M)) as [H| H]; [ flia Hi H | cbn; clear H ].
+  split; [ easy | ].
+  split; [ easy | ].
+  clear i j Hi Hj.
+  intros i j Hi Hj.
+  now apply Hss.
+}
+Qed.
+
 Theorem is_square_bmat_loop_mul : ∀ T {so : semiring_op T} BMA BMB sizes,
   is_square_bmat_loop sizes BMA
   → is_square_bmat_loop sizes BMB
@@ -3069,16 +3100,6 @@ Theorem bmat_zero_like_sqr : ∀ T {so : semiring_op T} {sp : semiring_prop T} B
 Proof.
 intros * sp * Hss.
 now apply bmat_zero_like_mul.
-Qed.
-
-Theorem bmat_add_0_l : ∀ T {so : semiring_op T} {sp : semiring_prop T} BM,
-  is_square_bmat BM
-  → (bmat_zero_like BM + BM)%BM = BM.
-Proof.
-intros * sp * Hss.
-...
-rewrite <- bmat_zero_like_mul_distr_l; [ | easy | easy ].
-now apply bmat_zero_like_sqr.
 Qed.
 
 Theorem bmat_mul_0_l : ∀ T {so : semiring_op T} {sp : semiring_prop T} BM,
@@ -4185,22 +4206,10 @@ rewrite bmat_add_add_swap; [ | easy | | ]; cycle 1. {
 unfold so.
 rewrite bmat_add_opp_r; [ | easy | easy ].
 symmetry.
-...
-apply bmat_add_0_l.
 Search bmat_zero_like.
-...
-Check bmat_add_0_r.
-apply bmat_add_0_l.
-specialize (bmat_sub_cancel_r MA MB MC Ha Hb Hc Hssab Hssac) as H1.
-Check Z.sub_cancel_r.
-...
-stepl (n + m - n == p - n) by apply sub_cancel_r.
-About Z.add_move_l.
-Print Z.add_move_l.
-Check Z.add_sub_assoc.
-Check Z.sub_diag.
-Check Z.add_0_r.
-...
+rewrite (bmat_zero_like_eq_compat _ MB); [ | easy | easy | easy ].
+now apply bmat_add_0_l.
+Qed.
 
 Theorem bmat_add_move_0_l : ∀ T {ro : ring_op T} (so := rng_semiring) MA MB,
   is_square_bmat MA
@@ -4210,6 +4219,7 @@ Theorem bmat_add_move_0_l : ∀ T {ro : ring_op T} (so := rng_semiring) MA MB,
   → MB = (- MA)%BM.
 Proof.
 intros * Ha Hb Hss Hab.
+...
 Print Z.add_move_0_l.
 Check Z.add_move_l.
 ...
