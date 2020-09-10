@@ -144,6 +144,14 @@ eapply rng_sub_compat_l with (c := c) in Habc.
 now do 2 rewrite rng_add_sub in Habc.
 Qed.
 
+Theorem rng_add_reg_l : ∀ a b c, (c + a = c + b)%Rng → (a = b)%Rng.
+Proof.
+intros a b c Habc; simpl in Habc; simpl.
+apply rng_add_reg_r with (c := c).
+rewrite srng_add_comm; symmetry.
+now rewrite srng_add_comm; symmetry.
+Qed.
+
 Theorem rng_mul_0_l : ∀ a, (0 * a = 0)%Rng.
 Proof.
 intros a.
@@ -354,15 +362,6 @@ Proof.
 intros a b c Habc; simpl in Habc; simpl.
 eapply srng_sub_compat_l with (c := c) in Habc.
 now do 2 rewrite srng_add_sub in Habc.
-Qed.
-
-Theorem srng_add_reg_l : ∀ a b c, (c + a = c + b)%Srng → (a = b)%Srng.
-Proof.
-intros a b c Habc; simpl in Habc; simpl.
-apply srng_add_reg_r with (c := c).
-rewrite srng_add_comm; symmetry.
-rewrite srng_add_comm; symmetry.
-assumption.
 Qed.
 
 Theorem srng_opp_add_distr : ∀ a b,

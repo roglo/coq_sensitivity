@@ -1982,12 +1982,16 @@ induction BM as [x| M IHBM] using bmatrix_ind2. {
 }
 Qed.
 
+Definition bmat_sub T {ro : ring_op T} (so := rng_semiring) BMA BMB :=
+  bmat_add BMA (bmat_opp BMB).
+
 Declare Scope BM_scope.
 Delimit Scope BM_scope with BM.
 
 Module bmatrix_Notations.
 
 Notation "a + b" := (bmat_add a b) : BM_scope.
+Notation "a - b" := (bmat_sub a b) : BM_scope.
 Notation "a * b" := (bmat_mul a b) : BM_scope.
 Notation "- a" := (bmat_opp a) : BM_scope.
 
@@ -2400,6 +2404,19 @@ apply (IHsizes _ size1); [ easy | now apply Hss | ]. {
   intros H; apply H3.
   destruct H as [H| H]; [ now right; left | now right; right ].
 }
+Qed.
+
+Theorem sizes_of_bmatrix_at_0_0 :
+  ∀ T {so : semiring_op T} {sp : semiring_prop T},
+  ∀ (f : _ → _ → bmatrix T) r,
+  (∀ i j, i < r → j < r →
+      is_square_bmat_loop (sizes_of_bmatrix (f 0 0)) (f i j))
+  → ∀ i j, i < r → j < r →
+  sizes_of_bmatrix (f i j) = sizes_of_bmatrix (f 0 0).
+Proof.
+intros * sp * Hf * Hi Hj.
+apply (sizes_of_bmatrix_mat_el (mk_mat f r r)); cbn; [ | easy | easy ].
+destruct (zerop r) as [Hrz| Hrz]; [ flia Hi Hrz | easy ].
 Qed.
 
 Theorem bmat_zero_like_add_distr :
@@ -3986,6 +4003,144 @@ intros i j Hi Hj.
 now apply IHsizes, HM.
 Qed.
 
+Theorem bmat_add_cancel_l :
+  ∀ T {ro : ring_op T} (so := rng_semiring) {sp : semiring_prop T}
+     {rp : ring_prop T} MA MB MC,
+  is_square_bmat MA
+  → is_square_bmat MB
+  → is_square_bmat MC
+  → sizes_of_bmatrix MA = sizes_of_bmatrix MB
+  → sizes_of_bmatrix MA = sizes_of_bmatrix MC
+  → (MA + MB = MA + MC)%BM
+  → MB = MC.
+Proof.
+intros * sp rp * Ha Hb Hc Hssab Hssac Hbc.
+revert MB MC Hb Hc Hssab Hssac Hbc.
+induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
+  destruct MB as [xb| mb]. {
+    destruct MC as [xc| mc]. {
+      cbn in Hbc.
+      f_equal.
+      injection Hbc; clear Hbc; intros Hbc.
+      now apply rng_add_reg_l in Hbc.
+    }
+    cbn in Hssac, Hc.
+    destruct (zerop (mat_nrows mc)) as [Hrc| Hrc]; [ easy | ].
+    now destruct (zerop (mat_ncols mc)).
+  }
+  cbn in Hssab, Hb.
+  destruct (zerop (mat_nrows mb)) as [Hrb| Hrb]; [ easy | ].
+  now destruct (zerop (mat_ncols mb)).
+}
+destruct MB as [xb| mb]. {
+  cbn in Hssab, Ha.
+  destruct (zerop (mat_nrows ma)) as [Hra| Hra]; [ easy | ].
+  now destruct (mat_ncols ma).
+}
+destruct MC as [xc| mc]. {
+  cbn in Hssac, Hc.
+  destruct (zerop (mat_nrows ma)) as [Hra| Hra]; [ easy | ].
+  now destruct (mat_ncols ma).
+}
+f_equal.
+cbn in Ha, Hb, Hc, Hssab, Hssac.
+destruct ma as (fa, ra, ca).
+destruct mb as (fb, rb, cb).
+destruct mc as (fc, rc, cc).
+cbn in *.
+destruct (zerop ra) as [Hra| Hra]; [ easy | ].
+destruct (zerop ca) as [Hca| Hca]; [ easy | ].
+destruct (zerop rb) as [Hrb| Hrb]; [ easy | ].
+destruct (zerop cb) as [Hcb| Hcb]; [ easy | ].
+destruct (zerop rc) as [Hrc| Hrc]; [ easy | ].
+destruct (zerop cc) as [Hcc| Hcc]; [ easy | ].
+cbn in *.
+destruct Ha as (_ & H1 & Ha); subst ca.
+destruct Hb as (_ & H1 & Hb); subst cb.
+destruct Hc as (_ & H1 & Hc); subst cc.
+injection Hssab; clear Hssab; intros Hssab H1; subst rb.
+injection Hssac; clear Hssac; intros Hssac H1; subst rc.
+clear Hca Hcb Hrb Hcc Hrc.
+move fb before fa; move fc before fb.
+injection Hbc; clear Hbc; intros Hbc.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros i j Hi Hj.
+apply f_equal with (f := λ g, g i) in Hbc.
+apply f_equal with (f := λ g, g j) in Hbc.
+apply (IHMA i j); [ easy | easy | | | | | | easy ]. {
+  rewrite (sizes_of_bmatrix_at_0_0 fa Ha); [ | easy | easy ].
+  now apply Ha.
+} {
+  unfold is_square_bmat.
+  rewrite (sizes_of_bmatrix_at_0_0 fb Hb); [ | easy | easy ].
+  now apply Hb.
+} {
+  unfold is_square_bmat.
+  rewrite (sizes_of_bmatrix_at_0_0 fc Hc); [ | easy | easy ].
+  now apply Hc.
+} {
+  rewrite (sizes_of_bmatrix_at_0_0 fa Ha); [ | easy | easy ].
+  rewrite (sizes_of_bmatrix_at_0_0 fb Hb); [ | easy | easy ].
+  easy.
+} {
+  rewrite (sizes_of_bmatrix_at_0_0 fa Ha); [ | easy | easy ].
+  rewrite (sizes_of_bmatrix_at_0_0 fc Hc); [ | easy | easy ].
+  easy.
+}
+Qed.
+
+Theorem bmat_add_cancel_r : ∀ T {ro : ring_op T} (so := rng_semiring) MA MB MC,
+  is_square_bmat MA
+  → is_square_bmat MB
+  → is_square_bmat MC
+  → sizes_of_bmatrix MA = sizes_of_bmatrix MB
+  → sizes_of_bmatrix MA = sizes_of_bmatrix MC
+  → (MA + MC = MB + MC)%BM
+  → MA = MB.
+Proof.
+intros * Ha Hb Hc Hssab Hssac Hab.
+(* on peut pas utiliser bmat_add_cancel_l, c'est pas commutatif *)
+(* faut recopier tout son code ! *)
+...
+
+Theorem bmat_sub_cancel_r : ∀ T {ro : ring_op T} (so := rng_semiring) MA MB MC,
+  is_square_bmat MA
+  → is_square_bmat MB
+  → is_square_bmat MC
+  → sizes_of_bmatrix MA = sizes_of_bmatrix MB
+  → sizes_of_bmatrix MA = sizes_of_bmatrix MC
+  → (MA - MC = MB - MC)%BM
+  → MA = MB.
+Proof.
+intros * Ha Hb Hc Hssab Hssac Hab.
+Check Z.add_cancel_r.
+...
+Print Z.sub_cancel_r.
+Check Z.sub_sub_distr.
+Check Z.sub_diag.
+Check Z.sub_0_r.
+...
+
+Theorem bmat_add_move_l : ∀ T {ro : ring_op T} (so := rng_semiring) MA MB MC,
+  is_square_bmat MA
+  → is_square_bmat MB
+  → is_square_bmat MC
+  → sizes_of_bmatrix MA = sizes_of_bmatrix MB
+  → sizes_of_bmatrix MA = sizes_of_bmatrix MC
+  → (MA + MB)%BM = MC
+  → MB = (MC - MA)%BM.
+Proof.
+intros * Ha Hb Hc Hssab Hssac Hab.
+Check Z.sub_cancel_r.
+...
+stepl (n + m - n == p - n) by apply sub_cancel_r.
+About Z.add_move_l.
+Print Z.add_move_l.
+Check Z.add_sub_assoc.
+Check Z.sub_diag.
+Check Z.add_0_r.
+...
+
 Theorem bmat_add_move_0_l : ∀ T {ro : ring_op T} (so := rng_semiring) MA MB,
   is_square_bmat MA
   → is_square_bmat MB
@@ -3994,6 +4149,11 @@ Theorem bmat_add_move_0_l : ∀ T {ro : ring_op T} (so := rng_semiring) MA MB,
   → MB = (- MA)%BM.
 Proof.
 intros * Ha Hb Hss Hab.
+Print Z.add_move_0_l.
+Check Z.add_move_l.
+...
+Z.add_move_l
+     : ∀ n m p : Z, (n + m)%Z = p ↔ m = (p - n)%Z
 ...
 
 Theorem bmat_mul_opp_l :
