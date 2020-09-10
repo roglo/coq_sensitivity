@@ -3832,21 +3832,6 @@ injection Has; clear Has; intros Has.
 injection Hbs; clear Hbs; intros Hbs.
 injection Hcs; clear Hcs; intros Hcs.
 rewrite Nat.sub_0_r.
-(*
-assert (H : ∀ j, j < S size → is_square_bmat_loop sizes (fa i j)). {
-  now intros; apply Ha.
-}
-move H before Ha; clear Ha; rename H into Ha.
-assert (H : ∀ j, j < S size → is_square_bmat_loop sizes (fb i j)). {
-  now intros; apply Hb.
-}
-move H before Hb; clear Hb; rename H into Hb.
-assert (H : ∀ i, i < S size → is_square_bmat_loop sizes (fc i j)). {
-  now intros; apply Hc.
-}
-move H before Hc; clear Hc; rename H into Hc.
-move j before i.
-*)
 rewrite IHMC; [ | flia | easy | ]. 2: {
   exists sizes.
   unfold is_square_bmat.
@@ -3866,6 +3851,30 @@ rewrite IHMC; [ | flia | easy | ]. 2: {
     apply Hc; [ flia | easy ].
   }
   easy.
+}
+assert (H : ∀ j, j < S size → is_square_bmat_loop sizes (fa i j)). {
+  now intros; apply Ha.
+}
+move H before Ha; clear Ha; rename H into Ha.
+assert (H : ∀ j, j < S size → is_square_bmat_loop sizes (fb i j)). {
+  now intros; apply Hb.
+}
+move H before Hb; clear Hb; rename H into Hb.
+assert (H : ∀ i, i < S size → is_square_bmat_loop sizes (fc i j)). {
+  now intros; apply Hc.
+}
+move H before Hc; clear Hc; rename H into Hc.
+move j before i.
+clear Hi Hj IHMC.
+induction size; [ easy | ].
+rewrite List_seq_succ_r; cbn.
+do 3 rewrite fold_left_app; cbn.
+rewrite IHsize; cycle 1. {
+  intros k Hk; apply Ha; flia Hk.
+} {
+  intros k Hk; apply Hb; flia Hk.
+} {
+  intros k Hk; apply Hc; flia Hk.
 }
 ...
     intros i1 j1 Hi1 Hj1.
