@@ -4020,11 +4020,11 @@ Theorem bmat_add_cancel_l :
   → (MA + MB = MA + MC)%BM
   → MB = MC.
 Proof.
-intros * sp rp * Hfit.
-...
-intros * sp rp * Ha Hb Hc Hssab Hssac Hbc.
-revert MB MC Hb Hc Hssab Hssac Hbc.
+intros * sp rp * Hfit Hbc.
+revert MB MC Hfit Hbc.
 induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
+  destruct Hfit as (sizes & Ha & Hb & Hc & Has & Hbs & Hcs).
+  cbn in Has; subst sizes.
   destruct MB as [xb| mb]. {
     destruct MC as [xc| mc]. {
       cbn in Hbc.
@@ -4032,26 +4032,30 @@ induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
       injection Hbc; clear Hbc; intros Hbc.
       now apply rng_add_reg_l in Hbc.
     }
-    cbn in Hssac, Hc.
+    cbn in Hc, Hcs.
     destruct (zerop (mat_nrows mc)) as [Hrc| Hrc]; [ easy | ].
     now destruct (zerop (mat_ncols mc)).
   }
-  cbn in Hssab, Hb.
+  cbn in Hb, Hbs.
   destruct (zerop (mat_nrows mb)) as [Hrb| Hrb]; [ easy | ].
   now destruct (zerop (mat_ncols mb)).
 }
 destruct MB as [xb| mb]. {
-  cbn in Hssab, Ha.
+  destruct Hfit as (sizes & Ha & Hb & Hc & Has & Hbs & Hcs).
+  cbn in Ha, Has, Hbs; move Hbs at top; subst sizes.
   destruct (zerop (mat_nrows ma)) as [Hra| Hra]; [ easy | ].
   now destruct (mat_ncols ma).
 }
 destruct MC as [xc| mc]. {
-  cbn in Hssac, Hc.
+  destruct Hfit as (sizes & Ha & Hb & Hc & Has & Hbs & Hcs).
+  cbn in Ha, Has, Hcs; move Hcs at top; subst sizes.
   destruct (zerop (mat_nrows ma)) as [Hra| Hra]; [ easy | ].
   now destruct (mat_ncols ma).
 }
 f_equal.
-cbn in Ha, Hb, Hc, Hssab, Hssac.
+cbn in Hbc.
+injection Hbc; clear Hbc; intros Hbc.
+destruct Hfit as (sizes & Ha & Hb & Hc & Has & Hbs & Hcs).
 destruct ma as (fa, ra, ca).
 destruct mb as (fb, rb, cb).
 destruct mc as (fc, rc, cc).
@@ -4066,35 +4070,29 @@ cbn in *.
 destruct Ha as (_ & H1 & Ha); subst ca.
 destruct Hb as (_ & H1 & Hb); subst cb.
 destruct Hc as (_ & H1 & Hc); subst cc.
-injection Hssab; clear Hssab; intros Hssab H1; subst rb.
-injection Hssac; clear Hssac; intros Hssac H1; subst rc.
-clear Hca Hcb Hrb Hcc Hrc.
+move rb before ra; move rc before rb.
 move fb before fa; move fc before fb.
-injection Hbc; clear Hbc; intros Hbc.
+rewrite <- Hbs in Has.
+injection Has; clear Has; intros Has H; subst rb.
+rewrite <- Hcs in Hbs.
+injection Hbs; clear Hbs; intros Hbs H; subst rc.
+clear Hca Hcb Hrb Hcc Hrc.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros i j Hi Hj.
 apply f_equal with (f := λ g, g i) in Hbc.
 apply f_equal with (f := λ g, g j) in Hbc.
-apply (IHMA i j); [ easy | easy | | | | | | easy ]. {
-  rewrite (sizes_of_bmatrix_at_0_0 fa Ha); [ | easy | easy ].
-  now apply Ha.
-} {
-  unfold is_square_bmat.
-  rewrite (sizes_of_bmatrix_at_0_0 fb Hb); [ | easy | easy ].
-  now apply Hb.
-} {
-  unfold is_square_bmat.
-  rewrite (sizes_of_bmatrix_at_0_0 fc Hc); [ | easy | easy ].
-  now apply Hc.
-} {
-  rewrite (sizes_of_bmatrix_at_0_0 fa Ha); [ | easy | easy ].
-  rewrite (sizes_of_bmatrix_at_0_0 fb Hb); [ | easy | easy ].
-  easy.
-} {
-  rewrite (sizes_of_bmatrix_at_0_0 fa Ha); [ | easy | easy ].
-  rewrite (sizes_of_bmatrix_at_0_0 fc Hc); [ | easy | easy ].
-  easy.
-}
+apply (IHMA i j); [ easy | easy | | easy ].
+destruct sizes as [| size]; [ easy | ].
+injection Hcs; clear Hcs; intros Hcs H; subst ra.
+exists sizes.
+unfold is_square_bmat.
+rewrite (sizes_of_bmatrix_at_0_0 fa Ha); [ | easy | easy ].
+rewrite (sizes_of_bmatrix_at_0_0 fb Hb); [ | easy | easy ].
+rewrite (sizes_of_bmatrix_at_0_0 fc Hc); [ | easy | easy ].
+split; [ now apply Ha | ].
+split; [ now apply Hb | ].
+split; [ now apply Hc | ].
+split; [ congruence | split; congruence ].
 Qed.
 
 Theorem bmat_add_cancel_r :
@@ -4109,6 +4107,7 @@ Theorem bmat_add_cancel_r :
   → MA = MB.
 Proof.
 intros * sp rp * Ha Hb Hc Hssab Hssac Hab.
+...
 rewrite (bmat_add_comm MA) in Hab. 2: {
   apply (square_bmat_fit_for_add (sizes_of_bmatrix MA)); [ easy | ].
   now rewrite Hssac.
@@ -4132,6 +4131,7 @@ Theorem bmat_sub_cancel_r :
   → MA = MB.
 Proof.
 intros * so sp * Ha Hb Hc Hssab Hssac Hab.
+...
 apply bmat_add_cancel_r in Hab; try easy. {
   now apply is_square_bmat_opp.
 } {
@@ -4151,6 +4151,7 @@ Theorem bmat_add_move_l :
   → MB = (MC - MA)%BM.
 Proof.
 intros * sp rp * Ha Hb Hc Hssab Hssac Hab.
+...
 rewrite <- Hab.
 unfold bmat_sub.
 rewrite bmat_add_add_swap; [ | easy | | ]; cycle 1. {
@@ -4176,6 +4177,7 @@ Theorem bmat_add_move_0_l : ∀ T {ro : ring_op T} (so := rng_semiring) MA MB,
   → MB = (- MA)%BM.
 Proof.
 intros * Ha Hb Hss Hab.
+...
 apply bmat_add_move_l in Hab.
 ...
 Print Z.add_move_0_l.
