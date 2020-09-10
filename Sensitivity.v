@@ -3651,13 +3651,12 @@ Definition bmat_nrows T (M : bmatrix T) :=
   | BM_M m => mat_nrows m
   end.
 
-Print is_square_bmat.
-
-Definition bmat_fit_for_distr T (MA MB MC : bmatrix T) :=
+Definition bmat_op_3_squares T (MA MB MC : bmatrix T) :=
   ∃ sizes,
-  is_square_bmat_loop sizes MA ∧
-  is_square_bmat_loop sizes MB ∧
-  is_square_bmat_loop sizes MC.
+  is_square_bmat MA ∧ is_square_bmat MB ∧ is_square_bmat MC ∧
+  sizes_of_bmatrix MA = sizes ∧
+  sizes_of_bmatrix MB = sizes ∧
+  sizes_of_bmatrix MC = sizes.
 
 Theorem square_bmat_fit_for_add : ∀ T sizes (MA MB : bmatrix T),
   is_square_bmat_loop sizes MA
@@ -3795,30 +3794,30 @@ Qed.
 
 Theorem bmat_mul_add_distr_r :
   ∀ T (so : semiring_op T) {sp : semiring_prop T} (MA MB MC : bmatrix T),
-  bmat_fit_for_distr MA MB MC
+  bmat_op_3_squares MA MB MC
   → ((MA + MB) * MC = MA * MC + MB * MC)%BM.
 Proof.
 intros * sp * Hfit.
 revert MA MB Hfit.
 induction MC as [xc| mc IHMC] using bmatrix_ind2; intros. {
-  destruct Hfit as (sizes & Ha & Hb & Hc).
+  destruct Hfit as (sizes & Ha & Hb & Hc & Has & Hbs & Hcs).
+  unfold is_square_bmat in Ha, Hb, Hc.
+  rewrite Has in Ha; rewrite Hbs in Hb; rewrite Hcs in Hc.
   destruct sizes; [ | easy ].
-  cbn in Ha, Hb.
   destruct MA as [xa| ma]; [ | easy ].
   destruct MB as [xb| mb]; [ | easy ].
   now cbn; rewrite srng_mul_add_distr_r.
 }
-destruct Hfit as (sizes & Ha & Hb & Hc).
-cbn in Hc.
+destruct Hfit as (sizes & Ha & Hb & Hc & Has & Hbs & Hcs).
+unfold is_square_bmat in Ha, Hb, Hc.
+rewrite Has in Ha; rewrite Hbs in Hb; rewrite Hcs in Hc.
 destruct sizes as [| size]; [ easy | ].
 cbn in Ha, Hb, Hc.
-destruct Hc as (Hcr & Hcc & Hc).
 destruct MA as [xa| ma]; [ easy | ].
 destruct MB as [xb| mb]; [ easy | ].
+destruct Hc as (Hcr & Hcc & Hc).
 destruct Ha as (Har & Hac & Ha).
 destruct Hb as (Hbr & Hbc & Hb).
-move Hbr before Har; move Hcr before Hbr.
-move Hbc before Hac; move Hcc before Hbc.
 cbn; f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros i j Hi Hj.
@@ -3828,7 +3827,12 @@ destruct mc as (fc, rc, cc).
 cbn in *.
 subst ra rb rc ca cb cc.
 destruct size; [ easy | cbn ].
+cbn in Has, Hbs, Hcs.
+injection Has; clear Has; intros Has.
+injection Hbs; clear Hbs; intros Hbs.
+injection Hcs; clear Hcs; intros Hcs.
 rewrite Nat.sub_0_r.
+(*
 assert (H : ∀ j, j < S size → is_square_bmat_loop sizes (fa i j)). {
   now intros; apply Ha.
 }
@@ -3842,8 +3846,33 @@ assert (H : ∀ i, i < S size → is_square_bmat_loop sizes (fc i j)). {
 }
 move H before Hc; clear Hc; rename H into Hc.
 move j before i.
+*)
 rewrite IHMC; [ | flia | easy | ]. 2: {
   exists sizes.
+  unfold is_square_bmat.
+  rewrite <- Has in Ha.
+  rewrite <- Hbs in Hb.
+  rewrite <- Hcs in Hc.
+  rewrite (sizes_of_bmatrix_at_0_0 fa Ha); [ | easy | flia ].
+  rewrite (sizes_of_bmatrix_at_0_0 fb Hb); [ | easy | flia ].
+  rewrite (sizes_of_bmatrix_at_0_0 fc Hc); [ | flia | easy ].
+  split. {
+    apply Ha; [ easy | flia ].
+  }
+  split. {
+    apply Hb; [ easy | flia ].
+  }
+  split. {
+    apply Hc; [ flia | easy ].
+  }
+  easy.
+}
+...
+    intros i1 j1 Hi1 Hj1.
+    apply Ha.
+...
+  rewrite Has, Hbs, Hcs.
+...
   split; [ apply Ha; flia | ].
   split; [ apply Hb; flia | ].
   apply Hc; flia.
@@ -4219,6 +4248,7 @@ Theorem bmat_add_move_0_l : ∀ T {ro : ring_op T} (so := rng_semiring) MA MB,
   → MB = (- MA)%BM.
 Proof.
 intros * Ha Hb Hss Hab.
+apply bmat_add_move_l in Hab.
 ...
 Print Z.add_move_0_l.
 Check Z.add_move_l.
