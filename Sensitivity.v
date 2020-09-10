@@ -3928,244 +3928,54 @@ assert (Hx : is_square_bmat_loop sizes x). {
   intros * HA HB.
   now apply is_square_bmat_loop_mul.
 }
-assert (Hu : is_square_bmat_loop sizes u) by (subst u; apply Ha; flia).
-assert (Hv : is_square_bmat_loop sizes v) by (subst v; apply Hb; flia).
-assert (Hw : is_square_bmat_loop sizes w) by (subst w; apply Hc; flia).
-assert (Huw : is_square_bmat_loop sizes (u * w)%BM). {
-  now apply is_square_bmat_loop_mul.
-}
-assert (Hvw : is_square_bmat_loop sizes (v * w)%BM). {
-  now apply is_square_bmat_loop_mul.
-}
-assert (Huwvw : bmat_fit_for_add (u * w)%BM (v * w)%BM). {
-  now apply (square_bmat_fit_for_add sizes).
-}
-assert (Hxuw : bmat_fit_for_add x (u * w)%BM). {
-  now apply (square_bmat_fit_for_add sizes).
-}
-rewrite <- (bmat_add_add_swap _ _ (u * w)%BM); [ | | easy ].
-...
-rewrite (bmat_add_assoc x).
-rewrite <- (bmat_add_assoc (x + y)%BM).
-f_equal.
-apply bmat_add_comm; [ easy | ].
-...
-rewrite <- bmat_add_assoc; [ | easy | | ]; cycle 1. {
-  subst x y.
-  apply (square_bmat_fit_for_add sizes). {
-    apply square_bmat_fold_left. {
-      intros * HMA HMB.
-      now apply square_bmat_mul.
-    } {
-      intros k Hk; apply Ha; flia Hk.
-    } {
-      intros k Hk; apply Hc; flia Hk.
-    }
-  } {
-    apply square_bmat_fold_left. {
-      intros * HMA HMB.
-      now apply square_bmat_mul.
-    } {
-      intros k Hk; apply Hb; flia Hk.
-    } {
-      intros k Hk; apply Hc; flia Hk.
-    }
-  }
-} {
-  subst x y.
-  apply (square_bmat_fit_for_add sizes). {
-    apply square_bmat_fold_left. {
-      intros * HMA HMB.
-      now apply square_bmat_mul.
-    } {
-      intros k Hk; apply Hb; flia Hk.
-    } {
-      intros k Hk; apply Hc; flia Hk.
-    }
-  } {
-    apply square_bmat_mul; [ easy | | apply Hc; flia ].
-    apply square_bmat_add; [ apply Ha; flia | apply Hb; flia ].
-  }
-}
-...
-    intros i1 j1 Hi1 Hj1.
-    apply Ha.
-...
-  rewrite Has, Hbs, Hcs.
-...
-  split; [ apply Ha; flia | ].
-  split; [ apply Hb; flia | ].
-  apply Hc; flia.
-}
-replace
-  (fold_left
-    (λ (acc : bmatrix T) (j0 : nat),
-       (acc + (fa i (j0 + 1)%nat + fb i (j0 + 1)%nat) * fc (j0 + 1)%nat j)%BM)
-    (seq 0 size) (fa i 0 * fc 0 j + fb i 0 * fc 0 j)%BM)
-with
-  (fold_left
-    (λ (acc : bmatrix T) (j0 : nat),
-       (acc +
-        (fa i (j0 + 1)%nat * fc (j0 + 1)%nat j +
-         fb i (j0 + 1)%nat * fc (j0 + 1)%nat j))%BM)
-    (seq 0 size) (fa i 0 * fc 0 j + fb i 0 * fc 0 j)%BM). 2: {
-  apply List_fold_left_ext_in.
-  intros k M Hk.
-  f_equal.
-  apply in_seq in Hk.
-  symmetry.
-  apply IHMC; [ flia Hk | easy | ].
-  exists sizes.
-  split; [ apply Ha; flia Hk | ].
-  split; [ apply Hb; flia Hk | ].
-  apply Hc; flia Hk.
-}
-clear Hi Hj.
-induction size; [ easy | ].
-rewrite <- (Nat.add_1_r size).
-rewrite seq_app; cbn.
-do 3 rewrite fold_left_app; cbn.
-rewrite IHsize; cycle 1. {
-  intros i' j' Hi' Hj' * HMAB.
-  apply IHMC; [ flia Hi' | flia Hj' | easy ].
-} {
-  intros k Hk; apply Ha; flia Hk.
-} {
-  intros k Hk; apply Hb; flia Hk.
-} {
-  intros k Hk; apply Hc; flia Hk.
-}
-remember (fold_left _ _ _) as x in |-*.
-remember (fold_left _ _ _) as y in |-*.
-rewrite <- bmat_add_assoc; [ | easy | | ]; cycle 1. {
-  subst x y.
-  apply (square_bmat_fit_for_add sizes). {
-    apply square_bmat_fold_left. {
-      intros * HMA HMB.
-      now apply square_bmat_mul.
-    } {
-      intros k Hk; apply Ha; flia Hk.
-    } {
-      intros k Hk; apply Hc; flia Hk.
-    }
-  } {
-    apply square_bmat_fold_left. {
-      intros * HMA HMB.
-      now apply square_bmat_mul.
-    } {
-      intros k Hk; apply Hb; flia Hk.
-    } {
-      intros k Hk; apply Hc; flia Hk.
-    }
-  }
-} {
-  subst x y.
-  apply (square_bmat_fit_for_add sizes). {
-    apply square_bmat_fold_left. {
-      intros * HMA HMB.
-      now apply square_bmat_mul.
-    } {
-      intros k Hk; apply Hb; flia Hk.
-    } {
-      intros k Hk; apply Hc; flia Hk.
-    }
-  } {
-    apply square_bmat_add. {
-      apply square_bmat_mul; [ easy | apply Ha; flia | apply Hc; flia ].
-    } {
-      apply square_bmat_mul; [ easy | apply Hb; flia | apply Hc; flia ].
-    }
-  }
-}
-rewrite <- bmat_add_assoc; [ | easy | | ]; cycle 1. {
-  subst x.
-  apply (square_bmat_fit_for_add sizes). {
-    apply square_bmat_fold_left. {
-      intros * HMA HMB.
-      now apply square_bmat_mul.
-    } {
-      intros k Hk; apply Ha; flia Hk.
-    } {
-      intros k Hk; apply Hc; flia Hk.
-    }
-  } {
-    apply square_bmat_mul; [ easy | | ]. {
-      apply Ha; flia.
-    } {
-      apply Hc; flia.
-    }
-  }
-} {
-  apply (square_bmat_fit_for_add sizes). {
-    apply square_bmat_mul; [ easy | apply Ha; flia | apply Hc; flia ].
-  } {
-    apply square_bmat_add. {
-      subst y.
-      apply square_bmat_fold_left. {
-        now intros; apply square_bmat_mul.
-      } {
-        intros * H; apply Hb; flia H.
-      } {
-        intros * H; apply Hc; flia H.
-      }
-    } {
-      apply square_bmat_mul; [ easy | apply Hb; flia | apply Hc; flia ].
-    }
-  }
-}
-f_equal.
-rewrite bmat_add_comm; [ | easy | ]. 2: {
-  apply (square_bmat_fit_for_add sizes). {
-    subst y.
-    apply square_bmat_fold_left. {
-      now intros; apply square_bmat_mul.
-    } {
-      intros * H; apply Hb; flia H.
-    } {
-      intros * H; apply Hc; flia H.
-    }
-  } {
-    apply square_bmat_add. {
-      apply square_bmat_mul; [ easy | apply Ha; flia | apply Hc; flia ].
-    } {
-      apply square_bmat_mul; [ easy | apply Hb; flia | apply Hc; flia ].
-    }
-  }
-}
-rewrite <- bmat_add_assoc; [ | easy | | ]; cycle 1. {
-  apply (square_bmat_fit_for_add sizes). {
-    apply square_bmat_mul; [ easy | apply Ha; flia | apply Hc; flia ].
-  } {
-    apply square_bmat_mul; [ easy | apply Hb; flia | apply Hc; flia ].
-  }
-} {
-  apply (square_bmat_fit_for_add sizes). {
-    apply square_bmat_mul; [ easy | apply Hb; flia | apply Hc; flia ].
-  } {
-    subst y.
-    apply square_bmat_fold_left. {
-      now intros; apply square_bmat_mul.
-    } {
-      intros * H; apply Hb; flia H.
-    } {
-      intros * H; apply Hc; flia H.
-    }
-  }
-}
-f_equal.
-apply bmat_add_comm; [ easy | ].
-apply (square_bmat_fit_for_add sizes). {
-  apply square_bmat_mul; [ easy | apply Hb; flia | apply Hc; flia ].
-} {
+assert (Hy : is_square_bmat_loop sizes y). {
   subst y.
-  apply square_bmat_fold_left. {
-    now intros; apply square_bmat_mul.
+  apply square_bmat_fold_left; cycle 1. {
+    intros k Hk; apply Hb; flia Hk.
   } {
-    intros * H; apply Hb; flia H.
-  } {
-    intros * H; apply Hc; flia H.
+    intros k Hk; apply Hc; flia Hk.
   }
+  intros * HA HB.
+  now apply is_square_bmat_loop_mul.
 }
+assert (Sxy : is_square_bmat_loop sizes (x + y)%BM). {
+  now apply is_square_bmat_loop_add.
+}
+assert (Su : is_square_bmat_loop sizes u) by (subst u; apply Ha; flia).
+assert (Sv : is_square_bmat_loop sizes v) by (subst v; apply Hb; flia).
+assert (Sw : is_square_bmat_loop sizes w) by (subst w; apply Hc; flia).
+assert (Suw : is_square_bmat_loop sizes (u * w)%BM). {
+  now apply is_square_bmat_loop_mul.
+}
+assert (Svw : is_square_bmat_loop sizes (v * w)%BM). {
+  now apply is_square_bmat_loop_mul.
+}
+assert (Syvw : is_square_bmat_loop sizes (y + v * w)%BM). {
+  now apply is_square_bmat_loop_add.
+}
+assert (Hxy : bmat_fit_for_add x y). {
+  now apply (square_bmat_fit_for_add sizes).
+}
+assert (Hx_uw : bmat_fit_for_add x (u * w)%BM). {
+  now apply (square_bmat_fit_for_add sizes).
+}
+assert (Hx_yvw : bmat_fit_for_add x (y + v * w)%BM). {
+  now apply (square_bmat_fit_for_add sizes).
+}
+assert (Hy_vw : bmat_fit_for_add y (v * w)%BM). {
+  now apply (square_bmat_fit_for_add sizes).
+}
+assert (Hxy_vw : bmat_fit_for_add (x + y)%BM (v * w)%BM). {
+  now apply (square_bmat_fit_for_add sizes).
+}
+assert (Huw_vw : bmat_fit_for_add (u * w)%BM (v * w)%BM). {
+  now apply (square_bmat_fit_for_add sizes).
+}
+rewrite <- (bmat_add_add_swap _ _ (u * w)%BM); [ | easy | easy ].
+rewrite (bmat_add_assoc x); [ | easy | easy ].
+rewrite <- (bmat_add_assoc (x + y)%BM); [ | easy | now symmetry ].
+f_equal.
+now apply bmat_add_comm.
 Qed.
 
 Theorem is_square_bmat_loop_opp : ∀ T {ro : ring_op T} (M : bmatrix T) sizes,
@@ -4206,14 +4016,12 @@ Qed.
 Theorem bmat_add_cancel_l :
   ∀ T {ro : ring_op T} (so := rng_semiring) {sp : semiring_prop T}
      {rp : ring_prop T} MA MB MC,
-  is_square_bmat MA
-  → is_square_bmat MB
-  → is_square_bmat MC
-  → sizes_of_bmatrix MA = sizes_of_bmatrix MB
-  → sizes_of_bmatrix MA = sizes_of_bmatrix MC
+  bmat_op_3_squares MA MB MC
   → (MA + MB = MA + MC)%BM
   → MB = MC.
 Proof.
+intros * sp rp * Hfit.
+...
 intros * sp rp * Ha Hb Hc Hssab Hssac Hbc.
 revert MB MC Hb Hc Hssab Hssac Hbc.
 induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
