@@ -3826,47 +3826,60 @@ induction MC as [xc| mc IHMC] using bmatrix_ind2; intros. {
   now cbn; rewrite srng_mul_add_distr_r.
 }
 destruct Hcsb as (sizes & Hcsb).
-...
-destruct Hfit as (sizes & Ha & Hb & Hc & Has & Hbs & Hcs).
-unfold is_square_bmat in Ha, Hb, Hc.
-rewrite Has in Ha; rewrite Hbs in Hb; rewrite Hcs in Hc.
-destruct sizes as [| size]; [ easy | ].
-cbn in Ha, Hb, Hc.
-destruct MA as [xa| ma]; [ easy | ].
+destruct sizes as [| size]. {
+  specialize (Hcsb _ (or_intror (or_intror (or_introl eq_refl)))).
+  destruct Hcsb as (H1, H2); unfold is_square_bmat in H1.
+  now rewrite H2 in H1.
+}
+destruct MA as [xa| ma]. {
+  now specialize (Hcsb _ (or_introl eq_refl)).
+}
 destruct MB as [xb| mb]; [ easy | ].
-destruct Hc as (Hcr & Hcc & Hc).
-destruct Ha as (Har & Hac & Ha).
-destruct Hb as (Hbr & Hbc & Hb).
+specialize (Hcsb _ (or_introl eq_refl)) as Ha.
+specialize (Hcsb _ (or_intror (or_introl eq_refl))) as Hb.
+specialize (Hcsb _ (or_intror (or_intror (or_introl eq_refl)))) as Hc.
+unfold is_square_bmat in Ha, Hb, Hc.
+destruct Ha as (Ha, Has); rewrite Has in Ha; cbn in Ha.
+destruct Hb as (Hb, Hbs); rewrite Hbs in Hb; cbn in Hb.
+destruct Hc as (Hc, Hcs); rewrite Hcs in Hc; cbn in Hc.
 cbn; f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros i j Hi Hj.
 destruct ma as (fa, ra, ca).
 destruct mb as (fb, rb, cb).
 destruct mc as (fc, rc, cc).
-cbn in *.
-subst ra rb rc ca cb cc.
-destruct size; [ easy | cbn ].
-cbn in Has, Hbs, Hcs.
+cbn - [ In ] in *.
+destruct Ha as (H1 & H2 & Ha); subst ra ca.
+destruct Hb as (H1 & H2 & Hb); subst rb cb.
+destruct Hc as (H1 & H2 & Hc); subst rc cc.
+destruct size; [ easy | cbn in Has, Hbs, Hcs |-* ].
 injection Has; clear Has; intros Has.
 injection Hbs; clear Hbs; intros Hbs.
 injection Hcs; clear Hcs; intros Hcs.
 rewrite Nat.sub_0_r.
 rewrite IHMC; [ | flia | easy | ]. 2: {
   exists sizes.
+  intros BM HBM.
   unfold is_square_bmat.
   rewrite <- Has in Ha.
   rewrite <- Hbs in Hb.
   rewrite <- Hcs in Hc.
-  rewrite (sizes_of_bmatrix_at_0_0 fa Ha); [ | easy | flia ].
-  rewrite (sizes_of_bmatrix_at_0_0 fb Hb); [ | easy | flia ].
-  rewrite (sizes_of_bmatrix_at_0_0 fc Hc); [ | flia | easy ].
-  split. {
+  destruct HBM as [H| HBM]. {
+    subst BM.
+    rewrite (sizes_of_bmatrix_at_0_0 fa Ha); [ | easy | flia ].
+    split; [ | easy ].
     apply Ha; [ easy | flia ].
   }
-  split. {
+  destruct HBM as [H| HBM]. {
+    subst BM.
+    rewrite (sizes_of_bmatrix_at_0_0 fb Hb); [ | easy | flia ].
+    split; [ | easy ].
     apply Hb; [ easy | flia ].
   }
-  split. {
+  destruct HBM as [H| HBM]. {
+    subst BM.
+    rewrite (sizes_of_bmatrix_at_0_0 fc Hc); [ | flia | easy ].
+    split; [ | easy ].
     apply Hc; [ flia | easy ].
   }
   easy.
@@ -3890,20 +3903,27 @@ with
   symmetry.
   apply IHMC; [ flia Hk | easy | ].
   exists sizes.
+  intros BM HBM.
   unfold is_square_bmat.
-  rewrite <- Has in Ha.
-  rewrite <- Hbs in Hb.
-  rewrite <- Hcs in Hc.
-  rewrite (sizes_of_bmatrix_at_0_0 fa Ha); [ | easy | flia Hk ].
-  rewrite (sizes_of_bmatrix_at_0_0 fb Hb); [ | easy | flia Hk ].
-  rewrite (sizes_of_bmatrix_at_0_0 fc Hc); [ | flia Hk | easy ].
-  split. {
+  destruct HBM as [H| HBM]. {
+    subst BM.
+    rewrite <- Has in Ha.
+    rewrite (sizes_of_bmatrix_at_0_0 fa Ha); [ | easy | flia Hk ].
+    split; [ | easy ].
     apply Ha; [ easy | flia Hk ].
   }
-  split. {
+  destruct HBM as [H| HBM]. {
+    subst BM.
+    rewrite <- Hbs in Hb.
+    rewrite (sizes_of_bmatrix_at_0_0 fb Hb); [ | easy | flia Hk ].
+    split; [ | easy ].
     apply Hb; [ easy | flia Hk ].
   }
-  split. {
+  destruct HBM as [H| HBM]. {
+    subst BM.
+    rewrite <- Hcs in Hc.
+    rewrite (sizes_of_bmatrix_at_0_0 fc Hc); [ | flia Hk | easy ].
+    split; [ | easy ].
     apply Hc; [ flia Hk | easy ].
   }
   easy.
@@ -3926,6 +3946,16 @@ induction size; [ easy | ].
 rewrite List_seq_succ_r; cbn.
 do 3 rewrite fold_left_app; cbn.
 rewrite IHsize; cycle 1. {
+  intros BM HBM.
+  destruct HBM as [H| HBM]. {
+    subst BM; cbn; rewrite Has.
+    split; [ | easy ].
+    split; [ easy | ].
+    split; [ easy | ].
+    intros i1 j1 Hi1 Hj1.
+    specialize (Hcsb _ (or_introl eq_refl)).
+    cbn in Hcsb.
+...
   intros k Hk; apply Ha; flia Hk.
 } {
   intros k Hk; apply Hb; flia Hk.
