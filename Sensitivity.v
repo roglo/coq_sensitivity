@@ -4142,45 +4142,31 @@ split. {
   unfold is_square_bmat.
   destruct HBM as [HBM| HBM]; [ subst BM | ]. {
     rewrite (sizes_of_bmatrix_at_0_0 fa Ha); [ | easy | easy ].
-...
-    rewrite <- Hcs, <- Has.
-    split; [ | easy ].
     now apply Ha.
   }
-  destruct HBM as [HBM| HBM]. {
-    subst BM.
+  destruct HBM as [HBM| HBM]; [ subst BM | ]. {
     rewrite (sizes_of_bmatrix_at_0_0 fb Hb); [ | easy | easy ].
-    rewrite <- Hcs, <- Hbs.
-    split; [ | easy ].
     now apply Hb.
   }
-  destruct HBM as [HBM| HBM]; [ | easy ].
-  subst BM.
-  rewrite (sizes_of_bmatrix_at_0_0 fc Hc); [ | easy | easy ].
-  split; [ | easy ].
-  now apply Hc.
+  destruct HBM as [HBM| HBM]; [ subst BM | ]. {
+    rewrite (sizes_of_bmatrix_at_0_0 fc Hc); [ | easy | easy ].
+    now apply Hc.
+  }
+  easy.
+} {
   intros BM HBM.
   unfold is_square_bmat.
-  destruct HBM as [HBM| HBM]. {
-    subst BM.
-    rewrite <- Has in Ha.
-    rewrite (sizes_of_bmatrix_at_0_0 fa Ha); [ | easy | easy ].
-    rewrite <- Hcs, <- Has.
-    split; [ | easy ].
-    now apply Ha.
+  destruct HBM as [HBM| HBM]; [ subst BM | ]. {
+    now rewrite (sizes_of_bmatrix_at_0_0 fa Ha).
   }
-  destruct HBM as [HBM| HBM]. {
-    subst BM.
-    rewrite (sizes_of_bmatrix_at_0_0 fb Hb); [ | easy | easy ].
-    rewrite <- Hcs, <- Hbs.
-    split; [ | easy ].
-    now apply Hb.
+  destruct HBM as [HBM| HBM]; [ subst BM | ]. {
+    now rewrite (sizes_of_bmatrix_at_0_0 fb Hb).
   }
-  destruct HBM as [HBM| HBM]; [ | easy ].
-  subst BM.
-  rewrite (sizes_of_bmatrix_at_0_0 fc Hc); [ | easy | easy ].
-  split; [ | easy ].
-  now apply Hc.
+  destruct HBM as [HBM| HBM]; [ subst BM | ]. {
+    now rewrite (sizes_of_bmatrix_at_0_0 fc Hc).
+  }
+  easy.
+}
 Qed.
 
 Theorem bmat_add_cancel_r :
@@ -4192,33 +4178,39 @@ Theorem bmat_add_cancel_r :
 Proof.
 intros * sp rp * Hcsb Hab.
 rewrite (bmat_add_comm MA) in Hab. 2: {
-  destruct Hcsb as (sizes, Hcsb).
-  specialize (Hcsb _ (or_introl eq_refl)) as Ha.
-  specialize (Hcsb _ (or_intror (or_intror (or_introl eq_refl)))) as Hc.
-  destruct Ha as (Ha, Has).
-  destruct Hc as (Hc, Hcs).
+  destruct Hcsb as (sizes & Hsq & Hsz).
+  specialize (Hsq _ (or_introl eq_refl)) as Ha.
+  specialize (Hsz _ (or_introl eq_refl)) as Has.
+  specialize (Hsq _ (or_intror (or_intror (or_introl eq_refl)))) as Hc.
+  specialize (Hsz _ (or_intror (or_intror (or_introl eq_refl)))) as Hcs.
   unfold is_square_bmat in Ha, Hc.
   rewrite Hcs, <- Has in Hc.
   now apply (square_bmat_fit_for_add (sizes_of_bmatrix MA)).
 }
 rewrite (bmat_add_comm MB) in Hab. 2: {
-  destruct Hcsb as (sizes, Hcsb).
-  specialize (Hcsb _ (or_intror (or_introl eq_refl))) as Hb.
-  specialize (Hcsb _ (or_intror (or_intror (or_introl eq_refl)))) as Hc.
-  destruct Hb as (Hb, Hbs).
-  destruct Hc as (Hc, Hcs).
+  destruct Hcsb as (sizes & Hsq & Hsz).
+  specialize (Hsq _ (or_intror (or_introl eq_refl))) as Hb.
+  specialize (Hsz _ (or_intror (or_introl eq_refl))) as Hbs.
+  specialize (Hsq _ (or_intror (or_intror (or_introl eq_refl)))) as Hc.
+  specialize (Hsz _ (or_intror (or_intror (or_introl eq_refl)))) as Hcs.
   unfold is_square_bmat in Hb, Hc.
   rewrite Hcs, <- Hbs in Hc.
   now apply (square_bmat_fit_for_add (sizes_of_bmatrix MB)).
 }
 apply bmat_add_cancel_l in Hab; [ easy | easy | easy | ].
-destruct Hcsb as (sizes, Hcsb).
+destruct Hcsb as (sizes & Hsq & Hsz).
 exists sizes.
-intros BM HBM.
-apply Hcsb.
-destruct HBM as [HBM| HBM]; [ now subst BM; right; right; left | ].
-destruct HBM as [HBM| HBM]; [ now subst BM; left | ].
-destruct HBM as [HBM| HBM]; [ now subst BM; right; left | easy ].
+split. {
+  intros BM HBM.
+  destruct HBM as [HBM| HBM]; [ now apply Hsq; right; right; left | ].
+  destruct HBM as [HBM| HBM]; [ now apply Hsq; left | ].
+  destruct HBM as [HBM| HBM]; [ now apply Hsq; right; left | easy ].
+} {
+  intros BM HBM.
+  destruct HBM as [HBM| HBM]; [ now subst BM; apply Hsz; right; right; left | ].
+  destruct HBM as [HBM| HBM]; [ now subst BM; apply Hsz; left | ].
+  destruct HBM as [HBM| HBM]; [ now subst BM; apply Hsz; right; left | easy ].
+}
 Qed.
 
 Theorem bmat_sub_cancel_r :
@@ -4230,18 +4222,24 @@ Theorem bmat_sub_cancel_r :
 Proof.
 intros * sp rp * Hcsb Hab.
 apply bmat_add_cancel_r in Hab; [ easy | easy | easy | ].
-destruct Hcsb as (sizes, Hcsb).
+destruct Hcsb as (sizes & Hsq & Hsz).
 exists sizes.
-intros BM HBM.
-destruct HBM as [HBM| HBM]; [ now apply Hcsb; left | ].
-destruct HBM as [HBM| HBM]; [ now apply Hcsb; right; left | ].
-destruct HBM as [HBM| HBM]; [ | easy ].
-subst BM.
-rewrite sizes_of_bmatrix_opp.
-specialize (is_square_bmat_opp MC) as H1.
-specialize (Hcsb _ (or_intror (or_intror (or_introl eq_refl)))) as H2.
-destruct H2 as (H2, H3).
-now specialize (H1 H2).
+split. {
+  intros BM HBM.
+  destruct HBM as [HBM| HBM]; [ now apply Hsq; left | ].
+  destruct HBM as [HBM| HBM]; [ now apply Hsq; right; left | ].
+  destruct HBM as [HBM| HBM]; [ | easy ].
+  subst BM.
+  now apply is_square_bmat_opp, Hsq; right; right; left.
+} {
+  intros BM HBM.
+  destruct HBM as [HBM| HBM]; [ now apply Hsz; left | ].
+  destruct HBM as [HBM| HBM]; [ now apply Hsz; right; left | ].
+  destruct HBM as [HBM| HBM]; [ | easy ].
+  subst BM.
+  rewrite sizes_of_bmatrix_opp.
+  now apply Hsz; right; right; left.
+}
 Qed.
 
 Theorem bmat_add_move_l :
@@ -4254,41 +4252,39 @@ Proof.
 intros * sp rp * Hcsb Hab.
 rewrite <- Hab.
 unfold bmat_sub.
-destruct Hcsb as (sizes, Hcsb).
+destruct Hcsb as (sizes & Hsq & Hsz).
 rewrite bmat_add_add_swap; [ | easy | | ]; cycle 1. {
   apply (square_bmat_fit_for_add (sizes_of_bmatrix MA)). {
-    now apply Hcsb; left.
+    now apply Hsq; left.
   } {
-    specialize (Hcsb _ (or_introl eq_refl)) as H.
-    destruct H as (H, Hs); rewrite Hs.
-    specialize (Hcsb _ (or_intror (or_introl eq_refl))) as H'.
-    now rewrite <- (proj2 H').
+    specialize (Hsq _ (or_intror (or_introl eq_refl))) as H.
+    rewrite Hsz; [ | now left ].
+    rewrite <- (Hsz MB); [ | now right; left ].
+    now apply Hsq; right; left.
   }
 } {
   apply (square_bmat_fit_for_add (sizes_of_bmatrix MA)). {
-    now apply Hcsb; left.
+    now apply Hsq; left.
   } {
-    specialize (Hcsb _ (or_introl eq_refl)) as H.
-    destruct H as (H, Hs); rewrite Hs.
+    specialize (Hsq _ (or_introl eq_refl)) as H.
     apply is_square_bmat_loop_opp.
-    now rewrite <- Hs.
+    now apply Hsq; left.
   }
 }
 unfold so.
 rewrite bmat_add_opp_r; [ | easy | easy ].
 symmetry.
 rewrite (bmat_zero_like_eq_compat _ MB); cycle 1. {
-  now apply Hcsb; left.
+  now apply Hsq; left.
 } {
-  now apply Hcsb; right; left.
+  now apply Hsq; right; left.
 } {
-  specialize (Hcsb _ (or_introl eq_refl)) as H.
-  destruct H as (H, Hs); rewrite Hs; clear H Hs.
-  specialize (Hcsb _ (or_intror (or_introl eq_refl))) as H.
-  now destruct H as (H, Hs); rewrite Hs.
+  rewrite Hsz; [ | now left ].
+  rewrite Hsz; [ | now right; left ].
+  easy.
 }
 apply bmat_add_0_l; [ easy | ].
-now apply Hcsb; right; left.
+now apply Hsq; right; left.
 Qed.
 
 Theorem bmat_add_move_0_l :
@@ -4300,7 +4296,7 @@ Theorem bmat_add_move_0_l :
 Proof.
 intros * sp rp * Hcsb Hab.
 apply bmat_add_move_l in Hab; [ | easy | easy | ]. 2: {
-  destruct Hcsb as (sizes, Hcsb).
+  destruct Hcsb as (sizes & Hsq & Hsz).
 ...
 Print Z.add_move_0_l.
 Check Z.add_move_l.
