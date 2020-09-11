@@ -4312,8 +4312,8 @@ Qed.
 
 Theorem bmat_add_move_0_l :
   ∀ T {ro : ring_op T} (so := rng_semiring) {sp : semiring_prop T}
-     {rp : ring_prop T} MA MB MC,
-  compatible_square_bmatrices [MA; MB; MC]
+     {rp : ring_prop T} MA MB,
+  compatible_square_bmatrices [MA; MB]
   → (MA + MB)%BM = bmat_zero_like MA
   → MB = (- MA)%BM.
 Proof.
@@ -4352,12 +4352,72 @@ Theorem bmat_mul_opp_l :
   ∀ T {ro : ring_op T} (so := rng_semiring) (rp : ring_prop T)
     (sp : semiring_prop T),
   ∀ MA MB,
-  is_square_bmat MA
-  → is_square_bmat MB
-  → sizes_of_bmatrix MA = sizes_of_bmatrix MB
+  compatible_square_bmatrices [MA; MB]
   → bmat_mul (bmat_opp MA) MB = bmat_opp (bmat_mul MA MB).
 Proof.
-intros * rp sp * Ha Hb Hss.
+intros * rp sp * Hcsb.
+specialize (@bmat_mul_add_distr_r T so sp MA (bmat_opp MA) MB) as H1.
+assert (H : compatible_square_bmatrices [MA; (- MA)%BM; MB]). {
+  destruct Hcsb as (sizes & Hsq & Hsz).
+  exists sizes.
+  split; intros BM HBM. {
+    destruct HBM as [HBM| HBM]; [ now subst BM; apply Hsq; left | ].
+    destruct HBM as [HBM| HBM]; [ subst BM | ]. {
+      now apply is_square_bmat_opp, Hsq; left.
+    }
+    destruct HBM as [HBM| HBM]; [ now subst BM; apply Hsq; right; left | ].
+    easy.
+  } {
+    destruct HBM as [HBM| HBM]; [ now subst BM; apply Hsz; left | ].
+    destruct HBM as [HBM| HBM]; [ subst BM | ]. {
+      now rewrite sizes_of_bmatrix_opp; apply Hsz; left.
+    }
+    destruct HBM as [HBM| HBM]; [ now subst BM; apply Hsz; right; left | ].
+    easy.
+  }
+}
+specialize (H1 H); clear H.
+unfold so in H1.
+rewrite bmat_add_opp_r in H1; [ | easy | easy ].
+destruct Hcsb as (sizes & Hsq & Hsz).
+assert (Hab : bmat_zero_like MA = bmat_zero_like MB). {
+  rewrite (bmat_zero_like_eq_compat _ MB); [ easy | | | ]. {
+    now apply Hsq; left.
+  } {
+    now apply Hsq; right; left.
+  } {
+    rewrite Hsz; [ | now left ].
+    rewrite Hsz; [ | now right; left ].
+    easy.
+  }
+}
+unfold so in Hab.
+rewrite Hab in H1.
+rewrite bmat_mul_0_l in H1; [ | easy | ]. 2: {
+  now apply Hsq; right; left.
+}
+symmetry in H1.
+rewrite <- Hab in H1.
+rewrite (bmat_zero_like_eq_compat _ MB) in H1; cycle 1. {
+  now apply Hsq; left.
+} {
+  now apply Hsq; right; left.
+} {
+  rewrite Hsz; [ | now left ].
+  rewrite Hsz; [ | now right; left ].
+  easy.
+}
+rewrite <- Hab in H1.
+rewrite <- (bmat_zero_like_mul _ MB) in H1; cycle 1. {
+  now apply Hsq; left.
+} {
+  now apply Hsq; right; left.
+} {
+  rewrite Hsz; [ | now left ].
+  rewrite Hsz; [ | now right; left ].
+  easy.
+}
+apply bmat_add_move_0_l in H1; [ easy | easy | easy | ].
 ...
 specialize (@bmat_mul_add_distr_r T so sp MA (bmat_opp MA) MB) as H1.
 assert (H : bmat_fit_for_distr MA (- MA)%BM MB). {
