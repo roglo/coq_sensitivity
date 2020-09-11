@@ -4225,21 +4225,44 @@ Proof.
 intros * sp rp * Hcsb Hab.
 rewrite <- Hab.
 unfold bmat_sub.
+destruct Hcsb as (sizes, Hcsb).
 rewrite bmat_add_add_swap; [ | easy | | ]; cycle 1. {
-...
-  apply (square_bmat_fit_for_add (sizes_of_bmatrix MA)); [ easy | ].
-  now rewrite Hssab.
+  apply (square_bmat_fit_for_add (sizes_of_bmatrix MA)). {
+    now apply Hcsb; left.
+  } {
+    specialize (Hcsb _ (or_introl eq_refl)) as H.
+    destruct H as (H, Hs); rewrite Hs.
+    specialize (Hcsb _ (or_intror (or_introl eq_refl))) as H'.
+    now rewrite <- (proj2 H').
+  }
 } {
-  apply (square_bmat_fit_for_add (sizes_of_bmatrix MA)); [ easy | ].
-  now apply is_square_bmat_loop_opp.
+  apply (square_bmat_fit_for_add (sizes_of_bmatrix MA)). {
+    now apply Hcsb; left.
+  } {
+    specialize (Hcsb _ (or_introl eq_refl)) as H.
+    destruct H as (H, Hs); rewrite Hs.
+    apply is_square_bmat_loop_opp.
+    now rewrite <- Hs.
+  }
 }
 unfold so.
 rewrite bmat_add_opp_r; [ | easy | easy ].
 symmetry.
-Search bmat_zero_like.
-rewrite (bmat_zero_like_eq_compat _ MB); [ | easy | easy | easy ].
-now apply bmat_add_0_l.
+rewrite (bmat_zero_like_eq_compat _ MB); cycle 1. {
+  now apply Hcsb; left.
+} {
+  now apply Hcsb; right; left.
+} {
+  specialize (Hcsb _ (or_introl eq_refl)) as H.
+  destruct H as (H, Hs); rewrite Hs; clear H Hs.
+  specialize (Hcsb _ (or_intror (or_introl eq_refl))) as H.
+  now destruct H as (H, Hs); rewrite Hs.
+}
+apply bmat_add_0_l; [ easy | ].
+now apply Hcsb; right; left.
 Qed.
+
+...
 
 Theorem bmat_add_move_0_l : ∀ T {ro : ring_op T} (so := rng_semiring) MA MB,
   is_square_bmat MA
