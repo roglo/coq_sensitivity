@@ -3651,12 +3651,18 @@ Definition bmat_nrows T (M : bmatrix T) :=
   | BM_M m => mat_nrows m
   end.
 
+Definition compatible_square_bmatrices T (BML : list (bmatrix T)) :=
+  ∃ sizes,
+   (∀ BM, BM ∈ BML → is_square_bmat BM ∧ sizes_of_bmatrix BM = sizes).
+
+(*
 Definition bmat_op_3_squares T (MA MB MC : bmatrix T) :=
   ∃ sizes,
   is_square_bmat MA ∧ is_square_bmat MB ∧ is_square_bmat MC ∧
   sizes_of_bmatrix MA = sizes ∧
   sizes_of_bmatrix MB = sizes ∧
   sizes_of_bmatrix MC = sizes.
+*)
 
 Theorem square_bmat_fit_for_add : ∀ T sizes (MA MB : bmatrix T),
   is_square_bmat_loop sizes MA
@@ -3794,20 +3800,33 @@ Qed.
 
 Theorem bmat_mul_add_distr_r :
   ∀ T (so : semiring_op T) {sp : semiring_prop T} (MA MB MC : bmatrix T),
-  bmat_op_3_squares MA MB MC
+  compatible_square_bmatrices [MA; MB; MC]
   → ((MA + MB) * MC = MA * MC + MB * MC)%BM.
 Proof.
-intros * sp * Hfit.
-revert MA MB Hfit.
+intros * sp * Hcsb.
+revert MA MB Hcsb.
 induction MC as [xc| mc IHMC] using bmatrix_ind2; intros. {
-  destruct Hfit as (sizes & Ha & Hb & Hc & Has & Hbs & Hcs).
-  unfold is_square_bmat in Ha, Hb, Hc.
-  rewrite Has in Ha; rewrite Hbs in Hb; rewrite Hcs in Hc.
-  destruct sizes; [ | easy ].
-  destruct MA as [xa| ma]; [ | easy ].
-  destruct MB as [xb| mb]; [ | easy ].
+  destruct Hcsb as (sizes & Hcsb).
+  unfold is_square_bmat in Hcsb.
+  destruct sizes as [| size]. 2: {
+    specialize (Hcsb _ (or_intror (or_intror (or_introl eq_refl)))).
+    destruct Hcsb as (H1, H2).
+    now rewrite H2 in H1.
+  }
+  destruct MA as [xa| ma]. 2: {
+    specialize (Hcsb _ (or_introl eq_refl)).
+    destruct Hcsb as (H1, H2).
+    now rewrite H2 in H1.
+  }
+  destruct MB as [xb| mb]. 2: {
+    specialize (Hcsb _ (or_intror (or_introl eq_refl))).
+    destruct Hcsb as (H1, H2).
+    now rewrite H2 in H1.
+  }
   now cbn; rewrite srng_mul_add_distr_r.
 }
+destruct Hcsb as (sizes & Hcsb).
+...
 destruct Hfit as (sizes & Ha & Hb & Hc & Has & Hbs & Hcs).
 unfold is_square_bmat in Ha, Hb, Hc.
 rewrite Has in Ha; rewrite Hbs in Hb; rewrite Hcs in Hc.
