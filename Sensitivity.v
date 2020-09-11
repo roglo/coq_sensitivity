@@ -3941,29 +3941,23 @@ assert (H : ∀ i, i < S size → is_square_bmat_loop sizes (fc i j)). {
 }
 move H before Hc; clear Hc; rename H into Hc.
 move j before i.
-clear Hi Hj IHMC.
+clear Hi Hj IHMC Hcsb.
 induction size; [ easy | ].
 rewrite List_seq_succ_r; cbn.
 do 3 rewrite fold_left_app; cbn.
 rewrite IHsize; cycle 1. {
-  intros BM HBM.
-  destruct HBM as [H| HBM]. {
-    subst BM; cbn; rewrite Has.
-    split; [ | easy ].
-    split; [ easy | ].
-    split; [ easy | ].
-    intros i1 j1 Hi1 Hj1.
-    specialize (Hcsb _ (or_introl eq_refl)).
-    cbn in Hcsb.
-...
   intros k Hk; apply Ha; flia Hk.
 } {
   intros k Hk; apply Hb; flia Hk.
 } {
   intros k Hk; apply Hc; flia Hk.
 }
-remember (fold_left (λ (acc : bmatrix T) (j0 : nat), acc + fa i (j0 + 1)%nat * fc (j0 + 1)%nat j) (seq 0 size) (fa i 0 * fc 0 j))%BM as x.
-remember (fold_left (λ (acc : bmatrix T) (j0 : nat), acc + fb i (j0 + 1)%nat * fc (j0 + 1)%nat j) (seq 0 size) (fb i 0 * fc 0 j))%BM as y.
+remember
+  (fold_left (λ acc j0, acc + fa i (j0 + 1)%nat * fc (j0 + 1)%nat j)
+     (seq 0 size) (fa i 0 * fc 0 j))%BM as x.
+remember
+  (fold_left (λ acc j0, acc + fb i (j0 + 1)%nat * fc (j0 + 1)%nat j)
+     (seq 0 size) (fb i 0 * fc 0 j))%BM as y.
 remember (fa i (size + 1)%nat) as u.
 remember (fb i (size + 1)%nat) as v.
 remember (fc (size + 1)%nat j) as w.
@@ -4065,13 +4059,15 @@ Qed.
 Theorem bmat_add_cancel_l :
   ∀ T {ro : ring_op T} (so := rng_semiring) {sp : semiring_prop T}
      {rp : ring_prop T} MA MB MC,
-  bmat_op_3_squares MA MB MC
+  compatible_square_bmatrices [MA; MB; MC]
   → (MA + MB = MA + MC)%BM
   → MB = MC.
 Proof.
-intros * sp rp * Hfit Hbc.
-revert MB MC Hfit Hbc.
+intros * sp rp * Hcsb Hbc.
+revert MB MC Hcsb Hbc.
 induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
+  destruct Hcsb as (sizes & Hcsb).
+...
   destruct Hfit as (sizes & Ha & Hb & Hc & Has & Hbs & Hcs).
   cbn in Has; subst sizes.
   destruct MB as [xb| mb]. {
