@@ -4287,6 +4287,29 @@ apply bmat_add_0_l; [ easy | ].
 now apply Hsq; right; left.
 Qed.
 
+Theorem bmat_zero_like_opp :
+  ∀ T {ro : ring_op T} (so := rng_semiring) {sp : semiring_prop T}
+     {rp : ring_prop T} MA,
+  is_square_bmat MA
+  → bmat_zero_like (- MA)%BM = bmat_zero_like MA.
+Proof.
+intros * sp rp * Ha.
+induction MA as [xa| ma IHMA] using bmatrix_ind2; [ easy | cbn ].
+f_equal.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros * Hi Hj.
+apply IHMA; [ easy | easy | ].
+cbn in Ha.
+destruct (zerop (mat_nrows ma)) as [Hrz| Hrz]; [ flia Hrz Hi | ].
+destruct (zerop (mat_ncols ma)) as [Hcz| Hcz]; [ flia Hcz Hj | ].
+cbn in Ha.
+destruct Ha as (_ & Hrc & Ha).
+unfold is_square_bmat.
+rewrite Hrc in Hj.
+rewrite (@sizes_of_bmatrix_at_0_0 T so) with (r := mat_nrows ma); try easy.
+now apply Ha.
+Qed.
+
 Theorem bmat_add_move_0_l :
   ∀ T {ro : ring_op T} (so := rng_semiring) {sp : semiring_prop T}
      {rp : ring_prop T} MA MB MC,
@@ -4297,6 +4320,37 @@ Proof.
 intros * sp rp * Hcsb Hab.
 apply bmat_add_move_l in Hab; [ | easy | easy | ]. 2: {
   destruct Hcsb as (sizes & Hsq & Hsz).
+  exists sizes.
+  split. {
+    intros * HBM.
+    destruct HBM as [HBM| HBM]; [ now subst BM; apply Hsq; left | ].
+    destruct HBM as [HBM| HBM]; [ now subst BM; apply Hsq; right; left | ].
+    destruct HBM as [HBM| HBM]; [ subst BM | easy ].
+    now apply square_bmat_zero_like, Hsq; left.
+  } {
+    intros * HBM.
+    destruct HBM as [HBM| HBM]; [ now subst BM; apply Hsz; left | ].
+    destruct HBM as [HBM| HBM]; [ now subst BM; apply Hsz; right; left | ].
+    destruct HBM as [HBM| HBM]; [ subst BM | easy ].
+    rewrite sizes_of_bmat_zero_like.
+    now apply Hsz; left.
+  }
+}
+unfold bmat_sub in Hab.
+unfold so in Hab.
+rewrite <- bmat_zero_like_opp in Hab; [ | easy | easy | ]. 2: {
+  destruct Hcsb as (size & Hsq & Hsz).
+...
+rewrite bmat_add_0_l in Hab.
+...
+
+Search (bmat_zero_like (- _)%BM).
+Search bmat_zero_like.
+...
+rewrite bmat_zero_like_opp in Hab.
+rewrite bmat_add_0_l in Hab.
+
+Search (_ - _)%BM.
 ...
 Print Z.add_move_0_l.
 Check Z.add_move_l.
