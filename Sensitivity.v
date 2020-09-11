@@ -4340,24 +4340,13 @@ unfold bmat_sub in Hab.
 unfold so in Hab.
 rewrite <- bmat_zero_like_opp in Hab; [ | easy | easy | ]. 2: {
   destruct Hcsb as (size & Hsq & Hsz).
-...
-rewrite bmat_add_0_l in Hab.
-...
-
-Search (bmat_zero_like (- _)%BM).
-Search bmat_zero_like.
-...
-rewrite bmat_zero_like_opp in Hab.
-rewrite bmat_add_0_l in Hab.
-
-Search (_ - _)%BM.
-...
-Print Z.add_move_0_l.
-Check Z.add_move_l.
-...
-Z.add_move_l
-     : ∀ n m p : Z, (n + m)%Z = p ↔ m = (p - n)%Z
-...
+  now apply Hsq; left.
+}
+rewrite bmat_add_0_l in Hab; [ easy | easy | ].
+apply is_square_bmat_opp.
+destruct Hcsb as (sizes & Hsq & Hsz).
+now apply Hsq; left.
+Qed.
 
 Theorem bmat_mul_opp_l :
   ∀ T {ro : ring_op T} (so := rng_semiring) (rp : ring_prop T)
@@ -4369,6 +4358,7 @@ Theorem bmat_mul_opp_l :
   → bmat_mul (bmat_opp MA) MB = bmat_opp (bmat_mul MA MB).
 Proof.
 intros * rp sp * Ha Hb Hss.
+...
 specialize (@bmat_mul_add_distr_r T so sp MA (bmat_opp MA) MB) as H1.
 assert (H : bmat_fit_for_distr MA (- MA)%BM MB). {
   exists (sizes_of_bmatrix MA).
