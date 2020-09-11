@@ -4154,66 +4154,79 @@ split; [ | easy ].
 now apply Hc.
 Qed.
 
-...
-
 Theorem bmat_add_cancel_r :
   ∀ T {ro : ring_op T} (so := rng_semiring) {sp : semiring_prop T}
      {rp : ring_prop T} MA MB MC,
-  bmat_op_3_squares MA MB MC
+  compatible_square_bmatrices [MA; MB; MC]
   → (MA + MC = MB + MC)%BM
   → MA = MB.
 Proof.
-intros * sp rp * Hfit Hab.
+intros * sp rp * Hcsb Hab.
 rewrite (bmat_add_comm MA) in Hab. 2: {
-  destruct Hfit as (sizes & Ha & Hb & Hc & Has & Hbs & Hcs).
-  apply (square_bmat_fit_for_add (sizes_of_bmatrix MA)); [ easy | ].
-  now rewrite Has, <- Hcs.
+  destruct Hcsb as (sizes, Hcsb).
+  specialize (Hcsb _ (or_introl eq_refl)) as Ha.
+  specialize (Hcsb _ (or_intror (or_intror (or_introl eq_refl)))) as Hc.
+  destruct Ha as (Ha, Has).
+  destruct Hc as (Hc, Hcs).
+  unfold is_square_bmat in Ha, Hc.
+  rewrite Hcs, <- Has in Hc.
+  now apply (square_bmat_fit_for_add (sizes_of_bmatrix MA)).
 }
 rewrite (bmat_add_comm MB) in Hab. 2: {
-  destruct Hfit as (sizes & Ha & Hb & Hc & Has & Hbs & Hcs).
-  apply (square_bmat_fit_for_add (sizes_of_bmatrix MB)); [ easy | ].
-  now rewrite Hbs, <- Hcs.
+  destruct Hcsb as (sizes, Hcsb).
+  specialize (Hcsb _ (or_intror (or_introl eq_refl))) as Hb.
+  specialize (Hcsb _ (or_intror (or_intror (or_introl eq_refl)))) as Hc.
+  destruct Hb as (Hb, Hbs).
+  destruct Hc as (Hc, Hcs).
+  unfold is_square_bmat in Hb, Hc.
+  rewrite Hcs, <- Hbs in Hc.
+  now apply (square_bmat_fit_for_add (sizes_of_bmatrix MB)).
 }
 apply bmat_add_cancel_l in Hab; [ easy | easy | easy | ].
-destruct Hfit as (sizes & Ha & Hb & Hc & Has & Hbs & Hcs).
-now exists sizes.
+destruct Hcsb as (sizes, Hcsb).
+exists sizes.
+intros BM HBM.
+apply Hcsb.
+destruct HBM as [HBM| HBM]; [ now subst BM; right; right; left | ].
+destruct HBM as [HBM| HBM]; [ now subst BM; left | ].
+destruct HBM as [HBM| HBM]; [ now subst BM; right; left | easy ].
 Qed.
 
 Theorem bmat_sub_cancel_r :
   ∀ T {ro : ring_op T} (so := rng_semiring) {sp : semiring_prop T}
      {rp : ring_prop T} MA MB MC,
-  bmat_op_3_squares MA MB MC
+  compatible_square_bmatrices [MA; MB; MC]
   → (MA - MC = MB - MC)%BM
   → MA = MB.
 Proof.
-intros * sp rp * Hfit Hab.
+intros * sp rp * Hcsb Hab.
 apply bmat_add_cancel_r in Hab; [ easy | easy | easy | ].
-destruct Hfit as (sizes & Ha & Hb & Hc & Has & Hbs & Hcs).
+destruct Hcsb as (sizes, Hcsb).
 exists sizes.
-split; [ easy | ].
-split; [ easy | ].
-split; [ now apply is_square_bmat_opp | ].
-split; [ easy | ].
-split; [ easy | ].
-now rewrite sizes_of_bmatrix_opp.
+intros BM HBM.
+destruct HBM as [HBM| HBM]; [ now apply Hcsb; left | ].
+destruct HBM as [HBM| HBM]; [ now apply Hcsb; right; left | ].
+destruct HBM as [HBM| HBM]; [ | easy ].
+subst BM.
+rewrite sizes_of_bmatrix_opp.
+specialize (is_square_bmat_opp MC) as H1.
+specialize (Hcsb _ (or_intror (or_intror (or_introl eq_refl)))) as H2.
+destruct H2 as (H2, H3).
+now specialize (H1 H2).
 Qed.
 
 Theorem bmat_add_move_l :
   ∀ T {ro : ring_op T} (so := rng_semiring) {sp : semiring_prop T}
      {rp : ring_prop T} MA MB MC,
-  is_square_bmat MA
-  → is_square_bmat MB
-  → is_square_bmat MC
-  → sizes_of_bmatrix MA = sizes_of_bmatrix MB
-  → sizes_of_bmatrix MA = sizes_of_bmatrix MC
+  compatible_square_bmatrices [MA; MB; MC]
   → (MA + MB)%BM = MC
   → MB = (MC - MA)%BM.
 Proof.
-intros * sp rp * Ha Hb Hc Hssab Hssac Hab.
-...
+intros * sp rp * Hcsb Hab.
 rewrite <- Hab.
 unfold bmat_sub.
 rewrite bmat_add_add_swap; [ | easy | | ]; cycle 1. {
+...
   apply (square_bmat_fit_for_add (sizes_of_bmatrix MA)); [ easy | ].
   now rewrite Hssab.
 } {
