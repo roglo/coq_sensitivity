@@ -4445,74 +4445,38 @@ split; intros BM HBM. {
     }
   }
 } {
-...
-specialize (@bmat_mul_add_distr_r T so sp MA (bmat_opp MA) MB) as H1.
-assert (H : bmat_fit_for_distr MA (- MA)%BM MB). {
-  exists (sizes_of_bmatrix MA).
-  split; [ easy | ].
-  split; [ | now rewrite Hss ].
-  now apply square_bmat_opp.
+  destruct HBM as [HBM| HBM]. {
+    subst BM.
+    rewrite sizes_of_bmatrix_mul; [ | easy | | | ]. {
+      now apply Hsz; left.
+    } {
+      now apply Hsq; left.
+    } {
+      now apply Hsq; right; left.
+    } {
+      rewrite Hsz; [ | now left ].
+      rewrite Hsz; [ easy | now right; left ].
+    }
+  } {
+    destruct HBM as [HBM| HBM]; [ | easy ].
+    subst BM.
+    rewrite sizes_of_bmatrix_mul; [ | easy | | | ]. {
+      rewrite sizes_of_bmatrix_opp.
+      now apply Hsz; left.
+    } {
+      apply is_square_bmat_opp.
+      now apply Hsq; left.
+    } {
+      now apply Hsq; right; left.
+    } {
+      rewrite sizes_of_bmatrix_opp.
+      rewrite Hsz; [ | now left ].
+      rewrite Hsz; [ easy | now right; left ].
+    }
+  }
 }
-specialize (H1 H); clear H.
-unfold so in H1.
-rewrite bmat_add_opp_r in H1; [ | easy | easy ].
-rewrite (bmat_zero_like_eq_compat _ MB) in H1; [ | easy | easy | easy ].
-rewrite bmat_mul_0_l in H1; [ | easy | easy ].
-symmetry in H1.
-...
-rewrite (bmat_add_move_0_l MA) in H1.
-...
-intros.
-revert MB.
-destruct MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
-  destruct MB as [xb| mb]; [ cbn | easy ].
-  f_equal.
-  apply rng_mul_opp_l.
-}
-destruct MB as [xb| mb]; [ easy | cbn ].
-f_equal; f_equal.
-destruct ma as (lla).
-destruct mb as (llb).
-cbn in IHMA |-*.
-progress fold (@bmat_list_mul T so).
-progress fold (@bmat_list_list_mul T so (map (map (λ mm, bmat_opp mm)) lla) llb).
-progress fold (@bmat_list_list_mul T so lla llb).
-revert llb.
-induction lla as [| la1]; intros; [ easy | cbn ].
-f_equal. 2: {
-  progress fold (@bmat_list_list_mul T so (map (map (λ mm, bmat_opp mm)) lla) llb).
-  progress fold (@bmat_list_list_mul T so lla llb).
-  apply IHlla.
-  intros la Hla a Ha b.
-  apply (IHMA la); [ now right | easy ].
-}
-rewrite map_map.
-apply map_ext_in_iff.
-intros la2 Hla2.
-destruct la2 as [| a2]; cbn. {
-  now destruct (map (λ mm, bmat_opp mm) la1), la1.
-}
-destruct la1 as [| a1]; [ easy | cbn ].
-rewrite (IHMA (a1 :: la1)); [ | now left | now left ].
-remember (bmat_mul a1 a2) as k; clear Heqk.
-clear Hla2.
-revert k la2.
-induction la1 as [| a3]; intros; [ easy | cbn ].
-destruct la2 as [| a4]; [ easy | cbn ].
-Inspect 1.
-...
-rewrite <- bmat_mul_add_distr_l.
-...
-
-specialize (bmat_mul_add_distr_r (bmat_opp MA) MA MB) as H.
-...
-specialize (srng_mul_add_distr_r (- a)%Rng a b) as H.
-unfold so in H.
-rewrite rng_add_opp_l in H.
-rewrite srng_mul_0_l in H.
-symmetry in H.
-now apply rng_add_move_0_r in H.
 Qed.
+
 ...
 
 (*
@@ -4655,8 +4619,13 @@ rewrite list_list_transpose_cons; cycle 1. {
 Theorem bmat_mul_opp_opp :
   ∀ T {ro : ring_op T} (so := rng_semiring)
        {sp : semiring_prop T} {rp : ring_prop T} MA MB,
-  bmat_mul (bmat_opp MA) (bmat_opp MB) = bmat_mul MA MB.
+  compatible_square_bmatrices [MA; MB]
+  → bmat_mul (bmat_opp MA) (bmat_opp MB) = bmat_mul MA MB.
 Proof.
+intros * sp rp * Hab.
+subst so.
+rewrite bmat_mul_opp_l.
+...
 intros.
 revert MB.
 induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
