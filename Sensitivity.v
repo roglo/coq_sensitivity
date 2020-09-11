@@ -4076,52 +4076,52 @@ induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
       injection Hbc; clear Hbc; intros Hbc.
       now apply rng_add_reg_l in Hbc.
     }
-...
-    cbn in Hc, Hcs.
-    destruct (zerop (mat_nrows mc)) as [Hrc| Hrc]; [ easy | ].
-    now destruct (zerop (mat_ncols mc)).
+    specialize (Hcsb _ (or_intror (or_intror (or_introl eq_refl)))) as Hc.
+    destruct Hc as (Hc, Hcs).
+    now unfold is_square_bmat in Hc; rewrite Hcs in Hc.
   }
-  cbn in Hb, Hbs.
-  destruct (zerop (mat_nrows mb)) as [Hrb| Hrb]; [ easy | ].
-  now destruct (zerop (mat_ncols mb)).
+  specialize (Hcsb _ (or_intror (or_introl eq_refl))) as Hb.
+  destruct Hb as (Hb, Hbs).
+  now unfold is_square_bmat in Hb; rewrite Hbs in Hb.
 }
+destruct Hcsb as (sizes & Hcsb).
+specialize (Hcsb _ (or_introl eq_refl)) as Ha.
+destruct Ha as (Ha, Has).
+unfold is_square_bmat in Ha; rewrite Has in Ha.
+specialize (Hcsb _ (or_intror (or_introl eq_refl))) as Hb.
+destruct Hb as (Hb, Hbs).
+specialize (Hcsb _ (or_intror (or_intror (or_introl eq_refl)))) as Hc.
+destruct Hc as (Hc, Hcs).
 destruct MB as [xb| mb]. {
-  destruct Hfit as (sizes & Ha & Hb & Hc & Has & Hbs & Hcs).
-  cbn in Ha, Has, Hbs; move Hbs at top; subst sizes.
-  destruct (zerop (mat_nrows ma)) as [Hra| Hra]; [ easy | ].
-  now destruct (mat_ncols ma).
+  now move Hbs at top; cbn in Hbs; subst sizes.
 }
 destruct MC as [xc| mc]. {
-  destruct Hfit as (sizes & Ha & Hb & Hc & Has & Hbs & Hcs).
-  cbn in Ha, Has, Hcs; move Hcs at top; subst sizes.
-  destruct (zerop (mat_nrows ma)) as [Hra| Hra]; [ easy | ].
-  now destruct (mat_ncols ma).
+  now move Hcs at top; cbn in Hcs; subst sizes.
 }
 f_equal.
 cbn in Hbc.
 injection Hbc; clear Hbc; intros Hbc.
-destruct Hfit as (sizes & Ha & Hb & Hc & Has & Hbs & Hcs).
 destruct ma as (fa, ra, ca).
 destruct mb as (fb, rb, cb).
 destruct mc as (fc, rc, cc).
 cbn in *.
+destruct (zerop rc) as [Hrc| Hrc]; [ easy | ].
+destruct (zerop cc) as [Hcc| Hcc]; [ easy | ].
+cbn in Hcs.
+rewrite <- Hcs in Has, Hbs.
 destruct (zerop ra) as [Hra| Hra]; [ easy | ].
 destruct (zerop ca) as [Hca| Hca]; [ easy | ].
 destruct (zerop rb) as [Hrb| Hrb]; [ easy | ].
 destruct (zerop cb) as [Hcb| Hcb]; [ easy | ].
-destruct (zerop rc) as [Hrc| Hrc]; [ easy | ].
-destruct (zerop cc) as [Hcc| Hcc]; [ easy | ].
 cbn in *.
+injection Has; clear Has; intros Has H; subst rc.
+injection Hbs; clear Hbs; intros Hbs H; subst rb.
+rewrite <- Hcs in Ha; cbn in Ha.
 destruct Ha as (_ & H1 & Ha); subst ca.
 destruct Hb as (_ & H1 & Hb); subst cb.
 destruct Hc as (_ & H1 & Hc); subst cc.
-move rb before ra; move rc before rb.
+clear Hca Hrb Hcb Hrc Hcc.
 move fb before fa; move fc before fb.
-rewrite <- Hbs in Has.
-injection Has; clear Has; intros Has H; subst rb.
-rewrite <- Hcs in Hbs.
-injection Hbs; clear Hbs; intros Hbs H; subst rc.
-clear Hca Hcb Hrb Hcc Hrc.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros i j Hi Hj.
 apply f_equal with (f := λ g, g i) in Hbc.
@@ -4130,15 +4130,31 @@ apply (IHMA i j); [ easy | easy | | easy ].
 destruct sizes as [| size]; [ easy | ].
 injection Hcs; clear Hcs; intros Hcs H; subst ra.
 exists sizes.
+intros BM HBM.
 unfold is_square_bmat.
-rewrite (sizes_of_bmatrix_at_0_0 fa Ha); [ | easy | easy ].
-rewrite (sizes_of_bmatrix_at_0_0 fb Hb); [ | easy | easy ].
+destruct HBM as [HBM| HBM]. {
+  subst BM.
+  rewrite <- Has in Ha.
+  rewrite (sizes_of_bmatrix_at_0_0 fa Ha); [ | easy | easy ].
+  rewrite <- Hcs, <- Has.
+  split; [ | easy ].
+  now apply Ha.
+}
+destruct HBM as [HBM| HBM]. {
+  subst BM.
+  rewrite (sizes_of_bmatrix_at_0_0 fb Hb); [ | easy | easy ].
+  rewrite <- Hcs, <- Hbs.
+  split; [ | easy ].
+  now apply Hb.
+}
+destruct HBM as [HBM| HBM]; [ | easy ].
+subst BM.
 rewrite (sizes_of_bmatrix_at_0_0 fc Hc); [ | easy | easy ].
-split; [ now apply Ha | ].
-split; [ now apply Hb | ].
-split; [ now apply Hc | ].
-split; [ congruence | split; congruence ].
+split; [ | easy ].
+now apply Hc.
 Qed.
+
+...
 
 Theorem bmat_add_cancel_r :
   ∀ T {ro : ring_op T} (so := rng_semiring) {sp : semiring_prop T}
