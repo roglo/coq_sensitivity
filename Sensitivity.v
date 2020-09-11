@@ -4121,21 +4121,20 @@ Qed.
 Theorem bmat_sub_cancel_r :
   ∀ T {ro : ring_op T} (so := rng_semiring) {sp : semiring_prop T}
      {rp : ring_prop T} MA MB MC,
-  is_square_bmat MA
-  → is_square_bmat MB
-  → is_square_bmat MC
-  → sizes_of_bmatrix MA = sizes_of_bmatrix MB
-  → sizes_of_bmatrix MA = sizes_of_bmatrix MC
+  bmat_op_3_squares MA MB MC
   → (MA - MC = MB - MC)%BM
   → MA = MB.
 Proof.
-intros * so sp * Ha Hb Hc Hssab Hssac Hab.
-...
-apply bmat_add_cancel_r in Hab; try easy. {
-  now apply is_square_bmat_opp.
-} {
-  now rewrite sizes_of_bmatrix_opp.
-}
+intros * sp rp * Hfit Hab.
+apply bmat_add_cancel_r in Hab; [ easy | easy | easy | ].
+destruct Hfit as (sizes & Ha & Hb & Hc & Has & Hbs & Hcs).
+exists sizes.
+split; [ easy | ].
+split; [ easy | ].
+split; [ now apply is_square_bmat_opp | ].
+split; [ easy | ].
+split; [ easy | ].
+now rewrite sizes_of_bmatrix_opp.
 Qed.
 
 Theorem bmat_add_move_l :
