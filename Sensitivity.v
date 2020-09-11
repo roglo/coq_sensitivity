@@ -4418,6 +4418,33 @@ rewrite <- (bmat_zero_like_mul _ MB) in H1; cycle 1. {
   easy.
 }
 apply bmat_add_move_0_l in H1; [ easy | easy | easy | ].
+exists sizes.
+split; intros BM HBM. {
+  destruct HBM as [HBM| HBM]. {
+    subst BM.
+    apply is_square_bmat_mul; [ easy | | | ]. {
+      now apply Hsq; left.
+    } {
+      now apply Hsq; right; left.
+    } {
+      rewrite Hsz; [ | now left ].
+      rewrite Hsz; [ easy | now right; left ].
+    }
+  } {
+    destruct HBM as [HBM| HBM]; [ | easy ].
+    subst BM.
+    apply is_square_bmat_mul; [ easy | | | ]. {
+      apply is_square_bmat_opp.
+      now apply Hsq; left.
+    } {
+      now apply Hsq; right; left.
+    } {
+      rewrite sizes_of_bmatrix_opp.
+      rewrite Hsz; [ | now left ].
+      rewrite Hsz; [ easy | now right; left ].
+    }
+  }
+} {
 ...
 specialize (@bmat_mul_add_distr_r T so sp MA (bmat_opp MA) MB) as H1.
 assert (H : bmat_fit_for_distr MA (- MA)%BM MB). {
