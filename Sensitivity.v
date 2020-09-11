@@ -4067,9 +4067,8 @@ intros * sp rp * Hcsb Hbc.
 revert MB MC Hcsb Hbc.
 induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
   destruct Hcsb as (sizes & Hcsb).
-...
-  destruct Hfit as (sizes & Ha & Hb & Hc & Has & Hbs & Hcs).
-  cbn in Has; subst sizes.
+  specialize (Hcsb _ (or_introl eq_refl)) as Ha.
+  destruct Ha as (_, Has); cbn in Has; subst sizes.
   destruct MB as [xb| mb]. {
     destruct MC as [xc| mc]. {
       cbn in Hbc.
@@ -4077,6 +4076,7 @@ induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
       injection Hbc; clear Hbc; intros Hbc.
       now apply rng_add_reg_l in Hbc.
     }
+...
     cbn in Hc, Hcs.
     destruct (zerop (mat_nrows mc)) as [Hrc| Hrc]; [ easy | ].
     now destruct (zerop (mat_ncols mc)).
