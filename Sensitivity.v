@@ -5035,8 +5035,18 @@ apply matrix_eq; cbn; [ easy | easy | ].
 intros i j Hi Hj.
 destruct i. {
   destruct j; cbn. {
-    rewrite IHn.
-    destruct n; cbn.
+    destruct n; cbn. {
+      rewrite srng_add_0_l.
+      rewrite srng_mul_1_l, srng_mul_0_l.
+      now rewrite srng_add_0_r.
+    }
+    f_equal.
+    apply matrix_eq; cbn; [ easy | easy | ].
+    clear Hi Hj.
+    intros i j Hi Hj.
+    destruct i. {
+      destruct j; cbn. {
+        destruct n; cbn. {
 ...
 
 (* "We prove by induction that A_n^2 = nI" *)
