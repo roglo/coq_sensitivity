@@ -4357,122 +4357,60 @@ Theorem bmat_mul_opp_l :
 Proof.
 intros * rp sp * Hcsb.
 specialize (@bmat_mul_add_distr_r T so sp MA (bmat_opp MA) MB) as H1.
+destruct Hcsb as (sizes & Hsq & Hsz).
+specialize (Hsq _ (or_introl eq_refl)) as Ha.
+specialize (Hsq _ (or_intror (or_introl eq_refl))) as Hb.
+specialize (Hsz _ (or_introl eq_refl)) as Has.
+specialize (Hsz _ (or_intror (or_introl eq_refl))) as Hbs.
+generalize Ha; intros Hao.
+apply (@is_square_bmat_opp _ ro) in Hao.
+generalize Has; intros Haso.
+rewrite <- (@sizes_of_bmatrix_opp _ ro) in Haso.
 assert (H : compatible_square_bmatrices [MA; (- MA)%BM; MB]). {
-  destruct Hcsb as (sizes & Hsq & Hsz).
   exists sizes.
   split; intros BM HBM. {
-    destruct HBM as [HBM| HBM]; [ now subst BM; apply Hsq; left | ].
-    destruct HBM as [HBM| HBM]; [ subst BM | ]. {
-      now apply is_square_bmat_opp, Hsq; left.
-    }
-    destruct HBM as [HBM| HBM]; [ now subst BM; apply Hsq; right; left | ].
-    easy.
+    destruct HBM as [HBM| HBM]; [ now subst BM | ].
+    destruct HBM as [HBM| HBM]; [ now subst BM | ].
+    destruct HBM as [HBM| HBM]; [ now subst BM | easy ].
   } {
-    destruct HBM as [HBM| HBM]; [ now subst BM; apply Hsz; left | ].
-    destruct HBM as [HBM| HBM]; [ subst BM | ]. {
-      now rewrite sizes_of_bmatrix_opp; apply Hsz; left.
-    }
-    destruct HBM as [HBM| HBM]; [ now subst BM; apply Hsz; right; left | ].
-    easy.
+    destruct HBM as [HBM| HBM]; [ now subst BM | ].
+    destruct HBM as [HBM| HBM]; [ now subst BM | ].
+    destruct HBM as [HBM| HBM]; [ now subst BM | easy ].
   }
 }
 specialize (H1 H); clear H.
 unfold so in H1.
 rewrite bmat_add_opp_r in H1; [ | easy | easy ].
-destruct Hcsb as (sizes & Hsq & Hsz).
+assert (Hss : sizes_of_bmatrix MA = sizes_of_bmatrix MB). {
+  now rewrite Has, Hbs.
+}
 assert (Hab : bmat_zero_like MA = bmat_zero_like MB). {
-  rewrite (bmat_zero_like_eq_compat _ MB); [ easy | | | ]. {
-    now apply Hsq; left.
-  } {
-    now apply Hsq; right; left.
-  } {
-    rewrite Hsz; [ | now left ].
-    rewrite Hsz; [ | now right; left ].
-    easy.
-  }
+  now rewrite (bmat_zero_like_eq_compat _ MB).
 }
 unfold so in Hab.
 rewrite Hab in H1.
-rewrite bmat_mul_0_l in H1; [ | easy | ]. 2: {
-  now apply Hsq; right; left.
-}
+rewrite bmat_mul_0_l in H1; [ | easy | easy ].
 symmetry in H1.
 rewrite <- Hab in H1.
-rewrite (bmat_zero_like_eq_compat _ MB) in H1; cycle 1. {
-  now apply Hsq; left.
-} {
-  now apply Hsq; right; left.
-} {
-  rewrite Hsz; [ | now left ].
-  rewrite Hsz; [ | now right; left ].
-  easy.
-}
+rewrite (bmat_zero_like_eq_compat _ MB) in H1; [ | easy | easy | easy ].
 rewrite <- Hab in H1.
-rewrite <- (bmat_zero_like_mul _ MB) in H1; cycle 1. {
-  now apply Hsq; left.
-} {
-  now apply Hsq; right; left.
-} {
-  rewrite Hsz; [ | now left ].
-  rewrite Hsz; [ | now right; left ].
-  easy.
-}
+rewrite <- (bmat_zero_like_mul _ MB) in H1; [ | easy | easy | easy ].
 apply bmat_add_move_0_l in H1; [ easy | easy | easy | ].
 exists sizes.
 split; intros BM HBM. {
-  destruct HBM as [HBM| HBM]. {
-    subst BM.
-    apply is_square_bmat_mul; [ easy | | | ]. {
-      now apply Hsq; left.
-    } {
-      now apply Hsq; right; left.
-    } {
-      rewrite Hsz; [ | now left ].
-      rewrite Hsz; [ easy | now right; left ].
-    }
-  } {
-    destruct HBM as [HBM| HBM]; [ | easy ].
-    subst BM.
-    apply is_square_bmat_mul; [ easy | | | ]. {
-      apply is_square_bmat_opp.
-      now apply Hsq; left.
-    } {
-      now apply Hsq; right; left.
-    } {
-      rewrite sizes_of_bmatrix_opp.
-      rewrite Hsz; [ | now left ].
-      rewrite Hsz; [ easy | now right; left ].
-    }
+  destruct HBM as [HBM| HBM]; [ subst BM | ]. {
+    now apply is_square_bmat_mul.
   }
+  destruct HBM as [HBM| HBM]; [ subst BM | easy ].
+  apply is_square_bmat_mul; [ easy | easy | easy | ].
+  now rewrite Haso, Hbs.
 } {
-  destruct HBM as [HBM| HBM]. {
-    subst BM.
-    rewrite sizes_of_bmatrix_mul; [ | easy | | | ]. {
-      now apply Hsz; left.
-    } {
-      now apply Hsq; left.
-    } {
-      now apply Hsq; right; left.
-    } {
-      rewrite Hsz; [ | now left ].
-      rewrite Hsz; [ easy | now right; left ].
-    }
+  destruct HBM as [HBM| HBM]; [ subst BM | ]. {
+    now rewrite sizes_of_bmatrix_mul.
   } {
-    destruct HBM as [HBM| HBM]; [ | easy ].
-    subst BM.
-    rewrite sizes_of_bmatrix_mul; [ | easy | | | ]. {
-      rewrite sizes_of_bmatrix_opp.
-      now apply Hsz; left.
-    } {
-      apply is_square_bmat_opp.
-      now apply Hsq; left.
-    } {
-      now apply Hsq; right; left.
-    } {
-      rewrite sizes_of_bmatrix_opp.
-      rewrite Hsz; [ | now left ].
-      rewrite Hsz; [ easy | now right; left ].
-    }
+    destruct HBM as [HBM| HBM]; [ subst BM | easy ].
+    rewrite sizes_of_bmatrix_mul; [ easy | easy | easy | easy | ].
+    now rewrite sizes_of_bmatrix_opp.
   }
 }
 Qed.
