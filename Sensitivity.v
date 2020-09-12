@@ -5026,13 +5026,24 @@ Theorem bmat_nat_mul_succ :
   (bmat_nat_mul_l n (I_2_pow n) + I_2_pow n * I_2_pow n)%BM.
 Proof.
 intros.
-induction n; cbn. {
+induction n. {
+  cbn.
   do 2 rewrite srng_add_0_l.
   now rewrite srng_mul_1_l.
 }
+cbn - [ mat_of_list_list ].
 f_equal.
-apply matrix_eq; cbn; [ easy | easy | ].
+apply matrix_eq; cbn - [ mat_of_list_list ]; [ easy | easy | ].
 intros i j Hi Hj.
+cbn in Hi, Hj.
+remember [[I_2_pow n; IZ_2_pow 0%Srng n]; [IZ_2_pow 0%Srng n; I_2_pow n]]
+  as l eqn:Hl.
+cbn.
+remember (BM_1 1%Srng) as d eqn:Hd.
+remember (list_list_ncols l) as x.
+rewrite Hl in Heqx; cbn in Heqx; subst x.
+cbn.
+...
 destruct i. {
   destruct j; cbn. {
     destruct n; cbn. {
