@@ -2503,8 +2503,6 @@ apply IHra. {
 }
 Qed.
 
-...
-
 Definition compatible_square_bmatrices T (BML : list (bmatrix T)) :=
   ∃ sizes,
    (∀ BM, BM ∈ BML → is_square_bmat BM) ∧
@@ -2778,7 +2776,6 @@ assert (H : ∀ i, i < S size → is_square_bmat_loop sizes (fb i j)). {
 move H before Hb; clear Hb; rename H into Hb.
 clear Hi Hj.
 move j before i.
-(**)
 induction size. {
   apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
 }
@@ -3901,16 +3898,13 @@ cbn in *.
 subst ra ca rb cb.
 destruct size; [ easy | cbn ].
 rewrite Nat.sub_0_r.
-assert (H : ∀ j, j < S size → is_square_bmat_loop sizes (fa i j)). {
-  now intros; apply Ha.
+apply square_bmat_fold_left; [ easy | | ]. {
+  intros k Hk.
+  apply Ha; [ easy | flia Hk ].
+} {
+  intros k Hk.
+  apply Hb; [ flia Hk | easy ].
 }
-move H before Ha; clear Ha; rename H into Ha.
-assert (H : ∀ i, i < S size → is_square_bmat_loop sizes (fb i j)). {
-  now intros; apply Hb.
-}
-move H before Hb; clear Hb; rename H into Hb.
-move j before i; clear Hi Hj.
-now apply square_bmat_fold_left.
 Qed.
 
 Theorem bmat_mul_add_distr_r :
@@ -4817,10 +4811,11 @@ assert (Hab : bmat_zero_like MA = bmat_zero_like MB). {
 }
 unfold so in Hab.
 rewrite <- Hab in H1.
-...
 rewrite bmat_mul_0_r in H1; [ | easy | easy ].
 symmetry in H1.
+(*
 rewrite <- Hab in H1.
+*)
 rewrite (bmat_zero_like_eq_compat _ MB) in H1; [ | easy | easy | easy ].
 rewrite <- Hab in H1.
 rewrite <- (bmat_zero_like_mul _ MB) in H1; [ | easy | easy | easy ].
@@ -4832,7 +4827,7 @@ split; intros BM HBM. {
   }
   destruct HBM as [HBM| HBM]; [ subst BM | easy ].
   apply is_square_bmat_mul; [ easy | easy | easy | ].
-  now rewrite Haso, Hbs.
+  congruence.
 } {
   destruct HBM as [HBM| HBM]; [ subst BM | ]. {
     now rewrite sizes_of_bmatrix_mul.
@@ -4843,8 +4838,6 @@ split; intros BM HBM. {
   }
 }
 Qed.
-
-...
 
 (*
 Theorem bmat_list_mul_eq_compat : ∀ T {so : semiring_op T} d l1 l2 l3 l4 a,
@@ -4987,152 +4980,45 @@ Theorem bmat_mul_opp_opp :
   ∀ T {ro : ring_op T} (so := rng_semiring)
        {sp : semiring_prop T} {rp : ring_prop T} MA MB,
   compatible_square_bmatrices [MA; MB]
-  → bmat_mul (bmat_opp MA) (bmat_opp MB) = bmat_mul MA MB.
+  → (- MA * - MB = MA * MB)%BM.
 Proof.
 intros * sp rp * Hab.
 subst so.
-rewrite bmat_mul_opp_l.
-...
-intros.
-revert MB.
-induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
-  destruct MB as [xb| mb]; [ cbn | easy ].
-  f_equal.
-  now apply rng_mul_opp_opp.
+rewrite bmat_mul_opp_l; [ | easy | easy | ]. 2: {
+  destruct Hab as (sizes & Hsq & Hsz).
+  exists sizes.
+  split; intros BM HBM. {
+    destruct HBM as [HBM| HBM]; [ now subst BM; apply Hsq; left | ].
+    destruct HBM as [HBM| HBM]; [ subst BM | easy ].
+    now apply is_square_bmat_opp, Hsq; right; left.
+  } {
+    destruct HBM as [HBM| HBM]; [ now subst BM; apply Hsz; left | ].
+    destruct HBM as [HBM| HBM]; [ subst BM | easy ].
+    now rewrite sizes_of_bmatrix_opp; apply Hsz; right; left.
+  }
 }
-destruct MB as [xb| mb]; [ easy | cbn ].
-f_equal; f_equal.
-...
-destruct ma as (lla).
-destruct mb as (llb).
-cbn in IHMA |-*.
-set (list_opp := map (λ mm, (- mm)%BM)).
-progress fold (@bmat_list_mul_loop T so).
-progress fold (@bmat_list_list_mul T so (map list_opp lla) (map list_opp llb)).
-progress fold (@bmat_list_list_mul T so lla llb).
-revert llb.
-induction lla as [| la]; intros; [ easy | cbn ].
-progress fold (@bmat_list_list_mul T so (map list_opp lla) (map list_opp llb)).
-progress fold (@bmat_list_list_mul T so lla llb).
-f_equal. 2: {
-  apply IHlla.
-  intros la1 Hla1 a1 Ha1 b1.
-  apply (IHMA la1); [ now right | easy ].
-}
-Print bmat_list_mul.
-progress fold (@bmat_list_mul T so (list_opp la)).
-progress fold (@bmat_list_mul T so la).
-unfold list_opp.
-...
-rewrite (list_list_transpose_opp void_bmat).
-fold list_opp.
-...
+rewrite bmat_mul_opp_r; [ | easy | easy | easy ].
+now rewrite bmat_opp_involutive.
+Qed.
 
 Theorem bmat_mul_sqr_opp :
   ∀ T {ro : ring_op T} (so := rng_semiring)
        {sp : semiring_prop T} {rp : ring_prop T} M,
-  bmat_mul (bmat_opp M) (bmat_opp M) = bmat_mul M M.
+  is_square_bmat M
+  → (- M * - M = M * M)%BM.
 Proof.
-intros.
-induction M as [x| M IHM] using bmatrix_ind2. {
-  cbn.
-  f_equal.
-  now apply rng_mul_opp_opp.
+intros * sp rp * HM.
+apply bmat_mul_opp_opp; [ easy | easy | ].
+exists (sizes_of_bmatrix M).
+split; intros BM HBM. {
+  replace BM with M; [ easy | ].
+  destruct HBM as [| HBM]; [ easy | now destruct HBM ].
+} {
+  replace BM with M; [ easy | ].
+  destruct HBM as [| HBM]; [ easy | now destruct HBM ].
 }
-destruct M as (ll); cbn in IHM |-*.
-f_equal; f_equal.
-set (list_opp := map (λ mm, (- mm)%BM)).
-progress fold (@bmat_list_mul_loop T so).
-progress fold (@bmat_list_list_mul T so (map list_opp ll) (map list_opp ll)).
-progress fold (@bmat_list_list_mul T so ll ll).
-...
-induction ll as [| l1]; intros; [ easy | ].
-cbn - [ hd ].
-rewrite <- map_cons.
-progress fold (@bmat_list_list_mul T so ll (l1 :: ll)).
-progress fold (@bmat_list_list_mul T so (map list_opp ll) (map list_opp (l1 :: ll))).
-f_equal. 2: {
-  destruct ll as [| l2]; [ easy | ].
-  cbn - [ list_list_transpose ].
-  cbn - [ list_list_transpose ] in IHll.
-  do 2 rewrite <- map_cons.
-  rewrite <- map_cons in IHll.
-  progress fold
-    (@bmat_list_list_mul T so (map list_opp ll) (map list_opp (l1 :: l2 :: ll))).
-  progress fold (@bmat_list_list_mul T so ll (l1 :: l2 :: ll)).
-  progress fold (@bmat_list_list_mul T so (map list_opp ll) (map list_opp (l2 :: ll))) in IHll.
-  progress fold (@bmat_list_list_mul T so ll (l2 :: ll)) in IHll.
-  progress fold (bmat_list_mul (list_opp l2)).
-  progress fold (bmat_list_mul l2).
-  progress fold (bmat_list_mul (list_opp l2)) in IHll.
-  progress fold (bmat_list_mul l2) in IHll.
-  f_equal. 2: {
-    destruct ll as [| l3]; [ easy | ].
-    cbn - [ list_list_transpose ] in IHll |-*.
-    do 3 rewrite <- map_cons.
-    do 2 rewrite <- map_cons in IHll.
-    progress fold (@bmat_list_list_mul T so (map list_opp ll) (map list_opp (l1 :: l2 :: l3 :: ll))).
-    progress fold (@bmat_list_list_mul T so (map list_opp ll) (map list_opp (l2 :: l3 :: ll))) in IHll.
-    progress fold (@bmat_list_list_mul T so ll (l1 :: l2 :: l3 :: ll)).
-    progress fold (@bmat_list_list_mul T so ll (l2 :: l3 :: ll)) in IHll.
-    progress fold (bmat_list_mul (list_opp l3)).
-    progress fold (bmat_list_mul (list_opp l3)) in IHll.
-    progress fold (bmat_list_mul l3).
-    progress fold (bmat_list_mul l3) in IHll.
-    f_equal. 2: {
-...
-assert (∀ ll1 ll2,
-  bmat_list_list_mul (map list_opp ll1) ll2 =
-  map list_opp (bmat_list_list_mul ll1 ll2)). {
-clear; intros.
-Print bmat_list_list_mul.
-revert ll2.
-induction ll1 as [| l1]; intros; [ easy | cbn ].
-progress fold (@bmat_list_list_mul T so ll1 ll2).
-progress fold (@bmat_list_list_mul T so (map list_opp ll1) ll2).
-f_equal; [ | apply IHll1 ].
-progress fold (bmat_list_mul (list_opp l1)).
-progress fold (bmat_list_mul l1).
-...
-assert (∀ ll1 ll2,
-  bmat_list_list_mul (map list_opp ll2) (map list_opp (ll1 ++ ll2)) =
-  bmat_list_list_mul ll2 (ll1 ++ ll2)). {
-  clear.
-  intros.
-  revert ll2.
-  induction ll1 as [| l1]; intros; cbn. {
-    induction ll2 as [| l2]; [ easy | ].
-    cbn - [ list_list_transpose ].
-    rewrite <- map_cons.
-    progress fold (@bmat_list_list_mul T so (map list_opp ll2) (map list_opp (l2 :: ll2))).
-    progress fold (@bmat_list_list_mul T so ll2 (l2 :: ll2)).
-    f_equal. 2: {
-      cbn.
- Print bmat_list_list_mul.
-...
-revert l1.
-induction ll2 as [| l2]; intros; [ easy | ].
-revert l2.
-induction l1 as [| e1]; intros. {
-  cbn.
-  revert ll2 IHll2.
-  induction l2 as [| e2]; intros; [ easy | ].
-  cbn; f_equal.
-...
+Qed.
 
-remember (list_list_transpose void_bmat ll2) as ll.
-clear.
-revert ll.
-destruct l1 as [| e1]; intros; cbn. {
-  induction ll as [| l1]; [ easy | now cbn; f_equal ].
-}
-induction ll as [| l2]; cbn; [ easy | ].
-destruct l2 as [| e2]; cbn. {
-  f_equal.
-  now destruct ll.
-}
-f_equal; [ | easy ].
-clear.
 ...
 
 (* "We prove by induction that A_n^2 = nI" *)
