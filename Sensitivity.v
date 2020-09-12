@@ -2472,51 +2472,38 @@ cbn in *.
 subst ca; clear Hrr Hzra Hzca.
 destruct ra; [ easy | cbn ].
 rewrite Nat.sub_0_r.
-clear - IHBMA Hi Haa Ha sp.
-assert (H :
-  ∀ j, j < S ra
-  → is_square_bmat_loop (sizes_of_bmatrix (fa i j)) (fa i j)
-  → ∀ BMB,
-     (bmat_zero_like (fa i j) * BMB = bmat_zero_like (fa i j * BMB))%BM). {
-  intros k Hk H *.
-  now apply IHBMA.
+(**)
+replace
+  (fold_left (λ a k, a + bmat_zero_like (fa i (k + 1)%nat) * fb (k + 1)%nat j)
+    (seq 0 ra) (bmat_zero_like (fa i 0 * fb 0 j)))%BM
+with
+  (fold_left (λ a k, a + bmat_zero_like (fa i (k + 1)%nat * fb (k + 1)%nat j))
+    (seq 0 ra) (bmat_zero_like (fa i 0 * fb 0 j)))%BM. 2: {
+  apply List_fold_left_ext_in.
+  intros k BM Hk; f_equal.
+  apply in_seq in Hk.
+  clear BM.
+  symmetry; apply IHBMA; [ easy | flia Hk | ].
+  rewrite Haa; [ | easy | flia Hk ].
+  apply Ha; [ easy | flia Hk ].
 }
-move H before IHBMA; clear IHBMA; rename H into IHBMA.
-assert (H :
-  ∀ j, j < S ra → is_square_bmat_loop (sizes_of_bmatrix (fa 0 0)) (fa i j)). {
-  intros k Hk.
-  now apply Ha.
-}
-move H before Ha; clear Ha; rename H into Ha.
-assert (H :
-  ∀ j, j < S ra → sizes_of_bmatrix (fa i j) = sizes_of_bmatrix (fa 0 0)). {
-  intros k Hk.
-  now apply Haa.
-}
-clear Haa; rename H into Haa.
-clear Hi.
-revert fa fb i j IHBMA Ha Haa.
-induction ra; intros; [ easy | ].
-replace (S ra) with (ra + 1) by apply Nat.add_1_r.
-rewrite seq_app, fold_left_app; cbn.
-rewrite IHBMA; [ | flia | ]. 2: {
-  rewrite Haa; [ | flia ].
-  apply Ha; flia.
-}
+clear Hi IHBMA.
+induction ra; [ easy | ].
+rewrite List_seq_succ_r; cbn.
+rewrite fold_left_app; cbn.
 rewrite fold_left_app; cbn.
 rewrite bmat_zero_like_add_distr; [ | easy ].
 f_equal.
 apply IHra. {
-  intros k Hk H *.
-  apply IHBMA; [ flia Hk | easy ].
+  intros i1 j1 Hi1 Hj1.
+  apply Ha; [ flia Hi1 | flia Hj1 ].
 } {
-  intros k Hk.
-  apply Ha; flia Hk.
-} {
-  intros k Hk.
-  apply Haa; flia Hk.
+  intros i1 j1 Hi1 Hj1.
+  apply Haa; [ flia Hi1 | flia Hj1 ].
 }
 Qed.
+
+...
 
 Definition compatible_square_bmatrices T (BML : list (bmatrix T)) :=
   ∃ sizes,
