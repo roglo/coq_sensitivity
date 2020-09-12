@@ -4028,6 +4028,33 @@ f_equal.
 now apply bmat_add_comm.
 Qed.
 
+Theorem bmat_mul_add_distr_l :
+  ∀ T (so : semiring_op T) {sp : semiring_prop T} (MA MB MC : bmatrix T),
+  compatible_square_bmatrices [MA; MB; MC]
+  → (MA * (MB + MC) = MA * MB + MA * MC)%BM.
+Proof.
+intros * sp * Hcsb.
+revert MB MC Hcsb.
+induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
+  destruct Hcsb as (sizes & Hsq & Hsz).
+  unfold is_square_bmat in Hsq.
+  destruct sizes as [| size]. 2: {
+    specialize (Hsq _ (or_introl eq_refl)).
+    rewrite Hsz in Hsq; [ easy | now left ].
+  }
+  destruct MB as [xb| mb]. 2: {
+    specialize (Hsq _ (or_intror (or_introl eq_refl))).
+    rewrite Hsz in Hsq; [ easy | now right; left ].
+  }
+  destruct MC as [xc| mc]. 2: {
+    specialize (Hsq _ (or_intror (or_intror (or_introl eq_refl)))).
+    rewrite Hsz in Hsq; [ easy | now right; right; left ].
+  }
+  now cbn; rewrite srng_mul_add_distr_l.
+}
+destruct Hcsb as (sizes & Hsq & Hsz).
+...
+
 Theorem is_square_bmat_loop_opp : ∀ T {ro : ring_op T} (M : bmatrix T) sizes,
   is_square_bmat_loop sizes M → is_square_bmat_loop sizes (- M)%BM.
 Proof.
@@ -4353,10 +4380,79 @@ Theorem bmat_mul_opp_l :
     (sp : semiring_prop T),
   ∀ MA MB,
   compatible_square_bmatrices [MA; MB]
-  → bmat_mul (bmat_opp MA) MB = bmat_opp (bmat_mul MA MB).
+  → ((- MA) * MB = - (MA * MB))%BM.
 Proof.
 intros * rp sp * Hcsb.
 specialize (@bmat_mul_add_distr_r T so sp MA (bmat_opp MA) MB) as H1.
+destruct Hcsb as (sizes & Hsq & Hsz).
+specialize (Hsq _ (or_introl eq_refl)) as Ha.
+specialize (Hsq _ (or_intror (or_introl eq_refl))) as Hb.
+specialize (Hsz _ (or_introl eq_refl)) as Has.
+specialize (Hsz _ (or_intror (or_introl eq_refl))) as Hbs.
+generalize Ha; intros Hao.
+apply (@is_square_bmat_opp _ ro) in Hao.
+generalize Has; intros Haso.
+rewrite <- (@sizes_of_bmatrix_opp _ ro) in Haso.
+assert (H : compatible_square_bmatrices [MA; (- MA)%BM; MB]). {
+  exists sizes.
+  split; intros BM HBM. {
+    destruct HBM as [HBM| HBM]; [ now subst BM | ].
+    destruct HBM as [HBM| HBM]; [ now subst BM | ].
+    destruct HBM as [HBM| HBM]; [ now subst BM | easy ].
+  } {
+    destruct HBM as [HBM| HBM]; [ now subst BM | ].
+    destruct HBM as [HBM| HBM]; [ now subst BM | ].
+    destruct HBM as [HBM| HBM]; [ now subst BM | easy ].
+  }
+}
+specialize (H1 H); clear H.
+unfold so in H1.
+rewrite bmat_add_opp_r in H1; [ | easy | easy ].
+assert (Hss : sizes_of_bmatrix MA = sizes_of_bmatrix MB). {
+  now rewrite Has, Hbs.
+}
+assert (Hab : bmat_zero_like MA = bmat_zero_like MB). {
+  now rewrite (bmat_zero_like_eq_compat _ MB).
+}
+unfold so in Hab.
+rewrite Hab in H1.
+rewrite bmat_mul_0_l in H1; [ | easy | easy ].
+symmetry in H1.
+rewrite <- Hab in H1.
+rewrite (bmat_zero_like_eq_compat _ MB) in H1; [ | easy | easy | easy ].
+rewrite <- Hab in H1.
+rewrite <- (bmat_zero_like_mul _ MB) in H1; [ | easy | easy | easy ].
+apply bmat_add_move_0_l in H1; [ easy | easy | easy | ].
+exists sizes.
+split; intros BM HBM. {
+  destruct HBM as [HBM| HBM]; [ subst BM | ]. {
+    now apply is_square_bmat_mul.
+  }
+  destruct HBM as [HBM| HBM]; [ subst BM | easy ].
+  apply is_square_bmat_mul; [ easy | easy | easy | ].
+  now rewrite Haso, Hbs.
+} {
+  destruct HBM as [HBM| HBM]; [ subst BM | ]. {
+    now rewrite sizes_of_bmatrix_mul.
+  } {
+    destruct HBM as [HBM| HBM]; [ subst BM | easy ].
+    rewrite sizes_of_bmatrix_mul; [ easy | easy | easy | easy | ].
+    now rewrite sizes_of_bmatrix_opp.
+  }
+}
+Qed.
+
+Theorem bmat_mul_opp_r :
+  ∀ T {ro : ring_op T} (so := rng_semiring) (rp : ring_prop T)
+    (sp : semiring_prop T),
+  ∀ MA MB,
+  compatible_square_bmatrices [MA; MB]
+  → (MA * (- MB) = - (MA * MB))%BM.
+Proof.
+intros * rp sp * Hcsb.
+...
+specialize (@bmat_mul_add_distr_l T so sp MA MB (bmat_opp MB)) as H1.
+...
 destruct Hcsb as (sizes & Hsq & Hsz).
 specialize (Hsq _ (or_introl eq_refl)) as Ha.
 specialize (Hsq _ (or_intror (or_introl eq_refl))) as Hb.
