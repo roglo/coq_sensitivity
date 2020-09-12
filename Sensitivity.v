@@ -2518,6 +2518,111 @@ apply IHra. {
 }
 Qed.
 
+Theorem bmat_zero_like_mul_distr_r :
+  ∀ T {so : semiring_op T} {sp : semiring_prop T} BMA BMB,
+  is_square_bmat BMB
+  → bmat_zero_like (BMA * BMB)%BM = (BMA * bmat_zero_like BMB)%BM.
+Proof.
+intros * sp * Hb.
+symmetry.
+revert BMA.
+induction BMB as [xb| mb IHBMB] using bmatrix_ind2; intros; cbn. {
+  destruct BMA as [xa| ma]; [ cbn | easy ].
+  now rewrite srng_mul_0_r.
+}
+destruct BMA as [xa| ma]; [ easy | ].
+cbn; f_equal.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros * Hi Hj.
+specialize (sizes_of_bmatrix_mat_el _ Hb) as Hbs.
+cbn in Hb.
+destruct (zerop (mat_nrows mb)) as [Hzrb| Hzrb]; [ easy | ].
+destruct (zerop (mat_ncols mb)) as [Hzcb| Hzcb]; [ easy | ].
+cbn in Hb.
+destruct Hb as (Hrr & Hcr & Hb).
+rewrite Hcr in Hbs.
+rewrite IHBMB; [ | easy | easy | ]. 2: {
+  rewrite Hcr in Hj.
+  specialize (Hb 0 j Hzrb Hj) as H2.
+  unfold is_square_bmat.
+  now rewrite Hbs.
+}
+destruct ma as (fa, ra, ca).
+destruct mb as (fb, rb, cb).
+cbn in *.
+subst cb; clear Hrr Hzrb Hzcb.
+destruct ca; [ easy | cbn ].
+rewrite Nat.sub_0_r.
+...
+induction ca; [ easy | ].
+replace (S ca) with (ca + 1) by apply Nat.add_1_r.
+rewrite seq_app, fold_left_app; cbn.
+rewrite IHBMB; [ | | easy | ]. 2: {
+rewrite IHBMB; [ | flia | ]. 2: {
+  rewrite Haa; [ | flia ].
+  apply Ha; flia.
+}
+rewrite fold_left_app; cbn.
+rewrite bmat_zero_like_add_distr; [ | easy ].
+f_equal.
+apply IHra. {
+  intros k Hk H *.
+  apply IHBMA; [ flia Hk | easy ].
+} {
+  intros k Hk.
+  apply Ha; flia Hk.
+} {
+  intros k Hk.
+  apply Haa; flia Hk.
+}
+...
+clear - IHBMB Hj Hbs Hb sp.
+assert (H :
+  ∀ i, i < rb
+  → is_square_bmat_loop (sizes_of_bmatrix (fb i j)) (fb i j)
+  → ∀ BMA,
+     (BMA * bmat_zero_like (fb i j) = bmat_zero_like (BMA * fb i j))%BM). {
+  intros k Hk H *.
+  now apply IHBMB.
+}
+move H before IHBMB; clear IHBMB; rename H into IHBMB.
+assert (H :
+  ∀ i, i < rb → is_square_bmat_loop (sizes_of_bmatrix (fb 0 0)) (fb i j)). {
+  intros k Hk.
+  now apply Hb.
+}
+move H before Hb; clear Hb; rename H into Hb.
+assert (H :
+  ∀ i, i < rb → sizes_of_bmatrix (fb i j) = sizes_of_bmatrix (fb 0 0)). {
+  intros k Hk.
+  now apply Hbs.
+}
+clear Hbs; rename H into Hbs.
+clear Hj.
+revert fa fb i j IHBMB Hb Hbs.
+...
+induction rb; intros; [ easy | ].
+replace (S ra) with (ra + 1) by apply Nat.add_1_r.
+rewrite seq_app, fold_left_app; cbn.
+rewrite IHBMA; [ | flia | ]. 2: {
+  rewrite Haa; [ | flia ].
+  apply Ha; flia.
+}
+rewrite fold_left_app; cbn.
+rewrite bmat_zero_like_add_distr; [ | easy ].
+f_equal.
+apply IHra. {
+  intros k Hk H *.
+  apply IHBMA; [ flia Hk | easy ].
+} {
+  intros k Hk.
+  apply Ha; flia Hk.
+} {
+  intros k Hk.
+  apply Haa; flia Hk.
+}
+Qed.
+
 Theorem bmat_zero_like_eq_compat :
   ∀ T {so : semiring_op T} {sp : semiring_prop T},
   ∀ BMA BMB,
@@ -3111,7 +3216,17 @@ rewrite <- bmat_zero_like_mul_distr_l; [ | easy | easy ].
 now apply bmat_zero_like_sqr.
 Qed.
 
-Theorem bmat_mul_0_r : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
+Theorem bmat_mul_0_r : ∀ T {so : semiring_op T} {sp : semiring_prop T} BM,
+  is_square_bmat BM
+  → (BM * bmat_zero_like BM)%BM = bmat_zero_like BM.
+Proof.
+intros * sp * Hss.
+...
+rewrite <- bmat_zero_like_mul_distr_r; [ | easy | easy ].
+now apply bmat_zero_like_sqr.
+Qed.
+
+Theorem old_bmat_mul_0_r : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
   bmat_fit_for_add (I_2_pow n) M
   → bmat_mul M (Z_2_pow n) = Z_2_pow n.
 Proof.
@@ -3273,7 +3388,7 @@ destruct i. {
   destruct j. {
     rewrite IHn; [ | easy ].
     rewrite fold_Z_2_pow.
-    rewrite bmat_mul_0_r; [ | easy | ]. 2: {
+    rewrite old_bmat_mul_0_r; [ | easy | ]. 2: {
       transitivity (Z_2_pow n); [ | easy ].
       apply bmat_fit_for_add_IZ_IZ.
     }
@@ -3283,7 +3398,7 @@ destruct i. {
   }
   destruct j; [ | flia Hj ].
   rewrite fold_Z_2_pow.
-  rewrite bmat_mul_0_r; [ | easy | easy ].
+  rewrite old_bmat_mul_0_r; [ | easy | easy ].
   rewrite IHn. 2: {
     transitivity (Z_2_pow n); [ | easy ].
     apply bmat_fit_for_add_IZ_IZ.
@@ -3297,12 +3412,12 @@ destruct j. {
     apply bmat_fit_for_add_IZ_IZ.
   }
   rewrite fold_Z_2_pow.
-  rewrite bmat_mul_0_r; [ | easy | easy ].
+  rewrite old_bmat_mul_0_r; [ | easy | easy ].
   now apply bmat_add_0_r.
 }
 destruct j; [ | flia Hj ].
 rewrite fold_Z_2_pow.
-rewrite bmat_mul_0_r; [ | easy | ]. 2: {
+rewrite old_bmat_mul_0_r; [ | easy | ]. 2: {
   transitivity (Z_2_pow n); [ | easy ].
   apply bmat_fit_for_add_IZ_IZ.
 }
@@ -4226,72 +4341,45 @@ assert (Hy : is_square_bmat_loop sizes y). {
   intros * HA HB.
   now apply is_square_bmat_loop_mul.
 }
-(*
 assert (Sxy : is_square_bmat_loop sizes (x + y)%BM). {
   now apply is_square_bmat_loop_add.
 }
-*)
 assert (Su : is_square_bmat_loop sizes u) by (subst u; apply Ha; flia).
 assert (Sv : is_square_bmat_loop sizes v) by (subst v; apply Hb; flia).
 assert (Sw : is_square_bmat_loop sizes w) by (subst w; apply Hc; flia).
-(*
-assert (Suw : is_square_bmat_loop sizes (u * w)%BM). {
-  now apply is_square_bmat_loop_mul.
-}
-*)
 assert (Suv : is_square_bmat_loop sizes (u * v)%BM). {
   now apply is_square_bmat_loop_mul.
 }
 assert (Suw : is_square_bmat_loop sizes (u * w)%BM). {
   now apply is_square_bmat_loop_mul.
 }
-(*
-assert (Svw : is_square_bmat_loop sizes (v * w)%BM). {
-  now apply is_square_bmat_loop_mul.
-}
-*)
 assert (Syuw : is_square_bmat_loop sizes (y + u * w)%BM). {
-  now apply is_square_bmat_loop_add.
-}
-(*
-assert (Syvw : is_square_bmat_loop sizes (y + v * w)%BM). {
   now apply is_square_bmat_loop_add.
 }
 assert (Hxy : bmat_fit_for_add x y). {
   now apply (square_bmat_fit_for_add sizes).
 }
-assert (Hx_uw : bmat_fit_for_add x (u * w)%BM). {
-  now apply (square_bmat_fit_for_add sizes).
-}
-*)
 assert (Hx_uv : bmat_fit_for_add x (u * v)%BM). {
   now apply (square_bmat_fit_for_add sizes).
 }
 assert (Hx_yuw : bmat_fit_for_add x (y + u * w)%BM). {
   now apply (square_bmat_fit_for_add sizes).
 }
-(*
-assert (Hx_yvw : bmat_fit_for_add x (y + v * w)%BM). {
+assert (Hy_uw : bmat_fit_for_add y (u * w)%BM). {
   now apply (square_bmat_fit_for_add sizes).
 }
-assert (Hy_vw : bmat_fit_for_add y (v * w)%BM). {
+assert (Hxy_uw : bmat_fit_for_add (x + y)%BM (u * w)%BM). {
   now apply (square_bmat_fit_for_add sizes).
 }
-assert (Hxy_vw : bmat_fit_for_add (x + y)%BM (v * w)%BM). {
+assert (Huw_uv : bmat_fit_for_add (u * w)%BM (u * v)%BM). {
   now apply (square_bmat_fit_for_add sizes).
 }
-assert (Huw_vw : bmat_fit_for_add (u * w)%BM (v * w)%BM). {
-  now apply (square_bmat_fit_for_add sizes).
-}
-*)
 rewrite <- (bmat_add_add_swap _ _ (u * v)%BM); [ | easy | easy ].
-...
-rewrite (bmat_add_assoc x); [ | | ].
-rewrite <- (bmat_add_assoc (x + y)%BM); [ | | ].
+rewrite (bmat_add_assoc x); [ | easy | easy ].
+rewrite <- (bmat_add_assoc (x + y)%BM); [ | easy | easy ].
 f_equal.
 now apply bmat_add_comm.
 Qed.
-...
 
 Theorem is_square_bmat_loop_opp : ∀ T {ro : ring_op T} (M : bmatrix T) sizes,
   is_square_bmat_loop sizes M → is_square_bmat_loop sizes (- M)%BM.
@@ -4688,19 +4776,17 @@ Theorem bmat_mul_opp_r :
   → (MA * (- MB) = - (MA * MB))%BM.
 Proof.
 intros * rp sp * Hcsb.
-...
 specialize (@bmat_mul_add_distr_l T so sp MA MB (bmat_opp MB)) as H1.
-...
 destruct Hcsb as (sizes & Hsq & Hsz).
 specialize (Hsq _ (or_introl eq_refl)) as Ha.
 specialize (Hsq _ (or_intror (or_introl eq_refl))) as Hb.
 specialize (Hsz _ (or_introl eq_refl)) as Has.
 specialize (Hsz _ (or_intror (or_introl eq_refl))) as Hbs.
-generalize Ha; intros Hao.
-apply (@is_square_bmat_opp _ ro) in Hao.
-generalize Has; intros Haso.
-rewrite <- (@sizes_of_bmatrix_opp _ ro) in Haso.
-assert (H : compatible_square_bmatrices [MA; (- MA)%BM; MB]). {
+generalize Hb; intros Hbo.
+apply (@is_square_bmat_opp _ ro) in Hbo.
+generalize Hbs; intros Hbso.
+rewrite <- (@sizes_of_bmatrix_opp _ ro) in Hbso.
+assert (H : compatible_square_bmatrices [MA; MB; (- MB)%BM]). {
   exists sizes.
   split; intros BM HBM. {
     destruct HBM as [HBM| HBM]; [ now subst BM | ].
@@ -4722,8 +4808,9 @@ assert (Hab : bmat_zero_like MA = bmat_zero_like MB). {
   now rewrite (bmat_zero_like_eq_compat _ MB).
 }
 unfold so in Hab.
-rewrite Hab in H1.
-rewrite bmat_mul_0_l in H1; [ | easy | easy ].
+rewrite <- Hab in H1.
+...
+rewrite bmat_mul_0_r in H1; [ | easy | easy ].
 symmetry in H1.
 rewrite <- Hab in H1.
 rewrite (bmat_zero_like_eq_compat _ MB) in H1; [ | easy | easy | easy ].
