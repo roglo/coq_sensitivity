@@ -4053,6 +4053,24 @@ induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
   now cbn; rewrite srng_mul_add_distr_l.
 }
 destruct Hcsb as (sizes & Hsq & Hsz).
+destruct sizes as [| size]. {
+  specialize (Hsq _ (or_introl eq_refl)).
+  unfold is_square_bmat in Hsq.
+  rewrite Hsz in Hsq; [ easy | now left ].
+}
+destruct MB as [xb| mb]. {
+  now specialize (Hsz _ (or_intror (or_introl eq_refl))).
+}
+destruct MC as [xc| mc]; [ easy | ].
+specialize (Hsq _ (or_introl eq_refl)) as Ha.
+specialize (Hsq _ (or_intror (or_introl eq_refl))) as Hb.
+specialize (Hsq _ (or_intror (or_intror (or_introl eq_refl)))) as Hc.
+unfold is_square_bmat in Ha, Hb, Hc.
+specialize (Hsz _ (or_introl eq_refl)) as Has.
+specialize (Hsz _ (or_intror (or_introl eq_refl))) as Hbs.
+specialize (Hsz _ (or_intror (or_intror (or_introl eq_refl)))) as Hcs.
+cbn; f_equal.
+apply matrix_eq; cbn; [ easy | easy | ].
 ...
 
 Theorem is_square_bmat_loop_opp : ∀ T {ro : ring_op T} (M : bmatrix T) sizes,
