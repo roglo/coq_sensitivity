@@ -5026,39 +5026,10 @@ Theorem bmat_nat_mul_succ :
   (bmat_nat_mul_l n (I_2_pow n) + I_2_pow n * I_2_pow n)%BM.
 Proof.
 intros.
-induction n. {
-  cbn.
-  do 2 rewrite srng_add_0_l.
-  now rewrite srng_mul_1_l.
-}
-cbn - [ mat_of_list_list ].
+rewrite bmat_add_nat_mul_l_succ; [ | easy ].
 f_equal.
-apply matrix_eq; cbn - [ mat_of_list_list ]; [ easy | easy | ].
-intros i j Hi Hj.
-cbn in Hi, Hj.
-remember [[I_2_pow n; IZ_2_pow 0%Srng n]; [IZ_2_pow 0%Srng n; I_2_pow n]]
-  as l eqn:Hl.
-cbn.
-remember (BM_1 1%Srng) as d eqn:Hd.
-remember (list_list_ncols l) as x.
-rewrite Hl in Heqx; cbn in Heqx; subst x.
-cbn.
-...
-destruct i. {
-  destruct j; cbn. {
-    destruct n; cbn. {
-      rewrite srng_add_0_l.
-      rewrite srng_mul_1_l, srng_mul_0_l.
-      now rewrite srng_add_0_r.
-    }
-    f_equal.
-    apply matrix_eq; cbn; [ easy | easy | ].
-    clear Hi Hj.
-    intros i j Hi Hj.
-    destruct i. {
-      destruct j; cbn. {
-        destruct n; cbn. {
-...
+now rewrite bmat_mul_1_r.
+Qed.
 
 (* "We prove by induction that A_n^2 = nI" *)
 
@@ -5075,6 +5046,10 @@ intros * Hi Hj.
 destruct i. {
   destruct j. {
     cbn; rewrite IHn; symmetry.
+    now apply bmat_nat_mul_succ.
+  }
+  destruct j; [ | flia Hj ].
+  cbn.
 ...
 intros.
 induction n; intros; [ now cbn; rewrite srng_mul_0_l | ].
