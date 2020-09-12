@@ -5019,15 +5019,19 @@ split; intros BM HBM. {
 }
 Qed.
 
-...
-
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I :
     ∀ T {ro : ring_op T} (so := rng_semiring),
     ∀ {rp : ring_prop T} {sp : semiring_prop T} n,
-  bmat_mul (A n) (A n) = bmat_nat_mul_l n (I_2_pow n).
+  (A n * A n = bmat_nat_mul_l n (I_2_pow n))%BM.
 Proof.
+intros.
+induction n; intros; [ now cbn; rewrite srng_mul_0_l | ].
+cbn; f_equal.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros * Hi Hj.
+...
 intros.
 induction n; intros; [ now cbn; rewrite srng_mul_0_l | ].
 cbn; f_equal; f_equal.
