@@ -2520,9 +2520,70 @@ Qed.
 
 Theorem bmat_zero_like_mul_distr_r :
   ∀ T {so : semiring_op T} {sp : semiring_prop T} BMA BMB,
-  is_square_bmat BMB
+  is_square_bmat BMA
   → bmat_zero_like (BMA * BMB)%BM = (BMA * bmat_zero_like BMB)%BM.
 Proof.
+intros * sp * Ha.
+revert BMB.
+induction BMA as [xa| ma IHBMA] using bmatrix_ind2; intros; cbn. {
+  destruct BMB as [xb| mb]; [ cbn | easy ].
+  now rewrite srng_mul_0_r.
+}
+destruct BMB as [xb| mb]; [ easy | ].
+cbn; f_equal.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros * Hi Hj.
+destruct ma as (fa, ra, ca).
+destruct mb as (fb, rb, cb).
+cbn in *.
+destruct (zerop ra) as [Hraz| Hraz]; [ easy | ].
+destruct ca; [ easy | cbn in Ha |-*; clear Hraz ].
+destruct Ha as (_ & H & Ha); subst ra.
+rewrite Nat.sub_0_r.
+assert (H :
+  ∀ j, j < S ca
+  → is_square_bmat_loop (sizes_of_bmatrix (fa i j)) (fa i j)
+  → ∀ BMB,
+     (bmat_zero_like (fa i j * BMB)%BM = (fa i j * bmat_zero_like BMB))%BM). {
+  intros k Hk H *.
+  now apply IHBMA.
+}
+move H before IHBMA; clear IHBMA; rename H into IHBMA.
+assert (H :
+  ∀ j, j < S ca → is_square_bmat_loop (sizes_of_bmatrix (fa 0 0)) (fa i j)). {
+  intros k Hk.
+  now apply Ha.
+}
+move H before Ha; clear Ha; rename H into Ha.
+induction ca; intros. {
+  cbn.
+  apply IHBMA; [ flia | ].
+  rewrite (@sizes_of_bmatrix_at_0_0 _ _ _ _ 1); [ | | easy | flia ]. {
+    apply Ha; flia.
+  }
+  intros i1 j1 Hi1 Hj1.
+  apply Nat.lt_1_r in Hi.
+  apply Nat.lt_1_r in Hi1.
+  apply Nat.lt_1_r in Hj1.
+  subst i i1 j1.
+  apply Ha; flia.
+}
+rewrite List_seq_succ_r; cbn.
+rewrite fold_left_app; cbn.
+rewrite fold_left_app; cbn.
+rewrite bmat_zero_like_add_distr; [ | easy ].
+f_equal. 2: {
+  apply IHBMA; [ flia | ].
+  rewrite (@sizes_of_bmatrix_at_0_0 _ _ _ _ (S (S ca)));
+    [ | | easy | flia ]. 2: {
+    intros i1 j1 Hi1 Hj1.
+(* ouais, mon cul, hein *)
+...
+    apply Ha; flia.
+  }
+..
+apply IHra. {
+...
 intros * sp * Hb.
 symmetry.
 revert BMA.
