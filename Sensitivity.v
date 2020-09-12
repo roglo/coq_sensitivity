@@ -5019,6 +5019,26 @@ split; intros BM HBM. {
 }
 Qed.
 
+Theorem bmat_nat_mul_succ :
+  ∀ T {ro : ring_op T} (so := rng_semiring),
+  ∀ {rp : ring_prop T} {sp : semiring_prop T} n,
+  bmat_nat_mul_l (S n) (I_2_pow n) =
+  (bmat_nat_mul_l n (I_2_pow n) + I_2_pow n * I_2_pow n)%BM.
+Proof.
+intros.
+induction n; cbn. {
+  do 2 rewrite srng_add_0_l.
+  now rewrite srng_mul_1_l.
+}
+f_equal.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros i j Hi Hj.
+destruct i. {
+  destruct j; cbn. {
+    rewrite IHn.
+    destruct n; cbn.
+...
+
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I :
@@ -5033,7 +5053,7 @@ apply matrix_eq; cbn; [ easy | easy | ].
 intros * Hi Hj.
 destruct i. {
   destruct j. {
-    cbn; rewrite IHn.
+    cbn; rewrite IHn; symmetry.
 ...
 intros.
 induction n; intros; [ now cbn; rewrite srng_mul_0_l | ].
