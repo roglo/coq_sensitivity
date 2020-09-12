@@ -5031,6 +5031,9 @@ induction n; intros; [ now cbn; rewrite srng_mul_0_l | ].
 cbn; f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros * Hi Hj.
+destruct i. {
+  destruct j. {
+    cbn; rewrite IHn.
 ...
 intros.
 induction n; intros; [ now cbn; rewrite srng_mul_0_l | ].
