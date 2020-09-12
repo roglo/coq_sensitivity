@@ -4071,6 +4071,22 @@ specialize (Hsz _ (or_intror (or_introl eq_refl))) as Hbs.
 specialize (Hsz _ (or_intror (or_intror (or_introl eq_refl)))) as Hcs.
 cbn; f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
+intros i j Hi Hj.
+destruct ma as (fa, ra, ca).
+destruct mb as (fb, rb, cb).
+destruct mc as (fc, rc, cc).
+cbn - [ In ] in *.
+rewrite Has in Ha; rewrite Hbs in Hb; rewrite Hcs in Hc.
+cbn in Ha, Hb, Hc.
+destruct Ha as (H1 & H2 & Ha); subst ra ca.
+destruct Hb as (H1 & H2 & Hb); subst rb cb.
+destruct Hc as (H1 & H2 & Hc); subst rc cc.
+destruct size; [ easy | cbn in Has, Hbs, Hcs |-* ].
+injection Has; clear Has; intros Has.
+injection Hbs; clear Hbs; intros Hbs.
+injection Hcs; clear Hcs; intros Hcs.
+rewrite Nat.sub_0_r.
+rewrite IHMA; [ | easy | flia | ]. 2: {
 ...
 
 Theorem is_square_bmat_loop_opp : ∀ T {ro : ring_op T} (M : bmatrix T) sizes,
