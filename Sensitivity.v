@@ -4570,7 +4570,17 @@ Qed.
 
 (* block matrix trace *)
 
-Fixpoint Tr T {so : semiring_op T} (BM : bmatrix T) :=
+Section in_ring.
+
+Context {T : Type}.
+Context {ro : ring_op T}.
+(* marche pas
+Context (so := rng_semiring).
+*)
+Context {sp : @semiring_prop T (@rng_semiring T ro)}.
+Context {rp : @ring_prop T ro}.
+
+Fixpoint Tr (so := rng_semiring) (BM : bmatrix T) :=
   match BM with
   | BM_1 x => x
   | BM_M M => (Σ (i = 0, mat_nrows M - 1), Tr (mat_el M i i))%Srng
@@ -4583,14 +4593,11 @@ Compute (let ro := Z_ring_op in let so := rng_semiring in Tr (I_2_pow 4)).
 Compute (let ro := Z_ring_op in let so := rng_semiring in Tr (A 3)).
 *)
 
-Theorem Tr_opp :
-  ∀ T {ro : ring_op T} (so := rng_semiring),
-  ∀ {sp : semiring_prop T} {rp : ring_prop T},
-  ∀ BM,
+Theorem Tr_opp : ∀ (so := rng_semiring) BM,
   is_square_bmat BM
   → Tr (- BM)%BM = (- Tr BM)%Rng.
 Proof.
-intros * sp rp * HBM.
+intros * so * HBM.
 induction BM as [x| M IHBM] using bmatrix_ind2; [ easy | ].
 cbn - [ seq "-" ].
 cbn in HBM.
@@ -4600,7 +4607,7 @@ cbn in HBM.
 rewrite rng_opp_summation; [ | easy | easy ].
 cbn.
 rewrite IHBM; [ | easy | easy | now apply HBM ].
-do 2 rewrite srng_add_0_l.
+rewrite srng_add_0_l.
 apply List_fold_left_ext_in.
 intros i x Hi.
 apply in_seq in Hi.
@@ -4613,21 +4620,21 @@ rewrite (@sizes_of_bmatrix_at_0_0 T so) with (r := mat_nrows M);
 apply HBM; flia Hi.
 Qed.
 
-Theorem Tr_A :
-  ∀ T {ro : ring_op T} (so := rng_semiring),
-  ∀ {rp : ring_prop T} {sp : semiring_prop T} n,
-  Tr (A n) = 0%Srng.
+Theorem Tr_A : ∀ (so := rng_semiring) n, Tr (A n) = 0%Srng.
 Proof.
 intros.
 induction n; [ easy | cbn ].
 rewrite IHn.
 do 2 rewrite srng_add_0_l.
 unfold so.
-rewrite Tr_opp; [ | easy | easy | apply A_is_square_bmat ].
-unfold so in IHn.
+rewrite Tr_opp; [ | apply A_is_square_bmat ].
 rewrite IHn.
 apply rng_opp_0.
 Qed.
+
+...
+
+End in_ring.
 
 ...
 
