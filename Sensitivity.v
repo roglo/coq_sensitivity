@@ -1687,19 +1687,6 @@ Qed.
               λ_i ≥ µ_i ≥ λ_{i+n-m}."
 *)
 
-(*
-Add LoadPath "../../math-comp/master".
-From mathcomp Require Import all_algebra.
-(*
-Set Implicit Arguments.
-*)
-Unset Strict Implicit.
-Unset Printing Implicit Defensive.
-Check poly.
-Print ringType.
-Print GRing.Ring.type.
-*)
-
 Require Import Semiring SRsummation.
 
 Fixpoint List_map2 A B C (f : A → B → C) la lb :=
@@ -2031,9 +2018,6 @@ Fixpoint A T {ro : ring_op T} (so := rng_semiring) n : bmatrix T :=
 Print A.
 
 Require Import ZArith.
-(*
-Open Scope Z_scope.
-*)
 
 About Z_ring_op.
 Compute (let n := 2%nat in let _ := Z_ring_op in let _ := rng_semiring in A n).
@@ -2472,7 +2456,6 @@ cbn in *.
 subst ca; clear Hrr Hzra Hzca.
 destruct ra; [ easy | cbn ].
 rewrite Nat.sub_0_r.
-(**)
 replace
   (fold_left (λ a k, a + bmat_zero_like (fa i (k + 1)%nat) * fb (k + 1)%nat j)
     (seq 0 ra) (bmat_zero_like (fa i 0 * fb 0 j)))%BM
@@ -2880,7 +2863,6 @@ specialize (Hssab (fb 0 0)).
 specialize (Hssab (Hb 0 0 Hrza Hrza) Hss).
 destruct ra; [ easy | clear Hrza; cbn ].
 rewrite Nat.sub_0_r.
-(**)
 induction ra. {
   apply IHBMA; [ flia | flia | apply Ha; flia | apply Hb; flia | easy ].
 }
@@ -3350,14 +3332,6 @@ rewrite IHn; [ | easy ].
 now apply old_bmat_add_0_l.
 Qed.
 
-(*
-Theorem bmat_mul_1_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n BM,
-  is_square_bmat BM
-  → (bmat_one_like BM * BM)%BM = BM.
-Proof.
-...
-*)
-
 Theorem bmat_mul_1_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
   bmat_fit_for_add (I_2_pow n) M
   → bmat_mul (I_2_pow n) M = M.
@@ -3528,48 +3502,6 @@ cbn; f_equal.
 now apply matrix_eq.
 Qed.
 
-(*
-Theorem bmat_add_opp_r : ∀ T {ro : ring_op T} (so := rng_semiring)
-    {rp : ring_prop T} {sp : semiring_prop T} M n,
-  bmat_fit_for_add M (Z_2_pow n)
-  → bmat_add M (bmat_opp M) = Z_2_pow n.
-Proof.
-intros * rp sp * Hss.
-revert n Hss.
-induction M as [x| M IHM] using bmatrix_ind2; intros. {
-  cbn.
-  subst so.
-  rewrite fold_rng_sub.
-  rewrite rng_add_opp_r.
-  now destruct n.
-}
-destruct n; [ easy | cbn ].
-cbn in Hss.
-destruct Hss as (Hr & Hc & Hss).
-rewrite Hr, Hc in IHM, Hss |-*.
-f_equal.
-apply matrix_eq; cbn; [ easy | easy | ].
-intros * Hi Hj.
-rewrite (IHM i j Hi Hj n). 2: {
-  specialize (Hss _ _ Hi Hj) as H; cbn in H.
-  destruct i. {
-    destruct j; [ easy | ].
-    destruct j; [ easy | flia Hj ].
-  }
-  destruct i; [ | flia Hi ].
-  destruct j; [ easy | ].
-  destruct j; [ easy | flia Hj ].
-}
-destruct i. {
-  destruct j; [ easy | cbn ].
-  destruct j; [ easy | flia Hj ].
-}
-destruct i; [ cbn | flia Hi ].
-destruct j; [ easy | cbn ].
-destruct j; [ easy | flia Hj ].
-Qed.
-*)
-
 Theorem bmat_nat_mul_0_r : ∀ T {so : semiring_op T} {sp : semiring_prop T}
     k n,
   bmat_nat_mul_l k (Z_2_pow n) = Z_2_pow n.
@@ -3728,68 +3660,6 @@ apply IHMA with (MB := mat_el mb k j); [ easy | easy | | ]. {
   now apply Hfm.
 }
 Qed.
-
-(* à finir, si c'est finissable...
-Theorem bmat_fit_for_add_mul_cancel_l : ∀ T {so : semiring_op T} MA MB MC,
-  bmat_fit_for_add MB MC
-  → bmat_fit_for_mul MA MB
-  → bmat_fit_for_add (MA * MB)%BM (MA * MC)%BM.
-Proof.
-intros * Hfa Hfm.
-revert MB MC Hfa Hfm.
-induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
-  now destruct MB, MC.
-}
-destruct MB as [xb| mb]; [ now destruct MC | ].
-destruct MC as [xc| mc]; [ easy | ].
-cbn in Hfa, Hfm |-*.
-split; [ easy | ].
-split; [ easy | ].
-destruct Hfa as (Hrr & Hcc & Hfa).
-destruct Hfm as (Ha & Hab & Hfm).
-intros * Hi Hj.
-fold (mat_el_mul_loop (mat_el ma) (mat_el mb)).
-fold (mat_el_mul_loop (mat_el ma) (mat_el mc)).
-destruct ma as (fa, ra, ca).
-destruct mb as (fb, rb, cb).
-destruct mc as (fc, rc, cc).
-cbn in *.
-move fb before fa.
-move fc before fb.
-subst rc cc rb.
-destruct ca; [ easy | clear Ha; cbn ].
-rewrite Nat.sub_0_r.
-destruct ca; cbn. {
-  apply IHMA; [ easy | flia | | ]. {
-    apply Hfa; [ flia | easy ].
-  } {
-    apply Hfm; [ easy | easy | flia ].
-  }
-}
-destruct ca; cbn. {
-  apply bmat_fit_for_add_add_l. {
-    symmetry.
-    apply bmat_fit_for_add_add_l. {
-      apply IHMA; [ easy | flia | | ]. {
-        symmetry.
-        apply Hfa; [ flia | easy ].
-      } {
-        apply bmat_fit_for_mul_add_mul with (MB := fb 0 j); [ easy | | ]. {
-          apply Hfm; [ easy | easy | flia ].
-        } {
-          apply Hfa; [ flia | easy ].
-        }
-      }
-    }
-...
-    remember (fa i 1 * fc 1 j)%BM as MA eqn:HMA.
-    remember (fa i 0 * fb 0 j)%BM as MB eqn:HMB.
-    symmetry in HMA, HMB.
-    move MB before MA.
-    destruct MA as [xa| ma]. {
-      destruct MB as [xb| mb]; [ easy | cbn ].
-...
-*)
 
 Definition bmat_same_nrows T (MA MB : bmatrix T) :=
   match (MA, MB) with
@@ -4835,9 +4705,6 @@ unfold so in Hab.
 rewrite <- Hab in H1.
 rewrite bmat_mul_0_r in H1; [ | easy | easy ].
 symmetry in H1.
-(*
-rewrite <- Hab in H1.
-*)
 rewrite (bmat_zero_like_eq_compat _ MB) in H1; [ | easy | easy | easy ].
 rewrite <- Hab in H1.
 rewrite <- (bmat_zero_like_mul _ MB) in H1; [ | easy | easy | easy ].
@@ -4860,143 +4727,6 @@ split; intros BM HBM. {
   }
 }
 Qed.
-
-(*
-Theorem bmat_list_mul_eq_compat : ∀ T {so : semiring_op T} d l1 l2 l3 l4 a,
-  length l1 = length l3
-  → length l2 = length l4
-  → (∀ i, bmat_mul (nth i l1 d) (nth i l2 d) = bmat_mul (nth i l3 d) (nth i l4 d))
-  → bmat_list_mul_loop a l1 l2 = bmat_list_mul_loop a l3 l4.
-Proof.
-intros * Hlen1 Hlen2 Hmm.
-revert a l2 l3 l4 Hlen1 Hlen2 Hmm.
-induction l1 as [| e1]; intros; [ now destruct l3 | ].
-destruct l3 as [| e3]; [ easy | cbn ].
-destruct l2 as [| e2]; [ now destruct l4 | cbn ].
-destruct l4 as [| e4]; [ easy | cbn ].
-specialize (Hmm 0) as H1; cbn in H1.
-rewrite H1.
-cbn in Hlen1, Hlen2.
-apply Nat.succ_inj in Hlen1.
-apply Nat.succ_inj in Hlen2.
-apply IHl1; [ easy | easy | ].
-intros i.
-now specialize (Hmm (S i)) as H2.
-Qed.
-*)
-
-(*
-Theorem bmat_mul_void_l : ∀ T {so : semiring_op T} M,
-  bmat_mul void_bmat M = void_bmat.
-Proof.
-intros.
-now induction M.
-Qed.
-*)
-
-(*
-Theorem bmat_mul_void_r_compat : ∀ T {so : semiring_op T} MA MB,
-  bmat_fit_for_add MA MB
-  → bmat_mul MA void_bmat = bmat_mul MB void_bmat.
-Proof.
-intros * Hss.
-revert MB Hss.
-induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
-  now destruct MB.
-}
-destruct MB as [xb| mb]; [ easy | cbn ].
-f_equal; f_equal.
-apply List_map_fun; [ apply [] | | easy ].
-destruct ma as (lla).
-destruct mb as (llb).
-move llb before lla.
-cbn in IHMA |-*.
-cbn in Hss.
-fold (@have_same_list_struct T) in Hss.
-fold (@have_same_list_list_struct T) in Hss.
-revert llb Hss.
-induction lla as [| la]; intros; [ now destruct llb | cbn ].
-destruct llb as [| lb]; [ easy | cbn ].
-f_equal.
-cbn in Hss.
-apply IHlla; [ | easy ].
-intros la1 Hla1 a1 Ha1 b1 Hab1.
-apply (IHMA la1); [ now right | easy | easy ].
-Qed.
-*)
-
-(*
-Theorem list_list_transpose_cons : ∀ T (d : T) l ll,
-  ll ≠ []
-  → (∀ l1, l1 ∈ ll → length l1 = length l)
-  → list_list_transpose d (l :: ll) =
-     List_map2 (λ a1 l1, a1 :: l1) l (list_list_transpose d ll).
-Proof.
-intros * Hll Hlenll; cbn.
-remember (length l) as len eqn:Hlen.
-symmetry in Hlen.
-revert l ll Hlen Hll Hlenll.
-induction len; intros. {
-  now apply length_zero_iff_nil in Hlen; subst l.
-}
-destruct l as [| a]; [ easy | ].
-cbn in Hlen |-*.
-apply Nat.succ_inj in Hlen.
-rewrite IHlen; [ | easy | now destruct ll | ]. 2: {
-  intros l1 Hl1.
-  clear Hll.
-  induction ll as [| l2]; [ easy | ].
-  cbn - [ In ] in Hl1.
-  destruct Hl1 as [Hl1| Hl1]. {
-    specialize (Hlenll l2 (or_introl eq_refl)) as H1.
-    destruct l2 as [| a2]; [ easy | ].
-    cbn in Hl1; subst l2.
-    now apply Nat.succ_inj in H1; rewrite <- H1.
-  }
-  apply IHll; [ | easy ].
-  intros l3 Hl3.
-  now apply Hlenll; right.
-}
-destruct ll as [| l1]; [ easy | clear Hll; cbn ].
-destruct l1 as [| a1]; [ | easy ].
-now specialize (Hlenll _ (or_introl eq_refl)).
-Qed.
-*)
-
-(*
-Theorem list_list_transpose_opp : ∀ T {ro : ring_op T} d ll,
-  list_list_transpose void_bmat (map (map (λ mm, (- mm)%BM)) ll) =
-  map (map (λ mm, (- mm)%BM)) (list_list_transpose d ll).
-Proof.
-intros.
-set (list_opp := map (λ mm, (- mm)%BM)).
-induction ll as [| l]; [ easy | ].
-cbn - [ list_list_transpose ].
-destruct ll as [| l1]. {
-  induction l as [| a]; [ easy | cbn ].
-  f_equal.
-  apply IHl.
-}
-rewrite list_list_transpose_cons; cycle 1. {
-  intros H.
-  now apply map_eq_nil in H.
-} {
-  intros l2 Hl2.
-  cbn in IHll.
-  induction l as [| a]. {
-    cbn.
-    apply in_map_iff in Hl2.
-    destruct Hl2 as (l3 & Hl3o & Hl3).
-    subst l2.
-    unfold list_opp.
-    rewrite map_length.
-    destruct Hl3 as [Hl3| Hl3]. {
-      subst l3.
-      destruct l1 as [| a1]; [ easy | exfalso ].
-      cbn in IHll.
-      injection IHll; clear IHll; intros H1 H2.
-...
-*)
 
 Theorem bmat_mul_opp_opp :
   ∀ T {ro : ring_op T} (so := rng_semiring)
@@ -5182,21 +4912,6 @@ unfold so.
 rewrite bmat_zero_like_opp; [ easy | easy | easy | ].
 apply A_is_square_bmat.
 Qed.
-
-(*
-Theorem bmat_fit_for_add_sqr_l : ∀ T {so : semiring_op T} BM,
-  bmat_fit_for_add (BM * BM)%BM BM.
-Proof.
-intros.
-induction BM as [x| m IHBM]; [ easy | cbn ].
-split; [ easy | ].
-split; [ easy | ].
-intros i j Hi Hj.
-destruct m as (f, r, c); cbn in *.
-destruct c; [ easy | cbn ].
-rewrite Nat.sub_0_r.
-...
-*)
 
 (* "We prove by induction that A_n^2 = nI" *)
 
