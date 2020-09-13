@@ -1689,6 +1689,7 @@ Qed.
 
 Require Import Semiring SRsummation.
 
+(*
 Fixpoint List_map2 A B C (f : A → B → C) la lb :=
   match la with
   | a :: la' =>
@@ -1698,6 +1699,7 @@ Fixpoint List_map2 A B C (f : A → B → C) la lb :=
       end
   | [] => []
   end.
+*)
 
 (* matrices *)
 
@@ -1714,10 +1716,12 @@ Axiom matrix_eq : ∀ T (MA MB : matrix T),
       mat_el MA i j = mat_el MB i j)
   → MA = MB.
 
+(*
 Definition void_mat {T} d : matrix T :=
   {| mat_el i j := d;
      mat_nrows := 0;
      mat_ncols := 0 |}.
+*)
 
 Definition list_list_nrows T (ll : list (list T)) :=
   length ll.
@@ -1725,8 +1729,10 @@ Definition list_list_nrows T (ll : list (list T)) :=
 Definition list_list_ncols T (ll : list (list T)) :=
   length (hd [] ll).
 
+(*
 Definition list_list_of_mat T (M : matrix T) : list (list T) :=
   map (λ i, map (mat_el M i) (seq 0 (mat_ncols M))) (seq 0 (mat_nrows M)).
+*)
 
 Definition list_list_el T d (ll : list (list T)) i j : T :=
   nth j (nth i ll []) d.
@@ -1734,10 +1740,12 @@ Definition list_list_el T d (ll : list (list T)) i j : T :=
 Definition mat_of_list_list T d (ll : list (list T)) :=
   mk_mat (list_list_el d ll) (list_list_nrows ll) (list_list_ncols ll).
 
+(*
 Compute (let (i, j) := (2, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j).
 Compute (let (i, j) := (7, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j).
 Compute (let (i, j) := (1, 3) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j).
 Compute (list_list_of_mat (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
+*)
 
 (* block matrices *)
 
@@ -1745,10 +1753,10 @@ Inductive bmatrix T :=
   | BM_1 : T → bmatrix T
   | BM_M : matrix (bmatrix T) → bmatrix T.
 
-Print void_mat.
-
+(*
 Definition void_bmat T d : bmatrix T :=
   BM_M (void_mat d).
+*)
 
 Theorem bmatrix_ind2 : ∀ T (P : bmatrix T → Prop),
   (∀ t, P (BM_1 t))
@@ -1770,6 +1778,7 @@ intros k l Hk Hl.
 now apply IHB.
 Qed.
 
+(*
 Fixpoint concat_list_in_list T (ll1 ll2 : list (list T)) :=
   match ll1 with
   | [] => ll2
@@ -1861,6 +1870,7 @@ Definition mat_add T (add : T → T → T) (M1 M2 : matrix T) :
   {| mat_el i j := add (mat_el M1 i j) (mat_el M2 i j);
      mat_nrows := mat_nrows M1;
      mat_ncols := mat_ncols M1 |}.
+*)
 
 (* addition of block matrices *)
 
@@ -1890,6 +1900,7 @@ Definition nat_semiring_op : semiring_op nat :=
      srng_add := Nat.add;
      srng_mul := Nat.mul |}.
 
+(*
 Compute (let _ := nat_semiring_op in list_list_of_mat (mat_add add (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list_list 0 [[1; 2]; [3; 4]; [5; 6]; [7; 8]]))).
 
 (* multiplication *)
@@ -1900,6 +1911,7 @@ Definition mat_mul T {so : semiring_op T} (MA MB : matrix T) :=
      mat_ncols := mat_ncols MB |}.
 
 Compute (let _ := nat_semiring_op in list_list_of_mat (mat_mul (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list_list 0 [[1; 2]; [3; 4]; [5; 6]; [7; 8]]))).
+*)
 
 (* multiplication of block matrices *)
 
@@ -1931,12 +1943,14 @@ Fixpoint bmat_mul T {so : semiring_op T} (MM1 MM2 : bmatrix T) :=
       end
   end.
 
+(*
 Definition mat_el_mul T {so : semiring_op T} MMA MMB i k :=
   fold_left
     (λ acc j,
        bmat_add acc (bmat_mul (mat_el MMA i (j + 1)) (mat_el MMB (j + 1) k)))
     (seq 0 (mat_ncols MMA - 1))
     (bmat_mul (mat_el MMA i 0) (mat_el MMB 0 k)).
+*)
 
 (* opposite *)
 
@@ -2015,8 +2029,7 @@ Fixpoint A T {ro : ring_op T} (so := rng_semiring) n : bmatrix T :=
              [I_2_pow n'; bmat_opp (A n')]])
   end.
 
-Print A.
-
+(*
 Require Import ZArith.
 
 About Z_ring_op.
@@ -2025,6 +2038,7 @@ Compute (let n := 2%nat in let _ := Z_ring_op in let _ := rng_semiring in A n).
 Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (I_2_pow n)).
 Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (A n)).
 Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (bmat_mul (A n) (A n))).
+*)
 
 Definition rng_mul_nat_l T {so : semiring_op T} n v :=
   match n with
@@ -2060,6 +2074,7 @@ Fixpoint bmat_fit_for_add T (MA MB : bmatrix T) :=
       end
   end.
 
+(*
 Fixpoint bmat_fit_for_mul T (MA MB : bmatrix T) :=
   match MA with
   | BM_1 xa =>
@@ -2078,6 +2093,7 @@ Fixpoint bmat_fit_for_mul T (MA MB : bmatrix T) :=
           bmat_fit_for_mul (mat_el MMA i k) (mat_el MMB k j)
       end
   end.
+*)
 
 Require Import Relations.
 
@@ -2319,12 +2335,14 @@ apply IHsizes.
 now apply HBM.
 Qed.
 
+(*
 Theorem eq_bmat_zero_like_BM_1 : ∀ T {so : semiring_op T} (BM : bmatrix T) x,
   bmat_zero_like BM = BM_1 x → x = 0%Srng.
 Proof.
 intros * HBM.
 destruct BM as [y| M]; cbn in HBM; [ now injection HBM | easy ].
 Qed.
+*)
 
 Theorem no_zero_bmat_size : ∀ T (BM : bmatrix T), 0 ∉ sizes_of_bmatrix BM.
 Proof.
@@ -3526,12 +3544,14 @@ destruct j; [ easy | cbn ].
 destruct j; [ easy | flia Hj ].
 Qed.
 
+(*
 Definition mat_el_mul_loop T {so : semiring_op T} f g :=
   fix mat_el_mul_loop it a (i j k : nat) :=
      match it with
      | 0 => a
      | S it' => mat_el_mul_loop it' (a + f i j * g j k)%BM i (j + 1) k
      end.
+*)
 
 Theorem bmat_fit_for_add_add_l : ∀ T {so : semiring_op T} MA MB MC,
   bmat_fit_for_add MA MC
@@ -3601,6 +3621,7 @@ rewrite (bmat_add_comm MA MB); [ | easy ].
 apply bmat_add_add_swap; [ easy | easy | now symmetry ].
 Qed.
 
+(*
 Theorem bmat_fit_for_add_mul_mul :
   ∀ T {so : semiring_op T} (MA MB MC : bmatrix T),
   bmat_fit_for_add MA MB
@@ -3700,6 +3721,7 @@ Definition bmat_nrows T (M : bmatrix T) :=
   | BM_1 _ => 0
   | BM_M m => mat_nrows m
   end.
+*)
 
 Theorem square_bmat_fit_for_add : ∀ T sizes (MA MB : bmatrix T),
   is_square_bmat_loop sizes MA
@@ -3739,6 +3761,7 @@ intros i j Hi Hj.
 apply IHsizes; [ now apply Ha | now apply Hb ].
 Qed.
 
+(*
 Theorem fold_left_add_bmat_add :
   ∀ T {so : semiring_op T} {sp : semiring_prop T},
   ∀ f x y sta len,
@@ -3766,6 +3789,7 @@ apply IHlen. {
   symmetry; apply Hyf; flia.
 }
 Qed.
+*)
 
 Theorem square_bmat_fold_left : ∀ T {so : semiring_op T},
   ∀ (fa fb : nat → nat → bmatrix T) size sizes i j,
@@ -4310,6 +4334,7 @@ unfold is_square_bmat in HM.
 now rewrite sizes_of_bmatrix_opp.
 Qed.
 
+(*
 Theorem bmat_add_cancel_l :
   ∀ T {ro : ring_op T} (so := rng_semiring) {sp : semiring_prop T}
      {rp : ring_prop T} MA MB MC,
@@ -4488,6 +4513,7 @@ split. {
   now apply Hsz; right; right; left.
 }
 Qed.
+*)
 
 Theorem bmat_add_move_l :
   ∀ T {ro : ring_op T} (so := rng_semiring) {sp : semiring_prop T}
