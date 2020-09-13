@@ -75,3 +75,16 @@ rewrite IHn; [ | | flia Hn ]. {
 intros i Hi.
 apply Hz; flia Hi.
 Qed.
+
+Theorem rng_opp_summation :
+  ∀ T (ro : ring_op T) (so := rng_semiring),
+  ∀ {rp : ring_prop T} {sp : semiring_prop T},
+  ∀ b e f,
+  ((- Σ (i = b, e), f i) = Σ (i = b, e), (- f i))%Rng.
+Proof.
+intros.
+remember (S e - b) as len.
+clear e Heqlen.
+revert b.
+induction len; intros; cbn; [ apply rng_opp_0 | ].
+...

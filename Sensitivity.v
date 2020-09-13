@@ -4568,9 +4568,52 @@ transitivity (A n). 2: {
 apply bmat_fit_for_add_IZ_A.
 Qed.
 
-Inspect 1.
+(* block matrix trace *)
 
-(* yeah! *)
+Fixpoint bmat_tr T {so : semiring_op T} (BM : bmatrix T) :=
+  match BM with
+  | BM_1 x => x
+  | BM_M M => (Σ (i = 0, mat_nrows M - 1), bmat_tr (mat_el M i i))%Srng
+  end.
+
+(*
+Require Import ZArith.
+Compute (let ro := Z_ring_op in let so := rng_semiring in bmat_tr (I_2_pow 3)).
+Compute (let ro := Z_ring_op in let so := rng_semiring in bmat_tr (I_2_pow 4)).
+Compute (let ro := Z_ring_op in let so := rng_semiring in bmat_tr (A 3)).
+*)
+
+Theorem bmat_trace_opp :
+  ∀ T {ro : ring_op T} (so := rng_semiring) {sp : semiring_prop T} BM,
+  is_square_bmat BM
+  → bmat_tr (- BM)%BM = (- bmat_tr BM)%Rng.
+Proof.
+intros * sp * HBM.
+induction BM as [x| M IHBM] using bmatrix_ind2; [ easy | ].
+cbn - [ seq "-" ].
+cbn in HBM.
+destruct (zerop (mat_nrows M)) as [Hrz| Hrz]; [ easy | ].
+destruct (zerop (mat_ncols M)) as [Hcz| Hcz]; [ easy | ].
+cbn in HBM.
+...
+rewrite rng_opp_summation.
+...
+
+Theorem A_trace :
+  ∀ T {ro : ring_op T} (so := rng_semiring),
+  ∀ {rp : ring_prop T} {sp : semiring_prop T} n,
+  bmat_tr (A n) = 0%Srng.
+Proof.
+intros.
+induction n; [ easy | cbn ].
+rewrite IHn.
+do 2 rewrite srng_add_0_l.
+unfold so.
+rewrite bmat_trace_opp; [ | easy | apply A_is_square_bmat ].
+unfold so in IHn.
+rewrite IHn.
+apply rng_opp_0.
+Qed.
 
 ...
 
