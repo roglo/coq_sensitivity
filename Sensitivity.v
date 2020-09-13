@@ -3236,6 +3236,64 @@ rewrite <- bmat_zero_like_mul_distr_r; [ | easy | ]. 2: {
 now apply bmat_zero_like_sqr.
 Qed.
 
+(* à faire... peut-être
+Theorem old_bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
+  bmat_fit_for_add (I_2_pow n) M
+  → bmat_mul (Z_2_pow n) M = Z_2_pow n.
+Proof.
+intros * sp * Hss.
+revert M Hss.
+induction n; intros. {
+cbn.
+  destruct M as [xm| mm]; [ now cbn; rewrite srng_mul_0_r | easy ].
+}
+destruct M as [xm| mm]; [ easy | ].
+cbn in Hss.
+destruct Hss as (Hr & Hc & Hss).
+cbn; f_equal.
+rewrite <- Hr, <- Hc.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros * Hi Hj.
+specialize (Hss 0 0 Nat.lt_0_2 Nat.lt_0_2) as Hij00; cbn in Hij00.
+specialize (Hss 0 1 Nat.lt_0_2 Nat.lt_1_2) as Hij01; cbn in Hij01.
+specialize (Hss 1 0 Nat.lt_1_2 Nat.lt_0_2) as Hij10; cbn in Hij10.
+specialize (Hss 1 1 Nat.lt_1_2 Nat.lt_1_2) as Hij11; cbn in Hij11.
+destruct i. {
+  destruct j. {
+    rewrite IHn; [ cbn | easy ].
+    rewrite IHn. 2: {
+      transitivity (Z_2_pow n); [ | easy ].
+      apply bmat_fit_for_add_IZ_IZ.
+    }
+    now apply old_bmat_add_0_l.
+  }
+  destruct j; [ cbn | flia Hj ].
+  rewrite IHn; [ | easy ].
+  rewrite IHn. 2: {
+    transitivity (Z_2_pow n); [ | easy ].
+    apply bmat_fit_for_add_IZ_IZ.
+  }
+  now apply old_bmat_add_0_l.
+}
+destruct i; [ cbn | flia Hi ].
+destruct j. {
+  rewrite IHn. 2: {
+    transitivity (Z_2_pow n); [ | easy ].
+    apply bmat_fit_for_add_IZ_IZ.
+  }
+  rewrite IHn; [ | easy ].
+  now apply old_bmat_add_0_l.
+}
+destruct j; [ | flia Hj ].
+rewrite IHn. 2: {
+  transitivity (Z_2_pow n); [ | easy ].
+  apply bmat_fit_for_add_IZ_IZ.
+}
+rewrite IHn; [ | easy ].
+now apply old_bmat_add_0_l.
+Qed.
+*)
+
 Theorem old_bmat_mul_0_r : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
   bmat_fit_for_add (I_2_pow n) M
   → bmat_mul M (Z_2_pow n) = Z_2_pow n.
@@ -3291,7 +3349,6 @@ rewrite IHn. 2: {
 rewrite IHn; [ | easy ].
 now apply old_bmat_add_0_l.
 Qed.
-(**)
 
 (*
 Theorem bmat_mul_1_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n BM,
@@ -3301,7 +3358,6 @@ Proof.
 ...
 *)
 
-(*
 Theorem bmat_mul_1_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
   bmat_fit_for_add (I_2_pow n) M
   → bmat_mul (I_2_pow n) M = M.
@@ -3333,6 +3389,7 @@ destruct i. {
     apply bmat_fit_for_add_IZ_IZ.
   }
   rewrite fold_Z_2_pow.
+...
   rewrite bmat_mul_0_l; [ | easy | ]. 2: {
     destruct j. {
       transitivity (Z_2_pow n); [ | easy ].
@@ -3370,7 +3427,8 @@ destruct j; [ | flia Hj ].
 transitivity (I_2_pow n); [ | easy ].
 apply bmat_fit_for_add_IZ_IZ.
 Qed.
-*)
+
+...
 
 Theorem bmat_mul_1_r : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
   bmat_fit_for_add (I_2_pow n) M
@@ -5019,18 +5077,6 @@ split; intros BM HBM. {
 }
 Qed.
 
-Theorem bmat_nat_mul_succ :
-  ∀ T {ro : ring_op T} (so := rng_semiring),
-  ∀ {rp : ring_prop T} {sp : semiring_prop T} n,
-  bmat_nat_mul_l (S n) (I_2_pow n) =
-  (bmat_nat_mul_l n (I_2_pow n) + I_2_pow n * I_2_pow n)%BM.
-Proof.
-intros.
-rewrite bmat_add_nat_mul_l_succ; [ | easy ].
-f_equal.
-now rewrite bmat_mul_1_r.
-Qed.
-
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I :
@@ -5046,10 +5092,20 @@ intros * Hi Hj.
 destruct i. {
   destruct j. {
     cbn; rewrite IHn; symmetry.
-    now apply bmat_nat_mul_succ.
+    rewrite bmat_add_nat_mul_l_succ; [ | easy ].
+    now rewrite bmat_mul_1_r.
   }
-  destruct j; [ | flia Hj ].
-  cbn.
+  destruct j; [ cbn | flia Hj ].
+  rewrite bmat_add_nat_mul_l_succ; [ | easy ].
+  rewrite bmat_mul_1_r; [ | easy | ]. 2: {
+    unfold I_2_pow.
+    apply bmat_fit_for_add_IZ_A.
+  }
+...
+  rewrite bmat_mul_1_l; [ | easy | ]. 2: {
+    unfold I_2_pow.
+    apply bmat_fit_for_add_IZ_A.
+  }
 ...
 intros.
 induction n; intros; [ now cbn; rewrite srng_mul_0_l | ].
