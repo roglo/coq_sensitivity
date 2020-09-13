@@ -4568,8 +4568,6 @@ transitivity (A n). 2: {
 apply bmat_fit_for_add_IZ_A.
 Qed.
 
-(* block matrix trace *)
-
 Section in_ring.
 
 Context {T : Type}.
@@ -4579,6 +4577,8 @@ Context (so := rng_semiring).
 *)
 Context {sp : @semiring_prop T (@rng_semiring T ro)}.
 Context {rp : @ring_prop T ro}.
+
+(* block matrix trace *)
 
 Fixpoint Tr (so := rng_semiring) (BM : bmatrix T) :=
   match BM with
