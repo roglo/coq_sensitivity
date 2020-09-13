@@ -3492,7 +3492,7 @@ transitivity (I_2_pow n); [ | easy ].
 apply bmat_fit_for_add_IZ_IZ.
 Qed.
 
-Theorem bmat_add_nat_mul_l_succ : ∀ T {so : semiring_op T}
+Theorem bmat_nat_mul_l_succ : ∀ T {so : semiring_op T}
     {sp : semiring_prop T} n M,
   bmat_nat_mul_l (S n) M = bmat_add (bmat_nat_mul_l n M) M.
 Proof.
@@ -3926,39 +3926,6 @@ apply IHsize. {
   intros k Hk; apply Ha; flia Hk.
 } {
   intros k Hk; apply Hb; flia Hk.
-}
-Qed.
-
-Theorem square_bmat_mul : ∀ T {so : semiring_op T} {sp : semiring_prop T},
-  ∀ MA MB sizes,
-  is_square_bmat_loop sizes MA
-  → is_square_bmat_loop sizes MB
-  → is_square_bmat_loop sizes (MA * MB)%BM.
-Proof.
-intros * sp * Ha Hb.
-revert MA MB Ha Hb.
-induction sizes as [| size]; intros; [ now destruct MA, MB | ].
-cbn in Ha, Hb |-*.
-destruct MA as [xa| ma]; [ easy | ].
-destruct MB as [xb| mb]; [ easy | cbn ].
-destruct Ha as (Hra & Hca & Ha).
-destruct Hb as (Hrb & Hcb & Hb).
-split; [ easy | ].
-split; [ easy | ].
-intros i j Hi Hj.
-progress fold (mat_el_mul ma mb i j).
-destruct ma as (fa, ra, ca).
-destruct mb as (fb, rb, cb).
-cbn in *.
-subst ra ca rb cb.
-destruct size; [ easy | cbn ].
-rewrite Nat.sub_0_r.
-apply square_bmat_fold_left; [ easy | | ]. {
-  intros k Hk.
-  apply Ha; [ easy | flia Hk ].
-} {
-  intros k Hk.
-  apply Hb; [ flia Hk | easy ].
 }
 Qed.
 
@@ -5083,7 +5050,7 @@ induction n; [ easy | cbn ].
 split; [ easy | ].
 split; [ easy | ].
 intros i j Hi Hj.
-rewrite bmat_add_nat_mul_l_succ; [ | easy ].
+rewrite bmat_nat_mul_l_succ; [ | easy ].
 destruct i; cbn. {
   destruct j; cbn. {
     symmetry.
@@ -5216,6 +5183,21 @@ rewrite bmat_zero_like_opp; [ easy | easy | easy | ].
 apply A_is_square_bmat.
 Qed.
 
+(*
+Theorem bmat_fit_for_add_sqr_l : ∀ T {so : semiring_op T} BM,
+  bmat_fit_for_add (BM * BM)%BM BM.
+Proof.
+intros.
+induction BM as [x| m IHBM]; [ easy | cbn ].
+split; [ easy | ].
+split; [ easy | ].
+intros i j Hi Hj.
+destruct m as (f, r, c); cbn in *.
+destruct c; [ easy | cbn ].
+rewrite Nat.sub_0_r.
+...
+*)
+
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I :
@@ -5231,11 +5213,11 @@ intros * Hi Hj.
 destruct i. {
   destruct j. {
     cbn; rewrite IHn; symmetry.
-    rewrite bmat_add_nat_mul_l_succ; [ | easy ].
+    rewrite bmat_nat_mul_l_succ; [ | easy ].
     now rewrite bmat_mul_1_r.
   }
   destruct j; [ cbn | flia Hj ].
-  rewrite bmat_add_nat_mul_l_succ; [ | easy ].
+  rewrite bmat_nat_mul_l_succ; [ | easy ].
   rewrite bmat_mul_1_r; [ | easy | ]. 2: {
     unfold I_2_pow.
     apply bmat_fit_for_add_IZ_A.
@@ -5256,51 +5238,42 @@ destruct i. {
 }
 destruct i; [ | flia Hi ].
 destruct j; cbn. {
-...
-intros.
-induction n; intros; [ now cbn; rewrite srng_mul_0_l | ].
-cbn; f_equal; f_equal.
-rewrite IHn.
-rewrite bmat_mul_1_r; [ | easy | easy ].
-rewrite bmat_mul_1_r; [ | easy | ]. 2: {
-  apply bmat_fit_for_add_IZ_A.
-}
-rewrite bmat_mul_1_l; [ | easy | ]. 2: {
-  transitivity (A n); [ | apply bmat_fit_for_add_opp_r ].
-  apply bmat_fit_for_add_IZ_A.
-}
-rewrite bmat_mul_1_l; [ | easy | ]. 2: {
-  apply bmat_fit_for_add_IZ_A.
-}
-rewrite fold_Z_2_pow.
-rewrite bmat_nat_mul_0_r; [ | easy ].
-f_equal. {
-  f_equal. {
-    symmetry.
-    now apply bmat_add_nat_mul_l_succ.
+  rewrite bmat_mul_1_l; [ | easy | ]. 2: {
+    apply bmat_fit_for_add_IZ_A.
   }
-  f_equal.
-  apply bmat_add_opp_r; [ easy | easy | ].
-  symmetry.
-  apply bmat_fit_for_add_IZ_A.
-}
-f_equal.
-f_equal. {
   rewrite bmat_mul_1_r; [ | easy | ]. 2: {
-    transitivity (A n); [ apply bmat_fit_for_add_IZ_A | ].
-    apply bmat_fit_for_add_opp_r.
+    transitivity (A n); [ | apply bmat_fit_for_add_opp_r ].
+    apply bmat_fit_for_add_IZ_A.
   }
-  apply bmat_add_opp_r; [ easy | easy | ].
-  symmetry.
-  apply bmat_fit_for_add_IZ_A.
+  unfold so.
+  rewrite bmat_add_opp_r; [ | easy | easy ].
+  rewrite bmat_nat_mul_l_succ; [ | easy ].
+  rewrite fold_Z_2_pow.
+  rewrite bmat_nat_mul_0_r; [ | easy ].
+  rewrite bmat_add_0_r; [ | easy | easy ].
+  now apply bmat_zero_like_A_eq_Z.
 }
-f_equal.
-rewrite bmat_add_nat_mul_l_succ; [ | easy ].
-rewrite bmat_add_comm; [ | easy ].
-f_equal.
+destruct j; [ cbn | flia Hj ].
+rewrite bmat_mul_1_l; [ | easy | easy ].
+unfold so.
+rewrite bmat_mul_sqr_opp; [ | easy | easy | apply A_is_square_bmat ].
+rewrite bmat_nat_mul_l_succ; [ | easy ].
+unfold so in IHn.
 rewrite <- IHn.
-...
-apply bmat_mul_sqr_opp.
+apply bmat_add_comm; [ easy | ].
+transitivity (A n). 2: {
+  apply (square_bmat_fit_for_add (sizes_of_bmatrix (A n))). {
+    apply A_is_square_bmat.
+  }
+  apply is_square_bmat_loop_mul; apply A_is_square_bmat.
+}
+apply bmat_fit_for_add_IZ_A.
+Qed.
+
+Inspect 1.
+
+(* yeah! *)
+
 ...
 
 Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
