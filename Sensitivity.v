@@ -3236,8 +3236,8 @@ rewrite <- bmat_zero_like_mul_distr_r; [ | easy | ]. 2: {
 now apply bmat_zero_like_sqr.
 Qed.
 
-(* à faire... peut-être
-Theorem old_bmat_mul_0_l : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
+Theorem bmat_mul_Z_2_pow_l : ∀ T {so : semiring_op T } {sp : semiring_prop T},
+  ∀ n M,
   bmat_fit_for_add (I_2_pow n) M
   → bmat_mul (Z_2_pow n) M = Z_2_pow n.
 Proof.
@@ -3245,13 +3245,13 @@ intros * sp * Hss.
 revert M Hss.
 induction n; intros. {
 cbn.
-  destruct M as [xm| mm]; [ now cbn; rewrite srng_mul_0_r | easy ].
+  destruct M as [xm| mm]; [ now cbn; rewrite srng_mul_0_l | easy ].
 }
 destruct M as [xm| mm]; [ easy | ].
 cbn in Hss.
 destruct Hss as (Hr & Hc & Hss).
 cbn; f_equal.
-rewrite <- Hr, <- Hc.
+rewrite <- Hc.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros * Hi Hj.
 specialize (Hss 0 0 Nat.lt_0_2 Nat.lt_0_2) as Hij00; cbn in Hij00.
@@ -3268,20 +3268,20 @@ destruct i. {
     now apply old_bmat_add_0_l.
   }
   destruct j; [ cbn | flia Hj ].
-  rewrite IHn; [ | easy ].
   rewrite IHn. 2: {
     transitivity (Z_2_pow n); [ | easy ].
     apply bmat_fit_for_add_IZ_IZ.
   }
+  rewrite IHn; [ | easy ].
   now apply old_bmat_add_0_l.
 }
 destruct i; [ cbn | flia Hi ].
 destruct j. {
+  rewrite IHn; [ | easy ].
   rewrite IHn. 2: {
     transitivity (Z_2_pow n); [ | easy ].
     apply bmat_fit_for_add_IZ_IZ.
   }
-  rewrite IHn; [ | easy ].
   now apply old_bmat_add_0_l.
 }
 destruct j; [ | flia Hj ].
@@ -3292,9 +3292,9 @@ rewrite IHn. 2: {
 rewrite IHn; [ | easy ].
 now apply old_bmat_add_0_l.
 Qed.
-*)
 
-Theorem old_bmat_mul_0_r : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
+Theorem bmat_mul_Z_2_pow_r : ∀ T {so : semiring_op T } {sp : semiring_prop T},
+  ∀ n M,
   bmat_fit_for_add (I_2_pow n) M
   → bmat_mul M (Z_2_pow n) = Z_2_pow n.
 Proof.
@@ -3389,8 +3389,7 @@ destruct i. {
     apply bmat_fit_for_add_IZ_IZ.
   }
   rewrite fold_Z_2_pow.
-...
-  rewrite bmat_mul_0_l; [ | easy | ]. 2: {
+  rewrite bmat_mul_Z_2_pow_l; [ | easy | ]. 2: {
     destruct j. {
       transitivity (Z_2_pow n); [ | easy ].
       apply bmat_fit_for_add_IZ_IZ.
@@ -3408,7 +3407,7 @@ destruct i. {
 }
 destruct i; [ cbn | flia Hi ].
 rewrite fold_Z_2_pow.
-rewrite bmat_mul_0_l; [ | easy | ]. 2: {
+rewrite bmat_mul_Z_2_pow_l; [ | easy | ]. 2: {
   destruct j; [ easy | ].
   destruct j; [ | flia Hj ].
   transitivity (Z_2_pow n); [ | easy ].
@@ -3421,14 +3420,12 @@ rewrite IHn. 2: {
   }
   destruct j; [ easy | flia Hj ].
 }
-apply bmat_add_0_l; [ easy | ].
+apply old_bmat_add_0_l; [ easy | ].
 destruct j; [ easy | ].
 destruct j; [ | flia Hj ].
 transitivity (I_2_pow n); [ | easy ].
 apply bmat_fit_for_add_IZ_IZ.
 Qed.
-
-...
 
 Theorem bmat_mul_1_r : ∀ T {so : semiring_op T } {sp : semiring_prop T} n M,
   bmat_fit_for_add (I_2_pow n) M
@@ -3456,7 +3453,7 @@ destruct i. {
   destruct j. {
     rewrite IHn; [ | easy ].
     rewrite fold_Z_2_pow.
-    rewrite old_bmat_mul_0_r; [ | easy | ]. 2: {
+    rewrite bmat_mul_Z_2_pow_r; [ | easy | ]. 2: {
       transitivity (Z_2_pow n); [ | easy ].
       apply bmat_fit_for_add_IZ_IZ.
     }
@@ -3466,7 +3463,7 @@ destruct i. {
   }
   destruct j; [ | flia Hj ].
   rewrite fold_Z_2_pow.
-  rewrite old_bmat_mul_0_r; [ | easy | easy ].
+  rewrite bmat_mul_Z_2_pow_r; [ | easy | easy ].
   rewrite IHn. 2: {
     transitivity (Z_2_pow n); [ | easy ].
     apply bmat_fit_for_add_IZ_IZ.
@@ -3480,12 +3477,12 @@ destruct j. {
     apply bmat_fit_for_add_IZ_IZ.
   }
   rewrite fold_Z_2_pow.
-  rewrite old_bmat_mul_0_r; [ | easy | easy ].
+  rewrite bmat_mul_Z_2_pow_r; [ | easy | easy ].
   now apply bmat_add_0_r.
 }
 destruct j; [ | flia Hj ].
 rewrite fold_Z_2_pow.
-rewrite old_bmat_mul_0_r; [ | easy | ]. 2: {
+rewrite bmat_mul_Z_2_pow_r; [ | easy | ]. 2: {
   transitivity (Z_2_pow n); [ | easy ].
   apply bmat_fit_for_add_IZ_IZ.
 }
@@ -5101,11 +5098,30 @@ destruct i. {
     unfold I_2_pow.
     apply bmat_fit_for_add_IZ_A.
   }
-...
   rewrite bmat_mul_1_l; [ | easy | ]. 2: {
     unfold I_2_pow.
-    apply bmat_fit_for_add_IZ_A.
+    transitivity (A n); [ apply bmat_fit_for_add_IZ_A | ].
+    apply bmat_fit_for_add_opp_r.
   }
+  unfold so.
+  rewrite bmat_add_opp_r; [ | easy | easy ].
+  rewrite fold_Z_2_pow.
+  rewrite bmat_add_0_r; [ | easy | ]. 2: {
+    transitivity (A n * A n)%BM. 2: {
+      rewrite IHn.
+      (* lemma to do *)
+      clear - sp.
+      induction n; [ easy | cbn ].
+      split; [ easy | ].
+      split; [ easy | ].
+      intros i j Hi Hj.
+      rewrite bmat_add_nat_mul_l_succ; [ | easy ].
+      rewrite bmat_add_nat_mul_l_succ; [ | easy ].
+      destruct i; cbn. {
+        destruct j; cbn. {
+          apply bmat_fit_for_add_add_l. {
+            symmetry.
+            apply bmat_fit_for_add_add_l; [ now symmetry | ].
 ...
 intros.
 induction n; intros; [ now cbn; rewrite srng_mul_0_l | ].
