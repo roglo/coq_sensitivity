@@ -1,3 +1,5 @@
+BlockMat.vio: BlockMat.v Misc.vio Semiring.vio SRsummation.vio
+BlockMat.vo BlockMat.glob BlockMat.v.beautified BlockMat.required_vo: BlockMat.v Misc.vo Semiring.vo SRsummation.vo
 Misc.vio: Misc.v 
 Misc.vo Misc.glob Misc.v.beautified Misc.required_vo: Misc.v 
 Ring2.vio: Ring2.v 
@@ -10,7 +12,7 @@ SRsummation.vio: SRsummation.v Semiring.vio Misc.vio
 SRsummation.vo SRsummation.glob SRsummation.v.beautified SRsummation.required_vo: SRsummation.v Semiring.vo Misc.vo
 Semiring.vio: Semiring.v 
 Semiring.vo Semiring.glob Semiring.v.beautified Semiring.required_vo: Semiring.v 
-Sensitivity.vio: Sensitivity.v Misc.vio Semiring.vio SRsummation.vio
-Sensitivity.vo Sensitivity.glob Sensitivity.v.beautified Sensitivity.required_vo: Sensitivity.v Misc.vo Semiring.vo SRsummation.vo
+Sensitivity.vio: Sensitivity.v Misc.vio
+Sensitivity.vo Sensitivity.glob Sensitivity.v.beautified Sensitivity.required_vo: Sensitivity.v Misc.vo
 toto.vio: toto.v Misc.vio Semiring.vio SRsummation.vio
 toto.vo toto.glob toto.v.beautified toto.required_vo: toto.v Misc.vo Semiring.vo SRsummation.vo
