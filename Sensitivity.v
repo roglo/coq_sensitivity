@@ -4570,46 +4570,60 @@ Qed.
 
 (* block matrix trace *)
 
-Fixpoint bmat_tr T {so : semiring_op T} (BM : bmatrix T) :=
+Fixpoint Tr T {so : semiring_op T} (BM : bmatrix T) :=
   match BM with
   | BM_1 x => x
-  | BM_M M => (Σ (i = 0, mat_nrows M - 1), bmat_tr (mat_el M i i))%Srng
+  | BM_M M => (Σ (i = 0, mat_nrows M - 1), Tr (mat_el M i i))%Srng
   end.
 
 (*
 Require Import ZArith.
-Compute (let ro := Z_ring_op in let so := rng_semiring in bmat_tr (I_2_pow 3)).
-Compute (let ro := Z_ring_op in let so := rng_semiring in bmat_tr (I_2_pow 4)).
-Compute (let ro := Z_ring_op in let so := rng_semiring in bmat_tr (A 3)).
+Compute (let ro := Z_ring_op in let so := rng_semiring in Tr (I_2_pow 3)).
+Compute (let ro := Z_ring_op in let so := rng_semiring in Tr (I_2_pow 4)).
+Compute (let ro := Z_ring_op in let so := rng_semiring in Tr (A 3)).
 *)
 
-Theorem bmat_trace_opp :
-  ∀ T {ro : ring_op T} (so := rng_semiring) {sp : semiring_prop T} BM,
+Theorem Tr_opp :
+  ∀ T {ro : ring_op T} (so := rng_semiring),
+  ∀ {sp : semiring_prop T} {rp : ring_prop T},
+  ∀ BM,
   is_square_bmat BM
-  → bmat_tr (- BM)%BM = (- bmat_tr BM)%Rng.
+  → Tr (- BM)%BM = (- Tr BM)%Rng.
 Proof.
-intros * sp * HBM.
+intros * sp rp * HBM.
 induction BM as [x| M IHBM] using bmatrix_ind2; [ easy | ].
 cbn - [ seq "-" ].
 cbn in HBM.
 destruct (zerop (mat_nrows M)) as [Hrz| Hrz]; [ easy | ].
 destruct (zerop (mat_ncols M)) as [Hcz| Hcz]; [ easy | ].
 cbn in HBM.
-...
-rewrite rng_opp_summation.
-...
+rewrite rng_opp_summation; [ | easy | easy ].
+cbn.
+rewrite IHBM; [ | easy | easy | now apply HBM ].
+do 2 rewrite srng_add_0_l.
+apply List_fold_left_ext_in.
+intros i x Hi.
+apply in_seq in Hi.
+f_equal.
+destruct HBM as (_ & Hcr & HBM).
+apply IHBM; [ flia Hi | flia Hi Hcr | ].
+unfold is_square_bmat.
+rewrite (@sizes_of_bmatrix_at_0_0 T so) with (r := mat_nrows M);
+  [ | easy | easy | flia Hi | flia Hcr Hi ].
+apply HBM; flia Hi.
+Qed.
 
-Theorem A_trace :
+Theorem Tr_A :
   ∀ T {ro : ring_op T} (so := rng_semiring),
   ∀ {rp : ring_prop T} {sp : semiring_prop T} n,
-  bmat_tr (A n) = 0%Srng.
+  Tr (A n) = 0%Srng.
 Proof.
 intros.
 induction n; [ easy | cbn ].
 rewrite IHn.
 do 2 rewrite srng_add_0_l.
 unfold so.
-rewrite bmat_trace_opp; [ | easy | apply A_is_square_bmat ].
+rewrite Tr_opp; [ | easy | easy | apply A_is_square_bmat ].
 unfold so in IHn.
 rewrite IHn.
 apply rng_opp_0.
