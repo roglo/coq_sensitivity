@@ -5074,6 +5074,148 @@ split; intros BM HBM. {
 }
 Qed.
 
+Theorem bmat_fit_for_add_Z_2_pow_bmat_nat_mul_l :
+  ∀ T {ro : ring_op T} (so := rng_semiring) {sp : semiring_prop T} n,
+  bmat_fit_for_add (Z_2_pow n) (bmat_nat_mul_l n (Z_2_pow n)).
+Proof.
+intros.
+induction n; [ easy | cbn ].
+split; [ easy | ].
+split; [ easy | ].
+intros i j Hi Hj.
+rewrite bmat_add_nat_mul_l_succ; [ | easy ].
+destruct i; cbn. {
+  destruct j; cbn. {
+    symmetry.
+    now apply bmat_fit_for_add_add_l; symmetry.
+  }
+  destruct j; [ | flia Hj ].
+  symmetry.
+  now apply bmat_fit_for_add_add_l; symmetry.
+}
+destruct i; [ | flia Hi ].
+destruct j; cbn. {
+  symmetry.
+  now apply bmat_fit_for_add_add_l; symmetry.
+}
+destruct j; [ | flia Hj ]. {
+  symmetry.
+  now apply bmat_fit_for_add_add_l; symmetry.
+}
+Qed.
+
+Theorem bmat_zero_like_IZ_eq_Z :
+  ∀ T {ro : ring_op T} (so := rng_semiring),
+  ∀ u n, bmat_zero_like (IZ_2_pow u n) = Z_2_pow n.
+Proof.
+intros.
+revert u.
+induction n; intros; [ easy | cbn ].
+f_equal.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros i j Hi Hj.
+destruct i; cbn. {
+  destruct j; cbn; [ easy | ].
+  destruct j; [ easy | flia Hj ].
+}
+destruct i; [ cbn | flia Hi ].
+destruct j; cbn; [ easy | ].
+destruct j; [ easy | flia Hj ].
+Qed.
+
+Theorem sizes_of_bmatrix_A : ∀ T {ro : ring_op T} n,
+  sizes_of_bmatrix (A n) = repeat 2 n.
+Proof.
+intros.
+induction n; [ easy | now cbn; f_equal ].
+Qed.
+
+Theorem sizes_of_bmatrix_IZ : ∀ T {ro : ring_op T} (so := rng_semiring) n u,
+  sizes_of_bmatrix (IZ_2_pow u n) = repeat 2 n.
+Proof.
+intros.
+induction n; [ easy | now cbn; f_equal ].
+Qed.
+
+Theorem IZ_is_square_bmat : ∀ T {ro : ring_op T} (so := rng_semiring) n u,
+  is_square_bmat (IZ_2_pow u n).
+Proof.
+intros.
+revert u.
+induction n; intros; [ easy | cbn ].
+split; [ easy | ].
+split; [ easy | ].
+intros i j Hi Hj.
+destruct i; cbn. {
+  destruct j; [ apply IHn | cbn ].
+  destruct j; [ | flia Hj ].
+  unfold so.
+  rewrite sizes_of_bmatrix_IZ.
+  rewrite <- (sizes_of_bmatrix_IZ n 0%Srng).
+  apply IHn.
+}
+destruct i; [ | flia Hi ].
+destruct j; cbn. {
+  unfold so.
+  rewrite sizes_of_bmatrix_IZ.
+  rewrite <- (sizes_of_bmatrix_IZ n 0%Srng).
+  apply IHn.
+}
+destruct j; [ | flia Hj ].
+apply IHn.
+Qed.
+
+Theorem A_is_square_bmat : ∀ T {ro : ring_op T} (so := rng_semiring) n,
+  is_square_bmat (A n).
+Proof.
+intros.
+induction n; [ easy | cbn ].
+split; [ easy | ].
+split; [ easy | ].
+intros i j Hi Hj.
+destruct i; cbn. {
+  destruct j; [ easy | cbn ].
+  destruct j; [ | flia Hj ].
+  rewrite sizes_of_bmatrix_A.
+  rewrite <- (sizes_of_bmatrix_IZ n 1%Srng).
+  apply IZ_is_square_bmat.
+}
+destruct i; [ cbn | flia Hi ].
+destruct j; cbn. {
+  rewrite sizes_of_bmatrix_A.
+  rewrite <- (sizes_of_bmatrix_IZ n 1%Srng).
+  apply IZ_is_square_bmat.
+}
+destruct j; [ | flia Hj ].
+apply is_square_bmat_loop_opp.
+apply IHn.
+Qed.
+
+Theorem bmat_zero_like_A_eq_Z :
+  ∀ T {ro : ring_op T} (so := rng_semiring)
+     {rp : ring_prop T} {sp : semiring_prop T},
+  ∀ n, bmat_zero_like (A n) = Z_2_pow n.
+Proof.
+intros.
+induction n; [ easy | cbn ].
+f_equal.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros i j Hi Hj.
+destruct i; cbn. {
+  destruct j; cbn; [ easy | ].
+  destruct j; [ cbn | flia Hj ].
+  apply bmat_zero_like_IZ_eq_Z.
+}
+destruct i; [ cbn | flia Hi ].
+destruct j; cbn. {
+  apply bmat_zero_like_IZ_eq_Z.
+}
+destruct j; [ | flia Hj ].
+unfold so.
+rewrite bmat_zero_like_opp; [ easy | easy | easy | ].
+apply A_is_square_bmat.
+Qed.
+
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I :
@@ -5107,21 +5249,13 @@ destruct i. {
   rewrite bmat_add_opp_r; [ | easy | easy ].
   rewrite fold_Z_2_pow.
   rewrite bmat_add_0_r; [ | easy | ]. 2: {
-    transitivity (A n * A n)%BM. 2: {
-      rewrite IHn.
-      (* lemma to do *)
-      clear - sp.
-      induction n; [ easy | cbn ].
-      split; [ easy | ].
-      split; [ easy | ].
-      intros i j Hi Hj.
-      rewrite bmat_add_nat_mul_l_succ; [ | easy ].
-      rewrite bmat_add_nat_mul_l_succ; [ | easy ].
-      destruct i; cbn. {
-        destruct j; cbn. {
-          apply bmat_fit_for_add_add_l. {
-            symmetry.
-            apply bmat_fit_for_add_add_l; [ now symmetry | ].
+    now apply bmat_fit_for_add_Z_2_pow_bmat_nat_mul_l.
+  }
+  rewrite bmat_nat_mul_0_r; [ | easy ].
+  now apply bmat_zero_like_A_eq_Z.
+}
+destruct i; [ | flia Hi ].
+destruct j; cbn. {
 ...
 intros.
 induction n; intros; [ now cbn; rewrite srng_mul_0_l | ].
