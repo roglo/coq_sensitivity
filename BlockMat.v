@@ -110,8 +110,6 @@ Fixpoint list_list_of_bmat T (MM : bmatrix T) : list (list T) :=
       List.concat ll
   end.
 
-Section in_ring_1.
-
 Context {T : Type}.
 Context {ro : ring_op T}.
 (* marche pas
@@ -122,15 +120,14 @@ Context {rp : @ring_prop T ro}.
 
 (* addition *)
 
-Definition mat_add T (add : T → T → T) (M1 M2 : matrix T) :
-    matrix T :=
+Definition mat_add (add : T → T → T) (M1 M2 : matrix T) : matrix T :=
   {| mat_el i j := add (mat_el M1 i j) (mat_el M2 i j);
      mat_nrows := mat_nrows M1;
      mat_ncols := mat_ncols M1 |}.
 
 (* addition of block matrices *)
 
-Fixpoint bmat_add {so : semiring_op T} (MM1 MM2 : bmatrix T) :=
+Fixpoint bmat_add (so := rng_semiring) (MM1 MM2 : bmatrix T) :=
   match MM1 with
   | BM_1 xa =>
       match MM2 with
@@ -162,7 +159,7 @@ Compute (let _ := nat_semiring_op in list_list_of_mat (mat_add add (mat_of_list_
 
 (* multiplication *)
 
-Definition mat_mul T {so : semiring_op T} (MA MB : matrix T) :=
+Definition mat_mul (so := rng_semiring) (MA MB : matrix T) :=
   {| mat_el i k := (Σ (j = 0, mat_ncols MA), mat_el MA i j * mat_el MB j k)%Srng;
      mat_nrows := mat_nrows MA;
      mat_ncols := mat_ncols MB |}.
@@ -173,7 +170,7 @@ Compute (let _ := nat_semiring_op in list_list_of_mat (mat_mul (mat_of_list_list
 
 (* multiplication of block matrices *)
 
-Fixpoint bmat_mul {so : semiring_op T} (MM1 MM2 : bmatrix T) :=
+Fixpoint bmat_mul (so := rng_semiring) (MM1 MM2 : bmatrix T) :=
   match MM1 with
   | BM_1 xa =>
       match MM2 with
@@ -215,7 +212,7 @@ Fixpoint bmat_opp BM : bmatrix T :=
       BM_M M
   end.
 
-Theorem bmat_opp_involutive : ∀ (so := @rng_semiring T ro) BM,
+Theorem bmat_opp_involutive : ∀ (so := rng_semiring) BM,
   bmat_opp (bmat_opp BM) = BM.
 Proof.
 intros.
@@ -234,8 +231,6 @@ Qed.
 Definition bmat_sub (so := rng_semiring) BMA BMB :=
   bmat_add BMA (bmat_opp BMB).
 
-End in_ring_1.
-
 Declare Scope BM_scope.
 Delimit Scope BM_scope with BM.
 
@@ -250,19 +245,9 @@ End bmatrix_Notations.
 
 Import bmatrix_Notations.
 
-Section in_ring_2.
-
-Context {T : Type}.
-Context {ro : ring_op T}.
-(* marche pas
-Context (so := rng_semiring).
-*)
-Context {sp : @semiring_prop T (@rng_semiring T ro)}.
-Context {rp : @ring_prop T ro}.
-
 (* sequence "An" *)
 
-Fixpoint IZ_2_pow {so : semiring_op T} (u : T) n :=
+Fixpoint IZ_2_pow (so := rng_semiring) (u : T) n :=
   match n with
   | 0 => BM_1 u
   | S n' =>
@@ -272,11 +257,15 @@ Fixpoint IZ_2_pow {so : semiring_op T} (u : T) n :=
             [IZ_2_pow 0%Srng n'; IZ_2_pow u n']])
   end.
 
-Definition I_2_pow {so : semiring_op T} := IZ_2_pow 1%Srng.
-Definition Z_2_pow {so : semiring_op T} := IZ_2_pow 0%Srng.
+Definition I_2_pow (so := rng_semiring) := IZ_2_pow 1%Srng.
+Definition Z_2_pow (so := rng_semiring) := IZ_2_pow 0%Srng.
 
-Theorem fold_Z_2_pow : ∀ {so : semiring_op T} n,
+Theorem fold_Z_2_pow : ∀ (so := rng_semiring) n,
   IZ_2_pow 0%Srng n = Z_2_pow n.
+Proof. easy. Qed.
+
+Theorem fold_I_2_pow : ∀ (so := rng_semiring) n,
+  IZ_2_pow 1%Srng n = I_2_pow n.
 Proof. easy. Qed.
 
 Fixpoint A (so := rng_semiring) n : bmatrix T :=
@@ -300,13 +289,13 @@ Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_l
 Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (bmat_mul (A n) (A n))).
 *)
 
-Definition rng_mul_nat_l {so : semiring_op T} n v :=
+Definition rng_mul_nat_l (so := rng_semiring) n v :=
   match n with
   | 0 => 0%Srng
   | S n' => (Σ (_ = 0, n'), v)%Srng
   end.
 
-Fixpoint bmat_nat_mul_l {so : semiring_op T} n BM :=
+Fixpoint bmat_nat_mul_l (so := rng_semiring) n BM :=
   match BM with
   | BM_1 x => BM_1 (rng_mul_nat_l n x)
   | BM_M M =>
@@ -396,7 +385,7 @@ Theorem bmat_add_comm : ∀ (so := rng_semiring) MA MB,
   bmat_fit_for_add MA MB
   → bmat_add MA MB = bmat_add MB MA.
 Proof.
-intros * Hss.
+intros * so * Hss.
 revert MB Hss.
 induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
   destruct MB as [xb| mb]; [ | easy ].
@@ -419,7 +408,7 @@ Theorem old_bmat_add_0_l : ∀ (so := rng_semiring) n M,
   bmat_fit_for_add (Z_2_pow n) M
   → bmat_add (Z_2_pow n) M = M.
 Proof.
-intros * Hss.
+intros * so * Hss.
 revert M Hss.
 induction n; intros. {
   cbn.
@@ -445,7 +434,7 @@ Theorem bmat_add_0_r : ∀ (so := rng_semiring) n M,
   bmat_fit_for_add (Z_2_pow n) M
   → bmat_add M (Z_2_pow n) = M.
 Proof.
-intros * Hss.
+intros * so * Hss.
 rewrite bmat_add_comm; [ | easy ].
 now apply old_bmat_add_0_l.
 Qed.
@@ -614,7 +603,7 @@ specialize (H1 0 0 Hzs Hzs) as H2.
 specialize (no_zero_bmat_size (fa 0 0)) as H3.
 rewrite <- Hsizes in H3.
 clear Hsizes Hm Ha Hzs Hr Hc.
-clear i j Hi Hj fa ra sp.
+clear i j Hi Hj fa ra.
 revert M size H1 H2 H3.
 induction sizes as [| size1]; intros; [ now destruct (mat_el M 0 0) | ].
 cbn in H2.
@@ -666,7 +655,7 @@ Theorem bmat_zero_like_mul_distr_l : ∀ (so := rng_semiring) BMA BMB,
   is_square_bmat BMA
   → bmat_zero_like (BMA * BMB)%BM = (bmat_zero_like BMA * BMB)%BM.
 Proof.
-intros * Ha.
+intros * so * Ha.
 symmetry.
 revert BMB.
 induction BMA as [xa| ma IHBMA] using bmatrix_ind2; intros; cbn. {
@@ -677,7 +666,7 @@ destruct BMB as [xb| mb]; [ easy | ].
 cbn; f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros * Hi Hj.
-specialize (sizes_of_bmatrix_mat_el _ Ha) as Haa.
+specialize (@sizes_of_bmatrix_mat_el _ Ha) as Haa.
 cbn in Ha.
 destruct (zerop (mat_nrows ma)) as [Hzra| Hzra]; [ easy | ].
 destruct (zerop (mat_ncols ma)) as [Hzca| Hzca]; [ easy | ].
@@ -735,7 +724,7 @@ Theorem bmat_zero_like_mul_distr_r :
   compatible_square_bmatrices [BMA; BMB]
   → bmat_zero_like (BMA * BMB)%BM = (BMA * bmat_zero_like BMB)%BM.
 Proof.
-intros * Hcsb.
+intros * so * Hcsb.
 revert BMB Hcsb.
 induction BMA as [xa| ma IHBMA] using bmatrix_ind2; intros; cbn. {
   destruct BMB as [xb| mb]; [ cbn | easy ].
@@ -877,7 +866,7 @@ Theorem sizes_of_bmatrix_add : ∀ (so := rng_semiring) BMA BMB,
   → sizes_of_bmatrix BMA = sizes_of_bmatrix BMB
   → sizes_of_bmatrix (BMA + BMB)%BM = sizes_of_bmatrix BMA.
 Proof.
-intros * Ha Hb Hab.
+intros * so * Ha Hb Hab.
 revert BMB Hb Hab.
 induction BMA as [xa| ma IHBMA] using bmatrix_ind2; intros. {
   now destruct BMB.
@@ -910,7 +899,7 @@ Theorem is_square_bmat_loop_add : ∀ (so := rng_semiring) BMA BMB sizes,
   → is_square_bmat_loop sizes BMB
   → is_square_bmat_loop sizes (BMA + BMB)%BM.
 Proof.
-intros * Ha Hb.
+intros * so * Ha Hb.
 revert BMA BMB Ha Hb.
 induction sizes as [| size]; intros; cbn; [ now destruct BMA, BMB | ].
 cbn in Ha, Hb.
@@ -931,7 +920,7 @@ Theorem bmat_add_0_l : ∀ (so := rng_semiring) BM,
   is_square_bmat BM
   → (bmat_zero_like BM + BM)%BM = BM.
 Proof.
-intros * Hss.
+intros * so * Hss.
 induction BM as [x| M IHBM] using bmatrix_ind2. {
   now cbn; rewrite srng_add_0_l.
 }
@@ -963,7 +952,7 @@ Theorem is_square_bmat_loop_mul : ∀ (so := rng_semiring) BMA BMB sizes,
   → is_square_bmat_loop sizes BMB
   → is_square_bmat_loop sizes (BMA * BMB)%BM.
 Proof.
-intros * Ha Hb.
+intros * so * Ha Hb.
 revert BMA BMB Ha Hb.
 induction sizes as [| size]; intros; cbn; [ now destruct BMA, BMB | ].
 cbn in Ha, Hb.
@@ -1015,7 +1004,7 @@ Theorem sizes_of_bmatrix_fold_left : ∀ (so := rng_semiring) BM sta len f,
   → sizes_of_bmatrix (fold_left (λ acc j, (acc + f j)%BM) (seq sta len) BM) =
     sizes_of_bmatrix BM.
 Proof.
-intros * Hb Hf Hfb.
+intros * so * Hb Hf Hfb.
 revert sta BM Hf Hb Hfb.
 induction len; intros; [ easy | cbn ].
 rewrite IHlen; cycle 1. {
@@ -1057,7 +1046,7 @@ Theorem sizes_of_bmatrix_mul : ∀ (so := rng_semiring) BMA BMB,
   → sizes_of_bmatrix BMA = sizes_of_bmatrix BMB
   → sizes_of_bmatrix (BMA * BMB)%BM = sizes_of_bmatrix BMA.
 Proof.
-intros * Ha Hb Hab.
+intros * so * Ha Hb Hab.
 revert BMB Hb Hab.
 induction BMA as [xa| ma IHBMA] using bmatrix_ind2; intros. {
   now destruct BMB.
@@ -1265,7 +1254,7 @@ rewrite sizes_of_bmatrix_add; [ easy | | | ]; cycle 1. {
     }
   }
   unfold is_square_bmat.
-  clear - sp Hssab Ha Hss Hb IHBMA Has Hbs IHra.
+  clear - Hssab Ha Hss Hb IHBMA Has Hbs IHra.
   rewrite sizes_of_bmatrix_fold_left; cycle 1. {
     unfold is_square_bmat.
     rewrite Hssab.
@@ -1384,7 +1373,7 @@ Theorem is_square_bmat_mul : ∀ (so := rng_semiring) BMA BMB,
   → sizes_of_bmatrix BMA = sizes_of_bmatrix BMB
   → is_square_bmat (BMA * BMB)%BM.
 Proof.
-intros * Ha Hb Hab.
+intros * so * Ha Hb Hab.
 unfold is_square_bmat.
 rewrite sizes_of_bmatrix_mul; [ | easy | easy | easy ].
 apply is_square_bmat_loop_mul; [ apply Ha | ].
@@ -1398,7 +1387,7 @@ Theorem bmat_zero_like_mul : ∀ (so := rng_semiring) BMA BMB,
   → sizes_of_bmatrix BMA = sizes_of_bmatrix BMB
   → bmat_zero_like (BMA * BMB)%BM = bmat_zero_like BMA.
 Proof.
-intros * Ha Hb Hab.
+intros * so * Ha Hb Hab.
 apply bmat_zero_like_eq_compat; [ | easy | ]. {
   now apply is_square_bmat_mul.
 }
@@ -1409,7 +1398,7 @@ Theorem bmat_zero_like_sqr : ∀ (so := rng_semiring) BM,
   is_square_bmat BM
   → bmat_zero_like (BM * BM)%BM = bmat_zero_like BM.
 Proof.
-intros * Hss.
+intros * so * Hss.
 now apply bmat_zero_like_mul.
 Qed.
 
@@ -1417,7 +1406,7 @@ Theorem bmat_mul_0_l : ∀ (so := rng_semiring) BM,
   is_square_bmat BM
   → (bmat_zero_like BM * BM)%BM = bmat_zero_like BM.
 Proof.
-intros * Hss.
+intros * so * Hss.
 rewrite <- bmat_zero_like_mul_distr_l; [ | easy ].
 now apply bmat_zero_like_sqr.
 Qed.
@@ -1426,7 +1415,7 @@ Theorem bmat_mul_0_r : ∀ (so := rng_semiring) BM,
   is_square_bmat BM
   → (BM * bmat_zero_like BM)%BM = bmat_zero_like BM.
 Proof.
-intros * Hss.
+intros * so * Hss.
 rewrite <- bmat_zero_like_mul_distr_r. 2: {
   exists (sizes_of_bmatrix BM).
   split; intros BMA HBMA. {
@@ -1444,7 +1433,7 @@ Theorem bmat_mul_Z_2_pow_l : ∀ (so := rng_semiring) n M,
   bmat_fit_for_add (I_2_pow n) M
   → bmat_mul (Z_2_pow n) M = Z_2_pow n.
 Proof.
-intros * Hss.
+intros * so * Hss.
 revert M Hss.
 induction n; intros. {
 cbn.
@@ -1500,7 +1489,7 @@ Theorem bmat_mul_Z_2_pow_r : ∀ (so := rng_semiring) n M,
   bmat_fit_for_add (I_2_pow n) M
   → bmat_mul M (Z_2_pow n) = Z_2_pow n.
 Proof.
-intros * Hss.
+intros * so * Hss.
 revert M Hss.
 induction n; intros. {
 cbn.
@@ -1556,7 +1545,7 @@ Theorem bmat_mul_1_l : ∀ (so := rng_semiring) n M,
   bmat_fit_for_add (I_2_pow n) M
   → bmat_mul (I_2_pow n) M = M.
 Proof.
-intros * Hss.
+intros * so * Hss.
 revert M Hss.
 induction n; intros. {
   cbn.
@@ -1625,7 +1614,7 @@ Theorem bmat_mul_1_r : ∀ (so := rng_semiring) n M,
   bmat_fit_for_add (I_2_pow n) M
   → bmat_mul M (I_2_pow n) = M.
 Proof.
-intros * Hss.
+intros * so * Hss.
 revert M Hss.
 induction n; intros. {
   cbn.
@@ -1686,8 +1675,7 @@ transitivity (I_2_pow n); [ | easy ].
 apply bmat_fit_for_add_IZ_IZ.
 Qed.
 
-Theorem bmat_nat_mul_l_succ : ∀ (so := rng_semiring)
-    n M,
+Theorem bmat_nat_mul_l_succ : ∀ (so := rng_semiring) n M,
   bmat_nat_mul_l (S n) M = bmat_add (bmat_nat_mul_l n M) M.
 Proof.
 intros.
@@ -1730,7 +1718,8 @@ induction n; intros. {
   cbn; f_equal.
   unfold rng_mul_nat_l.
   destruct k; [ easy | ].
-  now apply all_0_srng_summation_0.
+  apply all_0_srng_summation_0; [ | easy ].
+  apply sp.
 }
 cbn; f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
@@ -1749,7 +1738,7 @@ Theorem bmat_fit_for_add_add_l : ∀ (so := rng_semiring) MA MB MC,
   → bmat_fit_for_add MB MC
   → bmat_fit_for_add (MA + MB)%BM MC.
 Proof.
-intros * Hssac Hssbc.
+intros * so * Hssac Hssbc.
 revert MA MB Hssac Hssbc.
 induction MC as [xc| mc IHMC] using bmatrix_ind2; intros. {
   destruct MA; [ now destruct MB | easy ].
@@ -1780,7 +1769,7 @@ Theorem bmat_add_add_swap : ∀ (so := rng_semiring) MA MB MC,
   → bmat_fit_for_add MA MC
   → (MA + MB + MC = MA + MC + MB)%BM.
 Proof.
-intros * Hssab Hssac.
+intros * so * Hssab Hssac.
 revert MB MC Hssab Hssac.
 induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
   destruct MB as [xb| mb]; [ cbn | easy ].
@@ -1800,7 +1789,7 @@ Theorem bmat_add_assoc : ∀ (so := rng_semiring) MA MB MC,
   → bmat_fit_for_add MB MC
   → (MA + (MB + MC) = (MA + MB) + MC)%BM.
 Proof.
-intros * Hssab Hssbc.
+intros * so * Hssab Hssbc.
 rewrite bmat_add_comm. 2: {
   symmetry.
   apply bmat_fit_for_add_add_l; symmetry; [ easy | ].
@@ -1835,7 +1824,7 @@ Theorem square_bmat_add : ∀ (so := rng_semiring) MA MB sizes,
   → is_square_bmat_loop sizes MB
   → is_square_bmat_loop sizes (MA + MB)%BM.
 Proof.
-intros * Ha Hb.
+intros * so * Ha Hb.
 revert MA MB Ha Hb.
 induction sizes as [| size]; intros; [ now destruct MA, MB | ].
 cbn in Ha, Hb |-*.
@@ -1861,7 +1850,7 @@ Theorem square_bmat_fold_left : ∀ (so := rng_semiring),
        (fold_left (λ a k, (a + fa i (k + 1)%nat * fb (k + 1)%nat j)%BM) 
        (seq 0 size) (fa i 0 * fb 0 j)%BM).
 Proof.
-intros * IHsizes Ha Hb.
+intros * so * IHsizes Ha Hb.
 induction size. {
   apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
 }
@@ -1886,7 +1875,7 @@ Theorem bmat_mul_add_distr_r :
   compatible_square_bmatrices [MA; MB; MC]
   → ((MA + MB) * MC = MA * MC + MB * MC)%BM.
 Proof.
-intros * Hcsb.
+intros * so * Hcsb.
 revert MA MB Hcsb.
 induction MC as [xc| mc IHMC] using bmatrix_ind2; intros. {
   destruct Hcsb as (sizes & Hsq & Hsz).
@@ -2124,7 +2113,7 @@ Theorem bmat_mul_add_distr_l :
   compatible_square_bmatrices [MA; MB; MC]
   → (MA * (MB + MC) = MA * MB + MA * MC)%BM.
 Proof.
-intros * Hcsb.
+intros * so * Hcsb.
 revert MB MC Hcsb.
 induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
   destruct Hcsb as (sizes & Hsq & Hsz).
@@ -2397,7 +2386,7 @@ Theorem bmat_add_move_l : ∀ (so := rng_semiring) MA MB MC,
   → (MA + MB)%BM = MC
   → MB = (MC - MA)%BM.
 Proof.
-intros * Hcsb Hab.
+intros * so * Hcsb Hab.
 rewrite <- Hab.
 unfold bmat_sub.
 destruct Hcsb as (sizes & Hsq & Hsz).
@@ -2461,7 +2450,7 @@ Theorem bmat_add_move_0_l : ∀ (so := rng_semiring) MA MB,
   → (MA + MB)%BM = bmat_zero_like MA
   → MB = (- MA)%BM.
 Proof.
-intros * Hcsb Hab.
+intros * so * Hcsb Hab.
 apply bmat_add_move_l in Hab. 2: {
   destruct Hcsb as (sizes & Hsq & Hsz).
   exists sizes.
@@ -2496,7 +2485,7 @@ Theorem bmat_mul_opp_l : ∀ (so := rng_semiring) MA MB,
   compatible_square_bmatrices [MA; MB]
   → ((- MA) * MB = - (MA * MB))%BM.
 Proof.
-intros * Hcsb.
+intros * so * Hcsb.
 specialize (@bmat_mul_add_distr_r MA (bmat_opp MA) MB) as H1.
 destruct Hcsb as (sizes & Hsq & Hsz).
 specialize (Hsq _ (or_introl eq_refl)) as Ha.
@@ -2560,7 +2549,7 @@ Theorem bmat_mul_opp_r : ∀ (so := rng_semiring) MA MB,
   compatible_square_bmatrices [MA; MB]
   → (MA * (- MB) = - (MA * MB))%BM.
 Proof.
-intros * Hcsb.
+intros * so * Hcsb.
 specialize (@bmat_mul_add_distr_l MA MB (bmat_opp MB)) as H1.
 destruct Hcsb as (sizes & Hsq & Hsz).
 specialize (Hsq _ (or_introl eq_refl)) as Ha.
@@ -2623,7 +2612,7 @@ Theorem bmat_mul_opp_opp : ∀ (so := rng_semiring) MA MB,
   compatible_square_bmatrices [MA; MB]
   → (- MA * - MB = MA * MB)%BM.
 Proof.
-intros * Hab.
+intros * so * Hab.
 subst so.
 rewrite bmat_mul_opp_l. 2: {
   destruct Hab as (sizes & Hsq & Hsz).
@@ -2646,7 +2635,7 @@ Theorem bmat_mul_sqr_opp : ∀ (so := rng_semiring) M,
   is_square_bmat M
   → (- M * - M = M * M)%BM.
 Proof.
-intros* HM.
+intros * so * HM.
 apply bmat_mul_opp_opp.
 exists (sizes_of_bmatrix M).
 split; intros BM HBM. {
@@ -2859,6 +2848,7 @@ unfold so.
 rewrite bmat_mul_sqr_opp; [ | apply A_is_square_bmat ].
 rewrite bmat_nat_mul_l_succ.
 unfold so in IHn.
+rewrite fold_I_2_pow at 1.
 rewrite <- IHn.
 apply bmat_add_comm.
 transitivity (A n). 2: {
@@ -2896,7 +2886,7 @@ cbn in HBM.
 destruct (zerop (mat_nrows M)) as [Hrz| Hrz]; [ easy | ].
 destruct (zerop (mat_ncols M)) as [Hcz| Hcz]; [ easy | ].
 cbn in HBM.
-rewrite rng_opp_summation; [ | easy | easy ].
+rewrite rng_opp_summation; [ | apply rp | apply sp ].
 cbn.
 rewrite IHBM; [ | easy | easy | now apply HBM ].
 rewrite srng_add_0_l.
@@ -2923,10 +2913,6 @@ rewrite Tr_opp; [ | apply A_is_square_bmat ].
 rewrite IHn.
 apply rng_opp_0.
 Qed.
-
-...
-
-End in_ring_2.
 
 ...
 
