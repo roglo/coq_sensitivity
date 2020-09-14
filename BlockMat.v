@@ -1,3 +1,7 @@
+(* matrices and block matrices *)
+(* sequence A_n of matrices defined in sensitivity conjecture
+   and the proof their square is "n * I_n" *)
+
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
