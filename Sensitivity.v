@@ -1679,10 +1679,6 @@ Qed.
 
 ...
 
-Definition charac_polyn {A} {n : nat} (M : matrix A) := det (M - x * I).
-
-...
-
 (* testing... *)
 
 Compute (Δ full_cube, Nat.sqrt 3).
