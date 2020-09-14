@@ -2926,7 +2926,9 @@ Qed.
 
 ...
 
-End in_ring.
+End in_ring_2.
+
+...
 
 Definition charac_polyn {A} {n : nat} (M : matrix A) := det (M - x * I).
 
