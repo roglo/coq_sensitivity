@@ -132,6 +132,13 @@ Definition mat_add (add : T → T → T) (M1 M2 : matrix T) : matrix T :=
 
 (* addition of block matrices *)
 
+(* perhaps this "bmat_add" should allow to add "BM_1 0" with "BM_M M"
+   to allow a kind of "polymorphic" zero matrix to be used; this would
+   be useful for "bmat_mul" where a summation is required, necessarily
+   starting with zero (but which zero?) *)
+
+...
+
 Fixpoint bmat_add (MM1 MM2 : bmatrix T) :=
   match MM1 with
   | BM_1 xa =>
