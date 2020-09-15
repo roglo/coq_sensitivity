@@ -973,12 +973,25 @@ erewrite sizes_of_bmatrix_mat_el; [ | | easy | easy ]. {
 }
 Qed.
 
-Theorem bmat_zero_like_is_square : ∀ BM sizes,
-  is_square_bmat_loop sizes (bmat_zero_like BM).
+Theorem bmat_zero_like_is_square : ∀ BM,
+  is_square_bmat BM
+  → is_square_bmat (bmat_zero_like BM).
 Proof.
-intros.
-destruct BM as [x| M]; cbn. {
-  destruct sizes; [ easy | cbn ].
+intros * HBM.
+induction BM as [x| M IHBM] using bmatrix_ind2; [ easy | cbn ].
+cbn in HBM.
+destruct (zerop (mat_nrows M)) as [Hrz| Hrz]; [ easy | ].
+destruct (zerop (mat_ncols M)) as [Hcz| Hcz]; [ easy | ].
+cbn in HBM |-*.
+destruct HBM as (Hr & Hc & HBM).
+split; [ easy | ].
+split; [ easy | ].
+intros i j Hi Hj.
+rewrite <- Hc in Hj.
+specialize (IHBM i j Hi Hj).
+...
+rewrite sizes_of_bmat_zero_like.
+apply HBM.
 ...
 
 Theorem bmat_add_0_r : ∀ BM,
