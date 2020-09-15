@@ -973,27 +973,6 @@ erewrite sizes_of_bmatrix_mat_el; [ | | easy | easy ]. {
 }
 Qed.
 
-Theorem bmat_zero_like_is_square : ∀ BM,
-  is_square_bmat BM
-  → is_square_bmat (bmat_zero_like BM).
-Proof.
-intros * HBM.
-induction BM as [x| M IHBM] using bmatrix_ind2; [ easy | cbn ].
-cbn in HBM.
-destruct (zerop (mat_nrows M)) as [Hrz| Hrz]; [ easy | ].
-destruct (zerop (mat_ncols M)) as [Hcz| Hcz]; [ easy | ].
-cbn in HBM |-*.
-destruct HBM as (Hr & Hc & HBM).
-split; [ easy | ].
-split; [ easy | ].
-intros i j Hi Hj.
-rewrite <- Hc in Hj.
-specialize (IHBM i j Hi Hj).
-...
-rewrite sizes_of_bmat_zero_like.
-apply HBM.
-...
-
 Theorem bmat_add_0_r : ∀ BM,
   is_square_bmat BM
   → (BM + bmat_zero_like BM)%BM = BM.
@@ -1001,8 +980,11 @@ Proof.
 intros * Hss.
 rewrite bmat_add_comm. 2: {
   apply square_bmat_fit_for_add with (sizes := sizes_of_bmatrix BM); [ easy | ].
-
-...
+  rewrite <- sizes_of_bmat_zero_like.
+  now apply square_bmat_zero_like.
+}
+now apply bmat_add_0_l.
+Qed.
 
 (*
 Theorem is_square_bmat_loop_mul : ∀ BMA BMB sizes,
@@ -1515,7 +1497,7 @@ replace
 with
   (fold_left
      (λ (acc : bmatrix T) (j0 : nat),
-       (acc + bmat_zero_like (f 0 0))%BM)
+       (acc + bmat_zero_like (f i j))%BM)
      (seq 0 r) (bmat_zero_like (f i j))). 2: {
   apply List_fold_left_ext_in.
   intros k M Hk.
@@ -1543,18 +1525,21 @@ with
     rewrite (sizes_of_bmatrix_at_0_0 f Hss); [ | easy | easy ].
     now apply Hss.
   } {
-    apply Hss; flia Hi.
+    unfold is_square_bmat.
+    rewrite sizes_of_bmatrix_at_0_0 with (r := r); [ | easy | easy | easy ].
+    now apply Hss.
   }
-  now apply (sizes_of_bmatrix_at_0_0 f Hss).
+  rewrite (sizes_of_bmatrix_at_0_0 f Hss); [ symmetry | easy | easy ].
+  now rewrite (sizes_of_bmatrix_at_0_0 f Hss).
 }
-clear - sp.
+clear - sp Hss.
 induction r; [ easy | ].
 rewrite List_seq_succ_r; cbn.
 rewrite fold_left_app; cbn.
-rewrite IHr.
-Search (_ + bmat_zero_like _)%BM.
-Search (bmat_zero_like _ + _)%BM.
-Check bmat_add_0_r.
+rewrite IHr. {
+  rewrite <- bmat_zero_like_idemp at 2.
+  apply bmat_add_0_r.
+  apply square_bmat_zero_like.
 ...
 induction r; [ easy | ].
 rewrite List_seq_succ_r; cbn.
