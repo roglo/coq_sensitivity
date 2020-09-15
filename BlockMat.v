@@ -1457,6 +1457,38 @@ rewrite bmat_zero_like_eq_compat with (BMB := f i j); cycle 1. {
   symmetry.
   apply (sizes_of_bmatrix_at_0_0 f Hss Hi Hj).
 }
+replace
+  (fold_left
+     (λ (acc : bmatrix T) (j0 : nat),
+       (acc + bmat_zero_like (f i j0) * f j0 j)%BM)
+     (seq 0 r) (bmat_zero_like (f i j)))
+with
+  (fold_left
+     (λ (acc : bmatrix T) (j0 : nat),
+       (acc + bmat_zero_like (f i j0))%BM)
+     (seq 0 r) (bmat_zero_like (f i j))). 2: {
+  apply List_fold_left_ext_in.
+  intros k M Hk.
+  apply in_seq in Hk.
+  f_equal.
+  rewrite bmat_zero_like_eq_compat with (BMB := f k j); cycle 1. {
+    unfold is_square_bmat.
+    rewrite (sizes_of_bmatrix_at_0_0 f Hss Hi); [ | easy ].
+    now apply Hss.
+  } {
+    unfold is_square_bmat.
+    rewrite (sizes_of_bmatrix_at_0_0 f Hss); [ | easy | easy ].
+    now apply Hss.
+  } {
+    rewrite (sizes_of_bmatrix_at_0_0 f Hss); [ symmetry | easy | easy ].
+    now rewrite (sizes_of_bmatrix_at_0_0 f Hss).
+  }
+  symmetry.
+  apply IHBM; [ easy | easy | ].
+  rewrite (sizes_of_bmatrix_at_0_0 f Hss); [ | easy | easy ].
+  now apply Hss.
+}
+...
 clear Hi Hj.
 ...
 induction r; [ easy | ].
