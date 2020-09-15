@@ -2918,6 +2918,15 @@ rewrite IHn.
 apply rng_opp_0.
 Qed.
 
+(* eigenvalues and eigenvectors *)
+
+...
+
+Theorem exists_eigenvalues : ∀ (M : matrix T),
+  is_square_mat M
+  → ∃ EVL, length EVL = mat_nrows M ∧
+     ∀ μ V, (μ, V) ∈ EVL → mat_mul_scal_l μ M = vect_mul_scal μ V.
+
 ...
 
 Definition charac_polyn {A} {n : nat} (M : matrix A) := det (M - x * I).
