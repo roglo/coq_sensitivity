@@ -654,17 +654,62 @@ intros * Hi Hj.
 now apply IHBMA.
 Qed.
 
+Theorem bmat_zero_like_idemp :
+  ∀ BM, bmat_zero_like (bmat_zero_like BM) = bmat_zero_like BM.
+Proof.
+intros.
+induction BM as [x| M IHBM] using bmatrix_ind2; [ easy | cbn ].
+f_equal.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros i j Hi Hj.
+destruct M as (f, r, c); cbn in *.
+now apply IHBM.
+Qed.
+
 Definition compatible_square_bmatrices (BML : list (bmatrix T)) :=
   ∃ sizes,
    (∀ BM, BM ∈ BML → is_square_bmat BM) ∧
    (∀ BM, BM ∈ BML → sizes_of_bmatrix BM = sizes).
 
-(*
 Theorem bmat_zero_like_mul_distr_l : ∀ BMA BMB,
   is_square_bmat BMA
   → bmat_zero_like (BMA * BMB)%BM = (bmat_zero_like BMA * BMB)%BM.
 Proof.
 intros * Ha.
+revert BMB.
+induction BMA as [xa| ma IHBMA] using bmatrix_ind2; intros; cbn. {
+  destruct BMB as [xb| mb]; [ | easy ].
+  now rewrite srng_mul_0_l.
+}
+destruct BMB as [xb| mb]; [ easy | ].
+cbn; f_equal.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros * Hi Hj.
+rewrite bmat_zero_like_idemp.
+destruct ma as (fa, ra, ca).
+destruct mb as (fb, rb, cb).
+cbn in *.
+destruct (zerop ra) as [H| H]; [ easy | cbn in Ha; clear H ].
+destruct (zerop ca) as [H| H]; [ easy | cbn in Ha; clear H ].
+destruct Ha as (_ & H & Ha); subst ca.
+replace
+  (fold_left (λ a k, a + bmat_zero_like (fa i k) * fb k j)
+    (seq 0 ra) (bmat_zero_like (fa 0 0)))%BM
+with
+  (fold_left (λ a k, a + bmat_zero_like (fa i k * fb k j))
+    (seq 0 ra) (bmat_zero_like (fa 0 0)))%BM. 2: {
+  apply List_fold_left_ext_in.
+  intros k BM Hk; f_equal.
+  apply in_seq in Hk.
+  clear BM.
+  apply IHBMA; [ easy | flia Hk | ].
+  rewrite sizes_of_bmatrix_at_0_0 with (r := ra); [ | easy | easy | easy ].
+  now apply Ha.
+}
+clear Hi IHBMA.
+...
+
+(*
 symmetry.
 revert BMB.
 induction BMA as [xa| ma IHBMA] using bmatrix_ind2; intros; cbn. {
@@ -1451,19 +1496,8 @@ now apply bmat_zero_like_mul.
 Qed.
 *)
 
-Theorem bmat_zero_like_idemp :
-  ∀ BM, bmat_zero_like (bmat_zero_like BM) = bmat_zero_like BM.
-Proof.
-intros.
-induction BM as [x| M IHBM] using bmatrix_ind2; [ easy | cbn ].
-f_equal.
-apply matrix_eq; cbn; [ easy | easy | ].
-intros i j Hi Hj.
-destruct M as (f, r, c); cbn in *.
-now apply IHBM.
-Qed.
-
-Theorem bmat_mul_0_l : ∀ BM,
+(* à supprimer, peut-être *)
+Theorem bmat_mul_0_l' : ∀ BM,
   is_square_bmat BM
   → (bmat_zero_like BM * BM)%BM = bmat_zero_like BM.
 Proof.
@@ -1532,6 +1566,16 @@ with
   rewrite (sizes_of_bmatrix_at_0_0 f Hss); [ symmetry | easy | easy ].
   now rewrite (sizes_of_bmatrix_at_0_0 f Hss).
 }
+rewrite bmat_zero_like_eq_compat with (BMB := f 0 0); cycle 1. {
+  unfold is_square_bmat.
+  rewrite (sizes_of_bmatrix_at_0_0 f Hss); [ | easy | easy ].
+  now apply Hss.
+} {
+  apply Hss; flia Hi.
+} {
+  apply sizes_of_bmatrix_at_0_0 with (r := r); [ | easy | easy ].
+  apply Hss.
+}
 clear - sp Hss.
 induction r; [ easy | ].
 rewrite List_seq_succ_r; cbn.
@@ -1540,50 +1584,11 @@ rewrite IHr. {
   rewrite <- bmat_zero_like_idemp at 2.
   apply bmat_add_0_r.
   apply square_bmat_zero_like.
-...
-induction r; [ easy | ].
-rewrite List_seq_succ_r; cbn.
-rewrite fold_left_app; cbn.
-rewrite IHr. {
-  rewrite IHBM.
-...
-assert (H1 : ∀ i, i < r → is_square_bmat_loop (sizes_of_bmatrix (f 0 0)) (f i j)). {
-  clear i Hi.
-  intros i Hi.
-  now apply Hss.
+  apply Hss; flia.
 }
-assert (H2 : ∀ j, j < r → is_square_bmat_loop (sizes_of_bmatrix (f 0 0)) (f i j)). {
-  clear j Hj H1.
-  intros j Hj.
-  now apply Hss.
-}
-specialize (Hss 0 0) as H3.
-assert (H : 0 < r) by flia Hi.
-specialize (H3 H H); clear H.
-specialize (Hss i j Hi Hj) as H4.
-Check sizes_of_bmatrix_at_0_0.
-specialize (sizes_of_bmatrix_at_0_0 f Hss Hi Hj) as H5.
-rewrite <- H5 in H4.
-clear Hss Hi Hj.
-induction r. {
-  cbn.
-  now apply bmat_zero_like_eq_compat.
-}
-rewrite List_seq_succ_r; cbn.
-rewrite fold_left_app; cbn.
-...
-rewrite IHr; cycle 1. {
-  intros i1 j1 Hi1 Hj1 Hij.
-  apply IHBM; [ flia Hi1 | flia Hj1 | easy ].
-} {
-  intros i1 Hi1.
-  apply H1; flia Hi1.
-} {
-  intros j1 Hj1.
-  apply H2; flia Hj1.
-}
-rewrite IHBM.
-...
+intros i j Hi Hj.
+apply Hss; [ flia Hi | flia Hj ].
+Qed.
 
 Theorem bmat_mul_0_l : ∀ BM,
   is_square_bmat BM
@@ -1593,6 +1598,8 @@ intros * Hss.
 rewrite <- bmat_zero_like_mul_distr_l; [ | easy ].
 now apply bmat_zero_like_sqr.
 Qed.
+
+...
 
 Theorem bmat_mul_0_r : ∀ BM,
   is_square_bmat BM
