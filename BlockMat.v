@@ -707,67 +707,18 @@ with
   now apply Ha.
 }
 clear Hi IHBMA.
-...
-
-(*
-symmetry.
-revert BMB.
-induction BMA as [xa| ma IHBMA] using bmatrix_ind2; intros; cbn. {
-  destruct BMB as [xb| mb]; [ | easy ].
-  now rewrite srng_mul_0_l.
+induction ra. {
+  cbn; apply bmat_zero_like_idemp.
 }
-destruct BMB as [xb| mb]; [ easy | ].
-cbn; f_equal.
-apply matrix_eq; cbn; [ easy | easy | ].
-intros * Hi Hj.
-specialize (@sizes_of_bmatrix_mat_el _ Ha) as Haa.
-cbn in Ha.
-destruct (zerop (mat_nrows ma)) as [Hzra| Hzra]; [ easy | ].
-destruct (zerop (mat_ncols ma)) as [Hzca| Hzca]; [ easy | ].
-cbn in Ha.
-destruct Ha as (Hrr & Hcr & Ha).
-rewrite Hcr in Haa.
-rewrite IHBMA; [ | easy | easy | ]. 2: {
-  specialize (Ha i 0 Hi Hzra) as H2.
-  unfold is_square_bmat.
-  now rewrite Haa.
-}
-destruct ma as (fa, ra, ca).
-destruct mb as (fb, rb, cb).
-cbn in *.
-subst ca; clear Hrr Hzra Hzca.
-destruct ra; [ easy | cbn ].
-rewrite Nat.sub_0_r.
-replace
-  (fold_left (λ a k, a + bmat_zero_like (fa i (k + 1)%nat) * fb (k + 1)%nat j)
-    (seq 0 ra) (bmat_zero_like (fa i 0 * fb 0 j)))%BM
-with
-  (fold_left (λ a k, a + bmat_zero_like (fa i (k + 1)%nat * fb (k + 1)%nat j))
-    (seq 0 ra) (bmat_zero_like (fa i 0 * fb 0 j)))%BM. 2: {
-  apply List_fold_left_ext_in.
-  intros k BM Hk; f_equal.
-  apply in_seq in Hk.
-  clear BM.
-  symmetry; apply IHBMA; [ easy | flia Hk | ].
-  rewrite Haa; [ | easy | flia Hk ].
-  apply Ha; [ easy | flia Hk ].
-}
-clear Hi IHBMA.
-induction ra; [ easy | ].
 rewrite List_seq_succ_r; cbn.
 rewrite fold_left_app; cbn.
 rewrite fold_left_app; cbn.
 rewrite bmat_zero_like_add_distr.
 f_equal.
-apply IHra. {
-  intros i1 j1 Hi1 Hj1.
-  apply Ha; [ flia Hi1 | flia Hj1 ].
-} {
-  intros i1 j1 Hi1 Hj1.
-  apply Haa; [ flia Hi1 | flia Hj1 ].
-}
+apply IHra.
+intros i1 j1 Hi1 Hj1.
+apply Ha; [ flia Hi1 | flia Hj1 ].
 Qed.
-*)
 
 (*
 Theorem bmat_zero_like_mul_distr_r :
@@ -1496,7 +1447,9 @@ now apply bmat_zero_like_mul.
 Qed.
 *)
 
-(* à supprimer, peut-être *)
+(* bon, je me suis faich... à prouver ça, mais il y a une autre
+   preuve ci-dessous, invoquant des théorèmes que j'avais déjà
+   faits.
 Theorem bmat_mul_0_l' : ∀ BM,
   is_square_bmat BM
   → (bmat_zero_like BM * BM)%BM = bmat_zero_like BM.
@@ -1589,6 +1542,7 @@ rewrite IHr. {
 intros i j Hi Hj.
 apply Hss; [ flia Hi | flia Hj ].
 Qed.
+*)
 
 Theorem bmat_mul_0_l : ∀ BM,
   is_square_bmat BM
@@ -1596,6 +1550,7 @@ Theorem bmat_mul_0_l : ∀ BM,
 Proof.
 intros * Hss.
 rewrite <- bmat_zero_like_mul_distr_l; [ | easy ].
+...
 now apply bmat_zero_like_sqr.
 Qed.
 
