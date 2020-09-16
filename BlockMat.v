@@ -1304,6 +1304,41 @@ rewrite sizes_of_bmatrix_add. {
           }
         }
       } {
+        apply is_square_bmat_loop_add. {
+          rewrite sizes_of_bmatrix_add; [ | | easy | ]. {
+            apply is_square_bmat_zero_like.
+            now apply Ha.
+          } {
+            apply is_square_bmat_zero_like.
+            now apply Ha.
+          } {
+            rewrite sizes_of_bmat_zero_like.
+            symmetry.
+            rewrite IHBMA; [ easy | easy | easy | | | congruence ]. {
+              now apply Ha.
+            } {
+              now apply Hb.
+            }
+          }
+        } {
+          rewrite sizes_of_bmatrix_add; [ | | easy | ]. {
+            rewrite sizes_of_bmat_zero_like.
+            apply is_square_bmat_loop_mul; [ now apply Ha | ].
+            now rewrite Hab; apply Hb.
+          } {
+            apply is_square_bmat_zero_like.
+            now apply Ha.
+          } {
+            rewrite sizes_of_bmat_zero_like.
+            symmetry.
+            rewrite IHBMA; [ easy | easy | easy | | | congruence ]. {
+              now apply Ha.
+            } {
+              now apply Hb.
+            }
+          }
+        }
+      } {
 ...
 intros * Ha Hb Hab.
 revert BMB Hb Hab.
