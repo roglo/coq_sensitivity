@@ -1387,7 +1387,7 @@ rewrite sizes_of_bmatrix_add. {
         intros j Hj.
         assert (H8 : 0 < S (S (S ra))) by flia.
         assert (H9 : j < S (S (S ra))) by flia Hj.
-        rewrite sizes_of_bmatrix_add. {
+        rewrite sizes_of_bmatrix_add; [ | | easy | ]. {
           rewrite sizes_of_bmat_zero_like.
           symmetry.
           rewrite IHBMA; [ | easy | easy | | | ]. {
@@ -1423,6 +1423,31 @@ rewrite sizes_of_bmatrix_add. {
               easy.
             }
           } {
+            rewrite sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
+              symmetry.
+              rewrite sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
+                easy.
+              } {
+                intros i k Hi Hk.
+                apply Hb; [ flia Hi | flia Hk ].
+              } {
+                flia Hj.
+              } {
+                easy.
+              }
+            } {
+              intros i k Hi Hk.
+              apply Ha; [ flia Hi | flia Hk ].
+            } {
+              easy.
+            } {
+              flia Hj.
+            }
+          }
+        } {
+          apply is_square_bmat_zero_like.
+          now apply Ha.
+        } {
 ...
 intros * Ha Hb Hab.
 revert BMB Hb Hab.
