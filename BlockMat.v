@@ -1181,8 +1181,6 @@ rewrite sizes_of_bmatrix_add. {
     }
   }
   clear - H2 Ha Hb Hab IHBMA.
-Search (bmat_zero_like (_ + _)%BM).
-...
   induction ra. {
     cbn.
     assert (H1 : 0 < 2) by flia.
