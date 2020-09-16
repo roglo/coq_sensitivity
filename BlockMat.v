@@ -1448,6 +1448,17 @@ rewrite sizes_of_bmatrix_add. {
           apply is_square_bmat_zero_like.
           now apply Ha.
         } {
+          rewrite sizes_of_bmat_zero_like.
+          symmetry.
+          apply IHBMA; [ easy | easy | | | easy ]. {
+            now apply Ha.
+          } {
+            now apply Hb.
+          }
+        }
+      }
+    }
+  } {
 ...
 intros * Ha Hb Hab.
 revert BMB Hb Hab.
