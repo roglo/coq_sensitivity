@@ -559,7 +559,7 @@ apply IHsizes.
 now apply HBM.
 Qed.
 
-Theorem square_bmat_zero_like : ∀ (BM : bmatrix T),
+Theorem is_square_bmat_zero_like : ∀ (BM : bmatrix T),
   is_square_bmat BM
   → is_square_bmat (bmat_zero_like BM).
 Proof.
@@ -984,7 +984,7 @@ intros * Hss.
 rewrite bmat_add_comm. 2: {
   apply square_bmat_fit_for_add with (sizes := sizes_of_bmatrix BM); [ easy | ].
   rewrite <- sizes_of_bmat_zero_like.
-  now apply square_bmat_zero_like.
+  now apply is_square_bmat_zero_like.
 }
 now apply bmat_add_0_l.
 Qed.
@@ -1125,7 +1125,7 @@ destruct ra. {
   rewrite sizes_of_bmatrix_add. {
     apply sizes_of_bmat_zero_like.
   } {
-    apply square_bmat_zero_like.
+    apply is_square_bmat_zero_like.
     apply Ha; flia.
   } {
     apply is_square_bmat_loop_mul. {
@@ -1158,17 +1158,38 @@ rewrite sizes_of_bmatrix_add. {
     apply Hbs; [ flia Hi | flia Hj ].
   }
 } {
-Search (is_square_bmat_loop _ (_ + _)%BM).
-Theorem glop : ∀ BMA BMB sta len f,
-  (fold_left (λ acc j, acc + f j) (seq sta len) (BMA + BMB))%BM =
-  (BMA + fold_left (λ acc j, acc + f j) (seq sta len) BMB)%BM.
-Proof.
-intros.
-induction len; [ easy | ].
-rewrite List_seq_succ_r; cbn.
-rewrite fold_left_app; cbn.
-rewrite fold_left_app; cbn.
-rewrite IHlen.
+  clear IHra.
+  induction ra. {
+    cbn.
+    rewrite sizes_of_bmatrix_add. {
+      apply is_square_bmat_loop_add. {
+        apply square_bmat_loop_zero_like.
+        rewrite sizes_of_bmat_zero_like.
+        apply Ha; flia.
+      } {
+        apply is_square_bmat_loop_mul. {
+          rewrite sizes_of_bmat_zero_like.
+          apply Ha; flia.
+        } {
+          rewrite sizes_of_bmat_zero_like.
+          rewrite Hab; apply Hb; flia.
+        }
+      }
+    } {
+      now apply is_square_bmat_zero_like.
+    } {
+      apply is_square_bmat_loop_mul. {
+        rewrite IHBMA; [ easy | flia | flia | easy | easy | easy ].
+      } {
+        rewrite IHBMA; [ | flia | flia | easy | easy | easy ].
+        now rewrite Hab.
+      }
+    } {
+      rewrite sizes_of_bmat_zero_like.
+      symmetry.
+      apply IHBMA; [ flia | flia | easy | easy | easy ].
+    }
+  }
 ...
 intros * Ha Hb Hab.
 revert BMB Hb Hab.
@@ -1620,7 +1641,7 @@ rewrite fold_left_app; cbn.
 rewrite IHr. {
   rewrite <- bmat_zero_like_idemp at 2.
   apply bmat_add_0_r.
-  apply square_bmat_zero_like.
+  apply is_square_bmat_zero_like.
   apply Hss; flia.
 }
 intros i j Hi Hj.
@@ -2668,7 +2689,7 @@ apply bmat_add_move_l in Hab. 2: {
     destruct HBM as [HBM| HBM]; [ now subst BM; apply Hsq; left | ].
     destruct HBM as [HBM| HBM]; [ now subst BM; apply Hsq; right; left | ].
     destruct HBM as [HBM| HBM]; [ subst BM | easy ].
-    now apply square_bmat_zero_like, Hsq; left.
+    now apply is_square_bmat_zero_like, Hsq; left.
   } {
     intros * HBM.
     destruct HBM as [HBM| HBM]; [ now subst BM; apply Hsz; left | ].
