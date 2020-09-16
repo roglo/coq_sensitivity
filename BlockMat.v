@@ -1159,6 +1159,7 @@ rewrite sizes_of_bmatrix_add. {
   }
 } {
   clear IHra.
+  clear - Ha Hb Hab IHBMA.
   induction ra. {
     cbn.
     rewrite sizes_of_bmatrix_add. {
@@ -1176,9 +1177,14 @@ rewrite sizes_of_bmatrix_add. {
         }
       }
     } {
-      now apply is_square_bmat_zero_like.
+      apply is_square_bmat_zero_like.
+      apply Ha; flia.
     } {
       apply is_square_bmat_loop_mul. {
+        rewrite IHBMA; [ | flia | flia | | | easy ]. {
+          apply Ha; flia.
+        } {
+...
         rewrite IHBMA; [ easy | flia | flia | easy | easy | easy ].
       } {
         rewrite IHBMA; [ | flia | flia | easy | easy | easy ].
@@ -1190,6 +1196,27 @@ rewrite sizes_of_bmatrix_add. {
       apply IHBMA; [ flia | flia | easy | easy | easy ].
     }
   }
+  rewrite List_seq_succ_r; cbn.
+  rewrite fold_left_app; cbn.
+  apply is_square_bmat_loop_add. {
+    rewrite sizes_of_bmatrix_add. {
+      apply IHra. {
+        intros * Hi Hj Hsq * HBMB Hss.
+        apply IHBMA; [ flia Hi | flia Hj | easy | easy | easy ].
+      } {
+        intros * Hi Hj.
+        apply Ha; [ flia Hi | flia Hj ].
+      } {
+        intros * Hi Hj.
+        apply Hb; [ flia Hi | flia Hj ].
+      } {
+        intros * Hi Hj.
+        apply Has; [ flia Hi | flia Hj ].
+...
+    apply is_square_bmat_loop_mul. {
+      rewrite sizes_of_bmatrix_add. {
+...
+    rewrite Hss; apply Hb; flia.
 ...
 intros * Ha Hb Hab.
 revert BMB Hb Hab.
