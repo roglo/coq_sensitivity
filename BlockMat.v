@@ -1381,6 +1381,7 @@ rewrite sizes_of_bmatrix_add. {
           }
         }
       } {
+        intros j Hj.
 ...
 intros * Ha Hb Hab.
 revert BMB Hb Hab.
