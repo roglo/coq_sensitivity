@@ -1117,12 +1117,14 @@ destruct Ha as (_ & H & Ha); subst ca.
 destruct Hb as (_ & H & Hb); subst cb.
 injection Hab; clear Hab; intros Hab H; subst rb.
 clear Hcaz Hcbz Hrbz.
-destruct ra; [ easy | clear Hraz; cbn ].
+induction ra; [ easy | clear Hraz ].
 assert (Hsa : is_square_bmat (fa 0 0)) by (apply Ha; flia).
 assert (Hsb : is_square_bmat (fb 0 0)) by (apply Hb; flia).
-induction ra. {
+destruct ra. {
   cbn.
-  rewrite sizes_of_bmatrix_add; cycle 1. {
+  rewrite sizes_of_bmatrix_add. {
+    apply sizes_of_bmat_zero_like.
+  } {
     apply square_bmat_zero_like.
     apply Ha; flia.
   } {
@@ -1135,8 +1137,38 @@ induction ra. {
     rewrite IHBMA; [ | flia | flia | easy | easy | easy ].
     apply sizes_of_bmat_zero_like.
   }
-  apply sizes_of_bmat_zero_like.
 }
+rewrite List_seq_succ_r; cbn.
+rewrite fold_left_app; cbn.
+rewrite sizes_of_bmatrix_add. {
+  apply IHra; [ | flia | | | | ]. {
+    intros * Hi Hj Hij * HBMB Hfb.
+    apply IHBMA; [ flia Hi | flia Hj | easy | easy | easy ].
+  } {
+    intros * Hi Hj.
+    apply Ha; [ flia Hi | flia Hj ].
+  } {
+    intros * Hi Hj.
+    apply Hb; [ flia Hi | flia Hj ].
+  } {
+    intros * Hi Hj.
+    apply Has; [ flia Hi | flia Hj ].
+  } {
+    intros * Hi Hj.
+    apply Hbs; [ flia Hi | flia Hj ].
+  }
+} {
+Search (is_square_bmat_loop _ (_ + _)%BM).
+Theorem glop : ∀ BMA BMB sta len f,
+  (fold_left (λ acc j, acc + f j) (seq sta len) (BMA + BMB))%BM =
+  (BMA + fold_left (λ acc j, acc + f j) (seq sta len) BMB)%BM.
+Proof.
+intros.
+induction len; [ easy | ].
+rewrite List_seq_succ_r; cbn.
+rewrite fold_left_app; cbn.
+rewrite fold_left_app; cbn.
+rewrite IHlen.
 ...
 intros * Ha Hb Hab.
 revert BMB Hb Hab.
