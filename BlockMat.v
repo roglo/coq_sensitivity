@@ -1207,7 +1207,7 @@ rewrite sizes_of_bmatrix_add. {
   }
 } {
   clear IHra.
-  clear - Ha Hb Hab IHBMA Hssm Hsaba Hsabb.
+  clear - Ha Hb Hab IHBMA Hssm Hsaba Hsabb H6 H7.
   assert (Hzr : 0 < S (S ra)) by flia.
   assert (H2 : is_square_bmat (fa 0 0 * fb 0 0)%BM). {
     now apply is_square_bmat_loop_mul.
@@ -1241,7 +1241,7 @@ rewrite sizes_of_bmatrix_add. {
   assert (H4 : S ra < S (S ra)) by flia.
   assert (H5 : S ra < S (S (S ra))) by flia.
   assert
-    (H6 : sizes_of_bmatrix (fa 0 (S ra)) = sizes_of_bmatrix (fa 0 0)). {
+    (H6' : sizes_of_bmatrix (fa 0 (S ra)) = sizes_of_bmatrix (fa 0 0)). {
     apply sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
       intros i j Hi Hj.
       apply Ha; [ flia Hi | flia Hj ].
@@ -1252,7 +1252,7 @@ rewrite sizes_of_bmatrix_add. {
     }
   }
   assert
-  (H7 : sizes_of_bmatrix (fb (S ra) 0) = sizes_of_bmatrix (fb 0 0)). {
+  (H7' : sizes_of_bmatrix (fb (S ra) 0) = sizes_of_bmatrix (fb 0 0)). {
     apply sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
       intros i j Hi Hj.
       apply Hb; [ flia Hi | flia Hj ].
@@ -1289,21 +1289,21 @@ rewrite sizes_of_bmatrix_add. {
       apply is_square_bmat_loop_mul. {
 (**)
         rewrite IHBMA; [ | easy | easy | | | congruence ]. {
-          now rewrite H6; apply Ha.
+          now rewrite H6'; apply Ha.
         } {
-          now rewrite H6; apply Ha.
+          now rewrite H6'; apply Ha.
         } {
           unfold is_square_bmat.
-          now rewrite H7; apply Hb.
+          now rewrite H7'; apply Hb.
         }
       } {
         rewrite IHBMA; [ | easy | easy | | | congruence ]. {
-          now rewrite H6, Hab; apply Hb.
+          now rewrite H6', Hab; apply Hb.
         } {
-          now rewrite H6; apply Ha.
+          now rewrite H6'; apply Ha.
         } {
           unfold is_square_bmat.
-          now rewrite H7; apply Hb.
+          now rewrite H7'; apply Hb.
         }
       }
     } {
@@ -1312,10 +1312,10 @@ rewrite sizes_of_bmatrix_add. {
           rewrite sizes_of_bmat_zero_like.
           symmetry.
           rewrite IHBMA; [ easy | easy | easy | | | congruence ]. {
-            now rewrite H6; apply Ha.
+            now rewrite H6'; apply Ha.
           } {
             unfold is_square_bmat.
-            now rewrite H7; apply Hb.
+            now rewrite H7'; apply Hb.
           }
         } {
           now apply is_square_bmat_zero_like, Ha.
@@ -1623,21 +1623,21 @@ rewrite sizes_of_bmatrix_add. {
     } {
       apply is_square_bmat_loop_mul. {
         rewrite IHBMA; [ | easy | easy | | | congruence ]. {
-          now rewrite H6; apply Ha.
+          now rewrite H6'; apply Ha.
         } {
-          now rewrite H6; apply Ha.
+          now rewrite H6'; apply Ha.
         } {
           unfold is_square_bmat.
-          now rewrite H7; apply Hb.
+          now rewrite H7'; apply Hb.
         }
       } {
         rewrite IHBMA; [ | easy | easy | | | congruence ]. {
-          now rewrite H6, Hab; apply Hb.
+          now rewrite H6', Hab; apply Hb.
         } {
-          now rewrite H6; apply Ha.
+          now rewrite H6'; apply Ha.
         } {
           unfold is_square_bmat.
-          now rewrite H7; apply Hb.
+          now rewrite H7'; apply Hb.
         }
       }
     } {
@@ -1646,10 +1646,10 @@ rewrite sizes_of_bmatrix_add. {
           rewrite sizes_of_bmat_zero_like.
           symmetry.
           rewrite IHBMA; [ easy | easy | easy | | | congruence ]. {
-            now rewrite H6; apply Ha.
+            now rewrite H6'; apply Ha.
           } {
             unfold is_square_bmat.
-            now rewrite H7; apply Hb.
+            now rewrite H7'; apply Hb.
           }
         } {
           now apply is_square_bmat_zero_like, Ha.
