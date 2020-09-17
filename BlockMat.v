@@ -1900,6 +1900,9 @@ rewrite sizes_of_bmatrix_add. {
 }
 Qed.
 
+(* pfiou... 900 lignes pour un théorème... *)
+(* ça va pas, ça *)
+
 Inspect 1.
 
 ...
