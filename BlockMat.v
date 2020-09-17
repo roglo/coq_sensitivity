@@ -1281,6 +1281,7 @@ rewrite sizes_of_bmatrix_add. {
         }
       }
     } {
+      assert (H8 : 0 < S (S (S ra))) by flia.
       rewrite sizes_of_bmatrix_fold_left. {
         rewrite sizes_of_bmatrix_add; [ | | easy | easy ]. {
           rewrite sizes_of_bmat_zero_like.
@@ -1315,7 +1316,6 @@ rewrite sizes_of_bmatrix_add. {
         }
       } {
         intros j Hj.
-        assert (H8 : 0 < S (S (S ra))) by flia.
         assert (H9 : j < S (S (S ra))) by flia Hj.
         assert
           (H10 : sizes_of_bmatrix (fa 0 j) = sizes_of_bmatrix (fa 0 0)). {
@@ -1360,7 +1360,6 @@ rewrite sizes_of_bmatrix_add. {
         }
       } {
         intros j Hj.
-        assert (H8 : 0 < S (S (S ra))) by flia.
         assert (H9 : j < S (S (S ra))) by flia Hj.
         rewrite sizes_of_bmatrix_add; [ | | easy | easy ]. {
           clear - IHBMA Ha Hj Hb Hab.
@@ -1479,7 +1478,6 @@ rewrite sizes_of_bmatrix_add. {
         }
       } {
         intros j Hj.
-        assert (H8 : 0 < S (S (S ra))) by flia.
         assert (H9 : j < S (S (S ra))) by flia Hj.
         assert
           (H10 : sizes_of_bmatrix (fa 0 j) = sizes_of_bmatrix (fa 0 0)). {
