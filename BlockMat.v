@@ -1127,6 +1127,30 @@ assert (Hssm :
   symmetry.
   apply IHBMA; [ flia | flia | apply Ha; flia |  apply Hb; flia| easy ].
 }
+assert
+  (Hsaba :
+     is_square_bmat_loop (sizes_of_bmatrix (fa 0 0 * fb 0 0)%BM) (fa 0 0)). {
+  assert (Hzr : 0 < S ra) by flia.
+  rewrite IHBMA; [ | flia | flia | | | easy ]. {
+    now apply Ha.
+  } {
+    now apply Ha.
+  } {
+    now apply Hb.
+  }
+}
+assert
+  (Hsabb :
+     is_square_bmat_loop (sizes_of_bmatrix (fa 0 0 * fb 0 0)%BM) (fb 0 0)). {
+  assert (Hzr : 0 < S ra) by flia.
+  rewrite IHBMA; [ | flia | flia | | | easy ]. {
+    now rewrite Hab; apply Hb.
+  } {
+    now apply Ha.
+  } {
+    now apply Hb.
+  }
+}
 destruct ra. {
   cbn.
   rewrite sizes_of_bmatrix_add. {
@@ -1166,28 +1190,12 @@ rewrite sizes_of_bmatrix_add. {
   }
 } {
   clear IHra.
-  clear - Ha Hb Hab IHBMA Hssm.
+  clear - Ha Hb Hab IHBMA Hssm Hsaba Hsabb.
   assert (Hzr : 0 < S (S ra)) by flia.
   assert (H2 : is_square_bmat (fa 0 0 * fb 0 0)%BM). {
-    apply is_square_bmat_loop_mul. {
-      rewrite IHBMA; [ | flia | flia | | | easy ]. {
-        now apply Ha.
-      } {
-        now apply Ha.
-      } {
-        now apply Hb.
-      }
-    } {
-      rewrite IHBMA; [ | flia | flia | | | easy ]. {
-        now rewrite Hab; apply Hb.
-      } {
-        now apply Ha.
-      } {
-        now apply Hb.
-      }
-    }
+    now apply is_square_bmat_loop_mul.
   }
-  clear - H2 Ha Hb Hab IHBMA Hssm.
+  clear - H2 Ha Hb Hab IHBMA Hssm Hsaba Hsabb.
   induction ra. {
     cbn.
     assert (H1 : 0 < 2) by flia.
@@ -1361,7 +1369,7 @@ rewrite sizes_of_bmatrix_add. {
         intros j Hj.
         assert (H9 : j < S (S (S ra))) by flia Hj.
         rewrite sizes_of_bmatrix_add; [ | | easy | easy ]. {
-          clear - IHBMA Ha Hj Hb Hab.
+          clear - IHBMA Ha Hj Hb Hab Hsaba Hsabb.
           cbn in Hj.
           destruct Hj as (_ & Hj).
           assert (H3 : 0 < S (S ra)) by flia.
