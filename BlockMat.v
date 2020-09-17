@@ -1810,6 +1810,8 @@ rewrite sizes_of_bmatrix_add. {
     }
   }
 } {
+  cbn in IHra.
+  rewrite IHra. {
 ...
 intros * Ha Hb Hab.
 revert BMB Hb Hab.
