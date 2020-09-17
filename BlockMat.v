@@ -1223,6 +1223,8 @@ assert
     apply Nat.lt_0_succ.
   }
 }
+(*
+...
 destruct ra. {
   cbn.
   rewrite sizes_of_bmatrix_add. {
@@ -1237,9 +1239,11 @@ destruct ra. {
     rewrite IHBMA; [ easy | flia | flia | easy | easy | easy ].
   }
 }
+*)
 rewrite List_seq_succ_r; cbn.
 rewrite fold_left_app; cbn.
 rewrite sizes_of_bmatrix_add. {
+  destruct ra; [ apply sizes_of_bmat_zero_like | ].
   apply IHra; [ | flia | | | | ]. {
     intros * Hi Hj Hij * HBMB Hfb.
     apply IHBMA; [ flia Hi | flia Hj | easy | easy | easy ].
@@ -1265,6 +1269,11 @@ rewrite sizes_of_bmatrix_add. {
   }
   clear - H2 Ha Hb Hab IHBMA Hssm Hsaba Hsabb.
   induction ra. {
+    apply is_square_bmat_zero_like.
+    apply Ha; flia.
+  }
+(*
+  induction ra. {
     cbn.
     assert (H1 : 0 < 2) by flia.
     rewrite sizes_of_bmatrix_add; [ | | easy | easy ]. {
@@ -1285,6 +1294,7 @@ rewrite sizes_of_bmatrix_add. {
       now apply Ha.
     }
   }
+*)
   assert (Hzr : 0 < S (S (S ra))) by flia.
   rewrite List_seq_succ_r; cbn.
   rewrite fold_left_app; cbn.
@@ -1340,6 +1350,7 @@ rewrite sizes_of_bmatrix_add. {
       apply is_square_bmat_loop_mul. {
         now apply sizes_of_bmatrix_mul_a.
       } {
+...
         rewrite IHBMA; [ | easy | easy | | | congruence ]. {
           now rewrite H6', Hab; apply Hb.
         } {
@@ -1419,7 +1430,6 @@ rewrite sizes_of_bmatrix_add. {
             apply Hb; [ flia Hi Hj | flia Hk Hj ].
           }
         } {
-(**)
           rewrite IHBMA; [ | easy | easy | | | congruence ]. {
             now rewrite H10, Hab; apply Hb.
           } {
