@@ -1501,15 +1501,14 @@ rewrite sizes_of_bmatrix_add. {
           }
         }
         apply is_square_bmat_loop_mul. {
-          rewrite IHBMA; [ | easy | easy | | | ]. {
+          rewrite IHBMA; [ | easy | easy | | | congruence ]. {
             now rewrite H10; apply Ha.
           } {
             now rewrite H10; apply Ha.
           } {
             unfold is_square_bmat.
             now rewrite H11; apply Hb.
-          } {
-...
+          }
         } {
           rewrite IHBMA; [ | easy | easy | | | congruence ]. {
             now rewrite H10, Hab; apply Hb.
@@ -1520,6 +1519,8 @@ rewrite sizes_of_bmatrix_add. {
             now rewrite H11; apply Hb.
           }
         }
+      } {
+        intros j Hj.
 ...
 intros * Ha Hb Hab.
 revert BMB Hb Hab.
