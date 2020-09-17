@@ -1281,7 +1281,6 @@ rewrite sizes_of_bmatrix_add. {
         }
       }
     } {
-      assert (H8 : 0 < S (S (S ra))) by flia.
       rewrite sizes_of_bmatrix_fold_left. {
         rewrite sizes_of_bmatrix_add; [ | | easy | easy ]. {
           rewrite sizes_of_bmat_zero_like.
