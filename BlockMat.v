@@ -1479,6 +1479,50 @@ rewrite sizes_of_bmatrix_add. {
         }
       } {
         intros j Hj.
+        assert (H8 : 0 < S (S (S ra))) by flia.
+        assert (H9 : j < S (S (S ra))) by flia Hj.
+        assert
+          (H10 : sizes_of_bmatrix (fa 0 j) = sizes_of_bmatrix (fa 0 0)). {
+          apply sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
+            intros i k Hi Hk.
+            apply Ha; [ flia Hi | flia Hk ].
+          } {
+            easy.
+          } {
+            flia Hj.
+          }
+        }
+        assert
+          (H11 : sizes_of_bmatrix (fb j 0) = sizes_of_bmatrix (fb 0 0)). {
+          apply sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
+            intros i k Hi Hk.
+            apply Hb; [ flia Hi | flia Hk ].
+          } {
+            flia Hj.
+          } {
+            easy.
+          }
+        }
+        apply is_square_bmat_loop_mul. {
+          rewrite IHBMA; [ | easy | easy | | | ]. {
+            now rewrite H10; apply Ha.
+          } {
+            now rewrite H10; apply Ha.
+          } {
+            unfold is_square_bmat.
+            now rewrite H11; apply Hb.
+          } {
+...
+        } {
+          rewrite IHBMA; [ | easy | easy | | | congruence ]. {
+            now rewrite H10, Hab; apply Hb.
+          } {
+            now rewrite H10; apply Ha.
+          } {
+            unfold is_square_bmat.
+            now rewrite H11; apply Hb.
+          }
+        }
 ...
 intros * Ha Hb Hab.
 revert BMB Hb Hab.
