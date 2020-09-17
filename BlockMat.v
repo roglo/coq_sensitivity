@@ -1151,6 +1151,27 @@ assert
     now apply Hb.
   }
 }
+assert (H6 : sizes_of_bmatrix (fa 0 ra) = sizes_of_bmatrix (fa 0 0)). {
+  apply sizes_of_bmatrix_at_0_0 with (r := S ra). {
+    intros i j Hi Hj.
+    apply Ha; [ flia Hi | flia Hj ].
+  } {
+    apply Nat.lt_0_succ.
+  } {
+    apply Nat.lt_succ_diag_r.
+  }
+}
+assert
+  (H7 : sizes_of_bmatrix (fb ra 0) = sizes_of_bmatrix (fb 0 0)). {
+  apply sizes_of_bmatrix_at_0_0 with (r := S ra). {
+    intros i j Hi Hj.
+    apply Hb; [ flia Hi | flia Hj ].
+  } {
+    apply Nat.lt_succ_diag_r.
+  } {
+    apply Nat.lt_0_succ.
+  }
+}
 destruct ra. {
   cbn.
   rewrite sizes_of_bmatrix_add. {
@@ -1159,14 +1180,10 @@ destruct ra. {
     apply is_square_bmat_zero_like.
     apply Ha; flia.
   } {
-    apply is_square_bmat_loop_mul. {
-      rewrite IHBMA; [ easy | flia | flia | easy | easy | easy ].
-    }
-    rewrite IHBMA; [ | flia | flia | easy | easy | easy ].
-    now rewrite Hab.
+    now apply is_square_bmat_loop_mul.
   } {
-    rewrite IHBMA; [ | flia | flia | easy | easy | easy ].
-    apply sizes_of_bmat_zero_like.
+    rewrite sizes_of_bmat_zero_like.
+    rewrite IHBMA; [ easy | flia | flia | easy | easy | easy ].
   }
 }
 rewrite List_seq_succ_r; cbn.
@@ -1270,6 +1287,7 @@ rewrite sizes_of_bmatrix_add. {
       }
     } {
       apply is_square_bmat_loop_mul. {
+(**)
         rewrite IHBMA; [ | easy | easy | | | congruence ]. {
           now rewrite H6; apply Ha.
         } {
@@ -1775,28 +1793,6 @@ rewrite sizes_of_bmatrix_add. {
 } {
   assert (H3 : 0 < S (S ra)) by flia.
   assert (H4 : S ra < S (S ra)) by flia.
-  assert
-    (H6 : sizes_of_bmatrix (fa 0 (S ra)) = sizes_of_bmatrix (fa 0 0)). {
-    apply sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
-      intros i j Hi Hj.
-      apply Ha; [ flia Hi | flia Hj ].
-    } {
-      easy.
-    } {
-      easy.
-    }
-  }
-  assert
-  (H7 : sizes_of_bmatrix (fb (S ra) 0) = sizes_of_bmatrix (fb 0 0)). {
-    apply sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
-      intros i j Hi Hj.
-      apply Hb; [ flia Hi | flia Hj ].
-    } {
-      easy.
-    } {
-      easy.
-    }
-  }
   apply is_square_bmat_loop_mul. {
     rewrite IHBMA; [ | easy | easy | | | congruence ]. {
       now rewrite H6; apply Ha.
