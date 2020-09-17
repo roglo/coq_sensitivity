@@ -1139,8 +1139,6 @@ rewrite IHBMA; [ | easy | easy | | | congruence ]. {
 }
 Qed.
 
-...
-
 Theorem sizes_of_bmatrix_mul : ∀ BMA BMB,
   is_square_bmat BMA
   → is_square_bmat BMB
@@ -1342,8 +1340,6 @@ rewrite sizes_of_bmatrix_add. {
       apply is_square_bmat_loop_mul. {
         now apply sizes_of_bmatrix_mul_a.
       } {
-...
-(**)
         rewrite IHBMA; [ | easy | easy | | | congruence ]. {
           now rewrite H6', Hab; apply Hb.
         } {
