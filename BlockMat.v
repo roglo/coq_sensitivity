@@ -1088,6 +1088,58 @@ rewrite IHlen; cycle 1. {
 apply sizes_of_bmatrix_add; [ easy | apply Hf; flia | apply Hfb; flia ].
 Qed.
 
+Lemma sizes_of_bmatrix_mul_1 : ∀ fa fb ra,
+  (∀ i j,
+   i < S (S (S ra))
+   → j < S (S (S ra))
+   → is_square_bmat_loop (sizes_of_bmatrix (fa i j)) (fa i j)
+   → ∀ BMB,
+      is_square_bmat BMB
+      → sizes_of_bmatrix (fa i j) = sizes_of_bmatrix BMB
+      → sizes_of_bmatrix (fa i j * BMB)%BM = sizes_of_bmatrix (fa i j))
+  → (∀ i j, i < S (S (S ra)) → j < S (S (S ra)) →
+      is_square_bmat_loop (sizes_of_bmatrix (fa 0 0)) (fa i j))
+  → (∀ i j, i < S (S (S ra)) → j < S (S (S ra)) →
+      is_square_bmat_loop (sizes_of_bmatrix (fb 0 0)) (fb i j))
+  → sizes_of_bmatrix (fa 0 0) = sizes_of_bmatrix (fb 0 0)
+  → is_square_bmat_loop (sizes_of_bmatrix (fa 0 (S ra) * fb (S ra) 0)%BM)
+       (fa 0 (S ra)).
+Proof.
+intros * IHBMA Ha Hb Hab.
+assert (Hzr : 0 < S (S (S ra))) by flia.
+assert (H5 : S ra < S (S (S ra))) by flia.
+assert
+  (H6' : sizes_of_bmatrix (fa 0 (S ra)) = sizes_of_bmatrix (fa 0 0)). {
+  apply sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
+    intros i j Hi Hj.
+    apply Ha; [ flia Hi | flia Hj ].
+  } {
+    flia.
+  } {
+    flia.
+  }
+}
+assert
+(H7' : sizes_of_bmatrix (fb (S ra) 0) = sizes_of_bmatrix (fb 0 0)). {
+  apply sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
+    intros i j Hi Hj.
+    apply Hb; [ flia Hi | flia Hj ].
+  } {
+    flia.
+  } {
+    flia.
+  }
+}
+rewrite IHBMA; [ | easy | easy | | | congruence ]. {
+  now rewrite H6'; apply Ha.
+} {
+  now rewrite H6'; apply Ha.
+} {
+  unfold is_square_bmat.
+  now rewrite H7'; apply Hb.
+}
+Qed.
+
 Theorem sizes_of_bmatrix_mul : ∀ BMA BMB,
   is_square_bmat BMA
   → is_square_bmat BMB
@@ -1287,15 +1339,7 @@ rewrite sizes_of_bmatrix_add. {
       }
     } {
       apply is_square_bmat_loop_mul. {
-(**)
-        rewrite IHBMA; [ | easy | easy | | | congruence ]. {
-          now rewrite H6'; apply Ha.
-        } {
-          now rewrite H6'; apply Ha.
-        } {
-          unfold is_square_bmat.
-          now rewrite H7'; apply Hb.
-        }
+        now apply sizes_of_bmatrix_mul_1.
       } {
         rewrite IHBMA; [ | easy | easy | | | congruence ]. {
           now rewrite H6', Hab; apply Hb.
