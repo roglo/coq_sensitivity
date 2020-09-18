@@ -1482,50 +1482,15 @@ rewrite sizes_of_bmatrix_add. {
   } {
     rewrite sizes_of_bmatrix_add. {
       rewrite sizes_of_bmatrix_fold_left. {
-...
-        rewrite sizes_of_bmatrix_add; [ | | | easy ]. {
-          rewrite sizes_of_bmat_zero_like.
-          apply is_square_bmat_loop_mul. {
-            now apply Ha.
-          } {
-            now rewrite Hab; apply Hb.
-          }
-        } {
-          apply is_square_bmat_zero_like.
+        rewrite sizes_of_bmat_zero_like.
+        apply is_square_bmat_loop_mul. {
           now apply Ha.
         } {
-          unfold is_square_bmat.
-          rewrite IHBMA; [ | easy | easy | | | congruence ]. {
-            apply is_square_bmat_loop_mul. {
-              now apply Ha.
-            } {
-              now rewrite Hab; apply Hb.
-            }
-          } {
-            now apply Ha.
-          } {
-            now apply Hb.
-          }
+          now rewrite Hab; apply Hb.
         }
       } {
-        apply is_square_bmat_loop_add. {
-          rewrite sizes_of_bmatrix_add; [ | | easy | easy ]. {
-            apply is_square_bmat_zero_like.
-            now apply Ha.
-          } {
-            apply is_square_bmat_zero_like.
-            now apply Ha.
-          }
-        } {
-          rewrite sizes_of_bmatrix_add; [ | | easy | easy ]. {
-            rewrite sizes_of_bmat_zero_like.
-            apply is_square_bmat_loop_mul; [ now apply Ha | ].
-            now rewrite Hab; apply Hb.
-          } {
-            apply is_square_bmat_zero_like.
-            now apply Ha.
-          }
-        }
+        apply is_square_bmat_zero_like.
+        now apply Ha.
       } {
         intros j Hj.
         assert (H9 : j < S (S (S ra))) by flia Hj.
@@ -1552,6 +1517,7 @@ rewrite sizes_of_bmatrix_add. {
           }
         }
         apply is_square_bmat_loop_mul. {
+...
           rewrite IHBMA; [ | easy | easy | | | congruence ]. {
             now rewrite H10; apply Ha.
           } {
