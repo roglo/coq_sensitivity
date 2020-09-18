@@ -1247,10 +1247,6 @@ rewrite sizes_of_bmatrix_add. {
   apply IHra; flia.
 } {
   clear IHra.
-  clear - Ha Hb Hab IHBMA Hsaba Hsabb Haj Hbj.
-  assert (H2 : is_square_bmat (fa 0 0 * fb 0 0)%BM). {
-    now apply is_square_bmat_loop_mul.
-  }
   induction ra. {
     apply is_square_bmat_zero_like.
     apply Ha; flia.
@@ -1263,7 +1259,7 @@ rewrite sizes_of_bmatrix_add. {
          is_square_bmat BMB
          → sizes_of_bmatrix (fa i j) = sizes_of_bmatrix BMB
          → sizes_of_bmatrix (fa i j * BMB)%BM = sizes_of_bmatrix (fa i j)). {
-    intros i j Hi Hj Hsa * HBMB Hss.
+    intros i j Hi Hj Hsa' * HBMB Hss.
     apply IHBMA; [ flia Hi | flia Hj | easy | easy | easy ].
   }
   specialize (IHra H); clear H.
@@ -1585,7 +1581,7 @@ rewrite sizes_of_bmatrix_add. {
 }
 Qed.
 
-(* pfiou... 450 lignes pour un théorème... *)
+(* pfiou... 440 lignes pour un théorème... *)
 (* ça va pas, ça *)
 
 Inspect 1.
