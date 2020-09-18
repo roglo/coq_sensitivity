@@ -1153,8 +1153,6 @@ induction BMA as [xa| ma IHBMA] using bmatrix_ind2; intros. {
 destruct BMB as [xb| mb]; [ easy | cbn ].
 move mb before ma.
 cbn in Ha, Hb, Hab.
-specialize (sizes_of_bmatrix_mat_el ma Ha) as Has.
-specialize (sizes_of_bmatrix_mat_el mb Hb) as Hbs.
 destruct ma as (fa, ra, ca).
 destruct mb as (fb, rb, cb).
 cbn in *.
@@ -1196,20 +1194,6 @@ assert
    → is_square_bmat_loop (sizes_of_bmatrix (fb 0 0)) (fb i j)). {
   intros * Hi Hj.
   apply Hb; [ flia Hi | flia Hj ].
-}
-specialize (IHra H); clear H.
-assert
-  (H : ∀ i j,
-   i < ra → j < ra → sizes_of_bmatrix (fa i j) = sizes_of_bmatrix (fa 0 0)). {
-  intros * Hi Hj.
-  apply Has; [ flia Hi | flia Hj ].
-}
-specialize (IHra H); clear H.
-assert
-  (H : ∀ i j,
-   i < ra → j < ra → sizes_of_bmatrix (fb i j) = sizes_of_bmatrix (fb 0 0)). {
-  intros * Hi Hj.
-  apply Hbs; [ flia Hi | flia Hj ].
 }
 specialize (IHra H); clear H.
 assert (Hsa : is_square_bmat (fa 0 0)) by (apply Ha; flia).
@@ -1594,7 +1578,7 @@ rewrite sizes_of_bmatrix_add. {
   symmetry.
   assert (H0ss : 0 < S (S ra)) by flia.
   assert (Hssr : S ra < S (S ra)) by flia.
-  rewrite IHBMA; [ now apply Haj | flia | flia | | | ]. {
+  rewrite IHBMA; [ now apply Haj | easy | easy | | | ]. {
     rewrite Haj; [ now apply Ha | easy ].
   } {
     unfold is_square_bmat.
