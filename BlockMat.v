@@ -1263,12 +1263,12 @@ rewrite sizes_of_bmatrix_add. {
   apply IHra; flia.
 } {
   clear IHra.
-  clear - Ha Hb Hab IHBMA Hsaba Hsabb.
+  clear - Ha Hb Hab IHBMA Hsaba Hsabb Haj Hbj.
   assert (Hzr : 0 < S (S ra)) by flia.
   assert (H2 : is_square_bmat (fa 0 0 * fb 0 0)%BM). {
     now apply is_square_bmat_loop_mul.
   }
-  clear - H2 Ha Hb Hab IHBMA Hsaba Hsabb.
+  clear - H2 Ha Hb Hab IHBMA Hsaba Hsabb Haj Hbj.
   induction ra. {
     apply is_square_bmat_zero_like.
     apply Ha; flia.
@@ -1301,26 +1301,26 @@ rewrite sizes_of_bmatrix_add. {
     apply Hb; [ flia Hi | flia Hj ].
   }
   specialize (IHra H); clear H.
+  assert
+    (H : ∀ j, j < S ra
+     → sizes_of_bmatrix (fa 0 j) = sizes_of_bmatrix (fa 0 0)). {
+    intros * Hj.
+    apply Haj; flia Hj.
+  }
+  specialize (IHra H); clear H.
+  assert
+    (H : ∀ j, j < S ra
+     → sizes_of_bmatrix (fb j 0) = sizes_of_bmatrix (fb 0 0)). {
+    intros * Hj.
+    apply Hbj; flia Hj.
+  }
+  specialize (IHra H); clear H.
   assert (Hzsr : 0 < S ra) by flia.
   assert (Hzssr : 0 < S (S ra)) by flia.
   assert (Hrsr : ra < S ra) by flia.
   assert (Hrssr : ra < S (S ra)) by flia.
   rewrite List_seq_succ_r; cbn.
   rewrite fold_left_app; cbn.
-  assert
-    (Haj : ∀ j, j < S ra → sizes_of_bmatrix (fa 0 j) = sizes_of_bmatrix (fa 0 0)). {
-    intros j Hj.
-    apply (@sizes_of_bmatrix_at_0_0 _ (S ra)); [ | flia Hj | easy ].
-    intros i k Hi Hk.
-    apply Ha; [ flia Hi | flia Hk ].
-  }
-  assert
-    (Hbj : ∀ j, j < S ra → sizes_of_bmatrix (fb j 0) = sizes_of_bmatrix (fb 0 0)). {
-    intros j Hj.
-    apply (@sizes_of_bmatrix_at_0_0 _ (S ra)); [ | easy | flia Hj ].
-    intros i k Hi Hk.
-    apply Hb; [ flia Hi | flia Hk ].
-  }
   apply is_square_bmat_loop_add. {
     rewrite sizes_of_bmatrix_add; [ easy | easy | | ]. {
       apply is_square_bmat_loop_mul. {
@@ -1444,7 +1444,8 @@ rewrite sizes_of_bmatrix_add. {
              sizes_of_bmatrix (fa 0 j * fb j 0)%BM =
              sizes_of_bmatrix (fa 0 0)). {
           assert (H8 : j < S ra) by flia Hj.
-          rewrite IHBMA; [ now apply Haj | easy | flia Hj | | | ]. {
+          assert (H9 : j < S (S ra)) by flia Hj.
+          rewrite IHBMA; [ now apply Haj | easy | easy | | | ]. {
             rewrite Haj; [ | easy ].
             apply Ha; [ easy | flia Hj ].
           } {
