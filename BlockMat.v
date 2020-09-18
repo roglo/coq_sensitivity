@@ -1734,60 +1734,22 @@ rewrite sizes_of_bmatrix_add. {
     }
   }
 } {
-  cbn.
+  clear - Hssm IHra IHBMA H6 H7 Ha Hb Hab.
   destruct ra. {
     now cbn; rewrite sizes_of_bmat_zero_like.
   }
   rewrite IHra; [ | flia ].
   symmetry.
-  rewrite IHBMA; [ easy | flia | flia | | | ]. {
-    rewrite sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
-      apply Ha; flia.
-    } {
-      intros i j Hi Hj.
-      apply Ha; [ flia Hi | flia Hj ].
-    } {
-      flia.
-    } {
-      flia.
-    }
+  rewrite IHBMA; [ easy | flia | flia | | | congruence ]. {
+    rewrite H6; apply Ha; flia.
   } {
     unfold is_square_bmat.
-    rewrite sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
-      apply Hb; flia.
-    } {
-      intros i j Hi Hj.
-      apply Hb; [ flia Hi | flia Hj ].
-    } {
-      flia.
-    } {
-      flia.
-    }
-  } {
-    rewrite sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
-      symmetry.
-      rewrite sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
-        easy.
-      } {
-        apply Hb; flia.
-      } {
-        flia.
-      } {
-        flia.
-      }
-    } {
-      intros i j Hi Hj.
-      apply Ha; [ flia Hi | flia Hj ].
-    } {
-      flia.
-    } {
-      flia.
-    }
+    rewrite H7; apply Hb; flia.
   }
 }
 Qed.
 
-(* pfiou... 640 lignes pour un théorème... *)
+(* pfiou... 600 lignes pour un théorème... *)
 (* ça va pas, ça *)
 
 Inspect 1.
