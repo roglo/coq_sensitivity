@@ -1223,23 +1223,6 @@ assert
     apply Nat.lt_0_succ.
   }
 }
-(*
-...
-destruct ra. {
-  cbn.
-  rewrite sizes_of_bmatrix_add. {
-    apply sizes_of_bmat_zero_like.
-  } {
-    apply is_square_bmat_zero_like.
-    apply Ha; flia.
-  } {
-    now apply is_square_bmat_loop_mul.
-  } {
-    rewrite sizes_of_bmat_zero_like.
-    rewrite IHBMA; [ easy | flia | flia | easy | easy | easy ].
-  }
-}
-*)
 rewrite List_seq_succ_r; cbn.
 rewrite fold_left_app; cbn.
 rewrite sizes_of_bmatrix_add. {
@@ -1272,29 +1255,6 @@ rewrite sizes_of_bmatrix_add. {
     apply is_square_bmat_zero_like.
     apply Ha; flia.
   }
-(*
-  induction ra. {
-    cbn.
-    assert (H1 : 0 < 2) by flia.
-    rewrite sizes_of_bmatrix_add; [ | | easy | easy ]. {
-      apply is_square_bmat_loop_add. {
-        apply square_bmat_loop_zero_like.
-        rewrite sizes_of_bmat_zero_like.
-        now apply Ha.
-      } {
-        rewrite sizes_of_bmat_zero_like.
-        apply is_square_bmat_loop_mul. {
-          now apply Ha.
-        } {
-          now rewrite Hab; apply Hb.
-        }
-      }
-    } {
-      apply is_square_bmat_zero_like.
-      now apply Ha.
-    }
-  }
-*)
   assert (Hzsr : 0 < S ra) by flia.
   assert (Hzssr : 0 < S (S ra)) by flia.
   assert (Hrsr : ra < S ra) by flia.
@@ -1493,7 +1453,7 @@ rewrite sizes_of_bmatrix_add. {
         now apply Ha.
       } {
         intros j Hj.
-        assert (H9 : j < S (S (S ra))) by flia Hj.
+        assert (H9 : j < S (S ra)) by flia Hj.
         assert
           (H10 : sizes_of_bmatrix (fa 0 j) = sizes_of_bmatrix (fa 0 0)). {
           apply sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
@@ -1517,7 +1477,6 @@ rewrite sizes_of_bmatrix_add. {
           }
         }
         apply is_square_bmat_loop_mul. {
-...
           rewrite IHBMA; [ | easy | easy | | | congruence ]. {
             now rewrite H10; apply Ha.
           } {
@@ -1544,9 +1503,9 @@ rewrite sizes_of_bmatrix_add. {
             intros i k Hi Hk.
             apply Ha; [ flia Hi | flia Hk ].
           } {
-            flia.
-          } {
             easy.
+          } {
+            flia Hj.
           }
         }
         assert
@@ -1555,9 +1514,9 @@ rewrite sizes_of_bmatrix_add. {
             intros i k Hi Hk.
             apply Hb; [ flia Hi | flia Hk ].
           } {
-            easy.
+            flia Hj.
           } {
-            flia.
+            easy.
           }
         }
         assert
@@ -1582,20 +1541,6 @@ rewrite sizes_of_bmatrix_add. {
             } {
               now apply Hb.
             }
-        }
-        rewrite sizes_of_bmatrix_add. {
-          now rewrite sizes_of_bmat_zero_like.
-        } {
-          apply is_square_bmat_zero_like.
-          now apply Ha.
-        } {
-          apply is_square_bmat_loop_mul. {
-            rewrite Hab0.
-            now apply Ha.
-          } {
-            rewrite Hab0, Hab.
-            now apply Hb.
-          }
         } {
           now rewrite sizes_of_bmat_zero_like.
         }
@@ -1633,40 +1578,19 @@ rewrite sizes_of_bmatrix_add. {
       }
     } {
       rewrite sizes_of_bmatrix_fold_left. {
-        rewrite sizes_of_bmatrix_add; [ | | easy | easy ]. {
-          rewrite sizes_of_bmat_zero_like.
-          symmetry.
-          rewrite IHBMA; [ easy | easy | easy | | | congruence ]. {
-            now rewrite H6'; apply Ha.
-          } {
-            unfold is_square_bmat.
-            now rewrite H7'; apply Hb.
-          }
+        rewrite sizes_of_bmat_zero_like.
+        symmetry.
+        rewrite IHBMA; [ easy | easy | easy | | | congruence ]. {
+          now rewrite H6'; apply Ha.
         } {
-          now apply is_square_bmat_zero_like, Ha.
+          unfold is_square_bmat.
+          now rewrite H7'; apply Hb.
         }
       } {
-        apply is_square_bmat_loop_add. {
-          rewrite sizes_of_bmatrix_add; [ | | easy | easy ]. {
-            apply is_square_bmat_zero_like.
-            now apply Ha.
-          } {
-            apply is_square_bmat_zero_like.
-            now apply Ha.
-          }
-        } {
-          rewrite sizes_of_bmatrix_add; [ | | easy | easy ]. {
-            rewrite sizes_of_bmat_zero_like.
-            apply is_square_bmat_loop_mul; [ now apply Ha | ].
-            now rewrite Hab; apply Hb.
-          } {
-            apply is_square_bmat_zero_like.
-            now apply Ha.
-          }
-        }
+        now apply is_square_bmat_zero_like, Ha.
       } {
         intros j Hj.
-        assert (H9 : j < S (S (S ra))) by flia Hj.
+        assert (H9 : j < S (S ra)) by flia Hj.
         assert
           (H10 : sizes_of_bmatrix (fa 0 j) = sizes_of_bmatrix (fa 0 0)). {
           apply sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
@@ -1710,80 +1634,65 @@ rewrite sizes_of_bmatrix_add. {
         }
       } {
         intros j Hj.
-        assert (H9 : j < S (S (S ra))) by flia Hj.
-        rewrite sizes_of_bmatrix_add; [ | | easy | easy ]. {
-          clear - IHBMA Ha Hj Hb Hab.
-          cbn in Hj.
-          destruct Hj as (_ & Hj).
-          assert (H3 : 0 < S (S ra)) by flia.
-          assert (H9 : j < S (S (S ra))) by flia Hj.
-          assert (Hsss : 0 < S (S (S ra))) by flia.
-          rewrite sizes_of_bmat_zero_like.
-          symmetry.
-          rewrite IHBMA; [ | easy | easy | | | ]. {
-            apply sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
-              intros i k Hi Hk.
-              apply Ha; [ flia Hi | flia Hk ].
-            } {
-              easy.
-            } {
-              flia Hj.
-            }
+        assert (H9 : j < S ra) by flia Hj.
+        assert (Hjssr : j < S (S ra)) by flia Hj.
+        rewrite sizes_of_bmat_zero_like.
+        symmetry.
+        rewrite IHBMA; [ | easy | easy | | | ]. {
+          apply (@sizes_of_bmatrix_at_0_0 _ (S ra)); [ | easy | easy ].
+          intros i k Hi Hk.
+          apply Ha; [ flia Hi | flia Hk ].
+        } {
+          rewrite (@sizes_of_bmatrix_at_0_0 _ (S ra)). {
+            now apply Ha.
           } {
-            rewrite sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
-              now apply Ha.
-            } {
-              intros i k Hi Hk.
-              apply Ha; [ flia Hi | flia Hk ].
-            } {
-              easy.
-            } {
-              flia Hj.
-            }
+            intros i k Hi Hk.
+            apply Ha; [ flia Hi | flia Hk ].
           } {
-            unfold is_square_bmat.
-            rewrite sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
-              now apply Hb.
+            easy.
+          } {
+            easy.
+          }
+        } {
+          unfold is_square_bmat.
+          rewrite sizes_of_bmatrix_at_0_0 with (r := S ra). {
+            now apply Hb.
+          } {
+            intros i k Hi Hk.
+            apply Hb; [ flia Hi | flia Hk ].
+          } {
+            easy.
+          } {
+            easy.
+          }
+        } {
+          rewrite sizes_of_bmatrix_at_0_0 with (r := S ra). {
+            symmetry.
+            rewrite sizes_of_bmatrix_at_0_0 with (r := S ra). {
+              easy.
             } {
               intros i k Hi Hk.
               apply Hb; [ flia Hi | flia Hk ].
             } {
-              flia Hj.
+              easy.
             } {
               easy.
             }
           } {
-            rewrite sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
-              symmetry.
-              rewrite sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
-                easy.
-              } {
-                intros i k Hi Hk.
-                apply Hb; [ flia Hi | flia Hk ].
-              } {
-                flia Hj.
-              } {
-                easy.
-              }
-            } {
-              intros i k Hi Hk.
-              apply Ha; [ flia Hi | flia Hk ].
-            } {
-              easy.
-            } {
-              flia Hj.
-            }
+            intros i k Hi Hk.
+            apply Ha; [ flia Hi | flia Hk ].
+          } {
+            easy.
+          } {
+            easy.
           }
-        } {
-          apply is_square_bmat_zero_like.
-          now apply Ha.
         }
       }
     }
   }
 } {
-  assert (H3 : 0 < S (S ra)) by flia.
-  assert (H4 : S ra < S (S ra)) by flia.
+  assert (H3 : 0 < S ra) by flia.
+  assert (H4 : ra < S ra) by flia.
   apply is_square_bmat_loop_mul. {
     rewrite IHBMA; [ | easy | easy | | | congruence ]. {
       now rewrite H6; apply Ha.
@@ -1805,18 +1714,10 @@ rewrite sizes_of_bmatrix_add. {
   }
 } {
   cbn in IHra.
+  destruct ra; [ easy | ].
   rewrite IHra. {
     symmetry.
-    rewrite IHBMA; [ | flia | flia | | | ]. {
-      apply sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
-        intros i j Hi Hj.
-        apply Ha; [ flia Hi | flia Hj ].
-      } {
-        flia.
-      } {
-        flia.
-      }
-    } {
+    rewrite IHBMA; [ easy | flia | flia | | | ]. {
       rewrite sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
         apply Ha; flia.
       } {
@@ -1895,7 +1796,7 @@ rewrite sizes_of_bmatrix_add. {
 }
 Qed.
 
-(* pfiou... 900 lignes pour un théorème... *)
+(* pfiou... 700 lignes pour un théorème... *)
 (* ça va pas, ça *)
 
 Inspect 1.
