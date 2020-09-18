@@ -1570,7 +1570,6 @@ rewrite sizes_of_bmatrix_add. {
     }
   }
 } {
-  clear - Hssm IHra IHBMA Haj Hbj Ha Hb Hab.
   destruct ra. {
     now cbn; rewrite sizes_of_bmat_zero_like.
   }
