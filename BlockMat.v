@@ -1471,12 +1471,6 @@ rewrite sizes_of_bmatrix_add. {
 }
 Qed.
 
-(* pfiou... 330 lignes pour un théorème... *)
-
-Inspect 1.
-
-...
-
 Theorem is_square_bmat_mul : ∀ BMA BMB,
   is_square_bmat BMA
   → is_square_bmat BMB
@@ -1485,7 +1479,6 @@ Theorem is_square_bmat_mul : ∀ BMA BMB,
 Proof.
 intros * Ha Hb Hab.
 unfold is_square_bmat.
-...
 rewrite sizes_of_bmatrix_mul; [ | easy | easy | easy ].
 apply is_square_bmat_loop_mul; [ apply Ha | ].
 rewrite Hab.
@@ -1500,7 +1493,6 @@ Theorem bmat_zero_like_mul : ∀ BMA BMB,
 Proof.
 intros * Ha Hb Hab.
 apply bmat_zero_like_eq_compat; [ | easy | ]. {
-...
   now apply is_square_bmat_mul.
 }
 now apply sizes_of_bmatrix_mul.
@@ -1511,106 +1503,8 @@ Theorem bmat_zero_like_sqr : ∀ BM,
   → bmat_zero_like (BM * BM)%BM = bmat_zero_like BM.
 Proof.
 intros * Hss.
-...
 now apply bmat_zero_like_mul.
 Qed.
-
-(* bon, je me suis faich... à prouver ça, mais il y a une autre
-   preuve ci-dessous, invoquant des théorèmes que j'avais déjà
-   faits.
-Theorem bmat_mul_0_l' : ∀ BM,
-  is_square_bmat BM
-  → (bmat_zero_like BM * BM)%BM = bmat_zero_like BM.
-Proof.
-intros * Hss.
-induction BM as [x| M IHBM] using bmatrix_ind2. {
-  now cbn; rewrite srng_mul_0_l.
-}
-cbn; f_equal.
-apply matrix_eq; cbn; [ easy | easy | ].
-intros i j Hi Hj.
-rewrite bmat_zero_like_idemp.
-destruct M as (f, r, c); cbn in *.
-destruct (zerop r) as [H| H]; [ easy | cbn in Hss; clear H ].
-destruct (zerop c) as [H| H]; [ easy | cbn in Hss; clear H ].
-destruct Hss as (_ & H & Hss); subst c.
-rewrite bmat_zero_like_eq_compat with (BMB := f i j); cycle 1. {
-  apply Hss; flia Hi.
-} {
-  unfold is_square_bmat.
-  rewrite (sizes_of_bmatrix_at_0_0 f Hss Hi Hj).
-  now apply Hss.
-} {
-  symmetry.
-  apply (sizes_of_bmatrix_at_0_0 f Hss Hi Hj).
-}
-replace
-  (fold_left
-     (λ (acc : bmatrix T) (j0 : nat),
-       (acc + bmat_zero_like (f i j0) * f j0 j)%BM)
-     (seq 0 r) (bmat_zero_like (f i j)))
-with
-  (fold_left
-     (λ (acc : bmatrix T) (j0 : nat),
-       (acc + bmat_zero_like (f i j))%BM)
-     (seq 0 r) (bmat_zero_like (f i j))). 2: {
-  apply List_fold_left_ext_in.
-  intros k M Hk.
-  apply in_seq in Hk.
-  f_equal.
-  symmetry.
-  rewrite bmat_zero_like_eq_compat with (BMB := f k j); cycle 1. {
-    unfold is_square_bmat.
-    rewrite (sizes_of_bmatrix_at_0_0 f Hss); [ | easy | easy ].
-    now apply Hss.
-  } {
-    unfold is_square_bmat.
-    rewrite (sizes_of_bmatrix_at_0_0 f Hss); [ | easy | easy ].
-    now apply Hss.
-  } {
-    rewrite (sizes_of_bmatrix_at_0_0 f Hss); [ symmetry | easy | easy ].
-    now rewrite (sizes_of_bmatrix_at_0_0 f Hss).
-  }
-  rewrite IHBM; [ | easy | easy | ]. 2: {
-    rewrite (sizes_of_bmatrix_at_0_0 f Hss); [ | easy | easy ].
-    now apply Hss.
-  }
-  apply bmat_zero_like_eq_compat. {
-    unfold is_square_bmat.
-    rewrite (sizes_of_bmatrix_at_0_0 f Hss); [ | easy | easy ].
-    now apply Hss.
-  } {
-    unfold is_square_bmat.
-    rewrite sizes_of_bmatrix_at_0_0 with (r := r); [ | easy | easy | easy ].
-    now apply Hss.
-  }
-  rewrite (sizes_of_bmatrix_at_0_0 f Hss); [ symmetry | easy | easy ].
-  now rewrite (sizes_of_bmatrix_at_0_0 f Hss).
-}
-rewrite bmat_zero_like_eq_compat with (BMB := f 0 0); cycle 1. {
-  unfold is_square_bmat.
-  rewrite (sizes_of_bmatrix_at_0_0 f Hss); [ | easy | easy ].
-  now apply Hss.
-} {
-  apply Hss; flia Hi.
-} {
-  apply sizes_of_bmatrix_at_0_0 with (r := r); [ | easy | easy ].
-  apply Hss.
-}
-clear - sp Hss.
-induction r; [ easy | ].
-rewrite List_seq_succ_r; cbn.
-rewrite fold_left_app; cbn.
-rewrite IHr. {
-  rewrite <- bmat_zero_like_idemp at 2.
-  apply bmat_add_0_r.
-  apply is_square_bmat_zero_like.
-  apply Hss; flia.
-}
-intros i j Hi Hj.
-apply Hss; [ flia Hi | flia Hj ].
-Qed.
-*)
 
 Theorem bmat_mul_0_l : ∀ BM,
   is_square_bmat BM
@@ -1618,17 +1512,15 @@ Theorem bmat_mul_0_l : ∀ BM,
 Proof.
 intros * Hss.
 rewrite <- bmat_zero_like_mul_distr_l; [ | easy ].
-...
 now apply bmat_zero_like_sqr.
 Qed.
-
-...
 
 Theorem bmat_mul_0_r : ∀ BM,
   is_square_bmat BM
   → (BM * bmat_zero_like BM)%BM = bmat_zero_like BM.
 Proof.
 intros * Hss.
+...
 rewrite <- bmat_zero_like_mul_distr_r. 2: {
   exists (sizes_of_bmatrix BM).
   split; intros BMA HBMA. {
