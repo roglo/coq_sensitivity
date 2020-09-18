@@ -1413,36 +1413,30 @@ rewrite sizes_of_bmatrix_add. {
         intros j Hj.
         assert (H9 : j < S (S ra)) by flia Hj.
         assert
-          (Haj : sizes_of_bmatrix (fa 0 j) = sizes_of_bmatrix (fa 0 0)). {
-          cbn in Hj; destruct Hj as (_, Hj); clear - Ha Hj.
-(**)
-          apply sizes_of_bmatrix_at_0_0 with (r := ra). {
-            intros i k Hi Hk.
-            apply Ha; [ flia Hi | flia Hk ].
-          } {
-            flia Hj.
-          } {
-            easy.
-          }
+          (Haj : ∀ j, j < ra → sizes_of_bmatrix (fa 0 j) = sizes_of_bmatrix (fa 0 0)). {
+          clear j Hj H9.
+          intros j Hj.
+          apply (@sizes_of_bmatrix_at_0_0 _ ra); [ | flia Hj | easy ].
+          intros i k Hi Hk.
+          apply Ha; [ flia Hi | flia Hk ].
         }
         assert
-          (Hbj : sizes_of_bmatrix (fb j 0) = sizes_of_bmatrix (fb 0 0)). {
-          apply sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
-            intros i k Hi Hk.
-            apply Hb; [ flia Hi | flia Hk ].
-          } {
-            easy.
-          } {
-            flia.
-          }
+          (Hbj : ∀ j, j < ra → sizes_of_bmatrix (fb j 0) = sizes_of_bmatrix (fb 0 0)). {
+          clear j Hj H9.
+          intros j Hj.
+          apply (@sizes_of_bmatrix_at_0_0 _ ra); [ | easy | flia Hj ].
+          intros i k Hi Hk.
+          apply Hb; [ flia Hi | flia Hk ].
         }
         rewrite sizes_of_bmat_zero_like.
         symmetry.
-        rewrite IHBMA; [ easy | easy | easy | | | congruence ]. {
-          now rewrite Haj; apply Ha.
+        rewrite IHBMA; [ now apply Haj | easy | easy | | | ]. {
+          rewrite Haj; [ now apply Ha | easy ].
         } {
           unfold is_square_bmat.
-          now rewrite Hbj; apply Hb.
+          rewrite Hbj; [ now apply Hb | easy ].
+        } {
+          rewrite Haj; [ now rewrite Hbj | easy ].
         }
       }
     }
