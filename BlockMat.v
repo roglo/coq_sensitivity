@@ -1414,13 +1414,15 @@ rewrite sizes_of_bmatrix_add. {
         assert (H9 : j < S (S ra)) by flia Hj.
         assert
           (Haj : sizes_of_bmatrix (fa 0 j) = sizes_of_bmatrix (fa 0 0)). {
-          apply sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
+          cbn in Hj; destruct Hj as (_, Hj); clear - Ha Hj.
+(**)
+          apply sizes_of_bmatrix_at_0_0 with (r := ra). {
             intros i k Hi Hk.
             apply Ha; [ flia Hi | flia Hk ].
           } {
-            easy.
-          } {
             flia Hj.
+          } {
+            easy.
           }
         }
         assert
