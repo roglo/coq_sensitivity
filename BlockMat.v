@@ -1214,11 +1214,8 @@ assert
 specialize (IHra H); clear H.
 assert (Hsa : is_square_bmat (fa 0 0)) by (apply Ha; flia).
 assert (Hsb : is_square_bmat (fb 0 0)) by (apply Hb; flia).
-assert (Hssm :
-  sizes_of_bmatrix (bmat_zero_like (fa 0 0)) =
-  sizes_of_bmatrix (fa 0 0 * fb 0 0)%BM). {
-  rewrite sizes_of_bmat_zero_like.
-  symmetry.
+assert
+  (Hssm : sizes_of_bmatrix (fa 0 0 * fb 0 0)%BM = sizes_of_bmatrix (fa 0 0)). {
   apply IHBMA; [ flia | flia | apply Ha; flia |  apply Hb; flia| easy ].
 }
 assert
@@ -1273,12 +1270,12 @@ rewrite sizes_of_bmatrix_add. {
   apply IHra; flia.
 } {
   clear IHra.
-  clear - Ha Hb Hab IHBMA Hssm Hsaba Hsabb H6 H7.
+  clear - Ha Hb Hab IHBMA Hsaba Hsabb H6 H7.
   assert (Hzr : 0 < S (S ra)) by flia.
   assert (H2 : is_square_bmat (fa 0 0 * fb 0 0)%BM). {
     now apply is_square_bmat_loop_mul.
   }
-  clear - H2 Ha Hb Hab IHBMA Hssm Hsaba Hsabb.
+  clear - H2 Ha Hb Hab IHBMA Hsaba Hsabb.
   induction ra. {
     apply is_square_bmat_zero_like.
     apply Ha; flia.
@@ -1714,6 +1711,7 @@ rewrite sizes_of_bmatrix_add. {
     }
   }
 } {
+  clear - IHBMA H6 H7 Ha Hb Hab.
   assert (H3 : 0 < S ra) by flia.
   assert (H4 : ra < S ra) by flia.
   apply is_square_bmat_loop_mul. {
@@ -1736,8 +1734,10 @@ rewrite sizes_of_bmatrix_add. {
     }
   }
 } {
-  cbn in IHra.
-  destruct ra; [ easy | ].
+  cbn.
+  destruct ra. {
+    now cbn; rewrite sizes_of_bmat_zero_like.
+  }
   rewrite IHra; [ | flia ].
   symmetry.
   rewrite IHBMA; [ easy | flia | flia | | | ]. {
