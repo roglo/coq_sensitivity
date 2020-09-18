@@ -1248,11 +1248,9 @@ rewrite sizes_of_bmatrix_add. {
 } {
   clear IHra.
   clear - Ha Hb Hab IHBMA Hsaba Hsabb Haj Hbj.
-  assert (Hzr : 0 < S (S ra)) by flia.
   assert (H2 : is_square_bmat (fa 0 0 * fb 0 0)%BM). {
     now apply is_square_bmat_loop_mul.
   }
-  clear - H2 Ha Hb Hab IHBMA Hsaba Hsabb Haj Hbj.
   induction ra. {
     apply is_square_bmat_zero_like.
     apply Ha; flia.
@@ -1542,7 +1540,6 @@ rewrite sizes_of_bmatrix_add. {
     }
   }
 } {
-  clear - IHBMA Haj Hbj Ha Hb Hab.
   assert (H3 : 0 < S ra) by flia.
   assert (H4 : ra < S ra) by flia.
   apply is_square_bmat_loop_mul. {
