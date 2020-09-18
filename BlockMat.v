@@ -1412,9 +1412,8 @@ rewrite sizes_of_bmatrix_add. {
       } {
         intros j Hj.
         assert (H9 : j < S (S ra)) by flia Hj.
-        rewrite sizes_of_bmat_zero_like.
-        symmetry.
-        rewrite IHBMA; [ | easy | easy | | | ]. {
+        assert
+          (Haj : sizes_of_bmatrix (fa 0 j) = sizes_of_bmatrix (fa 0 0)). {
           apply sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
             intros i k Hi Hk.
             apply Ha; [ flia Hi | flia Hk ].
@@ -1423,50 +1422,25 @@ rewrite sizes_of_bmatrix_add. {
           } {
             flia Hj.
           }
-        } {
-          rewrite sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
-            now apply Ha.
-          } {
-            intros i k Hi Hk.
-            apply Ha; [ flia Hi | flia Hk ].
-          } {
-            easy.
-          } {
-            flia Hj.
-          }
-        } {
-          unfold is_square_bmat.
-          rewrite sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
-            now apply Hb.
-          } {
+        }
+        assert
+          (Hbj : sizes_of_bmatrix (fb j 0) = sizes_of_bmatrix (fb 0 0)). {
+          apply sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
             intros i k Hi Hk.
             apply Hb; [ flia Hi | flia Hk ].
           } {
-            flia Hj.
-          } {
             easy.
+          } {
+            flia.
           }
+        }
+        rewrite sizes_of_bmat_zero_like.
+        symmetry.
+        rewrite IHBMA; [ easy | easy | easy | | | congruence ]. {
+          now rewrite Haj; apply Ha.
         } {
-          rewrite sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
-            symmetry.
-            rewrite sizes_of_bmatrix_at_0_0 with (r := S (S ra)). {
-              easy.
-            } {
-              intros i k Hi Hk.
-              apply Hb; [ flia Hi | flia Hk ].
-            } {
-              flia Hj.
-            } {
-              easy.
-            }
-          } {
-            intros i k Hi Hk.
-            apply Ha; [ flia Hi | flia Hk ].
-          } {
-            easy.
-          } {
-            flia Hj.
-          }
+          unfold is_square_bmat.
+          now rewrite Hbj; apply Hb.
         }
       }
     }
