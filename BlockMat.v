@@ -1570,65 +1570,15 @@ apply IHBMA; [ easy | easy | ].
 now apply Hab.
 Qed.
 
-Theorem bmat_mul_Z_2_pow_r : ∀ n M,
-  bmat_fit_for_add (I_2_pow n) M
+Theorem bmat_mul_Z_2_pow_r : ∀ n u M,
+  bmat_fit_for_add (IZ_2_pow u n) M
   → bmat_mul M (Z_2_pow n) = Z_2_pow n.
 Proof.
 intros * Hss.
 revert M Hss.
+revert u.
 induction n; intros. {
   cbn.
-  destruct M as [xm| mm]; [ now cbn; rewrite srng_mul_0_r | easy ].
-}
-destruct M as [xm| mm]; [ easy | ].
-cbn in Hss.
-destruct Hss as (Hr & Hc & Hss).
-cbn; f_equal.
-rewrite <- Hc.
-apply matrix_eq; cbn; [ easy | easy | ].
-intros * Hi Hj.
-specialize (Hss 0 0 Nat.lt_0_2 Nat.lt_0_2) as Hij00; cbn in Hij00.
-specialize (Hss 0 1 Nat.lt_0_2 Nat.lt_1_2) as Hij01; cbn in Hij01.
-specialize (Hss 1 0 Nat.lt_1_2 Nat.lt_0_2) as Hij10; cbn in Hij10.
-specialize (Hss 1 1 Nat.lt_1_2 Nat.lt_1_2) as Hij11; cbn in Hij11.
-destruct i. {
-  destruct j. {
-    rewrite IHn; [ cbn | easy ].
-    rewrite IHn. 2: {
-      transitivity (Z_2_pow n); [ | easy ].
-      apply bmat_fit_for_add_IZ_IZ.
-    }
-    rewrite (bmat_zero_like_eq_compat _ (Z_2_pow n)); cycle 1. {
-      specialize (Hss 0 0 Nat.lt_0_2 Nat.lt_0_2).
-      cbn in Hss.
-      unfold is_square_bmat.
-      remember (sizes_of_bmatrix (mat_el mm 0 0)) as sizes eqn:Hsizes.
-      apply (is_square_bmat_fit_for_add sizes (I_2_pow n)); [ | easy ].
-      rewrite Hsizes.
-      rewrite (bmat_fit_for_add_sizes _ (I_2_pow n)); [ | easy ].
-      apply IZ_is_square_bmat.
-    } {
-      apply IZ_is_square_bmat.
-    } {
-      apply bmat_fit_for_add_sizes.
-      transitivity (I_2_pow n); [ easy | ].
-      apply bmat_fit_for_add_IZ_IZ.
-    }
-    rewrite bmat_add_0_l.
-    now apply old_bmat_add_0_l.
-  } {
-    destruct j; [ cbn | flia Hj ].
-    rewrite IHn; [ cbn | easy ].
-    rewrite IHn. 2: {
-      transitivity (Z_2_pow n); [ | easy ].
-      apply bmat_fit_for_add_IZ_IZ.
-    }
-    rewrite (bmat_zero_like_eq_compat _ (Z_2_pow n)); cycle 1. {
-...
-intros * Hss.
-revert M Hss.
-induction n; intros. {
-cbn.
   destruct M as [xm| mm]; [ now cbn; rewrite srng_mul_0_r | easy ].
 }
 destruct M as [xm| mm]; [ easy | ].
@@ -1642,42 +1592,55 @@ specialize (Hss 0 0 Nat.lt_0_2 Nat.lt_0_2) as Hij00; cbn in Hij00.
 specialize (Hss 0 1 Nat.lt_0_2 Nat.lt_1_2) as Hij01; cbn in Hij01.
 specialize (Hss 1 0 Nat.lt_1_2 Nat.lt_0_2) as Hij10; cbn in Hij10.
 specialize (Hss 1 1 Nat.lt_1_2 Nat.lt_1_2) as Hij11; cbn in Hij11.
+assert
+  (H1 :
+     (bmat_zero_like (mat_el mm 0 0) + Z_2_pow n + Z_2_pow n)%BM =
+     Z_2_pow n). {
+  rewrite (bmat_zero_like_eq_compat _ (Z_2_pow n)); cycle 1. {
+    specialize (Hss 0 0 Nat.lt_0_2 Nat.lt_0_2).
+    cbn in Hss.
+    unfold is_square_bmat.
+    remember (sizes_of_bmatrix (mat_el mm 0 0)) as sizes eqn:Hsizes.
+    apply (is_square_bmat_fit_for_add sizes (IZ_2_pow u n)); [ | easy ].
+    rewrite Hsizes.
+    rewrite (bmat_fit_for_add_sizes _ (IZ_2_pow u n)); [ | easy ].
+    apply IZ_is_square_bmat.
+  } {
+    apply IZ_is_square_bmat.
+  } {
+    apply bmat_fit_for_add_sizes.
+    transitivity (IZ_2_pow u n); [ easy | ].
+    apply bmat_fit_for_add_IZ_IZ.
+  }
+  rewrite bmat_add_0_l.
+  now apply old_bmat_add_0_l.
+}
 destruct i. {
   destruct j. {
-    rewrite IHn; [ cbn | easy ].
-    rewrite IHn. 2: {
-      transitivity (Z_2_pow n); [ | easy ].
-      apply bmat_fit_for_add_IZ_IZ.
-    }
-Check bmat_add_0_l.
-,..
-    rewrite bmat_add_0_l.
-    now apply old_bmat_add_0_l.
-  }
-  destruct j; [ cbn | flia Hj ].
-  rewrite IHn; [ | easy ].
-  rewrite IHn. 2: {
+    rewrite (IHn u); [ cbn | easy ].
+    rewrite (IHn u); [ easy | ].
+    transitivity (Z_2_pow n); [ | easy ].
+    apply bmat_fit_for_add_IZ_IZ.
+  } {
+    destruct j; [ cbn | flia Hj ].
+    rewrite (IHn u); [ cbn | easy ].
+    rewrite (IHn u); [ easy | ].
     transitivity (Z_2_pow n); [ | easy ].
     apply bmat_fit_for_add_IZ_IZ.
   }
-  now apply old_bmat_add_0_l.
-}
-destruct i; [ cbn | flia Hi ].
-destruct j. {
-  rewrite IHn. 2: {
+} {
+  destruct i; [ | flia Hi ].
+  destruct j. {
+    rewrite (IHn u); [ now rewrite (IHn u) | ].
+    transitivity (Z_2_pow n); [ | easy ].
+    apply bmat_fit_for_add_IZ_IZ.
+  } {
+    destruct j; [ cbn | flia Hj ].
+    rewrite (IHn u); [ now rewrite (IHn u) | ].
     transitivity (Z_2_pow n); [ | easy ].
     apply bmat_fit_for_add_IZ_IZ.
   }
-  rewrite IHn; [ | easy ].
-  now apply old_bmat_add_0_l.
 }
-destruct j; [ | flia Hj ].
-rewrite IHn. 2: {
-  transitivity (Z_2_pow n); [ | easy ].
-  apply bmat_fit_for_add_IZ_IZ.
-}
-rewrite IHn; [ | easy ].
-now apply old_bmat_add_0_l.
 Qed.
 
 Theorem bmat_mul_1_l : ∀ n M,
@@ -1718,11 +1681,23 @@ destruct i. {
     }
     destruct j; [ easy | flia Hj ].
   }
-  apply old_bmat_add_0_r.
   destruct j. {
+    rewrite old_bmat_add_0_r. 2: {
+      rewrite (bmat_zero_like_eq_compat _ (mat_el M 0 0)).
+      unfold so.
+      rewrite bmat_add_0_l.
+...
+Search (bmat_fit_for_add (_ + _)%BM).
+...
     transitivity (I_2_pow n); [ | easy ].
     apply bmat_fit_for_add_IZ_IZ.
   }
+Search (bmat_fit_for_add (IZ_2_pow _ _)).
+  rewrite old_bmat_add_0_r.
+...
+bmat_mul_Z_2_pow_r:
+  ∀ (n : nat) (u : T) (M : bmatrix T), bmat_fit_for_add (IZ_2_pow u n) M → (M * Z_2_pow n)%BM = Z_2_pow n
+...
   destruct j; [ | flia Hj ].
   transitivity (Z_2_pow n); [ | easy ].
   apply bmat_fit_for_add_IZ_IZ.
