@@ -1831,10 +1831,6 @@ rewrite (bmat_zero_like_eq_compat _ (mat_el M 1 j)); cycle 1. {
 apply bmat_add_0_l.
 Qed.
 
-Inspect 1.
-
-...
-
 Theorem bmat_mul_1_r : ∀ n M,
   bmat_fit_for_add (I_2_pow n) M
   → bmat_mul M (I_2_pow n) = M.
@@ -1861,16 +1857,38 @@ destruct i. {
   destruct j. {
     rewrite IHn; [ | easy ].
     rewrite fold_Z_2_pow.
-    rewrite bmat_mul_Z_2_pow_r. 2: {
-      transitivity (Z_2_pow n); [ | easy ].
-      apply bmat_fit_for_add_IZ_IZ.
-    }
+    rewrite bmat_add_0_l.
+    rewrite (bmat_mul_Z_2_pow_r _ 0%Srng); [ | easy ].
     apply old_bmat_add_0_r.
     transitivity (I_2_pow n); [ | easy ].
     apply bmat_fit_for_add_IZ_IZ.
-  }
-  destruct j; [ | flia Hj ].
-  rewrite fold_Z_2_pow.
+  } {
+    destruct j; [ | flia Hj ].
+    rewrite (bmat_mul_Z_2_pow_r _ 1%Srng); [ | easy ].
+    rewrite IHn. 2: {
+      transitivity (Z_2_pow n); [ | easy ].
+      apply bmat_fit_for_add_IZ_IZ.
+    }
+    rewrite old_bmat_add_0_r. 2: {
+      apply -> is_square_bmat_fit_for_add; [ | apply IZ_is_square_bmat ].
+      apply is_square_bmat_loop_zero_like.
+      apply <- is_square_bmat_fit_for_add; [ apply Hij00 | ].
+      rewrite sizes_of_bmatrix_IZ.
+      rewrite <- (sizes_of_bmatrix_IZ _ 1%Srng).
+      apply IZ_is_square_bmat.
+    }
+    rewrite (bmat_zero_like_eq_compat _ (mat_el M 0 1)); cycle 1. {
+      apply <- is_square_bmat_fit_for_add; [ apply Hij00 | ].
+...
+Search (bmat_zero_like).
+Search (bmat_zero_like _ + _)%BM.
+...
+    transitivity (I_2_pow n); [ | easy ].
+    easy.
+    apply bmat_fit_for_add_IZ_IZ.
+Check bmat_mul_Z_2_pow_r.
+...
+  rewrite bmat_add_0_l.
   rewrite bmat_mul_Z_2_pow_r; [ | easy ].
   rewrite IHn. 2: {
     transitivity (Z_2_pow n); [ | easy ].
