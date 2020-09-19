@@ -1751,44 +1751,34 @@ destruct i. {
     apply bmat_add_0_l.
   } {
     destruct j; [ | flia Hj ].
-...
-      apply square_bmat_loop_zero_like.
-
-      apply bmat_fit_for_add_add_r. 2: {
-        transitivity (I_2_pow n); [ | easy ].
-        apply bmat_fit_for_add_IZ_IZ.
+    rewrite old_bmat_add_0_r. 2: {
+      apply -> is_square_bmat_fit_for_add. 2: {
+        apply IZ_is_square_bmat.
       }
-Search (bmat_zero_like (IZ_2_pow _ _)).
-Search bmat_fit_for_add (Z_2_pow _).
-Search bmat_fit_for_add _ (bmat_zero_like _).
-Search bmat_zero_like.
-...
-    rewrite (bmat_zero_like_eq_compat _ (mat_el M 0 0)); cycle 1. {
+      apply is_square_bmat_loop_add. 2: {
+        apply <- is_square_bmat_fit_for_add in Hij01; [ apply Hij01 | ].
+        apply IZ_is_square_bmat.
+      }
+      apply is_square_bmat_loop_zero_like.
+      rewrite sizes_of_bmatrix_IZ.
+      rewrite <- (sizes_of_bmatrix_IZ n 1%Srng).
+      apply IZ_is_square_bmat.
+    }
+    rewrite (bmat_zero_like_eq_compat _ (mat_el M 0 1)); cycle 1. {
       apply IZ_is_square_bmat.
     } {
-Search (is_square_bmat_loop _).
-is_square_bmat_fit_for_add:
-  ∀ (sizes : list nat) (MA MB : bmatrix T),
-    is_square_bmat_loop sizes MA → is_square_bmat_loop sizes MB ↔ bmat_fit_for_add MA MB
-...
-    rewrite old_bmat_add_0_r. 2: {
-      unfold so.
-      rewrite bmat_add_0_l.
-...
-Search (bmat_fit_for_add (_ + _)%BM).
-...
-    transitivity (I_2_pow n); [ | easy ].
-    apply bmat_fit_for_add_IZ_IZ.
+      apply <- is_square_bmat_fit_for_add; [ apply Hij01 | ].
+      apply bmat_fit_for_add_sizes in Hij01.
+      rewrite <- Hij01.
+      apply IZ_is_square_bmat.
+    } {
+      apply bmat_fit_for_add_sizes in Hij01.
+      unfold I_2_pow.
+      rewrite sizes_of_bmatrix_IZ.
+      now rewrite <- (sizes_of_bmatrix_IZ n 0%Srng).
+    }
+    apply bmat_add_0_l.
   }
-Search (bmat_fit_for_add (IZ_2_pow _ _)).
-  rewrite old_bmat_add_0_r.
-...
-bmat_mul_Z_2_pow_r:
-  ∀ (n : nat) (u : T) (M : bmatrix T), bmat_fit_for_add (IZ_2_pow u n) M → (M * Z_2_pow n)%BM = Z_2_pow n
-...
-  destruct j; [ | flia Hj ].
-  transitivity (Z_2_pow n); [ | easy ].
-  apply bmat_fit_for_add_IZ_IZ.
 }
 destruct i; [ cbn | flia Hi ].
 rewrite fold_Z_2_pow.
@@ -1805,7 +1795,8 @@ rewrite IHn. 2: {
   }
   destruct j; [ easy | flia Hj ].
 }
-apply old_bmat_add_0_l.
+rewrite old_bmat_add_0_r.
+...
 destruct j; [ easy | ].
 destruct j; [ | flia Hj ].
 transitivity (I_2_pow n); [ | easy ].
