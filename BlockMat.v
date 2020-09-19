@@ -1458,8 +1458,6 @@ rewrite <- bmat_zero_like_mul_distr_r; [ | easy ].
 now apply bmat_zero_like_sqr.
 Qed.
 
-...
-
 Theorem bmat_mul_Z_2_pow_l : ∀ n M,
   bmat_fit_for_add (I_2_pow n) M
   → bmat_mul (Z_2_pow n) M = Z_2_pow n.
@@ -1467,7 +1465,7 @@ Proof.
 intros * Hss.
 revert M Hss.
 induction n; intros. {
-cbn.
+  cbn.
   destruct M as [xm| mm]; [ now cbn; rewrite srng_mul_0_l | easy ].
 }
 destruct M as [xm| mm]; [ easy | ].
@@ -1488,6 +1486,10 @@ destruct i. {
       transitivity (Z_2_pow n); [ | easy ].
       apply bmat_fit_for_add_IZ_IZ.
     }
+    rewrite old_bmat_add_0_r. 2: {
+...
+rewrite old_bmat_add_0_l.
+...
     now apply old_bmat_add_0_l.
   }
   destruct j; [ cbn | flia Hj ].
