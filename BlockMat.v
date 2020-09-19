@@ -1742,11 +1742,15 @@ destruct i. {
       apply IZ_is_square_bmat.
     } {
       apply <- is_square_bmat_fit_for_add; [ apply Hij00 | ].
-Search (is_square_bmat_loop _ (IZ_2_pow _ _)).
-...
-Check bmat_add_0_l.
-...
-        rewrite <- sizes_of
+      apply bmat_fit_for_add_sizes in Hij00.
+      rewrite <- Hij00.
+      apply IZ_is_square_bmat.
+    } {
+      now apply bmat_fit_for_add_sizes in Hij00.
+    }
+    apply bmat_add_0_l.
+  } {
+    destruct j; [ | flia Hj ].
 ...
       apply square_bmat_loop_zero_like.
 
