@@ -1618,6 +1618,12 @@ destruct i. {
     now apply old_bmat_add_0_l.
   } {
     destruct j; [ cbn | flia Hj ].
+    rewrite IHn; [ cbn | easy ].
+    rewrite IHn. 2: {
+      transitivity (Z_2_pow n); [ | easy ].
+      apply bmat_fit_for_add_IZ_IZ.
+    }
+    rewrite (bmat_zero_like_eq_compat _ (Z_2_pow n)); cycle 1. {
 ...
 intros * Hss.
 revert M Hss.
