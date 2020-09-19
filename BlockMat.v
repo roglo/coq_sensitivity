@@ -1583,12 +1583,7 @@ destruct i. {
       cbn in Hss.
       unfold is_square_bmat.
       remember (sizes_of_bmatrix (mat_el mm 0 0)) as sizes eqn:Hsizes.
-      specialize (is_square_bmat_fit_for_add sizes) as H1.
-      specialize (H1 (I_2_pow n)).
-      specialize (H1 (mat_el mm 0 0)).
-...
-      apply <- is_square_bmat_fit_for_add in Hss; [ | ].
-      apply <- is_square_bmat_fit_for_add; [ apply Hij00 | ].
+      apply (is_square_bmat_fit_for_add sizes (I_2_pow n)); [ | easy ].
 ...
 (**)
       revert n HBM.
