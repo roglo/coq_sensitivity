@@ -1938,16 +1938,41 @@ destruct j. {
 }
 destruct j; [ | flia Hj ].
 rewrite fold_Z_2_pow.
-...
-rewrite bmat_mul_Z_2_pow_r. 2: {
+rewrite (bmat_mul_Z_2_pow_r _ 0%Srng). 2: {
   transitivity (Z_2_pow n); [ | easy ].
   apply bmat_fit_for_add_IZ_IZ.
 }
 rewrite IHn; [ | easy ].
-apply old_bmat_add_0_l.
-transitivity (I_2_pow n); [ | easy ].
-apply bmat_fit_for_add_IZ_IZ.
+rewrite old_bmat_add_0_r. 2: {
+  apply -> is_square_bmat_fit_for_add; [ | apply IZ_is_square_bmat ].
+  apply is_square_bmat_loop_zero_like.
+  apply <- is_square_bmat_fit_for_add; [ | apply IZ_is_square_bmat ].
+  transitivity (I_2_pow n); [ | easy ].
+  apply bmat_fit_for_add_IZ_IZ.
+}
+rewrite (bmat_zero_like_eq_compat _ (mat_el M 1 1)); cycle 1. {
+  apply <- is_square_bmat_fit_for_add; [ apply Hij00 | ].
+  apply bmat_fit_for_add_sizes in Hij00.
+  rewrite <- Hij00.
+  apply IZ_is_square_bmat.
+} {
+  apply <- is_square_bmat_fit_for_add; [ apply Hij11 | ].
+  apply bmat_fit_for_add_sizes in Hij11.
+  rewrite <- Hij11.
+  apply IZ_is_square_bmat.
+} {
+  apply bmat_fit_for_add_sizes in Hij00.
+  apply bmat_fit_for_add_sizes in Hij11.
+  unfold I_2_pow in Hij00, Hij11.
+  rewrite sizes_of_bmatrix_IZ in Hij00, Hij11.
+  congruence.
+}
+apply bmat_add_0_l.
 Qed.
+
+Inspect 1.
+
+...
 
 Theorem bmat_nat_mul_l_succ : ∀ n M,
   bmat_nat_mul_l (S n) M = bmat_add (bmat_nat_mul_l n M) M.
