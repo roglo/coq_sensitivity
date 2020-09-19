@@ -1550,6 +1550,26 @@ rewrite bmat_add_0_l.
 now apply old_bmat_add_0_l.
 Qed.
 
+Theorem bmat_fit_for_add_sizes : ∀ BMA BMB,
+  bmat_fit_for_add BMA BMB
+  → sizes_of_bmatrix BMA = sizes_of_bmatrix BMB.
+Proof.
+intros * Hab.
+revert BMB Hab.
+induction BMA as [xa| ma IHBMA] using bmatrix_ind2; intros. {
+  now destruct BMB.
+}
+destruct BMB as [xb| mb]; [ easy | ].
+cbn in Hab |-*.
+destruct Hab as (Hr & Hc & Hab).
+rewrite <- Hr, <- Hc.
+destruct (zerop (mat_nrows ma)) as [Hzr| Hzr]; [ easy | ].
+destruct (zerop (mat_ncols ma)) as [Hzc| Hzc]; [ easy | cbn ].
+f_equal.
+apply IHBMA; [ easy | easy | ].
+now apply Hab.
+Qed.
+
 Theorem bmat_mul_Z_2_pow_r : ∀ n M,
   bmat_fit_for_add (I_2_pow n) M
   → bmat_mul M (Z_2_pow n) = Z_2_pow n.
@@ -1584,47 +1604,20 @@ destruct i. {
       unfold is_square_bmat.
       remember (sizes_of_bmatrix (mat_el mm 0 0)) as sizes eqn:Hsizes.
       apply (is_square_bmat_fit_for_add sizes (I_2_pow n)); [ | easy ].
-...
-(**)
-      revert n HBM.
-      induction BM as [x| M IHBM] using bmatrix_ind2; intros; [ easy | cbn ].
-      destruct n; [ easy | cbn in HBM ].
-      destruct HBM as (Hr & Hc & HBM).
-      rewrite <- Hr, <- Hc in IHBM |-*; cbn.
-      split; [ easy | ].
-      split; [ easy | ].
-      intros i j Hi Hj.
-      specialize (HBM _ _ Hi Hj).
-      destruct i. {
-        destruct j. {
-          cbn in HBM.
-          apply (IHBM 0 0 Nat.lt_0_2 Nat.lt_0_2 n HBM).
-        } {
-          destruct j; [ | flia Hj ].
-          cbn in HBM.
-...
-      revert BM HBM.
-      induction n; intros; [ now destruct BM | ].
-      cbn in HBM.
-      remember (mat_el mm 0 0) as M eqn:HM.
-      destruct M as [| mm']; [ easy | ].
-      destruct Hij00 as (Hr & Hc & Hfa).
-      cbn.
-      rewrite <- Hr, <- Hc; cbn.
-      split; [ easy | ].
-      split; [ easy | ].
-      intros i j Hi Hj.
-...
-      specialize (Hfa 0 0 Nat.lt_0_2 Nat.lt_0_2).
-      cbn in Hfa |-*.
-      rewrite <- Hr, <- Hc; cbn.
-      apply IHn.
-      apply IHn.
-Search (_ → is_square_bmat _).
-...
+      rewrite Hsizes.
+      rewrite (bmat_fit_for_add_sizes _ (I_2_pow n)); [ | easy ].
+      apply IZ_is_square_bmat.
+    } {
+      apply IZ_is_square_bmat.
+    } {
+      apply bmat_fit_for_add_sizes.
+      transitivity (I_2_pow n); [ easy | ].
+      apply bmat_fit_for_add_IZ_IZ.
+    }
     rewrite bmat_add_0_l.
     now apply old_bmat_add_0_l.
-  }
+  } {
+    destruct j; [ cbn | flia Hj ].
 ...
 intros * Hss.
 revert M Hss.
