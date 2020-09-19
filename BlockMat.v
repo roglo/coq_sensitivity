@@ -1522,6 +1522,10 @@ destruct i. {
       apply bmat_fit_for_add_IZ_IZ.
     }
     rewrite old_bmat_add_0_r. 2: {
+Check bmat_add_0_l.
+...
+      rewrite old_bmat_add_0_l.
+...
        rewrite bmat_add_0_l; [ easy | ].
        apply IZ_is_square_bmat.
     }
@@ -1533,8 +1537,11 @@ destruct i. {
     apply bmat_fit_for_add_IZ_IZ.
   }
   rewrite IHn; [ | easy ].
-...
-  now apply old_bmat_add_0_l.
+  rewrite old_bmat_add_0_r. 2: {
+    rewrite bmat_add_0_l; [ easy | ].
+    apply IZ_is_square_bmat.
+  }
+  apply bmat_add_0_l, IZ_is_square_bmat.
 }
 destruct i; [ cbn | flia Hi ].
 destruct j. {
