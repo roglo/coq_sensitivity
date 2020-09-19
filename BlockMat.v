@@ -542,7 +542,7 @@ cbn; f_equal.
 now apply IHBM.
 Qed.
 
-Theorem square_bmat_loop_zero_like : ∀ BM sizes,
+Theorem is_square_bmat_loop_zero_like : ∀ BM sizes,
   is_square_bmat_loop sizes BM
   → is_square_bmat_loop sizes (bmat_zero_like BM).
 Proof.
@@ -566,7 +566,7 @@ Proof.
 intros * HBM.
 unfold is_square_bmat in HBM |-*.
 rewrite sizes_of_bmat_zero_like.
-now apply square_bmat_loop_zero_like.
+now apply is_square_bmat_loop_zero_like.
 Qed.
 
 Theorem no_zero_bmat_size : ∀ (BM : bmatrix T), 0 ∉ sizes_of_bmatrix BM.
@@ -958,7 +958,7 @@ move j before i.
 induction size. {
   cbn.
   apply is_square_bmat_loop_add. {
-    now apply square_bmat_loop_zero_like.
+    now apply is_square_bmat_loop_zero_like.
   }
   apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
 }
@@ -1643,6 +1643,47 @@ destruct i. {
 }
 Qed.
 
+Theorem bmat_fit_for_add_add_l : ∀ MA MB MC,
+  bmat_fit_for_add MA MC
+  → bmat_fit_for_add MB MC
+  → bmat_fit_for_add (MA + MB)%BM MC.
+Proof.
+intros * Hssac Hssbc.
+revert MA MB Hssac Hssbc.
+induction MC as [xc| mc IHMC] using bmatrix_ind2; intros. {
+  destruct MA; [ now destruct MB | easy ].
+}
+destruct MA as [xa| ma]; [ easy | ].
+destruct MB as [xb| mb]; [ easy | ].
+cbn in Hssac, Hssbc |-*.
+destruct Hssac as (Hrac & Hcac & Hssac).
+destruct Hssbc as (Hrbc & Hcbc & Hssbc).
+split; [ easy | ].
+split; [ easy | ].
+intros * Hi Hj.
+apply IHMC; [ | | now apply Hssac | ]. {
+  now rewrite Hrac in Hi.
+} {
+  now rewrite Hcac in Hj.
+} {
+  apply Hssbc. {
+    now rewrite Hrac, <- Hrbc in Hi.
+  } {
+    now rewrite Hcac, <- Hcbc in Hj.
+  }
+}
+Qed.
+
+Theorem bmat_fit_for_add_add_r : ∀ MA MB MC,
+  bmat_fit_for_add MA MB
+  → bmat_fit_for_add MA MC
+  → bmat_fit_for_add MA (MB + MC)%BM.
+Proof.
+intros * Hssab Hsscc.
+symmetry.
+now apply bmat_fit_for_add_add_l.
+Qed.
+
 Theorem bmat_mul_1_l : ∀ n M,
   bmat_fit_for_add (I_2_pow n) M
   → bmat_mul (I_2_pow n) M = M.
@@ -1683,7 +1724,50 @@ destruct i. {
   }
   destruct j. {
     rewrite old_bmat_add_0_r. 2: {
-      rewrite (bmat_zero_like_eq_compat _ (mat_el M 0 0)).
+      apply -> is_square_bmat_fit_for_add. 2: {
+        apply IZ_is_square_bmat.
+      }
+      apply is_square_bmat_loop_add. 2: {
+        apply <- is_square_bmat_fit_for_add in Hij00; [ apply Hij00 | ].
+        rewrite sizes_of_bmatrix_IZ.
+        rewrite <- (sizes_of_bmatrix_IZ n 1%Srng).
+        apply IZ_is_square_bmat.
+      }
+      apply is_square_bmat_loop_zero_like.
+      rewrite sizes_of_bmatrix_IZ.
+      rewrite <- (sizes_of_bmatrix_IZ n 1%Srng).
+      apply IZ_is_square_bmat.
+    }
+    rewrite (bmat_zero_like_eq_compat _ (mat_el M 0 0)); cycle 1. {
+      apply IZ_is_square_bmat.
+    } {
+      apply <- is_square_bmat_fit_for_add; [ apply Hij00 | ].
+Search (is_square_bmat_loop _ (IZ_2_pow _ _)).
+...
+Check bmat_add_0_l.
+...
+        rewrite <- sizes_of
+...
+      apply square_bmat_loop_zero_like.
+
+      apply bmat_fit_for_add_add_r. 2: {
+        transitivity (I_2_pow n); [ | easy ].
+        apply bmat_fit_for_add_IZ_IZ.
+      }
+Search (bmat_zero_like (IZ_2_pow _ _)).
+Search bmat_fit_for_add (Z_2_pow _).
+Search bmat_fit_for_add _ (bmat_zero_like _).
+Search bmat_zero_like.
+...
+    rewrite (bmat_zero_like_eq_compat _ (mat_el M 0 0)); cycle 1. {
+      apply IZ_is_square_bmat.
+    } {
+Search (is_square_bmat_loop _).
+is_square_bmat_fit_for_add:
+  ∀ (sizes : list nat) (MA MB : bmatrix T),
+    is_square_bmat_loop sizes MA → is_square_bmat_loop sizes MB ↔ bmat_fit_for_add MA MB
+...
+    rewrite old_bmat_add_0_r. 2: {
       unfold so.
       rewrite bmat_add_0_l.
 ...
@@ -1845,37 +1929,6 @@ destruct i. {
 destruct i; [ | flia Hi ].
 destruct j; [ easy | cbn ].
 destruct j; [ easy | flia Hj ].
-Qed.
-
-Theorem bmat_fit_for_add_add_l : ∀ MA MB MC,
-  bmat_fit_for_add MA MC
-  → bmat_fit_for_add MB MC
-  → bmat_fit_for_add (MA + MB)%BM MC.
-Proof.
-intros * Hssac Hssbc.
-revert MA MB Hssac Hssbc.
-induction MC as [xc| mc IHMC] using bmatrix_ind2; intros. {
-  destruct MA; [ now destruct MB | easy ].
-}
-destruct MA as [xa| ma]; [ easy | ].
-destruct MB as [xb| mb]; [ easy | ].
-cbn in Hssac, Hssbc |-*.
-destruct Hssac as (Hrac & Hcac & Hssac).
-destruct Hssbc as (Hrbc & Hcbc & Hssbc).
-split; [ easy | ].
-split; [ easy | ].
-intros * Hi Hj.
-apply IHMC; [ | | now apply Hssac | ]. {
-  now rewrite Hrac in Hi.
-} {
-  now rewrite Hcac in Hj.
-} {
-  apply Hssbc. {
-    now rewrite Hrac, <- Hrbc in Hi.
-  } {
-    now rewrite Hcac, <- Hcbc in Hj.
-  }
-}
 Qed.
 
 Theorem bmat_add_add_swap : ∀ MA MB MC,
