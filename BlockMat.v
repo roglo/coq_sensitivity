@@ -860,67 +860,64 @@ intros i j Hi Hj.
 apply IHsizes; [ now apply Ha | now apply Hb ].
 Qed.
 
-Theorem square_bmat_fit_for_add : ∀ sizes (MA MB : bmatrix T),
+Theorem is_square_bmat_fit_for_add : ∀ sizes (MA MB : bmatrix T),
   is_square_bmat_loop sizes MA
   → is_square_bmat_loop sizes MB
-  → bmat_fit_for_add MA MB.
+  ↔ bmat_fit_for_add MA MB.
 Proof.
-intros * Ha Hb.
-revert MA MB Ha Hb.
-induction sizes as [| size]; intros; [ now destruct MA, MB | ].
-cbn in Ha, Hb.
-destruct MA as [xa| ma]; [ easy | ].
-destruct MB as [xb| mb]; [ easy | cbn ].
-destruct Ha as (Hra & Hca & Ha).
-destruct Hb as (Hrb & Hcb & Hb).
-split; [ congruence | ].
-split; [ congruence | ].
-intros * Hi Hj.
-apply IHsizes; [ apply Ha; congruence | apply Hb; congruence ].
+intros * Ha.
+split; intros Hb. {
+  revert MA MB Ha Hb.
+  induction sizes as [| size]; intros; [ now destruct MA, MB | ].
+  cbn in Ha, Hb.
+  destruct MA as [xa| ma]; [ easy | ].
+  destruct MB as [xb| mb]; [ easy | cbn ].
+  destruct Ha as (Hra & Hca & Ha).
+  destruct Hb as (Hrb & Hcb & Hb).
+  split; [ congruence | ].
+  split; [ congruence | ].
+  intros * Hi Hj.
+  apply IHsizes; [ apply Ha; congruence | apply Hb; congruence ].
+} {
+  revert MA MB Ha Hb.
+  induction sizes as [| size]; intros; [ now destruct MA, MB | ].
+  destruct MA as [xa| ma]; [ easy | ].
+  destruct MB as [xb| mb]; [ easy | cbn ].
+  cbn in Ha, Hb |-*.
+  destruct Ha as (Hra & Hca & Ha).
+  destruct Hb as (Hrb & Hcb & Hb).
+  split; [ congruence | ].
+  split; [ congruence | ].
+  intros * Hi Hj.
+  apply (IHsizes (mat_el ma i j)); [ now apply Ha | ].
+  apply Hb; congruence.
+}
 Qed.
 
 Theorem bmat_add_0_l : ∀ BM,
-  is_square_bmat BM
-  → (bmat_zero_like BM + BM)%BM = BM.
+  (bmat_zero_like BM + BM)%BM = BM.
 Proof.
-intros * Hss.
+intros.
 induction BM as [x| M IHBM] using bmatrix_ind2. {
   now cbn; rewrite srng_add_0_l.
 }
 cbn; f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros i j Hi Hj.
-apply IHBM; [ easy | easy | ].
-cbn in Hss.
-unfold is_square_bmat.
-destruct (zerop (mat_nrows M)) as [H| H]; [ flia Hi H | cbn in Hss; clear H ].
-destruct (zerop (mat_ncols M)) as [H| H]; [ flia Hj H | cbn in Hss; clear H ].
-destruct Hss as (_ & Hcr & Hss).
-erewrite sizes_of_bmatrix_mat_el; [ | | easy | easy ]. {
-  rewrite Hcr in Hj.
-  now apply Hss.
-} {
-  cbn; rewrite Hcr.
-  destruct (zerop (mat_nrows M)) as [H| H]; [ flia Hi H | cbn; clear H ].
-  split; [ easy | ].
-  split; [ easy | ].
-  clear i j Hi Hj.
-  intros i j Hi Hj.
-  now apply Hss.
-}
+now apply IHBM.
 Qed.
 
 Theorem bmat_add_0_r : ∀ BM,
-  is_square_bmat BM
-  → (BM + bmat_zero_like BM)%BM = BM.
+  (BM + bmat_zero_like BM)%BM = BM.
 Proof.
-intros * Hss.
-rewrite bmat_add_comm. 2: {
-  apply square_bmat_fit_for_add with (sizes := sizes_of_bmatrix BM); [ easy | ].
-  rewrite <- sizes_of_bmat_zero_like.
-  now apply is_square_bmat_zero_like.
+intros.
+induction BM as [x| M IHBM] using bmatrix_ind2. {
+  now cbn; rewrite srng_add_0_r.
 }
-now apply bmat_add_0_l.
+cbn; f_equal.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros i j Hi Hj.
+now apply IHBM.
 Qed.
 
 Theorem is_square_bmat_loop_mul : ∀ BMA BMB sizes,
@@ -1521,15 +1518,8 @@ destruct i. {
       transitivity (Z_2_pow n); [ | easy ].
       apply bmat_fit_for_add_IZ_IZ.
     }
-    rewrite old_bmat_add_0_r. 2: {
-Check bmat_add_0_l.
-...
-      rewrite old_bmat_add_0_l.
-...
-       rewrite bmat_add_0_l; [ easy | ].
-       apply IZ_is_square_bmat.
-    }
-    apply bmat_add_0_l, IZ_is_square_bmat.
+    rewrite bmat_add_0_l.
+    now apply old_bmat_add_0_l.
   }
   destruct j; [ cbn | flia Hj ].
   rewrite IHn. 2: {
@@ -1537,11 +1527,8 @@ Check bmat_add_0_l.
     apply bmat_fit_for_add_IZ_IZ.
   }
   rewrite IHn; [ | easy ].
-  rewrite old_bmat_add_0_r. 2: {
-    rewrite bmat_add_0_l; [ easy | ].
-    apply IZ_is_square_bmat.
-  }
-  apply bmat_add_0_l, IZ_is_square_bmat.
+  rewrite bmat_add_0_l.
+  now apply old_bmat_add_0_l.
 }
 destruct i; [ cbn | flia Hi ].
 destruct j. {
@@ -1550,6 +1537,7 @@ destruct j. {
     transitivity (Z_2_pow n); [ | easy ].
     apply bmat_fit_for_add_IZ_IZ.
   }
+  rewrite bmat_add_0_l.
   now apply old_bmat_add_0_l.
 }
 destruct j; [ | flia Hj ].
@@ -1558,6 +1546,7 @@ rewrite IHn. 2: {
   apply bmat_fit_for_add_IZ_IZ.
 }
 rewrite IHn; [ | easy ].
+rewrite bmat_add_0_l.
 now apply old_bmat_add_0_l.
 Qed.
 
@@ -1565,6 +1554,83 @@ Theorem bmat_mul_Z_2_pow_r : ∀ n M,
   bmat_fit_for_add (I_2_pow n) M
   → bmat_mul M (Z_2_pow n) = Z_2_pow n.
 Proof.
+intros * Hss.
+revert M Hss.
+induction n; intros. {
+  cbn.
+  destruct M as [xm| mm]; [ now cbn; rewrite srng_mul_0_r | easy ].
+}
+destruct M as [xm| mm]; [ easy | ].
+cbn in Hss.
+destruct Hss as (Hr & Hc & Hss).
+cbn; f_equal.
+rewrite <- Hc.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros * Hi Hj.
+specialize (Hss 0 0 Nat.lt_0_2 Nat.lt_0_2) as Hij00; cbn in Hij00.
+specialize (Hss 0 1 Nat.lt_0_2 Nat.lt_1_2) as Hij01; cbn in Hij01.
+specialize (Hss 1 0 Nat.lt_1_2 Nat.lt_0_2) as Hij10; cbn in Hij10.
+specialize (Hss 1 1 Nat.lt_1_2 Nat.lt_1_2) as Hij11; cbn in Hij11.
+destruct i. {
+  destruct j. {
+    rewrite IHn; [ cbn | easy ].
+    rewrite IHn. 2: {
+      transitivity (Z_2_pow n); [ | easy ].
+      apply bmat_fit_for_add_IZ_IZ.
+    }
+    rewrite (bmat_zero_like_eq_compat _ (Z_2_pow n)); cycle 1. {
+      specialize (Hss 0 0 Nat.lt_0_2 Nat.lt_0_2).
+      cbn in Hss.
+      unfold is_square_bmat.
+      remember (sizes_of_bmatrix (mat_el mm 0 0)) as sizes eqn:Hsizes.
+      specialize (is_square_bmat_fit_for_add sizes) as H1.
+      specialize (H1 (I_2_pow n)).
+      specialize (H1 (mat_el mm 0 0)).
+...
+      apply <- is_square_bmat_fit_for_add in Hss; [ | ].
+      apply <- is_square_bmat_fit_for_add; [ apply Hij00 | ].
+...
+(**)
+      revert n HBM.
+      induction BM as [x| M IHBM] using bmatrix_ind2; intros; [ easy | cbn ].
+      destruct n; [ easy | cbn in HBM ].
+      destruct HBM as (Hr & Hc & HBM).
+      rewrite <- Hr, <- Hc in IHBM |-*; cbn.
+      split; [ easy | ].
+      split; [ easy | ].
+      intros i j Hi Hj.
+      specialize (HBM _ _ Hi Hj).
+      destruct i. {
+        destruct j. {
+          cbn in HBM.
+          apply (IHBM 0 0 Nat.lt_0_2 Nat.lt_0_2 n HBM).
+        } {
+          destruct j; [ | flia Hj ].
+          cbn in HBM.
+...
+      revert BM HBM.
+      induction n; intros; [ now destruct BM | ].
+      cbn in HBM.
+      remember (mat_el mm 0 0) as M eqn:HM.
+      destruct M as [| mm']; [ easy | ].
+      destruct Hij00 as (Hr & Hc & Hfa).
+      cbn.
+      rewrite <- Hr, <- Hc; cbn.
+      split; [ easy | ].
+      split; [ easy | ].
+      intros i j Hi Hj.
+...
+      specialize (Hfa 0 0 Nat.lt_0_2 Nat.lt_0_2).
+      cbn in Hfa |-*.
+      rewrite <- Hr, <- Hc; cbn.
+      apply IHn.
+      apply IHn.
+Search (_ → is_square_bmat _).
+...
+    rewrite bmat_add_0_l.
+    now apply old_bmat_add_0_l.
+  }
+...
 intros * Hss.
 revert M Hss.
 induction n; intros. {
@@ -1589,6 +1655,9 @@ destruct i. {
       transitivity (Z_2_pow n); [ | easy ].
       apply bmat_fit_for_add_IZ_IZ.
     }
+Check bmat_add_0_l.
+,..
+    rewrite bmat_add_0_l.
     now apply old_bmat_add_0_l.
   }
   destruct j; [ cbn | flia Hj ].
