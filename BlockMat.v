@@ -1458,6 +1458,41 @@ rewrite <- bmat_zero_like_mul_distr_r; [ | easy ].
 now apply bmat_zero_like_sqr.
 Qed.
 
+Theorem sizes_of_bmatrix_IZ : ∀ n u,
+  sizes_of_bmatrix (IZ_2_pow u n) = repeat 2 n.
+Proof.
+intros.
+induction n; [ easy | now cbn; f_equal ].
+Qed.
+
+Theorem IZ_is_square_bmat : ∀ n u,
+  is_square_bmat (IZ_2_pow u n).
+Proof.
+intros.
+revert u.
+induction n; intros; [ easy | cbn ].
+split; [ easy | ].
+split; [ easy | ].
+intros i j Hi Hj.
+destruct i; cbn. {
+  destruct j; [ apply IHn | cbn ].
+  destruct j; [ | flia Hj ].
+  unfold so.
+  rewrite sizes_of_bmatrix_IZ.
+  rewrite <- (sizes_of_bmatrix_IZ n 0%Srng).
+  apply IHn.
+}
+destruct i; [ | flia Hi ].
+destruct j; cbn. {
+  unfold so.
+  rewrite sizes_of_bmatrix_IZ.
+  rewrite <- (sizes_of_bmatrix_IZ n 0%Srng).
+  apply IHn.
+}
+destruct j; [ | flia Hj ].
+apply IHn.
+Qed.
+
 Theorem bmat_mul_Z_2_pow_l : ∀ n M,
   bmat_fit_for_add (I_2_pow n) M
   → bmat_mul (Z_2_pow n) M = Z_2_pow n.
@@ -1487,10 +1522,10 @@ destruct i. {
       apply bmat_fit_for_add_IZ_IZ.
     }
     rewrite old_bmat_add_0_r. 2: {
-...
-rewrite old_bmat_add_0_l.
-...
-    now apply old_bmat_add_0_l.
+       rewrite bmat_add_0_l; [ easy | ].
+       apply IZ_is_square_bmat.
+    }
+    apply bmat_add_0_l, IZ_is_square_bmat.
   }
   destruct j; [ cbn | flia Hj ].
   rewrite IHn. 2: {
@@ -1498,6 +1533,7 @@ rewrite old_bmat_add_0_l.
     apply bmat_fit_for_add_IZ_IZ.
   }
   rewrite IHn; [ | easy ].
+...
   now apply old_bmat_add_0_l.
 }
 destruct i; [ cbn | flia Hi ].
@@ -2712,41 +2748,6 @@ Theorem sizes_of_bmatrix_A : ∀ n,
 Proof.
 intros.
 induction n; [ easy | now cbn; f_equal ].
-Qed.
-
-Theorem sizes_of_bmatrix_IZ : ∀ n u,
-  sizes_of_bmatrix (IZ_2_pow u n) = repeat 2 n.
-Proof.
-intros.
-induction n; [ easy | now cbn; f_equal ].
-Qed.
-
-Theorem IZ_is_square_bmat : ∀ n u,
-  is_square_bmat (IZ_2_pow u n).
-Proof.
-intros.
-revert u.
-induction n; intros; [ easy | cbn ].
-split; [ easy | ].
-split; [ easy | ].
-intros i j Hi Hj.
-destruct i; cbn. {
-  destruct j; [ apply IHn | cbn ].
-  destruct j; [ | flia Hj ].
-  unfold so.
-  rewrite sizes_of_bmatrix_IZ.
-  rewrite <- (sizes_of_bmatrix_IZ n 0%Srng).
-  apply IHn.
-}
-destruct i; [ | flia Hi ].
-destruct j; cbn. {
-  unfold so.
-  rewrite sizes_of_bmatrix_IZ.
-  rewrite <- (sizes_of_bmatrix_IZ n 0%Srng).
-  apply IHn.
-}
-destruct j; [ | flia Hj ].
-apply IHn.
 Qed.
 
 Theorem A_is_square_bmat : ∀ n,
