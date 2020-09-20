@@ -2308,6 +2308,9 @@ assert (Hy : is_square_bmat_loop sizes y). {
 assert (Su : is_square_bmat_loop sizes u) by (subst u; apply Ha; flia).
 assert (Sv : is_square_bmat_loop sizes v) by (subst v; apply Hb; flia).
 assert (Sw : is_square_bmat_loop sizes w) by (subst w; apply Hc; flia).
+assert (Sxy : is_square_bmat_loop sizes (x + y)%BM). {
+  now apply is_square_bmat_loop_add.
+}
 assert (Suw : is_square_bmat_loop sizes (u * w)%BM). {
   now apply is_square_bmat_loop_mul.
 }
@@ -2317,34 +2320,23 @@ assert (Svw : is_square_bmat_loop sizes (v * w)%BM). {
 assert (Syvw : is_square_bmat_loop sizes (y + v * w)%BM). {
   now apply is_square_bmat_loop_add.
 }
+assert (Hxy : bmat_fit_for_add x y). {
+  now apply (is_square_bmat_fit_for_add sizes).
+}
 assert (Hx_yvw : bmat_fit_for_add x (y + v * w)%BM). {
   now apply (is_square_bmat_fit_for_add sizes).
 }
 assert (Hx_uw : bmat_fit_for_add x (u * w)%BM). {
   now apply (is_square_bmat_fit_for_add sizes).
 }
-rewrite <- (bmat_add_add_swap _ _ (u * w)%BM); [ | easy | easy ].
-rewrite (bmat_add_assoc x); try easy.
-...
-rewrite (bmat_add_assoc x); [ | easy | easy ].
-rewrite <- (bmat_add_assoc (x + y)%BM); [ | easy | now symmetry ].
-f_equal.
-now apply bmat_add_comm.
-...
-assert (Sxy : is_square_bmat_loop sizes (x + y)%BM). {
-  now apply is_square_bmat_loop_add.
-}
-assert (Hxy : bmat_fit_for_add x y). {
-  now apply (square_bmat_fit_for_add sizes).
+assert (Hxy_vw : bmat_fit_for_add (x + y)%BM (v * w)%BM). {
+  now apply (is_square_bmat_fit_for_add sizes).
 }
 assert (Hy_vw : bmat_fit_for_add y (v * w)%BM). {
-  now apply (square_bmat_fit_for_add sizes).
-}
-assert (Hxy_vw : bmat_fit_for_add (x + y)%BM (v * w)%BM). {
-  now apply (square_bmat_fit_for_add sizes).
+  now apply (is_square_bmat_fit_for_add sizes).
 }
 assert (Huw_vw : bmat_fit_for_add (u * w)%BM (v * w)%BM). {
-  now apply (square_bmat_fit_for_add sizes).
+  now apply (is_square_bmat_fit_for_add sizes).
 }
 rewrite <- (bmat_add_add_swap _ _ (u * w)%BM); [ | easy | easy ].
 rewrite (bmat_add_assoc x); [ | easy | easy ].
