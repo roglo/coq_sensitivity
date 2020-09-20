@@ -3079,6 +3079,17 @@ Definition mat_mul_vect_r M V :=
 Definition vect_mul_scal_l μ V :=
   mk_vect (λ i, μ * vect_el V i)%Srng (vect_nrows V).
 
+(* determinant *)
+
+Definition det M :=
+...
+
+(* characteristic polynomial *)
+
+Definition charac_polyn (M : matrix T) := det (M - x * I).
+
+...
+
 (* eigenvalues and eigenvectors *)
 
 Theorem exists_eigenvalues : ∀ (M : matrix T),
@@ -3088,8 +3099,6 @@ Theorem exists_eigenvalues : ∀ (M : matrix T),
 Proof.
 intros M HM.
 ...
-
-Definition charac_polyn {A} {n : nat} (M : matrix A) := det (M - x * I).
 
 ...
 
