@@ -2614,13 +2614,66 @@ cbn in Ha, Hb, Hc.
 destruct Ha as (H1 & H2 & Ha); subst ra ca.
 destruct Hb as (H1 & H2 & Hb); subst rb cb.
 destruct Hc as (H1 & H2 & Hc); subst rc cc.
-destruct size; [ easy | cbn in Has, Hbs, Hcs |-* ].
+destruct (zerop size) as [H| H]; [ easy | ].
+cbn in Has, Hbs, Hcs; clear H.
 injection Has; clear Has; intros Has.
 injection Hbs; clear Hbs; intros Hbs.
 injection Hcs; clear Hcs; intros Hcs.
-(*
-rewrite Nat.sub_0_r.
-*)
+replace
+  (fold_left
+    (λ (acc : bmatrix T) (k : nat),
+       (acc + fa i k * (fb k j + fc k j))%BM)
+    (seq 0 size) (bmat_zero_like (fa 0 0)%BM))
+with
+  (fold_left
+    (λ (acc : bmatrix T) (k : nat),
+       (acc + (fa i k * fb k j + fa i k * fc k j))%BM)
+    (seq 0 size) (bmat_zero_like (fa 0 0)%BM)). 2: {
+  apply List_fold_left_ext_in.
+  intros k M Hk.
+  f_equal.
+  apply in_seq in Hk.
+  symmetry.
+  apply IHMA; [ easy | flia Hk | ].
+  exists sizes.
+  rewrite <- Has in Ha.
+  rewrite <- Hbs in Hb.
+  rewrite <- Hcs in Hc.
+  split. {
+    intros BM HBM.
+    unfold is_square_bmat.
+    destruct HBM as [H| HBM]; [ subst BM | ]. {
+      rewrite (sizes_of_bmatrix_at_0_0 fa Ha); [ | easy | flia Hk ].
+      apply Ha; [ easy | flia Hk ].
+    }
+    destruct HBM as [H| HBM]; [ subst BM | ]. {
+      rewrite (sizes_of_bmatrix_at_0_0 fb Hb); [ | flia Hk | easy ].
+      apply Hb; [ flia Hk | easy ].
+    }
+    destruct HBM as [H| HBM]; [ subst BM | ]. {
+      rewrite (sizes_of_bmatrix_at_0_0 fc Hc); [ | flia Hk | easy ].
+      apply Hc; [ flia Hk | easy ].
+    }
+    easy.
+  } {
+    intros BM HBM.
+    destruct HBM as [H| HBM]; [ subst BM | ]. {
+      rewrite (sizes_of_bmatrix_at_0_0 fa Ha); [ easy | easy | flia Hk ].
+    }
+    destruct HBM as [H| HBM]; [ subst BM | ]. {
+      rewrite (sizes_of_bmatrix_at_0_0 fb Hb); [ easy | flia Hk | easy ].
+    }
+    destruct HBM as [H| HBM]; [ subst BM | ]. {
+      rewrite (sizes_of_bmatrix_at_0_0 fc Hc); [ easy | flia Hk | easy ].
+    }
+    easy.
+  }
+}
+assert (Hfa00 : is_square_bmat_loop sizes (fa 0 0)). {
+  apply Ha; flia Hi.
+}
+(* voir dans le théorème précédent *)
+...
 rewrite IHMA; [ | easy | flia | ]. 2: {
   rewrite <- Has in Ha.
   rewrite <- Hbs in Hb.
