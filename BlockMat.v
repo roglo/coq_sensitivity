@@ -2345,6 +2345,7 @@ f_equal.
 now apply bmat_add_comm.
 Qed.
 
+(*
 Theorem bmat_mul_add_distr_l :
   ∀ (MA MB MC : bmatrix T),
   compatible_square_bmatrices [MA; MB; MC]
@@ -2558,6 +2559,7 @@ rewrite <- (bmat_add_assoc (x + y)%BM); [ | easy | now symmetry ].
 f_equal.
 now apply bmat_add_comm.
 Qed.
+*)
 
 Theorem bmat_mul_add_distr_l :
   ∀ (MA MB MC : bmatrix T),
@@ -2616,7 +2618,9 @@ destruct size; [ easy | cbn in Has, Hbs, Hcs |-* ].
 injection Has; clear Has; intros Has.
 injection Hbs; clear Hbs; intros Hbs.
 injection Hcs; clear Hcs; intros Hcs.
+(*
 rewrite Nat.sub_0_r.
+*)
 rewrite IHMA; [ | easy | flia | ]. 2: {
   rewrite <- Has in Ha.
   rewrite <- Hbs in Hb.
@@ -2652,6 +2656,7 @@ rewrite IHMA; [ | easy | flia | ]. 2: {
     easy.
   }
 }
+...
 replace
   (fold_left
     (λ (acc : bmatrix T) (j0 : nat),
