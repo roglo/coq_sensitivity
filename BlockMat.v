@@ -3093,20 +3093,36 @@ Definition submatrix (M : matrix T) i j :=
     (mat_nrows M - 1)
     (mat_ncols M - 1).
 
-...
+(* (-1) ^ n *)
+
+Definition minus_one_pow n :=
+  match n mod 2 with
+  | 0 => 1%Rng
+  | _ => (- 1%Srng)%Rng
+  end.
 
 (* determinant *)
-
-(* ouais mais non mais c'est pas ça... *)
 
 Fixpoint det_loop M n :=
   match n with
   | 0 => 0%Rng
+  | 1 => mat_el M 0 0
   | S n' =>
-      (Σ (j = 0, n'), (*(- 1) ^ j * *) mat_el M n' j * det_loop M n')%Srng
+      (Σ (j = 0, n'),
+       minus_one_pow j * mat_el M 0 j * det_loop (submatrix M 0 j) n')%Rng
   end.
 
 Definition det M := det_loop M (mat_nrows M).
+
+(*
+End in_ring.
+
+Require Import ZArith.
+Open Scope Z_scope.
+
+Compute let ro := Z_ring_op in det (mat_of_list_list 0 [[1; 2]; [3; 4]]).
+Compute let ro := Z_ring_op in det (mat_of_list_list 0 [[-2; 2; -3]; [-1; 1; 3]; [2; 0; -1]]). (* 18: seems good *)
+*)
 
 ...
 
