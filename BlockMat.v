@@ -167,7 +167,8 @@ Compute (list_list_of_mat (mat_add add (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6;
 (* multiplication *)
 
 Definition mat_mul {so : semiring_op T} (MA MB : matrix T) :=
-  {| mat_el i k := (Σ (j = 0, mat_ncols MA), mat_el MA i j * mat_el MB j k)%Srng;
+  {| mat_el i k :=
+       (Σ (j = 0, mat_ncols MA - 1), mat_el MA i j * mat_el MB j k)%Srng;
      mat_nrows := mat_nrows MA;
      mat_ncols := mat_ncols MB |}.
 
@@ -3057,6 +3058,34 @@ rewrite IHn.
 apply rng_opp_0.
 Qed.
 
+(* vector *)
+
+Record vector T := mk_vect
+  { vect_el : nat → T;
+    vect_nrows : nat }.
+
+(* multiplication of a matrix by a vector *)
+
+Definition mat_mul_vect_r M V :=
+  mk_vect (λ i, (Σ (j = 0, mat_ncols M - 1), mat_el M i j * vect_el V j)%Srng)
+    (mat_nrows M).
+
+(* multiplication of a vector by a scalar *)
+
+Definition vect_mul_scal_l μ V :=
+  mk_vect (λ i, μ * vect_el V i)%Srng (vect_nrows V).
+
+(* eigenvalues and eigenvectors *)
+
+...
+
+Theorem exists_eigenvalues : ∀ (M : matrix T),
+  is_square_mat M
+  → ∃ EVL, length EVL = mat_nrows M ∧
+     (∀ μ V, (μ, V) ∈ EVL ↔ mat_mul_vect_r M V = vect_mul_scal_l μ V).
+
+...
+
 End in_ring.
 
 Module bmatrix_Notations.
@@ -3072,17 +3101,6 @@ Notation "- a" := (bmat_opp a) : BM_scope.
 End bmatrix_Notations.
 
 Import bmatrix_Notations.
-
-(* eigenvalues and eigenvectors *)
-
-...
-
-Theorem exists_eigenvalues : ∀ (M : matrix T),
-  is_square_mat M
-  → ∃ EVL, length EVL = mat_nrows M ∧
-     ∀ μ V, (μ, V) ∈ EVL → mat_mul_scal_l μ M = vect_mul_scal μ V.
-
-...
 
 Definition charac_polyn {A} {n : nat} (M : matrix A) := det (M - x * I).
 
