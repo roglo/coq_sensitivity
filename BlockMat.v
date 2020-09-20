@@ -3081,7 +3081,19 @@ Definition vect_mul_scal_l μ V :=
 
 (* determinant *)
 
-Definition det M :=
+...
+
+(* ouais mais non mais c'est pas ça... *)
+
+Fixpoint det_loop M n :=
+  match n with
+  | 0 => 0%Rng
+  | S n' =>
+      (Σ (j = 0, n'), (*(- 1) ^ j * *) mat_el M n' j * det_loop M n')%Srng
+  end.
+
+Definition det M := det_loop M (mat_nrows M).
+
 ...
 
 (* characteristic polynomial *)
