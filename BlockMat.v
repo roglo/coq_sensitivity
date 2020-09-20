@@ -3079,9 +3079,23 @@ Definition mat_mul_vect_r M V :=
 Definition vect_mul_scal_l μ V :=
   mk_vect (λ i, μ * vect_el V i)%Srng (vect_nrows V).
 
-(* determinant *)
+(* matrix without row i and column j *)
+
+Definition submatrix (M : matrix T) i j :=
+  mk_mat
+    (λ k l,
+       if lt_dec k i then
+         if lt_dec l j then mat_el M k l
+         else mat_el M k (l + 1)
+       else
+         if lt_dec l j then mat_el M (k + 1) l
+         else mat_el M (k + 1) (l + 1))
+    (mat_nrows M - 1)
+    (mat_ncols M - 1).
 
 ...
+
+(* determinant *)
 
 (* ouais mais non mais c'est pas ça... *)
 
