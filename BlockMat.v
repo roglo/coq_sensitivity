@@ -3058,6 +3058,10 @@ rewrite IHn.
 apply rng_opp_0.
 Qed.
 
+(* *)
+
+Definition is_square_mat (M : matrix T) := mat_nrows M = mat_ncols M.
+
 (* vector *)
 
 Record vector T := mk_vect
@@ -3077,12 +3081,15 @@ Definition vect_mul_scal_l μ V :=
 
 (* eigenvalues and eigenvectors *)
 
-...
-
 Theorem exists_eigenvalues : ∀ (M : matrix T),
   is_square_mat M
   → ∃ EVL, length EVL = mat_nrows M ∧
      (∀ μ V, (μ, V) ∈ EVL ↔ mat_mul_vect_r M V = vect_mul_scal_l μ V).
+Proof.
+intros M HM.
+...
+
+Definition charac_polyn {A} {n : nat} (M : matrix A) := det (M - x * I).
 
 ...
 
@@ -3101,7 +3108,3 @@ Notation "- a" := (bmat_opp a) : BM_scope.
 End bmatrix_Notations.
 
 Import bmatrix_Notations.
-
-Definition charac_polyn {A} {n : nat} (M : matrix A) := det (M - x * I).
-
-...
