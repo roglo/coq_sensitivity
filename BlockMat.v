@@ -2089,22 +2089,25 @@ Theorem square_bmat_fold_left :
    → is_square_bmat_loop sizes MB
    → is_square_bmat_loop sizes (MA * MB)%BM)
   → (∀ j, j < S size → is_square_bmat_loop sizes (fa i j))
-  → (∀ i, i < S size → is_square_bmat_loop sizes (fb i j))
+  → (∀ i j, i < S size → j < S size → is_square_bmat_loop sizes (fb i j))
   → is_square_bmat_loop sizes
-       (fold_left (λ a k, (a + fa i (k + 1)%nat * fb (k + 1)%nat j)%BM) 
-       (seq 0 size) (fa i 0 * fb 0 j)%BM).
+       (fold_left (λ a k, (a + fa i k * fb k j)%BM)
+          (seq 0 size) (bmat_zero_like (fa 0 0))).
 Proof.
 intros * IHsizes Ha Hb.
 induction size. {
-  apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
+  apply is_square_bmat_loop_zero_like.
+Abort. (*
+...
+  apply Ha; apply Nat.lt_0_1.
 }
-rewrite <- (Nat.add_1_r size).
-rewrite seq_app.
-rewrite fold_left_app.
-rewrite Nat.add_0_l.
-unfold seq at 1.
-unfold fold_left at 1.
+rewrite List_seq_succ_r; cbn.
+rewrite fold_left_app; cbn.
 apply square_bmat_add. 2: {
+  apply IHsizes.
+...
+
+  apply IHsizes; [ apply Ha | apply Hb ].
   apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
 }
 apply IHsize. {
@@ -2113,6 +2116,7 @@ apply IHsize. {
   intros k Hk; apply Hb; flia Hk.
 }
 Qed.
+*)
 
 Theorem bmat_mul_add_distr_r :
   ∀ (MA MB MC : bmatrix T),
@@ -2222,17 +2226,22 @@ with
     easy.
   }
 }
+assert (H : ∀ j, j < size → is_square_bmat_loop sizes (fa i j)). {
+  now intros; apply Ha.
+}
+move H before Ha; clear Ha; rename H into Ha.
 clear Hi Hj IHMC Hsq Hsz.
 induction size; [ apply bmat_zero_like_add_distr | ].
 rewrite List_seq_succ_r; cbn.
 do 3 rewrite fold_left_app; cbn.
 rewrite IHsize; cycle 1. {
-  intros i1 j1 Hi1 Hj1; apply Ha; [ flia Hi1 | flia Hj1 ].
+  intros k Hk; apply Ha; flia Hk.
 } {
   intros i1 j1 Hi1 Hj1; apply Hb; [ flia Hi1 | flia Hj1 ].
 } {
   intros i1 j1 Hi1 Hj1; apply Hc; [ flia Hi1 | flia Hj1 ].
 }
+clear IHsize.
 remember
   (fold_left (λ acc j0, acc + fa i j0 * fc j0 j) (seq 0 size)
      (bmat_zero_like (fa 0 0)))%BM as x.
@@ -2246,9 +2255,25 @@ move y before x; move u before y.
 move v before u; move w before v.
 assert (Hx : is_square_bmat_loop sizes x). {
   subst x.
-Check square_bmat_fold_left.
+  clear Heqy Hequ Heqv Heqw.
+  induction size. {
+    cbn.
+    apply is_square_bmat_loop_zero_like.
+...
+    apply Ha.
+    apply Ha; apply Nat.lt_0_1.
+  }
+  rewrite List_seq_succ_r; cbn.
+  rewrite fold_left_app; cbn.
+  apply is_square_bmat_loop_add. 2: {
+    apply is_square_bmat_loop_mul. {
+      apply Ha.
 ...
   apply square_bmat_fold_left; cycle 1. {
+    intros i1 j1 Hi1 Hj1.
+    now apply Ha.
+  } {
+...
     intros k Hk; apply Ha; flia Hk.
   } {
     intros k Hk; apply Hc; flia Hk.
@@ -2447,7 +2472,6 @@ with
 assert (H : ∀ j, j < S size → is_square_bmat_loop sizes (fa i j)). {
   now intros; apply Ha.
 }
-move H before Ha; clear Ha; rename H into Ha.
 assert (H : ∀ j, j < S size → is_square_bmat_loop sizes (fb i j)). {
   now intros; apply Hb.
 }
