@@ -2060,25 +2060,6 @@ rewrite (bmat_add_comm MA MB); [ | easy ].
 apply bmat_add_add_swap; [ easy | now symmetry ].
 Qed.
 
-Theorem square_bmat_add : ∀ MA MB sizes,
-  is_square_bmat_loop sizes MA
-  → is_square_bmat_loop sizes MB
-  → is_square_bmat_loop sizes (MA + MB)%BM.
-Proof.
-intros * Ha Hb.
-revert MA MB Ha Hb.
-induction sizes as [| size]; intros; [ now destruct MA, MB | ].
-cbn in Ha, Hb |-*.
-destruct MA as [xa| ma]; [ easy | ].
-destruct MB as [xb| mb]; [ easy | cbn ].
-destruct Ha as (Hra & Hca & Ha).
-destruct Hb as (Hrb & Hcb & Hb).
-split; [ easy | ].
-split; [ easy | ].
-intros i j Hi Hj.
-apply IHsizes; [ now apply Ha | now apply Hb ].
-Qed.
-
 Theorem bmat_zero_like_add_diag : ∀ BM,
   bmat_zero_like (BM + BM)%BM = bmat_zero_like BM.
 Proof.
@@ -3093,9 +3074,6 @@ End bmatrix_Notations.
 Import bmatrix_Notations.
 
 (* eigenvalues and eigenvectors *)
-
-Check square_bmat_add.
-Search (is_square_bmat_loop _ (bmat_add _ _)).
 
 ...
 
