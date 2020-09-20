@@ -3080,6 +3080,9 @@ End in_ring.
 
 Module bmatrix_Notations.
 
+Declare Scope BM_scope.
+Delimit Scope BM_scope with BM.
+
 Notation "a + b" := (bmat_add a b) : BM_scope.
 Notation "a - b" := (bmat_sub a b) : BM_scope.
 Notation "a * b" := (bmat_mul a b) : BM_scope.
@@ -3090,6 +3093,9 @@ End bmatrix_Notations.
 Import bmatrix_Notations.
 
 (* eigenvalues and eigenvectors *)
+
+Check square_bmat_add.
+Search (is_square_bmat_loop _ (bmat_add _ _)).
 
 ...
 
