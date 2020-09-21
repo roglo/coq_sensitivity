@@ -3262,6 +3262,27 @@ Definition polyn_ring_op : ring_op (polynomial T) :=
 
 Existing Instance polyn_ring_op.
 
+(* degree of sum of polynomials (note: not normalized sum) *)
+
+Theorem polyn_degree_add : ∀ P Q,
+  polyn_degree (P + Q)%P = max (polyn_degree P) (polyn_degree Q).
+Proof. easy. Qed.
+
+Theorem summation_polyn_degree : ∀ f b e,
+   polyn_degree (Σ (i = b, e), f i)%Rng =
+   fold_left max (map (@polyn_degree _) (map f (seq b (S e - b)))) 0.
+Proof.
+intros.
+cbn - [ "-" ].
+remember (S e - b) as len; clear e Heqlen.
+revert b.
+induction len; intros; [ easy | ].
+rewrite List_seq_succ_r; cbn.
+do 2 rewrite map_app; cbn.
+do 2 rewrite fold_left_app; cbn.
+now f_equal.
+Qed.
+
 (* characteristic polynomial = det(xI-M) *)
 
 Definition charac_polyn (M : matrix T) :=
@@ -3281,7 +3302,7 @@ intros acp M Hrz HM.
 destruct acp as (Hroots).
 specialize (Hroots (charac_polyn M)) as H1.
 assert (H : polyn_degree (charac_polyn M) > 0). {
-  clear H1; cbn.
+  cbn.
   replace (mat_nrows M) with (S (mat_nrows M - 1)) at 2 by flia Hrz.
   cbn - [ mat_id sub polyn_ring_op ].
   destruct (Nat.eq_dec (mat_nrows M) 1) as [Hr1| Hr1]. {
@@ -3289,6 +3310,10 @@ assert (H : polyn_degree (charac_polyn M) > 0). {
   }
   move Hr1 before Hrz.
   replace (mat_nrows M - 1) with (S (mat_nrows M - 2)) at 1 by flia Hrz Hr1.
+  rewrite summation_polyn_degree.
+  rewrite <- Nat.sub_succ_l; [ | flia Hrz Hr1 ].
+  rewrite Nat.sub_succ.
+  do 2 rewrite Nat.sub_0_r.
 ...
 
 End in_ring.
