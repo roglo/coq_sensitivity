@@ -3112,7 +3112,7 @@ Fixpoint det_loop M n :=
        minus_one_pow j * mat_el M 0 j * det_loop (submatrix M 0 j) n')%Rng
   end.
 
-Definition det M := det_loop M (mat_nrows M).
+Definition determinant M := det_loop M (mat_nrows M).
 
 (*
 End in_ring.
@@ -3120,29 +3120,69 @@ End in_ring.
 Require Import ZArith.
 Open Scope Z_scope.
 
-Compute let ro := Z_ring_op in det (mat_of_list_list 0 [[1; 2]; [3; 4]]).
-Compute let ro := Z_ring_op in det (mat_of_list_list 0 [[-2; 2; -3]; [-1; 1; 3]; [2; 0; -1]]). (* 18: seems good *)
+Compute let ro := Z_ring_op in determinant (mat_of_list_list 0 [[1; 2]; [3; 4]]).
+Compute let ro := Z_ring_op in determinant (mat_of_list_list 0 [[-2; 2; -3]; [-1; 1; 3]; [2; 0; -1]]). (* 18: seems good *)
 *)
+
+(* 1 ≠ 0 in semirings *)
+
+Class sring_1_neq_0_prop :=
+  { srng_1_neq_0 : (1 ≠ 0)%Srng }.
+
+Context {sp10 : sring_1_neq_0_prop}.
+
+(* decidability in equality in semirings *)
+
+Class sring_dec_prop :=
+  { srng_eq_dec : ∀ a b : T, {a = b} + {a ≠ b} }.
+
+Context {dp : sring_dec_prop}.
+
+Definition srng_eqb (a b : T) :=
+  if srng_eq_dec a b then true else false.
+
+Theorem srng_1_neqb_0 : srng_eqb 1%Srng 0%Srng = false.
+Proof.
+unfold srng_eqb; cbn.
+destruct (srng_eq_dec 1%Srng 0%Srng) as [H| H]; [ | easy ].
+now apply srng_1_neq_0 in H.
+Qed.
 
 (* polynomial *)
 
-...
+Class polynomial := mk_poly
+  { polyn_list : list T;
+    polyn_prop : srng_eqb (last polyn_list 1%Srng) 0%Srng = false }.
 
-(* problem: how do I define a semiring with decidability of equality?
-   and, in general, the hierarchy of rings, fields and all their
-   miscellaneous properties? *)
+Definition monom_x := mk_poly [0; 1]%Srng srng_1_neqb_0.
 
-Definition rng_eqb {so : semiring_op T} {sp : semiring_prop T} (a b : T) :=
-  if rng_eq_dec a b then true else false.
+(* convertion matrix → matrix with monomials *)
 
-Record polynomial T {ro : ring_op T} {rp : ring_prop} := mk_poly
-  { polyn_list : list A;
-    polyn_prop : rng_eqb (last lap 1%Rng) 0%Rng = false }.
-...
+Theorem monom_mat_of_mat_prop : ∀ M i j,
+  mat_el M i j ≠ 0%Srng
+  → srng_eqb (last [mat_el M i j] 1%Srng) 0%Srng = false.
+Proof.
+intros * HM.
+unfold srng_eqb; cbn.
+now destruct (srng_eq_dec (mat_el M i j) 0%Srng).
+Qed.
+
+Definition monom_mat_of_mat M : matrix polynomial :=
+  mk_mat
+    (λ i j,
+       match srng_eq_dec (mat_el M i j) 0%Srng with
+       | left _ => mk_poly [] srng_1_neqb_0
+       | right p => mk_poly [mat_el M i j] (monom_mat_of_mat_prop M i j p)
+       end)
+    (mat_nrows M) (mat_ncols M).
 
 (* characteristic polynomial *)
 
-Definition charac_polyn (M : matrix T) := det (M - x * I).
+...
+
+Definition charac_polyn (M : matrix T) :=
+  determinant
+    (monom_mat_of_mat M - monom_x * monom_mat_of_mat (mat_I (mat_nrows M)))%P.
 
 ...
 
