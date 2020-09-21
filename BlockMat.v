@@ -3272,13 +3272,19 @@ Definition charac_polyn (M : matrix T) :=
 (* eigenvalues and eigenvectors *)
 
 Theorem exists_eigenvalues : ∀ (acp : algeb_closed_prop) (M : matrix T),
-  is_square_mat M
+  mat_nrows M ≠ 0
+  → is_square_mat M
   → ∃ EVL, length EVL = mat_nrows M ∧
      (∀ μ V, (μ, V) ∈ EVL ↔ mat_mul_vect_r M V = vect_mul_scal_l μ V).
 Proof.
-intros acp M HM.
+intros acp M Hrz HM.
 destruct acp as (Hroots).
-destruct M as (f, r, c); cbn.
+specialize (Hroots (charac_polyn M)) as H1.
+assert (H : polyn_degree (charac_polyn M) > 0). {
+  cbn.
+  replace (mat_nrows M) with (S (mat_nrows M - 1)) by flia Hrz.
+  cbn.
+...
 destruct (zerop r) as [Hrz| Hrz]. {
   subst r.
   exists [].
@@ -3291,44 +3297,22 @@ destruct (zerop r) as [Hrz| Hrz]. {
   cbn in Hmr.
   unfold vect_mul_scal_l in Hmr; cbn in Hmr.
   injection Hmr; clear Hmr; intros H Hmr; subst d.
-  cbn in Hmr.
-...
-  apply (f_equal (λ x, f x)) in Hmr.
-...
-  assert (∀ i, (0 + f i O * v O)%Srng = (μ * v i)%Srng). {
+(**)
+  set (g := λ i : nat, (0 + f i O * v O)%Srng) in Hmr.
+  set (h := (λ i : nat, (μ * v i)%Srng)) in Hmr.
+  assert (H : ∀ i, g i = h i) by now rewrite Hmr.
+  subst g h; cbn in H.
+  assert (H1 : ∀ i, (f i O * v O)%Srng = (μ * v i)%Srng). {
     intros i.
-    fold so in Hmr.
-Set Printing All.
-
-Check f_equal.
-...
-(λ x, f x) = (λ x, g x) → ∀ x, (λ x, f x) x = (λ x, g x) x
-...
-(λ x, f x) = (λ x, g x) → ∀ x, f x = g x
-...
-(λ x, f x) = (λ x, g x) → f = g
-...
-  assert (∀ i, (λ i, (0 + f i O * v O)%Srng) i = (λ i, (μ * v i)%Srng) i). {
-Set Printing All.
-    intros i.
-Set Printing All.
-    fold so in Hmr.
-
-    rewrite Hmr.
-
-Set Printing All.
-...
-  eapply (f_equal) in Hmr.
-Check f_equal.
-(λ f, f x)
+    specialize (H i).
+    now rewrite srng_add_0_l in H.
+  }
+  clear H.
 ...
 destruct (zerop (polyn_degree (charac_polyn M))) as [Hpz| Hpz]. {
   exists [].
   cbn in Hpz.
 ...
-specialize (Hroots (charac_polyn M)) as H1.
-assert (H : polyn_degree (charac_polyn M) > 0). {
-  destruct r; cbn.
 ...
   cbn.
   unfold monom_mat_of_mat; cbn.
