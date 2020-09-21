@@ -3128,25 +3128,34 @@ Compute let ro := Z_ring_op in determinant (mat_of_list_list 0 [[1; 2]; [3; 4]])
 Compute let ro := Z_ring_op in determinant (mat_of_list_list 0 [[-2; 2; -3]; [-1; 1; 3]; [2; 0; -1]]). (* 18: seems good *)
 *)
 
+End in_ring.
+
 (* 1 ≠ 0 in semirings *)
 
-Class sring_1_neq_0_prop :=
+Class sring_1_neq_0_prop T {so : semiring_op T} :=
   { srng_1_neq_0 : (1 ≠ 0)%Srng }.
 
+(*
 Context {sp10 : sring_1_neq_0_prop}.
+*)
 
 (* decidability in equality in semirings *)
 
-Class sring_dec_prop :=
+Class sring_dec_prop T :=
   { srng_eq_dec : ∀ a b : T, {a = b} + {a ≠ b} }.
 
+(*
 Context {dp : sring_dec_prop}.
+*)
 
-Definition srng_eqb (a b : T) :=
+Definition srng_eqb T {dp : sring_dec_prop T} (a b : T) :=
   if srng_eq_dec a b then true else false.
 
-Theorem srng_1_neqb_0 : srng_eqb 1%Srng 0%Srng = false.
+Theorem srng_1_neqb_0 : ∀ T,
+   ∀ {so : semiring_op T} {dp : sring_dec_prop T} {sp10 : sring_1_neq_0_prop},
+  srng_eqb 1%Srng 0%Srng = false.
 Proof.
+intros.
 unfold srng_eqb; cbn.
 destruct (srng_eq_dec 1%Srng 0%Srng) as [H| H]; [ | easy ].
 now apply srng_1_neq_0 in H.
@@ -3154,11 +3163,24 @@ Qed.
 
 (* polynomial *)
 
-Class polynomial := mk_poly
-  { polyn_list : list T;
-    polyn_prop : srng_eqb (last polyn_list 1%Srng) 0%Srng = false }.
+Class polynomial T := mk_polyn
+  { polyn_list : list T }.
 
-Definition monom_x := mk_poly [0; 1]%Srng srng_1_neqb_0.
+Class polynomial_prop T {so : semiring_op T} {dp : sring_dec_prop T} l :=
+  mk_polyn_prop
+  { polyn_prop : srng_eqb (last l 1%Srng) 0%Srng = false }.
+
+Section in_ring.
+
+Context {T : Type}.
+Context {ro : ring_op T}.
+Context (so := rng_semiring).
+Context {sp : @semiring_prop T (@rng_semiring T ro)}.
+Context {rp : @ring_prop T ro}.
+Context {dp : @sring_dec_prop T}.
+Existing Instance so.
+
+Definition monom_x := mk_polyn [0; 1]%Srng.
 
 (* convertion matrix → matrix with monomials *)
 
@@ -3171,18 +3193,65 @@ unfold srng_eqb; cbn.
 now destruct (srng_eq_dec (mat_el M i j) 0%Srng).
 Qed.
 
-Definition monom_mat_of_mat M : matrix polynomial :=
+Definition monom_mat_of_mat M : matrix (polynomial T) :=
   mk_mat
     (λ i j,
        match srng_eq_dec (mat_el M i j) 0%Srng with
-       | left _ => mk_poly [] srng_1_neqb_0
-       | right p => mk_poly [mat_el M i j] (monom_mat_of_mat_prop M i j p)
+       | left _ => mk_polyn []
+       | right p => mk_polyn [mat_el M i j]
        end)
     (mat_nrows M) (mat_ncols M).
 
-(* characteristic polynomial *)
+...
+
+Definition monom_mat_of_mat M : matrix (polynomial T) :=
+  mk_mat
+    (λ i j,
+       match srng_eq_dec (mat_el M i j) 0%Srng with
+       | left _ => mk_polyn [] srng_1_neqb_0
+       | right p => mk_polyn [mat_el M i j] (monom_mat_of_mat_prop M i j p)
+       end)
+    (mat_nrows M) (mat_ncols M).
+
+(* operations on polynomials *)
+
+Fixpoint polyn_list_add (la lb : list T) :=
+  match la with
+  | [] => lb
+  | a :: la' =>
+      match lb with
+      | [] => la
+      | b :: lb' => (a + b)%Srng :: polyn_list_add la' lb'
+      end
+  end.
+
+Fixpoint polyn_list_norm (la : list T) : list T :=
+  match la with
+  | [] => []
+  | [a] => if srng_eq_dec a 0%Srng then [] else [a]
+  | a :: la' => a :: polyn_list_norm la'
+  end.
+
+Check polyn_list.
+
+Definition polyn_add P Q :=
+  mk_polyn (polyn_list_norm (polyn_list_add (polyn_list P) (polyn_list Q))) 42.
+...
+
+Definition polyn_sub P Q :=
+  polyn_add P (polyn_opp Q).
+
+(* polynomial syntax *)
+
+Declare Scope polynomial_scope.
+Delimit Scope polynomial_scope with P.
+
+Notation "a - b" := (polyn_sub a b) : polynomial_scope.
+Notation "a * b" := (polyn_mul a b) : polynomial_scope.
 
 ...
+
+(* characteristic polynomial *)
 
 Definition charac_polyn (M : matrix T) :=
   determinant
