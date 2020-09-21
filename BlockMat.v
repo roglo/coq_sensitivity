@@ -3278,13 +3278,56 @@ Theorem exists_eigenvalues : ∀ (acp : algeb_closed_prop) (M : matrix T),
 Proof.
 intros acp M HM.
 destruct acp as (Hroots).
+destruct M as (f, r, c); cbn.
+destruct (zerop r) as [Hrz| Hrz]. {
+  subst r.
+  exists [].
+  split; [ easy | ].
+  intros.
+  split; intros Hmr; [ easy | exfalso ].
+  unfold is_square_mat in HM; cbn in HM; subst c.
+  unfold mat_mul_vect_r in Hmr; cbn in Hmr.
+  destruct V as (v, d).
+  cbn in Hmr.
+  unfold vect_mul_scal_l in Hmr; cbn in Hmr.
+  injection Hmr; clear Hmr; intros H Hmr; subst d.
+  cbn in Hmr.
+...
+  apply (f_equal (λ x, f x)) in Hmr.
+...
+  assert (∀ i, (0 + f i O * v O)%Srng = (μ * v i)%Srng). {
+    intros i.
+    fold so in Hmr.
+Set Printing All.
+
+Check f_equal.
+...
+(λ x, f x) = (λ x, g x) → ∀ x, (λ x, f x) x = (λ x, g x) x
+...
+(λ x, f x) = (λ x, g x) → ∀ x, f x = g x
+...
+(λ x, f x) = (λ x, g x) → f = g
+...
+  assert (∀ i, (λ i, (0 + f i O * v O)%Srng) i = (λ i, (μ * v i)%Srng) i). {
+Set Printing All.
+    intros i.
+Set Printing All.
+    fold so in Hmr.
+
+    rewrite Hmr.
+
+Set Printing All.
+...
+  eapply (f_equal) in Hmr.
+Check f_equal.
+(λ f, f x)
+...
 destruct (zerop (polyn_degree (charac_polyn M))) as [Hpz| Hpz]. {
   exists [].
   cbn in Hpz.
 ...
 specialize (Hroots (charac_polyn M)) as H1.
 assert (H : polyn_degree (charac_polyn M) > 0). {
-  destruct M as (f, r, c); cbn.
   destruct r; cbn.
 ...
   cbn.
