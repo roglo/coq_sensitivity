@@ -3180,6 +3180,17 @@ Record polynomial T := mk_polyn
   { polyn_el : nat → T;
     polyn_degree : nat }.
 
+(* evaluation of a polynomial *)
+
+Definition eval_polyn T {so : semiring_op T} (P : polynomial T) x :=
+  (Σ (i = 0, polyn_degree P - 1), polyn_el P i * x ^ i)%Srng.
+
+(* algebraically closed set *)
+
+Class algeb_closed_prop T {so : semiring_op T} :=
+  { alcl_roots :
+      ∀ P : polynomial T, polyn_degree P > 0 → ∃ x, eval_polyn P x = 0%Srng }.
+
 Section in_ring.
 
 Context {T : Type}.
@@ -3258,18 +3269,18 @@ Definition charac_polyn (M : matrix T) :=
     (monom_mat_of_mat M -
      mat_mul_scal_l (monom_x) (monom_mat_of_mat (mat_id (mat_nrows M))))%M.
 
-...
-
 (* eigenvalues and eigenvectors *)
 
-Theorem exists_eigenvalues : ∀ (M : matrix T),
+Theorem exists_eigenvalues : ∀ (acp : algeb_closed_prop) (M : matrix T),
   is_square_mat M
   → ∃ EVL, length EVL = mat_nrows M ∧
      (∀ μ V, (μ, V) ∈ EVL ↔ mat_mul_vect_r M V = vect_mul_scal_l μ V).
 Proof.
-intros M HM.
-...
-
+intros acp M HM.
+destruct acp as (Hroots).
+specialize (Hroots (charac_polyn M)) as H1.
+assert (H : polyn_degree (charac_polyn M) > 0). {
+  cbn.
 ...
 
 End in_ring.
