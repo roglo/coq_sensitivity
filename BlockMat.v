@@ -3130,41 +3130,11 @@ Compute let ro := Z_ring_op in determinant (mat_of_list_list 0 [[-2; 2; -3]; [-1
 
 End in_ring.
 
-(* 1 ≠ 0 in semirings *)
-
-Class sring_1_neq_0_prop T {so : semiring_op T} :=
-  { srng_1_neq_0 : (1 ≠ 0)%Srng }.
-
-(* decidability in equality in semirings *)
-
-Class sring_dec_prop T :=
-  { srng_eq_dec : ∀ a b : T, {a = b} + {a ≠ b} }.
-
-Definition srng_eqb T {dp : sring_dec_prop T} (a b : T) :=
-  if srng_eq_dec a b then true else false.
-
-Theorem srng_1_neqb_0 : ∀ T,
-   ∀ {so : semiring_op T} {dp : sring_dec_prop T} {sp10 : sring_1_neq_0_prop},
-  srng_eqb 1%Srng 0%Srng = false.
-Proof.
-intros.
-unfold srng_eqb; cbn.
-destruct (srng_eq_dec 1%Srng 0%Srng) as [H| H]; [ | easy ].
-now apply srng_1_neq_0 in H.
-Qed.
-
 (* polynomial *)
 
-Class polynomial T := mk_polyn
-  { polyn_list : list T }.
-
-Arguments polyn_list {T} _.
-
-(*
-Class polynomial_prop T {so : semiring_op T} {dp : sring_dec_prop T} l :=
-  mk_polyn_prop
-  { polyn_prop : srng_eqb (last l 1%Srng) 0%Srng = false }.
-*)
+Record polynomial T := mk_polyn
+  { polyn_el : nat → T;
+    polyn_degree : nat }.
 
 Section in_ring.
 
@@ -3173,63 +3143,38 @@ Context {ro : ring_op T}.
 Context (so := rng_semiring).
 Context {sp : @semiring_prop T (@rng_semiring T ro)}.
 Context {rp : @ring_prop T ro}.
-Context {dp : @sring_dec_prop T}.
 Existing Instance so.
 
-Definition monom_x := mk_polyn [0; 1]%Srng.
+Definition polyn_of_list l :=
+  mk_polyn (λ i, nth i l 0%Srng) (length l).
+
+Definition monom_x := polyn_of_list [0; 1]%Srng.
 
 (* convertion matrix → matrix with monomials *)
 
-(*
-Theorem monom_mat_of_mat_prop : ∀ M i j,
-  mat_el M i j ≠ 0%Srng
-  → srng_eqb (last [mat_el M i j] 1%Srng) 0%Srng = false.
-Proof.
-intros * HM.
-unfold srng_eqb; cbn.
-now destruct (srng_eq_dec (mat_el M i j) 0%Srng).
-Qed.
-*)
-
 Definition monom_mat_of_mat M : matrix (polynomial T) :=
-  mk_mat
-    (λ i j,
-       match srng_eq_dec (mat_el M i j) 0%Srng with
-       | left _ => mk_polyn []
-       | right p => mk_polyn [mat_el M i j]
-       end)
+  mk_mat (λ i j, polyn_of_list [mat_el M i j])
     (mat_nrows M) (mat_ncols M).
 
-(* operations on polynomials *)
-
-Fixpoint polyn_list_add (la lb : list T) :=
-  match la with
-  | [] => lb
-  | a :: la' =>
-      match lb with
-      | [] => la
-      | b :: lb' => (a + b)%Srng :: polyn_list_add la' lb'
-      end
-  end.
-
-Fixpoint polyn_list_norm (la : list T) : list T :=
-  match la with
-  | [] => []
-  | [a] => if srng_eq_dec a 0%Srng then [] else [a]
-  | a :: la' => a :: polyn_list_norm la'
-  end.
+(* addition of polynomials *)
 
 Definition polyn_add P Q :=
-  mk_polyn (polyn_list_norm (polyn_list_add (polyn_list P) (polyn_list Q))).
+  mk_polyn (λ i, polyn_el P i + polyn_el Q i)%Srng
+    (max (polyn_degree P) (polyn_degree Q)).
+
+(* opposite of a polynomial *)
 
 Definition polyn_opp P :=
-  mk_polyn (λ
-...
+  mk_polyn (λ i, (- polyn_el P i)%Rng) (polyn_degree P).
 
-...
+(* subtraction of polynomials *)
 
 Definition polyn_sub P Q :=
   polyn_add P (polyn_opp Q).
+
+(* multiplication of polynomials *)
+
+...
 
 (* polynomial syntax *)
 
