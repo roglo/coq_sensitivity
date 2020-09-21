@@ -3262,12 +3262,12 @@ Definition polyn_ring_op : ring_op (polynomial T) :=
 
 Existing Instance polyn_ring_op.
 
-(* characteristic polynomial *)
+(* characteristic polynomial = det(xI-M) *)
 
 Definition charac_polyn (M : matrix T) :=
   determinant
-    (monom_mat_of_mat M -
-     mat_mul_scal_l (monom_x) (monom_mat_of_mat (mat_id (mat_nrows M))))%M.
+    (mat_mul_scal_l (monom_x) (monom_mat_of_mat (mat_id (mat_nrows M))) -
+     monom_mat_of_mat M)%M.
 
 (* eigenvalues and eigenvectors *)
 
