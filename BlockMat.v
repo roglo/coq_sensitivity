@@ -3222,6 +3222,10 @@ Fixpoint polyn_list_norm (la : list T) : list T :=
 Definition polyn_add P Q :=
   mk_polyn (polyn_list_norm (polyn_list_add (polyn_list P) (polyn_list Q))).
 
+Definition polyn_opp P :=
+  mk_polyn (λ
+...
+
 ...
 
 Definition polyn_sub P Q :=
