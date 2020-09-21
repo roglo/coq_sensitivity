@@ -3278,9 +3278,18 @@ Theorem exists_eigenvalues : ∀ (acp : algeb_closed_prop) (M : matrix T),
 Proof.
 intros acp M HM.
 destruct acp as (Hroots).
+destruct (zerop (polyn_degree (charac_polyn M))) as [Hpz| Hpz]. {
+  exists [].
+  cbn in Hpz.
+...
 specialize (Hroots (charac_polyn M)) as H1.
 assert (H : polyn_degree (charac_polyn M) > 0). {
+  destruct M as (f, r, c); cbn.
+  destruct r; cbn.
+...
   cbn.
+  unfold monom_mat_of_mat; cbn.
+  unfold mat_sub, mat_opp; cbn.
 ...
 
 End in_ring.
