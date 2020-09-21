@@ -3282,41 +3282,12 @@ destruct acp as (Hroots).
 specialize (Hroots (charac_polyn M)) as H1.
 assert (H : polyn_degree (charac_polyn M) > 0). {
   cbn.
-  replace (mat_nrows M) with (S (mat_nrows M - 1)) by flia Hrz.
-  cbn.
-...
-destruct (zerop r) as [Hrz| Hrz]. {
-  subst r.
-  exists [].
-  split; [ easy | ].
-  intros.
-  split; intros Hmr; [ easy | exfalso ].
-  unfold is_square_mat in HM; cbn in HM; subst c.
-  unfold mat_mul_vect_r in Hmr; cbn in Hmr.
-  destruct V as (v, d).
-  cbn in Hmr.
-  unfold vect_mul_scal_l in Hmr; cbn in Hmr.
-  injection Hmr; clear Hmr; intros H Hmr; subst d.
-(**)
-  set (g := λ i : nat, (0 + f i O * v O)%Srng) in Hmr.
-  set (h := (λ i : nat, (μ * v i)%Srng)) in Hmr.
-  assert (H : ∀ i, g i = h i) by now rewrite Hmr.
-  subst g h; cbn in H.
-  assert (H1 : ∀ i, (f i O * v O)%Srng = (μ * v i)%Srng). {
-    intros i.
-    specialize (H i).
-    now rewrite srng_add_0_l in H.
+  replace (mat_nrows M) with (S (mat_nrows M - 1)) at 2 by flia Hrz.
+  cbn - [ mat_id sub srng_add polyn_ring_op ].
+  destruct (Nat.eq_dec (mat_nrows M) 1) as [Hr1| Hr1]. {
+    rewrite Hr1, Nat.sub_diag; cbn; flia.
   }
-  clear H.
-...
-destruct (zerop (polyn_degree (charac_polyn M))) as [Hpz| Hpz]. {
-  exists [].
-  cbn in Hpz.
-...
-...
-  cbn.
-  unfold monom_mat_of_mat; cbn.
-  unfold mat_sub, mat_opp; cbn.
+  replace (mat_nrows M - 1) with (S (mat_nrows M - 2)) at 1 by flia Hrz Hr1.
 ...
 
 End in_ring.
