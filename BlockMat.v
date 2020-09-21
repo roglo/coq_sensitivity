@@ -3124,6 +3124,20 @@ Compute let ro := Z_ring_op in det (mat_of_list_list 0 [[1; 2]; [3; 4]]).
 Compute let ro := Z_ring_op in det (mat_of_list_list 0 [[-2; 2; -3]; [-1; 1; 3]; [2; 0; -1]]). (* 18: seems good *)
 *)
 
+(* polynomial *)
+
+...
+
+(* problem: how do I define a semiring with decidability of equality?
+   and, in general, the hierarchy of rings, fields and all their
+   miscellaneous properties? *)
+
+Definition rng_eqb {so : semiring_op T} {sp : semiring_prop T} (a b : T) :=
+  if rng_eq_dec a b then true else false.
+
+Record polynomial T {ro : ring_op T} {rp : ring_prop} := mk_poly
+  { polyn_list : list A;
+    polyn_prop : rng_eqb (last lap 1%Rng) 0%Rng = false }.
 ...
 
 (* characteristic polynomial *)
