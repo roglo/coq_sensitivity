@@ -3049,6 +3049,10 @@ Qed.
 Theorem Tr_A : ∀ n, Tr (A n) = 0%Srng.
 Proof.
 intros.
+(*
+revert n.
+apply nat_ind; [ | intros n IHn ]; [ easy | ].
+*)
 induction n; [ easy | cbn ].
 rewrite IHn.
 do 2 rewrite srng_add_0_l.
