@@ -3135,18 +3135,10 @@ End in_ring.
 Class sring_1_neq_0_prop T {so : semiring_op T} :=
   { srng_1_neq_0 : (1 ≠ 0)%Srng }.
 
-(*
-Context {sp10 : sring_1_neq_0_prop}.
-*)
-
 (* decidability in equality in semirings *)
 
 Class sring_dec_prop T :=
   { srng_eq_dec : ∀ a b : T, {a = b} + {a ≠ b} }.
-
-(*
-Context {dp : sring_dec_prop}.
-*)
 
 Definition srng_eqb T {dp : sring_dec_prop T} (a b : T) :=
   if srng_eq_dec a b then true else false.
@@ -3166,9 +3158,13 @@ Qed.
 Class polynomial T := mk_polyn
   { polyn_list : list T }.
 
+Arguments polyn_list {T} _.
+
+(*
 Class polynomial_prop T {so : semiring_op T} {dp : sring_dec_prop T} l :=
   mk_polyn_prop
   { polyn_prop : srng_eqb (last l 1%Srng) 0%Srng = false }.
+*)
 
 Section in_ring.
 
@@ -3184,6 +3180,7 @@ Definition monom_x := mk_polyn [0; 1]%Srng.
 
 (* convertion matrix → matrix with monomials *)
 
+(*
 Theorem monom_mat_of_mat_prop : ∀ M i j,
   mat_el M i j ≠ 0%Srng
   → srng_eqb (last [mat_el M i j] 1%Srng) 0%Srng = false.
@@ -3192,6 +3189,7 @@ intros * HM.
 unfold srng_eqb; cbn.
 now destruct (srng_eq_dec (mat_el M i j) 0%Srng).
 Qed.
+*)
 
 Definition monom_mat_of_mat M : matrix (polynomial T) :=
   mk_mat
@@ -3199,17 +3197,6 @@ Definition monom_mat_of_mat M : matrix (polynomial T) :=
        match srng_eq_dec (mat_el M i j) 0%Srng with
        | left _ => mk_polyn []
        | right p => mk_polyn [mat_el M i j]
-       end)
-    (mat_nrows M) (mat_ncols M).
-
-...
-
-Definition monom_mat_of_mat M : matrix (polynomial T) :=
-  mk_mat
-    (λ i j,
-       match srng_eq_dec (mat_el M i j) 0%Srng with
-       | left _ => mk_polyn [] srng_1_neqb_0
-       | right p => mk_polyn [mat_el M i j] (monom_mat_of_mat_prop M i j p)
        end)
     (mat_nrows M) (mat_ncols M).
 
@@ -3232,10 +3219,9 @@ Fixpoint polyn_list_norm (la : list T) : list T :=
   | a :: la' => a :: polyn_list_norm la'
   end.
 
-Check polyn_list.
-
 Definition polyn_add P Q :=
-  mk_polyn (polyn_list_norm (polyn_list_add (polyn_list P) (polyn_list Q))) 42.
+  mk_polyn (polyn_list_norm (polyn_list_add (polyn_list P) (polyn_list Q))).
+
 ...
 
 Definition polyn_sub P Q :=
@@ -3246,6 +3232,7 @@ Definition polyn_sub P Q :=
 Declare Scope polynomial_scope.
 Delimit Scope polynomial_scope with P.
 
+Notation "a + b" := (polyn_add a b) : polynomial_scope.
 Notation "a - b" := (polyn_sub a b) : polynomial_scope.
 Notation "a * b" := (polyn_mul a b) : polynomial_scope.
 
