@@ -3290,9 +3290,6 @@ assert (H : polyn_degree (charac_polyn M) > 0). {
   move Hr1 before Hrz.
   replace (mat_nrows M - 1) with (S (mat_nrows M - 2)) at 1 by flia Hrz Hr1.
 ...
-  destruct M as (f, r, c).
-  cbn in Hrz, Hr1.
-...
 
 End in_ring.
 
