@@ -125,10 +125,10 @@ Existing Instance so.
 
 (* addition *)
 
-Definition mat_add (add : T → T → T) (M1 M2 : matrix T) : matrix T :=
-  {| mat_el i j := add (mat_el M1 i j) (mat_el M2 i j);
-     mat_nrows := mat_nrows M1;
-     mat_ncols := mat_ncols M1 |}.
+Definition mat_add {so : semiring_op T} (MA MB : matrix T) :=
+  {| mat_el i j := (mat_el MA i j + mat_el MB i j)%Srng;
+     mat_nrows := mat_nrows MA;
+     mat_ncols := mat_ncols MA |}.
 
 (* addition of block matrices *)
 
@@ -221,6 +221,11 @@ Fixpoint bmat_mul {so : semiring_op T} (MM1 MM2 : bmatrix T) :=
 
 (* opposite *)
 
+Definition mat_opp M : matrix T :=
+  {| mat_el i j := (- mat_el M i j)%Rng;
+     mat_nrows := mat_nrows M;
+     mat_ncols := mat_ncols M |}.
+
 Fixpoint bmat_opp BM : bmatrix T :=
   match BM with
   | BM_1 x => BM_1 (- x)%Rng
@@ -249,8 +254,15 @@ induction BM as [x| M IHBM] using bmatrix_ind2. {
 }
 Qed.
 
+(* subtraction *)
+
+Definition mat_sub MA MB :=
+  mat_add MA (mat_opp MB).
+
 Definition bmat_sub BMA BMB :=
   bmat_add BMA (bmat_opp BMB).
+
+(* notations *)
 
 Declare Scope BM_scope.
 Delimit Scope BM_scope with BM.
@@ -3130,6 +3142,33 @@ Compute let ro := Z_ring_op in determinant (mat_of_list_list 0 [[-2; 2; -3]; [-1
 
 End in_ring.
 
+Module matrix_Notations.
+
+Declare Scope M_scope.
+Delimit Scope M_scope with M.
+
+Notation "a + b" := (mat_add a b) : M_scope.
+Notation "a - b" := (mat_sub a b) : M_scope.
+Notation "a * b" := (mat_mul a b) : M_scope.
+Notation "- a" := (mat_opp a) : M_scope.
+
+End matrix_Notations.
+
+Module bmatrix_Notations.
+
+Declare Scope BM_scope.
+Delimit Scope BM_scope with BM.
+
+Notation "a + b" := (bmat_add a b) : BM_scope.
+Notation "a - b" := (bmat_sub a b) : BM_scope.
+Notation "a * b" := (bmat_mul a b) : BM_scope.
+Notation "- a" := (bmat_opp a) : BM_scope.
+
+End bmatrix_Notations.
+
+Import matrix_Notations.
+Import bmatrix_Notations.
+
 (* polynomial *)
 
 Record polynomial T := mk_polyn
@@ -3174,24 +3213,32 @@ Definition polyn_sub P Q :=
 
 (* multiplication of polynomials *)
 
-...
+Definition polyn_mul P Q :=
+ mk_polyn
+   (λ i, Σ (j = 0, i), polyn_el P j * polyn_el Q (i - j))%Srng
+   (polyn_degree P + polyn_degree Q).
 
 (* polynomial syntax *)
 
 Declare Scope polynomial_scope.
 Delimit Scope polynomial_scope with P.
 
-Notation "a + b" := (polyn_add a b) : polynomial_scope.
-Notation "a - b" := (polyn_sub a b) : polynomial_scope.
-Notation "a * b" := (polyn_mul a b) : polynomial_scope.
+Notation "P + Q" := (polyn_add P Q) : polynomial_scope.
+Notation "P - Q" := (polyn_sub P Q) : polynomial_scope.
+Notation "P * Q" := (polyn_mul P Q) : polynomial_scope.
 
-...
+(* identity matrix *)
+
+Definition mat_id n :=
+  mk_mat (λ i j, if Nat.eq_dec i j then 1%Srng else 0%Srng) n n.
 
 (* characteristic polynomial *)
 
+...
+
 Definition charac_polyn (M : matrix T) :=
   determinant
-    (monom_mat_of_mat M - monom_x * monom_mat_of_mat (mat_I (mat_nrows M)))%P.
+    (monom_mat_of_mat M - monom_x * monom_mat_of_mat (mat_id (mat_nrows M)))%M.
 
 ...
 
