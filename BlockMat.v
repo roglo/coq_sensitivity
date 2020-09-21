@@ -3281,13 +3281,17 @@ intros acp M Hrz HM.
 destruct acp as (Hroots).
 specialize (Hroots (charac_polyn M)) as H1.
 assert (H : polyn_degree (charac_polyn M) > 0). {
-  cbn.
+  clear H1; cbn.
   replace (mat_nrows M) with (S (mat_nrows M - 1)) at 2 by flia Hrz.
-  cbn - [ mat_id sub srng_add polyn_ring_op ].
+  cbn - [ mat_id sub polyn_ring_op ].
   destruct (Nat.eq_dec (mat_nrows M) 1) as [Hr1| Hr1]. {
     rewrite Hr1, Nat.sub_diag; cbn; flia.
   }
+  move Hr1 before Hrz.
   replace (mat_nrows M - 1) with (S (mat_nrows M - 2)) at 1 by flia Hrz Hr1.
+...
+  destruct M as (f, r, c).
+  cbn in Hrz, Hr1.
 ...
 
 End in_ring.
