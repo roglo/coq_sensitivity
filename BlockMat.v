@@ -3095,6 +3095,11 @@ Definition mat_mul_vect_r M V :=
 Definition vect_mul_scal_l μ V :=
   mk_vect (λ i, μ * vect_el V i)%Srng (vect_nrows V).
 
+(* multiplication of a matrix by a scalar *)
+
+Definition mat_mul_scal_l μ M :=
+  mk_mat (λ i j, μ * mat_el M i j)%Srng (mat_nrows M) (mat_ncols M).
+
 (* matrix without row i and column j *)
 
 Definition submatrix (M : matrix T) i j :=
@@ -3232,13 +3237,26 @@ Notation "P * Q" := (polyn_mul P Q) : polynomial_scope.
 Definition mat_id n :=
   mk_mat (λ i j, if Nat.eq_dec i j then 1%Srng else 0%Srng) n n.
 
-(* characteristic polynomial *)
+(* semiring and ring of polynomials *)
 
-...
+Definition polyn_semiring_op : semiring_op (polynomial T) :=
+  {| srng_zero := polyn_of_list [];
+     srng_one := polyn_of_list [0%Srng; 1%Srng];
+     srng_add := polyn_add;
+     srng_mul := polyn_mul |}.
+
+Definition polyn_ring_op : ring_op (polynomial T) :=
+  {| rng_semiring := polyn_semiring_op;
+     rng_opp := polyn_opp |}.
+
+Existing Instance polyn_ring_op.
+
+(* characteristic polynomial *)
 
 Definition charac_polyn (M : matrix T) :=
   determinant
-    (monom_mat_of_mat M - monom_x * monom_mat_of_mat (mat_id (mat_nrows M)))%M.
+    (monom_mat_of_mat M -
+     mat_mul_scal_l (monom_x) (monom_mat_of_mat (mat_id (mat_nrows M))))%M.
 
 ...
 
