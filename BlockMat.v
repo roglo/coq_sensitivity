@@ -3202,9 +3202,7 @@ Fixpoint polyn_deg1_loop T {so : semiring_op T} {sdp : sring_dec_prop}
     (f : nat → T) n :=
   match n with
   | 0 => 0
-  | S n' =>
-      if srng_eq_dec (f n') 0%Srng then polyn_deg1_loop f n'
-      else n'
+  | S n' => if srng_eq_dec (f n') 0%Srng then polyn_deg1_loop f n' else n
   end.
 
 Definition polyn_degree1 T {so : semiring_op T} {sdp : sring_dec_prop} P :=
@@ -3384,44 +3382,18 @@ assert (H : polyn_degree (charac_polyn M) = mat_nrows M). {
   replace (mat_nrows M) with (S (mat_nrows M - 1)) at 2 by flia Hrz.
   cbn - [ mat_id sub polyn_ring_op ].
   destruct (Nat.eq_dec (mat_nrows M) 1) as [Hr1| Hr1]. {
-    rewrite Hr1; simpl.
-remember (monom_x * polyn_of_list [1%Srng])%P as p.
-cbn in Heqp.
-remember (polyn_opp (polyn_of_list [mat_el M 0 0])) as q.
-(* bin ça a l'air bon, non ? *)
-unfold polyn_degree.
-unfold polyn_degree1.
-cbn.
-rewrite Heqp at 2.
-cbn - [ max ].
-rewrite Heqq at 2.
-cbn - [ max ].
-unfold max.
-...
-unfold monom_x.
-cbn - [ max ].
-rewrite Heqp, Heqq.
-cbn - [ max ].
-Print polyn_deg1_loop.
-...
-Print polyn_coeff.
-...
     rewrite Hr1, Nat.sub_diag; cbn.
     do 2 rewrite srng_mul_0_l.
     rewrite srng_mul_1_l.
     do 3 rewrite srng_add_0_l.
     rewrite srng_add_0_r.
     unfold so.
-    destruct (srng_eq_dec 1%Rng 0%Rng) as [H| H]. {
-      now apply srng_1_neq_0 in H.
-    }
-...
+    destruct (srng_eq_dec 1%Rng 0%Rng) as [H| H]; [ | easy ].
+    now apply srng_1_neq_0 in H.
   }
-(**)
   destruct (Nat.eq_dec (mat_nrows M) 2) as [Hr2| Hr2]. {
     rewrite Hr2; simpl.
     rewrite polyn_add_0_l.
-...
 Time cbn.
 repeat rewrite srng_mul_0_l.
 repeat rewrite srng_mul_0_r.
@@ -3437,18 +3409,14 @@ repeat rewrite srng_add_0_l.
 repeat rewrite srng_add_0_r.
 repeat rewrite srng_mul_1_l.
 repeat rewrite srng_mul_1_r.
-destruct (srng_eq_dec 0%Srng 0%Srng) as [H| H]; [ clear H | easy ].
 destruct (srng_eq_dec 1%Srng 0%Srng) as [H| H]; [ now apply srng_1_neq_0 in H | clear H ].
-(* ah putain la vache, c'est faux ! *)
-...
-    unfold minus_one_pow; simpl.
-    unfold polyn_of_list; simpl.
-    unfold polyn_opp; simpl.
-    unfold polyn_coeff; simpl.
+cbn.
+(* ah putain la vache, c'est encore faux ! *)
 ...
   move Hr1 before Hrz.
   replace (mat_nrows M - 1) with (S (mat_nrows M - 2)) at 1 by flia Hrz Hr1.
   unfold polyn_degree.
+  unfold polyn_degree1.
   rewrite summation_polyn_deg_ub.
   rewrite <- Nat.sub_succ_l; [ | flia Hrz Hr1 ].
   rewrite Nat.sub_succ.
