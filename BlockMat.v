@@ -3394,6 +3394,8 @@ assert (H : polyn_degree (charac_polyn M) = mat_nrows M). {
   destruct (Nat.eq_dec (mat_nrows M) 2) as [Hr2| Hr2]. {
     rewrite Hr2; simpl.
     rewrite polyn_add_0_l.
+(* (x-M₀₀)(x-M₁₁)-(-M₀₁)(-M₁₀) : ouais, son degré, c'est bien 2, bordel *)
+...
 Time cbn.
 repeat rewrite srng_mul_0_l.
 repeat rewrite srng_mul_0_r.
