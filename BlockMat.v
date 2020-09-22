@@ -3298,6 +3298,7 @@ Notation "0" := (polyn_of_list []) : polynomial_scope.
 Notation "P + Q" := (polyn_add P Q) : polynomial_scope.
 Notation "P - Q" := (polyn_sub P Q) : polynomial_scope.
 Notation "P * Q" := (polyn_mul P Q) : polynomial_scope.
+Notation "- P" := (polyn_opp P) : polynomial_scope.
 
 (* identity matrix *)
 
@@ -3383,6 +3384,24 @@ assert (H : polyn_degree (charac_polyn M) = mat_nrows M). {
   replace (mat_nrows M) with (S (mat_nrows M - 1)) at 2 by flia Hrz.
   cbn - [ mat_id sub polyn_ring_op ].
   destruct (Nat.eq_dec (mat_nrows M) 1) as [Hr1| Hr1]. {
+    rewrite Hr1; simpl.
+remember (monom_x * polyn_of_list [1%Srng])%P as p.
+cbn in Heqp.
+remember (polyn_opp (polyn_of_list [mat_el M 0 0])) as q.
+(* bin ça a l'air bon, non ? *)
+...
+cbn.
+rewrite Heqq at 2.
+cbn.
+rewrite Heqp at 2.
+unfold monom_x.
+cbn - [ max ].
+rewrite Heqp, Heqq.
+cbn - [ max ].
+Print polyn_deg1_loop.
+...
+Print polyn_coeff.
+...
     rewrite Hr1, Nat.sub_diag; cbn.
     do 2 rewrite srng_mul_0_l.
     rewrite srng_mul_0_r.
