@@ -3174,22 +3174,44 @@ End bmatrix_Notations.
 Import matrix_Notations.
 Import bmatrix_Notations.
 
+(* decidability of equality in semirings
+   and the fact that 1 ≠ 0 *)
+
+Class sring_dec_prop T {so : semiring_op T} :=
+  { srng_eq_dec : ∀ a b : T, {a = b} + {a ≠ b};
+    srng_1_neq_0 : (1 ≠ 0)%Srng }.
+
 (* polynomial *)
 
 Record polynomial T := mk_polyn
   { polyn_el : nat → T;
     polyn_deg_ub : nat }.
 
+(* degree of a polynomial *)
+
+Fixpoint polyn_deg_loop T {so : semiring_op T} {sdp : sring_dec_prop}
+    (f : nat → T) n :=
+  match n with
+  | 0 => 0
+  | S n' =>
+      if srng_eq_dec (f n') 0%Srng then polyn_deg_loop f n'
+      else n'
+  end.
+
+Definition polyn_degree T {so : semiring_op T} {sdp : sring_dec_prop} P :=
+  polyn_deg_loop (polyn_el P) (polyn_deg_ub P).
+
 (* evaluation of a polynomial *)
 
-Definition eval_polyn T {so : semiring_op T} (P : polynomial T) x :=
-  (Σ (i = 0, polyn_deg_ub P - 1), polyn_el P i * x ^ i)%Srng.
+Definition eval_polyn T {so : semiring_op T} {sdp : sring_dec_prop}
+    (P : polynomial T) x :=
+  (Σ (i = 0, polyn_degree P - 1), polyn_el P i * x ^ i)%Srng.
 
 (* algebraically closed set *)
 
-Class algeb_closed_prop T {so : semiring_op T} :=
+Class algeb_closed_prop T {so : semiring_op T} {sdp : sring_dec_prop} :=
   { alcl_roots :
-      ∀ P : polynomial T, polyn_deg_ub P > 0 → ∃ x, eval_polyn P x = 0%Srng }.
+      ∀ P : polynomial T, polyn_degree P > 0 → ∃ x, eval_polyn P x = 0%Srng }.
 
 Section in_ring.
 
@@ -3198,10 +3220,15 @@ Context {ro : ring_op T}.
 Context (so := rng_semiring).
 Context {sp : @semiring_prop T (@rng_semiring T ro)}.
 Context {rp : @ring_prop T ro}.
+Context {sdp : @sring_dec_prop T so}.
 Existing Instance so.
+
+(* polynomial from a list *)
 
 Definition polyn_of_list l :=
   mk_polyn (λ i, nth i l 0%Srng) (length l).
+
+(* monomial *)
 
 Definition monom_x := polyn_of_list [0; 1]%Srng.
 
@@ -3262,7 +3289,7 @@ Definition polyn_ring_op : ring_op (polynomial T) :=
 
 Existing Instance polyn_ring_op.
 
-(* degree of sum of polynomials (note: not normalized sum) *)
+(* degree upper bound (polyn_deg_ub) of sum of polynomials *)
 
 Theorem polyn_deg_ub_add : ∀ P Q,
   polyn_deg_ub (P + Q)%P = max (polyn_deg_ub P) (polyn_deg_ub Q).
@@ -3301,15 +3328,26 @@ Proof.
 intros acp M Hrz HM.
 destruct acp as (Hroots).
 specialize (Hroots (charac_polyn M)) as H1.
-assert (H : polyn_deg_ub (charac_polyn M) > 0). {
+assert (H : polyn_degree (charac_polyn M) > 0). {
   cbn.
   replace (mat_nrows M) with (S (mat_nrows M - 1)) at 2 by flia Hrz.
   cbn - [ mat_id sub polyn_ring_op ].
   destruct (Nat.eq_dec (mat_nrows M) 1) as [Hr1| Hr1]. {
-    rewrite Hr1, Nat.sub_diag; cbn; flia.
+    rewrite Hr1, Nat.sub_diag; cbn.
+    do 2 rewrite srng_mul_0_l.
+    rewrite srng_mul_0_r.
+    rewrite srng_mul_1_l.
+    unfold so.
+    rewrite rng_opp_0.
+    do 6 rewrite srng_add_0_l.
+    rewrite srng_add_0_r.
+    destruct (srng_eq_dec 0%Rng 0%Rng) as [H| H]; [ clear H | easy ].
+    destruct (srng_eq_dec 1%Rng 0%Rng) as [H| H]; [ | flia ].
+    now apply srng_1_neq_0 in H.
   }
   move Hr1 before Hrz.
   replace (mat_nrows M - 1) with (S (mat_nrows M - 2)) at 1 by flia Hrz Hr1.
+  unfold polyn_degree.
   rewrite summation_polyn_deg_ub.
   rewrite <- Nat.sub_succ_l; [ | flia Hrz Hr1 ].
   rewrite Nat.sub_succ.
