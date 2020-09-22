@@ -3187,41 +3187,37 @@ Record polynomial T := mk_polyn
   { polyn_el : nat → T;
     polyn_deg_ub : nat }.
 
+Arguments polyn_deg_ub {T}%type_scope.
+
 (* coefficient in a polynomial *)
 
 Definition polyn_coeff T {so : semiring_op T} P i :=
-  if le_dec i (polyn_deg_ub P) then polyn_el P i else 0%Srng.
-
-(* ne vaudrait-il pas mieux que polyn_deg_ub corresponde à degré+1 ?
-     polyn   math   degré  length polyn  polyn_deg_ub
-      []             -1        0             ?
-      [0]     0      -1        1             ?           → non normalisé !
-      [3]     3       0        1             ?
-      [2;3]   3x+2    1        2             ?
-      [1;0;1] x²+1    2        3             ?
- *)
-
-...
+  if lt_dec i (polyn_deg_ub P) then polyn_el P i else 0%Srng.
 
 (* degree of a polynomial *)
+(* degree is ≥ -1 *)
+(* degree1 is actually a natural equal to degree+1 *)
 
-Fixpoint polyn_deg_loop T {so : semiring_op T} {sdp : sring_dec_prop}
+Fixpoint polyn_deg1_loop T {so : semiring_op T} {sdp : sring_dec_prop}
     (f : nat → T) n :=
   match n with
   | 0 => 0
   | S n' =>
-      if srng_eq_dec (f n') 0%Srng then polyn_deg_loop f n'
+      if srng_eq_dec (f n') 0%Srng then polyn_deg1_loop f n'
       else n'
   end.
 
+Definition polyn_degree1 T {so : semiring_op T} {sdp : sring_dec_prop} P :=
+  polyn_deg1_loop (polyn_coeff P) (polyn_deg_ub P).
+
 Definition polyn_degree T {so : semiring_op T} {sdp : sring_dec_prop} P :=
-  polyn_deg_loop (polyn_coeff P) (polyn_deg_ub P).
+  polyn_degree1 P - 1.
 
 (* evaluation of a polynomial *)
 
 Definition eval_polyn T {so : semiring_op T} {sdp : sring_dec_prop}
     (P : polynomial T) x :=
-  (Σ (i = 0, polyn_degree P - 1), polyn_coeff P i * x ^ i)%Srng.
+  (Σ (i = 0, polyn_degree1 P - 1), polyn_coeff P i * x ^ i)%Srng.
 
 (* algebraically closed set *)
 
@@ -3243,10 +3239,13 @@ Existing Instance so.
 
 Definition is_norm_polyn P := polyn_el P (polyn_deg_ub P - 1) ≠ 0%Srng.
 
-(* polynomial from a list *)
+(* polynomial from and to a list *)
 
 Definition polyn_of_list l :=
   mk_polyn (λ i, nth i l 0%Srng) (length l).
+
+Definition list_of_polyn (P : polynomial T) :=
+  map (polyn_el P) (seq 0 (polyn_deg_ub P)).
 
 (* monomial *)
 
@@ -3281,16 +3280,14 @@ Definition polyn_mul P Q :=
     (λ i, Σ (j = 0, i), polyn_coeff P j * polyn_coeff Q (i - j))%Srng
     (polyn_deg_ub P + polyn_deg_ub Q).
 
-(**)
+(*
 End in_ring.
 
 Require Import ZArith.
 Open Scope Z_scope.
 
-Compute let ro := Z_ring_op in polyn_mul (polyn_of_list [1; 1]) (polyn_of_list [-1; 1]).
-(**)
-
-...
+Compute let ro := Z_ring_op in list_of_polyn (polyn_mul (polyn_of_list [1; 1]) (polyn_of_list [-1; 1])).
+*)
 
 (* polynomial syntax *)
 
@@ -3348,11 +3345,9 @@ Theorem polyn_deg_ub_add : ∀ P Q,
   polyn_deg_ub (P + Q)%P = max (polyn_deg_ub P) (polyn_deg_ub Q).
 Proof. easy. Qed.
 
-...
-
 Theorem summation_polyn_deg_ub : ∀ f b e,
    polyn_deg_ub (Σ (i = b, e), f i)%Rng =
-   fold_left max (map (@polyn_deg_ub _) (map f (seq b (S e - b)))) 0.
+   fold_left max (map polyn_deg_ub (map f (seq b (S e - b)))) 0.
 Proof.
 intros.
 cbn - [ "-" ].
@@ -3392,15 +3387,14 @@ assert (H : polyn_degree (charac_polyn M) = mat_nrows M). {
     do 2 rewrite srng_mul_0_l.
     rewrite srng_mul_0_r.
     rewrite srng_mul_1_l.
-    unfold so.
-(*
-    rewrite rng_opp_0.
-*)
     do 6 rewrite srng_add_0_l.
     rewrite srng_add_0_r.
+    unfold so.
     destruct (srng_eq_dec 0%Rng 0%Rng) as [H| H]; [ clear H | easy ].
-    destruct (srng_eq_dec 1%Rng 0%Rng) as [H| H]; [ | easy ].
-    now apply srng_1_neq_0 in H.
+    destruct (srng_eq_dec 1%Rng 0%Rng) as [H| H]. {
+      now apply srng_1_neq_0 in H.
+    }
+...
   }
 (**)
   destruct (Nat.eq_dec (mat_nrows M) 2) as [Hr2| Hr2]. {
