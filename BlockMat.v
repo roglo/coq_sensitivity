@@ -3278,7 +3278,7 @@ Definition polyn_sub P Q :=
 Definition polyn_mul P Q :=
   mk_polyn
     (λ i, Σ (j = 0, i), polyn_coeff P j * polyn_coeff Q (i - j))%Srng
-    (polyn_deg_ub P + polyn_deg_ub Q).
+    (polyn_deg_ub P + polyn_deg_ub Q - 1).
 
 (*
 End in_ring.
@@ -3389,11 +3389,15 @@ remember (monom_x * polyn_of_list [1%Srng])%P as p.
 cbn in Heqp.
 remember (polyn_opp (polyn_of_list [mat_el M 0 0])) as q.
 (* bin ça a l'air bon, non ? *)
-...
-cbn.
-rewrite Heqq at 2.
+unfold polyn_degree.
+unfold polyn_degree1.
 cbn.
 rewrite Heqp at 2.
+cbn - [ max ].
+rewrite Heqq at 2.
+cbn - [ max ].
+unfold max.
+...
 unfold monom_x.
 cbn - [ max ].
 rewrite Heqp, Heqq.
@@ -3404,12 +3408,10 @@ Print polyn_coeff.
 ...
     rewrite Hr1, Nat.sub_diag; cbn.
     do 2 rewrite srng_mul_0_l.
-    rewrite srng_mul_0_r.
     rewrite srng_mul_1_l.
-    do 6 rewrite srng_add_0_l.
+    do 3 rewrite srng_add_0_l.
     rewrite srng_add_0_r.
     unfold so.
-    destruct (srng_eq_dec 0%Rng 0%Rng) as [H| H]; [ clear H | easy ].
     destruct (srng_eq_dec 1%Rng 0%Rng) as [H| H]. {
       now apply srng_1_neq_0 in H.
     }
