@@ -3187,6 +3187,11 @@ Record polynomial T := mk_polyn
   { polyn_el : nat → T;
     polyn_deg_ub : nat }.
 
+(* coefficient in a polynomial *)
+
+Definition polyn_coeff T {so : semiring_op T} P i :=
+  if lt_dec i (polyn_deg_ub P) then polyn_el P i else 0%Srng.
+
 (* degree of a polynomial *)
 
 Fixpoint polyn_deg_loop T {so : semiring_op T} {sdp : sring_dec_prop}
@@ -3199,13 +3204,13 @@ Fixpoint polyn_deg_loop T {so : semiring_op T} {sdp : sring_dec_prop}
   end.
 
 Definition polyn_degree T {so : semiring_op T} {sdp : sring_dec_prop} P :=
-  polyn_deg_loop (polyn_el P) (polyn_deg_ub P).
+  polyn_deg_loop (polyn_coeff P) (polyn_deg_ub P).
 
 (* evaluation of a polynomial *)
 
 Definition eval_polyn T {so : semiring_op T} {sdp : sring_dec_prop}
     (P : polynomial T) x :=
-  (Σ (i = 0, polyn_degree P - 1), polyn_el P i * x ^ i)%Srng.
+  (Σ (i = 0, polyn_degree P - 1), polyn_coeff P i * x ^ i)%Srng.
 
 (* algebraically closed set *)
 
@@ -3241,13 +3246,13 @@ Definition monom_mat_of_mat M : matrix (polynomial T) :=
 (* addition of polynomials *)
 
 Definition polyn_add P Q :=
-  mk_polyn (λ i, polyn_el P i + polyn_el Q i)%Srng
+  mk_polyn (λ i, polyn_coeff P i + polyn_coeff Q i)%Srng
     (max (polyn_deg_ub P) (polyn_deg_ub Q)).
 
 (* opposite of a polynomial *)
 
 Definition polyn_opp P :=
-  mk_polyn (λ i, (- polyn_el P i)%Rng) (polyn_deg_ub P).
+  mk_polyn (λ i, (- polyn_coeff P i)%Rng) (polyn_deg_ub P).
 
 (* subtraction of polynomials *)
 
@@ -3258,7 +3263,7 @@ Definition polyn_sub P Q :=
 
 Definition polyn_mul P Q :=
  mk_polyn
-   (λ i, Σ (j = 0, i), polyn_el P j * polyn_el Q (i - j))%Srng
+   (λ i, Σ (j = 0, i), polyn_coeff P j * polyn_coeff Q (i - j))%Srng
    (polyn_deg_ub P + polyn_deg_ub Q).
 
 (* polynomial syntax *)
@@ -3328,7 +3333,7 @@ Proof.
 intros acp M Hrz HM.
 destruct acp as (Hroots).
 specialize (Hroots (charac_polyn M)) as H1.
-assert (H : polyn_degree (charac_polyn M) > 0). {
+assert (H : polyn_degree (charac_polyn M) = mat_nrows M). {
   cbn.
   replace (mat_nrows M) with (S (mat_nrows M - 1)) at 2 by flia Hrz.
   cbn - [ mat_id sub polyn_ring_op ].
@@ -3338,13 +3343,42 @@ assert (H : polyn_degree (charac_polyn M) > 0). {
     rewrite srng_mul_0_r.
     rewrite srng_mul_1_l.
     unfold so.
+(*
     rewrite rng_opp_0.
+*)
     do 6 rewrite srng_add_0_l.
     rewrite srng_add_0_r.
     destruct (srng_eq_dec 0%Rng 0%Rng) as [H| H]; [ clear H | easy ].
-    destruct (srng_eq_dec 1%Rng 0%Rng) as [H| H]; [ | flia ].
+    destruct (srng_eq_dec 1%Rng 0%Rng) as [H| H]; [ | easy ].
     now apply srng_1_neq_0 in H.
   }
+(**)
+  destruct (Nat.eq_dec (mat_nrows M) 2) as [Hr2| Hr2]. {
+    rewrite Hr2; simpl.
+cbn.
+repeat rewrite srng_mul_0_l.
+repeat rewrite srng_mul_0_r.
+repeat rewrite srng_add_0_l.
+repeat rewrite srng_add_0_r.
+repeat rewrite srng_mul_0_l.
+repeat rewrite srng_mul_0_r.
+repeat rewrite srng_add_0_l.
+repeat rewrite srng_add_0_r.
+repeat rewrite srng_mul_0_l.
+repeat rewrite srng_mul_0_r.
+repeat rewrite srng_add_0_l.
+repeat rewrite srng_add_0_r.
+repeat rewrite srng_mul_1_l.
+repeat rewrite srng_mul_1_r.
+destruct (srng_eq_dec 0%Srng 0%Srng) as [H| H]; [ clear H | easy ].
+destruct (srng_eq_dec 1%Srng 0%Srng) as [H| H]; [ now apply srng_1_neq_0 in H | clear H ].
+(* ah putain la vache, c'est faux ! *)
+...
+    unfold minus_one_pow; simpl.
+    unfold polyn_of_list; simpl.
+    unfold polyn_opp; simpl.
+    unfold polyn_coeff; simpl.
+...
   move Hr1 before Hrz.
   replace (mat_nrows M - 1) with (S (mat_nrows M - 2)) at 1 by flia Hrz Hr1.
   unfold polyn_degree.
