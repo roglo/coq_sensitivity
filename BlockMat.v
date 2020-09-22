@@ -3190,7 +3190,18 @@ Record polynomial T := mk_polyn
 (* coefficient in a polynomial *)
 
 Definition polyn_coeff T {so : semiring_op T} P i :=
-  if lt_dec i (polyn_deg_ub P) then polyn_el P i else 0%Srng.
+  if le_dec i (polyn_deg_ub P) then polyn_el P i else 0%Srng.
+
+(* ne vaudrait-il pas mieux que polyn_deg_ub corresponde à degré+1 ?
+     polyn   math   degré  length polyn  polyn_deg_ub
+      []             -1        0             ?
+      [0]     0      -1        1             ?           → non normalisé !
+      [3]     3       0        1             ?
+      [2;3]   3x+2    1        2             ?
+      [1;0;1] x²+1    2        3             ?
+ *)
+
+...
 
 (* degree of a polynomial *)
 
@@ -3228,6 +3239,10 @@ Context {rp : @ring_prop T ro}.
 Context {sdp : @sring_dec_prop T so}.
 Existing Instance so.
 
+(* normalized polynomial *)
+
+Definition is_norm_polyn P := polyn_el P (polyn_deg_ub P - 1) ≠ 0%Srng.
+
 (* polynomial from a list *)
 
 Definition polyn_of_list l :=
@@ -3262,9 +3277,20 @@ Definition polyn_sub P Q :=
 (* multiplication of polynomials *)
 
 Definition polyn_mul P Q :=
- mk_polyn
-   (λ i, Σ (j = 0, i), polyn_coeff P j * polyn_coeff Q (i - j))%Srng
-   (polyn_deg_ub P + polyn_deg_ub Q).
+  mk_polyn
+    (λ i, Σ (j = 0, i), polyn_coeff P j * polyn_coeff Q (i - j))%Srng
+    (polyn_deg_ub P + polyn_deg_ub Q).
+
+(**)
+End in_ring.
+
+Require Import ZArith.
+Open Scope Z_scope.
+
+Compute let ro := Z_ring_op in polyn_mul (polyn_of_list [1; 1]) (polyn_of_list [-1; 1]).
+(**)
+
+...
 
 (* polynomial syntax *)
 
@@ -3299,7 +3325,7 @@ Existing Instance polyn_ring_op.
 (* function extensionality required for polynomials *)
 Axiom polyn_eq : ∀ (P Q : polynomial T),
   polyn_deg_ub P = polyn_deg_ub Q
-  → (∀ i, polyn_el P i = polyn_el Q i)
+  → (∀ i, i < polyn_deg_ub P → polyn_el P i = polyn_el Q i)
   → P = Q.
 
 (* add 0 to polynomial *)
@@ -3310,11 +3336,11 @@ intros.
 unfold polyn_add; cbn.
 destruct P as (f, d); cbn.
 apply polyn_eq; cbn; [ easy | ].
-intros i.
+intros i Hi.
 unfold polyn_coeff; cbn.
 rewrite srng_add_0_l.
-destruct (lt_dec i d) as [Hid| Hid]; [ easy | ].
-...
+now destruct (lt_dec i d).
+Qed.
 
 (* degree upper bound (polyn_deg_ub) of sum of polynomials *)
 
@@ -3377,8 +3403,7 @@ assert (H : polyn_degree (charac_polyn M) = mat_nrows M). {
 (**)
   destruct (Nat.eq_dec (mat_nrows M) 2) as [Hr2| Hr2]. {
     rewrite Hr2; simpl.
-...
-    unfold polyn_of_list at 1; simpl.
+    rewrite polyn_add_0_l.
 ...
 Time cbn.
 repeat rewrite srng_mul_0_l.
