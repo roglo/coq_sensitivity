@@ -3307,7 +3307,7 @@ Definition mat_id n :=
 
 Definition polyn_semiring_op : semiring_op (polynomial T) :=
   {| srng_zero := polyn_of_list [];
-     srng_one := polyn_of_list [0%Srng; 1%Srng];
+     srng_one := polyn_of_list [1%Srng];
      srng_add := polyn_add;
      srng_mul := polyn_mul |}.
 
@@ -3395,7 +3395,6 @@ assert (H : polyn_degree (charac_polyn M) = mat_nrows M). {
     rewrite Hr2; simpl.
     rewrite polyn_add_0_l.
 (* (x-M₀₀)(x-M₁₁)-(-M₀₁)(-M₁₀) : ouais, son degré, c'est bien 2, bordel *)
-...
 Time cbn.
 repeat rewrite srng_mul_0_l.
 repeat rewrite srng_mul_0_r.
@@ -3412,8 +3411,9 @@ repeat rewrite srng_add_0_r.
 repeat rewrite srng_mul_1_l.
 repeat rewrite srng_mul_1_r.
 destruct (srng_eq_dec 1%Srng 0%Srng) as [H| H]; [ now apply srng_1_neq_0 in H | clear H ].
-cbn.
-(* ah putain la vache, c'est encore faux ! *)
+easy.
+}
+(* ok, c'est bon *)
 ...
   move Hr1 before Hrz.
   replace (mat_nrows M - 1) with (S (mat_nrows M - 2)) at 1 by flia Hrz Hr1.
