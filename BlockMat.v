@@ -86,7 +86,7 @@ intros k l Hk Hl.
 now apply IHB.
 Qed.
 
-Fixpoint concat_list_in_list T (ll1 ll2 : list (list T)) :=
+Fixpoint concat_list_in_list {T} (ll1 ll2 : list (list T)) :=
   match ll1 with
   | [] => ll2
   | l1 :: ll1' =>
@@ -96,8 +96,8 @@ Fixpoint concat_list_in_list T (ll1 ll2 : list (list T)) :=
        end
   end.
 
-Definition concat_list_list_list T (lll : list (list (list T))) :=
-  fold_left (@concat_list_in_list T) lll [].
+Definition concat_list_list_list {T} (lll : list (list (list T))) :=
+  fold_left concat_list_in_list lll [].
 
 Fixpoint list_list_of_bmat T (MM : bmatrix T) : list (list T) :=
   match MM with
@@ -3347,6 +3347,8 @@ Qed.
 Theorem polyn_deg_ub_add : ∀ P Q,
   polyn_deg_ub (P + Q)%P = max (polyn_deg_ub P) (polyn_deg_ub Q).
 Proof. easy. Qed.
+
+...
 
 Theorem summation_polyn_deg_ub : ∀ f b e,
    polyn_deg_ub (Σ (i = b, e), f i)%Rng =
