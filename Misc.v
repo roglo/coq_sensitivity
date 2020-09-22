@@ -1120,9 +1120,6 @@ induction l as [| a l]; [ easy | cbn ].
 now rewrite List.map_map, IHl.
 Qed.
 
-About length.
-About length.
-
 Theorem List_flat_map_length {A B} : ∀ (l : list A) (f : _ → list B),
   length (flat_map f l) =
     List.fold_right Nat.add 0 (map length (map f l)).
