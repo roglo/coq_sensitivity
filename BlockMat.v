@@ -3271,6 +3271,7 @@ Definition polyn_mul P Q :=
 Declare Scope polynomial_scope.
 Delimit Scope polynomial_scope with P.
 
+Notation "0" := (polyn_of_list []) : polynomial_scope.
 Notation "P + Q" := (polyn_add P Q) : polynomial_scope.
 Notation "P - Q" := (polyn_sub P Q) : polynomial_scope.
 Notation "P * Q" := (polyn_mul P Q) : polynomial_scope.
@@ -3292,7 +3293,28 @@ Definition polyn_ring_op : ring_op (polynomial T) :=
   {| rng_semiring := polyn_semiring_op;
      rng_opp := polyn_opp |}.
 
+Existing Instance polyn_semiring_op.
 Existing Instance polyn_ring_op.
+
+(* function extensionality required for polynomials *)
+Axiom polyn_eq : ∀ (P Q : polynomial T),
+  polyn_deg_ub P = polyn_deg_ub Q
+  → (∀ i, polyn_el P i = polyn_el Q i)
+  → P = Q.
+
+(* add 0 to polynomial *)
+
+Theorem polyn_add_0_l : ∀ P, (0 + P)%P = P.
+Proof.
+intros.
+unfold polyn_add; cbn.
+destruct P as (f, d); cbn.
+apply polyn_eq; cbn; [ easy | ].
+intros i.
+unfold polyn_coeff; cbn.
+rewrite srng_add_0_l.
+destruct (lt_dec i d) as [Hid| Hid]; [ easy | ].
+...
 
 (* degree upper bound (polyn_deg_ub) of sum of polynomials *)
 
@@ -3355,7 +3377,10 @@ assert (H : polyn_degree (charac_polyn M) = mat_nrows M). {
 (**)
   destruct (Nat.eq_dec (mat_nrows M) 2) as [Hr2| Hr2]. {
     rewrite Hr2; simpl.
-cbn.
+...
+    unfold polyn_of_list at 1; simpl.
+...
+Time cbn.
 repeat rewrite srng_mul_0_l.
 repeat rewrite srng_mul_0_r.
 repeat rewrite srng_add_0_l.
