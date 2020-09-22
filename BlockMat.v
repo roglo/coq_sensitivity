@@ -3178,18 +3178,18 @@ Import bmatrix_Notations.
 
 Record polynomial T := mk_polyn
   { polyn_el : nat → T;
-    polyn_degree : nat }.
+    polyn_deg_ub : nat }.
 
 (* evaluation of a polynomial *)
 
 Definition eval_polyn T {so : semiring_op T} (P : polynomial T) x :=
-  (Σ (i = 0, polyn_degree P - 1), polyn_el P i * x ^ i)%Srng.
+  (Σ (i = 0, polyn_deg_ub P - 1), polyn_el P i * x ^ i)%Srng.
 
 (* algebraically closed set *)
 
 Class algeb_closed_prop T {so : semiring_op T} :=
   { alcl_roots :
-      ∀ P : polynomial T, polyn_degree P > 0 → ∃ x, eval_polyn P x = 0%Srng }.
+      ∀ P : polynomial T, polyn_deg_ub P > 0 → ∃ x, eval_polyn P x = 0%Srng }.
 
 Section in_ring.
 
@@ -3215,12 +3215,12 @@ Definition monom_mat_of_mat M : matrix (polynomial T) :=
 
 Definition polyn_add P Q :=
   mk_polyn (λ i, polyn_el P i + polyn_el Q i)%Srng
-    (max (polyn_degree P) (polyn_degree Q)).
+    (max (polyn_deg_ub P) (polyn_deg_ub Q)).
 
 (* opposite of a polynomial *)
 
 Definition polyn_opp P :=
-  mk_polyn (λ i, (- polyn_el P i)%Rng) (polyn_degree P).
+  mk_polyn (λ i, (- polyn_el P i)%Rng) (polyn_deg_ub P).
 
 (* subtraction of polynomials *)
 
@@ -3232,7 +3232,7 @@ Definition polyn_sub P Q :=
 Definition polyn_mul P Q :=
  mk_polyn
    (λ i, Σ (j = 0, i), polyn_el P j * polyn_el Q (i - j))%Srng
-   (polyn_degree P + polyn_degree Q).
+   (polyn_deg_ub P + polyn_deg_ub Q).
 
 (* polynomial syntax *)
 
@@ -3264,13 +3264,13 @@ Existing Instance polyn_ring_op.
 
 (* degree of sum of polynomials (note: not normalized sum) *)
 
-Theorem polyn_degree_add : ∀ P Q,
-  polyn_degree (P + Q)%P = max (polyn_degree P) (polyn_degree Q).
+Theorem polyn_deg_ub_add : ∀ P Q,
+  polyn_deg_ub (P + Q)%P = max (polyn_deg_ub P) (polyn_deg_ub Q).
 Proof. easy. Qed.
 
-Theorem summation_polyn_degree : ∀ f b e,
-   polyn_degree (Σ (i = b, e), f i)%Rng =
-   fold_left max (map (@polyn_degree _) (map f (seq b (S e - b)))) 0.
+Theorem summation_polyn_deg_ub : ∀ f b e,
+   polyn_deg_ub (Σ (i = b, e), f i)%Rng =
+   fold_left max (map (@polyn_deg_ub _) (map f (seq b (S e - b)))) 0.
 Proof.
 intros.
 cbn - [ "-" ].
@@ -3301,7 +3301,7 @@ Proof.
 intros acp M Hrz HM.
 destruct acp as (Hroots).
 specialize (Hroots (charac_polyn M)) as H1.
-assert (H : polyn_degree (charac_polyn M) > 0). {
+assert (H : polyn_deg_ub (charac_polyn M) > 0). {
   cbn.
   replace (mat_nrows M) with (S (mat_nrows M - 1)) at 2 by flia Hrz.
   cbn - [ mat_id sub polyn_ring_op ].
@@ -3310,7 +3310,7 @@ assert (H : polyn_degree (charac_polyn M) > 0). {
   }
   move Hr1 before Hrz.
   replace (mat_nrows M - 1) with (S (mat_nrows M - 2)) at 1 by flia Hrz Hr1.
-  rewrite summation_polyn_degree.
+  rewrite summation_polyn_deg_ub.
   rewrite <- Nat.sub_succ_l; [ | flia Hrz Hr1 ].
   rewrite Nat.sub_succ.
   do 2 rewrite Nat.sub_0_r.
