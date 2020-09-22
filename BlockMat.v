@@ -3293,6 +3293,7 @@ Declare Scope polynomial_scope.
 Delimit Scope polynomial_scope with P.
 
 Notation "0" := (polyn_of_list []) : polynomial_scope.
+Notation "1" := (polyn_of_list [1%Srng]) : polynomial_scope.
 Notation "P + Q" := (polyn_add P Q) : polynomial_scope.
 Notation "P - Q" := (polyn_sub P Q) : polynomial_scope.
 Notation "P * Q" := (polyn_mul P Q) : polynomial_scope.
@@ -3391,31 +3392,53 @@ assert (H : polyn_degree (charac_polyn M) = mat_nrows M). {
     destruct (srng_eq_dec 1%Rng 0%Rng) as [H| H]; [ | easy ].
     now apply srng_1_neq_0 in H.
   }
+  move Hr1 before Hrz.
   destruct (Nat.eq_dec (mat_nrows M) 2) as [Hr2| Hr2]. {
     rewrite Hr2; simpl.
     rewrite polyn_add_0_l.
-(* (x-M₀₀)(x-M₁₁)-(-M₀₁)(-M₁₀) : ouais, son degré, c'est bien 2, bordel *)
-Time cbn.
-repeat rewrite srng_mul_0_l.
-repeat rewrite srng_mul_0_r.
-repeat rewrite srng_add_0_l.
-repeat rewrite srng_add_0_r.
-repeat rewrite srng_mul_0_l.
-repeat rewrite srng_mul_0_r.
-repeat rewrite srng_add_0_l.
-repeat rewrite srng_add_0_r.
-repeat rewrite srng_mul_0_l.
-repeat rewrite srng_mul_0_r.
-repeat rewrite srng_add_0_l.
-repeat rewrite srng_add_0_r.
-repeat rewrite srng_mul_1_l.
-repeat rewrite srng_mul_1_r.
-destruct (srng_eq_dec 1%Srng 0%Srng) as [H| H]; [ now apply srng_1_neq_0 in H | clear H ].
-easy.
-}
-(* ok, c'est bon *)
+    (* (x-M₀₀)(x-M₁₁)-(-M₀₁)(-M₁₀) *)
+    Time cbn.
+    repeat rewrite srng_mul_0_l.
+    repeat rewrite srng_mul_0_r.
+    repeat rewrite srng_add_0_l.
+    repeat rewrite srng_add_0_r.
+    repeat rewrite srng_mul_0_l.
+    repeat rewrite srng_mul_0_r.
+    repeat rewrite srng_add_0_l.
+    repeat rewrite srng_add_0_r.
+    repeat rewrite srng_mul_0_l.
+    repeat rewrite srng_mul_0_r.
+    repeat rewrite srng_add_0_l.
+    repeat rewrite srng_add_0_r.
+    repeat rewrite srng_mul_1_l.
+    repeat rewrite srng_mul_1_r.
+    destruct (srng_eq_dec 1%Srng 0%Srng) as [H| H]; [ | easy ].
+    now apply srng_1_neq_0 in H.
+  }
+  move Hr2 before Hr1.
+  destruct (Nat.eq_dec (mat_nrows M) 3) as [Hr3| Hr3]. {
+    rewrite Hr3; simpl.
+    rewrite polyn_add_0_l.
+    Time cbn.
+    repeat rewrite srng_mul_0_l.
+    repeat rewrite srng_mul_0_r.
+    repeat rewrite srng_add_0_l.
+    repeat rewrite srng_add_0_r.
+    repeat rewrite srng_mul_0_l.
+    repeat rewrite srng_mul_0_r.
+    repeat rewrite srng_add_0_l.
+    repeat rewrite srng_add_0_r.
+    repeat rewrite srng_mul_0_l.
+    repeat rewrite srng_mul_0_r.
+    repeat rewrite srng_add_0_l.
+    repeat rewrite srng_add_0_r.
+    repeat rewrite srng_mul_1_l.
+    repeat rewrite srng_mul_1_r.
+    destruct (srng_eq_dec 1%Srng 0%Srng) as [H| H]; [ | easy ].
+    now apply srng_1_neq_0 in H.
+  }
+  move Hr3 before Hr2.
 ...
-  move Hr1 before Hrz.
   replace (mat_nrows M - 1) with (S (mat_nrows M - 2)) at 1 by flia Hrz Hr1.
   unfold polyn_degree.
   unfold polyn_degree1.
