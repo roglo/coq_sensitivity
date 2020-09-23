@@ -3451,18 +3451,69 @@ apply polyn_eq; cbn. {
   remember (polyn_deg_ub P) as pd eqn:Hpd.
   remember (polyn_deg_ub Q) as qd eqn:Hqd.
   remember (polyn_deg_ub R) as rd eqn:Hrd.
+  move qd before pd; move rd before qd.
   rewrite <- Nat.add_max_distr_l.
   now rewrite Nat.sub_max_distr_r.
 } {
   unfold polyn_coeff.
   unfold polyn_add, polyn_mul.
+  unfold polyn_coeff.
   remember (polyn_deg_ub P) as pd eqn:Hpd.
   remember (polyn_deg_ub Q) as qd eqn:Hqd.
   remember (polyn_deg_ub R) as rd eqn:Hrd.
-  intros i Hi.
-  cbn.
+  move qd before pd; move rd before qd.
+  intros i Hi; cbn.
   do 3 rewrite srng_add_0_l.
   rewrite Nat.sub_0_r; cbn.
+  destruct (lt_dec i (pd + qd - 1)) as [Hipq| Hipq]. {
+    destruct (lt_dec i (pd + rd - 1)) as [Hipr| Hipr]. {
+      destruct (lt_dec 0 pd) as [Hzp| Hzp]. 2: {
+        apply Nat.nlt_ge in Hzp.
+        apply Nat.le_0_r in Hzp; move Hzp at top; subst pd.
+        cbn.
+        do 3 rewrite srng_mul_0_l.
+        erewrite List_fold_left_ext_in. 2: {
+          intros j c Hj.
+          now rewrite srng_mul_0_l, srng_add_0_r.
+        }
+        symmetry.
+        erewrite List_fold_left_ext_in. 2: {
+          intros j c Hj.
+          now rewrite srng_mul_0_l, srng_add_0_r.
+        }
+        rewrite srng_add_comm.
+        erewrite List_fold_left_ext_in. 2: {
+          intros j c Hj.
+          now rewrite srng_mul_0_l, srng_add_0_r.
+        }
+        rewrite List_fold_left_id.
+        apply srng_add_0_l.
+      }
+      destruct (lt_dec i (max qd rd)) as [Hiqr| Hiqr]. 2: {
+        apply Nat.nlt_ge in Hiqr.
+        rewrite srng_mul_0_r.
+        destruct (lt_dec i qd) as [Hiq| Hiq]. {
+          exfalso.
+          apply Nat.nlt_ge in Hiqr; apply Hiqr.
+          apply Nat.max_lt_iff.
+          now left.
+        }
+        destruct (lt_dec i rd) as [Hir| Hir]. {
+          exfalso.
+          apply Nat.nlt_ge in Hiqr; apply Hiqr.
+          apply Nat.max_lt_iff.
+          now right.
+        }
+        rewrite srng_mul_0_r.
+        apply Nat.nlt_ge in Hiq.
+        apply Nat.nlt_ge in Hir.
+        destruct (zerop i) as [Hzi| Hzi]. {
+          subst i; cbn; symmetry.
+          apply srng_add_0_l.
+        }
+        replace i with (S i - 1) by flia Hzi.
+        unfold so.
+        rewrite <- srng_summation_add_distr.
 ...
 
 Definition polyn_semiring_prop : semiring_prop (polynomial T) :=

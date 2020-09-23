@@ -2,7 +2,7 @@
 
 Require Import Utf8 Arith.
 Require Import Semiring Misc.
-Import List.
+Import List List.ListNotations.
 
 Notation "'Σ' ( i = b , e ) , g" :=
   (fold_left (λ c i, (c + g)%Srng) (seq b (S e - b)) 0%Srng)
@@ -97,6 +97,20 @@ rewrite srng_add_0_l.
 apply fold_left_srng_add_fun_from_0.
 Qed.
 
+Theorem srng_summation_split_last : ∀ g b k,
+  b ≤ S k
+  → (Σ (i = b, S k), g i = Σ (i = b, k), g i + g (S k))%Srng.
+Proof.
+intros g b k Hbk.
+remember (S k - b) as len eqn:Hlen.
+replace (S (S k) - b) with (S len) by flia Hbk Hlen.
+rewrite List_seq_succ_r; cbn.
+rewrite fold_left_app; cbn.
+rewrite Hlen.
+f_equal; f_equal.
+flia Hbk.
+Qed.
+
 Theorem srng_summation_rtl : ∀ g b k,
   (Σ (i = b, k), g i = Σ (i = b, k), g (k + b - i)%nat)%Srng.
 Proof.
@@ -149,6 +163,48 @@ apply IHlen.
 intros i Hi.
 apply Hb.
 flia Hi.
+Qed.
+
+Theorem srng_summation_empty : ∀ g b k,
+  k < b → (Σ (i = b, k), g i = 0)%Srng.
+Proof.
+intros * Hkb.
+now replace (S k - b) with 0 by flia Hkb.
+Qed.
+
+Theorem srng_summation_add_distr : ∀ g h b k,
+  (Σ (i = b, k), (g i + h i) =
+   Σ (i = b, k), g i + Σ (i = b, k), h i)%Srng.
+Proof.
+intros g h b k.
+destruct (le_dec b k) as [Hbk| Hbk]. {
+  revert b Hbk.
+  induction k; intros. {
+    destruct b; [ now cbn; do 3 rewrite srng_add_0_l | ].
+    now cbn; rewrite srng_add_0_r.
+  }
+  rewrite srng_summation_split_last; [ | easy ].
+  rewrite srng_summation_split_last; [ | easy ].
+  rewrite srng_summation_split_last; [ | easy ].
+  rewrite srng_add_add_swap.
+  do 2 rewrite srng_add_assoc.
+  rewrite srng_add_add_swap.
+  f_equal; f_equal.
+  destruct (eq_nat_dec b (S k)) as [Hbek| Hbek]. {
+    subst b.
+    rewrite srng_summation_empty; [ | flia ].
+    rewrite srng_summation_empty; [ | flia ].
+    rewrite srng_summation_empty; [ | flia ].
+    symmetry; apply srng_add_0_l.
+  }
+  apply IHk.
+  flia Hbk Hbek.
+}
+apply Nat.nle_gt in Hbk.
+rewrite srng_summation_empty; [ | easy ].
+rewrite srng_summation_empty; [ | easy ].
+rewrite srng_summation_empty; [ | easy ].
+symmetry; apply srng_add_0_l.
 Qed.
 
 End in_ring.

@@ -51,6 +51,13 @@ revert a.
 induction l as [| c]; intros; [ easy | apply IHl ].
 Qed.
 
+Theorem List_fold_left_id : ∀ A B (l : list B) (a : A),
+  fold_left (λ c _, c) l a = a.
+Proof.
+intros A B l a.
+now induction l.
+Qed.
+
 (* summations *)
 
 Notation "'Σ' ( i = b , e ) , g" :=
