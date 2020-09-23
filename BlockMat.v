@@ -3347,7 +3347,7 @@ apply polyn_eq; [ apply Nat.max_comm | ].
 intros i Hi; apply srng_add_comm.
 Qed.
 
-Theorem poly_add_assoc : ∀ P Q R, (P + (Q + R) = ((P + Q) + R))%P.
+Theorem polyn_add_assoc : ∀ P Q R, (P + (Q + R) = ((P + Q) + R))%P.
 Proof.
 intros.
 apply polyn_eq; [ cbn; apply Nat.max_assoc | ].
@@ -3386,16 +3386,26 @@ destruct (lt_dec i pd) as [Hip| Hip]. {
     }
   }
 } {
-  rewrite srng_add_0_l.
+  do 2 rewrite srng_add_0_l.
   apply Nat.max_lt_iff in Hi.
   destruct Hi as [Hi| Hi]; [ easy | ].
   destruct (lt_dec i (max qd rd)) as [Hqr| Hqr]; [ | easy ].
   clear Hqr.
-...
+  destruct (lt_dec i qd) as [Hiq| Hiq]. {
+    destruct (lt_dec i (max pd qd)) as [Hipq| Hipq]; [ easy | ].
+    exfalso; apply Hipq.
+    now apply Nat.max_lt_iff; right.
+  } {
+    now destruct (lt_dec i (max pd qd)).
+  }
+}
+Qed.
 
 Definition polyn_semiring_prop : semiring_prop (polynomial T) :=
   {| srng_add_comm := polyn_add_comm;
-     srng_add_assoc := 42 |}.
+     srng_add_assoc := polyn_add_assoc;
+     srng_add_0_l := polyn_add_0_l;
+     srng_mul_comm := 42 |}.
 
 ...
 
