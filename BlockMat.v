@@ -3378,6 +3378,27 @@ unfold charac_polyn.
 unfold determinant.
 remember (mat_nrows (_ - _)%M) as x.
 cbn in Heqx; subst x.
+remember (mat_nrows M) as r eqn:Hr; clear Hr.
+induction r; [ easy | clear Hrz ].
+cbn - [ mat_id sub polyn_ring_op ].
+unfold so.
+destruct r. {
+  cbn.
+  rewrite srng_add_0_l.
+  rewrite srng_add_0_r.
+  rewrite srng_mul_0_l.
+  rewrite srng_add_0_l.
+  now rewrite srng_mul_1_l.
+}
+unfold so.
+Search (Σ (_ = _, _), _)%Srng.
+Search (Σ (_ = _, _), _)%Rng.
+...
+intros * Hrz.
+unfold charac_polyn.
+unfold determinant.
+remember (mat_nrows (_ - _)%M) as x.
+cbn in Heqx; subst x.
 remember (mat_nrows M) as r eqn:Hr. clear Hr.
 destruct r; [ easy | clear Hrz ].
 cbn - [ mat_id sub polyn_ring_op ].
