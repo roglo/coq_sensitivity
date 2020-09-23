@@ -19,12 +19,10 @@ Class semiring_prop A {so : semiring_op A} :=
   { srng_add_comm : ∀ a b : A, (a + b = b + a)%Srng;
     srng_add_assoc : ∀ a b c : A, (a + (b + c) = (a + b) + c)%Srng;
     srng_add_0_l : ∀ a : A, (0 + a)%Srng = a;
+    srng_mul_comm : ∀ a b : A, (a * b = b * a)%Srng;
     srng_mul_1_l : ∀ a : A, (1 * a)%Srng = a;
-    srng_mul_1_r : ∀ a : A, (a * 1)%Srng = a;
     srng_mul_add_distr_l : ∀ a b c : A, (a * (b + c) = a * b + a * c)%Srng;
-    srng_mul_add_distr_r : ∀ a b c : A, ((a + b) * c = a * c + b * c)%Srng;
-    srng_mul_0_l : ∀ a, (0 * a = 0)%Srng;
-    srng_mul_0_r : ∀ a, (a * 0 = 0)%Srng }.
+    srng_mul_0_l : ∀ a, (0 * a = 0)%Srng }.
 
 Fixpoint srng_power {A} {R : semiring_op A} a n :=
   match n with
@@ -47,12 +45,39 @@ rewrite srng_add_comm.
 apply srng_add_0_l.
 Qed.
 
+Theorem srng_mul_0_r : ∀ a, (a * 0 = 0)%Srng.
+Proof.
+intros a; simpl.
+rewrite srng_mul_comm, srng_mul_0_l.
+reflexivity.
+Qed.
+
+Theorem srng_mul_1_r : ∀ a, (a * 1 = a)%Srng.
+Proof.
+intros a; simpl.
+rewrite srng_mul_comm, srng_mul_1_l.
+reflexivity.
+Qed.
+
 Theorem srng_add_add_swap : ∀ n m p, (n + m + p = n + p + m)%Srng.
 Proof.
 intros n m p; simpl.
 do 2 rewrite <- srng_add_assoc.
 assert (m + p = p + m)%Srng as H by apply srng_add_comm.
 rewrite H; reflexivity.
+Qed.
+
+Theorem srng_mul_add_distr_r : ∀ x y z,
+  ((x + y) * z = x * z + y * z)%Srng.
+Proof.
+intros x y z; simpl.
+rewrite srng_mul_comm.
+rewrite srng_mul_add_distr_l.
+rewrite srng_mul_comm.
+assert (H : srng_mul z y = srng_mul y z). {
+ apply srng_mul_comm.
+}
+now rewrite H.
 Qed.
 
 End semiring_theorems.
@@ -229,12 +254,10 @@ Definition Z_semiring_prop : semiring_prop Z :=
   {| srng_add_comm := Z.add_comm;
      srng_add_assoc := Z.add_assoc;
      srng_add_0_l := Z.add_0_l;
+     srng_mul_comm := Z.mul_comm;
      srng_mul_1_l := Z.mul_1_l;
-     srng_mul_1_r := Z.mul_1_r;
      srng_mul_add_distr_l := Z.mul_add_distr_l;
-     srng_mul_add_distr_r := Z.mul_add_distr_r;
-     srng_mul_0_l := Z.mul_0_l;
-     srng_mul_0_r := Z.mul_0_r |}.
+     srng_mul_0_l := Z.mul_0_l |}.
 
 Definition Z_ring_prop : ring_prop Z :=
   {| rng_add_opp_l := Z.add_opp_diag_l |}.

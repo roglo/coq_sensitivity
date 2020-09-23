@@ -97,4 +97,58 @@ rewrite srng_add_0_l.
 apply fold_left_srng_add_fun_from_0.
 Qed.
 
+Theorem srng_summation_rtl : ∀ g b k,
+  (Σ (i = b, k), g i = Σ (i = b, k), g (k + b - i)%nat)%Srng.
+Proof.
+intros g b k.
+destruct (le_dec (S k) b) as [Hkb| Hkb]. {
+  cbn - [ "-" ].
+  now replace (S k - b) with 0 by flia Hkb.
+}
+apply Nat.nle_gt in Hkb.
+apply -> Nat.lt_succ_r in Hkb.
+remember (S k - b) as len eqn:Hlen.
+replace k with (b + len - 1) by flia Hkb Hlen.
+clear Hlen Hkb.
+revert b.
+induction len; intros; [ easy | ].
+rewrite List_seq_succ_r at 1; cbn.
+rewrite fold_left_app; cbn.
+symmetry.
+rewrite fold_left_srng_add_fun_from_0.
+rewrite srng_add_comm.
+f_equal; [ | rewrite srng_add_0_l; f_equal; flia ].
+rewrite IHlen.
+rewrite <- seq_shift.
+rewrite List_fold_left_map.
+apply List_fold_left_ext_in.
+intros j c Hj.
+apply in_seq in Hj.
+f_equal; f_equal; flia.
+Qed.
+
+Theorem srng_summation_eq_compat : ∀ g h b k,
+  (∀ i, b ≤ i ≤ k → (g i = h i)%Srng)
+  → (Σ (i = b, k), g i = Σ (i = b, k), h i)%Srng.
+Proof.
+intros * Hgh.
+remember (S k - b) as len eqn:Hlen.
+assert (∀ i, b ≤ i < b + len → g i = h i). {
+  intros i Hi.
+  apply Hgh; flia Hlen Hi.
+}
+clear k Hgh Hlen.
+rename H into Hb.
+revert b Hb.
+induction len; intros; [ easy | cbn ].
+do 2 rewrite srng_add_0_l.
+rewrite fold_left_srng_add_fun_from_0; symmetry.
+rewrite fold_left_srng_add_fun_from_0; symmetry.
+f_equal; [ apply Hb; flia | ].
+apply IHlen.
+intros i Hi.
+apply Hb.
+flia Hi.
+Qed.
+
 End in_ring.

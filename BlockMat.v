@@ -3324,20 +3324,6 @@ Axiom polyn_eq : ∀ (P Q : polynomial T),
   → (∀ i, i < polyn_deg_ub P → polyn_el P i = polyn_el Q i)
   → P = Q.
 
-(* add 0 to polynomial *)
-
-Theorem polyn_add_0_l : ∀ P, (0 + P)%P = P.
-Proof.
-intros.
-unfold polyn_add; cbn.
-destruct P as (f, d); cbn.
-apply polyn_eq; cbn; [ easy | ].
-intros i Hi.
-unfold polyn_coeff; cbn.
-rewrite srng_add_0_l.
-now destruct (lt_dec i d).
-Qed.
-
 (* polynomials semiring properties *)
 
 Theorem polyn_add_comm : ∀ P Q : polynomial T, (P + Q)%P = (Q + P)%P.
@@ -3401,11 +3387,91 @@ destruct (lt_dec i pd) as [Hip| Hip]. {
 }
 Qed.
 
+Theorem polyn_add_0_l : ∀ P, (0 + P)%P = P.
+Proof.
+intros.
+unfold polyn_add; cbn.
+destruct P as (f, d); cbn.
+apply polyn_eq; cbn; [ easy | ].
+intros i Hi.
+unfold polyn_coeff; cbn.
+rewrite srng_add_0_l.
+now destruct (lt_dec i d).
+Qed.
+
+Theorem polyn_mul_comm : ∀ P Q, (P * Q = Q * P)%P.
+Proof.
+intros.
+unfold polyn_mul.
+apply polyn_eq; [ now rewrite Nat.add_comm | ].
+cbn - [ "-" ].
+intros i Hi.
+unfold so.
+rewrite srng_summation_rtl.
+apply srng_summation_eq_compat.
+intros j Hj.
+rewrite Nat.add_0_r.
+replace (i - (i - j)) with j by flia Hj.
+apply srng_mul_comm.
+Qed.
+
+Theorem polyn_mul_1_l : ∀ P, (1 * P)%P = P.
+Proof.
+intros.
+unfold polyn_mul; cbn.
+destruct P as (f, d); cbn.
+apply polyn_eq; [ now cbn; rewrite Nat.sub_0_r | ].
+intros i Hi.
+cbn in Hi |-*.
+rewrite Nat.sub_0_r in Hi |-*.
+rewrite srng_add_0_l, srng_mul_1_l.
+unfold polyn_coeff.
+remember (polyn_el 1%P) as x.
+cbn; subst x.
+destruct (lt_dec i d) as [H| H]; [ clear H | easy ].
+clear - sp.
+transitivity (fold_left (λ c j, c) (seq 1 i) (f i)). 2: {
+  remember (f i) as x; clear Heqx.
+  induction i; [ easy | ].
+  rewrite List_seq_succ_r; cbn.
+  now rewrite fold_left_app; cbn.
+}
+apply List_fold_left_ext_in.
+intros j c Hj.
+apply in_seq in Hj.
+destruct (lt_dec j 1) as [Hj1| Hj1]; [ flia Hj Hj1 | ].
+rewrite srng_mul_0_l.
+apply srng_add_0_r.
+Qed.
+
+Theorem polyn_mul_add_distr_l : ∀ P Q R, (P * (Q + R) = P * Q + P * R)%P.
+Proof.
+intros.
+apply polyn_eq; cbn. {
+  remember (polyn_deg_ub P) as pd eqn:Hpd.
+  remember (polyn_deg_ub Q) as qd eqn:Hqd.
+  remember (polyn_deg_ub R) as rd eqn:Hrd.
+  rewrite <- Nat.add_max_distr_l.
+  now rewrite Nat.sub_max_distr_r.
+} {
+  unfold polyn_coeff.
+  unfold polyn_add, polyn_mul.
+  remember (polyn_deg_ub P) as pd eqn:Hpd.
+  remember (polyn_deg_ub Q) as qd eqn:Hqd.
+  remember (polyn_deg_ub R) as rd eqn:Hrd.
+  intros i Hi.
+  cbn.
+  do 3 rewrite srng_add_0_l.
+  rewrite Nat.sub_0_r; cbn.
+...
+
 Definition polyn_semiring_prop : semiring_prop (polynomial T) :=
   {| srng_add_comm := polyn_add_comm;
      srng_add_assoc := polyn_add_assoc;
      srng_add_0_l := polyn_add_0_l;
-     srng_mul_1_l := 42 |}.
+     srng_mul_comm := polyn_mul_comm;
+     srng_mul_1_l := polyn_mul_1_l;
+     srng_mul_add_distr_l := polyn_mul_add_distr_l |}.
 
 ...
 
