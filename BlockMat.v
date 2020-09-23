@@ -3344,12 +3344,14 @@ Theorem polyn_add_comm : ∀ P Q : polynomial T, (P + Q)%P = (Q + P)%P.
 Proof.
 intros.
 apply polyn_eq; [ apply Nat.max_comm | ].
-intros i Hi.
-cbn in Hi.
-...
+intros i Hi; apply srng_add_comm.
+Qed.
 
 Definition polyn_semiring_prop : semiring_prop (polynomial T) :=
-  {| srng_add_comm := polyn_add_comm |}.
+  {| srng_add_comm := polyn_add_comm;
+     srng_add_assoc := 42 |}.
+
+...
 
 (* degree upper bound (polyn_deg_ub) of sum of polynomials *)
 
