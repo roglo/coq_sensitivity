@@ -3367,6 +3367,36 @@ Definition charac_polyn (M : matrix T) :=
     (mat_mul_scal_l (monom_x) (monom_mat_of_mat (mat_id (mat_nrows M))) -
      monom_mat_of_mat M)%M.
 
+(* the higher coefficient of a characateristic polynomial is 1 *)
+
+Theorem charac_polyn_higher_coeff : ∀ M,
+  mat_nrows M ≠ 0
+  → polyn_el (charac_polyn M) (mat_nrows M) = 1%Srng.
+Proof.
+intros * Hrz.
+cbn.
+replace (mat_nrows M) with (S (mat_nrows M - 1)) at 2 by flia Hrz.
+cbn - [ mat_id sub polyn_ring_op ].
+destruct (Nat.eq_dec (mat_nrows M) 1) as [Hr1| Hr1]. {
+  rewrite Hr1, Nat.sub_diag; cbn.
+  rewrite srng_mul_0_l.
+  rewrite srng_mul_1_l.
+  do 2 rewrite srng_add_0_l.
+  now rewrite srng_add_0_r.
+}
+move Hr1 before Hrz.
+destruct (Nat.eq_dec (mat_nrows M) 2) as [Hr2| Hr2]. {
+  rewrite Hr2; simpl.
+  rewrite polyn_add_0_l; cbn.
+  do 4 rewrite srng_mul_0_r.
+  do 4 rewrite srng_mul_0_l.
+  do 8 rewrite srng_add_0_l.
+  rewrite srng_mul_0_r.
+  do 5 rewrite srng_add_0_r.
+  now do 3 rewrite srng_mul_1_l.
+}
+...
+
 (* eigenvalues and eigenvectors *)
 
 Theorem exists_eigenvalues : ∀ (acp : algeb_closed_prop) (M : matrix T),
@@ -3378,74 +3408,11 @@ Proof.
 intros acp M Hrz HM.
 destruct acp as (Hroots).
 specialize (Hroots (charac_polyn M)) as H1.
-assert (H : polyn_degree (charac_polyn M) = mat_nrows M). {
-  cbn.
-  replace (mat_nrows M) with (S (mat_nrows M - 1)) at 2 by flia Hrz.
-  cbn - [ mat_id sub polyn_ring_op ].
-  destruct (Nat.eq_dec (mat_nrows M) 1) as [Hr1| Hr1]. {
-    rewrite Hr1, Nat.sub_diag; cbn.
-    do 2 rewrite srng_mul_0_l.
-    rewrite srng_mul_1_l.
-    do 3 rewrite srng_add_0_l.
-    rewrite srng_add_0_r.
-    unfold so.
-    destruct (srng_eq_dec 1%Rng 0%Rng) as [H| H]; [ | easy ].
-    now apply srng_1_neq_0 in H.
-  }
-  move Hr1 before Hrz.
-  destruct (Nat.eq_dec (mat_nrows M) 2) as [Hr2| Hr2]. {
-    rewrite Hr2; simpl.
-    rewrite polyn_add_0_l.
-    (* (x-M₀₀)(x-M₁₁)-(-M₀₁)(-M₁₀) *)
-    Time cbn.
-    repeat rewrite srng_mul_0_l.
-    repeat rewrite srng_mul_0_r.
-    repeat rewrite srng_add_0_l.
-    repeat rewrite srng_add_0_r.
-    repeat rewrite srng_mul_0_l.
-    repeat rewrite srng_mul_0_r.
-    repeat rewrite srng_add_0_l.
-    repeat rewrite srng_add_0_r.
-    repeat rewrite srng_mul_0_l.
-    repeat rewrite srng_mul_0_r.
-    repeat rewrite srng_add_0_l.
-    repeat rewrite srng_add_0_r.
-    repeat rewrite srng_mul_1_l.
-    repeat rewrite srng_mul_1_r.
-    destruct (srng_eq_dec 1%Srng 0%Srng) as [H| H]; [ | easy ].
-    now apply srng_1_neq_0 in H.
-  }
-  move Hr2 before Hr1.
-  destruct (Nat.eq_dec (mat_nrows M) 3) as [Hr3| Hr3]. {
-    rewrite Hr3; simpl.
-    rewrite polyn_add_0_l.
-    Time cbn.
-    repeat rewrite srng_mul_0_l.
-    repeat rewrite srng_mul_0_r.
-    repeat rewrite srng_add_0_l.
-    repeat rewrite srng_add_0_r.
-    repeat rewrite srng_mul_0_l.
-    repeat rewrite srng_mul_0_r.
-    repeat rewrite srng_add_0_l.
-    repeat rewrite srng_add_0_r.
-    repeat rewrite srng_mul_0_l.
-    repeat rewrite srng_mul_0_r.
-    repeat rewrite srng_add_0_l.
-    repeat rewrite srng_add_0_r.
-    repeat rewrite srng_mul_1_l.
-    repeat rewrite srng_mul_1_r.
-    destruct (srng_eq_dec 1%Srng 0%Srng) as [H| H]; [ | easy ].
-    now apply srng_1_neq_0 in H.
-  }
-  move Hr3 before Hr2.
 ...
-  replace (mat_nrows M - 1) with (S (mat_nrows M - 2)) at 1 by flia Hrz Hr1.
-  unfold polyn_degree.
-  unfold polyn_degree1.
-  rewrite summation_polyn_deg_ub.
-  rewrite <- Nat.sub_succ_l; [ | flia Hrz Hr1 ].
-  rewrite Nat.sub_succ.
-  do 2 rewrite Nat.sub_0_r.
+assert (H2 : polyn_el (charac_polyn M) (mat_nrows M) = 1%Srng). {
+  now apply charac_polyn_higher_coeff.
+}
+assert (H3 : polyn_degree (charac_polyn M) = mat_nrows M). {
 ...
 
 End in_ring.
