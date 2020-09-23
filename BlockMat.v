@@ -3373,9 +3373,14 @@ Theorem charac_polyn_higher_coeff : ∀ M,
   mat_nrows M ≠ 0
   → polyn_el (charac_polyn M) (mat_nrows M) = 1%Srng.
 Proof.
-intros * Hrz; cbn.
+intros * Hrz.
+unfold charac_polyn.
+unfold determinant.
+remember (mat_nrows (_ - _)%M) as x.
+cbn in Heqx; subst x.
 remember (mat_nrows M) as r eqn:Hr. clear Hr.
 destruct r; [ easy | clear Hrz ].
+cbn - [ mat_id sub polyn_ring_op ].
 destruct r. {
   cbn.
   rewrite srng_add_0_l.
@@ -3386,18 +3391,6 @@ destruct r. {
 }
 destruct r. {
   cbn.
-  do 9 rewrite srng_add_0_l.
-  do 2 rewrite srng_add_0_r.
-  do 6 rewrite srng_mul_0_l.
-  do 3 rewrite srng_mul_0_r.
-  do 4 rewrite srng_add_0_l.
-  do 4 rewrite srng_add_0_r.
-  rewrite srng_mul_0_r.
-  rewrite srng_add_0_r.
-  now do 3 rewrite srng_mul_1_l.
-}
-destruct r. {
-  cbn.
   repeat rewrite srng_add_0_l.
   repeat rewrite srng_add_0_r.
   repeat rewrite srng_mul_0_l.
@@ -3405,9 +3398,6 @@ destruct r. {
   progress repeat rewrite srng_add_0_l.
   progress repeat rewrite srng_add_0_r.
   progress repeat rewrite srng_mul_0_r.
-  progress repeat rewrite srng_add_0_l.
-  progress repeat rewrite srng_add_0_r.
-  progress repeat rewrite srng_mul_0_l.
   progress repeat rewrite srng_add_0_r.
   now repeat rewrite srng_mul_1_l.
 }
