@@ -3354,6 +3354,43 @@ apply polyn_eq; [ cbn; apply Nat.max_assoc | ].
 intros i Hi; cbn in Hi |-*.
 unfold "+"%P.
 unfold polyn_coeff; cbn.
+remember (polyn_deg_ub P) as pd eqn:Hpd.
+remember (polyn_deg_ub Q) as qd eqn:Hqd.
+remember (polyn_deg_ub R) as rd eqn:Hrd.
+move qd before pd; move rd before qd.
+destruct (lt_dec i pd) as [Hip| Hip]. {
+  destruct (lt_dec i (max pd qd)) as [Hipq| Hipq]. 2: {
+    exfalso; apply Hipq.
+    apply Nat.max_lt_iff.
+    now left.
+  }
+  destruct (lt_dec i qd) as [Hiq| Hiq]. {
+    destruct (lt_dec i (max qd rd)) as [Hiqr| Hiqr]. 2: {
+      exfalso; apply Hiqr.
+      apply Nat.max_lt_iff.
+      now left.
+    }
+    apply srng_add_assoc.
+  } {
+    rewrite srng_add_0_r.
+    destruct (lt_dec i rd) as [Hir| Hir]. {
+      destruct (lt_dec i (max qd rd)) as [Hiqr| Hiqr]. 2: {
+        exfalso; apply Hiqr.
+        apply Nat.max_lt_iff.
+        now right.
+      }
+      now rewrite srng_add_0_l.
+    } {
+      rewrite srng_add_0_r.
+      now destruct (lt_dec i (max qd rd)).
+    }
+  }
+} {
+  rewrite srng_add_0_l.
+  apply Nat.max_lt_iff in Hi.
+  destruct Hi as [Hi| Hi]; [ easy | ].
+  destruct (lt_dec i (max qd rd)) as [Hqr| Hqr]; [ | easy ].
+  clear Hqr.
 ...
 
 Definition polyn_semiring_prop : semiring_prop (polynomial T) :=
