@@ -3401,6 +3401,19 @@ destruct r. {
   progress repeat rewrite srng_add_0_r.
   now repeat rewrite srng_mul_1_l.
 }
+destruct r. {
+  cbn.
+  repeat rewrite srng_add_0_l.
+  repeat rewrite srng_add_0_r.
+  repeat rewrite srng_mul_0_l.
+  repeat rewrite srng_mul_0_r.
+  progress repeat rewrite srng_add_0_l.
+  progress repeat rewrite srng_add_0_r.
+  progress repeat rewrite srng_mul_0_r.
+  progress repeat rewrite srng_mul_0_l.
+  progress repeat rewrite srng_add_0_r.
+  now repeat rewrite srng_mul_1_l.
+}
 ...
 
 (* eigenvalues and eigenvectors *)
