@@ -2023,8 +2023,7 @@ induction n; intros. {
   cbn; f_equal.
   unfold rng_mul_nat_l.
   destruct k; [ easy | ].
-  apply all_0_srng_summation_0; [ | easy ].
-  apply sp.
+  now apply all_0_srng_summation_0.
 }
 cbn; f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
@@ -3042,10 +3041,10 @@ cbn in HBM.
 destruct (zerop (mat_nrows M)) as [Hrz| Hrz]; [ easy | ].
 destruct (zerop (mat_ncols M)) as [Hcz| Hcz]; [ easy | ].
 cbn in HBM.
-rewrite rng_opp_summation; [ | apply rp | apply sp ].
-cbn.
+unfold so.
+rewrite rng_opp_summation; cbn.
 rewrite IHBM; [ | easy | easy | now apply HBM ].
-do 2 rewrite srng_add_0_l.
+rewrite srng_add_0_l.
 apply List_fold_left_ext_in.
 intros i x Hi.
 apply in_seq in Hi.
@@ -3339,6 +3338,19 @@ rewrite srng_add_0_l.
 now destruct (lt_dec i d).
 Qed.
 
+(* polynomials semiring properties *)
+
+Theorem polyn_add_comm : ∀ P Q : polynomial T, (P + Q)%P = (Q + P)%P.
+Proof.
+intros.
+apply polyn_eq; [ apply Nat.max_comm | ].
+intros i Hi.
+cbn in Hi.
+...
+
+Definition polyn_semiring_prop : semiring_prop (polynomial T) :=
+  {| srng_add_comm := polyn_add_comm |}.
+
 (* degree upper bound (polyn_deg_ub) of sum of polynomials *)
 
 Theorem polyn_deg_ub_add : ∀ P Q,
@@ -3392,6 +3404,9 @@ destruct r. {
 }
 unfold so.
 Search (Σ (_ = _, _), _)%Srng.
+unfold so.
+...
+rewrite srng_summation_split_first.
 Search (Σ (_ = _, _), _)%Rng.
 ...
 intros * Hrz.

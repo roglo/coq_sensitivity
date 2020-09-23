@@ -96,3 +96,5 @@ rewrite Nat.sub_0_r.
 rewrite srng_add_0_l.
 apply fold_left_srng_add_fun_from_0.
 Qed.
+
+End in_ring.
