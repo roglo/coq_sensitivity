@@ -3405,7 +3405,7 @@ Definition polyn_semiring_prop : semiring_prop (polynomial T) :=
   {| srng_add_comm := polyn_add_comm;
      srng_add_assoc := polyn_add_assoc;
      srng_add_0_l := polyn_add_0_l;
-     srng_mul_comm := 42 |}.
+     srng_mul_1_l := 42 |}.
 
 ...
 
