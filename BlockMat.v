@@ -3373,38 +3373,43 @@ Theorem charac_polyn_higher_coeff : ∀ M,
   mat_nrows M ≠ 0
   → polyn_el (charac_polyn M) (mat_nrows M) = 1%Srng.
 Proof.
-intros * Hrz.
-cbn.
-replace (mat_nrows M) with (S (mat_nrows M - 1)) at 2 by flia Hrz.
-cbn - [ mat_id sub polyn_ring_op ].
-destruct (Nat.eq_dec (mat_nrows M) 1) as [Hr1| Hr1]. {
-  rewrite Hr1, Nat.sub_diag; cbn.
+intros * Hrz; cbn.
+remember (mat_nrows M) as r eqn:Hr. clear Hr.
+destruct r; [ easy | clear Hrz ].
+destruct r. {
+  cbn.
+  rewrite srng_add_0_l.
+  rewrite srng_add_0_r.
   rewrite srng_mul_0_l.
-  rewrite srng_mul_1_l.
-  do 2 rewrite srng_add_0_l.
-  now rewrite srng_add_0_r.
+  rewrite srng_add_0_l.
+  now rewrite srng_mul_1_l.
 }
-destruct (Nat.eq_dec (mat_nrows M) 2) as [Hr2| Hr2]. {
-  rewrite Hr2; simpl.
-  rewrite polyn_add_0_l; cbn.
-  do 4 rewrite srng_mul_0_r.
-  do 4 rewrite srng_mul_0_l.
-  do 8 rewrite srng_add_0_l.
+destruct r. {
+  cbn.
+  do 9 rewrite srng_add_0_l.
+  do 2 rewrite srng_add_0_r.
+  do 6 rewrite srng_mul_0_l.
+  do 3 rewrite srng_mul_0_r.
+  do 4 rewrite srng_add_0_l.
+  do 4 rewrite srng_add_0_r.
   rewrite srng_mul_0_r.
-  do 5 rewrite srng_add_0_r.
+  rewrite srng_add_0_r.
   now do 3 rewrite srng_mul_1_l.
 }
-destruct (Nat.eq_dec (mat_nrows M) 3) as [Hr3| Hr3]. {
-  rewrite Hr3; simpl.
-  rewrite polyn_add_0_l; cbn.
-  do 9 rewrite srng_mul_0_r.
-  do 15 rewrite srng_mul_0_l.
-  do 19 rewrite srng_add_0_l.
-  do 5 rewrite srng_mul_0_r.
-  do 14 rewrite srng_add_0_r.
-  do 2 rewrite srng_mul_0_l.
-  do 2 rewrite srng_add_0_r.
-  now do 4 rewrite srng_mul_1_l.
+destruct r. {
+  cbn.
+  repeat rewrite srng_add_0_l.
+  repeat rewrite srng_add_0_r.
+  repeat rewrite srng_mul_0_l.
+  repeat rewrite srng_mul_0_r.
+  progress repeat rewrite srng_add_0_l.
+  progress repeat rewrite srng_add_0_r.
+  progress repeat rewrite srng_mul_0_r.
+  progress repeat rewrite srng_add_0_l.
+  progress repeat rewrite srng_add_0_r.
+  progress repeat rewrite srng_mul_0_l.
+  progress repeat rewrite srng_add_0_r.
+  now repeat rewrite srng_mul_1_l.
 }
 ...
 
