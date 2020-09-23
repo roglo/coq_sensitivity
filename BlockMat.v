@@ -3384,7 +3384,6 @@ destruct (Nat.eq_dec (mat_nrows M) 1) as [Hr1| Hr1]. {
   do 2 rewrite srng_add_0_l.
   now rewrite srng_add_0_r.
 }
-move Hr1 before Hrz.
 destruct (Nat.eq_dec (mat_nrows M) 2) as [Hr2| Hr2]. {
   rewrite Hr2; simpl.
   rewrite polyn_add_0_l; cbn.
@@ -3394,6 +3393,18 @@ destruct (Nat.eq_dec (mat_nrows M) 2) as [Hr2| Hr2]. {
   rewrite srng_mul_0_r.
   do 5 rewrite srng_add_0_r.
   now do 3 rewrite srng_mul_1_l.
+}
+destruct (Nat.eq_dec (mat_nrows M) 3) as [Hr3| Hr3]. {
+  rewrite Hr3; simpl.
+  rewrite polyn_add_0_l; cbn.
+  do 9 rewrite srng_mul_0_r.
+  do 15 rewrite srng_mul_0_l.
+  do 19 rewrite srng_add_0_l.
+  do 5 rewrite srng_mul_0_r.
+  do 14 rewrite srng_add_0_r.
+  do 2 rewrite srng_mul_0_l.
+  do 2 rewrite srng_add_0_r.
+  now do 4 rewrite srng_mul_1_l.
 }
 ...
 
