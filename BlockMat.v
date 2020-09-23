@@ -3466,12 +3466,12 @@ apply polyn_eq; cbn. {
   do 3 rewrite srng_add_0_l.
   rewrite Nat.sub_0_r; cbn.
   destruct (lt_dec i (pd + qd - 1)) as [Hipq| Hipq]. {
+    unfold so.
+    rewrite fold_left_srng_add_fun_from_0; symmetry.
+    rewrite fold_left_srng_add_fun_from_0.
+    rewrite srng_add_add_swap.
+    rewrite fold_left_srng_add_fun_from_0.
     destruct (lt_dec i (pd + rd - 1)) as [Hipr| Hipr]. {
-      unfold so.
-      rewrite fold_left_srng_add_fun_from_0; symmetry.
-      rewrite fold_left_srng_add_fun_from_0.
-      rewrite srng_add_add_swap.
-      rewrite fold_left_srng_add_fun_from_0.
       rewrite srng_add_assoc.
       rewrite <- srng_add_assoc.
       f_equal. {
@@ -3497,6 +3497,21 @@ apply polyn_eq; cbn. {
       rewrite <- srng_summation_add_distr.
       apply srng_summation_eq_compat.
       intros j Hj.
+      rewrite <- srng_mul_add_distr_l.
+      f_equal.
+      rewrite srng_add_comm.
+      destruct (lt_dec (i - j) (max qd rd)) as [Hijqr| Hijqr]; [ easy | ].
+      destruct (lt_dec (i - j) qd) as [Hijq| Hijq]. {
+        exfalso; apply Hijqr.
+        now apply Nat.max_lt_iff; left.
+      }
+      destruct (lt_dec (i - j) rd) as [Hijr| Hijr]. {
+        exfalso; apply Hijqr.
+        now apply Nat.max_lt_iff; right.
+      }
+      apply srng_add_0_l.
+    }
+    f_equal.
 ...
       destruct (lt_dec 0 pd) as [Hzp| Hzp]. 2: {
         apply Nat.nlt_ge in Hzp.
