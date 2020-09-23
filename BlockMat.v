@@ -3511,71 +3511,34 @@ apply polyn_eq; cbn. {
       }
       apply srng_add_0_l.
     }
-    f_equal.
-...
+    f_equal. {
+      rewrite srng_add_0_r.
       destruct (lt_dec 0 pd) as [Hzp| Hzp]. 2: {
-        apply Nat.nlt_ge in Hzp.
-        apply Nat.le_0_r in Hzp; move Hzp at top; subst pd.
-        cbn.
-        do 3 rewrite srng_mul_0_l.
-        erewrite List_fold_left_ext_in. 2: {
-          intros j c Hj.
-          now rewrite srng_mul_0_l, srng_add_0_r.
-        }
-        symmetry.
-        erewrite List_fold_left_ext_in. 2: {
-          intros j c Hj.
-          now rewrite srng_mul_0_l, srng_add_0_r.
-        }
-        rewrite srng_add_comm.
-        erewrite List_fold_left_ext_in. 2: {
-          intros j c Hj.
-          now rewrite srng_mul_0_l, srng_add_0_r.
-        }
-        rewrite List_fold_left_id.
-        apply srng_add_0_l.
+        now do 2 rewrite srng_mul_0_l.
       }
-      destruct (lt_dec i (max qd rd)) as [Hiqr| Hiqr]. 2: {
-        apply Nat.nlt_ge in Hiqr.
-        rewrite srng_mul_0_r.
-        destruct (lt_dec i qd) as [Hiq| Hiq]. {
-          exfalso.
-          apply Nat.nlt_ge in Hiqr; apply Hiqr.
-          apply Nat.max_lt_iff.
-          now left.
+      f_equal.
+      destruct (lt_dec i (max qd rd)) as [Hiqr| Hiqr]. {
+        destruct (lt_dec i qd) as [Hiq| Hiq]. 2: {
+          destruct (lt_dec i rd) as [Hir| Hir]. 2: {
+            symmetry; apply srng_add_0_l.
+          }
+          flia Hipq Hipr Hiqr Hiq.
+        } {
+          destruct (lt_dec i rd) as [Hir| Hir]. 2: {
+            symmetry; apply srng_add_0_r.
+          }
+          clear Hiqr.
+          flia Hi Hipq Hipr Hiq Hir Hzp.
         }
-        destruct (lt_dec i rd) as [Hir| Hir]. {
-          exfalso.
-          apply Nat.nlt_ge in Hiqr; apply Hiqr.
-          apply Nat.max_lt_iff.
-          now right.
-        }
-        rewrite srng_mul_0_r.
-        apply Nat.nlt_ge in Hiq.
-        apply Nat.nlt_ge in Hir.
-        destruct (zerop i) as [Hzi| Hzi]. {
-          subst i; cbn; symmetry.
-          apply srng_add_0_l.
-        }
-        replace i with (S i - 1) by flia Hzi.
-        unfold so.
-        rewrite <- srng_summation_add_distr.
-        apply srng_summation_eq_compat.
-        intros j Hj.
-        rewrite <- srng_mul_add_distr_l.
-        f_equal.
-        rewrite Nat.sub_succ, Nat.sub_0_r.
-        destruct (lt_dec (i - j) (max qd rd)) as [Hijqr| Hijqr]; [ easy | ].
-        destruct (lt_dec (i - j) qd) as [Hijq| Hijq]. {
-          exfalso; apply Hijqr.
-          now apply Nat.max_lt_iff; left.
-        }
-        destruct (lt_dec (i - j) rd) as [Hijr| Hijr]. {
-          exfalso; apply Hijqr.
-          now apply Nat.max_lt_iff; right.
-        }
-        symmetry; apply srng_add_0_l.
       } {
+        destruct (lt_dec i qd) as [Hiq| Hiq]; [ | easy ].
+        flia Hi Hipq Hipr Hzp Hiqr Hiq.
+      }
+    } {
+      apply List_fold_left_ext_in.
+      intros j c Hj.
+      apply in_seq in Hj.
+      f_equal.
 ...
 
 Definition polyn_semiring_prop : semiring_prop (polynomial T) :=
