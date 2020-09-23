@@ -3467,6 +3467,37 @@ apply polyn_eq; cbn. {
   rewrite Nat.sub_0_r; cbn.
   destruct (lt_dec i (pd + qd - 1)) as [Hipq| Hipq]. {
     destruct (lt_dec i (pd + rd - 1)) as [Hipr| Hipr]. {
+      unfold so.
+      rewrite fold_left_srng_add_fun_from_0; symmetry.
+      rewrite fold_left_srng_add_fun_from_0.
+      rewrite srng_add_add_swap.
+      rewrite fold_left_srng_add_fun_from_0.
+      rewrite srng_add_assoc.
+      rewrite <- srng_add_assoc.
+      f_equal. {
+        rewrite <- srng_mul_add_distr_l.
+        f_equal.
+        destruct (lt_dec i (max qd rd)) as [Hiqr| Hiqr]; [ easy | ].
+        destruct (lt_dec i qd) as [Hiq| Hiq]. {
+          exfalso; apply Hiqr.
+          now apply Nat.max_lt_iff; left.
+        }
+        destruct (lt_dec i rd) as [Hir| Hir]. {
+          exfalso; apply Hiqr.
+          now apply Nat.max_lt_iff; right.
+        }
+        apply srng_add_0_l.
+      }
+      destruct (zerop i) as [Hzi| Hzi]. {
+        subst i; cbn.
+        apply srng_add_0_l.
+      }
+      remember (seq 1 i) as s eqn:Hs.
+      replace i with (S i - 1) in Hs by flia Hzi; subst s.
+      rewrite <- srng_summation_add_distr.
+      apply srng_summation_eq_compat.
+      intros j Hj.
+...
       destruct (lt_dec 0 pd) as [Hzp| Hzp]. 2: {
         apply Nat.nlt_ge in Hzp.
         apply Nat.le_0_r in Hzp; move Hzp at top; subst pd.
@@ -3514,6 +3545,22 @@ apply polyn_eq; cbn. {
         replace i with (S i - 1) by flia Hzi.
         unfold so.
         rewrite <- srng_summation_add_distr.
+        apply srng_summation_eq_compat.
+        intros j Hj.
+        rewrite <- srng_mul_add_distr_l.
+        f_equal.
+        rewrite Nat.sub_succ, Nat.sub_0_r.
+        destruct (lt_dec (i - j) (max qd rd)) as [Hijqr| Hijqr]; [ easy | ].
+        destruct (lt_dec (i - j) qd) as [Hijq| Hijq]. {
+          exfalso; apply Hijqr.
+          now apply Nat.max_lt_iff; left.
+        }
+        destruct (lt_dec (i - j) rd) as [Hijr| Hijr]. {
+          exfalso; apply Hijqr.
+          now apply Nat.max_lt_iff; right.
+        }
+        symmetry; apply srng_add_0_l.
+      } {
 ...
 
 Definition polyn_semiring_prop : semiring_prop (polynomial T) :=
