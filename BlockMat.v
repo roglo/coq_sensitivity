@@ -3180,41 +3180,38 @@ Class sring_dec_prop T {so : semiring_op T} :=
   { srng_eq_dec : ∀ a b : T, {a = b} + {a ≠ b};
     srng_1_neq_0 : (1 ≠ 0)%Srng }.
 
-(* polynomial *)
+(* property of a polynomial: its coefficient of higher degree is not 0 *)
+(* returns a boolean to allow proof of equality to be unique *)
 
-Record polynomial T := mk_polyn
-  { polyn_el : nat → T;
-    polyn_deg_ub : nat }.
-
-Arguments polyn_deg_ub {T}%type_scope.
-
-(* coefficient in a polynomial *)
-
-Definition polyn_coeff T {so : semiring_op T} P i :=
-  if lt_dec i (polyn_deg_ub P) then polyn_el P i else 0%Srng.
-
-(* degree of a polynomial *)
-(* degree is ≥ -1 *)
-(* degree1 is actually a natural equal to degree+1 *)
-
-Fixpoint polyn_deg1_loop T {so : semiring_op T} {sdp : sring_dec_prop}
-    (f : nat → T) n :=
+Definition polyn_prop_test T {so : semiring_op T} {fdp : sring_dec_prop} f n :=
   match n with
-  | 0 => 0
-  | S n' => if srng_eq_dec (f n') 0%Srng then polyn_deg1_loop f n' else n
+  | 0 => True
+  | S n => if srng_eq_dec (f n) 0%Srng then True else False
   end.
 
-Definition polyn_degree1 T {so : semiring_op T} {sdp : sring_dec_prop} P :=
-  polyn_deg1_loop (polyn_coeff P) (polyn_deg_ub P).
+(* polynomial *)
+
+Record polynomial T (so : semiring_op T) (sdp : sring_dec_prop) := mk_polyn
+  { polyn_coeff : nat → T;
+    polyn_degree_plus_1 : nat;
+    polyn_prop : polyn_prop_test polyn_coeff polyn_degree_plus_1 }.
+
+Arguments polynomial T%type_scope {so sdp}.
+Arguments mk_polyn {T so sdp}.
+
+(* degree of a polynomial *)
 
 Definition polyn_degree T {so : semiring_op T} {sdp : sring_dec_prop} P :=
-  polyn_degree1 P - 1.
+  polyn_degree_plus_1 P - 1.
 
 (* evaluation of a polynomial *)
 
 Definition eval_polyn T {so : semiring_op T} {sdp : sring_dec_prop}
     (P : polynomial T) x :=
-  (Σ (i = 0, polyn_degree1 P - 1), polyn_coeff P i * x ^ i)%Srng.
+  match polyn_degree_plus_1 P with
+  | 0 => 0%Srng
+  | S n => (Σ (i = 0, n), polyn_coeff P i * x ^ i)%Srng
+  end.
 
 (* algebraically closed set *)
 
@@ -3232,13 +3229,47 @@ Context {rp : @ring_prop T ro}.
 Context {sdp : @sring_dec_prop T so}.
 Existing Instance so.
 
-(* normalized polynomial *)
-
-Definition is_norm_polyn P := polyn_el P (polyn_deg_ub P - 1) ≠ 0%Srng.
-
 (* polynomial from and to a list *)
 
+Fixpoint norm_rev_list_as_polyn rev_l :=
+  match rev_l with
+  | [] => []
+  | a :: l' =>
+      if srng_eq_dec a 0%Srng then norm_rev_list_as_polyn l'
+      else rev_l
+  end.
+
+Definition norm_list_as_polyn l := rev (norm_rev_list_as_polyn (rev l)).
+
+Definition is_norm_list l :=
+  polyn_prop_test (λ i, nth i l 0%Srng) (length l).
+
+Theorem polyn_of_list_prop : ∀ l (P : is_norm_list l),
+  polyn_prop_test (λ i : nat, nth i l 0%Srng) (length l).
+Proof.
+intros * HP.
+now destruct l.
+Qed.
+
+Theorem glop : ∀ l, is_norm_list (norm_list_as_polyn l).
+Admitted.
+
 Definition polyn_of_list l :=
+  let l' := norm_list_as_polyn l in
+  mk_polyn (λ i, nth i l 0%Srng) (length l')
+    (polyn_of_list_prop l' (glop l)).
+
+(* ah, puis zut *)
+
+...
+
+Definition polyn_of_list l :=
+  let l' := norm_list_as_polyn l in
+  mk_polyn (λ i, nth i l 0%Srng) (length l') (polyn_of_list_prop l).
+
+Print polyn_of_list.
+
+...
   mk_polyn (λ i, nth i l 0%Srng) (length l).
 
 Definition list_of_polyn (P : polynomial T) :=
@@ -3279,6 +3310,30 @@ Fixpoint find_polyn_deg f n :=
   end.
 
 Definition mk_norm_polyn f n := mk_polyn f (find_polyn_deg f n).
+
+Theorem find_polyn_deg_le : ∀ f n, find_polyn_deg f n ≤ n.
+Proof.
+intros.
+induction n; [ easy | cbn ].
+destruct (srng_eq_dec (f n) 0%Srng) as [H| H]; [ | easy ].
+transitivity n; [ easy | ].
+apply Nat.le_succ_diag_r.
+Qed.
+
+Theorem find_polyn_deg_eq_diag : ∀ f n,
+  find_polyn_deg f n = n → n = 0 ∨ f (n - 1) ≠ 0%Srng.
+Proof.
+intros * Hn.
+destruct n; [ now left | right ].
+rewrite Nat.sub_succ, Nat.sub_0_r.
+cbn in Hn.
+destruct (srng_eq_dec (f n) 0%Srng) as [Hnz| Hnz]; [ | easy ].
+exfalso.
+specialize (find_polyn_deg_le f n) as H1.
+apply Nat.nlt_ge in H1.
+apply H1; rewrite Hn.
+apply Nat.lt_succ_diag_r.
+Qed.
 
 (* multiplication of polynomials *)
 
@@ -3335,6 +3390,12 @@ Existing Instance polyn_semiring_op.
 Existing Instance polyn_ring_op.
 
 (* function extensionality required for polynomials *)
+Axiom polyn_eq : ∀ (P Q : polynomial T),
+  polyn_degree_plus_1 P = polyn_degree_plus_1 Q
+  → (∀ i, i < polyn_degree_plus_1 P → polyn_coeff P i = polyn_coeff Q i)
+  → P = Q.
+...
+
 Axiom polyn_eq : ∀ (P Q : polynomial T),
   polyn_deg_ub P = polyn_deg_ub Q
   → (∀ i, i < polyn_deg_ub P → polyn_el P i = polyn_el Q i)
@@ -3458,11 +3519,23 @@ unfold polyn_mul.
 apply polyn_eq. {
   cbn - [ "-" seq ].
   rewrite Nat.sub_succ, Nat.sub_0_r.
-(*
-  unfold polyn_coeff at 1.
-  remember (polyn_deg_ub 1%P) as x eqn:Hx.
-  cbn in Hx; subst x.
-*)
+  remember (polyn_deg_ub P) as len eqn:Hlen.
+  symmetry in Hlen.
+  revert P Hlen.
+  induction len; intros; [ easy | ].
+  cbn - [ "-" seq polyn_el ].
+  destruct
+    (srng_eq_dec
+       (Σ (j = 0, len), polyn_coeff 1%P j * polyn_coeff P (len - j))
+       0)%Srng
+    as [H| H]; [ | easy ].
+  exfalso. (* find_polyn_deg_le *)
+  destruct len. {
+    cbn in H.
+    rewrite srng_add_0_l, srng_mul_1_l in H.
+...
+Check find_polyn_deg_le.
+
   induction (polyn_deg_ub P) as [| len]; [ easy | ].
   cbn - [ "-" seq polyn_el ].
   rewrite IHlen.
@@ -3472,30 +3545,17 @@ apply polyn_eq. {
        0)%Srng
     as [H| H]; [ | easy ].
   exfalso.
-Print find_polyn_deg.
-Theorem glop : ∀ f n, find_polyn_deg f n = n → n = 0 ∨ f (n - 1) ≠ 0%Srng.
-Proof.
-intros * Hn.
-induction n; [ now left | right ].
-rewrite Nat.sub_succ, Nat.sub_0_r.
-cbn in Hn.
-destruct (srng_eq_dec (f n) 0%Srng) as [Hnz| Hnz]; [ | easy ].
-...
-  unfold so in H.
-  rewrite srng_summation_split_first in H; [ | apply Nat.le_0_l ].
-  remember (polyn_coeff 1%P 0) as x; cbn in Heqx; subst x.
-  rewrite srng_mul_1_l in H.
-...
-  cbn - [ "-" seq polyn_el ] in H.
-  remember (polyn_el
-...
-  rewrite srng_summation_succ_succ.
-...
-  rewrite find_polyn_deg_eq_compat with
-    (g := λ i,
+  specialize (@find_polyn_deg_eq_diag _ _ IHlen) as H1.
+  destruct H1 as [H1| H1]. {
+    subst len.
+    cbn in H, IHlen.
 
-  cbn - [ "-" seq ].
-  destruct (srng_eq_dec (Σ (j = 0, S len), polyn_coeff 1%P j * polyn_coeff P (S len - j))%Srng 0%Srng) as [H| H]. {
+  apply find_polyn_deg_eq_diag in IHlen.
+  destruct IHlen as [H2| H2]. {
+    subst len.
+    cbn in H.
+...
+  symmetry in H.
 ...
 
 intros.
