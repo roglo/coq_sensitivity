@@ -3186,7 +3186,7 @@ Class sring_dec_prop T {so : semiring_op T} :=
 Definition polyn_prop_test T {so : semiring_op T} {fdp : sring_dec_prop} f n :=
   match n with
   | 0 => True
-  | S n => if srng_eq_dec (f n) 0%Srng then True else False
+  | S n => if srng_eq_dec (f n) 0%Srng then False else True
   end.
 
 (* polynomial *)
@@ -3229,7 +3229,7 @@ Context {rp : @ring_prop T ro}.
 Context {sdp : @sring_dec_prop T so}.
 Existing Instance so.
 
-(* polynomial from and to a list *)
+(* normalize a list, i.e. remove all trailing 0s *)
 
 Fixpoint norm_rev_list_as_polyn rev_l :=
   match rev_l with
@@ -3241,39 +3241,48 @@ Fixpoint norm_rev_list_as_polyn rev_l :=
 
 Definition norm_list_as_polyn l := rev (norm_rev_list_as_polyn (rev l)).
 
-Definition is_norm_list l :=
-  polyn_prop_test (λ i, nth i l 0%Srng) (length l).
+(* polynomial from and to a list *)
 
-Theorem polyn_of_list_prop : ∀ l (P : is_norm_list l),
-  polyn_prop_test (λ i : nat, nth i l 0%Srng) (length l).
+Theorem polyn_of_list_prop : ∀ l,
+  polyn_prop_test (λ i, nth i (norm_list_as_polyn l) 0%Srng)
+    (length (norm_list_as_polyn l)).
 Proof.
-intros * HP.
-now destruct l.
+intros.
+unfold norm_list_as_polyn.
+remember (rev l) as l' eqn:Hl.
+clear l Hl.
+rename l' into l.
+rewrite rev_length.
+induction l as [| a]; [ easy | cbn ].
+destruct (srng_eq_dec a 0%Srng) as [Haz| Haz]; [ apply IHl | cbn ].
+rewrite app_nth2; rewrite rev_length; [ | now unfold ge ].
+rewrite Nat.sub_diag; cbn.
+now destruct (srng_eq_dec a 0%Srng).
 Qed.
 
-Theorem glop : ∀ l, is_norm_list (norm_list_as_polyn l).
-Admitted.
-
 Definition polyn_of_list l :=
-  let l' := norm_list_as_polyn l in
-  mk_polyn (λ i, nth i l 0%Srng) (length l')
-    (polyn_of_list_prop l' (glop l)).
-
-(* ah, puis zut *)
-
-...
-
-Definition polyn_of_list l :=
-  let l' := norm_list_as_polyn l in
-  mk_polyn (λ i, nth i l 0%Srng) (length l') (polyn_of_list_prop l).
-
-Print polyn_of_list.
-
-...
-  mk_polyn (λ i, nth i l 0%Srng) (length l).
+  mk_polyn
+    (λ i, nth i (norm_list_as_polyn l) 0%Srng) (length (norm_list_as_polyn l))
+    (polyn_of_list_prop l).
 
 Definition list_of_polyn (P : polynomial T) :=
-  map (polyn_el P) (seq 0 (polyn_deg_ub P)).
+  map (polyn_coeff P) (seq 0 (polyn_degree_plus_1 P)).
+
+(*
+End in_ring.
+
+Require Import ZArith.
+Open Scope Z_scope.
+
+Theorem Z_neq_1_0 : 1%Z ≠ 0%Z. Proof. easy. Qed.
+
+Definition Z_sring_dec_prop :=
+  {| srng_eq_dec := Z.eq_dec;
+     srng_1_neq_0 := Z_neq_1_0 |}.
+
+Compute let ro := Z_ring_op in let sdp := Z_sring_dec_prop in list_of_polyn (polyn_of_list [3; 4; 7; 0]).
+Compute let ro := Z_ring_op in let sdp := Z_sring_dec_prop in list_of_polyn (polyn_of_list [0]).
+*)
 
 (* monomial *)
 
@@ -3287,8 +3296,38 @@ Definition monom_mat_of_mat M : matrix (polynomial T) :=
 
 (* addition of polynomials *)
 
+Fixpoint polyn_list_add la lb :=
+  match la with
+  | [] => lb
+  | a :: la' =>
+      match lb with
+      | [] => la
+      | b :: lb' => (a + b)%Srng :: polyn_list_add la' lb'
+      end
+  end.
+
 Definition polyn_add P Q :=
-  mk_polyn (λ i, polyn_coeff P i + polyn_coeff Q i)%Srng
+  polyn_of_list (polyn_list_add (list_of_polyn P) (list_of_polyn Q)).
+
+Check polyn_add.
+
+(*
+End in_ring.
+
+Require Import ZArith.
+Open Scope Z_scope.
+
+Theorem Z_neq_1_0 : 1%Z ≠ 0%Z. Proof. easy. Qed.
+
+Definition Z_sring_dec_prop :=
+  {| srng_eq_dec := Z.eq_dec;
+     srng_1_neq_0 := Z_neq_1_0 |}.
+
+Compute let ro := Z_ring_op in let sdp := Z_sring_dec_prop in list_of_polyn (polyn_add (polyn_of_list [3; 4; 7; 0])
+(polyn_of_list [7; 0; 0; 22])).
+*)
+
+...
     (max (polyn_deg_ub P) (polyn_deg_ub Q)).
 
 (* opposite of a polynomial *)
