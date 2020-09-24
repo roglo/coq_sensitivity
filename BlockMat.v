@@ -3539,6 +3539,16 @@ apply polyn_eq; cbn. {
       intros j c Hj.
       apply in_seq in Hj.
       f_equal.
+      destruct (lt_dec j pd) as [Hjp| Hjp]. 2: {
+        now do 2 rewrite srng_mul_0_l.
+      }
+      f_equal.
+      destruct (lt_dec (i - j) qd) as [Hijq| Hijq]. 2: {
+        rewrite srng_add_0_l.
+        destruct (lt_dec (i - j) (max qd rd)) as [Hijqr| Hijqr]; [ | easy ].
+        destruct (lt_dec (i - j) rd) as [Hijr| Hijr]; [ | easy ].
+        flia Hipr Hjp Hijr.
+      }
 ...
 
 Definition polyn_semiring_prop : semiring_prop (polynomial T) :=
