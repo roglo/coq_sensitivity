@@ -3438,22 +3438,48 @@ Qed.
 
 (* polynomials semiring properties *)
 
+Theorem polyn_list_add_comm : ∀ la lb,
+  polyn_list_add la lb = polyn_list_add lb la.
+Proof.
+intros.
+revert lb.
+induction la as [| a]; intros; [ now destruct lb | ].
+destruct lb as [| b]; [ easy | cbn ].
+f_equal; [ | apply IHla ].
+apply srng_add_comm.
+Qed.
+
 Theorem polyn_add_comm : ∀ P Q : polynomial T, (P + Q)%P = (Q + P)%P.
 Proof.
 intros (PL, PP) (QL, QP); cbn.
 apply polyn_eq; cbn.
 f_equal; f_equal; f_equal.
 clear PP QP.
-revert QL.
-induction PL as [| a]; intros; [ now destruct QL | ].
-destruct QL as [| b]; [ easy | cbn ].
-f_equal; [ | apply IHPL ].
-apply srng_add_comm.
+apply polyn_list_add_comm.
 Qed.
+
+Theorem polyn_add_add_swap : ∀ P Q R, (P + Q + R = P + R + Q)%P.
+Proof.
+intros (la, Pa) (lb, Pb) (lc, Pc).
+apply polyn_eq; cbn; f_equal.
+clear Pa Pb Pc.
+revert lb lc.
+induction la as [| a]; intros; cbn. {
+  revert lc.
+  induction lb as [| b]; intros; cbn. {
+    induction lc as [| c]; [ easy | cbn ].
+Print norm_rev_list_as_polyn.
+Theorem norm_rev_list_as_polyn_app :
+  norm_rev_list_as_polyn (l1 ++ l2) =
+  norm_rev_list_as_polyn (re...
+...
 
 Theorem polyn_add_assoc : ∀ P Q R, (P + (Q + R) = ((P + Q) + R))%P.
 Proof.
-intros.
+intros (la, Pa) (lb, Pb) (lc, Pc).
+apply polyn_eq; cbn; f_equal.
+clear Pa Pb Pc.
+revert la lc.
 ...
 apply polyn_eq; [ cbn; apply Nat.max_assoc | ].
 intros i Hi; cbn in Hi |-*.
