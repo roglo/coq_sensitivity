@@ -3239,15 +3239,13 @@ Existing Instance so.
 
 (* normalize a list, i.e. remove all trailing 0s *)
 
-Fixpoint norm_rev_list_as_polyn rev_l :=
-  match rev_l with
+Fixpoint remove_heading_0s l :=
+  match l with
   | [] => []
-  | a :: l' =>
-      if srng_eq_dec a 0%Srng then norm_rev_list_as_polyn l'
-      else rev_l
+  | a :: l' => if srng_eq_dec a 0%Srng then remove_heading_0s l' else l
   end.
 
-Definition norm_list_as_polyn l := rev (norm_rev_list_as_polyn (rev l)).
+Definition norm_list_as_polyn l := rev (remove_heading_0s (rev l)).
 
 (* polynomial from and to a list *)
 
@@ -3488,9 +3486,9 @@ rewrite rev_length, Nat.sub_diag in Pa; cbn in Pa.
 now destruct (srng_eq_dec 0%Srng 0%Srng).
 Qed.
 
-Theorem norm_rev_list_as_polyn_idemp : ∀ la,
-  norm_rev_list_as_polyn (norm_rev_list_as_polyn la) =
-  norm_rev_list_as_polyn la.
+Theorem remove_heading_0s_idemp : ∀ la,
+  remove_heading_0s (remove_heading_0s la) =
+  remove_heading_0s la.
 Proof.
 intros.
 induction la as [| a]; [ easy | cbn ].
@@ -3498,27 +3496,45 @@ destruct (srng_eq_dec a 0%Srng) as [Haz| Haz]; [ easy | cbn ].
 now destruct (srng_eq_dec a 0%Srng).
 Qed.
 
-Theorem norm_rev_list_as_polyn_app : ∀ la lb,
-  norm_rev_list_as_polyn (la ++ lb) =
-    match norm_rev_list_as_polyn la with
-    | [] => norm_rev_list_as_polyn lb
+Theorem remove_heading_0s_app : ∀ la lb,
+  remove_heading_0s (la ++ lb) =
+    match remove_heading_0s la with
+    | [] => remove_heading_0s lb
     | a :: la' => a :: la' ++ lb
     end.
 Proof.
 intros.
-remember (norm_rev_list_as_polyn la) as lc eqn:Hlc; symmetry in Hlc.
-revert la lb Hlc.
-induction lc as [| c]; intros. {
+remember (remove_heading_0s la) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| c]. {
   induction la as [| a]; [ easy | ].
   cbn in Hlc |-*.
   destruct (srng_eq_dec a 0%Srng) as [Haz| Haz]; [ now apply IHla | easy ].
 }
-cbn.
-...
-destruct la as [| a]; cbn; [ easy | ].
+revert lb c lc Hlc.
+induction la as [| a]; intros; [ easy | cbn ].
 destruct (srng_eq_dec a 0%Srng) as [Haz| Haz]. {
   subst a; cbn in Hlc.
   destruct (srng_eq_dec 0%Srng 0%Srng) as [H| H]; [ clear H | easy ].
+  apply IHla, Hlc.
+}
+cbn in Hlc.
+destruct (srng_eq_dec a 0%Srng) as [H| H]; [ easy | clear H ].
+now injection Hlc; clear Hlc; intros; subst c lc.
+Qed.
+
+Theorem List_eq_rev_l : ∀ A (la lb : list A),
+  rev la = lb → la = rev lb.
+Proof.
+intros * Hll.
+subst lb; symmetry.
+apply rev_involutive.
+Qed.
+
+Theorem List_rev_repeat : ∀ A (a : A) n, rev (repeat a n) = repeat a n.
+Proof.
+intros.
+induction n; [ easy | cbn ].
+rewrite IHn.
 ...
 
 Theorem polyn_add_add_swap : ∀ P Q R, (P + Q + R = P + R + Q)%P.
@@ -3535,31 +3551,51 @@ induction la as [| a]; intros; cbn. {
     rewrite polyn_list_add_0_r.
     rewrite rev_involutive.
     symmetry.
-    apply norm_rev_list_as_polyn_idemp.
+    apply remove_heading_0s_idemp.
   }
   destruct lc as [| c]; cbn. {
     rewrite rev_involutive.
-    apply norm_rev_list_as_polyn_idemp.
+    apply remove_heading_0s_idemp.
   }
-...
-  rewrite (norm_rev_list_as_polyn_app (rev lb)).
-  rewrite (norm_rev_list_as_polyn_app (rev lc)).
-  remember (norm_rev_list_as_polyn (rev lb)) as x eqn:Hx.
-  remember (norm_rev_list_as_polyn (rev lc)) as y eqn:Hy.
+  rewrite (remove_heading_0s_app (rev lb)).
+  rewrite (remove_heading_0s_app (rev lc)).
+  remember (remove_heading_0s (rev lb)) as x eqn:Hx.
+  remember (remove_heading_0s (rev lc)) as y eqn:Hy.
   move y before x.
   symmetry in Hx, Hy.
   destruct x as [| x1]. {
     cbn in IHlb.
+Theorem eq_remove_heading_0s_nil : ∀ la,
+  remove_heading_0s la = [] → ∃ n, la = repeat 0%Srng n.
+Proof.
+intros * Hla.
+induction la as [| a]; [ now exists 0 | ].
+cbn in Hla.
+destruct (srng_eq_dec a 0%Srng) as [Haz| Haz]; [ | easy ].
+subst a.
+specialize (IHla Hla) as (n, Hn).
+now exists (S n); cbn; subst la.
+Qed.
+apply eq_remove_heading_0s_nil in Hx.
+destruct Hx as (nb, Hnb).
+apply List_eq_rev_l in Hnb.
+Search (rev (repeat _ _)).
+
+...
+Check List_rev_inj.
+...
     destruct y as [| y1]. {
       cbn.
       destruct (srng_eq_dec b 0%Srng) as [Hbz| Hbz]. {
         subst b; cbn.
         destruct (srng_eq_dec c 0%Srng) as [Hcz| Hcz]. {
           subst c; cbn.
-          rewrite norm_rev_list_as_polyn_app; cbn; rewrite Hy.
-          rewrite norm_rev_list_as_polyn_app; cbn; rewrite Hx.
+          rewrite remove_heading_0s_app; cbn; rewrite Hy.
+          rewrite remove_heading_0s_app; cbn; rewrite Hx.
           easy.
         }
+        cbn.
+        rewrite polyn_list_add_0_r, srng_add_0_l.
 ...
 
 Theorem polyn_add_assoc : ∀ P Q R, (P + (Q + R) = ((P + Q) + R))%P.
