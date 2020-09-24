@@ -3458,6 +3458,43 @@ clear PP QP.
 apply polyn_list_add_comm.
 Qed.
 
+Theorem polyn_list_add_0_l : ∀ la, polyn_list_add [] la = la.
+Proof. easy. Qed.
+
+Theorem polyn_list_add_0_r : ∀ la, polyn_list_add la [] = la.
+Proof.
+intros; rewrite polyn_list_add_comm; apply polyn_list_add_0_l.
+Qed.
+
+Theorem polyn_add_0_l : ∀ P, (0 + P)%P = P.
+Proof.
+intros (la, Pa); cbn.
+apply polyn_eq.
+cbn - [ polyn_list_add ].
+rewrite polyn_list_add_0_l.
+unfold norm_list_as_polyn.
+rewrite <- rev_involutive; f_equal.
+rewrite <- (rev_involutive la) in Pa.
+rewrite rev_length in Pa.
+remember (rev la) as l; clear la Heql.
+rename l into la.
+unfold polyn_prop_test in Pa.
+destruct la as [| a]; [ easy | ].
+cbn - [ nth ] in Pa |-*.
+destruct (srng_eq_dec a 0%Srng) as [Haz| Haz]; [ | easy ].
+subst a; exfalso.
+rewrite app_nth2 in Pa; [ | now unfold ge; rewrite rev_length ].
+rewrite rev_length, Nat.sub_diag in Pa; cbn in Pa.
+now destruct (srng_eq_dec 0%Srng 0%Srng).
+Qed.
+
+Theorem norm_rev_list_as_polyn_idemp : ∀ la,
+  norm_rev_list_as_polyn (norm_rev_list_as_polyn la) =
+  norm_rev_list_as_polyn la.
+Proof.
+intros.
+...
+
 Theorem polyn_add_add_swap : ∀ P Q R, (P + Q + R = P + R + Q)%P.
 Proof.
 intros (la, Pa) (lb, Pb) (lc, Pc).
@@ -3467,7 +3504,15 @@ revert lb lc.
 induction la as [| a]; intros; cbn. {
   revert lc.
   induction lb as [| b]; intros; cbn. {
+    remember (rev lc) as l eqn:Hl.
+    clear lc Hl; rename l into lc.
+    rewrite polyn_list_add_0_r.
+    rewrite rev_involutive.
+...
     induction lc as [| c]; [ easy | cbn ].
+    destruct (srng_eq_dec c 0%Srng) as [Hcz| Hcz]; [ apply IHlc | ].
+    rewrite polyn_list_add_0_r.
+...
 Print norm_rev_list_as_polyn.
 Theorem norm_rev_list_as_polyn_app :
   norm_rev_list_as_polyn (l1 ++ l2) =
@@ -3530,18 +3575,6 @@ destruct (lt_dec i pd) as [Hip| Hip]. {
     now destruct (lt_dec i (max pd qd)).
   }
 }
-Qed.
-
-Theorem polyn_add_0_l : ∀ P, (0 + P)%P = P.
-Proof.
-intros.
-unfold polyn_add; cbn.
-destruct P as (f, d); cbn.
-apply polyn_eq; cbn; [ easy | ].
-intros i Hi.
-unfold polyn_coeff; cbn.
-rewrite srng_add_0_l.
-now destruct (lt_dec i d).
 Qed.
 
 Theorem find_polyn_deg_eq_compat : ∀ f g n,
