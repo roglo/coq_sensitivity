@@ -3505,13 +3505,17 @@ apply polyn_eq; cbn; f_equal.
 clear Pa Pb Pc.
 revert lb lc.
 induction la as [| a]; intros; cbn. {
+  rewrite (polyn_list_add_comm _ lb).
+  rewrite (polyn_list_add_comm _ lc).
   revert lc.
   induction lb as [| b]; intros; cbn. {
-    remember (rev lc) as l eqn:Hl.
-    clear lc Hl; rename l into lc.
     rewrite polyn_list_add_0_r.
     rewrite rev_involutive.
     symmetry.
+    apply norm_rev_list_as_polyn_idemp.
+  }
+  destruct lc as [| c]; cbn. {
+    rewrite rev_involutive.
     apply norm_rev_list_as_polyn_idemp.
   }
 ...
