@@ -3493,7 +3493,10 @@ Theorem norm_rev_list_as_polyn_idemp : ∀ la,
   norm_rev_list_as_polyn la.
 Proof.
 intros.
-...
+induction la as [| a]; [ easy | cbn ].
+destruct (srng_eq_dec a 0%Srng) as [Haz| Haz]; [ easy | cbn ].
+now destruct (srng_eq_dec a 0%Srng).
+Qed.
 
 Theorem polyn_add_add_swap : ∀ P Q R, (P + Q + R = P + R + Q)%P.
 Proof.
@@ -3508,15 +3511,9 @@ induction la as [| a]; intros; cbn. {
     clear lc Hl; rename l into lc.
     rewrite polyn_list_add_0_r.
     rewrite rev_involutive.
-...
-    induction lc as [| c]; [ easy | cbn ].
-    destruct (srng_eq_dec c 0%Srng) as [Hcz| Hcz]; [ apply IHlc | ].
-    rewrite polyn_list_add_0_r.
-...
-Print norm_rev_list_as_polyn.
-Theorem norm_rev_list_as_polyn_app :
-  norm_rev_list_as_polyn (l1 ++ l2) =
-  norm_rev_list_as_polyn (re...
+    symmetry.
+    apply norm_rev_list_as_polyn_idemp.
+  }
 ...
 
 Theorem polyn_add_assoc : ∀ P Q R, (P + (Q + R) = ((P + Q) + R))%P.
