@@ -231,6 +231,14 @@ rewrite rng_mul_opp_r.
 apply rng_opp_involutive.
 Qed.
 
+Theorem rng_opp_inj : ∀ a b, (- a = - b)%Rng → a = b.
+Proof.
+intros.
+rewrite <- (rng_opp_involutive a).
+rewrite H.
+apply rng_opp_involutive.
+Qed.
+
 End ring_theorems.
 
 (* Ring of integers *)
@@ -463,19 +471,6 @@ intros.
 unfold srng_sub.
 rewrite srng_opp_0.
 apply srng_add_0_r.
-Qed.
-
-Theorem srng_opp_inj_wd : ∀ a b, (- a = - b)%Srng ↔ (a = b)%Srng.
-Proof.
-intros a b; split; intros H.
- apply srng_add_move_0_r in H.
- rewrite srng_add_comm in H.
- apply srng_add_move_0_r in H.
- rewrite H.
- apply srng_add_move_0_r.
- apply srng_add_opp_r.
-
- rewrite H; reflexivity.
 Qed.
 
 Theorem srng_mul_mul_swap : ∀ n m p, (n * m * p = n * p * m)%Srng.

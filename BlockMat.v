@@ -3185,21 +3185,29 @@ Class sring_dec_prop T {so : semiring_op T} :=
 
 Definition polyn_prop_test T {so : semiring_op T} {fdp : sring_dec_prop} f n :=
   match n with
-  | 0 => True
-  | S n => if srng_eq_dec (f n) 0%Srng then False else True
+  | 0 => true
+  | S n => if srng_eq_dec (f n) 0%Srng then false else true
   end.
 
 (* polynomial *)
 
 Record polynomial T (so : semiring_op T) (sdp : sring_dec_prop) := mk_polyn
-  { polyn_coeff : nat → T;
-    polyn_degree_plus_1 : nat;
-    polyn_prop : polyn_prop_test polyn_coeff polyn_degree_plus_1 }.
+  { polyn_list : list T;
+    polyn_prop :
+      polyn_prop_test (λ i, nth i polyn_list 0%Srng) (length polyn_list) =
+      true }.
 
 Arguments polynomial T%type_scope {so sdp}.
 Arguments mk_polyn {T so sdp}.
 
+Definition polyn_coeff T {so : semiring_op T} {sdp : sring_dec_prop} P i :=
+  nth i (polyn_list P) 0%Srng.
+
 (* degree of a polynomial *)
+
+Definition polyn_degree_plus_1 T {so : semiring_op T} {sdp : sring_dec_prop}
+     P :=
+  length (polyn_list P).
 
 Definition polyn_degree T {so : semiring_op T} {sdp : sring_dec_prop} P :=
   polyn_degree_plus_1 P - 1.
@@ -3245,7 +3253,7 @@ Definition norm_list_as_polyn l := rev (norm_rev_list_as_polyn (rev l)).
 
 Theorem polyn_of_list_prop : ∀ l,
   polyn_prop_test (λ i, nth i (norm_list_as_polyn l) 0%Srng)
-    (length (norm_list_as_polyn l)).
+    (length (norm_list_as_polyn l)) = true.
 Proof.
 intros.
 unfold norm_list_as_polyn.
@@ -3261,12 +3269,10 @@ now destruct (srng_eq_dec a 0%Srng).
 Qed.
 
 Definition polyn_of_list l :=
-  mk_polyn
-    (λ i, nth i (norm_list_as_polyn l) 0%Srng) (length (norm_list_as_polyn l))
-    (polyn_of_list_prop l).
+  mk_polyn (norm_list_as_polyn l) (polyn_of_list_prop l).
 
 Definition list_of_polyn (P : polynomial T) :=
-  map (polyn_coeff P) (seq 0 (polyn_degree_plus_1 P)).
+  polyn_list P.
 
 (*
 End in_ring.
@@ -3280,6 +3286,7 @@ Definition Z_sring_dec_prop :=
   {| srng_eq_dec := Z.eq_dec;
      srng_1_neq_0 := Z_neq_1_0 |}.
 
+Compute let ro := Z_ring_op in let sdp := Z_sring_dec_prop in polyn_of_list [3; 4; 7; 0].
 Compute let ro := Z_ring_op in let sdp := Z_sring_dec_prop in list_of_polyn (polyn_of_list [3; 4; 7; 0]).
 Compute let ro := Z_ring_op in let sdp := Z_sring_dec_prop in list_of_polyn (polyn_of_list [0]).
 *)
@@ -3307,9 +3314,7 @@ Fixpoint polyn_list_add la lb :=
   end.
 
 Definition polyn_add P Q :=
-  polyn_of_list (polyn_list_add (list_of_polyn P) (list_of_polyn Q)).
-
-Check polyn_add.
+  polyn_of_list (polyn_list_add (polyn_list P) (polyn_list Q)).
 
 (*
 End in_ring.
@@ -3324,62 +3329,50 @@ Definition Z_sring_dec_prop :=
      srng_1_neq_0 := Z_neq_1_0 |}.
 
 Compute let ro := Z_ring_op in let sdp := Z_sring_dec_prop in list_of_polyn (polyn_add (polyn_of_list [3; 4; 7; 0])
-(polyn_of_list [7; 0; 0; 22])).
+(polyn_of_list [7; 0; 0; 22; -4])).
+Compute let ro := Z_ring_op in let sdp := Z_sring_dec_prop in list_of_polyn (polyn_add (polyn_of_list [3; 4; 7; 0])
+(polyn_of_list [7; 2; -7])).
 *)
-
-...
-    (max (polyn_deg_ub P) (polyn_deg_ub Q)).
 
 (* opposite of a polynomial *)
 
+Theorem polyn_opp_prop_test : ∀ P,
+  polyn_prop_test (λ i, nth i (map rng_opp (polyn_list P)) 0%Srng)
+    (length (map rng_opp (polyn_list P))) = true.
+Proof.
+intros.
+rewrite map_length.
+destruct P as (l, p).
+unfold polyn_prop_test in p |-*; cbn.
+remember (length l) as len eqn:Hlen.
+symmetry in Hlen.
+destruct len; [ easy | ].
+rewrite (List_map_nth_in _ 0%Srng); [ | flia Hlen ].
+destruct (srng_eq_dec (nth len l 0%Srng) 0%Srng) as [H| Hz]; [ easy | ].
+clear p.
+destruct (srng_eq_dec (- nth len l 0%Srng)%Rng 0%Srng) as [H| H]; [ | easy ].
+rewrite <- rng_opp_involutive in H.
+apply rng_opp_inj in H.
+unfold so in H.
+now rewrite rng_opp_0 in H.
+Qed.
+
 Definition polyn_opp P :=
-  mk_polyn (λ i, (- polyn_coeff P i)%Rng) (polyn_deg_ub P).
+  mk_polyn (map rng_opp (polyn_list P)) (polyn_opp_prop_test P).
 
 (* subtraction of polynomials *)
 
 Definition polyn_sub P Q :=
   polyn_add P (polyn_opp Q).
 
-(* normalization of a polynomial, i.e. its last coeff be not 0 *)
-
-Fixpoint find_polyn_deg f n :=
-  match n with
-  | 0 => 0
-  | S n' => if srng_eq_dec (f n') 0%Srng then find_polyn_deg f n' else n
-  end.
-
-Definition mk_norm_polyn f n := mk_polyn f (find_polyn_deg f n).
-
-Theorem find_polyn_deg_le : ∀ f n, find_polyn_deg f n ≤ n.
-Proof.
-intros.
-induction n; [ easy | cbn ].
-destruct (srng_eq_dec (f n) 0%Srng) as [H| H]; [ | easy ].
-transitivity n; [ easy | ].
-apply Nat.le_succ_diag_r.
-Qed.
-
-Theorem find_polyn_deg_eq_diag : ∀ f n,
-  find_polyn_deg f n = n → n = 0 ∨ f (n - 1) ≠ 0%Srng.
-Proof.
-intros * Hn.
-destruct n; [ now left | right ].
-rewrite Nat.sub_succ, Nat.sub_0_r.
-cbn in Hn.
-destruct (srng_eq_dec (f n) 0%Srng) as [Hnz| Hnz]; [ | easy ].
-exfalso.
-specialize (find_polyn_deg_le f n) as H1.
-apply Nat.nlt_ge in H1.
-apply H1; rewrite Hn.
-apply Nat.lt_succ_diag_r.
-Qed.
-
 (* multiplication of polynomials *)
 
+Definition polyn_list_mul la lb :=
+  map (λ i, Σ (j = 0, i), nth j la 0 * nth (i - j) lb 0)%Srng
+    (seq 0 (length la + length lb - 1)).
+
 Definition polyn_mul P Q :=
-  mk_norm_polyn
-    (λ i, Σ (j = 0, i), polyn_coeff P j * polyn_coeff Q (i - j))%Srng
-    (polyn_deg_ub P + polyn_deg_ub Q - 1).
+  polyn_of_list (polyn_list_mul (polyn_list P) (polyn_list Q)).
 
 (*
 End in_ring.
@@ -3393,6 +3386,8 @@ Definition Z_sring_dec_prop :=
   {| srng_eq_dec := Z.eq_dec;
      srng_1_neq_0 := Z_neq_1_0 |}.
 
+Compute let ro := Z_ring_op in let sdp := Z_sring_dec_prop in polyn_list_mul [1] [3; 4].
+Compute let ro := Z_ring_op in let sdp := Z_sring_dec_prop in polyn_list_mul [1; 1; 0] [-1; 1; 0].
 Compute let ro := Z_ring_op in let sdp := Z_sring_dec_prop in list_of_polyn (polyn_mul (polyn_of_list [1; 1]) (polyn_of_list [-1; 1])).
 *)
 
@@ -3408,7 +3403,7 @@ Notation "P - Q" := (polyn_sub P Q) : polynomial_scope.
 Notation "P * Q" := (polyn_mul P Q) : polynomial_scope.
 Notation "- P" := (polyn_opp P) : polynomial_scope.
 
-(* identity matrix *)
+(* identity matrix of size n *)
 
 Definition mat_id n :=
   mk_mat (λ i j, if Nat.eq_dec i j then 1%Srng else 0%Srng) n n.
@@ -3428,30 +3423,38 @@ Definition polyn_ring_op : ring_op (polynomial T) :=
 Existing Instance polyn_semiring_op.
 Existing Instance polyn_ring_op.
 
-(* function extensionality required for polynomials *)
-Axiom polyn_eq : ∀ (P Q : polynomial T),
-  polyn_degree_plus_1 P = polyn_degree_plus_1 Q
-  → (∀ i, i < polyn_degree_plus_1 P → polyn_coeff P i = polyn_coeff Q i)
-  → P = Q.
-...
+(* equality of polynomials ↔ equality of their lists *)
 
-Axiom polyn_eq : ∀ (P Q : polynomial T),
-  polyn_deg_ub P = polyn_deg_ub Q
-  → (∀ i, i < polyn_deg_ub P → polyn_el P i = polyn_el Q i)
+Theorem polyn_eq : ∀ P Q,
+  polyn_list P = polyn_list Q
   → P = Q.
+Proof.
+intros (PL, PP) (QL, QP) HPQ.
+cbn in HPQ |-*.
+subst QL.
+f_equal.
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+Qed.
 
 (* polynomials semiring properties *)
 
 Theorem polyn_add_comm : ∀ P Q : polynomial T, (P + Q)%P = (Q + P)%P.
 Proof.
-intros.
-apply polyn_eq; [ apply Nat.max_comm | ].
-intros i Hi; apply srng_add_comm.
+intros (PL, PP) (QL, QP); cbn.
+apply polyn_eq; cbn.
+f_equal; f_equal; f_equal.
+clear PP QP.
+revert QL.
+induction PL as [| a]; intros; [ now destruct QL | ].
+destruct QL as [| b]; [ easy | cbn ].
+f_equal; [ | apply IHPL ].
+apply srng_add_comm.
 Qed.
 
 Theorem polyn_add_assoc : ∀ P Q R, (P + (Q + R) = ((P + Q) + R))%P.
 Proof.
 intros.
+...
 apply polyn_eq; [ cbn; apply Nat.max_assoc | ].
 intros i Hi; cbn in Hi |-*.
 unfold "+"%P.
