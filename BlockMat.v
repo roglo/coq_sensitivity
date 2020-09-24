@@ -3498,6 +3498,32 @@ destruct (srng_eq_dec a 0%Srng) as [Haz| Haz]; [ easy | cbn ].
 now destruct (srng_eq_dec a 0%Srng).
 Qed.
 
+Theorem norm_rev_list_as_polyn_app : ∀ la lb,
+  norm_rev_list_as_polyn (la ++ lb) =
+    match norm_rev_list_as_polyn la with
+    | [] => norm_rev_list_as_polyn lb
+    | _ => norm_rev_list_as_polyn (norm_rev_list_as_polyn la ++ lb)
+    end.
+Proof.
+intros.
+remember (norm_rev_list_as_polyn la) as lc eqn:Hlc; symmetry in Hlc.
+revert la lb Hlc.
+induction lc as [| c]; intros. {
+  induction la as [| a]; [ easy | ].
+  cbn in Hlc |-*.
+  destruct (srng_eq_dec a 0%Srng) as [Haz| Haz]; [ now apply IHla | easy ].
+}
+cbn.
+destruct (srng_eq_dec c 0%Srng) as [Hcz| Hcz]. {
+  subst c.
+  (* Hlc impossible: to be proven *)
+  admit.
+}
+destruct la as [| a]; cbn; [ easy | ].
+destruct (srng_eq_dec a 0%Srng) as [Haz| Haz]. {
+  subst a; cbn in Hlc.
+...
+
 Theorem polyn_add_add_swap : ∀ P Q R, (P + Q + R = P + R + Q)%P.
 Proof.
 intros (la, Pa) (lb, Pb) (lc, Pc).
@@ -3518,6 +3544,25 @@ induction la as [| a]; intros; cbn. {
     rewrite rev_involutive.
     apply norm_rev_list_as_polyn_idemp.
   }
+...
+  rewrite (norm_rev_list_as_polyn_app (rev lb)).
+  rewrite (norm_rev_list_as_polyn_app (rev lc)).
+  remember (norm_rev_list_as_polyn (rev lb)) as x eqn:Hx.
+  remember (norm_rev_list_as_polyn (rev lc)) as y eqn:Hy.
+  move y before x.
+  symmetry in Hx, Hy.
+  destruct x as [| x1]. {
+    cbn in IHlb.
+    destruct y as [| y1]. {
+      cbn.
+      destruct (srng_eq_dec b 0%Srng) as [Hbz| Hbz]. {
+        subst b; cbn.
+        destruct (srng_eq_dec c 0%Srng) as [Hcz| Hcz]. {
+          subst c; cbn.
+          rewrite norm_rev_list_as_polyn_app; cbn; rewrite Hy.
+          rewrite norm_rev_list_as_polyn_app; cbn; rewrite Hx.
+          easy.
+        }
 ...
 
 Theorem polyn_add_assoc : ∀ P Q R, (P + (Q + R) = ((P + Q) + R))%P.
