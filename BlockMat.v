@@ -3549,6 +3549,30 @@ apply polyn_eq; cbn. {
         destruct (lt_dec (i - j) rd) as [Hijr| Hijr]; [ | easy ].
         flia Hipr Hjp Hijr.
       }
+      destruct (lt_dec (i - j) (max qd rd)) as [Hijqr| Hijqr]. 2: {
+        flia Hijq Hijqr.
+      }
+      destruct (lt_dec (i - j) rd) as [Hijr| Hijr]. 2: {
+        now rewrite srng_add_0_r.
+      }
+      flia Hipr Hjp Hijr.
+    }
+  } {
+    rewrite srng_add_0_l.
+    destruct (lt_dec i (pd + rd - 1)) as [Hipr| Hipr]. 2: {
+      flia Hi Hipq Hipr.
+    }
+    destruct (lt_dec 0 pd) as [Hzp| Hzp]. 2: {
+      do 2 rewrite srng_mul_0_l.
+      apply Nat.nlt_ge in Hzp.
+      apply Nat.le_0_r in Hzp.
+      move Hzp at top; subst pd.
+      apply List_fold_left_ext_in.
+      intros j c Hj.
+      f_equal.
+...
+    destruct (lt_dec i (max qd rd)) as [Hiqr| Hiqr]. {
+      flia Hi Hipq Hipr Hiqr.
 ...
 
 Definition polyn_semiring_prop : semiring_prop (polynomial T) :=
