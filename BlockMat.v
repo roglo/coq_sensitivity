@@ -3502,7 +3502,7 @@ Theorem norm_rev_list_as_polyn_app : ∀ la lb,
   norm_rev_list_as_polyn (la ++ lb) =
     match norm_rev_list_as_polyn la with
     | [] => norm_rev_list_as_polyn lb
-    | _ => norm_rev_list_as_polyn (norm_rev_list_as_polyn la ++ lb)
+    | a :: la' => a :: la' ++ lb
     end.
 Proof.
 intros.
@@ -3514,14 +3514,11 @@ induction lc as [| c]; intros. {
   destruct (srng_eq_dec a 0%Srng) as [Haz| Haz]; [ now apply IHla | easy ].
 }
 cbn.
-destruct (srng_eq_dec c 0%Srng) as [Hcz| Hcz]. {
-  subst c.
-  (* Hlc impossible: to be proven *)
-  admit.
-}
+...
 destruct la as [| a]; cbn; [ easy | ].
 destruct (srng_eq_dec a 0%Srng) as [Haz| Haz]. {
   subst a; cbn in Hlc.
+  destruct (srng_eq_dec 0%Srng 0%Srng) as [H| H]; [ clear H | easy ].
 ...
 
 Theorem polyn_add_add_swap : ∀ P Q R, (P + Q + R = P + R + Q)%P.
