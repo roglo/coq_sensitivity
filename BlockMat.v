@@ -3568,11 +3568,58 @@ apply polyn_eq; cbn. {
       apply Nat.le_0_r in Hzp.
       move Hzp at top; subst pd.
       apply List_fold_left_ext_in.
-      intros j c Hj.
-      f_equal.
-...
+      intros j c Hj; f_equal.
+      apply in_seq in Hj.
+      destruct (lt_dec j 0) as [Hjz| Hjz]; [ easy | ].
+      now do 2 rewrite srng_mul_0_l.
+    }
     destruct (lt_dec i (max qd rd)) as [Hiqr| Hiqr]. {
-      flia Hi Hipq Hipr Hiqr.
+      destruct (lt_dec i rd) as [Hir| Hir]; [ | flia Hi Hipq Hiqr Hir ].
+      destruct (lt_dec i qd) as [Hiq| Hiq]; [ flia Hipq Hzp Hiq | ].
+      rewrite srng_add_0_l.
+      apply List_fold_left_ext_in.
+      intros j c Hj; f_equal; clear c.
+      apply in_seq in Hj.
+      destruct (lt_dec j pd) as [Hjp| Hjp]. 2: {
+        now do 2 rewrite srng_mul_0_l.
+      }
+      f_equal.
+      destruct (lt_dec (i - j) rd) as [Hijr| Hijr]; [ | flia Hir Hijr ].
+      destruct (lt_dec (i - j) qd) as [Hijq| Hijq]; [ flia Hipq Hjp Hijq | ].
+      rewrite srng_add_0_l.
+      destruct (lt_dec (i - j) (max qd rd)) as [Hijqr| Hijqr]; [ easy | ].
+      flia Hijr Hijq Hijqr.
+    } {
+      destruct (lt_dec i rd) as [Hir| Hir]; [ flia Hiqr Hir | ].
+      rewrite srng_mul_0_r.
+      apply List_fold_left_ext_in.
+      intros j c Hj; f_equal; clear c.
+      apply in_seq in Hj.
+      destruct (lt_dec j pd) as [Hjp| Hjp]. 2: {
+        now do 2 rewrite srng_mul_0_l.
+      }
+      f_equal.
+      destruct (lt_dec (i - j) rd) as [Hijr| Hijr]. 2: {
+        destruct (lt_dec (i - j) (max qd rd)) as [Hijqr| Hijqr]; [ | easy ].
+        rewrite srng_add_0_r.
+        destruct (lt_dec (i - j) qd) as [Hijq| Hijq]; [ | easy ].
+        flia Hipq Hjp Hijq.
+      }
+      destruct (lt_dec (i - j) qd) as [Hijq| Hijq]; [ flia Hipq Hjp Hijq | ].
+      rewrite srng_add_0_l.
+      destruct (lt_dec (i - j) (max qd rd)) as [Hijqr| Hijqr]; [ easy | ].
+      flia Hijr Hijq Hijqr.
+    }
+  }
+}
+Qed.
+
+Theorem polyn_mul_0_l : ∀ P, (0 * P = 0)%P.
+Proof.
+intros.
+apply polyn_eq. {
+  cbn.
+Print polyn_mul.
 ...
 
 Definition polyn_semiring_prop : semiring_prop (polynomial T) :=
@@ -3581,7 +3628,8 @@ Definition polyn_semiring_prop : semiring_prop (polynomial T) :=
      srng_add_0_l := polyn_add_0_l;
      srng_mul_comm := polyn_mul_comm;
      srng_mul_1_l := polyn_mul_1_l;
-     srng_mul_add_distr_l := polyn_mul_add_distr_l |}.
+     srng_mul_add_distr_l := polyn_mul_add_distr_l;
+     srng_mul_0_l := polyn_mul_0_l |}.
 
 ...
 
