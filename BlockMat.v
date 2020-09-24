@@ -3270,10 +3270,20 @@ Definition polyn_opp P :=
 Definition polyn_sub P Q :=
   polyn_add P (polyn_opp Q).
 
+(* normalization of a polynomial, i.e. its last coeff be not 0 *)
+
+Fixpoint find_polyn_deg f n :=
+  match n with
+  | 0 => 0
+  | S n' => if srng_eq_dec (f n') 0%Srng then find_polyn_deg f n' else n
+  end.
+
+Definition mk_norm_polyn f n := mk_polyn f (find_polyn_deg f n).
+
 (* multiplication of polynomials *)
 
 Definition polyn_mul P Q :=
-  mk_polyn
+  mk_norm_polyn
     (λ i, Σ (j = 0, i), polyn_coeff P j * polyn_coeff Q (i - j))%Srng
     (polyn_deg_ub P + polyn_deg_ub Q - 1).
 
@@ -3283,7 +3293,13 @@ End in_ring.
 Require Import ZArith.
 Open Scope Z_scope.
 
-Compute let ro := Z_ring_op in list_of_polyn (polyn_mul (polyn_of_list [1; 1]) (polyn_of_list [-1; 1])).
+Theorem Z_neq_1_0 : 1%Z ≠ 0%Z. Proof. easy. Qed.
+
+Definition Z_sring_dec_prop :=
+  {| srng_eq_dec := Z.eq_dec;
+     srng_1_neq_0 := Z_neq_1_0 |}.
+
+Compute let ro := Z_ring_op in let sdp := Z_sring_dec_prop in list_of_polyn (polyn_mul (polyn_of_list [1; 1]) (polyn_of_list [-1; 1])).
 *)
 
 (* polynomial syntax *)
@@ -3399,24 +3415,89 @@ rewrite srng_add_0_l.
 now destruct (lt_dec i d).
 Qed.
 
+Theorem find_polyn_deg_eq_compat : ∀ f g n,
+  (∀ i, i < n → f i = g i)
+  → find_polyn_deg f n = find_polyn_deg g n.
+Proof.
+intros * Hfg.
+induction n; [ easy | cbn ].
+rewrite <- Hfg; [ | now apply Nat.lt_succ_r ].
+destruct (srng_eq_dec (f n) 0%Srng) as [Hfz| Hfz]; [ | easy ].
+apply IHn; intros i Hi.
+now apply Hfg, Nat.lt_lt_succ_r.
+Qed.
+
 Theorem polyn_mul_comm : ∀ P Q, (P * Q = Q * P)%P.
 Proof.
 intros.
 unfold polyn_mul.
-apply polyn_eq; [ now rewrite Nat.add_comm | ].
-cbn - [ "-" ].
-intros i Hi.
-unfold so.
-rewrite srng_summation_rtl.
-apply srng_summation_eq_compat.
-intros j Hj.
-rewrite Nat.add_0_r.
-replace (i - (i - j)) with j by flia Hj.
-apply srng_mul_comm.
+assert (H : ∀ i,
+  (Σ (j = 0, i), polyn_coeff P j * polyn_coeff Q (i - j))%Rng =
+  (Σ (j = 0, i), polyn_coeff Q j * polyn_coeff P (i - j))%Rng). {
+  intros i.
+  rewrite srng_summation_rtl.
+  apply srng_summation_eq_compat.
+  intros j Hj.
+  rewrite Nat.add_0_r.
+  replace (i - (i - j)) with j by flia Hj.
+  apply srng_mul_comm.
+}
+apply polyn_eq. {
+  rewrite (Nat.add_comm (polyn_deg_ub Q)).
+  cbn - [ "-" seq ].
+  apply find_polyn_deg_eq_compat.
+  intros i Hi; apply H.
+}
+intros i Hi; apply H.
 Qed.
 
 Theorem polyn_mul_1_l : ∀ P, (1 * P)%P = P.
 Proof.
+intros.
+unfold polyn_mul.
+apply polyn_eq. {
+  cbn - [ "-" seq ].
+  rewrite Nat.sub_succ, Nat.sub_0_r.
+(*
+  unfold polyn_coeff at 1.
+  remember (polyn_deg_ub 1%P) as x eqn:Hx.
+  cbn in Hx; subst x.
+*)
+  induction (polyn_deg_ub P) as [| len]; [ easy | ].
+  cbn - [ "-" seq polyn_el ].
+  rewrite IHlen.
+  destruct
+    (srng_eq_dec
+       (Σ (j = 0, len), polyn_coeff 1%P j * polyn_coeff P (len - j))
+       0)%Srng
+    as [H| H]; [ | easy ].
+  exfalso.
+Print find_polyn_deg.
+Theorem glop : ∀ f n, find_polyn_deg f n = n → n = 0 ∨ f (n - 1) ≠ 0%Srng.
+Proof.
+intros * Hn.
+induction n; [ now left | right ].
+rewrite Nat.sub_succ, Nat.sub_0_r.
+cbn in Hn.
+destruct (srng_eq_dec (f n) 0%Srng) as [Hnz| Hnz]; [ | easy ].
+...
+  unfold so in H.
+  rewrite srng_summation_split_first in H; [ | apply Nat.le_0_l ].
+  remember (polyn_coeff 1%P 0) as x; cbn in Heqx; subst x.
+  rewrite srng_mul_1_l in H.
+...
+  cbn - [ "-" seq polyn_el ] in H.
+  remember (polyn_el
+...
+  rewrite srng_summation_succ_succ.
+...
+  rewrite find_polyn_deg_eq_compat with
+    (g := λ i,
+
+  cbn - [ "-" seq ].
+  destruct (srng_eq_dec (Σ (j = 0, S len), polyn_coeff 1%P j * polyn_coeff P (S len - j))%Srng 0%Srng) as [H| H]. {
+...
+
 intros.
 unfold polyn_mul; cbn.
 destruct P as (f, d); cbn.
