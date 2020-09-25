@@ -3808,13 +3808,24 @@ induction la as [| a]; intros; cbn. {
       rewrite firstn_length in Hnc.
       rewrite skipn_length in Hnc.
       rewrite rev_length in Hnc.
+      remember (rev lc) as lc'.
+      symmetry in Heqlc'.
+      apply List_eq_rev_l in Heqlc'.
+      subst lc.
+      rename lc' into lc.
+      rewrite skipn_rev in Hnc.
+      rewrite rev_length in Hnc.
       destruct (le_dec (length lc) (length lx)) as [Hcx| Hcx]. {
         rewrite (proj2 (Nat.sub_0_le _ _)) in Hnc; [ | easy ].
         cbn in Hnc.
-        rewrite Nat.min_r in Hnc; [ | easy ].
-        rewrite Nat.max_r in Hnc; [ | easy ].
         destruct Hnc as (H1 & H2 & H3).
-        subst nc.
+        injection H2; clear H2; intros; subst x.
+        now apply neq_strip_heading_0s_cons_0 in Hlx.
+      }
+      apply Nat.nle_gt in Hcx.
+      rewrite Nat.min_l in Hnc; [ | flia Hcx ].
+      rewrite Nat.max_l in Hnc; [ | flia Hcx ].
+      rewrite Nat.max_l in Hnc; [ | flia Hcx ].
 ...
         rewrite polyn_list_add_comm in H2; cbn in H2.
 ...
