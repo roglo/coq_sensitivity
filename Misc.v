@@ -1484,6 +1484,30 @@ destruct l as [| a]; [ easy | cbn in Hl ].
 now apply app_eq_nil in Hl.
 Qed.
 
+Theorem List_eq_rev_l : ∀ A (la lb : list A),
+  rev la = lb → la = rev lb.
+Proof.
+intros * Hll.
+subst lb; symmetry.
+apply rev_involutive.
+Qed.
+
+Theorem List_repeat_succ_app : ∀ A (a : A) n,
+  repeat a (S n) = repeat a n ++ [a].
+Proof.
+intros A *.
+induction n; [ easy | ].
+now cbn; f_equal.
+Qed.
+
+Theorem List_rev_repeat : ∀ A (a : A) n, rev (repeat a n) = repeat a n.
+Proof.
+intros.
+induction n; [ easy | ].
+rewrite List_repeat_succ_app at 2; cbn.
+now rewrite IHn.
+Qed.
+
 Theorem List_app_cons : ∀ A (l1 l2 : list A) a,
   l1 ++ a :: l2 = l1 ++ [a] ++ l2.
 Proof. easy. Qed.
