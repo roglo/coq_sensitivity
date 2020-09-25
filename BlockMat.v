@@ -3697,8 +3697,7 @@ do 2 rewrite <- polyn_add_assoc.
 now rewrite (polyn_add_comm R).
 Qed.
 
-...
-
+(*
 Theorem find_polyn_deg_eq_compat : ∀ f g n,
   (∀ i, i < n → f i = g i)
   → find_polyn_deg f n = find_polyn_deg g n.
@@ -3710,35 +3709,39 @@ destruct (srng_eq_dec (f n) 0%Srng) as [Hfz| Hfz]; [ | easy ].
 apply IHn; intros i Hi.
 now apply Hfg, Nat.lt_lt_succ_r.
 Qed.
+*)
+
+Theorem polyn_list_mul_comm : ∀ la lb,
+  polyn_list_mul la lb = polyn_list_mul lb la.
+Proof.
+intros la lb.
+unfold polyn_list_mul.
+rewrite (Nat.add_comm (length lb)).
+apply map_ext.
+intros i.
+unfold so.
+rewrite srng_summation_rtl.
+apply srng_summation_eq_compat.
+intros j Hj.
+rewrite srng_mul_comm.
+rewrite Nat.add_0_r.
+now replace (i - (i - j)) with j by flia Hj.
+Qed.
 
 Theorem polyn_mul_comm : ∀ P Q, (P * Q = Q * P)%P.
 Proof.
 intros.
 unfold polyn_mul.
-assert (H : ∀ i,
-  (Σ (j = 0, i), polyn_coeff P j * polyn_coeff Q (i - j))%Rng =
-  (Σ (j = 0, i), polyn_coeff Q j * polyn_coeff P (i - j))%Rng). {
-  intros i.
-  rewrite srng_summation_rtl.
-  apply srng_summation_eq_compat.
-  intros j Hj.
-  rewrite Nat.add_0_r.
-  replace (i - (i - j)) with j by flia Hj.
-  apply srng_mul_comm.
-}
-apply polyn_eq. {
-  rewrite (Nat.add_comm (polyn_deg_ub Q)).
-  cbn - [ "-" seq ].
-  apply find_polyn_deg_eq_compat.
-  intros i Hi; apply H.
-}
-intros i Hi; apply H.
+apply polyn_eq.
+f_equal; f_equal.
+apply polyn_list_mul_comm.
 Qed.
 
 Theorem polyn_mul_1_l : ∀ P, (1 * P)%P = P.
 Proof.
 intros.
 unfold polyn_mul.
+...
 apply polyn_eq. {
   cbn - [ "-" seq ].
   rewrite Nat.sub_succ, Nat.sub_0_r.
