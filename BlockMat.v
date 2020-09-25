@@ -3826,6 +3826,23 @@ induction la as [| a]; intros; cbn. {
       rewrite Nat.min_l in Hnc; [ | flia Hcx ].
       rewrite Nat.max_l in Hnc; [ | flia Hcx ].
       rewrite Nat.max_l in Hnc; [ | flia Hcx ].
+      rewrite Nat.add_sub_assoc in Hnc; [ | flia Hcx ].
+      rewrite Nat.add_comm, Nat.add_sub in Hnc.
+      destruct Hnc as (H1 & H2 & H3).
+      clear nc H3.
+      rewrite polyn_list_add_app_r in Hlt.
+      rewrite rev_length in Hlt.
+      rewrite rev_app_distr in Hlt.
+      rewrite strip_heading_0s_app in Hlt.
+      remember
+        (strip_heading_0s (rev (polyn_list_add (skipn (length ly) lb) [y])))
+        as lu eqn:Hlu.
+      symmetry in Hlu.
+      destruct lu as [| u]. {
+        apply eq_strip_heading_0s_nil in Hlu.
+        destruct Hlu as (n, Hlu).
+        apply List_eq_rev_l in Hlu.
+        rewrite List_rev_repeat in Hlu.
 ...
         rewrite polyn_list_add_comm in H2; cbn in H2.
 ...
