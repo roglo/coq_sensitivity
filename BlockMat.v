@@ -3625,309 +3625,79 @@ destruct lb as [| b]; [ easy | cbn ].
 f_equal; apply IHla.
 Qed.
 
-Theorem polyn_add_add_swap : ∀ P Q R, (P + Q + R = P + R + Q)%P.
+Theorem norm_list_as_polyn_add_idemp_l : ∀ la lb,
+  norm_list_as_polyn (polyn_list_add (norm_list_as_polyn la) lb) =
+  norm_list_as_polyn (polyn_list_add la lb).
 Proof.
-intros (la, Pa) (lb, Pb) (lc, Pc).
-apply polyn_eq; cbn; f_equal.
-revert lb lc Pb Pc.
-induction la as [| a]; intros; cbn. {
-  rewrite (polyn_list_add_comm _ lb).
-  rewrite (polyn_list_add_comm _ lc).
-  destruct lb as [| b]; cbn. {
-    rewrite polyn_list_add_0_r.
-    rewrite rev_involutive.
-    symmetry.
-    apply strip_0s_idemp.
-  }
-  destruct lc as [| c]; cbn. {
-    rewrite rev_involutive.
-    apply strip_0s_idemp.
-  }
-  move c before b.
-  rewrite (strip_0s_app (rev lb)).
-  rewrite (strip_0s_app (rev lc)).
-  remember (strip_0s (rev lb)) as lx eqn:Hlx.
-  remember (strip_0s (rev lc)) as ly eqn:Hly.
-  move ly before lx.
-  symmetry in Hlx, Hly.
-  destruct lx as [| x]. {
-    cbn.
-    apply eq_strip_0s_nil in Hlx.
-    destruct Hlx as (nb, Hnb).
-    apply List_eq_rev_l in Hnb.
-    rewrite List_rev_repeat in Hnb.
-    subst lb.
-    destruct (srng_eq_dec b 0) as [Hbz| Hbz]. {
-      subst b; cbn.
-      destruct ly as [| y]. {
-        apply eq_strip_0s_nil in Hly.
-        destruct Hly as (nc, Hnc).
-        apply List_eq_rev_l in Hnc.
-        rewrite List_rev_repeat in Hnc.
-        subst lc; cbn.
-        rewrite List_rev_repeat.
-        destruct (srng_eq_dec c 0) as [Hcz| Hcz]. {
-          subst c; cbn.
-          rewrite List_rev_repeat.
-          do 2 rewrite <- List_repeat_succ_app.
-          now do 2 rewrite strip_0s_repeat_0s.
-        }
-        cbn.
-        rewrite polyn_list_add_0_r.
-        rewrite srng_add_0_l.
-        rewrite List_rev_repeat.
-        do 2 rewrite strip_0s_app.
-        now do 2 rewrite strip_0s_repeat_0s.
-      }
-      cbn.
-      rewrite rev_unit; cbn.
-      rewrite srng_add_0_l.
-      rewrite strip_0s_app.
-      rewrite Hly.
-      rewrite strip_0s_app; cbn.
-      rewrite polyn_list_add_repeat_0s_l.
-      rewrite rev_app_distr.
-      rewrite List_rev_repeat.
-      rewrite app_length.
-      rewrite rev_length; cbn.
-      rewrite rev_app_distr.
-      rewrite rev_involutive; cbn.
-      rewrite strip_0s_app.
-      rewrite strip_0s_repeat_0s.
-      cbn.
-      destruct (srng_eq_dec y 0) as [Hyz| Hyz]; [ | easy ].
-      subst y.
-      now apply neq_strip_0s_cons_0 in Hly.
-    }
-    cbn.
-    rewrite polyn_list_add_0_r.
-    rewrite strip_0s_app.
-    rewrite Hly; cbn.
-    destruct ly as [| y]. {
-      destruct (srng_eq_dec (c + b) 0) as [Hcbz| Hcbz]. {
-        destruct (srng_eq_dec c 0) as [Hcz| Hcz]. {
-          cbn; subst c.
-          now rewrite srng_add_0_l in Hcbz.
-        }
-        cbn.
-        rewrite srng_add_comm, Hcbz.
-        rewrite polyn_list_add_0_r.
-        rewrite List_rev_repeat.
-        rewrite strip_0s_app.
-        rewrite strip_0s_repeat_0s; cbn.
-        now destruct (srng_eq_dec 0 0).
-      }
-      destruct (srng_eq_dec c 0) as [Hcz| Hcz]. {
-        cbn; subst c.
-        rewrite List_rev_repeat.
-        rewrite strip_0s_app.
-        rewrite strip_0s_repeat_0s; cbn.
-        destruct (srng_eq_dec b 0); [ easy | ].
-        now rewrite srng_add_0_l.
-      }
-      cbn.
-      rewrite polyn_list_add_0_r.
-      rewrite List_rev_repeat.
-      rewrite strip_0s_app.
-      rewrite strip_0s_repeat_0s; cbn.
-      rewrite srng_add_comm in Hcbz.
-      rewrite srng_add_comm at 1.
-      now destruct (srng_eq_dec (b + c) 0).
-    }
-    cbn.
-    rewrite rev_app_distr; cbn.
-    rewrite polyn_list_add_repeat_0s_l; cbn.
-    rewrite app_length, rev_length.
-    do 2 rewrite rev_app_distr; cbn.
-    rewrite rev_involutive.
-    rewrite List_rev_repeat.
-    do 2 rewrite strip_0s_app; cbn.
-    rewrite strip_0s_repeat_0s.
-    rewrite srng_add_comm.
-    destruct (srng_eq_dec y 0) as [Hyz| Hyz]; [ | easy ].
-    subst y.
-    now apply neq_strip_0s_cons_0 in Hly.
-  }
-  rewrite app_comm_cons.
-  rewrite rev_app_distr; cbn.
-  rewrite strip_0s_app.
-  destruct ly as [| y]. {
-    apply eq_strip_0s_nil in Hly.
-    destruct Hly as (nc, Hnc).
-    apply List_eq_rev_l in Hnc.
-    rewrite List_rev_repeat in Hnc; subst lc; cbn.
-    rewrite polyn_list_add_repeat_0s_l.
-    rewrite app_length, rev_length; cbn.
-    do 2 rewrite rev_app_distr; cbn.
-    rewrite strip_0s_app.
-    rewrite List_rev_repeat.
-    rewrite strip_0s_repeat_0s; cbn.
-    rewrite rev_involutive.
-    destruct (srng_eq_dec x 0) as [Hxz| Hxz]. {
-      subst x.
-      now apply neq_strip_0s_cons_0 in Hlx.
-    }
-    destruct (srng_eq_dec c 0) as [Hcz| Hcz]. {
-      subst c; cbn.
-      rewrite srng_add_0_l.
-      rewrite strip_0s_app; cbn.
-      now rewrite Hlx.
-    }
-    cbn.
-    rewrite polyn_list_add_0_r.
-    rewrite strip_0s_app.
-    rewrite Hlx.
-    now rewrite srng_add_comm.
+intros.
+unfold norm_list_as_polyn; f_equal.
+revert la.
+induction lb as [| b]; intros. {
+  do 2 rewrite polyn_list_add_0_r.
+  now rewrite rev_involutive, strip_0s_idemp.
+}
+cbn.
+destruct la as [| a]; [ easy | cbn ].
+do 2 rewrite strip_0s_app; cbn.
+rewrite <- IHlb.
+remember (strip_0s (rev la)) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| c]. {
+  cbn.
+  destruct (srng_eq_dec a 0) as [Haz| Haz]. {
+    subst a; rewrite srng_add_0_l; cbn.
+    now rewrite strip_0s_app.
   }
   cbn.
-  move x before c; move y before x.
-  rewrite rev_app_distr; cbn.
-  rewrite (srng_add_comm c).
-  rewrite strip_0s_app.
-  remember (strip_0s (rev (polyn_list_add lc (rev lx ++ [x])))) as lz
-    eqn:Hlz.
-  remember (strip_0s (rev (polyn_list_add lb (rev ly ++ [y])))) as lt
-    eqn:Hlt.
-  move lz before ly; move lt before lz.
-  symmetry in Hlz, Hlt.
-  destruct lz as [| z]. {
-    apply eq_strip_0s_nil in Hlz.
-    destruct Hlz as (nc, Hnc).
-    apply List_eq_rev_l in Hnc.
-    rewrite List_rev_repeat in Hnc.
-    destruct lt as [| t]; [ easy | ].
-    destruct (srng_eq_dec (b + c) 0) as [Hbcz| Hbcz]. {
-      exfalso.
-      rewrite polyn_list_add_app_r in Hnc.
-      cbn in Hnc.
-      apply List_eq_app_repeat in Hnc.
-      do 2 rewrite polyn_list_add_length in Hnc.
-      cbn in Hnc.
-      rewrite firstn_length in Hnc.
-      rewrite skipn_length in Hnc.
-      rewrite rev_length in Hnc.
-      remember (rev lc) as lc'.
-      symmetry in Heqlc'.
-      apply List_eq_rev_l in Heqlc'.
-      subst lc.
-      rename lc' into lc.
-      rewrite skipn_rev in Hnc.
-      rewrite rev_length in Hnc.
-      destruct (le_dec (length lc) (length lx)) as [Hcx| Hcx]. {
-        rewrite (proj2 (Nat.sub_0_le _ _)) in Hnc; [ | easy ].
-        cbn in Hnc.
-        destruct Hnc as (H1 & H2 & H3).
-        injection H2; clear H2; intros; subst x.
-        now apply neq_strip_0s_cons_0 in Hlx.
-      }
-      apply Nat.nle_gt in Hcx.
-      rewrite Nat.min_l in Hnc; [ | flia Hcx ].
-      rewrite Nat.max_l in Hnc; [ | flia Hcx ].
-      rewrite Nat.max_l in Hnc; [ | flia Hcx ].
-      rewrite Nat.add_sub_assoc in Hnc; [ | flia Hcx ].
-      rewrite Nat.add_comm, Nat.add_sub in Hnc.
-      destruct Hnc as (H1 & H2 & H3).
-      clear nc H3.
-      rewrite polyn_list_add_app_r in Hlt.
-      rewrite rev_length in Hlt.
-      rewrite rev_app_distr in Hlt.
-      rewrite strip_0s_app in Hlt.
-      remember
-        (strip_0s (rev (polyn_list_add (skipn (length ly) lb) [y])))
-        as lu eqn:Hlu.
-      symmetry in Hlu.
-      destruct lu as [| u]. {
-        apply eq_strip_0s_nil in Hlu.
-        destruct Hlu as (n, Hlu).
-        apply List_eq_rev_l in Hlu.
-        rewrite List_rev_repeat in Hlu.
-cbn in Pa, Pb, Pc.
-        destruct lb as [| b1]; [ easy | ].
-cbn in Pb.
-rewrite rev_length in Pc.
-        remember (length ly) as ylen eqn:Hylen.
-        symmetry in Hylen.
-        destruct ylen; cbn in Hlu. {
-          cbn in Hlt.
-          apply length_zero_iff_nil in Hylen.
-          now subst ly.
-        }
-cbn in *.
-...
-        rewrite polyn_list_add_comm in H2; cbn in H2.
-...
-        replace x with (@srng_zero T so) in Hlx. {
-          now apply neq_strip_0s_cons_0 in Hlx.
-        }
-        destruct (skipn (length lx) lc); [ now injection H2 | ].
-        cbn in H2.
-...
-Search (polyn_list_add _ _ = repeat _ _).
-Search (max _ _ + max _ _).
-...
-      specialize (Nat.min_max_distr) as H.
-      specialize (H (length lx) (length lc) (length lx)).
-      rewrite Nat.min_id in H.
-      rewrite <- H in Hnc.
-...
+  now rewrite strip_0s_app.
+}
+cbn.
+rewrite rev_app_distr; cbn.
+now rewrite strip_0s_app.
+Qed.
 
-Theorem polyn_add_assoc : ∀ P Q R, (P + (Q + R) = ((P + Q) + R))%P.
+Theorem norm_list_as_polyn_add_idemp_r : ∀ la lb,
+  norm_list_as_polyn (polyn_list_add la (norm_list_as_polyn lb)) =
+  norm_list_as_polyn (polyn_list_add la lb).
+Proof.
+intros.
+rewrite polyn_list_add_comm.
+rewrite norm_list_as_polyn_add_idemp_l.
+now rewrite polyn_list_add_comm.
+Qed.
+
+Theorem polyn_list_add_assoc : ∀ la lb lc,
+  polyn_list_add la (polyn_list_add lb lc) =
+  polyn_list_add (polyn_list_add la lb) lc.
+Proof.
+intros.
+revert lb lc.
+induction la; intros; [ easy | ].
+destruct lb; [ easy | cbn ].
+destruct lc; [ easy | cbn ].
+rewrite srng_add_assoc.
+f_equal.
+apply IHla.
+Qed.
+
+Theorem polyn_add_assoc : ∀ P Q R, (P + (Q + R) = (P + Q) + R)%P.
 Proof.
 intros (la, Pa) (lb, Pb) (lc, Pc).
-apply polyn_eq; cbn; f_equal.
-clear Pa Pb Pc.
-revert la lc.
-...
-apply polyn_eq; [ cbn; apply Nat.max_assoc | ].
-intros i Hi; cbn in Hi |-*.
-unfold "+"%P.
-unfold polyn_coeff; cbn.
-remember (polyn_deg_ub P) as pd eqn:Hpd.
-remember (polyn_deg_ub Q) as qd eqn:Hqd.
-remember (polyn_deg_ub R) as rd eqn:Hrd.
-move qd before pd; move rd before qd.
-destruct (lt_dec i pd) as [Hip| Hip]. {
-  destruct (lt_dec i (max pd qd)) as [Hipq| Hipq]. 2: {
-    exfalso; apply Hipq.
-    apply Nat.max_lt_iff.
-    now left.
-  }
-  destruct (lt_dec i qd) as [Hiq| Hiq]. {
-    destruct (lt_dec i (max qd rd)) as [Hiqr| Hiqr]. 2: {
-      exfalso; apply Hiqr.
-      apply Nat.max_lt_iff.
-      now left.
-    }
-    apply srng_add_assoc.
-  } {
-    rewrite srng_add_0_r.
-    destruct (lt_dec i rd) as [Hir| Hir]. {
-      destruct (lt_dec i (max qd rd)) as [Hiqr| Hiqr]. 2: {
-        exfalso; apply Hiqr.
-        apply Nat.max_lt_iff.
-        now right.
-      }
-      now rewrite srng_add_0_l.
-    } {
-      rewrite srng_add_0_r.
-      now destruct (lt_dec i (max qd rd)).
-    }
-  }
-} {
-  do 2 rewrite srng_add_0_l.
-  apply Nat.max_lt_iff in Hi.
-  destruct Hi as [Hi| Hi]; [ easy | ].
-  destruct (lt_dec i (max qd rd)) as [Hqr| Hqr]; [ | easy ].
-  clear Hqr.
-  destruct (lt_dec i qd) as [Hiq| Hiq]. {
-    destruct (lt_dec i (max pd qd)) as [Hipq| Hipq]; [ easy | ].
-    exfalso; apply Hipq.
-    now apply Nat.max_lt_iff; right.
-  } {
-    now destruct (lt_dec i (max pd qd)).
-  }
-}
+apply polyn_eq.
+cbn - [ polyn_list_add ].
+rewrite norm_list_as_polyn_add_idemp_l.
+rewrite norm_list_as_polyn_add_idemp_r.
+f_equal.
+apply polyn_list_add_assoc.
 Qed.
+
+Theorem polyn_add_add_swap : ∀ P Q R, (P + Q + R = P + R + Q)%P.
+Proof.
+intros.
+do 2 rewrite <- polyn_add_assoc.
+now rewrite (polyn_add_comm R).
+Qed.
+
+...
 
 Theorem find_polyn_deg_eq_compat : ∀ f g n,
   (∀ i, i < n → f i = g i)
