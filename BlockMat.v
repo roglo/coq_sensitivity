@@ -3534,6 +3534,14 @@ specialize (IHla Hla) as (n, Hn).
 now exists (S n); cbn; subst la.
 Qed.
 
+Theorem remove_heading_0s_repeat_0s : ∀ n,
+  remove_heading_0s (repeat 0%Srng n) = [].
+Proof.
+intros.
+induction n; [ easy | cbn ].
+now destruct (srng_eq_dec 0%Srng 0%Srng).
+Qed.
+
 Theorem polyn_add_add_swap : ∀ P Q R, (P + Q + R = P + R + Q)%P.
 Proof.
 intros (la, Pa) (lb, Pb) (lc, Pc).
@@ -3543,8 +3551,7 @@ revert lb lc.
 induction la as [| a]; intros; cbn. {
   rewrite (polyn_list_add_comm _ lb).
   rewrite (polyn_list_add_comm _ lc).
-  revert lc.
-  induction lb as [| b]; intros; cbn. {
+  destruct lb as [| b]; cbn. {
     rewrite polyn_list_add_0_r.
     rewrite rev_involutive.
     symmetry.
@@ -3561,7 +3568,7 @@ induction la as [| a]; intros; cbn. {
   move y before x.
   symmetry in Hx, Hy.
   destruct x as [| x1]. {
-    cbn in IHlb; cbn.
+    cbn.
     apply eq_remove_heading_0s_nil in Hx.
     destruct Hx as (nb, Hnb).
     apply List_eq_rev_l in Hnb.
@@ -3579,6 +3586,30 @@ induction la as [| a]; intros; cbn. {
         destruct (srng_eq_dec c 0%Srng) as [Hcz| Hcz]. {
           subst c; cbn.
           rewrite List_rev_repeat.
+          do 2 rewrite <- List_repeat_succ_app.
+          now do 2 rewrite remove_heading_0s_repeat_0s.
+        }
+        cbn.
+        rewrite polyn_list_add_0_r.
+        rewrite srng_add_0_l.
+        rewrite List_rev_repeat.
+        do 2 rewrite remove_heading_0s_app.
+        now do 2 rewrite remove_heading_0s_repeat_0s.
+      }
+      cbn.
+      rewrite rev_unit; cbn.
+      rewrite srng_add_0_l.
+      rewrite remove_heading_0s_app.
+      rewrite Hy.
+      rewrite remove_heading_0s_app; cbn.
+...
+Theorem polyn_list_add_repeat_0s_l : ∀ n la,
+  polyn_list_add (repeat 0%Srng n) la = la.
+Proof.
+intros.
+induction n; [ easy | cbn ].
+destruct la as [| a]; cbn.
+(* ah bin non *)
 ...
 
 Theorem polyn_add_assoc : ∀ P Q R, (P + (Q + R) = ((P + Q) + R))%P.
