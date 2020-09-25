@@ -3805,7 +3805,32 @@ induction la as [| a]; intros; cbn. {
       apply List_eq_app_repeat in Hnc.
       do 2 rewrite polyn_list_add_length in Hnc.
       cbn in Hnc.
-      destruct Hnc as (H1 & H2 & H3).
+      rewrite firstn_length in Hnc.
+      rewrite skipn_length in Hnc.
+      rewrite rev_length in Hnc.
+      destruct (le_dec (length lc) (length lx)) as [Hcx| Hcx]. {
+        rewrite (proj2 (Nat.sub_0_le _ _)) in Hnc; [ | easy ].
+        cbn in Hnc.
+        rewrite Nat.min_r in Hnc; [ | easy ].
+        rewrite Nat.max_r in Hnc; [ | easy ].
+        destruct Hnc as (H1 & H2 & H3).
+        subst nc.
+...
+        rewrite polyn_list_add_comm in H2; cbn in H2.
+...
+        replace x with (@srng_zero T so) in Hlx. {
+          now apply neq_strip_heading_0s_cons_0 in Hlx.
+        }
+        destruct (skipn (length lx) lc); [ now injection H2 | ].
+        cbn in H2.
+...
+Search (polyn_list_add _ _ = repeat _ _).
+Search (max _ _ + max _ _).
+...
+      specialize (Nat.min_max_distr) as H.
+      specialize (H (length lx) (length lc) (length lx)).
+      rewrite Nat.min_id in H.
+      rewrite <- H in Hnc.
 ...
 
 Theorem polyn_add_assoc : ∀ P Q R, (P + (Q + R) = ((P + Q) + R))%P.
