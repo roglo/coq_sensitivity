@@ -3830,6 +3830,7 @@ induction la as [| a]; intros; cbn. {
       rewrite Nat.add_comm, Nat.add_sub in Hnc.
       destruct Hnc as (H1 & H2 & H3).
       clear nc H3.
+...
       rewrite polyn_list_add_app_r in Hlt.
       rewrite rev_length in Hlt.
       rewrite rev_app_distr in Hlt.
@@ -3852,6 +3853,7 @@ induction la as [| a]; intros; cbn. {
           apply length_zero_iff_nil in Hylen.
           now subst ly.
         }
+cbn in Hlt.
 ...
         rewrite polyn_list_add_comm in H2; cbn in H2.
 ...
