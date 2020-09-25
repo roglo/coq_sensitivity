@@ -3741,7 +3741,38 @@ Theorem polyn_mul_1_l : ∀ P, (1 * P)%P = P.
 Proof.
 intros.
 unfold polyn_mul.
+apply polyn_eq.
+cbn - [ seq ].
+destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | ].
+clear H.
+unfold polyn_list_mul.
+cbn - [ seq "-" nth ].
+rewrite Nat.sub_succ, Nat.sub_0_r.
+remember (polyn_list P) as la eqn:Hla.
+clear Hla.
 ...
+unfold norm_list_as_polyn.
+rewrite <- map_rev.
+symmetry; apply List_eq_rev_l; symmetry.
+induction la as [| a]; [ easy | ].
+cbn - [ seq "-" nth ].
+rewrite List_seq_succ_r.
+cbn - [ seq "-" nth ].
+rewrite rev_app_distr.
+rewrite map_app.
+rewrite strip_0s_app.
+cbn - [ seq "-" nth ].
+...
+rewrite map_app.
+Search (norm_list_as_polyn (_ ++ _)).
+unfold norm_list_as_polyn.
+rewrite rev_app_distr.
+...
+rewrite norm_list_as_polyn_app.
+...
+
+intros.
+unfold polyn_mul.
 apply polyn_eq. {
   cbn - [ "-" seq ].
   rewrite Nat.sub_succ, Nat.sub_0_r.
