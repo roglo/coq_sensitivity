@@ -3241,13 +3241,13 @@ Existing Instance so.
 
 (* normalize a list, i.e. remove all trailing 0s *)
 
-Fixpoint strip_heading_0s l :=
+Fixpoint strip_0s l :=
   match l with
   | [] => []
-  | a :: l' => if srng_eq_dec a 0%Srng then strip_heading_0s l' else l
+  | a :: l' => if srng_eq_dec a 0%Srng then strip_0s l' else l
   end.
 
-Definition norm_list_as_polyn l := rev (strip_heading_0s (rev l)).
+Definition norm_list_as_polyn l := rev (strip_0s (rev l)).
 
 (* polynomial from and to a list *)
 
@@ -3488,9 +3488,9 @@ rewrite rev_length, Nat.sub_diag in Pa; cbn in Pa.
 now destruct (srng_eq_dec 0%Srng 0%Srng).
 Qed.
 
-Theorem strip_heading_0s_idemp : ∀ la,
-  strip_heading_0s (strip_heading_0s la) =
-  strip_heading_0s la.
+Theorem strip_0s_idemp : ∀ la,
+  strip_0s (strip_0s la) =
+  strip_0s la.
 Proof.
 intros.
 induction la as [| a]; [ easy | cbn ].
@@ -3498,15 +3498,15 @@ destruct (srng_eq_dec a 0%Srng) as [Haz| Haz]; [ easy | cbn ].
 now destruct (srng_eq_dec a 0%Srng).
 Qed.
 
-Theorem strip_heading_0s_app : ∀ la lb,
-  strip_heading_0s (la ++ lb) =
-    match strip_heading_0s la with
-    | [] => strip_heading_0s lb
+Theorem strip_0s_app : ∀ la lb,
+  strip_0s (la ++ lb) =
+    match strip_0s la with
+    | [] => strip_0s lb
     | a :: la' => a :: la' ++ lb
     end.
 Proof.
 intros.
-remember (strip_heading_0s la) as lc eqn:Hlc; symmetry in Hlc.
+remember (strip_0s la) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as [| c]. {
   induction la as [| a]; [ easy | ].
   cbn in Hlc |-*.
@@ -3524,8 +3524,8 @@ destruct (srng_eq_dec a 0%Srng) as [H| H]; [ easy | clear H ].
 now injection Hlc; clear Hlc; intros; subst c lc.
 Qed.
 
-Theorem eq_strip_heading_0s_nil : ∀ la,
-  strip_heading_0s la = [] → ∃ n, la = repeat 0%Srng n.
+Theorem eq_strip_0s_nil : ∀ la,
+  strip_0s la = [] → ∃ n, la = repeat 0%Srng n.
 Proof.
 intros * Hla.
 induction la as [| a]; [ now exists 0 | ].
@@ -3536,8 +3536,8 @@ specialize (IHla Hla) as (n, Hn).
 now exists (S n); cbn; subst la.
 Qed.
 
-Theorem strip_heading_0s_repeat_0s : ∀ n,
-  strip_heading_0s (repeat 0%Srng n) = [].
+Theorem strip_0s_repeat_0s : ∀ n,
+  strip_0s (repeat 0%Srng n) = [].
 Proof.
 intros.
 induction n; [ easy | cbn ].
@@ -3555,8 +3555,8 @@ rewrite srng_add_0_l; f_equal.
 apply IHn.
 Qed.
 
-Theorem neq_strip_heading_0s_cons_0 : ∀ la lb,
-  strip_heading_0s la ≠ 0%Srng :: lb.
+Theorem neq_strip_0s_cons_0 : ∀ la lb,
+  strip_0s la ≠ 0%Srng :: lb.
 Proof.
 intros * Hll.
 revert lb Hll.
@@ -3640,18 +3640,18 @@ induction la as [| a]; intros; cbn. {
     rewrite polyn_list_add_0_r.
     rewrite rev_involutive.
     symmetry.
-    apply strip_heading_0s_idemp.
+    apply strip_0s_idemp.
   }
   destruct lc as [| c]; cbn. {
     rewrite rev_involutive.
-    apply strip_heading_0s_idemp.
+    apply strip_0s_idemp.
   }
   move c before b.
   cbn - [ nth ] in Pb, Pc.
-  rewrite (strip_heading_0s_app (rev lb)).
-  rewrite (strip_heading_0s_app (rev lc)).
-  remember (strip_heading_0s (rev lb)) as lx eqn:Hlx.
-  remember (strip_heading_0s (rev lc)) as ly eqn:Hly.
+  rewrite (strip_0s_app (rev lb)).
+  rewrite (strip_0s_app (rev lc)).
+  remember (strip_0s (rev lb)) as lx eqn:Hlx.
+  remember (strip_0s (rev lc)) as ly eqn:Hly.
   move ly before lx.
   symmetry in Hlx, Hly.
   destruct lx as [| x]. {
@@ -3667,22 +3667,22 @@ induction la as [| a]; intros; cbn. {
     rewrite polyn_list_add_0_r.
     rewrite rev_involutive.
     symmetry.
-    apply strip_heading_0s_idemp.
+    apply strip_0s_idemp.
   }
   destruct lc as [| c]; cbn. {
     rewrite rev_involutive.
-    apply strip_heading_0s_idemp.
+    apply strip_0s_idemp.
   }
   move c before b.
-  rewrite (strip_heading_0s_app (rev lb)).
-  rewrite (strip_heading_0s_app (rev lc)).
-  remember (strip_heading_0s (rev lb)) as lx eqn:Hlx.
-  remember (strip_heading_0s (rev lc)) as ly eqn:Hly.
+  rewrite (strip_0s_app (rev lb)).
+  rewrite (strip_0s_app (rev lc)).
+  remember (strip_0s (rev lb)) as lx eqn:Hlx.
+  remember (strip_0s (rev lc)) as ly eqn:Hly.
   move ly before lx.
   symmetry in Hlx, Hly.
   destruct lx as [| x]. {
     cbn.
-    apply eq_strip_heading_0s_nil in Hlx.
+    apply eq_strip_0s_nil in Hlx.
     destruct Hlx as (nb, Hnb).
     apply List_eq_rev_l in Hnb.
     rewrite List_rev_repeat in Hnb.
@@ -3690,7 +3690,7 @@ induction la as [| a]; intros; cbn. {
     destruct (srng_eq_dec b 0) as [Hbz| Hbz]. {
       subst b; cbn.
       destruct ly as [| y]. {
-        apply eq_strip_heading_0s_nil in Hly.
+        apply eq_strip_0s_nil in Hly.
         destruct Hly as (nc, Hnc).
         apply List_eq_rev_l in Hnc.
         rewrite List_rev_repeat in Hnc.
@@ -3700,21 +3700,21 @@ induction la as [| a]; intros; cbn. {
           subst c; cbn.
           rewrite List_rev_repeat.
           do 2 rewrite <- List_repeat_succ_app.
-          now do 2 rewrite strip_heading_0s_repeat_0s.
+          now do 2 rewrite strip_0s_repeat_0s.
         }
         cbn.
         rewrite polyn_list_add_0_r.
         rewrite srng_add_0_l.
         rewrite List_rev_repeat.
-        do 2 rewrite strip_heading_0s_app.
-        now do 2 rewrite strip_heading_0s_repeat_0s.
+        do 2 rewrite strip_0s_app.
+        now do 2 rewrite strip_0s_repeat_0s.
       }
       cbn.
       rewrite rev_unit; cbn.
       rewrite srng_add_0_l.
-      rewrite strip_heading_0s_app.
+      rewrite strip_0s_app.
       rewrite Hly.
-      rewrite strip_heading_0s_app; cbn.
+      rewrite strip_0s_app; cbn.
       rewrite polyn_list_add_repeat_0s_l.
       rewrite rev_app_distr.
       rewrite List_rev_repeat.
@@ -3722,16 +3722,16 @@ induction la as [| a]; intros; cbn. {
       rewrite rev_length; cbn.
       rewrite rev_app_distr.
       rewrite rev_involutive; cbn.
-      rewrite strip_heading_0s_app.
-      rewrite strip_heading_0s_repeat_0s.
+      rewrite strip_0s_app.
+      rewrite strip_0s_repeat_0s.
       cbn.
       destruct (srng_eq_dec y 0) as [Hyz| Hyz]; [ | easy ].
       subst y.
-      now apply neq_strip_heading_0s_cons_0 in Hly.
+      now apply neq_strip_0s_cons_0 in Hly.
     }
     cbn.
     rewrite polyn_list_add_0_r.
-    rewrite strip_heading_0s_app.
+    rewrite strip_0s_app.
     rewrite Hly; cbn.
     destruct ly as [| y]. {
       destruct (srng_eq_dec (c + b) 0) as [Hcbz| Hcbz]. {
@@ -3743,23 +3743,23 @@ induction la as [| a]; intros; cbn. {
         rewrite srng_add_comm, Hcbz.
         rewrite polyn_list_add_0_r.
         rewrite List_rev_repeat.
-        rewrite strip_heading_0s_app.
-        rewrite strip_heading_0s_repeat_0s; cbn.
+        rewrite strip_0s_app.
+        rewrite strip_0s_repeat_0s; cbn.
         now destruct (srng_eq_dec 0 0).
       }
       destruct (srng_eq_dec c 0) as [Hcz| Hcz]. {
         cbn; subst c.
         rewrite List_rev_repeat.
-        rewrite strip_heading_0s_app.
-        rewrite strip_heading_0s_repeat_0s; cbn.
+        rewrite strip_0s_app.
+        rewrite strip_0s_repeat_0s; cbn.
         destruct (srng_eq_dec b 0); [ easy | ].
         now rewrite srng_add_0_l.
       }
       cbn.
       rewrite polyn_list_add_0_r.
       rewrite List_rev_repeat.
-      rewrite strip_heading_0s_app.
-      rewrite strip_heading_0s_repeat_0s; cbn.
+      rewrite strip_0s_app.
+      rewrite strip_0s_repeat_0s; cbn.
       rewrite srng_add_comm in Hcbz.
       rewrite srng_add_comm at 1.
       now destruct (srng_eq_dec (b + c) 0).
@@ -3771,41 +3771,41 @@ induction la as [| a]; intros; cbn. {
     do 2 rewrite rev_app_distr; cbn.
     rewrite rev_involutive.
     rewrite List_rev_repeat.
-    do 2 rewrite strip_heading_0s_app; cbn.
-    rewrite strip_heading_0s_repeat_0s.
+    do 2 rewrite strip_0s_app; cbn.
+    rewrite strip_0s_repeat_0s.
     rewrite srng_add_comm.
     destruct (srng_eq_dec y 0) as [Hyz| Hyz]; [ | easy ].
     subst y.
-    now apply neq_strip_heading_0s_cons_0 in Hly.
+    now apply neq_strip_0s_cons_0 in Hly.
   }
   rewrite app_comm_cons.
   rewrite rev_app_distr; cbn.
-  rewrite strip_heading_0s_app.
+  rewrite strip_0s_app.
   destruct ly as [| y]. {
-    apply eq_strip_heading_0s_nil in Hly.
+    apply eq_strip_0s_nil in Hly.
     destruct Hly as (nc, Hnc).
     apply List_eq_rev_l in Hnc.
     rewrite List_rev_repeat in Hnc; subst lc; cbn.
     rewrite polyn_list_add_repeat_0s_l.
     rewrite app_length, rev_length; cbn.
     do 2 rewrite rev_app_distr; cbn.
-    rewrite strip_heading_0s_app.
+    rewrite strip_0s_app.
     rewrite List_rev_repeat.
-    rewrite strip_heading_0s_repeat_0s; cbn.
+    rewrite strip_0s_repeat_0s; cbn.
     rewrite rev_involutive.
     destruct (srng_eq_dec x 0) as [Hxz| Hxz]. {
       subst x.
-      now apply neq_strip_heading_0s_cons_0 in Hlx.
+      now apply neq_strip_0s_cons_0 in Hlx.
     }
     destruct (srng_eq_dec c 0) as [Hcz| Hcz]. {
       subst c; cbn.
       rewrite srng_add_0_l.
-      rewrite strip_heading_0s_app; cbn.
+      rewrite strip_0s_app; cbn.
       now rewrite Hlx.
     }
     cbn.
     rewrite polyn_list_add_0_r.
-    rewrite strip_heading_0s_app.
+    rewrite strip_0s_app.
     rewrite Hlx.
     now rewrite srng_add_comm.
   }
@@ -3813,15 +3813,15 @@ induction la as [| a]; intros; cbn. {
   move x before c; move y before x.
   rewrite rev_app_distr; cbn.
   rewrite (srng_add_comm c).
-  rewrite strip_heading_0s_app.
-  remember (strip_heading_0s (rev (polyn_list_add lc (rev lx ++ [x])))) as lz
+  rewrite strip_0s_app.
+  remember (strip_0s (rev (polyn_list_add lc (rev lx ++ [x])))) as lz
     eqn:Hlz.
-  remember (strip_heading_0s (rev (polyn_list_add lb (rev ly ++ [y])))) as lt
+  remember (strip_0s (rev (polyn_list_add lb (rev ly ++ [y])))) as lt
     eqn:Hlt.
   move lz before ly; move lt before lz.
   symmetry in Hlz, Hlt.
   destruct lz as [| z]. {
-    apply eq_strip_heading_0s_nil in Hlz.
+    apply eq_strip_0s_nil in Hlz.
     destruct Hlz as (nc, Hnc).
     apply List_eq_rev_l in Hnc.
     rewrite List_rev_repeat in Hnc.
@@ -3848,7 +3848,7 @@ induction la as [| a]; intros; cbn. {
         cbn in Hnc.
         destruct Hnc as (H1 & H2 & H3).
         injection H2; clear H2; intros; subst x.
-        now apply neq_strip_heading_0s_cons_0 in Hlx.
+        now apply neq_strip_0s_cons_0 in Hlx.
       }
       apply Nat.nle_gt in Hcx.
       rewrite Nat.min_l in Hnc; [ | flia Hcx ].
@@ -3861,13 +3861,13 @@ induction la as [| a]; intros; cbn. {
       rewrite polyn_list_add_app_r in Hlt.
       rewrite rev_length in Hlt.
       rewrite rev_app_distr in Hlt.
-      rewrite strip_heading_0s_app in Hlt.
+      rewrite strip_0s_app in Hlt.
       remember
-        (strip_heading_0s (rev (polyn_list_add (skipn (length ly) lb) [y])))
+        (strip_0s (rev (polyn_list_add (skipn (length ly) lb) [y])))
         as lu eqn:Hlu.
       symmetry in Hlu.
       destruct lu as [| u]. {
-        apply eq_strip_heading_0s_nil in Hlu.
+        apply eq_strip_0s_nil in Hlu.
         destruct Hlu as (n, Hlu).
         apply List_eq_rev_l in Hlu.
         rewrite List_rev_repeat in Hlu.
@@ -3887,7 +3887,7 @@ cbn in *.
         rewrite polyn_list_add_comm in H2; cbn in H2.
 ...
         replace x with (@srng_zero T so) in Hlx. {
-          now apply neq_strip_heading_0s_cons_0 in Hlx.
+          now apply neq_strip_0s_cons_0 in Hlx.
         }
         destruct (skipn (length lx) lc); [ now injection H2 | ].
         cbn in H2.
