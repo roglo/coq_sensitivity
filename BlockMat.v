@@ -3627,36 +3627,6 @@ Qed.
 
 Theorem polyn_add_add_swap : ∀ P Q R, (P + Q + R = P + R + Q)%P.
 Proof.
-(*
-intros (la, Pa) (lb, Pb) (lc, Pc).
-apply polyn_eq; cbn; f_equal.
-move lb before la; move lc before lb.
-revert lb lc Pb Pc.
-induction la as [| a]; intros; cbn. {
-  clear Pa.
-  rewrite (polyn_list_add_comm _ lb).
-  rewrite (polyn_list_add_comm _ lc).
-  destruct lb as [| b]; cbn. {
-    rewrite polyn_list_add_0_r.
-    rewrite rev_involutive.
-    symmetry.
-    apply strip_0s_idemp.
-  }
-  destruct lc as [| c]; cbn. {
-    rewrite rev_involutive.
-    apply strip_0s_idemp.
-  }
-  move c before b.
-  cbn - [ nth ] in Pb, Pc.
-  rewrite (strip_0s_app (rev lb)).
-  rewrite (strip_0s_app (rev lc)).
-  remember (strip_0s (rev lb)) as lx eqn:Hlx.
-  remember (strip_0s (rev lc)) as ly eqn:Hly.
-  move ly before lx.
-  symmetry in Hlx, Hly.
-  destruct lx as [| x]. {
-...
-*)
 intros (la, Pa) (lb, Pb) (lc, Pc).
 apply polyn_eq; cbn; f_equal.
 revert lb lc Pb Pc.
