@@ -3627,10 +3627,39 @@ Qed.
 
 Theorem polyn_add_add_swap : ∀ P Q R, (P + Q + R = P + R + Q)%P.
 Proof.
+(*
 intros (la, Pa) (lb, Pb) (lc, Pc).
 apply polyn_eq; cbn; f_equal.
-clear Pa Pb Pc.
-revert lb lc.
+move lb before la; move lc before lb.
+revert lb lc Pb Pc.
+induction la as [| a]; intros; cbn. {
+  clear Pa.
+  rewrite (polyn_list_add_comm _ lb).
+  rewrite (polyn_list_add_comm _ lc).
+  destruct lb as [| b]; cbn. {
+    rewrite polyn_list_add_0_r.
+    rewrite rev_involutive.
+    symmetry.
+    apply strip_heading_0s_idemp.
+  }
+  destruct lc as [| c]; cbn. {
+    rewrite rev_involutive.
+    apply strip_heading_0s_idemp.
+  }
+  move c before b.
+  cbn - [ nth ] in Pb, Pc.
+  rewrite (strip_heading_0s_app (rev lb)).
+  rewrite (strip_heading_0s_app (rev lc)).
+  remember (strip_heading_0s (rev lb)) as lx eqn:Hlx.
+  remember (strip_heading_0s (rev lc)) as ly eqn:Hly.
+  move ly before lx.
+  symmetry in Hlx, Hly.
+  destruct lx as [| x]. {
+...
+*)
+intros (la, Pa) (lb, Pb) (lc, Pc).
+apply polyn_eq; cbn; f_equal.
+revert lb lc Pb Pc.
 induction la as [| a]; intros; cbn. {
   rewrite (polyn_list_add_comm _ lb).
   rewrite (polyn_list_add_comm _ lc).
@@ -3705,7 +3734,6 @@ induction la as [| a]; intros; cbn. {
     rewrite strip_heading_0s_app.
     rewrite Hly; cbn.
     destruct ly as [| y]. {
-      clear lc Hly.
       destruct (srng_eq_dec (c + b) 0) as [Hcbz| Hcbz]. {
         destruct (srng_eq_dec c 0) as [Hcz| Hcz]. {
           cbn; subst c.
@@ -3830,7 +3858,6 @@ induction la as [| a]; intros; cbn. {
       rewrite Nat.add_comm, Nat.add_sub in Hnc.
       destruct Hnc as (H1 & H2 & H3).
       clear nc H3.
-...
       rewrite polyn_list_add_app_r in Hlt.
       rewrite rev_length in Hlt.
       rewrite rev_app_distr in Hlt.
@@ -3844,16 +3871,18 @@ induction la as [| a]; intros; cbn. {
         destruct Hlu as (n, Hlu).
         apply List_eq_rev_l in Hlu.
         rewrite List_rev_repeat in Hlu.
-        clear b Hbcz.
-        destruct lb as [| b]; [ easy | ].
+cbn in Pa, Pb, Pc.
+        destruct lb as [| b1]; [ easy | ].
+cbn in Pb.
+rewrite rev_length in Pc.
         remember (length ly) as ylen eqn:Hylen.
         symmetry in Hylen.
-        destruct ylen. cbn in Hlu. {
+        destruct ylen; cbn in Hlu. {
           cbn in Hlt.
           apply length_zero_iff_nil in Hylen.
           now subst ly.
         }
-cbn in Hlt.
+cbn in *.
 ...
         rewrite polyn_list_add_comm in H2; cbn in H2.
 ...
