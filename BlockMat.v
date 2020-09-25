@@ -3579,7 +3579,51 @@ induction lc as [| c]; intros; cbn. {
   rewrite firstn_nil, skipn_nil.
   now do 3 rewrite polyn_list_add_0_r.
 }
-...
+destruct la as [| a]; [ easy | cbn ].
+f_equal; apply IHlc.
+Qed.
+
+Theorem polyn_list_add_app_r : ∀ la lb lc,
+  polyn_list_add la (lb ++ lc) =
+  polyn_list_add (firstn (length lb) la) lb ++
+  polyn_list_add (skipn (length lb) la) lc.
+Proof.
+intros.
+do 3 rewrite polyn_list_add_comm.
+rewrite polyn_list_add_app_l.
+rewrite (polyn_list_add_comm lb).
+rewrite (polyn_list_add_comm lc).
+easy.
+Qed.
+
+Theorem List_eq_app_repeat : ∀ A la lb n (c : A),
+  la ++ lb = repeat c n
+  → la = repeat c (length la) ∧ lb = repeat c (length lb) ∧
+     length la + length lb = n.
+Proof.
+intros A * Hll.
+revert n Hll.
+induction la as [| a]; intros; cbn. {
+  cbn in Hll; subst lb; cbn.
+  now rewrite repeat_length.
+}
+destruct n; [ easy | ].
+cbn in Hll.
+injection Hll; clear Hll; intros Hll H; subst c.
+specialize (IHla n Hll).
+destruct IHla as (H1 & H2 & H3).
+now rewrite <- H1, <- H2, H3.
+Qed.
+
+Theorem polyn_list_add_length : ∀ la lb,
+  length (polyn_list_add la lb) = max (length la) (length lb).
+Proof.
+intros.
+revert lb.
+induction la as [| a]; intros; [ easy | cbn ].
+destruct lb as [| b]; [ easy | cbn ].
+f_equal; apply IHla.
+Qed.
 
 Theorem polyn_add_add_swap : ∀ P Q R, (P + Q + R = P + R + Q)%P.
 Proof.
@@ -3756,12 +3800,12 @@ induction la as [| a]; intros; cbn. {
     destruct lt as [| t]; [ easy | ].
     destruct (srng_eq_dec (b + c) 0) as [Hbcz| Hbcz]. {
       exfalso.
-...
-rewrite polyn_list_add_comm in Hnc.
-rewrite polyn_list_add_app_l in Hnc.
-cbn in Hnc.
-Search (repeat _ _ = _ ++ _).
-Search (_ ++ _ = repeat _ _).
+      rewrite polyn_list_add_app_r in Hnc.
+      cbn in Hnc.
+      apply List_eq_app_repeat in Hnc.
+      do 2 rewrite polyn_list_add_length in Hnc.
+      cbn in Hnc.
+      destruct Hnc as (H1 & H2 & H3).
 ...
 
 Theorem polyn_add_assoc : ∀ P Q R, (P + (Q + R) = ((P + Q) + R))%P.
