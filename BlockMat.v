@@ -3843,6 +3843,15 @@ induction la as [| a]; intros; cbn. {
         destruct Hlu as (n, Hlu).
         apply List_eq_rev_l in Hlu.
         rewrite List_rev_repeat in Hlu.
+        clear b Hbcz.
+        destruct lb as [| b]; [ easy | ].
+        remember (length ly) as ylen eqn:Hylen.
+        symmetry in Hylen.
+        destruct ylen. cbn in Hlu. {
+          cbn in Hlt.
+          apply length_zero_iff_nil in Hylen.
+          now subst ly.
+        }
 ...
         rewrite polyn_list_add_comm in H2; cbn in H2.
 ...
