@@ -3812,74 +3812,41 @@ destruct lc as [| c]. {
     subst a.
     rewrite Nat.sub_succ, Nat.sub_0_r.
     rewrite Nat.add_comm.
-...
     destruct lb as [| b]. {
       cbn.
       apply eq_strip_0s_nil in Hlc.
       destruct Hlc as (n, Hla).
       apply List_eq_rev_l in Hla.
       rewrite List_rev_repeat in Hla; subst la.
-      rewrite repeat_length; symmetry.
-      induction n; [ easy | ].
-      apply List_eq_rev_nil in IHn.
-      apply eq_strip_0s_nil in IHn.
-      rewrite strip_0s_app.
-      rewrite srng_mul_0_r, srng_add_0_r; cbn.
-      destruct (srng_eq_dec 0 0) as [H| H]; [ clear H | easy ].
-
+      rewrite repeat_length.
+      apply List_eq_rev_l; cbn; symmetry.
+      remember (seq 0 n) as la; clear Heqla.
+      remember (@srng_zero T so) as z.
+      replace (z :: repeat z n) with (repeat z (S n)) by easy.
+      subst z.
+      remember (S n) as m; clear n Heqm.
+      revert m.
+      induction la as [| a] using rev_ind; intros; [ easy | ].
+      rewrite map_app.
       rewrite rev_app_distr.
-...
-      rewrite Nat.sub_0_l;
-      cbn.
-      cbn - [ seq "-" nth ].
-      rewrite Nat.sub_0_l.
-cbn.
-...
-      destruct la as [| a1]; [ easy | ].
-      cbn - [ seq "-" nth ].
-      rewrite Nat.sub_0_l, Nat.add_0_r.
-      rewrite <- Nat.add_1_l.
-      rewrite seq_app, map_app.
-      rewrite norm_list_as_polyn_app.
-      cbn.
-      rewrite srng_mul_0_l.
-
-      cbn - [ seq "-" nth ].
-...
-    rewrite map_ext_in with (g := λ i, 0%Srng). 2: {
-      intros j Hj.
+      rewrite strip_0s_app.
+      rewrite IHla.
+      cbn - [ polyn_list_convol_mul ].
+      destruct (srng_eq_dec (polyn_list_convol_mul (repeat 0%Srng m) [] a) 0)
+        as [H| H]; [ easy | ].
+      exfalso; apply H.
+      unfold polyn_list_convol_mul.
       unfold so.
-      rewrite all_0_srng_summation_0; [ easy | ].
+      apply all_0_srng_summation_0.
       intros i Hi.
-      rewrite nth_overflow; [ | easy ].
-      apply srng_mul_0_l.
+      rewrite (nth_overflow []); [ | apply Nat.le_0_l ].
+      apply srng_mul_0_r.
     }
-    symmetry.
-    rewrite map_ext_in with (g := λ i, 0%Srng). 2: {
-      intros j Hj.
-      unfold so.
-      rewrite all_0_srng_summation_0; [ easy | ].
-      intros i Hi.
-      apply eq_strip_0s_nil in Hlc.
-      destruct Hlc as (n, Hla).
-      apply List_eq_rev_l in Hla.
-      rewrite List_rev_repeat in Hla.
-      subst a la.
-      unfold so.
-      replace (@nth T i (0 :: @repeat T 0 n) 0)%Rng with (@srng_zero T so). {
-        apply srng_mul_0_l.
-      }
-      clear.
-      revert i.
-      induction n; intros; cbn. {
-        destruct i; [ easy | now destruct i ].
-      }
-      destruct i; [ easy | ].
-      destruct i; [ easy | ].
-      now specialize (IHn (S i)).
-    }
-    unfold norm_list_as_polyn.
-    f_equal.
+    cbn; f_equal.
+    rewrite Nat.sub_0_r, srng_mul_0_l, srng_add_0_l.
+    rewrite strip_0s_app; cbn.
+    destruct (srng_eq_dec 0 0) as [H| H]; [ clear H | easy ].
+...
     do 2 rewrite <- map_rev.
     apply strip_0s_map_0.
   }
