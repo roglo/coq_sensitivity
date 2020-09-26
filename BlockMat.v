@@ -3742,15 +3742,27 @@ Theorem norm_list_as_polyn_mul_idemp_l : ∀ la lb,
   norm_list_as_polyn (polyn_list_mul la lb).
 Proof.
 intros.
-...
-unfold "*"%lap; cbn.
-destruct la as [| a]; [ easy | cbn ].
+unfold polyn_list_mul.
+destruct la as [| a]; [ easy | ].
+cbn - [ seq "-" nth ].
 rewrite strip_0s_app.
 remember (strip_0s (rev la)) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as [| c]. {
-  cbn.
-  destruct (rng_eq_dec a 0%Rng) as [Haz| Haz]. {
-    cbn.
+  apply eq_strip_0s_nil in Hlc.
+  destruct Hlc as (n, Hla).
+  apply List_eq_rev_l in Hla.
+  rewrite List_rev_repeat in Hla.
+  subst la.
+  rewrite repeat_length.
+  cbn - [ seq "-" nth ].
+  destruct (srng_eq_dec a 0) as [Haz| Haz]. {
+    subst a.
+    cbn - [ seq "-" nth ].
+    rewrite Nat.sub_succ, Nat.sub_0_r.
+...
+    destruct lb as [| b]. {
+      destruct n; [ easy | cbn ].
+...
     destruct lb as [| b]; [ easy | cbn ].
     rewrite lap_convol_mul_0_l; [ easy | ].
     intros i; cbn.
