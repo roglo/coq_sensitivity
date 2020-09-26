@@ -3786,137 +3786,26 @@ cbn - [ nth ] in Hla.
 destruct (srng_eq_dec (nth (length la) (a :: la) 0%Srng) 0)
   as [Hz| Hz]; [ easy | ].
 symmetry; apply List_eq_rev_l; symmetry.
-...
-Search (strip_0s).
-Search (nth (length _)).
-Search (strip_0s (rev _)).
-Search last.
-remember (length la) as len eqn:Hlen; symmetry in Hlen.
-revert a la Hlen Hz.
-induction len; intros. {
-  apply length_zero_iff_nil in Hlen; subst la.
-  cbn in Hz |-*.
-  now destruct (srng_eq_dec a 0).
-}
-cbn in Hz.
-destruct la as [| a']; [ easy | ].
-cbn in Hlen; apply Nat.succ_inj in Hlen.
-specialize (IHlen _ _ Hlen Hz) as H1.
-cbn in H1 |-*.
-...
-specialize (List_last_nth (a :: la) 0%Srng) as H1.
-replace (length (a :: la) - 1) with (length la) in H1 by (cbn; flia).
-rewrite <- H1 in Hz.
-...
-
-Theorem polyn_mul_1_l : ∀ P, (1 * P)%P = P.
-Proof.
-intros.
-unfold polyn_mul.
-apply polyn_eq.
-cbn - [ seq ].
-destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | ].
-clear H.
-unfold polyn_list_mul.
-cbn - [ seq "-" nth ].
-rewrite Nat.sub_succ, Nat.sub_0_r.
-remember (polyn_list P) as la eqn:Hla.
 clear Hla.
-...
-unfold norm_list_as_polyn.
-rewrite <- map_rev.
-symmetry; apply List_eq_rev_l; symmetry.
-induction la as [| a]; [ easy | ].
-cbn - [ seq "-" nth ].
-rewrite List_seq_succ_r.
-cbn - [ seq "-" nth ].
-rewrite rev_app_distr.
-rewrite map_app.
-rewrite strip_0s_app.
-cbn - [ seq "-" nth ].
-...
-rewrite map_app.
-Search (norm_list_as_polyn (_ ++ _)).
-unfold norm_list_as_polyn.
-rewrite rev_app_distr.
-...
-rewrite norm_list_as_polyn_app.
-...
-
-intros.
-unfold polyn_mul.
-apply polyn_eq. {
-  cbn - [ "-" seq ].
-  rewrite Nat.sub_succ, Nat.sub_0_r.
-  remember (polyn_deg_ub P) as len eqn:Hlen.
-  symmetry in Hlen.
-  revert P Hlen.
-  induction len; intros; [ easy | ].
-  cbn - [ "-" seq polyn_el ].
-  destruct
-    (srng_eq_dec
-       (Σ (j = 0, len), polyn_coeff 1%P j * polyn_coeff P (len - j))
-       0)%Srng
-    as [H| H]; [ | easy ].
-  exfalso. (* find_polyn_deg_le *)
-  destruct len. {
-    cbn in H.
-    rewrite srng_add_0_l, srng_mul_1_l in H.
-...
-Check find_polyn_deg_le.
-
-  induction (polyn_deg_ub P) as [| len]; [ easy | ].
-  cbn - [ "-" seq polyn_el ].
-  rewrite IHlen.
-  destruct
-    (srng_eq_dec
-       (Σ (j = 0, len), polyn_coeff 1%P j * polyn_coeff P (len - j))
-       0)%Srng
-    as [H| H]; [ | easy ].
-  exfalso.
-  specialize (@find_polyn_deg_eq_diag _ _ IHlen) as H1.
-  destruct H1 as [H1| H1]. {
-    subst len.
-    cbn in H, IHlen.
-
-  apply find_polyn_deg_eq_diag in IHlen.
-  destruct IHlen as [H2| H2]. {
-    subst len.
-    cbn in H.
-...
-  symmetry in H.
-...
-
-intros.
-unfold polyn_mul; cbn.
-destruct P as (f, d); cbn.
-apply polyn_eq; [ now cbn; rewrite Nat.sub_0_r | ].
-intros i Hi.
-cbn in Hi |-*.
-rewrite Nat.sub_0_r in Hi |-*.
-rewrite srng_add_0_l, srng_mul_1_l.
-unfold polyn_coeff.
-remember (polyn_el 1%P) as x.
-cbn; subst x.
-destruct (lt_dec i d) as [H| H]; [ clear H | easy ].
-clear - sp.
-transitivity (fold_left (λ c j, c) (seq 1 i) (f i)). 2: {
-  remember (f i) as x; clear Heqx.
-  induction i; [ easy | ].
-  rewrite List_seq_succ_r; cbn.
-  now rewrite fold_left_app; cbn.
-}
-apply List_fold_left_ext_in.
-intros j c Hj.
-apply in_seq in Hj.
-destruct (lt_dec j 1) as [Hj1| Hj1]; [ flia Hj Hj1 | ].
-rewrite srng_mul_0_l.
-apply srng_add_0_r.
+remember (rev (a :: la)) as lb eqn:Hlb.
+symmetry in Hlb.
+apply List_eq_rev_l in Hlb.
+rewrite Hlb in Hz.
+Search (nth _ (rev _)).
+apply (f_equal length) in Hlb.
+cbn in Hlb; rewrite rev_length in Hlb.
+rewrite rev_nth in Hz; [ | flia Hlb ].
+rewrite <- Hlb, Nat.sub_diag in Hz.
+clear Hlb.
+induction lb as [| b]; [ easy | ].
+cbn in Hz |-*.
+now destruct (srng_eq_dec b 0).
 Qed.
 
 Theorem polyn_mul_add_distr_l : ∀ P Q R, (P * (Q + R) = P * Q + P * R)%P.
 Proof.
 intros.
+...
 apply polyn_eq; cbn. {
   remember (polyn_deg_ub P) as pd eqn:Hpd.
   remember (polyn_deg_ub Q) as qd eqn:Hqd.
