@@ -3739,7 +3739,15 @@ Qed.
 
 Theorem strip_0s_map_0 : ∀ A (la lb : list A),
   strip_0s (map (λ _, 0%Srng) la) = strip_0s (map (λ _, 0%Srng) lb).
-...
+Proof.
+intros A *.
+revert lb.
+induction la as [| a]; intros; cbn. {
+  induction lb as [| b]; [ easy | cbn ].
+  now destruct (srng_eq_dec 0 0).
+}
+now destruct (srng_eq_dec 0 0).
+Qed.
 
 Theorem norm_list_as_polyn_mul_idemp_l : ∀ la lb,
   norm_list_as_polyn (polyn_list_mul (norm_list_as_polyn la) lb) =
@@ -3791,28 +3799,11 @@ destruct lc as [| c]. {
     unfold norm_list_as_polyn.
     f_equal.
     do 2 rewrite <- map_rev.
-...
-apply strip_0s_map_0.
-}
-
-...
-    destruct lb as [| b]; [ easy | cbn ].
-    rewrite lap_convol_mul_0_l; [ easy | ].
-    intros i; cbn.
-    destruct i; [ easy | ].
-    specialize (proj1 (eq_strip_0s_nil _) Hlc) as H1.
-    destruct (lt_dec i (length la)) as [Hil| Hil]. {
-      specialize (H1 (length la - S i)).
-      rewrite <- rev_length in H1.
-      rewrite <- rev_nth in H1. {
-        now rewrite rev_involutive in H1.
-      }
-      now rewrite rev_length.
-    }
-    apply Nat.nlt_ge in Hil.
-    now rewrite nth_overflow.
+    apply strip_0s_map_0.
   }
-  cbn.
+  cbn - [ seq "-" nth ].
+  do 2 rewrite Nat.sub_succ, Nat.sub_0_r.
+...
   destruct lb as [| b]; [ easy | ].
   remember (b :: lb) as ld eqn:Hld; symmetry in Hld.
   do 2 rewrite Nat.sub_0_r.
