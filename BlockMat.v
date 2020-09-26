@@ -3737,6 +3737,118 @@ f_equal; f_equal.
 apply polyn_list_mul_comm.
 Qed.
 
+Theorem norm_list_as_polyn_mul_idemp_l : ∀ la lb,
+  norm_list_as_polyn (polyn_list_mul (norm_list_as_polyn la) lb) =
+  norm_list_as_polyn (polyn_list_mul la lb).
+Proof.
+intros.
+...
+unfold "*"%lap; cbn.
+destruct la as [| a]; [ easy | cbn ].
+rewrite strip_0s_app.
+remember (strip_0s (rev la)) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| c]. {
+  cbn.
+  destruct (rng_eq_dec a 0%Rng) as [Haz| Haz]. {
+    cbn.
+    destruct lb as [| b]; [ easy | cbn ].
+    rewrite lap_convol_mul_0_l; [ easy | ].
+    intros i; cbn.
+    destruct i; [ easy | ].
+    specialize (proj1 (eq_strip_0s_nil _) Hlc) as H1.
+    destruct (lt_dec i (length la)) as [Hil| Hil]. {
+      specialize (H1 (length la - S i)).
+      rewrite <- rev_length in H1.
+      rewrite <- rev_nth in H1. {
+        now rewrite rev_involutive in H1.
+      }
+      now rewrite rev_length.
+    }
+    apply Nat.nlt_ge in Hil.
+    now rewrite nth_overflow.
+  }
+  cbn.
+  destruct lb as [| b]; [ easy | ].
+  remember (b :: lb) as ld eqn:Hld; symmetry in Hld.
+  do 2 rewrite Nat.sub_0_r.
+  rewrite fold_lap_norm.
+  rewrite (lap_convol_mul_cons_with_0_l _ la). 2: {
+    intros i.
+    specialize (proj1 (eq_strip_0s_nil _) Hlc) as H1.
+    destruct (lt_dec i (length la)) as [Hil| Hil]. {
+      specialize (H1 (length la - S i)).
+      rewrite <- rev_length in H1.
+      rewrite <- rev_nth in H1. {
+        now rewrite rev_involutive in H1.
+      }
+      now rewrite rev_length.
+    }
+    apply Nat.nlt_ge in Hil.
+    now rewrite nth_overflow.
+  }
+  rewrite Nat.add_comm.
+  apply lap_convol_mul_more; cbn.
+  now rewrite Nat.sub_0_r.
+}
+rewrite rev_app_distr; cbn.
+rewrite fold_lap_norm.
+destruct lb as [| b]; [ easy | ].
+remember (b :: lb) as d eqn:Hd.
+replace (rev lc ++ [c]) with (rev (c :: lc)) by easy.
+rewrite <- Hlc.
+rewrite fold_lap_norm.
+do 2 rewrite Nat.sub_0_r.
+clear c lc b lb Hlc Hd.
+rename d into lb.
+rewrite (lap_convol_mul_more (length la - length (lap_norm la))). 2: {
+  now cbn; rewrite Nat.sub_0_r.
+}
+rewrite (Nat.add_comm _ (length lb)).
+rewrite <- Nat.add_assoc.
+rewrite Nat.add_sub_assoc; [ | apply lap_norm_length_le ].
+rewrite (Nat.add_comm _ (length la)).
+rewrite Nat.add_sub.
+rewrite Nat.add_comm.
+apply lap_norm_cons_norm.
+now cbn; rewrite Nat.sub_0_r.
+...
+intros.
+unfold norm_list_as_polyn; f_equal.
+revert la.
+induction lb as [| b]; intros. {
+  do 2 rewrite polyn_list_add_0_r.
+  now rewrite rev_involutive, strip_0s_idemp.
+}
+cbn.
+destruct la as [| a]; [ easy | cbn ].
+do 2 rewrite strip_0s_app; cbn.
+rewrite <- IHlb.
+remember (strip_0s (rev la)) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| c]. {
+  cbn.
+  destruct (srng_eq_dec a 0) as [Haz| Haz]. {
+    subst a; rewrite srng_add_0_l; cbn.
+    now rewrite strip_0s_app.
+  }
+  cbn.
+  now rewrite strip_0s_app.
+}
+cbn.
+rewrite rev_app_distr; cbn.
+now rewrite strip_0s_app.
+Qed.
+...
+
+Theorem norm_list_as_polyn_mul_idemp_r : ∀ la lb,
+  norm_list_as_polyn (polyn_list_mul la (norm_list_as_polyn lb)) =
+  norm_list_as_polyn (polyn_list_mul la lb).
+Proof.
+intros.
+rewrite polyn_list_mul_comm.
+rewrite norm_list_as_polyn_mul_idemp_l.
+now rewrite polyn_list_mul_comm.
+Qed.
+
 Theorem polyn_of_list_mul_1_l : ∀ la,
   polyn_list_mul (polyn_list 1%P) la = la.
 Proof.
@@ -3805,6 +3917,19 @@ Qed.
 Theorem polyn_mul_add_distr_l : ∀ P Q R, (P * (Q + R) = P * Q + P * R)%P.
 Proof.
 intros.
+unfold polyn_mul.
+apply polyn_eq.
+cbn - [ polyn_list_add ].
+rewrite norm_list_as_polyn_mul_idemp_r.
+rewrite norm_list_as_polyn_add_idemp_l.
+rewrite norm_list_as_polyn_add_idemp_r.
+f_equal.
+...
+rewrite fold_lap_norm.
+rewrite lap_mul_norm_idemp_r.
+rewrite lap_add_norm_idemp_l.
+rewrite lap_add_norm_idemp_r.
+now rewrite lap_mul_add_distr_l.
 ...
 apply polyn_eq; cbn. {
   remember (polyn_deg_ub P) as pd eqn:Hpd.
