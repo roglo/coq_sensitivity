@@ -3737,6 +3737,10 @@ f_equal; f_equal.
 apply polyn_list_mul_comm.
 Qed.
 
+Theorem strip_0s_map_0 : ∀ A (la lb : list A),
+  strip_0s (map (λ _, 0%Srng) la) = strip_0s (map (λ _, 0%Srng) lb).
+...
+
 Theorem norm_list_as_polyn_mul_idemp_l : ∀ la lb,
   norm_list_as_polyn (polyn_list_mul (norm_list_as_polyn la) lb) =
   norm_list_as_polyn (polyn_list_mul la lb).
@@ -3786,7 +3790,11 @@ destruct lc as [| c]. {
     }
     unfold norm_list_as_polyn.
     f_equal.
-Search (map _ (seq _ _)).
+    do 2 rewrite <- map_rev.
+...
+apply strip_0s_map_0.
+}
+
 ...
     destruct lb as [| b]; [ easy | cbn ].
     rewrite lap_convol_mul_0_l; [ easy | ].
