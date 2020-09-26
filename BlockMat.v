@@ -3527,15 +3527,23 @@ now injection Hlc; clear Hlc; intros; subst c lc.
 Qed.
 
 Theorem eq_strip_0s_nil : ∀ la,
-  strip_0s la = [] → ∃ n, la = repeat 0%Srng n.
+  strip_0s la = [] ↔ ∃ n, la = repeat 0%Srng n.
 Proof.
-intros * Hla.
-induction la as [| a]; [ now exists 0 | ].
-cbn in Hla.
-destruct (srng_eq_dec a 0%Srng) as [Haz| Haz]; [ | easy ].
-subst a.
-specialize (IHla Hla) as (n, Hn).
-now exists (S n); cbn; subst la.
+intros.
+split. {
+  intros Hla.
+  induction la as [| a]; [ now exists 0 | ].
+  cbn in Hla.
+  destruct (srng_eq_dec a 0%Srng) as [Haz| Haz]; [ | easy ].
+  subst a.
+  specialize (IHla Hla) as (n, Hn).
+  now exists (S n); cbn; subst la.
+} {
+  intros (n, Hn).
+  subst la.
+  induction n; cbn; [ easy | ].
+  now destruct (srng_eq_dec 0 0).
+}
 Qed.
 
 Theorem strip_0s_repeat_0s : ∀ n,
@@ -3794,19 +3802,27 @@ induction la as [| a]; intros; cbn. {
 now destruct (srng_eq_dec 0 0).
 Qed.
 
-Theorem polyn_list_convol_mul_0_l : ∀ la i,
-  polyn_list_convol_mul [] la i = 0%Srng.
+Theorem polyn_list_convol_mul_0_l : ∀ n la i,
+  polyn_list_convol_mul (repeat 0%Srng n) la i = 0%Srng.
 Proof.
 intros.
 unfold polyn_list_convol_mul.
 apply all_0_srng_summation_0.
 intros j ahj.
-rewrite nth_overflow; [ | apply Nat.le_0_l ].
+remember (@srng_zero T so) as z.
+replace (nth j (repeat z n) z) with z; subst z. 2: {
+  symmetry; clear.
+  revert j.
+  induction n; intros; cbn; [ now destruct j | ].
+  destruct j; [ easy | ].
+  apply IHn.
+}
 apply srng_mul_0_l.
 Qed.
 
-Theorem map_polyn_list_convol_mul_0_l : ∀ la li,
-  map (polyn_list_convol_mul [] la) li = repeat 0%Srng (length li).
+Theorem map_polyn_list_convol_mul_0_l : ∀ n la li,
+  map (polyn_list_convol_mul (repeat 0%Srng n) la) li =
+  repeat 0%Srng (length li).
 Proof.
 intros.
 induction li as [| i]; [ easy | ].
@@ -3840,53 +3856,29 @@ destruct lc as [| c]. {
   cbn - [ seq "-" nth ].
   destruct (srng_eq_dec a 0) as [Haz| Haz]. {
     cbn - [ seq "-" nth ].
-    rewrite map_polyn_list_convol_mul_0_l.
+    rewrite (map_polyn_list_convol_mul_0_l 0).
     rewrite seq_length.
     rewrite norm_list_as_polyn_repeat_0.
-...
-    subst a.
-    rewrite Nat.sub_succ, Nat.sub_0_r.
-    rewrite Nat.add_comm.
-    destruct lb as [| b]. {
-      cbn.
-      apply eq_strip_0s_nil in Hlc.
-      destruct Hlc as (n, Hla).
-      apply List_eq_rev_l in Hla.
-      rewrite List_rev_repeat in Hla; subst la.
-      rewrite repeat_length.
-      apply List_eq_rev_l; cbn; symmetry.
-      remember (seq 0 n) as la; clear Heqla.
-      remember (@srng_zero T so) as z.
-      replace (z :: repeat z n) with (repeat z (S n)) by easy.
-      subst z.
-      remember (S n) as m; clear n Heqm.
-      revert m.
-      induction la as [| a] using rev_ind; intros; [ easy | ].
-      rewrite map_app.
-      rewrite rev_app_distr.
-      rewrite strip_0s_app.
-      rewrite IHla.
-      cbn - [ polyn_list_convol_mul ].
-      destruct (srng_eq_dec (polyn_list_convol_mul (repeat 0%Srng m) [] a) 0)
-        as [H| H]; [ easy | ].
-      exfalso; apply H.
-      unfold polyn_list_convol_mul.
-      unfold so.
-      apply all_0_srng_summation_0.
-      intros i Hi.
-      rewrite (nth_overflow []); [ | apply Nat.le_0_l ].
-      apply srng_mul_0_r.
-    }
-    cbn; f_equal.
-    rewrite Nat.sub_0_r, srng_mul_0_l, srng_add_0_l.
-    rewrite strip_0s_app; cbn.
-    destruct (srng_eq_dec 0 0) as [H| H]; [ clear H | easy ].
-...
-rewrite map_polyn_list_convol_mul_0_l.
-...
-    do 2 rewrite <- map_rev.
-    apply strip_0s_map_0.
+    cbn.
+    symmetry.
+    apply List_eq_rev_nil.
+    rewrite rev_involutive.
+    apply eq_strip_0s_nil.
+    apply eq_strip_0s_nil in Hlc.
+    destruct Hlc as (n, Hn).
+    apply List_eq_rev_l in Hn.
+    rewrite List_rev_repeat in Hn.
+    subst a la.
+    rewrite repeat_length.
+    rewrite Nat.sub_0_r.
+    exists (n + length lb).
+    symmetry.
+    apply List_eq_rev_l.
+    rewrite List_rev_repeat; symmetry.
+    rewrite (map_polyn_list_convol_mul_0_l (S n)).
+    now rewrite seq_length.
   }
+...
   cbn - [ seq "-" nth ].
   do 2 rewrite Nat.sub_succ, Nat.sub_0_r.
   rewrite Nat.add_comm.
