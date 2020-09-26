@@ -3737,6 +3737,29 @@ f_equal; f_equal.
 apply polyn_list_mul_comm.
 Qed.
 
+Theorem polyn_of_list_mul_1_l : ∀ la,
+  polyn_list_mul (polyn_list 1%P) la = la.
+Proof.
+intros.
+cbn - [ seq ].
+destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | ].
+cbn - [ seq ]; clear H.
+unfold polyn_list_mul.
+unfold length at 1.
+rewrite (Nat.add_comm 1), Nat.add_sub.
+...
+rewrite rng_mul_1_l, rng_add_0_r; f_equal.
+now rewrite lap_convol_mul_1_l.
+...
+
+Theorem polyn_mul_1_l : ∀ P, (1 * P)%P = P.
+Proof.
+intros.
+unfold polyn_mul.
+...
+rewrite polyn_of_list_mul_1_l.
+...
+
 Theorem polyn_mul_1_l : ∀ P, (1 * P)%P = P.
 Proof.
 intros.
