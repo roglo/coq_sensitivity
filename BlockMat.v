@@ -3748,20 +3748,45 @@ cbn - [ seq "-" nth ].
 rewrite strip_0s_app.
 remember (strip_0s (rev la)) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as [| c]. {
-  apply eq_strip_0s_nil in Hlc.
-  destruct Hlc as (n, Hla).
-  apply List_eq_rev_l in Hla.
-  rewrite List_rev_repeat in Hla.
-  subst la.
-  rewrite repeat_length.
   cbn - [ seq "-" nth ].
   destruct (srng_eq_dec a 0) as [Haz| Haz]. {
-    subst a.
     cbn - [ seq "-" nth ].
     rewrite Nat.sub_succ, Nat.sub_0_r.
-...
-    destruct lb as [| b]. {
-      destruct n; [ easy | cbn ].
+    rewrite map_ext_in with (g := λ i, 0%Srng). 2: {
+      intros j Hj.
+      unfold so.
+      rewrite all_0_srng_summation_0; [ easy | ].
+      intros i Hi.
+      rewrite nth_overflow; [ | easy ].
+      apply srng_mul_0_l.
+    }
+    symmetry.
+    rewrite map_ext_in with (g := λ i, 0%Srng). 2: {
+      intros j Hj.
+      unfold so.
+      rewrite all_0_srng_summation_0; [ easy | ].
+      intros i Hi.
+      apply eq_strip_0s_nil in Hlc.
+      destruct Hlc as (n, Hla).
+      apply List_eq_rev_l in Hla.
+      rewrite List_rev_repeat in Hla.
+      subst a la.
+      unfold so.
+      replace (@nth T i (0 :: @repeat T 0 n) 0)%Rng with (@srng_zero T so). {
+        apply srng_mul_0_l.
+      }
+      clear.
+      revert i.
+      induction n; intros; cbn. {
+        destruct i; [ easy | now destruct i ].
+      }
+      destruct i; [ easy | ].
+      destruct i; [ easy | ].
+      now specialize (IHn (S i)).
+    }
+    unfold norm_list_as_polyn.
+    f_equal.
+Search (map _ (seq _ _)).
 ...
     destruct lb as [| b]; [ easy | cbn ].
     rewrite lap_convol_mul_0_l; [ easy | ].
