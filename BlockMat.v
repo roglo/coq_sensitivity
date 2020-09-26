@@ -3788,6 +3788,21 @@ destruct (srng_eq_dec (nth (length la) (a :: la) 0%Srng) 0)
 symmetry; apply List_eq_rev_l; symmetry.
 Search (strip_0s).
 Search (nth (length _)).
+Search (strip_0s (rev _)).
+Search last.
+remember (length la) as len eqn:Hlen; symmetry in Hlen.
+revert a la Hlen Hz.
+induction len; intros. {
+  apply length_zero_iff_nil in Hlen; subst la.
+  cbn in Hz |-*.
+  now destruct (srng_eq_dec a 0).
+}
+cbn in Hz.
+destruct la as [| a']; [ easy | ].
+...
+specialize (List_last_nth (a :: la) 0%Srng) as H1.
+replace (length (a :: la) - 1) with (length la) in H1 by (cbn; flia).
+rewrite <- H1 in Hz.
 ...
 
 Theorem polyn_mul_1_l : ∀ P, (1 * P)%P = P.
