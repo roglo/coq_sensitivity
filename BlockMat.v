@@ -3747,6 +3747,16 @@ cbn - [ seq ]; clear H.
 unfold polyn_list_mul.
 unfold length at 1.
 rewrite (Nat.add_comm 1), Nat.add_sub.
+replace (map _ _) with (map (λ i, nth i la 0%Srng) (seq 0 (length la))). 2: {
+  apply map_ext_in.
+  intros j Hj.
+  apply in_seq in Hj.
+  unfold so.
+  rewrite srng_summation_split_first; [ | easy ].
+  unfold nth at 2.
+  rewrite srng_mul_1_l, Nat.sub_0_r.
+...
+  rewrite all_0_summation_0.
 ...
 rewrite rng_mul_1_l, rng_add_0_r; f_equal.
 now rewrite lap_convol_mul_1_l.
