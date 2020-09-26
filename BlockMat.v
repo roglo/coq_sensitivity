@@ -3367,9 +3367,11 @@ Definition polyn_sub P Q :=
 
 (* multiplication of polynomials *)
 
+Definition polyn_list_convol_mul la lb i :=
+  (Σ (j = 0, i), nth j la 0 * nth (i - j) lb 0)%Srng.
+
 Definition polyn_list_mul la lb :=
-  map (λ i, Σ (j = 0, i), nth j la 0 * nth (i - j) lb 0)%Srng
-    (seq 0 (length la + length lb - 1)).
+  map (polyn_list_convol_mul la lb) (seq 0 (length la + length lb - 1)).
 
 Definition polyn_mul P Q :=
   polyn_of_list (polyn_list_mul (polyn_list P) (polyn_list Q)).
@@ -3544,6 +3546,29 @@ induction n; [ easy | cbn ].
 now destruct (srng_eq_dec 0%Srng 0%Srng).
 Qed.
 
+Theorem norm_list_as_polyn_app : ∀ la lb,
+  norm_list_as_polyn (la ++ lb) =
+  match norm_list_as_polyn lb with
+  | [] => norm_list_as_polyn la
+  | lc => la ++ lc
+  end.
+Proof.
+intros.
+unfold norm_list_as_polyn.
+rewrite rev_app_distr.
+rewrite strip_0s_app.
+remember (strip_0s (rev lb)) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc as [| c]; [ easy | ].
+rewrite app_comm_cons.
+rewrite rev_app_distr.
+rewrite rev_involutive.
+remember (rev (c :: lc)) as ld eqn:Hld.
+symmetry in Hld.
+destruct ld as [| d]; [ | easy ].
+now apply List_eq_rev_nil in Hld.
+Qed.
+
 Theorem polyn_list_add_repeat_0s_l : ∀ n la,
   polyn_list_add (repeat 0%Srng n) la = la ++ repeat 0%Srng (n - length la).
 Proof.
@@ -3623,6 +3648,20 @@ revert lb.
 induction la as [| a]; intros; [ easy | cbn ].
 destruct lb as [| b]; [ easy | cbn ].
 f_equal; apply IHla.
+Qed.
+
+Theorem norm_list_as_polyn_involutive : ∀ la,
+  norm_list_as_polyn (norm_list_as_polyn la) = norm_list_as_polyn la.
+Proof.
+intros.
+induction la as [| a] using rev_ind; [ easy | ].
+rewrite norm_list_as_polyn_app.
+remember (norm_list_as_polyn [a]) as x eqn:Hx.
+cbn in Hx; subst x.
+destruct (srng_eq_dec a 0) as [Haz| Haz]; [ easy | ].
+cbn - [ norm_list_as_polyn ].
+rewrite norm_list_as_polyn_app; cbn.
+now destruct (srng_eq_dec a 0).
 Qed.
 
 Theorem norm_list_as_polyn_add_idemp_l : ∀ la lb,
@@ -3711,6 +3750,19 @@ now apply Hfg, Nat.lt_lt_succ_r.
 Qed.
 *)
 
+Theorem polyn_list_convol_mul_comm : ∀ la lb i,
+  polyn_list_convol_mul la lb i = polyn_list_convol_mul lb la i.
+Proof.
+intros.
+unfold polyn_list_convol_mul, so.
+rewrite srng_summation_rtl.
+apply srng_summation_eq_compat.
+intros j Hj.
+rewrite srng_mul_comm.
+rewrite Nat.add_0_r.
+now replace (i - (i - j)) with j by flia Hj.
+Qed.
+
 Theorem polyn_list_mul_comm : ∀ la lb,
   polyn_list_mul la lb = polyn_list_mul lb la.
 Proof.
@@ -3718,14 +3770,7 @@ intros la lb.
 unfold polyn_list_mul.
 rewrite (Nat.add_comm (length lb)).
 apply map_ext.
-intros i.
-unfold so.
-rewrite srng_summation_rtl.
-apply srng_summation_eq_compat.
-intros j Hj.
-rewrite srng_mul_comm.
-rewrite Nat.add_0_r.
-now replace (i - (i - j)) with j by flia Hj.
+apply polyn_list_convol_mul_comm.
 Qed.
 
 Theorem polyn_mul_comm : ∀ P Q, (P * Q = Q * P)%P.
@@ -3758,12 +3803,49 @@ unfold polyn_list_mul.
 destruct la as [| a]; [ easy | ].
 cbn - [ seq "-" nth ].
 rewrite strip_0s_app.
+rewrite rev_length.
 remember (strip_0s (rev la)) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as [| c]. {
   cbn - [ seq "-" nth ].
   destruct (srng_eq_dec a 0) as [Haz| Haz]. {
     cbn - [ seq "-" nth ].
+    subst a.
     rewrite Nat.sub_succ, Nat.sub_0_r.
+    rewrite Nat.add_comm.
+...
+    destruct lb as [| b]. {
+      cbn.
+      apply eq_strip_0s_nil in Hlc.
+      destruct Hlc as (n, Hla).
+      apply List_eq_rev_l in Hla.
+      rewrite List_rev_repeat in Hla; subst la.
+      rewrite repeat_length; symmetry.
+      induction n; [ easy | ].
+      apply List_eq_rev_nil in IHn.
+      apply eq_strip_0s_nil in IHn.
+      rewrite strip_0s_app.
+      rewrite srng_mul_0_r, srng_add_0_r; cbn.
+      destruct (srng_eq_dec 0 0) as [H| H]; [ clear H | easy ].
+
+      rewrite rev_app_distr.
+...
+      rewrite Nat.sub_0_l;
+      cbn.
+      cbn - [ seq "-" nth ].
+      rewrite Nat.sub_0_l.
+cbn.
+...
+      destruct la as [| a1]; [ easy | ].
+      cbn - [ seq "-" nth ].
+      rewrite Nat.sub_0_l, Nat.add_0_r.
+      rewrite <- Nat.add_1_l.
+      rewrite seq_app, map_app.
+      rewrite norm_list_as_polyn_app.
+      cbn.
+      rewrite srng_mul_0_l.
+
+      cbn - [ seq "-" nth ].
+...
     rewrite map_ext_in with (g := λ i, 0%Srng). 2: {
       intros j Hj.
       unfold so.
@@ -3803,6 +3885,24 @@ destruct lc as [| c]. {
   }
   cbn - [ seq "-" nth ].
   do 2 rewrite Nat.sub_succ, Nat.sub_0_r.
+  rewrite Nat.add_comm.
+  destruct lb as [| b]. {
+    destruct la as [| a1]; [ easy | ].
+    cbn - [ seq "-" nth ].
+    rewrite <- Nat.add_1_l.
+    rewrite seq_app.
+    rewrite map_app.
+...
+    unfold norm_list_as_polyn.
+    rewrite rev_app_distr.
+...
+    rewrite strip_0s_app.
+    cbn - [ "-" nth ].
+    rewrite map_ext_in with (g := λ i, 0%Srng).
+    rewrite all_0_srng_summation_0.
+
+
+  rewrite List_seq_strip_first.
 ...
   destruct lb as [| b]; [ easy | ].
   remember (b :: lb) as ld eqn:Hld; symmetry in Hld.
