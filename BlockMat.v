@@ -3853,22 +3853,22 @@ rewrite strip_0s_app.
 rewrite rev_length.
 remember (strip_0s (rev la)) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as [| c]. {
+  apply eq_strip_0s_nil in Hlc.
+  destruct Hlc as (n, Hn).
+  apply List_eq_rev_l in Hn.
+  rewrite List_rev_repeat in Hn.
+  subst la.
   cbn - [ seq "-" nth ].
   destruct (srng_eq_dec a 0) as [Haz| Haz]. {
+    subst a.
     cbn - [ seq "-" nth ].
     rewrite (map_polyn_list_convol_mul_0_l 0).
     rewrite seq_length.
-    rewrite norm_list_as_polyn_repeat_0.
-    cbn.
+    rewrite norm_list_as_polyn_repeat_0; cbn.
     symmetry.
     apply List_eq_rev_nil.
     rewrite rev_involutive.
     apply eq_strip_0s_nil.
-    apply eq_strip_0s_nil in Hlc.
-    destruct Hlc as (n, Hn).
-    apply List_eq_rev_l in Hn.
-    rewrite List_rev_repeat in Hn.
-    subst a la.
     rewrite repeat_length.
     rewrite Nat.sub_0_r.
     exists (n + length lb).
@@ -3878,27 +3878,9 @@ destruct lc as [| c]. {
     rewrite (map_polyn_list_convol_mul_0_l (S n)).
     now rewrite seq_length.
   }
-...
-  cbn - [ seq "-" nth ].
-  do 2 rewrite Nat.sub_succ, Nat.sub_0_r.
-  rewrite Nat.add_comm.
-  destruct lb as [| b]. {
-    destruct la as [| a1]; [ easy | ].
-    cbn - [ seq "-" nth ].
-    rewrite <- Nat.add_1_l.
-    rewrite seq_app.
-    rewrite map_app.
-...
-    unfold norm_list_as_polyn.
-    rewrite rev_app_distr.
-...
-    rewrite strip_0s_app.
-    cbn - [ "-" nth ].
-    rewrite map_ext_in with (g := λ i, 0%Srng).
-    rewrite all_0_srng_summation_0.
-
-
-  rewrite List_seq_strip_first.
+  rewrite Nat.sub_succ, Nat.sub_0_r.
+  rewrite Nat.sub_succ, Nat.sub_0_r.
+  rewrite repeat_length; cbn.
 ...
   destruct lb as [| b]; [ easy | ].
   remember (b :: lb) as ld eqn:Hld; symmetry in Hld.
