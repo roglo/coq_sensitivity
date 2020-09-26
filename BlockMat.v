@@ -3794,6 +3794,37 @@ induction la as [| a]; intros; cbn. {
 now destruct (srng_eq_dec 0 0).
 Qed.
 
+Theorem polyn_list_convol_mul_0_l : ∀ la i,
+  polyn_list_convol_mul [] la i = 0%Srng.
+Proof.
+intros.
+unfold polyn_list_convol_mul.
+apply all_0_srng_summation_0.
+intros j ahj.
+rewrite nth_overflow; [ | apply Nat.le_0_l ].
+apply srng_mul_0_l.
+Qed.
+
+Theorem map_polyn_list_convol_mul_0_l : ∀ la li,
+  map (polyn_list_convol_mul [] la) li = repeat 0%Srng (length li).
+Proof.
+intros.
+induction li as [| i]; [ easy | ].
+cbn - [ polyn_list_convol_mul ].
+rewrite IHli; f_equal.
+apply polyn_list_convol_mul_0_l.
+Qed.
+
+Theorem norm_list_as_polyn_repeat_0 : ∀ n,
+  norm_list_as_polyn (repeat 0%Srng n) = [].
+Proof.
+intros.
+induction n; [ easy | ].
+rewrite List_repeat_succ_app.
+rewrite norm_list_as_polyn_app; cbn.
+now destruct (srng_eq_dec 0 0).
+Qed.
+
 Theorem norm_list_as_polyn_mul_idemp_l : ∀ la lb,
   norm_list_as_polyn (polyn_list_mul (norm_list_as_polyn la) lb) =
   norm_list_as_polyn (polyn_list_mul la lb).
@@ -3809,6 +3840,10 @@ destruct lc as [| c]. {
   cbn - [ seq "-" nth ].
   destruct (srng_eq_dec a 0) as [Haz| Haz]. {
     cbn - [ seq "-" nth ].
+    rewrite map_polyn_list_convol_mul_0_l.
+    rewrite seq_length.
+    rewrite norm_list_as_polyn_repeat_0.
+...
     subst a.
     rewrite Nat.sub_succ, Nat.sub_0_r.
     rewrite Nat.add_comm.
@@ -3846,6 +3881,8 @@ destruct lc as [| c]. {
     rewrite Nat.sub_0_r, srng_mul_0_l, srng_add_0_l.
     rewrite strip_0s_app; cbn.
     destruct (srng_eq_dec 0 0) as [H| H]; [ clear H | easy ].
+...
+rewrite map_polyn_list_convol_mul_0_l.
 ...
     do 2 rewrite <- map_rev.
     apply strip_0s_map_0.
