@@ -3786,6 +3786,7 @@ cbn - [ nth ] in Hla.
 destruct (srng_eq_dec (nth (length la) (a :: la) 0%Srng) 0)
   as [Hz| Hz]; [ easy | ].
 symmetry; apply List_eq_rev_l; symmetry.
+...
 Search (strip_0s).
 Search (nth (length _)).
 Search (strip_0s (rev _)).
@@ -3799,6 +3800,9 @@ induction len; intros. {
 }
 cbn in Hz.
 destruct la as [| a']; [ easy | ].
+cbn in Hlen; apply Nat.succ_inj in Hlen.
+specialize (IHlen _ _ Hlen Hz) as H1.
+cbn in H1 |-*.
 ...
 specialize (List_last_nth (a :: la) 0%Srng) as H1.
 replace (length (a :: la) - 1) with (length la) in H1 by (cbn; flia).
