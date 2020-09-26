@@ -3755,19 +3755,39 @@ replace (map _ _) with (map (λ i, nth i la 0%Srng) (seq 0 (length la))). 2: {
   rewrite srng_summation_split_first; [ | easy ].
   unfold nth at 2.
   rewrite srng_mul_1_l, Nat.sub_0_r.
-...
-  rewrite all_0_summation_0.
-...
-rewrite rng_mul_1_l, rng_add_0_r; f_equal.
-now rewrite lap_convol_mul_1_l.
-...
+  rewrite all_0_srng_summation_0; [ now rewrite srng_add_0_r | ].
+  intros i Hi.
+  destruct i; [ flia Hi | ].
+  now destruct i; cbn; rewrite srng_mul_0_l.
+}
+induction la as [| a]; [ easy | ].
+cbn - [ seq nth ].
+rewrite <- Nat.add_1_l.
+rewrite seq_app.
+rewrite map_app.
+rewrite Nat.add_0_l.
+remember (map _ (seq 0 1)) as x; cbn in Heqx; subst x.
+rewrite <- List_cons_app; f_equal.
+rewrite <- seq_shift.
+now rewrite map_map.
+Qed.
 
 Theorem polyn_mul_1_l : ∀ P, (1 * P)%P = P.
 Proof.
 intros.
 unfold polyn_mul.
-...
 rewrite polyn_of_list_mul_1_l.
+apply polyn_eq; cbn.
+unfold norm_list_as_polyn.
+destruct P as (la, Hla); cbn.
+unfold polyn_prop_test in Hla.
+destruct la as [| a]; [ easy | ].
+cbn - [ nth ] in Hla.
+destruct (srng_eq_dec (nth (length la) (a :: la) 0%Srng) 0)
+  as [Hz| Hz]; [ easy | ].
+symmetry; apply List_eq_rev_l; symmetry.
+Search (strip_0s).
+Search (nth (length _)).
 ...
 
 Theorem polyn_mul_1_l : ∀ P, (1 * P)%P = P.
