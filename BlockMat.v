@@ -3881,7 +3881,24 @@ destruct lc as [| c]. {
   rewrite Nat.sub_succ, Nat.sub_0_r.
   rewrite Nat.sub_succ, Nat.sub_0_r.
   rewrite repeat_length; cbn.
+Theorem glop : ∀ a lb,
+  map (polyn_list_convol_mul [a] lb) (seq 0 (length lb)) =
+  map (srng_mul a) lb.
+Proof.
+intros.
+induction lb as [| b]; [ easy | cbn ].
+rewrite srng_add_0_l; f_equal.
+rewrite <- seq_shift.
+rewrite map_map.
+unfold polyn_list_convol_mul.
 ...
+cbn - [ seq ].
+rewrite List_seq_succ_r.
+rewrite map_app.
+...
+rewrite glop.
+...
+
   destruct lb as [| b]; [ easy | ].
   remember (b :: lb) as ld eqn:Hld; symmetry in Hld.
   do 2 rewrite Nat.sub_0_r.
