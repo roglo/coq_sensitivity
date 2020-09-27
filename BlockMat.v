@@ -3925,16 +3925,24 @@ rewrite all_0_srng_summation_0. 2: {
 now rewrite Nat.sub_0_r, srng_add_0_r.
 Qed.
 
-Theorem norm_list_as_polyn_map_0 : ∀ ln,
-  norm_list_as_polyn (map (λ _ : nat, 0%Srng) ln) = [].
+Theorem all_0_norm_list_as_polyn_map_0 : ∀ A (ln : list A) f,
+  (∀ n, n ∈ ln → f n = 0%Srng)
+  → norm_list_as_polyn (map f ln) = [].
 Proof.
-intros.
+intros A * Hf.
 unfold norm_list_as_polyn.
 apply List_eq_rev_nil.
 rewrite rev_involutive.
 induction ln as [| n]; [ easy | cbn ].
-rewrite strip_0s_app, IHln; cbn.
-now destruct (srng_eq_dec 0 0).
+rewrite strip_0s_app.
+rewrite IHln. 2: {
+  intros i Hi.
+  now apply Hf; right.
+}
+cbn.
+destruct (srng_eq_dec (f n) 0) as [H| H]; [ easy | ].
+exfalso; apply H.
+now apply Hf; left.
 Qed.
 
 Theorem norm_list_as_polyn_mul_idemp_l : ∀ la lb,
@@ -3991,13 +3999,14 @@ destruct lc as [| c]. {
     rewrite nth_overflow; [ | easy ].
     apply srng_mul_0_r.
   }
-  now rewrite norm_list_as_polyn_map_0 in Hla.
+  now rewrite all_0_norm_list_as_polyn_map_0 in Hla.
 }
 rewrite Nat.sub_succ, Nat.sub_0_r.
 rewrite app_comm_cons, app_length.
 cbn - [ norm_list_as_polyn ].
 rewrite Nat.sub_0_r.
 rewrite rev_app_distr; cbn.
+do 2 rewrite (Nat.add_comm _ (length lb)).
 rewrite map_polyn_list_convol_mul_cons_l.
 rewrite map_polyn_list_convol_mul_cons_l.
 rewrite <- norm_list_as_polyn_add_idemp_l.
@@ -4005,6 +4014,14 @@ rewrite <- norm_list_as_polyn_add_idemp_r; symmetry.
 rewrite <- norm_list_as_polyn_add_idemp_l.
 rewrite <- norm_list_as_polyn_add_idemp_r; symmetry.
 f_equal; f_equal. {
+  do 2 (rewrite seq_app; symmetry).
+  do 2 rewrite map_app.
+  do 2 rewrite norm_list_as_polyn_app.
+  rewrite Nat.add_0_l.
+...
+  rewrite all_0_norm_list_as_polyn_map_0.
+  symmetry.
+  rewrite all_0_norm_list_as_polyn_map_0.
 ...
   destruct lb as [| b]; [ easy | ].
   remember (b :: lb) as ld eqn:Hld; symmetry in Hld.
