@@ -4010,7 +4010,6 @@ rewrite <- norm_list_as_polyn_add_idemp_r; symmetry.
 rewrite <- norm_list_as_polyn_add_idemp_l.
 rewrite <- norm_list_as_polyn_add_idemp_r; symmetry.
 f_equal; f_equal. {
-... bon, chuis fatigué...
   do 2 (rewrite seq_app; symmetry).
   do 2 rewrite map_app.
   do 2 rewrite norm_list_as_polyn_app.
@@ -4030,6 +4029,19 @@ f_equal; f_equal. {
   }
   easy.
 }
+do 2 rewrite (seq_app (length lb)).
+do 2 rewrite map_app.
+cbn - [ nth seq sub ].
+do 2 rewrite norm_list_as_polyn_app.
+Search (norm_list_as_polyn _ = []).
+rewrite all_0_norm_list_as_polyn_map_0. 2: {
+  intros n Hn.
+  apply in_seq in Hn.
+  apply all_0_srng_summation_0.
+  intros i Hi.
+  rewrite nth_overflow.
+(* euh... non... *)
+...
 do 2 rewrite (Nat.add_comm (length lb)).
 replace (rev lc ++ [c]) with (rev (c :: lc)) by easy.
 rewrite <- Hlc.
