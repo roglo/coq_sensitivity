@@ -3945,10 +3945,14 @@ exfalso; apply H.
 now apply Hf; left.
 Qed.
 
-Search (length (strip_0s _)).
 Theorem length_strip_0s_le : ∀ la, length (strip_0s la) ≤ length la.
 Proof.
-...
+intros.
+induction la as [| a]; [ easy | cbn ].
+destruct (srng_eq_dec a 0) as [Haz| Haz]; [ | easy ].
+transitivity (length la); [ easy | ].
+apply Nat.le_succ_diag_r.
+Qed.
 
 Theorem norm_list_as_polyn_mul_idemp_l : ∀ la lb,
   norm_list_as_polyn (polyn_list_mul (norm_list_as_polyn la) lb) =
@@ -4047,12 +4051,21 @@ assert (Hca : length lc < length la). {
   rewrite <- Hlc.
   rewrite <- (rev_length la).
   apply Nat.lt_succ_r.
+  apply length_strip_0s_le.
+}
+rewrite Nat.add_1_r.
+remember (length la - S (length lc)) as lac eqn:Hlac.
+replace (length la) with (S (length lc) + lac) by flia Hca Hlac.
+replace (S (length lc)) with (length (strip_0s (rev la))) by now rewrite Hlc.
+rewrite <- Nat.add_assoc.
+Print polyn_list_mul.
+Print polyn_list_convol_mul.
 ...
-apply length_strip_0s_le.
+do 2 rewrite seq_app.
+rewrite Nat.add_0_l.
+do 2 rewrite map_app.
 ...
-Search (rev _ ++ _).
-Search (rev _ ++ [_]).
-
+do 2 rewrite norm_list_as_polyn_app.
 ...
   destruct lb as [| b]; [ easy | ].
   remember (b :: lb) as ld eqn:Hld; symmetry in Hld.
