@@ -3861,9 +3861,17 @@ rewrite all_0_srng_summation_0. 2: {
 now rewrite Nat.sub_0_r, srng_add_0_r.
 Qed.
 
-Theorem norm_list_as_polyn_map_0 : ∀ li,
-  norm_list_as_polyn (map (λ _ : nat, 0%Srng) li) = [].
-...
+Theorem norm_list_as_polyn_map_0 : ∀ ln,
+  norm_list_as_polyn (map (λ _ : nat, 0%Srng) ln) = [].
+Proof.
+intros.
+unfold norm_list_as_polyn.
+apply List_eq_rev_nil.
+rewrite rev_involutive.
+induction ln as [| n]; [ easy | cbn ].
+rewrite strip_0s_app, IHln; cbn.
+now destruct (srng_eq_dec 0 0).
+Qed.
 
 Theorem norm_list_as_polyn_mul_idemp_l : ∀ la lb,
   norm_list_as_polyn (polyn_list_mul (norm_list_as_polyn la) lb) =
@@ -3919,8 +3927,13 @@ destruct lc as [| c]. {
     rewrite nth_overflow; [ | easy ].
     apply srng_mul_0_r.
   }
-...
-now rewrite norm_list_as_polyn_map_0 in Hla.
+  now rewrite norm_list_as_polyn_map_0 in Hla.
+}
+rewrite Nat.sub_succ, Nat.sub_0_r.
+rewrite app_comm_cons, app_length.
+cbn - [ norm_list_as_polyn ].
+rewrite Nat.sub_0_r.
+rewrite rev_app_distr; cbn.
 ...
   destruct lb as [| b]; [ easy | ].
   remember (b :: lb) as ld eqn:Hld; symmetry in Hld.
