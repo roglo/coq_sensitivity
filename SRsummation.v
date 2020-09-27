@@ -78,25 +78,41 @@ rewrite <- IHlen.
 now rewrite rng_opp_add_distr.
 Qed.
 
-Theorem srng_summation_split_first : ∀ g b k,
+Theorem srng_summation_split_first : ∀ b k g,
   b ≤ k
   → (Σ (i = b, k), g i)%Srng = (g b + Σ (i = S b, k), g i)%Srng.
 Proof.
-intros g b k Hbk.
+intros * Hbk.
 remember (S k - b) as len eqn:Hlen.
 replace (S k - S b) with (len - 1) by flia Hlen.
 assert (H : len ≠ 0) by flia Hlen Hbk.
 clear k Hbk Hlen.
 rename H into Hlen.
-revert b.
-induction len; intros; [ easy | clear Hlen ].
-destruct len; [ apply srng_add_comm | ].
-remember (S len) as slen; cbn; subst slen.
-rewrite Nat.sub_0_r.
-rewrite srng_add_0_l.
+destruct len; [ easy | cbn ].
+rewrite srng_add_0_l, Nat.sub_0_r.
 apply fold_left_srng_add_fun_from_0.
 Qed.
 
+Theorem srng_summation_split_last : ∀ b k g,
+  b ≤ k
+  → (Σ (i = b, k), g i = Σ (i = S b, k), g (i - 1) + g k)%Srng.
+Proof.
+intros * Hbk.
+remember (S k - S b) as len eqn:Hlen.
+rewrite Nat.sub_succ in Hlen.
+replace (S k - b) with (S len) by flia Hbk Hlen.
+replace k with (b + len) by flia Hbk Hlen.
+rewrite <- seq_shift.
+rewrite List_fold_left_map.
+rewrite List_seq_succ_r.
+rewrite fold_left_app.
+cbn; f_equal.
+apply List_fold_left_ext_in.
+intros i c Hi.
+now rewrite Nat.sub_0_r.
+Qed.
+
+(*
 Theorem srng_summation_split_last : ∀ g b k,
   b ≤ S k
   → (Σ (i = b, S k), g i = Σ (i = b, k), g i + g (S k))%Srng.
@@ -110,6 +126,7 @@ rewrite Hlen.
 f_equal; f_equal.
 flia Hbk.
 Qed.
+*)
 
 Theorem srng_summation_rtl : ∀ g b k,
   (Σ (i = b, k), g i = Σ (i = b, k), g (k + b - i)%nat)%Srng.
@@ -172,6 +189,16 @@ intros * Hkb.
 now replace (S k - b) with 0 by flia Hkb.
 Qed.
 
+Theorem srng_summation_succ_succ : ∀ b k g,
+  (Σ (i = S b, S k), g i = Σ (i = b, k), g (S i))%Srng.
+Proof.
+intros b k g.
+rewrite Nat.sub_succ.
+remember (S k - b)%nat as len; clear Heqlen.
+rewrite <- seq_shift.
+now rewrite List_fold_left_map.
+Qed.
+
 Theorem srng_summation_add_distr : ∀ g h b k,
   (Σ (i = b, k), (g i + h i) =
    Σ (i = b, k), g i + Σ (i = b, k), h i)%Srng.
@@ -180,16 +207,14 @@ intros g h b k.
 destruct (le_dec b k) as [Hbk| Hbk]. {
   revert b Hbk.
   induction k; intros. {
-    destruct b; [ now cbn; do 3 rewrite srng_add_0_l | ].
-    now cbn; rewrite srng_add_0_r.
+    apply Nat.le_0_r in Hbk; subst b; cbn.
+    now do 3 rewrite srng_add_0_l.
   }
-  rewrite srng_summation_split_last; [ | easy ].
-  rewrite srng_summation_split_last; [ | easy ].
-  rewrite srng_summation_split_last; [ | easy ].
-  rewrite srng_add_add_swap.
-  do 2 rewrite srng_add_assoc.
-  rewrite srng_add_add_swap.
-  f_equal; f_equal.
+  rewrite (srng_summation_split_last b); [ | easy ].
+  rewrite (srng_summation_split_last b); [ | easy ].
+  rewrite (srng_summation_split_last b); [ | easy ].
+  do 2 rewrite srng_add_assoc; f_equal.
+  rewrite srng_add_add_swap; f_equal.
   destruct (eq_nat_dec b (S k)) as [Hbek| Hbek]. {
     subst b.
     rewrite srng_summation_empty; [ | flia ].
@@ -197,8 +222,15 @@ destruct (le_dec b k) as [Hbk| Hbk]. {
     rewrite srng_summation_empty; [ | flia ].
     symmetry; apply srng_add_0_l.
   }
-  apply IHk.
-  flia Hbk Hbek.
+  do 3 rewrite srng_summation_succ_succ.
+  rewrite srng_summation_eq_compat
+    with (h := λ i, (g i + h i)%Srng). 2: {
+    intros * Hi.
+    now rewrite Nat.sub_succ, Nat.sub_0_r.
+  }
+  rewrite IHk; [ | flia Hbk Hbek ].
+  now f_equal; apply srng_summation_eq_compat; intros i Hi;
+    rewrite Nat.sub_succ, Nat.sub_0_r.
 }
 apply Nat.nle_gt in Hbk.
 rewrite srng_summation_empty; [ | easy ].

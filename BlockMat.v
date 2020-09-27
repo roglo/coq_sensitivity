@@ -3861,12 +3861,10 @@ destruct i; [ easy | ].
 now cbn; rewrite Nat.sub_0_r.
 Qed.
 
-(*
-...
-Theorem glop : ∀ a la lb ln,
-  map (polyn_list_convol_mul (a :: la) lb) ln =
+Theorem map_polyn_list_convol_mul_cons_r : ∀ b la lb ln,
+  map (polyn_list_convol_mul la (b :: lb)) ln =
   polyn_list_add
-    (map (λ n, a * nth n lb 0) ln)%Srng
+    (map (λ n, nth n la 0 * b) ln)%Srng
     (map (λ n, (Σ (j = 1, n), nth (j - 1) la 0 * nth (n - j) lb 0)%Srng) ln).
 Proof.
 intros.
@@ -3875,35 +3873,13 @@ induction ln as [| n]; [ easy | ].
 cbn - [ nth seq sub ].
 f_equal; [ | apply IHln ].
 unfold so.
-rewrite srng_summation_split_first; [ | apply Nat.le_0_l ].
-f_equal; [ now cbn; rewrite Nat.sub_0_r | ].
+rewrite srng_summation_split_last; [ | apply Nat.le_0_l ].
+rewrite Nat.sub_diag.
+rewrite srng_add_comm; f_equal.
 apply srng_summation_eq_compat.
 intros i Hi; f_equal.
-destruct i; [ easy | ].
-now cbn; rewrite Nat.sub_0_r.
+now replace (n - (i - 1)) with (S (n - i)) by flia Hi.
 Qed.
-...
-
-Theorem map_polyn_list_convol_mul_cons_l : ∀ a la lb ln,
-  map (polyn_list_convol_mul (a :: la) lb) ln =
-  map
-    (λ n,
-     (a * nth n lb 0 + Σ (j = 1, n), nth (j - 1) la 0 * nth (n - j) lb 0)%Srng) ln.
-Proof.
-intros.
-unfold polyn_list_convol_mul.
-induction ln as [| n]; [ easy | ].
-cbn - [ nth seq sub ].
-f_equal; [ | apply IHln ].
-unfold so.
-rewrite srng_summation_split_first; [ | apply Nat.le_0_l ].
-f_equal; [ now cbn; rewrite Nat.sub_0_r | ].
-apply srng_summation_eq_compat.
-intros i Hi; f_equal.
-destruct i; [ easy | ].
-now cbn; rewrite Nat.sub_0_r.
-Qed.
-*)
 
 Theorem map_polyn_list_convol_mul_const_l : ∀ n a ln lb,
   map (λ i, polyn_list_convol_mul (a :: repeat 0%Srng n) lb i) ln =
@@ -4010,19 +3986,31 @@ destruct lc as [| c]. {
   }
   now rewrite all_0_norm_list_as_polyn_map_0 in Hla.
 }
+rewrite map_ext_in with
+  (g := polyn_list_convol_mul lb (rev (c :: lc ++ [a]))). 2: {
+  intros i Hi.
+  apply polyn_list_convol_mul_comm.
+}
+symmetry.
+rewrite map_ext_in with (g :=polyn_list_convol_mul lb (a :: la)). 2: {
+  intros i Hi.
+  apply polyn_list_convol_mul_comm.
+}
+symmetry.
 rewrite Nat.sub_succ, Nat.sub_0_r.
 rewrite app_comm_cons, app_length.
 cbn - [ norm_list_as_polyn ].
 rewrite Nat.sub_0_r.
 rewrite rev_app_distr; cbn.
 do 2 rewrite (Nat.add_comm _ (length lb)).
-rewrite map_polyn_list_convol_mul_cons_l.
-rewrite map_polyn_list_convol_mul_cons_l.
+rewrite map_polyn_list_convol_mul_cons_r.
+rewrite map_polyn_list_convol_mul_cons_r.
 rewrite <- norm_list_as_polyn_add_idemp_l.
 rewrite <- norm_list_as_polyn_add_idemp_r; symmetry.
 rewrite <- norm_list_as_polyn_add_idemp_l.
 rewrite <- norm_list_as_polyn_add_idemp_r; symmetry.
 f_equal; f_equal. {
+... bon, chuis fatigué...
   do 2 (rewrite seq_app; symmetry).
   do 2 rewrite map_app.
   do 2 rewrite norm_list_as_polyn_app.
@@ -4031,14 +4019,14 @@ f_equal; f_equal. {
     intros n Hn.
     apply in_seq in Hn.
     rewrite nth_overflow; [ | easy ].
-    apply srng_mul_0_r.
+    apply srng_mul_0_l.
   }
   symmetry.
   rewrite all_0_norm_list_as_polyn_map_0. 2: {
     intros n Hn.
     apply in_seq in Hn.
     rewrite nth_overflow; [ | easy ].
-    apply srng_mul_0_r.
+    apply srng_mul_0_l.
   }
   easy.
 }
@@ -4058,13 +4046,23 @@ remember (length la - S (length lc)) as lac eqn:Hlac.
 replace (length la) with (S (length lc) + lac) by flia Hca Hlac.
 replace (S (length lc)) with (length (strip_0s (rev la))) by now rewrite Hlc.
 rewrite <- Nat.add_assoc.
-Print polyn_list_mul.
-Print polyn_list_convol_mul.
-...
 do 2 rewrite seq_app.
 rewrite Nat.add_0_l.
-do 2 rewrite map_app.
 ...
+  ============================
+  norm_list_as_polyn
+    (map
+       (λ n : nat,
+          (Σ (j = 1, n),
+           nth (j - 1) (rev (strip_0s (rev la))) 0 * nth (n - j) lb 0)%Srng)
+       (seq 0 (length (strip_0s (rev la))) ++
+        seq (length (strip_0s (rev la))) (length lb))) =
+  norm_list_as_polyn
+    (map (λ n : nat, (Σ (j = 1, n), nth (j - 1) la 0 * nth (n - j) lb 0)%Srng)
+       (seq 0 (length (strip_0s (rev la))) ++
+        seq (length (strip_0s (rev la))) (lac + length lb)))
+,,,
+do 2 rewrite map_app.
 do 2 rewrite norm_list_as_polyn_app.
 ...
   destruct lb as [| b]; [ easy | ].
