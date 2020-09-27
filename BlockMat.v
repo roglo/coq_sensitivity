@@ -3036,7 +3036,7 @@ Theorem Tr_opp : ∀ BM,
 Proof.
 intros * HBM.
 induction BM as [x| M IHBM] using bmatrix_ind2; [ easy | ].
-cbn - [ seq "-" ].
+cbn - [ seq sub ].
 cbn in HBM.
 destruct (zerop (mat_nrows M)) as [Hrz| Hrz]; [ easy | ].
 destruct (zerop (mat_ncols M)) as [Hcz| Hcz]; [ easy | ].
@@ -3841,9 +3841,73 @@ rewrite norm_list_as_polyn_app; cbn.
 now destruct (srng_eq_dec 0 0).
 Qed.
 
-Theorem map_polyn_list_convol_mul_const_l : ∀ n a li lb,
-  map (λ i, polyn_list_convol_mul (a :: repeat 0%Srng n) lb i) li =
-  map (λ i, a * nth i lb 0)%Srng li.
+Theorem map_polyn_list_convol_mul_cons_l : ∀ a la lb ln,
+  map (polyn_list_convol_mul (a :: la) lb) ln =
+  polyn_list_add
+    (map (λ n, a * nth n lb 0) ln)%Srng
+    (map (λ n, (Σ (j = 1, n), nth (j - 1) la 0 * nth (n - j) lb 0)%Srng) ln).
+Proof.
+intros.
+unfold polyn_list_convol_mul.
+induction ln as [| n]; [ easy | ].
+cbn - [ nth seq sub ].
+f_equal; [ | apply IHln ].
+unfold so.
+rewrite srng_summation_split_first; [ | apply Nat.le_0_l ].
+f_equal; [ now cbn; rewrite Nat.sub_0_r | ].
+apply srng_summation_eq_compat.
+intros i Hi; f_equal.
+destruct i; [ easy | ].
+now cbn; rewrite Nat.sub_0_r.
+Qed.
+
+(*
+...
+Theorem glop : ∀ a la lb ln,
+  map (polyn_list_convol_mul (a :: la) lb) ln =
+  polyn_list_add
+    (map (λ n, a * nth n lb 0) ln)%Srng
+    (map (λ n, (Σ (j = 1, n), nth (j - 1) la 0 * nth (n - j) lb 0)%Srng) ln).
+Proof.
+intros.
+unfold polyn_list_convol_mul.
+induction ln as [| n]; [ easy | ].
+cbn - [ nth seq sub ].
+f_equal; [ | apply IHln ].
+unfold so.
+rewrite srng_summation_split_first; [ | apply Nat.le_0_l ].
+f_equal; [ now cbn; rewrite Nat.sub_0_r | ].
+apply srng_summation_eq_compat.
+intros i Hi; f_equal.
+destruct i; [ easy | ].
+now cbn; rewrite Nat.sub_0_r.
+Qed.
+...
+
+Theorem map_polyn_list_convol_mul_cons_l : ∀ a la lb ln,
+  map (polyn_list_convol_mul (a :: la) lb) ln =
+  map
+    (λ n,
+     (a * nth n lb 0 + Σ (j = 1, n), nth (j - 1) la 0 * nth (n - j) lb 0)%Srng) ln.
+Proof.
+intros.
+unfold polyn_list_convol_mul.
+induction ln as [| n]; [ easy | ].
+cbn - [ nth seq sub ].
+f_equal; [ | apply IHln ].
+unfold so.
+rewrite srng_summation_split_first; [ | apply Nat.le_0_l ].
+f_equal; [ now cbn; rewrite Nat.sub_0_r | ].
+apply srng_summation_eq_compat.
+intros i Hi; f_equal.
+destruct i; [ easy | ].
+now cbn; rewrite Nat.sub_0_r.
+Qed.
+*)
+
+Theorem map_polyn_list_convol_mul_const_l : ∀ n a ln lb,
+  map (λ i, polyn_list_convol_mul (a :: repeat 0%Srng n) lb i) ln =
+  map (λ i, a * nth i lb 0)%Srng ln.
 Proof.
 intros.
 unfold polyn_list_convol_mul.
@@ -3880,7 +3944,7 @@ Proof.
 intros.
 unfold polyn_list_mul.
 destruct la as [| a]; [ easy | ].
-cbn - [ seq "-" nth ].
+cbn - [ nth seq sub ].
 rewrite strip_0s_app.
 rewrite rev_length.
 remember (strip_0s (rev la)) as lc eqn:Hlc; symmetry in Hlc.
@@ -3890,10 +3954,10 @@ destruct lc as [| c]. {
   apply List_eq_rev_l in Hn.
   rewrite List_rev_repeat in Hn.
   subst la.
-  cbn - [ seq "-" nth ].
+  cbn - [ nth seq sub ].
   destruct (srng_eq_dec a 0) as [Haz| Haz]. {
     subst a.
-    cbn - [ seq "-" nth ].
+    cbn - [ nth seq sub ].
     rewrite (map_polyn_list_convol_mul_0_l 0).
     rewrite seq_length.
     rewrite norm_list_as_polyn_repeat_0; cbn.
@@ -3934,6 +3998,13 @@ rewrite app_comm_cons, app_length.
 cbn - [ norm_list_as_polyn ].
 rewrite Nat.sub_0_r.
 rewrite rev_app_distr; cbn.
+rewrite map_polyn_list_convol_mul_cons_l.
+rewrite map_polyn_list_convol_mul_cons_l.
+rewrite <- norm_list_as_polyn_add_idemp_l.
+rewrite <- norm_list_as_polyn_add_idemp_r; symmetry.
+rewrite <- norm_list_as_polyn_add_idemp_l.
+rewrite <- norm_list_as_polyn_add_idemp_r; symmetry.
+f_equal; f_equal. {
 ...
   destruct lb as [| b]; [ easy | ].
   remember (b :: lb) as ld eqn:Hld; symmetry in Hld.
@@ -4040,7 +4111,7 @@ replace (map _ _) with (map (λ i, nth i la 0%Srng) (seq 0 (length la))). 2: {
   now destruct i; cbn; rewrite srng_mul_0_l.
 }
 induction la as [| a]; [ easy | ].
-cbn - [ seq nth ].
+cbn - [ nth seq ].
 rewrite <- Nat.add_1_l.
 rewrite seq_app.
 rewrite map_app.
@@ -4295,7 +4366,7 @@ Theorem summation_polyn_deg_ub : ∀ f b e,
    fold_left max (map polyn_deg_ub (map f (seq b (S e - b)))) 0.
 Proof.
 intros.
-cbn - [ "-" ].
+cbn - [ sub ].
 remember (S e - b) as len; clear e Heqlen.
 revert b.
 induction len; intros; [ easy | ].
