@@ -3841,8 +3841,8 @@ rewrite norm_list_as_polyn_app; cbn.
 now destruct (srng_eq_dec 0 0).
 Qed.
 
-Theorem map_polyn_list_convol_mul_const_l : ∀ a lb,
-  map (polyn_list_convol_mul [a] lb) (seq 0 (length lb)) =
+Theorem map_polyn_list_convol_mul_const_l : ∀ n a lb,
+  map (polyn_list_convol_mul (a :: repeat 0%Srng n) lb) (seq 0 (length lb)) =
   map (srng_mul a) lb.
 Proof.
 intros.
@@ -3855,8 +3855,9 @@ rewrite map_ext_in with (g := λ i, (a * nth i lb 0)%Srng). 2: {
   rewrite srng_summation_split_first; [ | easy ].
   rewrite all_0_srng_summation_0. 2: {
     intros j Hj.
-    rewrite nth_overflow; [ | easy ].
-    apply srng_mul_0_l.
+    destruct j; [ easy | cbn ].
+    rewrite List_nth_repeat.
+    destruct (lt_dec j n); apply srng_mul_0_l.
   }
   now rewrite Nat.sub_0_r, srng_add_0_r.
 }
@@ -3906,7 +3907,9 @@ destruct lc as [| c]. {
   rewrite Nat.sub_succ, Nat.sub_0_r.
   rewrite Nat.sub_succ, Nat.sub_0_r.
   rewrite repeat_length; cbn.
-  rewrite map_polyn_list_convol_mul_const_l.
+  rewrite (map_polyn_list_convol_mul_const_l 0).
+...
+  rewrite (map_polyn_list_convol_mul_const_l n).
 ...
   destruct lb as [| b]; [ easy | ].
   remember (b :: lb) as ld eqn:Hld; symmetry in Hld.

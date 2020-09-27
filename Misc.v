@@ -1508,6 +1508,22 @@ rewrite List_repeat_succ_app at 2; cbn.
 now rewrite IHn.
 Qed.
 
+Theorem List_nth_repeat : ∀ A (a d : A) i n,
+  nth i (repeat a n) d = if lt_dec i n then a else d.
+Proof.
+intros A *.
+destruct (lt_dec i n) as [Hin| Hin]. {
+  revert i Hin.
+  induction n; intros; [ easy | cbn ].
+  destruct i; [ easy | ].
+  apply Nat.succ_lt_mono in Hin.
+  now apply IHn.
+}
+apply Nat.nlt_ge in Hin.
+apply nth_overflow.
+now rewrite repeat_length.
+Qed.
+
 Theorem List_app_cons : ∀ A (l1 l2 : list A) a,
   l1 ++ a :: l2 = l1 ++ [a] ++ l2.
 Proof. easy. Qed.
