@@ -4029,11 +4029,12 @@ f_equal; f_equal. {
   }
   easy.
 }
+...
 do 2 rewrite (seq_app (length lb)).
 do 2 rewrite map_app.
 cbn - [ nth seq sub ].
 do 2 rewrite norm_list_as_polyn_app.
-Search (norm_list_as_polyn _ = []).
+...
 rewrite all_0_norm_list_as_polyn_map_0. 2: {
   intros n Hn.
   apply in_seq in Hn.
