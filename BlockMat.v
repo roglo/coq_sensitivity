@@ -4018,10 +4018,21 @@ f_equal; f_equal. {
   do 2 rewrite map_app.
   do 2 rewrite norm_list_as_polyn_app.
   rewrite Nat.add_0_l.
-...
-  rewrite all_0_norm_list_as_polyn_map_0.
+  rewrite all_0_norm_list_as_polyn_map_0. 2: {
+    intros n Hn.
+    apply in_seq in Hn.
+    rewrite nth_overflow; [ | easy ].
+    apply srng_mul_0_r.
+  }
   symmetry.
-  rewrite all_0_norm_list_as_polyn_map_0.
+  rewrite all_0_norm_list_as_polyn_map_0. 2: {
+    intros n Hn.
+    apply in_seq in Hn.
+    rewrite nth_overflow; [ | easy ].
+    apply srng_mul_0_r.
+  }
+  easy.
+}
 ...
   destruct lb as [| b]; [ easy | ].
   remember (b :: lb) as ld eqn:Hld; symmetry in Hld.
