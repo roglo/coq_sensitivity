@@ -3945,6 +3945,11 @@ exfalso; apply H.
 now apply Hf; left.
 Qed.
 
+Search (length (strip_0s _)).
+Theorem length_strip_0s_le : ∀ la, length (strip_0s la) ≤ length la.
+Proof.
+...
+
 Theorem norm_list_as_polyn_mul_idemp_l : ∀ la lb,
   norm_list_as_polyn (polyn_list_mul (norm_list_as_polyn la) lb) =
   norm_list_as_polyn (polyn_list_mul la lb).
@@ -4033,6 +4038,21 @@ f_equal; f_equal. {
   }
   easy.
 }
+do 2 rewrite (Nat.add_comm (length lb)).
+replace (rev lc ++ [c]) with (rev (c :: lc)) by easy.
+rewrite <- Hlc.
+assert (Hca : length lc < length la). {
+  apply Nat.succ_lt_mono.
+  replace (S (length lc)) with (length (c :: lc)) by easy.
+  rewrite <- Hlc.
+  rewrite <- (rev_length la).
+  apply Nat.lt_succ_r.
+...
+apply length_strip_0s_le.
+...
+Search (rev _ ++ _).
+Search (rev _ ++ [_]).
+
 ...
   destruct lb as [| b]; [ easy | ].
   remember (b :: lb) as ld eqn:Hld; symmetry in Hld.
