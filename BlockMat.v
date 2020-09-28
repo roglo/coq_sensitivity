@@ -3931,24 +3931,29 @@ apply Nat.le_succ_diag_r.
 Qed.
 
 Theorem norm_list_as_polyn_map_seq_ext : ∀ sta len dlen f,
-  (∀ i, sta + len ≤ i ≤ sta + len + dlen → f i = f (sta + len))
+  (∀ i, sta + len ≤ i ≤ sta + len + dlen → f i = f (sta + len + dlen - 1))
   → norm_list_as_polyn (map f (seq sta (len + dlen))) =
     norm_list_as_polyn (map f (seq sta len)).
 Proof.
 intros * Hi.
-... mmm.... ça doit pas être ça...
 unfold norm_list_as_polyn; f_equal.
 revert sta len Hi.
 induction dlen; intros; [ now rewrite Nat.add_0_r | ].
 rewrite <- Nat.add_succ_comm.
+...
 rewrite IHdlen. 2: {
   intros j Hj.
+  rewrite <- Nat.add_assoc.
+  rewrite Nat.add_succ_comm.
+  rewrite Nat.add_assoc.
   apply Hi; flia Hj.
 }
 rewrite List_seq_succ_r.
 rewrite map_app.
 rewrite rev_app_distr; cbn.
 destruct (srng_eq_dec (f (sta + len)) 0) as [Hz| Hz]; [ easy | ].
+symmetry.
+...
 exfalso; apply Hz.
 apply Hi; flia.
 Qed.
