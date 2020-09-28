@@ -3930,36 +3930,37 @@ transitivity (length la); [ easy | ].
 apply Nat.le_succ_diag_r.
 Qed.
 
-Theorem norm_list_as_polyn_map_seq_ext : ∀ sta len dlen f,
-  (∀ i, sta + len ≤ i < sta + len + dlen → f i = 0%Srng)
-  → norm_list_as_polyn (map f (seq sta (len + dlen))) =
-    norm_list_as_polyn (map f (seq sta len)).
+Theorem norm_list_convol_mul_more : ∀ n la lb i len,
+  length la + length lb - 1 ≤ i + len
+  → norm_list_as_polyn (map (polyn_list_convol_mul la lb) (seq i len)) =
+    norm_list_as_polyn (map (polyn_list_convol_mul la lb) (seq i (len + n))).
 Proof.
-intros * Hi.
-Admitted. (*
-unfold norm_list_as_polyn; f_equal.
-revert sta dlen Hi.
-induction len; intros. {
-  cbn.
-  apply eq_strip_0s_nil.
-...
-induction len; intros; [ now rewrite Nat.add_0_r | ].
-rewrite <- Nat.add_succ_comm.
-rewrite IHdlen. 2: {
-  intros j Hj.
-
-  rewrite <- Nat.add_succ_comm.
-  rewrite Nat.add_assoc.
-  apply Hi; flia Hj.
+intros.
+induction n; [ rewrite Nat.add_0_r; reflexivity | idtac ].
+rewrite Nat.add_succ_r.
+Admitted.
+(*
+rewrite lap_convol_mul_succ.
+rewrite IHn.
+apply lap_norm_app_0_r.
+intros j.
+rewrite all_0_summation_0. {
+  destruct j; [ easy | now destruct j ].
 }
-rewrite List_seq_succ_r.
-rewrite map_app.
-rewrite rev_app_distr; cbn.
-destruct (srng_eq_dec (f (sta + len)) 0) as [Hz| Hz]; [ easy | ].
-symmetry.
-...
-exfalso; apply Hz.
-apply Hi; flia.
+clear j.
+intros j (_, Hj).
+apply rng_mul_eq_0.
+destruct (le_dec (length la) j) as [H1| H1]. {
+  now left; rewrite List.nth_overflow.
+} {
+  apply Nat.nle_gt in H1.
+  destruct (le_dec (length lb) (i + (len + n) - j)) as [H2| H2]. {
+    now right; rewrite nth_overflow.
+  } {
+    exfalso; apply H2; clear H2.
+    flia H H1.
+  }
+}
 Qed.
 *)
 
@@ -4062,103 +4063,12 @@ f_equal; f_equal. {
   }
   easy.
 }
-Search (map (λ _, Σ (_ = _, _), _))%Srng.
-...
-rewrite map_ext_in with
-  (g := λ n, (Σ (j = 1, length lb), nth (j - 1) lb 0 * nth (n - j) (rev lc ++ [c]) 0)%Srng). 2: {
-  intros i Hi.
-  apply in_seq in Hi.
-  replace (length lb) with (i + (length lb - i)) by flia Hi.
-...
-do 2 (rewrite seq_app; symmetry).
-do 2 rewrite map_app.
-do 2 rewrite norm_list_as_polyn_app.
-cbn - [ nth seq sub ].
-...
-Check norm_list_as_polyn_map_seq_ext.
-...
-rewrite norm_list_as_polyn_map_seq_ext. 2: {
-  intros i Hi.
-  rewrite Nat.add_0_l.
-  replace i with (length lb + (i - length lb)) by flia Hi.
-Search (Σ (_ = _, _ + _), _).
-...
-  apply all_0_srng_summation_0.
-  intros j Hj.
-  rewrite nth_overflow.
-
-rewrite norm_list_as_polyn_map_seq_ext.
-...
-do 2 rewrite (seq_app (length lb)).
-do 2 rewrite map_app.
-cbn - [ nth seq sub ].
-do 2 rewrite norm_list_as_polyn_app.
-...
-rewrite all_0_norm_list_as_polyn_map_0. 2: {
-  intros n Hn.
-  apply in_seq in Hn.
-  apply all_0_srng_summation_0.
-  intros i Hi.
-  rewrite nth_overflow.
-(* euh... non... *)
-...
-do 2 rewrite (Nat.add_comm (length lb)).
 replace (rev lc ++ [c]) with (rev (c :: lc)) by easy.
 rewrite <- Hlc.
-assert (Hca : length lc < length la). {
-  apply Nat.succ_lt_mono.
-  replace (S (length lc)) with (length (c :: lc)) by easy.
-  rewrite <- Hlc.
-  rewrite <- (rev_length la).
-  apply Nat.lt_succ_r.
-  apply length_strip_0s_le.
-}
-rewrite Nat.add_1_r.
-remember (length la - S (length lc)) as lac eqn:Hlac.
-replace (length la) with (S (length lc) + lac) by flia Hca Hlac.
-replace (S (length lc)) with (length (strip_0s (rev la))) by now rewrite Hlc.
-rewrite <- Nat.add_assoc.
-do 2 rewrite seq_app.
-rewrite Nat.add_0_l.
+Check norm_list_convol_mul_more.
+Print polyn_list_convol_mul.
+rewrite (norm_list_convol_mul_more).
 ...
-  ============================
-  norm_list_as_polyn
-    (map
-       (λ n : nat,
-          (Σ (j = 1, n),
-           nth (j - 1) (rev (strip_0s (rev la))) 0 * nth (n - j) lb 0)%Srng)
-       (seq 0 (length (strip_0s (rev la))) ++
-        seq (length (strip_0s (rev la))) (length lb))) =
-  norm_list_as_polyn
-    (map (λ n : nat, (Σ (j = 1, n), nth (j - 1) la 0 * nth (n - j) lb 0)%Srng)
-       (seq 0 (length (strip_0s (rev la))) ++
-        seq (length (strip_0s (rev la))) (lac + length lb)))
-,,,
-do 2 rewrite map_app.
-do 2 rewrite norm_list_as_polyn_app.
-...
-  destruct lb as [| b]; [ easy | ].
-  remember (b :: lb) as ld eqn:Hld; symmetry in Hld.
-  do 2 rewrite Nat.sub_0_r.
-  rewrite fold_lap_norm.
-  rewrite (lap_convol_mul_cons_with_0_l _ la). 2: {
-    intros i.
-    specialize (proj1 (eq_strip_0s_nil _) Hlc) as H1.
-    destruct (lt_dec i (length la)) as [Hil| Hil]. {
-      specialize (H1 (length la - S i)).
-      rewrite <- rev_length in H1.
-      rewrite <- rev_nth in H1. {
-        now rewrite rev_involutive in H1.
-      }
-      now rewrite rev_length.
-    }
-    apply Nat.nlt_ge in Hil.
-    now rewrite nth_overflow.
-  }
-  rewrite Nat.add_comm.
-  apply lap_convol_mul_more; cbn.
-  now rewrite Nat.sub_0_r.
-}
 rewrite rev_app_distr; cbn.
 rewrite fold_lap_norm.
 destruct lb as [| b]; [ easy | ].
