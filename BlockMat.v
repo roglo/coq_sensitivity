@@ -3930,6 +3930,27 @@ transitivity (length la); [ easy | ].
 apply Nat.le_succ_diag_r.
 Qed.
 
+Theorem norm_list_as_polyn_map_seq_ext : ∀ sta len dlen f,
+  (∀ i, sta + len < i ≤ sta + len + dlen → f i = 0%Srng)
+  → norm_list_as_polyn (map f (seq sta (len + dlen))) =
+    norm_list_as_polyn (map f (seq sta len)).
+Proof.
+intros * Hi.
+unfold norm_list_as_polyn; f_equal.
+revert sta len Hi.
+induction dlen; intros; [ now rewrite Nat.add_0_r | ].
+rewrite <- Nat.add_succ_comm.
+rewrite IHdlen. 2: {
+  intros j Hj.
+  apply Hi; flia Hj.
+}
+rewrite List_seq_succ_r.
+rewrite map_app.
+rewrite rev_app_distr; cbn.
+destruct (srng_eq_dec (f (sta + len)) 0) as [Hz| Hz]; [ easy | ].
+symmetry.
+...
+
 Theorem norm_list_as_polyn_mul_idemp_l : ∀ la lb,
   norm_list_as_polyn (polyn_list_mul (norm_list_as_polyn la) lb) =
   norm_list_as_polyn (polyn_list_mul la lb).
@@ -4029,6 +4050,9 @@ f_equal; f_equal. {
   }
   easy.
 }
+...
+rewrite norm_list_as_polyn_map_seq_ext.
+rewrite norm_list_as_polyn_map_seq_ext.
 ...
 do 2 rewrite (seq_app (length lb)).
 do 2 rewrite map_app.
