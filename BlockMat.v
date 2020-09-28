@@ -3173,6 +3173,8 @@ End bmatrix_Notations.
 Import matrix_Notations.
 Import bmatrix_Notations.
 
+... (* working on SRpolynomial.v now *)
+
 (* decidability of equality in semirings
    and the fact that 1 ≠ 0 *)
 
