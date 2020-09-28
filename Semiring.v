@@ -270,6 +270,11 @@ Definition Z_semiring_prop : semiring_prop Z :=
 Definition Z_ring_prop : ring_prop Z :=
   {| rng_add_opp_l := Z.add_opp_diag_l |}.
 
+(* allows to use ring theorems on Z
+Canonical Structure Z_semiring_op.
+Canonical Structure Z_semiring_prop.
+*)
+
 (* borrowed from Ring2.v because, now, I want to start with
    semirings, and define rings later from semirings; this way,
    summations with syntax Σ can be defined (later) on semirings,
