@@ -4064,6 +4064,12 @@ f_equal; f_equal. {
 }
 Search (map (λ _, Σ (_ = _, _), _))%Srng.
 ...
+rewrite map_ext_in with
+  (g := λ n, (Σ (j = 1, length lb), nth (j - 1) lb 0 * nth (n - j) (rev lc ++ [c]) 0)%Srng). 2: {
+  intros i Hi.
+  apply in_seq in Hi.
+  replace (length lb) with (i + (length lb - i)) by flia Hi.
+...
 do 2 (rewrite seq_app; symmetry).
 do 2 rewrite map_app.
 do 2 rewrite norm_list_as_polyn_app.
