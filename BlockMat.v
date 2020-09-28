@@ -4062,6 +4062,8 @@ f_equal; f_equal. {
   }
   easy.
 }
+Search (map (λ _, Σ (_ = _, _), _))%Srng.
+...
 do 2 (rewrite seq_app; symmetry).
 do 2 rewrite map_app.
 do 2 rewrite norm_list_as_polyn_app.
