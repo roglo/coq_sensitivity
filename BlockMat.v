@@ -3931,11 +3931,12 @@ apply Nat.le_succ_diag_r.
 Qed.
 
 Theorem norm_list_as_polyn_map_seq_ext : ∀ sta len dlen f,
-  (∀ i, sta + len ≤ i ≤ sta + len + dlen → f i = 0%Srng)
+  (∀ i, sta + len ≤ i ≤ sta + len + dlen → f i = f (sta + len))
   → norm_list_as_polyn (map f (seq sta (len + dlen))) =
     norm_list_as_polyn (map f (seq sta len)).
 Proof.
 intros * Hi.
+... mmm.... ça doit pas être ça...
 unfold norm_list_as_polyn; f_equal.
 revert sta len Hi.
 induction dlen; intros; [ now rewrite Nat.add_0_r | ].
@@ -3951,6 +3952,7 @@ destruct (srng_eq_dec (f (sta + len)) 0) as [Hz| Hz]; [ easy | ].
 exfalso; apply Hz.
 apply Hi; flia.
 Qed.
+*)
 
 Theorem norm_list_as_polyn_mul_idemp_l : ∀ la lb,
   norm_list_as_polyn (polyn_list_mul (norm_list_as_polyn la) lb) =
@@ -4054,6 +4056,9 @@ f_equal; f_equal. {
 ...
 rewrite norm_list_as_polyn_map_seq_ext. 2: {
   intros i Hi.
+  rewrite Nat.add_0_l.
+  replace i with (length lb + (i - length lb)) by flia Hi.
+Search (Σ (_ = _, _ + _), _).
 ...
   apply all_0_srng_summation_0.
   intros j Hj.
