@@ -3861,7 +3861,7 @@ destruct i; [ easy | ].
 now cbn; rewrite Nat.sub_0_r.
 Qed.
 
-Theorem map_polyn_list_convol_mul_cons_r' : ∀ b la lb sta len,
+Theorem map_polyn_list_convol_mul_cons_r_gen : ∀ b la lb sta len,
   map (polyn_list_convol_mul la (b :: lb)) (seq sta len) =
   polyn_list_add
     (map (λ n, nth n la 0 * b) (seq sta len))%Srng
@@ -3927,7 +3927,7 @@ Theorem map_polyn_list_convol_mul_cons_r : ∀ b la lb len,
     (0%Srng :: map (λ n, polyn_list_convol_mul la lb (n - 1)) (seq 1 len)).
 Proof.
 intros.
-rewrite map_polyn_list_convol_mul_cons_r'.
+rewrite map_polyn_list_convol_mul_cons_r_gen.
 f_equal.
 rewrite <- (Nat.add_1_l len).
 rewrite seq_app.
@@ -4132,7 +4132,6 @@ f_equal; f_equal. {
     apply in_seq in Hn.
     rewrite nth_overflow; [ | easy ].
     apply srng_mul_0_l.
-...
   }
   symmetry.
   rewrite all_0_norm_list_as_polyn_map_0. 2: {
@@ -4142,6 +4141,7 @@ f_equal; f_equal. {
     apply srng_mul_0_l.
   }
   easy.
+}
 ...
 rewrite map_polyn_list_convol_mul_cons_r.
 rewrite map_polyn_list_convol_mul_cons_r.
