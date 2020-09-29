@@ -4152,17 +4152,42 @@ rewrite
      (λ n,
         (Σ (j = 0, length lb),
          nth j (b :: lb) 0 * nth (n - 1 - j) (rev lc ++ [c]) 0))%Srng
-     (seq (_ + _) _)); subst f. 2: {
+     (seq (_ + _) _)). 2: {
+  subst f.
   intros i Hi.
   apply in_seq in Hi.
-  destruct (le_dec i (length lb)) as [Hib| Hib]. {
-    unfold so.
-    rewrite (srng_summation_split (i - 1) _ _ (length lb)); [ | flia Hib ].
-    rewrite Nat.sub_add; [ | easy ].
-    symmetry; rewrite <- srng_add_0_r.
-    f_equal.
-    apply all_0_srng_summation_0.
-    intros j Hj.
+  unfold so.
+  rewrite (srng_summation_split (length lb) _ _ (i - 1)); [ | flia Hi ].
+  rewrite (all_0_srng_summation_0 (length lb + 1)). 2: {
+    intros j Hj; rewrite Nat.add_1_r in Hj.
+    rewrite nth_overflow; [ | easy ].
+    apply srng_mul_0_l.
+  }
+  apply srng_add_0_r.
+}
+subst f.
+symmetry.
+rewrite seq_app, map_app.
+remember (λ _, _) as f.
+rewrite
+  (map_ext_in _
+     (λ n,
+        (Σ (j = 0, length lb),
+         nth j (b :: lb) 0 * nth (n - 1 - j) la 0))%Srng
+     (seq (_ + _) _)). 2: {
+  subst f.
+  intros i Hi.
+  apply in_seq in Hi.
+  unfold so.
+  rewrite (srng_summation_split (length lb) _ _ (i - 1)); [ | flia Hi ].
+  rewrite (all_0_srng_summation_0 (length lb + 1)). 2: {
+    intros j Hj; rewrite Nat.add_1_r in Hj.
+    rewrite nth_overflow; [ | easy ].
+    apply srng_mul_0_l.
+  }
+  apply srng_add_0_r.
+}
+subst f.
 ... 3
 do 2 rewrite (Nat.add_comm (length lb)).
 rewrite seq_app, map_app.
