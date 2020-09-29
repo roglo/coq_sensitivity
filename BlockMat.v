@@ -3861,20 +3861,19 @@ destruct i; [ easy | ].
 now cbn; rewrite Nat.sub_0_r.
 Qed.
 
-Theorem map_polyn_list_convol_mul_cons_r : ∀ b la lb len,
-  map (polyn_list_convol_mul la (b :: lb)) (seq 0 len) =
+Theorem map_polyn_list_convol_mul_cons_r : ∀ b la lb sta len,
+  map (polyn_list_convol_mul la (b :: lb)) (seq sta len) =
   polyn_list_add
-    (map (λ n, nth n la 0 * b) (seq 0 len))%Srng
+    (map (λ n, nth n la 0 * b) (seq sta len))%Srng
     (map
        (λ n,
           if zerop n then 0%Srng
           else (Σ (j = 0, n - 1), nth j la 0 * nth (n - j - 1) lb 0)%Srng)
-       (seq 0 len)).
+       (seq sta len)).
 Proof.
 intros.
 unfold polyn_list_convol_mul.
-remember (seq 0 len) as ln eqn:Hln; symmetry in Hln.
-remember 0 as sta in Hln; clear Heqsta.
+remember (seq sta len) as ln eqn:Hln; symmetry in Hln.
 revert sta len Hln.
 induction ln as [| n]; intros; [ easy | ].
 destruct len; [ easy | ].
