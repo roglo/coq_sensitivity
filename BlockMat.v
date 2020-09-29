@@ -4144,18 +4144,25 @@ f_equal; f_equal. {
 }
 rewrite Nat.add_1_r.
 unfold polyn_list_convol_mul.
+(**)
+rewrite seq_app, map_app.
+remember (λ _, _) as f.
 rewrite
   (map_ext_in _
      (λ n,
         (Σ (j = 0, length lb),
-         nth j (b :: lb) 0 * nth (n - 1 - j) (rev lc ++ [c]) 0))%Srng). 2: {
+         nth j (b :: lb) 0 * nth (n - 1 - j) (rev lc ++ [c]) 0))%Srng
+     (seq (_ + _) _)); subst f. 2: {
   intros i Hi.
   apply in_seq in Hi.
-...
-  rewrite srng_summation_split.
-
-         Σ (j = S (length lb, length lb + S (length lc)),
-         nth j (b :: lb) 0 * nth (n - 1 - j) (rev lc ++ [c]) 0)%Srng)).
+  destruct (le_dec i (length lb)) as [Hib| Hib]. {
+    unfold so.
+    rewrite (srng_summation_split (i - 1) _ _ (length lb)); [ | flia Hib ].
+    rewrite Nat.sub_add; [ | easy ].
+    symmetry; rewrite <- srng_add_0_r.
+    f_equal.
+    apply all_0_srng_summation_0.
+    intros j Hj.
 ... 3
 do 2 rewrite (Nat.add_comm (length lb)).
 rewrite seq_app, map_app.

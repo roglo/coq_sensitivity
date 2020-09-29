@@ -239,31 +239,31 @@ rewrite srng_summation_empty; [ | easy ].
 symmetry; apply srng_add_0_l.
 Qed.
 
-Theorem summation_split : ∀ j g b k,
+Theorem srng_summation_split : ∀ j g b k,
   b ≤ S j ≤ S k
   → (Σ (i = b, k), g i = Σ (i = b, j), g i + Σ (i = j+1, k), g i)%Srng.
 Proof.
 intros * (Hbj, Hjk).
-...
-unfold summation.
 remember (S j - b) as len1 eqn:Hlen1.
 remember (S k - b) as len2 eqn:Hlen2.
 move len2 before len1.
 replace (S k - (j + 1)) with (len2 - len1) by flia Hlen1 Hlen2 Hbj.
 replace (j + 1) with (b + len1) by flia Hlen1 Hbj.
 assert (Hll : len1 ≤ len2) by flia Hlen1 Hlen2 Hjk.
-clear - rp Hll.
+clear - sp Hll.
 revert b len2 Hll.
 induction len1; intros. {
-  cbn.
-  now rewrite rng_add_0_l, Nat.add_0_r, Nat.sub_0_r.
+  now cbn; rewrite srng_add_0_l, Nat.add_0_r, Nat.sub_0_r.
 }
-cbn.
 destruct len2; [ flia Hll | ].
-apply Nat.succ_le_mono in Hll.
-cbn.
-rewrite IHlen1; [ | easy ].
-rewrite rng_add_assoc.
+apply Nat.succ_le_mono in Hll; cbn.
+rewrite srng_add_0_l.
+rewrite (fold_left_srng_add_fun_from_0 (g b)).
+rewrite (fold_left_srng_add_fun_from_0 (g b)).
+rewrite <- srng_add_assoc; f_equal.
+replace len2 with (len1 + (len2 - len1)) at 1 by flia Hll.
+rewrite seq_app, fold_left_app.
+rewrite fold_left_srng_add_fun_from_0.
 now rewrite Nat.add_succ_comm.
 Qed.
 
