@@ -1313,6 +1313,9 @@ rewrite <- IHal.
 now rewrite List_filter_filter_comm.
 Qed.
 
+Theorem List_length_cons : ∀ A (a : A) la, length (a :: la) = S (length la).
+Proof. easy. Qed.
+
 Theorem List_length_filter_negb {A} : ∀ f (l : list A),
   NoDup l
   → length (filter f l) = length l - length (filter (λ x, negb (f x)) l).

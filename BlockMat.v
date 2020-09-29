@@ -3945,8 +3945,6 @@ intros j Hj.
 now rewrite Nat_sub_sub_swap.
 Qed.
 
-...
-
 (*
 Theorem map_polyn_list_convol_mul_cons_r : ∀ b la lb ln,
   map (polyn_list_convol_mul la (b :: lb)) ln =
@@ -4091,8 +4089,61 @@ cbn - [ norm_list_as_polyn ].
 rewrite Nat.sub_0_r.
 rewrite rev_app_distr; cbn.
 do 2 rewrite (Nat.add_comm _ (length lb)).
+(*1 begin*)
+destruct lb as [| b]. {
+  rewrite (map_ext_in _ (λ i, 0%Srng)). 2: {
+    intros i Hi.
+    unfold polyn_list_convol_mul.
+    apply all_0_srng_summation_0.
+    intros j Hj.
+    rewrite nth_overflow; [ | apply Nat.le_0_l ].
+    apply srng_mul_0_l.
+  }
+  symmetry.
+  rewrite (map_ext_in _ (λ i, 0%Srng)). 2: {
+    intros i Hi.
+    unfold polyn_list_convol_mul.
+    apply all_0_srng_summation_0.
+    intros j Hj.
+    rewrite nth_overflow; [ | apply Nat.le_0_l ].
+    apply srng_mul_0_l.
+  }
+  unfold norm_list_as_polyn.
+  do 2 rewrite <- map_rev.
+  now setoid_rewrite (strip_0s_map_0 _ []).
+}
+rewrite List_length_cons.
+do 2 rewrite Nat.add_succ_l.
 rewrite map_polyn_list_convol_mul_cons_r.
+rewrite map_polyn_list_convol_mul_cons_r.
+rewrite <- norm_list_as_polyn_add_idemp_l.
+rewrite <- norm_list_as_polyn_add_idemp_r; symmetry.
+rewrite <- norm_list_as_polyn_add_idemp_l.
+rewrite <- norm_list_as_polyn_add_idemp_r; symmetry.
+f_equal; f_equal. {
+(*1 end*)
+  do 2 rewrite <- Nat.add_succ_l.
+  do 2 (rewrite seq_app; symmetry).
+  do 2 rewrite map_app.
+  do 2 rewrite norm_list_as_polyn_app.
+  rewrite Nat.add_0_l.
+  rewrite all_0_norm_list_as_polyn_map_0. 2: {
+    intros n Hn.
+    apply in_seq in Hn.
+    rewrite nth_overflow; [ | easy ].
+    apply srng_mul_0_l.
 ...
+  }
+  symmetry.
+  rewrite all_0_norm_list_as_polyn_map_0. 2: {
+    intros n Hn.
+    apply in_seq in Hn.
+    rewrite nth_overflow; [ | easy ].
+    apply srng_mul_0_l.
+  }
+  easy.
+...
+rewrite map_polyn_list_convol_mul_cons_r.
 rewrite map_polyn_list_convol_mul_cons_r.
 rewrite <- norm_list_as_polyn_add_idemp_l.
 rewrite <- norm_list_as_polyn_add_idemp_r; symmetry.
