@@ -3873,21 +3873,46 @@ Theorem map_polyn_list_convol_mul_cons_r : ∀ b la lb sta len,
 Proof.
 intros.
 unfold polyn_list_convol_mul.
-remember (seq sta len) as ln eqn:Hln; symmetry in Hln.
-revert sta len Hln.
-induction ln as [| n]; intros; [ easy | ].
-destruct len; [ easy | ].
-injection Hln; clear Hln; intros H Hln; subst sta.
+revert sta.
+induction len; intros; [ easy | ].
+rewrite List_seq_succ_r.
+rewrite map_app, IHlen.
+do 2 rewrite map_app.
+rewrite polyn_list_add_app_r, map_length.
+rewrite firstn_app, map_length, Nat.sub_diag, firstn_O.
+rewrite app_nil_r.
+rewrite skipn_app, map_length, Nat.sub_diag, skipn_O.
+rewrite polyn_list_add_app_l.
+rewrite skipn_length.
+do 2 rewrite List_firstn_map.
+rewrite map_length.
+do 2 rewrite List_skipn_map.
+rewrite seq_length.
+rewrite List_firstn_seq, Nat.min_id.
+rewrite List_skipn_seq; [ | easy ].
+rewrite Nat.sub_diag.
+rewrite polyn_list_add_0_l.
+remember (firstn 0 _) as x; cbn in Heqx; subst x.
+remember (skipn 0 _) as x; cbn in Heqx; subst x.
+remember (map _ []) as x; cbn in Heqx; subst x.
+rewrite app_nil_l.
+f_equal.
 cbn - [ nth seq sub ].
-f_equal; [ | now apply (IHln (S n) len) ].
+f_equal.
+destruct (Nat.eq_dec (sta + len) 0) as [Hz| Hz]. {
+  rewrite Hz; cbn.
+  apply srng_add_comm.
+}
+remember (sta + len) as n eqn:Hn.
+destruct n; [ easy | ].
+cbn - [ nth seq sub ].
+rewrite srng_add_comm.
+replace (S n - 1) with n by flia.
 unfold so.
 rewrite srng_summation_split_last; [ | apply Nat.le_0_l ].
 rewrite Nat.sub_diag.
-rewrite srng_add_comm; f_equal.
-destruct n; [ easy | ].
-cbn - [ nth seq sub ].
+f_equal.
 rewrite srng_summation_succ_succ.
-rewrite Nat.sub_succ, (Nat.sub_0_r n).
 apply srng_summation_eq_compat.
 intros i Hi.
 rewrite Nat.sub_succ, Nat.sub_0_r.
@@ -3895,7 +3920,8 @@ f_equal.
 replace (S n - i) with (S (n - i)) by flia Hi.
 now rewrite Nat.sub_succ, Nat.sub_0_r.
 Qed.
-(* faudrait faire pareil pour map_..._cons_l *)
+
+...
 
 (*
 Theorem map_polyn_list_convol_mul_cons_r : ∀ b la lb ln,
