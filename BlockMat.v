@@ -3173,8 +3173,6 @@ End bmatrix_Notations.
 Import matrix_Notations.
 Import bmatrix_Notations.
 
-... (* working on SRpolynomial.v now *)
-
 (* decidability of equality in semirings
    and the fact that 1 ≠ 0 *)
 
@@ -3863,6 +3861,36 @@ destruct i; [ easy | ].
 now cbn; rewrite Nat.sub_0_r.
 Qed.
 
+(* suite : changer len en (S len) *)
+...
+Theorem map_polyn_list_convol_mul_cons_r : ∀ b la lb len,
+  map (polyn_list_convol_mul la (b :: lb)) (seq 0 len) =
+  polyn_list_add
+    (map (λ n, nth n la 0 * b) (seq 0 len))%Srng
+    (map (λ n, (Σ (j = 1, n), nth (j - 1) la 0 * nth (n - j) lb 0)%Srng)
+       (seq 0 len)).
+Proof.
+intros.
+unfold polyn_list_convol_mul.
+remember (seq 0 len) as ln eqn:Hln; symmetry in Hln.
+remember 0 as sta in Hln; clear Heqsta.
+revert sta len Hln.
+induction ln as [| n]; intros; [ easy | ].
+destruct len; [ easy | ].
+injection Hln; clear Hln; intros H Hln; subst sta.
+cbn - [ nth seq sub ].
+f_equal; [ | now apply (IHln (S n) len) ].
+unfold so.
+rewrite srng_summation_split_last; [ | apply Nat.le_0_l ].
+rewrite Nat.sub_diag.
+rewrite srng_add_comm; f_equal.
+apply srng_summation_eq_compat.
+intros i Hi; f_equal.
+now replace (n - (i - 1)) with (S (n - i)) by flia Hi.
+Qed.
+(* faudrait faire pareil pour map_..._cons_l *)
+
+(*
 Theorem map_polyn_list_convol_mul_cons_r : ∀ b la lb ln,
   map (polyn_list_convol_mul la (b :: lb)) ln =
   polyn_list_add
@@ -3882,6 +3910,7 @@ apply srng_summation_eq_compat.
 intros i Hi; f_equal.
 now replace (n - (i - 1)) with (S (n - i)) by flia Hi.
 Qed.
+*)
 
 Theorem map_polyn_list_convol_mul_const_l : ∀ n a ln lb,
   map (λ i, polyn_list_convol_mul (a :: repeat 0%Srng n) lb i) ln =
@@ -3931,40 +3960,6 @@ destruct (srng_eq_dec a 0) as [Haz| Haz]; [ | easy ].
 transitivity (length la); [ easy | ].
 apply Nat.le_succ_diag_r.
 Qed.
-
-Theorem norm_list_convol_mul_more : ∀ n la lb i len,
-  length la + length lb - 1 ≤ i + len
-  → norm_list_as_polyn (map (polyn_list_convol_mul la lb) (seq i len)) =
-    norm_list_as_polyn (map (polyn_list_convol_mul la lb) (seq i (len + n))).
-Proof.
-intros.
-induction n; [ rewrite Nat.add_0_r; reflexivity | idtac ].
-rewrite Nat.add_succ_r.
-Admitted.
-(*
-rewrite lap_convol_mul_succ.
-rewrite IHn.
-apply lap_norm_app_0_r.
-intros j.
-rewrite all_0_summation_0. {
-  destruct j; [ easy | now destruct j ].
-}
-clear j.
-intros j (_, Hj).
-apply rng_mul_eq_0.
-destruct (le_dec (length la) j) as [H1| H1]. {
-  now left; rewrite List.nth_overflow.
-} {
-  apply Nat.nle_gt in H1.
-  destruct (le_dec (length lb) (i + (len + n) - j)) as [H2| H2]. {
-    now right; rewrite nth_overflow.
-  } {
-    exfalso; apply H2; clear H2.
-    flia H H1.
-  }
-}
-Qed.
-*)
 
 Theorem norm_list_as_polyn_mul_idemp_l : ∀ la lb,
   norm_list_as_polyn (polyn_list_mul (norm_list_as_polyn la) lb) =
@@ -4040,6 +4035,7 @@ rewrite Nat.sub_0_r.
 rewrite rev_app_distr; cbn.
 do 2 rewrite (Nat.add_comm _ (length lb)).
 rewrite map_polyn_list_convol_mul_cons_r.
+...
 rewrite map_polyn_list_convol_mul_cons_r.
 rewrite <- norm_list_as_polyn_add_idemp_l.
 rewrite <- norm_list_as_polyn_add_idemp_r; symmetry.
@@ -4067,9 +4063,6 @@ f_equal; f_equal. {
 }
 replace (rev lc ++ [c]) with (rev (c :: lc)) by easy.
 rewrite <- Hlc.
-Check norm_list_convol_mul_more.
-Print polyn_list_convol_mul.
-rewrite (norm_list_convol_mul_more).
 ...
 rewrite rev_app_distr; cbn.
 rewrite fold_lap_norm.
