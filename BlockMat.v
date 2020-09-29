@@ -3861,13 +3861,14 @@ destruct i; [ easy | ].
 now cbn; rewrite Nat.sub_0_r.
 Qed.
 
-(* suite : changer len en (S len) *)
-...
 Theorem map_polyn_list_convol_mul_cons_r : ∀ b la lb len,
   map (polyn_list_convol_mul la (b :: lb)) (seq 0 len) =
   polyn_list_add
     (map (λ n, nth n la 0 * b) (seq 0 len))%Srng
-    (map (λ n, (Σ (j = 1, n), nth (j - 1) la 0 * nth (n - j) lb 0)%Srng)
+    (map
+       (λ n,
+          if zerop n then 0%Srng
+          else (Σ (j = 0, n - 1), nth j la 0 * nth (n - j - 1) lb 0)%Srng)
        (seq 0 len)).
 Proof.
 intros.
@@ -3884,9 +3885,16 @@ unfold so.
 rewrite srng_summation_split_last; [ | apply Nat.le_0_l ].
 rewrite Nat.sub_diag.
 rewrite srng_add_comm; f_equal.
+destruct n; [ easy | ].
+cbn - [ nth seq sub ].
+rewrite srng_summation_succ_succ.
+rewrite Nat.sub_succ, (Nat.sub_0_r n).
 apply srng_summation_eq_compat.
-intros i Hi; f_equal.
-now replace (n - (i - 1)) with (S (n - i)) by flia Hi.
+intros i Hi.
+rewrite Nat.sub_succ, Nat.sub_0_r.
+f_equal.
+replace (S n - i) with (S (n - i)) by flia Hi.
+now rewrite Nat.sub_succ, Nat.sub_0_r.
 Qed.
 (* faudrait faire pareil pour map_..._cons_l *)
 
