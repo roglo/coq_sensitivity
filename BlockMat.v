@@ -4142,6 +4142,43 @@ f_equal; f_equal. {
   }
   easy.
 }
+rewrite Nat.add_1_r.
+unfold polyn_list_convol_mul.
+rewrite
+  (map_ext_in _
+     (λ n,
+        (Σ (j = 0, length lb),
+         nth j (b :: lb) 0 * nth (n - 1 - j) (rev lc ++ [c]) 0))%Srng). 2: {
+  intros i Hi.
+  apply in_seq in Hi.
+...
+  rewrite srng_summation_split.
+
+         Σ (j = S (length lb, length lb + S (length lc)),
+         nth j (b :: lb) 0 * nth (n - 1 - j) (rev lc ++ [c]) 0)%Srng)).
+... 3
+do 2 rewrite (Nat.add_comm (length lb)).
+rewrite seq_app, map_app.
+... 2
+rewrite (map_ext_in _ (λ _, 0%Srng) (seq _ (length lb))). 2: {
+  intros i Hi.
+  unfold polyn_list_convol_mul.
+  cbn - [ nth seq sub ].
+... 1
+assert (Hca : length lc < length la). {
+  apply Nat.succ_lt_mono.
+  replace (S (length lc)) with (length (c :: lc)) by easy.
+  rewrite <- Hlc.
+  rewrite <- (rev_length la).
+  apply Nat.lt_succ_r.
+  apply length_strip_0s_le.
+}
+remember (length la - S (length lc)) as lac eqn:Hlac.
+replace (length la) with (S (length lc) + lac) by flia Hca Hlac.
+replace (S (length lc)) with (length (strip_0s (rev la))) by now rewrite Hlc.
+rewrite <- Nat.add_assoc.
+do 2 rewrite seq_app.
+rewrite Nat.add_0_l.
 ...
 rewrite map_polyn_list_convol_mul_cons_r.
 rewrite map_polyn_list_convol_mul_cons_r.
