@@ -3861,7 +3861,7 @@ destruct i; [ easy | ].
 now cbn; rewrite Nat.sub_0_r.
 Qed.
 
-Theorem map_polyn_list_convol_mul_cons_r : ∀ b la lb sta len,
+Theorem map_polyn_list_convol_mul_cons_r' : ∀ b la lb sta len,
   map (polyn_list_convol_mul la (b :: lb)) (seq sta len) =
   polyn_list_add
     (map (λ n, nth n la 0 * b) (seq sta len))%Srng
@@ -3919,6 +3919,30 @@ rewrite Nat.sub_succ, Nat.sub_0_r.
 f_equal.
 replace (S n - i) with (S (n - i)) by flia Hi.
 now rewrite Nat.sub_succ, Nat.sub_0_r.
+Qed.
+
+Theorem map_polyn_list_convol_mul_cons_r : ∀ b la lb len,
+  map (polyn_list_convol_mul la (b :: lb)) (seq 0 (S len)) =
+  polyn_list_add (map (λ n, (nth n la 0 * b)%Srng) (seq 0 (S len)))
+    (0%Srng :: map (λ n, polyn_list_convol_mul la lb (n - 1)) (seq 1 len)).
+Proof.
+intros.
+rewrite map_polyn_list_convol_mul_cons_r'.
+f_equal.
+rewrite <- (Nat.add_1_l len).
+rewrite seq_app.
+cbn - [ nth seq sub ].
+rewrite map_app.
+replace (seq 0 1) with [0] by easy.
+cbn - [ nth seq sub ].
+f_equal.
+apply map_ext_in.
+intros i Hi.
+apply in_seq in Hi.
+destruct (zerop i) as [H| H]; [ flia Hi H | ].
+apply srng_summation_eq_compat.
+intros j Hj.
+now rewrite Nat_sub_sub_swap.
 Qed.
 
 ...
