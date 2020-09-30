@@ -4165,6 +4165,24 @@ rewrite Nat.add_sub_assoc. 2: {
 }
 rewrite Nat.add_1_r, (Nat.add_comm _ (length la)).
 rewrite Nat.add_sub.
+unfold norm_polyn_list at 2.
+replace (rev lc ++ [c]) with (rev (c :: lc)) by easy.
+rewrite <- Hlc.
+...
+(*
+Theorem norm_polyn_list_cons_norm : ∀ a la lb i len,
+  length (a :: la) + length lb - 1 ≤ i + len
+  → norm_polyn_list
+      (map (polyn_list_convol_mul (a :: norm_polyn_list la) lb) (seq i len)) =
+    norm_polyn_list
+      (map (polyn_list_convol_mul (a :: la) lb) (seq i len)).
+Proof.
+intros * Hlen.
+*)
+....
+rewrite fold_norm_polyn_list.
+...
+rewrite norm_polyn_list_cons_norm.
 ...
 Theorem lap_norm_cons_norm : ∀ a la lb i len,
   length (a :: la) + length lb - 1 ≤ i + len
