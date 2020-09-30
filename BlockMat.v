@@ -4226,13 +4226,26 @@ f_equal; f_equal. 2: {
 clear IHlb.
 remember (length lb) as len eqn:Hlen.
 clear lb Hlen.
-Search (norm_polyn_list (map _ _)).
-...
+destruct (srng_eq_dec a 0) as [Haz| Haz]. {
+  subst a; cbn in Hlc.
+  destruct (srng_eq_dec 0 0) as [H| H]; [ clear H | easy ].
+... 3
+do 2 rewrite <- Nat.add_succ_r.
 replace (S (length la)) with (length (a :: la)) by easy.
 replace (S (length lc)) with (length (c :: lc)) by easy.
+remember (a :: la) as ld eqn:Hld.
+remember (c :: lc) as le eqn:Hle.
+destruct ld as [| d]; [ easy | ].
+destruct le as [| e]; [ easy | ].
+clear a la c lc Hld Hle.
+rename d into a; rename e into c.
+rename ld into la; rename le into lc.
+move a after b; move c before b.
+...
+  norm_polyn_list (map (λ n : nat, (b * nth n (rev (a :: la)) 0)%Srng) (seq 0 (S (len + length la)))) =
+  norm_polyn_list (map (λ n : nat, (b * nth n (rev (c :: lc)) 0)%Srng) (seq 0 (S (len + length lc))))
 ...
 do 2 rewrite Nat.add_succ_r.
-...
 ...
 Search (polyn_list_add (map _ _)).
 ... 2
