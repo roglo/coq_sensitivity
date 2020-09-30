@@ -3249,6 +3249,10 @@ Fixpoint strip_0s l :=
 
 Definition norm_polyn_list l := rev (strip_0s (rev l)).
 
+Theorem fold_norm_polyn_list : ∀ la,
+  rev (strip_0s (rev la)) = norm_polyn_list la.
+Proof. easy. Qed.
+
 (* polynomial from and to a list *)
 
 Theorem polyn_of_list_prop : ∀ l,
@@ -4034,6 +4038,39 @@ do 2 rewrite strip_0s_app.
 now rewrite Hll.
 Qed.
 
+Theorem polyn_list_convol_mul_more : ∀ n la lb i len,
+  length la + length lb - 1 ≤ i + len
+  → norm_polyn_list (map (polyn_list_convol_mul la lb) (seq i len)) =
+    norm_polyn_list (map (polyn_list_convol_mul la lb) (seq i (len + n))).
+Proof.
+intros.
+induction n; [ now rewrite Nat.add_0_r | ].
+rewrite Nat.add_succ_r.
+rewrite List_seq_succ_r.
+rewrite map_app.
+rewrite norm_polyn_list_app.
+rewrite <- IHn.
+cbn - [ norm_polyn_list nth seq sub ].
+unfold polyn_list_convol_mul at 2.
+unfold so.
+rewrite all_0_srng_summation_0. {
+  now cbn; destruct (srng_eq_dec 0 0).
+}
+intros j (_, Hj).
+destruct (le_dec (length la) j) as [H1| H1]. {
+  rewrite nth_overflow; [ | easy ].
+  apply srng_mul_0_l.
+} {
+  apply Nat.nle_gt in H1.
+  destruct (le_dec (length lb) (i + (len + n) - j)) as [H2| H2]. {
+    rewrite (nth_overflow lb); [ | easy ].
+    apply srng_mul_0_r.
+  }
+  exfalso; apply H2; clear H2.
+  flia H H1.
+}
+Qed.
+
 Theorem norm_polyn_list_mul_idemp_l : ∀ la lb,
   norm_polyn_list (polyn_list_mul (norm_polyn_list la) lb) =
   norm_polyn_list (polyn_list_mul la lb).
@@ -4107,6 +4144,44 @@ cbn - [ norm_polyn_list ].
 rewrite Nat.sub_0_r.
 rewrite rev_app_distr; cbn.
 do 2 rewrite (Nat.add_comm _ (length lb)).
+(**)
+rewrite
+  (polyn_list_convol_mul_more
+     (length la - length (norm_polyn_list la))). 2: {
+  cbn; rewrite app_length, rev_length; cbn.
+  rewrite <- Nat.add_1_r, Nat.add_assoc.
+  now rewrite Nat.add_sub.
+}
+remember (norm_polyn_list la) as x eqn:Hx.
+unfold norm_polyn_list in Hx.
+rewrite Hlc in Hx; subst x.
+rewrite rev_length.
+remember (length (c :: lc)) as x eqn:Hx.
+cbn in Hx; subst x.
+rewrite <- Nat.add_assoc.
+rewrite Nat.add_sub_assoc. 2: {
+  specialize (length_strip_0s_le (rev la)) as H.
+  now rewrite Hlc, rev_length in H.
+}
+rewrite Nat.add_1_r, (Nat.add_comm _ (length la)).
+rewrite Nat.add_sub.
+...
+Theorem lap_norm_cons_norm : ∀ a la lb i len,
+  length (a :: la) + length lb - 1 ≤ i + len
+  → lap_norm (lap_convol_mul (a :: lap_norm la) lb i len) =
+    lap_norm (lap_convol_mul (a :: la) lb i len).
+Proof.
+intros * Hlen.
+rewrite (lap_norm_repeat_0 la) at 2.
+rewrite app_comm_cons.
+now rewrite lap_convol_mul_app_rep_0_l.
+Qed.
+...
+rewrite Nat.add_sub.
+rewrite Nat.add_comm.
+apply lap_norm_cons_norm.
+now cbn; rewrite Nat.sub_0_r.
+...
 (*1 begin*)
 destruct lb as [| b]. {
   rewrite (map_ext_in _ (λ i, 0%Srng)). 2: {
@@ -4402,6 +4477,7 @@ replace (map _ _) with (map (λ i, nth i la 0%Srng) (seq 0 (length la))). 2: {
   apply map_ext_in.
   intros j Hj.
   apply in_seq in Hj.
+  unfold polyn_list_convol_mul.
   unfold so.
   rewrite srng_summation_split_first; [ | easy ].
   unfold nth at 2.
@@ -4455,6 +4531,13 @@ Qed.
 
 Theorem polyn_mul_add_distr_l : ∀ P Q R, (P * (Q + R) = P * Q + P * R)%P.
 Proof.
+intros.
+unfold polyn_mul.
+apply polyn_eq; cbn.
+rewrite fold_norm_polyn_list.
+...
+rewrite norm_polyn_list_mul_idemp_r.
+...
 intros.
 unfold polyn_mul.
 apply polyn_eq.
