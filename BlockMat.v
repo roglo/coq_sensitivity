@@ -4071,6 +4071,27 @@ destruct (le_dec (length la) j) as [H1| H1]. {
 }
 Qed.
 
+Theorem norm_polyn_list_cons_norm : ∀ a la lb i len,
+  length (a :: la) + length lb - 1 ≤ i + len
+  → norm_polyn_list
+      (map (polyn_list_convol_mul (a :: norm_polyn_list la) lb) (seq i len)) =
+    norm_polyn_list
+      (map (polyn_list_convol_mul (a :: la) lb) (seq i len)).
+Proof.
+intros * Hlen.
+...
+rewrite (lap_norm_repeat_0 la) at 2.
+rewrite app_comm_cons.
+now rewrite lap_convol_mul_app_rep_0_l.
+Qed.
+...
+rewrite Nat.add_sub.
+rewrite Nat.add_comm.
+apply lap_norm_cons_norm.
+now cbn; rewrite Nat.sub_0_r.
+...
+...
+
 Theorem norm_polyn_list_mul_idemp_l : ∀ la lb,
   norm_polyn_list (polyn_list_mul (norm_polyn_list la) lb) =
   norm_polyn_list (polyn_list_mul la lb).
@@ -4127,6 +4148,7 @@ destruct lc as [| c]. {
   }
   now rewrite all_0_norm_polyn_list_map_0 in Hla.
 }
+(*
 rewrite map_ext_in with
   (g := polyn_list_convol_mul lb (rev (c :: lc ++ [a]))). 2: {
   intros i Hi.
@@ -4138,6 +4160,7 @@ rewrite map_ext_in with (g :=polyn_list_convol_mul lb (a :: la)). 2: {
   apply polyn_list_convol_mul_comm.
 }
 symmetry.
+*)
 rewrite Nat.sub_succ, Nat.sub_0_r.
 rewrite app_comm_cons, app_length.
 cbn - [ norm_polyn_list ].
@@ -4149,8 +4172,8 @@ rewrite
   (polyn_list_convol_mul_more
      (length la - length (norm_polyn_list la))). 2: {
   cbn; rewrite app_length, rev_length; cbn.
-  rewrite <- Nat.add_1_r, Nat.add_assoc.
-  now rewrite Nat.add_sub.
+  rewrite Nat.sub_0_r.
+  now rewrite Nat.add_comm.
 }
 remember (norm_polyn_list la) as x eqn:Hx.
 unfold norm_polyn_list in Hx.
@@ -4168,37 +4191,9 @@ rewrite Nat.add_sub.
 unfold norm_polyn_list at 2.
 replace (rev lc ++ [c]) with (rev (c :: lc)) by easy.
 rewrite <- Hlc.
+do 2 rewrite fold_norm_polyn_list.
 ...
-(*
-Theorem norm_polyn_list_cons_norm : ∀ a la lb i len,
-  length (a :: la) + length lb - 1 ≤ i + len
-  → norm_polyn_list
-      (map (polyn_list_convol_mul (a :: norm_polyn_list la) lb) (seq i len)) =
-    norm_polyn_list
-      (map (polyn_list_convol_mul (a :: la) lb) (seq i len)).
-Proof.
-intros * Hlen.
-*)
-....
-rewrite fold_norm_polyn_list.
-...
-rewrite norm_polyn_list_cons_norm.
-...
-Theorem lap_norm_cons_norm : ∀ a la lb i len,
-  length (a :: la) + length lb - 1 ≤ i + len
-  → lap_norm (lap_convol_mul (a :: lap_norm la) lb i len) =
-    lap_norm (lap_convol_mul (a :: la) lb i len).
-Proof.
-intros * Hlen.
-rewrite (lap_norm_repeat_0 la) at 2.
-rewrite app_comm_cons.
-now rewrite lap_convol_mul_app_rep_0_l.
-Qed.
-...
-rewrite Nat.add_sub.
-rewrite Nat.add_comm.
-apply lap_norm_cons_norm.
-now cbn; rewrite Nat.sub_0_r.
+apply norm_polyn_list_cons_norm.
 ...
 (*1 begin*)
 destruct lb as [| b]. {
