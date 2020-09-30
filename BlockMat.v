@@ -3929,6 +3929,7 @@ intros j Hj.
 now rewrite Nat_sub_sub_swap.
 Qed.
 
+(* (a+xP)Q = aQ+x(PQ) *)
 Theorem map_polyn_list_convol_mul_cons_l : ∀ a la lb len,
   map (polyn_list_convol_mul (a :: la) lb) (seq 0 (S len)) =
   polyn_list_add (map (λ n, (a * nth n lb 0)%Srng) (seq 0 (S len)))
@@ -4203,6 +4204,29 @@ induction lb as [| b]; intros. {
 remember (length (b :: lb)) as x; cbn in Heqx; subst x.
 do 2 rewrite Nat.add_succ_l.
 do 2 rewrite map_polyn_list_convol_mul_cons_l.
+Search norm_polyn_list.
+do 2 (rewrite <- norm_polyn_list_add_idemp_l; symmetry).
+do 2 (rewrite <- norm_polyn_list_add_idemp_r; symmetry).
+f_equal; f_equal. 2: {
+  apply norm_polyn_list_cons_0.
+  do 2 rewrite <- seq_shift.
+  do 2 rewrite map_map.
+  erewrite map_ext_in. 2: {
+    intros i Hi.
+    now rewrite Nat.sub_succ, Nat.sub_0_r.
+  }
+  symmetry.
+  erewrite map_ext_in. 2: {
+    intros i Hi.
+    now rewrite Nat.sub_succ, Nat.sub_0_r.
+  }
+  symmetry.
+  now apply IHlb.
+}
+clear IHlb.
+remember (length lb) as len eqn:Hlen.
+clear lb Hlen.
+Search (norm_polyn_list (map _ _)).
 ...
 replace (S (length la)) with (length (a :: la)) by easy.
 replace (S (length lc)) with (length (c :: lc)) by easy.
