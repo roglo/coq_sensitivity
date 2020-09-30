@@ -4156,11 +4156,35 @@ f_equal; f_equal. {
   easy.
 }
 rewrite Nat.add_1_r.
-(**)
-replace (S (length lc)) with (length (c :: lc)) by easy.
-replace (rev lc ++ [c]) with (rev (c :: lc)) by easy.
-rewrite <- Hlc.
 apply norm_polyn_list_cons_0.
+(**)
+do 2 rewrite <- seq_shift.
+do 2 rewrite map_map.
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  now rewrite Nat.sub_succ, Nat.sub_0_r.
+}
+symmetry.
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  now rewrite Nat.sub_succ, Nat.sub_0_r.
+}
+symmetry.
+remember (rev la) as ld eqn:Hld; symmetry in Hld.
+destruct ld as [| d]; [ easy | ].
+cbn in Hld.
+apply List_eq_rev_l in Hld.
+cbn in Hld.
+subst la.
+rewrite app_length; cbn.
+rewrite Nat.add_1_r.
+rewrite rev_length.
+... 2
+clear a.
+destruct la as [| a]; [ easy | ].
+remember (length (a :: la)) as x; cbn in Heqx; subst x.
+do 2 rewrite <- Nat.add_succ_comm.
+Search (seq (S _)).
 ... 1
 unfold polyn_list_convol_mul.
 rewrite seq_app, map_app.
