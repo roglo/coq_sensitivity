@@ -3247,16 +3247,16 @@ Fixpoint strip_0s l :=
   | a :: l' => if srng_eq_dec a 0%Srng then strip_0s l' else l
   end.
 
-Definition norm_list_as_polyn l := rev (strip_0s (rev l)).
+Definition norm_polyn_list l := rev (strip_0s (rev l)).
 
 (* polynomial from and to a list *)
 
 Theorem polyn_of_list_prop : ∀ l,
-  polyn_prop_test (λ i, nth i (norm_list_as_polyn l) 0%Srng)
-    (length (norm_list_as_polyn l)) = true.
+  polyn_prop_test (λ i, nth i (norm_polyn_list l) 0%Srng)
+    (length (norm_polyn_list l)) = true.
 Proof.
 intros.
-unfold norm_list_as_polyn.
+unfold norm_polyn_list.
 remember (rev l) as l' eqn:Hl.
 clear l Hl.
 rename l' into l.
@@ -3269,7 +3269,7 @@ now destruct (srng_eq_dec a 0%Srng).
 Qed.
 
 Definition polyn_of_list l :=
-  mk_polyn (norm_list_as_polyn l) (polyn_of_list_prop l).
+  mk_polyn (norm_polyn_list l) (polyn_of_list_prop l).
 
 Definition list_of_polyn (P : polynomial T) :=
   polyn_list P.
@@ -3474,7 +3474,7 @@ intros (la, Pa); cbn.
 apply polyn_eq.
 cbn - [ polyn_list_add ].
 rewrite polyn_list_add_0_l.
-unfold norm_list_as_polyn.
+unfold norm_polyn_list.
 rewrite <- rev_involutive; f_equal.
 rewrite <- (rev_involutive la) in Pa.
 rewrite rev_length in Pa.
@@ -3554,15 +3554,15 @@ induction n; [ easy | cbn ].
 now destruct (srng_eq_dec 0%Srng 0%Srng).
 Qed.
 
-Theorem norm_list_as_polyn_app : ∀ la lb,
-  norm_list_as_polyn (la ++ lb) =
-  match norm_list_as_polyn lb with
-  | [] => norm_list_as_polyn la
+Theorem norm_polyn_list_app : ∀ la lb,
+  norm_polyn_list (la ++ lb) =
+  match norm_polyn_list lb with
+  | [] => norm_polyn_list la
   | lc => la ++ lc
   end.
 Proof.
 intros.
-unfold norm_list_as_polyn.
+unfold norm_polyn_list.
 rewrite rev_app_distr.
 rewrite strip_0s_app.
 remember (strip_0s (rev lb)) as lc eqn:Hlc.
@@ -3658,26 +3658,26 @@ destruct lb as [| b]; [ easy | cbn ].
 f_equal; apply IHla.
 Qed.
 
-Theorem norm_list_as_polyn_involutive : ∀ la,
-  norm_list_as_polyn (norm_list_as_polyn la) = norm_list_as_polyn la.
+Theorem norm_polyn_list_involutive : ∀ la,
+  norm_polyn_list (norm_polyn_list la) = norm_polyn_list la.
 Proof.
 intros.
 induction la as [| a] using rev_ind; [ easy | ].
-rewrite norm_list_as_polyn_app.
-remember (norm_list_as_polyn [a]) as x eqn:Hx.
+rewrite norm_polyn_list_app.
+remember (norm_polyn_list [a]) as x eqn:Hx.
 cbn in Hx; subst x.
 destruct (srng_eq_dec a 0) as [Haz| Haz]; [ easy | ].
-cbn - [ norm_list_as_polyn ].
-rewrite norm_list_as_polyn_app; cbn.
+cbn - [ norm_polyn_list ].
+rewrite norm_polyn_list_app; cbn.
 now destruct (srng_eq_dec a 0).
 Qed.
 
-Theorem norm_list_as_polyn_add_idemp_l : ∀ la lb,
-  norm_list_as_polyn (polyn_list_add (norm_list_as_polyn la) lb) =
-  norm_list_as_polyn (polyn_list_add la lb).
+Theorem norm_polyn_list_add_idemp_l : ∀ la lb,
+  norm_polyn_list (polyn_list_add (norm_polyn_list la) lb) =
+  norm_polyn_list (polyn_list_add la lb).
 Proof.
 intros.
-unfold norm_list_as_polyn; f_equal.
+unfold norm_polyn_list; f_equal.
 revert la.
 induction lb as [| b]; intros. {
   do 2 rewrite polyn_list_add_0_r.
@@ -3702,13 +3702,13 @@ rewrite rev_app_distr; cbn.
 now rewrite strip_0s_app.
 Qed.
 
-Theorem norm_list_as_polyn_add_idemp_r : ∀ la lb,
-  norm_list_as_polyn (polyn_list_add la (norm_list_as_polyn lb)) =
-  norm_list_as_polyn (polyn_list_add la lb).
+Theorem norm_polyn_list_add_idemp_r : ∀ la lb,
+  norm_polyn_list (polyn_list_add la (norm_polyn_list lb)) =
+  norm_polyn_list (polyn_list_add la lb).
 Proof.
 intros.
 rewrite polyn_list_add_comm.
-rewrite norm_list_as_polyn_add_idemp_l.
+rewrite norm_polyn_list_add_idemp_l.
 now rewrite polyn_list_add_comm.
 Qed.
 
@@ -3731,8 +3731,8 @@ Proof.
 intros (la, Pa) (lb, Pb) (lc, Pc).
 apply polyn_eq.
 cbn - [ polyn_list_add ].
-rewrite norm_list_as_polyn_add_idemp_l.
-rewrite norm_list_as_polyn_add_idemp_r.
+rewrite norm_polyn_list_add_idemp_l.
+rewrite norm_polyn_list_add_idemp_r.
 f_equal.
 apply polyn_list_add_assoc.
 Qed.
@@ -3831,13 +3831,13 @@ rewrite IHli; f_equal.
 apply polyn_list_convol_mul_0_l.
 Qed.
 
-Theorem norm_list_as_polyn_repeat_0 : ∀ n,
-  norm_list_as_polyn (repeat 0%Srng n) = [].
+Theorem norm_polyn_list_repeat_0 : ∀ n,
+  norm_polyn_list (repeat 0%Srng n) = [].
 Proof.
 intros.
 induction n; [ easy | ].
 rewrite List_repeat_succ_app.
-rewrite norm_list_as_polyn_app; cbn.
+rewrite norm_polyn_list_app; cbn.
 now destruct (srng_eq_dec 0 0).
 Qed.
 
@@ -3987,12 +3987,12 @@ rewrite all_0_srng_summation_0. 2: {
 now rewrite Nat.sub_0_r, srng_add_0_r.
 Qed.
 
-Theorem all_0_norm_list_as_polyn_map_0 : ∀ A (ln : list A) f,
+Theorem all_0_norm_polyn_list_map_0 : ∀ A (ln : list A) f,
   (∀ n, n ∈ ln → f n = 0%Srng)
-  → norm_list_as_polyn (map f ln) = [].
+  → norm_polyn_list (map f ln) = [].
 Proof.
 intros A * Hf.
-unfold norm_list_as_polyn.
+unfold norm_polyn_list.
 apply List_eq_rev_nil.
 rewrite rev_involutive.
 induction ln as [| n]; [ easy | cbn ].
@@ -4016,22 +4016,22 @@ transitivity (length la); [ easy | ].
 apply Nat.le_succ_diag_r.
 Qed.
 
-Theorem norm_list_as_polyn_cons_0 : ∀ la lb,
-  norm_list_as_polyn la = norm_list_as_polyn lb
-  → norm_list_as_polyn (0%Srng :: la) =
-     norm_list_as_polyn (0%Srng :: lb).
+Theorem norm_polyn_list_cons_0 : ∀ la lb,
+  norm_polyn_list la = norm_polyn_list lb
+  → norm_polyn_list (0%Srng :: la) =
+     norm_polyn_list (0%Srng :: lb).
 Proof.
 intros * Hll.
-unfold norm_list_as_polyn in Hll |-*.
+unfold norm_polyn_list in Hll |-*.
 f_equal.
 apply List_rev_inj in Hll; cbn.
 do 2 rewrite strip_0s_app.
 now rewrite Hll.
 Qed.
 
-Theorem norm_list_as_polyn_mul_idemp_l : ∀ la lb,
-  norm_list_as_polyn (polyn_list_mul (norm_list_as_polyn la) lb) =
-  norm_list_as_polyn (polyn_list_mul la lb).
+Theorem norm_polyn_list_mul_idemp_l : ∀ la lb,
+  norm_polyn_list (polyn_list_mul (norm_polyn_list la) lb) =
+  norm_polyn_list (polyn_list_mul la lb).
 Proof.
 intros.
 unfold polyn_list_mul.
@@ -4052,7 +4052,7 @@ destruct lc as [| c]. {
     cbn - [ nth seq sub ].
     rewrite (map_polyn_list_convol_mul_0_l 0).
     rewrite seq_length.
-    rewrite norm_list_as_polyn_repeat_0; cbn.
+    rewrite norm_polyn_list_repeat_0; cbn.
     symmetry.
     apply List_eq_rev_nil.
     rewrite rev_involutive.
@@ -4073,8 +4073,8 @@ destruct lc as [| c]. {
   rewrite (map_polyn_list_convol_mul_const_l n).
   rewrite Nat.add_comm.
   rewrite seq_app, map_app.
-  rewrite norm_list_as_polyn_app; cbn.
-  remember (norm_list_as_polyn (map _ (seq _ n))) as la eqn:Hla.
+  rewrite norm_polyn_list_app; cbn.
+  remember (norm_polyn_list (map _ (seq _ n))) as la eqn:Hla.
   symmetry in Hla.
   destruct la as [| a1]; [ easy | exfalso ].
   rewrite map_ext_in with (g := λ i, 0%Srng) in Hla. 2: {
@@ -4083,7 +4083,7 @@ destruct lc as [| c]. {
     rewrite nth_overflow; [ | easy ].
     apply srng_mul_0_r.
   }
-  now rewrite all_0_norm_list_as_polyn_map_0 in Hla.
+  now rewrite all_0_norm_polyn_list_map_0 in Hla.
 }
 rewrite map_ext_in with
   (g := polyn_list_convol_mul lb (rev (c :: lc ++ [a]))). 2: {
@@ -4098,7 +4098,7 @@ rewrite map_ext_in with (g :=polyn_list_convol_mul lb (a :: la)). 2: {
 symmetry.
 rewrite Nat.sub_succ, Nat.sub_0_r.
 rewrite app_comm_cons, app_length.
-cbn - [ norm_list_as_polyn ].
+cbn - [ norm_polyn_list ].
 rewrite Nat.sub_0_r.
 rewrite rev_app_distr; cbn.
 do 2 rewrite (Nat.add_comm _ (length lb)).
@@ -4121,7 +4121,7 @@ destruct lb as [| b]. {
     rewrite nth_overflow; [ | apply Nat.le_0_l ].
     apply srng_mul_0_l.
   }
-  unfold norm_list_as_polyn.
+  unfold norm_polyn_list.
   do 2 rewrite <- map_rev.
   now setoid_rewrite (strip_0s_map_0 _ []).
 }
@@ -4129,25 +4129,25 @@ rewrite List_length_cons.
 do 2 rewrite Nat.add_succ_l.
 rewrite map_polyn_list_convol_mul_cons_r.
 rewrite map_polyn_list_convol_mul_cons_r.
-rewrite <- norm_list_as_polyn_add_idemp_l.
-rewrite <- norm_list_as_polyn_add_idemp_r; symmetry.
-rewrite <- norm_list_as_polyn_add_idemp_l.
-rewrite <- norm_list_as_polyn_add_idemp_r; symmetry.
+rewrite <- norm_polyn_list_add_idemp_l.
+rewrite <- norm_polyn_list_add_idemp_r; symmetry.
+rewrite <- norm_polyn_list_add_idemp_l.
+rewrite <- norm_polyn_list_add_idemp_r; symmetry.
 f_equal; f_equal. {
 (*1 end*)
   do 2 rewrite <- Nat.add_succ_l.
   do 2 (rewrite seq_app; symmetry).
   do 2 rewrite map_app.
-  do 2 rewrite norm_list_as_polyn_app.
+  do 2 rewrite norm_polyn_list_app.
   rewrite Nat.add_0_l.
-  rewrite all_0_norm_list_as_polyn_map_0. 2: {
+  rewrite all_0_norm_polyn_list_map_0. 2: {
     intros n Hn.
     apply in_seq in Hn.
     rewrite nth_overflow; [ | easy ].
     apply srng_mul_0_l.
   }
   symmetry.
-  rewrite all_0_norm_list_as_polyn_map_0. 2: {
+  rewrite all_0_norm_polyn_list_map_0. 2: {
     intros n Hn.
     apply in_seq in Hn.
     rewrite nth_overflow; [ | easy ].
@@ -4160,7 +4160,7 @@ rewrite Nat.add_1_r.
 replace (S (length lc)) with (length (c :: lc)) by easy.
 replace (rev lc ++ [c]) with (rev (c :: lc)) by easy.
 rewrite <- Hlc.
-apply norm_list_as_polyn_cons_0.
+apply norm_polyn_list_cons_0.
 ... 1
 unfold polyn_list_convol_mul.
 rewrite seq_app, map_app.
@@ -4209,23 +4209,23 @@ subst f.
 ...
 rewrite map_polyn_list_convol_mul_cons_r.
 rewrite map_polyn_list_convol_mul_cons_r.
-rewrite <- norm_list_as_polyn_add_idemp_l.
-rewrite <- norm_list_as_polyn_add_idemp_r; symmetry.
-rewrite <- norm_list_as_polyn_add_idemp_l.
-rewrite <- norm_list_as_polyn_add_idemp_r; symmetry.
+rewrite <- norm_polyn_list_add_idemp_l.
+rewrite <- norm_polyn_list_add_idemp_r; symmetry.
+rewrite <- norm_polyn_list_add_idemp_l.
+rewrite <- norm_polyn_list_add_idemp_r; symmetry.
 f_equal; f_equal. {
   do 2 (rewrite seq_app; symmetry).
   do 2 rewrite map_app.
-  do 2 rewrite norm_list_as_polyn_app.
+  do 2 rewrite norm_polyn_list_app.
   rewrite Nat.add_0_l.
-  rewrite all_0_norm_list_as_polyn_map_0. 2: {
+  rewrite all_0_norm_polyn_list_map_0. 2: {
     intros n Hn.
     apply in_seq in Hn.
     rewrite nth_overflow; [ | easy ].
     apply srng_mul_0_l.
   }
   symmetry.
-  rewrite all_0_norm_list_as_polyn_map_0. 2: {
+  rewrite all_0_norm_polyn_list_map_0. 2: {
     intros n Hn.
     apply in_seq in Hn.
     rewrite nth_overflow; [ | easy ].
@@ -4259,7 +4259,7 @@ apply lap_norm_cons_norm.
 now cbn; rewrite Nat.sub_0_r.
 ...
 intros.
-unfold norm_list_as_polyn; f_equal.
+unfold norm_polyn_list; f_equal.
 revert la.
 induction lb as [| b]; intros. {
   do 2 rewrite polyn_list_add_0_r.
@@ -4285,13 +4285,13 @@ now rewrite strip_0s_app.
 Qed.
 ...
 
-Theorem norm_list_as_polyn_mul_idemp_r : ∀ la lb,
-  norm_list_as_polyn (polyn_list_mul la (norm_list_as_polyn lb)) =
-  norm_list_as_polyn (polyn_list_mul la lb).
+Theorem norm_polyn_list_mul_idemp_r : ∀ la lb,
+  norm_polyn_list (polyn_list_mul la (norm_polyn_list lb)) =
+  norm_polyn_list (polyn_list_mul la lb).
 Proof.
 intros.
 rewrite polyn_list_mul_comm.
-rewrite norm_list_as_polyn_mul_idemp_l.
+rewrite norm_polyn_list_mul_idemp_l.
 now rewrite polyn_list_mul_comm.
 Qed.
 
@@ -4336,7 +4336,7 @@ intros.
 unfold polyn_mul.
 rewrite polyn_of_list_mul_1_l.
 apply polyn_eq; cbn.
-unfold norm_list_as_polyn.
+unfold norm_polyn_list.
 destruct P as (la, Hla); cbn.
 unfold polyn_prop_test in Hla.
 destruct la as [| a]; [ easy | ].
@@ -4366,9 +4366,9 @@ intros.
 unfold polyn_mul.
 apply polyn_eq.
 cbn - [ polyn_list_add ].
-rewrite norm_list_as_polyn_mul_idemp_r.
-rewrite norm_list_as_polyn_add_idemp_l.
-rewrite norm_list_as_polyn_add_idemp_r.
+rewrite norm_polyn_list_mul_idemp_r.
+rewrite norm_polyn_list_add_idemp_l.
+rewrite norm_polyn_list_add_idemp_r.
 f_equal.
 ...
 rewrite fold_lap_norm.
