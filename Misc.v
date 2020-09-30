@@ -1495,6 +1495,13 @@ subst lb; symmetry.
 apply rev_involutive.
 Qed.
 
+Theorem List_rev_inj : ∀ A (la lb : list A), rev la = rev lb → la = lb.
+Proof.
+intros A * Hll.
+apply List_eq_rev_l in Hll.
+now rewrite rev_involutive in Hll.
+Qed.
+
 Theorem List_repeat_succ_app : ∀ A (a : A) n,
   repeat a (S n) = repeat a n ++ [a].
 Proof.

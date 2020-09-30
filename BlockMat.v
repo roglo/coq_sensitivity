@@ -4016,6 +4016,19 @@ transitivity (length la); [ easy | ].
 apply Nat.le_succ_diag_r.
 Qed.
 
+Theorem norm_list_as_polyn_cons_0 : ∀ la lb,
+  norm_list_as_polyn la = norm_list_as_polyn lb
+  → norm_list_as_polyn (0%Srng :: la) =
+     norm_list_as_polyn (0%Srng :: lb).
+Proof.
+intros * Hll.
+unfold norm_list_as_polyn in Hll |-*.
+f_equal.
+apply List_rev_inj in Hll; cbn.
+do 2 rewrite strip_0s_app.
+now rewrite Hll.
+Qed.
+
 Theorem norm_list_as_polyn_mul_idemp_l : ∀ la lb,
   norm_list_as_polyn (polyn_list_mul (norm_list_as_polyn la) lb) =
   norm_list_as_polyn (polyn_list_mul la lb).
@@ -4147,6 +4160,7 @@ rewrite Nat.add_1_r.
 replace (S (length lc)) with (length (c :: lc)) by easy.
 replace (rev lc ++ [c]) with (rev (c :: lc)) by easy.
 rewrite <- Hlc.
+apply norm_list_as_polyn_cons_0.
 ... 1
 unfold polyn_list_convol_mul.
 rewrite seq_app, map_app.
