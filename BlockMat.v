@@ -4079,6 +4079,13 @@ Theorem norm_polyn_list_cons_norm : ∀ a la lb i len,
       (map (polyn_list_convol_mul (a :: la) lb) (seq i len)).
 Proof.
 intros * Hlen.
+revert i Hlen.
+induction len; intros; [ easy | ].
+destruct i. {
+...
+rewrite List_seq_succ_r.
+rewrite map_app, norm_polyn_list_app; symmetry.
+rewrite map_app, norm_polyn_list_app; symmetry.
 ...
 rewrite (lap_norm_repeat_0 la) at 2.
 rewrite app_comm_cons.
