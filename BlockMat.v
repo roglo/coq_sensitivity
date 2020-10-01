@@ -4191,47 +4191,13 @@ do 2 rewrite map_app.
 do 2 rewrite norm_polyn_list_app.
 cbn - [ norm_polyn_list nth sub ].
 rewrite IHlen.
-remember (norm_polyn_list _) as lc eqn:Hlc; symmetry in Hlc.
-destruct lc as [| c]. {
-  cbn - [ seq ].
-  f_equal.
-  destruct (srng_eq_dec (polyn_list_convol_mul (la ++ [0%Srng]) lb i) 0)
-    as [Hz1| Hz1]. {
-    destruct (srng_eq_dec (polyn_list_convol_mul la lb i) 0) as [Hz2| Hz2];
-      [ easy | exfalso ].
-    apply Hz2; clear Hz2.
-    rewrite <- Hz1.
-    unfold polyn_list_convol_mul.
-    apply srng_summation_eq_compat.
-    intros j Hj.
-    destruct (lt_dec j (length la)) as [Hjla| Hjla]. {
-      now rewrite app_nth1.
-    }
-    apply Nat.nlt_ge in Hjla.
-    rewrite (nth_overflow la); [ | easy ].
-    rewrite app_nth2; [ | easy ].
-    destruct (Nat.eq_dec j (length la)) as [Hjla2| Hjla2]. {
-      now rewrite Hjla2, Nat.sub_diag.
-    }
-    symmetry.
-    rewrite nth_overflow; [ easy | cbn; flia Hjla Hjla2 ].
-  } {
-...
-cbn - [ seq ].
-do 2 rewrite strip_0s_app.
-rewrite <- (rev_involutive (strip_0s _)).
-rewrite fold_lap_norm.
-rewrite <- (rev_involutive (strip_0s (rev _))).
-rewrite fold_lap_norm.
-rewrite IHlen.
-remember (rev (lap_norm _)) as lc eqn:Hlc; symmetry in Hlc.
-f_equal.
-destruct lc as [| c]. {
-  apply List_eq_rev_nil in Hlc.
-  f_equal; f_equal.
-  apply summation_compat.
+assert
+  (Hll :
+     polyn_list_convol_mul la lb i =
+     polyn_list_convol_mul (la ++ [0%Srng]) lb i). {
+  unfold polyn_list_convol_mul.
+  apply srng_summation_eq_compat.
   intros j Hj.
-  f_equal; clear.
   destruct (lt_dec j (length la)) as [Hjla| Hjla]. {
     now rewrite app_nth1.
   }
@@ -4241,25 +4207,11 @@ destruct lc as [| c]. {
   destruct (Nat.eq_dec j (length la)) as [Hjla2| Hjla2]. {
     now rewrite Hjla2, Nat.sub_diag.
   }
-  rewrite nth_overflow; [ easy | cbn; flia Hjla Hjla2 ].
-} {
-  f_equal; f_equal.
-  apply summation_compat.
-  intros j Hj.
-  f_equal; clear.
-  destruct (lt_dec j (length la)) as [Hjla| Hjla]. {
-    now rewrite app_nth1.
-  }
-  apply Nat.nlt_ge in Hjla.
-  rewrite (nth_overflow la); [ | easy ].
-  rewrite app_nth2; [ | easy ].
-  destruct (Nat.eq_dec j (length la)) as [Hjla2| Hjla2]. {
-    now rewrite Hjla2, Nat.sub_diag.
-  }
+  symmetry.
   rewrite nth_overflow; [ easy | cbn; flia Hjla Hjla2 ].
 }
+now rewrite Hll.
 Qed.
-...
 
 (*
 Theorem lap_norm_cons_norm : ∀ a la lb i len,
@@ -4277,94 +4229,8 @@ Proof.
 intros * Hlen.
 rewrite (norm_polyn_list_app_repeat_0 la) at 2.
 rewrite app_comm_cons.
-...
 now rewrite polyn_list_convol_mul_app_rep_0_l.
 Qed.
-
-...
-rewrite (lap_norm_repeat_0 la) at 2.
-rewrite app_comm_cons.
-now rewrite lap_convol_mul_app_rep_0_l.
-Qed.
-...
-Check polyn_list_add_repeat_0s_l.
-rewrite (polyn_list_add_repeat_0s_l (length la)) at 2.
-...
-intros * Hlen.
-revert i Hlen.
-induction len; intros; [ easy | ].
-rewrite <- Nat.add_1_l.
-rewrite seq_app.
-rewrite map_app, norm_polyn_list_app; symmetry.
-rewrite map_app, norm_polyn_list_app; symmetry.
-rewrite IHlen; [ | flia Hlen ].
-remember (norm_polyn_list _) as lc eqn:Hlc in |-*.
-symmetry in Hlc.
-destruct lc as [| c]. 2: {
-  f_equal.
-  apply map_ext_in.
-  intros j Hj.
-  apply in_seq in Hj.
-  replace j with i by flia Hj.
-  clear j Hj.
-  apply srng_summation_eq_compat.
-  intros j (_, Hj).
-  unfold norm_polyn_list.
-  destruct j; [ easy | cbn ].
-...
-Theorem glop : ∀ la, ∃ n,
-  la = repeat 0%Srng n ++ strip_0s la.
-...
-Print strip_0s.
-specialize (glop la) as (n, Hn).
-...
-destruct lc as [| c]. {
-  cbn - [ nth sub ]; f_equal.
-  specialize (proj2 (all_0_norm_polyn_list_map_0 _ _) Hlc) as Hn.
-  destruct
-    (srng_eq_dec (polyn_list_convol_mul (a :: norm_polyn_list la) lb i) 0)
-    as [Hz1| Hz1]. {
-    destruct (srng_eq_dec (polyn_list_convol_mul (a :: la) lb i) 0)
-      as [Hz2| Hz2]; [ easy | exfalso ].
-    apply Hz2; clear Hz2.
-    unfold polyn_list_convol_mul.
-    apply all_0_srng_summation_0.
-    intros j Hj.
-...
-    induction la as [| a1]; [ easy | ].
-    cbn - [ polyn_list_convol_mul ] in Hz1.
-    unfold polyn_list_convol_mul.
-    unfold so.
-    apply all_0_srng_summation_0.
-
-...
-Theorem lap_convol_mul_app_rep_0_l : ∀ la lb i len n,
-  lap_norm (lap_convol_mul (la ++ repeat 0%Rng n) lb i len) =
-  lap_norm (lap_convol_mul la lb i len).
-Proof.
-intros.
-revert la i len.
-induction n; intros. {
-  now cbn; rewrite app_nil_r.
-...
-destruct i. {
-...
-rewrite List_seq_succ_r.
-rewrite map_app, norm_polyn_list_app; symmetry.
-rewrite map_app, norm_polyn_list_app; symmetry.
-...
-rewrite (lap_norm_repeat_0 la) at 2.
-rewrite app_comm_cons.
-now rewrite lap_convol_mul_app_rep_0_l.
-Qed.
-...
-rewrite Nat.add_sub.
-rewrite Nat.add_comm.
-apply lap_norm_cons_norm.
-now cbn; rewrite Nat.sub_0_r.
-...
-...
-*)
 
 (*
 Theorem lap_mul_norm_idemp_l : ∀ la lb,
@@ -4456,281 +4322,10 @@ unfold norm_polyn_list at 2.
 replace (rev lc ++ [c]) with (rev (c :: lc)) by easy.
 rewrite <- Hlc.
 do 2 rewrite fold_norm_polyn_list.
-...
-do 2 rewrite eq_map_seq.
-...
 apply norm_polyn_list_cons_norm.
-...
-(*1 begin*)
-destruct lb as [| b]. {
-  rewrite (map_ext_in _ (λ i, 0%Srng)). 2: {
-    intros i Hi.
-    unfold polyn_list_convol_mul.
-    apply all_0_srng_summation_0.
-    intros j Hj.
-    rewrite nth_overflow; [ | apply Nat.le_0_l ].
-    apply srng_mul_0_l.
-  }
-  symmetry.
-  rewrite (map_ext_in _ (λ i, 0%Srng)). 2: {
-    intros i Hi.
-    unfold polyn_list_convol_mul.
-    apply all_0_srng_summation_0.
-    intros j Hj.
-    rewrite nth_overflow; [ | apply Nat.le_0_l ].
-    apply srng_mul_0_l.
-  }
-  unfold norm_polyn_list.
-  do 2 rewrite <- map_rev.
-  now setoid_rewrite (strip_0s_map_0 _ []).
-}
-rewrite List_length_cons.
-do 2 rewrite Nat.add_succ_l.
-rewrite map_polyn_list_convol_mul_cons_r.
-rewrite map_polyn_list_convol_mul_cons_r.
-rewrite <- norm_polyn_list_add_idemp_l.
-rewrite <- norm_polyn_list_add_idemp_r; symmetry.
-rewrite <- norm_polyn_list_add_idemp_l.
-rewrite <- norm_polyn_list_add_idemp_r; symmetry.
-f_equal; f_equal. {
-(*1 end*)
-  do 2 rewrite <- Nat.add_succ_l.
-  do 2 (rewrite seq_app; symmetry).
-  do 2 rewrite map_app.
-  do 2 rewrite norm_polyn_list_app.
-  rewrite Nat.add_0_l.
-  rewrite all_0_norm_polyn_list_map_0. 2: {
-    intros n Hn.
-    apply in_seq in Hn.
-    rewrite nth_overflow; [ | easy ].
-    apply srng_mul_0_l.
-  }
-  symmetry.
-  rewrite all_0_norm_polyn_list_map_0. 2: {
-    intros n Hn.
-    apply in_seq in Hn.
-    rewrite nth_overflow; [ | easy ].
-    apply srng_mul_0_l.
-  }
-  easy.
-}
-clear a.
-move c before b.
-rewrite Nat.add_1_r.
-apply norm_polyn_list_cons_0.
-(**)
-do 2 rewrite <- seq_shift.
-do 2 rewrite map_map.
-erewrite map_ext_in. 2: {
-  intros i Hi.
-  now rewrite Nat.sub_succ, Nat.sub_0_r.
-}
-symmetry.
-erewrite map_ext_in. 2: {
-  intros i Hi.
-  now rewrite Nat.sub_succ, Nat.sub_0_r.
-}
-remember (rev la) as ld eqn:Hld; symmetry in Hld.
-destruct ld as [| d]; [ easy | ].
-cbn in Hld.
-apply List_eq_rev_l in Hld.
-cbn in Hld.
-subst la.
-rename d into a; move a after b.
-rename ld into la; move la after lb.
-rewrite app_length; cbn.
-rewrite Nat.add_1_r.
-rewrite rev_length.
-replace (rev la ++ [a]) with (rev (a :: la)) by easy.
-replace (rev lc ++ [c]) with (rev (c :: lc)) by easy.
-do 2 rewrite <- Nat.add_succ_comm.
-replace (S (length lb)) with (length (b :: lb)) by easy.
-remember (b :: lb) as ld eqn:Hld.
-clear b lb Hld.
-rename ld into lb; move lb after lc.
-revert a c la lc Hlc.
-induction lb as [| b]; intros. {
-  cbn.
-  do 2 rewrite (map_polyn_list_convol_mul_0_l 0).
-  do 2 rewrite List_rev_repeat.
-  now do 2 rewrite strip_0s_repeat_0s.
-}
-remember (length (b :: lb)) as x; cbn in Heqx; subst x.
-do 2 rewrite Nat.add_succ_l.
-do 2 rewrite map_polyn_list_convol_mul_cons_l.
-Search norm_polyn_list.
-do 2 (rewrite <- norm_polyn_list_add_idemp_l; symmetry).
-do 2 (rewrite <- norm_polyn_list_add_idemp_r; symmetry).
-f_equal; f_equal. 2: {
-  apply norm_polyn_list_cons_0.
-  do 2 rewrite <- seq_shift.
-  do 2 rewrite map_map.
-  erewrite map_ext_in. 2: {
-    intros i Hi.
-    now rewrite Nat.sub_succ, Nat.sub_0_r.
-  }
-  symmetry.
-  erewrite map_ext_in. 2: {
-    intros i Hi.
-    now rewrite Nat.sub_succ, Nat.sub_0_r.
-  }
-  symmetry.
-  now apply IHlb.
-}
-clear IHlb.
-remember (length lb) as len eqn:Hlen.
-clear lb Hlen.
-destruct (srng_eq_dec a 0) as [Haz| Haz]. {
-  subst a; cbn in Hlc.
-  destruct (srng_eq_dec 0 0) as [H| H]; [ clear H | easy ].
-... 3
-do 2 rewrite <- Nat.add_succ_r.
-replace (S (length la)) with (length (a :: la)) by easy.
-replace (S (length lc)) with (length (c :: lc)) by easy.
-remember (a :: la) as ld eqn:Hld.
-remember (c :: lc) as le eqn:Hle.
-destruct ld as [| d]; [ easy | ].
-destruct le as [| e]; [ easy | ].
-clear a la c lc Hld Hle.
-rename d into a; rename e into c.
-rename ld into la; rename le into lc.
-move a after b; move c before b.
-...
-  norm_polyn_list (map (λ n : nat, (b * nth n (rev (a :: la)) 0)%Srng) (seq 0 (S (len + length la)))) =
-  norm_polyn_list (map (λ n : nat, (b * nth n (rev (c :: lc)) 0)%Srng) (seq 0 (S (len + length lc))))
-...
-do 2 rewrite Nat.add_succ_r.
-...
-Search (polyn_list_add (map _ _)).
-... 2
-clear a.
-destruct la as [| a]; [ easy | ].
-remember (length (a :: la)) as x; cbn in Heqx; subst x.
-do 2 rewrite <- Nat.add_succ_comm.
-Search (seq (S _)).
-... 1
-unfold polyn_list_convol_mul.
-rewrite seq_app, map_app.
-remember (λ _, _) as f.
-rewrite
-  (map_ext_in _
-     (λ n,
-        (Σ (j = 0, length lb),
-         nth j (b :: lb) 0 * nth (n - 1 - j) (rev lc ++ [c]) 0))%Srng
-     (seq (_ + _) _)). 2: {
-  subst f.
-  intros i Hi.
-  apply in_seq in Hi.
-  unfold so.
-  rewrite (srng_summation_split (length lb) _ _ (i - 1)); [ | flia Hi ].
-  rewrite (all_0_srng_summation_0 (length lb + 1)). 2: {
-    intros j Hj; rewrite Nat.add_1_r in Hj.
-    rewrite nth_overflow; [ | easy ].
-    apply srng_mul_0_l.
-  }
-  apply srng_add_0_r.
-}
-subst f.
-symmetry.
-rewrite seq_app, map_app.
-remember (λ _, _) as f.
-rewrite
-  (map_ext_in _
-     (λ n,
-        (Σ (j = 0, length lb),
-         nth j (b :: lb) 0 * nth (n - 1 - j) la 0))%Srng
-     (seq (_ + _) _)). 2: {
-  subst f.
-  intros i Hi.
-  apply in_seq in Hi.
-  unfold so.
-  rewrite (srng_summation_split (length lb) _ _ (i - 1)); [ | flia Hi ].
-  rewrite (all_0_srng_summation_0 (length lb + 1)). 2: {
-    intros j Hj; rewrite Nat.add_1_r in Hj.
-    rewrite nth_overflow; [ | easy ].
-    apply srng_mul_0_l.
-  }
-  apply srng_add_0_r.
-}
-subst f.
-...
-rewrite map_polyn_list_convol_mul_cons_r.
-rewrite map_polyn_list_convol_mul_cons_r.
-rewrite <- norm_polyn_list_add_idemp_l.
-rewrite <- norm_polyn_list_add_idemp_r; symmetry.
-rewrite <- norm_polyn_list_add_idemp_l.
-rewrite <- norm_polyn_list_add_idemp_r; symmetry.
-f_equal; f_equal. {
-  do 2 (rewrite seq_app; symmetry).
-  do 2 rewrite map_app.
-  do 2 rewrite norm_polyn_list_app.
-  rewrite Nat.add_0_l.
-  rewrite all_0_norm_polyn_list_map_0. 2: {
-    intros n Hn.
-    apply in_seq in Hn.
-    rewrite nth_overflow; [ | easy ].
-    apply srng_mul_0_l.
-  }
-  symmetry.
-  rewrite all_0_norm_polyn_list_map_0. 2: {
-    intros n Hn.
-    apply in_seq in Hn.
-    rewrite nth_overflow; [ | easy ].
-    apply srng_mul_0_l.
-  }
-  easy.
-}
-replace (rev lc ++ [c]) with (rev (c :: lc)) by easy.
-rewrite <- Hlc.
-...
-rewrite rev_app_distr; cbn.
-rewrite fold_lap_norm.
-destruct lb as [| b]; [ easy | ].
-remember (b :: lb) as d eqn:Hd.
-replace (rev lc ++ [c]) with (rev (c :: lc)) by easy.
-rewrite <- Hlc.
-rewrite fold_lap_norm.
-do 2 rewrite Nat.sub_0_r.
-clear c lc b lb Hlc Hd.
-rename d into lb.
-rewrite (lap_convol_mul_more (length la - length (lap_norm la))). 2: {
-  now cbn; rewrite Nat.sub_0_r.
-}
-rewrite (Nat.add_comm _ (length lb)).
-rewrite <- Nat.add_assoc.
-rewrite Nat.add_sub_assoc; [ | apply lap_norm_length_le ].
-rewrite (Nat.add_comm _ (length la)).
-rewrite Nat.add_sub.
-rewrite Nat.add_comm.
-apply lap_norm_cons_norm.
-now cbn; rewrite Nat.sub_0_r.
-...
-intros.
-unfold norm_polyn_list; f_equal.
-revert la.
-induction lb as [| b]; intros. {
-  do 2 rewrite polyn_list_add_0_r.
-  now rewrite rev_involutive, strip_0s_idemp.
-}
 cbn.
-destruct la as [| a]; [ easy | cbn ].
-do 2 rewrite strip_0s_app; cbn.
-rewrite <- IHlb.
-remember (strip_0s (rev la)) as lc eqn:Hlc; symmetry in Hlc.
-destruct lc as [| c]. {
-  cbn.
-  destruct (srng_eq_dec a 0) as [Haz| Haz]. {
-    subst a; rewrite srng_add_0_l; cbn.
-    now rewrite strip_0s_app.
-  }
-  cbn.
-  now rewrite strip_0s_app.
-}
-cbn.
-rewrite rev_app_distr; cbn.
-now rewrite strip_0s_app.
+now rewrite Nat.sub_0_r, Nat.add_comm.
 Qed.
-...
 
 Theorem norm_polyn_list_mul_idemp_r : ∀ la lb,
   norm_polyn_list (polyn_list_mul la (norm_polyn_list lb)) =
@@ -4741,6 +4336,8 @@ rewrite polyn_list_mul_comm.
 rewrite norm_polyn_list_mul_idemp_l.
 now rewrite polyn_list_mul_comm.
 Qed.
+
+...
 
 Theorem polyn_of_list_mul_1_l : ∀ la,
   polyn_list_mul (polyn_list 1%P) la = la.
