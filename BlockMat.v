@@ -4403,11 +4403,31 @@ cbn in Hz |-*.
 now destruct (srng_eq_dec b 0).
 Qed.
 
+(*
+Theorem eq_lap_norm_eq_length : ∀ la lb,
+  lap_norm la = lap_norm lb
+  → length la = length lb
+  → la = lb.
+Proof.
+intros * Hll Hlen.
+...
+*)
+
+(*
+Lemma lap_norm_mul_add_distr_l : ∀ la lb lc,
+  lap_norm (la * (lb + lc))%lap = lap_norm (la * lb + la * lc)%lap.
+Proof.
+intros la lb lc.
+...
+*)
+
 Theorem polyn_list_mul_add_distr_l : ∀ la lb lc,
   polyn_list_mul la (polyn_list_add lb lc) =
   polyn_list_add (polyn_list_mul la lb) (polyn_list_mul la lc).
 Proof.
 intros.
+...
+apply eq_lap_norm_eq_length; [ apply lap_norm_mul_add_distr_l | ].
 ...
 
 Theorem polyn_mul_add_distr_l : ∀ P Q R, (P * (Q + R) = P * Q + P * R)%P.
