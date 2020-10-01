@@ -4337,8 +4337,6 @@ rewrite norm_polyn_list_mul_idemp_l.
 now rewrite polyn_list_mul_comm.
 Qed.
 
-...
-
 Theorem polyn_of_list_mul_1_l : ∀ la,
   polyn_list_mul (polyn_list 1%P) la = la.
 Proof.
@@ -4411,8 +4409,13 @@ intros.
 unfold polyn_mul.
 apply polyn_eq; cbn.
 rewrite fold_norm_polyn_list.
-...
 rewrite norm_polyn_list_mul_idemp_r.
+rewrite norm_polyn_list_add_idemp_l.
+rewrite norm_polyn_list_add_idemp_r.
+f_equal.
+Search polyn_list_mul.
+...
+Check polyn_list_mul_add_distr_l.
 ...
 intros.
 unfold polyn_mul.
