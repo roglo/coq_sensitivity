@@ -4102,6 +4102,7 @@ destruct (le_dec (length la) j) as [H1| H1]. {
 }
 Qed.
 
+(*
 Theorem norm_polyn_list_cons_norm : ∀ a la lb i len,
   length (a :: la) + length lb - 1 ≤ i + len
   → norm_polyn_list
@@ -4128,6 +4129,15 @@ destruct lc as [| c]. 2: {
   clear j Hj.
   apply srng_summation_eq_compat.
   intros j (_, Hj).
+  unfold norm_polyn_list.
+  destruct j; [ easy | cbn ].
+...
+
+Theorem glop : ∀ la, ∃ n,
+  la = repeat 0%Srng n ++ strip_0s la.
+...
+Print strip_0s.
+specialize (glop la) as (n, Hn).
 ...
 destruct lc as [| c]. {
   cbn - [ nth sub ]; f_equal.
@@ -4175,6 +4185,7 @@ apply lap_norm_cons_norm.
 now cbn; rewrite Nat.sub_0_r.
 ...
 ...
+*)
 
 Theorem norm_polyn_list_mul_idemp_l : ∀ la lb,
   norm_polyn_list (polyn_list_mul (norm_polyn_list la) lb) =
@@ -4189,10 +4200,9 @@ rewrite rev_length.
 remember (strip_0s (rev la)) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as [| c]. {
   apply eq_strip_0s_nil in Hlc.
-  destruct Hlc as (n, Hn).
-  apply List_eq_rev_l in Hn.
-  rewrite List_rev_repeat in Hn.
-  subst la.
+  apply List_eq_rev_l in Hlc.
+  rewrite List_rev_repeat, rev_length in Hlc.
+  rewrite Hlc.
   cbn - [ nth seq sub ].
   destruct (srng_eq_dec a 0) as [Haz| Haz]. {
     subst a.
@@ -4206,45 +4216,32 @@ destruct lc as [| c]. {
     apply eq_strip_0s_nil.
     rewrite repeat_length.
     rewrite Nat.sub_0_r.
-    exists (n + length lb).
+    rewrite rev_length, map_length, seq_length.
     symmetry.
     apply List_eq_rev_l.
     rewrite List_rev_repeat; symmetry.
-    rewrite (map_polyn_list_convol_mul_0_l (S n)).
+    rewrite (map_polyn_list_convol_mul_0_l (S (length la))).
     now rewrite seq_length.
   }
   rewrite Nat.sub_succ, Nat.sub_0_r.
   rewrite Nat.sub_succ, Nat.sub_0_r.
   rewrite repeat_length; cbn.
   rewrite (map_polyn_list_convol_mul_const_l 0).
-  rewrite (map_polyn_list_convol_mul_const_l n).
+  rewrite (map_polyn_list_convol_mul_const_l (length la)).
   rewrite Nat.add_comm.
   rewrite seq_app, map_app.
   rewrite norm_polyn_list_app; cbn.
-  remember (norm_polyn_list (map _ (seq _ n))) as la eqn:Hla.
-  symmetry in Hla.
-  destruct la as [| a1]; [ easy | exfalso ].
-  rewrite map_ext_in with (g := λ i, 0%Srng) in Hla. 2: {
+  remember (norm_polyn_list (map _ (seq _ (length la)))) as ld eqn:Hld.
+  symmetry in Hld.
+  destruct ld as [| d]; [ easy | exfalso ].
+  rewrite map_ext_in with (g := λ i, 0%Srng) in Hld. 2: {
     intros j Hj.
     apply in_seq in Hj.
     rewrite nth_overflow; [ | easy ].
     apply srng_mul_0_r.
   }
-  now rewrite all_0_norm_polyn_list_map_0 in Hla.
+  now rewrite (proj1 (all_0_norm_polyn_list_map_0 _ _)) in Hld.
 }
-(*
-rewrite map_ext_in with
-  (g := polyn_list_convol_mul lb (rev (c :: lc ++ [a]))). 2: {
-  intros i Hi.
-  apply polyn_list_convol_mul_comm.
-}
-symmetry.
-rewrite map_ext_in with (g :=polyn_list_convol_mul lb (a :: la)). 2: {
-  intros i Hi.
-  apply polyn_list_convol_mul_comm.
-}
-symmetry.
-*)
 rewrite Nat.sub_succ, Nat.sub_0_r.
 rewrite app_comm_cons, app_length.
 cbn - [ norm_polyn_list ].
