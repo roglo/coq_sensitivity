@@ -4403,6 +4403,13 @@ cbn in Hz |-*.
 now destruct (srng_eq_dec b 0).
 Qed.
 
+Theorem polyn_list_mul_add_distr_l : ∀ la lb lc,
+  polyn_list_mul la (polyn_list_add lb lc) =
+  polyn_list_add (polyn_list_mul la lb) (polyn_list_mul la lc).
+Proof.
+intros.
+...
+
 Theorem polyn_mul_add_distr_l : ∀ P Q R, (P * (Q + R) = P * Q + P * R)%P.
 Proof.
 intros.
@@ -4412,10 +4419,9 @@ rewrite fold_norm_polyn_list.
 rewrite norm_polyn_list_mul_idemp_r.
 rewrite norm_polyn_list_add_idemp_l.
 rewrite norm_polyn_list_add_idemp_r.
-f_equal.
-Search polyn_list_mul.
 ...
-Check polyn_list_mul_add_distr_l.
+f_equal.
+apply polyn_list_mul_add_distr_l.
 ...
 intros.
 unfold polyn_mul.
