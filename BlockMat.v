@@ -3377,6 +3377,28 @@ Definition polyn_list_convol_mul la lb i :=
 Definition polyn_list_mul la lb :=
   map (polyn_list_convol_mul la lb) (seq 0 (length la + length lb - 1)).
 
+... à réfléchir ...
+
+(*
+Fixpoint lap_convol_mul {α} {ro : ring_op α} {rp : ring_prop} al1 al2 i len :=
+  match len with
+  | O => []
+  | S len1 =>
+      (Σ (j = 0, i), List.nth j al1 0 * List.nth (i - j) al2 0)%Rng ::
+      lap_convol_mul al1 al2 (S i) len1
+  end.
+
+Definition lap_mul {α} {ro : ring_op α} {rp : ring_prop} la lb :=
+  match la with
+  | [] => []
+  | _ =>
+      match lb with
+      | [] => []
+      | _ => lap_convol_mul la lb 0 (length la + length lb - 1)
+      end
+  end.
+*)
+
 Definition polyn_mul P Q :=
   polyn_of_list (polyn_list_mul (polyn_list P) (polyn_list Q)).
 
