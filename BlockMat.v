@@ -4185,6 +4185,37 @@ rewrite app_assoc.
 rewrite IHn; clear n IHn.
 revert la i.
 induction len; intros; [ easy | ].
+rewrite <- Nat.add_1_l.
+rewrite seq_app.
+do 2 rewrite map_app.
+do 2 rewrite norm_polyn_list_app.
+cbn - [ norm_polyn_list nth sub ].
+rewrite IHlen.
+remember (norm_polyn_list _) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| c]. {
+  cbn - [ seq ].
+  f_equal.
+  destruct (srng_eq_dec (polyn_list_convol_mul (la ++ [0%Srng]) lb i) 0)
+    as [Hz1| Hz1]. {
+    destruct (srng_eq_dec (polyn_list_convol_mul la lb i) 0) as [Hz2| Hz2];
+      [ easy | exfalso ].
+    apply Hz2; clear Hz2.
+    rewrite <- Hz1.
+    unfold polyn_list_convol_mul.
+    apply srng_summation_eq_compat.
+    intros j Hj.
+    destruct (lt_dec j (length la)) as [Hjla| Hjla]. {
+      now rewrite app_nth1.
+    }
+    apply Nat.nlt_ge in Hjla.
+    rewrite (nth_overflow la); [ | easy ].
+    rewrite app_nth2; [ | easy ].
+    destruct (Nat.eq_dec j (length la)) as [Hjla2| Hjla2]. {
+      now rewrite Hjla2, Nat.sub_diag.
+    }
+    symmetry.
+    rewrite nth_overflow; [ easy | cbn; flia Hjla Hjla2 ].
+  } {
 ...
 cbn - [ seq ].
 do 2 rewrite strip_0s_app.
