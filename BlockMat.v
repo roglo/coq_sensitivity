@@ -3377,8 +3377,6 @@ Definition polyn_list_convol_mul la lb i :=
 Definition polyn_list_mul la lb :=
   map (polyn_list_convol_mul la lb) (seq 0 (length la + length lb - 1)).
 
-... à réfléchir ...
-
 (*
 Fixpoint lap_convol_mul {α} {ro : ring_op α} {rp : ring_prop} al1 al2 i len :=
   match len with
@@ -3552,32 +3550,30 @@ destruct (srng_eq_dec a 0%Srng) as [H| H]; [ easy | clear H ].
 now injection Hlc; clear Hlc; intros; subst c lc.
 Qed.
 
-Theorem eq_strip_0s_nil : ∀ la,
-  strip_0s la = [] ↔ ∃ n, la = repeat 0%Srng n.
-Proof.
-intros.
-split. {
-  intros Hla.
-  induction la as [| a]; [ now exists 0 | ].
-  cbn in Hla.
-  destruct (srng_eq_dec a 0%Srng) as [Haz| Haz]; [ | easy ].
-  subst a.
-  specialize (IHla Hla) as (n, Hn).
-  now exists (S n); cbn; subst la.
-} {
-  intros (n, Hn).
-  subst la.
-  induction n; cbn; [ easy | ].
-  now destruct (srng_eq_dec 0 0).
-}
-Qed.
-
 Theorem strip_0s_repeat_0s : ∀ n,
   strip_0s (repeat 0%Srng n) = [].
 Proof.
 intros.
 induction n; [ easy | cbn ].
 now destruct (srng_eq_dec 0%Srng 0%Srng).
+Qed.
+
+Theorem eq_strip_0s_nil : ∀ la,
+  strip_0s la = [] ↔ la = repeat 0%Srng (length la).
+Proof.
+intros.
+split. {
+  intros Hla.
+  induction la as [| a]; [ easy | ].
+  cbn in Hla.
+  destruct (srng_eq_dec a 0%Srng) as [Haz| Haz]; [ | easy ].
+  subst a.
+  specialize (IHla Hla).
+  now cbn; f_equal.
+} {
+  intros H; rewrite H.
+  apply strip_0s_repeat_0s.
+}
 Qed.
 
 Theorem norm_polyn_list_app : ∀ la lb,
@@ -4020,22 +4016,35 @@ Qed.
 
 Theorem all_0_norm_polyn_list_map_0 : ∀ A (ln : list A) f,
   (∀ n, n ∈ ln → f n = 0%Srng)
-  → norm_polyn_list (map f ln) = [].
+  ↔ norm_polyn_list (map f ln) = [].
 Proof.
-intros A * Hf.
-unfold norm_polyn_list.
-apply List_eq_rev_nil.
-rewrite rev_involutive.
-induction ln as [| n]; [ easy | cbn ].
-rewrite strip_0s_app.
-rewrite IHln. 2: {
-  intros i Hi.
-  now apply Hf; right.
+intros A *.
+split; intros Hf. {
+  unfold norm_polyn_list.
+  apply List_eq_rev_nil.
+  rewrite rev_involutive.
+  induction ln as [| n]; [ easy | cbn ].
+  rewrite strip_0s_app.
+  rewrite IHln. 2: {
+    intros i Hi.
+    now apply Hf; right.
+  }
+  cbn.
+  destruct (srng_eq_dec (f n) 0) as [H| H]; [ easy | ].
+  exfalso; apply H.
+  now apply Hf; left.
+} {
+  intros n Hn.
+  unfold norm_polyn_list in Hf.
+  apply List_eq_rev_nil in Hf.
+  apply eq_strip_0s_nil in Hf.
+  rewrite rev_length, map_length in Hf.
+  apply List_eq_rev_l in Hf.
+  apply (in_map f) in Hn.
+  rewrite Hf in Hn.
+  apply in_rev in Hn.
+  now apply repeat_spec in Hn.
 }
-cbn.
-destruct (srng_eq_dec (f n) 0) as [H| H]; [ easy | ].
-exfalso; apply H.
-now apply Hf; left.
 Qed.
 
 Theorem length_strip_0s_le : ∀ la, length (strip_0s la) ≤ length la.
@@ -4110,8 +4119,28 @@ rewrite map_app, norm_polyn_list_app; symmetry.
 rewrite IHlen; [ | flia Hlen ].
 remember (norm_polyn_list _) as lc eqn:Hlc in |-*.
 symmetry in Hlc.
+destruct lc as [| c]. 2: {
+  f_equal.
+...
 destruct lc as [| c]. {
-  cbn - [ nth sub ].
+  cbn - [ nth sub ]; f_equal.
+  specialize (proj2 (all_0_norm_polyn_list_map_0 _ _) Hlc) as Hn.
+  destruct
+    (srng_eq_dec (polyn_list_convol_mul (a :: norm_polyn_list la) lb i) 0)
+    as [Hz1| Hz1]. {
+    destruct (srng_eq_dec (polyn_list_convol_mul (a :: la) lb i) 0)
+      as [Hz2| Hz2]; [ easy | exfalso ].
+    apply Hz2; clear Hz2.
+    unfold polyn_list_convol_mul.
+    apply all_0_srng_summation_0.
+    intros j Hj.
+...
+    induction la as [| a1]; [ easy | ].
+    cbn - [ polyn_list_convol_mul ] in Hz1.
+    unfold polyn_list_convol_mul.
+    unfold so.
+    apply all_0_srng_summation_0.
+
 ...
 Theorem lap_convol_mul_app_rep_0_l : ∀ la lb i len n,
   lap_norm (lap_convol_mul (la ++ repeat 0%Rng n) lb i len) =
