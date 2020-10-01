@@ -4081,6 +4081,25 @@ Proof.
 intros * Hlen.
 revert i Hlen.
 induction len; intros; [ easy | ].
+rewrite <- Nat.add_1_l.
+rewrite seq_app.
+rewrite map_app, norm_polyn_list_app; symmetry.
+rewrite map_app, norm_polyn_list_app; symmetry.
+rewrite IHlen; [ | flia Hlen ].
+remember (norm_polyn_list _) as lc eqn:Hlc in |-*.
+symmetry in Hlc.
+destruct lc as [| c]. {
+  cbn - [ nth sub ].
+...
+Theorem lap_convol_mul_app_rep_0_l : ∀ la lb i len n,
+  lap_norm (lap_convol_mul (la ++ repeat 0%Rng n) lb i len) =
+  lap_norm (lap_convol_mul la lb i len).
+Proof.
+intros.
+revert la i len.
+induction n; intros. {
+  now cbn; rewrite app_nil_r.
+...
 destruct i. {
 ...
 rewrite List_seq_succ_r.
