@@ -4121,6 +4121,13 @@ remember (norm_polyn_list _) as lc eqn:Hlc in |-*.
 symmetry in Hlc.
 destruct lc as [| c]. 2: {
   f_equal.
+  apply map_ext_in.
+  intros j Hj.
+  apply in_seq in Hj.
+  replace j with i by flia Hj.
+  clear j Hj.
+  apply srng_summation_eq_compat.
+  intros j (_, Hj).
 ...
 destruct lc as [| c]. {
   cbn - [ nth sub ]; f_equal.
