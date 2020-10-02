@@ -3429,6 +3429,14 @@ Notation "P - Q" := (polyn_sub P Q) : polynomial_scope.
 Notation "P * Q" := (polyn_mul P Q) : polynomial_scope.
 Notation "- P" := (polyn_opp P) : polynomial_scope.
 
+Declare Scope polyn_list_scope.
+Delimit Scope polyn_list_scope with PL.
+
+Notation "0" := ([]) : polyn_list_scope.
+Notation "1" := ([1%Srng]) : polyn_list_scope.
+Notation "la + lb" := (polyn_list_add la lb) : polyn_list_scope.
+Notation "la * lb" := (polyn_list_mul la lb) : polyn_list_scope.
+
 (* identity matrix of size n *)
 
 Definition mat_id n :=
@@ -4466,12 +4474,93 @@ easy.
 Qed.
 
 (*
+Fixpoint lap_convol_mul_add al1 al2 al3 i len :=
+  match len with
+  | O => []
+  | S len1 =>
+      (Σ (j = 0, i),
+       List.nth j al1 0 *
+       (List.nth (i - j) al2 0 + List.nth (i - j) al3 0))%Rng ::
+       lap_convol_mul_add al1 al2 al3 (S i) len1
+  end.
+*)
+Fixpoint polyn_list_convol_mul_add (la lb lc : list T) i len :=
+  match len with
+  | O => []
+  | S len1 =>
+      (Σ (j = 0, i),
+       List.nth j la 0 *
+       (List.nth (i - j) lb 0 + List.nth (i - j) lc 0))%Srng ::
+       polyn_list_convol_mul_add la lb lc (S i) len1
+  end.
+
+(*
+Theorem lap_convol_mul_lap_add : ∀ la lb lc i len,
+  eq
+    (lap_convol_mul la (lap_add lb lc) i len)
+    (lap_convol_mul_add la lb lc i len).
+Proof.
+intros la lb lc i len.
+*)
+Theorem polyn_list_convol_mul_lap_add : ∀ la lb lc i len,
+  map (polyn_list_convol_mul la (lb + lc)%PL) (seq i len) =
+  polyn_list_convol_mul_add la lb lc i len.
+Proof.
+...
+intros la lb lc i len.
+revert la lb lc i.
+induction len; intros; [ reflexivity | simpl ].
+rewrite IHlen; f_equal.
+apply summation_compat; intros j (_, Hj).
+f_equal.
+rewrite list_nth_add; reflexivity.
+Qed.
+
+(*
 Lemma lap_norm_mul_add_distr_l : ∀ la lb lc,
   lap_norm (la * (lb + lc))%lap = lap_norm (la * lb + la * lc)%lap.
 Proof.
 intros la lb lc.
 ...
 *)
+Theorem norm_polyn_list_mul_add_distr_l : ∀ la lb lc,
+  norm_polyn_list (la * (lb + lc))%PL =
+  norm_polyn_list (la * lb + la * lc)%PL.
+Proof.
+intros la lb lc.
+unfold polyn_list_mul.
+remember (length la + length (lb + lc)%PL - 1) as labc.
+remember (length la + length lb - 1) as lab.
+remember (length la + length lc - 1) as lac.
+rewrite Heqlabc.
+remember (lb + lc)%PL as lbc.
+symmetry in Heqlbc.
+rewrite <- Heqlbc in Heqlabc |-*.
+rewrite (polyn_list_convol_mul_more (lab + lac)); [ | subst; flia ].
+rewrite <- Heqlabc.
+symmetry.
+rewrite Heqlab.
+rewrite <- norm_polyn_list_add_idemp_l.
+rewrite (polyn_list_convol_mul_more (labc + lac)); [ | flia ].
+rewrite <- Heqlab.
+rewrite norm_polyn_list_add_idemp_l.
+rewrite polyn_list_add_comm.
+rewrite <- norm_polyn_list_add_idemp_l.
+rewrite Heqlac.
+rewrite (polyn_list_convol_mul_more (labc + lab)); [ | flia ].
+rewrite norm_polyn_list_add_idemp_l.
+rewrite <- Heqlac.
+rewrite Nat.add_comm.
+rewrite polyn_list_add_comm.
+rewrite Nat.add_assoc, Nat.add_shuffle0, Nat.add_comm, Nat.add_assoc.
+symmetry.
+...
+rewrite lap_convol_mul_lap_add.
+rewrite lap_add_lap_convol_mul.
+reflexivity.
+Qed.
+
+...
 
 Theorem polyn_list_mul_add_distr_l : ∀ la lb lc,
   polyn_list_mul la (polyn_list_add lb lc) =
