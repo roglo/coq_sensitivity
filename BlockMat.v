@@ -3215,9 +3215,9 @@ Definition charac_polyn (M : matrix T) :=
         (x-a -b )
         (-c  x-d)
    which is
-        (x-a)(x-d)-cb = x²-(a+d)x-(ad+bc)
+        (x-a)(x-d)-cb = x²-(a+d)x+(ad-bc)
    list of its coefficients
-        [-(ad+bd); -(a+d); 1]
+        [ad-bc; -(a+d); 1]
    whose length is 3 = nrows(M)+1
  *)
 
