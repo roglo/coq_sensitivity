@@ -3212,6 +3212,7 @@ Theorem charac_polyn_higher_coeff : ∀ M,
   → polyn_coeff (charac_polyn M) (mat_nrows M) = 1%Srng.
 Proof.
 intros * Hrz.
+...
 unfold charac_polyn.
 unfold determinant.
 remember (mat_nrows (_ - _)%M) as x.
