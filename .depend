@@ -8,6 +8,8 @@ Rpolynomial2.vio: Rpolynomial2.v Misc.vio Ring2.vio Rsummation.vio
 Rpolynomial2.vo Rpolynomial2.glob Rpolynomial2.v.beautified Rpolynomial2.required_vo: Rpolynomial2.v Misc.vo Ring2.vo Rsummation.vo
 Rsummation.vio: Rsummation.v Misc.vio Ring2.vio
 Rsummation.vo Rsummation.glob Rsummation.v.beautified Rsummation.required_vo: Rsummation.v Misc.vo Ring2.vo
+SRpolynomial.vio: SRpolynomial.v Misc.vio Semiring.vio SRsummation.vio
+SRpolynomial.vo SRpolynomial.glob SRpolynomial.v.beautified SRpolynomial.required_vo: SRpolynomial.v Misc.vo Semiring.vo SRsummation.vo
 SRsummation.vio: SRsummation.v Semiring.vio Misc.vio
 SRsummation.vo SRsummation.glob SRsummation.v.beautified SRsummation.required_vo: SRsummation.v Semiring.vo Misc.vo
 Semiring.vio: Semiring.v 

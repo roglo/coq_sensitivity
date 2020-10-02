@@ -1,4 +1,4 @@
-TARGET=Misc.vo Semiring.vo SRsummation.vo Ring2.vo Rsummation.vo Rpolynomial2.vo
+TARGET=Misc.vo Semiring.vo SRsummation.vo Ring2.vo
 FILESFORDEP=`LC_ALL=C ls *.v`
 
 all: pa_coq.cmo $(TARGET)
