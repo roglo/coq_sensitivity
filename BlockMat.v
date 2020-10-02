@@ -3216,8 +3216,9 @@ unfold charac_polyn.
 unfold determinant.
 remember (mat_nrows (_ - _)%M) as x.
 cbn in Heqx; subst x.
-remember (mat_nrows M) as r eqn:Hr; clear Hr.
-induction r; [ easy | clear Hrz ].
+remember (mat_nrows M) as r eqn:Hr; symmetry in Hr.
+revert M Hr.
+induction r; intros; [ easy | clear Hrz ].
 cbn - [ mat_id sub polyn_ring_op ].
 destruct r. {
   cbn.
@@ -3241,6 +3242,8 @@ destruct r. {
     now apply srng_1_neq_0 in H.
   }
 }
+specialize (IHr (Nat.neq_succ_0 _)).
+...
 Print det_loop.
 About _x.
 Print mat_id.
