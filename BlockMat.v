@@ -2970,7 +2970,7 @@ destruct i. {
     transitivity (A n); [ apply bmat_fit_for_add_IZ_A | ].
     apply bmat_fit_for_add_opp_r.
   }
-  rewrite bmat_add_0_l.
+  rewrite<< bmat_add_0_l.
   rewrite bmat_add_opp_r.
   rewrite fold_Z_2_pow.
   rewrite old_bmat_add_0_r. 2: {

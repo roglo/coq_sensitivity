@@ -1439,14 +1439,21 @@ now rewrite map_polyn_list_add_convol_mul.
 Qed.
 
 Theorem polyn_list_mul_add_distr_l : ∀ la lb lc,
-  polyn_list_mul la (polyn_list_add lb lc) =
-  polyn_list_add (polyn_list_mul la lb) (polyn_list_mul la lc).
+  (la * (lb + lc))%PL = (la * lb + la * lc)%PL.
 Proof.
 intros.
 apply eq_norm_polyn_list_eq_length. {
   apply norm_polyn_list_mul_add_distr_l.
 }
-...
+Search (length (_ * _)%PL).
+unfold polyn_list_mul.
+rewrite map_length, seq_length.
+do 2 rewrite polyn_list_add_length.
+do 2 rewrite map_length, seq_length.
+Search (max (_ + _)).
+rewrite <- Nat.add_max_distr_l.
+now rewrite Nat.sub_max_distr_r.
+Qed.
 
 Theorem polyn_mul_add_distr_l : ∀ P Q R, (P * (Q + R) = P * Q + P * R)%P.
 Proof.
@@ -1457,199 +1464,27 @@ rewrite fold_norm_polyn_list.
 rewrite norm_polyn_list_mul_idemp_r.
 rewrite norm_polyn_list_add_idemp_l.
 rewrite norm_polyn_list_add_idemp_r.
-...
 f_equal.
 apply polyn_list_mul_add_distr_l.
-...
-intros.
-unfold polyn_mul.
-apply polyn_eq.
-cbn - [ polyn_list_add ].
-rewrite norm_polyn_list_mul_idemp_r.
-rewrite norm_polyn_list_add_idemp_l.
-rewrite norm_polyn_list_add_idemp_r.
-f_equal.
-...
-rewrite fold_lap_norm.
-rewrite lap_mul_norm_idemp_r.
-rewrite lap_add_norm_idemp_l.
-rewrite lap_add_norm_idemp_r.
-now rewrite lap_mul_add_distr_l.
-...
-apply polyn_eq; cbn. {
-  remember (polyn_deg_ub P) as pd eqn:Hpd.
-  remember (polyn_deg_ub Q) as qd eqn:Hqd.
-  remember (polyn_deg_ub R) as rd eqn:Hrd.
-  move qd before pd; move rd before qd.
-  rewrite <- Nat.add_max_distr_l.
-  now rewrite Nat.sub_max_distr_r.
-} {
-  unfold polyn_coeff.
-  unfold polyn_add, polyn_mul.
-  unfold polyn_coeff.
-  remember (polyn_deg_ub P) as pd eqn:Hpd.
-  remember (polyn_deg_ub Q) as qd eqn:Hqd.
-  remember (polyn_deg_ub R) as rd eqn:Hrd.
-  move qd before pd; move rd before qd.
-  intros i Hi; cbn.
-  do 3 rewrite srng_add_0_l.
-  rewrite Nat.sub_0_r; cbn.
-  destruct (lt_dec i (pd + qd - 1)) as [Hipq| Hipq]. {
-    unfold so.
-    rewrite fold_left_srng_add_fun_from_0; symmetry.
-    rewrite fold_left_srng_add_fun_from_0.
-    rewrite srng_add_add_swap.
-    rewrite fold_left_srng_add_fun_from_0.
-    destruct (lt_dec i (pd + rd - 1)) as [Hipr| Hipr]. {
-      rewrite srng_add_assoc.
-      rewrite <- srng_add_assoc.
-      f_equal. {
-        rewrite <- srng_mul_add_distr_l.
-        f_equal.
-        destruct (lt_dec i (max qd rd)) as [Hiqr| Hiqr]; [ easy | ].
-        destruct (lt_dec i qd) as [Hiq| Hiq]. {
-          exfalso; apply Hiqr.
-          now apply Nat.max_lt_iff; left.
-        }
-        destruct (lt_dec i rd) as [Hir| Hir]. {
-          exfalso; apply Hiqr.
-          now apply Nat.max_lt_iff; right.
-        }
-        apply srng_add_0_l.
-      }
-      destruct (zerop i) as [Hzi| Hzi]. {
-        subst i; cbn.
-        apply srng_add_0_l.
-      }
-      remember (seq 1 i) as s eqn:Hs.
-      replace i with (S i - 1) in Hs by flia Hzi; subst s.
-      rewrite <- srng_summation_add_distr.
-      apply srng_summation_eq_compat.
-      intros j Hj.
-      rewrite <- srng_mul_add_distr_l.
-      f_equal.
-      rewrite srng_add_comm.
-      destruct (lt_dec (i - j) (max qd rd)) as [Hijqr| Hijqr]; [ easy | ].
-      destruct (lt_dec (i - j) qd) as [Hijq| Hijq]. {
-        exfalso; apply Hijqr.
-        now apply Nat.max_lt_iff; left.
-      }
-      destruct (lt_dec (i - j) rd) as [Hijr| Hijr]. {
-        exfalso; apply Hijqr.
-        now apply Nat.max_lt_iff; right.
-      }
-      apply srng_add_0_l.
-    }
-    f_equal. {
-      rewrite srng_add_0_r.
-      destruct (lt_dec 0 pd) as [Hzp| Hzp]. 2: {
-        now do 2 rewrite srng_mul_0_l.
-      }
-      f_equal.
-      destruct (lt_dec i (max qd rd)) as [Hiqr| Hiqr]. {
-        destruct (lt_dec i qd) as [Hiq| Hiq]. 2: {
-          destruct (lt_dec i rd) as [Hir| Hir]. 2: {
-            symmetry; apply srng_add_0_l.
-          }
-          flia Hipq Hipr Hiqr Hiq.
-        } {
-          destruct (lt_dec i rd) as [Hir| Hir]. 2: {
-            symmetry; apply srng_add_0_r.
-          }
-          clear Hiqr.
-          flia Hi Hipq Hipr Hiq Hir Hzp.
-        }
-      } {
-        destruct (lt_dec i qd) as [Hiq| Hiq]; [ | easy ].
-        flia Hi Hipq Hipr Hzp Hiqr Hiq.
-      }
-    } {
-      apply List_fold_left_ext_in.
-      intros j c Hj.
-      apply in_seq in Hj.
-      f_equal.
-      destruct (lt_dec j pd) as [Hjp| Hjp]. 2: {
-        now do 2 rewrite srng_mul_0_l.
-      }
-      f_equal.
-      destruct (lt_dec (i - j) qd) as [Hijq| Hijq]. 2: {
-        rewrite srng_add_0_l.
-        destruct (lt_dec (i - j) (max qd rd)) as [Hijqr| Hijqr]; [ | easy ].
-        destruct (lt_dec (i - j) rd) as [Hijr| Hijr]; [ | easy ].
-        flia Hipr Hjp Hijr.
-      }
-      destruct (lt_dec (i - j) (max qd rd)) as [Hijqr| Hijqr]. 2: {
-        flia Hijq Hijqr.
-      }
-      destruct (lt_dec (i - j) rd) as [Hijr| Hijr]. 2: {
-        now rewrite srng_add_0_r.
-      }
-      flia Hipr Hjp Hijr.
-    }
-  } {
-    rewrite srng_add_0_l.
-    destruct (lt_dec i (pd + rd - 1)) as [Hipr| Hipr]. 2: {
-      flia Hi Hipq Hipr.
-    }
-    destruct (lt_dec 0 pd) as [Hzp| Hzp]. 2: {
-      do 2 rewrite srng_mul_0_l.
-      apply Nat.nlt_ge in Hzp.
-      apply Nat.le_0_r in Hzp.
-      move Hzp at top; subst pd.
-      apply List_fold_left_ext_in.
-      intros j c Hj; f_equal.
-      apply in_seq in Hj.
-      destruct (lt_dec j 0) as [Hjz| Hjz]; [ easy | ].
-      now do 2 rewrite srng_mul_0_l.
-    }
-    destruct (lt_dec i (max qd rd)) as [Hiqr| Hiqr]. {
-      destruct (lt_dec i rd) as [Hir| Hir]; [ | flia Hi Hipq Hiqr Hir ].
-      destruct (lt_dec i qd) as [Hiq| Hiq]; [ flia Hipq Hzp Hiq | ].
-      rewrite srng_add_0_l.
-      apply List_fold_left_ext_in.
-      intros j c Hj; f_equal; clear c.
-      apply in_seq in Hj.
-      destruct (lt_dec j pd) as [Hjp| Hjp]. 2: {
-        now do 2 rewrite srng_mul_0_l.
-      }
-      f_equal.
-      destruct (lt_dec (i - j) rd) as [Hijr| Hijr]; [ | flia Hir Hijr ].
-      destruct (lt_dec (i - j) qd) as [Hijq| Hijq]; [ flia Hipq Hjp Hijq | ].
-      rewrite srng_add_0_l.
-      destruct (lt_dec (i - j) (max qd rd)) as [Hijqr| Hijqr]; [ easy | ].
-      flia Hijr Hijq Hijqr.
-    } {
-      destruct (lt_dec i rd) as [Hir| Hir]; [ flia Hiqr Hir | ].
-      rewrite srng_mul_0_r.
-      apply List_fold_left_ext_in.
-      intros j c Hj; f_equal; clear c.
-      apply in_seq in Hj.
-      destruct (lt_dec j pd) as [Hjp| Hjp]. 2: {
-        now do 2 rewrite srng_mul_0_l.
-      }
-      f_equal.
-      destruct (lt_dec (i - j) rd) as [Hijr| Hijr]. 2: {
-        destruct (lt_dec (i - j) (max qd rd)) as [Hijqr| Hijqr]; [ | easy ].
-        rewrite srng_add_0_r.
-        destruct (lt_dec (i - j) qd) as [Hijq| Hijq]; [ | easy ].
-        flia Hipq Hjp Hijq.
-      }
-      destruct (lt_dec (i - j) qd) as [Hijq| Hijq]; [ flia Hipq Hjp Hijq | ].
-      rewrite srng_add_0_l.
-      destruct (lt_dec (i - j) (max qd rd)) as [Hijqr| Hijqr]; [ easy | ].
-      flia Hijr Hijq Hijqr.
-    }
-  }
-}
 Qed.
 
 Theorem polyn_mul_0_l : ∀ P, (0 * P = 0)%P.
 Proof.
 intros.
-apply polyn_eq. {
-  cbn.
-Print polyn_mul.
-...
+apply polyn_eq.
+cbn; symmetry.
+remember (polyn_list P) as la eqn:Hla.
+apply List_eq_rev_l.
+cbn; symmetry.
+apply eq_strip_0s_nil.
+rewrite rev_length, map_length.
+rewrite seq_length.
+symmetry.
+apply List_eq_rev_l.
+rewrite List_rev_repeat; symmetry.
+rewrite (map_polyn_list_convol_mul_0_l 0).
+now rewrite seq_length.
+Qed.
 
 Definition polyn_semiring_prop : semiring_prop (polynomial T) :=
   {| srng_add_comm := polyn_add_comm;
@@ -1660,6 +1495,7 @@ Definition polyn_semiring_prop : semiring_prop (polynomial T) :=
      srng_mul_add_distr_l := polyn_mul_add_distr_l;
      srng_mul_0_l := polyn_mul_0_l |}.
 
+(*<
 ...
 
 (* degree upper bound (polyn_deg_ub) of sum of polynomials *)
@@ -1682,3 +1518,4 @@ do 2 rewrite map_app; cbn.
 do 2 rewrite fold_left_app; cbn.
 now f_equal.
 Qed.
+*)
