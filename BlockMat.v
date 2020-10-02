@@ -3206,34 +3206,26 @@ Definition charac_polyn (M : matrix T) :=
     (mat_mul_scal_l (_x) (monom_mat_of_mat (mat_id (mat_nrows M))) -
      monom_mat_of_mat M)%M.
 
-(* the list of coefficients of the characteristic polynomial of a matrix M
-   has length "nrows(M) + 1"
-   e.g. matrix
-        (a b)
-        (c d)
-   characteristic polynomial = determinant of
-        (x-a -b )
-        (-c  x-d)
-   which is
-        (x-a)(x-d)-cb = x²-(a+d)x+(ad-bc)
-   list of its coefficients
-        [ad-bc; -(a+d); 1]
-   whose length is 3 = nrows(M)+1
- *)
+(* monic polynomial: polynomial whose leading coefficient is 1 *)
 
-Theorem charac_polyn_list_length : ∀ M,
-  length (polyn_list (charac_polyn M)) = mat_nrows M + 1.
-Proof.
-intros.
-cbn.
-...
+Definition is_monic_polyn P := polyn_coeff P (polyn_degree P - 1) = 1%Srng.
 
-(* the higher coefficient of a characateristic polynomial is 1 *)
+(* the caracteristic polynomial of a matrix is monic, i.e. its
+   leading coefficient is 1 *)
 
-Theorem charac_polyn_higher_coeff : ∀ M,
+Theorem charac_polyn_is_monic : ∀ M,
   mat_nrows M ≠ 0
-  → polyn_coeff (charac_polyn M) (mat_nrows M) = 1%Srng.
+  → is_monic_polyn (charac_polyn M).
 Proof.
+intros * Hrz.
+unfold charac_polyn.
+unfold determinant; cbn.
+remember (mat_nrows M) as r eqn:Hr; symmetry in Hr.
+revert M Hr.
+induction r; intros; [ easy | clear Hrz ].
+cbn.
+destruct r. {
+...
 intros * Hrz.
 specialize (polyn_prop (charac_polyn M)) as H1.
 unfold polyn_prop_test in H1.
@@ -3350,6 +3342,28 @@ destruct r. {
   progress repeat rewrite srng_add_0_r.
   now repeat rewrite srng_mul_1_l.
 }
+...
+
+(* the list of coefficients of the characteristic polynomial of a matrix M
+   has length "nrows(M) + 1"
+   e.g. matrix
+        (a b)
+        (c d)
+   characteristic polynomial = determinant of
+        (x-a -b )
+        (-c  x-d)
+   which is
+        (x-a)(x-d)-cb = x²-(a+d)x+(ad-bc)
+   list of its coefficients
+        [ad-bc; -(a+d); 1]
+   whose length is 3 = nrows(M)+1
+ *)
+
+Theorem charac_polyn_list_length : ∀ M,
+  length (polyn_list (charac_polyn M)) = mat_nrows M + 1.
+Proof.
+intros.
+cbn.
 ...
 
 (* eigenvalues and eigenvectors *)
