@@ -4410,8 +4410,60 @@ Theorem eq_lap_norm_eq_length : ∀ la lb,
   → la = lb.
 Proof.
 intros * Hll Hlen.
-...
 *)
+Theorem eq_norm_polyn_list_eq_length : ∀ la lb,
+  norm_polyn_list la = norm_polyn_list lb
+  → length la = length lb
+  → la = lb.
+Proof.
+intros * Hll Hlen.
+unfold norm_polyn_list in Hll.
+apply (f_equal (@rev _)) in Hll.
+do 2 rewrite rev_involutive in Hll.
+setoid_rewrite <- rev_length in Hlen.
+apply List_rev_inj.
+remember (rev la) as l; clear la Heql; rename l into la.
+remember (rev lb) as l; clear lb Heql; rename l into lb.
+revert la Hll Hlen.
+induction lb as [| b]; intros. {
+  now apply length_zero_iff_nil in Hlen.
+}
+destruct la as [| a]; [ easy | ].
+cbn in Hll, Hlen.
+apply Nat.succ_inj in Hlen.
+destruct (srng_eq_dec a 0) as [Haz| Haz]. {
+  destruct (srng_eq_dec b 0) as [Hbz| Hbz]. {
+    subst a b; f_equal.
+    now apply IHlb.
+  }
+  exfalso; clear - Hbz Hll Hlen.
+  assert (H : length la ≤ length lb) by flia Hlen.
+  clear Hlen; rename H into Hlen.
+  induction la as [| a]; [ easy | ].
+  cbn in Hll.
+  destruct (srng_eq_dec a 0) as [Haz| Haz]. {
+    cbn in Hlen.
+    apply IHla; [ easy | flia Hlen ].
+  }
+  rewrite Hll in Hlen; cbn in Hlen.
+  flia Hlen.
+}
+destruct (srng_eq_dec b 0) as [Hbz| Hbz]. {
+  exfalso; clear b Hbz.
+  clear - Haz Hll Hlen.
+  assert (H : length lb ≤ length la) by flia Hlen.
+  clear Hlen; rename H into Hlen.
+  induction lb as [| b]; [ easy | ].
+  cbn in Hll.
+  destruct (srng_eq_dec b 0) as [Hbz| Hbz]. {
+    cbn in Hlen.
+    apply IHlb; [ easy | flia Hlen ].
+  }
+  rewrite <- Hll in Hlen; cbn in Hlen.
+  flia Hlen.
+}
+easy.
+Qed.
 
 (*
 Lemma lap_norm_mul_add_distr_l : ∀ la lb lc,
@@ -4427,7 +4479,7 @@ Theorem polyn_list_mul_add_distr_l : ∀ la lb lc,
 Proof.
 intros.
 ...
-apply eq_lap_norm_eq_length; [ apply lap_norm_mul_add_distr_l | ].
+apply eq_norm_polyn_list_eq_length; [ apply lap_norm_mul_add_distr_l | ].
 ...
 
 Theorem polyn_mul_add_distr_l : ∀ P Q R, (P * (Q + R) = P * Q + P * R)%P.
