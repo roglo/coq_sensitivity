@@ -2970,7 +2970,7 @@ destruct i. {
     transitivity (A n); [ apply bmat_fit_for_add_IZ_A | ].
     apply bmat_fit_for_add_opp_r.
   }
-  rewrite<< bmat_add_0_l.
+  rewrite bmat_add_0_l.
   rewrite bmat_add_opp_r.
   rewrite fold_Z_2_pow.
   rewrite old_bmat_add_0_r. 2: {
@@ -3173,9 +3173,19 @@ End bmatrix_Notations.
 Import matrix_Notations.
 Import bmatrix_Notations.
 
-... à vérifier, quand les polynômes seront faits
+Require Import SRpolynomial.
 
-Require Import SRpolynomials.
+Section in_ring.
+
+Context {T : Type}.
+Context {ro : ring_op T}.
+Context (so := rng_semiring).
+Context {sp : @semiring_prop T (@rng_semiring T ro)}.
+Context {rp : @ring_prop T ro}.
+Context {sdp : @sring_dec_prop T so}.
+Existing Instance so.
+Existing Instance polyn_semiring_op.
+Existing Instance polyn_ring_op.
 
 (* convertion matrix → matrix with monomials *)
 
@@ -3185,21 +3195,21 @@ Definition monom_mat_of_mat M : matrix (polynomial T) :=
 
 (* identity matrix of size n *)
 
-Definition mat_id n :=
+Definition mat_id n : matrix T :=
   mk_mat (λ i j, if Nat.eq_dec i j then 1%Srng else 0%Srng) n n.
 
 (* characteristic polynomial = det(xI-M) *)
 
 Definition charac_polyn (M : matrix T) :=
   determinant
-    (mat_mul_scal_l (monom_x) (monom_mat_of_mat (mat_id (mat_nrows M))) -
+    (mat_mul_scal_l (_x) (monom_mat_of_mat (mat_id (mat_nrows M))) -
      monom_mat_of_mat M)%M.
 
 (* the higher coefficient of a characateristic polynomial is 1 *)
 
 Theorem charac_polyn_higher_coeff : ∀ M,
   mat_nrows M ≠ 0
-  → polyn_el (charac_polyn M) (mat_nrows M) = 1%Srng.
+  → polyn_coeff (charac_polyn M) (mat_nrows M) = 1%Srng.
 Proof.
 intros * Hrz.
 unfold charac_polyn.
@@ -3209,21 +3219,34 @@ cbn in Heqx; subst x.
 remember (mat_nrows M) as r eqn:Hr; clear Hr.
 induction r; [ easy | clear Hrz ].
 cbn - [ mat_id sub polyn_ring_op ].
-unfold so.
 destruct r. {
   cbn.
+  do 2 rewrite rev_length.
+  destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | ].
+  clear H; cbn.
+  do 2 rewrite srng_add_0_l.
+  do 2 rewrite srng_mul_0_l.
   rewrite srng_add_0_l.
-  rewrite srng_add_0_r.
-  rewrite srng_mul_0_l.
-  rewrite srng_add_0_l.
-  now rewrite srng_mul_1_l.
+  rewrite srng_mul_1_l.
+  destruct (srng_eq_dec 1 0) as [H| H]; [ | clear H ]. {
+    now apply srng_1_neq_0 in H.
+  }
+  destruct (srng_eq_dec (mat_el M 0 0)) as [Hmz| Hmz]. {
+    cbn.
+    destruct (srng_eq_dec 1 0) as [H| H]; [ | easy ].
+    now apply srng_1_neq_0 in H.
+  } {
+    cbn.
+    destruct (srng_eq_dec 1 0) as [H| H]; [ | easy ].
+    now apply srng_1_neq_0 in H.
+  }
 }
-unfold so.
-Search (Σ (_ = _, _), _)%Srng.
-unfold so.
-...
-rewrite srng_summation_split_first.
-Search (Σ (_ = _, _), _)%Rng.
+Print det_loop.
+About _x.
+Print mat_id.
+Print submatrix.
+remember (Σ (j = _, _), _)%Srng as x.
+Print mat_mul_scal_l.
 ...
 intros * Hrz.
 unfold charac_polyn.
