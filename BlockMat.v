@@ -3206,12 +3206,39 @@ Definition charac_polyn (M : matrix T) :=
     (mat_mul_scal_l (_x) (monom_mat_of_mat (mat_id (mat_nrows M))) -
      monom_mat_of_mat M)%M.
 
+(* the list of coefficients of the characteristic polynomial of a matrix M
+   has length "nrows(M) + 1"
+   e.g. matrix
+        (a b)
+        (c d)
+   characteristic polynomial = determinant of
+        (x-a -b )
+        (-c  x-d)
+   which is
+        (x-a)(x-d)-cb = x²-(a+d)x-(ad+bc)
+   list of its coefficients
+        [-(ad+bd); -(a+d); 1]
+   whose length is 3 = nrows(M)+1
+ *)
+
+Theorem charac_polyn_list_length : ∀ M,
+  length (polyn_list (charac_polyn M)) = mat_nrows M + 1.
+Proof.
+intros.
+cbn.
+...
+
 (* the higher coefficient of a characateristic polynomial is 1 *)
 
 Theorem charac_polyn_higher_coeff : ∀ M,
   mat_nrows M ≠ 0
   → polyn_coeff (charac_polyn M) (mat_nrows M) = 1%Srng.
 Proof.
+intros * Hrz.
+specialize (polyn_prop (charac_polyn M)) as H1.
+unfold polyn_prop_test in H1.
+unfold charac_polyn in H1.
+...
 intros * Hrz.
 unfold charac_polyn.
 unfold determinant.
