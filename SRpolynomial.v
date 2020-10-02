@@ -1382,4 +1382,30 @@ Definition polyn_semiring_prop : semiring_prop (polynomial T) :=
      srng_mul_add_distr_l := polyn_mul_add_distr_l;
      srng_mul_0_l := polyn_mul_0_l |}.
 
+Canonical Structure polyn_semiring_op.
+Canonical Structure polyn_ring_op.
+Canonical Structure polyn_semiring_prop.
+
 End in_ring.
+
+Module polynomial_Notations.
+
+Declare Scope polynomial_scope.
+Delimit Scope polynomial_scope with P.
+
+Notation "0" := (polyn_of_list []) : polynomial_scope.
+Notation "1" := (polyn_of_list [1%Srng]) : polynomial_scope.
+Notation "P + Q" := (polyn_add P Q) : polynomial_scope.
+Notation "P - Q" := (polyn_sub P Q) : polynomial_scope.
+Notation "P * Q" := (polyn_mul P Q) : polynomial_scope.
+Notation "- P" := (polyn_opp P) : polynomial_scope.
+
+Declare Scope polyn_list_scope.
+Delimit Scope polyn_list_scope with PL.
+
+Notation "0" := ([]) : polyn_list_scope.
+Notation "1" := ([1%Srng]) : polyn_list_scope.
+Notation "la + lb" := (polyn_list_add la lb) : polyn_list_scope.
+Notation "la * lb" := (polyn_list_mul la lb) : polyn_list_scope.
+
+End polynomial_Notations.

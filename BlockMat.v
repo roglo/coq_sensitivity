@@ -3174,6 +3174,7 @@ Import matrix_Notations.
 Import bmatrix_Notations.
 
 Require Import SRpolynomial.
+Import polynomial_Notations.
 
 Section in_ring.
 
@@ -3212,7 +3213,6 @@ Theorem charac_polyn_higher_coeff : ∀ M,
   → polyn_coeff (charac_polyn M) (mat_nrows M) = 1%Srng.
 Proof.
 intros * Hrz.
-...
 unfold charac_polyn.
 unfold determinant.
 remember (mat_nrows (_ - _)%M) as x.
@@ -3221,6 +3221,7 @@ remember (mat_nrows M) as r eqn:Hr; symmetry in Hr.
 revert M Hr.
 induction r; intros; [ easy | clear Hrz ].
 cbn - [ mat_id sub polyn_ring_op ].
+rewrite fold_rng_sub.
 destruct r. {
   cbn.
   do 2 rewrite rev_length.
@@ -3244,6 +3245,35 @@ destruct r. {
   }
 }
 specialize (IHr (Nat.neq_succ_0 _)).
+destruct r. {
+  cbn - [ norm_polyn_list ].
+  rewrite map_length.
+  cbn.
+  destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | ].
+  clear H; cbn.
+  repeat rewrite srng_add_0_l.
+  repeat rewrite srng_add_0_r.
+  repeat rewrite srng_mul_0_l.
+  repeat rewrite srng_mul_0_r.
+  repeat rewrite srng_mul_1_l.
+  repeat rewrite srng_mul_1_r.
+  repeat rewrite srng_add_0_l.
+  repeat rewrite srng_add_0_r.
+  repeat rewrite srng_mul_0_l.
+  repeat rewrite srng_mul_0_r.
+  repeat rewrite srng_mul_1_l.
+  repeat rewrite srng_mul_1_r.
+  destruct (srng_eq_dec 0 0) as [H| H]; [ clear H; cbn | easy ].
+  destruct (srng_eq_dec 0 0) as [H| H]; [ clear H; cbn | easy ].
+  destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | ].
+  clear H; cbn.
+(* ouais, bon, c'est l'enfer *)
+...
+  polyn_coeff
+    (Σ (j = 0, 1),
+     minus_one_pow j * (_x * polyn_of_list [mat_el (mat_id 2) 0 j] + - polyn_of_list [mat_el M 0 j]) *
+     det_loop (submatrix (mat_mul_scal_l _x (monom_mat_of_mat (mat_id 2)) - monom_mat_of_mat M)%M 0 j) 1)%Rng 2 =
+  1%Srng
 ...
 Print det_loop.
 About _x.
@@ -3326,5 +3356,3 @@ Notation "a * b" := (bmat_mul a b) : BM_scope.
 Notation "- a" := (bmat_opp a) : BM_scope.
 
 End bmatrix_Notations.
-
-Import bmatrix_Notations.
