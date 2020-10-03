@@ -3123,6 +3123,35 @@ Definition minus_one_pow n :=
 
 (* determinant *)
 
+Fixpoint rev_next right list :=
+  match list with
+  | x :: rlist =>
+      let fix loop rleft list :=
+        match list with
+        | y :: r =>
+            if lt_dec x y then
+              rev_append rlist (y :: rev_append rleft (x :: r))
+            else
+              loop (y :: rleft) r
+        | [] =>
+            rev_next (rev (x :: rleft)) rlist
+        end
+      in
+      loop [] right
+  | [] => []
+  end.
+
+Definition next_permut list := rev_next [] (rev list).
+
+Compute (next_permut [1;2;3]).
+Compute (next_permut [1;3;2]).
+Compute (next_permut [2;1;3]).
+Compute (next_permut [2;3;1]).
+Compute (next_permut [3;1;2]).
+Compute (next_permut [3;2;1]).
+
+...
+
 Fixpoint det_loop M n :=
   match n with
   | 0 => 0%Rng
