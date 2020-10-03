@@ -3123,7 +3123,7 @@ Definition minus_one_pow n :=
 
 (* next permutation of a list of nat *)
 
-Fixpoint rev_next right list :=
+Fixpoint rev_next list right :=
   match list with
   | x :: rlist =>
       let fix loop lb list :=
@@ -3134,14 +3134,14 @@ Fixpoint rev_next right list :=
             else
               loop (lb ++ [y]) la
         | [] =>
-            rev_next (lb ++ [x]) rlist
+            rev_next rlist (lb ++ [x])
         end
       in
       loop [] right
   | [] => []
   end.
 
-Definition next_permut list := rev_next [] (rev list).
+Definition next_permut list := rev_next (rev list) [].
 
 Compute (next_permut [1;2;3]).
 Compute (next_permut [1;3;2]).
