@@ -3187,6 +3187,9 @@ Context {sdp : @sring_dec_prop T so}.
 Existing Instance so.
 Existing Instance polyn_semiring_op.
 Existing Instance polyn_ring_op.
+Existing Instance polyn_semiring_prop.
+...
+Existing Instance polyn_ring_prop.
 
 (* convertion matrix → matrix with monomials *)
 
@@ -3209,7 +3212,7 @@ Definition charac_polyn (M : matrix T) :=
 (* monic polynomial: polynomial whose leading coefficient is 1 *)
 (* to be moved to SRpolynomial.v *)
 
-Definition is_monic_polyn P := polyn_coeff P (polyn_degree P - 1) = 1%Srng.
+Definition is_monic_polyn P := polyn_coeff P (polyn_degree P) = 1%Srng.
 Arguments is_monic_polyn P%P.
 
 Theorem polyn_x_minus_is_monic : ∀ a,
@@ -3220,10 +3223,23 @@ intros * Ha.
 unfold polyn_degree in Ha; cbn in Ha.
 unfold polyn_degree_plus_1 in Ha; cbn in Ha.
 apply Nat.sub_0_le in Ha.
+destruct a as (la, Hla).
+cbn in Ha |-*.
+destruct la as [| a]. {
+  unfold is_monic_polyn; cbn.
+  destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | cbn ].
+  clear H.
+  destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | cbn ].
+  easy.
+}
+destruct la; [ | cbn in Ha; flia Ha ].
+cbn in Hla.
 unfold is_monic_polyn; cbn.
-destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | ].
+destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | cbn ].
 clear H.
-...
+destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | ].
+easy.
+Qed.
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
    leading coefficient is 1 *)
@@ -3243,7 +3259,23 @@ destruct r. {
   unfold so.
   rewrite polyn_mul_1_r.
   rewrite fold_polyn_sub.
-Inspect 1.
+  apply polyn_x_minus_is_monic.
+  now cbn; destruct (srng_eq_dec (mat_el M 0 0) 0).
+}
+destruct r. {
+  cbn.
+  rewrite polyn_add_0_l.
+  rewrite polyn_mul_1_l.
+  unfold so.
+  rewrite polyn_mul_1_r.
+  assert (H : polyn_of_list [0%Rng] = 0%P). {
+    apply polyn_eq; cbn.
+    now destruct (srng_eq_dec 0 0).
+  }
+  rewrite H.
+  rewrite polyn_mul_0_r.
+  do 2 rewrite polyn_add_0_l.
+  rewrite rng_mul_opp_opp.
 ...
 intros * Hrz.
 specialize (polyn_prop (charac_polyn M)) as H1.

@@ -1495,6 +1495,14 @@ subst lb; symmetry.
 apply rev_involutive.
 Qed.
 
+Theorem List_eq_rev_r : ∀ A (la lb : list A),
+  la = rev lb → rev la = lb.
+Proof.
+intros * Hll.
+subst la.
+apply rev_involutive.
+Qed.
+
 Theorem List_rev_inj : ∀ A (la lb : list A), rev la = rev lb → la = lb.
 Proof.
 intros A * Hll.

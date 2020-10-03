@@ -1383,6 +1383,13 @@ rewrite (map_polyn_list_convol_mul_0_l 0).
 now rewrite seq_length.
 Qed.
 
+Theorem polyn_mul_0_r : ∀ P, (P * 0 = 0)%P.
+Proof.
+intros.
+rewrite polyn_mul_comm.
+apply polyn_mul_0_l.
+Qed.
+
 Definition polyn_semiring_prop : semiring_prop (polynomial T) :=
   {| srng_add_comm := polyn_add_comm;
      srng_add_assoc := polyn_add_assoc;
@@ -1392,9 +1399,27 @@ Definition polyn_semiring_prop : semiring_prop (polynomial T) :=
      srng_mul_add_distr_l := polyn_mul_add_distr_l;
      srng_mul_0_l := polyn_mul_0_l |}.
 
+Theorem polyn_add_opp_l : ∀ P : polynomial T, (- P + P)%P = 0%P.
+Proof.
+intros.
+apply polyn_eq; cbn.
+destruct P as (la, Hla); cbn.
+apply List_eq_rev_r; cbn.
+apply eq_strip_0s_nil.
+apply List_eq_rev_r; cbn.
+rewrite List_rev_repeat.
+rewrite rev_length.
+...
+
+Definition polyn_ring_prop : ring_prop (polynomial T) :=
+  {| rng_add_opp_l := polyn_add_opp_l |}.
+...
+
 Canonical Structure polyn_semiring_op.
 Canonical Structure polyn_ring_op.
 Canonical Structure polyn_semiring_prop.
+...
+Canonical Structure polyn_ring_prop.
 
 End in_ring.
 
