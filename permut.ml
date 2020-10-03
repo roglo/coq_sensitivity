@@ -53,7 +53,7 @@ value rec rev_rnext right =
   | [] -> [] ]
 ;
 
-value rnext = rev_rnext [];
+value rnext x = rev_rnext [] x;
 
 (* *)
 
@@ -90,12 +90,12 @@ value ex =
    "5 d'amour"]
 ;
 
-value first n =
+value seq n =
   loop n [] where rec loop i list =
     if i <= 0 then list else loop (i - 1) [i - 1 :: list]
 ;
 
-value rfirst n =
+value rseq n =
   loop 0 [] where rec loop i list =
     if i >= n then list else loop (i + 1) [i :: list]
 ;
