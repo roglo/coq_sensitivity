@@ -3121,7 +3121,7 @@ Definition minus_one_pow n :=
   | _ => (- 1%Srng)%Rng
   end.
 
-(* determinant *)
+(* next permutation of a list of nat *)
 
 Fixpoint rev_next right list :=
   match list with
@@ -3151,6 +3151,8 @@ Compute (next_permut [3;1;2]).
 Compute (next_permut [3;2;1]).
 
 ...
+
+(* determinant *)
 
 Fixpoint det_loop M n :=
   match n with
