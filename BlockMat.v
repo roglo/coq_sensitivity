@@ -3207,8 +3207,23 @@ Definition charac_polyn (M : matrix T) :=
      monom_mat_of_mat M)%M.
 
 (* monic polynomial: polynomial whose leading coefficient is 1 *)
+(* to be moved to SRpolynomial.v *)
 
 Definition is_monic_polyn P := polyn_coeff P (polyn_degree P - 1) = 1%Srng.
+Arguments is_monic_polyn P%P.
+
+Theorem polyn_x_minus_is_monic : ∀ a,
+  polyn_degree a = 0
+  → is_monic_polyn (_x - a).
+Proof.
+intros * Ha.
+unfold polyn_degree in Ha; cbn in Ha.
+unfold polyn_degree_plus_1 in Ha; cbn in Ha.
+apply Nat.sub_0_le in Ha.
+unfold is_monic_polyn; cbn.
+destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | ].
+clear H.
+...
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
    leading coefficient is 1 *)
@@ -3225,6 +3240,10 @@ revert M Hr.
 induction r; intros; [ easy | clear Hrz ].
 cbn.
 destruct r. {
+  unfold so.
+  rewrite polyn_mul_1_r.
+  rewrite fold_polyn_sub.
+Inspect 1.
 ...
 intros * Hrz.
 specialize (polyn_prop (charac_polyn M)) as H1.

@@ -200,6 +200,9 @@ Definition polyn_opp P :=
 Definition polyn_sub P Q :=
   polyn_add P (polyn_opp Q).
 
+Theorem fold_polyn_sub : ∀ P Q, polyn_add P (polyn_opp Q) = polyn_sub P Q.
+Proof. easy. Qed.
+
 (* multiplication of polynomials *)
 
 Definition polyn_list_convol_mul la lb i :=
@@ -1167,6 +1170,13 @@ clear Hlb.
 induction lb as [| b]; [ easy | ].
 cbn in Hz |-*.
 now destruct (srng_eq_dec b 0).
+Qed.
+
+Theorem polyn_mul_1_r : ∀ P, (P * 1)%P = P.
+Proof.
+intros.
+rewrite polyn_mul_comm.
+apply polyn_mul_1_l.
 Qed.
 
 Theorem eq_norm_polyn_list_eq_length : ∀ la lb,
