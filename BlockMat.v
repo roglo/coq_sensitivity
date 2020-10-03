@@ -3188,7 +3188,6 @@ Existing Instance so.
 Existing Instance polyn_semiring_op.
 Existing Instance polyn_ring_op.
 Existing Instance polyn_semiring_prop.
-...
 Existing Instance polyn_ring_prop.
 
 (* convertion matrix → matrix with monomials *)
@@ -3275,7 +3274,11 @@ destruct r. {
   rewrite H.
   rewrite polyn_mul_0_r.
   do 2 rewrite polyn_add_0_l.
-  rewrite rng_mul_opp_opp.
+  rewrite rng_mul_opp_opp; cbn.
+  rewrite srng_mul_1_l.
+  rewrite rng_mul_opp_r; cbn.
+  do 3 rewrite fold_polyn_sub; cbn.
+(* ouais, ça marche, mais, bon *)
 ...
 intros * Hrz.
 specialize (polyn_prop (charac_polyn M)) as H1.

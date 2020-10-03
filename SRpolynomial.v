@@ -1409,16 +1409,26 @@ apply eq_strip_0s_nil.
 apply List_eq_rev_r; cbn.
 rewrite List_rev_repeat.
 rewrite rev_length.
-...
+clear Hla.
+induction la as [| a]; [ easy | cbn ].
+unfold so.
+now rewrite rng_add_opp_l; f_equal.
+Qed.
+
+Theorem polyn_add_opp_r : ∀ P : polynomial T, (P - P)%P = 0%P.
+Proof.
+intros.
+unfold polyn_sub.
+rewrite polyn_add_comm.
+apply polyn_add_opp_l.
+Qed.
 
 Definition polyn_ring_prop : ring_prop (polynomial T) :=
   {| rng_add_opp_l := polyn_add_opp_l |}.
-...
 
 Canonical Structure polyn_semiring_op.
 Canonical Structure polyn_ring_op.
 Canonical Structure polyn_semiring_prop.
-...
 Canonical Structure polyn_ring_prop.
 
 End in_ring.
