@@ -3150,6 +3150,9 @@ Compute (next_permut [2;3;1]).
 Compute (next_permut [3;1;2]).
 Compute (next_permut [3;2;1]).
 
+Compute (rev_next [2;1] [3]).
+Compute (rev [1] ++ 3 :: [] ++ 2 :: []).
+
 ...
 
 Fixpoint next_permut right list :=
