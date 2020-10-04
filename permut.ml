@@ -10,11 +10,11 @@
         (e.g. [894765321] from right to left is [123567498])
    - x is the first such that the list decreases
         ([123567] are increasing, 4 is smaller than 7, therefore x=4)
-   - cut that increasing list ([123567]) into three parts:
+   - the rest is named "lc" (lc=[98]): it will be unchanged
+   - cut the increasing list above ([123567]) into three parts:
      * the first ones less than x, named "lb" (lb=[123])
      * the first one greater than x, named "y" (y=5)
      * the rest, named "la" (la=[67])
-   - the rest is unchanged, named "lc" (lc=[98])
    - in summary:
      * initial: (rev lc)  x (rev la) y (rev lb)
                 89        4 76       5 321
