@@ -159,3 +159,43 @@ begin
   end;
 end {of genl};
 *)
+
+(* all permutations and parities in a row;
+   parity = even = false; parity = odd = true *)
+
+value rec distrib (n : α) (ppl : list (list α * bool)) : list (list α * bool) =
+  match ppl with
+  | [] -> [([n], False)]
+  | _ -> failwith "distrib 1 not impl"
+  end.
+
+value rec all_permut_and_parity list =
+  match list with
+  | [] -> []
+  | [n :: list'] ->
+      let ppl = all_permut_and_parity list' in
+      distrib n ppl
+  end.
+
+(*
+value distribute c (l : list (list int * bool)) : list (list int * bool) =
+  (insert [] [[c :: l]] l : list (list int * bool))
+  where rec insert acc1 acc2 =
+    fun
+    | [] → acc2
+    | [hd :: tl] →
+        insert [hd :: acc1] [List.rev_append acc1 [hd; c :: tl] :: acc2] tl
+    end
+;
+
+value rec all_permut_and_parity =
+  fun
+  | [] → [(([] : list int), False)]
+  | [hd :: tl] →
+      List.fold_left
+        (fun (acc : list (list int * bool)) x →
+           List.rev_append (distribute hd x) acc)
+        ([] : list (list int * bool)) (all_permut_and_parity tl)
+  end
+;
+*)
