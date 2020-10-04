@@ -3153,6 +3153,8 @@ Compute (next_permut [3;2;1]).
 Compute (rev_next_permut [2;1] [3]).
 Compute (rev [1] ++ 3 :: [] ++ 2 :: []).
 
+Compute (rev_next_permut [3;1] [2]).
+
 ...
 
 (* determinant *)

@@ -37,6 +37,28 @@ value next list = rev_next [] (List.rev list);
 
 (* *)
 
+value rec rev_next_permut (list : list int) right =
+  match list with
+  | [x :: rlist] ->
+      let rec loop lb list =
+        match list with
+        | [y :: la] ->
+            if x < y then
+              List.append (List.append (List.rev rlist) [y :: lb]) [x :: la]
+            else
+              loop (List.append lb [y]) la
+        | [] ->
+            rev_next_permut rlist (List.append lb [x])
+        end
+      in
+      loop [] right
+  | [] -> []
+  end.
+
+value next_permut list = rev_next_permut (List.rev list) [].
+
+(* *)
+
 value rec rev_rnext right =
   fun
   [ [x :: rlist] ->
