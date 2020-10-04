@@ -11,27 +11,27 @@
    - x is the first such that the list decreases
         ([123567] are increasing, 4 is smaller than 7, therefore x=4)
    - cut that increasing list ([123567]) into three parts:
-     * the first ones less than x, named "B" (B=[123])
+     * the first ones less than x, named "lb" (lb=[123])
      * the first one greater than x, named "y" (y=5)
-     * the rest, named "A" (A=[67])
-   - the rest is unchanged, named "C" (C=[98])
+     * the rest, named "la" (la=[67])
+   - the rest is unchanged, named "lc" (lc=[98])
    - in summary:
-     * initial: (rev C)  x (rev A) y (rev B)
-                89       4 76      5 321
-     * result:  (rev C)  y B   x A
-                89       5 123 4 67
+     * initial: (rev lc)  x (rev la) y (rev lb)
+                89        4 76       5 321
+     * result:  (rev lc)  y lb   x la
+                89        5 123  4 67
 
    initial:
                        | <---------------------------------------< increasing
        ----------------+-------------------------------------------
-       |      C      |x|       <--A         |y|       <--B        |
+       |     lc      |x|       <--la        |y|       <--lb       |
        ----------------+----------------------+--------------------
                        | <--greater than x--> | <--less than x--> |
 
    result:
 
        ------------------------------------------------------------
-       |      C      |y|         B-->     |x|           A-->      |
+       |     lc      |y|        lb-->     |x|          la-->      |
        ------------------------------------------------------------
 *)
 
