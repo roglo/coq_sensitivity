@@ -137,3 +137,25 @@ value rec all_permut_from list =
   end.
 
 all_permut_from [1;2;3].
+
+(* permutations with alternating signatures *)
+(* Pascal language; paper from D. Roelants van Baronaigien and Frank Ruskey
+   "Generating permutations with given ups and downs"
+problem: I cannot understand what "Printlt" mean, what is the input
+and what is the output?
+
+Procedure genl(k, v: integer);
+var i, lb, ub: integer;
+begin
+  P[k] := v;
+  if k = 1 then Printlt
+  else begin
+    if Q[k-1] = 1 then begin
+      lb:=1; ub:=v;
+    end else begin
+      lb:=v+1; ub:=n-k+2;
+    end;
+    for i := lb to ub do genl(k-1,i);
+  end;
+end {of genl};
+*)
