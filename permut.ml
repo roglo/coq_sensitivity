@@ -82,18 +82,19 @@ next_permut [8;9;4;7;6;5;3;2;1].
 (* short version, computing x and y in a row and
    using List.rev_append, and nicely ordered parameters *)
 
-value rec rev_next_permut' right =
+value rec rev_next_permut' la =
   fun
   | [x :: lc] ->
-      loop [] right where rec loop rleft =
+      loop [] la where rec loop lb =
         fun
-        [ [y :: right] ->
+        | [y :: la] ->
             if x < y then
-              List.rev_append lc [y :: List.rev_append rleft [x :: right]]
+              List.rev_append lc [y :: List.rev_append lb [x :: la]]
             else
-              loop [y :: rleft] right
+              loop [y :: lb] la
         | [] ->
-            rev_next_permut' (List.rev [x :: rleft]) lc ]
+            rev_next_permut' (List.rev [x :: lb]) lc
+        end
   | [] -> []
   end
 ;
