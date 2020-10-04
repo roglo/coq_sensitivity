@@ -51,6 +51,7 @@ value rec next_permut_find_x rlist =
   end.
 
 (* returns Some(lb,y,la) or None if y not found *)
+(* if "x" and "inc" come from next_permut_find_x above, cannot return None *)
 value rec next_permut_find_y x inc =
   match inc with
   | [] -> None
