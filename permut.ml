@@ -15,7 +15,8 @@
      * the first ones less than x, named "lb" (lb=[123])
      * the first one greater than x, named "y" (y=5)
      * the rest, named "la" (la=[67])
-   - in summary:
+   - the result is the concatenation of "rev lc", "y", "lb" and "la"
+   - the example, in summary:
      * initial: (rev lc)  x (rev la) y (rev lb)
                 89        4 76       5 321
      * result:  (rev lc)  y lb   x la
@@ -35,28 +36,51 @@
        ------------------------------------------------------------
 *)
 
-value rec rev_next_permut list right =
-  match list with
-  | [x :: lc] ->
-      loop [] right where rec loop lb list =
-        match list with
-        | [y :: la] ->
-            if x < y then
-              List.append (List.append (List.rev lc) [y :: lb]) [x :: la]
-            else
-              loop (List.append lb [y]) la
-        | [] ->
-            rev_next_permut lc (List.append lb [x])
+(* returns Some(inc,x,lc) of None if x not found *)
+value rec next_permut_find_x rlist =
+  match rlist with
+  | [] | [_] -> None
+  | [y; z :: lc] ->
+      if z < y then Some ([y], z, lc)
+      else
+        match next_permut_find_x [z :: lc] with
+        | None -> None
+        | Some (inc, x, lc) -> Some ([y :: inc], x, lc)
         end
-  | [] -> []
   end.
 
-value next_permut list = rev_next_permut (List.rev list) [].
+(* returns Some(lb,y,la) or None if y not found *)
+value rec next_permut_find_y x inc =
+  match inc with
+  | [] -> None
+  | [z :: lz] ->
+      if x < z then Some ([], z, lz)
+      else
+        match next_permut_find_y x lz with
+        | None -> None
+        | Some (lb, y, la) -> Some ([z :: lb], y, la)
+	end
+  end.
+
+(* next permutation of a list *)
+value next_permut list =
+  match next_permut_find_x (List.rev list) with
+  | None -> []
+  | Some (inc, x, lc) ->
+      match next_permut_find_y x inc with
+      | None -> []
+      | Some (lb, y, la) ->
+          List.append (List.append (List.rev lc) [y :: lb]) [x :: la]
+      end
+  end.
+
+(* *)
 
 [8;9;4;7;6;5;3;2;1].
 next_permut [8;9;4;7;6;5;3;2;1].
 
-(* optimized version, using List.rev_append and nicely ordered parameters *)
+(* short version, computing x and y in a row and
+   using List.rev_append, and nicely ordered parameters *)
 
 value rec rev_next_permut' right =
   fun
