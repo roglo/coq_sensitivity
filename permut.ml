@@ -172,7 +172,7 @@ value rec insert n l p =
        List.map (fun (l, p) -> ([m :: l], p)) (insert n l' (not p))]
   end.
 
-value rec distrib (n : α) (ppl : list (list α * bool)) : list (list α * bool) =
+value rec distrib n ppl =
   match ppl with
   | [] -> []
   | [((l, p) : (list α * bool)) :: ppl] ->
