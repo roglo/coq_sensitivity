@@ -2,7 +2,7 @@
 
 (* The function "next_permut" returns the next permutation of a list.
    Returns [] if no more permutation.
-   Next permutation in lexical order *)
+   Next permutation is in lexical order *)
 
 (*
    Algorithm for "next_permut" (below):
