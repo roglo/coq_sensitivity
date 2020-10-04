@@ -163,10 +163,16 @@ end {of genl};
 (* all permutations and parities in a row;
    parity = even = false; parity = odd = true *)
 
+value rec insert n l p =
+  match l with
+  | [] -> []
+  | [m :: l'] -> ...
+
 value rec distrib (n : α) (ppl : list (list α * bool)) : list (list α * bool) =
   match ppl with
-  | [] -> [([n], False)]
-  | _ -> failwith "distrib 1 not impl"
+  | [] -> []
+  | [(l, p) : (list α * bool)) :: ppl] ->
+       List.append (insert n l p) (distrib n ppl)
   end.
 
 value rec all_permut_and_parity list =
