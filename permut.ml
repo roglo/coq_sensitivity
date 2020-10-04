@@ -1,8 +1,7 @@
 (* $Id: permut.ml,v 1.7 2008/10/30 18:59:48 deraugla Exp $ *)
 
-(* The function "next_permut" returns the next permutation of a list.
-   Returns [] if no more permutation.
-   Next permutation is in lexical order *)
+(* The function "next_permut" returns the next permutation of a list
+   in lexical order. Returns [] if no more permutation. *)
 
 (*
    Algorithm for "next_permut" (below):
