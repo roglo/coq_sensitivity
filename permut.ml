@@ -4,7 +4,7 @@
    in lexical order. Returns [] if no more permutation. *)
 
 (*
-   Algorithm for "next_permut" (below):
+   Algorithm for "next_permut":
    - taking the initial list from right to left,
         (e.g. [894765321] from right to left is [123567498])
    - x is the first such that the list decreases
