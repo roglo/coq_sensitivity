@@ -4,6 +4,16 @@
    Returns [] if no more permutation. *)
 
 (*
+   - taking the initial list from right to left,
+        (e.g. [1537642] from right to left is [2467351])
+   - x is the first such that the list decreases
+        ([2467] are increasing, 3 is smaller than 7, therefore x=3)
+   - cut that increasing list ([2467]) into three parts:
+     * the ones less than x ([2]) named "B" (B=[2])
+     * the first one greater than x (4), named "y" (y=4)
+     * the rest ([67]), named "A" (A=[67])
+   - the rest ([15]) is unchanged
+
    initial:
                        | <---------------------------------------< increasing
        ----------------+-------------------------------------------
@@ -40,9 +50,11 @@ value next list = rev_next [] (List.rev list);
 value rec rev_next_permut (list : list int) right =
   match list with
   | [x :: rlist] ->
+let _ = Printf.printf "x %d\n%!" x in
       let rec loop lb list =
         match list with
         | [y :: la] ->
+let _ = Printf.printf "y %d\n%!" y in
             if x < y then
               List.append (List.append (List.rev rlist) [y :: lb]) [x :: la]
             else
