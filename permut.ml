@@ -1,123 +1,82 @@
 (* $Id: permut.ml,v 1.7 2008/10/30 18:59:48 deraugla Exp $ *)
 
-(* The function "next" returns the next permutation of a list.
-   Returns [] if no more permutation. *)
+(* The function "next_permut" returns the next permutation of a list.
+   Returns [] if no more permutation.
+   Next permutation in lexical order *)
 
 (*
+   Algorithm for "next_permut" (below):
    - taking the initial list from right to left,
-        (e.g. [1537642] from right to left is [2467351])
+        (e.g. [894765321] from right to left is [123567498])
    - x is the first such that the list decreases
-        ([2467] are increasing, 3 is smaller than 7, therefore x=3)
-   - cut that increasing list ([2467]) into three parts:
-     * the ones less than x ([2]) named "B" (B=[2])
-     * the first one greater than x (4), named "y" (y=4)
-     * the rest ([67]), named "A" (A=[67])
-   - the rest ([15]) is unchanged
+        ([123567] are increasing, 4 is smaller than 7, therefore x=4)
+   - cut that increasing list ([123567]) into three parts:
+     * the first ones less than x, named "B" (B=[123])
+     * the first one greater than x, named "y" (y=5)
+     * the rest, named "A" (A=[67])
+   - the rest is unchanged, named "C" (C=[98])
+   - in summary:
+     * initial: (rev C)  x (rev A) y (rev B)
+                89       4 76      5 321
+     * result:  (rev C)  y B   x A
+                89       5 123 4 67
 
    initial:
                        | <---------------------------------------< increasing
        ----------------+-------------------------------------------
-       |             |x|       <--A         |y|       <--B        |
+       |      C      |x|       <--A         |y|       <--B        |
        ----------------+----------------------+--------------------
                        | <--greater than x--> | <--less than x--> |
 
    result:
 
        ------------------------------------------------------------
-       |             |y|         B-->     |x|           A-->      |
+       |      C      |y|         B-->     |x|           A-->      |
        ------------------------------------------------------------
 *)
 
-value rec rev_next right =
-  fun
-  [ [x :: rlist] ->
-      loop [] right where rec loop rleft =
-        fun
-        [ [y :: right] ->
-            if x < y then
-              List.rev_append rlist [y :: List.rev_append rleft [x :: right]]
-            else
-              loop [y :: rleft] right
-        | [] ->
-            rev_next (List.rev [x :: rleft]) rlist ]
-  | [] -> [] ]
-;
-
-value next list = rev_next [] (List.rev list);
-
-(* *)
-
-value rec rev_next_permut (list : list int) right =
+value rec rev_next_permut list right =
   match list with
-  | [x :: rlist] ->
-let _ = Printf.printf "x %d\n%!" x in
-      let rec loop lb list =
+  | [x :: lc] ->
+      loop [] right where rec loop lb list =
         match list with
         | [y :: la] ->
-let _ = Printf.printf "y %d\n%!" y in
             if x < y then
-              List.append (List.append (List.rev rlist) [y :: lb]) [x :: la]
+              List.append (List.append (List.rev lc) [y :: lb]) [x :: la]
             else
               loop (List.append lb [y]) la
         | [] ->
-            rev_next_permut rlist (List.append lb [x])
+            rev_next_permut lc (List.append lb [x])
         end
-      in
-      loop [] right
   | [] -> []
   end.
 
 value next_permut list = rev_next_permut (List.rev list) [].
 
-(* *)
+[8;9;4;7;6;5;3;2;1].
+next_permut [8;9;4;7;6;5;3;2;1].
 
-value rec rev_rnext right =
+(* optimized version, using List.rev_append and nicely ordered parameters *)
+
+value rec rev_next_permut' right =
   fun
-  [ [x :: rlist] ->
+  | [x :: lc] ->
       loop [] right where rec loop rleft =
         fun
         [ [y :: right] ->
             if x < y then
-              List.rev_append (List.rev_append rleft [x :: right])
-                [y :: rlist]
+              List.rev_append lc [y :: List.rev_append rleft [x :: right]]
             else
               loop [y :: rleft] right
         | [] ->
-            rev_rnext (List.rev [x :: rleft]) rlist ]
-  | [] -> [] ]
+            rev_next_permut' (List.rev [x :: rleft]) lc ]
+  | [] -> []
+  end
 ;
 
-value rnext x = rev_rnext [] x;
+value next_permut' list = rev_next_permut' [] (List.rev list);
 
-(* *)
-
-value rec rev_rnext2 rleft right rlist =
-  match (right, rlist) with
-  [ ([y :: right], [x :: rlist]) ->
-      if x < y then
-        List.rev_append (List.rev_append rleft [x :: right]) [y :: rlist]
-      else
-        rev_rnext2 [y :: rleft] right [x :: rlist]
-  | ([], [x :: rlist]) ->
-      rev_rnext2 [] (List.rev [x :: rleft]) rlist
-  | (_, []) -> [] ]
-;
-
-value rec rev_rnext3 rleft right =
-  fun
-  [ [x :: rlist] ->
-      match right with
-      [ [y :: right] ->
-          if x < y then
-            List.rev_append (List.rev_append rleft [x :: right]) [y :: rlist]
-          else
-            rev_rnext3 [y :: rleft] right [x :: rlist]
-      | [] ->
-          rev_rnext3 [] (List.rev [x :: rleft]) rlist ]
-  | [] -> [] ]
-;
-
-(* *)
+(* borrowed from Molière, "Le bourgeois gentilhomme" *)
 
 value ex =
   ["1 belle marquise"; "2 vos beaux yeux"; "3 me font"; "4 mourir";
