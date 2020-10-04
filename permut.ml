@@ -16,6 +16,8 @@
      * the first one greater than x, named "y" (y=5)
      * the rest, named "la" (la=[67])
    - the result is the concatenation of "rev lc", "y", "lb" and "la"
+   - if no "x" found, the initial list is all decreasing, result is []
+   - if "x" is found, "y" must be found
    - the example, in summary:
      * initial: (rev lc)  x (rev la) y (rev lb)
                 89        4 76       5 321
