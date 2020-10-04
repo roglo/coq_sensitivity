@@ -161,47 +161,28 @@ end {of genl};
 *)
 
 (* all permutations and parities in a row;
-   parity = even = false; parity = odd = true *)
+   parity = even = false (signature =+1);
+   parity = odd = true (signature=-1) *)
 
 value rec insert n l p =
   match l with
-  | [] -> []
-  | [m :: l'] -> ...
+  | [] -> [([n], p)]
+  | [m :: l'] ->
+      [([n; m :: l'], p) ::
+       List.map (fun (l, p) -> ([m :: l], p)) (insert n l' (not p))]
+  end.
 
 value rec distrib (n : α) (ppl : list (list α * bool)) : list (list α * bool) =
   match ppl with
   | [] -> []
-  | [(l, p) : (list α * bool)) :: ppl] ->
+  | [((l, p) : (list α * bool)) :: ppl] ->
        List.append (insert n l p) (distrib n ppl)
   end.
 
 value rec all_permut_and_parity list =
   match list with
-  | [] -> []
+  | [] -> [([], False)]
   | [n :: list'] ->
       let ppl = all_permut_and_parity list' in
       distrib n ppl
   end.
-
-(*
-value distribute c (l : list (list int * bool)) : list (list int * bool) =
-  (insert [] [[c :: l]] l : list (list int * bool))
-  where rec insert acc1 acc2 =
-    fun
-    | [] → acc2
-    | [hd :: tl] →
-        insert [hd :: acc1] [List.rev_append acc1 [hd; c :: tl] :: acc2] tl
-    end
-;
-
-value rec all_permut_and_parity =
-  fun
-  | [] → [(([] : list int), False)]
-  | [hd :: tl] →
-      List.fold_left
-        (fun (acc : list (list int * bool)) x →
-           List.rev_append (distribute hd x) acc)
-        ([] : list (list int * bool)) (all_permut_and_parity tl)
-  end
-;
-*)
