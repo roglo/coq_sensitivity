@@ -5,7 +5,7 @@
 
 (*
    Algorithm for "next_permut":
-   - taking the initial list from right to left,
+   - take the initial list from right to left,
         (e.g. [894765321] from right to left is [123567498])
    - x is the first such that the list decreases
         ([123567] are increasing, 4 is smaller than 7, therefore x=4)
@@ -110,6 +110,14 @@ value ex =
    "5 d'amour"]
 ;
 
+value rec iter next list n =
+  if n <= 0 then list else iter next (next list) (n - 1)
+;
+
+iter next_permut ex 109;
+
+(* *)
+
 value seq n =
   loop n [] where rec loop i list =
     if i <= 0 then list else loop (i - 1) [i - 1 :: list]
@@ -120,8 +128,12 @@ value rseq n =
     if i >= n then list else loop (i + 1) [i :: list]
 ;
 
-value rec fact n = if n <= 1 then 1 else n * fact (n - 1);
+(* all permutations *)
 
-value rec iter next list n =
-  if n <= 0 then list else iter next (next list) (n - 1)
-;
+value rec all_permut_from list =
+  match next_permut list with
+  | [] -> [list]
+  | list' -> [list :: all_permut_from list']
+  end.
+
+all_permut_from [1;2;3].
