@@ -153,8 +153,7 @@ value rec insert n l p =
 value rec distrib n ppl =
   match ppl with
   | [] -> []
-  | [((l, p) : (list α * bool)) :: ppl] ->
-       List.append (insert n l p) (distrib n ppl)
+  | [((l, p) :: ppl] -> List.append (insert n l p) (distrib n ppl)
   end.
 
 value rec all_permut_and_parity list =
