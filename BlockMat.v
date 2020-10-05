@@ -3253,7 +3253,14 @@ unfold determinant; cbn.
 remember (mat_nrows M) as r eqn:Hr; symmetry in Hr.
 revert M Hr.
 induction r; intros; [ easy | clear Hrz ].
+remember (mat_mul_scal_l _x (monom_mat_of_mat (mat_id (S r))) - monom_mat_of_mat M)%M as d eqn:Hd.
 cbn.
+Print det_loop.
+cbn - [ nth seq sub mat_mul_scal_l ].
+...
+  ============================
+  is_monic_polyn (det_loop (mat_mul_scal_l _x (monom_mat_of_mat (mat_id (S r))) - monom_mat_of_mat M)%M (S r))
+...
 destruct r. {
   unfold so.
   rewrite polyn_mul_1_r.
