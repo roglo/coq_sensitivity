@@ -3270,11 +3270,11 @@ cbn - [ sub det_loop ].
 unfold minus_one_pow at 1.
 cbn - [ sub det_loop ].
 rewrite Nat.sub_diag, polyn_mul_1_l.
-remember (mat_el PM 0 0) as x eqn:Hx.
-rewrite HPM in Hx; cbn in Hx.
-unfold so in Hx.
-rewrite srng_mul_1_r in Hx.
-rewrite fold_polyn_sub in Hx.
+remember (mat_el PM 0 0) as x_a eqn:Hxa.
+rewrite HPM in Hxa; cbn in Hxa.
+unfold so in Hxa.
+rewrite srng_mul_1_r in Hxa.
+rewrite fold_polyn_sub in Hxa.
 ...
 intros * Hrz.
 unfold charac_polyn.
