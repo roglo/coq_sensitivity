@@ -3240,6 +3240,69 @@ destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | ].
 easy.
 Qed.
 
+Theorem norm_polyn_list_id : ∀ la,
+  last la 0%Srng ≠ 0%Srng
+  → norm_polyn_list la = la.
+Proof.
+intros * Hla.
+unfold norm_polyn_list; f_equal.
+apply List_eq_rev_r.
+remember (rev la) as lb eqn:Hlb.
+apply List_eq_rev_r in Hlb; subst la.
+rename lb into la.
+rewrite List_rev_last in Hla.
+destruct la as [| a]; [ easy | ].
+cbn in Hla |-*.
+now destruct (srng_eq_dec a 0).
+Qed.
+
+Theorem polyn_degree_sum : ∀ P Q,
+  polyn_degree Q < polyn_degree P
+  → polyn_degree (P + Q) = polyn_degree P.
+Proof.
+intros * Hdeg.
+unfold polyn_degree in Hdeg |-*.
+unfold polyn_degree_plus_1 in Hdeg |-*.
+f_equal.
+destruct P as (la, Hla).
+destruct Q as (lb, Hlb).
+move lb before la.
+cbn - [ norm_polyn_list ] in Hdeg |-*.
+unfold polyn_prop_test in Hla, Hlb.
+destruct la as [| a]; [ easy | ].
+cbn - [ nth ] in Hla.
+destruct (srng_eq_dec (nth (length la) (a :: la) 0%Rng) 0) as [Haz| Haz]. {
+  easy.
+}
+clear Hla.
+destruct lb as [| b]. {
+  cbn - [ rev length ].
+  clear - Haz.
+  rewrite norm_polyn_list_id; [ easy | ].
+  cbn in Haz |-*.
+  revert a Haz.
+  induction la as [| a1]; intros; cbn in Haz |-*; [ easy | ].
+  now apply IHla.
+}
+cbn - [ nth ] in Hlb.
+destruct (srng_eq_dec (nth (length lb) (b :: lb) 0%Rng) 0) as [Hbz| Hbz]. {
+  easy.
+}
+clear Hlb.
+...
+
+Theorem is_monic_polyn_sum : ∀ P Q,
+  polyn_degree Q < polyn_degree P
+  → is_monic_polyn P
+  → is_monic_polyn (P + Q).
+Proof.
+intros * Hdeg HP.
+unfold is_monic_polyn in HP |-*.
+Search polyn_degree.
+...
+rewrite polyn_degree_sum; [ | easy ].
+...
+
 (* the caracteristic polynomial of a matrix is monic, i.e. its
    leading coefficient is 1 *)
 
@@ -3275,6 +3338,8 @@ rewrite HPM in Hxa; cbn in Hxa.
 unfold so in Hxa.
 rewrite srng_mul_1_r in Hxa.
 rewrite fold_polyn_sub in Hxa.
+...
+apply is_monic_polyn_sum.
 ...
 intros * Hrz.
 unfold charac_polyn.
