@@ -204,8 +204,25 @@ begin
 end {of genl};
 *)
 
-value rec genl k v = do {
-  p.[k] := v;
-  if i = 1 then p
+(* ouais, bon, ça marche pas
+
+value rec genl p q n k v = do {
+  let lb = ref 0 in
+  let ub = ref 0 in
+  p.(k) := v;
+  if k = 1 then do {
+    Printf.printf "P=";
+    for i = 0 to n - 1 do { Printf.printf "%d" p.(i) };
+    Printf.printf "\n%!";
+  }
   else do {
-    if q.[k
+    if q.(k) = 1 then do {
+      lb.val := 1; ub.val := v;
+    }
+    else do {
+      lb.val := v + 1; ub.val := n - k + 2;
+    };
+    for i = lb.val to ub.val do { genl p q n (k - 1) i }
+  }
+};
+*)
