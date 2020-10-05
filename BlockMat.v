@@ -3269,26 +3269,28 @@ destruct Q as (lb, Hlb).
 move lb before la.
 cbn - [ norm_polyn_list ] in Hdeg |-*.
 unfold polyn_prop_test in Hla, Hlb.
-destruct la as [| a]; [ easy | ].
+revert lb Hlb Hdeg.
+induction la as [| a] using rev_ind; intros; [ easy | ].
+rewrite app_length, Nat.add_comm in Hla.
 cbn - [ nth ] in Hla.
-destruct (srng_eq_dec (nth (length la) (a :: la) 0%Rng) 0) as [Haz| Haz]. {
+destruct (srng_eq_dec (nth (length la) (la ++ [a]) 0%Rng) 0) as [Haz| Haz]. {
   easy.
 }
 clear Hla.
+rewrite app_nth2 in Haz; [ | now unfold ge ].
+rewrite Nat.sub_diag in Haz; cbn in Haz.
 destruct lb as [| b]. {
   cbn - [ rev length ].
-  clear - Haz.
+  rewrite polyn_list_add_0_r.
   rewrite norm_polyn_list_id; [ easy | ].
-  cbn in Haz |-*.
-  revert a Haz.
-  induction la as [| a1]; intros; cbn in Haz |-*; [ easy | ].
-  now apply IHla.
+  now rewrite List_last_app.
 }
 cbn - [ nth ] in Hlb.
 destruct (srng_eq_dec (nth (length lb) (b :: lb) 0%Rng) 0) as [Hbz| Hbz]. {
   easy.
 }
 clear Hlb.
+cbn.
 ...
 
 Theorem is_monic_polyn_sum : ∀ P Q,
