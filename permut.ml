@@ -142,18 +142,27 @@ all_permut_from [1;2;3].
    parity = even = false (signature =+1);
    parity = odd = true (signature=-1) *)
 
+value clever_append l1 l2 =
+  match (List.rev l1, l2) with
+  | ([], _) -> l2
+  | (_, []) -> l1
+  | ([x1 :: _], [x2 :: _]) ->
+      if snd x1 = snd x2 then List.append l1 (List.rev l2)
+      else List.append l1 l2
+  end.
+
 value rec insert n l p =
   match l with
   | [] -> [([n], p)]
   | [m :: l'] ->
-      [([n; m :: l'], p) ::
-       List.map (fun (l, p) -> ([m :: l], p)) (insert n l' (not p))]
+      clever_append [([n; m :: l'], p)]
+        (List.map (fun (l, p) -> ([m :: l], p)) (insert n l' (not p)))
   end.
 
 value rec distrib n ppl =
   match ppl with
   | [] -> []
-  | [(l, p) :: ppl'] -> List.append (insert n l p) (distrib n ppl')
+  | [(l, p) :: ppl'] -> clever_append (insert n l p) (distrib n ppl')
   end.
 
 value rec all_permut_and_parity list =
