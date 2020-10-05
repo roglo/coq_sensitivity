@@ -3265,6 +3265,16 @@ induction r; intros. {
 }
 remember (S r) as sr.
 cbn - [ "-" ]; subst sr.
+rewrite srng_summation_split_first; [ | flia ].
+cbn - [ sub det_loop ].
+unfold minus_one_pow at 1.
+cbn - [ sub det_loop ].
+rewrite Nat.sub_diag, polyn_mul_1_l.
+remember (mat_el PM 0 0) as x eqn:Hx.
+rewrite HPM in Hx; cbn in Hx.
+unfold so in Hx.
+rewrite srng_mul_1_r in Hx.
+rewrite fold_polyn_sub in Hx.
 ...
 intros * Hrz.
 unfold charac_polyn.
