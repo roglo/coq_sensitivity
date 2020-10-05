@@ -66,6 +66,10 @@ Notation "'Σ' ( i = b , e ) , g" :=
   (summation b e (λ c i, c + g) 0)
   (at level 45, i at level 0, b at level 60, e at level 60) : nat_scope.
 
+Theorem fold_summation : ∀ {T} b e f (d : T),
+  fold_left f (seq b (S e - b)) d = summation b e f d.
+Proof. easy. Qed.
+
 Theorem fold_left_add_fun_from_0 {A} : ∀ a l (f : A → nat),
   fold_left (λ c i, c + f i) l a =
   a + fold_left (λ c i, c + f i) l 0.
