@@ -1,4 +1,4 @@
-(* $Id: permut.ml,v 1.7 2008/10/30 18:59:48 deraugla Exp $ *)
+(* ocaml -I $(camlp5 -where) camlp5r.cma *)
 
 (* The function "next_permut" returns the next permutation of a list
    in lexical order. Returns [] if no more permutation. *)
