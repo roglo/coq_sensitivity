@@ -60,10 +60,10 @@ Qed.
 
 (* summations *)
 
-Definition summation b e f := fold_left f (seq b (S e - b)) 0.
+Definition summation {T} b e f (d : T) := fold_left f (seq b (S e - b)) d.
 
 Notation "'Σ' ( i = b , e ) , g" :=
-  (summation b e (λ c i, c + g))
+  (summation b e (λ c i, c + g) 0)
   (at level 45, i at level 0, b at level 60, e at level 60) : nat_scope.
 
 Theorem fold_left_add_fun_from_0 {A} : ∀ a l (f : A → nat),
