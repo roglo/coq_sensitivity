@@ -3121,42 +3121,6 @@ Definition minus_one_pow n :=
   | _ => (- 1%Srng)%Rng
   end.
 
-(* next permutation of a list of nat *)
-
-Fixpoint rev_next_permut list right :=
-  match list with
-  | x :: rlist =>
-      let fix loop lb list :=
-        match list with
-        | y :: la =>
-            if lt_dec x y then
-              rev rlist ++ y :: lb ++ x :: la
-            else
-              loop (lb ++ [y]) la
-        | [] =>
-            rev_next_permut rlist (lb ++ [x])
-        end
-      in
-      loop [] right
-  | [] => []
-  end.
-
-Definition next_permut list := rev_next_permut (rev list) [].
-
-Compute (next_permut [1;2;3]).
-Compute (next_permut [1;3;2]).
-Compute (next_permut [2;1;3]).
-Compute (next_permut [2;3;1]).
-Compute (next_permut [3;1;2]).
-Compute (next_permut [3;2;1]).
-
-Compute (rev_next_permut [2;1] [3]).
-Compute (rev [1] ++ 3 :: [] ++ 2 :: []).
-
-Compute (rev_next_permut [3;1] [2]).
-
-...
-
 (* determinant *)
 
 Fixpoint det_loop M n :=
