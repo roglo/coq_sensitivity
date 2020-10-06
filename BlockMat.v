@@ -3456,13 +3456,18 @@ rewrite Nat.add_succ_r.
 clear - so sp Haz Hbz.
 revert a b lb Haz Hbz.
 induction la as [| a1]; intros. {
-  destruct lb as [| b1]. {
+  cbn - [ norm_polyn_list seq ].
+  revert b Hbz.
+  induction lb as [| b1]; intros. {
     cbn.
     rewrite srng_add_0_l.
     rewrite rev_length.
     now destruct (srng_eq_dec (a * b) 0).
   }
   rewrite List_last_cons_cons in Hbz.
+  specialize (IHlb b1 Hbz).
+  cbn - [ norm_polyn_list polyn_list_convol_mul seq ].
+  rewrite Nat.sub_0_r.
 ...
   rewrite map_polyn_list_convol_mul_cons_l.
   cbn - [ norm_polyn_list polyn_list_convol_mul nth ].
