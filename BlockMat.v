@@ -3375,7 +3375,66 @@ Proof.
 intros * Hdeg HP.
 unfold is_monic_polyn in HP |-*.
 rewrite polyn_degree_sum; [ | easy ].
-...
+cbn in HP |-*.
+destruct P as (la, Hla).
+destruct Q as (lb, Hlb).
+move lb before la.
+cbn in Hla, Hlb, Hdeg, HP.
+cbn - [ norm_polyn_list ].
+(**)
+destruct la as [| a]; [ easy | ].
+cbn - [ nth ] in HP.
+cbn - [ norm_polyn_list "+"%PL ].
+rewrite Nat.sub_0_r in HP |-*.
+destruct lb as [| b]. {
+  rewrite polyn_list_add_0_r.
+  rewrite norm_polyn_list_id; [ easy | ].
+  rewrite List_last_nth.
+  cbn - [ nth ].
+  rewrite Nat.sub_0_r, HP.
+  apply srng_1_neq_0.
+}
+cbn in Hdeg.
+do 2 rewrite Nat.sub_0_r in Hdeg.
+specialize (List_last_nth (a :: la) 0%Rng) as H.
+cbn - [ last nth ] in H.
+rewrite Nat.sub_0_r in H.
+unfold so in HP.
+rewrite <- H in HP; clear H.
+clear - Hdeg HP.
+move b before a.
+revert a b lb Hdeg HP.
+induction la as [| a1]; intros; [ easy | ].
+remember (a1 :: la) as l; cbn in HP; subst l.
+destruct lb as [| b1]. {
+  cbn - [ norm_polyn_list ].
+  rewrite norm_polyn_list_id. 2: {
+    remember (a1 :: la) as l; cbn; subst l.
+    unfold so; rewrite HP.
+    apply srng_1_neq_0.
+  }
+  remember (a1 :: la) as l; cbn; subst l.
+  rewrite List_last_nth in HP.
+  cbn - [ nth ] in HP.
+  now rewrite Nat.sub_0_r in HP.
+}
+cbn - [ norm_polyn_list ].
+cbn in Hdeg.
+apply Nat.succ_lt_mono in Hdeg.
+specialize (IHla a1 b1 lb Hdeg HP).
+rewrite norm_polyn_list_cons; [ easy | ].
+clear - so sdp HP Hdeg.
+revert lb a1 b1 HP Hdeg.
+induction la as [| a]; intros; [ easy | cbn ].
+remember (a :: la) as l; cbn in HP; subst l.
+destruct lb as [| b]. {
+  unfold so; rewrite HP.
+  apply srng_1_neq_0.
+}
+cbn in Hdeg.
+apply Nat.succ_lt_mono in Hdeg.
+now apply IHla.
+Qed.
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
    leading coefficient is 1 *)
@@ -3412,8 +3471,7 @@ rewrite HPM in Hxa; cbn in Hxa.
 unfold so in Hxa.
 rewrite srng_mul_1_r in Hxa.
 rewrite fold_polyn_sub in Hxa.
-...
-apply is_monic_polyn_sum.
+apply is_monic_polyn_sum. {
 ...
 intros * Hrz.
 unfold charac_polyn.
