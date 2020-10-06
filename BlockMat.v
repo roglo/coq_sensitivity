@@ -3256,6 +3256,49 @@ cbn in Hla |-*.
 now destruct (srng_eq_dec a 0).
 Qed.
 
+Theorem norm_polyn_list_app_last_nz : ∀ la lb,
+  last lb 0%Srng ≠ 0%Srng
+  → norm_polyn_list (la ++ lb) = la ++ norm_polyn_list lb.
+Proof.
+intros * Hlb.
+revert lb Hlb.
+induction la as [| a]; intros; [ easy | ].
+cbn - [ norm_polyn_list ].
+rewrite List_cons_app.
+rewrite norm_polyn_list_app.
+rewrite IHla; [ | easy ].
+destruct lb as [| b]; [ easy | ].
+destruct la as [| a1]; [ | easy ].
+cbn - [ norm_polyn_list ].
+remember (norm_polyn_list (b :: lb)) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc as [| c]; [ | easy ].
+exfalso; apply Hlb; clear Hlb.
+clear IHla.
+revert b Hlc.
+induction lb as [| b1]; intros. {
+  cbn in Hlc.
+  now destruct (srng_eq_dec b 0%Rng).
+}
+remember (b1 :: lb) as l; cbn; subst l.
+apply IHlb.
+cbn in Hlc |-*.
+apply List_eq_rev_l in Hlc.
+apply List_eq_rev_r.
+rewrite strip_0s_app in Hlc.
+remember (strip_0s (rev lb ++ [b1])) as ld eqn:Hld.
+symmetry in Hld.
+now destruct ld.
+Qed.
+
+Theorem norm_polyn_list_cons : ∀ a la,
+  last la 0%Srng ≠ 0%Srng
+  → norm_polyn_list (a :: la) = a :: norm_polyn_list la.
+Proof.
+intros * Hla.
+now specialize (norm_polyn_list_app_last_nz [a] la Hla) as H.
+Qed.
+
 Theorem polyn_degree_sum : ∀ P Q,
   polyn_degree Q < polyn_degree P
   → polyn_degree (P + Q) = polyn_degree P.
@@ -3306,29 +3349,19 @@ destruct lb as [| b1]. {
   now rewrite norm_polyn_list_id.
 }
 cbn - [ norm_polyn_list ].
-...
-revert lb Hlb Hdeg.
-induction la as [| a] using rev_ind; intros; [ easy | ].
-rewrite app_length, Nat.add_comm in Hla.
-cbn - [ nth ] in Hla.
-destruct (srng_eq_dec (nth (length la) (la ++ [a]) 0%Rng) 0) as [Haz| Haz]. {
-  easy.
+cbn in Hdeg.
+apply Nat.succ_lt_mono in Hdeg.
+remember (a1 :: la) as l; cbn in Haz; subst l.
+remember (b1 :: lb) as l; cbn in Hbz; subst l.
+specialize (IHla a1 b1 lb Haz Hbz Hdeg).
+(*
+unfold norm_polyn_list in IHla |-*.
+rewrite rev_length in IHla |-*.
+*)
+rewrite norm_polyn_list_cons. {
+  cbn - [ norm_polyn_list ].
+  now rewrite IHla.
 }
-clear Hla.
-rewrite app_nth2 in Haz; [ | now unfold ge ].
-rewrite Nat.sub_diag in Haz; cbn in Haz.
-destruct lb as [| b]. {
-  cbn - [ rev length ].
-  rewrite polyn_list_add_0_r.
-  rewrite norm_polyn_list_id; [ easy | ].
-  now rewrite List_last_app.
-}
-cbn - [ nth ] in Hlb.
-destruct (srng_eq_dec (nth (length lb) (b :: lb) 0%Rng) 0) as [Hbz| Hbz]. {
-  easy.
-}
-clear Hlb.
-cbn.
 ...
 
 Theorem is_monic_polyn_sum : ∀ P Q,
