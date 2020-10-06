@@ -3455,6 +3455,28 @@ rewrite <- List_last_nth_cons in Haz, Hbz.
 do 2 rewrite <- List_last_nth_cons in HPQ.
 rewrite Nat.add_succ_r.
 (**)
+rewrite map_polyn_list_convol_mul_cons_l.
+rewrite <- seq_shift, map_map.
+erewrite (map_ext_in (λ x, polyn_list_convol_mul _ _ _)). 2: {
+  intros i Hi.
+  now rewrite Nat.sub_succ, Nat.sub_0_r.
+}
+remember (map _ _) as lc eqn:Hc in |-*.
+remember (map (polyn_list_convol_mul _ _) _) as ld eqn:Hld.
+move ld before lc; cbn.
+... 2
+remember (seq 0 (S (length la + length lb))) as lc eqn:Hlc.
+replace (map _ _) with ([a] * map (λ n, nth n (b :: lb) 0%Srng) lc)%PL. 2: {
+  clear - sp.
+  revert a b lb.
+  induction lc as [| c]; intros; [ easy | ].
+  cbn - [ "*"%PL nth ].
+  cbn - [ nth ].
+  unfold so.
+  rewrite srng_add_0_l.
+  f_equal.
+  rewrite map_length.
+... 1
 revert a b lb Haz Hbz HPQ.
 induction la as [| a1]; intros. {
   cbn - [ norm_polyn_list seq ].
@@ -3535,8 +3557,8 @@ erewrite (map_ext_in (λ x, polyn_list_convol_mul _ _ _)). 2: {
 remember (map _ _) as lc eqn:Hc in |-*.
 move IHla at bottom.
 remember (map (polyn_list_convol_mul _ _) _) as ld eqn:Hld.
-move ld before lc.
-cbn.
+move ld before lc; cbn.
+Search (norm_polyn_list (_ + _)).
 ...
 cbn - [ norm_polyn_list polyn_list_convol_mul seq ].
 rewrite map_polyn_list_convol_mul_comm.
