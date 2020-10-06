@@ -3419,29 +3419,30 @@ now apply IHla.
 Qed.
 
 Theorem polyn_degree_prod : ∀ P Q,
-  P ≠ 0%P
-  → Q ≠ 0%P
+  (polyn_coeff P (polyn_degree P) * polyn_coeff Q (polyn_degree Q) ≠ 0)%Srng
   → polyn_degree (P * Q) = polyn_degree P + polyn_degree Q.
 Proof.
-intros * HP HQ.
+intros * HPQ.
 unfold polyn_degree; cbn.
 unfold polyn_degree_plus_1.
 destruct P as (la, Hla).
 destruct Q as (lb, Hlb).
 move lb before la.
 cbn - [ norm_polyn_list ].
+cbn in HPQ.
 destruct la as [| a]. {
-  exfalso; apply HP.
-  now apply polyn_eq.
+  exfalso; apply HPQ; cbn.
+  apply srng_mul_0_l.
 }
 destruct lb as [| b]. {
-  exfalso; apply HQ.
-  now apply polyn_eq.
+  exfalso; apply HPQ; cbn.
+  apply srng_mul_0_r.
 }
 cbn - [ nth ] in Hla, Hlb.
 cbn - [ norm_polyn_list "+"%PL ].
 do 3 rewrite Nat.sub_0_r.
-clear HP HQ.
+do 2 rewrite List_length_cons in HPQ.
+do 2 rewrite Nat.sub_succ, Nat.sub_0_r in HPQ.
 destruct (srng_eq_dec (nth (length la) (a :: la) 0%Rng) 0) as [Haz| Haz]. {
   easy.
 }
@@ -3451,12 +3452,14 @@ destruct (srng_eq_dec (nth (length lb) (b :: lb) 0%Rng) 0) as [Hbz| Hbz]. {
 clear Hla Hlb.
 move b before a.
 rewrite <- List_last_nth_cons in Haz, Hbz.
+do 2 rewrite <- List_last_nth_cons in HPQ.
 rewrite Nat.add_succ_r.
 (**)
-revert a b lb Haz Hbz.
+revert a b lb Haz Hbz HPQ.
 induction la as [| a1]; intros. {
   cbn - [ norm_polyn_list seq ].
   cbn in Haz.
+  unfold last in HPQ at 1.
   unfold polyn_list_convol_mul.
   erewrite map_ext_in. 2: {
     intros i Hi.
@@ -3471,12 +3474,12 @@ induction la as [| a1]; intros. {
     }
     now rewrite srng_add_0_r.
   }
-  revert a b Haz Hbz.
+  revert a b Haz Hbz HPQ.
   induction lb as [| b1]; intros. {
     now cbn; destruct (srng_eq_dec (a * b) 0).
   }
-  rewrite List_last_cons_cons in Hbz.
-  specialize (IHlb a b1 Haz Hbz).
+  rewrite List_last_cons_cons in Hbz, HPQ.
+  specialize (IHlb a b1 Haz Hbz HPQ).
   cbn - [ norm_polyn_list polyn_list_convol_mul seq nth ].
   remember (S (length lb)) as n.
   cbn - [ norm_polyn_list nth ].
@@ -3489,17 +3492,9 @@ induction la as [| a1]; intros. {
     now remember (b1 :: lb) as l; cbn; subst l.
   }
   destruct lb as [| b2]. {
-    cbn in Hbz |-*.
-    destruct (srng_eq_dec (a * b1) 0) as [Hab1z| Hab1z]; [ | easy ].
-    exfalso; clear IHlb.
-(* faut être dans un anneau intègre *)
-...
-      destruct (srng_eq_dec (a * b) 0).
-cbn.
-    }
-    cbn in Hbz, Hab1z |-*.
-    cbn in IHlb.
-...
+    cbn in Hbz, HPQ |-*.
+    now destruct (srng_eq_dec (a * b1) 0).
+  }
   rewrite norm_polyn_list_cons. {
     rewrite List_length_cons.
     rewrite Nat.sub_succ, Nat.sub_0_r.
@@ -3507,10 +3502,20 @@ cbn.
     rewrite <- Nat.sub_succ_l. {
       now rewrite Nat.sub_succ, Nat.sub_0_r.
     }
-...
-  rewrite norm_polyn_list_cons. {
-    rewrite List_length_cons.
-    rewrite Nat.sub_succ, Nat.sub_0_r.
+    rewrite List_seq_succ_r, Nat.add_0_l.
+    rewrite map_app.
+    cbn - [ norm_polyn_list nth seq ].
+    rewrite norm_polyn_list_app.
+    remember (b2 :: lb) as l.
+    cbn; subst l.
+    rewrite <- List_last_nth_cons.
+    rewrite List_last_cons_cons in HPQ.
+    destruct (srng_eq_dec (a * last (b2 :: lb) 0%Srng) 0) as [Habz| Habz]. {
+      easy.
+    }
+    cbn; flia.
+  }
+  cbn - [ nth ].
 ...
   rewrite map_polyn_list_convol_mul_cons_l.
   cbn - [ norm_polyn_list polyn_list_convol_mul nth ].
