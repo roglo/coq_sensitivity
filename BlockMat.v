@@ -3280,7 +3280,7 @@ induction lb as [| b1]; intros. {
   cbn in Hlc.
   now destruct (srng_eq_dec b 0%Rng).
 }
-remember (b1 :: lb) as l; cbn; subst l.
+rewrite List_last_cons_cons.
 apply IHlb.
 cbn in Hlc |-*.
 apply List_eq_rev_l in Hlc.
@@ -3342,8 +3342,7 @@ destruct lb as [| b1]. {
 cbn - [ norm_polyn_list ].
 cbn in Hdeg.
 apply Nat.succ_lt_mono in Hdeg.
-remember (a1 :: la) as l; cbn in Haz; subst l.
-remember (b1 :: lb) as l; cbn in Hbz; subst l.
+rewrite List_last_cons_cons in Haz, Hbz.
 specialize (IHla a1 b1 lb Haz Hbz Hdeg).
 rewrite norm_polyn_list_cons. {
   cbn - [ norm_polyn_list ].
@@ -3390,7 +3389,7 @@ clear - Hdeg HP.
 move b before a.
 revert a b lb Hdeg HP.
 induction la as [| a1]; intros; [ easy | ].
-remember (a1 :: la) as l; cbn in HP; subst l.
+rewrite List_last_cons_cons in HP.
 destruct lb as [| b1]. {
   cbn - [ norm_polyn_list ].
   rewrite norm_polyn_list_id. 2: {
@@ -3409,7 +3408,7 @@ rewrite norm_polyn_list_cons; [ easy | ].
 clear - so sdp HP Hdeg.
 revert lb a1 b1 HP Hdeg.
 induction la as [| a]; intros; [ easy | cbn ].
-remember (a :: la) as l; cbn in HP; subst l.
+rewrite List_last_cons_cons in HP.
 destruct lb as [| b]. {
   rewrite HP.
   apply srng_1_neq_0.
@@ -3463,10 +3462,8 @@ induction la as [| a1]; intros. {
     rewrite rev_length.
     now destruct (srng_eq_dec (a * b) 0).
   }
+  rewrite List_last_cons_cons in Hbz.
 ...
-Search (last (_ :: _ ::_)).
-  remember (b1 :: lb) as l; cbn in Hba
-
   rewrite map_polyn_list_convol_mul_cons_l.
   cbn - [ norm_polyn_list polyn_list_convol_mul nth ].
   rewrite srng_add_0_r.
