@@ -3321,9 +3321,7 @@ clear Hla.
 destruct lb as [| b]. {
   rewrite polyn_list_add_0_r.
   rewrite norm_polyn_list_id; [ easy | ].
-  rewrite List_last_nth.
-  cbn - [ nth ].
-  now rewrite Nat.sub_0_r.
+  now rewrite List_last_nth_cons.
 }
 cbn - [ nth ] in Hlb.
 destruct (srng_eq_dec (nth (length lb) (b :: lb) 0%Srng) 0) as [Hbz| Hbz]. {
@@ -3332,14 +3330,8 @@ destruct (srng_eq_dec (nth (length lb) (b :: lb) 0%Srng) 0) as [Hbz| Hbz]. {
 clear Hlb.
 cbn in Hdeg.
 do 2 rewrite Nat.sub_0_r in Hdeg.
-specialize (List_last_nth (a :: la) 0%Rng) as H.
-cbn - [ last nth ] in H.
-rewrite Nat.sub_0_r in H.
-rewrite <- H in Haz; clear H.
-specialize (List_last_nth (b :: lb) 0%Rng) as H.
-cbn - [ last nth ] in H.
-rewrite Nat.sub_0_r in H.
-rewrite <- H in Hbz; clear H.
+rewrite <- List_last_nth_cons in Haz.
+rewrite <- List_last_nth_cons in Hbz.
 cbn - [ norm_polyn_list ].
 revert a b lb Haz Hbz Hdeg.
 induction la as [| a1]; intros; [ easy | ].
@@ -3381,8 +3373,93 @@ destruct Q as (lb, Hlb).
 move lb before la.
 cbn in Hla, Hlb, Hdeg, HP.
 cbn - [ norm_polyn_list ].
-(**)
 destruct la as [| a]; [ easy | ].
+cbn - [ nth ] in HP.
+cbn - [ norm_polyn_list "+"%PL ].
+rewrite Nat.sub_0_r in HP |-*.
+destruct lb as [| b]. {
+  rewrite polyn_list_add_0_r.
+  rewrite norm_polyn_list_id; [ easy | ].
+  rewrite List_last_nth_cons, HP.
+  apply srng_1_neq_0.
+}
+cbn in Hdeg.
+do 2 rewrite Nat.sub_0_r in Hdeg.
+rewrite <- List_last_nth_cons in HP.
+clear - Hdeg HP.
+move b before a.
+revert a b lb Hdeg HP.
+induction la as [| a1]; intros; [ easy | ].
+remember (a1 :: la) as l; cbn in HP; subst l.
+destruct lb as [| b1]. {
+  cbn - [ norm_polyn_list ].
+  rewrite norm_polyn_list_id. 2: {
+    remember (a1 :: la) as l; cbn; subst l.
+    rewrite HP.
+    apply srng_1_neq_0.
+  }
+  remember (a1 :: la) as l; cbn; subst l.
+  now rewrite List_last_nth_cons in HP.
+}
+cbn - [ norm_polyn_list ].
+cbn in Hdeg.
+apply Nat.succ_lt_mono in Hdeg.
+specialize (IHla a1 b1 lb Hdeg HP).
+rewrite norm_polyn_list_cons; [ easy | ].
+clear - so sdp HP Hdeg.
+revert lb a1 b1 HP Hdeg.
+induction la as [| a]; intros; [ easy | cbn ].
+remember (a :: la) as l; cbn in HP; subst l.
+destruct lb as [| b]. {
+  rewrite HP.
+  apply srng_1_neq_0.
+}
+cbn in Hdeg.
+apply Nat.succ_lt_mono in Hdeg.
+now apply IHla.
+Qed.
+
+Theorem polyn_degree_prod : ∀ P Q,
+  P ≠ 0%P
+  → Q ≠ 0%P
+  → polyn_degree (P * Q) = polyn_degree P + polyn_degree Q - 1.
+Proof.
+intros * HP HQ.
+unfold polyn_degree; cbn.
+unfold polyn_degree_plus_1.
+destruct P as (la, Hla).
+destruct Q as (lb, Hlb).
+move lb before la.
+cbn - [ norm_polyn_list ].
+destruct la as [| a]. {
+  exfalso; apply HP.
+  now apply polyn_eq.
+}
+destruct lb as [| b]. {
+  exfalso; apply HQ.
+  now apply polyn_eq.
+}
+clear HP HQ.
+cbn - [ nth ] in Hla, Hlb.
+cbn - [ norm_polyn_list "+"%PL ].
+do 3 rewrite Nat.sub_0_r.
+destruct (srng_eq_dec (nth (length la) (a :: la) 0%Rng) 0) as [Haz| Haz]. {
+  easy.
+}
+destruct (srng_eq_dec (nth (length lb) (b :: lb) 0%Rng) 0) as [Hbz| Hbz]. {
+  easy.
+}
+clear Hla Hlb.
+rewrite <- List_last_nth_cons in Haz, Hbz.
+...
+  destruct lb as [| b]; [ easy | ].
+  cbn - [ nth ] in Hlb.
+  cbn; rewrite Nat.sub_0_r.
+  destruct (srng_eq_dec (nth (length lb) (b :: lb) 0%Rng) 0) as [Hbz| Hbz]. {
+    easy.
+  }
+  clear Hlb.
+...
 cbn - [ nth ] in HP.
 cbn - [ norm_polyn_list "+"%PL ].
 rewrite Nat.sub_0_r in HP |-*.
@@ -3435,6 +3512,7 @@ cbn in Hdeg.
 apply Nat.succ_lt_mono in Hdeg.
 now apply IHla.
 Qed.
+...
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
    leading coefficient is 1 *)
@@ -3472,6 +3550,8 @@ unfold so in Hxa.
 rewrite srng_mul_1_r in Hxa.
 rewrite fold_polyn_sub in Hxa.
 apply is_monic_polyn_sum. {
+...
+rewrite polyn_degree_prod.
 ...
 intros * Hrz.
 unfold charac_polyn.

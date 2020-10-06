@@ -1609,6 +1609,14 @@ remember (b :: l) as l'; cbn; subst l'.
 apply IHl.
 Qed.
 
+Theorem List_last_nth_cons : ∀ A l (a d : A),
+  last (a :: l) d = nth (length l) (a :: l) d.
+Proof.
+intros.
+rewrite List_last_nth.
+now cbn; rewrite Nat.sub_0_r.
+Qed.
+
 Theorem List_eq_iff : ∀ A (l1 l2 : list A),
   l1 = l2 ↔ (length l1 = length l2 ∧ ∀ d i, nth i l1 d = nth i l2 d).
 Proof.

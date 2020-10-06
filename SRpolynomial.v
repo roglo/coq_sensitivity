@@ -1462,5 +1462,6 @@ Notation "'Σ' ( i = b , e ) , g" :=
 
 Arguments polyn_degree {T so sdp} P%P.
 Arguments norm_polyn_list {T ro sdp} l%PL.
+Arguments polyn_list_convol_mul {T ro} la%PL lb%PL _%nat.
 
 End polynomial_Notations.
