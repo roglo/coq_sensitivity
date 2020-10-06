@@ -3312,7 +3312,6 @@ destruct Q as (lb, Hlb).
 move lb before la.
 cbn - [ norm_polyn_list ] in Hdeg |-*.
 unfold polyn_prop_test in Hla, Hlb.
-(**)
 destruct la as [| a]; [ easy | ].
 cbn - [ nth ] in Hla.
 destruct (srng_eq_dec (nth (length la) (a :: la) 0%Srng) 0) as [Haz| Haz]. {
@@ -3354,15 +3353,19 @@ apply Nat.succ_lt_mono in Hdeg.
 remember (a1 :: la) as l; cbn in Haz; subst l.
 remember (b1 :: lb) as l; cbn in Hbz; subst l.
 specialize (IHla a1 b1 lb Haz Hbz Hdeg).
-(*
-unfold norm_polyn_list in IHla |-*.
-rewrite rev_length in IHla |-*.
-*)
 rewrite norm_polyn_list_cons. {
   cbn - [ norm_polyn_list ].
   now rewrite IHla.
 }
-...
+clear - so Haz Hdeg.
+revert lb a1 b1 Haz Hdeg.
+induction la as [| a]; intros; [ easy | cbn ].
+destruct lb as [| b]; [ easy | ].
+remember (a :: la) as x; cbn in Haz; subst x.
+cbn in Hdeg.
+apply Nat.succ_lt_mono in Hdeg.
+now apply IHla.
+Qed.
 
 Theorem is_monic_polyn_sum : ∀ P Q,
   polyn_degree Q < polyn_degree P
@@ -3371,8 +3374,6 @@ Theorem is_monic_polyn_sum : ∀ P Q,
 Proof.
 intros * Hdeg HP.
 unfold is_monic_polyn in HP |-*.
-Search polyn_degree.
-...
 rewrite polyn_degree_sum; [ | easy ].
 ...
 
