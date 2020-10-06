@@ -3457,6 +3457,22 @@ clear - so sp Haz Hbz.
 revert a b lb Haz Hbz.
 induction la as [| a1]; intros. {
   cbn - [ norm_polyn_list seq ].
+(**)
+unfold polyn_list_convol_mul.
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  apply in_seq in Hi.
+  rewrite srng_summation_split_first; [ | easy ].
+  rewrite Nat.sub_0_r.
+  rewrite <- List_hd_nth_0; unfold hd.
+  rewrite all_0_srng_summation_0. 2: {
+    intros j Hj.
+    rewrite nth_overflow; [ | easy ].
+    apply srng_mul_0_l.
+  }
+  now rewrite srng_add_0_r.
+}
+...
   revert b Hbz.
   induction lb as [| b1]; intros. {
     cbn.
@@ -3468,12 +3484,12 @@ induction la as [| a1]; intros. {
   specialize (IHlb b1 Hbz).
   cbn - [ norm_polyn_list polyn_list_convol_mul seq ].
   rewrite Nat.sub_0_r.
+  cbn - [ norm_polyn_list ].
 ...
   rewrite map_polyn_list_convol_mul_cons_l.
   cbn - [ norm_polyn_list polyn_list_convol_mul nth ].
   rewrite srng_add_0_r.
   remember (nth 0 (b :: lb) 0%Rng) as x eqn:Hx; cbn in Hx; subst x.
-
 ...
 rewrite map_polyn_list_convol_mul_cons_l.
 cbn - [ norm_polyn_list polyn_list_convol_mul nth ].
