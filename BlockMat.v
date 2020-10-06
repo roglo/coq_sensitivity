@@ -3418,6 +3418,14 @@ apply Nat.succ_lt_mono in Hdeg.
 now apply IHla.
 Qed.
 
+Theorem polyn_list_add_map : ∀ A f g (l : list A),
+  (map f l + map g l)%PL = (map (λ i, (f i + g i)%Rng) l).
+Proof.
+intros A *.
+induction l as [| a la]; [ easy | ].
+now cbn; rewrite IHla.
+Qed.
+
 Theorem polyn_degree_prod : ∀ P Q,
   (polyn_coeff P (polyn_degree P) * polyn_coeff Q (polyn_degree Q) ≠ 0)%Srng
   → polyn_degree (P * Q) = polyn_degree P + polyn_degree Q.
@@ -3472,6 +3480,14 @@ remember (map _ _) as lc eqn:Hlc in |-*.
 move lc after ld; move Hlc after Hld.
 cbn - [ norm_polyn_list ].
 rewrite srng_add_0_r.
+erewrite map_ext_in in Hlc. 2: {
+  intros i Hi.
+  now cbn.
+}
+subst lc ld.
+rewrite polyn_list_add_map.
+rewrite norm_polyn_list_cons. 2: {
+...
 ... 2
 remember (seq 0 (S (length la + length lb))) as lc eqn:Hlc.
 replace (map _ _) with ([a] * map (λ n, nth n (b :: lb) 0%Srng) lc)%PL. 2: {
