@@ -3470,6 +3470,8 @@ unfold nth in Hlc at 1.
 subst lc.
 remember (map _ _) as lc eqn:Hlc in |-*.
 move lc after ld; move Hlc after Hld.
+cbn - [ norm_polyn_list ].
+rewrite srng_add_0_r.
 ... 2
 remember (seq 0 (S (length la + length lb))) as lc eqn:Hlc.
 replace (map _ _) with ([a] * map (λ n, nth n (b :: lb) 0%Srng) lc)%PL. 2: {
