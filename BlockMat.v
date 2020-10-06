@@ -3461,9 +3461,15 @@ erewrite (map_ext_in (λ x, polyn_list_convol_mul _ _ _)). 2: {
   intros i Hi.
   now rewrite Nat.sub_succ, Nat.sub_0_r.
 }
-remember (map _ _) as lc eqn:Hc in |-*.
+remember (map _ _) as lc eqn:Hlc in |-*.
 remember (map (polyn_list_convol_mul _ _) _) as ld eqn:Hld.
 move ld before lc; cbn.
+cbn - [ nth ] in Hlc.
+rewrite <- seq_shift, map_map in Hlc.
+unfold nth in Hlc at 1.
+subst lc.
+remember (map _ _) as lc eqn:Hlc in |-*.
+move lc after ld; move Hlc after Hld.
 ... 2
 remember (seq 0 (S (length la + length lb))) as lc eqn:Hlc.
 replace (map _ _) with ([a] * map (λ n, nth n (b :: lb) 0%Srng) lc)%PL. 2: {
