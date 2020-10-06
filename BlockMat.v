@@ -3269,6 +3269,44 @@ destruct Q as (lb, Hlb).
 move lb before la.
 cbn - [ norm_polyn_list ] in Hdeg |-*.
 unfold polyn_prop_test in Hla, Hlb.
+(**)
+destruct la as [| a]; [ easy | ].
+cbn - [ nth ] in Hla.
+destruct (srng_eq_dec (nth (length la) (a :: la) 0%Srng) 0) as [Haz| Haz]. {
+  easy.
+}
+clear Hla.
+destruct lb as [| b]. {
+  rewrite polyn_list_add_0_r.
+  rewrite norm_polyn_list_id; [ easy | ].
+  rewrite List_last_nth.
+  cbn - [ nth ].
+  now rewrite Nat.sub_0_r.
+}
+cbn - [ nth ] in Hlb.
+destruct (srng_eq_dec (nth (length lb) (b :: lb) 0%Srng) 0) as [Hbz| Hbz]. {
+  easy.
+}
+clear Hlb.
+cbn in Hdeg.
+do 2 rewrite Nat.sub_0_r in Hdeg.
+specialize (List_last_nth (a :: la) 0%Rng) as H.
+cbn - [ last nth ] in H.
+rewrite Nat.sub_0_r in H.
+rewrite <- H in Haz; clear H.
+specialize (List_last_nth (b :: lb) 0%Rng) as H.
+cbn - [ last nth ] in H.
+rewrite Nat.sub_0_r in H.
+rewrite <- H in Hbz; clear H.
+cbn - [ norm_polyn_list ].
+revert a b lb Haz Hbz Hdeg.
+induction la as [| a1]; intros; [ easy | ].
+destruct lb as [| b1]. {
+  cbn - [ norm_polyn_list ].
+  now rewrite norm_polyn_list_id.
+}
+cbn - [ norm_polyn_list ].
+...
 revert lb Hlb Hdeg.
 induction la as [| a] using rev_ind; intros; [ easy | ].
 rewrite app_length, Nat.add_comm in Hla.
