@@ -3419,11 +3419,10 @@ now apply IHla.
 Qed.
 
 Theorem polyn_degree_prod : ∀ P Q,
-  P ≠ 0%P
-  → Q ≠ 0%P
+  (P * Q ≠ 0)%P
   → polyn_degree (P * Q) = polyn_degree P + polyn_degree Q - 1.
 Proof.
-intros * HP HQ.
+intros * HPQ.
 unfold polyn_degree; cbn.
 unfold polyn_degree_plus_1.
 destruct P as (la, Hla).
@@ -3431,17 +3430,25 @@ destruct Q as (lb, Hlb).
 move lb before la.
 cbn - [ norm_polyn_list ].
 destruct la as [| a]. {
-  exfalso; apply HP.
-  now apply polyn_eq.
+  exfalso; apply HPQ.
+  apply polyn_eq; cbn - [ norm_polyn_list ].
+  specialize (map_polyn_list_convol_mul_0_l 0) as H.
+  rewrite H.
+  now rewrite norm_polyn_list_repeat_0.
 }
 destruct lb as [| b]. {
-  exfalso; apply HQ.
-  now apply polyn_eq.
+  exfalso; apply HPQ.
+  apply polyn_eq; cbn - [ norm_polyn_list ].
+  rewrite map_polyn_list_convol_mul_comm.
+  specialize (map_polyn_list_convol_mul_0_l 0) as H.
+  rewrite H.
+  now rewrite norm_polyn_list_repeat_0.
 }
-clear HP HQ.
 cbn - [ nth ] in Hla, Hlb.
 cbn - [ norm_polyn_list "+"%PL ].
 do 3 rewrite Nat.sub_0_r.
+unfold "*"%P in HPQ.
+cbn - [ "*"%PL ] in HPQ.
 destruct (srng_eq_dec (nth (length la) (a :: la) 0%Rng) 0) as [Haz| Haz]. {
   easy.
 }
@@ -3453,25 +3460,27 @@ move b before a.
 rewrite <- List_last_nth_cons in Haz, Hbz.
 rewrite Nat.add_succ_r.
 (**)
-clear - so sp Haz Hbz.
-revert a b lb Haz Hbz.
+clear - so sp Haz Hbz HPQ.
+revert a b lb Haz Hbz HPQ.
 induction la as [| a1]; intros. {
   cbn - [ norm_polyn_list seq ].
 (**)
-unfold polyn_list_convol_mul.
-erewrite map_ext_in. 2: {
-  intros i Hi.
-  apply in_seq in Hi.
-  rewrite srng_summation_split_first; [ | easy ].
-  rewrite Nat.sub_0_r.
-  rewrite <- List_hd_nth_0; unfold hd.
-  rewrite all_0_srng_summation_0. 2: {
-    intros j Hj.
-    rewrite nth_overflow; [ | easy ].
-    apply srng_mul_0_l.
+...
+cbn in HPQ.
+  unfold polyn_list_convol_mul.
+  erewrite map_ext_in. 2: {
+    intros i Hi.
+    apply in_seq in Hi.
+    rewrite srng_summation_split_first; [ | easy ].
+    rewrite Nat.sub_0_r.
+    rewrite <- List_hd_nth_0; unfold hd.
+    rewrite all_0_srng_summation_0. 2: {
+      intros j Hj.
+      rewrite nth_overflow; [ | easy ].
+      apply srng_mul_0_l.
+    }
+    now rewrite srng_add_0_r.
   }
-  now rewrite srng_add_0_r.
-}
 ...
   revert b Hbz.
   induction lb as [| b1]; intros. {
