@@ -1617,6 +1617,10 @@ rewrite List_last_nth.
 now cbn; rewrite Nat.sub_0_r.
 Qed.
 
+Theorem List_last_cons_cons : ∀ A l (x y d : A),
+  last (x :: y :: l) d = last (y :: l) d.
+Proof. easy. Qed.
+
 Theorem List_eq_iff : ∀ A (l1 l2 : list A),
   l1 = l2 ↔ (length l1 = length l2 ∧ ∀ d i, nth i l1 d = nth i l2 d).
 Proof.

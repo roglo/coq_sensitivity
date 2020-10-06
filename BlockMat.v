@@ -3450,15 +3450,33 @@ destruct (srng_eq_dec (nth (length lb) (b :: lb) 0%Rng) 0) as [Hbz| Hbz]. {
   easy.
 }
 clear Hla Hlb.
+move b before a.
 rewrite <- List_last_nth_cons in Haz, Hbz.
-...
-  destruct lb as [| b]; [ easy | ].
-  cbn - [ nth ] in Hlb.
-  cbn; rewrite Nat.sub_0_r.
-  destruct (srng_eq_dec (nth (length lb) (b :: lb) 0%Rng) 0) as [Hbz| Hbz]. {
-    easy.
+rewrite Nat.add_succ_r.
+(**)
+clear - so sp Haz Hbz.
+revert a b lb Haz Hbz.
+induction la as [| a1]; intros. {
+  destruct lb as [| b1]. {
+    cbn.
+    rewrite srng_add_0_l.
+    rewrite rev_length.
+    now destruct (srng_eq_dec (a * b) 0).
   }
-  clear Hlb.
+...
+Search (last (_ :: _ ::_)).
+  remember (b1 :: lb) as l; cbn in Hba
+
+  rewrite map_polyn_list_convol_mul_cons_l.
+  cbn - [ norm_polyn_list polyn_list_convol_mul nth ].
+  rewrite srng_add_0_r.
+  remember (nth 0 (b :: lb) 0%Rng) as x eqn:Hx; cbn in Hx; subst x.
+
+...
+rewrite map_polyn_list_convol_mul_cons_l.
+cbn - [ norm_polyn_list polyn_list_convol_mul nth ].
+rewrite srng_add_0_r.
+remember (nth 0 (b :: lb) 0%Rng) as x eqn:Hx; cbn in Hx; subst x.
 ...
 cbn - [ nth ] in HP.
 cbn - [ norm_polyn_list "+"%PL ].
