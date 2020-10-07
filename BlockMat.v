@@ -3436,7 +3436,7 @@ unfold polyn_degree_plus_1.
 destruct P as (la, Hla).
 destruct Q as (lb, Hlb).
 move lb before la.
-cbn - [ norm_polyn_list ].
+cbn - [ norm_polyn_list polyn_list_mul ].
 cbn in HPQ.
 do 2 rewrite <- List_last_nth in HPQ.
 destruct la as [| a]. {
@@ -3448,8 +3448,8 @@ destruct lb as [| b]. {
   apply srng_mul_0_r.
 }
 cbn - [ nth ] in Hla, Hlb.
-cbn - [ norm_polyn_list "+"%PL ].
-do 3 rewrite Nat.sub_0_r.
+cbn - [ norm_polyn_list "*"%PL "+"%PL ].
+do 2 rewrite Nat.sub_0_r.
 destruct (srng_eq_dec (nth (length la) (a :: la) 0%Rng) 0) as [Haz| Haz]. {
   easy.
 }
@@ -3459,7 +3459,12 @@ destruct (srng_eq_dec (nth (length lb) (b :: lb) 0%Rng) 0) as [Hbz| Hbz]. {
 clear Hla Hlb.
 move b before a.
 rewrite <- List_last_nth_cons in Haz, Hbz.
-rewrite Nat.add_succ_r.
+...
+  Haz : last (a :: la) 0%Rng ≠ 0%Rng
+  Hbz : last (b :: lb) 0%Rng ≠ 0%Rng
+  HPQ : (last (a :: la) 0%Rng * last (b :: lb) 0%Rng)%Srng ≠ 0%Srng
+  ============================
+  length (norm_polyn_list ((a :: la) * (b :: lb))) - 1 = length la + length lb
 ...
 (**)
 rewrite map_polyn_list_convol_mul_cons_l.
