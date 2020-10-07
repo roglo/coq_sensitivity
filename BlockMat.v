@@ -3454,6 +3454,55 @@ move lb before la.
 cbn - [ norm_polyn_list polyn_list_mul ].
 cbn in HPQ.
 do 2 rewrite <- List_last_nth in HPQ.
+(**)
+rewrite norm_polyn_list_id. 2: {
+  destruct la as [| a]. {
+    exfalso; apply HPQ; cbn.
+    apply srng_mul_0_l.
+  }
+  destruct lb as [| b]. {
+    exfalso; apply HPQ; cbn.
+    apply srng_mul_0_r.
+  }
+  rewrite List_last_nth.
+  cbn; rewrite map_length, seq_length, Nat.sub_0_r.
+  rewrite Nat.add_succ_r, Nat.sub_succ, Nat.sub_0_r.
+  rewrite (List_map_nth_in _ 0); [ | rewrite seq_length; flia ].
+  rewrite seq_nth; [ | flia ].
+  rewrite Nat.add_0_l.
+  unfold polyn_list_convol_mul.
+  destruct (zerop (length la)) as [Hzla| Hzla]. {
+    rewrite Hzla, Nat.add_0_l.
+    apply length_zero_iff_nil in Hzla; subst la.
+    rewrite srng_summation_split_first; [ | flia ].
+    rewrite Nat.sub_0_r, <- List_hd_nth_0; unfold hd.
+    rewrite <- List_last_nth_cons.
+    rewrite all_0_srng_summation_0. 2: {
+      intros i Hi.
+      rewrite nth_overflow; [ | easy ].
+      apply srng_mul_0_l.
+    }
+    now rewrite srng_add_0_r.
+  }
+  rewrite (srng_summation_split (length la - 1)); [ | flia ].
+  rewrite all_0_srng_summation_0. 2: {
+    intros i (_, Hi).
+    rewrite (nth_overflow (b :: lb)); [ | cbn; flia Hi Hzla ].
+    apply srng_mul_0_r.
+  }
+  rewrite srng_add_0_l.
+  rewrite Nat.sub_add; [ | easy ].
+  rewrite srng_summation_split_first; [ | flia ].
+  rewrite Nat.add_comm, Nat.add_sub.
+  do 2 rewrite <- List_last_nth_cons.
+  rewrite all_0_srng_summation_0. 2: {
+    intros i Hi.
+    rewrite nth_overflow; [ | easy ].
+    apply srng_mul_0_l.
+  }
+  now rewrite srng_add_0_r.
+}
+...
 clear Hla Hlb.
 destruct la as [| a]. {
   exfalso; apply HPQ; cbn.
@@ -3484,8 +3533,11 @@ rewrite norm_polyn_list_id. 2: {
   rewrite seq_nth; [ | flia ].
   rewrite Nat.add_0_l.
   unfold polyn_list_convol_mul.
-Print polyn_list_mul.
-(* oups, mais en fait, c'est faux, ma définition de polyn_list_mul ! *)
+  rewrite (srng_summation_split (length la - 1)); [ | flia ].
+  rewrite all_0_srng_summation_0. 2: {
+    intros i (_, Hi).
+    rewrite (nth_overflow (b :: lb)). 2: {
+      cbn.
 ...
 revert a b lb HPQ Haz Hbz.
 induction la as [| a1]; intros. {
