@@ -3438,6 +3438,7 @@ destruct Q as (lb, Hlb).
 move lb before la.
 cbn - [ norm_polyn_list ].
 cbn in HPQ.
+do 2 rewrite <- List_last_nth in HPQ.
 destruct la as [| a]. {
   exfalso; apply HPQ; cbn.
   apply srng_mul_0_l.
@@ -3449,8 +3450,6 @@ destruct lb as [| b]. {
 cbn - [ nth ] in Hla, Hlb.
 cbn - [ norm_polyn_list "+"%PL ].
 do 3 rewrite Nat.sub_0_r.
-do 2 rewrite List_length_cons in HPQ.
-do 2 rewrite Nat.sub_succ, Nat.sub_0_r in HPQ.
 destruct (srng_eq_dec (nth (length la) (a :: la) 0%Rng) 0) as [Haz| Haz]. {
   easy.
 }
@@ -3460,8 +3459,8 @@ destruct (srng_eq_dec (nth (length lb) (b :: lb) 0%Rng) 0) as [Hbz| Hbz]. {
 clear Hla Hlb.
 move b before a.
 rewrite <- List_last_nth_cons in Haz, Hbz.
-do 2 rewrite <- List_last_nth_cons in HPQ.
 rewrite Nat.add_succ_r.
+...
 (**)
 rewrite map_polyn_list_convol_mul_cons_l.
 rewrite <- seq_shift, map_map.
