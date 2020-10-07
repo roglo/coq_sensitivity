@@ -3454,40 +3454,6 @@ move lb before la.
 cbn - [ norm_polyn_list polyn_list_mul ].
 cbn in HPQ.
 do 2 rewrite <- List_last_nth in HPQ.
-(*
-clear Hla Hlb.
-revert lb HPQ.
-induction la as [| a]; intros. {
-  exfalso; apply HPQ; cbn.
-  apply srng_mul_0_l.
-}
-destruct lb as [| b]. {
-  exfalso; apply HPQ; cbn.
-  apply srng_mul_0_r.
-}
-cbn - [ norm_polyn_list "*"%PL "+"%PL ].
-do 2 rewrite Nat.sub_0_r.
-destruct (srng_eq_dec (nth (length la) (a :: la) 0%Rng) 0) as [Haz| Haz]. {
-  rewrite <- List_last_nth_cons in Haz.
-  now rewrite Haz, srng_mul_0_l in HPQ.
-}
-destruct (srng_eq_dec (nth (length lb) (b :: lb) 0%Rng) 0) as [Hbz| Hbz]. {
-  rewrite <- List_last_nth_cons in Hbz.
-  now rewrite Hbz, srng_mul_0_r in HPQ.
-}
-move b before a.
-rewrite <- List_last_nth_cons in Haz, Hbz.
-...
-assert (H : (last la 0 * last lb 0 ≠ 0)%Srng). {
-  destruct la as [| a1]. {
-    cbn; rewrite srng_mul_0_l.
-    remember (b :: lb) as lc; cbn in HPQ; subst lc.
-    cbn in Haz.
-    destruct lb as [| b1]. {
-      cbn in HPQ, Hbz.
-
-... 1
-*)
 clear Hla Hlb.
 destruct la as [| a]. {
   exfalso; apply HPQ; cbn.
@@ -3509,6 +3475,16 @@ destruct (srng_eq_dec (nth (length lb) (b :: lb) 0%Rng) 0) as [Hbz| Hbz]. {
 }
 move b before a.
 rewrite <- List_last_nth_cons in Haz, Hbz.
+(**)
+rewrite norm_polyn_list_id. 2: {
+  rewrite List_last_nth.
+  cbn; rewrite map_length, seq_length, Nat.sub_0_r.
+  rewrite Nat.add_succ_r, Nat.sub_succ, Nat.sub_0_r.
+  rewrite (List_map_nth_in _ 0); [ | rewrite seq_length; flia ].
+  rewrite seq_nth; [ | flia ].
+  rewrite Nat.add_0_l.
+  unfold polyn_list_convol_mul.
+...
 revert a b lb HPQ Haz Hbz.
 induction la as [| a1]; intros. {
   remember (b :: lb) as lc.
@@ -3554,6 +3530,9 @@ induction la as [| a1]; intros. {
   rewrite map_length, seq_length.
   now cbn; rewrite Nat.sub_0_r.
 }
+rewrite List_last_cons_cons in HPQ, Haz.
+specialize (IHla _ _ _ HPQ Haz Hbz).
+rewrite norm_polyn_list_id.
 ...
 (**)
 rewrite map_polyn_list_convol_mul_cons_l.
