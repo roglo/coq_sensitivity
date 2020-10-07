@@ -3543,6 +3543,17 @@ induction la as [| a1]; intros. {
   rewrite polyn_list_add_repeat_0_r.
   rewrite map_length, seq_length, Nat.sub_diag.
   rewrite app_nil_r.
+  rewrite norm_polyn_list_id. 2: {
+    rewrite List_last_nth.
+    rewrite map_length, seq_length, Nat.sub_succ, Nat.sub_0_r.
+    rewrite (List_map_nth_in _ 0); [ | rewrite seq_length; flia ].
+    rewrite seq_nth; [ | flia ].
+    rewrite Nat.add_0_l.
+    now rewrite <- List_last_nth_cons.
+  }
+  rewrite map_length, seq_length.
+  now cbn; rewrite Nat.sub_0_r.
+}
 ...
 (**)
 rewrite map_polyn_list_convol_mul_cons_l.
