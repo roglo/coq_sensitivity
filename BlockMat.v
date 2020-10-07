@@ -3484,6 +3484,8 @@ rewrite norm_polyn_list_id. 2: {
   rewrite seq_nth; [ | flia ].
   rewrite Nat.add_0_l.
   unfold polyn_list_convol_mul.
+Print polyn_list_mul.
+(* oups, mais en fait, c'est faux, ma définition de polyn_list_mul ! *)
 ...
 revert a b lb HPQ Haz Hbz.
 induction la as [| a1]; intros. {
