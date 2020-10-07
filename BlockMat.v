@@ -3426,6 +3426,21 @@ induction l as [| a la]; [ easy | ].
 now cbn; rewrite IHla.
 Qed.
 
+Theorem polyn_list_add_repeat_0_r : ∀ la n,
+  (la + repeat 0%Srng n)%PL = la ++ repeat 0%Srng (n - length la).
+Proof.
+intros.
+revert n.
+induction la as [| a]; intros. {
+  now cbn; rewrite Nat.sub_0_r.
+}
+destruct n. {
+  now cbn; rewrite app_nil_r.
+}
+cbn; rewrite srng_add_0_r; f_equal.
+apply IHla.
+Qed.
+
 Theorem polyn_degree_prod : ∀ P Q,
   (polyn_coeff P (polyn_degree P) * polyn_coeff Q (polyn_degree Q) ≠ 0)%Srng
   → polyn_degree (P * Q) = polyn_degree P + polyn_degree Q.
@@ -3439,6 +3454,41 @@ move lb before la.
 cbn - [ norm_polyn_list polyn_list_mul ].
 cbn in HPQ.
 do 2 rewrite <- List_last_nth in HPQ.
+(*
+clear Hla Hlb.
+revert lb HPQ.
+induction la as [| a]; intros. {
+  exfalso; apply HPQ; cbn.
+  apply srng_mul_0_l.
+}
+destruct lb as [| b]. {
+  exfalso; apply HPQ; cbn.
+  apply srng_mul_0_r.
+}
+cbn - [ norm_polyn_list "*"%PL "+"%PL ].
+do 2 rewrite Nat.sub_0_r.
+destruct (srng_eq_dec (nth (length la) (a :: la) 0%Rng) 0) as [Haz| Haz]. {
+  rewrite <- List_last_nth_cons in Haz.
+  now rewrite Haz, srng_mul_0_l in HPQ.
+}
+destruct (srng_eq_dec (nth (length lb) (b :: lb) 0%Rng) 0) as [Hbz| Hbz]. {
+  rewrite <- List_last_nth_cons in Hbz.
+  now rewrite Hbz, srng_mul_0_r in HPQ.
+}
+move b before a.
+rewrite <- List_last_nth_cons in Haz, Hbz.
+...
+assert (H : (last la 0 * last lb 0 ≠ 0)%Srng). {
+  destruct la as [| a1]. {
+    cbn; rewrite srng_mul_0_l.
+    remember (b :: lb) as lc; cbn in HPQ; subst lc.
+    cbn in Haz.
+    destruct lb as [| b1]. {
+      cbn in HPQ, Hbz.
+
+... 1
+*)
+clear Hla Hlb.
 destruct la as [| a]. {
   exfalso; apply HPQ; cbn.
   apply srng_mul_0_l.
@@ -3447,24 +3497,52 @@ destruct lb as [| b]. {
   exfalso; apply HPQ; cbn.
   apply srng_mul_0_r.
 }
-cbn - [ nth ] in Hla, Hlb.
 cbn - [ norm_polyn_list "*"%PL "+"%PL ].
 do 2 rewrite Nat.sub_0_r.
 destruct (srng_eq_dec (nth (length la) (a :: la) 0%Rng) 0) as [Haz| Haz]. {
-  easy.
+  rewrite <- List_last_nth_cons in Haz.
+  now rewrite Haz, srng_mul_0_l in HPQ.
 }
 destruct (srng_eq_dec (nth (length lb) (b :: lb) 0%Rng) 0) as [Hbz| Hbz]. {
-  easy.
+  rewrite <- List_last_nth_cons in Hbz.
+  now rewrite Hbz, srng_mul_0_r in HPQ.
 }
-clear Hla Hlb.
 move b before a.
 rewrite <- List_last_nth_cons in Haz, Hbz.
-...
-  Haz : last (a :: la) 0%Rng ≠ 0%Rng
-  Hbz : last (b :: lb) 0%Rng ≠ 0%Rng
-  HPQ : (last (a :: la) 0%Rng * last (b :: lb) 0%Rng)%Srng ≠ 0%Srng
-  ============================
-  length (norm_polyn_list ((a :: la) * (b :: lb))) - 1 = length la + length lb
+revert a b lb HPQ Haz Hbz.
+induction la as [| a1]; intros. {
+  remember (b :: lb) as lc.
+  cbn in HPQ, Haz.
+  cbn - [ norm_polyn_list ].
+  rewrite Nat.sub_0_r; subst lc.
+  rewrite List_length_cons.
+  rewrite map_polyn_list_convol_mul_cons_l.
+  erewrite (map_ext_in (λ x, polyn_list_convol_mul _ _ _)). 2: {
+    intros i Hi.
+    apply in_seq in Hi.
+    unfold polyn_list_convol_mul.
+    rewrite srng_summation_split_first; [ | flia Hi ].
+    rewrite Nat.sub_0_r.
+    rewrite <- List_hd_nth_0; unfold hd.
+    rewrite srng_mul_0_l, srng_add_0_l.
+    rewrite all_0_srng_summation_0. 2: {
+      intros j Hj.
+      rewrite nth_overflow; [ | cbn; flia ].
+      apply srng_mul_0_l.
+    }
+    easy.
+  }
+  replace (0%Rng :: _) with (repeat 0%Rng (S (length lb))). 2: {
+    clear; cbn; f_equal.
+    remember 1 as n eqn:Hn; clear Hn.
+    revert n.
+    induction lb as [| b]; intros; [ easy | ].
+    cbn; f_equal.
+    apply IHlb.
+  }
+  rewrite polyn_list_add_repeat_0_r.
+  rewrite map_length, seq_length, Nat.sub_diag.
+  rewrite app_nil_r.
 ...
 (**)
 rewrite map_polyn_list_convol_mul_cons_l.
