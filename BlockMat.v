@@ -3517,10 +3517,6 @@ destruct (zerop (length lb)) as [Hzlb| Hzlb]. {
 flia Hzla Hzlb.
 Qed.
 
-Inspect 1.
-
-...
-
 (* the caracteristic polynomial of a matrix is monic, i.e. its
    leading coefficient is 1 *)
 
@@ -3557,8 +3553,58 @@ unfold so in Hxa.
 rewrite srng_mul_1_r in Hxa.
 rewrite fold_polyn_sub in Hxa.
 apply is_monic_polyn_sum. {
-...
-rewrite polyn_degree_prod.
+  rewrite polyn_degree_prod. 2: {
+    replace (polyn_coeff x_a (polyn_degree x_a)) with 1%Rng. 2: {
+      subst x_a; cbn.
+      destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | ].
+      clear H; cbn.
+      destruct (srng_eq_dec (mat_el M 0 0)) as [Hz| Hz]. {
+        cbn.
+        destruct (srng_eq_dec 1 0) as [H| H]; [ | easy ].
+        now apply srng_1_neq_0 in H.
+      }
+      cbn.
+      destruct (srng_eq_dec 1 0) as [H| H]; [ | easy ].
+      now apply srng_1_neq_0 in H.
+    }
+    rewrite srng_mul_1_l.
+    unfold is_monic_polyn in IHr.
+    unfold so in IHr |-*.
+    rewrite (IHr (submatrix M 0 0) (submatrix PM 0 0)). {
+      apply srng_1_neq_0.
+    } {
+      cbn; flia Hr.
+    }
+    apply matrix_eq; cbn; [ now subst PM | now subst PM | ].
+    intros i j Hi Hj.
+    rewrite HPM in Hi; cbn in Hi.
+    rewrite HPM; cbn.
+    destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+      subst j.
+      unfold so.
+      rewrite polyn_mul_1_r.
+      rewrite fold_polyn_sub.
+      destruct (Nat.eq_dec (i + 1) (i + 1)) as [H| H]; [ clear H | easy ].
+      now unfold so; rewrite srng_mul_1_r.
+    }
+    destruct (Nat.eq_dec (i + 1) (j + 1)) as [H| H]; [ | easy ].
+    flia Hij H.
+  }
+  replace (polyn_degree x_a) with 1. 2: {
+    rewrite Hxa; cbn.
+    destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | ].
+    destruct (srng_eq_dec (mat_el M 0 0)) as [Hz| Hz]. {
+      clear H; cbn.
+      destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | ].
+      easy.
+    }
+    clear H; cbn.
+    destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | ].
+    easy.
+  }
+  replace (polyn_degree (det_loop _ _)) with (S r). 2: {
+    subst PM.
+(* ouais, chuis pas sûr que c'est bien S r *)
 ...
 intros * Hrz.
 unfold charac_polyn.
