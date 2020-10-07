@@ -3602,8 +3602,10 @@ apply is_monic_polyn_sum. {
     destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | ].
     easy.
   }
+  clear x_a Hxa.
   replace (polyn_degree (det_loop _ _)) with (S r). 2: {
     subst PM.
+Print determinant.
 (* ouais, chuis pas sûr que c'est bien S r *)
 ...
 intros * Hrz.
