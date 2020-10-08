@@ -3620,31 +3620,20 @@ cbn.
 destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | easy ].
 Qed.
 
-(* degree of a characteristic polynomial
-Theorem charac_polyn_degree : ∀ M,
-  polyn_degree (charac_polyn M) = mat_nrows M.
+Theorem polyn_degree_summation_le : ∀ b e f m,
+  polyn_degree (Σ (i = b, e), f i) ≤
+  fold_left max (map (λ i, polyn_degree (f i)) (seq b (S e - b))) m.
 Proof.
 intros.
-unfold charac_polyn.
-unfold determinant.
-replace (mat_nrows (_ - _)%M) with (mat_nrows M) by easy.
-remember (mat_nrows M) as n eqn:Hn; symmetry in Hn.
-revert M Hn.
-induction n; intros; [ easy | ].
-cbn - [ summation mat_el ].
-destruct n. {
-  cbn - [ polyn_degree ].
-  rewrite polyn_mul_1_r.
-  rewrite polyn_degree_add. 2: {
-    rewrite polyn_degree_opp; cbn.
-    do 2 rewrite rev_length.
-    destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | ].
-    destruct (srng_eq_dec (mat_el M 0 0) 0); cbn; flia.
-  }
-  apply polyn_degree_monom.
-}
+unfold summation.
+remember (S e - b) as len eqn:Hlen.
+clear e Hlen.
+revert b m.
+induction len; intros; [ cbn; flia | ].
+cbn; rewrite polyn_add_0_l.
+etransitivity; [ | apply IHlen ].
+(* mouais, bof *)
 ...
-*)
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
    leading coefficient is 1 *)
@@ -3734,11 +3723,11 @@ apply is_monic_polyn_add. {
   clear x_a Hxa.
 Check fold_left.
 ...
-Theorem polyn_degree_summation : ∀ b e f,
-  polyn_degree (Σ (i = b, e), f i) =
-  fold_left max (map (λ i, polyn_degree (f i)) (seq b (S e - b))) 0.
-(* non, c'est plus compliqué que ça, la somme de deux polynômes
-   peut donner un polynôme d'un degré inférieur *)
+eapply Nat.le_lt_trans; [ apply polyn_degree_summation_le | ].
+rewrite Nat.sub_succ, Nat.sub_0_r.
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  rewrite polyn_degree_mul. 2: {
 ...
 rewrite polyn_degree_summation.
 ...
