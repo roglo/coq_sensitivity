@@ -3631,6 +3631,11 @@ clear e Hlen.
 revert b m.
 induction len; intros; [ cbn; flia | ].
 cbn; rewrite polyn_add_0_l.
+rewrite fold_left_srng_add_fun_from_0.
+cbn - [ polyn_degree ].
+rewrite polyn_add_comm.
+rewrite polyn_degree_add.
+...
 etransitivity; [ | apply IHlen ].
 (* mouais, bof *)
 ...
