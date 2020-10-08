@@ -3609,8 +3609,16 @@ apply is_monic_polyn_sum. {
       unfold determinant; f_equal; f_equal.
       now rewrite HPM.
     }
-Print determinant.
-Print charac_polyn.
+    assert
+      (H :
+       submatrix PM 0 0 =
+       (mat_mul_scal_l _x
+          (monom_mat_of_mat (mat_id (S r))) -
+           monom_mat_of_mat (submatrix M 0 0))%M). {
+...
+    specialize (IHr (submatrix M 0 0) (submatrix PM 0 0)).
+    assert (H : mat_nrows (submatrix M 0 0) = S r) by now cbn; rewrite Hr.
+    specialize (IHr H); clear H.
 ...
 
 (* the list of coefficients of the characteristic polynomial of a matrix M
