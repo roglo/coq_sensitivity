@@ -3174,6 +3174,15 @@ End bmatrix_Notations.
 Import matrix_Notations.
 Import bmatrix_Notations.
 
+Theorem submatrix_sub : ∀ T {ro : ring_op T} (MA MB : matrix T) i j,
+  subm (MA - MB)%M i j = (subm MA i j - subm MB i j)%M.
+Proof.
+intros.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros k l Hk Hl.
+now destruct (lt_dec k i), (lt_dec l j).
+Qed.
+
 Require Import SRpolynomial.
 Import polynomial_Notations.
 
@@ -3612,9 +3621,10 @@ apply is_monic_polyn_sum. {
     }
     assert (H : subm PM 0 0 = (_x × m2mm (mI (S r)) - m2mm (subm M 0 0))%M). {
       rewrite HPM; cbn.
-(* c'est nul, si je fais
-Arguments subm {T} M%M. Show.
-ça s'affiche moins bien *)
+      (* c'est nul, si je fais
+         Arguments subm {T} M%M. Show.
+         ça s'affiche moins bien *)
+      rewrite submatrix_sub.
 ...
     specialize (IHr (subm M 0 0) (subm PM 0 0)).
     assert (H : mat_nrows (subm M 0 0) = S r) by now cbn; rewrite Hr.
