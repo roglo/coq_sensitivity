@@ -3703,6 +3703,12 @@ apply is_monic_polyn_sum. {
       now rewrite submatrix_mI.
     }
     rewrite H.
+    enough (H' : polyn_degree (charac_polyn (subm M 0 0)) = S r). {
+      unfold charac_polyn in H'.
+      replace (mat_nrows (subm M 0 0)) with (S r) in H'; [ easy | ].
+      symmetry.
+      unfold subm; cbn; flia Hr.
+    }
 ...
     specialize (IHr (subm M 0 0) (subm PM 0 0)).
     assert (H : mat_nrows (subm M 0 0) = S r) by now cbn; rewrite Hr.
