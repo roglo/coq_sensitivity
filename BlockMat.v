@@ -3732,8 +3732,17 @@ apply is_monic_polyn_add. {
     easy.
   }
   clear x_a Hxa.
-  replace (polyn_degree (det_loop _ _)) with (S n). 2: {
+Check fold_left.
 ...
+Theorem polyn_degree_summation : ∀ b e f,
+  polyn_degree (Σ (i = b, e), f i) =
+  fold_left max (map (λ i, polyn_degree (f i)) (seq b (S e - b))) 0.
+(* non, c'est plus compliqué que ça, la somme de deux polynômes
+   peut donner un polynôme d'un degré inférieur *)
+...
+rewrite polyn_degree_summation.
+...
+  replace (polyn_degree (det_loop _ _)) with (S n). 2: {
     enough (H : polyn_degree (determinant (subm PM 0 0)) = S n). {
       rewrite <- H at 1.
       unfold determinant; f_equal; f_equal.
