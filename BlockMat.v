@@ -3101,7 +3101,7 @@ Definition mat_mul_scal_l μ M :=
 
 (* matrix without row i and column j *)
 
-Definition submatrix (M : matrix T) i j :=
+Definition subm (M : matrix T) i j :=
   mk_mat
     (λ k l,
        if lt_dec k i then
@@ -3129,7 +3129,7 @@ Fixpoint det_loop M n :=
   | 1 => mat_el M 0 0
   | S n' =>
       (Σ (j = 0, n'),
-       minus_one_pow j * mat_el M 0 j * det_loop (submatrix M 0 j) n')%Rng
+       minus_one_pow j * mat_el M 0 j * det_loop (subm M 0 j) n')%Rng
   end.
 
 Definition determinant M := det_loop M (mat_nrows M).
@@ -3151,10 +3151,11 @@ Module matrix_Notations.
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
 
-Notation "a + b" := (mat_add a b) : M_scope.
-Notation "a - b" := (mat_sub a b) : M_scope.
-Notation "a * b" := (mat_mul a b) : M_scope.
-Notation "- a" := (mat_opp a) : M_scope.
+Notation "A + B" := (mat_add A B) : M_scope.
+Notation "A - B" := (mat_sub A B) : M_scope.
+Notation "A * B" := (mat_mul A B) : M_scope.
+Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
+Notation "- A" := (mat_opp A) : M_scope.
 
 End matrix_Notations.
 
@@ -3163,10 +3164,10 @@ Module bmatrix_Notations.
 Declare Scope BM_scope.
 Delimit Scope BM_scope with BM.
 
-Notation "a + b" := (bmat_add a b) : BM_scope.
-Notation "a - b" := (bmat_sub a b) : BM_scope.
-Notation "a * b" := (bmat_mul a b) : BM_scope.
-Notation "- a" := (bmat_opp a) : BM_scope.
+Notation "A + B" := (bmat_add A B) : BM_scope.
+Notation "A - B" := (bmat_sub A B) : BM_scope.
+Notation "A * B" := (bmat_mul A B) : BM_scope.
+Notation "- A" := (bmat_opp A) : BM_scope.
 
 End bmatrix_Notations.
 
@@ -3570,7 +3571,7 @@ apply is_monic_polyn_sum. {
     rewrite srng_mul_1_l.
     unfold is_monic_polyn in IHr.
     unfold so in IHr |-*.
-    rewrite (IHr (submatrix M 0 0) (submatrix PM 0 0)). {
+    rewrite (IHr (subm M 0 0) (subm PM 0 0)). {
       apply srng_1_neq_0.
     } {
       cbn; flia Hr.
@@ -3604,18 +3605,19 @@ apply is_monic_polyn_sum. {
   }
   clear x_a Hxa.
   replace (polyn_degree (det_loop _ _)) with (S r). 2: {
-    enough (H : polyn_degree (determinant (submatrix PM 0 0)) = S r). {
+    enough (H : polyn_degree (determinant (subm PM 0 0)) = S r). {
       rewrite <- H at 1.
       unfold determinant; f_equal; f_equal.
       now rewrite HPM.
     }
-    assert
-      (H :
-       submatrix PM 0 0 =
-       (mat_mul_scal_l _x (m2mm (mI (S r))) - m2mm (submatrix M 0 0))%M). {
+    assert (H : subm PM 0 0 = (_x × m2mm (mI (S r)) - m2mm (subm M 0 0))%M). {
+      rewrite HPM; cbn.
+(* c'est nul, si je fais
+Arguments subm {T} M%M. Show.
+ça s'affiche moins bien *)
 ...
-    specialize (IHr (submatrix M 0 0) (submatrix PM 0 0)).
-    assert (H : mat_nrows (submatrix M 0 0) = S r) by now cbn; rewrite Hr.
+    specialize (IHr (subm M 0 0) (subm PM 0 0)).
+    assert (H : mat_nrows (subm M 0 0) = S r) by now cbn; rewrite Hr.
     specialize (IHr H); clear H.
 ...
 
@@ -3661,14 +3663,27 @@ assert (H3 : polyn_degree (charac_polyn M) = mat_nrows M). {
 
 End in_ring.
 
+Module matrix_Notations.
+
+Declare Scope M_scope.
+Delimit Scope M_scope with M.
+
+Notation "A + B" := (mat_add A B) : M_scope.
+Notation "A - B" := (mat_sub A B) : M_scope.
+Notation "A * B" := (mat_mul A B) : M_scope.
+Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
+Notation "- A" := (mat_opp A) : M_scope.
+
+End matrix_Notations.
+
 Module bmatrix_Notations.
 
 Declare Scope BM_scope.
 Delimit Scope BM_scope with BM.
 
-Notation "a + b" := (bmat_add a b) : BM_scope.
-Notation "a - b" := (bmat_sub a b) : BM_scope.
-Notation "a * b" := (bmat_mul a b) : BM_scope.
-Notation "- a" := (bmat_opp a) : BM_scope.
+Notation "A + B" := (bmat_add A B) : BM_scope.
+Notation "A - B" := (bmat_sub A B) : BM_scope.
+Notation "A * B" := (bmat_mul A B) : BM_scope.
+Notation "- A" := (bmat_opp A) : BM_scope.
 
 End bmatrix_Notations.
