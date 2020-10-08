@@ -3733,6 +3733,7 @@ apply is_monic_polyn_add. {
   }
   clear x_a Hxa.
   replace (polyn_degree (det_loop _ _)) with (S n). 2: {
+...
     enough (H : polyn_degree (determinant (subm PM 0 0)) = S n). {
       rewrite <- H at 1.
       unfold determinant; f_equal; f_equal.
