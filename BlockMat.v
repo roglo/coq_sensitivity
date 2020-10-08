@@ -3290,8 +3290,12 @@ Existing Instance polyn_ring_prop.
 
 (* characteristic polynomial = det(xI-M) *)
 
-Definition charac_polyn (M : matrix T) :=
-  determinant (_x × m2mm (mI (mat_nrows M)) - m2mm M)%M.
+Definition xI_sub_M M := (_x × m2mm (mI (mat_nrows M)) - m2mm M)%M.
+Definition charac_polyn (M : matrix T) := determinant (xI_sub_M M).
+
+Theorem fold_xI_sub_M : ∀ M,
+  (_x × m2mm (mI (mat_nrows M)) - m2mm M)%M = xI_sub_M M.
+Proof. easy. Qed.
 
 (* monic polynomial: polynomial whose leading coefficient is 1 *)
 (* to be moved to SRpolynomial.v *)
@@ -3652,9 +3656,11 @@ Proof.
 intros * Hrz.
 unfold charac_polyn.
 unfold determinant; cbn.
+unfold xI_sub_M; cbn.
 remember (mat_nrows M) as n eqn:Hn; symmetry in Hn.
 destruct n; [ easy | clear Hrz ].
 remember (_x × m2mm (mI (S n)) - m2mm M)%M as PM eqn:HPM.
+unfold xI_sub_M.
 revert M PM Hn HPM.
 induction n; intros. {
   subst PM; cbn; unfold so.
@@ -3744,24 +3750,41 @@ apply is_monic_polyn_add. {
     }
     rewrite H; rename H into HsubmPM.
     enough (H' : polyn_degree (charac_polyn (subm M 0 0)) = S n). {
-      unfold charac_polyn in H'.
+      unfold charac_polyn, xI_sub_M in H'.
       replace (mat_nrows (subm M 0 0)) with (S n) in H'; [ easy | ].
       symmetry.
       unfold subm; cbn; flia Hn.
     }
     specialize (IHn (subm M 0 0) (subm PM 0 0)).
     assert (H : mat_nrows (subm M 0 0) = S n) by now cbn; rewrite Hn.
-(*
+(**)
     specialize (IHn H HsubmPM); clear H.
     unfold is_monic_polyn in IHn.
-*)
+    unfold polyn_degree.
+    unfold polyn_degree_plus_1.
+enough (mat_nrows (subm M 0 0) = S n).
+rewrite <- H in HsubmPM.
+rewrite fold_xI_sub_M in HsubmPM.
+...
+unfold charac_polyn, determinant.
+...
+rewrite <- H.
+Theorem charac_polyn_degree ...
+...
     unfold charac_polyn.
+    rewrite <- H.
+Theorem
+...
     unfold determinant.
+    unfold xI_sub_M.
     rewrite submatrix_nrows, Hn, Nat.sub_succ, Nat.sub_0_r.
     rewrite <- HsubmPM.
     rewrite submatrix_nrows.
     replace (mat_nrows PM) with (S (S n)) by now rewrite HPM.
     rewrite Nat.sub_succ, Nat.sub_0_r.
+    rewrite <- H, fold_xI_sub_M in HsubmPM.
+    rewrite HsubmPM, <- H.
+Theorem glop :
 ...
 
 (* the list of coefficients of the characteristic polynomial of a matrix M
