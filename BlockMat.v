@@ -3702,6 +3702,7 @@ apply is_monic_polyn_sum. {
       do 2 rewrite submatrix_m2mm.
       now rewrite submatrix_mI.
     }
+    rewrite H.
 ...
     specialize (IHr (subm M 0 0) (subm PM 0 0)).
     assert (H : mat_nrows (subm M 0 0) = S r) by now cbn; rewrite Hr.
