@@ -3382,7 +3382,7 @@ intros * Hla.
 now specialize (norm_polyn_list_app_last_nz [a] la Hla) as H.
 Qed.
 
-Theorem polyn_degree_sum : ∀ P Q,
+Theorem polyn_degree_add : ∀ P Q,
   polyn_degree Q < polyn_degree P
   → polyn_degree (P + Q) = polyn_degree P.
 Proof.
@@ -3441,14 +3441,20 @@ apply Nat.succ_lt_mono in Hdeg.
 now apply IHla.
 Qed.
 
-Theorem is_monic_polyn_sum : ∀ P Q,
+Theorem polyn_degree_opp : ∀ M, polyn_degree (- M) = polyn_degree M.
+Proof.
+intros; cbn.
+now rewrite map_length.
+Qed.
+
+Theorem is_monic_polyn_add : ∀ P Q,
   polyn_degree Q < polyn_degree P
   → is_monic_polyn P
   → is_monic_polyn (P + Q).
 Proof.
 intros * Hdeg HP.
 unfold is_monic_polyn in HP |-*.
-rewrite polyn_degree_sum; [ | easy ].
+rewrite polyn_degree_add; [ | easy ].
 cbn in HP |-*.
 destruct P as (la, Hla).
 destruct Q as (lb, Hlb).
@@ -3524,7 +3530,7 @@ cbn; rewrite srng_add_0_r; f_equal.
 apply IHla.
 Qed.
 
-Theorem polyn_degree_prod : ∀ P Q,
+Theorem polyn_degree_mul : ∀ P Q,
   (polyn_coeff P (polyn_degree P) * polyn_coeff Q (polyn_degree Q) ≠ 0)%Srng
   → polyn_degree (P * Q) = polyn_degree P + polyn_degree Q.
 Proof.
@@ -3600,17 +3606,39 @@ destruct (zerop (length lb)) as [Hzlb| Hzlb]. {
 flia Hzla Hzlb.
 Qed.
 
-(* degree of a characteristic polynomial *)
+(* degree of monomial "x" *)
 
+Theorem polyn_degree_monom : polyn_degree _x = 1.
+Proof.
+cbn.
+destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | easy ].
+Qed.
+
+(* degree of a characteristic polynomial
 Theorem charac_polyn_degree : ∀ M,
   polyn_degree (charac_polyn M) = mat_nrows M.
 Proof.
 intros.
 unfold charac_polyn.
+unfold determinant.
+replace (mat_nrows (_ - _)%M) with (mat_nrows M) by easy.
 remember (mat_nrows M) as n eqn:Hn; symmetry in Hn.
 revert M Hn.
 induction n; intros; [ easy | ].
+cbn - [ summation mat_el ].
+destruct n. {
+  cbn - [ polyn_degree ].
+  rewrite polyn_mul_1_r.
+  rewrite polyn_degree_add. 2: {
+    rewrite polyn_degree_opp; cbn.
+    do 2 rewrite rev_length.
+    destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | ].
+    destruct (srng_eq_dec (mat_el M 0 0) 0); cbn; flia.
+  }
+  apply polyn_degree_monom.
+}
 ...
+*)
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
    leading coefficient is 1 *)
@@ -3624,9 +3652,7 @@ unfold charac_polyn.
 unfold determinant; cbn.
 remember (mat_nrows M) as n eqn:Hn; symmetry in Hn.
 destruct n; [ easy | clear Hrz ].
-remember
-  (mat_mul_scal_l _x (m2mm (mI (S n))) - m2mm M)%M
-  as PM eqn:HPM.
+remember (_x × m2mm (mI (S n)) - m2mm M)%M as PM eqn:HPM.
 revert M PM Hn HPM.
 induction n; intros. {
   subst PM; cbn; unfold so.
@@ -3647,8 +3673,8 @@ rewrite HPM in Hxa; cbn in Hxa.
 unfold so in Hxa.
 rewrite srng_mul_1_r in Hxa.
 rewrite fold_polyn_sub in Hxa.
-apply is_monic_polyn_sum. {
-  rewrite polyn_degree_prod. 2: {
+apply is_monic_polyn_add. {
+  rewrite polyn_degree_mul. 2: {
     replace (polyn_coeff x_a (polyn_degree x_a)) with 1%Rng. 2: {
       subst x_a; cbn.
       destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | ].
@@ -3714,20 +3740,19 @@ apply is_monic_polyn_sum. {
       do 2 rewrite submatrix_m2mm.
       now rewrite submatrix_mI.
     }
-    rewrite H.
+    rewrite H; rename H into HsubmPM.
     enough (H' : polyn_degree (charac_polyn (subm M 0 0)) = S n). {
       unfold charac_polyn in H'.
       replace (mat_nrows (subm M 0 0)) with (S n) in H'; [ easy | ].
       symmetry.
       unfold subm; cbn; flia Hn.
     }
+    specialize (IHn (subm M 0 0) (subm PM 0 0)).
+    assert (H : mat_nrows (subm M 0 0) = S n) by now cbn; rewrite Hn.
+    specialize (IHn H HsubmPM); clear H.
 ...
-rewrite charac_polyn_degree.
-cbn; flia Hr.
-...
-    specialize (IHr (subm M 0 0) (subm PM 0 0)).
-    assert (H : mat_nrows (subm M 0 0) = S r) by now cbn; rewrite Hr.
-    specialize (IHr H); clear H.
+    unfold is_monic_polyn in IHn.
+    cbn - [ summation ] in IHn.
 ...
 
 (* the list of coefficients of the characteristic polynomial of a matrix M
