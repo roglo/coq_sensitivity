@@ -9,6 +9,8 @@ Require Import Utf8 Arith.
 Import List List.ListNotations.
 Require Import Init.Nat.
 Require Import Misc.
+Require Import SRpolynomial.
+Import polynomial_Notations.
 
 (* "Given a n×n matrix A, a principal submatrix of A is obtained by deleting
     the same set of rows and columns from A.
@@ -121,6 +123,7 @@ Context {ro : ring_op T}.
 Context (so := rng_semiring).
 Context {sp : @semiring_prop T (@rng_semiring T ro)}.
 Context {rp : @ring_prop T ro}.
+Context {sdp : @sring_dec_prop T so}.
 Existing Instance so.
 
 (* addition *)
@@ -3144,6 +3147,17 @@ Compute let ro := Z_ring_op in determinant (mat_of_list_list 0 [[1; 2]; [3; 4]])
 Compute let ro := Z_ring_op in determinant (mat_of_list_list 0 [[-2; 2; -3]; [-1; 1; 3]; [2; 0; -1]]). (* 18: seems good *)
 *)
 
+(* convertion matrix → matrix with monomials *)
+
+Definition m2mm M : matrix (polynomial T) :=
+  mk_mat (λ i j, polyn_of_list [mat_el M i j])
+    (mat_nrows M) (mat_ncols M).
+
+(* identity matrix of size n *)
+
+Definition mI n : matrix T :=
+  mk_mat (λ i j, if Nat.eq_dec i j then 1%Srng else 0%Srng) n n.
+
 End in_ring.
 
 Module matrix_Notations.
@@ -3174,18 +3188,6 @@ End bmatrix_Notations.
 Import matrix_Notations.
 Import bmatrix_Notations.
 
-Theorem submatrix_sub : ∀ T {ro : ring_op T} (MA MB : matrix T) i j,
-  subm (MA - MB)%M i j = (subm MA i j - subm MB i j)%M.
-Proof.
-intros.
-apply matrix_eq; cbn; [ easy | easy | ].
-intros k l Hk Hl.
-now destruct (lt_dec k i), (lt_dec l j).
-Qed.
-
-Require Import SRpolynomial.
-Import polynomial_Notations.
-
 Section in_ring.
 
 Context {T : Type}.
@@ -3200,16 +3202,87 @@ Existing Instance polyn_ring_op.
 Existing Instance polyn_semiring_prop.
 Existing Instance polyn_ring_prop.
 
-(* convertion matrix → matrix with monomials *)
+Theorem submatrix_sub : ∀ (MA MB : matrix T) i j,
+  subm (MA - MB)%M i j = (subm MA i j - subm MB i j)%M.
+Proof.
+intros.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros k l Hk Hl.
+now destruct (lt_dec k i), (lt_dec l j).
+Qed.
 
-Definition m2mm M : matrix (polynomial T) :=
-  mk_mat (λ i j, polyn_of_list [mat_el M i j])
-    (mat_nrows M) (mat_ncols M).
+Theorem submatrix_mul_scal_l : ∀ (μ : T) M i j,
+  subm (μ × M)%M i j = (μ × subm M i j)%M.
+Proof.
+intros.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros k l Hk Hl.
+now destruct (lt_dec k i), (lt_dec l j).
+Qed.
 
-(* identity matrix of size n *)
+Theorem submatrix_m2mm : ∀ (M : matrix T) i j,
+  subm (m2mm M) i j = m2mm (subm M i j).
+Proof.
+intros.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros k l Hk Hl.
+now destruct (lt_dec k i), (lt_dec l j).
+Qed.
 
-Definition mI n : matrix T :=
-  mk_mat (λ i j, if Nat.eq_dec i j then 1%Srng else 0%Srng) n n.
+Theorem submatrix_mI : ∀ i r,
+ subm (mI (S r)) i i = mI r.
+Proof.
+intros.
+apply matrix_eq; cbn. {
+  now rewrite Nat.sub_0_r.
+} {
+  now rewrite Nat.sub_0_r.
+}
+intros k l Hk Hl.
+destruct (lt_dec k i) as [Hki| Hki]. {
+  destruct (lt_dec l i) as [Hli| Hli]; [ easy | ].
+  apply Nat.nlt_ge in Hli.
+  destruct (Nat.eq_dec k (l + 1)) as [Hkl1| Hkl1]. {
+    flia Hki Hli Hkl1.
+  }
+  destruct (Nat.eq_dec k l) as [Hkl| Hkl]; [ | easy ].
+  flia Hki Hli Hkl.
+} {
+  apply Nat.nlt_ge in Hki.
+  destruct (lt_dec l i) as [Hli| Hli]. {
+    destruct (Nat.eq_dec (k + 1) l) as [Hkl1| Hkl1]. {
+      flia Hki Hli Hkl1.
+    }
+    destruct (Nat.eq_dec k l) as [Hkl| Hkl]; [ | easy ].
+    flia Hki Hli Hkl.
+  } {
+    apply Nat.nlt_ge in Hli.
+    destruct (Nat.eq_dec (k + 1) (l + 1)) as [Hkl1| Hkl1]. {
+      destruct (Nat.eq_dec k l) as [Hkl| Hkl]; [ easy | ].
+      flia Hkl1 Hkl.
+    } {
+      destruct (Nat.eq_dec k l) as [Hkl| Hkl]; [ | easy ].
+      flia Hkl1 Hkl.
+    }
+  }
+}
+Qed.
+
+End in_ring.
+
+Section in_ring.
+
+Context {T : Type}.
+Context {ro : ring_op T}.
+Context (so := rng_semiring).
+Context {sp : @semiring_prop T (@rng_semiring T ro)}.
+Context {rp : @ring_prop T ro}.
+Context {sdp : @sring_dec_prop T so}.
+Existing Instance so.
+Existing Instance polyn_semiring_op.
+Existing Instance polyn_ring_op.
+Existing Instance polyn_semiring_prop.
+Existing Instance polyn_ring_prop.
 
 (* characteristic polynomial = det(xI-M) *)
 
@@ -3625,6 +3698,10 @@ apply is_monic_polyn_sum. {
          Arguments subm {T} M%M. Show.
          ça s'affiche moins bien *)
       rewrite submatrix_sub.
+      rewrite submatrix_mul_scal_l.
+      do 2 rewrite submatrix_m2mm.
+      now rewrite submatrix_mI.
+    }
 ...
     specialize (IHr (subm M 0 0) (subm PM 0 0)).
     assert (H : mat_nrows (subm M 0 0) = S r) by now cbn; rewrite Hr.
