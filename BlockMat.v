@@ -3291,9 +3291,7 @@ Existing Instance polyn_ring_prop.
 (* characteristic polynomial = det(xI-M) *)
 
 Definition charac_polyn (M : matrix T) :=
-  determinant
-    (mat_mul_scal_l (_x) (m2mm (mI (mat_nrows M))) -
-     m2mm M)%M.
+  determinant (_x × m2mm (mI (mat_nrows M)) - m2mm M)%M.
 
 (* monic polynomial: polynomial whose leading coefficient is 1 *)
 (* to be moved to SRpolynomial.v *)
