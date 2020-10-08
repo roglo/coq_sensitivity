@@ -3604,9 +3604,13 @@ apply is_monic_polyn_sum. {
   }
   clear x_a Hxa.
   replace (polyn_degree (det_loop _ _)) with (S r). 2: {
-    subst PM.
+    enough (H : polyn_degree (determinant (submatrix PM 0 0)) = S r). {
+      rewrite <- H at 1.
+      unfold determinant; f_equal; f_equal.
+      now rewrite HPM.
+    }
 Print determinant.
-(* ouais, chuis pas sûr que c'est bien S r *)
+Print charac_polyn.
 ...
 
 (* the list of coefficients of the characteristic polynomial of a matrix M
