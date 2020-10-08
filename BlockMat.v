@@ -3192,21 +3192,21 @@ Existing Instance polyn_ring_prop.
 
 (* convertion matrix → matrix with monomials *)
 
-Definition monom_mat_of_mat M : matrix (polynomial T) :=
+Definition m2mm M : matrix (polynomial T) :=
   mk_mat (λ i j, polyn_of_list [mat_el M i j])
     (mat_nrows M) (mat_ncols M).
 
 (* identity matrix of size n *)
 
-Definition mat_id n : matrix T :=
+Definition mI n : matrix T :=
   mk_mat (λ i j, if Nat.eq_dec i j then 1%Srng else 0%Srng) n n.
 
 (* characteristic polynomial = det(xI-M) *)
 
 Definition charac_polyn (M : matrix T) :=
   determinant
-    (mat_mul_scal_l (_x) (monom_mat_of_mat (mat_id (mat_nrows M))) -
-     monom_mat_of_mat M)%M.
+    (mat_mul_scal_l (_x) (m2mm (mI (mat_nrows M))) -
+     m2mm M)%M.
 
 (* monic polynomial: polynomial whose leading coefficient is 1 *)
 (* to be moved to SRpolynomial.v *)
@@ -3530,7 +3530,7 @@ unfold determinant; cbn.
 remember (mat_nrows M) as r eqn:Hr; symmetry in Hr.
 destruct r; [ easy | clear Hrz ].
 remember
-  (mat_mul_scal_l _x (monom_mat_of_mat (mat_id (S r))) - monom_mat_of_mat M)%M
+  (mat_mul_scal_l _x (m2mm (mI (S r))) - m2mm M)%M
   as PM eqn:HPM.
 revert M PM Hr HPM.
 induction r; intros. {
@@ -3612,9 +3612,7 @@ apply is_monic_polyn_sum. {
     assert
       (H :
        submatrix PM 0 0 =
-       (mat_mul_scal_l _x
-          (monom_mat_of_mat (mat_id (S r))) -
-           monom_mat_of_mat (submatrix M 0 0))%M). {
+       (mat_mul_scal_l _x (m2mm (mI (S r))) - m2mm (submatrix M 0 0))%M). {
 ...
     specialize (IHr (submatrix M 0 0) (submatrix PM 0 0)).
     assert (H : mat_nrows (submatrix M 0 0) = S r) by now cbn; rewrite Hr.
