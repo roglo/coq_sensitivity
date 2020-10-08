@@ -3753,8 +3753,10 @@ apply is_monic_polyn_add. {
     }
     specialize (IHn (subm M 0 0) (subm PM 0 0)).
     assert (H : mat_nrows (subm M 0 0) = S n) by now cbn; rewrite Hn.
+(*
     specialize (IHn H HsubmPM); clear H.
     unfold is_monic_polyn in IHn.
+*)
     unfold charac_polyn.
     unfold determinant.
     rewrite submatrix_nrows, Hn, Nat.sub_succ, Nat.sub_0_r.
@@ -3762,7 +3764,6 @@ apply is_monic_polyn_add. {
     rewrite submatrix_nrows.
     replace (mat_nrows PM) with (S (S n)) by now rewrite HPM.
     rewrite Nat.sub_succ, Nat.sub_0_r.
-remember (det_loop (subm PM 0 0) (S n)) as Q eqn:HQ.
 ...
 
 (* the list of coefficients of the characteristic polynomial of a matrix M
