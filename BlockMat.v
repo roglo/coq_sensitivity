@@ -3846,59 +3846,22 @@ apply is_monic_polyn_add. {
   clear x_a Hxa.
   rewrite <- Hn in HPM.
   rewrite fold_xI_sub_M in HPM.
-  specialize (polyn_degree_determinant_subm_xI_sub_M_le (subm M 0 0) (S n))
-    as H.
-  unfold determinant in H.
-  do 2 rewrite submatrix_nrows in H.
-  rewrite xI_sub_M_nrows in H.
-  rewrite submatrix_nrows in H.
-  rewrite Hn in H.
-  do 2 rewrite Nat.sub_succ, Nat.sub_0_r in H.
-...
-  rewrite Hn in H.
-  rewrite submatrix_xI_sub_M in H.
-  rewrite Hn, Nat.sub_succ, Nat.sub_0_r in H.
-  rewrite subm_xI_
   apply Nat.lt_succ_r.
-  etransitivity.
-...
   assert
-    (∀ i,
-     polyn_degree (determinant (subm (xI_sub_M M) 0 (S i))) ≤
-     polyn_degree (determinant (subm (xI_sub_M M) 0 0))). {
+    (H : ∀ i,
+     polyn_degree (det_loop (subm PM 0 i) (S n)) ≤
+     polyn_degree (det_loop (subm PM 0 0) (S n))). {
     intros.
-    unfold determinant.
-    do 2 rewrite submatrix_nrows.
-    rewrite xI_sub_M_nrows.
-    rewrite Hn.
-    rewrite Nat.sub_succ, Nat.sub_0_r.
-...
-    remember (mat_nrows M) as n eqn:Hn; clear Hn.
-(*
-*)
-    revert i M.
-    induction n; intros. {
-      cbn.
-      do 2 rewrite if_1_eq_0.
-      rewrite if_0_eq_0; cbn.
-      do 2 rewrite srng_add_0_l, srng_mul_0_l.
-      rewrite srng_add_0_l, srng_mul_1_l.
-      rewrite if_0_eq_0, if_1_eq_0; cbn.
-      destruct (srng_eq_dec (mat_el M 1 0)) as [H10z| H10z]. {
-        cbn; apply Nat.le_0_l.
-      }
-      cbn.
-      destruct (srng_eq_dec (- mat_el M 1 0)%Rng 0) as [H10z'| H10z']. {
-        cbn; apply Nat.le_0_l.
-      }
-      cbn; apply Nat.le_0_l.
-    }
-    remember (S n) as sn.
-    cbn - [ summation xI_sub_M ]; subst sn.
-...
-...
-      clear H.
-Check fold_left.
+    destruct i; [ easy | ].
+    specialize (polyn_degree_determinant_subm_xI_sub_M_le M i) as H.
+    unfold determinant in H.
+    do 2 rewrite submatrix_nrows in H.
+    rewrite xI_sub_M_nrows in H.
+    rewrite <- HPM in H.
+    rewrite Hn, Nat.sub_succ, Nat.sub_0_r in H.
+    etransitivity; [ | apply H ].
+    easy.
+  }
 ...
 eapply Nat.le_lt_trans; [ apply polyn_degree_summation_le | ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
