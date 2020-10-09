@@ -3297,6 +3297,10 @@ Theorem fold_xI_sub_M : ∀ M,
   (_x × m2mm (mI (mat_nrows M)) - m2mm M)%M = xI_sub_M M.
 Proof. easy. Qed.
 
+Theorem xI_sub_M_nrows : ∀ M,
+  mat_nrows (xI_sub_M M) = mat_nrows M.
+Proof. easy. Qed.
+
 (* monic polynomial: polynomial whose leading coefficient is 1 *)
 (* to be moved to SRpolynomial.v *)
 
@@ -3637,6 +3641,35 @@ etransitivity; [ | apply IHlen ].
 ...
 *)
 
+Theorem polyn_degree_determinant_subm_xI_sub_M_le : ∀ M i,
+  polyn_degree (determinant (subm (xI_sub_M M) 0 (S i))) ≤
+  polyn_degree (determinant (subm (xI_sub_M M) 0 0)).
+Proof.
+intros.
+unfold determinant.
+do 2 rewrite submatrix_nrows.
+rewrite xI_sub_M_nrows.
+remember (mat_nrows M - 1) as n eqn:Hn; clear Hn.
+induction n; [ easy | ].
+cbn - [ summation xI_sub_M ].
+destruct n. {
+  cbn.
+  do 2 rewrite if_1_eq_0.
+  rewrite if_0_eq_0; cbn.
+  do 2 rewrite srng_add_0_l, srng_mul_0_l.
+  rewrite srng_add_0_l, srng_mul_1_l.
+  rewrite if_0_eq_0, if_1_eq_0; cbn.
+  destruct (srng_eq_dec (mat_el M 1 0)) as [H10z| H10z]. {
+    cbn; apply Nat.le_0_l.
+  }
+  cbn.
+  destruct (srng_eq_dec (- mat_el M 1 0)%Rng 0) as [H10z'| H10z']. {
+    cbn; apply Nat.le_0_l.
+  }
+  cbn; apply Nat.le_0_l.
+}
+...
+
 (* the caracteristic polynomial of a matrix is monic, i.e. its
    leading coefficient is 1 *)
 
@@ -3714,14 +3747,43 @@ apply is_monic_polyn_add. {
     now cbn; rewrite if_1_eq_0.
   }
   clear x_a Hxa.
+  rewrite <- Hn in HPM.
+  rewrite fold_xI_sub_M in HPM.
+...
   assert
     (∀ i,
-     polyn_degree (det_loop (subm PM 0 (S i)) (S n)) ≤
-     polyn_degree (det_loop (subm PM 0 0) (S n))). {
+     polyn_degree (determinant (subm (xI_sub_M M) 0 (S i))) ≤
+     polyn_degree (determinant (subm (xI_sub_M M) 0 0))). {
     intros.
-    cbn.
-    destruct n. {
-      cbn; subst PM; cbn.
+    unfold determinant.
+    do 2 rewrite submatrix_nrows.
+    rewrite xI_sub_M_nrows.
+    rewrite Hn.
+    rewrite Nat.sub_succ, Nat.sub_0_r.
+...
+    remember (mat_nrows M) as n eqn:Hn; clear Hn.
+(*
+*)
+    revert i M.
+    induction n; intros. {
+      cbn.
+      do 2 rewrite if_1_eq_0.
+      rewrite if_0_eq_0; cbn.
+      do 2 rewrite srng_add_0_l, srng_mul_0_l.
+      rewrite srng_add_0_l, srng_mul_1_l.
+      rewrite if_0_eq_0, if_1_eq_0; cbn.
+      destruct (srng_eq_dec (mat_el M 1 0)) as [H10z| H10z]. {
+        cbn; apply Nat.le_0_l.
+      }
+      cbn.
+      destruct (srng_eq_dec (- mat_el M 1 0)%Rng 0) as [H10z'| H10z']. {
+        cbn; apply Nat.le_0_l.
+      }
+      cbn; apply Nat.le_0_l.
+    }
+    remember (S n) as sn.
+    cbn - [ summation xI_sub_M ]; subst sn.
+...
 ...
       clear H.
 Check fold_left.
