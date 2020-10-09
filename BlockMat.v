@@ -3305,7 +3305,9 @@ Proof. easy. Qed.
 (* monic polynomial: polynomial whose leading coefficient is 1 *)
 (* to be moved to SRpolynomial.v *)
 
-Definition is_monic_polyn P := polyn_coeff P (polyn_degree P) = 1%Srng.
+Definition is_monic_polyn (P : polynomial T) :=
+  polyn_coeff P (polyn_degree P) = 1%Srng.
+
 Arguments is_monic_polyn P%P.
 
 Theorem polyn_x_minus_is_monic : ∀ a,
@@ -3454,15 +3456,17 @@ intros; cbn.
 now rewrite map_length.
 Qed.
 
-Theorem is_monic_polyn_add : ∀ P Q,
+Theorem is_monic_polyn_add : ∀ (P Q : polynomial T),
   polyn_degree Q < polyn_degree P
   → is_monic_polyn P
   → is_monic_polyn (P + Q).
 Proof.
 intros * Hdeg HP.
 unfold is_monic_polyn in HP |-*.
+(*
 cbn - [ polyn_coeff ].
-...
+*)
+Check polyn_degree_add.
 rewrite polyn_degree_add; [ | easy ].
 cbn in HP |-*.
 destruct P as (la, Hla).
@@ -3539,7 +3543,7 @@ cbn; rewrite srng_add_0_r; f_equal.
 apply IHla.
 Qed.
 
-Theorem polyn_degree_mul : ∀ P Q,
+Theorem polyn_degree_mul : ∀ (P Q : polynomial T),
   (polyn_coeff P (polyn_degree P) * polyn_coeff Q (polyn_degree Q) ≠ 0)%Srng
   → polyn_degree (P * Q) = polyn_degree P + polyn_degree Q.
 Proof.
@@ -3670,7 +3674,7 @@ Check polyn_degree_add.
 specialize (polyn_degree_add) as H.
 remember (f b + f (S b))%P as P.
 remember (fold_left (λ (c : polynomial T) (i : nat), c + f i) (seq (S (S b)) len) 0)%Rng as Q.
-Canonical Structure polyn_sring_dec_prop.
+unfold srng_add at 1.
 rewrite polyn_degree_add.
 ...
 

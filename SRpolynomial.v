@@ -1441,11 +1441,32 @@ Qed.
 Definition polyn_ring_prop : ring_prop (polynomial T) :=
   {| rng_add_opp_l := polyn_add_opp_l |}.
 
-Theorem polyn_eq_dec : ∀ a b : polynomial T, {a = b} + {a ≠ b}.
-Admitted.
+Theorem polyn_eq_dec : ∀ P Q : polynomial T, {P = Q} + {P ≠ Q}.
+Proof.
+intros.
+destruct P as (la, Hla).
+destruct Q as (lb, Hlb).
+enough (H : {la = lb} + {la ≠ lb}). {
+  destruct H as [H| H]. {
+    subst la; left.
+    now apply polyn_eq; cbn.
+  } {
+    right.
+    intros H'; apply H; clear H.
+    now injection H'.
+  }
+}
+clear Hla Hlb.
+apply list_eq_dec, sdp.
+Qed.
 
 Theorem polyn_1_neq_0 : 1%P ≠ 0%P.
-Admitted.
+Proof.
+unfold polyn_of_list; cbn.
+intros H.
+injection H; clear H; intros.
+now rewrite if_1_eq_0 in H.
+Qed.
 
 Definition polyn_sring_dec_prop : @sring_dec_prop _ polyn_semiring_op :=
   {| srng_eq_dec := polyn_eq_dec;
@@ -1456,8 +1477,6 @@ Canonical Structure polyn_ring_op.
 Canonical Structure polyn_semiring_prop.
 Canonical Structure polyn_ring_prop.
 Canonical Structure polyn_sring_dec_prop.
-
-...
 
 End in_ring.
 
