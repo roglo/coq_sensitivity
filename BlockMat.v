@@ -3287,7 +3287,10 @@ Existing Instance polyn_semiring_op.
 Existing Instance polyn_ring_op.
 Existing Instance polyn_semiring_prop.
 Existing Instance polyn_ring_prop.
+(*
 Existing Instance polyn_sring_dec_prop.
+Time Check polyn_degree.
+*)
 
 (* characteristic polynomial = det(xI-M) *)
 
@@ -3648,8 +3651,11 @@ etransitivity; [ | apply IHlen ].
 ...
 *)
 
+(*
 Existing Instance polyn_sring_dec_prop.
+*)
 
+(* ah non, c'est probablement faux...
 Theorem polyn_degree_summation_le_compat : ∀ b e f g,
   (∀ i, b ≤ i ≤ e → polyn_degree (f i) ≤ polyn_degree (g i))
   → polyn_degree (Σ (i = b, e), f i) ≤ polyn_degree (Σ (i = b, e), g i).
@@ -3666,17 +3672,52 @@ induction len; intros. {
   do 2 rewrite polyn_add_0_l.
   apply Hfg; flia.
 }
+remember (S len) as slen.
 cbn - [ polyn_degree ].
+subst slen.
 do 2 rewrite polyn_add_0_l.
 rewrite fold_left_srng_add_fun_from_0.
-rewrite (fold_left_srng_add_fun_from_0 (g b + g (S b))%P).
-Check polyn_degree_add.
-specialize (polyn_degree_add) as H.
-remember (f b + f (S b))%P as P.
-remember (fold_left (λ (c : polynomial T) (i : nat), c + f i) (seq (S (S b)) len) 0)%Rng as Q.
-unfold srng_add at 1.
-rewrite polyn_degree_add.
+rewrite (fold_left_srng_add_fun_from_0 (g b)).
+remember (f b) as P1.
+remember (fold_left (λ c i, c + f i) (seq (S b) (S len)) 0)%Rng as Q1.
+remember (g b) as P2.
+remember (fold_left (λ c i, c + g i) (seq (S b) (S len)) 0)%Rng as Q2.
+move P2 before P1; move Q1 before P2; move Q2 before Q1.
+move HeqP2 before HeqP1.
+destruct (lt_dec (polyn_degree P1) (polyn_degree Q1)) as [HPQ1| HPQ1]. {
+  rewrite srng_add_comm.
+  unfold srng_add at 1.
+  rewrite polyn_degree_add; [ | easy ].
+  destruct (lt_dec (polyn_degree P2) (polyn_degree Q2)) as [HPQ2| HPQ2]. {
+    rewrite srng_add_comm.
+    unfold srng_add.
+    rewrite polyn_degree_add; [ | easy ].
+    subst Q1 Q2.
+    apply IHlen.
+    intros i Hi.
+    apply Hfg; flia Hi.
+  }
+  destruct (lt_dec (polyn_degree Q2) (polyn_degree P2)) as [HQP2| HQP2]. {
+    unfold srng_add.
+    rewrite polyn_degree_add; [ | easy ].
+    subst Q1 P2.
 ...
+    apply IHlen.
+    intros i Hi.
+    apply Hfg; flia Hi.
+  }
+
+    apply Nat.nlt_ge in HRS.
+
+    unfold srng_add.
+...
+    rewrite polyn_degree_add; [ | easy ].
+    subst Q S.
+    apply IHlen.
+    intros i Hi.
+    apply Hfg; flia Hi.
+...
+*)
 
 Theorem polyn_degree_determinant_subm_xI_sub_M_le : ∀ M i,
   polyn_degree (determinant (subm (xI_sub_M M) 0 (S i))) ≤
