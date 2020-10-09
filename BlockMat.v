@@ -3202,6 +3202,8 @@ Existing Instance polyn_ring_op.
 Existing Instance polyn_semiring_prop.
 Existing Instance polyn_ring_prop.
 
+(* combinations of submatrix and other *)
+
 Theorem submatrix_sub : ∀ (MA MB : matrix T) i j,
   subm (MA - MB)%M i j = (subm MA i j - subm MB i j)%M.
 Proof.
@@ -3304,6 +3306,21 @@ Proof. easy. Qed.
 Theorem xI_sub_M_nrows : ∀ M,
   mat_nrows (xI_sub_M M) = mat_nrows M.
 Proof. easy. Qed.
+
+Theorem submatrix_xI_sub_M : ∀ M i,
+  subm (xI_sub_M M) i i = xI_sub_M (subm M i i).
+Proof.
+intros.
+unfold xI_sub_M; cbn.
+rewrite submatrix_sub, <- submatrix_m2mm; f_equal.
+rewrite submatrix_mul_scal_l.
+rewrite submatrix_m2mm.
+destruct (mat_nrows M) as [| r]. {
+  now cbn; apply matrix_eq.
+}
+rewrite submatrix_mI.
+now rewrite Nat.sub_succ, Nat.sub_0_r.
+Qed.
 
 (* monic polynomial: polynomial whose leading coefficient is 1 *)
 (* to be moved to SRpolynomial.v *)
@@ -3728,7 +3745,8 @@ unfold determinant.
 do 2 rewrite submatrix_nrows.
 rewrite xI_sub_M_nrows.
 remember (mat_nrows M - 1) as n eqn:Hn; clear Hn.
-induction n; [ easy | ].
+revert M i.
+induction n; intros; [ easy | ].
 cbn - [ summation xI_sub_M ].
 destruct n. {
   cbn.
@@ -3746,16 +3764,7 @@ destruct n. {
   }
   cbn; apply Nat.le_0_l.
 }
-Print charac_polyn.
-Print xI_sub_M.
-Search subm.
-Theorem glop : ∀ M i j, subm (xI_sub_M M) i j = xI_sub_M (subm M i j).
-Proof.
-intros.
-unfold xI_sub_M; cbn.
-rewrite submatrix_sub, <- submatrix_m2mm; f_equal.
-rewrite submatrix_mul_scal_l.
-rewrite submatrix_m2mm.
+rewrite submatrix_xI_sub_M.
 ...
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
