@@ -3765,7 +3765,7 @@ destruct n. {
   cbn; apply Nat.le_0_l.
 }
 rewrite submatrix_xI_sub_M.
-Admitted.
+...
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
    leading coefficient is 1 *)
