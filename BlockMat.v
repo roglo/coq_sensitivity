@@ -3746,8 +3746,16 @@ destruct n. {
   }
   cbn; apply Nat.le_0_l.
 }
-...
-apply polyn_degree_summation_le_compat.
+Print charac_polyn.
+Print xI_sub_M.
+Search subm.
+Theorem glop : ∀ M i j, subm (xI_sub_M M) i j = xI_sub_M (subm M i j).
+Proof.
+intros.
+unfold xI_sub_M; cbn.
+rewrite submatrix_sub, <- submatrix_m2mm; f_equal.
+rewrite submatrix_mul_scal_l.
+rewrite submatrix_m2mm.
 ...
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
