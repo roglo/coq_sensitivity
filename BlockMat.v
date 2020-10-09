@@ -3315,18 +3315,14 @@ destruct a as (la, Hla).
 cbn in Ha |-*.
 destruct la as [| a]. {
   unfold is_monic_polyn; cbn.
-  destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | cbn ].
-  clear H.
-  destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | cbn ].
-  easy.
+  rewrite if_1_eq_0; cbn.
+  now rewrite if_1_eq_0.
 }
 destruct la; [ | cbn in Ha; flia Ha ].
 cbn in Hla.
 unfold is_monic_polyn; cbn.
-destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | cbn ].
-clear H.
-destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | ].
-easy.
+rewrite if_1_eq_0; cbn.
+now rewrite if_1_eq_0.
 Qed.
 
 Theorem norm_polyn_list_id : ∀ la,
@@ -3616,8 +3612,7 @@ Qed.
 
 Theorem polyn_degree_monom : polyn_degree _x = 1.
 Proof.
-cbn.
-destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | easy ].
+now cbn; rewrite if_1_eq_0.
 Qed.
 
 (*
@@ -3681,16 +3676,11 @@ apply is_monic_polyn_add. {
   rewrite polyn_degree_mul. 2: {
     replace (polyn_coeff x_a (polyn_degree x_a)) with 1%Rng. 2: {
       subst x_a; cbn.
-      destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | ].
-      clear H; cbn.
+      rewrite if_1_eq_0; cbn.
       destruct (srng_eq_dec (mat_el M 0 0)) as [Hz| Hz]. {
-        cbn.
-        destruct (srng_eq_dec 1 0) as [H| H]; [ | easy ].
-        now apply srng_1_neq_0 in H.
+        now cbn; rewrite if_1_eq_0.
       }
-      cbn.
-      destruct (srng_eq_dec 1 0) as [H| H]; [ | easy ].
-      now apply srng_1_neq_0 in H.
+      now cbn; rewrite if_1_eq_0.
     }
     rewrite srng_mul_1_l.
     unfold is_monic_polyn in IHn.
@@ -3717,15 +3707,11 @@ apply is_monic_polyn_add. {
   }
   replace (polyn_degree x_a) with 1. 2: {
     rewrite Hxa; cbn.
-    destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | ].
+    rewrite if_1_eq_0.
     destruct (srng_eq_dec (mat_el M 0 0)) as [Hz| Hz]. {
-      clear H; cbn.
-      destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | ].
-      easy.
+      now cbn; rewrite if_1_eq_0.
     }
-    clear H; cbn.
-    destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | ].
-    easy.
+    now cbn; rewrite if_1_eq_0.
   }
   clear x_a Hxa.
   assert
@@ -3736,7 +3722,7 @@ apply is_monic_polyn_add. {
     cbn.
     destruct n. {
       cbn; subst PM; cbn.
-      destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | ].
+...
       clear H.
 Check fold_left.
 ...

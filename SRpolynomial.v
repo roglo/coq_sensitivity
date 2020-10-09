@@ -281,6 +281,21 @@ f_equal.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
+(* often encountered cases: "if 0=0" and if "1=0" *)
+
+Theorem if_0_eq_0 : ∀ A (a b : A),
+  (if srng_eq_dec 0 0 then a else b) = a.
+intros.
+now destruct (srng_eq_dec 0 0).
+Qed.
+
+Theorem if_1_eq_0 : ∀ A (a b : A),
+  (if srng_eq_dec 1 0 then a else b) = b.
+intros.
+destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | ].
+easy.
+Qed.
+
 (* polynomials semiring properties *)
 
 Theorem polyn_list_add_comm : ∀ la lb,
@@ -330,7 +345,7 @@ destruct (srng_eq_dec a 0%Srng) as [Haz| Haz]; [ | easy ].
 subst a; exfalso.
 rewrite app_nth2 in Pa; [ | now unfold ge; rewrite rev_length ].
 rewrite rev_length, Nat.sub_diag in Pa; cbn in Pa.
-now destruct (srng_eq_dec 0%Srng 0%Srng).
+now rewrite if_0_eq_0 in Pa.
 Qed.
 
 Theorem strip_0s_idemp : ∀ la,
@@ -361,7 +376,7 @@ revert lb c lc Hlc.
 induction la as [| a]; intros; [ easy | cbn ].
 destruct (srng_eq_dec a 0%Srng) as [Haz| Haz]. {
   subst a; cbn in Hlc.
-  destruct (srng_eq_dec 0%Srng 0%Srng) as [H| H]; [ clear H | easy ].
+  rewrite if_0_eq_0 in Hlc.
   apply IHla, Hlc.
 }
 cbn in Hlc.
@@ -374,7 +389,7 @@ Theorem strip_0s_repeat_0s : ∀ n,
 Proof.
 intros.
 induction n; [ easy | cbn ].
-now destruct (srng_eq_dec 0%Srng 0%Srng).
+now rewrite if_0_eq_0.
 Qed.
 
 Theorem eq_strip_0s_nil : ∀ la,
@@ -624,9 +639,9 @@ intros A *.
 revert lb.
 induction la as [| a]; intros; cbn. {
   induction lb as [| b]; [ easy | cbn ].
-  now destruct (srng_eq_dec 0 0).
+  now rewrite if_0_eq_0.
 }
-now destruct (srng_eq_dec 0 0).
+now rewrite if_0_eq_0.
 Qed.
 
 Theorem polyn_list_convol_mul_0_l : ∀ n la i,
@@ -665,7 +680,7 @@ intros.
 induction n; [ easy | ].
 rewrite List_repeat_succ_app.
 rewrite norm_polyn_list_app; cbn.
-now destruct (srng_eq_dec 0 0).
+now rewrite if_0_eq_0.
 Qed.
 
 Theorem map_polyn_list_convol_mul_comm : ∀ la lb ln,
@@ -881,9 +896,7 @@ rewrite <- IHn.
 cbn - [ norm_polyn_list nth seq sub ].
 unfold polyn_list_convol_mul at 2.
 unfold so.
-rewrite all_0_srng_summation_0. {
-  now cbn; destruct (srng_eq_dec 0 0).
-}
+rewrite all_0_srng_summation_0; [ now cbn; rewrite if_0_eq_0 | ].
 intros j (_, Hj).
 destruct (le_dec (length la) j) as [H1| H1]. {
   rewrite nth_overflow; [ | easy ].
@@ -1114,8 +1127,8 @@ Theorem polyn_of_list_mul_1_l : ∀ la,
 Proof.
 intros.
 cbn - [ seq ].
-destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | ].
-cbn - [ seq ]; clear H.
+rewrite if_1_eq_0.
+cbn - [ seq ].
 unfold polyn_list_mul.
 unfold length at 1.
 rewrite (Nat.add_comm 1), Nat.add_sub.
