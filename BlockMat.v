@@ -3287,6 +3287,7 @@ Existing Instance polyn_semiring_op.
 Existing Instance polyn_ring_op.
 Existing Instance polyn_semiring_prop.
 Existing Instance polyn_ring_prop.
+Existing Instance polyn_sring_dec_prop.
 
 (* characteristic polynomial = det(xI-M) *)
 
@@ -3329,7 +3330,7 @@ rewrite if_1_eq_0; cbn.
 now rewrite if_1_eq_0.
 Qed.
 
-Theorem norm_polyn_list_id : ∀ la,
+Theorem norm_polyn_list_id : ∀ (la : list T),
   last la 0%Srng ≠ 0%Srng
   → norm_polyn_list la = la.
 Proof.
@@ -3345,7 +3346,7 @@ cbn in Hla |-*.
 now destruct (srng_eq_dec a 0).
 Qed.
 
-Theorem norm_polyn_list_app_last_nz : ∀ la lb,
+Theorem norm_polyn_list_app_last_nz : ∀ (la lb : list T),
   last lb 0%Srng ≠ 0%Srng
   → norm_polyn_list (la ++ lb) = la ++ norm_polyn_list lb.
 Proof.
@@ -3380,7 +3381,7 @@ symmetry in Hld.
 now destruct ld.
 Qed.
 
-Theorem norm_polyn_list_cons : ∀ a la,
+Theorem norm_polyn_list_cons : ∀ (a : T) la,
   last la 0%Srng ≠ 0%Srng
   → norm_polyn_list (a :: la) = a :: norm_polyn_list la.
 Proof.
@@ -3460,6 +3461,8 @@ Theorem is_monic_polyn_add : ∀ P Q,
 Proof.
 intros * Hdeg HP.
 unfold is_monic_polyn in HP |-*.
+cbn - [ polyn_coeff ].
+...
 rewrite polyn_degree_add; [ | easy ].
 cbn in HP |-*.
 destruct P as (la, Hla).
@@ -3641,6 +3644,36 @@ etransitivity; [ | apply IHlen ].
 ...
 *)
 
+Existing Instance polyn_sring_dec_prop.
+
+Theorem polyn_degree_summation_le_compat : ∀ b e f g,
+  (∀ i, b ≤ i ≤ e → polyn_degree (f i) ≤ polyn_degree (g i))
+  → polyn_degree (Σ (i = b, e), f i) ≤ polyn_degree (Σ (i = b, e), g i).
+Proof.
+intros * Hfg.
+unfold summation.
+remember (S e - b) as len eqn:Hlen.
+destruct len; [ easy | ].
+replace e with (b + len) in Hfg by flia Hlen.
+clear e Hlen.
+revert b Hfg.
+induction len; intros. {
+  cbn - [ polyn_degree ].
+  do 2 rewrite polyn_add_0_l.
+  apply Hfg; flia.
+}
+cbn - [ polyn_degree ].
+do 2 rewrite polyn_add_0_l.
+rewrite fold_left_srng_add_fun_from_0.
+rewrite (fold_left_srng_add_fun_from_0 (g b + g (S b))%P).
+Check polyn_degree_add.
+specialize (polyn_degree_add) as H.
+remember (f b + f (S b))%P as P.
+remember (fold_left (λ (c : polynomial T) (i : nat), c + f i) (seq (S (S b)) len) 0)%Rng as Q.
+Canonical Structure polyn_sring_dec_prop.
+rewrite polyn_degree_add.
+...
+
 Theorem polyn_degree_determinant_subm_xI_sub_M_le : ∀ M i,
   polyn_degree (determinant (subm (xI_sub_M M) 0 (S i))) ≤
   polyn_degree (determinant (subm (xI_sub_M M) 0 0)).
@@ -3668,6 +3701,8 @@ destruct n. {
   }
   cbn; apply Nat.le_0_l.
 }
+...
+apply polyn_degree_summation_le_compat.
 ...
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
