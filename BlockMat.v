@@ -3620,6 +3620,7 @@ cbn.
 destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | easy ].
 Qed.
 
+(*
 Theorem polyn_degree_summation_le : ∀ b e f m,
   polyn_degree (Σ (i = b, e), f i) ≤
   fold_left max (map (λ i, polyn_degree (f i)) (seq b (S e - b))) m.
@@ -3639,6 +3640,7 @@ rewrite polyn_degree_add.
 etransitivity; [ | apply IHlen ].
 (* mouais, bof *)
 ...
+*)
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
    leading coefficient is 1 *)
