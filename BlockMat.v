@@ -3728,6 +3728,16 @@ apply is_monic_polyn_add. {
     easy.
   }
   clear x_a Hxa.
+  assert
+    (∀ i,
+     polyn_degree (det_loop (subm PM 0 (S i)) (S n)) ≤
+     polyn_degree (det_loop (subm PM 0 0) (S n))). {
+    intros.
+    cbn.
+    destruct n. {
+      cbn; subst PM; cbn.
+      destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | ].
+      clear H.
 Check fold_left.
 ...
 eapply Nat.le_lt_trans; [ apply polyn_degree_summation_le | ].
