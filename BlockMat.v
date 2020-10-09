@@ -3765,7 +3765,7 @@ destruct n. {
   cbn; apply Nat.le_0_l.
 }
 rewrite submatrix_xI_sub_M.
-...
+Admitted.
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
    leading coefficient is 1 *)
@@ -3846,6 +3846,21 @@ apply is_monic_polyn_add. {
   clear x_a Hxa.
   rewrite <- Hn in HPM.
   rewrite fold_xI_sub_M in HPM.
+  specialize (polyn_degree_determinant_subm_xI_sub_M_le (subm M 0 0) (S n))
+    as H.
+  unfold determinant in H.
+  do 2 rewrite submatrix_nrows in H.
+  rewrite xI_sub_M_nrows in H.
+  rewrite submatrix_nrows in H.
+  rewrite Hn in H.
+  do 2 rewrite Nat.sub_succ, Nat.sub_0_r in H.
+...
+  rewrite Hn in H.
+  rewrite submatrix_xI_sub_M in H.
+  rewrite Hn, Nat.sub_succ, Nat.sub_0_r in H.
+  rewrite subm_xI_
+  apply Nat.lt_succ_r.
+  etransitivity.
 ...
   assert
     (∀ i,
