@@ -3837,6 +3837,20 @@ rewrite HPM in Hxa; cbn in Hxa.
 unfold so in Hxa.
 rewrite srng_mul_1_r in Hxa.
 rewrite fold_polyn_sub in Hxa.
+specialize (IHn (subm M 0 0) (subm PM 0 0)).
+specialize (IHn (det_loop (subm PM 0 0) (S n))).
+rewrite submatrix_nrows, Hn in IHn.
+rewrite Nat.sub_succ, Nat.sub_0_r in IHn.
+specialize (IHn eq_refl).
+assert (H : subm PM 0 0 = (_x × m2mm (mI (S n)) - m2mm (subm M 0 0))%M). {
+  rewrite HPM.
+  rewrite submatrix_sub.
+  rewrite submatrix_mul_scal_l.
+  rewrite submatrix_m2mm.
+  now rewrite submatrix_mI.
+}
+specialize (IHn H eq_refl); clear H.
+destruct IHn as (Hcoeff, Hdeg).
 split. {
   subst CP.
   apply is_monic_polyn_add. {
@@ -3851,13 +3865,17 @@ split. {
         }
       }
       rewrite srng_mul_1_l.
-      unfold is_monic_polyn in IHn.
-      unfold so in IHn |-*.
-      specialize (IHn (subm M 0 0) (subm PM 0 0)).
-      specialize (IHn (det_loop (subm PM 0 0) (S n))).
-      rewrite submatrix_nrows, Hn in IHn.
-      rewrite Nat.sub_succ, Nat.sub_0_r in IHn.
-      specialize (IHn eq_refl).
+      unfold is_monic_polyn in Hcoeff.
+      unfold so in Hcoeff |-*.
+      rewrite Hcoeff.
+      apply srng_1_neq_0.
+    }
+    rewrite Hdeg.
+    replace (polyn_degree x_a) with 1. 2: {
+      rewrite Hxa; cbn.
+      rewrite if_1_eq_0.
+      now destruct (srng_eq_dec (mat_el M 0 0)); cbn; rewrite if_1_eq_0.
+    }
 ...
 remember (S n) as sn.
 cbn - [ "-" ]; subst sn.
