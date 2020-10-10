@@ -3736,6 +3736,7 @@ destruct (lt_dec (polyn_degree P1) (polyn_degree Q1)) as [HPQ1| HPQ1]. {
 ...
 *)
 
+(*
 Theorem polyn_degree_determinant_subm_xI_sub_M_le : ∀ M i,
   polyn_degree (determinant (subm (xI_sub_M M) 0 (S i))) ≤
   polyn_degree (determinant (subm (xI_sub_M M) 0 0)).
@@ -3780,6 +3781,7 @@ destruct (le_dec i n) as [Hin| Hin]. {
   }
   cbn - [ summation det_loop xI_sub_M polyn_degree ].
 ...
+*)
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
    leading coefficient is 1 *)
@@ -3861,6 +3863,16 @@ apply is_monic_polyn_add. {
   rewrite <- Hn in HPM.
   rewrite fold_xI_sub_M in HPM.
   apply Nat.lt_succ_r.
+...
+Theorem glop : ∀ b e f g,
+  (∀ i, b ≤ i ≤ e → polyn_degree (f i) = 0)
+  → polyn_degree (Σ (i = b, e), f i * g i) = polyn_degree (Σ (i = b, e), g i).
+Proof.
+... ouais mais c'est faux, ça ...
+rewrite glop.
+Search (polyn_degree (_ * _)).
+Search (polyn_degree (_ + _)).
+...
   assert
     (H : ∀ i,
      polyn_degree (det_loop (subm PM 0 i) (S n)) ≤
