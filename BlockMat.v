@@ -3765,6 +3765,20 @@ destruct n. {
   cbn; apply Nat.le_0_l.
 }
 rewrite submatrix_xI_sub_M.
+destruct (le_dec i n) as [Hin| Hin]. {
+  rewrite (srng_summation_split i); [ | flia Hin ].
+  erewrite srng_summation_eq_compat. 2: {
+    intros j Hj.
+    destruct (lt_dec j (S i)) as [Hji| Hji]; [ | flia Hj Hji ].
+    easy.
+  }
+  cbn - [ summation det_loop xI_sub_M polyn_degree ].
+  erewrite (srng_summation_eq_compat _ _ (i + 1)). 2: {
+    intros j Hj.
+    destruct (lt_dec j (S i)) as [Hji| Hji]; [ flia Hj Hji | ].
+    easy.
+  }
+  cbn - [ summation det_loop xI_sub_M polyn_degree ].
 ...
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
