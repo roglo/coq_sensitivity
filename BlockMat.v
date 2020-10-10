@@ -3788,29 +3788,82 @@ destruct (le_dec i n) as [Hin| Hin]. {
 
 Theorem charac_polyn_is_monic : ∀ M,
   mat_nrows M ≠ 0
-  → is_monic_polyn (charac_polyn M).
+  → is_monic_polyn (charac_polyn M) ∧
+     polyn_degree (charac_polyn M) = mat_nrows M.
 Proof.
 intros * Hrz.
-unfold charac_polyn.
-unfold determinant; cbn.
-unfold xI_sub_M; cbn.
+remember (charac_polyn M) as CP eqn:HCP.
+unfold charac_polyn in HCP.
+unfold determinant in HCP; cbn in HCP.
+unfold xI_sub_M in HCP; cbn in HCP.
 remember (mat_nrows M) as n eqn:Hn; symmetry in Hn.
 destruct n; [ easy | clear Hrz ].
 remember (_x × m2mm (mI (S n)) - m2mm M)%M as PM eqn:HPM.
-unfold xI_sub_M.
-revert M PM Hn HPM.
+revert M PM CP Hn HPM HCP.
 induction n; intros. {
-  subst PM; cbn; unfold so.
-  rewrite polyn_mul_1_r.
-  rewrite fold_polyn_sub.
-  apply polyn_x_minus_is_monic.
-  now cbn; destruct (srng_eq_dec (mat_el M 0 0) 0).
+  subst PM; cbn in HCP; unfold so in HCP.
+  rewrite polyn_mul_1_r in HCP.
+  rewrite fold_polyn_sub in HCP.
+  split. {
+    subst CP.
+    apply polyn_x_minus_is_monic.
+    now cbn; destruct (srng_eq_dec (mat_el M 0 0) 0).
+  } {
+    subst CP; cbn.
+    rewrite if_1_eq_0; cbn.
+    destruct (srng_eq_dec (mat_el M 0 0) 0) as [Hmz| Hmz]. {
+      now cbn; rewrite if_1_eq_0.
+    } {
+      now cbn; rewrite if_1_eq_0.
+    }
+  }
 }
+(**)
+remember (S n) as sn.
+cbn - [ "-" ] in HCP; subst sn.
+subst CP.
+rewrite srng_summation_split_first; [ | flia ].
+remember
+  ((minus_one_pow 0 * mat_el PM 0 0 * det_loop (subm PM 0 0) (S n))%P +
+   Σ (i = 1, S n),
+     (minus_one_pow i * mat_el PM 0 i * det_loop (subm PM 0 i) (S n))%P)%Rng
+as CP eqn:HCP.
+cbn - [ sub det_loop ] in HCP.
+unfold minus_one_pow at 1 in HCP.
+cbn - [ sub det_loop ] in HCP.
+rewrite Nat.sub_diag, polyn_mul_1_l in HCP.
+remember (mat_el PM 0 0) as x_a eqn:Hxa.
+rewrite HPM in Hxa; cbn in Hxa.
+unfold so in Hxa.
+rewrite srng_mul_1_r in Hxa.
+rewrite fold_polyn_sub in Hxa.
+split. {
+  subst CP.
+  apply is_monic_polyn_add. {
+    rewrite polyn_degree_mul. 2: {
+      replace (polyn_coeff x_a (polyn_degree x_a)) with 1%Rng. 2: {
+        subst x_a; cbn.
+        rewrite if_1_eq_0; cbn.
+        destruct (srng_eq_dec (mat_el M 0 0)) as [Hz| Hz]. {
+          now cbn; rewrite if_1_eq_0.
+        } {
+          now cbn; rewrite if_1_eq_0.
+        }
+      }
+      rewrite srng_mul_1_l.
+      unfold is_monic_polyn in IHn.
+      unfold so in IHn |-*.
+      specialize (IHn (subm M 0 0) (subm PM 0 0)).
+      specialize (IHn (det_loop (subm PM 0 0) (S n))).
+      rewrite submatrix_nrows, Hn in IHn.
+      rewrite Nat.sub_succ, Nat.sub_0_r in IHn.
+      specialize (IHn eq_refl).
+...
 remember (S n) as sn.
 cbn - [ "-" ]; subst sn.
 rewrite srng_summation_split_first; [ | flia ].
 cbn - [ sub det_loop ].
-unfold minus_one_pow at 1.
+unfold minus_one_pow at 1 3.
 cbn - [ sub det_loop ].
 rewrite Nat.sub_diag, polyn_mul_1_l.
 remember (mat_el PM 0 0) as x_a eqn:Hxa.
@@ -3818,6 +3871,7 @@ rewrite HPM in Hxa; cbn in Hxa.
 unfold so in Hxa.
 rewrite srng_mul_1_r in Hxa.
 rewrite fold_polyn_sub in Hxa.
+...
 apply is_monic_polyn_add. {
   rewrite polyn_degree_mul. 2: {
     replace (polyn_coeff x_a (polyn_degree x_a)) with 1%Rng. 2: {
