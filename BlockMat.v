@@ -3646,10 +3646,9 @@ Proof.
 now cbn; rewrite if_1_eq_0.
 Qed.
 
-(*
-Theorem polyn_degree_summation_le : ∀ b e f m,
+Theorem polyn_degree_summation_le : ∀ b e m f,
   polyn_degree (Σ (i = b, e), f i) ≤
-  fold_left max (map (λ i, polyn_degree (f i)) (seq b (S e - b))) m.
+  fold_left max (map polyn_degree (map f (seq b (S e - b)))) m.
 Proof.
 intros.
 unfold summation.
@@ -3661,125 +3660,18 @@ cbn; rewrite polyn_add_0_l.
 rewrite fold_left_srng_add_fun_from_0.
 cbn - [ polyn_degree ].
 rewrite polyn_add_comm.
+Theorem polyn_degree_add_le : ∀ P Q,
+  polyn_degree (P + Q) ≤ max (polyn_degree P) (polyn_degree Q).
+Admitted.
+etransitivity; [ apply polyn_degree_add_le | ].
+(* est-ce que ça marche ? faut vérifier d'abord *)
+...
 rewrite polyn_degree_add.
 ...
 etransitivity; [ | apply IHlen ].
-(* mouais, bof *)
 ...
-*)
 
 (*
-Existing Instance polyn_sring_dec_prop.
-*)
-
-(* ah non, c'est probablement faux...
-Theorem polyn_degree_summation_le_compat : ∀ b e f g,
-  (∀ i, b ≤ i ≤ e → polyn_degree (f i) ≤ polyn_degree (g i))
-  → polyn_degree (Σ (i = b, e), f i) ≤ polyn_degree (Σ (i = b, e), g i).
-Proof.
-intros * Hfg.
-unfold summation.
-remember (S e - b) as len eqn:Hlen.
-destruct len; [ easy | ].
-replace e with (b + len) in Hfg by flia Hlen.
-clear e Hlen.
-revert b Hfg.
-induction len; intros. {
-  cbn - [ polyn_degree ].
-  do 2 rewrite polyn_add_0_l.
-  apply Hfg; flia.
-}
-remember (S len) as slen.
-cbn - [ polyn_degree ].
-subst slen.
-do 2 rewrite polyn_add_0_l.
-rewrite fold_left_srng_add_fun_from_0.
-rewrite (fold_left_srng_add_fun_from_0 (g b)).
-remember (f b) as P1.
-remember (fold_left (λ c i, c + f i) (seq (S b) (S len)) 0)%Rng as Q1.
-remember (g b) as P2.
-remember (fold_left (λ c i, c + g i) (seq (S b) (S len)) 0)%Rng as Q2.
-move P2 before P1; move Q1 before P2; move Q2 before Q1.
-move HeqP2 before HeqP1.
-destruct (lt_dec (polyn_degree P1) (polyn_degree Q1)) as [HPQ1| HPQ1]. {
-  rewrite srng_add_comm.
-  unfold srng_add at 1.
-  rewrite polyn_degree_add; [ | easy ].
-  destruct (lt_dec (polyn_degree P2) (polyn_degree Q2)) as [HPQ2| HPQ2]. {
-    rewrite srng_add_comm.
-    unfold srng_add.
-    rewrite polyn_degree_add; [ | easy ].
-    subst Q1 Q2.
-    apply IHlen.
-    intros i Hi.
-    apply Hfg; flia Hi.
-  }
-  destruct (lt_dec (polyn_degree Q2) (polyn_degree P2)) as [HQP2| HQP2]. {
-    unfold srng_add.
-    rewrite polyn_degree_add; [ | easy ].
-    subst Q1 P2.
-...
-    apply IHlen.
-    intros i Hi.
-    apply Hfg; flia Hi.
-  }
-
-    apply Nat.nlt_ge in HRS.
-
-    unfold srng_add.
-...
-    rewrite polyn_degree_add; [ | easy ].
-    subst Q S.
-    apply IHlen.
-    intros i Hi.
-    apply Hfg; flia Hi.
-...
-*)
-
-(*
-Theorem polyn_degree_determinant_subm_xI_sub_M_le : ∀ M i,
-  polyn_degree (determinant (subm (xI_sub_M M) 0 (S i))) ≤
-  polyn_degree (determinant (subm (xI_sub_M M) 0 0)).
-Proof.
-intros.
-unfold determinant.
-do 2 rewrite submatrix_nrows.
-rewrite xI_sub_M_nrows.
-remember (mat_nrows M - 1) as n eqn:Hn; clear Hn.
-revert M i.
-induction n; intros; [ easy | ].
-cbn - [ summation xI_sub_M ].
-destruct n. {
-  cbn.
-  do 2 rewrite if_1_eq_0.
-  rewrite if_0_eq_0; cbn.
-  do 2 rewrite srng_add_0_l, srng_mul_0_l.
-  rewrite srng_add_0_l, srng_mul_1_l.
-  rewrite if_0_eq_0, if_1_eq_0; cbn.
-  destruct (srng_eq_dec (mat_el M 1 0)) as [H10z| H10z]. {
-    cbn; apply Nat.le_0_l.
-  }
-  cbn.
-  destruct (srng_eq_dec (- mat_el M 1 0)%Rng 0) as [H10z'| H10z']. {
-    cbn; apply Nat.le_0_l.
-  }
-  cbn; apply Nat.le_0_l.
-}
-rewrite submatrix_xI_sub_M.
-destruct (le_dec i n) as [Hin| Hin]. {
-  rewrite (srng_summation_split i); [ | flia Hin ].
-  erewrite srng_summation_eq_compat. 2: {
-    intros j Hj.
-    destruct (lt_dec j (S i)) as [Hji| Hji]; [ | flia Hj Hji ].
-    easy.
-  }
-  cbn - [ summation det_loop xI_sub_M polyn_degree ].
-  erewrite (srng_summation_eq_compat _ _ (i + 1)). 2: {
-    intros j Hj.
-    destruct (lt_dec j (S i)) as [Hji| Hji]; [ flia Hj Hji | ].
-    easy.
-  }
-  cbn - [ summation det_loop xI_sub_M polyn_degree ].
 ...
 *)
 
@@ -3876,6 +3768,9 @@ split. {
       rewrite if_1_eq_0.
       now destruct (srng_eq_dec (mat_el M 0 0)); cbn; rewrite if_1_eq_0.
     }
+    clear x_a Hxa.
+...
+    eapply le_lt_trans; [ apply polyn_degree_summation_le | ].
 ...
 remember (S n) as sn.
 cbn - [ "-" ]; subst sn.
