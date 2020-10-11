@@ -3646,7 +3646,41 @@ Proof.
 now cbn; rewrite if_1_eq_0.
 Qed.
 
-Theorem polyn_degree_summation_le : ∀ b e m f,
+(* degree of sum and summation upper bound *)
+
+Theorem polyn_degree_add_ub : ∀ P Q,
+  polyn_degree (P + Q) ≤ max (polyn_degree P) (polyn_degree Q).
+Proof.
+intros (la, Hla) (lb, Hlb).
+move lb before la.
+cbn - [ "+"%PL ].
+rewrite Nat.sub_max_distr_r.
+apply Nat.sub_le_mono_r.
+destruct la as [| a]. {
+  clear Hla.
+  rewrite Nat.max_r; [ | cbn; flia ].
+  rewrite polyn_list_add_0_l.
+  destruct lb as [| b]; [ easy | ].
+  cbn - [ nth ] in Hlb.
+  destruct (srng_eq_dec (nth (length lb) (b :: lb) 0%Srng) 0)
+    as [| H]; [ easy | clear Hlb ].
+  rewrite <- List_last_nth_cons in H.
+  revert b H.
+  induction lb as [| b1]; intros. {
+    cbn.
+    now destruct (srng_eq_dec b 0).
+  }
+  rewrite List_last_cons_cons in H.
+  rewrite norm_polyn_list_cons; [ | easy ].
+  remember (b1 :: lb) as lc.
+  cbn - [ norm_polyn_list ].
+  subst lc.
+  apply -> Nat.succ_le_mono.
+  now apply IHlb.
+}
+...
+
+Theorem polyn_degree_summation_ub : ∀ b e m f,
   polyn_degree (Σ (i = b, e), f i) ≤
   fold_left max (map polyn_degree (map f (seq b (S e - b)))) m.
 Proof.
@@ -3660,20 +3694,21 @@ cbn; rewrite polyn_add_0_l.
 rewrite fold_left_srng_add_fun_from_0.
 cbn - [ polyn_degree ].
 rewrite polyn_add_comm.
-Theorem polyn_degree_add_le : ∀ P Q,
-  polyn_degree (P + Q) ≤ max (polyn_degree P) (polyn_degree Q).
-Admitted.
-etransitivity; [ apply polyn_degree_add_le | ].
-(* est-ce que ça marche ? faut vérifier d'abord *)
+etransitivity; [ apply polyn_degree_add_ub | ].
+destruct (le_dec
+  (polyn_degree (f b))
+  (polyn_degree
+      (fold_left (λ (c : polynomial T) (i : nat), (c + f i)%P)
+         (seq (S b) len) 0%P))) as [H1| H1]. {
+  etransitivity; [ | apply IHlen ].
+  rewrite max_l; [ easy | easy ].
+} {
+  apply Nat.nle_gt in H1.
+  rewrite max_r; [ | now apply Nat.lt_le_incl ].
+  apply Nat_le_fold_left_max.
+  apply Nat.le_max_r.
+}
 ...
-rewrite polyn_degree_add.
-...
-etransitivity; [ | apply IHlen ].
-...
-
-(*
-...
-*)
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
    leading coefficient is 1 *)
