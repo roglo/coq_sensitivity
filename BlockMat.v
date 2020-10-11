@@ -3678,6 +3678,52 @@ destruct la as [| a]. {
   apply -> Nat.succ_le_mono.
   now apply IHlb.
 }
+cbn - [ nth ] in Hla.
+destruct (srng_eq_dec (nth (length la) (a :: la) 0%Rng) 0)
+  as [Haz| Haz]; [ easy | clear Hla ].
+rewrite <- List_last_nth_cons in Haz.
+destruct lb as [| b]. {
+  cbn - [ norm_polyn_list ].
+  clear Hlb.
+  revert a Haz.
+  induction la as [| a1]; intros. {
+    cbn in Haz |-*.
+    now destruct (srng_eq_dec a 0).
+  }
+  rewrite List_last_cons_cons in Haz.
+  rewrite norm_polyn_list_cons; [ | easy ].
+  remember (a1 :: la) as lc; cbn; subst lc.
+  apply -> Nat.succ_le_mono.
+  now apply IHla.
+}
+cbn - [ nth ] in Hlb.
+destruct (srng_eq_dec (nth (length lb) (b :: lb) 0%Rng) 0)
+  as [Hbz| Hbz]; [ easy | clear Hlb ].
+rewrite <- List_last_nth_cons in Hbz.
+move b before a.
+revert a b lb Haz Hbz.
+induction la as [| a1]; intros. {
+  cbn in Haz.
+  cbn - [ norm_polyn_list ].
+  remember (a + b)%Rng as c; clear Heqc.
+  revert b c Hbz.
+  induction lb as [| b1]; intros. {
+    cbn in Hbz |-*.
+    destruct (srng_eq_dec c 0); cbn; flia.
+  }
+  rewrite List_last_cons_cons in Hbz.
+  rewrite norm_polyn_list_cons; [ | easy ].
+  remember (b1 :: lb) as lc; cbn; subst lc.
+  apply -> Nat.succ_le_mono.
+  now apply (IHlb b1).
+}
+...
+destruct la as [| a1]. {
+  cbn in Haz.
+  destruct lb as [| b]. {
+    cbn.
+    destruct srng
+    rewrite norm_polyn_list_cons.
 ...
 
 Theorem polyn_degree_summation_ub : ∀ b e m f,
