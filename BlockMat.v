@@ -3768,14 +3768,35 @@ apply Nat.succ_le_mono in IHla.
 etransitivity; [ | apply IHla ].
 remember ((a1 :: la) + (b1 :: lb))%PL as lc eqn:Hlc.
 remember (a + b)%Rng as c; clear a b Heqc.
-...
-rewrite norm_polyn_list_cons; [ easy | ].
-...
-etransitivity.
-...
-destruct (srng_eq_dec (last lc 0%Srng) 0) as [Hz| Hz]. 2: {
-  now rewrite norm_polyn_list_cons.
+clear.
+revert c.
+induction lc as [| c1] using rev_ind; intros. {
+  cbn.
+  now destruct (srng_eq_dec c 0); cbn; flia.
 }
+destruct (srng_eq_dec c1 0) as [Hz| Hz]. {
+  subst c1.
+  rewrite app_comm_cons.
+  do 2 rewrite norm_polyn_list_app.
+  cbn - [ norm_polyn_list ].
+  unfold norm_polyn_list at 1 3.
+  cbn - [ norm_polyn_list ].
+  unfold so.
+  rewrite if_0_eq_0.
+  cbn - [ norm_polyn_list ].
+  apply IHlc.
+}
+rewrite app_comm_cons.
+do 2 rewrite norm_polyn_list_app.
+cbn - [ norm_polyn_list ].
+unfold norm_polyn_list at 1 3.
+cbn - [ norm_polyn_list ].
+unfold so.
+now destruct (srng_eq_dec c1 0).
+Qed.
+
+(* bon, c'était laborieux... faudrait voir si y a pas plus simple *)
+
 ...
 
 Theorem polyn_degree_summation_ub : ∀ b e m f,
