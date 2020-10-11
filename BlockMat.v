@@ -3799,7 +3799,7 @@ unfold so.
 now destruct (srng_eq_dec c1 0).
 Qed.
 
-Theorem polyn_degree_summation_ub : ∀ b e m f,
+Theorem polyn_degree_summation_ub : ∀ m b e f,
   polyn_degree (Σ (i = b, e), f i) ≤
   fold_left max (map polyn_degree (map f (seq b (S e - b)))) m.
 Proof.
@@ -3827,6 +3827,16 @@ destruct (le_dec
   apply Nat_le_fold_left_max.
   apply Nat.le_max_r.
 }
+Qed.
+
+Theorem polyn_degree_minus_one_pow : ∀ i,
+  polyn_degree (minus_one_pow i) = 0.
+Proof.
+intros.
+unfold polyn_degree.
+unfold polyn_degree_plus_1.
+unfold minus_one_pow.
+now destruct (i mod 2); cbn; rewrite if_1_eq_0.
 Qed.
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
@@ -3923,7 +3933,14 @@ split. {
       now destruct (srng_eq_dec (mat_el M 0 0)); cbn; rewrite if_1_eq_0.
     }
     clear x_a Hxa.
-    eapply le_lt_trans; [ apply polyn_degree_summation_ub | ].
+    eapply le_lt_trans; [ apply (polyn_degree_summation_ub 0) | ].
+    rewrite Nat.sub_succ, Nat.sub_0_r.
+    rewrite map_map.
+    erewrite map_ext_in. 2: {
+      intros i Hi.
+      rewrite polyn_degree_mul. 2: {
+        rewrite polyn_degree_mul. 2: {
+          rewrite polyn_degree_minus_one_pow.
 ...
 remember (S n) as sn.
 cbn - [ "-" ]; subst sn.
