@@ -3369,7 +3369,7 @@ now destruct (srng_eq_dec a 0).
 Qed.
 
 Theorem norm_polyn_list_app_last_nz : ∀ (la lb : list T),
-  last lb 0%Srng ≠ 0%Srng
+  last (la ++ lb) 0%Srng ≠ 0%Srng
   → norm_polyn_list (la ++ lb) = la ++ norm_polyn_list lb.
 Proof.
 intros * Hlb.
@@ -3378,33 +3378,53 @@ induction la as [| a]; intros; [ easy | ].
 cbn - [ norm_polyn_list ].
 rewrite List_cons_app.
 rewrite norm_polyn_list_app.
-rewrite IHla; [ | easy ].
-destruct lb as [| b]; [ easy | ].
-destruct la as [| a1]; [ | easy ].
-cbn - [ norm_polyn_list ].
-remember (norm_polyn_list (b :: lb)) as lc eqn:Hlc.
+remember (la ++ lb) as lc eqn:Hlc.
 symmetry in Hlc.
-destruct lc as [| c]; [ | easy ].
+destruct lc as [| c]. cbn. {
+  apply app_eq_nil in Hlc.
+  destruct Hlc; subst la lb.
+  cbn in Hlb |-*.
+  now destruct (srng_eq_dec a 0).
+}
+rewrite <- Hlc.
+rewrite IHla. 2: {
+  cbn in Hlb.
+  rewrite Hlc in Hlb.
+  now rewrite <- Hlc in Hlb.
+}
+destruct lb as [| b]. {
+  cbn in Hlb.
+  rewrite Hlc in Hlb.
+  rewrite app_nil_r in Hlc.
+  now rewrite Hlc.
+}
+destruct la as [| a1]; [ | easy ].
+cbn in Hlc.
+cbn - [ norm_polyn_list ].
+remember (norm_polyn_list (b :: lb)) as ld eqn:Hld.
+symmetry in Hld.
+destruct ld as [| d]; [ | easy ].
 exfalso; apply Hlb; clear Hlb.
-clear IHla.
-revert b Hlc.
+clear IHla Hlc.
+revert b Hld.
 induction lb as [| b1]; intros. {
-  cbn in Hlc.
+  cbn in Hld.
   now destruct (srng_eq_dec b 0%Rng).
 }
+cbn - [ last ].
 rewrite List_last_cons_cons.
 apply IHlb.
-cbn in Hlc |-*.
-apply List_eq_rev_l in Hlc.
+cbn in Hld |-*.
+apply List_eq_rev_l in Hld.
 apply List_eq_rev_r.
-rewrite strip_0s_app in Hlc.
-remember (strip_0s (rev lb ++ [b1])) as ld eqn:Hld.
-symmetry in Hld.
-now destruct ld.
+rewrite strip_0s_app in Hld.
+remember (strip_0s (rev lb ++ [b1])) as le eqn:Hle.
+symmetry in Hle.
+now destruct le.
 Qed.
 
 Theorem norm_polyn_list_cons : ∀ (a : T) la,
-  last la 0%Srng ≠ 0%Srng
+  last (a :: la) 0%Srng ≠ 0%Srng
   → norm_polyn_list (a :: la) = a :: norm_polyn_list la.
 Proof.
 intros * Hla.
@@ -3460,6 +3480,8 @@ rewrite norm_polyn_list_cons. {
   cbn - [ norm_polyn_list ].
   now rewrite IHla.
 }
+(**)
+rewrite List_last_cons_cons.
 clear - so Haz Hdeg.
 revert lb a1 b1 Haz Hdeg.
 induction la as [| a]; intros; [ easy | cbn ].
@@ -3527,6 +3549,7 @@ cbn in Hdeg.
 apply Nat.succ_lt_mono in Hdeg.
 specialize (IHla a1 b1 lb Hdeg HP).
 rewrite norm_polyn_list_cons; [ easy | ].
+rewrite List_last_cons_cons.
 clear - so sdp HP Hdeg.
 revert lb a1 b1 HP Hdeg.
 induction la as [| a]; intros; [ easy | cbn ].
@@ -3717,13 +3740,42 @@ induction la as [| a1]; intros. {
   apply -> Nat.succ_le_mono.
   now apply (IHlb b1).
 }
-...
-destruct la as [| a1]. {
-  cbn in Haz.
-  destruct lb as [| b]. {
+rewrite List_last_cons_cons in Haz.
+remember (a1 :: la) as lc.
+cbn - [ norm_polyn_list ].
+subst lc.
+destruct lb as [| b1]. {
+  rewrite polyn_list_add_0_r.
+  cbn in Hbz.
+  rewrite norm_polyn_list_cons; [ | easy ].
+  cbn - [ norm_polyn_list ] in IHla |-*.
+  apply -> Nat.succ_le_mono.
+  clear IHla.
+  revert a1 Haz.
+  induction la as [| a2]; intros. {
     cbn.
-    destruct srng
-    rewrite norm_polyn_list_cons.
+    now destruct (srng_eq_dec a1 0).
+  }
+  rewrite List_last_cons_cons in Haz.
+  rewrite norm_polyn_list_cons; [ | easy ].
+  cbn - [ norm_polyn_list ].
+  apply -> Nat.succ_le_mono.
+  now apply IHla.
+}
+rewrite List_last_cons_cons in Hbz.
+specialize (IHla _ _ _ Haz Hbz).
+apply Nat.succ_le_mono in IHla.
+etransitivity; [ | apply IHla ].
+remember ((a1 :: la) + (b1 :: lb))%PL as lc eqn:Hlc.
+remember (a + b)%Rng as c; clear a b Heqc.
+...
+rewrite norm_polyn_list_cons; [ easy | ].
+...
+etransitivity.
+...
+destruct (srng_eq_dec (last lc 0%Srng) 0) as [Hz| Hz]. 2: {
+  now rewrite norm_polyn_list_cons.
+}
 ...
 
 Theorem polyn_degree_summation_ub : ∀ b e m f,
