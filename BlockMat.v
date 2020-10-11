@@ -3705,8 +3705,6 @@ destruct la as [| a]. {
   apply -> Nat.succ_le_mono.
   apply length_norm_polyn_list_le.
 }
-(* essayer d'améliorer, ci-dessous *)
-...
 cbn - [ nth ] in Hla.
 destruct (srng_eq_dec (nth (length la) (a :: la) 0%Rng) 0)
   as [Haz| Haz]; [ easy | clear Hla ].
@@ -3740,8 +3738,8 @@ induction la as [| a1]; intros. {
     cbn in Hbz |-*.
     destruct (srng_eq_dec c 0); cbn; flia.
   }
-  rewrite List_last_cons_cons in Hbz.
   rewrite norm_polyn_list_cons; [ | easy ].
+  rewrite List_last_cons_cons in Hbz.
   remember (b1 :: lb) as lc; cbn; subst lc.
   apply -> Nat.succ_le_mono.
   now apply (IHlb b1).
@@ -3800,11 +3798,6 @@ cbn - [ norm_polyn_list ].
 unfold so.
 now destruct (srng_eq_dec c1 0).
 Qed.
-
-(* bon, c'était laborieux... faudrait voir si y a pas plus simple *)
-
-...
-
 
 Theorem polyn_degree_summation_ub : ∀ b e m f,
   polyn_degree (Σ (i = b, e), f i) ≤
