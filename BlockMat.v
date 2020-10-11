@@ -3669,6 +3669,19 @@ Proof.
 now cbn; rewrite if_1_eq_0.
 Qed.
 
+(* normalized list is smaller than the list *)
+
+Theorem length_norm_polyn_list_le : ∀ la,
+  length (norm_polyn_list la) ≤ length la.
+Proof.
+intros.
+induction la as [| a] using rev_ind; [ easy | ].
+rewrite norm_polyn_list_app; cbn.
+destruct (srng_eq_dec a 0) as [Haz| Haz]; [ cbn | easy ].
+etransitivity; [ apply IHla | ].
+rewrite app_length; flia.
+Qed.
+
 (* degree of sum and summation upper bound *)
 
 Theorem polyn_degree_add_ub : ∀ P Q,
@@ -3688,19 +3701,12 @@ destruct la as [| a]. {
   destruct (srng_eq_dec (nth (length lb) (b :: lb) 0%Srng) 0)
     as [| H]; [ easy | clear Hlb ].
   rewrite <- List_last_nth_cons in H.
-  revert b H.
-  induction lb as [| b1]; intros. {
-    cbn.
-    now destruct (srng_eq_dec b 0).
-  }
-  rewrite List_last_cons_cons in H.
-  rewrite norm_polyn_list_cons; [ | easy ].
-  remember (b1 :: lb) as lc.
-  cbn - [ norm_polyn_list ].
-  subst lc.
+  rewrite norm_polyn_list_cons; [ cbn | easy ].
   apply -> Nat.succ_le_mono.
-  now apply IHlb.
+  apply length_norm_polyn_list_le.
 }
+(* essayer d'améliorer, ci-dessous *)
+...
 cbn - [ nth ] in Hla.
 destruct (srng_eq_dec (nth (length la) (a :: la) 0%Rng) 0)
   as [Haz| Haz]; [ easy | clear Hla ].
@@ -3799,6 +3805,7 @@ Qed.
 
 ...
 
+
 Theorem polyn_degree_summation_ub : ∀ b e m f,
   polyn_degree (Σ (i = b, e), f i) ≤
   fold_left max (map polyn_degree (map f (seq b (S e - b)))) m.
@@ -3827,7 +3834,7 @@ destruct (le_dec
   apply Nat_le_fold_left_max.
   apply Nat.le_max_r.
 }
-...
+Qed.
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
    leading coefficient is 1 *)
@@ -3923,8 +3930,7 @@ split. {
       now destruct (srng_eq_dec (mat_el M 0 0)); cbn; rewrite if_1_eq_0.
     }
     clear x_a Hxa.
-...
-    eapply le_lt_trans; [ apply polyn_degree_summation_le | ].
+    eapply le_lt_trans; [ apply polyn_degree_summation_ub | ].
 ...
 remember (S n) as sn.
 cbn - [ "-" ]; subst sn.
