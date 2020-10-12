@@ -3702,6 +3702,15 @@ destruct lb as [| b]. {
   rewrite (proj1 (all_0_norm_polyn_list_map_0 _ _)); [ cbn; flia | ].
   intros i Hi.
   apply all_0_srng_summation_0.
+  intros j Hj.
+  destruct (i - j); cbn; apply srng_mul_0_r.
+}
+cbn - [ nth ] in Hlb.
+rewrite <- List_last_nth_cons in Hlb.
+destruct (srng_eq_dec (last (b :: lb) 0%Rng) 0%Rng) as [Hbz| Hbz]; [ easy | ].
+clear Hlb.
+cbn - [ norm_polyn_list ].
+rewrite Nat.sub_0_r.
 ...
 
 Search (polyn_list_convol_mul (_ :: _)).
