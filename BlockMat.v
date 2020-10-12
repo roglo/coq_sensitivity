@@ -4051,7 +4051,20 @@ split. {
     }
     erewrite map_ext_in. 2: {
       intros i Hi.
-      apply Nat.add_cancel_l.
+      apply in_seq in Hi.
+      replace (polyn_degree (mat_el PM 0 i)) with 0. 2: {
+        rewrite HPM.
+        destruct i; [ flia Hi | cbn ].
+        rewrite if_1_eq_0, if_0_eq_0; cbn.
+        rewrite srng_add_0_l, srng_mul_0_l.
+        rewrite if_0_eq_0; cbn.
+        destruct (srng_eq_dec (mat_el M 0 (S i)) 0) as [Hmz| Hmz]; [ easy | ].
+        cbn.
+        destruct (srng_eq_dec (- mat_el M 0 (S i))%Rng 0) as [H| H]; [ easy | ].
+        now rewrite rev_length.
+      }
+      now rewrite Nat.add_0_r.
+    }
 ...
 Search (det_loop (subm _ _)).
 Search (polyn_degree (det_loop _ _)).
