@@ -3684,19 +3684,29 @@ unfold "*"%PL.
 destruct la as [| a]. {
   clear Hla.
   unfold polyn_list_convol_mul.
-  erewrite map_ext_in. 2: {
-    intros i Hi.
-    apply in_seq in Hi.
-    cbn in Hi.
-    rewrite all_0_srng_summation_0. 2: {
-      intros j Hj.
-      destruct j; cbn; apply srng_mul_0_l.
-    }
-    easy.
-  }
   rewrite (proj1 (all_0_norm_polyn_list_map_0 _ _)); [ cbn; flia | ].
-  easy.
+  intros i Hi; cbn in Hi.
+  apply all_0_srng_summation_0.
+  intros j Hj.
+  destruct j; cbn; apply srng_mul_0_l.
 }
+cbn - [ nth ] in Hla.
+rewrite <- List_last_nth_cons in Hla.
+destruct (srng_eq_dec (last (a :: la) 0%Rng) 0%Rng) as [Haz| Haz]; [ easy | ].
+clear Hla.
+cbn - [ norm_polyn_list ].
+do 2 rewrite Nat.sub_0_r.
+destruct lb as [| b]. {
+  clear Hlb.
+  unfold polyn_list_convol_mul.
+  rewrite (proj1 (all_0_norm_polyn_list_map_0 _ _)); [ cbn; flia | ].
+  intros i Hi.
+  apply all_0_srng_summation_0.
+...
+
+Search (polyn_list_convol_mul (_ :: _)).
+unfold so.
+specialize (map_polyn_list_convol_mul_cons_l a la lb) as H.
 ...
 
 (* degree of monomial "x" *)
