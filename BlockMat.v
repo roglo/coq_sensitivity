@@ -4026,12 +4026,23 @@ split. {
     eapply le_lt_trans; [ apply (polyn_degree_summation_ub 0) | ].
     rewrite Nat.sub_succ, Nat.sub_0_r.
     rewrite map_map.
-    eapply le_lt_trans. {
+    apply Nat.lt_succ_r.
+    etransitivity. {
       apply List_fold_left_max_map_le.
       intros i Hi.
       apply polyn_degree_mul_le.
     }
-Search (fold_left max).
+    etransitivity. {
+      eapply List_fold_left_max_map_le.
+      intros i Hi.
+      apply Nat.add_le_mono_r.
+      apply polyn_degree_mul_le.
+    }
+    erewrite map_ext_in. 2: {
+      intros i Hi.
+      apply Nat.add_cancel_l.
+Search (det_loop (subm _ _)).
+Search (polyn_degree (det_loop _ _)).
 ...
     erewrite map_ext_in. 2: {
       intros i Hi.
