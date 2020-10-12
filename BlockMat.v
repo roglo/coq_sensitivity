@@ -3936,13 +3936,15 @@ split. {
     eapply le_lt_trans; [ apply (polyn_degree_summation_ub 0) | ].
     rewrite Nat.sub_succ, Nat.sub_0_r.
     rewrite map_map.
+...
+(* ouais, c'est un peu compliqué : polyn_degree_mul ne fonctionne
+   que si le produit des coefficients du plus haut degré n'est pas
+   nul. *)
     erewrite map_ext_in. 2: {
       intros i Hi.
       apply in_seq in Hi.
       destruct i; [ flia Hi | ].
 (* deg ((-1)^(i+1) * (x I - M)_{0,i+1} * dét ((x I - M) \ {0, i+1})) *)
-Check polyn_degree_mul.
-...
       rewrite polyn_degree_mul. 2: {
         rewrite polyn_degree_mul. 2: {
           rewrite polyn_degree_minus_one_pow.
