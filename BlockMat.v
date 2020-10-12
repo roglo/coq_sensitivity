@@ -3941,6 +3941,30 @@ split. {
       rewrite polyn_degree_mul. 2: {
         rewrite polyn_degree_mul. 2: {
           rewrite polyn_degree_minus_one_pow.
+          replace (polyn_degree (mat_el PM 0 1)) with 1. 2: {
+            rewrite HPM.
+            cbn.
+            rewrite if_1_eq_0, if_0_eq_0; cbn.
+            rewrite srng_add_0_l, srng_mul_0_l.
+            rewrite if_0_eq_0; cbn.
+            destruct (srng_eq_dec (mat_el M 0 1) 0) as [Hmz| Hmz]. {
+              cbn.
+              clear i Hi.
+rewrite HPM in Hdeg; cbn in Hdeg.
+destruct n. {
+  cbn in Hdeg.
+  do 2 rewrite if_1_eq_0 in Hdeg; cbn in Hdeg.
+  rewrite srng_add_0_l, srng_mul_0_l, srng_mul_1_l in Hdeg.
+  rewrite srng_add_0_l, srng_mul_0_l in Hdeg.
+  rewrite srng_add_0_l in Hdeg.
+  rewrite if_1_eq_0 in Hdeg; cbn in Hdeg.
+  destruct (srng_eq_dec (mat_el M 1 1) 0) as [Hm1z| Hm1z]. {
+    cbn in Hdeg.
+    rewrite if_1_eq_0 in Hdeg.
+    cbn in Hdeg.
+    cbn in Hcoeff.
+    rewrite HPM in Hcoeff.
+    cbn in Hcoeff.
 ...
 remember (S n) as sn.
 cbn - [ "-" ]; subst sn.
