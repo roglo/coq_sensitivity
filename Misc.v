@@ -1237,6 +1237,16 @@ rewrite <- Nat.add_1_r.
 now rewrite seq_app.
 Qed.
 
+Theorem List_seq_eq_nil : ∀ b e, seq b e = [] → e ≤ b.
+Proof.
+intros.
+revert b H.
+induction e; intros; [ cbn; flia | ].
+destruct b; [ easy | ].
+apply -> Nat.succ_le_mono.
+now apply IHe.
+Qed.
+
 Theorem List_firstn_seq : ∀ n start len,
   firstn n (seq start len) = seq start (min n len).
 Proof.

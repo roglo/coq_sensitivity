@@ -3712,10 +3712,27 @@ clear Hlb.
 cbn - [ norm_polyn_list ].
 rewrite Nat.sub_0_r.
 rewrite Nat.add_succ_r.
+cbn - [ norm_polyn_list ].
+rewrite srng_add_0_l.
+remember (_ :: _) as l in |-*.
+destruct (srng_eq_dec (last l 0%Srng) 0) as [Hlab| Hlab]. 2: {
+  subst l.
+  rewrite norm_polyn_list_cons; [ | easy ].
+  cbn; rewrite Nat.sub_0_r.
+  rewrite norm_polyn_list_id. {
+    now rewrite map_length, seq_length.
+  }
+  remember (_ :: _) as l in Hlab.
+  symmetry in Heql.
+  destruct l as [| x]; [ easy | ].
+  injection Heql; clear Heql; intros Hl Hab; subst x.
+  rewrite Hl.
+  destruct l as [| x]. {
+    apply map_eq_nil in Hl.
+    cbn in Hlab.
+Check map_eq_nil.
 ...
-Search (polyn_list_convol_mul (_ :: _)).
-unfold so.
-specialize (map_polyn_list_convol_mul_cons_l a la lb) as H.
+    apply List_seq_eq_nil in Hl.
 ...
 
 (* degree of monomial "x" *)
