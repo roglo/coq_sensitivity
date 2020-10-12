@@ -3711,8 +3711,8 @@ destruct (srng_eq_dec (last (b :: lb) 0%Rng) 0%Rng) as [Hbz| Hbz]; [ easy | ].
 clear Hlb.
 cbn - [ norm_polyn_list ].
 rewrite Nat.sub_0_r.
+rewrite Nat.add_succ_r.
 ...
-
 Search (polyn_list_convol_mul (_ :: _)).
 unfold so.
 specialize (map_polyn_list_convol_mul_cons_l a la lb) as H.
