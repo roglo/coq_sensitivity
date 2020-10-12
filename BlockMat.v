@@ -4043,6 +4043,7 @@ split. {
       apply Nat.add_cancel_l.
 Search (det_loop (subm _ _)).
 Search (polyn_degree (det_loop _ _)).
+Search (polyn_degree (determinant _)).
 ...
     erewrite map_ext_in. 2: {
       intros i Hi.
