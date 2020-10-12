@@ -3719,6 +3719,22 @@ destruct (srng_eq_dec (last l 0%Srng) 0) as [Hlab| Hlab]. 2: {
   subst l.
   rewrite norm_polyn_list_cons; [ | easy ].
   cbn; rewrite Nat.sub_0_r.
+(**)
+  remember (_ :: _) as l in Hlab.
+  symmetry in Heql.
+  destruct l as [| x]; [ easy | ].
+  injection Heql; clear Heql; intros Hl Hab; subst x.
+  rewrite Hl.
+  destruct l as [| x]; [ cbn; flia | ].
+  rewrite List_last_cons_cons in Hlab.
+  rewrite norm_polyn_list_id; [ | easy ].
+...
+  remember (length la + length lb) as len eqn:Hlen.
+  symmetry in Hlen.
+  clear - Hl Hlen.
+  destruct len; [ easy | ].
+  induction len; [ now rewrite <- Hl | ].
+...
   rewrite norm_polyn_list_id. {
     now rewrite map_length, seq_length.
   }
