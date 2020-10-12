@@ -3662,6 +3662,19 @@ destruct (zerop (length lb)) as [Hzlb| Hzlb]. {
 flia Hzla Hzlb.
 Qed.
 
+Theorem norm_polyn_list_length_le : ∀ la,
+  length (norm_polyn_list la) ≤ length la.
+Proof.
+intros.
+induction la as [| a] using rev_ind; [ easy | ].
+rewrite norm_polyn_list_app, app_length; cbn.
+destruct (srng_eq_dec a 0%Srng) as [Hz| Hz]. {
+  cbn; flia IHla.
+}
+cbn.
+now rewrite app_length.
+Qed.
+
 Theorem polyn_degree_mul_le : ∀ P Q,
   polyn_degree (P * Q) ≤ polyn_degree P + polyn_degree Q.
 Proof.
@@ -3728,38 +3741,16 @@ destruct (srng_eq_dec (last l 0%Srng) 0) as [Hlab| Hlab]. 2: {
   destruct l as [| x]; [ cbn; flia | ].
   rewrite List_last_cons_cons in Hlab.
   rewrite norm_polyn_list_id; [ | easy ].
-...
-  remember (length la + length lb) as len eqn:Hlen.
-  symmetry in Hlen.
-  clear - Hl Hlen.
-  destruct len; [ easy | ].
-  induction len; [ now rewrite <- Hl | ].
-...
-  rewrite norm_polyn_list_id. {
-    now rewrite map_length, seq_length.
-  }
-  remember (_ :: _) as l in Hlab.
-  symmetry in Heql.
-  destruct l as [| x]; [ easy | ].
-  injection Heql; clear Heql; intros Hl Hab; subst x.
-  rewrite Hl.
-  destruct l as [| x]. {
-    apply map_eq_nil in Hl.
-    cbn in Hlab.
-    apply List_seq_eq_nil in Hl.
-    destruct (Nat.eq_dec (length la) 0) as [Hla| Hla]. {
-      rewrite Hla in Hl; cbn in Hl.
-      apply length_zero_iff_nil in Hla; subst la.
-      cbn in Haz, Hzz.
-      destruct (Nat.eq_dec (length lb) 0) as [Hlb| Hlb]. {
-        now apply length_zero_iff_nil in Hlb; subst lb.
-      }
-      destruct (Nat.eq_dec (length lb) 1) as [Hl1| Hl1]; [ | flia Hl1 Hl Hlb ].
-      destruct lb as [| b']; [ easy | ].
-      destruct lb as [| b'']; [ | easy ].
-      cbn in Hbz, Hzz.
-(* ah bin zut alors, marche pas *)
-...
+  rewrite <- Hl.
+  now rewrite map_length, seq_length.
+}
+etransitivity; [ apply Nat.sub_le_mono_r, norm_polyn_list_length_le | ].
+rewrite Heql; cbn.
+rewrite map_length, seq_length.
+now rewrite Nat.sub_0_r.
+Qed.
+
+Inspect 1.
 
 (* degree of monomial "x" *)
 
@@ -4035,18 +4026,12 @@ split. {
     eapply le_lt_trans; [ apply (polyn_degree_summation_ub 0) | ].
     rewrite Nat.sub_succ, Nat.sub_0_r.
     rewrite map_map.
-Check polyn_degree_mul.
-...
+    eapply le_lt_trans. {
+      apply List_fold_left_max_map_le.
+      intros i Hi.
+      apply polyn_degree_mul_le.
+    }
 Search (fold_left max).
-Theorem glip : ∀ A (l : list A) d f g,
-  (∀ i, i ∈ l → f i ≤ g i)
-  → fold_left max (map f l) d ≤ fold_left max (map g l) d.
-Admitted.
-eapply le_lt_trans. {
-  apply glip.
-  intros i Hi.
-  apply glop.
-}
 ...
     erewrite map_ext_in. 2: {
       intros i Hi.

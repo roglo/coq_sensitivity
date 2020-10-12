@@ -1502,6 +1502,24 @@ cbn; rewrite IHl.
 now rewrite Nat.mul_shuffle0.
 Qed.
 
+Theorem List_fold_left_max_map_le : ∀ A (l : list A) d f g,
+  (∀ i, i ∈ l → f i ≤ g i)
+  → fold_left max (map f l) d ≤ fold_left max (map g l) d.
+Proof.
+intros A * Hfg.
+revert d.
+induction l as [| a]; intros; [ easy | cbn ].
+etransitivity. {
+  apply IHl.
+  intros i Hi.
+  now apply Hfg; right.
+}
+apply Nat_fold_left_max_le.
+apply Nat.max_le_compat_l.
+apply Hfg.
+now left.
+Qed.
+
 Theorem List_firstn_map {A B} : ∀ n l (f : A → B),
   firstn n (map f l) = map f (firstn n l).
 Proof.
