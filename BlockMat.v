@@ -3940,6 +3940,9 @@ split. {
       intros i Hi.
       apply in_seq in Hi.
       destruct i; [ flia Hi | ].
+(* deg ((-1)^(i+1) * (x I - M)_{0,i+1} * dét ((x I - M) \ {0, i+1})) *)
+Check polyn_degree_mul.
+...
       rewrite polyn_degree_mul. 2: {
         rewrite polyn_degree_mul. 2: {
           rewrite polyn_degree_minus_one_pow.
