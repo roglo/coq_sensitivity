@@ -3730,9 +3730,19 @@ destruct (srng_eq_dec (last l 0%Srng) 0) as [Hlab| Hlab]. 2: {
   destruct l as [| x]. {
     apply map_eq_nil in Hl.
     cbn in Hlab.
-Check map_eq_nil.
-...
     apply List_seq_eq_nil in Hl.
+    destruct (Nat.eq_dec (length la) 0) as [Hla| Hla]. {
+      rewrite Hla in Hl; cbn in Hl.
+      apply length_zero_iff_nil in Hla; subst la.
+      cbn in Haz, Hzz.
+      destruct (Nat.eq_dec (length lb) 0) as [Hlb| Hlb]. {
+        now apply length_zero_iff_nil in Hlb; subst lb.
+      }
+      destruct (Nat.eq_dec (length lb) 1) as [Hl1| Hl1]; [ | flia Hl1 Hl Hlb ].
+      destruct lb as [| b']; [ easy | ].
+      destruct lb as [| b'']; [ | easy ].
+      cbn in Hbz, Hzz.
+(* ah bin zut alors, marche pas *)
 ...
 
 (* degree of monomial "x" *)
