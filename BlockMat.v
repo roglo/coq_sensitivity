@@ -4040,7 +4040,19 @@ split. {
     }
     erewrite map_ext_in. 2: {
       intros i Hi.
+      rewrite Nat.add_comm, Nat.add_assoc.
+      rewrite Nat.add_shuffle0.
       apply Nat.add_cancel_l.
+      apply polyn_degree_minus_one_pow.
+    }
+    erewrite map_ext_in. 2: {
+      intros i Hi.
+      apply Nat.add_0_r.
+    }
+    erewrite map_ext_in. 2: {
+      intros i Hi.
+      apply Nat.add_cancel_l.
+...
 Search (det_loop (subm _ _)).
 Search (polyn_degree (det_loop _ _)).
 Search (polyn_degree (determinant _)).
