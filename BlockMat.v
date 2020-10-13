@@ -3929,10 +3929,164 @@ unfold minus_one_pow.
 now destruct (i mod 2); cbn; rewrite if_1_eq_0.
 Qed.
 
+Theorem polyn_degree_mat_el_xI_sub_M_0_0 : ∀ M,
+  polyn_degree (mat_el (xI_sub_M M) 0 0) = 1.
+Proof.
+intros.
+cbn; rewrite if_1_eq_0; cbn.
+cbn; rewrite if_1_eq_0; cbn.
+rewrite srng_add_0_l, srng_mul_0_l, srng_mul_1_l.
+rewrite srng_add_0_l, srng_mul_0_l.
+rewrite srng_add_0_l.
+rewrite if_1_eq_0; cbn.
+now destruct (srng_eq_dec (mat_el M 0 0) 0); cbn; rewrite if_1_eq_0.
+Qed.
+
+Theorem polyn_coeff_add : ∀ P Q i,
+  polyn_coeff (P + Q)%P i = (polyn_coeff P i + polyn_coeff Q i)%Srng.
+Proof.
+intros (la, Hla) (lb, Hlb) i; cbn.
+move lb before la.
+destruct la as [| a]. {
+  clear Hla.
+  replace (nth i 0%PL 0%Rng) with 0%Rng by now destruct i.
+  rewrite polyn_list_add_0_l, srng_add_0_l.
+  induction lb as [| b] using rev_ind; [ easy | ].
+  cbn in Hlb |-*.
+  rewrite app_length, Nat.add_comm in Hlb; cbn in Hlb.
+  rewrite app_nth2 in Hlb; [ | now unfold ge ].
+  rewrite Nat.sub_diag in Hlb; cbn in Hlb.
+  rewrite rev_app_distr; cbn.
+  destruct (srng_eq_dec b 0) as [Hbz| Hbz]; [ easy | ].
+  now cbn; rewrite rev_involutive.
+}
+cbn - [ nth ] in Hla.
+rewrite <- List_last_nth_cons in Hla.
+destruct (srng_eq_dec (last (a :: la) 0%Rng) 0) as [Haz| Haz]; [ easy | ].
+clear Hla.
+...
+
+Theorem glop : ∀ M,
+  polyn_degree (determinant (xI_sub_M M)) = mat_nrows M.
+Proof.
+intros.
+cbn.
+remember (mat_nrows M) as n eqn:Hn; symmetry in Hn.
+revert M Hn.
+induction n; intros; [ easy | ].
+cbn - [ xI_sub_M summation ].
+destruct n. {
+  cbn - [ polyn_degree ].
+  rewrite polyn_mul_1_r.
+  rewrite polyn_degree_add. 2: {
+    cbn; rewrite if_1_eq_0; cbn.
+    destruct (srng_eq_dec (mat_el M 0 0) 0); cbn; flia.
+  }
+  apply polyn_degree_monom.
+}
+rewrite srng_summation_split_first; [ | flia ].
+cbn - [ minus_one_pow mat_el xI_sub_M det_loop polyn_degree summation ].
+rewrite polyn_degree_add. 2: {
+  rewrite polyn_degree_mul. 2: {
+    rewrite polyn_degree_mul. 2: {
+      cbn - [ polyn_degree xI_sub_M ].
+      rewrite if_1_eq_0.
+      remember (polyn_degree 1) as x; cbn in Heqx; subst x.
+      rewrite if_1_eq_0.
+      cbn - [ polyn_degree xI_sub_M ].
+      rewrite srng_mul_1_l.
+      rewrite polyn_degree_mat_el_xI_sub_M_0_0.
+      cbn; do 2 rewrite if_1_eq_0; cbn.
+      rewrite srng_add_0_l, srng_mul_0_l, srng_mul_1_l.
+      rewrite srng_add_0_l, srng_mul_0_l.
+      rewrite srng_add_0_l.
+      rewrite if_1_eq_0; cbn.
+      destruct (srng_eq_dec (mat_el M 0 0));
+        cbn; rewrite if_1_eq_0; cbn;
+          apply srng_1_neq_0.
+    }
+    rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
+    rewrite polyn_degree_mat_el_xI_sub_M_0_0.
+    rewrite submatrix_xI_sub_M.
+    rewrite IHn; [ | cbn; flia Hn ].
+    replace (polyn_coeff _ _) with 1%Rng. 2: {
+      cbn; rewrite if_1_eq_0; cbn.
+      rewrite if_1_eq_0; cbn.
+      rewrite srng_add_0_l, srng_mul_0_l, srng_mul_1_l.
+      rewrite srng_add_0_l, srng_mul_0_l.
+      rewrite srng_add_0_l.
+      rewrite if_1_eq_0; cbn.
+      destruct (srng_eq_dec (mat_el M 0 0)) as [Hmz| Hmz]. {
+        cbn; rewrite if_1_eq_0; cbn.
+        rewrite srng_add_0_l, srng_mul_0_l, srng_mul_1_l.
+        rewrite srng_add_0_r, srng_add_0_l, srng_mul_0_r.
+        now rewrite if_1_eq_0.
+      } {
+        cbn; rewrite if_1_eq_0; cbn.
+        rewrite srng_add_0_l, srng_mul_0_l, srng_mul_1_l.
+        rewrite srng_add_0_r, srng_add_0_l, srng_mul_1_l.
+        rewrite srng_add_0_l.
+        now rewrite if_1_eq_0.
+      }
+    }
+    rewrite srng_mul_1_l.
+    cbn - [ summation xI_sub_M ].
+    destruct n. {
+      cbn; rewrite if_1_eq_0; cbn.
+      cbn; rewrite if_1_eq_0; cbn.
+      rewrite srng_add_0_l, srng_mul_0_l, srng_mul_1_l.
+      rewrite srng_add_0_l, srng_mul_0_l.
+      rewrite srng_add_0_l.
+      rewrite if_1_eq_0; cbn.
+      destruct (srng_eq_dec (mat_el M 1 1) 0);
+        cbn; rewrite if_1_eq_0; cbn; apply srng_1_neq_0.
+    }
+    rewrite srng_summation_split_first; [ | flia ].
+...
+cbn - [ polyn_coeff xI_sub_M det_loop summation ].
+rewrite srng_mul_1_l.
+rewrite polyn_coeff_add.
+...
+Search polyn_coeff.
+    cbn - [ minus_one_pow mat_el xI_sub_M det_loop polyn_degree summation ].
+...
+    cbn - [ subm summation polyn_add det_loop ].
+    rewrite polyn_mul_1_l.
+    rewrite polyn_mul_1_
+    rewrite polyn_degree_add. 2: {
+  rewrite submatrix_xI_sub_M.
+...
+
+Theorem glop : ∀ M i j n,
+  i < n → j < n →
+  polyn_degree (det_loop (subm (xI_sub_M M) i j) (S n)) =
+    if Nat.eq_dec i j then S n else n.
+Proof.
+intros * Hi Hj.
+destruct n; [ easy | ].
+cbn - [ polyn_degree subm summation ].
+destruct n. {
+  apply Nat.lt_1_r in Hi.
+  apply Nat.lt_1_r in Hj.
+  subst i j.
+  cbn - [ polyn_degree subm ].
+  rewrite srng_add_0_l, srng_mul_1_l.
+...
+  rewrite polyn_mul_1_r.
+  do 4 rewrite fold_polyn_sub.
+  destruct (lt_dec 0 i) as [Hzi| Hzi]. {
+    destruct (lt_dec 0 j) as [Hzj| Hzj]. {
+      cbn; rewrite if_1_eq_0; cbn.
+      destruct (srng_eq_dec (mat_el M 0 0) 0) as [Hmz| Hmz]. {
+        cbn; rewrite if_1_eq_0; cbn.
+
+...
+
 Theorem glop : ∀ M i,
   polyn_degree (determinant (subm (xI_sub_M M) i i)) = mat_nrows M - 1.
 Proof.
 intros.
+cbn.
 remember (mat_nrows M) as n eqn:Hn; symmetry in Hn.
 revert M i Hn.
 induction n; intros; cbn; [ now rewrite Hn | ].
