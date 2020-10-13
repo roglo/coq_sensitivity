@@ -3936,7 +3936,7 @@ intros.
 cbn.
 remember (mat_nrows M) as n eqn:Hn.
 symmetry in Hn.
-revert i M Hn.
+revert M i Hn.
 induction n; intros; [ easy | cbn ].
 rewrite Nat.sub_0_r.
 destruct n; [ easy | ].
@@ -4004,8 +4004,68 @@ destruct (zerop i) as [Hiz| Hiz]. {
   }
   rewrite Nat.add_0_r.
   subst i.
+...
 Search (fold_left max).
 Check submatrix_xI_sub_M.
+Theorem toto : ∀ A (M : matrix A) i j k l,
+  subm (subm M i j) k l =
+    subm (subm M k l)
+      (if lt_dec k i then i - 1 else i)
+      (if lt_dec l j then j - 1 else j).
+Proof.
+intros A *.
+destruct (lt_dec k i) as [Hki| Hki]. {
+  destruct (lt_dec l j) as [Hlj| Hlj]. {
+    apply matrix_eq; [ easy | easy | ].
+    intros m n Hm Hn.
+    cbn in Hm, Hn; cbn.
+...
+rewrite (toto _ 0 1).
+cbn - [ fold_left polyn_degree det_loop subm ].
+...
+specialize (IHn (subm M 0 0)) as H1.
+remember (subm M 0 0) as M'.
+...
+intros A *.
+apply matrix_eq; [ easy | easy | ].
+intros m n Hm Hn.
+cbn in Hm, Hn.
+destruct (lt_dec k i) as [Hki| Hki]. {
+(*
+  replace i with (S k + (i - S k)) by flia Hki.
+  remember (i - S k) as dk.
+  clear i Hki Heqdk.
+  rewrite Nat.add_sub_swap; [ | flia ].
+  rewrite Nat.sub_succ, Nat.sub_0_r.
+*)
+  destruct (lt_dec l j) as [Hlj| Hlj]. {
+(*
+    replace j with (S l + (j - S l)) by flia Hlj.
+    remember (j - S l) as dl.
+    clear j Hlj Heqdl.
+    rewrite Nat.add_sub_swap; [ | flia ].
+    rewrite Nat.sub_succ, Nat.sub_0_r.
+*)
+...
+
+(*
+destruct (lt_dec m k), (lt_dec n l), (lt_dec m i), (lt_dec n l), (lt_dec n j), (lt_dec k i), (lt_dec m (i - 1));
+try easy.
+*)
+...
+destruct (lt_dec m i) as [Hmi| Hmi]. {
+  destruct (lt_dec n l) as [Hnl| Hnl]. {
+    destruct (lt_dec n j) as [Hnj| Hnj]. {
+      destruct (lt_dec m k) as [Hmk| Hmk]. {
+        destruct (lt_dec (n + 1) l) as [Hn1l| Hn1l]. {
+          destruct (lt_dec (m + 1) k) as [Hm1k| Hm1k]. {
+            destruct (lt_dec k  k) as [Hm1k| Hm1k]. {
+...
+      apply Nat.nlt_ge in Hm1i.
+      destruct (lt_dec m k) as [Hmk| Hmk]; [ easy | ].
+      apply Nat.nlt_ge in Hmk.
+      replace i with (m + 1) in * by flia Hmi Hm1i.
+      clear Hmi Hm1i.
 ...
 replace (polyn_degree (mat_el (subm (xI_sub_M M) 0 (S i)) 0 1)) with 1. 2: {
   cbn.
