@@ -3983,11 +3983,11 @@ rewrite HPM in Hxa; cbn in Hxa.
 unfold so in Hxa.
 rewrite srng_mul_1_r in Hxa.
 rewrite fold_polyn_sub in Hxa.
-specialize (IHn (subm M 0 0) (subm PM 0 0)).
-specialize (IHn (det_loop (subm PM 0 0) (S n))).
-rewrite submatrix_nrows, Hn in IHn.
-rewrite Nat.sub_succ, Nat.sub_0_r in IHn.
-specialize (IHn eq_refl).
+specialize (IHn (subm M 0 0) (subm PM 0 0)) as H1.
+specialize (H1 (det_loop (subm PM 0 0) (S n))).
+rewrite submatrix_nrows, Hn in H1.
+rewrite Nat.sub_succ, Nat.sub_0_r in H1.
+specialize (H1 eq_refl).
 assert (H : subm PM 0 0 = (_x × m2mm (mI (S n)) - m2mm (subm M 0 0))%M). {
   rewrite HPM.
   rewrite submatrix_sub.
@@ -3995,8 +3995,8 @@ assert (H : subm PM 0 0 = (_x × m2mm (mI (S n)) - m2mm (subm M 0 0))%M). {
   rewrite submatrix_m2mm.
   now rewrite submatrix_mI.
 }
-specialize (IHn H eq_refl); clear H.
-destruct IHn as (Hcoeff, Hdeg).
+specialize (H1 H eq_refl); clear H.
+destruct H1 as (Hcoeff, Hdeg).
 split. {
   subst CP.
   apply is_monic_polyn_add. {
@@ -4065,6 +4065,17 @@ split. {
       }
       now rewrite Nat.add_0_r.
     }
+    erewrite map_ext_in. 2: {
+      intros i Hi.
+      replace (det_loop _ _) with (determinant (subm PM 0 i)). 2: {
+        unfold determinant; f_equal.
+        now rewrite HPM.
+      }
+      easy.
+    }
+Search (fold_left _ (map _ _)).
+    rewrite List_fold_left_map.
+}
 ...
 Search (det_loop (subm _ _)).
 Search (polyn_degree (det_loop _ _)).
