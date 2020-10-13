@@ -3977,6 +3977,9 @@ erewrite map_ext_in. 2: {
 }
 (**)
 replace (S (S n)) with (1 + (1 + n)) by easy.
+rewrite Nat.sub_succ, Nat.sub_0_r in IHn.
+do 2 rewrite Nat.sub_succ in IHn.
+rewrite Nat.sub_0_r in IHn.
 do 2 rewrite seq_app.
 do 2 rewrite map_app.
 cbn - [ det_loop subm app ].
@@ -3989,6 +3992,20 @@ replace (polyn_degree (mat_el (subm (xI_sub_M M) 0 (S i)) 0 0)) with 0. 2: {
   now destruct (srng_eq_dec (- mat_el M 1 0)%Rng 0).
 }
 rewrite Nat.add_0_r.
+destruct (zerop i) as [Hiz| Hiz]. {
+  replace (polyn_degree (mat_el (subm (xI_sub_M M) 0 (S i)) 0 1)) with 0. 2: {
+    subst i; cbn.
+    rewrite if_1_eq_0; cbn.
+    rewrite if_0_eq_0; cbn.
+    rewrite srng_add_0_l, srng_mul_0_l.
+    rewrite if_0_eq_0; cbn.
+    destruct (srng_eq_dec (mat_el M 1 2) 0); [ easy | cbn ].
+    now destruct (srng_eq_dec (- mat_el M 1 2)%Rng 0).
+  }
+  rewrite Nat.add_0_r.
+  subst i.
+Search (fold_left max).
+...
 replace (polyn_degree (mat_el (subm (xI_sub_M M) 0 (S i)) 0 1)) with 1. 2: {
   cbn.
   destruct (lt_dec 1 (S i)) as [H1i| H1i]. {
@@ -3999,6 +4016,8 @@ replace (polyn_degree (mat_el (subm (xI_sub_M M) 0 (S i)) 0 1)) with 1. 2: {
     rewrite if_1_eq_0.
     now destruct (srng_eq_dec (mat_el M 1 1) 0); cbn; rewrite if_1_eq_0.
   }
+  apply Nat.nlt_ge in H1i.
+...
   clear i H1i.
   cbn; rewrite if_1_eq_0, if_0_eq_0; cbn.
   rewrite srng_add_0_l, srng_mul_0_l.
