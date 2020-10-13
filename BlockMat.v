@@ -3982,9 +3982,18 @@ rename lc into la.
 remember (b :: lb) as lc; clear b lb Heqlc.
 rename lc into lb.
 move lb before la.
+clear Hbz.
 revert la Haz.
+induction lb as [| b] using rev_ind; intros. {
+  cbn.
+  rewrite polyn_list_add_0_r.
+  rewrite norm_polyn_list_id; [ | easy ].
+  now destruct i; rewrite srng_add_0_r.
+}
+(*
 induction lb as [| b] using rev_ind; intros; [ easy | ].
 rewrite List_last_app in Hbz.
+*)
 rewrite polyn_list_add_app_r.
 destruct (lt_dec (length la) (length lb)) as [Hll| Hll]. {
   rewrite firstn_skipn_rev.
@@ -3997,7 +4006,26 @@ destruct (lt_dec (length la) (length lb)) as [Hll| Hll]. {
   }
   rewrite polyn_list_add_0_l.
   rewrite norm_polyn_list_app; cbn.
+  destruct (srng_eq_dec b 0) as [H| H]. {
+    cbn; subst b.
+    rewrite IHlb; [ | easy ].
+    destruct (lt_dec i (length lb)) as [Hilb| Hilb]. {
+      now rewrite app_nth1.
+    }
+    apply Nat.nlt_ge in Hilb.
+    rewrite (nth_overflow lb); [ | easy ].
+    destruct (Nat.eq_dec i (length lb)) as [Hib| Hib]. {
+      rewrite app_nth2; [ | flia Hib ].
+      now rewrite Hib, Nat.sub_diag.
+    }
+    rewrite (nth_overflow (lb ++ _)); [ easy | ].
+    rewrite app_length; cbn.
+    flia Hilb Hib.
+  }
+  cbn.
+(*
   destruct (srng_eq_dec b 0) as [H| H]; [ easy | clear H; cbn ].
+*)
   destruct (lt_dec i (length lb)) as [Hib| Hib]. {
     rewrite app_nth1. 2: {
       rewrite polyn_list_add_length.
@@ -4019,6 +4047,53 @@ destruct (lt_dec (length la) (length lb)) as [Hll| Hll]. {
   }
 } {
   apply Nat.nlt_ge in Hll.
+  destruct (Nat.eq_dec (length la) (length lb)) as [Hell| Hell]. {
+    rewrite <- Hell.
+    rewrite firstn_all.
+    rewrite skipn_all.
+    rewrite polyn_list_add_0_l.
+    destruct (srng_eq_dec b 0) as [Hbz| Hbz]. {
+      subst b.
+      rewrite norm_polyn_list_app; cbn.
+      destruct (srng_eq_dec 0 0) as [H| H]; [ clear H; cbn | easy ].
+      rewrite IHlb; [ | easy ].
+      destruct (lt_dec i (length lb)) as [Hilb| Hilb]. {
+        now rewrite app_nth1.
+      }
+      apply Nat.nlt_ge in Hilb.
+      rewrite (nth_overflow lb); [ | easy ].
+      destruct (Nat.eq_dec i (length lb)) as [Hib| Hib]. {
+        rewrite app_nth2; [ | flia Hib ].
+        now rewrite Hib, Nat.sub_diag.
+      }
+      rewrite (nth_overflow (lb ++ _)); [ easy | ].
+      rewrite app_length; cbn.
+      flia Hilb Hib.
+    }
+    rewrite norm_polyn_list_id; [ | now rewrite List_last_app ].
+    destruct (lt_dec i (length lb)) as [Hilb| Hilb]. {
+      rewrite app_nth1. 2: {
+        rewrite polyn_list_add_length.
+        rewrite max_r; [ easy | now rewrite Hell ].
+      }
+      rewrite app_nth1; [ | easy ].
+      apply list_polyn_nth_add.
+    }
+    apply Nat.nlt_ge in Hilb.
+    rewrite app_nth2. 2: {
+      rewrite polyn_list_add_length.
+      rewrite max_l; [ | easy ].
+      now rewrite Hell.
+    }
+    rewrite app_nth2; [ | easy ].
+    rewrite polyn_list_add_length.
+    rewrite max_l; [ | easy ].
+    rewrite Hell.
+    rewrite (nth_overflow la); [ | now rewrite Hell ].
+    now rewrite srng_add_0_l.
+  }
+...
+    rewrite IHlb; [ | | ].
 ...
 
 Theorem glop : ∀ M,
