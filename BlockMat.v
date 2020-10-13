@@ -3929,6 +3929,142 @@ unfold minus_one_pow.
 now destruct (i mod 2); cbn; rewrite if_1_eq_0.
 Qed.
 
+Theorem polyn_deg_det_subm_xI_sub_M_succ_le : ∀ M i,
+  polyn_degree (determinant (subm (xI_sub_M M) 0 (S i))) ≤ mat_nrows M - 2.
+Proof.
+intros.
+cbn.
+remember (mat_nrows M) as n eqn:Hn.
+symmetry in Hn.
+revert i M Hn.
+induction n; intros; [ easy | cbn ].
+rewrite Nat.sub_0_r.
+destruct n; [ easy | ].
+cbn - [ subm summation ].
+destruct n. {
+  cbn.
+  rewrite if_1_eq_0, if_0_eq_0; cbn.
+  rewrite srng_add_0_l, srng_mul_0_l.
+  rewrite if_0_eq_0; cbn.
+  destruct (srng_eq_dec (mat_el M 1 0) 0) as [Hmz| Hmz]; [ easy | cbn ].
+  now destruct (srng_eq_dec (- mat_el M 1 0)%Rng 0).
+}
+rewrite Nat.sub_0_r.
+etransitivity; [ apply (polyn_degree_summation_ub 0) | ].
+rewrite map_map.
+rewrite Nat.sub_0_r.
+etransitivity. {
+  apply List_fold_left_max_map_le.
+  intros j Hj.
+  apply polyn_degree_mul_le.
+}
+etransitivity. {
+  eapply List_fold_left_max_map_le.
+  intros j Hj.
+  apply Nat.add_le_mono_r.
+  apply polyn_degree_mul_le.
+}
+erewrite map_ext_in. 2: {
+  intros j Hj.
+  rewrite Nat.add_comm, Nat.add_assoc.
+  rewrite Nat.add_shuffle0.
+  apply Nat.add_cancel_l.
+  apply polyn_degree_minus_one_pow.
+}
+erewrite map_ext_in. 2: {
+  intros j Hj.
+  apply Nat.add_0_r.
+}
+(**)
+replace (S (S n)) with (1 + (1 + n)) by easy.
+do 2 rewrite seq_app.
+do 2 rewrite map_app.
+cbn - [ det_loop subm app ].
+replace (polyn_degree (mat_el (subm (xI_sub_M M) 0 (S i)) 0 0)) with 0. 2: {
+  cbn.
+  rewrite if_1_eq_0, if_0_eq_0; cbn.
+  rewrite srng_add_0_l, srng_mul_0_l.
+  rewrite if_0_eq_0; cbn.
+  destruct (srng_eq_dec (mat_el M 1 0) 0) as [Hmz| Hmz]; [ easy | cbn ].
+  now destruct (srng_eq_dec (- mat_el M 1 0)%Rng 0).
+}
+rewrite Nat.add_0_r.
+replace (polyn_degree (mat_el (subm (xI_sub_M M) 0 (S i)) 0 1)) with 1. 2: {
+  cbn.
+  destruct (lt_dec 1 (S i)) as [H1i| H1i]. {
+    cbn.
+    do 2 rewrite if_1_eq_0; cbn.
+    rewrite srng_add_0_l, srng_mul_0_l, srng_mul_1_l.
+    rewrite srng_add_0_l, srng_mul_0_l, srng_add_0_l.
+    rewrite if_1_eq_0.
+    now destruct (srng_eq_dec (mat_el M 1 1) 0); cbn; rewrite if_1_eq_0.
+  }
+  clear i H1i.
+  cbn; rewrite if_1_eq_0, if_0_eq_0; cbn.
+  rewrite srng_add_0_l, srng_mul_0_l.
+  rewrite if_0_eq_0; cbn.
+  destruct (srng_eq_dec (mat_el M 1 2) 0) as [Hmz| Hmz]. {
+    cbn.
+}
+...
+erewrite map_ext_in. 2: {
+  intros j Hj.
+  apply in_seq in Hj.
+...
+  remember (subm (xI_sub_M M) 0 (S i)) as PM eqn:HPM.
+...
+  replace (polyn_degree (mat_el PM 0 j)) with 1. 2: {
+    rewrite HPM.
+    cbn - [ xI_sub_M ].
+    destruct (lt_dec j (S i)) as [Hji| Hji]. {
+      unfold xI_sub_M.
+      cbn - [ mat_mul_scal_l ].
+      destruct (srng_eq_dec (mat_el M 1 j) 0) as [Hmz| Hmz]. {
+        cbn - [ norm_polyn_list polyn_list mI ].
+        rewrite polyn_list_add_0_r.
+        remember (mat_el (mI (mat_nrows M)) 1 j) as a eqn:Ha.
+        unfold polyn_of_list.
+        cbn - [ norm_polyn_list ].
+        rewrite norm_polyn_list_involutive.
+        cbn.
+        rewrite if_1_eq_0; cbn.
+        rewrite srng_add_0_l, srng_mul_0_l.
+...
+        destruct (srng_eq_dec a 0) as [Haz| Haz]. {
+          exfalso.
+          destruct j. {
+            cbn in Ha.
+            unfold xI_sub_M in HPM.
+            rewrite Hn in HPM.
+...
+            cbn in HPM.
+            cbn.
+        }
+        cbn.
+        rewrite srng_add_0_l, srng_mul_0_l, srng_mul_1_l.
+        rewrite srng_add_0_l.
+        destruct (srng_eq_dec a 0) as [Haz'| Haz']. {
+          now cbn; rewrite if_0_eq_0.
+        }
+        cbn.
+        rewrite Hn in Ha; cbn in Ha.
+        destruct j; [ easy | ].
+        destruct j.
+...
+
+    destruct j; [ flia Hj | cbn ].
+        rewrite if_1_eq_0, if_0_eq_0; cbn.
+        rewrite srng_add_0_l, srng_mul_0_l.
+        rewrite if_0_eq_0; cbn.
+        destruct (srng_eq_dec (mat_el M 0 (S i)) 0) as [Hmz| Hmz]; [ easy | ].
+        cbn.
+        destruct (srng_eq_dec (- mat_el M 0 (S i))%Rng 0) as [H| H]; [ easy | ].
+        now rewrite rev_length.
+      }
+      now rewrite Nat.add_0_r.
+    }
+...
+
 (* the caracteristic polynomial of a matrix is monic, i.e. its
    leading coefficient is 1 *)
 
@@ -4065,6 +4201,17 @@ split. {
       }
       now rewrite Nat.add_0_r.
     }
+(*
+    erewrite map_ext_in. 2: {
+      intros i Hi.
+remember (det_loop (subm PM 0 i) (S n)) as CP eqn:HCP.
+remember (subm PM 0 i) as PM' eqn:HPM'.
+rewrite HPM in HPM'.
+rewrite submatrix_sub in HPM'.
+rewrite submatrix_m2mm in HPM'.
+specialize (IHn (subm M 0 i)) as H1.
+specialize (H1 PM' CP).
+*)
     erewrite map_ext_in. 2: {
       intros i Hi.
       replace (det_loop _ _) with (determinant (subm PM 0 i)). 2: {
@@ -4077,10 +4224,6 @@ rewrite HPM.
 rewrite <- Hn.
 rewrite fold_xI_sub_M.
 (**)
-...
-Theorem polyn_deg_det_subm_xI_sub_M_succ : ∀ M i,
-  polyn_degree (determinant (subm (xI_sub_M M) 0 (S i))) = mat_nrows M - 1.
-Admitted.
 ...
 rewrite (map_ext_in _ (λ x, S n)). 2: {
 intros i Hi.
