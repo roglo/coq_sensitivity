@@ -3984,6 +3984,41 @@ rename lc into lb.
 move lb before la.
 revert la Haz.
 induction lb as [| b] using rev_ind; intros; [ easy | ].
+rewrite List_last_app in Hbz.
+rewrite polyn_list_add_app_r.
+destruct (lt_dec (length la) (length lb)) as [Hll| Hll]. {
+  rewrite firstn_skipn_rev.
+  replace (length _ - length _) with 0 by flia Hll.
+  rewrite skipn_O.
+  rewrite rev_involutive.
+  replace (skipn (length lb) la) with ([] : list T). 2: {
+    symmetry.
+    now apply skipn_all2, Nat.lt_le_incl.
+  }
+  rewrite polyn_list_add_0_l.
+  rewrite norm_polyn_list_app; cbn.
+  destruct (srng_eq_dec b 0) as [H| H]; [ easy | clear H; cbn ].
+  destruct (lt_dec i (length lb)) as [Hib| Hib]. {
+    rewrite app_nth1. 2: {
+      rewrite polyn_list_add_length.
+      rewrite max_r; [ easy | now apply Nat.lt_le_incl ].
+    }
+    rewrite app_nth1; [ | easy ].
+    apply list_polyn_nth_add.
+  } {
+    apply Nat.nlt_ge in Hib.
+    rewrite (nth_overflow la); [ | flia Hll Hib ].
+    rewrite srng_add_0_l.
+    rewrite app_nth2. 2: {
+      rewrite polyn_list_add_length.
+      rewrite max_r; [ easy | now apply Nat.lt_le_incl ].
+    }
+    rewrite app_nth2; [ | easy ].
+    rewrite polyn_list_add_length.
+    rewrite max_r; [ easy | now apply Nat.lt_le_incl ].
+  }
+} {
+  apply Nat.nlt_ge in Hll.
 ...
 
 Theorem glop : ∀ M,
