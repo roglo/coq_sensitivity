@@ -4005,6 +4005,7 @@ destruct (zerop i) as [Hiz| Hiz]. {
   rewrite Nat.add_0_r.
   subst i.
 Search (fold_left max).
+Check submatrix_xI_sub_M.
 ...
 replace (polyn_degree (mat_el (subm (xI_sub_M M) 0 (S i)) 0 1)) with 1. 2: {
   cbn.
