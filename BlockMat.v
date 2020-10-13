@@ -4073,8 +4073,24 @@ split. {
       }
       easy.
     }
-Search (fold_left _ (map _ _)).
+rewrite HPM.
+rewrite <- Hn.
+rewrite fold_xI_sub_M.
+(**)
+...
+Theorem polyn_deg_det_subm_xI_sub_M_succ : ∀ M i,
+  polyn_degree (determinant (subm (xI_sub_M M) 0 (S i))) = mat_nrows M - 1.
+Admitted.
+...
+rewrite (map_ext_in _ (λ x, S n)). 2: {
+intros i Hi.
+apply in_seq in Hi.
+destruct i; [ flia Hi | ].
+rewrite polyn_deg_det_subm_xI_sub_M_succ at 1.
+now rewrite Hn, Nat.sub_succ, Nat.sub_0_r.
+}
     rewrite List_fold_left_map.
+...
 }
 ...
 Search (det_loop (subm _ _)).
