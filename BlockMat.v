@@ -3929,6 +3929,86 @@ unfold minus_one_pow.
 now destruct (i mod 2); cbn; rewrite if_1_eq_0.
 Qed.
 
+Theorem glop : ∀ M i,
+  polyn_degree (determinant (subm (xI_sub_M M) i i)) = mat_nrows M - 1.
+Proof.
+intros.
+remember (mat_nrows M) as n eqn:Hn; symmetry in Hn.
+revert M i Hn.
+induction n; intros; cbn; [ now rewrite Hn | ].
+rewrite Hn.
+cbn; rewrite Nat.sub_0_r.
+specialize (IHn (subm M 0 0)) as H1.
+specialize (H1 i).
+assert (H : mat_nrows (subm M 0 0) = n). {
+  now cbn; rewrite Hn, Nat.sub_succ, Nat.sub_0_r.
+}
+specialize (H1 H); clear H.
+cbn in H1.
+rewrite Hn, Nat.sub_succ, Nat.sub_0_r in H1.
+clear IHn Hn.
+revert M i H1.
+induction n; intros; [ easy | ].
+rewrite Nat.sub_succ, Nat.sub_0_r in H1.
+cbn - [ polyn_degree subm summation ].
+destruct n. {
+  cbn.
+  rewrite srng_mul_1_r.
+  do 4 rewrite fold_polyn_sub.
+  destruct (lt_dec 0 i) as [Hiz| Hiz]. {
+    cbn.
+    rewrite if_1_eq_0; cbn.
+    now destruct (srng_eq_dec (mat_el M 0 0) 0); cbn; rewrite if_1_eq_0.
+  } {
+    cbn.
+    rewrite if_1_eq_0; cbn.
+    now destruct (srng_eq_dec (mat_el M 0 0) 0),
+      (srng_eq_dec (mat_el M 1 1) 0); cbn; rewrite if_1_eq_0.
+  }
+}
+rewrite srng_summation_split_first; [ | flia ].
+cbn - [ subm summation polyn_add det_loop ].
+rewrite polyn_mul_1_l.
+rewrite polyn_degree_add. 2: {
+  rewrite submatrix_xI_sub_M.
+...
+remember (S n) as sn; cbn; subst sn.
+clear e Hlen.
+revert b m.
+induction len; intros; [ cbn; flia | ].
+cbn; rewrite polyn_add_0_l.
+rewrite fold_left_srng_add_fun_from_0.
+cbn - [ polyn_degree ].
+rewrite polyn_add_comm.
+etransitivity; [ apply polyn_degree_add_ub | ].
+destruct (le_dec
+  (polyn_degree (f b))
+  (polyn_degree
+      (fold_left (λ (c : polynomial T) (i : nat), (c + f i)%P)
+         (seq (S b) len) 0%P))) as [H1| H1]. {
+  etransitivity; [ | apply IHlen ].
+  rewrite max_l; [ easy | easy ].
+} {
+  apply Nat.nle_gt in H1.
+  rewrite max_r; [ | now apply Nat.lt_le_incl ].
+  apply Nat_le_fold_left_max.
+  apply Nat.le_max_r.
+}
+...
+
+Theorem glop : ∀ M i j,
+  polyn_degree (determinant (subm (xI_sub_M M) i j)) =
+  if Nat.eq_dec i j then mat_nrows M - 1 else mat_nrows M - 2.
+Proof.
+intros.
+remember (mat_nrows M) as n eqn:Hn; symmetry in Hn.
+revert M i j Hn.
+induction n; intros; cbn. {
+  rewrite Hn; cbn.
+  now destruct (Nat.eq_dec i j).
+}
+...
+
 Theorem polyn_deg_det_subm_xI_sub_M_succ_le : ∀ M i,
   polyn_degree (determinant (subm (xI_sub_M M) 0 (S i))) ≤ mat_nrows M - 2.
 Proof.
