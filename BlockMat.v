@@ -3964,6 +3964,26 @@ cbn - [ nth ] in Hla.
 rewrite <- List_last_nth_cons in Hla.
 destruct (srng_eq_dec (last (a :: la) 0%Rng) 0) as [Haz| Haz]; [ easy | ].
 clear Hla.
+destruct lb as [| b]. {
+  rewrite polyn_list_add_0_r.
+  rewrite (nth_overflow 0%PL); [ | cbn; flia ].
+  rewrite srng_add_0_r.
+  f_equal.
+  rewrite fold_norm_polyn_list.
+  now apply norm_polyn_list_id.
+}
+cbn - [ nth ] in Hlb.
+rewrite <- List_last_nth_cons in Hlb.
+destruct (srng_eq_dec (last (b :: lb) 0%Rng) 0) as [Hbz| Hbz]; [ easy | ].
+clear Hlb.
+rewrite fold_norm_polyn_list.
+remember (a :: la) as lc; clear a la Heqlc.
+rename lc into la.
+remember (b :: lb) as lc; clear b lb Heqlc.
+rename lc into lb.
+move lb before la.
+revert la Haz.
+induction lb as [| b] using rev_ind; intros; [ easy | ].
 ...
 
 Theorem glop : ∀ M,
