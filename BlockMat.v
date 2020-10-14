@@ -4134,6 +4134,7 @@ do 2 rewrite polyn_add_0_l.
 rewrite fold_left_srng_add_fun_from_0; symmetry.
 rewrite fold_left_srng_add_fun_from_0; symmetry.
 remember (S len) as slen; cbn - [ polyn_add ]; subst slen.
+...
 rewrite polyn_degree_add. 2: {
 ...
 
