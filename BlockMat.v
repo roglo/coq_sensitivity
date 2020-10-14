@@ -4108,8 +4108,76 @@ rewrite Hlab.
 now rewrite Nat.sub_diag.
 Qed.
 
+Definition polyn_highest_coeff P :=
+  polyn_coeff P (polyn_degree P).
+
+Theorem glop : ∀ P Q,
+  polyn_degree P = polyn_degree Q
+  → (polyn_highest_coeff P + polyn_highest_coeff Q ≠ 0)%Srng
+  → polyn_degree (P + Q) = polyn_degree P.
+Proof.
+intros (la, Hla) (lb, Hlb) HPQ HCPQ.
+move lb before la.
+cbn - [ norm_polyn_list ] in *.
+destruct la as [| a]. {
+  cbn in HPQ, HCPQ |-*.
+  rewrite rev_length.
+  destruct lb as [| b]; [ easy | cbn ].
+  cbn in HPQ; rewrite Nat.sub_0_r in HPQ.
+  symmetry in HPQ.
+  apply length_zero_iff_nil in HPQ; subst lb.
+  cbn in Hlb, HCPQ |-*.
+  now destruct (srng_eq_dec b 0).
+}
+cbn - [ nth ] in Hla, HCPQ.
+cbn in HPQ.
+rewrite Nat.sub_0_r in HCPQ, HPQ.
+rewrite <- List_last_nth_cons in Hla, HCPQ.
+destruct lb as [| b]. {
+  apply length_zero_iff_nil in HPQ; subst la; cbn.
+  now destruct (srng_eq_dec a 0).
+}
+move b before a.
+cbn - [ nth ] in Hlb.
+cbn - [ nth last ] in HCPQ.
+rewrite Nat.sub_0_r in HCPQ.
+rewrite <- List_last_nth_cons in Hlb, HCPQ.
+cbn in HPQ; rewrite Nat.sub_0_r in HPQ.
+cbn - [ norm_polyn_list ].
+...
+
+
+Theorem polyn_degree_add_compat : ∀ Pa Pb Qa Qb,
+  polyn_degree Pa = polyn_degree Pb
+  → polyn_degree Qa = polyn_degree Qb
+  → polyn_degree (Pa + Qa) = polyn_degree (Pb + Qb).
+Proof.
+intros * HP HQ.
+destruct (lt_dec (polyn_degree Pa) (polyn_degree Qa)) as [HPQ| HPQ]. {
+  rewrite polyn_add_comm.
+  rewrite polyn_degree_add; [ | easy ].
+  rewrite polyn_add_comm.
+  rewrite polyn_degree_add; [ easy | congruence ].
+}
+apply Nat.nlt_ge in HPQ.
+destruct (lt_dec (polyn_degree Qa) (polyn_degree Pa)) as [HQP| HQP]. {
+  rewrite polyn_degree_add; [ | easy ].
+  rewrite polyn_degree_add; [ easy | congruence ].
+}
+apply Nat.nlt_ge in HQP.
+apply Nat.le_antisymm in HPQ; [ clear HQP | easy ].
+...
+Check polyn_degree_add_ub.
+unfold polyn_degree, polyn_degree_plus_1 in *.
+Search (polyn_list (_ + _)%P).
+cbn.
+Search (norm_polyn_list (_ + _)).
+Check norm_polyn_list.
+Search (length (norm_polyn_list _)).
+...
+
 Theorem polyn_degree_summation_eq_compat : ∀ b e f g,
-  (∀ i, b ≤ i ≤ e → f i = g i)
+  (∀ i, b ≤ i ≤ e → polyn_degree (f i) = polyn_degree (g i))
   → polyn_degree (Σ (i = b, e), f i) = polyn_degree (Σ (i = b, e), g i).
 Proof.
 intros * Hfg.
@@ -4125,7 +4193,8 @@ replace e with (b + len) in Hfg by flia Hlen Hbe.
 clear e Hbe Hlen.
 revert b Hfg.
 induction len; intros. {
-  cbn.
+  cbn - [ polyn_degree ].
+  do 2 rewrite polyn_add_0_l.
   rewrite Nat.add_0_r in Hfg.
   now rewrite Hfg.
 }
@@ -4134,6 +4203,8 @@ do 2 rewrite polyn_add_0_l.
 rewrite fold_left_srng_add_fun_from_0; symmetry.
 rewrite fold_left_srng_add_fun_from_0; symmetry.
 remember (S len) as slen; cbn - [ polyn_add ]; subst slen.
+...
+apply polyn_degree_add_compat.
 ...
 rewrite polyn_degree_add. 2: {
 ...

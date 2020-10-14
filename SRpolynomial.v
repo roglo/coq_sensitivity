@@ -1505,9 +1505,10 @@ Notation "'Σ' ( i = b , e ) , g" :=
   (at level 45, i at level 0, b at level 60, e at level 60) :
      polynomial_scope.
 
-Arguments polyn_degree {T so sdp} P%P.
 Arguments norm_polyn_list {T ro sdp} l%PL.
-Arguments polyn_list_convol_mul {T ro} la%PL lb%PL _%nat.
 Arguments polyn_coeff {T so sdp} P%P i%nat.
+Arguments polyn_degree {T so sdp} P%P.
+Arguments polyn_list_convol_mul {T ro} la%PL lb%PL _%nat.
+Arguments polyn_list {T so sdp} p%P.
 
 End polynomial_Notations.
