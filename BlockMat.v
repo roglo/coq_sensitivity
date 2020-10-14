@@ -4111,17 +4111,23 @@ destruct (lt_dec (length la) (length lb)) as [Hll| Hll]. {
     now destruct i; rewrite srng_add_0_r.
   } {
     cbn - [ norm_polyn_list nth ].
-    destruct la as [| a1]. {
+(**)
+clear IHlb.
+cbn in Hll, Hell.
+assert (Hba : length lb < length la) by flia Hll Hell.
+clear Hll Hell.
+revert i a b b1 lb Haz Hba.
+    induction la as [| a1]; intros. {
       rewrite skipn_nil, polyn_list_add_0_l.
       remember (norm_polyn_list [b]) as lc eqn:Hlc.
       cbn in Hlc.
       destruct (srng_eq_dec b 0) as [Hbz| Hbz]. {
         cbn in Hlc; subst b lc.
         rewrite firstn_nil, polyn_list_add_0_l.
-        destruct lb as [| b2]; [ easy | cbn in Hll; flia Hll ].
+        destruct lb as [| b2]; [ easy | cbn in Hba; flia Hba ].
       }
       cbn in Hlc; subst lc.
-      destruct lb as [| b2]; [ easy | cbn in Hll; flia Hll ].
+      destruct lb as [| b2]; [ easy | cbn in Hba; flia Hba ].
     }
     destruct lb as [| b2]. {
       cbn - [ norm_polyn_list nth ].
@@ -4156,6 +4162,37 @@ destruct (lt_dec (length la) (length lb)) as [Hll| Hll]. {
       now cbn; rewrite srng_add_0_r.
     }
     cbn - [ norm_polyn_list nth ].
+    rewrite List_last_cons_cons in Haz.
+    cbn in Hba.
+    apply Nat.succ_lt_mono in Hba.
+    specialize (IHla i _ b b1 _ Haz Hba) as H1.
+    remember (norm_polyn_list (skipn (length lb) la + [b])) as lc eqn:Hlc.
+    symmetry in Hlc.
+    destruct lc as [| c]. {
+      destruct i. {
+        cbn - [ norm_polyn_list ] in H1 |-*.
+        rewrite norm_polyn_list_cons; [ easy | ].
+        rewrite List_last_cons_cons.
+...
+  Haz : last (a :: la) 0%Rng ≠ 0%Rng
+  Hll : length (b1 :: lb) ≤ length (a :: la)
+  Hell : length (a :: la) ≠ length (b1 :: lb)
+  ============================
+  nth i
+    match norm_polyn_list (skipn (length lb) la + [b]) with
+    | 0%PL => norm_polyn_list ((a + b1)%Rng :: (firstn (length lb) la + lb)%PL)
+    | t :: l => (a + b1)%Rng :: (firstn (length lb) la + lb)%PL ++ t :: l
+    end 0%Rng = (nth i (a :: la) 0%Rng + nth i (b1 :: lb ++ [b]) 0%Rng)%Srng
+...
+  Haz : last (a :: a1 :: la) 0%Rng ≠ 0%Rng
+  Hll : length (b1 :: b2 :: lb) ≤ length (a :: a1 :: la)
+  Hell : length (a :: a1 :: la) ≠ length (b1 :: b2 :: lb)
+  ============================
+  nth i
+    match norm_polyn_list (skipn (length lb) la + [b]) with
+    | 0%PL => norm_polyn_list ((a + b1)%Rng :: (a1 + b2)%Rng :: (firstn (length lb) la + lb)%PL)
+    | t :: l => (a + b1)%Rng :: (a1 + b2)%Rng :: (firstn (length lb) la + lb)%PL ++ t :: l
+    end 0%Rng = (nth i (a :: a1 :: la) 0%Rng + nth i (b1 :: b2 :: lb ++ [b]) 0%Rng)%Srng
 ...
 
 Theorem glop : ∀ M,
