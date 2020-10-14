@@ -4108,6 +4108,11 @@ rewrite Hlab.
 now rewrite Nat.sub_diag.
 Qed.
 
+Theorem polyn_degree_det_subm_xI_sub_M_succ_r : ∀ i n M,
+  i ≤ n
+  → polyn_degree (det_loop (subm (xI_sub_M M) 0 (S i)) (S n)) = n.
+...
+
 Theorem glop : ∀ M,
   polyn_degree (determinant (xI_sub_M M)) = mat_nrows M.
 Proof.
@@ -4231,13 +4236,16 @@ rewrite polyn_degree_add. 2: {
     intros j Hj.
     apply Nat.add_0_r.
   }
-  erewrite map_ext_in. 2: {
+  rewrite map_ext_in with (g := λ _, n). 2: {
     intros j Hj.
     apply in_seq in Hj.
     destruct j; [ flia Hj | ].
-    replace (polyn_degree _) with n by admit.
-    easy.
+    replace (polyn_degree _) with n; [ easy | ].
+    symmetry.
 ...
+apply polyn_degree_det_subm_xI_sub_M_succ_r.
+flia Hj.
+..
 
 Theorem glop : ∀ M i j n,
   i < n → j < n →
