@@ -4175,18 +4175,6 @@ rewrite polyn_degree_add. 2: {
     cbn - [ polyn_coeff xI_sub_M det_loop summation ].
     rewrite srng_mul_1_l.
     rewrite polyn_coeff_add.
-Check polyn_coeff_add.
-Search (polyn_coeff (_ * _)%P).
-About polyn_coeff.
-...
-Search polyn_coeff.
-    cbn - [ minus_one_pow mat_el xI_sub_M det_loop polyn_degree summation ].
-...
-    cbn - [ subm summation polyn_add det_loop ].
-    rewrite polyn_mul_1_l.
-    rewrite polyn_mul_1_
-    rewrite polyn_degree_add. 2: {
-  rewrite submatrix_xI_sub_M.
 ...
 
 Theorem glop : ∀ M i j n,
