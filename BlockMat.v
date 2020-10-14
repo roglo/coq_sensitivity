@@ -4111,6 +4111,22 @@ Qed.
 Theorem polyn_degree_det_subm_xI_sub_M_succ_r : ∀ i n M,
   i ≤ n
   → polyn_degree (det_loop (subm (xI_sub_M M) 0 (S i)) (S n)) = n.
+Proof.
+intros * Hin.
+revert M i Hin.
+induction n; intros. {
+  apply Nat.le_0_r in Hin; subst i.
+  cbn.
+  rewrite if_1_eq_0; cbn.
+  rewrite if_0_eq_0; cbn.
+  rewrite srng_add_0_l, srng_mul_0_l.
+  rewrite if_0_eq_0; cbn.
+  destruct (srng_eq_dec (mat_el M 1 0) 0) as [Hmz| Hmz]; [ easy | cbn ].
+  now destruct (srng_eq_dec (- mat_el M 1 0)%Rng 0).
+}
+remember (S n) as sn.
+cbn - [ subm xI_sub_M summation ].
+subst sn.
 ...
 
 Theorem glop : ∀ M,
