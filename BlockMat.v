@@ -4108,6 +4108,35 @@ rewrite Hlab.
 now rewrite Nat.sub_diag.
 Qed.
 
+Theorem polyn_degree_summation_eq_compat : ∀ b e f g,
+  (∀ i, b ≤ i ≤ e → f i = g i)
+  → polyn_degree (Σ (i = b, e), f i) = polyn_degree (Σ (i = b, e), g i).
+Proof.
+intros * Hfg.
+destruct (le_dec b e) as [Hbe| Hbe]. 2: {
+  apply Nat.nle_gt in Hbe.
+  rewrite srng_summation_empty; [ | easy ].
+  now rewrite srng_summation_empty.
+}
+unfold summation.
+remember (S e - b) as len eqn:Hlen.
+destruct len; [ easy | ].
+replace e with (b + len) in Hfg by flia Hlen Hbe.
+clear e Hbe Hlen.
+revert b Hfg.
+induction len; intros. {
+  cbn.
+  rewrite Nat.add_0_r in Hfg.
+  now rewrite Hfg.
+}
+remember (S len) as slen; cbn; subst slen.
+do 2 rewrite polyn_add_0_l.
+rewrite fold_left_srng_add_fun_from_0; symmetry.
+rewrite fold_left_srng_add_fun_from_0; symmetry.
+remember (S len) as slen; cbn - [ polyn_add ]; subst slen.
+rewrite polyn_degree_add. 2: {
+...
+
 Theorem polyn_degree_det_subm_xI_sub_M_succ_r : ∀ i n M,
   i ≤ n
   → polyn_degree (det_loop (subm (xI_sub_M M) 0 (S i)) (S n)) = n.
@@ -4127,6 +4156,10 @@ induction n; intros. {
 remember (S n) as sn.
 cbn - [ subm xI_sub_M summation ].
 subst sn.
+Search (polyn_degree (Σ (_ = _, _), _)).
+...
+erewrite polyn_degree_summation_eq_compat. 2: {
+  intros j Hj.
 ...
 
 Theorem glop : ∀ M,
