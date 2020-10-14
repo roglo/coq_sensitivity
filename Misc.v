@@ -1183,13 +1183,24 @@ remember (b :: l) as l'; cbn; subst l'.
 right; apply IHl.
 Qed.
 
+Theorem List_last_app_not_nil_r : ∀ A (la lb : list A) d,
+  lb ≠ []
+  → last (la ++ lb) d = last lb d.
+Proof.
+intros A * Hlb.
+destruct lb as [| b]; [ easy | clear Hlb ].
+revert b lb.
+induction la as [| a]; intros; [ easy | cbn ].
+rewrite IHla.
+remember (la ++ b :: lb) as lc eqn:Hlc.
+destruct lc as [| c]; [ | easy ].
+now destruct la.
+Qed.
+
 Theorem List_last_app {A} : ∀ l (d a : A), List.last (l ++ [a]) d = a.
 Proof.
 intros.
-induction l; [ easy | ].
-cbn.
-remember (l ++ [a]) as l' eqn:Hl'.
-destruct l'; [ now destruct l | apply IHl ].
+now apply List_last_app_not_nil_r.
 Qed.
 
 Theorem List_rev_last : ∀ A l (d : A),

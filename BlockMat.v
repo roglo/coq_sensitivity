@@ -3979,6 +3979,32 @@ rewrite app_nth2 in Hlb; [ | now unfold ge ].
 rewrite Nat.sub_diag in Hlb; cbn in Hlb.
 destruct (srng_eq_dec b 0) as [Hbz| Hbz]; [ easy | clear Hlb ].
 move b before a.
+destruct (Nat.eq_dec (length la) (length lb)) as [Hlab| Hlab]. 2: {
+  rewrite norm_polyn_list_id. 2: {
+    destruct (lt_dec (length la) (length lb)) as [Hll| Hll]. {
+      clear Hlab i.
+      rewrite polyn_list_add_app_r.
+Search (last (_ ++ _)).
+...
+rewrite skipn_all2; [ | now rewrite app_length, Nat.add_1_r ].
+now rewrite List_last_app_not_nil_r.
+}
+...
+      rewrite List_firstn_all2; [ | now rewrite app_length, Nat.add_1_r ].
+      rewrite polyn_list_add_app_l.
+      cbn.
+...
+      rewrite firstn_app.
+Search (firstn).
+rewrite firstn_firstn.
+...
+      replace (last _ _) with b; [ easy | ].
+      symmetry.
+      clear Haz Hlab i.
+Search ((_ ++ _) + _)%PL.
+
+
+    intros Hll; apply Hlab; clear Hlab.
 ...
 intros (la, Hla) (lb, Hlb) i; cbn.
 move lb before la.
