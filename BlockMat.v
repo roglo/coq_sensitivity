@@ -3662,6 +3662,8 @@ destruct (zerop (length lb)) as [Hzlb| Hzlb]. {
 flia Hzla Hzlb.
 Qed.
 
+(* normalized list is smaller than the list *)
+
 Theorem norm_polyn_list_length_le : ∀ la,
   length (norm_polyn_list la) ≤ length la.
 Proof.
@@ -3750,26 +3752,11 @@ rewrite map_length, seq_length.
 now rewrite Nat.sub_0_r.
 Qed.
 
-Inspect 1.
-
 (* degree of monomial "x" *)
 
 Theorem polyn_degree_monom : polyn_degree _x = 1.
 Proof.
 now cbn; rewrite if_1_eq_0.
-Qed.
-
-(* normalized list is smaller than the list *)
-
-Theorem length_norm_polyn_list_le : ∀ la,
-  length (norm_polyn_list la) ≤ length la.
-Proof.
-intros.
-induction la as [| a] using rev_ind; [ easy | ].
-rewrite norm_polyn_list_app; cbn.
-destruct (srng_eq_dec a 0) as [Haz| Haz]; [ cbn | easy ].
-etransitivity; [ apply IHla | ].
-rewrite app_length; flia.
 Qed.
 
 (* degree of sum and summation upper bound *)
@@ -3793,7 +3780,7 @@ destruct la as [| a]. {
   rewrite <- List_last_nth_cons in H.
   rewrite norm_polyn_list_cons; [ cbn | easy ].
   apply -> Nat.succ_le_mono.
-  apply length_norm_polyn_list_le.
+  apply norm_polyn_list_length_le.
 }
 cbn - [ nth ] in Hla.
 destruct (srng_eq_dec (nth (length la) (a :: la) 0%Rng) 0)
@@ -4033,273 +4020,81 @@ destruct (srng_eq_dec (a + b) 0) as [Habz| Habz]. {
     apply Nat.succ_lt_mono in Hil.
     cbn - [ norm_polyn_list ].
     specialize (IHla _ _ Hlab Hil) as H1.
-...
-    destruct (srng_eq_dec (last (la + lb)%PL 0%Srng) 0) as [Hll| Hll]. {
-      rewrite norm_polyn_list_cons; [ easy | ].
-...
-    destruct (srng_eq_dec (a + b) 0) as [Habz| Habz]. {
-      unfold so in Habz.
-      rewrite Habz.
-      rewrite norm_polyn_list_cons; [ easy | ].
-...
-      cbn - [ norm_polyn_list ].
-      remember (norm_polyn_list _) as lc eqn:Hlc.
-      symmetry in Hlc.
-      detruct lc
-...
-
-
-cbn.
-...
-intros (la, Hla) (lb, Hlb) i; cbn.
-move lb before la.
-destruct la as [| a]. {
-  clear Hla.
-  replace (nth i 0%PL 0%Rng) with 0%Rng by now destruct i.
-  rewrite polyn_list_add_0_l, srng_add_0_l.
-  induction lb as [| b] using rev_ind; [ easy | ].
-  cbn in Hlb |-*.
-  rewrite app_length, Nat.add_comm in Hlb; cbn in Hlb.
-  rewrite app_nth2 in Hlb; [ | now unfold ge ].
-  rewrite Nat.sub_diag in Hlb; cbn in Hlb.
-  rewrite rev_app_distr; cbn.
-  destruct (srng_eq_dec b 0) as [Hbz| Hbz]; [ easy | ].
-  now cbn; rewrite rev_involutive.
-}
-cbn - [ nth ] in Hla.
-rewrite <- List_last_nth_cons in Hla.
-destruct (srng_eq_dec (last (a :: la) 0%Rng) 0) as [Haz| Haz]; [ easy | ].
-clear Hla.
-destruct lb as [| b]. {
-  rewrite polyn_list_add_0_r.
-  rewrite (nth_overflow 0%PL); [ | cbn; flia ].
-  rewrite srng_add_0_r.
-  f_equal.
-  rewrite fold_norm_polyn_list.
-  now apply norm_polyn_list_id.
-}
-cbn - [ nth ] in Hlb.
-rewrite <- List_last_nth_cons in Hlb.
-destruct (srng_eq_dec (last (b :: lb) 0%Rng) 0) as [Hbz| Hbz]; [ easy | ].
-clear Hlb.
-rewrite fold_norm_polyn_list.
-remember (a :: la) as lc; clear a la Heqlc.
-rename lc into la.
-remember (b :: lb) as lc; clear b lb Heqlc.
-rename lc into lb.
-move lb before la.
-clear Hbz.
-revert la Haz.
-induction lb as [| b] using rev_ind; intros. {
-  cbn.
-  rewrite polyn_list_add_0_r.
-  rewrite norm_polyn_list_id; [ | easy ].
-  now destruct i; rewrite srng_add_0_r.
-}
-rewrite polyn_list_add_app_r.
-destruct (lt_dec (length la) (length lb)) as [Hll| Hll]. {
-  rewrite firstn_skipn_rev.
-  replace (length _ - length _) with 0 by flia Hll.
-  rewrite skipn_O.
-  rewrite rev_involutive.
-  replace (skipn (length lb) la) with ([] : list T). 2: {
-    symmetry.
-    now apply skipn_all2, Nat.lt_le_incl.
-  }
-  rewrite polyn_list_add_0_l.
-  rewrite norm_polyn_list_app; cbn.
-  destruct (srng_eq_dec b 0) as [H| H]. {
-    cbn; subst b.
-    rewrite IHlb; [ | easy ].
-    destruct (lt_dec i (length lb)) as [Hilb| Hilb]. {
-      now rewrite app_nth1.
-    }
-    apply Nat.nlt_ge in Hilb.
-    rewrite (nth_overflow lb); [ | easy ].
-    destruct (Nat.eq_dec i (length lb)) as [Hib| Hib]. {
-      rewrite app_nth2; [ | flia Hib ].
-      now rewrite Hib, Nat.sub_diag.
-    }
-    rewrite (nth_overflow (lb ++ _)); [ easy | ].
-    rewrite app_length; cbn.
-    flia Hilb Hib.
-  }
-  cbn.
-  destruct (lt_dec i (length lb)) as [Hib| Hib]. {
-    rewrite app_nth1. 2: {
-      rewrite polyn_list_add_length.
-      rewrite max_r; [ easy | now apply Nat.lt_le_incl ].
-    }
-    rewrite app_nth1; [ | easy ].
-    apply list_polyn_nth_add.
-  } {
-    apply Nat.nlt_ge in Hib.
-    rewrite (nth_overflow la); [ | flia Hll Hib ].
-    rewrite srng_add_0_l.
-    rewrite app_nth2. 2: {
-      rewrite polyn_list_add_length.
-      rewrite max_r; [ easy | now apply Nat.lt_le_incl ].
-    }
-    rewrite app_nth2; [ | easy ].
-    rewrite polyn_list_add_length.
-    rewrite max_r; [ easy | now apply Nat.lt_le_incl ].
-  }
-} {
-  apply Nat.nlt_ge in Hll.
-  destruct (Nat.eq_dec (length la) (length lb)) as [Hell| Hell]. {
-    rewrite <- Hell.
-    rewrite firstn_all.
-    rewrite skipn_all.
-    rewrite polyn_list_add_0_l.
-    destruct (srng_eq_dec b 0) as [Hbz| Hbz]. {
-      subst b.
-      rewrite norm_polyn_list_app; cbn.
-      destruct (srng_eq_dec 0 0) as [H| H]; [ clear H; cbn | easy ].
-      rewrite IHlb; [ | easy ].
-      destruct (lt_dec i (length lb)) as [Hilb| Hilb]. {
-        now rewrite app_nth1.
-      }
-      apply Nat.nlt_ge in Hilb.
-      rewrite (nth_overflow lb); [ | easy ].
-      destruct (Nat.eq_dec i (length lb)) as [Hib| Hib]. {
-        rewrite app_nth2; [ | flia Hib ].
-        now rewrite Hib, Nat.sub_diag.
-      }
-      rewrite (nth_overflow (lb ++ _)); [ easy | ].
-      rewrite app_length; cbn.
-      flia Hilb Hib.
-    }
-    rewrite norm_polyn_list_id; [ | now rewrite List_last_app ].
-    destruct (lt_dec i (length lb)) as [Hilb| Hilb]. {
-      rewrite app_nth1. 2: {
-        rewrite polyn_list_add_length.
-        rewrite max_r; [ easy | now rewrite Hell ].
-      }
-      rewrite app_nth1; [ | easy ].
-      apply list_polyn_nth_add.
-    }
-    apply Nat.nlt_ge in Hilb.
-    rewrite app_nth2. 2: {
-      rewrite polyn_list_add_length.
-      rewrite max_l; [ | easy ].
-      now rewrite Hell.
-    }
-    rewrite app_nth2; [ | easy ].
-    rewrite polyn_list_add_length.
-    rewrite max_l; [ | easy ].
-    rewrite Hell.
-    rewrite (nth_overflow la); [ | now rewrite Hell ].
-    now rewrite srng_add_0_l.
-  }
-  rewrite norm_polyn_list_app.
-  destruct la as [| a]; [ easy | ].
-  destruct lb as [| b1]. {
-    rewrite skipn_O, firstn_O, polyn_list_add_0_l.
-    rewrite app_nil_l.
-    cbn - [ nth norm_polyn_list ].
-    rewrite polyn_list_add_0_r.
-    destruct la as [| a1]. {
-      cbn.
-      destruct (srng_eq_dec (a + b) 0) as [Hab| Hab]. {
-        cbn.
-        destruct i; [ easy | ].
-        now destruct i; rewrite srng_add_0_l.
-      }
-      cbn.
-      destruct i; [ easy | ].
-      now destruct i; rewrite srng_add_0_l.
-    }
-    rewrite norm_polyn_list_id. 2: {
-      now rewrite List_last_cons_cons in Haz |-*.
-    }
-    destruct i; [ easy | ].
-    remember (a1 :: la) as lc; cbn; subst lc.
-    now destruct i; rewrite srng_add_0_r.
-  } {
-    cbn - [ norm_polyn_list nth ].
-(**)
-clear IHlb.
-cbn in Hll, Hell.
-assert (Hba : length lb < length la) by flia Hll Hell.
-clear Hll Hell.
-revert i a b b1 lb Haz Hba.
-    induction la as [| a1]; intros. {
-      rewrite skipn_nil, polyn_list_add_0_l.
-      remember (norm_polyn_list [b]) as lc eqn:Hlc.
-      cbn in Hlc.
-      destruct (srng_eq_dec b 0) as [Hbz| Hbz]. {
-        cbn in Hlc; subst b lc.
-        rewrite firstn_nil, polyn_list_add_0_l.
-        destruct lb as [| b2]; [ easy | cbn in Hba; flia Hba ].
-      }
-      cbn in Hlc; subst lc.
-      destruct lb as [| b2]; [ easy | cbn in Hba; flia Hba ].
-    }
-    destruct lb as [| b2]. {
-      cbn - [ norm_polyn_list nth ].
-      rewrite polyn_list_add_0_r.
-      destruct la as [| a2]. {
-        cbn - [ nth ].
-        destruct (srng_eq_dec (a1 + b)%Rng 0) as [Ha1b| Ha1b]. {
-          cbn - [ nth ].
-          destruct (srng_eq_dec (a + b1)%Rng 0) as [Hab1| Hab1]. {
-            destruct i; [ easy | cbn ].
-            destruct i; [ easy | ].
-            now destruct i; rewrite srng_add_0_l.
-          } {
-            destruct i; [ easy | cbn ].
-            destruct i; [ easy | ].
-            now destruct i; rewrite srng_add_0_l.
-          }
-        } {
-          cbn - [ nth ].
-          destruct i; [ easy | ].
-          destruct i; [ easy | ].
-          now destruct i; cbn; rewrite srng_add_0_l.
-        }
-      }
-      rewrite norm_polyn_list_id. 2: {
-        rewrite List_last_cons_cons in Haz.
-        now rewrite List_last_cons_cons in Haz |-*.
-      }
-      destruct i; [ easy | ].
-      destruct i; [ easy | ].
-      destruct i; [ now cbn; rewrite srng_add_0_r | ].
-      now cbn; rewrite srng_add_0_r.
-    }
-    cbn - [ norm_polyn_list nth ].
-    rewrite List_last_cons_cons in Haz.
-    cbn in Hba.
-    apply Nat.succ_lt_mono in Hba.
-    specialize (IHla i _ b b1 _ Haz Hba) as H1.
-    remember (norm_polyn_list (skipn (length lb) la + [b])) as lc eqn:Hlc.
+    unfold norm_polyn_list in H1 |-*; cbn.
+    rewrite strip_0s_app.
+    remember (strip_0s (rev (la + lb)%PL)) as lc eqn:Hlc.
     symmetry in Hlc.
     destruct lc as [| c]. {
-      destruct i. {
-        cbn - [ norm_polyn_list ] in H1 |-*.
-        rewrite norm_polyn_list_cons; [ easy | ].
-        rewrite List_last_cons_cons.
-...
-  Haz : last (a :: la) 0%Rng ≠ 0%Rng
-  Hll : length (b1 :: lb) ≤ length (a :: la)
-  Hell : length (a :: la) ≠ length (b1 :: lb)
-  ============================
-  nth i
-    match norm_polyn_list (skipn (length lb) la + [b]) with
-    | 0%PL => norm_polyn_list ((a + b1)%Rng :: (firstn (length lb) la + lb)%PL)
-    | t :: l => (a + b1)%Rng :: (firstn (length lb) la + lb)%PL ++ t :: l
-    end 0%Rng = (nth i (a :: la) 0%Rng + nth i (b1 :: lb ++ [b]) 0%Rng)%Srng
-...
-  Haz : last (a :: a1 :: la) 0%Rng ≠ 0%Rng
-  Hll : length (b1 :: b2 :: lb) ≤ length (a :: a1 :: la)
-  Hell : length (a :: a1 :: la) ≠ length (b1 :: b2 :: lb)
-  ============================
-  nth i
-    match norm_polyn_list (skipn (length lb) la + [b]) with
-    | 0%PL => norm_polyn_list ((a + b1)%Rng :: (a1 + b2)%Rng :: (firstn (length lb) la + lb)%PL)
-    | t :: l => (a + b1)%Rng :: (a1 + b2)%Rng :: (firstn (length lb) la + lb)%PL ++ t :: l
-    end 0%Rng = (nth i (a :: a1 :: la) 0%Rng + nth i (b1 :: b2 :: lb ++ [b]) 0%Rng)%Srng
-...
+      cbn in H1 |-*.
+      destruct (srng_eq_dec (a + b) 0) as [Habz| Habz]; [ now destruct i | ].
+      easy.
+    }
+    cbn in H1 |-*.
+    now rewrite rev_app_distr.
+  }
+  apply Nat.nlt_ge in Hil.
+  rewrite app_nth2; [ | easy ].
+  rewrite app_nth2; [ | now rewrite <- Hlab ].
+  destruct (Nat.eq_dec i (length la)) as [Hila| Hila]. {
+    rewrite Hila, Hlab, Nat.sub_diag; cbn.
+    unfold so; rewrite Habz.
+    apply nth_overflow.
+    etransitivity; [ apply norm_polyn_list_length_le | ].
+    rewrite polyn_list_add_length.
+    rewrite max_r; [ easy | ].
+    now rewrite Hlab.
+  }
+  rewrite (nth_overflow [a]); [ | cbn; flia Hil Hila ].
+  rewrite (nth_overflow [b]); [ | cbn; flia Hil Hila Hlab ].
+  rewrite srng_add_0_l.
+  apply nth_overflow.
+  etransitivity; [ apply norm_polyn_list_length_le | ].
+  rewrite polyn_list_add_length.
+  rewrite max_l; [ easy | ].
+  now rewrite Hlab.
+}
+cbn.
+destruct (lt_dec i (length la)) as [Hil| Hil]. {
+  rewrite app_nth1. 2: {
+    rewrite polyn_list_add_length.
+    rewrite max_l; [ easy | ].
+    now rewrite Hlab.
+  }
+  rewrite app_nth1; [ | easy ].
+  rewrite app_nth1; [ | now rewrite <- Hlab ].
+  apply list_polyn_nth_add.
+}
+destruct (lt_dec (length la) i) as [Hlai| Hlai]. {
+  rewrite nth_overflow. 2: {
+    rewrite app_length, Nat.add_1_r.
+    rewrite polyn_list_add_length.
+    rewrite max_l; [ easy | ].
+    now rewrite Hlab.
+  }
+  rewrite nth_overflow. 2: {
+    now rewrite app_length, Nat.add_1_r.
+  }
+  rewrite nth_overflow. 2: {
+    now rewrite app_length, Nat.add_1_r, <- Hlab.
+  }
+  now rewrite srng_add_0_l.
+}
+apply Nat.nlt_ge in Hil.
+apply Nat.nlt_ge in Hlai.
+apply Nat.le_antisymm in Hil; [ | easy ].
+rewrite Hil.
+rewrite app_nth2. 2: {
+  rewrite polyn_list_add_length.
+  unfold ge.
+  rewrite max_l; [ easy | now rewrite Hlab ].
+}
+rewrite polyn_list_add_length.
+rewrite max_l; [ | now rewrite Hlab ].
+rewrite app_nth2; [ | now unfold ge ].
+rewrite app_nth2; [ | now unfold ge; rewrite Hlab ].
+rewrite Hlab.
+now rewrite Nat.sub_diag.
+Qed.
 
 Theorem glop : ∀ M,
   polyn_degree (determinant (xI_sub_M M)) = mat_nrows M.
@@ -4377,10 +4172,9 @@ rewrite polyn_degree_add. 2: {
         cbn; rewrite if_1_eq_0; cbn; apply srng_1_neq_0.
     }
     rewrite srng_summation_split_first; [ | flia ].
-...
-cbn - [ polyn_coeff xI_sub_M det_loop summation ].
-rewrite srng_mul_1_l.
-rewrite polyn_coeff_add.
+    cbn - [ polyn_coeff xI_sub_M det_loop summation ].
+    rewrite srng_mul_1_l.
+    rewrite polyn_coeff_add.
 ...
 Search polyn_coeff.
     cbn - [ minus_one_pow mat_el xI_sub_M det_loop polyn_degree summation ].
