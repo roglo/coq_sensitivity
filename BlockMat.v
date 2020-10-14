@@ -4092,8 +4092,11 @@ destruct (lt_dec (length la) (length lb)) as [Hll| Hll]. {
     rewrite (nth_overflow la); [ | now rewrite Hell ].
     now rewrite srng_add_0_l.
   }
-...
-    rewrite IHlb; [ | | ].
+  rewrite norm_polyn_list_app.
+  remember (norm_polyn_list (skipn (length lb) la + [b])) as lc eqn:Hlc.
+  symmetry in Hlc.
+  destruct lc as [| c]. {
+Search (norm_polyn_list (_ + _)%PL).
 ...
 
 Theorem glop : ∀ M,
