@@ -4160,103 +4160,25 @@ rewrite polyn_degree_add. 2: {
       }
     }
     rewrite srng_mul_1_l.
-(**)
-specialize (IHn (subm M 0 0)) as H1.
-remember (mat_nrows (subm M 0 0)) as m eqn:Hm.
-cbn in Hm.
-rewrite Hn, Nat.sub_succ, Nat.sub_0_r in Hm; subst m.
-specialize (H1 eq_refl).
-unfold polyn_degree in H1.
-unfold polyn_degree_plus_1 in H1.
-unfold polyn_coeff.
-remember (polyn_list _) as la eqn:Hla.
-rewrite <- H1.
-rewrite <- List_last_nth.
-assert (Hlen : length la = S (S n)) by flia H1.
-clear - so Hla Hlen.
-revert M n Hla Hlen.
-induction la as [| a] using rev_ind; intros; [ easy | ].
-destruct n. {
-  rewrite app_length, Nat.add_1_r in Hlen.
-  apply Nat.succ_inj in Hlen.
-  destruct la as [| a1]; [ easy | ].
-  destruct la; [ clear Hlen | easy ].
-  cbn - [ polyn_list ] in Hla; cbn.
-  rewrite polyn_mul_1_r in Hla.
-  cbn in Hla.
-  rewrite if_1_eq_0 in Hla; cbn in Hla.
-  destruct (srng_eq_dec (mat_el M 1 1) 0) as [Hmz| Hmz]. {
-    cbn in Hla.
-    rewrite if_1_eq_0 in Hla; cbn in Hla.
-    injection Hla; clear Hla; intros; subst a.
-    apply srng_1_neq_0.
+    specialize (IHn (subm M 0 0)) as H1.
+    remember (mat_nrows (subm M 0 0)) as m eqn:Hm.
+    cbn in Hm.
+    rewrite Hn, Nat.sub_succ, Nat.sub_0_r in Hm; subst m.
+    specialize (H1 eq_refl).
+    remember (det_loop _ _) as P eqn:HP.
+    clear - so H1.
+    destruct P as (la, Hla).
+    cbn in Hla, H1 |-*.
+    destruct la as [| a]; [ easy | cbn ].
+    cbn in H1; rewrite Nat.sub_0_r in H1.
+    cbn - [ nth ] in Hla.
+    rewrite <- List_last_nth_cons in Hla.
+    destruct (srng_eq_dec (last (a :: la) 0%Rng) 0) as [Haz| Haz]; [ easy | ].
+    rewrite List_last_nth_cons, H1 in Haz.
+    easy.
   }
-  cbn in Hla.
-  rewrite if_1_eq_0 in Hla; cbn in Hla.
-  injection Hla; clear Hla; intros; subst a.
-  apply srng_1_neq_0.
-}
-rewrite app_length, Nat.add_1_r in Hlen.
-apply Nat.succ_inj in Hlen.
-specialize (IHla (subm M 0 0) n) as H1.
-remember (det_loop (xI_sub_M (subm M 0 0)) (S (S n))) as M' eqn:HM'.
-symmetry in HM'.
-destruct M' as (lb, Hlb).
-cbn in Hla.
-destruct lb as [| b]. {
-  now apply app_eq_nil in Hla.
-}
-cbn - [ nth ] in Hlb.
-remember (S n) as sn.
-cbn - [ xI_sub_M subm summation ] in HM'; subst sn.
-...
-destruct (srng_eq_dec (nth (length lb) (b :: lb) 0%Rng) 0) as [Hbz| Hbz].
-...
-rewrite Hla.
-cbn - [ xI_sub_M summation xI_sub_M ].
-destruct n. {
-  cbn; rewrite if_1_eq_0; cbn.
-  cbn; rewrite if_1_eq_0; cbn.
-  rewrite srng_add_0_l, srng_mul_0_l, srng_mul_1_l.
-  rewrite srng_add_0_l, srng_mul_0_l.
-  rewrite srng_add_0_l.
-  rewrite if_1_eq_0; cbn.
-  destruct (srng_eq_dec (mat_el M 1 1) 0);
-    cbn; rewrite if_1_eq_0; cbn; apply srng_1_neq_0.
-}
-...
-    cbn - [ summation xI_sub_M ].
-    destruct n. {
-      cbn; rewrite if_1_eq_0; cbn.
-      cbn; rewrite if_1_eq_0; cbn.
-      rewrite srng_add_0_l, srng_mul_0_l, srng_mul_1_l.
-      rewrite srng_add_0_l, srng_mul_0_l.
-      rewrite srng_add_0_l.
-      rewrite if_1_eq_0; cbn.
-      destruct (srng_eq_dec (mat_el M 1 1) 0);
-        cbn; rewrite if_1_eq_0; cbn; apply srng_1_neq_0.
-    }
-    rewrite srng_summation_split_first; [ | flia ].
-    cbn - [ polyn_coeff xI_sub_M det_loop summation ].
-    rewrite srng_mul_1_l.
-    rewrite polyn_coeff_add.
-    remember (polyn_coeff (_ * _)%P (S (S n))) as c eqn:Hc.
-    replace c with 1%Rng. 2: {
-      subst c; symmetry.
-      cbn - [ polyn_coeff det_loop ].
-      rewrite srng_mul_1_r.
-      rewrite srng_mul_add_distr_r.
-      cbn - [ polyn_coeff xI_sub_M det_loop ].
-      rewrite polyn_coeff_add.
-...
-Search polyn_coeff.
-    cbn - [ minus_one_pow mat_el xI_sub_M det_loop polyn_degree summation ].
-...
-    cbn - [ subm summation polyn_add det_loop ].
-    rewrite polyn_mul_1_l.
-    rewrite polyn_mul_1_
-    rewrite polyn_degree_add. 2: {
   rewrite submatrix_xI_sub_M.
+  rewrite IHn; [ | cbn; flia Hn ].
 ...
 
 Theorem glop : ∀ M i j n,
