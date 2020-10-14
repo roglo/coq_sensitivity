@@ -4099,11 +4099,70 @@ destruct (lt_dec (length la) (length lb)) as [Hll| Hll]. {
     rewrite app_nil_l.
     cbn - [ nth norm_polyn_list ].
     rewrite polyn_list_add_0_r.
-...
-  remember (norm_polyn_list (skipn (length lb) la + [b])) as lc eqn:Hlc.
-  symmetry in Hlc.
-  destruct lc as [| c]. {
-Search (norm_polyn_list (_ + _)%PL).
+    destruct la as [| a1]. {
+      cbn.
+      destruct (srng_eq_dec (a + b) 0) as [Hab| Hab]. {
+        cbn.
+        destruct i; [ easy | ].
+        now destruct i; rewrite srng_add_0_l.
+      }
+      cbn.
+      destruct i; [ easy | ].
+      now destruct i; rewrite srng_add_0_l.
+    }
+    rewrite norm_polyn_list_id. 2: {
+      now rewrite List_last_cons_cons in Haz |-*.
+    }
+    destruct i; [ easy | ].
+    remember (a1 :: la) as lc; cbn; subst lc.
+    now destruct i; rewrite srng_add_0_r.
+  } {
+    cbn - [ norm_polyn_list nth ].
+    destruct la as [| a1]. {
+      rewrite skipn_nil, polyn_list_add_0_l.
+      remember (norm_polyn_list [b]) as lc eqn:Hlc.
+      cbn in Hlc.
+      destruct (srng_eq_dec b 0) as [Hbz| Hbz]. {
+        cbn in Hlc; subst b lc.
+        rewrite firstn_nil, polyn_list_add_0_l.
+        destruct lb as [| b2]; [ easy | cbn in Hll; flia Hll ].
+      }
+      cbn in Hlc; subst lc.
+      destruct lb as [| b2]; [ easy | cbn in Hll; flia Hll ].
+    }
+    destruct lb as [| b2]. {
+      cbn - [ norm_polyn_list nth ].
+      rewrite polyn_list_add_0_r.
+      destruct la as [| a2]. {
+        cbn - [ nth ].
+        destruct (srng_eq_dec (a1 + b)%Rng 0) as [Ha1b| Ha1b]. {
+          cbn - [ nth ].
+          destruct (srng_eq_dec (a + b1)%Rng 0) as [Hab1| Hab1]. {
+            destruct i; [ easy | cbn ].
+            destruct i; [ easy | ].
+            now destruct i; rewrite srng_add_0_l.
+          } {
+            destruct i; [ easy | cbn ].
+            destruct i; [ easy | ].
+            now destruct i; rewrite srng_add_0_l.
+          }
+        } {
+          cbn - [ nth ].
+          destruct i; [ easy | ].
+          destruct i; [ easy | ].
+          now destruct i; cbn; rewrite srng_add_0_l.
+        }
+      }
+      rewrite norm_polyn_list_id. 2: {
+        rewrite List_last_cons_cons in Haz.
+        now rewrite List_last_cons_cons in Haz |-*.
+      }
+      destruct i; [ easy | ].
+      destruct i; [ easy | ].
+      destruct i; [ now cbn; rewrite srng_add_0_r | ].
+      now cbn; rewrite srng_add_0_r.
+    }
+    cbn - [ norm_polyn_list nth ].
 ...
 
 Theorem glop : ∀ M,
