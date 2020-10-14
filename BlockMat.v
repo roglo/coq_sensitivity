@@ -4093,6 +4093,13 @@ destruct (lt_dec (length la) (length lb)) as [Hll| Hll]. {
     now rewrite srng_add_0_l.
   }
   rewrite norm_polyn_list_app.
+  destruct la as [| a]; [ easy | ].
+  destruct lb as [| b1]. {
+    rewrite skipn_O, firstn_O, polyn_list_add_0_l.
+    rewrite app_nil_l.
+    cbn - [ nth norm_polyn_list ].
+    rewrite polyn_list_add_0_r.
+...
   remember (norm_polyn_list (skipn (length lb) la + [b])) as lc eqn:Hlc.
   symmetry in Hlc.
   destruct lc as [| c]. {
