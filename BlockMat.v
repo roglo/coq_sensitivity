@@ -3996,6 +3996,60 @@ destruct (Nat.eq_dec (length la) (length lb)) as [Hlab| Hlab]. 2: {
   }
   apply list_polyn_nth_add.
 }
+rewrite polyn_list_add_app_l.
+rewrite firstn_app.
+rewrite Hlab, firstn_all.
+rewrite Nat.sub_diag, firstn_O.
+rewrite app_nil_r.
+rewrite skipn_app.
+rewrite skipn_all, Nat.sub_diag, skipn_O.
+rewrite app_nil_l; cbn.
+rewrite norm_polyn_list_app; cbn.
+destruct (srng_eq_dec (a + b) 0) as [Habz| Habz]. {
+  cbn.
+  destruct (lt_dec i (length la)) as [Hil| Hil]. {
+    rewrite app_nth1; [ | easy ].
+    rewrite app_nth1; [ | congruence ].
+    clear a b Haz Hbz Habz.
+    revert i lb Hlab Hil.
+    induction la as [| a]; intros. {
+      rewrite (nth_overflow []); [ | cbn; flia ].
+      symmetry in Hlab.
+      apply length_zero_iff_nil in Hlab; subst lb.
+      now rewrite srng_add_0_l.
+    }
+    destruct lb as [| b]; [ easy | ].
+    cbn in Hlab.
+    apply Nat.succ_inj in Hlab.
+    destruct i. {
+      cbn.
+      rewrite strip_0s_app.
+      remember (strip_0s _) as lc eqn:Hlc.
+      symmetry in Hlc.
+      destruct lc as [| c]; [ now cbn; destruct (srng_eq_dec (a + b) 0) | ].
+      now cbn; rewrite rev_app_distr.
+    }
+    cbn in Hil.
+    apply Nat.succ_lt_mono in Hil.
+    cbn - [ norm_polyn_list ].
+    specialize (IHla _ _ Hlab Hil) as H1.
+...
+    destruct (srng_eq_dec (last (la + lb)%PL 0%Srng) 0) as [Hll| Hll]. {
+      rewrite norm_polyn_list_cons; [ easy | ].
+...
+    destruct (srng_eq_dec (a + b) 0) as [Habz| Habz]. {
+      unfold so in Habz.
+      rewrite Habz.
+      rewrite norm_polyn_list_cons; [ easy | ].
+...
+      cbn - [ norm_polyn_list ].
+      remember (norm_polyn_list _) as lc eqn:Hlc.
+      symmetry in Hlc.
+      detruct lc
+...
+
+
+cbn.
 ...
 intros (la, Hla) (lb, Hlb) i; cbn.
 move lb before la.
