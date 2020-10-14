@@ -3984,27 +3984,18 @@ destruct (Nat.eq_dec (length la) (length lb)) as [Hlab| Hlab]. 2: {
     destruct (lt_dec (length la) (length lb)) as [Hll| Hll]. {
       clear Hlab i.
       rewrite polyn_list_add_app_r.
-Search (last (_ ++ _)).
-...
-rewrite skipn_all2; [ | now rewrite app_length, Nat.add_1_r ].
-now rewrite List_last_app_not_nil_r.
-}
-...
-      rewrite List_firstn_all2; [ | now rewrite app_length, Nat.add_1_r ].
+      rewrite skipn_all2; [ | now rewrite app_length, Nat.add_1_r ].
+      now rewrite List_last_app_not_nil_r.
+    } {
+      assert (H : length lb < length la) by flia Hlab Hll.
+      clear Hlab Hll i.
       rewrite polyn_list_add_app_l.
-      cbn.
-...
-      rewrite firstn_app.
-Search (firstn).
-rewrite firstn_firstn.
-...
-      replace (last _ _) with b; [ easy | ].
-      symmetry.
-      clear Haz Hlab i.
-Search ((_ ++ _) + _)%PL.
-
-
-    intros Hll; apply Hlab; clear Hlab.
+      rewrite skipn_all2; [ | now rewrite app_length, Nat.add_1_r ].
+      now rewrite List_last_app_not_nil_r.
+    }
+  }
+  apply list_polyn_nth_add.
+}
 ...
 intros (la, Hla) (lb, Hlb) i; cbn.
 move lb before la.
