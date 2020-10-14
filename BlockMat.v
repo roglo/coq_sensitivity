@@ -3945,6 +3945,41 @@ Qed.
 Theorem polyn_coeff_add : ∀ P Q i,
   polyn_coeff (P + Q)%P i = (polyn_coeff P i + polyn_coeff Q i)%Srng.
 Proof.
+intros (la, Hla) (lb, Hlb) i.
+move lb before la.
+cbn - [ norm_polyn_list ].
+unfold polyn_prop_test in Hla.
+unfold polyn_prop_test in Hlb.
+induction la as [| a] using rev_ind. {
+  rewrite polyn_list_add_0_l.
+  rewrite (nth_overflow []); [ | cbn; flia ].
+  rewrite srng_add_0_l.
+  revert i.
+  induction lb as [| b] using rev_ind; intros; [ easy | ].
+  rewrite app_length, Nat.add_comm in Hlb; cbn in Hlb.
+  rewrite app_nth2 in Hlb; [ | now unfold ge ].
+  rewrite Nat.sub_diag in Hlb; cbn in Hlb.
+  rewrite norm_polyn_list_app; cbn.
+  now destruct (srng_eq_dec b 0).
+}
+clear IHla.
+rewrite app_length, Nat.add_comm in Hla; cbn in Hla.
+rewrite app_nth2 in Hla; [ | now unfold ge ].
+rewrite Nat.sub_diag in Hla; cbn in Hla.
+destruct (srng_eq_dec a 0) as [Haz| Haz]; [ easy | clear Hla ].
+induction lb as [| b] using rev_ind. {
+  rewrite polyn_list_add_0_r.
+  rewrite (nth_overflow []); [ | cbn; flia ].
+  rewrite srng_add_0_r.
+  rewrite norm_polyn_list_id; [ easy | now rewrite List_last_app ].
+}
+clear IHlb.
+rewrite app_length, Nat.add_comm in Hlb; cbn in Hlb.
+rewrite app_nth2 in Hlb; [ | now unfold ge ].
+rewrite Nat.sub_diag in Hlb; cbn in Hlb.
+destruct (srng_eq_dec b 0) as [Hbz| Hbz]; [ easy | clear Hlb ].
+move b before a.
+...
 intros (la, Hla) (lb, Hlb) i; cbn.
 move lb before la.
 destruct la as [| a]. {
