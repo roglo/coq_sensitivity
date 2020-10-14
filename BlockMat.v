@@ -4175,6 +4175,9 @@ rewrite polyn_degree_add. 2: {
     cbn - [ polyn_coeff xI_sub_M det_loop summation ].
     rewrite srng_mul_1_l.
     rewrite polyn_coeff_add.
+Check polyn_coeff_add.
+Search (polyn_coeff (_ * _)%P).
+About polyn_coeff.
 ...
 Search polyn_coeff.
     cbn - [ minus_one_pow mat_el xI_sub_M det_loop polyn_degree summation ].
