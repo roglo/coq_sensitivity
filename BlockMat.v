@@ -3929,6 +3929,18 @@ rewrite if_1_eq_0; cbn.
 now destruct (srng_eq_dec (mat_el M 0 0) 0); cbn; rewrite if_1_eq_0.
 Qed.
 
+Theorem polyn_degree_mat_el_xI_sub_M_0_succ : ∀ M i,
+  polyn_degree (mat_el (xI_sub_M M) 0 (S i)) = 0.
+Proof.
+intros.
+cbn; rewrite if_1_eq_0; cbn.
+cbn; rewrite if_0_eq_0; cbn.
+rewrite srng_add_0_l, srng_mul_0_l.
+rewrite if_0_eq_0; cbn.
+destruct (srng_eq_dec (mat_el M 0 (S i)) 0) as [Hz| Hz]; [ easy | cbn ].
+now destruct (srng_eq_dec (- mat_el M 0 (S i))%Rng 0).
+Qed.
+
 Theorem polyn_coeff_add : ∀ P Q i,
   polyn_coeff (P + Q)%P i = (polyn_coeff P i + polyn_coeff Q i)%Srng.
 Proof.
@@ -4179,6 +4191,52 @@ rewrite polyn_degree_add. 2: {
   }
   rewrite submatrix_xI_sub_M.
   rewrite IHn; [ | cbn; flia Hn ].
+  replace (minus_one_pow 0) with 1%Srng by easy.
+  rewrite srng_mul_1_l.
+  rewrite polyn_degree_mat_el_xI_sub_M_0_0.
+  apply Nat.lt_succ_r.
+  etransitivity; [ apply (polyn_degree_summation_ub 0) | ].
+  rewrite Nat.sub_succ, Nat.sub_0_r.
+  rewrite map_map.
+  etransitivity. {
+    apply List_fold_left_max_map_le.
+    intros j Hj.
+    apply polyn_degree_mul_le.
+  }
+  etransitivity. {
+    eapply List_fold_left_max_map_le.
+    intros j Hj.
+    apply Nat.add_le_mono_r.
+    apply polyn_degree_mul_le.
+  }
+  erewrite map_ext_in. 2: {
+    intros j Hj.
+    rewrite Nat.add_comm, Nat.add_assoc.
+    rewrite Nat.add_shuffle0.
+    apply Nat.add_cancel_l.
+    apply polyn_degree_minus_one_pow.
+  }
+  erewrite map_ext_in. 2: {
+    intros j Hj.
+    apply Nat.add_0_r.
+  }
+  erewrite map_ext_in. 2: {
+    intros j Hj.
+    apply in_seq in Hj.
+    apply Nat.add_cancel_l.
+    destruct j; [ flia Hj | ].
+    apply polyn_degree_mat_el_xI_sub_M_0_succ.
+  }
+  erewrite map_ext_in. 2: {
+    intros j Hj.
+    apply Nat.add_0_r.
+  }
+  erewrite map_ext_in. 2: {
+    intros j Hj.
+    apply in_seq in Hj.
+    destruct j; [ flia Hj | ].
+    replace (polyn_degree _) with n by admit.
+    easy.
 ...
 
 Theorem glop : ∀ M i j n,
