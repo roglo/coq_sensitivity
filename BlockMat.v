@@ -3990,10 +3990,6 @@ induction lb as [| b] using rev_ind; intros. {
   rewrite norm_polyn_list_id; [ | easy ].
   now destruct i; rewrite srng_add_0_r.
 }
-(*
-induction lb as [| b] using rev_ind; intros; [ easy | ].
-rewrite List_last_app in Hbz.
-*)
 rewrite polyn_list_add_app_r.
 destruct (lt_dec (length la) (length lb)) as [Hll| Hll]. {
   rewrite firstn_skipn_rev.
@@ -4023,9 +4019,6 @@ destruct (lt_dec (length la) (length lb)) as [Hll| Hll]. {
     flia Hilb Hib.
   }
   cbn.
-(*
-  destruct (srng_eq_dec b 0) as [H| H]; [ easy | clear H; cbn ].
-*)
   destruct (lt_dec i (length lb)) as [Hib| Hib]. {
     rewrite app_nth1. 2: {
       rewrite polyn_list_add_length.
