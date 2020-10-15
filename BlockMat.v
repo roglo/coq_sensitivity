@@ -4247,9 +4247,13 @@ remember (S n) as sn.
 cbn - [ subm xI_sub_M summation ].
 subst sn.
 rewrite srng_summation_split_first; [ | flia ].
+unfold so.
+cbn - [ polyn_degree subm det_loop summation ].
+rewrite srng_mul_1_l.
 Search (polyn_degree (_ + _)).
 (* on devrait pouvoir utiliser polyn_degree_lt_add, faut vérifier et
    voir dans quel sens *)
+rewrite polyn_degree_lt_add.
 ...
 
 Theorem glop : ∀ M,
