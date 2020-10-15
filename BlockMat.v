@@ -4191,6 +4191,7 @@ rewrite polyn_degree_add_not_cancel; [ | congruence | easy ].
 congruence.
 Qed.
 
+(* chais pas... faut voir...
 Theorem polyn_degree_add_le_compat : ∀ Pa Pb Qa Qb,
   polyn_degree Pa ≤ polyn_degree Pb
   → polyn_degree Qa ≤ polyn_degree Qb
@@ -4224,6 +4225,7 @@ rewrite polyn_degree_add_not_cancel; [ | congruence | easy ].
 congruence.
 Qed.
 ...
+*)
 
 Theorem polyn_of_list_repeat_0s : ∀ n,
   polyn_of_list (repeat 0%Rng n) = 0%P.
