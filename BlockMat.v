@@ -3431,7 +3431,7 @@ intros * Hla.
 now specialize (norm_polyn_list_app_last_nz [a] la Hla) as H.
 Qed.
 
-Theorem polyn_degree_add : ∀ P Q,
+Theorem polyn_degree_lt_add : ∀ P Q,
   polyn_degree Q < polyn_degree P
   → polyn_degree (P + Q) = polyn_degree P.
 Proof.
@@ -3508,8 +3508,8 @@ unfold is_monic_polyn in HP |-*.
 (*
 cbn - [ polyn_coeff ].
 *)
-Check polyn_degree_add.
-rewrite polyn_degree_add; [ | easy ].
+Check polyn_degree_lt_add.
+rewrite polyn_degree_lt_add; [ | easy ].
 cbn in HP |-*.
 destruct P as (la, Hla).
 destruct Q as (lb, Hlb).
@@ -4111,7 +4111,7 @@ Qed.
 Definition polyn_highest_coeff P :=
   polyn_coeff P (polyn_degree P).
 
-Theorem glop : ∀ P Q,
+Theorem polyn_degree_add_not_cancel : ∀ P Q,
   polyn_degree P = polyn_degree Q
   → (polyn_highest_coeff P + polyn_highest_coeff Q ≠ 0)%Srng
   → polyn_degree (P + Q) = polyn_degree P.
@@ -4119,7 +4119,7 @@ Proof.
 intros (la, Hla) (lb, Hlb) HPQ HCPQ.
 move lb before la.
 cbn - [ norm_polyn_list ] in *.
-destruct la as [| a]. {
+destruct la as [| a] using rev_ind. {
   cbn in HPQ, HCPQ |-*.
   rewrite rev_length.
   destruct lb as [| b]; [ easy | cbn ].
@@ -4129,25 +4129,39 @@ destruct la as [| a]. {
   cbn in Hlb, HCPQ |-*.
   now destruct (srng_eq_dec b 0).
 }
-cbn - [ nth ] in Hla, HCPQ.
-cbn in HPQ.
-rewrite Nat.sub_0_r in HCPQ, HPQ.
-rewrite <- List_last_nth_cons in Hla, HCPQ.
-destruct lb as [| b]. {
+clear IHla.
+rewrite app_length in Hla, HCPQ, HPQ.
+rewrite Nat.add_1_r in Hla; cbn in Hla.
+rewrite Nat.add_sub in HPQ, HCPQ.
+rewrite app_nth2 in Hla; [ | now unfold ge ].
+rewrite app_nth2 in HCPQ; [ | now unfold ge ].
+rewrite Nat.sub_diag in Hla; cbn in Hla.
+rewrite Nat.sub_diag in HCPQ; cbn in HCPQ.
+destruct lb as [| b] using rev_ind. {
   apply length_zero_iff_nil in HPQ; subst la; cbn.
   now destruct (srng_eq_dec a 0).
 }
+clear IHlb.
 move b before a.
-cbn - [ nth ] in Hlb.
-cbn - [ nth last ] in HCPQ.
-rewrite Nat.sub_0_r in HCPQ.
-rewrite <- List_last_nth_cons in Hlb, HCPQ.
-cbn in HPQ; rewrite Nat.sub_0_r in HPQ.
-cbn - [ norm_polyn_list ].
-...
+rewrite app_length in Hlb, HCPQ, HPQ.
+rewrite Nat.add_1_r in Hlb; cbn in Hlb.
+rewrite Nat.add_sub in HPQ, HCPQ.
+rewrite app_nth2 in Hlb; [ | now unfold ge ].
+rewrite app_nth2 in HCPQ; [ | now unfold ge ].
+rewrite Nat.sub_diag in Hlb; cbn in Hlb.
+rewrite Nat.sub_diag in HCPQ; cbn in HCPQ.
+rewrite app_length, Nat.add_sub.
+rewrite polyn_list_add_app_l.
+rewrite firstn_app, HPQ, firstn_all, Nat.sub_diag, firstn_O, app_nil_r.
+rewrite skipn_app, skipn_all, app_nil_l, Nat.sub_diag, skipn_O; cbn.
+rewrite norm_polyn_list_app; cbn.
+destruct (srng_eq_dec (a + b) 0) as [H| H]; [ easy | clear H; cbn ].
+rewrite app_length, Nat.add_sub.
+rewrite polyn_list_add_length, max_r; [ easy | ].
+now rewrite HPQ.
+Qed.
 
-
-Theorem polyn_degree_add_compat : ∀ Pa Pb Qa Qb,
+Theorem polyn_degree_lt_add_compat : ∀ Pa Pb Qa Qb,
   polyn_degree Pa = polyn_degree Pb
   → polyn_degree Qa = polyn_degree Qb
   → polyn_degree (Pa + Qa) = polyn_degree (Pb + Qb).
@@ -4155,17 +4169,18 @@ Proof.
 intros * HP HQ.
 destruct (lt_dec (polyn_degree Pa) (polyn_degree Qa)) as [HPQ| HPQ]. {
   rewrite polyn_add_comm.
-  rewrite polyn_degree_add; [ | easy ].
+  rewrite polyn_degree_lt_add; [ | easy ].
   rewrite polyn_add_comm.
-  rewrite polyn_degree_add; [ easy | congruence ].
+  rewrite polyn_degree_lt_add; [ easy | congruence ].
 }
 apply Nat.nlt_ge in HPQ.
 destruct (lt_dec (polyn_degree Qa) (polyn_degree Pa)) as [HQP| HQP]. {
-  rewrite polyn_degree_add; [ | easy ].
-  rewrite polyn_degree_add; [ easy | congruence ].
+  rewrite polyn_degree_lt_add; [ | easy ].
+  rewrite polyn_degree_lt_add; [ easy | congruence ].
 }
 apply Nat.nlt_ge in HQP.
 apply Nat.le_antisymm in HPQ; [ clear HQP | easy ].
+Inspect 1.
 ...
 Check polyn_degree_add_ub.
 unfold polyn_degree, polyn_degree_plus_1 in *.
@@ -4204,9 +4219,9 @@ rewrite fold_left_srng_add_fun_from_0; symmetry.
 rewrite fold_left_srng_add_fun_from_0; symmetry.
 remember (S len) as slen; cbn - [ polyn_add ]; subst slen.
 ...
-apply polyn_degree_add_compat.
+apply polyn_degree_lt_add_compat.
 ...
-rewrite polyn_degree_add. 2: {
+rewrite polyn_degree_lt_add. 2: {
 ...
 
 Theorem polyn_degree_det_subm_xI_sub_M_succ_r : ∀ i n M,
@@ -4246,7 +4261,7 @@ cbn - [ xI_sub_M summation ].
 destruct n. {
   cbn - [ polyn_degree ].
   rewrite polyn_mul_1_r.
-  rewrite polyn_degree_add. 2: {
+  rewrite polyn_degree_lt_add. 2: {
     cbn; rewrite if_1_eq_0; cbn.
     destruct (srng_eq_dec (mat_el M 0 0) 0); cbn; flia.
   }
@@ -4254,7 +4269,7 @@ destruct n. {
 }
 rewrite srng_summation_split_first; [ | flia ].
 cbn - [ minus_one_pow mat_el xI_sub_M det_loop polyn_degree summation ].
-rewrite polyn_degree_add. 2: {
+rewrite polyn_degree_lt_add. 2: {
   rewrite polyn_degree_mul. 2: {
     rewrite polyn_degree_mul. 2: {
       cbn - [ polyn_degree xI_sub_M ].
@@ -4434,7 +4449,7 @@ destruct n. {
 rewrite srng_summation_split_first; [ | flia ].
 cbn - [ subm summation polyn_add det_loop ].
 rewrite polyn_mul_1_l.
-rewrite polyn_degree_add. 2: {
+rewrite polyn_degree_lt_add. 2: {
   rewrite submatrix_xI_sub_M.
 ...
 remember (S n) as sn; cbn; subst sn.
