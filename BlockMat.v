@@ -4161,35 +4161,35 @@ rewrite polyn_list_add_length, max_r; [ easy | ].
 now rewrite HPQ.
 Qed.
 
-Theorem polyn_degree_lt_add_compat : ∀ Pa Pb Qa Qb,
+Theorem polyn_degree_add_compat : ∀ Pa Pb Qa Qb,
   polyn_degree Pa = polyn_degree Pb
   → polyn_degree Qa = polyn_degree Qb
+  → (polyn_highest_coeff Pa + polyn_highest_coeff Qa)%Srng ≠ 0%Srng
+  → (polyn_highest_coeff Pb + polyn_highest_coeff Qb)%Srng ≠ 0%Srng
   → polyn_degree (Pa + Qa) = polyn_degree (Pb + Qb).
 Proof.
-intros * HP HQ.
+intros * HP HQ Hha Hhb.
 destruct (lt_dec (polyn_degree Pa) (polyn_degree Qa)) as [HPQ| HPQ]. {
   rewrite polyn_add_comm.
   rewrite polyn_degree_lt_add; [ | easy ].
   rewrite polyn_add_comm.
-  rewrite polyn_degree_lt_add; [ easy | congruence ].
+  rewrite polyn_degree_lt_add; [ easy | ].
+  unfold so in HP, HQ.
+  now rewrite <- HP, <- HQ.
 }
 apply Nat.nlt_ge in HPQ.
 destruct (lt_dec (polyn_degree Qa) (polyn_degree Pa)) as [HQP| HQP]. {
   rewrite polyn_degree_lt_add; [ | easy ].
-  rewrite polyn_degree_lt_add; [ easy | congruence ].
+  rewrite polyn_degree_lt_add; [ easy | ].
+  unfold so in HP, HQ.
+  now rewrite <- HP, <- HQ.
 }
 apply Nat.nlt_ge in HQP.
 apply Nat.le_antisymm in HPQ; [ clear HQP | easy ].
-Inspect 1.
-...
-Check polyn_degree_add_ub.
-unfold polyn_degree, polyn_degree_plus_1 in *.
-Search (polyn_list (_ + _)%P).
-cbn.
-Search (norm_polyn_list (_ + _)).
-Check norm_polyn_list.
-Search (length (norm_polyn_list _)).
-...
+rewrite polyn_degree_add_not_cancel; [ | easy | easy ].
+rewrite polyn_degree_add_not_cancel; [ | congruence | easy ].
+congruence.
+Qed.
 
 Theorem polyn_degree_summation_eq_compat : ∀ b e f g,
   (∀ i, b ≤ i ≤ e → polyn_degree (f i) = polyn_degree (g i))
@@ -4218,10 +4218,11 @@ do 2 rewrite polyn_add_0_l.
 rewrite fold_left_srng_add_fun_from_0; symmetry.
 rewrite fold_left_srng_add_fun_from_0; symmetry.
 remember (S len) as slen; cbn - [ polyn_add ]; subst slen.
-...
-apply polyn_degree_lt_add_compat.
-...
-rewrite polyn_degree_lt_add. 2: {
+apply polyn_degree_add_compat; [ apply Hfg; flia | | | ]. {
+  apply IHlen.
+  intros i Hi.
+  apply Hfg; flia Hi.
+} {
 ...
 
 Theorem polyn_degree_det_subm_xI_sub_M_succ_r : ∀ i n M,
