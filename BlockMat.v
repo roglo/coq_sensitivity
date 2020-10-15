@@ -4277,9 +4277,35 @@ apply polyn_degree_add_le_compat.
 ...
 *)
 
+Definition cumulate_subm lij (M : matrix (polynomial T)) :=
+  fold_left (λ m ij, subm m (fst ij) (snd ij)) lij M.
+
+Theorem polyn_degree_det_loop_cum_subm : ∀ lij M n i,
+  polyn_degree
+    (det_loop (subm (cumulate_subm lij (xI_sub_M M)) 0 (S i)) (S n)) ≤ n.
+Proof.
+intros.
+revert M i n.
+induction lij as [| (i, j)]; intros. {
+  cbn - [ det_loop ].
+  revert M i.
+  induction n; intros. {
+    cbn - [ polyn_list ].
+    specialize (polyn_of_list_repeat_0s 1) as H.
+    cbn in H; rewrite H; clear H.
+    rewrite srng_mul_0_r, srng_add_0_l; cbn.
+    now destruct (srng_eq_dec (mat_el M 1 0) 0).
+  }
+  remember (S n) as sn.
+  cbn - [ subm summation ]; subst sn.
+...
+
 Theorem polyn_degree_det_loop_subm_xI_sub_M_succ_r_le : ∀ M i n,
   polyn_degree (det_loop (subm (xI_sub_M M) 0 (S i)) (S n)) ≤ n.
 Proof.
+intros.
+apply (polyn_degree_det_loop_cum_subm [] M n i).
+...
 intros.
 revert M i.
 induction n; intros. {
