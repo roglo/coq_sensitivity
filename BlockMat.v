@@ -4276,11 +4276,36 @@ Proof.
 now intros; cbn; destruct (srng_eq_dec a 0).
 Qed.
 
-Theorem polyn_degree_det_subm_le : ∀ M i n,
-  polyn_degree (det_loop (subm M 0 i) n) ≤ polyn_degree (det_loop M n).
+Theorem polyn_degree_det_subm_le : ∀ M i j n,
+  polyn_degree (det_loop (subm (subm (xI_sub_M M) 0 i) 0 (S j)) n) ≤
+  polyn_degree (det_loop (subm (xI_sub_M M) 0 i) n).
 Proof.
 intros.
+revert M i j.
+induction n; intros; [ easy | ].
+cbn - [ subm summation ].
+destruct n. {
+  cbn.
+  specialize (polyn_of_list_repeat_0s 1) as H; cbn in H.
+  rewrite H; clear H.
+  rewrite polyn_mul_0_r.
+  do 3 rewrite polyn_add_0_l.
+  rewrite polyn_mul_1_r.
+  rewrite fold_polyn_sub.
+  destruct (lt_dec 0 i) as [Hzi| Hzi]. {
+    rewrite polyn_degree_opp, polyn_degree_of_single.
+    apply Nat.le_0_l.
+  }
+  rewrite polyn_degree_opp, polyn_degree_of_single.
+  apply Nat.le_0_l.
+}
+rewrite (srng_summation_split_first 0); [ | flia ].
+rewrite (srng_summation_split_first 0); [ | flia ].
+cbn - [ polyn_degree subm summation det_loop ].
+do 2 rewrite srng_mul_1_l.
+Search (polyn_degree (_ + _)).
 ...
+
 
 Theorem polyn_degree_det_loop_subm_xI_sub_M_succ_r_le : ∀ M i n,
   polyn_degree (det_loop (subm (xI_sub_M M) 0 (S i)) (S n)) ≤ n.
