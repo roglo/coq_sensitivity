@@ -4276,6 +4276,12 @@ Proof.
 now intros; cbn; destruct (srng_eq_dec a 0).
 Qed.
 
+Theorem polyn_degree_det_subm_le : ∀ M i n,
+  polyn_degree (det_loop (subm M 0 i) n) ≤ polyn_degree (det_loop M n).
+Proof.
+intros.
+...
+
 Theorem polyn_degree_det_loop_subm_xI_sub_M_succ_r_le : ∀ M i n,
   polyn_degree (det_loop (subm (xI_sub_M M) 0 (S i)) (S n)) ≤ n.
 Proof.
@@ -4303,6 +4309,9 @@ etransitivity. {
   apply List_fold_left_max_map_le.
   intros j Hj.
   apply Nat.add_le_mono_l.
+  etransitivity; [ | apply (IHn M i) ].
+...
+apply polyn_degree_det_subm_le.
 ...
   rewrite Nat.add_comm, Nat.add_assoc.
   rewrite Nat.add_shuffle0.
