@@ -4191,6 +4191,7 @@ rewrite polyn_degree_add_not_cancel; [ | congruence | easy ].
 congruence.
 Qed.
 
+(* mmm... il faut des conditions supplémentaires et qui sont compliquées...
 Theorem polyn_degree_summation_eq_compat : ∀ b e f g,
   (∀ i, b ≤ i ≤ e → polyn_degree (f i) = polyn_degree (g i))
   → polyn_degree (Σ (i = b, e), f i) = polyn_degree (Σ (i = b, e), g i).
@@ -4224,6 +4225,7 @@ apply polyn_degree_add_compat; [ apply Hfg; flia | | | ]. {
   apply Hfg; flia Hi.
 } {
 ...
+*)
 
 Theorem polyn_degree_det_subm_xI_sub_M_succ_r : ∀ i n M,
   i ≤ n
@@ -4244,10 +4246,10 @@ induction n; intros. {
 remember (S n) as sn.
 cbn - [ subm xI_sub_M summation ].
 subst sn.
-Search (polyn_degree (Σ (_ = _, _), _)).
-...
-erewrite polyn_degree_summation_eq_compat. 2: {
-  intros j Hj.
+rewrite srng_summation_split_first; [ | flia ].
+Search (polyn_degree (_ + _)).
+(* on devrait pouvoir utiliser polyn_degree_lt_add, faut vérifier et
+   voir dans quel sens *)
 ...
 
 Theorem glop : ∀ M,
