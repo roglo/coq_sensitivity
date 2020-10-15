@@ -4243,6 +4243,7 @@ Proof.
 now intros; cbn; destruct (srng_eq_dec a 0).
 Qed.
 
+(* bof, chais pas, ça a pas l'air simple...
 Theorem polyn_degree_det_subm_le : ∀ M i j n,
   polyn_degree (det_loop (subm (subm (xI_sub_M M) 0 i) 0 (S j)) n) ≤
   polyn_degree (det_loop (subm (xI_sub_M M) 0 i) n).
@@ -4274,7 +4275,7 @@ Search (polyn_degree (_ + _)).
 ...
 apply polyn_degree_add_le_compat.
 ...
-
+*)
 
 Theorem polyn_degree_det_loop_subm_xI_sub_M_succ_r_le : ∀ M i n,
   polyn_degree (det_loop (subm (xI_sub_M M) 0 (S i)) (S n)) ≤ n.
@@ -4304,6 +4305,7 @@ etransitivity. {
   intros j Hj.
   apply Nat.add_le_mono_l.
   etransitivity; [ | apply (IHn M i) ].
+Check (submatrix_xI_sub_M).
 ...
 apply polyn_degree_det_subm_le.
 ...
