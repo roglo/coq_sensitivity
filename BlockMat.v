@@ -4191,41 +4191,39 @@ rewrite polyn_degree_add_not_cancel; [ | congruence | easy ].
 congruence.
 Qed.
 
-(* mmm... il faut des conditions supplémentaires et qui sont compliquées...
-Theorem polyn_degree_summation_eq_compat : ∀ b e f g,
-  (∀ i, b ≤ i ≤ e → polyn_degree (f i) = polyn_degree (g i))
-  → polyn_degree (Σ (i = b, e), f i) = polyn_degree (Σ (i = b, e), g i).
+Theorem polyn_degree_add_le_compat : ∀ Pa Pb Qa Qb,
+  polyn_degree Pa ≤ polyn_degree Pb
+  → polyn_degree Qa ≤ polyn_degree Qb
+  → (polyn_highest_coeff Pb + polyn_highest_coeff Qb)%Srng ≠ 0%Srng
+  → polyn_degree (Pa + Qa) ≤ polyn_degree (Pb + Qb).
 Proof.
-intros * Hfg.
-destruct (le_dec b e) as [Hbe| Hbe]. 2: {
-  apply Nat.nle_gt in Hbe.
-  rewrite srng_summation_empty; [ | easy ].
-  now rewrite srng_summation_empty.
-}
-unfold summation.
-remember (S e - b) as len eqn:Hlen.
-destruct len; [ easy | ].
-replace e with (b + len) in Hfg by flia Hlen Hbe.
-clear e Hbe Hlen.
-revert b Hfg.
-induction len; intros. {
-  cbn - [ polyn_degree ].
-  do 2 rewrite polyn_add_0_l.
-  rewrite Nat.add_0_r in Hfg.
-  now rewrite Hfg.
-}
-remember (S len) as slen; cbn; subst slen.
-do 2 rewrite polyn_add_0_l.
-rewrite fold_left_srng_add_fun_from_0; symmetry.
-rewrite fold_left_srng_add_fun_from_0; symmetry.
-remember (S len) as slen; cbn - [ polyn_add ]; subst slen.
-apply polyn_degree_add_compat; [ apply Hfg; flia | | | ]. {
-  apply IHlen.
-  intros i Hi.
-  apply Hfg; flia Hi.
-} {
+intros * HP HQ Hhb.
+destruct (lt_dec (polyn_degree Pa) (polyn_degree Qa)) as [HPQ| HPQ]. {
+  rewrite polyn_add_comm.
+  rewrite polyn_degree_lt_add; [ | easy ].
+  rewrite polyn_add_comm.
+  rewrite polyn_degree_lt_add; [ easy | ].
 ...
-*)
+  eapply lt_le_trans; [ | apply HQ ].
+  eapply le_lt_trans; [ | apply HPQ ].
+...
+  unfold so in HP, HQ.
+  now rewrite <- HP, <- HQ.
+}
+apply Nat.nlt_ge in HPQ.
+destruct (lt_dec (polyn_degree Qa) (polyn_degree Pa)) as [HQP| HQP]. {
+  rewrite polyn_degree_lt_add; [ | easy ].
+  rewrite polyn_degree_lt_add; [ easy | ].
+  unfold so in HP, HQ.
+  now rewrite <- HP, <- HQ.
+}
+apply Nat.nlt_ge in HQP.
+apply Nat.le_antisymm in HPQ; [ clear HQP | easy ].
+rewrite polyn_degree_add_not_cancel; [ | easy | easy ].
+rewrite polyn_degree_add_not_cancel; [ | congruence | easy ].
+congruence.
+Qed.
+...
 
 Theorem polyn_of_list_repeat_0s : ∀ n,
   polyn_of_list (repeat 0%Rng n) = 0%P.
@@ -4237,39 +4235,6 @@ rewrite List_repeat_succ_app.
 rewrite norm_polyn_list_app; cbn.
 now rewrite if_0_eq_0.
 Qed.
-
-(* c'est faux, ça : sur la matrice nulle, par exemple, la partie
-   droite vaut 0 et non pas n...
-Theorem polyn_degree_det_subm_xI_sub_M_succ_r : ∀ i n M,
-  i ≤ n
-  → polyn_degree (det_loop (subm (xI_sub_M M) 0 (S i)) (S n)) = n.
-Proof.
-intros * Hin.
-revert M i Hin.
-induction n; intros. {
-  apply Nat.le_0_r in Hin; subst i.
-  cbn.
-  rewrite if_1_eq_0; cbn.
-  rewrite if_0_eq_0; cbn.
-  rewrite srng_add_0_l, srng_mul_0_l.
-  rewrite if_0_eq_0; cbn.
-  destruct (srng_eq_dec (mat_el M 1 0) 0) as [Hmz| Hmz]; [ easy | cbn ].
-  now destruct (srng_eq_dec (- mat_el M 1 0)%Rng 0).
-}
-remember (S n) as sn.
-cbn - [ subm xI_sub_M summation ].
-subst sn.
-rewrite srng_summation_split_first; [ | flia ].
-cbn - [ polyn_degree subm det_loop summation ].
-rewrite srng_mul_1_l.
-remember (mat_el _ _ _) as x eqn:Hx; cbn in Hx.
-specialize (polyn_of_list_repeat_0s 1) as H.
-cbn in H; rewrite H in Hx; clear H.
-rewrite polyn_mul_0_r, polyn_add_0_l in Hx; subst x.
-...
-rewrite polyn_degree_lt_add. 2: {
-...
-*)
 
 Theorem polyn_degree_of_single : ∀ a, polyn_degree (polyn_of_list [a]) = 0.
 Proof.
@@ -4305,12 +4270,7 @@ cbn - [ polyn_degree subm summation det_loop ].
 do 2 rewrite srng_mul_1_l.
 Search (polyn_degree (_ + _)).
 ...
-Theorem polyn_degree_add_le_compat:
-  ∀ Pa Pb Qa Qb,
-  polyn_degree Pa = polyn_degree Pb
-  → polyn_degree Qa = polyn_degree Qb
-  → (polyn_highest_coeff Pb + polyn_highest_coeff Qb)%Srng ≠ 0%Srng
-  → polyn_degree (Pa + Qa) ≤ polyn_degree (Pb + Qb).
+apply polyn_degree_add_le_compat.
 ...
 
 
