@@ -4227,6 +4227,19 @@ apply polyn_degree_add_compat; [ apply Hfg; flia | | | ]. {
 ...
 *)
 
+Theorem polyn_of_list_repeat_0s : ∀ n,
+  polyn_of_list (repeat 0%Rng n) = 0%P.
+Proof.
+intros.
+apply polyn_eq; cbn.
+induction n; [ easy | ].
+rewrite List_repeat_succ_app.
+rewrite norm_polyn_list_app; cbn.
+now rewrite if_0_eq_0.
+Qed.
+
+(* c'est faux, ça : sur la matrice nulle, par exemple, la partie
+   droite vaut 0 et non pas n...
 Theorem polyn_degree_det_subm_xI_sub_M_succ_r : ∀ i n M,
   i ≤ n
   → polyn_degree (det_loop (subm (xI_sub_M M) 0 (S i)) (S n)) = n.
@@ -4249,10 +4262,71 @@ subst sn.
 rewrite srng_summation_split_first; [ | flia ].
 cbn - [ polyn_degree subm det_loop summation ].
 rewrite srng_mul_1_l.
-Search (polyn_degree (_ + _)).
-(* on devrait pouvoir utiliser polyn_degree_lt_add, faut vérifier et
-   voir dans quel sens *)
-rewrite polyn_degree_lt_add.
+remember (mat_el _ _ _) as x eqn:Hx; cbn in Hx.
+specialize (polyn_of_list_repeat_0s 1) as H.
+cbn in H; rewrite H in Hx; clear H.
+rewrite polyn_mul_0_r, polyn_add_0_l in Hx; subst x.
+...
+rewrite polyn_degree_lt_add. 2: {
+...
+*)
+
+Theorem polyn_degree_of_single : ∀ a, polyn_degree (polyn_of_list [a]) = 0.
+Proof.
+now intros; cbn; destruct (srng_eq_dec a 0).
+Qed.
+
+Theorem polyn_degree_det_loop_subm_xI_sub_M_succ_r_le : ∀ M i n,
+  polyn_degree (det_loop (subm (xI_sub_M M) 0 (S i)) (S n)) ≤ n.
+Proof.
+intros.
+revert M i.
+induction n; intros. {
+  cbn - [ polyn_degree ].
+  specialize (polyn_of_list_repeat_0s 1) as H.
+  cbn in H; rewrite H; clear H.
+  rewrite polyn_mul_0_r, polyn_add_0_l.
+  rewrite polyn_degree_opp.
+  now rewrite polyn_degree_of_single.
+}
+remember (S n) as sn.
+cbn - [ subm xI_sub_M summation ]; subst sn.
+etransitivity; [ apply (polyn_degree_summation_ub 0) | ].
+rewrite Nat.sub_0_r.
+rewrite map_map.
+etransitivity. {
+  apply List_fold_left_max_map_le.
+  intros j Hj.
+  apply polyn_degree_mul_le.
+}
+etransitivity. {
+  apply List_fold_left_max_map_le.
+  intros j Hj.
+  apply Nat.add_le_mono_l.
+...
+  rewrite Nat.add_comm, Nat.add_assoc.
+  rewrite Nat.add_shuffle0.
+  apply Nat.add_cancel_l.
+    apply polyn_degree_minus_one_pow.
+  }
+  erewrite map_ext_in. 2: {
+    intros j Hj.
+    apply Nat.add_0_r.
+  }
+  erewrite map_ext_in. 2: {
+    intros j Hj.
+    apply in_seq in Hj.
+    apply Nat.add_cancel_l.
+    destruct j; [ flia Hj | ].
+    apply polyn_degree_mat_el_xI_sub_M_0_succ.
+  }
+  erewrite map_ext_in. 2: {
+    intros j Hj.
+    apply Nat.add_0_r.
+  }
+  etransitivity. {
+    apply List_fold_left_max_map_le with (g := λ _, n).
+    intros i Hi.
 ...
 
 Theorem glop : ∀ M,
@@ -4378,15 +4452,14 @@ rewrite polyn_degree_lt_add. 2: {
     intros j Hj.
     apply Nat.add_0_r.
   }
-  rewrite map_ext_in with (g := λ _, n). 2: {
-    intros j Hj.
-    apply in_seq in Hj.
-    destruct j; [ flia Hj | ].
-    replace (polyn_degree _) with n; [ easy | ].
-    symmetry.
+  etransitivity. {
+    apply List_fold_left_max_map_le with (g := λ _, n).
+    intros i Hi.
 ...
-apply polyn_degree_det_subm_xI_sub_M_succ_r.
-flia Hj.
+apply in_seq in Hi.
+destruct i; [ easy | ].
+apply polyn_degree_det_loop_subm_xI_sub_M_succ_r_le.
+
 ..
 
 Theorem glop : ∀ M i j n,
