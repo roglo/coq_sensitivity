@@ -4298,6 +4298,19 @@ induction lij as [| (i, j)]; intros. {
   }
   remember (S n) as sn.
   cbn - [ subm summation ]; subst sn.
+  unfold so.
+  rewrite srng_summation_split_first; [ | apply Nat.le_0_l ].
+  remember (S n) as sn.
+  cbn - [ polyn_degree subm summation ]; subst sn.
+  rewrite srng_mul_1_l.
+...
+  rewrite polyn_degree_lt_add. 2: {
+Search (polyn_degree (_ * _)).
+...
+    eapply lt_le_trans.
+Check polyn_degree_mul.
+    rewrite polyn_degree_mul.
+    replace (polyn_degree (mat_el (subm (xI_sub_M M) 0 (S i)) 0 0)) with 0.
 ...
 
 Theorem polyn_degree_det_loop_subm_xI_sub_M_succ_r_le : ∀ M i n,
