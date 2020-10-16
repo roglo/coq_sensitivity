@@ -4358,8 +4358,7 @@ Theorem polyn_degree_det_loop_subm_xI_sub_M_succ_r_le : ∀ M i n,
   → polyn_degree (det_loop (subm (xI_sub_M M) 0 (S i)) (S n)) ≤ S n.
 Proof.
 intros * Hn.
-clear Hn.
-revert M i (*Hn*).
+revert M i Hn.
 induction n; intros. {
   cbn - [ polyn_degree ].
   specialize (polyn_of_list_repeat_0s 1) as H.
@@ -4383,9 +4382,47 @@ etransitivity. {
   intros j Hj.
   apply Nat.add_le_mono_l.
 (**)
-  etransitivity; [ | apply (IHn (subm M 0 0) i) ].
+  etransitivity; [ | apply (IHn (subm M 0 0) 0) ]. 2: {
+    now cbn; rewrite Hn, Nat.sub_succ, Nat.sub_0_r.
+  }
+(**)
+destruct (zerop i).
+destruct (zerop j).
+destruct (zerop n). {
+subst i j n.
+cbn - [ subm summation ].
+(* 1 ≤ 0, genre : fectivement ça va pas *)
+...
   rewrite <- submatrix_xI_sub_M.
-(* mouais, je pense que ça, c'est bon. *)
+  cbn - [ subm summation ].
+  destruct n. {
+    cbn.
+    rewrite if_1_eq_0; cbn.
+    rewrite if_0_eq_0; cbn.
+    rewrite srng_add_0_l, srng_mul_0_l; cbn.
+    rewrite if_0_eq_0; cbn.
+    rewrite srng_mul_1_r.
+    specialize (polyn_of_list_repeat_0s 1) as H; cbn in H.
+    rewrite H; clear H.
+    rewrite srng_mul_0_r.
+    do 2 rewrite srng_add_0_l.
+    destruct (lt_dec 0 j) as [Hzj| Hzj]. {
+      rewrite polyn_degree_opp.
+      rewrite polyn_degree_of_single.
+      apply Nat.le_0_l.
+    }
+    destruct (lt_dec 1 (S i)) as [H1i| H1i]. {
+      rewrite polyn_degree_opp.
+      rewrite polyn_degree_of_single.
+      apply Nat.le_0_l.
+    }
+    destruct (srng_eq_dec (mat_el M 2 1) 0) as [Hmz| Hmz]. {
+      cbn - [ polyn_degree ].
+apply Nat.nlt_ge in Hzj.
+apply Nat.nlt_ge in H1i.
+apply Nat.le_0_r in Hzj.
+apply Nat.succ_le_mono, Nat.le_0_r in H1i.
+(* chiasse de pute *)
 ...
   etransitivity; [ | apply (IHn M i) ].
   cbn - [ subm summation ].
