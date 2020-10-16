@@ -4277,6 +4277,36 @@ apply polyn_degree_add_le_compat.
 ...
 *)
 
+Theorem polyn_degree_mat_el_subm_xI_sub_M_0_succ_0_0 : ∀ M i,
+  polyn_degree (mat_el (subm (xI_sub_M M) 0 (S i)) 0 0) = 0.
+Proof.
+intros; cbn.
+rewrite if_1_eq_0; cbn.
+rewrite if_0_eq_0; cbn.
+rewrite srng_add_0_l, srng_mul_0_l.
+rewrite if_0_eq_0; cbn.
+destruct (srng_eq_dec (mat_el M 1 0) 0) as [Hmz| Hmz]; [ easy | cbn ].
+now destruct (srng_eq_dec (- mat_el M 1 0)%Rng 0).
+Qed.
+
+Theorem polyn_coeff_mat_el_subm_xI_sub_M_succ_0_0_0 : ∀ M i,
+  polyn_coeff (mat_el (subm (xI_sub_M M) 0 (S i)) 0 0) 0 =
+    (- mat_el M 1 0)%Rng.
+Proof.
+intros; cbn.
+rewrite if_1_eq_0; cbn.
+rewrite if_0_eq_0; cbn.
+rewrite srng_add_0_l, srng_mul_0_l.
+rewrite if_0_eq_0; cbn.
+destruct (srng_eq_dec (mat_el M 1 0) 0) as [Hmz| Hmz]. {
+  cbn; symmetry.
+  rewrite Hmz.
+  apply rng_opp_0.
+}
+cbn.
+now destruct (srng_eq_dec (- mat_el M 1 0)%Rng 0).
+Qed.
+
 Definition cumulate_subm lij (M : matrix (polynomial T)) :=
   fold_left (λ m ij, subm m (fst ij) (snd ij)) lij M.
 
@@ -4303,14 +4333,13 @@ induction lij as [| (i, j)]; intros. {
   remember (S n) as sn.
   cbn - [ polyn_degree subm summation ]; subst sn.
   rewrite srng_mul_1_l.
-...
   rewrite polyn_degree_lt_add. 2: {
-Search (polyn_degree (_ * _)).
-...
-    eapply lt_le_trans.
-Check polyn_degree_mul.
-    rewrite polyn_degree_mul.
-    replace (polyn_degree (mat_el (subm (xI_sub_M M) 0 (S i)) 0 0)) with 0.
+    unfold so.
+    rewrite polyn_degree_mul. 2: {
+      rewrite polyn_degree_mat_el_subm_xI_sub_M_0_succ_0_0.
+      rewrite polyn_coeff_mat_el_subm_xI_sub_M_succ_0_0_0.
+remember (det_loop (subm (subm (xI_sub_M M) 0 (S i)) 0 0) (S n)) as a.
+(* très compliqué *)
 ...
 
 Theorem polyn_degree_det_loop_subm_xI_sub_M_succ_r_le : ∀ M i n,
