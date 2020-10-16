@@ -4388,6 +4388,7 @@ rewrite Nat.sub_succ, Nat.sub_0_r in H1.
 specialize (H1 eq_refl).
 rewrite <- submatrix_xI_sub_M in H1.
 etransitivity; [ | apply H1 ].
+(* mouais, je pense que ça, c'est bon. *)
 ...
   etransitivity; [ | apply (IHn M i) ].
   cbn - [ subm summation ].
