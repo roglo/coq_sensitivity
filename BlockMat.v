@@ -4344,6 +4344,15 @@ remember (det_loop (subm (subm (xI_sub_M M) 0 (S i)) 0 0) (S n)) as a.
 ...
 *)
 
+(*
+End in_ring.
+Require Import ZArith.
+Open Scope Z_scope.
+Definition M := mat_of_list_list 0 [[1; 0; 0; 0]; [0; 1; 0; 0]; [0; 0; 1; 0]; [0; 0; 0; 1]].
+Compute (let ro := ring_op Z in let _ := rng_semiring in det_loop (subm (xI_sub_M M) 0 1) 0).
+*)
+
+
 Theorem polyn_degree_det_loop_subm_xI_sub_M_succ_r_le : ∀ M i n,
   polyn_degree (det_loop (subm (xI_sub_M M) 0 (S i)) (S n)) ≤ n.
 Proof.
