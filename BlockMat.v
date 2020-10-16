@@ -4354,22 +4354,18 @@ Compute (let ro := ring_op Z in let _ := rng_semiring in det_loop (subm (xI_sub_
 
 
 Theorem polyn_degree_det_loop_subm_xI_sub_M_succ_r_le : ∀ M i n,
-  polyn_degree (det_loop (subm (xI_sub_M M) 0 (S i)) (S n)) ≤ n.
+  mat_nrows M = S (S n)
+  → polyn_degree (det_loop (subm (xI_sub_M M) 0 (S i)) (S n)) ≤ S n.
 Proof.
-(*
-intros.
-apply (polyn_degree_det_loop_cum_subm [] M n i).
-...
-*)
-intros.
-revert M i.
+intros * Hn.
+revert M i Hn.
 induction n; intros. {
   cbn - [ polyn_degree ].
   specialize (polyn_of_list_repeat_0s 1) as H.
   cbn in H; rewrite H; clear H.
   rewrite polyn_mul_0_r, polyn_add_0_l.
   rewrite polyn_degree_opp.
-  now rewrite polyn_degree_of_single.
+  rewrite polyn_degree_of_single; flia.
 }
 remember (S n) as sn.
 cbn - [ subm xI_sub_M summation ]; subst sn.
@@ -4385,6 +4381,14 @@ etransitivity. {
   apply List_fold_left_max_map_le.
   intros j Hj.
   apply Nat.add_le_mono_l.
+(**)
+specialize (IHn (subm M 0 0) i) as H1.
+rewrite submatrix_nrows, Hn in H1.
+rewrite Nat.sub_succ, Nat.sub_0_r in H1.
+specialize (H1 eq_refl).
+rewrite <- submatrix_xI_sub_M in H1.
+etransitivity; [ | apply H1 ].
+...
   etransitivity; [ | apply (IHn M i) ].
   cbn - [ subm summation ].
   destruct n. {
@@ -4431,6 +4435,7 @@ apply polyn_degree_det_subm_le.
     apply List_fold_left_max_map_le with (g := λ _, n).
     intros i Hi.
 ...
+*)
 
 Theorem glop : ∀ M,
   polyn_degree (determinant (xI_sub_M M)) = mat_nrows M.
@@ -4556,13 +4561,12 @@ rewrite polyn_degree_lt_add. 2: {
     apply Nat.add_0_r.
   }
   etransitivity. {
-    apply List_fold_left_max_map_le with (g := λ _, n).
+    apply List_fold_left_max_map_le with (g := λ _, S n).
     intros i Hi.
+    apply in_seq in Hi.
+    destruct i; [ easy | ].
 ...
-apply in_seq in Hi.
-destruct i; [ easy | ].
 apply polyn_degree_det_loop_subm_xI_sub_M_succ_r_le.
-
 ..
 
 Theorem glop : ∀ M i j n,
