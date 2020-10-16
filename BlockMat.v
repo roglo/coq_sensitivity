@@ -4307,6 +4307,7 @@ cbn.
 now destruct (srng_eq_dec (- mat_el M 1 0)%Rng 0).
 Qed.
 
+(*
 Definition cumulate_subm lij (M : matrix (polynomial T)) :=
   fold_left (λ m ij, subm m (fst ij) (snd ij)) lij M.
 
@@ -4341,13 +4342,16 @@ induction lij as [| (i, j)]; intros. {
 remember (det_loop (subm (subm (xI_sub_M M) 0 (S i)) 0 0) (S n)) as a.
 (* très compliqué *)
 ...
+*)
 
 Theorem polyn_degree_det_loop_subm_xI_sub_M_succ_r_le : ∀ M i n,
   polyn_degree (det_loop (subm (xI_sub_M M) 0 (S i)) (S n)) ≤ n.
 Proof.
+(*
 intros.
 apply (polyn_degree_det_loop_cum_subm [] M n i).
 ...
+*)
 intros.
 revert M i.
 induction n; intros. {
@@ -4373,7 +4377,24 @@ etransitivity. {
   intros j Hj.
   apply Nat.add_le_mono_l.
   etransitivity; [ | apply (IHn M i) ].
-Check (submatrix_xI_sub_M).
+  cbn - [ subm summation ].
+  destruct n. {
+    cbn - [ polyn_degree ].
+    specialize (polyn_of_list_repeat_0s 1) as H; cbn in H.
+    rewrite H; clear H.
+    rewrite srng_mul_0_r, srng_mul_1_r.
+    do 3 rewrite srng_add_0_l.
+    destruct (lt_dec 0 j) as [Hzj| Hzj]. {
+      rewrite polyn_degree_opp.
+      rewrite polyn_degree_of_single.
+      apply Nat.le_0_l.
+    }
+    destruct (lt_dec 1 (S i)) as [H1i| H1i]. {
+      rewrite polyn_degree_opp.
+      rewrite polyn_degree_of_single.
+      apply Nat.le_0_l.
+    }
+    (* et toc ! c'est faux *)
 ...
 apply polyn_degree_det_subm_le.
 ...
