@@ -4358,7 +4358,8 @@ Theorem polyn_degree_det_loop_subm_xI_sub_M_succ_r_le : ∀ M i n,
   → polyn_degree (det_loop (subm (xI_sub_M M) 0 (S i)) (S n)) ≤ S n.
 Proof.
 intros * Hn.
-revert M i Hn.
+clear Hn.
+revert M i (*Hn*).
 induction n; intros. {
   cbn - [ polyn_degree ].
   specialize (polyn_of_list_repeat_0s 1) as H.
@@ -4382,12 +4383,8 @@ etransitivity. {
   intros j Hj.
   apply Nat.add_le_mono_l.
 (**)
-specialize (IHn (subm M 0 0) i) as H1.
-rewrite submatrix_nrows, Hn in H1.
-rewrite Nat.sub_succ, Nat.sub_0_r in H1.
-specialize (H1 eq_refl).
-rewrite <- submatrix_xI_sub_M in H1.
-etransitivity; [ | apply H1 ].
+  etransitivity; [ | apply (IHn (subm M 0 0) i) ].
+  rewrite <- submatrix_xI_sub_M.
 (* mouais, je pense que ça, c'est bon. *)
 ...
   etransitivity; [ | apply (IHn M i) ].
