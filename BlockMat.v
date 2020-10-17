@@ -4202,33 +4202,22 @@ destruct (lt_dec (polyn_degree P) (polyn_degree Q)) as [HPQ| HPQ]. {
   rewrite polyn_add_comm.
   rewrite polyn_degree_lt_add; [ | easy ].
   rewrite polyn_add_comm.
-Search (polyn_degree (_ + _)).
-...
-  rewrite polyn_degree_add_not_cancel.
-...
-  rewrite polyn_degree_lt_add; [ easy | ].
-...
-  eapply lt_le_trans; [ | apply HQ ].
-  eapply le_lt_trans; [ | apply HPQ ].
-...
-  unfold so in HP, HQ.
-  now rewrite <- HP, <- HQ.
+  destruct (lt_dec (polyn_degree Q') (polyn_degree P')) as [HQP| HQP]. {
+    rewrite polyn_add_comm, polyn_degree_lt_add; [ | easy ].
+    etransitivity; [ apply HQ | ].
+    now apply Nat.lt_le_incl.
+  }
+  apply Nat.nlt_ge in HQP.
+  destruct (lt_dec (polyn_degree P') (polyn_degree Q')) as [H| H]. {
+    now rewrite polyn_degree_lt_add.
+  }
+  apply Nat.nlt_ge in H.
+  apply Nat.le_antisymm in HQP; [ clear H | easy ].
+  rewrite polyn_degree_add_not_cancel; [ | easy | now rewrite srng_add_comm ].
+  easy.
 }
 apply Nat.nlt_ge in HPQ.
-destruct (lt_dec (polyn_degree Qa) (polyn_degree Pa)) as [HQP| HQP]. {
-  rewrite polyn_degree_lt_add; [ | easy ].
-  rewrite polyn_degree_lt_add; [ easy | ].
-  unfold so in HP, HQ.
-  now rewrite <- HP, <- HQ.
-}
-apply Nat.nlt_ge in HQP.
-apply Nat.le_antisymm in HPQ; [ clear HQP | easy ].
-rewrite polyn_degree_add_not_cancel; [ | easy | easy ].
-rewrite polyn_degree_add_not_cancel; [ | congruence | easy ].
-congruence.
-Qed.
 ...
-*)
 
 Theorem polyn_of_list_repeat_0s : ∀ n,
   polyn_of_list (repeat 0%Rng n) = 0%P.
