@@ -4350,9 +4350,8 @@ induction lij as [| (i, j)]; intros. {
   remember (S n) as sn.
   cbn - [ polyn_degree subm xI_sub_M summation ]; subst sn.
   rewrite srng_mul_1_l.
-...
   rewrite polyn_degree_lt_add. 2: {
-...
+Abort.
 
 (*
 Theorem polyn_degree_det_loop_cum_subm : ∀ lij M n i,
@@ -4393,12 +4392,9 @@ Theorem polyn_degree_det_subm_subm_xI_sub_M_succ_le : ∀ M i j n,
   polyn_degree (det_loop (subm (subm (xI_sub_M M) 0 (S i)) 0 j) (S n)) ≤ S n.
 Proof.
 intros.
-...
+Abort. (*
 apply (polyn_degree_det_loop_cum_subm [(0, S i); (0, j)] M n).
 ...
-apply (polyn_degree_det_loop_cum_subm [(0, S i)] M n j).
-...
-
 revert M i j.
 induction n; intros. {
   cbn - [ polyn_degree ].
@@ -4420,6 +4416,7 @@ induction n; intros. {
 remember (S n) as sn.
 cbn - [ polyn_degree subm summation ]; subst sn.
 ...
+*)
 
 Theorem polyn_degree_det_loop_subm_xI_sub_M_succ_r_le : ∀ M i n,
   mat_nrows M = S (S n)
@@ -4449,7 +4446,7 @@ etransitivity. {
 erewrite List_fold_left_max_map_le. 2: {
   intros j Hj.
   apply Nat.add_le_mono_l.
-...
+Abort. (*
 apply polyn_degree_det_subm_subm_xI_sub_M_succ_le.
 }
 ...
@@ -4685,6 +4682,28 @@ rewrite polyn_degree_lt_add. 2: {
     intros i Hi.
     apply in_seq in Hi.
     destruct i; [ easy | ].
+specialize (IHn (subm M 0 0)) as H1.
+cbn - [ det_loop ] in H1.
+rewrite Hn in H1; cbn - [ det_loop ] in H1.
+specialize (H1 eq_refl).
+rewrite <- submatrix_xI_sub_M in H1.
+rewrite <- H1 at 2.
+clear IHn Hn Hi H1.
+revert M i.
+induction n; intros. {
+  cbn; do 2 rewrite if_1_eq_0; cbn.
+  rewrite if_0_eq_0; cbn.
+  rewrite srng_add_0_l, srng_mul_0_l.
+  rewrite srng_add_0_l, srng_mul_1_l.
+  rewrite if_0_eq_0; cbn.
+  rewrite if_1_eq_0; cbn.
+  destruct (srng_eq_dec (mat_el M 1 0) 0) as [Hm1z| Hm1z]. {
+    apply Nat.le_0_l.
+  }
+  cbn.
+  destruct (srng_eq_dec (- mat_el M 1 0)%Rng 0); apply Nat.le_0_l.
+}
+cbn - [ subm xI_sub_M summation ].
 ...
 apply polyn_degree_det_loop_subm_xI_sub_M_succ_r_le.
 ..
