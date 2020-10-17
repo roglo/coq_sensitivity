@@ -1501,7 +1501,7 @@ Notation "la + lb" := (polyn_list_add la lb) : polyn_list_scope.
 Notation "la * lb" := (polyn_list_mul la lb) : polyn_list_scope.
 
 Notation "'Σ' ( i = b , e ) , g" :=
-  (summation b e (λ c i, (c + g)%P) 0%P)
+  (iterate b e (λ c i, (c + g)%P) 0%P)
   (at level 45, i at level 0, b at level 60, e at level 60) :
      polynomial_scope.
 

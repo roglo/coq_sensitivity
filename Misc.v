@@ -60,14 +60,14 @@ Qed.
 
 (* summations *)
 
-Definition summation {T} b e f (d : T) := fold_left f (seq b (S e - b)) d.
+Definition iterate {T} b e f (d : T) := fold_left f (seq b (S e - b)) d.
 
 Notation "'Σ' ( i = b , e ) , g" :=
-  (summation b e (λ c i, c + g) 0)
+  (iterate b e (λ c i, c + g) 0)
   (at level 45, i at level 0, b at level 60, e at level 60) : nat_scope.
 
 Theorem fold_summation : ∀ {T} b e f (d : T),
-  fold_left f (seq b (S e - b)) d = summation b e f d.
+  fold_left f (seq b (S e - b)) d = iterate b e f d.
 Proof. easy. Qed.
 
 Theorem fold_left_add_fun_from_0 {A} : ∀ a l (f : A → nat),
@@ -117,7 +117,7 @@ Theorem summation_split_first : ∀ b e f,
   → Σ (i = b, e), f i = f b + Σ (i = S b, e), f i.
 Proof.
 intros * Hbe.
-unfold summation.
+unfold iterate.
 rewrite Nat.sub_succ.
 replace (S e - b) with (S (e - b)) by flia Hbe.
 cbn.
@@ -132,7 +132,7 @@ Proof.
 intros * Hbe He.
 destruct e; [ flia He | clear He ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
-unfold summation.
+unfold iterate.
 replace (S (S e) - b) with (S (S e - b)) by flia Hbe.
 remember (S e - b) as n eqn:Hn.
 revert b Hbe Hn.
@@ -151,7 +151,7 @@ Theorem all_0_summation_0 : ∀ b e f,
   → Σ (i = b, e), f i = 0.
 Proof.
 intros * Hz.
-unfold summation.
+unfold iterate.
 remember (S e - b) as n eqn:Hn.
 revert b Hz Hn.
 induction n; intros; [ easy | cbn ].
@@ -168,7 +168,7 @@ Ltac rewrite_in_summation th :=
   let e := fresh "e" in
   let a := fresh "a" in
   intros b e;
-  unfold summation;
+  unfold iterate;
   remember (S e - b) as n eqn:Hn;
   remember 0 as a eqn:Ha; clear Ha;
   revert e a b Hn;
@@ -181,7 +181,7 @@ Theorem summation_eq_compat : ∀ b e g h,
   → Σ (i = b, e), g i = Σ (i = b, e), h i.
 Proof.
 intros * Hgh.
-unfold summation.
+unfold iterate.
 remember (S e - b) as n eqn:Hn.
 remember 0 as a eqn:Ha; clear Ha.
 revert e a b Hn Hgh.
@@ -196,7 +196,7 @@ Theorem summation_le_compat: ∀ b e g h,
   (∀ i, b ≤ i ≤ e → g i ≤ h i) → Σ (i = b, e), g i ≤ Σ (i = b, e), h i.
 Proof.
 intros * Hgh.
-unfold summation.
+unfold iterate.
 remember (S e - b) as n eqn:Hn.
 remember 0 as a eqn:Ha; clear Ha.
 revert a b Hn Hgh.
@@ -249,7 +249,7 @@ Theorem mul_summation_distr_l : ∀ a b e f,
   a * (Σ (i = b, e), f i) = Σ (i = b, e), a * f i.
 Proof.
 intros.
-unfold summation.
+unfold iterate.
 remember (S e - b) as n eqn:Hn.
 revert e a b Hn.
 induction n; intros; [ apply Nat.mul_0_r | cbn ].
@@ -285,7 +285,7 @@ assert
   replace a with (a ^ 1) at 1 by apply Nat.pow_1_r.
   now rewrite <- Nat.pow_add_r.
 }
-unfold summation.
+unfold iterate.
 remember (S e - b) as n eqn:Hn.
 remember 0 as z eqn:Hz; clear Hz.
 revert e z b Hn.
@@ -301,7 +301,7 @@ Theorem power_shuffle2_in_summation : ∀ b e a c f,
   Σ (i = b, e), f i * a ^ (e - i) * c ^ S i.
 Proof.
 intros.
-unfold summation.
+unfold iterate.
 remember (S e - b) as n eqn:Hn.
 remember 0 as z eqn:Hz; clear Hz.
 revert e z b Hn.
@@ -320,7 +320,7 @@ Theorem summation_add : ∀ b e f g,
   Σ (i = b, e), (f i + g i) = Σ (i = b, e), f i + Σ (i = b, e), g i.
 Proof.
 intros.
-unfold summation.
+unfold iterate.
 remember (S e - b) as n eqn:Hn.
 revert b Hn.
 induction n; intros; [ easy | cbn ].
@@ -336,7 +336,7 @@ Theorem summation_sub : ∀ b e f g,
   → Σ (i = b, e), (f i - g i) = Σ (i = b, e), f i - Σ (i = b, e), g i.
 Proof.
 intros * Hgf.
-unfold summation.
+unfold iterate.
 remember (S e - b) as n eqn:Hn.
 revert b Hn Hgf.
 induction n; intros; [ easy | cbn ].
@@ -374,7 +374,7 @@ Theorem summation_succ_succ : ∀ b e f,
   Σ (i = S b, S e), f i = Σ (i = b, e), f (S i).
 Proof.
 intros.
-unfold summation.
+unfold iterate.
 rewrite Nat.sub_succ.
 remember (S e - b) as n eqn:Hn.
 revert b Hn.
@@ -388,7 +388,7 @@ Theorem summation_mod_idemp : ∀ b e f n,
 Proof.
 intros.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
-unfold summation.
+unfold iterate.
 remember (S e - b) as m eqn:Hm.
 revert b Hm.
 induction m; intros; [ easy | cbn ].
@@ -417,13 +417,13 @@ Theorem summation_rtl : ∀ g b k,
 Proof.
 intros g b k.
 destruct (le_dec (S k) b) as [Hkb| Hkb]. {
-  unfold summation.
+  unfold iterate.
   cbn - [ "-" ].
   now replace (S k - b) with 0 by flia Hkb.
 }
 apply Nat.nle_gt in Hkb.
 apply -> Nat.lt_succ_r in Hkb.
-unfold summation.
+unfold iterate.
 remember 0 as s.
 remember (S k - b) as len eqn:Hlen.
 replace k with (b + len - 1) by flia Hkb Hlen; clear.

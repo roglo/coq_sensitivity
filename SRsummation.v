@@ -5,11 +5,11 @@ Require Import Semiring Misc.
 Import List List.ListNotations.
 
 Notation "'Σ' ( i = b , e ) , g" :=
-  (summation b e (λ c i, (c + g)%Srng) 0%Srng)
+  (iterate b e (λ c i, (c + g)%Srng) 0%Srng)
   (at level 45, i at level 0, b at level 60, e at level 60) : semiring_scope.
 
 Notation "'Σ' ( i = b , e ) , g" :=
-  (summation b e (λ c i, (c + g)%Rng) 0%Rng)
+  (iterate b e (λ c i, (c + g)%Rng) 0%Rng)
   (at level 45, i at level 0, b at level 60, e at level 60) : ring_scope.
 
 Section in_ring.
@@ -38,7 +38,7 @@ Theorem all_0_srng_summation_0 : ∀ b e f,
   → (Σ (i = b, e), f i = 0)%Srng.
 Proof.
 intros * Hz.
-unfold summation.
+unfold iterate.
 remember (S e - b) as n eqn:Hn.
 revert b Hz Hn.
 induction n; intros; [ easy | cbn ].
@@ -68,7 +68,7 @@ Theorem rng_opp_summation : ∀ b e f,
   ((- Σ (i = b, e), f i) = Σ (i = b, e), (- f i))%Rng.
 Proof.
 intros.
-unfold summation.
+unfold iterate.
 remember (S e - b) as len.
 clear e Heqlen.
 revert b.
@@ -85,7 +85,7 @@ Theorem srng_summation_split_first : ∀ b k g,
   → (Σ (i = b, k), g i)%Srng = (g b + Σ (i = S b, k), g i)%Srng.
 Proof.
 intros * Hbk.
-unfold summation.
+unfold iterate.
 remember (S k - b) as len eqn:Hlen.
 replace (S k - S b) with (len - 1) by flia Hlen.
 assert (H : len ≠ 0) by flia Hlen Hbk.
@@ -101,7 +101,7 @@ Theorem srng_summation_split_last : ∀ b k g,
   → (Σ (i = b, k), g i = Σ (i = S b, k), g (i - 1) + g k)%Srng.
 Proof.
 intros * Hbk.
-unfold summation.
+unfold iterate.
 remember (S k - S b) as len eqn:Hlen.
 rewrite Nat.sub_succ in Hlen.
 replace (S k - b) with (S len) by flia Hbk Hlen.
@@ -121,13 +121,13 @@ Theorem srng_summation_rtl : ∀ g b k,
 Proof.
 intros g b k.
 destruct (le_dec (S k) b) as [Hkb| Hkb]. {
-  unfold summation.
+  unfold iterate.
   cbn - [ "-" ].
   now replace (S k - b) with 0 by flia Hkb.
 }
 apply Nat.nle_gt in Hkb.
 apply -> Nat.lt_succ_r in Hkb.
-unfold summation.
+unfold iterate.
 remember (S k - b) as len eqn:Hlen.
 replace k with (b + len - 1) by flia Hkb Hlen.
 clear Hlen Hkb.
@@ -153,7 +153,7 @@ Theorem srng_summation_eq_compat : ∀ g h b k,
   → (Σ (i = b, k), g i = Σ (i = b, k), h i)%Srng.
 Proof.
 intros * Hgh.
-unfold summation.
+unfold iterate.
 remember (S k - b) as len eqn:Hlen.
 assert (∀ i, b ≤ i < b + len → g i = h i). {
   intros i Hi.
@@ -177,7 +177,7 @@ Theorem srng_summation_empty : ∀ g b k,
   k < b → (Σ (i = b, k), g i = 0)%Srng.
 Proof.
 intros * Hkb.
-unfold summation.
+unfold iterate.
 now replace (S k - b) with 0 by flia Hkb.
 Qed.
 
@@ -185,7 +185,7 @@ Theorem srng_summation_succ_succ : ∀ b k g,
   (Σ (i = S b, S k), g i = Σ (i = b, k), g (S i))%Srng.
 Proof.
 intros b k g.
-unfold summation.
+unfold iterate.
 rewrite Nat.sub_succ.
 remember (S k - b)%nat as len; clear Heqlen.
 rewrite <- seq_shift.
@@ -237,7 +237,7 @@ Theorem srng_summation_split : ∀ j g b k,
   → (Σ (i = b, k), g i = Σ (i = b, j), g i + Σ (i = j+1, k), g i)%Srng.
 Proof.
 intros * (Hbj, Hjk).
-unfold summation.
+unfold iterate.
 remember (S j - b) as len1 eqn:Hlen1.
 remember (S k - b) as len2 eqn:Hlen2.
 move len2 before len1.
