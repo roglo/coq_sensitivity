@@ -4732,7 +4732,8 @@ rewrite (srng_summation_split_first 0); [ | apply Nat.le_0_l ].
 rewrite (srng_summation_split_first 0 (S n)); [ | apply Nat.le_0_l ].
 cbn - [ polyn_degree subm xI_sub_M det_loop summation mat_el ].
 do 2 rewrite srng_mul_1_l.
-apply polyn_degree_add_le_compat.
+apply polyn_degree_add_le_compat. 3: {
+(* chais même pas si ça va marcher, ça *)
 ..
 
 Theorem glop : ∀ M i j n,
