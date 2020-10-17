@@ -4385,7 +4385,7 @@ rewrite polyn_degree_mat_el_subm_xI_sub_M_0_succ_0_0.
 rewrite Nat.add_0_l.
 remember (S n) as sn.
 cbn - [ fold_left polyn_degree det_loop subm ]; subst sn.
-(* ouais, chais pas *)
+rewrite <- seq_shift, map_map.
 ...
 etransitivity. {
   apply List_fold_left_max_map_le.
