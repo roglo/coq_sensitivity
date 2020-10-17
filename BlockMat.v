@@ -4577,6 +4577,7 @@ apply polyn_degree_det_subm_le.
 ...
 *)
 
+(*
 Theorem glop : ∀ M,
   polyn_degree (determinant (xI_sub_M M)) = mat_nrows M.
 Proof.
@@ -4734,8 +4735,10 @@ cbn - [ polyn_degree subm xI_sub_M det_loop summation mat_el ].
 do 2 rewrite srng_mul_1_l.
 apply polyn_degree_add_le_compat. 3: {
 (* chais même pas si ça va marcher, ça *)
-..
+...
+*)
 
+(*
 Theorem glop : ∀ M i j n,
   i < n → j < n →
   polyn_degree (det_loop (subm (xI_sub_M M) i j) (S n)) =
@@ -4758,9 +4761,10 @@ destruct n. {
       cbn; rewrite if_1_eq_0; cbn.
       destruct (srng_eq_dec (mat_el M 0 0) 0) as [Hmz| Hmz]. {
         cbn; rewrite if_1_eq_0; cbn.
-
 ...
+*)
 
+(*
 Theorem glop : ∀ M i,
   polyn_degree (determinant (subm (xI_sub_M M) i i)) = mat_nrows M - 1.
 Proof.
@@ -4828,7 +4832,9 @@ destruct (le_dec
   apply Nat.le_max_r.
 }
 ...
+*)
 
+(*
 Theorem glop : ∀ M i j,
   polyn_degree (determinant (subm (xI_sub_M M) i j)) =
   if Nat.eq_dec i j then mat_nrows M - 1 else mat_nrows M - 2.
@@ -4841,7 +4847,9 @@ induction n; intros; cbn. {
   now destruct (Nat.eq_dec i j).
 }
 ...
+*)
 
+(*
 Theorem polyn_deg_det_subm_xI_sub_M_succ_le : ∀ M i,
   polyn_degree (determinant (subm (xI_sub_M M) 0 (S i))) ≤ mat_nrows M - 2.
 Proof.
@@ -4960,7 +4968,6 @@ destruct (lt_dec k i) as [Hki| Hki]. {
     rewrite Nat.sub_succ, Nat.sub_0_r.
 *)
 ...
-
 (*
 destruct (lt_dec m k), (lt_dec n l), (lt_dec m i), (lt_dec n l), (lt_dec n j), (lt_dec k i), (lt_dec m (i - 1));
 try easy.
@@ -5057,6 +5064,13 @@ erewrite map_ext_in. 2: {
       now rewrite Nat.add_0_r.
     }
 ...
+*)
+
+Theorem glop : ∀ M,
+  determinant M =
+    (summation 0 (mat_nrows M - 1) (λ c i, c * mat_el M i i) 1%Srng +
+     le reste).
+...
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
    leading coefficient is 1 *)
@@ -5066,6 +5080,10 @@ Theorem charac_polyn_is_monic : ∀ M,
   → is_monic_polyn (charac_polyn M) ∧
      polyn_degree (charac_polyn M) = mat_nrows M.
 Proof.
+intros * Hrz.
+remember (charac_polyn M) as CP eqn:HCP.
+unfold charac_polyn in HCP.
+...
 intros * Hrz.
 remember (charac_polyn M) as CP eqn:HCP.
 unfold charac_polyn in HCP.
