@@ -4191,18 +4191,21 @@ rewrite polyn_degree_add_not_cancel; [ | congruence | easy ].
 congruence.
 Qed.
 
-(* chais pas... faut voir...
-Theorem polyn_degree_add_le_compat : ∀ Pa Pb Qa Qb,
-  polyn_degree Pa ≤ polyn_degree Pb
-  → polyn_degree Qa ≤ polyn_degree Qb
-  → (polyn_highest_coeff Pb + polyn_highest_coeff Qb)%Srng ≠ 0%Srng
-  → polyn_degree (Pa + Qa) ≤ polyn_degree (Pb + Qb).
+Theorem polyn_degree_add_le_compat : ∀ P P' Q Q',
+  polyn_degree P ≤ polyn_degree P'
+  → polyn_degree Q ≤ polyn_degree Q'
+  → (polyn_highest_coeff P' + polyn_highest_coeff Q')%Srng ≠ 0%Srng
+  → polyn_degree (P + Q) ≤ polyn_degree (P' + Q').
 Proof.
 intros * HP HQ Hhb.
-destruct (lt_dec (polyn_degree Pa) (polyn_degree Qa)) as [HPQ| HPQ]. {
+destruct (lt_dec (polyn_degree P) (polyn_degree Q)) as [HPQ| HPQ]. {
   rewrite polyn_add_comm.
   rewrite polyn_degree_lt_add; [ | easy ].
   rewrite polyn_add_comm.
+Search (polyn_degree (_ + _)).
+...
+  rewrite polyn_degree_add_not_cancel.
+...
   rewrite polyn_degree_lt_add; [ easy | ].
 ...
   eapply lt_le_trans; [ | apply HQ ].
@@ -4704,6 +4707,14 @@ induction n; intros. {
   destruct (srng_eq_dec (- mat_el M 1 0)%Rng 0); apply Nat.le_0_l.
 }
 cbn - [ subm xI_sub_M summation ].
+rewrite (srng_summation_split_first 0); [ | apply Nat.le_0_l ].
+rewrite (srng_summation_split_first 0 (S n)); [ | apply Nat.le_0_l ].
+cbn - [ polyn_degree subm xI_sub_M det_loop summation mat_el ].
+do 2 rewrite srng_mul_1_l.
+...
+apply polyn_degree_add_le_compat.
+...
+rewrite polyn_degree_lt_add. 2: {
 ...
 apply polyn_degree_det_loop_subm_xI_sub_M_succ_r_le.
 ..
