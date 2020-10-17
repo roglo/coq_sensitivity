@@ -3128,8 +3128,7 @@ Definition minus_one_pow n :=
 
 Fixpoint det_loop M n :=
   match n with
-  | 0 => 0%Rng
-  | 1 => mat_el M 0 0
+  | 0 => 1%Rng
   | S n' =>
       (Σ (j = 0, n'),
        minus_one_pow j * mat_el M 0 j * det_loop (subm M 0 j) n')%Rng
@@ -4361,7 +4360,8 @@ induction lij as [| (i, j)]; intros. {
   revert M.
   induction n; intros. {
     cbn - [ polyn_list ].
-    rewrite srng_mul_1_r.
+    do 2 rewrite srng_mul_1_r.
+    rewrite srng_mul_1_l, srng_add_0_l.
     rewrite polyn_degree_1; [ easy | ].
     rewrite polyn_degree_opp.
     apply polyn_degree_of_single.
@@ -4451,7 +4451,8 @@ induction n; intros. {
   cbn - [ polyn_degree ].
   specialize (polyn_of_list_repeat_0s 1) as H.
   cbn in H; rewrite H; clear H.
-  rewrite polyn_mul_0_r, polyn_add_0_l.
+  rewrite polyn_add_0_l, polyn_mul_1_l, polyn_mul_0_r.
+  rewrite polyn_add_0_l, polyn_mul_1_r.
   rewrite polyn_degree_opp.
   rewrite polyn_degree_of_single; flia.
 }
@@ -5065,6 +5066,11 @@ erewrite map_ext_in. 2: {
     }
 ...
 *)
+
+Print det_loop.
+...
+determinant M =
+  Σ (i = 0, n-1), minus_one_pow i * mat_el 0 i * determinant (subm M 0 i)
 
 Theorem glop : ∀ M,
   determinant M =
