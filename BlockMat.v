@@ -4726,16 +4726,13 @@ induction n; intros. {
   cbn.
   destruct (srng_eq_dec (- mat_el M 1 0)%Rng 0); apply Nat.le_0_l.
 }
-cbn - [ subm xI_sub_M summation ].
+remember (S n) as sn.
+cbn - [ subm xI_sub_M summation ]; subst sn.
 rewrite (srng_summation_split_first 0); [ | apply Nat.le_0_l ].
 rewrite (srng_summation_split_first 0 (S n)); [ | apply Nat.le_0_l ].
 cbn - [ polyn_degree subm xI_sub_M det_loop summation mat_el ].
 do 2 rewrite srng_mul_1_l.
 apply polyn_degree_add_le_compat.
-...
-rewrite polyn_degree_lt_add. 2: {
-...
-apply polyn_degree_det_loop_subm_xI_sub_M_succ_r_le.
 ..
 
 Theorem glop : ∀ M i j n,
