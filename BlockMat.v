@@ -5067,29 +5067,78 @@ erewrite map_ext_in. 2: {
 ...
 *)
 
-Print det_loop.
-...
-determinant M =
-  Σ (i = 0, n-1), minus_one_pow i * mat_el 0 i * determinant (subm M 0 i)
-
-Theorem glop : ∀ M,
-  determinant M =
-    (iterate 0 (mat_nrows M - 1) (λ c i, c * mat_el M i i) 1%Srng +
-     le reste).
-...
-
 (* the caracteristic polynomial of a matrix is monic, i.e. its
    leading coefficient is 1 *)
+
+Theorem charac_polyn_degree : ∀ M,
+  mat_nrows M ≠ 0
+  → polyn_degree (charac_polyn M) = mat_nrows M.
+Proof.
+intros * Hrz.
+unfold charac_polyn, determinant.
+unfold xI_sub_M; cbn.
+remember (mat_nrows M) as n eqn:Hn; symmetry in Hn.
+destruct n; [ easy | clear Hrz ].
+revert M Hn.
+induction n; intros. {
+  cbn.
+  do 2 rewrite if_1_eq_0; cbn.
+  rewrite srng_add_0_l, srng_mul_0_l, srng_mul_1_l.
+  rewrite srng_add_0_l, srng_mul_0_l, srng_add_0_l.
+  rewrite if_1_eq_0; cbn.
+  destruct (srng_eq_dec (mat_el M 0 0) 0) as [Hmz| Hmz]. {
+    rewrite Nat.sub_0_r.
+    cbn; rewrite if_1_eq_0; cbn.
+    rewrite srng_add_0_l, srng_mul_1_l.
+    rewrite srng_mul_0_r, srng_add_0_r.
+    rewrite if_1_eq_0; cbn.
+    rewrite srng_add_0_l, srng_mul_1_l.
+    rewrite srng_mul_0_r, srng_add_0_r.
+    rewrite srng_mul_1_l, srng_add_0_l.
+    rewrite if_1_eq_0; cbn.
+    now rewrite if_1_eq_0; cbn.
+  } {
+    cbn; rewrite if_1_eq_0; cbn.
+    rewrite srng_add_0_l, srng_mul_1_l.
+    rewrite srng_mul_0_l, srng_add_0_r.
+    rewrite srng_add_0_l, srng_mul_1_l.
+    rewrite srng_add_0_l.
+    rewrite if_1_eq_0; cbn.
+    rewrite srng_add_0_l, srng_mul_0_r, srng_mul_1_l.
+    rewrite srng_add_0_l.
+    rewrite if_1_eq_0; cbn.
+    now rewrite if_1_eq_0; cbn.
+  }
+}
+specialize (IHn (subm M 0 0)) as H1.
+rewrite submatrix_nrows, Hn, Nat.sub_succ, Nat.sub_0_r in H1.
+specialize (H1 eq_refl).
+rewrite <- Hn.
+rewrite fold_xI_sub_M.
+replace (S n) with (mat_nrows (subm M 0 0)) in H1. 2: {
+  now rewrite submatrix_nrows, Hn, Nat.sub_succ, Nat.sub_0_r.
+}
+rewrite fold_xI_sub_M in H1.
+clear IHn.
+remember (subm M 0 0) as M' eqn:HM'.
+...
+cbn - [ iterate mat_el subm ].
+rewrite srng_summation_split_first; [ | apply Nat.le_0_l ].
+cbn - [ polyn_degree iterate mat_el subm ].
+rewrite srng_mul_1_l.
+remember (mat_el (_ - _)%M 0 0) as x eqn:Hx.
+cbn in Hx.
+rewrite srng_mul_1_r in Hx; subst x.
+rewrite fold_polyn_sub.
+rewrite polyn_degree_lt_add. 2: {
+  rewrite polyn_degree_mul.
+...
 
 Theorem charac_polyn_is_monic : ∀ M,
   mat_nrows M ≠ 0
   → is_monic_polyn (charac_polyn M) ∧
      polyn_degree (charac_polyn M) = mat_nrows M.
 Proof.
-intros * Hrz.
-remember (charac_polyn M) as CP eqn:HCP.
-unfold charac_polyn in HCP.
-...
 intros * Hrz.
 remember (charac_polyn M) as CP eqn:HCP.
 unfold charac_polyn in HCP.
@@ -5105,23 +5154,66 @@ induction n; intros. {
   rewrite fold_polyn_sub in HCP.
   split. {
     subst CP.
+    rewrite polyn_add_0_l, polyn_mul_1_l, polyn_mul_1_r.
     apply polyn_x_minus_is_monic.
     now cbn; destruct (srng_eq_dec (mat_el M 0 0) 0).
   } {
     subst CP; cbn.
+    do 2 rewrite if_1_eq_0; cbn.
+    rewrite srng_add_0_l, srng_mul_0_l, srng_mul_1_l.
+    rewrite srng_add_0_l, srng_mul_0_l, srng_add_0_l.
     rewrite if_1_eq_0; cbn.
     destruct (srng_eq_dec (mat_el M 0 0) 0) as [Hmz| Hmz]. {
-      now cbn; rewrite if_1_eq_0.
+      rewrite Nat.sub_0_r.
+      cbn; rewrite if_1_eq_0; cbn.
+      rewrite srng_add_0_l, srng_mul_1_l.
+      rewrite srng_mul_0_r, srng_add_0_r.
+      rewrite if_1_eq_0; cbn.
+      now rewrite if_1_eq_0; cbn.
     } {
-      now cbn; rewrite if_1_eq_0.
+      cbn; rewrite if_1_eq_0; cbn.
+      rewrite srng_add_0_l, srng_mul_1_l.
+      rewrite srng_mul_0_l, srng_add_0_r.
+      rewrite srng_add_0_l, srng_mul_1_l.
+      rewrite srng_add_0_l.
+      rewrite if_1_eq_0; cbn.
+      now rewrite if_1_eq_0; cbn.
     }
   }
 }
-(**)
 remember (S n) as sn.
 cbn - [ "-" ] in HCP; subst sn.
 subst CP.
 rewrite srng_summation_split_first; [ | flia ].
+(**)
+unfold is_monic_polyn.
+cbn - [ polyn_coeff polyn_degree det_loop iterate ].
+rewrite srng_mul_1_l.
+rewrite polyn_degree_lt_add. 2: {
+  rewrite polyn_degree_mul. 2: {
+    remember (_x × m2mm (mI (S n)) - m2mm (subm M 0 0))%M as PM' eqn:HPM'.
+    specialize (IHn (subm M 0 0) PM' (det_loop PM' (S n))) as H1.
+    rewrite submatrix_nrows, Hn, Nat.sub_succ, Nat.sub_0_r in H1.
+    specialize (H1 eq_refl HPM' eq_refl).
+    destruct H1 as (Hmp, Hpd).
+    rewrite HPM' in Hmp, Hpd.
+    unfold is_monic_polyn in Hmp.
+    unfold so in Hmp.
+    rewrite Hpd in Hmp.
+    rewrite HPM at 4.
+    rewrite submatrix_sub.
+    rewrite submatrix_mul_scal_l.
+    do 2 rewrite submatrix_m2mm.
+    rewrite submatrix_mI.
+    rewrite Hpd.
+    cbn - [ iterate m2mm ] in Hmp.
+Print polyn_degree_plus_1.
+...
+Theorem fold_is_monic_polyn : ∀ P,
+  polyn_coeff P (polyn_degree P) = 1%Srng → is_monic_polyn P.
+Proof. easy. Qed.
+rewrite fold_is_monic_polyn.
+...
 remember
   ((minus_one_pow 0 * mat_el PM 0 0 * det_loop (subm PM 0 0) (S n))%P +
    Σ (i = 1, S n),
