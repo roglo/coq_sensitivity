@@ -5071,12 +5071,50 @@ Theorem fold_determinant : ∀ T {ro : ring_op T} (M : matrix T),
   det_loop M (mat_nrows M) = determinant M.
 Proof. easy. Qed.
 
-Theorem polyn_degree_determinant_xI_sub : ∀ M n,
-  mat_nrows M = S n
-  → polyn_degree (determinant (xI_sub_M (subm M 0 0))) = n
-  → polyn_degree (determinant (xI_sub_M M)) = S n.
+Theorem polyn_degree_charac_polyn_subm : ∀ M n,
+  mat_nrows M = n
+  → polyn_degree (charac_polyn (subm M 0 0)) = n - 1
+  → polyn_degree (charac_polyn M) = n.
 Proof.
 intros * Hr Hsm.
+revert M Hr Hsm.
+induction n; intros. {
+  unfold charac_polyn.
+  unfold determinant; cbn.
+  rewrite Hr; cbn.
+  now rewrite if_1_eq_0.
+}
+rewrite Nat.sub_succ, Nat.sub_0_r in Hsm.
+specialize (IHn (subm M 0 0)) as H1.
+rewrite submatrix_nrows, Hr in H1.
+rewrite Nat.sub_succ, Nat.sub_0_r in H1.
+specialize (H1 eq_refl).
+Search subm.
+Print cumulate_subm.
+...
+intros * Hr Hsm.
+destruct n. {
+  unfold determinant; cbn.
+  rewrite Hr; cbn.
+  now rewrite if_1_eq_0.
+}
+rewrite Nat.sub_succ, Nat.sub_0_r in Hsm.
+revert M Hr Hsm.
+induction n; intros. {
+  clear Hsm.
+  unfold determinant.
+  rewrite xI_sub_M_nrows.
+  rewrite Hr.
+  cbn - [ polyn_degree ].
+  rewrite polyn_add_0_l, polyn_mul_1_l.
+  do 2 rewrite srng_mul_1_r.
+  apply polyn_degree_1.
+  rewrite polyn_degree_opp.
+  apply polyn_degree_of_single.
+}
+specialize (IHn (subm M 0 0)) as H1.
+rewrite submatrix_nrows, Hr in H1.
+specialize (H1 eq_refl).
 ...
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
