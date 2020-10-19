@@ -5405,7 +5405,7 @@ rewrite polyn_degree_lt_add. 2: {
           apply (f_equal rng_opp) in H.
           rewrite rng_opp_involutive in H.
           cbn in H.
-lll
+...
           rewrite rng_opp_0 in H.
 Search (- _ = _)%Rng.
 ...
