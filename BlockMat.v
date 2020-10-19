@@ -5071,6 +5071,7 @@ Theorem fold_determinant : ∀ T {ro : ring_op T} (M : matrix T),
   det_loop M (mat_nrows M) = determinant M.
 Proof. easy. Qed.
 
+(*
 Definition repeat_subm n (M : matrix T) :=
   fold_left (λ m _, subm m 0 0) (seq 1 n) M.
 
@@ -5103,6 +5104,7 @@ specialize (H1 eq_refl).
 rewrite repeat_subm_succ in Hsm.
 specialize (H1 Hsm).
 ...
+*)
 
 Theorem polyn_degree_charac_polyn_subm : ∀ M n,
   mat_nrows M = n
@@ -5118,12 +5120,42 @@ induction n; intros. {
   now rewrite if_1_eq_0.
 }
 rewrite Nat.sub_succ, Nat.sub_0_r in Hsm.
+(**)
+unfold charac_polyn, determinant in Hsm |-*.
+rewrite xI_sub_M_nrows in Hsm |-*.
+rewrite submatrix_nrows, Hr, Nat.sub_succ, Nat.sub_0_r in Hsm.
+rewrite Hr.
+cbn - [ iterate xI_sub_M ].
+rewrite srng_summation_split_first; [ | apply Nat.le_0_l ].
+cbn - [ polyn_degree iterate xI_sub_M ].
+rewrite srng_mul_1_l.
+rewrite polyn_degree_lt_add. 2: {
+  rewrite polyn_degree_mul. 2: {
+    rewrite submatrix_xI_sub_M, Hsm.
+    assert (H : is_monic_polyn (determinant (xI_sub_M (subm M 0 0)))). {
+      unfold is_monic_polyn, determinant.
+      rewrite xI_sub_M_nrows.
+      rewrite submatrix_nrows.
+      rewrite Hr, Nat.sub_succ, Nat.sub_0_r.
+      unfold so.
+      rewrite Hsm.
+...
+    }
+    unfold is_monic_polyn, determinant in H.
+    rewrite xI_sub_M_nrows in H.
+    rewrite submatrix_nrows in H.
+    rewrite Hr, Nat.sub_succ, Nat.sub_0_r in H.
+    unfold so in H.
+    rewrite Hsm in H.
+    rewrite H, srng_mul_1_r.
+...
+rewrite polyn_degree_mul.
+rewrite submatrix_xI_sub_M, Hsm.
+... 1
 specialize (IHn (subm M 0 0)) as H1.
 rewrite submatrix_nrows, Hr in H1.
 rewrite Nat.sub_succ, Nat.sub_0_r in H1.
 specialize (H1 eq_refl).
-Search subm.
-Print cumulate_subm.
 ...
 intros * Hr Hsm.
 destruct n. {
