@@ -5071,6 +5071,39 @@ Theorem fold_determinant : ∀ T {ro : ring_op T} (M : matrix T),
   det_loop M (mat_nrows M) = determinant M.
 Proof. easy. Qed.
 
+Definition repeat_subm n (M : matrix T) :=
+  fold_left (λ m _, subm m 0 0) (seq 1 n) M.
+
+Theorem repeat_subm_succ : ∀ n M,
+  repeat_subm (S n) M = repeat_subm n (subm M 0 0).
+Proof.
+intros.
+unfold repeat_subm.
+rewrite <- seq_shift.
+now rewrite List_fold_left_map.
+Qed.
+
+Theorem polyn_degree_charac_repeat_subm : ∀ M n m,
+  mat_nrows M = n
+  → polyn_degree (charac_polyn (repeat_subm m M)) = n - m
+  → polyn_degree (charac_polyn M) = n.
+Proof.
+intros * Hr Hsm.
+revert m M Hr Hsm.
+induction n; intros; cbn. {
+  rewrite Hr; cbn.
+  now rewrite if_1_eq_0.
+}
+destruct m; [ now rewrite Nat.sub_0_r in Hsm | ].
+rewrite Nat.sub_succ in Hsm.
+specialize (IHn m (subm M 0 0)) as H1.
+rewrite submatrix_nrows in H1.
+rewrite Hr, Nat.sub_succ, Nat.sub_0_r in H1.
+specialize (H1 eq_refl).
+rewrite repeat_subm_succ in Hsm.
+specialize (H1 Hsm).
+...
+
 Theorem polyn_degree_charac_polyn_subm : ∀ M n,
   mat_nrows M = n
   → polyn_degree (charac_polyn (subm M 0 0)) = n - 1
