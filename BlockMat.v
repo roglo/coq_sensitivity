@@ -5067,6 +5067,18 @@ erewrite map_ext_in. 2: {
 ...
 *)
 
+Theorem fold_determinant : ∀ T {ro : ring_op T} (M : matrix T),
+  det_loop M (mat_nrows M) = determinant M.
+Proof. easy. Qed.
+
+Theorem polyn_degree_determinant_xI_sub : ∀ M n,
+  mat_nrows M = S n
+  → polyn_degree (determinant (xI_sub_M (subm M 0 0))) = n
+  → polyn_degree (determinant (xI_sub_M M)) = S n.
+Proof.
+intros * Hr Hsm.
+...
+
 (* the caracteristic polynomial of a matrix is monic, i.e. its
    leading coefficient is 1 *)
 
@@ -5121,6 +5133,13 @@ replace (S n) with (mat_nrows (subm M 0 0)) in H1. 2: {
 rewrite fold_xI_sub_M in H1.
 clear IHn.
 remember (subm M 0 0) as M' eqn:HM'.
+rewrite <- xI_sub_M_nrows in H1 at 1 |-* at 1.
+rewrite fold_determinant in H1 |-*.
+rewrite HM' in H1; rewrite Hn.
+...
+apply polyn_degree_determinant_xI_sub; [ easy | ].
+rewrite H1, submatrix_nrows, Hn.
+now rewrite Nat.sub_succ, Nat.sub_0_r.
 ...
 cbn - [ iterate mat_el subm ].
 rewrite srng_summation_split_first; [ | apply Nat.le_0_l ].
