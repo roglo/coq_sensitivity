@@ -5106,6 +5106,7 @@ specialize (H1 Hsm).
 ...
 *)
 
+(*
 Theorem polyn_degree_charac_polyn_subm : ∀ M n,
   mat_nrows M = n
   → polyn_degree (charac_polyn (subm M 0 0)) = n - 1
@@ -5181,10 +5182,12 @@ specialize (IHn (subm M 0 0)) as H1.
 rewrite submatrix_nrows, Hr in H1.
 specialize (H1 eq_refl).
 ...
+*)
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
    leading coefficient is 1 *)
 
+(*
 Theorem charac_polyn_degree : ∀ M,
   mat_nrows M ≠ 0
   → polyn_degree (charac_polyn M) = mat_nrows M.
@@ -5255,12 +5258,34 @@ rewrite fold_polyn_sub.
 rewrite polyn_degree_lt_add. 2: {
   rewrite polyn_degree_mul.
 ...
+*)
 
 Theorem charac_polyn_is_monic : ∀ M,
   mat_nrows M ≠ 0
   → is_monic_polyn (charac_polyn M) ∧
      polyn_degree (charac_polyn M) = mat_nrows M.
 Proof.
+intros * Hrz.
+remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
+revert M Hr Hrz.
+induction n; intros; [ easy | clear Hrz ].
+unfold charac_polyn.
+unfold determinant; cbn.
+rewrite Hr; cbn - [ iterate xI_sub_M ].
+specialize (IHn (subm M 0 0)) as H1.
+rewrite submatrix_nrows, Hr, Nat.sub_succ, Nat.sub_0_r in H1.
+specialize (H1 eq_refl).
+unfold charac_polyn in H1.
+unfold determinant in H1; cbn in H1.
+rewrite Hr, Nat.sub_succ, Nat.sub_0_r in H1.
+rewrite <- submatrix_xI_sub_M in H1.
+rewrite srng_summation_split_first; [ | apply Nat.le_0_l ].
+remember (det_loop (subm (xI_sub_M M) 0 0) n) as M' eqn:HM'.
+cbn - [ is_monic_polyn polyn_degree xI_sub_M iterate ].
+rewrite srng_mul_1_l.
+rewrite polyn_degree_lt_add.
+(**)
+...
 intros * Hrz.
 remember (charac_polyn M) as CP eqn:HCP.
 unfold charac_polyn in HCP.
