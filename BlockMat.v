@@ -5405,14 +5405,12 @@ rewrite polyn_degree_lt_add. 2: {
   rewrite Nat.sub_succ, Nat.sub_0_r.
   apply Nat.lt_succ_r.
   rewrite map_map.
-(**)
   set (g := λ i, polyn_degree (det_loop (subm (xI_sub_M M) 0 i) (S n))).
   transitivity (fold_left max (map g (seq 1 (S n))) 0). {
     apply List_fold_left_max_map_le.
     intros i Hi.
     apply in_seq in Hi.
     destruct i; [ easy | ].
-(**)
     destruct (srng_eq_dec (mat_el M 0 (S i)) 0) as [Hmz| Hmz]. {
       rewrite mat_el_xI_sub_M_0_succ.
       rewrite Hmz.
@@ -5424,6 +5422,14 @@ rewrite polyn_degree_lt_add. 2: {
       cbn - [ polyn_degree det_loop subm ].
       rewrite polyn_mul_0_r.
       rewrite polyn_mul_0_l.
+      apply Nat.le_0_l.
+    }
+(**)
+    remember (det_loop (subm (xI_sub_M M) 0 (S i)) (S n)) as P eqn:HP.
+    symmetry in HP.
+    destruct (polyn_eq_dec P 0%P) as [Hpz| Hpz]. {
+      rewrite Hpz.
+      rewrite polyn_mul_0_r.
       apply Nat.le_0_l.
     }
     rewrite polyn_degree_mul. {
@@ -5447,15 +5453,15 @@ rewrite polyn_degree_lt_add. 2: {
       }
       rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
       rewrite polyn_degree_mat_el_xI_sub_M_0_succ, Nat.add_0_l.
+      rewrite <- HP.
       easy.
     } {
-    rewrite polyn_degree_mul. {
-      rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
-      rewrite polyn_degree_mat_el_xI_sub_M_0_succ.
-      rewrite polyn_coeff_mul_at_0.
-      rewrite polyn_coeff_minus_one_pow.
-      rewrite polyn_coeff_mat_el_xI_sub_M_0_succ.
-Search (polyn_degree (det_loop _ _)).
+      rewrite polyn_degree_mul. {
+        rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
+        rewrite polyn_degree_mat_el_xI_sub_M_0_succ.
+        rewrite polyn_coeff_mul_at_0.
+        rewrite polyn_coeff_minus_one_pow.
+        rewrite polyn_coeff_mat_el_xI_sub_M_0_succ.
 ...
       unfold minus_one_pow.
       destruct (S i mod 2) as [Hi2| Hi2]. {
