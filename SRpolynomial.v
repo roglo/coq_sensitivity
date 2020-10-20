@@ -246,7 +246,9 @@ Notation "- P" := (polyn_opp P) : polynomial_scope.
 Declare Scope polyn_list_scope.
 Delimit Scope polyn_list_scope with PL.
 
+(*
 Notation "0" := ([]) : polyn_list_scope.
+*)
 Notation "1" := ([1%Srng]) : polyn_list_scope.
 Notation "la + lb" := (polyn_list_add la lb) : polyn_list_scope.
 Notation "la * lb" := (polyn_list_mul la lb) : polyn_list_scope.
@@ -662,6 +664,14 @@ replace (nth j (repeat z n) z) with z; subst z. 2: {
 apply srng_mul_0_l.
 Qed.
 
+Theorem polyn_list_convol_mul_0_r : ∀ n la i,
+  polyn_list_convol_mul la (repeat 0%Srng n) i = 0%Srng.
+Proof.
+intros.
+rewrite polyn_list_convol_mul_comm.
+apply polyn_list_convol_mul_0_l.
+Qed.
+
 Theorem map_polyn_list_convol_mul_0_l : ∀ n la li,
   map (polyn_list_convol_mul (repeat 0%Srng n) la) li =
   repeat 0%Srng (length li).
@@ -671,6 +681,17 @@ induction li as [| i]; [ easy | ].
 cbn - [ polyn_list_convol_mul ].
 rewrite IHli; f_equal.
 apply polyn_list_convol_mul_0_l.
+Qed.
+
+Theorem map_polyn_list_convol_mul_0_r : ∀ n la li,
+  map (polyn_list_convol_mul la (repeat 0%Srng n)) li =
+  repeat 0%Srng (length li).
+Proof.
+intros.
+induction li as [| i]; [ easy | ].
+cbn - [ polyn_list_convol_mul ].
+rewrite IHli; f_equal.
+apply polyn_list_convol_mul_0_r.
 Qed.
 
 Theorem norm_polyn_list_repeat_0 : ∀ n,
@@ -1381,7 +1402,7 @@ apply polyn_list_mul_add_distr_l.
 Qed.
 
 Theorem polyn_list_mul_0_l : ∀ la,
-  norm_polyn_list (0 * la)%PL = 0%PL.
+  norm_polyn_list ([] * la)%PL = [].
 Proof.
 intros.
 apply List_eq_rev_r.
@@ -1395,7 +1416,7 @@ now rewrite seq_length.
 Qed.
 
 Theorem polyn_list_mul_0_r : ∀ la,
-  norm_polyn_list (la * 0)%PL = 0%PL.
+  norm_polyn_list (la * [])%PL = [].
 Proof.
 intros.
 rewrite polyn_list_mul_comm.
@@ -1416,11 +1437,79 @@ rewrite polyn_mul_comm.
 apply polyn_mul_0_l.
 Qed.
 
+Theorem norm_polyn_list_mul_assoc : ∀ la lb lc,
+  norm_polyn_list (la * (lb * lc))%PL =
+  norm_polyn_list ((la * lb) * lc)%PL.
+Proof.
+intros la lb lc.
+unfold polyn_list_mul.
+do 2 rewrite map_length.
+do 2 rewrite seq_length.
+destruct (Nat.eq_dec (length lb) 0) as [Hbz| Hbz]. {
+  rewrite Hbz; cbn; rewrite Nat.add_0_r.
+  apply length_zero_iff_nil in Hbz; subst lb.
+  rewrite (map_polyn_list_convol_mul_0_l 0).
+  rewrite (map_polyn_list_convol_mul_0_r 0).
+  do 2 rewrite seq_length.
+  rewrite map_polyn_list_convol_mul_0_l.
+  rewrite map_polyn_list_convol_mul_0_r.
+  now do 2 rewrite norm_polyn_list_repeat_0.
+}
+remember (length la + length lb + length lc - 2) as len eqn:Hlen.
+replace (length la + (length lb + length lc - 1) - 1) with len
+  by flia Hlen Hbz.
+replace (length la + length lb - 1 + length lc - 1) with len
+  by flia Hlen Hbz.
+...
+rewrite (polyn_list_convol_mul_more (lab + lbc)); [ | subst; flia ].
+symmetry.
+...
+rewrite Heqlabc.
+remember (lb + lc)%PL as lbc.
+symmetry in Heqlbc.
+rewrite <- Heqlbc in Heqlabc |-*.
+rewrite (polyn_list_convol_mul_more (lab + lac)); [ | subst; flia ].
+rewrite <- Heqlabc.
+symmetry.
+rewrite Heqlab.
+rewrite <- norm_polyn_list_add_idemp_l.
+rewrite (polyn_list_convol_mul_more (labc + lac)); [ | flia ].
+rewrite <- Heqlab.
+rewrite norm_polyn_list_add_idemp_l.
+rewrite polyn_list_add_comm.
+rewrite <- norm_polyn_list_add_idemp_l.
+rewrite Heqlac.
+rewrite (polyn_list_convol_mul_more (labc + lab)); [ | flia ].
+rewrite norm_polyn_list_add_idemp_l.
+rewrite <- Heqlac.
+rewrite Nat.add_comm.
+rewrite polyn_list_add_comm.
+rewrite Nat.add_assoc, Nat.add_shuffle0, Nat.add_comm, Nat.add_assoc.
+symmetry.
+rewrite map_polyn_list_convol_mul_add.
+now rewrite map_polyn_list_add_convol_mul.
+Qed.
+*)
+
+Theorem polyn_mul_assoc : ∀ P Q R, (P * (Q * R))%P = (P * Q * R)%P.
+Proof.
+intros (la, Pa) (lb, Pb) (lc, Pc).
+apply polyn_eq.
+cbn - [ polyn_list_mul ].
+rewrite norm_polyn_list_mul_idemp_l.
+rewrite norm_polyn_list_mul_idemp_r.
+...
+apply norm_polyn_list_mul_assoc.
+Qed.
+
+...
+
 Definition polyn_semiring_prop : semiring_prop (polynomial T) :=
   {| srng_add_comm := polyn_add_comm;
      srng_add_assoc := polyn_add_assoc;
      srng_add_0_l := polyn_add_0_l;
      srng_mul_comm := polyn_mul_comm;
+     srng_mul_assoc := polyn_mul_assoc;
      srng_mul_1_l := polyn_mul_1_l;
      srng_mul_add_distr_l := polyn_mul_add_distr_l;
      srng_mul_0_l := polyn_mul_0_l |}.
@@ -1506,7 +1595,9 @@ Notation "- P" := (polyn_opp P) : polynomial_scope.
 Declare Scope polyn_list_scope.
 Delimit Scope polyn_list_scope with PL.
 
+(*
 Notation "0" := ([]) : polyn_list_scope.
+*)
 Notation "1" := ([1%Srng]) : polyn_list_scope.
 Notation "la + lb" := (polyn_list_add la lb) : polyn_list_scope.
 Notation "la * lb" := (polyn_list_mul la lb) : polyn_list_scope.
