@@ -3761,6 +3761,74 @@ rewrite map_length, seq_length.
 now rewrite Nat.sub_0_r.
 Qed.
 
+Theorem polyn_coeff_mul_at_0 : ∀ P Q,
+  polyn_coeff (P * Q) 0 = (polyn_coeff P 0 * polyn_coeff Q 0)%Srng.
+Proof.
+(*
+intros (la, Hla) (lb, Hlb).
+move lb before la.
+cbn - [ polyn_list_mul ].
+destruct la as [| a] using rev_ind; [ | clear IHla ]. {
+  rewrite polyn_list_mul_0_l; cbn.
+  symmetry.
+  apply srng_mul_0_l.
+}
+rewrite app_length, Nat.add_comm in Hla.
+cbn - [ nth ] in Hla.
+rewrite app_nth2 in Hla; [ | now unfold ge ].
+rewrite Nat.sub_diag in Hla; cbn in Hla.
+destruct (srng_eq_dec a 0) as [| Haz]; [ easy | ].
+clear Hla.
+cbn - [ norm_polyn_list polyn_list_mul ].
+destruct lb as [| b] using rev_ind; [ | clear IHlb ]. {
+  rewrite polyn_list_mul_0_r; cbn.
+  symmetry.
+  apply srng_mul_0_r.
+}
+rewrite app_length, Nat.add_comm in Hlb.
+cbn - [ nth ] in Hlb.
+rewrite app_nth2 in Hlb; [ | now unfold ge ].
+rewrite Nat.sub_diag in Hlb; cbn in Hlb.
+destruct (srng_eq_dec b 0) as [| Hbz]; [ easy | ].
+clear Hlb.
+Search ((_ ++ _) * _)%PL.
+cbn - [ norm_polyn_list polyn_list_mul ].
+...
+*)
+intros (la, Hla) (lb, Hlb).
+move lb before la.
+cbn - [ polyn_list_mul ].
+destruct la as [| a]. {
+  rewrite polyn_list_mul_0_l; cbn.
+  symmetry.
+  apply srng_mul_0_l.
+}
+cbn - [ nth ] in Hla.
+rewrite <- List_last_nth_cons in Hla.
+destruct (srng_eq_dec (last (a :: la) 0%Srng) 0) as [| Haz]; [ easy | ].
+clear Hla.
+cbn - [ norm_polyn_list polyn_list_mul ].
+destruct lb as [| b]. {
+  rewrite polyn_list_mul_0_r; cbn.
+  symmetry.
+  apply srng_mul_0_r.
+}
+cbn - [ nth ] in Hlb.
+rewrite <- List_last_nth_cons in Hlb.
+destruct (srng_eq_dec (last (b :: lb) 0%Srng) 0) as [| Hbz]; [ easy | ].
+clear Hlb; cbn.
+rewrite Nat.sub_0_r, Nat.add_succ_r; cbn.
+rewrite srng_add_0_l.
+rewrite strip_0s_app; cbn.
+remember (strip_0s _) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc as [| c]; [ now destruct (srng_eq_dec (a * b) 0) | ].
+cbn.
+...
+rewrite <- map_rev.
+rewrite map_polyn_list_convol_mul_cons_l.
+...
+
 (* degree of monomial "x" *)
 
 Theorem polyn_degree_monom : polyn_degree _x = 1.
@@ -5418,17 +5486,6 @@ rewrite polyn_degree_lt_add. 2: {
     rewrite polyn_degree_mul. {
       rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
       rewrite polyn_degree_mat_el_xI_sub_M_0_succ.
-Theorem polyn_coeff_mul_at_0 : ∀ P Q,
-  polyn_coeff (P * Q) 0 = (polyn_coeff P 0 * polyn_coeff Q 0)%Srng.
-Proof.
-intros (la, Hla) (lb, Hlb).
-move lb before la.
-cbn - [ polyn_list_mul ].
-destruct la as [| a]. {
-  rewrite polyn_list_mul_0_l; cbn.
-  symmetry.
-  apply srng_mul_0_l.
-}
 ...
   etransitivity. {
     apply Nat_fold_left_max_le.

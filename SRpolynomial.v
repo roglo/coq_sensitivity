@@ -1394,6 +1394,14 @@ rewrite (map_polyn_list_convol_mul_0_l 0).
 now rewrite seq_length.
 Qed.
 
+Theorem polyn_list_mul_0_r : ∀ la,
+  norm_polyn_list (la * 0)%PL = 0%PL.
+Proof.
+intros.
+rewrite polyn_list_mul_comm.
+apply polyn_list_mul_0_l.
+Qed.
+
 Theorem polyn_mul_0_l : ∀ P, (0 * P = 0)%P.
 Proof.
 intros.
