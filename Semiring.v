@@ -81,6 +81,20 @@ assert (H : srng_mul z y = srng_mul y z). {
 now rewrite H.
 Qed.
 
+Theorem srng_add_compat_l : ∀ a b c,
+  (a = b)%Srng → (c + a = c + b)%Srng.
+Proof.
+intros a b c Hab.
+now rewrite Hab.
+Qed.
+
+Theorem srng_add_compat_r : ∀ a b c,
+  (a = b)%Srng → (a + c = b + c)%Srng.
+Proof.
+intros a b c Hab.
+now rewrite Hab.
+Qed.
+
 End semiring_theorems.
 
 (* Rings *)

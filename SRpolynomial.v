@@ -1605,7 +1605,7 @@ rewrite list_nth_polyn_list_convol_mul_aux; [ | easy ].
 now rewrite Nat.add_0_r.
 Qed.
 
-Theorem srng_summation_mul_polyn_list_nth_list_convol_mul : ∀ la lb lc k,
+Theorem srng_summation_mul_polyn_list_nth_map_list_convol_mul : ∀ la lb lc k,
   (Σ (i = 0, k),
      List.nth i la 0 *
      List.nth (k - i)
@@ -1622,7 +1622,7 @@ f_equal.
 now rewrite list_nth_polyn_list_convol_mul.
 Qed.
 
-Theorem srng_summation_mul_list_nth_map_list_convol_mul_2 : ∀ la lb lc k,
+Theorem srng_summation_mul_polyn_list_nth_map_list_convol_mul_2 : ∀ la lb lc k,
    (Σ (i = 0, k),
       List.nth i lc 0 *
       List.nth (k - i)
@@ -1641,6 +1641,39 @@ f_equal.
 rewrite Nat_sub_sub_distr; [ | easy ].
 rewrite Nat.sub_diag.
 now apply list_nth_polyn_list_convol_mul.
+Qed.
+
+Theorem srng_summation_aux_summation_aux_mul_swap : ∀ g1 (g2 : nat → T) g3 b1 b2 len,
+  fold_left
+    (λ c i, (c + fold_left (λ d j, d + g2 i * g3 i j) (seq b2 (g1 i)) 0)%Rng)
+    (seq b1 len) 0%Rng =
+  fold_left
+    (λ c i, (c + g2 i * fold_left (λ d j, d + g3 i j) (seq b2 (g1 i)) 0)%Rng)
+    (seq b1 len) 0%Rng.
+Proof.
+intros.
+revert b1 b2.
+induction len; intros; [ easy | ].
+rewrite List_seq_succ_r.
+do 2 rewrite fold_left_app.
+rewrite IHlen.
+...
+cbn.
+Check srng_add_compat_r.
+...
+About srng_add_compat_r.
+apply srng_add_compat_r.
+apply summation_aux_mul_swap.
+Qed.
+
+...
+
+Theorem srng_summation_summation_mul_swap : ∀ g1 (g2 : nat → T) g3 k,
+  (Σ (i = 0, k), (Σ (j = 0, g1 i), g2 i * g3 i j)
+   = Σ (i = 0, k), g2 i * Σ (j = 0, g1 i), g3 i j)%Rng.
+Proof.
+intros.
+apply srng_summation_aux_summation_aux_mul_swap.
 Qed.
 
 Theorem norm_polyn_list_mul_assoc : ∀ la lb lc,
@@ -1719,8 +1752,11 @@ destruct (lt_dec k len) as [Hklen| Hklen]. {
   rewrite Nat.add_0_l.
   unfold polyn_list_convol_mul.
   rewrite <- Hld, <- Hle.
-  rewrite srng_summation_mul_list_nth_map_list_convol_mul_2; symmetry.
-  rewrite srng_summation_mul_list_nth_map_list_convol_mul_2; symmetry.
+  rewrite srng_summation_mul_polyn_list_nth_map_list_convol_mul_2; symmetry.
+  rewrite srng_summation_mul_polyn_list_nth_map_list_convol_mul; symmetry.
+...
+rewrite <- srng_summation_summation_mul_swap.
+rewrite <- srng_summation_summation_mul_swap.
 ...
 rewrite <- summation_summation_mul_swap.
 rewrite <- summation_summation_mul_swap.
