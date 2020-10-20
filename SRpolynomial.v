@@ -1561,6 +1561,88 @@ induction la as [| a]; intros. {
 }
 Qed.
 
+Theorem list_nth_polyn_list_convol_mul_aux : ∀ la lb n i len,
+  List.length la + List.length lb - 1 = (i + len)%nat
+  → (List.nth n (map (polyn_list_convol_mul la lb) (seq i len)) 0%Rng =
+     Σ (j = 0, n + i),
+     List.nth j la 0 * List.nth (n + i - j) lb 0)%Rng.
+Proof.
+intros la lb n i len Hlen.
+revert la lb i n Hlen.
+induction len; intros. {
+  rewrite Nat.add_0_r in Hlen.
+  rewrite all_0_srng_summation_0; [ now destruct n | ].
+  intros j (_, Hj).
+  destruct (le_dec (length la) j) as [H1| H1]. {
+    rewrite nth_overflow; [ | easy ].
+    now rewrite srng_mul_0_l.
+  }
+  destruct (le_dec (length lb) (n + i - j)) as [H2| H2]. {
+   rewrite srng_mul_comm.
+   rewrite nth_overflow; [ | easy ].
+   now rewrite rng_mul_0_l.
+  }
+  exfalso; apply H2; clear Hj H2.
+  apply Nat.nle_gt in H1; subst i.
+  flia H1.
+} {
+  destruct n; [ easy | ].
+  rewrite Nat.add_succ_r, <- Nat.add_succ_l in Hlen.
+  cbn - [ iterate sub ].
+  rewrite IHlen; [ | easy ].
+  now rewrite Nat.add_succ_r, <- Nat.add_succ_l.
+}
+Qed.
+
+Theorem list_nth_polyn_list_convol_mul : ∀ la lb i len,
+  len = length la + length lb - 1
+  → (List.nth i (map (polyn_list_convol_mul la lb) (seq 0 len)) 0 =
+     Σ (j = 0, i), List.nth j la 0 * List.nth (i - j) lb 0)%Rng.
+Proof.
+intros la lb i len Hlen.
+symmetry in Hlen.
+rewrite list_nth_polyn_list_convol_mul_aux; [ | easy ].
+now rewrite Nat.add_0_r.
+Qed.
+
+Theorem srng_summation_mul_polyn_list_nth_list_convol_mul : ∀ la lb lc k,
+  (Σ (i = 0, k),
+     List.nth i la 0 *
+     List.nth (k - i)
+       (map (polyn_list_convol_mul lb lc) (seq 0 (length lb + length lc - 1)))
+       0 =
+   Σ (i = 0, k),
+     List.nth i la 0 *
+     Σ (j = 0, k - i),
+       List.nth j lb 0 * List.nth (k - i - j) lc 0)%Rng.
+Proof.
+intros la lb lc k.
+apply srng_summation_eq_compat; intros i (_, Hi).
+f_equal.
+now rewrite list_nth_polyn_list_convol_mul.
+Qed.
+
+Theorem srng_summation_mul_list_nth_map_list_convol_mul_2 : ∀ la lb lc k,
+   (Σ (i = 0, k),
+      List.nth i lc 0 *
+      List.nth (k - i)
+        (map (polyn_list_convol_mul la lb)
+           (seq 0 (length la + length lb - 1))) 0 =
+    Σ (i = 0, k),
+      List.nth (k - i) lc 0 *
+      Σ (j = 0, i),
+        List.nth j la 0 * List.nth (i - j) lb 0)%Rng.
+Proof.
+intros la lb lc k.
+rewrite srng_summation_rtl.
+apply srng_summation_eq_compat; intros i (_, Hi).
+rewrite Nat.add_0_r.
+f_equal.
+rewrite Nat_sub_sub_distr; [ | easy ].
+rewrite Nat.sub_diag.
+now apply list_nth_polyn_list_convol_mul.
+Qed.
+
 Theorem norm_polyn_list_mul_assoc : ∀ la lb lc,
   norm_polyn_list (la * (lb * lc))%PL =
   norm_polyn_list ((la * lb) * lc)%PL.
@@ -1630,13 +1712,16 @@ destruct le as [| e]. {
   rewrite Hlc', Hlb' in Hle; cbn in Hle.
   flia Hle.
 }
-Search (nth _ (map _ _)).
+destruct (lt_dec k len) as [Hklen| Hklen]. {
+  rewrite (List_map_nth_in _ 0); [ | now rewrite seq_length ].
+  rewrite (List_map_nth_in _ 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
+  rewrite Nat.add_0_l.
+  unfold polyn_list_convol_mul.
+  rewrite <- Hld, <- Hle.
+  rewrite srng_summation_mul_list_nth_map_list_convol_mul_2; symmetry.
+  rewrite srng_summation_mul_list_nth_map_list_convol_mul_2; symmetry.
 ...
-rewrite list_nth_lap_convol_mul; [ idtac | reflexivity ].
-rewrite list_nth_lap_convol_mul; [ idtac | reflexivity ].
-rewrite <- Hld, <- Hle.
-rewrite summation_mul_list_nth_lap_convol_mul_2; symmetry.
-rewrite summation_mul_list_nth_lap_convol_mul; symmetry.
 rewrite <- summation_summation_mul_swap.
 rewrite <- summation_summation_mul_swap.
 rewrite summation_summation_exch.
