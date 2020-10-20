@@ -1610,46 +1610,28 @@ replace (length la' + (length lb' + length lc' - 1) - 1) with len. 2: {
   subst la' lb' lc'; cbn in Hlen |-*; flia Hlen.
 }
 apply list_nth_polyn_list_eq; intros k.
-...
-apply list_nth_lap_eq; intros k.
-remember (lap_convol_mul la' lb' 0 (length la' + length lb' - 1)) as ld
-  eqn:Hld.
-remember (lap_convol_mul lb' lc' 0 (length lb' + length lc' - 1)) as le
-  eqn:Hle.
+remember
+  (map (polyn_list_convol_mul la' lb') (seq 0 (length la' + length lb' - 1)))
+  as ld eqn:Hld.
+remember
+  (map (polyn_list_convol_mul lb' lc') (seq 0 (length lb' + length lc' - 1)))
+  as le eqn:Hle.
 symmetry in Hld, Hle.
+move le before ld.
 destruct ld as [| d]. {
-  destruct le as [| e]; [ easy | cbn ].
-  rewrite match_id.
-  move e before c.
-  apply eq_lap_convol_mul_nil in Hld.
-  apply Nat.sub_0_le in Hld.
-  remember (length la' + length lb') as len eqn:Hlen.
-  symmetry in Hlen.
-  destruct len. {
-    apply Nat.eq_add_0 in Hlen.
-    now subst la'.
-  }
-  destruct len; [ clear Hld | flia Hld ].
-  apply Nat.eq_add_1 in Hlen.
-  destruct Hlen as [Hlen| Hlen]; [ now rewrite Hlb' in Hlen | ].
-  now rewrite Hla' in Hlen.
+  apply map_eq_nil in Hld.
+  apply List_seq_eq_nil in Hld.
+  rewrite Hla', Hlb' in Hld; cbn in Hld.
+  flia Hld.
 }
 destruct le as [| e]. {
-  cbn; rewrite match_id.
-  move d before c.
-  apply eq_lap_convol_mul_nil in Hle.
-  apply Nat.sub_0_le in Hle.
-  remember (length lb' + length lc') as len eqn:Hlen.
-  symmetry in Hlen.
-  destruct len. {
-    apply Nat.eq_add_0 in Hlen.
-    now subst lb'.
-  }
-  destruct len; [ clear Hle | flia Hle ].
-  apply Nat.eq_add_1 in Hlen.
-  destruct Hlen as [Hlen| Hlen]; [ now rewrite Hlc' in Hlen | ].
-  now rewrite Hlb' in Hlen.
+  apply map_eq_nil in Hle.
+  apply List_seq_eq_nil in Hle.
+  rewrite Hlc', Hlb' in Hle; cbn in Hle.
+  flia Hle.
 }
+Search (nth _ (map _ _)).
+...
 rewrite list_nth_lap_convol_mul; [ idtac | reflexivity ].
 rewrite list_nth_lap_convol_mul; [ idtac | reflexivity ].
 rewrite <- Hld, <- Hle.
