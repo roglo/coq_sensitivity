@@ -5401,24 +5401,33 @@ rewrite polyn_degree_lt_add. 2: {
         unfold minus_one_pow.
         destruct (S i mod 2) as [Hi2| Hi2]. {
           rewrite srng_mul_1_l.
-          intros H; apply Hmz.
+          intros H.
           apply (f_equal rng_opp) in H.
           rewrite rng_opp_involutive in H.
-          cbn in H.
-...
-          rewrite rng_opp_0 in H.
-Search (- _ = _)%Rng.
-...
-rewrite polyn
-        unfold xI_sub_M at 1.
-Search (mat_el (_ + _)%M).
-
-Search (polyn_degree (_ * _)).
-      rewrite polyn_degree_mul. 2: {
-        rewrite polyn_degree_minus_one_pow.
-        rewrite polyn_coeff_minus_one_pow.
-        rewrite polyn_degree_mat_el_xI_sub_M_0_succ.
-        rewrite polyn_coeff_mat_el_xI_sub_M_0_succ.
+          unfold so in H.
+          now rewrite rng_opp_0 in H.
+        }
+        unfold so.
+        rewrite rng_mul_opp_opp.
+        now rewrite srng_mul_1_l.
+      }
+      rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
+      rewrite polyn_degree_mat_el_xI_sub_M_0_succ, Nat.add_0_l.
+      easy.
+    } {
+      destruct (srng_eq_dec (mat_el M 0 (S i)) 0) as [Hmz| Hmz]. {
+        rewrite mat_el_xI_sub_M_0_succ.
+        rewrite Hmz.
+        specialize (polyn_of_list_repeat_0s 1) as H.
+        cbn in H.
+        unfold so.
+        rewrite H; clear H.
+        rewrite rng_opp_0.
+        cbn - [ polyn_coeff polyn_degree det_loop subm ].
+        rewrite polyn_mul_0_r.
+        remember (polyn_degree 0) as x eqn:Hx; cbn in Hx; subst x.
+        remember (polyn_coeff 0 0) as x eqn:Hx; cbn in Hx; subst x.
+        rewrite srng_mul_0_l.
 ...
   etransitivity. {
     apply Nat_fold_left_max_le.
