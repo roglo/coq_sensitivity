@@ -1437,6 +1437,133 @@ rewrite polyn_mul_comm.
 apply polyn_mul_0_l.
 Qed.
 
+Theorem list_nth_polyn_list_eq : ∀ la lb,
+  (∀ i, (List.nth i la 0 = List.nth i lb 0)%Rng)
+  → norm_polyn_list la = norm_polyn_list lb.
+Proof.
+intros * Hi.
+unfold norm_polyn_list; f_equal.
+revert lb Hi.
+induction la as [| a]; intros. {
+  induction lb as [| b]; [ easy | ].
+  specialize (Hi 0) as H; cbn in H.
+  subst b; cbn.
+  rewrite strip_0s_app; cbn.
+  remember (strip_0s (rev lb)) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc as [| c]; [ now destruct (srng_eq_dec _ _) | ].
+  assert (H : norm_polyn_list [] = norm_polyn_list lb). {
+    unfold norm_polyn_list; cbn.
+    cbn in IHlb.
+    change (rev [] = rev (strip_0s (rev lb))).
+    f_equal.
+    rewrite Hlc.
+    apply IHlb.
+    intros i; cbn; rewrite match_id.
+    now specialize (Hi (S i)); cbn in Hi.
+  }
+  cbn in H.
+  unfold norm_polyn_list in H.
+  rewrite Hlc in H.
+  symmetry in H.
+  now apply List_eq_rev_nil in H.
+} {
+  cbn.
+  rewrite strip_0s_app.
+  remember (strip_0s (rev la)) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc as [| c]. {
+    assert (Hla : ∀ i, nth i la 0%Rng = 0%Rng). {
+      intros i.
+      clear - Hlc.
+      revert i.
+      induction la as [| a]; intros; [ now cbn; rewrite match_id | cbn ].
+      destruct i. {
+        cbn in Hlc.
+        rewrite strip_0s_app in Hlc; cbn in Hlc.
+        remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
+...
+        destruct lb as [| b]; [ now destruct (srng_eq_dec a 0%Rng) | easy ].
+      }
+      apply IHla.
+      cbn in Hlc.
+      rewrite strip_0s_app in Hlc; cbn in Hlc.
+      remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
+      destruct lb as [| b]; [ now destruct (rng_eq_dec a 0%Rng) | easy ].
+    }
+    cbn.
+    destruct (rng_eq_dec a 0%Rng) as [Haz| Haz]. {
+      assert (Hlb : ∀ i, nth i lb 0%Rng = 0%Rng). {
+        intros.
+        rewrite <- Hi; cbn.
+        destruct i; [ easy | ].
+        apply Hla.
+      }
+      clear - Hlb.
+      induction lb as [| b]; [ easy | cbn ].
+      specialize (Hlb 0) as H1; cbn in H1; subst b.
+      rewrite strip_0s_app; cbn.
+      rewrite <- IHlb; [ now destruct (rng_eq_dec 0%Rng 0%Rng) | ].
+      intros i.
+      now specialize (Hlb (S i)).
+    }
+    destruct lb as [| b]; [ now specialize (Hi 0); cbn in Hi | cbn ].
+    rewrite strip_0s_app; cbn.
+    remember (strip_0s (rev lb)) as ld eqn:Hld; symmetry in Hld.
+    destruct ld as [| d]. {
+      destruct (rng_eq_dec b 0%Rng) as [Hbz| Hbz]. {
+        subst b.
+        now specialize (Hi 0).
+      }
+      f_equal.
+      now specialize (Hi 0).
+    }
+    specialize (IHla lb).
+    assert (H : ∀ i : nat, nth i la 0%Rng = nth i lb 0%Rng). {
+      intros i.
+      now specialize (Hi (S i)); cbn in Hi.
+    }
+    specialize (IHla H); clear H.
+    now rewrite Hld in IHla.
+  }
+  destruct lb as [| b]. {
+    specialize (IHla []).
+    assert (H : ∀ i : nat, nth i la 0%Rng = nth i [] 0%Rng). {
+      intros i; cbn; rewrite match_id.
+      now specialize (Hi (S i)).
+    }
+    now specialize (IHla H).
+  }
+  cbn.
+  rewrite strip_0s_app; cbn.
+  remember (strip_0s (rev lb)) as ld eqn:Hld; symmetry in Hld.
+  destruct ld as [| d]. {
+    destruct (rng_eq_dec b 0%Rng) as [Hbz| Hbz]. {
+      subst b.
+      specialize (IHla lb).
+      assert (H : ∀ i : nat, nth i la 0%Rng = nth i lb 0%Rng). {
+        intros i.
+        now specialize (Hi (S i)); cbn in Hi.
+      }
+      specialize (IHla H); clear H.
+      now rewrite Hld in IHla.
+    }
+    specialize (IHla lb).
+    assert (H : ∀ i : nat, nth i la 0%Rng = nth i lb 0%Rng). {
+      intros i.
+      now specialize (Hi (S i)); cbn in Hi.
+    }
+    specialize (IHla H); clear H.
+    now rewrite Hld in IHla.
+  }
+  specialize (Hi 0) as H1; cbn in H1; subst b.
+  do 2 rewrite app_comm_cons; f_equal.
+  rewrite <- Hld.
+  apply IHla.
+  now intros i; specialize (Hi (S i)).
+}
+Qed.
+
+...
+
 Theorem norm_polyn_list_mul_assoc : ∀ la lb lc,
   norm_polyn_list (la * (lb * lc))%PL =
   norm_polyn_list ((la * lb) * lc)%PL.
@@ -1477,6 +1604,7 @@ move b before a; move c before b.
 remember (a :: la) as la' eqn:Hla'.
 remember (b :: lb) as lb' eqn:Hlb'.
 remember (c :: lc) as lc' eqn:Hlc'.
+move lb' before la'; move lc' before lb'.
 remember (length la' + length lb' + length lc' - 2) as len eqn:Hlen.
 replace (length lc' + (length la' + length lb' - 1) - 1) with len. 2: {
   subst la' lb' lc'; cbn in Hlen |-*; flia Hlen.
@@ -1484,6 +1612,9 @@ replace (length lc' + (length la' + length lb' - 1) - 1) with len. 2: {
 replace (length la' + (length lb' + length lc' - 1) - 1) with len. 2: {
   subst la' lb' lc'; cbn in Hlen |-*; flia Hlen.
 }
+...
+apply list_nth_polyn_list_eq.
+intros k.
 ...
 remember (c :: lc) as lc' eqn:Hlc'.
 apply list_nth_lap_eq; intros k.
