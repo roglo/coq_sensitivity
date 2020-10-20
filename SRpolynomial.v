@@ -1480,17 +1480,16 @@ induction la as [| a]; intros. {
         cbn in Hlc.
         rewrite strip_0s_app in Hlc; cbn in Hlc.
         remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
-...
-        destruct lb as [| b]; [ now destruct (srng_eq_dec a 0%Rng) | easy ].
+        destruct lb as [| b]; [ now destruct (srng_eq_dec a 0) | easy ].
       }
       apply IHla.
       cbn in Hlc.
       rewrite strip_0s_app in Hlc; cbn in Hlc.
       remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
-      destruct lb as [| b]; [ now destruct (rng_eq_dec a 0%Rng) | easy ].
+      destruct lb as [| b]; [ now destruct (srng_eq_dec a 0) | easy ].
     }
     cbn.
-    destruct (rng_eq_dec a 0%Rng) as [Haz| Haz]. {
+    destruct (srng_eq_dec a 0) as [Haz| Haz]. {
       assert (Hlb : ∀ i, nth i lb 0%Rng = 0%Rng). {
         intros.
         rewrite <- Hi; cbn.
@@ -1501,7 +1500,7 @@ induction la as [| a]; intros. {
       induction lb as [| b]; [ easy | cbn ].
       specialize (Hlb 0) as H1; cbn in H1; subst b.
       rewrite strip_0s_app; cbn.
-      rewrite <- IHlb; [ now destruct (rng_eq_dec 0%Rng 0%Rng) | ].
+      rewrite <- IHlb; [ now rewrite if_0_eq_0 | ].
       intros i.
       now specialize (Hlb (S i)).
     }
@@ -1509,7 +1508,7 @@ induction la as [| a]; intros. {
     rewrite strip_0s_app; cbn.
     remember (strip_0s (rev lb)) as ld eqn:Hld; symmetry in Hld.
     destruct ld as [| d]. {
-      destruct (rng_eq_dec b 0%Rng) as [Hbz| Hbz]. {
+      destruct (srng_eq_dec b 0) as [Hbz| Hbz]. {
         subst b.
         now specialize (Hi 0).
       }
@@ -1536,7 +1535,7 @@ induction la as [| a]; intros. {
   rewrite strip_0s_app; cbn.
   remember (strip_0s (rev lb)) as ld eqn:Hld; symmetry in Hld.
   destruct ld as [| d]. {
-    destruct (rng_eq_dec b 0%Rng) as [Hbz| Hbz]. {
+    destruct (srng_eq_dec b 0) as [Hbz| Hbz]. {
       subst b.
       specialize (IHla lb).
       assert (H : ∀ i : nat, nth i la 0%Rng = nth i lb 0%Rng). {
@@ -1561,8 +1560,6 @@ induction la as [| a]; intros. {
   now intros i; specialize (Hi (S i)).
 }
 Qed.
-
-...
 
 Theorem norm_polyn_list_mul_assoc : ∀ la lb lc,
   norm_polyn_list (la * (lb * lc))%PL =
@@ -1612,11 +1609,8 @@ replace (length lc' + (length la' + length lb' - 1) - 1) with len. 2: {
 replace (length la' + (length lb' + length lc' - 1) - 1) with len. 2: {
   subst la' lb' lc'; cbn in Hlen |-*; flia Hlen.
 }
+apply list_nth_polyn_list_eq; intros k.
 ...
-apply list_nth_polyn_list_eq.
-intros k.
-...
-remember (c :: lc) as lc' eqn:Hlc'.
 apply list_nth_lap_eq; intros k.
 remember (lap_convol_mul la' lb' 0 (length la' + length lb' - 1)) as ld
   eqn:Hld.
