@@ -3609,7 +3609,6 @@ move lb before la.
 cbn - [ norm_polyn_list polyn_list_mul ].
 cbn in HPQ.
 do 2 rewrite <- List_last_nth in HPQ.
-(**)
 rewrite norm_polyn_list_id. 2: {
   destruct la as [| a]. {
     exfalso; apply HPQ; cbn.
@@ -5379,20 +5378,21 @@ rewrite polyn_degree_lt_add. 2: {
     intros i Hi.
     apply in_seq in Hi.
     destruct i; [ easy | ].
+(**)
+    destruct (srng_eq_dec (mat_el M 0 (S i)) 0) as [Hmz| Hmz]. {
+      rewrite mat_el_xI_sub_M_0_succ.
+      rewrite Hmz.
+      specialize (polyn_of_list_repeat_0s 1) as H.
+      cbn in H.
+      unfold so.
+      rewrite H; clear H.
+      rewrite rng_opp_0.
+      cbn - [ polyn_degree det_loop subm ].
+      rewrite polyn_mul_0_r.
+      rewrite polyn_mul_0_l.
+      apply Nat.le_0_l.
+    }
     rewrite polyn_degree_mul. {
-      destruct (srng_eq_dec (mat_el M 0 (S i)) 0) as [Hmz| Hmz]. {
-        rewrite mat_el_xI_sub_M_0_succ.
-        rewrite Hmz.
-        specialize (polyn_of_list_repeat_0s 1) as H.
-        cbn in H.
-        unfold so.
-        rewrite H; clear H.
-        rewrite rng_opp_0.
-        cbn - [ polyn_degree det_loop subm ].
-        rewrite polyn_mul_0_r.
-        remember (polyn_degree 0) as x eqn:Hx; cbn in Hx; subst x.
-        now rewrite Nat.add_0_l.
-      }
       rewrite polyn_degree_mul. 2: {
         rewrite polyn_degree_minus_one_pow.
         rewrite polyn_coeff_minus_one_pow.
@@ -5415,19 +5415,20 @@ rewrite polyn_degree_lt_add. 2: {
       rewrite polyn_degree_mat_el_xI_sub_M_0_succ, Nat.add_0_l.
       easy.
     } {
-      destruct (srng_eq_dec (mat_el M 0 (S i)) 0) as [Hmz| Hmz]. {
-        rewrite mat_el_xI_sub_M_0_succ.
-        rewrite Hmz.
-        specialize (polyn_of_list_repeat_0s 1) as H.
-        cbn in H.
-        unfold so.
-        rewrite H; clear H.
-        rewrite rng_opp_0.
-        cbn - [ polyn_coeff polyn_degree det_loop subm ].
-        rewrite polyn_mul_0_r.
-        remember (polyn_degree 0) as x eqn:Hx; cbn in Hx; subst x.
-        remember (polyn_coeff 0 0) as x eqn:Hx; cbn in Hx; subst x.
-        rewrite srng_mul_0_l.
+    rewrite polyn_degree_mul. {
+      rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
+      rewrite polyn_degree_mat_el_xI_sub_M_0_succ.
+Theorem polyn_coeff_mul_at_0 : ∀ P Q,
+  polyn_coeff (P * Q) 0 = (polyn_coeff P 0 * polyn_coeff Q 0)%Srng.
+Proof.
+intros (la, Hla) (lb, Hlb).
+move lb before la.
+cbn - [ polyn_list_mul ].
+destruct la as [| a]. {
+  rewrite polyn_list_mul_0_l; cbn.
+  symmetry.
+  apply srng_mul_0_l.
+}
 ...
   etransitivity. {
     apply Nat_fold_left_max_le.

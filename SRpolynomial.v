@@ -1380,22 +1380,25 @@ f_equal.
 apply polyn_list_mul_add_distr_l.
 Qed.
 
+Theorem polyn_list_mul_0_l : ∀ la,
+  norm_polyn_list (0 * la)%PL = 0%PL.
+Proof.
+intros.
+apply List_eq_rev_r.
+apply eq_strip_0s_nil; cbn.
+rewrite rev_length, map_length.
+rewrite seq_length.
+apply List_eq_rev_r.
+rewrite List_rev_repeat.
+rewrite (map_polyn_list_convol_mul_0_l 0).
+now rewrite seq_length.
+Qed.
+
 Theorem polyn_mul_0_l : ∀ P, (0 * P = 0)%P.
 Proof.
 intros.
 apply polyn_eq.
-cbn; symmetry.
-remember (polyn_list P) as la eqn:Hla.
-apply List_eq_rev_l.
-cbn; symmetry.
-apply eq_strip_0s_nil.
-rewrite rev_length, map_length.
-rewrite seq_length.
-symmetry.
-apply List_eq_rev_l.
-rewrite List_rev_repeat; symmetry.
-rewrite (map_polyn_list_convol_mul_0_l 0).
-now rewrite seq_length.
+apply polyn_list_mul_0_l.
 Qed.
 
 Theorem polyn_mul_0_r : ∀ P, (P * 0 = 0)%P.
