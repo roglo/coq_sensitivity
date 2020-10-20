@@ -1660,9 +1660,21 @@ rewrite IHlen.
 rewrite fold_left_srng_add_fun_from_0; symmetry.
 rewrite fold_left_srng_add_fun_from_0; symmetry.
 apply srng_add_compat_l.
-...
-apply summation_aux_mul_swap.
+cbn; do 2 rewrite srng_add_0_l.
+destruct (zerop (b2 + g1 (b1 + len))) as [Hz| Hz]. {
+  apply Nat.eq_add_0 in Hz.
+  destruct Hz as (Hbz, Hgz).
+  subst b2; rewrite Hgz.
+  cbn; symmetry.
+  apply srng_mul_0_r.
+}
+rewrite fold_iterate_2; [ | easy ].
+rewrite fold_iterate_2; [ | easy ].
+symmetry.
+apply srng_mul_summation_distr_l.
 Qed.
+
+Inspect 1.
 
 ...
 

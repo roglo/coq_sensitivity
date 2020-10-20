@@ -261,4 +261,19 @@ rewrite fold_left_srng_add_fun_from_0.
 now rewrite Nat.add_succ_comm.
 Qed.
 
+Theorem srng_mul_summation_distr_l : ∀ a b e f,
+  (a * (Σ (i = b, e), f i) = Σ (i = b, e), a * f i)%Srng.
+Proof.
+intros.
+unfold iterate.
+remember (S e - b) as n eqn:Hn.
+revert e a b Hn.
+induction n; intros; [ apply srng_mul_0_r | cbn ].
+do 2 rewrite srng_add_0_l.
+rewrite fold_left_srng_add_fun_from_0; symmetry.
+rewrite fold_left_srng_add_fun_from_0; symmetry.
+rewrite srng_mul_add_distr_l.
+rewrite (IHn e); [ easy | flia Hn ].
+Qed.
+
 End in_ring.

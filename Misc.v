@@ -66,9 +66,18 @@ Notation "'Σ' ( i = b , e ) , g" :=
   (iterate b e (λ c i, c + g) 0)
   (at level 45, i at level 0, b at level 60, e at level 60) : nat_scope.
 
-Theorem fold_summation : ∀ {T} b e f (d : T),
+Theorem fold_iterate : ∀ {T} b e f (d : T),
   fold_left f (seq b (S e - b)) d = iterate b e f d.
 Proof. easy. Qed.
+
+Theorem fold_iterate_2 : ∀ {T} b len f (d : T),
+  0 < b + len
+  → fold_left f (seq b len) d = iterate b (b + len - 1) f d.
+Proof.
+intros * Hblen.
+unfold iterate.
+now replace (S (b + len - 1) - b) with len by flia Hblen.
+Qed.
 
 Theorem fold_left_add_fun_from_0 {A} : ∀ a l (f : A → nat),
   fold_left (λ c i, c + f i) l a =
