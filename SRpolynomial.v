@@ -1674,10 +1674,6 @@ symmetry.
 apply srng_mul_summation_distr_l.
 Qed.
 
-Inspect 1.
-
-...
-
 Theorem srng_summation_summation_mul_swap : ∀ g1 (g2 : nat → T) g3 k,
   (Σ (i = 0, k), (Σ (j = 0, g1 i), g2 i * g3 i j)
    = Σ (i = 0, k), g2 i * Σ (j = 0, g1 i), g3 i j)%Rng.
@@ -1764,9 +1760,8 @@ destruct (lt_dec k len) as [Hklen| Hklen]. {
   rewrite <- Hld, <- Hle.
   rewrite srng_summation_mul_polyn_list_nth_map_list_convol_mul_2; symmetry.
   rewrite srng_summation_mul_polyn_list_nth_map_list_convol_mul; symmetry.
-...
-rewrite <- srng_summation_summation_mul_swap.
-rewrite <- srng_summation_summation_mul_swap.
+  rewrite <- srng_summation_summation_mul_swap.
+  rewrite <- srng_summation_summation_mul_swap.
 ...
 rewrite <- summation_summation_mul_swap.
 rewrite <- summation_summation_mul_swap.
