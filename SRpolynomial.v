@@ -1442,6 +1442,107 @@ Theorem norm_polyn_list_mul_assoc : ∀ la lb lc,
   norm_polyn_list ((la * lb) * lc)%PL.
 Proof.
 intros la lb lc.
+symmetry; rewrite polyn_list_mul_comm.
+unfold polyn_list_mul.
+do 2 rewrite map_length, seq_length.
+destruct lc as [| c]. {
+  destruct la as [| a]. {
+    do 2 rewrite (map_polyn_list_convol_mul_0_l 0).
+    now rewrite (Nat.add_comm (length []) (length lb)).
+  }
+  destruct lb as [| b]. {
+    do 2 rewrite (map_polyn_list_convol_mul_0_l 0).
+    rewrite (map_polyn_list_convol_mul_0_r 0).
+    now do 2 rewrite norm_polyn_list_repeat_0.
+  }
+  cbn - [ norm_polyn_list ].
+  rewrite (map_polyn_list_convol_mul_0_l 0).
+  rewrite (map_polyn_list_convol_mul_0_r 0).
+  rewrite map_polyn_list_convol_mul_0_r.
+  now do 2 rewrite norm_polyn_list_repeat_0.
+}
+destruct la as [| a]. {
+  do 2 rewrite (map_polyn_list_convol_mul_0_l 0).
+  rewrite map_polyn_list_convol_mul_0_r.
+  now do 2 rewrite norm_polyn_list_repeat_0.
+}
+destruct lb as [| b]. {
+  rewrite (map_polyn_list_convol_mul_0_l 0).
+  rewrite (map_polyn_list_convol_mul_0_r 0).
+  rewrite map_polyn_list_convol_mul_0_r.
+  rewrite map_polyn_list_convol_mul_0_r.
+  now do 2 rewrite norm_polyn_list_repeat_0.
+}
+move b before a; move c before b.
+remember (a :: la) as la' eqn:Hla'.
+remember (b :: lb) as lb' eqn:Hlb'.
+remember (c :: lc) as lc' eqn:Hlc'.
+remember (length la' + length lb' + length lc' - 2) as len eqn:Hlen.
+replace (length lc' + (length la' + length lb' - 1) - 1) with len. 2: {
+  subst la' lb' lc'; cbn in Hlen |-*; flia Hlen.
+}
+replace (length la' + (length lb' + length lc' - 1) - 1) with len. 2: {
+  subst la' lb' lc'; cbn in Hlen |-*; flia Hlen.
+}
+...
+remember (c :: lc) as lc' eqn:Hlc'.
+apply list_nth_lap_eq; intros k.
+remember (lap_convol_mul la' lb' 0 (length la' + length lb' - 1)) as ld
+  eqn:Hld.
+remember (lap_convol_mul lb' lc' 0 (length lb' + length lc' - 1)) as le
+  eqn:Hle.
+symmetry in Hld, Hle.
+destruct ld as [| d]. {
+  destruct le as [| e]; [ easy | cbn ].
+  rewrite match_id.
+  move e before c.
+  apply eq_lap_convol_mul_nil in Hld.
+  apply Nat.sub_0_le in Hld.
+  remember (length la' + length lb') as len eqn:Hlen.
+  symmetry in Hlen.
+  destruct len. {
+    apply Nat.eq_add_0 in Hlen.
+    now subst la'.
+  }
+  destruct len; [ clear Hld | flia Hld ].
+  apply Nat.eq_add_1 in Hlen.
+  destruct Hlen as [Hlen| Hlen]; [ now rewrite Hlb' in Hlen | ].
+  now rewrite Hla' in Hlen.
+}
+destruct le as [| e]. {
+  cbn; rewrite match_id.
+  move d before c.
+  apply eq_lap_convol_mul_nil in Hle.
+  apply Nat.sub_0_le in Hle.
+  remember (length lb' + length lc') as len eqn:Hlen.
+  symmetry in Hlen.
+  destruct len. {
+    apply Nat.eq_add_0 in Hlen.
+    now subst lb'.
+  }
+  destruct len; [ clear Hle | flia Hle ].
+  apply Nat.eq_add_1 in Hlen.
+  destruct Hlen as [Hlen| Hlen]; [ now rewrite Hlc' in Hlen | ].
+  now rewrite Hlb' in Hlen.
+}
+rewrite list_nth_lap_convol_mul; [ idtac | reflexivity ].
+rewrite list_nth_lap_convol_mul; [ idtac | reflexivity ].
+rewrite <- Hld, <- Hle.
+rewrite summation_mul_list_nth_lap_convol_mul_2; symmetry.
+rewrite summation_mul_list_nth_lap_convol_mul; symmetry.
+rewrite <- summation_summation_mul_swap.
+rewrite <- summation_summation_mul_swap.
+rewrite summation_summation_exch.
+rewrite summation_summation_shift.
+apply summation_compat; intros i Hi.
+apply summation_compat; intros j Hj.
+rewrite rng_mul_comm, rng_mul_assoc.
+rewrite Nat.add_comm, Nat.add_sub.
+rewrite Nat.add_comm, Nat.sub_add_distr.
+reflexivity.
+Qed.
+...
+intros la lb lc.
 unfold polyn_list_mul.
 do 2 rewrite map_length.
 do 2 rewrite seq_length.
@@ -1460,6 +1561,19 @@ replace (length la + (length lb + length lc - 1) - 1) with len
   by flia Hlen Hbz.
 replace (length la + length lb - 1 + length lc - 1) with len
   by flia Hlen Hbz.
+clear Hlen.
+revert la lb lc Hbz.
+induction len; intros; [ easy | ].
+cbn - [ norm_polyn_list polyn_list_convol_mul ].
+Check polyn_list_convol_mul_more.
+Search polyn_list_convol_mul.
+...
+Check norm_polyn_list_mul_idemp_l.
+...
+Print norm_polyn_list.
+Search (norm_polyn_list (_ ++ _)).
+Search (norm_polyn_list (_ :: _)).
+cbn.
 ...
 rewrite (polyn_list_convol_mul_more (lab + lbc)); [ | subst; flia ].
 symmetry.
