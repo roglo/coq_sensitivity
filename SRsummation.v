@@ -276,4 +276,59 @@ rewrite srng_mul_add_distr_l.
 rewrite (IHn e); [ easy | flia Hn ].
 Qed.
 
+Theorem srng_summation_only_one : ∀ g n, (Σ (i = n, n), g i = g n)%Srng.
+Proof.
+intros g n.
+unfold iterate.
+rewrite Nat.sub_succ_l; [ idtac | reflexivity ].
+rewrite Nat.sub_diag; simpl.
+apply srng_add_0_l.
+Qed.
+
+Theorem srng_summation_summation_exch : ∀ g k,
+  (Σ (j = 0, k), (Σ (i = 0, j), g i j) =
+   Σ (i = 0, k), Σ (j = i, k), g i j)%Srng.
+Proof.
+intros g k.
+induction k; [ easy | ].
+rewrite srng_summation_split_last; [ | apply Nat.le_0_l ].
+rewrite srng_summation_succ_succ.
+erewrite srng_summation_eq_compat. 2: {
+  intros i Hi.
+  now rewrite Nat.sub_succ, Nat.sub_0_r.
+}
+cbn - [ iterate ].
+rewrite IHk.
+symmetry.
+rewrite srng_summation_split_last; [ | flia ].
+rewrite srng_summation_succ_succ.
+erewrite srng_summation_eq_compat. 2: {
+  intros i Hi.
+  now rewrite Nat.sub_succ, Nat.sub_0_r.
+}
+cbn - [ iterate ].
+erewrite srng_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite srng_summation_split_last; [ | flia Hi ].
+  rewrite srng_summation_succ_succ.
+  erewrite srng_summation_eq_compat. 2: {
+    intros j Hj.
+    now rewrite Nat.sub_succ, Nat.sub_0_r.
+  }
+  easy.
+}
+cbn - [ iterate ].
+rewrite srng_summation_add_distr.
+rewrite <- srng_add_assoc.
+f_equal.
+symmetry.
+rewrite srng_summation_split_last; [ | flia ].
+rewrite srng_summation_succ_succ.
+rewrite srng_summation_only_one.
+f_equal.
+apply srng_summation_eq_compat.
+intros i Hi.
+now rewrite Nat.sub_succ, Nat.sub_0_r.
+Qed.
+
 End in_ring.
