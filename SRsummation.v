@@ -331,4 +331,48 @@ intros i Hi.
 now rewrite Nat.sub_succ, Nat.sub_0_r.
 Qed.
 
+Theorem srng_summation_summation_shift : ∀ g k,
+  (Σ (i = 0, k), (Σ (j = i, k), g i j) =
+   Σ (i = 0, k), Σ (j = 0, k - i), g i (i + j)%nat)%Srng.
+Proof.
+intros g k.
+apply srng_summation_eq_compat; intros i Hi.
+unfold iterate.
+rewrite Nat.sub_0_r.
+rewrite Nat.sub_succ_l; [ | now destruct Hi ].
+(**)
+remember (S (k - i)) as len eqn:Hlen.
+...
+clear k Hi Hlen.
+revert i.
+induction len; intros; [ easy | cbn ].
+do 2 rewrite srng_add_0_l.
+rewrite Nat.add_0_r.
+rewrite fold_left_srng_add_fun_from_0; symmetry.
+rewrite fold_left_srng_add_fun_from_0; symmetry.
+f_equal.
+rewrite IHlen.
+...
+assert (∀ i, b ≤ i < b + len → g i = h i). {
+  intros i Hi.
+  apply Hgh; flia Hlen Hi.
+}
+clear k Hgh Hlen.
+rename H into Hb.
+revert b Hb.
+induction len; intros; [ easy | cbn ].
+do 2 rewrite srng_add_0_l.
+rewrite fold_left_srng_add_fun_from_0; symmetry.
+rewrite fold_left_srng_add_fun_from_0; symmetry.
+f_equal; [ apply Hb; flia | ].
+apply IHlen.
+intros i Hi.
+apply Hb.
+flia Hi.
+Qed.
+...
+apply summation_aux_compat; intros j Hj.
+rewrite Nat.add_0_l; reflexivity.
+Qed.
+
 End in_ring.
