@@ -1657,12 +1657,10 @@ induction len; intros; [ easy | ].
 rewrite List_seq_succ_r.
 do 2 rewrite fold_left_app.
 rewrite IHlen.
+rewrite fold_left_srng_add_fun_from_0; symmetry.
+rewrite fold_left_srng_add_fun_from_0; symmetry.
+apply srng_add_compat_l.
 ...
-cbn.
-Check srng_add_compat_r.
-...
-About srng_add_compat_r.
-apply srng_add_compat_r.
 apply summation_aux_mul_swap.
 Qed.
 
