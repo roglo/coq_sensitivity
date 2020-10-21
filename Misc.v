@@ -58,13 +58,13 @@ intros A B l a.
 now induction l.
 Qed.
 
-(* iterations (for summations, products, maximum) *)
+(* iterations (for maximum, summations, products of an indexed sequence *)
 
 Definition iterate {T} b e f (d : T) := fold_left f (seq b (S e - b)) d.
 
 (* maximum of several values *)
 
-Notation "'MAX' ( i = b , e ) , g" :=
+Notation "'Max' ( i = b , e ) , g" :=
   (iterate b e (λ c i, max c (g)) 0)
   (at level 45, i at level 0, b at level 60, e at level 60) : nat_scope.
 
@@ -79,13 +79,41 @@ rewrite IHl; symmetry; rewrite IHl.
 now rewrite Nat.max_assoc.
 Qed.
 
-Theorem MAX_fold_left_max : ∀ b e f,
-  MAX (i = b, e), f i = fold_left max (map f (seq b (S e - b))) 0.
+Theorem Max_fold_left_max : ∀ b e f,
+  Max (i = b, e), f i = fold_left max (map f (seq b (S e - b))) 0.
 Proof.
 intros.
 unfold iterate.
 symmetry.
 apply List_fold_left_map.
+Qed.
+
+Theorem Max_lub_le : ∀ b e f n,
+  (∀ i, b ≤ i ≤ e → f i ≤ n)
+  → Max (i = b, e), f i ≤ n.
+Proof.
+intros * Hf.
+unfold iterate.
+remember (S e - b) as len eqn:Hlen.
+destruct len; [ apply Nat.le_0_l | ].
+replace e with (b + len) in Hf by flia Hlen.
+clear e Hlen.
+revert b Hf.
+induction len; intros. {
+  now apply Hf; rewrite Nat.add_0_r.
+}
+remember (S len) as slen; cbn; subst slen.
+rewrite fold_left_max_fun_from_0.
+remember (fold_left _ _ _) as x eqn:Hx.
+destruct (le_dec (f b) x) as [Hfx| Hfx]. {
+  rewrite Nat.max_r; [ | easy ].
+  subst x.
+  apply IHlen.
+  intros i Hi.
+  apply Hf; flia Hi.
+}
+rewrite Nat.max_l; [ | flia Hfx ].
+apply Hf; flia.
 Qed.
 
 (* summations *)

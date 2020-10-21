@@ -3920,7 +3920,7 @@ now destruct (srng_eq_dec c1 0).
 Qed.
 
 Theorem polyn_degree_summation_ub : ∀ b e f,
-  polyn_degree (Σ (i = b, e), f i) ≤ MAX (i = b, e), polyn_degree (f i).
+  polyn_degree (Σ (i = b, e), f i) ≤ Max (i = b, e), polyn_degree (f i).
 Proof.
 intros.
 unfold iterate.
@@ -4538,7 +4538,7 @@ remember (S n) as sn.
 cbn - [ subm xI_sub_M iterate ]; subst sn.
 etransitivity; [ apply polyn_degree_summation_ub | ].
 etransitivity. {
-  rewrite MAX_fold_left_max.
+  rewrite Max_fold_left_max.
   apply List_fold_left_max_map_le.
   intros j Hj.
   apply polyn_degree_mul_le.
@@ -5412,6 +5412,10 @@ rewrite polyn_degree_lt_add. 2: {
   cbn - [ polyn_degree P ].
   rewrite polyn_degree_opp; subst P.
   eapply le_lt_trans; [ apply polyn_degree_summation_ub | ].
+  cbn - [ fold_left polyn_degree det_loop ].
+  apply Nat.lt_succ_r.
+  apply Max_lub_le.
+  intros i Hi.
 ...
   rewrite Nat.sub_succ, Nat.sub_0_r.
   apply Nat.lt_succ_r.
