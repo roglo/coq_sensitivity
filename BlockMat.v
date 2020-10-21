@@ -3671,43 +3671,6 @@ destruct (zerop (length lb)) as [Hzlb| Hzlb]. {
 flia Hzla Hzlb.
 Qed.
 
-Theorem polyn_degree_mul_const_l : ∀ P Q,
-  polyn_degree P = 0
-  → polyn_coeff P 0 ≠ 0%Srng
-  → polyn_degree (P * Q) = polyn_degree Q.
-Proof.
-intros * Hpd Hpc.
-unfold polyn_degree; cbn.
-unfold polyn_degree_plus_1.
-destruct P as (la, Hla).
-destruct Q as (lb, Hlb).
-move lb before la.
-cbn - [ norm_polyn_list polyn_list_mul ].
-cbn in Hpd, Hpc.
-destruct la as [| a]; [ easy | ].
-cbn in Hpd.
-rewrite Nat.sub_0_r in Hpd.
-apply length_zero_iff_nil in Hpd; subst la.
-cbn in Hpc.
-clear Hla.
-cbn - [ norm_polyn_list ].
-rewrite Nat.sub_0_r.
-destruct lb as [| b]; [ easy | ].
-cbn - [ nth ] in Hlb.
-cbn - [ norm_polyn_list ].
-rewrite srng_add_0_l.
-rewrite Nat.sub_0_r.
-rewrite <- List_last_nth_cons in Hlb.
-destruct (srng_eq_dec (last (b :: lb) 0%Srng) 0) as [Hbz| Hbz]; [ easy | ].
-clear Hlb.
-cbn.
-rewrite rev_length.
-rewrite <- map_rev.
-specialize (map_polyn_list_convol_mul_const_l 0) as H1.
-cbn - [ map polyn_list_convol_mul ] in H1.
-rewrite H1; clear H1.
-...
-
 (* normalized list is smaller than the list *)
 
 Theorem norm_polyn_list_length_le : ∀ la,
