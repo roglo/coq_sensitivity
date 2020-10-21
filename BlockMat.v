@@ -4508,6 +4508,15 @@ induction n; intros. {
   specialize (polyn_of_list_repeat_0s 1) as H.
   cbn in H; rewrite H; clear H.
   rewrite polyn_mul_0_r, polyn_add_0_l.
+  destruct (lt_dec 1 (S i)) as [H1i| H1i]. {
+    rewrite polyn_degree_opp.
+    rewrite polyn_degree_of_single.
+    apply Nat.le_0_l.
+  }
+  rewrite polyn_degree_1; [ apply Nat.le_succ_diag_r | ].
+  rewrite polyn_degree_opp.
+  apply polyn_degree_of_single.
+}
 ...
 
 Theorem polyn_degree_det_loop_subm_xI_sub_M_succ_r_le : ∀ M i n,
