@@ -1763,8 +1763,8 @@ destruct (lt_dec k len) as [Hklen| Hklen]. {
   rewrite <- srng_summation_summation_mul_swap.
   rewrite <- srng_summation_summation_mul_swap.
   rewrite srng_summation_summation_exch.
+  rewrite srng_summation_summation_shift.
 ...
-rewrite summation_summation_exch.
 rewrite summation_summation_shift.
 apply summation_compat; intros i Hi.
 apply summation_compat; intros j Hj.

@@ -1,5 +1,7 @@
 (* summations on ar semiring *)
 
+Set Nested Proofs Allowed.
+
 Require Import Utf8 Arith.
 Require Import Semiring Misc.
 Import List List.ListNotations.
@@ -331,6 +333,22 @@ intros i Hi.
 now rewrite Nat.sub_succ, Nat.sub_0_r.
 Qed.
 
+Theorem fold_left_add_seq_add : ∀ b len i g,
+  fold_left (λ (c : T) (j : nat), (c + g i j)%Srng)
+    (seq (b + i) len) 0%Srng =
+  fold_left (λ (c : T) (j : nat), (c + g i (i + j)%nat)%Srng)
+    (seq b len) 0%Srng.
+Proof.
+intros.
+revert b i.
+induction len; intros; [ easy | cbn ].
+do 2 rewrite srng_add_0_l.
+rewrite fold_left_srng_add_fun_from_0; symmetry.
+rewrite fold_left_srng_add_fun_from_0; symmetry.
+f_equal; [ now rewrite Nat.add_comm | ].
+now rewrite <- IHlen.
+Qed.
+
 Theorem srng_summation_summation_shift : ∀ g k,
   (Σ (i = 0, k), (Σ (j = i, k), g i j) =
    Σ (i = 0, k), Σ (j = 0, k - i), g i (i + j)%nat)%Srng.
@@ -340,39 +358,7 @@ apply srng_summation_eq_compat; intros i Hi.
 unfold iterate.
 rewrite Nat.sub_0_r.
 rewrite Nat.sub_succ_l; [ | now destruct Hi ].
-(**)
-remember (S (k - i)) as len eqn:Hlen.
-...
-clear k Hi Hlen.
-revert i.
-induction len; intros; [ easy | cbn ].
-do 2 rewrite srng_add_0_l.
-rewrite Nat.add_0_r.
-rewrite fold_left_srng_add_fun_from_0; symmetry.
-rewrite fold_left_srng_add_fun_from_0; symmetry.
-f_equal.
-rewrite IHlen.
-...
-assert (∀ i, b ≤ i < b + len → g i = h i). {
-  intros i Hi.
-  apply Hgh; flia Hlen Hi.
-}
-clear k Hgh Hlen.
-rename H into Hb.
-revert b Hb.
-induction len; intros; [ easy | cbn ].
-do 2 rewrite srng_add_0_l.
-rewrite fold_left_srng_add_fun_from_0; symmetry.
-rewrite fold_left_srng_add_fun_from_0; symmetry.
-f_equal; [ apply Hb; flia | ].
-apply IHlen.
-intros i Hi.
-apply Hb.
-flia Hi.
-Qed.
-...
-apply summation_aux_compat; intros j Hj.
-rewrite Nat.add_0_l; reflexivity.
+now rewrite <- fold_left_add_seq_add, Nat.add_0_l.
 Qed.
 
 End in_ring.
