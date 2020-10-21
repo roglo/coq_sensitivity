@@ -5442,8 +5442,11 @@ rewrite polyn_degree_lt_add. 2: {
       rewrite polyn_mul_0_r.
       apply Nat.le_0_l.
     }
-Search (polyn_degree _ ≤ polyn_degree _).
-...
+    destruct (polyn_eq_dec Q 0%P) as [Hqz| Hqz]. {
+      rewrite Hqz.
+      rewrite polyn_mul_0_r.
+      now rewrite polyn_mul_0_r.
+    }
     rewrite polyn_degree_mul. 2: {
       rewrite polyn_degree_minus_one_pow.
       rewrite polyn_coeff_minus_one_pow.
@@ -5451,6 +5454,12 @@ Search (polyn_degree _ ≤ polyn_degree _).
         rewrite HP.
         rewrite polyn_degree_mat_el_xI_sub_M_0_succ.
         rewrite polyn_coeff_mat_el_xI_sub_M_0_succ.
+        (* à la louche *)
+        assert (polyn_degree Q = S n ∧ polyn_coeff Q (S n) = mat_el M (S i) 0). {
+          rewrite HQ.
+split. {
+  rewrite HQ in Hqz.
+  clear - so Hqz.
 ...
     rewrite polyn_degree_mul. {
       rewrite polyn_degree_mul. 2: {
