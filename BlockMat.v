@@ -4512,11 +4512,48 @@ cbn - [ polyn_degree subm iter_seq ]; subst sn.
 ...
 *)
 
+Print fold_right.
+
+Definition repeat_subm_0_0 T k i (M : matrix T) :=
+  fold_right (λ _ acc, subm acc 0 0) (subm M 0 i) (seq 1 k).
+
+Theorem polyn_degree_det_loop_repeat_subm_xI_sub_M_succ_r_le : ∀ M i n k,
+  mat_nrows M = n + k + 2
+  → polyn_degree (det_loop (repeat_subm_0_0 k (S i) (xI_sub_M M)) (S n))
+  ≤ S (S n).
+Proof.
+intros * Hn.
+revert M i k Hn.
+induction n; intros. {
+  cbn - [ polyn_degree ].
+  rewrite polyn_add_0_l, polyn_mul_1_l.
+  rewrite srng_mul_1_r.
+  cbn in Hn.
+  revert M Hn.
+  induction k; intros. {
+    cbn - [ polyn_degree ].
+    specialize (polyn_of_list_repeat_0s 1) as H.
+    cbn in H; rewrite H; clear H.
+    rewrite polyn_mul_0_r, polyn_add_0_l.
+    rewrite polyn_degree_opp.
+    rewrite polyn_degree_of_single.
+    apply Nat.le_0_l.
+  }
+  cbn - [ polyn_degree ].
+...
+*)
+
 Theorem polyn_degree_det_loop_subm_subm_xI_sub_M_succ_r_le : ∀ M i n,
   mat_nrows M = S (S (S n))
   → polyn_degree (det_loop (subm (subm (xI_sub_M M) 0 (S i)) 0 0) (S n)) ≤
       S (S n).
 Proof.
+intros * Hn.
+...
+specialize (polyn_degree_det_loop_repeat_subm_xI_sub_M_succ_r_le M i n 1) as H.
+replace (n + 1 + 2) with (S (S (S n))) in H by flia.
+now specialize (H Hn).
+...
 intros * Hn.
 revert M i Hn.
 induction n; intros. {
