@@ -5415,10 +5415,9 @@ rewrite polyn_degree_lt_add. 2: {
     remember (det_loop (subm (xI_sub_M M) 0 (S i)) (S n)) as Q eqn:HQ.
     move Q before P.
     rewrite <- polyn_mul_assoc.
-(*
-    destruct (srng_eq_dec (polyn_coeff (P * Q) (polyn_degree (P * Q))) 0)
-      as [Hpqz| Hpqz]. {
-*)
+(**)
+    unfold g.
+    rewrite <- HQ.
     destruct (polyn_eq_dec (P * Q) 0) as [Hpqz| Hpqz]. {
       rewrite Hpqz.
       rewrite polyn_mul_0_r.
@@ -5443,6 +5442,8 @@ rewrite polyn_degree_lt_add. 2: {
       rewrite polyn_mul_0_r.
       apply Nat.le_0_l.
     }
+Search (polyn_degree _ ≤ polyn_degree _).
+...
     rewrite polyn_degree_mul. 2: {
       rewrite polyn_degree_minus_one_pow.
       rewrite polyn_coeff_minus_one_pow.
