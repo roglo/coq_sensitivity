@@ -3273,6 +3273,12 @@ destruct (lt_dec k i) as [Hki| Hki]. {
 }
 Qed.
 
+Theorem polyn_degree_opp : ∀ P, polyn_degree (- P) = polyn_degree P.
+Proof.
+intros; cbn.
+now rewrite map_length.
+Qed.
+
 End in_ring.
 
 Section in_ring.
@@ -3489,12 +3495,6 @@ remember (a :: la) as x; cbn in Haz; subst x.
 cbn in Hdeg.
 apply Nat.succ_lt_mono in Hdeg.
 now apply IHla.
-Qed.
-
-Theorem polyn_degree_opp : ∀ P, polyn_degree (- P) = polyn_degree P.
-Proof.
-intros; cbn.
-now rewrite map_length.
 Qed.
 
 Theorem polyn_coeff_opp : ∀ P i,
@@ -5401,6 +5401,27 @@ rewrite polyn_degree_lt_add. 2: {
   specialize (H1 H); clear H.
   destruct H1 as (Hmp, Hpd).
   rewrite Hpd.
+(**)
+  erewrite srng_summation_eq_compat. 2: {
+    intros i Hi.
+    replace (mat_el (xI_sub_M M) 0 i) with (- polyn_of_list [mat_el M 0 i])%P.
+    2: {
+      unfold xI_sub_M; cbn.
+      destruct i; [ easy | ].
+      specialize (polyn_of_list_repeat_0s 1) as H.
+      cbn in H; rewrite H; clear H.
+      rewrite polyn_mul_0_r.
+      now rewrite srng_add_0_l.
+    }
+    rewrite rng_mul_opp_r.
+    rewrite rng_mul_opp_l.
+    easy.
+  }
+  cbn - [ iterate det_loop ].
+  rewrite <- rng_opp_summation.
+  set (P := (Σ (i = 1, S n), _)%Rng).
+  cbn - [ polyn_degree P ].
+  rewrite polyn_degree_opp; subst P.
 ...
   eapply le_lt_trans; [ apply (polyn_degree_summation_ub 0) | ].
   rewrite Nat.sub_succ, Nat.sub_0_r.
