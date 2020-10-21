@@ -4548,7 +4548,6 @@ destruct j. {
 Check submatrix_xI_sub_M.
 ...
 Search (polyn_degree (mat_el _ _ _)).
-...
 polyn_degree_mat_el_xI_sub_M_0_0: ∀ M : matrix T, polyn_degree (mat_el (xI_sub_M M) 0 0) = 1
 polyn_degree_mat_el_xI_sub_M_0_succ: ∀ (M : matrix T) (i : nat), polyn_degree (mat_el (xI_sub_M M) 0 (S i)) = 0
 polyn_degree_mat_el_subm_xI_sub_M_0_succ_0_0:
