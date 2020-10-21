@@ -1588,7 +1588,7 @@ induction len; intros. {
 } {
   destruct n; [ easy | ].
   rewrite Nat.add_succ_r, <- Nat.add_succ_l in Hlen.
-  cbn - [ iterate sub ].
+  cbn - [ iter_seq sub ].
   rewrite IHlen; [ | easy ].
   now rewrite Nat.add_succ_r, <- Nat.add_succ_l.
 }
@@ -1668,8 +1668,8 @@ destruct (zerop (b2 + g1 (b1 + len))) as [Hz| Hz]. {
   cbn; symmetry.
   apply srng_mul_0_r.
 }
-rewrite fold_iterate_2; [ | easy ].
-rewrite fold_iterate_2; [ | easy ].
+rewrite fold_iter_seq_2; [ | easy ].
+rewrite fold_iter_seq_2; [ | easy ].
 symmetry.
 apply srng_mul_summation_distr_l.
 Qed.
@@ -1914,7 +1914,7 @@ Notation "la + lb" := (polyn_list_add la lb) : polyn_list_scope.
 Notation "la * lb" := (polyn_list_mul la lb) : polyn_list_scope.
 
 Notation "'Σ' ( i = b , e ) , g" :=
-  (iterate b e (λ c i, (c + g)%P) 0%P)
+  (iter_seq b e (λ c i, (c + g)%P) 0%P)
   (at level 45, i at level 0, b at level 60, e at level 60) :
      polynomial_scope.
 

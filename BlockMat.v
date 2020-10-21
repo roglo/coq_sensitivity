@@ -3898,7 +3898,7 @@ Theorem polyn_degree_summation_ub : ∀ b e f,
   polyn_degree (Σ (i = b, e), f i) ≤ Max (i = b, e), polyn_degree (f i).
 Proof.
 intros.
-unfold iterate.
+unfold iter_seq.
 remember (S e - b) as len eqn:Hlen.
 clear e Hlen.
 revert b.
@@ -4420,11 +4420,11 @@ induction lij as [| (i, j)]; intros. {
     apply polyn_degree_of_single.
   }
   remember (S n) as sn.
-  cbn - [ subm iterate xI_sub_M ]; subst sn.
+  cbn - [ subm iter_seq xI_sub_M ]; subst sn.
   unfold so.
   rewrite srng_summation_split_first; [ | apply Nat.le_0_l ].
   remember (S n) as sn.
-  cbn - [ polyn_degree subm xI_sub_M iterate ]; subst sn.
+  cbn - [ polyn_degree subm xI_sub_M iter_seq ]; subst sn.
   rewrite srng_mul_1_l.
   rewrite polyn_degree_lt_add. 2: {
 Abort.
@@ -4447,11 +4447,11 @@ induction lij as [| (i, j)]; intros. {
     destruct (srng_eq_dec (mat_el M 1 0) 0); cbn; flia.
   }
   remember (S n) as sn.
-  cbn - [ subm iterate ]; subst sn.
+  cbn - [ subm iter_seq ]; subst sn.
   unfold so.
   rewrite srng_summation_split_first; [ | apply Nat.le_0_l ].
   remember (S n) as sn.
-  cbn - [ polyn_degree subm iterate ]; subst sn.
+  cbn - [ polyn_degree subm iter_seq ]; subst sn.
   rewrite srng_mul_1_l.
   rewrite polyn_degree_lt_add. 2: {
     unfold so.
@@ -4490,9 +4490,25 @@ induction n; intros. {
   now rewrite polyn_degree_opp, polyn_degree_of_single.
 }
 remember (S n) as sn.
-cbn - [ polyn_degree subm iterate ]; subst sn.
+cbn - [ polyn_degree subm iter_seq ]; subst sn.
 ...
 *)
+
+Theorem polyn_degree_det_loop_subm_subm_xI_sub_M_succ_r_le : ∀ M i n,
+  mat_nrows M = S (S (S n))
+  → polyn_degree (det_loop (subm (subm (xI_sub_M M) 0 (S i)) 0 0) (S n)) ≤
+    S (S n).
+Proof.
+intros * Hn.
+revert M i Hn.
+induction n; intros. {
+  cbn - [ polyn_degree ].
+  rewrite polyn_add_0_l, polyn_mul_1_l.
+  rewrite srng_mul_1_r, srng_mul_1_r.
+  specialize (polyn_of_list_repeat_0s 1) as H.
+  cbn in H; rewrite H; clear H.
+  rewrite polyn_mul_0_r, polyn_add_0_l.
+...
 
 Theorem polyn_degree_det_loop_subm_xI_sub_M_succ_r_le : ∀ M i n,
   mat_nrows M = S (S n)
@@ -4510,7 +4526,7 @@ induction n; intros. {
   rewrite polyn_degree_of_single; flia.
 }
 remember (S n) as sn.
-cbn - [ subm xI_sub_M iterate ]; subst sn.
+cbn - [ subm xI_sub_M iter_seq ]; subst sn.
 etransitivity; [ apply polyn_degree_summation_ub | ].
 apply Max_lub_le.
 intros j Hj.
@@ -4520,7 +4536,8 @@ rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
 etransitivity; [ apply polyn_degree_mul_le | ].
 destruct j. {
   rewrite polyn_degree_mat_el_subm_xI_sub_M_0_succ_0_0, Nat.add_0_l.
-Check submatrix_xI_sub_M.
+...
+  now apply polyn_degree_det_loop_subm_subm_xI_sub_M_succ_r_le.
 ...
 Search (polyn_degree (mat_el _ _ _)).
 polyn_degree_mat_el_xI_sub_M_0_0: ∀ M : matrix T, polyn_degree (mat_el (xI_sub_M M) 0 0) = 1
@@ -4565,11 +4582,11 @@ destruct (zerop i).
 destruct (zerop j).
 destruct (zerop n). {
 subst i j n.
-cbn - [ subm iterate ].
+cbn - [ subm iter_seq ].
 (* 1 ≤ 0, genre : fectivement ça va pas *)
 ...
   rewrite <- submatrix_xI_sub_M.
-  cbn - [ subm iterate ].
+  cbn - [ subm iter_seq ].
   destruct n. {
     cbn.
     rewrite if_1_eq_0; cbn.
@@ -4600,7 +4617,7 @@ apply Nat.succ_le_mono, Nat.le_0_r in H1i.
 (* chiasse de pute *)
 ...
   etransitivity; [ | apply (IHn M i) ].
-  cbn - [ subm iterate ].
+  cbn - [ subm iter_seq ].
   destruct n. {
     cbn - [ polyn_degree ].
     specialize (polyn_of_list_repeat_0s 1) as H; cbn in H.
@@ -4656,7 +4673,7 @@ cbn.
 remember (mat_nrows M) as n eqn:Hn; symmetry in Hn.
 revert M Hn.
 induction n; intros; [ easy | ].
-cbn - [ xI_sub_M iterate ].
+cbn - [ xI_sub_M iter_seq ].
 destruct n. {
   cbn - [ polyn_degree ].
   rewrite polyn_mul_1_r.
@@ -4667,7 +4684,7 @@ destruct n. {
   apply polyn_degree_monom.
 }
 rewrite srng_summation_split_first; [ | flia ].
-cbn - [ minus_one_pow mat_el xI_sub_M det_loop polyn_degree iterate ].
+cbn - [ minus_one_pow mat_el xI_sub_M det_loop polyn_degree iter_seq ].
 rewrite polyn_degree_lt_add. 2: {
   rewrite polyn_degree_mul. 2: {
     rewrite polyn_degree_mul. 2: {
@@ -4798,10 +4815,10 @@ induction n; intros. {
   destruct (srng_eq_dec (- mat_el M 1 0)%Rng 0); apply Nat.le_0_l.
 }
 remember (S n) as sn.
-cbn - [ subm xI_sub_M iterate ]; subst sn.
+cbn - [ subm xI_sub_M iter_seq ]; subst sn.
 rewrite (srng_summation_split_first 0); [ | apply Nat.le_0_l ].
 rewrite (srng_summation_split_first 0 (S n)); [ | apply Nat.le_0_l ].
-cbn - [ polyn_degree subm xI_sub_M det_loop iterate mat_el ].
+cbn - [ polyn_degree subm xI_sub_M det_loop iter_seq mat_el ].
 do 2 rewrite srng_mul_1_l.
 apply polyn_degree_add_le_compat. 3: {
 (* chais même pas si ça va marcher, ça *)
@@ -4816,7 +4833,7 @@ Theorem glop : ∀ M i j n,
 Proof.
 intros * Hi Hj.
 destruct n; [ easy | ].
-cbn - [ polyn_degree subm iterate ].
+cbn - [ polyn_degree subm iter_seq ].
 destruct n. {
   apply Nat.lt_1_r in Hi.
   apply Nat.lt_1_r in Hj.
@@ -4857,7 +4874,7 @@ clear IHn Hn.
 revert M i H1.
 induction n; intros; [ easy | ].
 rewrite Nat.sub_succ, Nat.sub_0_r in H1.
-cbn - [ polyn_degree subm iterate ].
+cbn - [ polyn_degree subm iter_seq ].
 destruct n. {
   cbn.
   rewrite srng_mul_1_r.
@@ -4874,7 +4891,7 @@ destruct n. {
   }
 }
 rewrite srng_summation_split_first; [ | flia ].
-cbn - [ subm iterate polyn_add det_loop ].
+cbn - [ subm iter_seq polyn_add det_loop ].
 rewrite polyn_mul_1_l.
 rewrite polyn_degree_lt_add. 2: {
   rewrite submatrix_xI_sub_M.
@@ -4931,7 +4948,7 @@ revert M i Hn.
 induction n; intros; [ easy | cbn ].
 rewrite Nat.sub_0_r.
 destruct n; [ easy | ].
-cbn - [ subm iterate ].
+cbn - [ subm iter_seq ].
 destruct n. {
   cbn.
   rewrite if_1_eq_0, if_0_eq_0; cbn.
@@ -5195,9 +5212,9 @@ unfold charac_polyn, determinant in Hsm |-*.
 rewrite xI_sub_M_nrows in Hsm |-*.
 rewrite submatrix_nrows, Hr, Nat.sub_succ, Nat.sub_0_r in Hsm.
 rewrite Hr.
-cbn - [ iterate xI_sub_M ].
+cbn - [ iter_seq xI_sub_M ].
 rewrite srng_summation_split_first; [ | apply Nat.le_0_l ].
-cbn - [ polyn_degree iterate xI_sub_M ].
+cbn - [ polyn_degree iter_seq xI_sub_M ].
 rewrite srng_mul_1_l.
 rewrite polyn_degree_lt_add. 2: {
   rewrite polyn_degree_mul. 2: {
@@ -5316,9 +5333,9 @@ apply polyn_degree_determinant_xI_sub; [ easy | ].
 rewrite H1, submatrix_nrows, Hn.
 now rewrite Nat.sub_succ, Nat.sub_0_r.
 ...
-cbn - [ iterate mat_el subm ].
+cbn - [ iter_seq mat_el subm ].
 rewrite srng_summation_split_first; [ | apply Nat.le_0_l ].
-cbn - [ polyn_degree iterate mat_el subm ].
+cbn - [ polyn_degree iter_seq mat_el subm ].
 rewrite srng_mul_1_l.
 remember (mat_el (_ - _)%M 0 0) as x eqn:Hx.
 cbn in Hx.
@@ -5340,7 +5357,7 @@ revert M Hr Hrz.
 induction n; intros; [ easy | clear Hrz ].
 unfold charac_polyn.
 unfold determinant; cbn.
-rewrite Hr; cbn - [ iterate xI_sub_M ].
+rewrite Hr; cbn - [ iter_seq xI_sub_M ].
 specialize (IHn (subm M 0 0)) as H1.
 rewrite submatrix_nrows, Hr, Nat.sub_succ, Nat.sub_0_r in H1.
 specialize (H1 eq_refl).
@@ -5350,7 +5367,7 @@ rewrite Hr, Nat.sub_succ, Nat.sub_0_r in H1.
 rewrite <- submatrix_xI_sub_M in H1.
 rewrite srng_summation_split_first; [ | apply Nat.le_0_l ].
 remember (det_loop (subm (xI_sub_M M) 0 0) n) as M' eqn:HM'.
-cbn - [ is_monic_polyn polyn_degree xI_sub_M iterate ].
+cbn - [ is_monic_polyn polyn_degree xI_sub_M iter_seq ].
 rewrite srng_mul_1_l.
 rewrite polyn_degree_lt_add. 2: {
   rewrite polyn_degree_mul. 2: {
@@ -5397,7 +5414,7 @@ rewrite polyn_degree_lt_add. 2: {
     rewrite rng_mul_opp_l.
     easy.
   }
-  cbn - [ iterate det_loop ].
+  cbn - [ iter_seq det_loop ].
   rewrite <- rng_opp_summation.
   set (P := (Σ (i = 1, S n), _)%Rng).
   cbn - [ polyn_degree P ].
