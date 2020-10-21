@@ -4537,6 +4537,24 @@ induction n; intros. {
 remember (S n) as sn.
 cbn - [ subm xI_sub_M iterate ]; subst sn.
 etransitivity; [ apply polyn_degree_summation_ub | ].
+apply Max_lub_le.
+intros j Hj.
+rewrite <- polyn_mul_assoc.
+etransitivity; [ apply polyn_degree_mul_le | ].
+rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
+etransitivity; [ apply polyn_degree_mul_le | ].
+destruct j. {
+  rewrite polyn_degree_mat_el_subm_xI_sub_M_0_succ_0_0, Nat.add_0_l.
+Check submatrix_xI_sub_M.
+...
+Search (polyn_degree (mat_el _ _ _)).
+...
+polyn_degree_mat_el_xI_sub_M_0_0: ∀ M : matrix T, polyn_degree (mat_el (xI_sub_M M) 0 0) = 1
+polyn_degree_mat_el_xI_sub_M_0_succ: ∀ (M : matrix T) (i : nat), polyn_degree (mat_el (xI_sub_M M) 0 (S i)) = 0
+polyn_degree_mat_el_subm_xI_sub_M_0_succ_0_0:
+  ∀ (M : matrix T) (i : nat), polyn_degree (mat_el (subm (xI_sub_M M) 0 (S i)) 0 0) = 0
+...
+etransitivity; [ apply polyn_degree_summation_ub | ].
 etransitivity. {
   rewrite Max_fold_left_max.
   apply List_fold_left_max_map_le.
@@ -4547,8 +4565,8 @@ etransitivity. {
 erewrite List_fold_left_max_map_le. 2: {
   intros j Hj.
   apply Nat.add_le_mono_l.
-Abort. (*
-apply polyn_degree_det_subm_subm_xI_sub_M_succ_le.
+...
+  apply polyn_degree_det_subm_subm_xI_sub_M_succ_le.
 }
 ...
 remember (S n) as sn.
@@ -5420,6 +5438,10 @@ rewrite polyn_degree_lt_add. 2: {
   rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
   etransitivity; [ apply polyn_degree_mul_le | ].
   rewrite polyn_degree_of_single, Nat.add_0_l.
+  destruct i; [ easy | ].
+...
+  now apply polyn_degree_det_loop_subm_xI_sub_M_succ_r_le.
+}
 ...
 
 (* the list of coefficients of the characteristic polynomial of a matrix M
