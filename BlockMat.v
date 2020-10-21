@@ -3919,34 +3919,24 @@ unfold so.
 now destruct (srng_eq_dec c1 0).
 Qed.
 
-Theorem polyn_degree_summation_ub : ∀ m b e f,
-  polyn_degree (Σ (i = b, e), f i) ≤
-  fold_left max (map polyn_degree (map f (seq b (S e - b)))) m.
+Theorem polyn_degree_summation_ub : ∀ b e f,
+  polyn_degree (Σ (i = b, e), f i) ≤ MAX (i = b, e), polyn_degree (f i).
 Proof.
 intros.
 unfold iterate.
 remember (S e - b) as len eqn:Hlen.
 clear e Hlen.
-revert b m.
+revert b.
 induction len; intros; [ cbn; flia | ].
 cbn; rewrite polyn_add_0_l.
 rewrite fold_left_srng_add_fun_from_0.
+rewrite fold_left_max_fun_from_0.
 cbn - [ polyn_degree ].
 rewrite polyn_add_comm.
 etransitivity; [ apply polyn_degree_add_ub | ].
-destruct (le_dec
-  (polyn_degree (f b))
-  (polyn_degree
-      (fold_left (λ (c : polynomial T) (i : nat), (c + f i)%P)
-         (seq (S b) len) 0%P))) as [H1| H1]. {
-  etransitivity; [ | apply IHlen ].
-  rewrite max_l; [ easy | easy ].
-} {
-  apply Nat.nle_gt in H1.
-  rewrite max_r; [ | now apply Nat.lt_le_incl ].
-  apply Nat_le_fold_left_max.
-  apply Nat.le_max_r.
-}
+rewrite Nat.max_comm.
+apply Nat.max_le_compat_l.
+apply IHlen.
 Qed.
 
 Theorem polyn_degree_minus_one_pow : ∀ i,
@@ -4546,10 +4536,9 @@ induction n; intros. {
 }
 remember (S n) as sn.
 cbn - [ subm xI_sub_M iterate ]; subst sn.
-etransitivity; [ apply (polyn_degree_summation_ub 0) | ].
-rewrite Nat.sub_0_r.
-rewrite map_map.
+etransitivity; [ apply polyn_degree_summation_ub | ].
 etransitivity. {
+  rewrite MAX_fold_left_max.
   apply List_fold_left_max_map_le.
   intros j Hj.
   apply polyn_degree_mul_le.
@@ -5422,9 +5411,8 @@ rewrite polyn_degree_lt_add. 2: {
   set (P := (Σ (i = 1, S n), _)%Rng).
   cbn - [ polyn_degree P ].
   rewrite polyn_degree_opp; subst P.
-Check polyn_degree_mul.
+  eapply le_lt_trans; [ apply polyn_degree_summation_ub | ].
 ...
-  eapply le_lt_trans; [ apply (polyn_degree_summation_ub 0) | ].
   rewrite Nat.sub_succ, Nat.sub_0_r.
   apply Nat.lt_succ_r.
   rewrite map_map.

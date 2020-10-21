@@ -58,9 +58,37 @@ intros A B l a.
 now induction l.
 Qed.
 
-(* summations *)
+(* iterations (for summations, products, maximum) *)
 
 Definition iterate {T} b e f (d : T) := fold_left f (seq b (S e - b)) d.
+
+(* maximum of several values *)
+
+Notation "'MAX' ( i = b , e ) , g" :=
+  (iterate b e (λ c i, max c (g)) 0)
+  (at level 45, i at level 0, b at level 60, e at level 60) : nat_scope.
+
+Theorem fold_left_max_fun_from_0 : ∀ a l (f : nat → _),
+  fold_left (λ c i, max c (f i)) l a =
+  max a (fold_left (λ c i, max c (f i)) l 0).
+Proof.
+intros.
+revert a.
+induction l as [| x l]; intros; [ symmetry; apply Nat.max_0_r | cbn ].
+rewrite IHl; symmetry; rewrite IHl.
+now rewrite Nat.max_assoc.
+Qed.
+
+Theorem MAX_fold_left_max : ∀ b e f,
+  MAX (i = b, e), f i = fold_left max (map f (seq b (S e - b))) 0.
+Proof.
+intros.
+unfold iterate.
+symmetry.
+apply List_fold_left_map.
+Qed.
+
+(* summations *)
 
 Notation "'Σ' ( i = b , e ) , g" :=
   (iterate b e (λ c i, c + g) 0)
