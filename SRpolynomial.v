@@ -1764,78 +1764,17 @@ destruct (lt_dec k len) as [Hklen| Hklen]. {
   rewrite <- srng_summation_summation_mul_swap.
   rewrite srng_summation_summation_exch.
   rewrite srng_summation_summation_shift.
-...
-rewrite summation_summation_shift.
-apply summation_compat; intros i Hi.
-apply summation_compat; intros j Hj.
-rewrite rng_mul_comm, rng_mul_assoc.
-rewrite Nat.add_comm, Nat.add_sub.
-rewrite Nat.add_comm, Nat.sub_add_distr.
-reflexivity.
-Qed.
-...
-intros la lb lc.
-unfold polyn_list_mul.
-do 2 rewrite map_length.
-do 2 rewrite seq_length.
-destruct (Nat.eq_dec (length lb) 0) as [Hbz| Hbz]. {
-  rewrite Hbz; cbn; rewrite Nat.add_0_r.
-  apply length_zero_iff_nil in Hbz; subst lb.
-  rewrite (map_polyn_list_convol_mul_0_l 0).
-  rewrite (map_polyn_list_convol_mul_0_r 0).
-  do 2 rewrite seq_length.
-  rewrite map_polyn_list_convol_mul_0_l.
-  rewrite map_polyn_list_convol_mul_0_r.
-  now do 2 rewrite norm_polyn_list_repeat_0.
+  apply srng_summation_eq_compat; intros i Hi.
+  apply srng_summation_eq_compat; intros j Hj.
+  rewrite srng_mul_comm, srng_mul_assoc.
+  rewrite Nat.add_comm, Nat.add_sub.
+  now rewrite Nat.add_comm, Nat.sub_add_distr.
 }
-remember (length la + length lb + length lc - 2) as len eqn:Hlen.
-replace (length la + (length lb + length lc - 1) - 1) with len
-  by flia Hlen Hbz.
-replace (length la + length lb - 1 + length lc - 1) with len
-  by flia Hlen Hbz.
-clear Hlen.
-revert la lb lc Hbz.
-induction len; intros; [ easy | ].
-cbn - [ norm_polyn_list polyn_list_convol_mul ].
-Check polyn_list_convol_mul_more.
-Search polyn_list_convol_mul.
-...
-Check norm_polyn_list_mul_idemp_l.
-...
-Print norm_polyn_list.
-Search (norm_polyn_list (_ ++ _)).
-Search (norm_polyn_list (_ :: _)).
-cbn.
-...
-rewrite (polyn_list_convol_mul_more (lab + lbc)); [ | subst; flia ].
-symmetry.
-...
-rewrite Heqlabc.
-remember (lb + lc)%PL as lbc.
-symmetry in Heqlbc.
-rewrite <- Heqlbc in Heqlabc |-*.
-rewrite (polyn_list_convol_mul_more (lab + lac)); [ | subst; flia ].
-rewrite <- Heqlabc.
-symmetry.
-rewrite Heqlab.
-rewrite <- norm_polyn_list_add_idemp_l.
-rewrite (polyn_list_convol_mul_more (labc + lac)); [ | flia ].
-rewrite <- Heqlab.
-rewrite norm_polyn_list_add_idemp_l.
-rewrite polyn_list_add_comm.
-rewrite <- norm_polyn_list_add_idemp_l.
-rewrite Heqlac.
-rewrite (polyn_list_convol_mul_more (labc + lab)); [ | flia ].
-rewrite norm_polyn_list_add_idemp_l.
-rewrite <- Heqlac.
-rewrite Nat.add_comm.
-rewrite polyn_list_add_comm.
-rewrite Nat.add_assoc, Nat.add_shuffle0, Nat.add_comm, Nat.add_assoc.
-symmetry.
-rewrite map_polyn_list_convol_mul_add.
-now rewrite map_polyn_list_add_convol_mul.
+apply Nat.nlt_ge in Hklen.
+rewrite nth_overflow; [ | now rewrite map_length, seq_length ].
+rewrite nth_overflow; [ | now rewrite map_length, seq_length ].
+easy.
 Qed.
-*)
 
 Theorem polyn_mul_assoc : ∀ P Q R, (P * (Q * R))%P = (P * Q * R)%P.
 Proof.
@@ -1844,11 +1783,8 @@ apply polyn_eq.
 cbn - [ polyn_list_mul ].
 rewrite norm_polyn_list_mul_idemp_l.
 rewrite norm_polyn_list_mul_idemp_r.
-...
 apply norm_polyn_list_mul_assoc.
 Qed.
-
-...
 
 Definition polyn_semiring_prop : semiring_prop (polynomial T) :=
   {| srng_add_comm := polyn_add_comm;
