@@ -1891,6 +1891,7 @@ Notation "'Σ' ( i = b , e ) , g" :=
 
 Arguments norm_polyn_list {T ro sdp} l%PL.
 Arguments polyn_coeff {T so sdp} P%P i%nat.
+Arguments polyn_eq_dec {T ro sdp} P%P Q%P.
 Arguments polyn_degree {T so sdp} P%P.
 Arguments polyn_list_convol_mul {T ro} la%PL lb%PL _%nat.
 Arguments polyn_list {T so sdp} p%P.

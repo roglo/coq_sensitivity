@@ -5415,28 +5415,42 @@ rewrite polyn_degree_lt_add. 2: {
     remember (det_loop (subm (xI_sub_M M) 0 (S i)) (S n)) as Q eqn:HQ.
     move Q before P.
     rewrite <- polyn_mul_assoc.
-...
+(*
+    destruct (srng_eq_dec (polyn_coeff (P * Q) (polyn_degree (P * Q))) 0)
+      as [Hpqz| Hpqz]. {
+*)
+    destruct (polyn_eq_dec (P * Q) 0) as [Hpqz| Hpqz]. {
+      rewrite Hpqz.
+      rewrite polyn_mul_0_r.
+      apply Nat.le_0_l.
+    }
     destruct (srng_eq_dec (mat_el M 0 (S i)) 0) as [Hmz| Hmz]. {
-      rewrite mat_el_xI_sub_M_0_succ.
-      rewrite Hmz.
+      rewrite mat_el_xI_sub_M_0_succ in HP.
+      rewrite Hmz in HP.
       specialize (polyn_of_list_repeat_0s 1) as H.
       cbn in H.
-      unfold so.
-      rewrite H; clear H.
-      rewrite rng_opp_0.
-      cbn - [ polyn_degree det_loop subm ].
-      rewrite polyn_mul_0_r.
-      rewrite polyn_mul_0_l.
+      unfold so in HP.
+      rewrite H in HP; clear H.
+      rewrite rng_opp_0 in HP.
+      rewrite HP.
+      cbn - [ polyn_degree ].
+      rewrite polyn_mul_0_l, polyn_mul_0_r.
       apply Nat.le_0_l.
     }
-(**)
-    remember (det_loop (subm (xI_sub_M M) 0 (S i)) (S n)) as P eqn:HP.
-    symmetry in HP.
     destruct (polyn_eq_dec P 0%P) as [Hpz| Hpz]. {
       rewrite Hpz.
+      rewrite polyn_mul_0_l.
       rewrite polyn_mul_0_r.
       apply Nat.le_0_l.
     }
+    rewrite polyn_degree_mul. 2: {
+      rewrite polyn_degree_minus_one_pow.
+      rewrite polyn_coeff_minus_one_pow.
+      rewrite polyn_degree_mul. 2: {
+        rewrite HP.
+        rewrite polyn_degree_mat_el_xI_sub_M_0_succ.
+        rewrite polyn_coeff_mat_el_xI_sub_M_0_succ.
+...
     rewrite polyn_degree_mul. {
       rewrite polyn_degree_mul. 2: {
         rewrite polyn_degree_minus_one_pow.
