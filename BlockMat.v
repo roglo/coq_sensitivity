@@ -4512,10 +4512,16 @@ cbn - [ polyn_degree subm iter_seq ]; subst sn.
 ...
 *)
 
-Print fold_right.
-
+(*
 Definition repeat_subm_0_0 T k i (M : matrix T) :=
   fold_right (λ _ acc, subm acc 0 0) (subm M 0 i) (seq 1 k).
+*)
+
+Fixpoint repeat_subm_0_0 T k i (M : matrix T) :=
+  match k with
+  | 0 => subm M 0 i
+  | S k' => subm (repeat_subm_0_0 k' i M) 0 0
+  end.
 
 Theorem polyn_degree_det_loop_repeat_subm_xI_sub_M_succ_r_le : ∀ M i n k,
   mat_nrows M = n + k + 2
@@ -4541,7 +4547,6 @@ induction n; intros. {
   }
   cbn - [ polyn_degree ].
 ...
-*)
 
 Theorem polyn_degree_det_loop_subm_subm_xI_sub_M_succ_r_le : ∀ M i n,
   mat_nrows M = S (S (S n))
