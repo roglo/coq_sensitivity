@@ -5414,8 +5414,8 @@ rewrite polyn_degree_lt_add. 2: {
     remember (mat_el (xI_sub_M M) 0 (S i))%P as P eqn:HP.
     remember (det_loop (subm (xI_sub_M M) 0 (S i)) (S n)) as Q eqn:HQ.
     move Q before P.
+    rewrite <- polyn_mul_assoc.
 ...
-    rewrite polyn_mul_assoc.
     destruct (srng_eq_dec (mat_el M 0 (S i)) 0) as [Hmz| Hmz]. {
       rewrite mat_el_xI_sub_M_0_succ.
       rewrite Hmz.
