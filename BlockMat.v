@@ -5401,6 +5401,7 @@ rewrite polyn_degree_lt_add. 2: {
   specialize (H1 H); clear H.
   destruct H1 as (Hmp, Hpd).
   rewrite Hpd.
+...
   eapply le_lt_trans; [ apply (polyn_degree_summation_ub 0) | ].
   rewrite Nat.sub_succ, Nat.sub_0_r.
   apply Nat.lt_succ_r.
