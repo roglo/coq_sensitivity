@@ -3327,35 +3327,7 @@ rewrite submatrix_mI.
 now rewrite Nat.sub_succ, Nat.sub_0_r.
 Qed.
 
-(* monic polynomial: polynomial whose leading coefficient is 1 *)
 (* to be moved to SRpolynomial.v *)
-
-Definition is_monic_polyn (P : polynomial T) :=
-  polyn_coeff P (polyn_degree P) = 1%Srng.
-
-Arguments is_monic_polyn P%P.
-
-Theorem polyn_x_minus_is_monic : ∀ a,
-  polyn_degree a = 0
-  → is_monic_polyn (_x - a).
-Proof.
-intros * Ha.
-unfold polyn_degree in Ha; cbn in Ha.
-unfold polyn_degree_plus_1 in Ha; cbn in Ha.
-apply Nat.sub_0_le in Ha.
-destruct a as (la, Hla).
-cbn in Ha |-*.
-destruct la as [| a]. {
-  unfold is_monic_polyn; cbn.
-  rewrite if_1_eq_0; cbn.
-  now rewrite if_1_eq_0.
-}
-destruct la; [ | cbn in Ha; flia Ha ].
-cbn in Hla.
-unfold is_monic_polyn; cbn.
-rewrite if_1_eq_0; cbn.
-now rewrite if_1_eq_0.
-Qed.
 
 Theorem norm_polyn_list_id : ∀ (la : list T),
   last la 0%Srng ≠ 0%Srng
@@ -3533,6 +3505,7 @@ rewrite Nat.sub_0_r in HP |-*.
 destruct lb as [| b]. {
   rewrite polyn_list_add_0_r.
   rewrite norm_polyn_list_id; [ easy | ].
+  unfold so.
   rewrite List_last_nth_cons, HP.
   apply srng_1_neq_0.
 }
@@ -3548,6 +3521,7 @@ destruct lb as [| b1]. {
   cbn - [ norm_polyn_list ].
   rewrite norm_polyn_list_id. 2: {
     remember (a1 :: la) as l; cbn; subst l.
+    unfold so.
     rewrite HP.
     apply srng_1_neq_0.
   }
@@ -3565,6 +3539,7 @@ revert lb a1 b1 HP Hdeg.
 induction la as [| a]; intros; [ easy | cbn ].
 rewrite List_last_cons_cons in HP.
 destruct lb as [| b]. {
+  unfold so.
   rewrite HP.
   apply srng_1_neq_0.
 }

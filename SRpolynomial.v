@@ -1860,6 +1860,35 @@ Canonical Structure polyn_semiring_prop.
 Canonical Structure polyn_ring_prop.
 Canonical Structure polyn_sring_dec_prop.
 
+(* monic polynomial: polynomial whose leading coefficient is 1 *)
+
+Definition is_monic_polyn (P : polynomial T) :=
+  polyn_coeff P (polyn_degree P) = 1%Srng.
+
+Arguments is_monic_polyn P%P.
+
+Theorem polyn_x_minus_is_monic : ∀ a,
+  polyn_degree a = 0
+  → is_monic_polyn (_x - a).
+Proof.
+intros * Ha.
+unfold polyn_degree in Ha; cbn in Ha.
+unfold polyn_degree_plus_1 in Ha; cbn in Ha.
+apply Nat.sub_0_le in Ha.
+destruct a as (la, Hla).
+cbn in Ha |-*.
+destruct la as [| a]. {
+  unfold is_monic_polyn; cbn.
+  rewrite if_1_eq_0; cbn.
+  now rewrite if_1_eq_0.
+}
+destruct la; [ | cbn in Ha; flia Ha ].
+cbn in Hla.
+unfold is_monic_polyn; cbn.
+rewrite if_1_eq_0; cbn.
+now rewrite if_1_eq_0.
+Qed.
+
 End in_ring.
 
 Module polynomial_Notations.
@@ -1889,6 +1918,7 @@ Notation "'Σ' ( i = b , e ) , g" :=
   (at level 45, i at level 0, b at level 60, e at level 60) :
      polynomial_scope.
 
+Arguments is_monic_polyn {T ro sdp} P%P.
 Arguments norm_polyn_list {T ro sdp} l%PL.
 Arguments polyn_coeff {T so sdp} P%P i%nat.
 Arguments polyn_eq_dec {T ro sdp} P%P Q%P.
