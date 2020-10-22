@@ -4433,11 +4433,13 @@ cbn - [ iter_seq xI_sub_M ].
 etransitivity; [ apply polyn_degree_summation_ub | ].
 cbn - [ iter_seq polyn_degree xI_sub_M ].
 apply Max_lub_le.
-intros j Hj.
+intros j (_, Hj).
+move j before i.
 rewrite <- polyn_mul_assoc.
 etransitivity; [ apply polyn_degree_mul_le | ].
 rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
 etransitivity; [ apply polyn_degree_mul_le | ].
+apply -> Nat.lt_succ_r in Hi.
 ...
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
