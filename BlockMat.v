@@ -4508,6 +4508,22 @@ etransitivity. {
   apply Nat.le_0_l.
 }
 apply -> Nat.succ_le_mono.
+Fixpoint repeat_subm T (M : matrix T) l :=
+  match l with
+  | [] => M
+  | i :: l' => subm (repeat_subm M l') 0 i
+  end.
+assert
+  (∀ l,
+   polyn_degree (det_loop (repeat_subm (subm (xI_sub_M M) 0 (S i)) l) n) ≤ n). {
+  clear IHn.
+  intros l.
+  clear Hr Hj Hk.
+  revert i l Hi.
+  induction n; intros; [ now cbn; rewrite if_1_eq_0 | ].
+  cbn - [ iter_seq repeat_subm ].
+...
+apply (H [k; j]).
 ...
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
