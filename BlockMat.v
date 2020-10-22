@@ -4534,6 +4534,14 @@ assert
   etransitivity; [ apply polyn_degree_mul_le | ].
   etransitivity. {
     apply (Nat.add_le_mono_r _ 1).
+    clear IHn.
+    revert i j n Hi Hj.
+    induction l as [| m]; intros. {
+      cbn - [ subm ].
+      destruct j. {
+        rewrite polyn_degree_mat_el_subm_xI_sub_M_0_succ_0_0.
+        apply Nat.le_0_l.
+      }
 Search (polyn_degree (mat_el _ _ _)).
 ...
 apply (H [k; j]).
