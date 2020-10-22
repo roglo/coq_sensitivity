@@ -4538,17 +4538,61 @@ induction k; intros; cbn. {
   apply Nat.nlt_ge in Hji.
 Abort.
 
+Theorem polyn_of_list_0 : polyn_of_list [0%Rng] = 0%P.
+Proof.
+now specialize (polyn_of_list_repeat_0s 1) as H; cbn in H.
+Qed.
+
 Theorem polyn_degree_det_loop_repeat_subm_xI_sub_M_succ_r_le : ∀ M i n k,
-  i < n
+  i < n + k
   → mat_nrows M = n + k + 2
   → polyn_degree (det_loop (repeat_subm_0_0 k (S i) (xI_sub_M M)) (S n)) ≤
        S (S n).
 Proof.
 intros * Hin Hn.
 revert M i k Hn Hin.
+induction n; intros. {
+  cbn - [ polyn_degree ].
+  rewrite polyn_add_0_l, polyn_mul_1_l, polyn_mul_1_r.
+  cbn in Hn, Hin.
+  revert M i Hn Hin.
+  induction k; intros; [ easy | ].
+  destruct i. {
+    cbn.
+    clear IHk Hin.
+    enough (∀ m, polyn_degree (mat_el (repeat_subm_0_0 k 1 (xI_sub_M M)) m m) ≤ 2). {
+      apply H.
+    }
+    intros m.
+    revert m M Hn.
+    induction k; intros. {
+      cbn - [ polyn_degree ].
+      destruct (lt_dec m 1) as [Hm1| Hm1]. {
+        apply Nat.lt_1_r in Hm1; subst m.
+        cbn - [ polyn_degree ].
+        unfold so.
+        rewrite polyn_of_list_0, srng_mul_0_r, srng_add_0_l.
+        rewrite polyn_degree_opp.
+        rewrite polyn_degree_of_single.
+        apply Nat.le_0_l.
+      }
+      apply Nat.nlt_ge in Hm1.
+      destruct (Nat.eq_dec (m + 1) (m + 1)) as [H| H]; [ clear H | easy ].
+      rewrite polyn_mul_1_r.
+      rewrite polyn_degree_1; [ flia | ].
+      rewrite polyn_degree_opp.
+      now rewrite polyn_degree_of_single.
+    }
+    cbn.
+    specialize (IHk (m + 1) (subm M 0 0)) as H1.
+    rewrite submatrix_nrows, Hn in H1.
+    replace (S (S k) + 2 - 1) with (S k + 2) in H1 by flia.
+    specialize (H1 eq_refl).
+Inspect 2.
+...
 induction n; intros; [ easy | ].
 destruct i. {
-...
+Abort.
 
 Theorem polyn_degree_det_loop_subm_subm_xI_sub_M_succ_r_le : ∀ M i n,
   i < n
@@ -4557,6 +4601,7 @@ Theorem polyn_degree_det_loop_subm_subm_xI_sub_M_succ_r_le : ∀ M i n,
       S (S n).
 Proof.
 intros * Hin Hn.
+...
 specialize (polyn_degree_det_loop_repeat_subm_xI_sub_M_succ_r_le M 1 Hin) as H.
 replace (n + 1 + 2) with (S (S (S n))) in H by flia.
 now specialize (H Hn).
@@ -4668,6 +4713,7 @@ cbn - [ subm iter_seq ].
     rewrite srng_add_0_l, srng_mul_0_l; cbn.
     rewrite if_0_eq_0; cbn.
     rewrite srng_mul_1_r.
+...
     specialize (polyn_of_list_repeat_0s 1) as H; cbn in H.
     rewrite H; clear H.
     rewrite srng_mul_0_r.
