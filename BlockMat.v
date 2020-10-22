@@ -4465,9 +4465,13 @@ rewrite polyn_degree_lt_add. 2: {
     easy.
   }
   apply Max_lub_lt. {
+    destruct n. {
+      cbn in HM'; rewrite HM'.
+      rewrite polyn_mul_1_r.
+      rewrite polyn_degree_mat_el_xI_sub_M_0_0.
+      apply Nat.lt_0_1.
 ...
-Search (mat_el (xI_sub_M _)).
-rewrite polyn_degree_mul.
+      rewrite polyn_degree_1.
 Search (max _ _ < _).
 Nat.max_lub_lt: ∀ n m p : nat, n < p → m < p → Nat.max n m < p
 ...
