@@ -4423,10 +4423,20 @@ Proof. easy. Qed.
 
 Theorem polyn_degree_det_loop_subm_xI_sub_M_succ_r_le : ∀ i n M,
   mat_nrows M = S n
-  → 1 ≤ i ≤ n
-  → polyn_degree (det_loop (subm (xI_sub_M M) 0 i) n) ≤ n.
+  → i < n
+  → polyn_degree (det_loop (subm (xI_sub_M M) 0 (S i)) n) ≤ n.
 Proof.
 intros * Hr Hi.
+revert i M Hr Hi.
+induction n; intros; [ easy | ].
+cbn - [ iter_seq xI_sub_M ].
+etransitivity; [ apply polyn_degree_summation_ub | ].
+cbn - [ iter_seq polyn_degree xI_sub_M ].
+apply Max_lub_le.
+intros j Hj.
+rewrite <- polyn_mul_assoc.
+etransitivity; [ apply polyn_degree_mul_le | ].
+rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
 ...
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
@@ -4504,6 +4514,9 @@ rewrite polyn_degree_lt_add. 2: {
   rewrite Hpd.
   rewrite polyn_degree_mat_el_xI_sub_M_0_0, Nat.add_1_l.
   apply Nat.lt_succ_r.
+  destruct i; [ easy | ].
+  destruct Hi as (_, Hi).
+  apply -> Nat.le_succ_l in Hi.
 ...
   now apply polyn_degree_det_loop_subm_xI_sub_M_succ_r_le.
 }
