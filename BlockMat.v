@@ -4523,60 +4523,48 @@ Fixpoint repeat_subm_0_0 T k i (M : matrix T) :=
   | S k' => subm (repeat_subm_0_0 k' i M) 0 0
   end.
 
-Theorem polyn_degree_det_loop_repeat_subm_xI_sub_M_succ_r_le : ∀ M i n k,
-  mat_nrows M = n + k + 2
-  → polyn_degree (det_loop (repeat_subm_0_0 k (S i) (xI_sub_M M)) (S n))
-  ≤ S (S n).
+Theorem subm_repeat_subm : ∀ T1 k i (M : matrix T1),
+  subm (repeat_subm_0_0 k i M) 0 0 = repeat_subm_0_0 k (S i) (subm M 0 0).
 Proof.
-intros * Hn.
-revert M i k Hn.
-induction n; intros. {
-  cbn - [ polyn_degree ].
-  rewrite polyn_add_0_l, polyn_mul_1_l.
-  rewrite srng_mul_1_r.
-  cbn in Hn.
-  revert M Hn.
-  induction k; intros. {
-    cbn - [ polyn_degree ].
-    specialize (polyn_of_list_repeat_0s 1) as H.
-    cbn in H; rewrite H; clear H.
-    rewrite polyn_mul_0_r, polyn_add_0_l.
-    rewrite polyn_degree_opp.
-    rewrite polyn_degree_of_single.
-    apply Nat.le_0_l.
+intros.
+revert i M.
+induction k; intros; cbn. {
+  apply matrix_eq; cbn; [ easy | easy | ].
+  intros k j Hk Hj.
+  destruct (lt_dec (j + 1) i) as [Hji| Hji]. {
+    destruct (lt_dec j (S i)) as [Hjsi| Hjsi]; [ easy | flia Hji Hjsi ].
   }
-  cbn - [ polyn_degree ].
+  destruct (lt_dec j (S i)) as [Hjsi| Hjsi]; [ | easy ].
+  apply Nat.nlt_ge in Hji.
+Abort.
+
+Theorem polyn_degree_det_loop_repeat_subm_xI_sub_M_succ_r_le : ∀ M i n k,
+  i < n
+  → mat_nrows M = n + k + 2
+  → polyn_degree (det_loop (repeat_subm_0_0 k (S i) (xI_sub_M M)) (S n)) ≤
+       S (S n).
+Proof.
+intros * Hin Hn.
+revert M i k Hn Hin.
+induction n; intros; [ easy | ].
+destruct i. {
 ...
 
 Theorem polyn_degree_det_loop_subm_subm_xI_sub_M_succ_r_le : ∀ M i n,
-  mat_nrows M = S (S (S n))
+  i < n
+  → mat_nrows M = S (S (S n))
   → polyn_degree (det_loop (subm (subm (xI_sub_M M) 0 (S i)) 0 0) (S n)) ≤
       S (S n).
 Proof.
-intros * Hn.
-...
-specialize (polyn_degree_det_loop_repeat_subm_xI_sub_M_succ_r_le M i n 1) as H.
+intros * Hin Hn.
+specialize (polyn_degree_det_loop_repeat_subm_xI_sub_M_succ_r_le M 1 Hin) as H.
 replace (n + 1 + 2) with (S (S (S n))) in H by flia.
 now specialize (H Hn).
-...
-intros * Hn.
-revert M i Hn.
-induction n; intros. {
-  cbn - [ polyn_degree ].
-  rewrite polyn_add_0_l, polyn_mul_1_l.
-  rewrite srng_mul_1_r, srng_mul_1_r.
-  specialize (polyn_of_list_repeat_0s 1) as H.
-  cbn in H; rewrite H; clear H.
-  rewrite polyn_mul_0_r, polyn_add_0_l.
-  destruct (lt_dec 1 (S i)) as [H1i| H1i]. {
-    rewrite polyn_degree_opp.
-    rewrite polyn_degree_of_single.
-    apply Nat.le_0_l.
-  }
-  rewrite polyn_degree_1; [ apply Nat.le_succ_diag_r | ].
-  rewrite polyn_degree_opp.
-  apply polyn_degree_of_single.
-}
+Qed.
+(*
+intros * Hin Hn.
+revert M i Hin Hn.
+induction n; intros; [ easy | ].
 remember (S n) as sn.
 cbn - [ subm xI_sub_M iter_seq ]; subst sn.
 etransitivity; [ apply polyn_degree_summation_ub | ].
@@ -4592,22 +4580,16 @@ destruct j. {
     apply polyn_degree_mat_el_subm_subm_xI_sub_M_0_succ_0_0.
   }
 ...
+*)
 
 Theorem polyn_degree_det_loop_subm_xI_sub_M_succ_r_le : ∀ M i n,
-  mat_nrows M = S (S n)
+  i < n
+  → mat_nrows M = S (S n)
   → polyn_degree (det_loop (subm (xI_sub_M M) 0 (S i)) (S n)) ≤ S n.
 Proof.
-intros * Hn.
-revert M i Hn.
-induction n; intros. {
-  cbn - [ polyn_degree ].
-  specialize (polyn_of_list_repeat_0s 1) as H.
-  cbn in H; rewrite H; clear H.
-  rewrite polyn_add_0_l, polyn_mul_1_l, polyn_mul_0_r.
-  rewrite polyn_add_0_l, polyn_mul_1_r.
-  rewrite polyn_degree_opp.
-  rewrite polyn_degree_of_single; flia.
-}
+intros * Hin Hn.
+revert M i Hin Hn.
+induction n; intros; [ easy | ].
 remember (S n) as sn.
 cbn - [ subm xI_sub_M iter_seq ]; subst sn.
 etransitivity; [ apply polyn_degree_summation_ub | ].
@@ -4619,6 +4601,15 @@ rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
 etransitivity; [ apply polyn_degree_mul_le | ].
 destruct j. {
   rewrite polyn_degree_mat_el_subm_xI_sub_M_0_succ_0_0, Nat.add_0_l.
+  destruct i. 2: {
+    apply Nat.succ_lt_mono in Hin.
+    specialize (IHn (subm M 0 0) i Hin) as H1.
+    rewrite submatrix_nrows, Hn in H1.
+    rewrite Nat.sub_succ, Nat.sub_0_r in H1.
+    specialize (H1 eq_refl).
+Inspect 5.
+...
+  apply polyn_degree_det_loop_subm_subm_xI_sub_M_succ_r_le; [ | easy ].
 ...
   now apply polyn_degree_det_loop_subm_subm_xI_sub_M_succ_r_le.
 ...
