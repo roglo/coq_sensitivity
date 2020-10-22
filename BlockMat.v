@@ -4437,6 +4437,7 @@ intros j Hj.
 rewrite <- polyn_mul_assoc.
 etransitivity; [ apply polyn_degree_mul_le | ].
 rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
+etransitivity; [ apply polyn_degree_mul_le | ].
 ...
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
