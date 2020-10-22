@@ -4522,6 +4522,19 @@ assert
   revert i l Hi.
   induction n; intros; [ now cbn; rewrite if_1_eq_0 | ].
   cbn - [ iter_seq repeat_subm ].
+  etransitivity; [ apply polyn_degree_summation_ub | ].
+  cbn - [ iter_seq polyn_degree xI_sub_M ].
+  apply Max_lub_le.
+  clear j.
+  intros j (_, Hj).
+  move j before i.
+  rewrite <- polyn_mul_assoc.
+  etransitivity; [ apply polyn_degree_mul_le | ].
+  rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
+  etransitivity; [ apply polyn_degree_mul_le | ].
+  etransitivity. {
+    apply (Nat.add_le_mono_r _ 1).
+Search (polyn_degree (mat_el _ _ _)).
 ...
 apply (H [k; j]).
 ...
