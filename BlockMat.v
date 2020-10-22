@@ -4444,7 +4444,7 @@ unfold determinant in H1; cbn in H1.
 rewrite Hr, Nat.sub_succ, Nat.sub_0_r in H1.
 rewrite <- submatrix_xI_sub_M in H1.
 rewrite srng_summation_split_first; [ | apply Nat.le_0_l ].
-remember (det_loop (subm (xI_sub_M M) 0 0) n) as M' eqn:HM'.
+remember (det_loop (subm (xI_sub_M M) 0 0) n) as P eqn:HP.
 cbn - [ is_monic_polyn polyn_degree xI_sub_M iter_seq ].
 rewrite srng_mul_1_l.
 rewrite polyn_degree_lt_add. 2: {
@@ -4466,12 +4466,36 @@ rewrite polyn_degree_lt_add. 2: {
   }
   apply Max_lub_lt. {
     destruct n. {
-      cbn in HM'; rewrite HM'.
+      cbn in HP; rewrite HP.
       rewrite polyn_mul_1_r.
       rewrite polyn_degree_mat_el_xI_sub_M_0_0.
       apply Nat.lt_0_1.
+    }
+    specialize (H1 (Nat.neq_succ_0 _)).
+    rewrite polyn_degree_mul. 2: {
+      rewrite polyn_degree_mat_el_xI_sub_M_0_0.
+      rewrite polyn_coeff_mat_el_xI_sub_M_0_0, srng_mul_1_l.
+      unfold is_monic_polyn in H1.
+      rewrite (proj1 H1).
+      apply srng_1_neq_0.
+    }
+    rewrite polyn_degree_mat_el_xI_sub_M_0_0.
+    flia.
+  }
+  intros i Hi.
+  assert (H : n ≠ 0) by flia Hi.
+  specialize (H1 H); clear H.
+  destruct H1 as (Hmp, Hpd).
+  rewrite polyn_degree_mul. 2: {
+    rewrite polyn_degree_mat_el_xI_sub_M_0_0.
+    rewrite polyn_coeff_mat_el_xI_sub_M_0_0, srng_mul_1_l.
+    unfold is_monic_polyn in Hmp.
+    rewrite Hmp.
+    apply srng_1_neq_0.
+  }
+  rewrite Hpd.
+  rewrite polyn_degree_mat_el_xI_sub_M_0_0, Nat.add_1_l.
 ...
-      rewrite polyn_degree_1.
 Search (max _ _ < _).
 Nat.max_lub_lt: ∀ n m p : nat, n < p → m < p → Nat.max n m < p
 ...
