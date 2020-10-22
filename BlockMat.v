@@ -4482,13 +4482,32 @@ etransitivity. {
     rewrite polyn_degree_of_single.
     apply Nat.le_0_l.
   }
-...
-  apply Nat.nlt_ge in Hjsi.
-  rewrite mat_el_xI_sub_M_diff; [ | flia Hjsi ].
+  apply Nat.nlt_ge in Hkj.
+  destruct (lt_dec (k + 1) (S i)) as [Hki| Hki]. {
+    rewrite mat_el_xI_sub_M.
+    destruct (Nat.eq_dec 2 (k + 1)) as [H2k| H2k]. {
+      unfold polyn_sub.
+      rewrite polyn_degree_1; [ easy | ].
+      rewrite polyn_degree_opp.
+      apply polyn_degree_of_single.
+    }
+    rewrite polyn_degree_opp.
+    rewrite polyn_degree_of_single.
+    apply Nat.le_0_l.
+  }
+  apply Nat.nlt_ge in Hki.
+  rewrite mat_el_xI_sub_M.
+  destruct (Nat.eq_dec 2 (k + 1 + 1)) as [H2k| H2k]. {
+    unfold polyn_sub.
+    rewrite polyn_degree_1; [ easy | ].
+    rewrite polyn_degree_opp.
+    apply polyn_degree_of_single.
+  }
   rewrite polyn_degree_opp.
   rewrite polyn_degree_of_single.
   apply Nat.le_0_l.
 }
+apply -> Nat.succ_le_mono.
 ...
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
