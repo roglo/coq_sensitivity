@@ -4448,6 +4448,32 @@ remember (det_loop (subm (xI_sub_M M) 0 0) n) as M' eqn:HM'.
 cbn - [ is_monic_polyn polyn_degree xI_sub_M iter_seq ].
 rewrite srng_mul_1_l.
 rewrite polyn_degree_lt_add. 2: {
+(**)
+  eapply le_lt_trans; [ apply polyn_degree_summation_ub | ].
+  cbn - [ iter_seq polyn_degree mat_el ].
+  apply le_lt_trans with
+    (m := Max (i = 1, n), polyn_degree (det_loop (subm (xI_sub_M M) 0 i) n)).
+  {
+Search (fold_left _ _ _ ≤ fold_left _ _ _).
+Search (Max (_ = _, _), _).
+Search (Σ (_ = _, _), _ ≤ _).
+...
+apply Max_le_compat.
+intros i Hi.
+...
+    apply Max_lub_le; intros i Hi.
+    rewrite <- polyn_mul_assoc.
+    etransitivity; [ apply polyn_degree_mul_le | ].
+    rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
+    etransitivity; [ apply polyn_degree_mul_le | ].
+    destruct i; [ flia Hi | ].
+    rewrite polyn_degree_mat_el_xI_sub_M_0_succ, Nat.add_0_l.
+...
+    rewrite polyn_degree_of_single, Nat.add_0_l.
+  destruct i; [ easy | ].
+  destruct Hi as (_, Hi).
+  apply Nat.succ_le_mono in Hi.
+...
   rewrite polyn_degree_mul. 2: {
     destruct n. {
       cbn in HM'; subst M'.
@@ -4508,6 +4534,8 @@ rewrite polyn_degree_lt_add. 2: {
   etransitivity; [ apply polyn_degree_mul_le | ].
   rewrite polyn_degree_of_single, Nat.add_0_l.
   destruct i; [ easy | ].
+  destruct Hi as (_, Hi).
+  apply Nat.succ_le_mono in Hi.
 ...
   now apply polyn_degree_det_loop_subm_xI_sub_M_succ_r_le.
 }

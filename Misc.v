@@ -117,6 +117,26 @@ rewrite Nat.max_l; [ | flia Hfx ].
 apply Hf; flia.
 Qed.
 
+Theorem Max_le_compat : ∀ b e g h,
+  (∀ i, b ≤ i ≤ e → g i ≤ h i)
+  → Max (i = b, e), g i ≤ Max (i = b, e), h i.
+Proof.
+intros * Hgh.
+unfold iter_seq.
+remember (S e - b) as n eqn:Hn.
+remember 0 as a eqn:Ha; clear Ha.
+revert a b Hn Hgh.
+induction n as [| n IHn]; intros; [ easy | cbn ].
+setoid_rewrite fold_left_max_fun_from_0.
+...
+do 2 rewrite <- Nat.add_assoc.
+apply Nat.add_le_mono_l.
+apply Nat.add_le_mono; [ apply Hgh; flia Hn | ].
+apply IHn; [ flia Hn | ].
+intros i Hbie.
+apply Hgh; flia Hbie.
+Qed.
+
 (* summations *)
 
 Notation "'Σ' ( i = b , e ) , g" :=
