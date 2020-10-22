@@ -3932,17 +3932,50 @@ unfold minus_one_pow.
 now destruct (i mod 2); cbn; rewrite if_1_eq_0.
 Qed.
 
+Theorem mat_el_xI_sub_M_id : ∀ i M,
+  mat_el (xI_sub_M M) i i = (_x - polyn_of_list [mat_el M i i])%P.
+Proof.
+intros; cbn.
+destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
+now rewrite polyn_mul_1_r.
+Qed.
+
+Theorem polyn_degree_1 : ∀ P,
+  polyn_degree P = 0
+  → polyn_degree (_x + P) = 1.
+Proof.
+intros (la, Hla) HP.
+cbn - [ norm_polyn_list ] in HP |-*.
+rewrite norm_polyn_list_add_idemp_l.
+destruct la as [| a] using rev_ind; [ now cbn; rewrite if_1_eq_0 | ].
+clear IHla.
+destruct la as [| a1]. 2: {
+  cbn in HP.
+  rewrite app_length in HP; cbn in HP; flia HP.
+}
+clear HP; cbn.
+now rewrite if_1_eq_0.
+Qed.
+
+Theorem polyn_degree_of_single : ∀ a, polyn_degree (polyn_of_list [a]) = 0.
+Proof.
+now intros; cbn; destruct (srng_eq_dec a 0).
+Qed.
+
+Theorem polyn_coeff_of_single : ∀ a, polyn_coeff (polyn_of_list [a]) 0 = a.
+Proof.
+now intros; cbn; destruct (srng_eq_dec a 0).
+Qed.
+
+
 Theorem polyn_degree_mat_el_xI_sub_M_0_0 : ∀ M,
   polyn_degree (mat_el (xI_sub_M M) 0 0) = 1.
 Proof.
 intros.
-cbn; rewrite if_1_eq_0; cbn.
-cbn; rewrite if_1_eq_0; cbn.
-rewrite srng_add_0_l, srng_mul_0_l, srng_mul_1_l.
-rewrite srng_add_0_l, srng_mul_0_l.
-rewrite srng_add_0_l.
-rewrite if_1_eq_0; cbn.
-now destruct (srng_eq_dec (mat_el M 0 0) 0); cbn; rewrite if_1_eq_0.
+rewrite mat_el_xI_sub_M_id.
+apply polyn_degree_1.
+rewrite polyn_degree_opp.
+apply polyn_degree_of_single.
 Qed.
 
 Theorem polyn_coeff_mat_el_xI_sub_M_0_0 : ∀ M,
@@ -3971,23 +4004,27 @@ rewrite norm_polyn_list_app; cbn.
 now rewrite if_0_eq_0.
 Qed.
 
-Theorem polyn_degree_of_single : ∀ a, polyn_degree (polyn_of_list [a]) = 0.
+Theorem polyn_of_list_0 : polyn_of_list [0%Rng] = 0%P.
 Proof.
-now intros; cbn; destruct (srng_eq_dec a 0).
+apply polyn_eq; cbn.
+now destruct (srng_eq_dec 0 0).
 Qed.
 
-Theorem polyn_coeff_of_single : ∀ a, polyn_coeff (polyn_of_list [a]) 0 = a.
+Theorem mat_el_xI_sub_M_diff : ∀ M i j,
+  i ≠ j
+  → mat_el (xI_sub_M M) i j = (- polyn_of_list [mat_el M i j])%P.
 Proof.
-now intros; cbn; destruct (srng_eq_dec a 0).
+intros * Hij.
+cbn.
+destruct (Nat.eq_dec i j) as [H| H]; [ easy | clear H ].
+now rewrite polyn_of_list_0, polyn_mul_0_r, polyn_add_0_l.
 Qed.
 
 Theorem mat_el_xI_sub_M_0_succ : ∀ M i,
   mat_el (xI_sub_M M) 0 (S i) = (- polyn_of_list [mat_el M 0 (S i)])%P.
 Proof.
-intros; cbn.
-specialize (polyn_of_list_repeat_0s 1) as H1.
-cbn in H1; rewrite H1; clear H1.
-now rewrite srng_mul_0_r, srng_add_0_l.
+intros.
+now apply mat_el_xI_sub_M_diff.
 Qed.
 
 Theorem polyn_degree_mat_el_xI_sub_M_0_succ : ∀ M i,
@@ -4318,57 +4355,6 @@ apply Nat.le_antisymm in HQP'; [ clear H | easy ].
 now rewrite polyn_degree_add_not_cancel.
 Qed.
 
-(* bof, chais pas, ça a pas l'air simple...
-Theorem polyn_degree_det_subm_le : ∀ M i j n,
-  polyn_degree (det_loop (subm (subm (xI_sub_M M) 0 i) 0 (S j)) n) ≤
-  polyn_degree (det_loop (subm (xI_sub_M M) 0 i) n).
-Proof.
-intros.
-revert M i j.
-induction n; intros; [ easy | ].
-cbn - [ subm summation ].
-destruct n. {
-  cbn.
-  specialize (polyn_of_list_repeat_0s 1) as H; cbn in H.
-  rewrite H; clear H.
-  rewrite polyn_mul_0_r.
-  do 3 rewrite polyn_add_0_l.
-  rewrite polyn_mul_1_r.
-  rewrite fold_polyn_sub.
-  destruct (lt_dec 0 i) as [Hzi| Hzi]. {
-    rewrite polyn_degree_opp, polyn_degree_of_single.
-    apply Nat.le_0_l.
-  }
-  rewrite polyn_degree_opp, polyn_degree_of_single.
-  apply Nat.le_0_l.
-}
-rewrite (srng_summation_split_first 0); [ | flia ].
-rewrite (srng_summation_split_first 0); [ | flia ].
-cbn - [ polyn_degree subm summation det_loop ].
-do 2 rewrite srng_mul_1_l.
-Search (polyn_degree (_ + _)).
-...
-apply polyn_degree_add_le_compat.
-...
-*)
-
-Theorem polyn_degree_1 : ∀ P,
-  polyn_degree P = 0
-  → polyn_degree (_x + P) = 1.
-Proof.
-intros (la, Hla) HP.
-cbn - [ norm_polyn_list ] in HP |-*.
-rewrite norm_polyn_list_add_idemp_l.
-destruct la as [| a] using rev_ind; [ now cbn; rewrite if_1_eq_0 | ].
-clear IHla.
-destruct la as [| a1]. 2: {
-  cbn in HP.
-  rewrite app_length in HP; cbn in HP; flia HP.
-}
-clear HP; cbn.
-now rewrite if_1_eq_0.
-Qed.
-
 Theorem polyn_degree_mat_el_subm_xI_sub_M_0_succ_0_0 : ∀ M i,
   polyn_degree (mat_el (subm (xI_sub_M M) 0 (S i)) 0 0) = 0.
 Proof.
@@ -4440,6 +4426,29 @@ etransitivity; [ apply polyn_degree_mul_le | ].
 rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
 etransitivity; [ apply polyn_degree_mul_le | ].
 apply -> Nat.lt_succ_r in Hi.
+etransitivity. {
+  apply (Nat.add_le_mono_r _ 1).
+  destruct (lt_dec j (S i)) as [Hjsi| Hjsi]. {
+    destruct (Nat.eq_dec 1 j) as [H1j| H1j]. {
+      subst j.
+      rewrite mat_el_xI_sub_M_id.
+      unfold polyn_sub.
+      rewrite polyn_degree_1; [ easy | ].
+      rewrite polyn_degree_opp.
+      apply polyn_degree_of_single.
+    }
+    rewrite mat_el_xI_sub_M_diff; [ | easy ].
+    rewrite polyn_degree_opp.
+    rewrite polyn_degree_of_single.
+    apply Nat.le_0_l.
+  }
+  apply Nat.nlt_ge in Hjsi.
+  rewrite mat_el_xI_sub_M_diff; [ | flia Hjsi ].
+  rewrite polyn_degree_opp.
+  rewrite polyn_degree_of_single.
+  apply Nat.le_0_l.
+}
+apply -> Nat.succ_le_mono.
 ...
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
