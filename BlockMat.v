@@ -4454,20 +4454,22 @@ rewrite polyn_degree_lt_add. 2: {
   apply le_lt_trans with
     (m := Max (i = 1, n), polyn_degree (det_loop (subm (xI_sub_M M) 0 i) n)).
   {
-Search (fold_left _ _ _ ≤ fold_left _ _ _).
-Search (Max (_ = _, _), _).
-Search (Σ (_ = _, _), _ ≤ _).
-...
-apply Max_le_compat.
-intros i Hi.
-...
-    apply Max_lub_le; intros i Hi.
+    apply Max_le_compat.
+    intros i Hi.
     rewrite <- polyn_mul_assoc.
     etransitivity; [ apply polyn_degree_mul_le | ].
     rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
     etransitivity; [ apply polyn_degree_mul_le | ].
     destruct i; [ flia Hi | ].
     rewrite polyn_degree_mat_el_xI_sub_M_0_succ, Nat.add_0_l.
+    easy.
+  }
+  apply Max_lub_lt. {
+...
+Search (mat_el (xI_sub_M _)).
+rewrite polyn_degree_mul.
+Search (max _ _ < _).
+Nat.max_lub_lt: ∀ n m p : nat, n < p → m < p → Nat.max n m < p
 ...
     rewrite polyn_degree_of_single, Nat.add_0_l.
   destruct i; [ easy | ].

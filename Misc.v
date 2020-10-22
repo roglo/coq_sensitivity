@@ -89,6 +89,35 @@ symmetry.
 apply List_fold_left_map.
 Qed.
 
+Theorem Max_lub_lt : ∀ b e f n,
+  0 < n
+  → (∀ i, b ≤ i ≤ e → f i < n)
+  → Max (i = b, e), f i < n.
+Proof.
+intros * Hn Hf.
+unfold iter_seq.
+remember (S e - b) as len eqn:Hlen.
+destruct len; [ easy | ].
+replace e with (b + len) in Hf by flia Hlen.
+clear e Hlen.
+revert b Hf.
+induction len; intros. {
+  now apply Hf; rewrite Nat.add_0_r.
+}
+remember (S len) as slen; cbn; subst slen.
+rewrite fold_left_max_fun_from_0.
+remember (fold_left _ _ _) as x eqn:Hx.
+destruct (le_dec (f b) x) as [Hfx| Hfx]. {
+  rewrite Nat.max_r; [ | easy ].
+  subst x.
+  apply IHlen.
+  intros i Hi.
+  apply Hf; flia Hi.
+}
+rewrite Nat.max_l; [ | flia Hfx ].
+apply Hf; flia.
+Qed.
+
 Theorem Max_lub_le : ∀ b e f n,
   (∀ i, b ≤ i ≤ e → f i ≤ n)
   → Max (i = b, e), f i ≤ n.
@@ -128,10 +157,9 @@ remember 0 as a eqn:Ha; clear Ha.
 revert a b Hn Hgh.
 induction n as [| n IHn]; intros; [ easy | cbn ].
 setoid_rewrite fold_left_max_fun_from_0.
-...
-do 2 rewrite <- Nat.add_assoc.
-apply Nat.add_le_mono_l.
-apply Nat.add_le_mono; [ apply Hgh; flia Hn | ].
+do 2 rewrite <- Nat.max_assoc.
+apply Nat.max_le_compat_l.
+apply Nat.max_le_compat; [ apply Hgh; flia Hn | ].
 apply IHn; [ flia Hn | ].
 intros i Hbie.
 apply Hgh; flia Hbie.
