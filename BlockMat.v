@@ -4421,6 +4421,14 @@ Theorem fold_determinant : ∀ T {ro : ring_op T} (M : matrix T),
   det_loop M (mat_nrows M) = determinant M.
 Proof. easy. Qed.
 
+Theorem polyn_degree_det_loop_subm_xI_sub_M_succ_r_le : ∀ i n M,
+  mat_nrows M = S n
+  → 1 ≤ i ≤ n
+  → polyn_degree (det_loop (subm (xI_sub_M M) 0 i) n) ≤ n.
+Proof.
+intros * Hr Hi.
+...
+
 (* the caracteristic polynomial of a matrix is monic, i.e. its
    leading coefficient is 1 *)
 
@@ -4495,6 +4503,10 @@ rewrite polyn_degree_lt_add. 2: {
   }
   rewrite Hpd.
   rewrite polyn_degree_mat_el_xI_sub_M_0_0, Nat.add_1_l.
+  apply Nat.lt_succ_r.
+...
+  now apply polyn_degree_det_loop_subm_xI_sub_M_succ_r_le.
+}
 ...
 Search (max _ _ < _).
 Nat.max_lub_lt: ∀ n m p : nat, n < p → m < p → Nat.max n m < p
