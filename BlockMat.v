@@ -3932,12 +3932,22 @@ unfold minus_one_pow.
 now destruct (i mod 2); cbn; rewrite if_1_eq_0.
 Qed.
 
-Theorem mat_el_xI_sub_M_id : ∀ i M,
-  mat_el (xI_sub_M M) i i = (_x - polyn_of_list [mat_el M i i])%P.
+Theorem polyn_of_list_0 : polyn_of_list [0%Rng] = 0%P.
+Proof.
+apply polyn_eq; cbn.
+now destruct (srng_eq_dec 0 0).
+Qed.
+
+Theorem mat_el_xI_sub_M : ∀ i j M,
+  mat_el (xI_sub_M M) i j =
+    if Nat.eq_dec i j then (_x - polyn_of_list [mat_el M i i])%P
+    else (- polyn_of_list [mat_el M i j])%P.
 Proof.
 intros; cbn.
-destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
-now rewrite polyn_mul_1_r.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  now rewrite polyn_mul_1_r, Hij.
+}
+now rewrite polyn_of_list_0, polyn_mul_0_r, polyn_add_0_l.
 Qed.
 
 Theorem polyn_degree_1 : ∀ P,
@@ -3972,7 +3982,7 @@ Theorem polyn_degree_mat_el_xI_sub_M_0_0 : ∀ M,
   polyn_degree (mat_el (xI_sub_M M) 0 0) = 1.
 Proof.
 intros.
-rewrite mat_el_xI_sub_M_id.
+rewrite mat_el_xI_sub_M.
 apply polyn_degree_1.
 rewrite polyn_degree_opp.
 apply polyn_degree_of_single.
@@ -4004,27 +4014,11 @@ rewrite norm_polyn_list_app; cbn.
 now rewrite if_0_eq_0.
 Qed.
 
-Theorem polyn_of_list_0 : polyn_of_list [0%Rng] = 0%P.
-Proof.
-apply polyn_eq; cbn.
-now destruct (srng_eq_dec 0 0).
-Qed.
-
-Theorem mat_el_xI_sub_M_diff : ∀ M i j,
-  i ≠ j
-  → mat_el (xI_sub_M M) i j = (- polyn_of_list [mat_el M i j])%P.
-Proof.
-intros * Hij.
-cbn.
-destruct (Nat.eq_dec i j) as [H| H]; [ easy | clear H ].
-now rewrite polyn_of_list_0, polyn_mul_0_r, polyn_add_0_l.
-Qed.
-
 Theorem mat_el_xI_sub_M_0_succ : ∀ M i,
   mat_el (xI_sub_M M) 0 (S i) = (- polyn_of_list [mat_el M 0 (S i)])%P.
 Proof.
 intros.
-now apply mat_el_xI_sub_M_diff.
+apply mat_el_xI_sub_M.
 Qed.
 
 Theorem polyn_degree_mat_el_xI_sub_M_0_succ : ∀ M i,
@@ -4429,26 +4423,72 @@ apply -> Nat.lt_succ_r in Hi.
 etransitivity. {
   apply (Nat.add_le_mono_r _ 1).
   destruct (lt_dec j (S i)) as [Hjsi| Hjsi]. {
+    rewrite mat_el_xI_sub_M.
     destruct (Nat.eq_dec 1 j) as [H1j| H1j]. {
-      subst j.
-      rewrite mat_el_xI_sub_M_id.
       unfold polyn_sub.
       rewrite polyn_degree_1; [ easy | ].
       rewrite polyn_degree_opp.
       apply polyn_degree_of_single.
     }
-    rewrite mat_el_xI_sub_M_diff; [ | easy ].
     rewrite polyn_degree_opp.
     rewrite polyn_degree_of_single.
     apply Nat.le_0_l.
   }
+  apply Nat.nlt_ge in Hjsi.
+  rewrite mat_el_xI_sub_M.
+  destruct (Nat.eq_dec 1 (j + 1)) as [H| H]; [ flia Hjsi H | clear H ].
+  rewrite polyn_degree_opp.
+  rewrite polyn_degree_of_single.
+  apply Nat.le_0_l.
+}
+apply -> Nat.succ_le_mono.
+clear IHn.
+revert i j M Hr Hi Hj.
+induction n; intros; [ now cbn; rewrite if_1_eq_0 | ].
+cbn - [ iter_seq xI_sub_M ].
+etransitivity; [ apply polyn_degree_summation_ub | ].
+cbn - [ iter_seq polyn_degree xI_sub_M ].
+apply Max_lub_le.
+intros k (_, Hk).
+move k before j.
+rewrite <- polyn_mul_assoc.
+etransitivity; [ apply polyn_degree_mul_le | ].
+rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
+etransitivity; [ apply polyn_degree_mul_le | ].
+etransitivity. {
+  apply (Nat.add_le_mono_r _ 1).
+  destruct (lt_dec k j) as [Hkj| Hkj]. {
+    destruct (lt_dec k (S i)) as [Hksi| Hksi]. {
+      rewrite mat_el_xI_sub_M.
+      destruct (Nat.eq_dec 2 k) as [H2k| H2k]. {
+        unfold polyn_sub.
+        rewrite polyn_degree_1; [ easy | ].
+        rewrite polyn_degree_opp.
+        apply polyn_degree_of_single.
+      }
+      rewrite polyn_degree_opp.
+      rewrite polyn_degree_of_single.
+      apply Nat.le_0_l.
+    }
+    apply Nat.nlt_ge in Hksi.
+    rewrite mat_el_xI_sub_M.
+    destruct (Nat.eq_dec 2 (k + 1)) as [H2k| H2k]. {
+      unfold polyn_sub.
+      rewrite polyn_degree_1; [ easy | ].
+      rewrite polyn_degree_opp.
+      apply polyn_degree_of_single.
+    }
+    rewrite polyn_degree_opp.
+    rewrite polyn_degree_of_single.
+    apply Nat.le_0_l.
+  }
+...
   apply Nat.nlt_ge in Hjsi.
   rewrite mat_el_xI_sub_M_diff; [ | flia Hjsi ].
   rewrite polyn_degree_opp.
   rewrite polyn_degree_of_single.
   apply Nat.le_0_l.
 }
-apply -> Nat.succ_le_mono.
 ...
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
