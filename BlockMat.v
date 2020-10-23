@@ -4057,7 +4057,7 @@ rewrite subm_repeat_subm.
 apply IHn.
 Qed.
 
-Theorem polyn_degree_det_loop_subm_xI_sub_M_0 : ∀ i n M,
+Theorem polyn_degree_det_loop_subm_xI_sub_M_le : ∀ i n M,
   polyn_degree (det_loop (subm (xI_sub_M M) 0 i) n) ≤ n.
 Proof.
 intros.
@@ -4228,7 +4228,7 @@ rewrite polyn_degree_lt_add. 2: {
   rewrite Hpd.
   rewrite polyn_degree_mat_el_xI_sub_M_0_0, Nat.add_1_l.
   apply Nat.lt_succ_r.
-  apply polyn_degree_det_loop_subm_xI_sub_M_0.
+  apply polyn_degree_det_loop_subm_xI_sub_M_le.
 }
 rewrite polyn_degree_mul. 2: {
   rewrite polyn_degree_mat_el_xI_sub_M_0_0.
@@ -4283,7 +4283,7 @@ rewrite polyn_coeff_overflow. 2: {
     apply Nat.lt_0_succ.
   }
   destruct i; [ easy | ].
-  apply polyn_degree_det_loop_subm_xI_sub_M_0.
+  apply polyn_degree_det_loop_subm_xI_sub_M_le.
 }
 rewrite srng_add_0_l.
 rewrite polyn_coeff_mul.
@@ -4295,7 +4295,7 @@ rewrite polyn_coeff_mat_el_xI_sub_M_0_0.
 rewrite (polyn_coeff_overflow P). 2: {
   rewrite HP.
   apply Nat.lt_succ_r.
-  apply polyn_degree_det_loop_subm_xI_sub_M_0.
+  apply polyn_degree_det_loop_subm_xI_sub_M_le.
 }
 rewrite srng_mul_0_r, srng_add_0_l.
 rewrite all_0_srng_summation_0. 2: {
