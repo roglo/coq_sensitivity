@@ -2374,6 +2374,55 @@ cbn in Hpn |-*.
 rewrite nth_overflow; [ easy | flia Hpn ].
 Qed.
 
+Theorem polyn_coeff_mul : ∀ P Q i,
+  polyn_coeff (P * Q)%P i =
+    (Σ (j = 0, i), polyn_coeff P j * polyn_coeff Q (i - j))%Srng.
+Proof.
+intros.
+cbn - [ iter_seq ].
+destruct P as (la, Hla).
+destruct Q as (lb, Hlb).
+cbn - [ iter_seq norm_polyn_list ].
+unfold polyn_list_convol_mul.
+remember (length la + length lb - 1) as len eqn:Hlen.
+destruct (lt_dec i len) as [Hilen| Hilen]. 2: {
+  apply Nat.nlt_ge in Hilen.
+  rewrite nth_overflow. 2: {
+    etransitivity; [ apply norm_polyn_list_length_le | ].
+    now rewrite map_length, seq_length.
+  }
+  symmetry.
+  apply all_0_srng_summation_0.
+  intros j Hj.
+  destruct (lt_dec j (length la)) as [Hjla| Hjla]. 2: {
+    apply Nat.nlt_ge in Hjla.
+    rewrite nth_overflow; [ | easy ].
+    apply srng_mul_0_l.
+  }
+  destruct (lt_dec (i - j) (length lb)) as [Hjlb| Hjlb]. 2: {
+    apply Nat.nlt_ge in Hjlb.
+    rewrite (nth_overflow lb); [ | easy ].
+    apply srng_mul_0_r.
+  }
+  flia Hlen Hilen Hj Hjla Hjlb.
+}
+rewrite nth_norm_polyn_list_map; [ easy | ].
+intros j Hj.
+apply all_0_srng_summation_0.
+intros k Hk.
+destruct (lt_dec k (length la)) as [Hka| Hka]. 2: {
+  apply Nat.nlt_ge in Hka.
+  rewrite nth_overflow; [ | easy ].
+  apply srng_mul_0_l.
+}
+destruct (lt_dec (j - k) (length lb)) as [Hjkb| Hjkb]. 2: {
+  apply Nat.nlt_ge in Hjkb.
+  rewrite (nth_overflow lb); [ | easy ].
+  apply srng_mul_0_r.
+}
+flia Hlen Hj Hka Hjkb.
+Qed.
+
 End in_ring.
 
 Module polynomial_Notations.
