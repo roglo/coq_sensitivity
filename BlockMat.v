@@ -3347,12 +3347,6 @@ unfold minus_one_pow.
 now destruct (i mod 2); cbn; rewrite if_1_eq_0.
 Qed.
 
-Theorem polyn_of_list_0 : polyn_of_list [0%Rng] = 0%P.
-Proof.
-apply polyn_eq; cbn.
-now destruct (srng_eq_dec 0 0).
-Qed.
-
 Theorem mat_el_xI_sub_M : ∀ i j M,
   mat_el (xI_sub_M M) i j =
     if Nat.eq_dec i j then (_x - polyn_of_list [mat_el M i i])%P
@@ -3364,34 +3358,6 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 }
 now rewrite polyn_of_list_0, polyn_mul_0_r, polyn_add_0_l.
 Qed.
-
-Theorem polyn_degree_1 : ∀ P,
-  polyn_degree P = 0
-  → polyn_degree (_x + P) = 1.
-Proof.
-intros (la, Hla) HP.
-cbn - [ norm_polyn_list ] in HP |-*.
-rewrite norm_polyn_list_add_idemp_l.
-destruct la as [| a] using rev_ind; [ now cbn; rewrite if_1_eq_0 | ].
-clear IHla.
-destruct la as [| a1]. 2: {
-  cbn in HP.
-  rewrite app_length in HP; cbn in HP; flia HP.
-}
-clear HP; cbn.
-now rewrite if_1_eq_0.
-Qed.
-
-Theorem polyn_degree_of_single : ∀ a, polyn_degree (polyn_of_list [a]) = 0.
-Proof.
-now intros; cbn; destruct (srng_eq_dec a 0).
-Qed.
-
-Theorem polyn_coeff_of_single : ∀ a, polyn_coeff (polyn_of_list [a]) 0 = a.
-Proof.
-now intros; cbn; destruct (srng_eq_dec a 0).
-Qed.
-
 
 Theorem polyn_degree_mat_el_xI_sub_M_0_0 : ∀ M,
   polyn_degree (mat_el (xI_sub_M M) 0 0) = 1.

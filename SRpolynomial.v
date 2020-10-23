@@ -2744,6 +2744,39 @@ destruct lc as [| c]; [ now destruct (srng_eq_dec (a * b) 0) | ].
 now cbn; rewrite rev_app_distr; cbn.
 Qed.
 
+Theorem polyn_of_list_0 : polyn_of_list [0%Rng] = 0%P.
+Proof.
+apply polyn_eq; cbn.
+now destruct (srng_eq_dec 0 0).
+Qed.
+
+Theorem polyn_degree_1 : ∀ P,
+  polyn_degree P = 0
+  → polyn_degree (_x + P) = 1.
+Proof.
+intros (la, Hla) HP.
+cbn - [ norm_polyn_list ] in HP |-*.
+rewrite norm_polyn_list_add_idemp_l.
+destruct la as [| a] using rev_ind; [ now cbn; rewrite if_1_eq_0 | ].
+clear IHla.
+destruct la as [| a1]. 2: {
+  cbn in HP.
+  rewrite app_length in HP; cbn in HP; flia HP.
+}
+clear HP; cbn.
+now rewrite if_1_eq_0.
+Qed.
+
+Theorem polyn_degree_of_single : ∀ a, polyn_degree (polyn_of_list [a]) = 0.
+Proof.
+now intros; cbn; destruct (srng_eq_dec a 0).
+Qed.
+
+Theorem polyn_coeff_of_single : ∀ a, polyn_coeff (polyn_of_list [a]) 0 = a.
+Proof.
+now intros; cbn; destruct (srng_eq_dec a 0).
+Qed.
+
 End in_ring.
 
 Module polynomial_Notations.
