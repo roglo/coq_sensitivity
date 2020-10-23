@@ -4580,6 +4580,21 @@ apply -> Nat.succ_le_mono.
 apply (polyn_degree_det_loop_repeat_subm_le [k; j]).
 Qed.
 
+Theorem polyn_highest_coeff_neq_0 : ∀ (P : polynomial T),
+  polyn_degree P ≠ 0
+  → polyn_coeff P (polyn_degree P) ≠ 0%Srng.
+Proof.
+intros (la, Hla) Hd.
+cbn in Hla, Hd |-*.
+destruct la as [| a] using rev_ind; [ easy | clear IHla ].
+rewrite <- List_last_nth, List_last_app.
+rewrite app_length, Nat.add_comm in Hla.
+cbn in Hla.
+rewrite app_nth2 in Hla; [ | now unfold ge ].
+rewrite Nat.sub_diag in Hla; cbn in Hla.
+now destruct (srng_eq_dec a 0).
+Qed.
+
 (* the caracteristic polynomial of a matrix is monic, i.e. its
    leading coefficient is 1 *)
 
@@ -4634,9 +4649,10 @@ rewrite polyn_degree_lt_add. 2: {
     rewrite polyn_degree_mul. 2: {
       rewrite polyn_degree_mat_el_xI_sub_M_0_0.
       rewrite polyn_coeff_mat_el_xI_sub_M_0_0, srng_mul_1_l.
-      unfold is_monic_polyn in H1.
-      rewrite (proj1 H1).
-      apply srng_1_neq_0.
+      destruct H1 as (Hmp, Hpd).
+      apply polyn_highest_coeff_neq_0.
+      unfold so.
+      now rewrite Hpd.
     }
     rewrite polyn_degree_mat_el_xI_sub_M_0_0.
     flia.
