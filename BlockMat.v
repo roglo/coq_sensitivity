@@ -4285,8 +4285,10 @@ destruct (lt_dec i len) as [Hilen| Hilen]. 2: {
   }
   flia Hlen Hilen Hj Hjla Hjlb.
 }
-...
-now rewrite nth_norm_polyn_list_map.
+rewrite nth_norm_polyn_list_map; [ easy | ].
+intros j Hj.
+apply all_0_srng_summation_0.
+intros k Hk.
 ...
 replace len with (i + (len - i)) by flia Hilen.
 ...
