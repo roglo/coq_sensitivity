@@ -513,8 +513,6 @@ unfold determinant; cbn.
 now apply polyn_coeff_det_loop_xI_sub_M.
 Qed.
 
-...
-
 (* the list of coefficients of the characteristic polynomial of a matrix M
    has length "nrows(M) + 1"
    e.g. matrix
@@ -534,8 +532,16 @@ Theorem charac_polyn_list_length : ∀ M,
   length (polyn_list (charac_polyn M)) = mat_nrows M + 1.
 Proof.
 intros.
-cbn.
-...
+remember (mat_nrows M) as n eqn:Hn; symmetry in Hn.
+destruct n. {
+  cbn; rewrite Hn; cbn.
+  now rewrite if_1_eq_0.
+}
+specialize (charac_polyn_degree M) as Hcp.
+cbn in Hcp |-*.
+unfold polyn_degree, polyn_degree_plus_1 in Hcp.
+flia Hn Hcp.
+Qed.
 
 (* eigenvalues and eigenvectors *)
 
