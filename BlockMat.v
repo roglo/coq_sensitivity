@@ -4049,7 +4049,6 @@ rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
 etransitivity; [ apply polyn_degree_mul_le | ].
 etransitivity. {
   apply (Nat.add_le_mono_r _ 1).
-  clear IHn.
   apply polyn_degree_mat_el_repeat_subm_le_1.
 }
 apply -> Nat.succ_le_mono.
