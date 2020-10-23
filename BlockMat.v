@@ -4598,10 +4598,13 @@ Qed.
 (* the degree of the caracteristic polynomial is the size of the matrix *)
 
 Theorem charac_polyn_degree : ∀ M,
-  mat_nrows M ≠ 0
-  → polyn_degree (charac_polyn M) = mat_nrows M.
+  polyn_degree (charac_polyn M) = mat_nrows M.
 Proof.
-intros * Hrz.
+intros.
+destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
+  cbn; rewrite Hrz; cbn.
+  now rewrite if_1_eq_0.
+}
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
 revert M Hr Hrz.
 induction n; intros; [ easy | clear Hrz ].
