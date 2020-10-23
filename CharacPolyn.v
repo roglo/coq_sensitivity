@@ -554,9 +554,17 @@ Proof.
 intros acp M Hrz HM.
 destruct acp as (Hroots).
 specialize (Hroots (charac_polyn M)) as H1.
-...
-assert (H2 : polyn_el (charac_polyn M) (mat_nrows M) = 1%Srng). {
-  now apply charac_polyn_higher_coeff.
+assert (H2 : polyn_coeff (charac_polyn M) (mat_nrows M) = 1%Srng). {
+  specialize (charac_polyn_is_monic M) as H2.
+  unfold is_monic_polyn in H2.
+  now rewrite charac_polyn_degree in H2.
 }
 assert (H3 : polyn_degree (charac_polyn M) = mat_nrows M). {
+  apply charac_polyn_degree.
+}
+unfold so in H1.
+rewrite H3 in H1.
+assert (H : mat_nrows M > 0) by flia Hrz.
+specialize (H1 H); clear H.
+destruct H1 as (x, Hx).
 ...
