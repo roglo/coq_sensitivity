@@ -4411,6 +4411,67 @@ Theorem subm_repeat_subm : ∀ T (M : matrix T) l i,
   subm (repeat_subm M l) 0 i = repeat_subm M (i :: l).
 Proof. easy. Qed.
 
+Theorem polyn_degree_det_loop_repeat_subm_le : ∀ l M i n,
+  polyn_degree (det_loop (repeat_subm (subm (xI_sub_M M) 0 (S i)) l) n) ≤ n.
+Proof.
+intros.
+revert l.
+induction n; intros; [ now cbn; rewrite if_1_eq_0 | ].
+cbn - [ iter_seq repeat_subm ].
+etransitivity; [ apply polyn_degree_summation_ub | ].
+cbn - [ iter_seq polyn_degree xI_sub_M ].
+apply Max_lub_le.
+intros j (_, Hj).
+move j before i.
+rewrite <- polyn_mul_assoc.
+etransitivity; [ apply polyn_degree_mul_le | ].
+rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
+etransitivity; [ apply polyn_degree_mul_le | ].
+etransitivity. {
+  apply (Nat.add_le_mono_r _ 1).
+  clear IHn.
+(*aa*)
+  enough
+    (∀ k,
+        polyn_degree (mat_el (repeat_subm (subm (xI_sub_M M) 0 (S i)) l) k j) ≤
+                     1) by apply H.
+  intros k.
+  clear Hj.
+  revert (*i*) j k (*n Hi Hj*).
+  induction l as [| m]; intros. {
+    cbn.
+    destruct (lt_dec j (S i)) as [Hjsi| Hjsi]. {
+      destruct (Nat.eq_dec (k + 1) j) as [Hkj| Hkj]. {
+        rewrite polyn_mul_1_r.
+        rewrite polyn_degree_1; [ easy | ].
+        rewrite polyn_degree_opp.
+        now rewrite polyn_degree_of_single.
+      }
+      rewrite polyn_of_list_0, polyn_mul_0_r, polyn_add_0_l.
+      rewrite polyn_degree_opp.
+      rewrite polyn_degree_of_single.
+      apply Nat.le_0_l.
+    }
+    destruct (Nat.eq_dec (k + 1) (j + 1)) as [Hkj| Hkj]. {
+      rewrite polyn_mul_1_r.
+      rewrite polyn_degree_1; [ easy | ].
+      rewrite polyn_degree_opp.
+      now rewrite polyn_degree_of_single.
+    }
+    rewrite polyn_of_list_0, polyn_mul_0_r, polyn_add_0_l.
+    rewrite polyn_degree_opp.
+    rewrite polyn_degree_of_single.
+    apply Nat.le_0_l.
+  }
+  cbn.
+  destruct (lt_dec j m) as [Hjm| Hjm]; [ apply IHl | ].
+  apply IHl.
+}
+apply -> Nat.succ_le_mono.
+rewrite subm_repeat_subm.
+apply IHn.
+Qed.
+
 Theorem polyn_degree_det_loop_subm_xI_sub_M_succ_r_le : ∀ i n M,
   mat_nrows M = S n
   → i < n
@@ -4518,71 +4579,7 @@ etransitivity. {
   apply Nat.le_0_l.
 }
 apply -> Nat.succ_le_mono.
-(*aa*)
-assert
-  (∀ l,
-   polyn_degree (det_loop (repeat_subm (subm (xI_sub_M M) 0 (S i)) l) n) ≤ n). {
-  clear IHn.
-  intros l.
-  clear Hr Hi Hj Hk.
-  revert i l.
-  induction n; intros; [ now cbn; rewrite if_1_eq_0 | ].
-  cbn - [ iter_seq repeat_subm ].
-  etransitivity; [ apply polyn_degree_summation_ub | ].
-  cbn - [ iter_seq polyn_degree xI_sub_M ].
-  apply Max_lub_le.
-  clear j.
-  intros j (_, Hj).
-  move j before i.
-  rewrite <- polyn_mul_assoc.
-  etransitivity; [ apply polyn_degree_mul_le | ].
-  rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
-  etransitivity; [ apply polyn_degree_mul_le | ].
-  etransitivity. {
-    apply (Nat.add_le_mono_r _ 1).
-    clear IHn.
-    clear k.
-    enough
-      (∀ k,
-       polyn_degree (mat_el (repeat_subm (subm (xI_sub_M M) 0 (S i)) l) k j) ≤
-       1) by apply H.
-    intros k.
-    clear Hj.
-    revert (*i*) j k (*n Hi Hj*).
-    induction l as [| m]; intros. {
-      cbn.
-      destruct (lt_dec j (S i)) as [Hjsi| Hjsi]. {
-        destruct (Nat.eq_dec (k + 1) j) as [Hkj| Hkj]. {
-          rewrite polyn_mul_1_r.
-          rewrite polyn_degree_1; [ easy | ].
-          rewrite polyn_degree_opp.
-          now rewrite polyn_degree_of_single.
-        }
-        rewrite polyn_of_list_0, polyn_mul_0_r, polyn_add_0_l.
-        rewrite polyn_degree_opp.
-        rewrite polyn_degree_of_single.
-        apply Nat.le_0_l.
-      }
-      destruct (Nat.eq_dec (k + 1) (j + 1)) as [Hkj| Hkj]. {
-        rewrite polyn_mul_1_r.
-        rewrite polyn_degree_1; [ easy | ].
-        rewrite polyn_degree_opp.
-        now rewrite polyn_degree_of_single.
-      }
-      rewrite polyn_of_list_0, polyn_mul_0_r, polyn_add_0_l.
-      rewrite polyn_degree_opp.
-      rewrite polyn_degree_of_single.
-      apply Nat.le_0_l.
-    }
-    cbn.
-    destruct (lt_dec j m) as [Hjm| Hjm]; [ apply IHl | ].
-    apply IHl.
-  }
-  apply -> Nat.succ_le_mono.
-  rewrite subm_repeat_subm.
-  apply IHn.
-}
-apply (H [k; j]).
+apply (polyn_degree_det_loop_repeat_subm_le [k; j]).
 Qed.
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
