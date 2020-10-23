@@ -4595,15 +4595,116 @@ rewrite Nat.sub_diag in Hla; cbn in Hla.
 now destruct (srng_eq_dec a 0).
 Qed.
 
+(* the degree of the caracteristic polynomial is the size of the matrix *)
+
+Theorem charac_polyn_degree : ∀ M,
+  mat_nrows M ≠ 0
+  → polyn_degree (charac_polyn M) = mat_nrows M.
+Proof.
+intros * Hrz.
+remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
+revert M Hr Hrz.
+induction n; intros; [ easy | clear Hrz ].
+unfold charac_polyn.
+unfold determinant; cbn.
+rewrite Hr; cbn - [ iter_seq xI_sub_M ].
+specialize (IHn (subm M 0 0)) as Hpd.
+rewrite submatrix_nrows, Hr, Nat.sub_succ, Nat.sub_0_r in Hpd.
+specialize (Hpd eq_refl).
+unfold charac_polyn in Hpd.
+unfold determinant in Hpd; cbn in Hpd.
+rewrite Hr, Nat.sub_succ, Nat.sub_0_r in Hpd.
+rewrite <- submatrix_xI_sub_M in Hpd.
+rewrite srng_summation_split_first; [ | apply Nat.le_0_l ].
+remember (det_loop (subm (xI_sub_M M) 0 0) n) as P eqn:HP.
+cbn - [ is_monic_polyn polyn_degree xI_sub_M iter_seq ].
+rewrite srng_mul_1_l.
+unfold is_monic_polyn.
+rewrite polyn_degree_lt_add. 2: {
+  eapply le_lt_trans; [ apply polyn_degree_summation_ub | ].
+  cbn - [ iter_seq polyn_degree mat_el ].
+  apply le_lt_trans with
+    (m := Max (i = 1, n), polyn_degree (det_loop (subm (xI_sub_M M) 0 i) n)).
+  {
+    apply Max_le_compat.
+    intros i Hi.
+    rewrite <- polyn_mul_assoc.
+    etransitivity; [ apply polyn_degree_mul_le | ].
+    rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
+    etransitivity; [ apply polyn_degree_mul_le | ].
+    destruct i; [ flia Hi | ].
+    rewrite polyn_degree_mat_el_xI_sub_M_0_succ, Nat.add_0_l.
+    easy.
+  }
+  apply Max_lub_lt. {
+    destruct n. {
+      cbn in HP; rewrite HP.
+      rewrite polyn_mul_1_r.
+      rewrite polyn_degree_mat_el_xI_sub_M_0_0.
+      apply Nat.lt_0_1.
+    }
+    specialize (Hpd (Nat.neq_succ_0 _)).
+    rewrite polyn_degree_mul. 2: {
+      rewrite polyn_degree_mat_el_xI_sub_M_0_0.
+      rewrite polyn_coeff_mat_el_xI_sub_M_0_0, srng_mul_1_l.
+      apply polyn_highest_coeff_neq_0.
+      unfold so.
+      now rewrite Hpd.
+    }
+    rewrite polyn_degree_mat_el_xI_sub_M_0_0.
+    flia.
+  }
+  intros i Hi.
+  assert (H : n ≠ 0) by flia Hi.
+  specialize (Hpd H); clear H.
+  rewrite polyn_degree_mul. 2: {
+    rewrite polyn_degree_mat_el_xI_sub_M_0_0.
+    rewrite polyn_coeff_mat_el_xI_sub_M_0_0, srng_mul_1_l.
+    apply polyn_highest_coeff_neq_0.
+    unfold so.
+    rewrite Hpd; flia Hi.
+  }
+  rewrite Hpd.
+  rewrite polyn_degree_mat_el_xI_sub_M_0_0, Nat.add_1_l.
+  apply Nat.lt_succ_r.
+  destruct i; [ easy | ].
+  destruct Hi as (_, Hi).
+  apply -> Nat.le_succ_l in Hi.
+  now apply polyn_degree_det_loop_subm_xI_sub_M_succ_r_le.
+}
+rewrite polyn_degree_mul. 2: {
+  rewrite polyn_degree_mat_el_xI_sub_M_0_0.
+  rewrite polyn_coeff_mat_el_xI_sub_M_0_0.
+  rewrite srng_mul_1_l.
+  destruct n. {
+    cbn in HP; subst P; cbn.
+    rewrite if_1_eq_0; cbn.
+    apply srng_1_neq_0.
+  }
+  specialize (Hpd (Nat.neq_succ_0 _)).
+  apply polyn_highest_coeff_neq_0.
+  unfold so.
+  now rewrite Hpd.
+}
+rewrite polyn_degree_mat_el_xI_sub_M_0_0.
+destruct n. {
+  subst P; cbn.
+  now rewrite if_1_eq_0.
+}
+now rewrite Hpd.
+Qed.
+
+...
+
 (* the caracteristic polynomial of a matrix is monic, i.e. its
    leading coefficient is 1 *)
 
 Theorem charac_polyn_is_monic : ∀ M,
   mat_nrows M ≠ 0
-  → is_monic_polyn (charac_polyn M) ∧
-     polyn_degree (charac_polyn M) = mat_nrows M.
+  → is_monic_polyn (charac_polyn M).
 Proof.
 intros * Hrz.
+...
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
 revert M Hr Hrz.
 induction n; intros; [ easy | clear Hrz ].
