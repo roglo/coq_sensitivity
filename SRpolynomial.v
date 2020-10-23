@@ -2777,6 +2777,184 @@ Proof.
 now intros; cbn; destruct (srng_eq_dec a 0).
 Qed.
 
+Theorem polyn_of_list_repeat_0s : ∀ n,
+  polyn_of_list (repeat 0%Rng n) = 0%P.
+Proof.
+intros.
+apply polyn_eq; cbn.
+induction n; [ easy | ].
+rewrite List_repeat_succ_app.
+rewrite norm_polyn_list_app; cbn.
+now rewrite if_0_eq_0.
+Qed.
+
+Theorem polyn_coeff_add : ∀ P Q i,
+  polyn_coeff (P + Q)%P i = (polyn_coeff P i + polyn_coeff Q i)%Srng.
+Proof.
+intros (la, Hla) (lb, Hlb) i.
+move lb before la.
+cbn - [ norm_polyn_list ].
+unfold polyn_prop_test in Hla.
+unfold polyn_prop_test in Hlb.
+induction la as [| a] using rev_ind. {
+  rewrite polyn_list_add_0_l.
+  rewrite (nth_overflow []); [ | cbn; flia ].
+  rewrite srng_add_0_l.
+  revert i.
+  induction lb as [| b] using rev_ind; intros; [ easy | ].
+  rewrite app_length, Nat.add_comm in Hlb; cbn in Hlb.
+  rewrite app_nth2 in Hlb; [ | now unfold ge ].
+  rewrite Nat.sub_diag in Hlb; cbn in Hlb.
+  rewrite norm_polyn_list_app; cbn.
+  now destruct (srng_eq_dec b 0).
+}
+clear IHla.
+rewrite app_length, Nat.add_comm in Hla; cbn in Hla.
+rewrite app_nth2 in Hla; [ | now unfold ge ].
+rewrite Nat.sub_diag in Hla; cbn in Hla.
+destruct (srng_eq_dec a 0) as [Haz| Haz]; [ easy | clear Hla ].
+induction lb as [| b] using rev_ind. {
+  rewrite polyn_list_add_0_r.
+  rewrite (nth_overflow []); [ | cbn; flia ].
+  rewrite srng_add_0_r.
+  rewrite norm_polyn_list_id; [ easy | now rewrite List_last_app ].
+}
+clear IHlb.
+rewrite app_length, Nat.add_comm in Hlb; cbn in Hlb.
+rewrite app_nth2 in Hlb; [ | now unfold ge ].
+rewrite Nat.sub_diag in Hlb; cbn in Hlb.
+destruct (srng_eq_dec b 0) as [Hbz| Hbz]; [ easy | clear Hlb ].
+move b before a.
+destruct (Nat.eq_dec (length la) (length lb)) as [Hlab| Hlab]. 2: {
+  rewrite norm_polyn_list_id. 2: {
+    destruct (lt_dec (length la) (length lb)) as [Hll| Hll]. {
+      clear Hlab i.
+      rewrite polyn_list_add_app_r.
+      rewrite skipn_all2; [ | now rewrite app_length, Nat.add_1_r ].
+      now rewrite List_last_app_not_nil_r.
+    } {
+      assert (H : length lb < length la) by flia Hlab Hll.
+      clear Hlab Hll i.
+      rewrite polyn_list_add_app_l.
+      rewrite skipn_all2; [ | now rewrite app_length, Nat.add_1_r ].
+      now rewrite List_last_app_not_nil_r.
+    }
+  }
+  apply list_polyn_nth_add.
+}
+rewrite polyn_list_add_app_l.
+rewrite firstn_app.
+rewrite Hlab, firstn_all.
+rewrite Nat.sub_diag, firstn_O.
+rewrite app_nil_r.
+rewrite skipn_app.
+rewrite skipn_all, Nat.sub_diag, skipn_O.
+rewrite app_nil_l; cbn.
+rewrite norm_polyn_list_app; cbn.
+destruct (srng_eq_dec (a + b) 0) as [Habz| Habz]. {
+  cbn.
+  destruct (lt_dec i (length la)) as [Hil| Hil]. {
+    rewrite app_nth1; [ | easy ].
+    rewrite app_nth1; [ | congruence ].
+    clear a b Haz Hbz Habz.
+    revert i lb Hlab Hil.
+    induction la as [| a]; intros. {
+      rewrite (nth_overflow []); [ | cbn; flia ].
+      symmetry in Hlab.
+      apply length_zero_iff_nil in Hlab; subst lb.
+      now rewrite srng_add_0_l.
+    }
+    destruct lb as [| b]; [ easy | ].
+    cbn in Hlab.
+    apply Nat.succ_inj in Hlab.
+    destruct i. {
+      cbn.
+      rewrite strip_0s_app.
+      remember (strip_0s _) as lc eqn:Hlc.
+      symmetry in Hlc.
+      destruct lc as [| c]; [ now cbn; destruct (srng_eq_dec (a + b) 0) | ].
+      now cbn; rewrite rev_app_distr.
+    }
+    cbn in Hil.
+    apply Nat.succ_lt_mono in Hil.
+    cbn - [ norm_polyn_list ].
+    specialize (IHla _ _ Hlab Hil) as H1.
+    unfold norm_polyn_list in H1 |-*; cbn.
+    rewrite strip_0s_app.
+    remember (strip_0s (rev (la + lb)%PL)) as lc eqn:Hlc.
+    symmetry in Hlc.
+    destruct lc as [| c]. {
+      cbn in H1 |-*.
+      destruct (srng_eq_dec (a + b) 0) as [Habz| Habz]; [ now destruct i | ].
+      easy.
+    }
+    cbn in H1 |-*.
+    now rewrite rev_app_distr.
+  }
+  apply Nat.nlt_ge in Hil.
+  rewrite app_nth2; [ | easy ].
+  rewrite app_nth2; [ | now rewrite <- Hlab ].
+  destruct (Nat.eq_dec i (length la)) as [Hila| Hila]. {
+    rewrite Hila, Hlab, Nat.sub_diag; cbn.
+    rewrite Habz.
+    apply nth_overflow.
+    etransitivity; [ apply norm_polyn_list_length_le | ].
+    rewrite polyn_list_add_length.
+    rewrite max_r; [ easy | ].
+    now rewrite Hlab.
+  }
+  rewrite (nth_overflow [a]); [ | cbn; flia Hil Hila ].
+  rewrite (nth_overflow [b]); [ | cbn; flia Hil Hila Hlab ].
+  rewrite srng_add_0_l.
+  apply nth_overflow.
+  etransitivity; [ apply norm_polyn_list_length_le | ].
+  rewrite polyn_list_add_length.
+  rewrite max_l; [ easy | ].
+  now rewrite Hlab.
+}
+cbn.
+destruct (lt_dec i (length la)) as [Hil| Hil]. {
+  rewrite app_nth1. 2: {
+    rewrite polyn_list_add_length.
+    rewrite max_l; [ easy | ].
+    now rewrite Hlab.
+  }
+  rewrite app_nth1; [ | easy ].
+  rewrite app_nth1; [ | now rewrite <- Hlab ].
+  apply list_polyn_nth_add.
+}
+destruct (lt_dec (length la) i) as [Hlai| Hlai]. {
+  rewrite nth_overflow. 2: {
+    rewrite app_length, Nat.add_1_r.
+    rewrite polyn_list_add_length.
+    rewrite max_l; [ easy | ].
+    now rewrite Hlab.
+  }
+  rewrite nth_overflow. 2: {
+    now rewrite app_length, Nat.add_1_r.
+  }
+  rewrite nth_overflow. 2: {
+    now rewrite app_length, Nat.add_1_r, <- Hlab.
+  }
+  now rewrite srng_add_0_l.
+}
+apply Nat.nlt_ge in Hil.
+apply Nat.nlt_ge in Hlai.
+apply Nat.le_antisymm in Hil; [ | easy ].
+rewrite Hil.
+rewrite app_nth2. 2: {
+  rewrite polyn_list_add_length.
+  unfold ge.
+  rewrite max_l; [ easy | now rewrite Hlab ].
+}
+rewrite polyn_list_add_length.
+rewrite max_l; [ | now rewrite Hlab ].
+rewrite app_nth2; [ | now unfold ge ].
+rewrite app_nth2; [ | now unfold ge; rewrite Hlab ].
+rewrite Hlab.
+now rewrite Nat.sub_diag.
+Qed.
+
 End in_ring.
 
 Module polynomial_Notations.
