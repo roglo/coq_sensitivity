@@ -4327,15 +4327,13 @@ Qed.
    leading coefficient is 1 *)
 
 Theorem charac_polyn_is_monic : ∀ M,
-  mat_nrows M ≠ 0
-  → is_monic_polyn (charac_polyn M).
+  is_monic_polyn (charac_polyn M).
 Proof.
-intros * Hrz.
+intros.
 unfold is_monic_polyn.
 rewrite charac_polyn_degree.
 unfold charac_polyn.
 unfold determinant; cbn.
-remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
 now apply polyn_coeff_det_loop_xI_sub_M.
 Qed.
 
