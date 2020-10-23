@@ -6,12 +6,6 @@ Matrix.vio: Matrix.v Misc.vio SRpolynomial.vio Semiring.vio SRsummation.vio
 Matrix.vo Matrix.glob Matrix.v.beautified Matrix.required_vo: Matrix.v Misc.vo SRpolynomial.vo Semiring.vo SRsummation.vo
 Misc.vio: Misc.v 
 Misc.vo Misc.glob Misc.v.beautified Misc.required_vo: Misc.v 
-Ring2.vio: Ring2.v 
-Ring2.vo Ring2.glob Ring2.v.beautified Ring2.required_vo: Ring2.v 
-Rpolynomial2.vio: Rpolynomial2.v Misc.vio Ring2.vio Rsummation.vio
-Rpolynomial2.vo Rpolynomial2.glob Rpolynomial2.v.beautified Rpolynomial2.required_vo: Rpolynomial2.v Misc.vo Ring2.vo Rsummation.vo
-Rsummation.vio: Rsummation.v Misc.vio Ring2.vio
-Rsummation.vo Rsummation.glob Rsummation.v.beautified Rsummation.required_vo: Rsummation.v Misc.vo Ring2.vo
 SRpolynomial.vio: SRpolynomial.v Misc.vio Semiring.vio SRsummation.vio
 SRpolynomial.vo SRpolynomial.glob SRpolynomial.v.beautified SRpolynomial.required_vo: SRpolynomial.v Misc.vo Semiring.vo SRsummation.vo
 SRsummation.vio: SRsummation.v Semiring.vio Misc.vio
@@ -20,3 +14,9 @@ Semiring.vio: Semiring.v
 Semiring.vo Semiring.glob Semiring.v.beautified Semiring.required_vo: Semiring.v 
 Sensitivity.vio: Sensitivity.v Misc.vio
 Sensitivity.vo Sensitivity.glob Sensitivity.v.beautified Sensitivity.required_vo: Sensitivity.v Misc.vo
+deprecat_Ring2.vio: deprecat_Ring2.v 
+deprecat_Ring2.vo deprecat_Ring2.glob deprecat_Ring2.v.beautified deprecat_Ring2.required_vo: deprecat_Ring2.v 
+deprecat_Rpolynomial2.vio: deprecat_Rpolynomial2.v Misc.vio deprecat_Rsummation.vio
+deprecat_Rpolynomial2.vo deprecat_Rpolynomial2.glob deprecat_Rpolynomial2.v.beautified deprecat_Rpolynomial2.required_vo: deprecat_Rpolynomial2.v Misc.vo deprecat_Rsummation.vo
+deprecat_Rsummation.vio: deprecat_Rsummation.v Misc.vio
+deprecat_Rsummation.vo deprecat_Rsummation.glob deprecat_Rsummation.v.beautified deprecat_Rsummation.required_vo: deprecat_Rsummation.v Misc.vo

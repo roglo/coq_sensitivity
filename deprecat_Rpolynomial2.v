@@ -6,7 +6,7 @@ Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Import List ListNotations.
 
-Require Import Misc Ring2 Rsummation.
+Require Import Misc Ring2 deprecat_Rsummation.
 
 (* definition of a polynomial *)
 
