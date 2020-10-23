@@ -4601,13 +4601,12 @@ Theorem charac_polyn_degree : ∀ M,
   polyn_degree (charac_polyn M) = mat_nrows M.
 Proof.
 intros.
-destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
-  cbn; rewrite Hrz; cbn.
+remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
+revert M Hr.
+induction n; intros. {
+  cbn; rewrite Hr; cbn.
   now rewrite if_1_eq_0.
 }
-remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
-revert M Hr Hrz.
-induction n; intros; [ easy | clear Hrz ].
 unfold charac_polyn.
 unfold determinant; cbn.
 rewrite Hr; cbn - [ iter_seq xI_sub_M ].
@@ -4646,7 +4645,6 @@ rewrite polyn_degree_lt_add. 2: {
       rewrite polyn_degree_mat_el_xI_sub_M_0_0.
       apply Nat.lt_0_1.
     }
-    specialize (Hpd (Nat.neq_succ_0 _)).
     rewrite polyn_degree_mul. 2: {
       rewrite polyn_degree_mat_el_xI_sub_M_0_0.
       rewrite polyn_coeff_mat_el_xI_sub_M_0_0, srng_mul_1_l.
@@ -4658,8 +4656,6 @@ rewrite polyn_degree_lt_add. 2: {
     flia.
   }
   intros i Hi.
-  assert (H : n ≠ 0) by flia Hi.
-  specialize (Hpd H); clear H.
   rewrite polyn_degree_mul. 2: {
     rewrite polyn_degree_mat_el_xI_sub_M_0_0.
     rewrite polyn_coeff_mat_el_xI_sub_M_0_0, srng_mul_1_l.
@@ -4684,7 +4680,6 @@ rewrite polyn_degree_mul. 2: {
     rewrite if_1_eq_0; cbn.
     apply srng_1_neq_0.
   }
-  specialize (Hpd (Nat.neq_succ_0 _)).
   apply polyn_highest_coeff_neq_0.
   unfold so.
   now rewrite Hpd.
