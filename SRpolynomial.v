@@ -1889,6 +1889,436 @@ rewrite if_1_eq_0; cbn.
 now rewrite if_1_eq_0.
 Qed.
 
+(* *)
+
+Theorem norm_polyn_list_app_last_nz : ∀ (la lb : list T),
+  last (la ++ lb) 0%Srng ≠ 0%Srng
+  → norm_polyn_list (la ++ lb) = la ++ norm_polyn_list lb.
+Proof.
+intros * Hlb.
+revert lb Hlb.
+induction la as [| a]; intros; [ easy | ].
+cbn - [ norm_polyn_list ].
+rewrite List_cons_app.
+rewrite norm_polyn_list_app.
+remember (la ++ lb) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc as [| c]. cbn. {
+  apply app_eq_nil in Hlc.
+  destruct Hlc; subst la lb.
+  cbn in Hlb |-*.
+  now destruct (srng_eq_dec a 0).
+}
+rewrite <- Hlc.
+rewrite IHla. 2: {
+  cbn in Hlb.
+  rewrite Hlc in Hlb.
+  now rewrite <- Hlc in Hlb.
+}
+destruct lb as [| b]. {
+  cbn in Hlb.
+  rewrite Hlc in Hlb.
+  rewrite app_nil_r in Hlc.
+  now rewrite Hlc.
+}
+destruct la as [| a1]; [ | easy ].
+cbn in Hlc.
+cbn - [ norm_polyn_list ].
+remember (norm_polyn_list (b :: lb)) as ld eqn:Hld.
+symmetry in Hld.
+destruct ld as [| d]; [ | easy ].
+exfalso; apply Hlb; clear Hlb.
+clear IHla Hlc.
+revert b Hld.
+induction lb as [| b1]; intros. {
+  cbn in Hld.
+  now destruct (srng_eq_dec b 0).
+}
+cbn - [ last ].
+rewrite List_last_cons_cons.
+apply IHlb.
+cbn in Hld |-*.
+apply List_eq_rev_l in Hld.
+apply List_eq_rev_r.
+rewrite strip_0s_app in Hld.
+remember (strip_0s (rev lb ++ [b1])) as le eqn:Hle.
+symmetry in Hle.
+now destruct le.
+Qed.
+
+Theorem norm_polyn_list_id : ∀ (la : list T),
+  last la 0%Srng ≠ 0%Srng
+  → norm_polyn_list la = la.
+Proof.
+intros * Hla.
+unfold norm_polyn_list; f_equal.
+apply List_eq_rev_r.
+remember (rev la) as lb eqn:Hlb.
+apply List_eq_rev_r in Hlb; subst la.
+rename lb into la.
+rewrite List_rev_last in Hla.
+destruct la as [| a]; [ easy | ].
+cbn in Hla |-*.
+now destruct (srng_eq_dec a 0).
+Qed.
+
+Theorem norm_polyn_list_cons : ∀ (a : T) la,
+  last (a :: la) 0%Srng ≠ 0%Srng
+  → norm_polyn_list (a :: la) = a :: norm_polyn_list la.
+Proof.
+intros * Hla.
+now specialize (norm_polyn_list_app_last_nz [a] la Hla) as H.
+Qed.
+
+Theorem polyn_degree_lt_add : ∀ P Q,
+  polyn_degree Q < polyn_degree P
+  → polyn_degree (P + Q) = polyn_degree P.
+Proof.
+intros * Hdeg.
+unfold polyn_degree in Hdeg |-*.
+unfold polyn_degree_plus_1 in Hdeg |-*.
+f_equal.
+destruct P as (la, Hla).
+destruct Q as (lb, Hlb).
+move lb before la.
+cbn - [ norm_polyn_list ] in Hdeg |-*.
+unfold polyn_prop_test in Hla, Hlb.
+destruct la as [| a]; [ easy | ].
+cbn - [ nth ] in Hla.
+destruct (srng_eq_dec (nth (length la) (a :: la) 0%Srng) 0) as [Haz| Haz]. {
+  easy.
+}
+clear Hla.
+destruct lb as [| b]. {
+  rewrite polyn_list_add_0_r.
+  rewrite norm_polyn_list_id; [ easy | ].
+  now rewrite List_last_nth_cons.
+}
+cbn - [ nth ] in Hlb.
+destruct (srng_eq_dec (nth (length lb) (b :: lb) 0%Srng) 0) as [Hbz| Hbz]. {
+  easy.
+}
+clear Hlb.
+cbn in Hdeg.
+do 2 rewrite Nat.sub_0_r in Hdeg.
+rewrite <- List_last_nth_cons in Haz.
+rewrite <- List_last_nth_cons in Hbz.
+cbn - [ norm_polyn_list ].
+revert a b lb Haz Hbz Hdeg.
+induction la as [| a1]; intros; [ easy | ].
+destruct lb as [| b1]. {
+  cbn - [ norm_polyn_list ].
+  now rewrite norm_polyn_list_id.
+}
+cbn - [ norm_polyn_list ].
+cbn in Hdeg.
+apply Nat.succ_lt_mono in Hdeg.
+rewrite List_last_cons_cons in Haz, Hbz.
+specialize (IHla a1 b1 lb Haz Hbz Hdeg).
+rewrite norm_polyn_list_cons. {
+  cbn - [ norm_polyn_list ].
+  now rewrite IHla.
+}
+rewrite List_last_cons_cons.
+clear - so Haz Hdeg.
+revert lb a1 b1 Haz Hdeg.
+induction la as [| a]; intros; [ easy | cbn ].
+destruct lb as [| b]; [ easy | ].
+remember (a :: la) as x; cbn in Haz; subst x.
+cbn in Hdeg.
+apply Nat.succ_lt_mono in Hdeg.
+now apply IHla.
+Qed.
+
+(* normalized list is smaller than the list *)
+
+Theorem norm_polyn_list_length_le : ∀ la,
+  length (norm_polyn_list la) ≤ length la.
+Proof.
+intros.
+induction la as [| a] using rev_ind; [ easy | ].
+rewrite norm_polyn_list_app, app_length; cbn.
+destruct (srng_eq_dec a 0%Srng) as [Hz| Hz]. {
+  cbn; flia IHla.
+}
+cbn.
+now rewrite app_length.
+Qed.
+
+(* degree of sum and summation upper bound *)
+
+Theorem polyn_degree_add_ub : ∀ P Q,
+  polyn_degree (P + Q) ≤ max (polyn_degree P) (polyn_degree Q).
+Proof.
+intros (la, Hla) (lb, Hlb).
+move lb before la.
+cbn - [ "+"%PL ].
+rewrite Nat.sub_max_distr_r.
+apply Nat.sub_le_mono_r.
+destruct la as [| a]. {
+  clear Hla.
+  rewrite Nat.max_r; [ | cbn; flia ].
+  rewrite polyn_list_add_0_l.
+  destruct lb as [| b]; [ easy | ].
+  cbn - [ nth ] in Hlb.
+  destruct (srng_eq_dec (nth (length lb) (b :: lb) 0%Srng) 0)
+    as [| H]; [ easy | clear Hlb ].
+  rewrite <- List_last_nth_cons in H.
+  rewrite norm_polyn_list_cons; [ cbn | easy ].
+  apply -> Nat.succ_le_mono.
+  apply norm_polyn_list_length_le.
+}
+cbn - [ nth ] in Hla.
+destruct (srng_eq_dec (nth (length la) (a :: la) 0%Srng) 0)
+  as [Haz| Haz]; [ easy | clear Hla ].
+rewrite <- List_last_nth_cons in Haz.
+destruct lb as [| b]. {
+  cbn - [ norm_polyn_list ].
+  clear Hlb.
+  revert a Haz.
+  induction la as [| a1]; intros. {
+    cbn in Haz |-*.
+    now destruct (srng_eq_dec a 0).
+  }
+  rewrite List_last_cons_cons in Haz.
+  rewrite norm_polyn_list_cons; [ | easy ].
+  remember (a1 :: la) as lc; cbn; subst lc.
+  apply -> Nat.succ_le_mono.
+  now apply IHla.
+}
+cbn - [ nth ] in Hlb.
+destruct (srng_eq_dec (nth (length lb) (b :: lb) 0%Srng) 0)
+  as [Hbz| Hbz]; [ easy | clear Hlb ].
+rewrite <- List_last_nth_cons in Hbz.
+move b before a.
+revert a b lb Haz Hbz.
+induction la as [| a1]; intros. {
+  cbn in Haz.
+  cbn - [ norm_polyn_list ].
+  remember (a + b)%Srng as c; clear Heqc.
+  revert b c Hbz.
+  induction lb as [| b1]; intros. {
+    cbn in Hbz |-*.
+    destruct (srng_eq_dec c 0); cbn; flia.
+  }
+  rewrite norm_polyn_list_cons; [ | easy ].
+  rewrite List_last_cons_cons in Hbz.
+  remember (b1 :: lb) as lc; cbn; subst lc.
+  apply -> Nat.succ_le_mono.
+  now apply (IHlb b1).
+}
+rewrite List_last_cons_cons in Haz.
+remember (a1 :: la) as lc.
+cbn - [ norm_polyn_list ].
+subst lc.
+destruct lb as [| b1]. {
+  rewrite polyn_list_add_0_r.
+  cbn in Hbz.
+  rewrite norm_polyn_list_cons; [ | easy ].
+  cbn - [ norm_polyn_list ] in IHla |-*.
+  apply -> Nat.succ_le_mono.
+  clear IHla.
+  revert a1 Haz.
+  induction la as [| a2]; intros. {
+    cbn.
+    now destruct (srng_eq_dec a1 0).
+  }
+  rewrite List_last_cons_cons in Haz.
+  rewrite norm_polyn_list_cons; [ | easy ].
+  cbn - [ norm_polyn_list ].
+  apply -> Nat.succ_le_mono.
+  now apply IHla.
+}
+rewrite List_last_cons_cons in Hbz.
+specialize (IHla _ _ _ Haz Hbz).
+apply Nat.succ_le_mono in IHla.
+etransitivity; [ | apply IHla ].
+remember ((a1 :: la) + (b1 :: lb))%PL as lc eqn:Hlc.
+remember (a + b)%Srng as c; clear a b Heqc.
+clear.
+revert c.
+induction lc as [| c1] using rev_ind; intros. {
+  cbn.
+  now destruct (srng_eq_dec c 0); cbn; flia.
+}
+destruct (srng_eq_dec c1 0) as [Hz| Hz]. {
+  subst c1.
+  rewrite app_comm_cons.
+  do 2 rewrite norm_polyn_list_app.
+  cbn - [ norm_polyn_list ].
+  unfold norm_polyn_list at 1 3.
+  cbn - [ norm_polyn_list ].
+  unfold so.
+  rewrite if_0_eq_0.
+  cbn - [ norm_polyn_list ].
+  apply IHlc.
+}
+rewrite app_comm_cons.
+do 2 rewrite norm_polyn_list_app.
+cbn - [ norm_polyn_list ].
+unfold norm_polyn_list at 1 3.
+cbn - [ norm_polyn_list ].
+unfold so.
+now destruct (srng_eq_dec c1 0).
+Qed.
+
+(* highest coefficient *)
+
+Definition polyn_highest_coeff P :=
+  polyn_coeff P (polyn_degree P).
+
+Theorem polyn_highest_coeff_neq_0 : ∀ (P : polynomial T),
+  polyn_degree P ≠ 0
+  → polyn_highest_coeff P ≠ 0%Srng.
+Proof.
+intros (la, Hla) Hd.
+cbn in Hla, Hd |-*.
+destruct la as [| a] using rev_ind; [ easy | clear IHla ].
+rewrite <- List_last_nth, List_last_app.
+rewrite app_length, Nat.add_comm in Hla.
+cbn in Hla.
+rewrite app_nth2 in Hla; [ | now unfold ge ].
+rewrite Nat.sub_diag in Hla; cbn in Hla.
+now destruct (srng_eq_dec a 0).
+Qed.
+
+Theorem polyn_degree_add_not_cancel : ∀ P Q,
+  polyn_degree P = polyn_degree Q
+  → (polyn_highest_coeff P + polyn_highest_coeff Q ≠ 0)%Srng
+  → polyn_degree (P + Q) = polyn_degree P.
+Proof.
+intros (la, Hla) (lb, Hlb) HPQ HCPQ.
+move lb before la.
+cbn - [ norm_polyn_list ] in *.
+destruct la as [| a] using rev_ind. {
+  cbn in HPQ, HCPQ |-*.
+  rewrite rev_length.
+  destruct lb as [| b]; [ easy | cbn ].
+  cbn in HPQ; rewrite Nat.sub_0_r in HPQ.
+  symmetry in HPQ.
+  apply length_zero_iff_nil in HPQ; subst lb.
+  cbn in Hlb, HCPQ |-*.
+  now destruct (srng_eq_dec b 0).
+}
+clear IHla.
+rewrite app_length in Hla, HCPQ, HPQ.
+rewrite Nat.add_1_r in Hla; cbn in Hla.
+rewrite Nat.add_sub in HPQ, HCPQ.
+rewrite app_nth2 in Hla; [ | now unfold ge ].
+rewrite app_nth2 in HCPQ; [ | now unfold ge ].
+rewrite Nat.sub_diag in Hla; cbn in Hla.
+rewrite Nat.sub_diag in HCPQ; cbn in HCPQ.
+destruct lb as [| b] using rev_ind. {
+  apply length_zero_iff_nil in HPQ; subst la; cbn.
+  now destruct (srng_eq_dec a 0).
+}
+clear IHlb.
+move b before a.
+rewrite app_length in Hlb, HCPQ, HPQ.
+rewrite Nat.add_1_r in Hlb; cbn in Hlb.
+rewrite Nat.add_sub in HPQ, HCPQ.
+rewrite app_nth2 in Hlb; [ | now unfold ge ].
+rewrite app_nth2 in HCPQ; [ | now unfold ge ].
+rewrite Nat.sub_diag in Hlb; cbn in Hlb.
+rewrite Nat.sub_diag in HCPQ; cbn in HCPQ.
+rewrite app_length, Nat.add_sub.
+rewrite polyn_list_add_app_l.
+rewrite firstn_app, HPQ, firstn_all, Nat.sub_diag, firstn_O, app_nil_r.
+rewrite skipn_app, skipn_all, app_nil_l, Nat.sub_diag, skipn_O; cbn.
+rewrite norm_polyn_list_app; cbn.
+destruct (srng_eq_dec (a + b) 0) as [H| H]; [ easy | clear H; cbn ].
+rewrite app_length, Nat.add_sub.
+rewrite polyn_list_add_length, max_r; [ easy | ].
+now rewrite HPQ.
+Qed.
+
+Theorem polyn_degree_add_compat : ∀ Pa Pb Qa Qb,
+  polyn_degree Pa = polyn_degree Pb
+  → polyn_degree Qa = polyn_degree Qb
+  → (polyn_highest_coeff Pa + polyn_highest_coeff Qa)%Srng ≠ 0%Srng
+  → (polyn_highest_coeff Pb + polyn_highest_coeff Qb)%Srng ≠ 0%Srng
+  → polyn_degree (Pa + Qa) = polyn_degree (Pb + Qb).
+Proof.
+intros * HP HQ Hha Hhb.
+destruct (lt_dec (polyn_degree Pa) (polyn_degree Qa)) as [HPQ| HPQ]. {
+  rewrite polyn_add_comm.
+  rewrite polyn_degree_lt_add; [ | easy ].
+  rewrite polyn_add_comm.
+  rewrite polyn_degree_lt_add; [ easy | ].
+  now rewrite <- HP, <- HQ.
+}
+apply Nat.nlt_ge in HPQ.
+destruct (lt_dec (polyn_degree Qa) (polyn_degree Pa)) as [HQP| HQP]. {
+  rewrite polyn_degree_lt_add; [ | easy ].
+  rewrite polyn_degree_lt_add; [ easy | ].
+  now rewrite <- HP, <- HQ.
+}
+apply Nat.nlt_ge in HQP.
+apply Nat.le_antisymm in HPQ; [ clear HQP | easy ].
+rewrite polyn_degree_add_not_cancel; [ | easy | easy ].
+rewrite polyn_degree_add_not_cancel; [ | congruence | easy ].
+congruence.
+Qed.
+
+Theorem polyn_degree_add_le_compat : ∀ P P' Q Q',
+  polyn_degree P ≤ polyn_degree P'
+  → polyn_degree Q ≤ polyn_degree Q'
+  → (polyn_highest_coeff P' + polyn_highest_coeff Q')%Srng ≠ 0%Srng
+  → polyn_degree (P + Q) ≤ polyn_degree (P' + Q').
+Proof.
+intros * HP HQ Hhb.
+destruct (lt_dec (polyn_degree P) (polyn_degree Q)) as [HPQ| HPQ]. {
+  rewrite polyn_add_comm.
+  rewrite polyn_degree_lt_add; [ | easy ].
+  rewrite polyn_add_comm.
+  destruct (lt_dec (polyn_degree Q') (polyn_degree P')) as [HQP| HQP]. {
+    rewrite polyn_add_comm, polyn_degree_lt_add; [ | easy ].
+    etransitivity; [ apply HQ | ].
+    now apply Nat.lt_le_incl.
+  }
+  apply Nat.nlt_ge in HQP.
+  destruct (lt_dec (polyn_degree P') (polyn_degree Q')) as [H| H]. {
+    now rewrite polyn_degree_lt_add.
+  }
+  apply Nat.nlt_ge in H.
+  apply Nat.le_antisymm in HQP; [ clear H | easy ].
+  rewrite polyn_degree_add_not_cancel; [ | easy | now rewrite srng_add_comm ].
+  easy.
+}
+apply Nat.nlt_ge in HPQ.
+destruct (lt_dec (polyn_degree Q) (polyn_degree P)) as [HQP| HQP]. {
+  rewrite polyn_degree_lt_add; [ | easy ].
+  rewrite polyn_add_comm.
+  destruct (lt_dec (polyn_degree Q') (polyn_degree P')) as [HQP'| HQP']. {
+    now rewrite polyn_add_comm, polyn_degree_lt_add.
+  }
+  apply Nat.nlt_ge in HQP'.
+  destruct (lt_dec (polyn_degree P') (polyn_degree Q')) as [H| H]. {
+    rewrite polyn_degree_lt_add; [ | easy ].
+    etransitivity; [ apply HP | easy ].
+  }
+  apply Nat.nlt_ge in H.
+  apply Nat.le_antisymm in HQP'; [ clear H | easy ].
+  rewrite polyn_degree_add_not_cancel; [ | easy | now rewrite srng_add_comm ].
+  congruence.
+}
+apply Nat.nlt_ge in HQP.
+apply Nat.le_antisymm in HPQ; [ clear HQP | easy ].
+etransitivity; [ apply polyn_degree_add_ub | ].
+rewrite max_l; [ | now rewrite HPQ ].
+destruct (lt_dec (polyn_degree Q') (polyn_degree P')) as [HQP'| HQP']. {
+  now rewrite polyn_degree_lt_add.
+}
+apply Nat.nlt_ge in HQP'.
+destruct (lt_dec (polyn_degree P') (polyn_degree Q')) as [H| H]. {
+  rewrite polyn_add_comm, polyn_degree_lt_add; [ | easy ].
+  etransitivity; [ apply HP | easy ].
+}
+apply Nat.nlt_ge in H.
+apply Nat.le_antisymm in HQP'; [ clear H | easy ].
+now rewrite polyn_degree_add_not_cancel.
+Qed.
+
 End in_ring.
 
 Module polynomial_Notations.
