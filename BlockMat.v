@@ -4683,6 +4683,7 @@ replace (polyn_degree P) with n. 2: {
   now specialize (H1 (Nat.neq_succ_0 _)).
 }
 split; [ | easy ].
+(* voir si on peut pas avoir ce théorème uniquement avec polyn_degree *)
 ...
 
 (* the list of coefficients of the characteristic polynomial of a matrix M
