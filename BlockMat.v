@@ -5,9 +5,14 @@
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
-Require Import Utf8 (* Arith *).
+Require Import Utf8 Arith.
+Import List List.ListNotations.
+Require Import Init.Nat.
+Require Import Relations.
 
+Require Import Misc.
 Require Import Matrix.
+Require Import Semiring SRsummation.
 
 (* block matrices *)
 
@@ -49,6 +54,15 @@ Fixpoint list_list_of_bmat T (MM : bmatrix T) : list (list T) :=
       in
       List.concat ll
   end.
+
+Section in_ring.
+
+Context {T : Type}.
+Context {ro : ring_op T}.
+Context (so := rng_semiring).
+Context {sp : @semiring_prop T (@rng_semiring T ro)}.
+Context {rp : @ring_prop T ro}.
+Existing Instance so.
 
 (* addition of block matrices *)
 
@@ -141,6 +155,7 @@ induction BM as [x| M IHBM] using bmatrix_ind2. {
   now apply IHBM.
 }
 Qed.
+
 
 Definition bmat_sub BMA BMB :=
   bmat_add BMA (bmat_opp BMB).
@@ -2956,19 +2971,7 @@ rewrite IHn.
 apply rng_opp_0.
 Qed.
 
-Module bmatrix_Notations.
-
-Declare Scope BM_scope.
-Delimit Scope BM_scope with BM.
-
-Notation "A + B" := (bmat_add A B) : BM_scope.
-Notation "A - B" := (bmat_sub A B) : BM_scope.
-Notation "A * B" := (bmat_mul A B) : BM_scope.
-Notation "- A" := (bmat_opp A) : BM_scope.
-
-End bmatrix_Notations.
-
-Import bmatrix_Notations.
+End in_ring.
 
 Module bmatrix_Notations.
 
