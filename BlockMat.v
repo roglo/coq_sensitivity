@@ -3457,7 +3457,6 @@ rewrite norm_polyn_list_cons. {
   cbn - [ norm_polyn_list ].
   now rewrite IHla.
 }
-(**)
 rewrite List_last_cons_cons.
 clear - so Haz Hdeg.
 revert lb a1 b1 Haz Hdeg.
@@ -3718,7 +3717,6 @@ destruct (srng_eq_dec (last l 0%Srng) 0) as [Hlab| Hlab]. 2: {
   subst l.
   rewrite norm_polyn_list_cons; [ | easy ].
   cbn; rewrite Nat.sub_0_r.
-(**)
   remember (_ :: _) as l in Hlab.
   symmetry in Heql.
   destruct l as [| x]; [ easy | ].
@@ -4662,77 +4660,29 @@ rewrite polyn_degree_lt_add. 2: {
   apply -> Nat.le_succ_l in Hi.
   now apply polyn_degree_det_loop_subm_xI_sub_M_succ_r_le.
 }
-...
-    rewrite polyn_degree_of_single, Nat.add_0_l.
-  destruct i; [ easy | ].
-  destruct Hi as (_, Hi).
-  apply Nat.succ_le_mono in Hi.
-...
-  rewrite polyn_degree_mul. 2: {
-    destruct n. {
-      cbn in HM'; subst M'.
-      cbn - [ polyn_coeff xI_sub_M ].
-      rewrite if_1_eq_0.
-      cbn - [ polyn_coeff xI_sub_M ].
-      remember (polyn_coeff 1 0) as x eqn:Hx; cbn in Hx.
-      rewrite if_1_eq_0 in Hx; cbn in Hx; subst x.
-      rewrite srng_mul_1_r.
-      rewrite polyn_degree_mat_el_xI_sub_M_0_0.
-      rewrite polyn_coeff_mat_el_xI_sub_M_0_0.
-      apply srng_1_neq_0.
-    }
-    assert (H : S n ≠ 0) by easy.
-    specialize (H1 H); clear H.
-    destruct H1 as (Hmp, Hpd).
-    unfold is_monic_polyn in Hmp.
-    unfold so in Hmp.
-    rewrite Hmp, srng_mul_1_r.
-    rewrite polyn_degree_mat_el_xI_sub_M_0_0.
-    rewrite polyn_coeff_mat_el_xI_sub_M_0_0.
+rewrite polyn_degree_mul. 2: {
+  rewrite polyn_degree_mat_el_xI_sub_M_0_0.
+  rewrite polyn_coeff_mat_el_xI_sub_M_0_0.
+  rewrite srng_mul_1_l.
+  destruct n. {
+    cbn in HP; subst P; cbn.
+    rewrite if_1_eq_0; cbn.
     apply srng_1_neq_0.
   }
-  rewrite polyn_degree_mat_el_xI_sub_M_0_0.
-  destruct n; [ apply Nat.lt_0_succ | ].
-  assert (H : S n ≠ 0) by easy.
-  specialize (H1 H); clear H.
+  specialize (H1 (Nat.neq_succ_0 _)).
   destruct H1 as (Hmp, Hpd).
-  rewrite Hpd.
-  erewrite srng_summation_eq_compat. 2: {
-    intros i Hi.
-    replace (mat_el (xI_sub_M M) 0 i) with (- polyn_of_list [mat_el M 0 i])%P.
-    2: {
-      unfold xI_sub_M; cbn.
-      destruct i; [ easy | ].
-      specialize (polyn_of_list_repeat_0s 1) as H.
-      cbn in H; rewrite H; clear H.
-      rewrite polyn_mul_0_r.
-      now rewrite srng_add_0_l.
-    }
-    rewrite rng_mul_opp_r.
-    rewrite rng_mul_opp_l.
-    easy.
-  }
-  cbn - [ iter_seq det_loop ].
-  rewrite <- rng_opp_summation.
-  set (P := (Σ (i = 1, S n), _)%Rng).
-  cbn - [ polyn_degree P ].
-  rewrite polyn_degree_opp; subst P.
-  eapply le_lt_trans; [ apply polyn_degree_summation_ub | ].
-  cbn - [ fold_left polyn_degree det_loop ].
-  apply Nat.lt_succ_r.
-  apply Max_lub_le.
-  intros i Hi.
-  rewrite <- polyn_mul_assoc.
-  etransitivity; [ apply polyn_degree_mul_le | ].
-  rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
-  etransitivity; [ apply polyn_degree_mul_le | ].
-  rewrite polyn_degree_of_single, Nat.add_0_l.
-  destruct i; [ easy | ].
-  destruct Hi as (_, Hi).
-  apply Nat.succ_le_mono in Hi.
-...
-  now apply polyn_degree_det_loop_subm_xI_sub_M_succ_r_le.
+  rewrite Hmp.
+  apply srng_1_neq_0.
 }
+rewrite polyn_degree_mat_el_xI_sub_M_0_0.
+replace (polyn_degree P) with n. 2: {
+  destruct n. {
+    subst P; cbn.
+    now rewrite if_1_eq_0.
+  }
+  now specialize (H1 (Nat.neq_succ_0 _)).
+}
+split; [ | easy ].
 ...
 
 (* the list of coefficients of the characteristic polynomial of a matrix M
