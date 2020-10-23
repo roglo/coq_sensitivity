@@ -253,6 +253,11 @@ Notation "1" := ([1%Srng]) : polyn_list_scope.
 Notation "la + lb" := (polyn_list_add la lb) : polyn_list_scope.
 Notation "la * lb" := (polyn_list_mul la lb) : polyn_list_scope.
 
+Notation "'Σ' ( i = b , e ) , g" :=
+  (iter_seq b e (λ c i, (c + g)%P) 0%P)
+  (at level 45, i at level 0, b at level 60, e at level 60) :
+     polynomial_scope.
+
 Arguments polyn_degree {T so sdp} P%P.
 
 (* semiring and ring of polynomials *)
@@ -1796,6 +1801,8 @@ Definition polyn_semiring_prop : semiring_prop (polynomial T) :=
      srng_mul_add_distr_l := polyn_mul_add_distr_l;
      srng_mul_0_l := polyn_mul_0_l |}.
 
+Existing Instance polyn_semiring_prop.
+
 Theorem polyn_add_opp_l : ∀ P : polynomial T, (- P + P)%P = 0%P.
 Proof.
 intros.
@@ -1822,6 +1829,8 @@ Qed.
 
 Definition polyn_ring_prop : ring_prop (polynomial T) :=
   {| rng_add_opp_l := polyn_add_opp_l |}.
+
+Existing Instance polyn_ring_prop.
 
 Theorem polyn_eq_dec : ∀ P Q : polynomial T, {P = Q} + {P ≠ Q}.
 Proof.
@@ -2421,6 +2430,33 @@ destruct (lt_dec (j - k) (length lb)) as [Hjkb| Hjkb]. 2: {
   apply srng_mul_0_r.
 }
 flia Hlen Hj Hka Hjkb.
+Qed.
+
+(* degree of monomial "x" *)
+
+Theorem polyn_degree_monom : polyn_degree _x = 1.
+Proof.
+now cbn; rewrite if_1_eq_0.
+Qed.
+
+Theorem polyn_degree_summation_ub : ∀ b e f,
+  polyn_degree (Σ (i = b, e), f i) ≤ Max (i = b, e), polyn_degree (f i).
+Proof.
+intros.
+unfold iter_seq.
+remember (S e - b) as len eqn:Hlen.
+clear e Hlen.
+revert b.
+induction len; intros; [ cbn; flia | ].
+cbn; rewrite polyn_add_0_l.
+rewrite fold_left_srng_add_fun_from_0.
+rewrite fold_left_max_fun_from_0.
+cbn - [ polyn_degree ].
+rewrite polyn_add_comm.
+etransitivity; [ apply polyn_degree_add_ub | ].
+rewrite Nat.max_comm.
+apply Nat.max_le_compat_l.
+apply IHlen.
 Qed.
 
 End in_ring.

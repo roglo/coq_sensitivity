@@ -3614,33 +3614,6 @@ destruct lc as [| c]; [ now destruct (srng_eq_dec (a * b) 0) | ].
 now cbn; rewrite rev_app_distr; cbn.
 Qed.
 
-(* degree of monomial "x" *)
-
-Theorem polyn_degree_monom : polyn_degree _x = 1.
-Proof.
-now cbn; rewrite if_1_eq_0.
-Qed.
-
-Theorem polyn_degree_summation_ub : ∀ b e f,
-  polyn_degree (Σ (i = b, e), f i) ≤ Max (i = b, e), polyn_degree (f i).
-Proof.
-intros.
-unfold iter_seq.
-remember (S e - b) as len eqn:Hlen.
-clear e Hlen.
-revert b.
-induction len; intros; [ cbn; flia | ].
-cbn; rewrite polyn_add_0_l.
-rewrite fold_left_srng_add_fun_from_0.
-rewrite fold_left_max_fun_from_0.
-cbn - [ polyn_degree ].
-rewrite polyn_add_comm.
-etransitivity; [ apply polyn_degree_add_ub | ].
-rewrite Nat.max_comm.
-apply Nat.max_le_compat_l.
-apply IHlen.
-Qed.
-
 Theorem polyn_degree_minus_one_pow : ∀ i,
   polyn_degree (minus_one_pow i) = 0.
 Proof.
