@@ -4542,6 +4542,58 @@ assert
         rewrite polyn_degree_mat_el_subm_xI_sub_M_0_succ_0_0.
         apply Nat.le_0_l.
       }
+      cbn - [ xI_sub_M ].
+      destruct (lt_dec (S j) (S i)) as [Hji| Hji]. {
+        cbn - [ polyn_degree mI ].
+        destruct j. {
+          rewrite polyn_degree_lt_add. 2: {
+            rewrite polyn_degree_opp.
+            rewrite polyn_degree_of_single.
+            rewrite polyn_degree_mul. 2: {
+              rewrite polyn_degree_of_single.
+              rewrite polyn_coeff_of_single.
+              remember (polyn_coeff _ _) as x eqn:Hx.
+              cbn in Hx.
+              rewrite if_1_eq_0 in Hx; cbn in Hx; subst x.
+              rewrite srng_mul_1_l.
+              apply srng_1_neq_0.
+            }
+            cbn.
+            rewrite if_1_eq_0; cbn.
+            apply Nat.lt_0_succ.
+          }
+          rewrite polyn_degree_mul. 2: {
+            rewrite polyn_degree_of_single.
+            rewrite polyn_coeff_of_single.
+            remember (polyn_coeff _ _) as x eqn:Hx.
+            cbn in Hx.
+            rewrite if_1_eq_0 in Hx; cbn in Hx; subst x.
+            rewrite srng_mul_1_l.
+            apply srng_1_neq_0.
+          }
+          cbn.
+          rewrite if_1_eq_0; cbn.
+          rewrite if_1_eq_0; cbn.
+          easy.
+        }
+        cbn - [ polyn_degree ].
+        rewrite polyn_of_list_0, polyn_mul_0_r, polyn_add_0_l.
+        rewrite polyn_degree_opp.
+        rewrite polyn_degree_of_single.
+        apply Nat.le_0_1.
+      }
+      apply Nat.nlt_ge in Hji.
+      rewrite Nat.add_1_r.
+      cbn - [ polyn_degree ].
+      rewrite polyn_of_list_0, polyn_mul_0_r, polyn_add_0_l.
+      rewrite polyn_degree_opp.
+      rewrite polyn_degree_of_single.
+      apply Nat.le_0_1.
+    }
+    cbn.
+    destruct (lt_dec j m) as [Hjm| Hjm]. {
+      cbn.
+...
 Search (polyn_degree (mat_el _ _ _)).
 ...
 apply (H [k; j]).
