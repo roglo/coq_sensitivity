@@ -4299,6 +4299,24 @@ rewrite polyn_coeff_overflow. 2: {
 }
 rewrite srng_add_0_l.
 ...
+cbn; rewrite if_1_eq_0.
+cbn; rewrite if_1_eq_0; cbn.
+rewrite srng_add_0_l, srng_mul_0_l, srng_mul_1_l.
+rewrite srng_add_0_l, srng_mul_0_l, srng_add_0_l.
+rewrite if_1_eq_0; cbn.
+destruct (srng_eq_dec (mat_el M 0 0) 0) as [Hmz| Hmz]. {
+  cbn; rewrite if_1_eq_0; cbn.
+  rewrite srng_add_0_l, srng_mul_0_l.
+  rewrite strip_0s_app.
+  rewrite HP; cbn.
+...
+  rewrite <- map_rev.
+cbn - [ polyn_coeff ].
+rewrite polyn_mul_1_r.
+
+unfold "*"%P, "*"%PL.
+unfold polyn_coeff.
+...
   rewrite <- polyn_mul_assoc.
   rewrite polyn_degree_mul. 2: {
     rewrite polyn_degree_minus_one_pow.
