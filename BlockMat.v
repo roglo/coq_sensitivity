@@ -4608,6 +4608,7 @@ rewrite srng_summation_split_first; [ | apply Nat.le_0_l ].
 remember (det_loop (subm (xI_sub_M M) 0 0) n) as P eqn:HP.
 cbn - [ is_monic_polyn polyn_degree xI_sub_M iter_seq ].
 rewrite srng_mul_1_l.
+unfold is_monic_polyn.
 rewrite polyn_degree_lt_add. 2: {
   eapply le_lt_trans; [ apply polyn_degree_summation_ub | ].
   cbn - [ iter_seq polyn_degree mat_el ].
@@ -4661,9 +4662,6 @@ rewrite polyn_degree_lt_add. 2: {
   apply -> Nat.le_succ_l in Hi.
   now apply polyn_degree_det_loop_subm_xI_sub_M_succ_r_le.
 }
-...
-Search (max _ _ < _).
-Nat.max_lub_lt: ∀ n m p : nat, n < p → m < p → Nat.max n m < p
 ...
     rewrite polyn_degree_of_single, Nat.add_0_l.
   destruct i; [ easy | ].
