@@ -258,6 +258,7 @@ Notation "'Σ' ( i = b , e ) , g" :=
   (at level 45, i at level 0, b at level 60, e at level 60) :
      polynomial_scope.
 
+Arguments polyn_coeff {T so sdp} P%P i%nat.
 Arguments polyn_degree {T so sdp} P%P.
 
 (* semiring and ring of polynomials *)
@@ -2457,6 +2458,21 @@ etransitivity; [ apply polyn_degree_add_ub | ].
 rewrite Nat.max_comm.
 apply Nat.max_le_compat_l.
 apply IHlen.
+Qed.
+
+Theorem polyn_coeff_opp : ∀ P i,
+  polyn_coeff (- P) i = (- polyn_coeff P i)%Rng.
+Proof.
+intros (la, Hla) *; cbn.
+unfold polyn_coeff.
+destruct (lt_dec i (length la)) as [Hila| Hila]. {
+  now rewrite (List_map_nth_in _ 0%Rng).
+}
+apply Nat.nlt_ge in Hila.
+rewrite nth_overflow; [ | now rewrite map_length ].
+rewrite nth_overflow; [ | easy ].
+symmetry.
+apply rng_opp_0.
 Qed.
 
 End in_ring.

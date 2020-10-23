@@ -3329,21 +3329,6 @@ Qed.
 
 (* to be moved to SRpolynomial.v *)
 
-Theorem polyn_coeff_opp : ∀ P i,
-  polyn_coeff (- P) i = (- polyn_coeff P i)%Rng.
-Proof.
-intros (la, Hla) *; cbn.
-unfold polyn_coeff.
-destruct (lt_dec i (length la)) as [Hila| Hila]. {
-  now rewrite (List_map_nth_in _ 0%Rng).
-}
-apply Nat.nlt_ge in Hila.
-rewrite nth_overflow; [ | now rewrite map_length ].
-rewrite nth_overflow; [ | easy ].
-symmetry.
-apply rng_opp_0.
-Qed.
-
 Theorem is_monic_polyn_add : ∀ (P Q : polynomial T),
   polyn_degree Q < polyn_degree P
   → is_monic_polyn P
