@@ -2319,6 +2319,61 @@ apply Nat.le_antisymm in HQP'; [ clear H | easy ].
 now rewrite polyn_degree_add_not_cancel.
 Qed.
 
+(* *)
+
+Theorem nth_norm_polyn_list_map : ∀ i len f,
+  (∀ i, len ≤ i → f i = 0%Srng)
+  → nth i (norm_polyn_list (map f (seq 0 len))) 0%Srng = f i.
+Proof.
+intros * Hf.
+revert i.
+induction len; intros. {
+  cbn; rewrite match_id; symmetry.
+  apply Hf, Nat.le_0_l.
+}
+rewrite List_seq_succ_r.
+rewrite map_app.
+rewrite norm_polyn_list_app.
+cbn - [ norm_polyn_list ].
+unfold norm_polyn_list at 1.
+cbn - [ norm_polyn_list ].
+destruct (srng_eq_dec (f len) 0) as [Hfz| Hfz]. {
+  cbn - [ norm_polyn_list ].
+  apply IHlen.
+  intros j Hj.
+  destruct (Nat.eq_dec j len) as [Hjlen| Hjlen]. {
+    now rewrite Hjlen.
+  }
+  apply Hf.
+  flia Hj Hjlen.
+}
+cbn.
+destruct (lt_dec i len) as [Hilen| Hilen]. {
+  rewrite app_nth1; [ | now rewrite map_length, seq_length ].
+  rewrite (List_map_nth_in _ 0); [ | now rewrite seq_length ].
+  now rewrite seq_nth.
+}
+apply Nat.nlt_ge in Hilen.
+rewrite app_nth2; [ | now rewrite map_length, seq_length ].
+rewrite map_length, seq_length.
+destruct (Nat.eq_dec i len) as [Hiel| Hiel]. {
+  now rewrite Hiel, Nat.sub_diag.
+}
+rewrite nth_overflow; [ | cbn; flia Hilen Hiel ].
+symmetry.
+apply Hf.
+flia Hilen Hiel.
+Qed.
+
+Theorem polyn_coeff_overflow : ∀ P n,
+  polyn_degree P < n
+  → polyn_coeff P n = 0%Srng.
+Proof.
+intros (la, Hla) n Hpn.
+cbn in Hpn |-*.
+rewrite nth_overflow; [ easy | flia Hpn ].
+Qed.
+
 End in_ring.
 
 Module polynomial_Notations.
