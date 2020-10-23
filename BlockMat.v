@@ -4401,6 +4401,16 @@ Theorem fold_determinant : ∀ T {ro : ring_op T} (M : matrix T),
   det_loop M (mat_nrows M) = determinant M.
 Proof. easy. Qed.
 
+Fixpoint repeat_subm T (M : matrix T) l :=
+  match l with
+  | [] => M
+  | i :: l' => subm (repeat_subm M l') 0 i
+  end.
+
+Theorem subm_repeat_subm : ∀ T (M : matrix T) l i,
+  subm (repeat_subm M l) 0 i = repeat_subm M (i :: l).
+Proof. easy. Qed.
+
 Theorem polyn_degree_det_loop_subm_xI_sub_M_succ_r_le : ∀ i n M,
   mat_nrows M = S n
   → i < n
@@ -4508,18 +4518,14 @@ etransitivity. {
   apply Nat.le_0_l.
 }
 apply -> Nat.succ_le_mono.
-Fixpoint repeat_subm T (M : matrix T) l :=
-  match l with
-  | [] => M
-  | i :: l' => subm (repeat_subm M l') 0 i
-  end.
+(*aa*)
 assert
   (∀ l,
    polyn_degree (det_loop (repeat_subm (subm (xI_sub_M M) 0 (S i)) l) n) ≤ n). {
   clear IHn.
   intros l.
-  clear Hr Hj Hk.
-  revert i l Hi.
+  clear Hr Hi Hj Hk.
+  revert i l.
   induction n; intros; [ now cbn; rewrite if_1_eq_0 | ].
   cbn - [ iter_seq repeat_subm ].
   etransitivity; [ apply polyn_degree_summation_ub | ].
@@ -4535,69 +4541,49 @@ assert
   etransitivity. {
     apply (Nat.add_le_mono_r _ 1).
     clear IHn.
-    revert i j n Hi Hj.
+    clear k.
+    enough
+      (∀ k,
+       polyn_degree (mat_el (repeat_subm (subm (xI_sub_M M) 0 (S i)) l) k j) ≤
+       1) by apply H.
+    intros k.
+    clear Hj.
+    revert (*i*) j k (*n Hi Hj*).
     induction l as [| m]; intros. {
-      cbn - [ subm ].
-      destruct j. {
-        rewrite polyn_degree_mat_el_subm_xI_sub_M_0_succ_0_0.
-        apply Nat.le_0_l.
-      }
-      cbn - [ xI_sub_M ].
-      destruct (lt_dec (S j) (S i)) as [Hji| Hji]. {
-        cbn - [ polyn_degree mI ].
-        destruct j. {
-          rewrite polyn_degree_lt_add. 2: {
-            rewrite polyn_degree_opp.
-            rewrite polyn_degree_of_single.
-            rewrite polyn_degree_mul. 2: {
-              rewrite polyn_degree_of_single.
-              rewrite polyn_coeff_of_single.
-              remember (polyn_coeff _ _) as x eqn:Hx.
-              cbn in Hx.
-              rewrite if_1_eq_0 in Hx; cbn in Hx; subst x.
-              rewrite srng_mul_1_l.
-              apply srng_1_neq_0.
-            }
-            cbn.
-            rewrite if_1_eq_0; cbn.
-            apply Nat.lt_0_succ.
-          }
-          rewrite polyn_degree_mul. 2: {
-            rewrite polyn_degree_of_single.
-            rewrite polyn_coeff_of_single.
-            remember (polyn_coeff _ _) as x eqn:Hx.
-            cbn in Hx.
-            rewrite if_1_eq_0 in Hx; cbn in Hx; subst x.
-            rewrite srng_mul_1_l.
-            apply srng_1_neq_0.
-          }
-          cbn.
-          rewrite if_1_eq_0; cbn.
-          rewrite if_1_eq_0; cbn.
-          easy.
+      cbn.
+      destruct (lt_dec j (S i)) as [Hjsi| Hjsi]. {
+        destruct (Nat.eq_dec (k + 1) j) as [Hkj| Hkj]. {
+          rewrite polyn_mul_1_r.
+          rewrite polyn_degree_1; [ easy | ].
+          rewrite polyn_degree_opp.
+          now rewrite polyn_degree_of_single.
         }
-        cbn - [ polyn_degree ].
         rewrite polyn_of_list_0, polyn_mul_0_r, polyn_add_0_l.
         rewrite polyn_degree_opp.
         rewrite polyn_degree_of_single.
-        apply Nat.le_0_1.
+        apply Nat.le_0_l.
       }
-      apply Nat.nlt_ge in Hji.
-      rewrite Nat.add_1_r.
-      cbn - [ polyn_degree ].
+      destruct (Nat.eq_dec (k + 1) (j + 1)) as [Hkj| Hkj]. {
+        rewrite polyn_mul_1_r.
+        rewrite polyn_degree_1; [ easy | ].
+        rewrite polyn_degree_opp.
+        now rewrite polyn_degree_of_single.
+      }
       rewrite polyn_of_list_0, polyn_mul_0_r, polyn_add_0_l.
       rewrite polyn_degree_opp.
       rewrite polyn_degree_of_single.
-      apply Nat.le_0_1.
+      apply Nat.le_0_l.
     }
     cbn.
-    destruct (lt_dec j m) as [Hjm| Hjm]. {
-      cbn.
-...
-Search (polyn_degree (mat_el _ _ _)).
-...
+    destruct (lt_dec j m) as [Hjm| Hjm]; [ apply IHl | ].
+    apply IHl.
+  }
+  apply -> Nat.succ_le_mono.
+  rewrite subm_repeat_subm.
+  apply IHn.
+}
 apply (H [k; j]).
-...
+Qed.
 
 (* the caracteristic polynomial of a matrix is monic, i.e. its
    leading coefficient is 1 *)
@@ -4626,7 +4612,6 @@ remember (det_loop (subm (xI_sub_M M) 0 0) n) as P eqn:HP.
 cbn - [ is_monic_polyn polyn_degree xI_sub_M iter_seq ].
 rewrite srng_mul_1_l.
 rewrite polyn_degree_lt_add. 2: {
-(**)
   eapply le_lt_trans; [ apply polyn_degree_summation_ub | ].
   cbn - [ iter_seq polyn_degree mat_el ].
   apply le_lt_trans with
@@ -4677,7 +4662,6 @@ rewrite polyn_degree_lt_add. 2: {
   destruct i; [ easy | ].
   destruct Hi as (_, Hi).
   apply -> Nat.le_succ_l in Hi.
-...
   now apply polyn_degree_det_loop_subm_xI_sub_M_succ_r_le.
 }
 ...
