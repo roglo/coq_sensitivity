@@ -4282,6 +4282,30 @@ rewrite polyn_coeff_add, srng_add_comm.
 rewrite polyn_coeff_overflow. 2: {
   eapply le_lt_trans; [ apply polyn_degree_summation_ub | ].
   cbn - [ iter_seq polyn_degree xI_sub_M ].
+  apply Max_lub_lt; [ apply Nat.lt_0_succ | ].
+  intros i Hi.
+  eapply le_lt_trans; [ apply polyn_degree_mul_le | ].
+  rewrite <- Nat.add_1_l.
+  apply Nat.add_lt_le_mono. {
+    eapply le_lt_trans; [ apply polyn_degree_mul_le |].
+    rewrite polyn_degree_minus_one_pow.
+    destruct i; [ easy | ].
+    rewrite polyn_degree_mat_el_xI_sub_M_0_succ.
+    apply Nat.lt_0_succ.
+  }
+  destruct i; [ easy | ].
+  apply polyn_degree_det_loop_subm_xI_sub_M_succ_r_le; [ easy | ].
+  flia Hi.
+}
+rewrite srng_add_0_l.
+...
+  rewrite <- polyn_mul_assoc.
+  rewrite polyn_degree_mul. 2: {
+    rewrite polyn_degree_minus_one_pow.
+    rewrite polyn_coeff_minus_one_pow.
+    rewrite polyn_degree_mul. 2: {
+      destruct i; [ easy | ].
+      rewrite polyn_degree_mat_el_xI_sub_M_0_succ.
 ...
 rewrite mat_el_xI_sub_M.
 destruct (Nat.eq_dec 0 0) as [H| H]; [ clear H | easy ].
