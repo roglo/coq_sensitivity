@@ -4253,6 +4253,15 @@ destruct n. {
 now rewrite Hpd.
 Qed.
 
+Theorem polyn_coeff_overflow : ∀ P n,
+  polyn_degree P < n
+  → polyn_coeff P n = 0%Srng.
+Proof.
+intros (la, Hla) n Hpn.
+cbn in Hpn |-*.
+rewrite nth_overflow; [ easy | flia Hpn ].
+Qed.
+
 Theorem polyn_coeff_det_loop_xI_sub_M : ∀ n M,
   mat_nrows M = n
   → polyn_coeff (det_loop (xI_sub_M M) n) n = 1%Srng.
@@ -4269,7 +4278,10 @@ rewrite srng_summation_split_first; [ | apply Nat.le_0_l ].
 remember (det_loop (subm (xI_sub_M M) 0 0) n) as P eqn:HP.
 cbn - [ polyn_coeff xI_sub_M iter_seq ].
 rewrite srng_mul_1_l.
-rewrite polyn_coeff_add.
+rewrite polyn_coeff_add, srng_add_comm.
+rewrite polyn_coeff_overflow. 2: {
+  eapply le_lt_trans; [ apply polyn_degree_summation_ub | ].
+  cbn - [ iter_seq polyn_degree xI_sub_M ].
 ...
 rewrite mat_el_xI_sub_M.
 destruct (Nat.eq_dec 0 0) as [H| H]; [ clear H | easy ].
