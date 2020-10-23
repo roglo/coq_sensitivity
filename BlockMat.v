@@ -4298,6 +4298,29 @@ rewrite polyn_coeff_overflow. 2: {
   flia Hi.
 }
 rewrite srng_add_0_l.
+Search (polyn_coeff (_ * _)).
+Theorem polyn_coeff_mul : ∀ P Q i,
+  polyn_coeff (P * Q) i =
+    (Σ (j = 0, i), polyn_coeff P j * polyn_coeff Q (i - j))%Srng.
+Proof.
+intros.
+cbn - [ iter_seq ].
+destruct P as (la, Hla).
+destruct Q as (lb, Hlb).
+cbn - [ iter_seq norm_polyn_list ].
+unfold polyn_list_convol_mul.
+Search (norm_polyn_list (map _ _)).
+...
+induction i. {
+  cbn.
+  rewrite srng_add_0_l.
+  unfold "*"%PL; cbn.
+  destruct P as (la, Hla).
+  destruct Q as (lb, Hlb).
+  cbn.
+  unfold polyn_list_convol_mul.
+  cbn - [ iter_seq ].
+
 ...
 cbn; rewrite if_1_eq_0.
 cbn; rewrite if_1_eq_0; cbn.
