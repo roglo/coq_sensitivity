@@ -1,7 +1,7 @@
 BlockMat.vio: BlockMat.v Misc.vio Matrix.vio Semiring.vio SRsummation.vio
 BlockMat.vo BlockMat.glob BlockMat.v.beautified BlockMat.required_vo: BlockMat.v Misc.vo Matrix.vo Semiring.vo SRsummation.vo
-CharacPolyn.vio: CharacPolyn.v 
-CharacPolyn.vo CharacPolyn.glob CharacPolyn.v.beautified CharacPolyn.required_vo: CharacPolyn.v 
+CharacPolyn.vio: CharacPolyn.v Misc.vio Semiring.vio SRsummation.vio SRpolynomial.vio Matrix.vio
+CharacPolyn.vo CharacPolyn.glob CharacPolyn.v.beautified CharacPolyn.required_vo: CharacPolyn.v Misc.vo Semiring.vo SRsummation.vo SRpolynomial.vo Matrix.vo
 Matrix.vio: Matrix.v Misc.vio SRpolynomial.vio Semiring.vio SRsummation.vio
 Matrix.vo Matrix.glob Matrix.v.beautified Matrix.required_vo: Matrix.v Misc.vo SRpolynomial.vo Semiring.vo SRsummation.vo
 Misc.vio: Misc.v 

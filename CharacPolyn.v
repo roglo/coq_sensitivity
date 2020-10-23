@@ -1,5 +1,30 @@
 (* characteristic polynomial = det(xI-M) *)
 
+Set Nested Proofs Allowed.
+Set Implicit Arguments.
+
+Require Import Utf8 Arith.
+Import List List.ListNotations.
+Require Import Init.Nat.
+
+Require Import Misc Semiring SRsummation SRpolynomial Matrix.
+Import polynomial_Notations.
+Import matrix_Notations.
+
+Section in_ring.
+
+Context {T : Type}.
+Context {ro : ring_op T}.
+Context (so := rng_semiring).
+Context {sp : @semiring_prop T (@rng_semiring T ro)}.
+Context {rp : @ring_prop T ro}.
+Context {sdp : @sring_dec_prop T so}.
+Existing Instance so.
+Existing Instance polyn_semiring_op.
+Existing Instance polyn_ring_op.
+Existing Instance polyn_semiring_prop.
+Existing Instance polyn_ring_prop.
+
 Definition xI_sub_M M := (_x × m2mm (mI (mat_nrows M)) - m2mm M)%M.
 Definition charac_polyn (M : matrix T) := determinant (xI_sub_M M).
 
