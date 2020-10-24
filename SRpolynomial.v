@@ -2960,6 +2960,17 @@ rewrite Hlab.
 now rewrite Nat.sub_diag.
 Qed.
 
+(* division of a polynomial P with (x - c) *)
+(* P = (x-c).Q + R with
+   Q = a_n.x^{n-1} +
+       (a_n.c+a_{n-1}).x^{n-2} +
+       ... +
+       ((a_n.c+a_{n-1})c+...+a_1)x^0
+   R = P(c) *)
+
+Definition polyn_div_x_sub_const P c :=
+...
+
 (* in algebraically closed set, a polynomial P is the
    product of its highest coefficient and all (x-rn)
    where rn cover all roots of P *)
@@ -3002,7 +3013,7 @@ rewrite Hn in H1.
 specialize (H1 (Nat.lt_0_succ _)).
 destruct H1 as (x, Hx).
 ...
-set (Q := polyn_div P (_x - polyn_of_list [x])).
+set (Q := polyn_div_x_sub_const P x.
 ...
 
 End in_ring.
