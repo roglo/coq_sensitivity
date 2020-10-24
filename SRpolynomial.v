@@ -2969,8 +2969,35 @@ Theorem subp_polyn_prop : ∀ i P,
   polyn_prop_test (λ i0 : nat, nth i0 (skipn i (polyn_list P)) 0%Srng)
     (length (skipn i (polyn_list P))) = true.
 Proof.
-intros.
-...
+intros i (la, Hla); cbn.
+revert i.
+induction la as [| a]; intros; [ now rewrite skipn_nil | ].
+cbn - [ nth ] in Hla.
+rewrite <- List_last_nth_cons in Hla.
+destruct (srng_eq_dec (last (a :: la) 0%Srng) 0) as [H| Haz]; [ easy | ].
+clear Hla.
+rewrite skipn_length.
+cbn - [ sub ].
+assert (H : polyn_prop_test (λ i : nat, nth i la 0%Srng) (length la) = true). {
+  clear - Haz.
+  revert a Haz.
+  induction la as [| a1]; intros; [ easy | ].
+  cbn - [ nth ].
+  rewrite  <- List_last_nth_cons.
+  rewrite List_last_cons_cons in Haz.
+  now destruct (srng_eq_dec (last (a1 :: la) 0%Srng) 0).
+}
+specialize (IHla H); clear H.
+destruct i. {
+  rewrite Nat.sub_0_r.
+  cbn - [ nth ].
+  rewrite  <- List_last_nth_cons.
+  now destruct (srng_eq_dec (last (a :: la) 0%Srng) 0).
+}
+rewrite Nat.sub_succ.
+specialize (IHla i) as H1.
+now rewrite skipn_length in H1.
+Qed.
 
 Definition sub_polyn P i :=
   {| polyn_list := skipn i (polyn_list P);
@@ -2986,9 +3013,8 @@ Definition sub_polyn P i :=
 
 Definition polyn_div_x_sub_const P c :=
   (polyn_of_list
-     (map (λ i, eval_polyn (subp P i) c) (seq 1 (polyn_degree P - 1))),
+     (map (λ i, eval_polyn (sub_polyn P i) c) (seq 1 (polyn_degree P - 1))),
    eval_polyn P c).
-...
 
 (* in algebraically closed set, a polynomial P is the
    product of its highest coefficient and all (x-rn)
@@ -3031,8 +3057,16 @@ specialize (Hroots P) as H1.
 rewrite Hn in H1.
 specialize (H1 (Nat.lt_0_succ _)).
 destruct H1 as (x, Hx).
-...
-set (Q := polyn_div_x_sub_const P x.
+remember (polyn_div_x_sub_const P x) as QR eqn:HQR.
+specialize (IHn (fst QR)) as H1.
+assert (H : polyn_degree (fst QR) = n). {
+  rewrite HQR.
+  clear - so Hn Hx.
+  cbn - [ polyn_degree ].
+  rewrite Hn, Nat.sub_succ, Nat.sub_0_r.
+  unfold sub_polyn.
+  unfold eval_polyn.
+  cbn.
 ...
 
 End in_ring.
