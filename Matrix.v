@@ -275,13 +275,25 @@ destruct (Nat.eq_dec i k) as [Hik| Hik]. {
   destruct n; [ easy | ].
   rewrite Nat.sub_succ, Nat.sub_0_r.
   apply -> Nat.lt_succ_r in Hi.
-  revert M i Hn Hr Hi.
+  clear Hn Hr.
+  revert M i (*Hn Hr*) Hi.
   induction n; intros. {
     cbn.
     do 2 rewrite srng_add_0_l, srng_mul_1_r.
     rewrite srng_mul_1_l, Nat.add_0_r.
     apply Nat.le_0_r in Hi; subst i; cbn.
     now rewrite srng_mul_1_r.
+  }
+  remember (S n) as sn.
+  cbn - [ iter_seq ]; subst sn.
+  destruct i. {
+    clear Hi.
+    apply srng_summation_eq_compat.
+    intros i Hi.
+    rewrite Nat.add_0_l.
+    rewrite srng_mul_comm.
+    do 2 rewrite <- srng_mul_assoc; f_equal.
+    apply srng_mul_comm.
   }
 ...
   destruct n. {
