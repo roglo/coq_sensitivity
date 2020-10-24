@@ -259,7 +259,19 @@ revert A B Hra Hrb Hca Hcb.
 induction n; intros; [ now cbn; rewrite srng_mul_1_l | ].
 cbn - [ iter_seq ].
 rewrite Hca, Nat.sub_succ, Nat.sub_0_r.
-Search ((Σ (_ = _, _), _) * (Σ (_ = _, _), _)).
+destruct n. {
+  cbn.
+  do 3 rewrite srng_add_0_l, srng_mul_1_l, srng_mul_1_r.
+  now rewrite srng_add_0_l.
+}
+destruct n. {
+  cbn.
+  rewrite Hca; cbn.
+  repeat rewrite srng_add_0_l.
+  repeat rewrite srng_mul_1_l.
+  repeat rewrite srng_mul_1_r.
+  unfold so; cbn.
+  (* mouais, bof *)
 ...
 
 (* combinations of submatrix and other *)
