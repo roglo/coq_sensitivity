@@ -2972,11 +2972,13 @@ Theorem polyn_in_algeb_closed :
          (_x - polyn_of_list [nth (i - 1) RL 0%Srng]))%P.
 Proof.
 intros.
-destruct (Nat.eq_dec (polyn_degree P) 0) as [Hdz| Hdz]. {
+remember (polyn_degree P) as n eqn:Hn; symmetry in Hn.
+revert P Hn.
+induction n; intros. {
   exists [].
   unfold polyn_highest_coeff.
   unfold polyn_coeff.
-  rewrite Hdz; cbn.
+  rewrite Hn; cbn.
   unfold so.
   rewrite polyn_mul_1_r.
   apply polyn_eq; cbn.
@@ -2984,8 +2986,8 @@ destruct (Nat.eq_dec (polyn_degree P) 0) as [Hdz| Hdz]. {
   destruct (srng_eq_dec (nth 0 (polyn_list P) 0%Srng) 0) as [Hpz| Hpz]. {
     destruct P as (la, Hla).
     destruct la as [| a]; [ easy | exfalso ].
-    cbn in Hdz; rewrite Nat.sub_0_r in Hdz.
-    apply length_zero_iff_nil in Hdz; subst la.
+    cbn in Hn; rewrite Nat.sub_0_r in Hn.
+    apply length_zero_iff_nil in Hn; subst la.
     cbn in Hla, Hpz.
     subst a.
     now rewrite if_0_eq_0 in Hla.
@@ -2996,8 +2998,11 @@ destruct (Nat.eq_dec (polyn_degree P) 0) as [Hdz| Hdz]. {
 }
 destruct acp as (Hroots).
 specialize (Hroots P) as H1.
-specialize (H1 (proj1 (Nat.neq_0_lt_0 _) Hdz)).
+rewrite Hn in H1.
+specialize (H1 (Nat.lt_0_succ _)).
 destruct H1 as (x, Hx).
+...
+set (Q := polyn_div P (_x - polyn_of_list [x])).
 ...
 
 End in_ring.
