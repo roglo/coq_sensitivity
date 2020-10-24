@@ -575,14 +575,17 @@ Notation "'Π' ( i = b , e ) , g" :=
      polynomial_scope.
 
 Theorem exists_eigenvalues : ∀ (acp : algeb_closed_prop) (M : matrix T),
-  mat_nrows M ≠ 0
-  → is_square_mat M
+  is_square_mat M
   → ∃ EVL,
      charac_polyn M =
-     (Π (i = 0, mat_nrows M - 1),
-        (_x - polyn_of_list [nth i EVL 0%Srng]))%P.
+       (Π (i = 1, mat_nrows M),
+          (_x - polyn_of_list [nth (i - 1) EVL 0%Srng]))%P.
 Proof.
-intros acp M Hrz HM.
+intros acp M HM.
+destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
+  exists [].
+  now cbn; rewrite Hrz; cbn.
+}
 destruct acp as (Hroots).
 specialize (Hroots (charac_polyn M)) as H1.
 assert (H2 : polyn_coeff (charac_polyn M) (mat_nrows M) = 1%Srng). {
@@ -598,4 +601,5 @@ rewrite H3 in H1.
 assert (H : mat_nrows M > 0) by flia Hrz.
 specialize (H1 H); clear H.
 destruct H1 as (x, Hx).
+About algeb_closed_prop.
 ...
