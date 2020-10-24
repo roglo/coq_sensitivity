@@ -239,7 +239,55 @@ Arguments mat_ncols {T} m%M.
 Arguments determinant {T ro} M%M.
 Arguments subm {T} M%M i%nat j%nat.
 
+(* comatrix *)
+
+Definition comatrix M : matrix T :=
+  {| mat_el i j := (minus_one_pow (i + j) * determinant (subm M i j))%Srng;
+     mat_nrows := mat_nrows M;
+     mat_ncols := mat_ncols M |}.
+
+(* matrix transpose *)
+
+Definition mat_transp (M : matrix T) :=
+  {| mat_el i j := mat_el M j i;
+     mat_nrows := mat_ncols M;
+     mat_ncols := mat_nrows M |}.
+
+(* M × t(com(M)) = det(M) × I *)
+
+Theorem matrix_mul_transp_com : ∀ M,
+  (M * mat_transp (comatrix M) = determinant M × mI (mat_nrows M))%M.
+Proof.
+intros.
+(* cf https://fr.wikipedia.org/wiki/Comatrice#G%C3%A9n%C3%A9ralisation *)
+...
+intros.
+apply matrix_eq; [ easy | easy | ].
+cbn - [ iter_seq determinant ].
+intros i k Hi Hk.
+destruct (Nat.eq_dec i k) as [Hik| Hik]. 2: {
+  rewrite srng_mul_0_r.
+  apply all_0_srng_summation_0.
+  intros j Hj.
+Search (determinant (subm _ _ _)).
+...
+... suite possible
+  subst k; rewrite srng_mul_1_r.
+...
+
+(* det M = 0 ↔ M is invertible *)
+
+Theorem det_not_zero_inv_iff : ∀ M,
+  determinant M ≠ 0%Srng ↔ ∃ M', (M * M')%M = mI (mat_nrows M).
+Proof.
+intros.
+split; intros HM. {
+
+...
+
 (* determinant of a product *)
+(* mmm... see https://proofwiki.org/wiki/Determinant_of_Matrix_Product
+   (Proof 2): perhaps enough for my problem *)
 
 Theorem det_mul : ∀ A B,
   is_square_mat A
