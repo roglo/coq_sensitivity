@@ -2960,6 +2960,22 @@ rewrite Hlab.
 now rewrite Nat.sub_diag.
 Qed.
 
+(* sub-polynomial:
+   polynomial skipping i coefficients:
+     input: Σ (j = 0, n), a_j x^j
+     output: Σ (j = i, n), a_j x^(j-i) *)
+
+Theorem subp_polyn_prop : ∀ i P,
+  polyn_prop_test (λ i0 : nat, nth i0 (skipn i (polyn_list P)) 0%Srng)
+    (length (skipn i (polyn_list P))) = true.
+Proof.
+intros.
+...
+
+Definition sub_polyn P i :=
+  {| polyn_list := skipn i (polyn_list P);
+     polyn_prop := subp_polyn_prop i P |}.
+
 (* division of a polynomial P with (x - c) *)
 (* P = (x-c).Q + R with
    Q = a_n.x^{n-1} +
@@ -2969,6 +2985,9 @@ Qed.
    R = P(c) *)
 
 Definition polyn_div_x_sub_const P c :=
+  (polyn_of_list
+     (map (λ i, eval_polyn (subp P i) c) (seq 1 (polyn_degree P - 1))),
+   eval_polyn P c).
 ...
 
 (* in algebraically closed set, a polynomial P is the
