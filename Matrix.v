@@ -242,17 +242,23 @@ Arguments subm {T} M%M i%nat j%nat.
 (* determinant of a product *)
 
 Theorem det_mul : ∀ A B,
-  mat_nrows A = mat_nrows B
+  is_square_mat A
+  → is_square_mat B
+  → mat_nrows A = mat_nrows B
   → determinant (A * B) =  (determinant A * determinant B)%Srng.
 Proof.
-intros * Hrr.
+intros * Hca Hcb Hrb.
 unfold determinant; cbn.
-rewrite <- Hrr.
-remember (mat_nrows A) as n eqn:Hn in |-*; symmetry in Hn.
-clear Hrr.
-revert A B Hn.
+rewrite <- Hrb.
+remember (mat_nrows A) as n eqn:Hra in |-*; symmetry in Hra.
+unfold is_square_mat in Hca, Hcb.
+symmetry in Hca, Hcb, Hrb.
+rewrite Hra in Hca, Hrb.
+rewrite Hrb in Hcb.
+revert A B Hra Hrb Hca Hcb.
 induction n; intros; [ now cbn; rewrite srng_mul_1_l | ].
 cbn - [ iter_seq ].
+rewrite Hca, Nat.sub_succ, Nat.sub_0_r.
 Search ((Σ (_ = _, _), _) * (Σ (_ = _, _), _)).
 ...
 
