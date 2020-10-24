@@ -258,6 +258,11 @@ Notation "'Σ' ( i = b , e ) , g" :=
   (at level 45, i at level 0, b at level 60, e at level 60) :
      polynomial_scope.
 
+Notation "'Π' ( i = b , e ) , g" :=
+  (iter_seq b e (λ c i, (c * g)%P) 1%P)
+  (at level 45, i at level 0, b at level 60, e at level 60) :
+     polynomial_scope.
+
 Arguments polyn_coeff {T so sdp} P%P i%nat.
 Arguments polyn_degree {T so sdp} P%P.
 
@@ -2955,6 +2960,46 @@ rewrite Hlab.
 now rewrite Nat.sub_diag.
 Qed.
 
+(* in algebraically closed set, a polynomial P is the
+   product of its highest coefficient and all (x-rn)
+   where rn cover all roots of P *)
+
+Theorem polyn_in_algeb_closed :
+  ∀ (acp : algeb_closed_prop) (P : polynomial T),
+  ∃ RL, P =
+      (polyn_of_list [polyn_highest_coeff P] *
+       Π (i = 1, polyn_degree P),
+         (_x - polyn_of_list [nth (i - 1) RL 0%Srng]))%P.
+Proof.
+intros.
+destruct (Nat.eq_dec (polyn_degree P) 0) as [Hdz| Hdz]. {
+  exists [].
+  unfold polyn_highest_coeff.
+  unfold polyn_coeff.
+  rewrite Hdz; cbn.
+  unfold so.
+  rewrite polyn_mul_1_r.
+  apply polyn_eq; cbn.
+  unfold so; cbn; fold so.
+  destruct (srng_eq_dec (nth 0 (polyn_list P) 0%Srng) 0) as [Hpz| Hpz]. {
+    destruct P as (la, Hla).
+    destruct la as [| a]; [ easy | exfalso ].
+    cbn in Hdz; rewrite Nat.sub_0_r in Hdz.
+    apply length_zero_iff_nil in Hdz; subst la.
+    cbn in Hla, Hpz.
+    subst a.
+    now rewrite if_0_eq_0 in Hla.
+  }
+  destruct P as (la, Hla).
+  destruct la as [| a]; [ easy | cbn ].
+  now destruct la.
+}
+destruct acp as (Hroots).
+specialize (Hroots P) as H1.
+specialize (H1 (proj1 (Nat.neq_0_lt_0 _) Hdz)).
+destruct H1 as (x, Hx).
+...
+
 End in_ring.
 
 Module polynomial_Notations.
@@ -2981,6 +3026,11 @@ Notation "la * lb" := (polyn_list_mul la lb) : polyn_list_scope.
 
 Notation "'Σ' ( i = b , e ) , g" :=
   (iter_seq b e (λ c i, (c + g)%P) 0%P)
+  (at level 45, i at level 0, b at level 60, e at level 60) :
+     polynomial_scope.
+
+Notation "'Π' ( i = b , e ) , g" :=
+  (iter_seq b e (λ c i, (c * g)%P) 1%P)
   (at level 45, i at level 0, b at level 60, e at level 60) :
      polynomial_scope.
 

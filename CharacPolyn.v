@@ -569,11 +569,6 @@ destruct H1 as (μ, Hμ).
 now exists μ.
 Qed.
 
-Notation "'Π' ( i = b , e ) , g" :=
-  (iter_seq b e (λ c i, (c * g)%P) 1%P)
-  (at level 45, i at level 0, b at level 60, e at level 60) :
-     polynomial_scope.
-
 Theorem exists_eigenvalues : ∀ (acp : algeb_closed_prop) (M : matrix T),
   is_square_mat M
   → ∃ EVL,
@@ -586,6 +581,21 @@ destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
   exists [].
   now cbn; rewrite Hrz; cbn.
 }
+destruct acp as (Hroots).
+specialize (Hroots (charac_polyn M)) as H1.
+assert (H2 : polyn_coeff (charac_polyn M) (mat_nrows M) = 1%Srng). {
+  specialize (charac_polyn_is_monic M) as H2.
+  unfold is_monic_polyn in H2.
+  now rewrite charac_polyn_degree in H2.
+}
+assert (H3 : polyn_degree (charac_polyn M) = mat_nrows M). {
+  apply charac_polyn_degree.
+}
+unfold so in H1.
+rewrite H3 in H1.
+assert (H : mat_nrows M > 0) by flia Hrz.
+specialize (H1 H); clear H.
+destruct H1 as (x, Hx).
 destruct acp as (Hroots).
 specialize (Hroots (charac_polyn M)) as H1.
 assert (H2 : polyn_coeff (charac_polyn M) (mat_nrows M) = 1%Srng). {
