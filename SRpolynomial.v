@@ -3064,6 +3064,8 @@ assert (H : polyn_degree (fst QR) = n). {
   clear - so Hn Hx.
   cbn - [ polyn_degree ].
   rewrite Hn, Nat.sub_succ, Nat.sub_0_r.
+Search polyn_of_list.
+...
   unfold sub_polyn.
   unfold eval_polyn.
   cbn.
