@@ -295,6 +295,7 @@ destruct (Nat.eq_dec i k) as [Hik| Hik]. {
     do 2 rewrite <- srng_mul_assoc; f_equal.
     apply srng_mul_comm.
   }
+Abort. (* on verra plus tard
 ...
   destruct n. {
     cbn.
@@ -332,16 +333,18 @@ destruct (Nat.eq_dec i k) as [Hik| Hik]. {
 Search (determinant (subm _ _ _)).
 ...
 ...
+*)
 
 (* det M = 0 ↔ M is invertible *)
 
+(*
 Theorem det_not_zero_inv_iff : ∀ M,
   determinant M ≠ 0%Srng ↔ ∃ M', (M * M')%M = mI (mat_nrows M).
 Proof.
 intros.
 split; intros HM. {
-
 ...
+*)
 
 (* determinant of a product *)
 (* mmm... see https://proofwiki.org/wiki/Determinant_of_Matrix_Product
@@ -377,8 +380,7 @@ destruct n. {
   repeat rewrite srng_mul_1_l.
   repeat rewrite srng_mul_1_r.
   unfold so; cbn.
-  (* mouais, bof *)
-...
+Abort. (* on verra plus tard *)
 
 (* combinations of submatrix and other *)
 

@@ -545,11 +545,42 @@ Qed.
 
 (* eigenvalues and eigenvectors *)
 
+Theorem exists_eigenvalue : ∀ (acp : algeb_closed_prop) (M : matrix T),
+  mat_nrows M ≠ 0
+  → is_square_mat M
+  → ∃ μ, eval_polyn (charac_polyn M) μ = 0%Srng.
+Proof.
+intros acp M Hrz HM.
+destruct acp as (Hroots).
+specialize (Hroots (charac_polyn M)) as H1.
+assert (H2 : polyn_coeff (charac_polyn M) (mat_nrows M) = 1%Srng). {
+  specialize (charac_polyn_is_monic M) as H2.
+  unfold is_monic_polyn in H2.
+  now rewrite charac_polyn_degree in H2.
+}
+assert (H3 : polyn_degree (charac_polyn M) = mat_nrows M). {
+  apply charac_polyn_degree.
+}
+unfold so in H1.
+rewrite H3 in H1.
+assert (H : mat_nrows M > 0) by flia Hrz.
+specialize (H1 H); clear H.
+destruct H1 as (μ, Hμ).
+now exists μ.
+Qed.
+
+Notation "'Π' ( i = b , e ) , g" :=
+  (iter_seq b e (λ c i, (c * g)%P) 1%P)
+  (at level 45, i at level 0, b at level 60, e at level 60) :
+     polynomial_scope.
+
 Theorem exists_eigenvalues : ∀ (acp : algeb_closed_prop) (M : matrix T),
   mat_nrows M ≠ 0
   → is_square_mat M
-  → ∃ EVL, length EVL = mat_nrows M ∧
-     (∀ μ V, (μ, V) ∈ EVL ↔ mat_mul_vect_r M V = vect_mul_scal_l μ V).
+  → ∃ EVL,
+     charac_polyn M =
+     (Π (i = 0, mat_nrows M - 1),
+        (_x - polyn_of_list [nth i EVL 0%Srng]))%P.
 Proof.
 intros acp M Hrz HM.
 destruct acp as (Hroots).
