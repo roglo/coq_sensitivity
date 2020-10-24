@@ -260,19 +260,18 @@ Theorem matrix_mul_transp_com : ∀ M,
 Proof.
 intros.
 (* cf https://fr.wikipedia.org/wiki/Comatrice#G%C3%A9n%C3%A9ralisation *)
-...
-intros.
 apply matrix_eq; [ easy | easy | ].
 cbn - [ iter_seq determinant ].
 intros i k Hi Hk.
-destruct (Nat.eq_dec i k) as [Hik| Hik]. 2: {
+destruct (Nat.eq_dec i k) as [Hik| Hik]. {
+  subst k; clear Hk; rewrite srng_mul_1_r.
+... suite possible
+} {
   rewrite srng_mul_0_r.
   apply all_0_srng_summation_0.
   intros j Hj.
 Search (determinant (subm _ _ _)).
 ...
-... suite possible
-  subst k; rewrite srng_mul_1_r.
 ...
 
 (* det M = 0 ↔ M is invertible *)
