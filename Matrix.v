@@ -256,15 +256,62 @@ Definition mat_transp (M : matrix T) :=
 (* M × t(com(M)) = det(M) × I *)
 
 Theorem matrix_mul_transp_com : ∀ M,
-  (M * mat_transp (comatrix M) = determinant M × mI (mat_nrows M))%M.
+  is_square_mat M
+  → (M * mat_transp (comatrix M) = determinant M × mI (mat_nrows M))%M.
 Proof.
-intros.
+intros * Hr.
+unfold is_square_mat in Hr.
 (* cf https://fr.wikipedia.org/wiki/Comatrice#G%C3%A9n%C3%A9ralisation *)
 apply matrix_eq; [ easy | easy | ].
 cbn - [ iter_seq determinant ].
 intros i k Hi Hk.
+rewrite <- Hr.
 destruct (Nat.eq_dec i k) as [Hik| Hik]. {
   subst k; clear Hk; rewrite srng_mul_1_r.
+  cbn - [ iter_seq ].
+  unfold determinant.
+  remember (mat_nrows M) as n eqn:Hn.
+  symmetry in Hn, Hr.
+  destruct n; [ easy | ].
+  rewrite Nat.sub_succ, Nat.sub_0_r.
+  apply -> Nat.lt_succ_r in Hi.
+  revert M i Hn Hr Hi.
+  induction n; intros. {
+    cbn.
+    do 2 rewrite srng_add_0_l, srng_mul_1_r.
+    rewrite srng_mul_1_l, Nat.add_0_r.
+    apply Nat.le_0_r in Hi; subst i; cbn.
+    now rewrite srng_mul_1_r.
+  }
+...
+  destruct n. {
+    cbn.
+    do 4 rewrite srng_add_0_l, srng_mul_1_r.
+    do 5 rewrite srng_mul_1_l.
+    do 2 rewrite srng_add_0_l.
+    rewrite Nat.add_0_r.
+    destruct i. {
+      cbn.
+      rewrite srng_mul_1_l.
+      f_equal.
+      unfold so.
+      do 3 rewrite rng_mul_opp_l.
+      do 2 rewrite srng_mul_1_l.
+      now rewrite rng_mul_opp_r.
+    }
+    destruct i; [ | flia Hi ].
+    cbn.
+    rewrite srng_mul_1_l.
+    unfold so; cbn.
+    do 2 rewrite rng_mul_opp_l.
+    rewrite srng_add_comm, srng_mul_comm.
+    f_equal.
+    rewrite srng_mul_1_l.
+    rewrite rng_mul_opp_r.
+    f_equal.
+    apply srng_mul_comm.
+  }
+...
 ... suite possible
 } {
   rewrite srng_mul_0_r.
