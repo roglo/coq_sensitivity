@@ -233,9 +233,11 @@ Notation "A * B" := (mat_mul A B) : M_scope.
 Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
 Notation "- A" := (mat_opp A) : M_scope.
 
+Arguments det_loop {T ro} M%M n%nat.
 Arguments mat_nrows {T} m%M.
 Arguments mat_ncols {T} m%M.
 Arguments determinant {T ro} M%M.
+Arguments subm {T} M%M i%nat j%nat.
 
 (* determinant of a product *)
 
@@ -247,12 +249,11 @@ intros * Hrr.
 unfold determinant; cbn.
 rewrite <- Hrr.
 remember (mat_nrows A) as n eqn:Hn in |-*; symmetry in Hn.
-clear Hn.
-induction n; [ now cbn; rewrite srng_mul_1_l | ].
-Opaque iter_seq.
-cbn.
-...
+clear Hrr.
+revert A B Hn.
+induction n; intros; [ now cbn; rewrite srng_mul_1_l | ].
 cbn - [ iter_seq ].
+Search ((Σ (_ = _, _), _) * (Σ (_ = _, _), _)).
 ...
 
 (* combinations of submatrix and other *)
