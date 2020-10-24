@@ -240,10 +240,19 @@ Arguments determinant {T ro} M%M.
 (* determinant of a product *)
 
 Theorem det_mul : ∀ A B,
-  determinant (A * B) =  (determinant A * determinant B)%Srng.
+  mat_nrows A = mat_nrows B
+  → determinant (A * B) =  (determinant A * determinant B)%Srng.
 Proof.
-intros.
+intros * Hrr.
 unfold determinant; cbn.
+rewrite <- Hrr.
+remember (mat_nrows A) as n eqn:Hn in |-*; symmetry in Hn.
+clear Hn.
+induction n; [ now cbn; rewrite srng_mul_1_l | ].
+Opaque iter_seq.
+cbn.
+...
+cbn - [ iter_seq ].
 ...
 
 (* combinations of submatrix and other *)
