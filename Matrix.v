@@ -233,6 +233,19 @@ Notation "A * B" := (mat_mul A B) : M_scope.
 Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
 Notation "- A" := (mat_opp A) : M_scope.
 
+Arguments mat_nrows {T} m%M.
+Arguments mat_ncols {T} m%M.
+Arguments determinant {T ro} M%M.
+
+(* determinant of a product *)
+
+Theorem det_mul : ∀ A B,
+  determinant (A * B) =  (determinant A * determinant B)%Srng.
+Proof.
+intros.
+unfold determinant; cbn.
+...
+
 (* combinations of submatrix and other *)
 
 Theorem submatrix_sub : ∀ (MA MB : matrix T) i j,
