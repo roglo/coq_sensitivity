@@ -596,6 +596,7 @@ rewrite H3 in H1.
 assert (H : mat_nrows M > 0) by flia Hrz.
 specialize (H1 H); clear H.
 destruct H1 as (x, Hx).
+...
 destruct acp as (Hroots).
 specialize (Hroots (charac_polyn M)) as H1.
 assert (H2 : polyn_coeff (charac_polyn M) (mat_nrows M) = 1%Srng). {

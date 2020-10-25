@@ -53,12 +53,21 @@ Definition polyn_degree T {so : semiring_op T} {sdp : sring_dec_prop} P :=
 
 (* evaluation of a polynomial *)
 
+(* could be a theorem, perhaps...
 Definition eval_polyn T {so : semiring_op T} {sdp : sring_dec_prop}
     (P : polynomial T) x :=
   match polyn_degree_plus_1 P with
   | 0 => 0%Srng
   | S n => (Σ (i = 0, n), polyn_coeff P i * x ^ i)%Srng
   end.
+*)
+
+Definition eval_polyn_list T {so : semiring_op T} (la : list T) x :=
+  fold_right (λ a acc, (acc * x + a)%Srng) 0%Srng la.
+
+Definition eval_polyn T {so : semiring_op T} {sdp : sring_dec_prop}
+    (P : polynomial T) :=
+  eval_polyn_list (polyn_list P).
 
 (* algebraically closed set *)
 
@@ -3036,8 +3045,29 @@ Theorem polyn_div_x_sub_const_prop : ∀ P c Q r,
         eval_polyn (sub_polyn P (i + 1)) c * c)%Rng.
 Proof.
 intros * Hqr * Hi.
+destruct P as (la, Hla).
+destruct Q as (lb, Hlb).
+move lb before la.
+move r before c.
+move i before r.
+move Hla before Hlb.
+cbn in Hi |-*.
+Print polyn_div_x_sub_const.
+(* peut-être faudrait-il définir sub_polyn_list et redéfinir
+   sub_polyn en fonction de lui ; on ne manipulerait alors
+   que des listes *)
+...
+cbn in Hla H
+revert Q c r i Hqr Hi.
+Print sub_polyn.
+Print eval_polyn.
+Search eval_polyn.
+Print eval_polyn_list.
+...
+intros * Hqr * Hi.
+move Q before P.
 remember (polyn_degree P) as n eqn:Hn; symmetry in Hn.
-revert P Hn c Q r Hqr i Hi.
+revert P Q c r i Hn Hqr Hi.
 induction n; intros; [ easy | ].
 ...
 
@@ -3094,6 +3124,7 @@ Search (polyn_of_list (map _ _)).
 destruct P as (la, Hla).
 cbn - [ norm_polyn_list ].
 ...
+*)
 
 (* in algebraically closed set, a polynomial P is the
    product of its highest coefficient and all (x-rn)
@@ -3178,6 +3209,7 @@ assert (H : polyn_degree Q = n). {
       now apply (IHla n).
     }
 ...
+*)
 
 End in_ring.
 
