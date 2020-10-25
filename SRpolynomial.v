@@ -1412,6 +1412,14 @@ f_equal.
 apply polyn_list_mul_add_distr_l.
 Qed.
 
+Theorem polyn_mul_add_distr_r : ∀ P Q R, ((P + Q) * R = P * R + Q * R)%P.
+Proof.
+intros.
+rewrite polyn_mul_comm.
+rewrite polyn_mul_add_distr_l.
+now do 2 rewrite (polyn_mul_comm R).
+Qed.
+
 Theorem polyn_list_mul_0_l : ∀ la,
   norm_polyn_list ([] * la)%PL = [].
 Proof.
@@ -3020,6 +3028,24 @@ Definition polyn_div_x_sub_const P c :=
      (map (λ i, eval_polyn (sub_polyn P i) c) (seq 1 (polyn_degree P - 1))),
    eval_polyn P c).
 
+Theorem polyn_div_x_sub_const_prop : ∀ P c Q r,
+  polyn_div_x_sub_const P c = (Q, r)
+  → P = ((_x - polyn_of_list [c]) * Q + polyn_of_list [r])%P.
+Proof.
+intros * HQR.
+injection HQR; clear HQR; intros HR HQ.
+apply polyn_eq.
+subst Q r.
+unfold polyn_sub.
+rewrite polyn_mul_add_distr_r.
+rewrite rng_mul_opp_l.
+rewrite fold_polyn_sub.
+Search (polyn_of_list (map _ _)).
+...
+destruct P as (la, Hla).
+cbn - [ norm_polyn_list ].
+...
+
 (* in algebraically closed set, a polynomial P is the
    product of its highest coefficient and all (x-rn)
    where rn cover all roots of P *)
@@ -3064,6 +3090,9 @@ destruct H1 as (x, Hx).
 remember (polyn_div_x_sub_const P x) as QR eqn:HQR.
 symmetry in HQR.
 destruct QR as (Q, R).
+...
+apply polyn_div_x_sub_const_prop in HQR.
+...
 specialize (IHn Q) as H1.
 assert (H : polyn_degree Q = n). {
   destruct Q as (lb, Hlb); cbn.
