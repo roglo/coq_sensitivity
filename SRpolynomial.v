@@ -3020,8 +3020,10 @@ Theorem polyn_list_length : ∀ P,
   length (polyn_list P) = polyn_degree_plus_1 P.
 Proof. easy. Qed.
 
+Definition sub_polyn_list (la : list T) i := skipn i la.
+
 Definition sub_polyn P i :=
-  {| polyn_list := skipn i (polyn_list P);
+  {| polyn_list := sub_polyn_list (polyn_list P) i;
      polyn_prop := subp_polyn_prop i P |}.
 
 (* division of a polynomial P with (x - c) *)
@@ -3032,10 +3034,13 @@ Definition sub_polyn P i :=
        ((a_n.c+a_{n-1})c+...+a_1)x^0
    R = P(c) *)
 
+Definition polyn_list_div_x_sub_const la c :=
+  (map (λ i, eval_polyn_list (sub_polyn_list la i) c) (seq 1 (length la)),
+   eval_polyn_list la c).
+
 Definition polyn_div_x_sub_const P c :=
-  (polyn_of_list
-     (map (λ i, eval_polyn (sub_polyn P i) c) (seq 1 (polyn_degree P - 1))),
-   eval_polyn P c).
+  (polyn_of_list (fst (polyn_list_div_x_sub_const (polyn_list P) c)),
+   snd (polyn_list_div_x_sub_const (polyn_list P) c)).
 
 Theorem polyn_div_x_sub_const_prop : ∀ P c Q r,
   polyn_div_x_sub_const P c = (Q, r)
@@ -3051,24 +3056,9 @@ move lb before la.
 move r before c.
 move i before r.
 move Hla before Hlb.
-cbn in Hi |-*.
-Print polyn_div_x_sub_const.
-(* peut-être faudrait-il définir sub_polyn_list et redéfinir
-   sub_polyn en fonction de lui ; on ne manipulerait alors
-   que des listes *)
-...
-cbn in Hla H
-revert Q c r i Hqr Hi.
-Print sub_polyn.
-Print eval_polyn.
-Search eval_polyn.
-Print eval_polyn_list.
-...
-intros * Hqr * Hi.
-move Q before P.
-remember (polyn_degree P) as n eqn:Hn; symmetry in Hn.
-revert P Q c r i Hn Hqr Hi.
-induction n; intros; [ easy | ].
+unfold polyn_div_x_sub_const in Hqr.
+cbn in Hqr, Hi |-*.
+injection Hqr; clear Hqr; intros Hr Hq.
 ...
 
 Theorem polyn_div_x_sub_const_prop : ∀ P c Q r,
