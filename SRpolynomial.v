@@ -2999,6 +2999,10 @@ specialize (IHla i) as H1.
 now rewrite skipn_length in H1.
 Qed.
 
+Theorem polyn_list_length : ∀ P,
+  length (polyn_list P) = polyn_degree_plus_1 P.
+Proof. easy. Qed.
+
 Definition sub_polyn P i :=
   {| polyn_list := skipn i (polyn_list P);
      polyn_prop := subp_polyn_prop i P |}.
@@ -3079,6 +3083,7 @@ assert (H : polyn_degree Q = n). {
     }
     specialize (H3 H); clear H.
     unfold eval_polyn in H3.
+    unfold polyn_degree_plus_1 in H3.
 ...
 
 End in_ring.
