@@ -3064,11 +3064,12 @@ assert (H : polyn_degree (fst QR) = n). {
   clear - so Hn Hx.
   cbn - [ polyn_degree ].
   rewrite Hn, Nat.sub_succ, Nat.sub_0_r.
-Search polyn_of_list.
-...
-  unfold sub_polyn.
-  unfold eval_polyn.
-  cbn.
+  destruct n; [ easy | ].
+  remember (map (λ i, eval_polyn (sub_polyn P i) x) (seq 1 (S n))) as l eqn:Hl.
+  rewrite List_seq_succ_r in Hl.
+  rewrite map_app in Hl.
+  cbn in Hl.
+Print sub_polyn.
 ...
 
 End in_ring.
