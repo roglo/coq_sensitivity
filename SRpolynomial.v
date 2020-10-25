@@ -3059,6 +3059,17 @@ move Hla before Hlb.
 unfold polyn_div_x_sub_const in Hqr.
 cbn in Hqr, Hi |-*.
 injection Hqr; clear Hqr; intros Hr Hq.
+unfold sub_polyn_list.
+...
+rewrite (List_skipn_cons_nth_skipn_succ _ _ 0%Srng).
+cbn - [ skipn ].
+unfold so.
+rewrite (srng_add_comm _ (nth i la 0%Srng)).
+unfold rng_sub.
+rewrite <- srng_add_assoc.
+rewrite fold_rng_sub.
+...
+fold_right f 0 la - fold_right f 0 lb
 ...
 
 Theorem polyn_div_x_sub_const_prop : ∀ P c Q r,

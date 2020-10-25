@@ -1749,6 +1749,21 @@ apply Nat.succ_le_mono in Hnlen.
 now apply IHlen.
 Qed.
 
+Theorem List_skipn_cons_nth_skipn_succ : ∀ A n (l : list A) d,
+  n < length l
+  → skipn n l = nth n l d :: skipn (S n) l.
+Proof.
+intros * Hn.
+revert l Hn.
+induction n; intros; [ now destruct l | ].
+destruct l as [| a]; [ easy | ].
+cbn in Hn.
+apply Nat.succ_lt_mono in Hn.
+remember (S (S n)) as sn; cbn; subst sn.
+remember (S n) as sn; cbn; subst sn.
+now apply IHn.
+Qed.
+
 Theorem List_last_nth : ∀ A l (d : A), last l d = nth (length l - 1) l d.
 Proof.
 intros.
