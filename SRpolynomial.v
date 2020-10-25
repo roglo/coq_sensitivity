@@ -3078,26 +3078,7 @@ assert (H : polyn_degree Q = n). {
       apply in_seq; flia.
     }
     specialize (H3 H); clear H.
-...
-  cbn.
-  destruc
-  cbn - [ polyn_degree ].
-  rewrite Hn, Nat.sub_succ, Nat.sub_0_r.
-  cbn.
-  destruct n; [ easy | ].
-  rewrite List_seq_succ_r.
-  rewrite map_app.
-  cbn.
-  rewrite norm_polyn_list_app.
-  cbn.
-  destruct (srng_eq_dec (eval_polyn (sub_polyn P (S n)) x) 0) as [Hxz| Hxz]. {
-    cbn.
-    move Hn at bottom.
-    unfold polyn_degree in Hn.
-    unfold polyn_degree_plus_1 in Hn.
-    unfold sub_polyn in Hxz.
-    unfold eval_polyn in Hxz.
-    cbn in Hxz.
+    unfold eval_polyn in H3.
 ...
 
 End in_ring.
