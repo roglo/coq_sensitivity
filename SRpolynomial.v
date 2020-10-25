@@ -3036,6 +3036,42 @@ intros * HQR.
 injection HQR; clear HQR; intros HR HQ.
 apply polyn_eq.
 subst Q r.
+remember (polyn_degree P) as n eqn:Hn.
+symmetry in Hn.
+revert c P Hn.
+induction n; intros. {
+  cbn; rewrite if_1_eq_0; cbn.
+  destruct (srng_eq_dec c 0) as [Hcz| Hcz]. {
+    cbn; rewrite if_1_eq_0; cbn.
+    rewrite srng_add_0_l, srng_mul_0_l.
+    rewrite if_0_eq_0; cbn.
+    subst c; cbn.
+    destruct (srng_eq_dec (eval_polyn P 0%Srng) 0) as [Hpz| Hpz]. {
+      cbn.
+      destruct P as (la, Hla); cbn in Hn |-*.
+      destruct la as [| a]; [ easy | exfalso ].
+      cbn in Hn.
+      rewrite Nat.sub_0_r in Hn.
+      apply length_zero_iff_nil in Hn; subst la.
+      cbn in Hla, Hpz.
+      rewrite srng_add_0_l, srng_mul_1_r in Hpz; subst a.
+      now rewrite if_0_eq_0 in Hla.
+    }
+    destruct P as (la, Hla); cbn in Hn |-*.
+    destruct la as [| a]; [ easy | ].
+    cbn in Hn.
+    rewrite Nat.sub_0_r in Hn.
+    apply length_zero_iff_nil in Hn; subst la.
+    cbn in Hla, Hpz |-*.
+    rewrite srng_add_0_l, srng_mul_1_r in Hpz |-*.
+    now destruct (srng_eq_dec a 0).
+  }
+...
+
+intros * HQR.
+injection HQR; clear HQR; intros HR HQ.
+apply polyn_eq.
+subst Q r.
 unfold polyn_sub.
 rewrite polyn_mul_add_distr_r.
 rewrite rng_mul_opp_l.
