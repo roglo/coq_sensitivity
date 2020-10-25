@@ -3060,16 +3060,30 @@ unfold polyn_div_x_sub_const in Hqr.
 cbn in Hqr, Hi |-*.
 injection Hqr; clear Hqr; intros Hr Hq.
 unfold sub_polyn_list.
-...
-rewrite (List_skipn_cons_nth_skipn_succ _ _ 0%Srng).
+rewrite List_skipn_cons_nth_skipn_succ with (d := 0%Srng); [ | flia Hi ].
 cbn - [ skipn ].
 unfold so.
 rewrite (srng_add_comm _ (nth i la 0%Srng)).
 unfold rng_sub.
 rewrite <- srng_add_assoc.
 rewrite fold_rng_sub.
-...
-fold_right f 0 la - fold_right f 0 lb
+rewrite Nat.add_1_r.
+rewrite rng_add_opp_r, srng_add_0_r.
+rewrite <- Hq.
+rewrite (list_nth_polyn_list_eq _ la). {
+  clear - Hla.
+  destruct la as [| a] using rev_ind; [ easy | clear IHla ].
+  cbn - [ nth ] in Hla.
+  rewrite app_length, Nat.add_comm in Hla; cbn in Hla.
+  rewrite app_nth2 in Hla; [ | now unfold ge ].
+  rewrite Nat.sub_diag in Hla; cbn in Hla.
+  rewrite norm_polyn_list_app; cbn.
+  now destruct (srng_eq_dec a 0).
+}
+intros j.
+destruct (lt_dec j (length la)) as [Hja| Hja]. {
+  rewrite (List_map_nth_in _ 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
 ...
 
 Theorem polyn_div_x_sub_const_prop : ∀ P c Q r,
