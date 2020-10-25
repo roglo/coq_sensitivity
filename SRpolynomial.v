@@ -3058,9 +3058,29 @@ rewrite Hn in H1.
 specialize (H1 (Nat.lt_0_succ _)).
 destruct H1 as (x, Hx).
 remember (polyn_div_x_sub_const P x) as QR eqn:HQR.
-specialize (IHn (fst QR)) as H1.
-assert (H : polyn_degree (fst QR) = n). {
-  rewrite HQR.
+symmetry in HQR.
+destruct QR as (Q, R).
+specialize (IHn Q) as H1.
+assert (H : polyn_degree Q = n). {
+  destruct Q as (lb, Hlb); cbn.
+  destruct lb as [| b]. {
+    cbn in Hlb.
+    unfold polyn_div_x_sub_const in HQR.
+    rewrite Hn in HQR.
+    rewrite Nat.sub_succ, Nat.sub_0_r in HQR.
+    injection HQR; clear HQR; intros HR HQ.
+    specialize (proj2 (all_0_norm_polyn_list_map_0 _ _) HQ) as H2.
+    cbn in H2.
+    clear H1 Hlb.
+    specialize (H2 n) as H3.
+    destruct n; [ easy | exfalso ].
+    assert (H : S n ∈ seq 1 (S n)). {
+      apply in_seq; flia.
+    }
+    specialize (H3 H); clear H.
+...
+  cbn.
+  destruc
   cbn - [ polyn_degree ].
   rewrite Hn, Nat.sub_succ, Nat.sub_0_r.
   cbn.
