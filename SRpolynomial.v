@@ -3030,6 +3030,56 @@ Definition polyn_div_x_sub_const P c :=
 
 Theorem polyn_div_x_sub_const_prop : ∀ P c Q r,
   polyn_div_x_sub_const P c = (Q, r)
+  → ∀ i, i < polyn_degree P
+  → polyn_coeff Q i =
+       (eval_polyn (sub_polyn P i) c -
+        eval_polyn (sub_polyn P (i + 1)) c * c)%Rng.
+Proof.
+intros * Hqr * Hi.
+remember (polyn_degree P) as n eqn:Hn; symmetry in Hn.
+revert P c Q r i Hqr Hn Hi.
+induction n; intros; [ easy | ].
+...
+  apply Nat.le_0_r in Hi.
+  subst i; cbn.
+  unfold polyn_div_x_sub_const in Hqr.
+  rewrite Hn in Hqr.
+  cbn in Hqr.
+  injection Hqr; clear Hqr; intros Hr Hq.
+  subst Q r; cbn.
+  unfold eval_polyn.
+  apply Nat.sub_0_le in Hn.
+  remember (polyn_degree_plus_1 (sub_polyn P 0)) as si eqn:Hsi.
+  remember (polyn_degree_plus_1 (sub_polyn P 1)) as si1 eqn:Hsi1.
+  symmetry in Hsi, Hsi1.
+  replace si with 0. 2: {
+    subst si; cbn; symmetry.
+    destruct P as (la, Hla).
+    cbn in Hn |-*.
+    destruct la as [| a]; [ easy | cbn ].
+    destruct la; [ | cbn in Hn; flia Hn ].
+    cbn in Hla.
+    cbn in Hsi1.
+...
+    destruct la as [| a]; [ now rewrite skipn_nil | cbn ].
+    destruct la; [ | cbn in Hn; flia Hn ].
+    destruct i; [ | now cbn; rewrite skipn_nil ].
+    cbn in Hla.
+...
+... suite ok
+  replace si1 with 0. 2: {
+    subst si1; cbn; symmetry.
+    destruct P as (la, Hla).
+    cbn in Hn |-*.
+    rewrite Nat.add_1_r.
+    destruct la as [| a]; [ easy | cbn ].
+    destruct la; [ | cbn in Hn; flia Hn ].
+    now rewrite skipn_nil.
+  }
+...
+
+Theorem polyn_div_x_sub_const_prop : ∀ P c Q r,
+  polyn_div_x_sub_const P c = (Q, r)
   → P = ((_x - polyn_of_list [c]) * Q + polyn_of_list [r])%P.
 Proof.
 intros * HQR.
