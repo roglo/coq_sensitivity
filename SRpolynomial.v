@@ -3045,6 +3045,26 @@ Definition polyn_div_x_sub_const P c :=
 Theorem polyn_div_x_sub_const_prop : ∀ P c Q r,
   polyn_div_x_sub_const P c = (Q, r)
   → ∀ i, i < polyn_degree P
+  → polyn_coeff Q i = eval_polyn (sub_polyn P i) c.
+Proof.
+intros * Hqr * Hi.
+destruct P as (la, Hla).
+destruct Q as (lb, Hlb).
+move lb before la.
+move r before c.
+move i before r.
+move Hla before Hlb.
+unfold polyn_div_x_sub_const in Hqr.
+cbn in Hqr, Hi |-*.
+injection Hqr; clear Hqr; intros Hr Hq.
+rewrite <- Hq.
+unfold sub_polyn_list.
+Check list_nth_polyn_list_eq.
+...
+
+Theorem polyn_div_x_sub_const_prop : ∀ P c Q r,
+  polyn_div_x_sub_const P c = (Q, r)
+  → ∀ i, i < polyn_degree P
   → polyn_coeff Q i =
        (eval_polyn (sub_polyn P i) c -
         eval_polyn (sub_polyn P (i + 1)) c * c)%Rng.
