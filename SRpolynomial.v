@@ -3076,7 +3076,7 @@ assert (H : polyn_degree Q = n). {
     rewrite Hx in HR.
     specialize (proj2 (all_0_norm_polyn_list_map_0 _ _) HQ) as H2.
     cbn in H2.
-    clear H1 Hlb.
+    clear H1 Hlb R HR.
     specialize (H2 n) as H3.
     destruct n; [ easy | exfalso ].
     assert (H : S n ∈ seq 1 (S n)). {
