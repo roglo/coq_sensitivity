@@ -3073,6 +3073,7 @@ assert (H : polyn_degree Q = n). {
     rewrite Hn in HQR.
     rewrite Nat.sub_succ, Nat.sub_0_r in HQR.
     injection HQR; clear HQR; intros HR HQ.
+    rewrite Hx in HR.
     specialize (proj2 (all_0_norm_polyn_list_map_0 _ _) HQ) as H2.
     cbn in H2.
     clear H1 Hlb.
@@ -3084,6 +3085,26 @@ assert (H : polyn_degree Q = n). {
     specialize (H3 H); clear H.
     unfold eval_polyn in H3.
     unfold polyn_degree_plus_1 in H3.
+    remember (length (polyn_list (sub_polyn P (S n)))) as len eqn:Hlen.
+    symmetry in Hlen.
+    destruct len. {
+      apply length_zero_iff_nil in Hlen.
+      unfold sub_polyn in Hlen.
+      cbn in Hlen.
+      destruct P as (la, Hla).
+      cbn in Hlen.
+      destruct la as [| a]; [ easy | ].
+      cbn in Hn; rewrite Nat.sub_0_r in Hn.
+      clear - Hn Hlen.
+...
+      cbn - [ iter_seq nth ] in Hx.
+      unfold polyn_coeff in Hx.
+      cbn - [ iter_seq nth ] in Hx.
+      cbn - [ nth ] in Hla.
+      clear HQ H2.
+      rewrite <- List_last_nth_cons in Hla.
+      destruct (srng_eq_dec (last (a :: la) 0%Srng) 0) as [| Haz]; [ easy | ].
+      clear Hla R HR H3.
 ...
 
 End in_ring.
