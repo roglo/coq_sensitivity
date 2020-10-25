@@ -3062,33 +3062,22 @@ specialize (IHn (fst QR)) as H1.
 assert (H : polyn_degree (fst QR) = n). {
   rewrite HQR.
   cbn - [ polyn_degree ].
-...
-  clear - so Hn Hx.
   rewrite Hn, Nat.sub_succ, Nat.sub_0_r.
+  cbn.
   destruct n; [ easy | ].
-  remember (map (λ i, eval_polyn (sub_polyn P i) x) (seq 1 (S n))) as l eqn:Hl.
-  rewrite List_seq_succ_r in Hl.
-  rewrite map_app in Hl.
-  cbn in Hl.
-  remember (sub_polyn P (S n)) as Q.
-  unfold sub_polyn in HeqQ.
-  remember (eval_polyn Q x) as y eqn:Hy.
-  rewrite HeqQ in Hy; cbn - [ skipn ] in Hy.
-  unfold polyn_degree in Hn.
-  unfold polyn_degree_plus_1 in Hn.
-  destruct P as (la, Hla).
-  cbn in Hn.
-  destruct la as [| a1] using rev_ind; [ easy | clear IHla ].
-  cbn in Hy.
-  unfold eval_polyn in Hy.
-  cbn in Hy.
-...
-  assert (length (la ++ [a1]) = S (S (S n))). {
-    rewrite <- Hn.
-    rewrite app_length.
-    cbn; flia.
-  }
-  rewrite H in Hy.
+  rewrite List_seq_succ_r.
+  rewrite map_app.
+  cbn.
+  rewrite norm_polyn_list_app.
+  cbn.
+  destruct (srng_eq_dec (eval_polyn (sub_polyn P (S n)) x) 0) as [Hxz| Hxz]. {
+    cbn.
+    move Hn at bottom.
+    unfold polyn_degree in Hn.
+    unfold polyn_degree_plus_1 in Hn.
+    unfold sub_polyn in Hxz.
+    unfold eval_polyn in Hxz.
+    cbn in Hxz.
 ...
 
 End in_ring.
