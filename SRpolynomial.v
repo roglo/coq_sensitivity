@@ -3088,23 +3088,17 @@ assert (H : polyn_degree Q = n). {
     remember (length (polyn_list (sub_polyn P (S n)))) as len eqn:Hlen.
     symmetry in Hlen.
     destruct len. {
-      apply length_zero_iff_nil in Hlen.
-      unfold sub_polyn in Hlen.
-      cbn in Hlen.
       destruct P as (la, Hla).
-      cbn in Hlen.
+      cbn in Hlen, Hn.
       destruct la as [| a]; [ easy | ].
       cbn in Hn; rewrite Nat.sub_0_r in Hn.
       clear - Hn Hlen.
-...
-      cbn - [ iter_seq nth ] in Hx.
-      unfold polyn_coeff in Hx.
-      cbn - [ iter_seq nth ] in Hx.
-      cbn - [ nth ] in Hla.
-      clear HQ H2.
-      rewrite <- List_last_nth_cons in Hla.
-      destruct (srng_eq_dec (last (a :: la) 0%Srng) 0) as [| Haz]; [ easy | ].
-      clear Hla R HR H3.
+      revert n Hn Hlen.
+      induction la as [| a]; intros; [ easy | ].
+      destruct n; [ easy | cbn in Hn, Hlen ].
+      apply Nat.succ_inj in Hn.
+      now apply (IHla n).
+    }
 ...
 
 End in_ring.
