@@ -3110,20 +3110,20 @@ remember (norm_polyn_list _) as la' eqn:Hla'.
 injection Hqr; clear Hqr; intros Hr Hq.
 assert (Hll : length la = length la'). {
   subst la'.
-  remember (length la) as len eqn:Hlen; symmetry in Hlen.
+  remember (length la) as n eqn:Hn; symmetry in Hn.
   symmetry.
-  revert la lq c r Hr Hlen Hq.
-  induction len; intros. {
+  revert la lq c r Hr Hn Hq.
+  induction n; intros. {
     cbn.
     rewrite polyn_list_add_0_r, srng_add_0_l.
-    apply length_zero_iff_nil in Hlen; subst la; cbn in Hr, Hq.
+    apply length_zero_iff_nil in Hn; subst la; cbn in Hr, Hq.
     subst r lq; cbn.
     rewrite srng_mul_0_r, srng_add_0_l.
     now rewrite if_0_eq_0.
   }
   destruct la as [| a]; [ easy | ].
-  cbn in Hlen.
-  apply Nat.succ_inj in Hlen.
+  cbn in Hn.
+  apply Nat.succ_inj in Hn.
   rewrite eval_polyn_list_cons in Hr.
   remember (eval_polyn_list la c) as r' eqn:Hr'.
   symmetry in Hr'; subst r.
@@ -3136,10 +3136,10 @@ assert (Hll : length la = length la'). {
     replace (skipn i la) with (sub_polyn_list la i) by easy.
     easy.
   }
-  remember (map (λ i, eval_polyn_list (sub_polyn_list la i) c) (seq 1 len))
+  remember (map (λ i, eval_polyn_list (sub_polyn_list la i) c) (seq 1 n))
     as lq' eqn:Hlq'.
   symmetry in Hlq'; subst lq.
-  specialize (IHlen la lq' c r' Hr' Hlen Hlq') as H1.
+  specialize (IHn la lq' c r' Hr' Hn Hlq') as H1.
   rewrite fold_eval_polyn_list.
 ...
   rewrite <- Hlq'.
