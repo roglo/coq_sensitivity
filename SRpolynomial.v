@@ -3168,6 +3168,14 @@ assert (Hll : length la = length la'). {
       destruct n; [ | easy ].
       now apply length_zero_iff_nil in Hn; subst la.
     }
+Theorem glop : ∀ la lb d,
+  last (la * lb)%PL d = last la d.
+Proof.
+intros.
+unfold "*"%PL.
+Search (last (map _ _)).
+Theorem glop : ∀ A B (f : A → B) l d,
+  last (map f l) (f d) = f (last l d).
 ...
   revert la lq c r Hr Hn Hq.
   induction n; intros. {
