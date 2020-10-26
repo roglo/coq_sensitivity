@@ -2411,10 +2411,65 @@ cbn in Hpn |-*.
 rewrite nth_overflow; [ easy | flia Hpn ].
 Qed.
 
+(*
+Theorem nth_polyn_list_mul : ∀ la lb i,
+  nth i (la * lb)%PL 0%Srng = polyn_list_convol_mul la lb i.
+Proof.
+...
+Theorem nth_polyn_list_mul : ∀ la lb i,
+  nth i (la * lb)%PL 0%Srng = (Σ (j = 0, i), nth j la 0 * nth (i - j) lb 0)%Srng.
+Proof.
+intros.
+Print polyn_list_convol_mul.
+remember (length la + length lb - 1) as len eqn:Hlen.
+destruct (lt_dec i len) as [Hilen| Hilen]. 2: {
+  apply Nat.nlt_ge in Hilen.
+  rewrite nth_overflow. 2: {
+    unfold polyn_list_mul.
+    now rewrite map_length, seq_length, <- Hlen.
+  }
+  symmetry.
+  apply all_0_srng_summation_0.
+  intros j Hj.
+  destruct (lt_dec j (length la)) as [Hjla| Hjla]. 2: {
+    apply Nat.nlt_ge in Hjla.
+    rewrite nth_overflow; [ | easy ].
+    apply srng_mul_0_l.
+  }
+  destruct (lt_dec (i - j) (length lb)) as [Hjlb| Hjlb]. 2: {
+    apply Nat.nlt_ge in Hjlb.
+    rewrite (nth_overflow lb); [ | easy ].
+    apply srng_mul_0_r.
+  }
+  flia Hlen Hilen Hj Hjla Hjlb.
+}
+unfold polyn_list_mul.
+rewrite Hlen in Hilen.
+rewrite (List_map_nth_in _ 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+now rewrite Nat.add_0_l.
+Qed.
+*)
+
 Theorem polyn_coeff_mul : ∀ P Q i,
   polyn_coeff (P * Q)%P i =
     (Σ (j = 0, i), polyn_coeff P j * polyn_coeff Q (i - j))%Srng.
 Proof.
+(*
+intros.
+unfold polyn_coeff.
+cbn - [ iter_seq norm_polyn_list ].
+remember (polyn_list P) as la.
+remember (polyn_list Q) as lb.
+Search (polyn_list (polyn_of_list _)).
+unfold polyn_of_list.
+...
+cbn - [ iter_seq polyn_list_mul ].
+destruct P as (la, Hla).
+destruct Q as (lb, Hlb).
+cbn - [ iter_seq polyn_list_mul ].
+...
+*)
 intros.
 cbn - [ iter_seq ].
 destruct P as (la, Hla).
@@ -3168,14 +3223,29 @@ assert (Hll : length la = length la'). {
       destruct n; [ | easy ].
       now apply length_zero_iff_nil in Hn; subst la.
     }
-Theorem glop : ∀ la lb d,
-  last (la * lb)%PL d = last la d.
-Proof.
-intros.
-unfold "*"%PL.
+...
+    cbn.
+    rewrite <- Hq at 2.
+    rewrite map_length, seq_length.
+    remember (map _ (seq 1 n)) as lb eqn:Hlb.
+    symmetry in Hlb.
+    destruct lb as [| b]. {
+      rewrite srng_add_0_l.
+      apply map_eq_nil in Hlb.
+      destruct n; [ | easy ].
+      now apply length_zero_iff_nil in Hn; subst la.
+    }
+    remember (map _ (seq 1 n)) as ld eqn:Hld in |-*.
+    symmetry in Hld.
+    destruct ld as [| d]. {
+      apply map_eq_nil in Hld.
+      destruct n; [ | easy ].
+      now apply length_zero_iff_nil in Hn; subst la.
+    }
+    rewrite <- Hq at 2.
+    rewrite <- Hlb.
+    rewrite map_length, seq_length.
 Search (last (map _ _)).
-Theorem glop : ∀ A B (f : A → B) l d,
-  last (map f l) (f d) = f (last l d).
 ...
   revert la lq c r Hr Hn Hq.
   induction n; intros. {
