@@ -3156,6 +3156,29 @@ induction len; intros. {
   apply length_zero_iff_nil in Hlen; subst lb; cbn.
   symmetry; apply srng_mul_0_r.
 }
+(**)
+rewrite List_seq_succ_r.
+rewrite map_app.
+cbn - [ last polyn_list_convol_mul ].
+rewrite List_last_app.
+unfold polyn_list_convol_mul.
+do 2 rewrite List_last_nth.
+destruct la as [| a]. {
+  unfold so.
+  rewrite all_0_srng_summation_0. 2: {
+    intros i Hi.
+    rewrite nth_overflow; [ | cbn; flia ].
+    apply srng_mul_0_l.
+  }
+  cbn; symmetry.
+  apply srng_mul_0_l.
+}
+cbn in Hlen.
+unfold so.
+rewrite (srng_summation_split (length la - 1)); [ | flia Hlen ].
+rewrite (srng_summation_split (length la - 2)); [ | flia ].
+rewrite all_0_srng_summation_0.
+...
 cbn - [ last ].
 rewrite srng_add_0_l.
 destruct la as [| a]. {
