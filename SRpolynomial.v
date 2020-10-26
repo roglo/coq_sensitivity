@@ -3042,10 +3042,10 @@ Definition polyn_div_x_sub_const P c :=
   (polyn_of_list (fst (polyn_list_div_x_sub_const (polyn_list P) c)),
    snd (polyn_list_div_x_sub_const (polyn_list P) c)).
 
-Theorem polyn_div_x_sub_const_prop : ∀ P c Q r,
+Theorem polyn_coeff_quotient_with_x_sub_const : ∀ P c Q r,
   polyn_div_x_sub_const P c = (Q, r)
   → ∀ i, i < polyn_degree P
-  → polyn_coeff Q i = eval_polyn (sub_polyn P i) c.
+  → polyn_coeff Q i = eval_polyn (sub_polyn P (i + 1)) c.
 Proof.
 intros * Hqr * Hi.
 destruct P as (la, Hla).
@@ -3055,61 +3055,67 @@ move r before c.
 move i before r.
 move Hla before Hlb.
 unfold polyn_div_x_sub_const in Hqr.
-cbn in Hqr, Hi |-*.
+cbn in Hqr, Hi.
 injection Hqr; clear Hqr; intros Hr Hq.
+unfold eval_polyn, sub_polyn.
+cbn - [ eval_polyn_list sub_polyn_list ].
 rewrite <- Hq.
-unfold sub_polyn_list.
-Check list_nth_polyn_list_eq.
-...
-
-Theorem polyn_div_x_sub_const_prop : ∀ P c Q r,
-  polyn_div_x_sub_const P c = (Q, r)
-  → ∀ i, i < polyn_degree P
-  → polyn_coeff Q i =
-       (eval_polyn (sub_polyn P i) c -
-        eval_polyn (sub_polyn P (i + 1)) c * c)%Rng.
-Proof.
-intros * Hqr * Hi.
-destruct P as (la, Hla).
-destruct Q as (lb, Hlb).
-move lb before la.
-move r before c.
-move i before r.
-move Hla before Hlb.
-unfold polyn_div_x_sub_const in Hqr.
-cbn in Hqr, Hi |-*.
-injection Hqr; clear Hqr; intros Hr Hq.
-unfold sub_polyn_list.
-rewrite List_skipn_cons_nth_skipn_succ with (d := 0%Srng); [ | flia Hi ].
-cbn - [ skipn ].
-unfold so.
-rewrite (srng_add_comm _ (nth i la 0%Srng)).
-unfold rng_sub.
-rewrite <- srng_add_assoc.
-rewrite fold_rng_sub.
+rewrite <- seq_shift.
+rewrite map_map.
 rewrite Nat.add_1_r.
-rewrite rng_add_opp_r, srng_add_0_r.
-rewrite <- Hq.
-rewrite (list_nth_polyn_list_eq _ la). {
-  clear - Hla.
-  destruct la as [| a] using rev_ind; [ easy | clear IHla ].
-  cbn - [ nth ] in Hla.
-  rewrite app_length, Nat.add_comm in Hla; cbn in Hla.
-  rewrite app_nth2 in Hla; [ | now unfold ge ].
-  rewrite Nat.sub_diag in Hla; cbn in Hla.
-  rewrite norm_polyn_list_app; cbn.
-  now destruct (srng_eq_dec a 0).
-}
-intros j.
-destruct (lt_dec j (length la)) as [Hja| Hja]. {
-  rewrite (List_map_nth_in _ 0); [ | now rewrite seq_length ].
-  rewrite seq_nth; [ | easy ].
-...
+apply nth_norm_polyn_list_map.
+intros j Hj.
+unfold sub_polyn_list.
+rewrite skipn_all2; [ easy | flia Hj ].
+Qed.
 
 Theorem polyn_div_x_sub_const_prop : ∀ P c Q r,
   polyn_div_x_sub_const P c = (Q, r)
   → P = ((_x - polyn_of_list [c]) * Q + polyn_of_list [r])%P.
 Proof.
+intros * HQR.
+specialize (polyn_coeff_quotient_with_x_sub_const HQR) as H1.
+apply polyn_eq.
+cbn - [ norm_polyn_list polyn_list_mul ].
+rewrite norm_polyn_list_add_idemp_l.
+rewrite norm_polyn_list_add_idemp_l.
+rewrite norm_polyn_list_add_idemp_r.
+injection HQR; clear HQR; intros HR HQ.
+replace  ([0%Srng; 1%Srng] + map rng_opp (norm_polyn_list [c]))%PL
+  with [(- c)%Rng; 1%Srng]. 2: {
+  cbn.
+  destruct (srng_eq_dec c 0) as [Hcz| Hcz]. {
+    subst c; cbn.
+    unfold so.
+    now rewrite rng_opp_0.
+  }
+  cbn.
+  now rewrite srng_add_0_l.
+}
+remember (norm_polyn_list [_; _]) as x eqn:Hx.
+cbn in Hx.
+rewrite if_1_eq_0 in Hx; cbn in Hx; subst x.
+...
+destruct P as (la, Hla).
+destruct Q as (lb, Hlb).
+move lb before la.
+move Hlb before Hla.
+injection HQR; clear HQR; intros HR HQ.
+cbn - [ norm_polyn_list ].
+rewrite norm_polyn_list_add_idemp_l.
+rewrite norm_polyn_list_add_idemp_l.
+rewrite norm_polyn_list_add_idemp_r.
+unfold eval_polyn, sub_polyn in H1.
+cbn - [ eval_polyn_list sub_polyn_list ] in H1.
+Search (polyn_list_convol_mul (norm_polyn_list _)).
+...
+rewrite norm_polyn_list_add.
+...
+nth_norm_polyn_list_map:
+  ∀ (i len : nat) (f : nat → T),
+    (∀ i0 : nat, len ≤ i0 → f i0 = 0%Srng)
+    → nth i (norm_polyn_list (map f (seq 0 len))) 0%Srng = f i
+...
 intros * HQR.
 injection HQR; clear HQR; intros HR HQ.
 apply polyn_eq.
@@ -3122,10 +3128,12 @@ induction n; intros. {
   destruct (srng_eq_dec c 0) as [Hcz| Hcz]. {
     cbn; rewrite if_1_eq_0; cbn.
     rewrite srng_add_0_l, srng_mul_0_l.
-    rewrite if_0_eq_0; cbn.
     subst c; cbn.
-    destruct (srng_eq_dec (eval_polyn P 0%Srng) 0) as [Hpz| Hpz]. {
+    destruct P as (la, Hla); cbn - [ eval_polyn_list ].
+    destruct (srng_eq_dec (eval_polyn_list la 0%Srng) 0) as [Hpz| Hpz]. {
       cbn.
+      rewrite rev_length.
+...
       destruct P as (la, Hla); cbn in Hn |-*.
       destruct la as [| a]; [ easy | exfalso ].
       cbn in Hn.
