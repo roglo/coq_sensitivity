@@ -3042,32 +3042,49 @@ Definition polyn_div_x_sub_const P c :=
   (polyn_of_list (fst (polyn_list_div_x_sub_const (polyn_list P) c)),
    snd (polyn_list_div_x_sub_const (polyn_list P) c)).
 
+Theorem polyn_list_nth_quotient_with_x_sub_const : ∀ la lq r c,
+  polyn_list_div_x_sub_const la c = (lq, r)
+  → ∀ i, i < length la
+  → nth i lq 0%Srng = eval_polyn_list (sub_polyn_list la (i + 1)) c.
+Proof.
+intros * Hqr * Hi.
+injection Hqr; clear Hqr; intros Hr Hq.
+subst lq; cbn.
+rewrite (List_map_nth_in _ 0); [ | now rewrite seq_length ].
+rewrite Nat.add_comm.
+now rewrite seq_nth.
+Qed.
+
 Theorem polyn_coeff_quotient_with_x_sub_const : ∀ P c Q r,
   polyn_div_x_sub_const P c = (Q, r)
   → ∀ i, i < polyn_degree P
   → polyn_coeff Q i = eval_polyn (sub_polyn P (i + 1)) c.
 Proof.
 intros * Hqr * Hi.
-destruct P as (la, Hla).
-destruct Q as (lb, Hlb).
-move lb before la.
-move r before c.
-move i before r.
-move Hla before Hlb.
+unfold polyn_div_x_sub_const in Hqr.
+remember (polyn_list_div_x_sub_const _ _) as ll eqn:Hll.
+symmetry in Hll.
+destruct ll as (lq, rr).
+injection Hqr; clear Hqr; intros Hr Hq; subst Q rr.
 unfold eval_polyn, sub_polyn.
 cbn - [ eval_polyn_list sub_polyn_list ].
-unfold polyn_div_x_sub_const in Hqr.
-cbn in Hqr, Hi.
-injection Hqr; clear Hqr; intros Hr Hq.
-clear Hla Hlb.
-rewrite <- Hq.
-rewrite <- seq_shift.
-rewrite map_map.
-rewrite Nat.add_1_r.
-apply nth_norm_polyn_list_map.
-intros j Hj.
-unfold sub_polyn_list.
-rewrite skipn_all2; [ easy | flia Hj ].
+unfold polyn_degree, polyn_degree_plus_1 in Hi.
+remember (polyn_list P) as la.
+clear P Heqla.
+replace (nth i (norm_polyn_list lq) 0%Srng) with (nth i lq 0%Srng). 2: {
+  injection Hll; clear Hll; intros; subst lq r.
+  rewrite <- seq_shift, map_map.
+  rewrite (List_map_nth_in _ 0); [ | rewrite seq_length; flia Hi ].
+  rewrite seq_nth; [ | flia Hi ].
+  rewrite Nat.add_0_l.
+  symmetry.
+  apply nth_norm_polyn_list_map.
+  intros j Hj.
+  unfold sub_polyn_list.
+  rewrite skipn_all2; [ easy | flia Hj ].
+}
+apply polyn_list_nth_quotient_with_x_sub_const with (r := r); [ easy | ].
+flia Hi.
 Qed.
 
 Theorem polyn_div_x_sub_const_prop : ∀ P c Q r,
