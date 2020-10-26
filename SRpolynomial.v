@@ -85,6 +85,10 @@ Context {rp : @ring_prop T ro}.
 Context {sdp : @sring_dec_prop T so}.
 Existing Instance so.
 
+Theorem fold_eval_polyn_list : ∀ la (x : T),
+  fold_right (λ a acc, (acc * x + a)%Srng) 0%Srng la = eval_polyn_list la x.
+Proof. easy. Qed.
+
 (* normalize a list, i.e. remove all trailing 0s *)
 
 Fixpoint strip_0s l :=
@@ -3027,6 +3031,14 @@ Definition sub_polyn P i :=
   {| polyn_list := sub_polyn_list (polyn_list P) i;
      polyn_prop := subp_polyn_prop i P |}.
 
+Theorem eval_polyn_list_cons : ∀ la (a x : T),
+  eval_polyn_list (a :: la) x = (a + x * eval_polyn_list la x)%Srng.
+Proof.
+intros.
+cbn; rewrite srng_add_comm; f_equal.
+apply srng_mul_comm.
+Qed.
+
 (* division of a polynomial P with (x - c) *)
 (* P = (x-c).Q + R with
    Q = a_n.x^{n-1} +
@@ -3109,12 +3121,32 @@ assert (Hll : length la = length la'). {
     rewrite srng_mul_0_r, srng_add_0_l.
     now rewrite if_0_eq_0.
   }
-(* bin non, ça va pas marcher, ça *)
+  destruct la as [| a]; [ easy | ].
+  cbn in Hlen.
+  apply Nat.succ_inj in Hlen.
+  rewrite eval_polyn_list_cons in Hr.
+  remember (eval_polyn_list la c) as r' eqn:Hr'.
+  symmetry in Hr'; subst r.
+  cbn in Hq.
+  rewrite <- seq_shift in Hq.
+  rewrite map_map in Hq.
+  erewrite map_ext_in in Hq. 2: {
+    intros i Hi.
+    cbn - [ eval_polyn_list ].
+    replace (skipn i la) with (sub_polyn_list la i) by easy.
+    easy.
+  }
+  remember (map (λ i, eval_polyn_list (sub_polyn_list la i) c) (seq 1 len))
+    as lq' eqn:Hlq'.
+  symmetry in Hlq'; subst lq.
+  specialize (IHlen la lq' c r' Hr' Hlen Hlq') as H1.
+  rewrite fold_eval_polyn_list.
 ...
-  cbn - [ norm_polyn_list polyn_list_mul ].
-  rewrite polyn_list_add_0_r.
-  rewrite srng_add_0_l.
-  rewrite norm_polyn_list_cons.
+  rewrite <- Hlq'.
+  replace (eval_polyn_list la c :: _) with (map (λ i, eval_polyn_list (sub_polyn_list la i) c) (seq 0 len)). 2: {
+    destruct len. 2: {
+      remember (seq 1 (S len)) as x; cbn; subst x.
+      f_equal.
 ...
 }
 split; [ easy | ].
@@ -3352,8 +3384,8 @@ Notation "'Π' ( i = b , e ) , g" :=
 Arguments is_monic_polyn {T ro sdp} P%P.
 Arguments norm_polyn_list {T ro sdp} l%PL.
 Arguments polyn_coeff {T so sdp} P%P i%nat.
-Arguments polyn_eq_dec {T ro sdp} P%P Q%P.
 Arguments polyn_degree {T so sdp} P%P.
+Arguments polyn_eq_dec {T ro sdp} P%P Q%P.
 Arguments polyn_list_convol_mul {T ro} la%PL lb%PL _%nat.
 Arguments polyn_list {T so sdp} p%P.
 
