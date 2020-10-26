@@ -3112,6 +3112,7 @@ assert (Hll : length la = length la'). {
   subst la'.
   remember (length la) as n eqn:Hn; symmetry in Hn.
   symmetry.
+...
   revert la lq c r Hr Hn Hq.
   induction n; intros. {
     cbn.
@@ -3141,12 +3142,6 @@ assert (Hll : length la = length la'). {
   symmetry in Hlq'; subst lq.
   specialize (IHn la lq' c r' Hr' Hn Hlq') as H1.
   rewrite fold_eval_polyn_list.
-...
-  rewrite <- Hlq'.
-  replace (eval_polyn_list la c :: _) with (map (λ i, eval_polyn_list (sub_polyn_list la i) c) (seq 0 len)). 2: {
-    destruct len. 2: {
-      remember (seq 1 (S len)) as x; cbn; subst x.
-      f_equal.
 ...
 }
 split; [ easy | ].
