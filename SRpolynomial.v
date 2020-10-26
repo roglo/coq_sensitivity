@@ -272,6 +272,7 @@ Notation "'Π' ( i = b , e ) , g" :=
   (at level 45, i at level 0, b at level 60, e at level 60) :
      polynomial_scope.
 
+Arguments norm_polyn_list l%PL.
 Arguments polyn_coeff {T so sdp} P%P i%nat.
 Arguments polyn_degree {T so sdp} P%P.
 
@@ -3091,7 +3092,32 @@ Theorem polyn_list_div_x_sub_const_prop : ∀ la lq c r,
   polyn_list_div_x_sub_const la c = (lq, r)
   → la = norm_polyn_list ([(- c)%Rng; 1%Srng] * lq + [r])%PL.
 Proof.
-intros * Hll.
+intros * Hqr.
+apply (proj2 (List_eq_iff _ _)).
+remember (norm_polyn_list _) as la' eqn:Hla'.
+injection Hqr; clear Hqr; intros Hr Hq.
+assert (Hll : length la = length la'). {
+  subst la'.
+  remember (length la) as len eqn:Hlen; symmetry in Hlen.
+  symmetry.
+  revert la lq c r Hr Hlen Hq.
+  induction len; intros. {
+    cbn.
+    rewrite polyn_list_add_0_r, srng_add_0_l.
+    apply length_zero_iff_nil in Hlen; subst la; cbn in Hr, Hq.
+    subst r lq; cbn.
+    rewrite srng_mul_0_r, srng_add_0_l.
+    now rewrite if_0_eq_0.
+  }
+(* bin non, ça va pas marcher, ça *)
+...
+  cbn - [ norm_polyn_list polyn_list_mul ].
+  rewrite polyn_list_add_0_r.
+  rewrite srng_add_0_l.
+  rewrite norm_polyn_list_cons.
+...
+}
+split; [ easy | ].
 ...
 
 Theorem polyn_div_x_sub_const_prop : ∀ P c Q r,
