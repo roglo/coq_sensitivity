@@ -3074,13 +3074,15 @@ Theorem polyn_div_x_sub_const_prop : ∀ P c Q r,
   → P = ((_x - polyn_of_list [c]) * Q + polyn_of_list [r])%P.
 Proof.
 intros * HQR.
+(*
 specialize (polyn_coeff_quotient_with_x_sub_const HQR) as H1.
+injection HQR; clear HQR; intros HR HQ.
+*)
 apply polyn_eq.
 cbn - [ norm_polyn_list polyn_list_mul ].
 rewrite norm_polyn_list_add_idemp_l.
 rewrite norm_polyn_list_add_idemp_l.
 rewrite norm_polyn_list_add_idemp_r.
-injection HQR; clear HQR; intros HR HQ.
 replace  ([0%Srng; 1%Srng] + map rng_opp (norm_polyn_list [c]))%PL
   with [(- c)%Rng; 1%Srng]. 2: {
   cbn.
