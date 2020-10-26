@@ -3140,6 +3140,81 @@ destruct ld; [ | easy ].
 now apply app_eq_nil in Hld.
 Qed.
 
+Theorem polyn_list_mul_last : ∀ la lb,
+  last (la * lb)%PL 0%Srng = (last la 0 * last lb 0)%Srng.
+Proof.
+intros.
+unfold polyn_list_mul.
+remember (length la + length lb - 1) as len eqn:Hlen.
+symmetry in Hlen.
+revert la lb Hlen.
+induction len; intros. {
+  cbn.
+  destruct la as [| a]; [ now cbn; rewrite srng_mul_0_l | ].
+  cbn in Hlen; rewrite Nat.sub_0_r in Hlen.
+  destruct la; [ | easy ].
+  apply length_zero_iff_nil in Hlen; subst lb; cbn.
+  symmetry; apply srng_mul_0_r.
+}
+cbn - [ last ].
+rewrite srng_add_0_l.
+destruct la as [| a]. {
+  cbn - [ last ].
+  rewrite srng_mul_0_l.
+  unfold last at 2.
+  rewrite srng_mul_0_l.
+  rewrite (map_polyn_list_convol_mul_0_l 0).
+  rewrite seq_length.
+  clear.
+  induction len; [ easy | cbn ].
+  destruct len; [ easy | ].
+  now cbn in IHlen; cbn.
+}
+cbn in Hlen.
+rewrite Nat.sub_0_r in Hlen.
+...
+intros.
+revert lb.
+induction la as [| a]; intros. {
+  cbn; rewrite srng_mul_0_l.
+  rewrite (map_polyn_list_convol_mul_0_l 0).
+  rewrite seq_length.
+  destruct (length lb - 1); [ easy | ].
+  rewrite List_repeat_succ_app.
+  now rewrite List_last_app.
+}
+cbn.
+rewrite Nat.sub_0_r.
+remember (length la + length lb) as len eqn:Hlen.
+symmetry in Hlen.
+destruct len. {
+  apply Nat.eq_add_0 in Hlen.
+  destruct Hlen as (Ha, Hb).
+  apply length_zero_iff_nil in Ha.
+  apply length_zero_iff_nil in Hb.
+  subst la lb; cbn.
+  symmetry.
+  apply srng_mul_0_r.
+}
+rewrite map_polyn_list_convol_mul_cons_l.
+cbn - [ iter_seq ].
+rewrite polyn_list_add_map.
+Search ((_ ++ _) * _)%PL.
+...
+intros.
+revert lb.
+induction la as [| a] using rev_ind; intros. {
+  cbn; rewrite srng_mul_0_l.
+  rewrite (map_polyn_list_convol_mul_0_l 0).
+  rewrite seq_length.
+  destruct (length lb - 1); [ easy | ].
+  rewrite List_repeat_succ_app.
+  now rewrite List_last_app.
+}
+rewrite List_last_app.
+Search ((_ ++ _) * _)%PL.
+...
+
 (* division of a polynomial P with (x - c) *)
 (* P = (x-c).Q + R with
    Q = a_n.x^{n-1} +
@@ -3223,6 +3298,8 @@ assert (Hll : length la = length la'). {
       destruct n; [ | easy ].
       now apply length_zero_iff_nil in Hn; subst la.
     }
+...
+rewrite polyn_list_mul_last.
 ...
     cbn.
     rewrite <- Hq at 2.
