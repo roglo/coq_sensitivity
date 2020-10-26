@@ -3173,11 +3173,26 @@ destruct la as [| a]. {
   cbn; symmetry.
   apply srng_mul_0_l.
 }
+destruct lb as [| b]. {
+  unfold so.
+  rewrite all_0_srng_summation_0. 2: {
+    intros i Hi.
+    rewrite (nth_overflow []); [ | cbn; flia ].
+    apply srng_mul_0_r.
+  }
+  cbn; symmetry.
+  apply srng_mul_0_r.
+}
 cbn in Hlen.
 unfold so.
+rewrite (srng_summation_split (length la)); [ | flia Hlen ].
 rewrite (srng_summation_split (length la - 1)); [ | flia Hlen ].
-rewrite (srng_summation_split (length la - 2)); [ | flia ].
-rewrite all_0_srng_summation_0.
+...
+rewrite all_0_srng_summation_0. 2: {
+  intros i Hi.
+  rewrite (nth_overflow (b :: lb)). 2: {
+    cbn.
+    flia Hlen Hi.
 ...
 cbn - [ last ].
 rewrite srng_add_0_l.
