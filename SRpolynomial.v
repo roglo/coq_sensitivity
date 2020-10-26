@@ -3168,13 +3168,6 @@ assert (Hll : length la = length la'). {
       destruct n; [ | easy ].
       now apply length_zero_iff_nil in Hn; subst la.
     }
-    destruct lq as [| q]. {
-      apply map_eq_nil in Hq.
-      destruct n; [ | easy ].
-      now apply length_zero_iff_nil in Hn; subst la.
-    }
-Search (_ * (_ :: _))%PL.
-Search ((_ :: _) * _)%PL.
 ...
   revert la lq c r Hr Hn Hq.
   induction n; intros. {
