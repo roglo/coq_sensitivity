@@ -3054,11 +3054,12 @@ move lb before la.
 move r before c.
 move i before r.
 move Hla before Hlb.
+unfold eval_polyn, sub_polyn.
+cbn - [ eval_polyn_list sub_polyn_list ].
 unfold polyn_div_x_sub_const in Hqr.
 cbn in Hqr, Hi.
 injection Hqr; clear Hqr; intros Hr Hq.
-unfold eval_polyn, sub_polyn.
-cbn - [ eval_polyn_list sub_polyn_list ].
+clear Hla Hlb.
 rewrite <- Hq.
 rewrite <- seq_shift.
 rewrite map_map.
