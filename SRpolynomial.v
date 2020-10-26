@@ -3087,11 +3087,18 @@ apply polyn_list_nth_quotient_with_x_sub_const with (r := r); [ easy | ].
 flia Hi.
 Qed.
 
+Theorem polyn_list_div_x_sub_const_prop : ∀ la lq c r,
+  polyn_list_div_x_sub_const la c = (lq, r)
+  → la = norm_polyn_list ([(- c)%Rng; 1%Srng] * lq + [r])%PL.
+Proof.
+intros * Hll.
+...
+
 Theorem polyn_div_x_sub_const_prop : ∀ P c Q r,
   polyn_div_x_sub_const P c = (Q, r)
   → P = ((_x - polyn_of_list [c]) * Q + polyn_of_list [r])%P.
 Proof.
-intros * HQR.
+intros * Hqr.
 apply polyn_eq.
 cbn - [ norm_polyn_list polyn_list_mul ].
 rewrite norm_polyn_list_add_idemp_l.
@@ -3111,10 +3118,18 @@ replace  ([0%Srng; 1%Srng] + map rng_opp (norm_polyn_list [c]))%PL
 remember (norm_polyn_list [_; _]) as x eqn:Hx.
 cbn in Hx.
 rewrite if_1_eq_0 in Hx; cbn in Hx; subst x.
-(*
-specialize (polyn_coeff_quotient_with_x_sub_const HQR) as H1.
-injection HQR; clear HQR; intros HR HQ.
-*)
+unfold polyn_div_x_sub_const in Hqr.
+remember (polyn_list_div_x_sub_const _ _) as ll eqn:Hll.
+symmetry in Hll.
+destruct ll as (lq, rr).
+injection Hqr; clear Hqr; intros Hr Hq; subst Q rr.
+remember (polyn_list (polyn_of_list lq)) as x eqn:Hx.
+cbn in Hx; subst x.
+rewrite <- norm_polyn_list_add_idemp_l.
+rewrite norm_polyn_list_mul_idemp_r.
+rewrite norm_polyn_list_add_idemp_l.
+...
+now apply polyn_list_div_x_sub_const_prop.
 ...
 destruct P as (la, Hla).
 destruct Q as (lb, Hlb).
