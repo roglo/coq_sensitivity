@@ -3140,6 +3140,10 @@ destruct ld; [ | easy ].
 now apply app_eq_nil in Hld.
 Qed.
 
+...
+
+(* ouais, chuis pas sûr que ça soit bon, ça *)
+
 Theorem polyn_list_mul_last : ∀ la lb,
   last (la * lb)%PL 0%Srng = (last la 0 * last lb 0)%Srng.
 Proof.
@@ -3184,10 +3188,21 @@ destruct lb as [| b]. {
   apply srng_mul_0_r.
 }
 cbn in Hlen.
+cbn - [ iter_seq nth ].
+do 2 rewrite Nat.sub_0_r.
+destruct la as [| a1]. {
+  unfold so.
+  rewrite all_0_srng_summation_0. 2: {
+    intros i Hi.
+    destruct i. {
+      cbn.
+      rewrite Nat.sub_0_r.
+      destruct len.
+      cbn in Hlen.
+...
 unfold so.
 rewrite (srng_summation_split (length la)); [ | flia Hlen ].
 rewrite (srng_summation_split (length la - 1)); [ | flia Hlen ].
-...
 rewrite all_0_srng_summation_0. 2: {
   intros i Hi.
   rewrite (nth_overflow (b :: lb)). 2: {
