@@ -3161,9 +3161,20 @@ assert (Hll : length la = length la'). {
   symmetry.
 (**)
   rewrite norm_polyn_list_id. 2: {
-    (* devrait être prouvé par Haz *)
     rewrite last_polyn_list_add_length_lt. 2: {
       cbn - [ polyn_list_mul ].
+      destruct lq as [| q]; [ exfalso | cbn; flia ].
+      apply map_eq_nil in Hq.
+      destruct n; [ | easy ].
+      now apply length_zero_iff_nil in Hn; subst la.
+    }
+    destruct lq as [| q]. {
+      apply map_eq_nil in Hq.
+      destruct n; [ | easy ].
+      now apply length_zero_iff_nil in Hn; subst la.
+    }
+Search (_ * (_ :: _))%PL.
+Search ((_ :: _) * _)%PL.
 ...
   revert la lq c r Hr Hn Hq.
   induction n; intros. {
