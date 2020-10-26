@@ -3101,10 +3101,11 @@ flia Hi.
 Qed.
 
 Theorem polyn_list_div_x_sub_const_prop : ∀ la lq c r,
-  polyn_list_div_x_sub_const la c = (lq, r)
+  last la 0%Srng ≠ 0%Srng
+  → polyn_list_div_x_sub_const la c = (lq, r)
   → la = norm_polyn_list ([(- c)%Rng; 1%Srng] * lq + [r])%PL.
 Proof.
-intros * Hqr.
+intros * Haz Hqr.
 apply (proj2 (List_eq_iff _ _)).
 remember (norm_polyn_list _) as la' eqn:Hla'.
 injection Hqr; clear Hqr; intros Hr Hq.
@@ -3112,6 +3113,9 @@ assert (Hll : length la = length la'). {
   subst la'.
   remember (length la) as n eqn:Hn; symmetry in Hn.
   symmetry.
+(**)
+  rewrite norm_polyn_list_id. 2: {
+    (* devrait être prouvé par Haz *)
 ...
   revert la lq c r Hr Hn Hq.
   induction n; intros. {
