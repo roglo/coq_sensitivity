@@ -3039,6 +3039,52 @@ cbn; rewrite srng_add_comm; f_equal.
 apply srng_mul_comm.
 Qed.
 
+Theorem last_polyn_list_add_length_lt : ∀ la lb d,
+  length lb < length la
+  → last (la + lb)%PL d = last la d.
+Proof.
+intros * Hll.
+rewrite polyn_list_add_comm.
+revert la Hll.
+induction lb as [| b] using rev_ind; intros; [ easy | ].
+destruct la as [| a] using rev_ind; [ now cbn in Hll | clear IHla ].
+do 2 rewrite app_length, Nat.add_1_r in Hll.
+apply Nat.succ_lt_mono in Hll.
+rewrite List_last_app.
+rewrite polyn_list_add_app_l.
+rewrite firstn_app.
+rewrite (proj2 (Nat.sub_0_le _ _)); [ | flia Hll ].
+rewrite firstn_O, app_nil_r.
+rewrite skipn_app.
+rewrite (proj2 (Nat.sub_0_le _ _)); [ | flia Hll ].
+rewrite skipn_O.
+rewrite List_last_app_not_nil_r. 2: {
+  now destruct (skipn (length lb) la).
+}
+cbn.
+remember (skipn (length lb) la) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc as [| c]. {
+  exfalso.
+  remember (length lb) as len.
+  clear - Hll Hlc.
+  revert la Hll Hlc.
+  induction len; intros; cbn. {
+    now cbn in Hlc; subst la.
+  }
+  destruct la as [| a]; [ easy | ].
+  cbn in Hll, Hlc.
+  apply Nat.succ_lt_mono in Hll.
+  now apply (IHlen la).
+}
+cbn.
+rewrite List_last_app.
+remember (lc ++ [a]) as ld eqn:Hld.
+symmetry in Hld.
+destruct ld; [ | easy ].
+now apply app_eq_nil in Hld.
+Qed.
+
 (* division of a polynomial P with (x - c) *)
 (* P = (x-c).Q + R with
    Q = a_n.x^{n-1} +
@@ -3116,6 +3162,8 @@ assert (Hll : length la = length la'). {
 (**)
   rewrite norm_polyn_list_id. 2: {
     (* devrait être prouvé par Haz *)
+    rewrite last_polyn_list_add_length_lt. 2: {
+      cbn - [ polyn_list_mul ].
 ...
   revert la lq c r Hr Hn Hq.
   induction n; intros. {
