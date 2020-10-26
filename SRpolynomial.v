@@ -3140,10 +3140,6 @@ destruct ld; [ | easy ].
 now apply app_eq_nil in Hld.
 Qed.
 
-...
-
-(* ouais, chuis pas sûr que ça soit bon, ça *)
-
 Theorem polyn_list_mul_last : ∀ la lb,
   last (la * lb)%PL 0%Srng = (last la 0 * last lb 0)%Srng.
 Proof.
@@ -3192,80 +3188,44 @@ cbn - [ iter_seq nth ].
 do 2 rewrite Nat.sub_0_r.
 destruct la as [| a1]. {
   unfold so.
+  cbn in Hlen.
+  apply Nat.succ_inj in Hlen.
+  rewrite srng_summation_split_first; [ | flia ].
   rewrite all_0_srng_summation_0. 2: {
     intros i Hi.
-    destruct i. {
-      cbn.
-      rewrite Nat.sub_0_r.
-      destruct len.
-      cbn in Hlen.
-...
+    destruct i; [ easy | ].
+    rewrite nth_overflow; [ | cbn; flia ].
+    apply srng_mul_0_l.
+  }
+  rewrite srng_add_0_r, Nat.sub_0_r.
+  now rewrite Hlen.
+}
+rewrite <- List_last_nth_cons.
+rewrite List_last_cons_cons.
+rewrite List_last_nth_cons.
+rewrite Nat.sub_0_r in Hlen; cbn in Hlen.
 unfold so.
+rewrite (srng_summation_split (S (length la))); [ | flia Hlen ].
 rewrite (srng_summation_split (length la)); [ | flia Hlen ].
-rewrite (srng_summation_split (length la - 1)); [ | flia Hlen ].
 rewrite all_0_srng_summation_0. 2: {
   intros i Hi.
-  rewrite (nth_overflow (b :: lb)). 2: {
-    cbn.
-    flia Hlen Hi.
-...
-cbn - [ last ].
-rewrite srng_add_0_l.
-destruct la as [| a]. {
-  cbn - [ last ].
-  rewrite srng_mul_0_l.
-  unfold last at 2.
-  rewrite srng_mul_0_l.
-  rewrite (map_polyn_list_convol_mul_0_l 0).
-  rewrite seq_length.
-  clear.
-  induction len; [ easy | cbn ].
-  destruct len; [ easy | ].
-  now cbn in IHlen; cbn.
-}
-cbn in Hlen.
-rewrite Nat.sub_0_r in Hlen.
-...
-intros.
-revert lb.
-induction la as [| a]; intros. {
-  cbn; rewrite srng_mul_0_l.
-  rewrite (map_polyn_list_convol_mul_0_l 0).
-  rewrite seq_length.
-  destruct (length lb - 1); [ easy | ].
-  rewrite List_repeat_succ_app.
-  now rewrite List_last_app.
-}
-cbn.
-rewrite Nat.sub_0_r.
-remember (length la + length lb) as len eqn:Hlen.
-symmetry in Hlen.
-destruct len. {
-  apply Nat.eq_add_0 in Hlen.
-  destruct Hlen as (Ha, Hb).
-  apply length_zero_iff_nil in Ha.
-  apply length_zero_iff_nil in Hb.
-  subst la lb; cbn.
-  symmetry.
+  rewrite (nth_overflow (b :: lb)); [ | cbn; flia Hlen Hi ].
   apply srng_mul_0_r.
 }
-rewrite map_polyn_list_convol_mul_cons_l.
-cbn - [ iter_seq ].
-rewrite polyn_list_add_map.
-Search ((_ ++ _) * _)%PL.
-...
-intros.
-revert lb.
-induction la as [| a] using rev_ind; intros. {
-  cbn; rewrite srng_mul_0_l.
-  rewrite (map_polyn_list_convol_mul_0_l 0).
-  rewrite seq_length.
-  destruct (length lb - 1); [ easy | ].
-  rewrite List_repeat_succ_app.
-  now rewrite List_last_app.
+rewrite srng_add_0_l.
+rewrite Nat.add_1_r.
+rewrite srng_summation_only_one.
+rewrite all_0_srng_summation_0. 2: {
+  intros i Hi.
+  rewrite (nth_overflow (a :: a1 :: la)); [ | cbn; flia Hlen Hi ].
+  apply srng_mul_0_l.
 }
-rewrite List_last_app.
-Search ((_ ++ _) * _)%PL.
+rewrite srng_add_0_r.
+now replace (len - S (length la)) with (length lb) by flia Hlen.
+Qed.
+
+Inspect 1.
+
 ...
 
 (* division of a polynomial P with (x - c) *)
