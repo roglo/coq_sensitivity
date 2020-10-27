@@ -532,13 +532,21 @@ now rewrite <- H1, <- H2, H3.
 Qed.
 
 Theorem polyn_list_add_length : ∀ la lb,
-  length (polyn_list_add la lb) = max (length la) (length lb).
+  length (la + lb)%PL = max (length la) (length lb).
 Proof.
 intros.
 revert lb.
 induction la as [| a]; intros; [ easy | cbn ].
 destruct lb as [| b]; [ easy | cbn ].
 f_equal; apply IHla.
+Qed.
+
+Theorem polyn_list_mul_length : ∀ la lb,
+  length (la * lb)%PL = length la + length lb - 1.
+Proof.
+intros.
+unfold polyn_list_mul; cbn.
+now rewrite map_length, seq_length.
 Qed.
 
 Theorem norm_polyn_list_involutive : ∀ la,
@@ -3285,17 +3293,13 @@ apply polyn_list_nth_quotient_with_x_sub_const with (r := r); [ easy | ].
 flia Hi.
 Qed.
 
-Theorem polyn_list_div_x_sub_const_prop : ∀ la lq c r,
+Theorem polyn_list_div_x_sub_const_length : ∀ la lq c r,
   last la 0%Srng ≠ 0%Srng
   → polyn_list_div_x_sub_const la c = (lq, r)
-  → la = norm_polyn_list ([(- c)%Rng; 1%Srng] * lq + [r])%PL.
+  → length la = length (norm_polyn_list ([(- c)%Rng; 1%Srng] * lq + [r])%PL).
 Proof.
 intros * Haz Hqr.
-apply (proj2 (List_eq_iff _ _)).
-remember (norm_polyn_list _) as la' eqn:Hla'.
 injection Hqr; clear Hqr; intros Hr Hq.
-assert (Hll : length la = length la'). {
-  subst la'.
   remember (length la) as n eqn:Hn; symmetry in Hn.
   symmetry.
   destruct n. {
@@ -3331,6 +3335,25 @@ assert (Hll : length la = length la'). {
     rewrite List_skipn_last with (d := 0%Srng) by now destruct la.
     now cbn; rewrite srng_mul_0_l, srng_add_0_l.
   }
+  rewrite polyn_list_add_length.
+  rewrite polyn_list_mul_length; cbn.
+  rewrite <- Hq.
+  rewrite map_length, seq_length.
+  rewrite max_l; [ easy | apply Nat.le_0_l ].
+Qed.
+
+Theorem polyn_list_div_x_sub_const_prop : ∀ la lq c r,
+  last la 0%Srng ≠ 0%Srng
+  → polyn_list_div_x_sub_const la c = (lq, r)
+  → la = norm_polyn_list ([(- c)%Rng; 1%Srng] * lq + [r])%PL.
+Proof.
+intros * Haz Hqr.
+apply (proj2 (List_eq_iff _ _)).
+specialize (polyn_list_div_x_sub_const_length Haz Hqr) as Hll.
+split; [ easy | ].
+remember (norm_polyn_list _) as la' eqn:Hla'.
+intros.
+move d before r.
 ...
   revert la lq c r Hr Hn Hq.
   induction n; intros. {
