@@ -3342,11 +3342,59 @@ rewrite map_length, seq_length.
 rewrite max_l; [ easy | apply Nat.le_0_l ].
 Qed.
 
+Theorem polyn_list_div_x_sub_const_prop0 : ∀ la lq c r n,
+  last la 0%Srng ≠ 0%Srng
+  → polyn_list_div_x_sub_const la c = (lq, r)
+  → length la = S (S n)
+  → la = ([(- c)%Rng; 1%Srng] * lq + [r])%PL.
+Proof.
+intros * Hqz Hqr Hla.
+...
+
 Theorem polyn_list_div_x_sub_const_prop : ∀ la lq c r,
   last la 0%Srng ≠ 0%Srng
   → polyn_list_div_x_sub_const la c = (lq, r)
   → la = norm_polyn_list ([(- c)%Rng; 1%Srng] * lq + [r])%PL.
 Proof.
+intros * Haz Hqr.
+remember (length la) as n eqn:Hn; symmetry in Hn.
+destruct n. {
+  now apply length_zero_iff_nil in Hn; subst la.
+}
+destruct n. {
+  destruct la as [| a]; [ easy | ].
+  destruct la; [ | easy ].
+  injection Hqr; clear Hqr; intros Hr Hq.
+  rewrite srng_mul_0_l, srng_add_0_l in Hr.
+  subst a lq; cbn.
+  rewrite srng_mul_0_r, srng_add_0_l, srng_add_0_l.
+  now destruct (srng_eq_dec r 0).
+}
+rewrite norm_polyn_list_id. 2: {
+  rewrite last_polyn_list_add_length_lt. 2: {
+    cbn - [ polyn_list_mul ].
+    destruct lq as [| q]; [ exfalso | cbn; flia ].
+    injection Hqr; clear Hqr; intros Hr Hq.
+    apply map_eq_nil in Hq.
+    now rewrite Hn in Hq.
+  }
+  rewrite polyn_list_mul_last.
+  cbn; rewrite srng_mul_1_l.
+  injection Hqr; clear Hqr; intros Hr Hq.
+  rewrite Hn, Nat.sub_succ, Nat.sub_0_r in Hq.
+  rewrite <- Hq.
+  rewrite List_seq_succ_r.
+  rewrite map_app.
+  cbn - [ sub_polyn_list ].
+  rewrite List_last_app.
+  unfold sub_polyn_list.
+  replace (S n) with (length la - 1) by flia Hn.
+  rewrite List_skipn_last with (d := 0%Srng) by now destruct la.
+  now cbn; rewrite srng_mul_0_l, srng_add_0_l.
+}
+...
+apply (polyn_list_div_x_sub_const_prop0 Haz Hqr Hn).
+...
 intros * Haz Hqr.
 apply (proj2 (List_eq_iff _ _)).
 specialize (polyn_list_div_x_sub_const_length Haz Hqr) as Hll.
@@ -3354,7 +3402,6 @@ split; [ easy | ].
 remember (norm_polyn_list _) as la' eqn:Hla'.
 intros.
 move d before r.
-(**)
 injection Hqr; clear Hqr; intros Hr Hq.
 remember (length la) as n eqn:Hn; symmetry in Hn, Hll.
 destruct n. {
