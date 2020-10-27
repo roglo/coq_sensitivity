@@ -3385,12 +3385,28 @@ rewrite List_skipn_last with (d := 0%Srng) by now destruct la.
 now cbn; rewrite srng_mul_0_l, srng_add_0_l.
 Qed.
 
+(* P = (x-c) Q + r *)
 Theorem polyn_list_div_x_sub_const_prop0 : ∀ la lq c r,
   last la 0%Srng ≠ 0%Srng
   → polyn_list_div_x_sub_const la c = (lq, r)
   → la = ([(- c)%Rng; 1%Srng] * lq + [r])%PL.
 Proof.
 intros * Hqz Hqr.
+remember (length la) as n eqn:Hn; symmetry in Hn.
+destruct n. {
+  now apply length_zero_iff_nil in Hn; subst la.
+}
+destruct n. {
+  destruct la as [| a]; [ easy | ].
+  destruct la; [ | easy ].
+  injection Hqr; clear Hqr; intros Hr Hq.
+  rewrite srng_mul_0_l, srng_add_0_l in Hr.
+  subst a lq; cbn.
+  rewrite srng_mul_0_r, srng_add_0_l, srng_add_0_l.
+  now destruct (srng_eq_dec r 0).
+}
+injection Hqr; clear Hqr; intros Hr Hq.
+rewrite Hn, Nat.sub_succ, Nat.sub_0_r in Hq.
 ...
 
 Theorem polyn_list_div_x_sub_const_prop : ∀ la lq c r,
