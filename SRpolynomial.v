@@ -3385,112 +3385,13 @@ rewrite List_skipn_last with (d := 0%Srng) by now destruct la.
 now cbn; rewrite srng_mul_0_l, srng_add_0_l.
 Qed.
 
-(* P = (x-c) Q + r *)
-Theorem polyn_list_div_x_sub_const_prop0 : ∀ la lq c r,
-  last la 0%Srng ≠ 0%Srng
-  → polyn_list_div_x_sub_const la c = (lq, r)
-  → la = ([(- c)%Rng; 1%Srng] * lq + [r])%PL.
-Proof.
-intros * Hqz Hqr.
-remember (length la) as n eqn:Hn; symmetry in Hn.
-destruct n. {
-  now apply length_zero_iff_nil in Hn; subst la.
-}
-destruct n. {
-  destruct la as [| a]; [ easy | ].
-  destruct la; [ | easy ].
-  injection Hqr; clear Hqr; intros Hr Hq.
-  rewrite srng_mul_0_l, srng_add_0_l in Hr.
-  subst a lq; cbn.
-  rewrite srng_mul_0_r, srng_add_0_l, srng_add_0_l.
-  now destruct (srng_eq_dec r 0).
-}
-injection Hqr; clear Hqr; intros Hr Hq.
-rewrite Hn, Nat.sub_succ, Nat.sub_0_r in Hq.
-cbn; rewrite srng_add_0_l, polyn_list_add_0_r.
-rewrite <- Hq at 3.
-rewrite map_length, seq_length.
-subst r.
-destruct la as [| a]; [ easy | ].
-cbn in Hn; apply Nat.succ_inj in Hn.
-f_equal. {
-  rewrite <- Hq; cbn.
-  rewrite srng_add_assoc, srng_mul_comm.
-  unfold so.
-  rewrite rng_mul_opp_r.
-  rewrite rng_add_opp_l; symmetry.
-  apply srng_add_0_l.
-}
-destruct la as [| a1]; [ easy | ].
-cbn in Hn; apply Nat.succ_inj in Hn.
-rewrite List_last_cons_cons in Hqz; cbn.
-f_equal. {
-  rewrite srng_add_0_l, srng_mul_1_l.
-  rewrite <- Hq; cbn.
-  destruct n. {
-    apply length_zero_iff_nil in Hn; subst la.
-    cbn; rewrite srng_mul_0_r, srng_add_0_l.
-    now rewrite srng_mul_0_l, srng_add_0_l.
-  }
-  rewrite (List_map_nth_in _ 0); [ | rewrite seq_length; flia ].
-  cbn.
-  rewrite srng_add_assoc, srng_mul_comm.
-  unfold so.
-  rewrite rng_mul_opp_r.
-  rewrite rng_add_opp_l; symmetry.
-  apply srng_add_0_l.
-}
-destruct la as [| a2]; [ now subst n | ].
-destruct n; [ easy | ].
-cbn in Hn; apply Nat.succ_inj in Hn.
-rewrite List_last_cons_cons in Hqz; cbn.
-f_equal. {
-  rewrite srng_add_0_l, srng_mul_1_l.
-  rewrite <- Hq; cbn.
-  destruct n. {
-    apply length_zero_iff_nil in Hn; subst la.
-    cbn; rewrite srng_mul_0_r, srng_add_0_l.
-    rewrite srng_mul_0_l, srng_add_0_l.
-    rewrite srng_mul_0_l; symmetry.
-    apply srng_add_0_r.
-  }
-  rewrite srng_mul_0_l, srng_add_0_r.
-  rewrite (List_map_nth_in _ 0); [ | rewrite seq_length; flia ].
-  cbn.
-  rewrite srng_add_assoc, srng_mul_comm.
-  unfold so.
-  rewrite rng_mul_opp_r.
-  rewrite rng_add_opp_l; symmetry.
-  apply srng_add_0_l.
-}
-destruct la as [| a3]; [ now subst n | ].
-destruct n; [ easy | ].
-cbn in Hn; apply Nat.succ_inj in Hn.
-rewrite List_last_cons_cons in Hqz; cbn.
-f_equal. {
-  rewrite srng_add_0_l, srng_mul_1_l.
-  rewrite <- Hq; cbn.
-  destruct n. {
-    apply length_zero_iff_nil in Hn; subst la.
-    cbn; rewrite srng_mul_0_r, srng_add_0_l.
-    rewrite srng_mul_0_l, srng_add_0_l.
-    now do 2 rewrite srng_mul_0_l, srng_add_0_r.
-  }
-  do 2 rewrite srng_mul_0_l, srng_add_0_r.
-  rewrite (List_map_nth_in _ 0); [ | rewrite seq_length; flia ].
-  cbn.
-  rewrite srng_add_assoc, srng_mul_comm.
-  unfold so.
-  rewrite rng_mul_opp_r.
-  rewrite rng_add_opp_l; symmetry.
-  apply srng_add_0_l.
-}
-Theorem glop : ∀ a la n lb lq c,
+Theorem polyn_list_div_x_sub_const_0 : ∀ a la n lb lq c,
   last (a :: la) 0%Srng ≠ 0%Srng
   → length la = n
   → map (λ i, eval_polyn_list (sub_polyn_list (lb ++ a :: la) i) c)
       (seq 1 (n + length lb)) = lq
-  → la = map (polyn_list_convol_mul [(- c)%Rng; 1%Srng] lq) (seq (S (length lb)) n).
+  → la =
+    map (polyn_list_convol_mul [(- c)%Rng; 1%Srng] lq) (seq (S (length lb)) n).
 Proof.
 intros * Hqz Hn Hq.
 revert a n lb lq c Hqz Hn Hq.
@@ -3569,6 +3470,113 @@ destruct n. {
   }
   apply H.
 }
+...
+
+(* P = (x-c) Q + r *)
+Theorem polyn_list_div_x_sub_const_prop0 : ∀ la lq c r,
+  last la 0%Srng ≠ 0%Srng
+  → polyn_list_div_x_sub_const la c = (lq, r)
+  → la = ([(- c)%Rng; 1%Srng] * lq + [r])%PL.
+Proof.
+intros * Hqz Hqr.
+remember (length la) as n eqn:Hn; symmetry in Hn.
+destruct n. {
+  now apply length_zero_iff_nil in Hn; subst la.
+}
+destruct n. {
+  destruct la as [| a]; [ easy | ].
+  destruct la; [ | easy ].
+  injection Hqr; clear Hqr; intros Hr Hq.
+  rewrite srng_mul_0_l, srng_add_0_l in Hr.
+  subst a lq; cbn.
+  rewrite srng_mul_0_r, srng_add_0_l, srng_add_0_l.
+  now destruct (srng_eq_dec r 0).
+}
+injection Hqr; clear Hqr; intros Hr Hq.
+rewrite Hn, Nat.sub_succ, Nat.sub_0_r in Hq.
+cbn; rewrite srng_add_0_l, polyn_list_add_0_r.
+rewrite <- Hq at 3.
+rewrite map_length, seq_length.
+subst r.
+destruct la as [| a]; [ easy | ].
+cbn in Hn; apply Nat.succ_inj in Hn.
+f_equal. {
+  rewrite <- Hq; cbn.
+  rewrite srng_add_assoc, srng_mul_comm.
+  unfold so.
+  rewrite rng_mul_opp_r.
+  rewrite rng_add_opp_l; symmetry.
+  apply srng_add_0_l.
+}
+destruct la as [| a1]; [ easy | ].
+cbn in Hn; apply Nat.succ_inj in Hn.
+rewrite List_last_cons_cons in Hqz; cbn.
+f_equal. {
+  rewrite srng_add_0_l, srng_mul_1_l.
+  rewrite <- Hq; cbn.
+  destruct n. {
+    apply length_zero_iff_nil in Hn; subst la.
+    cbn; rewrite srng_mul_0_r, srng_add_0_l.
+    now rewrite srng_mul_0_l, srng_add_0_l.
+  }
+  rewrite (List_map_nth_in _ 0); [ | rewrite seq_length; flia ].
+  cbn.
+  rewrite srng_add_assoc, srng_mul_comm.
+  unfold so.
+  rewrite rng_mul_opp_r.
+  rewrite rng_add_opp_l; symmetry.
+  apply srng_add_0_l.
+}
+...
+apply (polyn_list_div_x_sub_const_0 a1 la [a] _ Hqz Hn).
+now rewrite Nat.add_comm.
+...
+destruct la as [| a2]; [ now subst n | ].
+destruct n; [ easy | ].
+cbn in Hn; apply Nat.succ_inj in Hn.
+rewrite List_last_cons_cons in Hqz; cbn.
+f_equal. {
+  rewrite srng_add_0_l, srng_mul_1_l.
+  rewrite <- Hq; cbn.
+  destruct n. {
+    apply length_zero_iff_nil in Hn; subst la.
+    cbn; rewrite srng_mul_0_r, srng_add_0_l.
+    rewrite srng_mul_0_l, srng_add_0_l.
+    rewrite srng_mul_0_l; symmetry.
+    apply srng_add_0_r.
+  }
+  rewrite srng_mul_0_l, srng_add_0_r.
+  rewrite (List_map_nth_in _ 0); [ | rewrite seq_length; flia ].
+  cbn.
+  rewrite srng_add_assoc, srng_mul_comm.
+  unfold so.
+  rewrite rng_mul_opp_r.
+  rewrite rng_add_opp_l; symmetry.
+  apply srng_add_0_l.
+}
+destruct la as [| a3]; [ now subst n | ].
+destruct n; [ easy | ].
+cbn in Hn; apply Nat.succ_inj in Hn.
+rewrite List_last_cons_cons in Hqz; cbn.
+f_equal. {
+  rewrite srng_add_0_l, srng_mul_1_l.
+  rewrite <- Hq; cbn.
+  destruct n. {
+    apply length_zero_iff_nil in Hn; subst la.
+    cbn; rewrite srng_mul_0_r, srng_add_0_l.
+    rewrite srng_mul_0_l, srng_add_0_l.
+    now do 2 rewrite srng_mul_0_l, srng_add_0_r.
+  }
+  do 2 rewrite srng_mul_0_l, srng_add_0_r.
+  rewrite (List_map_nth_in _ 0); [ | rewrite seq_length; flia ].
+  cbn.
+  rewrite srng_add_assoc, srng_mul_comm.
+  unfold so.
+  rewrite rng_mul_opp_r.
+  rewrite rng_add_opp_l; symmetry.
+  apply srng_add_0_l.
+}
+Inspect 1.
 ...
   ============================
   a1 =
