@@ -3485,6 +3485,87 @@ f_equal. {
   rewrite rng_add_opp_l; symmetry.
   apply srng_add_0_l.
 }
+Theorem glop : ∀ a la n lb lq c,
+  last (a :: la) 0%Srng ≠ 0%Srng
+  → length la = n
+  → map (λ i, eval_polyn_list (sub_polyn_list (lb ++ a :: la) i) c)
+      (seq 1 (n + length lb)) = lq
+  → la = map (polyn_list_convol_mul [(- c)%Rng; 1%Srng] lq) (seq (S (length lb)) n).
+Proof.
+intros * Hqz Hn Hq.
+revert a n lb lq c Hqz Hn Hq.
+induction la as [| a1]; intros; [ now subst n | ].
+destruct n; [ easy | ].
+cbn in Hn; apply Nat.succ_inj in Hn.
+rewrite List_last_cons_cons in Hqz.
+cbn - [ polyn_list_convol_mul ].
+specialize (IHla a1 n (lb ++ [a])) as H1.
+specialize (H1 lq c Hqz Hn).
+rewrite app_length in H1.
+rewrite Nat.add_1_r in H1.
+rewrite <- Nat.add_succ_comm in H1.
+rewrite <- app_assoc in H1.
+specialize (H1 Hq).
+f_equal; [ | easy ].
+rewrite <- Hq.
+cbn - [ sub_polyn_list polyn_list_convol_mul ].
+destruct n. {
+  apply length_zero_iff_nil in Hn; subst la.
+  destruct lb as [| b1]. {
+    cbn.
+    rewrite srng_add_0_l, srng_mul_1_l.
+    rewrite srng_mul_0_r, srng_mul_0_l.
+    now do 2 rewrite srng_add_0_l.
+  }
+  destruct lb as [| b2]. {
+    cbn.
+    rewrite srng_add_0_l, srng_mul_1_l.
+    rewrite srng_mul_0_r, srng_mul_0_l.
+    rewrite srng_mul_0_l, srng_add_0_r.
+    now do 2 rewrite srng_add_0_l.
+  }
+  destruct lb as [| b3]. {
+    cbn.
+    rewrite srng_add_0_l, srng_mul_1_l.
+    rewrite srng_mul_0_r, srng_mul_0_l.
+    do 2 rewrite srng_mul_0_l, srng_add_0_r.
+    now do 2 rewrite srng_add_0_l.
+  }
+  destruct lb as [| b4]. {
+    cbn.
+    rewrite srng_add_0_l, srng_mul_1_l.
+    rewrite srng_mul_0_r, srng_mul_0_l.
+    do 3 rewrite srng_mul_0_l, srng_add_0_r.
+    now do 2 rewrite srng_add_0_l.
+  }
+(* induction on lb to do *)
+...
+apply glop.
+...
+  Hqz : last (a :: la) 0%Srng ≠ 0%Srng
+  Hn : length la = S n
+  Hq : map (λ i : nat, eval_polyn_list (sub_polyn_list (a :: la) i) c) (seq 1 (S n)) = lq
+  ============================
+  la = map (polyn_list_convol_mul [(- c)%Rng; 1%Srng] lq) (seq 1 (S n))
+
+  Hqz : last (a1 :: la) 0%Srng ≠ 0%Srng
+  Hn : length la = n
+  Hq : map (λ i : nat, eval_polyn_list (sub_polyn_list (a :: a1 :: la) i) c) (seq 1 (S n)) = lq
+  ============================
+  la = map (polyn_list_convol_mul [(- c)%Rng; 1%Srng] lq) (seq 2 n)
+
+  Hqz : last (a2 :: la) 0%Srng ≠ 0%Srng
+  Hn : length la = n
+  Hq : map (λ i : nat, eval_polyn_list (sub_polyn_list (a :: a1 :: a2 :: la) i) c) (seq 1 (S (S n))) = lq
+  ============================
+  la = map (polyn_list_convol_mul [(- c)%Rng; 1%Srng] lq) (seq 3 n)
+
+  Hqz : last (a3 :: la) 0%Srng ≠ 0%Srng
+  Hn : length la = n
+  Hq : map (λ i : nat, eval_polyn_list (sub_polyn_list (a :: a1 :: a2 :: a3 :: la) i) c) (seq 1 (S (S (S n)))) =
+       lq
+  ============================
+  la = map (polyn_list_convol_mul [(- c)%Rng; 1%Srng] lq) (seq 4 n)
 ...
 
 Theorem polyn_list_div_x_sub_const_prop : ∀ la lq c r,
