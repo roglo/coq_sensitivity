@@ -3553,7 +3553,10 @@ destruct n. {
     }
     remember (nth (length _) (_ :: _) _) as y eqn:Hy.
     cbn - [ map ] in Hy; subst y.
+    clear x Hx.
     remember (λ i, _) as f.
+    cbn - [ nth ].
+    remember (nth (S _) _ _) as x; cbn in Heqx; subst x.
 ...
   destruct lb as [| b1]. {
     cbn.
