@@ -3474,7 +3474,7 @@ induction n; intros. {
 destruct la as [| a2]; [ easy | ].
 specialize (IHn a1 a2 la (lb ++ [a])) as H1.
 (* ah bin non ça marche pas, ça, mon histoire *)
-...
+Abort. (* à voir *)
 
 (* P = (x-c) Q + r *)
 Theorem polyn_list_div_x_sub_const_prop0 : ∀ la lq c r,
@@ -3483,6 +3483,7 @@ Theorem polyn_list_div_x_sub_const_prop0 : ∀ la lq c r,
   → la = ([(- c)%Rng; 1%Srng] * lq + [r])%PL.
 Proof.
 intros * Hqz Hqr.
+...
 remember (length la) as n eqn:Hn; symmetry in Hn.
 destruct n. {
   now apply length_zero_iff_nil in Hn; subst la.
