@@ -3224,10 +3224,6 @@ rewrite srng_add_0_r.
 now replace (len - S (length la)) with (length lb) by flia Hlen.
 Qed.
 
-Inspect 1.
-
-...
-
 (* division of a polynomial P with (x - c) *)
 (* P = (x-c).Q + R with
    Q = a_n.x^{n-1} +
@@ -3303,6 +3299,18 @@ assert (Hll : length la = length la'). {
   remember (length la) as n eqn:Hn; symmetry in Hn.
   symmetry.
 (**)
+destruct n. {
+  now apply length_zero_iff_nil in Hn; subst la.
+}
+rewrite List_seq_succ_r in Hq.
+rewrite map_app in Hq.
+cbn - [ sub_polyn_list ] in Hq.
+rewrite <- Hn in Hq.
+unfold sub_polyn_list in Hq at 2.
+rewrite skipn_all in Hq.
+cbn - [ sub_polyn_list ] in Hq.
+(* donc lq se termine par un 0. Ça, alors ! *)
+...
   rewrite norm_polyn_list_id. 2: {
     rewrite last_polyn_list_add_length_lt. 2: {
       cbn - [ polyn_list_mul ].
@@ -3311,8 +3319,21 @@ assert (Hll : length la = length la'). {
       destruct n; [ | easy ].
       now apply length_zero_iff_nil in Hn; subst la.
     }
-...
-rewrite polyn_list_mul_last.
+    rewrite polyn_list_mul_last.
+    cbn; rewrite srng_mul_1_l.
+    rewrite <- Hq.
+    destruct n. {
+      now apply length_zero_iff_nil in Hn; subst la.
+    }
+    rewrite List_seq_succ_r.
+    rewrite map_app.
+    cbn - [ sub_polyn_list ].
+    rewrite List_last_app.
+    rewrite <- Hn.
+    unfold sub_polyn_list.
+    rewrite skipn_all.
+    cbn.
+(* c'est donc faux *)
 ...
     cbn.
     rewrite <- Hq at 2.
