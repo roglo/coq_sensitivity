@@ -3233,12 +3233,8 @@ Qed.
    R = P(c) *)
 
 Definition polyn_list_div_x_sub_const la c :=
-  (map (λ i, eval_polyn_list (sub_polyn_list la i) c) (seq 1 (length la)),
+  (map (λ i, eval_polyn_list (sub_polyn_list la i) c) (seq 1 (length la - 1)),
    eval_polyn_list la c).
-
-(* est-ce que ça serait pas plutôt (length la - 1), ci-dessus ? *)
-
-...
 
 Definition polyn_div_x_sub_const P c :=
   (polyn_of_list (fst (polyn_list_div_x_sub_const (polyn_list P) c)),
@@ -3246,7 +3242,7 @@ Definition polyn_div_x_sub_const P c :=
 
 Theorem polyn_list_nth_quotient_with_x_sub_const : ∀ la lq r c,
   polyn_list_div_x_sub_const la c = (lq, r)
-  → ∀ i, i < length la
+  → ∀ i, i < length la - 1
   → nth i lq 0%Srng = eval_polyn_list (sub_polyn_list la (i + 1)) c.
 Proof.
 intros * Hqr * Hi.
@@ -3302,30 +3298,37 @@ assert (Hll : length la = length la'). {
   subst la'.
   remember (length la) as n eqn:Hn; symmetry in Hn.
   symmetry.
-(**)
-destruct n. {
-  now apply length_zero_iff_nil in Hn; subst la.
-}
-rewrite List_seq_succ_r in Hq.
-rewrite map_app in Hq.
-cbn - [ sub_polyn_list ] in Hq.
-rewrite <- Hn in Hq.
-unfold sub_polyn_list in Hq at 2.
-rewrite skipn_all in Hq.
-cbn - [ sub_polyn_list ] in Hq.
-(* donc lq se termine par un 0. Ça, alors ! *)
-...
+  destruct n. {
+    now apply length_zero_iff_nil in Hn; subst la.
+  }
+  rewrite Nat.sub_succ, Nat.sub_0_r in Hq.
+  destruct n. {
+    cbn in Hq; subst lq.
+    unfold so.
+    destruct la as [| a]; [ easy | ].
+    destruct la; [ | easy ].
+    cbn in Haz, Hr.
+    rewrite srng_mul_0_l, srng_add_0_l in Hr.
+    subst a; cbn.
+    rewrite srng_add_0_l, srng_mul_0_r, srng_add_0_l.
+    now destruct (srng_eq_dec r 0).
+  }
   rewrite norm_polyn_list_id. 2: {
     rewrite last_polyn_list_add_length_lt. 2: {
       cbn - [ polyn_list_mul ].
       destruct lq as [| q]; [ exfalso | cbn; flia ].
-      apply map_eq_nil in Hq.
-      destruct n; [ | easy ].
-      now apply length_zero_iff_nil in Hn; subst la.
+      now apply map_eq_nil in Hq.
     }
     rewrite polyn_list_mul_last.
     cbn; rewrite srng_mul_1_l.
     rewrite <- Hq.
+    rewrite List_seq_succ_r.
+    rewrite map_app.
+    cbn - [ sub_polyn_list ].
+    rewrite List_last_app.
+...
+    rewrite <- Hn.
+...
     destruct n. {
       now apply length_zero_iff_nil in Hn; subst la.
     }
@@ -3337,7 +3340,7 @@ cbn - [ sub_polyn_list ] in Hq.
     unfold sub_polyn_list.
     rewrite skipn_all.
     cbn.
-(* c'est donc faux *)
+    rewrite Hq.
 ...
     cbn.
     rewrite <- Hq at 2.
