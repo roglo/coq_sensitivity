@@ -3511,6 +3511,50 @@ rewrite <- Hq.
 cbn - [ sub_polyn_list polyn_list_convol_mul ].
 destruct n. {
   apply length_zero_iff_nil in Hn; subst la.
+  rewrite Nat.add_0_l.
+  clear H1 Hq.
+  assert (∀ lb,
+    a1 =
+    polyn_list_convol_mul [(- c)%Rng; 1%Srng]
+      (eval_polyn_list (sub_polyn_list (lb ++ [a; a1]) 1) c
+       :: map (λ i, eval_polyn_list (sub_polyn_list (lb ++ [a; a1]) i) c)
+            (seq 2 (length lb)))
+      (S (length lb))). {
+    clear - so sp.
+    intros.
+    unfold sub_polyn_list.
+    unfold polyn_list_convol_mul.
+    unfold so.
+    rewrite srng_summation_split_first; [ | apply Nat.le_0_l ].
+    remember (nth 0 [-c; 1] 0)%Rng as x.
+    cbn in Heqx; subst x.
+    rewrite Nat.sub_0_r.
+    rewrite srng_summation_split_first; [ | flia ].
+    remember (nth 1 [-c; 1] 0)%Rng as x.
+    cbn in Heqx; subst x.
+    rewrite srng_mul_1_l.
+    rewrite Nat.sub_succ, Nat.sub_0_r.
+    rewrite all_0_srng_summation_0. 2: {
+      intros i Hi.
+      rewrite nth_overflow; [ | easy ].
+      apply srng_mul_0_l.
+    }
+    remember (eval_polyn_list _ _) as x eqn:Hx.
+    remember (map _ _) as l eqn:Hl.
+    remember (nth (S _) _ _) as y eqn:Hy.
+    cbn in Hy; subst y.
+    rewrite srng_add_0_r.
+    subst l.
+    destruct lb as [| b]. {
+      cbn in Hx |-*.
+      rewrite srng_mul_0_l in Hx.
+      rewrite srng_mul_0_r.
+      now rewrite srng_add_0_l in Hx |-*.
+    }
+    remember (nth (length _) (_ :: _) _) as y eqn:Hy.
+    cbn - [ map ] in Hy; subst y.
+    remember (λ i, _) as f.
+...
   destruct lb as [| b1]. {
     cbn.
     rewrite srng_add_0_l, srng_mul_1_l.
@@ -3538,6 +3582,37 @@ destruct n. {
     do 3 rewrite srng_mul_0_l, srng_add_0_r.
     now do 2 rewrite srng_add_0_l.
   }
+...
+  ============================
+  a1 =
+  polyn_list_convol_mul [(- c)%Rng; 1%Srng]
+    (eval_polyn_list (sub_polyn_list (lb ++ [a; a1]) 1) c
+     :: map (λ i : nat, eval_polyn_list (sub_polyn_list (lb ++ [a; a1]) i) c) (seq 2 (length lb))) 
+    (S (length lb))
+  ============================
+  a1 =
+  polyn_list_convol_mul [(- c)%Rng; 1%Srng]
+    (eval_polyn_list (sub_polyn_list ((b1 :: lb) ++ [a; a1]) 1) c
+     :: map (λ i : nat, eval_polyn_list (sub_polyn_list ((b1 :: lb) ++ [a; a1]) i) c) (seq 2 (length (b1 :: lb))))
+    (S (length (b1 :: lb)))
+  ============================
+  a1 =
+  polyn_list_convol_mul [(- c)%Rng; 1%Srng]
+    (eval_polyn_list (sub_polyn_list ((b1 :: b2 :: lb) ++ [a; a1]) 1) c
+     :: map (λ i : nat, eval_polyn_list (sub_polyn_list ((b1 :: b2 :: lb) ++ [a; a1]) i) c)
+          (seq 2 (length (b1 :: b2 :: lb)))) (S (length (b1 :: b2 :: lb)))
+  ============================
+  a1 =
+  polyn_list_convol_mul [(- c)%Rng; 1%Srng]
+    (eval_polyn_list (sub_polyn_list ((b1 :: b2 :: b3 :: lb) ++ [a; a1]) 1) c
+     :: map (λ i : nat, eval_polyn_list (sub_polyn_list ((b1 :: b2 :: b3 :: lb) ++ [a; a1]) i) c)
+          (seq 2 (length (b1 :: b2 :: b3 :: lb)))) (S (length (b1 :: b2 :: b3 :: lb)))
+  ============================
+  a1 =
+  polyn_list_convol_mul [(- c)%Rng; 1%Srng]
+    (eval_polyn_list (sub_polyn_list ((b1 :: b2 :: b3 :: b4 :: lb) ++ [a; a1]) 1) c
+     :: map (λ i : nat, eval_polyn_list (sub_polyn_list ((b1 :: b2 :: b3 :: b4 :: lb) ++ [a; a1]) i) c)
+          (seq 2 (length (b1 :: b2 :: b3 :: b4 :: lb)))) (S (length (b1 :: b2 :: b3 :: b4 :: lb)))
 (* induction on lb to do *)
 ...
 apply glop.
