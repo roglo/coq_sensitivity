@@ -3327,57 +3327,10 @@ assert (Hll : length la = length la'). {
     cbn - [ sub_polyn_list ].
     rewrite List_last_app.
     unfold sub_polyn_list.
-...
-    replace (skipn (S n) la) with [last la 0%Srng]. 2: {
-      cbn.
-      destruct la as [| a]; [ easy | ].
-      cbn in Hn; apply Nat.succ_inj in Hn.
-      destruct la as [| a']; [ easy | ].
-      cbn in Hn; apply Nat.succ_inj in Hn.
-      destruct n. {
-        now apply length_zero_iff_nil in Hn; subst la.
-      }
-      rewrite List_last_cons_cons.
-      cbn.
-      destruct la as [| a'']; [ easy | ].
-...
-    rewrite <- Hn.
-...
-    destruct n. {
-      now apply length_zero_iff_nil in Hn; subst la.
-    }
-    rewrite List_seq_succ_r.
-    rewrite map_app.
-    cbn - [ sub_polyn_list ].
-    rewrite List_last_app.
-    rewrite <- Hn.
-    unfold sub_polyn_list.
-    rewrite skipn_all.
-    cbn.
-    rewrite Hq.
-...
-    cbn.
-    rewrite <- Hq at 2.
-    rewrite map_length, seq_length.
-    remember (map _ (seq 1 n)) as lb eqn:Hlb.
-    symmetry in Hlb.
-    destruct lb as [| b]. {
-      rewrite srng_add_0_l.
-      apply map_eq_nil in Hlb.
-      destruct n; [ | easy ].
-      now apply length_zero_iff_nil in Hn; subst la.
-    }
-    remember (map _ (seq 1 n)) as ld eqn:Hld in |-*.
-    symmetry in Hld.
-    destruct ld as [| d]. {
-      apply map_eq_nil in Hld.
-      destruct n; [ | easy ].
-      now apply length_zero_iff_nil in Hn; subst la.
-    }
-    rewrite <- Hq at 2.
-    rewrite <- Hlb.
-    rewrite map_length, seq_length.
-Search (last (map _ _)).
+    replace (S n) with (length la - 1) by flia Hn.
+    rewrite List_skipn_last with (d := 0%Srng) by now destruct la.
+    now cbn; rewrite srng_mul_0_l, srng_add_0_l.
+  }
 ...
   revert la lq c r Hr Hn Hq.
   induction n; intros. {

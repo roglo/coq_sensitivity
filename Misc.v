@@ -1728,42 +1728,6 @@ Theorem List_app_cons : ∀ A (l1 l2 : list A) a,
   l1 ++ a :: l2 = l1 ++ [a] ++ l2.
 Proof. easy. Qed.
 
-Theorem List_skipn_map : ∀ A B (f : A → B) l n,
-  skipn n (map f l) = map f (skipn n l).
-Proof.
-intros.
-revert n.
-induction l as [| a]; intros; [ now do 2 rewrite skipn_nil | cbn ].
-destruct n; [ easy | cbn; apply IHl ].
-Qed.
-
-Theorem List_skipn_seq : ∀ n start len,
-  n ≤ len → skipn n (seq start len) = seq (start + n) (len - n).
-Proof.
-intros * Hnlen.
-revert n start Hnlen.
-induction len; intros; [ now rewrite skipn_nil | cbn ].
-destruct n; [ now cbn; rewrite Nat.add_0_r | cbn ].
-rewrite <- Nat.add_succ_comm.
-apply Nat.succ_le_mono in Hnlen.
-now apply IHlen.
-Qed.
-
-Theorem List_skipn_cons_nth_skipn_succ : ∀ A n (l : list A) d,
-  n < length l
-  → skipn n l = nth n l d :: skipn (S n) l.
-Proof.
-intros * Hn.
-revert l Hn.
-induction n; intros; [ now destruct l | ].
-destruct l as [| a]; [ easy | ].
-cbn in Hn.
-apply Nat.succ_lt_mono in Hn.
-remember (S (S n)) as sn; cbn; subst sn.
-remember (S n) as sn; cbn; subst sn.
-now apply IHn.
-Qed.
-
 Theorem List_last_nth : ∀ A l (d : A), last l d = nth (length l - 1) l d.
 Proof.
 intros.
@@ -1788,6 +1752,56 @@ Qed.
 Theorem List_last_cons_cons : ∀ A l (x y d : A),
   last (x :: y :: l) d = last (y :: l) d.
 Proof. easy. Qed.
+
+Theorem List_skipn_map : ∀ A B (f : A → B) l n,
+  skipn n (map f l) = map f (skipn n l).
+Proof.
+intros.
+revert n.
+induction l as [| a]; intros; [ now do 2 rewrite skipn_nil | cbn ].
+destruct n; [ easy | cbn; apply IHl ].
+Qed.
+
+Theorem List_skipn_seq : ∀ n start len,
+  n ≤ len → skipn n (seq start len) = seq (start + n) (len - n).
+Proof.
+intros * Hnlen.
+revert n start Hnlen.
+induction len; intros; [ now rewrite skipn_nil | cbn ].
+destruct n; [ now cbn; rewrite Nat.add_0_r | cbn ].
+rewrite <- Nat.add_succ_comm.
+apply Nat.succ_le_mono in Hnlen.
+now apply IHlen.
+Qed.
+
+Theorem List_skipn_last : ∀ A (la : list A) d,
+  la ≠ []
+  → skipn (length la - 1) la = [last la d].
+Proof.
+intros * Hla.
+destruct la as [| a]; [ easy | clear Hla ].
+cbn - [ last ]; rewrite Nat.sub_0_r.
+revert a.
+induction la as [| a1]; intros; [ easy | ].
+cbn - [ last ].
+rewrite List_last_cons_cons.
+apply IHla.
+Qed.
+
+Theorem List_skipn_cons_nth_skipn_succ : ∀ A n (l : list A) d,
+  n < length l
+  → skipn n l = nth n l d :: skipn (S n) l.
+Proof.
+intros * Hn.
+revert l Hn.
+induction n; intros; [ now destruct l | ].
+destruct l as [| a]; [ easy | ].
+cbn in Hn.
+apply Nat.succ_lt_mono in Hn.
+remember (S (S n)) as sn; cbn; subst sn.
+remember (S n) as sn; cbn; subst sn.
+now apply IHn.
+Qed.
 
 Theorem List_eq_iff : ∀ A (l1 l2 : list A),
   l1 = l2 ↔ (length l1 = length l2 ∧ ∀ d i, nth i l1 d = nth i l2 d).
