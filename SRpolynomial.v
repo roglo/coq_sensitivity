@@ -3326,6 +3326,20 @@ assert (Hll : length la = length la'). {
     rewrite map_app.
     cbn - [ sub_polyn_list ].
     rewrite List_last_app.
+    unfold sub_polyn_list.
+...
+    replace (skipn (S n) la) with [last la 0%Srng]. 2: {
+      cbn.
+      destruct la as [| a]; [ easy | ].
+      cbn in Hn; apply Nat.succ_inj in Hn.
+      destruct la as [| a']; [ easy | ].
+      cbn in Hn; apply Nat.succ_inj in Hn.
+      destruct n. {
+        now apply length_zero_iff_nil in Hn; subst la.
+      }
+      rewrite List_last_cons_cons.
+      cbn.
+      destruct la as [| a'']; [ easy | ].
 ...
     rewrite <- Hn.
 ...
