@@ -3545,46 +3545,30 @@ destruct n. {
     cbn in Hy; subst y.
     rewrite srng_add_0_r.
     subst l.
-    destruct lb as [| b]. {
-      cbn in Hx |-*.
-      rewrite srng_mul_0_l in Hx.
-      rewrite srng_mul_0_r.
-      now rewrite srng_add_0_l in Hx |-*.
+    subst x.
+    revert a1 a c.
+    induction lb as [| b]; intros. {
+      cbn.
+      rewrite srng_mul_0_l, srng_mul_0_r.
+      now do 2 rewrite srng_add_0_l.
     }
     remember (nth (length _) (_ :: _) _) as y eqn:Hy.
     cbn - [ map ] in Hy; subst y.
-    clear x Hx.
     remember (λ i, _) as f.
     cbn - [ nth ].
     remember (nth (S _) _ _) as x; cbn in Heqx; subst x.
-...
-  destruct lb as [| b1]. {
-    cbn.
-    rewrite srng_add_0_l, srng_mul_1_l.
-    rewrite srng_mul_0_r, srng_mul_0_l.
-    now do 2 rewrite srng_add_0_l.
+    rewrite <- seq_shift.
+    subst f.
+    rewrite map_map.
+    erewrite map_ext_in. 2: {
+      intros i Hi.
+      now rewrite skipn_cons.
+    }
+    rewrite skipn_cons.
+    apply IHlb.
   }
-  destruct lb as [| b2]. {
-    cbn.
-    rewrite srng_add_0_l, srng_mul_1_l.
-    rewrite srng_mul_0_r, srng_mul_0_l.
-    rewrite srng_mul_0_l, srng_add_0_r.
-    now do 2 rewrite srng_add_0_l.
-  }
-  destruct lb as [| b3]. {
-    cbn.
-    rewrite srng_add_0_l, srng_mul_1_l.
-    rewrite srng_mul_0_r, srng_mul_0_l.
-    do 2 rewrite srng_mul_0_l, srng_add_0_r.
-    now do 2 rewrite srng_add_0_l.
-  }
-  destruct lb as [| b4]. {
-    cbn.
-    rewrite srng_add_0_l, srng_mul_1_l.
-    rewrite srng_mul_0_r, srng_mul_0_l.
-    do 3 rewrite srng_mul_0_l, srng_add_0_r.
-    now do 2 rewrite srng_add_0_l.
-  }
+  apply H.
+}
 ...
   ============================
   a1 =
