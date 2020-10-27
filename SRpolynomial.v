@@ -3407,6 +3407,26 @@ destruct n. {
 }
 injection Hqr; clear Hqr; intros Hr Hq.
 rewrite Hn, Nat.sub_succ, Nat.sub_0_r in Hq.
+cbn; rewrite srng_add_0_l, polyn_list_add_0_r.
+rewrite <- Hq at 3.
+rewrite map_length, seq_length.
+destruct la as [| a]; [ easy | ].
+f_equal. {
+  rewrite <- Hr, <- Hq; cbn.
+  rewrite srng_add_assoc, srng_mul_comm.
+  unfold so.
+  rewrite rng_mul_opp_r.
+  rewrite rng_add_opp_l; symmetry.
+  apply srng_add_0_l.
+}
+clear r Hr.
+cbn in Hn; apply Nat.succ_inj in Hn.
+destruct la as [| a1]; [ easy | ].
+cbn in Hn; apply Nat.succ_inj in Hn.
+rewrite List_last_cons_cons in Hqz.
+cbn.
+f_equal. {
+  rewrite srng_add_0_l, srng_mul_1_l.
 ...
 
 Theorem polyn_list_div_x_sub_const_prop : ∀ la lq c r,
