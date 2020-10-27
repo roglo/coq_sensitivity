@@ -3236,6 +3236,10 @@ Definition polyn_list_div_x_sub_const la c :=
   (map (λ i, eval_polyn_list (sub_polyn_list la i) c) (seq 1 (length la)),
    eval_polyn_list la c).
 
+(* est-ce que ça serait pas plutôt (length la - 1), ci-dessus ? *)
+
+...
+
 Definition polyn_div_x_sub_const P c :=
   (polyn_of_list (fst (polyn_list_div_x_sub_const (polyn_list P) c)),
    snd (polyn_list_div_x_sub_const (polyn_list P) c)).
