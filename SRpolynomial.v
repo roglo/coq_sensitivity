@@ -3410,10 +3410,11 @@ specialize (H1 Hq).
 f_equal; [ | easy ].
 rewrite <- Hq.
 cbn - [ sub_polyn_list polyn_list_convol_mul ].
-destruct n. {
+clear - Hn sp.
+revert a a1 la lb Hn.
+induction n; intros. {
   apply length_zero_iff_nil in Hn; subst la.
   rewrite Nat.add_0_l.
-  clear H1 Hq.
   assert (∀ lb,
     a1 =
     polyn_list_convol_mul [(- c)%Rng; 1%Srng]
@@ -3470,6 +3471,9 @@ destruct n. {
   }
   apply H.
 }
+destruct la as [| a2]; [ easy | ].
+specialize (IHn a1 a2 la (lb ++ [a])) as H1.
+(* ah bin non ça marche pas, ça, mon histoire *)
 ...
 
 (* P = (x-c) Q + r *)
