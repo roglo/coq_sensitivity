@@ -3342,19 +3342,11 @@ rewrite map_length, seq_length.
 rewrite max_l; [ easy | apply Nat.le_0_l ].
 Qed.
 
-Theorem polyn_list_div_x_sub_const_prop0 : ∀ la lq c r n,
+Theorem norm_polyn_list_div_x_sub_const_prop : ∀ la lq c r,
   last la 0%Srng ≠ 0%Srng
   → polyn_list_div_x_sub_const la c = (lq, r)
-  → length la = S (S n)
-  → la = ([(- c)%Rng; 1%Srng] * lq + [r])%PL.
-Proof.
-intros * Hqz Hqr Hla.
-...
-
-Theorem polyn_list_div_x_sub_const_prop : ∀ la lq c r,
-  last la 0%Srng ≠ 0%Srng
-  → polyn_list_div_x_sub_const la c = (lq, r)
-  → la = norm_polyn_list ([(- c)%Rng; 1%Srng] * lq + [r])%PL.
+  → norm_polyn_list ([(- c); 1]%Rng * lq + [r])%PL =
+     ([(- c); 1]%Rng * lq + [r])%PL.
 Proof.
 intros * Haz Hqr.
 remember (length la) as n eqn:Hn; symmetry in Hn.
@@ -3370,30 +3362,46 @@ destruct n. {
   rewrite srng_mul_0_r, srng_add_0_l, srng_add_0_l.
   now destruct (srng_eq_dec r 0).
 }
-rewrite norm_polyn_list_id. 2: {
-  rewrite last_polyn_list_add_length_lt. 2: {
-    cbn - [ polyn_list_mul ].
-    destruct lq as [| q]; [ exfalso | cbn; flia ].
-    injection Hqr; clear Hqr; intros Hr Hq.
-    apply map_eq_nil in Hq.
-    now rewrite Hn in Hq.
-  }
-  rewrite polyn_list_mul_last.
-  cbn; rewrite srng_mul_1_l.
+apply norm_polyn_list_id.
+rewrite last_polyn_list_add_length_lt. 2: {
+  cbn - [ polyn_list_mul ].
+  destruct lq as [| q]; [ exfalso | cbn; flia ].
   injection Hqr; clear Hqr; intros Hr Hq.
-  rewrite Hn, Nat.sub_succ, Nat.sub_0_r in Hq.
-  rewrite <- Hq.
-  rewrite List_seq_succ_r.
-  rewrite map_app.
-  cbn - [ sub_polyn_list ].
-  rewrite List_last_app.
-  unfold sub_polyn_list.
-  replace (S n) with (length la - 1) by flia Hn.
-  rewrite List_skipn_last with (d := 0%Srng) by now destruct la.
-  now cbn; rewrite srng_mul_0_l, srng_add_0_l.
+  apply map_eq_nil in Hq.
+  now rewrite Hn in Hq.
 }
+rewrite polyn_list_mul_last.
+cbn; rewrite srng_mul_1_l.
+injection Hqr; clear Hqr; intros Hr Hq.
+rewrite Hn, Nat.sub_succ, Nat.sub_0_r in Hq.
+rewrite <- Hq.
+rewrite List_seq_succ_r.
+rewrite map_app.
+cbn - [ sub_polyn_list ].
+rewrite List_last_app.
+unfold sub_polyn_list.
+replace (S n) with (length la - 1) by flia Hn.
+rewrite List_skipn_last with (d := 0%Srng) by now destruct la.
+now cbn; rewrite srng_mul_0_l, srng_add_0_l.
+Qed.
+
+Theorem polyn_list_div_x_sub_const_prop0 : ∀ la lq c r,
+  last la 0%Srng ≠ 0%Srng
+  → polyn_list_div_x_sub_const la c = (lq, r)
+  → la = ([(- c)%Rng; 1%Srng] * lq + [r])%PL.
+Proof.
+intros * Hqz Hqr.
 ...
-apply (polyn_list_div_x_sub_const_prop0 Haz Hqr Hn).
+
+Theorem polyn_list_div_x_sub_const_prop : ∀ la lq c r,
+  last la 0%Srng ≠ 0%Srng
+  → polyn_list_div_x_sub_const la c = (lq, r)
+  → la = norm_polyn_list ([(- c)%Rng; 1%Srng] * lq + [r])%PL.
+Proof.
+intros * Haz Hqr.
+rewrite (norm_polyn_list_div_x_sub_const_prop Haz); [ | easy ].
+...
+apply (polyn_list_div_x_sub_const_prop0 Haz Hqr).
 ...
 intros * Haz Hqr.
 apply (proj2 (List_eq_iff _ _)).
