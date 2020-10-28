@@ -1887,6 +1887,8 @@ clear Hla Hlb.
 apply list_eq_dec, sdp.
 Qed.
 
+Arguments polyn_eq_dec P%P Q%P.
+
 Theorem polyn_1_neq_0 : 1%P ≠ 0%P.
 Proof.
 unfold polyn_of_list; cbn.
@@ -3248,6 +3250,7 @@ Definition polyn_div_x_sub_const P c :=
   (polyn_of_list (fst (polyn_list_div_x_sub_const (polyn_list P) c)),
    snd (polyn_list_div_x_sub_const (polyn_list P) c)).
 
+(*
 Theorem polyn_list_nth_quotient_with_x_sub_const : ∀ la lq r c,
   polyn_list_div_x_sub_const la c = (lq, r)
   → ∀ i, i < length la - 1
@@ -3260,7 +3263,9 @@ rewrite (List_map_nth_in _ 0); [ | now rewrite seq_length ].
 rewrite Nat.add_comm.
 now rewrite seq_nth.
 Qed.
+*)
 
+(*
 Theorem polyn_coeff_quotient_with_x_sub_const : ∀ P c Q r,
   polyn_div_x_sub_const P c = (Q, r)
   → ∀ i, i < polyn_degree P
@@ -3292,7 +3297,9 @@ replace (nth i (norm_polyn_list lq) 0%Srng) with (nth i lq 0%Srng). 2: {
 apply polyn_list_nth_quotient_with_x_sub_const with (r := r); [ easy | ].
 flia Hi.
 Qed.
+*)
 
+(*
 Theorem polyn_list_div_x_sub_const_length : ∀ la lq c r,
   last la 0%Srng ≠ 0%Srng
   → polyn_list_div_x_sub_const la c = (lq, r)
@@ -3341,6 +3348,7 @@ rewrite <- Hq.
 rewrite map_length, seq_length.
 rewrite max_l; [ easy | apply Nat.le_0_l ].
 Qed.
+*)
 
 Theorem norm_polyn_list_div_x_sub_const_prop : ∀ la lq c r,
   last la 0%Srng ≠ 0%Srng
@@ -3385,6 +3393,7 @@ rewrite List_skipn_last with (d := 0%Srng) by now destruct la.
 now cbn; rewrite srng_mul_0_l, srng_add_0_l.
 Qed.
 
+(*
 Theorem polyn_list_div_x_sub_const_0 : ∀ a la n lb lq c,
   last (a :: la) 0%Srng ≠ 0%Srng
   → length la = n
@@ -3474,7 +3483,7 @@ induction n; intros. {
 destruct la as [| a2]; [ easy | ].
 specialize (IHn a1 a2 la (lb ++ [a])) as H1.
 (* ah bin non ça marche pas, ça, mon histoire *)
-Abort. (* à voir *)
+*)
 
 (* P = (x-c) Q + r *)
 Theorem polyn_list_div_x_sub_const_prop0 : ∀ la lq c r,
@@ -3595,10 +3604,6 @@ rewrite rng_add_opp_l; symmetry.
 apply srng_add_0_l.
 Qed.
 
-Inspect 1.
-
-...
-
 Theorem polyn_list_div_x_sub_const_prop : ∀ la lq c r,
   last la 0%Srng ≠ 0%Srng
   → polyn_list_div_x_sub_const la c = (lq, r)
@@ -3606,105 +3611,10 @@ Theorem polyn_list_div_x_sub_const_prop : ∀ la lq c r,
 Proof.
 intros * Haz Hqr.
 rewrite (norm_polyn_list_div_x_sub_const_prop Haz); [ | easy ].
-...
 apply (polyn_list_div_x_sub_const_prop0 Haz Hqr).
-...
-intros * Haz Hqr.
-apply (proj2 (List_eq_iff _ _)).
-specialize (polyn_list_div_x_sub_const_length Haz Hqr) as Hll.
-split; [ easy | ].
-remember (norm_polyn_list _) as la' eqn:Hla'.
-intros.
-move d before r.
-injection Hqr; clear Hqr; intros Hr Hq.
-remember (length la) as n eqn:Hn; symmetry in Hn, Hll.
-destruct n. {
-  now apply length_zero_iff_nil in Hn; subst la.
-}
-rewrite Nat.sub_succ, Nat.sub_0_r in Hq.
-subst la'.
-destruct n. {
-  cbn in Hq; subst lq.
-  unfold so.
-  destruct la as [| a]; [ easy | ].
-  destruct la; [ | easy ].
-  cbn in Haz, Hr.
-  rewrite srng_mul_0_l, srng_add_0_l in Hr.
-  subst a; cbn.
-  rewrite srng_add_0_l, srng_mul_0_r, srng_add_0_l.
-  now destruct (srng_eq_dec r 0).
-}
-rewrite norm_polyn_list_id. 2: {
-  rewrite last_polyn_list_add_length_lt. 2: {
-    cbn - [ polyn_list_mul ].
-    destruct lq as [| q]; [ exfalso | cbn; flia ].
-    now apply map_eq_nil in Hq.
-  }
-  rewrite polyn_list_mul_last.
-  cbn; rewrite srng_mul_1_l.
-  rewrite <- Hq.
-  rewrite List_seq_succ_r.
-  rewrite map_app.
-  cbn - [ sub_polyn_list ].
-  rewrite List_last_app.
-  unfold sub_polyn_list.
-  replace (S n) with (length la - 1) by flia Hn.
-  rewrite List_skipn_last with (d := 0%Srng) by now destruct la.
-  now cbn; rewrite srng_mul_0_l, srng_add_0_l.
-}
-destruct i. {
-  cbn.
-  rewrite srng_add_0_l.
-  rewrite <- Hq.
-  rewrite (List_map_nth_in _ 0); [ | rewrite seq_length; flia ].
-  rewrite seq_nth; [ | flia ].
-  rewrite Nat.add_0_r.
-  unfold sub_polyn_list.
-  destruct la as [| a]; [ easy | ].
-  rewrite skipn_cons, skipn_O; cbn.
-  rewrite <- Hr.
-  rewrite eval_polyn_list_cons.
-  rewrite srng_add_comm.
-  unfold so.
-  rewrite rng_mul_opp_l.
-  now rewrite fold_rng_sub, rng_add_sub.
-}
-rewrite <- Hq.
-...
-  revert la lq c r Hr Hn Hq.
-  induction n; intros. {
-    cbn.
-    rewrite polyn_list_add_0_r, srng_add_0_l.
-    apply length_zero_iff_nil in Hn; subst la; cbn in Hr, Hq.
-    subst r lq; cbn.
-    rewrite srng_mul_0_r, srng_add_0_l.
-    now rewrite if_0_eq_0.
-  }
-  destruct la as [| a]; [ easy | ].
-  cbn in Hn.
-  apply Nat.succ_inj in Hn.
-  rewrite eval_polyn_list_cons in Hr.
-  remember (eval_polyn_list la c) as r' eqn:Hr'.
-  symmetry in Hr'; subst r.
-  cbn in Hq.
-  rewrite <- seq_shift in Hq.
-  rewrite map_map in Hq.
-  erewrite map_ext_in in Hq. 2: {
-    intros i Hi.
-    cbn - [ eval_polyn_list ].
-    replace (skipn i la) with (sub_polyn_list la i) by easy.
-    easy.
-  }
-  remember (map (λ i, eval_polyn_list (sub_polyn_list la i) c) (seq 1 n))
-    as lq' eqn:Hlq'.
-  symmetry in Hlq'; subst lq.
-  specialize (IHn la lq' c r' Hr' Hn Hlq') as H1.
-  rewrite fold_eval_polyn_list.
-...
-}
-split; [ easy | ].
-...
+Qed.
 
+(* P = (x - c) Q + r *)
 Theorem polyn_div_x_sub_const_prop : ∀ P c Q r,
   polyn_div_x_sub_const P c = (Q, r)
   → P = ((_x - polyn_of_list [c]) * Q + polyn_of_list [r])%P.
@@ -3739,81 +3649,28 @@ cbn in Hx; subst x.
 rewrite <- norm_polyn_list_add_idemp_l.
 rewrite norm_polyn_list_mul_idemp_r.
 rewrite norm_polyn_list_add_idemp_l.
-...
-now apply polyn_list_div_x_sub_const_prop.
-...
+destruct (polyn_eq_dec P 0) as [Hpz| Hpz]. {
+  subst P.
+  cbn in Hll |-*.
+  injection Hll; clear Hll; intros; subst r lq; cbn.
+  rewrite srng_mul_0_r.
+  do 2 rewrite srng_add_0_l.
+  now rewrite if_0_eq_0.
+}
+apply polyn_list_div_x_sub_const_prop; [ | easy ].
 destruct P as (la, Hla).
-destruct Q as (lb, Hlb).
-move lb before la.
-move Hlb before Hla.
-injection HQR; clear HQR; intros HR HQ.
-cbn - [ norm_polyn_list ].
-rewrite norm_polyn_list_add_idemp_l.
-rewrite norm_polyn_list_add_idemp_l.
-rewrite norm_polyn_list_add_idemp_r.
-unfold eval_polyn, sub_polyn in H1.
-cbn - [ eval_polyn_list sub_polyn_list ] in H1.
-Search (polyn_list_convol_mul (norm_polyn_list _)).
-...
-rewrite norm_polyn_list_add.
-...
-nth_norm_polyn_list_map:
-  ∀ (i len : nat) (f : nat → T),
-    (∀ i0 : nat, len ≤ i0 → f i0 = 0%Srng)
-    → nth i (norm_polyn_list (map f (seq 0 len))) 0%Srng = f i
-...
-intros * HQR.
-injection HQR; clear HQR; intros HR HQ.
-apply polyn_eq.
-subst Q r.
-remember (polyn_degree P) as n eqn:Hn.
-symmetry in Hn.
-revert c P Hn.
-induction n; intros. {
-  cbn; rewrite if_1_eq_0; cbn.
-  destruct (srng_eq_dec c 0) as [Hcz| Hcz]. {
-    cbn; rewrite if_1_eq_0; cbn.
-    rewrite srng_add_0_l, srng_mul_0_l.
-    subst c; cbn.
-    destruct P as (la, Hla); cbn - [ eval_polyn_list ].
-    destruct (srng_eq_dec (eval_polyn_list la 0%Srng) 0) as [Hpz| Hpz]. {
-      cbn.
-      rewrite rev_length.
-...
-      destruct P as (la, Hla); cbn in Hn |-*.
-      destruct la as [| a]; [ easy | exfalso ].
-      cbn in Hn.
-      rewrite Nat.sub_0_r in Hn.
-      apply length_zero_iff_nil in Hn; subst la.
-      cbn in Hla, Hpz.
-      rewrite srng_add_0_l, srng_mul_1_r in Hpz; subst a.
-      now rewrite if_0_eq_0 in Hla.
-    }
-    destruct P as (la, Hla); cbn in Hn |-*.
-    destruct la as [| a]; [ easy | ].
-    cbn in Hn.
-    rewrite Nat.sub_0_r in Hn.
-    apply length_zero_iff_nil in Hn; subst la.
-    cbn in Hla, Hpz |-*.
-    rewrite srng_add_0_l, srng_mul_1_r in Hpz |-*.
-    now destruct (srng_eq_dec a 0).
-  }
-...
+cbn in Hla |-*.
+destruct la as [| a]. {
+  exfalso; apply Hpz.
+  now apply polyn_eq.
+}
+cbn - [ nth ] in Hla.
+clear Hll Hpz.
+rewrite <- List_last_nth_cons in Hla.
+now destruct (srng_eq_dec (last (a :: la) 0%Srng) 0).
+Qed.
 
-intros * HQR.
-injection HQR; clear HQR; intros HR HQ.
-apply polyn_eq.
-subst Q r.
-unfold polyn_sub.
-rewrite polyn_mul_add_distr_r.
-rewrite rng_mul_opp_l.
-rewrite fold_polyn_sub.
-Search (polyn_of_list (map _ _)).
 ...
-destruct P as (la, Hla).
-cbn - [ norm_polyn_list ].
-...
-*)
 
 (* in algebraically closed set, a polynomial P is the
    product of its highest coefficient and all (x-rn)
