@@ -3670,8 +3670,6 @@ rewrite <- List_last_nth_cons in Hla.
 now destruct (srng_eq_dec (last (a :: la) 0%Srng) 0).
 Qed.
 
-...
-
 (* in algebraically closed set, a polynomial P is the
    product of its highest coefficient and all (x-rn)
    where rn cover all roots of P *)
@@ -3716,8 +3714,7 @@ destruct H1 as (x, Hx).
 remember (polyn_div_x_sub_const P x) as QR eqn:HQR.
 symmetry in HQR.
 destruct QR as (Q, R).
-...
-apply polyn_div_x_sub_const_prop in HQR.
+specialize (polyn_div_x_sub_const_prop HQR) as Hpqr.
 ...
 specialize (IHn Q) as H1.
 assert (H : polyn_degree Q = n). {
