@@ -3728,7 +3728,26 @@ rewrite srng_mul_0_l, srng_add_0_l in Hr.
 cbn in Hla.
 destruct (srng_eq_dec a2 0) as [Ha2z| Ha2z]; [ easy | clear Hla ].
 unfold nth.
-...
+cbn.
+destruct (srng_eq_dec a2 0) as [H| H]; [ easy | clear H; cbn ].
+rewrite if_1_eq_0; cbn.
+destruct (srng_eq_dec r 0) as [Hrz| Hrz]; cbn. {
+  rewrite if_1_eq_0; cbn.
+  rewrite srng_add_0_l, srng_mul_1_r, srng_mul_0_l.
+  rewrite srng_add_0_r, srng_mul_0_r, srng_add_0_r.
+  destruct (srng_eq_dec a2 0) as [H| H]; [ easy | clear H ].
+  now rewrite Hrz, srng_mul_0_r, srng_add_0_l in Hr; subst a1.
+}
+rewrite if_1_eq_0; cbn.
+rewrite srng_add_0_l, srng_mul_1_r, srng_mul_0_l.
+rewrite srng_add_0_r.
+destruct (srng_eq_dec a2 0) as [H| H]; [ easy | clear H ].
+cbn; rewrite srng_add_0_l, srng_add_0_l; f_equal.
+rewrite srng_add_comm in Hr.
+apply rng_add_move_0_r in Hr; subst a1.
+unfold so; symmetry.
+apply rng_mul_opp_r.
+Qed.
 
 (* in algebraically closed set, a polynomial P is the
    product of its highest coefficient and all (x-rn)
@@ -3780,53 +3799,10 @@ destruct n. {
   unfold polyn_highest_coeff.
   rewrite Hn, srng_mul_1_l.
   clear - Hx Hn.
-...
   now apply polyn_of_degree_1_eq.
 }
-...
-  apply polyn_eq.
-  cbn - [ polyn_of_const polyn_coeff ].
-  rewrite if_1_eq_0.
-  remember (map rng_opp _) as y eqn:Hy.
-  cbn in Hy.
-  destruct (srng_eq_dec x 0) as [Hxz| Hxz]. {
-    cbn in Hy; subst y.
-    rewrite polyn_list_add_0_r.
-    rewrite rev_involutive.
-    cbn.
-    rewrite if_1_eq_0; cbn.
-    rewrite rev_length.
-    destruct (srng_eq_dec (polyn_coeff P 1) 0) as [Hp1z| Hp1z]. {
-      unfold polyn_degree, polyn_degree_plus_1 in Hn.
-      destruct P as (la, Hla).
-      cbn in Hp1z, Hn |-*.
-      apply Nat.add_sub_eq_nz in Hn; [ | easy ].
-      symmetry in Hn; cbn in Hn.
-      clear Hx HQR Hpqr.
-      destruct la as [| a1]; [ easy | ].
-      destruct la as [| a2]; [ easy | ].
-      destruct la; [ | easy ].
-      cbn in Hp1z, Hla.
-      rewrite Hp1z in Hla.
-      now rewrite if_0_eq_0 in Hla.
-    }
-    cbn.
-    rewrite srng_add_0_l, srng_mul_1_r.
-    rewrite srng_mul_0_l, srng_add_0_r.
-    rewrite srng_add_0_l, srng_mul_0_r.
-    rewrite if_0_eq_0.
-    destruct (srng_eq_dec (polyn_coeff P 1) 0) as [H| H]; [ easy | clear H ].
-    cbn.
-...
-  }
-  cbn in Hy; subst y.
-  cbn.
-  rewrite if_1_eq_0; cbn.
-  unfold polyn_of_const, polyn_of_list.
-  cbn - [ norm_polyn_list ].
-...
 specialize (IHn Q) as H1.
-assert (H : polyn_degree Q = n). {
+assert (H : polyn_degree Q = S n). {
   move Hn at bottom.
   rewrite Hpqr in Hn.
   rewrite polyn_degree_lt_add in Hn. 2: {
@@ -3841,8 +3817,6 @@ assert (H : polyn_degree Q = n). {
       rewrite <- polyn_of_opp_const.
       rewrite polyn_coeff_1_of_x_add_const.
       rewrite srng_mul_1_l.
-Search (polyn_coeff _ (polyn_degree _)).
-Print polyn_highest_coeff.
 ...
 now rewrite if_1_eq_0; cbn.
 cbn - [ norm_polyn_list ].
