@@ -130,6 +130,10 @@ Definition list_of_polyn (P : polynomial T) :=
 
 Definition polyn_of_const x := polyn_of_list [x].
 
+Theorem fold_polyn_of_const : ∀ c,
+  polyn_of_list [c] = polyn_of_const c.
+Proof. easy. Qed.
+
 (*
 End in_ring.
 

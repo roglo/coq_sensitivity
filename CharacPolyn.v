@@ -7,7 +7,8 @@ Require Import Utf8 Arith.
 Import List List.ListNotations.
 Require Import Init.Nat.
 
-Require Import Misc Semiring SRsummation SRpolynomial Matrix.
+Require Import Misc Semiring SRsummation SRproduct.
+Require Import SRpolynomial Matrix.
 Import polynomial_Notations.
 Import matrix_Notations.
 
@@ -70,7 +71,7 @@ intros.
 rewrite mat_el_xI_sub_M.
 apply polyn_degree_1.
 rewrite polyn_degree_opp.
-apply polyn_degree_of_single.
+apply polyn_degree_of_const.
 Qed.
 
 Theorem polyn_coeff_mat_el_xI_sub_M_0_0 : ∀ M,
@@ -101,7 +102,7 @@ Proof.
 intros.
 rewrite mat_el_xI_sub_M_0_succ.
 rewrite polyn_degree_opp.
-apply polyn_degree_of_single.
+apply polyn_degree_of_const.
 Qed.
 
 Theorem polyn_coeff_mat_el_xI_sub_M_0_succ : ∀ i M,
@@ -111,7 +112,7 @@ intros.
 rewrite mat_el_xI_sub_M_0_succ.
 rewrite polyn_coeff_opp.
 f_equal.
-apply polyn_coeff_of_single.
+apply polyn_coeff_of_const.
 Qed.
 
 Theorem polyn_degree_mat_el_subm_xI_sub_M_0_succ_0_0 : ∀ M i,
@@ -136,12 +137,14 @@ cbn in H; rewrite H; clear H.
 rewrite srng_mul_0_r, srng_add_0_l.
 destruct (lt_dec 1 (S i)) as [H1i| H1i]. {
   rewrite polyn_degree_opp.
-  rewrite polyn_degree_of_single.
+  rewrite fold_polyn_of_const.
+  rewrite polyn_degree_of_const.
   apply Nat.le_0_l.
 }
 rewrite polyn_degree_1; [ easy | ].
 rewrite polyn_degree_opp.
-now rewrite polyn_degree_of_single.
+rewrite fold_polyn_of_const.
+now rewrite polyn_degree_of_const.
 Qed.
 
 Theorem polyn_coeff_mat_el_subm_xI_sub_M_succ_0_0_0 : ∀ M i,
@@ -184,22 +187,26 @@ induction l as [| m]; intros. {
       rewrite polyn_mul_1_r.
       rewrite polyn_degree_1; [ easy | ].
       rewrite polyn_degree_opp.
-      now rewrite polyn_degree_of_single.
+      rewrite fold_polyn_of_const.
+      now rewrite polyn_degree_of_const.
     }
     rewrite polyn_of_list_0, polyn_mul_0_r, polyn_add_0_l.
     rewrite polyn_degree_opp.
-    rewrite polyn_degree_of_single.
+    rewrite fold_polyn_of_const.
+    rewrite polyn_degree_of_const.
     apply Nat.le_0_l.
   }
   destruct (Nat.eq_dec (k + 1) (j + 1)) as [Hkj| Hkj]. {
     rewrite polyn_mul_1_r.
     rewrite polyn_degree_1; [ easy | ].
     rewrite polyn_degree_opp.
-    now rewrite polyn_degree_of_single.
+    rewrite fold_polyn_of_const.
+    now rewrite polyn_degree_of_const.
   }
   rewrite polyn_of_list_0, polyn_mul_0_r, polyn_add_0_l.
   rewrite polyn_degree_opp.
-  rewrite polyn_degree_of_single.
+  rewrite fold_polyn_of_const.
+  rewrite polyn_degree_of_const.
   apply Nat.le_0_l.
 }
 cbn.
@@ -256,10 +263,11 @@ etransitivity. {
       unfold polyn_sub.
       rewrite polyn_degree_1; [ easy | ].
       rewrite polyn_degree_opp.
-      apply polyn_degree_of_single.
+      apply polyn_degree_of_const.
     }
     rewrite polyn_degree_opp.
-    rewrite polyn_degree_of_single.
+    rewrite fold_polyn_of_const.
+    rewrite polyn_degree_of_const.
     apply Nat.le_0_l.
   }
   apply Nat.nlt_ge in Hji.
@@ -268,10 +276,11 @@ etransitivity. {
     unfold polyn_sub.
     rewrite polyn_degree_1; [ easy | ].
     rewrite polyn_degree_opp.
-    apply polyn_degree_of_single.
+    apply polyn_degree_of_const.
   }
   rewrite polyn_degree_opp.
-  rewrite polyn_degree_of_single.
+  rewrite fold_polyn_of_const.
+  rewrite polyn_degree_of_const.
   apply Nat.le_0_l.
 }
 apply -> Nat.succ_le_mono.
@@ -296,10 +305,11 @@ etransitivity. {
         unfold polyn_sub.
         rewrite polyn_degree_1; [ easy | ].
         rewrite polyn_degree_opp.
-        apply polyn_degree_of_single.
+        apply polyn_degree_of_const.
       }
       rewrite polyn_degree_opp.
-      rewrite polyn_degree_of_single.
+      rewrite fold_polyn_of_const.
+      rewrite polyn_degree_of_const.
       apply Nat.le_0_l.
     }
     apply Nat.nlt_ge in Hki.
@@ -308,10 +318,11 @@ etransitivity. {
       unfold polyn_sub.
       rewrite polyn_degree_1; [ easy | ].
       rewrite polyn_degree_opp.
-      apply polyn_degree_of_single.
+      apply polyn_degree_of_const.
     }
     rewrite polyn_degree_opp.
-    rewrite polyn_degree_of_single.
+    rewrite fold_polyn_of_const.
+    rewrite polyn_degree_of_const.
     apply Nat.le_0_l.
   }
   apply Nat.nlt_ge in Hkj.
@@ -321,10 +332,11 @@ etransitivity. {
       unfold polyn_sub.
       rewrite polyn_degree_1; [ easy | ].
       rewrite polyn_degree_opp.
-      apply polyn_degree_of_single.
+      apply polyn_degree_of_const.
     }
     rewrite polyn_degree_opp.
-    rewrite polyn_degree_of_single.
+    rewrite fold_polyn_of_const.
+    rewrite polyn_degree_of_const.
     apply Nat.le_0_l.
   }
   apply Nat.nlt_ge in Hki.
@@ -333,10 +345,11 @@ etransitivity. {
     unfold polyn_sub.
     rewrite polyn_degree_1; [ easy | ].
     rewrite polyn_degree_opp.
-    apply polyn_degree_of_single.
+    apply polyn_degree_of_const.
   }
   rewrite polyn_degree_opp.
-  rewrite polyn_degree_of_single.
+  rewrite fold_polyn_of_const.
+  rewrite polyn_degree_of_const.
   apply Nat.le_0_l.
 }
 apply -> Nat.succ_le_mono.
@@ -481,7 +494,7 @@ rewrite all_0_srng_summation_0. 2: {
     unfold polyn_sub.
     rewrite polyn_degree_1; [ easy | ].
     rewrite polyn_degree_opp.
-    apply polyn_degree_of_single.
+    apply polyn_degree_of_const.
   }
   apply srng_mul_0_l.
 }
@@ -574,7 +587,7 @@ Theorem exists_eigenvalues : ∀ (acp : algeb_closed_prop) (M : matrix T),
   → ∃ EVL,
      charac_polyn M =
        (Π (i = 1, mat_nrows M),
-          (_x - polyn_of_list [nth (i - 1) EVL 0%Srng]))%P.
+          (_x - polyn_of_list [nth (i - 1) EVL 0%Srng])%P)%Srng.
 Proof.
 intros acp M HM.
 destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {

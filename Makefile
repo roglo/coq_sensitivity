@@ -1,4 +1,4 @@
-TARGET=Misc.vo Semiring.vo SRsummation.vo SRpolynomial.vo SRproduct.vo Matrix.vo BlockMat.vo deprecat_Ring2.vo
+TARGET=Misc.vo Semiring.vo SRsummation.vo SRpolynomial.vo SRproduct.vo Matrix.vo BlockMat.vo CharacPolyn.vo deprecat_Ring2.vo
 FILESFORDEP=`LC_ALL=C ls *.v`
 
 all: pa_coq.cmo $(TARGET)
