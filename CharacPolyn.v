@@ -609,6 +609,7 @@ rewrite H3 in H1.
 assert (H : mat_nrows M > 0) by flia Hrz.
 specialize (H1 H); clear H.
 destruct H1 as (x, Hx).
+Check polyn_in_algeb_closed.
 ...
 destruct acp as (Hroots).
 specialize (Hroots (charac_polyn M)) as H1.
