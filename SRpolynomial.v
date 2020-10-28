@@ -3756,6 +3756,22 @@ destruct n. {
   exists [x]; cbn.
   unfold polyn_highest_coeff.
   rewrite Hn, srng_mul_1_l.
+  clear - Hx Hn.
+  apply polyn_eq.
+  destruct P as (la, Hla).
+  cbn - [ polyn_mul ].
+  apply Nat.add_sub_eq_nz in Hn; [ | easy ].
+  symmetry in Hn; cbn in Hn.
+  cbn in Hx.
+  destruct la as [| a1]; [ easy | ].
+  destruct la as [| a2]; [ easy | ].
+  destruct la; [ clear Hn | easy ].
+  move x before a2.
+  cbn in Hx.
+  rewrite srng_mul_0_l, srng_add_0_l in Hx.
+  cbn in Hla.
+  destruct (srng_eq_dec a2 0) as [Ha2z| Ha2z]; [ easy | clear Hla ].
+  unfold nth.
 ...
   apply polyn_eq.
   cbn - [ polyn_of_const polyn_coeff ].
