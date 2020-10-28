@@ -128,6 +128,8 @@ Definition polyn_of_list l :=
 Definition list_of_polyn (P : polynomial T) :=
   polyn_list P.
 
+Definition polyn_of_const x := polyn_of_list [x].
+
 (*
 End in_ring.
 
@@ -279,6 +281,7 @@ Notation "'Π' ( i = b , e ) , g" :=
 Arguments norm_polyn_list l%PL.
 Arguments polyn_coeff {T so sdp} P%P i%nat.
 Arguments polyn_degree {T so sdp} P%P.
+Arguments polyn_of_const x%Rng.
 
 (* semiring and ring of polynomials *)
 
@@ -294,6 +297,15 @@ Definition polyn_ring_op : ring_op (polynomial T) :=
 
 Existing Instance polyn_semiring_op.
 Existing Instance polyn_ring_op.
+
+(* degree of opposite of a polynomial *)
+
+Theorem polyn_degree_opp : ∀ P, polyn_degree (- P) = polyn_degree P.
+Proof.
+intros.
+unfold polyn_degree, polyn_degree_plus_1.
+now cbn; rewrite map_length.
+Qed.
 
 (* equality of polynomials ↔ equality of their lists *)
 
@@ -323,7 +335,23 @@ destruct (srng_eq_dec 1 0) as [H| H]; [ now apply srng_1_neq_0 in H | ].
 easy.
 Qed.
 
-(* polynomials semiring properties *)
+(* polynomials ring properties *)
+
+Theorem polyn_of_opp_const : ∀ c,
+  polyn_of_const (- c) = (- polyn_of_const c)%P.
+Proof.
+intros.
+apply polyn_eq; cbn.
+destruct (srng_eq_dec c 0) as [Hcz| Hcz]. {
+  rewrite Hcz.
+  unfold so.
+  now rewrite rng_opp_0, if_0_eq_0.
+}
+destruct (srng_eq_dec (- c)%Rng 0) as [Hocz| Hocz]; [ | easy ].
+apply (f_equal rng_opp) in Hocz.
+unfold so in Hocz.
+now rewrite rng_opp_involutive, rng_opp_0 in Hocz.
+Qed.
 
 Theorem polyn_list_add_comm : ∀ la lb,
   polyn_list_add la lb = polyn_list_add lb la.
@@ -2421,6 +2449,15 @@ cbn in Hpn |-*.
 rewrite nth_overflow; [ easy | flia Hpn ].
 Qed.
 
+Theorem polyn_coeff_1_of_x_add_const : ∀ c,
+  polyn_coeff (_x + polyn_of_const c) 1 = 1%Srng.
+Proof.
+intros.
+unfold polyn_coeff; cbn.
+rewrite if_1_eq_0; cbn.
+now destruct (srng_eq_dec c 0); cbn; rewrite if_1_eq_0.
+Qed.
+
 (*
 Theorem nth_polyn_list_mul : ∀ la lb i,
   nth i (la * lb)%PL 0%Srng = polyn_list_convol_mul la lb i.
@@ -2859,12 +2896,12 @@ clear HP; cbn.
 now rewrite if_1_eq_0.
 Qed.
 
-Theorem polyn_degree_of_single : ∀ a, polyn_degree (polyn_of_list [a]) = 0.
+Theorem polyn_degree_of_const : ∀ a, polyn_degree (polyn_of_const a) = 0.
 Proof.
 now intros; cbn; destruct (srng_eq_dec a 0).
 Qed.
 
-Theorem polyn_coeff_of_single : ∀ a, polyn_coeff (polyn_of_list [a]) 0 = a.
+Theorem polyn_coeff_of_const : ∀ a, polyn_coeff (polyn_of_const a) 0 = a.
 Proof.
 now intros; cbn; destruct (srng_eq_dec a 0).
 Qed.
@@ -3617,7 +3654,7 @@ Qed.
 (* P = (x - c) Q + r *)
 Theorem polyn_div_x_sub_const_prop : ∀ P c Q r,
   polyn_div_x_sub_const P c = (Q, r)
-  → P = ((_x - polyn_of_list [c]) * Q + polyn_of_list [r])%P.
+  → P = ((_x - polyn_of_const c) * Q + polyn_of_const r)%P.
 Proof.
 intros * Hqr.
 apply polyn_eq.
@@ -3677,9 +3714,9 @@ Qed.
 Theorem polyn_in_algeb_closed :
   ∀ (acp : algeb_closed_prop) (P : polynomial T),
   ∃ RL, P =
-      (polyn_of_list [polyn_highest_coeff P] *
+      (polyn_of_const (polyn_highest_coeff P) *
        Π (i = 1, polyn_degree P),
-         (_x - polyn_of_list [nth (i - 1) RL 0%Srng]))%P.
+         (_x - polyn_of_const (nth (i - 1) RL 0%Srng)))%P.
 Proof.
 intros.
 remember (polyn_degree P) as n eqn:Hn; symmetry in Hn.
@@ -3715,9 +3752,47 @@ remember (polyn_div_x_sub_const P x) as QR eqn:HQR.
 symmetry in HQR.
 destruct QR as (Q, R).
 specialize (polyn_div_x_sub_const_prop HQR) as Hpqr.
-...
 specialize (IHn Q) as H1.
 assert (H : polyn_degree Q = n). {
+  move Hn at bottom.
+  rewrite Hpqr in Hn.
+  rewrite polyn_degree_lt_add in Hn. 2: {
+    rewrite polyn_degree_of_const.
+    rewrite polyn_degree_mul. 2: {
+      unfold polyn_sub at 2.
+      rewrite polyn_degree_1. 2: {
+        rewrite polyn_degree_opp.
+        apply polyn_degree_of_const.
+      }
+      unfold polyn_sub.
+      rewrite <- polyn_of_opp_const.
+      rewrite polyn_coeff_1_of_x_add_const.
+      rewrite srng_mul_1_l.
+Search (polyn_coeff _ (polyn_degree _)).
+...
+now rewrite if_1_eq_0; cbn.
+cbn - [ norm_polyn_list ].
+      rewrite norm_polyn_list_add_idemp_l in Hy.
+      remember (map rng_opp (norm_polyn_list [x])) as z eqn:Hz.
+      cbn in Hz.
+      destruct (srng_eq_dec x 0) as [Hxz| Hxz]. {
+        cbn in Hz; subst z.
+        rewrite polyn_list_add_0_r in Hy.
+        cbn in Hy.
+        rewrite if_1_eq_0 in Hy; cbn in Hy; subst y.
+      unfold polyn_coeff in Hy.
+      cbn - [ norm_polyn_list ] in Hy.
+      rewrite norm_polyn_list_add_idemp_l in Hy.
+      remember (map rng_opp (norm_polyn_list [x])) as z eqn:Hz.
+      cbn in Hz.
+      destruct (srng_eq_dec x 0) as [Hxz| Hxz]. {
+        cbn in Hz; subst z.
+        rewrite polyn_list_add_0_r in Hy.
+        cbn in Hy.
+        rewrite if_1_eq_0 in Hy; cbn in Hy; subst y.
+...
+Search (polyn_list (_x + _)%P).
+...
   destruct Q as (lb, Hlb); cbn.
   destruct lb as [| b]. {
     cbn in Hlb.
