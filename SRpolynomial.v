@@ -3518,9 +3518,57 @@ rewrite srng_add_comm.
 unfold so; cbn.
 rewrite rng_mul_opp_l.
 rewrite fold_rng_sub, rng_add_sub.
-...
 destruct la as [| a]; [ cbn in Hn; flia Hn Hn2 | ].
 f_equal.
+cbn; rewrite Nat.sub_0_r.
+apply (proj2 (List_eq_iff _ _)).
+rewrite map_length, seq_length.
+split; [ easy | ].
+intros.
+destruct (le_dec (length la) i) as [Hila| Hila]. {
+  rewrite nth_overflow; [ | easy ].
+  rewrite nth_overflow; [ easy | ].
+  now rewrite map_length, seq_length.
+}
+apply Nat.nle_gt in Hila.
+rewrite (List_map_nth_in _ 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+rewrite (Nat.add_1_l i).
+unfold polyn_list_convol_mul.
+unfold so.
+rewrite srng_summation_split_first; [ | apply Nat.le_0_l ].
+erewrite srng_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite (List_map_nth_in _ 0). 2: {
+    rewrite seq_length.
+    flia Hila Hj.
+  }
+  easy.
+}
+cbn - [ iter_seq nth sub ].
+remember (nth 0 _ _) as x; cbn in Heqx; subst x.
+rewrite Nat.sub_0_r.
+rewrite srng_summation_split_first; [ | flia ].
+rewrite all_0_srng_summation_0. 2: {
+  intros j Hj.
+  rewrite nth_overflow; [ | easy ].
+  apply srng_mul_0_l.
+}
+rewrite srng_add_0_r.
+remember (nth 1 _ _) as x; cbn in Heqx; subst x.
+rewrite srng_mul_1_l.
+rewrite Nat.sub_succ, Nat.sub_0_r.
+rewrite seq_nth; [ | easy ].
+destruct (le_dec (length la) (S i)) as [Hsila| Hsila]. {
+  assert (Hi : length la = S i) by flia Hila Hsila.
+  rewrite nth_overflow with (n := S i). 2: {
+    now rewrite map_length, seq_length.
+  }
+  rewrite srng_mul_0_r, srng_add_0_l.
+  rewrite Nat.add_1_l, <- Hi.
+...
+rewrite (List_map_nth_in _ 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
 ...
 intros * Hqz Hqr.
 remember (length la) as n eqn:Hn; symmetry in Hn.
