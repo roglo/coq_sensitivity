@@ -3802,7 +3802,7 @@ destruct n. {
   now apply polyn_of_degree_1_eq.
 }
 specialize (IHn Q) as H1.
-assert (H : polyn_degree Q = S n). {
+assert (Hqd : polyn_degree Q = S n). {
   move Hn at bottom.
   rewrite Hpqr in Hn.
   rewrite polyn_degree_lt_add in Hn. 2: {
@@ -3817,65 +3817,63 @@ assert (H : polyn_degree Q = S n). {
       rewrite <- polyn_of_opp_const.
       rewrite polyn_coeff_1_of_x_add_const.
       rewrite srng_mul_1_l.
-...
-now rewrite if_1_eq_0; cbn.
-cbn - [ norm_polyn_list ].
-      rewrite norm_polyn_list_add_idemp_l in Hy.
-      remember (map rng_opp (norm_polyn_list [x])) as z eqn:Hz.
-      cbn in Hz.
-      destruct (srng_eq_dec x 0) as [Hxz| Hxz]. {
-        cbn in Hz; subst z.
-        rewrite polyn_list_add_0_r in Hy.
-        cbn in Hy.
-        rewrite if_1_eq_0 in Hy; cbn in Hy; subst y.
-      unfold polyn_coeff in Hy.
-      cbn - [ norm_polyn_list ] in Hy.
-      rewrite norm_polyn_list_add_idemp_l in Hy.
-      remember (map rng_opp (norm_polyn_list [x])) as z eqn:Hz.
-      cbn in Hz.
-      destruct (srng_eq_dec x 0) as [Hxz| Hxz]. {
-        cbn in Hz; subst z.
-        rewrite polyn_list_add_0_r in Hy.
-        cbn in Hy.
-        rewrite if_1_eq_0 in Hy; cbn in Hy; subst y.
-...
-Search (polyn_list (_x + _)%P).
-...
-  destruct Q as (lb, Hlb); cbn.
-  destruct lb as [| b]. {
-    cbn in Hlb.
-    unfold polyn_div_x_sub_const in HQR.
-    rewrite Hn in HQR.
-    rewrite Nat.sub_succ, Nat.sub_0_r in HQR.
-    injection HQR; clear HQR; intros HR HQ.
-    rewrite Hx in HR.
-    specialize (proj2 (all_0_norm_polyn_list_map_0 _ _) HQ) as H2.
-    cbn in H2.
-    clear H1 Hlb R HR.
-    specialize (H2 n) as H3.
-    destruct n; [ easy | exfalso ].
-    assert (H : S n ∈ seq 1 (S n)). {
-      apply in_seq; flia.
+      destruct (polyn_eq_dec Q 0) as [Hqz| Hqz]. {
+        exfalso.
+        rewrite Hqz, polyn_mul_0_r, polyn_add_0_l in Hn.
+        now rewrite polyn_degree_of_const in Hn.
+      }
+      destruct Q as (lb, Hlb); cbn.
+      destruct lb as [| b]. {
+        exfalso; apply Hqz.
+        now apply polyn_eq.
+      }
+      cbn - [ nth ].
+      rewrite Nat.sub_0_r.
+      cbn - [ nth ] in Hlb.
+      clear - Hlb.
+      now destruct (srng_eq_dec (nth (length lb) (b :: lb) 0%Srng) 0).
     }
-    specialize (H3 H); clear H.
-    unfold eval_polyn in H3.
-    unfold polyn_degree_plus_1 in H3.
-    remember (length (polyn_list (sub_polyn P (S n)))) as len eqn:Hlen.
-    symmetry in Hlen.
-    destruct len. {
-      destruct P as (la, Hla).
-      cbn in Hlen, Hn.
-      destruct la as [| a]; [ easy | ].
-      cbn in Hn; rewrite Nat.sub_0_r in Hn.
-      clear - Hn Hlen.
-      revert n Hn Hlen.
-      induction la as [| a]; intros; [ easy | ].
-      destruct n; [ easy | cbn in Hn, Hlen ].
-      apply Nat.succ_inj in Hn.
-      now apply (IHla n).
+    unfold polyn_sub.
+    rewrite polyn_degree_1; [ flia | ].
+    rewrite polyn_degree_opp.
+    apply polyn_degree_of_const.
+  }
+  rewrite polyn_degree_mul in Hn. 2: {
+    unfold polyn_sub.
+    rewrite polyn_degree_1. 2: {
+      rewrite polyn_degree_opp.
+      apply polyn_degree_of_const.
     }
+    rewrite <- polyn_of_opp_const.
+    rewrite polyn_coeff_1_of_x_add_const.
+    rewrite srng_mul_1_l.
+    destruct (polyn_eq_dec Q 0) as [Hqz| Hqz]. {
+      now rewrite Hqz, polyn_mul_0_r in Hn.
+    }
+    destruct Q as (lb, Hlb); cbn.
+    destruct lb as [| b]. {
+      exfalso; apply Hqz.
+      now apply polyn_eq.
+    }
+    cbn - [ nth ].
+    rewrite Nat.sub_0_r.
+    cbn - [ nth ] in Hlb.
+    clear - Hlb.
+    now destruct (srng_eq_dec (nth (length lb) (b :: lb) 0%Srng) 0).
+  }
+  unfold polyn_sub in Hn.
+  rewrite polyn_degree_1 in Hn; [ flia Hn | ].
+  rewrite polyn_degree_opp.
+  apply polyn_degree_of_const.
+}
+specialize (H1 Hqd).
+destruct H1 as (RL, Hq).
+exists (x :: RL).
+move Hpqr at bottom.
+rewrite Hq in Hpqr.
 ...
-*)
+rewrite srng_product_split_first.
+...
 
 End in_ring.
 
