@@ -20,6 +20,7 @@ Context (so := rng_semiring).
 Context {sp : @semiring_prop T (@rng_semiring T ro)}.
 Context {rp : @ring_prop T ro}.
 Context {sdp : @sring_dec_prop T so}.
+Context {acp : @algeb_closed_prop T so sdp}.
 Existing Instance so.
 Existing Instance polyn_semiring_op.
 Existing Instance polyn_ring_op.
@@ -558,12 +559,12 @@ Qed.
 
 (* eigenvalues and eigenvectors *)
 
-Theorem exists_eigenvalue : ∀ (acp : algeb_closed_prop) (M : matrix T),
+Theorem exists_eigenvalue : ∀  (M : matrix T),
   mat_nrows M ≠ 0
   → is_square_mat M
   → ∃ μ, eval_polyn (charac_polyn M) μ = 0%Srng.
 Proof.
-intros acp M Hrz HM.
+intros M Hrz HM.
 destruct acp as (Hroots).
 specialize (Hroots (charac_polyn M)) as H1.
 assert (H2 : polyn_coeff (charac_polyn M) (mat_nrows M) = 1%Srng). {
@@ -582,20 +583,19 @@ destruct H1 as (μ, Hμ).
 now exists μ.
 Qed.
 
-Theorem exists_eigenvalues : ∀ (acp : algeb_closed_prop) (M : matrix T),
+Theorem exists_eigenvalues : ∀ (M : matrix T),
   is_square_mat M
   → ∃ EVL,
      charac_polyn M =
        (Π (i = 1, mat_nrows M),
           (_x - polyn_of_list [nth (i - 1) EVL 0%Srng])%P)%Srng.
 Proof.
-intros acp M HM.
+intros M HM.
 destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
   exists [].
   now cbn; rewrite Hrz; cbn.
 }
-destruct acp as (Hroots).
-specialize (Hroots (charac_polyn M)) as H1.
+specialize (alcl_roots (charac_polyn M)) as H1.
 assert (H2 : polyn_coeff (charac_polyn M) (mat_nrows M) = 1%Srng). {
   specialize (charac_polyn_is_monic M) as H2.
   unfold is_monic_polyn in H2.
@@ -609,22 +609,13 @@ rewrite H3 in H1.
 assert (H : mat_nrows M > 0) by flia Hrz.
 specialize (H1 H); clear H.
 destruct H1 as (x, Hx).
-Check polyn_in_algeb_closed.
-...
-destruct acp as (Hroots).
-specialize (Hroots (charac_polyn M)) as H1.
-assert (H2 : polyn_coeff (charac_polyn M) (mat_nrows M) = 1%Srng). {
-  specialize (charac_polyn_is_monic M) as H2.
-  unfold is_monic_polyn in H2.
-  now rewrite charac_polyn_degree in H2.
-}
-assert (H3 : polyn_degree (charac_polyn M) = mat_nrows M). {
-  apply charac_polyn_degree.
-}
-unfold so in H1.
-rewrite H3 in H1.
-assert (H : mat_nrows M > 0) by flia Hrz.
-specialize (H1 H); clear H.
-destruct H1 as (x, Hx).
-About algeb_closed_prop.
-...
+specialize (polyn_in_algeb_closed (charac_polyn M)) as H1.
+destruct H1 as (RL, Hrl); exists RL.
+unfold polyn_highest_coeff in Hrl.
+rewrite H3, H2 in Hrl.
+unfold polyn_of_const in Hrl at 1.
+unfold so in Hrl.
+now rewrite srng_mul_1_l in Hrl.
+Qed.
+
+End in_ring.

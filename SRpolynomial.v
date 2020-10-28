@@ -83,6 +83,7 @@ Context (so := rng_semiring).
 Context {sp : @semiring_prop T (@rng_semiring T ro)}.
 Context {rp : @ring_prop T ro}.
 Context {sdp : @sring_dec_prop T so}.
+Context {acp : @algeb_closed_prop T so sdp}.
 Existing Instance so.
 
 Theorem fold_eval_polyn_list : ∀ la (x : T),
@@ -3519,7 +3520,7 @@ Qed.
    where rn cover all roots of P *)
 
 Theorem polyn_in_algeb_closed :
-  ∀ (acp : algeb_closed_prop) (P : polynomial T),
+  ∀ (P : polynomial T),
   ∃ RL, P =
       (polyn_of_const (polyn_highest_coeff P) *
        Π (i = 1, polyn_degree P),
