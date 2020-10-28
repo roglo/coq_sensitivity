@@ -3814,6 +3814,24 @@ destruct n. {
   clear - Hx Hn.
   now apply polyn_of_degree_1_eq.
 }
+assert (Hpcq : polyn_coeff Q (polyn_degree Q) ≠ 0%Srng). {
+  destruct (polyn_eq_dec Q 0) as [Hqz| Hqz]. {
+    rewrite Hqz in Hpqr.
+    rewrite polyn_mul_0_r, polyn_add_0_l in Hpqr.
+    rewrite Hpqr in Hn.
+    now rewrite polyn_degree_of_const in Hn.
+  }
+  destruct Q as (lb, Hlb); cbn.
+  destruct lb as [| b]. {
+    exfalso; apply Hqz.
+    now apply polyn_eq.
+  }
+  cbn - [ nth ].
+  rewrite Nat.sub_0_r.
+  cbn - [ nth ] in Hlb.
+  clear - Hlb.
+  now destruct (srng_eq_dec (nth (length lb) (b :: lb) 0%Srng) 0).
+}
 specialize (IHn Q) as H1.
 assert (Hqd : polyn_degree Q = S n). {
   move Hn at bottom.
@@ -3859,20 +3877,7 @@ assert (Hqd : polyn_degree Q = S n). {
     }
     rewrite <- polyn_of_opp_const.
     rewrite polyn_coeff_1_of_x_add_const.
-    rewrite srng_mul_1_l.
-    destruct (polyn_eq_dec Q 0) as [Hqz| Hqz]. {
-      now rewrite Hqz, polyn_mul_0_r in Hn.
-    }
-    destruct Q as (lb, Hlb); cbn.
-    destruct lb as [| b]. {
-      exfalso; apply Hqz.
-      now apply polyn_eq.
-    }
-    cbn - [ nth ].
-    rewrite Nat.sub_0_r.
-    cbn - [ nth ] in Hlb.
-    clear - Hlb.
-    now destruct (srng_eq_dec (nth (length lb) (b :: lb) 0%Srng) 0).
+    now rewrite srng_mul_1_l.
   }
   unfold polyn_sub in Hn.
   rewrite polyn_degree_1 in Hn; [ flia Hn | ].
@@ -3921,6 +3926,45 @@ cbn; subst y z; f_equal. {
   now rewrite Nat.sub_succ, Nat.sub_0_r.
 }
 rewrite Hpqr'.
+unfold polyn_highest_coeff.
+rewrite polyn_degree_mul. 2: {
+  unfold polyn_sub.
+  rewrite polyn_degree_1. 2: {
+    rewrite polyn_degree_opp.
+    apply polyn_degree_of_const.
+  }
+  rewrite <- polyn_of_opp_const.
+  rewrite polyn_coeff_1_of_x_add_const.
+  now rewrite srng_mul_1_l.
+}
+unfold polyn_sub.
+rewrite polyn_degree_1. 2: {
+  rewrite polyn_degree_opp.
+  apply polyn_degree_of_const.
+}
+rewrite polyn_coeff_mul.
+unfold so.
+rewrite srng_summation_split_first; [ | apply Nat.le_0_l ].
+rewrite (@polyn_coeff_overflow _ (1 + polyn_degree Q)); [ | flia ].
+rewrite srng_mul_0_r, srng_add_0_l.
+rewrite srng_summation_split_first; [ | flia ].
+rewrite <- polyn_of_opp_const.
+rewrite polyn_coeff_1_of_x_add_const.
+rewrite srng_mul_1_l.
+rewrite Nat.add_comm, Nat.add_sub.
+rewrite all_0_srng_summation_0. 2: {
+  intros i Hi.
+  rewrite polyn_coeff_overflow. 2: {
+    rewrite polyn_degree_1; [ easy | ].
+    apply polyn_degree_of_const.
+  }
+  apply srng_mul_0_l.
+}
+now rewrite srng_add_0_r.
+Qed.
+
+Inspect 1.
+
 ...
 
 End in_ring.
