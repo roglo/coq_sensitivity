@@ -3774,12 +3774,11 @@ destruct n. {
       cbn in Hp1z, Hn |-*.
       apply Nat.add_sub_eq_nz in Hn; [ | easy ].
       symmetry in Hn; cbn in Hn.
-      destruct la as [| a1]; [ discriminate Hn | ].
-      destruct la as [| a2]; [ discriminate Hn | ].
-      destruct la; [ | discriminate Hn ].
-      cbn in Hp1z.
-      cbn in Hla.
       clear Hx HQR Hpqr.
+      destruct la as [| a1]; [ easy | ].
+      destruct la as [| a2]; [ easy | ].
+      destruct la; [ | easy ].
+      cbn in Hp1z, Hla.
       rewrite Hp1z in Hla.
       now rewrite if_0_eq_0 in Hla.
     }
