@@ -3752,11 +3752,11 @@ remember (polyn_div_x_sub_const P x) as QR eqn:HQR.
 symmetry in HQR.
 destruct QR as (Q, R).
 specialize (polyn_div_x_sub_const_prop HQR) as Hpqr.
-...
 destruct n. {
   exists [x]; cbn.
   unfold polyn_highest_coeff.
   rewrite Hn, srng_mul_1_l.
+...
   apply polyn_eq.
   cbn - [ polyn_of_const polyn_coeff ].
   rewrite if_1_eq_0.
