@@ -5,7 +5,7 @@
 
 Require Import Utf8 Arith.
 Import List.
-Require Import Misc Ring2.
+Require Import Misc deprecat_Ring2.
 
 Fixpoint summation_aux {α} {r : ring_op α} b len g :=
   match len with

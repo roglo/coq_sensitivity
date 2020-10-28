@@ -8,7 +8,7 @@ Import List List.ListNotations.
 Require Import Init.Nat.
 Require Import Misc.
 
-Require Import Semiring SRsummation.
+Require Import Semiring SRsummation SRproduct.
 
 (* decidability of equality in semirings
    and the fact that 1 ≠ 0 *)
@@ -268,6 +268,7 @@ Notation "1" := ([1%Srng]) : polyn_list_scope.
 Notation "la + lb" := (polyn_list_add la lb) : polyn_list_scope.
 Notation "la * lb" := (polyn_list_mul la lb) : polyn_list_scope.
 
+(*
 Notation "'Σ' ( i = b , e ) , g" :=
   (iter_seq b e (λ c i, (c + g)%P) 0%P)
   (at level 45, i at level 0, b at level 60, e at level 60) :
@@ -277,6 +278,7 @@ Notation "'Π' ( i = b , e ) , g" :=
   (iter_seq b e (λ c i, (c * g)%P) 1%P)
   (at level 45, i at level 0, b at level 60, e at level 60) :
      polynomial_scope.
+*)
 
 Arguments norm_polyn_list l%PL.
 Arguments polyn_coeff {T so sdp} P%P i%nat.
@@ -2570,7 +2572,7 @@ now cbn; rewrite if_1_eq_0.
 Qed.
 
 Theorem polyn_degree_summation_ub : ∀ b e f,
-  polyn_degree (Σ (i = b, e), f i) ≤ Max (i = b, e), polyn_degree (f i).
+  polyn_degree (Σ (i = b, e), f i)%Srng ≤ Max (i = b, e), polyn_degree (f i).
 Proof.
 intros.
 unfold iter_seq.
@@ -3758,7 +3760,7 @@ Theorem polyn_in_algeb_closed :
   ∃ RL, P =
       (polyn_of_const (polyn_highest_coeff P) *
        Π (i = 1, polyn_degree P),
-         (_x - polyn_of_const (nth (i - 1) RL 0%Srng)))%P.
+         (_x - polyn_of_const (nth (i - 1) RL 0%Srng))%P)%Srng.
 Proof.
 intros.
 remember (polyn_degree P) as n eqn:Hn; symmetry in Hn.
@@ -3899,6 +3901,7 @@ Notation "1" := ([1%Srng]) : polyn_list_scope.
 Notation "la + lb" := (polyn_list_add la lb) : polyn_list_scope.
 Notation "la * lb" := (polyn_list_mul la lb) : polyn_list_scope.
 
+(*
 Notation "'Σ' ( i = b , e ) , g" :=
   (iter_seq b e (λ c i, (c + g)%P) 0%P)
   (at level 45, i at level 0, b at level 60, e at level 60) :
@@ -3908,6 +3911,7 @@ Notation "'Π' ( i = b , e ) , g" :=
   (iter_seq b e (λ c i, (c * g)%P) 1%P)
   (at level 45, i at level 0, b at level 60, e at level 60) :
      polynomial_scope.
+*)
 
 Arguments is_monic_polyn {T ro sdp} P%P.
 Arguments norm_polyn_list {T ro sdp} l%PL.

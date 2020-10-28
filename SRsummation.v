@@ -1,9 +1,9 @@
-(* summations on ar semiring *)
+(* summations on a semiring *)
 
 Set Nested Proofs Allowed.
 
 Require Import Utf8 Arith.
-Require Import Semiring Misc.
+Require Import Misc Semiring.
 Import List List.ListNotations.
 
 Notation "'Σ' ( i = b , e ) , g" :=
