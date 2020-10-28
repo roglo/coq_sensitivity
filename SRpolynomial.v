@@ -3707,6 +3707,29 @@ rewrite <- List_last_nth_cons in Hla.
 now destruct (srng_eq_dec (last (a :: la) 0%Srng) 0).
 Qed.
 
+Theorem polyn_of_degree_1_eq : ∀ P r,
+  polyn_degree P = 1
+  → eval_polyn P r = 0%Srng
+  → P = (polyn_of_const (polyn_coeff P 1) * (_x - polyn_of_const r))%P.
+Proof.
+intros * Hp Hr.
+apply polyn_eq.
+destruct P as (la, Hla).
+cbn - [ polyn_mul ].
+apply Nat.add_sub_eq_nz in Hp; [ | easy ].
+symmetry in Hp; cbn in Hp.
+cbn in Hr.
+destruct la as [| a1]; [ easy | ].
+destruct la as [| a2]; [ easy | ].
+destruct la; [ clear Hp | easy ].
+move r before a2.
+cbn in Hr.
+rewrite srng_mul_0_l, srng_add_0_l in Hr.
+cbn in Hla.
+destruct (srng_eq_dec a2 0) as [Ha2z| Ha2z]; [ easy | clear Hla ].
+unfold nth.
+...
+
 (* in algebraically closed set, a polynomial P is the
    product of its highest coefficient and all (x-rn)
    where rn cover all roots of P *)
@@ -3757,21 +3780,9 @@ destruct n. {
   unfold polyn_highest_coeff.
   rewrite Hn, srng_mul_1_l.
   clear - Hx Hn.
-  apply polyn_eq.
-  destruct P as (la, Hla).
-  cbn - [ polyn_mul ].
-  apply Nat.add_sub_eq_nz in Hn; [ | easy ].
-  symmetry in Hn; cbn in Hn.
-  cbn in Hx.
-  destruct la as [| a1]; [ easy | ].
-  destruct la as [| a2]; [ easy | ].
-  destruct la; [ clear Hn | easy ].
-  move x before a2.
-  cbn in Hx.
-  rewrite srng_mul_0_l, srng_add_0_l in Hx.
-  cbn in Hla.
-  destruct (srng_eq_dec a2 0) as [Ha2z| Ha2z]; [ easy | clear Hla ].
-  unfold nth.
+...
+  now apply polyn_of_degree_1_eq.
+}
 ...
   apply polyn_eq.
   cbn - [ polyn_of_const polyn_coeff ].
