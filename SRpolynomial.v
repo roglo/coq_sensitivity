@@ -3752,6 +3752,53 @@ remember (polyn_div_x_sub_const P x) as QR eqn:HQR.
 symmetry in HQR.
 destruct QR as (Q, R).
 specialize (polyn_div_x_sub_const_prop HQR) as Hpqr.
+destruct n. {
+  exists [x]; cbn.
+  unfold polyn_highest_coeff.
+  rewrite Hn, srng_mul_1_l.
+  apply polyn_eq.
+  cbn - [ polyn_of_const polyn_coeff ].
+  rewrite if_1_eq_0.
+  remember (map rng_opp _) as y eqn:Hy.
+  cbn in Hy.
+  destruct (srng_eq_dec x 0) as [Hxz| Hxz]. {
+    cbn in Hy; subst y.
+    rewrite polyn_list_add_0_r.
+    rewrite rev_involutive.
+    cbn.
+    rewrite if_1_eq_0; cbn.
+    rewrite rev_length.
+    destruct (srng_eq_dec (polyn_coeff P 1) 0) as [Hp1z| Hp1z]. {
+      unfold polyn_degree, polyn_degree_plus_1 in Hn.
+      destruct P as (la, Hla).
+      cbn in Hp1z, Hn |-*.
+      apply Nat.add_sub_eq_nz in Hn; [ | easy ].
+      symmetry in Hn; cbn in Hn.
+      destruct la as [| a1]; [ discriminate Hn | ].
+      destruct la as [| a2]; [ discriminate Hn | ].
+      destruct la; [ | discriminate Hn ].
+      cbn in Hp1z.
+      cbn in Hla.
+      clear Hx HQR Hpqr.
+      rewrite Hp1z in Hla.
+      now rewrite if_0_eq_0 in Hla.
+    }
+    cbn.
+    rewrite srng_add_0_l, srng_mul_1_r.
+    rewrite srng_mul_0_l, srng_add_0_r.
+    rewrite srng_add_0_l, srng_mul_0_r.
+    rewrite if_0_eq_0.
+    destruct (srng_eq_dec (polyn_coeff P 1) 0) as [H| H]; [ easy | clear H ].
+    cbn.
+...
+  }
+  cbn in Hy; subst y.
+...
+  unfold polyn_of_const, polyn_of_list.
+  cbn - [ norm_polyn_list ].
+  destruct P as (la, Hla).
+  cbn.
+...
 specialize (IHn Q) as H1.
 assert (H : polyn_degree Q = n). {
   move Hn at bottom.
@@ -3769,6 +3816,7 @@ assert (H : polyn_degree Q = n). {
       rewrite polyn_coeff_1_of_x_add_const.
       rewrite srng_mul_1_l.
 Search (polyn_coeff _ (polyn_degree _)).
+Print polyn_highest_coeff.
 ...
 now rewrite if_1_eq_0; cbn.
 cbn - [ norm_polyn_list ].
