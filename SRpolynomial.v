@@ -3483,7 +3483,35 @@ Theorem polyn_list_div_x_sub_const_prop0 : ∀ la lq c r,
   → la = ([(- c)%Rng; 1%Srng] * lq + [r])%PL.
 Proof.
 intros * Hqz Hqr.
+remember (length la) as n eqn:Hn; symmetry in Hn.
+injection Hqr; clear Hqr; intros Hr Hq.
+destruct (lt_dec n 2) as [Hn2| Hn2]. {
+  destruct n. {
+    now apply length_zero_iff_nil in Hn; subst la.
+  }
+  destruct n; [ | flia Hn2 ].
+  destruct la as [| a]; [ easy | ].
+  destruct la; [ | easy ].
+  cbn in Hr.
+  rewrite srng_mul_0_l, srng_add_0_l in Hr.
+  subst a lq; cbn.
+  rewrite srng_mul_0_r, srng_add_0_l, srng_add_0_l.
+  now destruct (srng_eq_dec r 0).
+}
+apply Nat.nlt_ge in Hn2.
+subst r lq.
+cbn; rewrite srng_add_0_l, polyn_list_add_0_r.
+rewrite map_length, seq_length.
+rewrite (List_map_nth_in _ 0); [ | rewrite seq_length; flia Hn Hn2 ].
+rewrite seq_nth; [ | flia Hn Hn2 ].
+rewrite Nat.add_0_r.
+replace (sub_polyn_list la 1) with (tl la). 2: {
+  subst n.
+  destruct la; [ cbn in Hn2; flia Hn2 | ].
+  destruct la; [ cbn in Hn2; flia Hn2 | easy ].
+}
 ...
+intros * Hqz Hqr.
 remember (length la) as n eqn:Hn; symmetry in Hn.
 destruct n. {
   now apply length_zero_iff_nil in Hn; subst la.
