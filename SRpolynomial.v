@@ -3050,7 +3050,7 @@ Qed.
      input: Σ (j = 0, n), a_j x^j
      output: Σ (j = i, n), a_j x^(j-i) *)
 
-Theorem subp_polyn_prop : ∀ i P,
+Theorem sub_polyn_prop : ∀ i P,
   polyn_prop_test (λ i0 : nat, nth i0 (skipn i (polyn_list P)) 0%Srng)
     (length (skipn i (polyn_list P))) = true.
 Proof.
@@ -3092,7 +3092,7 @@ Definition sub_polyn_list (la : list T) i := skipn i la.
 
 Definition sub_polyn P i :=
   {| polyn_list := sub_polyn_list (polyn_list P) i;
-     polyn_prop := subp_polyn_prop i P |}.
+     polyn_prop := sub_polyn_prop i P |}.
 
 Theorem eval_polyn_list_cons : ∀ la (a x : T),
   eval_polyn_list (a :: la) x = (a + x * eval_polyn_list la x)%Srng.
