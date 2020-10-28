@@ -3566,7 +3566,17 @@ destruct (le_dec (length la) (S i)) as [Hsila| Hsila]. {
   }
   rewrite srng_mul_0_r, srng_add_0_l.
   rewrite Nat.add_1_l, <- Hi.
-...
+  replace (length la) with (length (a :: la) - 1). 2: {
+    now cbn; rewrite Nat.sub_0_r.
+  }
+  unfold sub_polyn_list.
+  rewrite List_skipn_last with (d := d); [ | easy ].
+  remember (a :: la) as lb; cbn; subst lb.
+  rewrite srng_mul_0_l, srng_add_0_l.
+  rewrite List_last_nth_cons.
+  now rewrite Hi.
+}
+apply Nat.nle_gt in Hsila.
 rewrite (List_map_nth_in _ 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
 ...

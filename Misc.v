@@ -1774,20 +1774,6 @@ apply Nat.succ_le_mono in Hnlen.
 now apply IHlen.
 Qed.
 
-Theorem List_skipn_last : ∀ A (la : list A) d,
-  la ≠ []
-  → skipn (length la - 1) la = [last la d].
-Proof.
-intros * Hla.
-destruct la as [| a]; [ easy | clear Hla ].
-cbn - [ last ]; rewrite Nat.sub_0_r.
-revert a.
-induction la as [| a1]; intros; [ easy | ].
-cbn - [ last ].
-rewrite List_last_cons_cons.
-apply IHla.
-Qed.
-
 Theorem List_skipn_cons_nth_skipn_succ : ∀ A n (l : list A) d,
   n < length l
   → skipn n l = nth n l d :: skipn (S n) l.
@@ -1801,6 +1787,20 @@ apply Nat.succ_lt_mono in Hn.
 remember (S (S n)) as sn; cbn; subst sn.
 remember (S n) as sn; cbn; subst sn.
 now apply IHn.
+Qed.
+
+Theorem List_skipn_last : ∀ A (la : list A) d,
+  la ≠ []
+  → skipn (length la - 1) la = [last la d].
+Proof.
+intros * Hla.
+destruct la as [| a]; [ easy | clear Hla ].
+cbn - [ skipn last ].
+rewrite Nat.sub_0_r.
+rewrite List_skipn_cons_nth_skipn_succ with (d := d); [ | cbn; flia ].
+f_equal; [ | apply skipn_all ].
+symmetry.
+apply List_last_nth_cons.
 Qed.
 
 Theorem List_eq_iff : ∀ A (l1 l2 : list A),
