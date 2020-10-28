@@ -3752,6 +3752,7 @@ remember (polyn_div_x_sub_const P x) as QR eqn:HQR.
 symmetry in HQR.
 destruct QR as (Q, R).
 specialize (polyn_div_x_sub_const_prop HQR) as Hpqr.
+...
 destruct n. {
   exists [x]; cbn.
   unfold polyn_highest_coeff.
@@ -3792,11 +3793,10 @@ destruct n. {
 ...
   }
   cbn in Hy; subst y.
-...
+  cbn.
+  rewrite if_1_eq_0; cbn.
   unfold polyn_of_const, polyn_of_list.
   cbn - [ norm_polyn_list ].
-  destruct P as (la, Hla).
-  cbn.
 ...
 specialize (IHn Q) as H1.
 assert (H : polyn_degree Q = n). {
