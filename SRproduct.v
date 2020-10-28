@@ -50,4 +50,29 @@ rewrite srng_mul_1_l, Nat.sub_0_r.
 apply fold_left_srng_mul_fun_from_1.
 Qed.
 
+Theorem srng_product_eq_compat : ∀ g h b k,
+  (∀ i, b ≤ i ≤ k → (g i = h i)%Srng)
+  → (Π (i = b, k), g i = Π (i = b, k), h i)%Srng.
+Proof.
+intros * Hgh.
+unfold iter_seq.
+remember (S k - b) as len eqn:Hlen.
+assert (∀ i, b ≤ i < b + len → g i = h i). {
+  intros i Hi.
+  apply Hgh; flia Hlen Hi.
+}
+clear k Hgh Hlen.
+rename H into Hb.
+revert b Hb.
+induction len; intros; [ easy | cbn ].
+do 2 rewrite srng_mul_1_l.
+rewrite fold_left_srng_mul_fun_from_1; symmetry.
+rewrite fold_left_srng_mul_fun_from_1; symmetry.
+f_equal; [ apply Hb; flia | ].
+apply IHlen.
+intros i Hi.
+apply Hb.
+flia Hi.
+Qed.
+
 End in_ring.

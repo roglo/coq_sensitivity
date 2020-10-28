@@ -405,6 +405,13 @@ rewrite rev_length, Nat.sub_diag in Pa; cbn in Pa.
 now rewrite if_0_eq_0 in Pa.
 Qed.
 
+Theorem polyn_add_0_r : ∀ P, (P + 0)%P = P.
+Proof.
+intros.
+rewrite polyn_add_comm.
+apply polyn_add_0_l.
+Qed.
+
 Theorem strip_0s_idemp : ∀ la,
   strip_0s (strip_0s la) =
   strip_0s la.
@@ -3872,9 +3879,44 @@ specialize (H1 Hqd).
 destruct H1 as (RL, Hq).
 exists (x :: RL).
 move Hpqr at bottom.
+(**)
+injection HQR; intros HR HQ; clear HQ.
+rewrite <- HR in Hpqr.
+unfold eval_polyn in Hx.
+rewrite Hx in Hpqr.
+assert (H : (polyn_of_const 0 = 0)%P). {
+  apply polyn_eq; cbn.
+  now rewrite if_0_eq_0.
+}
+unfold so in Hpqr.
+rewrite H in Hpqr; clear H.
+rewrite polyn_add_0_r in Hpqr.
+generalize Hpqr; intros Hpqr'.
 rewrite Hq in Hpqr.
-...
-rewrite srng_product_split_first.
+rewrite srng_product_split_first; [ | flia ].
+rewrite Nat.sub_diag.
+remember (nth 0 _ _) as y eqn:Hy; cbn in Hy; subst y.
+rewrite srng_mul_comm, <- srng_mul_assoc.
+rewrite Hpqr at 1.
+remember (Π (i = _, _), _)%Srng as y eqn:Hy in |-*.
+remember (Π (i = _, _), _)%Srng as z eqn:Hz in |-*.
+cbn; f_equal; rewrite srng_mul_comm.
+cbn; subst y z; f_equal. {
+  unfold iter_seq.
+  symmetry.
+  rewrite <- seq_shift, List_fold_left_map.
+  rewrite (Nat.sub_succ (S (S n))).
+  erewrite List_fold_left_ext_in. 2: {
+    intros i * Hi.
+    now rewrite Nat.sub_succ, Nat.sub_0_r.
+  }
+  do 2 rewrite fold_iter_seq.
+  apply srng_product_eq_compat.
+  intros i Hi.
+  destruct i; [ easy | ].
+  now rewrite Nat.sub_succ, Nat.sub_0_r.
+}
+rewrite Hpqr'.
 ...
 
 End in_ring.
