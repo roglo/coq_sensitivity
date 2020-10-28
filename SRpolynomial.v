@@ -3510,6 +3510,17 @@ replace (sub_polyn_list la 1) with (tl la). 2: {
   destruct la; [ cbn in Hn2; flia Hn2 | ].
   destruct la; [ cbn in Hn2; flia Hn2 | easy ].
 }
+replace la with (hd 0%Srng la :: tl la) at 3. 2: {
+  destruct la; [ cbn in Hn; flia Hn Hn2 | easy ].
+}
+rewrite eval_polyn_list_cons.
+rewrite srng_add_comm.
+unfold so; cbn.
+rewrite rng_mul_opp_l.
+rewrite fold_rng_sub, rng_add_sub.
+...
+destruct la as [| a]; [ cbn in Hn; flia Hn Hn2 | ].
+f_equal.
 ...
 intros * Hqz Hqr.
 remember (length la) as n eqn:Hn; symmetry in Hn.
