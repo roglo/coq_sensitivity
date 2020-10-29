@@ -213,3 +213,11 @@ transitivity (A n). 2: {
 }
 apply bmat_fit_for_add_IZ_A.
 Qed.
+
+Print list_list_of_bmat.
+
+Fixpoint matrix_of_bmatrix (BM : bmatrix T) : matrix T :=
+  match BM with
+  | BM_1 x => mk_mat (λ _ _, x) 1 1
+  | BM_M MBM =>
+      let ll := ...

@@ -588,7 +588,7 @@ Theorem exists_eigenvalues : ∀ (M : matrix T),
   → ∃ EVL,
      charac_polyn M =
        (Π (i = 1, mat_nrows M),
-          (_x - polyn_of_list [nth (i - 1) EVL 0%Srng])%P)%Srng.
+          (_x - polyn_of_const (nth (i - 1) EVL 0%Srng))%P)%Srng.
 Proof.
 intros M HM.
 destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
