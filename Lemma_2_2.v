@@ -220,6 +220,23 @@ transitivity (A n). 2: {
 apply bmat_fit_for_add_IZ_A.
 Qed.
 
+Definition mat_of_bmat (BM : bmatrix T) : matrix T :=
+  mat_of_list_list 0%Srng (list_list_of_bmat BM).
+
+(* vaudrait mieux le définir sans passer par des listes
+   mais avec sizes_of_bmatrix *)
+
+...
+
+(*
+End in_ring.
+Require Import ZArith.
+
+Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (I_2_pow n)).
+*)
+
+Definition bmat_nrows (BM : bmatrix T) := mat_nrows (mat_of_bmat BM).
+
 Theorem is_square_bmat_is_square_mat : ∀ BM,
   is_square_bmat BM → is_square_mat (mat_of_bmat BM).
 Proof.
