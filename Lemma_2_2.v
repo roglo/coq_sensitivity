@@ -25,6 +25,12 @@ Context {sp : @semiring_prop T (@rng_semiring T ro)}.
 Context {rp : @ring_prop T ro}.
 Existing Instance so.
 
+Add Parametric Relation : _ (@bmat_fit_for_add T)
+ reflexivity proved by bmat_fit_for_add_refl
+ symmetry proved by bmat_fit_for_add_symm
+ transitivity proved by bmat_fit_for_add_trans
+ as bmat_fit_for_add_equivalence.
+
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
@@ -41,14 +47,6 @@ destruct i. {
     rewrite bmat_nat_mul_l_succ.
     rewrite <- IHn.
     unfold so.
-Check bmat_mul_1_r.
-    rewrite bmat_mul_1_r; [ | ].
-(* Ah oui, faut peut-être être sûr que bmat_fit_for_add est bien
-   une relation d'équivalence ; à importer de BlockMat d'une manière
-   ou d'une autre *)
-2: unfold I_2_pow; cbn.
-Print bmat_fit_for_add.
-...
     rewrite bmat_mul_1_r; [ | easy ].
     f_equal.
     rewrite <- bmat_zero_like_sqr; [ | apply A_is_square_bmat ].
@@ -56,6 +54,7 @@ Print bmat_fit_for_add.
   }
   destruct j; [ cbn | flia Hj ].
   rewrite bmat_nat_mul_l_succ.
+  unfold so.
   rewrite bmat_mul_1_r. 2: {
     unfold I_2_pow.
     apply bmat_fit_for_add_IZ_A.
@@ -76,6 +75,7 @@ Print bmat_fit_for_add.
 }
 destruct i; [ | flia Hi ].
 destruct j; cbn. {
+  unfold so.
   rewrite bmat_mul_1_l. 2: {
     apply bmat_fit_for_add_IZ_A.
   }
@@ -92,6 +92,7 @@ destruct j; cbn. {
   now apply bmat_zero_like_A_eq_Z.
 }
 destruct j; [ cbn | flia Hj ].
+unfold so.
 rewrite bmat_mul_1_l; [ | easy ].
 rewrite bmat_mul_sqr_opp; [ | apply A_is_square_bmat ].
 rewrite bmat_nat_mul_l_succ.
