@@ -398,6 +398,16 @@ Fixpoint is_square_bmat_loop sizes (M : bmatrix T) {struct sizes} :=
       end
   end.
 
+(* Some kinds of square bmatrices are manipulated to make operations
+   (addition, multiplication, ...) possible: the ones which have the
+   same size (= number of rows = number of columns) at each level;
+   this is computed by "sizes_of_bmatrix" which returns a list of
+   naturals, the first one for the size of all submatrices at level
+   1, the second one for the size of all submatrices at level 2, and
+   so on. This is taken from the first matrix (upper left one) at
+   each level. If the other matrices don't have the same size, they
+   are going to be truncated or extended with 0s if necessary. *)
+
 Fixpoint sizes_of_bmatrix (BM : bmatrix T) :=
   match BM with
   | BM_1 _ => []
