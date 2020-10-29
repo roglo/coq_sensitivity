@@ -618,4 +618,11 @@ unfold so in Hrl.
 now rewrite srng_mul_1_l in Hrl.
 Qed.
 
+(* to compute an eigenvector of the eigenvalue λ:
+   - triangularize λM-I = A⁻¹BA where B is a lower triangular matrix
+   - the determinant of B is equal to the determinant of λM-I = 0
+   - the determinant of B is the product of all values in the diagonal
+   - therefore one of the values of the diagonal is 0
+   - then, ??? *)
+
 End in_ring.
