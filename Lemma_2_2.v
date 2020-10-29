@@ -224,6 +224,9 @@ Theorem is_square_bmat_is_square_mat : ∀ BM,
   is_square_bmat BM → is_square_mat (mat_of_bmat BM).
 Proof.
 intros * Hsbm.
+induction BM as [x| M IHBM] using bmatrix_ind2; [ easy | ].
+unfold is_square_mat.
+cbn.
 ...
 
 Theorem exists_A_eigenvalues : ∀ n,
