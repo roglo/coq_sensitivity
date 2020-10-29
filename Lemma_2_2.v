@@ -1,5 +1,5 @@
-(* sequence A_n of matrices defined in sensitivity conjecture
-   and the proof their square is "n * I_n" *)
+(* Lemma 2.2 of the proof of the sensitivity conjecture *)
+(* sequence A_n of matrices and the proof their square is "n * I_n" *)
 
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
