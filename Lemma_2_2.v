@@ -12,8 +12,11 @@ Require Import Relations.
 *)
 
 Require Import Misc Matrix.
-Require Import Semiring (*SRsummation*).
-Require Import BlockMat.
+Require Import Semiring.
+Require Import SRproduct.
+Require Import SRpolynomial.
+Require Import BlockMat CharacPolyn.
+Import polynomial_Notations.
 Import bmatrix_Notations.
 
 Section in_ring.
@@ -23,7 +26,10 @@ Context {ro : ring_op T}.
 Context (so := rng_semiring).
 Context {sp : @semiring_prop T (@rng_semiring T ro)}.
 Context {rp : @ring_prop T ro}.
+Context {sdp : @sring_dec_prop T so}.
+Context {acp : @algeb_closed_prop T so sdp}.
 Existing Instance so.
+Existing Instance polyn_semiring_op.
 
 Add Parametric Relation : _ (@bmat_fit_for_add T)
  reflexivity proved by bmat_fit_for_add_refl
@@ -214,10 +220,24 @@ transitivity (A n). 2: {
 apply bmat_fit_for_add_IZ_A.
 Qed.
 
-Print list_list_of_bmat.
+Theorem is_square_bmat_is_square_mat : ∀ BM,
+  is_square_bmat BM → is_square_mat (mat_of_bmat BM).
+Proof.
+intros * Hsbm.
+...
 
-Fixpoint matrix_of_bmatrix (BM : bmatrix T) : matrix T :=
-  match BM with
-  | BM_1 x => mk_mat (λ _ _, x) 1 1
-  | BM_M MBM =>
-      let ll := ...
+Theorem exists_A_eigenvalues : ∀ n,
+  ∃ EVL,
+  charac_polyn (mat_of_bmat (A n)) =
+    (Π (i = 1, bmat_nrows (A n)),
+       (_x - polyn_of_const (nth (i - 1) EVL 0%Srng))%P)%Srng.
+Proof.
+intros.
+apply exists_eigenvalues.
+...
+unfold is_square_mat.
+specialize (A_is_square_bmat n) as H1.
+unfold is_square_bmat in H1.
+Print is_square_bmat_loop.
+Search A_is_square_bmat.
+...

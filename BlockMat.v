@@ -2792,6 +2792,11 @@ rewrite sizes_of_bmatrix_at_0_0 with (r := mat_nrows M);
 apply HBM; flia Hi.
 Qed.
 
+Definition mat_of_bmat (BM : bmatrix T) : matrix T :=
+  mat_of_list_list 0%Srng (list_list_of_bmat BM).
+
+Definition bmat_nrows (BM : bmatrix T) := mat_nrows (mat_of_bmat BM).
+
 End in_ring.
 
 Module bmatrix_Notations.
