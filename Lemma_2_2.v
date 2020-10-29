@@ -225,8 +225,17 @@ Theorem is_square_bmat_is_square_mat : ∀ BM,
 Proof.
 intros * Hsbm.
 induction BM as [x| M IHBM] using bmatrix_ind2; [ easy | ].
+unfold is_square_bmat in Hsbm.
+cbn in Hsbm.
+destruct (zerop (mat_nrows M)) as [Hzr| Hzr]; [ easy | ].
+destruct (zerop (mat_ncols M)) as [Hzc| Hzc]; [ easy | ].
+cbn in Hsbm.
+destruct Hsbm as (Hr & Hc & Hsbm).
 unfold is_square_mat.
-cbn.
+unfold mat_of_bmat; cbn.
+unfold list_list_ncols; cbn.
+rewrite Hc.
+remember (map _ _) as lll eqn:Hlll.
 ...
 
 Theorem exists_A_eigenvalues : ∀ n,
