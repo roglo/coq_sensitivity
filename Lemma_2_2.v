@@ -226,14 +226,18 @@ Definition mat_of_bmat (BM : bmatrix T) : matrix T :=
 (* vaudrait mieux le définir sans passer par des listes
    mais avec sizes_of_bmatrix *)
 
-...
+Print is_square_bmat.
+Print is_square_bmat_loop.
 
-(*
+(**)
 End in_ring.
 Require Import ZArith.
+Open Scope Z_scope.
 
-Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (I_2_pow n)).
-*)
+Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (A n)).
+Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_mat (mat_of_bmat (A n))).
+Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in mat_of_bmat (A n)).
+(**)
 
 Definition bmat_nrows (BM : bmatrix T) := mat_nrows (mat_of_bmat BM).
 
