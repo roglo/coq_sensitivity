@@ -220,15 +220,12 @@ transitivity (A n). 2: {
 apply bmat_fit_for_add_IZ_A.
 Qed.
 
+(*
 Definition mat_of_bmat (BM : bmatrix T) : matrix T :=
   mat_of_list_list 0%Srng (list_list_of_bmat BM).
 
-(* vaudrait mieux le définir sans passer par des listes
-   mais avec sizes_of_bmatrix *)
-
-Print is_square_bmat.
-Print is_square_bmat_loop.
-Print sizes_of_bmatrix.
+Definition bmat_nrows (BM : bmatrix T) := mat_nrows (mat_of_bmat BM).
+*)
 
 Fixpoint bmat_el (BM : bmatrix T) i j :=
   match BM with
@@ -242,24 +239,64 @@ Fixpoint bmat_el (BM : bmatrix T) i j :=
       end
   end.
 
+Definition sqr_bmat_size (BM : bmatrix T) :=
+  let sl := sizes_of_bmatrix BM in
+  Π (i = 1, length sl), nth (i - 1) sl 0.
+
+Definition mat_of_sqr_bmat (BM : bmatrix T) : matrix T :=
+  mk_mat (bmat_el BM) (sqr_bmat_size BM) (sqr_bmat_size BM).
+
 (**)
 End in_ring.
 Require Import ZArith.
 Open Scope Z_scope.
 Existing Instance Z_ring_op.
-
 Compute (let n := 3%nat in list_list_of_bmat (A n)).
+(*
 Compute (let n := 4%nat in mat_of_bmat (A n)%BM).
 Compute (let n := 4%nat in list_list_of_mat (mat_of_bmat (A n))).
+*)
 Compute (let n := 4%nat in map (λ i, map (λ j, bmat_el (A n) i j) (seq 0 (Nat.pow 2 n))) (seq 0 (Nat.pow 2 n))).
+Compute (list_list_of_bmat
+     (BM_M (mat_of_list_list (BM_1 0) (map(map (@BM_1 _))
+         [[1;2;3;4;5]; [6;7;8;9;10]; [11;12;13;14;15]])))).
+Definition ex :=
+ BM_M (mat_of_list_list (BM_1 0)
+   [[BM_M (mat_of_list_list (BM_1 0) (map(map (@BM_1 _))
+      [[1;2;3;4;5]; [6;7;8;9;10]; [11;12;13;14;15];
+         [16;17;18;19;20]; [21;22;23;24;25]]));
+     BM_M (mat_of_list_list (BM_1 0) (map(map (@BM_1 _))
+        [[31;32;33;34;35]; [36;37;38;39;40]; [41;42;43;44;45];
+           [46;47;48;49;50]; [51;52;53;54;55]]));
+     BM_M (mat_of_list_list (BM_1 0) (map(map (@BM_1 _))
+       [[61;62;63;64;65]; [66;67;68;69;60]; [71;72;73;74;75];
+          [76;77;78;79;70]; [81;82;83;84;85]]))];
+    [BM_M (mat_of_list_list (BM_1 0) (map(map (@BM_1 _))
+      [[101;2;3;4;5]; [6;7;8;9;10]; [11;12;13;14;15];
+         [16;17;18;19;20]; [21;22;23;24;25]]));
+     BM_M (mat_of_list_list (BM_1 0) (map(map (@BM_1 _))
+        [[31;32;33;34;35]; [36;37;38;39;40]; [41;42;43;44;45];
+           [46;47;48;49;50]; [51;52;53;54;55]]));
+     BM_M (mat_of_list_list (BM_1 0) (map(map (@BM_1 _))
+       [[31;32;33;34;35]; [36;37;38;39;40]; [41;42;43;44;45];
+          [46;47;48;49;50]; [51;52;53;54;55]]))];
+    [BM_M (mat_of_list_list (BM_1 0) (map(map (@BM_1 _))
+      [[201;2;3;4;5]; [6;7;8;9;10]; [11;12;13;14;15];
+         [16;17;18;19;20]; [21;22;23;24;25]]));
+     BM_M (mat_of_list_list (BM_1 0) (map(map (@BM_1 _))
+        [[31;32;33;34;35]; [36;37;38;39;40]; [41;42;43;44;45];
+           [46;47;48;49;50]; [51;52;53;54;55]]));
+     BM_M (mat_of_list_list (BM_1 0) (map(map (@BM_1 _))
+       [[31;32;33;34;35]; [36;37;38;39;40]; [41;42;43;44;45];
+          [46;47;48;49;50]; [51;52;53;54;55]]))]]).
+Compute (sizes_of_bmatrix ex).
+Compute (list_list_of_bmat ex).
+Compute (let n := sqr_bmat_size ex in map (λ i, map (λ j, bmat_el ex i j) (seq 0 n)) (seq 0 n)).
+Compute (list_list_of_mat (mat_of_sqr_bmat ex)).
+Compute (sqr_bmat_size ex).
 (**)
 
-(* bon, ça marche (bmat_el), mais je ne l'ai testé que sur A, il faudrait
-   un exemple plus varié, plus général *)
-
 ...
-
-Definition bmat_nrows (BM : bmatrix T) := mat_nrows (mat_of_bmat BM).
 
 Theorem is_square_bmat_is_square_mat : ∀ BM,
   is_square_bmat BM → is_square_mat (mat_of_bmat BM).
