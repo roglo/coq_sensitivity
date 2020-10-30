@@ -320,6 +320,14 @@ Qed.
    since V ≠ 0
        λ² = n
  *)
+
+(* donc il faut montrer qu'il existe des vecteurs propres; car,
+   pour l'instant, les "valeurs propres" d'une matrice M sont
+   définies comme étant les racines du polynôme caractéristique
+   dét(xI-M); tout ce qu'on a montré, c'est que pour les racines
+   (λi) de ce polynôme, on a
+     dét(xI-M) = Π (i=1,n),(x-λi) *)
+
 Theorem sqr_eigenv_A_eq_mat_sz : ∀ n EVL,
   are_eigenvalues (A n) EVL
   → ∀ μ, μ ∈ EVL → (μ * μ)%Srng = rng_mul_nat_l n 1%Srng.
