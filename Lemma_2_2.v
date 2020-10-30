@@ -276,3 +276,28 @@ rewrite fold_iter_seq in Hm.
 rewrite <- Hm in Hcp.
 ...
 *)
+
+(* https://fr.wikipedia.org/wiki/%C3%89limination_de_Gauss-Jordan#Algorithme *)
+
+Fixpoint abs_max_in_col (lt : T → T → bool) (abs : T → T)
+    (M : matrix T) it i j :=
+  match it with
+  | 0 => abs (mat_el M i j)
+  | S it' =>
+      let m := abs_max_in_col lt abs M it' (i + 1) j in
+      if lt m (abs (mat_el M i j)) then abs (mat_el M i j) else m
+  end.
+
+...
+
+(* oui mais non, c'est une récursion sur j qu'il faut faire... *)
+
+Fixpoint gauss_jordan lt abs (M : matrix T) or j :=
+  match or with
+  | 0 => M
+  | S or' =>
+      let r := mat_nrows M - 1 - or in
+      (*  Rechercher max(|M[i,j]|, r+1 ≤ i ≤ n).
+          Noter k l'indice de ligne du maximum *)
+      let k := abs_max_in_col lt abs M or' (r + 1) j in
+      if srng_eq_dec (mat_el M k j) 0 then
