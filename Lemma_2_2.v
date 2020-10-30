@@ -317,11 +317,13 @@ unfold are_eigenvalues in Hcp.
 specialize (lemma_2_A_n_2_eq_n_I n) as Ha.
 unfold charac_polyn in Hcp.
 unfold xI_sub_M in Hcp.
-remember (mat_nrows (mat_of_sqr_bmat (A n))) as x eqn:Hx.
-cbn in Hx.
-rewrite Nat.sub_0_r in Hx.
-rewrite sizes_of_bmatrix_A in Hx.
-rewrite repeat_length in Hx.
-replace n with (S n - 1) in Hx at 1.
-rewrite fold_iter_seq in Hx.
+unfold sqr_bmat_size in Hcp.
+remember (mat_nrows (mat_of_sqr_bmat (A n))) as m eqn:Hm.
+cbn in Hm.
+rewrite Nat.sub_0_r in Hm.
+rewrite sizes_of_bmatrix_A in Hm, Hcp.
+rewrite repeat_length in Hm, Hcp.
+replace n with (S n - 1) in Hm at 1 by flia.
+rewrite fold_iter_seq in Hm.
+rewrite <- Hm in Hcp.
 ...
