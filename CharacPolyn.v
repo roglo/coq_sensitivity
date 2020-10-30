@@ -27,6 +27,12 @@ Existing Instance polyn_ring_op.
 Existing Instance polyn_semiring_prop.
 Existing Instance polyn_ring_prop.
 
+(* convertion matrix → matrix with monomials *)
+
+Definition m2mm M : matrix (polynomial T) :=
+  mk_mat (λ i j, polyn_of_list [mat_el M i j])
+    (mat_nrows M) (mat_ncols M).
+
 Definition xI_sub_M M := (_x × m2mm (mI (mat_nrows M)) - m2mm M)%M.
 Definition charac_polyn (M : matrix T) := determinant (xI_sub_M M).
 
@@ -37,6 +43,15 @@ Proof. easy. Qed.
 Theorem xI_sub_M_nrows : ∀ M,
   mat_nrows (xI_sub_M M) = mat_nrows M.
 Proof. easy. Qed.
+
+Theorem submatrix_m2mm : ∀ (M : matrix T) i j,
+  subm (m2mm M) i j = m2mm (subm M i j).
+Proof.
+intros.
+apply matrix_eq; cbn; [ easy | easy | ].
+intros k l Hk Hl.
+now destruct (lt_dec k i), (lt_dec l j).
+Qed.
 
 Theorem submatrix_xI_sub_M : ∀ M i,
   subm (xI_sub_M M) i i = xI_sub_M (subm M i i).
@@ -213,6 +228,24 @@ induction l as [| m]; intros. {
 cbn.
 destruct (lt_dec j m) as [Hjm| Hjm]; [ apply IHl | ].
 apply IHl.
+Qed.
+
+Theorem polyn_degree_minus_one_pow : ∀ i,
+  polyn_degree (minus_one_pow i) = 0.
+Proof.
+intros.
+unfold polyn_degree.
+unfold polyn_degree_plus_1.
+unfold minus_one_pow.
+now destruct (i mod 2); cbn; rewrite if_1_eq_0.
+Qed.
+
+Theorem polyn_coeff_minus_one_pow : ∀ i,
+  polyn_coeff (minus_one_pow i) 0 = minus_one_pow i.
+Proof.
+intros.
+unfold minus_one_pow.
+now destruct (i mod 2); cbn; rewrite if_1_eq_0.
 Qed.
 
 Theorem polyn_degree_det_loop_repeat_subm_le : ∀ l M i n,

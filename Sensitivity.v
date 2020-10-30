@@ -1679,6 +1679,18 @@ Qed.
 
 ...
 
+(* "Given a n×n matrix A, a principal submatrix of A is obtained by deleting
+    the same set of rows and columns from A.
+
+   Theorem 2.1. (Cauchy’s Interlace Theorem) Let A be a symmetric n×n matrix,
+      and B be a m×m principal submatrix of A, for some m < n. If the
+      eigenvalues of A are λ₁ ≥ λ₂ ≥ … ≥ λ_n, and the eigenvalues of B
+      are µ₁ ≥ µ₂ ≥ … ≥ µ_m, then for all 1 ≤ i ≤ m,
+              λ_i ≥ µ_i ≥ λ_{i+n-m}."
+*)
+
+...
+
 (* testing... *)
 
 Compute (Δ full_cube, Nat.sqrt 3).

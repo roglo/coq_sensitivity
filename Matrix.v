@@ -8,19 +8,6 @@ Import List List.ListNotations.
 Require Import Init.Nat.
 
 Require Import Misc.
-Require Import SRpolynomial.
-Import polynomial_Notations.
-
-(* "Given a n×n matrix A, a principal submatrix of A is obtained by deleting
-    the same set of rows and columns from A.
-
-   Theorem 2.1. (Cauchy’s Interlace Theorem) Let A be a symmetric n×n matrix,
-      and B be a m×m principal submatrix of A, for some m < n. If the
-      eigenvalues of A are λ₁ ≥ λ₂ ≥ … ≥ λ_n, and the eigenvalues of B
-      are µ₁ ≥ µ₂ ≥ … ≥ µ_m, then for all 1 ≤ i ≤ m,
-              λ_i ≥ µ_i ≥ λ_{i+n-m}."
-*)
-
 Require Import Semiring SRsummation.
 
 (* matrices *)
@@ -80,7 +67,6 @@ Context {ro : ring_op T}.
 Context (so := rng_semiring).
 Context {sp : @semiring_prop T (@rng_semiring T ro)}.
 Context {rp : @ring_prop T ro}.
-Context {sdp : @sring_dec_prop T so}.
 Existing Instance so.
 
 (* addition *)
@@ -189,19 +175,12 @@ Definition determinant M := det_loop M (mat_nrows M).
 
 (*
 End in_ring.
-
 Require Import ZArith.
 Open Scope Z_scope.
-
-Compute let ro := Z_ring_op in determinant (mat_of_list_list 0 [[1; 2]; [3; 4]]).
-Compute let ro := Z_ring_op in determinant (mat_of_list_list 0 [[-2; 2; -3]; [-1; 1; 3]; [2; 0; -1]]). (* 18: seems good *)
+Existing Instance Z_ring_op.
+Compute determinant (mat_of_list_list 0 [[1; 2]; [3; 4]]).
+Compute determinant (mat_of_list_list 0 [[-2; 2; -3]; [-1; 1; 3]; [2; 0; -1]]). (* 18: seems good *)
 *)
-
-(* convertion matrix → matrix with monomials *)
-
-Definition m2mm M : matrix (polynomial T) :=
-  mk_mat (λ i j, polyn_of_list [mat_el M i j])
-    (mat_nrows M) (mat_ncols M).
 
 (* identity matrix of size n *)
 
@@ -217,12 +196,7 @@ Context {ro : ring_op T}.
 Context (so := rng_semiring).
 Context {sp : @semiring_prop T (@rng_semiring T ro)}.
 Context {rp : @ring_prop T ro}.
-Context {sdp : @sring_dec_prop T so}.
 Existing Instance so.
-Existing Instance polyn_semiring_op.
-Existing Instance polyn_ring_op.
-Existing Instance polyn_semiring_prop.
-Existing Instance polyn_ring_prop.
 
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
@@ -402,15 +376,6 @@ intros k l Hk Hl.
 now destruct (lt_dec k i), (lt_dec l j).
 Qed.
 
-Theorem submatrix_m2mm : ∀ (M : matrix T) i j,
-  subm (m2mm M) i j = m2mm (subm M i j).
-Proof.
-intros.
-apply matrix_eq; cbn; [ easy | easy | ].
-intros k l Hk Hl.
-now destruct (lt_dec k i), (lt_dec l j).
-Qed.
-
 Theorem submatrix_nrows : ∀ (M : matrix T) i j,
   mat_nrows (subm M i j) = mat_nrows M - 1.
 Proof. easy. Qed.
@@ -454,12 +419,6 @@ destruct (lt_dec k i) as [Hki| Hki]. {
 }
 Qed.
 
-Theorem polyn_degree_opp : ∀ P, polyn_degree (- P) = polyn_degree P.
-Proof.
-intros; cbn.
-now rewrite map_length.
-Qed.
-
 End in_ring.
 
 Section in_ring.
@@ -469,34 +428,7 @@ Context {ro : ring_op T}.
 Context (so := rng_semiring).
 Context {sp : @semiring_prop T (@rng_semiring T ro)}.
 Context {rp : @ring_prop T ro}.
-Context {sdp : @sring_dec_prop T so}.
 Existing Instance so.
-Existing Instance polyn_semiring_op.
-Existing Instance polyn_ring_op.
-Existing Instance polyn_semiring_prop.
-Existing Instance polyn_ring_prop.
-(*
-Existing Instance polyn_sring_dec_prop.
-Time Check polyn_degree.
-*)
-
-Theorem polyn_degree_minus_one_pow : ∀ i,
-  polyn_degree (minus_one_pow i) = 0.
-Proof.
-intros.
-unfold polyn_degree.
-unfold polyn_degree_plus_1.
-unfold minus_one_pow.
-now destruct (i mod 2); cbn; rewrite if_1_eq_0.
-Qed.
-
-Theorem polyn_coeff_minus_one_pow : ∀ i,
-  polyn_coeff (minus_one_pow i) 0 = minus_one_pow i.
-Proof.
-intros.
-unfold minus_one_pow.
-now destruct (i mod 2); cbn; rewrite if_1_eq_0.
-Qed.
 
 Theorem fold_determinant : ∀ T {ro : ring_op T} (M : matrix T),
   det_loop M (mat_nrows M) = determinant M.
