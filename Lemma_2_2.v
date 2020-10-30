@@ -246,7 +246,7 @@ Definition sqr_bmat_size (BM : bmatrix T) :=
 Definition mat_of_sqr_bmat (BM : bmatrix T) : matrix T :=
   mk_mat (bmat_el BM) (sqr_bmat_size BM) (sqr_bmat_size BM).
 
-(**)
+(*
 End in_ring.
 Require Import ZArith.
 Open Scope Z_scope.
@@ -294,40 +294,14 @@ Compute (list_list_of_bmat ex).
 Compute (let n := sqr_bmat_size ex in map (λ i, map (λ j, bmat_el ex i j) (seq 0 n)) (seq 0 n)).
 Compute (list_list_of_mat (mat_of_sqr_bmat ex)).
 Compute (sqr_bmat_size ex).
-(**)
-
-...
-
-Theorem is_square_bmat_is_square_mat : ∀ BM,
-  is_square_bmat BM → is_square_mat (mat_of_bmat BM).
-Proof.
-intros * Hsbm.
-induction BM as [x| M IHBM] using bmatrix_ind2; [ easy | ].
-unfold is_square_bmat in Hsbm.
-cbn in Hsbm.
-destruct (zerop (mat_nrows M)) as [Hzr| Hzr]; [ easy | ].
-destruct (zerop (mat_ncols M)) as [Hzc| Hzc]; [ easy | ].
-cbn in Hsbm.
-destruct Hsbm as (Hr & Hc & Hsbm).
-unfold is_square_mat.
-unfold mat_of_bmat; cbn.
-unfold list_list_ncols; cbn.
-rewrite Hc.
-remember (map _ _) as lll eqn:Hlll.
-...
+*)
 
 Theorem exists_A_eigenvalues : ∀ n,
   ∃ EVL,
-  charac_polyn (mat_of_bmat (A n)) =
-    (Π (i = 1, bmat_nrows (A n)),
+  charac_polyn (mat_of_sqr_bmat (A n)) =
+    (Π (i = 1, sqr_bmat_size (A n)),
        (_x - polyn_of_const (nth (i - 1) EVL 0%Srng))%P)%Srng.
 Proof.
 intros.
-apply exists_eigenvalues.
-...
-unfold is_square_mat.
-specialize (A_is_square_bmat n) as H1.
-unfold is_square_bmat in H1.
-Print is_square_bmat_loop.
-Search A_is_square_bmat.
-...
+now apply exists_eigenvalues.
+Qed.
