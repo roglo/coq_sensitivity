@@ -296,12 +296,22 @@ Compute (list_list_of_mat (mat_of_sqr_bmat ex)).
 Compute (sqr_bmat_size ex).
 *)
 
-Theorem exists_A_eigenvalues : ∀ n,
-  ∃ EVL,
-  charac_polyn (mat_of_sqr_bmat (A n)) =
-    (Π (i = 1, sqr_bmat_size (A n)),
+Definition are_eigenvalues M EVL :=
+  charac_polyn (mat_of_sqr_bmat M) =
+    (Π (i = 1, sqr_bmat_size M),
        (_x - polyn_of_const (nth (i - 1) EVL 0%Srng))%P)%Srng.
+
+Theorem exists_A_eigenvalues : ∀ n, ∃ EVL, are_eigenvalues (A n) EVL.
 Proof.
 intros.
 now apply exists_eigenvalues.
 Qed.
+
+Theorem sqr_eigenv_A_eq_mat_sz : ∀ n EVL,
+  are_eigenvalues (A n) EVL
+  → ∀ EV, EV ∈ EVL → (EV * EV)%Srng = rng_mul_nat_l n 1%Srng.
+Proof.
+intros * Hcp * Hev.
+unfold are_eigenvalues in Hcp.
+specialize (lemma_2_A_n_2_eq_n_I n) as Ha.
+...
