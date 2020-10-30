@@ -290,14 +290,16 @@ Fixpoint abs_max_in_col (lt : T → T → bool) (abs : T → T)
 
 ...
 
-(* oui mais non, c'est une récursion sur j qu'il faut faire... *)
-
-Fixpoint gauss_jordan lt abs (M : matrix T) or j :=
-  match or with
+Fixpoint gauss_jordan lt abs (M : matrix T) r oj :=
+  match oj with
   | 0 => M
-  | S or' =>
-      let r := mat_nrows M - 1 - or in
+  | S oj' =>
+      let j := mat_ncols M - 1 - oj in
       (*  Rechercher max(|M[i,j]|, r+1 ≤ i ≤ n).
           Noter k l'indice de ligne du maximum *)
-      let k := abs_max_in_col lt abs M or' (r + 1) j in
+      let k := abs_max_in_col lt abs M (max_nrows - 1 - r) r j in
       if srng_eq_dec (mat_el M k j) 0 then
+        let r := r + 1 in
+        (* Diviser la ligne k par A[k,j] *)
+(* aïe... j'ai pas encore de division, je suis dans un anneau, va
+   falloir en créer une *)
