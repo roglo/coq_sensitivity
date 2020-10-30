@@ -246,11 +246,12 @@ Fixpoint bmat_el (BM : bmatrix T) i j :=
 End in_ring.
 Require Import ZArith.
 Open Scope Z_scope.
+Existing Instance Z_ring_op.
 
-Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (A n)).
-Compute (let n := 4%nat in let _ := Z_ring_op in let _ := rng_semiring in mat_of_bmat (A n)%BM).
-Compute (let n := 4%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_mat (mat_of_bmat (A n))).
-Compute (let n := 4%nat in let _ := Z_ring_op in map (λ i, map (λ j, bmat_el (A n) i j) (seq 0 (Nat.pow 2 n))) (seq 0 (Nat.pow 2 n))).
+Compute (let n := 3%nat in list_list_of_bmat (A n)).
+Compute (let n := 4%nat in mat_of_bmat (A n)%BM).
+Compute (let n := 4%nat in list_list_of_mat (mat_of_bmat (A n))).
+Compute (let n := 4%nat in map (λ i, map (λ j, bmat_el (A n) i j) (seq 0 (Nat.pow 2 n))) (seq 0 (Nat.pow 2 n))).
 (**)
 
 (* bon, ça marche (bmat_el), mais je ne l'ai testé que sur A, il faudrait
