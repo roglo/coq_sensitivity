@@ -2,8 +2,8 @@ BlockMat.vio: BlockMat.v Misc.vio Matrix.vio Semiring.vio SRsummation.vio
 BlockMat.vo BlockMat.glob BlockMat.v.beautified BlockMat.required_vo: BlockMat.v Misc.vo Matrix.vo Semiring.vo SRsummation.vo
 CharacPolyn.vio: CharacPolyn.v Misc.vio Semiring.vio SRsummation.vio SRproduct.vio SRpolynomial.vio Matrix.vio
 CharacPolyn.vo CharacPolyn.glob CharacPolyn.v.beautified CharacPolyn.required_vo: CharacPolyn.v Misc.vo Semiring.vo SRsummation.vo SRproduct.vo SRpolynomial.vo Matrix.vo
-Lemma_2_2.vio: Lemma_2_2.v Misc.vio Matrix.vio Semiring.vio SRproduct.vio SRpolynomial.vio BlockMat.vio CharacPolyn.vio
-Lemma_2_2.vo Lemma_2_2.glob Lemma_2_2.v.beautified Lemma_2_2.required_vo: Lemma_2_2.v Misc.vo Matrix.vo Semiring.vo SRproduct.vo SRpolynomial.vo BlockMat.vo CharacPolyn.vo
+Lemma_2_2.vio: Lemma_2_2.v Misc.vio Matrix.vio BlockMat.vio Semiring.vio SRproduct.vio SRpolynomial.vio CharacPolyn.vio
+Lemma_2_2.vo Lemma_2_2.glob Lemma_2_2.v.beautified Lemma_2_2.required_vo: Lemma_2_2.v Misc.vo Matrix.vo BlockMat.vo Semiring.vo SRproduct.vo SRpolynomial.vo CharacPolyn.vo
 Matrix.vio: Matrix.v Misc.vio Semiring.vio SRsummation.vio
 Matrix.vo Matrix.glob Matrix.v.beautified Matrix.required_vo: Matrix.v Misc.vo Semiring.vo SRsummation.vo
 Misc.vio: Misc.v 

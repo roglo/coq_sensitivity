@@ -6,17 +6,14 @@ Set Implicit Arguments.
 
 Require Import Utf8 Arith.
 Import List List.ListNotations.
-(*
-Require Import Init.Nat.
-Require Import Relations.
-*)
 
-Require Import Misc Matrix.
+Require Import Misc Matrix BlockMat.
 Require Import Semiring.
-Require Import SRproduct.
-Require Import SRpolynomial.
-Require Import BlockMat CharacPolyn.
+(* required if reasoning with characteristic polynomial
+   to find eigenvalues; but perhaps it is not necessary *)
+Require Import SRproduct SRpolynomial CharacPolyn.
 Import polynomial_Notations.
+(* end required *)
 Import matrix_Notations.
 Import bmatrix_Notations.
 
@@ -27,10 +24,14 @@ Context {ro : ring_op T}.
 Context (so := rng_semiring).
 Context {sp : @semiring_prop T (@rng_semiring T ro)}.
 Context {rp : @ring_prop T ro}.
+(**)
 Context {sdp : @sring_dec_prop T so}.
 Context {acp : @algeb_closed_prop T so sdp}.
+(**)
 Existing Instance so.
+(**)
 Existing Instance polyn_semiring_op.
+(**)
 
 Add Parametric Relation : _ (@bmat_fit_for_add T)
  reflexivity proved by bmat_fit_for_add_refl
@@ -221,94 +222,6 @@ transitivity (A n). 2: {
 apply bmat_fit_for_add_IZ_A.
 Qed.
 
-(*
-Definition mat_of_bmat (BM : bmatrix T) : matrix T :=
-  mat_of_list_list 0%Srng (list_list_of_bmat BM).
-
-Definition bmat_nrows (BM : bmatrix T) := mat_nrows (mat_of_bmat BM).
-*)
-
-Fixpoint bmat_el (BM : bmatrix T) i j :=
-  match BM with
-  | BM_1 x => x
-  | BM_M MBM =>
-      match sizes_of_bmatrix BM with
-      | s :: sl =>
-          let n := Π (k = 1, length sl), nth (k - 1) sl 0 in
-          bmat_el (mat_el MBM (i / n) (j / n)) (i mod n) (j mod n)
-      | [] => 0%Srng
-      end
-  end.
-
-Definition sqr_bmat_size (BM : bmatrix T) :=
-  let sl := sizes_of_bmatrix BM in
-  Π (i = 1, length sl), nth (i - 1) sl 0.
-
-Definition mat_of_sqr_bmat (BM : bmatrix T) : matrix T :=
-  mk_mat (bmat_el BM) (sqr_bmat_size BM) (sqr_bmat_size BM).
-
-(*
-End in_ring.
-Require Import ZArith.
-Open Scope Z_scope.
-Existing Instance Z_ring_op.
-Compute (let n := 3%nat in list_list_of_bmat (A n)).
-(*
-Compute (let n := 4%nat in mat_of_bmat (A n)%BM).
-Compute (let n := 4%nat in list_list_of_mat (mat_of_bmat (A n))).
-*)
-Compute (let n := 4%nat in map (λ i, map (λ j, bmat_el (A n) i j) (seq 0 (Nat.pow 2 n))) (seq 0 (Nat.pow 2 n))).
-Compute (list_list_of_bmat
-     (BM_M (mat_of_list_list (BM_1 0) (map(map (@BM_1 _))
-         [[1;2;3;4;5]; [6;7;8;9;10]; [11;12;13;14;15]])))).
-Definition ex :=
- BM_M (mat_of_list_list (BM_1 0)
-   [[BM_M (mat_of_list_list (BM_1 0) (map(map (@BM_1 _))
-      [[1;2;3;4;5]; [6;7;8;9;10]; [11;12;13;14;15];
-         [16;17;18;19;20]; [21;22;23;24;25]]));
-     BM_M (mat_of_list_list (BM_1 0) (map(map (@BM_1 _))
-        [[31;32;33;34;35]; [36;37;38;39;40]; [41;42;43;44;45];
-           [46;47;48;49;50]; [51;52;53;54;55]]));
-     BM_M (mat_of_list_list (BM_1 0) (map(map (@BM_1 _))
-       [[61;62;63;64;65]; [66;67;68;69;60]; [71;72;73;74;75];
-          [76;77;78;79;70]; [81;82;83;84;85]]))];
-    [BM_M (mat_of_list_list (BM_1 0) (map(map (@BM_1 _))
-      [[101;2;3;4;5]; [6;7;8;9;10]; [11;12;13;14;15];
-         [16;17;18;19;20]; [21;22;23;24;25]]));
-     BM_M (mat_of_list_list (BM_1 0) (map(map (@BM_1 _))
-        [[31;32;33;34;35]; [36;37;38;39;40]; [41;42;43;44;45];
-           [46;47;48;49;50]; [51;52;53;54;55]]));
-     BM_M (mat_of_list_list (BM_1 0) (map(map (@BM_1 _))
-       [[31;32;33;34;35]; [36;37;38;39;40]; [41;42;43;44;45];
-          [46;47;48;49;50]; [51;52;53;54;55]]))];
-    [BM_M (mat_of_list_list (BM_1 0) (map(map (@BM_1 _))
-      [[201;2;3;4;5]; [6;7;8;9;10]; [11;12;13;14;15];
-         [16;17;18;19;20]; [21;22;23;24;25]]));
-     BM_M (mat_of_list_list (BM_1 0) (map(map (@BM_1 _))
-        [[31;32;33;34;35]; [36;37;38;39;40]; [41;42;43;44;45];
-           [46;47;48;49;50]; [51;52;53;54;55]]));
-     BM_M (mat_of_list_list (BM_1 0) (map(map (@BM_1 _))
-       [[31;32;33;34;35]; [36;37;38;39;40]; [41;42;43;44;45];
-          [46;47;48;49;50]; [51;52;53;54;55]]))]]).
-Compute (sizes_of_bmatrix ex).
-Compute (list_list_of_bmat ex).
-Compute (let n := sqr_bmat_size ex in map (λ i, map (λ j, bmat_el ex i j) (seq 0 n)) (seq 0 n)).
-Compute (list_list_of_mat (mat_of_sqr_bmat ex)).
-Compute (sqr_bmat_size ex).
-*)
-
-Definition charac_polyn_of_roots M roots :=
-  charac_polyn (mat_of_sqr_bmat M) =
-    (Π (i = 1, sqr_bmat_size M),
-       (_x - polyn_of_const (nth (i - 1) roots 0%Srng))%P)%Srng.
-
-Theorem exists_A_charac_polyn_roots :
-  ∀ n, ∃ roots, charac_polyn_of_roots (A n) roots.
-Proof.
-intros.
-now apply exists_charac_polyn_roots.
-Qed.
-
 (* proof that the square of eigenvalues of An is n
    let V be an eigenvector associated with the eigenvalue λ; we have
        An V = λ V
@@ -329,6 +242,19 @@ Qed.
    (λi) de ce polynôme, on a
      dét(xI-M) = Π (i=1,n),(x-λi) *)
 
+Definition charac_polyn_of_roots M roots :=
+  charac_polyn (mat_of_sqr_bmat M) =
+    (Π (i = 1, sqr_bmat_size M),
+       (_x - polyn_of_const (nth (i - 1) roots 0%Srng))%P)%Srng.
+
+Theorem exists_A_charac_polyn_roots :
+  ∀ n, ∃ roots, charac_polyn_of_roots (A n) roots.
+Proof.
+intros.
+now apply exists_charac_polyn_roots.
+Qed.
+
+(*
 Theorem sqr_roots_A_eq_mat_sz : ∀ n roots,
   charac_polyn_of_roots (A n) roots
   → ∀ μ, μ ∈ roots → (μ * μ)%Srng = rng_mul_nat_l n 1%Srng.
@@ -348,3 +274,4 @@ replace n with (S n - 1) in Hm at 1 by flia.
 rewrite fold_iter_seq in Hm.
 rewrite <- Hm in Hcp.
 ...
+*)
