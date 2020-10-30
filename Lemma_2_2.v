@@ -253,6 +253,9 @@ Compute (let n := 4%nat in let _ := Z_ring_op in let _ := rng_semiring in list_l
 Compute (let n := 4%nat in let _ := Z_ring_op in map (λ i, map (λ j, bmat_el (A n) i j) (seq 0 (Nat.pow 2 n))) (seq 0 (Nat.pow 2 n))).
 (**)
 
+(* bon, ça marche (bmat_el), mais je ne l'ai testé que sur A, il faudrait
+   un exemple plus varié, plus général *)
+
 ...
 
 Definition bmat_nrows (BM : bmatrix T) := mat_nrows (mat_of_bmat BM).
