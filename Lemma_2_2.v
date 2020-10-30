@@ -297,15 +297,16 @@ Compute (list_list_of_mat (mat_of_sqr_bmat ex)).
 Compute (sqr_bmat_size ex).
 *)
 
-Definition are_eigenvalues M EVL :=
+Definition charac_polyn_of_roots M roots :=
   charac_polyn (mat_of_sqr_bmat M) =
     (Π (i = 1, sqr_bmat_size M),
-       (_x - polyn_of_const (nth (i - 1) EVL 0%Srng))%P)%Srng.
+       (_x - polyn_of_const (nth (i - 1) roots 0%Srng))%P)%Srng.
 
-Theorem exists_A_eigenvalues : ∀ n, ∃ EVL, are_eigenvalues (A n) EVL.
+Theorem exists_A_charac_polyn_roots :
+  ∀ n, ∃ roots, charac_polyn_of_roots (A n) roots.
 Proof.
 intros.
-now apply exists_eigenvalues.
+now apply exists_charac_polyn_roots.
 Qed.
 
 (* proof that the square of eigenvalues of An is n
@@ -328,12 +329,12 @@ Qed.
    (λi) de ce polynôme, on a
      dét(xI-M) = Π (i=1,n),(x-λi) *)
 
-Theorem sqr_eigenv_A_eq_mat_sz : ∀ n EVL,
-  are_eigenvalues (A n) EVL
-  → ∀ μ, μ ∈ EVL → (μ * μ)%Srng = rng_mul_nat_l n 1%Srng.
+Theorem sqr_roots_A_eq_mat_sz : ∀ n roots,
+  charac_polyn_of_roots (A n) roots
+  → ∀ μ, μ ∈ roots → (μ * μ)%Srng = rng_mul_nat_l n 1%Srng.
 Proof.
 intros * Hcp * Hev.
-unfold are_eigenvalues in Hcp.
+unfold charac_polyn_of_roots in Hcp.
 specialize (lemma_2_A_n_2_eq_n_I n) as Ha.
 unfold charac_polyn in Hcp.
 unfold xI_sub_M in Hcp.

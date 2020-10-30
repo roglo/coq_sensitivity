@@ -557,9 +557,10 @@ unfold polyn_degree, polyn_degree_plus_1 in Hcp.
 flia Hn Hcp.
 Qed.
 
-(* eigenvalues and eigenvectors *)
+(* roots of characteristic polynomial supposed to be eigenvalues *)
 
-Theorem exists_eigenvalue : ∀  (M : matrix T),
+(*
+Theorem exists_root_of_charac_polyn : ∀  (M : matrix T),
   mat_nrows M ≠ 0
   → is_square_mat M
   → ∃ μ, eval_polyn (charac_polyn M) μ = 0%Srng.
@@ -582,13 +583,14 @@ specialize (H1 H); clear H.
 destruct H1 as (μ, Hμ).
 now exists μ.
 Qed.
+*)
 
-Theorem exists_eigenvalues : ∀ (M : matrix T),
+Theorem exists_charac_polyn_roots : ∀ (M : matrix T),
   is_square_mat M
-  → ∃ EVL,
+  → ∃ roots,
      charac_polyn M =
        (Π (i = 1, mat_nrows M),
-          (_x - polyn_of_const (nth (i - 1) EVL 0%Srng))%P)%Srng.
+          (_x - polyn_of_const (nth (i - 1) roots 0%Srng))%P)%Srng.
 Proof.
 intros M HM.
 destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
@@ -617,12 +619,5 @@ unfold polyn_of_const in Hrl at 1.
 unfold so in Hrl.
 now rewrite srng_mul_1_l in Hrl.
 Qed.
-
-(* to compute an eigenvector of the eigenvalue λ:
-   - triangularize λM-I = A⁻¹BA where B is a lower triangular matrix
-   - the determinant of B is equal to the determinant of λM-I = 0
-   - the determinant of B is the product of all values in the diagonal
-   - therefore one of the values of the diagonal is 0
-   - then, ??? *)
 
 End in_ring.
