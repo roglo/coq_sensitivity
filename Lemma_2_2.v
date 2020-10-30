@@ -10,10 +10,10 @@ Import List List.ListNotations.
 Require Import Misc Matrix BlockMat.
 Require Import Semiring.
 (* required if reasoning with characteristic polynomial
-   to find eigenvalues; but perhaps it is not necessary *)
+   to find eigenvalues; but perhaps it is not necessary
 Require Import SRproduct SRpolynomial CharacPolyn.
 Import polynomial_Notations.
-(* end required *)
+  end required *)
 Import matrix_Notations.
 Import bmatrix_Notations.
 
@@ -24,14 +24,12 @@ Context {ro : ring_op T}.
 Context (so := rng_semiring).
 Context {sp : @semiring_prop T (@rng_semiring T ro)}.
 Context {rp : @ring_prop T ro}.
-(**)
+(*
 Context {sdp : @sring_dec_prop T so}.
 Context {acp : @algeb_closed_prop T so sdp}.
-(**)
-Existing Instance so.
-(**)
 Existing Instance polyn_semiring_op.
-(**)
+*)
+Existing Instance so.
 
 Add Parametric Relation : _ (@bmat_fit_for_add T)
  reflexivity proved by bmat_fit_for_add_refl
@@ -242,17 +240,21 @@ Qed.
    (λi) de ce polynôme, on a
      dét(xI-M) = Π (i=1,n),(x-λi) *)
 
+(*
 Definition charac_polyn_of_roots M roots :=
   charac_polyn (mat_of_sqr_bmat M) =
     (Π (i = 1, sqr_bmat_size M),
        (_x - polyn_of_const (nth (i - 1) roots 0%Srng))%P)%Srng.
+*)
 
+(*
 Theorem exists_A_charac_polyn_roots :
   ∀ n, ∃ roots, charac_polyn_of_roots (A n) roots.
 Proof.
 intros.
 now apply exists_charac_polyn_roots.
 Qed.
+*)
 
 (*
 Theorem sqr_roots_A_eq_mat_sz : ∀ n roots,
