@@ -314,4 +314,5 @@ Proof.
 intros * Hcp * Hev.
 unfold are_eigenvalues in Hcp.
 specialize (lemma_2_A_n_2_eq_n_I n) as Ha.
+unfold charac_polyn in Hcp.
 ...
