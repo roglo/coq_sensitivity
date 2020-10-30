@@ -240,23 +240,22 @@ Qed.
    (λi) de ce polynôme, on a
      dét(xI-M) = Π (i=1,n),(x-λi) *)
 
-(*
+(* attempt by using roots of characteristic polynomial, as eigenvalues.
+   Drawback: does not compute the eigenvectors which are however
+   necessary for ending the lemma
+
 Definition charac_polyn_of_roots M roots :=
   charac_polyn (mat_of_sqr_bmat M) =
     (Π (i = 1, sqr_bmat_size M),
        (_x - polyn_of_const (nth (i - 1) roots 0%Srng))%P)%Srng.
-*)
 
-(*
 Theorem exists_A_charac_polyn_roots :
   ∀ n, ∃ roots, charac_polyn_of_roots (A n) roots.
 Proof.
 intros.
 now apply exists_charac_polyn_roots.
 Qed.
-*)
 
-(*
 Theorem sqr_roots_A_eq_mat_sz : ∀ n roots,
   charac_polyn_of_roots (A n) roots
   → ∀ μ, μ ∈ roots → (μ * μ)%Srng = rng_mul_nat_l n 1%Srng.
