@@ -308,6 +308,18 @@ intros.
 now apply exists_eigenvalues.
 Qed.
 
+(* proof that the square of eigenvalues of An is n
+   let V be an eigenvector associated with the eigenvalue λ; we have
+       An V = λ V
+   therefore
+       An² V = An (λ V) = λ (An V) = λ² V
+   but, by first part of lemma 2.2, we have
+       An² = nI
+   we can deduce that
+       λ² V = n V
+   since V ≠ 0
+       λ² = n
+ *)
 Theorem sqr_eigenv_A_eq_mat_sz : ∀ n EVL,
   are_eigenvalues (A n) EVL
   → ∀ μ, μ ∈ EVL → (μ * μ)%Srng = rng_mul_nat_l n 1%Srng.
