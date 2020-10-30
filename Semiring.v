@@ -25,6 +25,15 @@ Class semiring_prop A {so : semiring_op A} :=
     srng_mul_add_distr_l : ∀ a b c : A, (a * (b + c) = a * b + a * c)%Srng;
     srng_mul_0_l : ∀ a, (0 * a = 0)%Srng }.
 
+(* decidability of equality in semirings
+   and the fact that 1 ≠ 0 *)
+
+Class sring_dec_prop T {so : semiring_op T} :=
+  { srng_eq_dec : ∀ a b : T, {a = b} + {a ≠ b};
+    srng_1_neq_0 : (1 ≠ 0)%Srng }.
+
+Arguments srng_eq_dec {T}%type {so sring_dec_prop} _%Srng _%Srng.
+
 Fixpoint srng_power {A} {R : semiring_op A} a n :=
   match n with
   | O => 1%Srng

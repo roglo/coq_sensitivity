@@ -24,12 +24,14 @@ Context {ro : ring_op T}.
 Context (so := rng_semiring).
 Context {sp : @semiring_prop T (@rng_semiring T ro)}.
 Context {rp : @ring_prop T ro}.
-(*
 Context {sdp : @sring_dec_prop T so}.
+(*
 Context {acp : @algeb_closed_prop T so sdp}.
 Existing Instance polyn_semiring_op.
 *)
 Existing Instance so.
+
+Check srng_eq_dec.
 
 Add Parametric Relation : _ (@bmat_fit_for_add T)
  reflexivity proved by bmat_fit_for_add_refl
@@ -282,28 +284,32 @@ rewrite <- Hm in Hcp.
 Fixpoint abs_max_in_col (lt : T → T → bool) (abs : T → T)
     (M : matrix T) it i j :=
   match it with
-  | 0 => abs (mat_el M i j)
+  | 0 => i
   | S it' =>
-      let m := abs_max_in_col lt abs M it' (i + 1) j in
-      if lt m (abs (mat_el M i j)) then abs (mat_el M i j) else m
+      let k := abs_max_in_col lt abs M it' (i + 1) j in
+      if lt (abs (mat_el M k j)) (abs (mat_el M i j)) then i else k
   end.
 
-...
+(*
+Require Import ZArith.
+Check Z.ltb.
+Check Z.abs.
+*)
 
-Fixpoint gauss_jordan lt abs (A : matrix T) d r oj :=
+Fixpoint gauss_jordan_loop lt abs (A : matrix T) d r oj :=
   match oj with
   | 0 => (A, d)
   | S oj' =>
       let j := mat_ncols A - 1 - oj in
       (*  Rechercher max(|M[i,j]|, r+1 ≤ i ≤ n).
           Noter k l'indice de ligne du maximum *)
-      let k := abs_max_in_col lt abs A (max_nrows - 1 - r) r j in
+      let k := abs_max_in_col lt abs A (mat_nrows A - 1 - r) r j in
       if srng_eq_dec (mat_el A k j) 0 then
         let r := r + 1 in
         (* Diviser la ligne k par A[k,j] *)
         (* aïe... j'ai pas encore de division, bon, tant pis, on
            divisera plus tard par d *)
-        let dd := mat_el A k j
+        let dd := mat_el A k j in
         let d := (d * dd)%Srng in
         (* Si k≠r alors  Échanger les lignes k et r *)
         let A :=
@@ -322,3 +328,33 @@ Fixpoint gauss_jordan lt abs (A : matrix T) d r oj :=
            Si i≠r alors
             Soustraire à la ligne i la ligne r multipliée par A[i,j]
             (de façon à annuler A[i,j]) *)
+        let A :=
+          mk_mat (λ i j',
+            if Nat.eq_dec i r then mat_el A i j'
+            else (mat_el A i j' - mat_el A r j' * mat_el A i j)%Rng)
+            (mat_nrows A) (mat_nrows A)
+        in
+        gauss_jordan_loop lt abs A d r oj'
+      else
+        gauss_jordan_loop lt abs A d r oj'
+  end.
+
+Definition gauss_jordan lt abs (A : matrix T) :=
+  gauss_jordan_loop lt abs (A : matrix T) 1%Srng 0 (mat_ncols A - 1).
+
+End in_ring.
+Require Import ZArith.
+Open Scope Z_scope.
+Existing Instance Z_ring_op.
+Existing Instance Z_semiring_op.
+Theorem Z_1_neq_0 : 1 ≠ 0.
+Proof. easy. Qed.
+Definition Z_sring_dec_prop :=
+  {| srng_eq_dec := Z.eq_dec; srng_1_neq_0 := Z_1_neq_0 |}.
+Existing Instance Z_sring_dec_prop.
+Definition ex :=
+  mat_of_list_list 0 [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]].
+Compute list_list_of_mat ex.
+Compute (snd (gauss_jordan Z.ltb Z.abs ex)).
+Compute (list_list_of_mat (fst (gauss_jordan Z.ltb Z.abs ex))).
+(* bof, ça marche pas des masses *)

@@ -6,23 +6,15 @@ Set Implicit Arguments.
 Require Import Utf8 Arith.
 Import List List.ListNotations.
 Require Import Init.Nat.
+
 Require Import Misc.
-
 Require Import Semiring SRsummation SRproduct.
-
-(* decidability of equality in semirings
-   and the fact that 1 ≠ 0 *)
-
-Class sring_dec_prop T {so : semiring_op T} :=
-  { srng_eq_dec : ∀ a b : T, {a = b} + {a ≠ b};
-    srng_1_neq_0 : (1 ≠ 0)%Srng }.
-
-Arguments srng_eq_dec {T}%type {so sring_dec_prop} _%Srng _%Srng.
 
 (* property of a polynomial: its coefficient of higher degree is not 0 *)
 (* returns a boolean to allow proof of equality to be unique *)
 
-Definition polyn_prop_test T {so : semiring_op T} {fdp : sring_dec_prop} f n :=
+Definition polyn_prop_test T {so : semiring_op T} {fdp : sring_dec_prop T}
+    f n :=
   match n with
   | 0 => true
   | S n => if srng_eq_dec (f n) 0%Srng then false else true
@@ -30,7 +22,7 @@ Definition polyn_prop_test T {so : semiring_op T} {fdp : sring_dec_prop} f n :=
 
 (* polynomial *)
 
-Record polynomial T (so : semiring_op T) (sdp : sring_dec_prop) := mk_polyn
+Record polynomial T (so : semiring_op T) (sdp : sring_dec_prop T) := mk_polyn
   { polyn_list : list T;
     polyn_prop :
       polyn_prop_test (λ i, nth i polyn_list 0%Srng) (length polyn_list) =
@@ -39,16 +31,16 @@ Record polynomial T (so : semiring_op T) (sdp : sring_dec_prop) := mk_polyn
 Arguments polynomial T%type_scope {so sdp}.
 Arguments mk_polyn {T so sdp}.
 
-Definition polyn_coeff T {so : semiring_op T} {sdp : sring_dec_prop} P i :=
+Definition polyn_coeff T {so : semiring_op T} {sdp : sring_dec_prop T} P i :=
   nth i (polyn_list P) 0%Srng.
 
 (* degree of a polynomial *)
 
-Definition polyn_degree_plus_1 T {so : semiring_op T} {sdp : sring_dec_prop}
+Definition polyn_degree_plus_1 T {so : semiring_op T} {sdp : sring_dec_prop T}
      P :=
   length (polyn_list P).
 
-Definition polyn_degree T {so : semiring_op T} {sdp : sring_dec_prop} P :=
+Definition polyn_degree T {so : semiring_op T} {sdp : sring_dec_prop T} P :=
   polyn_degree_plus_1 P - 1.
 
 (* evaluation of a polynomial *)
@@ -65,13 +57,13 @@ Definition eval_polyn T {so : semiring_op T} {sdp : sring_dec_prop}
 Definition eval_polyn_list T {so : semiring_op T} (la : list T) x :=
   fold_right (λ a acc, (acc * x + a)%Srng) 0%Srng la.
 
-Definition eval_polyn T {so : semiring_op T} {sdp : sring_dec_prop}
+Definition eval_polyn T {so : semiring_op T} {sdp : sring_dec_prop T}
     (P : polynomial T) :=
   eval_polyn_list (polyn_list P).
 
 (* algebraically closed set *)
 
-Class algeb_closed_prop T {so : semiring_op T} {sdp : sring_dec_prop} :=
+Class algeb_closed_prop T {so : semiring_op T} {sdp : sring_dec_prop T} :=
   { alcl_roots :
       ∀ P : polynomial T, polyn_degree P > 0 → ∃ x, eval_polyn P x = 0%Srng }.
 
@@ -143,13 +135,13 @@ Open Scope Z_scope.
 
 Theorem Z_neq_1_0 : 1%Z ≠ 0%Z. Proof. easy. Qed.
 
-Definition Z_sring_dec_prop :=
+Definition Z_sring_dec_prop T :=
   {| srng_eq_dec := Z.eq_dec;
      srng_1_neq_0 := Z_neq_1_0 |}.
 
-Compute let ro := Z_ring_op in let sdp := Z_sring_dec_prop in polyn_of_list [3; 4; 7; 0].
-Compute let ro := Z_ring_op in let sdp := Z_sring_dec_prop in list_of_polyn (polyn_of_list [3; 4; 7; 0]).
-Compute let ro := Z_ring_op in let sdp := Z_sring_dec_prop in list_of_polyn (polyn_of_list [0]).
+Compute let ro := Z_ring_op in let sdp := Z_sring_dec_prop T in polyn_of_list [3; 4; 7; 0].
+Compute let ro := Z_ring_op in let sdp := Z_sring_dec_prop T in list_of_polyn (polyn_of_list [3; 4; 7; 0]).
+Compute let ro := Z_ring_op in let sdp := Z_sring_dec_prop T in list_of_polyn (polyn_of_list [0]).
 *)
 
 (* monomial *)
@@ -179,13 +171,13 @@ Open Scope Z_scope.
 
 Theorem Z_neq_1_0 : 1%Z ≠ 0%Z. Proof. easy. Qed.
 
-Definition Z_sring_dec_prop :=
+Definition Z_sring_dec_prop T :=
   {| srng_eq_dec := Z.eq_dec;
      srng_1_neq_0 := Z_neq_1_0 |}.
 
-Compute let ro := Z_ring_op in let sdp := Z_sring_dec_prop in list_of_polyn (polyn_add (polyn_of_list [3; 4; 7; 0])
+Compute let ro := Z_ring_op in let sdp := Z_sring_dec_prop T in list_of_polyn (polyn_add (polyn_of_list [3; 4; 7; 0])
 (polyn_of_list [7; 0; 0; 22; -4])).
-Compute let ro := Z_ring_op in let sdp := Z_sring_dec_prop in list_of_polyn (polyn_add (polyn_of_list [3; 4; 7; 0])
+Compute let ro := Z_ring_op in let sdp := Z_sring_dec_prop T in list_of_polyn (polyn_add (polyn_of_list [3; 4; 7; 0])
 (polyn_of_list [7; 2; -7])).
 *)
 
@@ -242,13 +234,13 @@ Open Scope Z_scope.
 
 Theorem Z_neq_1_0 : 1%Z ≠ 0%Z. Proof. easy. Qed.
 
-Definition Z_sring_dec_prop :=
+Definition Z_sring_dec_prop T :=
   {| srng_eq_dec := Z.eq_dec;
      srng_1_neq_0 := Z_neq_1_0 |}.
 
-Compute let ro := Z_ring_op in let sdp := Z_sring_dec_prop in polyn_list_mul [1] [3; 4].
-Compute let ro := Z_ring_op in let sdp := Z_sring_dec_prop in polyn_list_mul [1; 1; 0] [-1; 1; 0].
-Compute let ro := Z_ring_op in let sdp := Z_sring_dec_prop in list_of_polyn (polyn_mul (polyn_of_list [1; 1]) (polyn_of_list [-1; 1])).
+Compute let ro := Z_ring_op in let sdp := Z_sring_dec_prop T in polyn_list_mul [1] [3; 4].
+Compute let ro := Z_ring_op in let sdp := Z_sring_dec_prop T in polyn_list_mul [1; 1; 0] [-1; 1; 0].
+Compute let ro := Z_ring_op in let sdp := Z_sring_dec_prop T in list_of_polyn (polyn_mul (polyn_of_list [1; 1]) (polyn_of_list [-1; 1])).
 *)
 
 (* polynomial syntax *)
