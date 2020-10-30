@@ -290,16 +290,30 @@ Fixpoint abs_max_in_col (lt : T → T → bool) (abs : T → T)
 
 ...
 
-Fixpoint gauss_jordan lt abs (M : matrix T) r oj :=
+Fixpoint gauss_jordan lt abs (A : matrix T) r oj :=
   match oj with
-  | 0 => M
+  | 0 => A
   | S oj' =>
-      let j := mat_ncols M - 1 - oj in
+      let j := mat_ncols A - 1 - oj in
       (*  Rechercher max(|M[i,j]|, r+1 ≤ i ≤ n).
           Noter k l'indice de ligne du maximum *)
-      let k := abs_max_in_col lt abs M (max_nrows - 1 - r) r j in
-      if srng_eq_dec (mat_el M k j) 0 then
+      let k := abs_max_in_col lt abs A (max_nrows - 1 - r) r j in
+      if srng_eq_dec (mat_el A k j) 0 then
         let r := r + 1 in
         (* Diviser la ligne k par A[k,j] *)
-(* aïe... j'ai pas encore de division, je suis dans un anneau, va
-   falloir en créer une *)
+        (* aïe... j'ai pas encore de division, bon, tant pis, je
+           continue quand même *)
+        (* Si k≠r alors  Échanger les lignes k et r *)
+        let A :=
+          mk_mat (λ i j,
+            if Nat.eq_dec i k then mat_el A r j
+            else if Nat.eq_dec i r then mat_el A k j
+            else mat_el A i j) (mat_nrows A) (mat_ncols A)
+        in
+        (* Pour i de 1 jusqu'à n
+           Si i≠r alors
+            Soustraire à la ligne i la ligne r multipliée par A[i,j]
+            (de façon à annuler A[i,j]) *)
+        (* bon, vu que la ligne r n'a pas été divisée par A[k,j],
+           on va multiplier la ligne i par A[k,j] avant de la
+           soustraire comme dit ci-dessus *)
