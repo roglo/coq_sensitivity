@@ -228,6 +228,19 @@ Definition mat_of_bmat (BM : bmatrix T) : matrix T :=
 
 Print is_square_bmat.
 Print is_square_bmat_loop.
+Print sizes_of_bmatrix.
+
+Fixpoint bmat_el (BM : bmatrix T) i j :=
+  match BM with
+  | BM_1 x => x
+  | BM_M MBM =>
+      match sizes_of_bmatrix BM with
+      | s :: sl =>
+          let n := Π (k = 1, length sl), nth (k - 1) sl 0 in
+          bmat_el (mat_el MBM (i / n) (j / n)) (i mod n) (j mod n)
+      | [] => 0%Srng
+      end
+  end.
 
 (**)
 End in_ring.
@@ -235,9 +248,12 @@ Require Import ZArith.
 Open Scope Z_scope.
 
 Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_bmat (A n)).
-Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_mat (mat_of_bmat (A n))).
-Compute (let n := 3%nat in let _ := Z_ring_op in let _ := rng_semiring in mat_of_bmat (A n)).
+Compute (let n := 4%nat in let _ := Z_ring_op in let _ := rng_semiring in mat_of_bmat (A n)%BM).
+Compute (let n := 4%nat in let _ := Z_ring_op in let _ := rng_semiring in list_list_of_mat (mat_of_bmat (A n))).
+Compute (let n := 4%nat in let _ := Z_ring_op in map (λ i, map (λ j, bmat_el (A n) i j) (seq 0 (Nat.pow 2 n))) (seq 0 (Nat.pow 2 n))).
 (**)
+
+...
 
 Definition bmat_nrows (BM : bmatrix T) := mat_nrows (mat_of_bmat BM).
 
