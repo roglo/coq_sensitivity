@@ -277,15 +277,18 @@ rewrite <- Hm in Hcp.
 ...
 *)
 
+Definition rng_abs (lt : T → T → bool) x :=
+  if lt x 0%Srng then (- x)%Rng else x.
+
 (* https://fr.wikipedia.org/wiki/%C3%89limination_de_Gauss-Jordan#Algorithme *)
 
-Fixpoint abs_max_in_col (lt : T → T → bool) (abs : T → T)
-    (M : matrix T) it i j :=
+Fixpoint abs_max_in_col (lt : T → T → bool) (M : matrix T) it i j :=
   match it with
   | 0 => i
   | S it' =>
-      let k := abs_max_in_col lt abs M it' (i + 1) j in
-      if lt (abs (mat_el M k j)) (abs (mat_el M i j)) then i else k
+      let k := abs_max_in_col lt M it' (i + 1) j in
+      if lt (rng_abs lt (mat_el M k j)) (rng_abs lt (mat_el M i j)) then i
+      else k
   end.
 
 (* Swap the positions of two rows *)
@@ -314,14 +317,14 @@ Definition add_one_row_scalar_multiple_another A i' s i'' :=
    version of my code, it returns the pair of the echelon form
    multiplied by some constant d, and the constant d itself *)
 
-Fixpoint rng_gauss_jordan_loop lt abs (A : matrix T) d r oj :=
+Fixpoint rng_gauss_jordan_loop lt (A : matrix T) d r oj :=
   match oj with
   | 0 => (A, d)
   | S oj' =>
       let j := mat_ncols A - oj in
-      let k := abs_max_in_col lt abs A (mat_nrows A - 1 - r) r j in
+      let k := abs_max_in_col lt A (mat_nrows A - 1 - r) r j in
       if srng_eq_dec (mat_el A k j) 0 then
-        rng_gauss_jordan_loop lt abs A d r oj'
+        rng_gauss_jordan_loop lt A d r oj'
       else
         let r := r + 1 in
         let dd := mat_el A k j in
@@ -337,11 +340,11 @@ Fixpoint rng_gauss_jordan_loop lt abs (A : matrix T) d r oj :=
             (seq 0 (mat_nrows A)) A
         in
         let A := multiply_row_by_scalar A (r - 1) d in
-        rng_gauss_jordan_loop lt abs A (d * dd)%Srng r oj'
+        rng_gauss_jordan_loop lt A (d * dd)%Srng r oj'
   end.
 
-Definition rng_gauss_jordan lt abs (A : matrix T) :=
-  rng_gauss_jordan_loop lt abs (A : matrix T) 1%Srng 0 (mat_ncols A).
+Definition rng_gauss_jordan lt (A : matrix T) :=
+  rng_gauss_jordan_loop lt (A : matrix T) 1%Srng 0 (mat_ncols A).
 
 End in_ring.
 Require Import ZArith.
@@ -349,7 +352,7 @@ Open Scope Z_scope.
 Existing Instance Z_ring_op.
 Existing Instance Z_semiring_op.
 Existing Instance Z_sring_dec_prop.
-Definition Z_gauss_jordan := rng_gauss_jordan Z.ltb Z.abs.
+Definition Z_gauss_jordan := rng_gauss_jordan Z.ltb.
 Definition test ll :=
   let r := Z_gauss_jordan (mat_of_list_list 0 ll) in
   (list_list_of_mat (fst r), snd r).
