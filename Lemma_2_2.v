@@ -288,25 +288,30 @@ Fixpoint abs_max_in_col (lt : T → T → bool) (abs : T → T)
       if lt (abs (mat_el M k j)) (abs (mat_el M i j)) then i else k
   end.
 
+(* return by Gauss-Jordan elimination the row echelon form of the
+   matrix; actually, since there is no division in the present
+   version of my code, it returns the pair of the echelon form
+   multiplied by some constant d, and the constant d itself *)
+
 Fixpoint gauss_jordan_loop lt abs (A : matrix T) d r oj :=
   match oj with
   | 0 => (A, d)
   | S oj' =>
       let j := mat_ncols A - oj in
-      (*  Rechercher max(|M[i,j]|, r+1 ≤ i ≤ n).
-          Noter k l'indice de ligne du maximum *)
+      (*  Find max(|M[i,j]|, r+1 ≤ i ≤ n).
+          Note k the index of line of the maximum *)
       let k := abs_max_in_col lt abs A (mat_nrows A - 1 - r) r j in
       if srng_eq_dec (mat_el A k j) 0 then
         gauss_jordan_loop lt abs A d r oj'
       else
         let r := r + 1 in
-        (* Diviser la ligne k par A[k,j] *)
-        (* aïe... j'ai pas encore de division, bon, tant pis, on
-           multiplie les autres et on divisera plus tard l'ensemble
-           par A[k,j] *)
+        (* Divide the line k by A[k,j] *)
+        (* since there is not yet division in my implementation, I
+           shall multiply the other ones and divide later the whole
+           thing by A[k,j] *)
         let dd := mat_el A k j in
         let nd := (d * dd)%Srng in
-        (* Si k≠r alors  Échanger les lignes k et r *)
+        (* If k≠r then swap lines k and r *)
         let A :=
           if Nat.eq_dec k (r - 1) then A
           else
@@ -315,10 +320,10 @@ Fixpoint gauss_jordan_loop lt abs (A : matrix T) d r oj :=
               else if Nat.eq_dec i k then mat_el A (r - 1) j
               else mat_el A i j) (mat_nrows A) (mat_ncols A)
         in
-        (* Pour i de 1 jusqu'à n
-           Si i≠r alors
-            Soustraire à la ligne i la ligne r multipliée par A[i,j]
-            (de façon à annuler A[i,j]) *)
+        (* For i = 1 to n
+           If i≠r then
+            Subtract to line i the line r multiplied by A[i,j]
+            (in order to cancel A[i,j]) *)
         let A :=
           mk_mat (λ i' j',
             if Nat.eq_dec i' (r - 1) then (mat_el A i' j' * d)%Rng
@@ -342,7 +347,14 @@ Definition ex :=
   mat_of_list_list 0 [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]].
 Compute list_list_of_mat ex.
 Compute let r := gauss_jordan Z.ltb Z.abs ex in (list_list_of_mat (fst r), snd r).
-...
+(*
      = ([[48; 0; 0]; [0; 48; 0]; [0; 0; 48]], 48)
      : list (list Z) * Z
-ok
+ok *)
+Definition ex2 :=
+  mat_of_list_list 0 [[1;3;1;9];[1;1;-1;1];[3;11;5;35]].
+Compute let r := gauss_jordan Z.ltb Z.abs ex2 in (list_list_of_mat (fst r), snd r).
+Definition ex3 :=
+  mat_of_list_list 0 [[2;1;-1;8];[-3;-1;2;-11];[-2;1;2;-3]].
+Compute let r := gauss_jordan Z.ltb Z.abs ex3 in (list_list_of_mat (fst r), snd r).
+(* according to the internet examples, seems correct *)
