@@ -9,6 +9,7 @@ Import List List.ListNotations.
 
 Require Import Misc Matrix BlockMat.
 Require Import Semiring.
+Require Import Rational.
 (* required if reasoning with characteristic polynomial
    to find eigenvalues; but perhaps it is not necessary
 Require Import SRproduct SRpolynomial CharacPolyn.
@@ -457,3 +458,16 @@ Fixpoint gauss_jordan_loop lt (A : matrix T) r oj :=
 
 Definition gauss_jordan lt (A : matrix T) :=
   gauss_jordan_loop lt (A : matrix T) 0 (mat_ncols A).
+
+Import Q.Notations.
+
+Definition Q_semiring_op : semiring_op Q :=
+  {| srng_zero := 0%Q;
+     srng_one := 1%Q;
+     srng_add := Q.add;
+     srng_mul := Q.mul |}.
+
+...
+
+Definition Q_ring_op : ring_op Q :=
+  {| rng_semiring := Q_semiring_op |}.
