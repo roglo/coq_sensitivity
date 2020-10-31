@@ -306,29 +306,24 @@ Fixpoint gauss_jordan_loop lt abs (A : matrix T) d r oj :=
   | 0 => (A, d)
   | S oj' =>
       let j := mat_ncols A - oj in
-      (*  Find max(|M[i,j]|, r+1 ≤ i ≤ n).
-          Note k the index of line of the maximum *)
       let k := abs_max_in_col lt abs A (mat_nrows A - 1 - r) r j in
       if srng_eq_dec (mat_el A k j) 0 then
         gauss_jordan_loop lt abs A d r oj'
       else
         let r := r + 1 in
-        (* Divide the line k by A[k,j] *)
-        (* since there is not yet division in my implementation, I
-           shall multiply the other ones and divide later the whole
-           thing by A[k,j] *)
         let dd := mat_el A k j in
-        (* If k≠r then swap lines k and r *)
         let A := swap_lines A (r - 1) k in
-        (* For i = 1 to n
-           If i≠r then
-            Subtract to line i the line r multiplied by A[i,j]
-            (in order to cancel A[i,j]) *)
+        let A :=
+          mk_mat (λ i' j',
+            if Nat.eq_dec i' (r - 1) then mat_el A i' j'
+            else
+              (mat_el A i' j' * dd - mat_el A i' j * mat_el A (r - 1) j')%Rng)
+            (mat_nrows A) (mat_ncols A)
+        in
         let A :=
           mk_mat (λ i' j',
             if Nat.eq_dec i' (r - 1) then (mat_el A i' j' * d)%Rng
-            else
-              (mat_el A i' j' * dd - mat_el A i' j * mat_el A (r - 1) j')%Rng)
+            else mat_el A i' j')
             (mat_nrows A) (mat_ncols A)
         in
         gauss_jordan_loop lt abs A (d * dd)%Srng r oj'
