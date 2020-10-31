@@ -1450,8 +1450,7 @@ destruct a.
  assert (H2 : (xn + 1) / S a ≠ 0). {
    intros H1.
    apply Nat.div_small_iff in H1; [ | easy ].
-...
-   specialize (Nat_gcd_le_l (xn + 1) (xd +  1)) as H2.
+   specialize (@Nat_gcd_le_l (xn + 1) (xd +  1)) as H2.
    assert (H3 : xn + 1 ≠ 0) by flia.
    specialize (H2 H3).
    flia Ha H1 H2.
@@ -1459,7 +1458,7 @@ destruct a.
  assert (H3 : (xd + 1) / S a ≠ 0). {
    intros H1.
    apply Nat.div_small_iff in H1; [ | easy ].
-   specialize (Nat_gcd_le_r (xn + 1) (xd +  1)) as H3.
+   specialize (@Nat_gcd_le_r (xn + 1) (xd +  1)) as H3.
    assert (H4 : xd + 1 ≠ 0) by flia.
    specialize (H3 H4).
    flia Ha H1 H3.
@@ -1498,7 +1497,7 @@ destruct a.
  assert (H2 : (xn + 1) / S a ≠ 0). {
    intros H1.
    apply Nat.div_small_iff in H1; [ | easy ].
-   specialize (Nat_gcd_le_l (xn + 1) (xd +  1)) as H2.
+   specialize (@Nat_gcd_le_l (xn + 1) (xd +  1)) as H2.
    assert (H3 : xn + 1 ≠ 0) by flia.
    specialize (H2 H3).
    flia Ha H1 H2.
@@ -1506,7 +1505,7 @@ destruct a.
  assert (H3 : (xd + 1) / S a ≠ 0). {
    intros H1.
    apply Nat.div_small_iff in H1; [ | easy ].
-   specialize (Nat_gcd_le_r (xn + 1) (xd +  1)) as H3.
+   specialize (@Nat_gcd_le_r (xn + 1) (xd +  1)) as H3.
    assert (H4 : xd + 1 ≠ 0) by flia.
    specialize (H3 H4).
    flia Ha H1 H3.
@@ -1545,7 +1544,7 @@ destruct a.
  assert (H2 : (yn + 1) / S a ≠ 0). {
    intros H1.
    apply Nat.div_small_iff in H1; [ | easy ].
-   specialize (Nat_gcd_le_l (yn + 1) (yd +  1)) as H2.
+   specialize (@Nat_gcd_le_l (yn + 1) (yd +  1)) as H2.
    assert (H3 : yn + 1 ≠ 0) by flia.
    specialize (H2 H3).
    flia Ha H1 H2.
@@ -1553,7 +1552,7 @@ destruct a.
  assert (H3 : (yd + 1) / S a ≠ 0). {
    intros H1.
    apply Nat.div_small_iff in H1; [ | easy ].
-   specialize (Nat_gcd_le_r (yn + 1) (yd +  1)) as H3.
+   specialize (@Nat_gcd_le_r (yn + 1) (yd +  1)) as H3.
    assert (H4 : yd + 1 ≠ 0) by flia.
    specialize (H3 H4).
    flia Ha H1 H3.
@@ -1617,7 +1616,16 @@ destruct a.
    rewrite Ha; apply Nat_gcd_le_r.
    now rewrite Nat.add_1_r.
  }
- do 4 (rewrite Nat.sub_add; [ | do 2 rewrite Nat.add_1_r; simpl; flia ]).
+(**)
+ do 2 (rewrite Nat.sub_add; [ | do 2 rewrite Nat.add_1_r; simpl; flia ]).
+ rewrite Nat.sub_add. 2: {
+   do 4 rewrite Nat.add_1_r.
+   cbn; remember (_ + _) as z in |-*; flia.
+ }
+ rewrite Nat.sub_add. 2: {
+   do 2 rewrite Nat.add_1_r.
+   cbn; remember (_ + _) as z in |-*; flia.
+ }
  rewrite Nat.sub_add; [ | easy ].
  rewrite Nat.sub_add.
  +rewrite Nat.sub_add.
@@ -1637,6 +1645,7 @@ destruct a.
  +rewrite Nat.sub_add.
   *rewrite Nat.sub_add; [ | easy ].
    do 2 rewrite Nat.add_1_r.
+...
    eapply Nat.le_trans; [ | apply Nat_mul_le_pos_r; flia ].
    do 2 rewrite Nat.add_1_r in Ha.
    rewrite <- Nat.divide_div_mul_exact; [ | easy | ].
