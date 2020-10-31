@@ -346,6 +346,7 @@ Fixpoint rng_gauss_jordan_loop lt (A : matrix T) d r oj :=
 Definition rng_gauss_jordan lt (A : matrix T) :=
   rng_gauss_jordan_loop lt (A : matrix T) 1%Srng 0 (mat_ncols A).
 
+(*
 End in_ring.
 Require Import ZArith.
 Open Scope Z_scope.
@@ -401,3 +402,64 @@ Compute test [[1;2;2;-3;2;3];[2;4;1;0;-5;-6];[4;8;5;-6;-1;0];[-1;-2;-1;1;1;1]].
      = ([[-24; -48; 0; -24; 96; 120]; [0; 0; -24; 48; -72; -96];
         [0; 0; 0; 0; 0; 0]; [0; 0; 0; 0; 0; 0]], -24)
 *)
+*)
+
+(* let's go for the fields *)
+
+Class field_op T :=
+  { fld_ring : ring_op T;
+    fld_inv : T → T }.
+
+Definition fld_div T {F : field_op T} (ro := fld_ring) {so : semiring_op T}
+    a b :=
+  srng_mul a (fld_inv b).
+
+Declare Scope field_scope.
+
+Delimit Scope field_scope with F.
+Notation "0" := (@srng_zero _ rng_semiring) : field_scope.
+Notation "1" := (@srng_one _ rng_semiring) : field_scope.
+Notation "- a" := (@rng_opp _ _ a) : field_scope.
+Notation "a + b" := (@srng_add _ rng_semiring a b) : field_scope.
+Notation "a - b" := (@rng_sub _ _ a b) : field_scope.
+Notation "a * b" := (@srng_mul _ rng_semiring a b) : field_scope.
+Notation "a / b" := (@fld_div _ _ rng_semiring a b) : field_scope.
+
+(*
+Class field_prop A {so : ring_op A} :=
+  { rng_add_opp_l : ∀ a : A, (- a + a = 0)%Rng }.
+*)
+Context {fo : field_op T}.
+
+Check (1 / (1 + 1))%F.
+Check (1 - 1)%Rng.
+
+Fixpoint gauss_jordan_loop lt (A : matrix T) r oj :=
+  match oj with
+  | 0 => A
+  | S oj' =>
+      let j := mat_ncols A - oj in
+      let k := abs_max_in_col lt A (mat_nrows A - 1 - r) r j in
+      if srng_eq_dec (mat_el A k j) 0 then
+        gauss_jordan_loop lt A d r oj'
+      else
+        let r := r + 1 in
+...
+        let dd := mat_el A k j in
+        let A := swap_rows A (r - 1) k in
+        let A :=
+          fold_left
+            (λ A i'',
+               if Nat.eq_dec i'' (r - 1) then A
+               else
+                 let v := mat_el A i'' j in
+                 let A := multiply_row_by_scalar A i'' dd in
+                 add_one_row_scalar_multiple_another A i'' (- v)%Rng (r - 1))
+            (seq 0 (mat_nrows A)) A
+        in
+        let A := multiply_row_by_scalar A (r - 1) d in
+        gauss_jordan_loop lt A (d * dd)%Srng r oj'
+  end.
+
+Definition gauss_jordan lt (A : matrix T) :=
+  gauss_jordan_loop lt (A : matrix T) 0 (mat_ncols A).
