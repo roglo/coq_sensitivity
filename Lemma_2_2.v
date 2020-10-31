@@ -349,12 +349,24 @@ Compute list_list_of_mat ex.
 Compute let r := gauss_jordan Z.ltb Z.abs ex in (list_list_of_mat (fst r), snd r).
 (*
      = ([[48; 0; 0]; [0; 48; 0]; [0; 0; 48]], 48)
-     : list (list Z) * Z
-ok *)
+*)
 Definition ex2 :=
   mat_of_list_list 0 [[1;3;1;9];[1;1;-1;1];[3;11;5;35]].
 Compute let r := gauss_jordan Z.ltb Z.abs ex2 in (list_list_of_mat (fst r), snd r).
+(*
+     = ([[-24; 0; 48; 72]; [0; -24; -24; -96]; [0; 0; 0; 0]], -24)
+*)
 Definition ex3 :=
   mat_of_list_list 0 [[2;1;-1;8];[-3;-1;2;-11];[-2;1;2;-3]].
 Compute let r := gauss_jordan Z.ltb Z.abs ex3 in (list_list_of_mat (fst r), snd r).
-(* according to the internet examples, seems correct *)
+(*
+     = ([[45; 0; 0; 90]; [0; 45; 0; 135]; [0; 0; 45; -45]], 45)
+*)
+Definition ex4 :=
+  mat_of_list_list 0 [[2;-1;0;1;0;0];[-1;2;-1;0;1;0];[0;-1;2;0;0;1]].
+Compute let r := gauss_jordan Z.ltb Z.abs ex4 in (list_list_of_mat (fst r), snd r).
+(*
+     = ([[48; 0; 0; 36; 24; 12];
+         [0; 48; 0; 24; 48; 24];
+         [0; 0; 48; 12; 24; 36]], 48)
+*)
