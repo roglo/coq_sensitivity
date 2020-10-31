@@ -1346,7 +1346,9 @@ PQtac2.
 -do 2 PQtac2.
  replace (S yn * (S a * S xd)) with (S a * (S yn * S xd)) by flia.
  rewrite <- Nat.mul_assoc, <- Nat.mul_sub_distr_l.
- simpl; flia Hyx.
+ apply Nat.sub_gt in Hyx.
+ remember (_ - _) as u.
+ destruct u; [ easy | cbn; flia ].
 Qed.
 
 Theorem PQred_sub_mul_one_r : ∀ x y a,
@@ -1369,7 +1371,9 @@ PQtac2.
 -do 2 PQtac2.
  replace (S xn * (S a * S yd)) with (S a * (S xn * S yd)) by flia.
  rewrite <- Nat.mul_assoc, <- Nat.mul_sub_distr_l.
- simpl; flia Hyx.
+ apply Nat.sub_gt in Hyx.
+ remember (_ - _) as u.
+ destruct u; [ easy | cbn; flia ].
 Qed.
 
 Theorem PQred_mul_mul_one_l : ∀ x y a, PQred (x * y) = PQred (PQmake a a * x * y).
@@ -1446,6 +1450,7 @@ destruct a.
  assert (H2 : (xn + 1) / S a ≠ 0). {
    intros H1.
    apply Nat.div_small_iff in H1; [ | easy ].
+...
    specialize (Nat_gcd_le_l (xn + 1) (xd +  1)) as H2.
    assert (H3 : xn + 1 ≠ 0) by flia.
    specialize (H2 H3).

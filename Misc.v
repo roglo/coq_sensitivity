@@ -931,6 +931,14 @@ exists (uc * vc * c + uc + vc).
 ring.
 Qed.
 
+Theorem Nat_gcd_le_l : ∀ a b, a ≠ 0 → Nat.gcd a b ≤ a.
+Proof.
+intros * Haz.
+specialize (Nat.gcd_divide_l a b) as H1.
+destruct H1 as (c, Hc); rewrite Hc at 2.
+destruct c; [ easy | flia ].
+Qed.
+
 Theorem Nat_gcd_le_r : ∀ a b, b ≠ 0 → Nat.gcd a b ≤ b.
 Proof.
 intros * Hbz.

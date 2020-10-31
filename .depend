@@ -2,12 +2,20 @@ BlockMat.vio: BlockMat.v Misc.vio Matrix.vio Semiring.vio SRsummation.vio
 BlockMat.vo BlockMat.glob BlockMat.v.beautified BlockMat.required_vo: BlockMat.v Misc.vo Matrix.vo Semiring.vo SRsummation.vo
 CharacPolyn.vio: CharacPolyn.v Misc.vio Semiring.vio SRsummation.vio SRproduct.vio SRpolynomial.vio Matrix.vio
 CharacPolyn.vo CharacPolyn.glob CharacPolyn.v.beautified CharacPolyn.required_vo: CharacPolyn.v Misc.vo Semiring.vo SRsummation.vo SRproduct.vo SRpolynomial.vo Matrix.vo
+GQ.vio: GQ.v Misc.vio PQ.vio Nat_ggcd.vio
+GQ.vo GQ.glob GQ.v.beautified GQ.required_vo: GQ.v Misc.vo PQ.vo Nat_ggcd.vo
 Lemma_2_2.vio: Lemma_2_2.v Misc.vio Matrix.vio BlockMat.vio Semiring.vio
 Lemma_2_2.vo Lemma_2_2.glob Lemma_2_2.v.beautified Lemma_2_2.required_vo: Lemma_2_2.v Misc.vo Matrix.vo BlockMat.vo Semiring.vo
 Matrix.vio: Matrix.v Misc.vio Semiring.vio SRsummation.vio
 Matrix.vo Matrix.glob Matrix.v.beautified Matrix.required_vo: Matrix.v Misc.vo Semiring.vo SRsummation.vo
 Misc.vio: Misc.v 
 Misc.vo Misc.glob Misc.v.beautified Misc.required_vo: Misc.v 
+Nat_ggcd.vio: Nat_ggcd.v Misc.vio
+Nat_ggcd.vo Nat_ggcd.glob Nat_ggcd.v.beautified Nat_ggcd.required_vo: Nat_ggcd.v Misc.vo
+PQ.vio: PQ.v Misc.vio Nat_ggcd.vio
+PQ.vo PQ.glob PQ.v.beautified PQ.required_vo: PQ.v Misc.vo Nat_ggcd.vo
+Rational.vio: Rational.v Misc.vio GQ.vio
+Rational.vo Rational.glob Rational.v.beautified Rational.required_vo: Rational.v Misc.vo GQ.vo
 SRpolynomial.vio: SRpolynomial.v Misc.vio Semiring.vio SRsummation.vio SRproduct.vio
 SRpolynomial.vo SRpolynomial.glob SRpolynomial.v.beautified SRpolynomial.required_vo: SRpolynomial.v Misc.vo Semiring.vo SRsummation.vo SRproduct.vo
 SRproduct.vio: SRproduct.v Misc.vio Semiring.vio
