@@ -318,7 +318,6 @@ Fixpoint gauss_jordan_loop lt abs (A : matrix T) d r oj :=
            shall multiply the other ones and divide later the whole
            thing by A[k,j] *)
         let dd := mat_el A k j in
-        let nd := (d * dd)%Srng in
         (* If k≠r then swap lines k and r *)
         let A := swap_lines A (r - 1) k in
         (* For i = 1 to n
@@ -332,7 +331,7 @@ Fixpoint gauss_jordan_loop lt abs (A : matrix T) d r oj :=
               (mat_el A i' j' * dd - mat_el A i' j * mat_el A (r - 1) j')%Rng)
             (mat_nrows A) (mat_ncols A)
         in
-        gauss_jordan_loop lt abs A nd r oj'
+        gauss_jordan_loop lt abs A (d * dd)%Srng r oj'
   end.
 
 Definition gauss_jordan lt abs (A : matrix T) :=
