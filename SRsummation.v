@@ -18,10 +18,9 @@ Section in_ring.
 
 Context {T : Type}.
 Context {ro : ring_op T}.
-Context (so := rng_semiring).
-Context {sp : @semiring_prop T (@rng_semiring T ro)}.
-Context {rp : @ring_prop T ro}.
-Existing Instance so.
+Context (so : semiring_op T).
+Context {sp : semiring_prop T}.
+Context {rp : ring_prop T}.
 
 Theorem fold_left_srng_add_fun_from_0 : ∀ a l (f : nat → _),
   (fold_left (λ c i, c + f i) l a =

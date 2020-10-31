@@ -133,8 +133,8 @@ Section ring_theorems.
 Context {A : Type}.
 Context {ro : ring_op A}.
 Context {so : semiring_op A}.
-Context {sp : @semiring_prop A so}.
-Context {rp : @ring_prop A ro so}.
+Context {sp : semiring_prop A}.
+Context {rp : ring_prop A}.
 
 Theorem rng_sub_compat_l : ∀ a b c,
   (a = b)%Rng → (a - c = b - c)%Rng.
