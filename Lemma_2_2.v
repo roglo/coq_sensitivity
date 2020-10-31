@@ -31,8 +31,6 @@ Existing Instance polyn_semiring_op.
 *)
 Existing Instance so.
 
-Check srng_eq_dec.
-
 Add Parametric Relation : _ (@bmat_fit_for_add T)
  reflexivity proved by bmat_fit_for_add_refl
  symmetry proved by bmat_fit_for_add_symm
@@ -290,12 +288,6 @@ Fixpoint abs_max_in_col (lt : T → T → bool) (abs : T → T)
       if lt (abs (mat_el M k j)) (abs (mat_el M i j)) then i else k
   end.
 
-(*
-Require Import ZArith.
-Check Z.ltb.
-Check Z.abs.
-*)
-
 Fixpoint gauss_jordan_loop lt abs (A : matrix T) d r oj :=
   match oj with
   | 0 => (A, d)
@@ -345,12 +337,12 @@ Require Import ZArith.
 Open Scope Z_scope.
 Existing Instance Z_ring_op.
 Existing Instance Z_semiring_op.
-Theorem Z_1_neq_0 : 1 ≠ 0.
-Proof. easy. Qed.
-Definition Z_sring_dec_prop :=
-  {| srng_eq_dec := Z.eq_dec; srng_1_neq_0 := Z_1_neq_0 |}.
 Existing Instance Z_sring_dec_prop.
 Definition ex :=
   mat_of_list_list 0 [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]].
 Compute list_list_of_mat ex.
 Compute let r := gauss_jordan Z.ltb Z.abs ex in (list_list_of_mat (fst r), snd r).
+...
+     = ([[48; 0; 0]; [0; 48; 0]; [0; 0; 48]], 48)
+     : list (list Z) * Z
+ok

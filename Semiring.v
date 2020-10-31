@@ -303,6 +303,12 @@ Definition Z_semiring_prop : semiring_prop Z :=
 Definition Z_ring_prop : ring_prop Z :=
   {| rng_add_opp_l := Z.add_opp_diag_l |}.
 
+Theorem Z_1_neq_0 : 1%Z ≠ 0%Z.
+Proof. easy. Qed.
+
+Definition Z_sring_dec_prop : sring_dec_prop Z :=
+  {| srng_eq_dec := Z.eq_dec; srng_1_neq_0 := Z_1_neq_0 |}.
+
 (* allows to use ring theorems on Z
 Canonical Structure Z_semiring_op.
 Canonical Structure Z_semiring_prop.
