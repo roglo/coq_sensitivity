@@ -305,24 +305,29 @@ Fixpoint gauss_jordan_loop lt abs (A : matrix T) d r oj :=
           Noter k l'indice de ligne du maximum *)
       let k := abs_max_in_col lt abs A (mat_nrows A - 1 - r) r j in
       if srng_eq_dec (mat_el A k j) 0 then
+        gauss_jordan_loop lt abs A d r oj'
+      else
         let r := r + 1 in
         (* Diviser la ligne k par A[k,j] *)
         (* aïe... j'ai pas encore de division, bon, tant pis, on
-           divisera plus tard par d *)
+           multiplie les autres et on divisera plus tard l'ensemble
+           par A[k,j] *)
         let dd := mat_el A k j in
+        let A :=
+          mk_mat (λ i j,
+            if Nat.eq_dec i k then mat_el A i j
+            else (mat_el A i j * dd)%Srng)
+            (mat_nrows A) (mat_ncols A)
+        in
         let d := (d * dd)%Srng in
         (* Si k≠r alors  Échanger les lignes k et r *)
         let A :=
-          if Nat.eq_dec k r then
-            mk_mat (λ i j,
-              if Nat.eq_dec i k then mat_el A i j
-              else (mat_el A i j * dd)%Srng)
-              (mat_nrows A) (mat_ncols A)
+          if Nat.eq_dec k (r - 1) then A
           else
             mk_mat (λ i j,
-              if Nat.eq_dec i r then mat_el A k j
-              else if Nat.eq_dec i k then (mat_el A r j * dd)%Srng
-              else (mat_el A i j * dd)%Srng) (mat_nrows A) (mat_ncols A)
+              if Nat.eq_dec i (r - 1) then mat_el A k j
+              else if Nat.eq_dec i k then mat_el A (r - 1) j
+              else mat_el A i j) (mat_nrows A) (mat_ncols A)
         in
         (* Pour i de 1 jusqu'à n
            Si i≠r alors
@@ -330,12 +335,10 @@ Fixpoint gauss_jordan_loop lt abs (A : matrix T) d r oj :=
             (de façon à annuler A[i,j]) *)
         let A :=
           mk_mat (λ i j',
-            if Nat.eq_dec i r then mat_el A i j'
-            else (mat_el A i j' - mat_el A r j' * mat_el A i j)%Rng)
+            if Nat.eq_dec i (r - 1) then mat_el A i j'
+            else (mat_el A i j' - mat_el A (r - 1) j' * mat_el A i j)%Rng)
             (mat_nrows A) (mat_nrows A)
         in
-        gauss_jordan_loop lt abs A d r oj'
-      else
         gauss_jordan_loop lt abs A d r oj'
   end.
 
@@ -355,6 +358,14 @@ Existing Instance Z_sring_dec_prop.
 Definition ex :=
   mat_of_list_list 0 [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]].
 Compute list_list_of_mat ex.
+Compute let r := gauss_jordan Z.ltb Z.abs ex in (list_list_of_mat (fst r), snd r).
+...
+[[1; 3; 2]; [0; 1/2; -1]; [1; 3; -5]]
+
 Compute (snd (gauss_jordan Z.ltb Z.abs ex)).
 Compute (list_list_of_mat (fst (gauss_jordan Z.ltb Z.abs ex))).
 (* bof, ça marche pas des masses *)
+Compute abs_max_in_col Z.ltb Z.abs ex 2 0 0.
+      let k := abs_max_in_col lt abs A (mat_nrows A - 1 - r) r j in
+j=0 r=0
+Print abs_max_in_col.
