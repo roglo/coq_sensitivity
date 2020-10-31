@@ -444,9 +444,9 @@ Fixpoint gauss_jordan_loop lt (A : matrix T) r oj :=
         gauss_jordan_loop lt A d r oj'
       else
         let r := r + 1 in
-...
-        let dd := mat_el A k j in
+        let A := multiply_row_by_scalar A (r - 1) (mat_el A k j) in
         let A := swap_rows A (r - 1) k in
+...
         let A :=
           fold_left
             (λ A i'',
@@ -457,7 +457,6 @@ Fixpoint gauss_jordan_loop lt (A : matrix T) r oj :=
                  add_one_row_scalar_multiple_another A i'' (- v)%Rng (r - 1))
             (seq 0 (mat_nrows A)) A
         in
-        let A := multiply_row_by_scalar A (r - 1) d in
         gauss_jordan_loop lt A (d * dd)%Srng r oj'
   end.
 
