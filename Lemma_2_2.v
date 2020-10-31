@@ -288,18 +288,25 @@ Fixpoint abs_max_in_col (lt : T → T → bool) (abs : T → T)
       if lt (abs (mat_el M k j)) (abs (mat_el M i j)) then i else k
   end.
 
-Definition swap_lines (A : matrix T) u v :=
-  if Nat.eq_dec u v then A
-  else
-    mk_mat (λ i j,
-      if Nat.eq_dec i u then mat_el A v j
-      else if Nat.eq_dec i v then mat_el A u j
-      else mat_el A i j) (mat_nrows A) (mat_ncols A).
+(* Swap the positions of two rows *)
+Definition swap_rows (A : matrix T) i' i'' :=
+  mk_mat (λ i j,
+    if Nat.eq_dec i i' then mat_el A i'' j
+    else if Nat.eq_dec i i'' then mat_el A i' j
+    else mat_el A i j) (mat_nrows A) (mat_ncols A).
 
-Definition multiply_line_by_scalar A i v :=
-  mk_mat (λ i' j',
-    if Nat.eq_dec i' i then (mat_el A i' j' * v)%Rng
-    else mat_el A i' j')
+(* Multiply a row by a non-zero scalar *)
+Definition multiply_row_by_scalar A k s :=
+  mk_mat (λ i j,
+    if Nat.eq_dec i k then (s * mat_el A i j)%Rng
+    else mat_el A i j)
+    (mat_nrows A) (mat_ncols A).
+
+(* Add to one row a scalar multiple of another *)
+Definition add_one_row_scalar_multiple_another A i' s i'' :=
+  mk_mat (λ i j,
+    if Nat.eq_dec i i' then (mat_el A i j + s * mat_el A i'' j)%Rng
+    else mat_el A i j)
     (mat_nrows A) (mat_ncols A).
 
 (* return by Gauss-Jordan elimination the row echelon form of the
@@ -318,15 +325,18 @@ Fixpoint gauss_jordan_loop lt abs (A : matrix T) d r oj :=
       else
         let r := r + 1 in
         let dd := mat_el A k j in
-        let A := swap_lines A (r - 1) k in
+        let A := swap_rows A (r - 1) k in
         let A :=
-          mk_mat (λ i' j',
-            if Nat.eq_dec i' (r - 1) then mat_el A i' j'
-            else
-              (mat_el A i' j' * dd - mat_el A i' j * mat_el A (r - 1) j')%Rng)
-            (mat_nrows A) (mat_ncols A)
+          fold_left
+            (λ A i'',
+               if Nat.eq_dec i'' (r - 1) then A
+               else
+                 let v := mat_el A i'' j in
+                 let A := multiply_row_by_scalar A i'' dd in
+                 add_one_row_scalar_multiple_another A i'' (- v)%Rng (r - 1))
+            (seq 0 (mat_nrows A)) A
         in
-        let A := multiply_line_by_scalar A (r - 1) d in
+        let A := multiply_row_by_scalar A (r - 1) d in
         gauss_jordan_loop lt abs A (d * dd)%Srng r oj'
   end.
 
@@ -341,7 +351,6 @@ Existing Instance Z_semiring_op.
 Existing Instance Z_sring_dec_prop.
 Definition ex :=
   mat_of_list_list 0 [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]].
-Compute list_list_of_mat ex.
 Compute let r := gauss_jordan Z.ltb Z.abs ex in (list_list_of_mat (fst r), snd r).
 (*
      = ([[48; 0; 0]; [0; 48; 0]; [0; 0; 48]], 48)
