@@ -296,6 +296,12 @@ Definition swap_lines (A : matrix T) u v :=
       else if Nat.eq_dec i v then mat_el A u j
       else mat_el A i j) (mat_nrows A) (mat_ncols A).
 
+Definition multiply_line_by_scalar A i v :=
+  mk_mat (λ i' j',
+    if Nat.eq_dec i' i then (mat_el A i' j' * v)%Rng
+    else mat_el A i' j')
+    (mat_nrows A) (mat_ncols A).
+
 (* return by Gauss-Jordan elimination the row echelon form of the
    matrix; actually, since there is no division in the present
    version of my code, it returns the pair of the echelon form
@@ -320,12 +326,7 @@ Fixpoint gauss_jordan_loop lt abs (A : matrix T) d r oj :=
               (mat_el A i' j' * dd - mat_el A i' j * mat_el A (r - 1) j')%Rng)
             (mat_nrows A) (mat_ncols A)
         in
-        let A :=
-          mk_mat (λ i' j',
-            if Nat.eq_dec i' (r - 1) then (mat_el A i' j' * d)%Rng
-            else mat_el A i' j')
-            (mat_nrows A) (mat_ncols A)
-        in
+        let A := multiply_line_by_scalar A (r - 1) d in
         gauss_jordan_loop lt abs A (d * dd)%Srng r oj'
   end.
 
