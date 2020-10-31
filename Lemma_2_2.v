@@ -431,9 +431,6 @@ Class field_prop A {so : ring_op A} :=
 *)
 Context {fo : field_op T}.
 
-Check (1 / (1 + 1))%F.
-Check (1 - 1)%Rng.
-
 Fixpoint gauss_jordan_loop lt (A : matrix T) r oj :=
   match oj with
   | 0 => A
@@ -441,23 +438,21 @@ Fixpoint gauss_jordan_loop lt (A : matrix T) r oj :=
       let j := mat_ncols A - oj in
       let k := abs_max_in_col lt A (mat_nrows A - 1 - r) r j in
       if srng_eq_dec (mat_el A k j) 0 then
-        gauss_jordan_loop lt A d r oj'
+        gauss_jordan_loop lt A r oj'
       else
         let r := r + 1 in
         let A := multiply_row_by_scalar A (r - 1) (mat_el A k j) in
         let A := swap_rows A (r - 1) k in
-...
         let A :=
           fold_left
             (λ A i'',
                if Nat.eq_dec i'' (r - 1) then A
                else
                  let v := mat_el A i'' j in
-                 let A := multiply_row_by_scalar A i'' dd in
                  add_one_row_scalar_multiple_another A i'' (- v)%Rng (r - 1))
             (seq 0 (mat_nrows A)) A
         in
-        gauss_jordan_loop lt A (d * dd)%Srng r oj'
+        gauss_jordan_loop lt A r oj'
   end.
 
 Definition gauss_jordan lt (A : matrix T) :=
