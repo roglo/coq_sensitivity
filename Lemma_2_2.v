@@ -334,12 +334,15 @@ Fixpoint gauss_jordan_loop lt abs (A : matrix T) d r oj :=
             Soustraire à la ligne i la ligne r multipliée par A[i,j]
             (de façon à annuler A[i,j]) *)
         let A :=
-          mk_mat (λ i j',
-            if Nat.eq_dec i (r - 1) then mat_el A i j'
-            else (mat_el A i j' - mat_el A (r - 1) j' * mat_el A i j)%Rng)
-            (mat_nrows A) (mat_nrows A)
+          mk_mat (λ i' j',
+            if Nat.eq_dec i' (r - 1) then mat_el A i' j'
+            else (mat_el A i' j' - mat_el A (r - 1) j' * mat_el A i' j)%Rng)
+            (mat_nrows A) (mat_ncols A)
         in
+(A, d)
+(*
         gauss_jordan_loop lt abs A d r oj'
+*)
   end.
 
 Definition gauss_jordan lt abs (A : matrix T) :=
