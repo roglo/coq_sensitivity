@@ -314,14 +314,14 @@ Definition add_one_row_scalar_multiple_another A i' s i'' :=
    version of my code, it returns the pair of the echelon form
    multiplied by some constant d, and the constant d itself *)
 
-Fixpoint gauss_jordan_loop lt abs (A : matrix T) d r oj :=
+Fixpoint rng_gauss_jordan_loop lt abs (A : matrix T) d r oj :=
   match oj with
   | 0 => (A, d)
   | S oj' =>
       let j := mat_ncols A - oj in
       let k := abs_max_in_col lt abs A (mat_nrows A - 1 - r) r j in
       if srng_eq_dec (mat_el A k j) 0 then
-        gauss_jordan_loop lt abs A d r oj'
+        rng_gauss_jordan_loop lt abs A d r oj'
       else
         let r := r + 1 in
         let dd := mat_el A k j in
@@ -337,11 +337,11 @@ Fixpoint gauss_jordan_loop lt abs (A : matrix T) d r oj :=
             (seq 0 (mat_nrows A)) A
         in
         let A := multiply_row_by_scalar A (r - 1) d in
-        gauss_jordan_loop lt abs A (d * dd)%Srng r oj'
+        rng_gauss_jordan_loop lt abs A (d * dd)%Srng r oj'
   end.
 
-Definition gauss_jordan lt abs (A : matrix T) :=
-  gauss_jordan_loop lt abs (A : matrix T) 1%Srng 0 (mat_ncols A).
+Definition rng_gauss_jordan lt abs (A : matrix T) :=
+  rng_gauss_jordan_loop lt abs (A : matrix T) 1%Srng 0 (mat_ncols A).
 
 End in_ring.
 Require Import ZArith.
@@ -349,7 +349,7 @@ Open Scope Z_scope.
 Existing Instance Z_ring_op.
 Existing Instance Z_semiring_op.
 Existing Instance Z_sring_dec_prop.
-Definition Z_gauss_jordan := gauss_jordan Z.ltb Z.abs.
+Definition Z_gauss_jordan := rng_gauss_jordan Z.ltb Z.abs.
 Definition test ll :=
   let r := Z_gauss_jordan (mat_of_list_list 0 ll) in
   (list_list_of_mat (fst r), snd r).
@@ -375,4 +375,26 @@ Compute test [[5;2;1;0];[-7;-3;0;1]].
 (*
      = ([[-7; 0; -21; -14]; [0; -7; 49; 35]], -7)
      = ([[1; 0; 3; 2]; [0; 1; -7; -5]], -7)
+*)
+Compute test [[-3;-3;3;0];[3;-9;3;0];[6;-6;0;0]].
+(*
+     = ([[-216; 0; 108; 0]; [0; -216; 108; 0]; [0; 0; 0; 0]], -216)
+     = ([[1; 0; -1/2; 0]; [0; 1; -1/2; 0]; [0; 0; 0; 0]], 1)
+   1 0 -1/2
+   0 1 -1/2
+   0 0  0
+*)
+Compute test [[3;-3;3;0];[3;-3;3;0];[6;-6;6;0]].
+(*
+     = ([[6; -6; 6; 0]; [0; 0; 0; 0]; [0; 0; 0; 0]], 6)
+*)
+Compute test [[1;-1;2;5];[3;2;1;10];[2;-3;-2;-10]].
+(*
+     = ([[4095; 0; 0; 4095]; [0; 4095; 0; 8190]; [0; 0; 4095; 12285]], 4095)
+     = ([[1; 0; 0; 1]; [0; 1; 0; 2]; [0; 0; 1; 3]], 1)
+*)
+Compute test [[1;2;2;-3;2;3];[2;4;1;0;-5;-6];[4;8;5;-6;-1;0];[-1;-2;-1;1;1;1]].
+(*
+     = ([[-24; -48; 0; -24; 96; 120]; [0; 0; -24; 48; -72; -96];
+        [0; 0; 0; 0; 0; 0]; [0; 0; 0; 0; 0; 0]], -24)
 *)
