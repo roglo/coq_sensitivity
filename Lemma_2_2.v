@@ -313,12 +313,14 @@ Fixpoint gauss_jordan_loop lt abs (A : matrix T) d r oj :=
            multiplie les autres et on divisera plus tard l'ensemble
            par A[k,j] *)
         let dd := mat_el A k j in
+(*
         let A :=
           mk_mat (λ i j,
             if Nat.eq_dec i k then mat_el A i j
             else (mat_el A i j * dd)%Srng)
             (mat_nrows A) (mat_ncols A)
         in
+*)
         let d := (d * dd)%Srng in
         (* Si k≠r alors  Échanger les lignes k et r *)
         let A :=
@@ -335,8 +337,9 @@ Fixpoint gauss_jordan_loop lt abs (A : matrix T) d r oj :=
             (de façon à annuler A[i,j]) *)
         let A :=
           mk_mat (λ i' j',
-            if Nat.eq_dec i' (r - 1) then mat_el A i' j'
-            else (mat_el A i' j' - mat_el A (r - 1) j' * mat_el A i' j)%Rng)
+            if Nat.eq_dec i' (r - 1) then (mat_el A i' j' * dd)%Srng
+            else
+              (mat_el A i' j' * dd - mat_el A i' j * mat_el A (r - 1) j')%Rng)
             (mat_nrows A) (mat_ncols A)
         in
 (A, d)
