@@ -64,10 +64,9 @@ Section in_ring.
 
 Context {T : Type}.
 Context {ro : ring_op T}.
-Context (so := rng_semiring).
-Context {sp : @semiring_prop T (@rng_semiring T ro)}.
-Context {rp : @ring_prop T ro}.
-Existing Instance so.
+Context (so : semiring_op T).
+Context {sp : semiring_prop T}.
+Context {rp : ring_prop T}.
 
 (* addition *)
 
@@ -193,10 +192,9 @@ Section in_ring.
 
 Context {T : Type}.
 Context {ro : ring_op T}.
-Context (so := rng_semiring).
-Context {sp : @semiring_prop T (@rng_semiring T ro)}.
-Context {rp : @ring_prop T ro}.
-Existing Instance so.
+Context (so : semiring_op T).
+Context {sp : semiring_prop T}.
+Context {rp : ring_prop T}.
 
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
@@ -204,13 +202,16 @@ Delimit Scope M_scope with M.
 Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.
 Notation "A * B" := (mat_mul A B) : M_scope.
-Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
+Notation "μ × A" := (mat_mul_scal_l _ μ A) (at level 40) : M_scope.
 Notation "- A" := (mat_opp A) : M_scope.
 
-Arguments det_loop {T ro} M%M n%nat.
+Arguments det_loop {T ro so} M%M n%nat.
+Arguments mat_mul_scal_l {T so} _ M%M.
 Arguments mat_nrows {T} m%M.
 Arguments mat_ncols {T} m%M.
-Arguments determinant {T ro} M%M.
+Arguments mI {T so} n%nat.
+Arguments minus_one_pow {T ro so}.
+Arguments determinant {T ro so} M%M.
 Arguments subm {T} M%M i%nat j%nat.
 
 (* comatrix *)
@@ -262,7 +263,7 @@ destruct (Nat.eq_dec i k) as [Hik| Hik]. {
   cbn - [ iter_seq ]; subst sn.
   destruct i. {
     clear Hi.
-    apply srng_summation_eq_compat.
+    apply srng_summation_eq_compat; [ easy | ].
     intros i Hi.
     rewrite Nat.add_0_l.
     rewrite srng_mul_comm.
@@ -353,10 +354,12 @@ destruct n. {
   repeat rewrite srng_add_0_l.
   repeat rewrite srng_mul_1_l.
   repeat rewrite srng_mul_1_r.
-  unfold so; cbn.
+  cbn.
 Abort. (* on verra plus tard *)
 
 (* combinations of submatrix and other *)
+
+...
 
 Theorem submatrix_sub : ∀ (MA MB : matrix T) i j,
   subm (MA - MB)%M i j = (subm MA i j - subm MB i j)%M.
