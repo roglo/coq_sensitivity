@@ -349,29 +349,37 @@ Open Scope Z_scope.
 Existing Instance Z_ring_op.
 Existing Instance Z_semiring_op.
 Existing Instance Z_sring_dec_prop.
+Definition Z_gauss_jordan := gauss_jordan Z.ltb Z.abs.
 Definition ex :=
   mat_of_list_list 0 [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]].
-Compute let r := gauss_jordan Z.ltb Z.abs ex in (list_list_of_mat (fst r), snd r).
+Compute let r := Z_gauss_jordan ex in (list_list_of_mat (fst r), snd r).
 (*
      = ([[48; 0; 0]; [0; 48; 0]; [0; 0; 48]], 48)
 *)
 Definition ex2 :=
   mat_of_list_list 0 [[1;3;1;9];[1;1;-1;1];[3;11;5;35]].
-Compute let r := gauss_jordan Z.ltb Z.abs ex2 in (list_list_of_mat (fst r), snd r).
+Compute let r := Z_gauss_jordan ex2 in (list_list_of_mat (fst r), snd r).
 (*
      = ([[-24; 0; 48; 72]; [0; -24; -24; -96]; [0; 0; 0; 0]], -24)
 *)
 Definition ex3 :=
   mat_of_list_list 0 [[2;1;-1;8];[-3;-1;2;-11];[-2;1;2;-3]].
-Compute let r := gauss_jordan Z.ltb Z.abs ex3 in (list_list_of_mat (fst r), snd r).
+Compute let r := Z_gauss_jordan ex3 in (list_list_of_mat (fst r), snd r).
 (*
      = ([[45; 0; 0; 90]; [0; 45; 0; 135]; [0; 0; 45; -45]], 45)
 *)
 Definition ex4 :=
   mat_of_list_list 0 [[2;-1;0;1;0;0];[-1;2;-1;0;1;0];[0;-1;2;0;0;1]].
-Compute let r := gauss_jordan Z.ltb Z.abs ex4 in (list_list_of_mat (fst r), snd r).
+Compute let r := Z_gauss_jordan ex4 in (list_list_of_mat (fst r), snd r).
 (*
      = ([[48; 0; 0; 36; 24; 12];
          [0; 48; 0; 24; 48; 24];
          [0; 0; 48; 12; 24; 36]], 48)
+*)
+Definition ex5 :=
+  mat_of_list_list 0 [[5;2;1;0];[-7;-3;0;1]].
+Compute let r := Z_gauss_jordan ex5 in (list_list_of_mat (fst r), snd r).
+(*
+     = ([[-7; 0; -21; -14]; [0; -7; 49; 35]], -7)
+     = ([[1; 0; 3; 2]; [0; 1; -7; -5]], -7)
 *)
