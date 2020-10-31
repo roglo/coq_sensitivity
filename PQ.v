@@ -1393,7 +1393,6 @@ Theorem PQred_eq : ∀ x, (PQred x == x)%PQ.
 Proof.
 intros (xn, xd).
 unfold PQred; simpl.
-(**)
 remember (ggcd (xn + 1) (xd + 1)) as g eqn:Hg; symmetry in Hg.
 destruct g as (g, (aa, bb)).
 unfold "=="%PQ, nd; simpl.
@@ -1616,7 +1615,6 @@ destruct a.
    rewrite Ha; apply Nat_gcd_le_r.
    now rewrite Nat.add_1_r.
  }
-(**)
  do 2 (rewrite Nat.sub_add; [ | do 2 rewrite Nat.add_1_r; simpl; flia ]).
  rewrite Nat.sub_add. 2: {
    do 4 rewrite Nat.add_1_r.
@@ -1645,7 +1643,6 @@ destruct a.
  +rewrite Nat.sub_add.
   *rewrite Nat.sub_add; [ | easy ].
    do 2 rewrite Nat.add_1_r.
-...
    eapply Nat.le_trans; [ | apply Nat_mul_le_pos_r; flia ].
    do 2 rewrite Nat.add_1_r in Ha.
    rewrite <- Nat.divide_div_mul_exact; [ | easy | ].

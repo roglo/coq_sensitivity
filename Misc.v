@@ -728,6 +728,77 @@ apply Nat.add_le_mono_l.
 now apply Nat.lt_le_incl, Nat.mod_upper_bound.
 Qed.
 
+Theorem Nat_div_interv : ∀ n a b,
+  n * b ≤ a < (n + 1) * b
+  → a / b = n.
+Proof.
+intros * Hn.
+revert a b Hn.
+induction n; intros.
+-rewrite Nat.mul_0_l, Nat.mul_1_l in Hn.
+ now apply Nat.div_small.
+-specialize (IHn (a - b) b) as H1.
+ assert (H : n * b ≤ a - b < (n + 1) * b). {
+   destruct Hn as (H2, H3).
+   assert (Hba : b ≤ a). {
+     eapply Nat.le_trans; [ | apply H2 ].
+     apply Nat.le_add_r.
+   }
+   split.
+   -apply (Nat.add_le_mono_r _ _ b).
+    replace (n * b + b) with (S n * b) by apply Nat.add_comm.
+    rewrite Nat.sub_add; [ apply H2 | easy ].
+   -apply (Nat.add_lt_mono_r _ _ b).
+    rewrite Nat.sub_add; [ | easy ].
+    rewrite Nat.add_1_r in H3; cbn in H3.
+    rewrite Nat.add_1_r; cbn.
+    now rewrite Nat.add_assoc, Nat.add_shuffle0 in H3.
+ }
+ specialize (H1 H); clear H.
+ assert (H : b ≤ a). {
+   apply (Nat.mul_le_mono_pos_l _ _ (S n)); [ apply Nat.lt_0_succ | ].
+   eapply le_trans; [ apply Hn | apply Nat.le_add_r ].
+ }
+ destruct b.
+ +now do 2 rewrite Nat.mul_0_r in Hn.
+ +replace a with (S b + (a - S b)); cycle 1. {
+    rewrite Nat.add_sub_assoc; [ | easy ].
+    now rewrite Nat.add_comm, Nat.add_sub.
+  }
+  rewrite Nat_div_add_same_l; [ | easy ].
+  rewrite Nat.add_1_l.
+  now f_equal.
+Qed.
+
+Theorem Nat_le_add_l : ∀ a b, b ≤ a + b.
+Proof.
+intros.
+replace b with (0 + b) at 1 by easy.
+apply Nat.add_le_mono_r.
+apply Nat.le_0_l.
+Qed.
+
+Theorem Nat_mul_sub_div_le : ∀ a b c,
+  c ≤ a * b
+  → (a * b - c) / b ≤ a.
+Proof.
+intros * Hc.
+destruct (zerop b) as [Hb| Hb]. {
+  subst b; cbn; apply Nat.le_0_l.
+}
+apply Nat.neq_0_lt_0 in Hb.
+remember (a * b - c) as d eqn:Hd.
+assert (H1 : a = (c + d) / b). {
+  rewrite Hd.
+  rewrite Nat.add_sub_assoc; [ | easy ].
+  rewrite Nat.add_comm, Nat.add_sub.
+  now rewrite Nat.div_mul.
+}
+rewrite H1.
+apply Nat.div_le_mono; [ easy | ].
+apply Nat_le_add_l.
+Qed.
+
 Theorem Nat_mod_less_small : ∀ n a b,
   n * b ≤ a < (n + 1) * b
   → a mod b = a - n * b.
@@ -1152,6 +1223,20 @@ rewrite Nat.mul_mod_idemp_l; [ | easy ].
 rewrite <- Nat.mul_mod_idemp_r; [ | easy ].
 rewrite IHc; [ | easy ].
 now rewrite Nat.mul_mod_idemp_r.
+Qed.
+
+Theorem Nat_mul_le_pos_l : ∀ a b, 1 ≤ a → b ≤ a * b.
+Proof.
+intros * Ha.
+replace b with (1 * b) at 1 by apply Nat.mul_1_l.
+apply Nat.mul_le_mono_nonneg_r; [ apply Nat.le_0_l | easy ].
+Qed.
+
+Theorem Nat_mul_le_pos_r : ∀ a b, 1 ≤ b → a ≤ a * b.
+Proof.
+intros * Ha.
+replace a with (a * 1) at 1 by apply Nat.mul_1_r.
+apply Nat.mul_le_mono_nonneg_l; [ apply Nat.le_0_l | easy ].
 Qed.
 
 Notation "a ≡ b 'mod' c" := (a mod c = b mod c) (at level 70, b at level 36).

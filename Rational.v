@@ -2503,7 +2503,7 @@ unfold intg in Hx2; cbn in Hx2; cbn.
 rewrite (GQnum_den x).
 apply (GQlt_pair _ _ 1 1); [ easy | easy | easy | easy | ].
 do 2 rewrite Nat.mul_1_r.
-now apply Nat_div_small_iff.
+now apply Nat.div_small_iff.
 Qed.
 
 Theorem intg_of_frac : ∀ x, intg (frac x) = 0.
@@ -2918,7 +2918,7 @@ symmetry in H4; rewrite Nat.sub_diag in H4.
 now apply Nat.eq_add_0 in H4.
 Qed.
 
-(** * Summation *)
+(** * Summation
 
 Definition ord_ring_def :=
   {| rng_t := Q;
@@ -3098,7 +3098,10 @@ rewrite (sub_pair_pos 1 1); [ | flia | now apply Nat.pow_nonzero | ]; cycle 1. {
 }
 now do 2 rewrite Nat.mul_1_l.
 Qed.
+*)
 
 End Q.
 
+(*
 Canonical Structure Q.ord_ring_def.
+*)
