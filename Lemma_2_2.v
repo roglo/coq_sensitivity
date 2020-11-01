@@ -178,31 +178,29 @@ destruct i. {
 }
 destruct i; [ | flia Hi ].
 destruct j; cbn. {
-...
-  rewrite bmat_mul_1_l. 2: {
+  rewrite bmat_mul_1_l; [ | easy | ]. 2: {
     apply bmat_fit_for_add_IZ_A.
   }
-  rewrite bmat_mul_1_r. 2: {
+  rewrite bmat_mul_1_r; [ | easy | ]. 2: {
     transitivity (A n); [ | apply bmat_fit_for_add_opp_r ].
     apply bmat_fit_for_add_IZ_A.
   }
-  rewrite bmat_add_0_l.
-  rewrite bmat_add_opp_r.
-  rewrite bmat_nat_mul_l_succ.
+  rewrite bmat_add_0_l; [ | easy ].
+  rewrite bmat_add_opp_r; [ | easy | easy ].
+  rewrite bmat_nat_mul_l_succ; [ | easy ].
   rewrite fold_Z_2_pow.
-  rewrite bmat_nat_mul_0_r.
-  rewrite old_bmat_add_0_r; [ | easy ].
+  rewrite bmat_nat_mul_0_r; [ | easy ].
+  rewrite old_bmat_add_0_r; [ | easy | easy ].
   now apply bmat_zero_like_A_eq_Z.
 }
 destruct j; [ cbn | flia Hj ].
-unfold so.
-rewrite bmat_mul_1_l; [ | easy ].
-rewrite bmat_mul_sqr_opp; [ | apply A_is_square_bmat ].
-rewrite bmat_nat_mul_l_succ.
+rewrite bmat_mul_1_l; [ | easy | easy ].
+rewrite bmat_mul_sqr_opp; [ | easy | easy | apply A_is_square_bmat ].
+rewrite bmat_nat_mul_l_succ; [ | easy ].
 rewrite <- IHn.
 rewrite bmat_zero_like_A_eq_Z.
-rewrite old_bmat_add_0_l; [ | apply bmat_fit_for_add_IZ_IZ ].
-apply bmat_add_comm.
+rewrite old_bmat_add_0_l; [ | easy | apply bmat_fit_for_add_IZ_IZ ].
+apply bmat_add_comm; [ easy | ].
 transitivity (A n). 2: {
   apply (is_square_bmat_fit_for_add (sizes_of_bmatrix (A n))). {
     apply A_is_square_bmat.
@@ -409,6 +407,7 @@ Definition fld_div T {F : field_op T} (ro := fld_ring) {so : semiring_op T}
 Declare Scope field_scope.
 
 Delimit Scope field_scope with F.
+...
 Notation "0" := (@srng_zero _ rng_semiring) : field_scope.
 Notation "1" := (@srng_one _ rng_semiring) : field_scope.
 Notation "- a" := (@rng_opp _ _ a) : field_scope.
