@@ -236,8 +236,11 @@ Definition to_decimal_int (q : Q) : option Decimal.int :=
   | Neg gq => option_map Decimal.Neg (to_decimal_uint gq)
   end.
 
+(* deprecated since 8.12 *)
 Numeral Notation Q of_decimal_int to_decimal_int : Q_scope
   (abstract after 5001).
+
+...
 
 End Notations.
 
