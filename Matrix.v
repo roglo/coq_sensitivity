@@ -64,9 +64,10 @@ Section in_ring.
 
 Context {T : Type}.
 Context {ro : ring_op T}.
-Context (so : semiring_op T).
-Context {sp : semiring_prop T}.
-Context {rp : ring_prop T}.
+Context (so := rng_semiring).
+Context {sp : @semiring_prop T (@rng_semiring T ro)}.
+Context {rp : @ring_prop T ro}.
+Existing Instance so.
 
 (* addition *)
 
@@ -192,28 +193,25 @@ Section in_ring.
 
 Context {T : Type}.
 Context {ro : ring_op T}.
-Context (so : semiring_op T).
-Context {sp : semiring_prop T}.
-Context {rp : ring_prop T}.
+Context (so := rng_semiring).
+Context {sp : @semiring_prop T (@rng_semiring T ro)}.
+Context {rp : @ring_prop T ro}.
+Existing Instance so.
 
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
-
-Arguments det_loop {T ro so} M%M n%nat.
-Arguments mat_mul_scal_l {T so} _ M%M.
-Arguments mat_nrows {T} m%M.
-Arguments mat_ncols {T} m%M.
-Arguments mat_sub {T ro so} MA%M MB%M.
-Arguments mI {T so} n%nat.
-Arguments minus_one_pow {T ro so}.
-Arguments determinant {T ro so} M%M.
-Arguments subm {T} M%M i%nat j%nat.
 
 Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.
 Notation "A * B" := (mat_mul A B) : M_scope.
 Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
 Notation "- A" := (mat_opp A) : M_scope.
+
+Arguments det_loop {T ro} M%M n%nat.
+Arguments mat_nrows {T} m%M.
+Arguments mat_ncols {T} m%M.
+Arguments determinant {T ro} M%M.
+Arguments subm {T} M%M i%nat j%nat.
 
 (* comatrix *)
 
@@ -231,7 +229,7 @@ Definition mat_transp (M : matrix T) :=
 
 (* M × t(com(M)) = det(M) × I *)
 
-Theorem matrix_mul_transp_com : ∀ (M : matrix T),
+Theorem matrix_mul_transp_com : ∀ M,
   is_square_mat M
   → (M * mat_transp (comatrix M) = determinant M × mI (mat_nrows M))%M.
 Proof.
@@ -264,7 +262,7 @@ destruct (Nat.eq_dec i k) as [Hik| Hik]. {
   cbn - [ iter_seq ]; subst sn.
   destruct i. {
     clear Hi.
-    apply srng_summation_eq_compat; [ easy | ].
+    apply srng_summation_eq_compat.
     intros i Hi.
     rewrite Nat.add_0_l.
     rewrite srng_mul_comm.
@@ -355,7 +353,7 @@ destruct n. {
   repeat rewrite srng_add_0_l.
   repeat rewrite srng_mul_1_l.
   repeat rewrite srng_mul_1_r.
-  cbn.
+  unfold so; cbn.
 Abort. (* on verra plus tard *)
 
 (* combinations of submatrix and other *)
@@ -427,15 +425,12 @@ Section in_ring.
 
 Context {T : Type}.
 Context {ro : ring_op T}.
-Context (so : semiring_op T).
-Context {sp : semiring_prop T}.
-Context {rp : ring_prop T}.
+Context (so := rng_semiring).
+Context {sp : @semiring_prop T (@rng_semiring T ro)}.
+Context {rp : @ring_prop T ro}.
+Existing Instance so.
 
-Arguments det_loop {T ro so} M n%nat.
-Arguments determinant {T ro so} M.
-
-Theorem fold_determinant :
-  ∀ T {ro : ring_op T} {so : semiring_op T} (M : matrix T),
+Theorem fold_determinant : ∀ T {ro : ring_op T} (M : matrix T),
   det_loop M (mat_nrows M) = determinant M.
 Proof. easy. Qed.
 
@@ -445,16 +440,6 @@ Module matrix_Notations.
 
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
-
-Arguments det_loop {T ro so} M%M n%nat.
-Arguments mat_mul_scal_l {T so} _ M%M.
-Arguments mat_nrows {T} m%M.
-Arguments mat_ncols {T} m%M.
-Arguments mat_sub {T ro so} MA%M MB%M.
-Arguments mI {T so} n%nat.
-Arguments minus_one_pow {T ro so}.
-Arguments determinant {T ro so} M%M.
-Arguments subm {T} M%M i%nat j%nat.
 
 Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.

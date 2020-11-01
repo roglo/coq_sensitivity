@@ -16,11 +16,12 @@ Section in_ring.
 
 Context {T : Type}.
 Context {ro : ring_op T}.
-Context (so : semiring_op T).
-Context {sp : semiring_prop T}.
-Context {rp : ring_prop T}.
-Context {sdp : sring_dec_prop T}.
-Context {acp : algeb_closed_prop}.
+Context (so := rng_semiring).
+Context {sp : @semiring_prop T (@rng_semiring T ro)}.
+Context {rp : @ring_prop T ro}.
+Context {sdp : @sring_dec_prop T so}.
+Context {acp : @algeb_closed_prop T so sdp}.
+Existing Instance so.
 Existing Instance polyn_semiring_op.
 Existing Instance polyn_ring_op.
 Existing Instance polyn_semiring_prop.
@@ -84,7 +85,7 @@ Theorem polyn_degree_mat_el_xI_sub_M_0_0 : ∀ M,
 Proof.
 intros.
 rewrite mat_el_xI_sub_M.
-apply polyn_degree_1; [ easy | ].
+apply polyn_degree_1.
 rewrite polyn_degree_opp.
 apply polyn_degree_of_const.
 Qed.
@@ -147,11 +148,7 @@ Theorem polyn_degree_mat_el_subm_subm_xI_sub_M_0_succ_0_0 : ∀ M i,
 Proof.
 intros; cbn.
 rewrite srng_mul_1_r.
-(* loops...
 specialize (polyn_of_list_repeat_0s 1) as H.
-*)
-specialize @polyn_of_list_repeat_0s as H.
-specialize (H T so sdp 1).
 cbn in H; rewrite H; clear H.
 rewrite srng_mul_0_r, srng_add_0_l.
 destruct (lt_dec 1 (S i)) as [H1i| H1i]. {
@@ -160,7 +157,7 @@ destruct (lt_dec 1 (S i)) as [H1i| H1i]. {
   rewrite polyn_degree_of_const.
   apply Nat.le_0_l.
 }
-rewrite polyn_degree_1; [ easy | easy | ].
+rewrite polyn_degree_1; [ easy | ].
 rewrite polyn_degree_opp.
 rewrite fold_polyn_of_const.
 now rewrite polyn_degree_of_const.
@@ -203,30 +200,26 @@ induction l as [| m]; intros. {
   cbn.
   destruct (lt_dec j i) as [Hji| Hji]. {
     destruct (Nat.eq_dec (k + 1) j) as [Hkj| Hkj]. {
-      rewrite polyn_mul_1_r; [ | easy ].
-      rewrite polyn_degree_1; [ easy | easy | ].
+      rewrite polyn_mul_1_r.
+      rewrite polyn_degree_1; [ easy | ].
       rewrite polyn_degree_opp.
       rewrite fold_polyn_of_const.
       now rewrite polyn_degree_of_const.
     }
-    rewrite polyn_of_list_0.
-    rewrite polyn_mul_0_r; [ | easy ].
-    rewrite polyn_add_0_l.
+    rewrite polyn_of_list_0, polyn_mul_0_r, polyn_add_0_l.
     rewrite polyn_degree_opp.
     rewrite fold_polyn_of_const.
     rewrite polyn_degree_of_const.
     apply Nat.le_0_l.
   }
   destruct (Nat.eq_dec (k + 1) (j + 1)) as [Hkj| Hkj]. {
-    rewrite polyn_mul_1_r; [ | easy ].
-    rewrite polyn_degree_1; [ easy | easy | ].
+    rewrite polyn_mul_1_r.
+    rewrite polyn_degree_1; [ easy | ].
     rewrite polyn_degree_opp.
     rewrite fold_polyn_of_const.
     now rewrite polyn_degree_of_const.
   }
-  rewrite polyn_of_list_0.
-  rewrite polyn_mul_0_r; [ | easy ].
-  rewrite polyn_add_0_l.
+  rewrite polyn_of_list_0, polyn_mul_0_r, polyn_add_0_l.
   rewrite polyn_degree_opp.
   rewrite fold_polyn_of_const.
   rewrite polyn_degree_of_const.
@@ -237,13 +230,8 @@ destruct (lt_dec j m) as [Hjm| Hjm]; [ apply IHl | ].
 apply IHl.
 Qed.
 
-(* loops...
 Theorem polyn_degree_minus_one_pow : ∀ i,
   polyn_degree (minus_one_pow i) = 0.
-*)
-
-Theorem polyn_degree_minus_one_pow : ∀ i,
-  polyn_degree (@minus_one_pow (polynomial T) _ _ i) = 0.
 Proof.
 intros.
 unfold polyn_degree.
@@ -252,14 +240,8 @@ unfold minus_one_pow.
 now destruct (i mod 2); cbn; rewrite if_1_eq_0.
 Qed.
 
-(* loops...
 Theorem polyn_coeff_minus_one_pow : ∀ i,
   polyn_coeff (minus_one_pow i) 0 = minus_one_pow i.
-*)
-
-Theorem polyn_coeff_minus_one_pow : ∀ i,
-  polyn_coeff (@minus_one_pow (polynomial _) _ _ i) 0 =
-  @minus_one_pow (polynomial _) _ _ i.
 Proof.
 intros.
 unfold minus_one_pow.

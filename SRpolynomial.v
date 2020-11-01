@@ -71,11 +71,12 @@ Section in_ring.
 
 Context {T : Type}.
 Context {ro : ring_op T}.
-Context (so : semiring_op T).
-Context {sp : semiring_prop T}.
-Context {rp : ring_prop T}.
-Context {sdp : sring_dec_prop T}.
-Context {acp : algeb_closed_prop}.
+Context (so := rng_semiring).
+Context {sp : @semiring_prop T (@rng_semiring T ro)}.
+Context {rp : @ring_prop T ro}.
+Context {sdp : @sring_dec_prop T so}.
+Context {acp : @algeb_closed_prop T so sdp}.
+Existing Instance so.
 
 Theorem fold_eval_polyn_list : ∀ la (x : T),
   fold_right (λ a acc, (acc * x + a)%Srng) 0%Srng la = eval_polyn_list la x.
@@ -199,6 +200,7 @@ clear p.
 destruct (srng_eq_dec (- nth len l 0%Srng)%Rng 0%Srng) as [H| H]; [ | easy ].
 rewrite <- rng_opp_involutive in H.
 apply rng_opp_inj in H.
+unfold so in H.
 now rewrite rng_opp_0 in H.
 Qed.
 
@@ -289,7 +291,8 @@ Definition polyn_semiring_op : semiring_op (polynomial T) :=
      srng_mul := polyn_mul |}.
 
 Definition polyn_ring_op : ring_op (polynomial T) :=
-  {| rng_opp := polyn_opp |}.
+  {| rng_semiring := polyn_semiring_op;
+     rng_opp := polyn_opp |}.
 
 Existing Instance polyn_semiring_op.
 Existing Instance polyn_ring_op.
@@ -340,10 +343,12 @@ intros.
 apply polyn_eq; cbn.
 destruct (srng_eq_dec c 0) as [Hcz| Hcz]. {
   rewrite Hcz.
+  unfold so.
   now rewrite rng_opp_0, if_0_eq_0.
 }
 destruct (srng_eq_dec (- c)%Rng 0) as [Hocz| Hocz]; [ | easy ].
 apply (f_equal rng_opp) in Hocz.
+unfold so in Hocz.
 now rewrite rng_opp_involutive, rng_opp_0 in Hocz.
 Qed.
 
@@ -668,9 +673,9 @@ Theorem polyn_list_convol_mul_comm : ∀ la lb i,
   polyn_list_convol_mul la lb i = polyn_list_convol_mul lb la i.
 Proof.
 intros.
-unfold polyn_list_convol_mul.
-rewrite srng_summation_rtl; [ | easy ].
-apply srng_summation_eq_compat; [ easy | ].
+unfold polyn_list_convol_mul, so.
+rewrite srng_summation_rtl.
+apply srng_summation_eq_compat.
 intros j Hj.
 rewrite srng_mul_comm.
 rewrite Nat.add_0_r.
@@ -713,7 +718,7 @@ Theorem polyn_list_convol_mul_0_l : ∀ n la i,
 Proof.
 intros.
 unfold polyn_list_convol_mul.
-apply all_0_srng_summation_0; [ easy | ].
+apply all_0_srng_summation_0.
 intros j ahj.
 remember (@srng_zero T so) as z.
 replace (nth j (repeat z n) z) with z; subst z. 2: {
@@ -774,8 +779,9 @@ intros.
 unfold polyn_list_convol_mul.
 apply map_ext_in.
 intros i Hi.
-rewrite srng_summation_rtl; [ | easy ].
-apply srng_summation_eq_compat; [ easy | ].
+unfold so.
+rewrite srng_summation_rtl.
+apply srng_summation_eq_compat.
 intros j Hj.
 rewrite Nat.add_0_r.
 rewrite Nat_sub_sub_distr; [ | easy ].
@@ -830,11 +836,12 @@ destruct n; [ easy | ].
 cbn - [ nth seq sub ].
 rewrite srng_add_comm.
 replace (S n - 1) with n by flia.
+unfold so.
 rewrite srng_summation_split_last; [ | apply Nat.le_0_l ].
 rewrite Nat.sub_diag.
 f_equal.
 rewrite srng_summation_succ_succ.
-apply srng_summation_eq_compat; [ easy | ].
+apply srng_summation_eq_compat.
 intros i Hi.
 rewrite Nat.sub_succ, Nat.sub_0_r.
 f_equal.
@@ -861,7 +868,7 @@ apply map_ext_in.
 intros i Hi.
 apply in_seq in Hi.
 destruct (zerop i) as [H| H]; [ flia Hi H | ].
-apply srng_summation_eq_compat; [ easy | ].
+apply srng_summation_eq_compat.
 intros j Hj.
 now rewrite Nat_sub_sub_swap.
 Qed.
@@ -896,8 +903,9 @@ unfold polyn_list_convol_mul.
 apply map_ext_in.
 intros i Hi.
 destruct i; [ cbn; apply srng_add_0_l | ].
-rewrite srng_summation_split_first; [ | easy | apply Nat.le_0_l ].
-rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+unfold so.
+rewrite srng_summation_split_first; [ | apply Nat.le_0_l ].
+rewrite all_0_srng_summation_0. 2: {
   intros j Hj.
   destruct j; [ easy | cbn ].
   rewrite List_nth_repeat.
@@ -975,7 +983,8 @@ rewrite norm_polyn_list_app.
 rewrite <- IHn.
 cbn - [ norm_polyn_list nth seq sub ].
 unfold polyn_list_convol_mul at 2.
-rewrite all_0_srng_summation_0; [ now cbn; rewrite if_0_eq_0 | easy | ].
+unfold so.
+rewrite all_0_srng_summation_0; [ now cbn; rewrite if_0_eq_0 | ].
 intros j (_, Hj).
 destruct (le_dec (length la) j) as [H1| H1]. {
   rewrite nth_overflow; [ | easy ].
@@ -1071,7 +1080,7 @@ assert
      polyn_list_convol_mul la lb i =
      polyn_list_convol_mul (la ++ [0%Srng]) lb i). {
   unfold polyn_list_convol_mul.
-  apply srng_summation_eq_compat; [ easy | ].
+  apply srng_summation_eq_compat.
   intros j Hj.
   destruct (lt_dec j (length la)) as [Hjla| Hjla]. {
     now rewrite app_nth1.
@@ -1216,10 +1225,11 @@ replace (map _ _) with (map (λ i, nth i la 0%Srng) (seq 0 (length la))). 2: {
   intros j Hj.
   apply in_seq in Hj.
   unfold polyn_list_convol_mul.
-  rewrite srng_summation_split_first; [ | easy | easy ].
+  unfold so.
+  rewrite srng_summation_split_first; [ | easy ].
   unfold nth at 2.
   rewrite srng_mul_1_l, Nat.sub_0_r.
-  rewrite all_0_srng_summation_0; [ now rewrite srng_add_0_r | easy | ].
+  rewrite all_0_srng_summation_0; [ now rewrite srng_add_0_r | ].
   intros i Hi.
   destruct i; [ flia Hi | ].
   now destruct i; cbn; rewrite srng_mul_0_l.
@@ -1366,13 +1376,14 @@ rewrite (Nat.add_comm i).
 cbn - [ nth ]; f_equal.
 rewrite Nat.sub_0_r.
 do 2 rewrite srng_add_0_l.
-do 2 (rewrite fold_left_srng_add_fun_from_0; [ symmetry | easy ]).
+unfold so.
+do 2 (rewrite fold_left_srng_add_fun_from_0; symmetry).
 f_equal. {
   f_equal.
   apply list_polyn_nth_add.
 }
 replace i with (S i - 1) at 1 2 by flia.
-apply srng_summation_eq_compat; [ easy | ].
+apply srng_summation_eq_compat.
 intros j Hj.
 now rewrite list_polyn_nth_add.
 Qed.
@@ -1388,8 +1399,9 @@ induction len; intros; [ easy | ].
 cbn - [ nth sub ].
 rewrite IHlen; f_equal.
 unfold polyn_list_convol_mul.
-rewrite <- srng_summation_add_distr; [ | easy ].
-apply srng_summation_eq_compat; [ easy | ]; intros j (_, Hj).
+unfold so.
+rewrite <- srng_summation_add_distr.
+apply srng_summation_eq_compat; intros j (_, Hj).
 now rewrite srng_mul_add_distr_l.
 Qed.
 
@@ -1634,7 +1646,7 @@ intros la lb n i len Hlen.
 revert la lb i n Hlen.
 induction len; intros. {
   rewrite Nat.add_0_r in Hlen.
-  rewrite all_0_srng_summation_0; [ now destruct n | easy | ].
+  rewrite all_0_srng_summation_0; [ now destruct n | ].
   intros j (_, Hj).
   destruct (le_dec (length la) j) as [H1| H1]. {
     rewrite nth_overflow; [ | easy ].
@@ -1680,8 +1692,7 @@ Theorem srng_summation_mul_polyn_list_nth_map_list_convol_mul : ∀ la lb lc k,
        List.nth j lb 0 * List.nth (k - i - j) lc 0)%Rng.
 Proof.
 intros la lb lc k.
-apply srng_summation_eq_compat; [ easy | ].
-intros i (_, Hi).
+apply srng_summation_eq_compat; intros i (_, Hi).
 f_equal.
 now rewrite list_nth_polyn_list_convol_mul.
 Qed.
@@ -1698,9 +1709,8 @@ Theorem srng_summation_mul_polyn_list_nth_map_list_convol_mul_2 : ∀ la lb lc k
         List.nth j la 0 * List.nth (i - j) lb 0)%Rng.
 Proof.
 intros la lb lc k.
-rewrite srng_summation_rtl; [ | easy ].
-apply srng_summation_eq_compat; [ easy | ].
-intros i (_, Hi).
+rewrite srng_summation_rtl.
+apply srng_summation_eq_compat; intros i (_, Hi).
 rewrite Nat.add_0_r.
 f_equal.
 rewrite Nat_sub_sub_distr; [ | easy ].
@@ -1722,8 +1732,8 @@ induction len; intros; [ easy | ].
 rewrite List_seq_succ_r.
 do 2 rewrite fold_left_app.
 rewrite IHlen.
-rewrite fold_left_srng_add_fun_from_0; [ symmetry | easy ].
-rewrite fold_left_srng_add_fun_from_0; [ symmetry | easy ].
+rewrite fold_left_srng_add_fun_from_0; symmetry.
+rewrite fold_left_srng_add_fun_from_0; symmetry.
 apply srng_add_compat_l.
 cbn; do 2 rewrite srng_add_0_l.
 destruct (zerop (b2 + g1 (b1 + len))) as [Hz| Hz]. {
@@ -1736,7 +1746,7 @@ destruct (zerop (b2 + g1 (b1 + len))) as [Hz| Hz]. {
 rewrite fold_iter_seq_2; [ | easy ].
 rewrite fold_iter_seq_2; [ | easy ].
 symmetry.
-now apply srng_mul_summation_distr_l.
+apply srng_mul_summation_distr_l.
 Qed.
 
 Theorem srng_summation_summation_mul_swap : ∀ g1 (g2 : nat → T) g3 k,
@@ -1827,17 +1837,13 @@ destruct (lt_dec k len) as [Hklen| Hklen]. {
   rewrite srng_summation_mul_polyn_list_nth_map_list_convol_mul; symmetry.
   rewrite <- srng_summation_summation_mul_swap.
   rewrite <- srng_summation_summation_mul_swap.
-  rewrite srng_summation_summation_exch; [ | easy ].
-  rewrite srng_summation_summation_shift; [ | easy ].
-  apply srng_summation_eq_compat; [ easy | ].
-  intros i Hi.
-  apply srng_summation_eq_compat; [ easy | ].
-  intros j Hj.
+  rewrite srng_summation_summation_exch.
+  rewrite srng_summation_summation_shift.
+  apply srng_summation_eq_compat; intros i Hi.
+  apply srng_summation_eq_compat; intros j Hj.
   rewrite srng_mul_comm, srng_mul_assoc.
   rewrite Nat.add_comm, Nat.add_sub.
-  rewrite Nat.add_comm.
-  rewrite Nat.add_comm, Nat.sub_add_distr.
-  now rewrite Nat_sub_sub_swap.
+  now rewrite Nat.add_comm, Nat.sub_add_distr.
 }
 apply Nat.nlt_ge in Hklen.
 rewrite nth_overflow; [ | now rewrite map_length, seq_length ].
@@ -1879,6 +1885,7 @@ rewrite List_rev_repeat.
 rewrite rev_length.
 clear Hla.
 induction la as [| a]; [ easy | cbn ].
+unfold so.
 now rewrite rng_add_opp_l; f_equal.
 Qed.
 
@@ -2222,6 +2229,7 @@ destruct (srng_eq_dec c1 0) as [Hz| Hz]. {
   cbn - [ norm_polyn_list ].
   unfold norm_polyn_list at 1 3.
   cbn - [ norm_polyn_list ].
+  unfold so.
   rewrite if_0_eq_0.
   cbn - [ norm_polyn_list ].
   apply IHlc.
@@ -2231,6 +2239,7 @@ do 2 rewrite norm_polyn_list_app.
 cbn - [ norm_polyn_list ].
 unfold norm_polyn_list at 1 3.
 cbn - [ norm_polyn_list ].
+unfold so.
 now destruct (srng_eq_dec c1 0).
 Qed.
 
@@ -2473,7 +2482,7 @@ destruct (lt_dec i len) as [Hilen| Hilen]. 2: {
     now rewrite map_length, seq_length.
   }
   symmetry.
-  apply all_0_srng_summation_0; [ easy | ].
+  apply all_0_srng_summation_0.
   intros j Hj.
   destruct (lt_dec j (length la)) as [Hjla| Hjla]. 2: {
     apply Nat.nlt_ge in Hjla.
@@ -2489,7 +2498,7 @@ destruct (lt_dec i len) as [Hilen| Hilen]. 2: {
 }
 rewrite nth_norm_polyn_list_map; [ easy | ].
 intros j Hj.
-apply all_0_srng_summation_0; [ easy | ].
+apply all_0_srng_summation_0.
 intros k Hk.
 destruct (lt_dec k (length la)) as [Hka| Hka]. 2: {
   apply Nat.nlt_ge in Hka.
@@ -2529,7 +2538,6 @@ etransitivity; [ apply polyn_degree_add_ub | ].
 rewrite Nat.max_comm.
 apply Nat.max_le_compat_l.
 apply IHlen.
-apply polyn_semiring_prop.
 Qed.
 
 Theorem polyn_coeff_opp : ∀ P i,
@@ -2663,28 +2671,30 @@ rewrite norm_polyn_list_id. 2: {
   destruct (zerop (length la)) as [Hzla| Hzla]. {
     rewrite Hzla, Nat.add_0_l.
     apply length_zero_iff_nil in Hzla; subst la.
-    rewrite srng_summation_split_first; [ | easy | flia ].
+    unfold so.
+    rewrite srng_summation_split_first; [ | flia ].
     rewrite Nat.sub_0_r, <- List_hd_nth_0; unfold hd.
     rewrite <- List_last_nth_cons.
-    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+    rewrite all_0_srng_summation_0. 2: {
       intros i Hi.
       rewrite nth_overflow; [ | easy ].
       apply srng_mul_0_l.
     }
     now rewrite srng_add_0_r.
   }
-  rewrite srng_summation_split with (j := length la - 1); [ | easy | flia ].
-  rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+  unfold so.
+  rewrite (srng_summation_split (length la - 1)); [ | flia ].
+  rewrite all_0_srng_summation_0. 2: {
     intros i (_, Hi).
     rewrite (nth_overflow (b :: lb)); [ | cbn; flia Hi Hzla ].
     apply srng_mul_0_r.
   }
   rewrite srng_add_0_l.
   rewrite Nat.sub_add; [ | easy ].
-  rewrite srng_summation_split_first; [ | easy | flia ].
+  rewrite srng_summation_split_first; [ | flia ].
   rewrite Nat.add_comm, Nat.add_sub.
   do 2 rewrite <- List_last_nth_cons.
-  rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+  rewrite all_0_srng_summation_0. 2: {
     intros i Hi.
     rewrite nth_overflow; [ | easy ].
     apply srng_mul_0_l.
@@ -2730,7 +2740,7 @@ destruct la as [| a]. {
   unfold polyn_list_convol_mul.
   rewrite (proj1 (all_0_norm_polyn_list_map_0 _ _)); [ cbn; flia | ].
   intros i Hi; cbn in Hi.
-  apply all_0_srng_summation_0; [ easy | ].
+  apply all_0_srng_summation_0.
   intros j Hj.
   destruct j; cbn; apply srng_mul_0_l.
 }
@@ -2745,7 +2755,7 @@ destruct lb as [| b]. {
   unfold polyn_list_convol_mul.
   rewrite (proj1 (all_0_norm_polyn_list_map_0 _ _)); [ cbn; flia | ].
   intros i Hi.
-  apply all_0_srng_summation_0; [ easy | ].
+  apply all_0_srng_summation_0.
   intros j Hj.
   destruct (i - j); cbn; apply srng_mul_0_r.
 }
@@ -3151,7 +3161,8 @@ rewrite List_last_app.
 unfold polyn_list_convol_mul.
 do 2 rewrite List_last_nth.
 destruct la as [| a]. {
-  rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+  unfold so.
+  rewrite all_0_srng_summation_0. 2: {
     intros i Hi.
     rewrite nth_overflow; [ | cbn; flia ].
     apply srng_mul_0_l.
@@ -3160,7 +3171,8 @@ destruct la as [| a]. {
   apply srng_mul_0_l.
 }
 destruct lb as [| b]. {
-  rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+  unfold so.
+  rewrite all_0_srng_summation_0. 2: {
     intros i Hi.
     rewrite (nth_overflow []); [ | cbn; flia ].
     apply srng_mul_0_r.
@@ -3172,10 +3184,11 @@ cbn in Hlen.
 cbn - [ iter_seq nth ].
 do 2 rewrite Nat.sub_0_r.
 destruct la as [| a1]. {
+  unfold so.
   cbn in Hlen.
   apply Nat.succ_inj in Hlen.
-  rewrite srng_summation_split_first; [ | easy | flia ].
-  rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+  rewrite srng_summation_split_first; [ | flia ].
+  rewrite all_0_srng_summation_0. 2: {
     intros i Hi.
     destruct i; [ easy | ].
     rewrite nth_overflow; [ | cbn; flia ].
@@ -3188,17 +3201,18 @@ rewrite <- List_last_nth_cons.
 rewrite List_last_cons_cons.
 rewrite List_last_nth_cons.
 rewrite Nat.sub_0_r in Hlen; cbn in Hlen.
-rewrite srng_summation_split with (j := S (length la)); [ | easy | flia Hlen ].
-rewrite srng_summation_split with (j := length la); [ | easy | flia Hlen ].
-rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+unfold so.
+rewrite (srng_summation_split (S (length la))); [ | flia Hlen ].
+rewrite (srng_summation_split (length la)); [ | flia Hlen ].
+rewrite all_0_srng_summation_0. 2: {
   intros i Hi.
   rewrite (nth_overflow (b :: lb)); [ | cbn; flia Hlen Hi ].
   apply srng_mul_0_r.
 }
 rewrite srng_add_0_l.
 rewrite Nat.add_1_r.
-rewrite srng_summation_only_one; [ | easy ].
-rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+rewrite srng_summation_only_one.
+rewrite all_0_srng_summation_0. 2: {
   intros i Hi.
   rewrite (nth_overflow (a :: a1 :: la)); [ | cbn; flia Hlen Hi ].
   apply srng_mul_0_l.
@@ -3305,6 +3319,7 @@ replace la with (hd 0%Srng la :: tl la) at 3. 2: {
 }
 rewrite eval_polyn_list_cons.
 rewrite srng_add_comm.
+unfold so; cbn.
 rewrite rng_mul_opp_l.
 rewrite fold_rng_sub, rng_add_sub.
 destruct la as [| a]; [ cbn in Hn; flia Hn Hn2 | ].
@@ -3324,8 +3339,9 @@ rewrite (List_map_nth_in _ 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
 rewrite (Nat.add_1_l i).
 unfold polyn_list_convol_mul.
-rewrite srng_summation_split_first; [ | easy | apply Nat.le_0_l ].
-erewrite srng_summation_eq_compat; [ | easy | ]. 2: {
+unfold so.
+rewrite srng_summation_split_first; [ | apply Nat.le_0_l ].
+erewrite srng_summation_eq_compat. 2: {
   intros j Hj.
   rewrite (List_map_nth_in _ 0). 2: {
     rewrite seq_length.
@@ -3336,8 +3352,8 @@ erewrite srng_summation_eq_compat; [ | easy | ]. 2: {
 cbn - [ iter_seq nth sub ].
 remember (nth 0 _ _) as x; cbn in Heqx; subst x.
 rewrite Nat.sub_0_r.
-rewrite srng_summation_split_first; [ | easy | flia ].
-rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+rewrite srng_summation_split_first; [ | flia ].
+rewrite all_0_srng_summation_0. 2: {
   intros j Hj.
   rewrite nth_overflow; [ | easy ].
   apply srng_mul_0_l.
@@ -3409,6 +3425,7 @@ replace  ([0%Srng; 1%Srng] + map rng_opp (norm_polyn_list [c]))%PL
   cbn.
   destruct (srng_eq_dec c 0) as [Hcz| Hcz]. {
     subst c; cbn.
+    unfold so.
     now rewrite rng_opp_0.
   }
   cbn.
@@ -3486,7 +3503,7 @@ destruct (srng_eq_dec a2 0) as [H| H]; [ easy | clear H ].
 cbn; rewrite srng_add_0_l, srng_add_0_l; f_equal.
 rewrite srng_add_comm in Hr.
 apply rng_add_move_0_r in Hr; subst a1.
-symmetry.
+unfold so; symmetry.
 apply rng_mul_opp_r.
 Qed.
 
@@ -3509,8 +3526,10 @@ induction n; intros. {
   unfold polyn_highest_coeff.
   unfold polyn_coeff.
   rewrite Hn; cbn.
+  unfold so.
   rewrite polyn_mul_1_r.
   apply polyn_eq; cbn.
+  unfold so; cbn; fold so.
   destruct (srng_eq_dec (nth 0 (polyn_list P) 0%Srng) 0) as [Hpz| Hpz]. {
     destruct P as (la, Hla).
     destruct la as [| a]; [ easy | exfalso ].
@@ -3622,11 +3641,12 @@ assert (H : (polyn_of_const 0 = 0)%P). {
   apply polyn_eq; cbn.
   now rewrite if_0_eq_0.
 }
+unfold so in Hpqr.
 rewrite H in Hpqr; clear H.
 rewrite polyn_add_0_r in Hpqr.
 generalize Hpqr; intros Hpqr'.
 rewrite Hq in Hpqr.
-rewrite srng_product_split_first; [ | apply polyn_semiring_prop | flia ].
+rewrite srng_product_split_first; [ | flia ].
 rewrite Nat.sub_diag.
 remember (nth 0 _ _) as y eqn:Hy; cbn in Hy; subst y.
 rewrite srng_mul_comm, <- srng_mul_assoc.
@@ -3644,7 +3664,7 @@ cbn; subst y z; f_equal. {
     now rewrite Nat.sub_succ, Nat.sub_0_r.
   }
   do 2 rewrite fold_iter_seq.
-  apply srng_product_eq_compat; [ apply polyn_semiring_prop | ].
+  apply srng_product_eq_compat.
   intros i Hi.
   destruct i; [ easy | ].
   now rewrite Nat.sub_succ, Nat.sub_0_r.
@@ -3667,15 +3687,16 @@ rewrite polyn_degree_1. 2: {
   apply polyn_degree_of_const.
 }
 rewrite polyn_coeff_mul.
-rewrite srng_summation_split_first; [ | easy | apply Nat.le_0_l ].
+unfold so.
+rewrite srng_summation_split_first; [ | apply Nat.le_0_l ].
 rewrite (@polyn_coeff_overflow _ (1 + polyn_degree Q)); [ | flia ].
 rewrite srng_mul_0_r, srng_add_0_l.
-rewrite srng_summation_split_first; [ | easy | flia ].
+rewrite srng_summation_split_first; [ | flia ].
 rewrite <- polyn_of_opp_const.
 rewrite polyn_coeff_1_of_x_add_const.
 rewrite srng_mul_1_l.
 rewrite Nat.add_comm, Nat.add_sub.
-rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+rewrite all_0_srng_summation_0. 2: {
   intros i Hi.
   rewrite polyn_coeff_overflow. 2: {
     rewrite polyn_degree_1; [ easy | ].
@@ -3722,14 +3743,12 @@ Notation "'Π' ( i = b , e ) , g" :=
      polynomial_scope.
 *)
 
-Arguments _x {T so sdp}.
-Arguments is_monic_polyn {T so sdp} P%P.
-Arguments norm_polyn_list {T so sdp} l%PL.
+Arguments is_monic_polyn {T ro sdp} P%P.
+Arguments norm_polyn_list {T ro sdp} l%PL.
 Arguments polyn_coeff {T so sdp} P%P i%nat.
 Arguments polyn_degree {T so sdp} P%P.
-Arguments polyn_eq_dec {T so sdp} P%P Q%P.
-Arguments polyn_list_convol_mul {T so} la%PL lb%PL _%nat.
+Arguments polyn_eq_dec {T ro sdp} P%P Q%P.
+Arguments polyn_list_convol_mul {T ro} la%PL lb%PL _%nat.
 Arguments polyn_list {T so sdp} p%P.
-Arguments polyn_of_list_repeat_0s {T so sdp}.
 
 End polynomial_Notations.

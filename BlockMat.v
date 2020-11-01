@@ -57,9 +57,10 @@ Section in_ring.
 
 Context {T : Type}.
 Context {ro : ring_op T}.
-Context (so : semiring_op T).
-Context {sp : semiring_prop T}.
-Context {rp : ring_prop T}.
+Context (so := rng_semiring).
+Context {sp : @semiring_prop T (@rng_semiring T ro)}.
+Context {rp : @ring_prop T ro}.
+Existing Instance so.
 
 (* addition of block matrices *)
 
@@ -1358,12 +1359,14 @@ intros i j Hi Hj.
 destruct i; cbn. {
   destruct j; [ apply IHn | cbn ].
   destruct j; [ | flia Hj ].
+  unfold so.
   rewrite sizes_of_bmatrix_IZ.
   rewrite <- (sizes_of_bmatrix_IZ n 0%Srng).
   apply IHn.
 }
 destruct i; [ | flia Hi ].
 destruct j; cbn. {
+  unfold so.
   rewrite sizes_of_bmatrix_IZ.
   rewrite <- (sizes_of_bmatrix_IZ n 0%Srng).
   apply IHn.
@@ -1878,6 +1881,7 @@ Proof.
 intros.
 induction M as [x| M IHM] using bmatrix_ind2; intros. {
   cbn.
+  unfold so.
   rewrite fold_rng_sub.
   now rewrite rng_add_opp_r.
 }
@@ -2474,6 +2478,7 @@ rewrite bmat_add_add_swap; cycle 1. {
     now apply Hsq; left.
   }
 }
+unfold so.
 rewrite bmat_add_opp_r.
 symmetry.
 rewrite (bmat_zero_like_eq_compat _ MB); cycle 1. {
@@ -2534,6 +2539,7 @@ apply bmat_add_move_l in Hab. 2: {
   }
 }
 unfold bmat_sub in Hab.
+unfold so in Hab.
 rewrite <- bmat_zero_like_opp in Hab. 2: {
   destruct Hcsb as (size & Hsq & Hsz).
   now apply Hsq; left.
@@ -2569,6 +2575,7 @@ assert (H : compatible_square_bmatrices [MA; (- MA)%BM; MB]). {
   }
 }
 specialize (H1 H); clear H.
+unfold so in H1.
 rewrite bmat_add_opp_r in H1.
 assert (Hss : sizes_of_bmatrix MA = sizes_of_bmatrix MB). {
   now rewrite Has, Hbs.
@@ -2631,6 +2638,7 @@ assert (H : compatible_square_bmatrices [MA; MB; (- MB)%BM]). {
   }
 }
 specialize (H1 H); clear H.
+unfold so in H1.
 rewrite bmat_add_opp_r in H1.
 assert (Hss : sizes_of_bmatrix MA = sizes_of_bmatrix MB). {
   now rewrite Has, Hbs.
@@ -2778,7 +2786,8 @@ cbn in HBM.
 destruct (zerop (mat_nrows M)) as [Hrz| Hrz]; [ easy | ].
 destruct (zerop (mat_ncols M)) as [Hcz| Hcz]; [ easy | ].
 cbn in HBM.
-rewrite rng_opp_summation; [ cbn | easy | easy ].
+unfold so.
+rewrite rng_opp_summation; cbn.
 rewrite IHBM; [ | easy | easy | now apply HBM ].
 rewrite srng_add_0_l.
 apply List_fold_left_ext_in.
