@@ -147,7 +147,10 @@ Theorem polyn_degree_mat_el_subm_subm_xI_sub_M_0_succ_0_0 : ∀ M i,
 Proof.
 intros; cbn.
 rewrite srng_mul_1_r.
-Check polyn_of_list_repeat_0s.
+...
+specialize @polyn_of_list_repeat_0s as H.
+specialize (H T so sdp 1).
+About polyn_of_list_repeat_0s.
 ...
 specialize (polyn_of_list_repeat_0s 1) as H.
 cbn in H; rewrite H; clear H.

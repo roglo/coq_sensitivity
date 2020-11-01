@@ -3730,5 +3730,6 @@ Arguments polyn_degree {T so sdp} P%P.
 Arguments polyn_eq_dec {T so sdp} P%P Q%P.
 Arguments polyn_list_convol_mul {T so} la%PL lb%PL _%nat.
 Arguments polyn_list {T so sdp} p%P.
+Arguments polyn_of_list_repeat_0s {T so sdp}.
 
 End polynomial_Notations.
