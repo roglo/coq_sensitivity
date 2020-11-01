@@ -2876,6 +2876,7 @@ Notation "- A" := (bmat_opp A) : BM_scope.
 
 End bmatrix_Notations.
 
+Arguments bmat_nat_mul_l {T so}.
 Arguments I_2_pow {T so}.
 Arguments Z_2_pow {T so}.
 Arguments IZ_2_pow {T so}.

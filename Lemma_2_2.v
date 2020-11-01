@@ -138,8 +138,6 @@ Qed.
 
 (* "We prove by induction that A_n^2 = nI" *)
 
-...
-
 Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
   (A n * A n = bmat_nat_mul_l n (I_2_pow n))%BM.
 Proof.
@@ -151,38 +149,36 @@ intros * Hi Hj.
 destruct i. {
   destruct j. {
     cbn.
-    rewrite bmat_nat_mul_l_succ.
+    rewrite bmat_nat_mul_l_succ; [ | easy ].
     rewrite <- IHn.
-    unfold so.
-    rewrite bmat_mul_1_r; [ | easy ].
+    rewrite bmat_mul_1_r; [ | easy | easy ].
     f_equal.
     rewrite <- bmat_zero_like_sqr; [ | apply A_is_square_bmat ].
-    apply bmat_add_0_l.
+    now apply bmat_add_0_l.
   }
   destruct j; [ cbn | flia Hj ].
-  rewrite bmat_nat_mul_l_succ.
-  unfold so.
-  rewrite bmat_mul_1_r. 2: {
+  rewrite bmat_nat_mul_l_succ; [ | easy ].
+  rewrite bmat_mul_1_r; [ | easy | ]. 2: {
     unfold I_2_pow.
     apply bmat_fit_for_add_IZ_A.
   }
-  rewrite bmat_mul_1_l. 2: {
+  rewrite bmat_mul_1_l; [ | easy | ]. 2: {
     unfold I_2_pow.
     transitivity (A n); [ apply bmat_fit_for_add_IZ_A | ].
     apply bmat_fit_for_add_opp_r.
   }
-  rewrite bmat_add_0_l.
-  rewrite bmat_add_opp_r.
+  rewrite bmat_add_0_l; [ | easy ].
+  rewrite bmat_add_opp_r; [ | easy | easy ].
   rewrite fold_Z_2_pow.
-  rewrite old_bmat_add_0_r. 2: {
+  rewrite old_bmat_add_0_r; [ | easy | ]. 2: {
     now apply bmat_fit_for_add_Z_2_pow_bmat_nat_mul_l.
   }
-  rewrite bmat_nat_mul_0_r.
+  rewrite bmat_nat_mul_0_r; [ | easy ].
   now apply bmat_zero_like_A_eq_Z.
 }
 destruct i; [ | flia Hi ].
 destruct j; cbn. {
-  unfold so.
+...
   rewrite bmat_mul_1_l. 2: {
     apply bmat_fit_for_add_IZ_A.
   }
