@@ -88,27 +88,11 @@ Definition GQ_to_decimal_uint (gq : GQ) : option Decimal.uint :=
 Definition GQ_to_decimal_int (gq : GQ) : option Decimal.int :=
   option_map Decimal.Pos (GQ_to_decimal_uint gq).
 
-(* deprecated since 8.12
+...
+
+(* deprecated since 8.12; see how it was changed in PQ.v *)
+
 Numeral Notation GQ GQ_of_decimal_int GQ_to_decimal_int : GQ_scope.
-*)
-
-(* since 8.12 *)
-
-Definition GQ_of_numeral_int (n : Numeral.int) : option GQ :=
-  match n with
-  | Numeral.IntDec n => GQ_of_decimal_int n
-  | Numeral.IntHex _ => None
-  end.
-
-Definition GQ_to_numeral_uint (gq : GQ) : option Numeral.uint :=
-  match GQ_to_decimal_uint gq with
-  | Some d => Some (Numeral.UIntDec d)
-  | None => None
-  end.
-
-Numeral Notation GQ GQ_of_numeral_int GQ_to_numeral_uint : GQ_scope.
-
-(* end 8.12 *)
 
 (* Set Printing All. *)
 (* Check 1%GQ. *)

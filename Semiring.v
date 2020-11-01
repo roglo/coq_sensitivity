@@ -109,31 +109,32 @@ End semiring_theorems.
 (* Rings *)
 
 Class ring_op A :=
-  { rng_semiring : semiring_op A;
+  { (*rng_semiring : semiring_op A;*)
     rng_opp : A → A }.
 
-Definition rng_sub A {R : ring_op A} (S := rng_semiring) a b :=
+Definition rng_sub A {R : ring_op A} {S : semiring_op A} a b :=
   srng_add a (rng_opp b).
 
 Declare Scope ring_scope.
 
 Delimit Scope ring_scope with Rng.
-Notation "0" := (@srng_zero _ rng_semiring) : ring_scope.
-Notation "1" := (@srng_one _ rng_semiring) : ring_scope.
+Notation "0" := (@srng_zero _ _) : ring_scope.
+Notation "1" := (@srng_one _ _) : ring_scope.
 Notation "- a" := (@rng_opp _ _ a) : ring_scope.
-Notation "a + b" := (@srng_add _ rng_semiring a b) : ring_scope.
-Notation "a - b" := (@rng_sub _ _ a b) : ring_scope.
-Notation "a * b" := (@srng_mul _ rng_semiring a b) : ring_scope.
+Notation "a + b" := (@srng_add _ _ a b) : ring_scope.
+Notation "a - b" := (@rng_sub _ _ _ a b) : ring_scope.
+Notation "a * b" := (@srng_mul _ _ a b) : ring_scope.
 
-Class ring_prop A {so : ring_op A} :=
+Class ring_prop A {so : ring_op A} {ro : semiring_op A} :=
   { rng_add_opp_l : ∀ a : A, (- a + a = 0)%Rng }.
 
 Section ring_theorems.
 
 Context {A : Type}.
 Context {ro : ring_op A}.
-Context {sp : @semiring_prop A (@rng_semiring A ro)}.
-Context {rp : @ring_prop A ro}.
+Context {so : semiring_op A}.
+Context {sp : semiring_prop A}.
+Context {rp : ring_prop A}.
 
 Theorem rng_sub_compat_l : ∀ a b c,
   (a = b)%Rng → (a - c = b - c)%Rng.
@@ -232,9 +233,7 @@ Qed.
 Theorem rng_mul_opp_l : ∀ a b, (- a * b = - (a * b))%Rng.
 Proof.
 intros.
-set (so := rng_semiring).
 specialize (srng_mul_add_distr_r (- a)%Rng a b) as H.
-unfold so in H.
 rewrite rng_add_opp_l in H.
 rewrite srng_mul_0_l in H.
 symmetry in H.
@@ -244,9 +243,7 @@ Qed.
 Theorem rng_mul_opp_r : ∀ a b, (a * - b = - (a * b))%Rng.
 Proof.
 intros.
-set (so := rng_semiring).
 specialize (srng_mul_add_distr_l a b (- b)%Rng) as H.
-unfold so in H.
 rewrite fold_rng_sub in H.
 rewrite rng_add_opp_r in H.
 rewrite srng_mul_0_r in H.
@@ -284,8 +281,7 @@ Definition Z_semiring_op : semiring_op Z :=
      srng_mul := Z.mul |}.
 
 Definition Z_ring_op : ring_op Z :=
-  {| rng_semiring := Z_semiring_op;
-     rng_opp := Z.opp |}.
+  {| rng_opp := Z.opp |}.
 
 Canonical Structure Z_semiring_op.
 Canonical Structure Z_ring_op.
