@@ -504,8 +504,13 @@ now do 2 rewrite Nat.sub_succ, Nat.sub_0_r.
 Qed.
 Definition glop (pq : PQ) := PQ_of_pair (S (PQnum1 pq)) (S (PQden1 pq)).
 Print PQ_of_pair.
+Notation "a /// b" := (PQmake (a - 1) (b - 1)) (at level 32) : PQ_scope.
+Check (5 // 2)%PQ.
+Check (PQ_of_pair 5 2)%PQ.
 Compute (5 // 2)%PQ.
-Compute (glop (5 // 2)%PQ).
+Check (PQmake 4 1).
+Check (PQmake (5 - 1) (2 - 1)).
+Check (glop (PQmake 4 1)).
 ...
 Set Printing All.
 Check 5%GQ.
