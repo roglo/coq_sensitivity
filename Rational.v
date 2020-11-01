@@ -145,6 +145,7 @@ Definition inv x :=
   end.
 
 Definition sub x y := add x (opp y).
+Definition div x y := mul x (inv y).
 
 Definition abs x :=
   match x with
@@ -211,7 +212,7 @@ Notation "x + y" := (add x y) : Q_scope.
 Notation "x - y" := (sub x y) : Q_scope.
 Notation "‖ x ‖" := (abs x) (at level 60) : Q_scope.
 Notation "x * y" := (mul x y) : Q_scope.
-Notation "x / y" := (mul x (inv y)) : Q_scope.
+Notation "x / y" := (div x y) : Q_scope.
 Notation "/ x" := (inv x) : Q_scope.
 
 Definition of_decimal_uint (n : Decimal.uint) : Q := (Nat.of_uint n // 1)%Q.
@@ -236,11 +237,29 @@ Definition to_decimal_int (q : Q) : option Decimal.int :=
   | Neg gq => option_map Decimal.Neg (to_decimal_uint gq)
   end.
 
-(* deprecated since 8.12 *)
+(* deprecated since 8.12
 Numeral Notation Q of_decimal_int to_decimal_int : Q_scope
   (abstract after 5001).
+*)
 
-...
+(* since 8.12 *)
+
+Definition of_numeral_int (n : Numeral.int) : option Q :=
+  match n with
+  | Numeral.IntDec n => Some (of_decimal_int n)
+  | Numeral.IntHex _ => None
+  end.
+
+Definition to_numeral_int (q : Q) : option Numeral.int :=
+  match to_decimal_int q with
+  | Some d => Some (Numeral.IntDec d)
+  | None => None
+  end.
+
+Numeral Notation Q of_numeral_int to_numeral_int : Q_scope
+  (abstract after 5001).
+
+(* end 8.12 *)
 
 End Notations.
 
@@ -595,7 +614,7 @@ Qed.
 Theorem mul_inv_l : ∀ x, x ≠ 0%Q → (x / x = 1)%Q.
 Proof.
 intros * Hx.
-unfold "/"%Q.
+unfold div.
 destruct x as [| gx| gx]; [ easy | | ].
 -cbn; f_equal; apply GQmul_inv_r.
 -cbn; f_equal; apply GQmul_inv_r.
