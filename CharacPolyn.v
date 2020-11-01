@@ -488,21 +488,23 @@ specialize (IHn (subm M 0 0)) as Hpc.
 rewrite submatrix_nrows, Hr, Nat.sub_succ, Nat.sub_0_r in Hpc.
 specialize (Hpc eq_refl).
 rewrite <- submatrix_xI_sub_M in Hpc.
-...
-rewrite srng_summation_split_first; [ | apply Nat.le_0_l ].
+rewrite srng_summation_split_first; [ | | apply Nat.le_0_l ]. 2: {
+  now apply polyn_semiring_prop.
+}
 remember (det_loop (subm (xI_sub_M M) 0 0) n) as P eqn:HP.
 cbn - [ polyn_coeff xI_sub_M iter_seq ].
 rewrite srng_mul_1_l.
-rewrite polyn_coeff_add, srng_add_comm.
+rewrite polyn_coeff_add; [ | easy ].
+rewrite srng_add_comm.
 rewrite polyn_coeff_overflow. 2: {
-  eapply le_lt_trans; [ apply polyn_degree_summation_ub | ].
+  eapply le_lt_trans; [ now apply polyn_degree_summation_ub | ].
   cbn - [ iter_seq polyn_degree xI_sub_M ].
   apply Max_lub_lt; [ apply Nat.lt_0_succ | ].
   intros i Hi.
-  eapply le_lt_trans; [ apply polyn_degree_mul_le | ].
+  eapply le_lt_trans; [ now apply polyn_degree_mul_le | ].
   rewrite <- Nat.add_1_l.
   apply Nat.add_lt_le_mono. {
-    eapply le_lt_trans; [ apply polyn_degree_mul_le |].
+    eapply le_lt_trans; [ now apply polyn_degree_mul_le |].
     rewrite polyn_degree_minus_one_pow.
     destruct i; [ easy | ].
     rewrite polyn_degree_mat_el_xI_sub_M_0_succ.
@@ -512,10 +514,10 @@ rewrite polyn_coeff_overflow. 2: {
   apply polyn_degree_det_loop_subm_xI_sub_M_le.
 }
 rewrite srng_add_0_l.
-rewrite polyn_coeff_mul.
-rewrite srng_summation_split_first; [ | apply Nat.le_0_l ].
+rewrite polyn_coeff_mul; [ | easy ].
+rewrite srng_summation_split_first; [ | easy | apply Nat.le_0_l ].
 rewrite Nat.sub_0_r.
-rewrite srng_summation_split_first; [ | flia ].
+rewrite srng_summation_split_first; [ | easy | flia ].
 rewrite Nat.sub_succ, Nat.sub_0_r, Hpc, srng_mul_1_r.
 rewrite polyn_coeff_mat_el_xI_sub_M_0_0.
 rewrite (polyn_coeff_overflow P). 2: {
@@ -524,13 +526,13 @@ rewrite (polyn_coeff_overflow P). 2: {
   apply polyn_degree_det_loop_subm_xI_sub_M_le.
 }
 rewrite srng_mul_0_r, srng_add_0_l.
-rewrite all_0_srng_summation_0. 2: {
+rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
   intros i Hi.
   rewrite mat_el_xI_sub_M.
   destruct (Nat.eq_dec 0 0) as [H| H]; [ clear H | easy ].
   rewrite polyn_coeff_overflow. 2: {
     unfold polyn_sub.
-    rewrite polyn_degree_1; [ easy | ].
+    rewrite polyn_degree_1; [ easy | easy | ].
     rewrite polyn_degree_opp.
     apply polyn_degree_of_const.
   }
@@ -643,7 +645,6 @@ assert (H2 : polyn_coeff (charac_polyn M) (mat_nrows M) = 1%Srng). {
 assert (H3 : polyn_degree (charac_polyn M) = mat_nrows M). {
   apply charac_polyn_degree.
 }
-unfold so in H1.
 rewrite H3 in H1.
 assert (H : mat_nrows M > 0) by flia Hrz.
 specialize (H1 H); clear H.
@@ -653,7 +654,6 @@ destruct H1 as (RL, Hrl); exists RL.
 unfold polyn_highest_coeff in Hrl.
 rewrite H3, H2 in Hrl.
 unfold polyn_of_const in Hrl at 1.
-unfold so in Hrl.
 now rewrite srng_mul_1_l in Hrl.
 Qed.
 
