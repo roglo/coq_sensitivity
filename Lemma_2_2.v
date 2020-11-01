@@ -492,6 +492,28 @@ Check 1%PQ.
 Compute 1%PQ.
 Check 1%GQ.
 Compute 1%GQ.
+Check (5 // 2)%GQ.
+...
+Set Printing All.
+Check 5%GQ.
+Compute 5%GQ.
+Check (5 // 2)%GQ.
+Print GQ_of_pair.
+Print PQ_of_pair.
+Theorem fold_GQ : ∀ n d,
+  GQmake0 (PQmake n d) (@eq_refl nat (S d)) =
+  GQmake0 (PQmake n d) (@eq_refl nat (S d)).
+  GQmake0 (PQmake n d) (@eq_refl nat e) =
+(*
+Theorem glop :
+  GQmake0 (PQmake O O) (@eq_refl nat (S O))
+     = GQmake0 (PQmake O O)
+         (@eq_refl nat
+            (Nat.gcd (Init.Nat.add (PQnum1 (PQmake O O)) (S O))
+               (Init.Nat.add (PQden1 (PQmake O O)) (S O)))).
+*)
+Compute (2 + 3)%GQ.
+Print GQmake0.
 ...
 Check 1%Q.
 Compute 1%Q.
