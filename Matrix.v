@@ -431,9 +431,11 @@ Context (so : semiring_op T).
 Context {sp : semiring_prop T}.
 Context {rp : ring_prop T}.
 
-...
+Arguments det_loop {T ro so} M n%nat.
+Arguments determinant {T ro so} M.
 
-Theorem fold_determinant : ∀ T {ro : ring_op T} (M : matrix T),
+Theorem fold_determinant :
+  ∀ T {ro : ring_op T} {so : semiring_op T} (M : matrix T),
   det_loop M (mat_nrows M) = determinant M.
 Proof. easy. Qed.
 
