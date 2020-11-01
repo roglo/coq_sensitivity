@@ -420,11 +420,10 @@ rewrite polyn_degree_lt_add; [ | easy | ]. 2: {
   {
     apply Max_le_compat.
     intros i Hi.
-    rewrite <- polyn_mul_assoc.
-    etransitivity; [ apply polyn_degree_mul_le | ].
-...
+    rewrite <- polyn_mul_assoc; [ | easy | easy ].
+    etransitivity; [ now apply polyn_degree_mul_le | ].
     rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
-    etransitivity; [ apply polyn_degree_mul_le | ].
+    etransitivity; [ now apply polyn_degree_mul_le | ].
     destruct i; [ flia Hi | ].
     rewrite polyn_degree_mat_el_xI_sub_M_0_succ, Nat.add_0_l.
     easy.
@@ -432,26 +431,24 @@ rewrite polyn_degree_lt_add; [ | easy | ]. 2: {
   apply Max_lub_lt. {
     destruct n. {
       cbn in HP; rewrite HP.
-      rewrite polyn_mul_1_r.
+      rewrite polyn_mul_1_r; [ | easy ].
       rewrite polyn_degree_mat_el_xI_sub_M_0_0.
       apply Nat.lt_0_1.
     }
-    rewrite polyn_degree_mul. 2: {
+    rewrite polyn_degree_mul; [ | easy | ]. 2: {
       rewrite polyn_degree_mat_el_xI_sub_M_0_0.
       rewrite polyn_coeff_mat_el_xI_sub_M_0_0, srng_mul_1_l.
       apply polyn_highest_coeff_neq_0.
-      unfold so.
       now rewrite Hpd.
     }
     rewrite polyn_degree_mat_el_xI_sub_M_0_0.
     flia.
   }
   intros i Hi.
-  rewrite polyn_degree_mul. 2: {
+  rewrite polyn_degree_mul; [ | easy | ]. 2: {
     rewrite polyn_degree_mat_el_xI_sub_M_0_0.
     rewrite polyn_coeff_mat_el_xI_sub_M_0_0, srng_mul_1_l.
     apply polyn_highest_coeff_neq_0.
-    unfold so.
     rewrite Hpd; flia Hi.
   }
   rewrite Hpd.
@@ -459,7 +456,7 @@ rewrite polyn_degree_lt_add; [ | easy | ]. 2: {
   apply Nat.lt_succ_r.
   apply polyn_degree_det_loop_subm_xI_sub_M_le.
 }
-rewrite polyn_degree_mul. 2: {
+rewrite polyn_degree_mul; [ | easy | ]. 2: {
   rewrite polyn_degree_mat_el_xI_sub_M_0_0.
   rewrite polyn_coeff_mat_el_xI_sub_M_0_0.
   rewrite srng_mul_1_l.
@@ -469,7 +466,6 @@ rewrite polyn_degree_mul. 2: {
     apply srng_1_neq_0.
   }
   apply polyn_highest_coeff_neq_0.
-  unfold so.
   now rewrite Hpd.
 }
 rewrite polyn_degree_mat_el_xI_sub_M_0_0.
@@ -492,6 +488,7 @@ specialize (IHn (subm M 0 0)) as Hpc.
 rewrite submatrix_nrows, Hr, Nat.sub_succ, Nat.sub_0_r in Hpc.
 specialize (Hpc eq_refl).
 rewrite <- submatrix_xI_sub_M in Hpc.
+...
 rewrite srng_summation_split_first; [ | apply Nat.le_0_l ].
 remember (det_loop (subm (xI_sub_M M) 0 0) n) as P eqn:HP.
 cbn - [ polyn_coeff xI_sub_M iter_seq ].
