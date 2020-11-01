@@ -199,12 +199,6 @@ Context {rp : ring_prop T}.
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
 
-Notation "A + B" := (mat_add A B) : M_scope.
-Notation "A - B" := (mat_sub _ A B) : M_scope.
-Notation "A * B" := (mat_mul A B) : M_scope.
-Notation "μ × A" := (mat_mul_scal_l _ μ A) (at level 40) : M_scope.
-Notation "- A" := (mat_opp A) : M_scope.
-
 Arguments det_loop {T ro so} M%M n%nat.
 Arguments mat_mul_scal_l {T so} _ M%M.
 Arguments mat_nrows {T} m%M.
@@ -214,6 +208,12 @@ Arguments mI {T so} n%nat.
 Arguments minus_one_pow {T ro so}.
 Arguments determinant {T ro so} M%M.
 Arguments subm {T} M%M i%nat j%nat.
+
+Notation "A + B" := (mat_add A B) : M_scope.
+Notation "A - B" := (mat_sub A B) : M_scope.
+Notation "A * B" := (mat_mul A B) : M_scope.
+Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
+Notation "- A" := (mat_opp A) : M_scope.
 
 (* comatrix *)
 
@@ -231,7 +231,7 @@ Definition mat_transp (M : matrix T) :=
 
 (* M × t(com(M)) = det(M) × I *)
 
-Theorem matrix_mul_transp_com : ∀ M,
+Theorem matrix_mul_transp_com : ∀ (M : matrix T),
   is_square_mat M
   → (M * mat_transp (comatrix M) = determinant M × mI (mat_nrows M))%M.
 Proof.
@@ -445,6 +445,16 @@ Module matrix_Notations.
 
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
+
+Arguments det_loop {T ro so} M%M n%nat.
+Arguments mat_mul_scal_l {T so} _ M%M.
+Arguments mat_nrows {T} m%M.
+Arguments mat_ncols {T} m%M.
+Arguments mat_sub {T ro so} MA%M MB%M.
+Arguments mI {T so} n%nat.
+Arguments minus_one_pow {T ro so}.
+Arguments determinant {T ro so} M%M.
+Arguments subm {T} M%M i%nat j%nat.
 
 Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.

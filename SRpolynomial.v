@@ -3722,6 +3722,7 @@ Notation "'Π' ( i = b , e ) , g" :=
      polynomial_scope.
 *)
 
+Arguments _x {T so sdp}.
 Arguments is_monic_polyn {T so sdp} P%P.
 Arguments norm_polyn_list {T so sdp} l%PL.
 Arguments polyn_coeff {T so sdp} P%P i%nat.

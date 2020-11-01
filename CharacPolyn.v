@@ -32,8 +32,6 @@ Definition m2mm M : matrix (polynomial T) :=
   mk_mat (λ i j, polyn_of_list [mat_el M i j])
     (mat_nrows M) (mat_ncols M).
 
-...
-
 Definition xI_sub_M M := (_x × m2mm (mI (mat_nrows M)) - m2mm M)%M.
 Definition charac_polyn (M : matrix T) := determinant (xI_sub_M M).
 
@@ -86,7 +84,7 @@ Theorem polyn_degree_mat_el_xI_sub_M_0_0 : ∀ M,
 Proof.
 intros.
 rewrite mat_el_xI_sub_M.
-apply polyn_degree_1.
+apply polyn_degree_1; [ easy | ].
 rewrite polyn_degree_opp.
 apply polyn_degree_of_const.
 Qed.
@@ -149,6 +147,7 @@ Theorem polyn_degree_mat_el_subm_subm_xI_sub_M_0_succ_0_0 : ∀ M i,
 Proof.
 intros; cbn.
 rewrite srng_mul_1_r.
+...
 specialize (polyn_of_list_repeat_0s 1) as H.
 cbn in H; rewrite H; clear H.
 rewrite srng_mul_0_r, srng_add_0_l.
