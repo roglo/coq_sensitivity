@@ -97,7 +97,27 @@ Definition PQ_to_decimal_uint (pq : PQ) : option Decimal.uint :=
 Definition PQ_to_decimal_int (pq : PQ) : option Decimal.int :=
   option_map Decimal.Pos (PQ_to_decimal_uint pq).
 
-Numeral Notation PQ PQ_of_decimal_int PQ_to_decimal_int : PQ_scope.
+(* deprecated since 8.12
+Numeral Notation PQ PQ_of_decimal_int PQ_to_decimal_uint : PQ_scope.
+*)
+
+(* since 8.12 *)
+
+Definition PQ_of_numeral_int (n : Numeral.int) : option PQ :=
+  match n with
+  | Numeral.IntDec n => PQ_of_decimal_int n
+  | Numeral.IntHex _ => None
+  end.
+
+Definition PQ_to_numeral_uint (pq : PQ) : option Numeral.uint :=
+  match PQden1 pq with
+  | 0 => Some (Numeral.UIntDec (Nat.to_uint (PQnum1 pq + 1)))
+  | _ => None
+  end.
+
+Numeral Notation PQ PQ_of_numeral_int PQ_to_numeral_uint : PQ_scope.
+
+(* end 8.12 *)
 
 (*
 Check 25%PQ.

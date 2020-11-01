@@ -88,6 +88,10 @@ Definition GQ_to_decimal_uint (gq : GQ) : option Decimal.uint :=
 Definition GQ_to_decimal_int (gq : GQ) : option Decimal.int :=
   option_map Decimal.Pos (GQ_to_decimal_uint gq).
 
+...
+
+(* deprecated since 8.12; see how it was changed in PQ.v *)
+
 Numeral Notation GQ GQ_of_decimal_int GQ_to_decimal_int : GQ_scope.
 
 (* Set Printing All. *)
