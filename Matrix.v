@@ -200,7 +200,7 @@ Declare Scope M_scope.
 Delimit Scope M_scope with M.
 
 Notation "A + B" := (mat_add A B) : M_scope.
-Notation "A - B" := (mat_sub A B) : M_scope.
+Notation "A - B" := (mat_sub _ A B) : M_scope.
 Notation "A * B" := (mat_mul A B) : M_scope.
 Notation "μ × A" := (mat_mul_scal_l _ μ A) (at level 40) : M_scope.
 Notation "- A" := (mat_opp A) : M_scope.
@@ -209,6 +209,7 @@ Arguments det_loop {T ro so} M%M n%nat.
 Arguments mat_mul_scal_l {T so} _ M%M.
 Arguments mat_nrows {T} m%M.
 Arguments mat_ncols {T} m%M.
+Arguments mat_sub {T ro so} MA%M MB%M.
 Arguments mI {T so} n%nat.
 Arguments minus_one_pow {T ro so}.
 Arguments determinant {T ro so} M%M.
@@ -359,8 +360,6 @@ Abort. (* on verra plus tard *)
 
 (* combinations of submatrix and other *)
 
-...
-
 Theorem submatrix_sub : ∀ (MA MB : matrix T) i j,
   subm (MA - MB)%M i j = (subm MA i j - subm MB i j)%M.
 Proof.
@@ -428,10 +427,11 @@ Section in_ring.
 
 Context {T : Type}.
 Context {ro : ring_op T}.
-Context (so := rng_semiring).
-Context {sp : @semiring_prop T (@rng_semiring T ro)}.
-Context {rp : @ring_prop T ro}.
-Existing Instance so.
+Context (so : semiring_op T).
+Context {sp : semiring_prop T}.
+Context {rp : ring_prop T}.
+
+...
 
 Theorem fold_determinant : ∀ T {ro : ring_op T} (M : matrix T),
   det_loop M (mat_nrows M) = determinant M.
