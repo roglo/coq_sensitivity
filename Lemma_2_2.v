@@ -493,6 +493,19 @@ Compute 1%PQ.
 Check 1%GQ.
 Compute 1%GQ.
 Check (5 // 2)%GQ.
+Compute (5 // 2)%GQ.
+Check (5 // 2)%PQ.
+Compute (5 // 2)%PQ.
+Theorem fold_PQ : ∀ n d, PQmake n d = PQ_of_pair (S n) (S d).
+Proof.
+intros.
+unfold PQ_of_pair.
+now do 2 rewrite Nat.sub_succ, Nat.sub_0_r.
+Qed.
+Definition glop (pq : PQ) := PQ_of_pair (S (PQnum1 pq)) (S (PQden1 pq)).
+Print PQ_of_pair.
+Compute (5 // 2)%PQ.
+Compute (glop (5 // 2)%PQ).
 ...
 Set Printing All.
 Check 5%GQ.
