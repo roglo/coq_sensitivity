@@ -407,14 +407,13 @@ Definition fld_div T {F : field_op T} (ro := fld_ring) {so : semiring_op T}
 Declare Scope field_scope.
 
 Delimit Scope field_scope with F.
-...
-Notation "0" := (@srng_zero _ rng_semiring) : field_scope.
-Notation "1" := (@srng_one _ rng_semiring) : field_scope.
-Notation "- a" := (@rng_opp _ _ a) : field_scope.
-Notation "a + b" := (@srng_add _ rng_semiring a b) : field_scope.
-Notation "a - b" := (@rng_sub _ _ a b) : field_scope.
-Notation "a * b" := (@srng_mul _ rng_semiring a b) : field_scope.
-Notation "a / b" := (@fld_div _ _ rng_semiring a b) : field_scope.
+Notation "0" := srng_zero : field_scope.
+Notation "1" := srng_one : field_scope.
+Notation "- a" := (rng_opp a) : field_scope.
+Notation "a + b" := (srng_add a b) : field_scope.
+Notation "a - b" := (rng_sub a b) : field_scope.
+Notation "a * b" := (srng_mul a b) : field_scope.
+Notation "a / b" := (fld_div a b) : field_scope.
 
 (*
 Class field_prop A {so : ring_op A} :=
@@ -443,11 +442,15 @@ Fixpoint gauss_jordan_loop lt (A : matrix T) r oj :=
                  add_one_row_scalar_multiple_another A i'' (- v)%Rng (r - 1))
             (seq 0 (mat_nrows A)) A
         in
+if Nat.eq_dec j 0 then A else
         gauss_jordan_loop lt A r oj'
   end.
 
 Definition gauss_jordan lt (A : matrix T) :=
   gauss_jordan_loop lt (A : matrix T) 0 (mat_ncols A).
+
+(**)
+End in_ring.
 
 Import Q.Notations.
 
@@ -457,7 +460,45 @@ Definition Q_semiring_op : semiring_op Q :=
      srng_add := Q.add;
      srng_mul := Q.mul |}.
 
-...
-
 Definition Q_ring_op : ring_op Q :=
-  {| rng_semiring := Q_semiring_op |}.
+  {| rng_opp := Q.opp |}.
+
+Canonical Structure Q_semiring_op.
+Canonical Structure Q_ring_op.
+
+Theorem Q_1_neq_0 : 1%Q ≠ 0%Q.
+Proof. easy. Qed.
+
+Definition Q_sring_dec_prop : sring_dec_prop Q :=
+  {| srng_eq_dec := Q.eq_dec; srng_1_neq_0 := Q_1_neq_0 |}.
+
+Existing Instance Q_ring_op.
+Existing Instance Q_semiring_op.
+Existing Instance Q_sring_dec_prop.
+Definition Q_ltb a b :=
+  match Q.compare a b with Lt => true | _ => false end.
+Definition Q_gauss_jordan := gauss_jordan Q_ltb.
+Definition test ll :=
+  let r := Q_gauss_jordan (mat_of_list_list 0%Q ll) in
+  list_list_of_mat r.
+Compute (2 + 3)%Q.
+Require Import GQ.
+Require Import PQ.
+Compute (2 + 3)%Q.
+Import PQ_Notations.
+Import GQ_Notations.
+Import Q.Notations.
+Check 1%PQ.
+Compute 1%PQ.
+Check 1%GQ.
+Compute 1%GQ.
+...
+Check 1%Q.
+Compute 1%Q.
+Compute (2 + 3)%Q.
+Check (test [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]]%Q).
+...
+Compute test [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]]%Q.
+(*
+     = ([[48; 0; 0]; [0; 48; 0]; [0; 0; 48]], 48)
+*)
