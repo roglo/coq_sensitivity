@@ -22,15 +22,14 @@ Section in_ring.
 
 Context {T : Type}.
 Context {ro : ring_op T}.
-Context (so := rng_semiring).
-Context {sp : @semiring_prop T (@rng_semiring T ro)}.
-Context {rp : @ring_prop T ro}.
-Context {sdp : @sring_dec_prop T so}.
+Context (so : semiring_op T).
+Context {sp : semiring_prop T}.
+Context {rp : ring_prop T}.
+Context {sdp : sring_dec_prop T}.
 (*
 Context {acp : @algeb_closed_prop T so sdp}.
 Existing Instance polyn_semiring_op.
 *)
-Existing Instance so.
 
 Add Parametric Relation : _ (@bmat_fit_for_add T)
  reflexivity proved by bmat_fit_for_add_refl
@@ -122,7 +121,6 @@ destruct j; cbn. {
   apply bmat_zero_like_IZ_eq_Z.
 }
 destruct j; [ | flia Hj ].
-unfold so.
 rewrite bmat_zero_like_opp; [ easy | ].
 apply A_is_square_bmat.
 Qed.
@@ -130,20 +128,17 @@ Qed.
 Theorem Tr_A : ∀ n, Tr (A n) = 0%Srng.
 Proof.
 intros.
-(*
-revert n.
-apply nat_ind; [ | intros n IHn ]; [ easy | ].
-*)
 induction n; [ easy | cbn ].
 rewrite IHn.
 do 2 rewrite srng_add_0_l.
-unfold so.
-rewrite Tr_opp; [ | apply A_is_square_bmat ].
+rewrite Tr_opp; [ | easy | easy | apply A_is_square_bmat ].
 rewrite IHn.
 apply rng_opp_0.
 Qed.
 
 (* "We prove by induction that A_n^2 = nI" *)
+
+...
 
 Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
   (A n * A n = bmat_nat_mul_l n (I_2_pow n))%BM.

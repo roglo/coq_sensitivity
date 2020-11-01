@@ -2875,3 +2875,9 @@ Notation "A * B" := (bmat_mul A B) : BM_scope.
 Notation "- A" := (bmat_opp A) : BM_scope.
 
 End bmatrix_Notations.
+
+Arguments I_2_pow {T so}.
+Arguments Z_2_pow {T so}.
+Arguments IZ_2_pow {T so}.
+Arguments sizes_of_bmatrix_IZ {T so}.
+Arguments Tr {T so}.

@@ -256,8 +256,7 @@ Definition to_numeral_int (q : Q) : option Numeral.int :=
   | None => None
   end.
 
-Numeral Notation Q of_numeral_int to_numeral_int : Q_scope
-  (abstract after 5001).
+Numeral Notation Q of_numeral_int to_numeral_int : Q_scope.
 
 (* end 8.12 *)
 
