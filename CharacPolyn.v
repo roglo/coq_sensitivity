@@ -16,12 +16,11 @@ Section in_ring.
 
 Context {T : Type}.
 Context {ro : ring_op T}.
-Context (so := rng_semiring).
-Context {sp : @semiring_prop T (@rng_semiring T ro)}.
-Context {rp : @ring_prop T ro}.
-Context {sdp : @sring_dec_prop T so}.
-Context {acp : @algeb_closed_prop T so sdp}.
-Existing Instance so.
+Context (so : semiring_op T).
+Context {sp : semiring_prop T}.
+Context {rp : ring_prop T}.
+Context {sdp : sring_dec_prop T}.
+Context {acp : algeb_closed_prop}.
 Existing Instance polyn_semiring_op.
 Existing Instance polyn_ring_op.
 Existing Instance polyn_semiring_prop.
@@ -32,6 +31,8 @@ Existing Instance polyn_ring_prop.
 Definition m2mm M : matrix (polynomial T) :=
   mk_mat (λ i j, polyn_of_list [mat_el M i j])
     (mat_nrows M) (mat_ncols M).
+
+...
 
 Definition xI_sub_M M := (_x × m2mm (mI (mat_nrows M)) - m2mm M)%M.
 Definition charac_polyn (M : matrix T) := determinant (xI_sub_M M).
