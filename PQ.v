@@ -134,8 +134,12 @@ Check (pn 21).
 
 Bon. Faut un "numeral notation" pour les p_nat telle que ça affiche ici
    22%pn
-
 Mais, du coup, faut que je l'appelle "pn" (prev nat) ou "sn" (succ nat) ?
+Au alors carrément
+   22%n
+On s'en fout, du "%n", là juste pour des raisons syntaxiques. Pour dire
+que le nombre auquel je pense, c'est "22", même s'il est représenté
+internement par "21".
 *)
 ...
 (*
