@@ -628,10 +628,11 @@ Proof.
 intros * Hxy Hyz.
 unfold "<"%PQ, nd in Hxy |-*.
 unfold "≤"%PQ, nd in Hyz.
-...
-apply (Nat.mul_lt_mono_pos_r (PQden1 y + 1)); [ flia | ].
+apply (Nat.mul_lt_mono_pos_r (nn (PQden1 y) + 1)); [ flia | ].
 rewrite Nat.mul_shuffle0.
-apply (Nat.lt_le_trans _ ((PQnum1 y + 1) * (PQden1 x + 1) * (PQden1 z + 1))).
+apply
+  (Nat.lt_le_trans _
+     ((nn (PQnum1 y) + 1) * (nn (PQden1 x) + 1) * (nn (PQden1 z) + 1))).
 -apply Nat.mul_lt_mono_pos_r; [ flia | easy ].
 -setoid_rewrite Nat.mul_shuffle0.
  apply Nat.mul_le_mono_pos_r; [ flia | easy ].
@@ -682,6 +683,7 @@ do 10 rewrite Nat.add_1_r.
 do 4 (rewrite <- Nat.sub_succ_l; [ | simpl; flia ]).
 do 4 rewrite Nat.sub_succ, Nat.sub_0_r.
 do 2 rewrite Nat.mul_add_distr_r.
+...
 remember (S (PQnum1 x)) as xn eqn:Hxn.
 remember (S (PQden1 x)) as xd eqn:Hxd.
 remember (S (PQnum1 y)) as yn eqn:Hyn.
