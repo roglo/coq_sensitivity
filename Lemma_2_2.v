@@ -509,7 +509,7 @@ Compute qtest [[1;-1;2;5];[3;2;1;10];[2;-3;-2;-10]]%Q.
      = ([[4095; 0; 0; 4095]; [0; 4095; 0; 8190]; [0; 0; 4095; 12285]], 4095)
      = ([[1; 0; 0; 1]; [0; 1; 0; 2]; [0; 0; 1; 3]], 1)
 *)
-(* comment faire pour que ça
+(* comment faire pour que
      Pos {| PQ_of_GQ := 1; GQprop := eq_refl |}
    affiche
      1
@@ -528,3 +528,7 @@ Notation "a /// b" := (PQmake (a - 1) (b - 1)) (at level 32) : PQ_scope.
 *)
 Notation "a /// b" := (PQmake a b) (at level 32) : PQ_scope.
 Compute (2 // 5)%Q.
+(* bof, pas terrible, ça affiche évidemment 1 /// 4 mais pour faire
+   afficher 2 /// 5, c'est plus compliqué... va falloir ajouter un
+   Set Numeral Notation adapté, mais je suis pas sûr que ce soit
+   possible. *)
