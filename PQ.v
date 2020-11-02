@@ -42,6 +42,8 @@ Definition PQgt x y := PQlt y x.
 Definition PQge x y := PQle y x.
 
 (* addition, subtraction *)
+(* no opp : there are no negative numbers of type PQ
+   but like for nat, a subtraction can be defined *)
 
 Definition PQadd_num1 x y := nd x y + nd y x - 1.
 Definition PQsub_num1 x y := nd x y - nd y x - 1.
@@ -51,10 +53,12 @@ Definition PQadd x y :=
   PQmake (mknn (PQadd_num1 x y)) (mknn (PQadd_den1 x y)).
 Definition PQsub x y :=
   PQmake (mknn (PQsub_num1 x y)) (mknn (PQadd_den1 x y)).
+
 Arguments PQadd x%PQ y%PQ.
 Arguments PQsub x%PQ y%PQ.
 
 (* multiplication, inversion, division *)
+(* unlike opp, inv exists in PQ *)
 
 Definition PQinv x := PQmake (PQden1 x) (PQnum1 x).
 
@@ -162,6 +166,7 @@ Definition nnn_to_numeral_uint (nn1 : nnn) : option Numeral.uint :=
 Numeral Notation nnn nnn_of_numeral_int nnn_to_numeral_uint : nnn_scope.
 
 (*
+Check (12 - 7)%PQ.
 Check 25%PQ.
 Check (22 // 7)%PQ.
 Compute (22 // 7)%PQ.
