@@ -499,3 +499,16 @@ Compute qtest [[1;-1;2;5];[3;2;1;10];[2;-3;-2;-10]]%Q.
      = ([[4095; 0; 0; 4095]; [0; 4095; 0; 8190]; [0; 0; 4095; 12285]], 4095)
      = ([[1; 0; 0; 1]; [0; 1; 0; 2]; [0; 0; 1; 3]], 1)
 *)
+(* comment faire pour que ça
+         Pos
+           {|
+           GQ.PQ_of_GQ := {| PQ.PQnum1 := 0; PQ.PQden1 := 0 |};
+           GQ.GQprop := eq_refl |}
+   affiche
+     1
+   éventuellement
+     1%Q
+   ou alors
+     1%QS
+   (S pour "Spécial")
+*)
