@@ -484,6 +484,8 @@ Definition Q_gauss_jordan := gauss_jordan Q_ltb.
 Definition qtest ll :=
   let r := Q_gauss_jordan (mat_of_list_list 0%Q ll) in
   list_list_of_mat r.
+Require Import GQ PQ.
+Import GQ_Notations PQ_Notations.
 Compute qtest [[1]]%Q.
 Compute qtest [[1; -1]; [1; 1]]%Q.
 Compute qtest [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]]%Q.
@@ -494,16 +496,21 @@ Compute qtest [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]]%Q.
 (*
      = ([[48; 0; 0]; [0; 48; 0]; [0; 0; 48]], 48)
 *)
+Compute qtest [[-3;-3;3;0];[3;-9;3;0];[6;-6;0;0]]%Q.
+(*
+     = ([[-216; 0; 108; 0]; [0; -216; 108; 0]; [0; 0; 0; 0]], -216)
+     = ([[1; 0; -1/2; 0]; [0; 1; -1/2; 0]; [0; 0; 0; 0]], 1)
+   1 0 -1/2
+   0 1 -1/2
+   0 0  0
+*)
 Compute qtest [[1;-1;2;5];[3;2;1;10];[2;-3;-2;-10]]%Q.
 (*
      = ([[4095; 0; 0; 4095]; [0; 4095; 0; 8190]; [0; 0; 4095; 12285]], 4095)
      = ([[1; 0; 0; 1]; [0; 1; 0; 2]; [0; 0; 1; 3]], 1)
 *)
 (* comment faire pour que ça
-         Pos
-           {|
-           GQ.PQ_of_GQ := {| PQ.PQnum1 := 0; PQ.PQden1 := 0 |};
-           GQ.GQprop := eq_refl |}
+     Pos {| PQ_of_GQ := 1; GQprop := eq_refl |}
    affiche
      1
    éventuellement
@@ -511,4 +518,13 @@ Compute qtest [[1;-1;2;5];[3;2;1;10];[2;-3;-2;-10]]%Q.
    ou alors
      1%QS
    (S pour "Spécial")
+   Et que
+     Pos {| PQ_of_GQ := {| PQnum1 := 0; PQden1 := 1 |}; GQprop := eq_refl |}
+   affiche
+     (1 // 2)%QS
 *)
+(*
+Notation "a /// b" := (PQmake (a - 1) (b - 1)) (at level 32) : PQ_scope.
+*)
+Notation "a /// b" := (PQmake a b) (at level 32) : PQ_scope.
+Compute (2 // 5)%Q.
