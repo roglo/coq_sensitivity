@@ -11,19 +11,23 @@ Reserved Notation "a // b" (at level 32).
 Declare Scope PQ_scope.
 Delimit Scope PQ_scope with PQ.
 
-(* A PQ number {PQnum1:=a; PQden1:=b} represents the rational (a+1)/(b+1) *)
-(* With record p_nat, "pn a" means "a+1" *)
+(* Non null natural
+   Natural numbers excluding 0.
+   Represented by a nat "n" meaning "n+1" *)
 
-Record p_nat := pn { PN : nat }.
-Record PQ := PQmake { PQnum1 : p_nat; PQden1 : p_nat }.
+Record nnn := mknn { nn : nat }.
+
+(* A PQ number {PQnum1:=a; PQden1:=b} represents the rational (a+1)/(b+1) *)
+
+Record PQ := PQmake { PQnum1 : nnn; PQden1 : nnn }.
 (*
 Arguments PQmake _%nat _%nat.
 Arguments PQnum1 x%PQ : rename.
 Arguments PQden1 x%PQ : rename.
 *)
 
-Definition PQ_of_pair n d := PQmake (pn (n - 1)) (pn (d - 1)).
-Definition nd x y := (PN (PQnum1 x) + 1) * (PN (PQden1 y) + 1).
+Definition PQ_of_pair n d := PQmake (mknn (n - 1)) (mknn (d - 1)).
+Definition nd x y := (nn (PQnum1 x) + 1) * (nn (PQden1 y) + 1).
 Definition PQeq x y := nd x y = nd y x.
 
 Theorem PQeq_dec : ∀ x y : PQ, {PQeq x y} + {¬ PQeq x y}.
@@ -42,19 +46,22 @@ Definition PQge x y := PQle y x.
 
 Definition PQadd_num1 x y := nd x y + nd y x - 1.
 Definition PQsub_num1 x y := nd x y - nd y x - 1.
-Definition PQadd_den1 x y := (PN (PQden1 x) + 1) * (PN (PQden1 y) + 1) - 1.
+Definition PQadd_den1 x y := (nn (PQden1 x) + 1) * (nn (PQden1 y) + 1) - 1.
 
-Definition PQadd x y := PQmake (pn (PQadd_num1 x y)) (pn (PQadd_den1 x y)).
-Definition PQsub x y := PQmake (pn (PQsub_num1 x y)) (pn (PQadd_den1 x y)).
+Definition PQadd x y :=
+  PQmake (mknn (PQadd_num1 x y)) (mknn (PQadd_den1 x y)).
+Definition PQsub x y :=
+  PQmake (mknn (PQsub_num1 x y)) (mknn (PQadd_den1 x y)).
 Arguments PQadd x%PQ y%PQ.
 Arguments PQsub x%PQ y%PQ.
 
 (* multiplication, inversion, division *)
 
-Definition PQmul_num1 x y := (PN (PQnum1 x) + 1) * (PN (PQnum1 y) + 1) - 1.
-Definition PQmul_den1 x y := (PN (PQden1 x) + 1) * (PN (PQden1 y) + 1) - 1.
+Definition PQmul_num1 x y := (nn (PQnum1 x) + 1) * (nn (PQnum1 y) + 1) - 1.
+Definition PQmul_den1 x y := (nn (PQden1 x) + 1) * (nn (PQden1 y) + 1) - 1.
 
-Definition PQmul x y := PQmake (pn (PQmul_num1 x y)) (pn (PQmul_den1 x y)).
+Definition PQmul x y :=
+  PQmake (mknn (PQmul_num1 x y)) (mknn (PQmul_den1 x y)).
 Arguments PQmul x%PQ y%PQ.
 
 Definition PQinv x := PQmake (PQden1 x) (PQnum1 x).
@@ -93,8 +100,8 @@ Definition PQ_of_decimal_int (n : Decimal.int) : option PQ :=
   end.
 
 Definition PQ_to_decimal_uint (pq : PQ) : option Decimal.uint :=
-  match PN (PQden1 pq) with
-  | 0 => Some (Nat.to_uint (PN (PQnum1 pq) + 1))
+  match nn (PQden1 pq) with
+  | 0 => Some (Nat.to_uint (nn (PQnum1 pq) + 1))
   | _ => None
   end.
 
@@ -114,8 +121,8 @@ Definition PQ_of_numeral_int (n : Numeral.int) : option PQ :=
   end.
 
 Definition PQ_to_numeral_uint (pq : PQ) : option Numeral.uint :=
-  match PN (PQden1 pq) with
-  | 0 => Some (Numeral.UIntDec (Nat.to_uint (PN (PQnum1 pq) + 1)))
+  match nn (PQden1 pq) with
+  | 0 => Some (Numeral.UIntDec (Nat.to_uint (nn (PQnum1 pq) + 1)))
   | _ => None
   end.
 
@@ -123,30 +130,36 @@ Numeral Notation PQ PQ_of_numeral_int PQ_to_numeral_uint : PQ_scope.
 
 (* end 8.12 *)
 
+(* *)
+
+Definition nnn_of_decimal_uint (n : Decimal.uint) : option nnn :=
+  let a := Nat.of_uint n in
+  if Nat.eq_dec a 0 then None
+  else Some (mknn (a - 1)).
+
+Definition nnn_of_decimal_int (n : Decimal.int) : option nnn :=
+  match n with
+  | Decimal.Pos ui => nnn_of_decimal_uint ui
+  | Decimal.Neg ui => None
+  end.
+
+(* *)
+
+Definition nnn_of_numeral_int (n : Numeral.int) : option nnn :=
+  match n with
+  | Numeral.IntDec n => nnn_of_decimal_int n
+  | Numeral.IntHex _ => None
+  end.
+
+...
+
+Numeral Notation nnn nnn_of_numeral_int nnn_to_numeral_uint : nnn_scope.
+
 (**)
 Check 25%PQ.
 Check (22 // 7)%PQ.
 Compute (22 // 7)%PQ.
-Check (pn 21).
-(*
-{| PN := 21 |}
-     : p_nat
-
-Bon. Faut un "numeral notation" pour les p_nat telle que ça affiche ici
-   22%pn
-Mais, du coup, faut que je l'appelle "pn" (prev nat) ou "sn" (succ nat) ?
-Au alors carrément
-   22%n
-On s'en fout, du "%n", là juste pour des raisons syntaxiques. Pour dire
-que le nombre auquel je pense, c'est "22", même s'il est représenté
-internement par "21".
-*)
-...
-(*
-     = {| PQnum1 := {| PN := 21 |}; PQden1 := {| PN := 6 |} |}
-  I'd like it to print
-     = {| PQnum1 := 22%pn; PQden1 := 7%pn |}
-*)
+Check (mknn 21).
 (*
 Check 0%PQ.
 *)
