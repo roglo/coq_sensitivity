@@ -397,11 +397,10 @@ Compute test [[1;2;2;-3;2;3];[2;4;1;0;-5;-6];[4;8;5;-6;-1;0];[-1;-2;-1;1;1;1]].
 (* let's go for the fields *)
 
 Class field_op T :=
-  { fld_ring : ring_op T;
+  { (*fld_ring : ring_op T;*)
     fld_inv : T → T }.
 
-Definition fld_div T {F : field_op T} (ro := fld_ring) {so : semiring_op T}
-    a b :=
+Definition fld_div T {fo : field_op T} {so : semiring_op T} a b :=
   srng_mul a (fld_inv b).
 
 Declare Scope field_scope.
@@ -410,6 +409,7 @@ Delimit Scope field_scope with F.
 Notation "0" := srng_zero : field_scope.
 Notation "1" := srng_one : field_scope.
 Notation "- a" := (rng_opp a) : field_scope.
+Notation "/ a" := (fld_inv a) : field_scope.
 Notation "a + b" := (srng_add a b) : field_scope.
 Notation "a - b" := (rng_sub a b) : field_scope.
 Notation "a * b" := (srng_mul a b) : field_scope.
@@ -431,7 +431,7 @@ Fixpoint gauss_jordan_loop lt (A : matrix T) r oj :=
         gauss_jordan_loop lt A r oj'
       else
         let r := r + 1 in
-        let A := multiply_row_by_scalar A (r - 1) (mat_el A k j) in
+        let A := multiply_row_by_scalar A (r - 1) (/ mat_el A k j)%F in
         let A := swap_rows A (r - 1) k in
         let A :=
           fold_left
@@ -475,6 +475,10 @@ Definition Q_sring_dec_prop : sring_dec_prop Q :=
 Existing Instance Q_ring_op.
 Existing Instance Q_semiring_op.
 Existing Instance Q_sring_dec_prop.
+Print field_op.
+...
+Existing Instance Q_field_op.
+
 Definition Q_ltb a b :=
   match Q.compare a b with Lt => true | _ => false end.
 Definition Q_gauss_jordan := gauss_jordan Q_ltb.
