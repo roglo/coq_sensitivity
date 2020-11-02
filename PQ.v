@@ -1410,12 +1410,14 @@ PQtac1.
 PQtac2; [ PQtac2 | simpl; flia ].
 PQtac2; [ | simpl; flia ].
 do 3 PQtac2.
-...
-replace (S yn * (S a * S xd)) with (S a * (S yn * S xd)) by flia.
+replace (S (nn yn) * (S (nn a) * S (nn xd))) with
+  (S (nn a) * (S (nn yn) * S (nn xd))) by flia.
 rewrite <- Nat.mul_assoc, <- Nat.mul_add_distr_l.
 rewrite <- Nat.mul_assoc.
 rewrite ggcd_mul_mono_l; [ | easy ].
-now destruct (ggcd (S xn * S yd + S yn * S xd) (S xd * S yd)).
+now destruct
+  (ggcd (S (nn xn) * S (nn yd) + S (nn yn) * S (nn xd))
+     (S (nn xd) * S (nn yd))).
 Qed.
 
 Theorem PQred_sub_mul_one_l : ∀ x y a,
@@ -1430,13 +1432,17 @@ revert Hyx; PQtac1; intros.
 PQtac2; [ PQtac2 | flia Hyx ].
 PQtac2.
 -do 3 PQtac2.
- replace (S yn * (S a * S xd)) with (S a * (S yn * S xd)) by flia.
+ replace (S (nn yn) * (S (nn a) * S (nn xd))) with
+   (S (nn a) * (S (nn yn) * S (nn xd))) by flia.
  rewrite <- Nat.mul_assoc, <- Nat.mul_sub_distr_l.
  rewrite <- Nat.mul_assoc.
  rewrite ggcd_mul_mono_l; [ | easy ].
- now destruct (ggcd (S xn * S yd - S yn * S xd) (S xd * S yd)).
+ now destruct
+   (ggcd (S (nn xn) * S (nn yd) - S (nn yn) * S (nn xd))
+      (S (nn xd) * S (nn yd))).
 -do 2 PQtac2.
- replace (S yn * (S a * S xd)) with (S a * (S yn * S xd)) by flia.
+ replace (S (nn yn) * (S (nn a) * S (nn xd))) with
+   (S (nn a) * (S (nn yn) * S (nn xd))) by flia.
  rewrite <- Nat.mul_assoc, <- Nat.mul_sub_distr_l.
  apply Nat.sub_gt in Hyx.
  remember (_ - _) as u.
@@ -1453,6 +1459,12 @@ unfold PQmul_num1, PQmul_den1; simpl.
 unfold PQsub_num1, PQadd_den1, nd; simpl.
 revert Hyx; PQtac1; intros.
 PQtac2; [ PQtac2 | flia Hyx ].
+destruct a as (a).
+destruct xn as (xn).
+destruct xd as (xd).
+destruct yn as (yn).
+destruct yd as (yd).
+cbn - [ ggcd Nat.mul ].
 PQtac2.
 -do 3 PQtac2.
  replace (S xn * (S a * S yd)) with (S a * (S xn * S yd)) by flia.
@@ -1478,6 +1490,7 @@ PQtac1.
 do 6 PQtac2.
 do 2 rewrite <- Nat.mul_assoc.
 rewrite ggcd_mul_mono_l; [ | easy ].
+...
 now destruct (ggcd (S xn * S yn) (S xd * S yd)).
 Qed.
 
