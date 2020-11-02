@@ -63,7 +63,10 @@ Definition PQmul_den1 x y := (nn (PQden1 x) + 1) * (nn (PQden1 y) + 1) - 1.
 
 Definition PQmul x y :=
   PQmake (mknn (PQmul_num1 x y)) (mknn (PQmul_den1 x y)).
+Definition PQdiv x y :=
+  PQmake (mknn (PQmul_num1 x y)) (mknn (PQmul_den1 x y)).
 Arguments PQmul x%PQ y%PQ.
+Arguments PQdiv x%PQ y%PQ.
 
 Definition PQinv x := PQmake (PQden1 x) (PQnum1 x).
 
@@ -72,8 +75,9 @@ Module PQ_Notations.
 (*
 Notation "1" := (PQmake 0 0) : PQ_scope.
 Notation "2" := (PQmake 1 0) : PQ_scope.
-*)
 Notation "a // b" := (PQ_of_pair a b) : PQ_scope.
+*)
+Notation "a // b" := (PQmake a b) : PQ_scope.
 Notation "x == y" := (PQeq x y) (at level 70) : PQ_scope.
 Notation "x ≠≠ y" := (¬ PQeq x y) (at level 70) : PQ_scope.
 Notation "'if_PQeq_dec' x y 'then' P 'else' Q" :=
@@ -87,6 +91,7 @@ Notation "x ≤ y ≤ z" := (x ≤ y ∧ y ≤ z)%PQ (at level 70, y at next lev
 Notation "x + y" := (PQadd x y) : PQ_scope.
 Notation "x - y" := (PQsub x y) : PQ_scope.
 Notation "x * y" := (PQmul x y) : PQ_scope.
+Notation "x / y" := (PQdiv x) : PQ_scope.
 Notation "/ x" := (PQinv x) : PQ_scope.
 
 Definition PQ_of_decimal_uint (n : Decimal.uint) : option PQ :=
@@ -158,12 +163,21 @@ Definition nnn_to_numeral_uint (nn1 : nnn) : option Numeral.uint :=
 Numeral Notation nnn nnn_of_numeral_int nnn_to_numeral_uint : nnn_scope.
 
 (**)
-Notation "a /// b" := (PQmake a b) (at level 32) : PQ_scope.
-
 Check 25%PQ.
 Check (22 // 7)%PQ.
 Compute (22 // 7)%PQ.
+Compute (22 // 1)%PQ.
 Check (mknn 21).
+Unset Printing Notations.
+Check 3%PQ.
+Compute 3%PQ.
+Check (3//2)%PQ.
+Compute (3//2)%PQ.
+(* *)
+Check (3/2)%PQ.
+(* oui non, ça c'est pas bon ; faut que je voye la définition
+   de PQdiv *)
+...
 (*
 Check 0%PQ.
 *)
