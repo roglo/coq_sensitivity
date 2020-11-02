@@ -279,8 +279,8 @@ Theorem PQlt_le_dec : ∀ x y : PQ, {(x < y)%PQ} + {(y ≤ x)%PQ}.
 Proof.
 intros (xn, xd) (yn, yd).
 unfold PQlt, PQle, nd; simpl.
-...
-destruct (lt_dec ((xn + 1) * (yd + 1)) ((yn + 1) * (xd + 1))) as [H1| H1].
+destruct (lt_dec ((nn xn + 1) * (nn yd + 1)) ((nn yn + 1) * (nn xd + 1)))
+  as [H1| H1].
 -now left.
 -now right; apply Nat.nlt_ge.
 Qed.
@@ -290,7 +290,8 @@ Theorem PQle_lt_dec : ∀ x y : PQ, {(x ≤ y)%PQ} + {(y < x)%PQ}.
 Proof.
 intros (xn, xd) (yn, yd).
 unfold PQlt, PQle, nd; simpl.
-destruct (le_dec ((xn + 1) * (yd + 1)) ((yn + 1) * (xd + 1))) as [H1| H1].
+destruct (le_dec ((nn xn + 1) * (nn yd + 1)) ((nn yn + 1) * (nn xd + 1)))
+  as [H1| H1].
 -now left.
 -now right; apply Nat.nle_gt.
 Qed.
@@ -301,8 +302,8 @@ Ltac split_var x :=
   let xd := fresh x in
   let Hpn := fresh x in
   let Hpd := fresh x in
-  remember (PQnum1 x + 1) as xn eqn:Hxn;
-  remember (PQden1 x + 1) as xd eqn:Hxd;
+  remember (nn (PQnum1 x) + 1) as xn eqn:Hxn;
+  remember (nn (PQden1 x) + 1) as xd eqn:Hxd;
   assert (Hpn : 0 < xn) by flia Hxn;
   assert (Hpd : 0 < xd) by flia Hxd;
   clear Hxn Hxd.
@@ -443,14 +444,14 @@ rewrite Nat_sub_sub_swap, Nat.sub_succ, Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | simpl; flia ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
 do 2 rewrite Nat.mul_sub_distr_r.
-remember (S (PQnum1 x1)) as x1n eqn:Hx1n.
-remember (S (PQden1 x1)) as x1d eqn:Hx1d.
-remember (S (PQnum1 x2)) as x2n eqn:Hx2n.
-remember (S (PQden1 x2)) as x2d eqn:Hx2d.
-remember (S (PQnum1 y1)) as y1n eqn:Hy1n.
-remember (S (PQden1 y1)) as y1d eqn:Hy1d.
-remember (S (PQnum1 y2)) as y2n eqn:Hy2n.
-remember (S (PQden1 y2)) as y2d eqn:Hy2d.
+remember (S (nn (PQnum1 x1))) as x1n eqn:Hx1n.
+remember (S (nn (PQden1 x1))) as x1d eqn:Hx1d.
+remember (S (nn (PQnum1 x2))) as x2n eqn:Hx2n.
+remember (S (nn (PQden1 x2))) as x2d eqn:Hx2d.
+remember (S (nn (PQnum1 y1))) as y1n eqn:Hy1n.
+remember (S (nn (PQden1 y1))) as y1d eqn:Hy1d.
+remember (S (nn (PQnum1 y2))) as y2n eqn:Hy2n.
+remember (S (nn (PQden1 y2))) as y2d eqn:Hy2d.
 move H1 before H2.
 f_equal.
 -replace (y1n * x1d * (y2d * x2d)) with (y1n * y2d * x1d * x2d) by flia.
@@ -553,6 +554,7 @@ Theorem PQadd_add_swap : ∀ x y z, (x + y + z)%PQ = (x + z + y)%PQ.
 Proof.
 intros; PQtac1.
 repeat PQtac2; [ | simpl; flia | simpl; flia ].
+...
 PQtac3; f_equal; [ | f_equal; apply Nat.mul_shuffle0 ].
 f_equal.
 rewrite Nat.add_shuffle0.
