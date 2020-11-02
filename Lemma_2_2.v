@@ -528,7 +528,7 @@ Notation "a /// b" := (PQmake (a - 1) (b - 1)) (at level 32) : PQ_scope.
 *)
 Notation "a /// b" := (PQmake a b) (at level 32) : PQ_scope.
 Compute (2 // 5)%Q.
-(* bof, pas terrible, ça affiche évidemment 1 /// 4 mais pour faire
-   afficher 2 /// 5, c'est plus compliqué... va falloir ajouter un
+(* bof, pas terrible, ça affiche évidemment 1 /// 4, du coup, mais pour
+   faire afficher 2 /// 5, c'est plus compliqué... va falloir ajouter un
    Set Numeral Notation adapté, mais je suis pas sûr que ce soit
    possible. *)
