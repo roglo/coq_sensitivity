@@ -431,7 +431,7 @@ Fixpoint gauss_jordan_loop lt (A : matrix T) r oj :=
         gauss_jordan_loop lt A r oj'
       else
         let r := r + 1 in
-        let A := multiply_row_by_scalar A (r - 1) (/ mat_el A k j)%F in
+        let A := multiply_row_by_scalar A k (/ mat_el A k j)%F in
         let A := swap_rows A (r - 1) k in
         let A :=
           fold_left
@@ -490,8 +490,11 @@ Compute qtest [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]]%Q.
 (*
      = ([[48; 0; 0]; [0; 48; 0]; [0; 0; 48]], 48)
 *)
+Compute qtest [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]]%Q.
+(*
+     = ([[48; 0; 0]; [0; 48; 0]; [0; 0; 48]], 48)
+*)
 Compute qtest [[1;-1;2;5];[3;2;1;10];[2;-3;-2;-10]]%Q.
-(* hou la, c'est pas ça *)
 (*
      = ([[4095; 0; 0; 4095]; [0; 4095; 0; 8190]; [0; 0; 4095; 12285]], 4095)
      = ([[1; 0; 0; 1]; [0; 1; 0; 2]; [0; 0; 1; 3]], 1)
