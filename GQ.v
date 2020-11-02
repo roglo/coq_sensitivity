@@ -13,7 +13,8 @@ Delimit Scope GQ_scope with GQ.
 Record GQ :=
   GQmake0
     { PQ_of_GQ : PQ;
-      GQprop : Nat.gcd (PQnum1 PQ_of_GQ + 1) (PQden1 PQ_of_GQ + 1) = 1 }.
+      GQprop :
+        Nat.gcd (nn (PQnum1 PQ_of_GQ) + 1) (nn (PQden1 PQ_of_GQ) + 1) = 1 }.
 Arguments GQmake0 PQ_of_GQ%PQ.
 Arguments PQ_of_GQ x%GQ : rename.
 
@@ -82,8 +83,8 @@ Definition GQ_of_decimal_int (n : Decimal.int) : option GQ :=
 
 Definition GQ_to_decimal_uint (gq : GQ) : option Decimal.uint :=
   let (num, den) := PQ_of_GQ gq in
-  match den with
-  | 0 => Some (Nat.to_uint (num + 1))
+  match nn den with
+  | 0 => Some (Nat.to_uint (nn num + 1))
   | _ => None
   end.
 
@@ -163,6 +164,12 @@ simpl in Hxy.
 unfold GQ_of_PQ.
 apply GQeq_eq; simpl.
 unfold PQred; simpl.
+destruct xn as (xn).
+destruct xd as (xd).
+destruct yn as (yn).
+destruct yd as (yd).
+cbn in Hxy.
+cbn - [ ggcd ].
 remember (Nat.gcd (xn + 1) (xd + 1)) as gx eqn:Hgx.
 remember (Nat.gcd (yn + 1) (yd + 1)) as gy eqn:Hgy.
 move gy before gx.
@@ -176,7 +183,7 @@ destruct H1 as (H1, H2).
 destruct H3 as (H3, H4).
 assert (Hgxz : gx ≠ 0) by now intros H; rewrite H, Nat.add_1_r in H1.
 assert (Hgyz : gy ≠ 0) by now intros H; rewrite H, Nat.add_1_r in H3.
-f_equal; f_equal.
+f_equal; f_equal; f_equal.
 -rewrite <- (Nat.mul_cancel_l _ _ gx), <- H1; [ | easy ].
  rewrite <- (Nat.mul_cancel_l _ _ gy); [ | easy ].
  rewrite Nat.mul_assoc, Nat.mul_shuffle0, <- H3.
@@ -199,16 +206,13 @@ Proof.
 intros * Hxy Hyx.
 apply Nat.le_antisymm in Hxy; [ | easy ].
 unfold nd in Hxy.
-destruct x as ((xn, xd), Hxp).
-destruct y as ((yn, yd), Hyp).
+destruct x as (((xn), (xd)), Hxp).
+destruct y as (((yn), (yd)), Hyp).
 move yd before xd; move yn before xd.
 simpl in Hxp, Hyp, Hxy.
 apply GQeq_eq; simpl.
 clear Hyx.
 assert (H : yd + 1 ≠ 0) by flia.
-(*
-symmetry in Hxp, Hyp.
-*)
 apply (proj2 (Nat.mul_cancel_r _ _ _ H)) in Hxp.
 rewrite <- Nat.gcd_mul_mono_r, <- Hxy, Nat.mul_comm, Nat.mul_1_l in Hxp.
 rewrite Nat.gcd_mul_mono_l, Hyp, Nat.mul_1_r in Hxp.
@@ -235,7 +239,7 @@ apply ggcd_split in Hxp.
 rewrite Hxp.
 do 2 rewrite Nat.div_1_r.
 do 2 rewrite Nat.add_sub.
-now destruct xp.
+now destruct xp, PQnum1, PQden1.
 Qed.
 
 Theorem GQ_of_PQ_additive : ∀ x y,
@@ -283,14 +287,16 @@ Proof.
 intros.
 unfold "=="%PQ, nd; simpl.
 unfold PQred.
-remember (ggcd (PQnum1 x + 1) (PQden1 x + 1)) as g eqn:Hg.
+remember (ggcd (nn (PQnum1 x) + 1) (nn (PQden1 x) + 1)) as g eqn:Hg.
 erewrite ggcd_split in Hg; [ | easy ].
 subst g; simpl.
-specialize (Nat.gcd_divide_l (PQnum1 x + 1) (PQden1 x + 1)) as (c1, Hc1).
-specialize (Nat.gcd_divide_r (PQnum1 x + 1) (PQden1 x + 1)) as (c2, Hc2).
+specialize (Nat.gcd_divide_l (nn (PQnum1 x) + 1) (nn (PQden1 x) + 1)) as
+  (c1, Hc1).
+specialize (Nat.gcd_divide_r (nn (PQnum1 x) + 1) (nn (PQden1 x) + 1)) as
+  (c2, Hc2).
 move c2 before c1.
 rewrite Hc1 at 1.
-assert (Hg : Nat.gcd (PQnum1 x + 1) (PQden1 x + 1) ≠ 0). {
+assert (Hg : Nat.gcd (nn (PQnum1 x) + 1) (nn (PQden1 x) + 1) ≠ 0). {
   intros H; rewrite H in Hc1; flia Hc1.
 }
 rewrite Nat.div_mul; [ | easy ].
@@ -463,8 +469,6 @@ Proof.
 intros.
 (* do it with GQcompare (later)
    perhaps this is better to Compute *)
-...
-intros.
 destruct (GQle_lt_dec x y) as [H1| H1].
 -destruct (GQle_lt_dec y x) as [H2| H2].
  +now left; apply GQle_antisymm.
@@ -763,8 +767,8 @@ destruct x as (x, Hx).
 destruct y as (y, Hy).
 move y before x.
 simpl in H; simpl.
-destruct x as (xn, xd).
-destruct y as (yn, yd).
+destruct x as ((xn), (xd)).
+destruct y as ((yn), (yd)).
 simpl in *.
 unfold "=="%PQ, nd in H.
 simpl in H.
@@ -772,9 +776,6 @@ apply (Nat.mul_cancel_r _ _ (yd + 1)) in Hx; [ | flia ].
 rewrite Nat.mul_1_l in Hx.
 rewrite <- Nat.gcd_mul_mono_r in Hx.
 rewrite H, Nat.mul_comm in Hx.
-(*
-symmetry in Hy.
-*)
 rewrite Nat.gcd_mul_mono_l, Hy, Nat.mul_1_r in Hx.
 rewrite Hx in H.
 apply Nat.mul_cancel_r in H; [ | flia ].
@@ -785,7 +786,7 @@ Qed.
 
 Theorem GQ_of_PQ_eq : ∀ x y, GQ_of_PQ x = GQ_of_PQ y → (x == y)%PQ.
 Proof.
-intros (xn, xd) (yn, yd) H.
+intros ((xn), (xd)) ((yn), (yd)) H.
 unfold GQ_of_PQ in H; simpl in H.
 injection H; clear H; intros H.
 unfold PQred in H; simpl in H.
@@ -1192,7 +1193,7 @@ destruct a as (a, Ha); simpl.
 rewrite (ggcd_split _ _ 1); [ | easy ].
 do 2 rewrite Nat.div_1_r, Nat.add_1_r.
 do 2 rewrite Nat.sub_succ, Nat.sub_0_r.
-now destruct a.
+now destruct a, PQnum1, PQden1.
 Qed.
 
 Theorem GQmul_1_r : ∀ a, (a * 1)%GQ = a.
@@ -1245,8 +1246,8 @@ apply (GQlt_trans _ (x * t)).
 -now apply GQmul_lt_mono_r.
 Qed.
 
-Definition GQnum x := PQnum1 (PQ_of_GQ x) + 1.
-Definition GQden x := PQden1 (PQ_of_GQ x) + 1.
+Definition GQnum x := nn (PQnum1 (PQ_of_GQ x)) + 1.
+Definition GQden x := nn (PQden1 (PQ_of_GQ x)) + 1.
 Arguments GQnum x%GQ.
 Arguments GQden x%GQ.
 
@@ -1283,7 +1284,7 @@ unfold GQnum, GQden.
 unfold GQ_of_PQ; cbn.
 remember (PQ_of_GQ x) as px eqn:Hpx; symmetry in Hpx.
 unfold PQred.
-destruct px as (nx, dx).
+destruct px as ((nx), (dx)).
 remember ggcd as f; cbn; subst f.
 remember (ggcd (nx + 1) (dx + 1)) as g eqn:Hg.
 symmetry in Hg.
@@ -1511,11 +1512,10 @@ intros.
 apply GQeq_eq; cbn.
 destruct x as (px, Hpx); cbn.
 rewrite <- PQred_mul_r.
-unfold "*"%PQ, "/"%PQ.
+unfold "*"%PQ, PQinv.
 unfold PQmul_num1, PQmul_den1; cbn.
 rewrite Nat.mul_comm.
 apply PQred_diag.
-now do 2 rewrite Nat.add_1_r.
 Qed.
 
 Theorem GQmul_inv_l : ∀ x, (/ x * x = 1)%GQ.
