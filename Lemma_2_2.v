@@ -492,10 +492,13 @@ Compute qtest [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]]%Q.
 (*
      = ([[48; 0; 0]; [0; 48; 0]; [0; 0; 48]], 48)
 *)
-Compute qtest [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]]%Q.
 (*
-     = ([[48; 0; 0]; [0; 48; 0]; [0; 0; 48]], 48)
+Notation "++ a ( b )" := (Pos (GQ.GQmake0 a b)) (at level 35) : Q_scope.
+Notation "-- a ( b )" := (Neg (GQ.GQmake0 a b)) (at level 35) : Q_scope.
+Notation "a ▵ / b ▵" := (PQmake a b) (at level 32, format "a ▵ / b ▵") : PQ_scope.
 *)
+Notation "+ ^ a / ^ b ( c )" := (Pos (GQ.GQmake0 (PQmake a b) c)) (at level 35, format "+  ^ a / ^ b  ( c )") : Q_scope.
+Notation "- ^ a / ^ b ( c )" := (Neg (GQ.GQmake0 (PQmake a b) c)) (at level 35, format "-  ^ a / ^ b  ( c )") : Q_scope.
 Compute qtest [[-3;-3;3;0];[3;-9;3;0];[6;-6;0;0]]%Q.
 (*
      = ([[-216; 0; 108; 0]; [0; -216; 108; 0]; [0; 0; 0; 0]], -216)
