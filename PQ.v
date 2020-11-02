@@ -182,16 +182,13 @@ Compute (PQinv (3//2)%PQ).
 Compute (2//3 / 4 // 15)%PQ.
 Fail Check 0%PQ.
 *)
-...
-
-*)
 
 End PQ_Notations.
 
 Import PQ_Notations.
 
 Definition PQone x := PQmake (PQden1 x) (PQden1 x).
-Definition PQ_of_nat n := PQmake (n - 1) 0.
+Definition PQ_of_nat n := PQmake (mknn (n - 1)) 1.
 
 (* equality *)
 
@@ -206,7 +203,7 @@ Proof.
 unfold "==".
 intros * Hxy Hyz.
 unfold nd in *.
-apply (Nat.mul_cancel_l _ _ (PQnum1 y + 1)); [ flia | ].
+apply (Nat.mul_cancel_l _ _ (nn (PQnum1 y) + 1)); [ flia | ].
 rewrite Nat.mul_assoc, Nat.mul_shuffle0, Hyz.
 rewrite Nat.mul_shuffle0, <- Nat.mul_assoc, Hxy.
 rewrite Nat.mul_comm, Nat.mul_shuffle0.
@@ -277,6 +274,7 @@ Theorem PQlt_le_dec : ∀ x y : PQ, {(x < y)%PQ} + {(y ≤ x)%PQ}.
 Proof.
 intros (xn, xd) (yn, yd).
 unfold PQlt, PQle, nd; simpl.
+...
 destruct (lt_dec ((xn + 1) * (yd + 1)) ((yn + 1) * (xd + 1))) as [H1| H1].
 -now left.
 -now right; apply Nat.nlt_ge.
