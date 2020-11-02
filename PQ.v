@@ -683,13 +683,12 @@ do 10 rewrite Nat.add_1_r.
 do 4 (rewrite <- Nat.sub_succ_l; [ | simpl; flia ]).
 do 4 rewrite Nat.sub_succ, Nat.sub_0_r.
 do 2 rewrite Nat.mul_add_distr_r.
-...
-remember (S (PQnum1 x)) as xn eqn:Hxn.
-remember (S (PQden1 x)) as xd eqn:Hxd.
-remember (S (PQnum1 y)) as yn eqn:Hyn.
-remember (S (PQden1 y)) as yd eqn:Hyd.
-remember (S (PQnum1 z)) as zn eqn:Hzn.
-remember (S (PQden1 z)) as zd eqn:Hzd.
+remember (S (nn (PQnum1 x))) as xn eqn:Hxn.
+remember (S (nn (PQden1 x))) as xd eqn:Hxd.
+remember (S (nn (PQnum1 y))) as yn eqn:Hyn.
+remember (S (nn (PQden1 y))) as yd eqn:Hyd.
+remember (S (nn (PQnum1 z))) as zn eqn:Hzn.
+remember (S (nn (PQden1 z))) as zd eqn:Hzd.
 replace (zn * yd * (xd * zd)) with (zn * xd * (yd * zd)) by flia.
 replace (xn * zd * (yd * zd)) with (xn * yd * (zd * zd)) by flia.
 replace (yn * zd * (xd * zd)) with (yn * xd * (zd * zd)) by flia.
@@ -717,12 +716,12 @@ do 10 rewrite Nat.add_1_r.
 do 4 (rewrite <- Nat.sub_succ_l; [ | simpl; flia ]).
 do 4 rewrite Nat.sub_succ, Nat.sub_0_r.
 do 2 rewrite Nat.mul_add_distr_r.
-remember (S (PQnum1 x)) as xn eqn:Hxn.
-remember (S (PQden1 x)) as xd eqn:Hxd.
-remember (S (PQnum1 y)) as yn eqn:Hyn.
-remember (S (PQden1 y)) as yd eqn:Hyd.
-remember (S (PQnum1 z)) as zn eqn:Hzn.
-remember (S (PQden1 z)) as zd eqn:Hzd.
+remember (S (nn (PQnum1 x))) as xn eqn:Hxn.
+remember (S (nn (PQden1 x))) as xd eqn:Hxd.
+remember (S (nn (PQnum1 y))) as yn eqn:Hyn.
+remember (S (nn (PQden1 y))) as yd eqn:Hyd.
+remember (S (nn (PQnum1 z))) as zn eqn:Hzn.
+remember (S (nn (PQden1 z))) as zd eqn:Hzd.
 replace (zn * yd * (xd * zd)) with (zn * xd * (yd * zd)) by flia.
 replace (xn * zd * (yd * zd)) with (xn * yd * (zd * zd)) by flia.
 replace (yn * zd * (xd * zd)) with (yn * xd * (zd * zd)) by flia.
@@ -791,12 +790,12 @@ split.
  rewrite Nat.sub_succ, Nat.sub_0_r.
  rewrite <- Nat.sub_succ_l; [ | simpl; flia ].
  rewrite Nat.sub_succ, Nat.sub_0_r.
- remember (S (PQnum1 x)) as xn eqn:Hxn.
- remember (S (PQden1 x)) as xd eqn:Hxd.
- remember (S (PQnum1 y)) as yn eqn:Hyn.
- remember (S (PQden1 y)) as yd eqn:Hyd.
- remember (S (PQnum1 z)) as zn eqn:Hzn.
- remember (S (PQden1 z)) as zd eqn:Hzd.
+ remember (S (nn (PQnum1 x))) as xn eqn:Hxn.
+ remember (S (nn (PQden1 x))) as xd eqn:Hxd.
+ remember (S (nn (PQnum1 y))) as yn eqn:Hyn.
+ remember (S (nn (PQden1 y))) as yd eqn:Hyd.
+ remember (S (nn (PQnum1 z))) as zn eqn:Hzn.
+ remember (S (nn (PQden1 z))) as zd eqn:Hzd.
  do 2 rewrite Nat.mul_sub_distr_r.
  replace (zn * yd * (xd * zd)) with (zn * xd * (yd * zd)) by flia.
  replace (xn * zd * (yd * zd)) with (xn * yd * (zd * zd)) by flia.
@@ -827,12 +826,12 @@ split.
  rewrite Nat.sub_succ, Nat.sub_0_r.
  rewrite <- Nat.sub_succ_l; [ | simpl; flia ].
  rewrite Nat.sub_succ, Nat.sub_0_r.
- remember (S (PQnum1 x)) as xn eqn:Hxn.
- remember (S (PQden1 x)) as xd eqn:Hxd.
- remember (S (PQnum1 y)) as yn eqn:Hyn.
- remember (S (PQden1 y)) as yd eqn:Hyd.
- remember (S (PQnum1 z)) as zn eqn:Hzn.
- remember (S (PQden1 z)) as zd eqn:Hzd.
+ remember (S (nn (PQnum1 x))) as xn eqn:Hxn.
+ remember (S (nn (PQden1 x))) as xd eqn:Hxd.
+ remember (S (nn (PQnum1 y))) as yn eqn:Hyn.
+ remember (S (nn (PQden1 y))) as yd eqn:Hyd.
+ remember (S (nn (PQnum1 z))) as zn eqn:Hzn.
+ remember (S (nn (PQden1 z))) as zd eqn:Hzd.
  do 2 rewrite Nat.mul_sub_distr_r.
  replace (zn * yd * (zd * xd)) with (zn * xd * (zd * yd)) by flia.
  replace (xn * zd * (zd * yd)) with (xn * yd * (zd * zd)) by flia.
@@ -896,7 +895,7 @@ unfold "*"%PQ, PQmul_num1, PQmul_den1.
 revert Hyz.
 PQtac1; intros; PQtac2; [ | simpl; flia ].
 PQtac3; do 2 PQtac2; PQtac3; f_equal.
-remember (S (PQnum1 px) * S (PQden1 py)) as t.
+remember (S (nn (PQnum1 px)) * S (nn (PQden1 py))) as t.
 now rewrite Nat.mul_shuffle0, Hyz, Nat.mul_shuffle0, Nat.add_sub.
 Qed.
 
@@ -969,7 +968,7 @@ Theorem PQsub_add_distr : ∀ x y z,
 Proof.
 intros * Hyx.
 revert Hyx; PQtac1; intros.
-repeat PQtac2; PQtac3; [ f_equal; flia | flia Hyx | simpl; flia ].
+repeat PQtac2; PQtac3; [ f_equal; f_equal; flia | flia Hyx | simpl; flia ].
 Qed.
 
 Theorem PQsub_sub_swap : ∀ x y z,
@@ -993,7 +992,7 @@ rewrite Nat.mul_sub_distr_r, Nat.mul_assoc in Hyzx.
 repeat PQtac2; PQtac3; [ | simpl; flia | ].
 -f_equal; [ f_equal | now rewrite Nat.mul_shuffle0 ].
  rewrite Nat_sub_sub_assoc.
- +f_equal; [ | now rewrite Nat.mul_shuffle0 ].
+ +f_equal; f_equal; [ | now rewrite Nat.mul_shuffle0 ].
   now f_equal; rewrite Nat.mul_shuffle0.
  +split; [ | flia Hyzx ].
   now apply Nat.mul_le_mono_r, Nat.lt_le_incl.
@@ -1009,7 +1008,7 @@ repeat PQtac2; [ | simpl; flia | flia Hzy ].
 PQtac3.
 f_equal; f_equal.
 rewrite Nat.add_sub_assoc.
--f_equal; [ f_equal; apply Nat.mul_shuffle0 | apply Nat.mul_shuffle0 ].
+-f_equal; f_equal; [ f_equal; apply Nat.mul_shuffle0 | apply Nat.mul_shuffle0 ].
 -now apply Nat.mul_le_mono_r, Nat.lt_le_incl.
 Qed.
 
@@ -1021,7 +1020,7 @@ repeat PQtac2; [ | flia Hzx | simpl; flia ].
 PQtac3.
 f_equal; [ f_equal | now rewrite Nat.mul_shuffle0 ].
 rewrite Nat.add_sub_swap.
--f_equal; f_equal; apply Nat.mul_shuffle0.
+-f_equal; f_equal; f_equal; apply Nat.mul_shuffle0.
 -setoid_rewrite Nat.mul_shuffle0.
  rewrite Nat.mul_shuffle0.
  apply Nat.mul_le_mono_pos_r; [ apply Nat.lt_0_succ | ].
@@ -1121,7 +1120,7 @@ intros.
 unfold "*"%PQ.
 unfold PQmul_num1, PQmul_den1; simpl.
 do 2 rewrite Nat.add_0_r, Nat.add_sub.
-now destruct a.
+now destruct a, PQnum2, PQden2.
 Qed.
 
 Theorem PQmul_assoc : ∀ x y z, (x * (y * z) = (x * y) * z)%PQ.
@@ -1193,7 +1192,7 @@ unfold PQmul_num1, PQadd_den1, PQadd_num1, PQmul_den1, nd; simpl.
 PQtac1; do 2 PQtac2; [ | simpl; flia ].
 PQtac3; do 6 PQtac2.
 PQtac3; f_equal; [ | now rewrite Nat.mul_shuffle0 ].
-now f_equal; f_equal; rewrite Nat.mul_shuffle0.
+now f_equal; f_equal; f_equal; rewrite Nat.mul_shuffle0.
 Qed.
 
 Theorem PQmul_add_distr_l : ∀ x y z, (x * (y + z) == x * y + x * z)%PQ.
@@ -1208,8 +1207,8 @@ unfold PQmul_num1, PQadd_den1, PQadd_num1, PQmul_den1, nd; simpl.
 PQtac1; intros Hzy.
 repeat PQtac2.
 -repeat rewrite Nat.mul_assoc; f_equal.
- +f_equal; PQtac3; f_equal; apply Nat.mul_shuffle0.
- +f_equal; apply Nat.mul_shuffle0.
+ +f_equal; PQtac3; f_equal; f_equal; apply Nat.mul_shuffle0.
+ +f_equal; f_equal; apply Nat.mul_shuffle0.
 -flia Hzy.
 -cbn.
  rewrite Nat.mul_sub_distr_l.
@@ -1259,7 +1258,7 @@ now rewrite H2.
 Qed.
 
 Theorem PQinv_involutive : ∀ x, (/ / x = x)%PQ.
-Proof. intros. unfold "/"%PQ; now destruct x. Qed.
+Proof. intros. unfold PQinv; now destruct x. Qed.
 
 (* *)
 
@@ -1313,8 +1312,8 @@ Qed.
 Require Import Nat_ggcd.
 
 Definition PQred x :=
-  let '(_, (aa, bb)) := ggcd (PQnum1 x + 1) (PQden1 x + 1) in
-  PQmake (aa - 1) (bb - 1).
+  let '(_, (aa, bb)) := ggcd (nn (PQnum1 x) + 1) (nn (PQden1 x) + 1) in
+  PQmake (mknn (aa - 1)) (mknn (bb - 1)).
 Arguments PQred x%PQ.
 
 Instance PQred_morph : Proper (PQeq ==> PQeq) PQred.
@@ -1322,14 +1321,14 @@ Proof.
 intros (xn, xd) (yn, yd) Hxy.
 unfold "=="%PQ, nd in Hxy |-*; simpl in *.
 unfold PQred; simpl.
-remember (ggcd (xn + 1) (xd + 1)) as g1 eqn:Hg1; symmetry in Hg1.
-remember (ggcd (yn + 1) (yd + 1)) as g2 eqn:Hg2; symmetry in Hg2.
+remember (ggcd (nn xn + 1) (nn xd + 1)) as g1 eqn:Hg1; symmetry in Hg1.
+remember (ggcd (nn yn + 1) (nn yd + 1)) as g2 eqn:Hg2; symmetry in Hg2.
 move g2 before g1.
 destruct g1 as (g1 & aa1 & bb1).
 destruct g2 as (g2 & aa2 & bb2); simpl.
-specialize (ggcd_correct_divisors (xn + 1) (xd + 1)) as H1.
+specialize (ggcd_correct_divisors (nn xn + 1) (nn xd + 1)) as H1.
 rewrite Hg1 in H1; destruct H1 as (Hxn, Hxd).
-specialize (ggcd_correct_divisors (yn + 1) (yd + 1)) as H1.
+specialize (ggcd_correct_divisors (nn yn + 1) (nn yd + 1)) as H1.
 rewrite Hg2 in H1; destruct H1 as (Hyn, Hyd).
 rewrite Nat.mul_comm, Nat.add_1_r in Hxn, Hxd, Hyn, Hyd.
 rewrite Nat.sub_add; [ | destruct aa1; flia Hxn ].
@@ -1358,23 +1357,23 @@ Theorem PQred_idemp : ∀ x, PQred (PQred x) = PQred x.
 Proof.
 intros (xn, xd).
 unfold PQred; simpl.
-remember (ggcd (xn + 1) (xd + 1)) as g eqn:Hg1.
+remember (ggcd (nn xn + 1) (nn xd + 1)) as g eqn:Hg1.
 destruct g as (g1, (aa1, bb1)); simpl.
 assert (Haa1 : aa1 ≠ 0). {
   intros H; subst aa1.
-  specialize (ggcd_succ_l_neq_0 xn (xd + 1)) as H.
+  specialize (ggcd_succ_l_neq_0 (nn xn) (nn xd + 1)) as H.
   now rewrite <- Nat.add_1_r, <- Hg1 in H.
 }
 assert (Hbb1 : bb1 ≠ 0). {
   intros H; subst bb1.
   symmetry in Hg1.
   apply ggcd_swap in Hg1.
-  specialize (ggcd_succ_l_neq_0 xd (xn + 1)) as H.
+  specialize (ggcd_succ_l_neq_0 (nn xd) (nn xn + 1)) as H.
   now rewrite <- Nat.add_1_r, Hg1 in H.
 }
 rewrite Nat.sub_add; [ | flia Haa1 ].
 rewrite Nat.sub_add; [ | flia Hbb1 ].
-specialize (ggcd_correct_divisors (xn + 1) (xd + 1)) as H1.
+specialize (ggcd_correct_divisors (nn xn + 1) (nn xd + 1)) as H1.
 rewrite <- Hg1 in H1.
 destruct H1 as (H1, H2).
 remember (ggcd aa1 bb1) as g eqn:Hg2.
@@ -1411,6 +1410,7 @@ PQtac1.
 PQtac2; [ PQtac2 | simpl; flia ].
 PQtac2; [ | simpl; flia ].
 do 3 PQtac2.
+...
 replace (S yn * (S a * S xd)) with (S a * (S yn * S xd)) by flia.
 rewrite <- Nat.mul_assoc, <- Nat.mul_add_distr_l.
 rewrite <- Nat.mul_assoc.
