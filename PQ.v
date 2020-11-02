@@ -1490,18 +1490,17 @@ PQtac1.
 do 6 PQtac2.
 do 2 rewrite <- Nat.mul_assoc.
 rewrite ggcd_mul_mono_l; [ | easy ].
-...
-now destruct (ggcd (S xn * S yn) (S xd * S yd)).
+now destruct (ggcd (S (nn xn) * S (nn yn)) (S (nn xd) * S (nn yd))).
 Qed.
 
 Theorem PQred_eq : ∀ x, (PQred x == x)%PQ.
 Proof.
 intros (xn, xd).
 unfold PQred; simpl.
-remember (ggcd (xn + 1) (xd + 1)) as g eqn:Hg; symmetry in Hg.
+remember (ggcd (nn xn + 1) (nn xd + 1)) as g eqn:Hg; symmetry in Hg.
 destruct g as (g, (aa, bb)).
 unfold "=="%PQ, nd; simpl.
-specialize (ggcd_correct_divisors (xn + 1) (xd + 1)) as H.
+specialize (ggcd_correct_divisors (nn xn + 1) (nn xd + 1)) as H.
 rewrite Hg in H.
 destruct H as (Hxn, Hxd).
 rewrite Nat.sub_add; cycle 1. {
@@ -1537,54 +1536,54 @@ Proof. intros; now do 2 rewrite PQred_eq. Qed.
 Theorem PQred_add_l : ∀ x y, PQred (x + y) = PQred (PQred x + y).
 Proof.
 intros.
-remember (Nat.gcd (PQnum1 x + 1) (PQden1 x + 1)) as a eqn:Ha.
-rewrite (PQred_add_mul_one_l (PQred x) y (a - 1)).
+remember (Nat.gcd (nn (PQnum1 x) + 1) (nn (PQden1 x) + 1)) as a eqn:Ha.
+rewrite (PQred_add_mul_one_l (PQred x) y (mknn (a - 1))).
 f_equal; f_equal.
 destruct x as (xn, xd).
 simpl in Ha.
 unfold "*"%PQ; simpl.
 unfold PQmul_num1, PQmul_den1; simpl.
 unfold PQred; simpl.
-specialize (ggcd_split (xn + 1) (xd + 1) a Ha) as H.
+specialize (ggcd_split (nn xn + 1) (nn xd + 1) a Ha) as H.
 rewrite H; simpl.
 destruct a.
 -symmetry in Ha.
  apply Nat.gcd_eq_0_l in Ha; flia Ha.
 -replace (S a - 1 + 1) with (S a) by flia.
- assert (H2 : (xn + 1) / S a ≠ 0). {
+ assert (H2 : (nn xn + 1) / S a ≠ 0). {
    intros H1.
    apply Nat.div_small_iff in H1; [ | easy ].
-   specialize (@Nat_gcd_le_l (xn + 1) (xd +  1)) as H2.
-   assert (H3 : xn + 1 ≠ 0) by flia.
+   specialize (@Nat_gcd_le_l (nn xn + 1) (nn xd +  1)) as H2.
+   assert (H3 : nn xn + 1 ≠ 0) by flia.
    specialize (H2 H3).
    flia Ha H1 H2.
  }
- assert (H3 : (xd + 1) / S a ≠ 0). {
+ assert (H3 : (nn xd + 1) / S a ≠ 0). {
    intros H1.
    apply Nat.div_small_iff in H1; [ | easy ].
-   specialize (@Nat_gcd_le_r (xn + 1) (xd +  1)) as H3.
-   assert (H4 : xd + 1 ≠ 0) by flia.
+   specialize (@Nat_gcd_le_r (nn xn + 1) (nn xd +  1)) as H3.
+   assert (H4 : nn xd + 1 ≠ 0) by flia.
    specialize (H3 H4).
    flia Ha H1 H3.
  }
  rewrite Nat.sub_add; [ | flia H2 ].
  rewrite Nat.sub_add; [ | flia H3 ].
- specialize (Nat.gcd_divide_l (xn + 1) (xd + 1)) as (c1, Hc1).
+ specialize (Nat.gcd_divide_l (nn xn + 1) (nn xd + 1)) as (c1, Hc1).
  rewrite <- Ha in Hc1; rewrite Hc1.
  rewrite Nat.div_mul; [ | easy ].
  rewrite Nat.mul_comm, <- Hc1, Nat.add_sub.
- specialize (Nat.gcd_divide_r (xn + 1) (xd + 1)) as (c2, Hc2).
+ specialize (Nat.gcd_divide_r (nn xn + 1) (nn xd + 1)) as (c2, Hc2).
  rewrite <- Ha in Hc2; rewrite Hc2.
  rewrite Nat.div_mul; [ | easy ].
  rewrite Nat.mul_comm, <- Hc2, Nat.add_sub.
- easy.
+ now destruct xn, xd.
 Qed.
 
 Theorem PQred_sub_l : ∀ x y, (y < x)%PQ → PQred (x - y) = PQred (PQred x - y).
 Proof.
 intros * Hyx.
-remember (Nat.gcd (PQnum1 x + 1) (PQden1 x + 1)) as a eqn:Ha.
-rewrite (PQred_sub_mul_one_l (PQred x) y (a - 1)); cycle 1. {
+remember (Nat.gcd (nn (PQnum1 x) + 1) (nn (PQden1 x) + 1)) as a eqn:Ha.
+rewrite (PQred_sub_mul_one_l (PQred x) y (mknn (a - 1))); cycle 1. {
   now apply -> PQred_lt_r.
 }
 destruct x as (xn, xd).
@@ -1592,35 +1591,35 @@ simpl in Ha.
 unfold "*"%PQ; simpl.
 unfold PQmul_num1, PQmul_den1; simpl.
 unfold PQred; simpl.
-specialize (ggcd_split (xn + 1) (xd + 1) a Ha) as H.
+specialize (ggcd_split (nn xn + 1) (nn xd + 1) a Ha) as H.
 rewrite H; simpl.
 destruct a.
 -symmetry in Ha.
  apply Nat.gcd_eq_0_l in Ha; flia Ha.
 -replace (S a - 1 + 1) with (S a) by flia.
- assert (H2 : (xn + 1) / S a ≠ 0). {
+ assert (H2 : (nn xn + 1) / S a ≠ 0). {
    intros H1.
    apply Nat.div_small_iff in H1; [ | easy ].
-   specialize (@Nat_gcd_le_l (xn + 1) (xd +  1)) as H2.
-   assert (H3 : xn + 1 ≠ 0) by flia.
+   specialize (@Nat_gcd_le_l (nn xn + 1) (nn xd +  1)) as H2.
+   assert (H3 : nn xn + 1 ≠ 0) by flia.
    specialize (H2 H3).
    flia Ha H1 H2.
  }
- assert (H3 : (xd + 1) / S a ≠ 0). {
+ assert (H3 : (nn xd + 1) / S a ≠ 0). {
    intros H1.
    apply Nat.div_small_iff in H1; [ | easy ].
-   specialize (@Nat_gcd_le_r (xn + 1) (xd +  1)) as H3.
-   assert (H4 : xd + 1 ≠ 0) by flia.
+   specialize (@Nat_gcd_le_r (nn xn + 1) (nn xd +  1)) as H3.
+   assert (H4 : nn xd + 1 ≠ 0) by flia.
    specialize (H3 H4).
    flia Ha H1 H3.
  }
  rewrite Nat.sub_add; [ | flia H2 ].
  rewrite Nat.sub_add; [ | flia H3 ].
- specialize (Nat.gcd_divide_l (xn + 1) (xd + 1)) as (c1, Hc1).
+ specialize (Nat.gcd_divide_l (nn xn + 1) (nn xd + 1)) as (c1, Hc1).
  rewrite <- Ha in Hc1; rewrite Hc1.
  rewrite Nat.div_mul; [ | easy ].
  rewrite Nat.mul_comm, <- Hc1, Nat.add_sub.
- specialize (Nat.gcd_divide_r (xn + 1) (xd + 1)) as (c2, Hc2).
+ specialize (Nat.gcd_divide_r (nn xn + 1) (nn xd + 1)) as (c2, Hc2).
  rewrite <- Ha in Hc2; rewrite Hc2.
  rewrite Nat.div_mul; [ | easy ].
  rewrite Nat.mul_comm, <- Hc2, Nat.add_sub.
@@ -1630,8 +1629,8 @@ Qed.
 Theorem PQred_sub_r : ∀ x y, (y < x)%PQ → PQred (x - y) = PQred (x - PQred y).
 Proof.
 intros * Hyx.
-remember (Nat.gcd (PQnum1 y + 1) (PQden1 y + 1)) as a eqn:Ha.
-rewrite (PQred_sub_mul_one_r x (PQred y) (a - 1)); cycle 1. {
+remember (Nat.gcd (nn (PQnum1 y) + 1) (nn (PQden1 y) + 1)) as a eqn:Ha.
+rewrite (PQred_sub_mul_one_r x (PQred y) (mknn (a - 1))); cycle 1. {
   now apply -> PQred_lt_l.
 }
 destruct y as (yn, yd).
@@ -1639,35 +1638,35 @@ simpl in Ha.
 unfold "*"%PQ; simpl.
 unfold PQmul_num1, PQmul_den1; simpl.
 unfold PQred; simpl.
-specialize (ggcd_split (yn + 1) (yd + 1) a Ha) as H.
+specialize (ggcd_split (nn yn + 1) (nn yd + 1) a Ha) as H.
 rewrite H; simpl.
 destruct a.
 -symmetry in Ha.
  apply Nat.gcd_eq_0_l in Ha; flia Ha.
 -replace (S a - 1 + 1) with (S a) by flia.
- assert (H2 : (yn + 1) / S a ≠ 0). {
+ assert (H2 : (nn yn + 1) / S a ≠ 0). {
    intros H1.
    apply Nat.div_small_iff in H1; [ | easy ].
-   specialize (@Nat_gcd_le_l (yn + 1) (yd +  1)) as H2.
-   assert (H3 : yn + 1 ≠ 0) by flia.
+   specialize (@Nat_gcd_le_l (nn yn + 1) (nn yd +  1)) as H2.
+   assert (H3 : nn yn + 1 ≠ 0) by flia.
    specialize (H2 H3).
    flia Ha H1 H2.
  }
- assert (H3 : (yd + 1) / S a ≠ 0). {
+ assert (H3 : (nn yd + 1) / S a ≠ 0). {
    intros H1.
    apply Nat.div_small_iff in H1; [ | easy ].
-   specialize (@Nat_gcd_le_r (yn + 1) (yd +  1)) as H3.
-   assert (H4 : yd + 1 ≠ 0) by flia.
+   specialize (@Nat_gcd_le_r (nn yn + 1) (nn yd +  1)) as H3.
+   assert (H4 : nn yd + 1 ≠ 0) by flia.
    specialize (H3 H4).
    flia Ha H1 H3.
  }
  rewrite Nat.sub_add; [ | flia H2 ].
  rewrite Nat.sub_add; [ | flia H3 ].
- specialize (Nat.gcd_divide_l (yn + 1) (yd + 1)) as (c1, Hc1).
+ specialize (Nat.gcd_divide_l (nn yn + 1) (nn yd + 1)) as (c1, Hc1).
  rewrite <- Ha in Hc1; rewrite Hc1.
  rewrite Nat.div_mul; [ | easy ].
  rewrite Nat.mul_comm, <- Hc1, Nat.add_sub.
- specialize (Nat.gcd_divide_r (yn + 1) (yd + 1)) as (c2, Hc2).
+ specialize (Nat.gcd_divide_r (nn yn + 1) (nn yd + 1)) as (c2, Hc2).
  rewrite <- Ha in Hc2; rewrite Hc2.
  rewrite Nat.div_mul; [ | easy ].
  rewrite Nat.mul_comm, <- Hc2, Nat.add_sub.
@@ -1695,9 +1694,9 @@ Qed.
 Theorem PQred_mul_l : ∀ x y, PQred (x * y) = PQred (PQred x * y).
 Proof.
 intros.
-remember (Nat.gcd (PQnum1 x + 1) (PQden1 x + 1)) as a eqn:Ha.
-rewrite (PQred_mul_mul_one_l (PQred x) y (a - 1)).
-destruct x as (xn, xd).
+remember (Nat.gcd (nn (PQnum1 x) + 1) (nn (PQden1 x) + 1)) as a eqn:Ha.
+rewrite (PQred_mul_mul_one_l (PQred x) y (mknn (a - 1))).
+destruct x as ((xn), (xd)).
 simpl in Ha.
 unfold "*"%PQ; simpl.
 unfold PQmul_num1, PQmul_den1; simpl.
@@ -1773,13 +1772,13 @@ now rewrite PQred_mul_l, PQred_mul_r.
 Qed.
 
 Theorem PQred_gcd : ∀ x,
-  Nat.gcd (PQnum1 (PQred x) + 1) (PQden1 (PQred x) + 1) = 1.
+  Nat.gcd (nn (PQnum1 (PQred x)) + 1) (nn (PQden1 (PQred x)) + 1) = 1.
 Proof.
 intros.
 unfold PQred.
-remember (ggcd (PQnum1 x + 1) (PQden1 x + 1)) as g eqn:Hg1.
+remember (ggcd (nn (PQnum1 x) + 1) (nn (PQden1 x) + 1)) as g eqn:Hg1.
 destruct g as (g1, (aa1, bb1)); simpl.
-remember (Nat.gcd (PQnum1 x + 1) (PQden1 x + 1)) as g eqn:Hg.
+remember (Nat.gcd (nn (PQnum1 x) + 1) (nn (PQden1 x) + 1)) as g eqn:Hg.
 specialize (ggcd_split _ _ _ Hg) as H.
 rewrite <- Hg1 in H.
 do 2 rewrite Nat.add_1_r in Hg1; symmetry in Hg1.
@@ -1793,11 +1792,11 @@ rewrite Nat.sub_add.
 Qed.
 
 Theorem gcd_1_PQred : ∀ x,
-  Nat.gcd (PQnum1 x + 1) (PQden1 x + 1) = 1
+  Nat.gcd (nn (PQnum1 x) + 1) (nn (PQden1 x) + 1) = 1
   → x = PQred x.
 Proof.
 intros x Hx.
-destruct x as (xn, xd).
+destruct x as ((xn), (xd)).
 rewrite <- ggcd_gcd in Hx.
 unfold PQred.
 remember ggcd as f; cbn in Hx; cbn; subst f.
@@ -1817,7 +1816,7 @@ intros * Hx Hxy.
 unfold "=="%PQ, nd in Hxy.
 specialize (PQred_gcd x) as Hg.
 rewrite <- Hx in Hg.
-destruct x as (xn, xd), y as (yn, yd).
+destruct x as ((xn), (xd)), y as ((yn), (yd)).
 cbn in Hxy, Hg.
 assert (Hd : Nat.divide (xn + 1) ((xd + 1) * (yn + 1))). {
   rewrite Nat.mul_comm, <- Hxy.
@@ -1826,7 +1825,7 @@ assert (Hd : Nat.divide (xn + 1) ((xd + 1) * (yn + 1))). {
 }
 specialize (Nat.gauss _ _ _ Hd Hg) as H1.
 destruct H1 as (c, Hc).
-exists c.
+exists (mknn (c - 1)).
 unfold "*"%PQ; cbn.
 rewrite Nat.sub_add; cycle 1. {
   destruct c; [ now rewrite Nat.add_1_r in Hc | flia ].
@@ -1848,10 +1847,10 @@ intros Hxy.
 specialize (PQeq_red_l x y Hx Hxy) as H1.
 symmetry in Hxy.
 specialize (PQeq_red_l y x Hy Hxy) as H2.
-destruct H1 as (c, Hc).
-destruct H2 as (d, Hd).
+destruct H1 as ((c), Hc).
+destruct H2 as ((d), Hd).
 move d before c.
-destruct x as (xn, xd), y as (yn, yd).
+destruct x as ((xn), (xd)), y as ((yn), (yd)).
 unfold "*"%PQ in Hc, Hd.
 cbn in Hc, Hd.
 injection Hc; clear Hc; intros H1 H2.
@@ -1860,14 +1859,17 @@ destruct d.
 -cbn in H3, H4.
  rewrite Nat.add_0_r, Nat.add_sub in H3, H4.
  now subst xd xn.
--rewrite Nat.sub_add in H3, H4; [ | flia | flia ].
+-cbn in H3, H4.
+ rewrite Nat.add_comm, Nat.add_assoc in H3, H4.
+ rewrite Nat.add_sub in H3, H4.
  destruct c.
  +cbn in H1, H2.
   rewrite Nat.add_0_r, Nat.add_sub in H1, H2.
   now subst xd xn.
- +rewrite Nat.sub_add in H1, H2; [ | flia | flia ].
+ +cbn in H1, H2.
+  rewrite Nat.add_comm, Nat.add_assoc in H1, H2.
+  rewrite Nat.add_sub in H1, H2.
   cbn in H1, H2, H3, H4.
-  rewrite Nat.add_shuffle0, Nat.add_sub in H1, H2, H3, H4.
   rewrite H1 in H3 at 1.
   assert (H : c * (xd + 1) + d * (yd + 1) = 0) by flia H3.
   apply Nat.eq_add_0 in H.
@@ -1877,17 +1879,16 @@ destruct d.
   destruct H5 as [H5| H5]; [ | flia H5].
   destruct H6 as [H6| H6]; [ | flia H6].
   subst c d.
-  rewrite Nat.mul_0_l, Nat.add_0_r in H1, H2.
-  now subst yn yd.
+  cbn in H3.
+  flia H3.
 Qed.
 
-Theorem PQred_diag : ∀ x, x ≠ 0 → PQred (x // x) = 1%PQ.
+Theorem PQred_diag : ∀ x, PQred (x // x) = 1%PQ.
 Proof.
-intros * Hx.
+intros (x).
 unfold PQred.
-remember ggcd as f; cbn; subst f.
-rewrite Nat.sub_add; [ | flia Hx ].
-now rewrite ggcd_diag.
+cbn - [ ggcd ].
+rewrite ggcd_diag; [ easy | flia ].
 Qed.
 
 Theorem PQle_decidable : ∀ x y, Decidable.decidable (x ≤ y)%PQ.
