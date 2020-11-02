@@ -12,14 +12,18 @@ Declare Scope PQ_scope.
 Delimit Scope PQ_scope with PQ.
 
 (* A PQ number {PQnum1:=a; PQden1:=b} represents the rational (a+1)/(b+1) *)
+(* With record p_nat, "pn a" means "a+1" *)
 
-Record PQ := PQmake { PQnum1 : nat; PQden1 : nat }.
+Record p_nat := pn { PN : nat }.
+Record PQ := PQmake { PQnum1 : p_nat; PQden1 : p_nat }.
+(*
 Arguments PQmake _%nat _%nat.
 Arguments PQnum1 x%PQ : rename.
 Arguments PQden1 x%PQ : rename.
+*)
 
-Definition PQ_of_pair n d := PQmake (n - 1) (d - 1).
-Definition nd x y := (PQnum1 x + 1) * (PQden1 y + 1).
+Definition PQ_of_pair n d := PQmake (pn (n - 1)) (pn (d - 1)).
+Definition nd x y := (PN (PQnum1 x) + 1) * (PN (PQden1 y) + 1).
 Definition PQeq x y := nd x y = nd y x.
 
 Theorem PQeq_dec : ∀ x y : PQ, {PQeq x y} + {¬ PQeq x y}.
@@ -38,19 +42,19 @@ Definition PQge x y := PQle y x.
 
 Definition PQadd_num1 x y := nd x y + nd y x - 1.
 Definition PQsub_num1 x y := nd x y - nd y x - 1.
-Definition PQadd_den1 x y := (PQden1 x + 1) * (PQden1 y + 1) - 1.
+Definition PQadd_den1 x y := (PN (PQden1 x) + 1) * (PN (PQden1 y) + 1) - 1.
 
-Definition PQadd x y := PQmake (PQadd_num1 x y) (PQadd_den1 x y).
-Definition PQsub x y := PQmake (PQsub_num1 x y) (PQadd_den1 x y).
+Definition PQadd x y := PQmake (pn (PQadd_num1 x y)) (pn (PQadd_den1 x y)).
+Definition PQsub x y := PQmake (pn (PQsub_num1 x y)) (pn (PQadd_den1 x y)).
 Arguments PQadd x%PQ y%PQ.
 Arguments PQsub x%PQ y%PQ.
 
 (* multiplication, inversion, division *)
 
-Definition PQmul_num1 x y := (PQnum1 x + 1) * (PQnum1 y + 1) - 1.
-Definition PQmul_den1 x y := (PQden1 x + 1) * (PQden1 y + 1) - 1.
+Definition PQmul_num1 x y := (PN (PQnum1 x) + 1) * (PN (PQnum1 y) + 1) - 1.
+Definition PQmul_den1 x y := (PN (PQden1 x) + 1) * (PN (PQden1 y) + 1) - 1.
 
-Definition PQmul x y := PQmake (PQmul_num1 x y) (PQmul_den1 x y).
+Definition PQmul x y := PQmake (pn (PQmul_num1 x y)) (pn (PQmul_den1 x y)).
 Arguments PQmul x%PQ y%PQ.
 
 Definition PQinv x := PQmake (PQden1 x) (PQnum1 x).
@@ -89,8 +93,8 @@ Definition PQ_of_decimal_int (n : Decimal.int) : option PQ :=
   end.
 
 Definition PQ_to_decimal_uint (pq : PQ) : option Decimal.uint :=
-  match PQden1 pq with
-  | 0 => Some (Nat.to_uint (PQnum1 pq + 1))
+  match PN (PQden1 pq) with
+  | 0 => Some (Nat.to_uint (PN (PQnum1 pq) + 1))
   | _ => None
   end.
 
@@ -110,8 +114,8 @@ Definition PQ_of_numeral_int (n : Numeral.int) : option PQ :=
   end.
 
 Definition PQ_to_numeral_uint (pq : PQ) : option Numeral.uint :=
-  match PQden1 pq with
-  | 0 => Some (Numeral.UIntDec (Nat.to_uint (PQnum1 pq + 1)))
+  match PN (PQden1 pq) with
+  | 0 => Some (Numeral.UIntDec (Nat.to_uint (PN (PQnum1 pq) + 1)))
   | _ => None
   end.
 
@@ -119,12 +123,31 @@ Numeral Notation PQ PQ_of_numeral_int PQ_to_numeral_uint : PQ_scope.
 
 (* end 8.12 *)
 
-(*
+(**)
 Check 25%PQ.
 Check (22 // 7)%PQ.
+Compute (22 // 7)%PQ.
+Check (pn 21).
+(*
+{| PN := 21 |}
+     : p_nat
+
+Bon. Faut un "numeral notation" pour les p_nat telle que ça affiche ici
+   22%pn
+
+Mais, du coup, faut que je l'appelle "pn" (prev nat) ou "sn" (succ nat) ?
+*)
+...
+(*
+     = {| PQnum1 := {| PN := 21 |}; PQden1 := {| PN := 6 |} |}
+  I'd like it to print
+     = {| PQnum1 := 22%pn; PQden1 := 7%pn |}
 *)
 (*
 Check 0%PQ.
+*)
+...
+
 *)
 
 End PQ_Notations.
