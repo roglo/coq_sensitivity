@@ -442,7 +442,6 @@ Fixpoint gauss_jordan_loop lt (A : matrix T) r oj :=
                  add_one_row_scalar_multiple_another A i'' (- v)%Rng (r - 1))
             (seq 0 (mat_nrows A)) A
         in
-if Nat.eq_dec j 0 then A else
         gauss_jordan_loop lt A r oj'
   end.
 
@@ -472,77 +471,22 @@ Proof. easy. Qed.
 Definition Q_sring_dec_prop : sring_dec_prop Q :=
   {| srng_eq_dec := Q.eq_dec; srng_1_neq_0 := Q_1_neq_0 |}.
 
+Definition Q_field_op : field_op Q :=
+  {| fld_inv := Q.inv |}.
+
 Existing Instance Q_ring_op.
 Existing Instance Q_semiring_op.
 Existing Instance Q_sring_dec_prop.
-Print field_op.
-...
 Existing Instance Q_field_op.
-
 Definition Q_ltb a b :=
   match Q.compare a b with Lt => true | _ => false end.
 Definition Q_gauss_jordan := gauss_jordan Q_ltb.
-Definition test ll :=
+Definition qtest ll :=
   let r := Q_gauss_jordan (mat_of_list_list 0%Q ll) in
   list_list_of_mat r.
-Compute (2 + 3)%Q.
-Require Import GQ.
-Require Import PQ.
-Compute (2 + 3)%Q.
-Import PQ_Notations.
-Import GQ_Notations.
-Import Q.Notations.
-Check 1%PQ.
-Compute 1%PQ.
-Check 1%GQ.
-Compute 1%GQ.
-Check (5 // 2)%GQ.
-Compute (5 // 2)%GQ.
-Check (5 // 2)%PQ.
-Compute (5 // 2)%PQ.
-Theorem fold_PQ : ∀ n d, PQmake n d = PQ_of_pair (S n) (S d).
-Proof.
-intros.
-unfold PQ_of_pair.
-now do 2 rewrite Nat.sub_succ, Nat.sub_0_r.
-Qed.
-Definition glop (pq : PQ) := PQ_of_pair (S (PQnum1 pq)) (S (PQden1 pq)).
-Print PQ_of_pair.
-Notation "a /// b" := (PQmake (a - 1) (b - 1)) (at level 32) : PQ_scope.
-Check (5 // 2)%PQ.
-Check (PQ_of_pair 5 2)%PQ.
-Compute (5 // 2)%PQ.
-Check (PQmake 4 1).
-Check (PQmake (5 - 1) (2 - 1)).
-Check (glop (PQmake 4 1)).
-...
-Set Printing All.
-Check 5%GQ.
-Compute 5%GQ.
-Check (5 // 2)%GQ.
-Print GQ_of_pair.
-Print PQ_of_pair.
-Theorem fold_GQ : ∀ n d,
-  GQmake0 (PQmake n d) (@eq_refl nat (S d)) =
-  GQmake0 (PQmake n d) (@eq_refl nat (S d)).
-  GQmake0 (PQmake n d) (@eq_refl nat e) =
-(*
-Theorem glop :
-  GQmake0 (PQmake O O) (@eq_refl nat (S O))
-     = GQmake0 (PQmake O O)
-         (@eq_refl nat
-            (Nat.gcd (Init.Nat.add (PQnum1 (PQmake O O)) (S O))
-               (Init.Nat.add (PQden1 (PQmake O O)) (S O)))).
-*)
-Compute (2 + 3)%GQ.
-Print GQmake0.
-...
-Check 1%Q.
-Compute 1%Q.
-Compute (2 + 3)%Q.
-Check (test [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]]%Q).
-...
-Compute test [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]]%Q.
+Compute qtest [[1]]%Q.
+Compute qtest [[1; -1]; [1; 1]]%Q.
+Compute qtest [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]]%Q.
 (*
      = ([[48; 0; 0]; [0; 48; 0]; [0; 0; 48]], 48)
 *)

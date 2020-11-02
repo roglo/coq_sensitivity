@@ -760,6 +760,24 @@ Qed.
 
 Theorem eq_dec : ∀ x y : Q, {x = y} + {x ≠ y}.
 Proof.
+(*
+intros.
+destruct x as [| x| x]. {
+  now destruct y; [ left | right | right ].
+} {
+  destruct y as [| y| ]; [ now right | | now right ].
+  destruct (GQeq_dec x y) as [H| H]. {
+    now destruct H; left.
+  }
+  now right; intros H'; injection H'.
+} {
+  destruct y as [| | y]; [ now right | now right | ].
+  destruct (GQeq_dec x y) as [H| H]. {
+    now destruct H; left.
+  }
+  now right; intros H'; injection H'.
+}
+*)
 intros.
 destruct x as [| px| px], y as [| py| py]; try now right.
 -now left.
@@ -769,7 +787,8 @@ destruct x as [| px| px], y as [| py| py]; try now right.
 -destruct (GQeq_dec px py) as [H1| H1]; [ left | right ].
  +now f_equal.
  +now intros H; apply H1; injection H; intros.
-Qed.
+(**)
+Defined.
 Arguments eq_dec x%Q y%Q.
 
 Theorem lt_le_dec : ∀ x y : Q, {(x < y)%Q} + {(y ≤ x)%Q}.
