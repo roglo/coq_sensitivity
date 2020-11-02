@@ -8,20 +8,21 @@ Set Nested Proofs Allowed.
 Tactic Notation "flia" hyp_list(Hs) := clear - Hs; lia.
 Reserved Notation "a // b" (at level 32).
 
-Declare Scope PQ_scope.
-Delimit Scope PQ_scope with PQ.
-
 (* Non null natural
    Natural numbers excluding 0.
    Represented by a nat "n" meaning "n+1" *)
 
+Declare Scope nnn_scope.
+Delimit Scope nnn_scope with n.
 Record nnn := mknn { nn : nat }.
 
 (* A PQ number {PQnum1:=a; PQden1:=b} represents the rational (a+1)/(b+1) *)
 
+Declare Scope PQ_scope.
+Delimit Scope PQ_scope with PQ.
 Record PQ := PQmake { PQnum1 : nnn; PQden1 : nnn }.
+Arguments PQmake _%n _%n.
 (*
-Arguments PQmake _%nat _%nat.
 Arguments PQnum1 x%PQ : rename.
 Arguments PQden1 x%PQ : rename.
 *)
@@ -151,11 +152,14 @@ Definition nnn_of_numeral_int (n : Numeral.int) : option nnn :=
   | Numeral.IntHex _ => None
   end.
 
-...
+Definition nnn_to_numeral_uint (nn1 : nnn) : option Numeral.uint :=
+  Some (Numeral.UIntDec (Nat.to_uint (nn nn1 + 1))).
 
 Numeral Notation nnn nnn_of_numeral_int nnn_to_numeral_uint : nnn_scope.
 
 (**)
+Notation "a /// b" := (PQmake a b) (at level 32) : PQ_scope.
+
 Check 25%PQ.
 Check (22 // 7)%PQ.
 Compute (22 // 7)%PQ.
