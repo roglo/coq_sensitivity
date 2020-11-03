@@ -122,6 +122,11 @@ Record vector T := mk_vect
   { vect_el : nat → T;
     vect_nrows : nat }.
 
+Definition vect_of_list {T} d (l : list T) :=
+  mk_vect (λ i, nth i l d) (length l).
+Definition list_of_vect {T} (v : vector T) :=
+  map (vect_el v) (seq 0 (vect_nrows v)).
+
 (* multiplication of a matrix by a vector *)
 
 Definition mat_mul_vect_r M V :=
@@ -463,3 +468,5 @@ Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
 Notation "- A" := (mat_opp A) : M_scope.
 
 End matrix_Notations.
+
+Arguments mat_mul_vect_r {T so}.

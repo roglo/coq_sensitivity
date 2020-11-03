@@ -444,7 +444,7 @@ Fixpoint gauss_jordan_loop lt (A : matrix T) r oj :=
 Definition gauss_jordan lt (A : matrix T) :=
   gauss_jordan_loop lt (A : matrix T) 0 (mat_ncols A).
 
-(*
+(**)
 End in_ring.
 Import Q.Notations.
 Open Scope Q_scope.
@@ -453,8 +453,7 @@ Definition Q_semiring_op : semiring_op Q :=
      srng_one := 1;
      srng_add := Q.add;
      srng_mul := Q.mul |}.
-Definition Q_ring_op : ring_op Q :=
-  {| rng_opp := Q.opp |}.
+Definition Q_ring_op : ring_op Q := {| rng_opp := Q.opp |}.
 Canonical Structure Q_semiring_op.
 Canonical Structure Q_ring_op.
 Theorem Q_1_neq_0 : 1 ≠ 0.
@@ -523,4 +522,43 @@ Compute qtest [[1;2;2;-3;2;3];[2;4;1;0;-5;-6];[4;8;5;-6;-1;0];[-1;-2;-1;1;1;1]].
 *)
 Check (355//113)%Q.
 Compute (355//113)%Q.
+Require Import CharacPolyn.
+Require Import SRpolynomial.
+Definition Q_semiring_prop :=
+  {| srng_add_comm := Q.add_comm;
+     srng_add_assoc := Q.add_assoc;
+     srng_add_0_l := Q.add_0_l;
+     srng_mul_comm := Q.mul_comm;
+     srng_mul_assoc := Q.mul_assoc;
+     srng_mul_1_l := Q.mul_1_l;
+     srng_mul_add_distr_l := Q.mul_add_distr_l;
+     srng_mul_0_l := Q.mul_0_l |}.
+Definition Q_ring_prop := {| rng_add_opp_l := Q.add_opp_diag_l |}.
+Canonical Structure Q_semiring_prop.
+Canonical Structure Q_ring_prop.
+Existing Instance Q_semiring_prop.
+Existing Instance Q_ring_prop.
+
+(* trying to find eigenvalues and eigenvector on an example *)
+Definition qcp ll := charac_polyn (mat_of_list_list 0 ll).
+Compute qcp [[4;3];[-2;-3]].
+(*
+P=x²-x-6
+Δ=1+24=25
+r=(1±5)/2 (3 & -2)
+P=(x-3)(x+2)
+λ=3 or λ=-2
+1/ λ=3
+   λI-M=[[-1;-3];[2;6]]
+*)
+Compute qtest [[-1;-3;0];[2;6;0]].
+(*
+     = [[〈1〉; 〈3〉; 0]; [0; 0; 0]]
+x₁+3x₂=0
+x₁=-3x₂
+vector (-3, 1)
+*)
+Compute list_of_vect (mat_mul_vect_r (mat_of_list_list 0 [[4;3];[-2;-3]]) (vect_of_list 0 [-3;1])).
+(*
+     = [〈-9〉; 〈3〉]
 *)

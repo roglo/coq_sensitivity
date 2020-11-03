@@ -842,6 +842,13 @@ destruct x as [| px| px]; [ easy | | ]; simpl.
 -now rewrite GQcompare_diag.
 Qed.
 
+Theorem add_opp_diag_l : ∀ x, (- x + x)%Q = 0%Q.
+Proof.
+intros.
+rewrite add_opp_l.
+apply sub_diag.
+Qed.
+
 Theorem sub_add : ∀ a b, (a - b + b)%Q = a.
 Proof.
 intros.
