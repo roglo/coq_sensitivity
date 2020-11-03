@@ -6,7 +6,7 @@ Require Import Misc.
 Set Nested Proofs Allowed.
 
 Tactic Notation "flia" hyp_list(Hs) := clear - Hs; lia.
-Reserved Notation "a // b" (at level 32).
+Reserved Notation "a // b" (at level 32, format "a // b").
 
 (* Non null natural
    Natural numbers excluding 0.
@@ -75,12 +75,7 @@ Arguments PQdiv x%PQ y%PQ.
 
 Module PQ_Notations.
 
-(*
-Notation "1" := (PQmake 0 0) : PQ_scope.
-Notation "2" := (PQmake 1 0) : PQ_scope.
-Notation "a // b" := (PQ_of_pair a b) : PQ_scope.
-*)
-Notation "a // b" := (PQmake a b) : PQ_scope.
+Notation "a ╱ b" := (PQmake a b) (at level 1, format "a ╱ b") : PQ_scope.
 Notation "x == y" := (PQeq x y) (at level 70) : PQ_scope.
 Notation "x ≠≠ y" := (¬ PQeq x y) (at level 70) : PQ_scope.
 Notation "'if_PQeq_dec' x y 'then' P 'else' Q" :=
@@ -1810,7 +1805,7 @@ now do 2 rewrite Nat.add_sub.
 Qed.
 
 Theorem PQeq_red_l : ∀ x y,
-  x = PQred x → (x == y)%PQ → ∃ a, y = (a // a * x)%PQ.
+  x = PQred x → (x == y)%PQ → ∃ a, y = (a ╱ a * x)%PQ.
 Proof.
 intros * Hx Hxy.
 unfold "=="%PQ, nd in Hxy.
@@ -1883,7 +1878,7 @@ destruct d.
   flia H3.
 Qed.
 
-Theorem PQred_diag : ∀ x, PQred (x // x) = 1%PQ.
+Theorem PQred_diag : ∀ x, PQred (x ╱ x) = 1%PQ.
 Proof.
 intros (x).
 unfold PQred.
