@@ -487,18 +487,33 @@ Definition qtest ll :=
 Require Import GQ PQ.
 Import GQ_Notations PQ_Notations.
 Compute qtest [[1]]%Q.
-Compute qtest [[1; -1]; [1; 1]]%Q.
+(*
+Notation "++ a b" := (Pos (GQ.GQmake0 a b)) (at level 35, format "++  a  b") : Q_scope.
+Notation "-- a b" := (Neg (GQ.GQmake0 a b)) (at level 35, format "--  a  b") : Q_scope.
+*)
 Compute qtest [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]]%Q.
 (*
      = ([[48; 0; 0]; [0; 48; 0]; [0; 0; 48]], 48)
 *)
+Compute qtest [[1;3;1;9];[1;1;-1;1];[3;11;5;35]]%Q.
 (*
-Notation "++ a ( b )" := (Pos (GQ.GQmake0 a b)) (at level 35) : Q_scope.
-Notation "-- a ( b )" := (Neg (GQ.GQmake0 a b)) (at level 35) : Q_scope.
-Notation "a ▵ / b ▵" := (PQmake a b) (at level 32, format "a ▵ / b ▵") : PQ_scope.
+     = ([[-24; 0; 48; 72]; [0; -24; -24; -96]; [0; 0; 0; 0]], -24)
 *)
-Notation "+ ^ a / ^ b ( c )" := (Pos (GQ.GQmake0 (PQmake a b) c)) (at level 35, format "+  ^ a / ^ b  ( c )") : Q_scope.
-Notation "- ^ a / ^ b ( c )" := (Neg (GQ.GQmake0 (PQmake a b) c)) (at level 35, format "-  ^ a / ^ b  ( c )") : Q_scope.
+Compute qtest [[2;1;-1;8];[-3;-1;2;-11];[-2;1;2;-3]]%Q.
+(*
+     = ([[45; 0; 0; 90]; [0; 45; 0; 135]; [0; 0; 45; -45]], 45)
+*)
+Compute qtest [[2;-1;0;1;0;0];[-1;2;-1;0;1;0];[0;-1;2;0;0;1]]%Q.
+(*
+     = ([[48; 0; 0; 36; 24; 12];
+         [0; 48; 0; 24; 48; 24];
+         [0; 0; 48; 12; 24; 36]], 48)
+*)
+Compute qtest [[5;2;1;0];[-7;-3;0;1]]%Q.
+(*
+     = ([[-7; 0; -21; -14]; [0; -7; 49; 35]], -7)
+     = ([[1; 0; 3; 2]; [0; 1; -7; -5]], -7)
+*)
 Compute qtest [[-3;-3;3;0];[3;-9;3;0];[6;-6;0;0]]%Q.
 (*
      = ([[-216; 0; 108; 0]; [0; -216; 108; 0]; [0; 0; 0; 0]], -216)
@@ -507,31 +522,17 @@ Compute qtest [[-3;-3;3;0];[3;-9;3;0];[6;-6;0;0]]%Q.
    0 1 -1/2
    0 0  0
 *)
+Compute qtest [[3;-3;3;0];[3;-3;3;0];[6;-6;6;0]]%Q.
+(*
+     = ([[6; -6; 6; 0]; [0; 0; 0; 0]; [0; 0; 0; 0]], 6)
+*)
 Compute qtest [[1;-1;2;5];[3;2;1;10];[2;-3;-2;-10]]%Q.
 (*
      = ([[4095; 0; 0; 4095]; [0; 4095; 0; 8190]; [0; 0; 4095; 12285]], 4095)
      = ([[1; 0; 0; 1]; [0; 1; 0; 2]; [0; 0; 1; 3]], 1)
 *)
-(* comment faire pour que
-     Pos {| PQ_of_GQ := 1; GQprop := eq_refl |}
-   affiche
-     1
-   éventuellement
-     1%Q
-   ou alors
-     1%QS
-   (S pour "Spécial")
-   Et que
-     Pos {| PQ_of_GQ := {| PQnum1 := 0; PQden1 := 1 |}; GQprop := eq_refl |}
-   affiche
-     (1 // 2)%QS
-*)
+Compute qtest [[1;2;2;-3;2;3];[2;4;1;0;-5;-6];[4;8;5;-6;-1;0];[-1;-2;-1;1;1;1]]%Q.
 (*
-Notation "a /// b" := (PQmake (a - 1) (b - 1)) (at level 32) : PQ_scope.
+     = ([[-24; -48; 0; -24; 96; 120]; [0; 0; -24; 48; -72; -96];
+        [0; 0; 0; 0; 0; 0]; [0; 0; 0; 0; 0; 0]], -24)
 *)
-Notation "a /// b" := (PQmake a b) (at level 32) : PQ_scope.
-Compute (2 // 5)%Q.
-(* bof, pas terrible, ça affiche évidemment 1 /// 4, du coup, mais pour
-   faire afficher 2 /// 5, c'est plus compliqué... va falloir ajouter un
-   Set Numeral Notation adapté, mais je suis pas sûr que ce soit
-   possible. *)
