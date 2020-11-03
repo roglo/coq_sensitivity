@@ -19,8 +19,8 @@ Arguments GQmake0 PQ_of_GQ%PQ.
 Arguments PQ_of_GQ x%GQ : rename.
 
 (* the use of transparentify below is to allow Numeral Notation of
-   values of type Q (file NQ.v) work by always giving eq_refl as
-   proof of gcd n d = 1; thanks to Theo Zimmermann, Hugo Herbelin
+   values of type Q (file Rational.v) work by always giving eq_refl
+   as proof of gcd n d = 1; thanks to Theo Zimmermann, Hugo Herbelin
    and Jason Gross *)
 
 Definition transparentify {A} (D : {A} + {¬A}) (H : A) : A :=

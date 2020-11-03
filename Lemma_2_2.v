@@ -415,10 +415,6 @@ Notation "a - b" := (rng_sub a b) : field_scope.
 Notation "a * b" := (srng_mul a b) : field_scope.
 Notation "a / b" := (fld_div a b) : field_scope.
 
-(*
-Class field_prop A {so : ring_op A} :=
-  { rng_add_opp_l : ∀ a : A, (- a + a = 0)%Rng }.
-*)
 Context {fo : field_op T}.
 
 Fixpoint gauss_jordan_loop lt (A : matrix T) r oj :=
