@@ -447,16 +447,17 @@ Definition gauss_jordan lt (A : matrix T) :=
 (*
 End in_ring.
 Import Q.Notations.
+Open Scope Q_scope.
 Definition Q_semiring_op : semiring_op Q :=
-  {| srng_zero := 0%Q;
-     srng_one := 1%Q;
+  {| srng_zero := 0;
+     srng_one := 1;
      srng_add := Q.add;
      srng_mul := Q.mul |}.
 Definition Q_ring_op : ring_op Q :=
   {| rng_opp := Q.opp |}.
 Canonical Structure Q_semiring_op.
 Canonical Structure Q_ring_op.
-Theorem Q_1_neq_0 : 1%Q ≠ 0%Q.
+Theorem Q_1_neq_0 : 1 ≠ 0.
 Proof. easy. Qed.
 Definition Q_sring_dec_prop : sring_dec_prop Q :=
   {| srng_eq_dec := Q.eq_dec; srng_1_neq_0 := Q_1_neq_0 |}.
@@ -472,50 +473,50 @@ Definition Q_gauss_jordan := gauss_jordan Q_ltb.
 Definition qtest ll :=
   let r := Q_gauss_jordan (mat_of_list_list 0%Q ll) in
   list_list_of_mat r.
-Compute qtest [[1]]%Q.
-Compute qtest [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]]%Q.
-Check (2 + 3//2)%Q.
-Compute (2 + 3//2)%Q.
+Compute qtest [[1]].
+Check (2 + 3//2).
+Compute (2 + 3//2).
+Compute (2 + 2).
+Compute qtest [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]].
 (*
      = ([[48; 0; 0]; [0; 48; 0]; [0; 0; 48]], 48)
 *)
-Compute qtest [[1;3;1;9];[1;1;-1;1];[3;11;5;35]]%Q.
+Compute qtest [[1;3;1;9];[1;1;-1;1];[3;11;5;35]].
 (*
      = ([[-24; 0; 48; 72]; [0; -24; -24; -96]; [0; 0; 0; 0]], -24)
 *)
-Compute qtest [[2;1;-1;8];[-3;-1;2;-11];[-2;1;2;-3]]%Q.
+Compute qtest [[2;1;-1;8];[-3;-1;2;-11];[-2;1;2;-3]].
 (*
      = ([[45; 0; 0; 90]; [0; 45; 0; 135]; [0; 0; 45; -45]], 45)
 *)
-Compute qtest [[2;-1;0;1;0;0];[-1;2;-1;0;1;0];[0;-1;2;0;0;1]]%Q.
+Compute qtest [[2;-1;0;1;0;0];[-1;2;-1;0;1;0];[0;-1;2;0;0;1]].
 (*
      = ([[48; 0; 0; 36; 24; 12];
          [0; 48; 0; 24; 48; 24];
          [0; 0; 48; 12; 24; 36]], 48)
 *)
-Compute qtest [[5;2;1;0];[-7;-3;0;1]]%Q.
+Compute qtest [[5;2;1;0];[-7;-3;0;1]].
 (*
      = ([[-7; 0; -21; -14]; [0; -7; 49; 35]], -7)
      = ([[1; 0; 3; 2]; [0; 1; -7; -5]], -7)
 *)
-Compute qtest [[-3;-3;3;0];[3;-9;3;0];[6;-6;0;0]]%Q.
+Compute qtest [[-3;-3;3;0];[3;-9;3;0];[6;-6;0;0]].
 (*
-     = ([[-216; 0; 108; 0]; [0; -216; 108; 0]; [0; 0; 0; 0]], -216)
-     = ([[1; 0; -1/2; 0]; [0; 1; -1/2; 0]; [0; 0; 0; 0]], 1)
+     = [[〈1〉; 0; 〈-1╱2〉; 0]; [0; 〈1〉; 〈-1╱2〉; 0]; [0; 0; 0; 0]]
    1 0 -1/2
    0 1 -1/2
    0 0  0
 *)
-Compute qtest [[3;-3;3;0];[3;-3;3;0];[6;-6;6;0]]%Q.
+Compute qtest [[3;-3;3;0];[3;-3;3;0];[6;-6;6;0]].
 (*
      = ([[6; -6; 6; 0]; [0; 0; 0; 0]; [0; 0; 0; 0]], 6)
 *)
-Compute qtest [[1;-1;2;5];[3;2;1;10];[2;-3;-2;-10]]%Q.
+Compute qtest [[1;-1;2;5];[3;2;1;10];[2;-3;-2;-10]].
 (*
      = ([[4095; 0; 0; 4095]; [0; 4095; 0; 8190]; [0; 0; 4095; 12285]], 4095)
      = ([[1; 0; 0; 1]; [0; 1; 0; 2]; [0; 0; 1; 3]], 1)
 *)
-Compute qtest [[1;2;2;-3;2;3];[2;4;1;0;-5;-6];[4;8;5;-6;-1;0];[-1;-2;-1;1;1;1]]%Q.
+Compute qtest [[1;2;2;-3;2;3];[2;4;1;0;-5;-6];[4;8;5;-6;-1;0];[-1;-2;-1;1;1;1]].
 (*
      = ([[-24; -48; 0; -24; 96; 120]; [0; 0; -24; 48; -72; -96];
         [0; 0; 0; 0; 0; 0]; [0; 0; 0; 0; 0; 0]], -24)
