@@ -219,9 +219,9 @@ Notation "/ x" := (inv x) : Q_scope.
 (* e.g. the rational "-3/4" is displayed 〈-3╱4〉%Q *)
 
 Notation "'〈' a b" := (Pos {| PQ_of_GQ := a; GQprop := b |})
-  (at level 1, format "'〈' a b") : Q_scope.
+  (at level 1, format "'〈' a b", only printing) : Q_scope.
 Notation "'〈' - a b" := (Neg {| PQ_of_GQ := a; GQprop := b |})
-  (at level 1, format "'〈' - a b") : Q_scope.
+  (at level 1, format "'〈' - a b", only printing) : Q_scope.
 (* the field "GQprop" is always "eq_refl"; the following syntax
    make it "disapear" *)
 Notation "'〉'" := (@eq_refl nat (Nat.gcd _ _)) : Q_scope.
