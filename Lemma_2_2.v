@@ -534,8 +534,6 @@ Definition Q_semiring_prop :=
      srng_mul_add_distr_l := Q.mul_add_distr_l;
      srng_mul_0_l := Q.mul_0_l |}.
 Definition Q_ring_prop := {| rng_add_opp_l := Q.add_opp_diag_l |}.
-Canonical Structure Q_semiring_prop.
-Canonical Structure Q_ring_prop.
 Existing Instance Q_semiring_prop.
 Existing Instance Q_ring_prop.
 
@@ -558,7 +556,9 @@ x₁+3x₂=0
 x₁=-3x₂
 vector (-3, 1)
 *)
-Compute list_of_vect (mat_mul_vect_r (mat_of_list_list 0 [[4;3];[-2;-3]]) (vect_of_list 0 [-3;1])).
+Definition qtest_mul_m_v m v :=
+  list_of_vect (mat_mul_vect_r (mat_of_list_list 0 m) (vect_of_list 0 v)).
+Compute qtest_mul_m_v [[4;3];[-2;-3]] [-3;1].
 (*
      = [〈-9〉; 〈3〉]
 *)
