@@ -553,6 +553,8 @@ Compute qtest [[-1;-3;0];[2;6;0]].
 (*
      = [[〈1〉; 〈3〉; 0]; [0; 0; 0]]
 x₁+3x₂=0
+I must resolve this system "by hand". Is there a general algorithm to
+resolve it?
 x₁=-3x₂
 vector (-3, 1)
 *)
@@ -561,6 +563,7 @@ Definition qtest_mul_m_v m v :=
 Compute qtest_mul_m_v [[4;3];[-2;-3]] [-3;1].
 (*
      = [〈-9〉; 〈3〉]
+    Indeed, [-3;1] is an eigenvector
 *)
 (*
 2/ λ=-2
@@ -570,10 +573,13 @@ Compute qtest [[-6;-3;0];[2;1;0]].
 (*
      = [[〈1〉; 〈1╱2〉; 0]; [0; 0; 0]]
 x₁+1/2x₂=0
+I must resolve this system "by hand". Is there a general algorithm to
+resolve it?
 x₂=-2x₁
 vector (1,-2)
 *)
 Compute qtest_mul_m_v [[4;3];[-2;-3]] [1;-2].
 (*
      = [〈-2〉; 〈4〉]
+    Indeed, [1;-2] is an eigenvector
 *)
