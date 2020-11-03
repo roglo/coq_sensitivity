@@ -584,21 +584,22 @@ Compute qtest_mul_m_v [[4;3];[-2;-3]] [1;-2].
     Indeed, [1;-2] is an eigenvector
 *)
 
-(* To mathematically resolve a system of n linerar equations with n variables,
+(* To mathematically resolve a system of n linear equations with n variables,
    if the determinant of the matrix is not zero, it is easy: by Cramer's rule,
    each variable is the quotient of the determinant associated with the
    variable (of the matrix where the column of the variable is replaced
    by the column of the right hand side) and the determinant. This is
    not the good way in practice, but it is likely easier to manipulate
-   in proofs (not done, but if I have this problem, I do it like that.
-     But if the determinant is zero, and it is the case to find an
+   in proofs (not done, but if I have this problem, I do it like that).
+     But if the determinant is zero, and it is the case when finding an
    eigenvector associated with an eigenvalue, this method cannot work.
    The result is not just a point, but a vectorial subspace, the kernel
    of the matrix. For eigenvalues and eigenvariables, therefore, the
-   kernel of λI-M.
-     But how to compute this subspace? By returning a base, for example ?
+   kernel of λI-M: this kernel returns all eigenvariables associated
+   with λ.
+     But how to compute this subspace? By returning a base, for example?
    How, in the general case? I found on the Internet a lot of examples, but
    not the general algorithm.
-     In résumé, how to mathematically resolve a linear system of n equations
+     To sum up, how to mathematically resolve a linear system of n equations
    with n variables whose determinant is zero?
 *)
