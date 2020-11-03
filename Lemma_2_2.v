@@ -480,8 +480,10 @@ Definition Q_gauss_jordan := gauss_jordan Q_ltb.
 Definition qtest ll :=
   let r := Q_gauss_jordan (mat_of_list_list 0%Q ll) in
   list_list_of_mat r.
+(*
 Require Import GQ PQ.
 Import GQ_Notations PQ_Notations.
+*)
 Compute qtest [[1]]%Q.
 (*
 Notation "++ a b" := (Pos (GQ.GQmake0 a b)) (at level 35, format "++  a  b") : Q_scope.

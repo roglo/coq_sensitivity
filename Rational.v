@@ -190,6 +190,8 @@ Definition compare x y :=
 
 Module Notations.
 
+Export PQ.PQ_Notations.
+
 (* in 8.10, coq obstinately refuses to print "a < b < c": it prints
    "a < b ∧ b < c"; I found a solution: redefining my own and constructor
    and then, it works *)
