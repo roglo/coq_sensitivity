@@ -481,13 +481,6 @@ Definition qtest ll :=
   let r := Q_gauss_jordan (mat_of_list_list 0%Q ll) in
   list_list_of_mat r.
 Compute qtest [[1]]%Q.
-Notation "'〈' a b" := (Pos (GQ.GQmake0 a b))
-  (at level 1, format "'〈' a b") : Q_scope.
-Notation "'〈' - a b" := (Neg (GQ.GQmake0 a b))
-  (at level 1, format "'〈' - a b") : Q_scope.
-(* to make this "eq_refl" almost disapear *)
-Notation "'〉'" := (@eq_refl nat (Nat.gcd _ _)) : Q_scope.
-(**)
 Compute qtest [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]]%Q.
 Check (2 + 3//2)%Q.
 Compute (2 + 3//2)%Q.

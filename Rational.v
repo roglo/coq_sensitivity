@@ -215,6 +215,17 @@ Notation "x * y" := (mul x y) : Q_scope.
 Notation "x / y" := (div x y) : Q_scope.
 Notation "/ x" := (inv x) : Q_scope.
 
+(* reduced syntax of a computed rational *)
+(* e.g. the rational "-3/4" is displayed 〈-3╱4〉%Q *)
+
+Notation "'〈' a b" := (Pos {| PQ_of_GQ := a; GQprop := b |})
+  (at level 1, format "'〈' a b") : Q_scope.
+Notation "'〈' - a b" := (Neg {| PQ_of_GQ := a; GQprop := b |})
+  (at level 1, format "'〈' - a b") : Q_scope.
+(* the field "GQprop" is always "eq_refl"; the following syntax
+   make it "disapear" *)
+Notation "'〉'" := (@eq_refl nat (Nat.gcd _ _)) : Q_scope.
+
 Definition of_decimal_uint (n : Decimal.uint) : Q := (Nat.of_uint n // 1)%Q.
 
 Definition of_decimal_int (n : Decimal.int) : Q :=
