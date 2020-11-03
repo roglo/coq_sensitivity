@@ -223,8 +223,8 @@ Definition of_decimal_int (n : Decimal.int) : Q :=
 
 Definition to_decimal_uint (gq : GQ) : option Decimal.uint :=
   let (num, den) := PQ_of_GQ gq in
-  match den with
-  | 0 => Some (Nat.to_uint (num + 1))
+  match PQ.nn den with
+  | 0 => Some (Nat.to_uint (PQ.nn num + 1))
   | _ => None
   end.
 
