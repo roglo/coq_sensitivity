@@ -444,32 +444,24 @@ Fixpoint gauss_jordan_loop lt (A : matrix T) r oj :=
 Definition gauss_jordan lt (A : matrix T) :=
   gauss_jordan_loop lt (A : matrix T) 0 (mat_ncols A).
 
-(**)
+(*
 End in_ring.
-
 Import Q.Notations.
-
 Definition Q_semiring_op : semiring_op Q :=
   {| srng_zero := 0%Q;
      srng_one := 1%Q;
      srng_add := Q.add;
      srng_mul := Q.mul |}.
-
 Definition Q_ring_op : ring_op Q :=
   {| rng_opp := Q.opp |}.
-
 Canonical Structure Q_semiring_op.
 Canonical Structure Q_ring_op.
-
 Theorem Q_1_neq_0 : 1%Q ≠ 0%Q.
 Proof. easy. Qed.
-
 Definition Q_sring_dec_prop : sring_dec_prop Q :=
   {| srng_eq_dec := Q.eq_dec; srng_1_neq_0 := Q_1_neq_0 |}.
-
 Definition Q_field_op : field_op Q :=
   {| fld_inv := Q.inv |}.
-
 Existing Instance Q_ring_op.
 Existing Instance Q_semiring_op.
 Existing Instance Q_sring_dec_prop.
@@ -530,3 +522,4 @@ Compute qtest [[1;2;2;-3;2;3];[2;4;1;0;-5;-6];[4;8;5;-6;-1;0];[-1;-2;-1;1;1;1]]%
 *)
 Check (355//113)%Q.
 Compute (355//113)%Q.
+*)
