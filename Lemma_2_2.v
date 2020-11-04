@@ -449,7 +449,7 @@ Compute qtest [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]].
 *)
 Compute qtest [[1;3;1;9];[1;1;-1;1];[3;11;5;35]].
 (*
-     = ([[-24; 0; 48; 72]; [0; -24; -24; -96]; [0; 0; 0; 0]], -24)
+     = [[〈1〉; 0; 〈-2〉; 〈-3〉]; [0; 〈1〉; 〈1〉; 〈4〉]; [0; 0; 0; 0]]
 *)
 Compute qtest [[2;1;-1;8];[-3;-1;2;-11];[-2;1;2;-3]].
 (*
@@ -664,8 +664,8 @@ Fixpoint resolve_loop lt n (M : matrix T) (V : vector T) :=
         (* deletion last row which contains only zeros (mat_nrows A - 1),
            and the first variable is given the value 1 *)
         let B := mk_mat (mat_el A) (mat_nrows A - 1) (mat_ncols A - 1) in
-        resolve_loop lt n' B
-          (vect_sub V (vect_mul_scal_l 1%Srng (vect_of_mat_col M 0)))
+        let U := vect_sub V (vect_mul_scal_l 1%Srng (vect_of_mat_col M 0)) in
+        1%Srng :: resolve_loop lt n' B U
       else
         (* resolve for example by Cramer the system of equations Mx=V *)
         resolve_system so M V
@@ -689,10 +689,19 @@ Definition Q_ltb a b :=
 
 Definition qresolve (ll : list (list Q)) v :=
   resolve Q_ltb (mat_of_list_list 0 ll) (vect_of_list 0 v).
+Definition qtest_mul_m_v m v :=
+  list_of_vect (mat_mul_vect_r (mat_of_list_list 0 m) (vect_of_list 0 v)).
 
 Compute qresolve [[4;2];[3;-1]] [-1;2].
 (*
      = [〈3╱10〉; 〈-11╱10〉]     ok
 *)
+Compute qresolve [[1;3;1];[1;1;-1];[3;11;5]] [9;1;35].
+(*
+     = [[〈1〉; 0; 〈-2〉; 〈-3〉]; [0; 〈1〉; 〈1〉; 〈4〉]; [0; 0; 0; 0]]
+     = [〈1〉; 〈8〉; 0]
+*)
+Compute qtest_mul_m_v [[1;3;1];[1;1;-1];[3;11;5]] [1;8;0].
+(* mouais, bof *)
 
 ...
