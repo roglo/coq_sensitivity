@@ -667,6 +667,8 @@ Definition m2mm T {so : semiring_op T} {sdp : sring_dec_prop T} M :=
 (* attempt to resolve a system of n equations with n variables even
    in the case the determinant is 0 *)
 
+(* oui, bon, ça va pas *)
+
 Fixpoint resolve_loop T lt n (M : matrix T) (V : vector T) :=
   match n with
   | 0 => None
