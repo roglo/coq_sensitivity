@@ -538,7 +538,7 @@ Existing Instance Q_semiring_prop.
 Existing Instance Q_ring_prop.
 
 (* trying to find eigenvalues and eigenvector on an example *)
-Definition qcp ll := charac_polyn (mat_of_list_list 0 ll).
+Definition qcp ll := polyn_list (charac_polyn (mat_of_list_list 0 ll)).
 Compute qcp [[4;3];[-2;-3]].
 (*
 P=x²-x-6
@@ -603,3 +603,29 @@ Compute qtest_mul_m_v [[4;3];[-2;-3]] [1;-2].
      To sum up, how to mathematically resolve a linear system of n equations
    with n variables whose determinant is zero?
 *)
+
+(* https://en.wikipedia.org/wiki/Kernel_(linear_algebra)#Illustration *)
+Compute qtest [[2;3;5];[-4;2;3]].
+(*
+     = [[〈1〉; 0; 〈1╱16〉]; [0; 〈1〉; 〈13╱8〉]]
+
+  Good! matches what is written in the wikipedia page.
+*)
+
+Compute qtest [[1;2;2;2];[1;3;-2;-1];[3;5;8;8]].
+Compute qtest [[2;3;1;1];[3;1;5;2];[4;-1;-1;0]].
+Compute qtest [[2;3;1;1];[0;-7;7;1];[0;-7;-3;-2]].
+Compute qtest [[3;3;3;18];[-1;3;7;-10];[1;3;4;6]].
+Compute qtest [[0;0;2;-2;8;-6];[1;2;1;0;5;-1];[-2;-4;-1;0;-8;-1]].
+Compute qtest [[4;6;6];[1;3;2];[-1;-5;-2]].
+Compute qcp [[4;6;6];[1;3;2];[-1;-5;-2]].
+Compute qtest_mul_m_v [[4;6;6];[1;3;2];[-1;-5;-2]] [4;1;-3].
+Compute qtest_mul_m_v [[4;6;6];[1;3;2];[-1;-5;-2]] [3;1;-2].
+Compute qtest [[3;6;6];[1;2;2];[-1;-5;-3]].
+Compute qcp [[3;6;6];[1;2;2];[-1;-5;-3]].
+
+Compute qcp [[5;0;1];[1;1;0];[-7;1;0]].
+(* x³-6x²+12x-8 = (x-2)³*)
+Compute qtest [[-3;0;-1];[-1;1;0];[7;-1;2]].
+Compute qtest [[3;0;1];[1;-1;0];[-7;1;-2]].
+(* dimension of eigenvectors is 1, even if the multiplicity of 2 is 3 *)
