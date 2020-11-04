@@ -426,19 +426,19 @@ Fixpoint gauss_jordan_loop lt (A : matrix T) r oj :=
       if srng_eq_dec (mat_el A k j) 0 then
         gauss_jordan_loop lt A r oj'
       else
-        let r := r + 1 in
-        let A := multiply_row_by_scalar A k (/ mat_el A k j)%F in
-        let A := swap_rows A (r - 1) k in
-        let A :=
+        let r' := r + 1 in
+        let A' := multiply_row_by_scalar A k (/ mat_el A k j)%F in
+        let A'' := swap_rows A' (r' - 1) k in
+        let A''' :=
           fold_left
-            (λ A i'',
-               if Nat.eq_dec i'' (r - 1) then A
+            (λ B i'',
+               if Nat.eq_dec i'' (r' - 1) then B
                else
-                 let v := mat_el A i'' j in
-                 add_one_row_scalar_multiple_another A i'' (- v)%Rng (r - 1))
-            (seq 0 (mat_nrows A)) A
+                 let v := mat_el B i'' j in
+                 add_one_row_scalar_multiple_another B i'' (- v)%Rng (r' - 1))
+            (seq 0 (mat_nrows A'')) A''
         in
-        gauss_jordan_loop lt A r oj'
+        gauss_jordan_loop lt A''' r' oj'
   end.
 
 Definition gauss_jordan lt (A : matrix T) :=
@@ -462,8 +462,8 @@ Definition Q_sring_dec_prop : sring_dec_prop Q :=
   {| srng_eq_dec := Q.eq_dec; srng_1_neq_0 := Q_1_neq_0 |}.
 Definition Q_field_op : field_op Q :=
   {| fld_inv := Q.inv |}.
-Existing Instance Q_ring_op.
 Existing Instance Q_semiring_op.
+Existing Instance Q_ring_op.
 Existing Instance Q_sring_dec_prop.
 Existing Instance Q_field_op.
 Definition Q_ltb a b :=
@@ -638,13 +638,51 @@ Definition mat_repl_vect k (M : matrix T) V :=
     (mat_nrows M) (mat_ncols M).
 
 (* resolve a system of n equations with n variables whose determinant
-   is not zero *)
+   is not zero; Cramer's method *)
 
 Definition resolve_system (M : matrix T) (V : vector T) :=
-  map (λ i, (determinant (mat_repl_vect i M V) / determinant M)%F)
-    (seq 0 (vect_nrows V)).
+  map (λ j, (determinant (mat_repl_vect j M V) / determinant M)%F)
+    (seq 0 (mat_ncols M)).
 
-(* here, make some tests on ℚ *)
+(**)
+(* here, some tests on ℚ *)
+End in_ring.
+Import Q.Notations.
+Print Q.Notations.
+Open Scope Q_scope.
+Definition Q_semiring_op : semiring_op Q :=
+  {| srng_zero := 0;
+     srng_one := 1;
+     srng_add := Q.add;
+     srng_mul := Q.mul |}.
+Definition Q_ring_op : ring_op Q := {| rng_opp := Q.opp |}.
+Definition Q_field_op : field_op Q := {| fld_inv := Q.inv |}.
+Existing Instance Q_ring_op.
+Existing Instance Q_semiring_op.
+Existing Instance Q_field_op.
+Canonical Structure Q_semiring_op.
+Canonical Structure Q_ring_op.
+Canonical Structure Q_field_op.
+
+(* pourquoi il m'affiche fld_div dans Print resolve_system, au
+   lieu d'utiliser la notation "/" ? *)
+Print resolve_system.
+
+(* pareil pour fld_inv ici *)
+Print gauss_jordan_loop.
+
+(* pourtant, ici, il m'affiche bien "*" à la place de srng_mul *)
+Print multiply_row_by_scalar.
+
+(* pourquoi il me demande Q_semiring_op comme paramètre, ce con ?
+   pourquoi pas aussi Q_field_op et Q_ring_op, dans ce cas ? *)
+Definition qtest_rs (ll : list (list Q)) v :=
+  resolve_system Q_semiring_op (mat_of_list_list 0 ll) (vect_of_list 0 v).
+
+Compute qtest_rs [[4;2];[3;-1]] [-1;2].
+(*
+     = [〈3╱10〉; 〈-11╱10〉]     ok
+*)
 
 ...
 
