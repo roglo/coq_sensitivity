@@ -591,25 +591,13 @@ Definition resolve_system (M : matrix T) (V : vector T) :=
   map (λ j, (determinant (mat_repl_vect j M V) / determinant M)%F)
     (seq 0 (mat_ncols M)).
 
-(**)
+(*
 (* here, some tests on ℚ *)
 End in_ring.
 Require Import Qfield2.
 Import Q.Notations.
 Print Q.Notations.
 Open Scope Q_scope.
-(*
-Definition Q_semiring_op : semiring_op Q :=
-  {| srng_zero := 0;
-     srng_one := 1;
-     srng_add := Q.add;
-     srng_mul := Q.mul |}.
-Definition Q_ring_op : ring_op Q := {| rng_opp := Q.opp |}.
-Definition Q_field_op : field_op Q := {| fld_inv := Q.inv |}.
-Canonical Structure Q_semiring_op.
-Canonical Structure Q_ring_op.
-Canonical Structure Q_field_op.
-*)
 Existing Instance Q_ring_op.
 Existing Instance Q_semiring_op.
 Existing Instance Q_field_op.
@@ -631,8 +619,7 @@ Compute qtest_rs [[3;2;-1];[2;-2;4];[-1;1/2;-1]] [1;-2;0].
 (*
      = [〈1〉; 〈-2〉; 〈-2〉]      ok
 *)
-
-...
+*)
 
 (* closing the section and re-open it in order to generalize 'resolve_system'
    to any field T *)
@@ -651,22 +638,36 @@ Context {fo : field_op T}.
 
 Print resolve_system.
 
-...
+Definition vect_of_mat_col (M : matrix T) j :=
+  mk_vect (λ i, mat_el M i j) (mat_nrows M).
+
+Definition vect_add (U V : vector T) :=
+  mk_vect (λ i, (vect_el U i + vect_el V i)%Srng) (vect_nrows V).
+Definition vect_opp (V : vector T) :=
+  mk_vect (λ i, (- vect_el V i)%Rng) (vect_nrows V).
+
+Definition vect_sub (U V : vector T) := vect_add U (vect_opp V).
 
 (* attempt to resolve a system of n equations with n variables even
    in the case the determinant is 0 *)
 
-Fixpoint resolve_loop T lt n (M : matrix T) (V : vector T) :=
+Fixpoint resolve_loop lt n (M : matrix T) (V : vector T) :=
   match n with
   | 0 => None
   | S n' =>
       let A := gauss_jordan lt M in
-      if ¬ srng_eq_dec (determinant B) 0%Srng then
-        (* resolve for example by Cramer the system of equations Mx=V *)
-        Some ...
-      else
+      if srng_eq_dec (determinant A) 0%Srng then
         (* deletion last row which contains only zeros (mat_nrows A - 1),
            and last variable becomes a constant (mat_ncols A - 1) *)
         let B := mk_mat (mat_el A) (mat_nrows A - 1) (mat_ncols A - 1) in
-        resolve_loop lt n' B (V - last row of A or M)
+        resolve_loop lt n' B
+          (vect_sub V
+...
+             (vect_mul_scalar_l (vect_of_mat_col M 0) _x))
+      else
+        (* resolve for example by Cramer the system of equations Mx=V *)
+        Some (resolve_system so M V)
   end.
+
+Set Printing All.
+Print resolve_loop.
