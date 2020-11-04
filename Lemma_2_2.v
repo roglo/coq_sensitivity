@@ -8,7 +8,7 @@ Require Import Utf8 Arith.
 Import List List.ListNotations.
 
 Require Import Misc Matrix BlockMat.
-Require Import Semiring.
+Require Import Semiring Field2.
 Require Import Rational.
 (* required if reasoning with characteristic polynomial
    to find eigenvalues; but perhaps it is not necessary
@@ -394,27 +394,6 @@ Compute test [[1;2;2;-3;2;3];[2;4;1;0;-5;-6];[4;8;5;-6;-1;0];[-1;-2;-1;1;1;1]].
 *)
 *)
 
-(* let's go for the fields *)
-
-Class field_op T :=
-  { (*fld_ring : ring_op T;*)
-    fld_inv : T → T }.
-
-Definition fld_div T {fo : field_op T} {so : semiring_op T} a b :=
-  srng_mul a (fld_inv b).
-
-Declare Scope field_scope.
-
-Delimit Scope field_scope with F.
-Notation "0" := srng_zero : field_scope.
-Notation "1" := srng_one : field_scope.
-Notation "- a" := (rng_opp a) : field_scope.
-Notation "/ a" := (fld_inv a) : field_scope.
-Notation "a + b" := (srng_add a b) : field_scope.
-Notation "a - b" := (rng_sub a b) : field_scope.
-Notation "a * b" := (srng_mul a b) : field_scope.
-Notation "a / b" := (fld_div a b) : field_scope.
-
 Context {fo : field_op T}.
 
 Fixpoint gauss_jordan_loop lt (A : matrix T) r oj :=
@@ -446,22 +425,10 @@ Definition gauss_jordan lt (A : matrix T) :=
 
 (*
 End in_ring.
+Require Import Qfield2.
+Check Q_semiring_op.
 Import Q.Notations.
 Open Scope Q_scope.
-Definition Q_semiring_op : semiring_op Q :=
-  {| srng_zero := 0;
-     srng_one := 1;
-     srng_add := Q.add;
-     srng_mul := Q.mul |}.
-Definition Q_ring_op : ring_op Q := {| rng_opp := Q.opp |}.
-Canonical Structure Q_semiring_op.
-Canonical Structure Q_ring_op.
-Theorem Q_1_neq_0 : 1 ≠ 0.
-Proof. easy. Qed.
-Definition Q_sring_dec_prop : sring_dec_prop Q :=
-  {| srng_eq_dec := Q.eq_dec; srng_1_neq_0 := Q_1_neq_0 |}.
-Definition Q_field_op : field_op Q :=
-  {| fld_inv := Q.inv |}.
 Existing Instance Q_semiring_op.
 Existing Instance Q_ring_op.
 Existing Instance Q_sring_dec_prop.
@@ -584,26 +551,6 @@ Compute qtest_mul_m_v [[4;3];[-2;-3]] [1;-2].
     Indeed, [1;-2] is an eigenvector
 *)
 
-(* To mathematically resolve a system of n linear equations with n variables,
-   if the determinant of the matrix is not zero, it is easy: by Cramer's rule,
-   each variable is the quotient of the determinant associated with the
-   variable (of the matrix where the column of the variable is replaced
-   by the column of the right hand side) and the determinant. This is
-   not the good way in practice, but it is likely easier to manipulate
-   in proofs (not done, but if I have this problem, I do it like that).
-     But if the determinant is zero, and it is the case when finding an
-   eigenvector associated with an eigenvalue, this method cannot work.
-   The result is not just a point, but a vectorial subspace, the kernel
-   of the matrix. For eigenvalues and eigenvariables, therefore, the
-   kernel of λI-M: this kernel returns all eigenvariables associated
-   with λ.
-     But how to compute this subspace? By returning a base, for example?
-   How, in the general case? I found on the Internet a lot of examples, but
-   not the general algorithm.
-     To sum up, how to mathematically resolve a linear system of n equations
-   with n variables whose determinant is zero?
-*)
-
 (* https://en.wikipedia.org/wiki/Kernel_(linear_algebra)#Illustration *)
 Compute qtest [[2;3;5];[-4;2;3]].
 (*
@@ -647,9 +594,11 @@ Definition resolve_system (M : matrix T) (V : vector T) :=
 (**)
 (* here, some tests on ℚ *)
 End in_ring.
+Require Import Qfield2.
 Import Q.Notations.
 Print Q.Notations.
 Open Scope Q_scope.
+(*
 Definition Q_semiring_op : semiring_op Q :=
   {| srng_zero := 0;
      srng_one := 1;
@@ -657,22 +606,13 @@ Definition Q_semiring_op : semiring_op Q :=
      srng_mul := Q.mul |}.
 Definition Q_ring_op : ring_op Q := {| rng_opp := Q.opp |}.
 Definition Q_field_op : field_op Q := {| fld_inv := Q.inv |}.
-Existing Instance Q_ring_op.
-Existing Instance Q_semiring_op.
-Existing Instance Q_field_op.
 Canonical Structure Q_semiring_op.
 Canonical Structure Q_ring_op.
 Canonical Structure Q_field_op.
-
-(* pourquoi il m'affiche fld_div dans Print resolve_system, au
-   lieu d'utiliser la notation "/" ? *)
-Print resolve_system.
-
-(* pareil pour fld_inv ici *)
-Print gauss_jordan_loop.
-
-(* pourtant, ici, il m'affiche bien "*" à la place de srng_mul *)
-Print multiply_row_by_scalar.
+*)
+Existing Instance Q_ring_op.
+Existing Instance Q_semiring_op.
+Existing Instance Q_field_op.
 
 (* pourquoi il me demande Q_semiring_op comme paramètre, ce con ?
    pourquoi pas aussi Q_field_op et Q_ring_op, dans ce cas ? *)
@@ -682,6 +622,14 @@ Definition qtest_rs (ll : list (list Q)) v :=
 Compute qtest_rs [[4;2];[3;-1]] [-1;2].
 (*
      = [〈3╱10〉; 〈-11╱10〉]     ok
+*)
+Compute qtest_rs [[1;10;-3];[2;-1;2];[-1;1;1]] [5;2;-3].
+(*
+     = [〈2〉; 0; 〈-1〉]
+*)
+Compute qtest_rs [[3;2;-1];[2;-2;4];[-1;1/2;-1]] [1;-2;0].
+(*
+     = [〈1〉; 〈-2〉; 〈-2〉]      ok
 *)
 
 ...
