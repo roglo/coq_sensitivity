@@ -444,7 +444,7 @@ Fixpoint gauss_jordan_loop lt (A : matrix T) r oj :=
 Definition gauss_jordan lt (A : matrix T) :=
   gauss_jordan_loop lt (A : matrix T) 0 (mat_ncols A).
 
-(**)
+(*
 End in_ring.
 Import Q.Notations.
 Open Scope Q_scope.
@@ -629,3 +629,51 @@ Compute qcp [[5;0;1];[1;1;0];[-7;1;0]].
 Compute qtest [[-3;0;-1];[-1;1;0];[7;-1;2]].
 Compute qtest [[3;0;1];[1;-1;0];[-7;1;-2]].
 (* dimension of eigenvectors is 1, even if the multiplicity of 2 is 3 *)
+*)
+
+(* matrix whose k-th column is replaced by a vector *)
+
+Definition mat_repl_vect k (M : matrix T) V :=
+  mk_mat (λ i j, if Nat.eq_dec j k then vect_el V i else mat_el M i j)
+    (mat_nrows M) (mat_ncols M).
+
+(* resolve a system of n equations with n variables whose determinant
+   is not zero *)
+
+Definition resolve_system (M : matrix T) (V : vector T) :=
+  map (λ i, (determinant (mat_repl_vect i M V) / determinant M)%F)
+    (seq 0 (vect_nrows V)).
+
+End in_ring.
+
+Section in_field.
+
+Context {T : Type}.
+Context {ro : ring_op T}.
+Context (so : semiring_op T).
+Context {sp : semiring_prop T}.
+Context {rp : ring_prop T}.
+Context {sdp : sring_dec_prop T}.
+Context {fo : field_op T}.
+
+Print resolve_system.
+
+...
+
+(* attempt to resolve a system of n equations with n variables even
+   in the case the determinant is 0 *)
+
+Fixpoint resolve_loop T lt n (M : matrix T) (V : vector T) :=
+  match n with
+  | 0 => None
+  | S n' =>
+      let A := gauss_jordan lt M in
+      if ¬ srng_eq_dec (determinant B) 0%Srng then
+        (* resolve for example by Cramer the system of equations Mx=V *)
+        Some ...
+      else
+        (* deletion last row which contains only zeros (mat_nrows A - 1),
+           and last variable becomes a constant (mat_ncols A - 1) *)
+        let B := mk_mat (mat_el A) (mat_nrows A - 1) (mat_ncols A - 1) in
+        resolve_loop lt n' B (V - last row of A or M)
+  end.
