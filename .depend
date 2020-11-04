@@ -4,8 +4,8 @@ CharacPolyn.vio: CharacPolyn.v Misc.vio Semiring.vio SRsummation.vio SRproduct.v
 CharacPolyn.vo CharacPolyn.glob CharacPolyn.v.beautified CharacPolyn.required_vo: CharacPolyn.v Misc.vo Semiring.vo SRsummation.vo SRproduct.vo SRpolynomial.vo Matrix.vo
 GQ.vio: GQ.v Misc.vio PQ.vio Nat_ggcd.vio
 GQ.vo GQ.glob GQ.v.beautified GQ.required_vo: GQ.v Misc.vo PQ.vo Nat_ggcd.vo
-Lemma_2_2.vio: Lemma_2_2.v Misc.vio Matrix.vio BlockMat.vio Semiring.vio
-Lemma_2_2.vo Lemma_2_2.glob Lemma_2_2.v.beautified Lemma_2_2.required_vo: Lemma_2_2.v Misc.vo Matrix.vo BlockMat.vo Semiring.vo
+Lemma_2_2.vio: Lemma_2_2.v Misc.vio Matrix.vio BlockMat.vio Semiring.vio Rational.vio
+Lemma_2_2.vo Lemma_2_2.glob Lemma_2_2.v.beautified Lemma_2_2.required_vo: Lemma_2_2.v Misc.vo Matrix.vo BlockMat.vo Semiring.vo Rational.vo
 Matrix.vio: Matrix.v Misc.vio Semiring.vio SRsummation.vio
 Matrix.vo Matrix.glob Matrix.v.beautified Matrix.required_vo: Matrix.v Misc.vo Semiring.vo SRsummation.vo
 Misc.vio: Misc.v 
@@ -26,9 +26,13 @@ Semiring.vio: Semiring.v
 Semiring.vo Semiring.glob Semiring.v.beautified Semiring.required_vo: Semiring.v 
 Sensitivity.vio: Sensitivity.v Misc.vio
 Sensitivity.vo Sensitivity.glob Sensitivity.v.beautified Sensitivity.required_vo: Sensitivity.v Misc.vo
+Zring.vio: Zring.v Semiring.vio
+Zring.vo Zring.glob Zring.v.beautified Zring.required_vo: Zring.v Semiring.vo
 deprecat_Ring2.vio: deprecat_Ring2.v 
 deprecat_Ring2.vo deprecat_Ring2.glob deprecat_Ring2.v.beautified deprecat_Ring2.required_vo: deprecat_Ring2.v 
 deprecat_Rpolynomial2.vio: deprecat_Rpolynomial2.v Misc.vio deprecat_Ring2.vio deprecat_Rsummation.vio
 deprecat_Rpolynomial2.vo deprecat_Rpolynomial2.glob deprecat_Rpolynomial2.v.beautified deprecat_Rpolynomial2.required_vo: deprecat_Rpolynomial2.v Misc.vo deprecat_Ring2.vo deprecat_Rsummation.vo
 deprecat_Rsummation.vio: deprecat_Rsummation.v Misc.vio deprecat_Ring2.vio
 deprecat_Rsummation.vo deprecat_Rsummation.glob deprecat_Rsummation.v.beautified deprecat_Rsummation.required_vo: deprecat_Rsummation.v Misc.vo deprecat_Ring2.vo
+toto.vio: toto.v 
+toto.vo toto.glob toto.v.beautified toto.required_vo: toto.v 

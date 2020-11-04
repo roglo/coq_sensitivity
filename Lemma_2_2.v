@@ -338,7 +338,7 @@ Definition rng_gauss_jordan lt (A : matrix T) :=
 
 (*
 End in_ring.
-Require Import ZArith.
+Require Import ZArith Zring.
 Open Scope Z_scope.
 Existing Instance Z_ring_op.
 Existing Instance Z_semiring_op.
