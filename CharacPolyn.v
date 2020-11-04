@@ -30,7 +30,7 @@ Existing Instance polyn_ring_prop.
 (* convertion matrix → matrix with monomials *)
 
 Definition m2mm M : matrix (polynomial T) :=
-  mk_mat (λ i j, polyn_of_list [mat_el M i j])
+  mk_mat (λ i j, polyn_of_const (mat_el M i j))
     (mat_nrows M) (mat_ncols M).
 
 Definition xI_sub_M M := (_x × m2mm (mI (mat_nrows M)) - m2mm M)%M.
@@ -70,13 +70,14 @@ Qed.
 
 Theorem mat_el_xI_sub_M : ∀ i j M,
   mat_el (xI_sub_M M) i j =
-    if Nat.eq_dec i j then (_x - polyn_of_list [mat_el M i i])%P
-    else (- polyn_of_list [mat_el M i j])%P.
+    if Nat.eq_dec i j then (_x - polyn_of_const (mat_el M i i))%P
+    else (- polyn_of_const (mat_el M i j))%P.
 Proof.
 intros; cbn.
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-  now rewrite polyn_mul_1_r, Hij.
+  now rewrite Hij, polyn_mul_1_r.
 }
+unfold polyn_of_const.
 now rewrite polyn_of_list_0, polyn_mul_0_r, polyn_add_0_l.
 Qed.
 
@@ -147,6 +148,7 @@ Theorem polyn_degree_mat_el_subm_subm_xI_sub_M_0_succ_0_0 : ∀ M i,
   polyn_degree (mat_el (subm (subm (xI_sub_M M) 0 (S i)) 0 0) 0 0) ≤ 1.
 Proof.
 intros; cbn.
+unfold polyn_of_const.
 rewrite srng_mul_1_r.
 specialize (polyn_of_list_repeat_0s 1) as H.
 cbn in H; rewrite H; clear H.
@@ -203,9 +205,9 @@ induction l as [| m]; intros. {
       rewrite polyn_mul_1_r; [ | easy ].
       rewrite polyn_degree_1; [ easy | easy | ].
       rewrite polyn_degree_opp.
-      rewrite fold_polyn_of_const.
       now rewrite polyn_degree_of_const.
     }
+    unfold polyn_of_const.
     rewrite polyn_of_list_0.
     rewrite polyn_mul_0_r; [ | easy ].
     rewrite polyn_add_0_l.
@@ -218,9 +220,9 @@ induction l as [| m]; intros. {
     rewrite polyn_mul_1_r; [ | easy ].
     rewrite polyn_degree_1; [ easy | easy | ].
     rewrite polyn_degree_opp.
-    rewrite fold_polyn_of_const.
     now rewrite polyn_degree_of_const.
   }
+  unfold polyn_of_const.
   rewrite polyn_of_list_0.
   rewrite polyn_mul_0_r; [ | easy ].
   rewrite polyn_add_0_l.
@@ -304,7 +306,6 @@ etransitivity. {
       apply polyn_degree_of_const.
     }
     rewrite polyn_degree_opp.
-    rewrite fold_polyn_of_const.
     rewrite polyn_degree_of_const.
     apply Nat.le_0_l.
   }
@@ -317,7 +318,6 @@ etransitivity. {
     apply polyn_degree_of_const.
   }
   rewrite polyn_degree_opp.
-  rewrite fold_polyn_of_const.
   rewrite polyn_degree_of_const.
   apply Nat.le_0_l.
 }
@@ -346,7 +346,6 @@ etransitivity. {
         apply polyn_degree_of_const.
       }
       rewrite polyn_degree_opp.
-      rewrite fold_polyn_of_const.
       rewrite polyn_degree_of_const.
       apply Nat.le_0_l.
     }
@@ -359,7 +358,6 @@ etransitivity. {
       apply polyn_degree_of_const.
     }
     rewrite polyn_degree_opp.
-    rewrite fold_polyn_of_const.
     rewrite polyn_degree_of_const.
     apply Nat.le_0_l.
   }
@@ -373,7 +371,6 @@ etransitivity. {
       apply polyn_degree_of_const.
     }
     rewrite polyn_degree_opp.
-    rewrite fold_polyn_of_const.
     rewrite polyn_degree_of_const.
     apply Nat.le_0_l.
   }
@@ -386,7 +383,6 @@ etransitivity. {
     apply polyn_degree_of_const.
   }
   rewrite polyn_degree_opp.
-  rewrite fold_polyn_of_const.
   rewrite polyn_degree_of_const.
   apply Nat.le_0_l.
 }
@@ -431,6 +427,7 @@ rewrite polyn_degree_lt_add; [ | easy | ]. 2: {
   apply Max_lub_lt. {
     destruct n. {
       cbn in HP; rewrite HP.
+      rewrite fold_polyn_of_const.
       rewrite polyn_mul_1_r; [ | easy ].
       rewrite polyn_degree_mat_el_xI_sub_M_0_0.
       apply Nat.lt_0_1.

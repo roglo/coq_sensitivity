@@ -638,20 +638,36 @@ Context {fo : field_op T}.
 
 Print resolve_system.
 
-Definition vect_of_mat_col (M : matrix T) j :=
+Definition vect_of_mat_col T (M : matrix T) j :=
   mk_vect (λ i, mat_el M i j) (mat_nrows M).
 
-Definition vect_add (U V : vector T) :=
+Definition vect_add T {so : semiring_op T} (U V : vector T) :=
   mk_vect (λ i, (vect_el U i + vect_el V i)%Srng) (vect_nrows V).
-Definition vect_opp (V : vector T) :=
+Definition vect_opp T {ro : ring_op T} (V : vector T) :=
   mk_vect (λ i, (- vect_el V i)%Rng) (vect_nrows V).
 
-Definition vect_sub (U V : vector T) := vect_add U (vect_opp V).
+Definition vect_sub T {so : semiring_op T} {ro : ring_op T} (U V : vector T)
+  := vect_add U (vect_opp V).
+
+Definition vect_mul_scal_l T {so : semiring_op T} μ (V : vector T) :=
+  mk_vect (λ i, μ * vect_el V i)%Srng (vect_nrows V).
+
+Require Import SRpolynomial.
+
+Definition v2mv T {so : semiring_op T} {sdp : sring_dec_prop T} V :
+    vector (polynomial T) :=
+  mk_vect (λ i, polyn_of_const (vect_el V i))
+    (vect_nrows V).
+
+(* definition duplicated from CharacPolyn.v: to be unified *)
+Definition m2mm T {so : semiring_op T} {sdp : sring_dec_prop T} M :=
+  mk_mat (λ i j, polyn_of_const (mat_el M i j))
+    (mat_nrows M) (mat_ncols M).
 
 (* attempt to resolve a system of n equations with n variables even
    in the case the determinant is 0 *)
 
-Fixpoint resolve_loop lt n (M : matrix T) (V : vector T) :=
+Fixpoint resolve_loop T lt n (M : matrix T) (V : vector T) :=
   match n with
   | 0 => None
   | S n' =>
@@ -660,10 +676,9 @@ Fixpoint resolve_loop lt n (M : matrix T) (V : vector T) :=
         (* deletion last row which contains only zeros (mat_nrows A - 1),
            and last variable becomes a constant (mat_ncols A - 1) *)
         let B := mk_mat (mat_el A) (mat_nrows A - 1) (mat_ncols A - 1) in
-        resolve_loop lt n' B
-          (vect_sub V
 ...
-             (vect_mul_scalar_l (vect_of_mat_col M 0) _x))
+        resolve_loop lt_mat n' (m2mm B)
+          (vect_sub (v2mv V) (vect_mul_scal_l _x (v2mv (vect_of_mat_col M 0))))
       else
         (* resolve for example by Cramer the system of equations Mx=V *)
         Some (resolve_system so M V)

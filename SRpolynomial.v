@@ -247,7 +247,7 @@ Declare Scope polynomial_scope.
 Delimit Scope polynomial_scope with P.
 
 Notation "0" := (polyn_of_list []) : polynomial_scope.
-Notation "1" := (polyn_of_list [1%Srng]) : polynomial_scope.
+Notation "1" := (polyn_of_const 1%Srng) : polynomial_scope.
 Notation "P + Q" := (polyn_add P Q) : polynomial_scope.
 Notation "P - Q" := (polyn_sub P Q) : polynomial_scope.
 Notation "P * Q" := (polyn_mul P Q) : polynomial_scope.
@@ -1921,6 +1921,7 @@ Proof.
 unfold polyn_of_list; cbn.
 intros H.
 injection H; clear H; intros.
+unfold norm_polyn_list in H; cbn in H.
 now rewrite if_1_eq_0 in H.
 Qed.
 
