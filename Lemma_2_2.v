@@ -657,7 +657,7 @@ Definition vect_mul_scal_l T {so : semiring_op T} μ (V : vector T) :=
 
 Fixpoint resolve_loop lt n (M : matrix T) (V : vector T) :=
   match n with
-  | 0 => None
+  | 0 => []
   | S n' =>
       let A := gauss_jordan lt M in
       if srng_eq_dec (determinant A) 0%Srng then
@@ -668,7 +668,31 @@ Fixpoint resolve_loop lt n (M : matrix T) (V : vector T) :=
           (vect_sub V (vect_mul_scal_l 1%Srng (vect_of_mat_col M 0)))
       else
         (* resolve for example by Cramer the system of equations Mx=V *)
-        Some (resolve_system so M V)
+        resolve_system so M V
   end.
 
-Check resolve_loop.
+Definition resolve lt (M : matrix T) V := resolve_loop lt (mat_nrows M) M V.
+
+(* here, some tests on ℚ *)
+End in_field.
+Require Import Qfield2.
+Import Q.Notations.
+Print Q.Notations.
+Open Scope Q_scope.
+Existing Instance Q_ring_op.
+Existing Instance Q_semiring_op.
+Existing Instance Q_field_op.
+Existing Instance Q_sring_dec_prop.
+
+Definition Q_ltb a b :=
+  match Q.compare a b with Lt => true | _ => false end.
+
+Definition qresolve (ll : list (list Q)) v :=
+  resolve Q_ltb (mat_of_list_list 0 ll) (vect_of_list 0 v).
+
+Compute qresolve [[4;2];[3;-1]] [-1;2].
+(*
+     = [〈3╱10〉; 〈-11╱10〉]     ok
+*)
+
+...
