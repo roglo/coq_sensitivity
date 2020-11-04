@@ -644,6 +644,13 @@ Definition resolve_system (M : matrix T) (V : vector T) :=
   map (λ i, (determinant (mat_repl_vect i M V) / determinant M)%F)
     (seq 0 (vect_nrows V)).
 
+(* here, make some tests on ℚ *)
+
+...
+
+(* closing the section and re-open it in order to generalize 'resolve_system'
+   to any field T *)
+
 End in_ring.
 
 Section in_field.
