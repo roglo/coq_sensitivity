@@ -492,7 +492,7 @@ Print resolve_loop.
 
 Definition resolve lt (M : matrix T) V := resolve_loop lt (mat_nrows M) M V.
 
-(**)
+(*
 (* here, some tests on ℚ *)
 End in_field.
 Require Import Qfield2.
@@ -709,6 +709,7 @@ Compute qtest_mul_m_v [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]] [15/4;9/2;17/4].
 Compute qresolve [[2;1;-1];[-3;-1;2];[-2;1;2]] [8;-11;-3].
 (* [2;3;-1] *)
 Compute qtest_mul_m_v [[2;1;-1];[-3;-1;2];[-2;1;2]] [2;3;-1].
+*)
 
 (* trucs à prouver:
    1/ que le résultat de gauss_jordan donne bien une matrice échelonnée
@@ -721,3 +722,37 @@ Compute qtest_mul_m_v [[2;1;-1];[-3;-1;2];[-2;1;2]] [2;3;-1].
    3/ est-il possible que la réciproque soit vraie ? que si la dernière
       ligne n'est composée que de 0, alors c'est que le déterminant de
       la matrice initiale est nul ? *)
+
+(* pivot *)
+
+Fixpoint pivot_index_loop (M : matrix T) i j it :=
+  match it with
+  | 0 => j
+  | S it' =>
+      if srng_eq_dec (mat_el M i j) 0 then pivot_index_loop M i (j + 1) it'
+      else j
+  end.
+
+Definition pivot_index (M : matrix T) i :=
+  pivot_index_loop M i 0 (mat_ncols M).
+
+(* row echelon form *)
+
+Definition in_row_echelon_form (M : matrix T) :=
+  ∀ i, i < mat_nrows M - 1 → pivot_index M i < pivot_index M (i + 1).
+
+(* reduced row echelon form *)
+
+Definition in_reduced_row_echelon_form (M : matrix T) :=
+  in_row_echelon_form M ∧
+  (∀ i, i < mat_nrows M → ∀ k, k < mat_nrows M →
+   mat_el M k (pivot_index M i) = if Nat.eq_dec k i then 1%Srng else 0%Srng).
+
+(* proof that Gauss-Jordan algorithm returns a matrix in row
+   echelon form *)
+
+Theorem gauss_jordan_in_reduced_row_echelon_form : ∀ lt (M : matrix T),
+  in_reduced_row_echelon_form (gauss_jordan lt M).
+Proof.
+intros.
+...
