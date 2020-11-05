@@ -662,10 +662,10 @@ Fixpoint resolve_loop lt n (M : matrix T) (V : vector T) :=
       let A := gauss_jordan lt M in
       if srng_eq_dec (determinant A) 0%Srng then
         (* deletion last row which contains only zeros (mat_nrows A - 1),
-           and the first variable is given the value 1 *)
+           and the last variable is given the value 1 *)
         let B := mk_mat (mat_el A) (mat_nrows A - 1) (mat_ncols A - 1) in
-        let U := vect_sub V (vect_mul_scal_l 1%Srng (vect_of_mat_col M 0)) in
-        1%Srng :: resolve_loop lt n' B U
+        let U := vect_sub V (vect_mul_scal_l 1%Srng (vect_of_mat_col M (mat_ncols A - 1))) in
+        resolve_loop lt n' B U ++ [1%Srng]
       else
         (* resolve for example by Cramer the system of equations Mx=V *)
         resolve_system so M V
@@ -699,9 +699,9 @@ Compute qresolve [[4;2];[3;-1]] [-1;2].
 Compute qresolve [[1;3;1];[1;1;-1];[3;11;5]] [9;1;35].
 (*
      = [[〈1〉; 0; 〈-2〉; 〈-3〉]; [0; 〈1〉; 〈1〉; 〈4〉]; [0; 0; 0; 0]]
-     = [〈1〉; 〈8〉; 0]
+     = [〈8〉; 2; 1]
 *)
-Compute qtest_mul_m_v [[1;3;1];[1;1;-1];[3;11;5]] [1;8;0].
+Compute qtest_mul_m_v [[1;3;1];[1;1;-1];[3;11;5]] [8;2;1].
 (* mouais, bof *)
 
 ...
