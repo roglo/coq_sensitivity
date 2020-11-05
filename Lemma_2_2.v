@@ -709,3 +709,15 @@ Compute qtest_mul_m_v [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]] [15/4;9/2;17/4].
 Compute qresolve [[2;1;-1];[-3;-1;2];[-2;1;2]] [8;-11;-3].
 (* [2;3;-1] *)
 Compute qtest_mul_m_v [[2;1;-1];[-3;-1;2];[-2;1;2]] [2;3;-1].
+
+(* trucs à prouver:
+   1/ que le résultat de gauss_jordan donne bien une matrice échelonnée
+      réduite
+   2/ que, pour un matrice carrée, si le déterminant est nul, alors la
+      dernière ligne de son gauss_jordan est nulle; si la matrice est
+      bien échelonnée réduite, la dernière ligne contient au moins n-1
+      zéros; il resterait à prouver que le dernier coefficient est bien
+      nul lui aussi
+   3/ est-il possible que la réciproque soit vraie ? que si la dernière
+      ligne n'est composée que de 0, alors c'est que le déterminant de
+      la matrice initiale est nul ? *)
