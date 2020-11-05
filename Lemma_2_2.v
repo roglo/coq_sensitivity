@@ -425,6 +425,85 @@ Definition gauss_jordan lt (A : matrix T) :=
 
 (*
 End in_ring.
+*)
+
+(* matrix whose k-th column is replaced by a vector *)
+
+Definition mat_repl_vect k (M : matrix T) V :=
+  mk_mat (λ i j, if Nat.eq_dec j k then vect_el V i else mat_el M i j)
+    (mat_nrows M) (mat_ncols M).
+
+(* resolve a system of n equations with n variables whose determinant
+   is not zero; Cramer's method *)
+
+Definition resolve_system (M : matrix T) (V : vector T) :=
+  map (λ j, (determinant (mat_repl_vect j M V) / determinant M)%F)
+    (seq 0 (mat_ncols M)).
+
+(* closing the section and re-open it in order to generalize 'resolve_system'
+   to any field T *)
+
+End in_ring.
+
+Section in_field.
+
+Context {T : Type}.
+Context {ro : ring_op T}.
+Context (so : semiring_op T).
+Context {sp : semiring_prop T}.
+Context {rp : ring_prop T}.
+Context {sdp : sring_dec_prop T}.
+Context {fo : field_op T}.
+
+Print resolve_system.
+
+Definition vect_of_mat_col (M : matrix T) j :=
+  mk_vect (λ i, mat_el M i j) (mat_nrows M).
+
+Definition vect_add (U V : vector T) :=
+  mk_vect (λ i, (vect_el U i + vect_el V i)%Srng) (vect_nrows V).
+Definition vect_opp (V : vector T) :=
+  mk_vect (λ i, (- vect_el V i)%Rng) (vect_nrows V).
+
+Definition vect_sub (U V : vector T) := vect_add U (vect_opp V).
+
+Definition vect_mul_scal_l μ (V : vector T) :=
+  mk_vect (λ i, μ * vect_el V i)%Srng (vect_nrows V).
+
+Definition mat_vect_concat (M : matrix T) V :=
+  mk_mat
+    (λ i j, if Nat.eq_dec j (mat_ncols M) then vect_el V i else mat_el M i j)
+    (mat_nrows M) (mat_ncols M + 1).
+
+(* attempt to resolve a system of n equations with n variables even
+   in the case the determinant is 0 *)
+
+Fixpoint resolve_loop lt n (M : matrix T) (V : vector T) :=
+  match n with
+  | 0 => []
+  | S n' =>
+      if srng_eq_dec (determinant M) 0%Srng then
+        let MV := mat_vect_concat M V in
+        let A := gauss_jordan lt MV in
+        (* deletion last row which contains only zeros (mat_nrows A - 1),
+           and the last variable is given the value 1 *)
+        let B := mk_mat (mat_el A) (mat_nrows A - 1) (mat_ncols A - 1) in
+        let U :=
+          vect_sub
+            (vect_of_mat_col A (mat_ncols A))
+            (vect_mul_scal_l 1%Srng (vect_of_mat_col A (mat_ncols A - 1)))
+        in
+        resolve_loop lt n' B U
+      else
+        (* resolve for example by Cramer the system of equations Mx=V *)
+        resolve_system so M V
+  end.
+
+Definition resolve lt (M : matrix T) V := resolve_loop lt (mat_nrows M) M V.
+
+(**)
+(* here, some tests on ℚ *)
+End in_field.
 Require Import Qfield2.
 Check Q_semiring_op.
 Import Q.Notations.
@@ -576,31 +655,6 @@ Compute qcp [[5;0;1];[1;1;0];[-7;1;0]].
 Compute qtest [[-3;0;-1];[-1;1;0];[7;-1;2]].
 Compute qtest [[3;0;1];[1;-1;0];[-7;1;-2]].
 (* dimension of eigenvectors is 1, even if the multiplicity of 2 is 3 *)
-*)
-
-(* matrix whose k-th column is replaced by a vector *)
-
-Definition mat_repl_vect k (M : matrix T) V :=
-  mk_mat (λ i j, if Nat.eq_dec j k then vect_el V i else mat_el M i j)
-    (mat_nrows M) (mat_ncols M).
-
-(* resolve a system of n equations with n variables whose determinant
-   is not zero; Cramer's method *)
-
-Definition resolve_system (M : matrix T) (V : vector T) :=
-  map (λ j, (determinant (mat_repl_vect j M V) / determinant M)%F)
-    (seq 0 (mat_ncols M)).
-
-(*
-(* here, some tests on ℚ *)
-End in_ring.
-Require Import Qfield2.
-Import Q.Notations.
-Print Q.Notations.
-Open Scope Q_scope.
-Existing Instance Q_ring_op.
-Existing Instance Q_semiring_op.
-Existing Instance Q_field_op.
 
 (* pourquoi il me demande Q_semiring_op comme paramètre, ce con ?
    pourquoi pas aussi Q_field_op et Q_ring_op, dans ce cas ? *)
@@ -619,65 +673,7 @@ Compute qtest_rs [[3;2;-1];[2;-2;4];[-1;1/2;-1]] [1;-2;0].
 (*
      = [〈1〉; 〈-2〉; 〈-2〉]      ok
 *)
-*)
-
-(* closing the section and re-open it in order to generalize 'resolve_system'
-   to any field T *)
-
-End in_ring.
-
-Section in_field.
-
-Context {T : Type}.
-Context {ro : ring_op T}.
-Context (so : semiring_op T).
-Context {sp : semiring_prop T}.
-Context {rp : ring_prop T}.
-Context {sdp : sring_dec_prop T}.
-Context {fo : field_op T}.
-
-Print resolve_system.
-
-Definition vect_of_mat_col T (M : matrix T) j :=
-  mk_vect (λ i, mat_el M i j) (mat_nrows M).
-
-Definition vect_add T {so : semiring_op T} (U V : vector T) :=
-  mk_vect (λ i, (vect_el U i + vect_el V i)%Srng) (vect_nrows V).
-Definition vect_opp T {ro : ring_op T} (V : vector T) :=
-  mk_vect (λ i, (- vect_el V i)%Rng) (vect_nrows V).
-
-Definition vect_sub T {so : semiring_op T} {ro : ring_op T} (U V : vector T)
-  := vect_add U (vect_opp V).
-
-Definition vect_mul_scal_l T {so : semiring_op T} μ (V : vector T) :=
-  mk_vect (λ i, μ * vect_el V i)%Srng (vect_nrows V).
-
-(* attempt to resolve a system of n equations with n variables even
-   in the case the determinant is 0 *)
-
-Fixpoint resolve_loop lt n (M : matrix T) (V : vector T) :=
-  match n with
-  | 0 => []
-  | S n' =>
-      let A := gauss_jordan lt M in
-      if srng_eq_dec (determinant A) 0%Srng then
-        (* deletion last row which contains only zeros (mat_nrows A - 1),
-           and the last variable is given the value 1 *)
-        let B := mk_mat (mat_el A) (mat_nrows A - 1) (mat_ncols A - 1) in
-        let U :=
-          vect_sub V
-            (vect_mul_scal_l 1%Srng (vect_of_mat_col A (mat_ncols A - 1)))
-        in
-        resolve_loop lt n' B U ++ [1%Srng]
-      else
-        (* resolve for example by Cramer the system of equations Mx=V *)
-        resolve_system so M V
-  end.
-
-Definition resolve lt (M : matrix T) V := resolve_loop lt (mat_nrows M) M V.
-
-(* here, some tests on ℚ *)
-End in_field.
+(*
 Require Import Qfield2.
 Import Q.Notations.
 Print Q.Notations.
@@ -686,25 +682,44 @@ Existing Instance Q_ring_op.
 Existing Instance Q_semiring_op.
 Existing Instance Q_field_op.
 Existing Instance Q_sring_dec_prop.
-
-Definition Q_ltb a b :=
-  match Q.compare a b with Lt => true | _ => false end.
+*)
 
 Definition qresolve (ll : list (list Q)) v :=
   resolve Q_ltb (mat_of_list_list 0 ll) (vect_of_list 0 v).
-Definition qtest_mul_m_v m v :=
-  list_of_vect (mat_mul_vect_r (mat_of_list_list 0 m) (vect_of_list 0 v)).
 
 Compute qresolve [[4;2];[3;-1]] [-1;2].
 (*
      = [〈3╱10〉; 〈-11╱10〉]     ok
 *)
-Compute qresolve [[1;3;1];[1;1;-1];[3;11;5]] [9;1;35].
+Compute qtest [[1;3;1];[1;1;-1];[3;11;5]].
+(*
+     = [[〈1〉; 0; 〈-2〉]; [0; 〈1〉; 〈1〉]; [0; 0; 0]]
+*)
+Compute qtest [[1;3;1;9];[1;1;-1;1];[3;11;5;35]].
 (*
      = [[〈1〉; 0; 〈-2〉; 〈-3〉]; [0; 〈1〉; 〈1〉; 〈4〉]; [0; 0; 0; 0]]
-     = [〈11〉; 0; 〈1〉]
 *)
-Compute qtest_mul_m_v [[1;3;1];[1;1;-1];[3;11;5]] [11;0;1].
-(* mouais, bof *)
-
+Compute qtest_mul_m_v [[1;3;1];[1;1;-1];[3;11;5]] [3;1;3].
+(*
+     = [〈9〉; 〈1〉; 〈35〉]
+  ça, [3;1;3], c'est un bon résultat, que j'avais calculé à la
+  main; et ça donne bien ce qu'il faut
+*)
+Compute qtest_mul_m_v [[1;3;1];[1;1;-1];[3;11;5]] [1;2;2].
+(*
+     = [〈9〉; 〈1〉; 〈35〉]
+  ça, [1;2;2], c'est un autre bon résultat, que j'avais calculé à la
+  main; et ça donne bien ce qu'il faut
+*)
+(* ouais, bon, c'est la m *)
+...
+Compute qresolve [[1;3;1];[1;1;-1];[3;11;5]] [9;1;35].
+(*
+     = [〈3〉; 〈-4〉; 〈1〉]
+*)
+Compute qtest_mul_m_v [[1;3;1];[1;1;-1];[3;11;5]] [3;-4;1].
+(*
+     = [〈-8〉; 〈-2〉; 〈-30〉]
+ah bin non.
+*)
 ...
