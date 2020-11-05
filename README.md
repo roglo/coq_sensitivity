@@ -8,5 +8,5 @@ Work in progress...
 Daniel de Rauglaudre
 
 # COQ VERSION
-  The Coq Proof Assistant, version 8.11.0 (February 2020)
-  compiled on Feb 11 2020 7:06:27 with OCaml 4.08.2+dev0
+  The Coq Proof Assistant, version 8.12.0 (November 2020)
+  compiled on Nov 5 2020 7:19:33 with OCaml 4.11.0+dev4-2020-05-05
