@@ -476,16 +476,7 @@ Definition mat_vect_concat (M : matrix T) V :=
     (mat_nrows M) (mat_ncols M + 1).
 
 (* attempt to resolve a system of n equations with n variables even
-   in the case the determinant is 0 *)
-
-(* not sure it is ok
-   the example [[1;3;1];[1;1;-1];[3;11;5]] [9;1;35]
-   does not work;
-   something weird happens, due to the fact that I am not sure I
-   understand the situation
- *)
-
-...
+   in the case the determinant is 0; returns 1 only solution *)
 
 Fixpoint resolve_loop lt n (M : matrix T) (V : vector T) :=
   match n with
@@ -494,15 +485,21 @@ Fixpoint resolve_loop lt n (M : matrix T) (V : vector T) :=
       if srng_eq_dec (determinant M) 0%Srng then
         let MV := mat_vect_concat M V in
         let A := gauss_jordan lt MV in
-        (* deletion last row which contains only zeros (mat_nrows A - 1),
+        (* deletion last row which contains only zeros (mat_nrows M - 1),
            and the last variable is given the value 1 *)
-        let B := mk_mat (mat_el A) (mat_nrows A - 1) (mat_ncols A - 1) in
+        let B := mk_mat (mat_el A) (mat_nrows M - 1) (mat_ncols M - 1) in
         let U :=
-          vect_sub
-            (vect_of_mat_col A (mat_ncols A))
-            (vect_mul_scal_l 1%Srng (vect_of_mat_col A (mat_ncols A - 1)))
+          let rhs :=
+            mk_vect (vect_el (vect_of_mat_col A (mat_ncols M)))
+              (mat_nrows M - 1)
+          in
+          let last_col :=
+            mk_vect (vect_el (vect_of_mat_col A (mat_ncols M - 1)))
+              (mat_nrows M - 1)
+          in
+          vect_sub rhs last_col
         in
-        resolve_loop lt n' B U
+        resolve_loop lt n' B U ++ [1%Srng]
       else
         (* resolve for example by Cramer the system of equations Mx=V *)
         resolve_system so M V
@@ -700,6 +697,8 @@ Compute qresolve [[4;2];[3;-1]] [-1;2].
 (*
      = [〈3╱10〉; 〈-11╱10〉]     ok
 *)
+
+(* *)
 Compute qtest [[1;3;1];[1;1;-1];[3;11;5]].
 (*
      = [[〈1〉; 0; 〈-2〉]; [0; 〈1〉; 〈1〉]; [0; 0; 0]]
@@ -708,27 +707,12 @@ Compute qtest [[1;3;1;9];[1;1;-1;1];[3;11;5;35]].
 (*
      = [[〈1〉; 0; 〈-2〉; 〈-3〉]; [0; 〈1〉; 〈1〉; 〈4〉]; [0; 0; 0; 0]]
 *)
-Compute qtest_mul_m_v [[1;3;1];[1;1;-1];[3;11;5]] [3;1;3].
-(*
-     = [〈9〉; 〈1〉; 〈35〉]
-  ça, [3;1;3], c'est un bon résultat, que j'avais calculé à la
-  main; et ça donne bien ce qu'il faut
-*)
-Compute qtest_mul_m_v [[1;3;1];[1;1;-1];[3;11;5]] [1;2;2].
-(*
-     = [〈9〉; 〈1〉; 〈35〉]
-  ça, [1;2;2], c'est un autre bon résultat, que j'avais calculé à la
-  main; et ça donne bien ce qu'il faut
-*)
-(* ouais, bon, c'est la m *)
-...
 Compute qresolve [[1;3;1];[1;1;-1];[3;11;5]] [9;1;35].
 (*
-     = [〈3〉; 〈-4〉; 〈1〉]
+     = [〈-1〉; 〈3〉; 〈1〉]
 *)
-Compute qtest_mul_m_v [[1;3;1];[1;1;-1];[3;11;5]] [3;-4;1].
+Compute qtest_mul_m_v [[1;3;1];[1;1;-1];[3;11;5]] [-1;3;1].
 (*
-     = [〈-8〉; 〈-2〉; 〈-30〉]
-ah bin non.
+     = [〈9〉; 〈1〉; 〈35〉]    ok
 *)
 ...
