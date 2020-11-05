@@ -755,4 +755,8 @@ Theorem gauss_jordan_in_reduced_row_echelon_form : ∀ lt (M : matrix T),
   in_reduced_row_echelon_form (gauss_jordan lt M).
 Proof.
 intros.
+split. {
+  intros i Hi.
+  unfold gauss_jordan.
+  unfold pivot_index.
 ...
