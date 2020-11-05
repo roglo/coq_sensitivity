@@ -476,7 +476,10 @@ Definition mat_vect_concat (M : matrix T) V :=
     (mat_nrows M) (mat_ncols M + 1).
 
 (* attempt to resolve a system of n equations with n variables even
-   in the case the determinant is 0; returns 1 only solution *)
+   in the case the determinant is 0 *)
+(* returns one only solution; to return the set of solutions, we must
+   build a field holding constants a, b, c, etc.; polynomials could
+   help but we need polynomials with several variables *)
 
 Fixpoint resolve_loop lt n (M : matrix T) (V : vector T) :=
   match n with
