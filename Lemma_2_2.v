@@ -475,11 +475,11 @@ Definition mat_vect_concat (M : matrix T) V :=
     (λ i j, if Nat.eq_dec j (mat_ncols M) then vect_el V i else mat_el M i j)
     (mat_nrows M) (mat_ncols M + 1).
 
-(* attempt to resolve a system of n equations with n variables even
-   in the case the determinant is 0 *)
-(* returns one only solution; to return the set of solutions, we must
-   build a field holding constants a, b, c, etc.; polynomials could
-   help but we need polynomials with several variables *)
+(* resolving a system of n equations with n variables even
+   in the case when the determinant is 0 *)
+(* returns one only solution (if any); to return the set of solutions,
+   we must build a field holding constants a, b, c, etc.; polynomials
+   could help but we need polynomials with several variables *)
 
 Fixpoint resolve_loop lt n (M : matrix T) (V : vector T) :=
   match n with
@@ -488,7 +488,7 @@ Fixpoint resolve_loop lt n (M : matrix T) (V : vector T) :=
       if srng_eq_dec (determinant M) 0%Srng then
         let MV := mat_vect_concat M V in
         let A := gauss_jordan lt MV in
-        (* deletion last row which contains only zeros (mat_nrows M - 1),
+        (* deletion last row which, normally, contains only zeros
            and the last variable is given the value 1 *)
         let B := mk_mat (mat_el A) (mat_nrows M - 1) (mat_ncols M - 1) in
         let U :=
