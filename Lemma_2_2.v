@@ -478,6 +478,15 @@ Definition mat_vect_concat (M : matrix T) V :=
 (* attempt to resolve a system of n equations with n variables even
    in the case the determinant is 0 *)
 
+(* not sure it is ok
+   the example [[1;3;1];[1;1;-1];[3;11;5]] [9;1;35]
+   does not work;
+   something weird happens, due to the fact that I am not sure I
+   understand the situation
+ *)
+
+...
+
 Fixpoint resolve_loop lt n (M : matrix T) (V : vector T) :=
   match n with
   | 0 => []
