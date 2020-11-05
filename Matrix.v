@@ -127,6 +127,27 @@ Definition vect_of_list {T} d (l : list T) :=
 Definition list_of_vect {T} (v : vector T) :=
   map (vect_el v) (seq 0 (vect_nrows v)).
 
+(* addition, subtraction of vector *)
+
+Definition vect_add (U V : vector T) :=
+  mk_vect (λ i, (vect_el U i + vect_el V i)%Srng) (vect_nrows V).
+Definition vect_opp (V : vector T) :=
+  mk_vect (λ i, (- vect_el V i)%Rng) (vect_nrows V).
+
+Definition vect_sub (U V : vector T) := vect_add U (vect_opp V).
+
+(* vector from a matrix column *)
+
+Definition vect_of_mat_col (M : matrix T) j :=
+  mk_vect (λ i, mat_el M i j) (mat_nrows M).
+
+(* concatenation of a matrix and a vector *)
+
+Definition mat_vect_concat (M : matrix T) V :=
+  mk_mat
+    (λ i j, if Nat.eq_dec j (mat_ncols M) then vect_el V i else mat_el M i j)
+    (mat_nrows M) (mat_ncols M + 1).
+
 (* multiplication of a matrix by a vector *)
 
 Definition mat_mul_vect_r M V :=
@@ -449,10 +470,13 @@ End in_ring.
 Module matrix_Notations.
 
 Declare Scope M_scope.
+Declare Scope V_scope.
 Delimit Scope M_scope with M.
+Delimit Scope V_scope with V.
 
 Arguments det_loop {T ro so} M%M n%nat.
 Arguments mat_mul_scal_l {T so} _ M%M.
+Arguments mat_mul_vect_r {T so}.
 Arguments mat_nrows {T} m%M.
 Arguments mat_ncols {T} m%M.
 Arguments mat_sub {T ro so} MA%M MB%M.
@@ -460,6 +484,7 @@ Arguments mI {T so} n%nat.
 Arguments minus_one_pow {T ro so}.
 Arguments determinant {T ro so} M%M.
 Arguments subm {T} M%M i%nat j%nat.
+Arguments vect_sub {T ro so}.
 
 Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.
@@ -467,6 +492,8 @@ Notation "A * B" := (mat_mul A B) : M_scope.
 Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
 Notation "- A" := (mat_opp A) : M_scope.
 
+Notation "U + V" := (vect_add U V) : V_scope.
+Notation "U - V" := (vect_sub U V) : V_scope.
+
 End matrix_Notations.
 
-Arguments mat_mul_vect_r {T so}.

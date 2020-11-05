@@ -455,26 +455,6 @@ Context {rp : ring_prop T}.
 Context {sdp : sring_dec_prop T}.
 Context {fo : field_op T}.
 
-Print resolve_system.
-
-Definition vect_of_mat_col (M : matrix T) j :=
-  mk_vect (λ i, mat_el M i j) (mat_nrows M).
-
-Definition vect_add (U V : vector T) :=
-  mk_vect (λ i, (vect_el U i + vect_el V i)%Srng) (vect_nrows V).
-Definition vect_opp (V : vector T) :=
-  mk_vect (λ i, (- vect_el V i)%Rng) (vect_nrows V).
-
-Definition vect_sub (U V : vector T) := vect_add U (vect_opp V).
-
-Definition vect_mul_scal_l μ (V : vector T) :=
-  mk_vect (λ i, μ * vect_el V i)%Srng (vect_nrows V).
-
-Definition mat_vect_concat (M : matrix T) V :=
-  mk_mat
-    (λ i j, if Nat.eq_dec j (mat_ncols M) then vect_el V i else mat_el M i j)
-    (mat_nrows M) (mat_ncols M + 1).
-
 (* resolving a system of n equations with n variables even
    in the case when the determinant is 0 *)
 (* returns one only solution (if any); to return the set of solutions,
@@ -507,6 +487,8 @@ Fixpoint resolve_loop lt n (M : matrix T) (V : vector T) :=
         (* resolve for example by Cramer the system of equations Mx=V *)
         resolve_system so M V
   end.
+
+Print resolve_loop.
 
 Definition resolve lt (M : matrix T) V := resolve_loop lt (mat_nrows M) M V.
 
