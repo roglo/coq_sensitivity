@@ -643,6 +643,7 @@ destruct (srng_eq_dec (mat_el M i j) 0) as [Hm| Hm]. {
 ...
 *)
 
+(*
 Theorem pivot_index_lt : ∀ lt M i j k it,
   i ≤ j
   → i < mat_nrows M
@@ -658,12 +659,12 @@ induction it; intros. {
   cbn in Hp |-*.
   unfold pivot_index.
 Print pivot_index_loop.
-Abort. (*
 ...
 apply glop.
 ...
 *)
 
+(*
 Theorem glop : ∀ lt M i j it,
   j ≤ i
   → pivot_index_loop (gauss_jordan lt M) i j it ≤
@@ -682,6 +683,7 @@ destruct (srng_eq_dec (mat_el A i j) 0) as [Ha| Ha]. {
     apply IHit; flia Hji Hjei.
   }
 ...
+*)
 
 Theorem gauss_jordan_in_reduced_row_echelon_form : ∀ lt (M : matrix T),
   in_reduced_row_echelon_form (gauss_jordan lt M).
@@ -689,16 +691,4 @@ Proof.
 intros.
 split. {
   intros i Hi.
-(**)
-  unfold pivot_index.
-...
-  unfold gauss_jordan.
-...
-  apply pivot_index_lt.
-...
-  remember (mat_ncols M) as oj eqn:Hoj.
-  rewrite Nat.add_1_r.
-  remember 0 as r in |-*; clear Heqr.
-  revert r.
-  induction oj; intros. cbn. {
 ...
