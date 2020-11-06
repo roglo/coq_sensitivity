@@ -754,7 +754,7 @@ intros.
 split. {
   intros i Hi.
   unfold gauss_jordan.
-  remember (mat_ncols M) as oj; clear Heqoj.
+  remember (mat_ncols M) as oj eqn:Hoj.
   rewrite Nat.add_1_r.
   remember 0 as r in |-*; clear Heqr.
   revert r.
