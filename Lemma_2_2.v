@@ -665,16 +665,21 @@ apply glop.
 *)
 
 Theorem glop : ∀ lt M i j it,
-  pivot_index_loop (gauss_jordan lt M) i j it ≤
-  pivot_index_loop (gauss_jordan lt M) (i + 1) j it.
+  j ≤ i
+  → pivot_index_loop (gauss_jordan lt M) i j it ≤
+    pivot_index_loop (gauss_jordan lt M) (i + 1) j it.
 Proof.
-intros.
-revert M i j.
+intros * Hji.
+revert M i j Hji.
 induction it; intros; [ easy | cbn ].
 set (A := gauss_jordan lt M).
 destruct (srng_eq_dec (mat_el A i j) 0) as [Ha| Ha]. {
   destruct (srng_eq_dec (mat_el A (i + 1) j) 0) as [Ha1| Ha1]. {
-    apply IHit.
+    destruct (Nat.eq_dec j i) as [Hjei| Hjei]. {
+      subst j.
+...
+    }
+    apply IHit; flia Hji Hjei.
   }
 ...
 
