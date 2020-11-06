@@ -307,11 +307,11 @@ Definition gauss_jordan_step A i j k :=
   let A' := swap_rows A i k in
   let A'' := multiply_row_by_scalar A' i (/ mat_el A' i j)%F in
   fold_left
-    (λ B i'',
-       if Nat.eq_dec i'' i then B
+    (λ B i',
+       if Nat.eq_dec i' i then B
        else
-         let v := mat_el B i'' j in
-         add_one_row_scalar_multiple_another B i'' (- v)%Rng i)
+         let v := mat_el B i' j in
+         add_one_row_scalar_multiple_another B i' (- v)%Rng i)
     (seq 0 (mat_nrows A'')) A''.
 
 Fixpoint gauss_jordan_loop lt (A : matrix T) i j it :=
