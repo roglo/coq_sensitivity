@@ -303,36 +303,31 @@ Definition add_one_row_scalar_multiple_another A i' s i'' :=
     else mat_el A i j)
     (mat_nrows A) (mat_ncols A).
 
-Definition gauss_jordan_step A r i j :=
-  let A' := multiply_row_by_scalar A i (/ mat_el A i j)%F in
-  let A'' := swap_rows A' r i in
+Definition gauss_jordan_step A i j k :=
+  let A' := swap_rows A i k in
+  let A'' := multiply_row_by_scalar A' i (/ mat_el A' i j)%F in
   fold_left
     (λ B i'',
-       if Nat.eq_dec i'' r then B
+       if Nat.eq_dec i'' i then B
        else
          let v := mat_el B i'' j in
-         add_one_row_scalar_multiple_another B i'' (- v)%Rng r)
+         add_one_row_scalar_multiple_another B i'' (- v)%Rng i)
     (seq 0 (mat_nrows A'')) A''.
 
-Fixpoint gauss_jordan_loop lt (A : matrix T) r oj :=
-  match oj with
+Fixpoint gauss_jordan_loop lt (A : matrix T) i j it :=
+  match it with
   | 0 => A
-  | S oj' =>
-      let j := mat_ncols A - oj in
-      let i := abs_max_in_col lt A (mat_nrows A - 1 - r) r j in
-      if srng_eq_dec (mat_el A i j) 0 then
-        gauss_jordan_loop lt A r oj'
+  | S it' =>
+      let k := abs_max_in_col lt A (mat_nrows A - 1 - i) i j in
+      if srng_eq_dec (mat_el A k j) 0 then
+        gauss_jordan_loop lt A i (j + 1) it'
       else
-        let A' := gauss_jordan_step A r i j in
-        gauss_jordan_loop lt A' (r + 1) oj'
+        let A' := gauss_jordan_step A i j k in
+        gauss_jordan_loop lt A' (i + 1) (j + 1) it'
   end.
 
 Definition gauss_jordan lt (A : matrix T) :=
-  gauss_jordan_loop lt (A : matrix T) 0 (mat_ncols A).
-
-(*
-End in_ring.
-*)
+  gauss_jordan_loop lt (A : matrix T) 0 0 (mat_ncols A).
 
 (* matrix whose k-th column is replaced by a vector *)
 
@@ -395,15 +390,14 @@ Fixpoint resolve_loop lt n (M : matrix T) (V : vector T) :=
         resolve_system so M V
   end.
 
-Print resolve_loop.
-
 Definition resolve lt (M : matrix T) V := resolve_loop lt (mat_nrows M) M V.
 
 (*
 (* here, some tests on ℚ *)
 End in_field.
 Require Import Qfield2.
-Check Q_semiring_op.
+Require Import CharacPolyn.
+Require Import SRpolynomial.
 Import Q.Notations.
 Open Scope Q_scope.
 Existing Instance Q_semiring_op.
@@ -422,6 +416,11 @@ Definition qtest_gj ll :=
 Definition qtest_gjs (ll : list (list Q)) r i j :=
   list_list_of_mat (gauss_jordan_step Q_semiring_op
     (mat_of_list_list 0 ll) r i j).
+Definition qresolve (ll : list (list Q)) v :=
+  resolve Q_ltb (mat_of_list_list 0 ll) (vect_of_list 0 v).
+Definition qcp ll := polyn_list (charac_polyn (mat_of_list_list 0 ll)).
+Definition qtest_mul_m_v m v :=
+  list_of_vect (mat_mul_vect_r (mat_of_list_list 0 m) (vect_of_list 0 v)).
 
 Compute qtest_gj [[1]].
 Compute qtest_gj [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]].
@@ -456,13 +455,8 @@ Compute qtest_gj [[1;2;2;-3;2;3];[2;4;1;0;-5;-6];[4;8;5;-6;-1;0];[-1;-2;-1;1;1;1
      = ([[-24; -48; 0; -24; 96; 120]; [0; 0; -24; 48; -72; -96];
         [0; 0; 0; 0; 0; 0]; [0; 0; 0; 0; 0; 0]], -24)
 *)
-Check (355//113)%Q.
-Compute (355//113)%Q.
-Require Import CharacPolyn.
-Require Import SRpolynomial.
 
 (* trying to find eigenvalues and eigenvector on an example *)
-Definition qcp ll := polyn_list (charac_polyn (mat_of_list_list 0 ll)).
 Compute qcp [[4;3];[-2;-3]].
 (*
 P=x²-x-6
@@ -477,13 +471,9 @@ Compute qtest_gj [[-1;-3];[2;6]].
 (*
      = [[〈1〉; 〈3〉]; [0; 0]]
 x₁+3x₂=0
-I must resolve this system "by hand". Is there a general algorithm to
-resolve it?
-x₁=-3x₂
-vector (-3, 1)
 *)
-Definition qtest_mul_m_v m v :=
-  list_of_vect (mat_mul_vect_r (mat_of_list_list 0 m) (vect_of_list 0 v)).
+Compute qresolve [[-1;-3];[2;6]] [0;0].
+(* = [〈-3〉; 〈1〉] *)
 Compute qtest_mul_m_v [[4;3];[-2;-3]] [-3;1].
 (*
      = [〈-9〉; 〈3〉]
@@ -497,15 +487,13 @@ Compute qtest_gj [[-6;-3];[2;1]].
 (*
      = [[〈1〉; 〈1╱2〉]; [0; 0]]
 x₁+1/2x₂=0
-I must resolve this system "by hand". Is there a general algorithm to
-resolve it?
-x₂=-2x₁
-vector (1,-2)
 *)
-Compute qtest_mul_m_v [[4;3];[-2;-3]] [1;-2].
+Compute qresolve [[-6;-3];[2;1]] [0;0].
+(* = [〈-1╱2〉; 〈1〉] *)
+Compute qtest_mul_m_v [[4;3];[-2;-3]] [-1/2;1].
 (*
-     = [〈-2〉; 〈4〉]
-    Indeed, [1;-2] is an eigenvector
+     = [〈1〉; 〈-2〉]
+    Indeed, [-1/2;1] is an eigenvector
 *)
 
 (* https://en.wikipedia.org/wiki/Kernel_(linear_algebra)#Illustration *)
@@ -551,19 +539,6 @@ Compute qtest_rs [[3;2;-1];[2;-2;4];[-1;1/2;-1]] [1;-2;0].
 (*
      = [〈1〉; 〈-2〉; 〈-2〉]      ok
 *)
-(*
-Require Import Qfield2.
-Import Q.Notations.
-Print Q.Notations.
-Open Scope Q_scope.
-Existing Instance Q_ring_op.
-Existing Instance Q_semiring_op.
-Existing Instance Q_field_op.
-Existing Instance Q_sring_dec_prop.
-*)
-
-Definition qresolve (ll : list (list Q)) v :=
-  resolve Q_ltb (mat_of_list_list 0 ll) (vect_of_list 0 v).
 
 Compute qresolve [[4;2];[3;-1]] [-1;2].
 (*
