@@ -754,6 +754,9 @@ intros.
 split. {
   intros i Hi.
   unfold gauss_jordan.
-Print gauss_jordan_loop.
-Print gauss_jordan_step.
+  remember (mat_ncols M) as oj; clear Heqoj.
+  rewrite Nat.add_1_r.
+  remember 0 as r in |-*; clear Heqr.
+  revert r.
+  induction oj; intros. cbn. {
 ...
