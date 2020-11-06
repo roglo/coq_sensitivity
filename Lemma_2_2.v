@@ -26,6 +26,7 @@ Context {ro : ring_op T}.
 Context {sp : semiring_prop T}.
 Context {rp : ring_prop T}.
 Context {sdp : sring_dec_prop T}.
+Context {fo : field_op T}.
 (*
 Context {acp : @algeb_closed_prop T so sdp}.
 Existing Instance polyn_semiring_op.
@@ -301,100 +302,6 @@ Definition add_one_row_scalar_multiple_another A i' s i'' :=
     if Nat.eq_dec i i' then (mat_el A i j + s * mat_el A i'' j)%Rng
     else mat_el A i j)
     (mat_nrows A) (mat_ncols A).
-
-(* return by Gauss-Jordan elimination the row echelon form of the
-   matrix; actually, since there is no division in the present
-   version of my code, it returns the pair of the echelon form
-   multiplied by some constant d, and the constant d itself *)
-
-Fixpoint rng_gauss_jordan_loop lt (A : matrix T) d r oj :=
-  match oj with
-  | 0 => (A, d)
-  | S oj' =>
-      let j := mat_ncols A - oj in
-      let k := abs_max_in_col lt A (mat_nrows A - 1 - r) r j in
-      if srng_eq_dec (mat_el A k j) 0 then
-        rng_gauss_jordan_loop lt A d r oj'
-      else
-        let r := r + 1 in
-        let dd := mat_el A k j in
-        let A := swap_rows A (r - 1) k in
-        let A :=
-          fold_left
-            (λ A i'',
-               if Nat.eq_dec i'' (r - 1) then A
-               else
-                 let v := mat_el A i'' j in
-                 let A := multiply_row_by_scalar A i'' dd in
-                 add_one_row_scalar_multiple_another A i'' (- v)%Rng (r - 1))
-            (seq 0 (mat_nrows A)) A
-        in
-        let A := multiply_row_by_scalar A (r - 1) d in
-        rng_gauss_jordan_loop lt A (d * dd)%Srng r oj'
-  end.
-
-Definition rng_gauss_jordan lt (A : matrix T) :=
-  rng_gauss_jordan_loop lt (A : matrix T) 1%Srng 0 (mat_ncols A).
-
-(*
-End in_ring.
-Require Import ZArith Zring.
-Open Scope Z_scope.
-Existing Instance Z_ring_op.
-Existing Instance Z_semiring_op.
-Existing Instance Z_sring_dec_prop.
-Definition Z_gauss_jordan := rng_gauss_jordan Z.ltb.
-Definition test ll :=
-  let r := Z_gauss_jordan (mat_of_list_list 0 ll) in
-  (list_list_of_mat (fst r), snd r).
-Compute test [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]].
-(*
-     = ([[48; 0; 0]; [0; 48; 0]; [0; 0; 48]], 48)
-*)
-Compute test [[1;3;1;9];[1;1;-1;1];[3;11;5;35]].
-(*
-     = ([[-24; 0; 48; 72]; [0; -24; -24; -96]; [0; 0; 0; 0]], -24)
-*)
-Compute test [[2;1;-1;8];[-3;-1;2;-11];[-2;1;2;-3]].
-(*
-     = ([[45; 0; 0; 90]; [0; 45; 0; 135]; [0; 0; 45; -45]], 45)
-*)
-Compute test [[2;-1;0;1;0;0];[-1;2;-1;0;1;0];[0;-1;2;0;0;1]].
-(*
-     = ([[48; 0; 0; 36; 24; 12];
-         [0; 48; 0; 24; 48; 24];
-         [0; 0; 48; 12; 24; 36]], 48)
-*)
-Compute test [[5;2;1;0];[-7;-3;0;1]].
-(*
-     = ([[-7; 0; -21; -14]; [0; -7; 49; 35]], -7)
-     = ([[1; 0; 3; 2]; [0; 1; -7; -5]], -7)
-*)
-Compute test [[-3;-3;3;0];[3;-9;3;0];[6;-6;0;0]].
-(*
-     = ([[-216; 0; 108; 0]; [0; -216; 108; 0]; [0; 0; 0; 0]], -216)
-     = ([[1; 0; -1/2; 0]; [0; 1; -1/2; 0]; [0; 0; 0; 0]], 1)
-   1 0 -1/2
-   0 1 -1/2
-   0 0  0
-*)
-Compute test [[3;-3;3;0];[3;-3;3;0];[6;-6;6;0]].
-(*
-     = ([[6; -6; 6; 0]; [0; 0; 0; 0]; [0; 0; 0; 0]], 6)
-*)
-Compute test [[1;-1;2;5];[3;2;1;10];[2;-3;-2;-10]].
-(*
-     = ([[4095; 0; 0; 4095]; [0; 4095; 0; 8190]; [0; 0; 4095; 12285]], 4095)
-     = ([[1; 0; 0; 1]; [0; 1; 0; 2]; [0; 0; 1; 3]], 1)
-*)
-Compute test [[1;2;2;-3;2;3];[2;4;1;0;-5;-6];[4;8;5;-6;-1;0];[-1;-2;-1;1;1;1]].
-(*
-     = ([[-24; -48; 0; -24; 96; 120]; [0; 0; -24; 48; -72; -96];
-        [0; 0; 0; 0; 0; 0]; [0; 0; 0; 0; 0; 0]], -24)
-*)
-*)
-
-Context {fo : field_op T}.
 
 Definition gauss_jordan_step A r i j :=
   let A' := multiply_row_by_scalar A i (/ mat_el A i j)%F in
