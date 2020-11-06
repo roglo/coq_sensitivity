@@ -269,14 +269,17 @@ rewrite <- Hm in Hcp.
 *)
 
 (* https://fr.wikipedia.org/wiki/%C3%89limination_de_Gauss-Jordan#Algorithme *)
+(* but taking any non zero value in the column instead of the maximum one
+   in absolute value, because taking the maximum is just for computation,
+   not for mathematics *)
 
 Fixpoint first_non_zero_in_col (M : matrix T) it i j :=
   match it with
-  | 0 => i
+  | 0 => None
   | S it' =>
       if srng_eq_dec (mat_el M i j) 0 then
         first_non_zero_in_col M it' (i + 1) j
-      else i
+      else Some i
   end.
 
 (* Swap the positions of two rows *)
@@ -315,12 +318,13 @@ Fixpoint gauss_jordan_loop (A : matrix T) i j it :=
   match it with
   | 0 => A
   | S it' =>
-      let k := first_non_zero_in_col A (mat_nrows A - 1 - i) i j in
-      if srng_eq_dec (mat_el A k j) 0 then
-        gauss_jordan_loop A i (j + 1) it'
-      else
-        let A' := gauss_jordan_step A i j k in
-        gauss_jordan_loop A' (i + 1) (j + 1) it'
+      match first_non_zero_in_col A (mat_nrows A - i) i j with
+      | Some k =>
+          let A' := gauss_jordan_step A i j k in
+          gauss_jordan_loop A' (i + 1) (j + 1) it'
+      | None =>
+          gauss_jordan_loop A i (j + 1) it'
+      end
   end.
 
 Definition gauss_jordan (A : matrix T) :=
@@ -426,7 +430,6 @@ Compute qtest_gj [[2;1;-1;8];[-3;-1;2;-11];[-2;1;2;-3]].
 Compute qtest_gj [[2;-1;0;1;0;0];[-1;2;-1;0;1;0];[0;-1;2;0;0;1]].
 (* = [[〈1〉; 0; 0; 〈3╱4〉; 〈1╱2〉; 〈1╱4〉]; [0; 〈1〉; 0; 〈1╱2〉; 〈1〉; 〈1╱2〉];
       [0; 0; 〈1〉; 〈1╱4〉; 〈1╱2〉; 〈3╱4〉]] *)
-(**)
 Compute qtest_gj [[0;2;1;0];[-7;-3;0;1];[3;8;18;5]].
 (* = [[〈1〉; 0; 0; 〈-13╱205〉]; [0; 〈1〉; 0; 〈-38╱205〉]; [0; 0; 〈1〉; 〈76╱205〉]] *)
 Compute qtest_gj [[-7;-3;0;1];[3;8;18;5];[0;2;1;0]].
