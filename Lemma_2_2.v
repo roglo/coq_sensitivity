@@ -396,28 +396,28 @@ Compute test [[1;2;2;-3;2;3];[2;4;1;0;-5;-6];[4;8;5;-6;-1;0];[-1;-2;-1;1;1;1]].
 
 Context {fo : field_op T}.
 
+Definition gauss_jordan_action A r i j :=
+  let A' := multiply_row_by_scalar A i (/ mat_el A i j)%F in
+  let A'' := swap_rows A' (r - 1) i in
+  fold_left
+    (λ B i'',
+       if Nat.eq_dec i'' (r - 1) then B
+       else
+         let v := mat_el B i'' j in
+         add_one_row_scalar_multiple_another B i'' (- v)%Rng (r - 1))
+    (seq 0 (mat_nrows A'')) A''.
+
 Fixpoint gauss_jordan_loop lt (A : matrix T) r oj :=
   match oj with
   | 0 => A
   | S oj' =>
       let j := mat_ncols A - oj in
-      let k := abs_max_in_col lt A (mat_nrows A - 1 - r) r j in
-      if srng_eq_dec (mat_el A k j) 0 then
+      let i := abs_max_in_col lt A (mat_nrows A - 1 - r) r j in
+      if srng_eq_dec (mat_el A i j) 0 then
         gauss_jordan_loop lt A r oj'
       else
-        let r' := r + 1 in
-        let A' := multiply_row_by_scalar A k (/ mat_el A k j)%F in
-        let A'' := swap_rows A' (r' - 1) k in
-        let A''' :=
-          fold_left
-            (λ B i'',
-               if Nat.eq_dec i'' (r' - 1) then B
-               else
-                 let v := mat_el B i'' j in
-                 add_one_row_scalar_multiple_another B i'' (- v)%Rng (r' - 1))
-            (seq 0 (mat_nrows A'')) A''
-        in
-        gauss_jordan_loop lt A''' r' oj'
+        let A' := gauss_jordan_action A (r + 1) i j in
+        gauss_jordan_loop lt A' (r + 1) oj'
   end.
 
 Definition gauss_jordan lt (A : matrix T) :=
@@ -697,11 +697,11 @@ Compute qresolve [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]] [3;4;5].
      = [〈11╱2〉; 〈8〉; 〈13╱2〉]
 *)
 Compute qtest_mul_m_v [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]] [11/2;8;13/2].
+
 Compute qresolve [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]] [3;4;6].
-(*
-     = [〈23╱4〉; 〈17╱2〉; 〈29╱4〉]
-*)
+(* = [〈23╱4〉; 〈17╱2〉; 〈29╱4〉] *)
 Compute qtest_mul_m_v [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]] [23/4;17/2;29/4].
+
 Compute qresolve [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]] [3;1;4].
 (* [〈15╱4〉; 〈9╱2〉; 〈17╱4〉] *)
 Compute qtest_mul_m_v [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]] [15/4;9/2;17/4].
@@ -709,6 +709,7 @@ Compute qtest_mul_m_v [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]] [15/4;9/2;17/4].
 Compute qresolve [[2;1;-1];[-3;-1;2];[-2;1;2]] [8;-11;-3].
 (* [2;3;-1] *)
 Compute qtest_mul_m_v [[2;1;-1];[-3;-1;2];[-2;1;2]] [2;3;-1].
+Compute qtest [[1; 1; 1; 0]; [1; 1; 0; 1]].
 *)
 
 (* trucs à prouver:
@@ -737,11 +738,16 @@ Definition pivot_index (M : matrix T) i :=
   pivot_index_loop M i 0 (mat_ncols M).
 
 (* row echelon form *)
+(* a matrix is in row echelon form if the pivot shifts at each row *)
 
 Definition in_row_echelon_form (M : matrix T) :=
   ∀ i, i < mat_nrows M - 1 → pivot_index M i < pivot_index M (i + 1).
 
 (* reduced row echelon form *)
+(* a matrix is in reduced row echelon form if
+   1/ it is in row echelon form
+   2/ the column of pivots hold 1 at pivot and 0 everywhere else
+*)
 
 Definition in_reduced_row_echelon_form (M : matrix T) :=
   in_row_echelon_form M ∧
@@ -757,6 +763,5 @@ Proof.
 intros.
 split. {
   intros i Hi.
-  unfold gauss_jordan.
-  unfold pivot_index.
+Print gauss_jordan_loop.
 ...
