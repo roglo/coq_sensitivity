@@ -398,13 +398,13 @@ Context {fo : field_op T}.
 
 Definition gauss_jordan_step A r i j :=
   let A' := multiply_row_by_scalar A i (/ mat_el A i j)%F in
-  let A'' := swap_rows A' (r - 1) i in
+  let A'' := swap_rows A' r i in
   fold_left
     (λ B i'',
-       if Nat.eq_dec i'' (r - 1) then B
+       if Nat.eq_dec i'' r then B
        else
          let v := mat_el B i'' j in
-         add_one_row_scalar_multiple_another B i'' (- v)%Rng (r - 1))
+         add_one_row_scalar_multiple_another B i'' (- v)%Rng r)
     (seq 0 (mat_nrows A'')) A''.
 
 Fixpoint gauss_jordan_loop lt (A : matrix T) r oj :=
@@ -416,7 +416,7 @@ Fixpoint gauss_jordan_loop lt (A : matrix T) r oj :=
       if srng_eq_dec (mat_el A i j) 0 then
         gauss_jordan_loop lt A r oj'
       else
-        let A' := gauss_jordan_step A (r + 1) i j in
+        let A' := gauss_jordan_step A r i j in
         gauss_jordan_loop lt A' (r + 1) oj'
   end.
 
@@ -517,9 +517,6 @@ Definition qtest_gjs (ll : list (list Q)) r i j :=
     (mat_of_list_list 0 ll) r i j).
 Print qtest_gjs.
 Compute qtest_gj [[1]].
-Check (2 + 3//2).
-Compute (2 + 3//2).
-Compute (2 + 2).
 Compute qtest_gj [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]].
 (* = [[〈1〉; 0; 0]; [0; 〈1〉; 0]; [0; 0; 〈1〉]] *)
 Compute qtest_gj [[1;3;1;9];[1;1;-1;1];[3;11;5;35]].
@@ -530,10 +527,7 @@ Compute qtest_gj [[2;-1;0;1;0;0];[-1;2;-1;0;1;0];[0;-1;2;0;0;1]].
 (* = [[〈1〉; 0; 0; 〈3╱4〉; 〈1╱2〉; 〈1╱4〉]; [0; 〈1〉; 0; 〈1╱2〉; 〈1〉; 〈1╱2〉];
       [0; 0; 〈1〉; 〈1╱4〉; 〈1╱2〉; 〈3╱4〉]] *)
 Compute qtest_gj [[5;2;1;0];[-7;-3;0;1]].
-(*
-     = ([[-7; 0; -21; -14]; [0; -7; 49; 35]], -7)
-     = ([[1; 0; 3; 2]; [0; 1; -7; -5]], -7)
-*)
+(* = ([[1; 0; 3; 2]; [0; 1; -7; -5]], -7) *)
 Compute qtest_gj [[-3;-3;3];[3;-9;3];[6;-6;0]].
 (*
      = [[〈1〉; 0; 〈-1╱2〉]; [0; 〈1〉; 〈-1╱2〉]; [0; 0; 0]]
@@ -759,5 +753,7 @@ Proof.
 intros.
 split. {
   intros i Hi.
+  unfold gauss_jordan.
 Print gauss_jordan_loop.
+Print gauss_jordan_step.
 ...
