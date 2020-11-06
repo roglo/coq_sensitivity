@@ -268,18 +268,15 @@ rewrite <- Hm in Hcp.
 ...
 *)
 
-Definition rng_abs (lt : T → T → bool) x :=
-  if lt x 0%Srng then (- x)%Rng else x.
-
 (* https://fr.wikipedia.org/wiki/%C3%89limination_de_Gauss-Jordan#Algorithme *)
 
-Fixpoint abs_max_in_col (lt : T → T → bool) (M : matrix T) it i j :=
+Fixpoint first_non_zero_in_col (M : matrix T) it i j :=
   match it with
   | 0 => i
   | S it' =>
-      let k := abs_max_in_col lt M it' (i + 1) j in
-      if lt (rng_abs lt (mat_el M k j)) (rng_abs lt (mat_el M i j)) then i
-      else k
+      if srng_eq_dec (mat_el M i j) 0 then
+        first_non_zero_in_col M it' (i + 1) j
+      else i
   end.
 
 (* Swap the positions of two rows *)
@@ -314,20 +311,20 @@ Definition gauss_jordan_step A i j k :=
          add_one_row_scalar_multiple_another B i' (- v)%Rng i)
     (seq 0 (mat_nrows A'')) A''.
 
-Fixpoint gauss_jordan_loop lt (A : matrix T) i j it :=
+Fixpoint gauss_jordan_loop (A : matrix T) i j it :=
   match it with
   | 0 => A
   | S it' =>
-      let k := abs_max_in_col lt A (mat_nrows A - 1 - i) i j in
+      let k := first_non_zero_in_col A (mat_nrows A - 1 - i) i j in
       if srng_eq_dec (mat_el A k j) 0 then
-        gauss_jordan_loop lt A i (j + 1) it'
+        gauss_jordan_loop A i (j + 1) it'
       else
         let A' := gauss_jordan_step A i j k in
-        gauss_jordan_loop lt A' (i + 1) (j + 1) it'
+        gauss_jordan_loop A' (i + 1) (j + 1) it'
   end.
 
-Definition gauss_jordan lt (A : matrix T) :=
-  gauss_jordan_loop lt (A : matrix T) 0 0 (mat_ncols A).
+Definition gauss_jordan (A : matrix T) :=
+  gauss_jordan_loop (A : matrix T) 0 0 (mat_ncols A).
 
 (* matrix whose k-th column is replaced by a vector *)
 
@@ -363,13 +360,13 @@ Context {fo : field_op T}.
    we must build a field holding constants a, b, c, etc.; polynomials
    could help but we need polynomials with several variables *)
 
-Fixpoint resolve_loop lt n (M : matrix T) (V : vector T) :=
+Fixpoint resolve_loop n (M : matrix T) (V : vector T) :=
   match n with
   | 0 => []
   | S n' =>
       if srng_eq_dec (determinant M) 0%Srng then
         let MV := mat_vect_concat M V in
-        let A := gauss_jordan lt MV in
+        let A := gauss_jordan MV in
         (* deletion last row which, normally, contains only zeros
            and the last variable is given the value 1 *)
         let B := mk_mat (mat_el A) (mat_nrows M - 1) (mat_ncols M - 1) in
@@ -384,13 +381,13 @@ Fixpoint resolve_loop lt n (M : matrix T) (V : vector T) :=
           in
           vect_sub rhs last_col
         in
-        resolve_loop lt n' B U ++ [1%Srng]
+        resolve_loop n' B U ++ [1%Srng]
       else
         (* resolve for example by Cramer the system of equations Mx=V *)
         resolve_system so M V
   end.
 
-Definition resolve lt (M : matrix T) V := resolve_loop lt (mat_nrows M) M V.
+Definition resolve (M : matrix T) V := resolve_loop (mat_nrows M) M V.
 
 (*
 (* here, some tests on ℚ *)
@@ -407,17 +404,14 @@ Existing Instance Q_field_op.
 Existing Instance Q_semiring_prop.
 Existing Instance Q_ring_prop.
 
-Definition Q_ltb a b :=
-  match Q.compare a b with Lt => true | _ => false end.
-Definition Q_gauss_jordan := gauss_jordan Q_ltb.
 Definition qtest_gj ll :=
-  let r := Q_gauss_jordan (mat_of_list_list 0%Q ll) in
+  let r := gauss_jordan (mat_of_list_list 0%Q ll) in
   list_list_of_mat r.
 Definition qtest_gjs (ll : list (list Q)) r i j :=
   list_list_of_mat (gauss_jordan_step Q_semiring_op
     (mat_of_list_list 0 ll) r i j).
 Definition qresolve (ll : list (list Q)) v :=
-  resolve Q_ltb (mat_of_list_list 0 ll) (vect_of_list 0 v).
+  resolve (mat_of_list_list 0 ll) (vect_of_list 0 v).
 Definition qcp ll := polyn_list (charac_polyn (mat_of_list_list 0 ll)).
 Definition qtest_mul_m_v m v :=
   list_of_vect (mat_mul_vect_r (mat_of_list_list 0 m) (vect_of_list 0 v)).
@@ -428,12 +422,19 @@ Compute qtest_gj [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]].
 Compute qtest_gj [[1;3;1;9];[1;1;-1;1];[3;11;5;35]].
 (* = [[〈1〉; 0; 〈-2〉; 〈-3〉]; [0; 〈1〉; 〈1〉; 〈4〉]; [0; 0; 0; 0]] *)
 Compute qtest_gj [[2;1;-1;8];[-3;-1;2;-11];[-2;1;2;-3]].
-(* = ([[45; 0; 0; 90]; [0; 45; 0; 135]; [0; 0; 45; -45]], 45) *)
+(* = [[〈1〉; 0; 0; 〈2〉]; [0; 〈1〉; 0; 〈3〉]; [0; 0; 〈1〉; 〈-1〉]] *)
 Compute qtest_gj [[2;-1;0;1;0;0];[-1;2;-1;0;1;0];[0;-1;2;0;0;1]].
 (* = [[〈1〉; 0; 0; 〈3╱4〉; 〈1╱2〉; 〈1╱4〉]; [0; 〈1〉; 0; 〈1╱2〉; 〈1〉; 〈1╱2〉];
       [0; 0; 〈1〉; 〈1╱4〉; 〈1╱2〉; 〈3╱4〉]] *)
+(**)
+Compute qtest_gj [[0;2;1;0];[-7;-3;0;1];[3;8;18;5]].
+(* = [[〈1〉; 0; 0; 〈-13╱205〉]; [0; 〈1〉; 0; 〈-38╱205〉]; [0; 0; 〈1〉; 〈76╱205〉]] *)
+Compute qtest_gj [[-7;-3;0;1];[3;8;18;5];[0;2;1;0]].
+(* = [[〈1〉; 0; 0; 〈-13╱205〉]; [0; 〈1〉; 0; 〈-38╱205〉]; [0; 0; 〈1〉; 〈76╱205〉]] *)
 Compute qtest_gj [[5;2;1;0];[-7;-3;0;1]].
-(* = ([[1; 0; 3; 2]; [0; 1; -7; -5]], -7) *)
+(* = [[〈1〉; 0; 〈3〉; 〈2〉]; [0; 〈1〉; 〈-7〉; 〈-5〉]] *)
+Compute qtest_gj [[-7;-3;0;1];[5;2;1;0]].
+(* = [[〈1〉; 0; 〈3〉; 〈2〉]; [0; 〈1〉; 〈-7〉; 〈-5〉]] *)
 Compute qtest_gj [[-3;-3;3];[3;-9;3];[6;-6;0]].
 (*
      = [[〈1〉; 0; 〈-1╱2〉]; [0; 〈1〉; 〈-1╱2〉]; [0; 0; 0]]
@@ -685,8 +686,8 @@ destruct (srng_eq_dec (mat_el A i j) 0) as [Ha| Ha]. {
 ...
 *)
 
-Theorem gauss_jordan_in_reduced_row_echelon_form : ∀ lt (M : matrix T),
-  in_reduced_row_echelon_form (gauss_jordan lt M).
+Theorem gauss_jordan_in_reduced_row_echelon_form : ∀ (M : matrix T),
+  in_reduced_row_echelon_form (gauss_jordan M).
 Proof.
 intros.
 split. {
