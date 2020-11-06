@@ -110,6 +110,18 @@ Compute qtest_mul_m_v [[4;3];[-2;-3]] [-1/2;1].
     Indeed, [-1/2;1] is an eigenvector
 *)
 
+(* non invertible; what if computing its "invert" by gauss-jordan? *)
+Compute qtest_gj [[-6;-3;1;0];[2;1;0;1]].
+(* = [[〈1〉; 〈1╱2〉; 0; 〈1╱2〉]; [0; 0; 〈1〉; 〈3〉]] *)
+Compute list_list_of_mat (mat_mul (mat_of_list_list 0 [[-6;-3];[2;1]]) (mat_of_list_list 0 [[0;1/2];[1;3]])).
+(* = [[〈-3〉; 〈-12〉]; [〈1〉; 〈4〉]] ok, instead of I *)
+
+(* for an invertible matrix *)
+Compute qtest_gj [[-7;-3;1;0];[2;1;0;1]].
+(* = [[〈1〉; 0; 〈-1〉; 〈-3〉]; [0; 〈1〉; 〈2〉; 〈7〉]] *)
+Compute list_list_of_mat (mat_mul (mat_of_list_list 0 [[-7;-3];[2;1]]) (mat_of_list_list 0 [[-1;-3];[2;7]])).
+(* = [[〈1〉; 0]; [0; 〈1〉]] ok *)
+
 (* https://en.wikipedia.org/wiki/Kernel_(linear_algebra)#Illustration *)
 Compute qtest_gj [[2;3;5];[-4;2;3]].
 (*
