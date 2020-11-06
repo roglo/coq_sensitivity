@@ -515,7 +515,7 @@ Definition qtest_gj ll :=
 Definition qtest_gjs (ll : list (list Q)) r i j :=
   list_list_of_mat (gauss_jordan_step Q_semiring_op
     (mat_of_list_list 0 ll) r i j).
-Print qtest_gjs.
+
 Compute qtest_gj [[1]].
 Compute qtest_gj [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]].
 (* = [[〈1〉; 0; 0]; [0; 〈1〉; 0]; [0; 0; 〈1〉]] *)
