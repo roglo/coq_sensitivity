@@ -21,8 +21,8 @@ Import bmatrix_Notations.
 Section in_ring.
 
 Context {T : Type}.
-Context {ro : ring_op T}.
 Context (so : semiring_op T).
+Context {ro : ring_op T}.
 Context {sp : semiring_prop T}.
 Context {rp : ring_prop T}.
 Context {sdp : sring_dec_prop T}.
@@ -396,7 +396,7 @@ Compute test [[1;2;2;-3;2;3];[2;4;1;0;-5;-6];[4;8;5;-6;-1;0];[-1;-2;-1;1;1;1]].
 
 Context {fo : field_op T}.
 
-Definition gauss_jordan_action A r i j :=
+Definition gauss_jordan_step A r i j :=
   let A' := multiply_row_by_scalar A i (/ mat_el A i j)%F in
   let A'' := swap_rows A' (r - 1) i in
   fold_left
@@ -416,7 +416,7 @@ Fixpoint gauss_jordan_loop lt (A : matrix T) r oj :=
       if srng_eq_dec (mat_el A i j) 0 then
         gauss_jordan_loop lt A r oj'
       else
-        let A' := gauss_jordan_action A (r + 1) i j in
+        let A' := gauss_jordan_step A (r + 1) i j in
         gauss_jordan_loop lt A' (r + 1) oj'
   end.
 
@@ -503,47 +503,54 @@ Existing Instance Q_semiring_op.
 Existing Instance Q_ring_op.
 Existing Instance Q_sring_dec_prop.
 Existing Instance Q_field_op.
+Existing Instance Q_semiring_prop.
+Existing Instance Q_ring_prop.
+
 Definition Q_ltb a b :=
   match Q.compare a b with Lt => true | _ => false end.
 Definition Q_gauss_jordan := gauss_jordan Q_ltb.
-Definition qtest ll :=
+Definition qtest_gj ll :=
   let r := Q_gauss_jordan (mat_of_list_list 0%Q ll) in
   list_list_of_mat r.
-Compute qtest [[1]].
+Definition qtest_gjs (ll : list (list Q)) r i j :=
+  list_list_of_mat (gauss_jordan_step Q_semiring_op
+    (mat_of_list_list 0 ll) r i j).
+Print qtest_gjs.
+Compute qtest_gj [[1]].
 Check (2 + 3//2).
 Compute (2 + 3//2).
 Compute (2 + 2).
-Compute qtest [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]].
+Compute qtest_gj [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]].
 (* = [[〈1〉; 0; 0]; [0; 〈1〉; 0]; [0; 0; 〈1〉]] *)
-Compute qtest [[1;3;1;9];[1;1;-1;1];[3;11;5;35]].
+Compute qtest_gj [[1;3;1;9];[1;1;-1;1];[3;11;5;35]].
 (* = [[〈1〉; 0; 〈-2〉; 〈-3〉]; [0; 〈1〉; 〈1〉; 〈4〉]; [0; 0; 0; 0]] *)
-Compute qtest [[2;1;-1;8];[-3;-1;2;-11];[-2;1;2;-3]].
+Compute qtest_gj [[2;1;-1;8];[-3;-1;2;-11];[-2;1;2;-3]].
 (* = ([[45; 0; 0; 90]; [0; 45; 0; 135]; [0; 0; 45; -45]], 45) *)
-Compute qtest [[2;-1;0;1;0;0];[-1;2;-1;0;1;0];[0;-1;2;0;0;1]].
+Compute qtest_gj [[2;-1;0;1;0;0];[-1;2;-1;0;1;0];[0;-1;2;0;0;1]].
 (* = [[〈1〉; 0; 0; 〈3╱4〉; 〈1╱2〉; 〈1╱4〉]; [0; 〈1〉; 0; 〈1╱2〉; 〈1〉; 〈1╱2〉];
       [0; 0; 〈1〉; 〈1╱4〉; 〈1╱2〉; 〈3╱4〉]] *)
-Compute qtest [[5;2;1;0];[-7;-3;0;1]].
+Compute qtest_gj [[5;2;1;0];[-7;-3;0;1]].
 (*
      = ([[-7; 0; -21; -14]; [0; -7; 49; 35]], -7)
      = ([[1; 0; 3; 2]; [0; 1; -7; -5]], -7)
 *)
-Compute qtest [[-3;-3;3];[3;-9;3];[6;-6;0]].
+Compute qtest_gj [[-3;-3;3];[3;-9;3];[6;-6;0]].
 (*
      = [[〈1〉; 0; 〈-1╱2〉]; [0; 〈1〉; 〈-1╱2〉]; [0; 0; 0]]
    1 0 -1/2
    0 1 -1/2
    0 0  0
 *)
-Compute qtest [[3;-3;3];[3;-3;3];[6;-6;6]].
+Compute qtest_gj [[3;-3;3];[3;-3;3];[6;-6;6]].
 (*
      = ([[6; -6; 6]; [0; 0; 0]; [0; 0; 0]], 6)
 *)
-Compute qtest [[1;-1;2;5];[3;2;1;10];[2;-3;-2;-10]].
+Compute qtest_gj [[1;-1;2;5];[3;2;1;10];[2;-3;-2;-10]].
 (*
      = ([[4095; 0; 0; 4095]; [0; 4095; 0; 8190]; [0; 0; 4095; 12285]], 4095)
      = ([[1; 0; 0; 1]; [0; 1; 0; 2]; [0; 0; 1; 3]], 1)
 *)
-Compute qtest [[1;2;2;-3;2;3];[2;4;1;0;-5;-6];[4;8;5;-6;-1;0];[-1;-2;-1;1;1;1]].
+Compute qtest_gj [[1;2;2;-3;2;3];[2;4;1;0;-5;-6];[4;8;5;-6;-1;0];[-1;-2;-1;1;1;1]].
 (*
      = ([[-24; -48; 0; -24; 96; 120]; [0; 0; -24; 48; -72; -96];
         [0; 0; 0; 0; 0; 0]; [0; 0; 0; 0; 0; 0]], -24)
@@ -552,18 +559,6 @@ Check (355//113)%Q.
 Compute (355//113)%Q.
 Require Import CharacPolyn.
 Require Import SRpolynomial.
-Definition Q_semiring_prop :=
-  {| srng_add_comm := Q.add_comm;
-     srng_add_assoc := Q.add_assoc;
-     srng_add_0_l := Q.add_0_l;
-     srng_mul_comm := Q.mul_comm;
-     srng_mul_assoc := Q.mul_assoc;
-     srng_mul_1_l := Q.mul_1_l;
-     srng_mul_add_distr_l := Q.mul_add_distr_l;
-     srng_mul_0_l := Q.mul_0_l |}.
-Definition Q_ring_prop := {| rng_add_opp_l := Q.add_opp_diag_l |}.
-Existing Instance Q_semiring_prop.
-Existing Instance Q_ring_prop.
 
 (* trying to find eigenvalues and eigenvector on an example *)
 Definition qcp ll := polyn_list (charac_polyn (mat_of_list_list 0 ll)).
@@ -577,7 +572,7 @@ P=(x-3)(x+2)
 1/ λ=3
    λI-M=[[-1;-3];[2;6]]
 *)
-Compute qtest [[-1;-3];[2;6]].
+Compute qtest_gj [[-1;-3];[2;6]].
 (*
      = [[〈1〉; 〈3〉]; [0; 0]]
 x₁+3x₂=0
@@ -597,7 +592,7 @@ Compute qtest_mul_m_v [[4;3];[-2;-3]] [-3;1].
 2/ λ=-2
    λI-M=[[-6;-3];[2;1]]
 *)
-Compute qtest [[-6;-3];[2;1]].
+Compute qtest_gj [[-6;-3];[2;1]].
 (*
      = [[〈1〉; 〈1╱2〉]; [0; 0]]
 x₁+1/2x₂=0
@@ -613,29 +608,29 @@ Compute qtest_mul_m_v [[4;3];[-2;-3]] [1;-2].
 *)
 
 (* https://en.wikipedia.org/wiki/Kernel_(linear_algebra)#Illustration *)
-Compute qtest [[2;3;5];[-4;2;3]].
+Compute qtest_gj [[2;3;5];[-4;2;3]].
 (*
      = [[〈1〉; 0; 〈1╱16〉]; [0; 〈1〉; 〈13╱8〉]]
 
   Good! matches what is written in the wikipedia page.
 *)
 
-Compute qtest [[1;2;2;2];[1;3;-2;-1];[3;5;8;8]].
-Compute qtest [[2;3;1;1];[3;1;5;2];[4;-1;-1;0]].
-Compute qtest [[2;3;1;1];[0;-7;7;1];[0;-7;-3;-2]].
-Compute qtest [[3;3;3;18];[-1;3;7;-10];[1;3;4;6]].
-Compute qtest [[0;0;2;-2;8;-6];[1;2;1;0;5;-1];[-2;-4;-1;0;-8;-1]].
-Compute qtest [[4;6;6];[1;3;2];[-1;-5;-2]].
+Compute qtest_gj [[1;2;2;2];[1;3;-2;-1];[3;5;8;8]].
+Compute qtest_gj [[2;3;1;1];[3;1;5;2];[4;-1;-1;0]].
+Compute qtest_gj [[2;3;1;1];[0;-7;7;1];[0;-7;-3;-2]].
+Compute qtest_gj [[3;3;3;18];[-1;3;7;-10];[1;3;4;6]].
+Compute qtest_gj [[0;0;2;-2;8;-6];[1;2;1;0;5;-1];[-2;-4;-1;0;-8;-1]].
+Compute qtest_gj [[4;6;6];[1;3;2];[-1;-5;-2]].
 Compute qcp [[4;6;6];[1;3;2];[-1;-5;-2]].
 Compute qtest_mul_m_v [[4;6;6];[1;3;2];[-1;-5;-2]] [4;1;-3].
 Compute qtest_mul_m_v [[4;6;6];[1;3;2];[-1;-5;-2]] [3;1;-2].
-Compute qtest [[3;6;6];[1;2;2];[-1;-5;-3]].
+Compute qtest_gj [[3;6;6];[1;2;2];[-1;-5;-3]].
 Compute qcp [[3;6;6];[1;2;2];[-1;-5;-3]].
 
 Compute qcp [[5;0;1];[1;1;0];[-7;1;0]].
 (* x³-6x²+12x-8 = (x-2)³*)
-Compute qtest [[-3;0;-1];[-1;1;0];[7;-1;2]].
-Compute qtest [[3;0;1];[1;-1;0];[-7;1;-2]].
+Compute qtest_gj [[-3;0;-1];[-1;1;0];[7;-1;2]].
+Compute qtest_gj [[3;0;1];[1;-1;0];[-7;1;-2]].
 (* dimension of eigenvectors is 1, even if the multiplicity of 2 is 3 *)
 
 (* pourquoi il me demande Q_semiring_op comme paramètre, ce con ?
@@ -675,11 +670,12 @@ Compute qresolve [[4;2];[3;-1]] [-1;2].
 *)
 
 (* *)
-Compute qtest [[1;3;1];[1;1;-1];[3;11;5]].
+Compute qtest_gj [[1;3;1];[1;1;-1];[3;11;5]].
 (*
      = [[〈1〉; 0; 〈-2〉]; [0; 〈1〉; 〈1〉]; [0; 0; 0]]
 *)
-Compute qtest [[1;3;1;9];[1;1;-1;1];[3;11;5;35]].
+Compute qtest_gjs [[1;3;1;9];[1;1;-1;1];[3;11;5;35]] 0 0 0.
+Compute qtest_gj [[1;3;1;9];[1;1;-1;1];[3;11;5;35]].
 (*
      = [[〈1〉; 0; 〈-2〉; 〈-3〉]; [0; 〈1〉; 〈1〉; 〈4〉]; [0; 0; 0; 0]]
 *)
@@ -709,7 +705,7 @@ Compute qtest_mul_m_v [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]] [15/4;9/2;17/4].
 Compute qresolve [[2;1;-1];[-3;-1;2];[-2;1;2]] [8;-11;-3].
 (* [2;3;-1] *)
 Compute qtest_mul_m_v [[2;1;-1];[-3;-1;2];[-2;1;2]] [2;3;-1].
-Compute qtest [[1; 1; 1; 0]; [1; 1; 0; 1]].
+Compute qtest_gj [[1; 1; 1; 0]; [1; 1; 0; 1]].
 *)
 
 (* trucs à prouver:
