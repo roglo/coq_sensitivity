@@ -540,6 +540,15 @@ split. 2: {
     rewrite gauss_jordan_loop_ncols.
     rewrite Hit in Ha |-*.
     destruct it; [ easy | clear Hcz ].
+    cbn.
+    cbn - [ gauss_jordan_step ] in Ha.
+    rewrite Nat.sub_0_r in Ha.
+    remember (first_non_zero_in_col _ _ _ _) as k1 eqn:Hk1.
+    symmetry in Hk1.
+    destruct k1 as [k1| ]. {
+      destruct (srng_eq_dec (mat_el A k 0) 0) as [Hmz| Hmz]. {
+        destruct it; cbn. {
+          cbn in Ha.
 ...
 now apply glop with (M := M) (i := 0).
 ...
