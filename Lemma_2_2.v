@@ -457,6 +457,16 @@ intros A h Hh.
 now destruct (Nat.eq_dec h i).
 Qed.
 
+Theorem gauss_jordan_step_ncols : ∀ M i j k,
+  mat_ncols (gauss_jordan_step so M i j k) = mat_ncols M.
+Proof.
+intros.
+unfold gauss_jordan_step.
+rewrite List_app_fold_left; [ easy | ].
+intros A h Hh.
+now destruct (Nat.eq_dec h i).
+Qed.
+
 Theorem gauss_jordan_loop_nrows : ∀ M i j it,
   mat_nrows (gauss_jordan_loop M i j it) = mat_nrows M.
 Proof.
@@ -473,12 +483,42 @@ destruct k as [k| ]. {
 apply IHit.
 Qed.
 
+Theorem gauss_jordan_loop_ncols : ∀ M i j it,
+  mat_ncols (gauss_jordan_loop M i j it) = mat_ncols M.
+Proof.
+intros.
+revert M i j.
+induction it; intros; [ easy | ].
+cbn - [ gauss_jordan_step ].
+remember (first_non_zero_in_col _ _ _ _) as k eqn:Hk.
+symmetry in Hk.
+destruct k as [k| ]. {
+  rewrite IHit.
+  apply gauss_jordan_step_ncols.
+}
+apply IHit.
+Qed.
+
 Theorem gauss_jordan_nrows : ∀ M,
   mat_nrows (gauss_jordan M) = mat_nrows M.
 Proof.
 intros.
 apply gauss_jordan_loop_nrows.
 Qed.
+
+Theorem glop : ∀ M A i j k it,
+  it ≠ 0
+  → k < mat_nrows M
+  → A = gauss_jordan_loop M i j it
+  → mat_el A k (pivot_index_loop A k j it) = 1%F.
+Proof.
+intros M A * Hit Hk Ha.
+revert M A i j k Hk Ha.
+induction it; intros M A * Hk Ha; [ easy | clear Hit ].
+cbn - [ gauss_jordan_step ] in Ha |-*.
+destruct (srng_eq_dec (mat_el A k j) 0) as [Hmz| Hmz]. {
+  apply IHit.
+...
 
 Theorem gauss_jordan_in_reduced_row_echelon_form : ∀ (M : matrix T),
   mat_ncols M ≠ 0
@@ -490,6 +530,19 @@ split. 2: {
   move k before i.
   rewrite gauss_jordan_nrows in Hi, Hk.
   destruct (Nat.eq_dec k i) as [Hki| Hki]. {
+(**)
+    subst i; clear Hi.
+    remember (mat_ncols M) as it eqn:Hit; symmetry in Hit.
+    unfold gauss_jordan.
+    unfold pivot_index.
+    remember (gauss_jordan_loop _ _ _ _) as A eqn:Ha.
+    rewrite Ha at 3.
+    rewrite gauss_jordan_loop_ncols.
+    rewrite Hit in Ha |-*.
+    destruct it; [ easy | clear Hcz ].
+...
+now apply glop with (M := M) (i := 0).
+...
     subst k; clear Hk.
     unfold gauss_jordan.
     remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
