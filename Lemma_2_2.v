@@ -507,6 +507,7 @@ split. 2: {
         remember (gauss_jordan_loop _ _ _ _) as A eqn:HA.
         destruct c. {
           cbn - [ gauss_jordan_step ] in HA.
+          unfold gauss_jordan_step in HA.
 ...
 
 End in_field.
