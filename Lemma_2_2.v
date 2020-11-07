@@ -513,13 +513,12 @@ Theorem glop : ∀ M A i j k it,
   → mat_el A k (pivot_index_loop A k j it) = 1%F.
 Proof.
 intros M A * Hit Hk Ha.
+Print gauss_jordan_loop.
 revert M A i j k Hk Ha.
 induction it; intros M A * Hk Ha; [ easy | clear Hit ].
 cbn - [ gauss_jordan_step ] in Ha |-*.
 destruct (srng_eq_dec (mat_el A k j) 0) as [Hmz| Hmz]. {
-...
-  apply IHit.
-...
+Abort.
 
 Theorem gauss_jordan_in_reduced_row_echelon_form : ∀ (M : matrix T),
   mat_ncols M ≠ 0
