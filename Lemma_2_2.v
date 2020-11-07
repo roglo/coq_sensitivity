@@ -432,62 +432,6 @@ Definition in_reduced_row_echelon_form (M : matrix T) :=
 (* proof that Gauss-Jordan algorithm returns a matrix in row
    echelon form *)
 
-(*
-Theorem pivot_index_loop_le : ∀ M i j it,
-  pivot_index_loop M i j it ≤ pivot_index_loop M (i + 1) j it.
-Proof.
-intros.
-revert M i j.
-induction it; intros; [ easy | cbn ].
-destruct (srng_eq_dec (mat_el M i j) 0) as [Hm| Hm]. {
-  destruct (srng_eq_dec (mat_el M (i + 1) j) 0) as [Hm1| Hm1]. {
-    apply IHit.
-  }
-...
-*)
-
-(*
-Theorem pivot_index_lt : ∀ lt M i j k it,
-  i ≤ j
-  → i < mat_nrows M
-  → j < mat_ncols M
-  → k < mat_nrows M
-  → pivot_index (gauss_jordan_loop lt M i j it) k < mat_ncols M - 1
-  → pivot_index (gauss_jordan_loop lt M i j it) k <
-    pivot_index (gauss_jordan_loop lt M i j it) (k + 1).
-Proof.
-intros * Hij Hi Hj Hk Hp.
-revert M i j k Hij Hi Hj Hk Hp.
-induction it; intros. {
-  cbn in Hp |-*.
-  unfold pivot_index.
-Print pivot_index_loop.
-...
-apply glop.
-...
-*)
-
-(*
-Theorem glop : ∀ lt M i j it,
-  j ≤ i
-  → pivot_index_loop (gauss_jordan lt M) i j it ≤
-    pivot_index_loop (gauss_jordan lt M) (i + 1) j it.
-Proof.
-intros * Hji.
-revert M i j Hji.
-induction it; intros; [ easy | cbn ].
-set (A := gauss_jordan lt M).
-destruct (srng_eq_dec (mat_el A i j) 0) as [Ha| Ha]. {
-  destruct (srng_eq_dec (mat_el A (i + 1) j) 0) as [Ha1| Ha1]. {
-    destruct (Nat.eq_dec j i) as [Hjei| Hjei]. {
-      subst j.
-...
-    }
-    apply IHit; flia Hji Hjei.
-  }
-...
-*)
-
 (* to be moved to Misc.v *)
 Theorem List_app_fold_left : ∀ A B x l (f : B → A → B) (g : B → A),
   (∀ y i, i ∈ l → g (f y i) = g y)
