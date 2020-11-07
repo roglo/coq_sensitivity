@@ -488,12 +488,39 @@ destruct (srng_eq_dec (mat_el A i j) 0) as [Ha| Ha]. {
 ...
 *)
 
-Theorem gauss_jordan_in_reduced_row_echelon_form : ∀ (M : matrix T),
-  in_reduced_row_echelon_form (gauss_jordan M).
+Theorem gauss_jordan_nrows : ∀ M,
+  mat_nrows (gauss_jordan M) = mat_nrows M.
 Proof.
 intros.
-split. {
-  intros i Hi.
-Abort.
+unfold gauss_jordan.
+remember (mat_nrows M) as r eqn:Hr; symmetry in Hr.
+remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
+move c before r.
+revert M r Hr Hc.
+induction c; intros; [ easy | cbn ].
+rewrite Nat.sub_0_r.
+rewrite Hr.
+destruct r. {
+  cbn.
+...
+
+Theorem gauss_jordan_in_reduced_row_echelon_form : ∀ (M : matrix T),
+  mat_ncols M ≠ 0
+  → in_reduced_row_echelon_form (gauss_jordan M).
+Proof.
+intros * Hcz.
+split. 2: {
+  intros i Hi k Hk.
+  destruct (Nat.eq_dec k i) as [Hki| Hki]. {
+    subst k; clear Hk.
+    unfold gauss_jordan.
+    remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
+    destruct c; [ easy | clear Hcz ].
+    cbn.
+    rewrite Nat.sub_0_r.
+    remember (mat_nrows M) as r eqn:Hr; symmetry in Hr.
+    destruct r. {
+      cbn.
+...
 
 End in_field.
