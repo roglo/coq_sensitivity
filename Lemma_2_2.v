@@ -493,15 +493,20 @@ split. 2: {
     subst k; clear Hk.
     unfold gauss_jordan.
     remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
-    destruct c; [ easy | clear Hcz; cbn ].
+    destruct c; [ easy | clear Hcz ].
+    cbn - [ gauss_jordan_step ].
     rewrite Nat.sub_0_r.
     remember (mat_nrows M) as r eqn:Hr; symmetry in Hr.
-    destruct r; [ easy | cbn ].
+    move Hr after Hc.
+    destruct r; [ easy | ].
+    cbn - [ gauss_jordan_step ].
     destruct (srng_eq_dec (mat_el M 0 0) 0) as [Hmz| Hmz]. {
       remember (first_non_zero_in_col _ _ _ _) as k eqn:Hk.
       symmetry in Hk.
       destruct k as [k| ]. {
-      remember (gauss_jordan_loop _ _ _ _) as A eqn:HA.
+        remember (gauss_jordan_loop _ _ _ _) as A eqn:HA.
+        destruct c. {
+          cbn - [ gauss_jordan_step ] in HA.
 ...
 
 End in_field.
