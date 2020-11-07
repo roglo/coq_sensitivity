@@ -505,9 +505,13 @@ split. 2: {
       symmetry in Hk.
       destruct k as [k| ]. {
         remember (gauss_jordan_loop _ _ _ _) as A eqn:HA.
-        destruct c. {
-          cbn - [ gauss_jordan_step ] in HA.
-          unfold gauss_jordan_step in HA.
+        revert M A c i k Hi Hr Hc Hmz Hk HA.
+        induction r; intros; [ easy | ].
+        rename A0 into A.
+        cbn in Hk.
+        destruct (srng_eq_dec (mat_el M 1 0) 0) as [Hm1z| Hm1z]. {
+          destruct i. {
+            clear IHr Hi.
 ...
 
 End in_field.
