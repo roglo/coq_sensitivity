@@ -452,8 +452,10 @@ Theorem gauss_jordan_step_nrows : ∀ M i j k,
 Proof.
 intros.
 unfold gauss_jordan_step.
-rewrite List_app_fold_left. {
-...
+rewrite List_app_fold_left; [ easy | ].
+intros A h Hh.
+now destruct (Nat.eq_dec h i).
+Qed.
 
 Theorem gauss_jordan_loop_nrows : ∀ M i j it,
   mat_nrows (gauss_jordan_loop M i j it) = mat_nrows M.
@@ -466,24 +468,17 @@ remember (first_non_zero_in_col _ _ _ _) as k eqn:Hk.
 symmetry in Hk.
 destruct k as [k| ]. {
   rewrite IHit.
-...
+  apply gauss_jordan_step_nrows.
+}
+apply IHit.
+Qed.
 
 Theorem gauss_jordan_nrows : ∀ M,
   mat_nrows (gauss_jordan M) = mat_nrows M.
 Proof.
 intros.
-unfold gauss_jordan.
-remember (mat_nrows M) as r eqn:Hr; symmetry in Hr.
-remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
-move c before r.
-revert M r Hr Hc.
-induction c; intros; [ easy | cbn ].
-rewrite Nat.sub_0_r.
-rewrite Hr.
-destruct r. {
-  cbn.
-Print gauss_jordan_loop.
-...
+apply gauss_jordan_loop_nrows.
+Qed.
 
 Theorem gauss_jordan_in_reduced_row_echelon_form : ∀ (M : matrix T),
   mat_ncols M ≠ 0
@@ -492,16 +487,17 @@ Proof.
 intros * Hcz.
 split. 2: {
   intros i Hi k Hk.
+  move k before i.
+  rewrite gauss_jordan_nrows in Hi, Hk.
   destruct (Nat.eq_dec k i) as [Hki| Hki]. {
     subst k; clear Hk.
     unfold gauss_jordan.
     remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
-    destruct c; [ easy | clear Hcz ].
-    cbn.
+    destruct c; [ easy | clear Hcz; cbn ].
     rewrite Nat.sub_0_r.
     remember (mat_nrows M) as r eqn:Hr; symmetry in Hr.
-    destruct r. {
-      cbn.
+    destruct r; [ easy | cbn ].
+    destruct (srng_eq_dec (mat_el M 0 0) 0) as [Hmz| Hmz]. {
 ...
 
 End in_field.
