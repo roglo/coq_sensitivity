@@ -517,6 +517,7 @@ revert M A i j k Hk Ha.
 induction it; intros M A * Hk Ha; [ easy | clear Hit ].
 cbn - [ gauss_jordan_step ] in Ha |-*.
 destruct (srng_eq_dec (mat_el A k j) 0) as [Hmz| Hmz]. {
+...
   apply IHit.
 ...
 
