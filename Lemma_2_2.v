@@ -498,6 +498,10 @@ split. 2: {
     remember (mat_nrows M) as r eqn:Hr; symmetry in Hr.
     destruct r; [ easy | cbn ].
     destruct (srng_eq_dec (mat_el M 0 0) 0) as [Hmz| Hmz]. {
+      remember (first_non_zero_in_col _ _ _ _) as k eqn:Hk.
+      symmetry in Hk.
+      destruct k as [k| ]. {
+      remember (gauss_jordan_loop _ _ _ _) as A eqn:HA.
 ...
 
 End in_field.
