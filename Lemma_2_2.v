@@ -535,20 +535,20 @@ split. 2: {
     remember (mat_ncols M) as it eqn:Hit; symmetry in Hit.
     unfold gauss_jordan.
     unfold pivot_index.
-    remember (gauss_jordan_loop _ _ _ _) as A eqn:Ha.
-    rewrite Ha at 3.
     rewrite gauss_jordan_loop_ncols.
-    rewrite Hit in Ha |-*.
+    rewrite Hit.
     destruct it; [ easy | clear Hcz ].
-    cbn.
-    cbn - [ gauss_jordan_step ] in Ha.
-    rewrite Nat.sub_0_r in Ha.
+    cbn - [ gauss_jordan_step ].
+    rewrite Nat.sub_0_r.
     remember (first_non_zero_in_col _ _ _ _) as k1 eqn:Hk1.
     symmetry in Hk1.
     destruct k1 as [k1| ]. {
+      remember (gauss_jordan_loop _ _ _ _) as A eqn:Ha.
       destruct (srng_eq_dec (mat_el A k 0) 0) as [Hmz| Hmz]. {
         destruct it; cbn. {
-          cbn in Ha.
+...
+          cbn - [ gauss_jordan_loop ] in Ha.
+          remember (multiply_row_by_scalar _ _ _ _) as A' eqn:Ha'.
 ...
 now apply glop with (M := M) (i := 0).
 ...
