@@ -488,6 +488,42 @@ destruct (srng_eq_dec (mat_el A i j) 0) as [Ha| Ha]. {
 ...
 *)
 
+(* to be moved to Misc.v *)
+Theorem List_app_fold_left : ∀ A B x l (f : B → A → B) (g : B → A),
+  (∀ y i, i ∈ l → g (f y i) = g y)
+  → g (fold_left f l x) = g x.
+Proof.
+intros A * Hg.
+revert x.
+induction l as [| y]; intros; [ easy | cbn ].
+rewrite IHl. 2: {
+  intros z i Hi.
+  now apply Hg; right.
+}
+now apply Hg; left.
+Qed.
+
+Theorem gauss_jordan_step_nrows : ∀ M i j k,
+  mat_nrows (gauss_jordan_step so M i j k) = mat_nrows M.
+Proof.
+intros.
+unfold gauss_jordan_step.
+rewrite List_app_fold_left. {
+...
+
+Theorem gauss_jordan_loop_nrows : ∀ M i j it,
+  mat_nrows (gauss_jordan_loop M i j it) = mat_nrows M.
+Proof.
+intros.
+revert M i j.
+induction it; intros; [ easy | ].
+cbn - [ gauss_jordan_step ].
+remember (first_non_zero_in_col _ _ _ _) as k eqn:Hk.
+symmetry in Hk.
+destruct k as [k| ]. {
+  rewrite IHit.
+...
+
 Theorem gauss_jordan_nrows : ∀ M,
   mat_nrows (gauss_jordan M) = mat_nrows M.
 Proof.
@@ -502,6 +538,7 @@ rewrite Nat.sub_0_r.
 rewrite Hr.
 destruct r. {
   cbn.
+Print gauss_jordan_loop.
 ...
 
 Theorem gauss_jordan_in_reduced_row_echelon_form : ∀ (M : matrix T),
