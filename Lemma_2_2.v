@@ -546,7 +546,7 @@ split. 2: {
       remember (gauss_jordan_loop _ _ _ _) as A eqn:Ha.
       destruct (srng_eq_dec (mat_el A k 0) 0) as [Hmz| Hmz]. {
         rewrite <- (Nat.add_1_l it) in Hp.
-clear Hit Hmz Hk1 Hk.
+clear Hit Hmz Hk.
 ...
         remember 1 as i; clear Heqi.
         revert i A Hp Ha.
