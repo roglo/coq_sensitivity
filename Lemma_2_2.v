@@ -520,6 +520,8 @@ Print in_reduced_row_echelon_form.
    à "mat_nrows M". Du coup, "pivot_index M i" vaut ça aussi et
    "mat_el M k (pivot_index M i)" dans in_reduced_row_echelon_form
    n'a pas de sens, ça déborde de la matrice *)
+(* et même la définition de row_echelon_form ne va pas; si on tombe
+   sur une ligne de 0, la ligne suivante n'a pas davantage de 0 ! *)
 ...
   move k before i.
   rewrite gauss_jordan_nrows in Hi, Hk.
