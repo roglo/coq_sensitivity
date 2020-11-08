@@ -506,20 +506,6 @@ intros.
 apply gauss_jordan_loop_nrows.
 Qed.
 
-Theorem glop : ∀ M A i j k it,
-  it ≠ 0
-  → k < mat_nrows M
-  → A = gauss_jordan_loop M i j it
-  → mat_el A k (pivot_index_loop A k j it) = 1%F.
-Proof.
-intros M A * Hit Hk Ha.
-Print gauss_jordan_loop.
-revert M A i j k Hk Ha.
-induction it; intros M A * Hk Ha; [ easy | clear Hit ].
-cbn - [ gauss_jordan_step ] in Ha |-*.
-destruct (srng_eq_dec (mat_el A k j) 0) as [Hmz| Hmz]. {
-Abort.
-
 Theorem gauss_jordan_in_reduced_row_echelon_form : ∀ (M : matrix T),
   mat_ncols M ≠ 0
   → in_reduced_row_echelon_form (gauss_jordan M).
@@ -527,6 +513,14 @@ Proof.
 intros * Hcz.
 split. 2: {
   intros i Hi k Hk.
+Print pivot_index_loop.
+Print in_reduced_row_echelon_form.
+(* ça va pas, ça; selon ma définition de pivot_index_loop, si la
+   ligne i ne contient que des 0, ça renvoie j qui se trouve égal
+   à "mat_nrows M". Du coup, "pivot_index M i" vaut ça aussi et
+   "mat_el M k (pivot_index M i)" dans in_reduced_row_echelon_form
+   n'a pas de sens, ça déborde de la matrice *)
+...
   move k before i.
   rewrite gauss_jordan_nrows in Hi, Hk.
   destruct (Nat.eq_dec k i) as [Hki| Hki]. {
@@ -546,11 +540,7 @@ split. 2: {
       remember (gauss_jordan_loop _ _ _ _) as A eqn:Ha.
       destruct (srng_eq_dec (mat_el A k 0) 0) as [Hmz| Hmz]. {
         destruct it; cbn. {
-...
-          cbn - [ gauss_jordan_loop ] in Ha.
-          remember (multiply_row_by_scalar _ _ _ _) as A' eqn:Ha'.
-...
-now apply glop with (M := M) (i := 0).
+          cbn - [ gauss_jordan_step ] in Ha.
 ...
     subst k; clear Hk.
     unfold gauss_jordan.
