@@ -537,10 +537,32 @@ split. 2: {
     destruct k1 as [k1| ]. {
       remember (gauss_jordan_loop _ _ _ _) as A eqn:Ha.
       destruct (srng_eq_dec (mat_el A k 0) 0) as [Hmz| Hmz]. {
-        admit. (* should be resolved by "glop" below *)
-      }
-      cbn in Ha.
-      rewrite Ha.
+        destruct it; [ cbn in Hp; flia Hp | ].
+        cbn in Hp |-*.
+        destruct (srng_eq_dec (mat_el A k 1) 0) as [Hm1z| Hm1z]. {
+          destruct it; [ cbn in Hp; flia Hp | ].
+          cbn in Hp |-*.
+          destruct (srng_eq_dec (mat_el A k 2) 0) as [Hm2z| Hm2z]. {
+            destruct it; [ cbn in Hp; flia Hp | ].
+            cbn in Hp |-*.
+            destruct (srng_eq_dec (mat_el A k 3) 0) as [Hm3z| Hm3z]. {
+              admit. (* should be resolved by "glop" below *)
+            }
+            rewrite Ha.
+            remember (S (S it)) as sit eqn:Hsit.
+            cbn - [ gauss_jordan_step ].
+            rewrite gauss_jordan_step_nrows.
+            remember (gauss_jordan_step so M 0 0 k1) as A' eqn:Ha'.
+            remember (first_non_zero_in_col A' _ 1 1) as k2 eqn:Hk2.
+            symmetry in Hk2.
+            move k2 before k1.
+            move Hk2 before Hk1.
+            move A before M; move A' before A.
+            destruct k2 as [k2| ]. {
+              remember (gauss_jordan_step so A' _ _ _) as A2 eqn:Ha2.
+              remember (gauss_jordan_loop A2 _ _ _) as A'2 eqn:Ha'2.
+              move A2 before A'; move A'2 before A2.
+              move Ha2 before Ha; move Ha'2 before Ha2.
 ...
 Theorem glop : ∀ A k j it,
   pivot_index_loop A k j it < it + j
@@ -553,6 +575,11 @@ cbn in Hp |-*.
 destruct (srng_eq_dec (mat_el A k j) 0) as [Hmjz| Hmjz]. {
   apply IHit; flia Hp.
 }
+...
+  Hmjz : mat_el A k j ≠ 0%F
+  Hp : j < S (it + j)
+  ============================
+  mat_el A k j = 1%F
 ...
     subst k; clear Hk.
     unfold gauss_jordan.
