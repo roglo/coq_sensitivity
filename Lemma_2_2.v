@@ -545,7 +545,18 @@ split. 2: {
     destruct k1 as [k1| ]. {
       remember (gauss_jordan_loop _ _ _ _) as A eqn:Ha.
       destruct (srng_eq_dec (mat_el A k 0) 0) as [Hmz| Hmz]. {
-        destruct it; [ cbn in Hp; flia Hp | ].
+        rewrite <- (Nat.add_1_l it) in Hp.
+clear Hit Hmz Hk1 Hk.
+...
+        remember 1 as i; clear Heqi.
+        revert i A Hp Ha.
+        induction it; intros; [ cbn in Hp; flia Hp | ].
+        cbn in Hp |-*.
+        destruct (srng_eq_dec (mat_el A0 k i) 0) as [Hmiz| Hmiz]. {
+          apply IHit; [ flia Hp | ].
+...
+          apply IHit; flia Hp.
+        }
 ...
     subst k; clear Hk.
     unfold gauss_jordan.
