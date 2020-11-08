@@ -537,19 +537,22 @@ split. 2: {
     destruct k1 as [k1| ]. {
       remember (gauss_jordan_loop _ _ _ _) as A eqn:Ha.
       destruct (srng_eq_dec (mat_el A k 0) 0) as [Hmz| Hmz]. {
-        rewrite <- (Nat.add_1_l it) in Hp.
-        destruct it; [ cbn in Hp; flia Hp | ].
-        cbn in Hp |-*.
-        destruct (srng_eq_dec (mat_el A k 1) 0) as [Hm1z| Hm1z]. {
-          destruct it; [ cbn in Hp; flia Hp | ].
-          cbn in Hp |-*.
-          destruct (srng_eq_dec (mat_el A k 2) 0) as [Hm2z| Hm2z]. {
-            destruct it; [ cbn in Hp; flia Hp | ].
-            cbn in Hp |-*.
-            destruct (srng_eq_dec (mat_el A k 3) 0) as [Hm3z| Hm3z]. {
+        admit. (* should be resolved by "glop" below *)
+      }
+      cbn in Ha.
+      rewrite Ha.
 ...
-            destruct it; [ cbn in Hp; flia Hp | ].
-            cbn in Hp |-*.
+Theorem glop : ∀ A k j it,
+  pivot_index_loop A k j it < it + j
+  → mat_el A k (pivot_index_loop A k j it) = 1%Srng.
+Proof.
+intros A * Hp.
+revert A k j Hp.
+induction it; intros A k j Hp; [ cbn in Hp; flia Hp | ].
+cbn in Hp |-*.
+destruct (srng_eq_dec (mat_el A k j) 0) as [Hmjz| Hmjz]. {
+  apply IHit; flia Hp.
+}
 ...
     subst k; clear Hk.
     unfold gauss_jordan.
