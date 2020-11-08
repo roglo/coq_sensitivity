@@ -416,7 +416,8 @@ Definition pivot_index (M : matrix T) i :=
 (* a matrix is in row echelon form if the pivot shifts at each row *)
 
 Definition in_row_echelon_form (M : matrix T) :=
-  ∀ i, i < mat_nrows M - 1 → pivot_index M i < pivot_index M (i + 1).
+  ∀ i, i < mat_nrows M - 1 → pivot_index M (i + 1) < mat_ncols M →
+  pivot_index M i < pivot_index M (i + 1).
 
 (* reduced row echelon form *)
 (* a matrix is in reduced row echelon form if
@@ -427,7 +428,8 @@ Definition in_row_echelon_form (M : matrix T) :=
 Definition in_reduced_row_echelon_form (M : matrix T) :=
   in_row_echelon_form M ∧
   (∀ i, i < mat_nrows M → ∀ k, k < mat_nrows M →
-   mat_el M k (pivot_index M i) = if Nat.eq_dec k i then 1%Srng else 0%Srng).
+   pivot_index M i < mat_ncols M
+   → mat_el M k (pivot_index M i) = if Nat.eq_dec k i then 1%Srng else 0%Srng).
 
 (* proof that Gauss-Jordan algorithm returns a matrix in row
    echelon form *)
@@ -506,43 +508,44 @@ intros.
 apply gauss_jordan_loop_nrows.
 Qed.
 
+Theorem gauss_jordan_ncols : ∀ M,
+  mat_ncols (gauss_jordan M) = mat_ncols M.
+Proof.
+intros.
+apply gauss_jordan_loop_ncols.
+Qed.
+
 Theorem gauss_jordan_in_reduced_row_echelon_form : ∀ (M : matrix T),
   mat_ncols M ≠ 0
   → in_reduced_row_echelon_form (gauss_jordan M).
 Proof.
 intros * Hcz.
+(*
+split. {
+  unfold in_row_echelon_form.
+  intros i Hi Hp.
+  rewrite gauss_jordan_nrows in Hp.
+*)
 split. 2: {
-  intros i Hi k Hk.
-Print pivot_index_loop.
-Print in_reduced_row_echelon_form.
-(* ça va pas, ça; selon ma définition de pivot_index_loop, si la
-   ligne i ne contient que des 0, ça renvoie j qui se trouve égal
-   à "mat_nrows M". Du coup, "pivot_index M i" vaut ça aussi et
-   "mat_el M k (pivot_index M i)" dans in_reduced_row_echelon_form
-   n'a pas de sens, ça déborde de la matrice *)
-(* et même la définition de row_echelon_form ne va pas; si on tombe
-   sur une ligne de 0, la ligne suivante n'a pas davantage de 0 ! *)
-...
+  intros i Hi k Hk Hp.
   move k before i.
   rewrite gauss_jordan_nrows in Hi, Hk.
+  rewrite gauss_jordan_ncols in Hp.
   destruct (Nat.eq_dec k i) as [Hki| Hki]. {
-(**)
     subst i; clear Hi.
+    unfold gauss_jordan in Hp |-*.
+    unfold pivot_index in Hp |-*.
+    rewrite gauss_jordan_loop_ncols in Hp |-*.
     remember (mat_ncols M) as it eqn:Hit; symmetry in Hit.
-    unfold gauss_jordan.
-    unfold pivot_index.
-    rewrite gauss_jordan_loop_ncols.
-    rewrite Hit.
     destruct it; [ easy | clear Hcz ].
-    cbn - [ gauss_jordan_step ].
-    rewrite Nat.sub_0_r.
+    cbn - [ gauss_jordan_step ] in Hp |-*.
+    rewrite Nat.sub_0_r in Hp |-*.
     remember (first_non_zero_in_col _ _ _ _) as k1 eqn:Hk1.
     symmetry in Hk1.
     destruct k1 as [k1| ]. {
       remember (gauss_jordan_loop _ _ _ _) as A eqn:Ha.
       destruct (srng_eq_dec (mat_el A k 0) 0) as [Hmz| Hmz]. {
-        destruct it; cbn. {
-          cbn - [ gauss_jordan_step ] in Ha.
+        destruct it; [ cbn in Hp; flia Hp | ].
 ...
     subst k; clear Hk.
     unfold gauss_jordan.
