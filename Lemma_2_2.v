@@ -563,23 +563,41 @@ split. 2: {
               remember (gauss_jordan_loop A2 _ _ _) as A'2 eqn:Ha'2.
               move A2 before A'; move A'2 before A2.
               move Ha2 before Ha; move Ha'2 before Ha2.
+clear Hp.
+rewrite Hsit in Ha'2.
+(*
 ...
-Theorem glop : ∀ A k j it,
-  pivot_index_loop A k j it < it + j
-  → mat_el A k (pivot_index_loop A k j it) = 1%Srng.
-Proof.
-intros A * Hp.
-revert A k j Hp.
-induction it; intros A k j Hp; [ cbn in Hp; flia Hp | ].
-cbn in Hp |-*.
-destruct (srng_eq_dec (mat_el A k j) 0) as [Hmjz| Hmjz]. {
-  apply IHit; flia Hp.
-}
-...
-  Hmjz : mat_el A k j ≠ 0%F
-  Hp : j < S (it + j)
+  Ha'2 : A'2 = gauss_jordan_loop A2 2 2 (S (S it))
   ============================
-  mat_el A k j = 1%F
+  mat_el A'2 k 3 = 1%F
+...
+*)
+Theorem glop : ∀ A A' k j it i,
+   A = gauss_jordan_loop A' i i (it + j)
+  → pivot_index_loop A k (S j) it < it + S j
+  → mat_el A k (pivot_index_loop A k (S j) it) = 1%Srng.
+Proof.
+intros A * Ha Hp.
+revert A A' k j i Ha Hp.
+induction it; intros A A' k j i Ha Hp; [ cbn in Hp; flia Hp | ].
+cbn in Hp |-*.
+destruct (srng_eq_dec (mat_el A k (S j)) 0) as [Hmjz| Hmjz]. {
+  apply IHit with (A' := A') (i := i); [ | flia Hp ].
+  now replace (it + (j + 1)) with (S it + j) by flia.
+}
+clear Hp.
+cbn - [ gauss_jordan_step ] in Ha.
+rewrite Ha.
+remember (first_non_zero_in_col A' (mat_nrows A' - i) i i) as k1 eqn:Hk1.
+symmetry in Hk1.
+destruct k1 as [k1| ]. {
+  remember (gauss_jordan_step so A' i i k1) as A'' eqn:Ha''.
+  specialize (IHit A A'' 42 j (i + 1) Ha) as H1.
+(* ouais, c'pas clair... *)
+...
+  Hmjz : mat_el A k (S j) ≠ 0%F
+  ============================
+  mat_el A k (S j) = 1%F
 ...
     subst k; clear Hk.
     unfold gauss_jordan.
