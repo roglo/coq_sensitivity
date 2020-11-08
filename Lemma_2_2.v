@@ -412,6 +412,13 @@ Fixpoint pivot_index_loop (M : matrix T) i j it :=
 Definition pivot_index (M : matrix T) i :=
   pivot_index_loop M i 0 (mat_ncols M).
 
+Definition pivot (M : matrix T) i :=
+  mat_el M i (pivot_index M i).
+
+Theorem fold_pivot : ∀ M i,
+  mat_el M i (pivot_index M i) = pivot M i.
+Proof. easy. Qed.
+
 (* row echelon form *)
 (* a matrix is in row echelon form if the pivot shifts at each row *)
 
@@ -533,6 +540,9 @@ split. 2: {
   rewrite gauss_jordan_ncols in Hp.
   destruct (Nat.eq_dec k i) as [Hki| Hki]. {
     subst i; clear Hi.
+(**)
+remember (gauss_jordan M) as A eqn:Ha.
+...
     unfold gauss_jordan in Hp |-*.
     unfold pivot_index in Hp |-*.
     rewrite gauss_jordan_loop_ncols in Hp |-*.
@@ -546,6 +556,7 @@ split. 2: {
       remember (gauss_jordan_loop _ _ _ _) as A eqn:Ha.
       destruct (srng_eq_dec (mat_el A k 0) 0) as [Hmz| Hmz]. {
         rewrite <- (Nat.add_1_l it) in Hp.
+...
 clear Hit Hmz Hk.
 ...
         remember 1 as i; clear Heqi.
