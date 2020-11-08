@@ -1742,6 +1742,20 @@ apply Hfg.
 now left.
 Qed.
 
+Theorem List_app_fold_left : ∀ A B x l (f : B → A → B) (g : B → A),
+  (∀ y i, i ∈ l → g (f y i) = g y)
+  → g (fold_left f l x) = g x.
+Proof.
+intros A * Hg.
+revert x.
+induction l as [| y]; intros; [ easy | cbn ].
+rewrite IHl. 2: {
+  intros z i Hi.
+  now apply Hg; right.
+}
+now apply Hg; left.
+Qed.
+
 Theorem List_firstn_map {A B} : ∀ n l (f : A → B),
   firstn n (map f l) = map f (firstn n l).
 Proof.

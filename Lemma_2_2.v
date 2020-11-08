@@ -441,21 +441,6 @@ Definition in_reduced_row_echelon_form (M : matrix T) :=
 (* proof that Gauss-Jordan algorithm returns a matrix in row
    echelon form *)
 
-(* to be moved to Misc.v *)
-Theorem List_app_fold_left : ∀ A B x l (f : B → A → B) (g : B → A),
-  (∀ y i, i ∈ l → g (f y i) = g y)
-  → g (fold_left f l x) = g x.
-Proof.
-intros A * Hg.
-revert x.
-induction l as [| y]; intros; [ easy | cbn ].
-rewrite IHl. 2: {
-  intros z i Hi.
-  now apply Hg; right.
-}
-now apply Hg; left.
-Qed.
-
 Theorem gauss_jordan_step_nrows : ∀ M i j k,
   mat_nrows (gauss_jordan_step so M i j k) = mat_nrows M.
 Proof.
@@ -540,9 +525,6 @@ split. 2: {
   rewrite gauss_jordan_ncols in Hp.
   destruct (Nat.eq_dec k i) as [Hki| Hki]. {
     subst i; clear Hi.
-(**)
-remember (gauss_jordan M) as A eqn:Ha.
-...
     unfold gauss_jordan in Hp |-*.
     unfold pivot_index in Hp |-*.
     rewrite gauss_jordan_loop_ncols in Hp |-*.
@@ -556,18 +538,18 @@ remember (gauss_jordan M) as A eqn:Ha.
       remember (gauss_jordan_loop _ _ _ _) as A eqn:Ha.
       destruct (srng_eq_dec (mat_el A k 0) 0) as [Hmz| Hmz]. {
         rewrite <- (Nat.add_1_l it) in Hp.
-...
-clear Hit Hmz Hk.
-...
-        remember 1 as i; clear Heqi.
-        revert i A Hp Ha.
-        induction it; intros; [ cbn in Hp; flia Hp | ].
+        destruct it; [ cbn in Hp; flia Hp | ].
         cbn in Hp |-*.
-        destruct (srng_eq_dec (mat_el A0 k i) 0) as [Hmiz| Hmiz]. {
-          apply IHit; [ flia Hp | ].
+        destruct (srng_eq_dec (mat_el A k 1) 0) as [Hm1z| Hm1z]. {
+          destruct it; [ cbn in Hp; flia Hp | ].
+          cbn in Hp |-*.
+          destruct (srng_eq_dec (mat_el A k 2) 0) as [Hm2z| Hm2z]. {
+            destruct it; [ cbn in Hp; flia Hp | ].
+            cbn in Hp |-*.
+            destruct (srng_eq_dec (mat_el A k 3) 0) as [Hm3z| Hm3z]. {
 ...
-          apply IHit; flia Hp.
-        }
+            destruct it; [ cbn in Hp; flia Hp | ].
+            cbn in Hp |-*.
 ...
     subst k; clear Hk.
     unfold gauss_jordan.
