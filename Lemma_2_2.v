@@ -570,6 +570,8 @@ assert (H : mat_el A' 0 0 = 1%Srng). {
   apply fld_mul_inv_l.
   apply (first_non_zero_non_zero _ _ _ _ Hk1).
 }
+rewrite Ha' in H.
+cbn in H.
 ...
 (*end trying to prove it for the upper left number of the matrix*)
     unfold gauss_jordan in Hp |-*.
