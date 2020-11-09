@@ -1,6 +1,8 @@
 (* fields *)
 
+(*
 Set Implicit Arguments.
+*)
 
 Require Import Utf8.
 Require Import Semiring.
@@ -22,3 +24,6 @@ Notation "a + b" := (srng_add a b) : field_scope.
 Notation "a - b" := (rng_sub a b) : field_scope.
 Notation "a * b" := (srng_mul a b) : field_scope.
 Notation "a / b" := (fld_div a b) : field_scope.
+
+Class field_prop A {so : semiring_op A} {fo : field_op A} :=
+  { fld_mul_inv_l : ∀ a : A, a ≠ 0%F → (/ a * a = 1)%F }.

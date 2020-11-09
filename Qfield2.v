@@ -1,7 +1,6 @@
 (* field of rationals *)
 
 Set Implicit Arguments.
-
 Require Import Utf8.
 
 Require Import Semiring Field2 Rational.
@@ -38,3 +37,8 @@ Definition Q_sring_dec_prop : sring_dec_prop Q :=
 
 Definition Q_field_op : field_op Q :=
   {| fld_inv := Q.inv |}.
+
+Canonical Structure Q_field_op.
+
+Definition Q_field_prop : field_prop Q :=
+  {| fld_mul_inv_l := Q.mul_inv_l |}.

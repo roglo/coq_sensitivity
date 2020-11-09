@@ -125,7 +125,7 @@ Notation "a + b" := (@srng_add _ _ a b) : ring_scope.
 Notation "a - b" := (@rng_sub _ _ _ a b) : ring_scope.
 Notation "a * b" := (@srng_mul _ _ a b) : ring_scope.
 
-Class ring_prop A {so : ring_op A} {ro : semiring_op A} :=
+Class ring_prop A {so : semiring_op A} {ro : ring_op A} :=
   { rng_add_opp_l : ∀ a : A, (- a + a = 0)%Rng }.
 
 Section ring_theorems.
