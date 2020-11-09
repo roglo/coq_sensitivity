@@ -276,6 +276,27 @@ Fixpoint first_non_zero_in_col (M : matrix T) it i j :=
       else Some i
   end.
 
+Theorem first_non_zero_non_zero : ∀ M it i j k,
+  first_non_zero_in_col M it i j = Some k
+  → (∀ h, i ≤ h < k → mat_el M h j = 0%Srng) ∧
+    mat_el M k j ≠ 0%Srng.
+Proof.
+intros * Hk.
+revert i j k Hk.
+induction it; intros; [ easy | cbn ].
+cbn in Hk.
+destruct (srng_eq_dec (mat_el M i j) 0) as [Hmz| Hmz]. {
+  split. {
+    intros h Hh.
+    destruct (Nat.eq_dec i h) as [Hih| Hih]; [ now subst h | ].
+    eapply IHit; [ apply Hk | flia Hh Hih ].
+  }
+  now specialize (IHit _ _ _ Hk).
+}
+injection Hk; intros; subst k.
+split; [ flia | easy ].
+Qed.
+
 (* Swap the positions of two rows *)
 Definition swap_rows (A : matrix T) i' i'' :=
   mk_mat (λ i j,
@@ -547,8 +568,8 @@ remember (multiply_row_by_scalar _ _ _ _) as A' eqn:Ha'.
 assert (H : mat_el A' 0 0 = 1%Srng). {
   rewrite Ha'; cbn.
   apply fld_mul_inv_l.
-Search first_non_zero_in_col.
-(* theorem to write to say that if Hk1, mal_el M k1 0 ≠ 0%F *)
+  apply (first_non_zero_non_zero _ _ _ _ Hk1).
+}
 ...
 (*end trying to prove it for the upper left number of the matrix*)
     unfold gauss_jordan in Hp |-*.
