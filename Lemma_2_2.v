@@ -351,6 +351,7 @@ Context {sp : semiring_prop T}.
 Context {rp : ring_prop T}.
 Context {sdp : sring_dec_prop T}.
 Context {fo : field_op T}.
+Context {fp : field_prop T}.
 
 (* resolving a system of n equations with n variables even
    in the case when the determinant is 0 *)
@@ -545,14 +546,9 @@ cbn in Ha.
 remember (multiply_row_by_scalar _ _ _ _) as A' eqn:Ha'.
 assert (H : mat_el A' 0 0 = 1%Srng). {
   rewrite Ha'; cbn.
-Require Import Rational.
-Import Q.Notations.
-Search (_ / _ = 1)%Q.
-Search (/ _ * _ = 1)%Q.
-...
-Search (_ / _)%F.
-Search (_ * / _)%F.
-Search (/ _ * _)%F.
+  apply fld_mul_inv_l.
+Search first_non_zero_in_col.
+(* theorem to write to say that if Hk1, mal_el M k1 0 ≠ 0%F *)
 ...
 (*end trying to prove it for the upper left number of the matrix*)
     unfold gauss_jordan in Hp |-*.
