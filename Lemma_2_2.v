@@ -576,6 +576,45 @@ destruct k. {
          parce que gauss_jordan_loop ne modifie pas
          mat_el A' 0 0 *)
       rewrite Ha in Hmz.
+      specialize (List_app_fold_left) as H5.
+      specialize (H5 nat (matrix T) T A').
+      specialize (H5 (seq 0 (mat_nrows M))).
+      remember (λ (B : matrix T) (i' : nat),
+               if Nat.eq_dec i' 0
+               then B
+               else
+                add_one_row_scalar_multiple_another so B i'
+                  (- mat_el B i' 0)%F 0) as f eqn:Hf.
+      specialize (H5 f).
+      specialize (H5 (λ A', mat_el (gauss_jordan_loop A' 1 1 it) 0 0)).
+      cbn in H5.
+      rewrite H5 in Hmz; [ clear H5 | ]. 2: {
+        intros A''' i Hi.
+(* fuck, ça doit pas être ça... *)
+...
+      specialize (H5 (@mat_el _)).
+      move Ha at bottom.
+      remember (fold_left f (seq 0 (mat_nrows M)) A') as A''' eqn:Ha'''.
+Check List_app_fold_left.
+...
+      specialize (H5 (λ A,
+(* oh et pis ça fait chier, tiens *)
+...
+Definition gjl i j it A := gauss_jordan_loop A i j it.
+Theorem fold_gil i j it A : gauss_jordan_loop A i j it = gjl i j it A.
+Proof. easy. Qed.
+rewrite fold_gil in Ha.
+Check (gjl 1 1 it).
+...
+Check List_app_fold_left.
+...
+Search (fold_left _ (seq _ _)).
+      specialize (H5 (matrix T) nat).
+Print gauss_jordan_loop.
+      specialize (H5 nat (matrix T) A').
+      specialize (H5 (seq 0 (mat_nrows M))).
+      specialize (H5 (gjl 1 1 it)).
+      speci
 fuck
 ...
       rewrite List_app_fold_left in Hmz. 2: {
