@@ -34,18 +34,18 @@ Add Parametric Relation : _ (@bmat_fit_for_add T)
 
 (* sequence "An" *)
 
-Fixpoint A n : bmatrix T :=
+Fixpoint mA n : bmatrix T :=
   match n with
   | 0 => BM_1 0%Srng
   | S n' =>
        BM_M
          (mat_of_list_list (BM_1 0%Srng)
-            [[A n'; I_2_pow n'];
-             [I_2_pow n'; bmat_opp (A n')]])
+            [[mA n'; I_2_pow n'];
+             [I_2_pow n'; bmat_opp (mA n')]])
   end.
 
 Theorem bmat_fit_for_add_IZ_A : ∀ u n,
-  bmat_fit_for_add (IZ_2_pow u n) (A n).
+  bmat_fit_for_add (IZ_2_pow u n) (mA n).
 Proof.
 intros.
 revert u.
@@ -61,19 +61,19 @@ destruct i. {
 destruct i; [ | flia Hi ].
 destruct j; [ apply bmat_fit_for_add_IZ_IZ | ].
 destruct j; [ cbn | flia Hj ].
-transitivity (A n); [ easy | ].
+transitivity (mA n); [ easy | ].
 apply bmat_fit_for_add_opp_r.
 Qed.
 
 Theorem sizes_of_bmatrix_A : ∀ n,
-  sizes_of_bmatrix (A n) = repeat 2 n.
+  sizes_of_bmatrix (mA n) = repeat 2 n.
 Proof.
 intros.
 induction n; [ easy | now cbn; f_equal ].
 Qed.
 
 Theorem A_is_square_bmat : ∀ n,
-  is_square_bmat (A n).
+  is_square_bmat (mA n).
 Proof.
 intros.
 induction n; [ easy | cbn ].
@@ -99,7 +99,7 @@ apply IHn.
 Qed.
 
 Theorem bmat_zero_like_A_eq_Z :
-  ∀ n, bmat_zero_like (A n) = Z_2_pow n.
+  ∀ n, bmat_zero_like (mA n) = Z_2_pow n.
 Proof.
 intros.
 induction n; [ easy | cbn ].
@@ -120,7 +120,7 @@ rewrite bmat_zero_like_opp; [ easy | ].
 apply A_is_square_bmat.
 Qed.
 
-Theorem Tr_A : ∀ n, Tr (A n) = 0%Srng.
+Theorem Tr_A : ∀ n, Tr (mA n) = 0%Srng.
 Proof.
 intros.
 induction n; [ easy | cbn ].
@@ -134,7 +134,7 @@ Qed.
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
-  (A n * A n = bmat_nat_mul_l n (I_2_pow n))%BM.
+  (mA n * mA n = bmat_nat_mul_l n (I_2_pow n))%BM.
 Proof.
 intros.
 induction n; intros; [ now cbn; rewrite srng_mul_0_l | ].
@@ -159,7 +159,7 @@ destruct i. {
   }
   rewrite bmat_mul_1_l; [ | easy | ]. 2: {
     unfold I_2_pow.
-    transitivity (A n); [ apply bmat_fit_for_add_IZ_A | ].
+    transitivity (mA n); [ apply bmat_fit_for_add_IZ_A | ].
     apply bmat_fit_for_add_opp_r.
   }
   rewrite bmat_add_0_l; [ | easy ].
@@ -177,7 +177,7 @@ destruct j; cbn. {
     apply bmat_fit_for_add_IZ_A.
   }
   rewrite bmat_mul_1_r; [ | easy | ]. 2: {
-    transitivity (A n); [ | apply bmat_fit_for_add_opp_r ].
+    transitivity (mA n); [ | apply bmat_fit_for_add_opp_r ].
     apply bmat_fit_for_add_IZ_A.
   }
   rewrite bmat_add_0_l; [ | easy ].
@@ -196,8 +196,8 @@ rewrite <- IHn.
 rewrite bmat_zero_like_A_eq_Z.
 rewrite old_bmat_add_0_l; [ | easy | apply bmat_fit_for_add_IZ_IZ ].
 apply bmat_add_comm; [ easy | ].
-transitivity (A n). 2: {
-  apply (is_square_bmat_fit_for_add (sizes_of_bmatrix (A n))). {
+transitivity (mA n). 2: {
+  apply (is_square_bmat_fit_for_add (sizes_of_bmatrix (mA n))). {
     apply A_is_square_bmat.
   }
   apply is_square_bmat_loop_mul; apply A_is_square_bmat.
