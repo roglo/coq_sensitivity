@@ -621,7 +621,7 @@ rewrite mul_comm.
 apply mul_1_l.
 Qed.
 
-Theorem mul_inv_l : ∀ x, x ≠ 0%Q → (x / x = 1)%Q.
+Theorem mul_inv_r : ∀ x, x ≠ 0%Q → (x / x = 1)%Q.
 Proof.
 intros * Hx.
 unfold div.
@@ -630,11 +630,11 @@ destruct x as [| gx| gx]; [ easy | | ].
 -cbn; f_equal; apply GQmul_inv_r.
 Qed.
 
-Theorem mul_inv_r : ∀ x, x ≠ 0%Q → (/ x * x = 1)%Q.
+Theorem mul_inv_l : ∀ x, x ≠ 0%Q → (/ x * x = 1)%Q.
 Proof.
 intros * Hx.
 rewrite mul_comm.
-now apply mul_inv_l.
+now apply mul_inv_r.
 Qed.
 
 Theorem mul_add_distr_l : ∀ x y z, (x * (y + z) = x * y + x * z)%Q.

@@ -525,6 +525,36 @@ split. 2: {
   rewrite gauss_jordan_ncols in Hp.
   destruct (Nat.eq_dec k i) as [Hki| Hki]. {
     subst i; clear Hi.
+(*trying to prove it for the upper left number of the matrix*)
+destruct k. {
+  unfold gauss_jordan in Hp |-*.
+  unfold pivot_index in Hp |-*.
+  rewrite gauss_jordan_loop_ncols in Hp |-*.
+  remember (mat_ncols M) as it eqn:Hit; symmetry in Hit.
+  destruct it; [ easy | clear Hcz ].
+  cbn - [ gauss_jordan_step ] in Hp |-*.
+  rewrite Nat.sub_0_r in Hp |-*.
+  remember (first_non_zero_in_col _ _ _ _) as k1 eqn:Hk1.
+  symmetry in Hk1.
+  destruct k1 as [k1| ]. {
+    remember (gauss_jordan_loop _ _ _ _) as A eqn:Ha.
+    destruct (srng_eq_dec (mat_el A 0 0) 0) as [Hmz| Hmz]. {
+(* Hmz should imply that the first column holds only 0s, which
+   should be a contradiction with Hk1 *)
+cbn in Ha.
+remember (multiply_row_by_scalar _ _ _ _) as A' eqn:Ha'.
+assert (H : mat_el A' 0 0 = 1%Srng). {
+  rewrite Ha'; cbn.
+Require Import Rational.
+Import Q.Notations.
+Search (_ / _ = 1)%Q.
+Search (/ _ * _ = 1)%Q.
+...
+Search (_ / _)%F.
+Search (_ * / _)%F.
+Search (/ _ * _)%F.
+...
+(*end trying to prove it for the upper left number of the matrix*)
     unfold gauss_jordan in Hp |-*.
     unfold pivot_index in Hp |-*.
     rewrite gauss_jordan_loop_ncols in Hp |-*.
