@@ -564,13 +564,17 @@ destruct k. {
       cbn in Ha.
       specialize (first_non_zero_non_zero _ _ _ _ Hk1) as (H1, H2).
       remember (multiply_row_by_scalar _ _ _ _) as A' eqn:Ha'.
-      assert (H3 : mat_el A' 0 0 = 1%Srng). {
-        rewrite Ha'; cbn.
+      remember (swap_rows M 0 k1) as A'' eqn:Ha''.
+      assert (H3 : mat_el A'' 0 0 ≠ 0%Srng) by now rewrite Ha''.
+      assert (H4 : mat_el A' 0 0 = 1%Srng). {
+        rewrite Ha', Ha''; cbn.
         apply fld_mul_inv_l.
         apply (first_non_zero_non_zero _ _ _ _ Hk1).
       }
-      rewrite Ha' in H3.
-      cbn in H3.
+      move Hmz at bottom.
+      (* normalement, contradiction entre H4 et Hmz
+         parce que gauss_jordan_loop ne modifie pas
+         mat_el A' 0 0 *)
 ...
 (*end trying to prove it for the upper left number of the matrix*)
     unfold gauss_jordan in Hp |-*.
