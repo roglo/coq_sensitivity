@@ -575,7 +575,6 @@ destruct k. {
       (* normalement, contradiction entre H4 et Hmz
          parce que gauss_jordan_loop ne modifie pas
          mat_el A' 0 0 *)
-...
       specialize (List_app_fold_left) as H5.
       specialize (H5 nat (matrix T) A').
       specialize (H5 (seq 0 (mat_nrows M))).
@@ -586,6 +585,7 @@ destruct k. {
                 add_one_row_scalar_multiple_another so B i'
                   (- mat_el B i' 0)%F 0) as f eqn:Hf.
       specialize (H5 f).
+...
       move Ha at bottom.
       specialize (H5 (λ A,
 (* oh et pis ça fait chier, tiens *)
