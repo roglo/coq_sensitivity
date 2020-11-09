@@ -304,12 +304,20 @@ Definition swap_rows (A : matrix T) i' i'' :=
     else if Nat.eq_dec i i'' then mat_el A i' j
     else mat_el A i j) (mat_nrows A) (mat_ncols A).
 
+Theorem swap_rows_nrows : ∀ A i' i'',
+  mat_nrows (swap_rows A i' i'') = mat_nrows A.
+Proof. easy. Qed.
+
 (* Multiply a row by a non-zero scalar *)
 Definition multiply_row_by_scalar A k s :=
   mk_mat (λ i j,
     if Nat.eq_dec i k then (s * mat_el A i j)%Rng
     else mat_el A i j)
     (mat_nrows A) (mat_ncols A).
+
+Theorem multiply_row_by_scalar_nrows : ∀ A k s,
+  mat_nrows (multiply_row_by_scalar A k s) = mat_nrows A.
+Proof. easy. Qed.
 
 (* Add to one row a scalar multiple of another *)
 Definition add_one_row_scalar_multiple_another A i' s i'' :=
@@ -590,38 +598,32 @@ destruct k. {
       cbn in H5.
       rewrite H5 in Hmz; [ clear H5 | ]. 2: {
         intros A''' i Hi.
-(* fuck, ça doit pas être ça... *)
-...
-      specialize (H5 (@mat_el _)).
-      move Ha at bottom.
-      remember (fold_left f (seq 0 (mat_nrows M)) A') as A''' eqn:Ha'''.
-Check List_app_fold_left.
-...
-      specialize (H5 (λ A,
-(* oh et pis ça fait chier, tiens *)
-...
-Definition gjl i j it A := gauss_jordan_loop A i j it.
-Theorem fold_gil i j it A : gauss_jordan_loop A i j it = gjl i j it A.
-Proof. easy. Qed.
-rewrite fold_gil in Ha.
-Check (gjl 1 1 it).
-...
-Check List_app_fold_left.
-...
-Search (fold_left _ (seq _ _)).
-      specialize (H5 (matrix T) nat).
-Print gauss_jordan_loop.
-      specialize (H5 nat (matrix T) A').
-      specialize (H5 (seq 0 (mat_nrows M))).
-      specialize (H5 (gjl 1 1 it)).
-      speci
-fuck
-...
-      rewrite List_app_fold_left in Hmz. 2: {
-        intros A''' i Hi.
+        rewrite Hf.
         destruct (Nat.eq_dec i 0) as [Hiz| Hiz]; [ easy | ].
+        destruct i; [ easy | clear Hiz ].
+Theorem glop : ∀ A i j it,
+  mat_el (gauss_jordan_loop A (S i) (S j) it) 0 0 = mat_el A 0 0.
+Proof.
+intros.
+revert i j A.
+induction it; intros; [ easy | ].
+cbn - [ gauss_jordan_step ].
+remember (first_non_zero_in_col A (mat_nrows A - S i) (S i) (S j)) as k eqn:Hk.
+symmetry in Hk.
+destruct k as [k| ]; [ | apply IHit ].
+rewrite IHit.
+unfold gauss_jordan_step.
+rewrite multiply_row_by_scalar_nrows.
+rewrite swap_rows_nrows.
+rewrite List_app_fold_left with
+  (g := (λ f b c a, f a b c) (mat_el (T := T)) 0 0). 2: {
+  intros A' i' Hi'.
+  destruct (Nat.eq_dec i' (S i)) as [Hii| Hii]; [ easy | ].
+  destruct i'. {
+    cbn.
 ...
 (*end trying to prove it for the upper left number of the matrix*)
+...
     unfold gauss_jordan in Hp |-*.
     unfold pivot_index in Hp |-*.
     rewrite gauss_jordan_loop_ncols in Hp |-*.
@@ -643,7 +645,7 @@ fuck
             destruct it; [ cbn in Hp; flia Hp | ].
             cbn in Hp |-*.
             destruct (srng_eq_dec (mat_el A k 3) 0) as [Hm3z| Hm3z]. {
-              admit. (* should be resolved by "glop" below *)
+...
             }
             rewrite Ha.
             remember (S (S it)) as sit eqn:Hsit.
