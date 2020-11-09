@@ -1742,11 +1742,11 @@ apply Hfg.
 now left.
 Qed.
 
-Theorem List_app_fold_left : ∀ A B x l (f : B → A → B) (g : B → A),
+Theorem List_app_fold_left : ∀ A B C x l (f : B → A → B) (g : B → C),
   (∀ y i, i ∈ l → g (f y i) = g y)
   → g (fold_left f l x) = g x.
 Proof.
-intros A * Hg.
+intros * Hg.
 revert x.
 induction l as [| y]; intros; [ easy | cbn ].
 rewrite IHl. 2: {
