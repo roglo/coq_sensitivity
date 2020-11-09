@@ -561,17 +561,15 @@ destruct k. {
   destruct k1 as [k1| ]. {
     remember (gauss_jordan_loop _ _ _ _) as A eqn:Ha.
     destruct (srng_eq_dec (mat_el A 0 0) 0) as [Hmz| Hmz]. {
-(* Hmz should imply that the first column holds only 0s, which
-   should be a contradiction with Hk1 *)
-cbn in Ha.
-remember (multiply_row_by_scalar _ _ _ _) as A' eqn:Ha'.
-assert (H : mat_el A' 0 0 = 1%Srng). {
-  rewrite Ha'; cbn.
-  apply fld_mul_inv_l.
-  apply (first_non_zero_non_zero _ _ _ _ Hk1).
-}
-rewrite Ha' in H.
-cbn in H.
+      cbn in Ha.
+      remember (multiply_row_by_scalar _ _ _ _) as A' eqn:Ha'.
+      assert (H : mat_el A' 0 0 = 1%Srng). {
+        rewrite Ha'; cbn.
+        apply fld_mul_inv_l.
+        apply (first_non_zero_non_zero _ _ _ _ Hk1).
+      }
+      rewrite Ha' in H.
+      cbn in H.
 ...
 (*end trying to prove it for the upper left number of the matrix*)
     unfold gauss_jordan in Hp |-*.
