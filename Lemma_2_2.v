@@ -615,6 +615,7 @@ rewrite IHit.
 unfold gauss_jordan_step.
 rewrite multiply_row_by_scalar_nrows.
 rewrite swap_rows_nrows.
+...
 rewrite List_app_fold_left with
   (g := (λ f b c a, f a b c) (mat_el (T := T)) 0 0). 2: {
   intros A' i' Hi'.
