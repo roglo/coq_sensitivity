@@ -612,7 +612,7 @@ destruct k. {
 (**)
       assert (H3 : mat_el A'' 0 0 ≠ 0%Srng). {
         rewrite Ha''.
-        cbn - [ iter_seq ].
+        cbn - [ iter_seq Nat.eq_dec ].
 ...
       assert (H3 : mat_el A'' 0 0 ≠ 0%Srng) by now rewrite Ha''.
       assert (H4 : mat_el A' 0 0 = 1%Srng). {
