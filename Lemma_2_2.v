@@ -601,7 +601,6 @@ destruct k. {
         rewrite Hf.
         destruct (Nat.eq_dec i 0) as [Hiz| Hiz]; [ easy | ].
         destruct i; [ easy | clear Hiz ].
-...
 Theorem glop : ∀ A i j it,
   mat_el (gauss_jordan_loop A (S i) (S j) it) 0 0 = mat_el A 0 0.
 Proof.
@@ -616,12 +615,25 @@ rewrite IHit.
 unfold gauss_jordan_step.
 rewrite multiply_row_by_scalar_nrows.
 rewrite swap_rows_nrows.
+remember (swap_rows _ _ _) as A' eqn:Ha'.
+remember (multiply_row_by_scalar _ _ _ _) as A'' eqn:Ha''.
+move A'' before A'.
+remember (mat_nrows A) as r eqn:Hr; symmetry in Hr.
+destruct r; [ easy | ].
+rewrite <- (Nat.add_1_l r).
+rewrite seq_app.
+rewrite fold_left_app; cbn.
+remember (add_one_row_scalar_multiple_another _ _ _ _ _) as A''' eqn:Ha'''.
+move A''' before A''.
+...
 rewrite List_app_fold_left with
   (g := (λ f b c a, f a b c) (mat_el (T := T)) 0 0). 2: {
-  intros A' i' Hi'.
+  intros A'''' i' Hi'.
   destruct (Nat.eq_dec i' (S i)) as [Hii| Hii]; [ easy | ].
   destruct i'. {
     cbn.
+    rewrite <- srng_add_0_r.
+    f_equal.
 ...
 (*end trying to prove it for the upper left number of the matrix*)
 ...
