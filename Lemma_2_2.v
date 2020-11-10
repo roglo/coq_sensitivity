@@ -537,43 +537,6 @@ intros.
 apply gauss_jordan_loop_ncols.
 Qed.
 
-(* inspired from http://math.uga.edu/~pete/yuster-rref-unique.pdf
-   they make an induction of ncols; perhaps if I try that? *)
-Theorem gauss_jordan_in_reduced_row_echelon_form : ∀ (M : matrix T),
-  mat_ncols M ≠ 0
-  → in_reduced_row_echelon_form (gauss_jordan M).
-Proof.
-intros * Hcz.
-remember (mat_ncols M) as c eqn:Hc.
-symmetry in Hc.
-revert M Hc.
-induction c; intros; [ easy | clear Hcz ].
-destruct c. {
-  clear IHc.
-  split. {
-    unfold in_row_echelon_form.
-    intros i Hi Hp.
-    rewrite gauss_jordan_ncols, Hc in Hp.
-    rewrite gauss_jordan_nrows in Hi.
-    apply Nat.lt_1_r in Hp; rewrite Hp.
-    exfalso.
-    unfold gauss_jordan in Hp.
-    rewrite Hc in Hp; cbn - [ gauss_jordan_step ] in Hp.
-    rewrite Nat.sub_0_r in Hp.
-    unfold pivot_index in Hp.
-    remember (first_non_zero_in_col _ _ _ _) as k eqn:Hk.
-    symmetry in Hk.
-    destruct k as [k| ]. {
-      rewrite gauss_jordan_step_ncols in Hp.
-      rewrite Hc in Hp.
-      cbn - [ gauss_jordan_step ] in Hp.
-      destruct
-        (srng_eq_dec (mat_el (gauss_jordan_step so M 0 0 k) (i + 1) 0) 0)
-        as [Hmz| Hmz]; [ easy | clear Hp ].
-      specialize (first_non_zero_non_zero _ _ _ _ Hk) as (H1, H2).
-      apply Hmz; clear Hmz.
-...
-
 Theorem gauss_jordan_in_reduced_row_echelon_form : ∀ (M : matrix T),
   mat_ncols M ≠ 0
   → in_reduced_row_echelon_form (gauss_jordan M).
