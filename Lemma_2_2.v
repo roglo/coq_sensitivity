@@ -601,6 +601,7 @@ destruct k. {
         rewrite Hf.
         destruct (Nat.eq_dec i 0) as [Hiz| Hiz]; [ easy | ].
         destruct i; [ easy | clear Hiz ].
+...
 Theorem glop : ∀ A i j it,
   mat_el (gauss_jordan_loop A (S i) (S j) it) 0 0 = mat_el A 0 0.
 Proof.
@@ -615,7 +616,6 @@ rewrite IHit.
 unfold gauss_jordan_step.
 rewrite multiply_row_by_scalar_nrows.
 rewrite swap_rows_nrows.
-...
 rewrite List_app_fold_left with
   (g := (λ f b c a, f a b c) (mat_el (T := T)) 0 0). 2: {
   intros A' i' Hi'.
