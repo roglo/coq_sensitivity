@@ -555,7 +555,8 @@ split. 2: {
   rewrite gauss_jordan_ncols in Hp.
   destruct (Nat.eq_dec k i) as [Hki| Hki]. {
     subst i; clear Hi.
-(*trying to prove it for the upper left number of the matrix*)
+...
+(*trying to prove it just for the upper left number of the matrix*)
 destruct k. {
   unfold gauss_jordan in Hp |-*.
   unfold pivot_index in Hp |-*.
