@@ -542,12 +542,12 @@ Theorem gauss_jordan_in_reduced_row_echelon_form : ∀ (M : matrix T),
   → in_reduced_row_echelon_form (gauss_jordan M).
 Proof.
 intros * Hcz.
-(*
+(**)
 split. {
   unfold in_row_echelon_form.
   intros i Hi Hp.
-  rewrite gauss_jordan_nrows in Hp.
-*)
+...
+(*
 split. 2: {
   intros i Hi k Hk Hp.
   move k before i.
@@ -556,6 +556,7 @@ split. 2: {
   destruct (Nat.eq_dec k i) as [Hki| Hki]. {
     subst i; clear Hi.
 ...
+*)
 (*trying to prove it just for the upper left number of the matrix*)
 destruct k. {
   unfold gauss_jordan in Hp |-*.
