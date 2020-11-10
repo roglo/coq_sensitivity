@@ -546,6 +546,12 @@ intros * Hcz.
 split. {
   unfold in_row_echelon_form.
   intros i Hi Hp.
+...
+  Hcz : mat_ncols M ≠ 0
+  Hi : i < mat_nrows (gauss_jordan M) - 1
+  Hp : pivot_index (gauss_jordan M) (i + 1) < mat_ncols (gauss_jordan M)
+  ============================
+  pivot_index (gauss_jordan M) i < pivot_index (gauss_jordan M) (i + 1)
 *)
 split. 2: {
   intros i Hi k Hk Hp.
