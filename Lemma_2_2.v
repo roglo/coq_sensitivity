@@ -9,6 +9,7 @@ Import List List.ListNotations.
 
 Require Import Misc Matrix BlockMat.
 Require Import Semiring Field2.
+Require Import SRsummation.
 Import matrix_Notations.
 Import bmatrix_Notations.
 
@@ -297,12 +298,38 @@ injection Hk; intros; subst k.
 split; [ flia | easy ].
 Qed.
 
+(* swap matrix; identity matrix where rows i' and i'' are exchanged; *)
+Definition swap_mat sz i' i'' :=
+  mk_mat
+    (λ i j,
+     if Nat.eq_dec i j then
+       if Nat.eq_dec i i' ∨∨ Nat.eq_dec i i'' then 0%Srng
+       else 1%Srng
+     else if Nat.eq_dec i i' ∧∧ Nat.eq_dec j i'' then 1%Srng
+     else if Nat.eq_dec i i'' ∧∧ Nat.eq_dec j i' then 1%Srng
+     else 0%Srng)
+    sz sz.
+
 (* Swap the positions of two rows *)
+Definition swap_rows (A : matrix T) i' i'' :=
+  mat_mul (swap_mat (mat_nrows A) i' i'') A.
+
+(*
+End in_ring.
+Arguments swap_rows {T so}.
+Context {T : Type}.
+Context {so : semiring_op T}.
+Existing Instance nat_semiring_op.
+Compute list_list_of_mat (swap_rows (mat_of_list_list 0 [[3;4;5];[2;7;8];[10;11;12]]) 1 2).
+*)
+
+(* old version
 Definition swap_rows (A : matrix T) i' i'' :=
   mk_mat (λ i j,
     if Nat.eq_dec i i' then mat_el A i'' j
     else if Nat.eq_dec i i'' then mat_el A i' j
     else mat_el A i j) (mat_nrows A) (mat_ncols A).
+*)
 
 Theorem swap_rows_nrows : ∀ A i' i'',
   mat_nrows (swap_rows A i' i'') = mat_nrows A.
@@ -370,6 +397,9 @@ Definition resolve_system (M : matrix T) (V : vector T) :=
    to any field T *)
 
 End in_ring.
+
+Arguments swap_mat {T so}.
+Arguments swap_rows {T so}.
 
 Section in_field.
 
@@ -575,10 +605,15 @@ destruct k. {
   destruct k1 as [k1| ]. {
     remember (gauss_jordan_loop _ _ _ _) as A eqn:Ha.
     destruct (srng_eq_dec (mat_el A 0 0) 0) as [Hmz| Hmz]. {
-      cbn in Ha.
+      cbn - [ swap_rows ] in Ha.
       specialize (first_non_zero_non_zero _ _ _ _ Hk1) as (H1, H2).
       remember (multiply_row_by_scalar _ _ _ _) as A' eqn:Ha'.
       remember (swap_rows M 0 k1) as A'' eqn:Ha''.
+(**)
+      assert (H3 : mat_el A'' 0 0 ≠ 0%Srng). {
+        rewrite Ha''.
+        cbn - [ iter_seq ].
+...
       assert (H3 : mat_el A'' 0 0 ≠ 0%Srng) by now rewrite Ha''.
       assert (H4 : mat_el A' 0 0 = 1%Srng). {
         rewrite Ha', Ha''; cbn.
