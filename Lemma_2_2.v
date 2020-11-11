@@ -277,6 +277,32 @@ Fixpoint first_non_zero_in_col (M : matrix T) it i j :=
       else Some i
   end.
 
+Theorem first_non_zero_prop : ∀ M it i j k,
+  first_non_zero_in_col M it i j = Some k
+  → k < i + it ∧
+    (∀ h, i ≤ h < k → mat_el M h j = 0%Srng) ∧
+    mat_el M k j ≠ 0%Srng.
+Proof.
+intros * Hk.
+revert i j k Hk.
+induction it; intros; [ easy | cbn ].
+cbn in Hk.
+destruct (srng_eq_dec (mat_el M i j) 0) as [Hmz| Hmz]. {
+  specialize (IHit _ _ _ Hk) as H1.
+  destruct H1 as (H1 & H2 & H3).
+  rewrite <- Nat.add_assoc in H1.
+  split; [ easy | ].
+  split; [ | easy ].
+  intros h Hh.
+  destruct (Nat.eq_dec i h) as [Hih| Hih]; [ now subst h | ].
+  apply H2; flia Hh Hih.
+}
+injection Hk; intros; subst k.
+split; [ flia | ].
+split; [ flia | easy ].
+Qed.
+
+(*
 Theorem first_non_zero_non_zero : ∀ M it i j k,
   first_non_zero_in_col M it i j = Some k
   → (∀ h, i ≤ h < k → mat_el M h j = 0%Srng) ∧
@@ -297,6 +323,7 @@ destruct (srng_eq_dec (mat_el M i j) 0) as [Hmz| Hmz]. {
 injection Hk; intros; subst k.
 split; [ flia | easy ].
 Qed.
+*)
 
 (* swap matrix; identity matrix where rows i' and i'' are exchanged; *)
 Definition swap_mat sz i' i'' :=
@@ -606,13 +633,27 @@ destruct k. {
     remember (gauss_jordan_loop _ _ _ _) as A eqn:Ha.
     destruct (srng_eq_dec (mat_el A 0 0) 0) as [Hmz| Hmz]. {
       cbn - [ swap_rows ] in Ha.
-      specialize (first_non_zero_non_zero _ _ _ _ Hk1) as (H1, H2).
+      specialize (first_non_zero_prop _ _ _ _ Hk1) as (H1 & H2 & H3).
+      cbn in H1.
       remember (multiply_row_by_scalar _ _ _ _) as A' eqn:Ha'.
       remember (swap_rows M 0 k1) as A'' eqn:Ha''.
 (**)
-      assert (H3 : mat_el A'' 0 0 ≠ 0%Srng). {
+      assert (H4 : mat_el A'' 0 0 ≠ 0%Srng). {
         rewrite Ha''.
         cbn - [ iter_seq Nat.eq_dec ].
+        rewrite srng_summation_split_first; [ | easy | flia H1 ].
+        destruct (Nat.eq_dec 0 0) as [H| H]; [ | easy ].
+        cbn - [ iter_seq Nat.eq_dec ]; clear H.
+        rewrite srng_mul_0_l, srng_add_0_l.
+        erewrite srng_summation_eq_compat; [ | easy | ]. 2: {
+          intros i Hi.
+          destruct (Nat.eq_dec 0 i) as [H| H]; [ flia Hi H | clear H ].
+          easy.
+        }
+        cbn - [ iter_seq Nat.eq_dec ].
+        rewrite (srng_summation_split _ k1); [ | flia H1 ].
+        destruct (Nat.eq_dec k1 0) as [Hk1z| Hk1z]. {
+          exfalso; subst k1.
 ...
       assert (H3 : mat_el A'' 0 0 ≠ 0%Srng) by now rewrite Ha''.
       assert (H4 : mat_el A' 0 0 = 1%Srng). {
