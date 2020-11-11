@@ -447,6 +447,17 @@ destruct (lt_dec k i) as [Hki| Hki]. {
 }
 Qed.
 
+Definition sqr_mat_zero n :=
+  mk_mat (λ i j, 0%Srng) n n.
+Definition sqr_mat_one n :=
+  mk_mat (λ i j, if Nat.eq_dec i j then 1%Srng else 0%Srng) n n.
+
+Definition sqr_mat_semiring_op n : semiring_op (matrix T) :=
+  {| srng_zero := sqr_mat_zero n;
+     srng_one := sqr_mat_one n;
+     srng_add := mat_add;
+     srng_mul := mat_mul |}.
+
 End in_ring.
 
 Section in_ring.
@@ -475,6 +486,7 @@ Delimit Scope M_scope with M.
 Delimit Scope V_scope with V.
 
 Arguments det_loop {T ro so} M%M n%nat.
+Arguments determinant {T ro so} M%M.
 Arguments mat_mul_scal_l {T so} _ M%M.
 Arguments mat_mul_vect_r {T so}.
 Arguments mat_nrows {T} m%M.
@@ -482,7 +494,9 @@ Arguments mat_ncols {T} m%M.
 Arguments mat_sub {T ro so} MA%M MB%M.
 Arguments mI {T so} n%nat.
 Arguments minus_one_pow {T ro so}.
-Arguments determinant {T ro so} M%M.
+Arguments sqr_mat_one {T so}.
+Arguments sqr_mat_zero {T so}.
+Arguments sqr_mat_semiring_op {T so}.
 Arguments subm {T} M%M i%nat j%nat.
 Arguments vect_sub {T ro so}.
 

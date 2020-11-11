@@ -339,31 +339,14 @@ Definition add_one_row_scalar_multiple_another A i' s i'' :=
     (mat_nrows A) (mat_ncols A).
 *)
 
-Definition add_rows_scalar_multiple_some_row A' i j :=
-  fold_left
-    (λ B i',
-       if Nat.eq_dec i' i then B
-       else
-         let v := mat_el A' i' j in
-         (add_one_row_scalar_multiple_another_row_mat (mat_nrows A')
-            i' (- v)%Rng i * B)%M)
-    (seq 0 (mat_nrows A')) A'.
+Definition add_rows_scalar_multiple_some_row M i j :=
+  let mso := sqr_mat_semiring_op (mat_nrows M) in
+  (Π (i' = 0, mat_nrows M - 1),
+   if Nat.eq_dec i' i then sqr_mat_one (mat_nrows M) else
+   add_one_row_scalar_multiple_another_row_mat (mat_nrows M) i'
+     (- mat_el M i' j)%Rng i)%Srng.
 
-Print add_rows_scalar_multiple_some_row.
-(* ouais, chais pas... faut-il construire la liste des matrices
-   - sauf i - et en prendre le produit ? *)
-Print iter_seq.
-Locate "Π".
-Search (semiring_op _).
 ...
-Require Import Matrix.
-Check matrix_semiring_op.
-...
-seq 0 i ++ seq (i + 1) (mat_nrows A' - i - 1)
-
-Π (i' = 0, i - 1),
-...
-
 
 (* Gauss-Jordan elimination *)
 
