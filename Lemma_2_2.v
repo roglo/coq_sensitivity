@@ -342,11 +342,13 @@ Definition mat_add_rows_mul_scal_row M i j :=
 
 (* Gauss-Jordan elimination *)
 
-Definition gauss_jordan_step A i j k :=
+Definition gauss_jordan_step_op A i j k :=
   (mat_swap_rows (mat_nrows A) i k *
    mat_add_rows_mul_scal_row A k j *
-   mat_mul_row_by_scal (mat_nrows A) k (/ mat_el A k j) *
-   A)%M.
+   mat_mul_row_by_scal (mat_nrows A) k (/ mat_el A k j))%M.
+
+Definition gauss_jordan_step A i j k :=
+  (gauss_jordan_step_op A i j k * A)%M.
 
 Fixpoint gauss_jordan_loop (A : matrix T) i j it :=
   match it with
@@ -383,6 +385,8 @@ Definition resolve_system (M : matrix T) (V : vector T) :=
 End in_ring.
 
 Arguments mat_swap_rows {T so}.
+Arguments gauss_jordan_step_op {T so ro fo}.
+Arguments gauss_jordan_step {T so ro fo}.
 
 Section in_field.
 
@@ -485,11 +489,11 @@ Definition in_reduced_row_echelon_form (M : matrix T) :=
    echelon form *)
 
 Theorem gauss_jordan_step_nrows : ∀ M i j k,
-  mat_nrows (gauss_jordan_step so M i j k) = mat_nrows M.
+  mat_nrows (gauss_jordan_step M i j k) = mat_nrows M.
 Proof. easy. Qed.
 
 Theorem gauss_jordan_step_ncols : ∀ M i j k,
-  mat_ncols (gauss_jordan_step so M i j k) = mat_ncols M.
+  mat_ncols (gauss_jordan_step M i j k) = mat_ncols M.
 Proof. easy. Qed.
 
 Theorem gauss_jordan_loop_nrows : ∀ M i j it,
