@@ -321,15 +321,23 @@ Definition multiply_row_by_scalar_mat sz k s :=
      else 0%Srng)
     sz sz.
 
-(* Add to one row a scalar multiple of another *)
+(* Adding to one row a scalar multiple of another *)
 
-... (* do it with a matrix *)
+Definition add_one_row_scalar_multiple_another_row_mat sz i' s i'' :=
+  mk_mat
+    (λ i j,
+     if Nat.eq_dec i j then 1%Srng
+     else if Nat.eq_dec i i' then if Nat.eq_dec j i'' then s else 0%Srng
+     else 0%Srng)
+    sz sz.
 
+(* old version
 Definition add_one_row_scalar_multiple_another A i' s i'' :=
   mk_mat (λ i j,
     if Nat.eq_dec i i' then (mat_el A i j + s * mat_el A i'' j)%Rng
     else mat_el A i j)
     (mat_nrows A) (mat_ncols A).
+*)
 
 (* Gauss-Jordan elimination *)
 
@@ -342,7 +350,7 @@ Definition gauss_jordan_step A i j k :=
        if Nat.eq_dec i' i then B
        else
          let v := mat_el B i' j in
-         add_one_row_scalar_multiple_another B i' (- v)%Rng i)
+         (add_one_row_scalar_multiple_another_row_mat r i' (- v)%Rng i * B)%M)
     (seq 0 r) A'.
 
 Fixpoint gauss_jordan_loop (A : matrix T) i j it :=
@@ -380,7 +388,6 @@ Definition resolve_system (M : matrix T) (V : vector T) :=
 End in_ring.
 
 Arguments swap_mat {T so}.
-Arguments swap_rows {T so}.
 
 Section in_field.
 
@@ -489,7 +496,10 @@ intros.
 unfold gauss_jordan_step.
 rewrite List_app_fold_left; [ easy | ].
 intros A h Hh.
-now destruct (Nat.eq_dec h i).
+destruct (Nat.eq_dec h i) as [Hhi| Hhi]; [ easy | ].
+cbn.
+(* ah, tiens, bizarre *)
+...
 Qed.
 
 Theorem gauss_jordan_step_ncols : ∀ M i j k,
