@@ -325,12 +325,14 @@ split; [ flia | easy ].
 Qed.
 *)
 
-(*
+(**)
 (* swap matrix; identity matrix where rows i' and i'' are exchanged; *)
 Definition swap_mat sz i' i'' :=
   mk_mat
     (λ i j,
-     if Nat.eq_dec i j then
+     if Nat.eq_dec i' i'' then
+       if Nat.eq_dec i j then 1%Srng else 0%Srng
+     else if Nat.eq_dec i j then
        if Nat.eq_dec i i' ∨∨ Nat.eq_dec i i'' then 0%Srng
        else 1%Srng
      else if Nat.eq_dec i i' ∧∧ Nat.eq_dec j i'' then 1%Srng
@@ -341,24 +343,27 @@ Definition swap_mat sz i' i'' :=
 (* Swap the positions of two rows *)
 Definition swap_rows (A : matrix T) i' i'' :=
   mat_mul (swap_mat (mat_nrows A) i' i'') A.
-*)
+(**)
 
 (*
 End in_ring.
+Arguments swap_mat {T so}.
 Arguments swap_rows {T so}.
 Context {T : Type}.
 Context {so : semiring_op T}.
 Existing Instance nat_semiring_op.
-Compute list_list_of_mat (swap_rows (mat_of_list_list 0 [[3;4;5];[2;7;8];[10;11;12]]) 1 2).
+Compute list_list_of_mat (swap_mat 3 0 0).
+Compute list_list_of_mat (swap_rows (mat_of_list_list 0 [[3;4;5];[2;7;8];[10;11;12]]) 1 1).
+...
 *)
 
-(* old version *)
+(* old version
 Definition swap_rows (A : matrix T) i' i'' :=
   mk_mat (λ i j,
     if Nat.eq_dec i i' then mat_el A i'' j
     else if Nat.eq_dec i i'' then mat_el A i' j
     else mat_el A i j) (mat_nrows A) (mat_ncols A).
-(**)
+*)
 
 Theorem swap_rows_nrows : ∀ A i' i'',
   mat_nrows (swap_rows A i' i'') = mat_nrows A.
@@ -427,10 +432,8 @@ Definition resolve_system (M : matrix T) (V : vector T) :=
 
 End in_ring.
 
-(*
 Arguments swap_mat {T so}.
 Arguments swap_rows {T so}.
-*)
 
 Section in_field.
 
@@ -598,7 +601,6 @@ intros.
 apply gauss_jordan_loop_ncols.
 Qed.
 
-(* pas simple...
 Theorem gauss_jordan_in_reduced_row_echelon_form : ∀ (M : matrix T),
   mat_ncols M ≠ 0
   → in_reduced_row_echelon_form (gauss_jordan M).
@@ -642,35 +644,52 @@ destruct k. {
       cbn in H1.
       remember (multiply_row_by_scalar _ _ _ _) as A' eqn:Ha'.
       remember (swap_rows M 0 k1) as A'' eqn:Ha''.
-...
-(*
       assert (H4 : mat_el A'' 0 0 ≠ 0%Srng). {
         rewrite Ha''.
         cbn - [ iter_seq Nat.eq_dec ].
         rewrite srng_summation_split_first; [ | easy | flia H1 ].
         destruct (Nat.eq_dec 0 0) as [H| H]; [ | easy ].
         cbn - [ iter_seq Nat.eq_dec ]; clear H.
-        rewrite srng_mul_0_l, srng_add_0_l.
-        erewrite srng_summation_eq_compat; [ | easy | ]. 2: {
-          intros i Hi.
-          destruct (Nat.eq_dec 0 i) as [H| H]; [ flia Hi H | clear H ].
-          easy.
+(**)
+        destruct (Nat.eq_dec 0 k1) as [Hk1z| Hk1z]. {
+          subst k1; rewrite srng_mul_1_l.
+          rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+            intros i Hi.
+            destruct (Nat.eq_dec 0 i) as [Hiz| Hiz]; [ flia Hi Hiz | ].
+            now apply srng_mul_0_l.
+          }
+          now rewrite srng_add_0_r.
         }
-        cbn - [ iter_seq Nat.eq_dec ].
+        rewrite srng_mul_0_l, srng_add_0_l.
         rewrite (srng_summation_split _ k1); [ | flia H1 ].
-        destruct (Nat.eq_dec k1 0) as [Hk1z| Hk1z]. {
-          exfalso; subst k1.
-          (* mmm... pas si simple *)
-...
-      assert (H3 : mat_el A'' 0 0 ≠ 0%Srng) by now rewrite Ha''.
-*)
-      assert (H4 : mat_el A' 0 0 = 1%Srng). {
+        rewrite srng_summation_split_last; [ | flia Hk1z ].
+        destruct (Nat.eq_dec 0 k1) as [H| H]; [ flia Hk1z H | clear H ].
+        destruct (Nat.eq_dec k1 k1) as [H| H]; [ | easy ].
+        remember (bool_of_sumbool (left H)) as x; cbn in Heqx; subst x.
+        clear H.
+        rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+          intros i Hi.
+          destruct (Nat.eq_dec 0 (i - 1)) as [H| H]; [ flia H Hi | clear H ].
+          destruct (Nat.eq_dec (i - 1) k1) as [H| H]; [ flia H Hi | ].
+          apply srng_mul_0_l.
+        }
+        rewrite srng_add_0_l, srng_mul_1_l.
+        rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+          intros i Hi.
+          destruct (Nat.eq_dec 0 i) as [H| H]; [ flia H Hi | clear H ].
+          destruct (Nat.eq_dec i k1) as [H| H]; [ flia H Hi | ].
+          apply srng_mul_0_l.
+        }
+        now rewrite srng_add_0_r.
+      }
+      assert (H5 : mat_el A' 0 0 = 1%Srng). {
         rewrite Ha', Ha''.
         cbn - [ iter_seq Nat.eq_dec ].
         apply fld_mul_inv_l.
         rewrite srng_summation_split_first; [ | easy | flia H1 ].
         destruct (Nat.eq_dec 0 0) as [H| H]; [ | easy ].
         cbn - [ iter_seq Nat.eq_dec ]; clear H.
+...
         rewrite srng_mul_0_l, srng_add_0_l.
         erewrite srng_summation_eq_compat; [ | easy | ]. 2: {
           intros i Hi.
