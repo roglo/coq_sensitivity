@@ -302,13 +302,27 @@ split; [ flia | ].
 split; [ flia | easy ].
 Qed.
 
-(* Matrix operator swapping the positions of two rows of a matrix *)
+(* Matrix operator swapping the rows i1 and i2 of a matrix.
+     If one multiplies this matrix by another matrix, it returns that
+   other matrix where the rows i1 and i2 are swapped
+     It is the identity matrix where the 1s at (i1,i1) and (i2,i2)
+   are replaced by 0s, and the 0s at (i1,i2) and (i2,i1) are replaced
+   by 1s.
+     Example swapping rows 1 and 2 (indices start at 0) of a 5×5
+   matrix
+     1 0 0 0 0
+     0 0 1 0 0
+     0 1 0 0 0
+     0 0 0 1 0
+     0 0 0 0 1
 
-Definition mat_swap_rows sz i' i'' :=
+   Works even if i1=i2; in that case it is the identity matrix *)
+
+Definition mat_swap_rows sz i1 i2 :=
   mk_mat
     (λ i j,
-     if Nat.eq_dec i i' then if Nat.eq_dec j i'' then 1%Srng else 0%Srng
-     else if Nat.eq_dec i i'' then if Nat.eq_dec j i' then 1%Srng else 0%Srng
+     if Nat.eq_dec i i1 then if Nat.eq_dec j i2 then 1%Srng else 0%Srng
+     else if Nat.eq_dec i i2 then if Nat.eq_dec j i1 then 1%Srng else 0%Srng
      else if Nat.eq_dec i j then 1%Srng else 0%Srng)
     sz sz.
 
@@ -342,26 +356,26 @@ Definition mat_add_rows_mul_scal_row M i j :=
 
 (* Gauss-Jordan elimination *)
 
-Definition gauss_jordan_step_op A i j k :=
-  (mat_swap_rows (mat_nrows A) i k *
-   mat_add_rows_mul_scal_row A k j *
-   mat_mul_row_by_scal (mat_nrows A) k (/ mat_el A k j))%M.
+Definition gauss_jordan_step_op M i j k :=
+  (mat_swap_rows (mat_nrows M) i k *
+   mat_add_rows_mul_scal_row M k j *
+   mat_mul_row_by_scal (mat_nrows M) k (/ mat_el M k j))%M.
 
-Fixpoint gauss_jordan_loop (A : matrix T) i j it :=
+Fixpoint gauss_jordan_loop (M : matrix T) i j it :=
   match it with
-  | 0 => A
+  | 0 => M
   | S it' =>
-      match first_non_zero_in_col A (mat_nrows A - i) i j with
+      match first_non_zero_in_col M (mat_nrows M - i) i j with
       | Some k =>
-          let A' := (gauss_jordan_step_op A i j k * A)%M in
-          gauss_jordan_loop A' (i + 1) (j + 1) it'
+          let M' := (gauss_jordan_step_op M i j k * M)%M in
+          gauss_jordan_loop M' (i + 1) (j + 1) it'
       | None =>
-          gauss_jordan_loop A i (j + 1) it'
+          gauss_jordan_loop M i (j + 1) it'
       end
   end.
 
-Definition gauss_jordan (A : matrix T) :=
-  gauss_jordan_loop (A : matrix T) 0 0 (mat_ncols A).
+Definition gauss_jordan (M : matrix T) :=
+  gauss_jordan_loop (M : matrix T) 0 0 (mat_ncols M).
 
 (* matrix whose k-th column is replaced by a vector *)
 
