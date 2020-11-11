@@ -494,6 +494,7 @@ Theorem gauss_jordan_step_nrows : ∀ M i j k,
 Proof.
 intros.
 unfold gauss_jordan_step.
+...
 rewrite List_app_fold_left; [ easy | ].
 intros A h Hh.
 destruct (Nat.eq_dec h i) as [Hhi| Hhi]; [ easy | ].
