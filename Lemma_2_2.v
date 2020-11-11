@@ -9,7 +9,7 @@ Import List List.ListNotations.
 
 Require Import Misc Matrix BlockMat.
 Require Import Semiring Field2.
-Require Import SRsummation.
+Require Import SRsummation SRproduct.
 Import matrix_Notations.
 Import bmatrix_Notations.
 
@@ -339,6 +339,32 @@ Definition add_one_row_scalar_multiple_another A i' s i'' :=
     (mat_nrows A) (mat_ncols A).
 *)
 
+Definition add_rows_scalar_multiple_some_row A' i j :=
+  fold_left
+    (λ B i',
+       if Nat.eq_dec i' i then B
+       else
+         let v := mat_el A' i' j in
+         (add_one_row_scalar_multiple_another_row_mat (mat_nrows A')
+            i' (- v)%Rng i * B)%M)
+    (seq 0 (mat_nrows A')) A'.
+
+Print add_rows_scalar_multiple_some_row.
+(* ouais, chais pas... faut-il construire la liste des matrices
+   - sauf i - et en prendre le produit ? *)
+Print iter_seq.
+Locate "Π".
+Search (semiring_op _).
+...
+Require Import Matrix.
+Check matrix_semiring_op.
+...
+seq 0 i ++ seq (i + 1) (mat_nrows A' - i - 1)
+
+Π (i' = 0, i - 1),
+...
+
+
 (* Gauss-Jordan elimination *)
 
 Definition gauss_jordan_step A i j k :=
@@ -349,7 +375,7 @@ Definition gauss_jordan_step A i j k :=
     (λ B i',
        if Nat.eq_dec i' i then B
        else
-         let v := mat_el B i' j in
+         let v := mat_el A' i' j in
          (add_one_row_scalar_multiple_another_row_mat r i' (- v)%Rng i * B)%M)
     (seq 0 r) A'.
 
@@ -494,7 +520,7 @@ Theorem gauss_jordan_step_nrows : ∀ M i j k,
 Proof.
 intros.
 unfold gauss_jordan_step.
-(**)
+(*
 remember (seq 0 (mat_nrows M)) as l eqn:Hl.
 remember (mat_nrows M) as r eqn:Hr in Hl; symmetry in Hr.
 subst l.
@@ -504,8 +530,7 @@ rewrite List_seq_succ_r; cbn.
 rewrite fold_left_app; cbn.
 destruct (Nat.eq_dec r i) as [Hri| Hri]. {
   apply IHr.
-(* merde *)
-...
+*)
 rewrite List_apply_fold_left; [ easy | ].
 intros B h Hh.
 destruct (Nat.eq_dec h i) as [Hhi| Hhi]; [ easy | ].

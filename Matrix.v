@@ -496,4 +496,3 @@ Notation "U + V" := (vect_add U V) : V_scope.
 Notation "U - V" := (vect_sub U V) : V_scope.
 
 End matrix_Notations.
-
