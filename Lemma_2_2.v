@@ -562,7 +562,6 @@ split. 2: {
   rewrite gauss_jordan_ncols in Hp.
   destruct (Nat.eq_dec k i) as [Hki| Hki]. {
     subst i; clear Hi.
-...
 (**)
 (*trying to prove it just for the upper left number of the matrix*)
 destruct k. {
@@ -571,14 +570,14 @@ destruct k. {
   rewrite gauss_jordan_loop_ncols in Hp |-*.
   remember (mat_ncols M) as it eqn:Hit; symmetry in Hit.
   destruct it; [ easy | clear Hcz ].
-  cbn - [ gauss_jordan_step ] in Hp |-*.
+  cbn - [ gauss_jordan_step_op ] in Hp |-*.
   rewrite Nat.sub_0_r in Hp |-*.
   remember (first_non_zero_in_col _ _ _ _) as k1 eqn:Hk1.
   symmetry in Hk1.
   destruct k1 as [k1| ]. {
     remember (gauss_jordan_loop _ _ _ _) as A eqn:Ha.
     destruct (srng_eq_dec (mat_el A 0 0) 0) as [Hmz| Hmz]. {
-      unfold gauss_jordan_step in Ha.
+      unfold gauss_jordan_step_op in Ha.
       specialize (first_non_zero_prop _ _ _ _ Hk1) as (H1 & H2 & H3).
       cbn in H1.
 ...
