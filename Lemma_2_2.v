@@ -302,9 +302,9 @@ split; [ flia | ].
 split; [ flia | easy ].
 Qed.
 
-(* Swapping the positions of two rows of a matrix *)
+(* Matrix operator swapping the positions of two rows of a matrix *)
 
-Definition swap_mat sz i' i'' :=
+Definition mat_swap_rows sz i' i'' :=
   mk_mat
     (λ i j,
      if Nat.eq_dec i i' then if Nat.eq_dec j i'' then 1%Srng else 0%Srng
@@ -312,18 +312,20 @@ Definition swap_mat sz i' i'' :=
      else if Nat.eq_dec i j then 1%Srng else 0%Srng)
     sz sz.
 
-(* Multiplying a row by a scalar *)
+(* Matrix operator multiplying some row a matrix by a scalar *)
 
-Definition multiply_row_by_scalar_mat sz k s :=
+Definition mat_mul_row_by_scal sz k s :=
   mk_mat
     (λ i j,
      if Nat.eq_dec i j then if Nat.eq_dec i k then s else 1%Srng
      else 0%Srng)
     sz sz.
 
-(* Adding to one row a scalar multiple of another *)
+Arguments mat_mul_row_by_scal sz k s%F.
 
-Definition add_one_row_scalar_multiple_another_row_mat sz i' s i'' :=
+(* Matrix operator adding in a matrix one row to a scalar multiple of row *)
+
+Definition mat_add_row_mul_scal_row sz i' s i'' :=
   mk_mat
     (λ i j,
      if Nat.eq_dec i j then 1%Srng
@@ -331,36 +333,20 @@ Definition add_one_row_scalar_multiple_another_row_mat sz i' s i'' :=
      else 0%Srng)
     sz sz.
 
-(* old version
-Definition add_one_row_scalar_multiple_another A i' s i'' :=
-  mk_mat (λ i j,
-    if Nat.eq_dec i i' then (mat_el A i j + s * mat_el A i'' j)%Rng
-    else mat_el A i j)
-    (mat_nrows A) (mat_ncols A).
-*)
-
-Definition add_rows_scalar_multiple_some_row M i j :=
+Definition mat_add_rows_mul_scal_row M i j :=
   let mso := sqr_mat_semiring_op (mat_nrows M) in
   (Π (i' = 0, mat_nrows M - 1),
-   if Nat.eq_dec i' i then sqr_mat_one (mat_nrows M) else
-   add_one_row_scalar_multiple_another_row_mat (mat_nrows M) i'
-     (- mat_el M i' j)%Rng i)%Srng.
-
-...
+   if Nat.eq_dec i' i then sqr_mat_one (mat_nrows M)
+   else
+     mat_add_row_mul_scal_row (mat_nrows M) i' (- mat_el M i' j)%Rng i)%Srng.
 
 (* Gauss-Jordan elimination *)
 
 Definition gauss_jordan_step A i j k :=
-  let r := mat_nrows A in
-  let s := (/ mat_el A k j)%F in
-  let A' := (swap_mat r i k * multiply_row_by_scalar_mat r k s * A)%M in
-  fold_left
-    (λ B i',
-       if Nat.eq_dec i' i then B
-       else
-         let v := mat_el A' i' j in
-         (add_one_row_scalar_multiple_another_row_mat r i' (- v)%Rng i * B)%M)
-    (seq 0 r) A'.
+  (mat_swap_rows (mat_nrows A) i k *
+   mat_add_rows_mul_scal_row A k j *
+   mat_mul_row_by_scal (mat_nrows A) k (/ mat_el A k j) *
+   A)%M.
 
 Fixpoint gauss_jordan_loop (A : matrix T) i j it :=
   match it with
@@ -396,7 +382,7 @@ Definition resolve_system (M : matrix T) (V : vector T) :=
 
 End in_ring.
 
-Arguments swap_mat {T so}.
+Arguments mat_swap_rows {T so}.
 
 Section in_field.
 
@@ -500,36 +486,11 @@ Definition in_reduced_row_echelon_form (M : matrix T) :=
 
 Theorem gauss_jordan_step_nrows : ∀ M i j k,
   mat_nrows (gauss_jordan_step so M i j k) = mat_nrows M.
-Proof.
-intros.
-unfold gauss_jordan_step.
-(*
-remember (seq 0 (mat_nrows M)) as l eqn:Hl.
-remember (mat_nrows M) as r eqn:Hr in Hl; symmetry in Hr.
-subst l.
-revert M Hr.
-induction r; intros; [ easy | ].
-rewrite List_seq_succ_r; cbn.
-rewrite fold_left_app; cbn.
-destruct (Nat.eq_dec r i) as [Hri| Hri]. {
-  apply IHr.
-*)
-rewrite List_apply_fold_left; [ easy | ].
-intros B h Hh.
-destruct (Nat.eq_dec h i) as [Hhi| Hhi]; [ easy | ].
-cbn.
-...
-Qed.
+Proof. easy. Qed.
 
 Theorem gauss_jordan_step_ncols : ∀ M i j k,
   mat_ncols (gauss_jordan_step so M i j k) = mat_ncols M.
-Proof.
-intros.
-unfold gauss_jordan_step.
-rewrite List_app_fold_left; [ easy | ].
-intros A h Hh.
-now destruct (Nat.eq_dec h i).
-Qed.
+Proof. easy. Qed.
 
 Theorem gauss_jordan_loop_nrows : ∀ M i j it,
   mat_nrows (gauss_jordan_loop M i j it) = mat_nrows M.
@@ -600,6 +561,7 @@ split. 2: {
   rewrite gauss_jordan_ncols in Hp.
   destruct (Nat.eq_dec k i) as [Hki| Hki]. {
     subst i; clear Hi.
+...
 (**)
 (*trying to prove it just for the upper left number of the matrix*)
 destruct k. {
