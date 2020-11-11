@@ -325,6 +325,7 @@ split; [ flia | easy ].
 Qed.
 *)
 
+(*
 (* swap matrix; identity matrix where rows i' and i'' are exchanged; *)
 Definition swap_mat sz i' i'' :=
   mk_mat
@@ -340,6 +341,7 @@ Definition swap_mat sz i' i'' :=
 (* Swap the positions of two rows *)
 Definition swap_rows (A : matrix T) i' i'' :=
   mat_mul (swap_mat (mat_nrows A) i' i'') A.
+*)
 
 (*
 End in_ring.
@@ -350,13 +352,13 @@ Existing Instance nat_semiring_op.
 Compute list_list_of_mat (swap_rows (mat_of_list_list 0 [[3;4;5];[2;7;8];[10;11;12]]) 1 2).
 *)
 
-(* old version
+(* old version *)
 Definition swap_rows (A : matrix T) i' i'' :=
   mk_mat (λ i j,
     if Nat.eq_dec i i' then mat_el A i'' j
     else if Nat.eq_dec i i'' then mat_el A i' j
     else mat_el A i j) (mat_nrows A) (mat_ncols A).
-*)
+(**)
 
 Theorem swap_rows_nrows : ∀ A i' i'',
   mat_nrows (swap_rows A i' i'') = mat_nrows A.
@@ -425,8 +427,10 @@ Definition resolve_system (M : matrix T) (V : vector T) :=
 
 End in_ring.
 
+(*
 Arguments swap_mat {T so}.
 Arguments swap_rows {T so}.
+*)
 
 Section in_field.
 
@@ -594,6 +598,7 @@ intros.
 apply gauss_jordan_loop_ncols.
 Qed.
 
+(* pas simple...
 Theorem gauss_jordan_in_reduced_row_echelon_form : ∀ (M : matrix T),
   mat_ncols M ≠ 0
   → in_reduced_row_echelon_form (gauss_jordan M).
@@ -835,5 +840,6 @@ destruct k1 as [k1| ]. {
           destruct i. {
             clear IHr Hi.
 ...
+*)
 
 End in_field.
