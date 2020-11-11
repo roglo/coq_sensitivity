@@ -347,16 +347,13 @@ Definition gauss_jordan_step_op A i j k :=
    mat_add_rows_mul_scal_row A k j *
    mat_mul_row_by_scal (mat_nrows A) k (/ mat_el A k j))%M.
 
-Definition gauss_jordan_step A i j k :=
-  (gauss_jordan_step_op A i j k * A)%M.
-
 Fixpoint gauss_jordan_loop (A : matrix T) i j it :=
   match it with
   | 0 => A
   | S it' =>
       match first_non_zero_in_col A (mat_nrows A - i) i j with
       | Some k =>
-          let A' := gauss_jordan_step A i j k in
+          let A' := (gauss_jordan_step_op A i j k * A)%M in
           gauss_jordan_loop A' (i + 1) (j + 1) it'
       | None =>
           gauss_jordan_loop A i (j + 1) it'
@@ -386,7 +383,6 @@ End in_ring.
 
 Arguments mat_swap_rows {T so}.
 Arguments gauss_jordan_step_op {T so ro fo}.
-Arguments gauss_jordan_step {T so ro fo}.
 
 Section in_field.
 
@@ -488,12 +484,12 @@ Definition in_reduced_row_echelon_form (M : matrix T) :=
 (* proof that Gauss-Jordan algorithm returns a matrix in row
    echelon form *)
 
-Theorem gauss_jordan_step_nrows : ∀ M i j k,
-  mat_nrows (gauss_jordan_step M i j k) = mat_nrows M.
+Theorem gauss_jordan_step_op_nrows : ∀ M i j k,
+  mat_nrows (gauss_jordan_step_op M i j k) = mat_nrows M.
 Proof. easy. Qed.
 
-Theorem gauss_jordan_step_ncols : ∀ M i j k,
-  mat_ncols (gauss_jordan_step M i j k) = mat_ncols M.
+Theorem gauss_jordan_step_op_ncols : ∀ M i j k,
+  mat_ncols (gauss_jordan_step_op M i j k) = mat_nrows M.
 Proof. easy. Qed.
 
 Theorem gauss_jordan_loop_nrows : ∀ M i j it,
@@ -502,12 +498,13 @@ Proof.
 intros.
 revert M i j.
 induction it; intros; [ easy | ].
-cbn - [ gauss_jordan_step ].
+cbn - [ gauss_jordan_step_op ].
 remember (first_non_zero_in_col _ _ _ _) as k eqn:Hk.
 symmetry in Hk.
 destruct k as [k| ]. {
   rewrite IHit.
-  apply gauss_jordan_step_nrows.
+  rewrite mat_mul_nrows.
+  apply gauss_jordan_step_op_nrows.
 }
 apply IHit.
 Qed.
@@ -518,12 +515,12 @@ Proof.
 intros.
 revert M i j.
 induction it; intros; [ easy | ].
-cbn - [ gauss_jordan_step ].
+cbn - [ gauss_jordan_step_op ].
 remember (first_non_zero_in_col _ _ _ _) as k eqn:Hk.
 symmetry in Hk.
 destruct k as [k| ]. {
   rewrite IHit.
-  apply gauss_jordan_step_ncols.
+  apply mat_mul_ncols.
 }
 apply IHit.
 Qed.
