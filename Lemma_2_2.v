@@ -637,7 +637,8 @@ destruct k. {
       cbn in H1.
       remember (multiply_row_by_scalar _ _ _ _) as A' eqn:Ha'.
       remember (swap_rows M 0 k1) as A'' eqn:Ha''.
-(**)
+...
+(*
       assert (H4 : mat_el A'' 0 0 ≠ 0%Srng). {
         rewrite Ha''.
         cbn - [ iter_seq Nat.eq_dec ].
@@ -654,12 +655,30 @@ destruct k. {
         rewrite (srng_summation_split _ k1); [ | flia H1 ].
         destruct (Nat.eq_dec k1 0) as [Hk1z| Hk1z]. {
           exfalso; subst k1.
+          (* mmm... pas si simple *)
 ...
       assert (H3 : mat_el A'' 0 0 ≠ 0%Srng) by now rewrite Ha''.
+*)
       assert (H4 : mat_el A' 0 0 = 1%Srng). {
-        rewrite Ha', Ha''; cbn.
+        rewrite Ha', Ha''.
+        cbn - [ iter_seq Nat.eq_dec ].
         apply fld_mul_inv_l.
-        apply (first_non_zero_non_zero _ _ _ _ Hk1).
+        rewrite srng_summation_split_first; [ | easy | flia H1 ].
+        destruct (Nat.eq_dec 0 0) as [H| H]; [ | easy ].
+        cbn - [ iter_seq Nat.eq_dec ]; clear H.
+        rewrite srng_mul_0_l, srng_add_0_l.
+        erewrite srng_summation_eq_compat; [ | easy | ]. 2: {
+          intros i Hi.
+          destruct (Nat.eq_dec 0 i) as [H| H]; [ flia Hi H | clear H ].
+          easy.
+        }
+        cbn - [ iter_seq Nat.eq_dec ].
+        rewrite (srng_summation_split _ k1); [ | flia H1 ].
+        destruct (Nat.eq_dec k1 0) as [Hk1z| Hk1z]. {
+          exfalso; subst k1.
+          (* mmm... pas si simple *)
+...
+        apply (first_non_zero_prop _ _ _ _ Hk1).
       }
       move Hmz at bottom.
       (* normalement, contradiction entre H4 et Hmz
