@@ -7,6 +7,7 @@ Require Import CharacPolyn.
 Require Import SRpolynomial.
 Require Import Matrix.
 Require Import Lemma_2_2.
+Import matrix_Notations.
 
 Import Q.Notations.
 Open Scope Q_scope.
@@ -21,9 +22,12 @@ Existing Instance Q_ring_prop.
 Definition qtest_gj ll :=
   let r := gauss_jordan (mat_of_list_list 0%Q ll) in
   list_list_of_mat r.
+Definition qtest_gjso (ll : list (list Q)) r i j :=
+  let M := mat_of_list_list 0 ll in
+  list_list_of_mat (gauss_jordan_step_op M r i j).
 Definition qtest_gjs (ll : list (list Q)) r i j :=
-  list_list_of_mat (gauss_jordan_step Q_semiring_op
-    (mat_of_list_list 0 ll) r i j).
+  let M := mat_of_list_list 0 ll in
+  list_list_of_mat (gauss_jordan_step_op M r i j * M)%M.
 Definition qresolve (ll : list (list Q)) v :=
   resolve (mat_of_list_list 0 ll) (vect_of_list 0 v).
 Definition qcp ll := polyn_list (charac_polyn (mat_of_list_list 0 ll)).
@@ -176,7 +180,14 @@ Compute qtest_gj [[1;3;1];[1;1;-1];[3;11;5]].
 (*
      = [[〈1〉; 0; 〈-2〉]; [0; 〈1〉; 〈1〉]; [0; 0; 0]]
 *)
+Compute qtest_gjso [[1;3;1;9];[1;1;-1;1];[3;11;5;35]] 0 0 0.
+(*
+     = [[〈1〉; 0; 0]; [〈-1〉; 〈1〉; 0]; [〈-3〉; 0; 〈1〉]]
+*)
 Compute qtest_gjs [[1;3;1;9];[1;1;-1;1];[3;11;5;35]] 0 0 0.
+(*
+     = [[〈1〉; 〈3〉; 〈1〉; 〈9〉]; [0; 〈-2〉; 〈-2〉; 〈-8〉]; [0; 〈2〉; 〈2〉; 〈8〉]]
+*)
 Compute qtest_gj [[1;3;1;9];[1;1;-1;1];[3;11;5;35]].
 (*
      = [[〈1〉; 0; 〈-2〉; 〈-3〉]; [0; 〈1〉; 〈1〉; 〈4〉]; [0; 0; 0; 0]]
