@@ -330,14 +330,9 @@ Qed.
 Definition swap_mat sz i' i'' :=
   mk_mat
     (λ i j,
-     if Nat.eq_dec i' i'' then
-       if Nat.eq_dec i j then 1%Srng else 0%Srng
-     else if Nat.eq_dec i j then
-       if Nat.eq_dec i i' ∨∨ Nat.eq_dec i i'' then 0%Srng
-       else 1%Srng
-     else if Nat.eq_dec i i' ∧∧ Nat.eq_dec j i'' then 1%Srng
-     else if Nat.eq_dec i i'' ∧∧ Nat.eq_dec j i' then 1%Srng
-     else 0%Srng)
+     if Nat.eq_dec i i' then if Nat.eq_dec j i'' then 1%Srng else 0%Srng
+     else if Nat.eq_dec i i'' then if Nat.eq_dec j i' then 1%Srng else 0%Srng
+     else if Nat.eq_dec i j then 1%Srng else 0%Srng)
     sz sz.
 
 (* Swap the positions of two rows *)
@@ -353,7 +348,7 @@ Context {T : Type}.
 Context {so : semiring_op T}.
 Existing Instance nat_semiring_op.
 Compute list_list_of_mat (swap_mat 3 0 0).
-Compute list_list_of_mat (swap_rows (mat_of_list_list 0 [[3;4;5];[2;7;8];[10;11;12]]) 1 1).
+Compute list_list_of_mat (swap_rows (mat_of_list_list 0 [[3;4;5];[2;7;8];[10;11;12]]) 1 0).
 ...
 *)
 
@@ -648,35 +643,29 @@ destruct k. {
         rewrite Ha''.
         cbn - [ iter_seq Nat.eq_dec ].
         rewrite srng_summation_split_first; [ | easy | flia H1 ].
-        destruct (Nat.eq_dec 0 0) as [H| H]; [ | easy ].
-        cbn - [ iter_seq Nat.eq_dec ]; clear H.
-(**)
+        destruct (Nat.eq_dec 0 0) as [H| H]; [ clear H | easy ].
         destruct (Nat.eq_dec 0 k1) as [Hk1z| Hk1z]. {
           subst k1; rewrite srng_mul_1_l.
           rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
             intros i Hi.
-            destruct (Nat.eq_dec 0 i) as [Hiz| Hiz]; [ flia Hi Hiz | ].
-            now apply srng_mul_0_l.
+            destruct (Nat.eq_dec i 0) as [Hiz| Hiz]; [ flia Hi Hiz | ].
+            apply srng_mul_0_l.
           }
           now rewrite srng_add_0_r.
         }
         rewrite srng_mul_0_l, srng_add_0_l.
         rewrite (srng_summation_split _ k1); [ | flia H1 ].
         rewrite srng_summation_split_last; [ | flia Hk1z ].
-        destruct (Nat.eq_dec 0 k1) as [H| H]; [ flia Hk1z H | clear H ].
-        destruct (Nat.eq_dec k1 k1) as [H| H]; [ | easy ].
-        remember (bool_of_sumbool (left H)) as x; cbn in Heqx; subst x.
-        clear H.
+        destruct (Nat.eq_dec k1 k1) as [H| H]; [ clear H | easy ].
+        rewrite srng_mul_1_l.
         rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
           intros i Hi.
-          destruct (Nat.eq_dec 0 (i - 1)) as [H| H]; [ flia H Hi | clear H ].
           destruct (Nat.eq_dec (i - 1) k1) as [H| H]; [ flia H Hi | ].
           apply srng_mul_0_l.
         }
-        rewrite srng_add_0_l, srng_mul_1_l.
+        rewrite srng_add_0_l.
         rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
           intros i Hi.
-          destruct (Nat.eq_dec 0 i) as [H| H]; [ flia H Hi | clear H ].
           destruct (Nat.eq_dec i k1) as [H| H]; [ flia H Hi | ].
           apply srng_mul_0_l.
         }
@@ -687,8 +676,7 @@ destruct k. {
         cbn - [ iter_seq Nat.eq_dec ].
         apply fld_mul_inv_l.
         rewrite srng_summation_split_first; [ | easy | flia H1 ].
-        destruct (Nat.eq_dec 0 0) as [H| H]; [ | easy ].
-        cbn - [ iter_seq Nat.eq_dec ]; clear H.
+        destruct (Nat.eq_dec 0 0) as [H| H]; [ clear H | easy ].
 ...
         rewrite srng_mul_0_l, srng_add_0_l.
         erewrite srng_summation_eq_compat; [ | easy | ]. 2: {
