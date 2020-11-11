@@ -494,12 +494,22 @@ Theorem gauss_jordan_step_nrows : ∀ M i j k,
 Proof.
 intros.
 unfold gauss_jordan_step.
+(**)
+remember (seq 0 (mat_nrows M)) as l eqn:Hl.
+remember (mat_nrows M) as r eqn:Hr in Hl; symmetry in Hr.
+subst l.
+revert M Hr.
+induction r; intros; [ easy | ].
+rewrite List_seq_succ_r; cbn.
+rewrite fold_left_app; cbn.
+destruct (Nat.eq_dec r i) as [Hri| Hri]. {
+  apply IHr.
+(* merde *)
 ...
-rewrite List_app_fold_left; [ easy | ].
-intros A h Hh.
+rewrite List_apply_fold_left; [ easy | ].
+intros B h Hh.
 destruct (Nat.eq_dec h i) as [Hhi| Hhi]; [ easy | ].
 cbn.
-(* ah, tiens, bizarre *)
 ...
 Qed.
 

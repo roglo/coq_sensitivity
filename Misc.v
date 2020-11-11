@@ -1742,7 +1742,7 @@ apply Hfg.
 now left.
 Qed.
 
-Theorem List_app_fold_left : ∀ A B C x l (f : B → A → B) (g : B → C),
+Theorem List_apply_fold_left : ∀ A B C x l (f : B → A → B) (g : B → C),
   (∀ y i, i ∈ l → g (f y i) = g y)
   → g (fold_left f l x) = g x.
 Proof.
