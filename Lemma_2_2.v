@@ -302,31 +302,8 @@ split; [ flia | ].
 split; [ flia | easy ].
 Qed.
 
-(*
-Theorem first_non_zero_non_zero : ∀ M it i j k,
-  first_non_zero_in_col M it i j = Some k
-  → (∀ h, i ≤ h < k → mat_el M h j = 0%Srng) ∧
-    mat_el M k j ≠ 0%Srng.
-Proof.
-intros * Hk.
-revert i j k Hk.
-induction it; intros; [ easy | cbn ].
-cbn in Hk.
-destruct (srng_eq_dec (mat_el M i j) 0) as [Hmz| Hmz]. {
-  split. {
-    intros h Hh.
-    destruct (Nat.eq_dec i h) as [Hih| Hih]; [ now subst h | ].
-    eapply IHit; [ apply Hk | flia Hh Hih ].
-  }
-  now specialize (IHit _ _ _ Hk).
-}
-injection Hk; intros; subst k.
-split; [ flia | easy ].
-Qed.
-*)
+(* Swapping the positions of two rows of a matrix *)
 
-(**)
-(* swap matrix; identity matrix where rows i' and i'' are exchanged; *)
 Definition swap_mat sz i' i'' :=
   mk_mat
     (λ i j,
@@ -335,63 +312,38 @@ Definition swap_mat sz i' i'' :=
      else if Nat.eq_dec i j then 1%Srng else 0%Srng)
     sz sz.
 
-(* Swap the positions of two rows *)
-Definition swap_rows (A : matrix T) i' i'' :=
-  mat_mul (swap_mat (mat_nrows A) i' i'') A.
-(**)
+(* Multiplying a row by a scalar *)
 
-(*
-End in_ring.
-Arguments swap_mat {T so}.
-Arguments swap_rows {T so}.
-Context {T : Type}.
-Context {so : semiring_op T}.
-Existing Instance nat_semiring_op.
-Compute list_list_of_mat (swap_mat 3 0 0).
-Compute list_list_of_mat (swap_rows (mat_of_list_list 0 [[3;4;5];[2;7;8];[10;11;12]]) 1 0).
-...
-*)
-
-(* old version
-Definition swap_rows (A : matrix T) i' i'' :=
-  mk_mat (λ i j,
-    if Nat.eq_dec i i' then mat_el A i'' j
-    else if Nat.eq_dec i i'' then mat_el A i' j
-    else mat_el A i j) (mat_nrows A) (mat_ncols A).
-*)
-
-Theorem swap_rows_nrows : ∀ A i' i'',
-  mat_nrows (swap_rows A i' i'') = mat_nrows A.
-Proof. easy. Qed.
-
-(* Multiply a row by a non-zero scalar *)
-Definition multiply_row_by_scalar A k s :=
-  mk_mat (λ i j,
-    if Nat.eq_dec i k then (s * mat_el A i j)%Rng
-    else mat_el A i j)
-    (mat_nrows A) (mat_ncols A).
-
-Theorem multiply_row_by_scalar_nrows : ∀ A k s,
-  mat_nrows (multiply_row_by_scalar A k s) = mat_nrows A.
-Proof. easy. Qed.
+Definition multiply_row_by_scalar_mat sz k s :=
+  mk_mat
+    (λ i j,
+     if Nat.eq_dec i j then if Nat.eq_dec i k then s else 1%Srng
+     else 0%Srng)
+    sz sz.
 
 (* Add to one row a scalar multiple of another *)
+
+... (* do it with a matrix *)
+
 Definition add_one_row_scalar_multiple_another A i' s i'' :=
   mk_mat (λ i j,
     if Nat.eq_dec i i' then (mat_el A i j + s * mat_el A i'' j)%Rng
     else mat_el A i j)
     (mat_nrows A) (mat_ncols A).
 
+(* Gauss-Jordan elimination *)
+
 Definition gauss_jordan_step A i j k :=
-  let A' := swap_rows A i k in
-  let A'' := multiply_row_by_scalar A' i (/ mat_el A' i j)%F in
+  let r := mat_nrows A in
+  let s := (/ mat_el A k j)%F in
+  let A' := (swap_mat r i k * multiply_row_by_scalar_mat r k s * A)%M in
   fold_left
     (λ B i',
        if Nat.eq_dec i' i then B
        else
          let v := mat_el B i' j in
          add_one_row_scalar_multiple_another B i' (- v)%Rng i)
-    (seq 0 (mat_nrows A'')) A''.
+    (seq 0 r) A'.
 
 Fixpoint gauss_jordan_loop (A : matrix T) i j it :=
   match it with
@@ -634,9 +586,10 @@ destruct k. {
   destruct k1 as [k1| ]. {
     remember (gauss_jordan_loop _ _ _ _) as A eqn:Ha.
     destruct (srng_eq_dec (mat_el A 0 0) 0) as [Hmz| Hmz]. {
-      cbn - [ swap_rows ] in Ha.
+      unfold gauss_jordan_step in Ha.
       specialize (first_non_zero_prop _ _ _ _ Hk1) as (H1 & H2 & H3).
       cbn in H1.
+...
       remember (multiply_row_by_scalar _ _ _ _) as A' eqn:Ha'.
       remember (swap_rows M 0 k1) as A'' eqn:Ha''.
       assert (H4 : mat_el A'' 0 0 ≠ 0%Srng). {
@@ -674,6 +627,7 @@ destruct k. {
       assert (H5 : mat_el A' 0 0 = 1%Srng). {
         rewrite Ha', Ha''.
         cbn - [ iter_seq Nat.eq_dec ].
+...
         apply fld_mul_inv_l.
         rewrite srng_summation_split_first; [ | easy | flia H1 ].
         destruct (Nat.eq_dec 0 0) as [H| H]; [ clear H | easy ].
