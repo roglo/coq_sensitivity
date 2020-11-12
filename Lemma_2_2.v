@@ -572,6 +572,30 @@ intros.
 apply gauss_jordan_loop_ncols.
 Qed.
 
+(* since I am not able do prove that gauss jordan returns a reduced
+   row echelon_form, I am going to try, to spend time, to prove that
+   the determinant of a product is a product of determinant *)
+
+Theorem determinant_mul : ∀ A B,
+  mat_nrows A = mat_nrows B
+  → determinant (A * B) = (determinant A * determinant B)%Srng.
+Proof.
+intros * Hrr.
+unfold determinant; cbn.
+remember (mat_nrows A) as r eqn:Hr.
+symmetry in Hr.
+rewrite <- Hrr.
+symmetry in Hrr.
+rename Hr into Hra.
+rename Hrr into Hrb.
+revert A B Hra Hrb.
+induction r; intros. {
+  symmetry.
+  apply srng_mul_1_l.
+}
+cbn - [ iter_seq ].
+...
+
 Theorem gauss_jordan_in_reduced_row_echelon_form : ∀ (M : matrix T),
   mat_ncols M ≠ 0
   → in_reduced_row_echelon_form (gauss_jordan M).
