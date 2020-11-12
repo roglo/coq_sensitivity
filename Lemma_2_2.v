@@ -396,6 +396,51 @@ Fixpoint gauss_jordan_loop (M : matrix T) i j it :=
 Definition gauss_jordan (M : matrix T) :=
   gauss_jordan_loop (M : matrix T) 0 0 (mat_ncols M).
 
+(* version returning the list of matrices whose product is the
+   gauss-jordan elimination of the initial matrix *)
+
+Definition gauss_jordan_step_list M i j k :=
+  [mat_swap_rows (mat_nrows M) i k;
+   mat_add_rows_mul_scal_row M k j;
+   mat_mul_row_by_scal (mat_nrows M) k (/ mat_el M k j)%F].
+
+Fixpoint gauss_jordan_list_loop (M : matrix T) i j it :=
+  match it with
+  | 0 => []
+  | S it' =>
+      match first_non_zero_in_col M (mat_nrows M - i) i j with
+      | Some k =>
+          let ml := gauss_jordan_step_list M i j k in
+          let M' := fold_right mat_mul M ml in
+          gauss_jordan_list_loop M' (i + 1) (j + 1) it' ++ ml
+      | None =>
+          gauss_jordan_list_loop M i (j + 1) it'
+      end
+  end.
+
+Definition gauss_jordan_list (M : matrix T) :=
+  gauss_jordan_list_loop M 0 0 (mat_ncols M).
+
+Definition gauss_jordan' (M : matrix T) :=
+  fold_right mat_mul M (gauss_jordan_list M).
+
+Theorem gauss_jordan_list_gauss_jordan : ∀ (M : matrix T),
+  gauss_jordan' M = gauss_jordan M.
+Proof.
+intros.
+unfold gauss_jordan', gauss_jordan.
+unfold gauss_jordan_list.
+remember (mat_ncols M) as c eqn:Hc.
+symmetry in Hc.
+revert M Hc.
+induction c; intros; [ easy | ].
+cbn - [ gauss_jordan_step_list ].
+rewrite Nat.sub_0_r.
+remember (first_non_zero_in_col M (mat_nrows M) 0 0) as k eqn:Hk.
+symmetry in Hk.
+destruct k as [k| ]. {
+...
+
 (* matrix whose k-th column is replaced by a vector *)
 
 Definition mat_repl_vect k (M : matrix T) V :=
@@ -572,6 +617,7 @@ intros.
 apply gauss_jordan_loop_ncols.
 Qed.
 
+(*
 Theorem gauss_jordan_determinant : ∀ M,
   is_square_mat M
   → determinant (gauss_jordan M) = determinant M.
@@ -596,6 +642,7 @@ destruct k as [k| ]. {
   destruct Hk as (Hk & Hkz & Hknz).
   cbn in Hk.
 ...
+*)
 
 Theorem gauss_jordan_in_reduced_row_echelon_form : ∀ (M : matrix T),
   mat_ncols M ≠ 0
@@ -638,6 +685,7 @@ destruct k. {
       unfold gauss_jordan_step_op in Ha.
       specialize (first_non_zero_prop _ _ _ _ Hk1) as (H1 & H2 & H3).
       cbn in H1.
+Abort. (*
 ...
       remember (multiply_row_by_scalar _ _ _ _) as A' eqn:Ha'.
       remember (swap_rows M 0 k1) as A'' eqn:Ha''.

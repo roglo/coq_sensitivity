@@ -22,6 +22,12 @@ Existing Instance Q_ring_prop.
 Definition qtest_gj ll :=
   let r := gauss_jordan (mat_of_list_list 0%Q ll) in
   list_list_of_mat r.
+Definition qtest_gj' ll :=
+  let r := gauss_jordan' (mat_of_list_list 0%Q ll) in
+  list_list_of_mat r.
+Definition qtest_gjl ll :=
+  let r := gauss_jordan_list (mat_of_list_list 0%Q ll) in
+  map (@list_list_of_mat _) r.
 Definition qtest_gjso (ll : list (list Q)) r i j :=
   let M := mat_of_list_list 0 ll in
   list_list_of_mat (gauss_jordan_step_op M r i j).
@@ -38,10 +44,15 @@ Compute qtest_gj [[1]].
 Compute qtest_gj [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]].
 (* = [[〈1〉; 0; 0]; [0; 〈1〉; 0]; [0; 0; 〈1〉]] *)
 Compute qtest_gj [[1;3;1;9];[1;1;-1;1];[3;11;5;35]].
+Compute qtest_gj' [[1;3;1;9];[1;1;-1;1];[3;11;5;35]].
 (* = [[〈1〉; 0; 〈-2〉; 〈-3〉]; [0; 〈1〉; 〈1〉; 〈4〉]; [0; 0; 0; 0]] *)
+
 Compute qtest_gj [[2;1;-1;8];[-3;-1;2;-11];[-2;1;2;-3]].
+Compute qtest_gj' [[2;1;-1;8];[-3;-1;2;-11];[-2;1;2;-3]].
 (* = [[〈1〉; 0; 0; 〈2〉]; [0; 〈1〉; 0; 〈3〉]; [0; 0; 〈1〉; 〈-1〉]] *)
+
 Compute qtest_gj [[2;-1;0;1;0;0];[-1;2;-1;0;1;0];[0;-1;2;0;0;1]].
+Compute qtest_gj' [[2;-1;0;1;0;0];[-1;2;-1;0;1;0];[0;-1;2;0;0;1]].
 (* = [[〈1〉; 0; 0; 〈3╱4〉; 〈1╱2〉; 〈1╱4〉]; [0; 〈1〉; 0; 〈1╱2〉; 〈1〉; 〈1╱2〉];
       [0; 0; 〈1〉; 〈1╱4〉; 〈1╱2〉; 〈3╱4〉]] *)
 Compute qtest_gj [[0;2;1;0];[-7;-3;0;1];[3;8;18;5]].
