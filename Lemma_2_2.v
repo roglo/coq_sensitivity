@@ -381,14 +381,16 @@ Definition mat_add_row_mul_scal_row sz i1 s i2 :=
      It is the product of the matrix operator mat_add_row_mul_scal_row
    above, on all rows but row i.
 
-... mmm... below to be thought and rewritten...
-     Example for row 2; the "*" is the opposite of the value of the
-   second matrix at position (k,j)
-     1 0 0 0 0
-     0 1 0 0 0
-     * 0 1 0 0
-     0 0 0 1 0
-     0 0 0 0 1
+     Example for row 2 column 4 where "*" contains the opposite of
+   the value in the other matrix at its column 4
+     1 0 * 0 0
+     0 1 * 0 0
+     0 0 1 0 0
+     0 0 * 1 0
+     0 0 * 0 1
+
+     Could be implemented with one only matrix instead of the product
+   of several matrices. To be tested if proofs become too complicated.
 *)
 
 Definition mat_add_rows_mul_scal_row M i j :=

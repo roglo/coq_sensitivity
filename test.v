@@ -170,6 +170,9 @@ Compute qtest_rs [[3;2;-1];[2;-2;4];[-1;1/2;-1]] [1;-2;0].
      = [〈1〉; 〈-2〉; 〈-2〉]      ok
 *)
 
+Compute list_list_of_mat (mat_add_rows_mul_scal_row M i j).
+...
+
 Compute qresolve [[4;2];[3;-1]] [-1;2].
 (*
      = [〈3╱10〉; 〈-11╱10〉]     ok
