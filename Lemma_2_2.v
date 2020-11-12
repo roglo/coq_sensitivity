@@ -302,7 +302,7 @@ split; [ flia | ].
 split; [ flia | easy ].
 Qed.
 
-(* Matrix operator swapping the rows i1 and i2 of a matrix.
+(* Matrix operator, swapping the rows i1 and i2 of a matrix.
 
    When multiplying this matrix with another matrix, it returns that
    other matrix where the rows i1 and i2 are swapped
@@ -327,7 +327,7 @@ Definition mat_swap_rows sz i1 i2 :=
      else if Nat.eq_dec i j then 1%Srng else 0%Srng)
     sz sz.
 
-(* Matrix operator multiplying row k of a matrix by a scalar s
+(* Matrix operator, multiplying row k of a matrix by a scalar s
 
    When multiplying this matrix with another matrix, it returns that
    other matrix where all coefficients in row k are multiplied by s.
@@ -349,7 +349,7 @@ Definition mat_mul_row_by_scal sz k s :=
 
 Arguments mat_mul_row_by_scal sz k s%F.
 
-(* Matrix operator subtracting, to all rows k but row i, the row i multiplied
+(* Matrix operator, subtracting, to all rows k but row i, the row i multiplied
    by the coefficient in (k,j).
 
      When multiplying this matrix with another matrix, it returns that
