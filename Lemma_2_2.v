@@ -424,6 +424,26 @@ Definition gauss_jordan_list (M : matrix T) :=
 Definition gauss_jordan' (M : matrix T) :=
   fold_right mat_mul M (gauss_jordan_list M).
 
+Theorem glop : ∀ M i j it,
+  fold_right mat_mul M (gauss_jordan_list_loop M i j it) =
+  gauss_jordan_loop M i j it.
+Proof.
+intros.
+revert M i j.
+induction it; intros; [ easy | ].
+cbn - [ gauss_jordan_step_list ].
+remember (first_non_zero_in_col M (mat_nrows M - i) i j) as k eqn:Hk.
+symmetry in Hk.
+destruct k as [k| ]; [ | apply IHit ].
+rewrite fold_right_app.
+rewrite IHit.
+f_equal.
+cbn.
+unfold gauss_jordan_step_op.
+Search (_ * _ * _)%M.
+Search (_ + _ + _)%M.
+...
+
 Theorem gauss_jordan_list_gauss_jordan : ∀ (M : matrix T),
   gauss_jordan' M = gauss_jordan M.
 Proof.
