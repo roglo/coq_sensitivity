@@ -304,7 +304,7 @@ Qed.
 
 (* Matrix operator swapping the rows i1 and i2 of a matrix.
 
-   If one multiplies this matrix by another matrix, it returns that
+   When multiplying this matrix with another matrix, it returns that
    other matrix where the rows i1 and i2 are swapped
      It is the identity matrix where the 1s at (i1,i1) and (i2,i2)
    are replaced by 0s, and the 0s at (i1,i2) and (i2,i1) are replaced
@@ -329,7 +329,7 @@ Definition mat_swap_rows sz i1 i2 :=
 
 (* Matrix operator multiplying row k of a matrix by a scalar s
 
-   If one multiplies this matrix by another matrix, it returns that
+   When multiplying this matrix with another matrix, it returns that
    other matrix where all coefficients in row k are multiplied by s.
      It is the identity matrix where the 1 at (k,k) is replaced by s.
      Example for row 3 (staring at 0) of a 5x5 matrix
@@ -351,7 +351,7 @@ Arguments mat_mul_row_by_scal sz k s%F.
 
 (* Matrix operator adding, to row i1, a scalar multiple s of row i2.
 
-   If one multiplies this matrix by another matrix, it returns that
+   When multiplying this matrix with another matrix, it returns that
    other matrix where coefficients in row i1 are replaced by themselves
    plus s times the coefficient at same column in row i2 .
      It is the identity matrix where the 0 at (i1,i2) is replaced by s.
@@ -372,14 +372,31 @@ Definition mat_add_row_mul_scal_row sz i1 s i2 :=
      else 0%Srng)
     sz sz.
 
-(* *)
+(* Matrix operator subtracting, to all rows k but row i, the row i multiplied
+   by the coefficient in (k,j).
+
+     When multiplying this matrix with another matrix, it returns that
+   other matrix where all rows k (but row i) are replaced by themselves
+   minus the value in row k of the same column times the value in (k,j).
+     It is the product of the matrix operator mat_add_row_mul_scal_row
+   above, on all rows but row i.
+
+... mmm... below to be thought and rewritten...
+     Example for row 2; the "*" is the opposite of the value of the
+   second matrix at position (k,j)
+     1 0 0 0 0
+     0 1 0 0 0
+     * 0 1 0 0
+     0 0 0 1 0
+     0 0 0 0 1
+*)
 
 Definition mat_add_rows_mul_scal_row M i j :=
   let mso := sqr_mat_semiring_op (mat_nrows M) in
-  (Π (i' = 0, mat_nrows M - 1),
-   if Nat.eq_dec i' i then sqr_mat_one (mat_nrows M)
+  (Π (k = 0, mat_nrows M - 1),
+   if Nat.eq_dec k i then sqr_mat_one (mat_nrows M)
    else
-     mat_add_row_mul_scal_row (mat_nrows M) i' (- mat_el M i' j)%Rng i)%Srng.
+     mat_add_row_mul_scal_row (mat_nrows M) k (- mat_el M k j)%Rng i)%Srng.
 
 (* Gauss-Jordan elimination *)
 
