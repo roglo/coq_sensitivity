@@ -170,7 +170,15 @@ Compute qtest_rs [[3;2;-1];[2;-2;4];[-1;1/2;-1]] [1;-2;0].
      = [〈1〉; 〈-2〉; 〈-2〉]      ok
 *)
 
-Compute list_list_of_mat (mat_add_rows_mul_scal_row M i j).
+Compute list_list_of_mat (mat_add_rows_mul_scal_row Q_semiring_op (mat_of_list_list 0 [[1;2;3;4;5];[6;7;8;9;10];[11;12;13;14;15];[16;17;18;19;20];[21;22;23;23;25]]) 2%nat 4%nat).
+(*
+     = [[〈1〉; 0; 〈-5〉; 0; 0]; [0; 〈1〉; 〈-10〉; 0; 0];
+       [0; 0; 〈1〉; 0; 0]; [0; 0; 〈-20〉; 〈1〉; 0]; [0; 0; 〈-25〉; 0; 〈1〉]]
+*)
+Compute list_list_of_mat (mat_add_rows_mul_scal_row' Q_semiring_op (mat_of_list_list 0 [[1;2;3;4;5];[6;7;8;9;10];[11;12;13;14;15];[16;17;18;19;20];[21;22;23;23;25]]) 2%nat 4%nat).
+
+Compute list_list_of_mat (mat_add_rows_mul_scal_row Q_semiring_op (mat_of_list_list 0 [[1;2;3;4;5];[6;7;8;9;10];[11;12;13;14;15];[16;17;18;19;20];[21;22;23;23;25]]) 4%nat 0%nat).
+Compute list_list_of_mat (mat_add_rows_mul_scal_row' Q_semiring_op (mat_of_list_list 0 [[1;2;3;4;5];[6;7;8;9;10];[11;12;13;14;15];[16;17;18;19;20];[21;22;23;23;25]]) 4%nat 0%nat).
 ...
 
 Compute qresolve [[4;2];[3;-1]] [-1;2].

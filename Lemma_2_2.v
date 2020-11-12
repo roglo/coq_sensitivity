@@ -400,6 +400,16 @@ Definition mat_add_rows_mul_scal_row M i j :=
    else
      mat_add_row_mul_scal_row (mat_nrows M) k (- mat_el M k j)%Rng i)%Srng.
 
+(* that direct version, much simpler indeed *)
+
+Definition mat_add_rows_mul_scal_row' M i j :=
+  mk_mat
+    (λ i' j',
+     if Nat.eq_dec i' j' then 1%Srng
+     else if Nat.eq_dec j' i then (- mat_el M i' j)%Rng
+     else 0%Srng)
+   (mat_nrows M) (mat_nrows M).
+
 (* Gauss-Jordan elimination *)
 
 Definition gauss_jordan_step_op M i j k :=
