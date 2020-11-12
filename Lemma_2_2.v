@@ -629,6 +629,22 @@ apply gauss_jordan_loop_ncols.
 Qed.
 
 (**)
+Theorem gauss_jordan_list_size : ∀ M A,
+  A ∈ gauss_jordan_list M
+  → mat_nrows A = mat_nrows M ∧
+    mat_ncols A = mat_nrows M.
+Proof.
+intros * Ha.
+remember (gauss_jordan_list M) as ml eqn:Hml.
+symmetry in Hml.
+revert M A Hml Ha.
+induction ml as [| B]; intros; [ easy | ].
+destruct Ha as [Ha| Ha]. {
+  subst B.
+  unfold gauss_jordan_list in Hml.
+Print gauss_jordan_list_loop.
+...
+
 Theorem gauss_jordan_determinant : ∀ M,
   is_square_mat M
   → determinant (gauss_jordan M) = determinant M.
@@ -642,8 +658,13 @@ unfold gauss_jordan'.
 remember (gauss_jordan_list M) as ml eqn:Hml.
 symmetry in Hml.
 revert M Hsm Hml.
-induction ml as [| A]; intros; [ easy | ].
-cbn.
+induction ml as [| A] using rev_ind; intros; [ easy | ].
+rewrite fold_right_app; cbn.
+specialize (IHml (A * M)%M) as H1.
+cbn - [ gauss_jordan_list ] in H1.
+Print gauss_jordan_list.
+...
+specialize (H1 Hsm).
 ...
 remember (mat_nrows M) as r eqn:Hr.
 rename Hsm into Hc.
