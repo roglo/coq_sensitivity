@@ -424,7 +424,7 @@ Definition gauss_jordan_list (M : matrix T) :=
 Definition gauss_jordan' (M : matrix T) :=
   fold_right mat_mul M (gauss_jordan_list M).
 
-Theorem glop : ∀ M i j it,
+Theorem gauss_jordan_list_loop_gauss_jordan_loop : ∀ M i j it,
   fold_right mat_mul M (gauss_jordan_list_loop M i j it) =
   gauss_jordan_loop M i j it.
 Proof.
@@ -437,12 +437,11 @@ symmetry in Hk.
 destruct k as [k| ]; [ | apply IHit ].
 rewrite fold_right_app.
 rewrite IHit.
-f_equal.
-cbn.
+f_equal; cbn.
 unfold gauss_jordan_step_op.
-Search (_ * _ * _)%M.
-Search (_ + _ + _)%M.
-...
+rewrite mat_mul_assoc; [ | easy ].
+now apply mat_mul_assoc.
+Qed.
 
 Theorem gauss_jordan_list_gauss_jordan : ∀ (M : matrix T),
   gauss_jordan' M = gauss_jordan M.
@@ -450,16 +449,8 @@ Proof.
 intros.
 unfold gauss_jordan', gauss_jordan.
 unfold gauss_jordan_list.
-remember (mat_ncols M) as c eqn:Hc.
-symmetry in Hc.
-revert M Hc.
-induction c; intros; [ easy | ].
-cbn - [ gauss_jordan_step_list ].
-rewrite Nat.sub_0_r.
-remember (first_non_zero_in_col M (mat_nrows M) 0 0) as k eqn:Hk.
-symmetry in Hk.
-destruct k as [k| ]. {
-...
+apply gauss_jordan_list_loop_gauss_jordan_loop.
+Qed.
 
 (* matrix whose k-th column is replaced by a vector *)
 
@@ -637,7 +628,7 @@ intros.
 apply gauss_jordan_loop_ncols.
 Qed.
 
-(*
+(**)
 Theorem gauss_jordan_determinant : ∀ M,
   is_square_mat M
   → determinant (gauss_jordan M) = determinant M.
@@ -646,6 +637,33 @@ intros * Hsm.
 unfold is_square_mat in Hsm.
 unfold determinant.
 rewrite gauss_jordan_nrows.
+rewrite <- gauss_jordan_list_gauss_jordan; [ | easy ].
+unfold gauss_jordan'.
+remember (gauss_jordan_list M) as ml eqn:Hml.
+symmetry in Hml.
+revert M Hsm Hml.
+induction ml as [| A]; intros; [ easy | ].
+cbn.
+...
+remember (mat_nrows M) as r eqn:Hr.
+rename Hsm into Hc.
+symmetry in Hr, Hc.
+revert M Hr Hc.
+induction r; intros; [ easy | ].
+cbn - [ iter_seq ].
+...
+cbn - [ det_loop ].
+rewrite Hr, Nat.sub_0_r.
+remember (first_non_zero_in_col M (S r) 0 0) as k eqn:Hk.
+symmetry in Hk.
+destruct k as [k| ]. {
+  apply first_non_zero_prop in Hk.
+  destruct Hk as (Hk & Hkz & Hknz).
+  cbn in Hk.
+...
+intros * Hsm.
+unfold is_square_mat in Hsm.
+unfold determinant.
 unfold gauss_jordan.
 rewrite <- Hsm.
 remember (mat_nrows M) as r eqn:Hr.
@@ -662,7 +680,7 @@ destruct k as [k| ]. {
   destruct Hk as (Hk & Hkz & Hknz).
   cbn in Hk.
 ...
-*)
+(**)
 
 Theorem gauss_jordan_in_reduced_row_echelon_form : ∀ (M : matrix T),
   mat_ncols M ≠ 0

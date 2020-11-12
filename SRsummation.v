@@ -277,6 +277,17 @@ rewrite srng_mul_add_distr_l.
 rewrite (IHn e); [ easy | flia Hn ].
 Qed.
 
+Theorem srng_mul_summation_distr_r : ∀ a b e f,
+  ((Σ (i = b, e), f i) * a = Σ (i = b, e), f i * a)%Srng.
+Proof.
+intros.
+rewrite srng_mul_comm.
+rewrite srng_mul_summation_distr_l.
+apply srng_summation_eq_compat.
+intros i Hi.
+apply srng_mul_comm.
+Qed.
+
 Theorem srng_summation_only_one : ∀ g n, (Σ (i = n, n), g i = g n)%Srng.
 Proof.
 intros g n.
@@ -330,6 +341,45 @@ f_equal.
 apply srng_summation_eq_compat.
 intros i Hi.
 now rewrite Nat.sub_succ, Nat.sub_0_r.
+Qed.
+
+Theorem srng_summation_summation_exch' : ∀ g k l,
+  (Σ (j = 0, k), (Σ (i = 0, l), g i j) =
+   Σ (i = 0, l), Σ (j = 0, k), g i j)%Srng.
+Proof.
+intros.
+revert l.
+induction k; intros. {
+  cbn; do 3 rewrite srng_add_0_l.
+  apply List_fold_left_ext_in.
+  intros i c Hi.
+  now rewrite srng_add_0_l.
+}
+rewrite srng_summation_split_last; [ | flia ].
+rewrite srng_summation_succ_succ.
+erewrite srng_summation_eq_compat. 2: {
+  intros i Hi.
+  erewrite srng_summation_eq_compat. 2: {
+    intros j Hj.
+    now rewrite Nat.sub_succ, Nat.sub_0_r.
+  }
+  easy.
+}
+cbn - [ iter_seq ].
+symmetry.
+erewrite srng_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite srng_summation_split_last; [ | flia ].
+  rewrite srng_summation_succ_succ.
+  erewrite srng_summation_eq_compat. 2: {
+    intros j Hj.
+    now rewrite Nat.sub_succ, Nat.sub_0_r.
+  }
+  easy.
+}
+cbn - [ iter_seq ].
+rewrite IHk.
+apply srng_summation_add_distr.
 Qed.
 
 Theorem fold_left_add_seq_add : ∀ b len i g,

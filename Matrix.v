@@ -247,6 +247,35 @@ Notation "A * B" := (mat_mul A B) : M_scope.
 Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
 Notation "- A" := (mat_opp A) : M_scope.
 
+(* associativity of multiplication *)
+
+Theorem mat_mul_assoc : ∀ MA MB MC, (MA * (MB * MC))%M = ((MA * MB) * MC)%M.
+Proof.
+intros.
+apply matrix_eq; [ easy | easy | ].
+intros i j Hi Hj.
+cbn - [ iter_seq ].
+cbn in Hi, Hj.
+remember (mat_ncols MA) as ca eqn:Hca.
+remember (mat_ncols MB) as cb eqn:Hcb.
+move cb before ca.
+erewrite srng_summation_eq_compat; [ | easy | ]. 2: {
+  intros k Hk.
+  now apply srng_mul_summation_distr_l.
+}
+cbn - [ iter_seq ].
+rewrite srng_summation_summation_exch'; [ | easy ].
+apply srng_summation_eq_compat; [ easy | ].
+intros k Hk.
+erewrite srng_summation_eq_compat; [ | easy | ]. 2: {
+  intros l Hl.
+  now rewrite srng_mul_assoc.
+}
+cbn - [ iter_seq ].
+symmetry.
+now apply srng_mul_summation_distr_r.
+Qed.
+
 (* comatrix *)
 
 Definition comatrix M : matrix T :=
