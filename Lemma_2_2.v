@@ -349,37 +349,12 @@ Definition mat_mul_row_by_scal sz k s :=
 
 Arguments mat_mul_row_by_scal sz k s%F.
 
-(* Matrix operator adding, to row i1, a scalar multiple s of row i2.
-
-   When multiplying this matrix with another matrix, it returns that
-   other matrix where coefficients in row i1 are replaced by themselves
-   plus s times the coefficient at same column in row i2 .
-     It is the identity matrix where the 0 at (i1,i2) is replaced by s.
-     Example for row 3 (staring at 0) plus a multiple s of row 0 in
-   a 5x5 matrix
-       1 0 0 0 0
-       0 1 0 0 0
-       0 0 1 0 0
-       s 0 0 1 0
-       0 0 0 0 1
-*)
-
-Definition mat_add_row_mul_scal_row sz i1 s i2 :=
-  mk_mat
-    (λ i j,
-     if Nat.eq_dec i j then 1%Srng
-     else if Nat.eq_dec i i1 then if Nat.eq_dec j i2 then s else 0%Srng
-     else 0%Srng)
-    sz sz.
-
 (* Matrix operator subtracting, to all rows k but row i, the row i multiplied
    by the coefficient in (k,j).
 
      When multiplying this matrix with another matrix, it returns that
    other matrix where all rows k (but row i) are replaced by themselves
    minus the value in row k of the same column times the value in (k,j).
-     It is the product of the matrix operator mat_add_row_mul_scal_row
-   above, on all rows but row i.
 
      Example for row 2 column 4 where "*" contains the opposite of
    the value in the other matrix at its column 4
@@ -388,21 +363,9 @@ Definition mat_add_row_mul_scal_row sz i1 s i2 :=
      0 0 1 0 0
      0 0 * 1 0
      0 0 * 0 1
-
-     Could be implemented with one only matrix instead of the product
-   of several matrices. To be tested if proofs become too complicated.
 *)
 
 Definition mat_add_rows_mul_scal_row M i j :=
-  let mso := sqr_mat_semiring_op (mat_nrows M) in
-  (Π (k = 0, mat_nrows M - 1),
-   if Nat.eq_dec k i then sqr_mat_one (mat_nrows M)
-   else
-     mat_add_row_mul_scal_row (mat_nrows M) k (- mat_el M k j)%Rng i)%Srng.
-
-(* that direct version, much simpler indeed *)
-
-Definition mat_add_rows_mul_scal_row' M i j :=
   mk_mat
     (λ i' j',
      if Nat.eq_dec i' j' then 1%Srng
