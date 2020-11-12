@@ -303,7 +303,8 @@ split; [ flia | easy ].
 Qed.
 
 (* Matrix operator swapping the rows i1 and i2 of a matrix.
-     If one multiplies this matrix by another matrix, it returns that
+
+   If one multiplies this matrix by another matrix, it returns that
    other matrix where the rows i1 and i2 are swapped
      It is the identity matrix where the 1s at (i1,i1) and (i2,i2)
    are replaced by 0s, and the 0s at (i1,i2) and (i2,i1) are replaced
@@ -326,7 +327,18 @@ Definition mat_swap_rows sz i1 i2 :=
      else if Nat.eq_dec i j then 1%Srng else 0%Srng)
     sz sz.
 
-(* Matrix operator multiplying some row a matrix by a scalar *)
+(* Matrix operator multiplying row k of a matrix by a scalar s
+
+   If one multiplies this matrix by another matrix, it returns that
+   other matrix where all coefficients in row k are multiplied by s.
+     It is the identity matrix where the 1 at (k,k) is replaced by s.
+     Example for row 3 (staring at 0) of a 5x5 matrix
+       1 0 0 0 0
+       0 1 0 0 0
+       0 0 1 0 0
+       0 0 0 s 0
+       0 0 0 0 1
+*)
 
 Definition mat_mul_row_by_scal sz k s :=
   mk_mat
@@ -337,15 +349,30 @@ Definition mat_mul_row_by_scal sz k s :=
 
 Arguments mat_mul_row_by_scal sz k s%F.
 
-(* Matrix operator adding in a matrix one row to a scalar multiple of row *)
+(* Matrix operator adding, to row i1, a scalar multiple s of row i2.
 
-Definition mat_add_row_mul_scal_row sz i' s i'' :=
+   If one multiplies this matrix by another matrix, it returns that
+   other matrix where coefficients in row i1 are replaced by themselves
+   plus s times the coefficient at same column in row i2 .
+     It is the identity matrix where the 0 at (i1,i2) is replaced by s.
+     Example for row 3 (staring at 0) plus a multiple s of row 0 in
+   a 5x5 matrix
+       1 0 0 0 0
+       0 1 0 0 0
+       0 0 1 0 0
+       s 0 0 1 0
+       0 0 0 0 1
+*)
+
+Definition mat_add_row_mul_scal_row sz i1 s i2 :=
   mk_mat
     (λ i j,
      if Nat.eq_dec i j then 1%Srng
-     else if Nat.eq_dec i i' then if Nat.eq_dec j i'' then s else 0%Srng
+     else if Nat.eq_dec i i1 then if Nat.eq_dec j i2 then s else 0%Srng
      else 0%Srng)
     sz sz.
+
+(* *)
 
 Definition mat_add_rows_mul_scal_row M i j :=
   let mso := sqr_mat_semiring_op (mat_nrows M) in
