@@ -426,7 +426,7 @@ Fixpoint gauss_jordan_list_loop (M : matrix T) i j it :=
       | Some k =>
           let ml := gauss_jordan_step_list M i j k in
           let M' := fold_right mat_mul M ml in
-          gauss_jordan_list_loop M' (i + 1) (j + 1) it' ++ ml
+          (i, j, k) :: gauss_jordan_list_loop M' (i + 1) (j + 1) it'
       | None =>
           gauss_jordan_list_loop M i (j + 1) it'
       end
@@ -436,10 +436,17 @@ Definition gauss_jordan_list (M : matrix T) :=
   gauss_jordan_list_loop M 0 0 (mat_ncols M).
 
 Definition gauss_jordan' (M : matrix T) :=
-  fold_right mat_mul M (gauss_jordan_list M).
+  fold_left
+    (λ A '(i, j, k),
+     let ml := gauss_jordan_step_list A i j k in
+     fold_right mat_mul A ml)
+    (gauss_jordan_list M) M.
 
 Theorem gauss_jordan_list_loop_gauss_jordan_loop : ∀ M i j it,
-  fold_right mat_mul M (gauss_jordan_list_loop M i j it) =
+  fold_left
+    (λ (A : matrix T) '(i, j, k),
+       fold_right mat_mul A (gauss_jordan_step_list A i j k))
+    (gauss_jordan_list_loop M i j it) M =
   gauss_jordan_loop M i j it.
 Proof.
 intros.
@@ -449,10 +456,10 @@ cbn - [ gauss_jordan_step_list ].
 remember (first_non_zero_in_col M (mat_nrows M - i) i j) as k eqn:Hk.
 symmetry in Hk.
 destruct k as [k| ]; [ | apply IHit ].
-rewrite fold_right_app.
+cbn - [ gauss_jordan_step_list ].
 rewrite IHit.
-f_equal; cbn.
 unfold gauss_jordan_step_op.
+f_equal; cbn.
 rewrite mat_mul_assoc; [ | easy ].
 now apply mat_mul_assoc.
 Qed.
@@ -486,8 +493,8 @@ End in_ring.
 
 Arguments mat_swap_rows {T so}.
 Arguments first_non_zero_in_col {T so sdp} M%M.
+Arguments gauss_jordan_step_list {T so ro fo}.
 Arguments gauss_jordan_step_op {T so ro fo}.
-
 
 Section in_field.
 
@@ -644,6 +651,7 @@ intros.
 apply gauss_jordan_loop_ncols.
 Qed.
 
+(*
 Theorem gauss_jordan_list_loop_app_sizes : ∀ M A ml i j c,
   gauss_jordan_list_loop M i j c = ml ++ [A]
   → mat_nrows A = mat_nrows M ∧ mat_ncols A = mat_nrows M.
@@ -667,6 +675,7 @@ destruct k as [k| ]. {
 }
 apply (IHc i (j + 1) ml Hml).
 Qed.
+*)
 
 (*
 Theorem gauss_jordan_list_loop_app_mul : ∀ M A ml i j c,
@@ -726,6 +735,7 @@ Qed.
 ...
 *)
 
+(*
 Theorem gauss_jordan_list_size : ∀ M A,
   A ∈ gauss_jordan_list M
   → mat_nrows A = mat_nrows M ∧
@@ -768,6 +778,7 @@ assert (H : gauss_jordan_list (B * M)%M = ml). {
   }
   cbn - [ gauss_jordan_step_list ] in Hml |-*.
 ...
+*)
 
 Theorem gauss_jordan_determinant : ∀ M,
   is_square_mat M
@@ -782,7 +793,27 @@ unfold gauss_jordan'.
 remember (gauss_jordan_list M) as ml eqn:Hml.
 symmetry in Hml.
 revert M Hsm Hml.
-induction ml as [| A] using rev_ind; intros; [ easy | ].
+induction ml as [| ((i, j), k)]; intros; [ easy | ].
+cbn - [ gauss_jordan_step_list ].
+remember (gauss_jordan_step_list M i j k) as A eqn:Ha.
+replace (mat_nrows M) with (mat_nrows (fold_right mat_mul M A)) at 1. 2: {
+  now rewrite Ha.
+}
+rewrite IHml; [ | now rewrite Ha | ]. 2: {
+  rewrite Ha.
+  unfold gauss_jordan_list in Hml |-*.
+  replace (mat_ncols _) with (mat_ncols M) by easy.
+  remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
+  destruct c; [ easy | ].
+  cbn - [ gauss_jordan_step_list ] in Hml.
+  rewrite Nat.sub_0_r in Hml.
+  remember (first_non_zero_in_col M (mat_nrows M) 0 0) as k' eqn:Hk'.
+  symmetry in Hk'.
+  destruct k' as [k'| ]. {
+    remember (fold_right _ _ _) as x in Hml.
+    injection Hml; clear Hml; intros Hml H2 H3 H4; subst k' i j x.
+    rewrite <- Hml, <- Ha.
+...
 rewrite fold_right_app; cbn.
 specialize (IHml (A * M)%M) as H1.
 cbn - [ gauss_jordan_list ] in H1.
