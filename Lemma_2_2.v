@@ -795,6 +795,26 @@ remember (gauss_jordan_list M) as gjl eqn:Hgjl.
 symmetry in Hgjl.
 revert M Hsm Hgjl.
 induction gjl as [| ((i, j), k)]; intros; [ easy | ].
+(**)
+remember (fold_right mat_mul M (gauss_jordan_step_list M i j k)) as A eqn:Ha.
+specialize (IHgjl A) as H1.
+assert (H : mat_nrows A = mat_ncols A) by now rewrite Ha.
+specialize (H1 H); clear H.
+assert (H : gauss_jordan_list A = gjl). {
+  rewrite Ha; cbn.
+  unfold gauss_jordan_list in Hgjl.
+  remember (mat_ncols M) as it eqn:Hit.
+  symmetry in Hit.
+  destruct it; [ easy | ].
+  cbn in Hgjl.
+  rewrite Nat.sub_0_r, Hsm in Hgjl.
+  remember (first_non_zero_in_col M (S it) 0 0) as k' eqn:Hk'.
+  symmetry in Hk'.
+  destruct k' as [k'| ]. {
+    injection Hgjl; clear Hgjl; intros H2 Hk Hj Hi.
+    subst k' i j.
+    rewrite Hsm.
+...
 cbn - [ gauss_jordan_step_list ].
 remember (gauss_jordan_step_list M i j k) as ml eqn:Hml.
 rewrite List_apply_fold_left. 2: {
