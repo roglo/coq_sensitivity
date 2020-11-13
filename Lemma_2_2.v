@@ -691,6 +691,9 @@ destruct k as [k| ]. {
     do 2 rewrite app_assoc in Hml.
     apply app_inj_tail in Hml.
     destruct Hml as (Hml, Ha).
+    specialize (first_non_zero_Some _ _ _ _ Hk) as (H1 & H2 & H3).
+    specialize (first_non_zero_Some _ _ _ _ Hk') as (H4 & H5 & H6).
+    move H4 before H1; move H5 before H2; move H6 before H3.
 ...
     cbn - [ gauss_jordan_step_list ].
     rewrite <- Ha at 2.
