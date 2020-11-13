@@ -642,7 +642,30 @@ intros.
 apply gauss_jordan_loop_ncols.
 Qed.
 
-(**)
+Theorem gauss_jordan_list_loop_app_sizes : ∀ M A ml i j c,
+  gauss_jordan_list_loop M i j c = ml ++ [A]
+  → mat_nrows A = mat_nrows M ∧ mat_ncols A = mat_nrows M.
+Proof.
+intros * Hml.
+revert i j ml Hml.
+induction c; intros. {
+  symmetry in Hml.
+  now apply app_eq_nil in Hml.
+}
+cbn - [ gauss_jordan_step_list ] in Hml.
+remember (first_non_zero_in_col M (mat_nrows M - i) i j) as k eqn:Hk.
+symmetry in Hk.
+destruct k as [k| ]. {
+  unfold gauss_jordan_step_list in Hml at 2.
+  do 2 rewrite List_app_cons in Hml.
+  do 2 rewrite app_assoc in Hml.
+  apply app_inj_tail in Hml.
+  destruct Hml as (Hml, Ha).
+  now rewrite <- Ha.
+}
+apply (IHc i (j + 1) ml Hml).
+Qed.
+
 Theorem gauss_jordan_list_size : ∀ M A,
   A ∈ gauss_jordan_list M
   → mat_nrows A = mat_nrows M ∧
@@ -659,72 +682,8 @@ destruct Ha as [Ha| Ha]. 2: {
   subst B.
   unfold gauss_jordan_list in Hml.
   remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
-  destruct c. {
-    symmetry in Hml.
-    now apply app_eq_nil in Hml.
-  }
-  cbn - [ gauss_jordan_step_list ] in Hml.
-  rewrite Nat.sub_0_r in Hml.
-  remember (first_non_zero_in_col M (mat_nrows M) 0 0) as k eqn:Hk.
-  symmetry in Hk.
-  destruct k as [k| ]. {
-    unfold gauss_jordan_step_list in Hml at 2.
-    do 2 rewrite List_app_cons in Hml.
-    do 2 rewrite app_assoc in Hml.
-    apply app_inj_tail in Hml.
-    destruct Hml as (Hml, Ha).
-    now rewrite <- Ha.
-  }
-  destruct c. {
-    symmetry in Hml.
-    now apply app_eq_nil in Hml.
-  }
-  cbn - [ gauss_jordan_step_list ] in Hml.
-  rewrite Nat.sub_0_r in Hml.
-  remember (first_non_zero_in_col M (mat_nrows M) 0 1) as k' eqn:Hk'.
-  symmetry in Hk'.
-  destruct k' as [k'| ]. {
-    unfold gauss_jordan_step_list in Hml at 2.
-    do 2 rewrite List_app_cons in Hml.
-    do 2 rewrite app_assoc in Hml.
-    apply app_inj_tail in Hml.
-    destruct Hml as (Hml, Ha).
-    now rewrite <- Ha.
-  }
-  assert (H : ∀ m,
-    (∀ j, j < m → first_non_zero_in_col M (mat_nrows M) 0 j = None)
-    → first_non_zero_in_col M (mat_nrows M) 0 m ≠ None
-    → gauss_jordan_list_loop M 0 m c = ml ++ [A]
-    → mat_nrows A = mat_nrows M ∧ mat_ncols A = mat_nrows M). {
-    intros m Hm Hms Hma.
-    clear Hk.
-    induction m. {
-      cbn in Hma.
-      destruct c. {
-        symmetry in Hma.
-        now apply app_eq_nil in Hma.
-      }
-      cbn - [ gauss_jordan_step_list ] in Hma.
-      rewrite Nat.sub_0_r in Hma.
-      remember (first_non_zero_in_col M (mat_nrows M) 0 0) as k eqn:Hk.
-      symmetry in Hk.
-      destruct k as [k| ]; [ | easy ].
-      unfold gauss_jordan_step_list in Hma at 2.
-      do 2 rewrite List_app_cons in Hma.
-      do 2 rewrite app_assoc in Hma.
-      apply app_inj_tail in Hma.
-      destruct Hma as (Hma, Ha).
-      now rewrite <- Ha.
-    }
-...
-    }
-  apply (H 2).
-...
-    specialize (first_non_zero_None M) as H1.
-    specialize (H1 (mat_nrows M) 0 0 (Nat.le_refl _) Hk).
-    specialize (first_non_zero_Some M) as H2.
-    specialize (H2 (mat_nrows M) 0 1 k' Hk').
-    destruct H2 as (H2 & H3 & H4); cbn in H2.
+  apply (gauss_jordan_list_loop_app_sizes M A ml 0 0 c Hml).
+}
 ...
 
 Theorem gauss_jordan_determinant : ∀ M,
