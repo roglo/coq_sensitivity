@@ -790,52 +790,33 @@ unfold determinant.
 rewrite gauss_jordan_nrows.
 rewrite <- gauss_jordan_list_gauss_jordan; [ | easy ].
 unfold gauss_jordan'.
-remember (gauss_jordan_list M) as ml eqn:Hml.
-symmetry in Hml.
-revert M Hsm Hml.
-induction ml as [| ((i, j), k)]; intros; [ easy | ].
+remember (gauss_jordan_list M) as gjl eqn:Hgjl.
+symmetry in Hgjl.
+revert M Hsm Hgjl.
+induction gjl as [| ((i, j), k)]; intros; [ easy | ].
 cbn - [ gauss_jordan_step_list ].
-remember (gauss_jordan_step_list M i j k) as A eqn:Ha.
-replace (mat_nrows M) with (mat_nrows (fold_right mat_mul M A)) at 1. 2: {
-  now rewrite Ha.
+remember (gauss_jordan_step_list M i j k) as ml eqn:Hml.
+replace (mat_nrows M) with (mat_nrows (fold_right mat_mul M ml)) at 1. 2: {
+  now rewrite Hml.
 }
-rewrite IHml; [ | now rewrite Ha | ]. 2: {
-  rewrite Ha.
-  unfold gauss_jordan_list in Hml |-*.
+rewrite IHgjl; [ | now rewrite Hml | ]. 2: {
+  rewrite Hml.
+  unfold gauss_jordan_list in Hgjl |-*.
   replace (mat_ncols _) with (mat_ncols M) by easy.
   remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
   destruct c; [ easy | ].
-  cbn - [ gauss_jordan_step_list ] in Hml.
-  rewrite Nat.sub_0_r in Hml.
+  cbn - [ gauss_jordan_step_list ] in Hgjl.
+  rewrite Nat.sub_0_r in Hgjl.
   remember (first_non_zero_in_col M (mat_nrows M) 0 0) as k' eqn:Hk'.
   symmetry in Hk'.
   destruct k' as [k'| ]. {
-    remember (fold_right _ _ _) as x in Hml.
-    injection Hml; clear Hml; intros Hml H2 H3 H4; subst k' i j x.
-    rewrite <- Hml, <- Ha.
-...
-rewrite fold_right_app; cbn.
-specialize (IHml (A * M)%M) as H1.
-cbn - [ gauss_jordan_list ] in H1.
-Print gauss_jordan_list.
-...
-specialize (H1 Hsm).
-...
-remember (mat_nrows M) as r eqn:Hr.
-rename Hsm into Hc.
-symmetry in Hr, Hc.
-revert M Hr Hc.
-induction r; intros; [ easy | ].
-cbn - [ iter_seq ].
-...
-cbn - [ det_loop ].
-rewrite Hr, Nat.sub_0_r.
-remember (first_non_zero_in_col M (S r) 0 0) as k eqn:Hk.
-symmetry in Hk.
-destruct k as [k| ]. {
-  apply first_non_zero_prop in Hk.
-  destruct Hk as (Hk & Hkz & Hknz).
-  cbn in Hk.
+    remember (fold_right _ _ _) as x in Hgjl.
+    injection Hgjl; clear Hgjl; intros Hgjl H2 H3 H4; subst k' i j x.
+    rewrite <- Hgjl, <- Hml.
+    cbn - [ gauss_jordan_step_list ].
+    replace (mat_nrows _) with (mat_nrows M) by now rewrite Hml.
+    rewrite Nat.sub_0_r.
+    remember (fold_right mat_mul M ml) as A eqn:Ha.
 ...
 intros * Hsm.
 unfold is_square_mat in Hsm.
