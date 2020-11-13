@@ -780,6 +780,7 @@ assert (H : gauss_jordan_list (B * M)%M = ml). {
 ...
 *)
 
+(**)
 Theorem gauss_jordan_determinant : ∀ M,
   is_square_mat M
   → determinant (gauss_jordan M) = determinant M.
@@ -796,6 +797,7 @@ revert M Hsm Hgjl.
 induction gjl as [| ((i, j), k)]; intros; [ easy | ].
 cbn - [ gauss_jordan_step_list ].
 remember (gauss_jordan_step_list M i j k) as ml eqn:Hml.
+...
 replace (mat_nrows M) with (mat_nrows (fold_right mat_mul M ml)) at 1. 2: {
   now rewrite Hml.
 }
@@ -837,7 +839,7 @@ destruct k as [k| ]. {
   destruct Hk as (Hk & Hkz & Hknz).
   cbn in Hk.
 ...
-(**)
+*)
 
 Theorem gauss_jordan_in_reduced_row_echelon_form : ∀ (M : matrix T),
   mat_ncols M ≠ 0
