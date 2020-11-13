@@ -485,7 +485,9 @@ Definition resolve_system (M : matrix T) (V : vector T) :=
 End in_ring.
 
 Arguments mat_swap_rows {T so}.
+Arguments first_non_zero_in_col {T so sdp} M%M.
 Arguments gauss_jordan_step_op {T so ro fo}.
+
 
 Section in_field.
 
@@ -666,6 +668,45 @@ destruct k as [k| ]. {
 apply (IHc i (j + 1) ml Hml).
 Qed.
 
+Theorem gauss_jordan_list_loop_app_mul : ∀ M A ml i j c,
+  gauss_jordan_list_loop M i j c = ml ++ [A]
+  → gauss_jordan_list_loop (A * M)%M i j c = ml.
+Proof.
+intros * Hml.
+revert i j ml Hml.
+induction c; intros. {
+  symmetry in Hml.
+  now apply app_eq_nil in Hml.
+}
+cbn - [ gauss_jordan_step_list ] in Hml |-*.
+remember (first_non_zero_in_col (A * M) (mat_nrows A - i) i j) as k eqn:Hk.
+symmetry in Hk.
+destruct k as [k| ]. {
+  remember (first_non_zero_in_col M (mat_nrows M - i) i j) as k' eqn:Hk'.
+  symmetry in Hk'.
+  move k after k'; move Hk after Hk'.
+  destruct k' as [k'| ]. {
+    unfold gauss_jordan_step_list in Hml at 2.
+    do 2 rewrite List_app_cons in Hml.
+    do 2 rewrite app_assoc in Hml.
+    apply app_inj_tail in Hml.
+    destruct Hml as (Hml, Ha).
+...
+    cbn - [ gauss_jordan_step_list ].
+    rewrite <- Ha at 2.
+  cbn - [ gauss_jordan_step_list ].
+...
+cbn - [ gauss_jordan_step_list ] in Hml.
+remember (first_non_zero_in_col M (mat_nrows M - i) i j) as k eqn:Hk.
+symmetry in Hk.
+
+...
+}
+cbn - [ gauss_jordan_step_list ].
+apply (IHc i (j + 1) ml Hml).
+Qed.
+...
+
 Theorem gauss_jordan_list_size : ∀ M A,
   A ∈ gauss_jordan_list M
   → mat_nrows A = mat_nrows M ∧
@@ -684,6 +725,29 @@ destruct Ha as [Ha| Ha]. 2: {
   remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
   apply (gauss_jordan_list_loop_app_sizes M A ml 0 0 c Hml).
 }
+specialize (IHml (B * M)%M B) as H1.
+...
+unfold gauss_jordan_list in Hml, H1.
+cbn in H1.
+Inspect 1.
+...
+apply gauss_jordan_list_loop_app_mul in Hml.
+...
+assert (H : gauss_jordan_list (B * M)%M = ml). {
+  clear A IHml Ha H1.
+  revert M B Hml.
+  induction ml as [| C] using rev_ind; intros. {
+    cbn in Hml |-*.
+    remember (mat_ncol
+...
+  cbn.
+  unfold gauss_jordan_list in Hml.
+  remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
+  destruct c. {
+    symmetry in Hml.
+    now apply app_eq_nil in Hml.
+  }
+  cbn - [ gauss_jordan_step_list ] in Hml |-*.
 ...
 
 Theorem gauss_jordan_determinant : ∀ M,
