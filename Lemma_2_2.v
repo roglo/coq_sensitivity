@@ -797,6 +797,8 @@ revert M Hsm Hgjl.
 induction gjl as [| ((i, j), k)]; intros; [ easy | ].
 cbn - [ gauss_jordan_step_list ].
 remember (gauss_jordan_step_list M i j k) as ml eqn:Hml.
+rewrite List_apply_fold_left. 2: {
+  intros A ((i', j'), k') Hijk'.
 ...
 replace (mat_nrows M) with (mat_nrows (fold_right mat_mul M ml)) at 1. 2: {
   now rewrite Hml.
