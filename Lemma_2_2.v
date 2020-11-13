@@ -675,6 +675,7 @@ destruct Ha as [Ha| Ha]. 2: {
     destruct Hml as (Hml, Ha).
     now rewrite <- Ha.
   }
+...
   destruct c. {
     symmetry in Hml.
     now apply app_eq_nil in Hml.
@@ -691,6 +692,16 @@ destruct Ha as [Ha| Ha]. 2: {
     destruct Hml as (Hml, Ha).
     now rewrite <- Ha.
   }
+...
+  assert (H : ∀ m,
+    (∀ j, j < m → first_non_zero_in_col M (mat_nrows M) 0 j = None)
+    → ((∃ k, first_non_zero_in_col M (mat_nrows M) 0 m = Some k) ∨
+       m = mat_ncols M)
+    → gauss_jordan_list_loop M 0 m c = ml ++ [A]
+    → mat_nrows A = mat_nrows M ∧ mat_ncols A = mat_nrows M). {
+...
+  }
+  eapply H.
 ...
     specialize (first_non_zero_None M) as H1.
     specialize (H1 (mat_nrows M) 0 0 (Nat.le_refl _) Hk).
