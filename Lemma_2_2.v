@@ -277,7 +277,7 @@ Fixpoint first_non_zero_in_col (M : matrix T) it i j :=
       else Some i
   end.
 
-Theorem first_non_zero_prop : ∀ M it i j k,
+Theorem first_non_zero_Some : ∀ M it i j k,
   first_non_zero_in_col M it i j = Some k
   → k < i + it ∧
     (∀ h, i ≤ h < k → mat_el M h j = 0%Srng) ∧
@@ -300,6 +300,20 @@ destruct (srng_eq_dec (mat_el M i j) 0) as [Hmz| Hmz]. {
 injection Hk; intros; subst k.
 split; [ flia | ].
 split; [ flia | easy ].
+Qed.
+
+Theorem first_non_zero_None : ∀ M it i j,
+  mat_nrows M ≤ i + it
+  → first_non_zero_in_col M it i j = None
+  → ∀ h, i ≤ h < mat_nrows M → mat_el M h j = 0%Srng.
+Proof.
+intros * Hm Hz h Hh.
+revert i j h Hz Hh Hm.
+induction it; intros; [ flia Hh Hm | ].
+cbn in Hz.
+destruct (srng_eq_dec (mat_el M i j) 0) as [Hmz| Hmz]; [ | easy ].
+destruct (Nat.eq_dec i h) as [Hih| Hih]; [ now subst h | ].
+apply (IHit (i + 1)); [ easy | flia Hh Hih | flia Hm ].
 Qed.
 
 (* Matrix operator, swapping the rows i1 and i2 of a matrix.
@@ -638,11 +652,51 @@ intros * Ha.
 remember (gauss_jordan_list M) as ml eqn:Hml.
 symmetry in Hml.
 revert M A Hml Ha.
-induction ml as [| B]; intros; [ easy | ].
-destruct Ha as [Ha| Ha]. {
+induction ml as [| B] using rev_ind; intros; [ easy | ].
+apply in_app_or in Ha.
+destruct Ha as [Ha| Ha]. 2: {
+  destruct Ha as [Ha| Ha]; [ | easy ].
   subst B.
   unfold gauss_jordan_list in Hml.
-Print gauss_jordan_list_loop.
+  remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
+  destruct c. {
+    symmetry in Hml.
+    now apply app_eq_nil in Hml.
+  }
+  cbn - [ gauss_jordan_step_list ] in Hml.
+  rewrite Nat.sub_0_r in Hml.
+  remember (first_non_zero_in_col M (mat_nrows M) 0 0) as k eqn:Hk.
+  symmetry in Hk.
+  destruct k as [k| ]. {
+    unfold gauss_jordan_step_list in Hml at 2.
+    do 2 rewrite List_app_cons in Hml.
+    do 2 rewrite app_assoc in Hml.
+    apply app_inj_tail in Hml.
+    destruct Hml as (Hml, Ha).
+    now rewrite <- Ha.
+  }
+  destruct c. {
+    symmetry in Hml.
+    now apply app_eq_nil in Hml.
+  }
+  cbn - [ gauss_jordan_step_list ] in Hml.
+  rewrite Nat.sub_0_r in Hml.
+  remember (first_non_zero_in_col M (mat_nrows M) 0 1) as k' eqn:Hk'.
+  symmetry in Hk'.
+  destruct k' as [k'| ]. {
+    unfold gauss_jordan_step_list in Hml at 2.
+    do 2 rewrite List_app_cons in Hml.
+    do 2 rewrite app_assoc in Hml.
+    apply app_inj_tail in Hml.
+    destruct Hml as (Hml, Ha).
+    now rewrite <- Ha.
+  }
+...
+    specialize (first_non_zero_None M) as H1.
+    specialize (H1 (mat_nrows M) 0 0 (Nat.le_refl _) Hk).
+    specialize (first_non_zero_Some M) as H2.
+    specialize (H2 (mat_nrows M) 0 1 k' Hk').
+    destruct H2 as (H2 & H3 & H4); cbn in H2.
 ...
 
 Theorem gauss_jordan_determinant : ∀ M,
