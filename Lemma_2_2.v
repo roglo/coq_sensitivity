@@ -668,10 +668,26 @@ destruct k as [k| ]. {
 apply (IHc i (j + 1) ml Hml).
 Qed.
 
+(*
 Theorem gauss_jordan_list_loop_app_mul : ∀ M A ml i j c,
   gauss_jordan_list_loop M i j c = ml ++ [A]
   → gauss_jordan_list_loop (A * M)%M i j c = ml.
 Proof.
+intros * Hml.
+cbn - [ gauss_jordan_step_list ] in Hml.
+remember (first_non_zero_in_col M (mat_nrows M - i) i j) as k eqn:Hk.
+symmetry in Hk.
+destruct k as [k| ]. {
+  unfold gauss_jordan_step_list in Hml at 2.
+  do 2 rewrite List_app_cons in Hml.
+  do 2 rewrite app_assoc in Hml.
+  apply app_inj_tail in Hml.
+  destruct Hml as (Hml, Ha).
+  specialize (first_non_zero_Some _ _ _ _ Hk) as (H1 & H2 & H3).
+  destruct c. {
+    cbn.
+    cbn in Hml.
+...
 intros * Hml.
 revert i j ml Hml.
 induction c; intros. {
@@ -702,13 +718,13 @@ destruct k as [k| ]. {
 cbn - [ gauss_jordan_step_list ] in Hml.
 remember (first_non_zero_in_col M (mat_nrows M - i) i j) as k eqn:Hk.
 symmetry in Hk.
-
 ...
 }
 cbn - [ gauss_jordan_step_list ].
 apply (IHc i (j + 1) ml Hml).
 Qed.
 ...
+*)
 
 Theorem gauss_jordan_list_size : ∀ M A,
   A ∈ gauss_jordan_list M
