@@ -816,6 +816,7 @@ destruct k' as [k'| ]. {
 ...
 *)
 
+(*
 Theorem gauss_jordan_determinant : ∀ M,
   is_square_mat M
   → determinant (gauss_jordan M) = determinant M.
@@ -923,6 +924,8 @@ split. 2: {
   rewrite gauss_jordan_ncols in Hp.
   destruct (Nat.eq_dec k i) as [Hki| Hki]. {
     subst i; clear Hi.
+    rewrite <- gauss_jordan_list_gauss_jordan in Hp |-*; [ | easy | easy ].
+...
 (**)
 (*trying to prove it just for the upper left number of the matrix*)
 destruct k. {
