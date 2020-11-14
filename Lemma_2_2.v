@@ -816,11 +816,146 @@ destruct k' as [k'| ]. {
 ...
 *)
 
+Theorem mat_swap_row_mul_l_lemma : ∀ M i j sz,
+  i < sz
+  → j < sz
+  → (Σ (k = 0, sz - 1), (if Nat.eq_dec k i then 1 else 0) * mat_el M k j)%Rng
+    = mat_el M i j.
+Proof.
+intros * His Hj.
+rewrite (srng_summation_split _ j); [ | flia Hj ].
+rewrite srng_summation_split_last; [ | flia ].
+destruct j. {
+  rewrite srng_summation_empty; [ | flia ].
+  rewrite srng_add_0_l.
+  destruct (Nat.eq_dec 0 i) as [Hiz| Hiz]. {
+    subst i.
+    rewrite srng_mul_1_l.
+    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+      intros k Hk.
+      destruct (Nat.eq_dec k 0) as [H| H]; [ flia H Hk | clear H ].
+      apply srng_mul_0_l.
+    }
+    apply srng_add_0_r.
+  }
+  rewrite srng_mul_0_l, srng_add_0_l.
+  cbn - [ Nat.eq_dec iter_seq ].
+  rewrite (srng_summation_split _ i); [ | flia His ].
+  rewrite srng_summation_split_last; [ | flia Hiz ].
+  rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+    intros k Hk.
+    destruct (Nat.eq_dec (k - 1) i) as [H| H]; [ flia H Hk | clear H ].
+    apply srng_mul_0_l.
+  }
+  rewrite srng_add_0_l.
+  destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
+  rewrite srng_mul_1_l.
+  rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+    intros k Hk.
+    destruct (Nat.eq_dec k i) as [H| H]; [ flia H Hk | clear H ].
+    apply srng_mul_0_l.
+  }
+  apply srng_add_0_r.
+}
+rewrite srng_summation_succ_succ.
+destruct (Nat.eq_dec (S j) i) as [Hji| Hji]. {
+  rewrite srng_mul_1_l.
+  rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+    intros k Hk.
+    rewrite Nat.sub_succ, Nat.sub_0_r.
+    destruct (Nat.eq_dec k i) as [H| H]; [ flia Hji Hk H | clear H ].
+    apply srng_mul_0_l.
+  }
+  rewrite srng_add_0_l.
+  rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+    intros k Hk.
+    destruct (Nat.eq_dec k i) as [H| H]; [ flia Hji Hk H | clear H ].
+    apply srng_mul_0_l.
+  }
+  now rewrite srng_add_0_r, Hji.
+}
+rewrite srng_mul_0_l, srng_add_0_r.
+destruct (le_dec i j) as [Hij| Hij]. {
+  rewrite (srng_summation_split _ i); [ | flia Hij ].
+  rewrite srng_summation_split_last; [ | flia ].
+  rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+    intros k Hk.
+    rewrite Nat.sub_succ, Nat.sub_0_r.
+    destruct (Nat.eq_dec (k - 1) i) as [H| H]; [ flia Hji Hk H | clear H ].
+    apply srng_mul_0_l.
+  }
+  rewrite srng_add_0_l, Nat.sub_succ, Nat.sub_0_r.
+  destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
+  rewrite srng_mul_1_l.
+  rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+    intros k Hk.
+    rewrite Nat.sub_succ, Nat.sub_0_r.
+    destruct (Nat.eq_dec k i) as [H| H]; [ flia Hji Hk H | clear H ].
+    apply srng_mul_0_l.
+  }
+  rewrite srng_add_0_r.
+  rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+    intros k Hk.
+    destruct (Nat.eq_dec k i) as [H| H]; [ flia Hij Hk H | clear H ].
+    apply srng_mul_0_l.
+  }
+  apply srng_add_0_r.
+}
+apply Nat.nle_gt in Hij.
+rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+  intros k Hk.
+  rewrite Nat.sub_succ, Nat.sub_0_r.
+  destruct (Nat.eq_dec k i) as [H| H]; [ flia Hij Hk H | clear H ].
+  apply srng_mul_0_l.
+}
+rewrite srng_add_0_l.
+rewrite (srng_summation_split _ i); [ | flia His Hij ].
+rewrite srng_summation_split_last; [ | flia Hji Hij ].
+rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+  intros k Hk.
+  destruct (Nat.eq_dec (k - 1) i) as [H| H]; [ flia Hij Hk H | clear H ].
+  apply srng_mul_0_l.
+}
+rewrite srng_add_0_l.
+destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
+rewrite srng_mul_1_l.
+rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+  intros k Hk.
+  destruct (Nat.eq_dec k i) as [H| H]; [ flia Hji Hk H | clear H ].
+  apply srng_mul_0_l.
+}
+apply srng_add_0_r.
+Qed.
+
+Theorem mat_swap_rows_mul_l : ∀ M sz i1 i2,
+  mat_ncols M = sz
+  → i1 < sz
+  → i2 < sz
+  → (mat_swap_rows sz i1 i2 * M)%M =
+    mk_mat
+      (λ i j,
+       if Nat.eq_dec i i1 then mat_el M i2 j
+       else if Nat.eq_dec i i2 then mat_el M i1 j
+       else mat_el M i j) sz sz.
+Proof.
+intros * Hsz Hi1s Hi2s.
+apply matrix_eq; [ easy | easy | ].
+cbn - [ Nat.eq_dec iter_seq ].
+intros i j Hi Hj.
+destruct (Nat.eq_dec i i1) as [Hii1| Hii1]. {
+  now apply mat_swap_row_mul_l_lemma.
+}
+destruct (Nat.eq_dec i i2) as [Hii2| Hii2]. {
+  now apply mat_swap_row_mul_l_lemma.
+}
+...
+
 Theorem det_loop_mat_swap_rows_l : ∀ M sz i1 i2 n,
   sz = mat_nrows M
   → det_loop (mat_swap_rows sz i1 i2 * M) n = det_loop M n.
 Proof.
 intros * Hsz.
+...
 revert M sz i1 i2 Hsz.
 induction n; intros; [ easy | ].
 cbn - [ iter_seq Nat.eq_dec ].
