@@ -793,22 +793,24 @@ intros * Hsm Hit Hgjl.
 revert M i j it Hsm Hit Hgjl.
 induction gjl as [| ((i', j'), k)]; intros; [ easy | ].
 remember (fold_right mat_mul M (gauss_jordan_step_list M i j k)) as A eqn:Ha.
-destruct it; [ easy | ].
-specialize (IHgjl A (i' + 1) (j' + 1) it) as H1.
-assert (H : mat_nrows A = mat_ncols A) by now rewrite Ha.
-specialize (H1 H); clear H.
-assert (H : it ≤ mat_nrows A) by (rewrite Ha; cbn; flia Hit).
-specialize (H1 H); clear H.
-assert (H : gauss_jordan_list_loop A (i' + 1) (j' + 1) it = gjl). {
-  rewrite Ha; cbn.
-  unfold gauss_jordan_list in Hgjl.
-  cbn in Hgjl.
-  remember (first_non_zero_in_col M (mat_nrows M - i) i j) as k' eqn:Hk'.
-  symmetry in Hk'.
-  destruct k' as [k'| ]. {
+remember (first_non_zero_in_col M (mat_nrows M - i) i j) as k' eqn:Hk'.
+symmetry in Hk'.
+destruct k' as [k'| ]. {
+  specialize (IHgjl A (i' + 1) (j' + 1) it) as H1.
+  assert (H : mat_nrows A = mat_ncols A) by now rewrite Ha.
+  specialize (H1 H); clear H.
+  assert (H : it ≤ mat_nrows A) by now rewrite Ha.
+  specialize (H1 H); clear H.
+  destruct it; [ easy | ].
+  assert (H : gauss_jordan_list_loop A (i' + 1) (j' + 1) (S it) = gjl). {
+    rewrite Ha; remember (S it) as sit; cbn; subst sit.
+    cbn in Hgjl.
+    rewrite Hk' in Hgjl.
     injection Hgjl; clear Hgjl; intros H2 Hk Hj Hi.
-    now subst k' i' j'.
+    subst k' i' j'.
+...
   }
+  specialize (H1 H); clear H.
 ...
 
 Theorem gauss_jordan_determinant : ∀ M,
