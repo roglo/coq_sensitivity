@@ -890,8 +890,7 @@ Theorem det_loop_mat_swap_rows_l : ∀ M sz i1 i2 n,
 Proof.
 intros * Hsr Hi1s Hi2s.
 rewrite mat_id_swap_rows_mul_l; [ | easy | easy | easy ].
-...
-revert M sz i1 i2 Hsz.
+revert M sz i1 i2 Hsr Hi1s Hi2s.
 induction n; intros; [ easy | ].
 cbn - [ iter_seq Nat.eq_dec ].
 destruct (Nat.eq_dec 0 i1) as [Hi1z| Hi1z]. {
@@ -900,72 +899,11 @@ destruct (Nat.eq_dec 0 i1) as [Hi1z| Hi1z]. {
     subst i2.
     apply srng_summation_eq_compat; [ easy | ].
     intros i Hi.
-    do 2 rewrite <- srng_mul_assoc.
-    f_equal.
-    f_equal. {
-      rewrite srng_summation_split_first; [ | easy | flia ].
-      cbn - [ iter_seq ].
-      rewrite srng_mul_1_l.
-      rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
-        intros j Hj.
-        destruct (Nat.eq_dec j 0) as [H| H]; [ flia H Hj | ].
-        apply srng_mul_0_l.
-      }
-      apply srng_add_0_r.
-    }
     f_equal; f_equal.
     apply matrix_eq; [ easy | easy | ].
-    intros k j Hk Hj.
-    cbn in Hk; simpl.
-    destruct (Nat.eq_dec k 0) as [Hkz| Hkz]. {
-      subst k.
-      rewrite srng_summation_split_first; [ simpl | easy | flia ].
-      rewrite srng_mul_1_l.
-      rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
-        intros h Hh.
-        destruct (Nat.eq_dec h 0) as [H| H]; [ flia H Hh | ].
-        apply srng_mul_0_l.
-      }
-      apply srng_add_0_r.
-    }
-    rewrite (srng_summation_split _ k); [ | flia Hk ].
-    rewrite srng_summation_split_last; [ | flia ].
-    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
-      intros h Hh.
-      destruct (Nat.eq_dec k (h - 1)) as [H| H]; [ flia H Hh | ].
-      apply srng_mul_0_l.
-    }
-    rewrite srng_add_0_l.
-    destruct (Nat.eq_dec k k) as [H| H]; [ clear H | easy ].
-    rewrite srng_mul_1_l.
-    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
-      intros h Hh.
-      destruct (Nat.eq_dec k h) as [H| H]; [ flia H Hh | ].
-      apply srng_mul_0_l.
-    }
-    apply srng_add_0_r.
+    cbn; intros j k Hj Hk.
+    destruct (Nat.eq_dec (j + 1) 0) as [H| H]; [ flia H | easy ].
   }
-  rewrite srng_summation_split_first; [ | easy | flia ].
-  destruct (lt_dec i2 sz) as [Hi2s| Hi2s]. {
-    rewrite (srng_summation_split _ i2); [ | flia Hi2s ].
-    rewrite srng_summation_split_last; [ | flia ].
-    replace i2 with (S (i2 - 1)) at 1 by flia Hi2z.
-    rewrite srng_summation_succ_succ.
-    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
-      intros i Hi.
-      rewrite Nat.sub_succ, Nat.sub_0_r.
-      destruct (Nat.eq_dec i i2) as [Hii2| Hii2]; [ flia Hi Hii2 Hi2z | ].
-      apply srng_mul_0_l.
-    }
-    rewrite srng_add_0_l.
-    destruct (Nat.eq_dec i2 i2) as [H| H]; [ clear H | easy ].
-    rewrite srng_mul_1_l.
-    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
-      intros i Hi.
-      destruct (Nat.eq_dec i i2) as [H| H]; [ flia Hi H | clear H ].
-      apply srng_mul_0_l.
-    }
-    rewrite srng_add_0_r.
 ...
 
 Theorem gauss_jordan_determinant : ∀ M,
