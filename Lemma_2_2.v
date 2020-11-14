@@ -875,6 +875,7 @@ destruct (Nat.eq_dec 0 i1) as [Hi1z| Hi1z]. {
     }
     apply srng_add_0_r.
   }
+  rewrite srng_summation_split_first; [ | easy | flia ].
 ...
 
 Theorem gauss_jordan_determinant : ∀ M,
