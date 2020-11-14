@@ -882,17 +882,18 @@ rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
 apply srng_add_0_r.
 Qed.
 
-Theorem det_loop_mat_swap_rows_l : ∀ M sz i1 i2 n,
-  sz = mat_nrows M
-  → i1 < sz
-  → i2 < sz
-  → det_loop (mat_id_swap_rows sz i1 i2 * M) n = det_loop M n.
+Theorem det_loop_mat_swap_rows_l : ∀ M i1 i2 n,
+  n = mat_nrows M
+  → i1 < n
+  → i2 < n
+  → det_loop (mat_id_swap_rows n i1 i2 * M) n = det_loop M n.
 Proof.
 intros * Hsr Hi1s Hi2s.
 rewrite mat_id_swap_rows_mul_l; [ | easy | easy | easy ].
-revert M sz i1 i2 Hsr Hi1s Hi2s.
+revert M i1 i2 Hsr Hi1s Hi2s.
 induction n; intros; [ easy | ].
 cbn - [ iter_seq Nat.eq_dec ].
+(**)
 destruct (Nat.eq_dec 0 i1) as [Hi1z| Hi1z]. {
   subst i1.
   destruct (Nat.eq_dec i2 0) as [Hi2z| Hi2z]. {
@@ -904,6 +905,8 @@ destruct (Nat.eq_dec 0 i1) as [Hi1z| Hi1z]. {
     cbn; intros j k Hj Hk.
     destruct (Nat.eq_dec (j + 1) 0) as [H| H]; [ flia H | easy ].
   }
+  rewrite srng_summation_split_first; [ | easy | flia ].
+  rewrite (srng_summation_split _ i2).
 ...
 
 Theorem gauss_jordan_determinant : ∀ M,
@@ -921,86 +924,17 @@ symmetry in Hgjl.
 unfold gauss_jordan_list in Hgjl.
 revert M Hsm Hgjl.
 induction gjl as [| ((i, j), k)]; intros; [ easy | ].
-(**)
 cbn - [ gauss_jordan_step_list ].
-unfold gauss_jordan_step_list at 2.
-cbn - [ gauss_jordan_step_list ].
-Definition det_loop' n M := det_loop M n.
-Theorem fold_det_loop' : ∀ n M, det_loop M n = det_loop' n M.
-Proof. easy. Qed.
-rewrite fold_det_loop'.
-rewrite List_apply_fold_left. 2: {
-  intros A ((i', j'), k') Hijk'.
-  cbn; unfold det_loop'.
+remember (fold_right mat_mul M (gauss_jordan_step_list M i j k)) as M' eqn:Hm.
+replace (mat_nrows M) with (mat_nrows M') at 1 by now rewrite Hm.
+rewrite IHgjl; [ | now rewrite Hm | ]. {
+  rewrite Hm.
+  unfold gauss_jordan_step_list at 1.
+  cbn - [ gauss_jordan_step_list ].
 ...
-rewrite det_loop_mat_swap_rows_l.
+  rewrite det_loop_mat_swap_rows_l; [ | easy | cbn | cbn ].
+(* goals 2 and 3 should be proven by Hgjl *)
 ...
-remember (fold_right mat_mul M (gauss_jordan_step_list M i j k)) as A eqn:Ha.
-specialize (IHgjl A) as H1.
-assert (H : mat_nrows A = mat_ncols A) by now rewrite Ha.
-specialize (H1 H); clear H.
-assert (H : gauss_jordan_list A = gjl). {
-  rewrite Ha; cbn.
-  unfold gauss_jordan_list in Hgjl.
-  remember (mat_ncols M) as it eqn:Hit.
-  symmetry in Hit.
-  destruct it; [ easy | ].
-  cbn in Hgjl.
-  rewrite Nat.sub_0_r, Hsm in Hgjl.
-  remember (first_non_zero_in_col M (S it) 0 0) as k' eqn:Hk'.
-  symmetry in Hk'.
-  destruct k' as [k'| ]. {
-    injection Hgjl; clear Hgjl; intros H2 Hk Hj Hi.
-    subst k' i j.
-    rewrite Hsm.
-...
-cbn - [ gauss_jordan_step_list ].
-remember (gauss_jordan_step_list M i j k) as ml eqn:Hml.
-rewrite List_apply_fold_left. 2: {
-  intros A ((i', j'), k') Hijk'.
-...
-replace (mat_nrows M) with (mat_nrows (fold_right mat_mul M ml)) at 1. 2: {
-  now rewrite Hml.
-}
-rewrite IHgjl; [ | now rewrite Hml | ]. 2: {
-  rewrite Hml.
-  unfold gauss_jordan_list in Hgjl |-*.
-  replace (mat_ncols _) with (mat_ncols M) by easy.
-  remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
-  destruct c; [ easy | ].
-  cbn - [ gauss_jordan_step_list ] in Hgjl.
-  rewrite Nat.sub_0_r in Hgjl.
-  remember (first_non_zero_in_col M (mat_nrows M) 0 0) as k' eqn:Hk'.
-  symmetry in Hk'.
-  destruct k' as [k'| ]. {
-    remember (fold_right _ _ _) as x in Hgjl.
-    injection Hgjl; clear Hgjl; intros Hgjl H2 H3 H4; subst k' i j x.
-    rewrite <- Hgjl, <- Hml.
-    cbn - [ gauss_jordan_step_list ].
-    replace (mat_nrows _) with (mat_nrows M) by now rewrite Hml.
-    rewrite Nat.sub_0_r.
-    remember (fold_right mat_mul M ml) as A eqn:Ha.
-...
-intros * Hsm.
-unfold is_square_mat in Hsm.
-unfold determinant.
-unfold gauss_jordan.
-rewrite <- Hsm.
-remember (mat_nrows M) as r eqn:Hr.
-rename Hsm into Hc.
-symmetry in Hr, Hc.
-revert M Hr Hc.
-induction r; intros; [ easy | ].
-cbn - [ det_loop ].
-rewrite Hr, Nat.sub_0_r.
-remember (first_non_zero_in_col M (S r) 0 0) as k eqn:Hk.
-symmetry in Hk.
-destruct k as [k| ]. {
-  apply first_non_zero_prop in Hk.
-  destruct Hk as (Hk & Hkz & Hknz).
-  cbn in Hk.
-...
-*)
 
 Theorem gauss_jordan_in_reduced_row_echelon_form : ∀ (M : matrix T),
   mat_ncols M ≠ 0
