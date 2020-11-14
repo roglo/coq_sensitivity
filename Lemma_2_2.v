@@ -779,6 +779,8 @@ assert (H : gauss_jordan_list (B * M)%M = ml). {
   cbn - [ gauss_jordan_step_list ] in Hml |-*.
 ...
 *)
+
+(*
 Theorem glop : ∀ M i j it gjl,
   mat_nrows M = mat_ncols M
   → it ≤ mat_nrows M
@@ -812,6 +814,7 @@ destruct k' as [k'| ]. {
   }
   specialize (H1 H); clear H.
 ...
+*)
 
 Theorem gauss_jordan_determinant : ∀ M,
   is_square_mat M
