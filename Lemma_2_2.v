@@ -882,6 +882,7 @@ rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
 apply srng_add_0_r.
 Qed.
 
+(* faux ! ça doit être soit le même soit son opposé !
 Theorem det_loop_mat_swap_rows_l : ∀ M i1 i2 n,
   n = mat_nrows M
   → i1 < n
@@ -894,6 +895,22 @@ revert M i1 i2 Hsr Hi1s Hi2s.
 induction n; intros; [ easy | ].
 cbn - [ iter_seq Nat.eq_dec ].
 (**)
+destruct (lt_dec i1 i2) as [Hii| Hii]. {
+  rewrite (srng_summation_split _ i1); [ | flia Hi1s ].
+  rewrite srng_summation_split_last; [ | flia ].
+  rewrite (srng_summation_split _ i2 _ (i1 + 1)); [ | flia Hi2s Hii ].
+  rewrite (srng_summation_split_last _ _ i2); [ | flia Hii ].
+  remember (Σ (_ = 1, i1), _)%Srng as s_bef_i1 eqn:Hs1.
+  remember (Σ (_ = _, i2), _)%Srng as s_bet_i1_and_i2 eqn:Hs12.
+  remember (Σ (_ = _, n), _)%Srng as s_aft_i2 eqn:Hs2.
+Check IHn.
+Search subm.
+Theorem glop :
+  i ≠ 0
+  → subm (mat_swap_rows M i j) 0 i = mat_swap_rows (subm M 0 ) i j.
+...
+   det_loop (subm (mat_swap_rows M i1 i2) 0 i1) n +
+...
 destruct (Nat.eq_dec 0 i1) as [Hi1z| Hi1z]. {
   subst i1.
   destruct (Nat.eq_dec i2 0) as [Hi2z| Hi2z]. {
@@ -906,8 +923,18 @@ destruct (Nat.eq_dec 0 i1) as [Hi1z| Hi1z]. {
     destruct (Nat.eq_dec (j + 1) 0) as [H| H]; [ flia H | easy ].
   }
   rewrite srng_summation_split_first; [ | easy | flia ].
-  rewrite (srng_summation_split _ i2).
+  rewrite (srng_summation_split _ i2); [ | flia Hi2s ].
+  rewrite srng_summation_split_last; [ | flia Hi2z ].
+  cbn - [ iter_seq ].
+  rewrite srng_mul_1_l.
 ...
+*)
+
+...
+
+(* faux !!! *)
+(* le déterminant de M doit se calculer à partir des matrices
+   produites par gauss_jordan. C'est pas égal !!! *)
 
 Theorem gauss_jordan_determinant : ∀ M,
   is_square_mat M
@@ -935,6 +962,7 @@ rewrite IHgjl; [ | now rewrite Hm | ]. {
   rewrite det_loop_mat_swap_rows_l; [ | easy | cbn | cbn ].
 (* goals 2 and 3 should be proven by Hgjl *)
 ...
+*)
 
 Theorem gauss_jordan_in_reduced_row_echelon_form : ∀ (M : matrix T),
   mat_ncols M ≠ 0
