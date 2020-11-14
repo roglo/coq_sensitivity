@@ -932,20 +932,20 @@ destruct (Nat.eq_dec 0 i1) as [Hi1z| Hi1z]. {
 
 (* Multiplicative factor for computing determinant from gauss-jordan form.
    We have
-      det M = this_mult_fact * det (gauss_jordan M)
+      det (M) = this_mult_fact * det (gauss_jordan M)
    We know that the determinant of a gauss_jordan form is 1 or 0.
  *)
 
 Fixpoint det_mult_fact_from_gjl_loop (M : matrix T) i j it :=
   match it with
-  | 0 => @srng_one T so
+  | 0 => 1%Srng
   | S it' =>
       match first_non_zero_in_col M (mat_nrows M - i) i j with
       | Some k =>
           let ml := gauss_jordan_step_list M i j k in
           let M' := fold_right mat_mul M ml in
           let v :=
-            ((if Nat.eq_dec i k then 1%Srng else (- (1))) / mat_el M k j)%F
+            ((if Nat.eq_dec i k then 1 else (- (1))) * mat_el M k j)%Rng
           in
           (v * det_mult_fact_from_gjl_loop M' (S i) (S j) it')%Srng
       | None =>
