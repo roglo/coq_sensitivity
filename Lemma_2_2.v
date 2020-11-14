@@ -875,6 +875,27 @@ destruct (Nat.eq_dec 0 i1) as [Hi1z| Hi1z]. {
     }
     apply srng_add_0_r.
   }
+  rewrite srng_summation_split_first; [ | easy | flia ].
+  destruct (lt_dec i2 sz) as [Hi2s| Hi2s]. {
+    rewrite (srng_summation_split _ i2); [ | flia Hi2s ].
+    rewrite srng_summation_split_last; [ | flia ].
+    replace i2 with (S (i2 - 1)) at 1 by flia Hi2z.
+    rewrite srng_summation_succ_succ.
+    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+      intros i Hi.
+      rewrite Nat.sub_succ, Nat.sub_0_r.
+      destruct (Nat.eq_dec i i2) as [Hii2| Hii2]; [ flia Hi Hii2 Hi2z | ].
+      apply srng_mul_0_l.
+    }
+    rewrite srng_add_0_l.
+    destruct (Nat.eq_dec i2 i2) as [H| H]; [ clear H | easy ].
+    rewrite srng_mul_1_l.
+    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+      intros i Hi.
+      destruct (Nat.eq_dec i i2) as [H| H]; [ flia Hi H | clear H ].
+      apply srng_mul_0_l.
+    }
+    rewrite srng_add_0_r.
 ...
 
 Theorem gauss_jordan_determinant : ∀ M,
