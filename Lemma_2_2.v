@@ -948,7 +948,23 @@ destruct (Nat.eq_dec i i1) as [Hii1| Hii1]. {
 destruct (Nat.eq_dec i i2) as [Hii2| Hii2]. {
   now apply mat_swap_row_mul_l_lemma.
 }
-...
+rewrite (srng_summation_split _ i); [ | flia Hi ].
+rewrite srng_summation_split_last; [ | flia ].
+destruct (Nat.eq_dec i i) as [H| H]; [ clear H | flia H ].
+rewrite srng_mul_1_l.
+rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+  intros k Hk.
+  destruct (Nat.eq_dec i (k - 1)) as [H| H]; [ flia Hk H | clear H ].
+  apply srng_mul_0_l.
+}
+rewrite srng_add_0_l.
+rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+  intros k Hk.
+  destruct (Nat.eq_dec i k) as [H| H]; [ flia Hk H | clear H ].
+  apply srng_mul_0_l.
+}
+apply srng_add_0_r.
+Qed.
 
 Theorem det_loop_mat_swap_rows_l : ∀ M sz i1 i2 n,
   sz = mat_nrows M
