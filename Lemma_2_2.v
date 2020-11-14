@@ -316,6 +316,13 @@ destruct (Nat.eq_dec i h) as [Hih| Hih]; [ now subst h | ].
 apply (IHit (i + 1)); [ easy | flia Hh Hih | flia Hm ].
 Qed.
 
+Definition mat_swap_rows (M : matrix T) i1 i2 :=
+  mk_mat
+    (λ i j,
+     if Nat.eq_dec i i1 then mat_el M i2 j
+     else if Nat.eq_dec i i2 then mat_el M i1 j
+     else mat_el M i j) (mat_nrows M) (mat_ncols M).
+
 (* Matrix operator, swapping the rows i1 and i2 of a matrix.
 
    When multiplying this matrix with another matrix, it returns that
@@ -333,7 +340,8 @@ Qed.
 
    Works even if i1=i2; in that case it is the identity matrix *)
 
-Definition mat_swap_rows sz i1 i2 :=
+(* perhaps should be defined with "mat_swap_rows" above *)
+Definition mat_id_swap_rows sz i1 i2 :=
   mk_mat
     (λ i j,
      if Nat.eq_dec i i1 then if Nat.eq_dec j i2 then 1%Srng else 0%Srng
@@ -354,14 +362,14 @@ Definition mat_swap_rows sz i1 i2 :=
        0 0 0 0 1
 *)
 
-Definition mat_mul_row_by_scal sz k s :=
+Definition mat_id_mul_row_by_scal sz k s :=
   mk_mat
     (λ i j,
      if Nat.eq_dec i j then if Nat.eq_dec i k then s else 1%Srng
      else 0%Srng)
     sz sz.
 
-Arguments mat_mul_row_by_scal sz k s%F.
+Arguments mat_id_mul_row_by_scal sz k s%F.
 
 (* Matrix operator, subtracting, to all rows k but row i, the row i multiplied
    by the coefficient in (k,j).
@@ -379,7 +387,7 @@ Arguments mat_mul_row_by_scal sz k s%F.
      0 0 * 0 1
 *)
 
-Definition mat_add_rows_mul_scal_row M i j :=
+Definition mat_id_add_rows_mul_scal_row M i j :=
   mk_mat
     (λ i' j',
      if Nat.eq_dec i' j' then 1%Srng
@@ -390,9 +398,9 @@ Definition mat_add_rows_mul_scal_row M i j :=
 (* Gauss-Jordan elimination *)
 
 Definition gauss_jordan_step_op M i j k :=
-  (mat_swap_rows (mat_nrows M) i k *
-   mat_add_rows_mul_scal_row M k j *
-   mat_mul_row_by_scal (mat_nrows M) k (/ mat_el M k j))%M.
+  (mat_id_swap_rows (mat_nrows M) i k *
+   mat_id_add_rows_mul_scal_row M k j *
+   mat_id_mul_row_by_scal (mat_nrows M) k (/ mat_el M k j))%M.
 
 Fixpoint gauss_jordan_loop (M : matrix T) i j it :=
   match it with
@@ -414,9 +422,9 @@ Definition gauss_jordan (M : matrix T) :=
    gauss-jordan elimination of the initial matrix *)
 
 Definition gauss_jordan_step_list M i j k :=
-  [mat_swap_rows (mat_nrows M) i k;
-   mat_add_rows_mul_scal_row M k j;
-   mat_mul_row_by_scal (mat_nrows M) k (/ mat_el M k j)%F].
+  [mat_id_swap_rows (mat_nrows M) i k;
+   mat_id_add_rows_mul_scal_row M k j;
+   mat_id_mul_row_by_scal (mat_nrows M) k (/ mat_el M k j)%F].
 
 Fixpoint gauss_jordan_list_loop (M : matrix T) i j it :=
   match it with
@@ -491,7 +499,7 @@ Definition resolve_system (M : matrix T) (V : vector T) :=
 
 End in_ring.
 
-Arguments mat_swap_rows {T so}.
+Arguments mat_id_swap_rows {T so}.
 Arguments first_non_zero_in_col {T so sdp} M%M.
 Arguments gauss_jordan_step_list {T so ro fo}.
 Arguments gauss_jordan_step_op {T so ro fo}.
@@ -822,8 +830,8 @@ Theorem mat_swap_row_mul_l_lemma : ∀ M i j sz,
   → (Σ (k = 0, sz - 1), (if Nat.eq_dec k i then 1 else 0) * mat_el M k j)%Rng
     = mat_el M i j.
 Proof.
-intros * His Hj.
-rewrite (srng_summation_split _ j); [ | flia Hj ].
+intros * His Hjs.
+rewrite (srng_summation_split _ j); [ | flia Hjs ].
 rewrite srng_summation_split_last; [ | flia ].
 destruct j. {
   rewrite srng_summation_empty; [ | flia ].
@@ -927,22 +935,23 @@ rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
 apply srng_add_0_r.
 Qed.
 
-Theorem mat_swap_rows_mul_l : ∀ M sz i1 i2,
-  mat_ncols M = sz
+...
+
+Print mat_swap_rows.
+
+Theorem mat_id_swap_rows_mul_l : ∀ M sz i1 i2,
+  sz = mat_nrows M
   → i1 < sz
   → i2 < sz
-  → (mat_swap_rows sz i1 i2 * M)%M =
-    mk_mat
-      (λ i j,
-       if Nat.eq_dec i i1 then mat_el M i2 j
-       else if Nat.eq_dec i i2 then mat_el M i1 j
-       else mat_el M i j) sz sz.
+  → (mat_id_swap_rows sz i1 i2 * M)%M = mat_swap_rows M i1 i2.
 Proof.
 intros * Hsz Hi1s Hi2s.
 apply matrix_eq; [ easy | easy | ].
 cbn - [ Nat.eq_dec iter_seq ].
 intros i j Hi Hj.
 destruct (Nat.eq_dec i i1) as [Hii1| Hii1]. {
+  apply mat_swap_row_mul_l_lemma.
+...
   now apply mat_swap_row_mul_l_lemma.
 }
 destruct (Nat.eq_dec i i2) as [Hii2| Hii2]. {
@@ -967,10 +976,13 @@ apply srng_add_0_r.
 Qed.
 
 Theorem det_loop_mat_swap_rows_l : ∀ M sz i1 i2 n,
-  sz = mat_nrows M
+  sz = mat_ncols M
+  → i1 < sz
+  → i2 < sz
   → det_loop (mat_swap_rows sz i1 i2 * M) n = det_loop M n.
 Proof.
-intros * Hsz.
+intros * Hsz Hi1s Hi2s.
+rewrite mat_swap_rows_mul_l; [ | easy | easy | easy ].
 ...
 revert M sz i1 i2 Hsz.
 induction n; intros; [ easy | ].
