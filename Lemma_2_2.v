@@ -780,7 +780,6 @@ assert (H : gauss_jordan_list (B * M)%M = ml). {
 ...
 *)
 
-(**)
 Theorem gauss_jordan_determinant : ∀ M,
   is_square_mat M
   → determinant (gauss_jordan M) = determinant M.
