@@ -816,7 +816,67 @@ destruct k' as [k'| ]. {
 ...
 *)
 
-(*
+Theorem det_loop_mat_swap_rows_l : ∀ M sz i1 i2 n,
+  sz = mat_nrows M
+  → det_loop (mat_swap_rows sz i1 i2 * M) n = det_loop M n.
+Proof.
+intros * Hsz.
+revert M sz i1 i2 Hsz.
+induction n; intros; [ easy | ].
+cbn - [ iter_seq Nat.eq_dec ].
+destruct (Nat.eq_dec 0 i1) as [Hi1z| Hi1z]. {
+  subst i1.
+  destruct (Nat.eq_dec i2 0) as [Hi2z| Hi2z]. {
+    subst i2.
+    apply srng_summation_eq_compat; [ easy | ].
+    intros i Hi.
+    do 2 rewrite <- srng_mul_assoc.
+    f_equal.
+    f_equal. {
+      rewrite srng_summation_split_first; [ | easy | flia ].
+      cbn - [ iter_seq ].
+      rewrite srng_mul_1_l.
+      rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+        intros j Hj.
+        destruct (Nat.eq_dec j 0) as [H| H]; [ flia H Hj | ].
+        apply srng_mul_0_l.
+      }
+      apply srng_add_0_r.
+    }
+    f_equal; f_equal.
+    apply matrix_eq; [ easy | easy | ].
+    intros k j Hk Hj.
+    cbn in Hk; simpl.
+    destruct (Nat.eq_dec k 0) as [Hkz| Hkz]. {
+      subst k.
+      rewrite srng_summation_split_first; [ simpl | easy | flia ].
+      rewrite srng_mul_1_l.
+      rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+        intros h Hh.
+        destruct (Nat.eq_dec h 0) as [H| H]; [ flia H Hh | ].
+        apply srng_mul_0_l.
+      }
+      apply srng_add_0_r.
+    }
+    rewrite (srng_summation_split _ k); [ | flia Hk ].
+    rewrite srng_summation_split_last; [ | flia ].
+    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+      intros h Hh.
+      destruct (Nat.eq_dec k (h - 1)) as [H| H]; [ flia H Hh | ].
+      apply srng_mul_0_l.
+    }
+    rewrite srng_add_0_l.
+    destruct (Nat.eq_dec k k) as [H| H]; [ clear H | easy ].
+    rewrite srng_mul_1_l.
+    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+      intros h Hh.
+      destruct (Nat.eq_dec k h) as [H| H]; [ flia H Hh | ].
+      apply srng_mul_0_l.
+    }
+    apply srng_add_0_r.
+  }
+...
+
 Theorem gauss_jordan_determinant : ∀ M,
   is_square_mat M
   → determinant (gauss_jordan M) = determinant M.
@@ -830,10 +890,22 @@ unfold gauss_jordan'.
 remember (gauss_jordan_list M) as gjl eqn:Hgjl.
 symmetry in Hgjl.
 unfold gauss_jordan_list in Hgjl.
-...
 revert M Hsm Hgjl.
 induction gjl as [| ((i, j), k)]; intros; [ easy | ].
 (**)
+cbn - [ gauss_jordan_step_list ].
+unfold gauss_jordan_step_list at 2.
+cbn - [ gauss_jordan_step_list ].
+Definition det_loop' n M := det_loop M n.
+Theorem fold_det_loop' : ∀ n M, det_loop M n = det_loop' n M.
+Proof. easy. Qed.
+rewrite fold_det_loop'.
+rewrite List_apply_fold_left. 2: {
+  intros A ((i', j'), k') Hijk'.
+  cbn; unfold det_loop'.
+...
+rewrite det_loop_mat_swap_rows_l.
+...
 remember (fold_right mat_mul M (gauss_jordan_step_list M i j k)) as A eqn:Ha.
 specialize (IHgjl A) as H1.
 assert (H : mat_nrows A = mat_ncols A) by now rewrite Ha.
