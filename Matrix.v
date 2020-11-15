@@ -202,28 +202,6 @@ Definition minus_one_pow n :=
 
 (* determinant *)
 
-Fixpoint det_from_row_loop M i j :=
-  match j with
-  | 0 => 1%Rng
-  | S j' =>
-      (minus_one_pow j * mat_el M i j * determinant (subm M i j') +
-       det_from_row_loop M i j')
-  end.
-...
-
-Fixpoint det_from_row_loop M i n :=
-  match n with
-  | 0 => 1%Rng
-  | S n' =>
-      (Σ (j = 0, n'),
-       minus_one_pow j * mat_el M i j *
-       det_from_row_loop (subm M i j) i n')%Rng
-  end.
-
-      (Σ (j = 0, n'),
-       minus_one_pow j * mat_el M i j *
-       det_from_row_loop (subm M i j) i n')%Rng
-
 ...
 
 Fixpoint det_loop M n :=
