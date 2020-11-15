@@ -202,6 +202,13 @@ Definition minus_one_pow n :=
 
 (* determinant *)
 
+Definition det_from_row det M i :=
+  (minus_one_pow i *
+   Σ (j = 0, mat_ncols M - 1),
+     minus_one_pow j * mat_el M i j * det (subm M i j))%Rng.
+
+Print det_from_row.
+
 ...
 
 Fixpoint det_loop M n :=
