@@ -671,11 +671,13 @@ Definition det_mult_fact_from_gjl M :=
 (* *)
 
 Theorem resolved : ∀ M V R,
-  mat_nrows M = vect_nrows R
+  is_square_mat M
+  → mat_nrows M = vect_nrows R
   → V = resolve M R
   → (M · V)%V = R.
 Proof.
-intros * Hrr Hv.
+intros * Hsm Hrr Hv.
+unfold is_square_mat in Hsm.
 unfold resolve in Hv.
 remember (mat_nrows M) as r eqn:Hr; symmetry in Hr.
 destruct r. {
@@ -687,10 +689,24 @@ destruct r. {
   now apply vector_eq.
 }
 rename Hr into Hmr.
-symmetry in Hrr.
+symmetry in Hsm, Hrr.
 cbn in Hv.
 destruct (srng_eq_dec (determinant M) 0) as [Hdz| Hdz]. 2: {
   unfold resolve_system in Hv.
+  unfold mat_mul_vect_r.
+  apply vector_eq; [ now rewrite Hmr | ].
+  cbn - [ iter_seq ].
+  intros i Hi.
+  subst V.
+  cbn - [ iter_seq ].
+  erewrite srng_summation_eq_compat; [ | easy | ]. 2: {
+    intros j Hj.
+    rewrite (List_map_nth_in _ 0); [ | rewrite seq_length; flia Hsm Hj ].
+    rewrite seq_nth; [ | flia Hsm Hj ].
+    rewrite Nat.add_0_l.
+    easy.
+  }
+  cbn - [ iter_seq ].
 ...
 remember (gauss_jordan_loop (mat_vect_concat M R) 0 0 (mat_ncols M + 1))
   as MGJ eqn:Hmgj.
