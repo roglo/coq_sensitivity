@@ -438,6 +438,7 @@ Arguments mat_id_swap_rows {T so}.
 Arguments first_non_zero_in_col {T so sdp} M%M.
 Arguments gauss_jordan_step_list {T so ro fo}.
 Arguments gauss_jordan_step_op {T so ro fo}.
+Arguments resolve_system {T so ro fo}.
 
 Section in_field.
 
@@ -480,7 +481,7 @@ Fixpoint resolve_loop n (M : matrix T) (V : vector T) :=
         resolve_loop n' B U ++ [1%Srng]
       else
         (* resolve for example by Cramer the system of equations Mx=V *)
-        resolve_system so M V
+        resolve_system M V
   end.
 
 Definition resolve (M : matrix T) V :=
@@ -685,36 +686,35 @@ destruct r. {
   cbn in Hrr; subst rr; rewrite Hr.
   now apply vector_eq.
 }
+rename Hr into Hmr.
+symmetry in Hrr.
 cbn in Hv.
-destruct (srng_eq_dec (determinant M) 0) as [Hdz| Hdz]. {
+destruct (srng_eq_dec (determinant M) 0) as [Hdz| Hdz]. 2: {
+  unfold resolve_system in Hv.
+...
+remember (gauss_jordan_loop (mat_vect_concat M R) 0 0 (mat_ncols M + 1))
+  as MGJ eqn:Hmgj.
 remember
   {| mat_el :=
        mat_el (gauss_jordan_loop (mat_vect_concat M R) 0 0 (mat_ncols M + 1));
      mat_nrows := mat_nrows M - 1;
      mat_ncols := mat_ncols M - 1 |}
-  as MGJ eqn:Hmgj.
+  as A eqn:Ha.
 remember {|
              vect_el := λ i : nat,
                           mat_el
                             (gauss_jordan_loop (mat_vect_concat M R) 0 0
                                (mat_ncols M + 1)) i 
                             (mat_ncols M);
-             vect_nrows := mat_nrows M - 1 |} as U1 eqn:Hu1.
+             vect_nrows := mat_nrows M - 1 |} as Vrhs eqn:Hvrhs.
 remember {|
              vect_el := λ i : nat,
                           mat_el
                             (gauss_jordan_loop (mat_vect_concat M R) 0 0
                                (mat_ncols M + 1)) i 
                             (mat_ncols M - 1);
-             vect_nrows := mat_nrows M - 1 |} as U2 eqn:Hu2.
-remember (gauss_jordan_loop (mat_vect_concat M R) 0 0
-                          (mat_ncols M + 1)) as A eqn:Ha.
-assert (MGJ = A). {
-  rewrite Ha, Hmgj.
-  apply matrix_eq; cbn.
-  rewrite gauss_jordan_loop_nrows.
-  cbn.
-(* aie aie aie *)
+             vect_nrows := mat_nrows M - 1 |} as Vlast eqn:Hvlast.
+Print resolve_loop.
 ...
 
 (* Eigenvector property: the fact that V is such that MV=λV *)
