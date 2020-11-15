@@ -23,10 +23,6 @@ Context {sp : semiring_prop T}.
 Context {rp : ring_prop T}.
 Context {sdp : sring_dec_prop T}.
 Context {fo : field_op T}.
-(*
-Context {acp : @algeb_closed_prop T so sdp}.
-Existing Instance polyn_semiring_op.
-*)
 
 Add Parametric Relation : _ (@bmat_fit_for_add T)
  reflexivity proved by bmat_fit_for_add_refl
@@ -206,68 +202,6 @@ transitivity (mA n). 2: {
 }
 apply bmat_fit_for_add_IZ_A.
 Qed.
-
-(* proof that the square of eigenvalues of An is n
-   let V be an eigenvector associated with the eigenvalue λ; we have
-       An V = λ V
-   therefore
-       An² V = An (λ V) = λ (An V) = λ² V
-   but, by first part of lemma 2.2, we have
-       An² = nI
-   we can deduce that
-       λ² V = n V
-   since V ≠ 0
-       λ² = n
- *)
-
-(* donc il faut montrer qu'il existe des vecteurs propres; car,
-   pour l'instant, les "valeurs propres" d'une matrice M sont
-   définies comme étant les racines du polynôme caractéristique
-   dét(xI-M); tout ce qu'on a montré, c'est que pour les racines
-   (λi) de ce polynôme, on a
-     dét(xI-M) = Π (i=1,n),(x-λi) *)
-
-(* attempt by using roots of characteristic polynomial, as eigenvalues.
-   Drawback: does not compute the eigenvectors which are however
-   necessary for ending the lemma
-
-Definition charac_polyn_of_roots M roots :=
-  charac_polyn (mat_of_sqr_bmat M) =
-    (Π (i = 1, sqr_bmat_size M),
-       (_x - polyn_of_const (nth (i - 1) roots 0%Srng))%P)%Srng.
-
-Theorem exists_A_charac_polyn_roots :
-  ∀ n, ∃ roots, charac_polyn_of_roots (A n) roots.
-Proof.
-intros.
-now apply exists_charac_polyn_roots.
-Qed.
-
-Theorem sqr_roots_A_eq_mat_sz : ∀ n roots,
-  charac_polyn_of_roots (A n) roots
-  → ∀ μ, μ ∈ roots → (μ * μ)%Srng = rng_mul_nat_l n 1%Srng.
-Proof.
-intros * Hcp * Hev.
-unfold charac_polyn_of_roots in Hcp.
-specialize (lemma_2_A_n_2_eq_n_I n) as Ha.
-unfold charac_polyn in Hcp.
-unfold xI_sub_M in Hcp.
-unfold sqr_bmat_size in Hcp.
-remember (mat_nrows (mat_of_sqr_bmat (A n))) as m eqn:Hm.
-cbn in Hm.
-rewrite Nat.sub_0_r in Hm.
-rewrite sizes_of_bmatrix_A in Hm, Hcp.
-rewrite repeat_length in Hm, Hcp.
-replace n with (S n - 1) in Hm at 1 by flia.
-rewrite fold_iter_seq in Hm.
-rewrite <- Hm in Hcp.
-...
-*)
-
-(* https://fr.wikipedia.org/wiki/%C3%89limination_de_Gauss-Jordan#Algorithme *)
-(* but taking any non zero value in the column instead of the maximum one
-   in absolute value, because taking the maximum is just for computation,
-   not for mathematics *)
 
 Fixpoint first_non_zero_in_col (M : matrix T) it i j :=
   match it with
@@ -551,18 +485,6 @@ Fixpoint resolve_loop n (M : matrix T) (V : vector T) :=
 
 Definition resolve (M : matrix T) V := resolve_loop (mat_nrows M) M V.
 
-(* trucs à prouver:
-   1/ que le résultat de gauss_jordan donne bien une matrice échelonnée
-      réduite
-   2/ que, pour un matrice carrée, si le déterminant est nul, alors la
-      dernière ligne de son gauss_jordan est nulle; si la matrice est
-      bien échelonnée réduite, la dernière ligne contient au moins n-1
-      zéros; il resterait à prouver que le dernier coefficient est bien
-      nul lui aussi
-   3/ est-il possible que la réciproque soit vraie ? que si la dernière
-      ligne n'est composée que de 0, alors c'est que le déterminant de
-      la matrice initiale est nul ? *)
-
 (* pivot *)
 
 Fixpoint pivot_index_loop (M : matrix T) i j it :=
@@ -659,171 +581,6 @@ Proof.
 intros.
 apply gauss_jordan_loop_ncols.
 Qed.
-
-(*
-Theorem gauss_jordan_list_loop_app_sizes : ∀ M A ml i j c,
-  gauss_jordan_list_loop M i j c = ml ++ [A]
-  → mat_nrows A = mat_nrows M ∧ mat_ncols A = mat_nrows M.
-Proof.
-intros * Hml.
-revert i j ml Hml.
-induction c; intros. {
-  symmetry in Hml.
-  now apply app_eq_nil in Hml.
-}
-cbn - [ gauss_jordan_step_list ] in Hml.
-remember (first_non_zero_in_col M (mat_nrows M - i) i j) as k eqn:Hk.
-symmetry in Hk.
-destruct k as [k| ]. {
-  unfold gauss_jordan_step_list in Hml at 2.
-  do 2 rewrite List_app_cons in Hml.
-  do 2 rewrite app_assoc in Hml.
-  apply app_inj_tail in Hml.
-  destruct Hml as (Hml, Ha).
-  now rewrite <- Ha.
-}
-apply (IHc i (j + 1) ml Hml).
-Qed.
-*)
-
-(*
-Theorem gauss_jordan_list_loop_app_mul : ∀ M A ml i j c,
-  gauss_jordan_list_loop M i j c = ml ++ [A]
-  → gauss_jordan_list_loop (A * M)%M i j c = ml.
-Proof.
-intros * Hml.
-cbn - [ gauss_jordan_step_list ] in Hml.
-remember (first_non_zero_in_col M (mat_nrows M - i) i j) as k eqn:Hk.
-symmetry in Hk.
-destruct k as [k| ]. {
-  unfold gauss_jordan_step_list in Hml at 2.
-  do 2 rewrite List_app_cons in Hml.
-  do 2 rewrite app_assoc in Hml.
-  apply app_inj_tail in Hml.
-  destruct Hml as (Hml, Ha).
-  specialize (first_non_zero_Some _ _ _ _ Hk) as (H1 & H2 & H3).
-  destruct c. {
-    cbn.
-    cbn in Hml.
-...
-intros * Hml.
-revert i j ml Hml.
-induction c; intros. {
-  symmetry in Hml.
-  now apply app_eq_nil in Hml.
-}
-cbn - [ gauss_jordan_step_list ] in Hml |-*.
-remember (first_non_zero_in_col (A * M) (mat_nrows A - i) i j) as k eqn:Hk.
-symmetry in Hk.
-destruct k as [k| ]. {
-  remember (first_non_zero_in_col M (mat_nrows M - i) i j) as k' eqn:Hk'.
-  symmetry in Hk'.
-  move k after k'; move Hk after Hk'.
-  destruct k' as [k'| ]. {
-    unfold gauss_jordan_step_list in Hml at 2.
-    do 2 rewrite List_app_cons in Hml.
-    do 2 rewrite app_assoc in Hml.
-    apply app_inj_tail in Hml.
-    destruct Hml as (Hml, Ha).
-    specialize (first_non_zero_Some _ _ _ _ Hk) as (H1 & H2 & H3).
-    specialize (first_non_zero_Some _ _ _ _ Hk') as (H4 & H5 & H6).
-    move H4 before H1; move H5 before H2; move H6 before H3.
-...
-    cbn - [ gauss_jordan_step_list ].
-    rewrite <- Ha at 2.
-  cbn - [ gauss_jordan_step_list ].
-...
-cbn - [ gauss_jordan_step_list ] in Hml.
-remember (first_non_zero_in_col M (mat_nrows M - i) i j) as k eqn:Hk.
-symmetry in Hk.
-...
-}
-cbn - [ gauss_jordan_step_list ].
-apply (IHc i (j + 1) ml Hml).
-Qed.
-...
-*)
-
-(*
-Theorem gauss_jordan_list_size : ∀ M A,
-  A ∈ gauss_jordan_list M
-  → mat_nrows A = mat_nrows M ∧
-    mat_ncols A = mat_nrows M.
-Proof.
-intros * Ha.
-remember (gauss_jordan_list M) as ml eqn:Hml.
-symmetry in Hml.
-revert M A Hml Ha.
-induction ml as [| B] using rev_ind; intros; [ easy | ].
-apply in_app_or in Ha.
-destruct Ha as [Ha| Ha]. 2: {
-  destruct Ha as [Ha| Ha]; [ | easy ].
-  subst B.
-  unfold gauss_jordan_list in Hml.
-  remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
-  apply (gauss_jordan_list_loop_app_sizes M A ml 0 0 c Hml).
-}
-specialize (IHml (B * M)%M B) as H1.
-...
-unfold gauss_jordan_list in Hml, H1.
-cbn in H1.
-Inspect 1.
-...
-apply gauss_jordan_list_loop_app_mul in Hml.
-...
-assert (H : gauss_jordan_list (B * M)%M = ml). {
-  clear A IHml Ha H1.
-  revert M B Hml.
-  induction ml as [| C] using rev_ind; intros. {
-    cbn in Hml |-*.
-    remember (mat_ncol
-...
-  cbn.
-  unfold gauss_jordan_list in Hml.
-  remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
-  destruct c. {
-    symmetry in Hml.
-    now apply app_eq_nil in Hml.
-  }
-  cbn - [ gauss_jordan_step_list ] in Hml |-*.
-...
-*)
-
-(*
-Theorem glop : ∀ M i j it gjl,
-  mat_nrows M = mat_ncols M
-  → it ≤ mat_nrows M
-  → gauss_jordan_list_loop M i j it = gjl
-  → det_loop
-      (fold_left
-         (λ (A : matrix T) '(i, j, k),
-            fold_right mat_mul A (gauss_jordan_step_list A i j k)) gjl M)
-      it = det_loop M it.
-Proof.
-intros * Hsm Hit Hgjl.
-revert M i j it Hsm Hit Hgjl.
-induction gjl as [| ((i', j'), k)]; intros; [ easy | ].
-remember (fold_right mat_mul M (gauss_jordan_step_list M i j k)) as A eqn:Ha.
-remember (first_non_zero_in_col M (mat_nrows M - i) i j) as k' eqn:Hk'.
-symmetry in Hk'.
-destruct k' as [k'| ]. {
-  specialize (IHgjl A (i' + 1) (j' + 1) it) as H1.
-  assert (H : mat_nrows A = mat_ncols A) by now rewrite Ha.
-  specialize (H1 H); clear H.
-  assert (H : it ≤ mat_nrows A) by now rewrite Ha.
-  specialize (H1 H); clear H.
-  destruct it; [ easy | ].
-  assert (H : gauss_jordan_list_loop A (i' + 1) (j' + 1) (S it) = gjl). {
-    rewrite Ha; remember (S it) as sit; cbn; subst sit.
-    cbn in Hgjl.
-    rewrite Hk' in Hgjl.
-    injection Hgjl; clear Hgjl; intros H2 Hk Hj Hi.
-    subst k' i' j'.
-...
-  }
-  specialize (H1 H); clear H.
-...
-*)
 
 Theorem mat_swap_row_mul_l_lemma : ∀ M i j sz,
   i < sz
