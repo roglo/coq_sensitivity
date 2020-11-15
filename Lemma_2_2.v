@@ -960,7 +960,7 @@ Definition det_mult_fact_from_gjl M :=
 
 (* faux !!! *)
 (* le déterminant de M doit se calculer à partir des matrices
-   produites par gauss_jordan. C'est pas égal !!! *)
+   produites par gauss_jordan. C'est pas égal !!!
 
 Theorem gauss_jordan_determinant : ∀ M,
   is_square_mat M
@@ -1033,7 +1033,6 @@ destruct k. {
       unfold gauss_jordan_step_op in Ha.
       specialize (first_non_zero_prop _ _ _ _ Hk1) as (H1 & H2 & H3).
       cbn in H1.
-Abort. (*
 ...
       remember (multiply_row_by_scalar _ _ _ _) as A' eqn:Ha'.
       remember (swap_rows M 0 k1) as A'' eqn:Ha''.

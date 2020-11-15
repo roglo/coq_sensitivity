@@ -25,9 +25,11 @@ Definition qtest_gj ll :=
 Definition qtest_gj' ll :=
   let r := gauss_jordan' (mat_of_list_list 0%Q ll) in
   list_list_of_mat r.
+(*
 Definition qtest_gjl ll :=
   let r := gauss_jordan_list (mat_of_list_list 0%Q ll) in
   map (@list_list_of_mat _) r.
+*)
 Definition qtest_gjso (ll : list (list Q)) r i j :=
   let M := mat_of_list_list 0 ll in
   list_list_of_mat (gauss_jordan_step_op M r i j).
@@ -39,6 +41,8 @@ Definition qresolve (ll : list (list Q)) v :=
 Definition qcp ll := polyn_list (charac_polyn (mat_of_list_list 0 ll)).
 Definition qtest_mul_m_v m v :=
   list_of_vect (mat_mul_vect_r (mat_of_list_list 0 m) (vect_of_list 0 v)).
+Definition qtest_det ll := determinant (mat_of_list_list 0 ll).
+Definition qtest_det_mf ll := det_mult_fact_from_gjl (mat_of_list_list 0 ll).
 
 Compute qtest_gj [[1]].
 Compute qtest_gj [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]].
@@ -46,15 +50,20 @@ Compute qtest_gj [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]].
 Compute qtest_gj [[1;3;1;9];[1;1;-1;1];[3;11;5;35]].
 Compute qtest_gj' [[1;3;1;9];[1;1;-1;1];[3;11;5;35]].
 (* = [[〈1〉; 0; 〈-2〉; 〈-3〉]; [0; 〈1〉; 〈1〉; 〈4〉]; [0; 0; 0; 0]] *)
+Compute qtest_det [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]].
+Compute qtest_det_mf [[2; -1; 0]; [-1; 2; -1]; [0; -1; 2]].
 
 Compute qtest_gj [[2;1;-1;8];[-3;-1;2;-11];[-2;1;2;-3]].
 Compute qtest_gj' [[2;1;-1;8];[-3;-1;2;-11];[-2;1;2;-3]].
 (* = [[〈1〉; 0; 0; 〈2〉]; [0; 〈1〉; 0; 〈3〉]; [0; 0; 〈1〉; 〈-1〉]] *)
+Compute qtest_det [[2;1;-1];[-3;-1;2];[-2;1;2]].
+Compute qtest_det_mf [[2;1;-1];[-3;-1;2];[-2;1;2]].
 
 Compute qtest_gj [[2;-1;0;1;0;0];[-1;2;-1;0;1;0];[0;-1;2;0;0;1]].
 Compute qtest_gj' [[2;-1;0;1;0;0];[-1;2;-1;0;1;0];[0;-1;2;0;0;1]].
 (* = [[〈1〉; 0; 0; 〈3╱4〉; 〈1╱2〉; 〈1╱4〉]; [0; 〈1〉; 0; 〈1╱2〉; 〈1〉; 〈1╱2〉];
       [0; 0; 〈1〉; 〈1╱4〉; 〈1╱2〉; 〈3╱4〉]] *)
+
 Compute qtest_gj [[0;2;1;0];[-7;-3;0;1];[3;8;18;5]].
 (* = [[〈1〉; 0; 0; 〈-13╱205〉]; [0; 〈1〉; 0; 〈-38╱205〉]; [0; 0; 〈1〉; 〈76╱205〉]] *)
 Compute qtest_gj [[-7;-3;0;1];[3;8;18;5];[0;2;1;0]].
@@ -70,6 +79,8 @@ Compute qtest_gj [[-3;-3;3];[3;-9;3];[6;-6;0]].
    0 1 -1/2
    0 0  0
 *)
+Compute qtest_det [[-3;-3;3];[3;-9;3];[6;-6;0]].
+Compute qtest_det_mf [[-3;-3;3];[3;-9;3];[6;-6;0]].
 Compute qtest_gj [[3;-3;3];[3;-3;3];[6;-6;6]].
 (*
      = ([[6; -6; 6]; [0; 0; 0]; [0; 0; 0]], 6)
@@ -108,6 +119,8 @@ Compute qtest_mul_m_v [[4;3];[-2;-3]] [-3;1].
      = [〈-9〉; 〈3〉]
     Indeed, [-3;1] is an eigenvector
 *)
+Compute qtest_det [[-1;-3];[2;6]].
+Compute qtest_det_mf [[-1;-3];[2;6]].
 (*
 2/ λ=-2
    λI-M=[[-6;-3];[2;1]]
@@ -181,13 +194,13 @@ Compute qtest_rs [[3;2;-1];[2;-2;4];[-1;1/2;-1]] [1;-2;0].
      = [〈1〉; 〈-2〉; 〈-2〉]      ok
 *)
 
-Compute list_list_of_mat (mat_add_rows_mul_scal_row Q_semiring_op (mat_of_list_list 0 [[1;2;3;4;5];[6;7;8;9;10];[11;12;13;14;15];[16;17;18;19;20];[21;22;23;23;25]]) 2%nat 4%nat).
+Compute list_list_of_mat (mat_id_add_rows_mul_scal_row Q_semiring_op (mat_of_list_list 0 [[1;2;3;4;5];[6;7;8;9;10];[11;12;13;14;15];[16;17;18;19;20];[21;22;23;23;25]]) 2%nat 4%nat).
 (*
      = [[〈1〉; 0; 〈-5〉; 0; 0]; [0; 〈1〉; 〈-10〉; 0; 0];
        [0; 0; 〈1〉; 0; 0]; [0; 0; 〈-20〉; 〈1〉; 0]; [0; 0; 〈-25〉; 0; 〈1〉]]
 *)
 
-Compute list_list_of_mat (mat_add_rows_mul_scal_row Q_semiring_op (mat_of_list_list 0 [[1;2;3;4;5];[6;7;8;9;10];[11;12;13;14;15];[16;17;18;19;20];[21;22;23;23;25]]) 4%nat 0%nat).
+Compute list_list_of_mat (mat_id_add_rows_mul_scal_row Q_semiring_op (mat_of_list_list 0 [[1;2;3;4;5];[6;7;8;9;10];[11;12;13;14;15];[16;17;18;19;20];[21;22;23;23;25]]) 4%nat 0%nat).
 
 Compute qresolve [[4;2];[3;-1]] [-1;2].
 (*
