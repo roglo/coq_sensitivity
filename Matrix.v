@@ -133,6 +133,8 @@ Definition vect_of_list {T} d (l : list T) :=
 Definition list_of_vect {T} (v : vector T) :=
   map (vect_el v) (seq 0 (vect_nrows v)).
 
+Definition vect_zero n := mk_vect (λ _, 0%Srng) n.
+
 (* addition, subtraction of vector *)
 
 Definition vect_add (U V : vector T) :=
@@ -534,6 +536,8 @@ Arguments sqr_mat_zero {T so}.
 Arguments sqr_mat_semiring_op {T so}.
 Arguments subm {T} M%M i%nat j%nat.
 Arguments vect_sub {T ro so}.
+Arguments vect_mul_scal_l {T so} _%Srng _%V.
+Arguments vect_zero {T so}.
 
 Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.
@@ -543,5 +547,7 @@ Notation "- A" := (mat_opp A) : M_scope.
 
 Notation "U + V" := (vect_add U V) : V_scope.
 Notation "U - V" := (vect_sub U V) : V_scope.
+Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
+Notation "A · V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
 
 End matrix_Notations.

@@ -9,7 +9,8 @@ Import List List.ListNotations.
 
 Require Import Misc Matrix BlockMat.
 Require Import Semiring Field2.
-Require Import SRsummation SRproduct.
+Require Import SRsummation SRproduct SRpolynomial.
+Require Import CharacPolyn.
 Import matrix_Notations.
 Import bmatrix_Notations.
 
@@ -882,54 +883,6 @@ rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
 apply srng_add_0_r.
 Qed.
 
-(* faux ! ça doit être soit le même soit son opposé !
-Theorem det_loop_mat_swap_rows_l : ∀ M i1 i2 n,
-  n = mat_nrows M
-  → i1 < n
-  → i2 < n
-  → det_loop (mat_id_swap_rows n i1 i2 * M) n = det_loop M n.
-Proof.
-intros * Hsr Hi1s Hi2s.
-rewrite mat_id_swap_rows_mul_l; [ | easy | easy | easy ].
-revert M i1 i2 Hsr Hi1s Hi2s.
-induction n; intros; [ easy | ].
-cbn - [ iter_seq Nat.eq_dec ].
-(**)
-destruct (lt_dec i1 i2) as [Hii| Hii]. {
-  rewrite (srng_summation_split _ i1); [ | flia Hi1s ].
-  rewrite srng_summation_split_last; [ | flia ].
-  rewrite (srng_summation_split _ i2 _ (i1 + 1)); [ | flia Hi2s Hii ].
-  rewrite (srng_summation_split_last _ _ i2); [ | flia Hii ].
-  remember (Σ (_ = 1, i1), _)%Srng as s_bef_i1 eqn:Hs1.
-  remember (Σ (_ = _, i2), _)%Srng as s_bet_i1_and_i2 eqn:Hs12.
-  remember (Σ (_ = _, n), _)%Srng as s_aft_i2 eqn:Hs2.
-Check IHn.
-Search subm.
-Theorem glop :
-  i ≠ 0
-  → subm (mat_swap_rows M i j) 0 i = mat_swap_rows (subm M 0 ) i j.
-...
-   det_loop (subm (mat_swap_rows M i1 i2) 0 i1) n +
-...
-destruct (Nat.eq_dec 0 i1) as [Hi1z| Hi1z]. {
-  subst i1.
-  destruct (Nat.eq_dec i2 0) as [Hi2z| Hi2z]. {
-    subst i2.
-    apply srng_summation_eq_compat; [ easy | ].
-    intros i Hi.
-    f_equal; f_equal.
-    apply matrix_eq; [ easy | easy | ].
-    cbn; intros j k Hj Hk.
-    destruct (Nat.eq_dec (j + 1) 0) as [H| H]; [ flia H | easy ].
-  }
-  rewrite srng_summation_split_first; [ | easy | flia ].
-  rewrite (srng_summation_split _ i2); [ | flia Hi2s ].
-  rewrite srng_summation_split_last; [ | flia Hi2z ].
-  cbn - [ iter_seq ].
-  rewrite srng_mul_1_l.
-...
-*)
-
 (* Multiplicative factor for computing determinant from gauss-jordan form.
    We have
       det (M) = this_mult_fact * det (gauss_jordan M)
@@ -956,39 +909,20 @@ Fixpoint det_mult_fact_from_gjl_loop (M : matrix T) i j it :=
 Definition det_mult_fact_from_gjl M :=
   det_mult_fact_from_gjl_loop M 0 0 (mat_ncols M).
 
-...
+(* Eigenvector property: the fact that V is such that MV=λV *)
 
-(* faux !!! *)
-(* le déterminant de M doit se calculer à partir des matrices
-   produites par gauss_jordan. C'est pas égal !!!
+Definition eval_mat_polyn M x :=
+  mk_mat (λ i j, eval_polyn (mat_el M i j) x) (mat_nrows M) (mat_ncols M).
 
-Theorem gauss_jordan_determinant : ∀ M,
-  is_square_mat M
-  → determinant (gauss_jordan M) = determinant M.
+Theorem eigenvector_prop : ∀ M μ V S,
+  eval_polyn (charac_polyn M) μ = 0%Srng
+  → S = eval_mat_polyn (xI_sub_M M) μ
+  → V = vect_of_list 0%Srng (resolve S (vect_zero (mat_ncols M)))
+  → (M · V = μ × V)%V.
 Proof.
-intros * Hsm.
-unfold is_square_mat in Hsm.
-unfold determinant.
-rewrite gauss_jordan_nrows.
-rewrite <- gauss_jordan_list_gauss_jordan; [ | easy ].
-unfold gauss_jordan'.
-remember (gauss_jordan_list M) as gjl eqn:Hgjl.
-symmetry in Hgjl.
-unfold gauss_jordan_list in Hgjl.
-revert M Hsm Hgjl.
-induction gjl as [| ((i, j), k)]; intros; [ easy | ].
-cbn - [ gauss_jordan_step_list ].
-remember (fold_right mat_mul M (gauss_jordan_step_list M i j k)) as M' eqn:Hm.
-replace (mat_nrows M) with (mat_nrows M') at 1 by now rewrite Hm.
-rewrite IHgjl; [ | now rewrite Hm | ]. {
-  rewrite Hm.
-  unfold gauss_jordan_step_list at 1.
-  cbn - [ gauss_jordan_step_list ].
+intros * Hμ Hs Hv.
+unfold charac_polyn in Hμ.
 ...
-  rewrite det_loop_mat_swap_rows_l; [ | easy | cbn | cbn ].
-(* goals 2 and 3 should be proven by Hgjl *)
-...
-*)
 
 Theorem gauss_jordan_in_reduced_row_echelon_form : ∀ (M : matrix T),
   mat_ncols M ≠ 0
