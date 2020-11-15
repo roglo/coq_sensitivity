@@ -128,6 +128,12 @@ Record vector T := mk_vect
   { vect_el : nat → T;
     vect_nrows : nat }.
 
+(* function extensionality required for vectors *)
+Axiom vector_eq : ∀ T (VA VB : vector T),
+  vect_nrows VA = vect_nrows VB
+  → (∀ i, i < vect_nrows VA → vect_el VA i = vect_el VB i)
+  → VA = VB.
+
 Definition vect_of_list {T} d (l : list T) :=
   mk_vect (λ i, nth i l d) (length l).
 Definition list_of_vect {T} (v : vector T) :=

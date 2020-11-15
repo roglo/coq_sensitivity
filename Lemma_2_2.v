@@ -483,7 +483,8 @@ Fixpoint resolve_loop n (M : matrix T) (V : vector T) :=
         resolve_system so M V
   end.
 
-Definition resolve (M : matrix T) V := resolve_loop (mat_nrows M) M V.
+Definition resolve (M : matrix T) V :=
+  vect_of_list 0%Srng (resolve_loop (mat_nrows M) M V).
 
 (* pivot *)
 
@@ -666,6 +667,56 @@ Fixpoint det_mult_fact_from_gjl_loop (M : matrix T) i j it :=
 Definition det_mult_fact_from_gjl M :=
   det_mult_fact_from_gjl_loop M 0 0 (mat_ncols M).
 
+(* *)
+
+Theorem resolved : ∀ M V R,
+  mat_nrows M = vect_nrows R
+  → V = resolve M R
+  → (M · V)%V = R.
+Proof.
+intros * Hrr Hv.
+unfold resolve in Hv.
+remember (mat_nrows M) as r eqn:Hr; symmetry in Hr.
+destruct r. {
+  cbn in Hv.
+  subst V.
+  unfold mat_mul_vect_r.
+  destruct R as (fr, rr).
+  cbn in Hrr; subst rr; rewrite Hr.
+  now apply vector_eq.
+}
+cbn in Hv.
+destruct (srng_eq_dec (determinant M) 0) as [Hdz| Hdz]. {
+remember
+  {| mat_el :=
+       mat_el (gauss_jordan_loop (mat_vect_concat M R) 0 0 (mat_ncols M + 1));
+     mat_nrows := mat_nrows M - 1;
+     mat_ncols := mat_ncols M - 1 |}
+  as MGJ eqn:Hmgj.
+remember {|
+             vect_el := λ i : nat,
+                          mat_el
+                            (gauss_jordan_loop (mat_vect_concat M R) 0 0
+                               (mat_ncols M + 1)) i 
+                            (mat_ncols M);
+             vect_nrows := mat_nrows M - 1 |} as U1 eqn:Hu1.
+remember {|
+             vect_el := λ i : nat,
+                          mat_el
+                            (gauss_jordan_loop (mat_vect_concat M R) 0 0
+                               (mat_ncols M + 1)) i 
+                            (mat_ncols M - 1);
+             vect_nrows := mat_nrows M - 1 |} as U2 eqn:Hu2.
+remember (gauss_jordan_loop (mat_vect_concat M R) 0 0
+                          (mat_ncols M + 1)) as A eqn:Ha.
+assert (MGJ = A). {
+  rewrite Ha, Hmgj.
+  apply matrix_eq; cbn.
+  rewrite gauss_jordan_loop_nrows.
+  cbn.
+(* aie aie aie *)
+...
+
 (* Eigenvector property: the fact that V is such that MV=λV *)
 
 Definition eval_mat_polyn M x :=
@@ -674,11 +725,13 @@ Definition eval_mat_polyn M x :=
 Theorem eigenvector_prop : ∀ M μ V S,
   eval_polyn (charac_polyn M) μ = 0%Srng
   → S = eval_mat_polyn (xI_sub_M M) μ
-  → V = vect_of_list 0%Srng (resolve S (vect_zero (mat_ncols M)))
-  → (M · V = μ × V)%V.
+  → V = resolve S (vect_zero (mat_ncols M))
+  → (M · V = μ × V)%V ∧ V ≠ vect_zero (vect_nrows V).
 Proof.
 intros * Hμ Hs Hv.
 unfold charac_polyn in Hμ.
+...
+specialize (resolved Hv) as H1.
 ...
 
 Theorem gauss_jordan_in_reduced_row_echelon_form : ∀ (M : matrix T),
