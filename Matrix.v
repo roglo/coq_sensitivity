@@ -202,15 +202,6 @@ Definition minus_one_pow n :=
 
 (* determinant *)
 
-Definition det_from_row det M i :=
-  (minus_one_pow i *
-   Σ (j = 0, mat_ncols M - 1),
-     minus_one_pow j * mat_el M i j * det (subm M i j))%Rng.
-
-Print det_from_row.
-
-...
-
 Fixpoint det_loop M n :=
   match n with
   | 0 => 1%Rng
@@ -220,6 +211,22 @@ Fixpoint det_loop M n :=
   end.
 
 Definition determinant M := det_loop M (mat_nrows M).
+
+(* the following versions of computing the determinant should
+   (to be proven) be equivalent; perhaps could help for proving
+   Cramer's rule of resolving equations *)
+
+Definition det_from_row M i :=
+  (minus_one_pow i *
+   Σ (j = 0, mat_ncols M - 1),
+     minus_one_pow j * mat_el M i j * determinant (subm M i j))%Rng.
+
+Definition det_from_col M j :=
+  (minus_one_pow j *
+   Σ (i = 0, mat_nrows M - 1),
+     minus_one_pow i * mat_el M i j * determinant (subm M i j))%Rng.
+
+...
 
 (*
 End in_ring.
