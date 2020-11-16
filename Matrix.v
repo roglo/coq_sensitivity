@@ -254,6 +254,15 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   subst i.
   destruct c; [ flia Hr Hij Hj | ].
 ...
+  rewrite srng_summation_split_first; [ symmetry | easy | flia ].
+  rewrite srng_summation_split_first; [ symmetry | easy | flia ].
+  rewrite (srng_summation_split _ j); [ symmetry | flia Hr Hj ].
+  rewrite (srng_summation_split _ j); [ symmetry | flia Hr Hj ].
+  rewrite srng_summation_split_last; [ symmetry | flia Hij ].
+  rewrite srng_summation_split_last; [ symmetry | flia Hij ].
+  cbn - [ iter_seq mat_el ].
+  do 2 rewrite srng_mul_1_l.
+...
 
 (* proof that det_from_row is equal to determinant *)
 
