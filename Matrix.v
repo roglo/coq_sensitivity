@@ -235,6 +235,23 @@ Definition mat_swap_rows (M : matrix T) i1 i2 :=
      else if Nat.eq_dec i i2 then mat_el M i1 j
      else mat_el M i j) (mat_nrows M) (mat_ncols M).
 
+Definition mat_add_row_mul_scal_row M i1 v i2 :=
+  mk_mat
+    (λ i j,
+     if Nat.eq_dec i i1 then (mat_el M i1 j + v * mat_el M i2 j)%Srng
+     else mat_el M i j)
+   (mat_nrows M) (mat_nrows M).
+
+
+Theorem det_add_row_mul_scal_row : ∀ M i v j,
+  determinant (mat_add_row_mul_scal_row M i v j) = determinant M.
+Proof.
+intros.
+(* look point 4 at
+https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html
+*)
+...
+
 Theorem det_swap_rows : ∀ M i j,
   is_square_mat M
   → i ≠ j
@@ -243,7 +260,7 @@ Theorem det_swap_rows : ∀ M i j,
   → determinant (mat_swap_rows M i j) = (- determinant M)%Rng.
 Proof.
 intros * Hsm Hij Hi Hj.
-(* look at
+(* look point 5 at
 https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html
 *)
 ...
