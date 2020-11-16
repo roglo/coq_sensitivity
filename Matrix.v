@@ -247,22 +247,63 @@ Definition mat_add_row_mul_scal_row M i1 v i2 :=
    rows in B and C are equal to the corresponding rows in A (that is B
    and C differ from A by one row only), then det(A)=det(B)+det(C). *)
 (* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html *)
-Theorem det_sum_row_row : ∀ A B C i,
-  (∀ j, mat_el A i j = (mat_el B i j + mat_el C i j)%Srng)
-  → (∀ i' j, i' ≠ i → mat_el B i' j = mat_el A i' j)
-  → (∀ i' j, i' ≠ i → mat_el C i' j = mat_el A i' j)
+
+(* Well, since my definition of the discriminant only covers the
+   row 0, we can prove that only when i=0; this will able us to
+   prove the next theorem, swapping rows by going via row 0 *)
+
+Theorem det_sum_row_row : ∀ A B C n,
+  n ≠ 0
+  → mat_nrows A = n
+  → mat_nrows B = n
+  → mat_nrows C = n
+  → mat_ncols A = n
+  → mat_ncols B = n
+  → mat_ncols C = n
+  → (∀ j, mat_el A 0 j = (mat_el B 0 j + mat_el C 0 j)%Srng)
+  → (∀ i j, i ≠ 0 → mat_el B i j = mat_el A i j)
+  → (∀ i j, i ≠ 0 → mat_el C i j = mat_el A i j)
   → determinant A = (determinant B + determinant C)%Srng.
 Proof.
-intros * Hbc Hb Hc.
-...
+intros * Hnz Hra Hrb Hrc Hca Hcb Hcc Hbc Hb Hc.
+unfold determinant.
+rewrite Hca, Hcb, Hcc.
+destruct n; [ easy | clear Hnz ].
+cbn - [ iter_seq ].
+assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
+  intros.
+  apply matrix_eq; cbn; [ now rewrite Hra, Hrb | now rewrite Hca, Hcb | ].
+  intros i j' Hi Hj'.
+  destruct (lt_dec j' j); symmetry; apply Hb; flia.
+}
+assert (Hac : ∀ j, subm A 0 j = subm C 0 j). {
+  intros.
+  apply matrix_eq; cbn; [ now rewrite Hra, Hrc | now rewrite Hca, Hcc | ].
+  intros i j' Hi Hj'.
+  destruct (lt_dec j' j); symmetry; apply Hc; flia.
+}
+erewrite srng_summation_eq_compat; [ | easy | ]. 2: {
+  intros j Hj.
+  rewrite Hbc.
+  rewrite srng_mul_add_distr_l.
+  rewrite srng_mul_add_distr_r.
+  rewrite Hab at 1.
+  rewrite Hac at 1.
+  easy.
+}
+cbn - [ iter_seq ].
+now apply srng_summation_add_distr.
+Qed.
 
-Theorem det_add_row_mul_scal_row : ∀ M i v j,
-  determinant (mat_add_row_mul_scal_row M i v j) = determinant M.
+(* If we add a row (column) of A multiplied by a scalar k to another
+   row (column) of A, then the determinant will not change. *)
+(* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html *)
+(* doing it only when the first row is 0; can be generalized later *)
+
+Theorem det_add_row_mul_scal_row : ∀ M v j,
+  determinant (mat_add_row_mul_scal_row M 0 v j) = determinant M.
 Proof.
 intros.
-(* look point 4 at
-https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html
-*)
 ...
 
 Theorem det_swap_rows : ∀ M i j,
