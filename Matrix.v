@@ -248,11 +248,46 @@ unfold determinant; cbn.
 remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
 rename Hsm into Hr.
 destruct c; [ flia Hr Hi | ].
+remember (mat_swap_rows M i j) as M' eqn:HM'.
 cbn - [ iter_seq ].
 rewrite rng_opp_summation; [ | easy | easy ].
 destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   subst i.
   destruct c; [ flia Hr Hij Hj | ].
+(**)
+  symmetry.
+  rewrite srng_summation_split_first; [ | easy | flia ].
+  rewrite (srng_summation_split _ j); [ | flia Hr Hj ].
+  rewrite srng_summation_split_last; [ | flia Hij ].
+  cbn - [ iter_seq mat_el ].
+  rewrite srng_mul_1_l.
+  remember
+    (Σ (j0 = 0, c),
+     minus_one_pow j0 * mat_el (subm M 0 0) 0 j0 *
+     det_loop (subm (subm M 0 0) 0 j0) c)%Rng as K5.
+  remember
+    (Σ (i = 2, j),
+     - (minus_one_pow (i - 1) * mat_el M 0 (i - 1) *
+        (Σ (j0 = 0, c),
+         minus_one_pow j0 * mat_el (subm M 0 (i - 1)) 0 j0 *
+         det_loop (subm (subm M 0 (i - 1)) 0 j0) c)))%Rng as K6.
+  remember
+    (Σ (j0 = 0, c),
+     minus_one_pow j0 * mat_el (subm M 0 j) 0 j0 *
+     det_loop (subm (subm M 0 j) 0 j0) c)%Rng as K7.
+  remember
+    (Σ (i = j + 1, S c),
+     - (minus_one_pow i * mat_el M 0 i *
+        (Σ (j0 = 0, c),
+         minus_one_pow j0 * mat_el (subm M 0 i) 0 j0 *
+         det_loop (subm (subm M 0 i) 0 j0) c)))%Rng as K8.
+(* I should isolate "mat_el M j j" from K5 in order to get its
+   product with "mat_el M 0 0", the rest being a sub-discriminant
+   which is supposed to be equal to the equivalent in M' in the
+   rhs *)
+...
+  symmetry.
+...
   rewrite srng_summation_split_first; [ symmetry | easy | flia ].
   rewrite srng_summation_split_first; [ symmetry | easy | flia ].
   rewrite (srng_summation_split _ j); [ symmetry | flia Hr Hj ].
@@ -263,25 +298,25 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   do 2 rewrite srng_mul_1_l.
   remember
      (Σ (j0 = 0, c),
-      minus_one_pow j0 * mat_el (subm (mat_swap_rows M 0 j) 0 0) 0 j0 *
-      det_loop (subm (subm (mat_swap_rows M 0 j) 0 0) 0 j0) c)%Rng as K1.
+      minus_one_pow j0 * mat_el (subm M' 0 0) 0 j0 *
+      det_loop (subm (subm M' 0 0) 0 j0) c)%Rng as K1.
   remember
     (Σ (i = 2, j),
-     minus_one_pow (i - 1) * mat_el M j (i - 1) *
+     minus_one_pow (i - 1) * mat_el M' 0 (i - 1) *
      (Σ (j0 = 0, c),
-      minus_one_pow j0 * mat_el (subm (mat_swap_rows M 0 j) 0 (i - 1)) 0 j0 *
-      det_loop (subm (subm (mat_swap_rows M 0 j) 0 (i - 1)) 0 j0) c))%Rng as
+      minus_one_pow j0 * mat_el (subm M' 0 (i - 1)) 0 j0 *
+      det_loop (subm (subm M' 0 (i - 1)) 0 j0) c))%Rng as
       K2.
   remember
     (Σ (j0 = 0, c),
-     minus_one_pow j0 * mat_el (subm (mat_swap_rows M 0 j) 0 j) 0 j0 *
-     det_loop (subm (subm (mat_swap_rows M 0 j) 0 j) 0 j0) c)%Rng as K3.
+     minus_one_pow j0 * mat_el (subm M' 0 j) 0 j0 *
+     det_loop (subm (subm M' 0 j) 0 j0) c)%Rng as K3.
   remember
     (Σ (i = j + 1, S c),
-     minus_one_pow i * mat_el M j i *
+     minus_one_pow i * mat_el M' 0 i *
      (Σ (j0 = 0, c),
-      minus_one_pow j0 * mat_el (subm (mat_swap_rows M 0 j) 0 i) 0 j0 *
-      det_loop (subm (subm (mat_swap_rows M 0 j) 0 i) 0 j0) c))%Rng as K4.
+      minus_one_pow j0 * mat_el (subm M' 0 i) 0 j0 *
+      det_loop (subm (subm M' 0 i) 0 j0) c))%Rng as K4.
   remember
     (Σ (j0 = 0, c),
      minus_one_pow j0 * mat_el (subm M 0 0) 0 j0 *
