@@ -237,8 +237,9 @@ Definition mat_swap_rows (M : matrix T) i1 i2 :=
 
 Theorem det_swap_rows : ∀ M i j,
   i ≠ j
-  → determinant (mat_swap_rows M i j) = determinant M.
+  → determinant (mat_swap_rows M i j) = (- determinant M)%Rng.
 Proof.
+intros * Hij.
 Admitted.
 
 (* proof that det_from_row is equal to determinant *)
@@ -258,7 +259,10 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   now rewrite Nat.sub_succ, Nat.sub_0_r.
 }
 apply not_eq_sym in Hiz.
-rewrite <- (det_swap_rows M Hiz).
+specialize (det_swap_rows M Hiz) as H.
+apply (f_equal rng_opp) in H.
+rewrite rng_opp_involutive in H.
+rewrite <- H; clear H.
 apply not_eq_sym in Hiz.
 unfold det_from_row, determinant.
 cbn - [ iter_seq ].
@@ -267,12 +271,16 @@ destruct c; [ easy | clear Hcz ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
 cbn - [ iter_seq ].
 rewrite srng_mul_summation_distr_l; [ | easy ].
+rewrite rng_opp_summation; [ | easy | easy ].
 apply srng_summation_eq_compat; [ easy | ].
 intros j Hj.
 rewrite srng_mul_comm.
 rewrite <- srng_mul_assoc.
+rewrite <- rng_mul_opp_r.
 f_equal.
 rewrite srng_mul_comm; symmetry.
+apply rng_opp_inj.
+rewrite rng_opp_involutive.
 ...
 
 (*
