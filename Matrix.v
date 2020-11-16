@@ -226,6 +226,21 @@ Definition det_from_col M j :=
    Σ (i = 0, mat_nrows M - 1),
      minus_one_pow i * mat_el M i j * determinant (subm M i j))%Rng.
 
+(* proof that the swapping two rows negates the determinant  *)
+
+Definition mat_swap_rows (M : matrix T) i1 i2 :=
+  mk_mat
+    (λ i j,
+     if Nat.eq_dec i i1 then mat_el M i2 j
+     else if Nat.eq_dec i i2 then mat_el M i1 j
+     else mat_el M i j) (mat_nrows M) (mat_ncols M).
+
+Theorem det_swap_rows : ∀ M i j,
+  i ≠ j
+  → determinant (mat_swap_rows M i j) = determinant M.
+Proof.
+Admitted.
+
 (* proof that det_from_row is equal to determinant *)
 
 Theorem det_from_row_is_det : ∀ M i,
@@ -233,12 +248,31 @@ Theorem det_from_row_is_det : ∀ M i,
   → det_from_row M i = determinant M.
 Proof.
 intros * Hcz.
+destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+  subst i.
+  unfold determinant, det_from_row.
+  cbn - [ iter_seq ].
+  rewrite srng_mul_1_l.
+  remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
+  destruct c; [ easy | clear Hcz ].
+  now rewrite Nat.sub_succ, Nat.sub_0_r.
+}
+apply not_eq_sym in Hiz.
+rewrite <- (det_swap_rows M Hiz).
+apply not_eq_sym in Hiz.
 unfold det_from_row, determinant.
 cbn - [ iter_seq ].
 remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
 destruct c; [ easy | clear Hcz ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
 cbn - [ iter_seq ].
+rewrite srng_mul_summation_distr_l; [ | easy ].
+apply srng_summation_eq_compat; [ easy | ].
+intros j Hj.
+rewrite srng_mul_comm.
+rewrite <- srng_mul_assoc.
+f_equal.
+rewrite srng_mul_comm; symmetry.
 ...
 
 (*

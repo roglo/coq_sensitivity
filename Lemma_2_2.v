@@ -251,13 +251,6 @@ destruct (Nat.eq_dec i h) as [Hih| Hih]; [ now subst h | ].
 apply (IHit (i + 1)); [ easy | flia Hh Hih | flia Hm ].
 Qed.
 
-Definition mat_swap_rows (M : matrix T) i1 i2 :=
-  mk_mat
-    (λ i j,
-     if Nat.eq_dec i i1 then mat_el M i2 j
-     else if Nat.eq_dec i i2 then mat_el M i1 j
-     else mat_el M i j) (mat_nrows M) (mat_ncols M).
-
 (* Matrix operator, swapping the rows i1 and i2 of a matrix.
 
    When multiplying this matrix with another matrix, it returns that
@@ -275,7 +268,7 @@ Definition mat_swap_rows (M : matrix T) i1 i2 :=
 
    Works even if i1=i2; in that case it is the identity matrix *)
 
-(* perhaps should be defined with "mat_swap_rows" above *)
+(* perhaps should be defined with "mat_swap_rows" of Matrix.v *)
 Definition mat_id_swap_rows sz i1 i2 :=
   mk_mat
     (λ i j,
