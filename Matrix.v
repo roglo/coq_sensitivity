@@ -240,7 +240,7 @@ Theorem det_swap_rows : ∀ M i j,
   → determinant (mat_swap_rows M i j) = (- determinant M)%Rng.
 Proof.
 intros * Hij.
-Admitted.
+...
 
 (* proof that det_from_row is equal to determinant *)
 
