@@ -275,7 +275,12 @@ rewrite (srng_mul_comm (mat_el A 0 j)).
 do 2 rewrite <- srng_mul_assoc.
 f_equal.
 rewrite srng_mul_comm; f_equal.
-...
+f_equal.
+apply matrix_eq; [ easy | easy | cbn ].
+rename j into k; rename Hj into Hk.
+intros i j Hi Hj.
+destruct (Nat.eq_dec (i + 1) 0) as [H| H]; [ flia H | easy ].
+Qed.
 
 
 (* If the i-th row (column) in A is a sum of the i-th row (column) of
@@ -331,24 +336,60 @@ cbn - [ iter_seq ].
 now apply srng_summation_add_distr.
 Qed.
 
+(* If two rows (columns) in A are equal then det(A)=0. *)
+(* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html *)
+(* doing it only when the first row is 0; can be generalized later *)
+
+Theorem det_two_rows_are_eq : ∀ A i,
+  is_square_mat A
+  → 0 < i < mat_nrows A
+  → mat_ncols A ≠ 0
+  → (∀ j, mat_el A i j = mat_el A 0 j)
+  → determinant A = 0%Srng.
+Proof.
+intros * Hsm Hiz Hcz Ha.
+unfold is_square_mat in Hsm.
+unfold determinant.
+rewrite Hsm in Hiz.
+remember (mat_ncols A) as n eqn:Hn; symmetry in Hn.
+destruct n; [ easy | clear Hcz ].
+cbn - [ iter_seq ].
+(**)
+destruct n; [ flia Hiz | ].
+cbn - [ iter_seq ].
+erewrite srng_summation_eq_compat; [ | easy | ]. 2: {  
+  intros j Hj.
+(* bon, chais pas *)
+...
+rewrite srng_summation_split_first; [ | easy | flia ].
+cbn - [ iter_seq ].
+rewrite srng_mul_1_l.
+rewrite (srng_summation_split _ i); [ | flia Hiz ].
+rewrite srng_summation_split_last;[ | easy ].
+...
+rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+  intros k Hk.
+...
+
 (* If we add a row (column) of A multiplied by a scalar k to another
    row (column) of A, then the determinant will not change. *)
 (* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html *)
 (* doing it only when the first row is 0; can be generalized later *)
 
 Theorem det_add_row_mul_scal_row : ∀ M v k,
-  mat_nrows M ≠ 0
+  is_square_mat M
+  → mat_nrows M ≠ 0
   → determinant (mat_add_row_mul_scal_row M 0 v k) = determinant M.
 Proof.
-intros * Hrz.
+intros * Hsm Hrz.
+unfold is_square_mat in Hsm.
 remember
   (mk_mat
      (λ i j,
       if Nat.eq_dec i 0 then (v * mat_el M k j)%Srng else mat_el M i j)
      (mat_nrows M) (mat_ncols M)) as C eqn:Hc.
 rewrite (det_sum_row_row _ M C Hrz); cycle 7. {
-  intros j.
-  now rewrite Hc.
+  now intros; rewrite Hc.
 } {
   intros i j Hi.
   now cbn; destruct (Nat.eq_dec i 0).
@@ -356,6 +397,21 @@ rewrite (det_sum_row_row _ M C Hrz); cycle 7. {
   intros i j Hi; rewrite Hc; cbn.
   now destruct (Nat.eq_dec i 0).
 } {
+  remember
+    (mk_mat (λ i j, if Nat.eq_dec i 0 then mat_el M k j else mat_el M i j)
+       (mat_nrows M) (mat_ncols M)) as D eqn:Hd.
+  specialize (det_mul_row_0_by_scal D v) as H1.
+  assert (H : mat_ncols D ≠ 0); [ subst D; cbn; congruence | ].
+  specialize (H1 H); clear H.
+  assert (H : mat_mul_row_0_by_scal D v = C). {
+    unfold mat_mul_row_0_by_scal; rewrite Hc, Hd; cbn.
+    apply matrix_eq; [ easy | easy | cbn ].
+    intros i j Hi Hj.
+    now destruct (Nat.eq_dec i 0).
+  }
+  rewrite H in H1; clear H.
+  assert (H : determinant D = 0%Srng). {
+    rewrite Hd.
 ...
 
 (* proof that the swapping two rows negates the determinant  *)
