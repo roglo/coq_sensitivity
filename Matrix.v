@@ -242,6 +242,19 @@ Definition mat_add_row_mul_scal_row M i1 v i2 :=
      else mat_el M i j)
    (mat_nrows M) (mat_nrows M).
 
+(* If the i-th row (column) in A is a sum of the i-th row (column) of
+   a matrix B and the i-th row (column) of a matrix C and all other
+   rows in B and C are equal to the corresponding rows in A (that is B
+   and C differ from A by one row only), then det(A)=det(B)+det(C). *)
+(* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html *)
+Theorem det_sum_row_row : ∀ A B C i,
+  (∀ j, mat_el A i j = (mat_el B i j + mat_el C i j)%Srng)
+  → (∀ i' j, i' ≠ i → mat_el B i' j = mat_el A i' j)
+  → (∀ i' j, i' ≠ i → mat_el C i' j = mat_el A i' j)
+  → determinant A = (determinant B + determinant C)%Srng.
+Proof.
+intros * Hbc Hb Hc.
+...
 
 Theorem det_add_row_mul_scal_row : ∀ M i v j,
   determinant (mat_add_row_mul_scal_row M i v j) = determinant M.
