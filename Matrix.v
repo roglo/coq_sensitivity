@@ -359,7 +359,11 @@ destruct n; [ flia Hiz | ].
 cbn - [ iter_seq ].
 erewrite srng_summation_eq_compat; [ | easy | ]. 2: {  
   intros j Hj.
-(* bon, chais pas *)
+  rewrite (srng_summation_split _ (i - 1)); [ | flia Hiz ].
+  rewrite Nat.sub_add; [ | easy ].
+  easy.
+}
+cbn - [ iter_seq ].
 ...
 rewrite srng_summation_split_first; [ | easy | flia ].
 cbn - [ iter_seq ].
