@@ -210,7 +210,7 @@ Fixpoint det_loop M n :=
        minus_one_pow j * mat_el M 0 j * det_loop (subm M 0 j) n')%Rng
   end.
 
-Definition determinant M := det_loop M (mat_nrows M).
+Definition determinant M := det_loop M (mat_ncols M).
 
 (* the following versions of computing the determinant should
    (to be proven) be equivalent; perhaps could help for proving
@@ -226,6 +226,19 @@ Definition det_from_col M j :=
    Σ (i = 0, mat_nrows M - 1),
      minus_one_pow i * mat_el M i j * determinant (subm M i j))%Rng.
 
+(* proof that det_from_row is equal to determinant *)
+
+Theorem det_from_row_is_det : ∀ M i,
+  mat_ncols M ≠ 0
+  → det_from_row M i = determinant M.
+Proof.
+intros * Hcz.
+unfold det_from_row, determinant.
+cbn - [ iter_seq ].
+remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
+destruct c; [ easy | clear Hcz ].
+rewrite Nat.sub_succ, Nat.sub_0_r.
+cbn - [ iter_seq ].
 ...
 
 (*
