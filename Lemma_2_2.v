@@ -290,6 +290,7 @@ Definition mat_id_swap_rows sz i1 i2 :=
        0 0 0 0 1
 *)
 
+(* perhaps redundant; see Matrix.v *)
 Definition mat_id_mul_row_by_scal sz k s :=
   mk_mat
     (λ i j,
@@ -315,6 +316,7 @@ Arguments mat_id_mul_row_by_scal sz k s%F.
      0 0 * 0 1
 *)
 
+(* perhaps redundant; see Matrix.v *)
 Definition mat_id_add_rows_mul_scal_row M i j :=
   mk_mat
     (λ i' j',
