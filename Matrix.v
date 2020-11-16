@@ -243,6 +243,11 @@ Theorem det_swap_rows : ∀ M i j,
   → determinant (mat_swap_rows M i j) = (- determinant M)%Rng.
 Proof.
 intros * Hsm Hij Hi Hj.
+(* look at
+https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html
+*)
+...
+intros * Hsm Hij Hi Hj.
 unfold is_square_mat in Hsm.
 unfold determinant; cbn.
 remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
