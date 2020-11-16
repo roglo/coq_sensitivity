@@ -300,10 +300,26 @@ Qed.
 (* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html *)
 (* doing it only when the first row is 0; can be generalized later *)
 
-Theorem det_add_row_mul_scal_row : ∀ M v j,
-  determinant (mat_add_row_mul_scal_row M 0 v j) = determinant M.
+Theorem det_add_row_mul_scal_row : ∀ M v k,
+  mat_nrows M ≠ 0
+  → determinant (mat_add_row_mul_scal_row M 0 v k) = determinant M.
 Proof.
-intros.
+intros * Hrz.
+remember
+  (mk_mat
+     (λ i j,
+      if Nat.eq_dec i 0 then (v * mat_el M k j)%Srng else mat_el M i j)
+     (mat_nrows M) (mat_ncols M)) as C eqn:Hc.
+rewrite (det_sum_row_row _ M C Hrz); cycle 7. {
+  intros j.
+  now rewrite Hc.
+} {
+  intros i j Hi.
+  now cbn; destruct (Nat.eq_dec i 0).
+} {
+  intros i j Hi; rewrite Hc.
+  cbn; destruct (Nat.eq_dec i 0); [ | easy ].
+(* bon, c'est pas encore ça... *)
 ...
 
 Theorem det_swap_rows : ∀ M i j,
