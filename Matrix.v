@@ -236,10 +236,23 @@ Definition mat_swap_rows (M : matrix T) i1 i2 :=
      else mat_el M i j) (mat_nrows M) (mat_ncols M).
 
 Theorem det_swap_rows : ∀ M i j,
-  i ≠ j
+  is_square_mat M
+  → i ≠ j
+  → i < mat_nrows M
+  → j < mat_nrows M
   → determinant (mat_swap_rows M i j) = (- determinant M)%Rng.
 Proof.
-intros * Hij.
+intros * Hsm Hij Hi Hj.
+unfold is_square_mat in Hsm.
+unfold determinant; cbn.
+remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
+rename Hsm into Hr.
+destruct c; [ flia Hr Hi | ].
+cbn - [ iter_seq ].
+rewrite rng_opp_summation; [ | easy | easy ].
+destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+  subst i.
+  destruct c; [ flia Hr Hij Hj | ].
 ...
 
 (* proof that det_from_row is equal to determinant *)
