@@ -689,6 +689,15 @@ erewrite srng_summation_eq_compat; [ | easy | ]. 2: {
   easy.
 }
 cbn - [ iter_seq ].
+(* should try to replace both determinants by a version going through
+   column i0: this way the sub-determinants are the same. *)
+(* but in that case, I need that a determinant going through any row
+   or any column are equal to the determinant I defined (going through
+   the first line; I started that in Matrix.v, but I am blocked *)
+(* well, I don't really need this theorem since my problem is about
+   matrices the discriminants of which are equal to zero *)
+(* but I wanted to prove it anyway, for the sport; I thought it was
+   easy but it is not *)
 ...
 
 Theorem resolved : ∀ M V R,

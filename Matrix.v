@@ -357,6 +357,7 @@ cbn - [ iter_seq ].
 (**)
 destruct n; [ flia Hiz | ].
 cbn - [ iter_seq ].
+Abort. (* blocked by the present implementation of discriminant
 ...
 erewrite srng_summation_eq_compat; [ | easy | ]. 2: {  
   intros j Hj.
@@ -375,6 +376,7 @@ rewrite srng_summation_split_last;[ | easy ].
 rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
   intros k Hk.
 ...
+*)
 
 (* If we add a row (column) of A multiplied by a scalar k to another
    row (column) of A, then the determinant will not change. *)
@@ -417,7 +419,9 @@ rewrite (det_sum_row_row _ M C Hrz); cycle 7. {
   rewrite H in H1; clear H.
   assert (H : determinant D = 0%Srng). {
     rewrite Hd.
+Abort. (* blocked because needs the previous lemma
 ...
+*)
 
 (* proof that the swapping two rows negates the determinant  *)
 
@@ -432,6 +436,7 @@ intros * Hsm Hij Hi Hj.
 (* look point 5 at
 https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html
 *)
+Abort. (*
 ...
 intros * Hsm Hij Hi Hj.
 unfold is_square_mat in Hsm.
@@ -529,6 +534,7 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
          minus_one_pow j0 * mat_el (subm M 0 i) 0 j0 *
          det_loop (subm (subm M 0 i) 0 j0) c)))%Rng as K8.
 ...
+*)
 
 (* proof that det_from_row is equal to determinant *)
 
@@ -547,6 +553,8 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   now rewrite Nat.sub_succ, Nat.sub_0_r.
 }
 apply not_eq_sym in Hiz.
+Abort. (*
+...
 specialize (det_swap_rows M Hiz) as H.
 apply (f_equal rng_opp) in H.
 rewrite rng_opp_involutive in H.
@@ -570,6 +578,7 @@ rewrite srng_mul_comm; symmetry.
 apply rng_opp_inj.
 rewrite rng_opp_involutive.
 ...
+*)
 
 (*
 End in_ring.
@@ -746,7 +755,7 @@ Arguments determinant {T ro so} M.
 
 Theorem fold_determinant :
   ∀ T {ro : ring_op T} {so : semiring_op T} (M : matrix T),
-  det_loop M (mat_nrows M) = determinant M.
+  det_loop M (mat_ncols M) = determinant M.
 Proof. easy. Qed.
 
 End in_ring.
