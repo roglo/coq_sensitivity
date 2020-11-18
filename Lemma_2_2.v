@@ -1030,9 +1030,29 @@ destruct k1 as [k1| ]. {
 ...
 *)
 
-Arguments mat_of_sqr_bmat {T so}.
 Arguments mA {T so ro}.
-Arguments I_2_pow {T so}.
+
+Theorem mat_of_sqr_mbat_mul : ∀ A B,
+  is_square_bmat A
+  → is_square_bmat B
+  → sizes_of_bmatrix A = sizes_of_bmatrix B
+  → mat_of_sqr_bmat (A * B) = (mat_of_sqr_bmat A * mat_of_sqr_bmat B)%M.
+Proof.
+intros * Ha Hb Hab.
+apply matrix_eq. {
+  cbn - [ iter_seq ].
+  unfold sqr_bmat_size.
+  now rewrite sizes_of_bmatrix_mul.
+} {
+  cbn - [ iter_seq ].
+  unfold sqr_bmat_size.
+  rewrite sizes_of_bmatrix_mul; [ | easy | easy | easy ].
+  now rewrite Hab.
+}
+cbn - [ iter_seq ].
+intros i j Hi Hj.
+rewrite sqr_bmat_size_mul in Hi; [ | easy | easy | easy ].
+...
 
 Fixpoint srng_of_nat n :=
   match n with

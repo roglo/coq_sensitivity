@@ -2812,6 +2812,19 @@ Definition sqr_bmat_size (BM : bmatrix T) :=
 Definition mat_of_sqr_bmat (BM : bmatrix T) : matrix T :=
   mk_mat (bmat_el BM) (sqr_bmat_size BM) (sqr_bmat_size BM).
 
+Arguments sqr_bmat_size BM%BM.
+
+Theorem sqr_bmat_size_mul : ∀ BMA BMB,
+  is_square_bmat BMA
+  → is_square_bmat BMB
+  → sizes_of_bmatrix BMA = sizes_of_bmatrix BMB
+  → sqr_bmat_size (BMA * BMB) = sqr_bmat_size BMA.
+Proof.
+intros * Ha Hb Hab.
+unfold sqr_bmat_size.
+now rewrite sizes_of_bmatrix_mul.
+Qed.
+
 (*
 End in_ring.
 Require Import ZArith.
@@ -2874,11 +2887,14 @@ Notation "A - B" := (bmat_sub A B) : BM_scope.
 Notation "A * B" := (bmat_mul A B) : BM_scope.
 Notation "- A" := (bmat_opp A) : BM_scope.
 
-End bmatrix_Notations.
-
+Arguments bmat_el {T so} BM%BM i%nat j%nat.
 Arguments bmat_nat_mul_l {T so}.
+Arguments mat_of_sqr_bmat {T so} BM%BM.
 Arguments I_2_pow {T so}.
 Arguments Z_2_pow {T so}.
 Arguments IZ_2_pow {T so}.
 Arguments sizes_of_bmatrix_IZ {T so}.
+Arguments sqr_bmat_size {T} BM%BM.
 Arguments Tr {T so}.
+
+End bmatrix_Notations.
