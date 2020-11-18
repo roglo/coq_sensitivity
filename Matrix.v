@@ -357,7 +357,7 @@ cbn - [ iter_seq ].
 (**)
 destruct n; [ flia Hiz | ].
 cbn - [ iter_seq ].
-...
+Abort.
 (* blocked by the present implementation of discriminant
 erewrite srng_summation_eq_compat; [ | easy | ]. 2: {  
   intros j Hj.

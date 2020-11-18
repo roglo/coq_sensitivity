@@ -699,7 +699,9 @@ cbn - [ iter_seq ].
    matrices the discriminants of which are equal to zero *)
 (* but I wanted to prove it anyway, for the sport; I thought it was
    easy but it is not *)
+Abort. (* for the moment
 ...
+*)
 
 Theorem resolved : ∀ M V R,
   is_square_mat M
@@ -723,6 +725,7 @@ rename Hr into Hmr.
 symmetry in Hsm, Hrr.
 cbn in Hv.
 destruct (srng_eq_dec (determinant M) 0) as [Hdz| Hdz]. 2: {
+Abort. (* for the moment...
   apply resolved_with_det_neq_0.
 ...
 remember (gauss_jordan_loop (mat_vect_concat M R) 0 0 (mat_ncols M + 1))
@@ -749,6 +752,7 @@ remember {|
              vect_nrows := mat_nrows M - 1 |} as Vlast eqn:Hvlast.
 Print resolve_loop.
 ...
+*)
 
 (* Eigenvector property: the fact that V is such that MV=λV *)
 
@@ -763,9 +767,11 @@ Theorem eigenvector_prop : ∀ M μ V S,
 Proof.
 intros * Hμ Hs Hv.
 unfold charac_polyn in Hμ.
+Abort. (* for the moment...
 ...
 specialize (resolved Hv) as H1.
 ...
+*)
 
 Theorem gauss_jordan_in_reduced_row_echelon_form : ∀ (M : matrix T),
   mat_ncols M ≠ 0
@@ -791,8 +797,8 @@ split. 2: {
   destruct (Nat.eq_dec k i) as [Hki| Hki]. {
     subst i; clear Hi.
     rewrite <- gauss_jordan_list_gauss_jordan in Hp |-*; [ | easy | easy ].
+Abort. (* for the moment...
 ...
-(**)
 (*trying to prove it just for the upper left number of the matrix*)
 destruct k. {
   unfold gauss_jordan in Hp |-*.
@@ -1023,5 +1029,27 @@ destruct k1 as [k1| ]. {
             clear IHr Hi.
 ...
 *)
+
+(* here, I would like to prove that, knowing that An^2 = nI, the
+   eigenvalues of An are √n and -√n, as the Lemma 2.2. claims *)
+
+Arguments mat_of_sqr_bmat {T so}.
+Arguments mA {T so ro}.
+
+Fixpoint srng_of_nat n :=
+  match n with
+  | 0 => 0%Srng
+  | S n' => (1 + srng_of_nat n')%Srng
+  end.
+
+Theorem A_eigenvalue : ∀ n μ,
+  (μ * μ = srng_of_nat n)%Rng
+  → ∃ V,
+      V ≠ vect_zero (vect_nrows V) ∧
+      (mat_of_sqr_bmat (mA n) · V = μ × V)%V.
+Proof.
+intros * Hμ2n.
+specialize (lemma_2_A_n_2_eq_n_I n) as H1.
+...
 
 End in_field.
