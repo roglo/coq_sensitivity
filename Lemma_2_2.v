@@ -1050,6 +1050,8 @@ Theorem A_eigenvalue : ∀ n μ,
 Proof.
 intros * Hμ2n.
 specialize (lemma_2_A_n_2_eq_n_I n) as H1.
+(* well, that formula is applied on block matrices, I should convert it
+   (and prove) it on normal matrices *)
 ...
 
 End in_field.
