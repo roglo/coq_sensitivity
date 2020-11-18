@@ -1030,17 +1030,26 @@ destruct k1 as [k1| ]. {
 ...
 *)
 
-(* here, I would like to prove that, knowing that An^2 = nI, the
-   eigenvalues of An are √n and -√n, as the Lemma 2.2. claims *)
-
 Arguments mat_of_sqr_bmat {T so}.
 Arguments mA {T so ro}.
+Arguments I_2_pow {T so}.
 
 Fixpoint srng_of_nat n :=
   match n with
   | 0 => 0%Srng
   | S n' => (1 + srng_of_nat n')%Srng
   end.
+
+Theorem lemma_2_A_n_2_eq_n_I' : ∀ n,
+  (mat_of_sqr_bmat (mA n) * mat_of_sqr_bmat (mA n) =
+   srng_of_nat n × mat_of_sqr_bmat (I_2_pow n))%M.
+Proof.
+intros.
+specialize (lemma_2_A_n_2_eq_n_I n) as H1.
+...
+
+(* here, I would like to prove that, knowing that An^2 = nI, the
+   eigenvalues of An are √n and -√n, as the Lemma 2.2. claims *)
 
 Theorem A_eigenvalue : ∀ n μ,
   (μ * μ = srng_of_nat n)%Rng
@@ -1049,9 +1058,7 @@ Theorem A_eigenvalue : ∀ n μ,
       (mat_of_sqr_bmat (mA n) · V = μ × V)%V.
 Proof.
 intros * Hμ2n.
-specialize (lemma_2_A_n_2_eq_n_I n) as H1.
-(* well, that formula is applied on block matrices, I should convert it
-   (and prove) it on normal matrices *)
+specialize (lemma_2_A_n_2_eq_n_I' n) as H1.
 ...
 
 End in_field.
