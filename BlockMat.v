@@ -2887,8 +2887,10 @@ destruct Hb as (_ & Hcrb & Hb).
 move Hrbz before Hraz; move Hcbz before Hcaz.
 move Hcrb before Hcra; move Hb before Ha.
 injection Hab; clear Hab; intros Hab Hrr.
+move Hrr after Hcra; move MB after Hraz.
 cbn - [ iter_seq ].
-Search (length (sizes_of_bmatrix _)).
+...
+rewrite sizes_of_bmatrix_fold_left.
 ...
 
 (*
