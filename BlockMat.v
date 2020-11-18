@@ -2873,6 +2873,22 @@ destruct B as [xb| MB]. {
   }
   now destruct (zerop (mat_ncols MA)).
 }
+remember 1 as one.
+cbn - [ iter_seq ].
+cbn - [ iter_seq ] in Ha, Hb, Hab, Hi, Hj.
+cbn in Hi, Hj; subst one.
+destruct (zerop (mat_nrows MA)) as [Hraz| Hraz]; [ easy | ].
+destruct (zerop (mat_ncols MA)) as [Hcaz| Hcaz]; [ easy | ].
+destruct (zerop (mat_nrows MB)) as [Hrbz| Hrbz]; [ easy | ].
+destruct (zerop (mat_ncols MB)) as [Hcbz| Hcbz]; [ easy | ].
+cbn in Ha, Hb, Hab, Hi, Hj.
+destruct Ha as (_ & Hcra & Ha).
+destruct Hb as (_ & Hcrb & Hb).
+move Hrbz before Hraz; move Hcbz before Hcaz.
+move Hcrb before Hcra; move Hb before Ha.
+injection Hab; clear Hab; intros Hab Hrr.
+cbn - [ iter_seq ].
+Search (length (sizes_of_bmatrix _)).
 ...
 
 (*
