@@ -2847,8 +2847,22 @@ apply matrix_eq. {
 cbn - [ iter_seq ].
 intros i j Hi Hj.
 rewrite sqr_bmat_size_mul in Hi; [ | easy | easy | easy ].
-Print bmat_el.
-Print bmat_mul.
+revert i j B Hb Hab Hi Hj.
+induction A as [xa| MA IHBM] using bmatrix_ind2; intros. {
+  cbn.
+  destruct B as [xb| MB]. {
+    symmetry.
+    apply srng_add_0_l.
+  }
+  cbn in Hab.
+  unfold is_square_bmat in Hb; cbn in Hb.
+  destruct (zerop (mat_nrows MB)) as [Hbrz| Hbrz]. {
+    cbn; rewrite Hbrz; cbn.
+    rewrite srng_mul_0_r; symmetry.
+    apply srng_add_0_l.
+  }
+  now destruct (zerop (mat_ncols MB)).
+}
 ...
 
 (*
