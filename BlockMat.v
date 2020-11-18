@@ -2847,6 +2847,10 @@ apply matrix_eq. {
 cbn - [ iter_seq ].
 intros i j Hi Hj.
 rewrite sqr_bmat_size_mul in Hi; [ | easy | easy | easy ].
+(**)
+unfold sqr_bmat_size.
+remember (sizes_of_bmatrix A) as sz eqn:Has.
+...
 revert i j B Hb Hab Hi Hj.
 induction A as [xa| MA IHMA] using bmatrix_ind2; intros. {
   cbn.
