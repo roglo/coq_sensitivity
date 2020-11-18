@@ -2848,7 +2848,7 @@ cbn - [ iter_seq ].
 intros i j Hi Hj.
 rewrite sqr_bmat_size_mul in Hi; [ | easy | easy | easy ].
 revert i j B Hb Hab Hi Hj.
-induction A as [xa| MA IHBM] using bmatrix_ind2; intros. {
+induction A as [xa| MA IHMA] using bmatrix_ind2; intros. {
   cbn.
   destruct B as [xb| MB]. {
     symmetry.
@@ -2862,6 +2862,16 @@ induction A as [xa| MA IHBM] using bmatrix_ind2; intros. {
     apply srng_add_0_l.
   }
   now destruct (zerop (mat_ncols MB)).
+}
+destruct B as [xb| MB]. {
+  cbn in Hab.
+  unfold is_square_bmat in Ha; cbn in Ha.
+  destruct (zerop (mat_nrows MA)) as [Harz| Harz]. {
+    cbn; rewrite Harz; cbn.
+    rewrite srng_mul_0_l; symmetry.
+    apply srng_add_0_l.
+  }
+  now destruct (zerop (mat_ncols MA)).
 }
 ...
 
