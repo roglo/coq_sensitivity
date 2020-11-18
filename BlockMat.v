@@ -11,6 +11,7 @@ Require Import Relations.
 Require Import Misc.
 Require Import Matrix.
 Require Import Semiring SRsummation.
+Import matrix_Notations.
 
 (* block matrices *)
 
@@ -2813,6 +2814,7 @@ Definition mat_of_sqr_bmat (BM : bmatrix T) : matrix T :=
   mk_mat (bmat_el BM) (sqr_bmat_size BM) (sqr_bmat_size BM).
 
 Arguments sqr_bmat_size BM%BM.
+Arguments mat_of_sqr_bmat BM%BM.
 
 Theorem sqr_bmat_size_mul : ∀ BMA BMB,
   is_square_bmat BMA
@@ -2824,6 +2826,30 @@ intros * Ha Hb Hab.
 unfold sqr_bmat_size.
 now rewrite sizes_of_bmatrix_mul.
 Qed.
+
+Theorem mat_of_sqr_bmat_mul : ∀ A B,
+  is_square_bmat A
+  → is_square_bmat B
+  → sizes_of_bmatrix A = sizes_of_bmatrix B
+  → mat_of_sqr_bmat (A * B) = (mat_of_sqr_bmat A * mat_of_sqr_bmat B)%M.
+Proof.
+intros * Ha Hb Hab.
+apply matrix_eq. {
+  cbn - [ iter_seq ].
+  unfold sqr_bmat_size.
+  now rewrite sizes_of_bmatrix_mul.
+} {
+  cbn - [ iter_seq ].
+  unfold sqr_bmat_size.
+  rewrite sizes_of_bmatrix_mul; [ | easy | easy | easy ].
+  now rewrite Hab.
+}
+cbn - [ iter_seq ].
+intros i j Hi Hj.
+rewrite sqr_bmat_size_mul in Hi; [ | easy | easy | easy ].
+Print bmat_el.
+Print bmat_mul.
+...
 
 (*
 End in_ring.
