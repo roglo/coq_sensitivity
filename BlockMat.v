@@ -2898,6 +2898,19 @@ move Hrr after Hcra; move MB after Hraz.
 cbn - [ iter_seq ].
 rewrite <- Hab.
 remember (sizes_of_bmatrix (mat_el MA 0 0)) as sz1 eqn:Hsz1.
+remember
+  (sizes_of_bmatrix
+     (fold_left (λ acc k, (acc + mat_el MA 0 k * mat_el MB k 0)%BM)
+        (seq 0 (mat_ncols MA)) (bmat_zero_like (mat_el MA 0 0))))
+  as sz2 eqn:Hsz2.
+remember (Π (k = 1, length sz1), nth (k - 1) sz1 0) as s1 eqn:Hs1.
+remember (Π (k = 1, length sz2), nth (k - 1) sz2 0) as s2 eqn:Hs2.
+rename Hsz1 into Hsa; rename Hab into Hsb.
+move sz2 before sz1; move Hsb before Hsa.
+move sz after sz1; move Has after Hsa.
+move Hsz2 before Hsb.
+move s2 before s1.
+specialize (IHMA (i / s1)) as H1.
 ...
 rewrite sizes_of_bmatrix_fold_left.
 ...
