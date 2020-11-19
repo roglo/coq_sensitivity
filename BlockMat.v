@@ -2923,6 +2923,8 @@ remember
      (fold_left (λ acc k, (acc + mat_el MA 0 k * mat_el MB k 0)%BM)
         (seq 0 (mat_ncols MA)) (bmat_zero_like (mat_el MA 0 0))))
   as sz2 eqn:Hsz2.
+remember (Π (k = 1, length sz), nth (k - 1) sz 0)%Srng as len1 eqn:Hlen1.
+move IHsz at bottom.
 ...
 revert i j sz B Hb Hi Hj Has Hbs.
 induction A as [xa| MA IHMA] using bmatrix_ind2; intros. {
