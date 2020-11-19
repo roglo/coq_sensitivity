@@ -10,8 +10,13 @@ Require Import Relations.
 
 Require Import Misc.
 Require Import Matrix.
-Require Import Semiring SRsummation.
+Require Import Semiring SRsummation SRproduct.
 Import matrix_Notations.
+
+Existing Instance nat_semiring_op.
+About nat_semiring_op.
+...
+Existing Instance nat_semiring_prop.
 
 (* block matrices *)
 
@@ -2800,7 +2805,7 @@ Fixpoint bmat_el (BM : bmatrix T) i j :=
   | BM_M MBM =>
       match sizes_of_bmatrix BM with
       | s :: sl =>
-          let n := Π (k = 1, length sl), nth (k - 1) sl 0 in
+          let n := (Π (k = 1, length sl), nth (k - 1) sl 0)%Srng in
           bmat_el (mat_el MBM (i / n) (j / n)) (i mod n) (j mod n)
       | [] => 0%Srng
       end
@@ -2808,7 +2813,7 @@ Fixpoint bmat_el (BM : bmatrix T) i j :=
 
 Definition sqr_bmat_size (BM : bmatrix T) :=
   let sl := sizes_of_bmatrix BM in
-  Π (i = 1, length sl), nth (i - 1) sl 0.
+  (Π (i = 1, length sl), nth (i - 1) sl 0)%Srng.
 
 Definition mat_of_sqr_bmat (BM : bmatrix T) : matrix T :=
   mk_mat (bmat_el BM) (sqr_bmat_size BM) (sqr_bmat_size BM).
@@ -2868,12 +2873,19 @@ induction sz as [| size]; intros. {
   destruct (zerop (mat_nrows MA)) as [Harz| Harz]; [ easy | ].
   now destruct (zerop (mat_ncols MA)).
 }
-remember (Π (i0 = 1, length (size :: sz)), nth (i0 - 1) (size :: sz) 0)
+remember (Π (i0 = 1, length (size :: sz)), nth (i0 - 1) (size :: sz) 0)%Srng
   as len eqn:Hlen.
-cbn - [ iter_seq nth ] in Hlen.
+(*
+Canonical Structure nat_semiring_op.
+Existing Instance nat_semiring_op.
+*)
+rewrite srng_product_split_first in Hlen; [ | apply nat_semiring_op | ].
+2: easy.
+
+...
 Check @srng_summation_split_first.
 About srng_summation_split_first.
-Check summation_split_first.
+Check srng_product_split_first.
 ...
 Locate "Π".
 Theorem product_split_first : ∀ b k g,

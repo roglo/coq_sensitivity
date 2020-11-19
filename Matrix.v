@@ -81,6 +81,13 @@ Definition nat_semiring_op : semiring_op nat :=
      srng_add := Nat.add;
      srng_mul := Nat.mul |}.
 
+Canonical Structure nat_semiring_op.
+
+Definition nat_semiring_prop : semiring_prop nat :=
+  {| srng_add_comm := Nat.add_comm;
+     srng_add_assoc := Nat.add_assoc |}.
+...
+
 (*
 End in_ring.
 Compute (list_list_of_mat (mat_add add (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list_list 0 [[1; 2]; [3; 4]; [5; 6]; [7; 8]]))).

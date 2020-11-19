@@ -171,9 +171,11 @@ Notation "'Σ' ( i = b , e ) , g" :=
   (iter_seq b e (λ c i, c + g) 0)
   (at level 45, i at level 0, b at level 60, e at level 60) : nat_scope.
 
+(*
 Notation "'Π' ( i = b , e ) , g" :=
   (iter_seq b e (λ c i, c * g) 1)
   (at level 45, i at level 0, b at level 60, e at level 60) : nat_scope.
+*)
 
 Theorem fold_iter_seq : ∀ {T} b e f (d : T),
   fold_left f (seq b (S e - b)) d = iter_seq b e f d.
