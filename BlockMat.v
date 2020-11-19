@@ -2849,14 +2849,15 @@ intros i j Hi Hj.
 rewrite sqr_bmat_size_mul in Hi; [ | easy | easy | easy ].
 unfold sqr_bmat_size.
 remember (sizes_of_bmatrix A) as sz eqn:Has.
-revert i j sz B Hb Hab Hi Hj Has.
+rename Hab into Hbs.
+revert i j sz B Hb Hi Hj Has Hbs.
 induction A as [xa| MA IHMA] using bmatrix_ind2; intros. {
-  cbn; rewrite Hab.
+  cbn; rewrite Hbs.
   destruct B as [xb| MB]. {
     symmetry.
     apply srng_add_0_l.
   }
-  cbn in Hab.
+  cbn in Hbs.
   unfold is_square_bmat in Hb; cbn in Hb.
   destruct (zerop (mat_nrows MB)) as [Hbrz| Hbrz]. {
     cbn; rewrite Hbrz; cbn.
@@ -2867,7 +2868,7 @@ induction A as [xa| MA IHMA] using bmatrix_ind2; intros. {
   now subst sz.
 }
 destruct B as [xb| MB]. {
-  cbn in Hab; rewrite Hab.
+  cbn in Hbs; rewrite Hbs.
   cbn in Has.
   unfold is_square_bmat in Ha; cbn in Ha.
   destruct (zerop (mat_nrows MA)) as [Harz| Harz]. {
@@ -2880,23 +2881,22 @@ destruct B as [xb| MB]. {
 }
 remember 1 as one.
 cbn - [ iter_seq ].
-cbn - [ iter_seq ] in Ha, Hb, Hab, Hi, Hj.
+cbn - [ iter_seq ] in Ha, Hb, Has, Hbs, Hi, Hj.
 cbn in Hi, Hj; subst one.
-cbn in Has.
 destruct (zerop (mat_nrows MA)) as [Hraz| Hraz]; [ easy | ].
 destruct (zerop (mat_ncols MA)) as [Hcaz| Hcaz]; [ easy | ].
 destruct (zerop (mat_nrows MB)) as [Hrbz| Hrbz]; [ easy | ].
 destruct (zerop (mat_ncols MB)) as [Hcbz| Hcbz]; [ easy | ].
-cbn in Ha, Hb, Hab, Hi, Hj, Has.
+cbn in Ha, Hb, Hi, Hj, Has, Hbs.
 destruct Ha as (_ & Hcra & Ha).
 destruct Hb as (_ & Hcrb & Hb).
 move Hrbz before Hraz; move Hcbz before Hcaz.
 move Hcrb before Hcra; move Hb before Ha.
-rewrite Has in Hab.
-injection Hab; clear Hab; intros Hab Hrr.
+rewrite Has in Hbs.
+injection Hbs; clear Hbs; intros Hbs Hrr.
 move Hrr after Hcra; move MB after Hraz.
 cbn - [ iter_seq ].
-rewrite <- Hab.
+rewrite <- Hbs.
 remember (sizes_of_bmatrix (mat_el MA 0 0)) as sz1 eqn:Hsz1.
 remember
   (sizes_of_bmatrix
@@ -2905,10 +2905,10 @@ remember
   as sz2 eqn:Hsz2.
 remember (Π (k = 1, length sz1), nth (k - 1) sz1 0) as s1 eqn:Hs1.
 remember (Π (k = 1, length sz2), nth (k - 1) sz2 0) as s2 eqn:Hs2.
-rename Hsz1 into Hsa; rename Hab into Hsb.
-move sz2 before sz1; move Hsb before Hsa.
+rename Hsz1 into Hsa.
+move sz2 before sz1; move Hbs before Hsa.
 move sz after sz1; move Has after Hsa.
-move Hsz2 before Hsb.
+move Hsz2 before Hbs.
 move s2 before s1.
 specialize (IHMA (i / s1)) as H1.
 ...
