@@ -2893,10 +2893,10 @@ destruct Hb as (_ & Hcrb & Hb).
 move Hrbz before Hraz; move Hcbz before Hcaz.
 move Hcrb before Hcra; move Hb before Ha.
 rewrite Has in Hbs.
-injection Hbs; clear Hbs; intros Hbs Hrr.
+injection Hbs; clear Hbs; intros Hsb Hrr.
 move Hrr after Hcra; move MB after Hraz.
 cbn - [ iter_seq ].
-rewrite <- Hbs.
+rewrite <- Hsb.
 remember (sizes_of_bmatrix (mat_el MA 0 0)) as sz1 eqn:Hsz1.
 remember
   (sizes_of_bmatrix
@@ -2906,9 +2906,9 @@ remember
 remember (Π (k = 1, length sz1), nth (k - 1) sz1 0) as s1 eqn:Hs1.
 remember (Π (k = 1, length sz2), nth (k - 1) sz2 0) as s2 eqn:Hs2.
 rename Hsz1 into Hsa.
-move sz2 before sz1; move Hbs before Hsa.
+move sz2 before sz1; move Hsb before Hsa.
 move sz after sz1; move Has after Hsa.
-move Hsz2 before Hbs.
+move Hsz2 before Hsb.
 move s2 before s1.
 specialize (IHMA (i / s1)) as H1.
 ...
