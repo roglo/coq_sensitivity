@@ -2850,6 +2850,7 @@ rewrite sqr_bmat_size_mul in Hi; [ | easy | easy | easy ].
 unfold sqr_bmat_size.
 remember (sizes_of_bmatrix A) as sz eqn:Has.
 rename Hab into Hbs.
+...
 revert i j sz B Hb Hi Hj Has Hbs.
 induction A as [xa| MA IHMA] using bmatrix_ind2; intros. {
   cbn; rewrite Hbs.
