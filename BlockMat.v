@@ -2850,6 +2850,59 @@ rewrite sqr_bmat_size_mul in Hi; [ | easy | easy | easy ].
 unfold sqr_bmat_size.
 remember (sizes_of_bmatrix A) as sz eqn:Has.
 rename Hab into Hbs.
+(**)
+symmetry in Has, Hbs.
+revert i j A B Ha Hb Has Hbs Hi Hj.
+induction sz as [| size]; intros. {
+  destruct A as [xa| MA]. {
+    clear Ha Has.
+    destruct B as [xb| MB]. {
+      cbn; symmetry.
+      apply srng_add_0_l.
+    }
+    cbn in Hb, Hbs.
+    destruct (zerop (mat_nrows MB)) as [Hbrz| Hbrz]; [ easy | ].
+    now destruct (zerop (mat_ncols MB)).
+  }
+  cbn in Ha, Has.
+  destruct (zerop (mat_nrows MA)) as [Harz| Harz]; [ easy | ].
+  now destruct (zerop (mat_ncols MA)).
+}
+remember (Π (i0 = 1, length (size :: sz)), nth (i0 - 1) (size :: sz) 0)
+  as len eqn:Hlen.
+cbn - [ iter_seq nth ] in Hlen.
+Check @srng_summation_split_first.
+About srng_summation_split_first.
+Check summation_split_first.
+...
+Locate "Π".
+Theorem product_split_first : ∀ b k g,
+  b ≤ k
+  → (Π (i = b, k), g i)%Srng = (g b * Σ (i = S b, k), g i)%Srng.
+Proof.
+intros * Hbk.
+unfold iter_seq.
+remember (S k - b) as len eqn:Hlen.
+replace (S k - S b) with (len - 1) by flia Hlen.
+assert (H : len ≠ 0) by flia Hlen Hbk.
+clear k Hbk Hlen.
+rename H into Hlen.
+destruct len; [ easy | cbn ].
+rewrite srng_add_0_l, Nat.sub_0_r.
+apply fold_left_srng_add_fun_from_0.
+Qed.
+...
+rewrite srng_product_split_first in Hlen.
+...
+  rewrite srng_add_0_l.
+  cbn.
+  unfold sqr_bmat_size in Hi, Hj.
+  rewrite <- Has in Hi; cbn in Hi.
+  rewrite <- Hbs in Hj; cbn in Hj.
+  apply Nat.lt_1_r in Hi.
+  apply Nat.lt_1_r in Hj.
+  subst i j.
+  symmetry in Has, Hbs.
 ...
 revert i j sz B Hb Hi Hj Has Hbs.
 induction A as [xa| MA IHMA] using bmatrix_ind2; intros. {
