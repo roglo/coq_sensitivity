@@ -2847,13 +2847,11 @@ apply matrix_eq. {
 cbn - [ iter_seq ].
 intros i j Hi Hj.
 rewrite sqr_bmat_size_mul in Hi; [ | easy | easy | easy ].
-(**)
 unfold sqr_bmat_size.
 remember (sizes_of_bmatrix A) as sz eqn:Has.
-...
-revert i j B Hb Hab Hi Hj.
+revert i j sz B Hb Hab Hi Hj Has.
 induction A as [xa| MA IHMA] using bmatrix_ind2; intros. {
-  cbn.
+  cbn; rewrite Hab.
   destruct B as [xb| MB]. {
     symmetry.
     apply srng_add_0_l.
@@ -2865,34 +2863,41 @@ induction A as [xa| MA IHMA] using bmatrix_ind2; intros. {
     rewrite srng_mul_0_r; symmetry.
     apply srng_add_0_l.
   }
-  now destruct (zerop (mat_ncols MB)).
+  destruct (zerop (mat_ncols MB)); [ easy | ].
+  now subst sz.
 }
 destruct B as [xb| MB]. {
-  cbn in Hab.
+  cbn in Hab; rewrite Hab.
+  cbn in Has.
   unfold is_square_bmat in Ha; cbn in Ha.
   destruct (zerop (mat_nrows MA)) as [Harz| Harz]. {
     cbn; rewrite Harz; cbn.
     rewrite srng_mul_0_l; symmetry.
     apply srng_add_0_l.
   }
-  now destruct (zerop (mat_ncols MA)).
+  destruct (zerop (mat_ncols MA)); [ easy | ].
+  now subst sz.
 }
 remember 1 as one.
 cbn - [ iter_seq ].
 cbn - [ iter_seq ] in Ha, Hb, Hab, Hi, Hj.
 cbn in Hi, Hj; subst one.
+cbn in Has.
 destruct (zerop (mat_nrows MA)) as [Hraz| Hraz]; [ easy | ].
 destruct (zerop (mat_ncols MA)) as [Hcaz| Hcaz]; [ easy | ].
 destruct (zerop (mat_nrows MB)) as [Hrbz| Hrbz]; [ easy | ].
 destruct (zerop (mat_ncols MB)) as [Hcbz| Hcbz]; [ easy | ].
-cbn in Ha, Hb, Hab, Hi, Hj.
+cbn in Ha, Hb, Hab, Hi, Hj, Has.
 destruct Ha as (_ & Hcra & Ha).
 destruct Hb as (_ & Hcrb & Hb).
 move Hrbz before Hraz; move Hcbz before Hcaz.
 move Hcrb before Hcra; move Hb before Ha.
+rewrite Has in Hab.
 injection Hab; clear Hab; intros Hab Hrr.
 move Hrr after Hcra; move MB after Hraz.
 cbn - [ iter_seq ].
+rewrite <- Hab.
+remember (sizes_of_bmatrix (mat_el MA 0 0)) as sz1 eqn:Hsz1.
 ...
 rewrite sizes_of_bmatrix_fold_left.
 ...
