@@ -2911,8 +2911,8 @@ move sz after sz1; move Has after Hsa.
 move Hsz2 before Hsb.
 move s2 before s1.
 specialize (IHMA (i / s1)) as H1.
-...
-rewrite sizes_of_bmatrix_fold_left.
+replace (mat_ncols MA) with (S (mat_ncols MA - 1) - 0) by flia Hcaz.
+rewrite fold_iter_seq.
 ...
 
 (*
