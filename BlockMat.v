@@ -2924,6 +2924,10 @@ remember
         (seq 0 (mat_ncols MA)) (bmat_zero_like (mat_el MA 0 0))))
   as sz2 eqn:Hsz2.
 remember (Π (k = 1, length sz), nth (k - 1) sz 0)%Srng as len1 eqn:Hlen1.
+remember (Π (k = 1, length sz2), nth (k - 1) sz2 0)%Srng as len2 eqn:Hlen2.
+move len2 before len1.
+move Hlen2 before Hlen1.
+move sz2 before sz.
 move IHsz at bottom.
 ...
 revert i j sz B Hb Hi Hj Has Hbs.
