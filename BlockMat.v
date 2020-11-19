@@ -14,8 +14,6 @@ Require Import Semiring SRsummation SRproduct.
 Import matrix_Notations.
 
 Existing Instance nat_semiring_op.
-About nat_semiring_op.
-...
 Existing Instance nat_semiring_prop.
 
 (* block matrices *)
@@ -2875,46 +2873,56 @@ induction sz as [| size]; intros. {
 }
 remember (Π (i0 = 1, length (size :: sz)), nth (i0 - 1) (size :: sz) 0)%Srng
   as len eqn:Hlen.
-(*
-Canonical Structure nat_semiring_op.
-Existing Instance nat_semiring_op.
-*)
-rewrite srng_product_split_first in Hlen; [ | apply nat_semiring_op | ].
-2: easy.
-
-...
-Check @srng_summation_split_first.
-About srng_summation_split_first.
-Check srng_product_split_first.
-...
-Locate "Π".
-Theorem product_split_first : ∀ b k g,
-  b ≤ k
-  → (Π (i = b, k), g i)%Srng = (g b * Σ (i = S b, k), g i)%Srng.
-Proof.
-intros * Hbk.
-unfold iter_seq.
-remember (S k - b) as len eqn:Hlen.
-replace (S k - S b) with (len - 1) by flia Hlen.
-assert (H : len ≠ 0) by flia Hlen Hbk.
-clear k Hbk Hlen.
-rename H into Hlen.
-destruct len; [ easy | cbn ].
-rewrite srng_add_0_l, Nat.sub_0_r.
-apply fold_left_srng_add_fun_from_0.
-Qed.
-...
-rewrite srng_product_split_first in Hlen.
-...
-  rewrite srng_add_0_l.
-  cbn.
-  unfold sqr_bmat_size in Hi, Hj.
-  rewrite <- Has in Hi; cbn in Hi.
-  rewrite <- Hbs in Hj; cbn in Hj.
-  apply Nat.lt_1_r in Hi.
-  apply Nat.lt_1_r in Hj.
-  subst i j.
-  symmetry in Has, Hbs.
+rewrite srng_product_split_first in Hlen; cycle 1. {
+  apply nat_semiring_prop.
+} {
+  cbn; flia.
+}
+rewrite Nat.sub_diag in Hlen.
+unfold nth in Hlen at 1.
+erewrite srng_product_eq_compat in Hlen; [ | apply nat_semiring_prop | ]. 2: {
+  intros k Hk.
+  replace (k - 1) with (S (k - 2)) by flia Hk.
+  cbn; easy.
+}
+rewrite List_length_cons in Hlen.
+rewrite iter_succ_succ in Hlen.
+erewrite srng_product_eq_compat in Hlen; [ | apply nat_semiring_prop | ]. 2: {
+  intros k Hk.
+  now rewrite Nat.sub_succ.
+}
+cbn - [ iter_seq nth srng_mul srng_one ] in Hlen.
+destruct size. {
+  specialize (no_zero_bmat_size A) as H1.
+  rewrite Has in H1.
+  now exfalso; apply H1; left.
+}
+destruct A as [xa| MA]; [ easy | ].
+destruct B as [xb| MB]; [ easy | ].
+cbn - [ iter_seq srng_mul srng_one ].
+cbn - [ iter_seq ] in Ha, Hb, Has, Hbs.
+unfold sqr_bmat_size in Hi, Hj.
+cbn - [ iter_seq srng_mul srng_one ] in Hi, Hj.
+destruct (zerop (mat_nrows MA)) as [Hraz| Hraz]; [ easy | ].
+destruct (zerop (mat_ncols MA)) as [Hcaz| Hcaz]; [ easy | ].
+destruct (zerop (mat_nrows MB)) as [Hrbz| Hrbz]; [ easy | ].
+destruct (zerop (mat_ncols MB)) as [Hcbz| Hcbz]; [ easy | ].
+cbn in Ha, Hb, Has, Hbs.
+cbn - [ iter_seq srng_mul srng_one ] in Hi, Hj.
+destruct Ha as (_ & Hcra & Ha).
+destruct Hb as (_ & Hcrb & Hb).
+move Hrbz before Hraz; move Hcbz before Hcaz.
+move Hcrb before Hcra; move Hb before Ha.
+injection Has; clear Has; intros Has Hra.
+injection Hbs; clear Hbs; intros Hbs Hrb.
+move Hbs before Has.
+cbn - [ iter_seq srng_mul srng_one ].
+rewrite Has, Hbs.
+remember
+  (sizes_of_bmatrix
+     (fold_left (λ acc k, (acc + mat_el MA 0 k * mat_el MB k 0)%BM)
+        (seq 0 (mat_ncols MA)) (bmat_zero_like (mat_el MA 0 0))))
+  as sz2 eqn:Hsz2.
 ...
 revert i j sz B Hb Hi Hj Has Hbs.
 induction A as [xa| MA IHMA] using bmatrix_ind2; intros. {

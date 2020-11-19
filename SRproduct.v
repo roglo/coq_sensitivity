@@ -75,4 +75,11 @@ apply Hb.
 flia Hi.
 Qed.
 
+Theorem srng_product_succ_succ : ∀ b k g,
+  (Π (i = S b, S k), g i = Π (i = b, k), g (S i))%Srng.
+Proof.
+intros b k g.
+apply iter_succ_succ.
+Qed.
+
 End in_ring.

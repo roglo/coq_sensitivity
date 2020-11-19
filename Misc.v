@@ -190,6 +190,18 @@ unfold iter_seq.
 now replace (S (b + len - 1) - b) with len by flia Hblen.
 Qed.
 
+Theorem iter_succ_succ : ∀ {T} b k f (d : T),
+  iter_seq (S b) (S k) f d =
+  iter_seq b k (λ c i, f c (S i)) d.
+Proof.
+intros.
+unfold iter_seq.
+rewrite Nat.sub_succ.
+remember (S k - b)%nat as len; clear Heqlen.
+rewrite <- seq_shift.
+now rewrite List_fold_left_map.
+Qed.
+
 Theorem fold_left_add_fun_from_0 {A} : ∀ a l (f : A → nat),
   fold_left (λ c i, c + f i) l a =
   a + fold_left (λ c i, c + f i) l 0.
@@ -494,13 +506,7 @@ Theorem summation_succ_succ : ∀ b e f,
   Σ (i = S b, S e), f i = Σ (i = b, e), f (S i).
 Proof.
 intros.
-unfold iter_seq.
-rewrite Nat.sub_succ.
-remember (S e - b) as n eqn:Hn.
-revert b Hn.
-induction n; intros; [ easy | cbn ].
-setoid_rewrite fold_left_add_fun_from_0.
-rewrite IHn; [ easy | flia Hn ].
+apply iter_succ_succ.
 Qed.
 
 Theorem summation_mod_idemp : ∀ b e f n,

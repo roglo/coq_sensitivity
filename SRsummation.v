@@ -186,11 +186,7 @@ Theorem srng_summation_succ_succ : ∀ b k g,
   (Σ (i = S b, S k), g i = Σ (i = b, k), g (S i))%Srng.
 Proof.
 intros b k g.
-unfold iter_seq.
-rewrite Nat.sub_succ.
-remember (S k - b)%nat as len; clear Heqlen.
-rewrite <- seq_shift.
-now rewrite List_fold_left_map.
+apply iter_succ_succ.
 Qed.
 
 Theorem srng_summation_add_distr : ∀ g h b k,
