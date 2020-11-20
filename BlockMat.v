@@ -422,6 +422,8 @@ Fixpoint sizes_of_bmatrix (BM : bmatrix T) :=
 Definition is_square_bmat (BM : bmatrix T) :=
   is_square_bmat_loop (sizes_of_bmatrix BM) BM.
 
+Arguments is_square_bmat BM%BM.
+
 Theorem sizes_of_bmat_zero_like : ∀ (BM : bmatrix T),
   sizes_of_bmatrix (bmat_zero_like BM) = sizes_of_bmatrix BM.
 Proof.
@@ -2931,6 +2933,70 @@ move Hlen after Hlen1.
 move Hlen2 before Hlen1.
 rewrite Has in Ha, Hi.
 rewrite Hbs in Hb, Hj.
+assert
+  (Hsza : ∀ i j, i < mat_nrows MA → j < mat_ncols MA →
+                 sizes_of_bmatrix (mat_el MA i j) = sizes_of_bmatrix (mat_el MA 0 0)). {
+  intros i' j' Hi' Hj'.
+  apply sizes_of_bmatrix_mat_el; [ | easy | easy ].
+  cbn.
+  destruct (zerop (mat_nrows MA)) as [H| H]; [ flia H Hraz | ].
+  cbn; clear H.
+  destruct (zerop (mat_ncols MA)) as [H| H]; [ flia H Hcaz | ].
+  cbn; clear H.
+  split; [ easy | ].
+  split; [ easy | ].
+  intros i'' j'' Hi'' Hj''.
+  rewrite Has.
+  now apply Ha.
+}
+assert
+(Hszb : ∀ i j, i < mat_nrows MB → j < mat_ncols MB →
+               sizes_of_bmatrix (mat_el MB i j) = sizes_of_bmatrix (mat_el MB 0 0)). {
+  intros i' j' Hi' Hj'.
+  apply sizes_of_bmatrix_mat_el; [ | easy | easy ].
+  cbn.
+  destruct (zerop (mat_nrows MB)) as [H| H]; [ flia H Hrbz | ].
+  cbn; clear H.
+  destruct (zerop (mat_ncols MB)) as [H| H]; [ flia H Hcbz | ].
+  cbn; clear H.
+  split; [ easy | ].
+  split; [ easy | ].
+  intros i'' j'' Hi'' Hj''.
+  rewrite Hbs.
+  now apply Hb.
+}
+rewrite sizes_of_bmatrix_fold_left in Hsz2; cycle 1. {
+  apply is_square_bmat_zero_like.
+  unfold is_square_bmat.
+  rewrite Has.
+  now apply Ha.
+} {
+  intros k Hk.
+  apply is_square_bmat_mul. {
+    unfold is_square_bmat.
+    rewrite Hsza; [ | easy | easy ].
+    rewrite Has.
+    apply Ha; [ easy | ].
+    now rewrite <- Hcra.
+  } {
+    unfold is_square_bmat.
+    rewrite Hszb; [ | | easy ]. 2: {
+      now rewrite Hrb, <- Hra, <- Hcra.
+    }
+    rewrite Hbs.
+    apply Hb; [ | easy ].
+    now rewrite Hrb, <- Hra, <- Hcra.
+  }
+  rewrite Hsza; [ | easy | easy ].
+  rewrite Hszb; [ | | easy ]. 2: {
+    now rewrite Hrb, <- Hra, <- Hcra.
+  }
+  now rewrite Has, Hbs.
+} {
+  intros k Hk.
+  rewrite sizes_of_bmat_zero_like.
+  symmetry.
+  rewrite sizes_of_bmatrix_mul; cycle 1. {
 ...
 revert i j sz B Hb Hi Hj Has Hbs.
 induction A as [xa| MA IHMA] using bmatrix_ind2; intros. {
