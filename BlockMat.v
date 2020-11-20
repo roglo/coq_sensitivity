@@ -3005,6 +3005,10 @@ rewrite sizes_of_bmat_zero_like.
 rewrite Has.
 remember (Π (k = 1, length sz), nth (k - 1) sz 0)%Srng as len1 eqn:Hlen1.
 move Hlen after Hlen1.
+move Hra after Hraz; move Hrb before Hra.
+rewrite Hra in Hcra.
+rewrite Hrb in Hcrb.
+clear Hraz Hrbz Hcaz Hcbz.
 ...
 revert i j sz B Hb Hi Hj Has Hbs.
 induction A as [xa| MA IHMA] using bmatrix_ind2; intros. {
