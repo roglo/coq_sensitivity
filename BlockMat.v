@@ -2925,16 +2925,12 @@ remember
   as sz2 eqn:Hsz2.
 remember (Π (k = 1, length sz), nth (k - 1) sz 0)%Srng as len1 eqn:Hlen1.
 remember (Π (k = 1, length sz2), nth (k - 1) sz2 0)%Srng as len2 eqn:Hlen2.
-move IHsz at bottom.
 move len1 before len2.
 move len2 after len1.
 move Hlen after Hlen1.
+move Hlen2 before Hlen1.
 rewrite Has in Ha, Hi.
 rewrite Hbs in Hb, Hj.
-...
-move len2 before len1.
-move Hlen2 before Hlen1.
-move sz2 before sz.
 ...
 revert i j sz B Hb Hi Hj Has Hbs.
 induction A as [xa| MA IHMA] using bmatrix_ind2; intros. {
