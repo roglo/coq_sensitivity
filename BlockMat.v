@@ -2980,23 +2980,40 @@ rewrite sizes_of_bmatrix_fold_left in Hsz2; cycle 1. {
     now rewrite <- Hcra.
   } {
     unfold is_square_bmat.
-    rewrite Hszb; [ | | easy ]. 2: {
-      now rewrite Hrb, <- Hra, <- Hcra.
-    }
+    rewrite Hszb; [ | now rewrite Hrb, <- Hra, <- Hcra | easy ].
     rewrite Hbs.
     apply Hb; [ | easy ].
     now rewrite Hrb, <- Hra, <- Hcra.
   }
   rewrite Hsza; [ | easy | easy ].
-  rewrite Hszb; [ | | easy ]. 2: {
-    now rewrite Hrb, <- Hra, <- Hcra.
-  }
+  rewrite Hszb; [ | now rewrite Hrb, <- Hra, <- Hcra | easy ].
   now rewrite Has, Hbs.
 } {
   intros k Hk.
   rewrite sizes_of_bmat_zero_like.
   symmetry.
   rewrite sizes_of_bmatrix_mul; cycle 1. {
+    unfold is_square_bmat.
+    rewrite Hsza; [ | easy | easy ].
+    rewrite Has.
+    apply Ha; [ easy | ].
+    now rewrite <- Hcra.
+  } {
+    unfold is_square_bmat.
+    rewrite Hszb; [ | now rewrite Hrb, <- Hra, <- Hcra | easy ].
+    rewrite Hbs.
+    apply Hb; [ now rewrite Hrb, <- Hra, <- Hcra | easy ].
+  } {
+    rewrite Hsza; [ | easy | easy ].
+    rewrite Hszb; [ | now rewrite Hrb, <- Hra, <- Hcra | easy ].
+    now rewrite Hbs.
+  } {
+    now apply Hsza.
+  }
+}
+rewrite sizes_of_bmat_zero_like in Hsz2.
+rewrite Has in Hsz2; subst sz2.
+rewrite <- Hlen1 in Hlen2; subst len2.
 ...
 revert i j sz B Hb Hi Hj Has Hbs.
 induction A as [xa| MA IHMA] using bmatrix_ind2; intros. {
