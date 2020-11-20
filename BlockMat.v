@@ -2920,22 +2920,12 @@ injection Hbs; clear Hbs; intros Hbs Hrb.
 move Hbs before Has.
 cbn - [ iter_seq srng_mul srng_one ].
 rewrite Has, Hbs.
-remember
-  (sizes_of_bmatrix
-     (fold_left (λ acc k, (acc + mat_el MA 0 k * mat_el MB k 0)%BM)
-        (seq 0 (mat_ncols MA)) (bmat_zero_like (mat_el MA 0 0))))
-  as sz2 eqn:Hsz2.
-remember (Π (k = 1, length sz), nth (k - 1) sz 0)%Srng as len1 eqn:Hlen1.
-remember (Π (k = 1, length sz2), nth (k - 1) sz2 0)%Srng as len2 eqn:Hlen2.
-move len1 before len2.
-move len2 after len1.
-move Hlen after Hlen1.
-move Hlen2 before Hlen1.
+(**)
 rewrite Has in Ha, Hi.
 rewrite Hbs in Hb, Hj.
 assert
   (Hsza : ∀ i j, i < mat_nrows MA → j < mat_ncols MA →
-                 sizes_of_bmatrix (mat_el MA i j) = sizes_of_bmatrix (mat_el MA 0 0)). {
+   sizes_of_bmatrix (mat_el MA i j) = sizes_of_bmatrix (mat_el MA 0 0)). {
   intros i' j' Hi' Hj'.
   apply sizes_of_bmatrix_mat_el; [ | easy | easy ].
   cbn.
@@ -2950,8 +2940,8 @@ assert
   now apply Ha.
 }
 assert
-(Hszb : ∀ i j, i < mat_nrows MB → j < mat_ncols MB →
-               sizes_of_bmatrix (mat_el MB i j) = sizes_of_bmatrix (mat_el MB 0 0)). {
+  (Hszb : ∀ i j, i < mat_nrows MB → j < mat_ncols MB →
+   sizes_of_bmatrix (mat_el MB i j) = sizes_of_bmatrix (mat_el MB 0 0)). {
   intros i' j' Hi' Hj'.
   apply sizes_of_bmatrix_mat_el; [ | easy | easy ].
   cbn.
@@ -2965,7 +2955,7 @@ assert
   rewrite Hbs.
   now apply Hb.
 }
-rewrite sizes_of_bmatrix_fold_left in Hsz2; cycle 1. {
+rewrite sizes_of_bmatrix_fold_left; cycle 1. {
   apply is_square_bmat_zero_like.
   unfold is_square_bmat.
   rewrite Has.
@@ -3011,9 +3001,10 @@ rewrite sizes_of_bmatrix_fold_left in Hsz2; cycle 1. {
     now apply Hsza.
   }
 }
-rewrite sizes_of_bmat_zero_like in Hsz2.
-rewrite Has in Hsz2; subst sz2.
-rewrite <- Hlen1 in Hlen2; subst len2.
+rewrite sizes_of_bmat_zero_like.
+rewrite Has.
+remember (Π (k = 1, length sz), nth (k - 1) sz 0)%Srng as len1 eqn:Hlen1.
+move Hlen after Hlen1.
 ...
 revert i j sz B Hb Hi Hj Has Hbs.
 induction A as [xa| MA IHMA] using bmatrix_ind2; intros. {
