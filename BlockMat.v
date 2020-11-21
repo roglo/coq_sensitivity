@@ -925,11 +925,13 @@ rewrite IHBMA; [ | easy | easy | | | congruence ]. {
 }
 Qed.
 
+Arguments sizes_of_bmatrix BM%BM.
+
 Theorem sizes_of_bmatrix_mul : ∀ BMA BMB,
   is_square_bmat BMA
   → is_square_bmat BMB
   → sizes_of_bmatrix BMA = sizes_of_bmatrix BMB
-  → sizes_of_bmatrix (BMA * BMB)%BM = sizes_of_bmatrix BMA.
+  → sizes_of_bmatrix (BMA * BMB) = sizes_of_bmatrix BMA.
 Proof.
 intros * Ha Hb Hab.
 revert BMB Hb Hab.
@@ -1049,10 +1051,6 @@ rewrite sizes_of_bmatrix_add. {
   }
 }
 Qed.
-(* voir si on peut pas enlever les hypothèses "is_square_bmat" *)
-
-...
-
 
 Theorem is_square_bmat_mul : ∀ BMA BMB,
   is_square_bmat BMA
@@ -2582,7 +2580,6 @@ Definition mat_of_sqr_bmat (BM : bmatrix T) : matrix T :=
 
 Arguments bmat_el BM%BM (i j)%nat.
 Arguments mat_of_sqr_bmat BM%BM.
-Arguments sizes_of_bmatrix BM%BM.
 Arguments sqr_bmat_size BM%BM.
 
 Theorem bmat_el_add : ∀ A B i j,
@@ -2607,7 +2604,18 @@ destruct (zerop (mat_ncols MA)) as [Hacz| Hacz]. {
   symmetry; apply srng_add_0_l.
 }
 cbn - [ iter_seq srng_mul srng_one ].
-rewrite sizes_of_bmatrix_add; cycle 1. {
+assert (Hsab :
+  sizes_of_bmatrix (mat_el MA 0 0) = sizes_of_bmatrix (mat_el MB 0 0)). {
+  apply bmat_fit_for_add_sizes.
+  now apply Hab.
+}
+rewrite sizes_of_bmatrix_add; [ | easy ].
+rewrite <- Hsab.
+remember (sizes_of_bmatrix (mat_el MA 0 0)) as sz eqn:Hsz.
+rename Hsz into Hasz.
+rename Hsab into Hbsz.
+remember (Π (k = 1, length sz), nth (k - 1) sz 0)%Srng as len eqn:Hlen.
+apply IHA.
 ...
 
 Theorem sqr_bmat_size_mul : ∀ BMA BMB,
