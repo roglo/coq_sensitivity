@@ -2585,8 +2585,31 @@ Theorem bmat_el_add : ∀ A B,
   → bmat_el (A + B) i j = (bmat_el A i j + bmat_el B i j)%Srng.
 Proof.
 intros * Hab * Hi Hj.
+unfold compatible_square_bmatrices in Hab.
+destruct Hab as (sz & Hsq & Hsm).
+specialize (Hsq A (or_introl eq_refl)) as Hsqa.
+specialize (Hsq B (or_intror (or_introl eq_refl))) as Hsqb.
+specialize (Hsm A (or_introl eq_refl)) as Hsma.
+specialize (Hsm B (or_intror (or_introl eq_refl))) as Hsmb.
+clear Hsq Hsm.
+revert sz B Hsqb Hsma Hsmb i j Hi Hj.
+induction A as [xa| MA IHA] using bmatrix_ind2; intros. {
+  cbn in Hsma; subst sz.
+  destruct B as [xb| MB]; [ easy | ].
+  cbn in Hsqb, Hsmb.
+  destruct (zerop (mat_nrows MB)) as [Hrbz| Hrbz]; [ easy | ].
+  now destruct (zerop (mat_ncols MB)).
+}
+cbn in Hsma, Hsqa.
+destruct B as [xb| MB]. {
+  cbn in Hsmb.
+  move Hsmb after Hsma; subst sz.
+  destruct (zerop (mat_nrows MA)) as [Hraz| Hraz]; [ easy | ].
+  now destruct (zerop (mat_ncols MA)).
+}
+cbn in Hsqb, Hsmb.
+cbn - [ iter_seq srng_mul srng_one ].
 ...
-revert B i j Hab.
 induction A as [xa| MA IHA] using bmatrix_ind2; intros; [ now destruct B | ].
 destruct B as [xb| MB]; [ easy | ].
 cbn in Hab.
