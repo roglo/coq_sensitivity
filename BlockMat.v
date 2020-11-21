@@ -161,15 +161,35 @@ Qed.
 Definition bmat_sub BMA BMB :=
   bmat_add BMA (bmat_opp BMB).
 
+End in_ring.
+
 (* notations *)
+
+Module bmatrix_Notations.
 
 Declare Scope BM_scope.
 Delimit Scope BM_scope with BM.
 
 Notation "a + b" := (bmat_add a b) : BM_scope.
-Notation "a - b" := (bmat_sub a b) : BM_scope.
+Notation "a - b" := (bmat_sub _ a b) : BM_scope.
 Notation "a * b" := (bmat_mul a b) : BM_scope.
 Notation "- a" := (bmat_opp a) : BM_scope.
+
+Arguments bmat_add {T so} _%BM _%BM.
+Arguments bmat_sub {T ro so} _%BM _%BM.
+Arguments bmat_opp_involutive {T ro so sp rp} _%BM.
+
+End bmatrix_Notations.
+
+Import bmatrix_Notations.
+
+Section in_ring.
+
+Context {T : Type}.
+Context {ro : ring_op T}.
+Context (so : semiring_op T).
+Context {sp : semiring_prop T}.
+Context {rp : ring_prop T}.
 
 (* zero and one block matrices *)
 
@@ -2750,6 +2770,49 @@ apply IHA with (sz := sizes); [ easy | | | | easy | easy | | ]. {
 }
 Qed.
 
+End in_ring.
+
+Section in_ring.
+
+Context {T : Type}.
+Context {ro : ring_op T}.
+Context (so : semiring_op T).
+Context {sp : semiring_prop T}.
+Context {rp : ring_prop T}.
+
+Arguments bmat_el {T so} BM%BM (i j)%nat.
+
+Theorem bmat_el_summation (bso : semiring_op (bmatrix T))
+    (bsp : semiring_prop (bmatrix T)) : ∀ b e i j f,
+  b ≤ e
+  → bmat_el (Σ (k = b, e), f k)%Srng i j =
+      (Σ (k = b, e), bmat_el (f k) i j)%Srng.
+Proof.
+intros * Hbe.
+unfold iter_seq.
+remember (S e - b) as len eqn:Hlen.
+assert (H : 0 < len) by flia Hbe Hlen.
+clear e Hbe Hlen; rename H into Hlen.
+revert b i j.
+induction len; intros; [ easy | clear Hlen ].
+destruct (Nat.eq_dec len 0) as [Hlz| Hlz]. {
+  subst len; cbn.
+  now do 2 rewrite srng_add_0_l.
+}
+rewrite List_seq_succ_r.
+do 2 rewrite fold_left_app.
+cbn.
+remember (fold_left (λ (c : bmatrix T) (k : nat), c + f k) (seq b len) 0)%Rng as A.
+remember (f (b + len)) as B eqn:HB.
+About bmat_el_add.
+specialize (@bmat_el_add T so A B) as H1.
+cbn in H1.
+clear - H1.
+Set Printing All.
+...
+rewrite H1.
+...
+
 Definition mat_of_sqr_bmat (BM : bmatrix T) : matrix T :=
   mk_mat (bmat_el BM) (sqr_bmat_size BM) (sqr_bmat_size BM).
 
@@ -2937,7 +3000,9 @@ set (j1 := j / len1).
 set (i2 := i mod len1).
 set (j2 := j mod len1).
 rewrite Hlen.
-Search (bmat_el (_ + _)).
+Inspect 3.
+...
+rewrite bmat_el_summation.
 ...
 revert i j sz B Hb Hi Hj Has Hbs.
 induction A as [xa| MA IHMA] using bmatrix_ind2; intros. {
