@@ -3009,6 +3009,23 @@ move Hra after Hraz; move Hrb before Hra.
 rewrite Hra in Hcra.
 rewrite Hrb in Hcrb.
 clear Hraz Hrbz Hcaz Hcbz.
+(* make lhs printed with notation 'Σ' *)
+rewrite Hcra, <- (Nat.sub_0_r (S size)).
+rewrite fold_iter_seq.
+set (bso :=
+  {| srng_zero := bmat_zero_like (mat_el MA 0 0);
+     srng_one := bmat_zero_like (mat_el MA 0 0);
+     srng_add := bmat_add;
+     srng_mul := bmat_mul |}).
+replace (@bmat_add so) with (@srng_add _ bso) by easy.
+replace (@bmat_zero_like so (@mat_el (bmatrix T) MA O O))
+  with (@srng_zero _ bso) by easy.
+move IHsz at bottom.
+set (i1 := i / len1).
+set (j1 := j / len1).
+set (i2 := i mod len1).
+set (j2 := j mod len1).
+rewrite Hlen.
 ...
 revert i j sz B Hb Hi Hj Has Hbs.
 induction A as [xa| MA IHMA] using bmatrix_ind2; intros. {
