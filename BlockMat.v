@@ -2736,36 +2736,22 @@ apply IHA with (sz := sizes); [ easy | | | | easy | easy | | ]. {
   rewrite Hsab in Hqsb.
   now apply Hqsb; rewrite Hrbn.
 } {
-...
-induction A as [xa| MA IHA] using bmatrix_ind2; intros; [ now destruct B | ].
-destruct B as [xb| MB]; [ easy | ].
-cbn in Hab.
-destruct Hab as (Hrr & Hcc & Hab).
-cbn - [ iter_seq srng_mul srng_one ].
-rewrite <- Hrr, <- Hcc.
-destruct (zerop (mat_nrows MA)) as [Harz| Harz]. {
-  symmetry; apply srng_add_0_l.
+  unfold sqr_bmat_size.
+  rewrite Hsa, <- Hlen.
+  apply Nat.mod_upper_bound.
+  rewrite Hlen.
+  now apply (product_bmatrix_sizes_ne_0 (mat_el MA 0 0)).
+} {
+  unfold sqr_bmat_size.
+  rewrite Hsa, <- Hlen.
+  apply Nat.mod_upper_bound.
+  rewrite Hlen.
+  now apply (product_bmatrix_sizes_ne_0 (mat_el MA 0 0)).
 }
-destruct (zerop (mat_ncols MA)) as [Hacz| Hacz]. {
-  symmetry; apply srng_add_0_l.
-}
-cbn - [ iter_seq srng_mul srng_one ].
-assert (Hsab :
-  sizes_of_bmatrix (mat_el MA 0 0) = sizes_of_bmatrix (mat_el MB 0 0)). {
-  apply bmat_fit_for_add_sizes.
-  now apply Hab.
-}
-rewrite sizes_of_bmatrix_add; [ | easy ].
-rewrite <- Hsab.
-remember (sizes_of_bmatrix (mat_el MA 0 0)) as sz eqn:Hsz.
-rename Hsz into Hasz.
-rename Hsab into Hbsz.
-remember (Π (k = 1, length sz), nth (k - 1) sz 0)%Srng as len eqn:Hlen.
-...
-assert (Hi : i / len < mat_nrows MA). {
-  Print sizes_of_bmatrix.
-...
-apply IHA; [ | | apply Hab ].
+Qed.
+
+Inspect 1.
+
 ...
 
 Definition mat_of_sqr_bmat (BM : bmatrix T) : matrix T :=
