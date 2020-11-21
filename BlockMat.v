@@ -2609,6 +2609,19 @@ destruct B as [xb| MB]. {
 }
 cbn in Hsqb, Hsmb.
 cbn - [ iter_seq srng_mul srng_one ].
+destruct (zerop (mat_nrows MA)) as [Hraz| Hraz]; [ easy | ].
+destruct (zerop (mat_ncols MA)) as [Hcaz| Hcaz]; [ easy | ].
+destruct (zerop (mat_nrows MB)) as [Hrbz| Hrbz]; [ easy | ].
+destruct (zerop (mat_ncols MB)) as [Hcbz| Hcbz]; [ easy | ].
+cbn in Hsqa, Hsqb, Hsma, Hsmb.
+cbn - [ iter_seq srng_mul srng_one ].
+rewrite <- Hsma in Hsmb.
+injection Hsmb; clear Hsmb; intros Hsab Hrab.
+rewrite sizes_of_bmatrix_add; [ | easy ].
+rewrite Hsab.
+remember (sizes_of_bmatrix (mat_el MA 0 0)) as sizes eqn:Hsizes.
+remember (Π (k = 1, length sizes), nth (k - 1) sizes 0)%Srng as len eqn:Hlen.
+apply IHA with (sz := sizes). 5: {
 ...
 induction A as [xa| MA IHA] using bmatrix_ind2; intros; [ now destruct B | ].
 destruct B as [xb| MB]; [ easy | ].
