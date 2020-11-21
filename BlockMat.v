@@ -2633,6 +2633,7 @@ induction A as [xa| MA IHA] using bmatrix_ind2; intros. {
   now destruct (zerop (mat_ncols MB)).
 }
 generalize Hsqa; intros Hsqa'.
+generalize Hsqb; intros Hsqb'.
 cbn in Hsma, Hsqa.
 destruct B as [xb| MB]. {
   cbn in Hsqa, Hsmb.
@@ -2651,11 +2652,20 @@ cbn in Hsqa, Hsqb, Hsma, Hsmb.
 cbn - [ iter_seq srng_mul srng_one nth ] in Hi, Hj |-*.
 rewrite <- Hsma in Hsmb.
 injection Hsmb; clear Hsmb; intros Hsab Hrab.
+remember (mat_nrows MA) as n eqn:Hran; symmetry in Hran.
+destruct Hsqa as (_ & Hcan & Hqsa).
+move Hcan before Hran.
+rename Hrab into Hrbn.
+move Hrbn before Hcan; move MB before MA.
+destruct Hsqb as (_ & Hcbn & Hqsb).
+rewrite Hrbn in Hcbn.
+move Hcbn before Hrbn.
+clear Hcaz Hrbz Hcbz.
 rewrite sizes_of_bmatrix_add; [ | easy ].
 rewrite Hsab.
 remember (sizes_of_bmatrix (mat_el MA 0 0)) as sizes eqn:Hsizes.
 remember (Π (k = 1, length sizes), nth (k - 1) sizes 0)%Srng as len eqn:Hlen.
-assert (Hilen : i / len < mat_nrows MA). {
+assert (Hilen : i / len < n). {
   apply Nat.div_lt_upper_bound. {
     rewrite Hlen.
     now apply (product_bmatrix_sizes_ne_0 (mat_el MA 0 0)).
@@ -2677,7 +2687,7 @@ assert (Hilen : i / len < mat_nrows MA). {
     now rewrite <- Hlen in Hi.
   }
 }
-assert (Hjlen : j / len < mat_ncols MA). {
+assert (Hjlen : j / len < n). {
   apply Nat.div_lt_upper_bound. {
     rewrite Hlen.
     now apply (product_bmatrix_sizes_ne_0 (mat_el MA 0 0)).
@@ -2696,15 +2706,36 @@ assert (Hjlen : j / len < mat_ncols MA). {
       now cbn.
     }
     cbn - [ iter_seq srng_mul srng_one ] in Hj, Hlen.
-    rewrite <- Hlen in Hj.
-    destruct Hsqa as (_ & H & _).
-    now rewrite H.
+    now rewrite <- Hlen in Hj.
   }
 }
-apply IHA with (sz := sizes); [ easy | easy | | | | | | ]; cycle 2. {
-  now rewrite sizes_of_bmatrix_mat_el.
+assert (Hsa : sizes_of_bmatrix (mat_el MA (i / len) (j / len)) = sizes). {
+  rewrite sizes_of_bmatrix_mat_el; [ | easy | | ]; cycle 1. {
+    now rewrite Hran.
+  } {
+    now rewrite Hcan.
+  }
+  now rewrite <- Hsizes.
+}
+assert (Hsb : sizes_of_bmatrix (mat_el MB (i / len) (j / len)) = sizes). {
+  rewrite sizes_of_bmatrix_mat_el; [ easy | easy | | ]. {
+    now rewrite Hrbn.
+  } {
+    now rewrite Hcbn.
+  }
+}
+apply IHA with (sz := sizes); [ easy | | | | easy | easy | | ]. {
+  now rewrite Hcan.
 } {
-  rewrite sizes_of_bmatrix_mat_el.
+  unfold is_square_bmat.
+  rewrite Hsa.
+  now apply Hqsa.
+} {
+  unfold is_square_bmat.
+  rewrite Hsb.
+  rewrite Hsab in Hqsb.
+  now apply Hqsb; rewrite Hrbn.
+} {
 ...
 induction A as [xa| MA IHA] using bmatrix_ind2; intros; [ now destruct B | ].
 destruct B as [xb| MB]; [ easy | ].
