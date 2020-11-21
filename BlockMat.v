@@ -2750,10 +2750,6 @@ apply IHA with (sz := sizes); [ easy | | | | easy | easy | | ]. {
 }
 Qed.
 
-Inspect 1.
-
-...
-
 Definition mat_of_sqr_bmat (BM : bmatrix T) : matrix T :=
   mk_mat (bmat_el BM) (sqr_bmat_size BM) (sqr_bmat_size BM).
 
@@ -2893,30 +2889,7 @@ assert
   rewrite Hbs.
   now apply Hb.
 }
-rewrite sizes_of_bmatrix_fold_left; cycle 1. {
-  apply is_square_bmat_zero_like.
-  unfold is_square_bmat.
-  rewrite Has.
-  now apply Ha.
-} {
-  intros k Hk.
-  apply is_square_bmat_mul. {
-    unfold is_square_bmat.
-    rewrite Hsza; [ | easy | easy ].
-    rewrite Has.
-    apply Ha; [ easy | ].
-    now rewrite <- Hcra.
-  } {
-    unfold is_square_bmat.
-    rewrite Hszb; [ | now rewrite Hrb, <- Hra, <- Hcra | easy ].
-    rewrite Hbs.
-    apply Hb; [ | easy ].
-    now rewrite Hrb, <- Hra, <- Hcra.
-  }
-  rewrite Hsza; [ | easy | easy ].
-  rewrite Hszb; [ | now rewrite Hrb, <- Hra, <- Hcra | easy ].
-  now rewrite Has, Hbs.
-} {
+rewrite sizes_of_bmatrix_fold_left. 2: {
   intros k Hk.
   rewrite sizes_of_bmat_zero_like.
   symmetry.
