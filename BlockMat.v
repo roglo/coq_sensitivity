@@ -2579,6 +2579,38 @@ Definition sqr_bmat_size (BM : bmatrix T) :=
 
 Arguments sqr_bmat_size BM%BM.
 
+Theorem product_bmatrix_sizes_ne_0 : ∀ sizes A,
+  sizes = sizes_of_bmatrix A
+  → (Π (k = 1, length sizes), nth (k - 1) sizes 0%Rng)%Srng ≠ 0.
+Proof.
+intros * Hsizes Hlen.
+revert A Hsizes.
+induction sizes as [| size]; intros; [ easy | ].
+cbn - [ iter_seq srng_mul srng_one nth ] in Hlen.
+rewrite iter_succ_succ in Hlen.
+rewrite srng_product_split_first in Hlen; [ | | flia ]. 2: {
+  apply nat_semiring_prop.
+}
+apply Nat.eq_mul_0 in Hlen.
+destruct Hlen as [Hlen| Hlen]. {
+  specialize (no_zero_bmat_size A) as H1.
+  now apply H1; rewrite <- Hsizes; left.
+}
+destruct A as [xa| MA]; [ easy | ].
+apply IHsizes with (A := mat_el MA 0 0). 2: {
+  cbn in Hsizes.
+  destruct (zerop (mat_nrows MA)) as [H| Hrz]; [ easy | ].
+  destruct (zerop (mat_ncols MA)) as [H| Hcz]; [ easy | ].
+  cbn in Hsizes.
+  now injection Hsizes.
+}
+rewrite <- Hlen at 2.
+apply srng_product_eq_compat; [ apply nat_semiring_prop | ].
+intros i Hi.
+destruct i; [ flia Hi | ].
+now do 2 rewrite Nat.sub_succ, Nat.sub_0_r.
+Qed.
+
 Theorem bmat_el_add : ∀ A B,
   compatible_square_bmatrices [A; B]
   → ∀ i j, i < sqr_bmat_size A → j < sqr_bmat_size A
@@ -2600,9 +2632,10 @@ induction A as [xa| MA IHA] using bmatrix_ind2; intros. {
   destruct (zerop (mat_nrows MB)) as [Hrbz| Hrbz]; [ easy | ].
   now destruct (zerop (mat_ncols MB)).
 }
+generalize Hsqa; intros Hsqa'.
 cbn in Hsma, Hsqa.
 destruct B as [xb| MB]. {
-  cbn in Hsmb.
+  cbn in Hsqa, Hsmb.
   move Hsmb after Hsma; subst sz.
   destruct (zerop (mat_nrows MA)) as [Hraz| Hraz]; [ easy | ].
   now destruct (zerop (mat_ncols MA)).
@@ -2622,6 +2655,11 @@ rewrite Hsab.
 remember (sizes_of_bmatrix (mat_el MA 0 0)) as sizes eqn:Hsizes.
 remember (Π (k = 1, length sizes), nth (k - 1) sizes 0)%Srng as len eqn:Hlen.
 apply IHA with (sz := sizes). 5: {
+  rewrite sizes_of_bmatrix_mat_el; [ easy | easy | | ]. {
+    apply Nat.div_lt_upper_bound. {
+      rewrite Hlen.
+      now apply (product_bmatrix_sizes_ne_0 (mat_el MA 0 0)).
+    } {
 ...
 induction A as [xa| MA IHA] using bmatrix_ind2; intros; [ now destruct B | ].
 destruct B as [xb| MB]; [ easy | ].
