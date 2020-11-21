@@ -2571,31 +2571,27 @@ Fixpoint bmat_el (BM : bmatrix T) i j :=
       end
   end.
 
+Arguments bmat_el BM%BM (i j)%nat.
+
 Definition sqr_bmat_size (BM : bmatrix T) :=
   let sl := sizes_of_bmatrix BM in
   (Π (i = 1, length sl), nth (i - 1) sl 0)%Srng.
 
-Definition mat_of_sqr_bmat (BM : bmatrix T) : matrix T :=
-  mk_mat (bmat_el BM) (sqr_bmat_size BM) (sqr_bmat_size BM).
-
-Arguments bmat_el BM%BM (i j)%nat.
-Arguments mat_of_sqr_bmat BM%BM.
 Arguments sqr_bmat_size BM%BM.
 
-Theorem bmat_el_add : ∀ A B i j,
-  bmat_fit_for_add A B
+Theorem bmat_el_add : ∀ A B,
+  compatible_square_bmatrices [A; B]
+  → ∀ i j, i < sqr_bmat_size A → j < sqr_bmat_size A
   → bmat_el (A + B) i j = (bmat_el A i j + bmat_el B i j)%Srng.
 Proof.
-intros * Hab.
+intros * Hab * Hi Hj.
+...
 revert B i j Hab.
 induction A as [xa| MA IHA] using bmatrix_ind2; intros; [ now destruct B | ].
 destruct B as [xb| MB]; [ easy | ].
 cbn in Hab.
 destruct Hab as (Hrr & Hcc & Hab).
 cbn - [ iter_seq srng_mul srng_one ].
-(*
-remember (Π (k = 1, length sl), nth (k - 1) sl 0)%Srng as sz eqn:Hsz.
-*)
 rewrite <- Hrr, <- Hcc.
 destruct (zerop (mat_nrows MA)) as [Harz| Harz]. {
   symmetry; apply srng_add_0_l.
@@ -2615,8 +2611,17 @@ remember (sizes_of_bmatrix (mat_el MA 0 0)) as sz eqn:Hsz.
 rename Hsz into Hasz.
 rename Hsab into Hbsz.
 remember (Π (k = 1, length sz), nth (k - 1) sz 0)%Srng as len eqn:Hlen.
-apply IHA.
 ...
+assert (Hi : i / len < mat_nrows MA). {
+  Print sizes_of_bmatrix.
+...
+apply IHA; [ | | apply Hab ].
+...
+
+Definition mat_of_sqr_bmat (BM : bmatrix T) : matrix T :=
+  mk_mat (bmat_el BM) (sqr_bmat_size BM) (sqr_bmat_size BM).
+
+Arguments mat_of_sqr_bmat BM%BM.
 
 Theorem sqr_bmat_size_mul : ∀ BMA BMB,
   is_square_bmat BMA
