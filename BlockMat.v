@@ -2641,25 +2641,70 @@ destruct B as [xb| MB]. {
   now destruct (zerop (mat_ncols MA)).
 }
 cbn in Hsqb, Hsmb.
-cbn - [ iter_seq srng_mul srng_one ].
+unfold sqr_bmat_size in Hi, Hj.
+cbn - [ iter_seq srng_mul srng_one ] in Hi, Hj |-*.
 destruct (zerop (mat_nrows MA)) as [Hraz| Hraz]; [ easy | ].
 destruct (zerop (mat_ncols MA)) as [Hcaz| Hcaz]; [ easy | ].
 destruct (zerop (mat_nrows MB)) as [Hrbz| Hrbz]; [ easy | ].
 destruct (zerop (mat_ncols MB)) as [Hcbz| Hcbz]; [ easy | ].
 cbn in Hsqa, Hsqb, Hsma, Hsmb.
-cbn - [ iter_seq srng_mul srng_one ].
+cbn - [ iter_seq srng_mul srng_one nth ] in Hi, Hj |-*.
 rewrite <- Hsma in Hsmb.
 injection Hsmb; clear Hsmb; intros Hsab Hrab.
 rewrite sizes_of_bmatrix_add; [ | easy ].
 rewrite Hsab.
 remember (sizes_of_bmatrix (mat_el MA 0 0)) as sizes eqn:Hsizes.
 remember (Π (k = 1, length sizes), nth (k - 1) sizes 0)%Srng as len eqn:Hlen.
-apply IHA with (sz := sizes). 5: {
-  rewrite sizes_of_bmatrix_mat_el; [ easy | easy | | ]. {
-    apply Nat.div_lt_upper_bound. {
-      rewrite Hlen.
-      now apply (product_bmatrix_sizes_ne_0 (mat_el MA 0 0)).
+assert (Hilen : i / len < mat_nrows MA). {
+  apply Nat.div_lt_upper_bound. {
+    rewrite Hlen.
+    now apply (product_bmatrix_sizes_ne_0 (mat_el MA 0 0)).
+  } {
+    rewrite iter_succ_succ in Hi.
+    rewrite srng_product_split_first in Hi; [ | | flia ]. 2: {
+      apply nat_semiring_prop.
+    }
+    remember (nth (_ - _) _ _) as x in Hi; cbn in Heqx; subst x.
+    rewrite Nat.mul_comm in Hi.
+    erewrite srng_product_eq_compat in Hi; cycle 1. {
+      apply nat_semiring_prop.
     } {
+      intros k Hk.
+      rewrite Nat.sub_succ_l; [ | easy ].
+      now cbn.
+    }
+    cbn - [ iter_seq srng_mul srng_one ] in Hi, Hlen.
+    now rewrite <- Hlen in Hi.
+  }
+}
+assert (Hjlen : j / len < mat_ncols MA). {
+  apply Nat.div_lt_upper_bound. {
+    rewrite Hlen.
+    now apply (product_bmatrix_sizes_ne_0 (mat_el MA 0 0)).
+  } {
+    rewrite iter_succ_succ in Hj.
+    rewrite srng_product_split_first in Hj; [ | | flia ]. 2: {
+      apply nat_semiring_prop.
+    }
+    remember (nth (_ - _) _ _) as x in Hj; cbn in Heqx; subst x.
+    rewrite Nat.mul_comm in Hj.
+    erewrite srng_product_eq_compat in Hj; cycle 1. {
+      apply nat_semiring_prop.
+    } {
+      intros k Hk.
+      rewrite Nat.sub_succ_l; [ | easy ].
+      now cbn.
+    }
+    cbn - [ iter_seq srng_mul srng_one ] in Hj, Hlen.
+    rewrite <- Hlen in Hj.
+    destruct Hsqa as (_ & H & _).
+    now rewrite H.
+  }
+}
+apply IHA with (sz := sizes); [ easy | easy | | | | | | ]; cycle 2. {
+  now rewrite sizes_of_bmatrix_mat_el.
+} {
+  rewrite sizes_of_bmatrix_mat_el.
 ...
 induction A as [xa| MA IHA] using bmatrix_ind2; intros; [ now destruct B | ].
 destruct B as [xb| MB]; [ easy | ].
