@@ -624,8 +624,6 @@ Definition compatible_square_bmatrices (BML : list (bmatrix T)) :=
  (∀ BM, BM ∈ BML → is_square_bmat BM) ∧
   ∃ sizes, (∀ BM, BM ∈ BML → sizes_of_bmatrix BM = sizes).
 
-About bmat_zero_like.
-
 Theorem bmat_zero_like_mul_distr_l : ∀ BMA BMB,
   is_square_bmat BMA
   → bmat_zero_like (BMA * BMB) = (bmat_zero_like BMA * BMB)%BM.
@@ -662,55 +660,40 @@ with
   rewrite List_seq_succ_r.
   rewrite fold_left_app; cbn.
   rewrite fold_left_app; cbn.
-  rewrite IHra.
-Theorem bmat_zero_like_add_idemp_l : ∀ A B,
-  bmat_zero_like (bmat_zero_like A + B) = bmat_zero_like (A + B).
-...
-rewrite bmat_add_comm.
-Search (bmat_zero_like (bmat_zero_like _ + _)%BM).
-About bmat_zero_like.
-Search (bmat_zero_like (_ + bmat_zero_like _)%BM).
-Search bmat_zero_like.
-  rewrite bmat_zero_like_add_idemp_r.
-...
-  apply List_fold_left_ext_in.
-  intros k BM Hk; f_equal.
-  apply in_seq in Hk.
-  clear BM.
-  apply IHBMA; [ easy | flia Hk | ].
-  rewrite sizes_of_bmatrix_at_0_0 with (r := ra); [ | easy | easy | easy ].
-  now apply Ha.
-...
+  rewrite bmat_zero_like_add_distr.
+  f_equal.
+  apply IHra.
+}
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-Search (bmat_zero_like (fold_left _ _ _)).
-...
-replace
-  (fold_left (λ a k, a + bmat_zero_like (fa i k) * fb k j)
-    (seq 0 ra) (bmat_zero_like (fa 0 0)))%BM
-with
-  (fold_left (λ a k, a + bmat_zero_like (fa i k * fb k j))
-    (seq 0 ra) (bmat_zero_like (fa 0 0)))%BM. 2: {
-  apply List_fold_left_ext_in.
+  eapply List_fold_left_ext_in.
   intros k BM Hk; f_equal.
   apply in_seq in Hk.
-  clear BM.
-  apply IHBMA; [ easy | flia Hk | ].
-  rewrite sizes_of_bmatrix_at_0_0 with (r := ra); [ | easy | easy | easy ].
-  now apply Ha.
+  destruct (Nat.eq_dec i k) as [Hik| Hik]. {
+    apply IHBMA; [ easy | flia Hk | ].
+    rewrite sizes_of_bmatrix_at_0_0 with (r := ra); [ | easy | easy | easy ].
+    now apply Ha.
+  } {
+    apply IHBMA; [ easy | flia Hk | ].
+    rewrite sizes_of_bmatrix_at_0_0 with (r := ra); [ | easy | easy | easy ].
+    now apply Ha.
+  }
+} {
+  eapply List_fold_left_ext_in.
+  intros k BM Hk; f_equal.
+  apply in_seq in Hk.
+  destruct (Nat.eq_dec i k) as [Hik| Hik]. {
+    apply IHBMA; [ easy | flia Hk | ].
+    rewrite sizes_of_bmatrix_at_0_0 with (r := ra); [ | easy | easy | easy ].
+    now apply Ha.
+  } {
+    apply IHBMA; [ easy | flia Hk | ].
+    rewrite sizes_of_bmatrix_at_0_0 with (r := ra); [ | easy | easy | easy ].
+    now apply Ha.
+  }
 }
-clear Hi IHBMA.
-induction ra. {
-  cbn; apply bmat_zero_like_idemp.
-}
-rewrite List_seq_succ_r; cbn.
-rewrite fold_left_app; cbn.
-rewrite fold_left_app; cbn.
-rewrite bmat_zero_like_add_distr.
-f_equal.
-apply IHra.
-intros i1 j1 Hi1 Hj1.
-apply Ha; [ flia Hi1 | flia Hj1 ].
 Qed.
+
+...
 
 Theorem bmat_zero_like_mul_distr_r : ∀ BMA BMB,
   is_square_bmat BMA
