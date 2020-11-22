@@ -87,35 +87,33 @@ Fixpoint bmat_add {so : semiring_op T} (MM1 MM2 : bmatrix T) :=
       end
   end.
 
-(* a null block matrix having the same structure as a given block matrix *)
+(* a null or identity block matrix having the same structure as a given
+    block matrix; see usage below for null and identity *)
 
-Fixpoint bmat_zero_like {so : semiring_op T} (BM : bmatrix T) :=
+Fixpoint bmat_IZ_like (u : T) {so : semiring_op T} (BM : bmatrix T) :=
   match BM with
-  | BM_1 _ => BM_1 0%Srng
-  | BM_M M =>
-      let M' :=
-        mk_mat (λ i j, bmat_zero_like (mat_el M i j))
-          (mat_nrows M) (mat_ncols M)
-      in
-      BM_M M'
-  end.
-
-(* an identity block matrix having the same structure as a given block
-    matrix *)
-
-Fixpoint bmat_one_like {so : semiring_op T} (BM : bmatrix T) :=
-  match BM with
-  | BM_1 _ => BM_1 1%Srng
+  | BM_1 _ => BM_1 u
   | BM_M M =>
       let M' :=
         mk_mat
           (λ i j,
-           if Nat.eq_dec i j then bmat_one_like (mat_el M i j)
-           else bmat_zero_like (mat_el M i j))
+           if Nat.eq_dec i j then bmat_IZ_like u (mat_el M i j)
+           else bmat_IZ_like 0%Srng (mat_el M i j))
           (mat_nrows M) (mat_ncols M)
       in
       BM_M M'
   end.
+
+Arguments bmat_IZ_like u%Rng {so}.
+
+(* a null block matrix having the same structure as a given block matrix *)
+
+Definition bmat_zero_like := bmat_IZ_like 0.
+
+(* an identity block matrix having the same structure as a given block
+    matrix *)
+
+Definition bmat_one_like := bmat_IZ_like 1.
 
 (* multiplication of block matrices *)
 
@@ -189,12 +187,15 @@ Delimit Scope BM_scope with BM.
 
 Notation "a + b" := (bmat_add a b) : BM_scope.
 Notation "a - b" := (bmat_sub _ a b) : BM_scope.
-Notation "a * b" := (bmat_mul a b) : BM_scope.
+Notation "a * b" := (bmat_mul _ a b) : BM_scope.
 Notation "- a" := (bmat_opp a) : BM_scope.
 
 Arguments bmat_add {T so} _%BM _%BM.
 Arguments bmat_sub {T ro so} _%BM _%BM.
+Arguments bmat_mul {T so} _%BM _%BM.
 Arguments bmat_opp_involutive {T ro so sp rp} _%BM.
+Arguments bmat_zero_like {T so} BM%BM.
+Arguments bmat_one_like {T so} BM%BM.
 
 End bmatrix_Notations.
 
@@ -483,12 +484,12 @@ cbn; f_equal.
 now apply IHBM.
 Qed.
 
-Theorem is_square_bmat_loop_zero_like : ∀ BM sizes,
+Theorem is_square_bmat_loop_IZ_like : ∀ u BM sizes,
   is_square_bmat_loop sizes BM
-  → is_square_bmat_loop sizes (bmat_zero_like BM).
+  → is_square_bmat_loop sizes (bmat_IZ_like u BM).
 Proof.
 intros * HBM.
-revert BM HBM.
+revert u BM HBM.
 induction sizes as [| size]; intros; [ now destruct BM | ].
 cbn in HBM |-*.
 destruct BM as [x| M]; [ easy | cbn ].
@@ -496,18 +497,15 @@ destruct HBM as (Hr & Hc & HBM).
 split; [ easy | ].
 split; [ easy | ].
 intros i j Hi Hj.
-apply IHsizes.
-now apply HBM.
+now destruct (Nat.eq_dec i j); apply IHsizes, HBM.
 Qed.
 
-Theorem is_square_bmat_zero_like : ∀ (BM : bmatrix T),
-  is_square_bmat BM
-  → is_square_bmat (bmat_zero_like BM).
+Theorem is_square_bmat_loop_zero_like : ∀ BM sizes,
+  is_square_bmat_loop sizes BM
+  → is_square_bmat_loop sizes (bmat_zero_like BM).
 Proof.
 intros * HBM.
-unfold is_square_bmat in HBM |-*.
-rewrite sizes_of_bmat_zero_like.
-now apply is_square_bmat_loop_zero_like.
+now apply is_square_bmat_loop_IZ_like.
 Qed.
 
 Theorem is_square_bmat_loop_one_like : ∀ BM sizes,
@@ -515,31 +513,7 @@ Theorem is_square_bmat_loop_one_like : ∀ BM sizes,
   → is_square_bmat_loop sizes (bmat_one_like BM).
 Proof.
 intros * HBM.
-revert BM HBM.
-induction sizes as [| size]; intros; [ now destruct BM | ].
-cbn in HBM |-*.
-destruct BM as [x| M]; [ easy | cbn ].
-destruct HBM as (Hr & Hc & HBM).
-split; [ easy | ].
-split; [ easy | ].
-intros i j Hi Hj.
-destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-  apply IHsizes.
-  now apply HBM.
-} {
-  apply is_square_bmat_loop_zero_like.
-  now apply HBM.
-}
-Qed.
-
-Theorem is_square_bmat_one_like : ∀ (BM : bmatrix T),
-  is_square_bmat BM
-  → is_square_bmat (bmat_one_like BM).
-Proof.
-intros * HBM.
-unfold is_square_bmat in HBM |-*.
-rewrite sizes_of_bmat_one_like.
-now apply is_square_bmat_loop_one_like.
+now apply is_square_bmat_loop_IZ_like.
 Qed.
 
 Theorem no_zero_bmat_size : ∀ (BM : bmatrix T), 0 ∉ sizes_of_bmatrix BM.
@@ -631,7 +605,7 @@ destruct BMB as [xb| mb]; [ easy | cbn ].
 f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros * Hi Hj.
-now apply IHBMA.
+now destruct (Nat.eq_dec i j); apply IHBMA.
 Qed.
 
 Theorem bmat_zero_like_idemp :
@@ -643,16 +617,18 @@ f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros i j Hi Hj.
 destruct M as (f, r, c); cbn in *.
-now apply IHBM.
+now destruct (Nat.eq_dec i j); apply IHBM.
 Qed.
 
 Definition compatible_square_bmatrices (BML : list (bmatrix T)) :=
  (∀ BM, BM ∈ BML → is_square_bmat BM) ∧
   ∃ sizes, (∀ BM, BM ∈ BML → sizes_of_bmatrix BM = sizes).
 
+About bmat_zero_like.
+
 Theorem bmat_zero_like_mul_distr_l : ∀ BMA BMB,
   is_square_bmat BMA
-  → bmat_zero_like (BMA * BMB)%BM = (bmat_zero_like BMA * BMB)%BM.
+  → bmat_zero_like (BMA * BMB) = (bmat_zero_like BMA * BMB)%BM.
 Proof.
 intros * Ha.
 revert BMB.
@@ -671,6 +647,20 @@ cbn in *.
 destruct (zerop ra) as [H| H]; [ easy | cbn in Ha; clear H ].
 destruct (zerop ca) as [H| H]; [ easy | cbn in Ha; clear H ].
 destruct Ha as (_ & H & Ha); subst ca.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+...
+  replace
+    (fold_left (λ a k, a + fa i k * fb k j)
+       (seq 0 ra) (bmat_zero_like (fa 0 0)))%BM
+  with
+     (bmat_zero_like (fa 0 0)).
+  replace
+    (fold_left (λ a k, a + @bmat_zero_like T so (fa i k) * fb k j)
+      (seq 0 ra) (@bmat_zero_like T so (fa 0 0)))%BM
+  with
+    (fold_left (λ a k, a + bmat_zero_like (fa i k * fb k j))
+      (seq 0 ra) (bmat_zero_like (fa 0 0)))%BM. 2: {
+...
 replace
   (fold_left (λ a k, a + bmat_zero_like (fa i k) * fb k j)
     (seq 0 ra) (bmat_zero_like (fa 0 0)))%BM
