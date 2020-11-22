@@ -100,6 +100,23 @@ Fixpoint bmat_zero_like {so : semiring_op T} (BM : bmatrix T) :=
       BM_M M'
   end.
 
+(* an identity block matrix having the same structure as a given block
+    matrix *)
+
+Fixpoint bmat_one_like {so : semiring_op T} (BM : bmatrix T) :=
+  match BM with
+  | BM_1 _ => BM_1 1%Srng
+  | BM_M M =>
+      let M' :=
+        mk_mat
+          (λ i j,
+           if Nat.eq_dec i j then bmat_one_like (mat_el M i j)
+           else bmat_zero_like (mat_el M i j))
+          (mat_nrows M) (mat_ncols M)
+      in
+      BM_M M'
+  end.
+
 (* multiplication of block matrices *)
 
 Fixpoint bmat_mul {so : semiring_op T} (MM1 MM2 : bmatrix T) :=
@@ -455,6 +472,17 @@ cbn; f_equal.
 now apply IHBM.
 Qed.
 
+Theorem sizes_of_bmat_one_like : ∀ (BM : bmatrix T),
+  sizes_of_bmatrix (bmat_one_like BM) = sizes_of_bmatrix BM.
+Proof.
+intros.
+induction BM as [x| M IHBM] using bmatrix_ind2; [ easy | cbn ].
+destruct (zerop (mat_nrows M)) as [Hr| Hr]; [ easy | ].
+destruct (zerop (mat_ncols M)) as [Hc| Hc]; [ easy | ].
+cbn; f_equal.
+now apply IHBM.
+Qed.
+
 Theorem is_square_bmat_loop_zero_like : ∀ BM sizes,
   is_square_bmat_loop sizes BM
   → is_square_bmat_loop sizes (bmat_zero_like BM).
@@ -480,6 +508,38 @@ intros * HBM.
 unfold is_square_bmat in HBM |-*.
 rewrite sizes_of_bmat_zero_like.
 now apply is_square_bmat_loop_zero_like.
+Qed.
+
+Theorem is_square_bmat_loop_one_like : ∀ BM sizes,
+  is_square_bmat_loop sizes BM
+  → is_square_bmat_loop sizes (bmat_one_like BM).
+Proof.
+intros * HBM.
+revert BM HBM.
+induction sizes as [| size]; intros; [ now destruct BM | ].
+cbn in HBM |-*.
+destruct BM as [x| M]; [ easy | cbn ].
+destruct HBM as (Hr & Hc & HBM).
+split; [ easy | ].
+split; [ easy | ].
+intros i j Hi Hj.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  apply IHsizes.
+  now apply HBM.
+} {
+  apply is_square_bmat_loop_zero_like.
+  now apply HBM.
+}
+Qed.
+
+Theorem is_square_bmat_one_like : ∀ (BM : bmatrix T),
+  is_square_bmat BM
+  → is_square_bmat (bmat_one_like BM).
+Proof.
+intros * HBM.
+unfold is_square_bmat in HBM |-*.
+rewrite sizes_of_bmat_one_like.
+now apply is_square_bmat_loop_one_like.
 Qed.
 
 Theorem no_zero_bmat_size : ∀ (BM : bmatrix T), 0 ∉ sizes_of_bmatrix BM.
@@ -946,6 +1006,20 @@ Qed.
 
 Arguments sizes_of_bmatrix BM%BM.
 
+Theorem is_square_bmat_add : ∀ BMA BMB,
+  is_square_bmat BMA
+  → is_square_bmat BMB
+  → sizes_of_bmatrix BMA = sizes_of_bmatrix BMB
+  → is_square_bmat (BMA + BMB)%BM.
+Proof.
+intros * Ha Hb Hab.
+unfold is_square_bmat.
+rewrite sizes_of_bmatrix_add; [ | easy ].
+apply is_square_bmat_loop_add; [ apply Ha | ].
+rewrite Hab.
+apply Hb.
+Qed.
+
 Theorem sizes_of_bmatrix_mul : ∀ BMA BMB,
   is_square_bmat BMA
   → is_square_bmat BMB
@@ -1351,7 +1425,7 @@ symmetry.
 now apply bmat_fit_for_add_add_l.
 Qed.
 
-Theorem bmat_mul_1_l : ∀ n M,
+Theorem old_bmat_mul_1_l : ∀ n M,
   bmat_fit_for_add (I_2_pow n) M
   → bmat_mul (I_2_pow n) M = M.
 Proof.
@@ -1498,7 +1572,7 @@ rewrite (bmat_zero_like_eq_compat _ (mat_el M 1 j)); cycle 1. {
 apply bmat_add_0_l.
 Qed.
 
-Theorem bmat_mul_1_r : ∀ n M,
+Theorem old_bmat_mul_1_r : ∀ n M,
   bmat_fit_for_add (I_2_pow n) M
   → bmat_mul M (I_2_pow n) = M.
 Proof.
@@ -2795,24 +2869,153 @@ Context {rp : ring_prop T}.
 Arguments bmat_el {T so} BM%BM (i j)%nat.
 *)
 
-Definition bmat_semiring_op_for M :=
+Definition square_bmatrix M (HM : is_square_bmat M) :=
+  {A : bmatrix T | compatible_square_bmatrices [M; A]}.
+
+Theorem comp_squ_bmat_with_zero_like : ∀ M (HM : is_square_bmat M),
+  compatible_square_bmatrices [M; bmat_zero_like M].
+Proof.
+intros.
+split. {
+  intros * HBM.
+  destruct HBM as [HBM| HBM]; [ now subst BM | ].
+  destruct HBM as [HBM| HBM]; [ | easy ].
+  subst BM.
+  now apply is_square_bmat_zero_like.
+} {
+  exists (sizes_of_bmatrix M).
+  intros * HBM.
+  destruct HBM as [HBM| HBM]; [ now subst BM | ].
+  destruct HBM as [HBM| HBM]; [ | easy ].
+  subst BM.
+  apply sizes_of_bmat_zero_like.
+}
+Qed.
+
+Theorem comp_squ_bmat_with_one_like : ∀ M (HM : is_square_bmat M),
+  compatible_square_bmatrices [M; bmat_one_like M].
+Proof.
+intros.
+split. {
+  intros * HBM.
+  destruct HBM as [HBM| HBM]; [ now subst BM | ].
+  destruct HBM as [HBM| HBM]; [ | easy ].
+  subst BM.
+  now apply is_square_bmat_one_like.
+} {
+  exists (sizes_of_bmatrix M).
+  intros * HBM.
+  destruct HBM as [HBM| HBM]; [ now subst BM | ].
+  destruct HBM as [HBM| HBM]; [ | easy ].
+  subst BM.
+  apply sizes_of_bmat_one_like.
+}
+Qed.
+
+Definition squ_bmat_zero M HM : square_bmatrix M HM.
+Proof.
+exists (bmat_zero_like M).
+now apply comp_squ_bmat_with_zero_like.
+Qed.
+
+Definition squ_bmat_one M HM : square_bmatrix M HM.
+Proof.
+exists (bmat_one_like M).
+now apply comp_squ_bmat_with_one_like.
+Qed.
+
+...
+
+Definition squ_bmat_add M HM (MA MB : square_bmatrix M HM) :
+  square_bmatrix M HM.
+Proof.
+destruct MA as (MA & Hma).
+destruct MB as (MB & Hmb).
+exists (MA + MB)%BM.
+destruct Hma as (Hsqa & sza & Hma).
+destruct Hmb as (Hsqb & szb & Hmb).
+split. {
+  intros M' Hbm.
+  destruct Hbm as [Hbm| Hbm]; [ now subst M' | ].
+  destruct Hbm as [Hbm| Hbm]; [ | easy ].
+  subst M'.
+  apply is_square_bmat_add. {
+    now apply Hsqa; right; left.
+  } {
+    now apply Hsqb; right; left.
+  }
+  transitivity (sizes_of_bmatrix M). {
+    rewrite Hma; [ symmetry | now right; left ].
+    now apply Hma; left.
+  } {
+    rewrite Hmb; [ symmetry | now left ].
+    now apply Hmb; right; left.
+  }
+} {
+  exists (sizes_of_bmatrix M).
+  intros M' Hbm.
+  destruct Hbm as [Hbm| Hbm]; [ now subst M' | ].
+  destruct Hbm as [Hbm| Hbm]; [ | easy ].
+  subst M'.
+  rewrite sizes_of_bmatrix_add. {
+    rewrite Hma; [ symmetry | now right; left ].
+    now apply Hma; left.
+  }
+  transitivity (sizes_of_bmatrix M). {
+    rewrite Hma; [ symmetry | now right; left ].
+    now apply Hma; left.
+  } {
+    rewrite Hmb; [ symmetry | now left ].
+    now apply Hmb; right; left.
+  }
+}
+Qed.
+
+Definition bmat_semiring_op_for M HM : semiring_op (square_bmatrix M HM) :=
+  {| srng_zero := squ_bmat_zero M HM;
+     srng_one := squ_bmat_one M HM;
+     srng_add := @squ_bmat_add M HM;
+     srng_mul := @squ_bmat_mul M HM |}.
+
+...
+
+Definition bmat_semiring_op_for M : semiring_op (bmatrix T) :=
   {| srng_zero := bmat_zero_like M;
      srng_one := bmat_zero_like M;
      srng_add := bmat_add;
      srng_mul := bmat_mul |}.
 
+Canonical Structure bmat_semiring_op_for.
+
+Theorem bmat_semiring_add_comm : ∀ (M a b : bmatrix T),
+  bmat_fit_for_add M a
+  → bmat_fit_for_add M b
+  → (a + b)%BM = (b + a)%BM.
+Proof.
+intros * Ha Hb.
+apply bmat_add_comm.
+transitivity M; [ now symmetry | easy ].
+Qed.
+
+Definition bmat_semiring_prop_for (M : bmatrix T) :
+  semiring_prop (bmatrix T) :=
+  {| srng_add_comm a b :=
+       bmat_semiring_add_comm M a b |}.
+...
+
 Theorem bmat_el_summation : ∀ b e i j f
   (bso := bmat_semiring_op_for (f b)),
   b ≤ e
+  → is_square_bmat (f b)
   → bmat_el (Σ (k = b, e), f k)%Srng i j =
       (Σ (k = b, e), bmat_el (f k) i j)%Srng.
 Proof.
-intros * Hbe.
+intros * Hbe Hsf.
 unfold iter_seq.
 remember (S e - b) as len eqn:Hlen.
 assert (H : 0 < len) by flia Hbe Hlen.
 clear e Hbe Hlen; rename H into Hlen.
-revert b i j bso.
+revert b i j bso Hsf.
 induction len; intros; [ easy | clear Hlen ].
 destruct (Nat.eq_dec len 0) as [Hlz| Hlz]. {
   subst len; cbn.
@@ -2828,16 +3031,18 @@ cbn; rewrite bmat_el_add. 2: {
     destruct HBM as [HBM| HBM]. {
       subst BM.
       clear IHlen.
-      induction len; [ easy | clear Hlz ].
-      destruct len. {
-        cbn - [ is_square_bmat ].
-Search (is_square_bmat (_ + _)).
+      replace (@bmat_add T so) with (@srng_add _ bso) by easy.
+Check @fold_left_add_fun_from_0.
+Check @fold_left_srng_add_fun_from_0.
+      rewrite fold_left_srng_add_fun_from_0.
 ...
+Set Printing All.
+(*
       replace len with (S (b + len - 1) - b) by flia Hlz.
       rewrite fold_iter_seq.
       replace (@bmat_add T so) with (@srng_add _ bso) by easy.
       replace (@bmat_zero_like T so (f b)) with (@srng_zero _ bso) by easy.
-...
+*)
       clear IHlen.
       induction len; intros. {
         cbn - [ is_square_bmat ].
@@ -2845,9 +3050,27 @@ Search (is_square_bmat (_ + _)).
           cbn.
         admit.
       }
+...
+      induction len; [ easy | clear Hlz ].
+      destruct len. {
+        cbn - [ is_square_bmat ].
+        apply is_square_bmat_add; [ | easy | ]. {
+          now apply is_square_bmat_zero_like.
+        }
+        apply sizes_of_bmat_zero_like.
+      }
+      rewrite List_seq_succ_r.
+      rewrite fold_left_app.
       cbn - [ is_square_bmat ].
+      apply is_square_bmat_add; cycle 1. {
+        admit.
+      } {
+...
+        rewrite fold_left_srng_add_fun_from_0.
+        rewrite List_fold_left_f
+        rewrite sizes_of_bmatrix_add.
+...
       rewrite <- seq_shift.
-      rewrite List_fold_left_map.
 Search (fold_left _ _ 0%Srng).
 rewrite fold_left_srng_add_fun_from_0.
       rewrite List_fold_left_f
