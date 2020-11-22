@@ -2487,12 +2487,13 @@ Theorem bmat_mul_sqr_opp : ∀ M,
 Proof.
 intros * HM.
 apply bmat_mul_opp_opp.
-...
-exists (sizes_of_bmatrix M).
-split; intros BM HBM. {
+split. {
+  intros BM HBM.
   replace BM with M; [ easy | ].
   destruct HBM as [| HBM]; [ easy | now destruct HBM ].
 } {
+  exists (sizes_of_bmatrix M).
+  intros BM HBM.
   replace BM with M; [ easy | ].
   destruct HBM as [| HBM]; [ easy | now destruct HBM ].
 }
@@ -2648,7 +2649,7 @@ Theorem bmat_el_add : ∀ A B,
 Proof.
 intros * Hab * Hi Hj.
 unfold compatible_square_bmatrices in Hab.
-destruct Hab as (sz & Hsq & Hsm).
+destruct Hab as (Hsq & sz & Hsm).
 specialize (Hsq A (or_introl eq_refl)) as Hsqa.
 specialize (Hsq B (or_intror (or_introl eq_refl))) as Hsqb.
 specialize (Hsm A (or_introl eq_refl)) as Hsma.
@@ -2822,7 +2823,10 @@ rewrite List_seq_succ_r.
 do 2 rewrite fold_left_app.
 cbn; rewrite bmat_el_add. 2: {
   unfold compatible_square_bmatrices.
-Print compatible_square_bmatrices.
+  split. {
+    intros BM HBM.
+    destruct HBM as [HBM| HBM]. {
+      subst BM.
 ..
   exists (sizes_of_bmatrix
 
