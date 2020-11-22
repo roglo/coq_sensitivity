@@ -647,19 +647,42 @@ cbn in *.
 destruct (zerop ra) as [H| H]; [ easy | cbn in Ha; clear H ].
 destruct (zerop ca) as [H| H]; [ easy | cbn in Ha; clear H ].
 destruct Ha as (_ & H & Ha); subst ca.
-destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+replace
+  (bmat_zero_like
+     (fold_left (λ a k, (a + fa i k * fb k j)%BM)
+        (seq 0 ra) (bmat_zero_like (fa 0 0))))
+with
+  (fold_left (λ a k, (a + bmat_zero_like (fa i k * fb k j))%BM)
+     (seq 0 ra) (bmat_zero_like (fa 0 0))). 2: {
+  clear IHBMA Ha Hi.
+  induction ra. {
+    symmetry.
+    apply bmat_zero_like_idemp.
+  }
+  rewrite List_seq_succ_r.
+  rewrite fold_left_app; cbn.
+  rewrite fold_left_app; cbn.
+  rewrite IHra.
+Theorem bmat_zero_like_add_idemp_l : ∀ A B,
+  bmat_zero_like (bmat_zero_like A + B) = bmat_zero_like (A + B).
 ...
-  replace
-    (fold_left (λ a k, a + fa i k * fb k j)
-       (seq 0 ra) (bmat_zero_like (fa 0 0)))%BM
-  with
-     (bmat_zero_like (fa 0 0)).
-  replace
-    (fold_left (λ a k, a + @bmat_zero_like T so (fa i k) * fb k j)
-      (seq 0 ra) (@bmat_zero_like T so (fa 0 0)))%BM
-  with
-    (fold_left (λ a k, a + bmat_zero_like (fa i k * fb k j))
-      (seq 0 ra) (bmat_zero_like (fa 0 0)))%BM. 2: {
+rewrite bmat_add_comm.
+Search (bmat_zero_like (bmat_zero_like _ + _)%BM).
+About bmat_zero_like.
+Search (bmat_zero_like (_ + bmat_zero_like _)%BM).
+Search bmat_zero_like.
+  rewrite bmat_zero_like_add_idemp_r.
+...
+  apply List_fold_left_ext_in.
+  intros k BM Hk; f_equal.
+  apply in_seq in Hk.
+  clear BM.
+  apply IHBMA; [ easy | flia Hk | ].
+  rewrite sizes_of_bmatrix_at_0_0 with (r := ra); [ | easy | easy | easy ].
+  now apply Ha.
+...
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+Search (bmat_zero_like (fold_left _ _ _)).
 ...
 replace
   (fold_left (λ a k, a + bmat_zero_like (fa i k) * fb k j)
