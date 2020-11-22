@@ -2827,6 +2827,24 @@ cbn; rewrite bmat_el_add. 2: {
     intros BM HBM.
     destruct HBM as [HBM| HBM]. {
       subst BM.
+      replace len with (S (b + len - 1) - b) by flia Hlz.
+      rewrite fold_iter_seq.
+      replace (@bmat_add T so) with (@srng_add _ bso) by easy.
+      replace (@bmat_zero_like T so (f b)) with (@srng_zero _ bso) by easy.
+...
+      clear IHlen.
+      induction len; intros. {
+        cbn - [ is_square_bmat ].
+        destruct b. {
+          cbn.
+        admit.
+      }
+      cbn - [ is_square_bmat ].
+      rewrite <- seq_shift.
+      rewrite List_fold_left_map.
+Search (fold_left _ _ 0%Srng).
+rewrite fold_left_srng_add_fun_from_0.
+      rewrite List_fold_left_f
 ..
   exists (sizes_of_bmatrix
 
