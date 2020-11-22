@@ -97,8 +97,7 @@ Fixpoint bmat_IZ_like (u : T) {so : semiring_op T} (BM : bmatrix T) :=
       let M' :=
         mk_mat
           (λ i j,
-           if Nat.eq_dec i j then bmat_IZ_like u (mat_el M i j)
-           else bmat_IZ_like 0%Srng (mat_el M i j))
+           bmat_IZ_like (if eqb i j then u else 0%Srng) (mat_el M i j))
           (mat_nrows M) (mat_ncols M)
       in
       BM_M M'
@@ -109,6 +108,9 @@ Arguments bmat_IZ_like u%Rng {so}.
 (* a null block matrix having the same structure as a given block matrix *)
 
 Definition bmat_zero_like := bmat_IZ_like 0.
+
+Theorem fold_bmat_zero_like : bmat_IZ_like 0 = bmat_zero_like.
+Proof. easy. Qed.
 
 (* an identity block matrix having the same structure as a given block
     matrix *)
@@ -210,6 +212,8 @@ Context {sp : semiring_prop T}.
 Context {rp : ring_prop T}.
 
 (* zero and one block matrices *)
+(* this is, I guess, an old version that should be removed one day;
+   now I use bmat_IZ_like *)
 
 Fixpoint IZ_2_pow (u : T) n :=
   match n with
@@ -605,7 +609,8 @@ destruct BMB as [xb| mb]; [ easy | cbn ].
 f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros * Hi Hj.
-now destruct (Nat.eq_dec i j); apply IHBMA.
+rewrite Tauto.if_same.
+now apply IHBMA.
 Qed.
 
 Theorem bmat_zero_like_idemp :
@@ -617,7 +622,8 @@ f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros i j Hi Hj.
 destruct M as (f, r, c); cbn in *.
-now destruct (Nat.eq_dec i j); apply IHBM.
+rewrite Tauto.if_same.
+now apply IHBM.
 Qed.
 
 Definition compatible_square_bmatrices (BML : list (bmatrix T)) :=
@@ -638,13 +644,17 @@ destruct BMB as [xb| mb]; [ easy | ].
 cbn; f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros * Hi Hj.
+rewrite Tauto.if_same.
+(*
 rewrite bmat_zero_like_idemp.
+*)
 destruct ma as (fa, ra, ca).
 destruct mb as (fb, rb, cb).
 cbn in *.
 destruct (zerop ra) as [H| H]; [ easy | cbn in Ha; clear H ].
 destruct (zerop ca) as [H| H]; [ easy | cbn in Ha; clear H ].
 destruct Ha as (_ & H & Ha); subst ca.
+rewrite fold_bmat_zero_like.
 replace
   (bmat_zero_like
      (fold_left (λ a k, (a + fa i k * fb k j)%BM)
@@ -664,33 +674,15 @@ with
   f_equal.
   apply IHra.
 }
-destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-  eapply List_fold_left_ext_in.
-  intros k BM Hk; f_equal.
-  apply in_seq in Hk.
-  destruct (Nat.eq_dec i k) as [Hik| Hik]. {
-    apply IHBMA; [ easy | flia Hk | ].
-    rewrite sizes_of_bmatrix_at_0_0 with (r := ra); [ | easy | easy | easy ].
-    now apply Ha.
-  } {
-    apply IHBMA; [ easy | flia Hk | ].
-    rewrite sizes_of_bmatrix_at_0_0 with (r := ra); [ | easy | easy | easy ].
-    now apply Ha.
-  }
-} {
-  eapply List_fold_left_ext_in.
-  intros k BM Hk; f_equal.
-  apply in_seq in Hk.
-  destruct (Nat.eq_dec i k) as [Hik| Hik]. {
-    apply IHBMA; [ easy | flia Hk | ].
-    rewrite sizes_of_bmatrix_at_0_0 with (r := ra); [ | easy | easy | easy ].
-    now apply Ha.
-  } {
-    apply IHBMA; [ easy | flia Hk | ].
-    rewrite sizes_of_bmatrix_at_0_0 with (r := ra); [ | easy | easy | easy ].
-    now apply Ha.
-  }
-}
+rewrite bmat_zero_like_idemp.
+eapply List_fold_left_ext_in.
+intros k BM Hk; f_equal.
+rewrite Tauto.if_same.
+rewrite fold_bmat_zero_like.
+apply in_seq in Hk.
+apply IHBMA; [ easy | flia Hk | ].
+rewrite sizes_of_bmatrix_at_0_0 with (r := ra); [ | easy | easy | easy ].
+now apply Ha.
 Qed.
 
 ...
