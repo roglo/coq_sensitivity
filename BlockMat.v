@@ -2827,6 +2827,12 @@ cbn; rewrite bmat_el_add. 2: {
     intros BM HBM.
     destruct HBM as [HBM| HBM]. {
       subst BM.
+      clear IHlen.
+      induction len; [ easy | clear Hlz ].
+      destruct len. {
+        cbn - [ is_square_bmat ].
+Search (is_square_bmat (_ + _)).
+...
       replace len with (S (b + len - 1) - b) by flia Hlz.
       rewrite fold_iter_seq.
       replace (@bmat_add T so) with (@srng_add _ bso) by easy.
