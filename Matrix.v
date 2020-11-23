@@ -696,6 +696,8 @@ Theorem submatrix_nrows {m n} : ∀ (M : matrix m n T) i j,
   mat_nrows (subm M i j) = mat_nrows M - 1.
 Proof. easy. Qed.
 
+... (* faut voir... c'est utilisé dans CharacPolyn.v *)
+
 Theorem submatrix_mI : ∀ i r,
  subm (mI (S r)) i i = mI r.
 Proof.
