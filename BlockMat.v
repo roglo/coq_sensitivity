@@ -2911,6 +2911,49 @@ split. {
 }
 Qed.
 
+Theorem comp_squ_bmat_with_mul : ∀ M (HM : is_square_bmat M) MA MB,
+  compatible_square_bmatrices [M; MA]
+  → compatible_square_bmatrices [M; MB]
+  → compatible_square_bmatrices [M; (MA * MB)%BM].
+Proof.
+intros * HM * Hma Hmb.
+destruct Hma as (sza & Hma).
+destruct Hmb as (szb & Hmb).
+exists (sizes_of_bmatrix M).
+intros M' Hbm.
+destruct Hbm as [Hbm| Hbm]; [ now subst M' | ].
+destruct Hbm as [Hbm| Hbm]; [ | easy ].
+subst M'.
+split. {
+...
+  apply is_square_bmat_add. {
+    now apply Hma; right; left.
+  } {
+    now apply Hmb; right; left.
+  }
+  transitivity (sizes_of_bmatrix M). {
+    rewrite (proj2 (Hma _ (or_intror (or_introl eq_refl)))).
+    now symmetry; apply Hma; left.
+  } {
+    rewrite (proj2 (Hmb _ (or_intror (or_introl eq_refl)))).
+    now apply Hmb; left.
+  }
+} {
+  rewrite sizes_of_bmatrix_add. {
+    rewrite (proj2 (Hma _ (or_intror (or_introl eq_refl)))).
+    now symmetry; apply Hma; left.
+  } {
+    transitivity (sizes_of_bmatrix M). {
+      rewrite (proj2 (Hma _ (or_intror (or_introl eq_refl)))).
+      now symmetry; apply Hma; left.
+    } {
+      rewrite (proj2 (Hmb _ (or_intror (or_introl eq_refl)))).
+      now apply Hmb; left.
+    }
+  }
+}
+Qed.
+
 Definition squ_bmat_zero M HM : square_bmatrix M HM.
 Proof.
 exists (bmat_zero_like M).
@@ -2938,6 +2981,8 @@ Proof.
 destruct MA as (MA & Hma).
 destruct MB as (MB & Hmb).
 exists (MA * MB)%BM.
+...
+apply comp_squ_bmat_with_mul.
 ...
 
 Definition bmat_semiring_op_for M HM : semiring_op (square_bmatrix M HM) :=
