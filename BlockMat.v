@@ -2370,28 +2370,23 @@ Theorem bmat_add_move_0_l : ∀ MA MB,
 Proof.
 intros * Hcsb Hab.
 apply bmat_add_move_l in Hab. 2: {
-...
-  destruct Hcsb as (Hsq & sizes & Hsz).
+  destruct Hcsb as (sizes & Hcsb).
+  exists sizes.
+  intros * HBM.
+  destruct HBM as [HBM| HBM]; [ now subst BM; apply Hcsb; left | ].
+  destruct HBM as [HBM| HBM]; [ now subst BM; apply Hcsb; right; left | ].
+  destruct HBM as [HBM| HBM]; [ subst BM | easy ].
   split. {
-    intros * HBM.
-    destruct HBM as [HBM| HBM]; [ now subst BM; apply Hsq; left | ].
-    destruct HBM as [HBM| HBM]; [ now subst BM; apply Hsq; right; left | ].
-    destruct HBM as [HBM| HBM]; [ subst BM | easy ].
-    now apply is_square_bmat_zero_like, Hsq; left.
+    now apply is_square_bmat_zero_like, Hcsb; left.
   } {
-    exists sizes.
-    intros * HBM.
-    destruct HBM as [HBM| HBM]; [ now subst BM; apply Hsz; left | ].
-    destruct HBM as [HBM| HBM]; [ now subst BM; apply Hsz; right; left | ].
-    destruct HBM as [HBM| HBM]; [ subst BM | easy ].
     rewrite sizes_of_bmat_zero_like.
-    now apply Hsz; left.
+    now apply Hcsb; left.
   }
 }
 unfold bmat_sub in Hab.
 rewrite <- bmat_zero_like_opp in Hab. 2: {
-  destruct Hcsb as (Hsq & size & Hsz).
-  now apply Hsq; left.
+  destruct Hcsb as (size & Hcsb).
+  now apply Hcsb; left.
 }
 now rewrite bmat_add_0_l in Hab.
 Qed.
@@ -2403,6 +2398,7 @@ Proof.
 intros * Hcsb.
 specialize (@bmat_mul_add_distr_r MA (bmat_opp MA) MB) as H1.
 destruct Hcsb as (Hsq & sizes & Hsz).
+...
 specialize (Hsq _ (or_introl eq_refl)) as Ha.
 specialize (Hsq _ (or_intror (or_introl eq_refl))) as Hb.
 specialize (Hsz _ (or_introl eq_refl)) as Has.
