@@ -2531,17 +2531,10 @@ Theorem bmat_mul_sqr_opp : ∀ M,
 Proof.
 intros * HM.
 apply bmat_mul_opp_opp.
-...
-split. {
-  intros BM HBM.
-  replace BM with M; [ easy | ].
-  destruct HBM as [| HBM]; [ easy | now destruct HBM ].
-} {
-  exists (sizes_of_bmatrix M).
-  intros BM HBM.
-  replace BM with M; [ easy | ].
-  destruct HBM as [| HBM]; [ easy | now destruct HBM ].
-}
+exists (sizes_of_bmatrix M).
+intros BM HBM.
+replace BM with M; [ easy | ].
+destruct HBM as [| HBM]; [ easy | now destruct HBM ].
 Qed.
 
 Theorem bmat_fit_for_add_Z_2_pow_bmat_nat_mul_l :
@@ -2695,13 +2688,12 @@ Theorem bmat_el_add : ∀ A B,
   → bmat_el (A + B) i j = (bmat_el A i j + bmat_el B i j)%Srng.
 Proof.
 intros * Hab * Hi Hj.
-unfold compatible_square_bmatrices in Hab.
-destruct Hab as (Hsq & sz & Hsm).
-specialize (Hsq A (or_introl eq_refl)) as Hsqa.
-specialize (Hsq B (or_intror (or_introl eq_refl))) as Hsqb.
-specialize (Hsm A (or_introl eq_refl)) as Hsma.
-specialize (Hsm B (or_intror (or_introl eq_refl))) as Hsmb.
-clear Hsq Hsm.
+destruct Hab as (sz & Hab).
+specialize (Hab A (or_introl eq_refl)) as Hsqa.
+specialize (Hab B (or_intror (or_introl eq_refl))) as Hsqb.
+destruct Hsqa as (Hsqa, Hsma).
+destruct Hsqb as (Hsqb, Hsmb).
+clear Hab.
 revert sz B Hsqb Hsma Hsmb i j Hi Hj.
 induction A as [xa| MA IHA] using bmatrix_ind2; intros. {
   cbn in Hsma; subst sz.
@@ -2849,6 +2841,7 @@ Theorem comp_squ_bmat_with_zero_like : ∀ M (HM : is_square_bmat M),
   compatible_square_bmatrices [M; bmat_zero_like M].
 Proof.
 intros.
+...
 split. {
   intros * HBM.
   destruct HBM as [HBM| HBM]; [ now subst BM | ].
