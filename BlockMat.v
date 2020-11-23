@@ -2912,60 +2912,18 @@ split. {
     rewrite (proj2 (Hma _ (or_intror (or_introl eq_refl)))).
     now symmetry; apply Hma; left.
   } {
-...
-    rewrite (proj2 (Hma _ (or_intror (or_introl eq_refl)))).
-    rewrite (proj2 (Hmb _ (or_intror (or_introl eq_refl)))).
-    apply Hma.
-...
-    now rewrite (proj2 (Hmb _ (or_introl eq_refl))).
-...
-    rewrite Hma; [ symmetry | now right; left ].
-    now apply Hma; left.
-  }
-  transitivity (sizes_of_bmatrix M). {
-    rewrite Hma; [ symmetry | now right; left ].
-    now apply Hma; left.
-  } {
-    rewrite Hmb; [ symmetry | now left ].
-    now apply Hmb; right; left.
-  }
-...
-split. {
-  intros M' Hbm.
-  destruct Hbm as [Hbm| Hbm]; [ now subst M' | ].
-  destruct Hbm as [Hbm| Hbm]; [ | easy ].
-  subst M'.
-  apply is_square_bmat_add. {
-    now apply Hsqa; right; left.
-  } {
-    now apply Hsqb; right; left.
-  }
-  transitivity (sizes_of_bmatrix M). {
-    rewrite Hma; [ symmetry | now right; left ].
-    now apply Hma; left.
-  } {
-    rewrite Hmb; [ symmetry | now left ].
-    now apply Hmb; right; left.
-  }
-} {
-  exists (sizes_of_bmatrix M).
-  intros M' Hbm.
-  destruct Hbm as [Hbm| Hbm]; [ now subst M' | ].
-  destruct Hbm as [Hbm| Hbm]; [ | easy ].
-  subst M'.
-  rewrite sizes_of_bmatrix_add. {
-    rewrite Hma; [ symmetry | now right; left ].
-    now apply Hma; left.
-  }
-  transitivity (sizes_of_bmatrix M). {
-    rewrite Hma; [ symmetry | now right; left ].
-    now apply Hma; left.
-  } {
-    rewrite Hmb; [ symmetry | now left ].
-    now apply Hmb; right; left.
+    transitivity (sizes_of_bmatrix M). {
+      rewrite (proj2 (Hma _ (or_intror (or_introl eq_refl)))).
+      now symmetry; apply Hma; left.
+    } {
+      rewrite (proj2 (Hmb _ (or_intror (or_introl eq_refl)))).
+      now apply Hmb; left.
+    }
   }
 }
 Qed.
+
+...
 
 Definition bmat_semiring_op_for M HM : semiring_op (square_bmatrix M HM) :=
   {| srng_zero := squ_bmat_zero M HM;
