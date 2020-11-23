@@ -650,6 +650,44 @@ Definition compatible_square_bmatrices (BML : list (bmatrix T)) :=
   ∃ sizes,
   ∀ BM, BM ∈ BML → is_square_bmat BM ∧ sizes_of_bmatrix BM = sizes.
 
+Definition compatible_square_bmatrices' (BML : list (bmatrix T)) :=
+  ∀ BM, BM ∈ BML →
+  is_square_bmat BM ∧
+  sizes_of_bmatrix BM = sizes_of_bmatrix (hd (BM_1 0%Srng) BML).
+
+Theorem glop : ∀ BML,
+  compatible_square_bmatrices BML ↔
+  compatible_square_bmatrices' BML.
+Proof.
+intros.
+unfold compatible_square_bmatrices, compatible_square_bmatrices'.
+split; intros Hbml. {
+  intros BM Hbm.
+  destruct Hbml as (sizes, Hbml).
+  specialize (Hbml _ Hbm) as H1.
+  specialize (Hbml (hd (BM_1 0%Rng) BML)) as H2.
+  assert (H : hd (BM_1 0%Rng) BML ∈ BML). {
+    destruct BML as [| BM0]; [ easy | cbn ].
+    now left.
+  }
+  specialize (H2 H); clear H.
+  split; [ easy | ].
+  destruct H1 as (_, H1).
+  destruct H2 as (_, H2).
+  congruence.
+} {
+  exists (sizes_of_bmatrix (hd (BM_1 0%Rng) BML)).
+  intros BM Hbm.
+  now apply Hbml.
+}
+Qed.
+
+(* ouais, c'est bien mais il faudrait une version dont la preuve
+   soit unique, comme ça on pourrait la supprimer dans les types
+   dépendants les utilisant *)
+
+...
+
 Theorem bmat_zero_like_mul_distr_l : ∀ BMA BMB,
   is_square_bmat BMA
   → bmat_zero_like (BMA * BMB) = (bmat_zero_like BMA * BMB)%BM.
@@ -2977,7 +3015,7 @@ destruct MA as (MA & Hma).
 destruct MB as (MB & Hmb).
 exists (MA + MB)%BM.
 now apply comp_squ_bmat_with_add.
-Qed.
+Defined.
 
 Definition squ_bmat_mul M HM (MA MB : square_bmatrix M HM) :
   square_bmatrix M HM.
@@ -2986,7 +3024,7 @@ destruct MA as (MA & Hma).
 destruct MB as (MB & Hmb).
 exists (MA * MB)%BM.
 now apply comp_squ_bmat_with_mul.
-Qed.
+Defined.
 
 Definition bmat_semiring_op_for M HM : semiring_op (square_bmatrix M HM) :=
   {| srng_zero := squ_bmat_zero M HM;
@@ -3000,6 +3038,17 @@ Theorem bmat_semiring_add_comm : ∀ M HM (a b : square_bmatrix M HM),
   squ_bmat_add a b = squ_bmat_add b a.
 Proof.
 intros.
+unfold squ_bmat_add.
+destruct a as (A, HA).
+destruct b as (B, HB).
+apply eq_exist_uncurried.
+specialize (bmat_add_comm A B) as H1.
+assert (H : bmat_fit_for_add A B). {
+  admit.
+}
+specialize (H1 H); clear H.
+exists H1.
+Check (comp_squ_bmat_with_add HM HB HA).
 ...
 apply bmat_add_comm.
 transitivity M; [ now symmetry | easy ].
