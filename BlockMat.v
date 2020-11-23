@@ -2841,19 +2841,14 @@ Theorem comp_squ_bmat_with_zero_like : ∀ M (HM : is_square_bmat M),
   compatible_square_bmatrices [M; bmat_zero_like M].
 Proof.
 intros.
-...
+exists (sizes_of_bmatrix M).
+intros * HBM.
+destruct HBM as [HBM| HBM]; [ now subst BM | ].
+destruct HBM as [HBM| HBM]; [ | easy ].
+subst BM.
 split. {
-  intros * HBM.
-  destruct HBM as [HBM| HBM]; [ now subst BM | ].
-  destruct HBM as [HBM| HBM]; [ | easy ].
-  subst BM.
   now apply is_square_bmat_zero_like.
 } {
-  exists (sizes_of_bmatrix M).
-  intros * HBM.
-  destruct HBM as [HBM| HBM]; [ now subst BM | ].
-  destruct HBM as [HBM| HBM]; [ | easy ].
-  subst BM.
   apply sizes_of_bmat_zero_like.
 }
 Qed.
@@ -2862,20 +2857,14 @@ Theorem comp_squ_bmat_with_one_like : ∀ M (HM : is_square_bmat M),
   compatible_square_bmatrices [M; bmat_one_like M].
 Proof.
 intros.
-Print compatible_square_bmatrices.
-...
+exists (sizes_of_bmatrix M).
+intros * HBM.
+destruct HBM as [HBM| HBM]; [ now subst BM | ].
+destruct HBM as [HBM| HBM]; [ | easy ].
+subst BM.
 split. {
-  intros * HBM.
-  destruct HBM as [HBM| HBM]; [ now subst BM | ].
-  destruct HBM as [HBM| HBM]; [ | easy ].
-  subst BM.
   now apply is_square_bmat_one_like.
 } {
-  exists (sizes_of_bmatrix M).
-  intros * HBM.
-  destruct HBM as [HBM| HBM]; [ now subst BM | ].
-  destruct HBM as [HBM| HBM]; [ | easy ].
-  subst BM.
   apply sizes_of_bmat_one_like.
 }
 Qed.
@@ -2892,16 +2881,55 @@ exists (bmat_one_like M).
 now apply comp_squ_bmat_with_one_like.
 Qed.
 
-...
-
 Definition squ_bmat_add M HM (MA MB : square_bmatrix M HM) :
   square_bmatrix M HM.
 Proof.
 destruct MA as (MA & Hma).
 destruct MB as (MB & Hmb).
 exists (MA + MB)%BM.
-destruct Hma as (Hsqa & sza & Hma).
-destruct Hmb as (Hsqb & szb & Hmb).
+destruct Hma as (sza & Hma).
+destruct Hmb as (szb & Hmb).
+exists (sizes_of_bmatrix M).
+intros M' Hbm.
+destruct Hbm as [Hbm| Hbm]; [ now subst M' | ].
+destruct Hbm as [Hbm| Hbm]; [ | easy ].
+subst M'.
+split. {
+  apply is_square_bmat_add. {
+    now apply Hma; right; left.
+  } {
+    now apply Hmb; right; left.
+  }
+  transitivity (sizes_of_bmatrix M). {
+    rewrite (proj2 (Hma _ (or_intror (or_introl eq_refl)))).
+    now symmetry; apply Hma; left.
+  } {
+    rewrite (proj2 (Hmb _ (or_intror (or_introl eq_refl)))).
+    now apply Hmb; left.
+  }
+} {
+  rewrite sizes_of_bmatrix_add. {
+    rewrite (proj2 (Hma _ (or_intror (or_introl eq_refl)))).
+    now symmetry; apply Hma; left.
+  } {
+...
+    rewrite (proj2 (Hma _ (or_intror (or_introl eq_refl)))).
+    rewrite (proj2 (Hmb _ (or_intror (or_introl eq_refl)))).
+    apply Hma.
+...
+    now rewrite (proj2 (Hmb _ (or_introl eq_refl))).
+...
+    rewrite Hma; [ symmetry | now right; left ].
+    now apply Hma; left.
+  }
+  transitivity (sizes_of_bmatrix M). {
+    rewrite Hma; [ symmetry | now right; left ].
+    now apply Hma; left.
+  } {
+    rewrite Hmb; [ symmetry | now left ].
+    now apply Hmb; right; left.
+  }
+...
 split. {
   intros M' Hbm.
   destruct Hbm as [Hbm| Hbm]; [ now subst M' | ].
