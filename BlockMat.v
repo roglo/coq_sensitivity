@@ -443,6 +443,21 @@ Fixpoint is_square_bmat_loop sizes (M : bmatrix T) {struct sizes} :=
       end
   end.
 
+Fixpoint is_square_bmat_bool_loop sizes (M : bmatrix T) {struct sizes} :=
+  match M with
+  | BM_1 _ => match sizes with [] => true | _ => false end
+  | BM_M MM =>
+      match sizes with
+      | size :: sizes' =>
+          ((mat_nrows MM =? size) &&
+           (mat_ncols MM =? size) &&
+           forallb
+             (λ '(i, j), is_square_bmat_bool_loop sizes' (mat_el MM i j))
+             (list_prod (seq 0 size) (seq 0 size)))%bool
+      | [] => false
+      end
+  end.
+
 (* Some kinds of square bmatrices are manipulated to make operations
    (addition, multiplication, ...) possible: the ones which have the
    same size (= number of rows = number of columns) at each level;
@@ -463,6 +478,9 @@ Fixpoint sizes_of_bmatrix (BM : bmatrix T) :=
 
 Definition is_square_bmat (BM : bmatrix T) :=
   is_square_bmat_loop (sizes_of_bmatrix BM) BM.
+
+Definition is_square_bmat_bool (BM : bmatrix T) :=
+  is_square_bmat_bool_loop (sizes_of_bmatrix BM) BM.
 
 Arguments is_square_bmat BM%BM.
 
@@ -652,8 +670,74 @@ Definition compatible_square_bmatrices (BML : list (bmatrix T)) :=
 
 Definition compatible_square_bmatrices' (BML : list (bmatrix T)) :=
   ∀ BM, BM ∈ BML →
-  is_square_bmat BM ∧
+  is_square_bmat_bool BM = true ∧
   sizes_of_bmatrix BM = sizes_of_bmatrix (hd (BM_1 0%Srng) BML).
+
+Theorem is_square_bmat_bool_iff : ∀ BM,
+  is_square_bmat BM ↔ is_square_bmat_bool BM = true.
+Proof.
+intros.
+unfold is_square_bmat, is_square_bmat_bool.
+remember (sizes_of_bmatrix BM) as sizes eqn:H; clear H.
+split; intros Hbm. {
+  revert sizes Hbm.
+  induction BM as [x| m IHBM] using bmatrix_ind2; intros; cbn. {
+    now destruct sizes.
+  }
+  destruct sizes as [| size]; [ easy | ].
+  cbn in Hbm |-*.
+  destruct Hbm as (Hr & Hc & Hbm).
+  apply Bool.andb_true_iff.
+  split; [ apply Bool.andb_true_iff; split | ]. {
+    now apply Nat.eqb_eq.
+  } {
+    now apply Nat.eqb_eq.
+  }
+  apply forallb_forall.
+  intros (i, j) Hij.
+  apply in_prod_iff in Hij.
+  destruct Hij as (Hi, Hj).
+  apply in_seq in Hi.
+  apply in_seq in Hj.
+  apply IHBM; [ | | now apply Hbm ]. {
+    now rewrite <- Hr in Hi.
+  } {
+    now rewrite <- Hc in Hj.
+  }
+} {
+  revert sizes Hbm.
+  induction BM as [x| m IHBM] using bmatrix_ind2; intros; cbn. {
+    now destruct sizes.
+  }
+  destruct sizes as [| size]; [ easy | ].
+  cbn in Hbm |-*.
+  apply Bool.andb_true_iff in Hbm.
+  destruct Hbm as (Hrc, Hbm).
+  apply Bool.andb_true_iff in Hrc.
+  destruct Hrc as (Hr, Hc).
+  apply Nat.eqb_eq in Hr.
+  apply Nat.eqb_eq in Hc.
+  split; [ easy | ].
+  split; [ easy | ].
+  intros * Hi Hj.
+  apply IHBM; [ now rewrite Hr | now rewrite Hc | ].
+  specialize forallb_forall as H1.
+  specialize (H1 (nat * nat)%type).
+  specialize (H1 (λ '(i, j), is_square_bmat_bool_loop sizes (mat_el m i j))).
+  specialize (H1 (list_prod (seq 0 size) (seq 0 size))).
+  specialize (proj1 H1 Hbm (i, j)) as H2; clear H1.
+  cbn in H2.
+  apply H2.
+  apply in_prod_iff.
+  split. {
+    apply in_seq; split; [ flia | easy ].
+  } {
+    apply in_seq; split; [ flia | easy ].
+  }
+}
+Qed.
+
+...
 
 Theorem glop : ∀ BML,
   compatible_square_bmatrices BML ↔
@@ -671,10 +755,12 @@ split; intros Hbml. {
     now left.
   }
   specialize (H2 H); clear H.
-  split; [ easy | ].
-  destruct H1 as (_, H1).
-  destruct H2 as (_, H2).
-  congruence.
+  split. 2: {
+    destruct H1 as (_, H1).
+    destruct H2 as (_, H2).
+    congruence.
+  }
+...
 } {
   exists (sizes_of_bmatrix (hd (BM_1 0%Rng) BML)).
   intros BM Hbm.
