@@ -217,7 +217,7 @@ Definition minus_one_pow n :=
 
 (* determinant *)
 
-Fixpoint det_loop {m n} (M : matrix m n T) k :=
+Fixpoint det_loop {n} (M : matrix n n T) k :=
   match k with
   | 0 => 1%Rng
   | S k' =>
@@ -225,18 +225,18 @@ Fixpoint det_loop {m n} (M : matrix m n T) k :=
        minus_one_pow j * mat_el M 0 j * det_loop (subm M 0 j) k')%Rng
   end.
 
-Definition determinant {m n} (M : matrix m n T) := det_loop M n.
+Definition determinant {n} (M : matrix n n T) := det_loop M n.
 
 (* the following versions of computing the determinant should
    (to be proven) be equivalent; perhaps could help for proving
    Cramer's rule of resolving equations *)
 
-Definition det_from_row (M : matrix m n T) i :=
+Definition det_from_row (M : matrix n n T) i :=
   (minus_one_pow i *
    Σ (j = 0, mat_ncols M - 1),
      minus_one_pow j * mat_el M i j * determinant (subm M i j))%Rng.
 
-Definition det_from_col (M : matrix m n T) j :=
+Definition det_from_col (M : matrix n n T) j :=
   (minus_one_pow j *
    Σ (i = 0, mat_nrows M - 1),
      minus_one_pow i * mat_el M i j * determinant (subm M i j))%Rng.
@@ -271,7 +271,7 @@ Definition mat_add_row_mul_scal_row {m n} (M : matrix m n T) i1 v i2 :=
    row 0, we can prove that only when i=0; this will able us to
    prove next theorems, swapping rows by going via row 0 *)
 
-Theorem det_mul_row_0_by_scal : ∀ {m n} (A : matrix m n T) v,
+Theorem det_mul_row_0_by_scal : ∀ {n} (A : matrix n n T) v,
   mat_ncols A ≠ 0
   → determinant (mat_mul_row_0_by_scal A v) = (v * determinant A)%Srng.
 Proof.
@@ -614,14 +614,14 @@ Context {rp : ring_prop T}.
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
 
-Arguments det_loop {T ro so m n} M%M k%nat.
+Arguments det_loop {T ro so n} M%M k%nat.
+Arguments determinant {T ro so n} M%M.
 Arguments mat_mul_scal_l {m n T so} _ M%M.
 Arguments mat_nrows {m n T} M%M.
 Arguments mat_ncols {m n T} M%M.
 Arguments mat_sub {m n T ro so} MA%M MB%M.
 Arguments mI {T so} n%nat.
 Arguments minus_one_pow {T ro so}.
-Arguments determinant {T ro so m n} M%M.
 Arguments subm {T m n} M%M i%nat j%nat.
 
 Notation "A + B" := (mat_add A B) : M_scope.
@@ -664,7 +664,7 @@ Qed.
 
 (* comatrix *)
 
-Definition comatrix {m n} (M : matrix m n T) : matrix m n T :=
+Definition comatrix {n} (M : matrix n n T) : matrix n n T :=
   {| mat_el i j := (minus_one_pow (i + j) * determinant (subm M i j))%Srng |}.
 
 (* matrix transpose *)
@@ -696,7 +696,7 @@ Theorem submatrix_nrows {m n} : ∀ (M : matrix m n T) i j,
   mat_nrows (subm M i j) = mat_nrows M - 1.
 Proof. easy. Qed.
 
-... (* faut voir... c'est utilisé dans CharacPolyn.v *)
+(* faut voir... c'est utilisé dans CharacPolyn.v
 
 Theorem submatrix_mI : ∀ i r,
  subm (mI (S r)) i i = mI r.
@@ -736,13 +736,14 @@ destruct (lt_dec k i) as [Hki| Hki]. {
   }
 }
 Qed.
+*)
 
 Definition sqr_mat_zero n :=
   mk_mat (λ i j, 0%Srng) n n.
 Definition sqr_mat_one n :=
   mk_mat (λ i j, if Nat.eq_dec i j then 1%Srng else 0%Srng) n n.
 
-Definition sqr_mat_semiring_op n : semiring_op (matrix T) :=
+Definition sqr_mat_semiring_op n : semiring_op (matrix n n T) :=
   {| srng_zero := sqr_mat_zero n;
      srng_one := sqr_mat_one n;
      srng_add := mat_add;
@@ -758,11 +759,11 @@ Context (so : semiring_op T).
 Context {sp : semiring_prop T}.
 Context {rp : ring_prop T}.
 
-Arguments det_loop {T ro so} M n%nat.
-Arguments determinant {T ro so} M.
+Arguments det_loop {T ro so n} M k%nat.
+Arguments determinant {T ro so n} M.
 
-Theorem fold_determinant :
-  ∀ T {ro : ring_op T} {so : semiring_op T} (M : matrix T),
+Theorem fold_determinant {n} :
+  ∀ T {ro : ring_op T} {so : semiring_op T} (M : matrix n n T),
   det_loop M (mat_ncols M) = determinant M.
 Proof. easy. Qed.
 
@@ -775,21 +776,21 @@ Declare Scope V_scope.
 Delimit Scope M_scope with M.
 Delimit Scope V_scope with V.
 
-Arguments det_loop {T ro so} M%M n%nat.
-Arguments determinant {T ro so} M%M.
-Arguments mat_mul_scal_l {T so} _ M%M.
-Arguments mat_mul_vect_r {T so}.
-Arguments mat_nrows {T} m%M.
-Arguments mat_ncols {T} m%M.
-Arguments mat_sub {T ro so} MA%M MB%M.
+Arguments det_loop {T ro so n} M%M k%nat.
+Arguments determinant {T ro so n} M%M.
+Arguments mat_mul_scal_l {m n T so} μ M%M.
+Arguments mat_mul_vect_r {m n T so} M%M V%V.
+Arguments mat_nrows {m n T} M%M.
+Arguments mat_ncols {m n T} M%M.
+Arguments mat_sub {m n T ro so} MA%M MB%M.
 Arguments mI {T so} n%nat.
 Arguments minus_one_pow {T ro so}.
 Arguments sqr_mat_one {T so}.
 Arguments sqr_mat_zero {T so}.
 Arguments sqr_mat_semiring_op {T so}.
-Arguments subm {T} M%M i%nat j%nat.
-Arguments vect_sub {T ro so}.
-Arguments vect_mul_scal_l {T so} _%Srng _%V.
+Arguments subm {T m n} M%M i%nat j%nat.
+Arguments vect_sub {m T ro so}.
+Arguments vect_mul_scal_l {m T so} μ%Srng V%V.
 Arguments vect_zero {T so}.
 
 Notation "A + B" := (mat_add A B) : M_scope.
