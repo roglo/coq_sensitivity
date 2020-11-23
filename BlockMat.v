@@ -119,7 +119,7 @@ Definition bmat_one_like := bmat_IZ_like 1.
 
 (* multiplication of block matrices *)
 
-Fixpoint bmat_mul {so : semiring_op T} (MM1 MM2 : bmatrix T) :=
+Fixpoint bmat_mul (MM1 MM2 : bmatrix T) :=
   match MM1 with
   | BM_1 xa =>
       match MM2 with
@@ -645,9 +645,6 @@ cbn; f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros * Hi Hj.
 rewrite Tauto.if_same.
-(*
-rewrite bmat_zero_like_idemp.
-*)
 destruct ma as (fa, ra, ca).
 destruct mb as (fb, rb, cb).
 cbn in *.
@@ -685,8 +682,6 @@ rewrite sizes_of_bmatrix_at_0_0 with (r := ra); [ | easy | easy | easy ].
 now apply Ha.
 Qed.
 
-...
-
 Theorem bmat_zero_like_mul_distr_r : ∀ BMA BMB,
   is_square_bmat BMA
   → bmat_zero_like (BMA * BMB)%BM = (BMA * bmat_zero_like BMB)%BM.
@@ -701,38 +696,41 @@ destruct BMB as [xb| mb]; [ easy | cbn ].
 f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros * Hi Hj.
+rewrite Tauto.if_same.
 destruct ma as (fa, ra, ca).
 destruct mb as (fb, rb, cb).
 cbn in *.
 destruct (zerop ra) as [H| H]; [ easy | cbn in Ha; clear H ].
 destruct (zerop ca) as [H| H]; [ easy | cbn in Ha; clear H ].
 destruct Ha as (_ & H & Ha); subst ca.
+rewrite fold_bmat_zero_like.
 replace
-  (fold_left (λ a k, a + fa i k * bmat_zero_like (fb k j))
-    (seq 0 ra) (bmat_zero_like (fa 0 0)))%BM
+  (bmat_zero_like
+     (fold_left (λ a k, (a + fa i k * fb k j)%BM)
+        (seq 0 ra) (bmat_zero_like (fa 0 0))))
 with
-  (fold_left (λ a k, a + bmat_zero_like (fa i k * fb k j))
-    (seq 0 ra) (bmat_zero_like (fa 0 0)))%BM. 2: {
-  apply List_fold_left_ext_in.
-  intros k BM Hk; f_equal.
-  apply in_seq in Hk.
-  clear BM.
-  apply IHBMA; [ easy | flia Hk | ].
-  rewrite sizes_of_bmatrix_at_0_0 with (r := ra); [ | easy | easy | easy ].
-  now apply Ha.
+  (fold_left (λ a k, (a + bmat_zero_like (fa i k * fb k j))%BM)
+     (seq 0 ra) (bmat_zero_like (fa 0 0))). 2: {
+  clear IHBMA Ha Hi.
+  induction ra. {
+    symmetry.
+    apply bmat_zero_like_idemp.
+  }
+  rewrite List_seq_succ_r.
+  rewrite fold_left_app; cbn.
+  rewrite fold_left_app; cbn.
+  rewrite bmat_zero_like_add_distr.
+  f_equal.
+  apply IHra.
 }
-clear Hi IHBMA.
-induction ra. {
-  cbn; apply bmat_zero_like_idemp.
-}
-rewrite List_seq_succ_r; cbn.
-rewrite fold_left_app; cbn.
-rewrite fold_left_app; cbn.
-rewrite bmat_zero_like_add_distr.
-f_equal.
-apply IHra.
-intros i1 j1 Hi1 Hj1.
-apply Ha; [ flia Hi1 | flia Hj1 ].
+eapply List_fold_left_ext_in.
+intros k BM Hk; f_equal.
+rewrite Tauto.if_same.
+rewrite fold_bmat_zero_like.
+apply in_seq in Hk.
+apply IHBMA; [ easy | flia Hk | ].
+rewrite sizes_of_bmatrix_at_0_0 with (r := ra); [ | easy | easy | easy ].
+now apply Ha.
 Qed.
 
 Theorem bmat_zero_like_eq_compat : ∀ BMA BMB,
@@ -758,6 +756,7 @@ cbn in *; subst ra ca rb cb.
 f_equal.
 apply matrix_eq; [ easy | easy | cbn ].
 intros * Hi Hj.
+rewrite Tauto.if_same.
 apply IHsizes; [ now apply Ha | now apply Hb ].
 Qed.
 
@@ -849,6 +848,7 @@ induction BM as [x| M IHBM] using bmatrix_ind2. {
 cbn; f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros i j Hi Hj.
+rewrite Tauto.if_same.
 now apply IHBM.
 Qed.
 
@@ -862,6 +862,7 @@ induction BM as [x| M IHBM] using bmatrix_ind2. {
 cbn; f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros i j Hi Hj.
+rewrite Tauto.if_same.
 now apply IHBM.
 Qed.
 
@@ -1729,7 +1730,10 @@ induction M as [x| M IHM] using bmatrix_ind2; intros. {
   now rewrite rng_add_opp_r.
 }
 cbn; f_equal.
-now apply matrix_eq.
+apply matrix_eq; [ easy | easy | cbn ].
+intros * Hi Hj.
+rewrite Tauto.if_same.
+now apply IHM.
 Qed.
 
 Theorem bmat_nat_mul_0_r : ∀ k n,
@@ -1798,6 +1802,7 @@ induction BM as [x| m IHBM] using bmatrix_ind2; [ easy | cbn ].
 f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros i j Hi Hj.
+...
 now apply IHBM.
 Qed.
 
