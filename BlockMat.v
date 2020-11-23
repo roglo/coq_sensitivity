@@ -2869,24 +2869,12 @@ split. {
 }
 Qed.
 
-Definition squ_bmat_zero M HM : square_bmatrix M HM.
+Theorem comp_squ_bmat_with_add : ∀ M (HM : is_square_bmat M) MA MB,
+  compatible_square_bmatrices [M; MA]
+  → compatible_square_bmatrices [M; MB]
+  → compatible_square_bmatrices [M; (MA + MB)%BM].
 Proof.
-exists (bmat_zero_like M).
-now apply comp_squ_bmat_with_zero_like.
-Qed.
-
-Definition squ_bmat_one M HM : square_bmatrix M HM.
-Proof.
-exists (bmat_one_like M).
-now apply comp_squ_bmat_with_one_like.
-Qed.
-
-Definition squ_bmat_add M HM (MA MB : square_bmatrix M HM) :
-  square_bmatrix M HM.
-Proof.
-destruct MA as (MA & Hma).
-destruct MB as (MB & Hmb).
-exists (MA + MB)%BM.
+intros * HM * Hma Hmb.
 destruct Hma as (sza & Hma).
 destruct Hmb as (szb & Hmb).
 exists (sizes_of_bmatrix M).
@@ -2923,6 +2911,33 @@ split. {
 }
 Qed.
 
+Definition squ_bmat_zero M HM : square_bmatrix M HM.
+Proof.
+exists (bmat_zero_like M).
+now apply comp_squ_bmat_with_zero_like.
+Qed.
+
+Definition squ_bmat_one M HM : square_bmatrix M HM.
+Proof.
+exists (bmat_one_like M).
+now apply comp_squ_bmat_with_one_like.
+Qed.
+
+Definition squ_bmat_add M HM (MA MB : square_bmatrix M HM) :
+  square_bmatrix M HM.
+Proof.
+destruct MA as (MA & Hma).
+destruct MB as (MB & Hmb).
+exists (MA + MB)%BM.
+now apply comp_squ_bmat_with_add.
+Qed.
+
+Definition squ_bmat_mul M HM (MA MB : square_bmatrix M HM) :
+  square_bmatrix M HM.
+Proof.
+destruct MA as (MA & Hma).
+destruct MB as (MB & Hmb).
+exists (MA * MB)%BM.
 ...
 
 Definition bmat_semiring_op_for M HM : semiring_op (square_bmatrix M HM) :=
