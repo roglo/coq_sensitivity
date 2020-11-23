@@ -647,8 +647,8 @@ now apply IHBM.
 Qed.
 
 Definition compatible_square_bmatrices (BML : list (bmatrix T)) :=
- (∀ BM, BM ∈ BML → is_square_bmat BM) ∧
-  ∃ sizes, (∀ BM, BM ∈ BML → sizes_of_bmatrix BM = sizes).
+  ∃ sizes,
+  ∀ BM, BM ∈ BML → is_square_bmat BM ∧ sizes_of_bmatrix BM = sizes.
 
 Theorem bmat_zero_like_mul_distr_l : ∀ BMA BMB,
   is_square_bmat BMA
@@ -1832,41 +1832,45 @@ Theorem bmat_mul_add_distr_r :
   → ((MA + MB) * MC = MA * MC + MB * MC)%BM.
 Proof.
 intros * Hcsb.
-revert MA MB Hcsb.
+destruct Hcsb as (sizes & Hcsb).
+revert MA MB sizes Hcsb.
 induction MC as [xc| mc IHMC] using bmatrix_ind2; intros. {
-  destruct Hcsb as (Hsq & sizes & Hsz).
-  unfold is_square_bmat in Hsq.
+  unfold is_square_bmat in Hcsb.
   destruct sizes as [| size]. 2: {
-    specialize (Hsq _ (or_intror (or_intror (or_introl eq_refl)))).
-    rewrite Hsz in Hsq; [ easy | now right; right; left ].
+    specialize (Hcsb _ (or_intror (or_intror (or_introl eq_refl)))).
+    destruct Hcsb as (Hsq, Hsz).
+    now rewrite Hsz in Hsq.
   }
   destruct MA as [xa| ma]. 2: {
-    specialize (Hsq _ (or_introl eq_refl)).
-    rewrite Hsz in Hsq; [ easy | now left ].
+    specialize (Hcsb _ (or_introl eq_refl)).
+    destruct Hcsb as (Hsq, Hsz).
+    now rewrite Hsz in Hsq.
   }
   destruct MB as [xb| mb]. 2: {
-    specialize (Hsq _ (or_intror (or_introl eq_refl))).
-    rewrite Hsz in Hsq; [ easy | now right; left ].
+    specialize (Hcsb _ (or_intror (or_introl eq_refl))).
+    destruct Hcsb as (Hsq, Hsz).
+    now rewrite Hsz in Hsq.
   }
   now cbn; rewrite srng_mul_add_distr_r.
 }
-destruct Hcsb as (Hsq & sizes & Hsz).
 destruct sizes as [| size]. {
-  specialize (Hsq _ (or_intror (or_intror (or_introl eq_refl)))).
+  specialize (Hcsb _ (or_intror (or_intror (or_introl eq_refl)))).
+  destruct Hcsb as (Hsq, Hsz).
   unfold is_square_bmat in Hsq.
-  rewrite Hsz in Hsq; [ easy | now right; right; left ].
+  now rewrite Hsz in Hsq.
 }
 destruct MA as [xa| ma]. {
-  now specialize (Hsz _ (or_introl eq_refl)).
+  now specialize (Hcsb _ (or_introl eq_refl)).
 }
 destruct MB as [xb| mb]; [ easy | ].
-specialize (Hsq _ (or_introl eq_refl)) as Ha.
-specialize (Hsq _ (or_intror (or_introl eq_refl))) as Hb.
-specialize (Hsq _ (or_intror (or_intror (or_introl eq_refl)))) as Hc.
+specialize (Hcsb _ (or_introl eq_refl)) as Ha.
+specialize (Hcsb _ (or_intror (or_introl eq_refl))) as Hb.
+specialize (Hcsb _ (or_intror (or_intror (or_introl eq_refl)))) as Hc.
+destruct Ha as (Ha, Has).
+destruct Hb as (Hb, Hbs).
+destruct Hc as (Hc, Hcs).
 unfold is_square_bmat in Ha, Hb, Hc.
-specialize (Hsz _ (or_introl eq_refl)) as Has.
-specialize (Hsz _ (or_intror (or_introl eq_refl))) as Hbs.
-specialize (Hsz _ (or_intror (or_intror (or_introl eq_refl)))) as Hcs.
+rewrite Has in Ha; rewrite Hbs in Hb; rewrite Hcs in Hc.
 cbn; f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros i j Hi Hj.
@@ -1874,7 +1878,6 @@ destruct ma as (fa, ra, ca).
 destruct mb as (fb, rb, cb).
 destruct mc as (fc, rc, cc).
 cbn - [ In ] in *.
-rewrite Has in Ha; rewrite Hbs in Hb; rewrite Hcs in Hc.
 cbn in Ha, Hb, Hc.
 destruct Ha as (H1 & H2 & Ha); subst ra ca.
 destruct Hb as (H1 & H2 & Hb); subst rb cb.
@@ -1899,40 +1902,28 @@ with
   f_equal.
   apply in_seq in Hk.
   symmetry.
-  apply IHMC; [ flia Hk | easy | ].
+  apply IHMC with (sizes := sizes); [ flia Hk | easy | ].
   rewrite <- Has in Ha.
   rewrite <- Hbs in Hb.
   rewrite <- Hcs in Hc.
-  split. {
-    intros BM HBM.
-    unfold is_square_bmat.
-    destruct HBM as [H| HBM]; [ subst BM | ]. {
-      rewrite (sizes_of_bmatrix_at_0_0 fa Ha); [ | easy | flia Hk ].
-      apply Ha; [ easy | flia Hk ].
-    }
-    destruct HBM as [H| HBM]; [ subst BM | ]. {
-      rewrite (sizes_of_bmatrix_at_0_0 fb Hb); [ | easy | flia Hk ].
-      apply Hb; [ easy | flia Hk ].
-    }
-    destruct HBM as [H| HBM]; [ subst BM | ]. {
-      rewrite (sizes_of_bmatrix_at_0_0 fc Hc); [ | flia Hk | easy ].
-      apply Hc; [ flia Hk | easy ].
-    }
-    easy.
-  } {
-    exists sizes.
-    intros BM HBM.
-    destruct HBM as [H| HBM]; [ subst BM | ]. {
-      rewrite (sizes_of_bmatrix_at_0_0 fa Ha); [ easy | easy | flia Hk ].
-    }
-    destruct HBM as [H| HBM]; [ subst BM | ]. {
-      rewrite (sizes_of_bmatrix_at_0_0 fb Hb); [ easy | easy | flia Hk ].
-    }
-    destruct HBM as [H| HBM]; [ subst BM | ]. {
-      rewrite (sizes_of_bmatrix_at_0_0 fc Hc); [ easy | flia Hk | easy ].
-    }
-    easy.
+  intros BM HBM.
+  unfold is_square_bmat.
+  destruct HBM as [H| HBM]; [ subst BM | ]. {
+    rewrite (sizes_of_bmatrix_at_0_0 fa Ha); [ | easy | flia Hk ].
+    split; [ | easy ].
+    apply Ha; [ easy | flia Hk ].
   }
+  destruct HBM as [H| HBM]; [ subst BM | ]. {
+    rewrite (sizes_of_bmatrix_at_0_0 fb Hb); [ | easy | flia Hk ].
+    split; [ | easy ].
+    apply Hb; [ easy | flia Hk ].
+  }
+  destruct HBM as [H| HBM]; [ subst BM | ]. {
+    rewrite (sizes_of_bmatrix_at_0_0 fc Hc); [ | flia Hk | easy ].
+    split; [ | easy ].
+    apply Hc; [ flia Hk | easy ].
+  }
+  easy.
 }
 assert (Hfa00 : is_square_bmat_loop sizes (fa 0 0)). {
   apply Ha; flia Hi.
@@ -1952,7 +1943,7 @@ assert (H : ∀ i, i < size → is_square_bmat_loop sizes (fc i j)). {
   now intros; apply Hc.
 }
 move H before Hc; clear Hc; rename H into Hc.
-clear Hi Hj IHMC Hsq Hsz.
+clear Hi Hj IHMC Hcsb.
 induction size; [ apply bmat_zero_like_add_distr | ].
 rewrite List_seq_succ_r; cbn.
 do 3 rewrite fold_left_app; cbn.
@@ -2063,6 +2054,7 @@ revert MB MC Hcsb.
 induction MA as [xa| ma IHMA] using bmatrix_ind2; intros. {
   destruct Hcsb as (Hsq & sizes & Hsz).
   unfold is_square_bmat in Hsq.
+...
   destruct sizes as [| size]. 2: {
     specialize (Hsq _ (or_introl eq_refl)).
     rewrite Hsz in Hsq; [ easy | now left ].
