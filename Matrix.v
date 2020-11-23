@@ -12,17 +12,17 @@ Require Import Semiring SRsummation.
 
 (* matrices *)
 
-Record matrix T := mk_mat
-  { mat_el : nat → nat → T;
-    mat_nrows : nat;
-    mat_ncols : nat }.
+Record matrix (m n : nat) T := mk_mat0
+  { mat_el : nat → nat → T }.
+
+Definition mk_mat {T} (f : nat → nat → T) m n := mk_mat0 m n f.
+Definition mat_nrows {m n T} (M : matrix m n T) := m.
+Definition mat_ncols {m n T} (M : matrix m n T) := n.
 
 (* function extensionality required for matrices *)
-Axiom matrix_eq : ∀ T (MA MB : matrix T),
-  mat_nrows MA = mat_nrows MB
-  → mat_ncols MA = mat_ncols MB
-  → (∀ i j, i < mat_nrows MA → j < mat_ncols MB →
-      mat_el MA i j = mat_el MB i j)
+Axiom matrix_eq : ∀ m n T (MA MB : matrix m n T),
+  (∀ i j, i < mat_nrows MA → j < mat_ncols MB →
+   mat_el MA i j = mat_el MB i j)
   → MA = MB.
 
 Definition list_list_nrows T (ll : list (list T)) :=
@@ -31,7 +31,7 @@ Definition list_list_nrows T (ll : list (list T)) :=
 Definition list_list_ncols T (ll : list (list T)) :=
   length (hd [] ll).
 
-Definition list_list_of_mat T (M : matrix T) : list (list T) :=
+Definition list_list_of_mat m n T (M : matrix m n T) : list (list T) :=
   map (λ i, map (mat_el M i) (seq 0 (mat_ncols M))) (seq 0 (mat_nrows M)).
 
 Definition list_list_el T d (ll : list (list T)) i j : T :=
@@ -62,6 +62,7 @@ Definition concat_list_list_list {T} (lll : list (list (list T))) :=
 
 Section in_ring.
 
+Context {m n p : nat}.
 Context {T : Type}.
 Context {ro : ring_op T}.
 Context (so : semiring_op T).
@@ -70,10 +71,12 @@ Context {rp : ring_prop T}.
 
 (* addition *)
 
-Definition mat_add {so : semiring_op T} (MA MB : matrix T) :=
-  {| mat_el i j := (mat_el MA i j + mat_el MB i j)%Srng;
-     mat_nrows := mat_nrows MA;
-     mat_ncols := mat_ncols MA |}.
+Definition mat_add {so : semiring_op T} (MA MB : matrix m n T) :
+  matrix m n T :=
+  {| mat_el i j := (mat_el MA i j + mat_el MB i j)%Srng |}.
+
+(* qu'est-ce que ça fout là, ça ? faudrait que je le mette ailleurs
+   dans Semiring.v, par exemple, ou chais pas *)
 
 Definition nat_semiring_op : semiring_op nat :=
   {| srng_zero := 0;
@@ -101,29 +104,28 @@ Compute (list_list_of_mat (mat_add add (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6;
 
 (* multiplication *)
 
-Definition mat_mul {so : semiring_op T} (MA MB : matrix T) :=
+Definition mat_mul {so : semiring_op T}
+     (MA : matrix m n T) (MB : matrix n p T) : matrix m p T :=
   {| mat_el i k :=
-       (Σ (j = 0, mat_ncols MA - 1), mat_el MA i j * mat_el MB j k)%Srng;
-     mat_nrows := mat_nrows MA;
-     mat_ncols := mat_ncols MB |}.
+       (Σ (j = 0, mat_ncols MA - 1), mat_el MA i j * mat_el MB j k)%Srng |}.
 
 (*
 End in_ring.
 Compute (let _ := nat_semiring_op in list_list_of_mat (mat_mul (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list_list 0 [[1; 2]; [3; 4]; [5; 6]; [7; 8]]))).
 *)
 
-Theorem mat_mul_nrows : ∀ A B, mat_nrows (mat_mul A B) = mat_nrows A.
+Theorem mat_mul_nrows : ∀ (A : matrix m n T) (B : matrix n p T),
+  mat_nrows (mat_mul A B) = mat_nrows A.
 Proof. easy. Qed.
 
-Theorem mat_mul_ncols : ∀ A B, mat_ncols (mat_mul A B) = mat_ncols B.
+Theorem mat_mul_ncols : ∀ (A : matrix m n T) (B : matrix n p T),
+  mat_ncols (mat_mul A B) = mat_ncols B.
 Proof. easy. Qed.
 
 (* opposite *)
 
-Definition mat_opp M : matrix T :=
-  {| mat_el i j := (- mat_el M i j)%Rng;
-     mat_nrows := mat_nrows M;
-     mat_ncols := mat_ncols M |}.
+Definition mat_opp (M : matrix m n T) : matrix m n T :=
+  {| mat_el i j := (- mat_el M i j)%Rng |}.
 
 (* subtraction *)
 
@@ -132,67 +134,69 @@ Definition mat_sub MA MB :=
 
 (* *)
 
-Definition is_square_mat (M : matrix T) := mat_nrows M = mat_ncols M.
+Definition is_square_mat {m n} (M : matrix m n T) :=
+  mat_nrows M = mat_ncols M.
 
 (* vector *)
 
-Record vector T := mk_vect
-  { vect_el : nat → T;
-    vect_nrows : nat }.
+Record vector (m : nat) T := mk_vect0
+  { vect_el : nat → T }.
+
+Definition mk_vect {T} (f : nat → T) m := mk_vect0 m f.
+Definition vect_nrows {m T} (V : vector m T) := m.
 
 (* function extensionality required for vectors *)
-Axiom vector_eq : ∀ T (VA VB : vector T),
-  vect_nrows VA = vect_nrows VB
-  → (∀ i, i < vect_nrows VA → vect_el VA i = vect_el VB i)
+Axiom vector_eq : ∀ m T (VA VB : vector m T),
+  (∀ i, i < vect_nrows VA → vect_el VA i = vect_el VB i)
   → VA = VB.
 
 Definition vect_of_list {T} d (l : list T) :=
   mk_vect (λ i, nth i l d) (length l).
-Definition list_of_vect {T} (v : vector T) :=
+Definition list_of_vect {m T} (v : vector m T) :=
   map (vect_el v) (seq 0 (vect_nrows v)).
 
 Definition vect_zero n := mk_vect (λ _, 0%Srng) n.
 
 (* addition, subtraction of vector *)
 
-Definition vect_add (U V : vector T) :=
-  mk_vect (λ i, (vect_el U i + vect_el V i)%Srng) (vect_nrows V).
-Definition vect_opp (V : vector T) :=
-  mk_vect (λ i, (- vect_el V i)%Rng) (vect_nrows V).
+Definition vect_add (U V : vector m T) :=
+  mk_vect (λ i, (vect_el U i + vect_el V i)%Srng) m.
+Definition vect_opp (V : vector m T) :=
+  mk_vect (λ i, (- vect_el V i)%Rng) m.
 
-Definition vect_sub (U V : vector T) := vect_add U (vect_opp V).
+Definition vect_sub (U V : vector m T) := vect_add U (vect_opp V).
 
 (* vector from a matrix column *)
 
-Definition vect_of_mat_col (M : matrix T) j :=
-  mk_vect (λ i, mat_el M i j) (mat_nrows M).
+Definition vect_of_mat_col (M : matrix m n T) j :=
+  mk_vect (λ i, mat_el M i j) m.
 
 (* concatenation of a matrix and a vector *)
 
-Definition mat_vect_concat (M : matrix T) V :=
+Definition mat_vect_concat (M : matrix m n T) (V : vector m T) :=
   mk_mat
     (λ i j, if Nat.eq_dec j (mat_ncols M) then vect_el V i else mat_el M i j)
-    (mat_nrows M) (mat_ncols M + 1).
+    m (n + 1).
 
 (* multiplication of a matrix by a vector *)
 
-Definition mat_mul_vect_r M V :=
+Definition mat_mul_vect_r (M : matrix m n T) (V : vector m T) :=
   mk_vect (λ i, (Σ (j = 0, mat_ncols M - 1), mat_el M i j * vect_el V j)%Srng)
-    (mat_nrows M).
+    n.
 
 (* multiplication of a vector by a scalar *)
 
-Definition vect_mul_scal_l μ V :=
-  mk_vect (λ i, μ * vect_el V i)%Srng (vect_nrows V).
+Definition vect_mul_scal_l μ (V : vector m T) :=
+  mk_vect (λ i, μ * vect_el V i)%Srng m.
 
 (* multiplication of a matrix by a scalar *)
 
-Definition mat_mul_scal_l μ M :=
-  mk_mat (λ i j, μ * mat_el M i j)%Srng (mat_nrows M) (mat_ncols M).
+Definition mat_mul_scal_l μ (M : matrix m n _) :=
+  mk_mat (λ i j, μ * mat_el M i j)%Srng m n.
 
 (* matrix without row i and column j *)
 
-Definition subm (M : matrix T) i j :=
+Definition subm {m n} (M : matrix m n T) i j :=
   mk_mat
     (λ k l,
        if lt_dec k i then
@@ -201,8 +205,7 @@ Definition subm (M : matrix T) i j :=
        else
          if lt_dec l j then mat_el M (k + 1) l
          else mat_el M (k + 1) (l + 1))
-    (mat_nrows M - 1)
-    (mat_ncols M - 1).
+    (m - 1) (n - 1).
 
 (* (-1) ^ n *)
 
@@ -214,51 +217,51 @@ Definition minus_one_pow n :=
 
 (* determinant *)
 
-Fixpoint det_loop M n :=
-  match n with
+Fixpoint det_loop {m n} (M : matrix m n T) k :=
+  match k with
   | 0 => 1%Rng
-  | S n' =>
-      (Σ (j = 0, n'),
-       minus_one_pow j * mat_el M 0 j * det_loop (subm M 0 j) n')%Rng
+  | S k' =>
+      (Σ (j = 0, k'),
+       minus_one_pow j * mat_el M 0 j * det_loop (subm M 0 j) k')%Rng
   end.
 
-Definition determinant M := det_loop M (mat_ncols M).
+Definition determinant {m n} (M : matrix m n T) := det_loop M n.
 
 (* the following versions of computing the determinant should
    (to be proven) be equivalent; perhaps could help for proving
    Cramer's rule of resolving equations *)
 
-Definition det_from_row M i :=
+Definition det_from_row (M : matrix m n T) i :=
   (minus_one_pow i *
    Σ (j = 0, mat_ncols M - 1),
      minus_one_pow j * mat_el M i j * determinant (subm M i j))%Rng.
 
-Definition det_from_col M j :=
+Definition det_from_col (M : matrix m n T) j :=
   (minus_one_pow j *
    Σ (i = 0, mat_nrows M - 1),
      minus_one_pow i * mat_el M i j * determinant (subm M i j))%Rng.
 
 (* *)
 
-Definition mat_mul_row_0_by_scal M s :=
+Definition mat_mul_row_0_by_scal {m n} (M : matrix m n T) s :=
   mk_mat
     (λ i j,
      if Nat.eq_dec i 0 then (s * mat_el M i j)%Srng else mat_el M i j)
-    (mat_nrows M) (mat_ncols M).
+    m n.
 
-Definition mat_swap_rows (M : matrix T) i1 i2 :=
+Definition mat_swap_rows {m n} (M : matrix m n T) i1 i2 :=
   mk_mat
     (λ i j,
      if Nat.eq_dec i i1 then mat_el M i2 j
      else if Nat.eq_dec i i2 then mat_el M i1 j
-     else mat_el M i j) (mat_nrows M) (mat_ncols M).
+     else mat_el M i j) m n.
 
-Definition mat_add_row_mul_scal_row M i1 v i2 :=
+Definition mat_add_row_mul_scal_row {m n} (M : matrix m n T) i1 v i2 :=
   mk_mat
     (λ i j,
      if Nat.eq_dec i i1 then (mat_el M i1 j + v * mat_el M i2 j)%Srng
      else mat_el M i j)
-   (mat_nrows M) (mat_nrows M).
+   m n.
 
 (* If we multiply a row (column) of A by a number, the determinant of
    A will be multiplied by the same number. *)
@@ -268,14 +271,16 @@ Definition mat_add_row_mul_scal_row M i1 v i2 :=
    row 0, we can prove that only when i=0; this will able us to
    prove next theorems, swapping rows by going via row 0 *)
 
-Theorem det_mul_row_0_by_scal : ∀ A v,
+Theorem det_mul_row_0_by_scal : ∀ {m n} (A : matrix m n T) v,
   mat_ncols A ≠ 0
   → determinant (mat_mul_row_0_by_scal A v) = (v * determinant A)%Srng.
 Proof.
+clear m n.
 intros * Hcz.
 unfold determinant; cbn.
 remember (mat_ncols A) as c eqn:Hc; symmetry in Hc.
 destruct c; [ easy | clear Hcz ].
+unfold mat_ncols in Hc; subst n.
 cbn - [ iter_seq ].
 rewrite srng_mul_summation_distr_l; [ | easy ].
 apply srng_summation_eq_compat; [ easy | ].
@@ -288,12 +293,11 @@ do 2 rewrite <- srng_mul_assoc.
 f_equal.
 rewrite srng_mul_comm; f_equal.
 f_equal.
-apply matrix_eq; [ easy | easy | cbn ].
+apply matrix_eq; cbn.
 rename j into k; rename Hj into Hk.
 intros i j Hi Hj.
 destruct (Nat.eq_dec (i + 1) 0) as [H| H]; [ flia H | easy ].
 Qed.
-
 
 (* If the i-th row (column) in A is a sum of the i-th row (column) of
    a matrix B and the i-th row (column) of a matrix C and all other
@@ -305,33 +309,26 @@ Qed.
    row 0, we can prove that only when i=0; this will able us to
    prove the next theorem, swapping rows by going via row 0 *)
 
-Theorem det_sum_row_row : ∀ A B C n,
+Theorem det_sum_row_row : ∀ (A B C : matrix n n T),
   n ≠ 0
-  → mat_nrows A = n
-  → mat_nrows B = n
-  → mat_nrows C = n
-  → mat_ncols A = n
-  → mat_ncols B = n
-  → mat_ncols C = n
   → (∀ j, mat_el A 0 j = (mat_el B 0 j + mat_el C 0 j)%Srng)
   → (∀ i j, i ≠ 0 → mat_el B i j = mat_el A i j)
   → (∀ i j, i ≠ 0 → mat_el C i j = mat_el A i j)
   → determinant A = (determinant B + determinant C)%Srng.
 Proof.
-intros * Hnz Hra Hrb Hrc Hca Hcb Hcc Hbc Hb Hc.
+intros * Hnz Hbc Hb Hc.
 unfold determinant.
-rewrite Hca, Hcb, Hcc.
 destruct n; [ easy | clear Hnz ].
 cbn - [ iter_seq ].
 assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
   intros.
-  apply matrix_eq; cbn; [ now rewrite Hra, Hrb | now rewrite Hca, Hcb | ].
+  apply matrix_eq; cbn.
   intros i j' Hi Hj'.
   destruct (lt_dec j' j); symmetry; apply Hb; flia.
 }
 assert (Hac : ∀ j, subm A 0 j = subm C 0 j). {
   intros.
-  apply matrix_eq; cbn; [ now rewrite Hra, Hrc | now rewrite Hca, Hcc | ].
+  apply matrix_eq; cbn.
   intros i j' Hi Hj'.
   destruct (lt_dec j' j); symmetry; apply Hc; flia.
 }
@@ -352,25 +349,26 @@ Qed.
 (* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html *)
 (* doing it only when the first row is 0; can be generalized later *)
 
-Theorem det_two_rows_are_eq : ∀ A i,
-  is_square_mat A
-  → 0 < i < mat_nrows A
+Theorem det_two_rows_are_eq : ∀ (A : matrix n n T) i,
+  0 < i < mat_nrows A
   → mat_ncols A ≠ 0
   → (∀ j, mat_el A i j = mat_el A 0 j)
   → determinant A = 0%Srng.
 Proof.
-intros * Hsm Hiz Hcz Ha.
-unfold is_square_mat in Hsm.
+intros * Hiz Hcz Ha.
+unfold mat_nrows in Hiz.
 unfold determinant.
+(*
 rewrite Hsm in Hiz.
 remember (mat_ncols A) as n eqn:Hn; symmetry in Hn.
+*)
 destruct n; [ easy | clear Hcz ].
 cbn - [ iter_seq ].
 (**)
-destruct n; [ flia Hiz | ].
-cbn - [ iter_seq ].
 Abort.
 (* blocked by the present implementation of discriminant
+destruct n; [ flia Hiz | ].
+cbn - [ iter_seq ].
 erewrite srng_summation_eq_compat; [ | easy | ]. 2: {  
   intros j Hj.
   rewrite (srng_summation_split _ (i - 1)); [ | flia Hiz ].
@@ -395,23 +393,22 @@ rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
 (* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html *)
 (* doing it only when the first row is 0; can be generalized later *)
 
-Theorem det_add_row_mul_scal_row : ∀ M v k,
-  is_square_mat M
-  → mat_nrows M ≠ 0
+Theorem det_add_row_mul_scal_row : ∀ (M : matrix n n T) v k,
+  mat_nrows M ≠ 0
   → determinant (mat_add_row_mul_scal_row M 0 v k) = determinant M.
 Proof.
-intros * Hsm Hrz.
-unfold is_square_mat in Hsm.
+intros * Hrz.
 remember
   (mk_mat
      (λ i j,
       if Nat.eq_dec i 0 then (v * mat_el M k j)%Srng else mat_el M i j)
      (mat_nrows M) (mat_ncols M)) as C eqn:Hc.
 rewrite (det_sum_row_row _ M C Hrz); cycle 7. {
-  now intros; rewrite Hc.
-} {
   intros i j Hi.
-  now cbn; destruct (Nat.eq_dec i 0).
+  cbn; destruct (Nat.eq_dec i 0).
+Abort. (* blocked because needs the previous lemma
+          and because of change of type matrix that
+          includes now its dimensions
 } {
   intros i j Hi; rewrite Hc; cbn.
   now destruct (Nat.eq_dec i 0).
@@ -431,20 +428,18 @@ rewrite (det_sum_row_row _ M C Hrz); cycle 7. {
   rewrite H in H1; clear H.
   assert (H : determinant D = 0%Srng). {
     rewrite Hd.
-Abort. (* blocked because needs the previous lemma
 ...
 *)
 
 (* proof that the swapping two rows negates the determinant  *)
 
-Theorem det_swap_rows : ∀ M i j,
-  is_square_mat M
-  → i ≠ j
+Theorem det_swap_rows : ∀ (M : matrix n n T) i j,
+  i ≠ j
   → i < mat_nrows M
   → j < mat_nrows M
   → determinant (mat_swap_rows M i j) = (- determinant M)%Rng.
 Proof.
-intros * Hsm Hij Hi Hj.
+intros * Hij Hi Hj.
 (* look point 5 at
 https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html
 *)
@@ -562,10 +557,10 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   rewrite srng_mul_1_l.
   remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
   destruct c; [ easy | clear Hcz ].
+Abort. (*
   now rewrite Nat.sub_succ, Nat.sub_0_r.
 }
 apply not_eq_sym in Hiz.
-Abort. (*
 ...
 specialize (det_swap_rows M Hiz) as H.
 apply (f_equal rng_opp) in H.
@@ -603,7 +598,7 @@ Compute determinant (mat_of_list_list 0 [[-2; 2; -3]; [-1; 1; 3]; [2; 0; -1]]). 
 
 (* identity matrix of size n *)
 
-Definition mI n : matrix T :=
+Definition mI n : matrix n n T :=
   mk_mat (λ i j, if Nat.eq_dec i j then 1%Srng else 0%Srng) n n.
 
 End in_ring.
@@ -619,15 +614,15 @@ Context {rp : ring_prop T}.
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
 
-Arguments det_loop {T ro so} M%M n%nat.
-Arguments mat_mul_scal_l {T so} _ M%M.
-Arguments mat_nrows {T} m%M.
-Arguments mat_ncols {T} m%M.
-Arguments mat_sub {T ro so} MA%M MB%M.
+Arguments det_loop {T ro so m n} M%M k%nat.
+Arguments mat_mul_scal_l {m n T so} _ M%M.
+Arguments mat_nrows {m n T} M%M.
+Arguments mat_ncols {m n T} M%M.
+Arguments mat_sub {m n T ro so} MA%M MB%M.
 Arguments mI {T so} n%nat.
 Arguments minus_one_pow {T ro so}.
-Arguments determinant {T ro so} M%M.
-Arguments subm {T} M%M i%nat j%nat.
+Arguments determinant {T ro so m n} M%M.
+Arguments subm {T m n} M%M i%nat j%nat.
 
 Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.
@@ -637,10 +632,12 @@ Notation "- A" := (mat_opp A) : M_scope.
 
 (* associativity of multiplication *)
 
-Theorem mat_mul_assoc : ∀ MA MB MC, (MA * (MB * MC))%M = ((MA * MB) * MC)%M.
+Theorem mat_mul_assoc {m n p q} :
+  ∀ (MA : matrix m n T) (MB : matrix n p T) (MC : matrix p q T),
+  (MA * (MB * MC))%M = ((MA * MB) * MC)%M.
 Proof.
 intros.
-apply matrix_eq; [ easy | easy | ].
+apply matrix_eq.
 intros i j Hi Hj.
 cbn - [ iter_seq ].
 cbn in Hi, Hj.
@@ -653,6 +650,7 @@ erewrite srng_summation_eq_compat; [ | easy | ]. 2: {
 }
 cbn - [ iter_seq ].
 rewrite srng_summation_summation_exch'; [ | easy ].
+unfold mat_ncols in Hcb |-*; subst cb.
 apply srng_summation_eq_compat; [ easy | ].
 intros k Hk.
 erewrite srng_summation_eq_compat; [ | easy | ]. 2: {
@@ -666,39 +664,35 @@ Qed.
 
 (* comatrix *)
 
-Definition comatrix M : matrix T :=
-  {| mat_el i j := (minus_one_pow (i + j) * determinant (subm M i j))%Srng;
-     mat_nrows := mat_nrows M;
-     mat_ncols := mat_ncols M |}.
+Definition comatrix {m n} (M : matrix m n T) : matrix m n T :=
+  {| mat_el i j := (minus_one_pow (i + j) * determinant (subm M i j))%Srng |}.
 
 (* matrix transpose *)
 
-Definition mat_transp (M : matrix T) :=
-  {| mat_el i j := mat_el M j i;
-     mat_nrows := mat_ncols M;
-     mat_ncols := mat_nrows M |}.
+Definition mat_transp {m n} (M : matrix m n T) : matrix n m T :=
+  {| mat_el i j := mat_el M j i |}.
 
 (* combinations of submatrix and other *)
 
-Theorem submatrix_sub : ∀ (MA MB : matrix T) i j,
+Theorem submatrix_sub {m n} : ∀ (MA MB : matrix m n T) i j,
   subm (MA - MB)%M i j = (subm MA i j - subm MB i j)%M.
 Proof.
 intros.
-apply matrix_eq; cbn; [ easy | easy | ].
+apply matrix_eq; cbn.
 intros k l Hk Hl.
 now destruct (lt_dec k i), (lt_dec l j).
 Qed.
 
-Theorem submatrix_mul_scal_l : ∀ (μ : T) M i j,
+Theorem submatrix_mul_scal_l {m n} : ∀ (μ : T) (M : matrix m n T) i j,
   subm (μ × M)%M i j = (μ × subm M i j)%M.
 Proof.
 intros.
-apply matrix_eq; cbn; [ easy | easy | ].
+apply matrix_eq; cbn.
 intros k l Hk Hl.
 now destruct (lt_dec k i), (lt_dec l j).
 Qed.
 
-Theorem submatrix_nrows : ∀ (M : matrix T) i j,
+Theorem submatrix_nrows {m n} : ∀ (M : matrix m n T) i j,
   mat_nrows (subm M i j) = mat_nrows M - 1.
 Proof. easy. Qed.
 
