@@ -2397,29 +2397,21 @@ Theorem bmat_mul_opp_l : ∀ MA MB,
 Proof.
 intros * Hcsb.
 specialize (@bmat_mul_add_distr_r MA (bmat_opp MA) MB) as H1.
-destruct Hcsb as (Hsq & sizes & Hsz).
-...
-specialize (Hsq _ (or_introl eq_refl)) as Ha.
-specialize (Hsq _ (or_intror (or_introl eq_refl))) as Hb.
-specialize (Hsz _ (or_introl eq_refl)) as Has.
-specialize (Hsz _ (or_intror (or_introl eq_refl))) as Hbs.
+destruct Hcsb as (sizes & Hcsb).
+specialize (Hcsb _ (or_introl eq_refl)) as Ha.
+specialize (Hcsb _ (or_intror (or_introl eq_refl))) as Hb.
+destruct Ha as (Ha, Has).
+destruct Hb as (Hb, Hbs).
 generalize Ha; intros Hao.
 apply is_square_bmat_opp in Hao.
 generalize Has; intros Haso.
 rewrite <- sizes_of_bmatrix_opp in Haso.
 assert (H : compatible_square_bmatrices [MA; (- MA)%BM; MB]). {
-  split. {
-    intros BM HBM.
-    destruct HBM as [HBM| HBM]; [ now subst BM | ].
-    destruct HBM as [HBM| HBM]; [ now subst BM | ].
-    destruct HBM as [HBM| HBM]; [ now subst BM | easy ].
-  } {
-    exists sizes.
-    intros BM HBM.
-    destruct HBM as [HBM| HBM]; [ now subst BM | ].
-    destruct HBM as [HBM| HBM]; [ now subst BM | ].
-    destruct HBM as [HBM| HBM]; [ now subst BM | easy ].
-  }
+  exists sizes.
+  intros BM HBM.
+  destruct HBM as [HBM| HBM]; [ now subst BM | ].
+  destruct HBM as [HBM| HBM]; [ now subst BM | ].
+  destruct HBM as [HBM| HBM]; [ now subst BM | easy ].
 }
 specialize (H1 H); clear H.
 rewrite bmat_add_opp_r in H1.
@@ -2437,24 +2429,22 @@ rewrite (bmat_zero_like_eq_compat _ MB) in H1; [ | easy | easy | easy ].
 rewrite <- Hab in H1.
 rewrite <- (bmat_zero_like_mul _ MB) in H1; [ | easy | easy | easy ].
 apply bmat_add_move_0_l in H1; [ easy | ].
-split. {
-  intros BM HBM.
-  destruct HBM as [HBM| HBM]; [ subst BM | ]. {
+exists sizes.
+intros BM HBM.
+destruct HBM as [HBM| HBM]; [ subst BM | ]. {
+  split. {
     now apply is_square_bmat_mul.
+  } {
+    now rewrite sizes_of_bmatrix_mul.
   }
-  destruct HBM as [HBM| HBM]; [ subst BM | easy ].
+}
+destruct HBM as [HBM| HBM]; [ subst BM | easy ].
+split. {
   apply is_square_bmat_mul; [ easy | easy | ].
   now rewrite Haso, Hbs.
 } {
-  exists sizes.
-  intros BM HBM.
-  destruct HBM as [HBM| HBM]; [ subst BM | ]. {
-    now rewrite sizes_of_bmatrix_mul.
-  } {
-    destruct HBM as [HBM| HBM]; [ subst BM | easy ].
-    rewrite sizes_of_bmatrix_mul; [ easy | easy | easy | ].
-    now rewrite sizes_of_bmatrix_opp.
-  }
+  rewrite sizes_of_bmatrix_mul; [ easy | easy | easy | ].
+  now rewrite sizes_of_bmatrix_opp.
 }
 Qed.
 
@@ -2464,6 +2454,7 @@ Theorem bmat_mul_opp_r : ∀ MA MB,
 Proof.
 intros * Hcsb.
 specialize (@bmat_mul_add_distr_l MA MB (bmat_opp MB)) as H1.
+...
 destruct Hcsb as (Hsq & sizes & Hsz).
 specialize (Hsq _ (or_introl eq_refl)) as Ha.
 specialize (Hsq _ (or_intror (or_introl eq_refl))) as Hb.
