@@ -2510,19 +2510,15 @@ Theorem bmat_mul_opp_opp : ∀ MA MB,
 Proof.
 intros * Hab.
 rewrite bmat_mul_opp_l. 2: {
-...
-  destruct Hab as (Hsq & sizes & Hsz).
+  destruct Hab as (sizes & Hab).
+  exists sizes.
+  intros BM HBM.
+  destruct HBM as [HBM| HBM]; [ now subst BM; apply Hab; left | ].
+  destruct HBM as [HBM| HBM]; [ subst BM | easy ].
   split. {
-    intros BM HBM.
-    destruct HBM as [HBM| HBM]; [ now subst BM; apply Hsq; left | ].
-    destruct HBM as [HBM| HBM]; [ subst BM | easy ].
-    now apply is_square_bmat_opp, Hsq; right; left.
+    now apply is_square_bmat_opp, Hab; right; left.
   } {
-    exists sizes.
-    intros BM HBM.
-    destruct HBM as [HBM| HBM]; [ now subst BM; apply Hsz; left | ].
-    destruct HBM as [HBM| HBM]; [ subst BM | easy ].
-    now rewrite sizes_of_bmatrix_opp; apply Hsz; right; left.
+    now rewrite sizes_of_bmatrix_opp; apply Hab; right; left.
   }
 }
 rewrite bmat_mul_opp_r; [ | easy ].
@@ -2535,6 +2531,7 @@ Theorem bmat_mul_sqr_opp : ∀ M,
 Proof.
 intros * HM.
 apply bmat_mul_opp_opp.
+...
 split. {
   intros BM HBM.
   replace BM with M; [ easy | ].
