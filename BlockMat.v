@@ -2925,8 +2925,8 @@ destruct Hbm as [Hbm| Hbm]; [ now subst M' | ].
 destruct Hbm as [Hbm| Hbm]; [ | easy ].
 subst M'.
 split. {
-...
-  apply is_square_bmat_add. {
+(**)
+  apply is_square_bmat_mul. {
     now apply Hma; right; left.
   } {
     now apply Hmb; right; left.
@@ -2939,9 +2939,13 @@ split. {
     now apply Hmb; left.
   }
 } {
-  rewrite sizes_of_bmatrix_add. {
+  rewrite sizes_of_bmatrix_mul. {
     rewrite (proj2 (Hma _ (or_intror (or_introl eq_refl)))).
     now symmetry; apply Hma; left.
+  } {
+    now apply Hma; right; left.
+  } {
+    now apply Hmb; right; left.
   } {
     transitivity (sizes_of_bmatrix M). {
       rewrite (proj2 (Hma _ (or_intror (or_introl eq_refl)))).
@@ -2981,9 +2985,8 @@ Proof.
 destruct MA as (MA & Hma).
 destruct MB as (MB & Hmb).
 exists (MA * MB)%BM.
-...
-apply comp_squ_bmat_with_mul.
-...
+now apply comp_squ_bmat_with_mul.
+Qed.
 
 Definition bmat_semiring_op_for M HM : semiring_op (square_bmatrix M HM) :=
   {| srng_zero := squ_bmat_zero M HM;
@@ -2991,30 +2994,20 @@ Definition bmat_semiring_op_for M HM : semiring_op (square_bmatrix M HM) :=
      srng_add := @squ_bmat_add M HM;
      srng_mul := @squ_bmat_mul M HM |}.
 
-...
-
-Definition bmat_semiring_op_for M : semiring_op (bmatrix T) :=
-  {| srng_zero := bmat_zero_like M;
-     srng_one := bmat_zero_like M;
-     srng_add := bmat_add;
-     srng_mul := bmat_mul |}.
-
 Canonical Structure bmat_semiring_op_for.
 
-Theorem bmat_semiring_add_comm : ∀ (M a b : bmatrix T),
-  bmat_fit_for_add M a
-  → bmat_fit_for_add M b
-  → (a + b)%BM = (b + a)%BM.
+Theorem bmat_semiring_add_comm : ∀ M HM (a b : square_bmatrix M HM),
+  squ_bmat_add a b = squ_bmat_add b a.
 Proof.
-intros * Ha Hb.
+intros.
+...
 apply bmat_add_comm.
 transitivity M; [ now symmetry | easy ].
 Qed.
 
-Definition bmat_semiring_prop_for (M : bmatrix T) :
-  semiring_prop (bmatrix T) :=
-  {| srng_add_comm a b :=
-       bmat_semiring_add_comm M a b |}.
+Definition bmat_semiring_prop_for M HM :
+  semiring_prop (square_bmatrix M HM) :=
+  {| srng_add_comm := @bmat_semiring_add_comm M HM |}.
 ...
 
 Theorem bmat_el_summation : ∀ b e i j f
