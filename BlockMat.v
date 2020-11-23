@@ -2485,25 +2485,22 @@ rewrite (bmat_zero_like_eq_compat _ MB) in H1; [ | easy | easy | easy ].
 rewrite <- Hab in H1.
 rewrite <- (bmat_zero_like_mul _ MB) in H1; [ | easy | easy | easy ].
 apply bmat_add_move_0_l in H1; [ easy | ].
-...
-split. {
-  intros BM HBM.
-  destruct HBM as [HBM| HBM]; [ subst BM | ]. {
+exists sizes.
+intros BM HBM.
+destruct HBM as [HBM| HBM]; [ subst BM | ]. {
+  split. {
     now apply is_square_bmat_mul.
+  } {
+    now rewrite sizes_of_bmatrix_mul.
   }
-  destruct HBM as [HBM| HBM]; [ subst BM | easy ].
+}
+destruct HBM as [HBM| HBM]; [ subst BM | easy ].
+split. {
   apply is_square_bmat_mul; [ easy | easy | ].
   congruence.
 } {
-  exists sizes.
-  intros BM HBM.
-  destruct HBM as [HBM| HBM]; [ subst BM | ]. {
-    now rewrite sizes_of_bmatrix_mul.
-  } {
-    destruct HBM as [HBM| HBM]; [ subst BM | easy ].
-    rewrite sizes_of_bmatrix_mul; [ easy | easy | easy | ].
-    now rewrite sizes_of_bmatrix_opp.
-  }
+  rewrite sizes_of_bmatrix_mul; [ easy | easy | easy | ].
+  now rewrite sizes_of_bmatrix_opp.
 }
 Qed.
 
@@ -2513,6 +2510,7 @@ Theorem bmat_mul_opp_opp : ∀ MA MB,
 Proof.
 intros * Hab.
 rewrite bmat_mul_opp_l. 2: {
+...
   destruct Hab as (Hsq & sizes & Hsz).
   split. {
     intros BM HBM.
