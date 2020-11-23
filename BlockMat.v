@@ -18,6 +18,11 @@ Existing Instance nat_semiring_prop.
 
 (* block matrices *)
 
+(* in this version, where matrices hold their dimensions in their types,
+   how to implement block matrices? *)
+
+...
+
 Inductive bmatrix T :=
   | BM_1 : T → bmatrix T
   | BM_M : matrix (bmatrix T) → bmatrix T.
