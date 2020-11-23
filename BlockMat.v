@@ -668,10 +668,27 @@ Definition compatible_square_bmatrices (BML : list (bmatrix T)) :=
   ∃ sizes,
   ∀ BM, BM ∈ BML → is_square_bmat BM ∧ sizes_of_bmatrix BM = sizes.
 
+Definition list_eqb T eqb d (l1 l2 : list T) :=
+  (Nat.eqb (length l1) (length l2) &&
+   forallb (λ i, eqb (nth i l1 d) (nth i l2 d)) (seq 0 (length l1)))%bool.
+
+Definition compatible_square_bmatrices' (BML : list (bmatrix T)) :=
+  (forallb is_square_bmat_bool BML &&
+   forallb
+     (λ BM,
+        let sz1 := sizes_of_bmatrix BM in
+        let sz2 := sizes_of_bmatrix (hd (BM_1 0%Srng) BML) in
+        list_eqb Nat.eqb 0 sz1 sz2)
+     BML)%bool.
+
+...
+
 Definition compatible_square_bmatrices' (BML : list (bmatrix T)) :=
   ∀ BM, BM ∈ BML →
   is_square_bmat_bool BM = true ∧
   sizes_of_bmatrix BM = sizes_of_bmatrix (hd (BM_1 0%Srng) BML).
+
+...
 
 Theorem is_square_bmat_bool_iff : ∀ BM,
   is_square_bmat BM ↔ is_square_bmat_bool BM = true.
@@ -737,8 +754,6 @@ split; intros Hbm. {
 }
 Qed.
 
-...
-
 Theorem glop : ∀ BML,
   compatible_square_bmatrices BML ↔
   compatible_square_bmatrices' BML.
@@ -760,11 +775,13 @@ split; intros Hbml. {
     destruct H2 as (_, H2).
     congruence.
   }
-...
+  now apply is_square_bmat_bool_iff.
 } {
   exists (sizes_of_bmatrix (hd (BM_1 0%Rng) BML)).
   intros BM Hbm.
-  now apply Hbml.
+  specialize (Hbml BM Hbm) as H1.
+  destruct H1 as (Hsq, Hsz).
+  now apply is_square_bmat_bool_iff in Hsq.
 }
 Qed.
 
