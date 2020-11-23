@@ -512,12 +512,32 @@ intros * HBM.
 now apply is_square_bmat_loop_IZ_like.
 Qed.
 
+Theorem is_square_bmat_zero_like : ∀ (BM : bmatrix T),
+  is_square_bmat BM
+  → is_square_bmat (bmat_zero_like BM).
+Proof.
+intros * HBM.
+unfold is_square_bmat in HBM |-*.
+rewrite sizes_of_bmat_zero_like.
+now apply is_square_bmat_loop_zero_like.
+Qed.
+
 Theorem is_square_bmat_loop_one_like : ∀ BM sizes,
   is_square_bmat_loop sizes BM
   → is_square_bmat_loop sizes (bmat_one_like BM).
 Proof.
 intros * HBM.
 now apply is_square_bmat_loop_IZ_like.
+Qed.
+
+Theorem is_square_bmat_one_like : ∀ (BM : bmatrix T),
+  is_square_bmat BM
+  → is_square_bmat (bmat_one_like BM).
+Proof.
+intros * HBM.
+unfold is_square_bmat in HBM |-*.
+rewrite sizes_of_bmat_one_like.
+now apply is_square_bmat_loop_one_like.
 Qed.
 
 Theorem no_zero_bmat_size : ∀ (BM : bmatrix T), 0 ∉ sizes_of_bmatrix BM.
@@ -1802,7 +1822,7 @@ induction BM as [x| m IHBM] using bmatrix_ind2; [ easy | cbn ].
 f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros i j Hi Hj.
-...
+rewrite Tauto.if_same.
 now apply IHBM.
 Qed.
 
@@ -2349,6 +2369,7 @@ induction MA as [xa| ma IHMA] using bmatrix_ind2; [ easy | cbn ].
 f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros * Hi Hj.
+rewrite Tauto.if_same.
 apply IHMA; [ easy | easy | ].
 cbn in Ha.
 destruct (zerop (mat_nrows ma)) as [Hrz| Hrz]; [ flia Hrz Hi | ].
@@ -2605,9 +2626,11 @@ induction n; intros; [ easy | cbn ].
 f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
 intros i j Hi Hj.
+rewrite Tauto.if_same.
+rewrite fold_bmat_zero_like.
 destruct i; cbn. {
   destruct j; cbn; [ easy | ].
-  destruct j; [ easy | flia Hj ].
+  destruct j; cbn; [ easy | flia Hj ].
 }
 destruct i; [ cbn | flia Hi ].
 destruct j; cbn; [ easy | ].
@@ -2889,6 +2912,8 @@ Theorem comp_squ_bmat_with_one_like : ∀ M (HM : is_square_bmat M),
   compatible_square_bmatrices [M; bmat_one_like M].
 Proof.
 intros.
+Print compatible_square_bmatrices.
+...
 split. {
   intros * HBM.
   destruct HBM as [HBM| HBM]; [ now subst BM | ].
