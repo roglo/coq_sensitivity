@@ -3143,7 +3143,7 @@ Proof.
 exists (bmat_zero_like M).
 apply compatible_square_bmatrices_bool_iff.
 now apply comp_squ_bmat_with_zero_like.
-Qed.
+Defined.
 
 Definition squ_bmat_one M HM : square_bmatrix M HM.
 Proof.
@@ -3174,13 +3174,44 @@ apply compatible_square_bmatrices_bool_iff in Hma.
 apply compatible_square_bmatrices_bool_iff in Hmb.
 apply compatible_square_bmatrices_bool_iff.
 now apply comp_squ_bmat_with_mul.
-Qed.
+Defined.
+
+End in_ring.
+
+Module square_bmatrix_Notations.
+
+Declare Scope SBM_scope.
+Delimit Scope SBM_scope with SBM.
+
+Arguments square_bmatrix {T so} M%BM HM.
+Arguments squ_bmat_zero {T so M%BM HM}.
+Arguments squ_bmat_one {T so M%M HM}.
+Arguments squ_bmat_add {T so M%M HM} MA%SBM MB%SBM.
+Arguments squ_bmat_mul {T so M%M HM} MA%SBM MB%SBM.
+Arguments compatible_square_bmatrices_bool {T so} BML%SBM.
+
+Notation "0" := (squ_bmat_zero) : SBM_scope.
+Notation "1" := (squ_bmat_one) : SBM_scope.
+Notation "A + B" := (squ_bmat_add A B) : SBM_scope.
+Notation "A * B" := (squ_bmat_mul A B) : SBM_scope.
+
+End square_bmatrix_Notations.
+
+Import square_bmatrix_Notations.
+
+Section in_ring.
+
+Context {T : Type}.
+Context {ro : ring_op T}.
+Context (so : semiring_op T).
+Context {sp : semiring_prop T}.
+Context {rp : ring_prop T}.
 
 Definition squ_bmat_semiring_op_for M HM : semiring_op (square_bmatrix M HM) :=
-  {| srng_zero := squ_bmat_zero M HM;
-     srng_one := squ_bmat_one M HM;
-     srng_add := @squ_bmat_add M HM;
-     srng_mul := @squ_bmat_mul M HM |}.
+  {| srng_zero := 0%SBM;
+     srng_one := 1%SBM;
+     srng_add := squ_bmat_add;
+     srng_mul := squ_bmat_mul |}.
 
 Canonical Structure squ_bmat_semiring_op_for.
 
@@ -3210,30 +3241,56 @@ apply (is_square_bmat_fit_for_add sza). {
 }
 Qed.
 
-Theorem squ_bmat_semiring_add_comm : ∀ M HM (a b : square_bmatrix M HM),
-  squ_bmat_add a b = squ_bmat_add b a.
+Theorem squ_bmat_add_comm : ∀ M HM (a b : square_bmatrix M HM),
+  (a + b)%SBM = (b + a)%SBM.
 Proof.
 intros.
 destruct a as (A, HA).
 destruct b as (B, HB).
 apply square_bmatrix_eq; cbn.
-apply bmat_add_comm.
+apply bmat_add_comm; [ easy | ].
 now apply (comp_squ_bmat_fit_for_add M).
 Qed.
 
-Theorem squ_bmat_semiring_add_assoc : ∀ M HM (a b c : square_bmatrix M HM),
-  squ_bmat_add a (squ_bmat_add b c) = squ_bmat_add (squ_bmat_add a b) c.
+Theorem squ_bmat_add_assoc : ∀ M HM (a b c : square_bmatrix M HM),
+  (a + (b + c))%SBM = ((a + b) + c)%SBM.
 Proof.
 intros M HM (A, Ha) (B, Hb) (C, Hc).
 apply square_bmatrix_eq; cbn.
-now apply bmat_add_assoc; apply (comp_squ_bmat_fit_for_add M).
+now apply bmat_add_assoc; [ easy | | ]; apply (comp_squ_bmat_fit_for_add M).
 Qed.
+
+Theorem bmat_zero_like_squ_bmat : ∀ M HM (A : square_bmatrix M HM),
+  bmat_zero_like M = bmat_zero_like (proj1_sig A).
+Proof.
+intros.
+destruct A as (A, Ha); cbn.
+apply compatible_square_bmatrices_bool_iff in Ha.
+destruct Ha as (sz, Ha).
+specialize (Ha _ (or_introl eq_refl)) as H1.
+specialize (Ha _ (or_intror (or_introl eq_refl))) as H2.
+apply bmat_zero_like_eq_compat; [ easy | easy | ].
+destruct H1, H2; congruence.
+Qed.
+
+Theorem squ_bmat_add_0_l : ∀ M HM (A : square_bmatrix M HM),
+  (0 + A = A)%SBM.
+Proof.
+intros M HM A.
+specialize (bmat_zero_like_squ_bmat A) as H1.
+destruct A as (A, Ha); cbn in H1.
+apply square_bmatrix_eq; cbn.
+rewrite H1.
+now apply bmat_add_0_l.
+Qed.
+
+...
 
 Definition squ_bmat_semiring_prop_for M HM :
   semiring_prop (square_bmatrix M HM) :=
-  {| srng_add_comm := @squ_bmat_semiring_add_comm M HM;
-     srng_add_assoc := @squ_bmat_semiring_add_assoc M HM;
-     srng_add_0_l := 42 |}.
+  {| srng_add_comm := @squ_bmat_add_comm M HM;
+     srng_add_assoc := @squ_bmat_add_assoc M HM;
+     srng_add_0_l := @squ_bmat_add_0_l M HM |}.
 ...
 
 Theorem bmat_el_summation : ∀ b e i j f
