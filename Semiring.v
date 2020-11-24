@@ -201,14 +201,14 @@ specialize rng_mul_add_distr_r as Hmad.
 specialize rng_add_reg_r as Har.
 unfold has_opp in Har.
 specialize rng_nr_mul_0_l as Hao.
-destruct rng_opp_opt as [rng_opp | | ]. {
-  assert (H : (0 * a + a = a)%Rng). {
-    transitivity ((0 * a + 1 * a)%Rng). {
-      now rewrite rng_mul_1_l.
-    }
-    rewrite <- Hmad.
-    now rewrite rng_add_0_l, rng_mul_1_l.
+assert (H : (0 * a + a = a)%Rng). {
+  transitivity ((0 * a + 1 * a)%Rng). {
+    now rewrite rng_mul_1_l.
   }
+  rewrite <- Hmad.
+  now rewrite rng_add_0_l, rng_mul_1_l.
+}
+destruct rng_opp_opt as [rng_opp | | ]. {
   apply Har with (c := a); [ easy | ].
   rewrite H.
   symmetry; apply rng_add_0_l.
