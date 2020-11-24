@@ -15,34 +15,20 @@ Notation "a * b" := (srng_mul a b) : semiring_scope.
 Notation "0" := srng_zero : semiring_scope.
 Notation "1" := srng_one : semiring_scope.
 
-Class semiring_prop A {so : semiring_op A} :=
+Class semiring_prop A {so : semiring_op A} (is_comm : bool) :=
   { srng_add_comm : ∀ a b : A, (a + b = b + a)%Srng;
     srng_add_assoc : ∀ a b c : A, (a + (b + c) = (a + b) + c)%Srng;
     srng_add_0_l : ∀ a : A, (0 + a)%Srng = a;
     srng_mul_assoc : ∀ a b c : A, (a * (b * c) = (a * b) * c)%Srng;
     srng_mul_add_distr_l : ∀ a b c : A, (a * (b + c) = a * b + a * c)%Srng;
-    srng_mul_1_l : ∀ a : A, (1 * a)%Srng = a }.
-
-(* non commutative semirings; in them, these ones cannot be proven *)
-
-Class semiring_non_comm_prop A {so : semiring_op A} :=
-  { srng_nc_mul_1_r : ∀ a : A, (a * 1)%Srng = a;
-    srng_nc_mul_0_l : ∀ a, (0 * a = 0)%Srng;
-    srng_nc_mul_0_r : ∀ a, (a * 0 = 0)%Srng;
-    srng_nc_mul_add_distr_r :
-      ∀ a b c : A, ((a + b) * c = a * c + b * c)%Srng }.
-
-(* commutative semirings *)
-
-Class semiring_comm_prop A {so : semiring_op A} :=
-  { srng_c_mul_comm : ∀ a b : A, (a * b = b * a)%Srng }.
-
-(* j'aimerais pouvoir dire qu'on ne peut pas être à la fois dans un
-   anneau commutatif et dans un anneau non commutatif ; donc qu'on
-   ne devrait pas avoir le droit d'utiliser les deux classes ci-dessus
-   à la fois *)
-
-...
+    srng_mul_1_l : ∀ a : A, (1 * a)%Srng = a;
+    (* below: specific for non-commutative and commutative semirings *)
+    srng_nc_mul_1_r : if is_comm then True else ∀ a : A, (a * 1 = a)%Srng;
+    srng_nc_mul_0_l : if is_comm then True else ∀ a, (0 * a = 0)%Srng;
+    srng_nc_mul_0_r : if is_comm then True else ∀ a, (a * 0 = 0)%Srng;
+    srng_nc_mul_add_distr_r : if is_comm then True else
+      ∀ a b c : A, ((a + b) * c = a * c + b * c)%Srng;
+    srng_c_mul_comm : if is_comm then ∀ a b : A, (a * b = b * a)%Srng else True }.
 
 (* decidability of equality in semirings
    and the fact that 1 ≠ 0 *)
@@ -65,8 +51,8 @@ Section semiring_theorems.
 
 Context {A : Type}.
 Context {so : semiring_op A}.
-Context {sp : semiring_prop A}.
-Context {scp : semiring_comm_prop A}.
+Context {is_comm : bool}.
+Context {sp : semiring_prop A is_comm}.
 
 Theorem srng_add_0_r : ∀ a, (a + 0 = a)%Srng.
 Proof.
@@ -78,8 +64,22 @@ Qed.
 Theorem srng_c_mul_1_r : ∀ a, (a * 1 = a)%Srng.
 Proof.
 intros a; simpl.
-now rewrite srng_c_mul_comm, srng_mul_1_l.
+destruct is_comm. {
+  specialize srng_c_mul_comm as Hmc.
+  cbn in Hmc.
+  now rewrite Hmc, srng_mul_1_l.
+} {
+  specialize srng_nc_mul_1_r as Hm1r.
+  cbn in Hm1r.
+  apply Hm1r.
+}
 Qed.
+
+(* ok, ça marche, mon commutatif et mon non-commutatif ;
+   mais est-ce que ça vaut le coup ?
+   le mieux n'est-il pas l'ennemi du bien ? *)
+
+...
 
 Theorem srng_add_add_swap : ∀ n m p, (n + m + p = n + p + m)%Srng.
 Proof.
