@@ -224,31 +224,16 @@ Proof.
 intros * Ho.
 unfold has_opp in Ho.
 unfold rng_sub.
-destruct rng_opp_opt as [rng_opp'| rng_sub| ]; [ | easy | easy ].
-Search rng_opp.
-cbn.
-...
-
-Theorem rng_add_reg_l : ∀ a b c, (c + a = c + b)%Rng → (a = b)%Rng.
-Proof.
-intros a b c Habc; simpl in Habc; simpl.
-apply rng_add_reg_r with (c := c).
-rewrite rng_add_comm; symmetry.
-now rewrite rng_add_comm; symmetry.
+unfold rng_opp.
+now destruct rng_opp_opt.
 Qed.
 
-Theorem rng_mul_0_l : ∀ a, (0 * a = 0)%Rng.
+Theorem rng_add_reg_l : ∀ a b c, has_opp → (c + a = c + b)%Rng → (a = b)%Rng.
 Proof.
-intros a.
-assert (H : (0 * a + a = a)%Rng). {
-  transitivity ((0 * a + 1 * a)%Rng). {
-    now rewrite rng_mul_1_l.
-  }
-  rewrite <- rng_mul_add_distr_r.
-  now rewrite rng_add_0_l, rng_mul_1_l.
-}
-apply rng_add_reg_r with (c := a).
-now rewrite rng_add_0_l.
+intros a b c Ho Habc; simpl in Habc; simpl.
+apply rng_add_reg_r with (c := c); [ easy | ].
+rewrite rng_add_comm; symmetry.
+now rewrite rng_add_comm; symmetry.
 Qed.
 
 Theorem rng_opp_0 : (- 0 = 0)%Rng.
@@ -257,14 +242,26 @@ transitivity (0 + - 0)%Rng. {
   symmetry.
   apply rng_add_0_l.
 }
-apply rng_add_opp_r.
+specialize rng_add_opp_r as Hao.
+unfold rng_opp.
+destruct rng_opp_opt as [rng_opp| rng_sub| ]. {
+  apply Hao.
+} {
+  apply rng_add_0_l.
+} {
+  apply rng_add_0_l.
+}
 Qed.
 
-Theorem rng_sub_0_r : ∀ a, (a - 0 = a)%Rng.
+Theorem rng_sub_0_r : ∀ a, has_opp → (a - 0 = a)%Rng.
 Proof.
-intros.
+intros * Hao.
 unfold rng_sub.
-rewrite rng_opp_0.
+specialize rng_opp_0 as Ho.
+unfold rng_opp in Ho.
+unfold has_opp in Hao.
+destruct rng_opp_opt as [rng_opp| rng_sub| ]; [ | easy | easy ].
+rewrite Ho.
 apply rng_add_0_r.
 Qed.
 
@@ -275,6 +272,7 @@ split; intros H. {
   apply rng_sub_compat_l with (c := b) in H.
   rewrite rng_add_sub in H.
   unfold rng_sub in H.
+...
   now rewrite rng_add_0_l in H.
 } {
   rewrite H.
