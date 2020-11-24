@@ -185,6 +185,9 @@ Proof.
 intros a b c Ho Habc; simpl in Habc; simpl.
 eapply rng_sub_compat_l with (c := c) in Habc.
 now do 2 rewrite rng_add_sub in Habc.
+...
+(* y a l'hypothèse has_opp, qui semble nécessaire ; ℕ n'a pas d'opposé mais,
+   pourtant, ce théorème y est vrai : comment l'y démontrer ? *)
 Qed.
 
 Theorem rng_mul_0_l : ∀ a, (0 * a = 0)%Rng.
@@ -200,6 +203,7 @@ destruct is_comm. {
     rewrite <- Hmad.
     now rewrite rng_add_0_l, rng_mul_1_l.
   }
+...
   apply Har with (c := a).
 ...
 
