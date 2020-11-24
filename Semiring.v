@@ -265,18 +265,23 @@ rewrite Ho.
 apply rng_add_0_r.
 Qed.
 
-Theorem rng_add_move_0_r : ∀ a b, (a + b = 0)%Rng ↔ (a = - b)%Rng.
+Theorem rng_add_move_0_r : ∀ a b, has_opp → (a + b = 0)%Rng ↔ (a = - b)%Rng.
 Proof.
-intros a b.
+intros a b Ho.
 split; intros H. {
   apply rng_sub_compat_l with (c := b) in H.
-  rewrite rng_add_sub in H.
+  rewrite rng_add_sub in H; [ | easy ].
+  unfold has_opp in Ho.
   unfold rng_sub in H.
-...
+  unfold rng_opp.
+  destruct rng_opp_opt as [rng_opp| rng_sub| ]; [ | easy | easy ].
   now rewrite rng_add_0_l in H.
 } {
   rewrite H.
-  now rewrite rng_add_opp_l.
+  specialize rng_nc_add_opp_r as Hao.
+  unfold has_opp in Ho.
+  destruct rng_opp_opt as [rng_opp| rng_sub| ]; [ | easy | easy ].
+  apply Hao.
 }
 Qed.
 
@@ -285,6 +290,7 @@ Proof.
 intros.
 symmetry.
 apply rng_add_move_0_r.
+...
 apply rng_add_opp_r.
 Qed.
 
