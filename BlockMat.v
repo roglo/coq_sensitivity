@@ -672,7 +672,7 @@ Definition list_eqb T eqb d (l1 l2 : list T) :=
   (Nat.eqb (length l1) (length l2) &&
    forallb (λ i, eqb (nth i l1 d) (nth i l2 d)) (seq 0 (length l1)))%bool.
 
-Definition compatible_square_bmatrices' (BML : list (bmatrix T)) :=
+Definition compatible_square_bmatrices_bool (BML : list (bmatrix T)) :=
   (forallb is_square_bmat_bool BML &&
    forallb
      (λ BM,
@@ -680,15 +680,6 @@ Definition compatible_square_bmatrices' (BML : list (bmatrix T)) :=
         let sz2 := sizes_of_bmatrix (hd (BM_1 0%Srng) BML) in
         list_eqb Nat.eqb 0 sz1 sz2)
      BML)%bool.
-
-...
-
-Definition compatible_square_bmatrices' (BML : list (bmatrix T)) :=
-  ∀ BM, BM ∈ BML →
-  is_square_bmat_bool BM = true ∧
-  sizes_of_bmatrix BM = sizes_of_bmatrix (hd (BM_1 0%Srng) BML).
-
-...
 
 Theorem is_square_bmat_bool_iff : ∀ BM,
   is_square_bmat BM ↔ is_square_bmat_bool BM = true.
@@ -754,42 +745,76 @@ split; intros Hbm. {
 }
 Qed.
 
-Theorem glop : ∀ BML,
+Theorem compatible_square_bmatrices_bool_iff : ∀ BML,
   compatible_square_bmatrices BML ↔
-  compatible_square_bmatrices' BML.
+  compatible_square_bmatrices_bool BML = true.
 Proof.
 intros.
-unfold compatible_square_bmatrices, compatible_square_bmatrices'.
+unfold compatible_square_bmatrices, compatible_square_bmatrices_bool.
 split; intros Hbml. {
-  intros BM Hbm.
   destruct Hbml as (sizes, Hbml).
-  specialize (Hbml _ Hbm) as H1.
-  specialize (Hbml (hd (BM_1 0%Rng) BML)) as H2.
-  assert (H : hd (BM_1 0%Rng) BML ∈ BML). {
-    destruct BML as [| BM0]; [ easy | cbn ].
-    now left.
-  }
-  specialize (H2 H); clear H.
-  split. 2: {
+  apply Bool.andb_true_iff.
+  split. {
+    apply forallb_forall.
+    intros BM Hbm.
+    specialize (Hbml _ Hbm) as H1.
+    specialize (Hbml (hd (BM_1 0%Rng) BML)) as H2.
+    assert (H : hd (BM_1 0%Rng) BML ∈ BML). {
+      destruct BML as [| BM0]; [ easy | cbn ].
+      now left.
+    }
+    specialize (H2 H); clear H.
+    now apply is_square_bmat_bool_iff.
+  } {
+    apply forallb_forall.
+    intros BM Hbm.
+    specialize (Hbml _ Hbm) as H1.
+    specialize (Hbml (hd (BM_1 0%Rng) BML)) as H2.
+    assert (H : hd (BM_1 0%Rng) BML ∈ BML). {
+      destruct BML as [| BM0]; [ easy | cbn ].
+      now left.
+    }
+    specialize (H2 H); clear H.
     destruct H1 as (_, H1).
     destruct H2 as (_, H2).
-    congruence.
+    rewrite H1, H2.
+    unfold list_eqb.
+    apply Bool.andb_true_iff.
+    split; [ apply Nat.eqb_refl | ].
+    apply forallb_forall.
+    intros i Hi.
+    apply Nat.eqb_refl.
   }
-  now apply is_square_bmat_bool_iff.
 } {
   exists (sizes_of_bmatrix (hd (BM_1 0%Rng) BML)).
   intros BM Hbm.
-  specialize (Hbml BM Hbm) as H1.
-  destruct H1 as (Hsq, Hsz).
-  now apply is_square_bmat_bool_iff in Hsq.
+  apply Bool.andb_true_iff in Hbml.
+  destruct Hbml as (Hsq, Hsz).
+  specialize (proj1 (forallb_forall _ _) Hsq _ Hbm) as H1.
+  specialize (proj1 (forallb_forall _ _) Hsz _ Hbm) as H2.
+  cbn in H2.
+  apply is_square_bmat_bool_iff in H1.
+  split; [ easy | ].
+  unfold list_eqb in H2.
+  apply Bool.andb_true_iff in H2.
+  destruct H2 as (H2, H3).
+  apply Nat.eqb_eq in H2.
+  specialize (proj1 (forallb_forall _ _) H3) as H4.
+  cbn in H4; clear H3.
+  remember (sizes_of_bmatrix BM) as sizes eqn:Hsizes.
+  apply List_eq_iff.
+  split; [ easy | ].
+  apply List_eq_iff.
+  apply (nth_ext _ _ 0 0); [ easy | ].
+  intros i d.
+  assert (H : i ∈ seq 0 (length sizes)). {
+    apply in_seq.
+    split; [ flia | easy ].
+  }
+  specialize (H4 _ H); clear H.
+  now apply Nat.eqb_eq in H4.
 }
 Qed.
-
-(* ouais, c'est bien mais il faudrait une version dont la preuve
-   soit unique, comme ça on pourrait la supprimer dans les types
-   dépendants les utilisant *)
-
-...
 
 Theorem bmat_zero_like_mul_distr_l : ∀ BMA BMB,
   is_square_bmat BMA
@@ -2976,7 +3001,21 @@ Arguments bmat_el {T so} BM%BM (i j)%nat.
 *)
 
 Definition square_bmatrix M (HM : is_square_bmat M) :=
-  {A : bmatrix T | compatible_square_bmatrices [M; A]}.
+  {A : bmatrix T | compatible_square_bmatrices_bool [M; A] = true}.
+
+Theorem square_bmatrix_eq M (HM : is_square_bmat M) :
+  ∀ (A B : square_bmatrix M HM),
+  proj1_sig A = proj1_sig B → A = B.
+Proof.
+intros * Hab.
+destruct A as (A, Ha).
+destruct B as (B, Hb).
+cbn in Hab.
+subst A.
+apply eq_exist_uncurried.
+exists eq_refl.
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+Qed.
 
 Theorem comp_squ_bmat_with_zero_like : ∀ M (HM : is_square_bmat M),
   compatible_square_bmatrices [M; bmat_zero_like M].
@@ -3102,14 +3141,16 @@ Qed.
 Definition squ_bmat_zero M HM : square_bmatrix M HM.
 Proof.
 exists (bmat_zero_like M).
+apply compatible_square_bmatrices_bool_iff.
 now apply comp_squ_bmat_with_zero_like.
 Qed.
 
 Definition squ_bmat_one M HM : square_bmatrix M HM.
 Proof.
 exists (bmat_one_like M).
+apply compatible_square_bmatrices_bool_iff.
 now apply comp_squ_bmat_with_one_like.
-Qed.
+Defined.
 
 Definition squ_bmat_add M HM (MA MB : square_bmatrix M HM) :
   square_bmatrix M HM.
@@ -3117,6 +3158,9 @@ Proof.
 destruct MA as (MA & Hma).
 destruct MB as (MB & Hmb).
 exists (MA + MB)%BM.
+apply compatible_square_bmatrices_bool_iff in Hma.
+apply compatible_square_bmatrices_bool_iff in Hmb.
+apply compatible_square_bmatrices_bool_iff.
 now apply comp_squ_bmat_with_add.
 Defined.
 
@@ -3126,8 +3170,11 @@ Proof.
 destruct MA as (MA & Hma).
 destruct MB as (MB & Hmb).
 exists (MA * MB)%BM.
+apply compatible_square_bmatrices_bool_iff in Hma.
+apply compatible_square_bmatrices_bool_iff in Hmb.
+apply compatible_square_bmatrices_bool_iff.
 now apply comp_squ_bmat_with_mul.
-Defined.
+Qed.
 
 Definition bmat_semiring_op_for M HM : semiring_op (square_bmatrix M HM) :=
   {| srng_zero := squ_bmat_zero M HM;
@@ -3137,29 +3184,38 @@ Definition bmat_semiring_op_for M HM : semiring_op (square_bmatrix M HM) :=
 
 Canonical Structure bmat_semiring_op_for.
 
-Theorem bmat_semiring_add_comm : ∀ M HM (a b : square_bmatrix M HM),
+Theorem squ_bmat_semiring_add_comm : ∀ M HM (a b : square_bmatrix M HM),
   squ_bmat_add a b = squ_bmat_add b a.
 Proof.
 intros.
-unfold squ_bmat_add.
 destruct a as (A, HA).
 destruct b as (B, HB).
-apply eq_exist_uncurried.
-specialize (bmat_add_comm A B) as H1.
-assert (H : bmat_fit_for_add A B). {
-  admit.
-}
-specialize (H1 H); clear H.
-exists H1.
-Check (comp_squ_bmat_with_add HM HB HA).
-...
+apply square_bmatrix_eq; cbn.
 apply bmat_add_comm.
-transitivity M; [ now symmetry | easy ].
+apply compatible_square_bmatrices_bool_iff in HA.
+apply compatible_square_bmatrices_bool_iff in HB.
+destruct HA as (sza, Ha).
+destruct HB as (szb, Hb).
+assert (H : szb = sza). {
+  specialize (Ha _ (or_introl eq_refl)).
+  specialize (Hb _ (or_introl eq_refl)).
+  now rewrite <- (proj2 Ha), (proj2 Hb).
+}
+subst szb.
+unfold is_square_bmat in Ha, Hb.
+apply (is_square_bmat_fit_for_add sza). {
+  specialize (Ha _ (or_intror (or_introl eq_refl))) as H1.
+  now rewrite (proj2 H1) in H1.
+} {
+  specialize (Hb _ (or_intror (or_introl eq_refl))) as H1.
+  now rewrite (proj2 H1) in H1.
+}
 Qed.
 
-Definition bmat_semiring_prop_for M HM :
+Definition squ_bmat_semiring_prop_for M HM :
   semiring_prop (square_bmatrix M HM) :=
-  {| srng_add_comm := @bmat_semiring_add_comm M HM |}.
+  {| srng_add_comm := @squ_bmat_semiring_add_comm M HM;
+     srng_add_assoc := 42 |}.
 ...
 
 Theorem bmat_el_summation : ∀ b e i j f
