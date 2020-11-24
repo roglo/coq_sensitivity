@@ -187,7 +187,8 @@ eapply rng_sub_compat_l with (c := c) in Habc.
 now do 2 rewrite rng_add_sub in Habc.
 ...
 (* y a l'hypothèse has_opp, qui semble nécessaire ; ℕ n'a pas d'opposé mais,
-   pourtant, ce théorème y est vrai : comment l'y démontrer ? *)
+   pourtant, ce théorème y est vrai : comment l'y démontrer ? faut-il le
+   définir comme axiome ? *)
 Qed.
 
 Theorem rng_mul_0_l : ∀ a, (0 * a = 0)%Rng.
