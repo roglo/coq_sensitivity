@@ -3176,22 +3176,20 @@ apply compatible_square_bmatrices_bool_iff.
 now apply comp_squ_bmat_with_mul.
 Qed.
 
-Definition bmat_semiring_op_for M HM : semiring_op (square_bmatrix M HM) :=
+Definition squ_bmat_semiring_op_for M HM : semiring_op (square_bmatrix M HM) :=
   {| srng_zero := squ_bmat_zero M HM;
      srng_one := squ_bmat_one M HM;
      srng_add := @squ_bmat_add M HM;
      srng_mul := @squ_bmat_mul M HM |}.
 
-Canonical Structure bmat_semiring_op_for.
+Canonical Structure squ_bmat_semiring_op_for.
 
-Theorem squ_bmat_semiring_add_comm : ∀ M HM (a b : square_bmatrix M HM),
-  squ_bmat_add a b = squ_bmat_add b a.
+Theorem comp_squ_bmat_fit_for_add : ∀ M A B,
+  compatible_square_bmatrices_bool [M; A] = true
+  → compatible_square_bmatrices_bool [M; B] = true
+  → bmat_fit_for_add A B.
 Proof.
-intros.
-destruct a as (A, HA).
-destruct b as (B, HB).
-apply square_bmatrix_eq; cbn.
-apply bmat_add_comm.
+intros * HA HB.
 apply compatible_square_bmatrices_bool_iff in HA.
 apply compatible_square_bmatrices_bool_iff in HB.
 destruct HA as (sza, Ha).
@@ -3212,10 +3210,30 @@ apply (is_square_bmat_fit_for_add sza). {
 }
 Qed.
 
+Theorem squ_bmat_semiring_add_comm : ∀ M HM (a b : square_bmatrix M HM),
+  squ_bmat_add a b = squ_bmat_add b a.
+Proof.
+intros.
+destruct a as (A, HA).
+destruct b as (B, HB).
+apply square_bmatrix_eq; cbn.
+apply bmat_add_comm.
+now apply (comp_squ_bmat_fit_for_add M).
+Qed.
+
+Theorem squ_bmat_semiring_add_assoc : ∀ M HM (a b c : square_bmatrix M HM),
+  squ_bmat_add a (squ_bmat_add b c) = squ_bmat_add (squ_bmat_add a b) c.
+Proof.
+intros M HM (A, Ha) (B, Hb) (C, Hc).
+apply square_bmatrix_eq; cbn.
+now apply bmat_add_assoc; apply (comp_squ_bmat_fit_for_add M).
+Qed.
+
 Definition squ_bmat_semiring_prop_for M HM :
   semiring_prop (square_bmatrix M HM) :=
   {| srng_add_comm := @squ_bmat_semiring_add_comm M HM;
-     srng_add_assoc := 42 |}.
+     srng_add_assoc := @squ_bmat_semiring_add_assoc M HM;
+     srng_add_0_l := 42 |}.
 ...
 
 Theorem bmat_el_summation : ∀ b e i j f
