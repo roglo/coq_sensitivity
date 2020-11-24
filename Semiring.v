@@ -22,12 +22,13 @@ Class semiring_prop A {so : semiring_op A} (is_comm : bool) :=
     srng_mul_assoc : ∀ a b c : A, (a * (b * c) = (a * b) * c)%Srng;
     srng_mul_add_distr_l : ∀ a b c : A, (a * (b + c) = a * b + a * c)%Srng;
     srng_mul_1_l : ∀ a : A, (1 * a)%Srng = a;
-    (* below: specific for non-commutative and commutative semirings *)
+    (* below: specific for non-commutative semirings *)
     srng_nc_mul_1_r : if is_comm then True else ∀ a : A, (a * 1 = a)%Srng;
     srng_nc_mul_0_l : if is_comm then True else ∀ a, (0 * a = 0)%Srng;
     srng_nc_mul_0_r : if is_comm then True else ∀ a, (a * 0 = 0)%Srng;
     srng_nc_mul_add_distr_r : if is_comm then True else
       ∀ a b c : A, ((a + b) * c = a * c + b * c)%Srng;
+    (* below: specific for commutative semirings *)
     srng_c_mul_comm : if is_comm then ∀ a b : A, (a * b = b * a)%Srng else True }.
 
 (* decidability of equality in semirings
@@ -75,12 +76,6 @@ destruct is_comm. {
 }
 Qed.
 
-(* ok, ça marche, mon commutatif et mon non-commutatif ;
-   mais est-ce que ça vaut le coup ?
-   le mieux n'est-il pas l'ennemi du bien ? *)
-
-...
-
 Theorem srng_add_add_swap : ∀ n m p, (n + m + p = n + p + m)%Srng.
 Proof.
 intros n m p; simpl.
@@ -89,17 +84,21 @@ assert (m + p = p + m)%Srng as H by apply srng_add_comm.
 rewrite H; reflexivity.
 Qed.
 
-Theorem srng_c_mul_add_distr_r : ∀ x y z,
+Theorem srng_mul_add_distr_r : ∀ x y z,
   ((x + y) * z = x * z + y * z)%Srng.
 Proof.
 intros x y z; simpl.
-rewrite srng_c_mul_comm.
-rewrite srng_mul_add_distr_l.
-rewrite srng_c_mul_comm.
-assert (H : srng_mul z y = srng_mul y z). {
-  apply srng_c_mul_comm.
+destruct is_comm. {
+  specialize srng_c_mul_comm as H1.
+  rewrite H1.
+  rewrite srng_mul_add_distr_l.
+  rewrite H1.
+  assert (H : srng_mul z y = srng_mul y z) by now rewrite H1.
+  now rewrite H.
+} {
+  specialize srng_nc_mul_add_distr_r as H1.
+  apply H1.
 }
-now rewrite H.
 Qed.
 
 Theorem srng_add_compat_l : ∀ a b c,
@@ -115,6 +114,16 @@ Proof.
 intros a b c Hab.
 now rewrite Hab.
 Qed.
+
+Theorem srng_mul_0_l : ∀ a, (0 * a = 0)%Srng.
+Proof.
+intros.
+destruct is_comm. {
+(* ah oui mais non, ça ne marche que si j'ai la soustraction *)
+...
+  specialize srng_nc_mul_0_l as H.
+  apply H.
+...
 
 End semiring_theorems.
 
@@ -143,10 +152,10 @@ Class ring_prop A {so : semiring_op A} {ro : ring_op A} :=
 Section ring_theorems.
 
 Context {A : Type}.
+Context {is_comm : bool}.
 Context {ro : ring_op A}.
 Context {so : semiring_op A}.
-Context {sp : semiring_prop A}.
-Context {scp : semiring_comm_prop A}.
+Context {sp : semiring_prop A is_comm}.
 Context {rp : ring_prop A}.
 
 Theorem rng_sub_compat_l : ∀ a b c,
@@ -190,15 +199,15 @@ rewrite srng_add_comm; symmetry.
 now rewrite srng_add_comm; symmetry.
 Qed.
 
-Theorem rng_c_mul_0_l : ∀ a, (0 * a = 0)%Rng.
+Theorem rng_mul_0_l : ∀ a, (0 * a = 0)%Rng.
 Proof.
 intros a.
 assert (H : (0 * a + a = a)%Rng). {
- transitivity ((0 * a + 1 * a)%Rng). {
-   now rewrite srng_mul_1_l.
- }
- rewrite <- srng_c_mul_add_distr_r.
- now rewrite srng_add_0_l, srng_mul_1_l.
+  transitivity ((0 * a + 1 * a)%Rng). {
+    now rewrite srng_mul_1_l.
+  }
+  rewrite <- srng_mul_add_distr_r.
+  now rewrite srng_add_0_l, srng_mul_1_l.
 }
 apply rng_add_reg_r with (c := a).
 now rewrite srng_add_0_l.
@@ -246,10 +255,9 @@ Qed.
 Theorem rng_mul_opp_l : ∀ a b, (- a * b = - (a * b))%Rng.
 Proof.
 intros.
-...
 specialize (srng_mul_add_distr_r (- a)%Rng a b) as H.
 rewrite rng_add_opp_l in H.
-rewrite srng_mul_0_l in H.
+rewrite rng_mul_0_l in H.
 symmetry in H.
 now apply rng_add_move_0_r in H.
 Qed.
@@ -260,6 +268,8 @@ intros.
 specialize (srng_mul_add_distr_l a b (- b)%Rng) as H.
 rewrite fold_rng_sub in H.
 rewrite rng_add_opp_r in H.
+Check srng_nc_mul_0_l.
+...
 rewrite srng_mul_0_r in H.
 symmetry in H.
 rewrite srng_add_comm in H.
