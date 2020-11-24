@@ -4,6 +4,9 @@ Set Implicit Arguments.
 
 Require Import Utf8.
 
+(* rings have opposite (Has_opp)
+   semirings don't have it but sometimes have subtraction (Has_sub) *)
+
 Inductive opp_opt T :=
 | Has_opp : (T → T) → opp_opt T
 | Has_sub : (T → T → T) → opp_opt T
@@ -51,22 +54,27 @@ Class ring_prop T {ro : ring_op T} (is_comm : bool) :=
     rng_mul_assoc : ∀ a b c : T, (a * (b * c) = (a * b) * c)%Rng;
     rng_mul_add_distr_l : ∀ a b c : T, (a * (b + c) = a * b + a * c)%Rng;
     rng_mul_1_l : ∀ a : T, (1 * a)%Rng = a;
-    (* below: rings have opp *)
+    (* rings have opp *)
     rng_add_opp_r :
       match rng_opp_opt with
       | Has_opp rng_opp => ∀ a : T, (a + rng_opp a = 0)%Rng
       | Has_sub rng_sub => ∀ a : T, (rng_sub a a = 0)%Rng
       | Has_no_sub _ => True
       end;
-    (* below: axiom of commutative rings *)
+    (* multiplication by 0 in semirings *)
+    rng_nr_mul_0_l :
+      match rng_opp_opt with
+      | Has_opp _ => True
+      | _ => ∀ a, (0 * a = 0)%Rng
+      end;
+    (* commutative multiplication in commutative rings *)
     rng_c_mul_comm : if is_comm then ∀ a b : T, (a * b = b * a)%Rng else True;
-    (* below: non provable in non-commutative rings *)
+    (* non provable in non-commutative rings *)
     rng_nc_add_opp_r :
       match rng_opp_opt with
       | Has_opp _ => ∀ a : T, (- a + a = 0)%Rng
       | Has_sub _ | Has_no_sub _ => True
       end;
-    rng_nc_mul_0_l : if is_comm then True else ∀ a, (0 * a = 0)%Rng;
     rng_nc_mul_0_r : if is_comm then True else ∀ a, (a * 0 = 0)%Rng;
     rng_nc_mul_1_r : if is_comm then True else ∀ a : T, (a * 1 = a)%Rng;
     rng_nc_mul_add_distr_r : if is_comm then True else
@@ -93,7 +101,6 @@ Section ring_theorems.
 Context {T : Type}.
 Context {ro : ring_op T}.
 Context {is_comm : bool}.
-Context {opp_status : opp_opt T}.
 Context {rp : ring_prop is_comm}.
 
 Theorem rng_add_0_r : ∀ a, (a + 0 = a)%Rng.
@@ -185,10 +192,6 @@ Proof.
 intros a b c Ho Habc; simpl in Habc; simpl.
 eapply rng_sub_compat_l with (c := c) in Habc.
 now do 2 rewrite rng_add_sub in Habc.
-...
-(* y a l'hypothèse has_opp, qui semble nécessaire ; ℕ n'a pas d'opposé mais,
-   pourtant, ce théorème y est vrai : comment l'y démontrer ? faut-il le
-   définir comme axiome ? *)
 Qed.
 
 Theorem rng_mul_0_l : ∀ a, (0 * a = 0)%Rng.
@@ -196,7 +199,9 @@ Proof.
 intros.
 specialize rng_mul_add_distr_r as Hmad.
 specialize rng_add_reg_r as Har.
-destruct is_comm. {
+unfold has_opp in Har.
+specialize rng_nr_mul_0_l as Hao.
+destruct rng_opp_opt as [rng_opp | | ]. {
   assert (H : (0 * a + a = a)%Rng). {
     transitivity ((0 * a + 1 * a)%Rng). {
       now rewrite rng_mul_1_l.
@@ -204,52 +209,25 @@ destruct is_comm. {
     rewrite <- Hmad.
     now rewrite rng_add_0_l, rng_mul_1_l.
   }
-...
-  apply Har with (c := a).
-...
-
-  apply rng_add_reg_r with (c := a).
-now rewrite rng_add_0_l.
-...
+  apply Har with (c := a); [ easy | ].
+  rewrite H.
+  symmetry; apply rng_add_0_l.
 } {
-  specialize rng_nc_mul_0_l as H; apply H.
+  apply Hao.
+} {
+  apply Hao.
 }
+Qed.
+
+Theorem fold_rng_sub : ∀ a b, has_opp → (a + - b)%Rng = (a - b)%Rng.
+Proof.
+intros * Ho.
+unfold has_opp in Ho.
+unfold rng_sub.
+destruct rng_opp_opt as [rng_opp'| rng_sub| ]; [ | easy | easy ].
+Search rng_opp.
+cbn.
 ...
-
-End ring_theorems.
-
-(* Rings *)
-
-Class ring_op A :=
-  { rng_opp : A → A }.
-
-Definition rng_sub A {R : ring_op A} {S : ring_op A} a b :=
-  rng_add a (rng_opp b).
-
-Declare Scope ring_scope.
-
-Delimit Scope ring_scope with Rng.
-Notation "0" := (@rng_zero _ _) : ring_scope.
-Notation "1" := (@rng_one _ _) : ring_scope.
-Notation "- a" := (@rng_opp _ _ a) : ring_scope.
-Notation "a + b" := (@rng_add _ _ a b) : ring_scope.
-Notation "a - b" := (@rng_sub _ _ _ a b) : ring_scope.
-Notation "a * b" := (@rng_mul _ _ a b) : ring_scope.
-
-Class ring_prop A {so : ring_op A} {ro : ring_op A} :=
-  { rng_add_opp_l : ∀ a : A, (- a + a = 0)%Rng }.
-
-Section ring_theorems.
-
-Context {A : Type}.
-Context {is_comm : bool}.
-Context {ro : ring_op A}.
-Context {so : ring_op A}.
-Context {sp : ring_prop A is_comm}.
-Context {rp : ring_prop A}.
-
-Theorem fold_rng_sub : ∀ a b, (a + - b)%Rng = (a - b)%Rng.
-Proof. intros; easy. Qed.
 
 Theorem rng_add_reg_l : ∀ a b c, (c + a = c + b)%Rng → (a = b)%Rng.
 Proof.
