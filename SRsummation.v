@@ -265,6 +265,7 @@ intros.
 unfold iter_seq.
 remember (S e - b) as n eqn:Hn.
 revert e a b Hn.
+...
 induction n; intros; [ apply srng_mul_0_r | cbn ].
 do 2 rewrite srng_add_0_l.
 rewrite fold_left_srng_add_fun_from_0; symmetry.
