@@ -131,10 +131,9 @@ Fixpoint bmat_mul (MM1 MM2 : bmatrix T) :=
       | BM_1 _ => BM_1 0%Srng
       | BM_M MMB =>
           let mat_el_mul i k :=
-            fold_left
+            iter_seq 0 (S (mat_ncols MMA - 1) - 0)
               (λ acc j,
                  bmat_add acc (bmat_mul (mat_el MMA i j) (mat_el MMB j k)))
-              (seq 0 (mat_ncols MMA))
               (bmat_zero_like (mat_el MMA 0 0))
           in
           let r :=
@@ -145,6 +144,18 @@ Fixpoint bmat_mul (MM1 MM2 : bmatrix T) :=
           BM_M r
       end
   end.
+
+Definition bmat_semiring_op {M} : semiring_op (bmatrix T) :=
+  {| srng_zero := bmat_zero_like M;
+     srng_one := bmat_one_like M;
+     srng_add := bmat_add;
+     srng_mul := bmat_mul |}.
+
+Canonical Structure bmat_semiring_op.
+
+Print bmat_mul.
+
+...
 
 Fixpoint bmat_opp BM : bmatrix T :=
   match BM with
@@ -823,10 +834,12 @@ Theorem bmat_zero_like_mul_distr_l : ∀ BMA BMB,
 Proof.
 intros * Ha.
 revert BMB.
-induction BMA as [xa| ma IHBMA] using bmatrix_ind2; intros; cbn. {
-  destruct BMB as [xb| mb]; [ | easy ].
+induction BMA as [xa| ma IHBMA] using bmatrix_ind2; intros. {
+  destruct BMB as [xb| mb]; [ cbn | easy ].
   now rewrite srng_mul_0_l.
 }
+cbn - [ iter_seq ].
+...
 destruct BMB as [xb| mb]; [ easy | ].
 cbn; f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
@@ -2049,6 +2062,7 @@ erewrite List_fold_left_ext_in. 2: {
   replace size with (S (size - 1) - 0) in Heqx by flia Hi.
   subst x.
   rewrite fold_iter_seq.
+Abort. (*
 Search (_ * iter_seq _ _ _ _)%Rng.
 ...
 Search (_ * fold_left _ _ _)%Rng.
@@ -3521,18 +3535,22 @@ Proof.
 intros M HM (A, Ha) (B, Hb) (C, Hc).
 apply square_bmatrix_eq; cbn.
 Search (_ * (_ * _))%BM.
-...
+Abort. (* à faire quand bmat_mul_assoc sera fait *)
 
+(*
 Definition squ_bmat_semiring_prop_for M HM :
   semiring_prop (square_bmatrix M HM) :=
   {| srng_add_comm := @squ_bmat_add_comm M HM;
      srng_add_assoc := @squ_bmat_add_assoc M HM;
      srng_add_0_l := @squ_bmat_add_0_l M HM;
      srng_mul_assoc := @squ_bmat_mul_assoc M HM |}.
+... à compléter quand il y aura bien tous les théorèmes
+*)
+
 ...
 
 Theorem bmat_el_summation : ∀ b e i j f
-  (bso := bmat_semiring_op_for (f b)),
+  (bso := squ_bmat_semiring_op_for (f b)),
   b ≤ e
   → is_square_bmat (f b)
   → bmat_el (Σ (k = b, e), f k)%Srng i j =
