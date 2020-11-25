@@ -131,7 +131,7 @@ Fixpoint bmat_mul (MM1 MM2 : bmatrix T) :=
       | BM_1 _ => BM_1 0%Srng
       | BM_M MMB =>
           let mat_el_mul i k :=
-            iter_seq 0 (S (mat_ncols MMA - 1) - 0)
+            iter_seq 0 (mat_ncols MMA - 1)
               (λ acc j,
                  bmat_add acc (bmat_mul (mat_el MMA i j) (mat_el MMB j k)))
               (bmat_zero_like (mat_el MMA 0 0))
@@ -152,10 +152,6 @@ Definition bmat_semiring_op {M} : semiring_op (bmatrix T) :=
      srng_mul := bmat_mul |}.
 
 Canonical Structure bmat_semiring_op.
-
-Print bmat_mul.
-
-...
 
 Fixpoint bmat_opp BM : bmatrix T :=
   match BM with
@@ -839,45 +835,54 @@ induction BMA as [xa| ma IHBMA] using bmatrix_ind2; intros. {
   now rewrite srng_mul_0_l.
 }
 cbn - [ iter_seq ].
-...
 destruct BMB as [xb| mb]; [ easy | ].
-cbn; f_equal.
-apply matrix_eq; cbn; [ easy | easy | ].
+cbn - [ iter_seq ]; f_equal.
+apply matrix_eq; [ easy | easy | ].
+cbn - [ iter_seq ].
 intros * Hi Hj.
 rewrite Tauto.if_same.
 destruct ma as (fa, ra, ca).
 destruct mb as (fb, rb, cb).
-cbn in *.
+cbn - [ iter_seq ] in *.
 destruct (zerop ra) as [H| H]; [ easy | cbn in Ha; clear H ].
 destruct (zerop ca) as [H| H]; [ easy | cbn in Ha; clear H ].
 destruct Ha as (_ & H & Ha); subst ca.
 rewrite fold_bmat_zero_like.
 replace
-  (bmat_zero_like
-     (fold_left (λ a k, (a + fa i k * fb k j)%BM)
-        (seq 0 ra) (bmat_zero_like (fa 0 0))))
+  (bmat_zero_like (iter_seq 0 (ra - 1) (λ a k, (a + fa i k * fb k j)%BM)
+     (bmat_zero_like (fa 0 0))))
 with
-  (fold_left (λ a k, (a + bmat_zero_like (fa i k * fb k j))%BM)
-     (seq 0 ra) (bmat_zero_like (fa 0 0))). 2: {
+  (iter_seq 0 (ra - 1) (λ a k, (a + bmat_zero_like (fa i k * fb k j))%BM)
+     (bmat_zero_like (fa 0 0))). 2: {
   clear IHBMA Ha Hi.
   induction ra. {
-    symmetry.
-    apply bmat_zero_like_idemp.
+    cbn.
+    rewrite bmat_zero_like_add_distr.
+    now rewrite bmat_zero_like_idemp.
   }
+  unfold iter_seq.
+  rewrite Nat.sub_succ.
+  do 2 rewrite Nat.sub_0_r.
   rewrite List_seq_succ_r.
   rewrite fold_left_app; cbn.
   rewrite fold_left_app; cbn.
   rewrite bmat_zero_like_add_distr.
   f_equal.
+  destruct ra. {
+    cbn; symmetry.
+    apply bmat_zero_like_idemp.
+  }
+  rewrite Nat.sub_succ, Nat.sub_0_r in IHra.
   apply IHra.
 }
 rewrite bmat_zero_like_idemp.
-eapply List_fold_left_ext_in.
+apply List_fold_left_ext_in.
 intros k BM Hk; f_equal.
 rewrite Tauto.if_same.
 rewrite fold_bmat_zero_like.
 apply in_seq in Hk.
-apply IHBMA; [ easy | flia Hk | ].
+assert (Hk' : k < ra) by flia Hk Hi.
+apply IHBMA; [ easy | easy | ].
 rewrite sizes_of_bmatrix_at_0_0 with (r := ra); [ | easy | easy | easy ].
 now apply Ha.
 Qed.
