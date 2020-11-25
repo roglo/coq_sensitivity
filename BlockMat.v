@@ -2940,14 +2940,17 @@ assert (Hjlen : j / len < n). {
     now apply (product_bmatrix_sizes_ne_0 (mat_el MA 0 0)).
   } {
     rewrite iter_succ_succ in Hj.
-...
-    rewrite srng_product_split_first in Hj; [ | | flia ]. 2: {
+    rewrite srng_product_split_first in Hj; [ | | | flia ]; cycle 1. {
       apply nat_semiring_prop.
+    } {
+      apply nat_sring_comm_prop.
     }
     remember (nth (_ - _) _ _) as x in Hj; cbn in Heqx; subst x.
     rewrite Nat.mul_comm in Hj.
     erewrite srng_product_eq_compat in Hj; cycle 1. {
       apply nat_semiring_prop.
+    } {
+      apply nat_sring_comm_prop.
     } {
       intros k Hk.
       rewrite Nat.sub_succ_l; [ | easy ].
@@ -3296,13 +3299,12 @@ rewrite H1.
 now apply bmat_add_0_l.
 Qed.
 
-...
-
 Definition squ_bmat_semiring_prop_for M HM :
   semiring_prop (square_bmatrix M HM) :=
   {| srng_add_comm := @squ_bmat_add_comm M HM;
      srng_add_assoc := @squ_bmat_add_assoc M HM;
-     srng_add_0_l := @squ_bmat_add_0_l M HM |}.
+     srng_add_0_l := @squ_bmat_add_0_l M HM;
+     srng_mul_assoc := 42 |}.
 ...
 
 Theorem bmat_el_summation : ∀ b e i j f
