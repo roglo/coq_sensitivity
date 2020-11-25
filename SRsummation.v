@@ -20,6 +20,7 @@ Context {T : Type}.
 Context {ro : ring_op T}.
 Context (so : semiring_op T).
 Context {sp : semiring_prop T}.
+Context {csp : comm_semiring_prop T}.
 Context {rp : ring_prop T}.
 
 Theorem fold_left_srng_add_fun_from_0 : ∀ a l (f : nat → _),
@@ -277,11 +278,11 @@ Theorem srng_mul_summation_distr_r : ∀ a b e f,
   ((Σ (i = b, e), f i) * a = Σ (i = b, e), f i * a)%Srng.
 Proof.
 intros.
-rewrite srng_mul_comm.
+rewrite srng_c_mul_comm.
 rewrite srng_mul_summation_distr_l.
 apply srng_summation_eq_compat.
 intros i Hi.
-apply srng_mul_comm.
+apply srng_c_mul_comm.
 Qed.
 
 Theorem srng_summation_only_one : ∀ g n, (Σ (i = n, n), g i = g n)%Srng.
