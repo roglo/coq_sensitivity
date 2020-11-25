@@ -1095,7 +1095,6 @@ destruct BMA as [xa| ma]; [ easy | ].
 destruct BMB as [xb| mb]; [ easy | ].
 destruct ma as (fa, ra, ca).
 destruct mb as (fb, rb, cb); cbn - [ iter_seq ] in *.
-...
 destruct Ha as (Hra & Hca & Ha).
 destruct Hb as (Hrb & Hcb & Hb).
 subst ra ca rb cb.
@@ -1115,9 +1114,11 @@ assert (H : ∀ i, i < size → is_square_bmat_loop sizes (fb i j)). {
   now apply Hb.
 }
 move H before Hb; clear Hb; rename H into Hb.
-destruct size; [ easy | cbn ].
+destruct size; [ easy | ].
+cbn - [ iter_seq ].
 clear Hi Hj.
 move j before i.
+rewrite Nat.sub_0_r.
 induction size. {
   cbn.
   apply is_square_bmat_loop_add. {
@@ -1125,7 +1126,8 @@ induction size. {
   }
   apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
 }
-...
+unfold iter_seq.
+rewrite Nat.sub_0_r.
 rewrite List_seq_succ_r; cbn.
 rewrite fold_left_app; cbn.
 apply is_square_bmat_loop_add. 2: {
@@ -1139,6 +1141,8 @@ apply IHsize. {
   apply Hb; flia Hk.
 }
 Qed.
+
+...
 
 Theorem sizes_of_bmatrix_fold_left : ∀ BM sta len f,
   (∀ n, sta ≤ n < sta + len → sizes_of_bmatrix BM = sizes_of_bmatrix (f n))
