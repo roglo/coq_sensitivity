@@ -2042,30 +2042,34 @@ cbn in Has, Hbs, Hcs; clear H.
 injection Has; clear Has; intros Has.
 injection Hbs; clear Hbs; intros Hbs.
 injection Hcs; clear Hcs; intros Hcs.
-...
-replace
-  (fold_left
-    (λ (acc : bmatrix T) (j0 : nat),
-       (acc + (fa i j0 + fb i j0) * fc j0 j)%BM)
-    (seq 0 size) (bmat_zero_like (fa 0 0 + fb 0 0)%BM))
-with
-  (fold_left
-    (λ (acc : bmatrix T) (j0 : nat),
-       (acc + (fa i j0 * fc j0 j + fb i j0 * fc j0 j))%BM)
-    (seq 0 size) (bmat_zero_like (fa 0 0 + fb 0 0)%BM)). 2: {
-  apply List_fold_left_ext_in.
+erewrite List_fold_left_ext_in. 2: {
   intros k M Hk.
-  f_equal.
   apply in_seq in Hk.
-  symmetry.
-  apply IHMC with (sizes := sizes); [ flia Hk | easy | ].
-  rewrite <- Has in Ha.
-  rewrite <- Hbs in Hb.
-  rewrite <- Hcs in Hc.
-  intros BM HBM.
-  unfold is_square_bmat.
-  destruct HBM as [H| HBM]; [ subst BM | ]. {
-    rewrite (sizes_of_bmatrix_at_0_0 fa Ha); [ | easy | flia Hk ].
+  remember (seq 0 size) as x.
+  replace size with (S (size - 1) - 0) in Heqx by flia Hi.
+  subst x.
+  rewrite fold_iter_seq.
+Search (_ * iter_seq _ _ _ _)%Rng.
+...
+Search (_ * fold_left _ _ _)%Rng.
+...
+  rewrite IHMC with (sizes := sizes) (MA := fa 42 42) (j := j); [ | apply Hi | apply Hj | ]. {
+
+...
+  rewrite IHMC with (sizes := sizes) (MA := fa 0 0) (j := j); [ | apply Hi | apply Hj | ]. 2: {
+    rewrite <- Has in Ha.
+    rewrite <- Hbs in Hb.
+    rewrite <- Hcs in Hc.
+    intros BM HBM.
+    unfold is_square_bmat.
+    destruct HBM as [H| HBM]; [ subst BM | ]. {
+      rewrite (sizes_of_bmatrix_at_0_0 fa Ha); [ | | ].
+      rewrite (sizes_of_bmatrix_at_0_0 fa Ha); [ | apply Hi | apply Hj ].
+      split; [ | easy ].
+      apply Ha; [ easy | easy ].
+    }
+    destruct HBM as [H| HBM]; [ subst BM | ]. {
+      rewrite (sizes_of_bmatrix_at_0_0 fa Ha); [ | apply Hi | apply Hj ].
     split; [ | easy ].
     apply Ha; [ easy | flia Hk ].
   }
@@ -2199,7 +2203,7 @@ rewrite <- (bmat_add_assoc (x + y)%BM); [ | easy | now symmetry ].
 f_equal.
 now apply bmat_add_comm.
 Qed.
-...
+*)
 
 Theorem bmat_zero_like_add_diag : ∀ BM,
   bmat_zero_like (BM + BM)%BM = bmat_zero_like BM.
@@ -2274,41 +2278,31 @@ cbn in Has, Hbs, Hcs; clear H.
 injection Has; clear Has; intros Has.
 injection Hbs; clear Hbs; intros Hbs.
 injection Hcs; clear Hcs; intros Hcs.
-replace
-  (fold_left
-    (λ (acc : bmatrix T) (j0 : nat),
-       (acc + (fa i j0 + fb i j0) * fc j0 j)%BM)
-    (seq 0 size) (bmat_zero_like (fa 0 0 + fb 0 0)%BM))
-with
-  (fold_left
-    (λ (acc : bmatrix T) (j0 : nat),
-       (acc + (fa i j0 * fc j0 j + fb i j0 * fc j0 j))%BM)
-    (seq 0 size) (bmat_zero_like (fa 0 0 + fb 0 0)%BM)). 2: {
-  apply List_fold_left_ext_in.
+erewrite List_fold_left_ext_in. 2: {
   intros k M Hk.
-  f_equal.
   apply in_seq in Hk.
-  symmetry.
-  apply IHMC with (sizes := sizes); [ flia Hk | easy | ].
-  rewrite <- Has in Ha.
-  rewrite <- Hbs in Hb.
-  rewrite <- Hcs in Hc.
-  intros BM HBM.
-  unfold is_square_bmat.
-  destruct HBM as [H| HBM]; [ subst BM | ]. {
-    rewrite (sizes_of_bmatrix_at_0_0 fa Ha); [ | easy | flia Hk ].
-    split; [ | easy ].
-    apply Ha; [ easy | flia Hk ].
-  }
-  destruct HBM as [H| HBM]; [ subst BM | ]. {
-    rewrite (sizes_of_bmatrix_at_0_0 fb Hb); [ | easy | flia Hk ].
-    split; [ | easy ].
-    apply Hb; [ easy | flia Hk ].
-  }
-  destruct HBM as [H| HBM]; [ subst BM | ]. {
-    rewrite (sizes_of_bmatrix_at_0_0 fc Hc); [ | flia Hk | easy ].
-    split; [ | easy ].
-    apply Hc; [ flia Hk | easy ].
+  rewrite IHMC with (sizes := sizes); [ | flia Hk | easy | ]. 2: {
+    rewrite <- Has in Ha.
+    rewrite <- Hbs in Hb.
+    rewrite <- Hcs in Hc.
+    intros BM HBM.
+    unfold is_square_bmat.
+    destruct HBM as [H| HBM]; [ subst BM | ]. {
+      rewrite (sizes_of_bmatrix_at_0_0 fa Ha); [ | easy | flia Hk ].
+      split; [ | easy ].
+      apply Ha; [ easy | flia Hk ].
+    }
+    destruct HBM as [H| HBM]; [ subst BM | ]. {
+      rewrite (sizes_of_bmatrix_at_0_0 fb Hb); [ | easy | flia Hk ].
+      split; [ | easy ].
+      apply Hb; [ easy | flia Hk ].
+    }
+    destruct HBM as [H| HBM]; [ subst BM | ]. {
+      rewrite (sizes_of_bmatrix_at_0_0 fc Hc); [ | flia Hk | easy ].
+      split; [ | easy ].
+      apply Hc; [ flia Hk | easy ].
+    }
+    easy.
   }
   easy.
 }
@@ -2492,6 +2486,8 @@ cbn in Has, Hbs, Hcs; clear H.
 injection Has; clear Has; intros Has.
 injection Hbs; clear Hbs; intros Hbs.
 injection Hcs; clear Hcs; intros Hcs.
+(* todo: could directly use List_fold_left_ext_in here instead
+   of replace like in bmat_mul_add_distr_r above *)
 replace
   (fold_left
     (λ (acc : bmatrix T) (k : nat),
