@@ -278,6 +278,27 @@ Theorem srng_mul_summation_distr_r : ∀ a b e f,
   ((Σ (i = b, e), f i) * a = Σ (i = b, e), f i * a)%Srng.
 Proof.
 intros.
+unfold iter_seq.
+remember (S e - b) as n eqn:Hn.
+revert e a b Hn.
+induction n; intros; [ apply srng_mul_0_l | cbn ].
+do 2 rewrite srng_add_0_l.
+rewrite fold_left_srng_add_fun_from_0; symmetry.
+rewrite fold_left_srng_add_fun_from_0; symmetry.
+rewrite srng_mul_add_distr_r.
+rewrite (IHn e); [ easy | flia Hn ].
+Qed.
+
+End in_ring.
+
+Check @srng_mul_summation_distr_r.
+
+...
+
+Theorem srng_mul_summation_distr_r : ∀ a b e f,
+  ((Σ (i = b, e), f i) * a = Σ (i = b, e), f i * a)%Srng.
+Proof.
+intros.
 rewrite srng_c_mul_comm.
 rewrite srng_mul_summation_distr_l.
 apply srng_summation_eq_compat.
