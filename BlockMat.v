@@ -2366,7 +2366,17 @@ assert (H : ∀ i, i < size → is_square_bmat_loop sizes (fc i j)). {
   now intros; apply Hc.
 }
 move H before Hc; clear Hc; rename H into Hc.
-clear Hi Hj IHMC Hcsb.
+destruct size; [ easy | ].
+move j before i.
+rewrite Nat.sub_succ, Nat.sub_0_r.
+induction size. {
+  cbn.
+...
+  apply is_square_bmat_loop_add. {
+    now apply is_square_bmat_loop_zero_like.
+  }
+  apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
+}
 ...
 induction size; [ apply bmat_zero_like_add_distr | ].
 rewrite List_seq_succ_r; cbn.
