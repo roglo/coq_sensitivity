@@ -2371,7 +2371,19 @@ move j before i.
 rewrite Nat.sub_succ, Nat.sub_0_r.
 induction size. {
   cbn.
+  rewrite bmat_zero_like_add_distr.
 ...
+  rewrite <- bmat_add_assoc. {
+    rewrite <- bmat_add_assoc. {
+      f_equal.
+      rewrite bmat_add_comm. {
+
+    f_equal.
+    rewrite bmat_add_add_swap.
+
+induction size. {
+  cbn.
+
   apply is_square_bmat_loop_add. {
     now apply is_square_bmat_loop_zero_like.
   }
