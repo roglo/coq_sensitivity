@@ -893,47 +893,58 @@ Theorem bmat_zero_like_mul_distr_r : ∀ BMA BMB,
 Proof.
 intros * Ha.
 revert BMB.
-induction BMA as [xa| ma IHBMA] using bmatrix_ind2; intros; cbn. {
+induction BMA as [xa| ma IHBMA] using bmatrix_ind2; intros. {
   destruct BMB as [xb| mb]; [ cbn | easy ].
   now rewrite srng_mul_0_r.
 }
-destruct BMB as [xb| mb]; [ easy | cbn ].
+destruct BMB as [xb| mb]; [ easy | ].
+cbn - [ iter_seq ].
 f_equal.
-apply matrix_eq; cbn; [ easy | easy | ].
+apply matrix_eq; [ easy | easy | ].
+cbn - [ iter_seq ].
 intros * Hi Hj.
 rewrite Tauto.if_same.
 destruct ma as (fa, ra, ca).
 destruct mb as (fb, rb, cb).
-cbn in *.
+cbn - [ iter_seq ] in *.
 destruct (zerop ra) as [H| H]; [ easy | cbn in Ha; clear H ].
 destruct (zerop ca) as [H| H]; [ easy | cbn in Ha; clear H ].
 destruct Ha as (_ & H & Ha); subst ca.
 rewrite fold_bmat_zero_like.
 replace
-  (bmat_zero_like
-     (fold_left (λ a k, (a + fa i k * fb k j)%BM)
-        (seq 0 ra) (bmat_zero_like (fa 0 0))))
+  (bmat_zero_like (iter_seq 0 (ra - 1) (λ a k, (a + fa i k * fb k j)%BM)
+     (bmat_zero_like (fa 0 0))))
 with
-  (fold_left (λ a k, (a + bmat_zero_like (fa i k * fb k j))%BM)
-     (seq 0 ra) (bmat_zero_like (fa 0 0))). 2: {
-  clear IHBMA Ha Hi.
+  (iter_seq 0 (ra - 1) (λ a k, (a + bmat_zero_like (fa i k * fb k j))%BM)
+     (bmat_zero_like (fa 0 0))). 2: {
+  clear IHBMA Ha Hi Hj.
   induction ra. {
-    symmetry.
-    apply bmat_zero_like_idemp.
+    cbn.
+    rewrite bmat_zero_like_add_distr.
+    now rewrite bmat_zero_like_idemp.
   }
+  unfold iter_seq.
+  rewrite Nat.sub_succ.
+  do 2 rewrite Nat.sub_0_r.
   rewrite List_seq_succ_r.
   rewrite fold_left_app; cbn.
   rewrite fold_left_app; cbn.
   rewrite bmat_zero_like_add_distr.
   f_equal.
+  destruct ra. {
+    cbn; symmetry.
+    apply bmat_zero_like_idemp.
+  }
+  rewrite Nat.sub_succ, Nat.sub_0_r in IHra.
   apply IHra.
 }
-eapply List_fold_left_ext_in.
+apply List_fold_left_ext_in.
 intros k BM Hk; f_equal.
 rewrite Tauto.if_same.
 rewrite fold_bmat_zero_like.
 apply in_seq in Hk.
-apply IHBMA; [ easy | flia Hk | ].
+assert (Hk' : k < ra) by flia Hk Hi.
+apply IHBMA; [ easy | easy | ].
 rewrite sizes_of_bmatrix_at_0_0 with (r := ra); [ | easy | easy | easy ].
 now apply Ha.
 Qed.
@@ -1078,12 +1089,13 @@ Theorem is_square_bmat_loop_mul : ∀ BMA BMB sizes,
 Proof.
 intros * Ha Hb.
 revert BMA BMB Ha Hb.
-induction sizes as [| size]; intros; cbn; [ now destruct BMA, BMB | ].
-cbn in Ha, Hb.
+induction sizes as [| size]; intros; [ now destruct BMA, BMB | ].
+cbn in Ha, Hb |-*.
 destruct BMA as [xa| ma]; [ easy | ].
 destruct BMB as [xb| mb]; [ easy | ].
 destruct ma as (fa, ra, ca).
-destruct mb as (fb, rb, cb); cbn in *.
+destruct mb as (fb, rb, cb); cbn - [ iter_seq ] in *.
+...
 destruct Ha as (Hra & Hca & Ha).
 destruct Hb as (Hrb & Hcb & Hb).
 subst ra ca rb cb.
@@ -1113,6 +1125,7 @@ induction size. {
   }
   apply IHsizes; [ apply Ha; flia | apply Hb; flia ].
 }
+...
 rewrite List_seq_succ_r; cbn.
 rewrite fold_left_app; cbn.
 apply is_square_bmat_loop_add. 2: {
