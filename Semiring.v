@@ -77,16 +77,25 @@ Print group_prop.
 (* ring or field properties *)
 
 Class ring_field_prop T {rfo : ring_field_op T} :=
-  { rf_mul_distr_l_opt :
+  { rf_add_prop : @group_prop T rf_grp_add;
+    rf_mul_prop : @group_prop T rf_grp_mul;
+    rf_mul_distr_l_opt :
       option (∀ a b c : T, (a * (b + c))%F = (a * b + a * c)%F) }.
 
 Print ring_field_prop.
 
-Theorem grp_add_0_l {T} {rfo : ring_field_op T} :
+Theorem grp_add_0_l {T} {rfo : ring_field_op T} {rfp : ring_field_prop} :
   match 0%F with
   | Some grp_unit => ∀ a : T, (grp_unit + a)%F = a
   | None => True
   end.
+Proof.
+set (go := rf_grp_add).
+set (gp := rf_add_prop).
+destruct grp_op_unit_opt as [grp_op_unit| ]. {
+  now destruct grp_unit_opt.
+}
+destruct grp_unit_opt as [grp_unit| ]; [ | easy ].
 
 ...
 
