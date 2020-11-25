@@ -1,16 +1,94 @@
-(* Semiring *)
+(* Group, Semiring, Ring, Field *)
 
 Set Implicit Arguments.
 
 Require Import Utf8.
 
-(* rings have opposite (Has_opp)
-   semirings don't have it but sometimes have subtraction (Has_sub) *)
+(* rings have opposite (Has_sym)
+   semirings don't have it but sometimes have subtraction (Has_sym_op) *)
+(* fields have inverse (Has_sym)
+   rings don't have it but sometimes have division (Has_sym_op) *)
 
-Inductive opp_opt T :=
-| Has_opp : (T → T) → opp_opt T
-| Has_sub : (T → T → T) → opp_opt T
-| Has_no_sub : opp_opt T.
+Inductive sym_opt T :=
+| Has_sym : (T → T) → sym_opt T
+| Has_sym_op : (T → T → T) → sym_opt T
+| Has_no_sym : sym_opt T.
+
+(* groups *)
+
+Class group_op T :=
+  { grp_op : T → T → T;
+    grp_unit_opt : option T;
+    grp_sym_opt : sym_opt T }.
+
+(* ring or field *)
+
+Class ring_field_op T :=
+  { rf_grp_add : group_op T;
+    rf_grp_mul : group_op T }.
+
+Declare Scope field_scope.
+Delimit Scope field_scope with F.
+
+(*
+Notation "0" := (rf_grp_add grp_unit_opt) : field_scope.
+Notation "1" := (rf_grp_mul grp_unit_opt) : field_scope.
+Notation "- a" := (rng_opp a) : ring_scope.
+Notation "a + b" := (grp_op rf_grp_add a b) : field_scope.
+Notation "a - b" := (rng_sub a b) : ring_scope.
+Notation "a * b" := (rng_mul a b) : ring_scope.
+*)
+
+Notation "0" := (@grp_unit_opt _ rf_grp_add) : field_scope.
+Notation "a + b" := (@grp_op _ rf_grp_add a b) : field_scope.
+Notation "a * b" := (@grp_op _ rf_grp_mul a b) : field_scope.
+
+(* group properties *)
+
+Class group_prop T {go : group_op T}  :=
+   { grp_comm_opt :
+       option (∀ a b, grp_op a b = grp_op b a);
+     grp_assoc_opt :
+       option (∀ a b c, grp_op a (grp_op b c) = grp_op (grp_op a b) c);
+     grp_op_unit_opt :
+       option
+         (match grp_unit_opt with
+          | Some grp_unit => ∀ a, grp_op grp_unit a = a
+          | None => True
+          end);
+     grp_op_sym_opt :
+       option
+         (match grp_sym_opt with
+          | Has_sym grp_sym =>
+              match grp_unit_opt with
+              | Some grp_unit => ∀ a, grp_op a (grp_sym a) = grp_unit
+              | None => True
+              end
+          | Has_sym_op grp_sym_op =>
+              match grp_unit_opt with
+              | Some grp_unit => ∀ a, grp_sym_op a a = grp_unit
+              | None => True
+              end
+          | Has_no_sym _ => True
+          end) }.
+
+Print group_prop.
+
+(* ring or field properties *)
+
+Class ring_field_prop T {rfo : ring_field_op T} :=
+  { rf_mul_distr_l_opt :
+      option (∀ a b c : T, (a * (b + c))%F = (a * b + a * c)%F) }.
+
+Print ring_field_prop.
+
+Theorem grp_add_0_l {T} {rfo : ring_field_op T} :
+  match 0%F with
+  | Some grp_unit => ∀ a : T, (grp_unit + a)%F = a
+  | None => True
+  end.
+
+...
 
 (* ring operators
    * only semiring if rng_opp_opt = Has_sub (e.g. ℕ) or Has_no_sub
@@ -178,6 +256,7 @@ Definition has_opp :=
 Theorem rng_add_sub : ∀ a b, has_opp → (a + b - b = a)%Rng.
 Proof.
 intros * Ho.
+...
 unfold has_opp in Ho.
 unfold rng_sub.
 specialize rng_add_opp_r as Hao.
@@ -208,6 +287,12 @@ assert (H : (0 * a + a = a)%Rng). {
   rewrite <- Hmad.
   now rewrite rng_add_0_l, rng_mul_1_l.
 }
+(**)
+apply rng_add_reg_r with (c := a). 2: {
+  rewrite H; symmetry.
+  apply rng_add_0_l.
+}
+...
 destruct rng_opp_opt as [rng_opp | | ]. {
   apply Har with (c := a); [ easy | ].
   rewrite H.
