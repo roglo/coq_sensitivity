@@ -74,6 +74,7 @@ Context {ro : ring_op T}.
 Context (so : semiring_op T).
 Context {sp : semiring_prop T}.
 Context {rp : ring_prop T}.
+Context {csp : sring_comm_prop T}.
 Context {sdp : sring_dec_prop T}.
 Context {acp : algeb_closed_prop}.
 
@@ -672,7 +673,7 @@ unfold polyn_list_convol_mul.
 rewrite srng_summation_rtl; [ | easy ].
 apply srng_summation_eq_compat; [ easy | ].
 intros j Hj.
-rewrite srng_mul_comm.
+rewrite srng_c_mul_comm.
 rewrite Nat.add_0_r.
 now replace (i - (i - j)) with j by flia Hj.
 Qed.
@@ -780,7 +781,7 @@ intros j Hj.
 rewrite Nat.add_0_r.
 rewrite Nat_sub_sub_distr; [ | easy ].
 rewrite Nat.sub_diag, Nat.add_0_l.
-apply srng_mul_comm.
+apply srng_c_mul_comm.
 Qed.
 
 Theorem map_polyn_list_convol_mul_cons_r_gen : ∀ b la lb sta len,
@@ -877,7 +878,7 @@ rewrite map_polyn_list_convol_mul_comm.
 rewrite map_polyn_list_convol_mul_cons_r.
 erewrite map_ext_in. 2: {
   intros i Hi.
-  apply srng_mul_comm.
+  apply srng_c_mul_comm.
 }
 f_equal; f_equal.
 erewrite map_ext_in. 2: {
@@ -1641,7 +1642,7 @@ induction len; intros. {
     now rewrite srng_mul_0_l.
   }
   destruct (le_dec (length lb) (n + i - j)) as [H2| H2]. {
-   rewrite srng_mul_comm.
+   rewrite srng_c_mul_comm.
    rewrite nth_overflow; [ | easy ].
    now rewrite rng_mul_0_l.
   }
@@ -1833,7 +1834,7 @@ destruct (lt_dec k len) as [Hklen| Hklen]. {
   intros i Hi.
   apply srng_summation_eq_compat; [ easy | ].
   intros j Hj.
-  rewrite srng_mul_comm, srng_mul_assoc.
+  rewrite srng_c_mul_comm, srng_mul_assoc.
   rewrite Nat.add_comm, Nat.add_sub.
   rewrite Nat.add_comm.
   rewrite Nat.add_comm, Nat.sub_add_distr.
@@ -1859,13 +1860,19 @@ Definition polyn_semiring_prop : semiring_prop (polynomial T) :=
   {| srng_add_comm := polyn_add_comm;
      srng_add_assoc := polyn_add_assoc;
      srng_add_0_l := polyn_add_0_l;
-     srng_mul_comm := polyn_mul_comm;
      srng_mul_assoc := polyn_mul_assoc;
      srng_mul_1_l := polyn_mul_1_l;
      srng_mul_add_distr_l := polyn_mul_add_distr_l;
      srng_mul_0_l := polyn_mul_0_l |}.
 
+Definition polyn_sring_comm_prop : sring_comm_prop (polynomial T) :=
+  {| srng_c_mul_comm := polyn_mul_comm |}.
+
 Existing Instance polyn_semiring_prop.
+Existing Instance polyn_sring_comm_prop.
+
+Canonical Structure polyn_semiring_prop.
+Canonical Structure polyn_sring_comm_prop.
 
 Theorem polyn_add_opp_l : ∀ P : polynomial T, (- P + P)%P = 0%P.
 Proof.
@@ -1930,10 +1937,12 @@ Definition polyn_sring_dec_prop : @sring_dec_prop _ polyn_semiring_op :=
      srng_1_neq_0 := polyn_1_neq_0 |}.
 
 Canonical Structure polyn_semiring_op.
+(*
 Canonical Structure polyn_ring_op.
 Canonical Structure polyn_semiring_prop.
 Canonical Structure polyn_ring_prop.
 Canonical Structure polyn_sring_dec_prop.
+*)
 
 (* monic polynomial: polynomial whose leading coefficient is 1 *)
 
@@ -3080,7 +3089,7 @@ Theorem eval_polyn_list_cons : ∀ la (a x : T),
 Proof.
 intros.
 cbn; rewrite srng_add_comm; f_equal.
-apply srng_mul_comm.
+apply srng_c_mul_comm.
 Qed.
 
 Theorem last_polyn_list_add_length_lt : ∀ la lb d,
@@ -3378,7 +3387,7 @@ rewrite skipn_cons.
 remember (nth (1 + i) (a :: la)) as x; cbn in Heqx; subst x.
 remember (skipn (S i) la) as lb eqn:Hlb.
 cbn; unfold eval_polyn_list.
-rewrite srng_add_assoc, srng_mul_comm.
+rewrite srng_add_assoc, srng_c_mul_comm.
 rewrite rng_mul_opp_r.
 rewrite rng_add_opp_l; symmetry.
 apply srng_add_0_l.
@@ -3538,7 +3547,7 @@ destruct n. {
   exists [x]; cbn.
   unfold polyn_highest_coeff.
   rewrite Hn, srng_mul_1_l.
-  clear - Hx Hn.
+  clear - Hx Hn csp.
   now apply polyn_of_degree_1_eq.
 }
 assert (Hpcq : polyn_coeff Q (polyn_degree Q) ≠ 0%Srng). {
@@ -3627,14 +3636,18 @@ rewrite H in Hpqr; clear H.
 rewrite polyn_add_0_r in Hpqr.
 generalize Hpqr; intros Hpqr'.
 rewrite Hq in Hpqr.
-rewrite srng_product_split_first; [ | apply polyn_semiring_prop | flia ].
+rewrite srng_product_split_first; [ | | | flia ]; cycle 1. {
+  apply polyn_semiring_prop.
+} {
+  apply polyn_sring_comm_prop.
+}
 rewrite Nat.sub_diag.
 remember (nth 0 _ _) as y eqn:Hy; cbn in Hy; subst y.
-rewrite srng_mul_comm, <- srng_mul_assoc.
+rewrite srng_c_mul_comm, <- srng_mul_assoc.
 rewrite Hpqr at 1.
 remember (Π (i = _, _), _)%Srng as y eqn:Hy in |-*.
 remember (Π (i = _, _), _)%Srng as z eqn:Hz in |-*.
-cbn; f_equal; rewrite srng_mul_comm.
+cbn; f_equal; rewrite srng_c_mul_comm.
 cbn; subst y z; f_equal. {
   unfold iter_seq.
   symmetry.
@@ -3645,7 +3658,11 @@ cbn; subst y z; f_equal. {
     now rewrite Nat.sub_succ, Nat.sub_0_r.
   }
   do 2 rewrite fold_iter_seq.
-  apply srng_product_eq_compat; [ apply polyn_semiring_prop | ].
+  apply srng_product_eq_compat. {
+    apply polyn_semiring_prop.
+  } {
+    apply polyn_sring_comm_prop.
+  }
   intros i Hi.
   destruct i; [ easy | ].
   now rewrite Nat.sub_succ, Nat.sub_0_r.

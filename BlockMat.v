@@ -209,6 +209,7 @@ Context {T : Type}.
 Context {ro : ring_op T}.
 Context (so : semiring_op T).
 Context {sp : semiring_prop T}.
+Context {scp : sring_comm_prop T}.
 Context {rp : ring_prop T}.
 
 (* zero and one block matrices *)
@@ -2825,8 +2826,10 @@ revert A Hsizes.
 induction sizes as [| size]; intros; [ easy | ].
 cbn - [ iter_seq srng_mul srng_one nth ] in Hlen.
 rewrite iter_succ_succ in Hlen.
-rewrite srng_product_split_first in Hlen; [ | | flia ]. 2: {
+rewrite srng_product_split_first in Hlen; [ | | | flia ]; cycle 1. {
   apply nat_semiring_prop.
+} {
+  apply nat_sring_comm_prop.
 }
 apply Nat.eq_mul_0 in Hlen.
 destruct Hlen as [Hlen| Hlen]. {
@@ -2842,7 +2845,11 @@ apply IHsizes with (A := mat_el MA 0 0). 2: {
   now injection Hsizes.
 }
 rewrite <- Hlen at 2.
-apply srng_product_eq_compat; [ apply nat_semiring_prop | ].
+apply srng_product_eq_compat. {
+  apply nat_semiring_prop.
+} {
+  apply nat_sring_comm_prop.
+}
 intros i Hi.
 destruct i; [ flia Hi | ].
 now do 2 rewrite Nat.sub_succ, Nat.sub_0_r.
@@ -2907,13 +2914,17 @@ assert (Hilen : i / len < n). {
     now apply (product_bmatrix_sizes_ne_0 (mat_el MA 0 0)).
   } {
     rewrite iter_succ_succ in Hi.
-    rewrite srng_product_split_first in Hi; [ | | flia ]. 2: {
+    rewrite srng_product_split_first in Hi; [ | | | flia ]; cycle 1. {
       apply nat_semiring_prop.
+    } {
+      apply nat_sring_comm_prop.
     }
     remember (nth (_ - _) _ _) as x in Hi; cbn in Heqx; subst x.
     rewrite Nat.mul_comm in Hi.
     erewrite srng_product_eq_compat in Hi; cycle 1. {
       apply nat_semiring_prop.
+    } {
+      apply nat_sring_comm_prop.
     } {
       intros k Hk.
       rewrite Nat.sub_succ_l; [ | easy ].
@@ -2929,6 +2940,7 @@ assert (Hjlen : j / len < n). {
     now apply (product_bmatrix_sizes_ne_0 (mat_el MA 0 0)).
   } {
     rewrite iter_succ_succ in Hj.
+...
     rewrite srng_product_split_first in Hj; [ | | flia ]. 2: {
       apply nat_semiring_prop.
     }

@@ -26,7 +26,7 @@ Class semiring_prop A {so : semiring_op A} :=
 
 (* commutative semiring *)
 
-Class comm_semiring_prop A {so : semiring_op A} :=
+Class sring_comm_prop A {so : semiring_op A} :=
   { srng_c_mul_comm : ∀ a b : A, (a * b = b * a)%Srng }.
 
 (* decidability of equality in semirings
@@ -51,7 +51,7 @@ Section semiring_theorems.
 Context {A : Type}.
 Context {so : semiring_op A}.
 Context {sp : semiring_prop A}.
-Context {csp : comm_semiring_prop A}.
+Context {scp : sring_comm_prop A}.
 
 Theorem srng_add_0_r : ∀ a, (a + 0 = a)%Srng.
 Proof.
@@ -139,7 +139,7 @@ Context {A : Type}.
 Context {ro : ring_op A}.
 Context {so : semiring_op A}.
 Context {sp : semiring_prop A}.
-Context {csp : comm_semiring_prop A}.
+Context {scp : sring_comm_prop A}.
 Context {rp : ring_prop A}.
 
 Theorem rng_sub_compat_l : ∀ a b c,

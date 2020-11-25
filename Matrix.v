@@ -66,6 +66,7 @@ Context {T : Type}.
 Context {ro : ring_op T}.
 Context (so : semiring_op T).
 Context {sp : semiring_prop T}.
+Context {scp : sring_comm_prop T}.
 Context {rp : ring_prop T}.
 
 (* addition *)
@@ -87,11 +88,16 @@ Definition nat_semiring_prop : semiring_prop nat :=
   {| srng_add_comm := Nat.add_comm;
      srng_add_assoc := Nat.add_assoc;
      srng_add_0_l := Nat.add_0_l;
-     srng_mul_comm := Nat.mul_comm;
      srng_mul_assoc := Nat.mul_assoc;
      srng_mul_1_l := Nat.mul_1_l;
      srng_mul_add_distr_l := Nat.mul_add_distr_l;
      srng_mul_0_l := Nat.mul_0_l |}.
+
+Definition nat_sring_comm_prop : sring_comm_prop nat :=
+  {| srng_c_mul_comm := Nat.mul_comm |}.
+
+Canonical Structure nat_semiring_prop.
+Canonical Structure nat_sring_comm_prop.
 
 (*
 End in_ring.
@@ -277,16 +283,16 @@ unfold determinant; cbn.
 remember (mat_ncols A) as c eqn:Hc; symmetry in Hc.
 destruct c; [ easy | clear Hcz ].
 cbn - [ iter_seq ].
-rewrite srng_mul_summation_distr_l; [ | easy ].
+rewrite srng_mul_summation_distr_l; [ | easy | easy ].
 apply srng_summation_eq_compat; [ easy | ].
 intros j Hj.
-rewrite (srng_mul_comm (minus_one_pow j)).
+rewrite (srng_c_mul_comm (minus_one_pow j)).
 do 2 rewrite <- srng_mul_assoc.
 f_equal.
-rewrite (srng_mul_comm (mat_el A 0 j)).
+rewrite (srng_c_mul_comm (mat_el A 0 j)).
 do 2 rewrite <- srng_mul_assoc.
 f_equal.
-rewrite srng_mul_comm; f_equal.
+rewrite srng_c_mul_comm; f_equal.
 f_equal.
 apply matrix_eq; [ easy | easy | cbn ].
 rename j into k; rename Hj into Hk.
@@ -614,6 +620,7 @@ Context {T : Type}.
 Context {ro : ring_op T}.
 Context (so : semiring_op T).
 Context {sp : semiring_prop T}.
+Context {scp : sring_comm_prop T}.
 Context {rp : ring_prop T}.
 
 Declare Scope M_scope.
