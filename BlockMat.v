@@ -1345,7 +1345,8 @@ rewrite sizes_of_bmatrix_add. {
   apply IHra; flia.
 } {
   destruct ra; [ now cbn; rewrite sizes_of_bmat_zero_like | ].
-...
+  unfold iter_seq in IHra.
+  rewrite Nat.sub_succ, (Nat.sub_0_r ra) in IHra.
   rewrite IHra; [ | flia ].
   symmetry.
   assert (H0ss : 0 < S (S ra)) by flia.
@@ -2366,6 +2367,7 @@ assert (H : ∀ i, i < size → is_square_bmat_loop sizes (fc i j)). {
 }
 move H before Hc; clear Hc; rename H into Hc.
 clear Hi Hj IHMC Hcsb.
+...
 induction size; [ apply bmat_zero_like_add_distr | ].
 rewrite List_seq_succ_r; cbn.
 do 3 rewrite fold_left_app; cbn.
