@@ -1142,8 +1142,6 @@ apply IHsize. {
 }
 Qed.
 
-...
-
 Theorem sizes_of_bmatrix_fold_left : ∀ BM sta len f,
   (∀ n, sta ≤ n < sta + len → sizes_of_bmatrix BM = sizes_of_bmatrix (f n))
   → sizes_of_bmatrix (fold_left (λ acc j, (acc + f j)%BM) (seq sta len) BM) =
@@ -1242,17 +1240,18 @@ revert BMB Hb Hab.
 induction BMA as [xa| ma IHBMA] using bmatrix_ind2; intros. {
   now destruct BMB.
 }
-destruct BMB as [xb| mb]; [ easy | cbn ].
+destruct BMB as [xb| mb]; [ easy | ].
+cbn - [ iter_seq ].
 move mb before ma.
 cbn in Ha, Hb, Hab.
 destruct ma as (fa, ra, ca).
 destruct mb as (fb, rb, cb).
-cbn in *.
+cbn - [ iter_seq ] in *.
 destruct (zerop ra) as [Hraz| Hraz]; [ easy | ].
 destruct (zerop ca) as [Hcaz| Hcaz]; [ easy | ].
 destruct (zerop rb) as [Hrbz| Hrbz]; [ easy | ].
 destruct (zerop cb) as [Hcbz| Hcbz]; [ easy | ].
-cbn in Ha, Hb, Hab |-*.
+cbn - [ iter_seq ] in Ha, Hb, Hab |-*.
 f_equal.
 destruct Ha as (_ & H & Ha); subst ca.
 destruct Hb as (_ & H & Hb); subst cb.
@@ -1320,7 +1319,8 @@ assert
   }
 }
 assert
-  (Haj : ∀ j, j < S ra → sizes_of_bmatrix (fa 0 j) = sizes_of_bmatrix (fa 0 0)). {
+  (Haj :
+   ∀ j, j < S ra → sizes_of_bmatrix (fa 0 j) = sizes_of_bmatrix (fa 0 0)). {
   intros j Hj.
   apply (@sizes_of_bmatrix_at_0_0 _ (S ra)); [ | flia Hj | easy ].
   intros i k Hi Hk.
@@ -1334,13 +1334,18 @@ assert
   intros i k Hi Hk.
   apply Hb; [ flia Hi | flia Hk ].
 }
+unfold iter_seq.
+rewrite Nat.sub_0_r.
 rewrite List_seq_succ_r; cbn.
 rewrite fold_left_app; cbn.
 rewrite sizes_of_bmatrix_add. {
   destruct ra; [ apply sizes_of_bmat_zero_like | ].
+  rewrite Nat.sub_succ, Nat.sub_0_r in IHra.
+  unfold iter_seq in IHra.
   apply IHra; flia.
 } {
   destruct ra; [ now cbn; rewrite sizes_of_bmat_zero_like | ].
+...
   rewrite IHra; [ | flia ].
   symmetry.
   assert (H0ss : 0 < S (S ra)) by flia.
