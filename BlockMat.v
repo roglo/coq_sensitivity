@@ -2595,6 +2595,69 @@ with
   intros k M Hk.
   f_equal.
   apply in_seq in Hk.
+(**)
+  cbn in Hk; destruct Hk as (_, Hk).
+  specialize (Ha i k Hi Hk) as Haik.
+  assert (Hbz : is_square_bmat_loop sizes (fb 0 0)). {
+    intros; apply Hb; flia Hk.
+  }
+  assert (Hbk : ∀ j, j < size → is_square_bmat_loop sizes (fb k j)). {
+    now intros; apply Hb.
+  }
+  assert (Hcj : ∀ i, i < size → is_square_bmat_loop sizes (fc i j)). {
+    now intros; apply Hc.
+  }
+  assert (Haiks : sizes_of_bmatrix (fa i k) = sizes). {
+    rewrite (@sizes_of_bmatrix_at_0_0 _ size); [ easy | | easy | easy ].
+    now rewrite <- Has in Ha.
+  }
+  assert (Hbks : ∀ j, j < size → sizes_of_bmatrix (fb k j) = sizes). {
+    intros l Hl.
+    rewrite (@sizes_of_bmatrix_at_0_0 _ size); [ easy | | easy | easy ].
+    now rewrite <- Hbs in Hb.
+  }
+  assert (Hcjs : ∀ i, i < size → sizes_of_bmatrix (fc i j) = sizes). {
+    intros l Hl.
+    rewrite (@sizes_of_bmatrix_at_0_0 _ size); [ easy | | easy | easy ].
+    now rewrite <- Hcs in Hc.
+  }
+  specialize (IHMA i k Hi Hk) as IHMAik.
+  remember (fa i k) as faik; clear Heqfaik.
+  destruct size; [ easy | ].
+  clear - sp IHMAik Haik Hbk Hcj Haiks Hbks Hcjs Hbz Hbs.
+  revert j k Hbk Hcj Hbks Hcjs.
+  induction size; intros. {
+    cbn.
+    rewrite bmat_mul_add_distr_l. 2: {
+      exists sizes.
+      intros BM HBM.
+      unfold is_square_bmat.
+      destruct HBM as [H| HBM]; [ subst BM | ]. {
+        now rewrite <- Haiks in Haik.
+      }
+      destruct HBM as [H| HBM]; [ subst BM | ]. {
+        rewrite sizes_of_bmat_zero_like.
+        split; [ | easy ].
+        rewrite Hbs.
+        now apply is_square_bmat_loop_zero_like.
+      }
+      destruct HBM as [H| ]; [ | easy ].
+      subst BM.
+...
+        rewrite Hbks.
+        rewrite sizes_of_bmat_zero_like.
+        rewrite (sizes_of_bmatrix_at_0_0 fa Ha); [ | easy | flia Hk ].
+        split; [ | easy ].
+        apply Ha; [ easy | flia Hk ].
+      }
+      rewrite <- Has in Ha.
+    rewrite <- Hbs in Hb.
+    rewrite <- Hcs in Hc.
+...
+    rewrite (bmat_zero_like_eq_compat _ faik); cycle 1. {
+      unfold is_square_bmat.
+      rewrite H
+...
   symmetry.
   clear Hcsb.
   destruct size; [ easy | ].
@@ -2602,7 +2665,6 @@ with
   do 2 rewrite fold_left_app; cbn.
   set (MB' := (fold_left (λ (acc0 : bmatrix T) (j1 : nat), acc0 + fb k j1 * fc j1 j) (seq 0 size) (bmat_zero_like (fb 0 0)))%BM).
   set (MC' := (fb k size * fc size j)%BM).
-  cbn in Hk; destruct Hk as (_, Hk).
   rewrite bmat_mul_add_distr_l. 2: {
     exists sizes.
     rewrite <- Has in Ha.
