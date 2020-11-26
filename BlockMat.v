@@ -2591,6 +2591,9 @@ erewrite List_fold_left_ext_in. 2: {
 }
 do 2 rewrite fold_iter_seq.
 symmetry.
+Check summation_eq_compat.
+About srng_summation_eq_compat.
+Search (Σ (_ = _, _), (_ +
 ...
 replace
   (fold_left

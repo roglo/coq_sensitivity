@@ -150,9 +150,10 @@ apply in_seq in Hj.
 f_equal; f_equal; flia.
 Qed.
 
-Theorem srng_summation_eq_compat : ∀ g h b k,
-  (∀ i, b ≤ i ≤ k → (g i = h i)%Srng)
-  → (Σ (i = b, k), g i = Σ (i = b, k), h i)%Srng.
+Theorem iter_seq_eq_compat : ∀ A b k g h (add : A → A → A) d,
+  (∀ i, b ≤ i ≤ k → g i = h i)
+  → iter_seq b k (λ c i, add c (g i)) d =
+    iter_seq b k (λ c i, add c (h i)) d.
 Proof.
 intros * Hgh.
 unfold iter_seq.
@@ -165,14 +166,20 @@ clear k Hgh Hlen.
 rename H into Hb.
 revert b Hb.
 induction len; intros; [ easy | cbn ].
-do 2 rewrite srng_add_0_l.
-rewrite fold_left_srng_add_fun_from_0; symmetry.
-rewrite fold_left_srng_add_fun_from_0; symmetry.
-f_equal; [ apply Hb; flia | ].
-apply IHlen.
-intros i Hi.
-apply Hb.
-flia Hi.
+rewrite <- Hb; [ | flia ].
+apply List_fold_left_ext_in.
+intros k c Hk.
+apply in_seq in Hk.
+rewrite Hb; [ easy | ].
+flia Hk.
+Qed.
+
+Theorem srng_summation_eq_compat : ∀ g h b k,
+  (∀ i, b ≤ i ≤ k → (g i = h i)%Srng)
+  → (Σ (i = b, k), g i = Σ (i = b, k), h i)%Srng.
+Proof.
+intros * Hgh.
+now apply iter_seq_eq_compat.
 Qed.
 
 Theorem srng_summation_empty : ∀ g b k,
