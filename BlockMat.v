@@ -2591,6 +2591,18 @@ erewrite List_fold_left_ext_in. 2: {
 }
 do 2 rewrite fold_iter_seq.
 symmetry.
+(**)
+erewrite iter_seq_eq_compat. 2: {
+  intros k Hk.
+(* make a general lemma
+   mul a (iter_seq _ _ (λ b i, add b (f i)) d) =
+   iter_seq _ _ (λ b i, add b (mul a (f i))) (mul a d)
+*)
+Search (_ * Σ (_ = _, _), _)%Rng.
+Check @srng_mul_summation_distr_l.
+(* lui faire subir le même sort que srng_summation_eq_compat *)
+...
+
 Check summation_eq_compat.
 About srng_summation_eq_compat.
 Search (Σ (_ = _, _), (_ +
