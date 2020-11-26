@@ -284,7 +284,7 @@ remember (mat_ncols A) as c eqn:Hc; symmetry in Hc.
 destruct c; [ easy | clear Hcz ].
 cbn - [ iter_seq ].
 rewrite srng_mul_summation_distr_l; [ | easy | easy ].
-apply srng_summation_eq_compat; [ easy | ].
+apply srng_summation_eq_compat.
 intros j Hj.
 rewrite (srng_c_mul_comm (minus_one_pow j)).
 do 2 rewrite <- srng_mul_assoc.
@@ -341,7 +341,7 @@ assert (Hac : ∀ j, subm A 0 j = subm C 0 j). {
   intros i j' Hi Hj'.
   destruct (lt_dec j' j); symmetry; apply Hc; flia.
 }
-erewrite srng_summation_eq_compat; [ | easy | ]. 2: {
+erewrite srng_summation_eq_compat. 2: {
   intros j Hj.
   rewrite Hbc.
   rewrite srng_mul_add_distr_l.
@@ -654,15 +654,15 @@ cbn in Hi, Hj.
 remember (mat_ncols MA) as ca eqn:Hca.
 remember (mat_ncols MB) as cb eqn:Hcb.
 move cb before ca.
-erewrite srng_summation_eq_compat; [ | easy | ]. 2: {
+erewrite srng_summation_eq_compat. 2: {
   intros k Hk.
   now apply srng_mul_summation_distr_l.
 }
 cbn - [ iter_seq ].
 rewrite srng_summation_summation_exch'; [ | easy ].
-apply srng_summation_eq_compat; [ easy | ].
+apply srng_summation_eq_compat.
 intros k Hk.
-erewrite srng_summation_eq_compat; [ | easy | ]. 2: {
+erewrite srng_summation_eq_compat. 2: {
   intros l Hl.
   now rewrite srng_mul_assoc.
 }

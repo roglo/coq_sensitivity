@@ -671,7 +671,7 @@ Proof.
 intros.
 unfold polyn_list_convol_mul.
 rewrite srng_summation_rtl; [ | easy ].
-apply srng_summation_eq_compat; [ easy | ].
+apply srng_summation_eq_compat.
 intros j Hj.
 rewrite srng_c_mul_comm.
 rewrite Nat.add_0_r.
@@ -776,7 +776,7 @@ unfold polyn_list_convol_mul.
 apply map_ext_in.
 intros i Hi.
 rewrite srng_summation_rtl; [ | easy ].
-apply srng_summation_eq_compat; [ easy | ].
+apply srng_summation_eq_compat.
 intros j Hj.
 rewrite Nat.add_0_r.
 rewrite Nat_sub_sub_distr; [ | easy ].
@@ -835,7 +835,7 @@ rewrite srng_summation_split_last; [ | apply Nat.le_0_l ].
 rewrite Nat.sub_diag.
 f_equal.
 rewrite srng_summation_succ_succ.
-apply srng_summation_eq_compat; [ easy | ].
+apply srng_summation_eq_compat.
 intros i Hi.
 rewrite Nat.sub_succ, Nat.sub_0_r.
 f_equal.
@@ -862,7 +862,7 @@ apply map_ext_in.
 intros i Hi.
 apply in_seq in Hi.
 destruct (zerop i) as [H| H]; [ flia Hi H | ].
-apply srng_summation_eq_compat; [ easy | ].
+apply srng_summation_eq_compat.
 intros j Hj.
 now rewrite Nat_sub_sub_swap.
 Qed.
@@ -1072,7 +1072,7 @@ assert
      polyn_list_convol_mul la lb i =
      polyn_list_convol_mul (la ++ [0%Srng]) lb i). {
   unfold polyn_list_convol_mul.
-  apply srng_summation_eq_compat; [ easy | ].
+  apply srng_summation_eq_compat.
   intros j Hj.
   destruct (lt_dec j (length la)) as [Hjla| Hjla]. {
     now rewrite app_nth1.
@@ -1373,7 +1373,7 @@ f_equal. {
   apply list_polyn_nth_add.
 }
 replace i with (S i - 1) at 1 2 by flia.
-apply srng_summation_eq_compat; [ easy | ].
+apply srng_summation_eq_compat.
 intros j Hj.
 now rewrite list_polyn_nth_add.
 Qed.
@@ -1390,7 +1390,7 @@ cbn - [ nth sub ].
 rewrite IHlen; f_equal.
 unfold polyn_list_convol_mul.
 rewrite <- srng_summation_add_distr; [ | easy ].
-apply srng_summation_eq_compat; [ easy | ]; intros j (_, Hj).
+apply srng_summation_eq_compat; intros j (_, Hj).
 now rewrite srng_mul_add_distr_l.
 Qed.
 
@@ -1681,7 +1681,7 @@ Theorem srng_summation_mul_polyn_list_nth_map_list_convol_mul : ∀ la lb lc k,
        List.nth j lb 0 * List.nth (k - i - j) lc 0)%Rng.
 Proof.
 intros la lb lc k.
-apply srng_summation_eq_compat; [ easy | ].
+apply srng_summation_eq_compat.
 intros i (_, Hi).
 f_equal.
 now rewrite list_nth_polyn_list_convol_mul.
@@ -1700,7 +1700,7 @@ Theorem srng_summation_mul_polyn_list_nth_map_list_convol_mul_2 : ∀ la lb lc k
 Proof.
 intros la lb lc k.
 rewrite srng_summation_rtl; [ | easy ].
-apply srng_summation_eq_compat; [ easy | ].
+apply srng_summation_eq_compat.
 intros i (_, Hi).
 rewrite Nat.add_0_r.
 f_equal.
@@ -1830,9 +1830,9 @@ destruct (lt_dec k len) as [Hklen| Hklen]. {
   rewrite <- srng_summation_summation_mul_swap.
   rewrite srng_summation_summation_exch; [ | easy ].
   rewrite srng_summation_summation_shift; [ | easy ].
-  apply srng_summation_eq_compat; [ easy | ].
+  apply srng_summation_eq_compat.
   intros i Hi.
-  apply srng_summation_eq_compat; [ easy | ].
+  apply srng_summation_eq_compat.
   intros j Hj.
   rewrite srng_c_mul_comm, srng_mul_assoc.
   rewrite Nat.add_comm, Nat.add_sub.
@@ -3335,7 +3335,7 @@ rewrite seq_nth; [ | easy ].
 rewrite (Nat.add_1_l i).
 unfold polyn_list_convol_mul.
 rewrite srng_summation_split_first; [ | easy | apply Nat.le_0_l ].
-erewrite srng_summation_eq_compat; [ | easy | ]. 2: {
+erewrite srng_summation_eq_compat. 2: {
   intros j Hj.
   rewrite (List_map_nth_in _ 0). 2: {
     rewrite seq_length.
