@@ -2575,6 +2575,11 @@ cbn in Has, Hbs, Hcs; clear H.
 injection Has; clear Has; intros Has.
 injection Hbs; clear Hbs; intros Hbs.
 injection Hcs; clear Hcs; intros Hcs.
+(**)
+erewrite List_fold_left_ext_in. 2: {
+  intros k M Hk.
+Search (_ * Σ (_ = _, _), _)%Rng.
+...
 replace
   (fold_left
      (λ (acc : bmatrix T) (j0 : nat),
