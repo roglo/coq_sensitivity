@@ -2588,14 +2588,13 @@ with
      (λ (acc : bmatrix T) (j0 : nat),
         (acc +
          fold_left
-           (λ acc0 j1, acc0 + fa i j0 * fb j0 j1 * fc j1 j)
+           (λ acc0 j1, acc0 + fa i j0 * (fb j0 j1 * fc j1 j))
            (seq 0 size) (bmat_zero_like (fb 0 0)))%BM) 
      (seq 0 size) (bmat_zero_like (fa 0 0))). 2: {
   apply List_fold_left_ext_in.
   intros k M Hk.
   f_equal.
   apply in_seq in Hk.
-(**)
   cbn in Hk; destruct Hk as (_, Hk).
   specialize (Ha i k Hi Hk) as Haik.
   assert (Hbz : is_square_bmat_loop sizes (fb 0 0)). {
@@ -2710,6 +2709,76 @@ with
   remember (S size) as ss; cbn; subst ss.
   do 2 rewrite fold_left_app.
   remember (S size) as ss; cbn; subst ss.
+  rewrite IHsize; cycle 1. {
+    intros l Hl; apply Hbk; flia Hl.
+  } {
+    intros l Hl; apply Hcj; flia Hl.
+  } {
+    intros l Hl; apply Hbks; flia Hl.
+  } {
+    intros l Hl; apply Hcjs; flia Hl.
+  }
+  symmetry.
+  apply bmat_mul_add_distr_l.
+  exists sizes.
+  intros BM HBM.
+  unfold is_square_bmat.
+  destruct HBM as [H| HBM]; [ subst BM | ]. {
+    now rewrite <- Haiks in Haik.
+  }
+  destruct HBM as [H| HBM]; [ subst BM | ]. {
+    rewrite sizes_of_bmatrix_fold_left. 2: {
+      intros l Hl.
+      rewrite sizes_of_bmat_zero_like.
+      rewrite sizes_of_bmatrix_mul; cycle 1. {
+        unfold is_square_bmat.
+        rewrite Hbks; [ | flia Hl ].
+        apply Hbk; flia Hl.
+      } {
+        unfold is_square_bmat.
+        rewrite Hcjs; [ | flia Hl ].
+        apply Hcj; flia Hl.
+      } {
+        rewrite Hbks; [ | flia Hl ].
+        rewrite Hcjs; [ easy | flia Hl ].
+      }
+      rewrite Hbks; [ easy | flia Hl ].
+    }
+    rewrite sizes_of_bmat_zero_like.
+    split; [ | easy ].
+    rewrite Hbs.
+    clear IHsize.
+    induction size. {
+      cbn.
+...
+    split; [ | easy ].
+    rewrite Hbs.
+    now apply is_square_bmat_loop_zero_like.
+  }
+      destruct HBM as [H| ]; [ | easy ].
+      subst BM.
+      rewrite sizes_of_bmatrix_mul; cycle 1. {
+        unfold is_square_bmat.
+        rewrite Hbks; [ | flia ].
+        apply Hbk; flia.
+      } {
+        unfold is_square_bmat.
+        rewrite Hcjs; [ | flia ].
+        apply Hcj; flia.
+      } {
+        rewrite Hbks; [ | flia ].
+        rewrite Hcjs; [ easy | flia ].
+      }
+      rewrite Hbks; [ | flia ].
+      split; [ | easy ].
+      apply is_square_bmat_loop_mul; [ apply Hbk; flia | ].
+      apply Hcj; flia.
+    }
+    rewrite IHMAik with (sizes := sizes). 2: {
+      intros BM HBM.
+      destruct HBM as [H| HBM]. {
+        subst BM.
+  intros
 ...
   rewrite IHsize.
 ...
