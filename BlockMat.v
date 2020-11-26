@@ -2640,12 +2640,27 @@ with
       rewrite sizes_of_bmat_zero_like.
       rewrite Hbs.
       split; [ | easy ].
+      rewrite Has in Ha.
       rewrite Hbs in Hb.
       rewrite Hcs in Hc.
-      clear IHMA Ha (*Hc*) Hi (*Hj Hk*).
-      induction size. {
+...
+      assert (H : ∀ j, j < size → is_square_bmat_loop sizes (fa i j)). {
+        intros l Hl.
+        apply Ha; [ easy | flia Hl ].
+      }
+      move H before Ha; clear Ha; rename H into Ha.
+      assert (H : ∀ i, i < size → is_square_bmat_loop sizes (fb i j)). {
+        intros l Hl.
+        apply Hb; [ flia Hl | easy ].
+      }
+      move H before Hb; clear Hb; rename H into Hb.
+      clear IHMA (*Ha Hc Hi Hj Hk*).
+      clear MB' MC'.
+      revert i j Ha Hb Hi Hj.
+      induction size; intros. {
         cbn.
         apply is_square_bmat_loop_zero_like.
+        apply Hb.
         apply Hb; flia.
       }
       rewrite List_seq_succ_r.
