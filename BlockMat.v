@@ -2641,6 +2641,25 @@ with
       rewrite sizes_of_bmat_zero_like.
       rewrite Hbs.
       split; [ | easy ].
+      rewrite Hbs in Hb.
+      rewrite Hcs in Hc.
+      clear IHMA Ha (*Hc*) Hi (*Hj Hk*).
+      induction size. {
+        cbn.
+        apply is_square_bmat_loop_zero_like.
+        apply Hb; flia.
+      }
+      rewrite List_seq_succ_r.
+      rewrite fold_left_app; cbn.
+      set (MD := (fold_left (λ (acc0 : bmatrix T) (j1 : nat), acc0 + fb k j1 * fc j1 j) (seq 0 size) (bmat_zero_like (fb 0 0)))%BM) in IHsize |-*.
+      apply is_square_bmat_loop_add. 2: {
+        apply is_square_bmat_loop_mul. {
+          apply Hb; [ easy | flia ].
+        }
+        apply Hc; [ flia | easy ].
+      } {
+        apply IHsize.
+(* crotte *)
 ...
   apply IHMA with (sizes := sizes); [ flia Hk | easy | ].
   rewrite <- Has in Ha.
