@@ -2624,7 +2624,7 @@ with
   specialize (IHMA i k Hi Hk) as IHMAik.
   remember (fa i k) as faik; clear Heqfaik.
   destruct size; [ easy | ].
-  clear - sp IHMAik Haik Hbk Hcj Haiks Hbks Hcjs Hbz Hbs.
+  clear - sp scp IHMAik Haik Hbk Hcj Haiks Hbks Hcjs Hbz Hbs.
   revert j k Hbk Hcj Hbks Hcjs.
   induction size; intros. {
     cbn.
@@ -2643,6 +2643,75 @@ with
       }
       destruct HBM as [H| ]; [ | easy ].
       subst BM.
+      rewrite sizes_of_bmatrix_mul; cycle 1. {
+        unfold is_square_bmat.
+        rewrite Hbks; [ | flia ].
+        apply Hbk; flia.
+      } {
+        unfold is_square_bmat.
+        rewrite Hcjs; [ | flia ].
+        apply Hcj; flia.
+      } {
+        rewrite Hbks; [ | flia ].
+        rewrite Hcjs; [ easy | flia ].
+      }
+      rewrite Hbks; [ | flia ].
+      split; [ | easy ].
+      apply is_square_bmat_loop_mul; [ apply Hbk; flia | ].
+      apply Hcj; flia.
+    }
+    rewrite IHMAik with (sizes := sizes). 2: {
+      intros BM HBM.
+      destruct HBM as [H| HBM]. {
+        subst BM.
+        unfold is_square_bmat.
+        now rewrite Haiks.
+      }
+      destruct HBM as [H| HBM]. {
+        subst BM.
+        unfold is_square_bmat.
+        rewrite Hbks; [ | flia ].
+        split; [ | easy ].
+        apply Hbk; flia.
+      } {
+        destruct HBM as [H| ]; [ | easy ].
+        subst BM.
+        unfold is_square_bmat.
+        rewrite Hcjs; [ | flia ].
+        split; [ | easy ].
+        apply Hcj; flia.
+      }
+    }
+    f_equal.
+    rewrite <- bmat_zero_like_mul_distr_r. 2: {
+      unfold is_square_bmat.
+      now rewrite Haiks.
+    }
+    rewrite bmat_zero_like_mul; cycle 1. {
+      unfold is_square_bmat.
+      now rewrite Haiks.
+    } {
+      unfold is_square_bmat.
+      now rewrite Hbs.
+    } {
+      congruence.
+    }
+    apply bmat_zero_like_eq_compat. {
+      unfold is_square_bmat.
+      now rewrite Hbs.
+    } {
+      unfold is_square_bmat.
+      now rewrite Haiks.
+    } {
+      congruence.
+    }
+  }
+  rewrite List_seq_succ_r.
+  remember (S size) as ss; cbn; subst ss.
+  do 2 rewrite fold_left_app.
+  remember (S size) as ss; cbn; subst ss.
+...
+  rewrite IHsize.
 ...
         rewrite Hbks.
         rewrite sizes_of_bmat_zero_like.
