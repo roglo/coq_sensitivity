@@ -2575,7 +2575,6 @@ cbn in Has, Hbs, Hcs; clear H.
 injection Has; clear Has; intros Has.
 injection Hbs; clear Hbs; intros Hbs.
 injection Hcs; clear Hcs; intros Hcs.
-...
 replace
   (fold_left
      (λ (acc : bmatrix T) (j0 : nat),
@@ -2595,7 +2594,6 @@ with
   apply List_fold_left_ext_in.
   intros k M Hk.
   f_equal.
-(**)
   apply in_seq in Hk.
   symmetry.
   clear Hcsb.
