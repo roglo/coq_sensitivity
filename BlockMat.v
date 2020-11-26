@@ -2576,9 +2576,21 @@ injection Has; clear Has; intros Has.
 injection Hbs; clear Hbs; intros Hbs.
 injection Hcs; clear Hcs; intros Hcs.
 (**)
+replace size with (S (size - 1) - 0).
 erewrite List_fold_left_ext_in. 2: {
   intros k M Hk.
-Search (_ * Σ (_ = _, _), _)%Rng.
+  rewrite fold_iter_seq.
+  easy.
+}
+rewrite fold_iter_seq.
+symmetry.
+erewrite List_fold_left_ext_in. 2: {
+  intros k M Hk.
+  rewrite fold_iter_seq.
+  easy.
+}
+do 2 rewrite fold_iter_seq.
+symmetry.
 ...
 replace
   (fold_left
