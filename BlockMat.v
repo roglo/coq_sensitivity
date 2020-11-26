@@ -2575,6 +2575,7 @@ cbn in Has, Hbs, Hcs; clear H.
 injection Has; clear Has; intros Has.
 injection Hbs; clear Hbs; intros Hbs.
 injection Hcs; clear Hcs; intros Hcs.
+...
 replace
   (fold_left
      (λ (acc : bmatrix T) (j0 : nat),
