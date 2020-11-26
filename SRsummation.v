@@ -266,19 +266,29 @@ rewrite fold_left_srng_add_fun_from_0.
 now rewrite Nat.add_succ_comm.
 Qed.
 
-Theorem srng_mul_summation_distr_l : ∀ a b e f,
-  (a * (Σ (i = b, e), f i) = Σ (i = b, e), a * f i)%Srng.
+Theorem mul_iter_seq_distr_l : ∀ A a b e f (add mul : A → A → A) d
+    (mul_add_distr_l : ∀ x y z, mul x (add y z) = add (mul x y) (mul x z)),
+  mul a (iter_seq b e (λ c i, add c (f i)) d) =
+  iter_seq b e (λ c i, add c (mul a (f i))) (mul a d).
 Proof.
 intros.
 unfold iter_seq.
 remember (S e - b) as n eqn:Hn.
-revert e a b Hn.
-induction n; intros; [ apply srng_mul_0_r | cbn ].
-do 2 rewrite srng_add_0_l.
-rewrite fold_left_srng_add_fun_from_0; symmetry.
-rewrite fold_left_srng_add_fun_from_0; symmetry.
-rewrite srng_mul_add_distr_l.
-rewrite (IHn e); [ easy | flia Hn ].
+clear e Hn.
+revert a b d.
+induction n; intros; [ easy | ].
+rewrite List_seq_succ_r.
+do 2 rewrite fold_left_app; cbn.
+rewrite <- IHn.
+apply mul_add_distr_l.
+Qed.
+
+Theorem srng_mul_summation_distr_l : ∀ a b e f,
+  (a * (Σ (i = b, e), f i) = Σ (i = b, e), a * f i)%Srng.
+Proof.
+intros.
+rewrite mul_iter_seq_distr_l; [ | apply srng_mul_add_distr_l ].
+now rewrite srng_mul_0_r.
 Qed.
 
 Theorem srng_mul_summation_distr_r : ∀ a b e f,
