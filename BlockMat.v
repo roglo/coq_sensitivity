@@ -2591,14 +2591,64 @@ erewrite List_fold_left_ext_in. 2: {
 }
 do 2 rewrite fold_iter_seq.
 symmetry.
-(**)
 erewrite iter_seq_eq_compat. 2: {
   intros k Hk.
+  assert (Hk' : k < size) by flia Hk Hi.
+  clear Hk; rename Hk' into Hk.
+  assert (Haiks : sizes_of_bmatrix (fa i k) = sizes). {
+    rewrite (@sizes_of_bmatrix_at_0_0 _ size); [ easy | | easy | flia Hi Hk ].
+    now rewrite <- Has in Ha.
+  }
+  assert (Hbz : is_square_bmat_loop sizes (fb 0 0)). {
+    intros; apply Hb; flia Hk.
+  }
+  specialize (Ha i k Hi Hk) as Haik.
+  replace
+    (fa i k *
+     iter_seq 0 (size - 1) (λ a l, a + fb k l * fc l j)
+       (bmat_zero_like (fb 0 0)))%BM
+  with
+    (iter_seq 0 (size - 1) (λ a l, a + fa i k * (fb k l * fc l j))
+       (bmat_zero_like (fb 0 0)))%BM. 2: {
+    unfold iter_seq.
+    rewrite Nat.sub_0_r.
+    replace (S (size - 1)) with size by flia Hi.
+    clear Hcsb Hi Hj Hk.
+    induction size. {
+      cbn.
+      rewrite <- bmat_zero_like_mul_distr_r. 2: {
+        unfold is_square_bmat.
+        now rewrite Haiks.
+      }
+      rewrite bmat_zero_like_mul; [ | | | congruence ]; cycle 1. {
+        now unfold is_square_bmat; rewrite Haiks.
+      } {
+        now unfold is_square_bmat; rewrite Hbs.
+      }
+      apply bmat_zero_like_eq_compat; [ | | congruence ]. {
+        now unfold is_square_bmat; rewrite Hbs.
+      } {
+        now unfold is_square_bmat; rewrite Haiks.
+      }
+    }
+    rewrite List_seq_succ_r.
+    do 2 rewrite fold_left_app; cbn.
+    rewrite IHsize; cycle 1. {
+      intros i' j' Hi' Hj' MB MC sizes' HBM.
+      apply IHMA with (sizes := sizes'); [ flia Hi' | flia Hj' | easy ].
+    } {
+      intros i' j' Hi' Hj'.
+      apply Ha; [ flia Hi' | flia Hj' ].
+    } {
+      intros i' j' Hi' Hj'.
+      apply Hb; [ flia Hi' | flia Hj' ].
+    } {
+      intros i' j' Hi' Hj'.
+      apply Hc; [ flia Hi' | flia Hj' ].
+    }
+    rewrite IHMA with (sizes := sizes).
 ...
-  rewrite mul_iter_seq_distr_l; [ easy | ].
-  intros y z.
-  apply bmat_mul_add_distr_l.
-...
+*)
 replace
   (fold_left
      (λ (acc : bmatrix T) (j0 : nat),
@@ -2706,6 +2756,7 @@ with
       }
     }
     f_equal.
+(*1*)
     rewrite <- bmat_zero_like_mul_distr_r. 2: {
       unfold is_square_bmat.
       now rewrite Haiks.
