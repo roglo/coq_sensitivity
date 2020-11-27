@@ -20,11 +20,13 @@ Context {ro : ring_op T}.
 Context (so : semiring_op T).
 Context {sp : semiring_prop T}.
 Context {rp : ring_prop T}.
+Context {scp : sring_comm_prop T}.
 Context {sdp : sring_dec_prop T}.
 Context {acp : algeb_closed_prop}.
 Existing Instance polyn_semiring_op.
 Existing Instance polyn_ring_op.
 Existing Instance polyn_semiring_prop.
+Existing Instance polyn_sring_comm_prop.
 Existing Instance polyn_ring_prop.
 
 (* convertion matrix → matrix with monomials *)
@@ -202,14 +204,14 @@ induction l as [| m]; intros. {
   cbn.
   destruct (lt_dec j i) as [Hji| Hji]. {
     destruct (Nat.eq_dec (k + 1) j) as [Hkj| Hkj]. {
-      rewrite polyn_mul_1_r; [ | easy ].
+      rewrite polyn_mul_1_r; [ | easy | easy ].
       rewrite polyn_degree_1; [ easy | easy | ].
       rewrite polyn_degree_opp.
       now rewrite polyn_degree_of_const.
     }
     unfold polyn_of_const.
     rewrite polyn_of_list_0.
-    rewrite polyn_mul_0_r; [ | easy ].
+    rewrite polyn_mul_0_r; [ | easy | easy ].
     rewrite polyn_add_0_l.
     rewrite polyn_degree_opp.
     rewrite fold_polyn_of_const.
@@ -217,14 +219,14 @@ induction l as [| m]; intros. {
     apply Nat.le_0_l.
   }
   destruct (Nat.eq_dec (k + 1) (j + 1)) as [Hkj| Hkj]. {
-    rewrite polyn_mul_1_r; [ | easy ].
+    rewrite polyn_mul_1_r; [ | easy | easy ].
     rewrite polyn_degree_1; [ easy | easy | ].
     rewrite polyn_degree_opp.
     now rewrite polyn_degree_of_const.
   }
   unfold polyn_of_const.
   rewrite polyn_of_list_0.
-  rewrite polyn_mul_0_r; [ | easy ].
+  rewrite polyn_mul_0_r; [ | easy | easy ].
   rewrite polyn_add_0_l.
   rewrite polyn_degree_opp.
   rewrite fold_polyn_of_const.
@@ -266,7 +268,7 @@ cbn - [ iter_seq polyn_degree xI_sub_M ].
 apply Max_lub_le.
 intros j (_, Hj).
 move j before i.
-rewrite <- polyn_mul_assoc; [ | easy | easy ].
+rewrite <- polyn_mul_assoc; [ | easy | easy | easy ].
 etransitivity; [ now apply polyn_degree_mul_le | ].
 rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
 etransitivity; [ now apply polyn_degree_mul_le | ].
@@ -291,7 +293,7 @@ cbn - [ iter_seq polyn_degree xI_sub_M ].
 apply Max_lub_le.
 intros j (_, Hj).
 move j before i.
-rewrite <- polyn_mul_assoc; [ | easy | easy ].
+rewrite <- polyn_mul_assoc; [ | easy | easy | easy ].
 etransitivity; [ now apply polyn_degree_mul_le | ].
 rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
 etransitivity; [ now apply polyn_degree_mul_le | ].
@@ -330,7 +332,7 @@ cbn - [ iter_seq polyn_degree xI_sub_M ].
 apply Max_lub_le.
 intros k (_, Hk).
 move k before j.
-rewrite <- polyn_mul_assoc; [ | easy | easy ].
+rewrite <- polyn_mul_assoc; [ | easy | easy | easy ].
 etransitivity; [ now apply polyn_degree_mul_le | ].
 rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
 etransitivity; [ now apply polyn_degree_mul_le | ].
@@ -416,7 +418,7 @@ rewrite polyn_degree_lt_add; [ | easy | ]. 2: {
   {
     apply Max_le_compat.
     intros i Hi.
-    rewrite <- polyn_mul_assoc; [ | easy | easy ].
+    rewrite <- polyn_mul_assoc; [ | easy | easy | easy ].
     etransitivity; [ now apply polyn_degree_mul_le | ].
     rewrite polyn_degree_minus_one_pow, Nat.add_0_l.
     etransitivity; [ now apply polyn_degree_mul_le | ].
@@ -428,11 +430,11 @@ rewrite polyn_degree_lt_add; [ | easy | ]. 2: {
     destruct n. {
       cbn in HP; rewrite HP.
       rewrite fold_polyn_of_const.
-      rewrite polyn_mul_1_r; [ | easy ].
+      rewrite polyn_mul_1_r; [ | easy | easy ].
       rewrite polyn_degree_mat_el_xI_sub_M_0_0.
       apply Nat.lt_0_1.
     }
-    rewrite polyn_degree_mul; [ | easy | ]. 2: {
+    rewrite polyn_degree_mul; [ | easy | easy | ]. 2: {
       rewrite polyn_degree_mat_el_xI_sub_M_0_0.
       rewrite polyn_coeff_mat_el_xI_sub_M_0_0, srng_mul_1_l.
       apply polyn_highest_coeff_neq_0.
@@ -442,7 +444,7 @@ rewrite polyn_degree_lt_add; [ | easy | ]. 2: {
     flia.
   }
   intros i Hi.
-  rewrite polyn_degree_mul; [ | easy | ]. 2: {
+  rewrite polyn_degree_mul; [ | easy | easy | ]. 2: {
     rewrite polyn_degree_mat_el_xI_sub_M_0_0.
     rewrite polyn_coeff_mat_el_xI_sub_M_0_0, srng_mul_1_l.
     apply polyn_highest_coeff_neq_0.
@@ -453,7 +455,7 @@ rewrite polyn_degree_lt_add; [ | easy | ]. 2: {
   apply Nat.lt_succ_r.
   apply polyn_degree_det_loop_subm_xI_sub_M_le.
 }
-rewrite polyn_degree_mul; [ | easy | ]. 2: {
+rewrite polyn_degree_mul; [ | easy | easy | ]. 2: {
   rewrite polyn_degree_mat_el_xI_sub_M_0_0.
   rewrite polyn_coeff_mat_el_xI_sub_M_0_0.
   rewrite srng_mul_1_l.
@@ -511,7 +513,7 @@ rewrite polyn_coeff_overflow. 2: {
   apply polyn_degree_det_loop_subm_xI_sub_M_le.
 }
 rewrite srng_add_0_l.
-rewrite polyn_coeff_mul; [ | easy ].
+rewrite polyn_coeff_mul; [ | easy | easy ].
 rewrite srng_summation_split_first; [ | easy | apply Nat.le_0_l ].
 rewrite Nat.sub_0_r.
 rewrite srng_summation_split_first; [ | easy | flia ].

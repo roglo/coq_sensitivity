@@ -20,7 +20,9 @@ Definition Z_semiring_prop : semiring_prop Z :=
   {| srng_add_comm := Z.add_comm;
      srng_add_assoc := Z.add_assoc;
      srng_add_0_l := Z.add_0_l;
+(*
      srng_mul_comm := Z.mul_comm;
+*)
      srng_mul_assoc := Z.mul_assoc;
      srng_mul_1_l := Z.mul_1_l;
      srng_mul_add_distr_l := Z.mul_add_distr_l;

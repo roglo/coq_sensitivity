@@ -267,7 +267,7 @@ now rewrite Nat.add_succ_comm.
 Qed.
 
 Theorem mul_iter_seq_distr_l : ∀ A a b e f (add mul : A → A → A) d
-    (mul_add_distr_l : ∀ x y z, mul x (add y z) = add (mul x y) (mul x z)),
+    (mul_add_distr_l : ∀ y z, mul a (add y z) = add (mul a y) (mul a z)),
   mul a (iter_seq b e (λ c i, add c (f i)) d) =
   iter_seq b e (λ c i, add c (mul a (f i))) (mul a d).
 Proof.
@@ -275,7 +275,7 @@ intros.
 unfold iter_seq.
 remember (S e - b) as n eqn:Hn.
 clear e Hn.
-revert a b d.
+revert b d.
 induction n; intros; [ easy | ].
 rewrite List_seq_succ_r.
 do 2 rewrite fold_left_app; cbn.

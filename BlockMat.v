@@ -2594,8 +2594,9 @@ symmetry.
 (**)
 erewrite iter_seq_eq_compat. 2: {
   intros k Hk.
+...
   rewrite mul_iter_seq_distr_l; [ easy | ].
-  intros x y z.
+  intros y z.
   apply bmat_mul_add_distr_l.
 ...
 replace
