@@ -1046,6 +1046,7 @@ Fixpoint srng_of_nat n :=
   | S n' => (1 + srng_of_nat n')%Srng
   end.
 
+(* A² = nI in matrices (instead of block matrices) *)
 Theorem lemma_2_A_n_2_eq_n_I' : ∀ n,
   (mat_of_squ_bmat (mA n) * mat_of_squ_bmat (mA n) =
    srng_of_nat n × mat_of_squ_bmat (I_2_pow n))%M.
