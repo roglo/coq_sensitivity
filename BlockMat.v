@@ -4108,6 +4108,7 @@ destruct A as [xa| MA]; [ easy | ].
 destruct B as [xb| MB]; [ easy | ].
 cbn - [ iter_seq ] in HAB |-*.
 injection HAB; clear HAB; intros HAB.
+cbn in Has, Hbs, Ha, Hb.
 destruct (zerop (mat_nrows MAB)) as [Hzrab| Hzrab]. {
   cbn - [ iter_seq ].
   rewrite <- HAB in Hzrab; cbn in Hzrab.
@@ -4126,16 +4127,110 @@ destruct (zerop (mat_nrows MA)) as [Hzra| Hzra]. {
 }
 cbn - [ iter_seq ].
 destruct (zerop (mat_ncols MAB)) as [Hzcab| Hzcab]. {
-  cbn - [ iter_seq ].
+  exfalso.
   rewrite <- HAB in Hzcab; cbn in Hzcab.
-  rewrite Hzcab.
+  rewrite Hzcab in Hbs; cbn in Hbs.
+  now destruct (zerop (mat_nrows MB)).
+}
+cbn - [ iter_seq ].
+rewrite <- HAB in Hzrab, Hzcab.
+cbn in Hzrab, Hzcab.
+destruct (zerop (mat_ncols MA)) as [Hzna| Hzna]. {
   cbn - [ iter_seq ].
-...
-  symmetry.
-  apply all_0_srng_summation_0; [ easy | ].
+  rewrite all_0_srng_summation_0; [ easy | easy | ].
   intros k Hk.
   apply srng_mul_0_l.
 }
+cbn in Has, Ha.
+destruct Ha as (_ & Hacr & Ha).
+injection Has; clear Has; intros Has Hras.
+destruct (zerop (mat_nrows MB)) as [Hzrb| Hzrb]; [ easy | ].
+destruct (zerop (mat_ncols MB)) as [Hzcb| Hzcb]; [ easy | ].
+cbn in Hbs, Hb.
+destruct Hb as (_ & Hbcr & Hb).
+injection Hbs; clear Hbs; intros Hbs Hrbs.
+move Hbs before Has.
+clear Hzrab Hzcab.
+cbn - [ iter_seq ].
+remember (sizes_of_bmatrix (mat_el MAB 0 0)) as sz eqn:Habs.
+rewrite <- HAB in Habs.
+cbn in Habs.
+rewrite Hacr, Hbcr in *.
+rewrite Hras, Hrbs in *.
+rewrite sizes_of_bmatrix_fold_left in Habs. 2: {
+  intros k Hk.
+  rewrite sizes_of_bmatrix_add. 2: {
+    rewrite sizes_of_bmat_zero_like.
+    symmetry.
+    apply sizes_of_bmatrix_mul; [ | | congruence ]. {
+      now unfold is_square_bmat; apply Ha.
+    } {
+      now unfold is_square_bmat; apply Hb.
+    }
+  }
+  rewrite sizes_of_bmat_zero_like.
+  symmetry.
+  rewrite sizes_of_bmatrix_mul; cycle 1. {
+    unfold is_square_bmat.
+    rewrite sizes_of_bmatrix_at_0_0 with (r := size); cycle 1. {
+      now intros; apply Ha.
+    } {
+      easy.
+    } {
+      flia Hk.
+    }
+    apply Ha; [ easy | flia Hk ].
+  } {
+    unfold is_square_bmat.
+    rewrite sizes_of_bmatrix_at_0_0 with (r := size); cycle 1. {
+      now intros; apply Hb.
+    } {
+      flia Hk.
+    } {
+      easy.
+    }
+    apply Hb; [ flia Hk | easy ].
+  } {
+    rewrite sizes_of_bmatrix_at_0_0 with (r := size); cycle 1. {
+      now intros; apply Ha.
+    } {
+      easy.
+    } {
+      flia Hk.
+    }
+    symmetry.
+    rewrite sizes_of_bmatrix_at_0_0 with (r := size); cycle 1. {
+      now intros; apply Hb.
+    } {
+      flia Hk.
+    } {
+      easy.
+    }
+    congruence.
+  } {
+    apply sizes_of_bmatrix_at_0_0 with (r := size). {
+      now intros; apply Ha.
+    } {
+      easy.
+    } {
+      flia Hk.
+    }
+  }
+}
+rewrite Has, Hbs.
+rewrite sizes_of_bmatrix_add in Habs. 2: {
+  rewrite sizes_of_bmat_zero_like.
+  symmetry.
+  apply sizes_of_bmatrix_mul; [ | | congruence ]. {
+    now unfold is_square_bmat; apply Ha.
+  } {
+    now unfold is_square_bmat; apply Hb.
+  }
+}
+rewrite sizes_of_bmat_zero_like, Has in Habs.
+subst sz.
+set (x := (Π (k = 1, length sizes), nth (k - 1) sizes 0)%Rng).
+...
 ...
 destruct size. {
   specialize (no_zero_bmat_size A) as H1.

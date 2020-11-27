@@ -11,6 +11,11 @@ Notation "'Π' ( i = b , e ) , g" :=
   (at level 45, i at level 0, b at level 60, e at level 60) :
      semiring_scope.
 
+Notation "'Π' ( i = b , e ) , g" :=
+  (iter_seq b e (λ c i, (c * g)%Srng) 1%Srng)
+  (at level 45, i at level 0, b at level 60, e at level 60) :
+     ring_scope.
+
 Section in_ring.
 
 Context {T : Type}.

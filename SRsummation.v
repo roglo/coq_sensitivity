@@ -8,7 +8,8 @@ Import List List.ListNotations.
 
 Notation "'Σ' ( i = b , e ) , g" :=
   (iter_seq b e (λ c i, (c + g)%Srng) 0%Srng)
-  (at level 45, i at level 0, b at level 60, e at level 60) : semiring_scope.
+  (at level 45, i at level 0, b at level 60, e at level 60) :
+    semiring_scope.
 
 Notation "'Σ' ( i = b , e ) , g" :=
   (iter_seq b e (λ c i, (c + g)%Rng) 0%Rng)
