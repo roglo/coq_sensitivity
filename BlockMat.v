@@ -2595,6 +2595,7 @@ erewrite iter_seq_eq_compat. 2: {
   intros k Hk.
   assert (Hk' : k < size) by flia Hk Hi.
   clear Hk; rename Hk' into Hk.
+...
   assert (Haiks : sizes_of_bmatrix (fa i k) = sizes). {
     rewrite (@sizes_of_bmatrix_at_0_0 _ size); [ easy | | easy | flia Hi Hk ].
     now rewrite <- Has in Ha.
@@ -2613,24 +2614,9 @@ erewrite iter_seq_eq_compat. 2: {
     unfold iter_seq.
     rewrite Nat.sub_0_r.
     replace (S (size - 1)) with size by flia Hi.
-    clear Hcsb Hi Hj Hk.
-    induction size. {
-      cbn.
-      rewrite <- bmat_zero_like_mul_distr_r. 2: {
-        unfold is_square_bmat.
-        now rewrite Haiks.
-      }
-      rewrite bmat_zero_like_mul; [ | | | congruence ]; cycle 1. {
-        now unfold is_square_bmat; rewrite Haiks.
-      } {
-        now unfold is_square_bmat; rewrite Hbs.
-      }
-      apply bmat_zero_like_eq_compat; [ | | congruence ]. {
-        now unfold is_square_bmat; rewrite Hbs.
-      } {
-        now unfold is_square_bmat; rewrite Haiks.
-      }
-    }
+    clear Hcsb Hj.
+    revert i k Hi Hk Haiks Haik.
+    induction size; intros; [ easy | ].
     rewrite List_seq_succ_r.
     do 2 rewrite fold_left_app; cbn.
     rewrite IHsize; cycle 1. {
@@ -2646,6 +2632,7 @@ erewrite iter_seq_eq_compat. 2: {
       intros i' j' Hi' Hj'.
       apply Hc; [ flia Hi' | flia Hj' ].
     }
+...
     rewrite IHMA with (sizes := sizes).
 ...
 *)
