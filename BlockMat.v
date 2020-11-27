@@ -4099,6 +4099,8 @@ erewrite srng_product_eq_compat in Hlen; cycle 1. {
 cbn - [ iter_seq nth srng_mul srng_one ] in Hlen.
 remember (A * B)%BM as AB eqn:HAB.
 symmetry in HAB.
+...
+revert i j Hi Hj.
 induction AB as [xab| MAB IHAB] using bmatrix_ind2; intros. {
   cbn - [ iter_seq ].
   destruct A as [xa| MA]; [ easy | ].
@@ -4282,6 +4284,8 @@ move Hsz at bottom.
 move HAB at bottom.
 move Hi at bottom.
 move Hj at bottom.
+symmetry in HAB.
+rewrite IHAB.
 ...
 destruct size. {
   specialize (no_zero_bmat_size A) as H1.
