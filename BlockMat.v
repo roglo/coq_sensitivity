@@ -2595,6 +2595,7 @@ erewrite iter_seq_eq_compat. 2: {
   intros k Hk.
   assert (Hk' : k < size) by flia Hk Hi.
   clear Hk; rename Hk' into Hk.
+Abort. (* bon, fait chier
 ...
   assert (Haiks : sizes_of_bmatrix (fa i k) = sizes). {
     rewrite (@sizes_of_bmatrix_at_0_0 _ size); [ easy | | easy | flia Hi Hk ].
@@ -2636,6 +2637,7 @@ erewrite iter_seq_eq_compat. 2: {
     rewrite IHMA with (sizes := sizes).
 ...
 *)
+(*
 replace
   (fold_left
      (λ (acc : bmatrix T) (j0 : nat),
@@ -3031,6 +3033,7 @@ Search (is_square_bmat_loop _ (_ + _)).
 ...
 assert (Hfa00 : is_square_bmat_loop sizes (fa 0 0)). {
 ...
+*)
 
 Theorem is_square_bmat_loop_opp : ∀ (M : bmatrix T) sizes,
   is_square_bmat_loop sizes M → is_square_bmat_loop sizes (- M)%BM.
@@ -3408,13 +3411,12 @@ Fixpoint bmat_el (BM : bmatrix T) i j :=
       end
   end.
 
-Arguments bmat_el BM%BM (i j)%nat.
-
-Definition sqr_bmat_size (BM : bmatrix T) :=
+Definition squ_bmat_size (BM : bmatrix T) :=
   let sl := sizes_of_bmatrix BM in
   (Π (i = 1, length sl), nth (i - 1) sl 0)%Srng.
 
-Arguments sqr_bmat_size BM%BM.
+Arguments bmat_el BM%BM (i j)%nat.
+Arguments squ_bmat_size BM%BM.
 
 Theorem product_bmatrix_sizes_ne_0 : ∀ sizes A,
   sizes = sizes_of_bmatrix A
@@ -3456,7 +3458,7 @@ Qed.
 
 Theorem bmat_el_add : ∀ A B,
   compatible_square_bmatrices [A; B]
-  → ∀ i j, i < sqr_bmat_size A → j < sqr_bmat_size A
+  → ∀ i j, i < squ_bmat_size A → j < squ_bmat_size A
   → bmat_el (A + B) i j = (bmat_el A i j + bmat_el B i j)%Srng.
 Proof.
 intros * Hab * Hi Hj.
@@ -3484,7 +3486,7 @@ destruct B as [xb| MB]. {
   now destruct (zerop (mat_ncols MA)).
 }
 cbn in Hsqb, Hsmb.
-unfold sqr_bmat_size in Hi, Hj.
+unfold squ_bmat_size in Hi, Hj.
 cbn - [ iter_seq srng_mul srng_one ] in Hi, Hj |-*.
 destruct (zerop (mat_nrows MA)) as [Hraz| Hraz]; [ easy | ].
 destruct (zerop (mat_ncols MA)) as [Hcaz| Hcaz]; [ easy | ].
@@ -3586,13 +3588,13 @@ apply IHA with (sz := sizes); [ easy | | | | easy | easy | | ]. {
   rewrite Hsab in Hqsb.
   now apply Hqsb; rewrite Hrbn.
 } {
-  unfold sqr_bmat_size.
+  unfold squ_bmat_size.
   rewrite Hsa, <- Hlen.
   apply Nat.mod_upper_bound.
   rewrite Hlen.
   now apply (product_bmatrix_sizes_ne_0 (mat_el MA 0 0)).
 } {
-  unfold sqr_bmat_size.
+  unfold squ_bmat_size.
   rewrite Hsa, <- Hlen.
   apply Nat.mod_upper_bound.
   rewrite Hlen.
@@ -3797,11 +3799,13 @@ Module square_bmatrix_Notations.
 Declare Scope SBM_scope.
 Delimit Scope SBM_scope with SBM.
 
+Arguments bmat_el {T so} BM%BM (i j)%nat.
 Arguments square_bmatrix {T so} M%BM HM.
 Arguments squ_bmat_zero {T so M%BM HM}.
 Arguments squ_bmat_one {T so M%M HM}.
 Arguments squ_bmat_add {T so M%M HM} MA%SBM MB%SBM.
 Arguments squ_bmat_mul {T so M%M HM} MA%SBM MB%SBM.
+Arguments squ_bmat_size {T} BM%BM.
 Arguments compatible_square_bmatrices_bool {T so} BML%SBM.
 
 Notation "0" := (squ_bmat_zero) : SBM_scope.
@@ -3916,8 +3920,7 @@ Definition squ_bmat_semiring_prop_for M HM :
 ... à compléter quand il y aura bien tous les théorèmes
 *)
 
-...
-
+(*
 Theorem bmat_el_summation : ∀ b e i j f
   (bso := squ_bmat_semiring_op_for (f b)),
   b ≤ e
@@ -3993,8 +3996,6 @@ rewrite fold_left_srng_add_fun_from_0.
   exists (sizes_of_bmatrix
 
 cbn.
-
-
 remember (fold_left (λ c k, c + f k) (seq b len) (bmat_zero_like (f b)))%Rng as A.
 remember (f (b + len)) as B eqn:HB.
 About bmat_el_add.
@@ -4007,43 +4008,43 @@ rewrite H1.
 ...
 *)
 
-Definition mat_of_sqr_bmat (BM : bmatrix T) : matrix T :=
-  mk_mat (bmat_el BM) (sqr_bmat_size BM) (sqr_bmat_size BM).
+Definition mat_of_squ_bmat (BM : bmatrix T) : matrix T :=
+  mk_mat (bmat_el BM) (squ_bmat_size BM) (squ_bmat_size BM).
 
-Arguments mat_of_sqr_bmat BM%BM.
+Arguments mat_of_squ_bmat BM%BM.
 
-Theorem sqr_bmat_size_mul : ∀ BMA BMB,
+Theorem squ_bmat_size_mul : ∀ BMA BMB,
   is_square_bmat BMA
   → is_square_bmat BMB
   → sizes_of_bmatrix BMA = sizes_of_bmatrix BMB
-  → sqr_bmat_size (BMA * BMB) = sqr_bmat_size BMA.
+  → squ_bmat_size (BMA * BMB) = squ_bmat_size BMA.
 Proof.
 intros * Ha Hb Hab.
-unfold sqr_bmat_size.
+unfold squ_bmat_size.
 now rewrite sizes_of_bmatrix_mul.
 Qed.
 
-Theorem mat_of_sqr_bmat_mul : ∀ A B,
+Theorem mat_of_squ_bmat_mul : ∀ A B,
   is_square_bmat A
   → is_square_bmat B
   → sizes_of_bmatrix A = sizes_of_bmatrix B
-  → mat_of_sqr_bmat (A * B) = (mat_of_sqr_bmat A * mat_of_sqr_bmat B)%M.
+  → mat_of_squ_bmat (A * B) = (mat_of_squ_bmat A * mat_of_squ_bmat B)%M.
 Proof.
 intros * Ha Hb Hab.
 apply matrix_eq. {
   cbn - [ iter_seq ].
-  unfold sqr_bmat_size.
+  unfold squ_bmat_size.
   now rewrite sizes_of_bmatrix_mul.
 } {
   cbn - [ iter_seq ].
-  unfold sqr_bmat_size.
+  unfold squ_bmat_size.
   rewrite sizes_of_bmatrix_mul; [ | easy | easy | easy ].
   now rewrite Hab.
 }
 cbn - [ iter_seq ].
 intros i j Hi Hj.
-rewrite sqr_bmat_size_mul in Hi; [ | easy | easy | easy ].
-unfold sqr_bmat_size.
+rewrite squ_bmat_size_mul in Hi; [ | easy | easy | easy ].
+unfold squ_bmat_size.
 remember (sizes_of_bmatrix A) as sz eqn:Has.
 rename Hab into Hbs.
 (**)
@@ -4069,17 +4070,24 @@ remember (Π (i0 = 1, length (size :: sz)), nth (i0 - 1) (size :: sz) 0)%Srng
 rewrite srng_product_split_first in Hlen; cycle 1. {
   apply nat_semiring_prop.
 } {
+  apply nat_sring_comm_prop.
+} {
   cbn; flia.
 }
 rewrite Nat.sub_diag in Hlen.
 unfold nth in Hlen at 1.
-erewrite srng_product_eq_compat in Hlen; [ | apply nat_semiring_prop | ]. 2: {
+erewrite srng_product_eq_compat in Hlen; cycle 1. {
+  apply nat_semiring_prop.
+} {
+  apply nat_sring_comm_prop.
+} {
   intros k Hk.
   replace (k - 1) with (S (k - 2)) by flia Hk.
   cbn; easy.
 }
 rewrite List_length_cons in Hlen.
 rewrite iter_succ_succ in Hlen.
+...
 erewrite srng_product_eq_compat in Hlen; [ | apply nat_semiring_prop | ]. 2: {
   intros k Hk.
   now rewrite Nat.sub_succ.
@@ -4094,7 +4102,7 @@ destruct A as [xa| MA]; [ easy | ].
 destruct B as [xb| MB]; [ easy | ].
 cbn - [ iter_seq srng_mul srng_one ].
 cbn - [ iter_seq ] in Ha, Hb, Has, Hbs.
-unfold sqr_bmat_size in Hi, Hj.
+unfold squ_bmat_size in Hi, Hj.
 cbn - [ iter_seq srng_mul srng_one ] in Hi, Hj.
 destruct (zerop (mat_nrows MA)) as [Hraz| Hraz]; [ easy | ].
 destruct (zerop (mat_ncols MA)) as [Hcaz| Hcaz]; [ easy | ].
@@ -4303,9 +4311,9 @@ Definition ex :=
           [46;47;48;49;50]; [51;52;53;54;55]]))]]).
 Compute (sizes_of_bmatrix ex).
 Compute (list_list_of_bmat ex).
-Compute (let n := sqr_bmat_size ex in map (λ i, map (λ j, bmat_el ex i j) (seq 0 n)) (seq 0 n)).
-Compute (list_list_of_mat (mat_of_sqr_bmat ex)).
-Compute (sqr_bmat_size ex).
+Compute (let n := squ_bmat_size ex in map (λ i, map (λ j, bmat_el ex i j) (seq 0 n)) (seq 0 n)).
+Compute (list_list_of_mat (mat_of_squ_bmat ex)).
+Compute (squ_bmat_size ex).
 *)
 
 End in_ring.
@@ -4322,12 +4330,12 @@ Notation "- A" := (bmat_opp A) : BM_scope.
 
 Arguments bmat_el {T so} BM%BM i%nat j%nat.
 Arguments bmat_nat_mul_l {T so}.
-Arguments mat_of_sqr_bmat {T so} BM%BM.
+Arguments mat_of_squ_bmat {T so} BM%BM.
 Arguments I_2_pow {T so}.
 Arguments Z_2_pow {T so}.
 Arguments IZ_2_pow {T so}.
 Arguments sizes_of_bmatrix_IZ {T so}.
-Arguments sqr_bmat_size {T} BM%BM.
+Arguments squ_bmat_size {T} BM%BM.
 Arguments Tr {T so}.
 
 End bmatrix_Notations.
