@@ -4087,6 +4087,7 @@ erewrite srng_product_eq_compat in Hlen; cycle 1. {
 }
 rewrite List_length_cons in Hlen.
 rewrite iter_succ_succ in Hlen.
+Abort. (* à voir...
 ...
 erewrite srng_product_eq_compat in Hlen; [ | apply nat_semiring_prop | ]. 2: {
   intros k Hk.
@@ -4265,6 +4266,7 @@ specialize (IHMA (i / s1)) as H1.
 replace (mat_ncols MA) with (S (mat_ncols MA - 1) - 0) by flia Hcaz.
 rewrite fold_iter_seq.
 ...
+*)
 
 (*
 End in_ring.
@@ -4318,6 +4320,7 @@ Compute (squ_bmat_size ex).
 
 End in_ring.
 
+(*
 Module bmatrix_Notations.
 
 Declare Scope BM_scope.
@@ -4327,6 +4330,7 @@ Notation "A + B" := (bmat_add A B) : BM_scope.
 Notation "A - B" := (bmat_sub A B) : BM_scope.
 Notation "A * B" := (bmat_mul A B) : BM_scope.
 Notation "- A" := (bmat_opp A) : BM_scope.
+*)
 
 Arguments bmat_el {T so} BM%BM i%nat j%nat.
 Arguments bmat_nat_mul_l {T so}.
@@ -4338,4 +4342,6 @@ Arguments sizes_of_bmatrix_IZ {T so}.
 Arguments squ_bmat_size {T} BM%BM.
 Arguments Tr {T so}.
 
+(*
 End bmatrix_Notations.
+*)

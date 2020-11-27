@@ -21,6 +21,7 @@ Context (so : semiring_op T).
 Context {ro : ring_op T}.
 Context {sp : semiring_prop T}.
 Context {rp : ring_prop T}.
+Context {scp : sring_comm_prop T}.
 Context {sdp : sring_dec_prop T}.
 Context {fo : field_op T}.
 
@@ -114,6 +115,7 @@ destruct j; cbn. {
   apply bmat_zero_like_IZ_eq_Z.
 }
 destruct j; [ | flia Hj ].
+rewrite fold_bmat_zero_like.
 rewrite bmat_zero_like_opp; [ easy | ].
 apply A_is_square_bmat.
 Qed.
@@ -144,18 +146,18 @@ destruct i. {
     cbn.
     rewrite bmat_nat_mul_l_succ; [ | easy ].
     rewrite <- IHn.
-    rewrite bmat_mul_1_r; [ | easy | easy ].
+    rewrite old_bmat_mul_1_r; [ | easy | easy | easy ].
     f_equal.
     rewrite <- bmat_zero_like_sqr; [ | apply A_is_square_bmat ].
     now apply bmat_add_0_l.
   }
   destruct j; [ cbn | flia Hj ].
   rewrite bmat_nat_mul_l_succ; [ | easy ].
-  rewrite bmat_mul_1_r; [ | easy | ]. 2: {
+  rewrite old_bmat_mul_1_r; [ | easy | easy | ]. 2: {
     unfold I_2_pow.
     apply bmat_fit_for_add_IZ_A.
   }
-  rewrite bmat_mul_1_l; [ | easy | ]. 2: {
+  rewrite old_bmat_mul_1_l; [ | easy | ]. 2: {
     unfold I_2_pow.
     transitivity (mA n); [ apply bmat_fit_for_add_IZ_A | ].
     apply bmat_fit_for_add_opp_r.
@@ -171,9 +173,11 @@ destruct i. {
 }
 destruct i; [ | flia Hi ].
 destruct j; cbn. {
-  rewrite bmat_mul_1_l; [ | easy | ]. 2: {
+  rewrite old_bmat_mul_1_l; [ | easy | ]. 2: {
     apply bmat_fit_for_add_IZ_A.
   }
+...
+old_bmat_mul_1_r
   rewrite bmat_mul_1_r; [ | easy | ]. 2: {
     transitivity (mA n); [ | apply bmat_fit_for_add_opp_r ].
     apply bmat_fit_for_add_IZ_A.
