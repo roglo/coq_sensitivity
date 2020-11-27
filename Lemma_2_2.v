@@ -176,9 +176,7 @@ destruct j; cbn. {
   rewrite old_bmat_mul_1_l; [ | easy | ]. 2: {
     apply bmat_fit_for_add_IZ_A.
   }
-...
-old_bmat_mul_1_r
-  rewrite bmat_mul_1_r; [ | easy | ]. 2: {
+  rewrite old_bmat_mul_1_r; [ | easy | easy | ]. 2: {
     transitivity (mA n); [ | apply bmat_fit_for_add_opp_r ].
     apply bmat_fit_for_add_IZ_A.
   }
@@ -191,8 +189,8 @@ old_bmat_mul_1_r
   now apply bmat_zero_like_A_eq_Z.
 }
 destruct j; [ cbn | flia Hj ].
-rewrite bmat_mul_1_l; [ | easy | easy ].
-rewrite bmat_mul_sqr_opp; [ | easy | easy | apply A_is_square_bmat ].
+rewrite old_bmat_mul_1_l; [ | easy | easy ].
+rewrite bmat_mul_sqr_opp; [ | easy | easy | easy | apply A_is_square_bmat ].
 rewrite bmat_nat_mul_l_succ; [ | easy ].
 rewrite <- IHn.
 rewrite bmat_zero_like_A_eq_Z.
@@ -402,7 +400,7 @@ cbn - [ gauss_jordan_step_list ].
 rewrite IHit.
 unfold gauss_jordan_step_op.
 f_equal; cbn.
-rewrite mat_mul_assoc; [ | easy ].
+rewrite mat_mul_assoc; [ | easy | easy ].
 now apply mat_mul_assoc.
 Qed.
 
@@ -446,6 +444,7 @@ Context {ro : ring_op T}.
 Context (so : semiring_op T).
 Context {sp : semiring_prop T}.
 Context {rp : ring_prop T}.
+Context {scp : sring_comm_prop T}.
 Context {sdp : sring_dec_prop T}.
 Context {fo : field_op T}.
 Context {fp : field_prop T}.
@@ -685,7 +684,7 @@ cbn - [ iter_seq ].
 intros i Hi.
 subst V.
 cbn - [ iter_seq ].
-erewrite srng_summation_eq_compat; [ | easy | ]. 2: {
+erewrite srng_summation_eq_compat. 2: {
   intros j Hj.
   rewrite (List_map_nth_in _ 0); [ | rewrite seq_length; flia Hsm Hi Hj ].
   rewrite seq_nth; [ | flia Hsm Hi Hj ].
@@ -800,7 +799,12 @@ split. 2: {
   rewrite gauss_jordan_ncols in Hp.
   destruct (Nat.eq_dec k i) as [Hki| Hki]. {
     subst i; clear Hi.
-    rewrite <- gauss_jordan_list_gauss_jordan in Hp |-*; [ | easy | easy ].
+    rewrite <- gauss_jordan_list_gauss_jordan in Hp |-*; cycle 1. {
+      easy.
+    } {
+      easy.
+    } {
+      easy.
 Abort. (* for the moment...
 ...
 (*trying to prove it just for the upper left number of the matrix*)
@@ -1043,12 +1047,23 @@ Fixpoint srng_of_nat n :=
   end.
 
 Theorem lemma_2_A_n_2_eq_n_I' : ∀ n,
-  (mat_of_sqr_bmat (mA n) * mat_of_sqr_bmat (mA n) =
-   srng_of_nat n × mat_of_sqr_bmat (I_2_pow n))%M.
+  (mat_of_squ_bmat (mA n) * mat_of_squ_bmat (mA n) =
+   srng_of_nat n × mat_of_squ_bmat (I_2_pow n))%M.
 Proof.
 intros.
 specialize (lemma_2_A_n_2_eq_n_I n) as H1.
 ...
+(* I though I could use this theorem, started in BlockMat.v
+   but I cannot finish it up. Anyway, I am not sure it would
+   resolve the problem; it could add one step, but afterwards?
+   I have to think of it
+Theorem mat_of_squ_bmat_mul : ∀ A B,
+  is_square_bmat A
+  → is_square_bmat B
+  → sizes_of_bmatrix A = sizes_of_bmatrix B
+  → mat_of_squ_bmat (A * B) = (mat_of_squ_bmat A * mat_of_squ_bmat B)%M.
+...
+*)
 
 (* here, I would like to prove that, knowing that An^2 = nI, the
    eigenvalues of An are √n and -√n, as the Lemma 2.2. claims *)
@@ -1057,7 +1072,7 @@ Theorem A_eigenvalue : ∀ n μ,
   (μ * μ = srng_of_nat n)%Rng
   → ∃ V,
       V ≠ vect_zero (vect_nrows V) ∧
-      (mat_of_sqr_bmat (mA n) · V = μ × V)%V.
+      (mat_of_squ_bmat (mA n) · V = μ × V)%V.
 Proof.
 intros * Hμ2n.
 specialize (lemma_2_A_n_2_eq_n_I' n) as H1.
