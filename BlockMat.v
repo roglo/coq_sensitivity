@@ -4099,19 +4099,20 @@ erewrite srng_product_eq_compat in Hlen; cycle 1. {
 cbn - [ iter_seq nth srng_mul srng_one ] in Hlen.
 remember (A * B)%BM as AB eqn:HAB.
 symmetry in HAB.
-...
+unfold squ_bmat_size in Hi, Hj.
 revert i j Hi Hj.
 induction AB as [xab| MAB IHAB] using bmatrix_ind2; intros. {
   cbn - [ iter_seq ].
   destruct A as [xa| MA]; [ easy | ].
   now destruct B.
 }
+move IHAB at bottom.
+cbn - [ iter_seq bmat_mul srng_mul srng_one nth bmat_el ] in IHAB.
 destruct A as [xa| MA]; [ easy | ].
 destruct B as [xb| MB]; [ easy | ].
-cbn - [ iter_seq ]. (* in HAB |-*. *)
+cbn - [ iter_seq ].
 injection HAB; clear HAB; intros HAB.
 cbn in Has, Hbs, Ha, Hb.
-unfold squ_bmat_size in Hi, Hj.
 remember (sizes_of_bmatrix (BM_M MA)) as x eqn:Hx.
 cbn in Hx; subst x.
 remember (sizes_of_bmatrix (BM_M MB)) as x eqn:Hx.
@@ -4285,7 +4286,47 @@ move HAB at bottom.
 move Hi at bottom.
 move Hj at bottom.
 symmetry in HAB.
-rewrite IHAB.
+move IHAB at bottom.
+cbn - [ iter_seq bmat_mul srng_mul srng_one nth bmat_el ] in IHAB.
+rewrite IHAB; cycle 1. {
+  rewrite HAB; cbn.
+  ... (* ouais *)
+} {
+  rewrite HAB; cbn.
+  ... (* ouais *)
+} {
+  rewrite HAB; cbn - [ iter_seq ].
+  rewrite Hras, Hbcr.
+  rewrite Hacr.
+  ... (* pas gagné mais faut voir *)
+} {
+  rewrite Has, Hras.
+  rewrite srng_product_split_first; [ | | | flia ]; cycle 1. {
+    apply nat_semiring_prop.
+  } {
+    apply nat_sring_comm_prop.
+  }
+  rewrite srng_product_succ_succ.
+  erewrite srng_product_eq_compat; cycle 1. {
+    apply nat_semiring_prop.
+  } {
+    apply nat_sring_comm_prop.
+  } {
+    intros k Hk.
+    rewrite Nat.sub_succ, Nat.sub_0_r.
+    replace k with (S (k - 1)) at 1 by flia Hk.
+    cbn; easy.
+  }
+  cbn - [ iter_seq srng_mul srng_one nth ].
+  remember (Π (i0 = 1, length sizes), nth (i0 - 1) sizes 0)%Rng as x eqn:Hx.
+  rewrite <- Hsz; subst x.
+  cbn - [ iter_seq srng_mul srng_one ] in Hsz.
+  cbn.
+  ... (* ouais *)
+} {
+  ... (* pareil, je crois *)
+}
+... (* possible, faut voir *)
 ...
 destruct size. {
   specialize (no_zero_bmat_size A) as H1.
