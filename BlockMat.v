@@ -4229,8 +4229,7 @@ rewrite sizes_of_bmatrix_add in Habs. 2: {
 }
 rewrite sizes_of_bmat_zero_like, Has in Habs.
 subst sz.
-set (x := (Π (k = 1, length sizes), nth (k - 1) sizes 0)%Rng).
-...
+set (sz := (Π (k = 1, length sizes), nth (k - 1) sizes 0)%Rng).
 ...
 destruct size. {
   specialize (no_zero_bmat_size A) as H1.
