@@ -4097,6 +4097,45 @@ erewrite srng_product_eq_compat in Hlen; cycle 1. {
   now rewrite Nat.sub_succ.
 }
 cbn - [ iter_seq nth srng_mul srng_one ] in Hlen.
+remember (A * B)%BM as AB eqn:HAB.
+symmetry in HAB.
+induction AB as [xab| MAB IHAB] using bmatrix_ind2; intros. {
+  cbn - [ iter_seq ].
+  destruct A as [xa| MA]; [ easy | ].
+  now destruct B.
+}
+destruct A as [xa| MA]; [ easy | ].
+destruct B as [xb| MB]; [ easy | ].
+cbn - [ iter_seq ] in HAB |-*.
+injection HAB; clear HAB; intros HAB.
+destruct (zerop (mat_nrows MAB)) as [Hzrab| Hzrab]. {
+  cbn - [ iter_seq ].
+  rewrite <- HAB in Hzrab; cbn in Hzrab.
+  rewrite Hzrab.
+  cbn - [ iter_seq ].
+  symmetry.
+  apply all_0_srng_summation_0; [ easy | ].
+  intros k Hk.
+  apply srng_mul_0_l.
+}
+cbn - [ iter_seq ].
+destruct (zerop (mat_nrows MA)) as [Hzra| Hzra]. {
+  exfalso.
+  rewrite <- HAB in Hzrab; cbn in Hzrab.
+  flia Hzrab Hzra.
+}
+cbn - [ iter_seq ].
+destruct (zerop (mat_ncols MAB)) as [Hzcab| Hzcab]. {
+  cbn - [ iter_seq ].
+  rewrite <- HAB in Hzcab; cbn in Hzcab.
+  rewrite Hzcab.
+  cbn - [ iter_seq ].
+...
+  symmetry.
+  apply all_0_srng_summation_0; [ easy | ].
+  intros k Hk.
+  apply srng_mul_0_l.
+}
 ...
 destruct size. {
   specialize (no_zero_bmat_size A) as H1.
