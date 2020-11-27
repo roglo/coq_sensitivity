@@ -4045,12 +4045,12 @@ cbn - [ iter_seq ].
 intros i j Hi Hj.
 rewrite squ_bmat_size_mul in Hi; [ | easy | easy | easy ].
 unfold squ_bmat_size.
-remember (sizes_of_bmatrix A) as sz eqn:Has.
+remember (sizes_of_bmatrix A) as sizes eqn:Has.
 rename Hab into Hbs.
 (**)
 symmetry in Has, Hbs.
 revert i j A B Ha Hb Has Hbs Hi Hj.
-induction sz as [| size]; intros. {
+induction sizes as [| size]; intros. {
   destruct A as [xa| MA]. {
     clear Ha Has.
     destruct B as [xb| MB]. {
@@ -4065,7 +4065,8 @@ induction sz as [| size]; intros. {
   destruct (zerop (mat_nrows MA)) as [Harz| Harz]; [ easy | ].
   now destruct (zerop (mat_ncols MA)).
 }
-remember (Π (i0 = 1, length (size :: sz)), nth (i0 - 1) (size :: sz) 0)%Srng
+remember
+  (Π (i0 = 1, length (size :: sizes)), nth (i0 - 1) (size :: sizes) 0)%Srng
   as len eqn:Hlen.
 rewrite srng_product_split_first in Hlen; cycle 1. {
   apply nat_semiring_prop.
@@ -4087,13 +4088,16 @@ erewrite srng_product_eq_compat in Hlen; cycle 1. {
 }
 rewrite List_length_cons in Hlen.
 rewrite iter_succ_succ in Hlen.
-Abort. (* à voir...
-...
-erewrite srng_product_eq_compat in Hlen; [ | apply nat_semiring_prop | ]. 2: {
+erewrite srng_product_eq_compat in Hlen; cycle 1. {
+  apply nat_semiring_prop.
+} {
+  apply nat_sring_comm_prop.
+} {
   intros k Hk.
   now rewrite Nat.sub_succ.
 }
 cbn - [ iter_seq nth srng_mul srng_one ] in Hlen.
+...
 destruct size. {
   specialize (no_zero_bmat_size A) as H1.
   rewrite Has in H1.
