@@ -4024,6 +4024,29 @@ unfold squ_bmat_size.
 now rewrite sizes_of_bmatrix_mul.
 Qed.
 
+Theorem glop : ∀ size A i j,
+  size = hd 0 (sizes_of_bmatrix (BM_M A))
+  → bmat_el (BM_M A) i j =
+    bmat_el (mat_el A (i / size) (j / size)) (i mod size) (j mod size).
+Proof.
+intros * Hsize.
+cbn - [ iter_seq srng_mul srng_one ].
+cbn in Hsize.
+destruct (zerop (mat_nrows A)) as [Hzra| Hzra]. {
+  cbn in Hsize.
+  cbn - [ iter_seq srng_mul srng_one ].
+  ... (* c'est faux, mais bon *)
+}
+destruct (zerop (mat_ncols A)) as [Hzca| Hzca]. {
+  cbn in Hsize.
+  cbn - [ iter_seq srng_mul srng_one ].
+  ... (* c'est faux, mais bon *)
+}
+cbn in Hsize.
+cbn - [ iter_seq srng_mul srng_one ].
+(* ouais non, c'est pas bon *)
+...
+
 Theorem mat_of_squ_bmat_mul : ∀ A B,
   is_square_bmat A
   → is_square_bmat B
@@ -4106,12 +4129,6 @@ induction AB as [xab| MAB IHAB] using bmatrix_ind2; intros. {
   destruct A as [xa| MA]; [ easy | ].
   now destruct B.
 }
-...
-à prouver, pour voir...
-bmat_el (BM_M A) i j =
-  bmat_el (mat_el A (i / size) (j / size)) (i mod size) (j mod size)
-un truc comme ça.
-...
 (*
 move IHAB at bottom.
 cbn - [ iter_seq bmat_mul srng_mul srng_one nth bmat_el ] in IHAB.
@@ -4173,6 +4190,7 @@ rewrite <- HAB in Habs.
 cbn in Habs.
 rewrite Hacr, Hbcr in *.
 rewrite Hras, Hrbs in *.
+(**)
 rewrite sizes_of_bmatrix_fold_left in Habs. 2: {
   intros k Hk.
   rewrite sizes_of_bmatrix_add. 2: {
