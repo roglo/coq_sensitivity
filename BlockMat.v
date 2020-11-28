@@ -4044,11 +4044,11 @@ apply matrix_eq. {
 cbn - [ iter_seq ].
 intros i j Hi Hj.
 rewrite squ_bmat_size_mul in Hi; [ | easy | easy | easy ].
-unfold squ_bmat_size.
+unfold squ_bmat_size in Hi, Hj |-*.
 remember (sizes_of_bmatrix A) as sizes eqn:Has.
 rename Hab into Hbs.
-(**)
 symmetry in Has, Hbs.
+...
 revert i j A B Ha Hb Has Hbs Hi Hj.
 induction sizes as [| size]; intros. {
   destruct A as [xa| MA]. {
