@@ -4097,17 +4097,25 @@ erewrite srng_product_eq_compat in Hlen; cycle 1. {
   now rewrite Nat.sub_succ.
 }
 cbn - [ iter_seq nth srng_mul srng_one ] in Hlen.
+(*
 remember (A * B)%BM as AB eqn:HAB.
 symmetry in HAB.
+*)
 unfold squ_bmat_size in Hi, Hj.
-revert i j Hi Hj.
+rewrite Has in Hi.
+rewrite Hbs in Hj.
+cbn - [ iter_seq srng_mul srng_one nth ] in Hi, Hj.
+...
+revert A B i j Hi Hj Ha Hb Has Hbs HAB.
 induction AB as [xab| MAB IHAB] using bmatrix_ind2; intros. {
   cbn - [ iter_seq ].
   destruct A as [xa| MA]; [ easy | ].
   now destruct B.
 }
+(*
 move IHAB at bottom.
 cbn - [ iter_seq bmat_mul srng_mul srng_one nth bmat_el ] in IHAB.
+*)
 destruct A as [xa| MA]; [ easy | ].
 destruct B as [xb| MB]; [ easy | ].
 cbn - [ iter_seq ].
@@ -4238,8 +4246,10 @@ rewrite sizes_of_bmatrix_add in Habs. 2: {
 rewrite sizes_of_bmat_zero_like, Has in Habs.
 subst sz.
 cbn - [ iter_seq srng_mul srng_one nth ] in Hi, Hj.
+(*
 rewrite Hras, Has in Hi.
 rewrite Hrbs, Hbs in Hj.
+*)
 move Hi at bottom.
 move Hj at bottom.
 rewrite srng_product_split_first in Hi; [ | | | flia ]; cycle 1. {
@@ -4288,7 +4298,7 @@ move Hj at bottom.
 symmetry in HAB.
 move IHAB at bottom.
 cbn - [ iter_seq bmat_mul srng_mul srng_one nth bmat_el ] in IHAB.
-rewrite IHAB; cycle 1. {
+erewrite IHAB; cycle 1. {
   rewrite HAB; cbn.
   apply Nat.div_lt_upper_bound; [ | now rewrite Nat.mul_comm ].
   now intros H; rewrite H, Nat.mul_0_r in Hi.
@@ -4297,6 +4307,7 @@ rewrite IHAB; cycle 1. {
   apply Nat.div_lt_upper_bound; [ | now rewrite Nat.mul_comm ].
   now intros H; rewrite H, Nat.mul_0_r in Hi.
 } {
+...
   rewrite HAB; cbn - [ iter_seq ].
   rewrite Hras, Hbcr.
   rewrite Hacr.
