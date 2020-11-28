@@ -4111,11 +4111,6 @@ induction AB as [xab| MAB IHAB] using bmatrix_ind2; intros. {
   destruct A as [xa| MA]; [ easy | ].
   now destruct B.
 }
-...
-à prouver, pour voir...
-bmat_el (BM_M A) i j = bmat_el (mat_el A (i / size) (j / size)),
-un truc comme ça.
-...
 (*
 move IHAB at bottom.
 cbn - [ iter_seq bmat_mul srng_mul srng_one nth bmat_el ] in IHAB.
@@ -4256,6 +4251,7 @@ rewrite Hrbs, Hbs in Hj.
 *)
 move Hi at bottom.
 move Hj at bottom.
+(*
 rewrite srng_product_split_first in Hi; [ | | | flia ]; cycle 1. {
   apply nat_semiring_prop.
 } {
@@ -4288,9 +4284,9 @@ erewrite srng_product_eq_compat in Hj; cycle 1. {
   cbn; easy.
 }
 cbn - [ iter_seq srng_mul srng_one nth ] in Hi, Hj.
+*)
 remember (Π (k = 1, length sizes), nth (k - 1) sizes 0)%Rng as sz eqn:Hsz.
-cbn in Hi, Hj.
-cbn in Hlen; subst len.
+subst len.
 move Hacr at bottom.
 move Hbcr at bottom.
 move Has at bottom.
@@ -4302,7 +4298,7 @@ move Hj at bottom.
 symmetry in HAB.
 move IHAB at bottom.
 cbn - [ iter_seq bmat_mul srng_mul srng_one nth bmat_el ] in IHAB.
-erewrite IHAB; cycle 1. {
+erewrite IHAB with (len := size * sz); cycle 1. {
   rewrite HAB; cbn.
   apply Nat.div_lt_upper_bound; [ | now rewrite Nat.mul_comm ].
   now intros H; rewrite H, Nat.mul_0_r in Hi.
@@ -4311,6 +4307,23 @@ erewrite IHAB; cycle 1. {
   apply Nat.div_lt_upper_bound; [ | now rewrite Nat.mul_comm ].
   now intros H; rewrite H, Nat.mul_0_r in Hi.
 } {
+  apply (lt_le_trans _ sz). {
+    apply Nat.mod_upper_bound.
+    now intros H; rewrite H, Nat.mul_0_r in Hi.
+  }
+  destruct size; [ easy | flia ].
+} {
+  apply (lt_le_trans _ sz). {
+    apply Nat.mod_upper_bound.
+    now intros H; rewrite H, Nat.mul_0_r in Hi.
+  }
+  destruct size; [ easy | flia ].
+} {
+...
+à prouver, pour voir...
+bmat_el (BM_M A) i j = bmat_el (mat_el A (i / size) (j / size)),
+un truc comme ça.
+...
 ...
   rewrite HAB; cbn - [ iter_seq ].
   rewrite Hras, Hbcr.
