@@ -4156,25 +4156,62 @@ rewrite bmat_el_BM_M with (sizes := size :: sizes) (len := len'); cycle 1. {
   destruct Ha as (_ & Hnra & Ha).
   destruct Hb as (_ & Hnrb & Hb).
   injection Has; clear Has; intros Hsa Has.
+  injection Hbs; clear Hbs; intros Hsb Hbs.
   f_equal; [ easy | ].
+  assert (Hsz : 0 < size) by now rewrite <- Has.
   rewrite sizes_of_bmatrix_fold_left. 2: {
     intros k Hk.
     rewrite sizes_of_bmatrix_add. {
       rewrite sizes_of_bmat_zero_like.
       symmetry.
-      rewrite sizes_of_bmatrix_mul. {
-        apply sizes_of_bmatrix_at_0_0 with (r := size). {
+      assert (Hks : k < size) by flia Hnra Has Hk.
+      assert
+        (Hak :
+           sizes_of_bmatrix (mat_el MA 0 k) =
+           sizes_of_bmatrix (mat_el MA 0 0)). {
+        apply sizes_of_bmatrix_at_0_0 with (r := size); [ | easy | easy ]. {
           intros i' j' Hi' Hj'.
           rewrite <- Has in Hi', Hj'.
           now apply Ha.
-        } {
-          flia Hnra Has Hk.
-        } {
-          flia Hnra Has Hk.
         }
       }
-      unfold is_square_bmat.
-...
+      assert
+        (Hbk :
+           sizes_of_bmatrix (mat_el MB k 0) =
+           sizes_of_bmatrix (mat_el MB 0 0)). {
+        apply sizes_of_bmatrix_at_0_0 with (r := size); [ | easy | easy ]. {
+          intros i' j' Hi' Hj'.
+          rewrite <- Hbs in Hi', Hj'.
+          now apply Hb.
+        }
+      }
+      rewrite sizes_of_bmatrix_mul; [ easy | | | congruence ]. {
+        unfold is_square_bmat; rewrite Hak.
+        now apply Ha; rewrite Has.
+      } {
+        unfold is_square_bmat; rewrite Hbk.
+        now apply Hb; rewrite Hbs.
+      }
+    }
+    rewrite sizes_of_bmat_zero_like.
+    symmetry.
+    apply sizes_of_bmatrix_mul; [ | | congruence ]. {
+      now unfold is_square_bmat; apply Ha.
+    } {
+      now unfold is_square_bmat; apply Hb.
+    }
+  } {
+    rewrite sizes_of_bmatrix_add. {
+      now rewrite sizes_of_bmat_zero_like.
+    } {
+      rewrite sizes_of_bmat_zero_like.
+      rewrite sizes_of_bmatrix_mul; [ easy | | | congruence ]. {
+        now unfold is_square_bmat; apply Ha.
+      } {
+        now unfold is_square_bmat; apply Hb.
+      }
+    }
+  }
 } {
   easy.
 } {
@@ -4191,7 +4228,6 @@ rewrite bmat_el_BM_M with (sizes := size :: sizes) (len := len'); cycle 1. {
   }
   easy.
 }
-(**)
 cbn - [ iter_seq ].
 injection HAB; clear HAB; intros HAB.
 cbn in Has, Hbs, Ha, Hb.
@@ -4318,6 +4354,7 @@ cbn - [ iter_seq srng_mul srng_one nth ] in Hi, Hj.
 move Hi at bottom.
 move Hj at bottom.
 remember (Π (k = 1, length sizes), nth (k - 1) sizes 0)%Rng as sz eqn:Hsz.
+move Hlen' at top; subst sz.
 subst len.
 move Hacr at bottom.
 move Hbcr at bottom.
