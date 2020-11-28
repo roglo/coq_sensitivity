@@ -4048,7 +4048,7 @@ unfold squ_bmat_size in Hi, Hj |-*.
 remember (sizes_of_bmatrix A) as sizes eqn:Has.
 rename Hab into Hbs.
 symmetry in Has, Hbs.
-...
+rewrite Hbs in Hj.
 revert i j A B Ha Hb Has Hbs Hi Hj.
 induction sizes as [| size]; intros. {
   destruct A as [xa| MA]. {
@@ -4100,11 +4100,11 @@ cbn - [ iter_seq nth srng_mul srng_one ] in Hlen.
 (*
 remember (A * B)%BM as AB eqn:HAB.
 symmetry in HAB.
-*)
 unfold squ_bmat_size in Hi, Hj.
 rewrite Has in Hi.
 rewrite Hbs in Hj.
-cbn - [ iter_seq srng_mul srng_one nth ] in Hi, Hj.
+cbn - [ iter_seq srng_mul srng_one nth ] in (*Hi,*) Hj.
+*)
 ...
 revert A B i j Hi Hj Ha Hb Has Hbs HAB.
 induction AB as [xab| MAB IHAB] using bmatrix_ind2; intros. {
