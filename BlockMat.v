@@ -4024,29 +4024,22 @@ unfold squ_bmat_size.
 now rewrite sizes_of_bmatrix_mul.
 Qed.
 
-Theorem glop : ∀ sizes len A i j,
+Theorem bmat_el_BM_M : ∀ sizes len A i j,
   sizes = sizes_of_bmatrix (BM_M A)
+  → sizes ≠ []
   → len = (Π (k = 2, length sizes), nth (k - 1) sizes 0)%Rng
   → bmat_el (BM_M A) i j =
     bmat_el (mat_el A (i / len) (j / len)) (i mod len) (j mod len).
 Proof.
-intros * Hsize Hlen.
+intros * Hsizes Hsznz Hlen.
 cbn - [ iter_seq srng_mul srng_one ].
-cbn in Hsize.
-destruct (zerop (mat_nrows A)) as [Hzra| Hzra]. {
-  cbn in Hsize.
-  cbn - [ iter_seq srng_mul srng_one ].
-...
-}
-destruct (zerop (mat_ncols A)) as [Hzca| Hzca]. {
-  cbn in Hsize.
-  cbn - [ iter_seq srng_mul srng_one ].
-...
-}
-cbn in Hsize.
+cbn in Hsizes.
+destruct (zerop (mat_nrows A)) as [Hzra| Hzra]; [ easy | ].
+destruct (zerop (mat_ncols A)) as [Hzca| Hzca]; [ easy | ].
+cbn in Hsizes.
 cbn - [ iter_seq srng_mul srng_one ].
 remember (sizes_of_bmatrix (mat_el A 0 0)) as sz eqn:Hsz.
-rewrite Hsize in Hlen.
+rewrite Hsizes in Hlen.
 cbn - [ iter_seq srng_mul srng_one nth ] in Hlen.
 rewrite srng_product_succ_succ in Hlen.
 erewrite srng_product_eq_compat in Hlen; cycle 1. {
@@ -4060,7 +4053,7 @@ erewrite srng_product_eq_compat in Hlen; cycle 1. {
 }
 cbn - [ iter_seq srng_mul srng_one ] in Hlen.
 now rewrite <- Hlen.
-...
+Qed.
 
 Theorem mat_of_squ_bmat_mul : ∀ A B,
   is_square_bmat A
@@ -4144,12 +4137,27 @@ induction AB as [xab| MAB IHAB] using bmatrix_ind2; intros. {
   destruct A as [xa| MA]; [ easy | ].
   now destruct B.
 }
-(*
-move IHAB at bottom.
-cbn - [ iter_seq bmat_mul srng_mul srng_one nth bmat_el ] in IHAB.
-*)
 destruct A as [xa| MA]; [ easy | ].
 destruct B as [xb| MB]; [ easy | ].
+(**)
+remember (Π (i = 1, length sizes), nth (i - 1) sizes 0)%Rng as len' eqn:Hlen'.
+rewrite bmat_el_BM_M with (sizes := size :: sizes) (len := len'); cycle 2. {
+  easy.
+} {
+  rewrite List_length_cons.
+  rewrite srng_product_succ_succ.
+  erewrite srng_product_eq_compat; cycle 1. {
+    apply nat_semiring_prop.
+  } {
+    apply nat_sring_comm_prop.
+  } {
+    intros k Hk.
+    replace (S k - 1) with (S (k - 1)) by flia Hk.
+    cbn; easy.
+  }
+  easy.
+}
+(**)
 cbn - [ iter_seq ].
 injection HAB; clear HAB; intros HAB.
 cbn in Has, Hbs, Ha, Hb.
@@ -4158,14 +4166,9 @@ cbn in Hx; subst x.
 remember (sizes_of_bmatrix (BM_M MB)) as x eqn:Hx.
 cbn in Hx; subst x.
 destruct (zerop (mat_nrows MAB)) as [Hzrab| Hzrab]. {
-  cbn - [ iter_seq ].
+  exfalso.
   rewrite <- HAB in Hzrab; cbn in Hzrab.
-  rewrite Hzrab.
-  cbn - [ iter_seq ].
-  symmetry.
-  apply all_0_srng_summation_0; [ easy | ].
-  intros k Hk.
-  apply srng_mul_0_l.
+  now rewrite Hzrab in Has; cbn in Has.
 }
 cbn - [ iter_seq ].
 destruct (zerop (mat_nrows MA)) as [Hzra| Hzra]. {
@@ -4205,7 +4208,6 @@ rewrite <- HAB in Habs.
 cbn in Habs.
 rewrite Hacr, Hbcr in *.
 rewrite Hras, Hrbs in *.
-(**)
 rewrite sizes_of_bmatrix_fold_left in Habs. 2: {
   intros k Hk.
   rewrite sizes_of_bmatrix_add. 2: {
@@ -4279,46 +4281,8 @@ rewrite sizes_of_bmatrix_add in Habs. 2: {
 rewrite sizes_of_bmat_zero_like, Has in Habs.
 subst sz.
 cbn - [ iter_seq srng_mul srng_one nth ] in Hi, Hj.
-(*
-rewrite Hras, Has in Hi.
-rewrite Hrbs, Hbs in Hj.
-*)
 move Hi at bottom.
 move Hj at bottom.
-(*
-rewrite srng_product_split_first in Hi; [ | | | flia ]; cycle 1. {
-  apply nat_semiring_prop.
-} {
-  apply nat_sring_comm_prop.
-}
-rewrite srng_product_split_first in Hj; [ | | | flia ]; cycle 1. {
-  apply nat_semiring_prop.
-} {
-  apply nat_sring_comm_prop.
-}
-rewrite srng_product_succ_succ in Hi, Hj.
-erewrite srng_product_eq_compat in Hi; cycle 1. {
-  apply nat_semiring_prop.
-} {
-  apply nat_sring_comm_prop.
-} {
-  intros k Hk.
-  rewrite Nat.sub_succ, Nat.sub_0_r.
-  replace k with (S (k - 1)) at 1 by flia Hk.
-  cbn; easy.
-}
-erewrite srng_product_eq_compat in Hj; cycle 1. {
-  apply nat_semiring_prop.
-} {
-  apply nat_sring_comm_prop.
-} {
-  intros k Hk.
-  rewrite Nat.sub_succ, Nat.sub_0_r.
-  replace k with (S (k - 1)) at 1 by flia Hk.
-  cbn; easy.
-}
-cbn - [ iter_seq srng_mul srng_one nth ] in Hi, Hj.
-*)
 remember (Π (k = 1, length sizes), nth (k - 1) sizes 0)%Rng as sz eqn:Hsz.
 subst len.
 move Hacr at bottom.
@@ -4332,6 +4296,7 @@ move Hj at bottom.
 symmetry in HAB.
 move IHAB at bottom.
 cbn - [ iter_seq bmat_mul srng_mul srng_one nth bmat_el ] in IHAB.
+...
 erewrite IHAB with (len := size * sz); cycle 1. {
   rewrite HAB; cbn.
   apply Nat.div_lt_upper_bound; [ | now rewrite Nat.mul_comm ].
@@ -4353,21 +4318,7 @@ erewrite IHAB with (len := size * sz); cycle 1. {
   }
   destruct size; [ easy | flia ].
 } {
-  ...
-(*
-...
-à prouver, pour voir...
-bmat_el (BM_M A) i j =
-  bmat_el (mat_el A (i / size) (j / size)) (i mod size) (j mod size)
-un truc comme ça.
-...
-*)
-} {
-  ... (* ouais, normal *)
-} {
-  ... (* ouais, normal *)
-} {
-  (* ah oui non, ça, ça va pas *)
+Check bmat_el_BM_M.
 ...
   rewrite HAB; cbn - [ iter_seq ].
   rewrite Hras, Hbcr.
