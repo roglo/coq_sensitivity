@@ -3966,7 +3966,7 @@ Set Printing All.
         cbn - [ is_square_bmat ].
         destruct b. {
           cbn.
-        admit.
+          ...
       }
 ...
       induction len; [ easy | clear Hlz ].
@@ -3981,7 +3981,7 @@ Set Printing All.
       rewrite fold_left_app.
       cbn - [ is_square_bmat ].
       apply is_square_bmat_add; cycle 1. {
-        admit.
+        ...
       } {
 ...
         rewrite fold_left_srng_add_fun_from_0.
@@ -4099,18 +4099,19 @@ erewrite srng_product_eq_compat in Hlen; cycle 1. {
 cbn - [ iter_seq nth srng_mul srng_one ] in Hlen.
 remember (A * B)%BM as AB eqn:HAB.
 symmetry in HAB.
-(*
-unfold squ_bmat_size in Hi, Hj.
-rewrite Has in Hi.
-rewrite Hbs in Hj.
-cbn - [ iter_seq srng_mul srng_one nth ] in (*Hi,*) Hj.
-*)
-revert A B i j len Hi Hj HAB Ha Hb Has Hbs Hlen(*HAB*).
+clear IHsizes.
+revert A B i j len size sizes Hi Hj HAB Ha Hb Has Hbs Hlen(*HAB*).
 induction AB as [xab| MAB IHAB] using bmatrix_ind2; intros. {
   cbn - [ iter_seq ].
   destruct A as [xa| MA]; [ easy | ].
   now destruct B.
 }
+...
+à prouver, pour voir...
+bmat_el (BM_M A) i j =
+  bmat_el (mat_el A (i / size) (j / size)) (i mod size) (j mod size)
+un truc comme ça.
+...
 (*
 move IHAB at bottom.
 cbn - [ iter_seq bmat_mul srng_mul srng_one nth bmat_el ] in IHAB.
@@ -4319,11 +4320,21 @@ erewrite IHAB with (len := size * sz); cycle 1. {
   }
   destruct size; [ easy | flia ].
 } {
+  ...
+(*
 ...
 à prouver, pour voir...
-bmat_el (BM_M A) i j = bmat_el (mat_el A (i / size) (j / size)),
+bmat_el (BM_M A) i j =
+  bmat_el (mat_el A (i / size) (j / size)) (i mod size) (j mod size)
 un truc comme ça.
 ...
+*)
+} {
+  ... (* ouais, normal *)
+} {
+  ... (* ouais, normal *)
+} {
+  (* ah oui non, ça, ça va pas *)
 ...
   rewrite HAB; cbn - [ iter_seq ].
   rewrite Hras, Hbcr.
