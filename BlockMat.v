@@ -4290,10 +4290,12 @@ move IHAB at bottom.
 cbn - [ iter_seq bmat_mul srng_mul srng_one nth bmat_el ] in IHAB.
 rewrite IHAB; cycle 1. {
   rewrite HAB; cbn.
-  ... (* ouais *)
+  apply Nat.div_lt_upper_bound; [ | now rewrite Nat.mul_comm ].
+  now intros H; rewrite H, Nat.mul_0_r in Hi.
 } {
   rewrite HAB; cbn.
-  ... (* ouais *)
+  apply Nat.div_lt_upper_bound; [ | now rewrite Nat.mul_comm ].
+  now intros H; rewrite H, Nat.mul_0_r in Hi.
 } {
   rewrite HAB; cbn - [ iter_seq ].
   rewrite Hras, Hbcr.
