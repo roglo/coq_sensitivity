@@ -4026,7 +4026,7 @@ Qed.
 
 Theorem glop : ∀ sizes len A i j,
   sizes = sizes_of_bmatrix (BM_M A)
-  → len = (Π (k = 1, length sizes), nth (k - 1) sizes 0)%Rng
+  → len = (Π (k = 1, length sizes - 1), nth (k - 1) sizes 0)%Rng
   → bmat_el (BM_M A) i j =
     bmat_el (mat_el A (i / len) (j / len)) (i mod len) (j mod len).
 Proof.
@@ -4045,8 +4045,10 @@ destruct (zerop (mat_ncols A)) as [Hzca| Hzca]. {
 }
 cbn in Hsize.
 cbn - [ iter_seq srng_mul srng_one ].
-rewrite <- Hlen.
-(* ouais non, c'est pas bon *)
+remember (length sizes - 1) as x eqn:Hx.
+rewrite Hsize in Hx; cbn in Hx.
+rewrite Nat.sub_0_r in Hx.
+rewrite <- Hx.
 ...
 
 Theorem mat_of_squ_bmat_mul : ∀ A B,
