@@ -4141,7 +4141,41 @@ destruct A as [xa| MA]; [ easy | ].
 destruct B as [xb| MB]; [ easy | ].
 (**)
 remember (Π (i = 1, length sizes), nth (i - 1) sizes 0)%Rng as len' eqn:Hlen'.
-rewrite bmat_el_BM_M with (sizes := size :: sizes) (len := len'); cycle 2. {
+rewrite bmat_el_BM_M with (sizes := size :: sizes) (len := len'); cycle 1. {
+  cbn in HAB.
+  injection HAB; clear HAB; intros HAB.
+  cbn in Has.
+  cbn in Hbs.
+  rewrite <- HAB; cbn.
+  cbn in Ha, Hb.
+  destruct (zerop (mat_nrows MA)) as [Hzra| Hzra]; [ easy | ].
+  destruct (zerop (mat_ncols MA)) as [Hzca| Hzca]; [ easy | ].
+  destruct (zerop (mat_nrows MB)) as [Hzrb| Hzrb]; [ easy | ].
+  destruct (zerop (mat_ncols MB)) as [Hzcb| Hzcb]; [ easy | ].
+  cbn in Ha, Hb, Has, Hbs |-*.
+  destruct Ha as (_ & Hnra & Ha).
+  destruct Hb as (_ & Hnrb & Hb).
+  injection Has; clear Has; intros Hsa Has.
+  f_equal; [ easy | ].
+  rewrite sizes_of_bmatrix_fold_left. 2: {
+    intros k Hk.
+    rewrite sizes_of_bmatrix_add. {
+      rewrite sizes_of_bmat_zero_like.
+      symmetry.
+      rewrite sizes_of_bmatrix_mul. {
+        apply sizes_of_bmatrix_at_0_0 with (r := size). {
+          intros i' j' Hi' Hj'.
+          rewrite <- Has in Hi', Hj'.
+          now apply Ha.
+        } {
+          flia Hnra Has Hk.
+        } {
+          flia Hnra Has Hk.
+        }
+      }
+      unfold is_square_bmat.
+...
+} {
   easy.
 } {
   rewrite List_length_cons.
