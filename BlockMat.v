@@ -4106,7 +4106,7 @@ rewrite Hbs in Hj.
 cbn - [ iter_seq srng_mul srng_one nth ] in (*Hi,*) Hj.
 *)
 ...
-revert A B i j Hi Hj Ha Hb Has Hbs HAB.
+revert A B i j len Hi Hj Ha Hb Has Hbs Hlen(*HAB*).
 induction AB as [xab| MAB IHAB] using bmatrix_ind2; intros. {
   cbn - [ iter_seq ].
   destruct A as [xa| MA]; [ easy | ].
