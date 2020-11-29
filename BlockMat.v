@@ -4128,9 +4128,9 @@ erewrite srng_product_eq_compat in Hlen; cycle 1. {
   now rewrite Nat.sub_succ.
 }
 cbn - [ iter_seq nth srng_mul srng_one ] in Hlen.
+...
 remember (A * B)%BM as AB eqn:HAB.
 symmetry in HAB.
-...
 clear IHsizes.
 revert A B i j len size sizes Hi Hj HAB Ha Hb Has Hbs Hlen(*HAB*).
 induction AB as [xab| MAB IHAB] using bmatrix_ind2; intros. {
