@@ -4025,20 +4025,25 @@ now rewrite sizes_of_bmatrix_mul.
 Qed.
 
 Theorem bmat_el_BM_M : ∀ sizes len A i j,
-  sizes = sizes_of_bmatrix (BM_M A)
+  sizes = sizes_of_bmatrix A
   → sizes ≠ []
   → len = (Π (k = 2, length sizes), nth (k - 1) sizes 0)%Rng
-  → bmat_el (BM_M A) i j =
-    bmat_el (mat_el A (i / len) (j / len)) (i mod len) (j mod len).
+  → bmat_el A i j =
+    match A with
+    | BM_1 x => x
+    | BM_M MA =>
+        bmat_el (mat_el MA (i / len) (j / len)) (i mod len) (j mod len)
+    end.
 Proof.
 intros * Hsizes Hsznz Hlen.
+destruct A as [xa| MA]; [ easy | ].
 cbn - [ iter_seq srng_mul srng_one ].
 cbn in Hsizes.
-destruct (zerop (mat_nrows A)) as [Hzra| Hzra]; [ easy | ].
-destruct (zerop (mat_ncols A)) as [Hzca| Hzca]; [ easy | ].
+destruct (zerop (mat_nrows MA)) as [Hzra| Hzra]; [ easy | ].
+destruct (zerop (mat_ncols MA)) as [Hzca| Hzca]; [ easy | ].
 cbn in Hsizes.
 cbn - [ iter_seq srng_mul srng_one ].
-remember (sizes_of_bmatrix (mat_el A 0 0)) as sz eqn:Hsz.
+remember (sizes_of_bmatrix (mat_el MA 0 0)) as sz eqn:Hsz.
 rewrite Hsizes in Hlen.
 cbn - [ iter_seq srng_mul srng_one nth ] in Hlen.
 rewrite srng_product_succ_succ in Hlen.
@@ -4149,7 +4154,7 @@ destruct A as [xa| MA]; [ easy | ].
 destruct B as [xb| MB]; [ easy | ].
 (**)
 remember (Π (i = 1, length sizes), nth (i - 1) sizes 0)%Rng as len' eqn:Hlen'.
-rewrite bmat_el_BM_M with (sizes := size :: sizes) (len := len'); cycle 1. {
+rewrite (@bmat_el_BM_M (size :: sizes) len'); cycle 1. {
   cbn in HAB.
   injection HAB; clear HAB; intros HAB.
   cbn in Has.
@@ -4236,6 +4241,22 @@ rewrite bmat_el_BM_M with (sizes := size :: sizes) (len := len'); cycle 1. {
   }
   easy.
 }
+subst len.
+remember (mat_el MAB (i / len') (j / len')) as AB' eqn:HAB'.
+symmetry in HAB'.
+(*
+destruct AB' as [xa| MAB']. {
+  unfold bmat_el at 1.
+  cbn - [ iter_seq srng_mul srng_one ].
+...
+*)
+remember (sizes_of_bmatrix AB') as sizes' eqn:Hsizes'.
+symmetry in Hsizes'.
+destruct sizes' as [| size']. {
+Print sizes_of_bmatrix.
+...
+erewrite (@bmat_el_BM_M sizes'); [ | easy | | ]; cycle 1. {
+rewrite (@bmat_el_BM_M sizes 42); cycle 1. {
 ...
 cbn - [ iter_seq ].
 injection HAB; clear HAB; intros HAB.
