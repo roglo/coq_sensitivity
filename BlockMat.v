@@ -4060,6 +4060,19 @@ cbn - [ iter_seq srng_mul srng_one ] in Hlen.
 now rewrite <- Hlen.
 Qed.
 
+Theorem squ_bmat_eq_sizes_nil : ∀ (BM : bmatrix T),
+  is_square_bmat BM
+  → sizes_of_bmatrix BM = []
+  → ∃ x, BM = BM_1 x.
+Proof.
+intros * Hsm HBM.
+destruct BM as [x| M]; [ now exists x | exfalso ].
+unfold is_square_bmat in Hsm.
+cbn in Hsm, HBM.
+destruct (zerop (mat_nrows M)) as [Hrz| Hrz]; [ easy | ].
+now destruct (zerop (mat_ncols M)).
+Qed.
+
 Theorem mat_of_squ_bmat_mul : ∀ A B,
   is_square_bmat A
   → is_square_bmat B
@@ -4253,7 +4266,15 @@ destruct AB' as [xa| MAB']. {
 remember (sizes_of_bmatrix AB') as sizes' eqn:Hsizes'.
 symmetry in Hsizes'.
 destruct sizes' as [| size']. {
-Print sizes_of_bmatrix.
+  apply squ_bmat_eq_sizes_nil in Hsizes'. 2: {
+    rewrite <- HAB'; cbn.
+    unfold is_square_bmat.
+    cbn - [ iter_seq ] in HAB.
+    injection HAB; clear HAB; intros HAB.
+    rewrite <- HAB.
+    cbn.
+    rewrite sizes_of_bmatrix_fold_left.
+(* putain la galère *)
 ...
 erewrite (@bmat_el_BM_M sizes'); [ | easy | | ]; cycle 1. {
 rewrite (@bmat_el_BM_M sizes 42); cycle 1. {
