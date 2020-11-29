@@ -4367,7 +4367,8 @@ move Hj at bottom.
 symmetry in HAB.
 move IHAB at bottom.
 cbn - [ iter_seq bmat_mul srng_mul srng_one nth bmat_el ] in IHAB.
-erewrite IHAB with (len := size * len'); cycle 1. {
+rewrite IHAB with (len := size * len') (size := size) (sizes := sizes) (A := BM_M MA) (B := BM_M MB);
+    cycle 1. {
   rewrite HAB; cbn.
   apply Nat.div_lt_upper_bound; [ | now rewrite Nat.mul_comm ].
   now intros H; rewrite H, Nat.mul_0_r in Hi.
@@ -4389,7 +4390,7 @@ erewrite IHAB with (len := size * len'); cycle 1. {
   destruct size; [ easy | flia ].
 } {
   rewrite HAB at 1; cbn - [ iter_seq ].
-...
+... (* chais pas *)
 } {
   rewrite Has, Hras.
   rewrite srng_product_split_first; [ | | | flia ]; cycle 1. {
