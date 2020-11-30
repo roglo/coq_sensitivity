@@ -4136,6 +4136,22 @@ cbn - [ iter_seq srng_mul srng_one ] in Hlen.
 now rewrite <- Hlen.
 Qed.
 
+Definition bmat_merge_fst_2_layers (BM : bmatrix T) :=
+  match BM with
+  | BM_1 _ => BM
+  | BM_M M =>
+      mat_map
+        (λ BM',
+         match BM' with
+         | BM_1 x => BM_1 x
+         | BM_M M' =>
+        M
+...
+
+Theorem glop :  ∀ A,
+  mat_of_squ_bmat A = mat_of_squ_bmat (bmat_merge_fst_layers A).
+...
+
 Theorem mat_of_squ_bmat_mul : ∀ A B,
   is_square_bmat A
   → is_square_bmat B
@@ -4143,6 +4159,7 @@ Theorem mat_of_squ_bmat_mul : ∀ A B,
   → mat_of_squ_bmat (A * B) = (mat_of_squ_bmat A * mat_of_squ_bmat B)%M.
 Proof.
 intros * Ha Hb Hab.
+...
 apply matrix_eq. {
   cbn - [ iter_seq ].
   unfold squ_bmat_size.
