@@ -4257,13 +4257,8 @@ rewrite (@bmat_el_BM_M (size :: sizes) len'); cycle 1. {
 subst len.
 remember (mat_el MAB (i / len') (j / len')) as AB' eqn:HAB'.
 symmetry in HAB'.
-(*
-destruct AB' as [xa| MAB']. {
-  unfold bmat_el at 1.
-  cbn - [ iter_seq srng_mul srng_one ].
-...
-*)
 remember (sizes_of_bmatrix AB') as sizes' eqn:Hsizes'.
+(*
 symmetry in Hsizes'.
 destruct sizes' as [| size']. {
   apply squ_bmat_eq_sizes_nil in Hsizes'. 2: {
@@ -4277,7 +4272,13 @@ destruct sizes' as [| size']. {
 (* putain la galère *)
 ...
 erewrite (@bmat_el_BM_M sizes'); [ | easy | | ]; cycle 1. {
-rewrite (@bmat_el_BM_M sizes 42); cycle 1. {
+*)
+rename len' into len; rename Hlen' into Hlen.
+remember (Π (k = 2, length sizes'), nth (k - 1) sizes' 0%Rng)%Rng as len'
+  eqn:Hlen'.
+erewrite bmat_el_BM_M; [ | apply Hsizes' | | apply Hlen' ]. 2: {
+(* qu'est-ce qui me prouve que size' ≠ [] ? rien. Peut-être est-ce une
+   hypothèse de trop dans bmat_el_BM_M ? *)
 ...
 cbn - [ iter_seq ].
 injection HAB; clear HAB; intros HAB.
