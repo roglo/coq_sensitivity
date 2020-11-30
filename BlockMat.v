@@ -4302,9 +4302,18 @@ rewrite (@bmat_el_BM_M (size :: sizes) len'); cycle 1. {
     }
   }
 } {
-  cbn.
-...
-  easy.
+  cbn in HAB |-*.
+  injection HAB; clear HAB; intros HAB.
+  subst MAB; cbn.
+  cbn in Ha.
+  now intros H; rewrite H in Ha.
+} {
+  cbn in HAB |-*.
+  injection HAB; clear HAB; intros HAB.
+  subst MAB; cbn.
+  cbn in Hb.
+  intros H; rewrite H in Hb.
+  now destruct (zerop (mat_nrows MB)).
 } {
   rewrite List_length_cons.
   rewrite srng_product_succ_succ.
@@ -4340,10 +4349,7 @@ erewrite (@bmat_el_BM_M sizes'); [ | easy | | ]; cycle 1. {
 rename len' into len; rename Hlen' into Hlen.
 remember (Π (k = 2, length sizes'), nth (k - 1) sizes' 0%Rng)%Rng as len'
   eqn:Hlen'.
-erewrite bmat_el_BM_M; [ | apply Hsizes' | | apply Hlen' ]. 2: {
-(* qu'est-ce qui me prouve que size' ≠ [] ? rien. Peut-être est-ce une
-   hypothèse de trop dans bmat_el_BM_M ? *)
-...
+erewrite bmat_el_BM_M; [ | apply Hsizes' | | | ]; cycle 1. {
 ...
 cbn - [ iter_seq ].
 injection HAB; clear HAB; intros HAB.
