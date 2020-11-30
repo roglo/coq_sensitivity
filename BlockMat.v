@@ -4064,6 +4064,44 @@ Qed.
 
 Theorem bmat_el_BM_M : ∀ sizes len A i j,
   sizes = sizes_of_bmatrix A
+  → bmat_nrows_fst_layer A ≠ 0
+  → bmat_ncols_fst_layer A ≠ 0
+  → len = (Π (k = 2, length sizes), nth (k - 1) sizes 0)%Rng
+  → bmat_el A i j =
+    match A with
+    | BM_1 x => x
+    | BM_M MA =>
+        bmat_el (mat_el MA (i / len) (j / len)) (i mod len) (j mod len)
+    end.
+Proof.
+intros * Hsizes Hr Hc Hlen.
+destruct A as [xa| MA]; [ easy | ].
+cbn in Hr, Hc.
+cbn - [ iter_seq srng_mul srng_one ].
+cbn in Hsizes.
+destruct (zerop (mat_nrows MA)) as [Hzra| Hzra]; [ easy | ].
+destruct (zerop (mat_ncols MA)) as [Hzca| Hzca]; [ easy | ].
+cbn in Hsizes.
+cbn - [ iter_seq srng_mul srng_one ].
+remember (sizes_of_bmatrix (mat_el MA 0 0)) as sz eqn:Hsz.
+rewrite Hsizes in Hlen.
+cbn - [ iter_seq srng_mul srng_one nth ] in Hlen.
+rewrite srng_product_succ_succ in Hlen.
+erewrite srng_product_eq_compat in Hlen; cycle 1. {
+  apply nat_semiring_prop.
+} {
+  apply nat_sring_comm_prop.
+} {
+  intros k Hk.
+  replace (S k - 1) with (S (k - 1)) by flia Hk.
+  cbn; easy.
+}
+cbn - [ iter_seq srng_mul srng_one ] in Hlen.
+now rewrite <- Hlen.
+Qed.
+
+Theorem old_bmat_el_BM_M : ∀ sizes len A i j,
+  sizes = sizes_of_bmatrix A
   → sizes ≠ []
   → len = (Π (k = 2, length sizes), nth (k - 1) sizes 0)%Rng
   → bmat_el A i j =
@@ -4073,27 +4111,6 @@ Theorem bmat_el_BM_M : ∀ sizes len A i j,
         bmat_el (mat_el MA (i / len) (j / len)) (i mod len) (j mod len)
     end.
 Proof.
-(* attempt to see whether we can remove the hypothesis sizes ≠ []
-intros * Hsizes Hsznz Hlen.
-clear Hsznz.
-destruct sizes as [| size]. {
-  cbn in Hlen; subst len.
-  do 2 rewrite Nat.div_1_r, Nat.mod_1_r.
-  destruct A as [xa| MA]; [ easy | ].
-  cbn - [ iter_seq srng_mul srng_one ].
-  symmetry in Hsizes; cbn in Hsizes.
-  destruct (zerop (mat_nrows MA)) as [Hraz| Hraz]. {
-    clear Hsizes.
-    cbn - [ iter_seq srng_mul srng_one ].
-...
-  }
-  destruct (zerop (mat_ncols MA)) as [Hcaz| Hcaz]; [ | easy ].
-  clear Hsizes.
-  cbn - [ iter_seq srng_mul srng_one ].
-...
-}
-...
-*)
 intros * Hsizes Hsznz Hlen.
 destruct A as [xa| MA]; [ easy | ].
 cbn - [ iter_seq srng_mul srng_one ].
@@ -4285,6 +4302,8 @@ rewrite (@bmat_el_BM_M (size :: sizes) len'); cycle 1. {
     }
   }
 } {
+  cbn.
+...
   easy.
 } {
   rewrite List_length_cons.
@@ -4304,10 +4323,10 @@ subst len.
 remember (mat_el MAB (i / len') (j / len')) as AB' eqn:HAB'.
 symmetry in HAB'.
 remember (sizes_of_bmatrix AB') as sizes' eqn:Hsizes'.
+(*
 destruct sizes' as [| size']. {
   symmetry in Hsizes'.
   apply squ_bmat_eq_sizes_nil in Hsizes'. 2: {
-...
     rewrite <- HAB'; cbn.
     unfold is_square_bmat.
     cbn - [ iter_seq ] in HAB.
@@ -4316,6 +4335,15 @@ destruct sizes' as [| size']. {
     cbn.
     rewrite sizes_of_bmatrix_fold_left.
 (* putain la galère *)
+erewrite (@bmat_el_BM_M sizes'); [ | easy | | ]; cycle 1. {
+*)
+rename len' into len; rename Hlen' into Hlen.
+remember (Π (k = 2, length sizes'), nth (k - 1) sizes' 0%Rng)%Rng as len'
+  eqn:Hlen'.
+erewrite bmat_el_BM_M; [ | apply Hsizes' | | apply Hlen' ]. 2: {
+(* qu'est-ce qui me prouve que size' ≠ [] ? rien. Peut-être est-ce une
+   hypothèse de trop dans bmat_el_BM_M ? *)
+...
 ...
 cbn - [ iter_seq ].
 injection HAB; clear HAB; intros HAB.
