@@ -4350,9 +4350,9 @@ rename len' into len; rename Hlen' into Hlen.
 remember (Π (k = 2, length sizes'), nth (k - 1) sizes' 0%Rng)%Rng as len'
   eqn:Hlen'.
 erewrite bmat_el_BM_M; [ | apply Hsizes' | | | ]; cycle 1. {
-...
   rewrite <- HAB'.
-  injection HAB; clear HAB; intros HAB; rewrite <- HAB; cbn.
+  injection HAB; clear HAB; intros HAB; rewrite <- HAB.
+  cbn - [ iter_seq ].
 ...
 cbn - [ iter_seq ].
 injection HAB; clear HAB; intros HAB.
