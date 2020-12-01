@@ -4372,7 +4372,8 @@ rewrite (@bmat_el_BM_M sizes' len''); try easy.
 remember (mat_el MAB (i / len') (j / len')) as AB' eqn:HAB'.
 symmetry in HAB'.
 destruct AB' as [xab| MAB']. {
-  clear sizes' Hsizes' Hlen''.
+  clear sizes' len'' Hsizes' Hlen''.
+(**)
   cbn - [ iter_seq srng_mul srng_one ].
   cbn in Has.
   destruct (zerop (mat_nrows MA)) as [Hraz| Hraz]. {
@@ -4417,6 +4418,14 @@ destruct AB' as [xab| MAB']. {
   rewrite Hbs.
   rewrite <- Hlen'.
   move Hbs before Has.
+(**)
+  cbn - [ iter_seq ] in HAB.
+  injection HAB; clear HAB; intros HAB.
+  rewrite <- HAB in HAB'.
+  cbn - [ iter_seq ] in HAB'.
+  move HAB' at bottom.
+...
+  exfalso; move HAB' at bottom.
 ...
 remember (mat_el MAB (i / len') (j / len')) as AB' eqn:HAB'.
 symmetry in HAB'.
