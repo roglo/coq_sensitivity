@@ -4264,7 +4264,7 @@ induction AB as [xab| MAB IHAB] using bmatrix_ind2; intros. {
 destruct A as [xa| MA]; [ easy | ].
 destruct B as [xb| MB]; [ easy | ].
 (**)
-remember (Π (i = 1, length sizes), nth (i - 1) sizes 0)%Rng as len' eqn:Hlen'.
+remember (Π (i = 1, length sizes), nth (i - 1) sizes O)%Rng as len' eqn:Hlen'.
 rewrite (@bmat_el_BM_M (size :: sizes) len'); cycle 1. {
   cbn in HAB.
   injection HAB; clear HAB; intros HAB.
@@ -4371,7 +4371,52 @@ remember ((Π (k = 2, length sizes'), nth (k - 1) sizes' 0%Rng)%Rng) as len'' eq
 rewrite (@bmat_el_BM_M sizes' len''); try easy.
 remember (mat_el MAB (i / len') (j / len')) as AB' eqn:HAB'.
 symmetry in HAB'.
-Print bmat_el.
+destruct AB' as [xab| MAB']. {
+  clear sizes' Hsizes' Hlen''.
+  cbn - [ iter_seq srng_mul srng_one ].
+  cbn in Has.
+  destruct (zerop (mat_nrows MA)) as [Hraz| Hraz]. {
+    cbn - [ iter_seq ].
+    move Ha at bottom.
+    cbn in Ha.
+    now rewrite Hraz in Ha.
+  }
+  destruct (zerop (mat_ncols MA)) as [Hcaz| Hcaz]. {
+    cbn - [ iter_seq ].
+    move Ha at bottom.
+    cbn in Ha.
+    rewrite Hcaz in Ha.
+    cbn in Ha.
+    unfold sumbool_or in Ha.
+    now rewrite Bool.orb_comm in Ha.
+  }
+  cbn - [ iter_seq srng_mul srng_one ].
+  cbn in Has.
+  injection Has; clear Has; intros Has Hra.
+  rewrite Has.
+  rewrite <- Hlen'.
+  cbn in Hbs.
+  destruct (zerop (mat_nrows MB)) as [Hrbz| Hrbz]. {
+    cbn - [ iter_seq ].
+    move Hb at bottom.
+    cbn in Hb.
+    now rewrite Hrbz in Hb.
+  }
+  destruct (zerop (mat_ncols MB)) as [Hcbz| Hcbz]. {
+    cbn - [ iter_seq ].
+    move Hb at bottom.
+    cbn in Hb.
+    rewrite Hcbz in Hb.
+    cbn in Hb.
+    unfold sumbool_or in Hb.
+    now rewrite Bool.orb_comm in Hb.
+  }
+  cbn - [ iter_seq srng_mul srng_one ].
+  cbn in Hbs.
+  injection Hbs; clear Hbs; intros Hbs Hrb.
+  rewrite Hbs.
+  rewrite <- Hlen'.
+  move Hbs before Has.
 ...
 remember (mat_el MAB (i / len') (j / len')) as AB' eqn:HAB'.
 symmetry in HAB'.
