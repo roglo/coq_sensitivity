@@ -4136,25 +4136,40 @@ cbn - [ iter_seq srng_mul srng_one ] in Hlen.
 now rewrite <- Hlen.
 Qed.
 
-...
-
 Definition bmat_merge_fst_2_layers (BM : bmatrix T) :=
   match BM with
   | BM_1 _ => BM
   | BM_M M =>
-      let r := mat_nrows M * bmat_nrows_fst_layer (mat_el M 0 0) in
-      let c := mat_ncols M * bmat_ncols_fst_layer (mat_el M 0 0) in
+      let r1 := mat_nrows M in
+      let r2 := bmat_nrows_fst_layer (mat_el M 0 0) in
+      let c1 := mat_ncols M in
+      let c2 := bmat_ncols_fst_layer (mat_el M 0 0) in
       BM_M
         (mk_mat
-           (λ i j, mat_el M (i / mat_nrows M) (j / mat_ncols M))
-           r c)
+           (λ i j,
+            match mat_el M (i / r2) (j / c2) with
+            | BM_1 x => BM_1 x
+            | BM_M M' => mat_el M' (i mod r2) (j mod c2)
+            end)
+           (r1 * r2) (c1 * c2))
   end.
 
-...
-
+(*
 Theorem glop :  ∀ A,
-  mat_of_squ_bmat A = mat_of_squ_bmat (bmat_merge_fst_layers A).
+  mat_of_squ_bmat A = mat_of_squ_bmat (bmat_merge_fst_2_layers A).
+Proof.
+intros.
+induction A as [xa| MA IHA] using bmatrix_ind2; intros; [ easy | ].
+cbn.
+apply matrix_eq. {
+  cbn - [ iter_seq ].
+  cbn.
+  destruct (zerop (mat_nrows MA)) as [Hraz| Hraz]; [ now rewrite Hraz | ].
+  unfold bmat_ncols_fst_layer; cbn.
+  destruct (zerop (mat_ncols MA)) as [Hcaz| Hcaz]. {
+(* pffff.... *)
 ...
+*)
 
 Theorem mat_of_squ_bmat_mul : ∀ A B,
   is_square_bmat A
@@ -4163,7 +4178,6 @@ Theorem mat_of_squ_bmat_mul : ∀ A B,
   → mat_of_squ_bmat (A * B) = (mat_of_squ_bmat A * mat_of_squ_bmat B)%M.
 Proof.
 intros * Ha Hb Hab.
-...
 apply matrix_eq. {
   cbn - [ iter_seq ].
   unfold squ_bmat_size.
@@ -4233,7 +4247,7 @@ cbn - [ iter_seq nth srng_mul srng_one ] in Hlen.
 remember (A * B)%BM as AB eqn:HAB.
 symmetry in HAB.
 (**)
-destruct AB as [xab| MAB IHAB]. {
+destruct AB as [xab| MAB]. {
   cbn - [ iter_seq ].
   destruct A as [xa| MA]; [ easy | ].
   now destruct B.

@@ -1040,6 +1040,21 @@ destruct k1 as [k1| ]. {
 
 Arguments mA {T so ro}.
 
+(*
+Check mat_of_list_list.
+About bmat_el.
+Check mat_of_squ_bmat.
+Check mA.
+Require Import ZArith Zring.
+Open Scope Z.
+Existing Instance Z_semiring_op.
+Existing Instance Z_ring_op.
+Definition glop n := list_list_of_mat (mat_of_squ_bmat (mA n)).
+Definition glip n := list_list_of_mat (mat_of_squ_bmat (bmat_merge_fst_2_layers (mA n))).
+Compute glop 3.
+Compute glip 3.
+*)
+
 Fixpoint srng_of_nat n :=
   match n with
   | 0 => 0%Srng
