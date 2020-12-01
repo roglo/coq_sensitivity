@@ -4366,11 +4366,11 @@ rewrite (@bmat_el_BM_M (size :: sizes) len'); cycle 1. {
   easy.
 }
 subst len.
-remember (sizes_of_bmatrix (mat_el MAB (i / len') (j / len'))) as sizes' eqn:Hsizes'.
-remember ((Π (k = 2, length sizes'), nth (k - 1) sizes' 0%Rng)%Rng) as len'' eqn:Hlen''.
-rewrite (@bmat_el_BM_M sizes' len''); try easy; cycle 1. {
-...
-... suite ok mais pas finie
+remember (sizes_of_bmatrix (mat_el MAB (i / len') (j / len'))) as sizes'
+  eqn:Hsizes'.
+remember ((Π (k = 2, length sizes'), nth (k - 1) sizes' 0%Rng)%Rng) as len''
+  eqn:Hlen''.
+rewrite (@bmat_el_BM_M sizes' len''); try easy.
 remember (mat_el MAB (i / len') (j / len')) as AB' eqn:HAB'.
 symmetry in HAB'.
 destruct AB' as [xab| MAB']. {
@@ -4426,7 +4426,21 @@ destruct AB' as [xab| MAB']. {
   rewrite <- HAB in HAB'.
   cbn - [ iter_seq ] in HAB'.
   move HAB' at bottom.
-  admit.
+  remember (mat_el MA 0 0) as BMA eqn:HBMA.
+  symmetry in HBMA.
+  destruct BMA as [xa| MA']. {
+    cbn - [ iter_seq ] in HAB'.
+    cbn in Has; subst sizes.
+    cbn in Hlen'; subst len'.
+...
+    cbn in Ha.
+    destruct (zerop (mat_nrows MA)) as [H| H]; [ easy | cbn in Ha; clear H ].
+    destruct (zerop (mat_ncols MA)) as [H| H]; [ easy | cbn in Ha; clear H ].
+    rewrite HBMA in Ha; cbn in Ha.
+    destruct Ha as (_ & Hcra & Ha).
+    specialize (Ha 0 0 Hraz Hraz) as H1.
+    rewrite HBMA in H1.
+...
 } {
 ...
   exfalso; move HAB' at bottom.
