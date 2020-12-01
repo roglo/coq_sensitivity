@@ -4136,16 +4136,20 @@ cbn - [ iter_seq srng_mul srng_one ] in Hlen.
 now rewrite <- Hlen.
 Qed.
 
+...
+
 Definition bmat_merge_fst_2_layers (BM : bmatrix T) :=
   match BM with
   | BM_1 _ => BM
   | BM_M M =>
-      mat_map
-        (λ BM',
-         match BM' with
-         | BM_1 x => BM_1 x
-         | BM_M M' =>
-        M
+      let r := mat_nrows M * bmat_nrows_fst_layer (mat_el M 0 0) in
+      let c := mat_ncols M * bmat_ncols_fst_layer (mat_el M 0 0) in
+      BM_M
+        (mk_mat
+           (λ i j, mat_el M (i / mat_nrows M) (j / mat_ncols M))
+           r c)
+  end.
+
 ...
 
 Theorem glop :  ∀ A,
