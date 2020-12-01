@@ -4366,11 +4366,11 @@ rewrite (@bmat_el_BM_M (size :: sizes) len'); cycle 1. {
   easy.
 }
 subst len.
-Inspect 3.
-Check bmat_el_BM_M.
 remember (sizes_of_bmatrix (mat_el MAB (i / len') (j / len'))) as sizes' eqn:Hsizes'.
 remember ((Π (k = 2, length sizes'), nth (k - 1) sizes' 0%Rng)%Rng) as len'' eqn:Hlen''.
-rewrite (@bmat_el_BM_M sizes' len''); try easy.
+rewrite (@bmat_el_BM_M sizes' len''); try easy; cycle 1. {
+...
+... suite ok mais pas finie
 remember (mat_el MAB (i / len') (j / len')) as AB' eqn:HAB'.
 symmetry in HAB'.
 destruct AB' as [xab| MAB']. {
@@ -4426,6 +4426,8 @@ destruct AB' as [xab| MAB']. {
   rewrite <- HAB in HAB'.
   cbn - [ iter_seq ] in HAB'.
   move HAB' at bottom.
+  admit.
+} {
 ...
   exfalso; move HAB' at bottom.
 ...
