@@ -4371,6 +4371,7 @@ remember ((Π (k = 2, length sizes'), nth (k - 1) sizes' 0%Rng)%Rng) as len'' eq
 rewrite (@bmat_el_BM_M sizes' len''); try easy.
 remember (mat_el MAB (i / len') (j / len')) as AB' eqn:HAB'.
 symmetry in HAB'.
+Print bmat_el.
 ...
 remember (mat_el MAB (i / len') (j / len')) as AB' eqn:HAB'.
 symmetry in HAB'.
