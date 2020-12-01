@@ -4171,6 +4171,8 @@ apply matrix_eq. {
 ...
 *)
 
+(* if An, resp. Bn are the normal matrices associated with the block
+   matrices A, resp B, the theorem says that (A * B)n = An * Bn *)
 Theorem mat_of_squ_bmat_mul : ∀ A B,
   is_square_bmat A
   → is_square_bmat B
