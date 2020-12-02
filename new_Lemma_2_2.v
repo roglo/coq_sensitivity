@@ -72,20 +72,28 @@ Compute glop
    [[[301;302;303;304]; [305;306;307;308]];
     [[311;312;313;314]; [315;316;317;318]];
     [[321;322;323;324]; [325;326;327;328]]]].
-(**)
-
-(* *)
+*)
 
 (* sequence "An" *)
 
 Fixpoint mA n : matrix T :=
   match n with
-  | 0 => mat_of_const 0%Srng
+  | 0 => mat_of_const 0%Rng
   | S n' =>
-      mat_of_mat_list_list (mat_of_const 0)
-        [[mA n'; I_2_pow n'];
-         [I_2_pow n'; mat_opp (mA n')]]
+      mat_of_mat_list_list 0%Srng
+        [[mA n'; squ_mat_one n'];
+         [squ_mat_one n'; mat_opp (mA n')]]
   end.
+
+(*
+End in_ring.
+Require Import ZArith Zring.
+Open Scope Z.
+Existing Instance Z_semiring_op.
+Existing Instance Z_ring_op.
+Definition glop n := list_list_of_mat (mA Z_semiring_op n).
+Compute glop 2.
+*)
 
 ...
 
