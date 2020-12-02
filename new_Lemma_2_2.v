@@ -196,24 +196,37 @@ apply rng_opp_0.
 Qed.
 *)
 
+(* *)
+
+Theorem mA_nrows : ∀ n, mat_nrows (mA n) = 2 ^ n.
+Proof.
+intros.
+induction n; [ easy | cbn ].
+now rewrite IHn, Nat.mul_comm; cbn.
+Qed.
+
+Theorem mA_ncols : ∀ n, mat_ncols (mA n) = 2 ^ n.
+Proof.
+intros.
+induction n; [ easy | cbn ].
+now rewrite IHn, Nat.mul_comm; cbn.
+Qed.
+
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
   (mA n * mA n = mat_nat_mul_l n (squ_mat_one (2 ^ n)))%M.
 Proof.
 intros.
-apply matrix_eq; cbn - [ iter_seq ].
-...
-induction n. {
-  cbn.
-  apply matrix_eq; [ easy | easy | cbn ].
-  intros * Hi Hj.
-  now rewrite srng_mul_0_l, srng_add_0_l.
+apply matrix_eq; cbn - [ iter_seq ]. {
+  apply mA_nrows.
+} {
+  apply mA_ncols.
 }
-
+intros * Hi Hj.
+rewrite mA_nrows in Hi.
+rewrite mA_ncols.
 ...
-
-; [ now cbn; rewrite srng_mul_0_l | ].
 induction n; intros; [ now cbn; rewrite srng_mul_0_l | ].
 cbn; f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
