@@ -1,8 +1,8 @@
 (* Lemma 2.2 of the proof of the sensitivity conjecture *)
 (* sequence A_n of matrices and the proof their square is "n * I_n" *)
-(* new version *not* using block matrices which are too complicated
-   (blocked in conversion to normal matrix for compatibility with
-   their multiplication). *)
+(* new version using a new version of block matrices with one only
+   level: block matrices just being matrices of matrices, not matrices
+   of block matrices *)
 
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
@@ -27,6 +27,18 @@ Context {scp : sring_comm_prop T}.
 Context {sdp : sring_dec_prop T}.
 Context {fo : field_op T}.
 
+(* conversion matrix of matrices into simple matrix *)
+
+Print mat_of_list_list.
+Print list_list_el.
+
+Definition mat_of_mat_list_list d (mll : list (list matrix T)) : matrix T :=
+  mk_mat
+    (λ i j, mat_el ( ... ouais, c'est compliqué...
+...
+
+(* *)
+
 Definition mat_of_const (c : T) := mk_mat (λ i j, c) 1 1.
 
 (* sequence "An" *)
@@ -35,14 +47,12 @@ Fixpoint mA n : matrix T :=
   match n with
   | 0 => mat_of_const 0%Srng
   | S n' =>
-      mk_mat
-        (λ i j,
-...
-       BM_M
-         (mat_of_list_list (BM_1 0%Srng)
-            [[mA n'; I_2_pow n'];
-             [I_2_pow n'; bmat_opp (mA n')]])
+      mat_of_mat_list_list
+        [[mA n'; I_2_pow n'];
+         [I_2_pow n'; mat_opp (mA n')]]
   end.
+
+...
 
 Theorem bmat_fit_for_add_IZ_A : ∀ u n,
   bmat_fit_for_add (IZ_2_pow u n) (mA n).
