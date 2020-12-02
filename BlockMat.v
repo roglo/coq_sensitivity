@@ -4366,15 +4366,18 @@ rewrite (@bmat_el_BM_M (size :: sizes) len'); cycle 1. {
   easy.
 }
 subst len.
-remember (sizes_of_bmatrix (mat_el MAB (i / len') (j / len'))) as sizes'
+rename len' into len.
+rename Hlen' into Hlen.
+...
+remember (sizes_of_bmatrix (mat_el MAB (i / len) (j / len))) as sizes'
   eqn:Hsizes'.
-remember ((Π (k = 2, length sizes'), nth (k - 1) sizes' 0%Rng)%Rng) as len''
-  eqn:Hlen''.
-rewrite (@bmat_el_BM_M sizes' len''); try easy.
-remember (mat_el MAB (i / len') (j / len')) as AB' eqn:HAB'.
+remember ((Π (k = 2, length sizes'), nth (k - 1) sizes' 0%Rng)%Rng) as len'
+  eqn:Hlen'.
+rewrite (@bmat_el_BM_M sizes' len'); try easy.
+remember (mat_el MAB (i / len) (j / len)) as AB' eqn:HAB'.
 symmetry in HAB'.
 destruct AB' as [xab| MAB']. {
-  clear sizes' len'' Hsizes' Hlen''.
+  clear sizes' len' Hsizes' Hlen'.
 (**)
   cbn - [ iter_seq srng_mul srng_one ].
   cbn in Has.
@@ -4397,7 +4400,7 @@ destruct AB' as [xab| MAB']. {
   cbn in Has.
   injection Has; clear Has; intros Has Hra.
   rewrite Has.
-  rewrite <- Hlen'.
+  rewrite <- Hlen.
   cbn in Hbs.
   destruct (zerop (mat_nrows MB)) as [Hrbz| Hrbz]. {
     cbn - [ iter_seq ].
@@ -4418,7 +4421,7 @@ destruct AB' as [xab| MAB']. {
   cbn in Hbs.
   injection Hbs; clear Hbs; intros Hbs Hrb.
   rewrite Hbs.
-  rewrite <- Hlen'.
+  rewrite <- Hlen.
   move Hbs before Has.
 (**)
   cbn - [ iter_seq ] in HAB.
@@ -4431,7 +4434,7 @@ destruct AB' as [xab| MAB']. {
   destruct BMA as [xa| MA']. {
     cbn - [ iter_seq ] in HAB'.
     cbn in Has; subst sizes.
-    cbn in Hlen'; subst len'.
+    cbn in Hlen; subst len.
 ...
     cbn in Ha.
     destruct (zerop (mat_nrows MA)) as [H| H]; [ easy | cbn in Ha; clear H ].
