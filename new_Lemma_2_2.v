@@ -27,19 +27,54 @@ Context {scp : sring_comm_prop T}.
 Context {sdp : sring_dec_prop T}.
 Context {fo : field_op T}.
 
-(* conversion matrix of matrices into simple matrix *)
-
-Print mat_of_list_list.
-Print list_list_el.
-
-Definition mat_of_mat_list_list d (mll : list (list matrix T)) : matrix T :=
-  mk_mat
-    (λ i j, mat_el ( ... ouais, c'est compliqué...
-...
-
 (* *)
 
 Definition mat_of_const (c : T) := mk_mat (λ i j, c) 1 1.
+
+(* conversion matrix of matrices (actually list of list of matrices)
+   into simple matrix *)
+
+Definition upper_left_mat_in_list_list d mll :=
+  hd (mat_of_const d) (hd [] mll).
+
+Definition mat_list_list_el d mll i j :=
+  let M := upper_left_mat_in_list_list d mll in
+  let r := mat_nrows M in
+  let c := mat_ncols M in
+  mat_el (nth (j / c) (nth (i / r) mll []) (mat_of_const d))
+    (i mod r) (j mod c).
+
+Definition mat_of_mat_list_list d (mll : list (list (matrix T))) : matrix T :=
+  let M := upper_left_mat_in_list_list d mll in
+  let r := mat_nrows M in
+  let c := mat_ncols M in
+  mk_mat (mat_list_list_el d mll)
+    (r * length mll)
+    (c * length (hd [] mll)).
+
+(*
+End in_ring.
+Require Import ZArith Zring.
+Open Scope Z.
+Existing Instance Z_semiring_op.
+Existing Instance Z_ring_op.
+Definition glop mll :=
+  list_list_of_mat
+    (mat_of_mat_list_list 0 (map (λ ml, map (mat_of_list_list 0) ml) mll)).
+Compute glop [[[[1;2;3]; [4;5;6]]; [[7;8;9]; [10;11;12]]]].
+Compute glop
+  [[[[101;102;103;104]; [105;106;107;108]];
+    [[111;112;113;114]; [115;116;117;118]];
+    [[121;122;123;124]; [125;126;127;128]]];
+   [[[201;202;203;204]; [205;206;207;208]];
+    [[211;212;213;214]; [215;216;217;218]];
+    [[221;222;223;224]; [225;226;227;228]]];
+   [[[301;302;303;304]; [305;306;307;308]];
+    [[311;312;313;314]; [315;316;317;318]];
+    [[321;322;323;324]; [325;326;327;328]]]].
+(**)
+
+(* *)
 
 (* sequence "An" *)
 
@@ -47,7 +82,7 @@ Fixpoint mA n : matrix T :=
   match n with
   | 0 => mat_of_const 0%Srng
   | S n' =>
-      mat_of_mat_list_list
+      mat_of_mat_list_list (mat_of_const 0)
         [[mA n'; I_2_pow n'];
          [I_2_pow n'; mat_opp (mA n')]]
   end.
