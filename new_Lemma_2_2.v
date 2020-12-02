@@ -228,17 +228,20 @@ rewrite mA_nrows in Hi.
 rewrite mA_ncols.
 destruct (Nat.eq_dec i k) as [Hik| Hik]. {
   subst k; clear Hk.
+...
   revert i Hi.
   induction n; intros. {
     cbn.
     now rewrite srng_mul_0_l, srng_add_0_l.
   }
+...
   cbn - [ iter_seq Nat.pow ].
   unfold mat_list_list_el.
   unfold upper_left_mat_in_list_list.
   cbn - [ iter_seq Nat.pow ].
   rewrite mA_nrows, mA_ncols.
   rewrite (srng_summation_split _ (2 ^ n - 1)).
+...
   destruct (lt_dec i (2 ^ n)) as [Hi2n| H2n]. {
     rewrite (Nat.div_small i); [ | easy ].
     rewrite (Nat.mod_small i); [ | easy ].
@@ -258,9 +261,12 @@ destruct (Nat.eq_dec i k) as [Hik| Hik]. {
     rewrite Nat.sub_add. 2: {
       now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
     }
+...
     rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
       intros j Hj.
-destruct n; cbn.
+      destruct n; cbn; [ apply srng_mul_0_l | ].
+      unfold mat_list_list_el; cbn.
+      rewrite mA_nrows, mA_ncols.
 ...
     erewrite srng_summation_eq_compat with (b := 2 ^ n). 2: {
       intros j Hj.
