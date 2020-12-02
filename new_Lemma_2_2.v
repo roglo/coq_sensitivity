@@ -226,6 +226,8 @@ apply matrix_eq; cbn - [ iter_seq ]. {
 intros i k Hi Hk.
 rewrite mA_nrows in Hi.
 rewrite mA_ncols.
+destruct (Nat.eq_dec i k) as [Hik| Hik]. {
+  subst k; clear Hk.
 ...
 induction n; intros; [ now cbn; rewrite srng_mul_0_l | ].
 cbn; f_equal.
