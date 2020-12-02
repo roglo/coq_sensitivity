@@ -223,7 +223,7 @@ apply matrix_eq; cbn - [ iter_seq ]. {
 } {
   apply mA_ncols.
 }
-intros * Hi Hj.
+intros i k Hi Hk.
 rewrite mA_nrows in Hi.
 rewrite mA_ncols.
 ...
