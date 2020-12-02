@@ -228,6 +228,12 @@ rewrite mA_nrows in Hi.
 rewrite mA_ncols.
 destruct (Nat.eq_dec i k) as [Hik| Hik]. {
   subst k; clear Hk.
+  revert i Hi.
+  induction n; intros. {
+    cbn.
+    now rewrite srng_mul_0_l, srng_add_0_l.
+  }
+  cbn - [ iter_seq Nat.pow ].
 ...
 induction n; intros; [ now cbn; rewrite srng_mul_0_l | ].
 cbn; f_equal.
