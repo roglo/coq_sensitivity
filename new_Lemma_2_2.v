@@ -242,12 +242,37 @@ destruct (Nat.eq_dec i k) as [Hik| Hik]. {
   rewrite Nat.sub_add. 2: {
     now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
   }
-...
   cbn - [ iter_seq Nat.pow ].
   unfold mat_list_list_el.
   unfold upper_left_mat_in_list_list.
   cbn - [ iter_seq Nat.pow ].
   rewrite mA_nrows, mA_ncols.
+  erewrite srng_summation_eq_compat. 2: {
+    intros j Hj.
+    rewrite (Nat.div_small j); [ | cbn in Hi; flia Hj Hi ].
+    rewrite (Nat.mod_small j); [ | cbn in Hi; flia Hj Hi ].
+    easy.
+  }
+  cbn - [ iter_seq Nat.pow ].
+  erewrite srng_add_comm.
+  erewrite srng_summation_eq_compat. 2: {
+    intros j Hj.
+    rewrite (Nat_div_less_small 1). 2: {
+      rewrite Nat.mul_1_l.
+      split; [ easy | ].
+      change (j < 2 ^ S n).
+      enough (H : 0 < 2 ^ S n) by flia H Hj.
+      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+    }
+    rewrite (@Nat_mod_less_small 1 j). 2: {
+      rewrite Nat.mul_1_l.
+      split; [ easy | ].
+      change (j < 2 ^ S n).
+      enough (H : 0 < 2 ^ S n) by flia H Hj.
+      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+    }
+    rewrite Nat.mul_1_l.
+...
   rewrite (srng_summation_split _ (2 ^ n - 1)).
 ...
   destruct (lt_dec i (2 ^ n)) as [Hi2n| H2n]. {
