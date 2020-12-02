@@ -80,9 +80,9 @@ Fixpoint mA n : matrix T :=
   match n with
   | 0 => mat_of_const 0%Rng
   | S n' =>
-      mat_of_mat_list_list 0%Srng
-        [[mA n'; squ_mat_one n'];
-         [squ_mat_one n'; mat_opp (mA n')]]
+      mat_of_mat_list_list 0%Rng
+        [[mA n'; squ_mat_one (2 ^ n')];
+         [squ_mat_one (2 ^ n'); (- mA n')%M]]
   end.
 
 (*
@@ -92,11 +92,21 @@ Open Scope Z.
 Existing Instance Z_semiring_op.
 Existing Instance Z_ring_op.
 Definition glop n := list_list_of_mat (mA Z_semiring_op n).
-Compute glop 2.
+Definition glip n := list_list_of_mat (squ_mat_one (Nat.pow 2 (n - 1))).
+Compute glip 3.
+Compute glop 3.
 *)
 
-...
+Definition rng_mul_nat_l n v :=
+  match n with
+  | 0 => 0%Srng
+  | S n' => (Σ (_ = 0, n'), v)%Srng
+  end.
 
+Definition mat_nat_mul_l n M :=
+  mk_mat (λ i j, rng_mul_nat_l n (mat_el M i j)) (mat_nrows M) (mat_ncols M).
+
+(*
 Theorem bmat_fit_for_add_IZ_A : ∀ u n,
   bmat_fit_for_add (IZ_2_pow u n) (mA n).
 Proof.
@@ -184,13 +194,26 @@ rewrite Tr_opp; [ | easy | easy | apply A_is_square_bmat ].
 rewrite IHn.
 apply rng_opp_0.
 Qed.
+*)
 
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
-  (mA n * mA n = bmat_nat_mul_l n (I_2_pow n))%BM.
+  (mA n * mA n = mat_nat_mul_l n (squ_mat_one (2 ^ n)))%M.
 Proof.
 intros.
+apply matrix_eq; cbn - [ iter_seq ].
+...
+induction n. {
+  cbn.
+  apply matrix_eq; [ easy | easy | cbn ].
+  intros * Hi Hj.
+  now rewrite srng_mul_0_l, srng_add_0_l.
+}
+
+...
+
+; [ now cbn; rewrite srng_mul_0_l | ].
 induction n; intros; [ now cbn; rewrite srng_mul_0_l | ].
 cbn; f_equal.
 apply matrix_eq; cbn; [ easy | easy | ].
