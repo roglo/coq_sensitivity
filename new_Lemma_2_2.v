@@ -106,96 +106,6 @@ Definition rng_mul_nat_l n v :=
 Definition mat_nat_mul_l n M :=
   mk_mat (λ i j, rng_mul_nat_l n (mat_el M i j)) (mat_nrows M) (mat_ncols M).
 
-(*
-Theorem bmat_fit_for_add_IZ_A : ∀ u n,
-  bmat_fit_for_add (IZ_2_pow u n) (mA n).
-Proof.
-intros.
-revert u.
-induction n; intros; [ easy | cbn ].
-split; [ easy | ].
-split; [ easy | ].
-intros * Hi Hj.
-destruct i. {
-  destruct j; [ apply IHn | ].
-  destruct j; [ cbn | flia Hj ].
-  apply bmat_fit_for_add_IZ_IZ.
-}
-destruct i; [ | flia Hi ].
-destruct j; [ apply bmat_fit_for_add_IZ_IZ | ].
-destruct j; [ cbn | flia Hj ].
-transitivity (mA n); [ easy | ].
-apply bmat_fit_for_add_opp_r.
-Qed.
-
-Theorem sizes_of_bmatrix_A : ∀ n,
-  sizes_of_bmatrix (mA n) = repeat 2 n.
-Proof.
-intros.
-induction n; [ easy | now cbn; f_equal ].
-Qed.
-
-Theorem A_is_square_bmat : ∀ n,
-  is_square_bmat (mA n).
-Proof.
-intros.
-induction n; [ easy | cbn ].
-split; [ easy | ].
-split; [ easy | ].
-intros i j Hi Hj.
-destruct i; cbn. {
-  destruct j; [ easy | cbn ].
-  destruct j; [ | flia Hj ].
-  rewrite sizes_of_bmatrix_A.
-  rewrite <- (sizes_of_bmatrix_IZ n 1%Srng).
-  apply IZ_is_square_bmat.
-}
-destruct i; [ cbn | flia Hi ].
-destruct j; cbn. {
-  rewrite sizes_of_bmatrix_A.
-  rewrite <- (sizes_of_bmatrix_IZ n 1%Srng).
-  apply IZ_is_square_bmat.
-}
-destruct j; [ | flia Hj ].
-apply is_square_bmat_loop_opp.
-apply IHn.
-Qed.
-
-Theorem bmat_zero_like_A_eq_Z :
-  ∀ n, bmat_zero_like (mA n) = Z_2_pow n.
-Proof.
-intros.
-induction n; [ easy | cbn ].
-f_equal.
-apply matrix_eq; cbn; [ easy | easy | ].
-intros i j Hi Hj.
-destruct i; cbn. {
-  destruct j; cbn; [ easy | ].
-  destruct j; [ cbn | flia Hj ].
-  apply bmat_zero_like_IZ_eq_Z.
-}
-destruct i; [ cbn | flia Hi ].
-destruct j; cbn. {
-  apply bmat_zero_like_IZ_eq_Z.
-}
-destruct j; [ | flia Hj ].
-rewrite fold_bmat_zero_like.
-rewrite bmat_zero_like_opp; [ easy | ].
-apply A_is_square_bmat.
-Qed.
-
-Theorem Tr_A : ∀ n, Tr (mA n) = 0%Srng.
-Proof.
-intros.
-induction n; [ easy | cbn ].
-rewrite IHn.
-do 2 rewrite srng_add_0_l.
-rewrite Tr_opp; [ | easy | easy | apply A_is_square_bmat ].
-rewrite IHn.
-apply rng_opp_0.
-Qed.
-*)
-
 (* *)
 
 Theorem mA_nrows : ∀ n, mat_nrows (mA n) = 2 ^ n.
@@ -218,6 +128,7 @@ Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
   (mA n * mA n = mat_nat_mul_l n (squ_mat_one (2 ^ n)))%M.
 Proof.
 intros.
+(* perhaps could be simplified, or things grouped together *)
 apply matrix_eq; cbn - [ iter_seq ]. {
   apply mA_nrows.
 } {
@@ -425,7 +336,7 @@ destruct (Nat.eq_dec i k) as [Hik| Hik]. {
     easy.
   }
   rewrite srng_add_comm.
-  destruct (lt_dec i (2 ^ n)) as [Hi2n| H2n]. {
+  destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
     rewrite (Nat.div_small i); [ | easy ].
     rewrite (Nat.mod_small i); [ | easy ].
     cbn - [ iter_seq Nat.pow ].
@@ -552,75 +463,146 @@ destruct (Nat.eq_dec i k) as [Hik| Hik]. {
       now rewrite srng_summation_succ_succ.
     }
   } {
-    apply Nat.nlt_ge in H2n.
-...
-induction n; intros; [ now cbn; rewrite srng_mul_0_l | ].
-cbn; f_equal.
-apply matrix_eq; cbn; [ easy | easy | ].
-intros * Hi Hj.
-destruct i. {
-  destruct j. {
-    cbn.
-    rewrite bmat_nat_mul_l_succ; [ | easy ].
-    rewrite <- IHn.
-    rewrite old_bmat_mul_1_r; [ | easy | easy | easy ].
-    f_equal.
-    rewrite <- bmat_zero_like_sqr; [ | apply A_is_square_bmat ].
-    now apply bmat_add_0_l.
+    apply Nat.nlt_ge in Hi2n.
+    rewrite (Nat_div_less_small 1). 2: {
+      rewrite Nat.mul_1_l.
+      split; [ easy | ].
+      change (i < 2 ^ S n).
+      enough (H : 0 < 2 ^ S n) by flia H Hi.
+      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+    }
+    rewrite (Nat_mod_less_small 1). 2: {
+      rewrite Nat.mul_1_l.
+      split; [ easy | ].
+      change (i < 2 ^ S n).
+      enough (H : 0 < 2 ^ S n) by flia H Hi.
+      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+    }
+    rewrite Nat.mul_1_l.
+    cbn - [ iter_seq Nat.pow ].
+    rewrite (srng_summation_split _ (i - 2 ^ n)). 2: {
+      split; [ flia | ].
+      apply -> Nat.succ_le_mono.
+      cbn in Hi; flia Hi.
+    }
+    rewrite srng_summation_split_last; [ | flia ].
+    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+      intros j Hj.
+      destruct (Nat.eq_dec (i - 2 ^ n) (j - 1)) as [Hij| Hij]. {
+        flia Hj Hij.
+      }
+      apply srng_mul_0_l.
+    }
+    rewrite srng_add_0_l.
+    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+      intros j Hj.
+      destruct (Nat.eq_dec (i - 2 ^ n) j) as [Hij| Hij]. {
+        flia Hj Hij.
+      }
+      apply srng_mul_0_l.
+    }
+    rewrite srng_add_0_r.
+    remember (i - 2 ^ n) as j eqn:Hj.
+    destruct (Nat.eq_dec j j) as [H| H]; [ clear H | easy ].
+    subst j; rewrite srng_mul_1_l.
+    erewrite srng_summation_eq_compat. 2: {
+      intros j Hj.
+      now rewrite rng_mul_opp_opp.
+    }
+    cbn - [ iter_seq Nat.pow ].
+    rewrite srng_summation_shift; [ | cbn; flia Hi ].
+    rewrite Nat_sub_sub_swap.
+    replace (2 ^ S n - 2 ^ n) with (2 ^ n). 2: {
+      cbn; rewrite Nat.add_0_r; symmetry.
+      apply Nat.add_sub.
+    }
+    erewrite srng_summation_eq_compat. 2: {
+      intros j Hj.
+      now rewrite Nat.add_comm, Nat.add_sub.
+    }
+    cbn - [ iter_seq Nat.pow ].
+    destruct (lt_dec k (2 ^ n)) as [Hk2n| Hk2n]. {
+      rewrite (Nat.div_small k); [ | easy ].
+      rewrite (Nat.mod_small k); [ | easy ].
+      cbn - [ iter_seq Nat.pow ].
+      rewrite (srng_summation_split _ k). 2: {
+        cbn in Hk; flia Hk Hk2n.
+      }
+      rewrite srng_summation_split_last; [ | flia ].
+      rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+        intros j Hj.
+        rewrite rng_mul_opp_opp.
+        destruct (Nat.eq_dec (j - 1) k) as [Hjk| Hjk]; [ flia Hj Hjk | ].
+        apply srng_mul_0_r.
+      }
+      rewrite srng_add_0_l, rng_opp_involutive.
+      destruct (Nat.eq_dec k k) as [H| H]; [ clear H | easy ].
+      rewrite rng_mul_opp_r, srng_mul_1_r.
+      rewrite srng_add_assoc.
+      rewrite fold_rng_sub.
+      rewrite rng_add_opp_r, srng_add_0_l.
+      rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+        intros j Hj.
+        destruct (Nat.eq_dec j k) as [Hjk| Hjk]; [ flia Hj Hjk | ].
+        rewrite rng_opp_0.
+        apply srng_mul_0_r.
+      }
+      symmetry.
+      clear IHn Hi Hk Hi2n Hk2n.
+      induction n; [ apply srng_add_0_l | ].
+      rewrite srng_summation_split_last; [ | flia ].
+      rewrite srng_add_0_r.
+      now rewrite srng_summation_succ_succ.
+    } {
+      apply Nat.nlt_ge in Hk2n.
+      rewrite (Nat_div_less_small 1). 2: {
+        rewrite Nat.mul_1_l.
+        split; [ easy | ].
+        change (k < 2 ^ S n).
+        enough (H : 0 < 2 ^ S n) by flia H Hk.
+        now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+      }
+      rewrite (Nat_mod_less_small 1). 2: {
+        rewrite Nat.mul_1_l.
+        split; [ easy | ].
+        change (k < 2 ^ S n).
+        enough (H : 0 < 2 ^ S n) by flia H Hk.
+        now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+      }
+      rewrite Nat.mul_1_l.
+      cbn - [ iter_seq Nat.pow ].
+      destruct (Nat.eq_dec (i - 2 ^ n) (k - 2 ^ n)) as [Hik2| Hik2]. {
+        flia Hik Hik2 Hi2n Hk2n.
+      }
+      rewrite srng_add_0_l.
+      erewrite srng_summation_eq_compat. 2: {
+        intros l Hl.
+        now do 2 rewrite rng_mul_opp_opp.
+      }
+      cbn - [ iter_seq Nat.pow ].
+      rewrite IHn; cycle 1. {
+        cbn in Hi; flia Hi.
+      } {
+        cbn in Hk; flia Hk.
+      } {
+        flia Hik Hi2n Hk2n.
+      } {
+        clear IHn Hi Hk Hi2n Hk2n Hik2.
+        symmetry.
+        induction n; [ apply srng_add_0_l | ].
+        rewrite srng_summation_split_last; [ | flia ].
+        rewrite srng_add_0_r.
+        now rewrite srng_summation_succ_succ.
+      }
+    }
   }
-  destruct j; [ cbn | flia Hj ].
-  rewrite bmat_nat_mul_l_succ; [ | easy ].
-  rewrite old_bmat_mul_1_r; [ | easy | easy | ]. 2: {
-    unfold I_2_pow.
-    apply bmat_fit_for_add_IZ_A.
-  }
-  rewrite old_bmat_mul_1_l; [ | easy | ]. 2: {
-    unfold I_2_pow.
-    transitivity (mA n); [ apply bmat_fit_for_add_IZ_A | ].
-    apply bmat_fit_for_add_opp_r.
-  }
-  rewrite bmat_add_0_l; [ | easy ].
-  rewrite bmat_add_opp_r; [ | easy | easy ].
-  rewrite fold_Z_2_pow.
-  rewrite old_bmat_add_0_r; [ | easy | ]. 2: {
-    now apply bmat_fit_for_add_Z_2_pow_bmat_nat_mul_l.
-  }
-  rewrite bmat_nat_mul_0_r; [ | easy ].
-  now apply bmat_zero_like_A_eq_Z.
 }
-destruct i; [ | flia Hi ].
-destruct j; cbn. {
-  rewrite old_bmat_mul_1_l; [ | easy | ]. 2: {
-    apply bmat_fit_for_add_IZ_A.
-  }
-  rewrite old_bmat_mul_1_r; [ | easy | easy | ]. 2: {
-    transitivity (mA n); [ | apply bmat_fit_for_add_opp_r ].
-    apply bmat_fit_for_add_IZ_A.
-  }
-  rewrite bmat_add_0_l; [ | easy ].
-  rewrite bmat_add_opp_r; [ | easy | easy ].
-  rewrite bmat_nat_mul_l_succ; [ | easy ].
-  rewrite fold_Z_2_pow.
-  rewrite bmat_nat_mul_0_r; [ | easy ].
-  rewrite old_bmat_add_0_r; [ | easy | easy ].
-  now apply bmat_zero_like_A_eq_Z.
-}
-destruct j; [ cbn | flia Hj ].
-rewrite old_bmat_mul_1_l; [ | easy | easy ].
-rewrite bmat_mul_sqr_opp; [ | easy | easy | easy | apply A_is_square_bmat ].
-rewrite bmat_nat_mul_l_succ; [ | easy ].
-rewrite <- IHn.
-rewrite bmat_zero_like_A_eq_Z.
-rewrite old_bmat_add_0_l; [ | easy | apply bmat_fit_for_add_IZ_IZ ].
-apply bmat_add_comm; [ easy | ].
-transitivity (mA n). 2: {
-  apply (is_square_bmat_fit_for_add (sizes_of_bmatrix (mA n))). {
-    apply A_is_square_bmat.
-  }
-  apply is_square_bmat_loop_mul; apply A_is_square_bmat.
-}
-apply bmat_fit_for_add_IZ_A.
 Qed.
+
+Inspect 1.
+Check mA.
+
+...
 
 Fixpoint first_non_zero_in_col (M : matrix T) it i j :=
   match it with
