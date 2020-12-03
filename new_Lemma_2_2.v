@@ -165,9 +165,7 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
     rewrite srng_add_0_l.
     rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
       intros j Hj.
-      destruct (Nat.eq_dec i (j - 2 ^ n)) as [Hij| Hij]. {
-        flia Hj Hij.
-      }
+      destruct (Nat.eq_dec i (j - 2 ^ n)) as [Hij| Hij]; [ flia Hj Hij | ].
       apply srng_mul_0_l.
     }
     rewrite srng_add_0_r.
@@ -221,9 +219,7 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
     rewrite srng_add_0_l.
     rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
       intros j Hj.
-      destruct (Nat.eq_dec j (k - 2 ^ n)) as [Hjk| Hjk]. {
-        flia Hj Hjk.
-      }
+      destruct (Nat.eq_dec j (k - 2 ^ n)) as [Hjk| Hjk]; [ flia Hj Hjk | ].
       apply srng_mul_0_r.
     }
     rewrite srng_add_0_r.
@@ -262,9 +258,7 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
     rewrite srng_add_assoc.
     rewrite fold_rng_sub.
     rewrite rng_add_opp_r, srng_add_0_l.
-    destruct (Nat.eq_dec i k) as [Hik| Hik]. {
-      flia Hi2n Hk2n Hik.
-    }
+    destruct (Nat.eq_dec i k) as [Hik| Hik]; [ flia Hi2n Hk2n Hik | ].
     rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
       intros j Hj.
       destruct (Nat.eq_dec i j) as [Hij| Hij]; [ flia Hj Hij | ].
@@ -308,9 +302,7 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
   rewrite srng_add_0_l.
   rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
     intros j Hj.
-    destruct (Nat.eq_dec (i - 2 ^ n) j) as [Hij| Hij]. {
-      flia Hj Hij.
-    }
+    destruct (Nat.eq_dec (i - 2 ^ n) j) as [Hij| Hij]; [ flia Hj Hij | ].
     apply srng_mul_0_l.
   }
   rewrite srng_add_0_r.
@@ -336,9 +328,7 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
       cbn in Hk; flia Hk Hk2n.
     }
     rewrite srng_summation_split_last; [ | flia ].
-    destruct (Nat.eq_dec i k) as [Hik| Hik]. {
-      flia Hik Hi2n Hk2n.
-    }
+    destruct (Nat.eq_dec i k) as [Hik| Hik]; [ flia Hik Hi2n Hk2n | ].
     rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
       intros j Hj.
       destruct (Nat.eq_dec (j - 1) k) as [Hjk| Hjk]; [ flia Hj Hjk | ].
