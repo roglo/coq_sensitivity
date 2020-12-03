@@ -568,8 +568,6 @@ Qed.
 Check mA.
 Inspect 1.
 
-...
-
 Fixpoint first_non_zero_in_col (M : matrix T) it i j :=
   match it with
   | 0 => None
@@ -1403,22 +1401,9 @@ destruct k1 as [k1| ]. {
 ...
 *)
 
+About mA.
 Arguments mA {T so ro}.
-
-(*
-Check mat_of_list_list.
-About bmat_el.
-Check mat_of_squ_bmat.
-Check mA.
-Require Import ZArith Zring.
-Open Scope Z.
-Existing Instance Z_semiring_op.
-Existing Instance Z_ring_op.
-Definition glop n := list_list_of_mat (mat_of_squ_bmat (mA n)).
-Definition glip n := list_list_of_mat (mat_of_squ_bmat (bmat_merge_fst_2_layers (mA n))).
-Compute glop 3.
-Compute glip 3.
-*)
+About mA.
 
 Fixpoint srng_of_nat n :=
   match n with
@@ -1426,25 +1411,36 @@ Fixpoint srng_of_nat n :=
   | S n' => (1 + srng_of_nat n')%Srng
   end.
 
-(* A² = nI in matrices (instead of block matrices) *)
-Theorem lemma_2_A_n_2_eq_n_I' : ∀ n,
-  (mat_of_squ_bmat (mA n) * mat_of_squ_bmat (mA n) =
-   srng_of_nat n × mat_of_squ_bmat (I_2_pow n))%M.
-Proof.
-intros.
-specialize (lemma_2_A_n_2_eq_n_I n) as H1.
-...
-(* I though I could use this theorem, started in BlockMat.v
-   but I cannot finish it up. Anyway, I am not sure it would
-   resolve the problem; it could add one step, but afterwards?
-   I have to think of it
-Theorem mat_of_squ_bmat_mul : ∀ A B,
-  is_square_bmat A
-  → is_square_bmat B
-  → sizes_of_bmatrix A = sizes_of_bmatrix B
-  → mat_of_squ_bmat (A * B) = (mat_of_squ_bmat A * mat_of_squ_bmat B)%M.
-...
+(*
+End in_field.
+Require Import ZArith Zring.
+Open Scope Z.
+Existing Instance Z_semiring_op.
+Existing Instance Z_ring_op.
+Definition glop n := list_list_of_mat (mA Z_semiring_op n).
+Definition glip n := list_list_of_mat (squ_mat_one (Nat.pow 2 (n - 1))).
+Compute glip 3.
+Compute glop 3.
+Check mk_vect.
+Definition mB n i := mk_vect (λ j, if Nat.eq_dec i j then 1 else 0) n.
+Search vector.
+Definition pouet n i := list_of_vect (mat_mul_vect_r (mA _ n) (mB n i)).
+Compute pouet 4 6.
+Require Import Rational Qfield2.
+Import Q.Notations.
+Open Scope Q_scope.
+Existing Instance Q_semiring_op.
+Existing Instance Q_ring_op.
+Existing Instance Q_sring_dec_prop.
+Existing Instance Q_field_op.
+Existing Instance Q_semiring_prop.
+Existing Instance Q_ring_prop.
+
+Compute determinant (mA Q_semiring_op 4).
+Compute list_list_of_mat (gauss_jordan' (mA Q_semiring_op 2)).
 *)
+
+...
 
 (* here, I would like to prove that, knowing that An^2 = nI, the
    eigenvalues of An are √n and -√n, as the Lemma 2.2. claims *)
