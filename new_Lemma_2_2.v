@@ -102,7 +102,7 @@ apply matrix_eq; cbn - [ iter_seq ]. {
 intros i k Hi Hk.
 rewrite mA_nrows in Hi.
 rewrite mA_ncols.
-revert i Hi.
+revert i k Hi Hk.
 induction n; intros. {
   cbn.
   now rewrite srng_mul_0_l, srng_add_0_l.
@@ -149,7 +149,7 @@ erewrite srng_summation_eq_compat. 2: {
   easy.
 }
 rewrite srng_add_comm.
-destruct (lt_dec i (2 ^ n)) as [Hi2n| H2n]. {
+destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
   rewrite (Nat.div_small i); [ | easy ].
   rewrite (Nat.mod_small i); [ | easy ].
   cbn - [ iter_seq Nat.pow ].
@@ -157,144 +157,136 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| H2n]. {
     rewrite (Nat.div_small k); [ | easy ].
     rewrite (Nat.mod_small k); [ | easy ].
     cbn - [ iter_seq Nat.pow ].
-...
-    rewrite IHn; [ | easy | easy | easy ].
-      rewrite srng_add_0_l.
-      rewrite (srng_summation_split _ (i + 2 ^ n)); [ | cbn; flia Hi Hi2n ].
+    rewrite IHn; [ | easy | easy ].
+    rewrite (srng_summation_split _ (i + 2 ^ n)); [ | cbn; flia Hi Hi2n ].
+    rewrite srng_summation_split_last; [ | flia ].
+    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+      intros j Hj.
+      destruct (Nat.eq_dec i (j - 1 - 2 ^ n)) as [Hij| Hij]. {
+        flia Hj Hij.
+      }
+      apply srng_mul_0_l.
+    }
+    rewrite srng_add_0_l.
+    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+      intros j Hj.
+      destruct (Nat.eq_dec i (j - 2 ^ n)) as [Hij| Hij]. {
+        flia Hj Hij.
+      }
+      apply srng_mul_0_l.
+    }
+    rewrite srng_add_0_r.
+    rewrite Nat.add_sub.
+    destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
+    rewrite srng_mul_1_l.
+    symmetry.
+    destruct (Nat.eq_dec i k) as [Hik| Hik]. {
+      subst k.
+      destruct n; [ easy | ].
+      cbn - [ iter_seq ].
       rewrite srng_summation_split_last; [ | flia ].
-      rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
-        intros j Hj.
-        destruct (Nat.eq_dec i (j - 1 - 2 ^ n)) as [Hij| Hij]. {
-          flia Hj Hij.
-        }
-        apply srng_mul_0_l.
-      }
-      rewrite srng_add_0_l.
-      rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
-        intros j Hj.
-        destruct (Nat.eq_dec i (j - 2 ^ n)) as [Hij| Hij]. {
-          flia Hj Hij.
-        }
-        apply srng_mul_0_l.
-      }
-      rewrite srng_add_0_r.
-      rewrite Nat.add_sub.
-      destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
-      rewrite srng_mul_1_l.
-      now destruct (Nat.eq_dec i k).
+      now rewrite srng_summation_succ_succ.
     } {
-      apply Nat.nlt_ge in Hk2n.
-      rewrite (Nat_div_less_small 1). 2: {
-        rewrite Nat.mul_1_l.
-        split; [ easy | ].
-        change (k < 2 ^ S n).
-        enough (H : 0 < 2 ^ S n) by flia H Hk.
-        now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-      }
-      rewrite (Nat_mod_less_small 1). 2: {
-        rewrite Nat.mul_1_l.
-        split; [ easy | ].
-        change (k < 2 ^ S n).
-        enough (H : 0 < 2 ^ S n) by flia H Hk.
-        now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-      }
-      rewrite Nat.mul_1_l.
-      cbn - [ iter_seq Nat.pow ].
-      rewrite (srng_summation_split _ (k - 2 ^ n)). 2: {
-        split; [ flia | ].
-        apply -> Nat.succ_le_mono.
-        cbn in Hk; flia Hk.
-      }
-      rewrite srng_summation_split_last; [ | flia ].
-      rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
-        intros j Hj.
-        destruct (Nat.eq_dec (j - 1) (k - 2 ^ n)) as [Hjk| Hjk]. {
-          flia Hj Hjk.
-        }
-        apply srng_mul_0_r.
-      }
-      rewrite srng_add_0_l.
-      rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
-        intros j Hj.
-        destruct (Nat.eq_dec j (k - 2 ^ n)) as [Hjk| Hjk]. {
-          flia Hj Hjk.
-        }
-        apply srng_mul_0_r.
-      }
       rewrite srng_add_0_r.
-      remember (k - 2 ^ n) as j eqn:Hj.
-      destruct (Nat.eq_dec j j) as [H| H]; [ clear H | easy ].
-      subst j; rewrite srng_mul_1_r.
-      erewrite srng_summation_eq_compat. 2: {
-        intros j Hj.
-        now rewrite rng_mul_opp_opp.
-      }
-      cbn - [ iter_seq Nat.pow ].
-      rewrite srng_summation_shift; [ | cbn; flia Hi ].
-      rewrite Nat_sub_sub_swap.
-      replace (2 ^ S n - 2 ^ n) with (2 ^ n). 2: {
-        cbn; rewrite Nat.add_0_r; symmetry.
-        apply Nat.add_sub.
-      }
-      erewrite srng_summation_eq_compat. 2: {
-        intros j Hj.
-        rewrite Nat.add_comm, Nat.add_sub.
-        rewrite rng_mul_opp_opp.
-        now rewrite rng_mul_opp_r.
-      }
-      cbn - [ iter_seq Nat.pow ].
-      rewrite (srng_summation_split _ i); [ | flia Hi Hi2n ].
+      clear IHn Hi Hk Hi2n Hk2n.
+      induction n; [ apply srng_add_0_l | ].
+      cbn - [ iter_seq ].
       rewrite srng_summation_split_last; [ | flia ].
-      destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
-      rewrite srng_mul_1_l.
-      rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
-        intros j Hj.
-        destruct (Nat.eq_dec i (j - 1)) as [Hij| Hij]; [ flia Hij Hj | ].
-        rewrite srng_mul_0_l.
-        apply rng_opp_0.
+      rewrite srng_add_0_r.
+      now rewrite srng_summation_succ_succ.
+    }
+  } {
+    apply Nat.nlt_ge in Hk2n.
+    rewrite (Nat_div_less_small 1). 2: {
+      rewrite Nat.mul_1_l.
+      split; [ easy | ].
+      change (k < 2 ^ S n).
+      enough (H : 0 < 2 ^ S n) by flia H Hk.
+      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+    }
+    rewrite (Nat_mod_less_small 1). 2: {
+      rewrite Nat.mul_1_l.
+      split; [ easy | ].
+      change (k < 2 ^ S n).
+      enough (H : 0 < 2 ^ S n) by flia H Hk.
+      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+    }
+    rewrite Nat.mul_1_l.
+    cbn - [ iter_seq Nat.pow ].
+    rewrite (srng_summation_split _ (k - 2 ^ n)). 2: {
+      split; [ flia | ].
+      apply -> Nat.succ_le_mono.
+      cbn in Hk; flia Hk.
+    }
+    rewrite srng_summation_split_last; [ | flia ].
+    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+      intros j Hj.
+      destruct (Nat.eq_dec (j - 1) (k - 2 ^ n)) as [Hjk| Hjk]. {
+        flia Hj Hjk.
       }
-      rewrite srng_add_0_l.
-      rewrite srng_add_assoc.
-      rewrite fold_rng_sub.
-      rewrite rng_add_opp_r, srng_add_0_l.
-      apply all_0_srng_summation_0; [ easy | ].
+      apply srng_mul_0_r.
+    }
+    rewrite srng_add_0_l.
+    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+      intros j Hj.
+      destruct (Nat.eq_dec j (k - 2 ^ n)) as [Hjk| Hjk]. {
+        flia Hj Hjk.
+      }
+      apply srng_mul_0_r.
+    }
+    rewrite srng_add_0_r.
+    remember (k - 2 ^ n) as j eqn:Hj.
+    destruct (Nat.eq_dec j j) as [H| H]; [ clear H | easy ].
+    subst j; rewrite srng_mul_1_r.
+    erewrite srng_summation_eq_compat. 2: {
+      intros j Hj.
+      now rewrite rng_mul_opp_opp.
+    }
+    cbn - [ iter_seq Nat.pow ].
+    rewrite srng_summation_shift; [ | cbn; flia Hi ].
+    rewrite Nat_sub_sub_swap.
+    replace (2 ^ S n - 2 ^ n) with (2 ^ n). 2: {
+      cbn; rewrite Nat.add_0_r; symmetry.
+      apply Nat.add_sub.
+    }
+    erewrite srng_summation_eq_compat. 2: {
+      intros j Hj.
+      rewrite Nat.add_comm, Nat.add_sub.
+      rewrite rng_mul_opp_opp.
+      now rewrite rng_mul_opp_r.
+    }
+    cbn - [ iter_seq Nat.pow ].
+    rewrite (srng_summation_split _ i); [ | flia Hi Hi2n ].
+    rewrite srng_summation_split_last; [ | flia ].
+    destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
+    rewrite srng_mul_1_l.
+    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+      intros j Hj.
+      destruct (Nat.eq_dec i (j - 1)) as [Hij| Hij]; [ flia Hij Hj | ].
+      rewrite srng_mul_0_l.
+      apply rng_opp_0.
+    }
+    rewrite srng_add_0_l.
+    rewrite srng_add_assoc.
+    rewrite fold_rng_sub.
+    rewrite rng_add_opp_r, srng_add_0_l.
+    destruct (Nat.eq_dec i k) as [Hik| Hik]. {
+      flia Hi2n Hk2n Hik.
+    }
+    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
       intros j Hj.
       destruct (Nat.eq_dec i j) as [Hij| Hij]; [ flia Hj Hij | ].
       rewrite srng_mul_0_l.
       apply rng_opp_0.
     }
-...
-  rewrite IHn; [ | easy ].
-  rewrite (srng_summation_split _ (i + 2 ^ n)); [ | cbn; flia Hi Hi2n ].
-  rewrite srng_summation_split_last; [ | flia ].
-  rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
-    intros j Hj.
-    destruct (Nat.eq_dec i (j - 1 - 2 ^ n)) as [Hij| Hij]. {
-      flia Hj Hij.
-    }
-    apply srng_mul_0_l.
+    symmetry.
+    clear IHn Hi Hk Hi2n Hk2n.
+    induction n; [ apply srng_add_0_l | ].
+    rewrite srng_summation_split_last; [ | flia ].
+    now rewrite srng_summation_succ_succ, srng_add_0_r.
   }
-  rewrite srng_add_0_l.
-  rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
-    intros j Hj.
-    destruct (Nat.eq_dec i (j - 2 ^ n)) as [Hij| Hij]. {
-      flia Hj Hij.
-    }
-    apply srng_mul_0_l.
-  }
-  rewrite srng_add_0_r.
-  rewrite Nat.add_sub.
-  destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
-  rewrite srng_mul_1_l.
-  rewrite srng_summation_split_last; [ | flia ].
-  f_equal.
-  clear IHn Hi Hi2n.
-  induction n; [ easy | ].
-  cbn - [ iter_seq ].
-  symmetry.
-  apply srng_summation_succ_succ.
 } {
-  apply Nat.nlt_ge in H2n.
+  apply Nat.nlt_ge in Hi2n.
   rewrite (Nat_div_less_small 1). 2: {
     rewrite Nat.mul_1_l.
     split; [ easy | ].
@@ -336,11 +328,6 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| H2n]. {
   remember (i - 2 ^ n) as j eqn:Hj.
   destruct (Nat.eq_dec j j) as [H| H]; [ clear H | easy ].
   subst j; rewrite srng_mul_1_l.
-  erewrite srng_summation_eq_compat. 2: {
-    intros j Hj.
-    now rewrite rng_mul_opp_opp.
-  }
-  cbn - [ iter_seq Nat.pow ].
   rewrite srng_summation_shift; [ | cbn; flia Hi ].
   rewrite Nat_sub_sub_swap.
   replace (2 ^ S n - 2 ^ n) with (2 ^ n). 2: {
@@ -352,466 +339,87 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| H2n]. {
     now rewrite Nat.add_comm, Nat.add_sub.
   }
   cbn - [ iter_seq Nat.pow ].
-  rewrite IHn; [ | cbn in Hi; flia Hi H2n ].
-  rewrite srng_add_comm.
-  rewrite srng_summation_split_last; [ | flia ].
-  f_equal.
-  clear IHn Hi H2n.
-  induction n; [ easy | ].
-  cbn - [ iter_seq ].
-  symmetry.
-  apply srng_summation_succ_succ.
-  }
-} {
-...
-
-intros.
-(* perhaps could be simplified, or things grouped together *)
-apply matrix_eq; cbn - [ iter_seq ]. {
-  apply mA_nrows.
-} {
-  apply mA_ncols.
-}
-intros i k Hi Hk.
-rewrite mA_nrows in Hi.
-rewrite mA_ncols.
-destruct (Nat.eq_dec i k) as [Hik| Hik]. {
-  (* diagonal of the rhs matrix "nI" = all 1s *)
-  subst k; clear Hk.
-  revert i Hi.
-  induction n; intros. {
-    cbn.
-    now rewrite srng_mul_0_l, srng_add_0_l.
-  }
-  rewrite (srng_summation_split _ (2 ^ n - 1)). 2: {
-    split; [ flia | ].
-    apply -> Nat.succ_le_mono.
-    apply Nat.sub_le_mono_r.
-    apply Nat.pow_le_mono_r; [ easy | flia ].
-  }
-  rewrite Nat.sub_add. 2: {
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  }
-  cbn - [ iter_seq Nat.pow ].
-  unfold mat_list_list_el.
-  unfold upper_left_mat_in_list_list.
-  cbn - [ iter_seq Nat.pow ].
-  rewrite mA_nrows, mA_ncols.
-  erewrite srng_summation_eq_compat. 2: {
-    intros j Hj.
-    rewrite (Nat.div_small j); [ | cbn in Hi; flia Hj Hi ].
-    rewrite (Nat.mod_small j); [ | cbn in Hi; flia Hj Hi ].
-    easy.
-  }
-  cbn - [ iter_seq Nat.pow ].
-  rewrite srng_add_comm.
-  erewrite srng_summation_eq_compat. 2: {
-    intros j Hj.
-    rewrite (Nat_div_less_small 1). 2: {
-      rewrite Nat.mul_1_l.
-      split; [ easy | ].
-      change (j < 2 ^ S n).
-      enough (H : 0 < 2 ^ S n) by flia H Hj.
-      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-    }
-    rewrite (@Nat_mod_less_small 1 j). 2: {
-      rewrite Nat.mul_1_l.
-      split; [ easy | ].
-      change (j < 2 ^ S n).
-      enough (H : 0 < 2 ^ S n) by flia H Hj.
-      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-    }
-    rewrite Nat.mul_1_l.
-    easy.
-  }
-  rewrite srng_add_comm.
-  destruct (lt_dec i (2 ^ n)) as [Hi2n| H2n]. {
-    rewrite (Nat.div_small i); [ | easy ].
-    rewrite (Nat.mod_small i); [ | easy ].
+  destruct (lt_dec k (2 ^ n)) as [Hk2n| Hk2n]. {
+    rewrite (Nat.div_small k); [ | easy ].
+    rewrite (Nat.mod_small k); [ | easy ].
     cbn - [ iter_seq Nat.pow ].
-    rewrite IHn; [ | easy ].
-    rewrite (srng_summation_split _ (i + 2 ^ n)); [ | cbn; flia Hi Hi2n ].
+    rewrite (srng_summation_split _ k). 2: {
+      cbn in Hk; flia Hk Hk2n.
+    }
     rewrite srng_summation_split_last; [ | flia ].
+    destruct (Nat.eq_dec i k) as [Hik| Hik]. {
+      flia Hik Hi2n Hk2n.
+    }
     rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
       intros j Hj.
-      destruct (Nat.eq_dec i (j - 1 - 2 ^ n)) as [Hij| Hij]. {
-        flia Hj Hij.
-      }
-      apply srng_mul_0_l.
+      destruct (Nat.eq_dec (j - 1) k) as [Hjk| Hjk]; [ flia Hj Hjk | ].
+      apply srng_mul_0_r.
     }
     rewrite srng_add_0_l.
+    destruct (Nat.eq_dec k k) as [H| H]; [ clear H | easy ].
+    rewrite srng_mul_1_r.
+    rewrite srng_add_assoc.
+    rewrite fold_rng_sub.
+    rewrite rng_add_opp_r, srng_add_0_l.
     rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
-      intros j Hj.
-      destruct (Nat.eq_dec i (j - 2 ^ n)) as [Hij| Hij]. {
-        flia Hj Hij.
-      }
-      apply srng_mul_0_l.
-    }
-    rewrite srng_add_0_r.
-    rewrite Nat.add_sub.
-    destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
-    rewrite srng_mul_1_l.
-    rewrite srng_summation_split_last; [ | flia ].
-    f_equal.
-    clear IHn Hi Hi2n.
-    induction n; [ easy | ].
-    cbn - [ iter_seq ].
-    symmetry.
-    apply srng_summation_succ_succ.
-  } {
-    apply Nat.nlt_ge in H2n.
-    rewrite (Nat_div_less_small 1). 2: {
-      rewrite Nat.mul_1_l.
-      split; [ easy | ].
-      change (i < 2 ^ S n).
-      enough (H : 0 < 2 ^ S n) by flia H Hi.
-      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-    }
-    rewrite (Nat_mod_less_small 1). 2: {
-      rewrite Nat.mul_1_l.
-      split; [ easy | ].
-      change (i < 2 ^ S n).
-      enough (H : 0 < 2 ^ S n) by flia H Hi.
-      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-    }
-    rewrite Nat.mul_1_l.
-    cbn - [ iter_seq Nat.pow ].
-    rewrite (srng_summation_split _ (i - 2 ^ n)). 2: {
-      split; [ flia | ].
-      apply -> Nat.succ_le_mono.
-      cbn in Hi; flia Hi.
-    }
-    rewrite srng_summation_split_last; [ | flia ].
-    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
-      intros j Hj.
-      destruct (Nat.eq_dec (i - 2 ^ n) (j - 1)) as [Hij| Hij]. {
-        flia Hj Hij.
-      }
-      apply srng_mul_0_l.
-    }
-    rewrite srng_add_0_l.
-    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
-      intros j Hj.
-      destruct (Nat.eq_dec (i - 2 ^ n) j) as [Hij| Hij]. {
-        flia Hj Hij.
-      }
-      apply srng_mul_0_l.
-    }
-    rewrite srng_add_0_r.
-    remember (i - 2 ^ n) as j eqn:Hj.
-    destruct (Nat.eq_dec j j) as [H| H]; [ clear H | easy ].
-    subst j; rewrite srng_mul_1_l.
-    erewrite srng_summation_eq_compat. 2: {
-      intros j Hj.
-      now rewrite rng_mul_opp_opp.
-    }
-    cbn - [ iter_seq Nat.pow ].
-    rewrite srng_summation_shift; [ | cbn; flia Hi ].
-    rewrite Nat_sub_sub_swap.
-    replace (2 ^ S n - 2 ^ n) with (2 ^ n). 2: {
-      cbn; rewrite Nat.add_0_r; symmetry.
-      apply Nat.add_sub.
-    }
-    erewrite srng_summation_eq_compat. 2: {
-      intros j Hj.
-      now rewrite Nat.add_comm, Nat.add_sub.
-    }
-    cbn - [ iter_seq Nat.pow ].
-    rewrite IHn; [ | cbn in Hi; flia Hi H2n ].
-    rewrite srng_add_comm.
-    rewrite srng_summation_split_last; [ | flia ].
-    f_equal.
-    clear IHn Hi H2n.
-    induction n; [ easy | ].
-    cbn - [ iter_seq ].
-    symmetry.
-    apply srng_summation_succ_succ.
-  }
-} {
-  (* not in diagonal of the rhs matrix "nI" = all 0s *)
-  replace (rng_mul_nat_l n 0%Rng) with 0%Rng. 2: {
-    unfold rng_mul_nat_l.
-    destruct n; [ easy | symmetry ].
-    now apply all_0_srng_summation_0.
-  }
-  revert i k Hi Hk Hik.
-  induction n; intros. {
-    cbn.
-    now rewrite srng_mul_0_l, srng_add_0_l.
-  }
-  rewrite (srng_summation_split _ (2 ^ n - 1)). 2: {
-    split; [ flia | ].
-    apply -> Nat.succ_le_mono.
-    apply Nat.sub_le_mono_r.
-    apply Nat.pow_le_mono_r; [ easy | flia ].
-  }
-  rewrite Nat.sub_add. 2: {
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  }
-  cbn - [ iter_seq Nat.pow ].
-  unfold mat_list_list_el.
-  unfold upper_left_mat_in_list_list.
-  cbn - [ iter_seq Nat.pow ].
-  rewrite mA_nrows, mA_ncols.
-  erewrite srng_summation_eq_compat. 2: {
-    intros j Hj.
-    rewrite (Nat.div_small j); [ | cbn in Hi; flia Hj Hi ].
-    rewrite (Nat.mod_small j); [ | cbn in Hi; flia Hj Hi ].
-    easy.
-  }
-  cbn - [ iter_seq Nat.pow ].
-  rewrite srng_add_comm.
-  erewrite srng_summation_eq_compat. 2: {
-    intros j Hj.
-    rewrite (Nat_div_less_small 1). 2: {
-      rewrite Nat.mul_1_l.
-      split; [ easy | ].
-      change (j < 2 ^ S n).
-      enough (H : 0 < 2 ^ S n) by flia H Hj.
-      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-    }
-    rewrite (@Nat_mod_less_small 1 j). 2: {
-      rewrite Nat.mul_1_l.
-      split; [ easy | ].
-      change (j < 2 ^ S n).
-      enough (H : 0 < 2 ^ S n) by flia H Hj.
-      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-    }
-    rewrite Nat.mul_1_l.
-    easy.
-  }
-  rewrite srng_add_comm.
-  destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
-    rewrite (Nat.div_small i); [ | easy ].
-    rewrite (Nat.mod_small i); [ | easy ].
-    cbn - [ iter_seq Nat.pow ].
-    destruct (lt_dec k (2 ^ n)) as [Hk2n| Hk2n]. {
-      rewrite (Nat.div_small k); [ | easy ].
-      rewrite (Nat.mod_small k); [ | easy ].
-      cbn - [ iter_seq Nat.pow ].
-      rewrite IHn; [ | easy | easy | easy ].
-      rewrite srng_add_0_l.
-      rewrite (srng_summation_split _ (i + 2 ^ n)); [ | cbn; flia Hi Hi2n ].
-      rewrite srng_summation_split_last; [ | flia ].
-      rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
-        intros j Hj.
-        destruct (Nat.eq_dec i (j - 1 - 2 ^ n)) as [Hij| Hij]. {
-          flia Hj Hij.
-        }
-        apply srng_mul_0_l.
-      }
-      rewrite srng_add_0_l.
-      rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
-        intros j Hj.
-        destruct (Nat.eq_dec i (j - 2 ^ n)) as [Hij| Hij]. {
-          flia Hj Hij.
-        }
-        apply srng_mul_0_l.
-      }
-      rewrite srng_add_0_r.
-      rewrite Nat.add_sub.
-      destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
-      rewrite srng_mul_1_l.
-      now destruct (Nat.eq_dec i k).
-    } {
-      apply Nat.nlt_ge in Hk2n.
-      rewrite (Nat_div_less_small 1). 2: {
-        rewrite Nat.mul_1_l.
-        split; [ easy | ].
-        change (k < 2 ^ S n).
-        enough (H : 0 < 2 ^ S n) by flia H Hk.
-        now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-      }
-      rewrite (Nat_mod_less_small 1). 2: {
-        rewrite Nat.mul_1_l.
-        split; [ easy | ].
-        change (k < 2 ^ S n).
-        enough (H : 0 < 2 ^ S n) by flia H Hk.
-        now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-      }
-      rewrite Nat.mul_1_l.
-      cbn - [ iter_seq Nat.pow ].
-      rewrite (srng_summation_split _ (k - 2 ^ n)). 2: {
-        split; [ flia | ].
-        apply -> Nat.succ_le_mono.
-        cbn in Hk; flia Hk.
-      }
-      rewrite srng_summation_split_last; [ | flia ].
-      rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
-        intros j Hj.
-        destruct (Nat.eq_dec (j - 1) (k - 2 ^ n)) as [Hjk| Hjk]. {
-          flia Hj Hjk.
-        }
-        apply srng_mul_0_r.
-      }
-      rewrite srng_add_0_l.
-      rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
-        intros j Hj.
-        destruct (Nat.eq_dec j (k - 2 ^ n)) as [Hjk| Hjk]. {
-          flia Hj Hjk.
-        }
-        apply srng_mul_0_r.
-      }
-      rewrite srng_add_0_r.
-      remember (k - 2 ^ n) as j eqn:Hj.
-      destruct (Nat.eq_dec j j) as [H| H]; [ clear H | easy ].
-      subst j; rewrite srng_mul_1_r.
-      erewrite srng_summation_eq_compat. 2: {
-        intros j Hj.
-        now rewrite rng_mul_opp_opp.
-      }
-      cbn - [ iter_seq Nat.pow ].
-      rewrite srng_summation_shift; [ | cbn; flia Hi ].
-      rewrite Nat_sub_sub_swap.
-      replace (2 ^ S n - 2 ^ n) with (2 ^ n). 2: {
-        cbn; rewrite Nat.add_0_r; symmetry.
-        apply Nat.add_sub.
-      }
-      erewrite srng_summation_eq_compat. 2: {
-        intros j Hj.
-        rewrite Nat.add_comm, Nat.add_sub.
-        rewrite rng_mul_opp_opp.
-        now rewrite rng_mul_opp_r.
-      }
-      cbn - [ iter_seq Nat.pow ].
-      rewrite (srng_summation_split _ i); [ | flia Hi Hi2n ].
-      rewrite srng_summation_split_last; [ | flia ].
-      destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
-      rewrite srng_mul_1_l.
-      rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
-        intros j Hj.
-        destruct (Nat.eq_dec i (j - 1)) as [Hij| Hij]; [ flia Hij Hj | ].
-        rewrite srng_mul_0_l.
-        apply rng_opp_0.
-      }
-      rewrite srng_add_0_l.
-      rewrite srng_add_assoc.
-      rewrite fold_rng_sub.
-      rewrite rng_add_opp_r, srng_add_0_l.
-      apply all_0_srng_summation_0; [ easy | ].
-      intros j Hj.
-      destruct (Nat.eq_dec i j) as [Hij| Hij]; [ flia Hj Hij | ].
-      rewrite srng_mul_0_l.
-      apply rng_opp_0.
-    }
-  } {
-    apply Nat.nlt_ge in Hi2n.
-    rewrite (Nat_div_less_small 1). 2: {
-      rewrite Nat.mul_1_l.
-      split; [ easy | ].
-      change (i < 2 ^ S n).
-      enough (H : 0 < 2 ^ S n) by flia H Hi.
-      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-    }
-    rewrite (Nat_mod_less_small 1). 2: {
-      rewrite Nat.mul_1_l.
-      split; [ easy | ].
-      change (i < 2 ^ S n).
-      enough (H : 0 < 2 ^ S n) by flia H Hi.
-      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-    }
-    rewrite Nat.mul_1_l.
-    cbn - [ iter_seq Nat.pow ].
-    rewrite (srng_summation_split _ (i - 2 ^ n)). 2: {
-      split; [ flia | ].
-      apply -> Nat.succ_le_mono.
-      cbn in Hi; flia Hi.
-    }
-    rewrite srng_summation_split_last; [ | flia ].
-    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
-      intros j Hj.
-      destruct (Nat.eq_dec (i - 2 ^ n) (j - 1)) as [Hij| Hij]. {
-        flia Hj Hij.
-      }
-      apply srng_mul_0_l.
-    }
-    rewrite srng_add_0_l.
-    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
-      intros j Hj.
-      destruct (Nat.eq_dec (i - 2 ^ n) j) as [Hij| Hij]. {
-        flia Hj Hij.
-      }
-      apply srng_mul_0_l.
-    }
-    rewrite srng_add_0_r.
-    remember (i - 2 ^ n) as j eqn:Hj.
-    destruct (Nat.eq_dec j j) as [H| H]; [ clear H | easy ].
-    subst j; rewrite srng_mul_1_l.
-    erewrite srng_summation_eq_compat. 2: {
-      intros j Hj.
-      now rewrite rng_mul_opp_opp.
-    }
-    cbn - [ iter_seq Nat.pow ].
-    rewrite srng_summation_shift; [ | cbn; flia Hi ].
-    rewrite Nat_sub_sub_swap.
-    replace (2 ^ S n - 2 ^ n) with (2 ^ n). 2: {
-      cbn; rewrite Nat.add_0_r; symmetry.
-      apply Nat.add_sub.
-    }
-    erewrite srng_summation_eq_compat. 2: {
-      intros j Hj.
-      now rewrite Nat.add_comm, Nat.add_sub.
-    }
-    cbn - [ iter_seq Nat.pow ].
-    destruct (lt_dec k (2 ^ n)) as [Hk2n| Hk2n]. {
-      rewrite (Nat.div_small k); [ | easy ].
-      rewrite (Nat.mod_small k); [ | easy ].
-      cbn - [ iter_seq Nat.pow ].
-      rewrite (srng_summation_split _ k). 2: {
-        cbn in Hk; flia Hk Hk2n.
-      }
-      rewrite srng_summation_split_last; [ | flia ].
-      rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
-        intros j Hj.
-        rewrite rng_mul_opp_opp.
-        destruct (Nat.eq_dec (j - 1) k) as [Hjk| Hjk]; [ flia Hj Hjk | ].
-        apply srng_mul_0_r.
-      }
-      rewrite srng_add_0_l, rng_opp_involutive.
-      destruct (Nat.eq_dec k k) as [H| H]; [ clear H | easy ].
-      rewrite rng_mul_opp_r, srng_mul_1_r.
-      rewrite srng_add_assoc.
-      rewrite fold_rng_sub.
-      rewrite rng_add_opp_r, srng_add_0_l.
-      apply all_0_srng_summation_0; [ easy | ].
       intros j Hj.
       destruct (Nat.eq_dec j k) as [Hjk| Hjk]; [ flia Hj Hjk | ].
-      rewrite rng_opp_0.
       apply srng_mul_0_r.
-    } {
-      apply Nat.nlt_ge in Hk2n.
-      rewrite (Nat_div_less_small 1). 2: {
-        rewrite Nat.mul_1_l.
-        split; [ easy | ].
-        change (k < 2 ^ S n).
-        enough (H : 0 < 2 ^ S n) by flia H Hk.
-        now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-      }
-      rewrite (Nat_mod_less_small 1). 2: {
-        rewrite Nat.mul_1_l.
-        split; [ easy | ].
-        change (k < 2 ^ S n).
-        enough (H : 0 < 2 ^ S n) by flia H Hk.
-        now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-      }
+    }
+    symmetry.
+    clear IHn Hi Hk Hi2n Hk2n.
+    induction n; [ apply srng_add_0_l | ].
+    rewrite srng_summation_split_last; [ | flia ].
+    rewrite srng_add_0_r.
+    now rewrite srng_summation_succ_succ.
+  } {
+    apply Nat.nlt_ge in Hk2n.
+    rewrite (Nat_div_less_small 1). 2: {
       rewrite Nat.mul_1_l.
-      cbn - [ iter_seq Nat.pow ].
-      destruct (Nat.eq_dec (i - 2 ^ n) (k - 2 ^ n)) as [Hik2| Hik2]. {
-        flia Hik Hik2 Hi2n Hk2n.
+      split; [ easy | ].
+      change (k < 2 ^ S n).
+      enough (H : 0 < 2 ^ S n) by flia H Hk.
+      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+    }
+    rewrite (Nat_mod_less_small 1). 2: {
+      rewrite Nat.mul_1_l.
+      split; [ easy | ].
+      change (k < 2 ^ S n).
+      enough (H : 0 < 2 ^ S n) by flia H Hk.
+      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+    }
+    rewrite Nat.mul_1_l.
+    cbn - [ iter_seq Nat.pow ].
+    erewrite srng_summation_eq_compat. 2: {
+      intros l Hl.
+      now rewrite rng_mul_opp_opp.
+    }
+    cbn - [ iter_seq Nat.pow ].
+    rewrite IHn; [ | cbn in Hi; flia Hi | cbn in Hk; flia Hk ].
+    destruct (Nat.eq_dec i k) as [Hik| Hik]. {
+      subst k.
+      remember (i - 2 ^ n) as j eqn:Hj.
+      destruct (Nat.eq_dec j j) as [H| H]; [ clear H | easy ].
+      subst j.
+      rewrite srng_add_comm.
+      rewrite srng_summation_split_last; [ | flia ].
+      f_equal.
+      clear IHn Hi Hi2n.
+      induction n; [ easy | ].
+      cbn - [ iter_seq ].
+      symmetry.
+      apply srng_summation_succ_succ.
+    } {
+      destruct (Nat.eq_dec (i - 2 ^ n) (k - 2 ^ n)) as [Hi2k| Hi2k]. {
+        flia Hik Hi2k Hi2n Hk2n.
       }
       rewrite srng_add_0_l.
-      erewrite srng_summation_eq_compat. 2: {
-        intros l Hl.
-        now do 2 rewrite rng_mul_opp_opp.
-      }
-      cbn - [ iter_seq Nat.pow ].
-      apply IHn. {
-        cbn in Hi; flia Hi.
-      } {
-        cbn in Hk; flia Hk.
-      } {
-        flia Hik Hi2n Hk2n.
-      }
+      symmetry.
+      clear IHn Hi Hk Hi2n Hk2n Hi2k.
+      induction n; [ apply srng_add_0_l | ].
+      cbn - [ iter_seq ].
+      rewrite srng_summation_split_last; [ | flia ].
+      now rewrite srng_summation_succ_succ, srng_add_0_r.
     }
   }
 }
