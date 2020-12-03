@@ -188,12 +188,9 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
       now rewrite srng_summation_succ_succ.
     } {
       rewrite srng_add_0_r.
-      clear IHn Hi Hk Hi2n Hk2n.
-      induction n; [ apply srng_add_0_l | ].
-      cbn - [ iter_seq ].
+      destruct n; [ apply srng_add_0_l | ].
       rewrite srng_summation_split_last; [ | flia ].
-      rewrite srng_add_0_r.
-      now rewrite srng_summation_succ_succ.
+      now rewrite srng_summation_succ_succ, srng_add_0_r.
     }
   } {
     apply Nat.nlt_ge in Hk2n.
@@ -280,10 +277,7 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
       apply rng_opp_0.
     }
     symmetry.
-    clear IHn Hi Hk Hi2n Hk2n.
-    induction n; [ apply srng_add_0_l | ].
-    rewrite srng_summation_split_last; [ | flia ].
-    now rewrite srng_summation_succ_succ, srng_add_0_r.
+    now apply all_0_srng_summation_0.
   }
 } {
   apply Nat.nlt_ge in Hi2n.
@@ -367,11 +361,8 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
       apply srng_mul_0_r.
     }
     symmetry.
-    clear IHn Hi Hk Hi2n Hk2n.
-    induction n; [ apply srng_add_0_l | ].
-    rewrite srng_summation_split_last; [ | flia ].
-    rewrite srng_add_0_r.
-    now rewrite srng_summation_succ_succ.
+    destruct n; [ apply srng_add_0_l | ].
+    now apply all_0_srng_summation_0.
   } {
     apply Nat.nlt_ge in Hk2n.
     rewrite (Nat_div_less_small 1). 2: {
@@ -404,10 +395,9 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
       rewrite srng_add_comm.
       rewrite srng_summation_split_last; [ | flia ].
       f_equal.
-      clear IHn Hi Hi2n.
-      induction n; [ easy | ].
-      cbn - [ iter_seq ].
       symmetry.
+      destruct n; [ easy | ].
+      cbn - [ iter_seq ].
       apply srng_summation_succ_succ.
     } {
       destruct (Nat.eq_dec (i - 2 ^ n) (k - 2 ^ n)) as [Hi2k| Hi2k]. {
@@ -415,9 +405,7 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
       }
       rewrite srng_add_0_l.
       symmetry.
-      clear IHn Hi Hk Hi2n Hk2n Hi2k.
-      induction n; [ apply srng_add_0_l | ].
-      cbn - [ iter_seq ].
+      destruct n; [ apply srng_add_0_l | ].
       rewrite srng_summation_split_last; [ | flia ].
       now rewrite srng_summation_succ_succ, srng_add_0_r.
     }
