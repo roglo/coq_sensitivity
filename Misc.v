@@ -197,6 +197,33 @@ rewrite <- seq_shift.
 now rewrite List_fold_left_map.
 Qed.
 
+Theorem List_seq_succ_r : ∀ sta len,
+  seq sta (S len) = seq sta len ++ [sta + len].
+Proof.
+intros.
+rewrite <- Nat.add_1_r.
+now rewrite seq_app.
+Qed.
+
+Theorem iter_shift : ∀ {T} b k f (d : T),
+  b ≤ k
+  → iter_seq b k f d =
+    iter_seq 0 (k - b) (λ c i, f c (b + i)) d.
+Proof.
+intros * Hbk.
+unfold iter_seq.
+rewrite Nat.sub_0_r.
+rewrite <- Nat.sub_succ_l; [ | easy ].
+remember (S k - b)%nat as len; clear Heqlen.
+clear k Hbk.
+revert b d.
+induction len; intros; [ easy | ].
+rewrite List_seq_succ_r; symmetry.
+rewrite List_seq_succ_r; symmetry.
+do 2 rewrite fold_left_app; cbn.
+now rewrite IHlen.
+Qed.
+
 Theorem fold_left_add_fun_from_0 {A} : ∀ a l (f : A → nat),
   fold_left (λ c i, c + f i) l a =
   a + fold_left (λ c i, c + f i) l 0.
@@ -1452,14 +1479,6 @@ cbn in Hnl; cbn.
 destruct n; [ easy | ].
 apply Nat.succ_lt_mono in Hnl.
 now apply IHl.
-Qed.
-
-Theorem List_seq_succ_r : ∀ sta len,
-  seq sta (S len) = seq sta len ++ [sta + len].
-Proof.
-intros.
-rewrite <- Nat.add_1_r.
-now rewrite seq_app.
 Qed.
 
 Theorem List_seq_eq_nil : ∀ b e, seq b e = [] → e ≤ b.

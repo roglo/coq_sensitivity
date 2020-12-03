@@ -198,6 +198,15 @@ intros b k g.
 apply iter_succ_succ.
 Qed.
 
+Theorem srng_summation_shift : ∀ b g k,
+  b ≤ k
+  → (Σ (i = b, k), g i =
+     Σ (i = 0, k - b), g (b + i)%nat)%Srng.
+Proof.
+intros b g k Hbk.
+now apply iter_shift.
+Qed.
+
 Theorem srng_summation_add_distr : ∀ g h b k,
   (Σ (i = b, k), (g i + h i) =
    Σ (i = b, k), g i + Σ (i = b, k), h i)%Srng.

@@ -38,6 +38,8 @@ deprecat_Rpolynomial2.vio: deprecat_Rpolynomial2.v Misc.vio deprecat_Ring2.vio d
 deprecat_Rpolynomial2.vo deprecat_Rpolynomial2.glob deprecat_Rpolynomial2.v.beautified deprecat_Rpolynomial2.required_vo: deprecat_Rpolynomial2.v Misc.vo deprecat_Ring2.vo deprecat_Rsummation.vo
 deprecat_Rsummation.vio: deprecat_Rsummation.v Misc.vio deprecat_Ring2.vio
 deprecat_Rsummation.vo deprecat_Rsummation.glob deprecat_Rsummation.v.beautified deprecat_Rsummation.required_vo: deprecat_Rsummation.v Misc.vo deprecat_Ring2.vo
+new_Lemma_2_2.vio: new_Lemma_2_2.v Misc.vio Matrix.vio Semiring.vio Field2.vio SRsummation.vio SRproduct.vio SRpolynomial.vio CharacPolyn.vio
+new_Lemma_2_2.vo new_Lemma_2_2.glob new_Lemma_2_2.v.beautified new_Lemma_2_2.required_vo: new_Lemma_2_2.v Misc.vo Matrix.vo Semiring.vo Field2.vo SRsummation.vo SRproduct.vo SRpolynomial.vo CharacPolyn.vo
 test.vio: test.v Rational.vio Qfield2.vio CharacPolyn.vio SRpolynomial.vio Matrix.vio Lemma_2_2.vio
 test.vo test.glob test.v.beautified test.required_vo: test.v Rational.vo Qfield2.vo CharacPolyn.vo SRpolynomial.vo Matrix.vo Lemma_2_2.vo
 toto.vio: toto.v 
