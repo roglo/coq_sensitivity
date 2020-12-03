@@ -843,7 +843,7 @@ Definition det_mult_fact_from_gjl M :=
 
 (* *)
 
-Theorem resolved_with_det_neq_0 : ∀ M V R,
+Theorem resolved_with_nz_det : ∀ M V R,
   is_square_mat M
   → mat_nrows M = vect_nrows R
   → determinant M ≠ 0%F
@@ -871,7 +871,7 @@ cbn - [ iter_seq ].
    column i0 instead of row 0: this way the sub-determinants are the
    same. *)
 (* but in that case, I need that a determinant going through any row
-   or any column are equal to the determinant I defined (going through
+   or any column is equal to the determinant I defined (going through
    the first row; I started that in Matrix.v, but I am blocked *)
 (* well, I don't really need this theorem since my problem is about
    matrices the discriminants of which are equal to zero *)
@@ -903,8 +903,9 @@ rename Hr into Hmr.
 symmetry in Hsm, Hrr.
 cbn in Hv.
 destruct (srng_eq_dec (determinant M) 0) as [Hdz| Hdz]. 2: {
+...
 Abort. (* for the moment...
-  apply resolved_with_det_neq_0.
+  apply resolved_with_nz_det.
 ...
 remember (gauss_jordan_loop (mat_vect_concat M R) 0 0 (mat_ncols M + 1))
   as MGJ eqn:Hmgj.
