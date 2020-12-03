@@ -255,6 +255,11 @@ destruct (Nat.eq_dec i k) as [Hik| Hik]. {
     apply srng_summation_succ_succ.
   }
 } {
+  replace (rng_mul_nat_l n 0%Rng) with 0%Rng. 2: {
+    unfold rng_mul_nat_l.
+    destruct n; [ easy | symmetry ].
+    now apply all_0_srng_summation_0.
+  }
   revert i k Hi Hk Hik.
   induction n; intros. {
     cbn.
@@ -311,6 +316,7 @@ destruct (Nat.eq_dec i k) as [Hik| Hik]. {
       rewrite (Nat.mod_small k); [ | easy ].
       cbn - [ iter_seq Nat.pow ].
       rewrite IHn; [ | easy | easy | easy ].
+      rewrite srng_add_0_l.
       rewrite (srng_summation_split _ (i + 2 ^ n)); [ | cbn; flia Hi Hi2n ].
       rewrite srng_summation_split_last; [ | flia ].
       rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
@@ -332,13 +338,6 @@ destruct (Nat.eq_dec i k) as [Hik| Hik]. {
       rewrite Nat.add_sub.
       destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
       rewrite srng_mul_1_l.
-      rewrite srng_summation_split_last; [ | flia ].
-      f_equal.
-      clear IHn Hi Hi2n.
-      induction n; [ easy | ].
-      cbn - [ iter_seq ].
-      symmetry.
-      apply srng_summation_succ_succ.
       now destruct (Nat.eq_dec i k).
     } {
       apply Nat.nlt_ge in Hk2n.
@@ -415,18 +414,11 @@ destruct (Nat.eq_dec i k) as [Hik| Hik]. {
       rewrite srng_add_assoc.
       rewrite fold_rng_sub.
       rewrite rng_add_opp_r, srng_add_0_l.
-      rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
-        intros j Hj.
-        destruct (Nat.eq_dec i j) as [Hij| Hij]; [ flia Hj Hij | ].
-        rewrite srng_mul_0_l.
-        apply rng_opp_0.
-      }
-      symmetry.
-      clear IHn Hi Hk Hi2n Hk2n.
-      induction n; [ apply srng_add_0_l | ].
-      rewrite srng_summation_split_last; [ | flia ].
-      rewrite srng_add_0_r.
-      now rewrite srng_summation_succ_succ.
+      apply all_0_srng_summation_0; [ easy | ].
+      intros j Hj.
+      destruct (Nat.eq_dec i j) as [Hij| Hij]; [ flia Hj Hij | ].
+      rewrite srng_mul_0_l.
+      apply rng_opp_0.
     }
   } {
     apply Nat.nlt_ge in Hi2n.
@@ -507,18 +499,11 @@ destruct (Nat.eq_dec i k) as [Hik| Hik]. {
       rewrite srng_add_assoc.
       rewrite fold_rng_sub.
       rewrite rng_add_opp_r, srng_add_0_l.
-      rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
-        intros j Hj.
-        destruct (Nat.eq_dec j k) as [Hjk| Hjk]; [ flia Hj Hjk | ].
-        rewrite rng_opp_0.
-        apply srng_mul_0_r.
-      }
-      symmetry.
-      clear IHn Hi Hk Hi2n Hk2n.
-      induction n; [ apply srng_add_0_l | ].
-      rewrite srng_summation_split_last; [ | flia ].
-      rewrite srng_add_0_r.
-      now rewrite srng_summation_succ_succ.
+      apply all_0_srng_summation_0; [ easy | ].
+      intros j Hj.
+      destruct (Nat.eq_dec j k) as [Hjk| Hjk]; [ flia Hj Hjk | ].
+      rewrite rng_opp_0.
+      apply srng_mul_0_r.
     } {
       apply Nat.nlt_ge in Hk2n.
       rewrite (Nat_div_less_small 1). 2: {
@@ -546,19 +531,12 @@ destruct (Nat.eq_dec i k) as [Hik| Hik]. {
         now do 2 rewrite rng_mul_opp_opp.
       }
       cbn - [ iter_seq Nat.pow ].
-      rewrite IHn; cycle 1. {
+      apply IHn. {
         cbn in Hi; flia Hi.
       } {
         cbn in Hk; flia Hk.
       } {
         flia Hik Hi2n Hk2n.
-      } {
-        clear IHn Hi Hk Hi2n Hk2n Hik2.
-        symmetry.
-        induction n; [ apply srng_add_0_l | ].
-        rewrite srng_summation_split_last; [ | flia ].
-        rewrite srng_add_0_r.
-        now rewrite srng_summation_succ_succ.
       }
     }
   }
