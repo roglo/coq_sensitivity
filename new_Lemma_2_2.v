@@ -126,22 +126,16 @@ cbn - [ iter_seq Nat.pow ].
 rewrite srng_add_comm.
 erewrite srng_summation_eq_compat. 2: {
   intros j Hj.
-  rewrite (Nat_div_less_small 1). 2: {
+  assert (H : 1 * 2 ^ n ≤ j < (1 + 1) * 2 ^ n). {
     rewrite Nat.mul_1_l.
     split; [ easy | ].
     change (j < 2 ^ S n).
     enough (H : 0 < 2 ^ S n) by flia H Hj.
     now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
   }
-  rewrite (@Nat_mod_less_small 1 j). 2: {
-    rewrite Nat.mul_1_l.
-    split; [ easy | ].
-    change (j < 2 ^ S n).
-    enough (H : 0 < 2 ^ S n) by flia H Hj.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  }
-  rewrite Nat.mul_1_l.
-  easy.
+  rewrite (Nat_div_less_small 1); [ | easy ].
+  rewrite (@Nat_mod_less_small 1 j); [ clear H | easy ].
+  now rewrite Nat.mul_1_l.
 }
 rewrite srng_add_comm.
 destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
@@ -187,20 +181,15 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
     }
   } {
     apply Nat.nlt_ge in Hk2n.
-    rewrite (Nat_div_less_small 1). 2: {
+    assert (H : 1 * 2 ^ n ≤ k < (1 + 1) * 2 ^ n). {
       rewrite Nat.mul_1_l.
       split; [ easy | ].
       change (k < 2 ^ S n).
       enough (H : 0 < 2 ^ S n) by flia H Hk.
       now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
     }
-    rewrite (Nat_mod_less_small 1). 2: {
-      rewrite Nat.mul_1_l.
-      split; [ easy | ].
-      change (k < 2 ^ S n).
-      enough (H : 0 < 2 ^ S n) by flia H Hk.
-      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-    }
+    rewrite (Nat_div_less_small 1); [ | easy ].
+    rewrite (Nat_mod_less_small 1); [ clear H | easy ].
     rewrite Nat.mul_1_l.
     cbn - [ iter_seq Nat.pow ].
     rewrite (srng_summation_split _ (k - 2 ^ n)). 2: {
@@ -270,20 +259,15 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
   }
 } {
   apply Nat.nlt_ge in Hi2n.
-  rewrite (Nat_div_less_small 1). 2: {
+  assert (H : 1 * 2 ^ n ≤ i < (1 + 1) * 2 ^ n). {
     rewrite Nat.mul_1_l.
     split; [ easy | ].
     change (i < 2 ^ S n).
     enough (H : 0 < 2 ^ S n) by flia H Hi.
     now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
   }
-  rewrite (Nat_mod_less_small 1). 2: {
-    rewrite Nat.mul_1_l.
-    split; [ easy | ].
-    change (i < 2 ^ S n).
-    enough (H : 0 < 2 ^ S n) by flia H Hi.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  }
+  rewrite (Nat_div_less_small 1); [ | easy ].
+  rewrite (Nat_mod_less_small 1); [ clear H | easy ].
   rewrite Nat.mul_1_l.
   cbn - [ iter_seq Nat.pow ].
   rewrite (srng_summation_split _ (i - 2 ^ n)). 2: {
@@ -350,20 +334,15 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
     now apply all_0_srng_summation_0.
   } {
     apply Nat.nlt_ge in Hk2n.
-    rewrite (Nat_div_less_small 1). 2: {
+    assert (H : 1 * 2 ^ n ≤ k < (1 + 1) * 2 ^ n). {
       rewrite Nat.mul_1_l.
       split; [ easy | ].
       change (k < 2 ^ S n).
       enough (H : 0 < 2 ^ S n) by flia H Hk.
       now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
     }
-    rewrite (Nat_mod_less_small 1). 2: {
-      rewrite Nat.mul_1_l.
-      split; [ easy | ].
-      change (k < 2 ^ S n).
-      enough (H : 0 < 2 ^ S n) by flia H Hk.
-      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-    }
+    rewrite (Nat_div_less_small 1); [ | easy ].
+    rewrite (Nat_mod_less_small 1); [ clear H | easy ].
     rewrite Nat.mul_1_l.
     cbn - [ iter_seq Nat.pow ].
     erewrite srng_summation_eq_compat. 2: {
