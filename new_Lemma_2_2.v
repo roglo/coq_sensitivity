@@ -356,34 +356,28 @@ destruct (Nat.eq_dec i k) as [Hik| Hik]. {
       now rewrite rng_mul_opp_opp.
     }
     cbn - [ iter_seq Nat.pow ].
-...
-rewrite srng_summation_shift.
-rewrite Nat_sub_sub_swap.
-replace (2 ^ S n - 2 ^ n) with (2 ^ n). 2: {
-  cbn; rewrite Nat.add_0_r; symmetry.
-  apply Nat.add_sub.
-}
-erewrite srng_summation_eq_compat. 2: {
-  intros j Hj.
-  now rewrite Nat.add_comm, Nat.add_sub.
-}
-cbn - [ iter_seq Nat.pow ].
-rewrite IHn.
-...
-Search (Σ (_ = _, _), _ = Σ (_ = _, _), _).
-Search (fold_left _ (seq _ _)).
-Search (seq _ _ = seq _ _).
-...
-    rewrite Nat.add_sub.
-    destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
-    rewrite srng_mul_1_l.
+    rewrite srng_summation_shift; [ | cbn; flia Hi ].
+    rewrite Nat_sub_sub_swap.
+    replace (2 ^ S n - 2 ^ n) with (2 ^ n). 2: {
+      cbn; rewrite Nat.add_0_r; symmetry.
+      apply Nat.add_sub.
+    }
+    erewrite srng_summation_eq_compat. 2: {
+      intros j Hj.
+      now rewrite Nat.add_comm, Nat.add_sub.
+    }
+    cbn - [ iter_seq Nat.pow ].
+    rewrite IHn; [ | cbn in Hi; flia Hi H2n ].
+    rewrite srng_add_comm.
     rewrite srng_summation_split_last; [ | flia ].
     f_equal.
-    clear IHn Hi Hi2n.
+    clear IHn Hi H2n.
     induction n; [ easy | ].
     cbn - [ iter_seq ].
     symmetry.
     apply srng_summation_succ_succ.
+  }
+}
 ...
 induction n; intros; [ now cbn; rewrite srng_mul_0_l | ].
 cbn; f_equal.
