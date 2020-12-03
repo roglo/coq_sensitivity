@@ -94,18 +94,13 @@ Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
   (mA n * mA n = mat_nat_mul_l n (squ_mat_one (2 ^ n)))%M.
 Proof.
 intros.
-apply matrix_eq; cbn - [ iter_seq ]. {
-  apply mA_nrows.
-} {
-  apply mA_ncols.
-}
+apply matrix_eq; [ apply mA_nrows | apply mA_ncols | ].
+cbn - [ iter_seq ].
+rewrite mA_nrows, mA_ncols.
 intros i k Hi Hk.
-rewrite mA_nrows in Hi.
-rewrite mA_ncols.
 revert i k Hi Hk.
 induction n; intros. {
-  cbn.
-  now rewrite srng_mul_0_l, srng_add_0_l.
+  now cbn; rewrite srng_mul_0_l, srng_add_0_l.
 }
 rewrite (srng_summation_split _ (2 ^ n - 1)). 2: {
   split; [ flia | ].
