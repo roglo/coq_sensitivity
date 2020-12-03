@@ -104,6 +104,7 @@ intros i k Hi Hk.
 rewrite mA_nrows in Hi.
 rewrite mA_ncols.
 destruct (Nat.eq_dec i k) as [Hik| Hik]. {
+  (* diagonal of the rhs matrix "nI" = all 1s *)
   subst k; clear Hk.
   revert i Hi.
   induction n; intros. {
@@ -255,6 +256,7 @@ destruct (Nat.eq_dec i k) as [Hik| Hik]. {
     apply srng_summation_succ_succ.
   }
 } {
+  (* not in diagonal of the rhs matrix "nI" = all 0s *)
   replace (rng_mul_nat_l n 0%Rng) with 0%Rng. 2: {
     unfold rng_mul_nat_l.
     destruct n; [ easy | symmetry ].
