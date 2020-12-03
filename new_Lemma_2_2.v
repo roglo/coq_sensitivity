@@ -881,6 +881,42 @@ Abort. (* for the moment
 ...
 *)
 
+Theorem resolved_with_zero_det : ∀ M V R,
+  is_square_mat M
+  → mat_nrows M = vect_nrows R
+  → determinant M = 0%Rng
+  → V = resolve M R
+  → (M · V)%V = R.
+Proof.
+intros * Hsm Hrr Hdet Hv.
+unfold is_square_mat in Hsm.
+unfold resolve in Hv.
+remember (mat_nrows M) as r eqn:Hmr; symmetry in Hmr.
+rename Hsm into Hmc.
+symmetry in Hmc, Hrr.
+revert M R Hmr Hmc Hrr Hdet Hv.
+induction r; intros. {
+  cbn in Hv.
+  subst V.
+  unfold mat_mul_vect_r.
+  destruct R as (fr, rr).
+  cbn in Hrr; subst rr; rewrite Hmr.
+  now apply vector_eq.
+}
+cbn in Hv.
+destruct (srng_eq_dec (determinant M) 0) as [Hdz| Hdz]; [ | easy ].
+clear Hdz.
+remember (gauss_jordan_loop (mat_vect_concat M R) 0 0 (mat_ncols M + 1))
+  as MGJ eqn:Hmgj.
+rewrite Hmr, Nat.sub_succ, Nat.sub_0_r in Hv.
+rewrite Hmc, Nat.sub_succ, Nat.sub_0_r in Hv.
+remember {| mat_el := mat_el MGJ; mat_nrows := r; mat_ncols := r |} as M'
+  eqn:HM'.
+remember
+  ({| vect_el := λ i, mat_el MGJ i (S r); vect_nrows := r |} -
+   {| vect_el := λ i, mat_el MGJ i r; vect_nrows := r |})%V as V' eqn:HV'.
+...
+
 Theorem resolved : ∀ M V R,
   is_square_mat M
   → mat_nrows M = vect_nrows R
