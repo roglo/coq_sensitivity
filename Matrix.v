@@ -236,6 +236,22 @@ Fixpoint det_loop M n :=
 
 Definition determinant M := det_loop M (mat_ncols M).
 
+(* *)
+
+Declare Scope V_scope.
+Delimit Scope V_scope with V.
+
+Notation "U + V" := (vect_add U V) : V_scope.
+Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
+
+Theorem determinant_multilinear : ∀ M i a b U V,
+  determinant (mat_repl_vect i M (a × U + b × V)%V) =
+    (a * determinant (mat_repl_vect i M U) +
+     b * determinant (mat_repl_vect i M V))%Rng.
+Proof.
+intros.
+...
+
 (* the following versions of computing the determinant should
    (to be proven) be equivalent; perhaps could help for proving
    Cramer's rule of resolving equations *)
