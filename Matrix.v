@@ -244,6 +244,86 @@ Delimit Scope V_scope with V.
 Notation "U + V" := (vect_add U V) : V_scope.
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
 
+(* the following versions of computing the determinant should
+   (to be proven) be equivalent; perhaps could help for proving
+   Cramer's rule of resolving equations *)
+
+Definition det_from_row M i :=
+  (minus_one_pow i *
+   Σ (j = 0, mat_ncols M - 1),
+     minus_one_pow j * mat_el M i j * determinant (subm M i j))%Rng.
+
+Definition det_from_col M j :=
+  (minus_one_pow j *
+   Σ (i = 0, mat_nrows M - 1),
+     minus_one_pow i * mat_el M i j * determinant (subm M i j))%Rng.
+
+(* *)
+
+Definition mat_mul_row_by_scal k M s :=
+  mk_mat
+    (λ i j,
+     if Nat.eq_dec i k then (s * mat_el M i j)%Srng else mat_el M i j)
+    (mat_nrows M) (mat_ncols M).
+
+Definition mat_swap_rows (M : matrix T) i1 i2 :=
+  mk_mat
+    (λ i j,
+     if Nat.eq_dec i i1 then mat_el M i2 j
+     else if Nat.eq_dec i i2 then mat_el M i1 j
+     else mat_el M i j) (mat_nrows M) (mat_ncols M).
+
+Definition mat_add_row_mul_scal_row M i1 v i2 :=
+  mk_mat
+    (λ i j,
+     if Nat.eq_dec i i1 then (mat_el M i1 j + v * mat_el M i2 j)%Srng
+     else mat_el M i j)
+   (mat_nrows M) (mat_nrows M).
+
+(* If we multiply a row (column) of A by a number, the determinant of
+   A will be multiplied by the same number. *)
+(* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html *)
+
+(* Well, since my definition of the discriminant only covers the
+   row 0, we can prove that only when i=0; this will able us to
+   prove next theorems, swapping rows by going via row 0 *)
+
+Theorem det_mul_row_0_by_scal : ∀ A v,
+  mat_ncols A ≠ 0
+  → determinant (mat_mul_row_0_by_scal A v) = (v * determinant A)%Srng.
+Proof.
+intros * Hcz.
+unfold determinant; cbn.
+remember (mat_ncols A) as c eqn:Hc; symmetry in Hc.
+destruct c; [ easy | clear Hcz ].
+cbn - [ iter_seq ].
+rewrite srng_mul_summation_distr_l; [ | easy | easy ].
+apply srng_summation_eq_compat.
+intros j Hj.
+rewrite (srng_c_mul_comm (minus_one_pow j)).
+do 2 rewrite <- srng_mul_assoc.
+f_equal.
+rewrite (srng_c_mul_comm (mat_el A 0 j)).
+do 2 rewrite <- srng_mul_assoc.
+f_equal.
+rewrite srng_c_mul_comm; f_equal.
+f_equal.
+apply matrix_eq; [ easy | easy | cbn ].
+rename j into k; rename Hj into Hk.
+intros i j Hi Hj.
+destruct (Nat.eq_dec (i + 1) 0) as [H| H]; [ flia H | easy ].
+Qed.
+
+(* multilinearity *)
+
+Theorem glop : ∀ M a,
+  (a * determinant M)%Srng = determinant M.
+Proof.
+intros.
+Inspect 1.
+rewrite <- det_mul_row_0_by_scal.
+...
+
 Theorem determinant_multilinear_mul : ∀ M i a V,
   mat_nrows M = mat_ncols M
   → i < mat_nrows M
@@ -251,6 +331,7 @@ Theorem determinant_multilinear_mul : ∀ M i a V,
        (a * determinant (mat_repl_vect i M V))%Rng.
 Proof.
 intros * Hrc Hi.
+...
 unfold vect_add, vect_mul_scal_l; cbn.
 unfold mat_repl_vect; cbn.
 rewrite <- Hrc.
@@ -319,77 +400,6 @@ do 3 rewrite srng_add_0_l, srng_mul_1_l.
   easy.
   rewrite srng_mul_1_r.
 ...
-
-(* the following versions of computing the determinant should
-   (to be proven) be equivalent; perhaps could help for proving
-   Cramer's rule of resolving equations *)
-
-Definition det_from_row M i :=
-  (minus_one_pow i *
-   Σ (j = 0, mat_ncols M - 1),
-     minus_one_pow j * mat_el M i j * determinant (subm M i j))%Rng.
-
-Definition det_from_col M j :=
-  (minus_one_pow j *
-   Σ (i = 0, mat_nrows M - 1),
-     minus_one_pow i * mat_el M i j * determinant (subm M i j))%Rng.
-
-(* *)
-
-Definition mat_mul_row_0_by_scal M s :=
-  mk_mat
-    (λ i j,
-     if Nat.eq_dec i 0 then (s * mat_el M i j)%Srng else mat_el M i j)
-    (mat_nrows M) (mat_ncols M).
-
-Definition mat_swap_rows (M : matrix T) i1 i2 :=
-  mk_mat
-    (λ i j,
-     if Nat.eq_dec i i1 then mat_el M i2 j
-     else if Nat.eq_dec i i2 then mat_el M i1 j
-     else mat_el M i j) (mat_nrows M) (mat_ncols M).
-
-Definition mat_add_row_mul_scal_row M i1 v i2 :=
-  mk_mat
-    (λ i j,
-     if Nat.eq_dec i i1 then (mat_el M i1 j + v * mat_el M i2 j)%Srng
-     else mat_el M i j)
-   (mat_nrows M) (mat_nrows M).
-
-(* If we multiply a row (column) of A by a number, the determinant of
-   A will be multiplied by the same number. *)
-(* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html *)
-
-(* Well, since my definition of the discriminant only covers the
-   row 0, we can prove that only when i=0; this will able us to
-   prove next theorems, swapping rows by going via row 0 *)
-
-Theorem det_mul_row_0_by_scal : ∀ A v,
-  mat_ncols A ≠ 0
-  → determinant (mat_mul_row_0_by_scal A v) = (v * determinant A)%Srng.
-Proof.
-intros * Hcz.
-unfold determinant; cbn.
-remember (mat_ncols A) as c eqn:Hc; symmetry in Hc.
-destruct c; [ easy | clear Hcz ].
-cbn - [ iter_seq ].
-rewrite srng_mul_summation_distr_l; [ | easy | easy ].
-apply srng_summation_eq_compat.
-intros j Hj.
-rewrite (srng_c_mul_comm (minus_one_pow j)).
-do 2 rewrite <- srng_mul_assoc.
-f_equal.
-rewrite (srng_c_mul_comm (mat_el A 0 j)).
-do 2 rewrite <- srng_mul_assoc.
-f_equal.
-rewrite srng_c_mul_comm; f_equal.
-f_equal.
-apply matrix_eq; [ easy | easy | cbn ].
-rename j into k; rename Hj into Hk.
-intros i j Hi Hj.
-destruct (Nat.eq_dec (i + 1) 0) as [H| H]; [ flia H | easy ].
-Qed.
-
 
 (* If the i-th row (column) in A is a sum of the i-th row (column) of
    a matrix B and the i-th row (column) of a matrix C and all other
