@@ -244,12 +244,68 @@ Delimit Scope V_scope with V.
 Notation "U + V" := (vect_add U V) : V_scope.
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
 
-Theorem determinant_multilinear : ∀ M i a b U V,
-  determinant (mat_repl_vect i M (a × U + b × V)%V) =
-    (a * determinant (mat_repl_vect i M U) +
-     b * determinant (mat_repl_vect i M V))%Rng.
+Theorem determinant_multilinear_mul : ∀ M i a V,
+  mat_nrows M = mat_ncols M
+  → i < mat_nrows M
+  → determinant (mat_repl_vect i M (a × V)%V) =
+       (a * determinant (mat_repl_vect i M V))%Rng.
 Proof.
-intros.
+intros * Hrc Hi.
+unfold vect_add, vect_mul_scal_l; cbn.
+unfold mat_repl_vect; cbn.
+rewrite <- Hrc.
+remember (mat_nrows M) as dim eqn:Hdim.
+symmetry in Hdim, Hrc.
+rename Hdim into Hrd.
+rename Hrc into Hcd.
+clear Hrd Hcd.
+revert i Hi.
+induction dim; intros; [ easy | ].
+cbn - [ iter_seq ].
+rewrite srng_mul_summation_distr_l; [ | easy | easy ].
+apply srng_summation_eq_compat.
+intros j (_, Hj).
+symmetry.
+rewrite (srng_c_mul_comm a).
+do 3 rewrite <- srng_mul_assoc.
+f_equal.
+destruct (Nat.eq_dec j i) as [Hji| Hji]. {
+  subst j.
+  rewrite srng_mul_assoc.
+  rewrite srng_c_mul_comm.
+  rewrite srng_mul_assoc.
+  f_equal.
+...
+
+Theorem determinant_multilinear : ∀ M i a b U V,
+  i < mat_nrows M
+  → determinant (mat_repl_vect i M (a × U + b × V)%V) =
+       (a * determinant (mat_repl_vect i M U) +
+        b * determinant (mat_repl_vect i M V))%Rng.
+Proof.
+intros * Hi.
+unfold vect_add, vect_mul_scal_l; cbn.
+unfold mat_repl_vect; cbn.
+enough (H : mat_nrows M = mat_ncols M).
+rewrite <- H.
+remember (mat_nrows M) as dim eqn:Hdim.
+symmetry in Hdim, H.
+rename Hdim into Hrd.
+rename H into Hcd.
+clear Hrd Hcd.
+revert i Hi.
+induction dim; intros; [ easy | ].
+cbn - [ iter_seq ].
+destruct i. {
+  rewrite srng_summation_split_first; [ | easy | flia ].
+  cbn - [ iter_seq ].
+  rewrite srng_mul_1_l.
+...    
+
+do 3 rewrite srng_add_0_l, srng_mul_1_l.
+  do 3 rewrite srng_mul_1_r.
+  easy.
+  rewrite srng_mul_1_r.
 ...
 
 (* the following versions of computing the determinant should
