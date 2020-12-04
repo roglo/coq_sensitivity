@@ -588,12 +588,6 @@ unfold gauss_jordan_list.
 apply gauss_jordan_list_loop_gauss_jordan_loop.
 Qed.
 
-(* matrix whose k-th column is replaced by a vector *)
-
-Definition mat_repl_vect k (M : matrix T) V :=
-  mk_mat (λ i j, if Nat.eq_dec j k then vect_el V i else mat_el M i j)
-    (mat_nrows M) (mat_ncols M).
-
 (* resolve a system of n equations with n variables whose determinant
    is not zero; Cramer's method *)
 

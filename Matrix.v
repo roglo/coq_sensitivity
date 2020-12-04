@@ -210,6 +210,12 @@ Definition subm (M : matrix T) i j :=
     (mat_nrows M - 1)
     (mat_ncols M - 1).
 
+(* matrix whose k-th column is replaced by a vector *)
+
+Definition mat_repl_vect k (M : matrix T) V :=
+  mk_mat (λ i j, if Nat.eq_dec j k then vect_el V i else mat_el M i j)
+    (mat_nrows M) (mat_ncols M).
+
 (* (-1) ^ n *)
 
 Definition minus_one_pow n :=
