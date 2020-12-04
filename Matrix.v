@@ -615,7 +615,7 @@ Compute determinant (mat_of_list_list 0 [[1; 2]; [3; 4]]).
 Compute determinant (mat_of_list_list 0 [[-2; 2; -3]; [-1; 1; 3]; [2; 0; -1]]). (* 18: seems good *)
 *)
 
-(* identity matrix of size n *)
+(* identity matrix of dimension n *)
 
 Definition mI n : matrix T :=
   mk_mat (λ i j, if Nat.eq_dec i j then 1%Srng else 0%Srng) n n.
