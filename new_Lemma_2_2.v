@@ -877,9 +877,7 @@ cbn - [ iter_seq ].
    matrices the discriminants of which are equal to zero *)
 (* but I wanted to prove it anyway, for the sport; I thought it was
    easy but it is not *)
-Abort. (* for the moment
 ...
-*)
 
 Theorem resolved_with_zero_det : ∀ M V R,
   is_square_mat M
