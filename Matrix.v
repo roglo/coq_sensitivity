@@ -269,11 +269,24 @@ symmetry.
 rewrite (srng_c_mul_comm a).
 do 3 rewrite <- srng_mul_assoc.
 f_equal.
+(**)
+unfold subm; cbn.
+rewrite Nat.sub_0_r.
 destruct (Nat.eq_dec j i) as [Hji| Hji]. {
   subst j.
   rewrite srng_mul_assoc.
   rewrite srng_c_mul_comm.
   rewrite srng_mul_assoc.
+  f_equal; f_equal.
+  apply matrix_eq; [ easy | easy | cbn ].
+  clear Hj.
+  intros j k Hj Hk.
+  destruct (lt_dec k i) as [Hki| Hki]. {
+    destruct (Nat.eq_dec k i) as [H| H]; [ flia Hki H | easy ].
+  } {
+    destruct (Nat.eq_dec (k + 1) i) as [H| H]; [ flia Hki H | easy ].
+  }
+} {
   f_equal.
 ...
 
@@ -300,8 +313,7 @@ destruct i. {
   rewrite srng_summation_split_first; [ | easy | flia ].
   cbn - [ iter_seq ].
   rewrite srng_mul_1_l.
-...    
-
+...
 do 3 rewrite srng_add_0_l, srng_mul_1_l.
   do 3 rewrite srng_mul_1_r.
   easy.
