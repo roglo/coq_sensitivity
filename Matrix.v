@@ -375,6 +375,14 @@ cbn - [ iter_seq ].
 (**)
 destruct n; [ flia Hiz | ].
 cbn - [ iter_seq ].
+rewrite (srng_summation_split _ i); [ | flia Hiz ].
+rewrite srng_summation_split_last; [ | flia ].
+rewrite srng_summation_shift; [ | flia Hiz ].
+erewrite srng_summation_eq_compat. 2: {
+  intros j Hj.
+  now rewrite Nat.add_comm, Nat.add_sub.
+}
+cbn - [ iter_seq ].
 ...
 (* blocked by the present implementation of discriminant
 erewrite srng_summation_eq_compat; [ | easy | ]. 2: {  
