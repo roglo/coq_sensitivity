@@ -799,7 +799,9 @@ Arguments squ_mat_one {T so}.
 Arguments squ_mat_zero {T so}.
 Arguments squ_mat_semiring_op {T so}.
 Arguments subm {T} M%M i%nat j%nat.
-Arguments vect_sub {T ro so}.
+Arguments vect_add {T so} U%V V%V.
+Arguments vect_sub {T ro so} U%V V%V.
+Arguments vect_opp {T ro} V%V.
 Arguments vect_mul_scal_l {T so} _%Srng _%V.
 Arguments vect_zero {T so}.
 
@@ -813,5 +815,6 @@ Notation "U + V" := (vect_add U V) : V_scope.
 Notation "U - V" := (vect_sub U V) : V_scope.
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
 Notation "A · V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
+Notation "- V" := (vect_opp V) : V_scope.
 
 End matrix_Notations.

@@ -894,7 +894,7 @@ unfold resolve in Hv.
 remember (mat_nrows M) as r eqn:Hmr; symmetry in Hmr.
 rename Hsm into Hmc.
 symmetry in Hmc, Hrr.
-revert M R Hmr Hmc Hrr Hdet Hv.
+revert M V R Hmr Hmc Hrr Hdet Hv.
 induction r; intros. {
   cbn in Hv.
   subst V.
@@ -915,6 +915,18 @@ remember {| mat_el := mat_el MGJ; mat_nrows := r; mat_ncols := r |} as M'
 remember
   ({| vect_el := λ i, mat_el MGJ i (S r); vect_nrows := r |} -
    {| vect_el := λ i, mat_el MGJ i r; vect_nrows := r |})%V as V' eqn:HV'.
+unfold vect_sub in HV'.
+unfold vect_opp in HV'; cbn in HV'.
+unfold vect_add in HV'; cbn in HV'.
+remember (mk_vect (vect_el R) r) as R' eqn:HR'.
+destruct (srng_eq_dec (determinant M') 0) as [Hdz| Hdz]. {
+  specialize (IHr M' V' R') as H1.
+  assert (H : mat_nrows M' = r) by now subst M'.
+  specialize (H1 H); clear H.
+  assert (H : mat_ncols M' = r) by now subst M'.
+  specialize (H1 H); clear H.
+  assert (H : vect_nrows R' = r) by now subst R'.
+  specialize (H1 H Hdz); clear H.
 ...
 
 Theorem resolved : ∀ M V R,
