@@ -290,7 +290,7 @@ Definition mat_add_row_mul_scal_row M i1 v i2 :=
 
 Theorem det_mul_row_0_by_scal : ∀ A v,
   mat_ncols A ≠ 0
-  → determinant (mat_mul_row_0_by_scal A v) = (v * determinant A)%Srng.
+  → determinant (mat_mul_row_by_scal 0 A v) = (v * determinant A)%Srng.
 Proof.
 intros * Hcz.
 unfold determinant; cbn.
@@ -320,15 +320,13 @@ Theorem glop : ∀ M a,
   (a * determinant M)%Srng = determinant M.
 Proof.
 intros.
-Inspect 1.
-rewrite <- det_mul_row_0_by_scal.
 ...
 
 Theorem determinant_multilinear_mul : ∀ M i a V,
   mat_nrows M = mat_ncols M
   → i < mat_nrows M
   → determinant (mat_repl_vect i M (a × V)%V) =
-       (a * determinant (mat_repl_vect i M V))%Rng.
+      (a * determinant (mat_repl_vect i M V))%Rng.
 Proof.
 intros * Hrc Hi.
 ...
