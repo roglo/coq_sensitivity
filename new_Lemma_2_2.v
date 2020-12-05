@@ -424,6 +424,11 @@ cbn - [ Nat.pow ] in Hμ, HV.
 rewrite HV.
 rewrite mat_vect_mul_assoc; [ | easy | easy ].
 cbn - [ iter_seq Nat.pow ].
+Theorem toto : ∀ ll1 ll2,
+  (mat_of_mat_list_list 0%F ll1 * mat_of_mat_list_list 0%F ll2)%M =
+  mat_of_mat_list_list 0%F [].
+...
+rewrite toto.
 ...
 unfold mat_mul.
 apply vector_eq; [ easy | ].
