@@ -423,6 +423,14 @@ destruct n. {
 cbn - [ Nat.pow ] in Hμ, HV.
 rewrite HV at 1.
 rewrite mat_vect_mul_assoc; [ | easy | easy ].
+unfold mat_mul.
+cbn - [ iter_seq Nat.pow ].
+apply vector_eq; [ now rewrite HV | ].
+rewrite HV.
+cbn - [ iter_seq Nat.pow base_vector_1 ].
+rewrite mA_nrows, mA_ncols.
+intros i Hi.
+rewrite Nat.mul_1_r.
 ...
 
 Fixpoint first_non_zero_in_col (M : matrix T) it i j :=
