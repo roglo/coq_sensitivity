@@ -403,6 +403,7 @@ cbn - [ iter_seq ].
       (                ) * V
       (       I        )
    for any vector V of dimension 2^(n+1).
+     There is going to be a special case for n = 0.
      We can take V, for example, as (1, 0, 0, 0....0), etc.
    This way, we have to prove that this pair eigen(value,vector)
    works *)
