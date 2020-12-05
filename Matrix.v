@@ -324,6 +324,7 @@ intros.
 ...
 *)
 
+(* doesn't work
 Theorem determinant_multilinear_mul : ∀ M i a V,
   mat_nrows M = mat_ncols M
   → i < mat_nrows M
@@ -369,34 +370,11 @@ destruct (Nat.eq_dec j i) as [Hji| Hji]. {
 } {
   f_equal.
   symmetry.
-  replace
-    {|
-    mat_el := λ k l : nat,
-                if lt_dec l j
-                then
-                 if Nat.eq_dec l i
-                 then (a * vect_el V (k + 1))%Rng
-                 else mat_el M (k + 1) l
-                else
-                 if Nat.eq_dec (l + 1) i
-                 then (a * vect_el V (k + 1))%Rng
-                 else mat_el M (k + 1) (l + 1);
-    mat_nrows := dim;
-    mat_ncols := dim |} with
-                {|
-                mat_el := λ i0 j : nat,
-                            if Nat.eq_dec j i
-                            then (a * vect_el V i0)%Rng
-                            else mat_el M i0 j;
-                mat_nrows := dim;
-                mat_ncols := dim |}. 2: {
-    apply matrix_eq; [ easy | easy | cbn ].
-    intros k l Hk Hl.
-    destruct (Nat.eq_dec l i) as [Hli| Hli]. {
-      subst l.
-      destruct (lt_dec i j) as [Hij| Hij]. {
+  destruct i. {
 ...
+*)
 
+(*
 Theorem determinant_multilinear : ∀ M i a b U V,
   i < mat_nrows M
   → determinant (mat_repl_vect i M (a × U + b × V)%V) =
@@ -426,6 +404,7 @@ do 3 rewrite srng_add_0_l, srng_mul_1_l.
   easy.
   rewrite srng_mul_1_r.
 ...
+*)
 
 (* If the i-th row (column) in A is a sum of the i-th row (column) of
    a matrix B and the i-th row (column) of a matrix C and all other
