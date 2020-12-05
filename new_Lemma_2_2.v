@@ -389,6 +389,12 @@ Fixpoint srng_of_nat n :=
 Theorem mat_vect_mul_assoc : ∀ A B V, (A · (B · V) = (A * B)%M · V)%V.
 Proof.
 intros.
+apply vector_eq; [ easy | ].
+intros i Hi.
+cbn in Hi.
+unfold mat_mul_vect_r.
+unfold mat_mul.
+cbn - [ iter_seq ].
 ...
 
 (* seems, on paper, that √(n+1) is an eignenvalue for A_{n+1}
