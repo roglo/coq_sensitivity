@@ -380,6 +380,18 @@ Qed.
 Check mA.
 Inspect 1.
 
+(* seems, on paper, that √(n+1) is an eignenvalue for A_{n+1}
+   and a corresponding eigenvector is
+      ( A_n + √(n+1) I )
+      (                ) * V
+      (       I        )
+   for any vector V of dimension 2^(n+1).
+     We can take V, for example, as (1, 0, 0, 0....0), etc.
+   This way, we have to prove that this pair eigen(value,vector)
+   works *)
+
+...
+
 Fixpoint first_non_zero_in_col (M : matrix T) it i j :=
   match it with
   | 0 => None
