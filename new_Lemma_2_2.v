@@ -380,6 +380,12 @@ Qed.
 Check mA.
 Inspect 1.
 
+Fixpoint srng_of_nat n :=
+  match n with
+  | 0 => 0%Srng
+  | S n' => (1 + srng_of_nat n')%Srng
+  end.
+
 (* seems, on paper, that √(n+1) is an eignenvalue for A_{n+1}
    and a corresponding eigenvector is
       ( A_n + √(n+1) I )
@@ -390,6 +396,33 @@ Inspect 1.
    This way, we have to prove that this pair eigen(value,vector)
    works *)
 
+Definition base_vector_1 dim :=
+  mk_vect (λ i, match i with 0 => 1%Srng | _ => 0%Srng end) dim.
+
+Definition A_n_eigenvector_of_sqrt_n n μ V :=
+  match n with
+  | 0 => base_vector_1 0
+  | S n' =>
+      (mat_of_mat_list_list 0%F
+         [[(mA n' + μ × squ_mat_one (2 ^ n))%M]; [squ_mat_one (2 ^ n)]]
+       · V)%V
+  end.
+
+Theorem A_n_eigen_formula : ∀ n μ V,
+  (μ * μ)%Rng = srng_of_nat n
+  → V = A_n_eigenvector_of_sqrt_n n μ (base_vector_1 (2 ^ n))
+  → (mA n · V = μ × V)%V.
+Proof.
+intros * Hμ HV.
+destruct n. {
+  cbn in Hμ, HV |-*.
+  (* we need to add that the ring is integral *)
+  admit.
+}
+cbn - [ Nat.pow ] in Hμ, HV.
+rewrite HV at 1.
+Search (mat_mul_vect_r _ (mat_mul_vect_r _ _)).
+Search (_ · (_ · _))%V.
 ...
 
 Fixpoint first_non_zero_in_col (M : matrix T) it i j :=
@@ -1269,12 +1302,6 @@ destruct k1 as [k1| ]. {
 About mA.
 Arguments mA {T so ro}.
 About mA.
-
-Fixpoint srng_of_nat n :=
-  match n with
-  | 0 => 0%Srng
-  | S n' => (1 + srng_of_nat n')%Srng
-  end.
 
 (*
 End in_field.
