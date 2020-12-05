@@ -316,11 +316,13 @@ Qed.
 
 (* multilinearity *)
 
+(*
 Theorem glop : ∀ M a,
   (a * determinant M)%Srng = determinant M.
 Proof.
 intros.
 ...
+*)
 
 Theorem determinant_multilinear_mul : ∀ M i a V,
   mat_nrows M = mat_ncols M
@@ -329,7 +331,6 @@ Theorem determinant_multilinear_mul : ∀ M i a V,
       (a * determinant (mat_repl_vect i M V))%Rng.
 Proof.
 intros * Hrc Hi.
-...
 unfold vect_add, vect_mul_scal_l; cbn.
 unfold mat_repl_vect; cbn.
 rewrite <- Hrc.
