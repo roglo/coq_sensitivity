@@ -386,6 +386,11 @@ Fixpoint srng_of_nat n :=
   | S n' => (1 + srng_of_nat n')%Srng
   end.
 
+Theorem mat_vect_mul_assoc : ∀ A B V, (A · (B · V) = (A * B)%M · V)%V.
+Proof.
+intros.
+...
+
 (* seems, on paper, that √(n+1) is an eignenvalue for A_{n+1}
    and a corresponding eigenvector is
       ( A_n + √(n+1) I )
@@ -421,8 +426,8 @@ destruct n. {
 }
 cbn - [ Nat.pow ] in Hμ, HV.
 rewrite HV at 1.
+About mat_mul_vect_r.
 Search (mat_mul_vect_r _ (mat_mul_vect_r _ _)).
-Search (_ · (_ · _))%V.
 ...
 
 Fixpoint first_non_zero_in_col (M : matrix T) it i j :=
