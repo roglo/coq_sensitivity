@@ -488,7 +488,7 @@ erewrite srng_summation_eq_compat. 2: {
   now rewrite Nat.add_comm, Nat.add_sub.
 }
 cbn - [ iter_seq ].
-...
+Abort.
 (* blocked by the present implementation of discriminant
 erewrite srng_summation_eq_compat; [ | easy | ]. 2: {  
   intros j Hj.
@@ -541,8 +541,8 @@ rewrite (det_sum_row_row _ M C Hrz); cycle 7. {
   specialize (det_mul_row_0_by_scal D v) as H1.
   assert (H : mat_ncols D ≠ 0); [ subst D; cbn; congruence | ].
   specialize (H1 H); clear H.
-  assert (H : mat_mul_row_0_by_scal D v = C). {
-    unfold mat_mul_row_0_by_scal; rewrite Hc, Hd; cbn.
+  assert (H : mat_mul_row_by_scal 0 D v = C). {
+    unfold mat_mul_row_by_scal; rewrite Hc, Hd; cbn.
     apply matrix_eq; [ easy | easy | cbn ].
     intros i j Hi Hj.
     now destruct (Nat.eq_dec i 0).
