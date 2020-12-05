@@ -421,12 +421,12 @@ destruct n. {
   admit.
 }
 cbn - [ Nat.pow ] in Hμ, HV.
-rewrite HV at 1.
-rewrite mat_vect_mul_assoc; [ | easy | easy ].
-unfold mat_mul.
-cbn - [ iter_seq Nat.pow ].
-apply vector_eq; [ now rewrite HV | ].
 rewrite HV.
+rewrite mat_vect_mul_assoc; [ | easy | easy ].
+cbn - [ iter_seq Nat.pow ].
+...
+unfold mat_mul.
+apply vector_eq; [ easy | ].
 cbn - [ iter_seq Nat.pow base_vector_1 ].
 rewrite mA_nrows, mA_ncols.
 intros i Hi.
