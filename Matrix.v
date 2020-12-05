@@ -339,7 +339,7 @@ symmetry in Hdim, Hrc.
 rename Hdim into Hrd.
 rename Hrc into Hcd.
 clear Hrd Hcd.
-revert i Hi.
+revert i Hi V.
 induction dim; intros; [ easy | ].
 cbn - [ iter_seq ].
 rewrite srng_mul_summation_distr_l; [ | easy | easy ].
@@ -368,6 +368,33 @@ destruct (Nat.eq_dec j i) as [Hji| Hji]. {
   }
 } {
   f_equal.
+  symmetry.
+  replace
+    {|
+    mat_el := λ k l : nat,
+                if lt_dec l j
+                then
+                 if Nat.eq_dec l i
+                 then (a * vect_el V (k + 1))%Rng
+                 else mat_el M (k + 1) l
+                else
+                 if Nat.eq_dec (l + 1) i
+                 then (a * vect_el V (k + 1))%Rng
+                 else mat_el M (k + 1) (l + 1);
+    mat_nrows := dim;
+    mat_ncols := dim |} with
+                {|
+                mat_el := λ i0 j : nat,
+                            if Nat.eq_dec j i
+                            then (a * vect_el V i0)%Rng
+                            else mat_el M i0 j;
+                mat_nrows := dim;
+                mat_ncols := dim |}. 2: {
+    apply matrix_eq; [ easy | easy | cbn ].
+    intros k l Hk Hl.
+    destruct (Nat.eq_dec l i) as [Hli| Hli]. {
+      subst l.
+      destruct (lt_dec i j) as [Hij| Hij]. {
 ...
 
 Theorem determinant_multilinear : ∀ M i a b U V,
