@@ -755,6 +755,13 @@ Notation "A * B" := (mat_mul A B) : M_scope.
 Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
 Notation "- A" := (mat_opp A) : M_scope.
 
+Declare Scope V_scope.
+Delimit Scope V_scope with V.
+
+Arguments mat_mul_vect_r {T so} M%M V%V.
+
+Notation "A · V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
+
 (* associativity of multiplication *)
 
 Theorem mat_mul_assoc : ∀ MA MB MC, (MA * (MB * MC))%M = ((MA * MB) * MC)%M.
@@ -782,6 +789,49 @@ erewrite srng_summation_eq_compat. 2: {
 cbn - [ iter_seq ].
 symmetry.
 now apply srng_mul_summation_distr_r.
+Qed.
+
+(* associativity with multiplication with vector *)
+
+Theorem mat_vect_mul_assoc_as_sums : ∀ A B V i,
+  i < mat_nrows A
+  → (Σ (j = 0, mat_ncols A - 1),
+       mat_el A i j *
+       (Σ (k = 0, mat_ncols B - 1), mat_el B j k * vect_el V k))%Rng =
+    (Σ (j = 0, mat_ncols B - 1),
+       (Σ (k = 0, mat_ncols A - 1), mat_el A i k * mat_el B k j) *
+       vect_el V j)%Rng.
+Proof.
+intros * Hi.
+erewrite srng_summation_eq_compat. 2: {
+  intros j Hj.
+  now rewrite srng_mul_summation_distr_l.
+}
+symmetry.
+erewrite srng_summation_eq_compat. 2: {
+  intros j Hj.
+  now rewrite srng_mul_summation_distr_r.
+}
+symmetry.
+cbn - [ iter_seq ].
+rewrite srng_summation_summation_exch'; [ | easy ].
+apply srng_summation_eq_compat.
+intros j Hj.
+apply srng_summation_eq_compat.
+intros k Hk.
+apply srng_mul_assoc.
+Qed.
+
+Theorem mat_vect_mul_assoc : ∀ A B V, (A · (B · V) = (A * B) · V)%V.
+Proof.
+intros.
+apply vector_eq; [ easy | ].
+intros i Hi.
+cbn in Hi.
+unfold mat_mul_vect_r.
+unfold mat_mul.
+cbn - [ iter_seq ].
+now apply mat_vect_mul_assoc_as_sums.
 Qed.
 
 (* comatrix *)
@@ -902,7 +952,7 @@ Delimit Scope V_scope with V.
 Arguments det_loop {T ro so} M%M n%nat.
 Arguments determinant {T ro so} M%M.
 Arguments mat_mul_scal_l {T so} _ M%M.
-Arguments mat_mul_vect_r {T so}.
+Arguments mat_mul_vect_r {T so} M%M V%V.
 Arguments mat_nrows {T} m%M.
 Arguments mat_ncols {T} m%M.
 Arguments mat_sub {T ro so} MA%M MB%M.
