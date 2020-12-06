@@ -52,23 +52,15 @@ Qed.
 Theorem rngl_opp_add_distr : ∀ a b, (- (a + b) = - a - b)%F.
 Proof.
 intros.
-Arguments rngl_add_reg_l {T}%type_scope {ro rp} Hro.
-apply (rngl_add_reg_l Hro _ _ (b + a)%F).
-...
-apply (@rngl_add_reg_l _ _ _ Hro _ _ (b + a)%F).
-(*
-apply (rngl_add_reg_l _ _ (b + a)%F).
-*)
+apply rngl_add_reg_l with (c := (b + a)%F); [ easy | ].
 unfold rngl_sub.
 rewrite rngl_add_assoc.
 do 3 rewrite fold_rngl_sub.
-...
-rewrite rngl_add_sub.
+rewrite rngl_add_sub; [ | easy ].
 rewrite rngl_add_comm.
-now do 2 rewrite rngl_add_opp_r.
+rewrite rngl_add_opp_r; [ | easy ].
+now rewrite rngl_add_opp_r.
 Qed.
-
-...
 
 Theorem rngl_opp_summation : ∀ b e f,
   ((- Σ (i = b, e), f i) = Σ (i = b, e), (- f i))%F.
@@ -78,7 +70,7 @@ unfold iter_seq.
 remember (S e - b) as len.
 clear e Heqlen.
 revert b.
-induction len; intros; [ apply rngl_opp_0 | ].
+induction len; intros; [ now apply rngl_opp_0 | ].
 rewrite List_seq_succ_r; cbn.
 rewrite fold_left_app; cbn.
 rewrite fold_left_app; cbn.
@@ -104,7 +96,7 @@ Qed.
 
 Theorem rngl_summation_split_last : ∀ b k g,
   b ≤ k
-  → (Σ (i = b, k), g i = Σ (i = S b, k), g (i - 1) + g k)%F.
+  → (Σ (i = b, k), g i = Σ (i = S b, k), g (i - 1)%nat + g k)%F.
 Proof.
 intros * Hbk.
 unfold iter_seq.
@@ -262,7 +254,7 @@ move len2 before len1.
 replace (S k - (j + 1)) with (len2 - len1) by flia Hlen1 Hlen2 Hbj.
 replace (j + 1) with (b + len1) by flia Hlen1 Hbj.
 assert (Hll : len1 ≤ len2) by flia Hlen1 Hlen2 Hjk.
-clear - sp Hll.
+clear - rp Hll.
 revert b len2 Hll.
 induction len1; intros. {
   now cbn; rewrite rngl_add_0_l, Nat.add_0_r, Nat.sub_0_r.
