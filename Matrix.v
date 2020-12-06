@@ -720,6 +720,11 @@ Compute determinant (mat_of_list_list 0 [[1; 2]; [3; 4]]).
 Compute determinant (mat_of_list_list 0 [[-2; 2; -3]; [-1; 1; 3]; [2; 0; -1]]). (* 18: seems good *)
 *)
 
+(* null matrix of dimension n *)
+
+Definition mZ n :=
+  mk_mat (λ i j, 0%Srng) n n.
+
 (* identity matrix of dimension n *)
 
 Definition mI n : matrix T :=
@@ -745,6 +750,7 @@ Arguments mat_nrows {T} m%M.
 Arguments mat_ncols {T} m%M.
 Arguments mat_sub {T ro so} MA%M MB%M.
 Arguments mI {T so} n%nat.
+Arguments mZ {T so} n%nat.
 Arguments minus_one_pow {T ro so}.
 Arguments determinant {T ro so} M%M.
 Arguments subm {T} M%M i%nat j%nat.
@@ -761,6 +767,20 @@ Delimit Scope V_scope with V.
 Arguments mat_mul_vect_r {T so} M%M V%V.
 
 Notation "A · V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
+
+(* multiplication left and right with identity *)
+
+(*
+Theorem mat_mul_1_l : ∀ M n,
+  n = mat_ncols M
+  → (mI n * M)%M = M.
+...
+
+Theorem mat_mul_1_r : ∀ M n,
+  n = mat_ncols M
+  → (M * mI n)%M = M.
+...
+*)
 
 (* associativity of multiplication *)
 
@@ -932,14 +952,16 @@ destruct (lt_dec k i) as [Hki| Hki]. {
 }
 Qed.
 
+(*
 Definition squ_mat_zero n :=
   mk_mat (λ i j, 0%Srng) n n.
 Definition squ_mat_one n :=
   mk_mat (λ i j, if Nat.eq_dec i j then 1%Srng else 0%Srng) n n.
+*)
 
 Definition squ_mat_semiring_op n : semiring_op (matrix T) :=
-  {| srng_zero := squ_mat_zero n;
-     srng_one := squ_mat_one n;
+  {| srng_zero := mZ n;
+     srng_one := mI n;
      srng_add := mat_add;
      srng_mul := mat_mul |}.
 
@@ -978,9 +1000,12 @@ Arguments mat_nrows {T} m%M.
 Arguments mat_ncols {T} m%M.
 Arguments mat_sub {T ro so} MA%M MB%M.
 Arguments mI {T so} n%nat.
+Arguments mZ {T so} n%nat.
 Arguments minus_one_pow {T ro so}.
+(*
 Arguments squ_mat_one {T so}.
 Arguments squ_mat_zero {T so}.
+*)
 Arguments squ_mat_semiring_op {T so}.
 Arguments subm {T} M%M i%nat j%nat.
 Arguments vect_add {T so} U%V V%V.

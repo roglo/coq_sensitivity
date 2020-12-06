@@ -59,8 +59,8 @@ Fixpoint mA n : matrix T :=
   | 0 => mat_of_scalar 0%Rng
   | S n' =>
       mat_of_mat_list_list 0%Rng
-        [[mA n'; squ_mat_one (2 ^ n')];
-         [squ_mat_one (2 ^ n'); (- mA n')%M]]
+        [[mA n'; mI (2 ^ n')];
+         [mI (2 ^ n'); (- mA n')%M]]
   end.
 
 Definition srng_of_nat n := (Σ (i = 1, n), 1)%Srng.
@@ -91,7 +91,7 @@ Qed.
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
-  (mA n * mA n)%M = (srng_of_nat n × squ_mat_one (2 ^ n))%M.
+  (mA n * mA n)%M = (srng_of_nat n × mI (2 ^ n))%M.
 Proof.
 intros.
 apply matrix_eq; [ apply mA_nrows | apply mA_ncols | ].
@@ -397,7 +397,7 @@ Definition A_n_eigenvector_of_sqrt_n n μ V :=
   | 0 => base_vector_1 0
   | S n' =>
       (mat_of_mat_list_list 0%F
-         [[(mA n' + μ × squ_mat_one (2 ^ n'))%M]; [squ_mat_one (2 ^ n')]]
+         [[(mA n' + μ × mI (2 ^ n'))%M]; [mI (2 ^ n')]]
        · V)%V
   end.
 
@@ -530,10 +530,20 @@ rewrite m_o_mll_2x2_2x1; cycle 1. {
 }
 rewrite mat_mul_add_distr_l; [ | easy ].
 rewrite lemma_2_A_n_2_eq_n_I.
+rewrite mat_mul_add_distr_l; [ | easy ].
 Search (_ * (_ × _))%M.
 Search ((_ × _) * _)%M.
 Search (_ × (_ * _))%M.
-Search squ_mat_one.
+Search (_ + _ = _)%M.
+...
+rewrite mat_mul_1_l; [ | easy ].
+rewrite mat_mul_1_l; [ | symmetry; apply mA_ncols ].
+rewrite mat_mul_1_l; [ | easy ].
+rewrite mat_mul_1_r; [ | symmetry; apply mA_ncols ].
+...
+Check mat_add_assoc.
+Check mat_add_add_swap.
+rewrite mat_add_add_swap.
 ...
 (*
 remember [mA n; squ_mat_one (2 ^ n)] as M1 eqn:HM1.
