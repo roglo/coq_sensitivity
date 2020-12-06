@@ -153,6 +153,13 @@ destruct rngl_is_comm. {
 }
 Qed.
 
+Theorem rngl_sub_compat_l : ∀ a b c,
+  (a = b)%F → (a - c = b - c)%F.
+Proof.
+intros a b c Hab.
+now rewrite Hab.
+Qed.
+
 Theorem fold_rngl_sub : ∀ a b, (a + - b)%F = (a - b)%F.
 Proof. intros; easy. Qed.
 
@@ -184,6 +191,20 @@ rewrite rngl_add_opp_r.
 apply rngl_add_0_r.
 Qed.
 
+Theorem rngl_add_reg_r : ∀ a b c, (a + c = b + c)%F → (a = b)%F.
+Proof.
+intros * Habc.
+eapply rngl_sub_compat_l with (c := c) in Habc.
+now do 2 rewrite rngl_add_sub in Habc.
+Qed.
+
+Theorem rngl_add_reg_l : ∀ a b c, (c + a = c + b)%F → (a = b)%F.
+Proof.
+intros * Habc.
+eapply rngl_sub_compat_l with (c := c) in Habc.
+now do 2 rewrite rngl_add_comm, rngl_add_sub in Habc.
+Qed.
+
 (*
 End ring_like_theorems.
 
@@ -192,23 +213,9 @@ Check @rngl_add_opp_r.
 Check @rngl_o_add_opp_l.
 Check @rngl_add_sub.
 Arguments rngl_add_opp_r {T ro rp Hro} x%F.
+Check @rngl_add_reg_r.
+Check @rngl_add_reg_l.
 *)
-
-Theorem rngl_add_reg_r : ∀ a b c, (a + c = b + c)%F → (a = b)%F.
-Proof.
-intros a b c Habc; simpl in Habc; simpl.
-...
-eapply rngl_sub_compat_l with (c := c) in Habc.
-now do 2 rewrite rngl_add_sub in Habc.
-Qed.
-
-Theorem rngl_add_reg_l : ∀ a b c, (c + a = c + b)%F → (a = b)%F.
-Proof.
-intros a b c Habc; simpl in Habc; simpl.
-apply rngl_add_reg_r with (c := c).
-rewrite rngl_add_comm; symmetry.
-now rewrite rngl_add_comm; symmetry.
-Qed.
 
 Theorem rngl_opp_0 : (- 0 = 0)%F.
 Proof.
