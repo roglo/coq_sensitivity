@@ -745,6 +745,7 @@ Declare Scope M_scope.
 Delimit Scope M_scope with M.
 
 Arguments det_loop {T ro so} M%M n%nat.
+Arguments is_square_mat {T} M%M.
 Arguments mat_mul_scal_l {T so} _ M%M.
 Arguments mat_nrows {T} m%M.
 Arguments mat_ncols {T} m%M.
@@ -767,6 +768,13 @@ Delimit Scope V_scope with V.
 Arguments mat_mul_vect_r {T so} M%M V%V.
 
 Notation "A · V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
+
+(* multiplication of a square matrix by a scalar is square *)
+
+Theorem mat_mul_scal_l_is_square : ∀ a M,
+  is_square_mat M
+  → is_square_mat (a × M).
+Proof. intros. easy. Qed.
 
 (* multiplication left and right with identity *)
 
@@ -803,6 +811,9 @@ Theorem mat_mul_1_r : ∀ M n,
   → (M * mI n)%M = M.
 Proof.
 intros * Hsm Hn.
+(**)
+clear scp.
+(**)
 apply matrix_eq; [ easy | cbn; congruence | ].
 cbn - [ iter_seq ].
 unfold is_square_mat in Hsm.
@@ -811,6 +822,7 @@ intros * Hi Hj.
 rewrite (srng_summation_split _ j); [ | flia Hj ].
 rewrite srng_summation_split_last; [ | flia ].
 destruct (Nat.eq_dec j j) as [H| H]; [ clear H | easy ].
+...
 rewrite srng_mul_1_r.
 rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
   intros k Hk.

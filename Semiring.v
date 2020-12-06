@@ -67,6 +67,11 @@ rewrite srng_c_mul_comm, srng_mul_0_l.
 reflexivity.
 Qed.
 
+...
+
+(* should not depend on the fact that the semiring
+   is commutative *)
+
 Theorem srng_mul_1_r : ∀ a, (a * 1 = a)%Srng.
 Proof.
 intros a; simpl.

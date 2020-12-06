@@ -534,10 +534,12 @@ rewrite mat_mul_add_distr_l; [ | easy ].
 specialize (mA_is_square n) as Hasm.
 rewrite mat_mul_1_l; [ | easy | easy | easy ].
 rewrite mat_mul_1_l; [ | easy | easy | now rewrite mA_ncols ].
-rewrite mat_mul_1_l; [ | easy | | easy ]. 2: {
-Search (is_square_mat (_ × _)).
+rewrite mat_mul_1_l; [ | easy | easy | easy ].
+rewrite mat_mul_1_r; [ | easy | easy | easy | ].
+Check @mat_mul_1_l.
+Check @mat_mul_1_r.
 ...
-rewrite mat_mul_1_r; [ | symmetry; apply mA_ncols ].
+rewrite mat_mul_1_r; [ | easy | | symmetry; apply mA_ncols | | ].
 ...
 Check mat_add_assoc.
 Check mat_add_add_swap.
