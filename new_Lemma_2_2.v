@@ -88,6 +88,13 @@ induction n; [ easy | cbn ].
 now rewrite IHn, Nat.mul_comm; cbn.
 Qed.
 
+Theorem mA_is_square_mat : ∀ n, is_square_mat (mA n).
+Proof.
+intros.
+unfold is_square_mat.
+now rewrite mA_nrows, mA_ncols.
+Qed.
+
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
@@ -413,12 +420,13 @@ Theorem m_o_mll_2x2_2x1 : ∀ d M1 M2 M3 M4 M5 M6,
    is_square_mat M1
    → mat_ncols M1 = mat_ncols M2
    → mat_ncols M1 = mat_ncols M3
+   → mat_ncols M1 = mat_ncols M4
    → mat_ncols M1 = mat_nrows M5
    → (mat_of_mat_list_list d [[M1; M2]; [M3; M4]] *
       mat_of_mat_list_list d [[M5]; [M6]])%M =
      mat_of_mat_list_list d [[M1 * M5 + M2 * M6]; [M3 * M5 + M4 * M6]]%M.
 Proof.
-intros * Hsm1 Hc1c2 Hc1c3 Hc1r5.
+intros * Hsm1 Hc1c2 Hc1c3 Hc1c4 Hc1r5.
 unfold is_square_mat in Hsm1.
 apply matrix_eq; [ easy | easy | ].
 cbn - [ iter_seq ].
@@ -430,7 +438,7 @@ unfold mat_list_list_el.
 cbn - [ iter_seq ].
 rewrite (Nat.div_small j); [ | flia Hj ].
 rewrite (Nat.mod_small j); [ | flia Hj ].
-rewrite <- Hc1c2, <- Hc1c3, <- Hc1r5.
+rewrite <- Hc1c2, <- Hc1c3, <- Hc1c4, <- Hc1r5.
 rewrite (srng_summation_split _ (mat_ncols M1)); [ | flia Hi ].
 rewrite srng_summation_split_last; [ | flia ].
 assert (H : mat_ncols M1 ≠ 0). {
@@ -492,7 +500,22 @@ destruct (lt_dec i (mat_nrows M1)) as [Hir1| Hir1]. {
     intros k Hk.
     now rewrite Nat.add_comm, Nat.add_sub.
   }
-...
+  destruct (Nat.eq_dec (mat_ncols M1) 1) as [Hc11| Hc11]. {
+    rewrite Hsm1, Hc11; cbn.
+    now rewrite srng_add_0_r, srng_add_0_l.
+  }
+  rewrite srng_summation_shift; [ | flia Hsm1 Hi Hc11 ].
+  remember (mat_ncols M1) as c.
+  replace (c * 2 - 1 - (c + 1)) with (c - 2) by flia.
+  rewrite (srng_summation_split_first _ _ (c - 1)); [ | flia Hc11 ].
+  rewrite (srng_summation_shift _ 1); [ | flia Hsm1 Hi Hc11 ].
+  f_equal.
+  replace (c - 1 - 1) with (c - 2) by flia.
+  apply srng_summation_eq_compat.
+  intros k Hk.
+  now rewrite <- Nat.add_assoc, Nat.add_comm, Nat.add_sub.
+}
+Qed.
 
 Theorem A_n_eigen_formula : ∀ n μ V,
   (μ * μ)%Rng = srng_of_nat n
@@ -509,8 +532,21 @@ cbn - [ Nat.pow ] in Hμ, HV.
 rewrite HV.
 rewrite mat_vect_mul_assoc; [ | easy | easy ].
 cbn - [ iter_seq Nat.pow ].
+rewrite m_o_mll_2x2_2x1; cycle 1. {
+  apply mA_is_square_mat.
+} {
+  apply mA_ncols.
+} {
+  apply mA_ncols.
+} {
+  easy.
+} {
+  now cbn; rewrite mA_nrows, mA_ncols.
+}
+Search (_ * _ * _)%M.
+Search (_ * (_ + _))%M.
 ...
-rewrite m_o_mll_2x2_2x1.
+rewrite mat_mul_add_distr_l.
 ...
 (*
 remember [mA n; squ_mat_one (2 ^ n)] as M1 eqn:HM1.
