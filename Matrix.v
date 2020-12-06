@@ -770,17 +770,16 @@ Notation "A · V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
 
 (* multiplication left and right with identity *)
 
-(*
 Theorem mat_mul_1_l : ∀ M n,
   n = mat_ncols M
   → (mI n * M)%M = M.
+Proof.
 ...
 
 Theorem mat_mul_1_r : ∀ M n,
   n = mat_ncols M
   → (M * mI n)%M = M.
 ...
-*)
 
 (* associativity of multiplication *)
 
