@@ -23,12 +23,19 @@ Class semiring_prop A {so : semiring_op A} :=
     srng_mul_assoc : ∀ a b c : A, (a * (b * c) = (a * b) * c)%Srng;
     srng_mul_1_l : ∀ a : A, (1 * a)%Srng = a;
     srng_mul_add_distr_l : ∀ a b c : A, (a * (b + c) = a * b + a * c)%Srng;
-    srng_mul_0_l : ∀ a, (0 * a = 0)%Srng }.
-
-(* commutative semiring *)
-
-Class sring_comm_prop A {so : semiring_op A} :=
-  { srng_c_mul_comm : ∀ a b : A, (a * b = b * a)%Srng }.
+    (* change as srng_nc_mul_0_l *)
+    srng_mul_0_l : ∀ a, (0 * a = 0)%Srng;
+    (* when commutative *)
+    srng_c_mul_comm :
+      if srng_is_comm then ∀ a b, (a * b = b * a)%Srng else True;
+    (* when not commutative *)
+    srng_nc_mul_1_r :
+      if srng_is_comm then True else ∀ a, (a * 1 = a)%Srng;
+    srng_nc_mul_0_r :
+      if srng_is_comm then True else ∀ a, (a * 0 = 0)%Srng;
+    srng_nc_mul_add_distr_r :
+      if srng_is_comm then True else
+       ∀ a b c, ((a + b) * c = a * c + b * c)%Srng }.
 
 (* decidability of equality in semirings
    and the fact that 1 ≠ 0 *)
@@ -52,7 +59,6 @@ Section semiring_theorems.
 Context {A : Type}.
 Context {so : semiring_op A}.
 Context {sp : semiring_prop A}.
-Context {scp : sring_comm_prop A}.
 
 Theorem srng_add_0_r : ∀ a, (a + 0 = a)%Srng.
 Proof.
@@ -64,18 +70,25 @@ Qed.
 Theorem srng_mul_0_r : ∀ a, (a * 0 = 0)%Srng.
 Proof.
 intros a; simpl.
-rewrite srng_c_mul_comm, srng_mul_0_l.
-reflexivity.
+specialize srng_c_mul_comm as srng_mul_comm.
+specialize srng_nc_mul_0_r as srng_mul_0_r.
+destruct srng_is_comm. {
+  now rewrite srng_mul_comm, srng_mul_0_l.
+} {
+  apply srng_mul_0_r.
+}
 Qed.
-
-(* should not depend on the fact that the semiring
-   is commutative *)
 
 Theorem srng_mul_1_r : ∀ a, (a * 1 = a)%Srng.
 Proof.
 intros a; simpl.
-rewrite srng_c_mul_comm, srng_mul_1_l.
-reflexivity.
+specialize srng_c_mul_comm as srng_mul_comm.
+specialize srng_nc_mul_1_r as srng_mul_1_r.
+destruct srng_is_comm. {
+  now rewrite srng_mul_comm, srng_mul_1_l.
+} {
+  apply srng_mul_1_r.
+}
 Qed.
 
 Theorem srng_add_add_swap : ∀ n m p, (n + m + p = n + p + m)%Srng.
@@ -90,13 +103,16 @@ Theorem srng_mul_add_distr_r : ∀ x y z,
   ((x + y) * z = x * z + y * z)%Srng.
 Proof.
 intros x y z; simpl.
-rewrite srng_c_mul_comm.
-rewrite srng_mul_add_distr_l.
-rewrite srng_c_mul_comm.
-assert (H : srng_mul z y = srng_mul y z). {
- apply srng_c_mul_comm.
+specialize srng_c_mul_comm as srng_mul_comm.
+specialize srng_nc_mul_add_distr_r as srng_mul_add_distr_r.
+destruct srng_is_comm. {
+  rewrite srng_mul_comm.
+  rewrite srng_mul_add_distr_l.
+  rewrite srng_mul_comm.
+  now rewrite (srng_mul_comm z).
+} {
+  apply srng_mul_add_distr_r.
 }
-now rewrite H.
 Qed.
 
 Theorem srng_add_compat_l : ∀ a b c,
@@ -143,7 +159,6 @@ Context {A : Type}.
 Context {ro : ring_op A}.
 Context {so : semiring_op A}.
 Context {sp : semiring_prop A}.
-Context {scp : sring_comm_prop A}.
 Context {rp : ring_prop A}.
 
 Theorem rng_sub_compat_l : ∀ a b c,
@@ -279,231 +294,3 @@ apply rng_opp_involutive.
 Qed.
 
 End ring_theorems.
-
-(* allows to use ring theorems on Z
-Canonical Structure Z_semiring_op.
-Canonical Structure Z_semiring_prop.
-*)
-
-(* borrowed from Ring2.v because, now, I want to start with
-   semirings, and define rings later from semirings; this way,
-   summations with syntax Σ can be defined (later) on semirings,
-   more general than rings, and testable on type nat *)
-(*
-Class semiring_prop {A} {ro : ring_op A} :=
-  { srng_1_neq_0 : (1 ≠ 0)%Rng;
-    srng_eq_dec : ∀ a b : A, {a = b} + {a ≠ b};
-    srng_add_comm : ∀ a b : A, (a + b = b + a)%Rng;
-    srng_add_assoc : ∀ a b c : A, (a + (b + c) = (a + b) + c)%Rng;
-    srng_add_0_l : ∀ a : A, (0 + a)%Rng = a;
-    srng_add_opp_l : ∀ a : A, (- a + a = 0)%Rng;
-    srng_mul_comm : ∀ a b : A, (a * b = b * a)%Rng;
-    srng_mul_assoc : ∀ a b c : A, (a * (b * c) = (a * b) * c)%Rng;
-    srng_mul_1_l : ∀ a : A, (1 * a)%Rng = a;
-    srng_mul_add_distr_l : ∀ a b c : A, (a * (b + c) = a * b + a * c)%Rng }.
-
-Arguments srng_eq_dec {_} {_} {_} _%Rng _%Rng.
-*)
-
-(*
-Context {rp : ring_prop}.
-*)
-
-(*
-Theorem srng_add_compat_l : ∀ a b c,
-  (a = b)%Srng → (c + a = c + b)%Srng.
-Proof.
-intros a b c Hab.
-rewrite Hab; reflexivity.
-Qed.
-
-Theorem srng_add_compat_r : ∀ a b c,
-  (a = b)%Srng → (a + c = b + c)%Srng.
-Proof.
-intros a b c Hab.
-rewrite Hab; reflexivity.
-Qed.
-
-Theorem srng_add_compat : ∀ a b c d,
-  (a = b)%Srng
-  → (c = d)%Srng
-    → (a + c = b + d)%Srng.
-Proof.
-intros a b c d Hab Hcd.
-rewrite Hab, Hcd; reflexivity.
-Qed.
-
-Theorem srng_sub_compat_r : ∀ a b c,
-  (b = c)%Srng → (a - b = a - c)%Srng.
-Proof.
-intros a b c Hbc.
-now rewrite Hbc.
-Qed.
-
-Theorem srng_mul_compat_r : ∀ a b c,
-  (a = b)%Srng
-  → (a * c = b * c)%Srng.
-Proof.
-intros a b c Hab; simpl in Hab |- *.
-rewrite Hab; reflexivity.
-Qed.
-
-Theorem srng_mul_compat : ∀ a b c d,
-  (a = b)%Srng
-  → (c = d)%Srng
-    → (a * c = b * d)%Srng.
-Proof.
-intros a b c d Hab Hcd.
-rewrite Hab, Hcd; reflexivity.
-Qed.
-
-Theorem srng_add_0_r : ∀ a, (a + 0 = a)%Srng.
-Proof.
-intros a; simpl.
-rewrite srng_add_comm.
-apply srng_add_0_l.
-Qed.
-
-Theorem fold_srng_sub : ∀ a b, (a + - b)%Srng = (a - b)%Srng.
-Proof. intros; easy. Qed.T
-
-Theorem srng_add_sub : ∀ a b, (a + b - b = a)%Srng.
-Proof.
-intros.
-unfold srng_sub.
-rewrite <- srng_add_assoc.
-rewrite fold_srng_sub.
-rewrite srng_add_opp_r.
-apply srng_add_0_r.
-Qed.
-
-heorem srng_sub_add : ∀ a b, (a - b + b = a)%Srng.
-Proof.
-intros.
-unfold srng_sub.
-rewrite <- srng_add_assoc.
-rewrite srng_add_opp_l.
-apply srng_add_0_r.
-Qed.
-
-Theorem srng_add_reg_r : ∀ a b c, (a + c = b + c)%Srng → (a = b)%Srng.
-Proof.
-intros a b c Habc; simpl in Habc; simpl.
-eapply srng_sub_compat_l with (c := c) in Habc.
-now do 2 rewrite srng_add_sub in Habc.
-Qed.
-
-Theorem srng_opp_add_distr : ∀ a b,
-  (- (a + b) = - a - b)%Srng.
-Proof.
-intros.
-apply (srng_add_reg_l _ _ (b + a)%Srng).
-unfold srng_sub.
-rewrite srng_add_assoc.
-do 3 rewrite fold_srng_sub.
-rewrite srng_add_sub.
-rewrite srng_add_comm.
-now do 2 rewrite srng_add_opp_r.
-Qed.
-
-Theorem srng_sub_add_distr : ∀ a b c, (a - (b + c) = a - b - c)%Srng.
-Proof.
-intros.
-unfold srng_sub.
-rewrite srng_opp_add_distr.
-apply srng_add_assoc.
-Qed.
-
-Theorem srng_mul_add_distr_r : ∀ x y z,
-  ((x + y) * z = x * z + y * z)%Srng.
-Proof.
-intros x y z; simpl.
-rewrite srng_mul_comm.
-rewrite srng_mul_add_distr_l.
-rewrite srng_mul_comm.
-assert (srng_mul z y = srng_mul y z) as H.
- apply srng_mul_comm.
-
- rewrite H; reflexivity.
-Qed.
-
-Theorem srng_mul_0_r : ∀ a, (a * 0 = 0)%Srng.
-Proof.
-intros a; simpl.
-rewrite srng_mul_comm, srng_mul_0_l.
-reflexivity.
-Qed.
-
-Theorem srng_mul_opp_l : ∀ a b, ((- a) * b = - (a * b))%Srng.
-Proof.
-intros a b; simpl.
-apply srng_add_reg_l with (c := (a * b)%Srng).
-rewrite fold_srng_sub.
-rewrite srng_add_opp_r.
-rewrite <- srng_mul_add_distr_r.
-rewrite fold_srng_sub.
-rewrite srng_add_opp_r, srng_mul_0_l.
-reflexivity.
-Qed.
-
-Theorem srng_mul_opp_r : ∀ a b, (a * (- b) = - (a * b))%Srng.
-Proof.
-intros a b; simpl.
-rewrite srng_mul_comm; symmetry.
-rewrite srng_mul_comm; symmetry.
-apply srng_mul_opp_l.
-Qed.
-
-Theorem srng_mul_sub_distr_l : ∀ x y z,
-  (x * (y - z) = x * y - x * z)%Srng.
-Proof.
-intros.
-unfold srng_sub.
-rewrite srng_mul_add_distr_l.
-now rewrite <- srng_mul_opp_r.
-Qed.
-
-Theorem srng_mul_sub_distr_r : ∀ x y z,
-  ((x - y) * z = x * z - y * z)%Srng.
-Proof.
-intros.
-rewrite srng_mul_comm.
-rewrite srng_mul_sub_distr_l.
-rewrite (srng_mul_comm _ x).
-rewrite (srng_mul_comm _ y).
-easy.
-Qed.
-
-Theorem srng_opp_0 : (- 0 = 0)%Srng.
-Proof.
-simpl; etransitivity; [ symmetry; apply srng_add_0_l | idtac ].
-apply srng_add_opp_r.
-Qed.
-
-Theorem srng_sub_0_r : ∀ a, (a - 0 = a)%Srng.
-Proof.
-intros.
-unfold srng_sub.
-rewrite srng_opp_0.
-apply srng_add_0_r.
-Qed.
-
-Theorem srng_mul_mul_swap : ∀ n m p, (n * m * p = n * p * m)%Srng.
-Proof.
-intros n m p.
-do 2 rewrite <- srng_mul_assoc.
-assert (m * p = p * m)%Srng as H by apply srng_mul_comm.
-rewrite H; reflexivity.
-Qed.
-
-Theorem srng_mul_eq_0 : ∀ n m,
-  (n = 0)%Srng ∨ (m = 0)%Srng
-  → (n * m = 0)%Srng.
-Proof.
-intros n m H; simpl in H; simpl.
-destruct H as [H| H]; rewrite H; [ apply srng_mul_0_l | apply srng_mul_0_r ].
-Qed.
-
-Theorem srng_pow_1_r : ∀ a, (a ^ 1 = a)%Srng.
-Proof. now intros; cbn; rewrite srng_mul_1_r. Qed.
-*)

@@ -74,7 +74,6 @@ Context {ro : ring_op T}.
 Context (so : semiring_op T).
 Context {sp : semiring_prop T}.
 Context {rp : ring_prop T}.
-Context {csp : sring_comm_prop T}.
 Context {sdp : sring_dec_prop T}.
 Context {acp : algeb_closed_prop}.
 
@@ -665,22 +664,32 @@ do 2 rewrite <- polyn_add_assoc.
 now rewrite (polyn_add_comm R).
 Qed.
 
-Theorem polyn_list_convol_mul_comm : ∀ la lb i,
-  polyn_list_convol_mul la lb i = polyn_list_convol_mul lb la i.
+Theorem polyn_list_convol_c_mul_comm :
+  if srng_is_comm then
+    ∀ la lb i,
+    polyn_list_convol_mul la lb i = polyn_list_convol_mul lb la i
+  else True.
 Proof.
+specialize srng_c_mul_comm as srng_mul_comm.
+destruct srng_is_comm; [ | easy ].
 intros.
 unfold polyn_list_convol_mul.
 rewrite srng_summation_rtl; [ | easy ].
 apply srng_summation_eq_compat.
 intros j Hj.
-rewrite srng_c_mul_comm.
 rewrite Nat.add_0_r.
-now replace (i - (i - j)) with j by flia Hj.
+rewrite Nat_sub_sub_assoc; [ | flia Hj ].
+rewrite Nat.add_comm, Nat.add_sub.
+apply srng_mul_comm.
 Qed.
 
-Theorem polyn_list_mul_comm : ∀ la lb,
-  polyn_list_mul la lb = polyn_list_mul lb la.
+Theorem polyn_list_c_mul_comm :
+  if srng_is_comm then
+    ∀ la lb, polyn_list_mul la lb = polyn_list_mul lb la
+  else True.
 Proof.
+specialize polyn_list_convol_c_mul_comm as polyn_list_convol_mul_comm.
+destruct srng_is_comm; [ | easy ].
 intros la lb.
 unfold polyn_list_mul.
 rewrite (Nat.add_comm (length lb)).
@@ -688,8 +697,11 @@ apply map_ext.
 apply polyn_list_convol_mul_comm.
 Qed.
 
-Theorem polyn_mul_comm : ∀ P Q, (P * Q = Q * P)%P.
+Theorem polyn_c_mul_comm :
+  if srng_is_comm then ∀ P Q, (P * Q = Q * P)%P else True.
 Proof.
+specialize polyn_list_c_mul_comm as polyn_list_mul_comm.
+destruct srng_is_comm; [ | easy ].
 intros.
 unfold polyn_mul.
 apply polyn_eq.
@@ -730,9 +742,27 @@ Qed.
 Theorem polyn_list_convol_mul_0_r : ∀ n la i,
   polyn_list_convol_mul la (repeat 0%Srng n) i = 0%Srng.
 Proof.
+specialize srng_nc_mul_0_r as srng_mul_0_r.
+specialize polyn_list_convol_c_mul_comm as polyn_list_convol_mul_comm.
+destruct srng_is_comm. {
+  intros.
+  rewrite polyn_list_convol_mul_comm.
+  apply polyn_list_convol_mul_0_l.
+}
 intros.
-rewrite polyn_list_convol_mul_comm.
-apply polyn_list_convol_mul_0_l.
+unfold polyn_list_convol_mul.
+apply all_0_srng_summation_0; [ easy | ].
+intros j ahj.
+remember (@srng_zero T so) as z.
+replace (nth (i - j) (repeat z n) z) with z; subst z. 2: {
+  symmetry; clear.
+  remember (i - j) as k; clear Heqk.
+  revert k.
+  induction n; intros; cbn; [ now destruct k | ].
+  destruct k; [ easy | ].
+  apply IHn.
+}
+apply srng_mul_0_r.
 Qed.
 
 Theorem map_polyn_list_convol_mul_0_l : ∀ n la li,
@@ -781,6 +811,7 @@ intros j Hj.
 rewrite Nat.add_0_r.
 rewrite Nat_sub_sub_distr; [ | easy ].
 rewrite Nat.sub_diag, Nat.add_0_l.
+...
 apply srng_c_mul_comm.
 Qed.
 
