@@ -63,41 +63,48 @@ Definition concat_list_list_list {T} (lll : list (list (list T))) :=
 Section in_ring.
 
 Context {T : Type}.
-Context {ro : ring_op T}.
-Context (so : semiring_op T).
-Context {sp : semiring_prop T}.
-Context {rp : ring_prop T}.
+Context (ro : ring_like_op T).
+Context {rp : ring_like_prop T}.
 
 (* addition *)
 
-Definition mat_add {so : semiring_op T} (MA MB : matrix T) :=
-  {| mat_el i j := (mat_el MA i j + mat_el MB i j)%Srng;
+Definition mat_add {ro : ring_like_op T} (MA MB : matrix T) :=
+  {| mat_el i j := (mat_el MA i j + mat_el MB i j)%F;
      mat_nrows := mat_nrows MA;
      mat_ncols := mat_ncols MA |}.
 
-Definition nat_semiring_op : semiring_op nat :=
-  {| srng_zero := 0;
-     srng_one := 1;
-     srng_add := Nat.add;
-     srng_mul := Nat.mul |}.
+Definition Nat_opp (x : nat) := 0.
+Definition Nat_inv (x : nat) := 0.
 
-Canonical Structure nat_semiring_op.
+Definition nat_ring_like_op : ring_like_op nat :=
+  {| rngl_zero := 0;
+     rngl_one := 1;
+     rngl_add := Nat.add;
+     rngl_mul := Nat.mul;
+     rngl_opp := Nat_opp;
+     rngl_inv := Nat_inv |}.
 
-Definition nat_semiring_prop : semiring_prop nat :=
-  {| srng_is_comm := true;
-     srng_add_comm := Nat.add_comm;
-     srng_add_assoc := Nat.add_assoc;
-     srng_add_0_l := Nat.add_0_l;
-     srng_mul_assoc := Nat.mul_assoc;
-     srng_mul_1_l := Nat.mul_1_l;
-     srng_mul_add_distr_l := Nat.mul_add_distr_l;
-     srng_mul_0_l := Nat.mul_0_l;
-     srng_c_mul_comm := Nat.mul_comm;
-     srng_nc_mul_1_r := I;
-     srng_nc_mul_0_r := I;
-     srng_nc_mul_add_distr_r := I |}.
+Canonical Structure nat_ring_like_op.
 
-Canonical Structure nat_semiring_prop.
+Definition nat_ring_like_prop : ring_like_prop nat :=
+  {| rngl_is_comm := true;
+     rngl_has_opp := false;
+     rngl_has_inv := false;
+     rngl_add_comm := Nat.add_comm;
+     rngl_add_assoc := Nat.add_assoc;
+     rngl_add_0_l := Nat.add_0_l;
+     rngl_mul_assoc := Nat.mul_assoc;
+     rngl_mul_1_l := Nat.mul_1_l;
+     rngl_mul_add_distr_l := Nat.mul_add_distr_l;
+     rngl_mul_0_l := Nat.mul_0_l;
+     rngl_c_mul_comm := Nat.mul_comm;
+     rngl_nc_mul_1_r := I;
+     rngl_nc_mul_0_r := I;
+     rngl_nc_mul_add_distr_r := I;
+     rngl_o_add_opp_l := I;
+     rngl_i_mul_inv_l := I |}.
+
+Canonical Structure nat_ring_like_prop.
 
 (*
 End in_ring.
@@ -107,15 +114,15 @@ Compute (list_list_of_mat (mat_add add (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6;
 
 (* multiplication *)
 
-Definition mat_mul {so : semiring_op T} (MA MB : matrix T) :=
+Definition mat_mul {so : ring_like_op T} (MA MB : matrix T) :=
   {| mat_el i k :=
-       (Σ (j = 0, mat_ncols MA - 1), mat_el MA i j * mat_el MB j k)%Srng;
+       (Σ (j = 0, mat_ncols MA - 1), mat_el MA i j * mat_el MB j k)%F;
      mat_nrows := mat_nrows MA;
      mat_ncols := mat_ncols MB |}.
 
 (*
 End in_ring.
-Compute (let _ := nat_semiring_op in list_list_of_mat (mat_mul (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list_list 0 [[1; 2]; [3; 4]; [5; 6]; [7; 8]]))).
+Compute (let _ := nat_ring_like_op in list_list_of_mat (mat_mul (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list_list 0 [[1; 2]; [3; 4]; [5; 6]; [7; 8]]))).
 *)
 
 Theorem mat_mul_nrows : ∀ A B, mat_nrows (mat_mul A B) = mat_nrows A.
@@ -126,10 +133,16 @@ Proof. easy. Qed.
 
 (* opposite *)
 
-Definition mat_opp M : matrix T :=
-  {| mat_el i j := (- mat_el M i j)%Rng;
+Definition mat_opp {ro : ring_like_op T} M : matrix T :=
+  {| mat_el i j := (- mat_el M i j)%F;
      mat_nrows := mat_nrows M;
      mat_ncols := mat_ncols M |}.
+(*
+Definition mat_opp M : matrix T :=
+  {| mat_el i j := (- mat_el M i j)%F;
+     mat_nrows := mat_nrows M;
+     mat_ncols := mat_ncols M |}.
+*)
 
 (* subtraction *)
 
@@ -157,14 +170,14 @@ Definition vect_of_list {T} d (l : list T) :=
 Definition list_of_vect {T} (v : vector T) :=
   map (vect_el v) (seq 0 (vect_nrows v)).
 
-Definition vect_zero n := mk_vect (λ _, 0%Srng) n.
+Definition vect_zero n := mk_vect (λ _, 0%F) n.
 
 (* addition, subtraction of vector *)
 
 Definition vect_add (U V : vector T) :=
-  mk_vect (λ i, (vect_el U i + vect_el V i)%Srng) (vect_nrows V).
+  mk_vect (λ i, (vect_el U i + vect_el V i)%F) (vect_nrows V).
 Definition vect_opp (V : vector T) :=
-  mk_vect (λ i, (- vect_el V i)%Rng) (vect_nrows V).
+  mk_vect (λ i, (- vect_el V i)%F) (vect_nrows V).
 
 Definition vect_sub (U V : vector T) := vect_add U (vect_opp V).
 
@@ -183,18 +196,18 @@ Definition mat_vect_concat (M : matrix T) V :=
 (* multiplication of a matrix by a vector *)
 
 Definition mat_mul_vect_r M V :=
-  mk_vect (λ i, (Σ (j = 0, mat_ncols M - 1), mat_el M i j * vect_el V j)%Srng)
+  mk_vect (λ i, (Σ (j = 0, mat_ncols M - 1), mat_el M i j * vect_el V j)%F)
     (mat_nrows M).
 
 (* multiplication of a vector by a scalar *)
 
-Definition vect_mul_scal_l μ V :=
-  mk_vect (λ i, μ * vect_el V i)%Srng (vect_nrows V).
+Definition vect_mul_scal_l s V :=
+  mk_vect (λ i, s * vect_el V i)%F (vect_nrows V).
 
 (* multiplication of a matrix by a scalar *)
 
-Definition mat_mul_scal_l μ M :=
-  mk_mat (λ i j, μ * mat_el M i j)%Srng (mat_nrows M) (mat_ncols M).
+Definition mat_mul_scal_l s M :=
+  mk_mat (λ i j, s * mat_el M i j)%F (mat_nrows M) (mat_ncols M).
 
 (* matrix without row i and column j *)
 
@@ -220,18 +233,18 @@ Definition mat_repl_vect k (M : matrix T) V :=
 
 Definition minus_one_pow n :=
   match n mod 2 with
-  | 0 => 1%Rng
-  | _ => (- 1%Srng)%Rng
+  | 0 => 1%F
+  | _ => (- 1%F)%F
   end.
 
 (* determinant *)
 
 Fixpoint det_loop M n :=
   match n with
-  | 0 => 1%Rng
+  | 0 => 1%F
   | S n' =>
       (Σ (j = 0, n'),
-       minus_one_pow j * mat_el M 0 j * det_loop (subm M 0 j) n')%Rng
+       minus_one_pow j * mat_el M 0 j * det_loop (subm M 0 j) n')%F
   end.
 
 Definition determinant M := det_loop M (mat_ncols M).
@@ -251,19 +264,19 @@ Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
 Definition det_from_row M i :=
   (minus_one_pow i *
    Σ (j = 0, mat_ncols M - 1),
-     minus_one_pow j * mat_el M i j * determinant (subm M i j))%Rng.
+     minus_one_pow j * mat_el M i j * determinant (subm M i j))%F.
 
 Definition det_from_col M j :=
   (minus_one_pow j *
    Σ (i = 0, mat_nrows M - 1),
-     minus_one_pow i * mat_el M i j * determinant (subm M i j))%Rng.
+     minus_one_pow i * mat_el M i j * determinant (subm M i j))%F.
 
 (* *)
 
 Definition mat_mul_row_by_scal k M s :=
   mk_mat
     (λ i j,
-     if Nat.eq_dec i k then (s * mat_el M i j)%Srng else mat_el M i j)
+     if Nat.eq_dec i k then (s * mat_el M i j)%F else mat_el M i j)
     (mat_nrows M) (mat_ncols M).
 
 Definition mat_swap_rows (M : matrix T) i1 i2 :=
@@ -276,7 +289,7 @@ Definition mat_swap_rows (M : matrix T) i1 i2 :=
 Definition mat_add_row_mul_scal_row M i1 v i2 :=
   mk_mat
     (λ i j,
-     if Nat.eq_dec i i1 then (mat_el M i1 j + v * mat_el M i2 j)%Srng
+     if Nat.eq_dec i i1 then (mat_el M i1 j + v * mat_el M i2 j)%F
      else mat_el M i j)
    (mat_nrows M) (mat_nrows M).
 
@@ -290,25 +303,25 @@ Definition mat_add_row_mul_scal_row M i1 v i2 :=
 
 Theorem det_mul_row_0_by_scal : ∀ A v,
   mat_ncols A ≠ 0
-  → determinant (mat_mul_row_by_scal 0 A v) = (v * determinant A)%Srng.
+  → determinant (mat_mul_row_by_scal 0 A v) = (v * determinant A)%F.
 Proof.
 intros * Hcz.
 unfold determinant; cbn.
 remember (mat_ncols A) as c eqn:Hc; symmetry in Hc.
 destruct c; [ easy | clear Hcz ].
 cbn - [ iter_seq ].
-rewrite srng_mul_summation_distr_l; [ | easy ].
-apply srng_summation_eq_compat.
+rewrite rngl_mul_summation_distr_l; [ | easy ].
+apply rngl_summation_eq_compat.
 intros j Hj.
 Abort. (*
 ... à finir
-rewrite (srng_c_mul_comm (minus_one_pow j)).
-do 2 rewrite <- srng_mul_assoc.
+rewrite (rngl_c_mul_comm (minus_one_pow j)).
+do 2 rewrite <- rngl_mul_assoc.
 f_equal.
-rewrite (srng_c_mul_comm (mat_el A 0 j)).
-do 2 rewrite <- srng_mul_assoc.
+rewrite (rngl_c_mul_comm (mat_el A 0 j)).
+do 2 rewrite <- rngl_mul_assoc.
 f_equal.
-rewrite srng_c_mul_comm; f_equal.
+rewrite rngl_c_mul_comm; f_equal.
 f_equal.
 apply matrix_eq; [ easy | easy | cbn ].
 rename j into k; rename Hj into Hk.
@@ -321,7 +334,7 @@ Qed.
 
 (*
 Theorem glop : ∀ M a,
-  (a * determinant M)%Srng = determinant M.
+  (a * determinant M)%F = determinant M.
 Proof.
 intros.
 ...
@@ -332,7 +345,7 @@ Theorem determinant_multilinear_mul : ∀ M i a V,
   mat_nrows M = mat_ncols M
   → i < mat_nrows M
   → determinant (mat_repl_vect i M (a × V)%V) =
-      (a * determinant (mat_repl_vect i M V))%Rng.
+      (a * determinant (mat_repl_vect i M V))%F.
 Proof.
 intros * Hrc Hi.
 unfold vect_add, vect_mul_scal_l; cbn.
@@ -346,21 +359,21 @@ clear Hrd Hcd.
 revert i Hi V.
 induction dim; intros; [ easy | ].
 cbn - [ iter_seq ].
-rewrite srng_mul_summation_distr_l; [ | easy | easy ].
-apply srng_summation_eq_compat.
+rewrite rngl_mul_summation_distr_l; [ | easy | easy ].
+apply rngl_summation_eq_compat.
 intros j (_, Hj).
 symmetry.
-rewrite (srng_c_mul_comm a).
-do 3 rewrite <- srng_mul_assoc.
+rewrite (rngl_c_mul_comm a).
+do 3 rewrite <- rngl_mul_assoc.
 f_equal.
 (**)
 unfold subm; cbn.
 rewrite Nat.sub_0_r.
 destruct (Nat.eq_dec j i) as [Hji| Hji]. {
   subst j.
-  rewrite srng_mul_assoc.
-  rewrite srng_c_mul_comm.
-  rewrite srng_mul_assoc.
+  rewrite rngl_mul_assoc.
+  rewrite rngl_c_mul_comm.
+  rewrite rngl_mul_assoc.
   f_equal; f_equal.
   apply matrix_eq; [ easy | easy | cbn ].
   clear Hj.
@@ -382,7 +395,7 @@ Theorem determinant_multilinear : ∀ M i a b U V,
   i < mat_nrows M
   → determinant (mat_repl_vect i M (a × U + b × V)%V) =
        (a * determinant (mat_repl_vect i M U) +
-        b * determinant (mat_repl_vect i M V))%Rng.
+        b * determinant (mat_repl_vect i M V))%F.
 Proof.
 intros * Hi.
 unfold vect_add, vect_mul_scal_l; cbn.
@@ -398,14 +411,14 @@ revert i Hi.
 induction dim; intros; [ easy | ].
 cbn - [ iter_seq ].
 destruct i. {
-  rewrite srng_summation_split_first; [ | easy | flia ].
+  rewrite rngl_summation_split_first; [ | easy | flia ].
   cbn - [ iter_seq ].
-  rewrite srng_mul_1_l.
+  rewrite rngl_mul_1_l.
 ...
-do 3 rewrite srng_add_0_l, srng_mul_1_l.
-  do 3 rewrite srng_mul_1_r.
+do 3 rewrite rngl_add_0_l, rngl_mul_1_l.
+  do 3 rewrite rngl_mul_1_r.
   easy.
-  rewrite srng_mul_1_r.
+  rewrite rngl_mul_1_r.
 ...
 *)
 
@@ -427,10 +440,10 @@ Theorem det_sum_row_row : ∀ A B C n,
   → mat_ncols A = n
   → mat_ncols B = n
   → mat_ncols C = n
-  → (∀ j, mat_el A 0 j = (mat_el B 0 j + mat_el C 0 j)%Srng)
+  → (∀ j, mat_el A 0 j = (mat_el B 0 j + mat_el C 0 j)%F)
   → (∀ i j, i ≠ 0 → mat_el B i j = mat_el A i j)
   → (∀ i j, i ≠ 0 → mat_el C i j = mat_el A i j)
-  → determinant A = (determinant B + determinant C)%Srng.
+  → determinant A = (determinant B + determinant C)%F.
 Proof.
 intros * Hnz Hra Hrb Hrc Hca Hcb Hcc Hbc Hb Hc.
 unfold determinant.
@@ -449,17 +462,17 @@ assert (Hac : ∀ j, subm A 0 j = subm C 0 j). {
   intros i j' Hi Hj'.
   destruct (lt_dec j' j); symmetry; apply Hc; flia.
 }
-erewrite srng_summation_eq_compat. 2: {
+erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   rewrite Hbc.
-  rewrite srng_mul_add_distr_l.
-  rewrite srng_mul_add_distr_r.
+  rewrite rngl_mul_add_distr_l.
+  rewrite rngl_mul_add_distr_r.
   rewrite Hab at 1.
   rewrite Hac at 1.
   easy.
 }
 cbn - [ iter_seq ].
-now apply srng_summation_add_distr.
+now apply rngl_summation_add_distr.
 Qed.
 
 (* If two rows (columns) in A are equal then det(A)=0. *)
@@ -471,7 +484,7 @@ Theorem det_two_rows_are_eq : ∀ A i,
   → 0 < i < mat_nrows A
   → mat_ncols A ≠ 0
   → (∀ j, mat_el A i j = mat_el A 0 j)
-  → determinant A = 0%Srng.
+  → determinant A = 0%F.
 Proof.
 intros * Hsm Hiz Hcz Ha.
 unfold is_square_mat in Hsm.
@@ -483,31 +496,31 @@ cbn - [ iter_seq ].
 (**)
 destruct n; [ flia Hiz | ].
 cbn - [ iter_seq ].
-rewrite (srng_summation_split _ i); [ | flia Hiz ].
-rewrite srng_summation_split_last; [ | flia ].
-rewrite srng_summation_shift; [ | flia Hiz ].
-erewrite srng_summation_eq_compat. 2: {
+rewrite (rngl_summation_split _ i); [ | flia Hiz ].
+rewrite rngl_summation_split_last; [ | flia ].
+rewrite rngl_summation_shift; [ | flia Hiz ].
+erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   now rewrite Nat.add_comm, Nat.add_sub.
 }
 cbn - [ iter_seq ].
 Abort.
 (* blocked by the present implementation of discriminant
-erewrite srng_summation_eq_compat; [ | easy | ]. 2: {  
+erewrite rngl_summation_eq_compat; [ | easy | ]. 2: {  
   intros j Hj.
-  rewrite (srng_summation_split _ (i - 1)); [ | flia Hiz ].
+  rewrite (rngl_summation_split _ (i - 1)); [ | flia Hiz ].
   rewrite Nat.sub_add; [ | easy ].
   easy.
 }
 cbn - [ iter_seq ].
 ...
-rewrite srng_summation_split_first; [ | easy | flia ].
+rewrite rngl_summation_split_first; [ | easy | flia ].
 cbn - [ iter_seq ].
-rewrite srng_mul_1_l.
-rewrite (srng_summation_split _ i); [ | flia Hiz ].
-rewrite srng_summation_split_last;[ | easy ].
+rewrite rngl_mul_1_l.
+rewrite (rngl_summation_split _ i); [ | flia Hiz ].
+rewrite rngl_summation_split_last;[ | easy ].
 ...
-rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
   intros k Hk.
 ...
 *)
@@ -527,7 +540,7 @@ unfold is_square_mat in Hsm.
 remember
   (mk_mat
      (λ i j,
-      if Nat.eq_dec i 0 then (v * mat_el M k j)%Srng else mat_el M i j)
+      if Nat.eq_dec i 0 then (v * mat_el M k j)%F else mat_el M i j)
      (mat_nrows M) (mat_ncols M)) as C eqn:Hc.
 rewrite (det_sum_row_row _ M C Hrz); cycle 7. {
   now intros; rewrite Hc.
@@ -552,7 +565,7 @@ Abort. (* à finir...
     now destruct (Nat.eq_dec i 0).
   }
   rewrite H in H1; clear H.
-  assert (H : determinant D = 0%Srng). {
+  assert (H : determinant D = 0%F). {
     rewrite Hd.
 Abort. (* blocked because needs the previous lemma
 ...
@@ -566,7 +579,7 @@ Theorem det_swap_rows : ∀ M i j,
   → i ≠ j
   → i < mat_nrows M
   → j < mat_nrows M
-  → determinant (mat_swap_rows M i j) = (- determinant M)%Rng.
+  → determinant (mat_swap_rows M i j) = (- determinant M)%F.
 Proof.
 intros * Hsm Hij Hi Hj.
 (* look point 5 at
@@ -588,31 +601,31 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   destruct c; [ flia Hr Hij Hj | ].
 (**)
   symmetry.
-  rewrite srng_summation_split_first; [ | easy | flia ].
-  rewrite (srng_summation_split _ j); [ | flia Hr Hj ].
-  rewrite srng_summation_split_last; [ | flia Hij ].
+  rewrite rngl_summation_split_first; [ | easy | flia ].
+  rewrite (rngl_summation_split _ j); [ | flia Hr Hj ].
+  rewrite rngl_summation_split_last; [ | flia Hij ].
   cbn - [ iter_seq mat_el ].
-  rewrite srng_mul_1_l.
+  rewrite rngl_mul_1_l.
   remember
     (Σ (j0 = 0, c),
      minus_one_pow j0 * mat_el (subm M 0 0) 0 j0 *
-     det_loop (subm (subm M 0 0) 0 j0) c)%Rng as K5.
+     det_loop (subm (subm M 0 0) 0 j0) c)%F as K5.
   remember
     (Σ (i = 2, j),
      - (minus_one_pow (i - 1) * mat_el M 0 (i - 1) *
         (Σ (j0 = 0, c),
          minus_one_pow j0 * mat_el (subm M 0 (i - 1)) 0 j0 *
-         det_loop (subm (subm M 0 (i - 1)) 0 j0) c)))%Rng as K6.
+         det_loop (subm (subm M 0 (i - 1)) 0 j0) c)))%F as K6.
   remember
     (Σ (j0 = 0, c),
      minus_one_pow j0 * mat_el (subm M 0 j) 0 j0 *
-     det_loop (subm (subm M 0 j) 0 j0) c)%Rng as K7.
+     det_loop (subm (subm M 0 j) 0 j0) c)%F as K7.
   remember
     (Σ (i = j + 1, S c),
      - (minus_one_pow i * mat_el M 0 i *
         (Σ (j0 = 0, c),
          minus_one_pow j0 * mat_el (subm M 0 i) 0 j0 *
-         det_loop (subm (subm M 0 i) 0 j0) c)))%Rng as K8.
+         det_loop (subm (subm M 0 i) 0 j0) c)))%F as K8.
 (* I should isolate "mat_el M j j" from K5 in order to get its
    product with "mat_el M 0 0", the rest being a sub-discriminant
    which is supposed to be equal to the equivalent in M' in the
@@ -620,55 +633,55 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
 ...
   symmetry.
 ...
-  rewrite srng_summation_split_first; [ symmetry | easy | flia ].
-  rewrite srng_summation_split_first; [ symmetry | easy | flia ].
-  rewrite (srng_summation_split _ j); [ symmetry | flia Hr Hj ].
-  rewrite (srng_summation_split _ j); [ symmetry | flia Hr Hj ].
-  rewrite srng_summation_split_last; [ symmetry | flia Hij ].
-  rewrite srng_summation_split_last; [ symmetry | flia Hij ].
+  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
+  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
+  rewrite (rngl_summation_split _ j); [ symmetry | flia Hr Hj ].
+  rewrite (rngl_summation_split _ j); [ symmetry | flia Hr Hj ].
+  rewrite rngl_summation_split_last; [ symmetry | flia Hij ].
+  rewrite rngl_summation_split_last; [ symmetry | flia Hij ].
   cbn - [ iter_seq mat_el ].
-  do 2 rewrite srng_mul_1_l.
+  do 2 rewrite rngl_mul_1_l.
   remember
      (Σ (j0 = 0, c),
       minus_one_pow j0 * mat_el (subm M' 0 0) 0 j0 *
-      det_loop (subm (subm M' 0 0) 0 j0) c)%Rng as K1.
+      det_loop (subm (subm M' 0 0) 0 j0) c)%F as K1.
   remember
     (Σ (i = 2, j),
      minus_one_pow (i - 1) * mat_el M' 0 (i - 1) *
      (Σ (j0 = 0, c),
       minus_one_pow j0 * mat_el (subm M' 0 (i - 1)) 0 j0 *
-      det_loop (subm (subm M' 0 (i - 1)) 0 j0) c))%Rng as
+      det_loop (subm (subm M' 0 (i - 1)) 0 j0) c))%F as
       K2.
   remember
     (Σ (j0 = 0, c),
      minus_one_pow j0 * mat_el (subm M' 0 j) 0 j0 *
-     det_loop (subm (subm M' 0 j) 0 j0) c)%Rng as K3.
+     det_loop (subm (subm M' 0 j) 0 j0) c)%F as K3.
   remember
     (Σ (i = j + 1, S c),
      minus_one_pow i * mat_el M' 0 i *
      (Σ (j0 = 0, c),
       minus_one_pow j0 * mat_el (subm M' 0 i) 0 j0 *
-      det_loop (subm (subm M' 0 i) 0 j0) c))%Rng as K4.
+      det_loop (subm (subm M' 0 i) 0 j0) c))%F as K4.
   remember
     (Σ (j0 = 0, c),
      minus_one_pow j0 * mat_el (subm M 0 0) 0 j0 *
-     det_loop (subm (subm M 0 0) 0 j0) c)%Rng as K5.
+     det_loop (subm (subm M 0 0) 0 j0) c)%F as K5.
   remember
     (Σ (i = 2, j),
      - (minus_one_pow (i - 1) * mat_el M 0 (i - 1) *
         (Σ (j0 = 0, c),
          minus_one_pow j0 * mat_el (subm M 0 (i - 1)) 0 j0 *
-         det_loop (subm (subm M 0 (i - 1)) 0 j0) c)))%Rng as K6.
+         det_loop (subm (subm M 0 (i - 1)) 0 j0) c)))%F as K6.
   remember
     (Σ (j0 = 0, c),
      minus_one_pow j0 * mat_el (subm M 0 j) 0 j0 *
-     det_loop (subm (subm M 0 j) 0 j0) c)%Rng as K7.
+     det_loop (subm (subm M 0 j) 0 j0) c)%F as K7.
   remember
     (Σ (i = j + 1, S c),
      - (minus_one_pow i * mat_el M 0 i *
         (Σ (j0 = 0, c),
          minus_one_pow j0 * mat_el (subm M 0 i) 0 j0 *
-         det_loop (subm (subm M 0 i) 0 j0) c)))%Rng as K8.
+         det_loop (subm (subm M 0 i) 0 j0) c)))%F as K8.
 ...
 *)
 
@@ -683,7 +696,7 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   subst i.
   unfold determinant, det_from_row.
   cbn - [ iter_seq ].
-  rewrite srng_mul_1_l.
+  rewrite rngl_mul_1_l.
   remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
   destruct c; [ easy | clear Hcz ].
   now rewrite Nat.sub_succ, Nat.sub_0_r.
@@ -702,15 +715,15 @@ remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
 destruct c; [ easy | clear Hcz ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
 cbn - [ iter_seq ].
-rewrite srng_mul_summation_distr_l; [ | easy ].
+rewrite rngl_mul_summation_distr_l; [ | easy ].
 rewrite rng_opp_summation; [ | easy | easy ].
-apply srng_summation_eq_compat; [ easy | ].
+apply rngl_summation_eq_compat; [ easy | ].
 intros j Hj.
-rewrite srng_mul_comm.
-rewrite <- srng_mul_assoc.
+rewrite rngl_mul_comm.
+rewrite <- rngl_mul_assoc.
 rewrite <- rng_mul_opp_r.
 f_equal.
-rewrite srng_mul_comm; symmetry.
+rewrite rngl_mul_comm; symmetry.
 apply rng_opp_inj.
 rewrite rng_opp_involutive.
 ...
@@ -728,36 +741,34 @@ Compute determinant (mat_of_list_list 0 [[-2; 2; -3]; [-1; 1; 3]; [2; 0; -1]]). 
 (* null matrix of dimension n *)
 
 Definition mZ n :=
-  mk_mat (λ i j, 0%Srng) n n.
+  mk_mat (λ i j, 0%F) n n.
 
 (* identity matrix of dimension n *)
 
 Definition mI n : matrix T :=
-  mk_mat (λ i j, if Nat.eq_dec i j then 1%Srng else 0%Srng) n n.
+  mk_mat (λ i j, if Nat.eq_dec i j then 1%F else 0%F) n n.
 
 End in_ring.
 
 Section in_ring.
 
 Context {T : Type}.
-Context {ro : ring_op T}.
-Context (so : semiring_op T).
-Context {sp : semiring_prop T}.
-Context {rp : ring_prop T}.
+Context (ro : ring_like_op T).
+Context {rp : ring_like_prop T}.
 
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
 
-Arguments det_loop {T ro so} M%M n%nat.
+Arguments det_loop {T ro} M%M n%nat.
 Arguments is_square_mat {T} M%M.
-Arguments mat_mul_scal_l {T so} _ M%M.
+Arguments mat_mul_scal_l {T ro} s%F M%M.
 Arguments mat_nrows {T} m%M.
 Arguments mat_ncols {T} m%M.
-Arguments mat_sub {T ro so} MA%M MB%M.
-Arguments mI {T so} n%nat.
-Arguments mZ {T so} n%nat.
-Arguments minus_one_pow {T ro so}.
-Arguments determinant {T ro so} M%M.
+Arguments mat_sub {T ro} MA%M MB%M.
+Arguments mI {T ro} n%nat.
+Arguments mZ {T ro} n%nat.
+Arguments minus_one_pow {T ro}.
+Arguments determinant {T ro} M%M.
 Arguments subm {T} M%M i%nat j%nat.
 
 Notation "A + B" := (mat_add A B) : M_scope.
@@ -769,7 +780,7 @@ Notation "- A" := (mat_opp A) : M_scope.
 Declare Scope V_scope.
 Delimit Scope V_scope with V.
 
-Arguments mat_mul_vect_r {T so} M%M V%V.
+Arguments mat_mul_vect_r {T ro} M%M V%V.
 
 Notation "A · V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
 
@@ -792,21 +803,21 @@ apply matrix_eq; [ cbn; congruence | easy | ].
 cbn - [ iter_seq ].
 rewrite <- Hn.
 intros * Hi Hj.
-rewrite (srng_summation_split _ i); [ | flia Hi ].
-rewrite srng_summation_split_last; [ | flia ].
+rewrite (rngl_summation_split _ i); [ | flia Hi ].
+rewrite rngl_summation_split_last; [ | flia ].
 destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
-rewrite srng_mul_1_l.
-rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+rewrite rngl_mul_1_l.
+rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
   intros k Hk.
   destruct (Nat.eq_dec i (k - 1)) as [H| H]; [ flia H Hk | ].
-  apply srng_mul_0_l.
+  apply rngl_mul_0_l.
 }
-rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
   intros k Hk.
   destruct (Nat.eq_dec i k) as [H| H]; [ flia H Hk | ].
-  apply srng_mul_0_l.
+  apply rngl_mul_0_l.
 }
-now rewrite srng_add_0_l, srng_add_0_r.
+now rewrite rngl_add_0_l, rngl_add_0_r.
 Qed.
 
 Theorem mat_mul_1_r : ∀ M n,
@@ -820,21 +831,21 @@ cbn - [ iter_seq ].
 unfold is_square_mat in Hsm.
 rewrite <- Hsm, <- Hn.
 intros * Hi Hj.
-rewrite (srng_summation_split _ j); [ | flia Hj ].
-rewrite srng_summation_split_last; [ | flia ].
+rewrite (rngl_summation_split _ j); [ | flia Hj ].
+rewrite rngl_summation_split_last; [ | flia ].
 destruct (Nat.eq_dec j j) as [H| H]; [ clear H | easy ].
-rewrite srng_mul_1_r.
-rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+rewrite rngl_mul_1_r.
+rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
   intros k Hk.
   destruct (Nat.eq_dec (k - 1) j) as [H| H]; [ flia H Hk | ].
-  apply srng_mul_0_r.
+  apply rngl_mul_0_r.
 }
-rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
   intros k Hk.
   destruct (Nat.eq_dec k j) as [H| H]; [ flia H Hk | ].
-  apply srng_mul_0_r.
+  apply rngl_mul_0_r.
 }
-now rewrite srng_add_0_l, srng_add_0_r.
+now rewrite rngl_add_0_l, rngl_add_0_r.
 Qed.
 
 (* associativity of multiplication *)
@@ -849,21 +860,21 @@ cbn in Hi, Hj.
 remember (mat_ncols MA) as ca eqn:Hca.
 remember (mat_ncols MB) as cb eqn:Hcb.
 move cb before ca.
-erewrite srng_summation_eq_compat. 2: {
+erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
-  now apply srng_mul_summation_distr_l.
+  now apply rngl_mul_summation_distr_l.
 }
 cbn - [ iter_seq ].
-rewrite srng_summation_summation_exch'; [ | easy ].
-apply srng_summation_eq_compat.
+rewrite rngl_summation_summation_exch'; [ | easy ].
+apply rngl_summation_eq_compat.
 intros k Hk.
-erewrite srng_summation_eq_compat. 2: {
+erewrite rngl_summation_eq_compat. 2: {
   intros l Hl.
-  now rewrite srng_mul_assoc.
+  now rewrite rngl_mul_assoc.
 }
 cbn - [ iter_seq ].
 symmetry.
-now apply srng_mul_summation_distr_r.
+now apply rngl_mul_summation_distr_r.
 Qed.
 
 (* left distributivity of multiplication over addition *)
@@ -879,12 +890,12 @@ cbn in Hi, Hj.
 remember (mat_ncols MA) as ca eqn:Hca.
 remember (mat_ncols MB) as cb eqn:Hcb.
 move cb before ca.
-erewrite srng_summation_eq_compat. 2: {
+erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
-  apply srng_mul_add_distr_l.
+  apply rngl_mul_add_distr_l.
 }
 cbn - [ iter_seq ].
-now apply srng_summation_add_distr.
+now apply rngl_summation_add_distr.
 Qed.
 
 (* associativity with multiplication with vector *)
@@ -893,29 +904,29 @@ Theorem mat_vect_mul_assoc_as_sums : ∀ A B V i,
   i < mat_nrows A
   → (Σ (j = 0, mat_ncols A - 1),
        mat_el A i j *
-       (Σ (k = 0, mat_ncols B - 1), mat_el B j k * vect_el V k))%Rng =
+       (Σ (k = 0, mat_ncols B - 1), mat_el B j k * vect_el V k))%F =
     (Σ (j = 0, mat_ncols B - 1),
        (Σ (k = 0, mat_ncols A - 1), mat_el A i k * mat_el B k j) *
-       vect_el V j)%Rng.
+       vect_el V j)%F.
 Proof.
 intros * Hi.
-erewrite srng_summation_eq_compat. 2: {
+erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
-  now rewrite srng_mul_summation_distr_l.
+  now rewrite rngl_mul_summation_distr_l.
 }
 symmetry.
-erewrite srng_summation_eq_compat. 2: {
+erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
-  now rewrite srng_mul_summation_distr_r.
+  now rewrite rngl_mul_summation_distr_r.
 }
 symmetry.
 cbn - [ iter_seq ].
-rewrite srng_summation_summation_exch'; [ | easy ].
-apply srng_summation_eq_compat.
+rewrite rngl_summation_summation_exch'; [ | easy ].
+apply rngl_summation_eq_compat.
 intros j Hj.
-apply srng_summation_eq_compat.
+apply rngl_summation_eq_compat.
 intros k Hk.
-apply srng_mul_assoc.
+apply rngl_mul_assoc.
 Qed.
 
 Theorem mat_vect_mul_assoc : ∀ A B V, (A · (B · V) = (A * B) · V)%V.
@@ -933,7 +944,7 @@ Qed.
 (* comatrix *)
 
 Definition comatrix M : matrix T :=
-  {| mat_el i j := (minus_one_pow (i + j) * determinant (subm M i j))%Srng;
+  {| mat_el i j := (minus_one_pow (i + j) * determinant (subm M i j))%F;
      mat_nrows := mat_nrows M;
      mat_ncols := mat_ncols M |}.
 
@@ -1007,34 +1018,29 @@ destruct (lt_dec k i) as [Hki| Hki]. {
 }
 Qed.
 
-(*
-Definition squ_mat_zero n :=
-  mk_mat (λ i j, 0%Srng) n n.
-Definition squ_mat_one n :=
-  mk_mat (λ i j, if Nat.eq_dec i j then 1%Srng else 0%Srng) n n.
-*)
+Definition phony_mat_inv (M : matrix T) := M.
 
-Definition squ_mat_semiring_op n : semiring_op (matrix T) :=
-  {| srng_zero := mZ n;
-     srng_one := mI n;
-     srng_add := mat_add;
-     srng_mul := mat_mul |}.
+Definition squ_mat_ring_like_op n : ring_like_op (matrix T) :=
+  {| rngl_zero := mZ n;
+     rngl_one := mI n;
+     rngl_add := mat_add;
+     rngl_mul := mat_mul;
+     rngl_opp := mat_opp;
+     rngl_inv := phony_mat_inv |}.
 
 End in_ring.
 
 Section in_ring.
 
 Context {T : Type}.
-Context {ro : ring_op T}.
-Context (so : semiring_op T).
-Context {sp : semiring_prop T}.
-Context {rp : ring_prop T}.
+Context (ro : ring_like_op T).
+Context {rp : ring_like_prop T}.
 
-Arguments det_loop {T ro so} M n%nat.
-Arguments determinant {T ro so} M.
+Arguments det_loop {T ro} M n%nat.
+Arguments determinant {T ro} M.
 
 Theorem fold_determinant :
-  ∀ T {ro : ring_op T} {so : semiring_op T} (M : matrix T),
+  ∀ T {ro : ring_like_op T} {so : ring_like_op T} (M : matrix T),
   det_loop M (mat_ncols M) = determinant M.
 Proof. easy. Qed.
 
@@ -1047,24 +1053,24 @@ Declare Scope V_scope.
 Delimit Scope M_scope with M.
 Delimit Scope V_scope with V.
 
-Arguments det_loop {T ro so} M%M n%nat.
-Arguments determinant {T ro so} M%M.
+Arguments det_loop {T ro} M%M n%nat.
+Arguments determinant {T ro} M%M.
 Arguments is_square_mat {T} M%M.
-Arguments mat_mul_scal_l {T so} _ M%M.
-Arguments mat_mul_vect_r {T so} M%M V%V.
+Arguments mat_mul_scal_l {T ro} _ M%M.
+Arguments mat_mul_vect_r {T ro} M%M V%V.
 Arguments mat_nrows {T} m%M.
 Arguments mat_ncols {T} m%M.
-Arguments mat_sub {T ro so} MA%M MB%M.
-Arguments mI {T so} n%nat.
-Arguments mZ {T so} n%nat.
-Arguments minus_one_pow {T ro so}.
-Arguments squ_mat_semiring_op {T so}.
+Arguments mat_sub {T ro} MA%M MB%M.
+Arguments mI {T ro} n%nat.
+Arguments mZ {T ro} n%nat.
+Arguments minus_one_pow {T ro}.
+Arguments squ_mat_ring_like_op {T ro}.
 Arguments subm {T} M%M i%nat j%nat.
-Arguments vect_add {T so} U%V V%V.
-Arguments vect_sub {T ro so} U%V V%V.
+Arguments vect_add {T ro} U%V V%V.
+Arguments vect_sub {T ro} U%V V%V.
 Arguments vect_opp {T ro} V%V.
-Arguments vect_mul_scal_l {T so} _%Srng _%V.
-Arguments vect_zero {T so}.
+Arguments vect_mul_scal_l {T ro} s%F V%V.
+Arguments vect_zero {T ro}.
 
 Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.

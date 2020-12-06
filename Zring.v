@@ -4,7 +4,7 @@ Require Import Utf8 ZArith.
 
 Require Import Semiring.
 
-Definition Z_inv (x : Z) := 0%Z.
+Definition phony_Z_inv (x : Z) := 0%Z.
 
 Definition Z_ring_like_op : ring_like_op Z :=
   {| rngl_zero := 0%Z;
@@ -12,7 +12,7 @@ Definition Z_ring_like_op : ring_like_op Z :=
      rngl_add := Z.add;
      rngl_mul := Z.mul;
      rngl_opp := Z.opp;
-     rngl_inv := Z_inv |}.
+     rngl_inv := phony_Z_inv |}.
 
 Canonical Structure Z_ring_like_op.
 
