@@ -23,14 +23,14 @@ Class semiring_prop A {so : semiring_op A} :=
     srng_mul_assoc : ∀ a b c : A, (a * (b * c) = (a * b) * c)%Srng;
     srng_mul_1_l : ∀ a : A, (1 * a)%Srng = a;
     srng_mul_add_distr_l : ∀ a b c : A, (a * (b + c) = a * b + a * c)%Srng;
-    (* change as srng_nc_mul_0_l *)
-    srng_mul_0_l : ∀ a, (0 * a = 0)%Srng;
     (* when commutative *)
     srng_c_mul_comm :
       if srng_is_comm then ∀ a b, (a * b = b * a)%Srng else True;
     (* when not commutative *)
     srng_nc_mul_1_r :
       if srng_is_comm then True else ∀ a, (a * 1 = a)%Srng;
+    srng_nc_mul_0_l :
+      if srng_is_comm then True else ∀ a, (0 * a = 0)%Srng;
     srng_nc_mul_0_r :
       if srng_is_comm then True else ∀ a, (a * 0 = 0)%Srng;
     srng_nc_mul_add_distr_r :
@@ -65,18 +65,6 @@ Proof.
 intros a; simpl.
 rewrite srng_add_comm.
 apply srng_add_0_l.
-Qed.
-
-Theorem srng_mul_0_r : ∀ a, (a * 0 = 0)%Srng.
-Proof.
-intros a; simpl.
-specialize srng_c_mul_comm as srng_mul_comm.
-specialize srng_nc_mul_0_r as srng_mul_0_r.
-destruct srng_is_comm. {
-  now rewrite srng_mul_comm, srng_mul_0_l.
-} {
-  apply srng_mul_0_r.
-}
 Qed.
 
 Theorem srng_mul_1_r : ∀ a, (a * 1 = a)%Srng.
@@ -141,8 +129,8 @@ Definition rng_sub A {R : ring_op A} {S : semiring_op A} a b :=
   srng_add a (rng_opp b).
 
 Declare Scope ring_scope.
-
 Delimit Scope ring_scope with Rng.
+
 Notation "0" := (@srng_zero _ _) : ring_scope.
 Notation "1" := (@srng_one _ _) : ring_scope.
 Notation "- a" := (@rng_opp _ _ a) : ring_scope.
@@ -175,6 +163,30 @@ Theorem rng_add_opp_r : ∀ x, (x - x = 0)%Rng.
 Proof.
 intros x; unfold rng_sub; rewrite srng_add_comm.
 apply rng_add_opp_l.
+Qed.
+
+Theorem srng_mul_0_l : ∀ a, (0 * a = 0)%Srng.
+Proof.
+intros.
+replace (0 * a)%Srng with ((0 - 0) * a)%Rng by now rewrite rng_add_opp_r.
+unfold rng_sub.
+rewrite srng_mul_add_distr_r.
+...
+Search (- 0)%Rng.
+Search (- _ * _)%Rng.
+...
+
+Theorem srng_mul_0_r : ∀ a, (a * 0 = 0)%Srng.
+Proof.
+intros a; simpl.
+specialize srng_c_mul_comm as srng_mul_comm.
+specialize srng_nc_mul_0_r as srng_mul_0_r.
+destruct srng_is_comm. {
+...
+  now rewrite srng_mul_comm, srng_mul_0_l.
+} {
+  apply srng_mul_0_r.
+}
 Qed.
 
 Theorem rng_add_sub : ∀ a b, (a + b - b = a)%Rng.
