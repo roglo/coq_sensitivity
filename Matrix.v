@@ -85,7 +85,8 @@ Definition nat_semiring_op : semiring_op nat :=
 Canonical Structure nat_semiring_op.
 
 Definition nat_semiring_prop : semiring_prop nat :=
-  {| srng_add_comm := Nat.add_comm;
+  {| srng_is_comm := true;
+     srng_add_comm := Nat.add_comm;
      srng_add_assoc := Nat.add_assoc;
      srng_add_0_l := Nat.add_0_l;
      srng_mul_assoc := Nat.mul_assoc;

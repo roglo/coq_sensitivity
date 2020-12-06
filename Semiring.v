@@ -16,7 +16,8 @@ Notation "0" := srng_zero : semiring_scope.
 Notation "1" := srng_one : semiring_scope.
 
 Class semiring_prop A {so : semiring_op A} :=
-  { srng_add_comm : ∀ a b : A, (a + b = b + a)%Srng;
+  { srng_is_comm : bool;
+    srng_add_comm : ∀ a b : A, (a + b = b + a)%Srng;
     srng_add_assoc : ∀ a b c : A, (a + (b + c) = (a + b) + c)%Srng;
     srng_add_0_l : ∀ a : A, (0 + a)%Srng = a;
     srng_mul_assoc : ∀ a b c : A, (a * (b * c) = (a * b) * c)%Srng;
@@ -66,8 +67,6 @@ intros a; simpl.
 rewrite srng_c_mul_comm, srng_mul_0_l.
 reflexivity.
 Qed.
-
-...
 
 (* should not depend on the fact that the semiring
    is commutative *)

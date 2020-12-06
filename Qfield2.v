@@ -18,7 +18,8 @@ Canonical Structure Q_semiring_op.
 Canonical Structure Q_ring_op.
 
 Definition Q_semiring_prop :=
-  {| srng_add_comm := Q.add_comm;
+  {| srng_is_comm := true;
+     srng_add_comm := Q.add_comm;
      srng_add_assoc := Q.add_assoc;
      srng_add_0_l := Q.add_0_l;
 (*

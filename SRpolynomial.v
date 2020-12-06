@@ -1857,7 +1857,8 @@ apply norm_polyn_list_mul_assoc.
 Qed.
 
 Definition polyn_semiring_prop : semiring_prop (polynomial T) :=
-  {| srng_add_comm := polyn_add_comm;
+  {| srng_is_comm := srng_is_comm;
+     srng_add_comm := polyn_add_comm;
      srng_add_assoc := polyn_add_assoc;
      srng_add_0_l := polyn_add_0_l;
      srng_mul_assoc := polyn_mul_assoc;
