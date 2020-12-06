@@ -411,12 +411,13 @@ Definition A_n_eigenvector_of_sqrt_n n μ V :=
 
 Theorem m_o_mll_2x2_2x1 : ∀ d M1 M2 M3 M4 M5 M6,
    is_square_mat M1
+   → mat_ncols M1 = mat_ncols M2
    → mat_ncols M1 = mat_nrows M5
    → (mat_of_mat_list_list d [[M1; M2]; [M3; M4]] *
       mat_of_mat_list_list d [[M5]; [M6]])%M =
      mat_of_mat_list_list d [[M1 * M5 + M2 * M6]; [M3 * M5 + M4 * M6]]%M.
 Proof.
-intros * Hsm1 Hc1r5.
+intros * Hsm1 Hc1c2 Hc1r5.
 unfold is_square_mat in Hsm1.
 apply matrix_eq; [ easy | easy | ].
 cbn - [ iter_seq ].
@@ -429,6 +430,7 @@ cbn - [ iter_seq ].
 rewrite (Nat.div_small j); [ | flia Hj ].
 rewrite (Nat.mod_small j); [ | flia Hj ].
 rewrite <- Hc1r5.
+rewrite <- Hc1c2.
 rewrite (srng_summation_split _ (mat_ncols M1)); [ | flia Hi ].
 rewrite srng_summation_split_last; [ | flia ].
 assert (H : mat_ncols M1 ≠ 0). {
@@ -464,6 +466,13 @@ destruct (lt_dec i (mat_nrows M1)) as [Hir1| Hir1]. {
     intros k Hk.
     now rewrite Nat.add_comm, Nat.add_sub.
   }
+  destruct (Nat.eq_dec (mat_ncols M1) 1) as [Hc11| Hc11]. {
+    rewrite Hc11; cbn.
+    now rewrite srng_add_0_r, srng_add_0_l.
+  }
+  rewrite srng_summation_shift; [ | flia Hsm1 Hir1 Hc11 ].
+  remember (mat_ncols M1) as c.
+  replace (c * 2 - 1 - (c + 1)) with (c - 2) by flia.
 ...
 
 Theorem A_n_eigen_formula : ∀ n μ V,
