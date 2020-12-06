@@ -1,4 +1,8 @@
-(* Semiring *)
+(* Rings *)
+(* the name of this module should be changed
+   because here, a semiring is a particular
+   case of rings where the opposite has no
+   property *)
 
 Require Import Utf8.
 
@@ -12,8 +16,7 @@ Class ring_op A :=
 Declare Scope ring_scope.
 Delimit Scope ring_scope with Rng.
 
-Definition rng_sub A {R : ring_op A} a b :=
-  rng_add a (rng_opp b).
+Definition rng_sub {A} {R : ring_op A} a b := rng_add a (rng_opp b).
 
 Notation "0" := rng_zero : ring_scope.
 Notation "1" := rng_one : ring_scope.
@@ -24,7 +27,7 @@ Notation "- a" := (rng_opp a) : ring_scope.
 
 Class ring_prop A {ro : ring_op A} :=
   { rng_is_comm : bool;
-     rng_is_semiring : bool;
+    rng_is_semiring : bool;
     rng_add_comm : ∀ a b : A, (a + b = b + a)%Rng;
     rng_add_assoc : ∀ a b c : A, (a + (b + c) = (a + b) + c)%Rng;
     rng_add_0_l : ∀ a : A, (0 + a)%Rng = a;
@@ -43,7 +46,7 @@ Class ring_prop A {ro : ring_op A} :=
     rng_nc_mul_add_distr_r :
       if rng_is_comm then True else
        ∀ a b c, ((a + b) * c = a * c + b * c)%Rng;
-    (* when only semiring *)
+    (* when ring (i.e. not a semiring) *)
     rng_s_add_opp_l :
       if rng_is_semiring then True else ∀ a : A, (- a + a = 0)%Rng }.
 
@@ -68,6 +71,7 @@ Section ring_theorems.
 
 Context {A : Type}.
 Context {ro : ring_op A}.
+Context {rp : ring_prop A}.
 
 Theorem rng_add_0_r : ∀ a, (a + 0 = a)%Rng.
 Proof.
@@ -139,50 +143,22 @@ destruct rng_is_comm. {
 }
 Qed.
 
-End ring_theorems.
-
-(* Rings *)
-
-Class ring_op A :=
-  { rng_opp : A → A }.
-
-Definition rng_sub A {R : ring_op A} {S : ring_op A} a b :=
-  rng_add a (rng_opp b).
-
-Declare Scope ring_scope.
-Delimit Scope ring_scope with Rng.
-
-Notation "0" := (@rng_zero _ _) : ring_scope.
-Notation "1" := (@rng_one _ _) : ring_scope.
-Notation "- a" := (@rng_opp _ _ a) : ring_scope.
-Notation "a + b" := (@rng_add _ _ a b) : ring_scope.
-Notation "a - b" := (@rng_sub _ _ _ a b) : ring_scope.
-Notation "a * b" := (@rng_mul _ _ a b) : ring_scope.
-
-Class ring_prop A {ro : ring_op A} {ro : ring_op A} :=
-  { rng_add_opp_l : ∀ a : A, (- a + a = 0)%Rng }.
-
-Section ring_theorems.
-
-Context {A : Type}.
-Context {ro : ring_op A}.
-Context {rp : ring_prop A}.
-
-Theorem rng_sub_compat_l : ∀ a b c,
-  (a = b)%Rng → (a - c = b - c)%Rng.
-Proof.
-intros a b c Hab.
-now rewrite Hab.
-Qed.
-
 Theorem fold_rng_sub : ∀ a b, (a + - b)%Rng = (a - b)%Rng.
 Proof. intros; easy. Qed.
 
-Theorem rng_add_opp_r : ∀ x, (x - x = 0)%Rng.
+Theorem rng_add_opp_r :
+  if rng_is_semiring then True else ∀ x, (x - x = 0)%Rng.
 Proof.
-intros x; unfold rng_sub; rewrite rng_add_comm.
-apply rng_add_opp_l.
+specialize rng_s_add_opp_l as rng_add_opp_l.
+destruct rng_is_semiring; [ easy | ].
+intros.
+unfold rng_sub.
+now rewrite rng_add_comm.
 Qed.
+
+... mouais... chais pas... je vais me retrouver avec des
+    tas de théorèmes, avec des soustractions, conditionnés
+    par rng_is_semiring... j'aime pas trop ça...
 
 Theorem rng_add_sub : ∀ a b, (a + b - b = a)%Rng.
 Proof.
