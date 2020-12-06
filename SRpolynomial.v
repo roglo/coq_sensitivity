@@ -797,22 +797,19 @@ rewrite norm_polyn_list_app; cbn.
 now rewrite if_0_eq_0.
 Qed.
 
-Theorem map_polyn_list_convol_mul_comm : ∀ la lb ln,
-  map (polyn_list_convol_mul la lb) ln =
-  map (polyn_list_convol_mul lb la) ln.
+Theorem map_polyn_list_convol_c_mul_comm :
+  if srng_is_comm then
+    ∀ la lb ln,
+    map (polyn_list_convol_mul la lb) ln =
+    map (polyn_list_convol_mul lb la) ln
+  else True.
 Proof.
+specialize polyn_list_convol_c_mul_comm as polyn_list_convol_mul_comm.
+destruct srng_is_comm; [ | easy ].
 intros.
-unfold polyn_list_convol_mul.
 apply map_ext_in.
 intros i Hi.
-rewrite srng_summation_rtl; [ | easy ].
-apply srng_summation_eq_compat.
-intros j Hj.
-rewrite Nat.add_0_r.
-rewrite Nat_sub_sub_distr; [ | easy ].
-rewrite Nat.sub_diag, Nat.add_0_l.
-...
-apply srng_c_mul_comm.
+apply polyn_list_convol_mul_comm.
 Qed.
 
 Theorem map_polyn_list_convol_mul_cons_r_gen : ∀ b la lb sta len,
@@ -899,17 +896,27 @@ now rewrite Nat_sub_sub_swap.
 Qed.
 
 (* (a+xP)Q = aQ+x(PQ) *)
-Theorem map_polyn_list_convol_mul_cons_l : ∀ a la lb len,
-  map (polyn_list_convol_mul (a :: la) lb) (seq 0 (S len)) =
-  polyn_list_add (map (λ n, (a * nth n lb 0)%Srng) (seq 0 (S len)))
-    (0%Srng :: map (λ n, polyn_list_convol_mul la lb (n - 1)) (seq 1 len)).
+(* flemme de devoir reprendre map_polyn_list_convol_mul_cons_r_gen
+   et map_polyn_list_convol_mul_cons_r; alors, pour l'instant, je
+   dis que ça ne marche que si c'est commutatif *)
+Theorem map_polyn_list_convol_c_mul_cons_l :
+  if srng_is_comm then
+    ∀ a la lb len,
+    map (polyn_list_convol_mul (a :: la) lb) (seq 0 (S len)) =
+    polyn_list_add (map (λ n, (a * nth n lb 0)%Srng) (seq 0 (S len)))
+      (0%Srng :: map (λ n, polyn_list_convol_mul la lb (n - 1)) (seq 1 len))
+  else True.
 Proof.
+specialize srng_c_mul_comm as srng_mul_comm.
+specialize map_polyn_list_convol_c_mul_comm as map_polyn_list_convol_mul_comm.
+specialize polyn_list_convol_c_mul_comm as polyn_list_convol_mul_comm.
+destruct srng_is_comm; [ | easy ].
 intros.
 rewrite map_polyn_list_convol_mul_comm.
 rewrite map_polyn_list_convol_mul_cons_r.
 erewrite map_ext_in. 2: {
   intros i Hi.
-  apply srng_c_mul_comm.
+  apply srng_mul_comm.
 }
 f_equal; f_equal.
 erewrite map_ext_in. 2: {
@@ -1223,10 +1230,18 @@ cbn.
 now rewrite Nat.sub_0_r, Nat.add_comm.
 Qed.
 
-Theorem norm_polyn_list_mul_idemp_r : ∀ la lb,
-  norm_polyn_list (polyn_list_mul la (norm_polyn_list lb)) =
-  norm_polyn_list (polyn_list_mul la lb).
+(* flemme de faire comme norm_polyn_list_mul_idemp_l;
+   alors je dis pour l'instant que ça ne marche que
+   si srng_is_comm *)
+Theorem norm_polyn_list_c_mul_idemp_r :
+  if srng_is_comm then
+    ∀ la lb,
+    norm_polyn_list (polyn_list_mul la (norm_polyn_list lb)) =
+    norm_polyn_list (polyn_list_mul la lb)
+  else True.
 Proof.
+specialize polyn_list_c_mul_comm as polyn_list_mul_comm.
+destruct srng_is_comm; [ | easy ].
 intros.
 rewrite polyn_list_mul_comm.
 rewrite norm_polyn_list_mul_idemp_l.
@@ -1297,8 +1312,13 @@ cbn in Hz |-*.
 now destruct (srng_eq_dec b 0).
 Qed.
 
-Theorem polyn_mul_1_r : ∀ P, (P * 1)%P = P.
+(* flemme de faire comme polyn_mul_1_l
+   alors je dis pour l'instant que ça ne marche que
+   si srng_is_comm *)
+Theorem polyn_c_mul_1_r : if srng_is_comm then ∀ P, (P * 1)%P = P else True.
 Proof.
+specialize polyn_c_mul_comm as polyn_mul_comm.
+destruct srng_is_comm; [ | easy ].
 intros.
 rewrite polyn_mul_comm.
 apply polyn_mul_1_l.
@@ -1481,6 +1501,7 @@ intros.
 unfold polyn_mul.
 apply polyn_eq; cbn.
 rewrite fold_norm_polyn_list.
+...
 rewrite norm_polyn_list_mul_idemp_r.
 rewrite norm_polyn_list_add_idemp_l.
 rewrite norm_polyn_list_add_idemp_r.
