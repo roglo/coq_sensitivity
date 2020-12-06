@@ -193,14 +193,9 @@ Qed.
 Theorem srng_mul_0_l : ∀ a, (0 * a = 0)%Srng.
 Proof.
 intros.
-assert (H : (0 * a + a = a)%Srng). {
-  transitivity ((0 * a + 1 * a)%Rng). {
-    now rewrite srng_mul_1_l.
-  }
-  rewrite <- srng_mul_add_distr_r.
-  now rewrite srng_add_0_l, srng_mul_1_l.
-}
-apply rng_add_reg_r with (c := a).
+apply rng_add_reg_r with (c := (1 * a)%Srng).
+rewrite <- srng_mul_add_distr_r.
+rewrite srng_add_0_l, srng_mul_1_l.
 now rewrite srng_add_0_l.
 Qed.
 
