@@ -412,12 +412,13 @@ Definition A_n_eigenvector_of_sqrt_n n μ V :=
 Theorem m_o_mll_2x2_2x1 : ∀ d M1 M2 M3 M4 M5 M6,
    is_square_mat M1
    → mat_ncols M1 = mat_ncols M2
+   → mat_ncols M1 = mat_ncols M3
    → mat_ncols M1 = mat_nrows M5
    → (mat_of_mat_list_list d [[M1; M2]; [M3; M4]] *
       mat_of_mat_list_list d [[M5]; [M6]])%M =
      mat_of_mat_list_list d [[M1 * M5 + M2 * M6]; [M3 * M5 + M4 * M6]]%M.
 Proof.
-intros * Hsm1 Hc1c2 Hc1r5.
+intros * Hsm1 Hc1c2 Hc1c3 Hc1r5.
 unfold is_square_mat in Hsm1.
 apply matrix_eq; [ easy | easy | ].
 cbn - [ iter_seq ].
@@ -429,8 +430,7 @@ unfold mat_list_list_el.
 cbn - [ iter_seq ].
 rewrite (Nat.div_small j); [ | flia Hj ].
 rewrite (Nat.mod_small j); [ | flia Hj ].
-rewrite <- Hc1r5.
-rewrite <- Hc1c2.
+rewrite <- Hc1c2, <- Hc1c3, <- Hc1r5.
 rewrite (srng_summation_split _ (mat_ncols M1)); [ | flia Hi ].
 rewrite srng_summation_split_last; [ | flia ].
 assert (H : mat_ncols M1 ≠ 0). {
@@ -473,6 +473,25 @@ destruct (lt_dec i (mat_nrows M1)) as [Hir1| Hir1]. {
   rewrite srng_summation_shift; [ | flia Hsm1 Hir1 Hc11 ].
   remember (mat_ncols M1) as c.
   replace (c * 2 - 1 - (c + 1)) with (c - 2) by flia.
+  rewrite (srng_summation_split_first _ _ (c - 1)); [ | flia Hc11 ].
+  rewrite (srng_summation_shift _ 1); [ | flia Hc11 Hsm1 Hir1 ].
+  f_equal.
+  replace (c - 1 - 1) with (c - 2) by flia.
+  apply srng_summation_eq_compat.
+  intros k Hk.
+  now rewrite <- Nat.add_assoc, Nat.add_comm, Nat.add_sub.
+} {
+  apply Nat.nlt_ge in Hir1.
+  rewrite (Nat_div_less_small 1); [ | flia Hir1 Hi ].
+  rewrite (Nat_mod_less_small 1); [ | flia Hir1 Hi ].
+  cbn - [ iter_seq ].
+  rewrite Nat.add_0_r, <- srng_add_assoc.
+  f_equal. {
+    rewrite srng_summation_shift; [ | flia Hsm1 Hi ].
+    apply srng_summation_eq_compat.
+    intros k Hk.
+    now rewrite Nat.add_comm, Nat.add_sub.
+  }
 ...
 
 Theorem A_n_eigen_formula : ∀ n μ V,
