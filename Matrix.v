@@ -791,6 +791,14 @@ symmetry.
 now apply srng_mul_summation_distr_r.
 Qed.
 
+(* left distributivity of multiplication over addition *)
+
+Theorem mat_mul_add_distr_l : ∀ MA MB MC : matrix T,
+  (MA * (MB + MC) = MA + MB + MA * MC)%M.
+Proof.
+intros.
+...
+
 (* associativity with multiplication with vector *)
 
 Theorem mat_vect_mul_assoc_as_sums : ∀ A B V i,
