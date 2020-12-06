@@ -432,19 +432,38 @@ cbn - [ iter_seq Nat.pow ].
 unfold mat_list_list_el.
 cbn - [ iter_seq Nat.pow ].
 rewrite mA_nrows, mA_ncols.
-...
-Theorem toto : ∀ ll1 ll2,
-  (mat_of_mat_list_list 0%F ll1 * mat_of_mat_list_list 0%F ll2)%M =
-  mat_of_mat_list_list 0%F [].
-...
-rewrite toto.
-...
-unfold mat_mul.
 apply vector_eq; [ easy | ].
-cbn - [ iter_seq Nat.pow base_vector_1 ].
-rewrite mA_nrows, mA_ncols.
+cbn - [ iter_seq Nat.pow ].
 intros i Hi.
-rewrite Nat.mul_1_r.
+rewrite srng_summation_split_first; [ | easy | flia ].
+rewrite Nat.div_0_l; [ | now apply Nat.pow_nonzero ].
+rewrite srng_mul_1_r.
+rewrite (all_0_srng_summation_0 _ 1). 2: {
+  intros k Hk.
+  destruct k; [ easy | ].
+  apply srng_mul_0_r.
+}
+rewrite srng_add_0_r.
+rewrite Nat.mod_0_l; [ | now apply Nat.pow_nonzero ].
+rewrite (srng_summation_split _ (2 ^ n - 1)); [ | flia ].
+rewrite Nat.sub_add; [ | now apply Nat.neq_0_lt_0, Nat.pow_nonzero ].
+erewrite srng_summation_eq_compat. 2: {
+  intros k Hk.
+  rewrite (Nat.div_small k); [ | flia Hi Hk ].
+  rewrite (Nat.mod_small k); [ | flia Hi Hk ].
+  easy.
+}
+cbn - [ iter_seq Nat.pow ].
+rewrite srng_summation_split_first; [ | easy | flia ].
+cbn - [ iter_seq Nat.pow ].
+rewrite srng_mul_1_r.
+...
+rewrite (all_0_srng_summation_0 _ 1). 2: {
+  intros k Hk.
+  destruct k; [ easy | ].
+  cbn.
+  rewrite srng_mul_0_r.
+}
 ...
 
 Fixpoint first_non_zero_in_col (M : matrix T) it i j :=
