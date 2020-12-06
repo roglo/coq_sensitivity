@@ -66,7 +66,6 @@ Context {T : Type}.
 Context {ro : ring_op T}.
 Context (so : semiring_op T).
 Context {sp : semiring_prop T}.
-Context {scp : sring_comm_prop T}.
 Context {rp : ring_prop T}.
 
 (* addition *)
@@ -84,6 +83,8 @@ Definition nat_semiring_op : semiring_op nat :=
 
 Canonical Structure nat_semiring_op.
 
+Print semiring_prop.
+
 Definition nat_semiring_prop : semiring_prop nat :=
   {| srng_is_comm := true;
      srng_add_comm := Nat.add_comm;
@@ -92,13 +93,13 @@ Definition nat_semiring_prop : semiring_prop nat :=
      srng_mul_assoc := Nat.mul_assoc;
      srng_mul_1_l := Nat.mul_1_l;
      srng_mul_add_distr_l := Nat.mul_add_distr_l;
-     srng_mul_0_l := Nat.mul_0_l |}.
-
-Definition nat_sring_comm_prop : sring_comm_prop nat :=
-  {| srng_c_mul_comm := Nat.mul_comm |}.
+     srng_mul_0_l := Nat.mul_0_l;
+     srng_c_mul_comm := Nat.mul_comm;
+     srng_nc_mul_1_r := I;
+     srng_nc_mul_0_r := I;
+     srng_nc_mul_add_distr_r := I |}.
 
 Canonical Structure nat_semiring_prop.
-Canonical Structure nat_sring_comm_prop.
 
 (*
 End in_ring.
@@ -298,6 +299,7 @@ unfold determinant; cbn.
 remember (mat_ncols A) as c eqn:Hc; symmetry in Hc.
 destruct c; [ easy | clear Hcz ].
 cbn - [ iter_seq ].
+...
 rewrite srng_mul_summation_distr_l; [ | easy | easy ].
 apply srng_summation_eq_compat.
 intros j Hj.
