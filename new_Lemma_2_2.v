@@ -543,12 +543,8 @@ rewrite m_o_mll_2x2_2x1; cycle 1. {
 } {
   now cbn; rewrite mA_nrows, mA_ncols.
 }
-Search (_ * _ * _)%M.
-Search (_ * (_ + _))%M.
-...
-rewrite mat_mul_add_distr_l.
-...
-rewrite mat_mul_add_distr_l.
+rewrite mat_mul_add_distr_l; [ | easy ].
+rewrite lemma_2_A_n_2_eq_n_I.
 ...
 (*
 remember [mA n; squ_mat_one (2 ^ n)] as M1 eqn:HM1.

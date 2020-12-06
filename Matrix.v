@@ -794,10 +794,23 @@ Qed.
 (* left distributivity of multiplication over addition *)
 
 Theorem mat_mul_add_distr_l : ∀ MA MB MC : matrix T,
-  (MA * (MB + MC) = MA + MB + MA * MC)%M.
+  (MA * (MB + MC) = MA * MB + MA * MC)%M.
 Proof.
 intros.
-...
+apply matrix_eq; [ easy | easy | ].
+intros i j Hi Hj.
+cbn - [ iter_seq ].
+cbn in Hi, Hj.
+remember (mat_ncols MA) as ca eqn:Hca.
+remember (mat_ncols MB) as cb eqn:Hcb.
+move cb before ca.
+erewrite srng_summation_eq_compat. 2: {
+  intros k Hk.
+  apply srng_mul_add_distr_l.
+}
+cbn - [ iter_seq ].
+now apply srng_summation_add_distr.
+Qed.
 
 (* associativity with multiplication with vector *)
 
