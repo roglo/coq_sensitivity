@@ -11,11 +11,8 @@ Require Import Utf8 Arith.
 Import List List.ListNotations.
 
 Require Import Misc Matrix.
-Require Import Semiring Field2.
-Require Import SRsummation SRproduct (* SRpolynomial *).
-(*
-Require Import CharacPolyn.
-*)
+Require Import Semiring.
+Require Import SRsummation SRproduct.
 Import matrix_Notations.
 
 Section in_ring.
