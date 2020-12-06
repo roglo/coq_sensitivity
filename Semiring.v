@@ -23,18 +23,15 @@ Class semiring_prop A {so : semiring_op A} :=
     srng_mul_assoc : ∀ a b c : A, (a * (b * c) = (a * b) * c)%Srng;
     srng_mul_1_l : ∀ a : A, (1 * a)%Srng = a;
     srng_mul_add_distr_l : ∀ a b c : A, (a * (b + c) = a * b + a * c)%Srng;
+    srng_mul_0_l : ∀ a, (0 * a = 0)%Srng;
     (* when commutative *)
     srng_c_mul_comm :
       if srng_is_comm then ∀ a b, (a * b = b * a)%Srng else True;
     (* when not commutative *)
-(*
     srng_nc_mul_1_r :
       if srng_is_comm then True else ∀ a, (a * 1 = a)%Srng;
-    srng_nc_mul_0_l :
-      if srng_is_comm then True else ∀ a, (0 * a = 0)%Srng;
     srng_nc_mul_0_r :
       if srng_is_comm then True else ∀ a, (a * 0 = 0)%Srng;
-*)
     srng_nc_mul_add_distr_r :
       if srng_is_comm then True else
        ∀ a b c, ((a + b) * c = a * c + b * c)%Srng }.
@@ -105,6 +102,31 @@ Theorem srng_add_compat_r : ∀ a b c,
 Proof.
 intros a b c Hab.
 now rewrite Hab.
+Qed.
+
+Theorem srng_mul_1_r : ∀ a, (a * 1 = a)%Srng.
+Proof.
+intros.
+specialize srng_c_mul_comm as srng_mul_comm.
+specialize srng_nc_mul_1_r as srng_mul_1_r.
+destruct srng_is_comm. {
+  now rewrite srng_mul_comm, srng_mul_1_l.
+} {
+  apply srng_mul_1_r.
+}
+Qed.
+
+Theorem srng_mul_0_r : ∀ a, (a * 0 = 0)%Srng.
+Proof.
+intros.
+specialize srng_c_mul_comm as srng_mul_comm.
+specialize srng_nc_mul_0_r as srng_mul_0_r.
+destruct srng_is_comm. {
+  rewrite srng_mul_comm.
+  apply srng_mul_0_l.
+} {
+  apply srng_mul_0_r.
+}
 Qed.
 
 End semiring_theorems.
@@ -178,52 +200,6 @@ apply rng_add_reg_r with (c := c).
 rewrite srng_add_comm; symmetry.
 now rewrite srng_add_comm; symmetry.
 Qed.
-
-Theorem srng_mul_0_l : ∀ a, (0 * a = 0)%Srng.
-Proof.
-intros.
-apply rng_add_reg_r with (c := (1 * a)%Srng).
-rewrite <- srng_mul_add_distr_r.
-now do 2 rewrite srng_add_0_l.
-Qed.
-
-Theorem srng_mul_0_r : ∀ a, (a * 0 = 0)%Srng.
-Proof.
-intros.
-apply rng_add_reg_r with (c := (a * 1)%Srng).
-rewrite <- srng_mul_add_distr_l.
-now do 2 rewrite srng_add_0_l.
-Qed.
-
-End ring_theorems.
-
-Check @srng_mul_0_l.
-Check @srng_mul_0_r.
-(* ah zut, il faut qu'on soye dans un ring *)
-
-...
-a0=0
-enough a0+a1=0+a1   reg_r
-enough a(0+1)=0+a1  distr_l
-enough a1=0+a1      add_0_l
-true
-
-Theorem srng_mul_1_r : ∀ a, (a * 1 = a)%Srng.
-Proof.
-intros a.
-...
-apply rng_add_reg_r with (c := (a * 0)%Srng).
-rewrite <- srng_mul_add_distr_l.
-...
-specialize srng_c_mul_comm as srng_mul_comm.
-specialize srng_nc_mul_1_r as srng_mul_1_r.
-destruct srng_is_comm. {
-  now rewrite srng_mul_comm, srng_mul_1_l.
-} {
-  apply srng_mul_1_r.
-}
-Qed.
-*)
 
 Theorem rng_opp_0 : (- 0 = 0)%Rng.
 Proof.
