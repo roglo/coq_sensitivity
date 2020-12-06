@@ -1501,6 +1501,7 @@ intros.
 unfold polyn_mul.
 apply polyn_eq; cbn.
 rewrite fold_norm_polyn_list.
+(* à finir *)
 ...
 rewrite norm_polyn_list_mul_idemp_r.
 rewrite norm_polyn_list_add_idemp_l.
