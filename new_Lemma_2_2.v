@@ -69,9 +69,6 @@ Definition rng_mul_nat_l n v :=
   | S n' => (Σ (_ = 0, n'), v)%Srng
   end.
 
-Definition mat_nat_mul_l n M :=
-  mk_mat (λ i j, rng_mul_nat_l n (mat_el M i j)) (mat_nrows M) (mat_ncols M).
-
 (* *)
 
 Theorem mA_nrows : ∀ n, mat_nrows (mA n) = 2 ^ n.
@@ -98,7 +95,7 @@ Qed.
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
-  (mA n * mA n = mat_nat_mul_l n (squ_mat_one (2 ^ n)))%M.
+  (mA n * mA n)%M = (rng_mul_nat_l n 1%F × squ_mat_one (2 ^ n))%M.
 Proof.
 intros.
 apply matrix_eq; [ apply mA_nrows | apply mA_ncols | ].
@@ -107,7 +104,9 @@ rewrite mA_nrows, mA_ncols.
 intros i k Hi Hk.
 revert i k Hi Hk.
 induction n; intros. {
-  now cbn; rewrite srng_mul_0_l, srng_add_0_l.
+  cbn.
+  do 2 rewrite srng_mul_0_l.
+  apply srng_add_0_l.
 }
 rewrite (srng_summation_split _ (2 ^ n - 1)). 2: {
   split; [ flia | ].
@@ -176,15 +175,14 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
     symmetry.
     destruct (Nat.eq_dec i k) as [Hik| Hik]. {
       subst k.
+      do 2 rewrite srng_mul_1_r.
       destruct n; [ easy | ].
       cbn - [ iter_seq ].
       rewrite srng_summation_split_last; [ | flia ].
       now rewrite srng_summation_succ_succ.
     } {
-      rewrite srng_add_0_r.
-      destruct n; [ apply srng_add_0_l | ].
-      rewrite srng_summation_split_last; [ | flia ].
-      now rewrite srng_summation_succ_succ, srng_add_0_r.
+      do 2 rewrite srng_mul_0_r.
+      symmetry; apply srng_add_0_r.
     }
   } {
     apply Nat.nlt_ge in Hk2n.
@@ -262,7 +260,7 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
       apply rng_opp_0.
     }
     symmetry.
-    now apply all_0_srng_summation_0.
+    apply srng_mul_0_r.
   }
 } {
   apply Nat.nlt_ge in Hi2n.
@@ -337,8 +335,7 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
       apply srng_mul_0_r.
     }
     symmetry.
-    destruct n; [ apply srng_add_0_l | ].
-    now apply all_0_srng_summation_0.
+    apply srng_mul_0_r.
   } {
     apply Nat.nlt_ge in Hk2n.
     assert (H : 1 * 2 ^ n ≤ k < (1 + 1) * 2 ^ n). {
@@ -365,33 +362,33 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
       subst j.
       rewrite srng_add_comm.
       rewrite srng_summation_split_last; [ | flia ].
+      do 2 rewrite srng_mul_1_r.
       f_equal.
-      symmetry.
       destruct n; [ easy | ].
       cbn - [ iter_seq ].
+      symmetry.
       apply srng_summation_succ_succ.
     } {
       destruct (Nat.eq_dec (i - 2 ^ n) (k - 2 ^ n)) as [Hi2k| Hi2k]. {
         flia Hik Hi2k Hi2n Hk2n.
       }
       rewrite srng_add_0_l.
-      symmetry.
-      destruct n; [ apply srng_add_0_l | ].
-      rewrite srng_summation_split_last; [ | flia ].
-      now rewrite srng_summation_succ_succ, srng_add_0_r.
+      now do 2 rewrite srng_mul_0_r.
     }
   }
 }
 Qed.
 
-Check mA.
-Inspect 1.
-
+(*
 Fixpoint srng_of_nat n :=
   match n with
   | 0 => 0%Srng
   | S n' => (1 + srng_of_nat n')%Srng
   end.
+
+Print mat_nat_mul_l.
+Print rng_mul_nat_l.
+*)
 
 (* seems, on paper, that √(n+1) is an eignenvalue for A_{n+1}
    and a corresponding eigenvector is
@@ -518,7 +515,7 @@ destruct (lt_dec i (mat_nrows M1)) as [Hir1| Hir1]. {
 Qed.
 
 Theorem A_n_eigen_formula : ∀ n μ V,
-  (μ * μ)%Rng = srng_of_nat n
+  (μ * μ)%Rng = rng_mul_nat_l n 1%Srng
   → V = A_n_eigenvector_of_sqrt_n n μ (base_vector_1 (2 ^ n))
   → (mA n · V = μ × V)%V.
 Proof.
@@ -545,24 +542,6 @@ rewrite m_o_mll_2x2_2x1; cycle 1. {
 }
 rewrite mat_mul_add_distr_l; [ | easy ].
 rewrite lemma_2_A_n_2_eq_n_I.
-Print mat_nat_mul_l.
-Print rng_mul_nat_l.
-Print mat_mul_scal_l.
-...
-mat_nat_mul_l = 
-λ (n : nat) (M : matrix T),
-  {|
-  mat_el := λ i j : nat, rng_mul_nat_l n (mat_el M i j);
-  mat_nrows := mat_nrows M;
-  mat_ncols := mat_ncols M |}
-     : nat → matrix T → matrix T
-mat_mul_scal_l = 
-λ (T : Type) (so : semiring_op T) (μ : T) (M : matrix T),
-  {|
-  mat_el := λ i j : nat, (μ * mat_el M i j)%F;
-  mat_nrows := mat_nrows M;
-  mat_ncols := mat_ncols M |}
-     : ∀ T : Type, semiring_op T → T → matrix T → matrix T
 ...
 (*
 remember [mA n; squ_mat_one (2 ^ n)] as M1 eqn:HM1.
