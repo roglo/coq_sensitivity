@@ -12,8 +12,10 @@ Import List List.ListNotations.
 
 Require Import Misc Matrix.
 Require Import Semiring Field2.
-Require Import SRsummation SRproduct SRpolynomial.
+Require Import SRsummation SRproduct. (* SRpolynomial *).
+(*
 Require Import CharacPolyn.
+*)
 Import matrix_Notations.
 
 Section in_ring.
