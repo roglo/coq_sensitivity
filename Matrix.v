@@ -299,10 +299,10 @@ unfold determinant; cbn.
 remember (mat_ncols A) as c eqn:Hc; symmetry in Hc.
 destruct c; [ easy | clear Hcz ].
 cbn - [ iter_seq ].
-...
-rewrite srng_mul_summation_distr_l; [ | easy | easy ].
+rewrite srng_mul_summation_distr_l; [ | easy ].
 apply srng_summation_eq_compat.
 intros j Hj.
+...
 rewrite (srng_c_mul_comm (minus_one_pow j)).
 do 2 rewrite <- srng_mul_assoc.
 f_equal.
