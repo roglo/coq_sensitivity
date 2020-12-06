@@ -409,6 +409,41 @@ Definition A_n_eigenvector_of_sqrt_n n μ V :=
        · V)%V
   end.
 
+Theorem m_o_mll_2x2_2x1 : ∀ d M1 M2 M3 M4 M5 M6,
+   is_square_mat M1
+   → (mat_of_mat_list_list d [[M1; M2]; [M3; M4]] *
+      mat_of_mat_list_list d [[M5]; [M6]])%M =
+     mat_of_mat_list_list d [[M1 * M5 + M2 * M6]; [M3 * M5 + M4 * M6]]%M.
+Proof.
+intros * Hsm1.
+unfold is_square_mat in Hsm1.
+apply matrix_eq; [ easy | easy | ].
+cbn - [ iter_seq ].
+intros * Hi Hj.
+rewrite Nat.mul_1_r in Hj.
+unfold mat_mul, mat_add.
+cbn - [ iter_seq ].
+unfold mat_list_list_el.
+cbn - [ iter_seq ].
+rewrite (Nat.div_small j); [ | flia Hj ].
+rewrite (Nat.mod_small j); [ | flia Hj ].
+rewrite (srng_summation_split _ (mat_ncols M1)); [ | flia Hi ].
+rewrite srng_summation_split_last; [ | flia ].
+erewrite srng_summation_eq_compat. 2: {
+  intros k Hk.
+  rewrite (Nat.div_small (k - 1)); [ | flia Hk ].
+  rewrite (Nat.mod_small (k - 1)); [ | flia Hk ].
+  easy.
+}
+cbn - [ iter_seq ].
+assert (H : mat_ncols M1 ≠ 0). {
+  intros H; rewrite H in Hsm1.
+  now rewrite Hsm1 in Hi; cbn in Hi.
+}
+rewrite Nat.div_same; [ | easy ].
+rewrite Nat.mod_same; [ clear H | easy ].
+...
+
 Theorem A_n_eigen_formula : ∀ n μ V,
   (μ * μ)%Rng = srng_of_nat n
   → V = A_n_eigenvector_of_sqrt_n n μ (base_vector_1 (2 ^ n))
@@ -424,6 +459,9 @@ cbn - [ Nat.pow ] in Hμ, HV.
 rewrite HV.
 rewrite mat_vect_mul_assoc; [ | easy | easy ].
 cbn - [ iter_seq Nat.pow ].
+...
+rewrite m_o_mll_2x2_2x1.
+...
 (*
 remember [mA n; squ_mat_one (2 ^ n)] as M1 eqn:HM1.
 remember [squ_mat_one (2 ^ n); (- mA n)%M] as M2 eqn:HM2.
