@@ -12,7 +12,7 @@ Import List List.ListNotations.
 
 Require Import Misc Matrix.
 Require Import Semiring Field2.
-Require Import SRsummation SRproduct. (* SRpolynomial *).
+Require Import SRsummation SRproduct (* SRpolynomial *).
 (*
 Require Import CharacPolyn.
 *)
@@ -25,7 +25,6 @@ Context (so : semiring_op T).
 Context {ro : ring_op T}.
 Context {sp : semiring_prop T}.
 Context {rp : ring_prop T}.
-Context {scp : sring_comm_prop T}.
 Context {sdp : sring_dec_prop T}.
 Context {fo : field_op T}.
 
@@ -517,7 +516,7 @@ destruct n. {
 }
 cbn - [ Nat.pow ] in Hμ, HV.
 rewrite HV.
-rewrite mat_vect_mul_assoc; [ | easy | easy ].
+rewrite mat_vect_mul_assoc; [ | easy ].
 cbn - [ iter_seq Nat.pow ].
 rewrite m_o_mll_2x2_2x1; cycle 1. {
   apply mA_is_square.
@@ -537,11 +536,7 @@ specialize (mA_is_square n) as Hasm.
 rewrite mat_mul_1_l; [ | easy | easy | easy ].
 rewrite mat_mul_1_l; [ | easy | easy | now rewrite mA_ncols ].
 rewrite mat_mul_1_l; [ | easy | easy | easy ].
-rewrite mat_mul_1_r; [ | easy | easy | easy | ].
-Check @mat_mul_1_l.
-Check @mat_mul_1_r.
-...
-rewrite mat_mul_1_r; [ | easy | | symmetry; apply mA_ncols | | ].
+rewrite mat_mul_1_r; [ | easy | easy | now cbn; rewrite mA_nrows ].
 ...
 Check mat_add_assoc.
 Check mat_add_add_swap.

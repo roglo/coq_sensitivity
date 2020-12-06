@@ -83,8 +83,6 @@ Definition nat_semiring_op : semiring_op nat :=
 
 Canonical Structure nat_semiring_op.
 
-Print semiring_prop.
-
 Definition nat_semiring_prop : semiring_prop nat :=
   {| srng_is_comm := true;
      srng_add_comm := Nat.add_comm;
@@ -302,7 +300,8 @@ cbn - [ iter_seq ].
 rewrite srng_mul_summation_distr_l; [ | easy ].
 apply srng_summation_eq_compat.
 intros j Hj.
-...
+Abort. (*
+... à finir
 rewrite (srng_c_mul_comm (minus_one_pow j)).
 do 2 rewrite <- srng_mul_assoc.
 f_equal.
@@ -316,6 +315,7 @@ rename j into k; rename Hj into Hk.
 intros i j Hi Hj.
 destruct (Nat.eq_dec (i + 1) 0) as [H| H]; [ flia H | easy ].
 Qed.
+*)
 
 (* multilinearity *)
 
@@ -541,6 +541,7 @@ rewrite (det_sum_row_row _ M C Hrz); cycle 7. {
   remember
     (mk_mat (λ i j, if Nat.eq_dec i 0 then mat_el M k j else mat_el M i j)
        (mat_nrows M) (mat_ncols M)) as D eqn:Hd.
+Abort. (* à finir...
   specialize (det_mul_row_0_by_scal D v) as H1.
   assert (H : mat_ncols D ≠ 0); [ subst D; cbn; congruence | ].
   specialize (H1 H); clear H.
@@ -555,6 +556,7 @@ rewrite (det_sum_row_row _ M C Hrz); cycle 7. {
     rewrite Hd.
 Abort. (* blocked because needs the previous lemma
 ...
+*)
 *)
 
 (* proof that the swapping two rows negates the determinant  *)
@@ -741,7 +743,6 @@ Context {T : Type}.
 Context {ro : ring_op T}.
 Context (so : semiring_op T).
 Context {sp : semiring_prop T}.
-Context {scp : sring_comm_prop T}.
 Context {rp : ring_prop T}.
 
 Declare Scope M_scope.
@@ -814,9 +815,6 @@ Theorem mat_mul_1_r : ∀ M n,
   → (M * mI n)%M = M.
 Proof.
 intros * Hsm Hn.
-(**)
-clear scp.
-(**)
 apply matrix_eq; [ easy | cbn; congruence | ].
 cbn - [ iter_seq ].
 unfold is_square_mat in Hsm.
@@ -825,7 +823,6 @@ intros * Hi Hj.
 rewrite (srng_summation_split _ j); [ | flia Hj ].
 rewrite srng_summation_split_last; [ | flia ].
 destruct (Nat.eq_dec j j) as [H| H]; [ clear H | easy ].
-...
 rewrite srng_mul_1_r.
 rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
   intros k Hk.
