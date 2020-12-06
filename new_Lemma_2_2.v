@@ -424,6 +424,34 @@ cbn - [ Nat.pow ] in Hμ, HV.
 rewrite HV.
 rewrite mat_vect_mul_assoc; [ | easy | easy ].
 cbn - [ iter_seq Nat.pow ].
+(*
+remember [mA n; squ_mat_one (2 ^ n)] as M1 eqn:HM1.
+remember [squ_mat_one (2 ^ n); (- mA n)%M] as M2 eqn:HM2.
+remember [(mA n + μ × squ_mat_one (2 ^ S n))%M] as M3 eqn:HM3.
+move M1 after M3.
+move M2 before M1.
+remember [squ_mat_one (2 ^ S n)] as M4 eqn:HM4.
+move M4 before M3.
+unfold mat_of_mat_list_list.
+cbn - [ iter_seq Nat.pow ].
+unfold mat_list_list_el.
+cbn - [ iter_seq Nat.pow ].
+remember (upper_left_mat_in_list_list 0%F [M1; M2]) as M5 eqn:HM5.
+rewrite HM1, HM2 in HM5; cbn in HM5; subst M5.
+remember (upper_left_mat_in_list_list 0%F [M3; M4]) as M5 eqn:HM5.
+rewrite HM3, HM4 in HM5; cbn in HM5; subst M5.
+rewrite mA_nrows, mA_ncols.
+remember (length M1) as len eqn:Hlen.
+rewrite HM1 in Hlen; cbn in Hlen; subst len.
+remember (length M3) as len eqn:Hlen.
+rewrite HM3 in Hlen; cbn in Hlen; subst len.
+cbn - [ iter_seq Nat.pow ].
+rewrite mA_nrows, mA_ncols.
+apply vector_eq; [ easy | ].
+cbn - [ iter_seq Nat.pow ].
+intros k Hk.
+...
+*)
 unfold mat_of_mat_list_list.
 cbn - [ iter_seq Nat.pow ].
 rewrite mA_nrows, mA_ncols, Nat.mul_1_r.
@@ -457,7 +485,25 @@ cbn - [ iter_seq Nat.pow ].
 rewrite srng_summation_split_first; [ | easy | flia ].
 cbn - [ iter_seq Nat.pow ].
 rewrite srng_mul_1_r.
+erewrite srng_summation_eq_compat. 2: {
+  intros k Hk.
+  destruct (Nat.eq_dec k 0) as [Hkz| Hkz]; [ flia Hk Hkz | ].
+  rewrite srng_mul_0_r, srng_add_0_r.
+  easy.
+}
+cbn - [ iter_seq Nat.pow ].
+destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
+  rewrite Nat.div_small; [ | easy ].
+  rewrite Nat.mod_small; [ | easy ].
+  cbn - [ iter_seq Nat.pow ].
 ...
+rewrite (all_0_srng_summation_0 _ 1). 2: {
+  intros k Hk.
+  destruct k; [ easy | ].
+  cbn.
+  rewrite srng_mul_0_r.
+}
+
 rewrite (all_0_srng_summation_0 _ 1). 2: {
   intros k Hk.
   destruct k; [ easy | ].
