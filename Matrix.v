@@ -771,15 +771,59 @@ Notation "A · V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
 (* multiplication left and right with identity *)
 
 Theorem mat_mul_1_l : ∀ M n,
-  n = mat_ncols M
+  is_square_mat M
+  → n = mat_ncols M
   → (mI n * M)%M = M.
 Proof.
-...
+intros * Hsm Hn.
+apply matrix_eq; [ cbn; congruence | easy | ].
+cbn - [ iter_seq ].
+rewrite <- Hn.
+intros * Hi Hj.
+rewrite (srng_summation_split _ i); [ | flia Hi ].
+rewrite srng_summation_split_last; [ | flia ].
+destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
+rewrite srng_mul_1_l.
+rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+  intros k Hk.
+  destruct (Nat.eq_dec i (k - 1)) as [H| H]; [ flia H Hk | ].
+  apply srng_mul_0_l.
+}
+rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+  intros k Hk.
+  destruct (Nat.eq_dec i k) as [H| H]; [ flia H Hk | ].
+  apply srng_mul_0_l.
+}
+now rewrite srng_add_0_l, srng_add_0_r.
+Qed.
 
 Theorem mat_mul_1_r : ∀ M n,
-  n = mat_ncols M
+  is_square_mat M
+  → n = mat_nrows M
   → (M * mI n)%M = M.
-...
+Proof.
+intros * Hsm Hn.
+apply matrix_eq; [ easy | cbn; congruence | ].
+cbn - [ iter_seq ].
+unfold is_square_mat in Hsm.
+rewrite <- Hsm, <- Hn.
+intros * Hi Hj.
+rewrite (srng_summation_split _ j); [ | flia Hj ].
+rewrite srng_summation_split_last; [ | flia ].
+destruct (Nat.eq_dec j j) as [H| H]; [ clear H | easy ].
+rewrite srng_mul_1_r.
+rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+  intros k Hk.
+  destruct (Nat.eq_dec (k - 1) j) as [H| H]; [ flia H Hk | ].
+  apply srng_mul_0_r.
+}
+rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+  intros k Hk.
+  destruct (Nat.eq_dec k j) as [H| H]; [ flia H Hk | ].
+  apply srng_mul_0_r.
+}
+now rewrite srng_add_0_l, srng_add_0_r.
+Qed.
 
 (* associativity of multiplication *)
 
@@ -993,6 +1037,7 @@ Delimit Scope V_scope with V.
 
 Arguments det_loop {T ro so} M%M n%nat.
 Arguments determinant {T ro so} M%M.
+Arguments is_square_mat {T} M%M.
 Arguments mat_mul_scal_l {T so} _ M%M.
 Arguments mat_mul_vect_r {T so} M%M V%V.
 Arguments mat_nrows {T} m%M.
@@ -1001,10 +1046,6 @@ Arguments mat_sub {T ro so} MA%M MB%M.
 Arguments mI {T so} n%nat.
 Arguments mZ {T so} n%nat.
 Arguments minus_one_pow {T ro so}.
-(*
-Arguments squ_mat_one {T so}.
-Arguments squ_mat_zero {T so}.
-*)
 Arguments squ_mat_semiring_op {T so}.
 Arguments subm {T} M%M i%nat j%nat.
 Arguments vect_add {T so} U%V V%V.

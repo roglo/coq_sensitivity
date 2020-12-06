@@ -81,7 +81,7 @@ induction n; [ easy | cbn ].
 now rewrite IHn, Nat.mul_comm; cbn.
 Qed.
 
-Theorem mA_is_square_mat : ∀ n, is_square_mat (mA n).
+Theorem mA_is_square : ∀ n, is_square_mat (mA n).
 Proof.
 intros.
 unfold is_square_mat.
@@ -518,7 +518,7 @@ rewrite HV.
 rewrite mat_vect_mul_assoc; [ | easy | easy ].
 cbn - [ iter_seq Nat.pow ].
 rewrite m_o_mll_2x2_2x1; cycle 1. {
-  apply mA_is_square_mat.
+  apply mA_is_square.
 } {
   apply mA_ncols.
 } {
@@ -531,14 +531,12 @@ rewrite m_o_mll_2x2_2x1; cycle 1. {
 rewrite mat_mul_add_distr_l; [ | easy ].
 rewrite lemma_2_A_n_2_eq_n_I.
 rewrite mat_mul_add_distr_l; [ | easy ].
-Search (_ * (_ × _))%M.
-Search ((_ × _) * _)%M.
-Search (_ × (_ * _))%M.
-Search (_ + _ = _)%M.
+specialize (mA_is_square n) as Hasm.
+rewrite mat_mul_1_l; [ | easy | easy | easy ].
+rewrite mat_mul_1_l; [ | easy | easy | now rewrite mA_ncols ].
+rewrite mat_mul_1_l; [ | easy | | easy ]. 2: {
+Search (is_square_mat (_ × _)).
 ...
-rewrite mat_mul_1_l; [ | easy ].
-rewrite mat_mul_1_l; [ | symmetry; apply mA_ncols ].
-rewrite mat_mul_1_l; [ | easy ].
 rewrite mat_mul_1_r; [ | symmetry; apply mA_ncols ].
 ...
 Check mat_add_assoc.
