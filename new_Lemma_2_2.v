@@ -63,11 +63,7 @@ Fixpoint mA n : matrix T :=
          [squ_mat_one (2 ^ n'); (- mA n')%M]]
   end.
 
-Definition rng_mul_nat_l n v :=
-  match n with
-  | 0 => 0%Srng
-  | S n' => (Σ (_ = 0, n'), v)%Srng
-  end.
+Definition srng_of_nat n := (Σ (i = 1, n), 1)%Srng.
 
 (* *)
 
@@ -95,7 +91,7 @@ Qed.
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
-  (mA n * mA n)%M = (rng_mul_nat_l n 1%F × squ_mat_one (2 ^ n))%M.
+  (mA n * mA n)%M = (srng_of_nat n × squ_mat_one (2 ^ n))%M.
 Proof.
 intros.
 apply matrix_eq; [ apply mA_nrows | apply mA_ncols | ].
@@ -178,6 +174,7 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
       do 2 rewrite srng_mul_1_r.
       destruct n; [ easy | ].
       cbn - [ iter_seq ].
+      unfold srng_of_nat.
       rewrite srng_summation_split_last; [ | flia ].
       now rewrite srng_summation_succ_succ.
     } {
@@ -360,14 +357,11 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
       remember (i - 2 ^ n) as j eqn:Hj.
       destruct (Nat.eq_dec j j) as [H| H]; [ clear H | easy ].
       subst j.
-      rewrite srng_add_comm.
-      rewrite srng_summation_split_last; [ | flia ].
       do 2 rewrite srng_mul_1_r.
-      f_equal.
-      destruct n; [ easy | ].
-      cbn - [ iter_seq ].
-      symmetry.
-      apply srng_summation_succ_succ.
+      rewrite srng_add_comm.
+      unfold srng_of_nat; symmetry.
+      rewrite srng_summation_split_last; [ | flia ].
+      now rewrite srng_summation_succ_succ.
     } {
       destruct (Nat.eq_dec (i - 2 ^ n) (k - 2 ^ n)) as [Hi2k| Hi2k]. {
         flia Hik Hi2k Hi2n Hk2n.
@@ -380,12 +374,6 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
 Qed.
 
 (*
-Fixpoint srng_of_nat n :=
-  match n with
-  | 0 => 0%Srng
-  | S n' => (1 + srng_of_nat n')%Srng
-  end.
-
 Print mat_nat_mul_l.
 Print rng_mul_nat_l.
 *)
@@ -409,7 +397,7 @@ Definition A_n_eigenvector_of_sqrt_n n μ V :=
   | 0 => base_vector_1 0
   | S n' =>
       (mat_of_mat_list_list 0%F
-         [[(mA n' + μ × squ_mat_one (2 ^ n))%M]; [squ_mat_one (2 ^ n)]]
+         [[(mA n' + μ × squ_mat_one (2 ^ n'))%M]; [squ_mat_one (2 ^ n')]]
        · V)%V
   end.
 
@@ -515,7 +503,7 @@ destruct (lt_dec i (mat_nrows M1)) as [Hir1| Hir1]. {
 Qed.
 
 Theorem A_n_eigen_formula : ∀ n μ V,
-  (μ * μ)%Rng = rng_mul_nat_l n 1%Srng
+  (μ * μ)%Rng = srng_of_nat n
   → V = A_n_eigenvector_of_sqrt_n n μ (base_vector_1 (2 ^ n))
   → (mA n · V = μ × V)%V.
 Proof.
@@ -542,6 +530,10 @@ rewrite m_o_mll_2x2_2x1; cycle 1. {
 }
 rewrite mat_mul_add_distr_l; [ | easy ].
 rewrite lemma_2_A_n_2_eq_n_I.
+Search (_ * (_ × _))%M.
+Search ((_ × _) * _)%M.
+Search (_ × (_ * _))%M.
+Search squ_mat_one.
 ...
 (*
 remember [mA n; squ_mat_one (2 ^ n)] as M1 eqn:HM1.
