@@ -449,10 +449,28 @@ erewrite (srng_summation_eq_compat _ _ _ (mat_ncols M1 + 1)). 2: {
   easy.
 }
 cbn - [ iter_seq ].
+rewrite Nat.add_0_r.
 destruct (lt_dec i (mat_nrows M1)) as [Hir1| Hir1]. {
   rewrite Nat.div_small; [ | easy ].
   rewrite Nat.mod_small; [ | easy ].
   cbn - [ iter_seq ].
+  destruct (lt_dec (mat_nrows M1) (mat_nrows M5)) as [Hr15| Hr15]. {
+    rewrite Nat.div_small; [ | now rewrite <- Hsm1 ].
+    rewrite Nat.mod_small; [ | now rewrite <- Hsm1 ].
+    erewrite srng_summation_eq_compat. 2: {
+      intros k Hk.
+      rewrite Nat.div_small; [ | flia Hr15 Hk Hsm1 ].
+      rewrite Nat.mod_small; [ | flia Hr15 Hk Hsm1 ].
+      easy.
+    }
+    cbn - [ iter_seq ].
+    rewrite <- srng_add_assoc.
+    f_equal. {
+      rewrite srng_summation_shift; [ | flia Hsm1 Hir1 ].
+      apply srng_summation_eq_compat.
+      intros k Hk.
+      now rewrite Nat.add_comm, Nat.add_sub.
+    }
 ...
 
 Theorem A_n_eigen_formula : ∀ n μ V,
