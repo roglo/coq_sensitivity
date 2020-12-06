@@ -545,6 +545,24 @@ rewrite m_o_mll_2x2_2x1; cycle 1. {
 }
 rewrite mat_mul_add_distr_l; [ | easy ].
 rewrite lemma_2_A_n_2_eq_n_I.
+Print mat_nat_mul_l.
+Print rng_mul_nat_l.
+Print mat_mul_scal_l.
+...
+mat_nat_mul_l = 
+λ (n : nat) (M : matrix T),
+  {|
+  mat_el := λ i j : nat, rng_mul_nat_l n (mat_el M i j);
+  mat_nrows := mat_nrows M;
+  mat_ncols := mat_ncols M |}
+     : nat → matrix T → matrix T
+mat_mul_scal_l = 
+λ (T : Type) (so : semiring_op T) (μ : T) (M : matrix T),
+  {|
+  mat_el := λ i j : nat, (μ * mat_el M i j)%F;
+  mat_nrows := mat_nrows M;
+  mat_ncols := mat_ncols M |}
+     : ∀ T : Type, semiring_op T → T → matrix T → matrix T
 ...
 (*
 remember [mA n; squ_mat_one (2 ^ n)] as M1 eqn:HM1.
