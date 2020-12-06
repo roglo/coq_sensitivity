@@ -442,6 +442,17 @@ assert (H : mat_ncols M1 ≠ 0). {
 }
 rewrite Nat.div_same; [ | easy ].
 rewrite Nat.mod_same; [ clear H | easy ].
+erewrite (srng_summation_eq_compat _ _ _ (mat_ncols M1 + 1)). 2: {
+  intros k Hk.
+  rewrite (Nat_div_less_small 1); [ | flia Hk ].
+  rewrite (@Nat_mod_less_small 1 k); [ | flia Hk ].
+  easy.
+}
+cbn - [ iter_seq ].
+destruct (lt_dec i (mat_nrows M1)) as [Hir1| Hir1]. {
+  rewrite Nat.div_small; [ | easy ].
+  rewrite Nat.mod_small; [ | easy ].
+  cbn - [ iter_seq ].
 ...
 
 Theorem A_n_eigen_formula : ∀ n μ V,
