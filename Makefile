@@ -1,4 +1,4 @@
-TARGET=new_Lemma_2_2.vo
+TARGET=Qfield2.vo Zring.vo new_Lemma_2_2.vo
 FILESFORDEP=`LC_ALL=C ls *.v`
 
 all: pa_coq.cmo $(TARGET)

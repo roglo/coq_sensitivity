@@ -22,13 +22,14 @@ Definition Q_semiring_prop :=
      srng_add_comm := Q.add_comm;
      srng_add_assoc := Q.add_assoc;
      srng_add_0_l := Q.add_0_l;
-(*
-     srng_mul_comm := Q.mul_comm;
-*)
      srng_mul_assoc := Q.mul_assoc;
      srng_mul_1_l := Q.mul_1_l;
      srng_mul_add_distr_l := Q.mul_add_distr_l;
-     srng_mul_0_l := Q.mul_0_l |}.
+     srng_mul_0_l := Q.mul_0_l;
+     srng_c_mul_comm := Q.mul_comm;
+     srng_nc_mul_1_r := I;
+     srng_nc_mul_0_r := I;
+     srng_nc_mul_add_distr_r := I |}.
 
 Definition Q_ring_prop := {| rng_add_opp_l := Q.add_opp_diag_l |}.
 
