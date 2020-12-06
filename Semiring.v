@@ -165,30 +165,6 @@ intros x; unfold rng_sub; rewrite srng_add_comm.
 apply rng_add_opp_l.
 Qed.
 
-Theorem srng_mul_0_l : ∀ a, (0 * a = 0)%Srng.
-Proof.
-intros.
-replace (0 * a)%Srng with ((0 - 0) * a)%Rng by now rewrite rng_add_opp_r.
-unfold rng_sub.
-rewrite srng_mul_add_distr_r.
-...
-Search (- 0)%Rng.
-Search (- _ * _)%Rng.
-...
-
-Theorem srng_mul_0_r : ∀ a, (a * 0 = 0)%Srng.
-Proof.
-intros a; simpl.
-specialize srng_c_mul_comm as srng_mul_comm.
-specialize srng_nc_mul_0_r as srng_mul_0_r.
-destruct srng_is_comm. {
-...
-  now rewrite srng_mul_comm, srng_mul_0_l.
-} {
-  apply srng_mul_0_r.
-}
-Qed.
-
 Theorem rng_add_sub : ∀ a b, (a + b - b = a)%Rng.
 Proof.
 intros.
@@ -213,6 +189,53 @@ apply rng_add_reg_r with (c := c).
 rewrite srng_add_comm; symmetry.
 now rewrite srng_add_comm; symmetry.
 Qed.
+
+Theorem srng_mul_0_l : ∀ a, (0 * a = 0)%Srng.
+Proof.
+intros.
+assert (H : (0 * a + a = a)%Srng). {
+  transitivity ((0 * a + 1 * a)%Rng). {
+    now rewrite srng_mul_1_l.
+  }
+  rewrite <- srng_mul_add_distr_r.
+  now rewrite srng_add_0_l, srng_mul_1_l.
+}
+apply rng_add_reg_r with (c := a).
+now rewrite srng_add_0_l.
+Qed.
+
+(* bizarre, j'ai pas eu besoin de la commutativité de la
+   multiplication *)
+
+...
+
+intros.
+specialize srng_nc_mul_0_l as srng_mul_0_l.
+...
+
+destruct srng_is_comm. {
+replace (0 * a)%Srng with ((a - a) * a)%Rng by now rewrite rng_add_opp_r.
+unfold rng_sub.
+rewrite srng_mul_add_distr_r.
+Search (- _ * _)%Rng.
+rewrite rng_opp_0.
+Search (- _ * _)%Rng.
+...
+
+Theorem srng_mul_0_r : ∀ a, (a * 0 = 0)%Srng.
+Proof.
+intros a; simpl.
+specialize srng_c_mul_comm as srng_mul_comm.
+specialize srng_nc_mul_0_r as srng_mul_0_r.
+destruct srng_is_comm. {
+...
+  now rewrite srng_mul_comm, srng_mul_0_l.
+} {
+  apply srng_mul_0_r.
+}
+Qed.
+
+...
 
 Theorem rng_mul_0_l : ∀ a, (0 * a = 0)%Rng.
 Proof.
