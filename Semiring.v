@@ -194,11 +194,10 @@ Check @rngl_add_sub.
 Arguments rngl_add_opp_r {T ro rp Hro} x%F.
 *)
 
-...
-
 Theorem rngl_add_reg_r : ∀ a b c, (a + c = b + c)%F → (a = b)%F.
 Proof.
 intros a b c Habc; simpl in Habc; simpl.
+...
 eapply rngl_sub_compat_l with (c := c) in Habc.
 now do 2 rewrite rngl_add_sub in Habc.
 Qed.
