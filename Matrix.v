@@ -762,7 +762,51 @@ Canonical Structure squ_mat_ring_like_op n : ring_like_op (square_matrix n) :=
 Theorem squ_mat_add_comm : ∀ n (MA MB : square_matrix n),
   squ_mat_add MA MB = squ_mat_add MB MA.
 Proof.
-...
+intros.
+apply eq_exist_uncurried.
+destruct MA as (A, Ha).
+destruct MB as (B, Hb); cbn.
+assert (p : (A + B)%M = (B + A)%M). {
+  apply Bool.andb_true_iff in Ha.
+  apply Bool.andb_true_iff in Hb.
+  destruct Ha as (Hra, Hca).
+  destruct Hb as (Hrb, Hcb).
+  apply Nat.eqb_eq in Hra.
+  apply Nat.eqb_eq in Hca.
+  apply Nat.eqb_eq in Hrb.
+  apply Nat.eqb_eq in Hcb.
+  apply mat_add_comm; congruence.
+}
+exists p.
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+Qed.
+
+Theorem squ_mat_add_assoc : ∀ n (MA MB MC : square_matrix n),
+  squ_mat_add MA (squ_mat_add MB MC) = squ_mat_add (squ_mat_add MA MB) MC.
+Proof.
+intros.
+apply eq_exist_uncurried.
+destruct MA as (A, Ha).
+destruct MB as (B, Hb).
+destruct MC as (C, Hc); cbn.
+assert (p : (A + (B + C))%M = (A + B + C)%M). {
+  apply Bool.andb_true_iff in Ha.
+  apply Bool.andb_true_iff in Hb.
+  apply Bool.andb_true_iff in Hc.
+  destruct Ha as (Hra, Hca).
+  destruct Hb as (Hrb, Hcb).
+  destruct Hc as (Hrc, Hcc).
+  apply Nat.eqb_eq in Hra.
+  apply Nat.eqb_eq in Hca.
+  apply Nat.eqb_eq in Hrb.
+  apply Nat.eqb_eq in Hcb.
+  apply Nat.eqb_eq in Hrc.
+  apply Nat.eqb_eq in Hcc.
+  apply mat_add_assoc; congruence.
+}
+exists p.
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+Qed.
 
 Definition squ_mat_ring_like_prop (n : nat)
     (rom : ring_like_op (square_matrix n)) :
@@ -771,7 +815,7 @@ Definition squ_mat_ring_like_prop (n : nat)
      rngl_has_opp := true;
      rngl_has_inv := false;
      rngl_add_comm := @squ_mat_add_comm n;
-     rngl_add_assoc := ?rngl_add_assoc;
+     rngl_add_assoc := @squ_mat_add_assoc n;
      rngl_add_0_l := ?rngl_add_0_l;
      rngl_mul_assoc := ?rngl_mul_assoc;
      rngl_mul_1_l := ?rngl_mul_1_l;
