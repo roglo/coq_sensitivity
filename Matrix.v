@@ -73,16 +73,16 @@ Definition mat_add {ro : ring_like_op T} (MA MB : matrix T) :=
      mat_nrows := mat_nrows MA;
      mat_ncols := mat_ncols MA |}.
 
-Definition Nat_opp (x : nat) := 0.
-Definition Nat_inv (x : nat) := 0.
+Definition phony_Nat_opp (x : nat) := 0.
+Definition phony_Nat_inv (x : nat) := 0.
 
 Definition nat_ring_like_op : ring_like_op nat :=
   {| rngl_zero := 0;
      rngl_one := 1;
      rngl_add := Nat.add;
      rngl_mul := Nat.mul;
-     rngl_opp := Nat_opp;
-     rngl_inv := Nat_inv |}.
+     rngl_opp := phony_Nat_opp;
+     rngl_inv := phony_Nat_inv |}.
 
 Canonical Structure nat_ring_like_op.
 
