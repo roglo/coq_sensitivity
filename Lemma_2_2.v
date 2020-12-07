@@ -537,11 +537,14 @@ rewrite mat_mul_1_l; [ | easy | easy | now rewrite mA_ncols ].
 rewrite mat_mul_1_l; [ | easy | easy | easy ].
 rewrite mat_mul_1_r; [ | easy | easy | now cbn; rewrite mA_nrows ].
 rewrite (mat_add_add_swap (mA n)).
-...
 rewrite mat_fold_sub.
-Theorem mat_add_opp_r : ∀ M, (M - M = mZ (mat_nrows M))%M.
-...
-rewrite mat_add_opp_r.
+rewrite mat_add_opp_r with (n0 := 2 ^ n); [ | easy | | ]; cycle 1. {
+  apply mA_is_square.
+} {
+  symmetry; apply mA_nrows.
+}
+rewrite mA_nrows.
+Search mZ.
 ...
 
 (* here, I would like to prove that, knowing that An^2 = nI, the

@@ -301,6 +301,7 @@ Qed.
 
 End ring_like_theorems.
 
+Arguments rngl_add_opp_l {T}%type_scope {ro rp} Hro.
 Arguments rngl_add_opp_r {T}%type_scope {ro rp} Hro.
 Arguments rngl_add_reg_l {T}%type_scope {ro rp} Hro.
 Arguments rngl_add_sub {T}%type_scope {ro rp} Hro.

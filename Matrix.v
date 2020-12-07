@@ -360,6 +360,32 @@ Theorem mat_mul_scal_l_is_square : ∀ a M,
   → is_square_mat (a × M).
 Proof. intros. easy. Qed.
 
+(* addition left and right with opposite *)
+
+Theorem mat_add_opp_l : ∀ M n,
+  is_square_mat M
+  → n = mat_nrows M
+  → (- M + M = mZ (mat_nrows M))%M.
+Proof.
+intros * Hsm Hn.
+apply matrix_eq; [ easy | cbn; congruence | ].
+cbn; rewrite <- Hn.
+intros * Hi Hj.
+now apply rngl_add_opp_l.
+Qed.
+
+Theorem mat_add_opp_r : ∀ M n,
+  is_square_mat M
+  → n = mat_nrows M
+  → (M - M = mZ (mat_nrows M))%M.
+Proof.
+intros * Hsm Hn.
+apply matrix_eq; [ easy | cbn; congruence | ].
+cbn; rewrite <- Hn.
+intros * Hi Hj.
+now apply rngl_add_opp_r.
+Qed.
+
 (* multiplication left and right with identity *)
 
 Theorem mat_mul_1_l : ∀ M n,
@@ -643,10 +669,11 @@ Delimit Scope V_scope with V.
 Arguments det_loop {T ro} M%M n%nat.
 Arguments determinant {T ro} M%M.
 Arguments is_square_mat {T} M%M.
+Arguments mat_add_opp_r {T}%type {ro rp} Hro M%M n%nat.
 Arguments mat_mul_scal_l {T ro} _ M%M.
 Arguments mat_mul_vect_r {T ro} M%M V%V.
-Arguments mat_mul_1_l {T}%type_scope {ro rp} Hro M%M n%nat_scope.
-Arguments mat_mul_1_r {T}%type_scope {ro rp} Hro M%M n%nat_scope.
+Arguments mat_mul_1_l {T}%type {ro rp} Hro M%M n%nat.
+Arguments mat_mul_1_r {T}%type {ro rp} Hro M%M n%nat.
 Arguments mat_nrows {T} m%M.
 Arguments mat_ncols {T} m%M.
 Arguments mat_sub {T ro} MA%M MB%M.
