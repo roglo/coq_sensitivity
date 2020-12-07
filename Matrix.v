@@ -832,7 +832,7 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn - [ iter_seq ].
 symmetry.
-now apply rngl_mul_summation_distr_r with (rp0 := rp).
+now apply rngl_mul_summation_distr_r.
 Qed.
 
 (* left distributivity of multiplication over addition *)
@@ -875,7 +875,7 @@ erewrite rngl_summation_eq_compat. 2: {
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
-  now rewrite rngl_mul_summation_distr_r with (rp0 := rp).
+  now rewrite rngl_mul_summation_distr_r.
 }
 symmetry.
 cbn - [ iter_seq ].
