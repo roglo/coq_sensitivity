@@ -434,3 +434,5 @@ now rewrite <- fold_left_add_seq_add, Nat.add_0_l.
 Qed.
 
 End in_ring.
+
+Arguments rngl_mul_summation_distr_l {T ro rp} Hro a b e f.

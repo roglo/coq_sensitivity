@@ -267,7 +267,7 @@ unfold determinant; cbn.
 remember (mat_ncols A) as c eqn:Hc; symmetry in Hc.
 destruct c; [ easy | clear Hcz ].
 cbn - [ iter_seq ].
-rewrite rngl_mul_summation_distr_l with (rp0 := rp); [ | easy ].
+rewrite rngl_mul_summation_distr_l; [ | easy ].
 apply rngl_summation_eq_compat.
 intros j Hj.
 Abort. (*
@@ -820,7 +820,7 @@ remember (mat_ncols MB) as cb eqn:Hcb.
 move cb before ca.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
-  now apply rngl_mul_summation_distr_l with (rp0 := rp).
+  now apply rngl_mul_summation_distr_l.
 }
 cbn - [ iter_seq ].
 rewrite rngl_summation_summation_exch'; [ | easy ].
@@ -870,7 +870,7 @@ Proof.
 intros * Hi.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
-  now rewrite rngl_mul_summation_distr_l with (rp0 := rp).
+  now rewrite rngl_mul_summation_distr_l.
 }
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
