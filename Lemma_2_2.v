@@ -12,7 +12,7 @@ Import List List.ListNotations.
 
 Require Import Misc Matrix.
 Require Import RingLike.
-Require Import SRsummation SRproduct.
+Require Import RLsummation RLproduct.
 Import matrix_Notations.
 
 Section in_ring.

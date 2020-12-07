@@ -1,4 +1,4 @@
-(* products on a semiring *)
+(* products on a ring-like (semiring, ring, field) *)
 
 Set Nested Proofs Allowed.
 
