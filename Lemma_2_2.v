@@ -503,6 +503,13 @@ destruct (lt_dec i (mat_nrows M1)) as [Hir1| Hir1]. {
 }
 Qed.
 
+Theorem m_o_mll_2x1_mul_scal_l : ∀ d a MA MB,
+ (mat_of_mat_list_list d [[a × MA]%M; [a × MB]%M] =
+  a × mat_of_mat_list_list d [[MA]; [MB]])%M.
+Proof.
+intros.
+...
+
 Theorem A_n_eigen_formula : ∀ n μ V,
   (μ * μ)%F = rngl_of_nat n
   → V = A_n_eigenvector_of_sqrt_n n μ (base_vector_1 (2 ^ n))
@@ -569,6 +576,9 @@ rewrite <- Hμ.
 rewrite <- mat_mul_scal_l_mul_assoc; [ | easy ].
 rewrite mat_mul_mul_scal_l; [ | easy | easy ].
 rewrite <- mat_mul_scal_add_distr_l; [ | easy ].
+Search mat_of_mat_list_list.
+...
+rewrite glop.
 ...
 
 (* here, I would like to prove that, knowing that An^2 = nI, the
