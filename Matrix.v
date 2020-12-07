@@ -666,14 +666,6 @@ Definition squ_mat_ring_like_op n : ring_like_op (matrix T) :=
      rngl_opp := mat_opp;
      rngl_inv := phony_mat_inv |}.
 
-End in_ring.
-
-Section in_ring.
-
-Context {T : Type}.
-Context (ro : ring_like_op T).
-Context {rp : ring_like_prop T}.
-
 Arguments det_loop {T ro} M n%nat.
 Arguments determinant {T ro} M.
 
