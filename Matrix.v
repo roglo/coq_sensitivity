@@ -524,6 +524,18 @@ cbn - [ iter_seq ].
 now apply rngl_summation_add_distr.
 Qed.
 
+(* left distributivity of multiplication by scalar over addition *)
+
+Theorem mat_mul_scal_l_add_distr_r : ∀ a b M,
+  (a × M + b × M = (a + b)%F × M)%M.
+Proof.
+intros.
+apply matrix_eq; [ easy | easy | ].
+intros * Hi Hj; cbn.
+symmetry.
+apply rngl_mul_add_distr_r.
+Qed.
+
 (* associativity with multiplication with vector *)
 
 Theorem mat_vect_mul_assoc_as_sums : ∀ A B V i,
