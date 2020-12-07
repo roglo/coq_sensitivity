@@ -545,13 +545,23 @@ Qed.
 (* left distributivity of multiplication by scalar over addition *)
 
 Theorem mat_mul_scal_l_add_distr_r : ∀ a b M,
-  (a × M + b × M = (a + b)%F × M)%M.
+  ((a + b)%F × M)%M = (a × M + b × M)%M.
 Proof.
 intros.
 apply matrix_eq; [ easy | easy | ].
 intros * Hi Hj; cbn.
-symmetry.
 apply rngl_mul_add_distr_r.
+Qed.
+
+(* associativity of multiplication by scalar *)
+
+Theorem mat_mul_scal_l_mul_distr_l : ∀ a b M,
+  (a × (b × M))%M = ((a * b)%F × M)%M.
+Proof.
+intros.
+apply matrix_eq; [ easy | easy | ].
+intros * Hi Hj; cbn.
+apply rngl_mul_assoc.
 Qed.
 
 (* associativity with multiplication with vector *)

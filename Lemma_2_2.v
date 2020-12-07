@@ -557,7 +557,7 @@ replace x with (1%F × x)%M in Hy. 2: {
   apply rngl_mul_1_l.
 }
 subst x.
-rewrite mat_mul_scal_l_add_distr_r in Hy; [ | easy ].
+rewrite <- mat_mul_scal_l_add_distr_r in Hy; [ | easy ].
 replace (rngl_of_nat n + 1)%F with (rngl_of_nat (S n)) in Hy. 2: {
   unfold rngl_of_nat.
   rewrite rngl_summation_split_last; [ | flia ].
@@ -565,6 +565,7 @@ replace (rngl_of_nat n + 1)%F with (rngl_of_nat (S n)) in Hy. 2: {
 }
 subst y.
 rewrite <- Hμ.
+rewrite <- mat_mul_scal_l_mul_distr_l; [ | easy ].
 ...
 
 (* here, I would like to prove that, knowing that An^2 = nI, the
