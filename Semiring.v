@@ -3,7 +3,19 @@
 (* Allows to define semirings, rings, fields, commutative or not,
    with two classes:
      ring_like_op, holding the operations, and
-     ring_like_prop, holding their properties *)
+     ring_like_prop, holding their properties.
+   In class ring_like_prop, we can set,
+     to make a semiring:
+        rngl_has_opp = false
+        rngl_has_inv = false
+     to make a ring:
+        rngl_has_opp = true
+        rngl_has_inv = false
+     to make a field:
+        rngl_has_opp = true
+        rngl_has_inv = true
+   They can be commutative or not by setting rngl_is_comm to true or false.
+ *)
 
 Require Import Utf8.
 
