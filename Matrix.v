@@ -353,6 +353,42 @@ Notation "A · V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
 Theorem mat_fold_sub : ∀ MA MB, (MA + - MB = MA - MB)%M.
 Proof. easy. Qed.
 
+(* commutativity of addition *)
+
+Theorem mat_add_comm : ∀ MA MB,
+  is_square_mat MA
+  → is_square_mat MB
+  → mat_nrows MA = mat_ncols MB
+  → (MA + MB = MB + MA)%M.
+Proof.
+intros * Ha Hb Hab.
+apply matrix_eq; [ | | cbn ]. {
+  unfold mat_add; cbn; congruence.
+} {
+  unfold mat_add; cbn; congruence.
+}
+intros * Hi Hj.
+apply rngl_add_comm.
+Qed.
+
+(* associativity of addition *)
+
+Theorem mat_add_add_swap : ∀ MA MB MC, (MA + MB + MC = MA + MC + MB)%M.
+Proof.
+intros.
+apply matrix_eq; [ easy | easy | cbn ].
+intros i j Hi Hj.
+apply rngl_add_add_swap.
+Qed.
+
+Theorem mat_add_assoc : ∀ MA MB MC, (MA + (MB + MC) = (MA + MB) + MC)%M.
+Proof.
+intros.
+apply matrix_eq; [ easy | easy | cbn ].
+intros i j Hi Hj.
+apply rngl_add_assoc.
+Qed.
+
 (* addition to zero *)
 
 Theorem mat_add_0_l : ∀ M n,
@@ -454,24 +490,6 @@ rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
   now apply rngl_mul_0_r.
 }
 now rewrite rngl_add_0_l, rngl_add_0_r.
-Qed.
-
-(* associativity of addition *)
-
-Theorem mat_add_add_swap : ∀ MA MB MC, (MA + MB + MC = MA + MC + MB)%M.
-Proof.
-intros.
-apply matrix_eq; [ easy | easy | cbn ].
-intros i j Hi Hj.
-apply rngl_add_add_swap.
-Qed.
-
-Theorem mat_add_assoc : ∀ MA MB MC, (MA + (MB + MC) = (MA + MB) + MC)%M.
-Proof.
-intros.
-apply matrix_eq; [ easy | easy | cbn ].
-intros i j Hi Hj.
-apply rngl_add_assoc.
 Qed.
 
 (* associativity of multiplication *)
@@ -658,13 +676,42 @@ Qed.
 
 Definition phony_mat_inv (M : matrix T) := M.
 
-Definition squ_mat_ring_like_op n : ring_like_op (matrix T) :=
+Canonical Structure squ_mat_ring_like_op n : ring_like_op (matrix T) :=
   {| rngl_zero := mZ n;
      rngl_one := mI n;
      rngl_add := mat_add;
      rngl_mul := mat_mul;
      rngl_opp := mat_opp;
      rngl_inv := phony_mat_inv |}.
+
+Existing Instance squ_mat_ring_like_op.
+
+Theorem glop : ∀ (n : nat) (M : matrix T), mat_nrows M = mat_ncols M.
+Proof.
+intros.
+specialize (squ_mat_ring_like_op n) as H.
+...
+
+Definition squ_mat_ring_like_prop (n : nat) (rom : ring_like_op (matrix T)) :
+    ring_like_prop (matrix T) :=
+  {| rngl_is_comm := false;
+     rngl_has_opp := true;
+     rngl_has_inv := false;
+     rngl_add_comm MA MB := mat_add_comm MA MB 42;
+     rngl_add_assoc := ?rngl_add_assoc;
+     rngl_add_0_l := ?rngl_add_0_l;
+     rngl_mul_assoc := ?rngl_mul_assoc;
+     rngl_mul_1_l := ?rngl_mul_1_l;
+     rngl_mul_add_distr_l := ?rngl_mul_add_distr_l;
+     rngl_c_mul_comm := ?rngl_c_mul_comm;
+     rngl_nc_mul_1_r := ?rngl_nc_mul_1_r;
+     rngl_nc_mul_add_distr_r := ?rngl_nc_mul_add_distr_r;
+     rngl_o_add_opp_l := ?rngl_o_add_opp_l;
+     rngl_no_mul_0_l := ?rngl_no_mul_0_l;
+     rngl_no_mul_0_r := ?rngl_no_mul_0_r;
+     rngl_i_mul_inv_l := ?rngl_i_mul_inv_l |}.
+
+...
 
 Arguments det_loop {T ro} M n%nat.
 Arguments determinant {T ro} M.
