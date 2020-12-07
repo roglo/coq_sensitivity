@@ -1,9 +1,3 @@
-BlockMat.vio: BlockMat.v Misc.vio Matrix.vio Semiring.vio SRsummation.vio SRproduct.vio
-BlockMat.vo BlockMat.glob BlockMat.v.beautified BlockMat.required_vo: BlockMat.v Misc.vo Matrix.vo Semiring.vo SRsummation.vo SRproduct.vo
-CharacPolyn.vio: CharacPolyn.v Misc.vio Semiring.vio SRsummation.vio SRproduct.vio SRpolynomial.vio Matrix.vio
-CharacPolyn.vo CharacPolyn.glob CharacPolyn.v.beautified CharacPolyn.required_vo: CharacPolyn.v Misc.vo Semiring.vo SRsummation.vo SRproduct.vo SRpolynomial.vo Matrix.vo
-Field2.vio: Field2.v Semiring.vio
-Field2.vo Field2.glob Field2.v.beautified Field2.required_vo: Field2.v Semiring.vo
 GQ.vio: GQ.v Misc.vio PQ.vio Nat_ggcd.vio
 GQ.vo GQ.glob GQ.v.beautified GQ.required_vo: GQ.v Misc.vo PQ.vo Nat_ggcd.vo
 Lemma_2_2.vio: Lemma_2_2.v Misc.vio Matrix.vio Semiring.vio SRsummation.vio SRproduct.vio Nsring.vio
@@ -22,8 +16,6 @@ Qfield2.vio: Qfield2.v Semiring.vio Rational.vio
 Qfield2.vo Qfield2.glob Qfield2.v.beautified Qfield2.required_vo: Qfield2.v Semiring.vo Rational.vo
 Rational.vio: Rational.v Misc.vio GQ.vio
 Rational.vo Rational.glob Rational.v.beautified Rational.required_vo: Rational.v Misc.vo GQ.vo
-SRpolynomial.vio: SRpolynomial.v Misc.vio Semiring.vio SRsummation.vio SRproduct.vio
-SRpolynomial.vo SRpolynomial.glob SRpolynomial.v.beautified SRpolynomial.required_vo: SRpolynomial.v Misc.vo Semiring.vo SRsummation.vo SRproduct.vo
 SRproduct.vio: SRproduct.v Misc.vio Semiring.vio
 SRproduct.vo SRproduct.glob SRproduct.v.beautified SRproduct.required_vo: SRproduct.v Misc.vo Semiring.vo
 SRsummation.vio: SRsummation.v Misc.vio Semiring.vio
@@ -34,11 +26,3 @@ Sensitivity.vio: Sensitivity.v Misc.vio
 Sensitivity.vo Sensitivity.glob Sensitivity.v.beautified Sensitivity.required_vo: Sensitivity.v Misc.vo
 Zring.vio: Zring.v Semiring.vio
 Zring.vo Zring.glob Zring.v.beautified Zring.required_vo: Zring.v Semiring.vo
-deprecat_Ring2.vio: deprecat_Ring2.v 
-deprecat_Ring2.vo deprecat_Ring2.glob deprecat_Ring2.v.beautified deprecat_Ring2.required_vo: deprecat_Ring2.v 
-deprecat_Rpolynomial2.vio: deprecat_Rpolynomial2.v Misc.vio deprecat_Ring2.vio deprecat_Rsummation.vio
-deprecat_Rpolynomial2.vo deprecat_Rpolynomial2.glob deprecat_Rpolynomial2.v.beautified deprecat_Rpolynomial2.required_vo: deprecat_Rpolynomial2.v Misc.vo deprecat_Ring2.vo deprecat_Rsummation.vo
-deprecat_Rsummation.vio: deprecat_Rsummation.v Misc.vio deprecat_Ring2.vio
-deprecat_Rsummation.vo deprecat_Rsummation.glob deprecat_Rsummation.v.beautified deprecat_Rsummation.required_vo: deprecat_Rsummation.v Misc.vo deprecat_Ring2.vo
-test.vio: test.v Rational.vio Qfield2.vio CharacPolyn.vio SRpolynomial.vio Matrix.vio Lemma_2_2.vio
-test.vo test.glob test.v.beautified test.required_vo: test.v Rational.vo Qfield2.vo CharacPolyn.vo SRpolynomial.vo Matrix.vo Lemma_2_2.vo
