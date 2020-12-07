@@ -26,12 +26,12 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_mul_assoc := Z.mul_assoc;
      rngl_mul_1_l := Z.mul_1_l;
      rngl_mul_add_distr_l := Z.mul_add_distr_l;
-     rngl_mul_0_l := Z.mul_0_l;
      rngl_c_mul_comm := Z.mul_comm;
      rngl_nc_mul_1_r := I;
-     rngl_nc_mul_0_r := I;
      rngl_nc_mul_add_distr_r := I;
      rngl_o_add_opp_l := Z.add_opp_diag_l;
+     rngl_no_mul_0_l := I;
+     rngl_no_mul_0_r := I;
      rngl_i_mul_inv_l := I |}.
 
 Theorem Z_1_neq_0 : 1%Z ≠ 0%Z.

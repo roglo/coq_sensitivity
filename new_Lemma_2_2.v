@@ -96,7 +96,8 @@ intros i k Hi Hk.
 revert i k Hi Hk.
 induction n; intros. {
   cbn.
-  do 2 rewrite rngl_mul_0_l.
+  rewrite rngl_mul_0_l; [ | easy ].
+  rewrite rngl_mul_0_l; [ | easy ].
   apply rngl_add_0_l.
 }
 rewrite (rngl_summation_split _ (2 ^ n - 1)). 2: {
@@ -151,13 +152,13 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
       destruct (Nat.eq_dec i (j - 1 - 2 ^ n)) as [Hij| Hij]. {
         flia Hj Hij.
       }
-      apply rngl_mul_0_l.
+      now apply rngl_mul_0_l.
     }
     rewrite rngl_add_0_l.
     rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
       intros j Hj.
       destruct (Nat.eq_dec i (j - 2 ^ n)) as [Hij| Hij]; [ flia Hj Hij | ].
-      apply rngl_mul_0_l.
+      now apply rngl_mul_0_l.
     }
     rewrite rngl_add_0_r.
     rewrite Nat.add_sub.
@@ -173,7 +174,8 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
       rewrite rngl_summation_split_last; [ | flia ].
       now rewrite rngl_summation_succ_succ.
     } {
-      do 2 rewrite rngl_mul_0_r.
+      rewrite rngl_mul_0_r; [ | easy ].
+      rewrite rngl_mul_0_r; [ | easy ].
       symmetry; apply rngl_add_0_r.
     }
   } {
@@ -200,13 +202,13 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
       destruct (Nat.eq_dec (j - 1) (k - 2 ^ n)) as [Hjk| Hjk]. {
         flia Hj Hjk.
       }
-      apply rngl_mul_0_r.
+      now apply rngl_mul_0_r.
     }
     rewrite rngl_add_0_l.
     rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
       intros j Hj.
       destruct (Nat.eq_dec j (k - 2 ^ n)) as [Hjk| Hjk]; [ flia Hj Hjk | ].
-      apply rngl_mul_0_r.
+      now apply rngl_mul_0_r.
     }
     rewrite rngl_add_0_r.
     remember (k - 2 ^ n) as j eqn:Hj.
@@ -237,7 +239,7 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
     rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
       intros j Hj.
       destruct (Nat.eq_dec i (j - 1)) as [Hij| Hij]; [ flia Hij Hj | ].
-      rewrite rngl_mul_0_l.
+      rewrite rngl_mul_0_l; [ | easy ].
       now apply rngl_opp_0.
     }
     rewrite rngl_add_0_l.
@@ -249,7 +251,7 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
     rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
       intros j Hj.
       destruct (Nat.eq_dec i j) as [Hij| Hij]; [ flia Hj Hij | ].
-      rewrite rngl_mul_0_l.
+      rewrite rngl_mul_0_l; [ | easy ].
       now apply rngl_opp_0.
     }
     symmetry.
@@ -279,13 +281,13 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
     destruct (Nat.eq_dec (i - 2 ^ n) (j - 1)) as [Hij| Hij]. {
       flia Hj Hij.
     }
-    apply rngl_mul_0_l.
+    now apply rngl_mul_0_l.
   }
   rewrite rngl_add_0_l.
   rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
     intros j Hj.
     destruct (Nat.eq_dec (i - 2 ^ n) j) as [Hij| Hij]; [ flia Hj Hij | ].
-    apply rngl_mul_0_l.
+    now apply rngl_mul_0_l.
   }
   rewrite rngl_add_0_r.
   remember (i - 2 ^ n) as j eqn:Hj.
@@ -314,7 +316,7 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
     rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
       intros j Hj.
       destruct (Nat.eq_dec (j - 1) k) as [Hjk| Hjk]; [ flia Hj Hjk | ].
-      apply rngl_mul_0_r.
+      now apply rngl_mul_0_r.
     }
     rewrite rngl_add_0_l.
     destruct (Nat.eq_dec k k) as [H| H]; [ clear H | easy ].
@@ -326,7 +328,7 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
     rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
       intros j Hj.
       destruct (Nat.eq_dec j k) as [Hjk| Hjk]; [ flia Hj Hjk | ].
-      apply rngl_mul_0_r.
+      now apply rngl_mul_0_r.
     }
     symmetry.
     now apply rngl_mul_0_r.
@@ -364,7 +366,8 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
         flia Hik Hi2k Hi2n Hk2n.
       }
       rewrite rngl_add_0_l.
-      now do 2 rewrite rngl_mul_0_r.
+      rewrite rngl_mul_0_r; [ | easy ].
+      now rewrite rngl_mul_0_r.
     }
   }
 }
@@ -512,7 +515,7 @@ destruct n. {
 }
 cbn - [ Nat.pow ] in Hμ, HV.
 rewrite HV.
-rewrite mat_vect_mul_assoc; [ | easy ].
+rewrite mat_vect_mul_assoc with (rp0 := rp); [ | easy ].
 cbn - [ iter_seq Nat.pow ].
 rewrite m_o_mll_2x2_2x1; cycle 1. {
   apply mA_is_square.
@@ -529,10 +532,11 @@ rewrite mat_mul_add_distr_l; [ | easy ].
 rewrite lemma_2_A_n_2_eq_n_I.
 rewrite mat_mul_add_distr_l; [ | easy ].
 specialize (mA_is_square n) as Hasm.
-rewrite mat_mul_1_l; [ | easy | easy | easy ].
-rewrite mat_mul_1_l; [ | easy | easy | now rewrite mA_ncols ].
-rewrite mat_mul_1_l; [ | easy | easy | easy ].
-rewrite mat_mul_1_r; [ | easy | easy | now cbn; rewrite mA_nrows ].
+rewrite mat_mul_1_l with (rp0 := rp); [ | easy | easy | easy ].
+rewrite mat_mul_1_l with (rp0 := rp); [ | easy | easy | now rewrite mA_ncols ].
+rewrite mat_mul_1_l with (rp0 := rp); [ | easy | easy | easy ].
+rewrite mat_mul_1_r with (rp0 := rp); [ | easy | easy | now cbn; rewrite mA_nrows ].
+Require Import Nsring.
 Print nat_ring_like_op.
 Existing Instance nat_ring_like_op.
 Compute (7 - 3)%F.

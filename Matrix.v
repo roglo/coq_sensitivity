@@ -65,6 +65,7 @@ Section in_ring.
 Context {T : Type}.
 Context (ro : ring_like_op T).
 Context {rp : ring_like_prop T}.
+Context {Hro : rngl_has_opp = true}.
 
 (* addition *)
 
@@ -73,45 +74,6 @@ Definition mat_add {ro : ring_like_op T} (MA MB : matrix T) :=
      mat_nrows := mat_nrows MA;
      mat_ncols := mat_ncols MA |}.
 
-Definition phony_Nat_opp (x : nat) := 0.
-Definition phony_Nat_inv (x : nat) := 0.
-
-Definition nat_ring_like_op : ring_like_op nat :=
-  {| rngl_zero := 0;
-     rngl_one := 1;
-     rngl_add := Nat.add;
-     rngl_mul := Nat.mul;
-     rngl_opp := phony_Nat_opp;
-     rngl_inv := phony_Nat_inv |}.
-
-Canonical Structure nat_ring_like_op.
-
-Definition nat_ring_like_prop : ring_like_prop nat :=
-  {| rngl_is_comm := true;
-     rngl_has_opp := false;
-     rngl_has_inv := false;
-     rngl_add_comm := Nat.add_comm;
-     rngl_add_assoc := Nat.add_assoc;
-     rngl_add_0_l := Nat.add_0_l;
-     rngl_mul_assoc := Nat.mul_assoc;
-     rngl_mul_1_l := Nat.mul_1_l;
-     rngl_mul_add_distr_l := Nat.mul_add_distr_l;
-     rngl_mul_0_l := Nat.mul_0_l;
-     rngl_c_mul_comm := Nat.mul_comm;
-     rngl_nc_mul_1_r := I;
-     rngl_nc_mul_0_r := I;
-     rngl_nc_mul_add_distr_r := I;
-     rngl_o_add_opp_l := I;
-     rngl_i_mul_inv_l := I |}.
-
-Canonical Structure nat_ring_like_prop.
-
-(*
-End in_ring.
-Compute (list_list_of_mat (mat_add add (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list_list 0 [[1; 2]; [3; 4]; [5; 6]; [7; 8]]))).
-Compute (list_list_of_mat (mat_add add (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list_list 0 [[1; 2]; [3; 4]; [5; 6]; [7; 8]]))).
-*)
-
 (* multiplication *)
 
 Definition mat_mul {so : ring_like_op T} (MA MB : matrix T) :=
@@ -119,11 +81,6 @@ Definition mat_mul {so : ring_like_op T} (MA MB : matrix T) :=
        (Σ (j = 0, mat_ncols MA - 1), mat_el MA i j * mat_el MB j k)%F;
      mat_nrows := mat_nrows MA;
      mat_ncols := mat_ncols MB |}.
-
-(*
-End in_ring.
-Compute (let _ := nat_ring_like_op in list_list_of_mat (mat_mul (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (mat_of_list_list 0 [[1; 2]; [3; 4]; [5; 6]; [7; 8]]))).
-*)
 
 Theorem mat_mul_nrows : ∀ A B, mat_nrows (mat_mul A B) = mat_nrows A.
 Proof. easy. Qed.
@@ -310,7 +267,7 @@ unfold determinant; cbn.
 remember (mat_ncols A) as c eqn:Hc; symmetry in Hc.
 destruct c; [ easy | clear Hcz ].
 cbn - [ iter_seq ].
-rewrite rngl_mul_summation_distr_l; [ | easy ].
+rewrite rngl_mul_summation_distr_l with (rp0 := rp); [ | easy ].
 apply rngl_summation_eq_compat.
 intros j Hj.
 Abort. (*
@@ -755,6 +712,7 @@ Section in_ring.
 Context {T : Type}.
 Context (ro : ring_like_op T).
 Context {rp : ring_like_prop T}.
+Context {Hro : rngl_has_opp = true}.
 
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
@@ -810,12 +768,12 @@ rewrite rngl_mul_1_l.
 rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
   intros k Hk.
   destruct (Nat.eq_dec i (k - 1)) as [H| H]; [ flia H Hk | ].
-  apply rngl_mul_0_l.
+  now apply rngl_mul_0_l.
 }
 rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
   intros k Hk.
   destruct (Nat.eq_dec i k) as [H| H]; [ flia H Hk | ].
-  apply rngl_mul_0_l.
+  now apply rngl_mul_0_l.
 }
 now rewrite rngl_add_0_l, rngl_add_0_r.
 Qed.
@@ -838,12 +796,12 @@ rewrite rngl_mul_1_r.
 rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
   intros k Hk.
   destruct (Nat.eq_dec (k - 1) j) as [H| H]; [ flia H Hk | ].
-  apply rngl_mul_0_r.
+  now apply rngl_mul_0_r.
 }
 rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
   intros k Hk.
   destruct (Nat.eq_dec k j) as [H| H]; [ flia H Hk | ].
-  apply rngl_mul_0_r.
+  now apply rngl_mul_0_r.
 }
 now rewrite rngl_add_0_l, rngl_add_0_r.
 Qed.
@@ -862,7 +820,7 @@ remember (mat_ncols MB) as cb eqn:Hcb.
 move cb before ca.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
-  now apply rngl_mul_summation_distr_l.
+  now apply rngl_mul_summation_distr_l with (rp0 := rp).
 }
 cbn - [ iter_seq ].
 rewrite rngl_summation_summation_exch'; [ | easy ].
@@ -874,7 +832,7 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn - [ iter_seq ].
 symmetry.
-now apply rngl_mul_summation_distr_r.
+now apply rngl_mul_summation_distr_r with (rp0 := rp).
 Qed.
 
 (* left distributivity of multiplication over addition *)
@@ -912,12 +870,12 @@ Proof.
 intros * Hi.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
-  now rewrite rngl_mul_summation_distr_l.
+  now rewrite rngl_mul_summation_distr_l with (rp0 := rp).
 }
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
-  now rewrite rngl_mul_summation_distr_r.
+  now rewrite rngl_mul_summation_distr_r with (rp0 := rp).
 }
 symmetry.
 cbn - [ iter_seq ].

@@ -52,21 +52,23 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_mul_assoc : ∀ a b c : T, (a * (b * c) = (a * b) * c)%F;
     rngl_mul_1_l : ∀ a : T, (1 * a)%F = a;
     rngl_mul_add_distr_l : ∀ a b c : T, (a * (b + c) = a * b + a * c)%F;
-    rngl_mul_0_l : ∀ a, (0 * a = 0)%F;
     (* when multiplication is commutative *)
     rngl_c_mul_comm :
       if rngl_is_comm then ∀ a b, (a * b = b * a)%F else True;
     (* when multiplication is not commutative *)
     rngl_nc_mul_1_r :
       if rngl_is_comm then True else ∀ a, (a * 1 = a)%F;
-    rngl_nc_mul_0_r :
-      if rngl_is_comm then True else ∀ a, (a * 0 = 0)%F;
     rngl_nc_mul_add_distr_r :
       if rngl_is_comm then True else
        ∀ a b c, ((a + b) * c = a * c + b * c)%F;
     (* when has opposite *)
     rngl_o_add_opp_l :
       if rngl_has_opp then ∀ a : T, (- a + a = 0)%F else True;
+    (* when has not opposite *)
+    rngl_no_mul_0_l :
+      if rngl_has_opp then True else ∀ a, (0 * a = 0)%F;
+    rngl_no_mul_0_r :
+      if rngl_has_opp then True else ∀ a, (a * 0 = 0)%F;
     (* when has inverse *)
     rngl_i_mul_inv_l :
       if rngl_has_inv then ∀ a : T, a ≠ 0%F → (/ a * a = 1)%F else True }.
@@ -152,19 +154,6 @@ destruct rngl_is_comm. {
 }
 Qed.
 
-Theorem rngl_mul_0_r : ∀ a, (a * 0 = 0)%F.
-Proof.
-intros.
-specialize rngl_c_mul_comm as rngl_mul_comm.
-specialize rngl_nc_mul_0_r as rngl_mul_0_r.
-destruct rngl_is_comm. {
-  rewrite rngl_mul_comm.
-  apply rngl_mul_0_l.
-} {
-  apply rngl_mul_0_r.
-}
-Qed.
-
 Theorem rngl_sub_compat_l : ∀ a b c,
   (a = b)%F → (a - c = b - c)%F.
 Proof.
@@ -174,14 +163,6 @@ Qed.
 
 Theorem fold_rngl_sub : ∀ a b, (a + - b)%F = (a - b)%F.
 Proof. intros; easy. Qed.
-
-Theorem rngl_add_opp_l : ∀ x, (- x + x = 0)%F.
-Proof.
-intros.
-specialize rngl_o_add_opp_l as rngl_add_opp_l.
-destruct rngl_has_opp; [ | easy ].
-apply rngl_add_opp_l.
-Qed.
 
 Theorem rngl_add_opp_r : ∀ x, (x - x = 0)%F.
 Proof.
@@ -217,17 +198,29 @@ eapply rngl_sub_compat_l with (c := c) in Habc.
 now do 2 rewrite rngl_add_comm, rngl_add_sub in Habc.
 Qed.
 
-(*
-End ring_like_theorems.
+Theorem rngl_mul_0_l : ∀ a, (0 * a = 0)%F.
+Proof.
+intros a.
+apply (rngl_add_reg_r _ _ (1 * a)%F).
+rewrite <- rngl_mul_add_distr_r.
+now do 2 rewrite rngl_add_0_l.
+Qed.
 
-Check @rngl_add_opp_l.
-Check @rngl_add_opp_r.
-Check @rngl_o_add_opp_l.
-Check @rngl_add_sub.
-Arguments rngl_add_opp_r {T ro rp Hro} x%F.
-Check @rngl_add_reg_r.
-Check @rngl_add_reg_l.
-*)
+Theorem rngl_mul_0_r : ∀ a, (a * 0 = 0)%F.
+Proof.
+intros.
+apply (rngl_add_reg_r _ _ (a * 1)%F).
+rewrite <- rngl_mul_add_distr_l.
+now do 2 rewrite rngl_add_0_l.
+Qed.
+
+Theorem rngl_add_opp_l : ∀ x, (- x + x = 0)%F.
+Proof.
+intros.
+specialize rngl_o_add_opp_l as rngl_add_opp_l.
+destruct rngl_has_opp; [ | easy ].
+apply rngl_add_opp_l.
+Qed.
 
 Theorem rngl_opp_0 : (- 0 = 0)%F.
 Proof.
@@ -312,5 +305,7 @@ Arguments rngl_add_opp_r {T}%type_scope {ro rp} Hro.
 Arguments rngl_add_reg_l {T}%type_scope {ro rp} Hro.
 Arguments rngl_add_sub {T}%type_scope {ro rp} Hro.
 Arguments rngl_mul_opp_opp {T}%type_scope {ro rp} Hro.
+Arguments rngl_mul_0_l {T}%type_scope {ro rp} Hro.
 Arguments rngl_mul_opp_r {T}%type_scope {ro rp} Hro.
+Arguments rngl_mul_0_r {T}%type_scope {ro rp} Hro.
 Arguments rngl_opp_0 {T}%type_scope {ro rp} Hro.

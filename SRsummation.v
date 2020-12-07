@@ -303,7 +303,7 @@ intros.
 unfold iter_seq.
 remember (S e - b) as n eqn:Hn.
 revert e a b Hn.
-induction n; intros; [ apply rngl_mul_0_l | cbn ].
+induction n; intros; [ now apply rngl_mul_0_l | cbn ].
 do 2 rewrite rngl_add_0_l.
 rewrite fold_left_rngl_add_fun_from_0; symmetry.
 rewrite fold_left_rngl_add_fun_from_0; symmetry.
