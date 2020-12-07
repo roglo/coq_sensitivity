@@ -674,6 +674,22 @@ destruct (lt_dec k i) as [Hki| Hki]. {
 }
 Qed.
 
+(* square matrices *)
+
+...
+
+Definition compatible_square_matrices_bool (ML : list (matrix T)) :=
+  (forallb is_square_mat ML &&
+   forallb
+     (λ BM,
+        let sz1 := mat_nrows ...
+        let sz2 := sizes_of_bmatrix (hd (BM_1 0%Srng) BML) in
+        list_eqb Nat.eqb 0 sz1 sz2)
+     ML)%bool.
+...
+Definition square_bmatrix M (HM : is_square_mat M) :=
+  {A : matrix T | compatible_square_bmatrices_bool [M; A] = true}.
+
 Definition phony_mat_inv (M : matrix T) := M.
 
 Canonical Structure squ_mat_ring_like_op n : ring_like_op (matrix T) :=
@@ -689,7 +705,8 @@ Existing Instance squ_mat_ring_like_op.
 Theorem glop : ∀ (n : nat) (M : matrix T), mat_nrows M = mat_ncols M.
 Proof.
 intros.
-specialize (squ_mat_ring_like_op n) as H.
+remember (squ_mat_ring_like_op n) as rom eqn:Hrom.
+unfold squ_mat_ring_like_op in Hrom.
 ...
 
 Definition squ_mat_ring_like_prop (n : nat) (rom : ring_like_op (matrix T)) :
