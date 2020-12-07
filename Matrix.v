@@ -722,33 +722,55 @@ Qed.
 Definition squ_mat_add n (MA MB : square_matrix n) : square_matrix n :=
   exist _ (proj1_sig MA + proj1_sig MB)%M (squ_mat_add_prop MA MB).
 
-Definition phony_mat_inv (M : matrix T) := M.
+Theorem squ_mat_mul_prop : ∀ n (MA MB : square_matrix n),
+  (mat_nrows (proj1_sig MA * proj1_sig MB) =? n) &&
+  (mat_ncols (proj1_sig MA * proj1_sig MB) =? n) = true.
+Proof.
+intros.
+destruct MA as (A, Hap).
+destruct MB as (B, Hbp); cbn.
+apply andb_true_intro.
+apply andb_true_iff in Hap.
+apply andb_true_iff in Hbp.
+easy.
+Qed.
+
+Definition squ_mat_mul n (MA MB : square_matrix n) : square_matrix n :=
+  exist _ (proj1_sig MA * proj1_sig MB)%M (squ_mat_mul_prop MA MB).
+
+Theorem squ_mat_opp_prop : ∀ n (M : square_matrix n),
+  (mat_nrows (- proj1_sig M)%M =? n) &&
+  (mat_ncols (- proj1_sig M)%M =? n) = true.
+Proof.
+intros.
+now destruct M as (A, Hap).
+Qed.
+
+Definition squ_mat_opp n (M : square_matrix n) : square_matrix n :=
+  exist _ (- proj1_sig M)%M (squ_mat_opp_prop M).
+
+Definition phony_squ_mat_inv n (M : square_matrix n) := M.
 
 Canonical Structure squ_mat_ring_like_op n : ring_like_op (square_matrix n) :=
   {| rngl_zero := squ_mat_zero n;
      rngl_one := squ_mat_one n;
      rngl_add := @squ_mat_add n;
-     rngl_mul := ?rngl_mul;
-     rngl_opp := ?rngl_opp;
-     rngl_inv := ?rngl_inv |}.
+     rngl_mul := @squ_mat_mul n;
+     rngl_opp := @squ_mat_opp n;
+     rngl_inv := @phony_squ_mat_inv n |}.
 
-...
-
-Existing Instance squ_mat_ring_like_op.
-
-Theorem glop : ∀ (n : nat) (M : matrix T), mat_nrows M = mat_ncols M.
+Theorem squ_mat_add_comm : ∀ n (MA MB : square_matrix n),
+  squ_mat_add MA MB = squ_mat_add MB MA.
 Proof.
-intros.
-remember (squ_mat_ring_like_op n) as rom eqn:Hrom.
-unfold squ_mat_ring_like_op in Hrom.
 ...
 
-Definition squ_mat_ring_like_prop (n : nat) (rom : ring_like_op (matrix T)) :
-    ring_like_prop (matrix T) :=
+Definition squ_mat_ring_like_prop (n : nat)
+    (rom : ring_like_op (square_matrix n)) :
+    ring_like_prop (square_matrix n) :=
   {| rngl_is_comm := false;
      rngl_has_opp := true;
      rngl_has_inv := false;
-     rngl_add_comm MA MB := mat_add_comm MA MB 42;
+     rngl_add_comm := @squ_mat_add_comm n;
      rngl_add_assoc := ?rngl_add_assoc;
      rngl_add_0_l := ?rngl_add_0_l;
      rngl_mul_assoc := ?rngl_mul_assoc;
