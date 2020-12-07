@@ -353,12 +353,18 @@ Notation "A · V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
 Theorem mat_fold_sub : ∀ MA MB, (MA + - MB = MA - MB)%M.
 Proof. easy. Qed.
 
-(* multiplication of a square matrix by a scalar is square *)
+(* addition to zero *)
 
-Theorem mat_mul_scal_l_is_square : ∀ a M,
+Theorem mat_add_0_l : ∀ M n,
   is_square_mat M
-  → is_square_mat (a × M).
-Proof. intros. easy. Qed.
+  → n = mat_nrows M
+  → (mZ n + M)%M = M.
+Proof.
+intros * Hsm Hn.
+apply matrix_eq; [ easy | cbn; congruence | ].
+intros * Hi Hj; cbn.
+apply rngl_add_0_l.
+Qed.
 
 (* addition left and right with opposite *)
 
@@ -385,6 +391,13 @@ cbn; rewrite <- Hn.
 intros * Hi Hj.
 now apply rngl_add_opp_r.
 Qed.
+
+(* multiplication of a square matrix by a scalar is square *)
+
+Theorem mat_mul_scal_l_is_square : ∀ a M,
+  is_square_mat M
+  → is_square_mat (a × M).
+Proof. intros. easy. Qed.
 
 (* multiplication left and right with identity *)
 

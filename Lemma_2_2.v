@@ -513,7 +513,7 @@ destruct n. {
   (* we need to add that the ring is integral *)
   admit.
 }
-cbn - [ Nat.pow ] in Hμ, HV.
+cbn - [ Nat.pow ] in HV.
 rewrite HV.
 rewrite mat_vect_mul_assoc with (rp0 := rp); [ | easy ].
 cbn - [ iter_seq Nat.pow ].
@@ -544,7 +544,20 @@ rewrite mat_add_opp_r with (n0 := 2 ^ n); [ | easy | | ]; cycle 1. {
   symmetry; apply mA_nrows.
 }
 rewrite mA_nrows.
-Search mZ.
+rewrite mat_add_0_l; [ | easy | | easy ]. 2: {
+  now apply mat_mul_scal_l_is_square.
+}
+rewrite mat_add_add_swap; [ | easy ].
+remember (mI (2 ^ n)) as x eqn:Hx in |-*.
+remember (rngl_of_nat n × x + x)%M as y eqn:Hy.
+rewrite Hx in Hy at 1.
+replace x with (1%F × x)%M in Hy. 2: {
+  apply matrix_eq; [ easy | easy | ].
+  intros * Hi Hj.
+  apply rngl_mul_1_l.
+}
+subst x.
+Search (_ × _ + _ × _)%M.
 ...
 
 (* here, I would like to prove that, knowing that An^2 = nI, the
