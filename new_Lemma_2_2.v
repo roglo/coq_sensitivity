@@ -18,12 +18,9 @@ Import matrix_Notations.
 Section in_ring.
 
 Context {T : Type}.
-Context (so : semiring_op T).
-Context {ro : ring_op T}.
-Context {sp : semiring_prop T}.
-Context {rp : ring_prop T}.
-Context {sdp : sring_dec_prop T}.
-Context {fo : field_op T}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context {Hro : rngl_has_opp = true}.
 
 (* *)
 
@@ -54,14 +51,14 @@ Definition mat_of_mat_list_list d (mll : list (list (matrix T))) : matrix T :=
 
 Fixpoint mA n : matrix T :=
   match n with
-  | 0 => mat_of_scalar 0%Rng
+  | 0 => mat_of_scalar 0%F
   | S n' =>
-      mat_of_mat_list_list 0%Rng
+      mat_of_mat_list_list 0%F
         [[mA n'; mI (2 ^ n')];
          [mI (2 ^ n'); (- mA n')%M]]
   end.
 
-Definition srng_of_nat n := (Σ (i = 1, n), 1)%Srng.
+Definition rngl_of_nat n := (Σ (i = 1, n), 1)%F.
 
 (* *)
 
@@ -89,7 +86,7 @@ Qed.
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
-  (mA n * mA n)%M = (srng_of_nat n × mI (2 ^ n))%M.
+  (mA n * mA n)%M = (rngl_of_nat n × mI (2 ^ n))%M.
 Proof.
 intros.
 apply matrix_eq; [ apply mA_nrows | apply mA_ncols | ].
@@ -99,10 +96,10 @@ intros i k Hi Hk.
 revert i k Hi Hk.
 induction n; intros. {
   cbn.
-  do 2 rewrite srng_mul_0_l.
-  apply srng_add_0_l.
+  do 2 rewrite rngl_mul_0_l.
+  apply rngl_add_0_l.
 }
-rewrite (srng_summation_split _ (2 ^ n - 1)). 2: {
+rewrite (rngl_summation_split _ (2 ^ n - 1)). 2: {
   split; [ flia | ].
   apply -> Nat.succ_le_mono.
   apply Nat.sub_le_mono_r.
@@ -116,15 +113,15 @@ unfold mat_list_list_el.
 unfold upper_left_mat_in_list_list.
 cbn - [ iter_seq Nat.pow ].
 rewrite mA_nrows, mA_ncols.
-erewrite srng_summation_eq_compat. 2: {
+erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   rewrite (Nat.div_small j); [ | cbn in Hi; flia Hj Hi ].
   rewrite (Nat.mod_small j); [ | cbn in Hi; flia Hj Hi ].
   easy.
 }
 cbn - [ iter_seq Nat.pow ].
-rewrite srng_add_comm.
-erewrite srng_summation_eq_compat. 2: {
+rewrite rngl_add_comm.
+erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   assert (H : 1 * 2 ^ n ≤ j < (1 + 1) * 2 ^ n). {
     rewrite Nat.mul_1_l.
@@ -137,7 +134,7 @@ erewrite srng_summation_eq_compat. 2: {
   rewrite (@Nat_mod_less_small 1 j); [ clear H | easy ].
   now rewrite Nat.mul_1_l.
 }
-rewrite srng_add_comm.
+rewrite rngl_add_comm.
 destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
   rewrite (Nat.div_small i); [ | easy ].
   rewrite (Nat.mod_small i); [ | easy ].
@@ -147,37 +144,37 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
     rewrite (Nat.mod_small k); [ | easy ].
     cbn - [ iter_seq Nat.pow ].
     rewrite IHn; [ | easy | easy ].
-    rewrite (srng_summation_split _ (i + 2 ^ n)); [ | cbn; flia Hi Hi2n ].
-    rewrite srng_summation_split_last; [ | flia ].
-    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+    rewrite (rngl_summation_split _ (i + 2 ^ n)); [ | cbn; flia Hi Hi2n ].
+    rewrite rngl_summation_split_last; [ | flia ].
+    rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
       intros j Hj.
       destruct (Nat.eq_dec i (j - 1 - 2 ^ n)) as [Hij| Hij]. {
         flia Hj Hij.
       }
-      apply srng_mul_0_l.
+      apply rngl_mul_0_l.
     }
-    rewrite srng_add_0_l.
-    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+    rewrite rngl_add_0_l.
+    rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
       intros j Hj.
       destruct (Nat.eq_dec i (j - 2 ^ n)) as [Hij| Hij]; [ flia Hj Hij | ].
-      apply srng_mul_0_l.
+      apply rngl_mul_0_l.
     }
-    rewrite srng_add_0_r.
+    rewrite rngl_add_0_r.
     rewrite Nat.add_sub.
     destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
-    rewrite srng_mul_1_l.
+    rewrite rngl_mul_1_l.
     symmetry.
     destruct (Nat.eq_dec i k) as [Hik| Hik]. {
       subst k.
-      do 2 rewrite srng_mul_1_r.
+      do 2 rewrite rngl_mul_1_r.
       destruct n; [ easy | ].
       cbn - [ iter_seq ].
-      unfold srng_of_nat.
-      rewrite srng_summation_split_last; [ | flia ].
-      now rewrite srng_summation_succ_succ.
+      unfold rngl_of_nat.
+      rewrite rngl_summation_split_last; [ | flia ].
+      now rewrite rngl_summation_succ_succ.
     } {
-      do 2 rewrite srng_mul_0_r.
-      symmetry; apply srng_add_0_r.
+      do 2 rewrite rngl_mul_0_r.
+      symmetry; apply rngl_add_0_r.
     }
   } {
     apply Nat.nlt_ge in Hk2n.
@@ -192,70 +189,71 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
     rewrite (Nat_mod_less_small 1); [ clear H | easy ].
     rewrite Nat.mul_1_l.
     cbn - [ iter_seq Nat.pow ].
-    rewrite (srng_summation_split _ (k - 2 ^ n)). 2: {
+    rewrite (rngl_summation_split _ (k - 2 ^ n)). 2: {
       split; [ flia | ].
       apply -> Nat.succ_le_mono.
       cbn in Hk; flia Hk.
     }
-    rewrite srng_summation_split_last; [ | flia ].
-    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+    rewrite rngl_summation_split_last; [ | flia ].
+    rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
       intros j Hj.
       destruct (Nat.eq_dec (j - 1) (k - 2 ^ n)) as [Hjk| Hjk]. {
         flia Hj Hjk.
       }
-      apply srng_mul_0_r.
+      apply rngl_mul_0_r.
     }
-    rewrite srng_add_0_l.
-    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+    rewrite rngl_add_0_l.
+    rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
       intros j Hj.
       destruct (Nat.eq_dec j (k - 2 ^ n)) as [Hjk| Hjk]; [ flia Hj Hjk | ].
-      apply srng_mul_0_r.
+      apply rngl_mul_0_r.
     }
-    rewrite srng_add_0_r.
+    rewrite rngl_add_0_r.
     remember (k - 2 ^ n) as j eqn:Hj.
     destruct (Nat.eq_dec j j) as [H| H]; [ clear H | easy ].
-    subst j; rewrite srng_mul_1_r.
-    erewrite srng_summation_eq_compat. 2: {
+    subst j; rewrite rngl_mul_1_r.
+    erewrite rngl_summation_eq_compat. 2: {
       intros j Hj.
-      now rewrite rng_mul_opp_opp.
+      now rewrite rngl_mul_opp_opp.
     }
     cbn - [ iter_seq Nat.pow ].
-    rewrite srng_summation_shift; [ | cbn; flia Hi ].
+    rewrite rngl_summation_shift; [ | cbn; flia Hi ].
     rewrite Nat_sub_sub_swap.
     replace (2 ^ S n - 2 ^ n) with (2 ^ n). 2: {
       cbn; rewrite Nat.add_0_r; symmetry.
       apply Nat.add_sub.
     }
-    erewrite srng_summation_eq_compat. 2: {
+    erewrite rngl_summation_eq_compat. 2: {
       intros j Hj.
       rewrite Nat.add_comm, Nat.add_sub.
-      rewrite rng_mul_opp_opp.
-      now rewrite rng_mul_opp_r.
+      rewrite rngl_mul_opp_opp; [ | easy ].
+      now rewrite rngl_mul_opp_r.
     }
     cbn - [ iter_seq Nat.pow ].
-    rewrite (srng_summation_split _ i); [ | flia Hi Hi2n ].
-    rewrite srng_summation_split_last; [ | flia ].
+    rewrite (rngl_summation_split _ i); [ | flia Hi Hi2n ].
+    rewrite rngl_summation_split_last; [ | flia ].
     destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
-    rewrite srng_mul_1_l.
-    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+    rewrite rngl_mul_1_l.
+    rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
       intros j Hj.
       destruct (Nat.eq_dec i (j - 1)) as [Hij| Hij]; [ flia Hij Hj | ].
-      rewrite srng_mul_0_l.
-      apply rng_opp_0.
+      rewrite rngl_mul_0_l.
+      now apply rngl_opp_0.
     }
-    rewrite srng_add_0_l.
-    rewrite srng_add_assoc.
-    rewrite fold_rng_sub.
-    rewrite rng_add_opp_r, srng_add_0_l.
+    rewrite rngl_add_0_l.
+    rewrite rngl_add_assoc.
+    rewrite fold_rngl_sub.
+    rewrite rngl_add_opp_r; [ | easy ].
+    rewrite rngl_add_0_l.
     destruct (Nat.eq_dec i k) as [Hik| Hik]; [ flia Hi2n Hk2n Hik | ].
-    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+    rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
       intros j Hj.
       destruct (Nat.eq_dec i j) as [Hij| Hij]; [ flia Hj Hij | ].
-      rewrite srng_mul_0_l.
-      apply rng_opp_0.
+      rewrite rngl_mul_0_l.
+      now apply rngl_opp_0.
     }
     symmetry.
-    apply srng_mul_0_r.
+    now apply rngl_mul_0_r.
   }
 } {
   apply Nat.nlt_ge in Hi2n.
@@ -270,36 +268,36 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
   rewrite (Nat_mod_less_small 1); [ clear H | easy ].
   rewrite Nat.mul_1_l.
   cbn - [ iter_seq Nat.pow ].
-  rewrite (srng_summation_split _ (i - 2 ^ n)). 2: {
+  rewrite (rngl_summation_split _ (i - 2 ^ n)). 2: {
     split; [ flia | ].
     apply -> Nat.succ_le_mono.
     cbn in Hi; flia Hi.
   }
-  rewrite srng_summation_split_last; [ | flia ].
-  rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+  rewrite rngl_summation_split_last; [ | flia ].
+  rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
     intros j Hj.
     destruct (Nat.eq_dec (i - 2 ^ n) (j - 1)) as [Hij| Hij]. {
       flia Hj Hij.
     }
-    apply srng_mul_0_l.
+    apply rngl_mul_0_l.
   }
-  rewrite srng_add_0_l.
-  rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+  rewrite rngl_add_0_l.
+  rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
     intros j Hj.
     destruct (Nat.eq_dec (i - 2 ^ n) j) as [Hij| Hij]; [ flia Hj Hij | ].
-    apply srng_mul_0_l.
+    apply rngl_mul_0_l.
   }
-  rewrite srng_add_0_r.
+  rewrite rngl_add_0_r.
   remember (i - 2 ^ n) as j eqn:Hj.
   destruct (Nat.eq_dec j j) as [H| H]; [ clear H | easy ].
-  subst j; rewrite srng_mul_1_l.
-  rewrite srng_summation_shift; [ | cbn; flia Hi ].
+  subst j; rewrite rngl_mul_1_l.
+  rewrite rngl_summation_shift; [ | cbn; flia Hi ].
   rewrite Nat_sub_sub_swap.
   replace (2 ^ S n - 2 ^ n) with (2 ^ n). 2: {
     cbn; rewrite Nat.add_0_r; symmetry.
     apply Nat.add_sub.
   }
-  erewrite srng_summation_eq_compat. 2: {
+  erewrite rngl_summation_eq_compat. 2: {
     intros j Hj.
     now rewrite Nat.add_comm, Nat.add_sub.
   }
@@ -308,29 +306,30 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
     rewrite (Nat.div_small k); [ | easy ].
     rewrite (Nat.mod_small k); [ | easy ].
     cbn - [ iter_seq Nat.pow ].
-    rewrite (srng_summation_split _ k). 2: {
+    rewrite (rngl_summation_split _ k). 2: {
       cbn in Hk; flia Hk Hk2n.
     }
-    rewrite srng_summation_split_last; [ | flia ].
+    rewrite rngl_summation_split_last; [ | flia ].
     destruct (Nat.eq_dec i k) as [Hik| Hik]; [ flia Hik Hi2n Hk2n | ].
-    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+    rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
       intros j Hj.
       destruct (Nat.eq_dec (j - 1) k) as [Hjk| Hjk]; [ flia Hj Hjk | ].
-      apply srng_mul_0_r.
+      apply rngl_mul_0_r.
     }
-    rewrite srng_add_0_l.
+    rewrite rngl_add_0_l.
     destruct (Nat.eq_dec k k) as [H| H]; [ clear H | easy ].
-    rewrite srng_mul_1_r.
-    rewrite srng_add_assoc.
-    rewrite fold_rng_sub.
-    rewrite rng_add_opp_r, srng_add_0_l.
-    rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+    rewrite rngl_mul_1_r.
+    rewrite rngl_add_assoc.
+    rewrite fold_rngl_sub.
+    rewrite rngl_add_opp_r; [ | easy ].
+    rewrite rngl_add_0_l.
+    rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
       intros j Hj.
       destruct (Nat.eq_dec j k) as [Hjk| Hjk]; [ flia Hj Hjk | ].
-      apply srng_mul_0_r.
+      apply rngl_mul_0_r.
     }
     symmetry.
-    apply srng_mul_0_r.
+    now apply rngl_mul_0_r.
   } {
     apply Nat.nlt_ge in Hk2n.
     assert (H : 1 * 2 ^ n ≤ k < (1 + 1) * 2 ^ n). {
@@ -344,9 +343,9 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
     rewrite (Nat_mod_less_small 1); [ clear H | easy ].
     rewrite Nat.mul_1_l.
     cbn - [ iter_seq Nat.pow ].
-    erewrite srng_summation_eq_compat. 2: {
+    erewrite rngl_summation_eq_compat. 2: {
       intros l Hl.
-      now rewrite rng_mul_opp_opp.
+      now rewrite rngl_mul_opp_opp.
     }
     cbn - [ iter_seq Nat.pow ].
     rewrite IHn; [ | cbn in Hi; flia Hi | cbn in Hk; flia Hk ].
@@ -355,17 +354,17 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
       remember (i - 2 ^ n) as j eqn:Hj.
       destruct (Nat.eq_dec j j) as [H| H]; [ clear H | easy ].
       subst j.
-      do 2 rewrite srng_mul_1_r.
-      rewrite srng_add_comm.
-      unfold srng_of_nat; symmetry.
-      rewrite srng_summation_split_last; [ | flia ].
-      now rewrite srng_summation_succ_succ.
+      do 2 rewrite rngl_mul_1_r.
+      rewrite rngl_add_comm.
+      unfold rngl_of_nat; symmetry.
+      rewrite rngl_summation_split_last; [ | flia ].
+      now rewrite rngl_summation_succ_succ.
     } {
       destruct (Nat.eq_dec (i - 2 ^ n) (k - 2 ^ n)) as [Hi2k| Hi2k]. {
         flia Hik Hi2k Hi2n Hk2n.
       }
-      rewrite srng_add_0_l.
-      now do 2 rewrite srng_mul_0_r.
+      rewrite rngl_add_0_l.
+      now do 2 rewrite rngl_mul_0_r.
     }
   }
 }
@@ -373,7 +372,7 @@ Qed.
 
 (*
 Print mat_nat_mul_l.
-Print rng_mul_nat_l.
+Print rngl_mul_nat_l.
 *)
 
 (* seems, on paper, that √(n+1) is an eignenvalue for A_{n+1}
@@ -388,7 +387,7 @@ Print rng_mul_nat_l.
    works *)
 
 Definition base_vector_1 dim :=
-  mk_vect (λ i, match i with 0 => 1%Srng | _ => 0%Srng end) dim.
+  mk_vect (λ i, match i with 0 => 1%F | _ => 0%F end) dim.
 
 Definition A_n_eigenvector_of_sqrt_n n μ V :=
   match n with
@@ -422,15 +421,15 @@ cbn - [ iter_seq ].
 rewrite (Nat.div_small j); [ | flia Hj ].
 rewrite (Nat.mod_small j); [ | flia Hj ].
 rewrite <- Hc1c2, <- Hc1c3, <- Hc1c4, <- Hc1r5.
-rewrite (srng_summation_split _ (mat_ncols M1)); [ | flia Hi ].
-rewrite srng_summation_split_last; [ | flia ].
+rewrite (rngl_summation_split _ (mat_ncols M1)); [ | flia Hi ].
+rewrite rngl_summation_split_last; [ | flia ].
 assert (H : mat_ncols M1 ≠ 0). {
   intros H; rewrite H in Hsm1.
   now rewrite Hsm1 in Hi; cbn in Hi.
 }
 rewrite Nat.div_same; [ | easy ].
 rewrite Nat.mod_same; [ clear H | easy ].
-erewrite srng_summation_eq_compat. 2: {
+erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   rewrite (Nat.div_small (k - 1)); [ | flia Hk ].
   rewrite (Nat.mod_small (k - 1)); [ | flia Hk ].
@@ -438,7 +437,7 @@ erewrite srng_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ iter_seq ].
-erewrite (srng_summation_eq_compat _ _ _ (mat_ncols M1 + 1)). 2: {
+erewrite (rngl_summation_eq_compat _ _ _ (mat_ncols M1 + 1)). 2: {
   intros k Hk.
   rewrite (Nat_div_less_small 1); [ | flia Hk ].
   rewrite (@Nat_mod_less_small 1 k); [ | flia Hk ].
@@ -450,25 +449,25 @@ destruct (lt_dec i (mat_nrows M1)) as [Hir1| Hir1]. {
   rewrite Nat.div_small; [ | easy ].
   rewrite Nat.mod_small; [ | easy ].
   cbn - [ iter_seq ].
-  rewrite <- srng_add_assoc.
+  rewrite <- rngl_add_assoc.
   f_equal. {
-    rewrite srng_summation_shift; [ | flia Hsm1 Hir1 ].
-    apply srng_summation_eq_compat.
+    rewrite rngl_summation_shift; [ | flia Hsm1 Hir1 ].
+    apply rngl_summation_eq_compat.
     intros k Hk.
     now rewrite Nat.add_comm, Nat.add_sub.
   }
   destruct (Nat.eq_dec (mat_ncols M1) 1) as [Hc11| Hc11]. {
     rewrite Hc11; cbn.
-    now rewrite srng_add_0_r, srng_add_0_l.
+    now rewrite rngl_add_0_r, rngl_add_0_l.
   }
-  rewrite srng_summation_shift; [ | flia Hsm1 Hir1 Hc11 ].
+  rewrite rngl_summation_shift; [ | flia Hsm1 Hir1 Hc11 ].
   remember (mat_ncols M1) as c.
   replace (c * 2 - 1 - (c + 1)) with (c - 2) by flia.
-  rewrite (srng_summation_split_first _ _ (c - 1)); [ | flia Hc11 ].
-  rewrite (srng_summation_shift _ 1); [ | flia Hc11 Hsm1 Hir1 ].
+  rewrite (rngl_summation_split_first _ _ (c - 1)); [ | flia Hc11 ].
+  rewrite (rngl_summation_shift _ 1); [ | flia Hc11 Hsm1 Hir1 ].
   f_equal.
   replace (c - 1 - 1) with (c - 2) by flia.
-  apply srng_summation_eq_compat.
+  apply rngl_summation_eq_compat.
   intros k Hk.
   now rewrite <- Nat.add_assoc, Nat.add_comm, Nat.add_sub.
 } {
@@ -476,32 +475,32 @@ destruct (lt_dec i (mat_nrows M1)) as [Hir1| Hir1]. {
   rewrite (Nat_div_less_small 1); [ | flia Hir1 Hi ].
   rewrite (Nat_mod_less_small 1); [ | flia Hir1 Hi ].
   cbn - [ iter_seq ].
-  rewrite Nat.add_0_r, <- srng_add_assoc.
+  rewrite Nat.add_0_r, <- rngl_add_assoc.
   f_equal. {
-    rewrite srng_summation_shift; [ | flia Hsm1 Hi ].
-    apply srng_summation_eq_compat.
+    rewrite rngl_summation_shift; [ | flia Hsm1 Hi ].
+    apply rngl_summation_eq_compat.
     intros k Hk.
     now rewrite Nat.add_comm, Nat.add_sub.
   }
   destruct (Nat.eq_dec (mat_ncols M1) 1) as [Hc11| Hc11]. {
     rewrite Hsm1, Hc11; cbn.
-    now rewrite srng_add_0_r, srng_add_0_l.
+    now rewrite rngl_add_0_r, rngl_add_0_l.
   }
-  rewrite srng_summation_shift; [ | flia Hsm1 Hi Hc11 ].
+  rewrite rngl_summation_shift; [ | flia Hsm1 Hi Hc11 ].
   remember (mat_ncols M1) as c.
   replace (c * 2 - 1 - (c + 1)) with (c - 2) by flia.
-  rewrite (srng_summation_split_first _ _ (c - 1)); [ | flia Hc11 ].
-  rewrite (srng_summation_shift _ 1); [ | flia Hsm1 Hi Hc11 ].
+  rewrite (rngl_summation_split_first _ _ (c - 1)); [ | flia Hc11 ].
+  rewrite (rngl_summation_shift _ 1); [ | flia Hsm1 Hi Hc11 ].
   f_equal.
   replace (c - 1 - 1) with (c - 2) by flia.
-  apply srng_summation_eq_compat.
+  apply rngl_summation_eq_compat.
   intros k Hk.
   now rewrite <- Nat.add_assoc, Nat.add_comm, Nat.add_sub.
 }
 Qed.
 
 Theorem A_n_eigen_formula : ∀ n μ V,
-  (μ * μ)%Rng = srng_of_nat n
+  (μ * μ)%F = rngl_of_nat n
   → V = A_n_eigenvector_of_sqrt_n n μ (base_vector_1 (2 ^ n))
   → (mA n · V = μ × V)%V.
 Proof.
@@ -578,32 +577,32 @@ rewrite mA_nrows, mA_ncols.
 apply vector_eq; [ easy | ].
 cbn - [ iter_seq Nat.pow ].
 intros i Hi.
-rewrite srng_summation_split_first; [ | easy | flia ].
+rewrite rngl_summation_split_first; [ | easy | flia ].
 rewrite Nat.div_0_l; [ | now apply Nat.pow_nonzero ].
-rewrite srng_mul_1_r.
-rewrite (all_0_srng_summation_0 _ 1). 2: {
+rewrite rngl_mul_1_r.
+rewrite (all_0_rngl_summation_0 _ 1). 2: {
   intros k Hk.
   destruct k; [ easy | ].
-  apply srng_mul_0_r.
+  apply rngl_mul_0_r.
 }
-rewrite srng_add_0_r.
+rewrite rngl_add_0_r.
 rewrite Nat.mod_0_l; [ | now apply Nat.pow_nonzero ].
-rewrite (srng_summation_split _ (2 ^ n - 1)); [ | flia ].
+rewrite (rngl_summation_split _ (2 ^ n - 1)); [ | flia ].
 rewrite Nat.sub_add; [ | now apply Nat.neq_0_lt_0, Nat.pow_nonzero ].
-erewrite srng_summation_eq_compat. 2: {
+erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   rewrite (Nat.div_small k); [ | flia Hi Hk ].
   rewrite (Nat.mod_small k); [ | flia Hi Hk ].
   easy.
 }
 cbn - [ iter_seq Nat.pow ].
-rewrite srng_summation_split_first; [ | easy | flia ].
+rewrite rngl_summation_split_first; [ | easy | flia ].
 cbn - [ iter_seq Nat.pow ].
-rewrite srng_mul_1_r.
-erewrite srng_summation_eq_compat. 2: {
+rewrite rngl_mul_1_r.
+erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   destruct (Nat.eq_dec k 0) as [Hkz| Hkz]; [ flia Hk Hkz | ].
-  rewrite srng_mul_0_r, srng_add_0_r.
+  rewrite rngl_mul_0_r, rngl_add_0_r.
   easy.
 }
 cbn - [ iter_seq Nat.pow ].
@@ -612,18 +611,18 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
   rewrite Nat.mod_small; [ | easy ].
   cbn - [ iter_seq Nat.pow ].
 ...
-rewrite (all_0_srng_summation_0 _ 1). 2: {
+rewrite (all_0_rngl_summation_0 _ 1). 2: {
   intros k Hk.
   destruct k; [ easy | ].
   cbn.
-  rewrite srng_mul_0_r.
+  rewrite rngl_mul_0_r.
 }
 
-rewrite (all_0_srng_summation_0 _ 1). 2: {
+rewrite (all_0_rngl_summation_0 _ 1). 2: {
   intros k Hk.
   destruct k; [ easy | ].
   cbn.
-  rewrite srng_mul_0_r.
+  rewrite rngl_mul_0_r.
 }
 ...
 
@@ -631,7 +630,7 @@ Fixpoint first_non_zero_in_col (M : matrix T) it i j :=
   match it with
   | 0 => None
   | S it' =>
-      if srng_eq_dec (mat_el M i j) 0 then
+      if rngl_eq_dec (mat_el M i j) 0 then
         first_non_zero_in_col M it' (i + 1) j
       else Some i
   end.
@@ -639,14 +638,14 @@ Fixpoint first_non_zero_in_col (M : matrix T) it i j :=
 Theorem first_non_zero_Some : ∀ M it i j k,
   first_non_zero_in_col M it i j = Some k
   → k < i + it ∧
-    (∀ h, i ≤ h < k → mat_el M h j = 0%Srng) ∧
-    mat_el M k j ≠ 0%Srng.
+    (∀ h, i ≤ h < k → mat_el M h j = 0%F) ∧
+    mat_el M k j ≠ 0%F.
 Proof.
 intros * Hk.
 revert i j k Hk.
 induction it; intros; [ easy | cbn ].
 cbn in Hk.
-destruct (srng_eq_dec (mat_el M i j) 0) as [Hmz| Hmz]. {
+destruct (rngl_eq_dec (mat_el M i j) 0) as [Hmz| Hmz]. {
   specialize (IHit _ _ _ Hk) as H1.
   destruct H1 as (H1 & H2 & H3).
   rewrite <- Nat.add_assoc in H1.
@@ -664,13 +663,13 @@ Qed.
 Theorem first_non_zero_None : ∀ M it i j,
   mat_nrows M ≤ i + it
   → first_non_zero_in_col M it i j = None
-  → ∀ h, i ≤ h < mat_nrows M → mat_el M h j = 0%Srng.
+  → ∀ h, i ≤ h < mat_nrows M → mat_el M h j = 0%F.
 Proof.
 intros * Hm Hz h Hh.
 revert i j h Hz Hh Hm.
 induction it; intros; [ flia Hh Hm | ].
 cbn in Hz.
-destruct (srng_eq_dec (mat_el M i j) 0) as [Hmz| Hmz]; [ | easy ].
+destruct (rngl_eq_dec (mat_el M i j) 0) as [Hmz| Hmz]; [ | easy ].
 destruct (Nat.eq_dec i h) as [Hih| Hih]; [ now subst h | ].
 apply (IHit (i + 1)); [ easy | flia Hh Hih | flia Hm ].
 Qed.
@@ -696,9 +695,9 @@ Qed.
 Definition mat_id_swap_rows sz i1 i2 :=
   mk_mat
     (λ i j,
-     if Nat.eq_dec i i1 then if Nat.eq_dec j i2 then 1%Srng else 0%Srng
-     else if Nat.eq_dec i i2 then if Nat.eq_dec j i1 then 1%Srng else 0%Srng
-     else if Nat.eq_dec i j then 1%Srng else 0%Srng)
+     if Nat.eq_dec i i1 then if Nat.eq_dec j i2 then 1%F else 0%F
+     else if Nat.eq_dec i i2 then if Nat.eq_dec j i1 then 1%F else 0%F
+     else if Nat.eq_dec i j then 1%F else 0%F)
     sz sz.
 
 (* Matrix operator, multiplying row k of a matrix by a scalar s
@@ -718,8 +717,8 @@ Definition mat_id_swap_rows sz i1 i2 :=
 Definition mat_id_mul_row_by_scal sz k s :=
   mk_mat
     (λ i j,
-     if Nat.eq_dec i j then if Nat.eq_dec i k then s else 1%Srng
-     else 0%Srng)
+     if Nat.eq_dec i j then if Nat.eq_dec i k then s else 1%F
+     else 0%F)
     sz sz.
 
 Arguments mat_id_mul_row_by_scal sz k s%F.
@@ -744,9 +743,9 @@ Arguments mat_id_mul_row_by_scal sz k s%F.
 Definition mat_id_add_rows_mul_scal_row M i j :=
   mk_mat
     (λ i' j',
-     if Nat.eq_dec i' j' then 1%Srng
-     else if Nat.eq_dec j' i then (- mat_el M i' j)%Rng
-     else 0%Srng)
+     if Nat.eq_dec i' j' then 1%F
+     else if Nat.eq_dec j' i then (- mat_el M i' j)%F
+     else 0%F)
    (mat_nrows M) (mat_nrows M).
 
 (* Gauss-Jordan elimination *)
@@ -875,7 +874,7 @@ Fixpoint resolve_loop n (M : matrix T) (V : vector T) :=
   match n with
   | 0 => []
   | S n' =>
-      if srng_eq_dec (determinant M) 0%Srng then
+      if rngl_eq_dec (determinant M) 0%F then
         let MV := mat_vect_concat M V in
         let A := gauss_jordan MV in
         (* deletion last row which, normally, contains only zeros
@@ -892,14 +891,14 @@ Fixpoint resolve_loop n (M : matrix T) (V : vector T) :=
           in
           vect_sub rhs last_col
         in
-        resolve_loop n' B U ++ [1%Srng]
+        resolve_loop n' B U ++ [1%F]
       else
         (* resolve for example by Cramer the system of equations Mx=V *)
         resolve_system M V
   end.
 
 Definition resolve (M : matrix T) V :=
-  vect_of_list 0%Srng (resolve_loop (mat_nrows M) M V).
+  vect_of_list 0%F (resolve_loop (mat_nrows M) M V).
 
 (* pivot *)
 
@@ -907,7 +906,7 @@ Fixpoint pivot_index_loop (M : matrix T) i j it :=
   match it with
   | 0 => j
   | S it' =>
-      if srng_eq_dec (mat_el M i j) 0 then pivot_index_loop M i (j + 1) it'
+      if rngl_eq_dec (mat_el M i j) 0 then pivot_index_loop M i (j + 1) it'
       else j
   end.
 
@@ -938,7 +937,7 @@ Definition in_reduced_row_echelon_form (M : matrix T) :=
   in_row_echelon_form M ∧
   (∀ i, i < mat_nrows M → ∀ k, k < mat_nrows M →
    pivot_index M i < mat_ncols M
-   → mat_el M k (pivot_index M i) = if Nat.eq_dec k i then 1%Srng else 0%Srng).
+   → mat_el M k (pivot_index M i) = if Nat.eq_dec k i then 1%F else 0%F).
 
 (* proof that Gauss-Jordan algorithm returns a matrix in row
    echelon form *)
@@ -1000,26 +999,26 @@ Qed.
 
 Theorem mat_swap_row_mul_l_lemma : ∀ M i j sz,
   i < sz
-  → (Σ (k = 0, sz - 1), (if Nat.eq_dec k i then 1 else 0) * mat_el M k j)%Rng
+  → (Σ (k = 0, sz - 1), (if Nat.eq_dec k i then 1 else 0) * mat_el M k j)%F
     = mat_el M i j.
 Proof.
 intros * His.
-rewrite (srng_summation_split _ i); [ | flia His ].
-rewrite srng_summation_split_last; [ | flia His ].
-rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+rewrite (rngl_summation_split _ i); [ | flia His ].
+rewrite rngl_summation_split_last; [ | flia His ].
+rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
   intros k Hk.
   destruct (Nat.eq_dec (k - 1) i) as [H| H]; [ flia Hk H | clear H ].
-  apply srng_mul_0_l.
+  apply rngl_mul_0_l.
 }
-rewrite srng_add_0_l.
+rewrite rngl_add_0_l.
 destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
-rewrite srng_mul_1_l.
-rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+rewrite rngl_mul_1_l.
+rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
   intros k Hk.
   destruct (Nat.eq_dec k i) as [H| H]; [ flia Hk H | clear H ].
-  apply srng_mul_0_l.
+  apply rngl_mul_0_l.
 }
-apply srng_add_0_r.
+apply rngl_add_0_r.
 Qed.
 
 Theorem mat_id_swap_rows_mul_l : ∀ M sz i1 i2,
@@ -1038,22 +1037,22 @@ destruct (Nat.eq_dec i i1) as [Hii1| Hii1]. {
 destruct (Nat.eq_dec i i2) as [Hii2| Hii2]. {
   now apply mat_swap_row_mul_l_lemma.
 }
-rewrite (srng_summation_split _ i); [ | flia Hi ].
-rewrite srng_summation_split_last; [ | flia ].
+rewrite (rngl_summation_split _ i); [ | flia Hi ].
+rewrite rngl_summation_split_last; [ | flia ].
 destruct (Nat.eq_dec i i) as [H| H]; [ clear H | flia H ].
-rewrite srng_mul_1_l.
-rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+rewrite rngl_mul_1_l.
+rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
   intros k Hk.
   destruct (Nat.eq_dec i (k - 1)) as [H| H]; [ flia Hk H | clear H ].
-  apply srng_mul_0_l.
+  apply rngl_mul_0_l.
 }
-rewrite srng_add_0_l.
-rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+rewrite rngl_add_0_l.
+rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
   intros k Hk.
   destruct (Nat.eq_dec i k) as [H| H]; [ flia Hk H | clear H ].
-  apply srng_mul_0_l.
+  apply rngl_mul_0_l.
 }
-apply srng_add_0_r.
+apply rngl_add_0_r.
 Qed.
 
 (* Multiplicative factor for computing determinant from gauss-jordan form.
@@ -1064,16 +1063,16 @@ Qed.
 
 Fixpoint det_mult_fact_from_gjl_loop (M : matrix T) i j it :=
   match it with
-  | 0 => 1%Srng
+  | 0 => 1%F
   | S it' =>
       match first_non_zero_in_col M (mat_nrows M - i) i j with
       | Some k =>
           let ml := gauss_jordan_step_list M i j k in
           let M' := fold_right mat_mul M ml in
           let v :=
-            ((if Nat.eq_dec i k then 1 else (- (1))) * mat_el M k j)%Rng
+            ((if Nat.eq_dec i k then 1 else (- (1))) * mat_el M k j)%F
           in
-          (v * det_mult_fact_from_gjl_loop M' (S i) (S j) it')%Srng
+          (v * det_mult_fact_from_gjl_loop M' (S i) (S j) it')%F
       | None =>
           det_mult_fact_from_gjl_loop M i (S j) it'
       end
@@ -1100,7 +1099,7 @@ cbn - [ iter_seq ].
 intros i Hi.
 subst V.
 cbn - [ iter_seq ].
-erewrite srng_summation_eq_compat. 2: {
+erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   rewrite (List_map_nth_in _ 0); [ | rewrite seq_length; flia Hsm Hi Hj ].
   rewrite seq_nth; [ | flia Hsm Hi Hj ].
@@ -1123,7 +1122,7 @@ cbn - [ iter_seq ].
 Theorem resolved_with_zero_det : ∀ M V R,
   is_square_mat M
   → mat_nrows M = vect_nrows R
-  → determinant M = 0%Rng
+  → determinant M = 0%F
   → V = resolve M R
   → (M · V)%V = R.
 Proof.
@@ -1143,7 +1142,7 @@ induction r; intros. {
   now apply vector_eq.
 }
 cbn in Hv.
-destruct (srng_eq_dec (determinant M) 0) as [Hdz| Hdz]; [ | easy ].
+destruct (rngl_eq_dec (determinant M) 0) as [Hdz| Hdz]; [ | easy ].
 clear Hdz.
 remember (gauss_jordan_loop (mat_vect_concat M R) 0 0 (mat_ncols M + 1))
   as MGJ eqn:Hmgj.
@@ -1158,7 +1157,7 @@ unfold vect_sub in HV'.
 unfold vect_opp in HV'; cbn in HV'.
 unfold vect_add in HV'; cbn in HV'.
 remember (mk_vect (vect_el R) r) as R' eqn:HR'.
-destruct (srng_eq_dec (determinant M') 0) as [Hdz| Hdz]. {
+destruct (rngl_eq_dec (determinant M') 0) as [Hdz| Hdz]. {
   specialize (IHr M' V' R') as H1.
   assert (H : mat_nrows M' = r) by now subst M'.
   specialize (H1 H); clear H.
@@ -1189,7 +1188,7 @@ destruct r. {
 rename Hr into Hmr.
 symmetry in Hsm, Hrr.
 cbn in Hv.
-destruct (srng_eq_dec (determinant M) 0) as [Hdz| Hdz]. 2: {
+destruct (rngl_eq_dec (determinant M) 0) as [Hdz| Hdz]. 2: {
 ...
 Abort. (* for the moment...
   apply resolved_with_nz_det.
@@ -1226,7 +1225,7 @@ Definition eval_mat_polyn M x :=
   mk_mat (λ i j, eval_polyn (mat_el M i j) x) (mat_nrows M) (mat_ncols M).
 
 Theorem eigenvector_prop : ∀ M μ V S,
-  eval_polyn (charac_polyn M) μ = 0%Srng
+  eval_polyn (charac_polyn M) μ = 0%F
   → S = eval_mat_polyn (xI_sub_M M) μ
   → V = resolve S (vect_zero (mat_ncols M))
   → (M · V = μ × V)%V ∧ V ≠ vect_zero (vect_nrows V).
@@ -1283,61 +1282,61 @@ destruct k. {
   symmetry in Hk1.
   destruct k1 as [k1| ]. {
     remember (gauss_jordan_loop _ _ _ _) as A eqn:Ha.
-    destruct (srng_eq_dec (mat_el A 0 0) 0) as [Hmz| Hmz]. {
+    destruct (rngl_eq_dec (mat_el A 0 0) 0) as [Hmz| Hmz]. {
       unfold gauss_jordan_step_op in Ha.
       specialize (first_non_zero_prop _ _ _ _ Hk1) as (H1 & H2 & H3).
       cbn in H1.
 ...
       remember (multiply_row_by_scalar _ _ _ _) as A' eqn:Ha'.
       remember (swap_rows M 0 k1) as A'' eqn:Ha''.
-      assert (H4 : mat_el A'' 0 0 ≠ 0%Srng). {
+      assert (H4 : mat_el A'' 0 0 ≠ 0%F). {
         rewrite Ha''.
         cbn - [ iter_seq Nat.eq_dec ].
-        rewrite srng_summation_split_first; [ | easy | flia H1 ].
+        rewrite rngl_summation_split_first; [ | easy | flia H1 ].
         destruct (Nat.eq_dec 0 0) as [H| H]; [ clear H | easy ].
         destruct (Nat.eq_dec 0 k1) as [Hk1z| Hk1z]. {
-          subst k1; rewrite srng_mul_1_l.
-          rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+          subst k1; rewrite rngl_mul_1_l.
+          rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
             intros i Hi.
             destruct (Nat.eq_dec i 0) as [Hiz| Hiz]; [ flia Hi Hiz | ].
-            apply srng_mul_0_l.
+            apply rngl_mul_0_l.
           }
-          now rewrite srng_add_0_r.
+          now rewrite rngl_add_0_r.
         }
-        rewrite srng_mul_0_l, srng_add_0_l.
-        rewrite (srng_summation_split _ k1); [ | flia H1 ].
-        rewrite srng_summation_split_last; [ | flia Hk1z ].
+        rewrite rngl_mul_0_l, rngl_add_0_l.
+        rewrite (rngl_summation_split _ k1); [ | flia H1 ].
+        rewrite rngl_summation_split_last; [ | flia Hk1z ].
         destruct (Nat.eq_dec k1 k1) as [H| H]; [ clear H | easy ].
-        rewrite srng_mul_1_l.
-        rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+        rewrite rngl_mul_1_l.
+        rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
           intros i Hi.
           destruct (Nat.eq_dec (i - 1) k1) as [H| H]; [ flia H Hi | ].
-          apply srng_mul_0_l.
+          apply rngl_mul_0_l.
         }
-        rewrite srng_add_0_l.
-        rewrite all_0_srng_summation_0; [ | easy | ]. 2: {
+        rewrite rngl_add_0_l.
+        rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
           intros i Hi.
           destruct (Nat.eq_dec i k1) as [H| H]; [ flia H Hi | ].
-          apply srng_mul_0_l.
+          apply rngl_mul_0_l.
         }
-        now rewrite srng_add_0_r.
+        now rewrite rngl_add_0_r.
       }
-      assert (H5 : mat_el A' 0 0 = 1%Srng). {
+      assert (H5 : mat_el A' 0 0 = 1%F). {
         rewrite Ha', Ha''.
         cbn - [ iter_seq Nat.eq_dec ].
 ...
         apply fld_mul_inv_l.
-        rewrite srng_summation_split_first; [ | easy | flia H1 ].
+        rewrite rngl_summation_split_first; [ | easy | flia H1 ].
         destruct (Nat.eq_dec 0 0) as [H| H]; [ clear H | easy ].
 ...
-        rewrite srng_mul_0_l, srng_add_0_l.
-        erewrite srng_summation_eq_compat; [ | easy | ]. 2: {
+        rewrite rngl_mul_0_l, rngl_add_0_l.
+        erewrite rngl_summation_eq_compat; [ | easy | ]. 2: {
           intros i Hi.
           destruct (Nat.eq_dec 0 i) as [H| H]; [ flia Hi H | clear H ].
           easy.
         }
         cbn - [ iter_seq Nat.eq_dec ].
-        rewrite (srng_summation_split _ k1); [ | flia H1 ].
+        rewrite (rngl_summation_split _ k1); [ | flia H1 ].
         destruct (Nat.eq_dec k1 0) as [Hk1z| Hk1z]. {
           exfalso; subst k1.
           (* mmm... pas si simple *)
@@ -1397,7 +1396,7 @@ rewrite List_app_fold_left with
   destruct (Nat.eq_dec i' (S i)) as [Hii| Hii]; [ easy | ].
   destruct i'. {
     cbn.
-    rewrite <- srng_add_0_r.
+    rewrite <- rngl_add_0_r.
     f_equal.
 ...
 (*end trying to prove it for the upper left number of the matrix*)
@@ -1413,16 +1412,16 @@ rewrite List_app_fold_left with
     symmetry in Hk1.
     destruct k1 as [k1| ]. {
       remember (gauss_jordan_loop _ _ _ _) as A eqn:Ha.
-      destruct (srng_eq_dec (mat_el A k 0) 0) as [Hmz| Hmz]. {
+      destruct (rngl_eq_dec (mat_el A k 0) 0) as [Hmz| Hmz]. {
         destruct it; [ cbn in Hp; flia Hp | ].
         cbn in Hp |-*.
-        destruct (srng_eq_dec (mat_el A k 1) 0) as [Hm1z| Hm1z]. {
+        destruct (rngl_eq_dec (mat_el A k 1) 0) as [Hm1z| Hm1z]. {
           destruct it; [ cbn in Hp; flia Hp | ].
           cbn in Hp |-*.
-          destruct (srng_eq_dec (mat_el A k 2) 0) as [Hm2z| Hm2z]. {
+          destruct (rngl_eq_dec (mat_el A k 2) 0) as [Hm2z| Hm2z]. {
             destruct it; [ cbn in Hp; flia Hp | ].
             cbn in Hp |-*.
-            destruct (srng_eq_dec (mat_el A k 3) 0) as [Hm3z| Hm3z]. {
+            destruct (rngl_eq_dec (mat_el A k 3) 0) as [Hm3z| Hm3z]. {
 ...
             }
             rewrite Ha.
@@ -1452,13 +1451,13 @@ rewrite Hsit in Ha'2.
 Theorem glop : ∀ A A' k j it i,
    A = gauss_jordan_loop A' i i (it + j)
   → pivot_index_loop A k (S j) it < it + S j
-  → mat_el A k (pivot_index_loop A k (S j) it) = 1%Srng.
+  → mat_el A k (pivot_index_loop A k (S j) it) = 1%F.
 Proof.
 intros A * Ha Hp.
 revert A A' k j i Ha Hp.
 induction it; intros A A' k j i Ha Hp; [ cbn in Hp; flia Hp | ].
 cbn in Hp |-*.
-destruct (srng_eq_dec (mat_el A k (S j)) 0) as [Hmjz| Hmjz]. {
+destruct (rngl_eq_dec (mat_el A k (S j)) 0) as [Hmjz| Hmjz]. {
   apply IHit with (A' := A') (i := i); [ | flia Hp ].
   now replace (it + (j + 1)) with (S it + j) by flia.
 }
@@ -1486,7 +1485,7 @@ destruct k1 as [k1| ]. {
     move Hr after Hc.
     destruct r; [ easy | ].
     cbn - [ gauss_jordan_step ].
-    destruct (srng_eq_dec (mat_el M 0 0) 0) as [Hmz| Hmz]. {
+    destruct (rngl_eq_dec (mat_el M 0 0) 0) as [Hmz| Hmz]. {
       remember (first_non_zero_in_col _ _ _ _) as k eqn:Hk.
       symmetry in Hk.
       destruct k as [k| ]. {
@@ -1495,7 +1494,7 @@ destruct k1 as [k1| ]. {
         induction r; intros; [ easy | ].
         rename A0 into A.
         cbn in Hk.
-        destruct (srng_eq_dec (mat_el M 1 0) 0) as [Hm1z| Hm1z]. {
+        destruct (rngl_eq_dec (mat_el M 1 0) 0) as [Hm1z| Hm1z]. {
           destruct i. {
             clear IHr Hi.
 ...
@@ -1540,7 +1539,7 @@ Compute list_list_of_mat (gauss_jordan' (mA Q_semiring_op 2)).
    eigenvalues of An are √n and -√n, as the Lemma 2.2. claims *)
 
 Theorem A_eigenvalue : ∀ n μ,
-  (μ * μ = srng_of_nat n)%Rng
+  (μ * μ = rngl_of_nat n)%F
   → ∃ V,
       V ≠ vect_zero (vect_nrows V) ∧
       (mat_of_squ_bmat (mA n) · V = μ × V)%V.
