@@ -1,7 +1,7 @@
 (* Ring-like *)
-(* Algebraic structure with two operations *)
+(* Algebraic structures with two operations *)
 (* Allows to define semirings, rings, fields, commutative or not,
-   with two structures:
+   with two classes:
      ring_like_op, holding the operations, and
      ring_like_prop, holding their properties *)
 
