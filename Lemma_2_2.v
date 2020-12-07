@@ -538,6 +538,9 @@ rewrite mat_mul_1_l; [ | easy | easy | easy ].
 rewrite mat_mul_1_r; [ | easy | easy | now cbn; rewrite mA_nrows ].
 rewrite (mat_add_add_swap (mA n)).
 ...
+rewrite mat_fold_sub.
+Theorem mat_add_opp_r : ∀ M, (M - M = mZ (mat_nrows M))%M.
+...
 rewrite mat_add_opp_r.
 ...
 
