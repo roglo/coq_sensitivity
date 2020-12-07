@@ -808,6 +808,23 @@ exists p.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
+Theorem squ_mat_add_0_l : ∀ n (MA : square_matrix n),
+  squ_mat_add (squ_mat_zero n) MA = MA.
+Proof.
+intros.
+destruct MA as (A, Ha).
+apply eq_exist_uncurried; cbn.
+assert (p : (mZ n + A)%M = A). {
+  apply Bool.andb_true_iff in Ha.
+  destruct Ha as (Hra, Hca).
+  apply Nat.eqb_eq in Hra.
+  apply Nat.eqb_eq in Hca.
+  apply mat_add_0_l; congruence.
+}
+exists p.
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+Qed.
+
 Definition squ_mat_ring_like_prop (n : nat)
     (rom : ring_like_op (square_matrix n)) :
     ring_like_prop (square_matrix n) :=
@@ -816,7 +833,7 @@ Definition squ_mat_ring_like_prop (n : nat)
      rngl_has_inv := false;
      rngl_add_comm := @squ_mat_add_comm n;
      rngl_add_assoc := @squ_mat_add_assoc n;
-     rngl_add_0_l := ?rngl_add_0_l;
+     rngl_add_0_l := rngl_add_0_l;
      rngl_mul_assoc := ?rngl_mul_assoc;
      rngl_mul_1_l := ?rngl_mul_1_l;
      rngl_mul_add_distr_l := ?rngl_mul_add_distr_l;
