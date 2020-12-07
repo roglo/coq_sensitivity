@@ -1016,6 +1016,8 @@ Arguments determinant {T ro} M%M.
 Arguments is_square_mat {T} M%M.
 Arguments mat_mul_scal_l {T ro} _ M%M.
 Arguments mat_mul_vect_r {T ro} M%M V%V.
+Arguments mat_mul_1_l {T}%type_scope {ro rp} Hro M%M n%nat_scope.
+Arguments mat_mul_1_r {T}%type_scope {ro rp} Hro M%M n%nat_scope.
 Arguments mat_nrows {T} m%M.
 Arguments mat_ncols {T} m%M.
 Arguments mat_sub {T ro} MA%M MB%M.

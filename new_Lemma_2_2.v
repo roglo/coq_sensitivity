@@ -532,10 +532,10 @@ rewrite mat_mul_add_distr_l; [ | easy ].
 rewrite lemma_2_A_n_2_eq_n_I.
 rewrite mat_mul_add_distr_l; [ | easy ].
 specialize (mA_is_square n) as Hasm.
-rewrite mat_mul_1_l with (rp0 := rp); [ | easy | easy | easy ].
-rewrite mat_mul_1_l with (rp0 := rp); [ | easy | easy | now rewrite mA_ncols ].
-rewrite mat_mul_1_l with (rp0 := rp); [ | easy | easy | easy ].
-rewrite mat_mul_1_r with (rp0 := rp); [ | easy | easy | now cbn; rewrite mA_nrows ].
+rewrite mat_mul_1_l; [ | easy | easy | easy ].
+rewrite mat_mul_1_l; [ | easy | easy | now rewrite mA_ncols ].
+rewrite mat_mul_1_l; [ | easy | easy | easy ].
+rewrite mat_mul_1_r; [ | easy | easy | now cbn; rewrite mA_nrows ].
 Require Import Nsring.
 Print nat_ring_like_op.
 Existing Instance nat_ring_like_op.
