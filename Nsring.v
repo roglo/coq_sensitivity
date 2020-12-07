@@ -1,7 +1,7 @@
 (* Semiring of natural *)
 
 Require Import Utf8 Arith.
-Require Import Semiring.
+Require Import RingLike.
 
 Definition phony_Nat_opp (x : nat) := 0.
 Definition phony_Nat_inv (x : nat) := 0.

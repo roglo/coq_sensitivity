@@ -11,7 +11,7 @@ Require Import Utf8 Arith.
 Import List List.ListNotations.
 
 Require Import Misc Matrix.
-Require Import Semiring.
+Require Import RingLike.
 Require Import SRsummation SRproduct.
 Import matrix_Notations.
 

@@ -3,7 +3,7 @@
 Set Implicit Arguments.
 Require Import Utf8.
 
-Require Import Semiring Rational.
+Require Import RingLike Rational.
 Import Q.Notations.
 
 Definition Q_ring_like_op : ring_like_op Q :=

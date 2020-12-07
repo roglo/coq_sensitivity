@@ -8,7 +8,7 @@ Import List List.ListNotations.
 Require Import Init.Nat.
 
 Require Import Misc.
-Require Import Semiring SRsummation.
+Require Import RingLike SRsummation.
 
 (* matrices *)
 

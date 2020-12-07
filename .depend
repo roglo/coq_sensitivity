@@ -1,28 +1,28 @@
 GQ.vio: GQ.v Misc.vio PQ.vio Nat_ggcd.vio
 GQ.vo GQ.glob GQ.v.beautified GQ.required_vo: GQ.v Misc.vo PQ.vo Nat_ggcd.vo
-Lemma_2_2.vio: Lemma_2_2.v Misc.vio Matrix.vio Semiring.vio SRsummation.vio SRproduct.vio Nsring.vio
-Lemma_2_2.vo Lemma_2_2.glob Lemma_2_2.v.beautified Lemma_2_2.required_vo: Lemma_2_2.v Misc.vo Matrix.vo Semiring.vo SRsummation.vo SRproduct.vo Nsring.vo
-Matrix.vio: Matrix.v Misc.vio Semiring.vio SRsummation.vio
-Matrix.vo Matrix.glob Matrix.v.beautified Matrix.required_vo: Matrix.v Misc.vo Semiring.vo SRsummation.vo
+Lemma_2_2.vio: Lemma_2_2.v Misc.vio Matrix.vio RingLike.vio SRsummation.vio SRproduct.vio Nsring.vio
+Lemma_2_2.vo Lemma_2_2.glob Lemma_2_2.v.beautified Lemma_2_2.required_vo: Lemma_2_2.v Misc.vo Matrix.vo RingLike.vo SRsummation.vo SRproduct.vo Nsring.vo
+Matrix.vio: Matrix.v Misc.vio RingLike.vio SRsummation.vio
+Matrix.vo Matrix.glob Matrix.v.beautified Matrix.required_vo: Matrix.v Misc.vo RingLike.vo SRsummation.vo
 Misc.vio: Misc.v 
 Misc.vo Misc.glob Misc.v.beautified Misc.required_vo: Misc.v 
 Nat_ggcd.vio: Nat_ggcd.v Misc.vio
 Nat_ggcd.vo Nat_ggcd.glob Nat_ggcd.v.beautified Nat_ggcd.required_vo: Nat_ggcd.v Misc.vo
-Nsring.vio: Nsring.v Semiring.vio
-Nsring.vo Nsring.glob Nsring.v.beautified Nsring.required_vo: Nsring.v Semiring.vo
+Nsring.vio: Nsring.v RingLike.vio
+Nsring.vo Nsring.glob Nsring.v.beautified Nsring.required_vo: Nsring.v RingLike.vo
 PQ.vio: PQ.v Misc.vio Nat_ggcd.vio
 PQ.vo PQ.glob PQ.v.beautified PQ.required_vo: PQ.v Misc.vo Nat_ggcd.vo
-Qfield2.vio: Qfield2.v Semiring.vio Rational.vio
-Qfield2.vo Qfield2.glob Qfield2.v.beautified Qfield2.required_vo: Qfield2.v Semiring.vo Rational.vo
+Qfield2.vio: Qfield2.v RingLike.vio Rational.vio
+Qfield2.vo Qfield2.glob Qfield2.v.beautified Qfield2.required_vo: Qfield2.v RingLike.vo Rational.vo
 Rational.vio: Rational.v Misc.vio GQ.vio
 Rational.vo Rational.glob Rational.v.beautified Rational.required_vo: Rational.v Misc.vo GQ.vo
-SRproduct.vio: SRproduct.v Misc.vio Semiring.vio
-SRproduct.vo SRproduct.glob SRproduct.v.beautified SRproduct.required_vo: SRproduct.v Misc.vo Semiring.vo
-SRsummation.vio: SRsummation.v Misc.vio Semiring.vio
-SRsummation.vo SRsummation.glob SRsummation.v.beautified SRsummation.required_vo: SRsummation.v Misc.vo Semiring.vo
-Semiring.vio: Semiring.v 
-Semiring.vo Semiring.glob Semiring.v.beautified Semiring.required_vo: Semiring.v 
+RingLike.vio: RingLike.v 
+RingLike.vo RingLike.glob RingLike.v.beautified RingLike.required_vo: RingLike.v 
+SRproduct.vio: SRproduct.v Misc.vio RingLike.vio
+SRproduct.vo SRproduct.glob SRproduct.v.beautified SRproduct.required_vo: SRproduct.v Misc.vo RingLike.vo
+SRsummation.vio: SRsummation.v Misc.vio RingLike.vio
+SRsummation.vo SRsummation.glob SRsummation.v.beautified SRsummation.required_vo: SRsummation.v Misc.vo RingLike.vo
 Sensitivity.vio: Sensitivity.v Misc.vio
 Sensitivity.vo Sensitivity.glob Sensitivity.v.beautified Sensitivity.required_vo: Sensitivity.v Misc.vo
-Zring.vio: Zring.v Semiring.vio
-Zring.vo Zring.glob Zring.v.beautified Zring.required_vo: Zring.v Semiring.vo
+Zring.vio: Zring.v RingLike.vio
+Zring.vo Zring.glob Zring.v.beautified Zring.required_vo: Zring.v RingLike.vo

@@ -3,7 +3,7 @@
 Set Nested Proofs Allowed.
 
 Require Import Utf8 Arith.
-Require Import Misc Semiring.
+Require Import Misc RingLike.
 Import List List.ListNotations.
 
 Notation "'Π' ( i = b , e ) , g" :=

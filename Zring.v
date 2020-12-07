@@ -2,7 +2,7 @@
 
 Require Import Utf8 ZArith.
 
-Require Import Semiring.
+Require Import RingLike.
 
 Definition phony_Z_inv (x : Z) := 0%Z.
 
