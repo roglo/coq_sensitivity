@@ -3,7 +3,7 @@
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
-Require Import Utf8 Arith.
+Require Import Utf8 Arith Bool.
 Import List List.ListNotations.
 Require Import Init.Nat.
 
@@ -676,29 +676,63 @@ Qed.
 
 (* square matrices *)
 
-...
+Definition is_square_mat_bool (M : matrix T) :=
+  Nat.eqb (mat_nrows M) (mat_ncols M).
 
 Definition compatible_square_matrices_bool (ML : list (matrix T)) :=
-  (forallb is_square_mat ML &&
+  (forallb is_square_mat_bool ML &&
    forallb
-     (λ BM,
-        let sz1 := mat_nrows ...
-        let sz2 := sizes_of_bmatrix (hd (BM_1 0%Srng) BML) in
-        list_eqb Nat.eqb 0 sz1 sz2)
+     (λ M,
+        let sz1 := mat_nrows M in
+        let sz2 := mat_nrows (hd M ML) in
+        Nat.eqb sz1 sz2)
      ML)%bool.
-...
-Definition square_bmatrix M (HM : is_square_mat M) :=
-  {A : matrix T | compatible_square_bmatrices_bool [M; A] = true}.
+
+Definition square_matrix n :=
+  {M : matrix T | Nat.eqb (mat_nrows M) n && Nat.eqb (mat_ncols M) n = true}.
+
+Theorem mZ_prop n : (mat_nrows (mZ n) =? n) && (mat_ncols (mZ n) =? n) = true.
+Proof.
+apply andb_true_intro.
+now split; apply Nat.eqb_eq.
+Qed.
+
+Theorem mI_prop n : (mat_nrows (mI n) =? n) && (mat_ncols (mI n) =? n) = true.
+Proof.
+apply andb_true_intro.
+now split; apply Nat.eqb_eq.
+Qed.
+
+Definition squ_mat_zero n : square_matrix n := exist _ (mZ n) (mZ_prop n).
+Definition squ_mat_one n : square_matrix n := exist _ (mI n) (mI_prop n).
+
+Theorem squ_mat_add_prop : ∀ n (MA MB : square_matrix n),
+  (mat_nrows (proj1_sig MA + proj1_sig MB) =? n) &&
+  (mat_ncols (proj1_sig MA + proj1_sig MB) =? n) = true.
+Proof.
+intros.
+destruct MA as (A, Hap).
+destruct MB as (B, Hbp); cbn.
+apply andb_true_intro.
+apply andb_true_iff in Hap.
+apply andb_true_iff in Hbp.
+easy.
+Qed.
+
+Definition squ_mat_add n (MA MB : square_matrix n) : square_matrix n :=
+  exist _ (proj1_sig MA + proj1_sig MB)%M (squ_mat_add_prop MA MB).
 
 Definition phony_mat_inv (M : matrix T) := M.
 
-Canonical Structure squ_mat_ring_like_op n : ring_like_op (matrix T) :=
-  {| rngl_zero := mZ n;
-     rngl_one := mI n;
-     rngl_add := mat_add;
-     rngl_mul := mat_mul;
-     rngl_opp := mat_opp;
-     rngl_inv := phony_mat_inv |}.
+Canonical Structure squ_mat_ring_like_op n : ring_like_op (square_matrix n) :=
+  {| rngl_zero := squ_mat_zero n;
+     rngl_one := squ_mat_one n;
+     rngl_add := @squ_mat_add n;
+     rngl_mul := ?rngl_mul;
+     rngl_opp := ?rngl_opp;
+     rngl_inv := ?rngl_inv |}.
+
+...
 
 Existing Instance squ_mat_ring_like_op.
 
