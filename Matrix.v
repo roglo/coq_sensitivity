@@ -319,6 +319,7 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context {rp : ring_like_prop T}.
 Context {Hro : rngl_has_opp = true}.
+Context {Hic : rngl_is_comm = true}.
 
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
@@ -555,13 +556,39 @@ Qed.
 
 (* associativity of multiplication by scalar *)
 
-Theorem mat_mul_scal_l_mul_distr_l : ∀ a b M,
+Theorem mat_mul_scal_l_mul_assoc : ∀ a b M,
   (a × (b × M))%M = ((a * b)%F × M)%M.
 Proof.
 intros.
 apply matrix_eq; [ easy | easy | ].
 intros * Hi Hj; cbn.
 apply rngl_mul_assoc.
+Qed.
+
+Theorem mat_mul_mul_scal_l : ∀ a MA MB, (MA * (a × MB) = a × (MA * MB))%M.
+Proof.
+intros.
+specialize rngl_c_mul_comm as rngl_mul_comm.
+destruct rngl_is_comm; [ | easy ].
+apply matrix_eq; [ easy | easy | ].
+intros * Hi Hj.
+cbn - [ iter_seq ].
+rewrite rngl_mul_summation_distr_l; [ | easy ].
+apply rngl_summation_eq_compat.
+intros k Hk.
+rewrite rngl_mul_comm.
+rewrite <- rngl_mul_assoc.
+f_equal.
+apply rngl_mul_comm.
+Qed.
+
+Theorem mat_mul_scal_add_distr_l : ∀ a MA MB,
+  (a × (MA + MB) = (a × MA + a × MB))%M.
+Proof.
+intros.
+apply matrix_eq; [ easy | easy | ].
+intros * Hi Hj.
+apply rngl_mul_add_distr_l.
 Qed.
 
 (* associativity with multiplication with vector *)
@@ -878,6 +905,7 @@ Arguments det_loop {T ro} M%M n%nat.
 Arguments determinant {T ro} M%M.
 Arguments is_square_mat {T} M%M.
 Arguments mat_add_opp_r {T}%type {ro rp} Hro M%M n%nat.
+Arguments mat_mul_mul_scal_l {T}%type {ro rp} Hro Hic.
 Arguments mat_mul_scal_l {T ro} _ M%M.
 Arguments mat_mul_vect_r {T ro} M%M V%V.
 Arguments mat_mul_1_l {T}%type {ro rp} Hro M%M n%nat.

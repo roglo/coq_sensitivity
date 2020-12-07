@@ -21,6 +21,7 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {Hro : rngl_has_opp = true}.
+Context {Hic : rngl_is_comm = true}.
 
 (* *)
 
@@ -565,7 +566,9 @@ replace (rngl_of_nat n + 1)%F with (rngl_of_nat (S n)) in Hy. 2: {
 }
 subst y.
 rewrite <- Hμ.
-rewrite <- mat_mul_scal_l_mul_distr_l; [ | easy ].
+rewrite <- mat_mul_scal_l_mul_assoc; [ | easy ].
+rewrite mat_mul_mul_scal_l; [ | easy | easy ].
+rewrite <- mat_mul_scal_add_distr_l; [ | easy ].
 ...
 
 (* here, I would like to prove that, knowing that An^2 = nI, the
