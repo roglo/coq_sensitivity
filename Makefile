@@ -1,7 +1,7 @@
 TARGET=Qfield2.vo Zring.vo Nsring.vo Lemma_2_2.vo
 FILESFORDEP=`LC_ALL=C ls *.v`
 
-all: pa_coq.cmo $(TARGET)
+all: $(TARGET)
 
 pa_coq.cmo: pa_coq.ml
 	ocamlc -I $$(camlp5 -where) -pp camlp5r -c $<
