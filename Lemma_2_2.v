@@ -536,17 +536,9 @@ rewrite mat_mul_1_l; [ | easy | easy | easy ].
 rewrite mat_mul_1_l; [ | easy | easy | now rewrite mA_ncols ].
 rewrite mat_mul_1_l; [ | easy | easy | easy ].
 rewrite mat_mul_1_r; [ | easy | easy | now cbn; rewrite mA_nrows ].
-Require Import Nsring.
-Print nat_ring_like_op.
-Existing Instance nat_ring_like_op.
-Compute (7 - 3)%F.
-Check (7 - 3)%nat.
-Compute (15 / 3)%F.
-Check (15 / 3)%nat.
+rewrite (mat_add_add_swap (mA n)).
 ...
-Check mat_add_assoc.
-Check mat_add_add_swap.
-rewrite mat_add_add_swap.
+rewrite mat_add_opp_r.
 ...
 (*
 remember [mA n; squ_mat_one (2 ^ n)] as M1 eqn:HM1.

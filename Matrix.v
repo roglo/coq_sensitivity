@@ -806,6 +806,24 @@ rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
 now rewrite rngl_add_0_l, rngl_add_0_r.
 Qed.
 
+(* associativity of addition *)
+
+Theorem mat_add_add_swap : ∀ MA MB MC, (MA + MB + MC = MA + MC + MB)%M.
+Proof.
+intros.
+apply matrix_eq; [ easy | easy | cbn ].
+intros i j Hi Hj.
+apply rngl_add_add_swap.
+Qed.
+
+Theorem mat_add_assoc : ∀ MA MB MC, (MA + (MB + MC) = (MA + MB) + MC)%M.
+Proof.
+intros.
+apply matrix_eq; [ easy | easy | cbn ].
+intros i j Hi Hj.
+apply rngl_add_assoc.
+Qed.
+
 (* associativity of multiplication *)
 
 Theorem mat_mul_assoc : ∀ MA MB MC, (MA * (MB * MC))%M = ((MA * MB) * MC)%M.

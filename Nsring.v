@@ -35,3 +35,12 @@ Definition nat_ring_like_prop : ring_like_prop nat :=
      rngl_i_mul_inv_l := I |}.
 
 Canonical Structure nat_ring_like_prop.
+
+(*
+Print nat_ring_like_op.
+Existing Instance nat_ring_like_op.
+Compute (7 - 3)%F.
+Compute (7 - 3)%nat.
+Compute (15 / 3)%F.
+Compute (15 / 3)%nat.
+*)
