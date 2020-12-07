@@ -825,6 +825,7 @@ exists p.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
+(* to be continued...
 Definition squ_mat_ring_like_prop (n : nat)
     (rom : ring_like_op (square_matrix n)) :
     ring_like_prop (square_matrix n) :=
@@ -844,8 +845,7 @@ Definition squ_mat_ring_like_prop (n : nat)
      rngl_no_mul_0_l := ?rngl_no_mul_0_l;
      rngl_no_mul_0_r := ?rngl_no_mul_0_r;
      rngl_i_mul_inv_l := ?rngl_i_mul_inv_l |}.
-
-...
+*)
 
 Arguments det_loop {T ro} M n%nat.
 Arguments determinant {T ro} M.
