@@ -1,7 +1,7 @@
 GQ.vio: GQ.v Misc.vio PQ.vio Nat_ggcd.vio
 GQ.vo GQ.glob GQ.v.beautified GQ.required_vo: GQ.v Misc.vo PQ.vo Nat_ggcd.vo
-Lemma_2_2.vio: Lemma_2_2.v Misc.vio Matrix.vio RingLike.vio RLsummation.vio RLproduct.vio
-Lemma_2_2.vo Lemma_2_2.glob Lemma_2_2.v.beautified Lemma_2_2.required_vo: Lemma_2_2.v Misc.vo Matrix.vo RingLike.vo RLsummation.vo RLproduct.vo
+Lemma_2_2.vio: Lemma_2_2.v Misc.vio Matrix.vio RingLike.vio RLsummation.vio
+Lemma_2_2.vo Lemma_2_2.glob Lemma_2_2.v.beautified Lemma_2_2.required_vo: Lemma_2_2.v Misc.vo Matrix.vo RingLike.vo RLsummation.vo
 Matrix.vio: Matrix.v Misc.vio RingLike.vio RLsummation.vio
 Matrix.vo Matrix.glob Matrix.v.beautified Matrix.required_vo: Matrix.v Misc.vo RingLike.vo RLsummation.vo
 Misc.vio: Misc.v 
