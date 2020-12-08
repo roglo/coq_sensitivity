@@ -14,8 +14,8 @@ Canonical Structure Z_ring_like_op : ring_like_op Z :=
      rngl_opp := Z.opp;
      rngl_inv := phony_Z_inv |}.
 
-Theorem Z_mul_eq_0 :  ∀ n m, (n * m)%Z = 0%Z → n = 0%Z ∨ m = 0%Z.
-Proof. now apply Z.mul_eq_0. Qed.
+Theorem Z_eq_mul_0 :  ∀ n m, (n * m)%Z = 0%Z → n = 0%Z ∨ m = 0%Z.
+Proof. now apply Z.eq_mul_0. Qed.
 
 Definition Z_ring_like_prop : ring_like_prop Z :=
   {| rngl_is_comm := true;
@@ -37,4 +37,4 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_opt_mul_0_r := I;
      rngl_opt_mul_inv_l := I;
      rngl_opt_eq_dec := Z.eq_dec;
-     rngl_opt_is_integral := Z_mul_eq_0 |}.
+     rngl_opt_is_integral := Z_eq_mul_0 |}.
