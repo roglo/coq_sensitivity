@@ -878,6 +878,50 @@ exists p.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
+Theorem squ_mat_mul_assoc : ∀ n (MA MB MC : square_matrix n),
+  squ_mat_mul MA (squ_mat_mul MB MC) = squ_mat_mul (squ_mat_mul MA MB) MC.
+Proof.
+intros.
+apply eq_exist_uncurried.
+destruct MA as (A, Ha).
+destruct MB as (B, Hb).
+destruct MC as (C, Hc); cbn.
+assert (p : (A * (B * C))%M = (A * B * C)%M). {
+  apply Bool.andb_true_iff in Ha.
+  apply Bool.andb_true_iff in Hb.
+  apply Bool.andb_true_iff in Hc.
+  destruct Ha as (Hra, Hca).
+  destruct Hb as (Hrb, Hcb).
+  destruct Hc as (Hrc, Hcc).
+  apply Nat.eqb_eq in Hra.
+  apply Nat.eqb_eq in Hca.
+  apply Nat.eqb_eq in Hrb.
+  apply Nat.eqb_eq in Hcb.
+  apply Nat.eqb_eq in Hrc.
+  apply Nat.eqb_eq in Hcc.
+  apply mat_mul_assoc; congruence.
+}
+exists p.
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+Qed.
+
+Theorem squ_mat_mul_1_l : ∀ n (MA : square_matrix n),
+  squ_mat_mul (squ_mat_one n) MA = MA.
+Proof.
+intros.
+destruct MA as (A, Ha).
+apply eq_exist_uncurried; cbn.
+assert (p : (mI n * A)%M = A). {
+  apply Bool.andb_true_iff in Ha.
+  destruct Ha as (Hra, Hca).
+  apply Nat.eqb_eq in Hra.
+  apply Nat.eqb_eq in Hca.
+  apply mat_mul_1_l; congruence.
+}
+exists p.
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+Qed.
+
 (* to be continued...
 Definition squ_mat_ring_like_prop (n : nat)
     (rom : ring_like_op (square_matrix n)) :
@@ -888,16 +932,16 @@ Definition squ_mat_ring_like_prop (n : nat)
      rngl_add_comm := @squ_mat_add_comm n;
      rngl_add_assoc := @squ_mat_add_assoc n;
      rngl_add_0_l := rngl_add_0_l;
-     rngl_mul_assoc := ?rngl_mul_assoc;
-     rngl_mul_1_l := ?rngl_mul_1_l;
+     rngl_mul_assoc := @squ_mat_mul_assoc n;
+     rngl_mul_1_l := @squ_mat_mul_1_l n;
      rngl_mul_add_distr_l := ?rngl_mul_add_distr_l;
-     rngl_c_mul_comm := ?rngl_c_mul_comm;
-     rngl_nc_mul_1_r := ?rngl_nc_mul_1_r;
-     rngl_nc_mul_add_distr_r := ?rngl_nc_mul_add_distr_r;
-     rngl_o_add_opp_l := ?rngl_o_add_opp_l;
-     rngl_no_mul_0_l := ?rngl_no_mul_0_l;
-     rngl_no_mul_0_r := ?rngl_no_mul_0_r;
-     rngl_i_mul_inv_l := ?rngl_i_mul_inv_l |}.
+     rngl_opt_mul_comm := ?rngl_c_mul_comm;
+     rngl_opt_mul_1_r := ?rngl_nc_mul_1_r;
+     rngl_opt_mul_add_distr_r := ?rngl_nc_mul_add_distr_r;
+     rngl_opt_add_opp_l := ?rngl_o_add_opp_l;
+     rngl_opt_mul_0_l := ?rngl_no_mul_0_l;
+     rngl_opt_mul_0_r := ?rngl_no_mul_0_r;
+     rngl_opt_mul_inv_l := ?rngl_i_mul_inv_l |}.
 *)
 
 Arguments det_loop {T ro} M n%nat.
