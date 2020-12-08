@@ -18,8 +18,8 @@ Definition Q_ring_like_prop :=
   {| rngl_is_comm := true;
      rngl_has_opp := true;
      rngl_has_inv := true;
-     rngl_eq_is_dec := true;
-     rngl_is_integral := true;
+     rngl_has_dec_eq := true;
+     rngl_is_integral := false;
      rngl_add_comm := Q.add_comm;
      rngl_add_assoc := Q.add_assoc;
      rngl_add_0_l := Q.add_0_l;
@@ -34,7 +34,7 @@ Definition Q_ring_like_prop :=
      rngl_opt_mul_0_r := I;
      rngl_opt_mul_inv_l := Q.mul_inv_l;
      rngl_opt_eq_dec := Q.eq_dec;
-     rngl_opt_is_integral := Q.eq_mul_0 |}.
+     rngl_opt_is_integral := I |}.
 
 Theorem Q_1_neq_0 : 1%Q ≠ 0%Q.
 Proof. easy. Qed.

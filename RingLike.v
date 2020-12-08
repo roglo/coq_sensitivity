@@ -46,7 +46,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_is_comm : bool;
     rngl_has_opp : bool;
     rngl_has_inv : bool;
-    rngl_eq_is_dec : bool;
+    rngl_has_dec_eq : bool;
     rngl_is_integral : bool;
     rngl_add_comm : ∀ a b : T, (a + b = b + a)%F;
     rngl_add_assoc : ∀ a b c : T, (a + (b + c) = (a + b) + c)%F;
@@ -76,10 +76,11 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if rngl_has_inv then ∀ a : T, a ≠ 0%F → (¹/ a * a = 1)%F else True;
     (* when equality is decidable *)
     rngl_opt_eq_dec :
-      if rngl_eq_is_dec then ∀ a b : T, {a = b} + {a ≠ b} else True;
+      if rngl_has_dec_eq then ∀ a b : T, {a = b} + {a ≠ b} else True;
     (* when has_no_zero_divisors *)
     rngl_opt_is_integral :
-      if rngl_is_integral then ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
+      if (rngl_is_integral || negb (rngl_has_inv && rngl_has_dec_eq))%bool then
+        ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
       else True }.
 
 (* the fact that 1 ≠ 0 *)
@@ -308,16 +309,19 @@ rewrite H.
 apply rngl_opp_involutive.
 Qed.
 
-Theorem rngl_is_integral_if_inv_and_eq_dec :
-  if (rngl_has_inv && rngl_eq_is_dec)%bool then
+Theorem rngl_integral :
+  if (rngl_is_integral || (rngl_has_inv && rngl_has_dec_eq))%bool then
     ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
   else True.
 Proof.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
 specialize rngl_opt_eq_dec as rngl_eq_dec.
+specialize rngl_opt_is_integral as rngl_integral.
+destruct rngl_is_integral; [ easy | ].
+cbn in rngl_integral |-*.
 destruct rngl_has_inv; [ | easy ].
-destruct rngl_eq_is_dec; [ | easy ].
-cbn.
+destruct rngl_has_dec_eq; [ | easy ].
+cbn; clear rngl_integral.
 intros * Hab.
 assert (H : (¹/a * a * b = ¹/a * 0)%F). {
   now rewrite <- rngl_mul_assoc, Hab.
@@ -331,12 +335,13 @@ Qed.
 
 End ring_like_theorems.
 
-Arguments rngl_add_opp_l {T}%type_scope {ro rp} Hro.
-Arguments rngl_add_opp_r {T}%type_scope {ro rp} Hro.
-Arguments rngl_add_reg_l {T}%type_scope {ro rp} Hro.
-Arguments rngl_add_sub {T}%type_scope {ro rp} Hro.
-Arguments rngl_mul_opp_opp {T}%type_scope {ro rp} Hro.
-Arguments rngl_mul_0_l {T}%type_scope {ro rp} Hro.
-Arguments rngl_mul_opp_r {T}%type_scope {ro rp} Hro.
-Arguments rngl_mul_0_r {T}%type_scope {ro rp} Hro.
-Arguments rngl_opp_0 {T}%type_scope {ro rp} Hro.
+Arguments rngl_add_opp_l {T}%type {ro rp} Hro.
+Arguments rngl_add_opp_r {T}%type {ro rp} Hro.
+Arguments rngl_add_reg_l {T}%type {ro rp} Hro.
+Arguments rngl_add_sub {T}%type {ro rp} Hro.
+Arguments rngl_integral {T}%type {ro rp} Hro.
+Arguments rngl_mul_opp_opp {T}%type {ro rp} Hro.
+Arguments rngl_mul_0_l {T}%type {ro rp} Hro.
+Arguments rngl_mul_opp_r {T}%type {ro rp} Hro.
+Arguments rngl_mul_0_r {T}%type {ro rp} Hro.
+Arguments rngl_opp_0 {T}%type {ro rp} Hro.
