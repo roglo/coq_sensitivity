@@ -15,6 +15,7 @@ Set Implicit Arguments.
 
 Require Import Utf8 Arith.
 Import List List.ListNotations.
+Require Import Permutation Sorted.
 
 Require Import Misc Matrix.
 Require Import RingLike.
@@ -33,10 +34,18 @@ Definition is_symm_mat (A : matrix T) :=
 Definition is_symm_squ_mat n (A : square_matrix n) :=
   is_symm_mat (proj1_sig A).
 
-Theorem glop : ∀ n m (A : square_matrix n) (B : square_matrix m),
+...
+
+Theorem glop :
+  ∀ n m (A : square_matrix n) (B : square_matrix m) eva evb seva sevb,
   m < n
   → is_symm_squ_mat A
-...
+  → eigenvalues A eva
+  → eigenvalues B evb
+  → Permutation eva seva
+  → Permutation evb sevb
+  → Sorted seva
+  → Sorted sevb
   → squ_mat_mul A A = A ∧ squ_mat_mul B B = B.
 Proof.
 ...
