@@ -346,8 +346,11 @@ Declare Scope V_scope.
 Delimit Scope V_scope with V.
 
 Arguments mat_mul_vect_r {T ro} M%M V%V.
+Arguments vect_mul_scal_l {T ro} s%F V%V.
 
 Notation "A · V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
+Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
+Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
 
 (* *)
 
@@ -634,6 +637,19 @@ cbn - [ iter_seq ].
 now apply mat_vect_mul_assoc_as_sums.
 Qed.
 
+Theorem mat_mul_scal_vect_assoc : ∀ a MA V, (a × (MA · V) = (a × MA) · V)%V.
+Proof.
+intros.
+apply vector_eq; [ easy | ].
+intros i Hi.
+cbn in Hi.
+cbn - [ iter_seq ].
+rewrite rngl_mul_summation_distr_l; [ | easy ].
+apply rngl_summation_eq_compat.
+intros j Hj.
+apply rngl_mul_assoc.
+Qed.
+
 (* comatrix *)
 
 Definition comatrix M : matrix T :=
@@ -908,6 +924,7 @@ Arguments mat_add_opp_r {T}%type {ro rp} Hro M%M n%nat.
 Arguments mat_mul_mul_scal_l {T}%type {ro rp} Hro Hic.
 Arguments mat_mul_scal_l {T ro} _ M%M.
 Arguments mat_mul_vect_r {T ro} M%M V%V.
+Arguments mat_mul_scal_vect_assoc {T}%type {ro rp} Hro.
 Arguments mat_mul_1_l {T}%type {ro rp} Hro M%M n%nat.
 Arguments mat_mul_1_r {T}%type {ro rp} Hro M%M n%nat.
 Arguments mat_nrows {T} m%M.

@@ -395,7 +395,7 @@ Definition base_vector_1 dim :=
 
 Definition A_n_eigenvector_of_sqrt_n n μ V :=
   match n with
-  | 0 => base_vector_1 0
+  | 0 => base_vector_1 1
   | S n' =>
       (mat_of_mat_list_list 0%F
          [[(mA n' + μ × mI (2 ^ n'))%M]; [mI (2 ^ n')]]
@@ -508,7 +508,19 @@ Theorem m_o_mll_2x1_mul_scal_l : ∀ d a MA MB,
   a × mat_of_mat_list_list d [[MA]; [MB]])%M.
 Proof.
 intros.
-...
+apply matrix_eq; [ easy | easy | ].
+cbn; rewrite Nat.mul_1_r.
+intros * Hi Hj.
+unfold mat_list_list_el; cbn.
+rewrite Nat.div_small; [ | easy ].
+rewrite (Nat.mod_small j); [ | easy ].
+destruct (lt_dec i (mat_nrows MA)) as [Hia| Hia]. {
+  now rewrite Nat.div_small.
+} {
+  apply Nat.nlt_ge in Hia.
+  rewrite (Nat_div_less_small 1); [ easy | flia Hi Hia ].
+}
+Qed.
 
 Theorem A_n_eigen_formula : ∀ n μ V,
   (μ * μ)%F = rngl_of_nat n
@@ -518,16 +530,21 @@ Proof.
 intros * Hμ HV.
 destruct n. {
   cbn in Hμ, HV |-*.
+  apply vector_eq; [ now subst V | ].
+  intros i Hi; cbn in Hi |-*.
+  subst V; cbn.
+  rewrite rngl_mul_0_l, rngl_add_0_l; [ | easy ].
+  destruct i; [ | flia Hi ].
+  rewrite rngl_mul_1_r; symmetry; clear Hi.
   (* we need to add that the ring is integral *)
-  admit.
+...
 }
 cbn - [ Nat.pow ] in HV.
 rewrite HV.
 rewrite mat_vect_mul_assoc with (rp0 := rp); [ | easy ].
 cbn - [ iter_seq Nat.pow ].
-rewrite m_o_mll_2x2_2x1; cycle 1. {
-  apply mA_is_square.
-} {
+specialize (mA_is_square n) as Hasm.
+rewrite m_o_mll_2x2_2x1; [ | easy | | | | ]; cycle 1. {
   apply mA_ncols.
 } {
   apply mA_ncols.
@@ -539,16 +556,13 @@ rewrite m_o_mll_2x2_2x1; cycle 1. {
 rewrite mat_mul_add_distr_l; [ | easy ].
 rewrite lemma_2_A_n_2_eq_n_I.
 rewrite mat_mul_add_distr_l; [ | easy ].
-specialize (mA_is_square n) as Hasm.
 rewrite mat_mul_1_l; [ | easy | easy | easy ].
 rewrite mat_mul_1_l; [ | easy | easy | now rewrite mA_ncols ].
 rewrite mat_mul_1_l; [ | easy | easy | easy ].
 rewrite mat_mul_1_r; [ | easy | easy | now cbn; rewrite mA_nrows ].
 rewrite (mat_add_add_swap (mA n)).
 rewrite mat_fold_sub.
-rewrite mat_add_opp_r with (n0 := 2 ^ n); [ | easy | | ]; cycle 1. {
-  apply mA_is_square.
-} {
+rewrite mat_add_opp_r with (n0 := 2 ^ n); [ | easy | easy | ]. 2: {
   symmetry; apply mA_nrows.
 }
 rewrite mA_nrows.
@@ -576,9 +590,11 @@ rewrite <- Hμ.
 rewrite <- mat_mul_scal_l_mul_assoc; [ | easy ].
 rewrite mat_mul_mul_scal_l; [ | easy | easy ].
 rewrite <- mat_mul_scal_add_distr_l; [ | easy ].
-Search mat_of_mat_list_list.
-...
-rewrite glop.
+rewrite m_o_mll_2x1_mul_scal_l.
+rewrite mat_mul_scal_vect_assoc; [ | easy ].
+rewrite mat_mul_1_r; [ | easy | easy | now rewrite mA_nrows ].
+rewrite mat_add_comm; [ easy | easy | easy | easy | cbn ].
+now rewrite mA_ncols.
 ...
 
 (* here, I would like to prove that, knowing that An^2 = nI, the
