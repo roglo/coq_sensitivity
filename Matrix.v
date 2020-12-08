@@ -546,6 +546,29 @@ cbn - [ iter_seq ].
 now apply rngl_summation_add_distr.
 Qed.
 
+(* right distributivity of multiplication over addition *)
+
+Theorem mat_mul_add_distr_r : ∀ MA MB MC : matrix T,
+  mat_ncols MA = mat_ncols MB
+  → ((MA + MB) * MC = MA * MC + MB * MC)%M.
+Proof.
+intros * Hab.
+apply matrix_eq; [ easy | easy | ].
+intros i j Hi Hj.
+cbn - [ iter_seq ].
+cbn in Hi, Hj.
+remember (mat_ncols MA) as ca eqn:Hca.
+remember (mat_ncols MB) as cb eqn:Hcb.
+move cb before ca.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  apply rngl_mul_add_distr_r.
+}
+cbn - [ iter_seq ].
+rewrite rngl_summation_add_distr; [ | easy ].
+now rewrite Hab.
+Qed.
+
 (* left distributivity of multiplication by scalar over addition *)
 
 Theorem mat_mul_scal_l_add_distr_r : ∀ a b M,
@@ -922,27 +945,119 @@ exists p.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
-(* to be continued...
+Theorem squ_mat_mul_add_distr_l : ∀ n (MA MB MC : square_matrix n),
+  squ_mat_mul MA (squ_mat_add MB MC) =
+  squ_mat_add (squ_mat_mul MA MB) (squ_mat_mul MA MC).
+Proof.
+intros.
+apply eq_exist_uncurried.
+destruct MA as (A, Ha).
+destruct MB as (B, Hb).
+destruct MC as (C, Hc); cbn.
+assert (p : (A * (B + C))%M = (A * B + A * C)%M). {
+  apply Bool.andb_true_iff in Ha.
+  apply Bool.andb_true_iff in Hb.
+  apply Bool.andb_true_iff in Hc.
+  destruct Ha as (Hra, Hca).
+  destruct Hb as (Hrb, Hcb).
+  destruct Hc as (Hrc, Hcc).
+  apply Nat.eqb_eq in Hra.
+  apply Nat.eqb_eq in Hca.
+  apply Nat.eqb_eq in Hrb.
+  apply Nat.eqb_eq in Hcb.
+  apply Nat.eqb_eq in Hrc.
+  apply Nat.eqb_eq in Hcc.
+  apply mat_mul_add_distr_l; congruence.
+}
+exists p.
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+Qed.
+
+Theorem squ_mat_mul_1_r : ∀ n (MA : square_matrix n),
+  squ_mat_mul MA (squ_mat_one n) = MA.
+Proof.
+intros.
+destruct MA as (A, Ha).
+apply eq_exist_uncurried; cbn.
+assert (p : (A * mI n)%M = A). {
+  apply Bool.andb_true_iff in Ha.
+  destruct Ha as (Hra, Hca).
+  apply Nat.eqb_eq in Hra.
+  apply Nat.eqb_eq in Hca.
+  apply mat_mul_1_r; congruence.
+}
+exists p.
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+Qed.
+
+Theorem squ_mat_mul_add_distr_r : ∀ n (MA MB MC : square_matrix n),
+  squ_mat_mul (squ_mat_add MA MB) MC =
+  squ_mat_add (squ_mat_mul MA MC) (squ_mat_mul MB MC).
+Proof.
+intros.
+apply eq_exist_uncurried.
+destruct MA as (A, Ha).
+destruct MB as (B, Hb).
+destruct MC as (C, Hc); cbn.
+assert (p : ((A + B) * C)%M = (A * C + B * C)%M). {
+  apply Bool.andb_true_iff in Ha.
+  apply Bool.andb_true_iff in Hb.
+  apply Bool.andb_true_iff in Hc.
+  destruct Ha as (Hra, Hca).
+  destruct Hb as (Hrb, Hcb).
+  destruct Hc as (Hrc, Hcc).
+  apply Nat.eqb_eq in Hra.
+  apply Nat.eqb_eq in Hca.
+  apply Nat.eqb_eq in Hrb.
+  apply Nat.eqb_eq in Hcb.
+  apply Nat.eqb_eq in Hrc.
+  apply Nat.eqb_eq in Hcc.
+  apply mat_mul_add_distr_r; congruence.
+}
+exists p.
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+Qed.
+
+Theorem squ_mat_add_opp_l : ∀ n (MA : square_matrix n),
+  squ_mat_add (squ_mat_opp MA) MA = squ_mat_zero n.
+Proof.
+intros.
+destruct MA as (A, Ha).
+apply eq_exist_uncurried; cbn.
+assert (p : (- A + A)%M = mZ n). {
+  apply Bool.andb_true_iff in Ha.
+  destruct Ha as (Hra, Hca).
+  apply Nat.eqb_eq in Hra.
+  apply Nat.eqb_eq in Hca.
+  rewrite mat_add_opp_l with (n := n); congruence.
+}
+exists p.
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+Qed.
+
 Definition squ_mat_ring_like_prop (n : nat)
-    (rom : ring_like_op (square_matrix n)) :
+    (rom : ring_like_prop (square_matrix n)) :
     ring_like_prop (square_matrix n) :=
   {| rngl_is_comm := false;
      rngl_has_opp := true;
      rngl_has_inv := false;
+     rngl_has_dec_eq := false; (* actually depends on dec_eq for T *)
+     rngl_is_integral_not_provable := false;
      rngl_add_comm := @squ_mat_add_comm n;
      rngl_add_assoc := @squ_mat_add_assoc n;
      rngl_add_0_l := rngl_add_0_l;
      rngl_mul_assoc := @squ_mat_mul_assoc n;
      rngl_mul_1_l := @squ_mat_mul_1_l n;
-     rngl_mul_add_distr_l := ?rngl_mul_add_distr_l;
-     rngl_opt_mul_comm := ?rngl_c_mul_comm;
-     rngl_opt_mul_1_r := ?rngl_nc_mul_1_r;
-     rngl_opt_mul_add_distr_r := ?rngl_nc_mul_add_distr_r;
-     rngl_opt_add_opp_l := ?rngl_o_add_opp_l;
-     rngl_opt_mul_0_l := ?rngl_no_mul_0_l;
-     rngl_opt_mul_0_r := ?rngl_no_mul_0_r;
-     rngl_opt_mul_inv_l := ?rngl_i_mul_inv_l |}.
-*)
+     rngl_mul_add_distr_l := @squ_mat_mul_add_distr_l n;
+     rngl_opt_mul_comm := I;
+     rngl_opt_mul_1_r := @squ_mat_mul_1_r n;
+     rngl_opt_mul_add_distr_r := @squ_mat_mul_add_distr_r n;
+     rngl_opt_add_opp_l := @squ_mat_add_opp_l n;
+     rngl_opt_mul_0_l := I;
+     rngl_opt_mul_0_r := I;
+     rngl_opt_mul_inv_l := I;
+     rngl_opt_eq_dec := I;
+     rngl_opt_is_integral := I |}.
 
 Arguments det_loop {T ro} M n%nat.
 Arguments determinant {T ro} M.
