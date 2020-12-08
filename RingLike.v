@@ -40,7 +40,7 @@ Notation "a - b" := (rngl_sub a b) : ring_like_scope.
 Notation "a * b" := (rngl_mul a b) : ring_like_scope.
 Notation "a / b" := (rngl_div a b) : ring_like_scope.
 Notation "- a" := (rngl_opp a) : ring_like_scope.
-Notation "/ a" := (rngl_inv a) : ring_like_scope.
+Notation "¹/ a" := (rngl_inv a) (at level 35) : ring_like_scope.
 
 Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_is_comm : bool;
@@ -72,7 +72,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if rngl_has_opp then True else ∀ a, (a * 0 = 0)%F;
     (* when has inverse *)
     rngl_i_mul_inv_l :
-      if rngl_has_inv then ∀ a : T, a ≠ 0%F → (/ a * a = 1)%F else True;
+      if rngl_has_inv then ∀ a : T, a ≠ 0%F → (¹/ a * a = 1)%F else True;
     (* when is_integral *)
     rngl_integral :
       if rngl_is_integral then ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F

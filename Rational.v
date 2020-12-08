@@ -213,7 +213,7 @@ Notation "x - y" := (sub x y) : Q_scope.
 Notation "‖ x ‖" := (abs x) (at level 60) : Q_scope.
 Notation "x * y" := (mul x y) : Q_scope.
 Notation "x / y" := (div x y) : Q_scope.
-Notation "/ x" := (inv x) : Q_scope.
+Notation "¹/ x" := (inv x) (at level 35) : Q_scope.
 
 (* reduced syntax of a computed rational *)
 (* e.g. the rational "-3/4" is displayed 〈-3╱4〉%Q *)
@@ -630,7 +630,7 @@ destruct x as [| gx| gx]; [ easy | | ].
 -cbn; f_equal; apply GQmul_inv_r.
 Qed.
 
-Theorem mul_inv_l : ∀ x, x ≠ 0%Q → (/ x * x = 1)%Q.
+Theorem mul_inv_l : ∀ x, x ≠ 0%Q → (¹/ x * x = 1)%Q.
 Proof.
 intros * Hx.
 rewrite mul_comm.
