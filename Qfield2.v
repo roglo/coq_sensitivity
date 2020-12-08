@@ -18,7 +18,7 @@ Definition Q_ring_like_prop :=
   {| rngl_is_comm := true;
      rngl_has_opp := true;
      rngl_has_inv := true;
-     rngl_is_integral := true;
+     rngl_has_no_zero_divisors := true;
      rngl_add_comm := Q.add_comm;
      rngl_add_assoc := Q.add_assoc;
      rngl_add_0_l := Q.add_0_l;
@@ -32,7 +32,7 @@ Definition Q_ring_like_prop :=
      rngl_no_mul_0_l := I;
      rngl_no_mul_0_r := I;
      rngl_i_mul_inv_l := Q.mul_inv_l;
-     rngl_integral := Q.eq_mul_0 |}.
+     rngl_not_having_zero_divisors := Q.eq_mul_0 |}.
 
 Theorem Q_1_neq_0 : 1%Q ≠ 0%Q.
 Proof. easy. Qed.
