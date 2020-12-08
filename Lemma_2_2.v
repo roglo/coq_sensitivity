@@ -22,7 +22,7 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {Hro : rngl_has_opp = true}.
 Context {Hic : rngl_is_comm = true}.
-Context {Hii : rngl_has_no_zero_divisors = true}.
+Context {Hii : rngl_is_integral = true}.
 
 (* *)
 
@@ -537,8 +537,8 @@ destruct n. {
   rewrite rngl_mul_0_l, rngl_add_0_l; [ | easy ].
   destruct i; [ | flia Hi ].
   rewrite rngl_mul_1_r; symmetry; clear Hi.
-  specialize rngl_not_having_zero_divisors as H.
-  destruct rngl_has_no_zero_divisors; [ | easy ].
+  specialize rngl_i_is_integral as H.
+  destruct rngl_is_integral; [ | easy ].
   apply H in Hμ.
   now destruct Hμ.
 }

@@ -21,7 +21,8 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
   {| rngl_is_comm := true;
      rngl_has_opp := true;
      rngl_has_inv := false;
-     rngl_has_no_zero_divisors := true;
+     rngl_eq_is_dec := true;
+     rngl_is_integral := true;
      rngl_add_comm := Z.add_comm;
      rngl_add_assoc := Z.add_assoc;
      rngl_add_0_l := Z.add_0_l;
@@ -35,10 +36,11 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_no_mul_0_l := I;
      rngl_no_mul_0_r := I;
      rngl_i_mul_inv_l := I;
-     rngl_not_having_zero_divisors := Z_mul_eq_0 |}.
+     rngl_d_eq_dec := Z.eq_dec;
+     rngl_i_is_integral := Z_mul_eq_0 |}.
 
 Theorem Z_1_neq_0 : 1%Z ≠ 0%Z.
 Proof. easy. Qed.
 
-Definition Z_ring_like_dec_prop : ring_like_dec_prop Z :=
-  {| rngl_eq_dec := Z.eq_dec; rngl_1_neq_0 := Z_1_neq_0 |}.
+Definition Z_ring_like_one_neq_zero_prop : ring_like_one_neq_zero Z :=
+  {| rngl_1_neq_0 := Z_1_neq_0 |}.

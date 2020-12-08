@@ -21,7 +21,8 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
   {| rngl_is_comm := true;
      rngl_has_opp := false;
      rngl_has_inv := false;
-     rngl_has_no_zero_divisors := true;
+     rngl_eq_is_dec := true;
+     rngl_is_integral := true;
      rngl_add_comm := Nat.add_comm;
      rngl_add_assoc := Nat.add_assoc;
      rngl_add_0_l := Nat.add_0_l;
@@ -35,7 +36,8 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_no_mul_0_l := Nat.mul_0_l;
      rngl_no_mul_0_r := Nat.mul_0_r;
      rngl_i_mul_inv_l := I;
-     rngl_not_having_zero_divisors := Nat_eq_mul_0 |}.
+     rngl_d_eq_dec := Nat.eq_dec;
+     rngl_i_is_integral := Nat_eq_mul_0 |}.
 
 (*
 Print nat_ring_like_op.

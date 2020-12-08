@@ -46,7 +46,8 @@ Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_is_comm : bool;
     rngl_has_opp : bool;
     rngl_has_inv : bool;
-    rngl_has_no_zero_divisors : bool;
+    rngl_eq_is_dec : bool;
+    rngl_is_integral : bool;
     rngl_add_comm : ∀ a b : T, (a + b = b + a)%F;
     rngl_add_assoc : ∀ a b c : T, (a + (b + c) = (a + b) + c)%F;
     rngl_add_0_l : ∀ a : T, (0 + a)%F = a;
@@ -73,19 +74,22 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* when has inverse *)
     rngl_i_mul_inv_l :
       if rngl_has_inv then ∀ a : T, a ≠ 0%F → (¹/ a * a = 1)%F else True;
+    (* when equality is decidable *)
+    rngl_d_eq_dec :
+      if rngl_eq_is_dec then ∀ a b : T, {a = b} + {a ≠ b} else True;
     (* when has_no_zero_divisors *)
-    rngl_not_having_zero_divisors :
-      if rngl_has_no_zero_divisors then ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
+    rngl_i_is_integral :
+      if rngl_is_integral then ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
       else True }.
 
-(* decidability of equality in ring_likes
-   and the fact that 1 ≠ 0 *)
+(* the fact that 1 ≠ 0 *)
 
-Class ring_like_dec_prop T {ro : ring_like_op T} :=
-  { rngl_eq_dec : ∀ a b : T, {a = b} + {a ≠ b};
-    rngl_1_neq_0 : (1 ≠ 0)%F }.
+Class ring_like_one_neq_zero T {ro : ring_like_op T} :=
+  { rngl_1_neq_0 : (1 ≠ 0)%F }.
 
+(*
 Arguments rngl_eq_dec {T}%type {ro ring_like_dec_prop} _%F _%F.
+*)
 
 Fixpoint rngl_power {T} {R : ring_like_op T} a n :=
   match n with
@@ -100,7 +104,6 @@ Section ring_like_theorems.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context {dp : ring_like_dec_prop T}.
 Context {Hro : rngl_has_opp = true}.
 
 Theorem rngl_add_0_r : ∀ a, (a + 0 = a)%F.
@@ -305,12 +308,16 @@ rewrite H.
 apply rngl_opp_involutive.
 Qed.
 
-Theorem rngl_not_having_zero_divisors_if_inv_and_eq_dec :
-  if rngl_has_inv then ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
+Theorem rngl_is_integral_if_inv_and_eq_dec :
+  if (rngl_has_inv && rngl_eq_is_dec)%bool then
+    ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
   else True.
 Proof.
 specialize rngl_i_mul_inv_l as rngl_mul_inv_l.
+specialize rngl_d_eq_dec as rngl_eq_dec.
 destruct rngl_has_inv; [ | easy ].
+destruct rngl_eq_is_dec; [ | easy ].
+cbn.
 intros * Hab.
 assert (H : (¹/a * a * b = ¹/a * 0)%F). {
   now rewrite <- rngl_mul_assoc, Hab.
