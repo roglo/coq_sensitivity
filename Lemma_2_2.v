@@ -537,7 +537,7 @@ destruct n. {
   rewrite rngl_mul_0_l, rngl_add_0_l; [ | easy ].
   destruct i; [ | flia Hi ].
   rewrite rngl_mul_1_r; symmetry; clear Hi.
-  specialize rngl_i_is_integral as H.
+  specialize rngl_opt_is_integral as H.
   destruct rngl_is_integral; [ | easy ].
   apply H in Hμ.
   now destruct Hμ.

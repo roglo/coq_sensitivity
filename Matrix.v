@@ -571,7 +571,7 @@ Qed.
 Theorem mat_mul_mul_scal_l : ∀ a MA MB, (MA * (a × MB) = a × (MA * MB))%M.
 Proof.
 intros.
-specialize rngl_c_mul_comm as rngl_mul_comm.
+specialize rngl_opt_mul_comm as rngl_mul_comm.
 destruct rngl_is_comm; [ | easy ].
 apply matrix_eq; [ easy | easy | ].
 intros * Hi Hj.

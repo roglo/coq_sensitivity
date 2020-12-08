@@ -55,30 +55,30 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_mul_1_l : ∀ a : T, (1 * a)%F = a;
     rngl_mul_add_distr_l : ∀ a b c : T, (a * (b + c) = a * b + a * c)%F;
     (* when multiplication is commutative *)
-    rngl_c_mul_comm :
+    rngl_opt_mul_comm :
       if rngl_is_comm then ∀ a b, (a * b = b * a)%F else True;
     (* when multiplication is not commutative *)
-    rngl_nc_mul_1_r :
+    rngl_opt_mul_1_r :
       if rngl_is_comm then True else ∀ a, (a * 1 = a)%F;
-    rngl_nc_mul_add_distr_r :
+    rngl_opt_mul_add_distr_r :
       if rngl_is_comm then True else
        ∀ a b c, ((a + b) * c = a * c + b * c)%F;
     (* when has opposite *)
-    rngl_o_add_opp_l :
+    rngl_opt_add_opp_l :
       if rngl_has_opp then ∀ a : T, (- a + a = 0)%F else True;
     (* when has not opposite *)
-    rngl_no_mul_0_l :
+    rngl_opt_mul_0_l :
       if rngl_has_opp then True else ∀ a, (0 * a = 0)%F;
-    rngl_no_mul_0_r :
+    rngl_opt_mul_0_r :
       if rngl_has_opp then True else ∀ a, (a * 0 = 0)%F;
     (* when has inverse *)
-    rngl_i_mul_inv_l :
+    rngl_opt_mul_inv_l :
       if rngl_has_inv then ∀ a : T, a ≠ 0%F → (¹/ a * a = 1)%F else True;
     (* when equality is decidable *)
-    rngl_d_eq_dec :
+    rngl_opt_eq_dec :
       if rngl_eq_is_dec then ∀ a b : T, {a = b} + {a ≠ b} else True;
     (* when has_no_zero_divisors *)
-    rngl_i_is_integral :
+    rngl_opt_is_integral :
       if rngl_is_integral then ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
       else True }.
 
@@ -125,8 +125,8 @@ Theorem rngl_mul_add_distr_r : ∀ x y z,
   ((x + y) * z = x * z + y * z)%F.
 Proof.
 intros x y z; simpl.
-specialize rngl_c_mul_comm as rngl_mul_comm.
-specialize rngl_nc_mul_add_distr_r as rngl_mul_add_distr_r.
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+specialize rngl_opt_mul_add_distr_r as rngl_mul_add_distr_r.
 destruct rngl_is_comm. {
   rewrite rngl_mul_comm.
   rewrite rngl_mul_add_distr_l.
@@ -154,8 +154,8 @@ Qed.
 Theorem rngl_mul_1_r : ∀ a, (a * 1 = a)%F.
 Proof.
 intros.
-specialize rngl_c_mul_comm as rngl_mul_comm.
-specialize rngl_nc_mul_1_r as rngl_mul_1_r.
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+specialize rngl_opt_mul_1_r as rngl_mul_1_r.
 destruct rngl_is_comm. {
   now rewrite rngl_mul_comm, rngl_mul_1_l.
 } {
@@ -176,7 +176,7 @@ Proof. intros; easy. Qed.
 Theorem rngl_add_opp_r : ∀ x, (x - x = 0)%F.
 Proof.
 intros.
-specialize rngl_o_add_opp_l as rngl_add_opp_l.
+specialize rngl_opt_add_opp_l as rngl_add_opp_l.
 destruct rngl_has_opp; [ | easy ].
 unfold rngl_sub.
 rewrite rngl_add_comm.
@@ -226,7 +226,7 @@ Qed.
 Theorem rngl_add_opp_l : ∀ x, (- x + x = 0)%F.
 Proof.
 intros.
-specialize rngl_o_add_opp_l as rngl_add_opp_l.
+specialize rngl_opt_add_opp_l as rngl_add_opp_l.
 destruct rngl_has_opp; [ | easy ].
 apply rngl_add_opp_l.
 Qed.
@@ -313,8 +313,8 @@ Theorem rngl_is_integral_if_inv_and_eq_dec :
     ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
   else True.
 Proof.
-specialize rngl_i_mul_inv_l as rngl_mul_inv_l.
-specialize rngl_d_eq_dec as rngl_eq_dec.
+specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
+specialize rngl_opt_eq_dec as rngl_eq_dec.
 destruct rngl_has_inv; [ | easy ].
 destruct rngl_eq_is_dec; [ | easy ].
 cbn.

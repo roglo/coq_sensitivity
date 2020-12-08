@@ -26,15 +26,15 @@ Definition Q_ring_like_prop :=
      rngl_mul_assoc := Q.mul_assoc;
      rngl_mul_1_l := Q.mul_1_l;
      rngl_mul_add_distr_l := Q.mul_add_distr_l;
-     rngl_c_mul_comm := Q.mul_comm;
-     rngl_nc_mul_1_r := I;
-     rngl_nc_mul_add_distr_r := I;
-     rngl_o_add_opp_l := Q.add_opp_diag_l;
-     rngl_no_mul_0_l := I;
-     rngl_no_mul_0_r := I;
-     rngl_i_mul_inv_l := Q.mul_inv_l;
-     rngl_d_eq_dec := Q.eq_dec;
-     rngl_i_is_integral := Q.eq_mul_0 |}.
+     rngl_opt_mul_comm := Q.mul_comm;
+     rngl_opt_mul_1_r := I;
+     rngl_opt_mul_add_distr_r := I;
+     rngl_opt_add_opp_l := Q.add_opp_diag_l;
+     rngl_opt_mul_0_l := I;
+     rngl_opt_mul_0_r := I;
+     rngl_opt_mul_inv_l := Q.mul_inv_l;
+     rngl_opt_eq_dec := Q.eq_dec;
+     rngl_opt_is_integral := Q.eq_mul_0 |}.
 
 Theorem Q_1_neq_0 : 1%Q ≠ 0%Q.
 Proof. easy. Qed.
