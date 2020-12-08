@@ -47,7 +47,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_has_opp : bool;
     rngl_has_inv : bool;
     rngl_has_dec_eq : bool;
-    rngl_is_integral : bool;
+    rngl_is_integral_not_provable : bool;
     rngl_add_comm : ∀ a b : T, (a + b = b + a)%F;
     rngl_add_assoc : ∀ a b c : T, (a + (b + c) = (a + b) + c)%F;
     rngl_add_0_l : ∀ a : T, (0 + a)%F = a;
@@ -79,7 +79,8 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if rngl_has_dec_eq then ∀ a b : T, {a = b} + {a ≠ b} else True;
     (* when has_no_zero_divisors *)
     rngl_opt_is_integral :
-      if (rngl_is_integral || negb (rngl_has_inv && rngl_has_dec_eq))%bool then
+      if (rngl_is_integral_not_provable ||
+          negb (rngl_has_inv && rngl_has_dec_eq))%bool then
         ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
       else True }.
 
@@ -310,14 +311,15 @@ apply rngl_opp_involutive.
 Qed.
 
 Theorem rngl_integral :
-  if (rngl_is_integral || (rngl_has_inv && rngl_has_dec_eq))%bool then
+  if (rngl_is_integral_not_provable ||
+      (rngl_has_inv && rngl_has_dec_eq))%bool then
     ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
   else True.
 Proof.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
 specialize rngl_opt_eq_dec as rngl_eq_dec.
 specialize rngl_opt_is_integral as rngl_integral.
-destruct rngl_is_integral; [ easy | ].
+destruct rngl_is_integral_not_provable; [ easy | ].
 cbn in rngl_integral |-*.
 destruct rngl_has_inv; [ | easy ].
 destruct rngl_has_dec_eq; [ | easy ].

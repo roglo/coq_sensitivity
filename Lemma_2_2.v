@@ -22,7 +22,10 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {Hro : rngl_has_opp = true}.
 Context {Hic : rngl_is_comm = true}.
-Context {Hii : rngl_is_integral = true}.
+Context
+  {Hii :
+     (rngl_is_integral_not_provable ||
+      rngl_has_inv && rngl_has_dec_eq)%bool = true}.
 
 (* *)
 
@@ -537,8 +540,8 @@ destruct n. {
   rewrite rngl_mul_0_l, rngl_add_0_l; [ | easy ].
   destruct i; [ | flia Hi ].
   rewrite rngl_mul_1_r; symmetry; clear Hi.
-  specialize rngl_opt_is_integral as H.
-  destruct rngl_is_integral; [ | easy ].
+  specialize (rngl_integral Hro) as H.
+  rewrite Hii in H.
   apply H in Hμ.
   now destruct Hμ.
 }
