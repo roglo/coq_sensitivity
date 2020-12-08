@@ -1,8 +1,16 @@
 (* Lemma 2.2 of the proof of the sensitivity conjecture *)
-(* sequence A_n of matrices and the proof their square is "n * I_n" *)
-(* new version using a new version of block matrices with one only
-   level: block matrices just being matrices of matrices, not matrices
-   of block matrices *)
+
+(* Lemma 2.2. We define a sequence of symmetric square matrices
+   iteratively as follows
+
+     A1 = [ 0 1 ]
+          [ 1 0 ],
+     An = [ A_{n-1} I        ]
+          [ I       -A_{n-1} ]
+
+   Then An is a 2^n x 2^n matrix whose eigenvalues are √n of multiplitiy
+   2^{n-1} and -√n of multiplicity 2^{n-1}.
+ *)
 
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
@@ -550,14 +558,10 @@ rewrite HV.
 rewrite mat_vect_mul_assoc with (rp0 := rp); [ | easy ].
 cbn - [ iter_seq Nat.pow ].
 specialize (mA_is_square n) as Hasm.
-rewrite m_o_mll_2x2_2x1; [ | easy | | | | ]; cycle 1. {
+rewrite m_o_mll_2x2_2x1; [ | easy | | | easy | easy ]; cycle 1. {
   apply mA_ncols.
 } {
   apply mA_ncols.
-} {
-  easy.
-} {
-  now cbn; rewrite mA_nrows, mA_ncols.
 }
 rewrite mat_mul_add_distr_l; [ | easy ].
 rewrite lemma_2_A_n_2_eq_n_I.
@@ -605,19 +609,7 @@ Qed.
 
 Inspect 1.
 
-...
-
-(* here, I would like to prove that, knowing that An^2 = nI, the
-   eigenvalues of An are √n and -√n, as the Lemma 2.2. claims *)
-
-Theorem A_eigenvalue : ∀ n μ,
-  (μ * μ = rngl_of_nat n)%F
-  → ∃ V,
-      V ≠ vect_zero (vect_nrows V) ∧
-      (mat_of_squ_bmat (mA n) · V = μ × V)%V.
-Proof.
-intros * Hμ2n.
-specialize (lemma_2_A_n_2_eq_n_I' n) as H1.
-...
+(* not finished... we must prove that √n and -√n are the only
+   eigenvalues of A_n and that they are of multiplicity 2^(n-1) *)
 
 End in_ring_like.
