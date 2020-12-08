@@ -100,6 +100,7 @@ Section ring_like_theorems.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
+Context {dp : ring_like_dec_prop T}.
 Context {Hro : rngl_has_opp = true}.
 
 Theorem rngl_add_0_r : ∀ a, (a + 0 = a)%F.
@@ -302,6 +303,23 @@ intros.
 rewrite <- (rngl_opp_involutive a).
 rewrite H.
 apply rngl_opp_involutive.
+Qed.
+
+Theorem rngl_not_having_zero_divisors_if_inv_and_eq_dec :
+  if rngl_has_inv then ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
+  else True.
+Proof.
+specialize rngl_i_mul_inv_l as rngl_mul_inv_l.
+destruct rngl_has_inv; [ | easy ].
+intros * Hab.
+assert (H : (¹/a * a * b = ¹/a * 0)%F). {
+  now rewrite <- rngl_mul_assoc, Hab.
+}
+rewrite rngl_mul_0_r in H.
+destruct (rngl_eq_dec a 0%F) as [Haz| Haz]; [ now left | ].
+rewrite rngl_mul_inv_l in H; [ | easy ].
+rewrite rngl_mul_1_l in H.
+now right.
 Qed.
 
 End ring_like_theorems.
