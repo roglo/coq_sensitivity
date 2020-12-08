@@ -75,9 +75,8 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if rngl_has_inv then ∀ a : T, a ≠ 0%F → (/ a * a = 1)%F else True;
     (* when is_integral *)
     rngl_integral :
-      if rngl_is_integral then
-         ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
-         else True }.
+      if rngl_is_integral then ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
+      else True }.
 
 (* decidability of equality in ring_likes
    and the fact that 1 ≠ 0 *)
