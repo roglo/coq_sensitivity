@@ -38,9 +38,3 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_opt_mul_inv_l := I;
      rngl_opt_eq_dec := Z.eq_dec;
      rngl_opt_is_integral := Z_mul_eq_0 |}.
-
-Theorem Z_1_neq_0 : 1%Z ≠ 0%Z.
-Proof. easy. Qed.
-
-Definition Z_ring_like_one_neq_zero_prop : ring_like_one_neq_zero Z :=
-  {| rngl_1_neq_0 := Z_1_neq_0 |}.

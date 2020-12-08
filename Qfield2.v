@@ -35,9 +35,3 @@ Definition Q_ring_like_prop :=
      rngl_opt_mul_inv_l := Q.mul_inv_l;
      rngl_opt_eq_dec := Q.eq_dec;
      rngl_opt_is_integral := I |}.
-
-Theorem Q_1_neq_0 : 1%Q ≠ 0%Q.
-Proof. easy. Qed.
-
-Definition Q_ring_like_one_neq_zero_prop : ring_like_one_neq_zero Q :=
-  {| rngl_1_neq_0 := Q_1_neq_0 |}.

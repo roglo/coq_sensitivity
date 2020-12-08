@@ -79,19 +79,9 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if rngl_has_dec_eq then ∀ a b : T, {a = b} + {a ≠ b} else True;
     (* when has_no_zero_divisors *)
     rngl_opt_is_integral :
-      if (rngl_is_integral_not_provable ||
-          negb (rngl_has_inv && rngl_has_dec_eq))%bool then
+      if rngl_is_integral_not_provable then
         ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
       else True }.
-
-(* the fact that 1 ≠ 0 *)
-
-Class ring_like_one_neq_zero T {ro : ring_like_op T} :=
-  { rngl_1_neq_0 : (1 ≠ 0)%F }.
-
-(*
-Arguments rngl_eq_dec {T}%type {ro ring_like_dec_prop} _%F _%F.
-*)
 
 Fixpoint rngl_power {T} {R : ring_like_op T} a n :=
   match n with
