@@ -23,4 +23,22 @@ Import matrix_Notations.
 
 Section in_ring_like.
 
+Context {T : Type}.
+Context (ro : ring_like_op T).
+
+Definition is_symm_mat (A : matrix T) :=
+  ∀ i j, i < mat_nrows A → j < mat_nrows A →
+  mat_el A i j = mat_el A j i.
+
+Definition is_symm_squ_mat n (A : square_matrix n) :=
+  is_symm_mat (proj1_sig A).
+
+Theorem glop : ∀ n m (A : square_matrix n) (B : square_matrix m),
+  m < n
+  → is_symm_squ_mat A
+...
+  → squ_mat_mul A A = A ∧ squ_mat_mul B B = B.
+Proof.
+...
+
 End in_ring_like.

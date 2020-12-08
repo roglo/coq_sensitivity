@@ -607,8 +607,6 @@ rewrite mat_add_comm; [ easy | easy | easy | easy | cbn ].
 now rewrite mA_ncols.
 Qed.
 
-Inspect 1.
-
 (* not finished... we must prove that √n and -√n are the only
    eigenvalues of A_n and that they are of multiplicity 2^(n-1) *)
 

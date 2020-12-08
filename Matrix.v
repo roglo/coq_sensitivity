@@ -1091,6 +1091,7 @@ Arguments mat_sub {T ro} MA%M MB%M.
 Arguments mI {T ro} n%nat.
 Arguments mZ {T ro} n%nat.
 Arguments minus_one_pow {T ro}.
+Arguments squ_mat_mul {T}%type {ro} {n%nat} MA MB.
 Arguments squ_mat_ring_like_op {T ro}.
 Arguments subm {T} M%M i%nat j%nat.
 Arguments vect_add {T ro} U%V V%V.
@@ -1112,3 +1113,4 @@ Notation "A · V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
 Notation "- V" := (vect_opp V) : V_scope.
 
 End matrix_Notations.
+About squ_mat_mul.
