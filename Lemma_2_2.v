@@ -22,6 +22,7 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {Hro : rngl_has_opp = true}.
 Context {Hic : rngl_is_comm = true}.
+Context {Hii : rngl_is_integral = true}.
 
 (* *)
 
@@ -522,7 +523,7 @@ destruct (lt_dec i (mat_nrows MA)) as [Hia| Hia]. {
 }
 Qed.
 
-Theorem A_n_eigen_formula : ∀ n μ V,
+Theorem A_n_eigen_formula_for_sqrt_n : ∀ n μ V,
   (μ * μ)%F = rngl_of_nat n
   → V = A_n_eigenvector_of_sqrt_n n μ (base_vector_1 (2 ^ n))
   → (mA n · V = μ × V)%V.
@@ -536,8 +537,10 @@ destruct n. {
   rewrite rngl_mul_0_l, rngl_add_0_l; [ | easy ].
   destruct i; [ | flia Hi ].
   rewrite rngl_mul_1_r; symmetry; clear Hi.
-  (* we need to add that the ring is integral *)
-...
+  specialize rngl_integral as H.
+  destruct rngl_is_integral; [ | easy ].
+  apply H in Hμ.
+  now destruct Hμ.
 }
 cbn - [ Nat.pow ] in HV.
 rewrite HV.
@@ -595,6 +598,10 @@ rewrite mat_mul_scal_vect_assoc; [ | easy ].
 rewrite mat_mul_1_r; [ | easy | easy | now rewrite mA_nrows ].
 rewrite mat_add_comm; [ easy | easy | easy | easy | cbn ].
 now rewrite mA_ncols.
+Qed.
+
+Inspect 1.
+
 ...
 
 (* here, I would like to prove that, knowing that An^2 = nI, the

@@ -6,7 +6,7 @@ Require Import RingLike.
 Definition phony_Nat_opp (x : nat) := 0.
 Definition phony_Nat_inv (x : nat) := 0.
 
-Definition nat_ring_like_op : ring_like_op nat :=
+Canonical Structure nat_ring_like_op : ring_like_op nat :=
   {| rngl_zero := 0;
      rngl_one := 1;
      rngl_add := Nat.add;
@@ -14,12 +14,14 @@ Definition nat_ring_like_op : ring_like_op nat :=
      rngl_opp := phony_Nat_opp;
      rngl_inv := phony_Nat_inv |}.
 
-Canonical Structure nat_ring_like_op.
+Theorem Nat_eq_mul_0 : ∀ n m, n * m = 0 → n = 0 ∨ m = 0.
+Proof. now intros; apply Nat.eq_mul_0. Qed.
 
-Definition nat_ring_like_prop : ring_like_prop nat :=
+Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
   {| rngl_is_comm := true;
      rngl_has_opp := false;
      rngl_has_inv := false;
+     rngl_is_integral := true;
      rngl_add_comm := Nat.add_comm;
      rngl_add_assoc := Nat.add_assoc;
      rngl_add_0_l := Nat.add_0_l;
@@ -32,9 +34,8 @@ Definition nat_ring_like_prop : ring_like_prop nat :=
      rngl_o_add_opp_l := I;
      rngl_no_mul_0_l := Nat.mul_0_l;
      rngl_no_mul_0_r := Nat.mul_0_r;
-     rngl_i_mul_inv_l := I |}.
-
-Canonical Structure nat_ring_like_prop.
+     rngl_i_mul_inv_l := I;
+     rngl_integral := Nat_eq_mul_0 |}.
 
 (*
 Print nat_ring_like_op.

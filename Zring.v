@@ -6,7 +6,7 @@ Require Import RingLike.
 
 Definition phony_Z_inv (x : Z) := 0%Z.
 
-Definition Z_ring_like_op : ring_like_op Z :=
+Canonical Structure Z_ring_like_op : ring_like_op Z :=
   {| rngl_zero := 0%Z;
      rngl_one := 1%Z;
      rngl_add := Z.add;
@@ -14,12 +14,14 @@ Definition Z_ring_like_op : ring_like_op Z :=
      rngl_opp := Z.opp;
      rngl_inv := phony_Z_inv |}.
 
-Canonical Structure Z_ring_like_op.
+Theorem Z_mul_eq_0 :  ∀ n m, (n * m)%Z = 0%Z → n = 0%Z ∨ m = 0%Z.
+Proof. now apply Z.mul_eq_0. Qed.
 
 Definition Z_ring_like_prop : ring_like_prop Z :=
   {| rngl_is_comm := true;
      rngl_has_opp := true;
      rngl_has_inv := false;
+     rngl_is_integral := true;
      rngl_add_comm := Z.add_comm;
      rngl_add_assoc := Z.add_assoc;
      rngl_add_0_l := Z.add_0_l;
@@ -32,7 +34,8 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_o_add_opp_l := Z.add_opp_diag_l;
      rngl_no_mul_0_l := I;
      rngl_no_mul_0_r := I;
-     rngl_i_mul_inv_l := I |}.
+     rngl_i_mul_inv_l := I;
+     rngl_integral := Z_mul_eq_0 |}.
 
 Theorem Z_1_neq_0 : 1%Z ≠ 0%Z.
 Proof. easy. Qed.
