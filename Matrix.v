@@ -1035,8 +1035,7 @@ exists p.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
-Definition squ_mat_ring_like_prop (n : nat)
-    (rom : ring_like_prop (square_matrix n)) :
+Definition squ_mat_ring_like_prop (n : nat) :
     ring_like_prop (square_matrix n) :=
   {| rngl_is_comm := false;
      rngl_has_opp := true;
@@ -1045,7 +1044,7 @@ Definition squ_mat_ring_like_prop (n : nat)
      rngl_is_integral_not_provable := false;
      rngl_add_comm := @squ_mat_add_comm n;
      rngl_add_assoc := @squ_mat_add_assoc n;
-     rngl_add_0_l := rngl_add_0_l;
+     rngl_add_0_l := @squ_mat_add_0_l n;
      rngl_mul_assoc := @squ_mat_mul_assoc n;
      rngl_mul_1_l := @squ_mat_mul_1_l n;
      rngl_mul_add_distr_l := @squ_mat_mul_add_distr_l n;
