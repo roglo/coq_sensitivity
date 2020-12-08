@@ -391,18 +391,6 @@ Print rngl_mul_nat_l.
    This way, we have to prove that this pair eigen(value,vector)
    works *)
 
-Definition base_vector_1 dim :=
-  mk_vect (λ i, match i with 0 => 1%F | _ => 0%F end) dim.
-
-Definition A_n_eigenvector_of_sqrt_n n μ V :=
-  match n with
-  | 0 => base_vector_1 1
-  | S n' =>
-      (mat_of_mat_list_list 0%F
-         [[(mA n' + μ × mI (2 ^ n'))%M]; [mI (2 ^ n')]]
-       · V)%V
-  end.
-
 Theorem m_o_mll_2x2_2x1 : ∀ d M1 M2 M3 M4 M5 M6,
    is_square_mat M1
    → mat_ncols M1 = mat_ncols M2
@@ -523,9 +511,21 @@ destruct (lt_dec i (mat_nrows MA)) as [Hia| Hia]. {
 }
 Qed.
 
-Theorem A_n_eigen_formula_for_sqrt_n : ∀ n μ V,
+Definition base_vector_1 dim :=
+  mk_vect (λ i, match i with 0 => 1%F | _ => 0%F end) dim.
+
+Definition A_n_eigenvector_of_sqrt_n n μ V :=
+  match n with
+  | 0 => base_vector_1 1
+  | S n' =>
+      (mat_of_mat_list_list 0%F
+         [[(mA n' + μ × mI (2 ^ n'))%M]; [mI (2 ^ n')]]
+       · V)%V
+  end.
+
+Theorem A_n_eigen_formula_for_sqrt_n : ∀ n μ U V,
   (μ * μ)%F = rngl_of_nat n
-  → V = A_n_eigenvector_of_sqrt_n n μ (base_vector_1 (2 ^ n))
+  → V = A_n_eigenvector_of_sqrt_n n μ U
   → (mA n · V = μ × V)%V.
 Proof.
 intros * Hμ HV.
