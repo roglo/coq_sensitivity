@@ -608,7 +608,7 @@ rewrite mat_add_comm; [ easy | easy | easy | easy | cbn ].
 now rewrite mA_ncols.
 Qed.
 
-Theorem srng_mul_reg_r : ∀ a b c,
+Theorem rngl_mul_reg_r : ∀ a b c,
   c ≠ 0%F
   → (a * c = b * c)%F
   → a = b.
@@ -618,9 +618,11 @@ Search (_ + _ = _ + _)%F.
 (* faut qu'il y ait un inverse *)
 Search (_ * _ = _ * _)%nat.
 Print Nat.mul_cancel_r.
+(*
 Require Import QArith.
 Search (_ * _ == _ * _)%Q.
 Check Qmult_inj_r.
+*)
 (* nat and Z use induction; Q use inverse;
    what do I do? If the ring-like has inverse, it works;
    otherwise, it could work if I could have induction.
@@ -649,9 +651,9 @@ assert (Hn : ¬ ∀ i, i < vect_nrows V → vect_el V i = 0%F). {
   cbn; intros * Hi.
   now apply H.
 }
-specialize rngl_opt_eq_dec as rngl_eq_dec.
-destruct rngl_has_dec_eq; [ | easy ].
 assert (∃ i, vect_el V i ≠ 0%F). {
+  specialize rngl_opt_eq_dec as rngl_eq_dec.
+  destruct rngl_has_dec_eq; [ | easy ].
   apply (not_forall_in_interv_imp_exist (a:=0) (b:=vect_nrows V - 1));
     cycle 1. {
     flia.
@@ -675,23 +677,19 @@ assert (∃ i, vect_el V i ≠ 0%F). {
 move Hiv at bottom.
 destruct H as (i, Hi).
 specialize (Hiv i).
-Check Nat.mul_cancel_r.
-...
-apply rngl_mul_reg_r in Hiv.
-...
-
-(* not finished... we must prove that √n and -√n are the only
-   eigenvalues of A_n and that they are of multiplicity 2^(n-1) *)
+now apply rngl_mul_reg_r in Hiv.
+Qed.
 
 Theorem An_eigenvalue_squared_is_n : ∀ n μ V,
-  V ≠ vect_zero (2 ^ n)
+  V ≠ vect_zero (vect_nrows V)
   → (mA n · V = μ × V)%V
   → (μ * μ)%F = rngl_of_nat n.
 Proof.
 intros * Hvz Hav.
 specialize (lemma_2_A_n_2_eq_n_I n) as Ha.
+(* μ * μ = rngl_of_nat n *)
+apply (vect_mul_scal_reg_r (V:=V)); [ easy | ].
 (*
-  μ * μ = rngl_of_nat n
   (μ * μ) × V = rngl_of_nat n × V
   μ × (μ × V) = rngl_of_nat n × V
   μ × (mA n . V) = rngl_of_nat n × V
@@ -702,8 +700,6 @@ specialize (lemma_2_A_n_2_eq_n_I n) as Ha.
   rngl_of_nat n × (mI (2 ^ n) . V) = rngl_of_nat n × V
   rngl_of_nat n × V = rngl_of_nat n × V
 *)
-...
-apply (vect_mul_scal_reg_r (V:=V) (n:=2^n)); [ easy | ].
 ...
 
 End in_ring_like.
