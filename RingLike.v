@@ -21,12 +21,12 @@
 
 Require Import Utf8.
 
-(* operators.
-   sub_ is subtraction when opp does not exist
-   div_ is quotion when inv does not exist *)
-
 Inductive opp_state := has_opp | has_sub_ | has_no_opp_nor_sub_.
 Inductive inv_state := has_inv | has_div_ | has_no_inv_nor_div_.
+
+(* operators.
+   sub_ is subtraction when opp does not exist
+   div_ is quotient when inv does not exist *)
 
 Class ring_like_op T :=
   { rngl_zero : T;
