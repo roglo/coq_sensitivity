@@ -90,7 +90,7 @@ Notation "x + y" := (PQadd x y) : PQ_scope.
 Notation "x - y" := (PQsub x y) : PQ_scope.
 Notation "x * y" := (PQmul x y) : PQ_scope.
 Notation "x / y" := (PQdiv x y) : PQ_scope.
-Notation "/ x" := (PQinv x) : PQ_scope.
+Notation "¹/ x" := (PQinv x) (at level 35, right associativity) : PQ_scope.
 
 Definition PQ_of_decimal_uint (n : Decimal.uint) : option PQ :=
   let a := Nat.of_uint n in
@@ -1252,7 +1252,7 @@ simpl in H2; simpl; do 2 rewrite Nat.sub_0_r in H2.
 now rewrite H2.
 Qed.
 
-Theorem PQinv_involutive : ∀ x, (/ / x = x)%PQ.
+Theorem PQinv_involutive : ∀ x, (¹/ ¹/ x = x)%PQ.
 Proof. intros. unfold PQinv; now destruct x. Qed.
 
 (* *)

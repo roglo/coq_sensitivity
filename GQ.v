@@ -40,7 +40,7 @@ Definition GQ_of_pair n d := GQ_of_PQ (PQ_of_pair n d).
 Definition GQadd x y := GQ_of_PQ (PQ_of_GQ x + PQ_of_GQ y).
 Definition GQsub x y := GQ_of_PQ (PQ_of_GQ x - PQ_of_GQ y).
 Definition GQmul x y := GQ_of_PQ (PQ_of_GQ x * PQ_of_GQ y).
-Definition GQinv x := GQ_of_PQ (/ PQ_of_GQ x).
+Definition GQinv x := GQ_of_PQ (¹/ PQ_of_GQ x).
 Arguments GQadd x%GQ y%GQ.
 Arguments GQsub x%GQ y%GQ.
 Arguments GQmul x%GQ y%GQ.
@@ -62,7 +62,7 @@ Notation "x + y" := (GQadd x y) : GQ_scope.
 Notation "x - y" := (GQsub x y) : GQ_scope.
 Notation "x * y" := (GQmul x y) : GQ_scope.
 Notation "x / y" := (GQmul x (GQinv y)) : GQ_scope.
-Notation "/ x" := (GQinv x) : GQ_scope.
+Notation "¹/ x" := (GQinv x) (at level 35, right associativity) : GQ_scope.
 Notation "x < y" := (GQlt x y) : GQ_scope.
 Notation "x ≤ y" := (GQle x y) : GQ_scope.
 Notation "x > y" := (GQgt x y) : GQ_scope.
@@ -1506,7 +1506,7 @@ setoid_rewrite GQmul_comm.
 apply GQmul_cancel_l.
 Qed.
 
-Theorem GQmul_inv_r : ∀ x, (x * / x = 1)%GQ.
+Theorem GQmul_inv_r : ∀ x, (x * ¹/ x = 1)%GQ.
 Proof.
 intros.
 apply GQeq_eq; cbn.
@@ -1518,7 +1518,7 @@ rewrite Nat.mul_comm.
 apply PQred_diag.
 Qed.
 
-Theorem GQmul_inv_l : ∀ x, (/ x * x = 1)%GQ.
+Theorem GQmul_inv_l : ∀ x, (¹/ x * x = 1)%GQ.
 Proof.
 intros; rewrite GQmul_comm.
 apply GQmul_inv_r.

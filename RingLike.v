@@ -40,7 +40,8 @@ Notation "a - b" := (rngl_sub a b) : ring_like_scope.
 Notation "a * b" := (rngl_mul a b) : ring_like_scope.
 Notation "a / b" := (rngl_div a b) : ring_like_scope.
 Notation "- a" := (rngl_opp a) : ring_like_scope.
-Notation "¹/ a" := (rngl_inv a) (at level 35) : ring_like_scope.
+Notation "¹/ a" := (rngl_inv a) (at level 35, right associativity) :
+  ring_like_scope.
 
 Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_is_comm : bool;

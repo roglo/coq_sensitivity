@@ -614,11 +614,13 @@ Theorem rngl_mul_reg_r : ∀ a b c,
   → a = b.
 Proof.
 intros * Hcz Hab.
+(*
 Search (_ + _ = _ + _)%F.
+*)
 (* faut qu'il y ait un inverse *)
+(*
 Search (_ * _ = _ * _)%nat.
 Print Nat.mul_cancel_r.
-(*
 Require Import QArith.
 Search (_ * _ == _ * _)%Q.
 Check Qmult_inj_r.

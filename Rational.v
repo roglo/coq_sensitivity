@@ -138,8 +138,8 @@ Definition opp x :=
 Definition inv x :=
   match x with
   | Zero => Zero
-  | Pos px => Pos (/ px)
-  | Neg px => Neg (/ px)
+  | Pos px => Pos (¹/ px)
+  | Neg px => Neg (¹/ px)
   end.
 
 Definition sub x y := add x (opp y).
@@ -213,7 +213,7 @@ Notation "x - y" := (sub x y) : Q_scope.
 Notation "‖ x ‖" := (abs x) (at level 60) : Q_scope.
 Notation "x * y" := (mul x y) : Q_scope.
 Notation "x / y" := (div x y) : Q_scope.
-Notation "¹/ x" := (inv x) (at level 35) : Q_scope.
+Notation "¹/ x" := (inv x) (at level 35, right associativity) : Q_scope.
 
 (* reduced syntax of a computed rational *)
 (* e.g. the rational "-3/4" is displayed 〈-3╱4〉%Q *)
