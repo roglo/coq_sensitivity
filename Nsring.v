@@ -12,7 +12,9 @@ Canonical Structure nat_ring_like_op : ring_like_op nat :=
      rngl_add := Nat.add;
      rngl_mul := Nat.mul;
      rngl_opp := phony_Nat_opp;
-     rngl_inv := phony_Nat_inv |}.
+     rngl_inv := phony_Nat_inv;
+     rngl_sub_ := Nat.sub;
+     rngl_div_ := Nat.div |}.
 
 Theorem Nat_eq_mul_0 : ∀ n m, n * m = 0 → n = 0 ∨ m = 0.
 Proof. now intros; apply Nat.eq_mul_0. Qed.
@@ -21,6 +23,8 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
   {| rngl_is_comm := true;
      rngl_has_opp := false;
      rngl_has_inv := false;
+     rngl_has_sub_ := true;
+     rngl_has_div_ := true;
      rngl_has_dec_eq := true;
      rngl_is_integral_not_provable := true;
      rngl_add_comm := Nat.add_comm;
@@ -36,6 +40,8 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_mul_0_l := Nat.mul_0_l;
      rngl_opt_mul_0_r := Nat.mul_0_r;
      rngl_opt_mul_inv_l := I;
+     rngl_opt_add_sub_ := Nat.add_sub;
+     rngl_opt_mul_div_ := Nat.div_mul;
      rngl_opt_eq_dec := Nat.eq_dec;
      rngl_opt_is_integral := Nat_eq_mul_0 |}.
 
@@ -43,7 +49,9 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
 Print nat_ring_like_op.
 Existing Instance nat_ring_like_op.
 Compute (7 - 3)%F.
+Compute (7 ~ 3)%F.
 Compute (7 - 3)%nat.
 Compute (15 / 3)%F.
+Compute (15 ÷ 3)%F.
 Compute (15 / 3)%nat.
 *)

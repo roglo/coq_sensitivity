@@ -25,7 +25,9 @@ Class ring_like_op T :=
     rngl_add : T → T → T;
     rngl_mul : T → T → T;
     rngl_opp : T → T;
-    rngl_inv : T → T }.
+    rngl_inv : T → T;
+    rngl_sub_ : T → T → T;
+    rngl_div_ : T → T → T }.
 
 Declare Scope ring_like_scope.
 Delimit Scope ring_like_scope with F.
@@ -42,11 +44,17 @@ Notation "a / b" := (rngl_div a b) : ring_like_scope.
 Notation "- a" := (rngl_opp a) : ring_like_scope.
 Notation "¹/ a" := (rngl_inv a) (at level 35, right associativity) :
   ring_like_scope.
+Notation "a ~ b" := (rngl_sub_ a b) (at level 50, left associativity) :
+  ring_like_scope.
+Notation "a ÷ b" := (rngl_div_ a b) (at level 40, left associativity) :
+  ring_like_scope.
 
 Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_is_comm : bool;
     rngl_has_opp : bool;
     rngl_has_inv : bool;
+    rngl_has_sub_ : bool;
+    rngl_has_div_ : bool;
     rngl_has_dec_eq : bool;
     rngl_is_integral_not_provable : bool;
     rngl_add_comm : ∀ a b : T, (a + b = b + a)%F;
@@ -75,6 +83,12 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* when has inverse *)
     rngl_opt_mul_inv_l :
       if rngl_has_inv then ∀ a : T, a ≠ 0%F → (¹/ a * a = 1)%F else True;
+    (* when has sub_ *)
+    rngl_opt_add_sub_ :
+      if rngl_has_sub_ then ∀ a b, (a + b ~ b = a)%F else True;
+    (* when has div_ *)
+    rngl_opt_mul_div_ :
+      if rngl_has_div_ then ∀ a b, b ≠ 0%F → (a * b ÷ b = a)%F else True;
     (* when equality is decidable *)
     rngl_opt_eq_dec :
       if rngl_has_dec_eq then ∀ a b : T, {a = b} + {a ≠ b} else True;

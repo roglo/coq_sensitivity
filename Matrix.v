@@ -828,6 +828,8 @@ Definition squ_mat_opp n (M : square_matrix n) : square_matrix n :=
   exist _ (- proj1_sig M)%M (squ_mat_opp_prop M).
 
 Definition phony_squ_mat_inv n (M : square_matrix n) := M.
+Definition phony_squ_mat_sub_ n (MA MB : square_matrix n) := MA.
+Definition phony_squ_mat_div_ n (MA MB : square_matrix n) := MA.
 
 Canonical Structure squ_mat_ring_like_op n : ring_like_op (square_matrix n) :=
   {| rngl_zero := squ_mat_zero n;
@@ -835,7 +837,9 @@ Canonical Structure squ_mat_ring_like_op n : ring_like_op (square_matrix n) :=
      rngl_add := @squ_mat_add n;
      rngl_mul := @squ_mat_mul n;
      rngl_opp := @squ_mat_opp n;
-     rngl_inv := @phony_squ_mat_inv n |}.
+     rngl_inv := @phony_squ_mat_inv n;
+     rngl_sub_ := @phony_squ_mat_sub_ n;
+     rngl_div_ := @phony_squ_mat_div_ n |}.
 
 Theorem squ_mat_add_comm : ∀ n (MA MB : square_matrix n),
   squ_mat_add MA MB = squ_mat_add MB MA.
@@ -1042,6 +1046,8 @@ Definition squ_mat_ring_like_prop (n : nat) :
   {| rngl_is_comm := false;
      rngl_has_opp := true;
      rngl_has_inv := false;
+     rngl_has_sub_ := false;
+     rngl_has_div_ := false;
      rngl_has_dec_eq := false; (* actually depends on dec_eq for T *)
      rngl_is_integral_not_provable := false;
      rngl_add_comm := @squ_mat_add_comm n;
@@ -1057,6 +1063,8 @@ Definition squ_mat_ring_like_prop (n : nat) :
      rngl_opt_mul_0_l := I;
      rngl_opt_mul_0_r := I;
      rngl_opt_mul_inv_l := I;
+     rngl_opt_add_sub_ := I;
+     rngl_opt_mul_div_ := I;
      rngl_opt_eq_dec := I;
      rngl_opt_is_integral := I |}.
 
