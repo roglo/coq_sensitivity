@@ -1,4 +1,4 @@
-TARGET=Qfield2.vo Zring.vo Nsring.vo Lemma_2_2.vo Lemma_2_1.vo
+TARGET=Qfield2.vo Zring.vo Nsring.vo Lemma_2_1.vo Lemma_2_2.vo
 FILESFORDEP=`LC_ALL=C ls *.v`
 
 all: $(TARGET)

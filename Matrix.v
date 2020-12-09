@@ -1063,8 +1063,11 @@ Definition squ_mat_ring_like_prop (n : nat) :
      rngl_opt_mul_0_l := I;
      rngl_opt_mul_0_r := I;
      rngl_opt_mul_inv_l := I;
+     rngl_opt_mul_inv_r := I;
      rngl_opt_add_sub_ := I;
+     rngl_opt_sub_add_ := I;
      rngl_opt_mul_div_ := I;
+     rngl_opt_div_mul_ := I;
      rngl_opt_eq_dec := I;
      rngl_opt_is_integral := I |}.
 

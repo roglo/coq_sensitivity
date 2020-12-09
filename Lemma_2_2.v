@@ -29,6 +29,8 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {Hro : rngl_has_opp = true}.
+Context {Hin : rngl_has_inv = true}.
+Context {Hid : rngl_has_inv = true ∨ rngl_has_div_ = true}.
 Context {Hic : rngl_is_comm = true}.
 Context {Hde : rngl_has_dec_eq = true}.
 Context
@@ -614,6 +616,15 @@ Theorem rngl_mul_reg_r : ∀ a b c,
   → a = b.
 Proof.
 intros * Hcz Hab.
+specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
+...
+clear Hro Hin Hic Hde Hii.
+Search rngl_has_inv.
+specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
+destruct rngl_has_inv. {
+  rewrite rngl
+...
+
 (*
 Search (_ + _ = _ + _)%F.
 *)

@@ -40,8 +40,11 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_mul_0_l := Nat.mul_0_l;
      rngl_opt_mul_0_r := Nat.mul_0_r;
      rngl_opt_mul_inv_l := I;
+     rngl_opt_mul_inv_r := I;
      rngl_opt_add_sub_ := Nat.add_sub;
+     rngl_opt_sub_add_ := I;
      rngl_opt_mul_div_ := Nat.div_mul;
+     rngl_opt_div_mul_ := I;
      rngl_opt_eq_dec := Nat.eq_dec;
      rngl_opt_is_integral := Nat_eq_mul_0 |}.
 

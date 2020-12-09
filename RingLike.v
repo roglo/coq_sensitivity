@@ -83,12 +83,24 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* when has inverse *)
     rngl_opt_mul_inv_l :
       if rngl_has_inv then ∀ a : T, a ≠ 0%F → (¹/ a * a = 1)%F else True;
+    rngl_opt_mul_inv_r :
+      if (rngl_has_inv && negb rngl_is_comm)%bool then
+        ∀ a : T, a ≠ 0%F → (a * ¹/ a = 1)%F
+      else True;
     (* when has sub_ *)
     rngl_opt_add_sub_ :
       if rngl_has_sub_ then ∀ a b, (a + b ~ b = a)%F else True;
+    rngl_opt_sub_add_ :
+      if (rngl_has_sub_ && negb rngl_is_comm)%bool then
+        ∀ a b, (a ~ a + b = b)%F
+      else True;
     (* when has div_ *)
     rngl_opt_mul_div_ :
       if rngl_has_div_ then ∀ a b, b ≠ 0%F → (a * b ÷ b = a)%F else True;
+    rngl_opt_div_mul_ :
+      if (rngl_has_div_ && negb rngl_is_comm)%bool then
+        ∀ a b, a ≠ 0%F → (a ÷ a * b = b)%F
+      else True;
     (* when equality is decidable *)
     rngl_opt_eq_dec :
       if rngl_has_dec_eq then ∀ a b : T, {a = b} + {a ≠ b} else True;
