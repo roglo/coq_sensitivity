@@ -30,7 +30,6 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {Hro : rngl_has_opp = true}.
 Context {Hin : rngl_has_inv = true}.
-Context {Hid : rngl_has_inv = true ∨ rngl_has_div_ = true}.
 Context {Hic : rngl_is_comm = true}.
 Context {Hde : rngl_has_dec_eq = true}.
 Context

@@ -5,7 +5,6 @@ Require Import Utf8 ZArith.
 Require Import RingLike.
 
 Definition phony_Z_inv (x : Z) := 0%Z.
-Definition phony_Z_sub_ := Z.sub.
 
 Canonical Structure Z_ring_like_op : ring_like_op Z :=
   {| rngl_zero := 0%Z;
@@ -13,9 +12,7 @@ Canonical Structure Z_ring_like_op : ring_like_op Z :=
      rngl_add := Z.add;
      rngl_mul := Z.mul;
      rngl_opp := Z.opp;
-     rngl_inv := phony_Z_inv;
-     rngl_sub_ := phony_Z_sub_;
-     rngl_div_ := Z.div |}.
+     rngl_inv := phony_Z_inv |}.
 
 Theorem Z_eq_mul_0 :  ∀ n m, (n * m)%Z = 0%Z → n = 0%Z ∨ m = 0%Z.
 Proof. now apply Z.eq_mul_0. Qed.
@@ -24,8 +21,6 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
   {| rngl_is_comm := true;
      rngl_has_opp := true;
      rngl_has_inv := false;
-     rngl_has_sub_ := false;
-     rngl_has_div_ := true;
      rngl_has_dec_eq := true;
      rngl_is_integral_not_provable := true;
      rngl_add_comm := Z.add_comm;
@@ -42,9 +37,5 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_opt_mul_0_r := I;
      rngl_opt_mul_inv_l := I;
      rngl_opt_mul_inv_r := I;
-     rngl_opt_add_sub_ := I;
-     rngl_opt_sub_add_ := I;
-     rngl_opt_mul_div_ := Z.div_mul;
-     rngl_opt_div_mul_ := I;
      rngl_opt_eq_dec := Z.eq_dec;
      rngl_opt_is_integral := Z_eq_mul_0 |}.
