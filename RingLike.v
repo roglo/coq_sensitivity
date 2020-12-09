@@ -300,8 +300,9 @@ clear Hro.
 unfold rngl_sub.
 specialize rngl_opt_add_opp as rngl_add_opp.
 destruct rngl_opp_state. {
-...
-  now rewrite H, rngl_add_0_r.
+  rewrite <- (rngl_add_0_r a).
+  rewrite <- rngl_add_assoc.
+  now rewrite rngl_add_opp.
 } {
   specialize (rngl_add_opp a 0%F).
   now rewrite rngl_add_0_r in rngl_add_opp.
@@ -310,8 +311,10 @@ destruct rngl_opp_state. {
 }
 Qed.
 
+(*
 End ring_like_theorems.
 Check @rngl_sub_0_r.
+*)
 
 ...
 
