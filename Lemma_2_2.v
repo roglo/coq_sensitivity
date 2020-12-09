@@ -624,8 +624,12 @@ Search (_ * _ == _ * _)%Q.
 Check Qmult_inj_r.
 *)
 (* nat and Z use induction; Q use inverse;
-   what do I do? If the ring-like has inverse, it works;
-   otherwise, it could work if I could have induction.
+   in categories, this property is called epimorphism
+   or "right simplification".
+
+   What do I do? If the ring-like has inverse, it works;
+   otherwise, it could work if I could use induction, like
+   in nat and Z.
    But I never thought about the possibility of induction
    in my ring-like definition; should I add it? It is
    connected to the possibility of having "subtraction"
