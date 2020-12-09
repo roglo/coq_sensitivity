@@ -104,10 +104,10 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       | has_div_ => ∀ a b, b ≠ 0%F → (a * b ÷ b = a)%F
       | _ => True
       end;
-    (* when equality is decidable *)
+    (* axiom when equality is decidable *)
     rngl_opt_eq_dec :
       if rngl_has_dec_eq then ∀ a b : T, {a = b} + {a ≠ b} else True;
-    (* when has_no_zero_divisors *)
+    (* axiom when has_no_zero_divisors *)
     rngl_opt_is_integral :
       if rngl_is_integral_not_provable then
         ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
@@ -127,8 +127,6 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {Hro : rngl_opp_state = has_opp}.
-
-...
 
 Theorem rngl_add_0_r : ∀ a, (a + 0 = a)%F.
 Proof.
@@ -196,6 +194,22 @@ Qed.
 
 Theorem fold_rngl_sub : ∀ a b, (a + - b)%F = (a - b)%F.
 Proof. intros; easy. Qed.
+
+Theorem rngl_add_opp_l : ∀ x, (- x + x = 0)%F.
+Proof.
+intros.
+specialize rngl_opt_add_opp as rngl_add_opp.
+rewrite rngl_add_comm.
+destruct rngl_opp_state. {
+  apply rngl_add_opp.
+} {
+  specialize (rngl_add_opp 0%F x).
+  rewrite rngl_add_0_l in rngl_add_opp.
+...
+} {
+  easy.
+}
+...
 
 Theorem rngl_add_opp_r : ∀ x, (x - x = 0)%F.
 Proof.
