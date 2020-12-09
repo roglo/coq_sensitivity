@@ -616,6 +616,19 @@ Proof.
 intros * Hcz Hab.
 Search (_ + _ = _ + _)%F.
 (* faut qu'il y ait un inverse *)
+Search (_ * _ = _ * _)%nat.
+Print Nat.mul_cancel_r.
+Require Import QArith.
+Search (_ * _ == _ * _)%Q.
+Check Qmult_inj_r.
+(* nat and Z use induction; Q use inverse;
+   what do I do? If the ring-like has inverse, it works;
+   otherwise, it could work if I could have induction.
+   But I never thought about the possibility of induction
+   in my ring-like definition; should I add it? It is
+   connected to the possibility of having "subtraction"
+   (like in nat) or "euclidian division" (like in nat
+   and Z? which are not implemented here (for the moment). *)
 ...
 
 Theorem vect_mul_scal_reg_r : ∀ V a b,
