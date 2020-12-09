@@ -92,7 +92,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* axioms when has opposite or subtraction *)
     rngl_opt_add_opp :
       match rngl_opp_state with
-      | has_opp => ∀ a, (a - a = 0)%F
+      | has_opp => ∀ a, (a + - a = 0)%F
       | has_sub_ => ∀ a b, (a + b ~ b = a)%F
       | _ => True
       end;
@@ -110,7 +110,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* axiom when has inverse or division *)
     rngl_opt_mul_inv :
       match rngl_inv_state with
-      | has_inv => ∀ a, a ≠ 0%F → (a / a = 1)%F
+      | has_inv => ∀ a, a ≠ 0%F → (a * ¹/ a = 1)%F
       | has_div_ => ∀ a b, b ≠ 0%F → (a * b ÷ b = a)%F
       | _ => True
       end;
@@ -289,7 +289,6 @@ transitivity (0 + - 0)%F. {
   apply rngl_add_0_l.
 }
 specialize rngl_opt_add_opp as rngl_add_opp.
-unfold rngl_sub in rngl_add_opp.
 rewrite Hro in rngl_add_opp.
 apply rngl_add_opp.
 Qed.
