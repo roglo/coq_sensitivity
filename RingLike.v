@@ -283,16 +283,15 @@ Qed.
 
 Theorem rngl_opp_0 : (- 0 = 0)%F.
 Proof.
-...
 clear Hro'.
 transitivity (0 + - 0)%F. {
   symmetry.
   apply rngl_add_0_l.
 }
-specialize rngl_add_opp_r as H.
-unfold rngl_sub in H.
-rewrite Hro in H.
-apply H.
+specialize rngl_opt_add_opp as rngl_add_opp.
+unfold rngl_sub in rngl_add_opp.
+rewrite Hro in rngl_add_opp.
+apply rngl_add_opp.
 Qed.
 
 End ring_like_theorems.
