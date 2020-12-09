@@ -25,6 +25,9 @@ Require Import Utf8.
    sub_ is subtraction when opp does not exist
    div_ is quotion when inv does not exist *)
 
+Inductive opp_state := has_opp | has_sub_ | has_no_opp_nor_sub_.
+Inductive inv_state := has_inv | has_div_ | has_no_inv_nor_div_.
+
 Class ring_like_op T :=
   { rngl_zero : T;
     rngl_one : T;
@@ -33,16 +36,25 @@ Class ring_like_op T :=
     rngl_opp : T → T;
     rngl_inv : T → T;
     rngl_sub_ : T → T → T;
-    rngl_div_ : T → T → T }.
-
-Inductive opp_state := has_opp | has_sub_ | has_no_opp_nor_sub_.
-Inductive inv_state := has_inv | has_div_ | has_no_inv_nor_div_.
+    rngl_div_ : T → T → T;
+    rngl_opp_state : opp_state;
+    rngl_inv_state : inv_state }.
 
 Declare Scope ring_like_scope.
 Delimit Scope ring_like_scope with F.
 
-Definition rngl_sub {T} {R : ring_like_op T} a b := rngl_add a (rngl_opp b).
-Definition rngl_div {T} {R : ring_like_op T} a b := rngl_mul a (rngl_inv b).
+Definition rngl_sub {T} {R : ring_like_op T} a b :=
+  match rngl_opp_state with
+  | has_opp => rngl_add a (rngl_opp b)
+  | has_sub_ => rngl_sub_ a b
+  | _ => rngl_zero
+  end.
+Definition rngl_div {T} {R : ring_like_op T} a b :=
+  match rngl_inv_state with
+  | has_inv => rngl_mul a (rngl_inv b)
+  | has_div_ => rngl_div_ a b
+  | _ => rngl_zero
+  end.
 
 Notation "0" := rngl_zero : ring_like_scope.
 Notation "1" := rngl_one : ring_like_scope.
@@ -60,8 +72,6 @@ Notation "a ÷ b" := (rngl_div_ a b) (at level 40, left associativity) :
 
 Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_is_comm : bool;
-    rngl_opp_state : opp_state;
-    rngl_inv_state : inv_state;
     rngl_has_dec_eq : bool;
     rngl_is_integral_not_provable : bool;
     rngl_add_comm : ∀ a b : T, (a + b = b + a)%F;
@@ -127,6 +137,7 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {Hro : rngl_opp_state = has_opp}.
+Context {Hro' : rngl_opp_state ≠ has_no_opp_nor_sub_}.
 
 Theorem rngl_add_0_r : ∀ a, (a + 0 = a)%F.
 Proof.
@@ -192,18 +203,48 @@ intros a b c Hab.
 now rewrite Hab.
 Qed.
 
+(*
 Theorem fold_rngl_sub : ∀ a b, (a + - b)%F = (a - b)%F.
 Proof. intros; easy. Qed.
+*)
 
 Theorem rngl_add_opp_l : ∀ x, (- x + x = 0)%F.
 Proof.
 intros.
 specialize rngl_opt_add_opp as rngl_add_opp.
 rewrite rngl_add_comm.
+unfold rngl_sub in rngl_add_opp.
+destruct rngl_opp_state; [ | easy | easy ].
+apply rngl_add_opp.
+Qed.
+
+Theorem rngl_add_opp_r : ∀ x, (x - x = 0)%F.
+Proof.
+intros.
+clear Hro.
+specialize rngl_opt_add_opp as rngl_add_opp.
+unfold rngl_sub in rngl_add_opp |-*.
 destruct rngl_opp_state. {
   apply rngl_add_opp.
 } {
+  specialize (rngl_add_opp 0%F x).
+  now rewrite rngl_add_0_l in rngl_add_opp.
+} {
   easy.
+}
+Qed.
+
+Theorem rngl_add_sub : ∀ a b, (a + b - b = a)%F.
+Proof.
+intros.
+clear Hro.
+specialize rngl_opt_add_opp as rngl_add_opp.
+unfold rngl_sub in rngl_add_opp |-*.
+rewrite <- rngl_add_assoc.
+destruct rngl_opp_state. {
+  now rewrite rngl_add_opp, rngl_add_0_r.
+} {
+  apply rngl_add_opp.
 } {
   easy.
 }
@@ -211,39 +252,10 @@ Qed.
 
 (*
 End ring_like_theorems.
-Check @rngl_add_opp_l.
+Check @rngl_add_sub.
 *)
 
-Theorem rngl_add_opp_r : ∀ x, (x - x = 0)%F.
-Proof.
-intros.
-specialize rngl_opt_add_opp as rngl_add_opp.
-destruct rngl_opp_state. {
-  apply rngl_add_opp.
-} {
-  specialize (rngl_add_opp 0%F x).
-  rewrite rngl_add_0_l in rngl_add_opp.
 ...
-} {
-  easy.
-}
-Qed.
-...
-destruct rngl_has_opp; [ | easy ].
-unfold rngl_sub.
-rewrite rngl_add_comm.
-apply rngl_add_opp_l.
-Qed.
-
-Theorem rngl_add_sub : ∀ a b, (a + b - b = a)%F.
-Proof.
-intros.
-unfold rngl_sub.
-rewrite <- rngl_add_assoc.
-rewrite fold_rngl_sub.
-rewrite rngl_add_opp_r.
-apply rngl_add_0_r.
-Qed.
 
 Theorem rngl_add_reg_r : ∀ a b c, (a + c = b + c)%F → (a = b)%F.
 Proof.
