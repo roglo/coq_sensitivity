@@ -6,20 +6,14 @@
      ring_like_prop, holding their properties.
    In class ring_like_prop, we can set,
      to make a semiring:
-        rngl_opp_color = blue or red
-          blue = there is no opposite, but subtraction, or
-          red = there is neither opposite, nor subtraction
-        rngl_inv_color = blue or red
-          blue = there is no inverse, but quotient, or
-          red = there is neither inverse, nor quotient
+        rngl_opp_state = has_sub_ / has_no_opp_nor_sub_
+        rngl_inv_state = has_div_ / has_no_inv_nor_div_
      to make a ring:
-        rngl_opp_color = green = there is opposite
-        rngl_inv_color =
-          blue = there is no inverse, but quotient, or
-          red = there is neither inverse, nor quotient
+        rngl_opp_state = has_opp
+        rngl_inv_state = has_div_ / has_no_inv_nor_div_
      to make a field:
-        rngl_opp_color = green = there is opposite
-        rngl_inv_color = green = there is inverse
+        rngl_opp_state = has_opp
+        rngl_inv_state = has_inv
    They can be commutative or not by setting boolean rngl_is_comm
    Equality can be decidable or not by setting boolean rngl_has_dec_eq,
    etc.
@@ -41,8 +35,8 @@ Class ring_like_op T :=
     rngl_sub_ : T → T → T;
     rngl_div_ : T → T → T }.
 
-Inductive opp_state : has_opp | has_sub_ | has_no_opp_nor_sub_
-Inductive inv_state : has_inv | has_div_ | has_no_inv_nor_div_
+Inductive opp_state := has_opp | has_sub_ | has_no_opp_nor_sub_.
+Inductive inv_state := has_inv | has_div_ | has_no_inv_nor_div_.
 
 Declare Scope ring_like_scope.
 Delimit Scope ring_like_scope with F.
@@ -66,8 +60,8 @@ Notation "a ÷ b" := (rngl_div_ a b) (at level 40, left associativity) :
 
 Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_is_comm : bool;
-    rngl_opp_color : color;
-    rngl_inv_color : color;
+    rngl_opp_state : opp_state;
+    rngl_inv_state : inv_state;
     rngl_has_dec_eq : bool;
     rngl_is_integral_not_provable : bool;
     rngl_add_comm : ∀ a b : T, (a + b = b + a)%F;
@@ -87,28 +81,28 @@ Class ring_like_prop T {ro : ring_like_op T} :=
        ∀ a b c, ((a + b) * c = a * c + b * c)%F;
     (* axioms when has opposite or subtraction *)
     rngl_opt_add_opp :
-      match rngl_opp_color with
-      | green => ∀ a, (a - a = 0)%F
-      | blue => ∀ a b, (a + b ~ b = a)%F
-      | red => True
+      match rngl_opp_state with
+      | has_opp => ∀ a, (a - a = 0)%F
+      | has_sub_ => ∀ a b, (a + b ~ b = a)%F
+      | _ => True
       end;
     (* axioms when has not opposite *)
     rngl_opt_mul_0_l :
-      match rngl_opp_color with
-      | green => True
-      | blue | red => ∀ a, (0 * a = a)%F
+      match rngl_opp_state with
+      | has_opp => True
+      | _ => ∀ a, (0 * a = a)%F
       end;
     rngl_opt_mul_0_r :
-      match rngl_opp_color with
-      | green => True
-      | blue | red => ∀ a, (a * 0 = a)%F
+      match rngl_opp_state with
+      | has_opp => True
+      | _ => ∀ a, (a * 0 = a)%F
       end;
-    (* axiom when has inverse or quotient *)
+    (* axiom when has inverse or division *)
     rngl_opt_mul_inv :
-      match rngl_opp_color with
-      | green => ∀ a, a ≠ 0%F → (a / a = 1)%F
-      | blue => ∀ a b, b ≠ 0%F → (a * b ÷ b = a)%F
-      | red => True
+      match rngl_inv_state with
+      | has_inv => ∀ a, a ≠ 0%F → (a / a = 1)%F
+      | has_div_ => ∀ a b, b ≠ 0%F → (a * b ÷ b = a)%F
+      | _ => True
       end;
     (* when equality is decidable *)
     rngl_opt_eq_dec :
@@ -132,7 +126,7 @@ Section ring_like_theorems.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context {Hro : rngl_opp_color = green}.
+Context {Hro : rngl_opp_state = has_opp}.
 
 ...
 
