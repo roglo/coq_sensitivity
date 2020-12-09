@@ -303,6 +303,8 @@ cbn - [ iter_seq ].
 now apply rngl_summation_add_distr.
 Qed.
 
+(* null matrix of dimension n *)
+
 Definition mZ n :=
   mk_mat (λ i j, 0%F) n n.
 
@@ -1113,4 +1115,3 @@ Notation "A · V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
 Notation "- V" := (vect_opp V) : V_scope.
 
 End matrix_Notations.
-About squ_mat_mul.

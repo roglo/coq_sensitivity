@@ -30,6 +30,7 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {Hro : rngl_has_opp = true}.
 Context {Hic : rngl_is_comm = true}.
+Context {Hde : rngl_has_dec_eq = true}.
 Context
   {Hii :
      (rngl_is_integral_not_provable ||
@@ -607,7 +608,89 @@ rewrite mat_add_comm; [ easy | easy | easy | easy | cbn ].
 now rewrite mA_ncols.
 Qed.
 
+Theorem srng_mul_reg_r : ∀ a b c,
+  c ≠ 0%F
+  → (a * c = b * c)%F
+  → a = b.
+Proof.
+intros * Hcz Hab.
+Search (_ + _ = _ + _)%F.
+(* faut qu'il y ait un inverse *)
+...
+
+Theorem vect_mul_scal_reg_r : ∀ V a b,
+  V ≠ vect_zero (vect_nrows V)
+  → (a × V = b × V)%V
+  → a = b.
+Proof.
+intros * Hvz Hab.
+assert (Hiv : ∀ i, vect_el (a × V)%V i = vect_el (b × V)%V i). {
+  intros i.
+  now rewrite Hab.
+}
+unfold vect_mul_scal_l in Hiv.
+cbn in Hiv.
+assert (Hn : ¬ ∀ i, i < vect_nrows V → vect_el V i = 0%F). {
+  intros H; apply Hvz.
+  apply vector_eq; [ easy | ].
+  cbn; intros * Hi.
+  now apply H.
+}
+specialize rngl_opt_eq_dec as rngl_eq_dec.
+destruct rngl_has_dec_eq; [ | easy ].
+assert (∃ i, vect_el V i ≠ 0%F). {
+  apply (not_forall_in_interv_imp_exist (a:=0) (b:=vect_nrows V - 1));
+    cycle 1. {
+    flia.
+  } {
+    intros Hnv.
+    apply Hn.
+    intros i Hi.
+    specialize (Hnv i).
+    assert (H : 0 ≤ i ≤ vect_nrows V - 1) by flia Hi.
+    specialize (Hnv H).
+    now destruct (rngl_eq_dec (vect_el V i) 0%F).
+  }
+  intros n.
+  unfold Decidable.decidable.
+  specialize (rngl_eq_dec (vect_el V n) 0%F) as [Hvnz| Hvnz]. {
+    now right.
+  } {
+    now left.
+  }
+}
+move Hiv at bottom.
+destruct H as (i, Hi).
+specialize (Hiv i).
+Check Nat.mul_cancel_r.
+...
+apply rngl_mul_reg_r in Hiv.
+...
+
 (* not finished... we must prove that √n and -√n are the only
    eigenvalues of A_n and that they are of multiplicity 2^(n-1) *)
+
+Theorem An_eigenvalue_squared_is_n : ∀ n μ V,
+  V ≠ vect_zero (2 ^ n)
+  → (mA n · V = μ × V)%V
+  → (μ * μ)%F = rngl_of_nat n.
+Proof.
+intros * Hvz Hav.
+specialize (lemma_2_A_n_2_eq_n_I n) as Ha.
+(*
+  μ * μ = rngl_of_nat n
+  (μ * μ) × V = rngl_of_nat n × V
+  μ × (μ × V) = rngl_of_nat n × V
+  μ × (mA n . V) = rngl_of_nat n × V
+  mA n . (μ × V) = rngl_of_nat n × V
+  mA n . (mA n . V) = rngl_of_nat n × V
+  (mA n * mA n) . V = rngl_of_nat n × V
+  (rngl_of_nat n × mI (2 ^ n)) . V = rngl_of_nat n × V
+  rngl_of_nat n × (mI (2 ^ n) . V) = rngl_of_nat n × V
+  rngl_of_nat n × V = rngl_of_nat n × V
+*)
+...
+apply (vect_mul_scal_reg_r (V:=V) (n:=2^n)); [ easy | ].
+...
 
 End in_ring_like.
