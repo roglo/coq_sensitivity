@@ -203,18 +203,32 @@ rewrite rngl_add_comm.
 destruct rngl_opp_state. {
   apply rngl_add_opp.
 } {
+  easy.
+} {
+  easy.
+}
+Qed.
+
+(*
+End ring_like_theorems.
+Check @rngl_add_opp_l.
+*)
+
+Theorem rngl_add_opp_r : ∀ x, (x - x = 0)%F.
+Proof.
+intros.
+specialize rngl_opt_add_opp as rngl_add_opp.
+destruct rngl_opp_state. {
+  apply rngl_add_opp.
+} {
   specialize (rngl_add_opp 0%F x).
   rewrite rngl_add_0_l in rngl_add_opp.
 ...
 } {
   easy.
 }
+Qed.
 ...
-
-Theorem rngl_add_opp_r : ∀ x, (x - x = 0)%F.
-Proof.
-intros.
-specialize rngl_opt_add_opp_l as rngl_add_opp_l.
 destruct rngl_has_opp; [ | easy ].
 unfold rngl_sub.
 rewrite rngl_add_comm.
