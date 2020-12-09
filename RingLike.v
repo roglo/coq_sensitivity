@@ -293,18 +293,27 @@ rewrite Hro in rngl_add_opp.
 apply rngl_add_opp.
 Qed.
 
-End ring_like_theorems.
-Check @rngl_opp_0.
-
-...
-
 Theorem rngl_sub_0_r : ∀ a, (a - 0 = a)%F.
 Proof.
 intros.
+clear Hro.
 unfold rngl_sub.
-rewrite rngl_opp_0.
-apply rngl_add_0_r.
+specialize rngl_opt_add_opp as rngl_add_opp.
+destruct rngl_opp_state. {
+...
+  now rewrite H, rngl_add_0_r.
+} {
+  specialize (rngl_add_opp a 0%F).
+  now rewrite rngl_add_0_r in rngl_add_opp.
+} {
+  easy.
+}
 Qed.
+
+End ring_like_theorems.
+Check @rngl_sub_0_r.
+
+...
 
 Theorem rngl_add_move_0_r : ∀ a b, (a + b = 0)%F ↔ (a = - b)%F.
 Proof.
