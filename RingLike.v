@@ -211,6 +211,7 @@ Proof. intros; easy. Qed.
 Theorem rngl_add_opp_l : ∀ x, (- x + x = 0)%F.
 Proof.
 intros.
+clear Hro'.
 specialize rngl_opt_add_opp as rngl_add_opp.
 rewrite rngl_add_comm.
 unfold rngl_sub in rngl_add_opp.
@@ -250,13 +251,6 @@ destruct rngl_opp_state. {
 }
 Qed.
 
-(*
-End ring_like_theorems.
-Check @rngl_add_sub.
-*)
-
-...
-
 Theorem rngl_add_reg_r : ∀ a b c, (a + c = b + c)%F → (a = b)%F.
 Proof.
 intros * Habc.
@@ -287,22 +281,24 @@ rewrite <- rngl_mul_add_distr_l.
 now do 2 rewrite rngl_add_0_l.
 Qed.
 
-Theorem rngl_add_opp_l : ∀ x, (- x + x = 0)%F.
-Proof.
-intros.
-specialize rngl_opt_add_opp_l as rngl_add_opp_l.
-destruct rngl_has_opp; [ | easy ].
-apply rngl_add_opp_l.
-Qed.
-
 Theorem rngl_opp_0 : (- 0 = 0)%F.
 Proof.
+...
+clear Hro'.
 transitivity (0 + - 0)%F. {
   symmetry.
   apply rngl_add_0_l.
 }
-apply rngl_add_opp_r.
+specialize rngl_add_opp_r as H.
+unfold rngl_sub in H.
+rewrite Hro in H.
+apply H.
 Qed.
+
+End ring_like_theorems.
+Check @rngl_opp_0.
+
+...
 
 Theorem rngl_sub_0_r : ∀ a, (a - 0 = a)%F.
 Proof.
