@@ -77,7 +77,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if rngl_has_inv then ∀ a : T, a ≠ 0%F → (¹/ a * a = 1)%F else True;
     rngl_opt_mul_inv_r :
       if (rngl_has_inv && negb rngl_is_comm)%bool then
-        ∀ a : T, a ≠ 0%F → (a * ¹/ a = 1)%F
+        ∀ a : T, a ≠ 0%F → (a / a = 1)%F
       else True;
     (* when equality is decidable *)
     rngl_opt_eq_dec :
@@ -170,6 +170,14 @@ Qed.
 Theorem fold_rngl_sub : ∀ a b, (a + - b)%F = (a - b)%F.
 Proof. intros; easy. Qed.
 
+Theorem rngl_add_opp_l : ∀ x, (- x + x = 0)%F.
+Proof.
+intros.
+specialize rngl_opt_add_opp_l as rngl_add_opp_l.
+destruct rngl_has_opp; [ | easy ].
+apply rngl_add_opp_l.
+Qed.
+
 Theorem rngl_add_opp_r : ∀ x, (x - x = 0)%F.
 Proof.
 intros.
@@ -218,14 +226,6 @@ intros.
 apply (rngl_add_reg_r _ _ (a * 1)%F).
 rewrite <- rngl_mul_add_distr_l.
 now do 2 rewrite rngl_add_0_l.
-Qed.
-
-Theorem rngl_add_opp_l : ∀ x, (- x + x = 0)%F.
-Proof.
-intros.
-specialize rngl_opt_add_opp_l as rngl_add_opp_l.
-destruct rngl_has_opp; [ | easy ].
-apply rngl_add_opp_l.
 Qed.
 
 Theorem rngl_opp_0 : (- 0 = 0)%F.
