@@ -32,6 +32,7 @@ Context {Hro : rngl_has_opp = true}.
 Context {Hin : rngl_has_inv = true}.
 Context {Hic : rngl_is_comm = true}.
 Context {Hde : rngl_has_dec_eq = true}.
+Context {Hiic : (rngl_has_inv && negb rngl_is_comm)%bool = true}.
 Context
   {Hii :
      (rngl_is_integral_not_provable ||
@@ -616,38 +617,13 @@ Theorem rngl_mul_reg_r : ∀ a b c,
 Proof.
 intros * Hcz Hab.
 specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
-...
-clear Hro Hin Hic Hde Hii.
-Search rngl_has_inv.
-specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
-destruct rngl_has_inv. {
-  rewrite rngl
-...
-
-(*
-Search (_ + _ = _ + _)%F.
-*)
-(* faut qu'il y ait un inverse *)
-(*
-Search (_ * _ = _ * _)%nat.
-Print Nat.mul_cancel_r.
-Require Import QArith.
-Search (_ * _ == _ * _)%Q.
-Check Qmult_inj_r.
-*)
-(* nat and Z use induction; Q use inverse;
-   in categories, this property is called epimorphism
-   or "right simplification".
-
-   What do I do? If the ring-like has inverse, it works;
-   otherwise, it could work if I could use induction, like
-   in nat and Z.
-   But I never thought about the possibility of induction
-   in my ring-like definition; should I add it? It is
-   connected to the possibility of having "subtraction"
-   (like in nat) or "euclidian division" (like in nat
-   and Z? which are not implemented here (for the moment). *)
-...
+rewrite Hiic in rngl_mul_inv_r.
+assert (H : (a * c / c = b * c / c)%F) by now rewrite Hab.
+unfold rngl_div in H, rngl_mul_inv_r.
+do 2 rewrite <- rngl_mul_assoc in H.
+rewrite rngl_mul_inv_r in H; [ | easy ].
+now do 2 rewrite rngl_mul_1_r in H.
+Qed.
 
 Theorem vect_mul_scal_reg_r : ∀ V a b,
   V ≠ vect_zero (vect_nrows V)
