@@ -740,8 +740,19 @@ split. {
     rewrite rngl_add_0_r in H3.
     rewrite H3 in Hμ.
     rewrite rngl_mul_0_l in Hμ; [ | easy ].
+    symmetry in Hμ.
+Search rngl_of_nat.
+(* actually, we need caracteristic = 0 *)
+Theorem rngl_of_nat_neq_0 : ∀ n, n ≠ 0 → rngl_of_nat n ≠ 0%F.
+Proof.
+intros * Hn.
+intros H; apply Hn; clear Hn.
+destruct n; [ easy | exfalso ].
+unfold rngl_of_nat in H.
+...
     unfold rngl_of_nat in Hμ.
-    clear - Hμ rp; symmetry in Hμ.
+    clear - Hμ rp.
+...
     induction n. {
       cbn in Hμ.
       rewrite rngl_add_0_l in Hμ.
