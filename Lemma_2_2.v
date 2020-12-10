@@ -637,6 +637,44 @@ rewrite <- mat_mul_scal_vect_assoc; [ | easy ].
 rewrite vect_mul_1_l; easy.
 Qed.
 
+Theorem μ_is_ev_of_An_iff_μ2_eq_n : ∀ n μ,
+  (∃ V, vect_nrows V = 2 ^ n ∧ V ≠ vect_zero (2 ^ n) ∧
+   mA n · V = μ × V)%V ↔
+  (μ * μ = rngl_of_nat n)%F.
+Proof.
+intros.
+split. {
+  intros HV.
+  destruct HV as (V & Hvr & Hvz & Hv).
+  now apply (@A_n_eigenvalue_squared_is_n _ _ V).
+} {
+  intros Hμ.
+  remember (A_n_eigenvector_of_sqrt_n n μ (base_vector_1 1)) as V eqn:Hv.
+  exists V.
+  split. {
+    rewrite Hv; cbn.
+    unfold A_n_eigenvector_of_sqrt_n; cbn.
+    destruct n; [ easy | cbn ].
+    rewrite mA_nrows.
+    now rewrite Nat.mul_comm.
+  }
+  split. {
+    rewrite Hv; cbn.
+    unfold A_n_eigenvector_of_sqrt_n; cbn.
+    destruct n. {
+      cbn.
+      intros H.
+      injection H; clear H; intros H.
+      set (f := λ i, match i with 0 => 1%F | S _ => 0%F end) in H.
+      set (g := λ _, 0%F) in H.
+      assert (H1 : ∀ i, f i = g i) by now rewrite H.
+      specialize (H1 0).
+      unfold f, g in H1; cbn in H1.
+...
+  }
+  now specialize (A_n_eigen_formula_for_sqrt_n _ _ _ Hv Hμ) as H1.
+...
+
 End in_ring_like.
 
 Inspect 2.
