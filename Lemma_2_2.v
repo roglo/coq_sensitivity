@@ -688,9 +688,6 @@ split. {
   assert (H3 : ∀ i, f i = g i) by now rewrite H2.
   specialize (H3 0) as H4.
   unfold f, g in H4.
-(*
-  cbn - [ iter_seq base_vector_1 ] in H4.
-*)
   rewrite Nat.mul_1_r in H4.
   rewrite rngl_summation_split_first in H4; [ | easy | flia ].
   unfold base_vector_1 in H4 at 1.
@@ -738,17 +735,11 @@ split. {
     now apply rngl_mul_0_r.
   }
   rewrite rngl_add_0_r in H4.
-(*
-  rewrite H4 in Hv.
-  cbn in Hv.
-  unfold mat_of_mat_list_list in Hv; cbn in Hv.
-  unfold mat_list_list_el in Hv; cbn in Hv.
-*)
   rewrite H4 in Hμ.
   rewrite rngl_mul_0_l in Hμ; [ | easy ].
   symmetry in Hμ.
+  move Hμ at bottom.
 ...
-Search rngl_of_nat.
 (* actually, we need characteristic = 0 *)
 Theorem rngl_of_nat_neq_0 : ∀ n, n ≠ 0 → rngl_of_nat n ≠ 0%F.
 Proof.
