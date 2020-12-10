@@ -17,6 +17,9 @@ Canonical Structure nat_ring_like_op : ring_like_op nat :=
 Theorem Nat_eq_mul_0 : ∀ n m, n * m = 0 → n = 0 ∨ m = 0.
 Proof. now intros; apply Nat.eq_mul_0. Qed.
 
+Theorem Nat_neq_1_0 : 1 ≠ 0.
+Proof. easy. Qed.
+
 Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
   {| rngl_is_comm := true;
      rngl_has_opp := false;
@@ -29,6 +32,7 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_mul_assoc := Nat.mul_assoc;
      rngl_mul_1_l := Nat.mul_1_l;
      rngl_mul_add_distr_l := Nat.mul_add_distr_l;
+     rngl_1_neq_0 := Nat_neq_1_0;
      rngl_opt_mul_comm := Nat.mul_comm;
      rngl_opt_mul_1_r := I;
      rngl_opt_mul_add_distr_r := I;

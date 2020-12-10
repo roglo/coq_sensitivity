@@ -14,6 +14,9 @@ Canonical Structure Q_ring_like_op : ring_like_op Q :=
      rngl_opp := Q.opp;
      rngl_inv := Q.inv |}.
 
+Theorem Q_1_neq_0 : (1 ≠ 0)%Q.
+Proof. easy. Qed.
+
 Definition Q_ring_like_prop :=
   {| rngl_is_comm := true;
      rngl_has_opp := true;
@@ -26,6 +29,7 @@ Definition Q_ring_like_prop :=
      rngl_mul_assoc := Q.mul_assoc;
      rngl_mul_1_l := Q.mul_1_l;
      rngl_mul_add_distr_l := Q.mul_add_distr_l;
+     rngl_1_neq_0 := Q_1_neq_0;
      rngl_opt_mul_comm := Q.mul_comm;
      rngl_opt_mul_1_r := I;
      rngl_opt_mul_add_distr_r := I;

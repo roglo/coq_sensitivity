@@ -55,6 +55,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_mul_assoc : ∀ a b c : T, (a * (b * c) = (a * b) * c)%F;
     rngl_mul_1_l : ∀ a : T, (1 * a)%F = a;
     rngl_mul_add_distr_l : ∀ a b c : T, (a * (b + c) = a * b + a * c)%F;
+    rngl_1_neq_0 : (1 ≠ 0)%F;
     (* when multiplication is commutative *)
     rngl_opt_mul_comm :
       if rngl_is_comm then ∀ a b, (a * b = b * a)%F else True;

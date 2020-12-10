@@ -17,6 +17,9 @@ Canonical Structure Z_ring_like_op : ring_like_op Z :=
 Theorem Z_eq_mul_0 :  ∀ n m, (n * m)%Z = 0%Z → n = 0%Z ∨ m = 0%Z.
 Proof. now apply Z.eq_mul_0. Qed.
 
+Theorem Z_1_neq_0 : (1 ≠ 0)%Z.
+Proof. easy. Qed.
+
 Definition Z_ring_like_prop : ring_like_prop Z :=
   {| rngl_is_comm := true;
      rngl_has_opp := true;
@@ -29,6 +32,7 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_mul_assoc := Z.mul_assoc;
      rngl_mul_1_l := Z.mul_1_l;
      rngl_mul_add_distr_l := Z.mul_add_distr_l;
+     rngl_1_neq_0 := Z_1_neq_0;
      rngl_opt_mul_comm := Z.mul_comm;
      rngl_opt_mul_1_r := I;
      rngl_opt_mul_add_distr_r := I;

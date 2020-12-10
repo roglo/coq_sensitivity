@@ -1138,6 +1138,20 @@ exists p.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
+Theorem squ_mat_1_neq_0 : ∀ n, squ_mat_one n ≠ squ_mat_zero n.
+Proof.
+intros.
+unfold squ_mat_one, squ_mat_zero.
+intros H.
+injection H; clear H; intros H.
+set (f := λ i j, if Nat.eq_dec i j then 1%F else 0%F) in H.
+set (g := λ _ _, 0%F) in H.
+assert (H1 : ∀ i j, f i j = g i j) by now rewrite H.
+specialize (H1 0 0).
+unfold f, g in H1; cbn in H1.
+now apply rngl_1_neq_0 in H1.
+Qed.
+
 Definition squ_mat_ring_like_prop (n : nat) :
     ring_like_prop (square_matrix n) :=
   {| rngl_is_comm := false;
@@ -1151,6 +1165,7 @@ Definition squ_mat_ring_like_prop (n : nat) :
      rngl_mul_assoc := @squ_mat_mul_assoc n;
      rngl_mul_1_l := @squ_mat_mul_1_l n;
      rngl_mul_add_distr_l := @squ_mat_mul_add_distr_l n;
+     rngl_1_neq_0 := @squ_mat_1_neq_0 n;
      rngl_opt_mul_comm := I;
      rngl_opt_mul_1_r := @squ_mat_mul_1_r n;
      rngl_opt_mul_add_distr_r := @squ_mat_mul_add_distr_r n;
