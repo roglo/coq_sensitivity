@@ -681,29 +681,29 @@ split. {
         match j with 0 => 1 | S _ => 0 end)%F) in H2.
     set (g := λ _, 0%F) in H2.
     assert (H3 : ∀ i, f i = g i) by now rewrite H2.
-    specialize (H3 0).
-    unfold f, g in H3.
-    cbn - [ iter_seq ] in H3.
-    rewrite Nat.mul_1_r in H3.
-    rewrite rngl_summation_split_first in H3; [ | easy | flia ].
-    rewrite rngl_mul_1_r in H3.
-    unfold mat_list_list_el in H3 at 1.
-    cbn - [ iter_seq ] in H3.
-    rewrite Nat.div_0_l in H3. 2: {
-      now rewrite mA_ncols; apply Nat.pow_nonzero.
+    specialize (H3 0) as H4.
+    unfold f, g in H4.
+    cbn - [ iter_seq ] in H4.
+    rewrite Nat.mul_1_r in H4.
+    rewrite rngl_summation_split_first in H4; [ | easy | flia ].
+    rewrite rngl_mul_1_r in H4.
+    unfold mat_list_list_el in H4 at 1.
+    cbn - [ iter_seq ] in H4.
+    assert (Hzca : 0 < mat_ncols (mA n)). {
+      rewrite mA_ncols.
+      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
     }
-    rewrite Nat.div_0_l in H3. 2: {
-      now rewrite mA_nrows; apply Nat.pow_nonzero.
+    assert (Hzra : 0 < mat_nrows (mA n)). {
+      rewrite mA_nrows.
+      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
     }
-    rewrite Nat.mod_0_l in H3. 2: {
-      now rewrite mA_nrows; apply Nat.pow_nonzero.
-    }
-    rewrite Nat.mod_0_l in H3. 2: {
-      now rewrite mA_ncols; apply Nat.pow_nonzero.
-    }
-    cbn - [ iter_seq ] in H3.
-    rewrite rngl_mul_1_r in H3.
-    replace (mat_el (mA n) 0 0) with 0%F in H3. 2: {
+    rewrite Nat.div_small in H4; [ | easy ].
+    rewrite (Nat.mod_small 0) in H4; [ | easy ].
+    rewrite Nat.div_small in H4; [ | easy ].
+    rewrite (Nat.mod_small 0) in H4; [ | easy ].
+    cbn - [ iter_seq ] in H4.
+    rewrite rngl_mul_1_r in H4.
+    replace (mat_el (mA n) 0 0) with 0%F in H4. 2: {
       clear.
       induction n; [ easy | cbn ].
       unfold mat_list_list_el; cbn.
@@ -721,15 +721,11 @@ split. {
       }
       apply IHn.
     }
-    rewrite rngl_add_0_l in H3.
-    rewrite all_0_rngl_summation_0 in H3; [ | easy | ]. 2: {
+    rewrite rngl_add_0_l in H4.
+    rewrite all_0_rngl_summation_0 in H4; [ | easy | ]. 2: {
       intros i Hi.
       unfold mat_list_list_el; cbn.
       assert (Hica : i < mat_ncols (mA n)) by flia Hi.
-      assert (Hzra : 0 < mat_nrows (mA n)). {
-        rewrite mA_nrows.
-        now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-      }
       rewrite Nat.div_small; [ | easy ].
       rewrite Nat.div_small; [ | easy ].
       rewrite Nat.mod_small; [ | easy ].
@@ -737,12 +733,13 @@ split. {
       destruct i; [ easy | ].
       now apply rngl_mul_0_r.
     }
-    rewrite rngl_add_0_r in H3.
-    rewrite H3 in Hμ.
+    rewrite rngl_add_0_r in H4.
+    rewrite H4 in Hμ.
     rewrite rngl_mul_0_l in Hμ; [ | easy ].
     symmetry in Hμ.
+...
 Search rngl_of_nat.
-(* actually, we need caracteristic = 0 *)
+(* actually, we need characteristic = 0 *)
 Theorem rngl_of_nat_neq_0 : ∀ n, n ≠ 0 → rngl_of_nat n ≠ 0%F.
 Proof.
 intros * Hn.
