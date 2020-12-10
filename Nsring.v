@@ -53,7 +53,7 @@ Compute (15 / 3)%F.
 Compute (15 / 3)%nat.
 *)
 
-(* ℤ/nℤ *)
+(* ℤn = ℤ/nℤ *)
 
 Definition Zn n := {a : nat | a <? S (n - 1) = true}.
 
@@ -93,10 +93,47 @@ Canonical Structure Zn_ring_like_op n : ring_like_op (Zn n) :=
 Compute (let n := 2 in let ro := Zn_ring_like_op n in (0%F, 1%F)).
 Compute (let n := 7 in let ro := Zn_ring_like_op n in (Zn_v n 4 + Zn_v n 5)%F).
 
-Theorem Zn_add_comm n : ∀ a b, Zn_add n a b = Zn_add n b a.
+Theorem Zn_eq : ∀ n (a b : Zn n), proj1_sig a = proj1_sig b → a = b.
+Proof.
+intros * Hab.
+destruct a as (a, Ha).
+destruct b as (b, Hb).
+cbn in Hab.
+apply eq_exist_uncurried.
+exists Hab.
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+Qed.
+
+Section Halte.
+
+Context {n : nat}.
+Context (ro := Zn_ring_like_op n).
+
+Theorem Zn_add_comm : ∀ a b : Zn n, Zn_add n a b = Zn_add n b a.
 Proof.
 intros.
-now unfold Zn_add; rewrite Nat.add_comm.
+Set Printing All.
+...
+
+Theorem Zn_add_comm : ∀ a b : Zn n, (a + b = b + a)%F.
+Proof.
+intros (a, Ha) (b, Hb).
+apply Zn_eq; cbn.
+unfold rngl_add; cbn.
+...
+rewrite Nat.add_comm.
+Qed.
+
+Theorem Zn_add_assoc n : ∀ a b c,
+  Zn_add n a (Zn_add n b c) = Zn_add n (Zn_add n a b) c.
+Proof.
+intros.
+...
+apply Zn_eq; cbn.
+destruct n; [ easy | ].
+rewrite Nat.add_mod_idemp_l; [ | easy ].
+rewrite Nat.add_mod_idemp_r; [ | easy ].
+now rewrite Nat.add_assoc.
 Qed.
 
 Definition Zn_ring_like_prop n : ring_like_prop nat :=
@@ -106,8 +143,8 @@ Definition Zn_ring_like_prop n : ring_like_prop nat :=
      rngl_has_dec_eq := true;
      rngl_is_integral_not_provable := true;
      rngl_add_comm := @Zn_add_comm n;
-     rngl_add_assoc := ... Nat.add_assoc;
-     rngl_add_0_l := Nat.add_0_l;
+     rngl_add_assoc := @Zn_add_assoc n;
+     rngl_add_0_l := ... Nat.add_0_l;
      rngl_mul_assoc := Nat.mul_assoc;
      rngl_mul_1_l := Nat.mul_1_l;
      rngl_mul_add_distr_l := Nat.mul_add_distr_l;
