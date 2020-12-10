@@ -558,7 +558,7 @@ destruct n. {
 }
 cbn - [ Nat.pow ] in HV.
 rewrite HV.
-rewrite mat_vect_mul_assoc with (rp0 := rp); [ | easy ].
+rewrite mat_vect_mul_assoc; [ | easy ].
 cbn - [ iter_seq Nat.pow ].
 specialize (mA_is_square n) as Hasm.
 rewrite m_o_mll_2x2_2x1; [ | easy | | | easy | easy ]; cycle 1. {
@@ -681,13 +681,19 @@ intros * Hvz Hav.
 specialize (lemma_2_A_n_2_eq_n_I n) as Ha.
 (* μ * μ = rngl_of_nat n *)
 apply (vect_mul_scal_reg_r (V:=V)); [ easy | ].
+(* (μ * μ) × V = rngl_of_nat n × V *)
+rewrite <- vect_mul_scal_l_mul_assoc; [ | easy ].
+(* μ × (μ × V) = rngl_of_nat n × V *)
+rewrite <- Hav.
+(* μ × (mA n . V) = rngl_of_nat n × V *)
+rewrite mat_mul_scal_vect_assoc'; [ | easy | easy ].
+(* mA n . (μ × V) = rngl_of_nat n × V *)
+rewrite <- Hav.
+(* mA n . (mA n . V) = rngl_of_nat n × V *)
+rewrite mat_vect_mul_assoc; [ | easy ].
+(* (mA n * mA n) . V = rngl_of_nat n × V *)
+...
 (*
-  (μ * μ) × V = rngl_of_nat n × V
-  μ × (μ × V) = rngl_of_nat n × V
-  μ × (mA n . V) = rngl_of_nat n × V
-  mA n . (μ × V) = rngl_of_nat n × V
-  mA n . (mA n . V) = rngl_of_nat n × V
-  (mA n * mA n) . V = rngl_of_nat n × V
   (rngl_of_nat n × mI (2 ^ n)) . V = rngl_of_nat n × V
   rngl_of_nat n × (mI (2 ^ n) . V) = rngl_of_nat n × V
   rngl_of_nat n × V = rngl_of_nat n × V

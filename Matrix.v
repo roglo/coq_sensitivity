@@ -60,7 +60,7 @@ Fixpoint concat_list_in_list {T} (ll1 ll2 : list (list T)) :=
 Definition concat_list_list_list {T} (lll : list (list (list T))) :=
   fold_left concat_list_in_list lll [].
 
-Section in_ring.
+Section in_ring_like.
 
 Context {T : Type}.
 Context (ro : ring_like_op T).
@@ -313,9 +313,9 @@ Definition mZ n :=
 Definition mI n : matrix T :=
   mk_mat (λ i j, if Nat.eq_dec i j then 1%F else 0%F) n n.
 
-End in_ring.
+End in_ring_like.
 
-Section in_ring.
+Section in_ring_like.
 
 Context {T : Type}.
 Context (ro : ring_like_op T).
@@ -593,6 +593,15 @@ intros * Hi Hj; cbn.
 apply rngl_mul_assoc.
 Qed.
 
+Theorem vect_mul_scal_l_mul_assoc : ∀ a b V,
+  (a × (b × V))%V = ((a * b)%F × V)%V.
+Proof.
+intros.
+apply vector_eq; [ easy | ].
+intros * Hi; cbn.
+apply rngl_mul_assoc.
+Qed.
+
 Theorem mat_mul_mul_scal_l : ∀ a MA MB, (MA * (a × MB) = a × (MA * MB))%M.
 Proof.
 intros.
@@ -673,6 +682,23 @@ rewrite rngl_mul_summation_distr_l; [ | easy ].
 apply rngl_summation_eq_compat.
 intros j Hj.
 apply rngl_mul_assoc.
+Qed.
+
+Theorem mat_mul_scal_vect_assoc' : ∀ a MA V, (a × (MA · V) = MA · (a × V))%V.
+Proof.
+intros.
+apply vector_eq; [ easy | ].
+intros i Hi.
+cbn in Hi.
+cbn - [ iter_seq ].
+rewrite rngl_mul_summation_distr_l; [ | easy ].
+apply rngl_summation_eq_compat.
+intros j Hj.
+do 2 rewrite rngl_mul_assoc.
+f_equal.
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+rewrite Hic in rngl_mul_comm.
+apply rngl_mul_comm.
 Qed.
 
 (* comatrix *)
@@ -1069,7 +1095,7 @@ Theorem fold_determinant :
   det_loop M (mat_ncols M) = determinant M.
 Proof. easy. Qed.
 
-End in_ring.
+End in_ring_like.
 
 Module matrix_Notations.
 
@@ -1086,6 +1112,8 @@ Arguments mat_mul_mul_scal_l {T}%type {ro rp} Hro Hic.
 Arguments mat_mul_scal_l {T ro} _ M%M.
 Arguments mat_mul_vect_r {T ro} M%M V%V.
 Arguments mat_mul_scal_vect_assoc {T}%type {ro rp} Hro.
+Arguments mat_mul_scal_vect_assoc' {T}%type {ro rp} Hro Hic.
+Arguments mat_vect_mul_assoc {T}%type {ro rp} Hro (A B)%M V%V.
 Arguments mat_mul_1_l {T}%type {ro rp} Hro M%M n%nat.
 Arguments mat_mul_1_r {T}%type {ro rp} Hro M%M n%nat.
 Arguments mat_nrows {T} m%M.
