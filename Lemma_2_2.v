@@ -662,6 +662,19 @@ split. {
   split. 2: {
     now specialize (A_n_eigen_formula_for_sqrt_n _ _ _ Hv Hμ) as H1.
   }
+Check A_n_eigen_formula_for_sqrt_n.
+Print A_n_eigenvector_of_sqrt_n.
+(* un corps peut être :
+   - algébriquement clos ou pas
+   - archimédien ou pas
+   - à égalité décidable ou pas
+   - complet ou pas
+   - de caractéristique nulle ou pas
+   - infini ou pas
+   - ordonné ou pas
+   - totalement ordonné ou pas
+*)
+...
   rewrite Hv; cbn.
   unfold A_n_eigenvector_of_sqrt_n; cbn.
   destruct n. {
