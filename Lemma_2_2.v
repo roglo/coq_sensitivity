@@ -32,7 +32,6 @@ Context {Hro : rngl_has_opp = true}.
 Context {Hin : rngl_has_inv = true}.
 Context {Hic : rngl_is_comm = true}.
 Context {Hde : rngl_has_dec_eq = true}.
-Context {Hiic : (rngl_has_inv && negb rngl_is_comm)%bool = true}.
 Context
   {Hii :
      (rngl_is_integral_not_provable ||
@@ -551,7 +550,7 @@ destruct n. {
   rewrite rngl_mul_0_l, rngl_add_0_l; [ | easy ].
   destruct i; [ | flia Hi ].
   rewrite rngl_mul_1_r; symmetry; clear Hi.
-  specialize (rngl_integral Hro) as H.
+  specialize (rngl_integral Hro Hin) as H.
   rewrite Hii in H.
   apply H in Hμ.
   now destruct Hμ.
@@ -638,6 +637,6 @@ rewrite <- mat_mul_scal_vect_assoc; [ | easy ].
 rewrite vect_mul_1_l; easy.
 Qed.
 
-Inspect 2.
-
 End in_ring_like.
+
+Inspect 2.

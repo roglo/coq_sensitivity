@@ -323,7 +323,7 @@ Context {rp : ring_like_prop T}.
 Context {Hro : rngl_has_opp = true}.
 Context {Hic : rngl_is_comm = true}.
 Context {Hde : rngl_has_dec_eq = true}.
-Context {Hiic : rngl_has_inv && negb rngl_is_comm = true}.
+Context {Hin : rngl_has_inv = true}.
 
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
@@ -680,7 +680,6 @@ Qed.
 Theorem mat_mul_mul_scal_l : ∀ a MA MB, (MA * (a × MB) = a × (MA * MB))%M.
 Proof.
 intros.
-clear Hiic.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
 destruct rngl_is_comm; [ | easy ].
 apply matrix_eq; [ easy | easy | ].
@@ -1205,7 +1204,7 @@ Arguments vect_add {T ro} U%V V%V.
 Arguments vect_sub {T ro} U%V V%V.
 Arguments vect_opp {T ro} V%V.
 Arguments vect_mul_scal_l {T ro} s%F V%V.
-Arguments vect_mul_scal_reg_r {T}%type {ro rp} Hde Hiic V%V (a b)%F.
+Arguments vect_mul_scal_reg_r {T}%type {ro rp} Hde Hin V%V (a b)%F.
 Arguments vect_mul_1_l {T}%type {ro rp} Hro V%V n%nat.
 Arguments vect_zero {T ro}.
 
