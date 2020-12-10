@@ -671,6 +671,39 @@ split. {
       unfold f, g in H1; cbn in H1.
       now apply rngl_1_neq_0 in H1.
     }
+    intros H.
+    injection H; clear H; intros H1 H2.
+    set
+      (f :=
+       λ i,
+       (Σ (j = 0, mat_ncols (mA n) * 1 - 1),
+        mat_list_list_el 0 [[(mA n + μ × mI (2 ^ n))%M]; [mI (2 ^ n)]] i j *
+        match j with 0 => 1 | S _ => 0 end)%F) in H2.
+    set (g := λ _, 0%F) in H2.
+    assert (H3 : ∀ i, f i = g i) by now rewrite H2.
+    specialize (H3 0).
+    unfold f, g in H3.
+    cbn - [ iter_seq ] in H3.
+    rewrite Nat.mul_1_r in H3.
+    rewrite rngl_summation_split_first in H3; [ | easy | flia ].
+    rewrite rngl_mul_1_r in H3.
+    unfold mat_list_list_el in H3 at 1.
+    cbn - [ iter_seq ] in H3.
+    rewrite Nat.div_0_l in H3. 2: {
+      now rewrite mA_ncols; apply Nat.pow_nonzero.
+    }
+    rewrite Nat.div_0_l in H3. 2: {
+      now rewrite mA_nrows; apply Nat.pow_nonzero.
+    }
+    rewrite Nat.mod_0_l in H3. 2: {
+      now rewrite mA_nrows; apply Nat.pow_nonzero.
+    }
+    rewrite Nat.mod_0_l in H3. 2: {
+      now rewrite mA_ncols; apply Nat.pow_nonzero.
+    }
+    cbn - [ iter_seq ] in H3.
+    rewrite rngl_mul_1_r in H3.
+    replace (mat_el (mA n) 0 0) with 0%F in H3. 2: {
 ...
   }
   now specialize (A_n_eigen_formula_for_sqrt_n _ _ _ Hv Hμ) as H1.
