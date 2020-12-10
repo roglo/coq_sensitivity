@@ -102,6 +102,7 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {Hro : rngl_has_opp = true}.
+Context (Hiic : (rngl_has_inv && negb rngl_is_comm)%bool = true).
 
 Theorem rngl_add_0_r : ∀ a, (a + 0 = a)%F.
 Proof.
@@ -122,6 +123,7 @@ Theorem rngl_mul_add_distr_r : ∀ x y z,
   ((x + y) * z = x * z + y * z)%F.
 Proof.
 intros x y z; simpl.
+clear Hiic.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
 specialize rngl_opt_mul_add_distr_r as rngl_mul_add_distr_r.
 destruct rngl_is_comm. {
@@ -151,6 +153,7 @@ Qed.
 Theorem rngl_mul_1_r : ∀ a, (a * 1 = a)%F.
 Proof.
 intros.
+clear Hiic.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
 specialize rngl_opt_mul_1_r as rngl_mul_1_r.
 destruct rngl_is_comm. {
@@ -158,6 +161,21 @@ destruct rngl_is_comm. {
 } {
   apply rngl_mul_1_r.
 }
+Qed.
+
+Theorem rngl_mul_reg_r : ∀ a b c,
+  c ≠ 0%F
+  → (a * c = b * c)%F
+  → a = b.
+Proof.
+intros * Hcz Hab.
+specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
+rewrite Hiic in rngl_mul_inv_r.
+assert (H : (a * c / c = b * c / c)%F) by now rewrite Hab.
+unfold rngl_div in H, rngl_mul_inv_r.
+do 2 rewrite <- rngl_mul_assoc in H.
+rewrite rngl_mul_inv_r in H; [ | easy ].
+now do 2 rewrite rngl_mul_1_r in H.
 Qed.
 
 Theorem rngl_sub_compat_l : ∀ a b c,
@@ -215,6 +233,7 @@ Qed.
 Theorem rngl_mul_0_l : ∀ a, (0 * a = 0)%F.
 Proof.
 intros a.
+clear Hiic.
 apply (rngl_add_reg_r _ _ (1 * a)%F).
 rewrite <- rngl_mul_add_distr_r.
 now do 2 rewrite rngl_add_0_l.
@@ -311,6 +330,7 @@ Theorem rngl_integral :
     ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
   else True.
 Proof.
+clear Hiic.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
 specialize rngl_opt_eq_dec as rngl_eq_dec.
 specialize rngl_opt_is_integral as rngl_integral.

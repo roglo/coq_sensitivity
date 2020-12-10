@@ -538,11 +538,11 @@ Definition A_n_eigenvector_of_sqrt_n n μ V :=
   end.
 
 Theorem A_n_eigen_formula_for_sqrt_n : ∀ n μ U V,
-  (μ * μ)%F = rngl_of_nat n
-  → V = A_n_eigenvector_of_sqrt_n n μ U
+  V = A_n_eigenvector_of_sqrt_n n μ U
+  → (μ * μ)%F = rngl_of_nat n
   → (mA n · V = μ × V)%V.
 Proof.
-intros * Hμ HV.
+intros * HV Hμ.
 destruct n. {
   cbn in Hμ, HV |-*.
   apply vector_eq; [ now subst V | ].
@@ -610,77 +610,16 @@ rewrite mat_add_comm; [ easy | easy | easy | easy | cbn ].
 now rewrite mA_ncols.
 Qed.
 
-Theorem rngl_mul_reg_r : ∀ a b c,
-  c ≠ 0%F
-  → (a * c = b * c)%F
-  → a = b.
-Proof.
-intros * Hcz Hab.
-specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
-rewrite Hiic in rngl_mul_inv_r.
-assert (H : (a * c / c = b * c / c)%F) by now rewrite Hab.
-unfold rngl_div in H, rngl_mul_inv_r.
-do 2 rewrite <- rngl_mul_assoc in H.
-rewrite rngl_mul_inv_r in H; [ | easy ].
-now do 2 rewrite rngl_mul_1_r in H.
-Qed.
-
-Theorem vect_mul_scal_reg_r : ∀ V a b,
-  V ≠ vect_zero (vect_nrows V)
-  → (a × V = b × V)%V
-  → a = b.
-Proof.
-intros * Hvz Hab.
-assert (Hiv : ∀ i, vect_el (a × V)%V i = vect_el (b × V)%V i). {
-  intros i.
-  now rewrite Hab.
-}
-unfold vect_mul_scal_l in Hiv.
-cbn in Hiv.
-assert (Hn : ¬ ∀ i, i < vect_nrows V → vect_el V i = 0%F). {
-  intros H; apply Hvz.
-  apply vector_eq; [ easy | ].
-  cbn; intros * Hi.
-  now apply H.
-}
-assert (∃ i, vect_el V i ≠ 0%F). {
-  specialize rngl_opt_eq_dec as rngl_eq_dec.
-  destruct rngl_has_dec_eq; [ | easy ].
-  apply (not_forall_in_interv_imp_exist (a:=0) (b:=vect_nrows V - 1));
-    cycle 1. {
-    flia.
-  } {
-    intros Hnv.
-    apply Hn.
-    intros i Hi.
-    specialize (Hnv i).
-    assert (H : 0 ≤ i ≤ vect_nrows V - 1) by flia Hi.
-    specialize (Hnv H).
-    now destruct (rngl_eq_dec (vect_el V i) 0%F).
-  }
-  intros n.
-  unfold Decidable.decidable.
-  specialize (rngl_eq_dec (vect_el V n) 0%F) as [Hvnz| Hvnz]. {
-    now right.
-  } {
-    now left.
-  }
-}
-move Hiv at bottom.
-destruct H as (i, Hi).
-specialize (Hiv i).
-now apply rngl_mul_reg_r in Hiv.
-Qed.
-
-Theorem An_eigenvalue_squared_is_n : ∀ n μ V,
-  V ≠ vect_zero (vect_nrows V)
+Theorem A_n_eigenvalue_squared_is_n : ∀ n μ V,
+  vect_nrows V = 2 ^ n
+  → V ≠ vect_zero (2 ^ n)
   → (mA n · V = μ × V)%V
   → (μ * μ)%F = rngl_of_nat n.
 Proof.
-intros * Hvz Hav.
+intros * Hvr Hvz Hav.
 specialize (lemma_2_A_n_2_eq_n_I n) as Ha.
 (* μ * μ = rngl_of_nat n *)
-apply (vect_mul_scal_reg_r (V:=V)); [ easy | ].
+apply vect_mul_scal_reg_r with (V0 := V); [ easy | easy | congruence | ].
 (* (μ * μ) × V = rngl_of_nat n × V *)
 rewrite <- vect_mul_scal_l_mul_assoc; [ | easy ].
 (* μ × (μ × V) = rngl_of_nat n × V *)
@@ -692,12 +631,13 @@ rewrite <- Hav.
 (* mA n . (mA n . V) = rngl_of_nat n × V *)
 rewrite mat_vect_mul_assoc; [ | easy ].
 (* (mA n * mA n) . V = rngl_of_nat n × V *)
-...
-(*
-  (rngl_of_nat n × mI (2 ^ n)) . V = rngl_of_nat n × V
-  rngl_of_nat n × (mI (2 ^ n) . V) = rngl_of_nat n × V
-  rngl_of_nat n × V = rngl_of_nat n × V
-*)
-...
+rewrite Ha.
+(* (rngl_of_nat n × mI (2 ^ n)) . V = rngl_of_nat n × V *)
+rewrite <- mat_mul_scal_vect_assoc; [ | easy ].
+(* rngl_of_nat n × (mI (2 ^ n) . V) = rngl_of_nat n × V *)
+rewrite vect_mul_1_l; easy.
+Qed.
+
+Inspect 2.
 
 End in_ring_like.

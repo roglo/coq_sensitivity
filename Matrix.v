@@ -322,6 +322,8 @@ Context (ro : ring_like_op T).
 Context {rp : ring_like_prop T}.
 Context {Hro : rngl_has_opp = true}.
 Context {Hic : rngl_is_comm = true}.
+Context {Hde : rngl_has_dec_eq = true}.
+Context {Hiic : rngl_has_inv && negb rngl_is_comm = true}.
 
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
@@ -337,6 +339,7 @@ Arguments mZ {T ro} n%nat.
 Arguments minus_one_pow {T ro}.
 Arguments determinant {T ro} M%M.
 Arguments subm {T} M%M i%nat j%nat.
+Arguments vect_zero {T ro} n%nat.
 
 Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.
@@ -498,6 +501,31 @@ rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
 now rewrite rngl_add_0_l, rngl_add_0_r.
 Qed.
 
+Theorem vect_mul_1_l : ∀ V n,
+  n = vect_nrows V
+  → (mI n · V)%V = V.
+Proof.
+intros * Hn.
+apply vector_eq; [ easy | ].
+cbn - [ iter_seq ].
+intros * Hi.
+rewrite (rngl_summation_split _ i); [ | flia Hi ].
+rewrite rngl_summation_split_last; [ | flia ].
+destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
+rewrite rngl_mul_1_l.
+rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
+  intros k Hk.
+  destruct (Nat.eq_dec i (k - 1)) as [H| H]; [ flia H Hk | ].
+  now apply rngl_mul_0_l.
+}
+rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
+  intros k Hk.
+  destruct (Nat.eq_dec i k) as [H| H]; [ flia H Hk | ].
+  now apply rngl_mul_0_l.
+}
+now rewrite rngl_add_0_l, rngl_add_0_r.
+Qed.
+
 (* associativity of multiplication *)
 
 Theorem mat_mul_assoc : ∀ MA MB MC, (MA * (MB * MC))%M = ((MA * MB) * MC)%M.
@@ -602,9 +630,57 @@ intros * Hi; cbn.
 apply rngl_mul_assoc.
 Qed.
 
+Theorem vect_mul_scal_reg_r : ∀ V a b,
+  V ≠ vect_zero (vect_nrows V)
+  → (a × V = b × V)%V
+  → a = b.
+Proof.
+intros * Hvz Hab.
+assert (Hiv : ∀ i, vect_el (a × V)%V i = vect_el (b × V)%V i). {
+  intros i.
+  now rewrite Hab.
+}
+unfold vect_mul_scal_l in Hiv.
+cbn in Hiv.
+assert (Hn : ¬ ∀ i, i < vect_nrows V → vect_el V i = 0%F). {
+  intros H; apply Hvz.
+  apply vector_eq; [ easy | ].
+  cbn; intros * Hi.
+  now apply H.
+}
+assert (∃ i, vect_el V i ≠ 0%F). {
+  specialize rngl_opt_eq_dec as rngl_eq_dec.
+  destruct rngl_has_dec_eq; [ | easy ].
+  apply (not_forall_in_interv_imp_exist (a:=0) (b:=vect_nrows V - 1));
+    cycle 1. {
+    flia.
+  } {
+    intros Hnv.
+    apply Hn.
+    intros i Hi.
+    specialize (Hnv i).
+    assert (H : 0 ≤ i ≤ vect_nrows V - 1) by flia Hi.
+    specialize (Hnv H).
+    now destruct (rngl_eq_dec (vect_el V i) 0%F).
+  }
+  intros n.
+  unfold Decidable.decidable.
+  specialize (rngl_eq_dec (vect_el V n) 0%F) as [Hvnz| Hvnz]. {
+    now right.
+  } {
+    now left.
+  }
+}
+move Hiv at bottom.
+destruct H as (i, Hi).
+specialize (Hiv i).
+now apply rngl_mul_reg_r in Hiv.
+Qed.
+
 Theorem mat_mul_mul_scal_l : ∀ a MA MB, (MA * (a × MB) = a × (MA * MB))%M.
 Proof.
 intros.
+clear Hiic.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
 destruct rngl_is_comm; [ | easy ].
 apply matrix_eq; [ easy | easy | ].
@@ -1129,6 +1205,8 @@ Arguments vect_add {T ro} U%V V%V.
 Arguments vect_sub {T ro} U%V V%V.
 Arguments vect_opp {T ro} V%V.
 Arguments vect_mul_scal_l {T ro} s%F V%V.
+Arguments vect_mul_scal_reg_r {T}%type {ro rp} Hde Hiic V%V (a b)%F.
+Arguments vect_mul_1_l {T}%type {ro rp} Hro V%V n%nat.
 Arguments vect_zero {T ro}.
 
 Notation "A + B" := (mat_add A B) : M_scope.
