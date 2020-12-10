@@ -739,8 +739,17 @@ split. {
     }
     rewrite rngl_add_0_r in H3.
     rewrite H3 in Hμ.
-    rewrite rngl_mul_0_l in Hμ.
+    rewrite rngl_mul_0_l in Hμ; [ | easy ].
     unfold rngl_of_nat in Hμ.
+    clear - Hμ rp; symmetry in Hμ.
+    induction n. {
+      cbn in Hμ.
+      rewrite rngl_add_0_l in Hμ.
+      now apply rngl_1_neq_0 in Hμ.
+    }
+    rewrite rngl_summation_shift in Hμ; [ | flia ].
+    rewrite rngl_summation_split_last in Hμ; [ | flia ].
+    rewrite Nat.sub_succ, Nat.sub_0_r in Hμ.
 ...
   }
   now specialize (A_n_eigen_formula_for_sqrt_n _ _ _ Hv Hμ) as H1.
