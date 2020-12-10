@@ -649,7 +649,7 @@ split. {
   now apply (@A_n_eigenvalue_squared_is_n _ _ V).
 } {
   intros Hμ.
-  remember (A_n_eigenvector_of_sqrt_n n μ (base_vector_1 1)) as V eqn:Hv.
+  remember (A_n_eigenvector_of_sqrt_n n μ (base_vector_1 42)) as V eqn:Hv.
   exists V.
   split. {
     rewrite Hv; cbn.
@@ -662,7 +662,6 @@ split. {
     rewrite Hv; cbn.
     unfold A_n_eigenvector_of_sqrt_n; cbn.
     destruct n. {
-      cbn.
       intros H.
       injection H; clear H; intros H.
       set (f := λ i, match i with 0 => 1%F | S _ => 0%F end) in H.
@@ -670,6 +669,8 @@ split. {
       assert (H1 : ∀ i, f i = g i) by now rewrite H.
       specialize (H1 0).
       unfold f, g in H1; cbn in H1.
+...
+    }
 ...
   }
   now specialize (A_n_eigen_formula_for_sqrt_n _ _ _ Hv Hμ) as H1.
