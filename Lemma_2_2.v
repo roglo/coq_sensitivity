@@ -704,6 +704,43 @@ split. {
     cbn - [ iter_seq ] in H3.
     rewrite rngl_mul_1_r in H3.
     replace (mat_el (mA n) 0 0) with 0%F in H3. 2: {
+      clear.
+      induction n; [ easy | cbn ].
+      unfold mat_list_list_el; cbn.
+      rewrite Nat.div_0_l. 2: {
+        now rewrite mA_ncols; apply Nat.pow_nonzero.
+      }
+      rewrite Nat.div_0_l. 2: {
+        now rewrite mA_nrows; apply Nat.pow_nonzero.
+      }
+      rewrite Nat.mod_0_l. 2: {
+        now rewrite mA_nrows; apply Nat.pow_nonzero.
+      }
+      rewrite Nat.mod_0_l. 2: {
+        now rewrite mA_ncols; apply Nat.pow_nonzero.
+      }
+      apply IHn.
+    }
+    rewrite rngl_add_0_l in H3.
+    rewrite all_0_rngl_summation_0 in H3; [ | easy | ]. 2: {
+      intros i Hi.
+      unfold mat_list_list_el; cbn.
+      assert (Hica : i < mat_ncols (mA n)) by flia Hi.
+      assert (Hzra : 0 < mat_nrows (mA n)). {
+        rewrite mA_nrows.
+        now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+      }
+      rewrite Nat.div_small; [ | easy ].
+      rewrite Nat.div_small; [ | easy ].
+      rewrite Nat.mod_small; [ | easy ].
+      rewrite Nat.mod_small; [ | easy ].
+      destruct i; [ easy | ].
+      now apply rngl_mul_0_r.
+    }
+    rewrite rngl_add_0_r in H3.
+    rewrite H3 in Hμ.
+    rewrite rngl_mul_0_l in Hμ.
+    unfold rngl_of_nat in Hμ.
 ...
   }
   now specialize (A_n_eigen_formula_for_sqrt_n _ _ _ Hv Hμ) as H1.
