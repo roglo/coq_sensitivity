@@ -71,70 +71,30 @@ Definition is_prime n :=
   | S (S c) => prime_test c n 2
   end.
 
-Fixpoint inv_mod_loop a n b :=
+(* (a ^ b) mod c defined like that so that we can use "Compute"
+   for testing; proved equal to (a ^ b) mod c just below... *)
+
+Fixpoint Nat_pow_mod_loop a b c :=
   match b with
-  | 0 => 0
-  | S b' =>
-      if Nat.eq_dec (a * b' mod n) 1 then b'
-      else inv_mod_loop a n b'
+  | 0 => 1 mod c
+  | S b' => (a * Nat_pow_mod_loop a b' c) mod c
   end.
 
-Definition inv_mod a n := inv_mod_loop a n n.
+Definition Nat_pow_mod a b c := Nat_pow_mod_loop a b c.
 
-Theorem glop : ∀ n a b,
-  is_prime n = true
-  → a ≠ 0
-  → b ≠ 0
-  → (inv_mod_loop a n b * a) mod n = 1.
-Proof.
-intros * Hn Haz Hnb.
-...
+(* ... and, in fact, it is a ^ b *)
 
-Theorem glop : ∀ n a b,
-  is_prime n = true
-  → a ≠ 0
-  → n ≤ b
-  → (inv_mod_loop a n b * a) mod n = 1.
+Theorem Nat_pow_mod_is_pow_mod : ∀ a b c,
+  c ≠ 0 → Nat_pow_mod a b c = (a ^ b) mod c.
 Proof.
-intros * Hn Haz Hnb.
-destruct b; [ now apply Nat.le_0_r in Hnb; subst n | ].
-destruct b. {
-  apply Nat.le_1_r in Hnb.
-  now destruct Hnb; subst n.
-}
-destruct b. {
-  cbn.
-  rewrite Nat.mul_1_r, Nat.mul_0_r.
-  rewrite Nat.mod_0_l; [ | now intros H; subst n ].
-  cbn.
-  destruct (Nat.eq_dec (a mod n) 1) as [Han| Han]. {
-    now rewrite Nat.mul_1_l.
-  }
-  apply Nat.le_antisymm in Hnb. 2: {
-    destruct n; [ easy | ].
-    destruct n; [ easy | ].
-    do 2 apply -> Nat.succ_le_mono.
-    apply Nat.le_0_l.
-  }
-  subst n.
-  exfalso.
-  induction a; [ easy | ].
-  destruct a; [ easy | ].
-  destruct a. {
-    cbn in IHa.
-    cbn in Han.
-...
-intros * Hn Haz Hnb.
-destruct (lt_dec b 2) as [Hb2| Hb2]. {
-  destruct b; [ now apply Nat.le_0_r in Hnb; subst n | ].
-  destruct b. {
-    apply Nat.le_1_r in Hnb.
-    now destruct Hnb; subst n.
-  }
-  now do 2 apply Nat.succ_lt_mono in Hb2.
-}
-apply Nat.nlt_ge in Hb2.
-...
+intros * Hcz.
+revert a.
+induction b; intros; [ easy | ].
+cbn; rewrite IHb.
+now rewrite Nat.mul_mod_idemp_r.
+Qed.
+
+Definition inv_mod i n := Nat_pow_mod i (n - 2) n.
 
 Theorem prime_mul_inv_l_mod : ∀ n a,
   is_prime n = true
@@ -143,6 +103,18 @@ Theorem prime_mul_inv_l_mod : ∀ n a,
 Proof.
 intros * Hn Haz.
 unfold inv_mod.
+rewrite Nat_pow_mod_is_pow_mod; [ | now intros H; subst n ].
+rewrite Nat.mul_mod_idemp_l; [ | now intros H; subst n ].
+replace a with (a ^ 1); [ | apply Nat.pow_1_r ].
+rewrite Nat.pow_1_r at 1.
+rewrite <- Nat.pow_add_r.
+replace (n - 2 + 1) with (n - 1). 2: {
+  destruct n; [ easy | ].
+  destruct n; [ easy | ].
+  cbn; rewrite Nat.sub_0_r.
+  symmetry.
+  apply Nat.add_1_r.
+}
 ...
 
 (* ℤn = ℤ/nℤ *)
