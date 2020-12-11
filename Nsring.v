@@ -104,33 +104,28 @@ exists Hab.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
-Section Halte.
+Section a.
 
 Context {n : nat}.
 Context (ro := Zn_ring_like_op n).
+Existing Instance ro.
 
-Theorem Zn_add_comm : ∀ a b : Zn n, Zn_add n a b = Zn_add n b a.
-Proof.
-intros.
-Set Printing All.
-...
-
-Theorem Zn_add_comm : ∀ a b : Zn n, (a + b = b + a)%F.
+Theorem Zn_add_comm : ∀ (a b : Zn n), (a + b = b + a)%F.
 Proof.
 intros (a, Ha) (b, Hb).
 apply Zn_eq; cbn.
 unfold rngl_add; cbn.
-...
-rewrite Nat.add_comm.
+now rewrite Nat.add_comm.
 Qed.
 
-Theorem Zn_add_assoc n : ∀ a b c,
-  Zn_add n a (Zn_add n b c) = Zn_add n (Zn_add n a b) c.
+Theorem Zn_add_assoc : ∀ (a b c : Zn n),
+  (a + (b + c) = (a + b) + c)%F.
 Proof.
 intros.
-...
 apply Zn_eq; cbn.
 destruct n; [ easy | ].
+clear n.
+rename n0 into n.
 rewrite Nat.add_mod_idemp_l; [ | easy ].
 rewrite Nat.add_mod_idemp_r; [ | easy ].
 now rewrite Nat.add_assoc.
