@@ -34,7 +34,7 @@ Context {Hic : rngl_is_comm = true}.
 Context {Hde : rngl_has_dec_eq = true}.
 Context
   {Hii :
-     (rngl_is_integral_not_provable ||
+     (rngl_is_domain ||
       rngl_has_inv && rngl_has_dec_eq)%bool = true}.
 
 (* *)

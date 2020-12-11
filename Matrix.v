@@ -1158,7 +1158,7 @@ Definition squ_mat_ring_like_prop (n : nat) :
      rngl_has_opp := true;
      rngl_has_inv := false;
      rngl_has_dec_eq := false; (* actually depends on dec_eq for T *)
-     rngl_is_integral_not_provable := false;
+     rngl_is_domain := false;
      rngl_add_comm := @squ_mat_add_comm n;
      rngl_add_assoc := @squ_mat_add_assoc n;
      rngl_add_0_l := @squ_mat_add_0_l n;
