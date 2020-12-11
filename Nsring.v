@@ -101,6 +101,13 @@ exists Hab.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
+Theorem Zn_neq : ∀ n (a b : Zn n), proj1_sig a ≠ proj1_sig b → a ≠ b.
+Proof.
+intros * Hab.
+intros H; apply Hab.
+now destruct H.
+Qed.
+
 Section a.
 
 Context {n : nat}.
@@ -149,6 +156,51 @@ rewrite Nat.mul_mod_idemp_r; [ | easy ].
 now rewrite Nat.mul_assoc.
 Qed.
 
+Theorem Zn_mul_1_l : ∀ (a : Zn n), (1 * a = a)%F.
+Proof.
+intros.
+apply Zn_eq; cbn.
+destruct a as (a, Ha); cbn.
+apply Nat.ltb_lt in Ha.
+destruct n; [ now apply Nat.lt_1_r in Ha | ].
+destruct n0; [ now apply Nat.lt_1_r in Ha | ].
+rewrite Nat.sub_succ, Nat.sub_0_r in Ha.
+rewrite (Nat.mod_small 1). 2: {
+  apply -> Nat.succ_lt_mono.
+  apply Nat.lt_0_succ.
+}
+rewrite Nat.mul_1_l.
+now rewrite Nat.mod_small.
+Qed.
+
+Theorem Zn_mul_add_distr_l : ∀ (a b c : Zn n),
+  (a * (b + c) = a * b + a * c)%F.
+Proof.
+intros.
+apply Zn_eq; cbn.
+destruct n; [ easy | ].
+rewrite Nat.add_mod_idemp_l; [ | easy ].
+rewrite Nat.add_mod_idemp_r; [ | easy ].
+rewrite Nat.mul_mod_idemp_r; [ | easy ].
+now rewrite Nat.mul_add_distr_l.
+Qed.
+
+Theorem Zn_1_neq_0 : (1 ≠ 0)%F.
+Proof.
+intros.
+apply Zn_neq; cbn.
+destruct n. 2: {
+  destruct n0. 2: {
+    rewrite Nat.mod_small. {
+      rewrite Nat.mod_small; [ easy | apply Nat.lt_0_succ ].
+    }
+    apply -> Nat.succ_lt_mono.
+    apply Nat.lt_0_succ.
+  }
+  cbn.
+...
+Qed.
+
 Definition Zn_ring_like_prop : ring_like_prop nat :=
   {| rngl_is_comm := true;
      rngl_has_opp := true;
@@ -159,8 +211,8 @@ Definition Zn_ring_like_prop : ring_like_prop nat :=
      rngl_add_assoc := Zn_add_assoc;
      rngl_add_0_l := Zn_add_0_l;
      rngl_mul_assoc := Zn_mul_assoc;
-     rngl_mul_1_l := ... Nat.mul_1_l;
-     rngl_mul_add_distr_l := Nat.mul_add_distr_l;
+     rngl_mul_1_l := Zn_mul_1_l;
+     rngl_mul_add_distr_l := Zn_mul_add_distr_l;
      rngl_1_neq_0 := Nat_neq_1_0;
      rngl_opt_mul_comm := Nat.mul_comm;
      rngl_opt_mul_1_r := I;
