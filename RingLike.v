@@ -43,12 +43,19 @@ Notation "- a" := (rngl_opp a) : ring_like_scope.
 Notation "¹/ a" := (rngl_inv a) (at level 35, right associativity) :
   ring_like_scope.
 
+Fixpoint rngl_of_nat {T} {ro : ring_like_op T} n :=
+  match n with
+  | 0 => 0%F
+  | S n' => (1 + rngl_of_nat n')%F
+  end.
+
 Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_is_comm : bool;
     rngl_has_opp : bool;
     rngl_has_inv : bool;
     rngl_has_dec_eq : bool;
     rngl_is_domain : bool;
+    rngl_characteristic : nat;
     rngl_add_comm : ∀ a b : T, (a + b = b + a)%F;
     rngl_add_assoc : ∀ a b c : T, (a + (b + c) = (a + b) + c)%F;
     rngl_add_0_l : ∀ a : T, (0 + a)%F = a;
@@ -87,7 +94,13 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_opt_is_integral :
       if rngl_is_domain then
         ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
-      else True }.
+      else True;
+    (* characteristic *)
+    rngl_characteristic_prop :
+      match rngl_characteristic with
+      | 0 => ∀ i, rngl_of_nat (S i) ≠ 0%F
+      | n => rngl_of_nat n = 0%F
+      end }.
 
 Fixpoint rngl_power {T} {R : ring_like_op T} a n :=
   match n with

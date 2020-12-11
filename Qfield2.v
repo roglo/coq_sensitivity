@@ -14,8 +14,29 @@ Canonical Structure Q_ring_like_op : ring_like_op Q :=
      rngl_opp := Q.opp;
      rngl_inv := Q.inv |}.
 
+Existing Instance Q_ring_like_op.
+
 Theorem Q_1_neq_0 : (1 ≠ 0)%Q.
 Proof. easy. Qed.
+
+Theorem Q_characteristic_prop : ∀ i, rngl_of_nat (S i) ≠ 0%Q.
+Proof.
+intros.
+cbn - [ Q.add ].
+assert (Hz : ∀ i, (0 ≤ rngl_of_nat i)%Q). {
+  clear i; intros.
+  cbn - [ Q.add ].
+  induction i; [ easy | ].
+  cbn - [ Q.add ].
+  now destruct (rngl_of_nat i).
+}
+intros H.
+specialize (Hz i).
+apply Q.nlt_ge in Hz; apply Hz.
+rewrite <- H.
+apply Q.lt_sub_lt_add_r.
+now rewrite Q.sub_diag.
+Qed.
 
 Definition Q_ring_like_prop :=
   {| rngl_is_comm := true;
@@ -23,6 +44,7 @@ Definition Q_ring_like_prop :=
      rngl_has_inv := true;
      rngl_has_dec_eq := true;
      rngl_is_domain := false;
+     rngl_characteristic := 0;
      rngl_add_comm := Q.add_comm;
      rngl_add_assoc := Q.add_assoc;
      rngl_add_0_l := Q.add_0_l;
@@ -39,4 +61,5 @@ Definition Q_ring_like_prop :=
      rngl_opt_mul_inv_l := Q.mul_inv_l;
      rngl_opt_mul_inv_r := I;
      rngl_opt_eq_dec := Q.eq_dec;
-     rngl_opt_is_integral := I |}.
+     rngl_opt_is_integral := I;
+     rngl_characteristic_prop := Q_characteristic_prop |}.

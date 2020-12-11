@@ -1159,6 +1159,7 @@ Definition squ_mat_ring_like_prop (n : nat) :
      rngl_has_inv := false;
      rngl_has_dec_eq := false; (* actually depends on dec_eq for T *)
      rngl_is_domain := false;
+     rngl_characteristic := 0;
      rngl_add_comm := @squ_mat_add_comm n;
      rngl_add_assoc := @squ_mat_add_assoc n;
      rngl_add_0_l := @squ_mat_add_0_l n;
@@ -1175,7 +1176,8 @@ Definition squ_mat_ring_like_prop (n : nat) :
      rngl_opt_mul_inv_l := I;
      rngl_opt_mul_inv_r := I;
      rngl_opt_eq_dec := I;
-     rngl_opt_is_integral := I |}.
+     rngl_opt_is_integral := I;
+     rngl_characteristic_prop := eq_refl |}.
 
 Arguments det_loop {T ro} M n%nat.
 Arguments determinant {T ro} M.
