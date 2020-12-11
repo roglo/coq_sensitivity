@@ -745,8 +745,9 @@ Print A_n_eigenvector_of_sqrt_n.
    - algébriquement clos ou pas
    - archimédien ou pas
    - à égalité décidable ou pas
+   - commutatif ou pas
    - complet ou pas
-   - de caractéristique nulle ou pas
+   - de caractéristique n, nul ou pas
    - fini ou infini
    - ordonné ou pas
    - totalement ordonné ou pas
