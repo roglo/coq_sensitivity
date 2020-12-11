@@ -321,7 +321,8 @@ Theorem Zn_opt_mul_inv_r :
   if (is_prime n && negb true)%bool then ∀ a : Zn n, a ≠ 0%F → (a / a)%F = 1%F
   else True.
 Proof.
-...
+now rewrite Bool.andb_false_r.
+Qed.
 
 Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
   {| rngl_is_comm := true;
