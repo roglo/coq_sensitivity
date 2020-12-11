@@ -55,32 +55,30 @@ Compute (15 / 3)%nat.
 
 (* ℤn = ℤ/nℤ *)
 
-Definition Zn n := {a : nat | a <? S (n - 1) = true}.
+Definition Zn n := {a : nat | a <? S (S (n - 2)) = true}.
 
-Theorem Zn_op_prop n r : r mod n <? S (n - 1) = true.
+Theorem Zn_op_prop n r : r mod S (S (n - 2)) <? S (S (n - 2)) = true.
 Proof.
 intros.
 apply Nat.ltb_lt.
-destruct n; [ apply Nat.lt_0_1 | ].
-rewrite Nat.sub_succ, Nat.sub_0_r.
 now apply Nat.mod_upper_bound.
 Qed.
 
 Definition Zn_v n v : Zn n :=
-  exist _ (v mod n) (Zn_op_prop n v).
+  exist _ (v mod S (S (n - 2))) (Zn_op_prop n v).
 
 Definition Zn_add n (a b : Zn n) : Zn n :=
   let r := proj1_sig a + proj1_sig b in
-  exist _ (r mod n) (Zn_op_prop n r).
+  exist _ (r mod S (S (n - 2))) (Zn_op_prop n r).
 Definition Zn_mul n (a b : Zn n) : Zn n :=
   let r := proj1_sig a * proj1_sig b in
-  exist _ (r mod n) (Zn_op_prop n r).
+  exist _ (r mod S (S (n - 2))) (Zn_op_prop n r).
 Definition Zn_opp n (a : Zn n) : Zn n :=
   let r := n - proj1_sig a in
-  exist _ (r mod n) (Zn_op_prop n r).
+  exist _ (r mod S (S (n - 2))) (Zn_op_prop n r).
 Definition phony_Zn_inv n (a : Zn n) : Zn n :=
   let r := 0 in
-  exist _ (r mod n) (Zn_op_prop n r).
+  exist _ (r mod S (S (n - 2))) (Zn_op_prop n r).
 
 Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
   {| rngl_zero := Zn_v n 0;
@@ -125,10 +123,7 @@ Qed.
 Theorem Zn_add_assoc : ∀ (a b c : Zn n), (a + (b + c) = (a + b) + c)%F.
 Proof.
 intros.
-apply Zn_eq; cbn.
-destruct n; [ easy | ].
-clear n.
-rename n0 into n.
+apply Zn_eq; cbn - [ "mod" ].
 rewrite Nat.add_mod_idemp_l; [ | easy ].
 rewrite Nat.add_mod_idemp_r; [ | easy ].
 now rewrite Nat.add_assoc.
@@ -137,20 +132,18 @@ Qed.
 Theorem Zn_add_0_l : ∀ (a : Zn n), (0 + a = a)%F.
 Proof.
 intros.
-apply Zn_eq; cbn.
+apply Zn_eq; cbn - [ "mod" ].
+rewrite (Nat.mod_small 0); [ | apply Nat.lt_0_succ ].
+rewrite Nat.add_0_l.
+apply Nat.mod_small.
 destruct a as (a, Ha); cbn.
-apply Nat.ltb_lt in Ha.
-destruct n; [ now apply Nat.lt_1_r in Ha | ].
-rewrite Nat.sub_succ, Nat.sub_0_r in Ha.
-rewrite Nat.mod_0_l; [ | easy ].
-now rewrite Nat.mod_small.
+now apply Nat.ltb_lt in Ha.
 Qed.
 
 Theorem Zn_mul_assoc : ∀ (a b c : Zn n), (a * (b * c) = (a * b) * c)%F.
 Proof.
 intros.
-apply Zn_eq; cbn.
-destruct n; [ easy | ].
+apply Zn_eq; cbn - [ "mod" ].
 rewrite Nat.mul_mod_idemp_l; [ | easy ].
 rewrite Nat.mul_mod_idemp_r; [ | easy ].
 now rewrite Nat.mul_assoc.
@@ -159,46 +152,40 @@ Qed.
 Theorem Zn_mul_1_l : ∀ (a : Zn n), (1 * a = a)%F.
 Proof.
 intros.
-apply Zn_eq; cbn.
-destruct a as (a, Ha); cbn.
-apply Nat.ltb_lt in Ha.
-destruct n; [ now apply Nat.lt_1_r in Ha | ].
-destruct n0; [ now apply Nat.lt_1_r in Ha | ].
-rewrite Nat.sub_succ, Nat.sub_0_r in Ha.
+apply Zn_eq; cbn - [ "mod" ].
 rewrite (Nat.mod_small 1). 2: {
   apply -> Nat.succ_lt_mono.
   apply Nat.lt_0_succ.
 }
 rewrite Nat.mul_1_l.
-now rewrite Nat.mod_small.
+destruct a as (a, Ha); cbn - [ "mod" ].
+apply Nat.ltb_lt in Ha.
+now apply Nat.mod_small.
 Qed.
 
 Theorem Zn_mul_add_distr_l : ∀ (a b c : Zn n),
   (a * (b + c) = a * b + a * c)%F.
 Proof.
 intros.
-apply Zn_eq; cbn.
-destruct n; [ easy | ].
+apply Zn_eq; cbn - [ "mod" ].
 rewrite Nat.add_mod_idemp_l; [ | easy ].
 rewrite Nat.add_mod_idemp_r; [ | easy ].
 rewrite Nat.mul_mod_idemp_r; [ | easy ].
 now rewrite Nat.mul_add_distr_l.
 Qed.
 
-Theorem Zn_1_neq_0 : (1 ≠ 0)%F.
+Theorem Zn_neq_1_0 : (1 ≠ 0)%F.
 Proof.
 intros.
-apply Zn_neq; cbn.
-destruct n. 2: {
-  destruct n0. 2: {
-    rewrite Nat.mod_small. {
-      rewrite Nat.mod_small; [ easy | apply Nat.lt_0_succ ].
-    }
-    apply -> Nat.succ_lt_mono.
-    apply Nat.lt_0_succ.
-  }
-  cbn.
-...
+apply Zn_neq; cbn - [ "mod" ].
+rewrite Nat.mod_small. 2: {
+  apply -> Nat.succ_lt_mono.
+  apply Nat.lt_0_succ.
+}
+rewrite Nat.mod_small. 2: {
+  apply Nat.lt_0_succ.
+}
+easy.
 Qed.
 
 Definition Zn_ring_like_prop : ring_like_prop nat :=
@@ -213,8 +200,8 @@ Definition Zn_ring_like_prop : ring_like_prop nat :=
      rngl_mul_assoc := Zn_mul_assoc;
      rngl_mul_1_l := Zn_mul_1_l;
      rngl_mul_add_distr_l := Zn_mul_add_distr_l;
-     rngl_1_neq_0 := Nat_neq_1_0;
-     rngl_opt_mul_comm := Nat.mul_comm;
+     rngl_1_neq_0 := Zn_neq_1_0;
+     rngl_opt_mul_comm := ... Nat.mul_comm;
      rngl_opt_mul_1_r := I;
      rngl_opt_mul_add_distr_r := I;
      rngl_opt_add_opp_l := I;
