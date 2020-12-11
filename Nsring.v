@@ -301,17 +301,20 @@ replace (at_least_2 n) with n. 2: {
   do 2 rewrite Nat.sub_succ.
   now rewrite Nat.sub_0_r.
 }
-...
 apply prime_mul_inv_l_mod; [ easy | ].
 destruct a as (a, Ha); cbn.
-cbn in Haz.
 intros H; apply Haz; clear Haz.
 apply Zn_eq; cbn; symmetry.
-...
-
-intros H; apply Haz; clear Haz; subst a.
-apply Zn_eq; cbn; symmetry.
-apply Nat.sub_diag.
+rewrite Nat.sub_diag; symmetry.
+destruct a; [ easy | exfalso ].
+apply Nat.ltb_lt in Ha.
+unfold at_least_2 in Ha.
+apply Nat.mod_divides in H; [ | flia Hn2 ].
+destruct H as (c, Hc).
+replace (S (S (n - 2))) with n in Ha by flia Hn2.
+rewrite Hc in Ha.
+apply Nat.nle_gt in Ha; apply Ha.
+destruct c; [ now rewrite Nat.mul_comm in Hc | flia ].
 Qed.
 
 Theorem Zn_opt_mul_inv_r :
