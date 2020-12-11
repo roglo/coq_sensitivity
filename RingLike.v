@@ -77,10 +77,6 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* when has inverse *)
     rngl_opt_mul_inv_l :
       if rngl_has_inv then ∀ a : T, a ≠ 0%F → (¹/ a * a = 1)%F else True;
-    rngl_opt_mul_inv_r :
-      if (rngl_has_inv && negb rngl_is_comm)%bool then
-        ∀ a : T, a ≠ 0%F → (a / a = 1)%F
-      else True;
     (* when equality is decidable *)
     rngl_opt_eq_dec :
       if rngl_has_dec_eq then ∀ a b : T, {a = b} + {a ≠ b} else True;
@@ -93,8 +89,6 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if rngl_is_domain then
         ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
       else True }.
-
-...
 
 Fixpoint rngl_power {T} {R : ring_like_op T} a n :=
   match n with
@@ -172,12 +166,19 @@ Qed.
 Theorem rngl_mul_inv_r : ∀ a : T, a ≠ 0%F → (a / a = 1)%F.
 Proof.
 intros * Ha.
+clear Hin.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
-specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
-rewrite Hin in rngl_mul_inv_l, rngl_mul_inv_r.
-unfold rngl_div.
+specialize rngl_opt_mul_div as rngl_mul_div.
+destruct rngl_is_domain. {
+  cbn in rngl_mul_div.
+  specialize (rngl_mul_div 1%F a Ha).
+  now rewrite rngl_mul_1_l in rngl_mul_div.
+}
+cbn in rngl_mul_div.
+...
 destruct rngl_is_comm. {
+  cbn in rngl_mul_inv_r.
+...
   rewrite rngl_mul_comm.
   now apply rngl_mul_inv_l.
 } {
