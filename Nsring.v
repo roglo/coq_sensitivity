@@ -53,11 +53,7 @@ Compute (15 / 3)%F.
 Compute (15 / 3)%nat.
 *)
 
-(* ℤn = ℤ/nℤ *)
-
-Definition at_least_2 n := S (S (n - 2)).
-
-Definition Zn n := {a : nat | a <? at_least_2 n = true}.
+(* primes, for ℤn, following *)
 
 Fixpoint prime_test cnt n d :=
   match cnt with
@@ -84,6 +80,40 @@ Fixpoint inv_mod_loop a n b :=
   end.
 
 Definition inv_mod a n := inv_mod_loop a n n.
+
+Theorem glop : ∀ n a b,
+  is_prime n = true
+  → a ≠ 0
+  → n ≤ b
+  → (inv_mod_loop a n b * a) mod n = 1.
+Proof.
+intros * Hn Haz Hnb.
+destruct b. {
+  now apply Nat.le_0_r in Hnb; subst n.
+}
+destruct b. {
+  apply Nat.le_1_r in Hnb.
+  destruct Hnb as [Hnb| Hnb]. {
+    now...
+
+  now apply Nat.le_0_r in Hnb; subst n.
+}
+...
+
+Theorem prime_mul_inv_l_mod : ∀ n a,
+  is_prime n = true
+  → a ≠ 0
+  → (inv_mod a n * a) mod n = 1.
+Proof.
+intros * Hn Haz.
+unfold inv_mod.
+...
+
+(* ℤn = ℤ/nℤ *)
+
+Definition at_least_2 n := S (S (n - 2)).
+
+Definition Zn n := {a : nat | a <? at_least_2 n = true}.
 
 Theorem Zn_op_prop n r : r mod at_least_2 n <? at_least_2 n = true.
 Proof.
@@ -244,14 +274,6 @@ destruct (Nat.eq_dec a b) as [Hab| Hab]; [ left | right ]. {
   now apply Zn_neq.
 }
 Qed.
-
-Theorem prime_mul_inv_l_mod : ∀ n a,
-  is_prime n = true
-  → a ≠ 0
-  → (inv_mod a n * a) mod n = 1.
-Proof.
-intros * Hn Haz.
-...
 
 Theorem Zn_opt_mul_inv_l :
   if is_prime n then ∀ a : Zn n, a ≠ 0%F → (¹/ a * a)%F = 1%F else True.
