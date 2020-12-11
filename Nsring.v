@@ -139,6 +139,16 @@ rewrite Nat.mod_0_l; [ | easy ].
 now rewrite Nat.mod_small.
 Qed.
 
+Theorem Zn_mul_assoc : ∀ (a b c : Zn n), (a * (b * c) = (a * b) * c)%F.
+Proof.
+intros.
+apply Zn_eq; cbn.
+destruct n; [ easy | ].
+rewrite Nat.mul_mod_idemp_l; [ | easy ].
+rewrite Nat.mul_mod_idemp_r; [ | easy ].
+now rewrite Nat.mul_assoc.
+Qed.
+
 Definition Zn_ring_like_prop : ring_like_prop nat :=
   {| rngl_is_comm := true;
      rngl_has_opp := true;
@@ -148,8 +158,8 @@ Definition Zn_ring_like_prop : ring_like_prop nat :=
      rngl_add_comm := Zn_add_comm;
      rngl_add_assoc := Zn_add_assoc;
      rngl_add_0_l := Zn_add_0_l;
-     rngl_mul_assoc := ... Nat.mul_assoc;
-     rngl_mul_1_l := Nat.mul_1_l;
+     rngl_mul_assoc := Zn_mul_assoc;
+     rngl_mul_1_l := ... Nat.mul_1_l;
      rngl_mul_add_distr_l := Nat.mul_add_distr_l;
      rngl_1_neq_0 := Nat_neq_1_0;
      rngl_opt_mul_comm := Nat.mul_comm;
