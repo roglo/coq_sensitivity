@@ -1,4 +1,4 @@
-(* Prime numbers *)
+(* Fermat's little theorem *)
 
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith SetoidList Permutation.
