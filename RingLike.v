@@ -23,15 +23,15 @@ Class ring_like_op T :=
   { rngl_zero : T;
     rngl_one : T;
     rngl_add : T → T → T;
+    rngl_sub : T → T → T;
     rngl_mul : T → T → T;
-    rngl_opp : T → T;
-    rngl_inv : T → T }.
+    rngl_div : T → T → T }.
 
 Declare Scope ring_like_scope.
 Delimit Scope ring_like_scope with F.
 
-Definition rngl_sub {T} {R : ring_like_op T} a b := rngl_add a (rngl_opp b).
-Definition rngl_div {T} {R : ring_like_op T} a b := rngl_mul a (rngl_inv b).
+Definition rngl_opp {T} {R : ring_like_op T} a := rngl_sub rngl_zero a.
+Definition rngl_inv {T} {R : ring_like_op T} a := rngl_div rngl_one a.
 
 Notation "0" := rngl_zero : ring_like_scope.
 Notation "1" := rngl_one : ring_like_scope.
@@ -48,10 +48,11 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_has_opp : bool;
     rngl_has_inv : bool;
     rngl_has_dec_eq : bool;
-    rngl_is_integral_not_provable : bool;
+    rngl_is_domain : bool;
     rngl_add_comm : ∀ a b : T, (a + b = b + a)%F;
     rngl_add_assoc : ∀ a b c : T, (a + (b + c) = (a + b) + c)%F;
     rngl_add_0_l : ∀ a : T, (0 + a)%F = a;
+    rngl_add_sub : ∀ a b, (a + b - b = a)%F;
     rngl_mul_assoc : ∀ a b c : T, (a * (b * c) = (a * b) * c)%F;
     rngl_mul_1_l : ∀ a : T, (1 * a)%F = a;
     rngl_mul_add_distr_l : ∀ a b c : T, (a * (b + c) = a * b + a * c)%F;
@@ -83,11 +84,17 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* when equality is decidable *)
     rngl_opt_eq_dec :
       if rngl_has_dec_eq then ∀ a b : T, {a = b} + {a ≠ b} else True;
-    (* when has_no_zero_divisors *)
+    (* when is domain *)
+    rngl_opt_mul_div :
+      if (rngl_is_domain || rngl_has_inv)%bool then
+        ∀ a b, (b ≠ 0 → a * b / b = a)%F
+      else True;
     rngl_opt_is_integral :
-      if rngl_is_integral_not_provable then
+      if rngl_is_domain then
         ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
       else True }.
+
+...
 
 Fixpoint rngl_power {T} {R : ring_like_op T} a n :=
   match n with
