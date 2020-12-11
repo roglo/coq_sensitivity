@@ -14,10 +14,15 @@ Canonical Structure nat_ring_like_op : ring_like_op nat :=
      rngl_opp := phony_Nat_opp;
      rngl_inv := phony_Nat_inv |}.
 
+Existing Instance nat_ring_like_op.
+
 Theorem Nat_eq_mul_0 : ∀ n m, n * m = 0 → n = 0 ∨ m = 0.
 Proof. now intros; apply Nat.eq_mul_0. Qed.
 
 Theorem Nat_neq_1_0 : 1 ≠ 0.
+Proof. easy. Qed.
+
+Theorem nat_characteristic_prop : ∀ i, rngl_of_nat (S i) ≠ 0.
 Proof. easy. Qed.
 
 Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
@@ -26,6 +31,7 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_has_inv := false;
      rngl_has_dec_eq := true;
      rngl_is_domain := true;
+     rngl_characteristic := 0;
      rngl_add_comm := Nat.add_comm;
      rngl_add_assoc := Nat.add_assoc;
      rngl_add_0_l := Nat.add_0_l;
@@ -42,7 +48,8 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_mul_inv_l := I;
      rngl_opt_mul_inv_r := I;
      rngl_opt_eq_dec := Nat.eq_dec;
-     rngl_opt_is_integral := Nat_eq_mul_0 |}.
+     rngl_opt_is_integral := Nat_eq_mul_0;
+     rngl_characteristic_prop := nat_characteristic_prop |}.
 
 (*
 Print nat_ring_like_op.
@@ -324,12 +331,21 @@ Proof.
 now rewrite Bool.andb_false_r.
 Qed.
 
+Theorem Zn_characteristic_prop :
+  match n with
+  | 0 => ∀ i : nat, rngl_of_nat (S i) ≠ 0%F
+  | S _ => rngl_of_nat n = 0%F
+  end.
+Proof.
+...
+
 Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
   {| rngl_is_comm := true;
      rngl_has_opp := true;
      rngl_has_inv := is_prime n;
      rngl_has_dec_eq := true;
      rngl_is_domain := false;
+     rngl_characteristic := n;
      rngl_add_comm := Zn_add_comm;
      rngl_add_assoc := Zn_add_assoc;
      rngl_add_0_l := Zn_add_0_l;
@@ -346,6 +362,7 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_opt_mul_inv_l := Zn_opt_mul_inv_l;
      rngl_opt_mul_inv_r := Zn_opt_mul_inv_r;
      rngl_opt_eq_dec := Zn_eq_dec;
-     rngl_opt_is_integral := I |}.
+     rngl_opt_is_integral := I;
+     rngl_characteristic_prop := Zn_characteristic_prop |}.
 
 End a.
