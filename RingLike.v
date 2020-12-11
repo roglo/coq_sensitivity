@@ -69,6 +69,8 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* when has opposite *)
     rngl_opt_add_opp_l :
       if rngl_has_opp then ∀ a : T, (- a + a = 0)%F else True;
+    rngl_opt_add_opp_r :
+      if rngl_has_opp then ∀ a : T, (a - a = a + -a)%F else True;
     (* when has not opposite *)
     rngl_opt_mul_0_l :
       if rngl_has_opp then True else ∀ a, (0 * a = 0)%F;
@@ -77,9 +79,8 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* when has inverse *)
     rngl_opt_mul_inv_l :
       if rngl_has_inv then ∀ a : T, a ≠ 0%F → (¹/ a * a = 1)%F else True;
-    (* when equality is decidable *)
-    rngl_opt_eq_dec :
-      if rngl_has_dec_eq then ∀ a b : T, {a = b} + {a ≠ b} else True;
+    rngl_opt_mul_inv_r :
+      if rngl_has_inv then ∀ a b, b ≠ 0%F → (a / b = a * ¹/ b)%F else True;
     (* when is domain *)
     rngl_opt_mul_div :
       if (rngl_is_domain || rngl_has_inv)%bool then
@@ -88,7 +89,10 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_opt_is_integral :
       if rngl_is_domain then
         ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
-      else True }.
+      else True;
+    (* when equality is decidable *)
+    rngl_opt_eq_dec :
+      if rngl_has_dec_eq then ∀ a b : T, {a = b} + {a ≠ b} else True }.
 
 Fixpoint rngl_power {T} {R : ring_like_op T} a n :=
   match n with
@@ -168,6 +172,7 @@ Proof.
 intros * Ha.
 clear Hin.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
+specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
 specialize rngl_opt_mul_div as rngl_mul_div.
 destruct rngl_is_domain. {
   cbn in rngl_mul_div.
@@ -175,6 +180,7 @@ destruct rngl_is_domain. {
   now rewrite rngl_mul_1_l in rngl_mul_div.
 }
 cbn in rngl_mul_div.
+(* mouais... faut voir... *)
 ...
 destruct rngl_is_comm. {
   cbn in rngl_mul_inv_r.
