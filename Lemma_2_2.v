@@ -662,19 +662,6 @@ split. {
   split. 2: {
     now specialize (A_n_eigen_formula_for_sqrt_n _ _ _ Hv Hμ) as H1.
   }
-Check A_n_eigen_formula_for_sqrt_n.
-Print A_n_eigenvector_of_sqrt_n.
-(* un corps peut être :
-   - algébriquement clos ou pas
-   - archimédien ou pas
-   - à égalité décidable ou pas
-   - complet ou pas
-   - de caractéristique nulle ou pas
-   - infini ou pas
-   - ordonné ou pas
-   - totalement ordonné ou pas
-*)
-...
   rewrite Hv; cbn.
   unfold A_n_eigenvector_of_sqrt_n; cbn.
   destruct n. {
@@ -752,6 +739,18 @@ Print A_n_eigenvector_of_sqrt_n.
   rewrite rngl_mul_0_l in Hμ; [ | easy ].
   symmetry in Hμ.
   move Hμ at bottom.
+Check A_n_eigen_formula_for_sqrt_n.
+Print A_n_eigenvector_of_sqrt_n.
+(* un corps peut être :
+   - algébriquement clos ou pas
+   - archimédien ou pas
+   - à égalité décidable ou pas
+   - complet ou pas
+   - de caractéristique nulle ou pas
+   - fini ou infini
+   - ordonné ou pas
+   - totalement ordonné ou pas
+*)
 ...
 (* actually, we need characteristic = 0 *)
 Theorem rngl_of_nat_neq_0 : ∀ n, n ≠ 0 → rngl_of_nat n ≠ 0%F.
