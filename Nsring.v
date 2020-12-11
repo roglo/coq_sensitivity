@@ -82,16 +82,13 @@ Definition phony_Zn_inv n (a : Zn n) : Zn n :=
   let r := 0 in
   exist _ (r mod n) (Zn_op_prop n r).
 
-Canonical Structure Zn_ring_like_op n : ring_like_op (Zn n) :=
+Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
   {| rngl_zero := Zn_v n 0;
      rngl_one := Zn_v n 1;
      rngl_add := Zn_add n;
      rngl_mul := Zn_mul n;
      rngl_opp := Zn_opp n;
      rngl_inv := phony_Zn_inv n |}.
-
-Compute (let n := 2 in let ro := Zn_ring_like_op n in (0%F, 1%F)).
-Compute (let n := 7 in let ro := Zn_ring_like_op n in (Zn_v n 4 + Zn_v n 5)%F).
 
 Theorem Zn_eq : ∀ n (a b : Zn n), proj1_sig a = proj1_sig b → a = b.
 Proof.
