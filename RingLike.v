@@ -97,7 +97,7 @@ Fixpoint rngl_power {T} {R : ring_like_op T} a n :=
 
 Notation "a ^ b" := (rngl_power a b) : ring_like_scope.
 
-Section ring_like_theorems.
+Section a.
 
 Context {T : Type}.
 Context {ro : ring_like_op T}.
@@ -371,7 +371,7 @@ rewrite rngl_mul_1_l in H.
 now right.
 Qed.
 
-End ring_like_theorems.
+End a.
 
 Arguments rngl_add_opp_l {T}%type {ro rp} Hro.
 Arguments rngl_add_opp_r {T}%type {ro rp} Hro.

@@ -60,7 +60,7 @@ Fixpoint concat_list_in_list {T} (ll1 ll2 : list (list T)) :=
 Definition concat_list_list_list {T} (lll : list (list (list T))) :=
   fold_left concat_list_in_list lll [].
 
-Section in_ring_like.
+Section a.
 
 Context {T : Type}.
 Context (ro : ring_like_op T).
@@ -313,9 +313,9 @@ Definition mZ n :=
 Definition mI n : matrix T :=
   mk_mat (λ i j, if Nat.eq_dec i j then 1%F else 0%F) n n.
 
-End in_ring_like.
+End a.
 
-Section in_ring_like.
+Section a.
 
 Context {T : Type}.
 Context (ro : ring_like_op T).
@@ -1185,7 +1185,7 @@ Theorem fold_determinant :
   det_loop M (mat_ncols M) = determinant M.
 Proof. easy. Qed.
 
-End in_ring_like.
+End a.
 
 Module matrix_Notations.
 

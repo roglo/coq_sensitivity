@@ -11,7 +11,7 @@ Notation "'Π' ( i = b , e ) , g" :=
   (at level 45, i at level 0, b at level 60, e at level 60) :
      ring_like_scope.
 
-Section in_ring.
+Section a.
 
 Context {T : Type}.
 Context (ro : ring_like_op T).
@@ -78,4 +78,4 @@ intros b k g.
 apply iter_succ_succ.
 Qed.
 
-End in_ring.
+End a.

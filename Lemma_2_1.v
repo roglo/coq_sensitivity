@@ -22,7 +22,7 @@ Require Import RingLike.
 Require Import RLsummation.
 Import matrix_Notations.
 
-Section in_ring_like.
+Section a.
 
 Context {T : Type}.
 Context (ro : ring_like_op T).

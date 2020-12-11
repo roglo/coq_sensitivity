@@ -11,7 +11,7 @@ Notation "'Σ' ( i = b , e ) , g" :=
   (at level 45, i at level 0, b at level 60, e at level 60) :
     ring_like_scope.
 
-Section in_ring_like.
+Section a.
 
 Context {T : Type}.
 Context (ro : ring_like_op T).
@@ -433,7 +433,7 @@ rewrite Nat.sub_succ_l; [ | now destruct Hi ].
 now rewrite <- fold_left_add_seq_add, Nat.add_0_l.
 Qed.
 
-End in_ring_like.
+End a.
 
 Arguments rngl_mul_summation_distr_l {T ro rp} Hro a b e f.
 Arguments rngl_mul_summation_distr_r {T ro rp} Hro a b e f.
