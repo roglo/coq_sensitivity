@@ -84,20 +84,56 @@ Definition inv_mod a n := inv_mod_loop a n n.
 Theorem glop : ∀ n a b,
   is_prime n = true
   → a ≠ 0
+  → b ≠ 0
+  → (inv_mod_loop a n b * a) mod n = 1.
+Proof.
+intros * Hn Haz Hnb.
+...
+
+Theorem glop : ∀ n a b,
+  is_prime n = true
+  → a ≠ 0
   → n ≤ b
   → (inv_mod_loop a n b * a) mod n = 1.
 Proof.
 intros * Hn Haz Hnb.
-destruct b. {
-  now apply Nat.le_0_r in Hnb; subst n.
-}
+destruct b; [ now apply Nat.le_0_r in Hnb; subst n | ].
 destruct b. {
   apply Nat.le_1_r in Hnb.
-  destruct Hnb as [Hnb| Hnb]. {
-    now...
-
-  now apply Nat.le_0_r in Hnb; subst n.
+  now destruct Hnb; subst n.
 }
+destruct b. {
+  cbn.
+  rewrite Nat.mul_1_r, Nat.mul_0_r.
+  rewrite Nat.mod_0_l; [ | now intros H; subst n ].
+  cbn.
+  destruct (Nat.eq_dec (a mod n) 1) as [Han| Han]. {
+    now rewrite Nat.mul_1_l.
+  }
+  apply Nat.le_antisymm in Hnb. 2: {
+    destruct n; [ easy | ].
+    destruct n; [ easy | ].
+    do 2 apply -> Nat.succ_le_mono.
+    apply Nat.le_0_l.
+  }
+  subst n.
+  exfalso.
+  induction a; [ easy | ].
+  destruct a; [ easy | ].
+  destruct a. {
+    cbn in IHa.
+    cbn in Han.
+...
+intros * Hn Haz Hnb.
+destruct (lt_dec b 2) as [Hb2| Hb2]. {
+  destruct b; [ now apply Nat.le_0_r in Hnb; subst n | ].
+  destruct b. {
+    apply Nat.le_1_r in Hnb.
+    now destruct Hnb; subst n.
+  }
+  now do 2 apply Nat.succ_lt_mono in Hb2.
+}
+apply Nat.nlt_ge in Hb2.
 ...
 
 Theorem prime_mul_inv_l_mod : ∀ n a,
