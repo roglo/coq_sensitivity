@@ -115,8 +115,7 @@ unfold rngl_add; cbn.
 now rewrite Nat.add_comm.
 Qed.
 
-Theorem Zn_add_assoc : ∀ (a b c : Zn n),
-  (a + (b + c) = (a + b) + c)%F.
+Theorem Zn_add_assoc : ∀ (a b c : Zn n), (a + (b + c) = (a + b) + c)%F.
 Proof.
 intros.
 apply Zn_eq; cbn.
@@ -128,16 +127,28 @@ rewrite Nat.add_mod_idemp_r; [ | easy ].
 now rewrite Nat.add_assoc.
 Qed.
 
-Definition Zn_ring_like_prop n : ring_like_prop nat :=
+Theorem Zn_add_0_l : ∀ (a : Zn n), (0 + a = a)%F.
+Proof.
+intros.
+apply Zn_eq; cbn.
+destruct a as (a, Ha); cbn.
+apply Nat.ltb_lt in Ha.
+destruct n; [ now apply Nat.lt_1_r in Ha | ].
+rewrite Nat.sub_succ, Nat.sub_0_r in Ha.
+rewrite Nat.mod_0_l; [ | easy ].
+now rewrite Nat.mod_small.
+Qed.
+
+Definition Zn_ring_like_prop : ring_like_prop nat :=
   {| rngl_is_comm := true;
      rngl_has_opp := true;
      rngl_has_inv := false; (* except if n is prime *)
      rngl_has_dec_eq := true;
      rngl_is_integral_not_provable := true;
-     rngl_add_comm := @Zn_add_comm n;
-     rngl_add_assoc := @Zn_add_assoc n;
-     rngl_add_0_l := ... Nat.add_0_l;
-     rngl_mul_assoc := Nat.mul_assoc;
+     rngl_add_comm := Zn_add_comm;
+     rngl_add_assoc := Zn_add_assoc;
+     rngl_add_0_l := Zn_add_0_l;
+     rngl_mul_assoc := ... Nat.mul_assoc;
      rngl_mul_1_l := Nat.mul_1_l;
      rngl_mul_add_distr_l := Nat.mul_add_distr_l;
      rngl_1_neq_0 := Nat_neq_1_0;
