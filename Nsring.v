@@ -1,7 +1,7 @@
 (* Semiring of natural *)
 
 Require Import Utf8 Arith.
-Require Import RingLike FermatLittle.
+Require Import Misc RingLike FermatLittle.
 
 Definition phony_Nat_opp (x : nat) := 0.
 Definition phony_Nat_inv (x : nat) := 0.
@@ -80,29 +80,32 @@ Qed.
 
 Definition inv_mod i n := Nat_pow_mod i (n - 2) n.
 
-Theorem prime_mul_inv_l_mod : ∀ n a,
-  is_prime n = true
-  → a ≠ 0
-  → (inv_mod a n * a) mod n = 1.
+Theorem prime_mul_inv_l_mod : ∀ p a,
+  is_prime p = true
+  → a mod p ≠ 0
+  → (inv_mod a p * a) mod p = 1.
 Proof.
-intros * Hn Haz.
+intros * Hp Haz.
 unfold inv_mod.
-rewrite Nat_pow_mod_is_pow_mod; [ | now intros H; subst n ].
-rewrite Nat.mul_mod_idemp_l; [ | now intros H; subst n ].
+rewrite Nat_pow_mod_is_pow_mod; [ | now intros H; subst p ].
+rewrite Nat.mul_mod_idemp_l; [ | now intros H; subst p ].
 replace a with (a ^ 1); [ | apply Nat.pow_1_r ].
 rewrite Nat.pow_1_r at 1.
 rewrite <- Nat.pow_add_r.
-replace (n - 2 + 1) with (n - 1). 2: {
-  destruct n; [ easy | ].
-  destruct n; [ easy | ].
+replace (p - 2 + 1) with (p - 1). 2: {
+  destruct p; [ easy | ].
+  destruct p; [ easy | ].
   cbn; rewrite Nat.sub_0_r.
   symmetry.
   apply Nat.add_1_r.
 }
 (* Fermat's little theorem *)
-...
+rewrite <- Nat_mod_pow_mod.
 apply fermat_little; [ easy | ].
-...
+split; [ flia Haz | ].
+apply Nat.mod_upper_bound.
+now destruct p.
+Qed.
 
 (* ℤn = ℤ/nℤ *)
 
@@ -302,6 +305,10 @@ replace (at_least_2 n) with n. 2: {
 apply prime_mul_inv_l_mod; [ easy | ].
 destruct a as (a, Ha); cbn.
 cbn in Haz.
+intros H; apply Haz; clear Haz.
+apply Zn_eq; cbn; symmetry.
+...
+
 intros H; apply Haz; clear Haz; subst a.
 apply Zn_eq; cbn; symmetry.
 apply Nat.sub_diag.
