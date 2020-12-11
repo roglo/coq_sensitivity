@@ -115,6 +115,7 @@ replace (n - 2 + 1) with (n - 1). 2: {
   symmetry.
   apply Nat.add_1_r.
 }
+(* Fermat's little theorem *)
 ...
 
 (* ℤn = ℤ/nℤ *)
