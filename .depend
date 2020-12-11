@@ -12,8 +12,8 @@ Misc.vio: Misc.v
 Misc.vo Misc.glob Misc.v.beautified Misc.required_vo: Misc.v 
 Nat_ggcd.vio: Nat_ggcd.v Misc.vio
 Nat_ggcd.vo Nat_ggcd.glob Nat_ggcd.v.beautified Nat_ggcd.required_vo: Nat_ggcd.v Misc.vo
-Nsring.vio: Nsring.v RingLike.vio
-Nsring.vo Nsring.glob Nsring.v.beautified Nsring.required_vo: Nsring.v RingLike.vo
+Nsring.vio: Nsring.v RingLike.vio FermatLittle.vio
+Nsring.vo Nsring.glob Nsring.v.beautified Nsring.required_vo: Nsring.v RingLike.vo FermatLittle.vo
 PQ.vio: PQ.v Misc.vio Nat_ggcd.vio
 PQ.vo PQ.glob PQ.v.beautified PQ.required_vo: PQ.v Misc.vo Nat_ggcd.vo
 Qfield2.vio: Qfield2.v RingLike.vio Rational.vio

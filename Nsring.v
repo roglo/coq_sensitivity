@@ -1,7 +1,7 @@
 (* Semiring of natural *)
 
 Require Import Utf8 Arith.
-Require Import RingLike.
+Require Import RingLike FermatLittle.
 
 Definition phony_Nat_opp (x : nat) := 0.
 Definition phony_Nat_inv (x : nat) := 0.
@@ -55,22 +55,6 @@ Compute (15 / 3)%nat.
 
 (* primes, for ℤn, following *)
 
-Fixpoint prime_test cnt n d :=
-  match cnt with
-  | 0 => true
-  | S c =>
-      match n mod d with
-      | 0 => n <=? d
-      | S _ => prime_test c n (d + 1)
-      end
-  end.
-
-Definition is_prime n :=
-  match n with
-  | 0 | 1 => false
-  | S (S c) => prime_test c n 2
-  end.
-
 (* (a ^ b) mod c defined like that so that we can use "Compute"
    for testing; proved equal to (a ^ b) mod c just below... *)
 
@@ -116,6 +100,8 @@ replace (n - 2 + 1) with (n - 1). 2: {
   apply Nat.add_1_r.
 }
 (* Fermat's little theorem *)
+...
+apply fermat_little; [ easy | ].
 ...
 
 (* ℤn = ℤ/nℤ *)
