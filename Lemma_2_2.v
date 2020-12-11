@@ -751,6 +751,7 @@ Print A_n_eigenvector_of_sqrt_n.
    - fini ou infini
    - ordonné ou pas
    - totalement ordonné ou pas
+   - valué ou pas
 *)
 ...
 (* actually, we need characteristic = 0 *)
