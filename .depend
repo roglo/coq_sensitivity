@@ -1,3 +1,5 @@
+FermatLittle.vio: FermatLittle.v Misc.vio
+FermatLittle.vo FermatLittle.glob FermatLittle.v.beautified FermatLittle.required_vo: FermatLittle.v Misc.vo
 GQ.vio: GQ.v Misc.vio PQ.vio Nat_ggcd.vio
 GQ.vo GQ.glob GQ.v.beautified GQ.required_vo: GQ.v Misc.vo PQ.vo Nat_ggcd.vo
 Lemma_2_1.vio: Lemma_2_1.v Misc.vio Matrix.vio RingLike.vio RLsummation.vio
