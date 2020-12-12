@@ -338,6 +338,25 @@ Theorem Zn_characteristic_prop :
   end.
 Proof.
 intros; cbn.
+unfold Zn_add, Zn_v; cbn - [ "mod" ].
+rewrite (Nat.mod_small 1); [ | unfold at_least_2; flia ].
+apply eq_exist_uncurried.
+cbn - [ "mod" ].
+assert (p
+  : S (S (proj1_sig (rngl_of_nat (n - 2))) mod at_least_2 n) ≡ 0
+    mod at_least_2 n). {
+  Set Printing All.
+...
+}
+exists p.
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+...
+Search (exist _ _ _ = exist _ _ _).
+
+apply Zn_eq.
+cbn - [ "mod" ].
+...
+intros; cbn.
 apply Zn_eq; cbn - [ "mod" ].
 unfold at_least_2.
 rewrite (Nat.mod_small 1); [ | flia ].
@@ -347,6 +366,26 @@ destruct (lt_dec n 2) as [Hn2| Hn2]. {
   destruct n'; [ easy | flia Hn2 ].
 }
 apply Nat.nlt_ge in Hn2.
+rewrite Nat.add_mod_idemp_r; [ | easy ].
+rewrite Nat.add_assoc.
+replace (S (S (n - 2))) with n by flia Hn2.
+rewrite Nat.add_comm; cbn.
+apply Nat.mod_divide; [ flia Hn2 | ].
+exists 1.
+rewrite Nat.mul_1_l.
+destruct n as [| n']; [ easy | ].
+destruct n'; [ flia Hn2 | clear Hn2 ].
+rewrite Nat.add_comm; cbn - [ "-" ].
+f_equal; f_equal; cbn.
+Search proj1_sig.
+...
+assert (proj1_sig (rngl_of_nat (n' - 0)) = n'). {
+  subst ro.
+  rewrite Nat.sub_0_r.
+  unfold at_least_2.
+  destruct n'; [ easy | ].
+  destruct n'; [ easy | ].
+  cbn - [ "mod" ].
 ...
 
 Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
