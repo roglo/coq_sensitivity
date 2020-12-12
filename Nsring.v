@@ -338,6 +338,18 @@ Theorem Zn_characteristic_prop :
   end.
 Proof.
 intros.
+destruct n as [| n']. {
+  intros; cbn.
+  apply Zn_neq; cbn - [ "mod" ].
+  rewrite Nat.mod_0_l; [ | easy ].
+  rewrite (Nat.mod_small 1); [ | unfold at_least_2; flia ].
+  unfold at_least_2; cbn - [ "mod" ].
+  unfold Zn_ring_like_op in ro.
+  cbn in ro.
+  subst ro; cbn - [ "mod" ].
+(* ouais, bin chais pas *)
+...
+intros.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n.
   intros i.
