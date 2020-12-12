@@ -332,15 +332,24 @@ Proof.
 now rewrite Bool.andb_false_r.
 Qed.
 
-Theorem Nat_fold_sub_succ : ∀ a b,
-  match b with
-  | 0 => S a
-  | S l => a - l
-  end = S a - b.
-Proof. easy. Qed.
-
-Theorem Nat_fold_mod_succ : ∀ n d, d - snd (Nat.divmod n d 0 d) = n mod (S d).
-Proof. easy. Qed.
+Theorem proj1_sig_rngl_of_nat : ∀ i,
+  proj1_sig (rngl_of_nat i) = i mod at_least_2 n.
+Proof.
+intros.
+induction i. {
+  cbn - [ "mod" ].
+  now rewrite Nat.mod_0_l.
+}
+cbn - [ "mod" ].
+rewrite (Nat.mod_small 1); [ | unfold at_least_2; flia ].
+unfold at_least_2 in IHi.
+cbn - [ "mod" ] in IHi.
+rewrite IHi.
+unfold at_least_2.
+remember (S (S (n - 2))) as k eqn:Hk.
+assert (Hk2 : 2 ≤ k) by flia Hk.
+apply Nat.add_mod_idemp_r; flia Hk2.
+Qed.
 
 Theorem Zn_characteristic_prop :
   match at_least_2 n with
@@ -349,21 +358,12 @@ Theorem Zn_characteristic_prop :
   end.
 Proof.
 intros.
-unfold at_least_2 at 1.
 apply Zn_eq.
-cbn - [ at_least_2 ].
-rewrite Nat.mod_0_l; [ | easy ].
-cbn - [ "mod" ].
-rewrite (Nat.mod_small 1); [ | unfold at_least_2; flia ].
-rewrite Nat.add_mod_idemp_r; [ | easy ].
-destruct n as [| n']; [ easy | ].
-destruct n'; [ easy | ].
-destruct n'; [ easy | ].
-destruct n'; [ easy | ].
-destruct n'; [ easy | ].
-destruct n'; [ easy | ].
-destruct n'; [ easy | ].
-...
+rewrite proj1_sig_rngl_of_nat.
+rewrite Nat.mod_same; [ | easy ].
+cbn; symmetry.
+apply Nat.sub_diag.
+Qed.
 
 Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
   {| rngl_is_comm := true;
