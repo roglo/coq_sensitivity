@@ -332,7 +332,7 @@ Proof.
 now rewrite Bool.andb_false_r.
 Qed.
 
-Theorem proj1_sig_rngl_of_nat : ∀ i,
+Theorem proj1_sig_Zn_of_nat : ∀ i,
   proj1_sig (rngl_of_nat i) = i mod at_least_2 n.
 Proof.
 intros.
@@ -359,7 +359,7 @@ Theorem Zn_characteristic_prop :
 Proof.
 intros.
 apply Zn_eq.
-rewrite proj1_sig_rngl_of_nat.
+rewrite proj1_sig_Zn_of_nat.
 rewrite Nat.mod_same; [ | easy ].
 cbn; symmetry.
 apply Nat.sub_diag.

@@ -1140,11 +1140,35 @@ unfold f, g in H1; cbn in H1.
 now apply rngl_1_neq_0 in H1.
 Qed.
 
+Theorem proj1_sig_squ_mat_of_nat : ∀ n i,
+  proj1_sig (@rngl_of_nat _ (squ_mat_ring_like_op n) i : square_matrix n) =
+  (rngl_of_nat i × mI n)%M.
+Proof.
+intros.
+induction i. {
+  cbn - [ "mod" ].
+...
+  now rewrite Nat.mod_0_l.
+}
+cbn - [ "mod" ].
+rewrite (Nat.mod_small 1); [ | unfold at_least_2; flia ].
+unfold at_least_2 in IHi.
+cbn - [ "mod" ] in IHi.
+rewrite IHi.
+unfold at_least_2.
+remember (S (S (n - 2))) as k eqn:Hk.
+assert (Hk2 : 2 ≤ k) by flia Hk.
+apply Nat.add_mod_idemp_r; flia Hk2.
+Qed.
+...
+*)
+
 Theorem squ_mat_characteristic_prop : ∀ n i,
   rngl_of_nat (S i) ≠ @rngl_zero _ (squ_mat_ring_like_op n).
 Proof.
 intros; cbn.
 apply square_matrix_neq; cbn.
+rewrite proj1_sig_squ_mat_of_nat.
 ...
 assert (Hz : ∀ i, (0 <= rngl_of_nat i)%Z). {
   clear i; intros.
