@@ -870,6 +870,28 @@ Definition compatible_square_matrices_bool (ML : list (matrix T)) :=
 Definition square_matrix n :=
   {M : matrix T | Nat.eqb (mat_nrows M) n && Nat.eqb (mat_ncols M) n = true}.
 
+Theorem square_matrix_eq : ∀ n (MA MB : square_matrix n),
+  proj1_sig MA = proj1_sig MB
+  → MA = MB.
+Proof.
+intros  * Hab.
+destruct MA as (A, ma).
+destruct MB as (B, mb).
+cbn in Hab.
+apply eq_exist_uncurried.
+exists Hab.
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+Qed.
+
+Theorem square_matrix_neq : ∀ n (MA MB : square_matrix n),
+  proj1_sig MA ≠ proj1_sig MB
+  → MA ≠ MB.
+Proof.
+intros * Hab H.
+apply Hab.
+now destruct H.
+Qed.
+
 Theorem mZ_prop n : (mat_nrows (mZ n) =? n) && (mat_ncols (mZ n) =? n) = true.
 Proof.
 apply andb_true_intro.
@@ -942,49 +964,41 @@ Theorem squ_mat_add_comm : ∀ n (MA MB : square_matrix n),
   squ_mat_add MA MB = squ_mat_add MB MA.
 Proof.
 intros.
-apply eq_exist_uncurried.
+apply square_matrix_eq; cbn.
 destruct MA as (A, Ha).
 destruct MB as (B, Hb); cbn.
-assert (p : (A + B)%M = (B + A)%M). {
-  apply Bool.andb_true_iff in Ha.
-  apply Bool.andb_true_iff in Hb.
-  destruct Ha as (Hra, Hca).
-  destruct Hb as (Hrb, Hcb).
-  apply Nat.eqb_eq in Hra.
-  apply Nat.eqb_eq in Hca.
-  apply Nat.eqb_eq in Hrb.
-  apply Nat.eqb_eq in Hcb.
-  apply mat_add_comm; congruence.
-}
-exists p.
-apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+apply Bool.andb_true_iff in Ha.
+apply Bool.andb_true_iff in Hb.
+destruct Ha as (Hra, Hca).
+destruct Hb as (Hrb, Hcb).
+apply Nat.eqb_eq in Hra.
+apply Nat.eqb_eq in Hca.
+apply Nat.eqb_eq in Hrb.
+apply Nat.eqb_eq in Hcb.
+apply mat_add_comm; congruence.
 Qed.
 
 Theorem squ_mat_add_assoc : ∀ n (MA MB MC : square_matrix n),
   squ_mat_add MA (squ_mat_add MB MC) = squ_mat_add (squ_mat_add MA MB) MC.
 Proof.
 intros.
-apply eq_exist_uncurried.
+apply square_matrix_eq; cbn.
 destruct MA as (A, Ha).
 destruct MB as (B, Hb).
 destruct MC as (C, Hc); cbn.
-assert (p : (A + (B + C))%M = (A + B + C)%M). {
-  apply Bool.andb_true_iff in Ha.
-  apply Bool.andb_true_iff in Hb.
-  apply Bool.andb_true_iff in Hc.
-  destruct Ha as (Hra, Hca).
-  destruct Hb as (Hrb, Hcb).
-  destruct Hc as (Hrc, Hcc).
-  apply Nat.eqb_eq in Hra.
-  apply Nat.eqb_eq in Hca.
-  apply Nat.eqb_eq in Hrb.
-  apply Nat.eqb_eq in Hcb.
-  apply Nat.eqb_eq in Hrc.
-  apply Nat.eqb_eq in Hcc.
-  apply mat_add_assoc; congruence.
-}
-exists p.
-apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+apply Bool.andb_true_iff in Ha.
+apply Bool.andb_true_iff in Hb.
+apply Bool.andb_true_iff in Hc.
+destruct Ha as (Hra, Hca).
+destruct Hb as (Hrb, Hcb).
+destruct Hc as (Hrc, Hcc).
+apply Nat.eqb_eq in Hra.
+apply Nat.eqb_eq in Hca.
+apply Nat.eqb_eq in Hrb.
+apply Nat.eqb_eq in Hcb.
+apply Nat.eqb_eq in Hrc.
+apply Nat.eqb_eq in Hcc.
+apply mat_add_assoc; congruence.
 Qed.
 
 Theorem squ_mat_add_0_l : ∀ n (MA : square_matrix n),
@@ -992,43 +1006,35 @@ Theorem squ_mat_add_0_l : ∀ n (MA : square_matrix n),
 Proof.
 intros.
 destruct MA as (A, Ha).
-apply eq_exist_uncurried; cbn.
-assert (p : (mZ n + A)%M = A). {
-  apply Bool.andb_true_iff in Ha.
-  destruct Ha as (Hra, Hca).
-  apply Nat.eqb_eq in Hra.
-  apply Nat.eqb_eq in Hca.
-  apply mat_add_0_l; congruence.
-}
-exists p.
-apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+apply square_matrix_eq; cbn.
+apply Bool.andb_true_iff in Ha.
+destruct Ha as (Hra, Hca).
+apply Nat.eqb_eq in Hra.
+apply Nat.eqb_eq in Hca.
+apply mat_add_0_l; congruence.
 Qed.
 
 Theorem squ_mat_mul_assoc : ∀ n (MA MB MC : square_matrix n),
   squ_mat_mul MA (squ_mat_mul MB MC) = squ_mat_mul (squ_mat_mul MA MB) MC.
 Proof.
 intros.
-apply eq_exist_uncurried.
+apply square_matrix_eq; cbn.
 destruct MA as (A, Ha).
 destruct MB as (B, Hb).
 destruct MC as (C, Hc); cbn.
-assert (p : (A * (B * C))%M = (A * B * C)%M). {
-  apply Bool.andb_true_iff in Ha.
-  apply Bool.andb_true_iff in Hb.
-  apply Bool.andb_true_iff in Hc.
-  destruct Ha as (Hra, Hca).
-  destruct Hb as (Hrb, Hcb).
-  destruct Hc as (Hrc, Hcc).
-  apply Nat.eqb_eq in Hra.
-  apply Nat.eqb_eq in Hca.
-  apply Nat.eqb_eq in Hrb.
-  apply Nat.eqb_eq in Hcb.
-  apply Nat.eqb_eq in Hrc.
-  apply Nat.eqb_eq in Hcc.
-  apply mat_mul_assoc; congruence.
-}
-exists p.
-apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+apply Bool.andb_true_iff in Ha.
+apply Bool.andb_true_iff in Hb.
+apply Bool.andb_true_iff in Hc.
+destruct Ha as (Hra, Hca).
+destruct Hb as (Hrb, Hcb).
+destruct Hc as (Hrc, Hcc).
+apply Nat.eqb_eq in Hra.
+apply Nat.eqb_eq in Hca.
+apply Nat.eqb_eq in Hrb.
+apply Nat.eqb_eq in Hcb.
+apply Nat.eqb_eq in Hrc.
+apply Nat.eqb_eq in Hcc.
+apply mat_mul_assoc; congruence.
 Qed.
 
 Theorem squ_mat_mul_1_l : ∀ n (MA : square_matrix n),
@@ -1036,16 +1042,12 @@ Theorem squ_mat_mul_1_l : ∀ n (MA : square_matrix n),
 Proof.
 intros.
 destruct MA as (A, Ha).
-apply eq_exist_uncurried; cbn.
-assert (p : (mI n * A)%M = A). {
-  apply Bool.andb_true_iff in Ha.
-  destruct Ha as (Hra, Hca).
-  apply Nat.eqb_eq in Hra.
-  apply Nat.eqb_eq in Hca.
-  apply mat_mul_1_l; congruence.
-}
-exists p.
-apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+apply square_matrix_eq; cbn.
+apply Bool.andb_true_iff in Ha.
+destruct Ha as (Hra, Hca).
+apply Nat.eqb_eq in Hra.
+apply Nat.eqb_eq in Hca.
+apply mat_mul_1_l; congruence.
 Qed.
 
 Theorem squ_mat_mul_add_distr_l : ∀ n (MA MB MC : square_matrix n),
@@ -1053,27 +1055,23 @@ Theorem squ_mat_mul_add_distr_l : ∀ n (MA MB MC : square_matrix n),
   squ_mat_add (squ_mat_mul MA MB) (squ_mat_mul MA MC).
 Proof.
 intros.
-apply eq_exist_uncurried.
+apply square_matrix_eq.
 destruct MA as (A, Ha).
 destruct MB as (B, Hb).
 destruct MC as (C, Hc); cbn.
-assert (p : (A * (B + C))%M = (A * B + A * C)%M). {
-  apply Bool.andb_true_iff in Ha.
-  apply Bool.andb_true_iff in Hb.
-  apply Bool.andb_true_iff in Hc.
-  destruct Ha as (Hra, Hca).
-  destruct Hb as (Hrb, Hcb).
-  destruct Hc as (Hrc, Hcc).
-  apply Nat.eqb_eq in Hra.
-  apply Nat.eqb_eq in Hca.
-  apply Nat.eqb_eq in Hrb.
-  apply Nat.eqb_eq in Hcb.
-  apply Nat.eqb_eq in Hrc.
-  apply Nat.eqb_eq in Hcc.
-  apply mat_mul_add_distr_l; congruence.
-}
-exists p.
-apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+apply Bool.andb_true_iff in Ha.
+apply Bool.andb_true_iff in Hb.
+apply Bool.andb_true_iff in Hc.
+destruct Ha as (Hra, Hca).
+destruct Hb as (Hrb, Hcb).
+destruct Hc as (Hrc, Hcc).
+apply Nat.eqb_eq in Hra.
+apply Nat.eqb_eq in Hca.
+apply Nat.eqb_eq in Hrb.
+apply Nat.eqb_eq in Hcb.
+apply Nat.eqb_eq in Hrc.
+apply Nat.eqb_eq in Hcc.
+apply mat_mul_add_distr_l; congruence.
 Qed.
 
 Theorem squ_mat_mul_1_r : ∀ n (MA : square_matrix n),
@@ -1081,16 +1079,12 @@ Theorem squ_mat_mul_1_r : ∀ n (MA : square_matrix n),
 Proof.
 intros.
 destruct MA as (A, Ha).
-apply eq_exist_uncurried; cbn.
-assert (p : (A * mI n)%M = A). {
-  apply Bool.andb_true_iff in Ha.
-  destruct Ha as (Hra, Hca).
-  apply Nat.eqb_eq in Hra.
-  apply Nat.eqb_eq in Hca.
-  apply mat_mul_1_r; congruence.
-}
-exists p.
-apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+apply square_matrix_eq; cbn.
+apply Bool.andb_true_iff in Ha.
+destruct Ha as (Hra, Hca).
+apply Nat.eqb_eq in Hra.
+apply Nat.eqb_eq in Hca.
+apply mat_mul_1_r; congruence.
 Qed.
 
 Theorem squ_mat_mul_add_distr_r : ∀ n (MA MB MC : square_matrix n),
@@ -1098,27 +1092,23 @@ Theorem squ_mat_mul_add_distr_r : ∀ n (MA MB MC : square_matrix n),
   squ_mat_add (squ_mat_mul MA MC) (squ_mat_mul MB MC).
 Proof.
 intros.
-apply eq_exist_uncurried.
+apply square_matrix_eq.
 destruct MA as (A, Ha).
 destruct MB as (B, Hb).
 destruct MC as (C, Hc); cbn.
-assert (p : ((A + B) * C)%M = (A * C + B * C)%M). {
-  apply Bool.andb_true_iff in Ha.
-  apply Bool.andb_true_iff in Hb.
-  apply Bool.andb_true_iff in Hc.
-  destruct Ha as (Hra, Hca).
-  destruct Hb as (Hrb, Hcb).
-  destruct Hc as (Hrc, Hcc).
-  apply Nat.eqb_eq in Hra.
-  apply Nat.eqb_eq in Hca.
-  apply Nat.eqb_eq in Hrb.
-  apply Nat.eqb_eq in Hcb.
-  apply Nat.eqb_eq in Hrc.
-  apply Nat.eqb_eq in Hcc.
-  apply mat_mul_add_distr_r; congruence.
-}
-exists p.
-apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+apply Bool.andb_true_iff in Ha.
+apply Bool.andb_true_iff in Hb.
+apply Bool.andb_true_iff in Hc.
+destruct Ha as (Hra, Hca).
+destruct Hb as (Hrb, Hcb).
+destruct Hc as (Hrc, Hcc).
+apply Nat.eqb_eq in Hra.
+apply Nat.eqb_eq in Hca.
+apply Nat.eqb_eq in Hrb.
+apply Nat.eqb_eq in Hcb.
+apply Nat.eqb_eq in Hrc.
+apply Nat.eqb_eq in Hcc.
+apply mat_mul_add_distr_r; congruence.
 Qed.
 
 Theorem squ_mat_add_opp_l : ∀ n (MA : square_matrix n),
@@ -1126,16 +1116,12 @@ Theorem squ_mat_add_opp_l : ∀ n (MA : square_matrix n),
 Proof.
 intros.
 destruct MA as (A, Ha).
-apply eq_exist_uncurried; cbn.
-assert (p : (- A + A)%M = mZ n). {
-  apply Bool.andb_true_iff in Ha.
-  destruct Ha as (Hra, Hca).
-  apply Nat.eqb_eq in Hra.
-  apply Nat.eqb_eq in Hca.
-  rewrite mat_add_opp_l with (n := n); congruence.
-}
-exists p.
-apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+apply square_matrix_eq; cbn.
+apply Bool.andb_true_iff in Ha.
+destruct Ha as (Hra, Hca).
+apply Nat.eqb_eq in Hra.
+apply Nat.eqb_eq in Hca.
+rewrite mat_add_opp_l with (n := n); congruence.
 Qed.
 
 Theorem squ_mat_1_neq_0 : ∀ n, squ_mat_one n ≠ squ_mat_zero n.
@@ -1151,6 +1137,29 @@ specialize (H1 0 0).
 unfold f, g in H1; cbn in H1.
 now apply rngl_1_neq_0 in H1.
 Qed.
+
+Theorem squ_mat_characteristic_prop : ∀ n i,
+  @rngl_of_nat _ (squ_mat_ring_like_op n) (S i) ≠
+  @rngl_zero _ (squ_mat_ring_like_op n).
+Proof.
+intros; cbn.
+apply square_matrix_neq; cbn.
+...
+assert (Hz : ∀ i, (0 <= rngl_of_nat i)%Z). {
+  clear i; intros.
+  cbn - [ Z.add ].
+  induction i; [ easy | ].
+  cbn - [ Z.add ].
+  now destruct (rngl_of_nat i).
+}
+intros H.
+specialize (Hz i).
+apply Z.nlt_ge in Hz; apply Hz.
+rewrite <- H.
+apply Z.lt_sub_lt_add_r.
+now rewrite Z.sub_diag.
+Qed.
+...
 
 Definition squ_mat_ring_like_prop (n : nat) :
     ring_like_prop (square_matrix n) :=
@@ -1177,7 +1186,9 @@ Definition squ_mat_ring_like_prop (n : nat) :
      rngl_opt_mul_inv_r := I;
      rngl_opt_eq_dec := I;
      rngl_opt_is_integral := I;
-     rngl_characteristic_prop := eq_refl |}.
+     rngl_characteristic_prop := @squ_mat_characteristic_prop n |}.
+
+...
 
 Arguments det_loop {T ro} M n%nat.
 Arguments determinant {T ro} M.
