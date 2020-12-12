@@ -432,9 +432,12 @@ Theorem mat_add_opp_r : ∀ M n,
 Proof.
 intros * Hsm Hn.
 apply matrix_eq; [ easy | cbn; congruence | ].
-cbn; rewrite <- Hn.
+cbn - [ mat_sub ]; rewrite <- Hn.
 intros * Hi Hj.
-now apply rngl_add_opp_r.
+specialize rngl_add_opp_r as H.
+cbn; unfold rngl_sub in H.
+rewrite Hro in H.
+apply H.
 Qed.
 
 (* multiplication of a square matrix by a scalar is square *)
@@ -685,7 +688,7 @@ destruct rngl_is_comm; [ | easy ].
 apply matrix_eq; [ easy | easy | ].
 intros * Hi Hj.
 cbn - [ iter_seq ].
-rewrite rngl_mul_summation_distr_l; [ | easy ].
+rewrite rngl_mul_summation_distr_l.
 apply rngl_summation_eq_compat.
 intros k Hk.
 rewrite rngl_mul_comm.
@@ -753,7 +756,7 @@ apply vector_eq; [ easy | ].
 intros i Hi.
 cbn in Hi.
 cbn - [ iter_seq ].
-rewrite rngl_mul_summation_distr_l; [ | easy ].
+rewrite rngl_mul_summation_distr_l.
 apply rngl_summation_eq_compat.
 intros j Hj.
 apply rngl_mul_assoc.
@@ -766,7 +769,7 @@ apply vector_eq; [ easy | ].
 intros i Hi.
 cbn in Hi.
 cbn - [ iter_seq ].
-rewrite rngl_mul_summation_distr_l; [ | easy ].
+rewrite rngl_mul_summation_distr_l.
 apply rngl_summation_eq_compat.
 intros j Hj.
 do 2 rewrite rngl_mul_assoc.
@@ -851,6 +854,14 @@ destruct (lt_dec k i) as [Hki| Hki]. {
     }
   }
 }
+Qed.
+
+Theorem mat_mul_scal_1_l : ∀ (M : matrix T), (1 × M = M)%M.
+Proof.
+intros.
+apply matrix_eq; [ easy | easy | cbn ].
+intros * Hi Hj.
+apply rngl_mul_1_l.
 Qed.
 
 (* square matrices *)
@@ -950,15 +961,19 @@ Qed.
 Definition squ_mat_opp n (M : square_matrix n) : square_matrix n :=
   exist _ (- proj1_sig M)%M (squ_mat_opp_prop M).
 
+Definition phony_squ_mat_sub n (MA MB : square_matrix n) := MA.
 Definition phony_squ_mat_inv n (M : square_matrix n) := M.
 
 Canonical Structure squ_mat_ring_like_op n : ring_like_op (square_matrix n) :=
-  {| rngl_zero := squ_mat_zero n;
+  {| rngl_has_opp := true;
+     rngl_has_inv := false;
+     rngl_zero := squ_mat_zero n;
      rngl_one := squ_mat_one n;
      rngl_add := @squ_mat_add n;
      rngl_mul := @squ_mat_mul n;
      rngl_opp := @squ_mat_opp n;
-     rngl_inv := @phony_squ_mat_inv n |}.
+     rngl_inv := @phony_squ_mat_inv n;
+     rngl_opt_sub := @phony_squ_mat_sub n |}.
 
 Existing Instance squ_mat_ring_like_op.
 
@@ -1150,23 +1165,13 @@ induction i. {
   apply matrix_eq; [ easy | easy | cbn ].
   intros * Hi Hj; symmetry.
   apply rngl_mul_0_l.
-Print ring_like_prop.
-
-...
-  now rewrite Nat.mod_0_l.
 }
 cbn - [ "mod" ].
-rewrite (Nat.mod_small 1); [ | unfold at_least_2; flia ].
-unfold at_least_2 in IHi.
-cbn - [ "mod" ] in IHi.
 rewrite IHi.
-unfold at_least_2.
-remember (S (S (n - 2))) as k eqn:Hk.
-assert (Hk2 : 2 ≤ k) by flia Hk.
-apply Nat.add_mod_idemp_r; flia Hk2.
+rewrite mat_mul_scal_l_add_distr_r.
+f_equal; symmetry.
+apply mat_mul_scal_1_l.
 Qed.
-...
-*)
 
 Theorem squ_mat_characteristic_prop : ∀ n i,
   rngl_of_nat (S i) ≠ @rngl_zero _ (squ_mat_ring_like_op n).
@@ -1195,8 +1200,6 @@ Qed.
 Definition squ_mat_ring_like_prop (n : nat) :
     ring_like_prop (square_matrix n) :=
   {| rngl_is_comm := false;
-     rngl_has_opp := true;
-     rngl_has_inv := false;
      rngl_has_dec_eq := false; (* actually depends on dec_eq for T *)
      rngl_is_domain := false;
      rngl_characteristic := 0;

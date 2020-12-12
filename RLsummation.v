@@ -77,8 +77,9 @@ rewrite List_seq_succ_r; cbn.
 rewrite fold_left_app; cbn.
 rewrite fold_left_app; cbn.
 rewrite <- IHlen.
-...
-now rewrite rngl_opp_add_distr.
+rewrite rngl_opp_add_distr.
+unfold rngl_sub.
+now rewrite Hro.
 Qed.
 
 Theorem rngl_summation_split_first : ∀ b k g,
@@ -438,5 +439,5 @@ Qed.
 
 End a.
 
-Arguments rngl_mul_summation_distr_l {T ro rp} Hro a b e f.
-Arguments rngl_mul_summation_distr_r {T ro rp} Hro a b e f.
+Arguments rngl_mul_summation_distr_l {T ro rp} a b e f.
+Arguments rngl_mul_summation_distr_r {T ro rp} a b e f.
