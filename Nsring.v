@@ -332,29 +332,19 @@ now rewrite Bool.andb_false_r.
 Qed.
 
 Theorem Zn_characteristic_prop :
-  match at_least_2 n with
+  match n with
   | 0 => ∀ i : nat, rngl_of_nat (S i) ≠ 0%F
-  | S _ => rngl_of_nat (at_least_2 n) = 0%F
+  | S _ => rngl_of_nat n = 0%F
   end.
 Proof.
-intros; cbn.
-unfold Zn_add, Zn_v; cbn - [ "mod" ].
-rewrite (Nat.mod_small 1); [ | unfold at_least_2; flia ].
-apply eq_exist_uncurried.
-cbn - [ "mod" ].
-assert (p
-  : S (S (proj1_sig (rngl_of_nat (n - 2))) mod at_least_2 n) ≡ 0
-    mod at_least_2 n). {
-  Set Printing All.
-...
-}
-exists p.
-apply (Eqdep_dec.UIP_dec Bool.bool_dec).
-...
-Search (exist _ _ _ = exist _ _ _).
-
-apply Zn_eq.
-cbn - [ "mod" ].
+intros.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  intros i.
+  apply Zn_neq; cbn - [ "mod" ].
+  rewrite Nat.mod_0_l; [ | easy ].
+  rewrite (Nat.mod_small 1); [ | unfold at_least_2; flia ].
+  unfold at_least_2; cbn - [ "mod" ].
 ...
 intros; cbn.
 apply Zn_eq; cbn - [ "mod" ].
@@ -378,6 +368,7 @@ destruct n'; [ flia Hn2 | clear Hn2 ].
 rewrite Nat.add_comm; cbn - [ "-" ].
 f_equal; f_equal; cbn.
 Search proj1_sig.
+Admitted. (*
 ...
 assert (proj1_sig (rngl_of_nat (n' - 0)) = n'). {
   subst ro.
@@ -387,6 +378,7 @@ assert (proj1_sig (rngl_of_nat (n' - 0)) = n'). {
   destruct n'; [ easy | ].
   cbn - [ "mod" ].
 ...
+*)
 
 Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
   {| rngl_is_comm := true;
@@ -394,7 +386,7 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_has_inv := is_prime n;
      rngl_has_dec_eq := true;
      rngl_is_domain := false;
-     rngl_characteristic := at_least_2 n;
+     rngl_characteristic := n;
      rngl_add_comm := Zn_add_comm;
      rngl_add_assoc := Zn_add_assoc;
      rngl_add_0_l := Zn_add_0_l;
