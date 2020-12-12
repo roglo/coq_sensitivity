@@ -111,8 +111,7 @@ intros i k Hi Hk.
 revert i k Hi Hk.
 induction n; intros. {
   cbn.
-  rewrite rngl_mul_0_l; [ | easy ].
-  rewrite rngl_mul_0_l; [ | easy ].
+  do 2 rewrite rngl_mul_0_l.
   apply rngl_add_0_l.
 }
 rewrite (rngl_summation_split _ (2 ^ n - 1)). 2: {
@@ -189,8 +188,7 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
       rewrite rngl_summation_split_last; [ | flia ].
       now rewrite rngl_summation_succ_succ.
     } {
-      rewrite rngl_mul_0_r; [ | easy ].
-      rewrite rngl_mul_0_r; [ | easy ].
+      do 2 rewrite rngl_mul_0_r.
       symmetry; apply rngl_add_0_r.
     }
   } {
@@ -254,23 +252,23 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
     rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
       intros j Hj.
       destruct (Nat.eq_dec i (j - 1)) as [Hij| Hij]; [ flia Hij Hj | ].
-      rewrite rngl_mul_0_l; [ | easy ].
+      rewrite rngl_mul_0_l.
       now apply rngl_opp_0.
     }
     rewrite rngl_add_0_l.
     rewrite rngl_add_assoc.
-    rewrite fold_rngl_sub.
-    rewrite rngl_add_opp_r; [ | easy ].
+    rewrite (@fold_rngl_sub _ _ Hro).
+    rewrite rngl_add_opp_r.
     rewrite rngl_add_0_l.
     destruct (Nat.eq_dec i k) as [Hik| Hik]; [ flia Hi2n Hk2n Hik | ].
     rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
       intros j Hj.
       destruct (Nat.eq_dec i j) as [Hij| Hij]; [ flia Hj Hij | ].
-      rewrite rngl_mul_0_l; [ | easy ].
+      rewrite rngl_mul_0_l.
       now apply rngl_opp_0.
     }
     symmetry.
-    now apply rngl_mul_0_r.
+    apply rngl_mul_0_r.
   }
 } {
   apply Nat.nlt_ge in Hi2n.
@@ -337,8 +335,8 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
     destruct (Nat.eq_dec k k) as [H| H]; [ clear H | easy ].
     rewrite rngl_mul_1_r.
     rewrite rngl_add_assoc.
-    rewrite fold_rngl_sub.
-    rewrite rngl_add_opp_r; [ | easy ].
+    rewrite (@fold_rngl_sub _ _ Hro).
+    rewrite rngl_add_opp_r.
     rewrite rngl_add_0_l.
     rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
       intros j Hj.
@@ -381,7 +379,7 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
         flia Hik Hi2k Hi2n Hk2n.
       }
       rewrite rngl_add_0_l.
-      rewrite rngl_mul_0_r; [ | easy ].
+      rewrite rngl_mul_0_r.
       now rewrite rngl_mul_0_r.
     }
   }
@@ -547,17 +545,17 @@ destruct n. {
   apply vector_eq; [ now subst V | ].
   intros i Hi; cbn in Hi |-*.
   subst V; cbn.
-  rewrite rngl_mul_0_l, rngl_add_0_l; [ | easy ].
+  rewrite rngl_mul_0_l, rngl_add_0_l.
   destruct i; [ | flia Hi ].
   rewrite rngl_mul_1_r; symmetry; clear Hi.
-  specialize (rngl_integral Hro Hin) as H.
+  specialize (rngl_integral Hin) as H.
   rewrite Hii in H.
   apply H in Hμ.
   now destruct Hμ.
 }
 cbn - [ Nat.pow ] in HV.
 rewrite HV.
-rewrite mat_vect_mul_assoc; [ | easy ].
+rewrite mat_vect_mul_assoc.
 cbn - [ iter_seq Nat.pow ].
 specialize (mA_is_square n) as Hasm.
 rewrite m_o_mll_2x2_2x1; [ | easy | | | easy | easy ]; cycle 1. {
@@ -568,10 +566,10 @@ rewrite m_o_mll_2x2_2x1; [ | easy | | | easy | easy ]; cycle 1. {
 rewrite mat_mul_add_distr_l; [ | easy ].
 rewrite lemma_2_A_n_2_eq_n_I.
 rewrite mat_mul_add_distr_l; [ | easy ].
-rewrite mat_mul_1_l; [ | easy | easy | easy ].
-rewrite mat_mul_1_l; [ | easy | easy | now rewrite mA_ncols ].
-rewrite mat_mul_1_l; [ | easy | easy | easy ].
-rewrite mat_mul_1_r; [ | easy | easy | now cbn; rewrite mA_nrows ].
+rewrite mat_mul_1_l; [ | easy | easy ].
+rewrite mat_mul_1_l; [ | easy | now rewrite mA_ncols ].
+rewrite mat_mul_1_l; [ | easy | easy ].
+rewrite mat_mul_1_r; [ | easy | now cbn; rewrite mA_nrows ].
 rewrite (mat_add_add_swap (mA n)).
 rewrite mat_fold_sub.
 rewrite mat_add_opp_r with (n0 := 2 ^ n); [ | easy | easy | ]. 2: {
@@ -600,11 +598,11 @@ replace (rngl_of_nat n + 1)%F with (rngl_of_nat (S n)) in Hy. 2: {
 subst y.
 rewrite <- Hμ.
 rewrite <- mat_mul_scal_l_mul_assoc; [ | easy ].
-rewrite mat_mul_mul_scal_l; [ | easy | easy ].
+rewrite mat_mul_mul_scal_l; [ | easy ].
 rewrite <- mat_mul_scal_add_distr_l; [ | easy ].
 rewrite m_o_mll_2x1_mul_scal_l.
-rewrite mat_mul_scal_vect_assoc; [ | easy ].
-rewrite mat_mul_1_r; [ | easy | easy | now rewrite mA_nrows ].
+rewrite mat_mul_scal_vect_assoc.
+rewrite mat_mul_1_r; [ | easy | now rewrite mA_nrows ].
 rewrite mat_add_comm; [ easy | easy | easy | easy | cbn ].
 now rewrite mA_ncols.
 Qed.
@@ -624,15 +622,15 @@ rewrite <- vect_mul_scal_l_mul_assoc; [ | easy ].
 (* μ × (μ × V) = rngl_of_nat n × V *)
 rewrite <- Hav.
 (* μ × (mA n . V) = rngl_of_nat n × V *)
-rewrite mat_mul_scal_vect_assoc'; [ | easy | easy ].
+rewrite mat_mul_scal_vect_assoc'; [ | easy ].
 (* mA n . (μ × V) = rngl_of_nat n × V *)
 rewrite <- Hav.
 (* mA n . (mA n . V) = rngl_of_nat n × V *)
-rewrite mat_vect_mul_assoc; [ | easy ].
+rewrite mat_vect_mul_assoc.
 (* (mA n * mA n) . V = rngl_of_nat n × V *)
 rewrite Ha.
 (* (rngl_of_nat n × mI (2 ^ n)) . V = rngl_of_nat n × V *)
-rewrite <- mat_mul_scal_vect_assoc; [ | easy ].
+rewrite <- mat_mul_scal_vect_assoc.
 (* rngl_of_nat n × (mI (2 ^ n) . V) = rngl_of_nat n × V *)
 rewrite vect_mul_1_l; easy.
 Qed.
@@ -736,7 +734,7 @@ split. {
   }
   rewrite rngl_add_0_r in H4.
   rewrite H4 in Hμ.
-  rewrite rngl_mul_0_l in Hμ; [ | easy ].
+  rewrite rngl_mul_0_l in Hμ.
   symmetry in Hμ.
   move Hμ at bottom.
 Check A_n_eigen_formula_for_sqrt_n.
