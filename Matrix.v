@@ -1188,12 +1188,70 @@ f_equal; symmetry.
 apply mat_mul_scal_1_l.
 Qed.
 
+Theorem squ_mat_characteristic_prop : ∀ n,
+  match
+    (if Nat.eq_dec n 0 then 1 else rngl_characteristic)
+  with
+  | 0 => ∀ i : nat, rngl_of_nat (S i) ≠ squ_mat_zero n
+  | S _ =>
+      rngl_of_nat (if Nat.eq_dec n 0 then 1 else rngl_characteristic) =
+      squ_mat_zero n
+  end.
+Proof.
+intros; cbn.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n; cbn.
+  apply square_matrix_eq; cbn.
+  now apply matrix_eq.
+}
+remember rngl_characteristic as c eqn:Hc.
+symmetry in Hc.
+destruct c. {
+  intros.
+  apply square_matrix_neq; cbn.
+  rewrite proj1_sig_squ_mat_of_nat.
+  apply matrix_neq; cbn.
+  right; right.
+  intros H.
+  destruct n; [ easy | ].
+  specialize (H 0 0 (Nat.lt_0_succ _) (Nat.lt_0_succ _)).
+  cbn in H.
+  rewrite rngl_mul_1_r in H.
+  specialize (rngl_characteristic_prop) as Hcp.
+  rewrite Hc in Hcp.
+...
+
+(*
+Theorem squ_mat_characteristic_prop : ∀ n,
+  match (if Nat.eq_dec n 0 then 1 else 0) with
+  | 0 => ∀ i : nat, rngl_of_nat (S i) ≠ squ_mat_zero n
+  | S _ => rngl_of_nat (if Nat.eq_dec n 0 then 1 else 0) = squ_mat_zero n
+  end.
+Proof.
+intros; cbn.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n; cbn.
+  apply square_matrix_eq; cbn.
+  now apply matrix_eq.
+}
+intros.
+apply square_matrix_neq; cbn.
+rewrite proj1_sig_squ_mat_of_nat.
+apply matrix_neq; cbn.
+right; right.
+intros H.
+destruct n; [ easy | ].
+specialize (H 0 0 (Nat.lt_0_succ _) (Nat.lt_0_succ _)).
+cbn in H.
+rewrite rngl_mul_1_r in H.
+...
 Theorem squ_mat_characteristic_prop : ∀ n i,
   rngl_of_nat (S i) ≠ @rngl_zero _ (squ_mat_ring_like_op n).
 Proof.
 intros; cbn.
 destruct n. {
   apply square_matrix_neq; cbn.
+  rewrite proj1_sig_squ_mat_of_nat.
   cbn.
 ...
   apply square_matrix_neq; cbn.
@@ -1228,7 +1286,7 @@ Definition squ_mat_ring_like_prop (n : nat) :
   {| rngl_is_comm := false;
      rngl_has_dec_eq := false; (* actually depends on dec_eq for T *)
      rngl_is_domain := false;
-     rngl_characteristic := 0;
+     rngl_characteristic := if Nat.eq_dec n 0 then 1 else rngl_characteristic;
      rngl_add_comm := @squ_mat_add_comm n;
      rngl_add_assoc := @squ_mat_add_assoc n;
      rngl_add_0_l := @squ_mat_add_0_l n;
