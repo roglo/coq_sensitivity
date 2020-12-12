@@ -1,5 +1,6 @@
 (* Semiring of natural *)
 
+Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Require Import Misc RingLike FermatLittle.
 
@@ -331,6 +332,16 @@ Proof.
 now rewrite Bool.andb_false_r.
 Qed.
 
+Theorem Nat_fold_sub_succ : ∀ a b,
+  match b with
+  | 0 => S a
+  | S l => a - l
+  end = S a - b.
+Proof. easy. Qed.
+
+Theorem Nat_fold_mod_succ : ∀ n d, d - snd (Nat.divmod n d 0 d) = n mod (S d).
+Proof. easy. Qed.
+
 Theorem Zn_characteristic_prop :
   match at_least_2 n with
   | 0 => ∀ i : nat, rngl_of_nat (S i) ≠ 0%F
@@ -342,67 +353,17 @@ unfold at_least_2 at 1.
 apply Zn_eq.
 cbn - [ at_least_2 ].
 rewrite Nat.mod_0_l; [ | easy ].
-...
+cbn - [ "mod" ].
 rewrite (Nat.mod_small 1); [ | unfold at_least_2; flia ].
 rewrite Nat.add_mod_idemp_r; [ | easy ].
-unfold at_least_2.
-...
-destruct n as [| n']. {
-  cbn.
-  intros; cbn.
-  apply Zn_neq; cbn - [ "mod" ].
-  rewrite Nat.mod_0_l; [ | easy ].
-  rewrite (Nat.mod_small 1); [ | unfold at_least_2; flia ].
-  unfold at_least_2; cbn - [ "mod" ].
-  unfold Zn_ring_like_op in ro.
-  cbn in ro.
-  subst ro; cbn - [ "mod" ].
-Admitted. (*
-(* ouais, bin chais pas *)
-...
-intros.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  subst n.
-  intros i.
-  apply Zn_neq; cbn - [ "mod" ].
-  rewrite Nat.mod_0_l; [ | easy ].
-  rewrite (Nat.mod_small 1); [ | unfold at_least_2; flia ].
-  unfold at_least_2; cbn - [ "mod" ].
-...
-intros; cbn.
-apply Zn_eq; cbn - [ "mod" ].
-unfold at_least_2.
-rewrite (Nat.mod_small 1); [ | flia ].
-rewrite (Nat.mod_small 0); [ | flia ].
-destruct (lt_dec n 2) as [Hn2| Hn2]. {
-  destruct n as [| n']; [ easy | ].
-  destruct n'; [ easy | flia Hn2 ].
-}
-apply Nat.nlt_ge in Hn2.
-rewrite Nat.add_mod_idemp_r; [ | easy ].
-rewrite Nat.add_assoc.
-replace (S (S (n - 2))) with n by flia Hn2.
-rewrite Nat.add_comm; cbn.
-apply Nat.mod_divide; [ flia Hn2 | ].
-exists 1.
-rewrite Nat.mul_1_l.
 destruct n as [| n']; [ easy | ].
-destruct n'; [ flia Hn2 | clear Hn2 ].
-rewrite Nat.add_comm; cbn - [ "-" ].
-f_equal; f_equal; cbn.
-Search proj1_sig.
-Admitted. (*
+destruct n'; [ easy | ].
+destruct n'; [ easy | ].
+destruct n'; [ easy | ].
+destruct n'; [ easy | ].
+destruct n'; [ easy | ].
+destruct n'; [ easy | ].
 ...
-assert (proj1_sig (rngl_of_nat (n' - 0)) = n'). {
-  subst ro.
-  rewrite Nat.sub_0_r.
-  unfold at_least_2.
-  destruct n'; [ easy | ].
-  destruct n'; [ easy | ].
-  cbn - [ "mod" ].
-...
-*)
-*)
 
 Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
   {| rngl_is_comm := true;
