@@ -6,13 +6,18 @@ Require Import Utf8.
 Require Import RingLike Rational.
 Import Q.Notations.
 
+Definition phony_Q_sub (a b : Q) := a.
+
 Canonical Structure Q_ring_like_op : ring_like_op Q :=
-  {| rngl_zero := 0%Q;
+  {| rngl_has_opp := true;
+     rngl_has_inv := true;
+     rngl_zero := 0%Q;
      rngl_one := 1%Q;
      rngl_add := Q.add;
      rngl_mul := Q.mul;
      rngl_opp := Q.opp;
-     rngl_inv := Q.inv |}.
+     rngl_inv := Q.inv;
+     rngl_opt_sub := phony_Q_sub |}.
 
 Existing Instance Q_ring_like_op.
 
@@ -40,8 +45,6 @@ Qed.
 
 Definition Q_ring_like_prop :=
   {| rngl_is_comm := true;
-     rngl_has_opp := true;
-     rngl_has_inv := true;
      rngl_has_dec_eq := true;
      rngl_is_domain := false;
      rngl_characteristic := 0;
@@ -56,6 +59,7 @@ Definition Q_ring_like_prop :=
      rngl_opt_mul_1_r := I;
      rngl_opt_mul_add_distr_r := I;
      rngl_opt_add_opp_l := Q.add_opp_diag_l;
+     rngl_opt_add_sub := I;
      rngl_opt_mul_0_l := I;
      rngl_opt_mul_0_r := I;
      rngl_opt_mul_inv_l := Q.mul_inv_l;

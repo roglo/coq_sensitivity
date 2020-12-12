@@ -20,17 +20,21 @@
 Require Import Utf8.
 
 Class ring_like_op T :=
-  { rngl_zero : T;
+  { rngl_has_opp : bool;
+    rngl_has_inv : bool;
+    rngl_zero : T;
     rngl_one : T;
     rngl_add : T → T → T;
     rngl_mul : T → T → T;
     rngl_opp : T → T;
-    rngl_inv : T → T }.
+    rngl_inv : T → T;
+    rngl_opt_sub : T → T → T }.
 
 Declare Scope ring_like_scope.
 Delimit Scope ring_like_scope with F.
 
-Definition rngl_sub {T} {R : ring_like_op T} a b := rngl_add a (rngl_opp b).
+Definition rngl_sub {T} {R : ring_like_op T} a b :=
+  if rngl_has_opp then rngl_add a (rngl_opp b) else rngl_opt_sub a b.
 Definition rngl_div {T} {R : ring_like_op T} a b := rngl_mul a (rngl_inv b).
 
 Notation "0" := rngl_zero : ring_like_scope.
@@ -51,8 +55,6 @@ Fixpoint rngl_of_nat {T} {ro : ring_like_op T} n :=
 
 Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_is_comm : bool;
-    rngl_has_opp : bool;
-    rngl_has_inv : bool;
     rngl_has_dec_eq : bool;
     rngl_is_domain : bool;
     rngl_characteristic : nat;
@@ -76,6 +78,8 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_opt_add_opp_l :
       if rngl_has_opp then ∀ a : T, (- a + a = 0)%F else True;
     (* when has not opposite *)
+    rngl_opt_add_sub :
+      if rngl_has_opp then True else ∀ a b : T, (a + b - b = a)%F;
     rngl_opt_mul_0_l :
       if rngl_has_opp then True else ∀ a, (0 * a = 0)%F;
     rngl_opt_mul_0_r :
@@ -222,7 +226,11 @@ now rewrite Hab.
 Qed.
 
 Theorem fold_rngl_sub : ∀ a b, (a + - b)%F = (a - b)%F.
-Proof. intros; easy. Qed.
+Proof.
+intros.
+unfold rngl_sub.
+now rewrite Hro.
+Qed.
 
 Theorem rngl_add_opp_l : ∀ x, (- x + x = 0)%F.
 Proof.
@@ -235,21 +243,33 @@ Qed.
 Theorem rngl_add_opp_r : ∀ x, (x - x = 0)%F.
 Proof.
 intros.
+clear Hro.
 specialize rngl_opt_add_opp_l as rngl_add_opp_l.
-destruct rngl_has_opp; [ | easy ].
-unfold rngl_sub.
-rewrite rngl_add_comm.
-apply rngl_add_opp_l.
+specialize rngl_opt_add_sub as rngl_add_sub.
+unfold rngl_sub in rngl_add_sub |-*.
+destruct rngl_has_opp. {
+  rewrite rngl_add_comm.
+  apply rngl_add_opp_l.
+} {
+  specialize (rngl_add_sub 0%F x).
+  now rewrite rngl_add_0_l in rngl_add_sub.
+}
 Qed.
 
 Theorem rngl_add_sub : ∀ a b, (a + b - b = a)%F.
 Proof.
 intros.
-unfold rngl_sub.
-rewrite <- rngl_add_assoc.
-rewrite fold_rngl_sub.
-rewrite rngl_add_opp_r.
-apply rngl_add_0_r.
+clear Hro.
+specialize rngl_opt_add_opp_l as rngl_add_opp_l.
+specialize rngl_opt_add_sub as rngl_add_sub.
+unfold rngl_sub in rngl_add_sub |-*.
+destruct rngl_has_opp. {
+  rewrite <- rngl_add_assoc.
+  rewrite (rngl_add_comm b).
+  now rewrite rngl_add_opp_l, rngl_add_0_r.
+} {
+  apply rngl_add_sub.
+}
 Qed.
 
 Theorem rngl_add_reg_r : ∀ a b c, (a + c = b + c)%F → (a = b)%F.
@@ -284,19 +304,22 @@ Qed.
 
 Theorem rngl_opp_0 : (- 0 = 0)%F.
 Proof.
+specialize rngl_add_opp_r as H.
+unfold rngl_sub in H.
+rewrite Hro in H.
 transitivity (0 + - 0)%F. {
   symmetry.
   apply rngl_add_0_l.
 }
-apply rngl_add_opp_r.
+apply H.
 Qed.
 
 Theorem rngl_sub_0_r : ∀ a, (a - 0 = a)%F.
 Proof.
 intros.
-unfold rngl_sub.
-rewrite rngl_opp_0.
-apply rngl_add_0_r.
+clear Hro.
+specialize (rngl_add_sub a 0%F) as H.
+now rewrite rngl_add_0_r in H.
 Qed.
 
 Theorem rngl_add_move_0_r : ∀ a b, (a + b = 0)%F ↔ (a = - b)%F.
@@ -306,6 +329,7 @@ split; intros H. {
   apply rngl_sub_compat_l with (c := b) in H.
   rewrite rngl_add_sub in H.
   unfold rngl_sub in H.
+  rewrite Hro in H.
   now rewrite rngl_add_0_l in H.
 } {
   rewrite H.
@@ -317,8 +341,10 @@ Theorem rngl_opp_involutive : ∀ x, (- - x)%F = x.
 Proof.
 intros.
 symmetry.
-apply rngl_add_move_0_r.
-apply rngl_add_opp_r.
+specialize rngl_add_opp_r as H.
+unfold rngl_sub in H.
+rewrite Hro in H.
+now apply rngl_add_move_0_r.
 Qed.
 
 Theorem rngl_mul_opp_l : ∀ a b, (- a * b = - (a * b))%F.
@@ -387,13 +413,13 @@ Qed.
 End a.
 
 Arguments rngl_add_opp_l {T}%type {ro rp} Hro.
-Arguments rngl_add_opp_r {T}%type {ro rp} Hro.
-Arguments rngl_add_reg_l {T}%type {ro rp} Hro.
-Arguments rngl_add_sub {T}%type {ro rp} Hro.
-Arguments rngl_integral {T}%type {ro rp} Hro.
+Arguments rngl_add_opp_r {T}%type {ro rp} x%F.
+Arguments rngl_add_reg_l {T}%type {ro rp} (a b c)%F.
+Arguments rngl_add_sub {T}%type {ro rp} (a b)%F.
+Arguments rngl_integral {T}%type {ro rp} Hin.
 Arguments rngl_mul_opp_opp {T}%type {ro rp} Hro.
-Arguments rngl_mul_0_l {T}%type {ro rp} Hro.
+Arguments rngl_mul_0_l {T}%type {ro rp} a%F.
 Arguments rngl_mul_opp_r {T}%type {ro rp} Hro.
 Arguments rngl_mul_reg_r {T}%type {ro rp} Hin.
-Arguments rngl_mul_0_r {T}%type {ro rp} Hro.
-Arguments rngl_opp_0 {T}%type {ro rp} Hro.
+Arguments rngl_mul_0_r {T}%type {ro rp} a%F.
+Arguments rngl_opp_0 {T}%type {ro rp}.

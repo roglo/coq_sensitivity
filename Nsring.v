@@ -8,12 +8,15 @@ Definition phony_Nat_opp (x : nat) := 0.
 Definition phony_Nat_inv (x : nat) := 0.
 
 Canonical Structure nat_ring_like_op : ring_like_op nat :=
-  {| rngl_zero := 0;
+  {| rngl_has_opp := false;
+     rngl_has_inv := false;
+     rngl_zero := 0;
      rngl_one := 1;
      rngl_add := Nat.add;
      rngl_mul := Nat.mul;
      rngl_opp := phony_Nat_opp;
-     rngl_inv := phony_Nat_inv |}.
+     rngl_inv := phony_Nat_inv;
+     rngl_opt_sub := Nat.sub |}.
 
 Existing Instance nat_ring_like_op.
 
@@ -28,8 +31,6 @@ Proof. easy. Qed.
 
 Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
   {| rngl_is_comm := true;
-     rngl_has_opp := false;
-     rngl_has_inv := false;
      rngl_has_dec_eq := true;
      rngl_is_domain := true;
      rngl_characteristic := 0;
@@ -44,6 +45,7 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_mul_1_r := I;
      rngl_opt_mul_add_distr_r := I;
      rngl_opt_add_opp_l := I;
+     rngl_opt_add_sub := Nat.add_sub;
      rngl_opt_mul_0_l := Nat.mul_0_l;
      rngl_opt_mul_0_r := Nat.mul_0_r;
      rngl_opt_mul_inv_l := I;
@@ -144,13 +146,18 @@ Definition Zn_inv n (a : Zn n) : Zn n :=
   let r := inv_mod (proj1_sig a) n in
   exist _ (r mod at_least_2 n) (Zn_op_prop n r).
 
+Definition phony_Zn_sub n (a b : Zn n) := a.
+
 Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
-  {| rngl_zero := Zn_v n 0;
+  {| rngl_has_opp := true;
+     rngl_has_inv := is_prime n;
+     rngl_zero := Zn_v n 0;
      rngl_one := Zn_v n 1;
      rngl_add := Zn_add n;
      rngl_mul := Zn_mul n;
      rngl_opp := Zn_opp n;
-     rngl_inv := Zn_inv n |}.
+     rngl_inv := Zn_inv n;
+     rngl_opt_sub := phony_Zn_sub n |}.
 
 Theorem Zn_eq : ∀ n (a b : Zn n), proj1_sig a = proj1_sig b → a = b.
 Proof.
@@ -367,8 +374,6 @@ Qed.
 
 Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
   {| rngl_is_comm := true;
-     rngl_has_opp := true;
-     rngl_has_inv := is_prime n;
      rngl_has_dec_eq := true;
      rngl_is_domain := false;
      rngl_characteristic := at_least_2 n;
@@ -383,6 +388,7 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_opt_mul_1_r := I;
      rngl_opt_mul_add_distr_r := I;
      rngl_opt_add_opp_l := Zn_add_opp_l;
+     rngl_opt_add_sub := I;
      rngl_opt_mul_0_l := I;
      rngl_opt_mul_0_r := I;
      rngl_opt_mul_inv_l := Zn_opt_mul_inv_l;

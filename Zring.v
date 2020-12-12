@@ -4,15 +4,19 @@ Require Import Utf8 ZArith.
 
 Require Import RingLike.
 
+Definition phony_Z_sub (x y : Z) := 0%Z.
 Definition phony_Z_inv (x : Z) := 0%Z.
 
 Canonical Structure Z_ring_like_op : ring_like_op Z :=
-  {| rngl_zero := 0%Z;
+  {| rngl_has_opp := true;
+     rngl_has_inv := false;
+     rngl_zero := 0%Z;
      rngl_one := 1%Z;
      rngl_add := Z.add;
      rngl_mul := Z.mul;
      rngl_opp := Z.opp;
-     rngl_inv := phony_Z_inv |}.
+     rngl_inv := phony_Z_inv;
+     rngl_opt_sub := phony_Z_sub |}.
 
 Existing Instance Z_ring_like_op.
 
@@ -43,8 +47,6 @@ Qed.
 
 Definition Z_ring_like_prop : ring_like_prop Z :=
   {| rngl_is_comm := true;
-     rngl_has_opp := true;
-     rngl_has_inv := false;
      rngl_has_dec_eq := true;
      rngl_is_domain := true;
      rngl_characteristic := 0;
@@ -59,6 +61,7 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_opt_mul_1_r := I;
      rngl_opt_mul_add_distr_r := I;
      rngl_opt_add_opp_l := Z.add_opp_diag_l;
+     rngl_opt_add_sub := I;
      rngl_opt_mul_0_l := I;
      rngl_opt_mul_0_r := I;
      rngl_opt_mul_inv_l := I;

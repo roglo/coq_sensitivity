@@ -1147,6 +1147,11 @@ Proof.
 intros.
 induction i. {
   cbn - [ "mod" ].
+  apply matrix_eq; [ easy | easy | cbn ].
+  intros * Hi Hj; symmetry.
+  apply rngl_mul_0_l.
+Print ring_like_prop.
+
 ...
   now rewrite Nat.mod_0_l.
 }
