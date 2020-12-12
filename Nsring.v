@@ -394,6 +394,18 @@ intros * Hb; cbn.
 apply Zn_eq; cbn.
 unfold Zn_div, Zn_mul; cbn - [ "mod" ].
 rewrite Hp; cbn - [ "mod" ].
+(* question : y a-t-il une division dans ℤn quand n n'est pas premier ?
+   j'ai l'impression que non, en fait
+   je veux dire une division telle que dans tous les cas où b ≠ 0
+       a * b / b = a
+   Il faudrait ajouter dans ce cas-là, dans ring_like_op
+      rngl_has_no_inv_but_div
+   Peut-être le même problème dans les matrices, d'ailleurs. Il n'y
+   a pas de inv, mais pas de div non plus, je pense.
+     Du coup, aussi, problème de combinaison de cas :
+   Si on a rngl_has_inv = true, on ne devrait pas pouvoir avoir
+   rngl_has_no_inv_but_div = true.
+*)
 ...
 
 unfold rngl_div.
