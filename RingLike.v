@@ -237,6 +237,8 @@ destruct rngl_is_comm. {
 }
 Qed.
 
+...
+
 Theorem rngl_sub_compat_l : ∀ a b c,
   (a = b)%F → (a - c = b - c)%F.
 Proof.
