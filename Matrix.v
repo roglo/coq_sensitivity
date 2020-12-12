@@ -25,6 +25,21 @@ Axiom matrix_eq : ∀ T (MA MB : matrix T),
       mat_el MA i j = mat_el MB i j)
   → MA = MB.
 
+Theorem matrix_neq : ∀ T (MA MB : matrix T),
+  mat_nrows MA ≠ mat_nrows MB ∨
+  mat_ncols MA ≠ mat_ncols MB ∨
+  ¬ (∀ i j, i < mat_nrows MA → j < mat_ncols MB →
+     mat_el MA i j = mat_el MB i j)
+  → MA ≠ MB.
+Proof.
+intros * Hab.
+intros H.
+subst MB.
+destruct Hab as [Hab| Hab]; [ easy | ].
+destruct Hab as [Hab| Hab]; [ easy | ].
+now apply Hab.
+Qed.
+
 Definition list_list_nrows T (ll : list (list T)) :=
   length ll.
 
@@ -1177,8 +1192,17 @@ Theorem squ_mat_characteristic_prop : ∀ n i,
   rngl_of_nat (S i) ≠ @rngl_zero _ (squ_mat_ring_like_op n).
 Proof.
 intros; cbn.
-apply square_matrix_neq; cbn.
+destruct n. {
+  apply square_matrix_neq; cbn.
+  cbn.
+...
+  apply square_matrix_neq; cbn.
 rewrite proj1_sig_squ_mat_of_nat.
+destruct n. {
+...
+cbn.
+cbn; right; right.
+intros H.
 ...
 assert (Hz : ∀ i, (0 <= rngl_of_nat i)%Z). {
   clear i; intros.
@@ -1197,6 +1221,8 @@ Qed.
 ...
 *)
 
+Check rngl_add_sub.
+
 Definition squ_mat_ring_like_prop (n : nat) :
     ring_like_prop (square_matrix n) :=
   {| rngl_is_comm := false;
@@ -1214,6 +1240,7 @@ Definition squ_mat_ring_like_prop (n : nat) :
      rngl_opt_mul_1_r := @squ_mat_mul_1_r n;
      rngl_opt_mul_add_distr_r := @squ_mat_mul_add_distr_r n;
      rngl_opt_add_opp_l := @squ_mat_add_opp_l n;
+     rngl_opt_add_sub := I;
      rngl_opt_mul_0_l := I;
      rngl_opt_mul_0_r := I;
      rngl_opt_mul_inv_l := I;
@@ -1221,8 +1248,6 @@ Definition squ_mat_ring_like_prop (n : nat) :
      rngl_opt_eq_dec := I;
      rngl_opt_is_integral := I;
      rngl_characteristic_prop := @squ_mat_characteristic_prop n |}.
-
-...
 
 Arguments det_loop {T ro} M n%nat.
 Arguments determinant {T ro} M.
@@ -1245,14 +1270,14 @@ Arguments det_loop {T ro} M%M n%nat.
 Arguments determinant {T ro} M%M.
 Arguments is_square_mat {T} M%M.
 Arguments mat_add_opp_r {T}%type {ro rp} Hro M%M n%nat.
-Arguments mat_mul_mul_scal_l {T}%type {ro rp} Hro Hic.
+Arguments mat_mul_mul_scal_l {T}%type {ro rp} Hic a%F MA%M.
 Arguments mat_mul_scal_l {T ro} _ M%M.
 Arguments mat_mul_vect_r {T ro} M%M V%V.
-Arguments mat_mul_scal_vect_assoc {T}%type {ro rp} Hro.
-Arguments mat_mul_scal_vect_assoc' {T}%type {ro rp} Hro Hic.
-Arguments mat_vect_mul_assoc {T}%type {ro rp} Hro (A B)%M V%V.
-Arguments mat_mul_1_l {T}%type {ro rp} Hro M%M n%nat.
-Arguments mat_mul_1_r {T}%type {ro rp} Hro M%M n%nat.
+Arguments mat_mul_scal_vect_assoc {T}%type {ro rp} a%F MA%M V%V.
+Arguments mat_mul_scal_vect_assoc' {T}%type {ro rp} Hic a%F MA%M V%V.
+Arguments mat_vect_mul_assoc {T}%type {ro rp} (A B)%M V%V.
+Arguments mat_mul_1_l {T}%type {ro rp} M%M n%nat.
+Arguments mat_mul_1_r {T}%type {ro rp} M%M n%nat.
 Arguments mat_nrows {T} m%M.
 Arguments mat_ncols {T} m%M.
 Arguments mat_sub {T ro} MA%M MB%M.
@@ -1267,7 +1292,7 @@ Arguments vect_sub {T ro} U%V V%V.
 Arguments vect_opp {T ro} V%V.
 Arguments vect_mul_scal_l {T ro} s%F V%V.
 Arguments vect_mul_scal_reg_r {T}%type {ro rp} Hde Hin V%V (a b)%F.
-Arguments vect_mul_1_l {T}%type {ro rp} Hro V%V n%nat.
+Arguments vect_mul_1_l {T}%type {ro rp} V%V n%nat.
 Arguments vect_zero {T ro}.
 
 Notation "A + B" := (mat_add A B) : M_scope.
