@@ -28,14 +28,16 @@ Class ring_like_op T :=
     rngl_mul : T → T → T;
     rngl_opp : T → T;
     rngl_inv : T → T;
-    rngl_opt_sub : T → T → T }.
+    rngl_opt_sub : T → T → T;
+    rngl_opt_div : T → T → T }.
 
 Declare Scope ring_like_scope.
 Delimit Scope ring_like_scope with F.
 
 Definition rngl_sub {T} {R : ring_like_op T} a b :=
   if rngl_has_opp then rngl_add a (rngl_opp b) else rngl_opt_sub a b.
-Definition rngl_div {T} {R : ring_like_op T} a b := rngl_mul a (rngl_inv b).
+Definition rngl_div {T} {R : ring_like_op T} a b :=
+  if rngl_has_inv then rngl_mul a (rngl_inv b) else rngl_opt_div a b.
 
 Notation "0" := rngl_zero : ring_like_scope.
 Notation "1" := rngl_one : ring_like_scope.
@@ -91,6 +93,9 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if (rngl_has_inv && negb rngl_is_comm)%bool then
         ∀ a : T, a ≠ 0%F → (a / a = 1)%F
       else True;
+    (* when has no inverse *)
+    rngl_opt_mul_div :
+      if rngl_has_inv then True else ∀ a b : T, b ≠ 0%F → (a * b / b = a)%F;
     (* when equality is decidable *)
     rngl_opt_eq_dec :
       if rngl_has_dec_eq then ∀ a b : T, {a = b} + {a ≠ b} else True;
@@ -182,16 +187,23 @@ Qed.
 Theorem rngl_mul_inv_r : ∀ a : T, a ≠ 0%F → (a / a = 1)%F.
 Proof.
 intros * Ha.
+clear Hro Hin.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
 specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
-rewrite Hin in rngl_mul_inv_l, rngl_mul_inv_r.
-unfold rngl_div.
-destruct rngl_is_comm. {
-  rewrite rngl_mul_comm.
-  now apply rngl_mul_inv_l.
+specialize rngl_opt_mul_div as rngl_mul_div.
+unfold rngl_div in rngl_mul_inv_r, rngl_mul_div |-*.
+destruct rngl_has_inv. {
+  destruct rngl_is_comm. {
+    rewrite rngl_mul_comm.
+    now apply rngl_mul_inv_l.
+  } {
+    cbn in rngl_mul_inv_r.
+    now apply rngl_mul_inv_r.
+  }
 } {
-  now apply rngl_mul_inv_r.
+  specialize (rngl_mul_div 1%F a Ha) as H.
+  now rewrite rngl_mul_1_l in H.
 }
 Qed.
 
@@ -211,6 +223,7 @@ do 2 rewrite <- rngl_mul_assoc in H.
 destruct rngl_is_comm. {
   rewrite (rngl_mul_comm c) in H.
   rewrite rngl_mul_inv_l in H; [ | easy ].
+...
   now do 2 rewrite rngl_mul_1_r in H.
 } {
   rewrite rngl_mul_inv_r in H; [ | easy ].
