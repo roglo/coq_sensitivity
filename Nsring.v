@@ -153,7 +153,7 @@ Definition Zn_div n (a b : Zn n) : Zn n :=
 
 Definition phony_Zn_sub n (a b : Zn n) := a.
 
-Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
+Canonical Structure Zn_ring_like_op n : ring_like_op (Zn n) :=
   {| rngl_has_opp := true;
      rngl_has_inv := is_prime n;
      rngl_zero := Zn_v n 0;
@@ -164,6 +164,8 @@ Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
      rngl_inv := Zn_inv n;
      rngl_opt_sub := phony_Zn_sub n;
      rngl_opt_div := Zn_div n |}.
+
+Existing Instance Zn_ring_like_op.
 
 Theorem Zn_eq : ∀ n (a b : Zn n), proj1_sig a = proj1_sig b → a = b.
 Proof.
@@ -381,6 +383,19 @@ Qed.
 Theorem Zn_opt_mul_div :
   if rngl_has_inv then True else ∀ a b : Zn n, b ≠ 0%F → (a * b / b)%F = a.
 Proof.
+cbn.
+unfold ro.
+unfold Zn_div.
+unfold Zn_ring_like_op.
+remember (is_prime n) as p eqn:Hp.
+symmetry in Hp.
+destruct p; [ easy | ].
+intros * Hb; cbn.
+apply Zn_eq; cbn.
+unfold Zn_div, Zn_mul; cbn - [ "mod" ].
+rewrite Hp; cbn - [ "mod" ].
+...
+
 unfold rngl_div.
 destruct rngl_has_inv; [ easy | ].
 intros * Hb; cbn.
