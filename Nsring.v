@@ -337,6 +337,15 @@ Theorem Zn_characteristic_prop :
   | S _ => rngl_of_nat n = 0%F
   end.
 Proof.
+destruct n. {
+  intros i; cbn.
+  unfold Zn_add, Zn_v.
+  cbn - [ "mod" ].
+  intros H.
+  apply EqdepFacts.eq_sig_fst in H.
+  unfold at_least_2 in H.
+  cbn - [ "mod" ] in H.
+  rewrite (Nat.mod_small 1) in H; [ | flia ].
 ...
 
 Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
