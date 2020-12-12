@@ -960,6 +960,8 @@ Canonical Structure squ_mat_ring_like_op n : ring_like_op (square_matrix n) :=
      rngl_opp := @squ_mat_opp n;
      rngl_inv := @phony_squ_mat_inv n |}.
 
+Existing Instance squ_mat_ring_like_op.
+
 Theorem squ_mat_add_comm : ∀ n (MA MB : square_matrix n),
   squ_mat_add MA MB = squ_mat_add MB MA.
 Proof.
@@ -1139,8 +1141,7 @@ now apply rngl_1_neq_0 in H1.
 Qed.
 
 Theorem squ_mat_characteristic_prop : ∀ n i,
-  @rngl_of_nat _ (squ_mat_ring_like_op n) (S i) ≠
-  @rngl_zero _ (squ_mat_ring_like_op n).
+  rngl_of_nat (S i) ≠ @rngl_zero _ (squ_mat_ring_like_op n).
 Proof.
 intros; cbn.
 apply square_matrix_neq; cbn.
@@ -1160,6 +1161,7 @@ apply Z.lt_sub_lt_add_r.
 now rewrite Z.sub_diag.
 Qed.
 ...
+*)
 
 Definition squ_mat_ring_like_prop (n : nat) :
     ring_like_prop (square_matrix n) :=
