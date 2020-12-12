@@ -52,13 +52,15 @@ Qed.
 Theorem rngl_opp_add_distr : ∀ a b, (- (a + b) = - a - b)%F.
 Proof.
 intros.
-apply rngl_add_reg_l with (c := (b + a)%F); [ easy | ].
+specialize (@fold_rngl_sub _ _ Hro) as H.
+apply rngl_add_reg_l with (c := (b + a)%F).
 unfold rngl_sub.
+rewrite Hro.
 rewrite rngl_add_assoc.
-do 3 rewrite fold_rngl_sub.
-rewrite rngl_add_sub; [ | easy ].
+do 3 rewrite H.
+rewrite rngl_add_sub.
 rewrite rngl_add_comm.
-rewrite rngl_add_opp_r; [ | easy ].
+rewrite rngl_add_opp_r.
 now rewrite rngl_add_opp_r.
 Qed.
 
@@ -75,6 +77,7 @@ rewrite List_seq_succ_r; cbn.
 rewrite fold_left_app; cbn.
 rewrite fold_left_app; cbn.
 rewrite <- IHlen.
+...
 now rewrite rngl_opp_add_distr.
 Qed.
 
