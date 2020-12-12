@@ -148,7 +148,8 @@ Definition Zn_inv n (a : Zn n) : Zn n :=
   let r := inv_mod (proj1_sig a) n in
   exist _ (r mod at_least_2 n) (Zn_op_prop n r).
 Definition Zn_div n (a b : Zn n) : Zn n :=
-  Zn_mul n a (Zn_inv n b).
+  if is_prime n then Zn_mul n a (Zn_inv n b)
+  else a.
 
 Definition phony_Zn_sub n (a b : Zn n) := a.
 
@@ -380,7 +381,26 @@ Qed.
 Theorem Zn_opt_mul_div :
   if rngl_has_inv then True else ∀ a b : Zn n, b ≠ 0%F → (a * b / b)%F = a.
 Proof.
+unfold rngl_div.
+destruct rngl_has_inv; [ easy | ].
+intros * Hb; cbn.
+apply Zn_eq.
+unfold Zn_div.
 ...
+apply Zn_eq; cbn - [ "mod" ].
+...
+rewrite Nat.mul_mod_idemp_l; [ | easy ].
+rewrite Nat.mul_mod_idemp_r; [ | easy ].
+rewrite <- Nat.mul_assoc.
+rewrite (Nat.mul_comm (proj1_sig b)).
+rewrite <- Nat.mul_mod_idemp_r; [ | easy ].
+...
+  destruct n as [| n']; [ easy | ].
+  destruct n'; [ easy | ].
+...
+rewrite prime_mul_inv_l_mod.
+...
+*)
 
 Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
   {| rngl_is_comm := true;
