@@ -213,18 +213,24 @@ Theorem rngl_mul_reg_r : ∀ a b c,
   → a = b.
 Proof.
 intros * Hcz Hab.
+clear Hro Hin.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
 specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
+specialize rngl_opt_mul_div as rngl_mul_div.
+(*
 rewrite Hin in rngl_mul_inv_l, rngl_mul_inv_r.
+*)
 assert (H : (a * c / c = b * c / c)%F) by now rewrite Hab.
 unfold rngl_div in H, rngl_mul_inv_r.
 do 2 rewrite <- rngl_mul_assoc in H.
 destruct rngl_is_comm. {
   rewrite (rngl_mul_comm c) in H.
-  rewrite rngl_mul_inv_l in H; [ | easy ].
+  destruct rngl_has_inv. {
+    rewrite rngl_mul_inv_l in H; [ | easy ].
+    now do 2 rewrite rngl_mul_1_r in H.
+  } {
 ...
-  now do 2 rewrite rngl_mul_1_r in H.
 } {
   rewrite rngl_mul_inv_r in H; [ | easy ].
   now do 2 rewrite rngl_mul_1_r in H.
