@@ -332,20 +332,21 @@ now rewrite Bool.andb_false_r.
 Qed.
 
 Theorem Zn_characteristic_prop :
-  match n with
+  match at_least_2 n with
   | 0 => ∀ i : nat, rngl_of_nat (S i) ≠ 0%F
-  | S _ => rngl_of_nat n = 0%F
+  | S _ => rngl_of_nat (at_least_2 n) = 0%F
   end.
 Proof.
-destruct n. {
-  intros i; cbn.
-  unfold Zn_add, Zn_v.
-  cbn - [ "mod" ].
-  intros H.
-  apply EqdepFacts.eq_sig_fst in H.
-  unfold at_least_2 in H.
-  cbn - [ "mod" ] in H.
-  rewrite (Nat.mod_small 1) in H; [ | flia ].
+intros; cbn.
+apply Zn_eq; cbn - [ "mod" ].
+unfold at_least_2.
+rewrite (Nat.mod_small 1); [ | flia ].
+rewrite (Nat.mod_small 0); [ | flia ].
+destruct (lt_dec n 2) as [Hn2| Hn2]. {
+  destruct n as [| n']; [ easy | ].
+  destruct n'; [ easy | flia Hn2 ].
+}
+apply Nat.nlt_ge in Hn2.
 ...
 
 Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
@@ -354,7 +355,7 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_has_inv := is_prime n;
      rngl_has_dec_eq := true;
      rngl_is_domain := false;
-     rngl_characteristic := n;
+     rngl_characteristic := at_least_2 n;
      rngl_add_comm := Zn_add_comm;
      rngl_add_assoc := Zn_add_assoc;
      rngl_add_0_l := Zn_add_0_l;
