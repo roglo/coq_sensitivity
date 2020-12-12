@@ -1206,6 +1206,8 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 }
 remember rngl_characteristic as c eqn:Hc.
 symmetry in Hc.
+specialize (rngl_characteristic_prop) as Hcp.
+rewrite Hc in Hcp.
 destruct c. {
   intros.
   apply square_matrix_neq; cbn.
@@ -1217,69 +1219,19 @@ destruct c. {
   specialize (H 0 0 (Nat.lt_0_succ _) (Nat.lt_0_succ _)).
   cbn in H.
   rewrite rngl_mul_1_r in H.
-  specialize (rngl_characteristic_prop) as Hcp.
-  rewrite Hc in Hcp.
-...
-
-(*
-Theorem squ_mat_characteristic_prop : ∀ n,
-  match (if Nat.eq_dec n 0 then 1 else 0) with
-  | 0 => ∀ i : nat, rngl_of_nat (S i) ≠ squ_mat_zero n
-  | S _ => rngl_of_nat (if Nat.eq_dec n 0 then 1 else 0) = squ_mat_zero n
-  end.
-Proof.
-intros; cbn.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  subst n; cbn.
-  apply square_matrix_eq; cbn.
-  now apply matrix_eq.
+  now specialize (Hcp i).
 }
-intros.
-apply square_matrix_neq; cbn.
-rewrite proj1_sig_squ_mat_of_nat.
-apply matrix_neq; cbn.
-right; right.
-intros H.
-destruct n; [ easy | ].
-specialize (H 0 0 (Nat.lt_0_succ _) (Nat.lt_0_succ _)).
-cbn in H.
-rewrite rngl_mul_1_r in H.
-...
-Theorem squ_mat_characteristic_prop : ∀ n i,
-  rngl_of_nat (S i) ≠ @rngl_zero _ (squ_mat_ring_like_op n).
-Proof.
-intros; cbn.
-destruct n. {
-  apply square_matrix_neq; cbn.
-  rewrite proj1_sig_squ_mat_of_nat.
-  cbn.
-...
-  apply square_matrix_neq; cbn.
-rewrite proj1_sig_squ_mat_of_nat.
-destruct n. {
-...
-cbn.
-cbn; right; right.
-intros H.
-...
-assert (Hz : ∀ i, (0 <= rngl_of_nat i)%Z). {
-  clear i; intros.
-  cbn - [ Z.add ].
-  induction i; [ easy | ].
-  cbn - [ Z.add ].
-  now destruct (rngl_of_nat i).
+cbn in Hcp |-*.
+apply square_matrix_eq; cbn.
+apply matrix_eq; [ easy | easy | cbn ].
+intros * Hi Hn.
+rewrite proj1_sig_squ_mat_of_nat; cbn.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  now rewrite rngl_mul_1_r.
 }
-intros H.
-specialize (Hz i).
-apply Z.nlt_ge in Hz; apply Hz.
-rewrite <- H.
-apply Z.lt_sub_lt_add_r.
-now rewrite Z.sub_diag.
+rewrite rngl_mul_0_r.
+apply rngl_add_0_l.
 Qed.
-...
-*)
-
-Check rngl_add_sub.
 
 Definition squ_mat_ring_like_prop (n : nat) :
     ring_like_prop (square_matrix n) :=
