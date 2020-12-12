@@ -16,7 +16,8 @@ Canonical Structure Z_ring_like_op : ring_like_op Z :=
      rngl_mul := Z.mul;
      rngl_opp := Z.opp;
      rngl_inv := phony_Z_inv;
-     rngl_opt_sub := phony_Z_sub |}.
+     rngl_opt_sub := phony_Z_sub;
+     rngl_opt_div := Z.div |}.
 
 Existing Instance Z_ring_like_op.
 
@@ -66,6 +67,7 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_opt_mul_0_r := I;
      rngl_opt_mul_inv_l := I;
      rngl_opt_mul_inv_r := I;
+     rngl_opt_mul_div := Z.div_mul;
      rngl_opt_eq_dec := Z.eq_dec;
      rngl_opt_is_integral := Z_eq_mul_0;
      rngl_characteristic_prop := Z_characteristic_prop |}.

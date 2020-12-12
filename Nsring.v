@@ -16,7 +16,8 @@ Canonical Structure nat_ring_like_op : ring_like_op nat :=
      rngl_mul := Nat.mul;
      rngl_opp := phony_Nat_opp;
      rngl_inv := phony_Nat_inv;
-     rngl_opt_sub := Nat.sub |}.
+     rngl_opt_sub := Nat.sub;
+     rngl_opt_div := Nat.div |}.
 
 Existing Instance nat_ring_like_op.
 
@@ -50,6 +51,7 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_mul_0_r := Nat.mul_0_r;
      rngl_opt_mul_inv_l := I;
      rngl_opt_mul_inv_r := I;
+     rngl_opt_mul_div := Nat.div_mul;
      rngl_opt_eq_dec := Nat.eq_dec;
      rngl_opt_is_integral := Nat_eq_mul_0;
      rngl_characteristic_prop := nat_characteristic_prop |}.
@@ -145,6 +147,8 @@ Definition Zn_opp n (a : Zn n) : Zn n :=
 Definition Zn_inv n (a : Zn n) : Zn n :=
   let r := inv_mod (proj1_sig a) n in
   exist _ (r mod at_least_2 n) (Zn_op_prop n r).
+Definition Zn_div n (a b : Zn n) : Zn n :=
+  Zn_mul n a (Zn_inv n b).
 
 Definition phony_Zn_sub n (a b : Zn n) := a.
 
@@ -157,7 +161,8 @@ Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
      rngl_mul := Zn_mul n;
      rngl_opp := Zn_opp n;
      rngl_inv := Zn_inv n;
-     rngl_opt_sub := phony_Zn_sub n |}.
+     rngl_opt_sub := phony_Zn_sub n;
+     rngl_opt_div := Zn_div n |}.
 
 Theorem Zn_eq : ∀ n (a b : Zn n), proj1_sig a = proj1_sig b → a = b.
 Proof.
@@ -372,6 +377,11 @@ cbn; symmetry.
 apply Nat.sub_diag.
 Qed.
 
+Theorem Zn_opt_mul_div :
+  if rngl_has_inv then True else ∀ a b : Zn n, b ≠ 0%F → (a * b / b)%F = a.
+Proof.
+...
+
 Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
   {| rngl_is_comm := true;
      rngl_has_dec_eq := true;
@@ -393,6 +403,7 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_opt_mul_0_r := I;
      rngl_opt_mul_inv_l := Zn_opt_mul_inv_l;
      rngl_opt_mul_inv_r := Zn_opt_mul_inv_r;
+     rngl_opt_mul_div := Zn_opt_mul_div;
      rngl_opt_eq_dec := Zn_eq_dec;
      rngl_opt_is_integral := I;
      rngl_characteristic_prop := Zn_characteristic_prop |}.

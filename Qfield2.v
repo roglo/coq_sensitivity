@@ -7,6 +7,7 @@ Require Import RingLike Rational.
 Import Q.Notations.
 
 Definition phony_Q_sub (a b : Q) := a.
+Definition phony_Q_div (a b : Q) := a.
 
 Canonical Structure Q_ring_like_op : ring_like_op Q :=
   {| rngl_has_opp := true;
@@ -17,7 +18,8 @@ Canonical Structure Q_ring_like_op : ring_like_op Q :=
      rngl_mul := Q.mul;
      rngl_opp := Q.opp;
      rngl_inv := Q.inv;
-     rngl_opt_sub := phony_Q_sub |}.
+     rngl_opt_sub := phony_Q_sub;
+     rngl_opt_div := phony_Q_div |}.
 
 Existing Instance Q_ring_like_op.
 
@@ -64,6 +66,7 @@ Definition Q_ring_like_prop :=
      rngl_opt_mul_0_r := I;
      rngl_opt_mul_inv_l := Q.mul_inv_l;
      rngl_opt_mul_inv_r := I;
+     rngl_opt_mul_div := I;
      rngl_opt_eq_dec := Q.eq_dec;
      rngl_opt_is_integral := I;
      rngl_characteristic_prop := Q_characteristic_prop |}.
