@@ -15,7 +15,29 @@
         rngl_has_opp = true
         rngl_has_inv = true
    They can be commutative or not by setting rngl_is_comm to true or false.
- *)
+   There are many properties that are implemented here or could be
+   implemented :
+     - algebraically closed or not
+     - archimedian or not
+     - with decidable equality or not
+     - commutative or not
+     - complete or not
+     - with characteristic 0 or not
+     - finite or infinite
+     - ordered or not
+     - totally ordered or not
+     - valuated or not
+     - with associative addition or multiplication or not
+     - with commutative addition or not
+     - with 0 or without
+     - with 1 or without
+     - with division or not
+     and so on.
+   One problem is that some of these properties imply some others. If I
+   take a boolean ab for the property A, and a boolean bb for the property
+   B, and if A → B, then in the four cases of (ab,bb), the case (true,false)
+   does not happen, and should not appear. But it does. How to do with that?
+*)
 
 Require Import Utf8.
 
