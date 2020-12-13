@@ -30,6 +30,7 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {Hro : rngl_has_opp = true}.
 Context {Hin : rngl_has_inv = true}.
+Context {Hid : rngl_has_no_inv_but_div = true}.
 Context {Hic : rngl_is_comm = true}.
 Context {Hde : rngl_has_dec_eq = true}.
 Context
@@ -614,6 +615,7 @@ Theorem A_n_eigenvalue_squared_is_n : ∀ n μ V,
   → (μ * μ)%F = rngl_of_nat n.
 Proof.
 intros * Hvr Hvz Hav.
+clear Hin.
 specialize (lemma_2_A_n_2_eq_n_I n) as Ha.
 (* μ * μ = rngl_of_nat n *)
 apply vect_mul_scal_reg_r with (V0 := V); [ easy | easy | congruence | ].

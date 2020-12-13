@@ -339,6 +339,7 @@ Context {Hro : rngl_has_opp = true}.
 Context {Hic : rngl_is_comm = true}.
 Context {Hde : rngl_has_dec_eq = true}.
 Context {Hin : rngl_has_inv = true}.
+Context {Hid : rngl_has_no_inv_but_div = true}.
 
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
@@ -654,6 +655,7 @@ Theorem vect_mul_scal_reg_r : ∀ V a b,
   → a = b.
 Proof.
 intros * Hvz Hab.
+clear Hro Hic Hin.
 assert (Hiv : ∀ i, vect_el (a × V)%V i = vect_el (b × V)%V i). {
   intros i.
   now rewrite Hab.
@@ -977,18 +979,21 @@ Definition squ_mat_opp n (M : square_matrix n) : square_matrix n :=
   exist _ (- proj1_sig M)%M (squ_mat_opp_prop M).
 
 Definition phony_squ_mat_sub n (MA MB : square_matrix n) := MA.
+Definition phony_squ_mat_div n (MA MB : square_matrix n) := MA.
 Definition phony_squ_mat_inv n (M : square_matrix n) := M.
 
 Canonical Structure squ_mat_ring_like_op n : ring_like_op (square_matrix n) :=
   {| rngl_has_opp := true;
      rngl_has_inv := false;
+     rngl_has_no_inv_but_div := false;
      rngl_zero := squ_mat_zero n;
      rngl_one := squ_mat_one n;
      rngl_add := @squ_mat_add n;
      rngl_mul := @squ_mat_mul n;
      rngl_opp := @squ_mat_opp n;
      rngl_inv := @phony_squ_mat_inv n;
-     rngl_opt_sub := @phony_squ_mat_sub n |}.
+     rngl_opt_sub := @phony_squ_mat_sub n;
+     rngl_opt_div := @phony_squ_mat_div n |}.
 
 Existing Instance squ_mat_ring_like_op.
 
@@ -1255,6 +1260,7 @@ Definition squ_mat_ring_like_prop (n : nat) :
      rngl_opt_mul_0_r := I;
      rngl_opt_mul_inv_l := I;
      rngl_opt_mul_inv_r := I;
+     rngl_opt_mul_div := I;
      rngl_opt_eq_dec := I;
      rngl_opt_is_integral := I;
      rngl_characteristic_prop := @squ_mat_characteristic_prop n |}.
@@ -1301,7 +1307,7 @@ Arguments vect_add {T ro} U%V V%V.
 Arguments vect_sub {T ro} U%V V%V.
 Arguments vect_opp {T ro} V%V.
 Arguments vect_mul_scal_l {T ro} s%F V%V.
-Arguments vect_mul_scal_reg_r {T}%type {ro rp} Hde Hin V%V (a b)%F.
+Arguments vect_mul_scal_reg_r {T}%type {ro rp} Hde Hid V%V (a b)%F.
 Arguments vect_mul_1_l {T}%type {ro rp} V%V n%nat.
 Arguments vect_zero {T ro}.
 
