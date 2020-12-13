@@ -1233,10 +1233,68 @@ rewrite rngl_mul_0_r.
 apply rngl_add_0_l.
 Qed.
 
+Theorem matrix_eq_dec : ∀ n (MA MB : matrix T),
+  (∀ a b : T, {a = b} + {a ≠ b})
+  → mat_nrows MA = n
+  → mat_ncols MA = n
+  → mat_nrows MB = n
+  → mat_ncols MB = n
+  → {MA = MB} + {MA ≠ MB}.
+Proof.
+intros * Hab Hra Hca Hrb Hcb.
+destruct MA as (fa, ra, ca).
+destruct MB as (fb, rb, cb).
+cbn in Hra, Hca, Hrb, Hcb.
+subst ra ca rb cb.
+assert (∀ i j, {fa i j = fb i j} + {fa i j ≠ fb i j}). {
+  intros.
+  apply Hab.
+}
+induction n; intros; [ now left; apply matrix_eq | ].
+destruct IHn as [IHn| IHn]. {
+  injection IHn; clear IHn; intros IHn.
+  now left; subst fb.
+} {
+  right.
+  intros H1; apply IHn; clear IHn.
+  injection H1; clear H1; intros H1.
+  now subst fb.
+}
+Qed.
+
+Theorem squ_mat_opt_eq_dec : ∀ n,
+  if rngl_has_dec_eq then ∀ a b : square_matrix n, {a = b} + {a ≠ b}
+  else True.
+Proof.
+intros.
+specialize rngl_opt_eq_dec as rngl_eq_dec.
+rewrite Hde in rngl_eq_dec |-*.
+intros.
+destruct a as (a, Ha).
+destruct b as (b, Hb).
+move b before a.
+assert (H : {a = b} + {a ≠ b}). {
+  apply Bool.andb_true_iff in Ha.
+  apply Bool.andb_true_iff in Hb.
+  destruct Ha as (Hra, Hca).
+  destruct Hb as (Hrb, Hcb).
+  apply Nat.eqb_eq in Hra.
+  apply Nat.eqb_eq in Hca.
+  apply Nat.eqb_eq in Hrb.
+  apply Nat.eqb_eq in Hcb.
+  now apply (@matrix_eq_dec n).
+}
+destruct H as [H| H]. {
+  now left; apply square_matrix_eq.
+} {
+  now right; apply square_matrix_neq.
+}
+Qed.
+
 Definition squ_mat_ring_like_prop (n : nat) :
     ring_like_prop (square_matrix n) :=
   {| rngl_is_comm := false;
-     rngl_has_dec_eq := false; (* actually depends on dec_eq for T *)
+     rngl_has_dec_eq := @rngl_has_dec_eq T ro rp;
      rngl_is_domain := false;
      rngl_characteristic := if Nat.eq_dec n 0 then 1 else rngl_characteristic;
      rngl_add_comm := @squ_mat_add_comm n;
@@ -1256,7 +1314,7 @@ Definition squ_mat_ring_like_prop (n : nat) :
      rngl_opt_mul_inv_l := I;
      rngl_opt_mul_inv_r := I;
      rngl_opt_mul_div := I;
-     rngl_opt_eq_dec := I;
+     rngl_opt_eq_dec := @squ_mat_opt_eq_dec n;
      rngl_opt_is_integral := I;
      rngl_characteristic_prop := @squ_mat_characteristic_prop n |}.
 
