@@ -640,10 +640,13 @@ rewrite <- mat_mul_scal_vect_assoc.
 rewrite vect_mul_1_l; easy.
 Qed.
 
+Definition is_eigenvector_of_An n μ (V : vector T) :=
+  vect_nrows V = 2 ^ n ∧
+  V ≠ vect_zero (2 ^ n) ∧
+  (mA n · V = μ × V)%V.
+
 Theorem μ_is_ev_of_An_iff_μ2_eq_n : ∀ n μ,
-  (∃ V, vect_nrows V = 2 ^ n ∧ V ≠ vect_zero (2 ^ n) ∧
-   mA n · V = μ × V)%V ↔
-  (μ * μ = rngl_of_nat n)%F.
+  (∃ V, is_eigenvector_of_An n μ V) ↔ (μ * μ = rngl_of_nat n)%F.
 Proof.
 intros.
 clear Hid Hii Hdi.
