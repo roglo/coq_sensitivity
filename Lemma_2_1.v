@@ -61,6 +61,9 @@ Qed.
 Definition mat_princ_subm (A : matrix T) l :=
   fold_left (λ a i, subm a i i) l A.
 
+Theorem subm_z : ∀ f i j, subm (mk_mat f 0 0) i j = mZ 0.
+Proof. now intros; apply matrix_eq. Qed.
+
 Theorem princ_subm_prop : ∀ n (A : square_matrix n) l,
   ((mat_nrows (mat_princ_subm (proj1_sig A) l) =? n - length l) &&
    (mat_ncols (mat_princ_subm (proj1_sig A) l) =? n - length l))%bool = true.
@@ -68,6 +71,29 @@ Proof.
 intros.
 apply Bool.andb_true_iff.
 split; apply Nat.eqb_eq. {
+  revert n A.
+  induction l as [| i]; intros. {
+    cbn; rewrite Nat.sub_0_r.
+    destruct A as (A, Ha); cbn in Ha |-*.
+    apply Bool.andb_true_iff in Ha.
+    destruct Ha as (Hra, Hca).
+    now apply Nat.eqb_eq in Hra.
+  }
+  cbn.
+  unfold mat_princ_subm in IHl.
+  destruct n. {
+    destruct A as (A, Ha); cbn in Ha |-*.
+    apply Bool.andb_true_iff in Ha.
+    destruct Ha as (Hra, Hca).
+    apply Nat.eqb_eq in Hra.
+    apply Nat.eqb_eq in Hca.
+    destruct A as (fa, ra, ca).
+    cbn in Hra, Hca.
+    subst ra ca.
+    rewrite subm_z.
+    clear.
+    induction l as [| i]; [ easy | cbn ].
+Search (subm (mZ _)).
 ...
 
 Definition princ_subm n (A : @square_matrix T n) (l : list nat) :
