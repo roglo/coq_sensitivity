@@ -34,11 +34,11 @@ Definition is_symm_mat (A : matrix T) :=
 Definition is_symm_squ_mat n (A : square_matrix n) :=
   is_symm_mat (proj1_sig A).
 
-Definition princ_subm (A : matrix T) n := subm A n n.
+Definition princ_subm_1 (A : matrix T) n := subm A n n.
 
-Theorem princ_subm_preserves_symm : ∀ (A : matrix T) n,
+Theorem princ_subm_1_preserves_symm : ∀ (A : matrix T) n,
   is_symm_mat A
-  → is_symm_mat (princ_subm A n).
+  → is_symm_mat (princ_subm_1 A n).
 Proof.
 intros * Ha.
 unfold is_symm_mat in Ha |-*; cbn.
@@ -58,10 +58,34 @@ destruct (lt_dec i n) as [Hin| Hin]. {
 }
 Qed.
 
+Definition mat_princ_subm (A : matrix T) l :=
+  fold_left (λ a i, subm a i i) l A.
+
+Theorem princ_subm_prop : ∀ n (A : square_matrix n) l,
+  ((mat_nrows (mat_princ_subm (proj1_sig A) l) =? n - length l) &&
+   (mat_ncols (mat_princ_subm (proj1_sig A) l) =? n - length l))%bool = true.
+Proof.
+intros.
+apply Bool.andb_true_iff.
+split; apply Nat.eqb_eq. {
+...
+
+Definition princ_subm n (A : @square_matrix T n) (l : list nat) :
+  @square_matrix T (n - length l).
+Proof.
+exists (mat_princ_subm (proj1_sig A) l).
+...
+apply princ_subm_prop.
+Qed.
+
+Definition eigenvalues M ev :=
+  ∀ μ, μ ∈ ev → ∃ V, V ≠ vect_zero (mat_nrows M) ∧ (M · V = μ × V)%V.
+
 Theorem glop :
-  ∀ n m (A : square_matrix n) (B : square_matrix m) eva evb seva sevb,
+  ∀ n m (A : square_matrix n) (B : square_matrix m) l eva evb seva sevb,
   m < n
   → is_symm_squ_mat A
+  → B = princ_subm A l
   → eigenvalues A eva
   → eigenvalues B evb
   → Permutation eva seva
