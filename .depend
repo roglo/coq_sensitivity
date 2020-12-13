@@ -4,20 +4,20 @@ GQ.vio: GQ.v Misc.vio PQ.vio Nat_ggcd.vio
 GQ.vo GQ.glob GQ.v.beautified GQ.required_vo: GQ.v Misc.vo PQ.vo Nat_ggcd.vo
 Lemma_2_1.vio: Lemma_2_1.v Misc.vio Matrix.vio RingLike.vio RLsummation.vio
 Lemma_2_1.vo Lemma_2_1.glob Lemma_2_1.v.beautified Lemma_2_1.required_vo: Lemma_2_1.v Misc.vo Matrix.vo RingLike.vo RLsummation.vo
-Lemma_2_2.vio: Lemma_2_2.v Misc.vio Matrix.vio RingLike.vio RLsummation.vio
-Lemma_2_2.vo Lemma_2_2.glob Lemma_2_2.v.beautified Lemma_2_2.required_vo: Lemma_2_2.v Misc.vo Matrix.vo RingLike.vo RLsummation.vo
+Lemma_2_2.vio: Lemma_2_2.v Misc.vio RingLike.vio Matrix.vio RLsummation.vio
+Lemma_2_2.vo Lemma_2_2.glob Lemma_2_2.v.beautified Lemma_2_2.required_vo: Lemma_2_2.v Misc.vo RingLike.vo Matrix.vo RLsummation.vo
 Matrix.vio: Matrix.v Misc.vio RingLike.vio RLsummation.vio
 Matrix.vo Matrix.glob Matrix.v.beautified Matrix.required_vo: Matrix.v Misc.vo RingLike.vo RLsummation.vo
 Misc.vio: Misc.v 
 Misc.vo Misc.glob Misc.v.beautified Misc.required_vo: Misc.v 
 Nat_ggcd.vio: Nat_ggcd.v Misc.vio
 Nat_ggcd.vo Nat_ggcd.glob Nat_ggcd.v.beautified Nat_ggcd.required_vo: Nat_ggcd.v Misc.vo
-Nsring.vio: Nsring.v RingLike.vio FermatLittle.vio
-Nsring.vo Nsring.glob Nsring.v.beautified Nsring.required_vo: Nsring.v RingLike.vo FermatLittle.vo
+Nrl.vio: Nrl.v Misc.vio RingLike.vio FermatLittle.vio
+Nrl.vo Nrl.glob Nrl.v.beautified Nrl.required_vo: Nrl.v Misc.vo RingLike.vo FermatLittle.vo
 PQ.vio: PQ.v Misc.vio Nat_ggcd.vio
 PQ.vo PQ.glob PQ.v.beautified PQ.required_vo: PQ.v Misc.vo Nat_ggcd.vo
-Qfield2.vio: Qfield2.v RingLike.vio Rational.vio
-Qfield2.vo Qfield2.glob Qfield2.v.beautified Qfield2.required_vo: Qfield2.v RingLike.vo Rational.vo
+Qrl.vio: Qrl.v RingLike.vio Rational.vio
+Qrl.vo Qrl.glob Qrl.v.beautified Qrl.required_vo: Qrl.v RingLike.vo Rational.vo
 RLproduct.vio: RLproduct.v Misc.vio RingLike.vio
 RLproduct.vo RLproduct.glob RLproduct.v.beautified RLproduct.required_vo: RLproduct.v Misc.vo RingLike.vo
 RLsummation.vio: RLsummation.v Misc.vio RingLike.vio
@@ -28,5 +28,5 @@ RingLike.vio: RingLike.v
 RingLike.vo RingLike.glob RingLike.v.beautified RingLike.required_vo: RingLike.v 
 Sensitivity.vio: Sensitivity.v Misc.vio
 Sensitivity.vo Sensitivity.glob Sensitivity.v.beautified Sensitivity.required_vo: Sensitivity.v Misc.vo
-Zring.vio: Zring.v RingLike.vio
-Zring.vo Zring.glob Zring.v.beautified Zring.required_vo: Zring.v RingLike.vo
+Zrl.vio: Zrl.v RingLike.vio
+Zrl.vo Zrl.glob Zrl.v.beautified Zrl.required_vo: Zrl.v RingLike.vo
