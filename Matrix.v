@@ -109,12 +109,6 @@ Definition mat_opp {ro : ring_like_op T} M : matrix T :=
   {| mat_el i j := (- mat_el M i j)%F;
      mat_nrows := mat_nrows M;
      mat_ncols := mat_ncols M |}.
-(*
-Definition mat_opp M : matrix T :=
-  {| mat_el i j := (- mat_el M i j)%F;
-     mat_nrows := mat_nrows M;
-     mat_ncols := mat_ncols M |}.
-*)
 
 (* subtraction *)
 
