@@ -537,7 +537,7 @@ Theorem A_n_eigen_formula_for_sqrt_n : ∀ n μ U V,
   → (mA n · V = μ × V)%V.
 Proof.
 intros * HV Hμ.
-clear Hid Hde Hch Hii.
+clear Hid Hch Hii Hdi.
 destruct n. {
   cbn in Hμ, HV |-*.
   apply vector_eq; [ now subst V | ].
@@ -547,8 +547,11 @@ destruct n. {
   destruct i; [ | flia Hi ].
   rewrite rngl_mul_1_r; symmetry; clear Hi.
   specialize (rngl_integral Hin) as H.
-  rewrite Hdi in H.
-  apply H in Hμ; [ | now left ].
+  rewrite Hin in H; cbn in H.
+  specialize (H (or_introl eq_refl)).
+  rewrite Hde in H.
+  rewrite Bool.orb_true_r in H.
+  apply H in Hμ.
   now destruct Hμ.
 }
 cbn - [ Nat.pow ] in HV.
@@ -643,7 +646,7 @@ Theorem μ_is_ev_of_An_iff_μ2_eq_n : ∀ n μ,
   (μ * μ = rngl_of_nat n)%F.
 Proof.
 intros.
-clear Hid Hii.
+clear Hid Hii Hdi.
 split. {
   intros HV.
   destruct HV as (V & Hvr & Hvz & Hv).
@@ -747,3 +750,5 @@ split. {
 Qed.
 
 End a.
+
+Inspect 1.
