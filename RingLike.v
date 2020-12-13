@@ -129,6 +129,7 @@ Context {rp : ring_like_prop T}.
 Context {Hro : rngl_has_opp = true}.
 Context {Hin : rngl_has_inv = true}.
 Context {Hid : rngl_has_no_inv_but_div = true}.
+Context {Hii : rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true}.
 
 Theorem rngl_add_0_r : ∀ a, (a + 0 = a)%F.
 Proof.
@@ -217,7 +218,7 @@ Theorem rngl_mul_reg_r : ∀ a b c,
   → a = b.
 Proof.
 intros * Hcz Hab.
-clear Hro Hin.
+clear Hro Hin Hid.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
 specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
@@ -236,7 +237,8 @@ destruct rngl_has_inv. {
     now do 2 rewrite rngl_mul_1_r in H.
   }
 } {
-  rewrite Hid in rngl_mul_div.
+  destruct Hii as [Hii'| Hii']; [ easy | ].
+  rewrite Hii' in rngl_mul_div.
   rewrite rngl_mul_div in H; [ | easy ].
   now rewrite rngl_mul_div in H.
 }
@@ -444,6 +446,6 @@ Arguments rngl_integral {T}%type {ro rp} Hin.
 Arguments rngl_mul_opp_opp {T}%type {ro rp} Hro.
 Arguments rngl_mul_0_l {T}%type {ro rp} a%F.
 Arguments rngl_mul_opp_r {T}%type {ro rp} Hro.
-Arguments rngl_mul_reg_r {T}%type {ro rp} Hid (a b c)%F.
+Arguments rngl_mul_reg_r {T}%type {ro rp} Hii (a b c)%F.
 Arguments rngl_mul_0_r {T}%type {ro rp} a%F.
 Arguments rngl_opp_0 {T}%type {ro rp}.

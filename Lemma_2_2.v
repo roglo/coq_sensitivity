@@ -32,8 +32,10 @@ Context {Hin : rngl_has_inv = true}.
 Context {Hid : rngl_has_no_inv_but_div = true}.
 Context {Hic : rngl_is_comm = true}.
 Context {Hde : rngl_has_dec_eq = true}.
+Context {Hch : rngl_characteristic = 0}.
+Context {Hii : rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true}.
 Context
-  {Hii :
+  {Hdi :
      (rngl_is_domain ||
       rngl_has_inv && rngl_has_dec_eq)%bool = true}.
 
@@ -106,7 +108,7 @@ Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
   (mA n * mA n)%M = (rngl_of_nat n × mI (2 ^ n))%M.
 Proof.
 intros.
-clear Hic.
+clear Hin Hid Hic Hde Hdi.
 apply matrix_eq; [ apply mA_nrows | apply mA_ncols | ].
 cbn - [ iter_seq ].
 rewrite mA_nrows, mA_ncols.
@@ -185,12 +187,12 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
     destruct (Nat.eq_dec i k) as [Hik| Hik]. {
       subst k.
       do 2 rewrite rngl_mul_1_r.
-...
-      destruct n; [ easy | ].
-      cbn - [ iter_seq ].
-      unfold rngl_of_nat.
-      rewrite rngl_summation_split_last; [ | flia ].
-      now rewrite rngl_summation_succ_succ.
+      clear Hi Hk Hi2n Hk2n IHn.
+      induction n; cbn. {
+        now rewrite rngl_add_0_l, rngl_add_0_r.
+      }
+      rewrite IHn, rngl_add_assoc; f_equal.
+      apply IHn.
     } {
       do 2 rewrite rngl_mul_0_r.
       symmetry; apply rngl_add_0_r.
@@ -373,11 +375,7 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
       remember (i - 2 ^ n) as j eqn:Hj.
       destruct (Nat.eq_dec j j) as [H| H]; [ clear H | easy ].
       subst j.
-      do 2 rewrite rngl_mul_1_r.
-      rewrite rngl_add_comm.
-      unfold rngl_of_nat; symmetry.
-      rewrite rngl_summation_split_last; [ | flia ].
-      now rewrite rngl_summation_succ_succ.
+      now do 2 rewrite rngl_mul_1_r.
     } {
       destruct (Nat.eq_dec (i - 2 ^ n) (k - 2 ^ n)) as [Hi2k| Hi2k]. {
         flia Hik Hi2k Hi2n Hk2n.
@@ -389,13 +387,6 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
   }
 }
 Qed.
-
-...
-
-(*
-Print mat_nat_mul_l.
-Print rngl_mul_nat_l.
-*)
 
 (* seems, on paper, that √(n+1) is an eignenvalue for A_{n+1}
    and a corresponding eigenvector is
@@ -546,6 +537,7 @@ Theorem A_n_eigen_formula_for_sqrt_n : ∀ n μ U V,
   → (mA n · V = μ × V)%V.
 Proof.
 intros * HV Hμ.
+clear Hid Hde Hch Hii.
 destruct n. {
   cbn in Hμ, HV |-*.
   apply vector_eq; [ now subst V | ].
@@ -555,8 +547,8 @@ destruct n. {
   destruct i; [ | flia Hi ].
   rewrite rngl_mul_1_r; symmetry; clear Hi.
   specialize (rngl_integral Hin) as H.
-  rewrite Hii in H.
-  apply H in Hμ.
+  rewrite Hdi in H.
+  apply H in Hμ; [ | now left ].
   now destruct Hμ.
 }
 cbn - [ Nat.pow ] in HV.
@@ -597,9 +589,12 @@ replace x with (1%F × x)%M in Hy. 2: {
 subst x.
 rewrite <- mat_mul_scal_l_add_distr_r in Hy; [ | easy ].
 replace (rngl_of_nat n + 1)%F with (rngl_of_nat (S n)) in Hy. 2: {
-  unfold rngl_of_nat.
-  rewrite rngl_summation_split_last; [ | flia ].
-  now rewrite rngl_summation_succ_succ.
+  clear HV Hμ Hasm Hy; cbn.
+  induction n; cbn. {
+    now rewrite rngl_add_0_l, rngl_add_0_r.
+  }
+  rewrite IHn, rngl_add_assoc; f_equal.
+  apply IHn.
 }
 subst y.
 rewrite <- Hμ.
@@ -620,10 +615,10 @@ Theorem A_n_eigenvalue_squared_is_n : ∀ n μ V,
   → (μ * μ)%F = rngl_of_nat n.
 Proof.
 intros * Hvr Hvz Hav.
-clear Hin.
+clear Hii Hid Hch.
 specialize (lemma_2_A_n_2_eq_n_I n) as Ha.
 (* μ * μ = rngl_of_nat n *)
-apply vect_mul_scal_reg_r with (V0 := V); [ easy | easy | congruence | ].
+apply vect_mul_scal_reg_r with (V0 := V); [ easy | now left | congruence | ].
 (* (μ * μ) × V = rngl_of_nat n × V *)
 rewrite <- vect_mul_scal_l_mul_assoc; [ | easy ].
 (* μ × (μ × V) = rngl_of_nat n × V *)
@@ -648,6 +643,7 @@ Theorem μ_is_ev_of_An_iff_μ2_eq_n : ∀ n μ,
   (μ * μ = rngl_of_nat n)%F.
 Proof.
 intros.
+clear Hid Hii.
 split. {
   intros HV.
   destruct HV as (V & Hvr & Hvz & Hv).
@@ -745,46 +741,9 @@ split. {
   symmetry in Hμ.
   move Hμ at bottom.
   specialize rngl_characteristic_prop as H.
-...
-Check A_n_eigen_formula_for_sqrt_n.
-Print A_n_eigenvector_of_sqrt_n.
-(* un corps peut être :
-   - algébriquement clos ou pas
-   - archimédien ou pas
-   - à égalité décidable ou pas
-   - commutatif ou pas
-   - complet ou pas
-   - de caractéristique n, nul ou pas
-   - fini ou infini
-   - ordonné ou pas
-   - totalement ordonné ou pas
-   - valué ou pas
-*)
-...
-(* actually, we need characteristic = 0 *)
-Theorem rngl_of_nat_neq_0 : ∀ n, n ≠ 0 → rngl_of_nat n ≠ 0%F.
-Proof.
-intros * Hn.
-intros H; apply Hn; clear Hn.
-destruct n; [ easy | exfalso ].
-unfold rngl_of_nat in H.
-...
-    unfold rngl_of_nat in Hμ.
-    clear - Hμ rp.
-...
-    induction n. {
-      cbn in Hμ.
-      rewrite rngl_add_0_l in Hμ.
-      now apply rngl_1_neq_0 in Hμ.
-    }
-    rewrite rngl_summation_shift in Hμ; [ | flia ].
-    rewrite rngl_summation_split_last in Hμ; [ | flia ].
-    rewrite Nat.sub_succ, Nat.sub_0_r in Hμ.
-...
-  }
-  now specialize (A_n_eigen_formula_for_sqrt_n _ _ _ Hv Hμ) as H1.
-...
+  rewrite Hch in H.
+  now apply H in Hμ.
+}
+Qed.
 
-End in_ring_like.
-
-Inspect 2.
+End a.
