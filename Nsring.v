@@ -1,4 +1,7 @@
-(* Semiring of natural *)
+(* ℕ is a ring-like without opposite, i.e. a semiring *)
+(* ℤ/nℤ is a ring-like,
+     if n is prime, has inverse, i.e. it is a field
+     if n is not prime, it has neither inverse nor division, it is a ring *)
 
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
@@ -10,6 +13,7 @@ Definition phony_Nat_inv (x : nat) := 0.
 Canonical Structure nat_ring_like_op : ring_like_op nat :=
   {| rngl_has_opp := false;
      rngl_has_inv := false;
+     rngl_has_no_inv_but_div := true;
      rngl_zero := 0;
      rngl_one := 1;
      rngl_add := Nat.add;
@@ -156,6 +160,7 @@ Definition phony_Zn_sub n (a b : Zn n) := a.
 Canonical Structure Zn_ring_like_op n : ring_like_op (Zn n) :=
   {| rngl_has_opp := true;
      rngl_has_inv := is_prime n;
+     rngl_has_no_inv_but_div := false;
      rngl_zero := Zn_v n 0;
      rngl_one := Zn_v n 1;
      rngl_add := Zn_add n;
@@ -380,55 +385,6 @@ cbn; symmetry.
 apply Nat.sub_diag.
 Qed.
 
-Theorem Zn_opt_mul_div :
-  if rngl_has_inv then True else ∀ a b : Zn n, b ≠ 0%F → (a * b / b)%F = a.
-Proof.
-cbn.
-unfold ro.
-unfold Zn_div.
-unfold Zn_ring_like_op.
-remember (is_prime n) as p eqn:Hp.
-symmetry in Hp.
-destruct p; [ easy | ].
-intros * Hb; cbn.
-apply Zn_eq; cbn.
-unfold Zn_div, Zn_mul; cbn - [ "mod" ].
-rewrite Hp; cbn - [ "mod" ].
-(* question : y a-t-il une division dans ℤn quand n n'est pas premier ?
-   j'ai l'impression que non, en fait
-   je veux dire une division telle que dans tous les cas où b ≠ 0
-       a * b / b = a
-   Il faudrait ajouter dans ce cas-là, dans ring_like_op
-      rngl_has_no_inv_but_div
-   Peut-être le même problème dans les matrices, d'ailleurs. Il n'y
-   a pas de inv, mais pas de div non plus, je pense.
-     Du coup, aussi, problème de combinaison de cas :
-   Si on a rngl_has_inv = true, on ne devrait pas pouvoir avoir
-   rngl_has_no_inv_but_div = true.
-*)
-...
-
-unfold rngl_div.
-destruct rngl_has_inv; [ easy | ].
-intros * Hb; cbn.
-apply Zn_eq.
-unfold Zn_div.
-...
-apply Zn_eq; cbn - [ "mod" ].
-...
-rewrite Nat.mul_mod_idemp_l; [ | easy ].
-rewrite Nat.mul_mod_idemp_r; [ | easy ].
-rewrite <- Nat.mul_assoc.
-rewrite (Nat.mul_comm (proj1_sig b)).
-rewrite <- Nat.mul_mod_idemp_r; [ | easy ].
-...
-  destruct n as [| n']; [ easy | ].
-  destruct n'; [ easy | ].
-...
-rewrite prime_mul_inv_l_mod.
-...
-*)
-
 Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
   {| rngl_is_comm := true;
      rngl_has_dec_eq := true;
@@ -450,7 +406,7 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_opt_mul_0_r := I;
      rngl_opt_mul_inv_l := Zn_opt_mul_inv_l;
      rngl_opt_mul_inv_r := Zn_opt_mul_inv_r;
-     rngl_opt_mul_div := Zn_opt_mul_div;
+     rngl_opt_mul_div := I;
      rngl_opt_eq_dec := Zn_eq_dec;
      rngl_opt_is_integral := I;
      rngl_characteristic_prop := Zn_characteristic_prop |}.

@@ -1,4 +1,4 @@
-(* Ring of integers *)
+(* ℤ is a ring-like, i.e. a ring *)
 
 Require Import Utf8 ZArith.
 
@@ -10,6 +10,7 @@ Definition phony_Z_inv (x : Z) := 0%Z.
 Canonical Structure Z_ring_like_op : ring_like_op Z :=
   {| rngl_has_opp := true;
      rngl_has_inv := false;
+     rngl_has_no_inv_but_div := true;
      rngl_zero := 0%Z;
      rngl_one := 1%Z;
      rngl_add := Z.add;

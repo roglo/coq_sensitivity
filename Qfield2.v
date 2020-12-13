@@ -1,4 +1,5 @@
-(* field of rationals *)
+(* ℚ is a ring-like with inverse *)
+(* i.e. it is a field *)
 
 Set Implicit Arguments.
 Require Import Utf8.
@@ -12,6 +13,7 @@ Definition phony_Q_div (a b : Q) := a.
 Canonical Structure Q_ring_like_op : ring_like_op Q :=
   {| rngl_has_opp := true;
      rngl_has_inv := true;
+     rngl_has_no_inv_but_div := false;
      rngl_zero := 0%Q;
      rngl_one := 1%Q;
      rngl_add := Q.add;

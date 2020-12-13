@@ -22,6 +22,7 @@ Require Import Utf8.
 Class ring_like_op T :=
   { rngl_has_opp : bool;
     rngl_has_inv : bool;
+    rngl_has_no_inv_but_div : bool;
     rngl_zero : T;
     rngl_one : T;
     rngl_add : T → T → T;
@@ -93,9 +94,10 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if (rngl_has_inv && negb rngl_is_comm)%bool then
         ∀ a : T, a ≠ 0%F → (a / a = 1)%F
       else True;
-    (* when has no inverse *)
+    (* when has no inverse but division *)
     rngl_opt_mul_div :
-      if rngl_has_inv then True else ∀ a b : T, b ≠ 0%F → (a * b / b = a)%F;
+      if rngl_has_no_inv_but_div then ∀ a b : T, b ≠ 0%F → (a * b / b = a)%F
+      else True;
     (* when equality is decidable *)
     rngl_opt_eq_dec :
       if rngl_has_dec_eq then ∀ a b : T, {a = b} + {a ≠ b} else True;
@@ -126,6 +128,7 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {Hro : rngl_has_opp = true}.
 Context {Hin : rngl_has_inv = true}.
+Context {Hid : rngl_has_no_inv_but_div = true}.
 
 Theorem rngl_add_0_r : ∀ a, (a + 0 = a)%F.
 Proof.
@@ -202,6 +205,7 @@ destruct rngl_has_inv. {
     now apply rngl_mul_inv_r.
   }
 } {
+  rewrite Hid in rngl_mul_div.
   specialize (rngl_mul_div 1%F a Ha) as H.
   now rewrite rngl_mul_1_l in H.
 }
@@ -232,6 +236,7 @@ destruct rngl_has_inv. {
     now do 2 rewrite rngl_mul_1_r in H.
   }
 } {
+  rewrite Hid in rngl_mul_div.
   rewrite rngl_mul_div in H; [ | easy ].
   now rewrite rngl_mul_div in H.
 }
@@ -439,6 +444,6 @@ Arguments rngl_integral {T}%type {ro rp} Hin.
 Arguments rngl_mul_opp_opp {T}%type {ro rp} Hro.
 Arguments rngl_mul_0_l {T}%type {ro rp} a%F.
 Arguments rngl_mul_opp_r {T}%type {ro rp} Hro.
-Arguments rngl_mul_reg_r {T}%type {ro rp} (a b c)%F.
+Arguments rngl_mul_reg_r {T}%type {ro rp} Hid (a b c)%F.
 Arguments rngl_mul_0_r {T}%type {ro rp} a%F.
 Arguments rngl_opp_0 {T}%type {ro rp}.
