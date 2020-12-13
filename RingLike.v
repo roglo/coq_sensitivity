@@ -29,14 +29,21 @@
      - valuated or not
      - with associative addition or multiplication or not
      - with commutative addition or not
-     - with 0 or without
-     - with 1 or without
+     - with 0 or without, right or left
+     - with 1 or without, right or left
      - with division or not
      and so on.
    One problem is that some of these properties imply some others. If I
    take a boolean ab for the property A, and a boolean bb for the property
    B, and if A → B, then in the four cases of (ab,bb), the case (true,false)
    does not happen, and should not appear. But it does. How to do with that?
+     Example:
+       has inverse ⇒ has division (that is multiplication by inverse)
+     But we can have a division without inverse : examples ℕ and ℤ
+     Neither division nor inverse : matrices and ℤ/nℤ (n composed)
+     But we cannot say "has inverse" and "has no division".
+     By "has division", I mean an operation such that "a * b / b = a".
+   What a mess!
 *)
 
 Require Import Utf8.
