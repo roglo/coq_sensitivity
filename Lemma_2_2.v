@@ -18,8 +18,7 @@ Set Implicit Arguments.
 Require Import Utf8 Arith.
 Import List List.ListNotations.
 
-Require Import Misc Matrix.
-Require Import RingLike.
+Require Import Misc RingLike Matrix.
 Require Import RLsummation.
 Import matrix_Notations.
 
@@ -74,7 +73,9 @@ Fixpoint mA n : matrix T :=
          [mI (2 ^ n'); (- mA n')%M]]
   end.
 
+(*
 Definition rngl_of_nat n := (Σ (i = 1, n), 1)%F.
+*)
 
 (* *)
 
@@ -105,6 +106,7 @@ Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
   (mA n * mA n)%M = (rngl_of_nat n × mI (2 ^ n))%M.
 Proof.
 intros.
+clear Hic.
 apply matrix_eq; [ apply mA_nrows | apply mA_ncols | ].
 cbn - [ iter_seq ].
 rewrite mA_nrows, mA_ncols.
@@ -183,6 +185,7 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
     destruct (Nat.eq_dec i k) as [Hik| Hik]. {
       subst k.
       do 2 rewrite rngl_mul_1_r.
+...
       destruct n; [ easy | ].
       cbn - [ iter_seq ].
       unfold rngl_of_nat.
@@ -386,6 +389,8 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
   }
 }
 Qed.
+
+...
 
 (*
 Print mat_nat_mul_l.
@@ -739,6 +744,8 @@ split. {
   rewrite rngl_mul_0_l in Hμ.
   symmetry in Hμ.
   move Hμ at bottom.
+  specialize rngl_characteristic_prop as H.
+...
 Check A_n_eigen_formula_for_sqrt_n.
 Print A_n_eigenvector_of_sqrt_n.
 (* un corps peut être :
