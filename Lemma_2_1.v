@@ -64,60 +64,85 @@ Definition mat_princ_subm (A : matrix T) l :=
 Theorem subm_z : ∀ f i j, subm (mk_mat f 0 0) i j = mZ 0.
 Proof. now intros; apply matrix_eq. Qed.
 
+Theorem squ_mat_subm_prop : ∀ n (A : @square_matrix T n) i j,
+  ((mat_nrows (subm (proj1_sig A) i j) =? n - 1) &&
+   (mat_ncols (subm (proj1_sig A) i j) =? n - 1))%bool = true.
+Proof.
+intros.
+destruct A as (A, Ha); cbn in Ha |-*.
+apply Bool.andb_true_iff in Ha.
+destruct Ha as (Hra, Hca).
+apply Nat.eqb_eq in Hra.
+apply Nat.eqb_eq in Hca.
+apply Bool.andb_true_iff.
+now split; apply Nat.eqb_eq; cbn; f_equal.
+Qed.
+
+Definition squ_mat_subm n (A : square_matrix n) i j : square_matrix (n - 1) :=
+  exist _ (subm (proj1_sig A) i j) (squ_mat_subm_prop A i j).
+
 Theorem princ_subm_prop : ∀ n (A : square_matrix n) l,
   ((mat_nrows (mat_princ_subm (proj1_sig A) l) =? n - length l) &&
    (mat_ncols (mat_princ_subm (proj1_sig A) l) =? n - length l))%bool = true.
 Proof.
 intros.
 apply Bool.andb_true_iff.
-split; apply Nat.eqb_eq. {
-  revert n A.
-  induction l as [| i]; intros. {
-    cbn; rewrite Nat.sub_0_r.
-    destruct A as (A, Ha); cbn in Ha |-*.
-    apply Bool.andb_true_iff in Ha.
-    destruct Ha as (Hra, Hca).
-    now apply Nat.eqb_eq in Hra.
-  }
-  cbn.
-  unfold mat_princ_subm in IHl.
-  destruct n. {
-    destruct A as (A, Ha); cbn in Ha |-*.
-    apply Bool.andb_true_iff in Ha.
-    destruct Ha as (Hra, Hca).
-    apply Nat.eqb_eq in Hra.
-    apply Nat.eqb_eq in Hca.
-    destruct A as (fa, ra, ca).
-    cbn in Hra, Hca.
-    subst ra ca.
-    rewrite subm_z.
-    clear.
-    induction l as [| i]; [ easy | cbn ].
-Search (subm (mZ _)).
-...
-
-Definition princ_subm n (A : @square_matrix T n) (l : list nat) :
-  @square_matrix T (n - length l).
-Proof.
-exists (mat_princ_subm (proj1_sig A) l).
-...
-apply princ_subm_prop.
+revert n A.
+induction l as [| i]; intros. {
+  cbn; rewrite Nat.sub_0_r.
+  destruct A as (A, Ha); cbn in Ha |-*.
+  apply Bool.andb_true_iff in Ha.
+  destruct Ha as (Hra, Hca).
+  apply Nat.eqb_eq in Hra.
+  apply Nat.eqb_eq in Hca.
+  now split; apply Nat.eqb_eq.
+}
+cbn.
+unfold mat_princ_subm in IHl.
+destruct n. {
+  destruct A as (A, Ha); cbn in Ha |-*.
+  apply Bool.andb_true_iff in Ha.
+  destruct Ha as (Hra, Hca).
+  apply Nat.eqb_eq in Hra.
+  apply Nat.eqb_eq in Hca.
+  destruct A as (fa, ra, ca).
+  cbn in Hra, Hca.
+  subst ra ca.
+  rewrite subm_z.
+  clear.
+  replace (fold_left _ l (mZ 0)) with (mZ 0); [ easy | ].
+  symmetry.
+  induction l as [| i]; [ easy | cbn ].
+  replace (subm (mZ 0) i i) with (mZ 0); [ easy | ].
+  now apply matrix_eq.
+}
+rewrite Nat.sub_succ.
+specialize (IHl _ (squ_mat_subm A i i)) as (H1, H2).
+cbn in H1; rewrite Nat.sub_0_r in H1; rewrite H1.
+cbn in H2; rewrite Nat.sub_0_r in H2; rewrite H2.
+easy.
 Qed.
+
+Definition princ_subm n (A : square_matrix n) (l : list nat) :
+   square_matrix (n - length l) :=
+ exist _ (mat_princ_subm (proj1_sig A) l) (princ_subm_prop A l).
 
 Definition eigenvalues M ev :=
   ∀ μ, μ ∈ ev → ∃ V, V ≠ vect_zero (mat_nrows M) ∧ (M · V = μ × V)%V.
 
 Theorem glop :
-  ∀ n m (A : square_matrix n) (B : square_matrix m) l eva evb seva sevb,
+  ∀ n m l (A : square_matrix n) (B : square_matrix (n - length l))
+    eva evb seva sevb,
   m < n
   → is_symm_squ_mat A
   → B = princ_subm A l
-  → eigenvalues A eva
-  → eigenvalues B evb
+  → eigenvalues (proj1_sig A) eva
+  → eigenvalues (proj1_sig B) evb
   → Permutation eva seva
   → Permutation evb sevb
-  → Sorted seva
-  → Sorted sevb
+...
+  → Sorted rngl_le seva
+  → Sorted rngl_le sevb
   → squ_mat_mul A A = A ∧ squ_mat_mul B B = B.
 Proof.
 ...
