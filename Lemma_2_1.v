@@ -34,7 +34,29 @@ Definition is_symm_mat (A : matrix T) :=
 Definition is_symm_squ_mat n (A : square_matrix n) :=
   is_symm_mat (proj1_sig A).
 
-...
+Definition princ_subm (A : matrix T) n := subm A n n.
+
+Theorem princ_subm_preserves_symm : ∀ (A : matrix T) n,
+  is_symm_mat A
+  → is_symm_mat (princ_subm A n).
+Proof.
+intros * Ha.
+unfold is_symm_mat in Ha |-*; cbn.
+intros i j Hi Hj.
+destruct (lt_dec i n) as [Hin| Hin]. {
+  destruct (lt_dec j n) as [Hjn| Hjn]. {
+    apply Ha; [ flia Hi | flia Hj ].
+  } {
+    apply Ha; [ flia Hi | flia Hj ].
+  }
+} {
+  destruct (lt_dec j n) as [Hjn| Hjn]. {
+    apply Ha; [ flia Hi | flia Hj ].
+  } {
+    apply Ha; [ flia Hi | flia Hj ].
+  }
+}
+Qed.
 
 Theorem glop :
   ∀ n m (A : square_matrix n) (B : square_matrix m) eva evb seva sevb,
