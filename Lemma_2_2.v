@@ -27,17 +27,6 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context {Hro : rngl_has_opp = true}.
-Context {Hin : rngl_has_inv = true}.
-Context {Hid : rngl_has_no_inv_but_div = true}.
-Context {Hic : rngl_is_comm = true}.
-Context {Hde : rngl_has_dec_eq = true}.
-Context {Hch : rngl_characteristic = 0}.
-Context {Hii : rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true}.
-Context
-  {Hdi :
-     (rngl_is_domain ||
-      rngl_has_inv && rngl_has_dec_eq)%bool = true}.
 
 (* *)
 
@@ -75,10 +64,6 @@ Fixpoint mA n : matrix T :=
          [mI (2 ^ n'); (- mA n')%M]]
   end.
 
-(*
-Definition rngl_of_nat n := (Σ (i = 1, n), 1)%F.
-*)
-
 (* *)
 
 Theorem mA_nrows : ∀ n, mat_nrows (mA n) = 2 ^ n.
@@ -104,11 +89,11 @@ Qed.
 
 (* "We prove by induction that A_n^2 = nI" *)
 
-Theorem lemma_2_A_n_2_eq_n_I : ∀ n,
-  (mA n * mA n)%M = (rngl_of_nat n × mI (2 ^ n))%M.
+Theorem lemma_2_A_n_2_eq_n_I :
+  rngl_has_opp = true →
+  ∀ n, (mA n * mA n)%M = (rngl_of_nat n × mI (2 ^ n))%M.
 Proof.
-intros.
-clear Hin Hid Hic Hde Hdi.
+intros Hro *.
 apply matrix_eq; [ apply mA_nrows | apply mA_ncols | ].
 cbn - [ iter_seq ].
 rewrite mA_nrows, mA_ncols.
@@ -531,13 +516,17 @@ Definition A_n_eigenvector_of_sqrt_n n μ V :=
        • V)%V
   end.
 
-Theorem A_n_eigen_formula_for_sqrt_n : ∀ n μ U V,
+Theorem A_n_eigen_formula_for_sqrt_n :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_has_dec_eq = true →
+  ∀ n μ U V,
   V = A_n_eigenvector_of_sqrt_n n μ U
   → (μ * μ)%F = rngl_of_nat n
   → (mA n • V = μ × V)%V.
 Proof.
-intros * HV Hμ.
-clear Hid Hch Hii Hdi.
+intros Hic Hro Hin Hde * HV Hμ.
 destruct n. {
   cbn in Hμ, HV |-*.
   apply vector_eq; [ now subst V | ].
@@ -564,7 +553,7 @@ rewrite m_o_mll_2x2_2x1; [ | easy | | | easy | easy ]; cycle 1. {
   apply mA_ncols.
 }
 rewrite mat_mul_add_distr_l; [ | easy ].
-rewrite lemma_2_A_n_2_eq_n_I.
+rewrite lemma_2_A_n_2_eq_n_I; [ | easy ].
 rewrite mat_mul_add_distr_l; [ | easy ].
 rewrite mat_mul_1_l; [ | easy | easy ].
 rewrite mat_mul_1_l; [ | easy | now rewrite mA_ncols ].
@@ -610,15 +599,19 @@ rewrite mat_add_comm; [ easy | easy | easy | easy | cbn ].
 now rewrite mA_ncols.
 Qed.
 
-Theorem A_n_eigenvalue_squared_is_n : ∀ n μ V,
+Theorem A_n_eigenvalue_squared_is_n :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_dec_eq = true →
+  rngl_has_inv = true →
+  ∀ n μ V,
   vect_nrows V = 2 ^ n
   → V ≠ vect_zero (2 ^ n)
   → (mA n • V = μ × V)%V
   → (μ * μ)%F = rngl_of_nat n.
 Proof.
-intros * Hvr Hvz Hav.
-clear Hii Hid Hch.
-specialize (lemma_2_A_n_2_eq_n_I n) as Ha.
+intros Hic Hro Hed Hin * Hvr Hvz Hav.
+specialize (lemma_2_A_n_2_eq_n_I Hro n) as Ha.
 (* μ * μ = rngl_of_nat n *)
 apply vect_mul_scal_reg_r with (V0 := V); [ easy | now left | congruence | ].
 (* (μ * μ) × V = rngl_of_nat n × V *)
@@ -644,15 +637,20 @@ Definition is_eigenvector_of_An n μ (V : vector T) :=
   V ≠ vect_zero (2 ^ n) ∧
   (mA n • V = μ × V)%V.
 
-Theorem μ_is_ev_of_An_iff_μ2_eq_n : ∀ n μ,
+Theorem μ_is_ev_of_An_iff_μ2_eq_n :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_dec_eq = true →
+  rngl_has_inv = true →
+  rngl_characteristic = 0 →
+  ∀ n μ,
   (∃ V, is_eigenvector_of_An n μ V) ↔ (μ * μ = rngl_of_nat n)%F.
 Proof.
-intros.
-clear Hid Hii Hdi.
+intros Hic Hro Heq Hin Hch *.
 split. {
   intros HV.
   destruct HV as (V & Hvr & Hvz & Hv).
-  now apply (@A_n_eigenvalue_squared_is_n _ _ V).
+  now apply A_n_eigenvalue_squared_is_n with (V := V).
 } {
   intros Hμ.
   remember (A_n_eigenvector_of_sqrt_n n μ (base_vector_1 42)) as V eqn:Hv.
@@ -666,7 +664,7 @@ split. {
   exists V.
   split; [ easy | ].
   split. 2: {
-    now specialize (A_n_eigen_formula_for_sqrt_n _ _ _ Hv Hμ) as H1.
+    now apply A_n_eigen_formula_for_sqrt_n with (U := base_vector_1 42).
   }
   rewrite Hv; cbn.
   unfold A_n_eigenvector_of_sqrt_n; cbn.
