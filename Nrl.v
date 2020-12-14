@@ -14,6 +14,7 @@ Canonical Structure nat_ring_like_op : ring_like_op nat :=
   {| rngl_has_opp := false;
      rngl_has_inv := false;
      rngl_has_no_inv_but_div := true;
+     rngl_is_ordered := true;
      rngl_zero := 0;
      rngl_one := 1;
      rngl_add := Nat.add;
@@ -67,7 +68,8 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_mul_div_r := I;
      rngl_opt_eq_dec := Nat.eq_dec;
      rngl_opt_is_integral := Nat_eq_mul_0;
-     rngl_characteristic_prop := nat_characteristic_prop |}.
+     rngl_characteristic_prop := nat_characteristic_prop;
+     rngl_opt_le_antisymm := Nat.le_antisymm |}.
 
 (*
 Print nat_ring_like_op.
@@ -172,6 +174,7 @@ Canonical Structure Zn_ring_like_op n : ring_like_op (Zn n) :=
   {| rngl_has_opp := true;
      rngl_has_inv := is_prime n;
      rngl_has_no_inv_but_div := false;
+     rngl_is_ordered := false; (* well, it is but not transitive *)
      rngl_zero := Zn_of_nat n 0;
      rngl_one := Zn_of_nat n 1;
      rngl_add := Zn_add n;
@@ -422,7 +425,8 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_opt_mul_div_r := I;
      rngl_opt_eq_dec := Zn_eq_dec;
      rngl_opt_is_integral := I;
-     rngl_characteristic_prop := Zn_characteristic_prop |}.
+     rngl_characteristic_prop := Zn_characteristic_prop;
+     rngl_opt_le_antisymm := I |}.
 
 End a.
 

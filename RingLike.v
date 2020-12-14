@@ -52,6 +52,7 @@ Class ring_like_op T :=
   { rngl_has_opp : bool;
     rngl_has_inv : bool;
     rngl_has_no_inv_but_div : bool;
+    rngl_is_ordered : bool;
     rngl_zero : T;
     rngl_one : T;
     rngl_add : T → T → T;
@@ -149,7 +150,10 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       match rngl_characteristic with
       | 0 => ∀ i, rngl_of_nat (S i) ≠ 0%F
       | n => rngl_of_nat n = 0%F
-      end }.
+      end;
+    (* when ordered *)
+    rngl_opt_le_antisymm :
+      if rngl_is_ordered then ∀ a b, (a ≤ b → b ≤ a → a = b)%F else True }.
 
 Fixpoint rngl_power {T} {R : ring_like_op T} a n :=
   match n with

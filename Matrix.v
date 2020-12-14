@@ -1026,6 +1026,7 @@ Canonical Structure squ_mat_ring_like_op n : ring_like_op (square_matrix n) :=
   {| rngl_has_opp := true;
      rngl_has_inv := false;
      rngl_has_no_inv_but_div := false;
+     rngl_is_ordered := false;
      rngl_zero := squ_mat_zero n;
      rngl_one := squ_mat_one n;
      rngl_add := @squ_mat_add n;
@@ -1377,7 +1378,8 @@ Definition squ_mat_ring_like_prop (n : nat) :
      rngl_opt_mul_div_r := I;
      rngl_opt_eq_dec := @squ_mat_opt_eq_dec n;
      rngl_opt_is_integral := I;
-     rngl_characteristic_prop := @squ_mat_characteristic_prop n |}.
+     rngl_characteristic_prop := @squ_mat_characteristic_prop n;
+     rngl_opt_le_antisymm := I |}.
 
 Theorem squ_mat_mul_scal_vect_comm :
   rngl_is_comm = true →

@@ -138,6 +138,36 @@ Definition Rayleigh_quotient n (M : square_matrix n) (x : vector T) :=
 
 Arguments Rayleigh_quotient [n]%nat_scope M%SM x%V.
 
+Theorem rngl_eq_add_0 : ∀ a b, (0 ≤ a → 0 ≤ b → a + b = 0 → a = 0 ∧ b = 0)%F.
+Proof.
+intros * Haz Hbz Hab.
+specialize rngl_opt_le_antisymm as rngl_le_antisymm.
+destruct rngl_is_ordered. {
+  split. {
+    apply rngl_le_antisymm in Haz; [ easy | ].
+    rewrite <- (rngl_add_0_r a).
+    rewrite <- Hab at 2.
+...
+Require Import ZArith.
+Search (_ + _ <= _ + _)%Z.
+...
+Z.add_le_mono: ∀ n m p q : Z, (n <= m)%Z → (p <= q)%Z → (n + p <= m + q)%Z
+Z.add_le_mono_l
+     : ∀ n m p : Z, (n <= m)%Z ↔ (p + n <= p + m)%Z
+...
+Check Z.add_le_mono_l.
+Search (_ → _ <= _ + _)%Z.
+...
+intros * Haz Hbz Hab.
+apply rngl_add_move_0_r in Hab.
+rewrite Hab in Haz.
+specialize rngl_opt_le_antisymm as rngl_le_antisymm.
+destruct rngl_is_ordered. {
+  apply rngl_le_antisymm in Hbz. 2: {
+Require Import ZArith.
+Search (_ ≤ _ - _)%Z.
+...
+
 Theorem RQ_mul_scal_prop :
   rngl_is_comm = true →
   rngl_has_dec_eq = true →
@@ -183,29 +213,35 @@ rewrite H1; cycle 1. {
   apply vector_eq; [ easy | cbn ].
   intros i Hi.
   rewrite <- Hr in H, Hi.
-...
+  remember (vect_el x) as f.
   clear - ro rp rngl_is_integral H Hi.
   revert i Hi.
   induction r; intros; [ easy | ].
   rewrite Nat.sub_succ, Nat.sub_0_r in H.
-  destruct i. {
-    destruct r. {
-      cbn in H.
-      rewrite rngl_add_0_l in H.
-      specialize (rngl_is_integral (vect_el x 0) (vect_el x 0) H) as H1.
-      now destruct H1.
-    }
-    apply IHr; [ | flia ].
-    rewrite Nat.sub_succ, Nat.sub_0_r.
-    rewrite rngl_summation_split_last in H; [ | flia ].
-    rewrite rngl_summation_shift in H; [ | flia ].
-    rewrite Nat.sub_succ, Nat.sub_0_r in H.
-    erewrite rngl_summation_eq_compat in H. 2: {
-      intros j Hj.
-      now rewrite Nat.add_comm, Nat.add_sub.
-    }
-    cbn - [ iter_seq ] in H.
+  rewrite rngl_summation_split_last in H; [ | flia ].
+  destruct r. {
+    cbn in H.
+    rewrite rngl_add_0_l in H.
+    specialize (rngl_is_integral _ _ H) as H1.
+    apply Nat.lt_1_r in Hi; subst i.
+    now destruct H1.
+  }
+  rewrite rngl_summation_shift in H; [ | flia ].
+  rewrite Nat.sub_succ, Nat.sub_0_r in H.
+  erewrite rngl_summation_eq_compat in H. 2: {
+    intros j Hj.
+    now rewrite Nat.add_comm, Nat.add_sub.
+  }
+  cbn - [ iter_seq ] in H.
 ...
+  apply rngl_eq_add_0 in H. {
+    destruct H as (H1, H2).
+    specialize (rngl_is_integral _ _ H2) as H3.
+    destruct (Nat.eq_dec i (S r)) as [Hisr| Hisr]. {
+      now subst i; destruct H3.
+    }
+    apply IHr; [ | flia Hi Hisr ].
+    now rewrite Nat.sub_succ, Nat.sub_0_r.
   }
 ...
 }
