@@ -528,13 +528,13 @@ Definition A_n_eigenvector_of_sqrt_n n μ V :=
   | S n' =>
       (mat_of_mat_list_list 0%F
          [[(mA n' + μ × mI (2 ^ n'))%M]; [mI (2 ^ n')]]
-       · V)%V
+       • V)%V
   end.
 
 Theorem A_n_eigen_formula_for_sqrt_n : ∀ n μ U V,
   V = A_n_eigenvector_of_sqrt_n n μ U
   → (μ * μ)%F = rngl_of_nat n
-  → (mA n · V = μ × V)%V.
+  → (mA n • V = μ × V)%V.
 Proof.
 intros * HV Hμ.
 clear Hid Hch Hii Hdi.
@@ -614,7 +614,7 @@ Qed.
 Theorem A_n_eigenvalue_squared_is_n : ∀ n μ V,
   vect_nrows V = 2 ^ n
   → V ≠ vect_zero (2 ^ n)
-  → (mA n · V = μ × V)%V
+  → (mA n • V = μ × V)%V
   → (μ * μ)%F = rngl_of_nat n.
 Proof.
 intros * Hvr Hvz Hav.
@@ -643,7 +643,7 @@ Qed.
 Definition is_eigenvector_of_An n μ (V : vector T) :=
   vect_nrows V = 2 ^ n ∧
   V ≠ vect_zero (2 ^ n) ∧
-  (mA n · V = μ × V)%V.
+  (mA n • V = μ × V)%V.
 
 Theorem μ_is_ev_of_An_iff_μ2_eq_n : ∀ n μ,
   (∃ V, is_eigenvector_of_An n μ V) ↔ (μ * μ = rngl_of_nat n)%F.

@@ -128,9 +128,18 @@ Definition princ_subm n (A : square_matrix n) (l : list nat) :
  exist _ (mat_princ_subm (proj1_sig A) l) (princ_subm_prop A l).
 
 Definition eigenvalues M ev :=
-  ∀ μ, μ ∈ ev → ∃ V, V ≠ vect_zero (mat_nrows M) ∧ (M · V = μ × V)%V.
+  ∀ μ, μ ∈ ev → ∃ V, V ≠ vect_zero (mat_nrows M) ∧ (M • V = μ × V)%V.
 
-Theorem glop :
+(* Rayleigh quotient *)
+
+Definition Rayleigh_quotient n (M : square_matrix n) (x : vector T) :=
+  ((x · (M · x)%SM)%V / (x · x)%V)%F.
+
+...
+
+(* Lemma 2.1 *)
+
+Theorem lemma_2_1 :
   ∀ n m l (A : square_matrix n) (B : square_matrix (n - length l)) seva sevb,
   m = n - length l
   → m < n

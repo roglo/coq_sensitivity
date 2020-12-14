@@ -170,6 +170,11 @@ Definition mat_mul_vect_r M V :=
 Definition vect_mul_scal_l s V :=
   mk_vect (λ i, s * vect_el V i)%F (vect_nrows V).
 
+(* dot product *)
+
+Definition vect_dot_product (U V : vector T) :=
+  (Σ (i = 0, vect_nrows U - 1), vect_el U i * vect_el V i)%F.
+
 (* multiplication of a matrix by a scalar *)
 
 Definition mat_mul_scal_l s M :=
@@ -364,7 +369,7 @@ Delimit Scope V_scope with V.
 Arguments mat_mul_vect_r {T ro} M%M V%V.
 Arguments vect_mul_scal_l {T ro} s%F V%V.
 
-Notation "A · V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
+Notation "A • V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
 Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
 
@@ -517,7 +522,7 @@ Qed.
 
 Theorem vect_mul_1_l : ∀ V n,
   n = vect_nrows V
-  → (mI n · V)%V = V.
+  → (mI n • V)%V = V.
 Proof.
 intros * Hn.
 apply vector_eq; [ easy | ].
@@ -749,7 +754,7 @@ intros k Hk.
 apply rngl_mul_assoc.
 Qed.
 
-Theorem mat_vect_mul_assoc : ∀ A B V, (A · (B · V) = (A * B) · V)%V.
+Theorem mat_vect_mul_assoc : ∀ A B V, (A • (B • V) = (A * B) • V)%V.
 Proof.
 intros.
 apply vector_eq; [ easy | ].
@@ -761,7 +766,7 @@ cbn - [ iter_seq ].
 now apply mat_vect_mul_assoc_as_sums.
 Qed.
 
-Theorem mat_mul_scal_vect_assoc : ∀ a MA V, (a × (MA · V) = (a × MA) · V)%V.
+Theorem mat_mul_scal_vect_assoc : ∀ a MA V, (a × (MA • V) = (a × MA) • V)%V.
 Proof.
 intros.
 apply vector_eq; [ easy | ].
@@ -774,7 +779,7 @@ intros j Hj.
 apply rngl_mul_assoc.
 Qed.
 
-Theorem mat_mul_scal_vect_assoc' : ∀ a MA V, (a × (MA · V) = MA · (a × V))%V.
+Theorem mat_mul_scal_vect_assoc' : ∀ a MA V, (a × (MA • V) = MA • (a × V))%V.
 Proof.
 intros.
 apply vector_eq; [ easy | ].
@@ -945,6 +950,9 @@ Qed.
 
 Definition squ_mat_add n (MA MB : square_matrix n) : square_matrix n :=
   exist _ (proj1_sig MA + proj1_sig MB)%M (squ_mat_add_prop MA MB).
+
+Definition squ_mat_mul_vect_r n (M : square_matrix n) V :=
+  (proj1_sig M • V)%V.
 
 Theorem squ_mat_mul_prop : ∀ n (MA MB : square_matrix n),
   (mat_nrows (proj1_sig MA * proj1_sig MB) =? n) &&
@@ -1334,8 +1342,10 @@ Module matrix_Notations.
 
 Declare Scope M_scope.
 Declare Scope V_scope.
+Declare Scope SM_scope.
 Delimit Scope M_scope with M.
 Delimit Scope V_scope with V.
+Delimit Scope SM_scope with SM.
 
 Arguments det_loop {T ro} M%M n%nat.
 Arguments determinant {T ro} M%M.
@@ -1355,8 +1365,10 @@ Arguments mat_sub {T ro} MA%M MB%M.
 Arguments mI {T ro} n%nat.
 Arguments mZ {T ro} n%nat.
 Arguments minus_one_pow {T ro}.
+Arguments squ_mat_add {T}%type {ro} {n%nat} MA MB.
 Arguments squ_mat_mul {T}%type {ro} {n%nat} MA MB.
 Arguments squ_mat_ring_like_op {T ro}.
+Arguments squ_mat_mul_vect_r {T}%type {ro} [n]%nat M%SM V%V.
 Arguments subm {T} M%M i%nat j%nat.
 Arguments vect_add {T ro} U%V V%V.
 Arguments vect_sub {T ro} U%V V%V.
@@ -1365,6 +1377,7 @@ Arguments vect_mul_scal_l {T ro} s%F V%V.
 Arguments vect_mul_scal_reg_r {T}%type {ro rp} Hde Hii V%V (a b)%F.
 Arguments vect_mul_1_l {T}%type {ro rp} V%V n%nat.
 Arguments vect_zero {T ro}.
+Arguments vect_dot_product {T}%type {ro} (U V)%V.
 
 Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.
@@ -1372,10 +1385,15 @@ Notation "A * B" := (mat_mul A B) : M_scope.
 Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
 Notation "- A" := (mat_opp A) : M_scope.
 
+Notation "A * B" := (squ_mat_mul A B) : SM_scope.
+Notation "A + B" := (squ_mat_add A B) : SM_scope.
+Notation "A · V" := (squ_mat_mul_vect_r A V) (at level 40) : SM_scope.
+
 Notation "U + V" := (vect_add U V) : V_scope.
 Notation "U - V" := (vect_sub U V) : V_scope.
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
-Notation "A · V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
+Notation "A • V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
+Notation "U · V" := (vect_dot_product U V) (at level 40) : V_scope.
 Notation "- V" := (vect_opp V) : V_scope.
 
 End matrix_Notations.
