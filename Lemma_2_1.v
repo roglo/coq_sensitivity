@@ -178,6 +178,35 @@ rewrite H1; cycle 1. {
   apply rngl_is_integral in H.
   now destruct H.
 } {
+  unfold vect_dot_product.
+  intros H; apply Hxz.
+  apply vector_eq; [ easy | cbn ].
+  intros i Hi.
+  rewrite <- Hr in H, Hi.
+...
+  clear - ro rp rngl_is_integral H Hi.
+  revert i Hi.
+  induction r; intros; [ easy | ].
+  rewrite Nat.sub_succ, Nat.sub_0_r in H.
+  destruct i. {
+    destruct r. {
+      cbn in H.
+      rewrite rngl_add_0_l in H.
+      specialize (rngl_is_integral (vect_el x 0) (vect_el x 0) H) as H1.
+      now destruct H1.
+    }
+    apply IHr; [ | flia ].
+    rewrite Nat.sub_succ, Nat.sub_0_r.
+    rewrite rngl_summation_split_last in H; [ | flia ].
+    rewrite rngl_summation_shift in H; [ | flia ].
+    rewrite Nat.sub_succ, Nat.sub_0_r in H.
+    erewrite rngl_summation_eq_compat in H. 2: {
+      intros j Hj.
+      now rewrite Nat.add_comm, Nat.add_sub.
+    }
+    cbn - [ iter_seq ] in H.
+...
+  }
 ...
 }
 rewrite rngl_mul_assoc.
