@@ -1002,8 +1002,18 @@ Canonical Structure squ_mat_ring_like_op n : ring_like_op (square_matrix n) :=
 
 Existing Instance squ_mat_ring_like_op.
 
+Declare Scope SM_scope.
+Delimit Scope SM_scope with SM.
+
+Arguments squ_mat_mul_vect_r {n}%nat M%SM V%V.
+
+Notation "A * B" := (squ_mat_mul A B) : SM_scope.
+Notation "A + B" := (squ_mat_add A B) : SM_scope.
+Notation "A • V" := (squ_mat_mul_vect_r A V) (at level 40) : SM_scope.
+Notation "- A" := (squ_mat_opp A) : SM_scope.
+
 Theorem squ_mat_add_comm : ∀ n (MA MB : square_matrix n),
-  squ_mat_add MA MB = squ_mat_add MB MA.
+  (MA + MB = MB + MA)%SM.
 Proof.
 intros.
 apply square_matrix_eq; cbn.
@@ -1021,7 +1031,7 @@ apply mat_add_comm; congruence.
 Qed.
 
 Theorem squ_mat_add_assoc : ∀ n (MA MB MC : square_matrix n),
-  squ_mat_add MA (squ_mat_add MB MC) = squ_mat_add (squ_mat_add MA MB) MC.
+  (MA + (MB + MC) = (MA + MB) + MC)%SM.
 Proof.
 intros.
 apply square_matrix_eq; cbn.
@@ -1044,7 +1054,7 @@ apply mat_add_assoc; congruence.
 Qed.
 
 Theorem squ_mat_add_0_l : ∀ n (MA : square_matrix n),
-  squ_mat_add (squ_mat_zero n) MA = MA.
+  (squ_mat_zero n + MA)%SM = MA.
 Proof.
 intros.
 destruct MA as (A, Ha).
@@ -1057,7 +1067,7 @@ apply mat_add_0_l; congruence.
 Qed.
 
 Theorem squ_mat_mul_assoc : ∀ n (MA MB MC : square_matrix n),
-  squ_mat_mul MA (squ_mat_mul MB MC) = squ_mat_mul (squ_mat_mul MA MB) MC.
+  (MA * (MB * MC) = (MA * MB) * MC)%SM.
 Proof.
 intros.
 apply square_matrix_eq; cbn.
@@ -1080,7 +1090,7 @@ apply mat_mul_assoc; congruence.
 Qed.
 
 Theorem squ_mat_mul_1_l : ∀ n (MA : square_matrix n),
-  squ_mat_mul (squ_mat_one n) MA = MA.
+  (squ_mat_one n * MA)%SM = MA.
 Proof.
 intros.
 destruct MA as (A, Ha).
@@ -1093,8 +1103,7 @@ apply mat_mul_1_l; congruence.
 Qed.
 
 Theorem squ_mat_mul_add_distr_l : ∀ n (MA MB MC : square_matrix n),
-  squ_mat_mul MA (squ_mat_add MB MC) =
-  squ_mat_add (squ_mat_mul MA MB) (squ_mat_mul MA MC).
+  (MA * (MB + MC) = MA * MB + MA * MC)%SM.
 Proof.
 intros.
 apply square_matrix_eq.
@@ -1117,7 +1126,7 @@ apply mat_mul_add_distr_l; congruence.
 Qed.
 
 Theorem squ_mat_mul_1_r : ∀ n (MA : square_matrix n),
-  squ_mat_mul MA (squ_mat_one n) = MA.
+  (MA * squ_mat_one n)%SM = MA.
 Proof.
 intros.
 destruct MA as (A, Ha).
@@ -1130,8 +1139,7 @@ apply mat_mul_1_r; congruence.
 Qed.
 
 Theorem squ_mat_mul_add_distr_r : ∀ n (MA MB MC : square_matrix n),
-  squ_mat_mul (squ_mat_add MA MB) MC =
-  squ_mat_add (squ_mat_mul MA MC) (squ_mat_mul MB MC).
+  ((MA + MB) * MC = MA * MC + MB * MC)%SM.
 Proof.
 intros.
 apply square_matrix_eq.
@@ -1154,7 +1162,7 @@ apply mat_mul_add_distr_r; congruence.
 Qed.
 
 Theorem squ_mat_add_opp_l : ∀ n (MA : square_matrix n),
-  squ_mat_add (squ_mat_opp MA) MA = squ_mat_zero n.
+  (- MA + MA)%SM = squ_mat_zero n.
 Proof.
 intros.
 destruct MA as (A, Ha).
@@ -1181,8 +1189,7 @@ now apply rngl_1_neq_0 in H1.
 Qed.
 
 Theorem proj1_sig_squ_mat_of_nat : ∀ n i,
-  proj1_sig (@rngl_of_nat _ (squ_mat_ring_like_op n) i : square_matrix n) =
-  (rngl_of_nat i × mI n)%M.
+  proj1_sig (rngl_of_nat i : square_matrix n) = (rngl_of_nat i × mI n)%M.
 Proof.
 intros.
 induction i. {
@@ -1328,8 +1335,25 @@ Definition squ_mat_ring_like_prop (n : nat) :
      rngl_opt_is_integral := I;
      rngl_characteristic_prop := @squ_mat_characteristic_prop n |}.
 
-Arguments det_loop {T ro} M n%nat.
-Arguments determinant {T ro} M.
+Theorem squ_mat_mul_scal_vect_assoc' : ∀ n (M : square_matrix n) c V,
+  (c × (M • V)%SM)%V = (M • (c × V))%SM.
+Proof.
+intros.
+apply vector_eq; [ easy | ].
+intros * Hi.
+cbn in Hi.
+cbn - [ iter_seq ].
+rewrite rngl_mul_summation_distr_l.
+apply rngl_summation_eq_compat.
+intros j Hj.
+do 2 rewrite rngl_mul_assoc.
+f_equal.
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+rewrite Hic in rngl_mul_comm.
+apply rngl_mul_comm.
+Qed.
+
+(* *)
 
 Theorem fold_determinant :
   ∀ T {ro : ring_like_op T} {so : ring_like_op T} (M : matrix T),
@@ -1369,6 +1393,8 @@ Arguments squ_mat_add {T}%type {ro} {n%nat} MA MB.
 Arguments squ_mat_mul {T}%type {ro} {n%nat} MA MB.
 Arguments squ_mat_ring_like_op {T ro}.
 Arguments squ_mat_mul_vect_r {T}%type {ro} [n]%nat M%SM V%V.
+About squ_mat_mul_scal_vect_assoc'.
+Arguments squ_mat_mul_scal_vect_assoc' {T}%type {ro rp} Hic n M%M c%F V%V.
 Arguments subm {T} M%M i%nat j%nat.
 Arguments vect_add {T ro} U%V V%V.
 Arguments vect_sub {T ro} U%V V%V.
@@ -1387,7 +1413,8 @@ Notation "- A" := (mat_opp A) : M_scope.
 
 Notation "A * B" := (squ_mat_mul A B) : SM_scope.
 Notation "A + B" := (squ_mat_add A B) : SM_scope.
-Notation "A · V" := (squ_mat_mul_vect_r A V) (at level 40) : SM_scope.
+Notation "A • V" := (squ_mat_mul_vect_r A V) (at level 40) : SM_scope.
+Notation "- A" := (squ_mat_opp A) : SM_scope.
 
 Notation "U + V" := (vect_add U V) : V_scope.
 Notation "U - V" := (vect_sub U V) : V_scope.

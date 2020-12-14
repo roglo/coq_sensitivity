@@ -26,6 +26,8 @@ Section a.
 
 Context {T : Type}.
 Context (ro : ring_like_op T).
+Context (rp : ring_like_prop T).
+Context {Hic : rngl_is_comm = true}.
 
 Definition is_symm_mat (A : matrix T) :=
   ∀ i j, i < mat_nrows A → j < mat_nrows A →
@@ -133,8 +135,19 @@ Definition eigenvalues M ev :=
 (* Rayleigh quotient *)
 
 Definition Rayleigh_quotient n (M : square_matrix n) (x : vector T) :=
-  ((x · (M · x)%SM)%V / (x · x)%V)%F.
+  ((x · (M • x)%SM)%V / (x · x)%V)%F.
 
+Arguments Rayleigh_quotient [n]%nat_scope M%SM x%V.
+
+Theorem RQ_mul_scal_prop : ∀ n (M : square_matrix n) x c,
+  Rayleigh_quotient M (c × x) = Rayleigh_quotient M x.
+Proof.
+intros.
+unfold Rayleigh_quotient.
+rewrite <- squ_mat_mul_scal_vect_assoc'; [ | easy ].
+Search ((_ × _) · (_ × _))%V.
+Search (_ · (_ × _))%V.
+Search ((_ × _) · _)%V.
 ...
 
 (* Lemma 2.1 *)
