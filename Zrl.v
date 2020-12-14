@@ -48,6 +48,13 @@ apply Z.lt_sub_lt_add_r.
 now rewrite Z.sub_diag.
 Qed.
 
+Theorem Z_mul_div_l : ∀ a b : Z, a ≠ 0%F → (a * b / a)%F = b.
+Proof.
+intros * Haz.
+rewrite Z.mul_comm.
+now apply Z.div_mul.
+Qed.
+
 Definition Z_ring_like_prop : ring_like_prop Z :=
   {| rngl_is_comm := true;
      rngl_has_dec_eq := true;
@@ -69,7 +76,8 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_opt_mul_0_r := I;
      rngl_opt_mul_inv_l := I;
      rngl_opt_mul_inv_r := I;
-     rngl_opt_mul_div := Z.div_mul;
+     rngl_opt_mul_div_l := Z_mul_div_l;
+     rngl_opt_mul_div_r := I;
      rngl_opt_eq_dec := Z.eq_dec;
      rngl_opt_is_integral := Z_eq_mul_0;
      rngl_characteristic_prop := Z_characteristic_prop |}.

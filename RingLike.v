@@ -128,8 +128,13 @@ Class ring_like_prop T {ro : ring_like_op T} :=
         ∀ a : T, a ≠ 0%F → (a / a = 1)%F
       else True;
     (* when has no inverse but division *)
-    rngl_opt_mul_div :
-      if rngl_has_no_inv_but_div then ∀ a b : T, b ≠ 0%F → (a * b / b = a)%F
+    rngl_opt_mul_div_l :
+      if rngl_has_no_inv_but_div then
+        ∀ a b : T, a ≠ 0%F → (a * b / a = b)%F
+      else True;
+    rngl_opt_mul_div_r :
+      if (rngl_has_no_inv_but_div && negb rngl_is_comm)%bool then
+        ∀ a b : T, b ≠ 0%F → (a * b / b = a)%F
       else True;
     (* when equality is decidable *)
     rngl_opt_eq_dec :
@@ -224,12 +229,12 @@ Qed.
 Theorem rngl_mul_inv_r : ∀ a : T, a ≠ 0%F → (a / a = 1)%F.
 Proof.
 intros * Ha.
-clear Hro Hin.
+clear Hro Hin Hid.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
 specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
-specialize rngl_opt_mul_div as rngl_mul_div.
-unfold rngl_div in rngl_mul_inv_r, rngl_mul_div |-*.
+specialize rngl_opt_mul_div_l as rngl_mul_div_l.
+unfold rngl_div in rngl_mul_inv_r, rngl_mul_div_l |-*.
 destruct rngl_has_inv. {
   destruct rngl_is_comm. {
     rewrite rngl_mul_comm.
@@ -239,21 +244,12 @@ destruct rngl_has_inv. {
     now apply rngl_mul_inv_r.
   }
 } {
-  rewrite Hid in rngl_mul_div.
-  specialize (rngl_mul_div 1%F a Ha) as H.
-  now rewrite rngl_mul_1_l in H.
+  destruct Hii as [Hii'| Hii']; [ easy | ].
+  rewrite Hii' in rngl_mul_div_l.
+  specialize (rngl_mul_div_l a 1%F Ha) as H.
+  now rewrite rngl_mul_1_r in H.
 }
 Qed.
-
-Theorem rngl_opt_mul_div_l :
-  if rngl_has_no_inv_but_div then ∀ a b : T, a ≠ 0%F → (a * b / a = b)%F
-  else True.
-Proof.
-clear Hro Hin Hid Hii.
-specialize rngl_opt_mul_div as H.
-destruct rngl_has_no_inv_but_div; [ | easy ].
-intros * Haz.
-...
 
 Theorem rngl_mul_reg_l : ∀ a b c,
   a ≠ 0%F
@@ -263,32 +259,19 @@ Proof.
 intros * Haz Hbc.
 clear Hro Hin Hid.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
-specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
-specialize rngl_opt_mul_div as rngl_mul_div.
-(*
-assert (H : (a * b / a = a * c / a)%F) by now rewrite Hbc.
-unfold rngl_div in H, rngl_mul_inv_r.
-do 2 rewrite <- rngl_mul_assoc in H.
-unfold rngl_div in rngl_mul_div.
-*)
-(*
-unfold rngl_div in H, rngl_mul_inv_r.
-*)
+specialize rngl_opt_mul_div_l as rngl_mul_div_l.
 assert (H1 : (¹/ a * (a * b) = ¹/ a * (a * c))%F) by now rewrite Hbc.
 assert (H2 : (a * b / a = a * c / a)%F) by now rewrite Hbc.
-unfold rngl_div in H2.
+unfold rngl_div in H2, rngl_mul_div_l.
 destruct rngl_has_inv. {
   do 2 rewrite rngl_mul_assoc in H1.
   rewrite rngl_mul_inv_l in H1; [ | easy ].
   now do 2 rewrite rngl_mul_1_l in H1.
 } {
   destruct Hii as [Hii'| Hii']; [ easy | ].
-  rewrite Hii' in rngl_mul_div.
-Search rngl_opt_div.
-...
-  rewrite rngl_mul_div in H; [ | easy ].
-  now rewrite rngl_mul_div in H.
+  rewrite Hii' in rngl_mul_div_l.
+  rewrite rngl_mul_div_l in H2; [ | easy ].
+  now rewrite rngl_mul_div_l in H2.
 }
 Qed.
 
@@ -302,11 +285,13 @@ clear Hro Hin Hid.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
 specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
-specialize rngl_opt_mul_div as rngl_mul_div.
+specialize rngl_opt_mul_div_r as rngl_mul_div_r.
+specialize rngl_opt_mul_div_l as rngl_mul_div_l.
 assert (H : (a * c / c = b * c / c)%F) by now rewrite Hab.
 unfold rngl_div in H, rngl_mul_inv_r.
 do 2 rewrite <- rngl_mul_assoc in H.
-unfold rngl_div in rngl_mul_div.
+unfold rngl_div in rngl_mul_div_l.
+unfold rngl_div in rngl_mul_div_r.
 destruct rngl_has_inv. {
   destruct rngl_is_comm. {
     rewrite (rngl_mul_comm c) in H.
@@ -318,9 +303,16 @@ destruct rngl_has_inv. {
   }
 } {
   destruct Hii as [Hii'| Hii']; [ easy | ].
-  rewrite Hii' in rngl_mul_div.
-  rewrite rngl_mul_div in H; [ | easy ].
-  now rewrite rngl_mul_div in H.
+  rewrite Hii' in rngl_mul_div_l, rngl_mul_div_r.
+  destruct rngl_is_comm. {
+    rewrite (rngl_mul_comm a) in H.
+    rewrite (rngl_mul_comm b) in H.
+    rewrite rngl_mul_div_l in H; [ | easy ].
+    now rewrite rngl_mul_div_l in H.
+  } {
+    rewrite rngl_mul_div_r in H; [ | easy ].
+    now rewrite rngl_mul_div_r in H.
+  }
 }
 Qed.
 

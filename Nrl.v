@@ -35,6 +35,13 @@ Proof. easy. Qed.
 Theorem nat_characteristic_prop : ∀ i, rngl_of_nat (S i) ≠ 0.
 Proof. easy. Qed.
 
+Theorem Nat_mul_div_l : ∀ a b : nat, a ≠ 0%F → (a * b / a)%F = b.
+Proof.
+intros * Haz.
+rewrite Nat.mul_comm.
+now apply Nat.div_mul.
+Qed.
+
 Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
   {| rngl_is_comm := true;
      rngl_has_dec_eq := true;
@@ -56,7 +63,8 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_mul_0_r := Nat.mul_0_r;
      rngl_opt_mul_inv_l := I;
      rngl_opt_mul_inv_r := I;
-     rngl_opt_mul_div := Nat.div_mul;
+     rngl_opt_mul_div_l := Nat_mul_div_l;
+     rngl_opt_mul_div_r := I;
      rngl_opt_eq_dec := Nat.eq_dec;
      rngl_opt_is_integral := Nat_eq_mul_0;
      rngl_characteristic_prop := nat_characteristic_prop |}.
@@ -137,7 +145,7 @@ apply Nat.ltb_lt.
 now apply Nat.mod_upper_bound.
 Qed.
 
-Definition Zn_v n v : Zn n :=
+Definition Zn_of_nat n v : Zn n :=
   exist _ (v mod at_least_2 n) (Zn_op_prop n v).
 
 Definition Zn_add n (a b : Zn n) : Zn n :=
@@ -164,8 +172,8 @@ Canonical Structure Zn_ring_like_op n : ring_like_op (Zn n) :=
   {| rngl_has_opp := true;
      rngl_has_inv := is_prime n;
      rngl_has_no_inv_but_div := false;
-     rngl_zero := Zn_v n 0;
-     rngl_one := Zn_v n 1;
+     rngl_zero := Zn_of_nat n 0;
+     rngl_one := Zn_of_nat n 1;
      rngl_add := Zn_add n;
      rngl_mul := Zn_mul n;
      rngl_opp := Zn_opp n;
@@ -410,9 +418,17 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_opt_mul_0_r := I;
      rngl_opt_mul_inv_l := Zn_opt_mul_inv_l;
      rngl_opt_mul_inv_r := Zn_opt_mul_inv_r;
-     rngl_opt_mul_div := I;
+     rngl_opt_mul_div_l := I;
+     rngl_opt_mul_div_r := I;
      rngl_opt_eq_dec := Zn_eq_dec;
      rngl_opt_is_integral := I;
      rngl_characteristic_prop := Zn_characteristic_prop |}.
 
 End a.
+
+(* not satisfactory: rngl_opt_mul_div_l and div_r should be ok if n
+   is prime; examples of non prime and prime:
+Compute (let n := 6 in let ro := Zn_ring_like_op n in proj1_sig (Zn_of_nat n 3 * Zn_of_nat n 2 / Zn_of_nat n 2)%F).
+Compute (let n := 7 in let ro := Zn_ring_like_op n in proj1_sig (Zn_of_nat n 3 * Zn_of_nat n 2 / Zn_of_nat n 2)%F).
+*)
+
