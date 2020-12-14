@@ -1399,6 +1399,35 @@ rewrite Hic in rngl_mul_comm.
 apply rngl_mul_comm.
 Qed.
 
+Theorem vect_eq_dec :
+  rngl_has_dec_eq = true →
+  ∀ n (U V : vector T),
+  vect_nrows U = n
+  → vect_nrows V = n
+  → {U = V} + {U ≠ V}.
+Proof.
+intros Hed * Hru Hrv.
+specialize rngl_opt_eq_dec as rngl_eq_dec.
+rewrite Hed in rngl_eq_dec.
+destruct U as (fu, ru).
+destruct V as (fv, rv).
+cbn in Hru, Hrv; subst ru rv.
+assert (H : ∀ i, {fu i = fv i} + {fu i ≠ fv i}). {
+  intros.
+  apply rngl_eq_dec.
+}
+induction n; intros; [ now left; apply vector_eq | ].
+destruct IHn as [IHn| IHn]. {
+  injection IHn; clear IHn; intros IHn.
+  now left; subst fv.
+} {
+  right.
+  intros H1; apply IHn; clear IHn.
+  injection H1; clear H1; intros H1.
+  now subst fv.
+}
+Qed.
+
 (* *)
 
 Theorem fold_determinant :
