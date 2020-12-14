@@ -167,6 +167,7 @@ Context {rp : ring_like_prop T}.
 Context {Hro : rngl_has_opp = true}.
 Context {Hin : rngl_has_inv = true}.
 Context {Hid : rngl_has_no_inv_but_div = true}.
+Context {Hdo : rngl_is_domain = true}.
 Context {Hii : rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true}.
 
 Theorem rngl_add_0_r : ∀ a, (a + 0 = a)%F.
@@ -489,7 +490,7 @@ Theorem rngl_integral :
     ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
   else True.
 Proof.
-clear Hro Hin Hid Hii.
+clear Hro Hin Hid Hii Hdo.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
 specialize rngl_opt_eq_dec as rngl_eq_dec.
 specialize rngl_opt_is_integral as rngl_integral.
@@ -511,10 +512,52 @@ Qed.
 
 End a.
 
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context {Hro : rngl_has_opp = true}.
+Context {Hin : rngl_has_inv = true}.
+Context {Hid : rngl_has_no_inv_but_div = true}.
+Context {Hdo : rngl_is_domain = true}.
+Context {Hii : rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true}.
+
+Theorem rngl_inv_mul : ∀ a b, a ≠ 0%F → b ≠ 0%F →(¹/ (a * b) = ¹/ b * ¹/ a)%F.
+Proof.
+intros * Haz Hbz.
+clear Hro Hii Hid.
+assert (Hii : rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true). {
+  now left.
+}
+specialize (@rngl_mul_reg_l T ro rp Hii) as H1.
+specialize (@rngl_mul_inv_r T ro rp Hii) as H2.
+specialize rngl_integral as H3.
+specialize rngl_opt_mul_div_l as rngl_mul_div_l.
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+unfold rngl_div in H2.
+rewrite Hdo in H3; cbn in H3.
+assert (Habz : (a * b)%F ≠ 0%F). {
+  intros H; specialize (H3 _ _ H).
+  now destruct H3.
+}
+rewrite Hin in H2.
+apply H1 with (a := (a * b)%F); [ easy | ].
+rewrite H2; [ | easy ].
+rewrite rngl_mul_assoc.
+rewrite <- (rngl_mul_assoc a).
+rewrite H2; [ | easy ].
+rewrite rngl_mul_1_r.
+now rewrite H2.
+Qed.
+
+End a.
+
 Arguments rngl_add_opp_l {T}%type {ro rp} Hro.
 Arguments rngl_add_opp_r {T}%type {ro rp} x%F.
 Arguments rngl_add_reg_l {T}%type {ro rp} (a b c)%F.
 Arguments rngl_add_sub {T}%type {ro rp} (a b)%F.
+Arguments rngl_inv_mul {T}%type {ro rp} Hin Hdo a%F b%F.
 Arguments rngl_integral {T}%type {ro rp}.
 Arguments rngl_mul_opp_opp {T}%type {ro rp} Hro.
 Arguments rngl_mul_0_l {T}%type {ro rp} a%F.

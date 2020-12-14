@@ -1367,7 +1367,7 @@ Definition squ_mat_ring_like_prop (n : nat) :
      rngl_opt_is_integral := I;
      rngl_characteristic_prop := @squ_mat_characteristic_prop n |}.
 
-Theorem squ_mat_mul_scal_vect_assoc' : ∀ n (M : square_matrix n) c V,
+Theorem squ_mat_mul_scal_vect_comm : ∀ n (M : square_matrix n) c V,
   (c × (M • V)%SM)%V = (M • (c × V))%SM.
 Proof.
 intros.
@@ -1425,8 +1425,7 @@ Arguments squ_mat_add {T}%type {ro} {n%nat} MA MB.
 Arguments squ_mat_mul {T}%type {ro} {n%nat} MA MB.
 Arguments squ_mat_ring_like_op {T ro}.
 Arguments squ_mat_mul_vect_r {T}%type {ro} [n]%nat M%SM V%V.
-About squ_mat_mul_scal_vect_assoc'.
-Arguments squ_mat_mul_scal_vect_assoc' {T}%type {ro rp} Hic n M%M c%F V%V.
+Arguments squ_mat_mul_scal_vect_comm {T}%type {ro rp} Hic n M%M c%F V%V.
 Arguments subm {T} M%M i%nat j%nat.
 Arguments vect_add {T ro} U%V V%V.
 Arguments vect_sub {T ro} U%V V%V.

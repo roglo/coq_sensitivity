@@ -28,7 +28,9 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 Context {Hic : rngl_is_comm = true}.
-Context {Hid : rngl_is_domain = true}.
+Context {Hdo : rngl_is_domain = true}.
+Context {Hin : rngl_has_inv = true}.
+Context {Hed : rngl_has_dec_eq = true}.
 Context {Hii : rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true}.
 
 Definition is_symm_mat (A : matrix T) :=
@@ -45,6 +47,7 @@ Theorem princ_subm_1_preserves_symm : ∀ (A : matrix T) n,
   → is_symm_mat (princ_subm_1 A n).
 Proof.
 intros * Ha.
+clear Hin.
 unfold is_symm_mat in Ha |-*; cbn.
 intros i j Hi Hj.
 destruct (lt_dec i n) as [Hin| Hin]. {
@@ -142,54 +145,44 @@ Definition Rayleigh_quotient n (M : square_matrix n) (x : vector T) :=
 Arguments Rayleigh_quotient [n]%nat_scope M%SM x%V.
 
 Theorem RQ_mul_scal_prop : ∀ n (M : square_matrix n) x c,
-  Rayleigh_quotient M (c × x) = Rayleigh_quotient M x.
+  c ≠ 0%F
+  → Rayleigh_quotient M (c × x) = Rayleigh_quotient M x.
 Proof.
-intros.
+intros * Hcz.
+clear Hii Hed.
 unfold Rayleigh_quotient.
-rewrite <- squ_mat_mul_scal_vect_assoc'; [ | easy ].
+...
+Check vect_eq_dec.
+...
+destruct (vect_eq_dec x (vect_zero (vect_nrows x))) as [Hxz| Hxz].
+...
+rewrite <- squ_mat_mul_scal_vect_comm; [ | easy ].
 rewrite vect_dot_mul_scal_mul_comm; [ | easy ].
 rewrite vect_dot_mul_scal_mul_comm; [ | easy ].
 do 2 rewrite vect_scal_mul_dot_mul_comm.
 do 2 rewrite rngl_mul_assoc.
 unfold rngl_div.
-destruct rngl_has_inv. {
-Theorem rngl_inv_mul : ∀ a b, a ≠ 0%F → b ≠ 0%F →(¹/ (a * b) = ¹/ a * ¹/ b)%F.
-Proof.
-intros * Haz Hbz.
-specialize (@rngl_mul_reg_l T ro rp Hii) as H1.
-specialize (@rngl_mul_inv_r T ro rp Hii) as H2.
-specialize rngl_integral as H3.
-specialize rngl_opt_mul_div_l as rngl_mul_div_l.
+specialize (rngl_inv_mul Hin Hdo) as H1.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
-unfold rngl_div in H2.
-rewrite Hid in H3; cbn in H3.
-assert (Habz : (a * b)%F ≠ 0%F). {
-  intros H; specialize (H3 _ _ H).
-  now destruct H3.
-}
-destruct rngl_has_inv. {
-  apply H1 with (a := (a * b)%F); [ easy | ].
-  rewrite H2; [ | easy ].
-  rewrite rngl_mul_assoc.
-  destruct rngl_is_comm. {
-    rewrite (rngl_mul_comm a).
-    rewrite rngl_mul_comm.
-    rewrite <- rngl_mul_assoc.
-    rewrite H2; [ | easy ].
-    rewrite rngl_mul_1_r.
-    rewrite rngl_mul_comm; symmetry.
-    now apply H2.
-  }
-...
+specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
+specialize rngl_opt_is_integral as rngl_is_integral.
+rewrite Hic in rngl_mul_comm.
+rewrite Hin in rngl_mul_inv_l |-*.
+rewrite Hdo in rngl_is_integral.
+rewrite H1; cycle 1. {
+  intros H; apply Hcz.
+  apply rngl_is_integral in H.
+  now destruct H.
 } {
-  destruct Hii as [Hii'| Hii']; [ easy | ].
+Check vect_eq_dec.
 ...
-Search rngl_inv.
-Search (_ / (_ * _))%F.
-Check rngl_mul_reg_l.
+}
 ...
-apply rngl_mul_reg_l with (c := a).
-
+rewrite rngl_mul_assoc.
+rewrite rngl_mul_comm.
+do 2 rewrite rngl_mul_assoc.
+rewrite rngl_mul_inv_l.
+now rewrite rngl_mul_1_l.
 ...
 
 (* min-max theorem, or variational theorem, or Courant–Fischer–Weyl min-max principle *)
