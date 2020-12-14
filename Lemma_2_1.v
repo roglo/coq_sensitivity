@@ -28,6 +28,7 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 Context {Hic : rngl_is_comm = true}.
+Context {Hid : rngl_is_domain = true}.
 Context {Hii : rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true}.
 
 Definition is_symm_mat (A : matrix T) :=
@@ -157,32 +158,29 @@ Proof.
 intros * Haz Hbz.
 specialize (@rngl_mul_reg_l T ro rp Hii) as H1.
 specialize (@rngl_mul_inv_r T ro rp Hii) as H2.
-...
 specialize rngl_integral as H3.
 specialize rngl_opt_mul_div_l as rngl_mul_div_l.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
 unfold rngl_div in H2.
+rewrite Hid in H3; cbn in H3.
+assert (Habz : (a * b)%F ≠ 0%F). {
+  intros H; specialize (H3 _ _ H).
+  now destruct H3.
+}
 destruct rngl_has_inv. {
-  apply H1 with (a := (a * b)%F). {
-
- 2: {
-    rewrite H2.
-    rewrite rngl_mul_assoc.
-    destruct rngl_is_comm. {
-      rewrite (rngl_mul_comm a).
-      rewrite rngl_mul_comm.
-      rewrite <- rngl_mul_assoc.
-      rewrite H2.
-      rewrite rngl_mul_1_r.
-      rewrite rngl_mul_comm; symmetry.
-      apply H2.
-      admit.
-      admit.
-    }
-    admit.
-    admit.
+  apply H1 with (a := (a * b)%F); [ easy | ].
+  rewrite H2; [ | easy ].
+  rewrite rngl_mul_assoc.
+  destruct rngl_is_comm. {
+    rewrite (rngl_mul_comm a).
+    rewrite rngl_mul_comm.
+    rewrite <- rngl_mul_assoc.
+    rewrite H2; [ | easy ].
+    rewrite rngl_mul_1_r.
+    rewrite rngl_mul_comm; symmetry.
+    now apply H2.
   }
-  admit.
+...
 } {
   destruct Hii as [Hii'| Hii']; [ easy | ].
 ...
