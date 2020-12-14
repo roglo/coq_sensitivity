@@ -225,6 +225,8 @@ Definition determinant M := det_loop M (mat_ncols M).
 Declare Scope V_scope.
 Delimit Scope V_scope with V.
 
+Arguments vect_el {T} v%V n%nat.
+
 Notation "U + V" := (vect_add U V) : V_scope.
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
 
@@ -368,10 +370,13 @@ Delimit Scope V_scope with V.
 
 Arguments mat_mul_vect_r {T ro} M%M V%V.
 Arguments vect_mul_scal_l {T ro} s%F V%V.
+Arguments vect_dot_product {T}%type {ro} (U V)%V.
+Arguments vect_el {T} v%V n%nat.
 
 Notation "A • V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
 Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
+Notation "U · V" := (vect_dot_product U V) (at level 40) : V_scope.
 
 (* *)
 
@@ -779,7 +784,7 @@ intros j Hj.
 apply rngl_mul_assoc.
 Qed.
 
-Theorem mat_mul_scal_vect_assoc' : ∀ a MA V, (a × (MA • V) = MA • (a × V))%V.
+Theorem mat_mul_scal_vect_comm : ∀ a MA V, (a × (MA • V) = MA • (a × V))%V.
 Proof.
 intros.
 apply vector_eq; [ easy | ].
@@ -794,6 +799,32 @@ f_equal.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
 rewrite Hic in rngl_mul_comm.
 apply rngl_mul_comm.
+Qed.
+
+Theorem vect_dot_mul_scal_mul_comm : ∀ (a : T) (U V : vector T),
+  (U · (a × V) = (a * (U · V))%F)%V.
+Proof.
+intros.
+unfold vect_dot_product.
+rewrite rngl_mul_summation_distr_l.
+apply rngl_summation_eq_compat.
+intros j Hj; cbn.
+do 2 rewrite rngl_mul_assoc.
+f_equal.
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+rewrite Hic in rngl_mul_comm.
+apply rngl_mul_comm.
+Qed.
+
+Theorem vect_scal_mul_dot_mul_comm : ∀ (a : T) (U V : vector T),
+  ((a × U) · V = (a * (U · V))%F)%V.
+Proof.
+intros.
+unfold vect_dot_product.
+rewrite rngl_mul_summation_distr_l.
+apply rngl_summation_eq_compat.
+intros j Hj; cbn.
+symmetry; apply rngl_mul_assoc.
 Qed.
 
 (* comatrix *)
@@ -1378,8 +1409,8 @@ Arguments mat_add_opp_r {T}%type {ro rp} Hro M%M n%nat.
 Arguments mat_mul_mul_scal_l {T}%type {ro rp} Hic a%F MA%M.
 Arguments mat_mul_scal_l {T ro} _ M%M.
 Arguments mat_mul_vect_r {T ro} M%M V%V.
+Arguments mat_mul_scal_vect_comm {T}%type {ro rp} Hic a%F MA%M V%V.
 Arguments mat_mul_scal_vect_assoc {T}%type {ro rp} a%F MA%M V%V.
-Arguments mat_mul_scal_vect_assoc' {T}%type {ro rp} Hic a%F MA%M V%V.
 Arguments mat_vect_mul_assoc {T}%type {ro rp} (A B)%M V%V.
 Arguments mat_mul_1_l {T}%type {ro rp} M%M n%nat.
 Arguments mat_mul_1_r {T}%type {ro rp} M%M n%nat.
@@ -1404,6 +1435,8 @@ Arguments vect_mul_scal_reg_r {T}%type {ro rp} Hde Hii V%V (a b)%F.
 Arguments vect_mul_1_l {T}%type {ro rp} V%V n%nat.
 Arguments vect_zero {T ro}.
 Arguments vect_dot_product {T}%type {ro} (U V)%V.
+Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hic a%F (U V)%V.
+Arguments vect_scal_mul_dot_mul_comm {T}%type {ro rp} a%F (U V)%V.
 
 Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.

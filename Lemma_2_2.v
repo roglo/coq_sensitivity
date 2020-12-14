@@ -627,7 +627,7 @@ rewrite <- vect_mul_scal_l_mul_assoc; [ | easy ].
 (* μ × (μ × V) = rngl_of_nat n × V *)
 rewrite <- Hav.
 (* μ × (mA n . V) = rngl_of_nat n × V *)
-rewrite mat_mul_scal_vect_assoc'; [ | easy ].
+rewrite mat_mul_scal_vect_comm; [ | easy ].
 (* mA n . (μ × V) = rngl_of_nat n × V *)
 rewrite <- Hav.
 (* mA n . (mA n . V) = rngl_of_nat n × V *)

@@ -145,9 +145,27 @@ Proof.
 intros.
 unfold Rayleigh_quotient.
 rewrite <- squ_mat_mul_scal_vect_assoc'; [ | easy ].
-Search ((_ × _) · (_ × _))%V.
-Search (_ · (_ × _))%V.
-Search ((_ × _) · _)%V.
+rewrite vect_dot_mul_scal_mul_comm; [ | easy ].
+rewrite vect_dot_mul_scal_mul_comm; [ | easy ].
+do 2 rewrite vect_scal_mul_dot_mul_comm.
+do 2 rewrite rngl_mul_assoc.
+Search ((_ * _) / (_ * _))%F.
+Search ((_ * _) / _)%F.
+unfold rngl_div.
+destruct rngl_has_inv. {
+Search rngl_inv.
+Theorem glop : ∀ a b, (¹/ (a * b) = ¹/ a * ¹/ b)%F.
+Proof.
+intros.
+Search (_ * _ = _ * _)%F.
+Check rngl_mul_reg_l.
+...
+apply rngl_mul_reg_l with (c := a).
+
+...
+
+(* min-max theorem, or variational theorem, or Courant–Fischer–Weyl min-max principle *)
+
 ...
 
 (* Lemma 2.1 *)
