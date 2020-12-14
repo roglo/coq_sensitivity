@@ -131,20 +131,19 @@ Definition eigenvalues M ev :=
   ∀ μ, μ ∈ ev → ∃ V, V ≠ vect_zero (mat_nrows M) ∧ (M · V = μ × V)%V.
 
 Theorem glop :
-  ∀ n m l (A : square_matrix n) (B : square_matrix (n - length l))
-    eva evb seva sevb,
-  m < n
+  ∀ n m l (A : square_matrix n) (B : square_matrix (n - length l)) seva sevb,
+  m = n - length l
+  → m < n
   → is_symm_squ_mat A
   → B = princ_subm A l
-  → eigenvalues (proj1_sig A) eva
-  → eigenvalues (proj1_sig B) evb
-  → Permutation eva seva
-  → Permutation evb sevb
-...
+  → eigenvalues (proj1_sig A) seva
+  → eigenvalues (proj1_sig B) sevb
   → Sorted rngl_le seva
   → Sorted rngl_le sevb
-  → squ_mat_mul A A = A ∧ squ_mat_mul B B = B.
+  → ∀ i, 1 ≤ i ≤ m →
+    (nth (i-n+m) seva 0%F ≤ nth i sevb 0%F ≤ nth i seva 0%F)%F.
 Proof.
+intros * Hm Hmn Hisa Hb Heva Hevb Hsa Hsb * Him.
 ...
 
 End in_ring_like.

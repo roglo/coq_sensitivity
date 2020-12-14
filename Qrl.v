@@ -20,6 +20,7 @@ Canonical Structure Q_ring_like_op : ring_like_op Q :=
      rngl_mul := Q.mul;
      rngl_opp := Q.opp;
      rngl_inv := Q.inv;
+     rngl_le := Q.le;
      rngl_opt_sub := phony_Q_sub;
      rngl_opt_div := phony_Q_div |}.
 

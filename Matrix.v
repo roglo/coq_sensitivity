@@ -973,6 +973,7 @@ Qed.
 Definition squ_mat_opp n (M : square_matrix n) : square_matrix n :=
   exist _ (- proj1_sig M)%M (squ_mat_opp_prop M).
 
+Definition phony_squ_mat_le n (MA MB : square_matrix n) := True.
 Definition phony_squ_mat_sub n (MA MB : square_matrix n) := MA.
 Definition phony_squ_mat_div n (MA MB : square_matrix n) := MA.
 Definition phony_squ_mat_inv n (M : square_matrix n) := M.
@@ -987,6 +988,7 @@ Canonical Structure squ_mat_ring_like_op n : ring_like_op (square_matrix n) :=
      rngl_mul := @squ_mat_mul n;
      rngl_opp := @squ_mat_opp n;
      rngl_inv := @phony_squ_mat_inv n;
+     rngl_le := @phony_squ_mat_le n;
      rngl_opt_sub := @phony_squ_mat_sub n;
      rngl_opt_div := @phony_squ_mat_div n |}.
 

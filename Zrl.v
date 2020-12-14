@@ -17,6 +17,7 @@ Canonical Structure Z_ring_like_op : ring_like_op Z :=
      rngl_mul := Z.mul;
      rngl_opp := Z.opp;
      rngl_inv := phony_Z_inv;
+     rngl_le := Z.le;
      rngl_opt_sub := phony_Z_sub;
      rngl_opt_div := Z.div |}.
 

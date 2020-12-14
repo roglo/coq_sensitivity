@@ -20,6 +20,7 @@ Canonical Structure nat_ring_like_op : ring_like_op nat :=
      rngl_mul := Nat.mul;
      rngl_opp := phony_Nat_opp;
      rngl_inv := phony_Nat_inv;
+     rngl_le := Nat.le;
      rngl_opt_sub := Nat.sub;
      rngl_opt_div := Nat.div |}.
 
@@ -154,6 +155,8 @@ Definition Zn_inv n (a : Zn n) : Zn n :=
 Definition Zn_div n (a b : Zn n) : Zn n :=
   if is_prime n then Zn_mul n a (Zn_inv n b)
   else a.
+Definition Zn_le n (a b : Zn n) : Prop :=
+  proj1_sig a ≤ proj1_sig b.
 
 Definition phony_Zn_sub n (a b : Zn n) := a.
 
@@ -167,6 +170,7 @@ Canonical Structure Zn_ring_like_op n : ring_like_op (Zn n) :=
      rngl_mul := Zn_mul n;
      rngl_opp := Zn_opp n;
      rngl_inv := Zn_inv n;
+     rngl_le := Zn_le n;
      rngl_opt_sub := phony_Zn_sub n;
      rngl_opt_div := Zn_div n |}.
 

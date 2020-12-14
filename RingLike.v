@@ -58,6 +58,7 @@ Class ring_like_op T :=
     rngl_mul : T → T → T;
     rngl_opp : T → T;
     rngl_inv : T → T;
+    rngl_le : T → T → Prop;
     rngl_opt_sub : T → T → T;
     rngl_opt_div : T → T → T }.
 
@@ -75,8 +76,11 @@ Notation "a + b" := (rngl_add a b) : ring_like_scope.
 Notation "a - b" := (rngl_sub a b) : ring_like_scope.
 Notation "a * b" := (rngl_mul a b) : ring_like_scope.
 Notation "a / b" := (rngl_div a b) : ring_like_scope.
+Notation "a ≤ b" := (rngl_le a b) : ring_like_scope.
 Notation "- a" := (rngl_opp a) : ring_like_scope.
 Notation "¹/ a" := (rngl_inv a) (at level 35, right associativity) :
+  ring_like_scope.
+Notation "a ≤ b ≤ c" := (a ≤ b ∧ b ≤ c)%F (at level 70, b at next level) :
   ring_like_scope.
 
 Fixpoint rngl_of_nat {T} {ro : ring_like_op T} n :=
