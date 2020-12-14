@@ -489,6 +489,7 @@ Theorem rngl_integral :
     ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
   else True.
 Proof.
+clear Hro Hin Hid Hii.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
 specialize rngl_opt_eq_dec as rngl_eq_dec.
 specialize rngl_opt_is_integral as rngl_integral.
@@ -514,7 +515,7 @@ Arguments rngl_add_opp_l {T}%type {ro rp} Hro.
 Arguments rngl_add_opp_r {T}%type {ro rp} x%F.
 Arguments rngl_add_reg_l {T}%type {ro rp} (a b c)%F.
 Arguments rngl_add_sub {T}%type {ro rp} (a b)%F.
-Arguments rngl_integral {T}%type {ro rp} Hin.
+Arguments rngl_integral {T}%type {ro rp}.
 Arguments rngl_mul_opp_opp {T}%type {ro rp} Hro.
 Arguments rngl_mul_0_l {T}%type {ro rp} a%F.
 Arguments rngl_mul_opp_r {T}%type {ro rp} Hro.

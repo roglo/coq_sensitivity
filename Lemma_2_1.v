@@ -28,6 +28,7 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 Context {Hic : rngl_is_comm = true}.
+Context {Hii : rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true}.
 
 Definition is_symm_mat (A : matrix T) :=
   ∀ i j, i < mat_nrows A → j < mat_nrows A →
@@ -149,15 +150,44 @@ rewrite vect_dot_mul_scal_mul_comm; [ | easy ].
 rewrite vect_dot_mul_scal_mul_comm; [ | easy ].
 do 2 rewrite vect_scal_mul_dot_mul_comm.
 do 2 rewrite rngl_mul_assoc.
-Search ((_ * _) / (_ * _))%F.
-Search ((_ * _) / _)%F.
 unfold rngl_div.
 destruct rngl_has_inv. {
-Search rngl_inv.
-Theorem glop : ∀ a b, (¹/ (a * b) = ¹/ a * ¹/ b)%F.
+Theorem rngl_inv_mul : ∀ a b, a ≠ 0%F → b ≠ 0%F →(¹/ (a * b) = ¹/ a * ¹/ b)%F.
 Proof.
-intros.
-Search (_ * _ = _ * _)%F.
+intros * Haz Hbz.
+specialize (@rngl_mul_reg_l T ro rp Hii) as H1.
+specialize (@rngl_mul_inv_r T ro rp Hii) as H2.
+...
+specialize rngl_integral as H3.
+specialize rngl_opt_mul_div_l as rngl_mul_div_l.
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+unfold rngl_div in H2.
+destruct rngl_has_inv. {
+  apply H1 with (a := (a * b)%F). {
+
+ 2: {
+    rewrite H2.
+    rewrite rngl_mul_assoc.
+    destruct rngl_is_comm. {
+      rewrite (rngl_mul_comm a).
+      rewrite rngl_mul_comm.
+      rewrite <- rngl_mul_assoc.
+      rewrite H2.
+      rewrite rngl_mul_1_r.
+      rewrite rngl_mul_comm; symmetry.
+      apply H2.
+      admit.
+      admit.
+    }
+    admit.
+    admit.
+  }
+  admit.
+} {
+  destruct Hii as [Hii'| Hii']; [ easy | ].
+...
+Search rngl_inv.
+Search (_ / (_ * _))%F.
 Check rngl_mul_reg_l.
 ...
 apply rngl_mul_reg_l with (c := a).

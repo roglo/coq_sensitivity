@@ -546,9 +546,8 @@ destruct n. {
   rewrite rngl_mul_0_l, rngl_add_0_l.
   destruct i; [ | flia Hi ].
   rewrite rngl_mul_1_r; symmetry; clear Hi.
-  specialize (rngl_integral Hin) as H.
+  specialize rngl_integral as H.
   rewrite Hin in H; cbn in H.
-  specialize (H (or_introl eq_refl)).
   rewrite Hde in H.
   rewrite Bool.orb_true_r in H.
   apply H in Hμ.
