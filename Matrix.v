@@ -80,7 +80,9 @@ Section a.
 Context {T : Type}.
 Context (ro : ring_like_op T).
 Context {rp : ring_like_prop T}.
+(*
 Context {Hro : rngl_has_opp = true}.
+*)
 
 (* addition *)
 
@@ -336,12 +338,14 @@ Section a.
 Context {T : Type}.
 Context (ro : ring_like_op T).
 Context {rp : ring_like_prop T}.
+(*
 Context {Hro : rngl_has_opp = true}.
 Context {Hic : rngl_is_comm = true}.
 Context {Hde : rngl_has_dec_eq = true}.
 Context {Hin : rngl_has_inv = true}.
 Context {Hid : rngl_has_no_inv_but_div = true}.
 Context {Hii : rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true}.
+*)
 
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
@@ -434,24 +438,28 @@ Qed.
 
 (* addition left and right with opposite *)
 
-Theorem mat_add_opp_l : ∀ M n,
+Theorem mat_add_opp_l :
+  rngl_has_opp = true →
+  ∀ M n,
   is_square_mat M
   → n = mat_nrows M
   → (- M + M = mZ (mat_nrows M))%M.
 Proof.
-intros * Hsm Hn.
+intros Hro * Hsm Hn.
 apply matrix_eq; [ easy | cbn; congruence | ].
 cbn; rewrite <- Hn.
 intros * Hi Hj.
 now apply rngl_add_opp_l.
 Qed.
 
-Theorem mat_add_opp_r : ∀ M n,
+Theorem mat_add_opp_r :
+  rngl_has_opp = true →
+  ∀ M n,
   is_square_mat M
   → n = mat_nrows M
   → (M - M = mZ (mat_nrows M))%M.
 Proof.
-intros * Hsm Hn.
+intros Hro * Hsm Hn.
 apply matrix_eq; [ easy | cbn; congruence | ].
 cbn - [ mat_sub ]; rewrite <- Hn.
 intros * Hi Hj.
@@ -654,13 +662,18 @@ intros * Hi; cbn.
 apply rngl_mul_assoc.
 Qed.
 
-Theorem vect_mul_scal_reg_r : ∀ V a b,
+Theorem vect_mul_scal_reg_r :
+  rngl_has_dec_eq = true →
+  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  ∀ V a b,
   V ≠ vect_zero (vect_nrows V)
   → (a × V = b × V)%V
   → a = b.
 Proof.
-intros * Hvz Hab.
+intros Hde Hii * Hvz Hab.
+(*
 clear Hro Hic Hin Hid.
+*)
 assert (Hiv : ∀ i, vect_el (a × V)%V i = vect_el (b × V)%V i). {
   intros i.
   now rewrite Hab.
@@ -675,7 +688,7 @@ assert (Hn : ¬ ∀ i, i < vect_nrows V → vect_el V i = 0%F). {
 }
 assert (∃ i, vect_el V i ≠ 0%F). {
   specialize rngl_opt_eq_dec as rngl_eq_dec.
-  destruct rngl_has_dec_eq; [ | easy ].
+  rewrite Hde in rngl_eq_dec.
   apply (not_forall_in_interv_imp_exist (a:=0) (b:=vect_nrows V - 1));
     cycle 1. {
     flia.
@@ -702,11 +715,13 @@ specialize (Hiv i).
 now apply rngl_mul_reg_r in Hiv.
 Qed.
 
-Theorem mat_mul_mul_scal_l : ∀ a MA MB, (MA * (a × MB) = a × (MA * MB))%M.
+Theorem mat_mul_mul_scal_l :
+  rngl_is_comm = true →
+  ∀ a MA MB, (MA * (a × MB) = a × (MA * MB))%M.
 Proof.
-intros.
+intros Hic *.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
-destruct rngl_is_comm; [ | easy ].
+rewrite Hic in rngl_mul_comm.
 apply matrix_eq; [ easy | easy | ].
 intros * Hi Hj.
 cbn - [ iter_seq ].
@@ -784,9 +799,11 @@ intros j Hj.
 apply rngl_mul_assoc.
 Qed.
 
-Theorem mat_mul_scal_vect_comm : ∀ a MA V, (a × (MA • V) = MA • (a × V))%V.
+Theorem mat_mul_scal_vect_comm :
+  rngl_is_comm = true →
+  ∀ a MA V, (a × (MA • V) = MA • (a × V))%V.
 Proof.
-intros.
+intros Hic *.
 apply vector_eq; [ easy | ].
 intros i Hi.
 cbn in Hi.
@@ -801,10 +818,12 @@ rewrite Hic in rngl_mul_comm.
 apply rngl_mul_comm.
 Qed.
 
-Theorem vect_dot_mul_scal_mul_comm : ∀ (a : T) (U V : vector T),
+Theorem vect_dot_mul_scal_mul_comm :
+  rngl_is_comm = true →
+  ∀ (a : T) (U V : vector T),
   (U · (a × V) = (a * (U · V))%F)%V.
 Proof.
-intros.
+intros Hic *.
 unfold vect_dot_product.
 rewrite rngl_mul_summation_distr_l.
 apply rngl_summation_eq_compat.
@@ -1192,10 +1211,17 @@ apply Nat.eqb_eq in Hcc.
 apply mat_mul_add_distr_r; congruence.
 Qed.
 
-Theorem squ_mat_add_opp_l : ∀ n (MA : square_matrix n),
-  (- MA + MA)%SM = squ_mat_zero n.
+Context {Hro : @rngl_has_opp T ro = true}.
+
+Theorem squ_mat_add_opp_l : ∀ n,
+  if @rngl_has_opp (square_matrix n) _ then
+    ∀ a : square_matrix n, (- a + a)%F = 0%F
+  else True.
 Proof.
 intros.
+remember rngl_has_opp as x eqn:Hx in |-*; symmetry in Hx.
+destruct x; [ | easy ].
+intros MA.
 destruct MA as (A, Ha).
 apply square_matrix_eq; cbn.
 apply Bool.andb_true_iff in Ha.
@@ -1316,8 +1342,8 @@ Theorem squ_mat_opt_eq_dec : ∀ n,
 Proof.
 intros.
 specialize rngl_opt_eq_dec as rngl_eq_dec.
-rewrite Hde in rngl_eq_dec |-*.
-intros.
+remember rngl_has_dec_eq as x eqn:Hde; symmetry in Hde.
+destruct x; [ | easy ].
 destruct a as (a, Ha).
 destruct b as (b, Hb).
 move b before a.
@@ -1367,10 +1393,12 @@ Definition squ_mat_ring_like_prop (n : nat) :
      rngl_opt_is_integral := I;
      rngl_characteristic_prop := @squ_mat_characteristic_prop n |}.
 
-Theorem squ_mat_mul_scal_vect_comm : ∀ n (M : square_matrix n) c V,
+Theorem squ_mat_mul_scal_vect_comm :
+  rngl_is_comm = true →
+  ∀ n (M : square_matrix n) c V,
   (c × (M • V)%SM)%V = (M • (c × V))%SM.
 Proof.
-intros.
+intros Hic *.
 apply vector_eq; [ easy | ].
 intros * Hi.
 cbn in Hi.

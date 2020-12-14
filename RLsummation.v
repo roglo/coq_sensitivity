@@ -16,7 +16,6 @@ Section a.
 Context {T : Type}.
 Context (ro : ring_like_op T).
 Context {rp : ring_like_prop T}.
-Context {Hro : rngl_has_opp = true}.
 
 Theorem fold_left_rngl_add_fun_from_0 : ∀ a l (f : nat → _),
   (fold_left (λ c i, c + f i) l a =
@@ -49,10 +48,12 @@ intros i Hi.
 apply Hz; flia Hi.
 Qed.
 
-Theorem rngl_opp_add_distr : ∀ a b, (- (a + b) = - a - b)%F.
+Theorem rngl_opp_add_distr :
+  rngl_has_opp = true →
+  ∀ a b, (- (a + b) = - a - b)%F.
 Proof.
-intros.
-specialize (@fold_rngl_sub _ _ Hro) as H.
+intros Hro *.
+specialize (fold_rngl_sub Hro) as H.
 apply rngl_add_reg_l with (c := (b + a)%F).
 unfold rngl_sub.
 rewrite Hro.
@@ -64,10 +65,11 @@ rewrite rngl_add_opp_r.
 now rewrite rngl_add_opp_r.
 Qed.
 
-Theorem rngl_opp_summation : ∀ b e f,
-  ((- Σ (i = b, e), f i) = Σ (i = b, e), (- f i))%F.
+Theorem rngl_opp_summation :
+  rngl_has_opp = true →
+  ∀ b e f, ((- Σ (i = b, e), f i) = Σ (i = b, e), (- f i))%F.
 Proof.
-intros.
+intros Hro *.
 unfold iter_seq.
 remember (S e - b) as len.
 clear e Heqlen.
@@ -77,7 +79,7 @@ rewrite List_seq_succ_r; cbn.
 rewrite fold_left_app; cbn.
 rewrite fold_left_app; cbn.
 rewrite <- IHlen.
-rewrite rngl_opp_add_distr.
+rewrite rngl_opp_add_distr; [ | easy ].
 unfold rngl_sub.
 now rewrite Hro.
 Qed.

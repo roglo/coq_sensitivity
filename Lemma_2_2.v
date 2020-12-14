@@ -550,7 +550,7 @@ destruct n. {
   rewrite Hin in H; cbn in H.
   rewrite Hde in H.
   rewrite Bool.orb_true_r in H.
-  apply H in Hμ.
+  apply (H eq_refl) in Hμ.
   now destruct Hμ.
 }
 cbn - [ Nat.pow ] in HV.
