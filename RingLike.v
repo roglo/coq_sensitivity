@@ -245,6 +245,16 @@ destruct rngl_has_inv. {
 }
 Qed.
 
+Theorem rngl_opt_mul_div_l :
+  if rngl_has_no_inv_but_div then ∀ a b : T, a ≠ 0%F → (a * b / a = b)%F
+  else True.
+Proof.
+clear Hro Hin Hid Hii.
+specialize rngl_opt_mul_div as H.
+destruct rngl_has_no_inv_but_div; [ | easy ].
+intros * Haz.
+...
+
 Theorem rngl_mul_reg_l : ∀ a b c,
   a ≠ 0%F
   → (a * b = a * c)%F
@@ -262,27 +272,21 @@ unfold rngl_div in H, rngl_mul_inv_r.
 do 2 rewrite <- rngl_mul_assoc in H.
 unfold rngl_div in rngl_mul_div.
 *)
-assert (H : (a * b / a = a * c / a)%F) by now rewrite Hbc.
+(*
 unfold rngl_div in H, rngl_mul_inv_r.
+*)
+assert (H1 : (¹/ a * (a * b) = ¹/ a * (a * c))%F) by now rewrite Hbc.
+assert (H2 : (a * b / a = a * c / a)%F) by now rewrite Hbc.
+unfold rngl_div in H2.
 destruct rngl_has_inv. {
-  destruct rngl_is_comm. {
-    do 2 rewrite (rngl_mul_comm a) in H.
-    do 2 rewrite <- rngl_mul_assoc in H.
-    rewrite (rngl_mul_comm a) in H.
-    rewrite rngl_mul_inv_l in H; [ | easy ].
-    now do 2 rewrite rngl_mul_1_r in H.
-  } {
-    cbn in rngl_mul_inv_r.
-(* ah, zut, je m'en sors pas si c'est pas commutatif *)
-(* or, ce théorème doit être vrai même si c'est pas commutatif *)
-(* faut peut-être revoir ring_like_prop *)
-...
-    rewrite rngl_mul_inv_r in H; [ | easy ].
-    now do 2 rewrite rngl_mul_1_r in H.
-  }
+  do 2 rewrite rngl_mul_assoc in H1.
+  rewrite rngl_mul_inv_l in H1; [ | easy ].
+  now do 2 rewrite rngl_mul_1_l in H1.
 } {
   destruct Hii as [Hii'| Hii']; [ easy | ].
   rewrite Hii' in rngl_mul_div.
+Search rngl_opt_div.
+...
   rewrite rngl_mul_div in H; [ | easy ].
   now rewrite rngl_mul_div in H.
 }
