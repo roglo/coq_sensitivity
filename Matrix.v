@@ -80,9 +80,6 @@ Section a.
 Context {T : Type}.
 Context (ro : ring_like_op T).
 Context {rp : ring_like_prop T}.
-(*
-Context {Hro : rngl_has_opp = true}.
-*)
 
 (* addition *)
 
@@ -338,14 +335,6 @@ Section a.
 Context {T : Type}.
 Context (ro : ring_like_op T).
 Context {rp : ring_like_prop T}.
-(*
-Context {Hro : rngl_has_opp = true}.
-Context {Hic : rngl_is_comm = true}.
-Context {Hde : rngl_has_dec_eq = true}.
-Context {Hin : rngl_has_inv = true}.
-Context {Hid : rngl_has_no_inv_but_div = true}.
-Context {Hii : rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true}.
-*)
 
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
@@ -671,9 +660,6 @@ Theorem vect_mul_scal_reg_r :
   → a = b.
 Proof.
 intros Hde Hii * Hvz Hab.
-(*
-clear Hro Hic Hin Hid.
-*)
 assert (Hiv : ∀ i, vect_el (a × V)%V i = vect_el (b × V)%V i). {
   intros i.
   now rewrite Hab.
