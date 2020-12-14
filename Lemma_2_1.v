@@ -27,13 +27,6 @@ Section a.
 Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
-(*
-Context {Hic : rngl_is_comm = true}.
-Context {Hdo : rngl_is_domain = true}.
-Context {Hin : rngl_has_inv = true}.
-Context {Hed : rngl_has_dec_eq = true}.
-Context {Hii : rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true}.
-*)
 
 Definition is_symm_mat (A : matrix T) :=
   ∀ i j, i < mat_nrows A → j < mat_nrows A →
@@ -49,9 +42,6 @@ Theorem princ_subm_1_preserves_symm : ∀ (A : matrix T) n,
   → is_symm_mat (princ_subm_1 A n).
 Proof.
 intros * Ha.
-(*
-clear Hin.
-*)
 unfold is_symm_mat in Ha |-*; cbn.
 intros i j Hi Hj.
 destruct (lt_dec i n) as [Hin| Hin]. {
@@ -149,30 +139,34 @@ Definition Rayleigh_quotient n (M : square_matrix n) (x : vector T) :=
 Arguments Rayleigh_quotient [n]%nat_scope M%SM x%V.
 
 Theorem RQ_mul_scal_prop :
-  rngl_has_dec_eq = true
-  → ∀ n (M : square_matrix n) x c,
+  rngl_is_comm = true →
+  rngl_has_dec_eq = true →
+  rngl_is_domain = true →
+  rngl_has_inv = true →
+  ∀ n (M : square_matrix n) x c,
   c ≠ 0%F
   → Rayleigh_quotient M (c × x) = Rayleigh_quotient M x.
 Proof.
-intros Hed * Hcz.
-(*
-clear Hii Hed.
-*)
+intros Hic Hed Hdo Hin * Hcz.
 unfold Rayleigh_quotient.
-Check rngl_has_dec_eq.
-Check rngl_opt_eq_dec.
-About vect_eq_dec.
-Arguments vect_eq_dec {T}%type {ro rp} _ n%nat U%V V%V.
 remember (vect_nrows x) as r eqn:Hr.
 destruct (vect_eq_dec Hed r x (vect_zero r)) as [Hxz| Hxz]. {
-...
+  easy.
+} {
+  easy.
+} {
+  subst x; cbn.
+  do 2 rewrite rngl_mul_0_l.
+  do 3 rewrite rngl_mul_0_r.
+  now rewrite rngl_mul_0_l.
+}
 rewrite <- squ_mat_mul_scal_vect_comm; [ | easy ].
 rewrite vect_dot_mul_scal_mul_comm; [ | easy ].
 rewrite vect_dot_mul_scal_mul_comm; [ | easy ].
 do 2 rewrite vect_scal_mul_dot_mul_comm.
 do 2 rewrite rngl_mul_assoc.
 unfold rngl_div.
-specialize (rngl_inv_mul Hin Hdo) as H1.
+specialize (rngl_inv_mul Hdo Hin) as H1.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
 specialize rngl_opt_is_integral as rngl_is_integral.
@@ -184,10 +178,8 @@ rewrite H1; cycle 1. {
   apply rngl_is_integral in H.
   now destruct H.
 } {
-Check vect_eq_dec.
 ...
 }
-...
 rewrite rngl_mul_assoc.
 rewrite rngl_mul_comm.
 do 2 rewrite rngl_mul_assoc.
