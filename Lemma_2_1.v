@@ -183,13 +183,13 @@ specialize rngl_opt_add_le_compat as rngl_add_le_compat.
 rewrite Hdo in rngl_is_integral.
 rewrite Hor in rngl_add_le_compat.
 unfold vect_dot_product.
-intros H; apply Hxz.
+intros H; apply Hxz; clear Hxz.
 apply vector_eq; [ easy | cbn ].
 intros i Hi.
 rewrite <- Hr in H, Hi.
 remember (vect_el x) as f.
 revert i Hi.
-clear Hr Hxz.
+clear Hr.
 induction r; intros; [ easy | ].
 rewrite Nat.sub_succ, Nat.sub_0_r in H.
 rewrite rngl_summation_split_last in H; [ | flia ].
