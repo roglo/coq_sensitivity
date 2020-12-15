@@ -304,28 +304,21 @@ Theorem Rayleigh_quotient_of_eigenvector :
   rngl_is_ordered = true →
   rngl_has_dec_le = true →
   ∀ n (M : square_matrix n) V μ,
-  (M • V)%SM = (μ × V)%V
+  V ≠ vect_zero (vect_nrows V)
+  → (M • V)%SM = (μ × V)%V
   → Rayleigh_quotient M V = μ.
 Proof.
-intros Hic Hop Hii Hdo Hor Hed * Hmv.
+intros Hic Hop Hii Hdo Hor Hdl * Hvz Hmv.
 unfold Rayleigh_quotient.
 rewrite Hmv.
 rewrite vect_dot_mul_scal_mul_comm; [ | easy ].
 apply rngl_mul_div_l; [ easy | ].
 intros H.
-apply eq_vect_squ_0 in H; try easy.
-...
-intros H.
-assert (Hvz : V = vect_zero (vect_nrows V)). {
-  apply vector_eq; [ easy | cbn ].
-  intros i Hi.
-  unfold vect_dot_product in H.
-...
-Search ((_ · _)%V = 0%F).
-Check rngl_opt_is_integral.
-Search vect_dot_product.
-Print vect_dot_product.
-Locate "·".
+now apply eq_vect_squ_0 in H.
+Qed.
+
+Inspect 1.
+
 ...
 
 (* min-max theorem, or variational theorem, or Courant–Fischer–Weyl min-max principle *)
