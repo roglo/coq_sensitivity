@@ -165,22 +165,22 @@ Definition is_ordered_field :=
   rngl_has_opp = true ∧
   rngl_has_dec_eq = true ∧
   rngl_has_dec_le = true ∧
-  rngl_is_domain = true ∧
+  rngl_is_integral = true ∧
   rngl_has_inv = true ∧
   rngl_is_ordered = true.
 
 Theorem eq_vect_squ_0 :
   rngl_has_opp = true →
   rngl_has_dec_le = true →
-  rngl_is_domain = true →
+  rngl_is_integral = true →
   rngl_is_ordered = true →
   ∀ x, (x · x)%V = 0%F → x = vect_zero (vect_nrows x).
 Proof.
 intros Hop Hed Hdo Hor * H.
 remember (vect_nrows x) as r eqn:Hr.
-specialize rngl_opt_is_integral as rngl_is_integral.
+specialize rngl_opt_integral as rngl_integral.
 specialize rngl_opt_add_le_compat as rngl_add_le_compat.
-rewrite Hdo in rngl_is_integral.
+rewrite Hdo in rngl_integral.
 rewrite Hor in rngl_add_le_compat.
 unfold vect_dot_product in H.
 apply vector_eq; [ easy | cbn ].
@@ -195,7 +195,7 @@ rewrite rngl_summation_split_last in H; [ | flia ].
 destruct r. {
   cbn in H.
   rewrite rngl_add_0_l in H.
-  specialize (rngl_is_integral _ _ H) as H1.
+  specialize (rngl_integral _ _ H) as H1.
   apply Nat.lt_1_r in Hi; subst i.
   now destruct H1.
 }
@@ -227,7 +227,7 @@ apply rngl_eq_add_0 in H; [ | easy | | ]; cycle 1. {
   now apply rngl_0_le_squ.
 }
 destruct H as (H1, H2).
-specialize (rngl_is_integral _ _ H2) as H3.
+specialize (rngl_integral _ _ H2) as H3.
 destruct (Nat.eq_dec i (S r)) as [Hisr| Hisr]; [ now subst i; destruct H3 | ].
 apply IHr; [ | flia Hi Hisr ].
 now rewrite Nat.sub_succ, Nat.sub_0_r.
@@ -261,7 +261,7 @@ unfold rngl_div.
 specialize (rngl_inv_mul Hdo Hin) as H1.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
-specialize rngl_opt_is_integral as rngl_is_integral.
+specialize rngl_opt_integral as rngl_integral.
 specialize rngl_opt_add_le_compat as rngl_add_le_compat.
 specialize rngl_opt_mul_le_compat_nonneg as rngl_mul_le_compat_nonneg.
 specialize rngl_opt_mul_le_compat_nonpos as rngl_mul_le_compat_nonpos.
@@ -270,7 +270,7 @@ specialize rngl_opt_le_refl as rngl_le_refl.
 specialize rngl_opt_le_dec as rngl_le_dec.
 rewrite Hic in rngl_mul_comm.
 rewrite Hin in rngl_mul_inv_l |-*.
-rewrite Hdo in rngl_is_integral.
+rewrite Hdo in rngl_integral.
 rewrite Hor in rngl_le_refl.
 rewrite Hor in rngl_add_le_compat.
 rewrite Hor, Hop in rngl_mul_le_compat_nonneg.
@@ -280,7 +280,7 @@ rewrite Hld in rngl_le_dec.
 cbn in rngl_mul_le_compat_nonneg, rngl_mul_le_compat_nonpos.
 rewrite H1; cycle 1. {
   intros H; apply Hcz.
-  apply rngl_is_integral in H.
+  apply rngl_integral in H.
   now destruct H.
 } {
   subst r.
@@ -292,17 +292,17 @@ rewrite rngl_mul_comm.
 do 2 rewrite rngl_mul_assoc.
 rewrite rngl_mul_inv_l; [ now rewrite rngl_mul_1_l | ].
 intros H; apply Hcz.
-apply rngl_is_integral in H.
+apply rngl_integral in H.
 now destruct H.
 Qed.
 
 Theorem Rayleigh_quotient_of_eigenvector :
   rngl_is_comm = true →
   rngl_has_opp = true →
-  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
-  rngl_is_domain = true →
-  rngl_is_ordered = true →
   rngl_has_dec_le = true →
+  rngl_is_integral = true →
+  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  rngl_is_ordered = true →
   ∀ n (M : square_matrix n) V μ,
   V ≠ vect_zero (vect_nrows V)
   → (M • V)%SM = (μ × V)%V

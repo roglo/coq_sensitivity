@@ -94,7 +94,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_is_comm : bool;
     rngl_has_dec_eq : bool;
     rngl_has_dec_le : bool;
-    rngl_is_domain : bool;
+    rngl_is_integral : bool;
     rngl_characteristic : nat;
     rngl_add_comm : ∀ a b : T, (a + b = b + a)%F;
     rngl_add_assoc : ∀ a b c : T, (a + (b + c) = (a + b) + c)%F;
@@ -145,8 +145,8 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_opt_le_dec :
       if rngl_has_dec_le then ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%F else True;
     (* when has_no_zero_divisors *)
-    rngl_opt_is_integral :
-      if rngl_is_domain then
+    rngl_opt_integral :
+      if rngl_is_integral then
         ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
       else True;
     (* characteristic *)
@@ -526,14 +526,14 @@ now apply rngl_opp_involutive.
 Qed.
 
 Theorem rngl_integral :
-  (rngl_is_domain || (rngl_has_inv && rngl_has_dec_eq))%bool = true →
+  (rngl_is_integral || (rngl_has_inv && rngl_has_dec_eq))%bool = true →
   ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F.
 Proof.
 intros Hdo * Hab.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
 specialize rngl_opt_eq_dec as rngl_eq_dec.
-specialize rngl_opt_is_integral as rngl_integral.
-destruct rngl_is_domain; [ now apply rngl_integral | ].
+specialize rngl_opt_integral as rngl_integral.
+destruct rngl_is_integral; [ now apply rngl_integral | ].
 destruct rngl_has_inv; [ | easy ].
 destruct rngl_has_dec_eq; [ | easy ].
 cbn; clear rngl_integral.
@@ -548,7 +548,7 @@ now right.
 Qed.
 
 Theorem rngl_inv_mul :
-  rngl_is_domain = true →
+  rngl_is_integral = true →
   rngl_has_inv = true →
   ∀ a b, a ≠ 0%F → b ≠ 0%F →(¹/ (a * b) = ¹/ b * ¹/ a)%F.
 Proof.
