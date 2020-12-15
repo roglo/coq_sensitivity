@@ -169,6 +169,7 @@ Definition is_ordered_field :=
   rngl_has_inv = true ∧
   rngl_is_ordered = true.
 
+(* à revoir avec égalités au lieu d'inégalités *)
 Theorem vect_squ_neq_0 :
   rngl_has_opp = true →
   rngl_has_dec_le = true →
