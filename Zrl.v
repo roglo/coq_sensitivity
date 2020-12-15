@@ -77,12 +77,11 @@ Qed.
 Theorem Z_not_le : ∀ a b, ¬ (a ≤ b)%Z → a = b ∨ (b ≤ a)%Z.
 Proof.
 intros * Hab.
-...
-destruct (Q.eq_dec a b) as [Heab| Heab]; [ now left | right ].
-apply Q.nle_gt in Hab.
-apply Q.nlt_ge; intros Hba.
+destruct (Z.eq_dec a b) as [Heab| Heab]; [ now left | right ].
+apply Z.nle_gt in Hab.
+apply Z.nlt_ge; intros Hba.
 apply Heab.
-now apply Q.le_antisymm; apply Q.lt_le_incl.
+now apply Z.le_antisymm; apply Z.lt_le_incl.
 Qed.
 
 Definition Z_ring_like_prop : ring_like_prop Z :=

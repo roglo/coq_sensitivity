@@ -50,6 +50,16 @@ intros * Hac Hbd.
 now apply Nat.mul_le_mono.
 Qed.
 
+Theorem Nat_not_le : ∀ a b, ¬ a ≤ b → a = b ∨ b ≤ a.
+Proof.
+intros * Hab.
+destruct (Nat.eq_dec a b) as [Heab| Heab]; [ now left | right ].
+apply Nat.nle_gt in Hab.
+apply Nat.nlt_ge; intros Hba.
+apply Heab.
+now apply Nat.le_antisymm; apply Nat.lt_le_incl.
+Qed.
+
 Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
   {| rngl_is_comm := true;
      rngl_has_dec_eq := true;
@@ -84,7 +94,8 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_add_le_compat := Nat.add_le_mono;
      rngl_opt_mul_le_compat_nonneg := I;
      rngl_opt_mul_le_compat_nonpos := I;
-     rngl_opt_mul_le_compat := Nat_mul_le_compat |}.
+     rngl_opt_mul_le_compat := Nat_mul_le_compat;
+     rngl_opt_not_le := Nat_not_le |}.
 
 (*
 Print nat_ring_like_op.
@@ -449,7 +460,8 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_opt_add_le_compat := I;
      rngl_opt_mul_le_compat_nonneg := I;
      rngl_opt_mul_le_compat_nonpos := I;
-     rngl_opt_mul_le_compat := I |}.
+     rngl_opt_mul_le_compat := I;
+     rngl_opt_not_le := I |}.
 
 End a.
 

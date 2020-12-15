@@ -138,19 +138,61 @@ Definition Rayleigh_quotient n (M : square_matrix n) (x : vector T) :=
 
 Arguments Rayleigh_quotient [n]%nat_scope M%SM x%V.
 
-Theorem RQ_mul_scal_prop :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_dec_eq = true →
+Theorem rngl_0_le_squ :
   rngl_has_dec_le = true →
-  rngl_is_domain = true →
-  rngl_has_inv = true →
+  rngl_has_opp = true →
   rngl_is_ordered = true →
+  ∀ n, (0 ≤ n * n)%F.
+Proof.
+intros Hld Hop Hor *.
+specialize rngl_opt_le_dec as rngl_le_dec.
+specialize rngl_opt_le_refl as rngl_le_refl.
+specialize rngl_opt_mul_le_compat_nonneg as rngl_mul_le_compat_nonneg.
+specialize rngl_opt_mul_le_compat_nonpos as rngl_mul_le_compat_nonpos.
+specialize rngl_opt_not_le as rngl_not_le.
+rewrite Hld in rngl_le_dec.
+rewrite Hor in rngl_le_refl.
+rewrite Hor, Hop in rngl_mul_le_compat_nonneg.
+rewrite Hor, Hop in rngl_mul_le_compat_nonpos.
+rewrite <- (rngl_mul_0_r 0).
+rewrite Hor in rngl_not_le.
+destruct (rngl_le_dec 0%F n) as [Hnz| Hnz]. {
+  apply rngl_mul_le_compat_nonneg. {
+    split; [ now apply rngl_le_refl | easy ].
+  } {
+    split; [ now apply rngl_le_refl | easy ].
+  }
+} {
+  apply rngl_mul_le_compat_nonpos. {
+    split; [ | now apply rngl_le_refl ].
+    apply rngl_not_le in Hnz.
+    destruct Hnz as [Hnz| Hnz]; [ | easy ].
+    rewrite <- Hnz; apply rngl_le_refl.
+  } {
+    split; [ | now apply rngl_le_refl ].
+    apply rngl_not_le in Hnz.
+    destruct Hnz as [Hnz| Hnz]; [ | easy ].
+    rewrite <- Hnz; apply rngl_le_refl.
+  }
+}
+Qed.
+
+Definition is_ordered_field :=
+  rngl_is_comm = true ∧
+  rngl_has_opp = true ∧
+  rngl_has_dec_eq = true ∧
+  rngl_has_dec_le = true ∧
+  rngl_is_domain = true ∧
+  rngl_has_inv = true ∧
+  rngl_is_ordered = true.
+
+Theorem RQ_mul_scal_prop :
+  is_ordered_field →
   ∀ n (M : square_matrix n) x c,
   c ≠ 0%F
   → Rayleigh_quotient M (c × x) = Rayleigh_quotient M x.
 Proof.
-intros Hic Hop Hed Hld Hdo Hin Hor * Hcz.
+intros (Hic & Hop & Hed & Hld & Hdo & Hin & Hor) * Hcz.
 unfold Rayleigh_quotient.
 remember (vect_nrows x) as r eqn:Hr.
 destruct (vect_eq_dec Hed r x (vect_zero r)) as [Hxz| Hxz]. {
@@ -173,16 +215,20 @@ specialize (rngl_inv_mul Hdo Hin) as H1.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
 specialize rngl_opt_is_integral as rngl_is_integral.
+specialize rngl_opt_add_le_compat as rngl_add_le_compat.
 specialize rngl_opt_mul_le_compat_nonneg as rngl_mul_le_compat_nonneg.
 specialize rngl_opt_mul_le_compat_nonpos as rngl_mul_le_compat_nonpos.
+specialize rngl_opt_not_le as rngl_not_le.
 specialize rngl_opt_le_refl as rngl_le_refl.
 specialize rngl_opt_le_dec as rngl_le_dec.
 rewrite Hic in rngl_mul_comm.
 rewrite Hin in rngl_mul_inv_l |-*.
 rewrite Hdo in rngl_is_integral.
 rewrite Hor in rngl_le_refl.
+rewrite Hor in rngl_add_le_compat.
 rewrite Hor, Hop in rngl_mul_le_compat_nonneg.
 rewrite Hor, Hop in rngl_mul_le_compat_nonpos.
+rewrite Hor in rngl_not_le.
 rewrite Hld in rngl_le_dec.
 cbn in rngl_mul_le_compat_nonneg, rngl_mul_le_compat_nonpos.
 rewrite H1; cycle 1. {
@@ -215,36 +261,42 @@ rewrite H1; cycle 1. {
     now rewrite Nat.add_comm, Nat.add_sub.
   }
   cbn - [ iter_seq ] in H.
-  apply rngl_eq_add_0 in H; [ | easy | | ]; cycle 2. {
-    rewrite <- (rngl_mul_0_r 0).
-    destruct (rngl_le_dec 0%F (f (S r))) as [Hrz| Hrz]. {
-      apply rngl_mul_le_compat_nonneg. {
-        split; [ now apply rngl_le_refl | easy ].
-      } {
-        split; [ now apply rngl_le_refl | easy ].
-      }
-    } {
-      apply rngl_mul_le_compat_nonpos. {
-        split; [ | now apply rngl_le_refl ].
-...
-      } {
-        split; [ now apply rngl_le_refl | easy ].
-      }
-...
-... suite ok
+  apply rngl_eq_add_0 in H; [ | easy | | ]; cycle 1. {
+    clear H IHr Hi.
+    induction r. {
+      cbn; rewrite rngl_add_0_l.
+      now apply rngl_0_le_squ.
+    }
+    rewrite rngl_summation_split_last; [ | flia ].
+    rewrite rngl_summation_shift; [ | flia ].
+    rewrite Nat.sub_succ, Nat.sub_0_r.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros j Hj.
+      now rewrite Nat.add_comm, Nat.add_sub.
+    }
+    cbn - [ iter_seq ].
+    rewrite <- (rngl_add_0_r 0%F) at 1.
+    apply rngl_add_le_compat; [ easy | ].
+    now apply rngl_0_le_squ.
+  } {
+    now apply rngl_0_le_squ.
+  }
   destruct H as (H1, H2).
   specialize (rngl_is_integral _ _ H2) as H3.
-  destruct (Nat.eq_dec i (S r)) as [Hisr| Hisr]; [ | subst i; destruct H3 ].
+  destruct (Nat.eq_dec i (S r)) as [Hisr| Hisr]; [ now subst i; destruct H3 | ].
   apply IHr; [ | flia Hi Hisr ].
   now rewrite Nat.sub_succ, Nat.sub_0_r.
-...
 }
 rewrite rngl_mul_assoc.
 rewrite rngl_mul_comm.
 do 2 rewrite rngl_mul_assoc.
-rewrite rngl_mul_inv_l.
-now rewrite rngl_mul_1_l.
-...
+rewrite rngl_mul_inv_l; [ now rewrite rngl_mul_1_l | ].
+intros H; apply Hcz.
+apply rngl_is_integral in H.
+now destruct H.
+Qed.
+
+Inspect 1.
 
 (* min-max theorem, or variational theorem, or Courant–Fischer–Weyl min-max principle *)
 
