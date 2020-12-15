@@ -810,6 +810,17 @@ destruct x as [| px| px].
 Qed.
 Arguments le_lt_dec x%Q y%Q.
 
+Theorem le_dec : ∀ x y : Q, {(x ≤ y)%Q} + {¬ (x ≤ y)%Q}.
+Proof.
+destruct x as [| px| px].
+-destruct y as [| py| py]; [ now left | now left | now right ].
+-destruct y as [| py| py]; [ now right | simpl | now right ].
+ apply GQle_dec.
+-destruct y as [| py| py]; [ now left | now left | ].
+ apply GQle_dec.
+Qed.
+Arguments le_dec x%Q y%Q.
+
 (** * Miscellaneous Properties *)
 
 Theorem sub_0_l : ∀ x, (0 - x = - x)%Q.

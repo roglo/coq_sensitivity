@@ -59,6 +59,7 @@ Qed.
 Definition Q_ring_like_prop :=
   {| rngl_is_comm := true;
      rngl_has_dec_eq := true;
+     rngl_has_dec_le := true;
      rngl_is_domain := false;
      rngl_characteristic := 0;
      rngl_add_comm := Q.add_comm;
@@ -80,6 +81,7 @@ Definition Q_ring_like_prop :=
      rngl_opt_mul_div_l := I;
      rngl_opt_mul_div_r := I;
      rngl_opt_eq_dec := Q.eq_dec;
+     rngl_opt_le_dec := Q.le_dec;
      rngl_opt_is_integral := I;
      rngl_characteristic_prop := Q_characteristic_prop;
      rngl_opt_le_refl := Q.le_refl;

@@ -292,6 +292,17 @@ destruct (le_dec ((nn xn + 1) * (nn yd + 1)) ((nn yn + 1) * (nn xd + 1)))
 Qed.
 Arguments PQle_lt_dec x%PQ y%PQ.
 
+Theorem PQle_dec : ∀ x y : PQ, {(x ≤ y)%PQ} + {¬ (x ≤ y)%PQ}.
+Proof.
+intros (xn, xd) (yn, yd).
+unfold PQlt, PQle, nd; simpl.
+destruct (le_dec ((nn xn + 1) * (nn yd + 1)) ((nn yn + 1) * (nn xd + 1)))
+  as [H1| H1].
+-now left.
+-now right.
+Qed.
+Arguments PQle_dec x%PQ y%PQ.
+
 Ltac split_var x :=
   let xn := fresh x in
   let xd := fresh x in

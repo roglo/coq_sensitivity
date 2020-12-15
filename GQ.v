@@ -452,6 +452,9 @@ Proof. intros; apply PQlt_le_dec. Qed.
 Theorem GQle_lt_dec : ∀ a b, {(a ≤ b)%GQ} + {(b < a)%GQ}.
 Proof. intros; apply PQle_lt_dec. Qed.
 
+Theorem GQle_dec : ∀ a b, {(a ≤ b)%GQ} + {¬ (a ≤ b)%GQ}.
+Proof. intros; apply PQle_dec. Qed.
+
 Theorem GQlt_irrefl : ∀ x, ¬ (x < x)%GQ.
 Proof. intros; apply PQlt_irrefl. Qed.
 

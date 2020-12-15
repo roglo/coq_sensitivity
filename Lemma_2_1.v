@@ -141,6 +141,7 @@ Arguments Rayleigh_quotient [n]%nat_scope M%SM x%V.
 Theorem RQ_mul_scal_prop :
   rngl_is_comm = true →
   rngl_has_dec_eq = true →
+  rngl_has_dec_le = true →
   rngl_is_domain = true →
   rngl_has_inv = true →
   rngl_is_ordered = true →
@@ -148,7 +149,7 @@ Theorem RQ_mul_scal_prop :
   c ≠ 0%F
   → Rayleigh_quotient M (c × x) = Rayleigh_quotient M x.
 Proof.
-intros Hic Hed Hdo Hin Hor * Hcz.
+intros Hic Hed Hld Hdo Hin Hor * Hcz.
 unfold Rayleigh_quotient.
 remember (vect_nrows x) as r eqn:Hr.
 destruct (vect_eq_dec Hed r x (vect_zero r)) as [Hxz| Hxz]. {
@@ -173,10 +174,12 @@ specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
 specialize rngl_opt_is_integral as rngl_is_integral.
 specialize rngl_opt_mul_le_compat as rngl_mul_le_compat.
 specialize rngl_opt_le_refl as rngl_le_refl.
+specialize rngl_opt_le_dec as rngl_le_dec.
 rewrite Hic in rngl_mul_comm.
 rewrite Hin in rngl_mul_inv_l |-*.
 rewrite Hdo in rngl_is_integral.
 rewrite Hor in rngl_mul_le_compat, rngl_le_refl.
+rewrite Hld in rngl_le_dec.
 rewrite H1; cycle 1. {
   intros H; apply Hcz.
   apply rngl_is_integral in H.
@@ -188,9 +191,6 @@ rewrite H1; cycle 1. {
   intros i Hi.
   rewrite <- Hr in H, Hi.
   remember (vect_el x) as f.
-(*
-  clear - ro rp Hor rngl_mul_le_compat rngl_is_integral rngl_le_refl H Hi.
-*)
   revert i Hi.
   clear Hr Hxz H1.
   induction r; intros; [ easy | ].
@@ -211,9 +211,14 @@ rewrite H1; cycle 1. {
   }
   cbn - [ iter_seq ] in H.
   apply rngl_eq_add_0 in H; [ | easy | | ]; cycle 2. {
-    rewrite <- (rngl_mul_0_r 0).
-    apply rngl_mul_le_compat.
-    split; [ apply rngl_le_refl | ].
+    destruct (rngl_le_dec 0%F (f (S r))) as [Hrz| Hrz]. {
+      rewrite <- (rngl_mul_0_r 0).
+      apply rngl_mul_le_compat. {
+        split; [ now apply rngl_le_refl | easy ].
+      } {
+        split; [ now apply rngl_le_refl | easy ].
+      }
+    } {
 ...
 ... suite ok
   destruct H as (H1, H2).

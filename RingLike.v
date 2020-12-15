@@ -93,6 +93,7 @@ Fixpoint rngl_of_nat {T} {ro : ring_like_op T} n :=
 Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_is_comm : bool;
     rngl_has_dec_eq : bool;
+    rngl_has_dec_le : bool;
     rngl_is_domain : bool;
     rngl_characteristic : nat;
     rngl_add_comm : ∀ a b : T, (a + b = b + a)%F;
@@ -140,6 +141,9 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* when equality is decidable *)
     rngl_opt_eq_dec :
       if rngl_has_dec_eq then ∀ a b : T, {a = b} + {a ≠ b} else True;
+    (* when le comparison is decidable *)
+    rngl_opt_le_dec :
+      if rngl_has_dec_le then ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%F else True;
     (* when has_no_zero_divisors *)
     rngl_opt_is_integral :
       if rngl_is_domain then

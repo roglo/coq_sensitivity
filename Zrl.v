@@ -70,6 +70,7 @@ Qed.
 Definition Z_ring_like_prop : ring_like_prop Z :=
   {| rngl_is_comm := true;
      rngl_has_dec_eq := true;
+     rngl_has_dec_le := true;
      rngl_is_domain := true;
      rngl_characteristic := 0;
      rngl_add_comm := Z.add_comm;
@@ -91,6 +92,7 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_opt_mul_div_l := Z_mul_div_l;
      rngl_opt_mul_div_r := I;
      rngl_opt_eq_dec := Z.eq_dec;
+     rngl_opt_le_dec := Z_le_dec;
      rngl_opt_is_integral := Z_eq_mul_0;
      rngl_characteristic_prop := Z_characteristic_prop;
      rngl_opt_le_refl := Z.le_refl;
