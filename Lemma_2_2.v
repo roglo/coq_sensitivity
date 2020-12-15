@@ -666,6 +666,7 @@ split. {
   split. 2: {
     now apply A_n_eigen_formula_for_sqrt_n with (U := base_vector_1 42).
   }
+  (* V ≠ vect_zero (2 ^ n) *)
   rewrite Hv; cbn.
   unfold A_n_eigenvector_of_sqrt_n; cbn.
   destruct n. {
