@@ -169,7 +169,6 @@ Definition is_ordered_field :=
   rngl_has_inv = true ∧
   rngl_is_ordered = true.
 
-(* à revoir avec égalités au lieu d'inégalités *)
 Theorem vect_squ_neq_0 :
   rngl_has_opp = true →
   rngl_has_dec_le = true →
@@ -178,13 +177,14 @@ Theorem vect_squ_neq_0 :
   ∀ x, x ≠ vect_zero (vect_nrows x) → (x · x)%V ≠ 0%F.
 Proof.
 intros Hop Hed Hdo Hor * Hxz.
+intros H.
 remember (vect_nrows x) as r eqn:Hr.
 specialize rngl_opt_is_integral as rngl_is_integral.
 specialize rngl_opt_add_le_compat as rngl_add_le_compat.
 rewrite Hdo in rngl_is_integral.
 rewrite Hor in rngl_add_le_compat.
-unfold vect_dot_product.
-intros H; apply Hxz; clear Hxz.
+unfold vect_dot_product in H.
+apply Hxz; clear Hxz.
 apply vector_eq; [ easy | cbn ].
 intros i Hi.
 rewrite <- Hr in H, Hi.
