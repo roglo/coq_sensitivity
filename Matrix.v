@@ -1379,7 +1379,10 @@ Definition squ_mat_ring_like_prop (n : nat) :
      rngl_opt_eq_dec := @squ_mat_opt_eq_dec n;
      rngl_opt_is_integral := I;
      rngl_characteristic_prop := @squ_mat_characteristic_prop n;
-     rngl_opt_le_antisymm := I |}.
+     rngl_opt_le_refl := I;
+     rngl_opt_le_antisymm := I;
+     rngl_opt_le_trans := I;
+     rngl_opt_add_le_compat := I |}.
 
 Theorem squ_mat_mul_scal_vect_comm :
   rngl_is_comm = true →

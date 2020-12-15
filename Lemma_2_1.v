@@ -138,46 +138,17 @@ Definition Rayleigh_quotient n (M : square_matrix n) (x : vector T) :=
 
 Arguments Rayleigh_quotient [n]%nat_scope M%SM x%V.
 
-Theorem rngl_eq_add_0 : ∀ a b, (0 ≤ a → 0 ≤ b → a + b = 0 → a = 0 ∧ b = 0)%F.
-Proof.
-intros * Haz Hbz Hab.
-specialize rngl_opt_le_antisymm as rngl_le_antisymm.
-destruct rngl_is_ordered. {
-  split. {
-    apply rngl_le_antisymm in Haz; [ easy | ].
-    rewrite <- (rngl_add_0_r a).
-    rewrite <- Hab at 2.
-...
-Require Import ZArith.
-Search (_ + _ <= _ + _)%Z.
-...
-Z.add_le_mono: ∀ n m p q : Z, (n <= m)%Z → (p <= q)%Z → (n + p <= m + q)%Z
-Z.add_le_mono_l
-     : ∀ n m p : Z, (n <= m)%Z ↔ (p + n <= p + m)%Z
-...
-Check Z.add_le_mono_l.
-Search (_ → _ <= _ + _)%Z.
-...
-intros * Haz Hbz Hab.
-apply rngl_add_move_0_r in Hab.
-rewrite Hab in Haz.
-specialize rngl_opt_le_antisymm as rngl_le_antisymm.
-destruct rngl_is_ordered. {
-  apply rngl_le_antisymm in Hbz. 2: {
-Require Import ZArith.
-Search (_ ≤ _ - _)%Z.
-...
-
 Theorem RQ_mul_scal_prop :
   rngl_is_comm = true →
   rngl_has_dec_eq = true →
   rngl_is_domain = true →
   rngl_has_inv = true →
+  rngl_is_ordered = true →
   ∀ n (M : square_matrix n) x c,
   c ≠ 0%F
   → Rayleigh_quotient M (c × x) = Rayleigh_quotient M x.
 Proof.
-intros Hic Hed Hdo Hin * Hcz.
+intros Hic Hed Hdo Hin Hor * Hcz.
 unfold Rayleigh_quotient.
 remember (vect_nrows x) as r eqn:Hr.
 destruct (vect_eq_dec Hed r x (vect_zero r)) as [Hxz| Hxz]. {
@@ -214,7 +185,7 @@ rewrite H1; cycle 1. {
   intros i Hi.
   rewrite <- Hr in H, Hi.
   remember (vect_el x) as f.
-  clear - ro rp rngl_is_integral H Hi.
+  clear - ro rp Hor rngl_is_integral H Hi.
   revert i Hi.
   induction r; intros; [ easy | ].
   rewrite Nat.sub_succ, Nat.sub_0_r in H.
@@ -233,16 +204,14 @@ rewrite H1; cycle 1. {
     now rewrite Nat.add_comm, Nat.add_sub.
   }
   cbn - [ iter_seq ] in H.
+  apply rngl_eq_add_0 in H; [ | easy | | ]; cycle 1. {
 ...
-  apply rngl_eq_add_0 in H. {
-    destruct H as (H1, H2).
-    specialize (rngl_is_integral _ _ H2) as H3.
-    destruct (Nat.eq_dec i (S r)) as [Hisr| Hisr]. {
-      now subst i; destruct H3.
-    }
-    apply IHr; [ | flia Hi Hisr ].
-    now rewrite Nat.sub_succ, Nat.sub_0_r.
-  }
+... suite ok
+  destruct H as (H1, H2).
+  specialize (rngl_is_integral _ _ H2) as H3.
+  destruct (Nat.eq_dec i (S r)) as [Hisr| Hisr]; [ | subst i; destruct H3 ].
+  apply IHr; [ | flia Hi Hisr ].
+  now rewrite Nat.sub_succ, Nat.sub_0_r.
 ...
 }
 rewrite rngl_mul_assoc.

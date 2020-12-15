@@ -69,7 +69,10 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_eq_dec := Nat.eq_dec;
      rngl_opt_is_integral := Nat_eq_mul_0;
      rngl_characteristic_prop := nat_characteristic_prop;
-     rngl_opt_le_antisymm := Nat.le_antisymm |}.
+     rngl_opt_le_refl := Nat.le_refl;
+     rngl_opt_le_antisymm := Nat.le_antisymm;
+     rngl_opt_le_trans := Nat.le_trans;
+     rngl_opt_add_le_compat := Nat.add_le_mono |}.
 
 (*
 Print nat_ring_like_op.
@@ -426,7 +429,10 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_opt_eq_dec := Zn_eq_dec;
      rngl_opt_is_integral := I;
      rngl_characteristic_prop := Zn_characteristic_prop;
-     rngl_opt_le_antisymm := I |}.
+     rngl_opt_le_refl := I;
+     rngl_opt_le_antisymm := I;
+     rngl_opt_le_trans := I;
+     rngl_opt_add_le_compat := I |}.
 
 End a.
 
@@ -435,4 +441,3 @@ End a.
 Compute (let n := 6 in let ro := Zn_ring_like_op n in proj1_sig (Zn_of_nat n 3 * Zn_of_nat n 2 / Zn_of_nat n 2)%F).
 Compute (let n := 7 in let ro := Zn_ring_like_op n in proj1_sig (Zn_of_nat n 3 * Zn_of_nat n 2 / Zn_of_nat n 2)%F).
 *)
-

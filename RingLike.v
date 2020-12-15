@@ -152,8 +152,15 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       | n => rngl_of_nat n = 0%F
       end;
     (* when ordered *)
+    rngl_opt_le_refl :
+      if rngl_is_ordered then ∀ a, (a ≤ a)%F else True;
     rngl_opt_le_antisymm :
-      if rngl_is_ordered then ∀ a b, (a ≤ b → b ≤ a → a = b)%F else True }.
+      if rngl_is_ordered then ∀ a b, (a ≤ b → b ≤ a → a = b)%F else True;
+    rngl_opt_le_trans :
+      if rngl_is_ordered then ∀ a b c, (a ≤ b → b ≤ c → a ≤ c)%F else True;
+    rngl_opt_add_le_compat :
+      if rngl_is_ordered then ∀ a b c d, (a ≤ b → c ≤ d → a + c ≤ b + d)%F
+      else True }.
 
 Fixpoint rngl_power {T} {R : ring_like_op T} a n :=
   match n with
@@ -548,6 +555,30 @@ rewrite <- (rngl_mul_assoc a).
 rewrite H2; [ | easy ].
 rewrite rngl_mul_1_r.
 now rewrite H2.
+Qed.
+
+Theorem rngl_eq_add_0 :
+  rngl_is_ordered = true →
+  ∀ a b, (0 ≤ a → 0 ≤ b → a + b = 0 → a = 0 ∧ b = 0)%F.
+Proof.
+intros Hor * Haz Hbz Hab.
+specialize rngl_opt_le_refl as rngl_le_refl.
+specialize rngl_opt_le_antisymm as rngl_le_antisymm.
+specialize rngl_opt_add_le_compat as rngl_add_le_compat.
+rewrite Hor in rngl_le_refl, rngl_le_antisymm, rngl_add_le_compat.
+split. {
+  apply rngl_le_antisymm in Haz; [ easy | ].
+  rewrite <- Hab.
+  remember (a + b)%F as ab.
+  rewrite <- (rngl_add_0_r a); subst ab.
+  apply rngl_add_le_compat; [ apply rngl_le_refl | easy ].
+} {
+  apply rngl_le_antisymm in Hbz; [ easy | ].
+  rewrite <- Hab.
+  remember (a + b)%F as ab.
+  rewrite <- (rngl_add_0_l b); subst ab.
+  apply rngl_add_le_compat; [ easy | apply rngl_le_refl ].
+}
 Qed.
 
 End a.
