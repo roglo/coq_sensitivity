@@ -296,11 +296,41 @@ apply rngl_is_integral in H.
 now destruct H.
 Qed.
 
-Theorem Rayleigh_quotient_of_eigenvector : ∀ n (M : square_matrix n) V μ,
+Theorem Rayleigh_quotient_of_eigenvector :
+  rngl_is_comm = true →
+  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  ∀ n (M : square_matrix n) V μ,
   (M • V)%SM = (μ × V)%V
   → Rayleigh_quotient M V = μ.
 Proof.
-intros.
+intros Hic Hii * Hmv.
+unfold Rayleigh_quotient.
+rewrite Hmv.
+rewrite vect_dot_mul_scal_mul_comm; [ | easy ].
+assert (H : ∀ a b : T, b ≠ 0%F → (a * b / b)%F = a). {
+  intros a b Hbz.
+  specialize rngl_opt_mul_div_l as rngl_mul_div_l.
+  specialize rngl_opt_mul_comm as rngl_mul_comm.
+  specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
+  rewrite Hic in rngl_mul_comm.
+  unfold rngl_div in rngl_mul_div_l |-*.
+  destruct rngl_has_inv. {
+    rewrite <- rngl_mul_assoc.
+    rewrite (rngl_mul_comm b).
+    rewrite rngl_mul_inv_l; [ | easy ].
+    apply rngl_mul_1_r.
+  }
+  destruct Hii as [Hii| Hii]; [ easy | ].
+  rewrite Hii in rngl_mul_div_l.
+  rewrite rngl_mul_comm.
+  now apply rngl_mul_div_l.
+}
+apply H.
+Search ((_ · _)%V = 0%F).
+Check rngl_opt_is_integral.
+Search vect_dot_product.
+Print vect_dot_product.
+Locate "·".
 ...
 
 (* min-max theorem, or variational theorem, or Courant–Fischer–Weyl min-max principle *)
