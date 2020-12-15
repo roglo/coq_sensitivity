@@ -296,7 +296,12 @@ apply rngl_is_integral in H.
 now destruct H.
 Qed.
 
-Inspect 1.
+Theorem Rayleigh_quotient_of_eigenvector : ∀ n (M : square_matrix n) V μ,
+  (M • V)%SM = (μ × V)%V
+  → Rayleigh_quotient M V = μ.
+Proof.
+intros.
+...
 
 (* min-max theorem, or variational theorem, or Courant–Fischer–Weyl min-max principle *)
 
