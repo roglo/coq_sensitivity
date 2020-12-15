@@ -169,15 +169,14 @@ Definition is_ordered_field :=
   rngl_has_inv = true ∧
   rngl_is_ordered = true.
 
-Theorem vect_squ_neq_0 :
+Theorem eq_vect_squ_0 :
   rngl_has_opp = true →
   rngl_has_dec_le = true →
   rngl_is_domain = true →
   rngl_is_ordered = true →
-  ∀ x, x ≠ vect_zero (vect_nrows x) → (x · x)%V ≠ 0%F.
+  ∀ x, (x · x)%V = 0%F → x = vect_zero (vect_nrows x).
 Proof.
-intros Hop Hed Hdo Hor * Hxz.
-intros H; apply Hxz; clear Hxz.
+intros Hop Hed Hdo Hor * H.
 remember (vect_nrows x) as r eqn:Hr.
 specialize rngl_opt_is_integral as rngl_is_integral.
 specialize rngl_opt_add_le_compat as rngl_add_le_compat.
@@ -284,7 +283,9 @@ rewrite H1; cycle 1. {
   apply rngl_is_integral in H.
   now destruct H.
 } {
-  now subst r; apply vect_squ_neq_0.
+  subst r.
+  intros H; apply Hxz.
+  now apply eq_vect_squ_0.
 }
 rewrite rngl_mul_assoc.
 rewrite rngl_mul_comm.
@@ -311,7 +312,8 @@ unfold Rayleigh_quotient.
 rewrite Hmv.
 rewrite vect_dot_mul_scal_mul_comm; [ | easy ].
 apply rngl_mul_div_l; [ easy | ].
-apply vect_squ_neq_0; try easy.
+intros H.
+apply eq_vect_squ_0 in H; try easy.
 ...
 intros H.
 assert (Hvz : V = vect_zero (vect_nrows V)). {
