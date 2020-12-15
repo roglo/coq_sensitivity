@@ -601,6 +601,42 @@ split. {
 }
 Qed.
 
+Theorem rngl_mul_div_l :
+  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  ∀ a b : T, b ≠ 0%F → (a * b / b)%F = a.
+Proof.
+intros Hii a b Hbz.
+specialize rngl_opt_mul_div_l as rngl_mul_div_l.
+specialize rngl_opt_mul_div_r as rngl_mul_div_r.
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
+specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
+destruct rngl_is_comm. {
+  unfold rngl_div in rngl_mul_div_l |-*.
+  destruct rngl_has_inv. {
+    rewrite <- rngl_mul_assoc.
+    rewrite (rngl_mul_comm b).
+    rewrite rngl_mul_inv_l; [ | easy ].
+    apply rngl_mul_1_r.
+  }
+  destruct Hii as [Hii| Hii]; [ easy | ].
+  rewrite Hii in rngl_mul_div_l.
+  rewrite rngl_mul_comm.
+  now apply rngl_mul_div_l.
+} {
+  destruct rngl_has_no_inv_but_div. {
+    cbn in rngl_mul_div_r.
+    now apply rngl_mul_div_r.
+  }
+  destruct Hii as [Hii| Hii]; [ | easy ].
+  unfold rngl_div in rngl_mul_inv_r |-*.
+  rewrite Hii in rngl_mul_inv_l, rngl_mul_inv_r |-*.
+  rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_inv_r; [ | easy ].
+  apply rngl_mul_1_r.
+}
+Qed.
+
 End a.
 
 Arguments rngl_add_opp_l {T}%type {ro rp} Hro.

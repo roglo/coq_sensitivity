@@ -1439,6 +1439,23 @@ destruct IHn as [IHn| IHn]. {
 }
 Qed.
 
+Theorem squ_mat_subm_prop : ∀ n (A : square_matrix n) i j,
+  ((mat_nrows (subm (proj1_sig A) i j) =? n - 1) &&
+   (mat_ncols (subm (proj1_sig A) i j) =? n - 1))%bool = true.
+Proof.
+intros.
+destruct A as (A, Ha); cbn in Ha |-*.
+apply Bool.andb_true_iff in Ha.
+destruct Ha as (Hra, Hca).
+apply Nat.eqb_eq in Hra.
+apply Nat.eqb_eq in Hca.
+apply Bool.andb_true_iff.
+now split; apply Nat.eqb_eq; cbn; f_equal.
+Qed.
+
+Definition squ_mat_subm n (A : square_matrix n) i j : square_matrix (n - 1) :=
+  exist _ (subm (proj1_sig A) i j) (squ_mat_subm_prop A i j).
+
 (* *)
 
 Theorem fold_determinant :

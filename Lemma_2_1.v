@@ -65,23 +65,6 @@ Definition mat_princ_subm (A : matrix T) l :=
 Theorem subm_z : ∀ f i j, subm (mk_mat f 0 0) i j = mZ 0.
 Proof. now intros; apply matrix_eq. Qed.
 
-Theorem squ_mat_subm_prop : ∀ n (A : @square_matrix T n) i j,
-  ((mat_nrows (subm (proj1_sig A) i j) =? n - 1) &&
-   (mat_ncols (subm (proj1_sig A) i j) =? n - 1))%bool = true.
-Proof.
-intros.
-destruct A as (A, Ha); cbn in Ha |-*.
-apply Bool.andb_true_iff in Ha.
-destruct Ha as (Hra, Hca).
-apply Nat.eqb_eq in Hra.
-apply Nat.eqb_eq in Hca.
-apply Bool.andb_true_iff.
-now split; apply Nat.eqb_eq; cbn; f_equal.
-Qed.
-
-Definition squ_mat_subm n (A : square_matrix n) i j : square_matrix (n - 1) :=
-  exist _ (subm (proj1_sig A) i j) (squ_mat_subm_prop A i j).
-
 Theorem princ_subm_prop : ∀ n (A : square_matrix n) l,
   ((mat_nrows (mat_princ_subm (proj1_sig A) l) =? n - length l) &&
    (mat_ncols (mat_princ_subm (proj1_sig A) l) =? n - length l))%bool = true.
@@ -307,25 +290,8 @@ intros Hic Hii * Hmv.
 unfold Rayleigh_quotient.
 rewrite Hmv.
 rewrite vect_dot_mul_scal_mul_comm; [ | easy ].
-assert (H : ∀ a b : T, b ≠ 0%F → (a * b / b)%F = a). {
-  intros a b Hbz.
-  specialize rngl_opt_mul_div_l as rngl_mul_div_l.
-  specialize rngl_opt_mul_comm as rngl_mul_comm.
-  specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
-  rewrite Hic in rngl_mul_comm.
-  unfold rngl_div in rngl_mul_div_l |-*.
-  destruct rngl_has_inv. {
-    rewrite <- rngl_mul_assoc.
-    rewrite (rngl_mul_comm b).
-    rewrite rngl_mul_inv_l; [ | easy ].
-    apply rngl_mul_1_r.
-  }
-  destruct Hii as [Hii| Hii]; [ easy | ].
-  rewrite Hii in rngl_mul_div_l.
-  rewrite rngl_mul_comm.
-  now apply rngl_mul_div_l.
-}
-apply H.
+apply rngl_mul_div_l; [ easy | ].
+...
 Search ((_ · _)%V = 0%F).
 Check rngl_opt_is_integral.
 Search vect_dot_product.
