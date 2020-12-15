@@ -297,12 +297,16 @@ Qed.
 
 Theorem Rayleigh_quotient_of_eigenvector :
   rngl_is_comm = true →
+  rngl_has_opp = true →
   rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  rngl_is_domain = true →
+  rngl_is_ordered = true →
+  rngl_has_dec_le = true →
   ∀ n (M : square_matrix n) V μ,
   (M • V)%SM = (μ × V)%V
   → Rayleigh_quotient M V = μ.
 Proof.
-intros Hic Hii * Hmv.
+intros Hic Hop Hii Hdo Hor Hed * Hmv.
 unfold Rayleigh_quotient.
 rewrite Hmv.
 rewrite vect_dot_mul_scal_mul_comm; [ | easy ].
