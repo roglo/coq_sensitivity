@@ -63,6 +63,16 @@ intros * Hac Hbd.
 now apply Q.mul_le_mono_nonpos.
 Qed.
 
+Theorem Q_not_le : ∀ a b, ¬ (a ≤ b)%Q → a = b ∨ (b ≤ a)%Q.
+Proof.
+intros * Hab.
+destruct (Q.eq_dec a b) as [Heab| Heab]; [ now left | right ].
+apply Q.nle_gt in Hab.
+apply Q.nlt_ge; intros Hba.
+apply Heab.
+now apply Q.le_antisymm; apply Q.lt_le_incl.
+Qed.
+
 Definition Q_ring_like_prop :=
   {| rngl_is_comm := true;
      rngl_has_dec_eq := true;
@@ -97,4 +107,5 @@ Definition Q_ring_like_prop :=
      rngl_opt_add_le_compat := Q.add_le_mono;
      rngl_opt_mul_le_compat_nonneg := Q_mul_le_compat_nonneg;
      rngl_opt_mul_le_compat_nonpos := Q_mul_le_compat_nonpos;
-     rngl_opt_mul_le_compat := I |}.
+     rngl_opt_mul_le_compat := I;
+     rngl_opt_not_le := Q_not_le |}.
