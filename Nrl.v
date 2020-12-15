@@ -43,6 +43,12 @@ rewrite Nat.mul_comm.
 now apply Nat.div_mul.
 Qed.
 
+Theorem Nat_mul_le_compat : ∀ a b c d, 0 ≤ a ≤ c → 0 ≤ b ≤ d → a * b ≤ c * d.
+Proof.
+intros * Hac Hbd.
+now apply Nat.mul_le_mono_nonneg.
+Qed.
+
 Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
   {| rngl_is_comm := true;
      rngl_has_dec_eq := true;
@@ -72,7 +78,8 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_le_refl := Nat.le_refl;
      rngl_opt_le_antisymm := Nat.le_antisymm;
      rngl_opt_le_trans := Nat.le_trans;
-     rngl_opt_add_le_compat := Nat.add_le_mono |}.
+     rngl_opt_add_le_compat := Nat.add_le_mono;
+     rngl_opt_mul_le_compat := Nat_mul_le_compat |}.
 
 (*
 Print nat_ring_like_op.
@@ -432,7 +439,8 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_opt_le_refl := I;
      rngl_opt_le_antisymm := I;
      rngl_opt_le_trans := I;
-     rngl_opt_add_le_compat := I |}.
+     rngl_opt_add_le_compat := I;
+     rngl_opt_mul_le_compat := I |}.
 
 End a.
 

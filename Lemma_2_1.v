@@ -171,9 +171,12 @@ specialize (rngl_inv_mul Hdo Hin) as H1.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
 specialize rngl_opt_is_integral as rngl_is_integral.
+specialize rngl_opt_mul_le_compat as rngl_mul_le_compat.
+specialize rngl_opt_le_refl as rngl_le_refl.
 rewrite Hic in rngl_mul_comm.
 rewrite Hin in rngl_mul_inv_l |-*.
 rewrite Hdo in rngl_is_integral.
+rewrite Hor in rngl_mul_le_compat, rngl_le_refl.
 rewrite H1; cycle 1. {
   intros H; apply Hcz.
   apply rngl_is_integral in H.
@@ -185,8 +188,11 @@ rewrite H1; cycle 1. {
   intros i Hi.
   rewrite <- Hr in H, Hi.
   remember (vect_el x) as f.
-  clear - ro rp Hor rngl_is_integral H Hi.
+(*
+  clear - ro rp Hor rngl_mul_le_compat rngl_is_integral rngl_le_refl H Hi.
+*)
   revert i Hi.
+  clear Hr Hxz H1.
   induction r; intros; [ easy | ].
   rewrite Nat.sub_succ, Nat.sub_0_r in H.
   rewrite rngl_summation_split_last in H; [ | flia ].
@@ -204,7 +210,10 @@ rewrite H1; cycle 1. {
     now rewrite Nat.add_comm, Nat.add_sub.
   }
   cbn - [ iter_seq ] in H.
-  apply rngl_eq_add_0 in H; [ | easy | | ]; cycle 1. {
+  apply rngl_eq_add_0 in H; [ | easy | | ]; cycle 2. {
+    rewrite <- (rngl_mul_0_r 0).
+    apply rngl_mul_le_compat.
+    split; [ apply rngl_le_refl | ].
 ...
 ... suite ok
   destruct H as (H1, H2).

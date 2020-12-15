@@ -194,8 +194,9 @@ Export PQ.PQ_Notations.
 
 (* in 8.10, coq obstinately refuses to print "a < b < c": it prints
    "a < b ∧ b < c"; I found a solution: redefining my own and constructor
-   and then, it works *)
+   and then, it works
 Inductive qand (A B : Prop) := qconj : A → B → qand A B.
+*)
 
 Notation "a // b" := (of_pair a b) : Q_scope.
 Notation "0" := Zero : Q_scope.
@@ -203,10 +204,10 @@ Notation "x < y" := (lt x y) : Q_scope.
 Notation "x ≤ y" := (le x y) : Q_scope.
 Notation "x > y" := (gt x y) : Q_scope.
 Notation "x ≥ y" := (ge x y) : Q_scope.
-Notation "x < y < z" := (qand (lt x y) (lt y z)) : Q_scope.
-Notation "x ≤ y < z" := (qand (le x y) (lt y z)) : Q_scope.
-Notation "x < y ≤ z" := (qand (lt x y) (le y z)) : Q_scope.
-Notation "x ≤ y ≤ z" := (qand (le x y) (le y z)) : Q_scope.
+Notation "x < y < z" := (lt x y ∧ lt y z) : Q_scope.
+Notation "x ≤ y < z" := (le x y ∧ lt y z) : Q_scope.
+Notation "x < y ≤ z" := (lt x y ∧ le y z) : Q_scope.
+Notation "x ≤ y ≤ z" := (le x y ∧ le y z) : Q_scope.
 Notation "- x" := (opp x) : Q_scope.
 Notation "x + y" := (add x y) : Q_scope.
 Notation "x - y" := (sub x y) : Q_scope.

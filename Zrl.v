@@ -4,6 +4,10 @@ Require Import Utf8 ZArith.
 
 Require Import RingLike.
 
+Notation "x ≤ y" := (x <= y)%Z (at level 70, y at next level) : Z_scope.
+Notation "x ≤ y ≤ z" := (x <= y ∧ y <= z)%Z (at level 70, y at next level) :
+  Z_scope.
+
 Definition phony_Z_sub (x y : Z) := 0%Z.
 Definition phony_Z_inv (x : Z) := 0%Z.
 
@@ -56,6 +60,13 @@ rewrite Z.mul_comm.
 now apply Z.div_mul.
 Qed.
 
+Theorem Z_mul_le_compat : ∀ a b c d,
+  (0 ≤ a ≤ c → 0 ≤ b ≤ d → a * b ≤ c * d)%Z.
+Proof.
+intros * Hac Hbd.
+now apply Z.mul_le_mono_nonneg.
+Qed.
+
 Definition Z_ring_like_prop : ring_like_prop Z :=
   {| rngl_is_comm := true;
      rngl_has_dec_eq := true;
@@ -85,4 +96,5 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_opt_le_refl := Z.le_refl;
      rngl_opt_le_antisymm := Z.le_antisymm;
      rngl_opt_le_trans := Z.le_trans;
-     rngl_opt_add_le_compat := Z.add_le_mono |}.
+     rngl_opt_add_le_compat := Z.add_le_mono;
+     rngl_opt_mul_le_compat := Z_mul_le_compat |}.
