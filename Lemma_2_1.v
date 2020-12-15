@@ -169,6 +169,71 @@ Definition is_ordered_field :=
   rngl_has_inv = true ∧
   rngl_is_ordered = true.
 
+Theorem vect_squ_neq_0 :
+  rngl_has_opp = true →
+  rngl_has_dec_le = true →
+  rngl_is_domain = true →
+  rngl_is_ordered = true →
+  ∀ x, x ≠ vect_zero (vect_nrows x) → (x · x)%V ≠ 0%F.
+Proof.
+intros Hop Hed Hdo Hor * Hxz.
+remember (vect_nrows x) as r eqn:Hr.
+specialize rngl_opt_is_integral as rngl_is_integral.
+specialize rngl_opt_add_le_compat as rngl_add_le_compat.
+rewrite Hdo in rngl_is_integral.
+rewrite Hor in rngl_add_le_compat.
+unfold vect_dot_product.
+intros H; apply Hxz.
+apply vector_eq; [ easy | cbn ].
+intros i Hi.
+rewrite <- Hr in H, Hi.
+remember (vect_el x) as f.
+revert i Hi.
+clear Hr Hxz.
+induction r; intros; [ easy | ].
+rewrite Nat.sub_succ, Nat.sub_0_r in H.
+rewrite rngl_summation_split_last in H; [ | flia ].
+destruct r. {
+  cbn in H.
+  rewrite rngl_add_0_l in H.
+  specialize (rngl_is_integral _ _ H) as H1.
+  apply Nat.lt_1_r in Hi; subst i.
+  now destruct H1.
+}
+rewrite rngl_summation_shift in H; [ | flia ].
+rewrite Nat.sub_succ, Nat.sub_0_r in H.
+erewrite rngl_summation_eq_compat in H. 2: {
+  intros j Hj.
+  now rewrite Nat.add_comm, Nat.add_sub.
+}
+cbn - [ iter_seq ] in H.
+apply rngl_eq_add_0 in H; [ | easy | | ]; cycle 1. {
+  clear H IHr Hi.
+  induction r. {
+    cbn; rewrite rngl_add_0_l.
+    now apply rngl_0_le_squ.
+  }
+  rewrite rngl_summation_split_last; [ | flia ].
+  rewrite rngl_summation_shift; [ | flia ].
+  rewrite Nat.sub_succ, Nat.sub_0_r.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j Hj.
+    now rewrite Nat.add_comm, Nat.add_sub.
+  }
+  cbn - [ iter_seq ].
+  rewrite <- (rngl_add_0_r 0%F) at 1.
+  apply rngl_add_le_compat; [ easy | ].
+  now apply rngl_0_le_squ.
+} {
+  now apply rngl_0_le_squ.
+}
+destruct H as (H1, H2).
+specialize (rngl_is_integral _ _ H2) as H3.
+destruct (Nat.eq_dec i (S r)) as [Hisr| Hisr]; [ now subst i; destruct H3 | ].
+apply IHr; [ | flia Hi Hisr ].
+now rewrite Nat.sub_succ, Nat.sub_0_r.
+Qed.
+
 Theorem RQ_mul_scal_prop :
   is_ordered_field →
   ∀ n (M : square_matrix n) x c,
@@ -219,56 +284,7 @@ rewrite H1; cycle 1. {
   apply rngl_is_integral in H.
   now destruct H.
 } {
-  unfold vect_dot_product.
-  intros H; apply Hxz.
-  apply vector_eq; [ easy | cbn ].
-  intros i Hi.
-  rewrite <- Hr in H, Hi.
-  remember (vect_el x) as f.
-  revert i Hi.
-  clear Hr Hxz H1.
-  induction r; intros; [ easy | ].
-  rewrite Nat.sub_succ, Nat.sub_0_r in H.
-  rewrite rngl_summation_split_last in H; [ | flia ].
-  destruct r. {
-    cbn in H.
-    rewrite rngl_add_0_l in H.
-    specialize (rngl_is_integral _ _ H) as H1.
-    apply Nat.lt_1_r in Hi; subst i.
-    now destruct H1.
-  }
-  rewrite rngl_summation_shift in H; [ | flia ].
-  rewrite Nat.sub_succ, Nat.sub_0_r in H.
-  erewrite rngl_summation_eq_compat in H. 2: {
-    intros j Hj.
-    now rewrite Nat.add_comm, Nat.add_sub.
-  }
-  cbn - [ iter_seq ] in H.
-  apply rngl_eq_add_0 in H; [ | easy | | ]; cycle 1. {
-    clear H IHr Hi.
-    induction r. {
-      cbn; rewrite rngl_add_0_l.
-      now apply rngl_0_le_squ.
-    }
-    rewrite rngl_summation_split_last; [ | flia ].
-    rewrite rngl_summation_shift; [ | flia ].
-    rewrite Nat.sub_succ, Nat.sub_0_r.
-    erewrite rngl_summation_eq_compat. 2: {
-      intros j Hj.
-      now rewrite Nat.add_comm, Nat.add_sub.
-    }
-    cbn - [ iter_seq ].
-    rewrite <- (rngl_add_0_r 0%F) at 1.
-    apply rngl_add_le_compat; [ easy | ].
-    now apply rngl_0_le_squ.
-  } {
-    now apply rngl_0_le_squ.
-  }
-  destruct H as (H1, H2).
-  specialize (rngl_is_integral _ _ H2) as H3.
-  destruct (Nat.eq_dec i (S r)) as [Hisr| Hisr]; [ now subst i; destruct H3 | ].
-  apply IHr; [ | flia Hi Hisr ].
-  now rewrite Nat.sub_succ, Nat.sub_0_r.
+  now subst r; apply vect_squ_neq_0.
 }
 rewrite rngl_mul_assoc.
 rewrite rngl_mul_comm.
@@ -291,6 +307,13 @@ unfold Rayleigh_quotient.
 rewrite Hmv.
 rewrite vect_dot_mul_scal_mul_comm; [ | easy ].
 apply rngl_mul_div_l; [ easy | ].
+apply vect_squ_neq_0; try easy.
+...
+intros H.
+assert (Hvz : V = vect_zero (vect_nrows V)). {
+  apply vector_eq; [ easy | cbn ].
+  intros i Hi.
+  unfold vect_dot_product in H.
 ...
 Search ((_ · _)%V = 0%F).
 Check rngl_opt_is_integral.
