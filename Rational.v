@@ -1627,9 +1627,18 @@ destruct y as [| yp| yp]; [ now right | easy | easy ].
 Qed.
 
 Theorem mul_le_mono_nonneg : ∀ x y z t,
-  (0 ≤ x)%Q → (x ≤ y)%Q → (0 ≤ z)%Q → (z ≤ t)%Q → (x * z ≤ y * t)%Q.
+  (0 ≤ x ≤ y)%Q → (0 ≤ z ≤ t)%Q → (x * z ≤ y * t)%Q.
 Proof.
-intros * Hx Hxy Hz Hzt.
+intros * (Hx, Hxy) (Hz, Hzt).
+destruct x as [| xp| xp], y as [| yp| yp], z as [| zp| zp], t as [| tp| tp];
+  try easy; cbn in *.
+now apply GQmul_le_mono.
+Qed.
+
+Theorem mul_le_mono_nonpos : ∀ x y z t,
+  (y ≤ x ≤ 0)%Q → (t ≤ z ≤ 0)%Q → (x * z ≤ y * t)%Q.
+Proof.
+intros * (Hyx, Hx) (Htz, Hz).
 destruct x as [| xp| xp], y as [| yp| yp], z as [| zp| zp], t as [| tp| tp];
   try easy; cbn in *.
 now apply GQmul_le_mono.

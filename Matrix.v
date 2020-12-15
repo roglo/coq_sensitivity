@@ -1385,6 +1385,8 @@ Definition squ_mat_ring_like_prop (n : nat) :
      rngl_opt_le_antisymm := I;
      rngl_opt_le_trans := I;
      rngl_opt_add_le_compat := I;
+     rngl_opt_mul_le_compat_nonneg := I;
+     rngl_opt_mul_le_compat_nonpos := I;
      rngl_opt_mul_le_compat := I |}.
 
 Theorem squ_mat_mul_scal_vect_comm :

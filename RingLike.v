@@ -165,9 +165,17 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_opt_add_le_compat :
       if rngl_is_ordered then ∀ a b c d, (a ≤ b → c ≤ d → a + c ≤ b + d)%F
       else True;
-    rngl_opt_mul_le_compat :
-      if rngl_is_ordered then
+    rngl_opt_mul_le_compat_nonneg :
+      if (rngl_is_ordered && rngl_has_opp)%bool then
         ∀ a b c d, (0 ≤ a ≤ c)%F → (0 ≤ b ≤ d)%F → (a * b ≤ c * d)%F
+      else True;
+    rngl_opt_mul_le_compat_nonpos :
+      if (rngl_is_ordered && rngl_has_opp)%bool then
+        ∀ a b c d, (c ≤ a ≤ 0)%F → (d ≤ b ≤ 0)%F → (a * b ≤ c * d)%F
+      else True;
+    rngl_opt_mul_le_compat :
+      if (rngl_is_ordered && negb rngl_has_opp)%bool then
+        ∀ a b c d, (a ≤ c)%F → (b ≤ d)%F → (a * b ≤ c * d)%F
       else True }.
 
 Fixpoint rngl_power {T} {R : ring_like_op T} a n :=

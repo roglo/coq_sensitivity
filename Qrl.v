@@ -49,11 +49,18 @@ apply Q.lt_sub_lt_add_r.
 now rewrite Q.sub_diag.
 Qed.
 
-Theorem Q_mul_le_compat : ∀ a b c d,
+Theorem Q_mul_le_compat_nonneg : ∀ a b c d,
   (0 ≤ a ≤ c → 0 ≤ b ≤ d → a * b ≤ c * d)%Q.
 Proof.
 intros * Hac Hbd.
 now apply Q.mul_le_mono_nonneg.
+Qed.
+
+Theorem Q_mul_le_compat_nonpos : ∀ a b c d,
+  (c ≤ a ≤ 0 → d ≤ b ≤ 0 → a * b ≤ c * d)%F.
+Proof.
+intros * Hac Hbd.
+now apply Q.mul_le_mono_nonpos.
 Qed.
 
 Definition Q_ring_like_prop :=
@@ -88,4 +95,6 @@ Definition Q_ring_like_prop :=
      rngl_opt_le_antisymm := Q.le_antisymm;
      rngl_opt_le_trans := Q.le_trans;
      rngl_opt_add_le_compat := Q.add_le_mono;
-     rngl_opt_mul_le_compat := Q_mul_le_compat |}.
+     rngl_opt_mul_le_compat_nonneg := Q_mul_le_compat_nonneg;
+     rngl_opt_mul_le_compat_nonpos := Q_mul_le_compat_nonpos;
+     rngl_opt_mul_le_compat := I |}.

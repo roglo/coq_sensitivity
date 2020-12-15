@@ -60,11 +60,18 @@ rewrite Z.mul_comm.
 now apply Z.div_mul.
 Qed.
 
-Theorem Z_mul_le_compat : ∀ a b c d,
+Theorem Z_mul_le_compat_nonneg : ∀ a b c d,
   (0 ≤ a ≤ c → 0 ≤ b ≤ d → a * b ≤ c * d)%Z.
 Proof.
 intros * Hac Hbd.
 now apply Z.mul_le_mono_nonneg.
+Qed.
+
+Theorem Z_mul_le_compat_nonpos : ∀ a b c d,
+  (c ≤ a ≤ 0 → d ≤ b ≤ 0 → a * b ≤ c * d)%F.
+Proof.
+intros * Hac Hbd.
+now apply Z.mul_le_mono_nonpos.
 Qed.
 
 Definition Z_ring_like_prop : ring_like_prop Z :=
@@ -99,4 +106,6 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_opt_le_antisymm := Z.le_antisymm;
      rngl_opt_le_trans := Z.le_trans;
      rngl_opt_add_le_compat := Z.add_le_mono;
-     rngl_opt_mul_le_compat := Z_mul_le_compat |}.
+     rngl_opt_mul_le_compat_nonneg := Z_mul_le_compat_nonneg;
+     rngl_opt_mul_le_compat_nonpos := Z_mul_le_compat_nonpos;
+     rngl_opt_mul_le_compat := I |}.
