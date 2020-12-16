@@ -321,7 +321,7 @@ Definition is_diagonal_square_matrix n (M : square_matrix n) :=
   ∀ i j, if Nat.eq_dec i j then True else mat_el (proj1_sig M) i j = 0%F.
 
 (* In the real case, the symmetric matrix M is diagonalisable in the
-   sense where there exists an orthogonal matrix O (the columns of which
+   sense that there exists an orthogonal matrix O (the columns of which
    are eigenvectors) and a diagonal matrix D the coefficients of which
    are eigenvalues μ_i such that
       M = O . D . O^T *)
