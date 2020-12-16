@@ -382,12 +382,17 @@ Definition squ_mat_with_vect n (Vl : list (vector T)) :
                      ...              ...
                      [0  0  0 .. μn ] [vn] =
 
-   [v1 v2 v3 ... vn] [μ1 v1]
-                     [μ2 v2]
-                     ...
-                     [μn vn] =
+   [v1 v2 v3 ... vn] [μ1 0  0 .. 0  ] [v11 v12 .. v1n]
+                     [0  μ2 0 .. 0  ] [v21 v22 .. v2n]
+                     ...              ...
+                     [0  0  0 .. μn ] [vn1 vn2 .. vnn] =
 
-   μ1 v1² + μ2 v2² + μ3 v3² + ... + μn vn²
+   [v11 v21 .. vn1] [μ1.v11 μ1.v12 .. μ1.v1n]
+   [v12 v22 .. vn2] [μ2.v11 μ2.v12 .. μ2.v1n]
+    ..  ..     ..
+   [v1n v2n .. vnn] [μn.v11 μn.v12 .. μn.v1n] =
+
+   [μ1.v11^2+μ2.v21.v11+μ3.v31.v11..+μn.vn1.v11 ..
 *)
 
 Theorem diagonalized_matrix_prop : ∀ n (M : @square_matrix T n) ev eV mD mO,
