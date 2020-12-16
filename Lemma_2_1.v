@@ -320,6 +320,9 @@ Qed.
 Definition is_diagonal_square_matrix n (M : square_matrix n) :=
   ∀ i j, if Nat.eq_dec i j then True else mat_el (proj1_sig M) i j = 0%F.
 
+Definition squ_mat_diagonal n (M : @square_matrix T n) :=
+  map (λ i, mat_el (proj1_sig M) i i) (seq 0 (mat_nrows (proj1_sig M))).
+
 (* In the real case, the symmetric matrix M is diagonalisable in the
    sense that there exists an orthogonal matrix O (the columns of which
    are eigenvectors) and a diagonal matrix D the coefficients of which
@@ -327,11 +330,17 @@ Definition is_diagonal_square_matrix n (M : square_matrix n) :=
       M = O . D . O^T *)
 
 Theorem glop : ∀ n (M : square_matrix n),
-  ∃ mD mO,
+  ∃ ev mD mO,
   is_diagonal_square_matrix mO ∧
+  eigenvalues (proj1_sig M) ev ∧
+  Permutation ev (squ_mat_diagonal M) ∧
   M = (mO⁺ * mD * mO)%SM.
 Proof.
 intros.
+(* make definitions
+     squ_mat_el M = mat_el (proj1_sig M)
+     mat_of_squ_mat M := proj1_sig M
+ *)
 ...
 
 (* changing variable x as y = O^T . x, the Rayleigh quotient R (M, x)
