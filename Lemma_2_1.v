@@ -114,6 +114,13 @@ Definition princ_subm n (A : square_matrix n) (l : list nat) :
 Definition eigenvalues M ev :=
   ∀ μ, μ ∈ ev → ∃ V, V ≠ vect_zero (mat_nrows M) ∧ (M • V = μ × V)%V.
 
+Definition eigenvalues_and_vectors M ev eV :=
+  ∀ i μ V, 0 ≤ i < mat_nrows M →
+  μ = nth i ev 0%F
+  → V = nth i eV (vect_zero (mat_nrows M))
+  → V ≠ vect_zero (mat_nrows M)
+  → (M • V = μ × V)%V.
+
 (* Rayleigh quotient *)
 
 Definition Rayleigh_quotient n (M : square_matrix n) (x : vector T) :=
@@ -323,6 +330,8 @@ Definition is_orthogonal_matrix (M : matrix T) :=
 Definition is_orthogonal_square_matrix n (M : square_matrix n) :=
   is_orthogonal_matrix (mat_of_squ_mat M).
 
+(* diagonal matrix with diagonal d being given *)
+
 Definition mat_with_diag n d :=
   mk_mat (λ i j, if Nat.eq_dec i j then nth i d 0%F else 0%F) n n.
 
@@ -330,28 +339,65 @@ Theorem mat_with_diag_prop : ∀ n d,
   ((mat_nrows (mat_with_diag n d) =? n) &&
    (mat_ncols (mat_with_diag n d) =? n))%bool = true.
 Proof.
-intros. cbn.
+intros; cbn.
 apply Bool.andb_true_iff.
 now split; apply Nat.eqb_eq.
 Qed.
 
+(* diagonal square matrix with diagonal d being given *)
+
 Definition squ_mat_with_diag n d : square_matrix n :=
  exist _ (mat_with_diag n d) (mat_with_diag_prop n d).
+
+(* matrix with columns given as list of vectors *)
+
+Definition mat_with_vect n Vl :=
+  mk_mat (λ i j, vect_el (nth j Vl (vect_zero n)) i) n n.
+
+(* square matrix with columns given as list of vectors *)
+
+Theorem mat_with_vect_prop : ∀ n Vl,
+  ((mat_nrows (mat_with_vect n Vl) =? n) &&
+   (mat_ncols (mat_with_vect n Vl) =? n))%bool = true.
+Proof.
+intros; cbn.
+apply Bool.andb_true_iff.
+now split; apply Nat.eqb_eq.
+Qed.
+
+Definition squ_mat_with_vect n (Vl : list (vector T)) :
+   square_matrix n :=
+ exist _ (mat_with_vect n Vl) (mat_with_vect_prop n Vl).
 
 (* In the real case, the symmetric matrix M is diagonalisable in the
    sense that there exists an orthogonal matrix O (the columns of which
    are eigenvectors) and a diagonal matrix D the coefficients of which
    are eigenvalues μ_i such that
-      M = O . D . O^T *)
+      M = O . D . O^t *)
 
-Theorem diagonal_prop : ∀ n (M : square_matrix n) mD ev,
-  eigenvalues (mat_of_squ_mat M) ev
+(* O                 D                O^t
+
+   [v1 v2 v3 ... vn] [μ1 0  0 .. 0  ] [v1]
+                     [0  μ2 0 .. 0  ] [v2]
+                     ...              ...
+                     [0  0  0 .. μn ] [vn] =
+
+   [v1 v2 v3 ... vn] [μ1 v1]
+                     [μ2 v2]
+                     ...
+                     [μn vn] =
+
+   μ1 v1² + μ2 v2² + μ3 v3² + ... + μn vn²
+*)
+
+Theorem diagonalized_matrix_prop : ∀ n (M : @square_matrix T n) ev eV mD mO,
+  is_symm_squ_mat M
+  → eigenvalues_and_vectors (mat_of_squ_mat M) ev eV
   → mD = squ_mat_with_diag n ev
-  → ∃ mO,
-     is_orthogonal_square_matrix mO ∧
-     M = (mO⁺ * mD * mO)%SM.
+  → mO = squ_mat_with_vect n eV
+   → M = (mO⁺ * mD * mO)%SM.
 Proof.
-intros * Hev.
+intros * Hsy Hvv Hd Ho.
 ...
 
 (* changing variable x as y = O^T . x, the Rayleigh quotient R (M, x)
