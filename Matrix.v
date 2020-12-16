@@ -1456,6 +1456,18 @@ Qed.
 Definition squ_mat_subm n (A : square_matrix n) i j : square_matrix (n - 1) :=
   exist _ (subm (proj1_sig A) i j) (squ_mat_subm_prop A i j).
 
+Theorem squ_mat_transp_prop : ∀ n (M : square_matrix n),
+  ((mat_nrows (mat_transp (proj1_sig M)) =? n) &&
+   (mat_ncols (mat_transp (proj1_sig M)) =? n))%bool = true.
+Proof.
+intros.
+destruct M as (M, Hm); cbn.
+now rewrite Bool.andb_comm.
+Qed.
+
+Definition squ_mat_transp n (M : square_matrix n) : square_matrix n :=
+  exist _ (mat_transp (proj1_sig M)) (squ_mat_transp_prop M).
+
 (* *)
 
 Theorem fold_determinant :
@@ -1520,6 +1532,7 @@ Notation "A * B" := (squ_mat_mul A B) : SM_scope.
 Notation "A + B" := (squ_mat_add A B) : SM_scope.
 Notation "A • V" := (squ_mat_mul_vect_r A V) (at level 40) : SM_scope.
 Notation "- A" := (squ_mat_opp A) : SM_scope.
+Notation "A ⁺" := (squ_mat_transp A) (at level 1, format "A ⁺") : SM_scope.
 
 Notation "U + V" := (vect_add U V) : V_scope.
 Notation "U - V" := (vect_sub U V) : V_scope.

@@ -317,6 +317,39 @@ intros H.
 now apply eq_vect_squ_0 in H.
 Qed.
 
+Definition is_diagonal_square_matrix n (M : square_matrix n) :=
+  ∀ i j, if Nat.eq_dec i j then True else mat_el (proj1_sig M) i j = 0%F.
+
+(* In the real case, the symmetric matrix M is diagonalisable in the
+   sense where there exists an orthogonal matrix O (the columns of which
+   are eigenvectors) and a diagonal matrix D the coefficients of which
+   are eigenvalues μ_i such that
+      M = O . D . O^T *)
+
+Theorem glop : ∀ n (M : square_matrix n),
+  ∃ mD mO,
+  is_diagonal_square_matrix mO ∧
+  M = (mO⁺ * mD * mO)%SM.
+Proof.
+intros.
+...
+
+(* changing variable x as y = O^T . x, the Rayleigh quotient R (M, x)
+   is equal to
+      Σ (i = 1, n), μ_i * y_i ^ 2 / Σ (i = 1, n), y_i ^ 2 *)
+
+Theorem Rayleigh_quotient_from_ortho : ∀ n (M : square_matrix n) mD mO x y ev,
+  is_symm_squ_mat M
+  → eigenvalues (proj1_sig M) ev
+  → M = (squ_mat_transp mO * mD * mO)%SM
+  → y = (squ_mat_transp mO • x)%SM
+  → Rayleigh_quotient M x =
+      (Σ (i = 1, n), nth i ev 0%F * rngl_squ (vect_el y i) /
+       Σ (i = 1, n), rngl_squ (vect_el y i))%F.
+Proof.
+intros * Hsy Hev Hmin Hmax.
+...
+
 (* The Rayleigh quotient reaches its minimum value μ_min (the smallest
    eigenvalue of M) when x is v_min (the corresponding eigenvector).
    Similarly, R (M,x) ≤ μ_max and R (M,v_max) = μ_max *)

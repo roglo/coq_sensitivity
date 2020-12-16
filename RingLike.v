@@ -182,11 +182,13 @@ Class ring_like_prop T {ro : ring_like_op T} :=
         ∀ a b, (¬ a ≤ b → a = b ∨ b ≤ a)%F
       else True }.
 
-Fixpoint rngl_power {T} {R : ring_like_op T} a n :=
+Fixpoint rngl_power {T} {ro : ring_like_op T} a n :=
   match n with
   | O => 1%F
   | S m => (a * rngl_power a m)%F
   end.
+
+Definition rngl_squ {T} {ro : ring_like_op T} x := (x * x)%F.
 
 Notation "a ^ b" := (rngl_power a b) : ring_like_scope.
 
