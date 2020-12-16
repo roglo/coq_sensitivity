@@ -934,8 +934,11 @@ Definition compatible_square_matrices_bool (ML : list (matrix T)) :=
 Definition square_matrix n :=
   {M : matrix T | Nat.eqb (mat_nrows M) n && Nat.eqb (mat_ncols M) n = true}.
 
+Definition mat_of_squ_mat n (M : square_matrix n) : matrix T := proj1_sig M.
+Definition squ_mat_el n (M : square_matrix n) := mat_el (mat_of_squ_mat M).
+
 Theorem square_matrix_eq : ∀ n (MA MB : square_matrix n),
-  proj1_sig MA = proj1_sig MB
+  mat_of_squ_mat MA = mat_of_squ_mat MB
   → MA = MB.
 Proof.
 intros  * Hab.
@@ -948,7 +951,7 @@ apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
 Theorem square_matrix_neq : ∀ n (MA MB : square_matrix n),
-  proj1_sig MA ≠ proj1_sig MB
+  mat_of_squ_mat MA ≠ mat_of_squ_mat MB
   → MA ≠ MB.
 Proof.
 intros * Hab H.
@@ -972,8 +975,8 @@ Definition squ_mat_zero n : square_matrix n := exist _ (mZ n) (mZ_prop n).
 Definition squ_mat_one n : square_matrix n := exist _ (mI n) (mI_prop n).
 
 Theorem squ_mat_add_prop : ∀ n (MA MB : square_matrix n),
-  (mat_nrows (proj1_sig MA + proj1_sig MB) =? n) &&
-  (mat_ncols (proj1_sig MA + proj1_sig MB) =? n) = true.
+  (mat_nrows (mat_of_squ_mat MA + mat_of_squ_mat MB) =? n) &&
+  (mat_ncols (mat_of_squ_mat MA + mat_of_squ_mat MB) =? n) = true.
 Proof.
 intros.
 destruct MA as (A, Hap).
@@ -985,14 +988,14 @@ easy.
 Qed.
 
 Definition squ_mat_add n (MA MB : square_matrix n) : square_matrix n :=
-  exist _ (proj1_sig MA + proj1_sig MB)%M (squ_mat_add_prop MA MB).
+  exist _ (mat_of_squ_mat MA + mat_of_squ_mat MB)%M (squ_mat_add_prop MA MB).
 
 Definition squ_mat_mul_vect_r n (M : square_matrix n) V :=
-  (proj1_sig M • V)%V.
+  (mat_of_squ_mat M • V)%V.
 
 Theorem squ_mat_mul_prop : ∀ n (MA MB : square_matrix n),
-  (mat_nrows (proj1_sig MA * proj1_sig MB) =? n) &&
-  (mat_ncols (proj1_sig MA * proj1_sig MB) =? n) = true.
+  (mat_nrows (mat_of_squ_mat MA * mat_of_squ_mat MB) =? n) &&
+  (mat_ncols (mat_of_squ_mat MA * mat_of_squ_mat MB) =? n) = true.
 Proof.
 intros.
 destruct MA as (A, Hap).
@@ -1004,18 +1007,18 @@ easy.
 Qed.
 
 Definition squ_mat_mul n (MA MB : square_matrix n) : square_matrix n :=
-  exist _ (proj1_sig MA * proj1_sig MB)%M (squ_mat_mul_prop MA MB).
+  exist _ (mat_of_squ_mat MA * mat_of_squ_mat MB)%M (squ_mat_mul_prop MA MB).
 
 Theorem squ_mat_opp_prop : ∀ n (M : square_matrix n),
-  (mat_nrows (- proj1_sig M)%M =? n) &&
-  (mat_ncols (- proj1_sig M)%M =? n) = true.
+  (mat_nrows (- mat_of_squ_mat M)%M =? n) &&
+  (mat_ncols (- mat_of_squ_mat M)%M =? n) = true.
 Proof.
 intros.
 now destruct M as (A, Hap).
 Qed.
 
 Definition squ_mat_opp n (M : square_matrix n) : square_matrix n :=
-  exist _ (- proj1_sig M)%M (squ_mat_opp_prop M).
+  exist _ (- mat_of_squ_mat M)%M (squ_mat_opp_prop M).
 
 Definition phony_squ_mat_le n (MA MB : square_matrix n) := True.
 Definition phony_squ_mat_sub n (MA MB : square_matrix n) := MA.
@@ -1232,8 +1235,8 @@ unfold f, g in H1; cbn in H1.
 now apply rngl_1_neq_0 in H1.
 Qed.
 
-Theorem proj1_sig_squ_mat_of_nat : ∀ n i,
-  proj1_sig (rngl_of_nat i : square_matrix n) = (rngl_of_nat i × mI n)%M.
+Theorem mat_of_squ_mat_squ_mat_of_nat : ∀ n i,
+  mat_of_squ_mat (rngl_of_nat i : square_matrix n) = (rngl_of_nat i × mI n)%M.
 Proof.
 intros.
 induction i. {
@@ -1272,7 +1275,7 @@ rewrite Hc in Hcp.
 destruct c. {
   intros.
   apply square_matrix_neq; cbn.
-  rewrite proj1_sig_squ_mat_of_nat.
+  rewrite mat_of_squ_mat_squ_mat_of_nat.
   apply matrix_neq; cbn.
   right; right.
   intros H.
@@ -1286,7 +1289,7 @@ cbn in Hcp |-*.
 apply square_matrix_eq; cbn.
 apply matrix_eq; [ easy | easy | cbn ].
 intros * Hi Hn.
-rewrite proj1_sig_squ_mat_of_nat; cbn.
+rewrite mat_of_squ_mat_squ_mat_of_nat; cbn.
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   now rewrite rngl_mul_1_r.
 }
@@ -1440,8 +1443,8 @@ destruct IHn as [IHn| IHn]. {
 Qed.
 
 Theorem squ_mat_subm_prop : ∀ n (A : square_matrix n) i j,
-  ((mat_nrows (subm (proj1_sig A) i j) =? n - 1) &&
-   (mat_ncols (subm (proj1_sig A) i j) =? n - 1))%bool = true.
+  ((mat_nrows (subm (mat_of_squ_mat A) i j) =? n - 1) &&
+   (mat_ncols (subm (mat_of_squ_mat A) i j) =? n - 1))%bool = true.
 Proof.
 intros.
 destruct A as (A, Ha); cbn in Ha |-*.
@@ -1454,11 +1457,11 @@ now split; apply Nat.eqb_eq; cbn; f_equal.
 Qed.
 
 Definition squ_mat_subm n (A : square_matrix n) i j : square_matrix (n - 1) :=
-  exist _ (subm (proj1_sig A) i j) (squ_mat_subm_prop A i j).
+  exist _ (subm (mat_of_squ_mat A) i j) (squ_mat_subm_prop A i j).
 
 Theorem squ_mat_transp_prop : ∀ n (M : square_matrix n),
-  ((mat_nrows (mat_transp (proj1_sig M)) =? n) &&
-   (mat_ncols (mat_transp (proj1_sig M)) =? n))%bool = true.
+  ((mat_nrows (mat_transp (mat_of_squ_mat M)) =? n) &&
+   (mat_ncols (mat_transp (mat_of_squ_mat M)) =? n))%bool = true.
 Proof.
 intros.
 destruct M as (M, Hm); cbn.
@@ -1466,7 +1469,7 @@ now rewrite Bool.andb_comm.
 Qed.
 
 Definition squ_mat_transp n (M : square_matrix n) : square_matrix n :=
-  exist _ (mat_transp (proj1_sig M)) (squ_mat_transp_prop M).
+  exist _ (mat_transp (mat_of_squ_mat M)) (squ_mat_transp_prop M).
 
 (* *)
 

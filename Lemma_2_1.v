@@ -33,7 +33,7 @@ Definition is_symm_mat (A : matrix T) :=
   mat_el A i j = mat_el A j i.
 
 Definition is_symm_squ_mat n (A : square_matrix n) :=
-  is_symm_mat (proj1_sig A).
+  is_symm_mat (mat_of_squ_mat A).
 
 Definition princ_subm_1 (A : matrix T) n := subm A n n.
 
@@ -66,8 +66,8 @@ Theorem subm_z : ∀ f i j, subm (mk_mat f 0 0) i j = mZ 0.
 Proof. now intros; apply matrix_eq. Qed.
 
 Theorem princ_subm_prop : ∀ n (A : square_matrix n) l,
-  ((mat_nrows (mat_princ_subm (proj1_sig A) l) =? n - length l) &&
-   (mat_ncols (mat_princ_subm (proj1_sig A) l) =? n - length l))%bool = true.
+  ((mat_nrows (mat_princ_subm (mat_of_squ_mat A) l) =? n - length l) &&
+   (mat_ncols (mat_princ_subm (mat_of_squ_mat A) l) =? n - length l))%bool = true.
 Proof.
 intros.
 apply Bool.andb_true_iff.
@@ -109,7 +109,7 @@ Qed.
 
 Definition princ_subm n (A : square_matrix n) (l : list nat) :
    square_matrix (n - length l) :=
- exist _ (mat_princ_subm (proj1_sig A) l) (princ_subm_prop A l).
+ exist _ (mat_princ_subm (mat_of_squ_mat A) l) (princ_subm_prop A l).
 
 Definition eigenvalues M ev :=
   ∀ μ, μ ∈ ev → ∃ V, V ≠ vect_zero (mat_nrows M) ∧ (M • V = μ × V)%V.
@@ -318,10 +318,10 @@ now apply eq_vect_squ_0 in H.
 Qed.
 
 Definition is_diagonal_square_matrix n (M : square_matrix n) :=
-  ∀ i j, if Nat.eq_dec i j then True else mat_el (proj1_sig M) i j = 0%F.
+  ∀ i j, if Nat.eq_dec i j then True else squ_mat_el M i j = 0%F.
 
-Definition squ_mat_diagonal n (M : @square_matrix T n) :=
-  map (λ i, mat_el (proj1_sig M) i i) (seq 0 (mat_nrows (proj1_sig M))).
+Definition squ_mat_diagonal n (M : square_matrix n) : list T :=
+  map (λ i, squ_mat_el M i i) (seq 0 n).
 
 (* In the real case, the symmetric matrix M is diagonalisable in the
    sense that there exists an orthogonal matrix O (the columns of which
@@ -329,18 +329,14 @@ Definition squ_mat_diagonal n (M : @square_matrix T n) :=
    are eigenvalues μ_i such that
       M = O . D . O^T *)
 
-Theorem glop : ∀ n (M : square_matrix n),
-  ∃ ev mD mO,
-  is_diagonal_square_matrix mO ∧
-  eigenvalues (proj1_sig M) ev ∧
-  Permutation ev (squ_mat_diagonal M) ∧
-  M = (mO⁺ * mD * mO)%SM.
+Theorem glop : ∀ n (M : square_matrix n) ev,
+  eigenvalues (mat_of_squ_mat M) ev
+  → ∃ mD mO,
+     is_diagonal_square_matrix mO ∧
+     Permutation ev (squ_mat_diagonal M) ∧
+     M = (mO⁺ * mD * mO)%SM.
 Proof.
-intros.
-(* make definitions
-     squ_mat_el M = mat_el (proj1_sig M)
-     mat_of_squ_mat M := proj1_sig M
- *)
+intros * Hev.
 ...
 
 (* changing variable x as y = O^T . x, the Rayleigh quotient R (M, x)
@@ -349,7 +345,7 @@ intros.
 
 Theorem Rayleigh_quotient_from_ortho : ∀ n (M : square_matrix n) mD mO x y ev,
   is_symm_squ_mat M
-  → eigenvalues (proj1_sig M) ev
+  → eigenvalues (mat_of_squ_mat M) ev
   → M = (squ_mat_transp mO * mD * mO)%SM
   → y = (squ_mat_transp mO • x)%SM
   → Rayleigh_quotient M x =
@@ -364,7 +360,7 @@ intros * Hsy Hev Hmin Hmax.
    Similarly, R (M,x) ≤ μ_max and R (M,v_max) = μ_max *)
 
 Theorem glop : ∀ n (M : square_matrix n) x sev μ_min μ_max,
-  eigenvalues (proj1_sig M) sev
+  eigenvalues (mat_of_squ_mat M) sev
   → Sorted rngl_le sev
   → μ_min = hd 0%F sev
   → μ_max = last sev 0%F
@@ -386,8 +382,8 @@ Theorem lemma_2_1 :
   → m < n
   → is_symm_squ_mat A
   → B = princ_subm A l
-  → eigenvalues (proj1_sig A) seva
-  → eigenvalues (proj1_sig B) sevb
+  → eigenvalues (mat_of_squ_mat A) seva
+  → eigenvalues (mat_of_squ_mat B) sevb
   → Sorted rngl_le seva
   → Sorted rngl_le sevb
   → ∀ i, 1 ≤ i ≤ m →
