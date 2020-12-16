@@ -323,11 +323,20 @@ Definition is_orthogonal_matrix (M : matrix T) :=
 Definition is_orthogonal_square_matrix n (M : square_matrix n) :=
   is_orthogonal_matrix (mat_of_squ_mat M).
 
-Definition is_diagonal_square_matrix n (M : square_matrix n) :=
-  ∀ i j, if Nat.eq_dec i j then True else squ_mat_el M i j = 0%F.
+Definition mat_with_diag n d :=
+  mk_mat (λ i j, if Nat.eq_dec i j then nth i d 0%F else 0%F) n n.
 
-Definition squ_mat_diagonal n (M : square_matrix n) : list T :=
-  map (λ i, squ_mat_el M i i) (seq 0 n).
+Theorem mat_with_diag_prop : ∀ n d,
+  ((mat_nrows (mat_with_diag n d) =? n) &&
+   (mat_ncols (mat_with_diag n d) =? n))%bool = true.
+Proof.
+intros. cbn.
+apply Bool.andb_true_iff.
+now split; apply Nat.eqb_eq.
+Qed.
+
+Definition squ_mat_with_diag n d : square_matrix n :=
+ exist _ (mat_with_diag n d) (mat_with_diag_prop n d).
 
 (* In the real case, the symmetric matrix M is diagonalisable in the
    sense that there exists an orthogonal matrix O (the columns of which
@@ -335,12 +344,11 @@ Definition squ_mat_diagonal n (M : square_matrix n) : list T :=
    are eigenvalues μ_i such that
       M = O . D . O^T *)
 
-Theorem diagonal_prop : ∀ n (M : square_matrix n) ev,
+Theorem diagonal_prop : ∀ n (M : square_matrix n) mD ev,
   eigenvalues (mat_of_squ_mat M) ev
-  → ∃ mD mO,
+  → mD = squ_mat_with_diag n ev
+  → ∃ mO,
      is_orthogonal_square_matrix mO ∧
-     is_diagonal_square_matrix mD ∧
-     Permutation ev (squ_mat_diagonal mD) ∧
      M = (mO⁺ * mD * mO)%SM.
 Proof.
 intros * Hev.
