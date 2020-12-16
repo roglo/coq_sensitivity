@@ -317,7 +317,18 @@ intros H.
 now apply eq_vect_squ_0 in H.
 Qed.
 
-Inspect 1.
+(* The Rayleigh quotient reaches its minimum value μ_min (the smallest
+   eigenvalue of M) when x is v_min (the corresponding eigenvector).
+   Similarly, R (M,x) ≤ μ_max and R (M,v_max) = μ_max *)
+
+Theorem glop : ∀ n (M : square_matrix n) x sev μ_min μ_max,
+  eigenvalues (proj1_sig M) sev
+  → Sorted rngl_le sev
+  → μ_min = hd 0%F sev
+  → μ_max = last sev 0%F
+  → (μ_min ≤ Rayleigh_quotient M x ≤ μ_max)%F.
+Proof.
+intros * Hev Hsev Hmin Hmax.
 
 ...
 
