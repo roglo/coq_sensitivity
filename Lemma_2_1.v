@@ -317,6 +317,12 @@ intros H.
 now apply eq_vect_squ_0 in H.
 Qed.
 
+Definition is_orthogonal_matrix (M : matrix T) :=
+  (mat_transp M * M)%M = mI (mat_nrows M).
+
+Definition is_orthogonal_square_matrix n (M : square_matrix n) :=
+  is_orthogonal_matrix (mat_of_squ_mat M).
+
 Definition is_diagonal_square_matrix n (M : square_matrix n) :=
   ∀ i j, if Nat.eq_dec i j then True else squ_mat_el M i j = 0%F.
 
@@ -329,11 +335,12 @@ Definition squ_mat_diagonal n (M : square_matrix n) : list T :=
    are eigenvalues μ_i such that
       M = O . D . O^T *)
 
-Theorem glop : ∀ n (M : square_matrix n) ev,
+Theorem diagonal_prop : ∀ n (M : square_matrix n) ev,
   eigenvalues (mat_of_squ_mat M) ev
   → ∃ mD mO,
-     is_diagonal_square_matrix mO ∧
-     Permutation ev (squ_mat_diagonal M) ∧
+     is_orthogonal_square_matrix mO ∧
+     is_diagonal_square_matrix mD ∧
+     Permutation ev (squ_mat_diagonal mD) ∧
      M = (mO⁺ * mD * mO)%SM.
 Proof.
 intros * Hev.
