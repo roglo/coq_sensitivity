@@ -1,0 +1,284 @@
+% $Id: principal.tex,v 1.39 2012/02/02 19:21:01 deraugla Exp $
+
+\documentclass[t]{beamer}
+\input{common.tex}
+
+% Images
+\pgfdeclareimage[interpolate=true,height=0.7cm]{ordo1}{images/ordo1}
+\pgfdeclareimage[interpolate=true,height=0.7cm]{ordo1-0}{images/ordo1-0}
+\pgfdeclareimage[interpolate=true,height=2.0cm]{ordo2}{images/ordo2}
+\pgfdeclareimage[interpolate=true,height=2.0cm]{ordo2ech}{images/ordo2echec}
+\pgfdeclareimage[interpolate=true,height=2.0cm]{ordo2ech2}{images/ordo2echec2}
+\pgfdeclareimage[interpolate=true,width=8.0cm]{ordo2seul}{images/ordo2seul}
+\pgfdeclareimage[interpolate=true,width=8.0cm]{ordo2pgcd}{images/ordo2pgcd}
+\pgfdeclareimage[interpolate=true,height=3.0cm]{ordo3pgcd}{images/ordo3pgcd}
+\pgfdeclareimage[interpolate=true,height=3.0cm]{ordo3}{images/ordo3}
+\pgfdeclareimage[interpolate=true,height=3.0cm]{ordo3fond}{images/ordo3fond}
+\pgfdeclareimage[interpolate=true,height=1.5cm]{ordo12}{images/ordo12}
+\pgfdeclareimage[interpolate=true,height=1.451cm]{ordo13}{images/ordo13}
+\pgfdeclareimage[interpolate=true,height=1.44cm]{ordo23}{images/ordo23}
+\pgfdeclareimage[interpolate=true,height=2cm]{ordo3coro}{images/ordo3coro}
+
+\begin{document}
+
+\title[Irif - Inria - 24th dec 2020] 
+{Ring-like algebraic structures \\
+  formalized in Coq}
+\author{Daniel de Rauglaudre}
+\institute{\small Irif - Inria}
+\date{24th december 2020}
+\frame{\titlepage}
+
+% - work made in Coq
+% - Ring-like algebraic structures formalizes in Coq
+
+\section[Plan]{}
+\frm{Plan}{
+\setcounter{tocdepth}{1}
+\tableofcontents
+}
+
+\section{introduction}
+
+\frm{Introduction} {
+
+  Motivation :
+  \begin{itemize}
+  \item Systèmes embarqués : sécurité.
+  \item Tester preuves formelles.
+  \item Projet P (Oséo).
+  \end{itemize}
+  \vsp
+  Logiciels d'ordonnancement :
+  \begin{itemize}
+  \item SynDEx de l'équipe Aoste (multiprocesseur).
+  \item Dameid.
+  \end{itemize}
+}
+
+\frm{Exemple de trois tâches}{
+
+  tâche $\tau_1$ : \{phase = 0; durée = 1; période = 6\} \\
+  tâche $\tau_2$ : \{phase = 3; durée = 1; période = 10\} \\
+  tâche $\tau_3$ : \{phase = 1; durée = 2; période = 15\}
+
+  \begin{center}
+    \pgfuseimage{ordo3}
+  \end{center}
+}
+
+\section{théorème}
+
+\frm{Théorème (Jan Korst - 1992)}{
+  
+  Une liste de tâches \{$\tau_1$ .. $\tau_n$\} est ordonnançable par l'algorithme de \\
+  {\em périodicité stricte non préemptive}, si et seulement si :\\
+  \begin{center}
+    $\forall$ $\tau_i$ = ($\phi_i$, $d_i$, $P_i$) $\in$ \{$\tau_1$ .. $\tau_n$\} \\
+    $\forall$ $\tau_j$ = ($\phi_j$, $d_j$, $P_j$) $\in$ \{$\tau_1$ .. $\tau_n$\} \\
+    avec i $\ne$ j et $\phi_i$ $\le$ $\phi_j$ \\
+    \vsp
+    on ait :\\
+    \vsp
+    \textcolor{blue}{$d_i$ $\le$ ($\phi_j$ - $\phi_i$)\ mod\ $G_{i,j}$ $\le$ $G_{i,j}$ - $d_j$} \\
+    \vsp
+    où $G_{i,j}$ = pgcd ($P_i$, $P_j$) \\
+  \end{center}
+}
+
+% - ne dit pas s'il y a une solution à ce problème
+% - quelle est l'idée de cette formule magique ?
+% - juste une intuition...
+
+\frm{Représentation de $d_i$ + $d_j$ $\le$ $G_{i,j}$}{
+
+  \begin{center}
+    \hspace{0.2cm} \pgfuseimage{ordo2seul} \\
+    le pgcd des périodes vaut 4 :\\
+    \vsp
+    \hspace{0cm} \pgfuseimage{ordo2pgcd} \\
+  \end{center}
+}
+
+\section{preuve formelle}
+
+\subsection{modélisation}
+
+\frm{Structures de données + Exemple}{
+
+  Tâche : \\
+  \hspace{2cm} Record \textcolor{blue}{Task} := \\
+  \hspace{2.5cm}  \{ \textcolor{blue}{id} : nat ; \textcolor{blue}{phase} : nat ; \textcolor{blue}{duration} : nat ; \textcolor{blue}{period} : nat \}.\\
+  \vsp
+  Unité de temps : \\
+  \vsp
+  \hspace{2cm} Inductive \textcolor{blue}{time\_unit} := \\
+  \hspace{2.2cm}  $|$ \textcolor{blue}{E} : time\_unit \hspace{2cm} (* processeur libre *)\\
+  \hspace{2.2cm}  $|$ \textcolor{blue}{A} : nat $\rightarrow$ time\_unit. \hspace{0.7cm} (* processeur occupé *) \\
+  \vsp
+  Exemple : \\
+  \vsp
+  \hspace{2cm} A 1, A 3, A 3, A 2, E, E, A 1, E, E, E, E, E, A 1, ...
+}
+
+% - en bleu, ce qui est défini
+% - en noir, éléments de syntaxe
+% - transition : qu'est-ce qui va construire ces unités de temps ?
+
+\frm{Fonctions}{
+
+  \textcolor{blue}{nth\_time\_unit} : nat $\rightarrow$ Task $\rightarrow$ time\_unit \\
+  \begin{itemize}
+  \item renvoit la $t^{ieme}$ unité de temps pour la tâche $\tau$
+  \end{itemize}
+  \vsp
+  \textcolor{blue}{merge\_unit\_list} : nat $\rightarrow$ list Task $\rightarrow$
+  option time\_unit \\
+  \begin{itemize}
+  \item renvoit la $t^{ieme}$ unité de temps pour la liste de tâches $\tau$l
+  \end{itemize}
+  \vsp
+  \textcolor{blue}{schedulable} : list Task $\rightarrow$ Prop := \\
+  \begin{itemize}
+  \item $\forall t$, merge\_unit\_list t $\tau$l $\ne$ None
+  \end{itemize}
+
+}
+
+% - par exemple durée = 3, période 10 : A A A E E E E E E E E
+% - merge_unit_list peut échouer si conflit entre tâches
+% - nth_time_unit : 5 lignes de code
+% - merge_unit_list : 14 lignes de code
+% - code de ces fonctions dans l'article
+
+\subsection{théorème}
+
+\frm{Condition nécessaire}{
+
+  Si, pour tout couple de tâches ($\tau_i$, $\tau_j$) de $\tau$l, \\
+  \hsp\hsp $d_i$ $\le$ ($\phi_j$ - $\phi_i$)\ mod\ $G_{i,j}$ $\le$ $G_{i,j}$ - $d_j$ \\
+  alors \\
+  \hsp\hsp $\forall$ t, merge\_unit\_list t $\tau$l $\ne$ None.
+
+  \vsp
+
+  \textcolor{blue}{Preuve} : \\
+  \hsp Par contradiction. On suppose donc que : \\
+  \hsp\hsp\hsp $\exists$ $\tau_i$ $\tau_j$ t / nth\_time\_unit t $\tau_i$ = A i \\
+  \hsp\hspace{2.25cm} nth\_time\_unit t $\tau_j$ = A j \\
+
+  \vsp
+  \hsp Puis, considérations sur les opérations élémentaires, \\
+  \hsp les inégalités et les modulos. Voir article.
+
+}
+
+\frm{Réciproque}{
+
+  On doit montrer que si \\
+  \hsp\hsp $\forall$ t, merge\_unit\_list t $\tau$l $\ne$ None, \\
+
+  alors, pour tout couple de tâches ($\tau_i$, $\tau_j$) de $\tau$l, \\
+  \hsp\hsp $d_i$ $\le$ ($\phi_j$ - $\phi_i$)\ mod\ $G_{i,j}$ $\le$ $G_{i,j}$ - $d_j$ \\
+  \vsp
+  \textcolor{blue}{Preuve} : par la contraposée. \\
+  \vsp
+   mais... mais... est-ce que ça va résoudre le problème ?
+}
+
+% - la contraposée n'implique pas forcément l'implication !
+
+\frm{Contraposée... problème !}{
+
+  En logique intuitioniste : \\
+  \hsp\hsp (A $\implies$ B) $\implies$ ($\bar{B}$ $\implies$ $\bar{A}$) \\
+  \vsp
+  Mais la réciproque n'est pas vraie, en général. \\
+  \vsp
+  Sauf si B est \textcolor{red}{décidable} ! \\
+  \vsp
+  B = \\
+  \hsp\hsp Pour tout couple de tâches ($\tau_i$, $\tau_j$) de $\tau$l, \\
+  \hsp\hsp\hsp\hsp $d_i$ $\le$ ($\phi_j$ - $\phi_i$)\ mod\ $G_{i,j}$ $\le$ $G_{i,j}$ - $d_j$ \\
+}
+
+\frm{Contraposée de la réciproque} {
+
+  S'il existe un couple de tâches ($\tau_i$, $\tau_j$) de $\tau$l tel que : \\
+  \hsp\hsp $d_i$ $>$ ($\phi_j$ - $\phi_i$)\ mod\ $G_{i,j}$ \textcolor{green}{$\vee$} \\
+  \hsp\hsp ($\phi_j$ - $\phi_i$)\ mod\ $G_{i,j}$ $>$ $G_{i,j}$ - $d_j$ \\
+  alors \\
+  \hsp\hsp $\exists$ t, merge\_unit\_list t $\tau$l = None. \\
+  \vsp
+  \textcolor{blue}{Preuve} : théorème de Bachet-Bézout. \\
+  \vsp
+  \only<2->{
+  \hsp\hsp $\forall$ a b $\in$ $\mathbb{N}$, $\exists$ u v $\in$ $\mathbb{Z}$ / a.u + b.v = pgcd(a, b) \\
+  \vsp}
+  \only<3->{
+  Bachet-Bézout sur les entiers naturels : \\
+  \vsp
+  \hsp\hsp $\forall$ a b $\in$ $\mathbb{N}$, $\exists$ u v $\in$ \textcolor{blue}{$\mathbb{N}$} / a.u = b.v + pgcd(a, b)}
+}
+
+\subsection{corollaires}
+
+\frm{Corollaire 1 : somme des durées} {
+
+  Une liste de tâches \{$\tau_1$ .. $\tau_n$\} est ordonnançable si :
+  \begin{center}
+    $\sum_{\tau_k}$ $d_k$ $\le$ pgcd $P_k$
+  \end{center}
+  On choisit les phases : $\phi_1$ = 0 et $\phi_{i+1}$ = $\phi_i$ + $d_i$ \\
+  \vsp
+  Réciproque fausse en toute généralité. Exemple :
+  \begin{center}
+    \{$d_1$=1; $P_1$=4 \}
+    \{$d_2$=1; $P_2$=6 \}
+    \{$d_3$=1; $P_3$=4 \} \\
+    \vsp
+    \pgfuseimage{ordo3coro}
+  \end{center}
+}
+
+\frm{Corollaire 2 : deux tâches} {
+
+  Deux tâches $\tau_1$ et $\tau_2$ sont ordonnançables si et seulement si :
+  \begin{center}
+    $d_1$ + $d_2$ $\le$ pgcd($P_1$, $P_2$)
+  \end{center}
+  Phases : $\phi_1$ = 0 et $\phi_2$ = $d_1$ \\
+  \vsp
+  Réciproque vraie dans ce cas.
+
+}
+
+\section{conclusion}
+
+\frm{Concrètement...} {
+
+  \begin{itemize}
+  \item début 2011
+  \item 2 mois de développement (débutant Coq)
+  \item 2000 lignes de Coq
+  \item sources sur le Web :
+    \url{http://pauillac.inria.fr/~ddr/publi/coq_korst/}
+  \item travail clos
+  \end{itemize}
+  
+}
+
+\frm{Conclusion et Travaux futurs} {
+
+  \begin{itemize}
+  \item Preuves {\em formelles} possibles dans ce domaine.
+  \item Opinion perso : Coq = révolution dans les maths !
+  \item Autre théorème en cours : tâches préemptives avec priorité.
+  \item Preuves formelles de {\em programmes} embarqués ? Projet P (Oséo).
+  \item Preuve formelle du noyau de SynDEx ?
+  \item Tactiques : {\em ssreflect} de Microsoft Research-Inria ?
+  \end{itemize}
+
+}
+
+\end{document}

@@ -1,0 +1,61 @@
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{xcolor}
+\usepackage[normalem]{ulem}
+\usepackage{wasysym}
+\usepackage{url}
+\usepackage{listings}
+\usepackage{verbatim}
+\usepackage{moreverb}
+\usepackage{gastex}
+\usepackage{graphicx} 
+\usepackage{multicol}
+
+\mode<presentation> {
+  \usetheme{Rocquencourt}
+  \setbeamercovered{highly dynamic}
+%  \setbeamersize{text margin left=0.5cm}
+}
+
+\AtBeginSection[]  {
+\begin{frame}<beamer>
+ \frametitle{Plan}
+ \setcounter{tocdepth}{2}
+ \tableofcontents[currentsection,sectionstyle=show/shaded,
+                  subsectionstyle=show/show/hide]
+\end{frame}
+}
+
+
+%========================================================================%
+% Blocks
+%========================================================================%
+
+\definecolor{myblue}{rgb}{0, 0.08, 0.55}
+
+\setbeamertemplate{blocks}[rounded][shadow=true]
+\setbeamercolor{block title}{bg=myblue, fg=white}    
+\setbeamercolor{block body}{bg=white, fg=black}     
+
+\setbeamercolor{block title example}{bg=green,fg=white}   
+\setbeamercolor{block body example}{bg=white,fg=black}   
+
+\setbeamercolor{block title alerted}{bg=red,fg=white}   
+\setbeamercolor{block body alerted}{bg=white,fg=black}   
+
+
+
+%========================================================================%
+% New command 
+%========================================================================%
+\newcommand{\frm}[2]{\frame{\frametitle{#1}\
+#2}}
+
+\newcommand{\parag}[1]{{\bf\textcolor{inriablue}{#1}}\\}
+\newcommand{\syndex}{SynDEx}
+\newcommand{\oc}{OCaml}
+\newcommand{\vsp}{\vspace{0.4cm}}
+\newcommand{\vspd}{\vspace{0.2cm}}
+\newcommand{\hsp}{\hspace{0.3cm}}
+
+			
