@@ -392,7 +392,8 @@ Definition squ_mat_with_vect n (Vl : list (vector T)) :
     ..  ..     ..
    [v1n v2n .. vnn] [μn.v11 μn.v12 .. μn.v1n] =
 
-   [μ1.v11^2+μ2.v21.v11+μ3.v31.v11..+μn.vn1.v11 ..
+   [v11.(μ1.v11+μ2.v21+μ3.v31..+μn.vn1) ..
+   [v11.(μ1.v12+μ2.v22+μ3.v31..+μn.vn2) ..
 *)
 
 Theorem diagonalized_matrix_prop : ∀ n (M : @square_matrix T n) ev eV mD mO,
