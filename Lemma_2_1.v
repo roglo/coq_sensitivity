@@ -374,28 +374,16 @@ Definition squ_mat_with_vect n (Vl : list (vector T)) :
    are eigenvalues μ_i such that
       M = O . D . O^t *)
 
-(* O                 D                O^t
-
-   [v1 v2 v3 ... vn] [μ1 0  0 .. 0  ] [v1]
-                     [0  μ2 0 .. 0  ] [v2]
-                     ...              ...
-                     [0  0  0 .. μn ] [vn] =
-
-   [v1 v2 v3 ... vn] [μ1.v1 μ2.v2 .. μn.vn] =
-
-   [v1 v2 v3 ... vn] [M.v1 M.v2 .. M.vn] =
-
-   [v1 v2 v3 ... vn] M [v1 v2 .. vn] =
-*)
-
-Theorem glop : ∀ n (M : @square_matrix T n) ev eV mD mO,
+Theorem diagonalized_matrix_prop_1 :
+  rngl_is_comm = true →
+  ∀ n (M : @square_matrix T n) ev eV mD mO,
   is_symm_squ_mat M
   → eigenvalues_and_vectors (mat_of_squ_mat M) ev eV
   → mD = squ_mat_with_diag n ev
   → mO = squ_mat_with_vect n eV
    → (M * mO = mO * mD)%SM.
 Proof.
-intros * Hsy Hvv Hd Ho.
+intros Hic * Hsy Hvv Hd Ho.
 apply square_matrix_eq; cbn.
 subst mO mD; cbn.
 remember (mat_with_vect n eV) as mO eqn:Hmo.
@@ -446,16 +434,28 @@ specialize (H1 H eq_refl eq_refl); clear H.
 destruct H1 as (Hvjz, H1).
 remember (nth j ev 0%F) as μ eqn:Hμ.
 remember (nth j eV (vect_zero n)) as V eqn:Hv.
-...
+symmetry.
+assert (H : vect_el (M • V) i = vect_el (μ × V) i) by now rewrite H1.
+cbn - [ iter_seq ] in H.
+rewrite Hc in H.
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+rewrite Hic in rngl_mul_comm.
+now rewrite rngl_mul_comm in H.
+Qed.
 
-Theorem diagonalized_matrix_prop : ∀ n (M : @square_matrix T n) ev eV mD mO,
+Theorem diagonalized_matrix_prop :
+  rngl_is_comm = true →
+  ∀ n (M : square_matrix n) ev eV mD mO,
   is_symm_squ_mat M
   → eigenvalues_and_vectors (mat_of_squ_mat M) ev eV
   → mD = squ_mat_with_diag n ev
   → mO = squ_mat_with_vect n eV
    → M = (mO * mD * mO⁺)%SM.
 Proof.
-intros * Hsy Hvv Hd Ho.
+intros Hic * Hsy Hvv Hd Ho.
+specialize (diagonalized_matrix_prop_1 Hic) as H.
+specialize (H n M ev eV mD mO Hsy Hvv Hd Ho).
+rewrite <- H.
 ...
 
 (* changing variable x as y = O^T . x, the Rayleigh quotient R (M, x)
