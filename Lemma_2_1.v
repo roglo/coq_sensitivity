@@ -389,6 +389,42 @@ Definition squ_mat_with_vect n (Vl : list (vector T)) :
    [v1 v2 v3 ... vn] M [v1 v2 .. vn] =
 *)
 
+Theorem glop : ∀ n (M : @square_matrix T n) ev eV mD mO,
+  is_symm_squ_mat M
+  → eigenvalues_and_vectors (mat_of_squ_mat M) ev eV
+  → mD = squ_mat_with_diag n ev
+  → mO = squ_mat_with_vect n eV
+   → (M * mO = mO * mD)%SM.
+Proof.
+intros * Hsy Hvv Hd Ho.
+apply square_matrix_eq; cbn.
+subst mO mD; cbn.
+remember (mat_with_vect n eV) as mO eqn:Hmo.
+remember (mat_with_diag n ev) as mD eqn:Hmd.
+move mD before mO.
+unfold eigenvalues_and_vectors in Hvv.
+unfold is_symm_squ_mat in Hsy.
+destruct M as (M, Hm).
+cbn in Hsy, Hvv |-*.
+apply Bool.andb_true_iff in Hm.
+destruct Hm as (Hr, Hc).
+apply Nat.eqb_eq in Hr.
+apply Nat.eqb_eq in Hc.
+rewrite Hr in Hvv.
+apply matrix_eq; [ now rewrite Hmo; cbn | | ]. {
+  now rewrite Hmo, Hmd; cbn.
+}
+cbn - [ iter_seq ].
+rewrite Hr, Hc.
+intros * Hi Hj.
+rewrite Hmd in Hj; cbn in Hj.
+remember (mat_ncols mO) as x eqn:Hx.
+rewrite Hmo in Hx; cbn in Hx; subst x.
+...
+apply rngl_summation_eq_compat.
+intros k Hk.
+...
+
 Theorem diagonalized_matrix_prop : ∀ n (M : @square_matrix T n) ev eV mD mO,
   is_symm_squ_mat M
   → eigenvalues_and_vectors (mat_of_squ_mat M) ev eV
