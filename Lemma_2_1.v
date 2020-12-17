@@ -497,6 +497,7 @@ split. {
   remember (nth i eV (vect_zero n)) as vi eqn:Hvi.
   remember (nth j eV (vect_zero n)) as vj eqn:Hvj.
   destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
+...
     enough (H : (vi · vj)%V = 0%F). {
       unfold vect_dot_product in H.
       remember (vect_nrows vi) as x eqn:Hx.
