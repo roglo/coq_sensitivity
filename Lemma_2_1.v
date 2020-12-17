@@ -497,9 +497,9 @@ split. {
   remember (nth i eV (vect_zero n)) as vi eqn:Hvi.
   remember (nth j eV (vect_zero n)) as vj eqn:Hvj.
   destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
-...
     unfold squ_mat_with_vect in Hm.
     unfold eigenvalues_and_vectors in Hvv.
+...
     destruct mO as (mO, Hmo).
     injection Hm; clear Hm; intros Hm.
     unfold mat_with_vect in Hm.
