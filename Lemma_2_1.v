@@ -443,6 +443,16 @@ rewrite Hic in rngl_mul_comm.
 now rewrite rngl_mul_comm in H.
 Qed.
 
+Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
+  ∀ n (M : square_matrix n) ev eV mO,
+  is_symm_squ_mat M
+  → eigenvalues_and_vectors (mat_of_squ_mat M) ev eV
+  → mO = squ_mat_with_vect n eV
+  → (mO * mO⁺ = squ_mat_zero n)%SM.
+Proof.
+intros * Hsy Hvv Hm.
+...
+
 Theorem diagonalized_matrix_prop :
   rngl_is_comm = true →
   ∀ n (M : square_matrix n) ev eV mD mO,
@@ -456,6 +466,7 @@ intros Hic * Hsy Hvv Hd Ho.
 specialize (diagonalized_matrix_prop_1 Hic) as H.
 specialize (H n M ev eV mD mO Hsy Hvv Hd Ho).
 rewrite <- H.
+rewrite <- squ_mat_mul_assoc; [ | easy ].
 ...
 
 (* changing variable x as y = O^T . x, the Rayleigh quotient R (M, x)

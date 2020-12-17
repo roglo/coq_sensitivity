@@ -1507,6 +1507,8 @@ Arguments mat_sub {T ro} MA%M MB%M.
 Arguments mI {T ro} n%nat.
 Arguments mZ {T ro} n%nat.
 Arguments minus_one_pow {T ro}.
+Arguments squ_mat_zero {T}%type {ro} n%nat.
+Arguments squ_mat_one {T}%type {ro} n%nat.
 Arguments squ_mat_add {T}%type {ro} {n%nat} MA MB.
 Arguments squ_mat_mul {T}%type {ro} {n%nat} MA MB.
 Arguments squ_mat_ring_like_op {T ro}.
