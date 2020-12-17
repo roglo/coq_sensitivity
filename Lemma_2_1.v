@@ -118,8 +118,7 @@ Definition eigenvalues_and_vectors M ev eV :=
   ∀ i μ V, 0 ≤ i < mat_nrows M →
   μ = nth i ev 0%F
   → V = nth i eV (vect_zero (mat_nrows M))
-  → V ≠ vect_zero (mat_nrows M)
-  → (M • V = μ × V)%V.
+  → V ≠ vect_zero (mat_nrows M) ∧ (M • V = μ × V)%V.
 
 (* Rayleigh quotient *)
 
@@ -444,6 +443,9 @@ cbn - [ iter_seq ].
 specialize (Hvv j (nth j ev 0%F) (nth j eV (vect_zero n))) as H1.
 assert (H : 0 ≤ j < n) by flia Hj.
 specialize (H1 H eq_refl eq_refl); clear H.
+destruct H1 as (Hvjz, H1).
+remember (nth j ev 0%F) as μ eqn:Hμ.
+remember (nth j eV (vect_zero n)) as V eqn:Hv.
 ...
 
 Theorem diagonalized_matrix_prop : ∀ n (M : @square_matrix T n) ev eV mD mO,
