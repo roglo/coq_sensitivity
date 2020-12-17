@@ -484,11 +484,27 @@ Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   is_symm_squ_mat M
   → eigenvalues_and_vectors (mat_of_squ_mat M) ev eV
   → mO = squ_mat_with_vect n eV
-  → (mO * mO⁺ = squ_mat_one n)%SM.
+  → (mO⁺ * mO = squ_mat_one n)%SM ∧
+     (mO * mO⁺ = squ_mat_one n)%SM.
 Proof.
 intros * Hsy Hvv Hm.
-apply square_matrix_eq; cbn.
-rewrite Hm; cbn.
+split. {
+  apply square_matrix_eq; cbn.
+  rewrite Hm; cbn.
+  apply matrix_eq; [ easy | easy | ].
+  cbn - [ iter_seq ].
+  intros * Hi Hj.
+  remember (nth i eV (vect_zero n)) as vi eqn:Hvi.
+  remember (nth j eV (vect_zero n)) as vj eqn:Hvj.
+  destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
+    enough (H : (vi · vj)%V = 0%F). {
+      unfold vect_dot_product in H.
+      remember (vect_nrows vi) as x eqn:Hx.
+      rewrite Hvi in Hx; cbn in Hx.
+      unfold eigenvalues_and_vectors in Hvv.
+      unfold squ_mat_with_vect in Hm.
+...
+      cbn - [ iter_seq ] in H.
 ...
 rewrite <- mI_transp_idemp.
 symmetry.
