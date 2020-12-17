@@ -439,7 +439,11 @@ rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
 rewrite rngl_add_0_r.
 rewrite Hmd; cbn - [ iter_seq ].
 destruct (Nat.eq_dec j j) as [H| H]; [ clear H | easy ].
-symmetry.
+rewrite Hmo.
+cbn - [ iter_seq ].
+specialize (Hvv j (nth j ev 0%F) (nth j eV (vect_zero n))) as H1.
+assert (H : 0 ≤ j < n) by flia Hj.
+specialize (H1 H eq_refl eq_refl); clear H.
 ...
 
 Theorem diagonalized_matrix_prop : ∀ n (M : @square_matrix T n) ev eV mD mO,
