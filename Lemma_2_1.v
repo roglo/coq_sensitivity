@@ -420,9 +420,26 @@ intros * Hi Hj.
 rewrite Hmd in Hj; cbn in Hj.
 remember (mat_ncols mO) as x eqn:Hx.
 rewrite Hmo in Hx; cbn in Hx; subst x.
-...
-apply rngl_summation_eq_compat.
-intros k Hk.
+symmetry.
+rewrite (rngl_summation_split _ j); [ | flia Hj ].
+rewrite rngl_summation_split_last; [ | flia ].
+rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
+  intros k Hk.
+  rewrite Hmd; cbn.
+  destruct (Nat.eq_dec (k - 1) j) as [Hkj| Hkj]; [ flia Hk Hkj | ].
+  apply rngl_mul_0_r.
+}
+rewrite rngl_add_0_l.
+rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
+  intros k Hk.
+  rewrite Hmd; cbn.
+  destruct (Nat.eq_dec k j) as [Hkj| Hkj]; [ flia Hk Hkj | ].
+  apply rngl_mul_0_r.
+}
+rewrite rngl_add_0_r.
+rewrite Hmd; cbn - [ iter_seq ].
+destruct (Nat.eq_dec j j) as [H| H]; [ clear H | easy ].
+symmetry.
 ...
 
 Theorem diagonalized_matrix_prop : ∀ n (M : @square_matrix T n) ev eV mD mO,
