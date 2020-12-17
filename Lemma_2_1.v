@@ -443,14 +443,71 @@ rewrite Hic in rngl_mul_comm.
 now rewrite rngl_mul_comm in H.
 Qed.
 
+Theorem mat_transp_invol : ∀ M : matrix T, (M⁺)⁺%M = M.
+Proof.
+intros.
+now apply matrix_eq.
+Qed.
+
+Theorem mat_transp_mul :
+  rngl_is_comm = true →
+  ∀ MA MB : matrix T,
+  mat_ncols MA = mat_nrows MB
+  → ((MA * MB)⁺ = MB⁺ * MA⁺)%M.
+Proof.
+intros Hic * Hab.
+apply matrix_eq; [ easy | easy | ].
+cbn - [ iter_seq ].
+intros * Hi Hj.
+rewrite <- Hab.
+apply rngl_summation_eq_compat.
+intros k Hk.
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+rewrite Hic in rngl_mul_comm.
+apply rngl_mul_comm.
+Qed.
+
+Theorem mI_transp_idemp : ∀ n, ((mI n)⁺)%M = mI n.
+Proof.
+intros.
+apply matrix_eq; [ easy | easy | cbn ].
+intros * Hi Hj.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  now subst i; destruct (Nat.eq_dec j j).
+} {
+  destruct (Nat.eq_dec j i); [ now subst j | easy ].
+}
+Qed.
+
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   ∀ n (M : square_matrix n) ev eV mO,
   is_symm_squ_mat M
   → eigenvalues_and_vectors (mat_of_squ_mat M) ev eV
   → mO = squ_mat_with_vect n eV
-  → (mO * mO⁺ = squ_mat_zero n)%SM.
+  → (mO * mO⁺ = squ_mat_one n)%SM.
 Proof.
 intros * Hsy Hvv Hm.
+apply square_matrix_eq; cbn.
+rewrite Hm; cbn.
+...
+rewrite <- mI_transp_idemp.
+symmetry.
+rewrite <- mat_transp_invol.
+symmetry.
+f_equal.
+rewrite mat_transp_mul.
+rewrite mat_transp_invol.
+...
+rewrite mat_transp_mul.
+rewrite mat_transp_invol.
+apply matrix_eq; [ easy | easy | ].
+cbn - [ iter_seq ].
+intros * Hi Hj.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
+(*
+  remember (nth i eV (vect_zero n)) as vi eqn:Hvi.
+  remember (nth j eV (vect_zero n)) as vj eqn:Hvj.
+*)
 ...
 
 Theorem diagonalized_matrix_prop :

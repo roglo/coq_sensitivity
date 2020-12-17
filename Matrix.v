@@ -1533,6 +1533,7 @@ Notation "A - B" := (mat_sub A B) : M_scope.
 Notation "A * B" := (mat_mul A B) : M_scope.
 Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
 Notation "- A" := (mat_opp A) : M_scope.
+Notation "A ⁺" := (mat_transp A) (at level 1, format "A ⁺") : M_scope.
 
 Notation "A * B" := (squ_mat_mul A B) : SM_scope.
 Notation "A + B" := (squ_mat_add A B) : SM_scope.
