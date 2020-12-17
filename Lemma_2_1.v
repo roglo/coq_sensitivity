@@ -394,7 +394,7 @@ Theorem diagonalized_matrix_prop : ∀ n (M : @square_matrix T n) ev eV mD mO,
   → eigenvalues_and_vectors (mat_of_squ_mat M) ev eV
   → mD = squ_mat_with_diag n ev
   → mO = squ_mat_with_vect n eV
-   → M = (mO⁺ * mD * mO)%SM.
+   → M = (mO * mD * mO⁺)%SM.
 Proof.
 intros * Hsy Hvv Hd Ho.
 ...
