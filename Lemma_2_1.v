@@ -500,6 +500,7 @@ split. {
     unfold squ_mat_with_vect in Hm.
     unfold eigenvalues_and_vectors in Hvv.
 ...
+(* https://math.stackexchange.com/questions/82467/eigenvectors-of-real-symmetric-matrices-are-orthogonal *)
     destruct mO as (mO, Hmo).
     injection Hm; clear Hm; intros Hm.
     unfold mat_with_vect in Hm.
