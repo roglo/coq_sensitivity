@@ -1463,11 +1463,18 @@ now apply H.
 Qed.
 
 Theorem mat_opt_add_sub : ∀ n (ro := mat_ring_like_op n),
-  if rngl_has_opp then True else ∀ a b : matrix n n T, (a + b - b)%F = a.
+  if rngl_has_opp then True else ∀ a b : matrix n n T, (a + b - b)%M = a.
 Proof.
 intros.
 remember rngl_has_opp as x eqn:Hx; symmetry in Hx.
 destruct x; [ easy | ].
+intros MA MB.
+Theorem mat_add_sub : ∀ m n (MA MB : matrix m n T), (MA + MB - MB)%M = MA.
+Admitted.
+...
+apply mat_add_sub.
+...
+
 intros MA MB.
 apply matrix_eq.
 intros * Hi Hj.
