@@ -1637,12 +1637,14 @@ destruct IHn as [IHn| IHn]. {
 }
 Qed.
 
+(* something wrong here: if n equals 0, all matrices are empty,
+   therefore 1 = 0 in matrices *)
+(*
 Theorem mat_1_neq_0 : ∀ n, @mI T ro n ≠ mZ n n.
 Proof.
 intros.
 apply matrix_neq.
 intros H; cbn in H.
-destruct n. {
 ...
 
 Definition mat_ring_like_prop (n : nat) :
@@ -1682,12 +1684,13 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_opt_mul_le_compat_nonpos := I;
      rngl_opt_mul_le_compat := I;
      rngl_opt_not_le := I |}.
-
 ...
+*)
 
+(*
 Theorem squ_mat_mul_scal_vect_comm :
   rngl_is_comm = true →
-  ∀ n (M : square_matrix n) c V,
+  ∀ n (M : matrix n n T) c V,
   (c × (M • V)%SM)%V = (M • (c × V))%SM.
 Proof.
 intros Hic *.
@@ -1704,17 +1707,16 @@ specialize rngl_opt_mul_comm as rngl_mul_comm.
 rewrite Hic in rngl_mul_comm.
 apply rngl_mul_comm.
 Qed.
+*)
 
 Theorem vect_eq_dec :
   rngl_has_dec_eq = true →
-  ∀ n (U V : vector T),
-  vect_nrows U = n
-  → vect_nrows V = n
-  → {U = V} + {U ≠ V}.
+  ∀ n (U V : vector n T), {U = V} + {U ≠ V}.
 Proof.
-intros Hed * Hru Hrv.
+intros Hed *.
 specialize rngl_opt_eq_dec as rngl_eq_dec.
 rewrite Hed in rngl_eq_dec.
+...
 destruct U as (fu, ru).
 destruct V as (fv, rv).
 cbn in Hru, Hrv; subst ru rv.
@@ -1791,6 +1793,7 @@ Theorem fold_determinant :
 Proof. easy. Qed.
 
 End a.
+...
 
 Module matrix_Notations.
 
