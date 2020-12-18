@@ -100,14 +100,13 @@ Proof. easy. Qed.
 
 (* opposite *)
 
-Definition mat_opt_opp {m n} M : matrix m n T :=
-  if rngl_has_opp then {| mat_el i j := (- mat_el M i j)%F |}
-  else M.
+Definition mat_opp {m n} (M : matrix m n T) : matrix m n T :=
+  {| mat_el i j := (- mat_el M i j)%F |}.
 
 (* subtraction *)
 
-Definition mat_sub {m n} (MA MB : matrix m n T) : matrix m n T :=
-  {| mat_el i j := (mat_el MA i j - mat_el MB i j)%F |}.
+Definition mat_sub {m n} (MA MB : matrix m n T) :=
+  mat_add MA (mat_opp MB).
 
 (* *)
 
@@ -342,6 +341,7 @@ Arguments mat_mul_scal_l {T ro m n} s%F M%M.
 Arguments mat_nrows {T} m%M.
 Arguments mat_ncols {T} m%M.
 *)
+Arguments mat_opp {T}%type {ro} {m n}%nat.
 Arguments mat_sub {T ro m n} MA%M MB%M.
 Arguments mI {T ro} n%nat.
 Arguments mZ {T ro} (m n)%nat.
@@ -354,9 +354,7 @@ Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.
 Notation "A * B" := (mat_mul A B) : M_scope.
 Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
-(*
 Notation "- A" := (mat_opp A) : M_scope.
-*)
 
 Declare Scope V_scope.
 Delimit Scope V_scope with V.
@@ -421,30 +419,27 @@ Qed.
 
 (* addition left and right with opposite *)
 
-Arguments mat_opt_opp {T}%type {ro} {m n}%nat M%M.
-
 Theorem mat_add_opp_l {m n} :
   rngl_has_opp = true →
-  ∀ (M : matrix m n T), (mat_opt_opp M + M = mZ m n)%M.
+  ∀ (M : matrix m n T), (- M + M = mZ m n)%M.
 Proof.
 intros Hro *.
-apply matrix_eq.
+apply matrix_eq; cbn.
 intros * Hi Hj.
-unfold mat_opt_opp.
-rewrite Hro; cbn.
 now apply rngl_add_opp_l.
 Qed.
 
-Theorem mat_add_opp_r :
-  ∀ {m n} (M : matrix m n T),
-  (M - M = mZ m n)%M.
+Theorem mat_add_opp_r {m n} :
+  rngl_has_opp = true →
+  ∀ (M : matrix m n T), (M - M = mZ m n)%M.
 Proof.
-intros.
-apply matrix_eq.
+intros Hro *.
+apply matrix_eq; cbn.
 intros * Hi Hj.
 specialize rngl_add_opp_r as H.
-cbn; unfold rngl_sub in H |-*.
-destruct rngl_has_opp; apply H.
+unfold rngl_sub in H.
+rewrite Hro in H.
+apply H.
 Qed.
 
 (*
@@ -1025,7 +1020,7 @@ Canonical Structure mat_ring_like_op n :
      rngl_one := mI n;
      rngl_add := @mat_add T _ n n;
      rngl_mul := @mat_mul T _ n n n;
-     rngl_opp := @mat_opt_opp T _ n n;
+     rngl_opp := @mat_opp T _ n n;
      rngl_inv := @phony_squ_mat_inv n;
      rngl_le := @phony_squ_mat_le n;
      rngl_opt_sub := @phony_squ_mat_sub n;
@@ -1468,6 +1463,7 @@ destruct x; [ | easy ].
 now apply H.
 Qed.
 
+(*
 Theorem mat_opt_add_sub : ∀ n,
   match @rngl_has_opp (matrix n n T) (mat_ring_like_op n) return Prop with
   | true => True
@@ -1485,9 +1481,10 @@ intros * Hi Hj.
 unfold rngl_sub.
 rewrite Hx.
 cbn.
-...
 apply rngl_add_sub.
+*)
 
+(*
 Theorem mat_opt_add_sub : ∀ n,
   if @rngl_has_opp (matrix n n T) (mat_ring_like_op n) then True
   else ∀ a b : matrix n n T, (a + b - b)%M = a.
@@ -1500,10 +1497,22 @@ apply matrix_eq; cbn.
 intros * Hi Hj.
 apply rngl_add_sub.
 Qed.
-
 Set Printing All.
+*)
 
-Definition squ_mat_ring_like_prop (n : nat) :
+Theorem mat_opt_add_sub : ∀ n (mro := mat_ring_like_op n),
+  if rngl_has_opp then True else ∀ a b : matrix n n T, (a + b - b)%F = a.
+Proof.
+intros.
+remember rngl_has_opp as x eqn:Hx; symmetry in Hx.
+destruct x; [ easy | ].
+intros MA MB.
+apply matrix_eq; cbn.
+intros * Hi Hj.
+unfold mro; cbn.
+...
+
+Definition mat_ring_like_prop (n : nat) :
   ring_like_prop (matrix n n T) :=
   {| rngl_is_comm := false;
      rngl_has_dec_eq := @rngl_has_dec_eq T ro rp;
