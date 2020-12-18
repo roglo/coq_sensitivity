@@ -1827,6 +1827,7 @@ Arguments mat_mul_1_r {T}%type {ro rp} {n}%nat M%M.
 Arguments mat_nrows {T} m%M.
 Arguments mat_ncols {T} m%M.
 *)
+Arguments mat_opp {T ro} {m n}%nat M%M.
 Arguments mat_sub {T ro} {m n}%nat MA%M MB%M.
 Arguments mI {T ro} n%nat.
 Arguments mZ {T ro} (m n)%nat.

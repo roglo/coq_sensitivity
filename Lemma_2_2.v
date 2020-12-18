@@ -30,39 +30,41 @@ Context {rp : ring_like_prop T}.
 
 (* *)
 
-Definition mat_of_scalar (c : T) := mk_mat (λ i j, c) 1 1.
+Definition mat_of_scalar (c : T) := mk_mat 1 1 (λ i j, c).
 
 (* conversion matrix of matrices (actually list of list of matrices)
    into simple matrix *)
 
-Definition upper_left_mat_in_list_list d mll :=
-  hd (mat_of_scalar d) (hd [] mll).
+Definition upper_left_mat_in_list_list {m n} mll : matrix m n T :=
+  hd (mZ m n) (hd [] mll).
 
-Definition mat_list_list_el d mll i j :=
-  let M := upper_left_mat_in_list_list d mll in
-  let r := mat_nrows M in
-  let c := mat_ncols M in
-  mat_el (nth (j / c) (nth (i / r) mll []) (mat_of_scalar d))
-    (i mod r) (j mod c).
+Definition mat_list_list_el {m n} mll i j :=
+  let M : matrix m n T := upper_left_mat_in_list_list mll in
+  mat_el (nth (j / n) (nth (i / m) mll []) (mZ m n))
+    (i mod m) (j mod n).
 
-Definition mat_of_mat_list_list d (mll : list (list (matrix T))) : matrix T :=
-  let M := upper_left_mat_in_list_list d mll in
-  let r := mat_nrows M in
-  let c := mat_ncols M in
-  mk_mat (mat_list_list_el d mll)
-    (r * length mll)
-    (c * length (hd [] mll)).
+Definition mat_of_mat_list_list {m n} (mll : list (list (matrix m n T))) :
+    matrix _ _ T :=
+  let M := upper_left_mat_in_list_list mll in
+  mk_mat (m * length mll) (n * length (hd [] mll))
+    (mat_list_list_el mll).
 
 (* sequence "An" *)
 
-Fixpoint mA n : matrix T :=
+(* avec mes matrices contenant le nombre de lignes et le nombre de
+   colonnes dans le type, je me retrouve avec la même galère qu'avec
+   les types dépendants : deux types égaux mais pas égaux *)
+
+Fixpoint mA n : matrix (2 ^ n) (2 ^ n) T :=
   match n with
-  | 0 => mat_of_scalar 0%F
+  | 0 => mZ (2 ^ n) (2 ^ n)
   | S n' =>
-      mat_of_mat_list_list 0%F
+      mat_of_mat_list_list
         [[mA n'; mI (2 ^ n')];
          [mI (2 ^ n'); (- mA n')%M]]
   end.
+
+...
 
 (* *)
 
