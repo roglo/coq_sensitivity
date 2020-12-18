@@ -550,7 +550,13 @@ split. {
     specialize (squ_mat_mul_vect_dot_vect Hic M vi vj) as H1.
     (* ((M • vi)%SM · vj)%V = (vi · (M⁺ • vj)%SM)%V *)
     assert (H : vect_nrows vi = n). {
-      rewrite Hvi; cbn.
+      specialize (Hvv i (nth i ev 0%F) vi) as H2.
+      rewrite mat_nrows_of_squ_mat in H2.
+      assert (H : 0 ≤ i < n) by flia Hi.
+      now specialize (H2 H eq_refl Hvi); clear H.
+    }
+    specialize (H1 H); clear H.
+    (* H1 : ((M • vi)%SM · vj)%V = (vi · (M⁺ • vj)%SM)%V *)
 ...
 (* https://math.stackexchange.com/questions/82467/eigenvectors-of-real-symmetric-matrices-are-orthogonal *)
     destruct mO as (mO, Hmo).
