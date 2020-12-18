@@ -1716,10 +1716,8 @@ Proof.
 intros Hed *.
 specialize rngl_opt_eq_dec as rngl_eq_dec.
 rewrite Hed in rngl_eq_dec.
-...
-destruct U as (fu, ru).
-destruct V as (fv, rv).
-cbn in Hru, Hrv; subst ru rv.
+destruct U as (fu).
+destruct V as (fv).
 assert (H : ∀ i, {fu i = fv i} + {fu i ≠ fv i}). {
   intros.
   apply rngl_eq_dec.
@@ -1736,7 +1734,8 @@ destruct IHn as [IHn| IHn]. {
 }
 Qed.
 
-Theorem squ_mat_subm_prop : ∀ n (A : square_matrix n) i j,
+(*
+Theorem squ_mat_subm_prop : ∀ n (A : matrix n n T) i j,
   ((mat_nrows (subm (mat_of_squ_mat A) i j) =? n - 1) &&
    (mat_ncols (subm (mat_of_squ_mat A) i j) =? n - 1))%bool = true.
 Proof.
@@ -1784,44 +1783,55 @@ apply Bool.andb_true_iff in Hm.
 destruct Hm as (H1, H2).
 now apply Nat.eqb_eq in H2.
 Qed.
+*)
 
 (* *)
 
+(*
 Theorem fold_determinant :
   ∀ T {ro : ring_like_op T} {so : ring_like_op T} (M : matrix T),
   det_loop M (mat_ncols M) = determinant M.
 Proof. easy. Qed.
+*)
 
 End a.
-...
 
 Module matrix_Notations.
 
 Declare Scope M_scope.
 Declare Scope V_scope.
+(*
 Declare Scope SM_scope.
+*)
 Delimit Scope M_scope with M.
 Delimit Scope V_scope with V.
+(*
 Delimit Scope SM_scope with SM.
+*)
 
-Arguments det_loop {T ro} M%M n%nat.
-Arguments determinant {T ro} M%M.
+Arguments det_loop {T ro} {n%nat} M%M i%nat.
+Arguments determinant {T ro} {n%nat} M%M.
+(*
 Arguments is_square_mat {T} M%M.
-Arguments mat_add_opp_r {T}%type {ro rp} Hro M%M n%nat.
-Arguments mat_mul_mul_scal_l {T}%type {ro rp} Hic a%F MA%M.
-Arguments mat_mul_scal_l {T ro} _ M%M.
-Arguments mat_mul_vect_r {T ro} M%M V%V.
-Arguments mat_mul_scal_vect_comm {T}%type {ro rp} Hic a%F MA%M V%V.
-Arguments mat_mul_scal_vect_assoc {T}%type {ro rp} a%F MA%M V%V.
-Arguments mat_vect_mul_assoc {T}%type {ro rp} (A B)%M V%V.
-Arguments mat_mul_1_l {T}%type {ro rp} M%M n%nat.
-Arguments mat_mul_1_r {T}%type {ro rp} M%M n%nat.
+*)
+Arguments mat_add_opp_r {T}%type {ro rp} {m n}%nat Hro M%M.
+Arguments mat_mul_mul_scal_l {T}%type {ro rp} Hic {m n p}%nat a%F MA%M.
+Arguments mat_mul_scal_l {T ro} {m n}%nat s%F M%M.
+Arguments mat_mul_vect_r {T ro} {m n}%nat M%M V%V.
+Arguments mat_mul_scal_vect_comm {T}%type {ro rp} Hic {m n}%nat a%F MA%M V%V.
+Arguments mat_mul_scal_vect_assoc {T}%type {ro rp} {m n}%nat a%F MA%M V%V.
+Arguments mat_vect_mul_assoc {T}%type {ro rp} {m n p}%nat (A B)%M V%V.
+Arguments mat_mul_1_l {T}%type {ro rp} {n}%nat M%M.
+Arguments mat_mul_1_r {T}%type {ro rp} {n}%nat M%M.
+(*
 Arguments mat_nrows {T} m%M.
 Arguments mat_ncols {T} m%M.
-Arguments mat_sub {T ro} MA%M MB%M.
+*)
+Arguments mat_sub {T ro} {m n}%nat MA%M MB%M.
 Arguments mI {T ro} n%nat.
-Arguments mZ {T ro} n%nat.
+Arguments mZ {T ro} (m n)%nat.
 Arguments minus_one_pow {T ro}.
+(*
 Arguments squ_mat_zero {T}%type {ro} n%nat.
 Arguments squ_mat_one {T}%type {ro} n%nat.
 Arguments squ_mat_add {T}%type {ro} {n%nat} MA MB.
@@ -1829,19 +1839,20 @@ Arguments squ_mat_mul {T}%type {ro} {n%nat} MA MB.
 Arguments squ_mat_ring_like_op {T ro}.
 Arguments squ_mat_mul_vect_r {T}%type {ro} [n]%nat M%SM V%V.
 Arguments squ_mat_mul_scal_vect_comm {T}%type {ro rp} Hic n M%M c%F V%V.
-Arguments subm {T} M%M i%nat j%nat.
-Arguments vect_add {T ro} U%V V%V.
-Arguments vect_sub {T ro} U%V V%V.
-Arguments vect_opp {T ro} V%V.
-Arguments vect_mul_scal_l {T ro} s%F V%V.
-Arguments vect_mul_scal_reg_r {T}%type {ro rp} Hde Hii V%V (a b)%F.
-Arguments vect_mul_1_l {T}%type {ro rp} V%V n%nat.
-Arguments vect_zero {T ro}.
-Arguments vect_dot_product {T}%type {ro} (U V)%V.
-Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hic a%F (U V)%V.
-Arguments vect_scal_mul_dot_mul_comm {T}%type {ro rp} a%F (U V)%V.
+*)
+Arguments subm {T} {m n}%nat M%M i%nat j%nat.
+Arguments vect_add {T ro} {n}%nat U%V V%V.
+Arguments vect_sub {T ro} {n}%nat U%V V%V.
+Arguments vect_opp {T ro} {n}%nat V%V.
+Arguments vect_mul_scal_l {T ro} s%F {n}%nat V%V.
+Arguments vect_mul_scal_reg_r {T}%type {ro rp} Hde Hii {n}%nat V%V (a b)%F.
+Arguments vect_mul_1_l {T}%type {ro rp} {n}%nat V%V.
+Arguments vect_zero {T ro} n%nat.
+Arguments vect_dot_product {T}%type {ro} {n}%nat (U V)%V.
+Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hic {n}%nat a%F (U V)%V.
+Arguments vect_scal_mul_dot_mul_comm {T}%type {ro rp} {n}%nat a%F (U V)%V.
 Arguments vect_eq_dec {T}%type {ro rp} _ n%nat U%V V%V.
-Arguments vect_el {T}%type v%V c%nat.
+Arguments vect_el {n}%nat {T}%type v%V c%nat.
 
 Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.
@@ -1850,11 +1861,13 @@ Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
 Notation "- A" := (mat_opp A) : M_scope.
 Notation "A ⁺" := (mat_transp A) (at level 1, format "A ⁺") : M_scope.
 
+(*
 Notation "A * B" := (squ_mat_mul A B) : SM_scope.
 Notation "A + B" := (squ_mat_add A B) : SM_scope.
 Notation "A • V" := (squ_mat_mul_vect_r A V) (at level 40) : SM_scope.
 Notation "- A" := (squ_mat_opp A) : SM_scope.
 Notation "A ⁺" := (squ_mat_transp A) (at level 1, format "A ⁺") : SM_scope.
+*)
 
 Notation "U + V" := (vect_add U V) : V_scope.
 Notation "U - V" := (vect_sub U V) : V_scope.
