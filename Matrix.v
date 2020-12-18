@@ -155,7 +155,7 @@ Definition mat_vect_concat {m n} (M : matrix m n T) (V : vector m T) :
 
 (* multiplication of a matrix by a vector *)
 
-Definition mat_mul_vect_r {m n} (M : matrix m n T) (V : vector m T) :=
+Definition mat_mul_vect_r {m n} (M : matrix m n T) (V : vector n T) :=
   mk_vect m (λ i, (Σ (j = 0, n - 1), mat_el M i j * vect_el V j)%F).
 
 (* multiplication of a vector by a scalar *)
@@ -170,30 +170,25 @@ Definition vect_dot_product {n} (U V : vector n T) :=
 
 (* multiplication of a matrix by a scalar *)
 
-...
-
-Definition mat_mul_scal_l s M :=
-  mk_mat (λ i j, s * mat_el M i j)%F (mat_nrows M) (mat_ncols M).
+Definition mat_mul_scal_l {m n} s (M : matrix m n T) :=
+  mk_mat m n (λ i j, s * mat_el M i j)%F.
 
 (* matrix without row i and column j *)
 
-Definition subm (M : matrix T) i j :=
-  mk_mat
+Definition subm {m n} (M : matrix m n T) i j :=
+  mk_mat (m - 1) (n - 1)
     (λ k l,
        if lt_dec k i then
          if lt_dec l j then mat_el M k l
          else mat_el M k (l + 1)
        else
          if lt_dec l j then mat_el M (k + 1) l
-         else mat_el M (k + 1) (l + 1))
-    (mat_nrows M - 1)
-    (mat_ncols M - 1).
+         else mat_el M (k + 1) (l + 1)).
 
 (* matrix whose k-th column is replaced by a vector *)
 
-Definition mat_repl_vect k (M : matrix T) V :=
-  mk_mat (λ i j, if Nat.eq_dec j k then vect_el V i else mat_el M i j)
-    (mat_nrows M) (mat_ncols M).
+Definition mat_repl_vect {m n} k (M : matrix m n T) (V : vector m T) :=
+  mk_mat m n (λ i j, if Nat.eq_dec j k then vect_el V i else mat_el M i j).
 
 (* (-1) ^ n *)
 
@@ -205,22 +200,22 @@ Definition minus_one_pow n :=
 
 (* determinant *)
 
-Fixpoint det_loop M n :=
-  match n with
+Fixpoint det_loop {n} (M : matrix n n T) i :=
+  match i with
   | 0 => 1%F
-  | S n' =>
-      (Σ (j = 0, n'),
-       minus_one_pow j * mat_el M 0 j * det_loop (subm M 0 j) n')%F
+  | S i' =>
+      (Σ (j = 0, i'),
+       minus_one_pow j * mat_el M 0 j * det_loop (subm M 0 j) i')%F
   end.
 
-Definition determinant M := det_loop M (mat_ncols M).
+Definition determinant {n} (M : matrix n n T) := det_loop M n.
 
 (* *)
 
 Declare Scope V_scope.
 Delimit Scope V_scope with V.
 
-Arguments vect_el {T} v%V n%nat.
+Arguments vect_el {n}%nat {T} v%V.
 
 Notation "U + V" := (vect_add U V) : V_scope.
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
@@ -229,17 +224,19 @@ Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
    (to be proven) be equivalent; perhaps could help for proving
    Cramer's rule of resolving equations *)
 
-Definition det_from_row M i :=
+Definition det_from_row {n} (M : matrix n n T) i :=
   (minus_one_pow i *
-   Σ (j = 0, mat_ncols M - 1),
+   Σ (j = 0, n - 1),
      minus_one_pow j * mat_el M i j * determinant (subm M i j))%F.
 
-Definition det_from_col M j :=
+Definition det_from_col {n} (M : matrix n n T) j :=
   (minus_one_pow j *
-   Σ (i = 0, mat_nrows M - 1),
+   Σ (i = 0, n - 1),
      minus_one_pow i * mat_el M i j * determinant (subm M i j))%F.
 
 (* *)
+
+(* to be updated to new definition matrix m n T  if I need them ...
 
 Definition mat_mul_row_by_scal k M s :=
   mk_mat
@@ -313,16 +310,17 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn - [ iter_seq ].
 now apply rngl_summation_add_distr.
 Qed.
+*)
 
-(* null matrix of dimension n *)
+(* null matrix of dimension m × n *)
 
-Definition mZ n :=
-  mk_mat (λ i j, 0%F) n n.
+Definition mZ m n :=
+  mk_mat m n (λ i j, 0%F).
 
-(* identity matrix of dimension n *)
+(* identity square matrix of dimension n *)
 
-Definition mI n : matrix T :=
-  mk_mat (λ i j, if Nat.eq_dec i j then 1%F else 0%F) n n.
+Definition mI n : matrix n n T :=
+  mk_mat n n (λ i j, if Nat.eq_dec i j then 1%F else 0%F).
 
 End a.
 
@@ -335,17 +333,21 @@ Context {rp : ring_like_prop T}.
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
 
-Arguments det_loop {T ro} M%M n%nat.
+Arguments det_loop {T ro} {n}%nat M%M i%nat.
+(*
 Arguments is_square_mat {T} M%M.
-Arguments mat_mul_scal_l {T ro} s%F M%M.
+*)
+Arguments mat_mul_scal_l {T ro m n} s%F M%M.
+(*
 Arguments mat_nrows {T} m%M.
 Arguments mat_ncols {T} m%M.
-Arguments mat_sub {T ro} MA%M MB%M.
+*)
+Arguments mat_sub {T ro m n} MA%M MB%M.
 Arguments mI {T ro} n%nat.
-Arguments mZ {T ro} n%nat.
+Arguments mZ {T ro} (m n)%nat.
 Arguments minus_one_pow {T ro}.
-Arguments determinant {T ro} M%M.
-Arguments subm {T} M%M i%nat j%nat.
+Arguments determinant {T ro n} M%M.
+Arguments subm {T m n} M%M i%nat j%nat.
 Arguments vect_zero {T ro} n%nat.
 
 Notation "A + B" := (mat_add A B) : M_scope.
@@ -357,10 +359,10 @@ Notation "- A" := (mat_opp A) : M_scope.
 Declare Scope V_scope.
 Delimit Scope V_scope with V.
 
-Arguments mat_mul_vect_r {T ro} M%M V%V.
-Arguments vect_mul_scal_l {T ro} s%F V%V.
-Arguments vect_dot_product {T}%type {ro} (U V)%V.
-Arguments vect_el {T} v%V n%nat.
+Arguments mat_mul_vect_r {T ro m n} M%M V%V.
+Arguments vect_mul_scal_l {T ro} s%F {n}%nat V%V.
+Arguments vect_dot_product {T}%type {ro n} (U V)%V.
+Arguments vect_el {n}%nat {T}%type v%V.
 
 Notation "A • V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
 Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
@@ -369,55 +371,47 @@ Notation "U · V" := (vect_dot_product U V) (at level 40) : V_scope.
 
 (* *)
 
-Theorem mat_fold_sub : ∀ MA MB, (MA + - MB = MA - MB)%M.
+Theorem mat_fold_sub : ∀ {m n} (MA MB : matrix m n T),
+  (MA + - MB = MA - MB)%M.
 Proof. easy. Qed.
 
 (* commutativity of addition *)
 
-Theorem mat_add_comm : ∀ MA MB,
-  is_square_mat MA
-  → is_square_mat MB
-  → mat_nrows MA = mat_ncols MB
-  → (MA + MB = MB + MA)%M.
+Theorem mat_add_comm : ∀ {m n} (MA MB : matrix m n T), (MA + MB = MB + MA)%M.
 Proof.
-intros * Ha Hb Hab.
-apply matrix_eq; [ | | cbn ]. {
-  unfold mat_add; cbn; congruence.
-} {
-  unfold mat_add; cbn; congruence.
-}
+intros.
+apply matrix_eq.
 intros * Hi Hj.
 apply rngl_add_comm.
 Qed.
 
 (* associativity of addition *)
 
-Theorem mat_add_add_swap : ∀ MA MB MC, (MA + MB + MC = MA + MC + MB)%M.
+Theorem mat_add_add_swap : ∀ {m n} (MA MB MC : matrix m n T),
+  (MA + MB + MC = MA + MC + MB)%M.
 Proof.
 intros.
-apply matrix_eq; [ easy | easy | cbn ].
+apply matrix_eq.
 intros i j Hi Hj.
 apply rngl_add_add_swap.
 Qed.
 
-Theorem mat_add_assoc : ∀ MA MB MC, (MA + (MB + MC) = (MA + MB) + MC)%M.
+Theorem mat_add_assoc : ∀ {m n} (MA MB MC : matrix m n T),
+  (MA + (MB + MC) = (MA + MB) + MC)%M.
 Proof.
 intros.
-apply matrix_eq; [ easy | easy | cbn ].
+apply matrix_eq.
 intros i j Hi Hj.
 apply rngl_add_assoc.
 Qed.
 
 (* addition to zero *)
 
-Theorem mat_add_0_l : ∀ M n,
-  is_square_mat M
-  → n = mat_nrows M
-  → (mZ n + M)%M = M.
+Theorem mat_add_0_l : ∀ {m n} (M : matrix m n T), (mZ m n + M)%M = M.
 Proof.
-intros * Hsm Hn.
-apply matrix_eq; [ easy | cbn; congruence | ].
-intros * Hi Hj; cbn.
+intros.
+apply matrix_eq.
+intros * Hi Hj.
 apply rngl_add_0_l.
 Qed.
 
@@ -425,28 +419,22 @@ Qed.
 
 Theorem mat_add_opp_l :
   rngl_has_opp = true →
-  ∀ M n,
-  is_square_mat M
-  → n = mat_nrows M
-  → (- M + M = mZ (mat_nrows M))%M.
+  ∀ {m n} (M : matrix m n T),
+  (- M + M = mZ m n)%M.
 Proof.
-intros Hro * Hsm Hn.
-apply matrix_eq; [ easy | cbn; congruence | ].
-cbn; rewrite <- Hn.
+intros Hro *.
+apply matrix_eq.
 intros * Hi Hj.
 now apply rngl_add_opp_l.
 Qed.
 
 Theorem mat_add_opp_r :
   rngl_has_opp = true →
-  ∀ M n,
-  is_square_mat M
-  → n = mat_nrows M
-  → (M - M = mZ (mat_nrows M))%M.
+  ∀ {m n} (M : matrix m n T),
+  (M - M = mZ m n)%M.
 Proof.
-intros Hro * Hsm Hn.
-apply matrix_eq; [ easy | cbn; congruence | ].
-cbn - [ mat_sub ]; rewrite <- Hn.
+intros Hro *.
+apply matrix_eq.
 intros * Hi Hj.
 specialize rngl_add_opp_r as H.
 cbn; unfold rngl_sub in H.
@@ -454,24 +442,22 @@ rewrite Hro in H.
 apply H.
 Qed.
 
+(*
 (* multiplication of a square matrix by a scalar is square *)
 
 Theorem mat_mul_scal_l_is_square : ∀ a M,
   is_square_mat M
   → is_square_mat (a × M).
 Proof. intros. easy. Qed.
+*)
 
 (* multiplication left and right with identity *)
 
-Theorem mat_mul_1_l : ∀ M n,
-  is_square_mat M
-  → n = mat_ncols M
-  → (mI n * M)%M = M.
+Theorem mat_mul_1_l : ∀ {n} (M : matrix n n T), (mI n * M)%M = M.
 Proof.
-intros * Hsm Hn.
-apply matrix_eq; [ cbn; congruence | easy | ].
+intros.
+apply matrix_eq.
 cbn - [ iter_seq ].
-rewrite <- Hn.
 intros * Hi Hj.
 rewrite (rngl_summation_split _ i); [ | flia Hi ].
 rewrite rngl_summation_split_last; [ | flia ].
@@ -490,16 +476,11 @@ rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
 now rewrite rngl_add_0_l, rngl_add_0_r.
 Qed.
 
-Theorem mat_mul_1_r : ∀ M n,
-  is_square_mat M
-  → n = mat_nrows M
-  → (M * mI n)%M = M.
+Theorem mat_mul_1_r : ∀ {n} (M : matrix n n T), (M * mI n)%M = M.
 Proof.
-intros * Hsm Hn.
-apply matrix_eq; [ easy | cbn; congruence | ].
+intros.
+apply matrix_eq.
 cbn - [ iter_seq ].
-unfold is_square_mat in Hsm.
-rewrite <- Hsm, <- Hn.
 intros * Hi Hj.
 rewrite (rngl_summation_split _ j); [ | flia Hj ].
 rewrite rngl_summation_split_last; [ | flia ].
@@ -518,12 +499,10 @@ rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
 now rewrite rngl_add_0_l, rngl_add_0_r.
 Qed.
 
-Theorem vect_mul_1_l : ∀ V n,
-  n = vect_nrows V
-  → (mI n • V)%V = V.
+Theorem vect_mul_1_l : ∀ {n} (V : vector n T), (mI n • V)%V = V.
 Proof.
-intros * Hn.
-apply vector_eq; [ easy | ].
+intros.
+apply vector_eq.
 cbn - [ iter_seq ].
 intros * Hi.
 rewrite (rngl_summation_split _ i); [ | flia Hi ].
@@ -545,16 +524,15 @@ Qed.
 
 (* associativity of multiplication *)
 
-Theorem mat_mul_assoc : ∀ MA MB MC, (MA * (MB * MC))%M = ((MA * MB) * MC)%M.
+Theorem mat_mul_assoc {m n p q} :
+  ∀ (MA : matrix m n T) (MB : matrix n p T) (MC : matrix p q T),
+  (MA * (MB * MC))%M = ((MA * MB) * MC)%M.
 Proof.
 intros.
-apply matrix_eq; [ easy | easy | ].
+apply matrix_eq.
 intros i j Hi Hj.
 cbn - [ iter_seq ].
 cbn in Hi, Hj.
-remember (mat_ncols MA) as ca eqn:Hca.
-remember (mat_ncols MB) as cb eqn:Hcb.
-move cb before ca.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   now apply rngl_mul_summation_distr_l.
@@ -574,17 +552,15 @@ Qed.
 
 (* left distributivity of multiplication over addition *)
 
-Theorem mat_mul_add_distr_l : ∀ MA MB MC : matrix T,
+Theorem mat_mul_add_distr_l {m n p} :
+  ∀ (MA : matrix m n T) (MB : matrix n p T) (MC : matrix n p T),
   (MA * (MB + MC) = MA * MB + MA * MC)%M.
 Proof.
 intros.
-apply matrix_eq; [ easy | easy | ].
+apply matrix_eq.
 intros i j Hi Hj.
 cbn - [ iter_seq ].
 cbn in Hi, Hj.
-remember (mat_ncols MA) as ca eqn:Hca.
-remember (mat_ncols MB) as cb eqn:Hcb.
-move cb before ca.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   apply rngl_mul_add_distr_l.
@@ -595,54 +571,50 @@ Qed.
 
 (* right distributivity of multiplication over addition *)
 
-Theorem mat_mul_add_distr_r : ∀ MA MB MC : matrix T,
-  mat_ncols MA = mat_ncols MB
-  → ((MA + MB) * MC = MA * MC + MB * MC)%M.
+Theorem mat_mul_add_distr_r {m n p} :
+  ∀ (MA : matrix m n T) (MB : matrix m n T) (MC : matrix n p T),
+  ((MA + MB) * MC = MA * MC + MB * MC)%M.
 Proof.
-intros * Hab.
-apply matrix_eq; [ easy | easy | ].
+intros.
+apply matrix_eq.
 intros i j Hi Hj.
 cbn - [ iter_seq ].
 cbn in Hi, Hj.
-remember (mat_ncols MA) as ca eqn:Hca.
-remember (mat_ncols MB) as cb eqn:Hcb.
-move cb before ca.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   apply rngl_mul_add_distr_r.
 }
 cbn - [ iter_seq ].
-rewrite rngl_summation_add_distr; [ | easy ].
-now rewrite Hab.
+now rewrite rngl_summation_add_distr.
 Qed.
 
 (* left distributivity of multiplication by scalar over addition *)
 
-Theorem mat_mul_scal_l_add_distr_r : ∀ a b M,
+Theorem mat_mul_scal_l_add_distr_r {m n} : ∀ a b (M : matrix m n T),
   ((a + b)%F × M)%M = (a × M + b × M)%M.
 Proof.
 intros.
-apply matrix_eq; [ easy | easy | ].
+apply matrix_eq.
 intros * Hi Hj; cbn.
 apply rngl_mul_add_distr_r.
 Qed.
 
 (* associativity of multiplication by scalar *)
 
-Theorem mat_mul_scal_l_mul_assoc : ∀ a b M,
+Theorem mat_mul_scal_l_mul_assoc {m n} : ∀ a b (M : matrix m n T),
   (a × (b × M))%M = ((a * b)%F × M)%M.
 Proof.
 intros.
-apply matrix_eq; [ easy | easy | ].
+apply matrix_eq.
 intros * Hi Hj; cbn.
 apply rngl_mul_assoc.
 Qed.
 
-Theorem vect_mul_scal_l_mul_assoc : ∀ a b V,
+Theorem vect_mul_scal_l_mul_assoc {n} : ∀ a b (V : vector n T),
   (a × (b × V))%V = ((a * b)%F × V)%V.
 Proof.
 intros.
-apply vector_eq; [ easy | ].
+apply vector_eq.
 intros * Hi; cbn.
 apply rngl_mul_assoc.
 Qed.
@@ -650,8 +622,8 @@ Qed.
 Theorem vect_mul_scal_reg_r :
   rngl_has_dec_eq = true →
   rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
-  ∀ V a b,
-  V ≠ vect_zero (vect_nrows V)
+  ∀ {n} (V : vector n T) a b,
+  V ≠ vect_zero n
   → (a × V = b × V)%V
   → a = b.
 Proof.
@@ -662,16 +634,16 @@ assert (Hiv : ∀ i, vect_el (a × V)%V i = vect_el (b × V)%V i). {
 }
 unfold vect_mul_scal_l in Hiv.
 cbn in Hiv.
-assert (Hn : ¬ ∀ i, i < vect_nrows V → vect_el V i = 0%F). {
+assert (Hn : ¬ ∀ i, i < n → vect_el V i = 0%F). {
   intros H; apply Hvz.
-  apply vector_eq; [ easy | ].
+  apply vector_eq.
   cbn; intros * Hi.
   now apply H.
 }
 assert (∃ i, vect_el V i ≠ 0%F). {
   specialize rngl_opt_eq_dec as rngl_eq_dec.
   rewrite Hde in rngl_eq_dec.
-  apply (not_forall_in_interv_imp_exist (a:=0) (b:=vect_nrows V - 1));
+  apply (not_forall_in_interv_imp_exist (a:=0) (b:=n-1));
     cycle 1. {
     flia.
   } {
@@ -679,13 +651,13 @@ assert (∃ i, vect_el V i ≠ 0%F). {
     apply Hn.
     intros i Hi.
     specialize (Hnv i).
-    assert (H : 0 ≤ i ≤ vect_nrows V - 1) by flia Hi.
+    assert (H : 0 ≤ i ≤ n - 1) by flia Hi.
     specialize (Hnv H).
     now destruct (rngl_eq_dec (vect_el V i) 0%F).
   }
-  intros n.
+  intros k.
   unfold Decidable.decidable.
-  specialize (rngl_eq_dec (vect_el V n) 0%F) as [Hvnz| Hvnz]. {
+  specialize (rngl_eq_dec (vect_el V k) 0%F) as [Hvnz| Hvnz]. {
     now right.
   } {
     now left.
@@ -699,12 +671,13 @@ Qed.
 
 Theorem mat_mul_mul_scal_l :
   rngl_is_comm = true →
-  ∀ a MA MB, (MA * (a × MB) = a × (MA * MB))%M.
+  ∀ {m n p} a (MA : matrix m n T) (MB : matrix n p T),
+  (MA * (a × MB) = a × (MA * MB))%M.
 Proof.
 intros Hic *.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
 rewrite Hic in rngl_mul_comm.
-apply matrix_eq; [ easy | easy | ].
+apply matrix_eq.
 intros * Hi Hj.
 cbn - [ iter_seq ].
 rewrite rngl_mul_summation_distr_l.
@@ -716,24 +689,25 @@ f_equal.
 apply rngl_mul_comm.
 Qed.
 
-Theorem mat_mul_scal_add_distr_l : ∀ a MA MB,
+Theorem mat_mul_scal_add_distr_l : ∀ {m n} a (MA MB : matrix m n T),
   (a × (MA + MB) = (a × MA + a × MB))%M.
 Proof.
 intros.
-apply matrix_eq; [ easy | easy | ].
+apply matrix_eq.
 intros * Hi Hj.
 apply rngl_mul_add_distr_l.
 Qed.
 
 (* associativity with multiplication with vector *)
 
-Theorem mat_vect_mul_assoc_as_sums : ∀ A B V i,
-  i < mat_nrows A
-  → (Σ (j = 0, mat_ncols A - 1),
+Theorem mat_vect_mul_assoc_as_sums :
+  ∀ {m n p} (A : matrix m n T) (B : matrix n p T) (V : vector p T) i,
+  i < m
+  → (Σ (j = 0, n - 1),
        mat_el A i j *
-       (Σ (k = 0, mat_ncols B - 1), mat_el B j k * vect_el V k))%F =
-    (Σ (j = 0, mat_ncols B - 1),
-       (Σ (k = 0, mat_ncols A - 1), mat_el A i k * mat_el B k j) *
+       (Σ (k = 0, p - 1), mat_el B j k * vect_el V k))%F =
+    (Σ (j = 0, p - 1),
+       (Σ (k = 0, n - 1), mat_el A i k * mat_el B k j) *
        vect_el V j)%F.
 Proof.
 intros * Hi.
@@ -756,10 +730,12 @@ intros k Hk.
 apply rngl_mul_assoc.
 Qed.
 
-Theorem mat_vect_mul_assoc : ∀ A B V, (A • (B • V) = (A * B) • V)%V.
+Theorem mat_vect_mul_assoc {m n p} :
+  ∀ (A : matrix m n T) (B : matrix n p T) (V : vector p T),
+  (A • (B • V) = (A * B) • V)%V.
 Proof.
 intros.
-apply vector_eq; [ easy | ].
+apply vector_eq.
 intros i Hi.
 cbn in Hi.
 unfold mat_mul_vect_r.
@@ -768,10 +744,11 @@ cbn - [ iter_seq ].
 now apply mat_vect_mul_assoc_as_sums.
 Qed.
 
-Theorem mat_mul_scal_vect_assoc : ∀ a MA V, (a × (MA • V) = (a × MA) • V)%V.
+Theorem mat_mul_scal_vect_assoc {m n} :
+  ∀ a (MA : matrix m n T) (V : vector n T), (a × (MA • V) = (a × MA) • V)%V.
 Proof.
 intros.
-apply vector_eq; [ easy | ].
+apply vector_eq.
 intros i Hi.
 cbn in Hi.
 cbn - [ iter_seq ].
@@ -783,10 +760,10 @@ Qed.
 
 Theorem mat_mul_scal_vect_comm :
   rngl_is_comm = true →
-  ∀ a MA V, (a × (MA • V) = MA • (a × V))%V.
+  ∀ {m n} a (MA : matrix m n T) V, (a × (MA • V) = MA • (a × V))%V.
 Proof.
 intros Hic *.
-apply vector_eq; [ easy | ].
+apply vector_eq.
 intros i Hi.
 cbn in Hi.
 cbn - [ iter_seq ].
@@ -802,7 +779,7 @@ Qed.
 
 Theorem vect_dot_mul_scal_mul_comm :
   rngl_is_comm = true →
-  ∀ (a : T) (U V : vector T),
+  ∀ {n} (a : T) (U V : vector n T),
   (U · (a × V) = (a * (U · V))%F)%V.
 Proof.
 intros Hic *.
@@ -817,7 +794,7 @@ rewrite Hic in rngl_mul_comm.
 apply rngl_mul_comm.
 Qed.
 
-Theorem vect_scal_mul_dot_mul_comm : ∀ (a : T) (U V : vector T),
+Theorem vect_scal_mul_dot_mul_comm : ∀ {n} (a : T) (U V : vector n T),
   ((a × U) · V = (a * (U · V))%F)%V.
 Proof.
 intros.
@@ -830,52 +807,39 @@ Qed.
 
 (* comatrix *)
 
-Definition comatrix M : matrix T :=
-  {| mat_el i j := (minus_one_pow (i + j) * determinant (subm M i j))%F;
-     mat_nrows := mat_nrows M;
-     mat_ncols := mat_ncols M |}.
+Definition comatrix {n} (M : matrix n n T) : matrix n n T :=
+  {| mat_el i j := (minus_one_pow (i + j) * determinant (subm M i j))%F |}.
 
 (* matrix transpose *)
 
-Definition mat_transp (M : matrix T) :=
-  {| mat_el i j := mat_el M j i;
-     mat_nrows := mat_ncols M;
-     mat_ncols := mat_nrows M |}.
+Definition mat_transp {m n} (M : matrix m n T) : matrix n m T :=
+  {| mat_el i j := mat_el M j i |}.
 
 (* combinations of submatrix and other *)
 
-Theorem submatrix_sub : ∀ (MA MB : matrix T) i j,
+Theorem submatrix_sub {m n} : ∀ (MA MB : matrix m n T) i j,
   subm (MA - MB)%M i j = (subm MA i j - subm MB i j)%M.
 Proof.
 intros.
-apply matrix_eq; cbn; [ easy | easy | ].
-intros k l Hk Hl.
+apply matrix_eq.
+intros k l Hk Hl; cbn.
 now destruct (lt_dec k i), (lt_dec l j).
 Qed.
 
-Theorem submatrix_mul_scal_l : ∀ (μ : T) M i j,
+Theorem submatrix_mul_scal_l {m n} : ∀ (μ : T) (M : matrix m n T) i j,
   subm (μ × M)%M i j = (μ × subm M i j)%M.
 Proof.
 intros.
-apply matrix_eq; cbn; [ easy | easy | ].
-intros k l Hk Hl.
+apply matrix_eq.
+intros k l Hk Hl; cbn.
 now destruct (lt_dec k i), (lt_dec l j).
 Qed.
 
-Theorem submatrix_nrows : ∀ (M : matrix T) i j,
-  mat_nrows (subm M i j) = mat_nrows M - 1.
-Proof. easy. Qed.
-
-Theorem submatrix_mI : ∀ i r,
- subm (mI (S r)) i i = mI r.
+Theorem submatrix_mI : ∀ i r, subm (mI r) i i = mI (r - 1).
 Proof.
 intros.
-apply matrix_eq; cbn. {
-  now rewrite Nat.sub_0_r.
-} {
-  now rewrite Nat.sub_0_r.
-}
-intros k l Hk Hl.
+apply matrix_eq.
+intros k l Hk Hl; cbn.
 destruct (lt_dec k i) as [Hki| Hki]. {
   destruct (lt_dec l i) as [Hli| Hli]; [ easy | ].
   apply Nat.nlt_ge in Hli.
@@ -905,13 +869,15 @@ destruct (lt_dec k i) as [Hki| Hki]. {
 }
 Qed.
 
-Theorem mat_mul_scal_1_l : ∀ (M : matrix T), (1 × M = M)%M.
+Theorem mat_mul_scal_1_l {m n} : ∀ (M : matrix m n T), (1 × M = M)%M.
 Proof.
 intros.
-apply matrix_eq; [ easy | easy | cbn ].
+apply matrix_eq; cbn.
 intros * Hi Hj.
 apply rngl_mul_1_l.
 Qed.
+
+...
 
 (* square matrices *)
 
