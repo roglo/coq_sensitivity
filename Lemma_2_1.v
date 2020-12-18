@@ -481,7 +481,44 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 }
 Qed.
 
+Theorem squ_mat_mul_vect_dot_vect :
+  rngl_is_comm = true →
+  ∀ n (M : square_matrix n) U V,
+  vect_nrows U = n
+  → ((M • U)%SM · V = U · (M⁺ • V)%SM)%V.
+Proof.
+intros Hic * Hun.
+unfold vect_dot_product.
+unfold squ_mat_mul_vect_r, squ_mat_transp.
+cbn - [ iter_seq ].
+rewrite mat_nrows_of_squ_mat.
+rewrite mat_ncols_of_squ_mat.
+rewrite Hun.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  now rewrite rngl_mul_summation_distr_r.
+}
+cbn - [ iter_seq ].
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  now rewrite rngl_mul_summation_distr_l.
+}
+cbn - [ iter_seq ].
+symmetry.
+rewrite rngl_summation_summation_exch'; [ | easy ].
+apply rngl_summation_eq_compat.
+intros i Hi.
+apply rngl_summation_eq_compat.
+intros j Hj.
+rewrite rngl_mul_assoc; f_equal.
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+rewrite Hic in rngl_mul_comm.
+apply rngl_mul_comm.
+Qed.
+
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
+  rngl_is_comm = true →
   ∀ n (M : square_matrix n) ev eV mO,
   is_symm_squ_mat M
   → eigenvalues_and_vectors (mat_of_squ_mat M) ev eV
@@ -489,7 +526,7 @@ Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   → (mO⁺ * mO = squ_mat_one n)%SM ∧
     (mO * mO⁺ = squ_mat_one n)%SM.
 Proof.
-intros * Hsy Hvv Hm.
+intros Hic * Hsy Hvv Hm.
 split. {
   apply square_matrix_eq; cbn.
   rewrite Hm; cbn.
@@ -510,6 +547,10 @@ split. {
       destruct H1 as (H1 & H2 & H3).
       now rewrite H1 in Hvvz.
     }
+    specialize (squ_mat_mul_vect_dot_vect Hic M vi vj) as H1.
+    (* ((M • vi)%SM · vj)%V = (vi · (M⁺ • vj)%SM)%V *)
+    assert (H : vect_nrows vi = n). {
+      rewrite Hvi; cbn.
 ...
 (* https://math.stackexchange.com/questions/82467/eigenvectors-of-real-symmetric-matrices-are-orthogonal *)
     destruct mO as (mO, Hmo).
