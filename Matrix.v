@@ -1465,6 +1465,17 @@ Qed.
 Theorem mat_opt_add_sub : ∀ n (ro := mat_ring_like_op n),
   if rngl_has_opp then True else ∀ a b : matrix n n T, (a + b - b)%F = a.
 Proof.
+intros.
+remember rngl_has_opp as x eqn:Hx; symmetry in Hx.
+destruct x; [ easy | ].
+intros MA MB.
+apply matrix_eq.
+intros * Hi Hj.
+cbn.
+Search ((_ + _) - _)%M.
+...
+now apply H.
+Qed.
 ...
 
 Definition squ_mat_ring_like_prop (n : nat) :
