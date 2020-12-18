@@ -314,7 +314,7 @@ Qed.
 
 (* null matrix of dimension m × n *)
 
-Definition mZ m n :=
+Definition mZ m n : matrix m n T :=
   mk_mat m n (λ i j, 0%F).
 
 (* identity square matrix of dimension n *)
@@ -417,10 +417,9 @@ Qed.
 
 (* addition left and right with opposite *)
 
-Theorem mat_add_opp_l :
+Theorem mat_add_opp_l {m n} :
   rngl_has_opp = true →
-  ∀ {m n} (M : matrix m n T),
-  (- M + M = mZ m n)%M.
+  ∀ (M : matrix m n T), (- M + M = mZ m n)%M.
 Proof.
 intros Hro *.
 apply matrix_eq.
@@ -1008,7 +1007,10 @@ Definition phony_squ_mat_sub n (MA MB : matrix n n T) := MA.
 Definition phony_squ_mat_div n (MA MB : matrix n n T) := MA.
 Definition phony_squ_mat_inv n (M : matrix n n T) := M.
 
-Canonical Structure mat_ring_like_op n : ring_like_op (matrix n n T) :=
+Definition at_least_1 n := S (n - 1).
+
+Canonical Structure mat_ring_like_op n :
+  ring_like_op (matrix n n T) :=
   {| rngl_has_opp := true;
      rngl_has_inv := false;
      rngl_has_no_inv_but_div := false;
@@ -1023,7 +1025,9 @@ Canonical Structure mat_ring_like_op n : ring_like_op (matrix n n T) :=
      rngl_opt_sub := @phony_squ_mat_sub n;
      rngl_opt_div := @phony_squ_mat_div n |}.
 
+(*
 Existing Instance mat_ring_like_op.
+*)
 
 (*
 Declare Scope SM_scope.
@@ -1338,9 +1342,6 @@ destruct H as [H| H]. {
   now right; apply square_matrix_neq.
 }
 Qed.
-*)
-
-...
 
 Definition squ_mat_ring_like_prop (n : nat) :
     ring_like_prop (square_matrix n) :=
@@ -1379,6 +1380,135 @@ Definition squ_mat_ring_like_prop (n : nat) :
      rngl_opt_mul_le_compat_nonpos := I;
      rngl_opt_mul_le_compat := I;
      rngl_opt_not_le := I |}.
+*)
+
+(*
+Theorem mat_1_neq_0 :
+  ∀ n, mI (at_least_1 n) ≠ mZ (at_least_1 n) (at_least_1 n).
+Proof.
+intros.
+unfold mI, mZ.
+(**)
+apply matrix_neq.
+unfold at_least_1.
+cbn; intros H.
+specialize (H 0 0 (Nat.lt_0_succ _) (Nat.lt_0_succ _)).
+destruct (Nat.eq_dec 0 0); [ | easy ].
+now apply rngl_1_neq_0 in H.
+Qed.
+*)
+
+(*
+Theorem mat_add_opp_l' : ∀ n,
+  if
+    @rngl_has_opp
+      (matrix (at_least_1 (at_least_1 n)) (at_least_1 (at_least_1 n)) T)
+      (mat_ring_like_op (at_least_1 n))
+  then
+    ∀ a : matrix (at_least_1 (at_least_1 n)) (at_least_1 (at_least_1 n)) T,
+    @eq (matrix (at_least_1 (at_least_1 n)) (at_least_1 (at_least_1 n)) T)
+      (@rngl_add
+         (matrix (at_least_1 (at_least_1 n)) (at_least_1 (at_least_1 n)) T)
+         (mat_ring_like_op (at_least_1 n))
+         (@rngl_opp
+            (matrix (at_least_1 (at_least_1 n)) (at_least_1 (at_least_1 n)) T)
+            (mat_ring_like_op (at_least_1 n)) a) a)
+      (@rngl_zero
+         (matrix (at_least_1 (at_least_1 n)) (at_least_1 (at_least_1 n)) T)
+         (mat_ring_like_op (at_least_1 n)))
+  else True.
+Proof.
+intros.
+remember rngl_has_opp as x eqn:Hx.
+destruct x; [ | easy ].
+intros MA.
+apply matrix_eq; cbn.
+intros * Hi Hj.
+...
+Search (- _ + _)%F.
+...
+specialize @rngl_opt_add_opp_l as rngl_add_opp_l.
+specialize (rngl_add_opp_l _ (mat_ring_like_op n)).
+specialize
+  (rngl_add_opp_l
+     (matrix (at_least_1 (at_least_1 n)) (at_least_1 (at_least_1 n)) T)).
+specialize (rngl_add_opp_l (mat_ring_like_op (at_least_1 n))).
+rewrite <- Hx in rngl_add_opp_l.
+rewrite rngl_add_opp_l.
+Set Printing All.
+apply rngl_add_opp_l.
+...
+
+apply rngl_add_opp_l.
+
+
+apply Bool.andb_true_iff in Ha.
+destruct Ha as (Hra, Hca).
+apply Nat.eqb_eq in Hra.
+apply Nat.eqb_eq in Hca.
+rewrite mat_add_opp_l with (n := n); congruence.
+Qed.
+*)
+
+Theorem mat_add_opp_l' : ∀ n (ro := mat_ring_like_op n),
+  if @rngl_has_opp (matrix n n T) _ then
+    ∀ a : matrix n n T, (- a + a)%F = 0%F
+  else True.
+Proof.
+intros.
+remember rngl_has_opp as x eqn:Hx; symmetry in Hx.
+destruct x; [ | easy ].
+intros.
+specialize (@mat_add_opp_l n n) as H.
+move a at top.
+Set Printing All.
+...
+
+Definition squ_mat_ring_like_prop (n : nat) :
+  ring_like_prop (matrix n n T) :=
+  {| rngl_is_comm := false;
+     rngl_has_dec_eq := @rngl_has_dec_eq T ro rp;
+     rngl_has_dec_le := false;
+     rngl_is_integral := false;
+     rngl_characteristic := if Nat.eq_dec n 0 then 1 else rngl_characteristic;
+     rngl_add_comm := mat_add_comm;
+     rngl_add_assoc := mat_add_assoc;
+     rngl_add_0_l := mat_add_0_l;
+     rngl_mul_assoc := mat_mul_assoc;
+     rngl_mul_1_l := mat_mul_1_l;
+     rngl_mul_add_distr_l := mat_mul_add_distr_l;
+     rngl_1_neq_0 := rngl_1_neq_0;
+     rngl_opt_mul_comm := I;
+     rngl_opt_mul_1_r := mat_mul_1_r;
+     rngl_opt_mul_add_distr_r := mat_mul_add_distr_r;
+     rngl_opt_add_opp_l := @mat_add_opp_l' n;
+     rngl_opt_add_sub := I;
+     rngl_opt_mul_0_l := I;
+     rngl_opt_mul_0_r := I;
+     rngl_opt_mul_inv_l := I;
+     rngl_opt_mul_inv_r := I;
+     rngl_opt_mul_div_l := I;
+     rngl_opt_mul_div_r := I;
+     rngl_opt_eq_dec := 42;
+(*
+     rngl_opt_eq_dec := @squ_mat_opt_eq_dec n;
+*)
+     rngl_opt_le_dec := I;
+     rngl_opt_integral := I;
+     rngl_characteristic_prop := 42;
+(*
+     rngl_characteristic_prop := @mat_characteristic_prop n;
+*)
+     rngl_opt_le_refl := I;
+     rngl_opt_le_antisymm := I;
+     rngl_opt_le_trans := I;
+     rngl_opt_add_le_compat := I;
+     rngl_opt_mul_le_compat_nonneg := I;
+     rngl_opt_mul_le_compat_nonpos := I;
+     rngl_opt_mul_le_compat := I;
+     rngl_opt_not_le := I |}.
+
+...
 
 Theorem squ_mat_mul_scal_vect_comm :
   rngl_is_comm = true →
