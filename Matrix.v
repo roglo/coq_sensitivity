@@ -1011,7 +1011,7 @@ Definition at_least_1 n := S (n - 1).
 
 Canonical Structure mat_ring_like_op n :
   ring_like_op (matrix n n T) :=
-  {| rngl_has_opp := true;
+  {| rngl_has_opp := rngl_has_opp;
      rngl_has_inv := false;
      rngl_has_no_inv_but_div := false;
      rngl_is_ordered := false;
@@ -1450,18 +1450,21 @@ rewrite mat_add_opp_l with (n := n); congruence.
 Qed.
 *)
 
-Theorem mat_add_opp_l' : ∀ n (ro := mat_ring_like_op n),
-  if @rngl_has_opp (matrix n n T) _ then
+Theorem mat_opt_add_opp_l : ∀ n (ro := mat_ring_like_op n),
+  if rngl_has_opp then
     ∀ a : matrix n n T, (- a + a)%F = 0%F
   else True.
 Proof.
 intros.
+specialize (@mat_add_opp_l n n) as H.
 remember rngl_has_opp as x eqn:Hx; symmetry in Hx.
 destruct x; [ | easy ].
-intros.
-specialize (@mat_add_opp_l n n) as H.
-move a at top.
-Set Printing All.
+now apply H.
+Qed.
+
+Theorem mat_opt_add_sub : ∀ n (ro := mat_ring_like_op n),
+  if rngl_has_opp then True else ∀ a b : matrix n n T, (a + b - b)%F = a.
+Proof.
 ...
 
 Definition squ_mat_ring_like_prop (n : nat) :
@@ -1481,8 +1484,8 @@ Definition squ_mat_ring_like_prop (n : nat) :
      rngl_opt_mul_comm := I;
      rngl_opt_mul_1_r := mat_mul_1_r;
      rngl_opt_mul_add_distr_r := mat_mul_add_distr_r;
-     rngl_opt_add_opp_l := @mat_add_opp_l' n;
-     rngl_opt_add_sub := I;
+     rngl_opt_add_opp_l := mat_opt_add_opp_l n;
+     rngl_opt_add_sub := mat_opt_add_sub n;
      rngl_opt_mul_0_l := I;
      rngl_opt_mul_0_r := I;
      rngl_opt_mul_inv_l := I;
