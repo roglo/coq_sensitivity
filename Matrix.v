@@ -1004,7 +1004,6 @@ Existing Instance squ_mat_ring_like_op.
 *)
 
 Definition phony_squ_mat_le n (MA MB : matrix n n T) := True.
-Definition phony_squ_mat_sub n (MA MB : matrix n n T) := MA.
 Definition phony_squ_mat_div n (MA MB : matrix n n T) := MA.
 Definition phony_squ_mat_inv n (M : matrix n n T) := M.
 
@@ -1023,12 +1022,12 @@ Canonical Structure mat_ring_like_op n :
      rngl_opp := @mat_opp T _ n n;
      rngl_inv := @phony_squ_mat_inv n;
      rngl_le := @phony_squ_mat_le n;
-     rngl_opt_sub := @phony_squ_mat_sub n;
+     rngl_opt_sub := @mat_sub T ro n n;
      rngl_opt_div := @phony_squ_mat_div n |}.
 
-(*
+(**)
 Existing Instance mat_ring_like_op.
-*)
+(**)
 
 (*
 Declare Scope SM_scope.
@@ -1451,6 +1450,21 @@ rewrite mat_add_opp_l with (n := n); congruence.
 Qed.
 *)
 
+Theorem mat_opt_add_opp_l : ∀ n,
+  if @rngl_has_opp (matrix n n T) _ then
+    ∀ a : matrix n n T, (- a + a)%F = 0%F
+  else True.
+Proof.
+intros.
+remember rngl_has_opp as x eqn:Hx in |-*; symmetry in Hx.
+destruct x; [ | easy ].
+intros MA.
+apply matrix_eq; cbn.
+intros * Hi Hj.
+now apply rngl_add_opp_l.
+Qed.
+
+(*
 Theorem mat_opt_add_opp_l : ∀ n (ro := mat_ring_like_op n),
   if rngl_has_opp then
     ∀ a : matrix n n T, (- a + a)%F = 0%F
@@ -1462,6 +1476,8 @@ remember rngl_has_opp as x eqn:Hx; symmetry in Hx.
 destruct x; [ | easy ].
 now apply H.
 Qed.
+...
+*)
 
 (*
 Theorem mat_opt_add_sub : ∀ n,
@@ -1500,7 +1516,27 @@ Qed.
 Set Printing All.
 *)
 
-Theorem mat_opt_add_sub : ∀ n (mro := mat_ring_like_op n),
+Theorem mat_opt_add_sub : ∀ n,
+  if @rngl_has_opp (matrix n n T) _ then True
+  else ∀ a b : matrix n n T, (a + b - b)%F = a.
+Proof.
+intros.
+specialize rngl_opt_add_sub as rngl_add_sub.
+cbn in rngl_add_sub.
+unfold mat_ring_like_op; cbn.
+remember (@rngl_has_opp T ro) as x eqn:Hx.
+destruct x; [ easy | cbn ].
+intros MA MB.
+apply matrix_eq; cbn.
+intros * Hi Hj.
+...
+Check @mat_add_opp_l.
+rewrite fold_rngl_sub.
+now rewrite rngl_add_sub.
+...
+
+(*
+Theorem mat_opt_add_sub : ∀ n,
   if rngl_has_opp then True else ∀ a b : matrix n n T, (a + b - b)%F = a.
 Proof.
 intros.
@@ -1509,8 +1545,16 @@ destruct x; [ easy | ].
 intros MA MB.
 apply matrix_eq; cbn.
 intros * Hi Hj.
-unfold mro; cbn.
 ...
+unfold mro; cbn.
+unfold mat_add; cbn.
+Set Printing All.
+unfold mat_ring_like_op.
+unfold phony_squ_mat_inv; cbn.
+cbn.
+cbn.
+...
+*)
 
 Definition mat_ring_like_prop (n : nat) :
   ring_like_prop (matrix n n T) :=
