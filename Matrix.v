@@ -877,9 +877,7 @@ intros * Hi Hj.
 apply rngl_mul_1_l.
 Qed.
 
-...
-
-(* square matrices *)
+(* square matrices should not be required now
 
 Definition is_square_mat_bool (M : matrix T) :=
   Nat.eqb (mat_nrows M) (mat_ncols M).
@@ -1003,7 +1001,31 @@ Canonical Structure squ_mat_ring_like_op n : ring_like_op (square_matrix n) :=
      rngl_opt_div := @phony_squ_mat_div n |}.
 
 Existing Instance squ_mat_ring_like_op.
+*)
 
+Definition phony_squ_mat_le n (MA MB : matrix n n T) := True.
+Definition phony_squ_mat_sub n (MA MB : matrix n n T) := MA.
+Definition phony_squ_mat_div n (MA MB : matrix n n T) := MA.
+Definition phony_squ_mat_inv n (M : matrix n n T) := M.
+
+Canonical Structure mat_ring_like_op n : ring_like_op (matrix n n T) :=
+  {| rngl_has_opp := true;
+     rngl_has_inv := false;
+     rngl_has_no_inv_but_div := false;
+     rngl_is_ordered := false;
+     rngl_zero := mZ n n;
+     rngl_one := mI n;
+     rngl_add := @mat_add T _ n n;
+     rngl_mul := @mat_mul T _ n n n;
+     rngl_opp := @mat_opp T _ n n;
+     rngl_inv := @phony_squ_mat_inv n;
+     rngl_le := @phony_squ_mat_le n;
+     rngl_opt_sub := @phony_squ_mat_sub n;
+     rngl_opt_div := @phony_squ_mat_div n |}.
+
+Existing Instance mat_ring_like_op.
+
+(*
 Declare Scope SM_scope.
 Delimit Scope SM_scope with SM.
 
@@ -1316,6 +1338,9 @@ destruct H as [H| H]. {
   now right; apply square_matrix_neq.
 }
 Qed.
+*)
+
+...
 
 Definition squ_mat_ring_like_prop (n : nat) :
     ring_like_prop (square_matrix n) :=
