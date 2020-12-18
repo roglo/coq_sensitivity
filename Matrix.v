@@ -12,31 +12,26 @@ Require Import RingLike RLsummation.
 
 (* matrices *)
 
-Record matrix T := mk_mat
-  { mat_el : nat → nat → T;
-    mat_nrows : nat;
-    mat_ncols : nat }.
+Record matrix (m n : nat) T := mk_mat
+  { mat_el : nat → nat → T }.
+
+(*
+Definition mat_nrows {m n T} (M : matrix m n T) := m.
+Definition mat_ncols {m n T} (M : matrix m n T) := n.
+*)
 
 (* function extensionality required for matrices *)
-Axiom matrix_eq : ∀ T (MA MB : matrix T),
-  mat_nrows MA = mat_nrows MB
-  → mat_ncols MA = mat_ncols MB
-  → (∀ i j, i < mat_nrows MA → j < mat_ncols MB →
-      mat_el MA i j = mat_el MB i j)
+Axiom matrix_eq : ∀ m n T (MA MB : matrix m n T),
+  (∀ i j, i < m → j < n → mat_el MA i j = mat_el MB i j)
   → MA = MB.
 
-Theorem matrix_neq : ∀ T (MA MB : matrix T),
-  mat_nrows MA ≠ mat_nrows MB ∨
-  mat_ncols MA ≠ mat_ncols MB ∨
-  ¬ (∀ i j, i < mat_nrows MA → j < mat_ncols MB →
-     mat_el MA i j = mat_el MB i j)
+Theorem matrix_neq : ∀ m n T (MA MB : matrix m n T),
+  ¬ (∀ i j, i < m → j < n → mat_el MA i j = mat_el MB i j)
   → MA ≠ MB.
 Proof.
 intros * Hab.
 intros H.
 subst MB.
-destruct Hab as [Hab| Hab]; [ easy | ].
-destruct Hab as [Hab| Hab]; [ easy | ].
 now apply Hab.
 Qed.
 
@@ -46,14 +41,15 @@ Definition list_list_nrows T (ll : list (list T)) :=
 Definition list_list_ncols T (ll : list (list T)) :=
   length (hd [] ll).
 
-Definition list_list_of_mat T (M : matrix T) : list (list T) :=
-  map (λ i, map (mat_el M i) (seq 0 (mat_ncols M))) (seq 0 (mat_nrows M)).
+Definition list_list_of_mat m n T (M : matrix m n T) : list (list T) :=
+  map (λ i, map (mat_el M i) (seq 0 m)) (seq 0 n).
 
 Definition list_list_el T d (ll : list (list T)) i j : T :=
   nth j (nth i ll []) d.
 
-Definition mat_of_list_list T d (ll : list (list T)) :=
-  mk_mat (list_list_el d ll) (list_list_nrows ll) (list_list_ncols ll).
+Definition mat_of_list_list T d (ll : list (list T)) :
+  matrix (list_list_nrows ll) (list_list_ncols ll) T :=
+  mk_mat (list_list_nrows ll) (list_list_ncols ll) (list_list_el d ll).
 
 (*
 Compute (let (i, j) := (2, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j).
@@ -83,98 +79,98 @@ Context {rp : ring_like_prop T}.
 
 (* addition *)
 
-Definition mat_add {ro : ring_like_op T} (MA MB : matrix T) :=
-  {| mat_el i j := (mat_el MA i j + mat_el MB i j)%F;
-     mat_nrows := mat_nrows MA;
-     mat_ncols := mat_ncols MA |}.
+Definition mat_add {ro : ring_like_op T} {m n} (MA MB : matrix m n T) :
+  matrix m n T :=
+  {| mat_el i j := (mat_el MA i j + mat_el MB i j)%F |}.
 
 (* multiplication *)
 
-Definition mat_mul {so : ring_like_op T} (MA MB : matrix T) :=
-  {| mat_el i k :=
-       (Σ (j = 0, mat_ncols MA - 1), mat_el MA i j * mat_el MB j k)%F;
-     mat_nrows := mat_nrows MA;
-     mat_ncols := mat_ncols MB |}.
+Definition mat_mul {ro : ring_like_op T} {m n p}
+    (MA : matrix m n T) (MB : matrix n p T) : matrix m p T :=
+  {| mat_el i k := (Σ (j = 0, n - 1), mat_el MA i j * mat_el MB j k)%F |}.
 
-Theorem mat_mul_nrows : ∀ A B, mat_nrows (mat_mul A B) = mat_nrows A.
+(*
+Theorem mat_mul_nrows {m n p} : ∀ (A : matrix T m n) (B : matrix T n p),
+  mat_nrows (mat_mul A B) = mat_nrows A.
 Proof. easy. Qed.
 
 Theorem mat_mul_ncols : ∀ A B, mat_ncols (mat_mul A B) = mat_ncols B.
 Proof. easy. Qed.
+*)
 
 (* opposite *)
 
-Definition mat_opp {ro : ring_like_op T} M : matrix T :=
-  {| mat_el i j := (- mat_el M i j)%F;
-     mat_nrows := mat_nrows M;
-     mat_ncols := mat_ncols M |}.
+Definition mat_opp {ro : ring_like_op T} {m n} (M : matrix m n T) :
+  matrix m n T :=
+  {| mat_el i j := (- mat_el M i j)%F |}.
 
 (* subtraction *)
 
-Definition mat_sub MA MB :=
+Definition mat_sub {m n} (MA MB : matrix m n T) :=
   mat_add MA (mat_opp MB).
 
 (* *)
 
-Definition is_square_mat (M : matrix T) := mat_nrows M = mat_ncols M.
+(*
+Definition is_square_mat {m n} (M : matrix m n T) := m = n.
+*)
 
 (* vector *)
 
-Record vector T := mk_vect
-  { vect_el : nat → T;
-    vect_nrows : nat }.
+Record vector (n : nat) T := mk_vect
+  { vect_el : nat → T }.
 
 (* function extensionality required for vectors *)
-Axiom vector_eq : ∀ T (VA VB : vector T),
-  vect_nrows VA = vect_nrows VB
-  → (∀ i, i < vect_nrows VA → vect_el VA i = vect_el VB i)
+Axiom vector_eq : ∀ n T (VA VB : vector n T),
+  (∀ i, i < n → vect_el VA i = vect_el VB i)
   → VA = VB.
 
 Definition vect_of_list {T} d (l : list T) :=
-  mk_vect (λ i, nth i l d) (length l).
-Definition list_of_vect {T} (v : vector T) :=
-  map (vect_el v) (seq 0 (vect_nrows v)).
+  mk_vect (length l) (λ i, nth i l d).
+Definition list_of_vect {n T} (v : vector n T) :=
+  map (vect_el v) (seq 0 n).
 
-Definition vect_zero n := mk_vect (λ _, 0%F) n.
+Definition vect_zero n := mk_vect n (λ _, 0%F).
 
 (* addition, subtraction of vector *)
 
-Definition vect_add (U V : vector T) :=
-  mk_vect (λ i, (vect_el U i + vect_el V i)%F) (vect_nrows V).
-Definition vect_opp (V : vector T) :=
-  mk_vect (λ i, (- vect_el V i)%F) (vect_nrows V).
+Definition vect_add {n} (U V : vector n T) :=
+  mk_vect n (λ i, (vect_el U i + vect_el V i)%F).
+Definition vect_opp {n} (V : vector n T) :=
+  mk_vect n (λ i, (- vect_el V i)%F).
 
-Definition vect_sub (U V : vector T) := vect_add U (vect_opp V).
+Definition vect_sub {n} (U V : vector n T) := vect_add U (vect_opp V).
 
 (* vector from a matrix column *)
 
-Definition vect_of_mat_col (M : matrix T) j :=
-  mk_vect (λ i, mat_el M i j) (mat_nrows M).
+Definition vect_of_mat_col {m n} (M : matrix m n T) j :=
+  mk_vect m (λ i, mat_el M i j).
 
 (* concatenation of a matrix and a vector *)
 
-Definition mat_vect_concat (M : matrix T) V :=
-  mk_mat
-    (λ i j, if Nat.eq_dec j (mat_ncols M) then vect_el V i else mat_el M i j)
-    (mat_nrows M) (mat_ncols M + 1).
+Definition mat_vect_concat {m n} (M : matrix m n T) (V : vector m T) :
+  matrix m (n + 1) T :=
+  mk_mat m (n + 1)
+    (λ i j, if Nat.eq_dec j n then vect_el V i else mat_el M i j).
 
 (* multiplication of a matrix by a vector *)
 
-Definition mat_mul_vect_r M V :=
-  mk_vect (λ i, (Σ (j = 0, mat_ncols M - 1), mat_el M i j * vect_el V j)%F)
-    (mat_nrows M).
+Definition mat_mul_vect_r {m n} (M : matrix m n T) (V : vector m T) :=
+  mk_vect m (λ i, (Σ (j = 0, n - 1), mat_el M i j * vect_el V j)%F).
 
 (* multiplication of a vector by a scalar *)
 
-Definition vect_mul_scal_l s V :=
-  mk_vect (λ i, s * vect_el V i)%F (vect_nrows V).
+Definition vect_mul_scal_l s {n} (V : vector n T) :=
+  mk_vect n (λ i, s * vect_el V i)%F.
 
 (* dot product *)
 
-Definition vect_dot_product (U V : vector T) :=
-  (Σ (i = 0, vect_nrows U - 1), vect_el U i * vect_el V i)%F.
+Definition vect_dot_product {n} (U V : vector n T) :=
+  (Σ (i = 0, n - 1), vect_el U i * vect_el V i)%F.
 
 (* multiplication of a matrix by a scalar *)
+
+...
 
 Definition mat_mul_scal_l s M :=
   mk_mat (λ i j, s * mat_el M i j)%F (mat_nrows M) (mat_ncols M).
