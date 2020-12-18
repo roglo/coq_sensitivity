@@ -118,7 +118,9 @@ Definition eigenvalues_and_vectors M ev eV :=
   ∀ i μ V, 0 ≤ i < mat_nrows M →
   μ = nth i ev 0%F
   → V = nth i eV (vect_zero (mat_nrows M))
-  → V ≠ vect_zero (mat_nrows M) ∧ (M • V = μ × V)%V.
+  → vect_nrows V = mat_nrows M ∧
+    V ≠ vect_zero (vect_nrows V) ∧
+    (M • V = μ × V)%V.
 
 (* Rayleigh quotient *)
 
@@ -431,7 +433,7 @@ cbn - [ iter_seq ].
 specialize (Hvv j (nth j ev 0%F) (nth j eV (vect_zero n))) as H1.
 assert (H : 0 ≤ j < n) by flia Hj.
 specialize (H1 H eq_refl eq_refl); clear H.
-destruct H1 as (Hvjz, H1).
+destruct H1 as (Hvjz & Hvj & H1).
 remember (nth j ev 0%F) as μ eqn:Hμ.
 remember (nth j eV (vect_zero n)) as V eqn:Hv.
 symmetry.
@@ -496,9 +498,18 @@ split. {
   intros * Hi Hj.
   remember (nth i eV (vect_zero n)) as vi eqn:Hvi.
   remember (nth j eV (vect_zero n)) as vj eqn:Hvj.
+  move vj before vi.
   destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
-    unfold squ_mat_with_vect in Hm.
     unfold eigenvalues_and_vectors in Hvv.
+    enough (Hvvz : (vi · vj)%V = 0%F). {
+      unfold vect_dot_product in Hvvz.
+      specialize (Hvv i (nth i ev 0%F) vi) as H1.
+      rewrite mat_nrows_of_squ_mat in H1.
+      assert (H : 0 ≤ i < n) by (split; [ flia | easy ]).
+      specialize (H1 H eq_refl Hvi); clear H.
+      destruct H1 as (H1 & H2 & H3).
+      now rewrite H1 in Hvvz.
+    }
 ...
 (* https://math.stackexchange.com/questions/82467/eigenvectors-of-real-symmetric-matrices-are-orthogonal *)
     destruct mO as (mO, Hmo).
@@ -507,26 +518,7 @@ split. {
     destruct mO as (fO, rO, cO).
     injection Hm; clear Hm; intros H1 H2 H3.
 ...
-    enough (Hvvz : (vi · vj)%V = 0%F). {
-      unfold vect_dot_product in Hvvz.
-      remember (vect_nrows vi) as x eqn:Hx.
-      rewrite Hvi in Hx; cbn in Hx.
-      unfold eigenvalues_and_vectors in Hvv.
-      specialize (Hvv i (nth i ev 0%F) vi) as H1.
-      assert (H : 0 ≤ i < mat_nrows (mat_of_squ_mat M)). {
-        destruct M as (M, Hm').
-        clear - Hi Hm'; cbn.
-        apply Bool.andb_true_iff in Hm'.
-        destruct Hm' as (H1, H2).
-        split; [ flia | ].
-        apply Nat.eqb_eq in H1.
-        congruence.
-      }
-      specialize (H1 H eq_refl); clear H.
-...
-      unfold squ_mat_with_vect in Hm.
-...
-      cbn - [ iter_seq ] in H.
+*)
 ...
 rewrite <- mI_transp_idemp.
 symmetry.

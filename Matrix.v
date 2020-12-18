@@ -1471,6 +1471,26 @@ Qed.
 Definition squ_mat_transp n (M : square_matrix n) : square_matrix n :=
   exist _ (mat_transp (mat_of_squ_mat M)) (squ_mat_transp_prop M).
 
+Theorem mat_nrows_of_squ_mat : ∀ n (M : square_matrix n),
+  mat_nrows (mat_of_squ_mat M) = n.
+Proof.
+intros.
+destruct M as (M, Hm); cbn.
+apply Bool.andb_true_iff in Hm.
+destruct Hm as (H1, H2).
+now apply Nat.eqb_eq in H1.
+Qed.
+
+Theorem mat_ncols_of_squ_mat : ∀ n (M : square_matrix n),
+  mat_ncols (mat_of_squ_mat M) = n.
+Proof.
+intros.
+destruct M as (M, Hm); cbn.
+apply Bool.andb_true_iff in Hm.
+destruct Hm as (H1, H2).
+now apply Nat.eqb_eq in H2.
+Qed.
+
 (* *)
 
 Theorem fold_determinant :
