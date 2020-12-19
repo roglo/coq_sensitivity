@@ -519,6 +519,8 @@ Qed.
 
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   rngl_is_comm = true →
+  rngl_has_dec_eq = true →
+  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
   ∀ n (M : square_matrix n) ev eV mO,
   is_symm_squ_mat M
   → eigenvalues_and_vectors (mat_of_squ_mat M) ev eV
@@ -526,7 +528,7 @@ Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   → (mO⁺ * mO = squ_mat_one n)%SM ∧
     (mO * mO⁺ = squ_mat_one n)%SM.
 Proof.
-intros Hic * Hsy Hvv Hm.
+intros Hic Heq Hii * Hsy Hvv Hm.
 split. {
   apply square_matrix_eq; cbn.
   rewrite Hm; cbn.
@@ -598,10 +600,10 @@ split. {
     rewrite vect_scal_mul_dot_mul_comm in H1.
     rewrite vect_dot_mul_scal_mul_comm in H1; [ | easy ].
     specialize rngl_opt_eq_dec as rngl_eq_dec.
-    destruct rngl_has_dec_eq.
+    rewrite Heq in rngl_eq_dec.
     destruct (rngl_eq_dec (vi · vj)%V 0%F) as [Hvvij| Hvvij]; [ easy | ].
     exfalso.
-    apply rngl_mul_reg_r in H1; [ | | easy ].
+    apply rngl_mul_reg_r in H1; [ | easy | easy ].
     (* all eigenvalues are supposed to be different? *)
 ...
 (* https://math.stackexchange.com/questions/82467/eigenvectors-of-real-symmetric-matrices-are-orthogonal *)
