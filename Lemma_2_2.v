@@ -51,12 +51,7 @@ Definition mat_of_mat_list_list {m n} (mll : list (list (matrix m n T))) :
 
 (* sequence "An" *)
 
-Definition transport {A B} (x : A) (H : A = B) : B :=
-  match H in (_ = y) return y with
-  | eq_refl => x
-  end.
-
-Theorem glop : ∀ T' n (l : list T'),
+Theorem mA_transp_prop : ∀ T' n (l : list T'),
   length l = 2
   → matrix (2 ^ n * length l) (2 ^ n * length l) T =
     matrix (2 ^ S n) (2 ^ S n) T.
@@ -70,173 +65,16 @@ Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
   match n with
   | 0 => mZ 1 1
   | S n' =>
-      let x :=
+      let ll :=
         [[mA n'; mI (2 ^ n')];
          [mI (2 ^ n'); (- mA n')%M]]
       in
-      transport (mat_of_mat_list_list x) (glop n' x eq_refl)
+      transport (mat_of_mat_list_list ll) (mA_transp_prop n' ll eq_refl)
   end.
-
-Check mA.
-
-...
-
-Theorem glop : ∀ n T' (A B : T') C,
-  matrix
-    (2 ^ n * length (hd [] [[A; B];C]))
-    (2 ^ n * length (hd [] [[A; B];C])) T =
-  matrix (2 ^ S n) (2 ^ S n) T.
-Proof.
-intros; cbn.
-now rewrite (Nat.mul_comm _ 2); cbn.
-Qed.
-
-Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
-  match n with
-  | 0 => mZ 1 1
-  | S n' =>
-      transport
-        (mat_of_mat_list_list
-           [[mA n'; mI (2 ^ n')];
-            [mI (2 ^ n'); (- mA n')%M]])
-        (glop n' (mA n') (mI (2 ^ n')) [mI (2 ^ n'); (- mA n')%M])
-  end.
-
-Check mA.
-...
-
-Theorem glip : ∀ n n' (H : S n' = n),
-  matrix (2 ^ S n') (2 ^ S n') T = matrix (2 ^ n) (2 ^ n) T.
-Proof.
-intros.
-now destruct H.
-Qed.
-
-Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
-  match n with
-  | 0 => mZ 1 1
-  | S n' =>
-      let ll := [[mA n'; mI (2 ^ n')]; [mI (2 ^ n'); (- mA n')%M]] in
-      let x := mat_of_mat_list_list ll in
-      let Hx : x = mat_of_mat_list_list ll := eq_refl in
-      let y :=
-          transport x
-            (glop (mA n') (mI (2 ^ n')) (mI (2 ^ n')) (- mA n')%M n')
-      in
-      let Hy :
-        y =
-        transport x (glop (mA n') (mI (2 ^ n')) (mI (2 ^ n')) (- mA n')%M n') :=
-          eq_refl in
-      y
-  end.
-
-Check mA.
-...
-
-Definition mA n :=
-   (fix mA (n0 : nat) : matrix (2 ^ n0) (2 ^ n0) T :=
-      match n0 as n1 return (matrix (2 ^ n1) (2 ^ n1) T) with
-      | 0 => mZ 1 1
-      | S n1 =>
-          let x :=
-            mat_of_mat_list_list
-              [[mA n1; mI (2 ^ n1)]; [mI (2 ^ n1); (- mA n1)%M]] in
-          let Hx :
-            x =
-            mat_of_mat_list_list
-              [[mA n1; mI (2 ^ n1)]; [mI (2 ^ n1); (- mA n1)%M]] := eq_refl in
-          let y :=
-            transport x
-              (glop (mA n1) (mI (2 ^ n1)) (mI (2 ^ n1)) (- mA n1)%M n1) in
-          let Hy :
-            y =
-            transport x
-              (glop (mA n1) (mI (2 ^ n1)) (mI (2 ^ n1)) (- mA n1)%M n1) :=
-            eq_refl in
-          y
-      end) n.
-
-Check mA.
-
-Definition mA :=
-(λ n : nat,
-   (fix mA (n0 : nat) : matrix (2 ^ n0) (2 ^ n0) T :=
-      match n0 as n1 return (matrix (2 ^ n1) (2 ^ n1) T) with
-      | 0 => mZ 1 1
-      | S n1 =>
-          let x :=
-            mat_of_mat_list_list
-              [[mA n1; mI (2 ^ n1)]; [mI (2 ^ n1); (- mA n1)%M]] in
-          let Hx :
-            x =
-            mat_of_mat_list_list
-              [[mA n1; mI (2 ^ n1)]; [mI (2 ^ n1); (- mA n1)%M]] := eq_refl in
-          let y :=
-            transport x
-              (glop (mA n1) (mI (2 ^ n1)) (mI (2 ^ n1)) (- mA n1)%M n1) in
-          let Hy :
-            y =
-            transport x
-              (glop (mA n1) (mI (2 ^ n1)) (mI (2 ^ n1)) (- mA n1)%M n1) :=
-            eq_refl in
-          y
-      end) n).
-
-Check mA.
-
-...
-
-Definition mA n : matrix (2 ^ n) (2 ^ n) T.
-revert n.
-fix mA 1.
-intros.
-destruct n.
-apply (mZ 1 1).
-remember
-        (mat_of_mat_list_list
-           [[mA n; mI (2 ^ n)];
-            [mI (2 ^ n); (- mA n)%M]]) as x eqn:Hx.
-remember
-  (transport x 
-     (glop (mA n) (mI (2 ^ n)) (mI (2 ^ n))(- mA n)%M n))
-as y eqn:Hy.
-apply y.
-Show Proof.
-Defined.
-
-Check mA.
-
-Fixpoint mA n : matrix (2 ^ n) (2 ^ n) T :=
-  match n with
-  | 0 => mZ 1 1
-  | S n' =>
-      let x :=
-        (mat_of_mat_list_list
-           [[mA n'; mI (2 ^ n')];
-            [mI (2 ^ n'); (- mA n')%M]])
-      in
-      let pouet : S n' = n := 42 in
-      transport
-        (transport x 
-           (glop (mA n') (mI (2 ^ n')) (mI (2 ^ n'))(- mA n')%M n'))
-        (@glip n n' pouet)
-  end.
-
-...
-
-Fixpoint mA n : matrix (2 ^ n) (2 ^ n) T :=
-  match n with
-  | 0 => mZ (2 ^ n) (2 ^ n)
-  | S n' =>
-      mat_of_mat_list_list
-        [[mA n'; mI (2 ^ n')];
-         [mI (2 ^ n'); (- mA n')%M]]
-  end.
-
-...
 
 (* *)
 
+(*
 Theorem mA_nrows : ∀ n, mat_nrows (mA n) = 2 ^ n.
 Proof.
 intros.
@@ -257,6 +95,7 @@ intros.
 unfold is_square_mat.
 now rewrite mA_nrows, mA_ncols.
 Qed.
+*)
 
 (* "We prove by induction that A_n^2 = nI" *)
 
@@ -265,9 +104,8 @@ Theorem lemma_2_A_n_2_eq_n_I :
   ∀ n, (mA n * mA n)%M = (rngl_of_nat n × mI (2 ^ n))%M.
 Proof.
 intros Hro *.
-apply matrix_eq; [ apply mA_nrows | apply mA_ncols | ].
+apply matrix_eq.
 cbn - [ iter_seq ].
-rewrite mA_nrows, mA_ncols.
 intros i k Hi Hk.
 revert i k Hi Hk.
 induction n; intros. {
@@ -285,12 +123,22 @@ rewrite Nat.sub_add. 2: {
   now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
 }
 cbn - [ iter_seq Nat.pow ].
+(*
 unfold mat_list_list_el.
 unfold upper_left_mat_in_list_list.
 cbn - [ iter_seq Nat.pow ].
-rewrite mA_nrows, mA_ncols.
+*)
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
+Theorem glop : ∀ m n p q (A : matrix m n T) P i j,
+  mat_el (transport A P : matrix p q T) i j = mat_el A i j.
+Proof.
+intros.
+unfold transport.
+...
+do 2 rewrite glop.
+cbn.
+...
   rewrite (Nat.div_small j); [ | cbn in Hi; flia Hj Hi ].
   rewrite (Nat.mod_small j); [ | cbn in Hi; flia Hj Hi ].
   easy.
