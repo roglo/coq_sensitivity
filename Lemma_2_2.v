@@ -51,18 +51,18 @@ Definition mat_of_mat_list_list {m n} (mll : list (list (matrix m n T))) :
 
 (* sequence "An" *)
 
-Theorem mA_transp_prop : ∀ T' n (l : list T'),
-  length l = 2
-  → matrix (2 ^ n * length l) (2 ^ n * length l) T =
-    matrix (2 ^ S n) (2 ^ S n) T.
+Theorem mA_transp_prop : ∀ n len,
+  2 = len
+  → matrix (2 ^ n * len) (2 ^ n * len) T =
+     matrix (2 ^ S n) (2 ^ S n) T.
 Proof.
 intros * Hlen; cbn.
-rewrite Hlen.
+destruct Hlen.
 now rewrite Nat.mul_comm.
 Qed.
 
 (*
-Definition mA_transp_prop' T' n (l : list T') (Hlen : length l = 2) :=
+Definition mA_transp_prop' n len (Hlen : 2 = len) :=
   match Hlen with
   | eq_refl =>
       match
@@ -83,7 +83,7 @@ Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
         [[mA n'; mI (2 ^ n')];
          [mI (2 ^ n'); (- mA n')%M]]
       in
-      transport (mat_of_mat_list_list ll) (mA_transp_prop n' ll eq_refl)
+      transport (mat_of_mat_list_list ll) (mA_transp_prop n' eq_refl)
   end.
 
 (* *)
@@ -137,11 +137,6 @@ rewrite Nat.sub_add. 2: {
   now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
 }
 cbn - [ iter_seq Nat.pow ].
-(*
-unfold mat_list_list_el.
-unfold upper_left_mat_in_list_list.
-cbn - [ iter_seq Nat.pow ].
-*)
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   unfold transport.
