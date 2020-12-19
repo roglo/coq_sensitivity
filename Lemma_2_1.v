@@ -526,7 +526,7 @@ Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   → eigenvalues_and_vectors (mat_of_squ_mat M) ev eV
   → mO = squ_mat_with_vect n eV
   → (mO⁺ * mO = squ_mat_one n)%SM ∧
-    (mO * mO⁺ = squ_mat_one n)%SM.
+     (mO * mO⁺ = squ_mat_one n)%SM.
 Proof.
 intros Hic Heq Hii * Hsy Hvv Hm.
 split. {
@@ -538,6 +538,7 @@ split. {
   remember (nth i eV (vect_zero n)) as vi eqn:Hvi.
   remember (nth j eV (vect_zero n)) as vj eqn:Hvj.
   move vj before vi.
+(* problem: if vi=vj but i≠j (same eigenvalues), this does not work *)
   destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
     unfold eigenvalues_and_vectors in Hvv.
     enough (Hvvz : (vi · vj)%V = 0%F). {
@@ -605,35 +606,8 @@ split. {
     exfalso.
     apply rngl_mul_reg_r in H1; [ | easy | easy ].
     (* all eigenvalues are supposed to be different? *)
-...
 (* https://math.stackexchange.com/questions/82467/eigenvectors-of-real-symmetric-matrices-are-orthogonal *)
-    destruct mO as (mO, Hmo).
-    injection Hm; clear Hm; intros Hm.
-    unfold mat_with_vect in Hm.
-    destruct mO as (fO, rO, cO).
-    injection Hm; clear Hm; intros H1 H2 H3.
-...
-*)
-...
-rewrite <- mI_transp_idemp.
-symmetry.
-rewrite <- mat_transp_invol.
-symmetry.
-f_equal.
-rewrite mat_transp_mul.
-rewrite mat_transp_invol.
-...
-rewrite mat_transp_mul.
-rewrite mat_transp_invol.
-apply matrix_eq; [ easy | easy | ].
-cbn - [ iter_seq ].
-intros * Hi Hj.
-destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
-(*
-  remember (nth i eV (vect_zero n)) as vi eqn:Hvi.
-  remember (nth j eV (vect_zero n)) as vj eqn:Hvj.
-*)
-...
+Abort.
 
 Theorem diagonalized_matrix_prop :
   rngl_is_comm = true →
@@ -649,7 +623,7 @@ specialize (diagonalized_matrix_prop_1 Hic) as H.
 specialize (H n M ev eV mD mO Hsy Hvv Hd Ho).
 rewrite <- H.
 rewrite <- squ_mat_mul_assoc; [ | easy ].
-...
+Abort.
 
 (* changing variable x as y = O^T . x, the Rayleigh quotient R (M, x)
    is equal to
@@ -665,7 +639,7 @@ Theorem Rayleigh_quotient_from_ortho : ∀ n (M : square_matrix n) mD mO x y ev,
        Σ (i = 1, n), rngl_squ (vect_el y i))%F.
 Proof.
 intros * Hsy Hev Hmin Hmax.
-...
+Abort.
 
 (* The Rayleigh quotient reaches its minimum value μ_min (the smallest
    eigenvalue of M) when x is v_min (the corresponding eigenvector).
@@ -679,7 +653,6 @@ Theorem glop : ∀ n (M : square_matrix n) x sev μ_min μ_max,
   → (μ_min ≤ Rayleigh_quotient M x ≤ μ_max)%F.
 Proof.
 intros * Hev Hsev Hmin Hmax.
-
 ...
 
 (* min-max theorem, or variational theorem, or Courant–Fischer–Weyl min-max principle *)
