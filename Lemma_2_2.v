@@ -140,6 +140,13 @@ cbn - [ iter_seq Nat.pow ].
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   unfold transport.
+enough (rngl_has_dec_eq = true).
+specialize rngl_opt_eq_dec as rngl_eq_dec.
+rewrite H in rngl_eq_dec.
+Check (mA_transp_prop n eq_refl).
+Check (Eqdep_dec.UIP_dec rngl_eq_dec).
+...
+rewrite (Eqdep_dec.UIP_dec rngl_eq_dec) with (x := matrix (2 ^ n * 2) (2 ^ n * 2) T).
 ...
 Theorem glop : ∀ m n p q (A : matrix m n T) P i j,
   mat_el (transport A P : matrix p q T) i j = mat_el A i j.
