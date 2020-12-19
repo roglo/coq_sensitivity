@@ -58,8 +58,22 @@ Theorem mA_transp_prop : ∀ T' n (l : list T'),
 Proof.
 intros * Hlen; cbn.
 rewrite Hlen.
-now rewrite (Nat.mul_comm _ 2).
+now rewrite Nat.mul_comm.
 Qed.
+
+(*
+Definition mA_transp_prop' T' n (l : list T') (Hlen : length l = 2) :=
+  match Hlen with
+  | eq_refl =>
+      match
+        match Nat.mul_comm (2 ^ n) 2 in (_ = sn) return (sn = 2 ^ n * 2) with
+        | eq_refl => eq_refl
+        end in (_ = m) return matrix m m T = matrix (2 ^ S n) (2 ^ S n) T
+      with
+      | eq_refl => eq_refl
+      end
+  end.
+*)
 
 Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
   match n with
@@ -131,6 +145,7 @@ cbn - [ iter_seq Nat.pow ].
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   unfold transport.
+...
 Theorem glop : ∀ m n p q (A : matrix m n T) P i j,
   mat_el (transport A P : matrix p q T) i j = mat_el A i j.
 Proof.
