@@ -131,7 +131,6 @@ cbn - [ iter_seq Nat.pow ].
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   unfold transport.
-...
 Theorem glop : ∀ m n p q (A : matrix m n T) P i j,
   mat_el (transport A P : matrix p q T) i j = mat_el A i j.
 Proof.
