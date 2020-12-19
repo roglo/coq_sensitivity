@@ -568,11 +568,41 @@ split. {
       now rewrite mat_nrows_of_squ_mat.
     }
     rewrite H, H2 in H1.
-    Search ((_ × _) · _)%V.
     clear H2 H.
     replace (M⁺)%SM with M in H1. 2: {
       apply square_matrix_eq; cbn.
-      apply matrix_eq; cbn.
+      unfold mat_transp; cbn.
+      rewrite mat_nrows_of_squ_mat.
+      rewrite mat_ncols_of_squ_mat.
+      apply matrix_eq; cbn. {
+        now rewrite mat_nrows_of_squ_mat.
+      } {
+        now rewrite mat_ncols_of_squ_mat.
+      }
+      intros i' j' Hi' Hj'.
+      rewrite Hsy; [ easy | easy | ].
+      now rewrite mat_nrows_of_squ_mat.
+    }
+    specialize (Hvv j (nth j ev 0%F) vj) as H2.
+    rewrite mat_nrows_of_squ_mat in H2.
+    assert (H : 0 ≤ j < n) by flia Hj.
+    specialize (H2 H eq_refl Hvj); clear H.
+    destruct H2 as (_ & _& H2).
+    assert (H : (M • vj)%SM = (mat_of_squ_mat M • vj)%V). {
+      apply vector_eq; [ easy | ].
+      cbn - [ iter_seq ].
+      now rewrite mat_nrows_of_squ_mat.
+    }
+    rewrite H, H2 in H1.
+    clear H2 H.
+    rewrite vect_scal_mul_dot_mul_comm in H1.
+    rewrite vect_dot_mul_scal_mul_comm in H1; [ | easy ].
+    specialize rngl_opt_eq_dec as rngl_eq_dec.
+    destruct rngl_has_dec_eq.
+    destruct (rngl_eq_dec (vi · vj)%V 0%F) as [Hvvij| Hvvij]; [ easy | ].
+    exfalso.
+    apply rngl_mul_reg_r in H1; [ | | easy ].
+    (* all eigenvalues are supposed to be different? *)
 ...
 (* https://math.stackexchange.com/questions/82467/eigenvectors-of-real-symmetric-matrices-are-orthogonal *)
     destruct mO as (mO, Hmo).
