@@ -481,7 +481,44 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 }
 Qed.
 
+Theorem squ_mat_mul_vect_dot_vect :
+  rngl_is_comm = true →
+  ∀ n (M : square_matrix n) U V,
+  vect_nrows U = n
+  → ((M • U)%SM · V = U · (M⁺ • V)%SM)%V.
+Proof.
+intros Hic * Hun.
+unfold vect_dot_product.
+unfold squ_mat_mul_vect_r, squ_mat_transp.
+cbn - [ iter_seq ].
+rewrite mat_nrows_of_squ_mat.
+rewrite mat_ncols_of_squ_mat.
+rewrite Hun.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  now rewrite rngl_mul_summation_distr_r.
+}
+cbn - [ iter_seq ].
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  now rewrite rngl_mul_summation_distr_l.
+}
+cbn - [ iter_seq ].
+symmetry.
+rewrite rngl_summation_summation_exch'; [ | easy ].
+apply rngl_summation_eq_compat.
+intros i Hi.
+apply rngl_summation_eq_compat.
+intros j Hj.
+rewrite rngl_mul_assoc; f_equal.
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+rewrite Hic in rngl_mul_comm.
+apply rngl_mul_comm.
+Qed.
+
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
+  rngl_is_comm = true →
   ∀ n (M : square_matrix n) ev eV mO,
   is_symm_squ_mat M
   → eigenvalues_and_vectors (mat_of_squ_mat M) ev eV
@@ -489,7 +526,7 @@ Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   → (mO⁺ * mO = squ_mat_one n)%SM ∧
     (mO * mO⁺ = squ_mat_one n)%SM.
 Proof.
-intros * Hsy Hvv Hm.
+intros Hic * Hsy Hvv Hm.
 split. {
   apply square_matrix_eq; cbn.
   rewrite Hm; cbn.
@@ -510,6 +547,62 @@ split. {
       destruct H1 as (H1 & H2 & H3).
       now rewrite H1 in Hvvz.
     }
+    specialize (squ_mat_mul_vect_dot_vect Hic M vi vj) as H1.
+    (* ((M • vi)%SM · vj)%V = (vi · (M⁺ • vj)%SM)%V *)
+    assert (H : vect_nrows vi = n). {
+      specialize (Hvv i (nth i ev 0%F) vi) as H2.
+      rewrite mat_nrows_of_squ_mat in H2.
+      assert (H : 0 ≤ i < n) by flia Hi.
+      now specialize (H2 H eq_refl Hvi); clear H.
+    }
+    specialize (H1 H); clear H.
+    (* H1 : ((M • vi)%SM · vj)%V = (vi · (M⁺ • vj)%SM)%V *)
+    specialize (Hvv i (nth i ev 0%F) vi) as H2.
+    rewrite mat_nrows_of_squ_mat in H2.
+    assert (H : 0 ≤ i < n) by flia Hi.
+    specialize (H2 H eq_refl Hvi); clear H.
+    destruct H2 as (_ & _& H2).
+    assert (H : (M • vi)%SM = (mat_of_squ_mat M • vi)%V). {
+      apply vector_eq; [ easy | ].
+      cbn - [ iter_seq ].
+      now rewrite mat_nrows_of_squ_mat.
+    }
+    rewrite H, H2 in H1.
+    clear H2 H.
+    replace (M⁺)%SM with M in H1. 2: {
+      apply square_matrix_eq; cbn.
+      unfold mat_transp; cbn.
+      rewrite mat_nrows_of_squ_mat.
+      rewrite mat_ncols_of_squ_mat.
+      apply matrix_eq; cbn. {
+        now rewrite mat_nrows_of_squ_mat.
+      } {
+        now rewrite mat_ncols_of_squ_mat.
+      }
+      intros i' j' Hi' Hj'.
+      rewrite Hsy; [ easy | easy | ].
+      now rewrite mat_nrows_of_squ_mat.
+    }
+    specialize (Hvv j (nth j ev 0%F) vj) as H2.
+    rewrite mat_nrows_of_squ_mat in H2.
+    assert (H : 0 ≤ j < n) by flia Hj.
+    specialize (H2 H eq_refl Hvj); clear H.
+    destruct H2 as (_ & _& H2).
+    assert (H : (M • vj)%SM = (mat_of_squ_mat M • vj)%V). {
+      apply vector_eq; [ easy | ].
+      cbn - [ iter_seq ].
+      now rewrite mat_nrows_of_squ_mat.
+    }
+    rewrite H, H2 in H1.
+    clear H2 H.
+    rewrite vect_scal_mul_dot_mul_comm in H1.
+    rewrite vect_dot_mul_scal_mul_comm in H1; [ | easy ].
+    specialize rngl_opt_eq_dec as rngl_eq_dec.
+    destruct rngl_has_dec_eq.
+    destruct (rngl_eq_dec (vi · vj)%V 0%F) as [Hvvij| Hvvij]; [ easy | ].
+    exfalso.
+    apply rngl_mul_reg_r in H1; [ | | easy ].
+    (* all eigenvalues are supposed to be different? *)
 ...
 (* https://math.stackexchange.com/questions/82467/eigenvectors-of-real-symmetric-matrices-are-orthogonal *)
     destruct mO as (mO, Hmo).
