@@ -86,10 +86,7 @@ Fixpoint mA' (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
       transport (mat_of_mat_list_list ll) (mA_transp_prop n' eq_refl)
   end.
 
-(*
-Definition transport' A B x (H : A = B) :=
-  @eq_rect Type A (λ t, t) x B H.
-*)
+Definition transport' A B x (H : A = B) := eq_rect A id x B H.
 
 Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
   match n with
