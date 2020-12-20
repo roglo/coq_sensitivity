@@ -936,58 +936,24 @@ cbn in Hcp |-*.
 apply matrix_eq; cbn.
 intros * Hi Hn.
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-...
-  now rewrite rngl_mul_1_r.
+  subst j.
+  replace
+    (@mat_el n n T (@rngl_of_nat (matrix n n T) (mat_ring_like_op n) c) i i)%F
+  with (@rngl_of_nat T ro c). 2: {
+    clear Hc.
+    clear Hcp.
+    induction c; [ easy | cbn ].
+    destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
+    now rewrite <- IHc.
+  }
+  easy.
 }
-rewrite rngl_mul_0_r.
-apply rngl_add_0_l.
+rewrite rngl_add_0_l.
+clear Hc Hcp.
+induction c; [ easy | cbn ].
+destruct (Nat.eq_dec i j) as [H| H]; [ easy | clear H ].
+now rewrite rngl_add_0_l.
 Qed.
-...
-Theorem squ_mat_characteristic_prop : ∀ n,
-  match
-    (if Nat.eq_dec n 0 then 1 else rngl_characteristic)
-  with
-  | 0 => ∀ i : nat, rngl_of_nat (S i) ≠ squ_mat_zero n
-  | S _ =>
-      rngl_of_nat (if Nat.eq_dec n 0 then 1 else rngl_characteristic) =
-      squ_mat_zero n
-  end.
-Proof.
-intros; cbn.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  subst n; cbn.
-  apply square_matrix_eq; cbn.
-  now apply matrix_eq.
-}
-remember rngl_characteristic as c eqn:Hc.
-symmetry in Hc.
-specialize (rngl_characteristic_prop) as Hcp.
-rewrite Hc in Hcp.
-destruct c. {
-  intros.
-  apply square_matrix_neq; cbn.
-  rewrite mat_of_squ_mat_squ_mat_of_nat.
-  apply matrix_neq; cbn.
-  right; right.
-  intros H.
-  destruct n; [ easy | ].
-  specialize (H 0 0 (Nat.lt_0_succ _) (Nat.lt_0_succ _)).
-  cbn in H.
-  rewrite rngl_mul_1_r in H.
-  now specialize (Hcp i).
-}
-cbn in Hcp |-*.
-apply square_matrix_eq; cbn.
-apply matrix_eq; [ easy | easy | cbn ].
-intros * Hi Hn.
-rewrite mat_of_squ_mat_squ_mat_of_nat; cbn.
-destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-  now rewrite rngl_mul_1_r.
-}
-rewrite rngl_mul_0_r.
-apply rngl_add_0_l.
-Qed.
-*)
 
 Theorem mat_opt_eq_dec : ∀ n,
   if rngl_has_dec_eq then ∀ a b : matrix n n T, {a = b} + {a ≠ b} else True.
