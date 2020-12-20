@@ -94,6 +94,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_is_comm : bool;
     rngl_has_dec_eq : bool;
     rngl_has_dec_le : bool;
+    rngl_has_1_neq_0 : bool;
     rngl_is_integral : bool;
     rngl_characteristic : nat;
     rngl_add_comm : ∀ a b : T, (a + b = b + a)%F;
@@ -102,7 +103,8 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_mul_assoc : ∀ a b c : T, (a * (b * c) = (a * b) * c)%F;
     rngl_mul_1_l : ∀ a : T, (1 * a)%F = a;
     rngl_mul_add_distr_l : ∀ a b c : T, (a * (b + c) = a * b + a * c)%F;
-    rngl_1_neq_0 : (1 ≠ 0)%F;
+    (* when 1 ≠ 0 *)
+    rngl_opt_1_neq_0 : if rngl_has_1_neq_0 then (1 ≠ 0)%F else True;
     (* when multiplication is commutative *)
     rngl_opt_mul_comm :
       if rngl_is_comm then ∀ a b, (a * b = b * a)%F else True;

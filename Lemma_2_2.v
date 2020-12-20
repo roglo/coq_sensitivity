@@ -642,11 +642,12 @@ Theorem μ_is_ev_of_An_iff_μ2_eq_n :
   rngl_has_opp = true →
   rngl_has_dec_eq = true →
   rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
   rngl_characteristic = 0 →
   ∀ n μ,
   (∃ V, is_eigenvector_of_An n μ V) ↔ (μ * μ = rngl_of_nat n)%F.
 Proof.
-intros Hic Hro Heq Hin Hch *.
+intros Hic Hro Heq Hin H10 Hch *.
 split. {
   intros HV.
   destruct HV as (V & Hvr & Hvz & Hv).
@@ -677,6 +678,8 @@ split. {
     assert (H1 : ∀ i, f i = g i) by now rewrite H.
     specialize (H1 0).
     unfold f, g in H1; cbn in H1.
+    specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
+    rewrite H10 in rngl_1_neq_0.
     now apply rngl_1_neq_0 in H1.
   }
   intros H.
