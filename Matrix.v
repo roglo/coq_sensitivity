@@ -1649,21 +1649,31 @@ destruct IHn as [IHn| IHn]. {
 }
 Qed.
 
-(* something wrong here: if n equals 0, all matrices are empty,
-   therefore 1 = 0 in matrices *)
-(*
-Theorem mat_1_neq_0 : ∀ n, @mI T ro n ≠ mZ n n.
+Theorem mat_1_neq_0 : ∀ n,
+  if rngl_has_1_neq_0 && negb (n =? 0) then @mI T ro n ≠ mZ n n else True.
 Proof.
 intros.
+specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
+remember (rngl_has_1_neq_0 && negb (n =? 0)) as b eqn:Hb.
+symmetry in Hb.
+destruct b; [ | easy ].
+apply Bool.andb_true_iff in Hb.
+destruct Hb as (H10, Hb).
+apply Bool.negb_true_iff in Hb.
+apply Nat.eqb_neq in Hb.
+rewrite H10 in rngl_1_neq_0.
 apply matrix_neq.
 intros H; cbn in H.
-...
+destruct n; [ easy | ].
+now specialize (H 0 0 (Nat.lt_0_succ _) (Nat.lt_0_succ _)).
+Qed.
 
 Definition mat_ring_like_prop (n : nat) :
   ring_like_prop (matrix n n T) :=
   {| rngl_is_comm := false;
      rngl_has_dec_eq := @rngl_has_dec_eq T ro rp;
      rngl_has_dec_le := false;
+     rngl_has_1_neq_0 := (rngl_has_1_neq_0 && negb (Nat.eqb n 0))%bool;
      rngl_is_integral := false;
      rngl_characteristic := if Nat.eq_dec n 0 then 1 else rngl_characteristic;
      rngl_add_comm := mat_add_comm;
@@ -1672,7 +1682,7 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_mul_assoc := mat_mul_assoc;
      rngl_mul_1_l := mat_mul_1_l;
      rngl_mul_add_distr_l := mat_mul_add_distr_l;
-     rngl_1_neq_0 := @mat_1_neq_0 n;
+     rngl_opt_1_neq_0 := @mat_1_neq_0 n;
      rngl_opt_mul_comm := I;
      rngl_opt_mul_1_r := mat_mul_1_r;
      rngl_opt_mul_add_distr_r := mat_mul_add_distr_r;
@@ -1696,8 +1706,6 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_opt_mul_le_compat_nonpos := I;
      rngl_opt_mul_le_compat := I;
      rngl_opt_not_le := I |}.
-...
-*)
 
 (*
 Theorem squ_mat_mul_scal_vect_comm :
