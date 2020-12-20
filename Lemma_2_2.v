@@ -75,6 +75,22 @@ Definition mA_transp_prop' n len (Hlen : 2 = len) :=
   end.
 *)
 
+Fixpoint mA' (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
+  match n with
+  | 0 => mZ 1 1
+  | S n' =>
+      let ll :=
+        [[mA' n'; mI (2 ^ n')];
+         [mI (2 ^ n'); (- mA' n')%M]]
+      in
+      transport (mat_of_mat_list_list ll) (mA_transp_prop n' eq_refl)
+  end.
+
+(*
+Definition transport' A B x (H : A = B) :=
+  @eq_rect Type A (λ t, t) x B H.
+*)
+
 Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
   match n with
   | 0 => mZ 1 1
@@ -83,8 +99,23 @@ Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
         [[mA n'; mI (2 ^ n')];
          [mI (2 ^ n'); (- mA n')%M]]
       in
-      transport (mat_of_mat_list_list ll) (mA_transp_prop n' eq_refl)
+      eq_rect _ id (mat_of_mat_list_list ll) _ (mA_transp_prop n' eq_refl)
   end.
+
+(*
+transport = 
+λ (A B : Type) (x : A) (H : A = B), match H in (_ = y) return y with
+                                    | eq_refl => x
+                                    end
+transport' = 
+λ (A B : Type) (x : A) (H : A = B), eq_rect A (λ t : Type, t) x B H
+     : ∀ A B : Type, A → A = B → (λ t : Type, t) B
+eq_rect = 
+λ (A : Type) (x : A) (P : A → Type) (f : P x) (y : A) (e : x = y),
+  match e in (_ = y0) return (P y0) with
+  | eq_refl => f
+  end
+*)
 
 (* *)
 
@@ -139,7 +170,15 @@ rewrite Nat.sub_add. 2: {
 cbn - [ iter_seq Nat.pow ].
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
-  unfold transport.
+...
+  unfold transport'.
+...
+  destruct (mA_transp_prop n eq_refl).
+...
+Search eq_rect.
+rewrite <- Eqdep_dec.eq_rect_eq_dec.
+rewrite f_equal_dep.
+cbn.
 ...
 rewrite (Eqdep_dec.UIP_dec rngl_eq_dec) with (x := matrix (2 ^ n * 2) (2 ^ n * 2) T).
 ...
