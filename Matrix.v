@@ -1202,7 +1202,6 @@ apply mat_mul_add_distr_r; congruence.
 Qed.
 
 Context {Hro : @rngl_has_opp T ro = true}.
-Context {H10 : @rngl_has_1_neq_0 T ro rp = true}.
 
 Theorem squ_mat_add_opp_l : ∀ n,
   if @rngl_has_opp (square_matrix n) _ then
@@ -1222,9 +1221,20 @@ apply Nat.eqb_eq in Hca.
 rewrite mat_add_opp_l with (n := n); congruence.
 Qed.
 
+Context {H10 : @rngl_has_1_neq_0 T ro rp = true}.
+
+(*
 Theorem squ_mat_1_neq_0 : ∀ n, squ_mat_one n ≠ squ_mat_zero n.
+*)
+Theorem squ_mat_1_neq_0 : ∀ n,
+  if negb (n =? 0) then  squ_mat_one n ≠ squ_mat_zero n else True.
 Proof.
 intros.
+remember (negb (n =? 0)) as b eqn:Hb.
+symmetry in Hb.
+destruct b; [ | easy ].
+apply Bool.negb_true_iff in Hb.
+apply Nat.eqb_neq in Hb.
 unfold squ_mat_one, squ_mat_zero.
 intros H.
 injection H; clear H; intros H.
@@ -1234,8 +1244,11 @@ assert (H1 : ∀ i j, f i j = g i j) by now rewrite H.
 specialize (H1 0 0).
 unfold f, g in H1; cbn in H1.
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
-rewrite H10 in rngl_1_neq_0.
-now apply rngl_1_neq_0 in H1.
+(*
+destruct rngl_has_1_neq_0; [ easy | ].
+apply rngl_1_neq_0 in H1.
+*)
+now rewrite H10 in rngl_1_neq_0.
 Qed.
 
 Theorem mat_of_squ_mat_squ_mat_of_nat : ∀ n i,
@@ -1363,7 +1376,7 @@ Definition squ_mat_ring_like_prop (n : nat) :
   {| rngl_is_comm := false;
      rngl_has_dec_eq := @rngl_has_dec_eq T ro rp;
      rngl_has_dec_le := false;
-     rngl_has_1_neq_0 := true;
+     rngl_has_1_neq_0 := negb (Nat.eqb n 0);
      rngl_is_integral := false;
      rngl_characteristic := if Nat.eq_dec n 0 then 1 else rngl_characteristic;
      rngl_add_comm := @squ_mat_add_comm n;
