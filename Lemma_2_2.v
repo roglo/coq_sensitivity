@@ -75,19 +75,6 @@ Definition mA_transp_prop' n len (Hlen : 2 = len) :=
   end.
 *)
 
-Fixpoint mA' (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
-  match n with
-  | 0 => mZ 1 1
-  | S n' =>
-      let ll :=
-        [[mA' n'; mI (2 ^ n')];
-         [mI (2 ^ n'); (- mA' n')%M]]
-      in
-      transport (mat_of_mat_list_list ll) (mA_transp_prop n' eq_refl)
-  end.
-
-Definition transport' A B x (H : A = B) := eq_rect A id x B H.
-
 Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
   match n with
   | 0 => mZ 1 1
@@ -95,6 +82,19 @@ Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
       let ll :=
         [[mA n'; mI (2 ^ n')];
          [mI (2 ^ n'); (- mA n')%M]]
+      in
+      transport (mat_of_mat_list_list ll) (mA_transp_prop n' eq_refl)
+  end.
+
+Definition transport' A B x (H : A = B) := eq_rect A id x B H.
+
+Fixpoint mA' (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
+  match n with
+  | 0 => mZ 1 1
+  | S n' =>
+      let ll :=
+        [[mA' n'; mI (2 ^ n')];
+         [mI (2 ^ n'); (- mA' n')%M]]
       in
       eq_rect _ id (mat_of_mat_list_list ll) _ (mA_transp_prop n' eq_refl)
   end.
@@ -167,8 +167,7 @@ rewrite Nat.sub_add. 2: {
 cbn - [ iter_seq Nat.pow ].
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
-...
-  unfold transport'.
+  unfold transport.
 ...
   destruct (mA_transp_prop n eq_refl).
 ...
