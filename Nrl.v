@@ -163,11 +163,11 @@ Qed.
 
 (* ℤn = ℤ/nℤ *)
 
-Definition at_least_2 n := S (S (n - 2)).
+Definition at_least_1 n := S(n - 1).
 
-Definition Zn n := {a : nat | a <? at_least_2 n = true}.
+Definition Zn n := {a : nat | a <? at_least_1 n = true}.
 
-Theorem Zn_op_prop n r : r mod at_least_2 n <? at_least_2 n = true.
+Theorem Zn_op_prop n r : r mod at_least_1 n <? at_least_1 n = true.
 Proof.
 intros.
 apply Nat.ltb_lt.
@@ -175,20 +175,20 @@ now apply Nat.mod_upper_bound.
 Qed.
 
 Definition Zn_of_nat n v : Zn n :=
-  exist _ (v mod at_least_2 n) (Zn_op_prop n v).
+  exist _ (v mod at_least_1 n) (Zn_op_prop n v).
 
 Definition Zn_add n (a b : Zn n) : Zn n :=
   let r := proj1_sig a + proj1_sig b in
-  exist _ (r mod at_least_2 n) (Zn_op_prop n r).
+  exist _ (r mod at_least_1 n) (Zn_op_prop n r).
 Definition Zn_mul n (a b : Zn n) : Zn n :=
   let r := proj1_sig a * proj1_sig b in
-  exist _ (r mod at_least_2 n) (Zn_op_prop n r).
+  exist _ (r mod at_least_1 n) (Zn_op_prop n r).
 Definition Zn_opp n (a : Zn n) : Zn n :=
-  let r := at_least_2 n - proj1_sig a in
-  exist _ (r mod at_least_2 n) (Zn_op_prop n r).
+  let r := at_least_1 n - proj1_sig a in
+  exist _ (r mod at_least_1 n) (Zn_op_prop n r).
 Definition Zn_inv n (a : Zn n) : Zn n :=
   let r := inv_mod (proj1_sig a) n in
-  exist _ (r mod at_least_2 n) (Zn_op_prop n r).
+  exist _ (r mod at_least_1 n) (Zn_op_prop n r).
 Definition Zn_div n (a b : Zn n) : Zn n :=
   if is_prime n then Zn_mul n a (Zn_inv n b)
   else a.
@@ -278,10 +278,7 @@ Theorem Zn_mul_1_l : ∀ (a : Zn n), (1 * a = a)%F.
 Proof.
 intros.
 apply Zn_eq; cbn - [ "mod" ].
-rewrite (Nat.mod_small 1). 2: {
-  apply -> Nat.succ_lt_mono.
-  apply Nat.lt_0_succ.
-}
+rewrite Nat.mul_mod_idemp_l; [ | easy ].
 rewrite Nat.mul_1_l.
 destruct a as (a, Ha); cbn - [ "mod" ].
 apply Nat.ltb_lt in Ha.
@@ -299,13 +296,18 @@ rewrite Nat.mul_mod_idemp_r; [ | easy ].
 now rewrite Nat.mul_add_distr_l.
 Qed.
 
-Theorem Zn_neq_1_0 : (1 ≠ 0)%F.
+Theorem Zn_neq_1_0 :
+  if 1 <? n then (1 ≠ 0)%F else True.
 Proof.
 intros.
+remember (1 <? n) as b eqn:Hb.
+symmetry in Hb.
+destruct b; [ | easy ].
+apply Nat.ltb_lt in Hb.
 apply Zn_neq; cbn - [ "mod" ].
 rewrite Nat.mod_small. 2: {
   apply -> Nat.succ_lt_mono.
-  apply Nat.lt_0_succ.
+  flia Hb.
 }
 rewrite Nat.mod_small. 2: {
   apply Nat.lt_0_succ.
@@ -361,14 +363,14 @@ apply Nat.nlt_ge in Hn2; cbn.
 apply Zn_eq; cbn - [ "mod" ].
 rewrite (Nat.mod_small 1). 2: {
   apply -> Nat.succ_lt_mono.
-  apply Nat.lt_0_succ.
+  flia Hn2.
 }
 rewrite Nat.mul_mod_idemp_l; [ | easy ].
-replace (at_least_2 n) with n. 2: {
+replace (at_least_1 n) with n. 2: {
   destruct n as [| n']; [ easy | ].
   destruct n'; [ easy | ].
-  unfold at_least_2.
-  do 2 rewrite Nat.sub_succ.
+  unfold at_least_1.
+  rewrite Nat.sub_succ.
   now rewrite Nat.sub_0_r.
 }
 apply prime_mul_inv_l_mod; [ easy | ].
@@ -378,13 +380,13 @@ apply Zn_eq; cbn; symmetry.
 rewrite Nat.sub_diag; symmetry.
 destruct a; [ easy | exfalso ].
 apply Nat.ltb_lt in Ha.
-unfold at_least_2 in Ha.
+unfold at_least_1 in Ha.
 apply Nat.mod_divides in H; [ | flia Hn2 ].
 destruct H as (c, Hc).
 replace (S (S (n - 2))) with n in Ha by flia Hn2.
 rewrite Hc in Ha.
 apply Nat.nle_gt in Ha; apply Ha.
-destruct c; [ now rewrite Nat.mul_comm in Hc | flia ].
+destruct c; [ now rewrite Nat.mul_comm in Hc | flia Hn2 ].
 Qed.
 
 Theorem Zn_opt_mul_inv_r :
@@ -395,7 +397,7 @@ now rewrite Bool.andb_false_r.
 Qed.
 
 Theorem proj1_sig_Zn_of_nat : ∀ i,
-  proj1_sig (rngl_of_nat i) = i mod at_least_2 n.
+  proj1_sig (rngl_of_nat i) = i mod at_least_1 n.
 Proof.
 intros.
 induction i. {
@@ -403,20 +405,18 @@ induction i. {
   now rewrite Nat.mod_0_l.
 }
 cbn - [ "mod" ].
-rewrite (Nat.mod_small 1); [ | unfold at_least_2; flia ].
-unfold at_least_2 in IHi.
+(**)
 cbn - [ "mod" ] in IHi.
 rewrite IHi.
-unfold at_least_2.
-remember (S (S (n - 2))) as k eqn:Hk.
-assert (Hk2 : 2 ≤ k) by flia Hk.
-apply Nat.add_mod_idemp_r; flia Hk2.
+rewrite Nat.add_mod_idemp_l; [ | easy ].
+rewrite Nat.add_mod_idemp_r; [ | easy ].
+easy.
 Qed.
 
 Theorem Zn_characteristic_prop :
-  match at_least_2 n with
+  match at_least_1 n with
   | 0 => ∀ i : nat, rngl_of_nat (S i) ≠ 0%F
-  | S _ => rngl_of_nat (at_least_2 n) = 0%F
+  | S _ => rngl_of_nat (at_least_1 n) = 0%F
   end.
 Proof.
 intros.
@@ -431,9 +431,9 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
   {| rngl_is_comm := true;
      rngl_has_dec_eq := true;
      rngl_has_dec_le := false;
-     rngl_has_1_neq_0 := true;
+     rngl_has_1_neq_0 := 1 <? n;
      rngl_is_integral := false;
-     rngl_characteristic := at_least_2 n;
+     rngl_characteristic := at_least_1 n;
      rngl_add_comm := Zn_add_comm;
      rngl_add_assoc := Zn_add_assoc;
      rngl_add_0_l := Zn_add_0_l;
