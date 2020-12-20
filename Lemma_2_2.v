@@ -178,6 +178,30 @@ specialize rngl_opt_eq_dec as H.
 destruct rngl_has_dec_eq in H.
 specialize (H1 _ H); clear H.
 ...
+replace
+  (mat_el
+     match mA_transp_prop n eq_refl in (_ = y) return (id y) with
+     | eq_refl => mat_of_mat_list_list [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]]
+     end i j)
+  with
+  (match mA_transp_prop n eq_refl with
+   | eq_refl =>
+       mat_el (mat_of_mat_list_list [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]]) i j
+   end).
+replace
+  (mat_el
+     match mA_transp_prop n eq_refl in (_ = y) return (id y) with
+     | eq_refl => mat_of_mat_list_list [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]]
+     end j k)
+  with
+  (match mA_transp_prop n eq_refl with
+   | eq_refl =>
+       mat_el (mat_of_mat_list_list [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]]) j k
+   end).
+destruct (mA_transp_prop n eq_refl).
+reflexivity.
+destruct (mA_transp_prop n eq_refl) at 1.
+...
   unfold transport.
 ...
   destruct (mA_transp_prop n eq_refl).
