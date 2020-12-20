@@ -15,11 +15,6 @@ Require Import RingLike RLsummation.
 Record matrix (m n : nat) T := mk_mat
   { mat_el : nat → nat → T }.
 
-(*
-Definition mat_nrows {m n T} (M : matrix m n T) := m.
-Definition mat_ncols {m n T} (M : matrix m n T) := n.
-*)
-
 (* function extensionality required for matrices *)
 Axiom matrix_eq : ∀ m n T (MA MB : matrix m n T),
   (∀ i j, i < m → j < n → mat_el MA i j = mat_el MB i j)
@@ -89,15 +84,6 @@ Definition mat_mul {ro : ring_like_op T} {m n p}
     (MA : matrix m n T) (MB : matrix n p T) : matrix m p T :=
   {| mat_el i k := (Σ (j = 0, n - 1), mat_el MA i j * mat_el MB j k)%F |}.
 
-(*
-Theorem mat_mul_nrows {m n p} : ∀ (A : matrix T m n) (B : matrix T n p),
-  mat_nrows (mat_mul A B) = mat_nrows A.
-Proof. easy. Qed.
-
-Theorem mat_mul_ncols : ∀ A B, mat_ncols (mat_mul A B) = mat_ncols B.
-Proof. easy. Qed.
-*)
-
 (* opposite *)
 
 Definition mat_opp {m n} (M : matrix m n T) : matrix m n T :=
@@ -107,12 +93,6 @@ Definition mat_opp {m n} (M : matrix m n T) : matrix m n T :=
 
 Definition mat_sub {m n} (MA MB : matrix m n T) :=
   mat_add MA (mat_opp MB).
-
-(* *)
-
-(*
-Definition is_square_mat {m n} (M : matrix m n T) := m = n.
-*)
 
 (* vector *)
 
@@ -333,14 +313,7 @@ Declare Scope M_scope.
 Delimit Scope M_scope with M.
 
 Arguments det_loop {T ro} {n}%nat M%M i%nat.
-(*
-Arguments is_square_mat {T} M%M.
-*)
 Arguments mat_mul_scal_l {T ro m n} s%F M%M.
-(*
-Arguments mat_nrows {T} m%M.
-Arguments mat_ncols {T} m%M.
-*)
 Arguments mat_opp {T}%type {ro} {m n}%nat.
 Arguments mat_sub {T ro m n} MA%M MB%M.
 Arguments mI {T ro} n%nat.
@@ -368,14 +341,6 @@ Notation "A • V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
 Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
 Notation "U · V" := (vect_dot_product U V) (at level 40) : V_scope.
-
-(* *)
-
-(*
-Theorem mat_fold_sub : ∀ {m n} (MA MB : matrix m n T),
-  (MA + - MB = MA - MB)%M.
-Proof. easy. Qed.
-*)
 
 (* commutativity of addition *)
 
@@ -441,15 +406,6 @@ unfold rngl_sub in H.
 rewrite Hro in H.
 apply H.
 Qed.
-
-(*
-(* multiplication of a square matrix by a scalar is square *)
-
-Theorem mat_mul_scal_l_is_square : ∀ a M,
-  is_square_mat M
-  → is_square_mat (a × M).
-Proof. intros. easy. Qed.
-*)
 
 (* multiplication left and right with identity *)
 
@@ -877,135 +833,9 @@ intros * Hi Hj.
 apply rngl_mul_1_l.
 Qed.
 
-(* square matrices should not be required now
-
-Definition is_square_mat_bool (M : matrix T) :=
-  Nat.eqb (mat_nrows M) (mat_ncols M).
-
-Definition compatible_square_matrices_bool (ML : list (matrix T)) :=
-  (forallb is_square_mat_bool ML &&
-   forallb
-     (λ M,
-        let sz1 := mat_nrows M in
-        let sz2 := mat_nrows (hd M ML) in
-        Nat.eqb sz1 sz2)
-     ML)%bool.
-
-Definition square_matrix n :=
-  {M : matrix T | Nat.eqb (mat_nrows M) n && Nat.eqb (mat_ncols M) n = true}.
-
-Definition mat_of_squ_mat n (M : square_matrix n) : matrix T := proj1_sig M.
-Definition squ_mat_el n (M : square_matrix n) := mat_el (mat_of_squ_mat M).
-
-Theorem square_matrix_eq : ∀ n (MA MB : square_matrix n),
-  mat_of_squ_mat MA = mat_of_squ_mat MB
-  → MA = MB.
-Proof.
-intros  * Hab.
-destruct MA as (A, ma).
-destruct MB as (B, mb).
-cbn in Hab.
-apply eq_exist_uncurried.
-exists Hab.
-apply (Eqdep_dec.UIP_dec Bool.bool_dec).
-Qed.
-
-Theorem square_matrix_neq : ∀ n (MA MB : square_matrix n),
-  mat_of_squ_mat MA ≠ mat_of_squ_mat MB
-  → MA ≠ MB.
-Proof.
-intros * Hab H.
-apply Hab.
-now destruct H.
-Qed.
-
-Theorem mZ_prop n : (mat_nrows (mZ n) =? n) && (mat_ncols (mZ n) =? n) = true.
-Proof.
-apply andb_true_intro.
-now split; apply Nat.eqb_eq.
-Qed.
-
-Theorem mI_prop n : (mat_nrows (mI n) =? n) && (mat_ncols (mI n) =? n) = true.
-Proof.
-apply andb_true_intro.
-now split; apply Nat.eqb_eq.
-Qed.
-
-Definition squ_mat_zero n : square_matrix n := exist _ (mZ n) (mZ_prop n).
-Definition squ_mat_one n : square_matrix n := exist _ (mI n) (mI_prop n).
-
-Theorem squ_mat_add_prop : ∀ n (MA MB : square_matrix n),
-  (mat_nrows (mat_of_squ_mat MA + mat_of_squ_mat MB) =? n) &&
-  (mat_ncols (mat_of_squ_mat MA + mat_of_squ_mat MB) =? n) = true.
-Proof.
-intros.
-destruct MA as (A, Hap).
-destruct MB as (B, Hbp); cbn.
-apply andb_true_intro.
-apply andb_true_iff in Hap.
-apply andb_true_iff in Hbp.
-easy.
-Qed.
-
-Definition squ_mat_add n (MA MB : square_matrix n) : square_matrix n :=
-  exist _ (mat_of_squ_mat MA + mat_of_squ_mat MB)%M (squ_mat_add_prop MA MB).
-
-Definition squ_mat_mul_vect_r n (M : square_matrix n) V :=
-  (mat_of_squ_mat M • V)%V.
-
-Theorem squ_mat_mul_prop : ∀ n (MA MB : square_matrix n),
-  (mat_nrows (mat_of_squ_mat MA * mat_of_squ_mat MB) =? n) &&
-  (mat_ncols (mat_of_squ_mat MA * mat_of_squ_mat MB) =? n) = true.
-Proof.
-intros.
-destruct MA as (A, Hap).
-destruct MB as (B, Hbp); cbn.
-apply andb_true_intro.
-apply andb_true_iff in Hap.
-apply andb_true_iff in Hbp.
-easy.
-Qed.
-
-Definition squ_mat_mul n (MA MB : square_matrix n) : square_matrix n :=
-  exist _ (mat_of_squ_mat MA * mat_of_squ_mat MB)%M (squ_mat_mul_prop MA MB).
-
-Theorem squ_mat_opp_prop : ∀ n (M : square_matrix n),
-  (mat_nrows (- mat_of_squ_mat M)%M =? n) &&
-  (mat_ncols (- mat_of_squ_mat M)%M =? n) = true.
-Proof.
-intros.
-now destruct M as (A, Hap).
-Qed.
-
-Definition squ_mat_opp n (M : square_matrix n) : square_matrix n :=
-  exist _ (- mat_of_squ_mat M)%M (squ_mat_opp_prop M).
-
-Definition phony_squ_mat_le n (MA MB : square_matrix n) := True.
-Definition phony_squ_mat_sub n (MA MB : square_matrix n) := MA.
-Definition phony_squ_mat_div n (MA MB : square_matrix n) := MA.
-Definition phony_squ_mat_inv n (M : square_matrix n) := M.
-
-Canonical Structure squ_mat_ring_like_op n : ring_like_op (square_matrix n) :=
-  {| rngl_has_opp := true;
-     rngl_has_inv := false;
-     rngl_has_no_inv_but_div := false;
-     rngl_is_ordered := false;
-     rngl_zero := squ_mat_zero n;
-     rngl_one := squ_mat_one n;
-     rngl_add := @squ_mat_add n;
-     rngl_mul := @squ_mat_mul n;
-     rngl_opp := @squ_mat_opp n;
-     rngl_inv := @phony_squ_mat_inv n;
-     rngl_le := @phony_squ_mat_le n;
-     rngl_opt_sub := @phony_squ_mat_sub n;
-     rngl_opt_div := @phony_squ_mat_div n |}.
-
-Existing Instance squ_mat_ring_like_op.
-*)
-
-Definition phony_squ_mat_le n (MA MB : matrix n n T) := True.
-Definition phony_squ_mat_div n (MA MB : matrix n n T) := MA.
-Definition phony_squ_mat_inv n (M : matrix n n T) := M.
+Definition phony_mat_le n (MA MB : matrix n n T) := True.
+Definition phony_mat_div n (MA MB : matrix n n T) := MA.
+Definition phony_mat_inv n (M : matrix n n T) := M.
 
 Definition at_least_1 n := S (n - 1).
 
@@ -1020,443 +850,14 @@ Canonical Structure mat_ring_like_op n :
      rngl_add := @mat_add T _ n n;
      rngl_mul := @mat_mul T _ n n n;
      rngl_opp := @mat_opp T _ n n;
-     rngl_inv := @phony_squ_mat_inv n;
-     rngl_le := @phony_squ_mat_le n;
+     rngl_inv := @phony_mat_inv n;
+     rngl_le := @phony_mat_le n;
      rngl_opt_sub := @mat_sub T ro n n;
-     rngl_opt_div := @phony_squ_mat_div n |}.
+     rngl_opt_div := @phony_mat_div n |}.
 
 (**)
 Existing Instance mat_ring_like_op.
 (**)
-
-(*
-Declare Scope SM_scope.
-Delimit Scope SM_scope with SM.
-
-Arguments squ_mat_mul_vect_r {n}%nat M%SM V%V.
-
-Notation "A * B" := (squ_mat_mul A B) : SM_scope.
-Notation "A + B" := (squ_mat_add A B) : SM_scope.
-Notation "A • V" := (squ_mat_mul_vect_r A V) (at level 40) : SM_scope.
-Notation "- A" := (squ_mat_opp A) : SM_scope.
-
-Theorem squ_mat_add_comm : ∀ n (MA MB : square_matrix n),
-  (MA + MB = MB + MA)%SM.
-Proof.
-intros.
-apply square_matrix_eq; cbn.
-destruct MA as (A, Ha).
-destruct MB as (B, Hb); cbn.
-apply Bool.andb_true_iff in Ha.
-apply Bool.andb_true_iff in Hb.
-destruct Ha as (Hra, Hca).
-destruct Hb as (Hrb, Hcb).
-apply Nat.eqb_eq in Hra.
-apply Nat.eqb_eq in Hca.
-apply Nat.eqb_eq in Hrb.
-apply Nat.eqb_eq in Hcb.
-apply mat_add_comm; congruence.
-Qed.
-
-Theorem squ_mat_add_assoc : ∀ n (MA MB MC : square_matrix n),
-  (MA + (MB + MC) = (MA + MB) + MC)%SM.
-Proof.
-intros.
-apply square_matrix_eq; cbn.
-destruct MA as (A, Ha).
-destruct MB as (B, Hb).
-destruct MC as (C, Hc); cbn.
-apply Bool.andb_true_iff in Ha.
-apply Bool.andb_true_iff in Hb.
-apply Bool.andb_true_iff in Hc.
-destruct Ha as (Hra, Hca).
-destruct Hb as (Hrb, Hcb).
-destruct Hc as (Hrc, Hcc).
-apply Nat.eqb_eq in Hra.
-apply Nat.eqb_eq in Hca.
-apply Nat.eqb_eq in Hrb.
-apply Nat.eqb_eq in Hcb.
-apply Nat.eqb_eq in Hrc.
-apply Nat.eqb_eq in Hcc.
-apply mat_add_assoc; congruence.
-Qed.
-
-Theorem squ_mat_add_0_l : ∀ n (MA : square_matrix n),
-  (squ_mat_zero n + MA)%SM = MA.
-Proof.
-intros.
-destruct MA as (A, Ha).
-apply square_matrix_eq; cbn.
-apply Bool.andb_true_iff in Ha.
-destruct Ha as (Hra, Hca).
-apply Nat.eqb_eq in Hra.
-apply Nat.eqb_eq in Hca.
-apply mat_add_0_l; congruence.
-Qed.
-
-Theorem squ_mat_mul_assoc : ∀ n (MA MB MC : square_matrix n),
-  (MA * (MB * MC) = (MA * MB) * MC)%SM.
-Proof.
-intros.
-apply square_matrix_eq; cbn.
-destruct MA as (A, Ha).
-destruct MB as (B, Hb).
-destruct MC as (C, Hc); cbn.
-apply Bool.andb_true_iff in Ha.
-apply Bool.andb_true_iff in Hb.
-apply Bool.andb_true_iff in Hc.
-destruct Ha as (Hra, Hca).
-destruct Hb as (Hrb, Hcb).
-destruct Hc as (Hrc, Hcc).
-apply Nat.eqb_eq in Hra.
-apply Nat.eqb_eq in Hca.
-apply Nat.eqb_eq in Hrb.
-apply Nat.eqb_eq in Hcb.
-apply Nat.eqb_eq in Hrc.
-apply Nat.eqb_eq in Hcc.
-apply mat_mul_assoc; congruence.
-Qed.
-
-Theorem squ_mat_mul_1_l : ∀ n (MA : square_matrix n),
-  (squ_mat_one n * MA)%SM = MA.
-Proof.
-intros.
-destruct MA as (A, Ha).
-apply square_matrix_eq; cbn.
-apply Bool.andb_true_iff in Ha.
-destruct Ha as (Hra, Hca).
-apply Nat.eqb_eq in Hra.
-apply Nat.eqb_eq in Hca.
-apply mat_mul_1_l; congruence.
-Qed.
-
-Theorem squ_mat_mul_add_distr_l : ∀ n (MA MB MC : square_matrix n),
-  (MA * (MB + MC) = MA * MB + MA * MC)%SM.
-Proof.
-intros.
-apply square_matrix_eq.
-destruct MA as (A, Ha).
-destruct MB as (B, Hb).
-destruct MC as (C, Hc); cbn.
-apply Bool.andb_true_iff in Ha.
-apply Bool.andb_true_iff in Hb.
-apply Bool.andb_true_iff in Hc.
-destruct Ha as (Hra, Hca).
-destruct Hb as (Hrb, Hcb).
-destruct Hc as (Hrc, Hcc).
-apply Nat.eqb_eq in Hra.
-apply Nat.eqb_eq in Hca.
-apply Nat.eqb_eq in Hrb.
-apply Nat.eqb_eq in Hcb.
-apply Nat.eqb_eq in Hrc.
-apply Nat.eqb_eq in Hcc.
-apply mat_mul_add_distr_l; congruence.
-Qed.
-
-Theorem squ_mat_mul_1_r : ∀ n (MA : square_matrix n),
-  (MA * squ_mat_one n)%SM = MA.
-Proof.
-intros.
-destruct MA as (A, Ha).
-apply square_matrix_eq; cbn.
-apply Bool.andb_true_iff in Ha.
-destruct Ha as (Hra, Hca).
-apply Nat.eqb_eq in Hra.
-apply Nat.eqb_eq in Hca.
-apply mat_mul_1_r; congruence.
-Qed.
-
-Theorem squ_mat_mul_add_distr_r : ∀ n (MA MB MC : square_matrix n),
-  ((MA + MB) * MC = MA * MC + MB * MC)%SM.
-Proof.
-intros.
-apply square_matrix_eq.
-destruct MA as (A, Ha).
-destruct MB as (B, Hb).
-destruct MC as (C, Hc); cbn.
-apply Bool.andb_true_iff in Ha.
-apply Bool.andb_true_iff in Hb.
-apply Bool.andb_true_iff in Hc.
-destruct Ha as (Hra, Hca).
-destruct Hb as (Hrb, Hcb).
-destruct Hc as (Hrc, Hcc).
-apply Nat.eqb_eq in Hra.
-apply Nat.eqb_eq in Hca.
-apply Nat.eqb_eq in Hrb.
-apply Nat.eqb_eq in Hcb.
-apply Nat.eqb_eq in Hrc.
-apply Nat.eqb_eq in Hcc.
-apply mat_mul_add_distr_r; congruence.
-Qed.
-
-Context {Hro : @rngl_has_opp T ro = true}.
-
-Theorem squ_mat_add_opp_l : ∀ n,
-  if @rngl_has_opp (square_matrix n) _ then
-    ∀ a : square_matrix n, (- a + a)%F = 0%F
-  else True.
-Proof.
-intros.
-remember rngl_has_opp as x eqn:Hx in |-*; symmetry in Hx.
-destruct x; [ | easy ].
-intros MA.
-destruct MA as (A, Ha).
-apply square_matrix_eq; cbn.
-apply Bool.andb_true_iff in Ha.
-destruct Ha as (Hra, Hca).
-apply Nat.eqb_eq in Hra.
-apply Nat.eqb_eq in Hca.
-rewrite mat_add_opp_l with (n := n); congruence.
-Qed.
-
-Theorem squ_mat_1_neq_0 : ∀ n,
-  if (rngl_has_1_neq_0 && negb (Nat.eqb n 0))%bool then
-    squ_mat_one n ≠ squ_mat_zero n
-  else True.
-Proof.
-intros.
-remember (rngl_has_1_neq_0 && negb (n =? 0)) as b eqn:Hb.
-symmetry in Hb.
-destruct b; [ | easy ].
-apply Bool.andb_true_iff in Hb.
-destruct Hb as (H10, Hb).
-apply Bool.negb_true_iff in Hb.
-apply Nat.eqb_neq in Hb.
-unfold squ_mat_one, squ_mat_zero.
-intros H.
-injection H; clear H; intros H.
-set (f := λ i j, if Nat.eq_dec i j then 1%F else 0%F) in H.
-set (g := λ _ _, 0%F) in H.
-assert (H1 : ∀ i j, f i j = g i j) by now rewrite H.
-specialize (H1 0 0).
-unfold f, g in H1; cbn in H1.
-specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
-now rewrite H10 in rngl_1_neq_0.
-Qed.
-
-Theorem mat_of_squ_mat_squ_mat_of_nat : ∀ n i,
-  mat_of_squ_mat (rngl_of_nat i : square_matrix n) = (rngl_of_nat i × mI n)%M.
-Proof.
-intros.
-induction i. {
-  cbn - [ "mod" ].
-  apply matrix_eq; [ easy | easy | cbn ].
-  intros * Hi Hj; symmetry.
-  apply rngl_mul_0_l.
-}
-cbn - [ "mod" ].
-rewrite IHi.
-rewrite mat_mul_scal_l_add_distr_r.
-f_equal; symmetry.
-apply mat_mul_scal_1_l.
-Qed.
-
-Theorem squ_mat_characteristic_prop : ∀ n,
-  match
-    (if Nat.eq_dec n 0 then 1 else rngl_characteristic)
-  with
-  | 0 => ∀ i : nat, rngl_of_nat (S i) ≠ squ_mat_zero n
-  | S _ =>
-      rngl_of_nat (if Nat.eq_dec n 0 then 1 else rngl_characteristic) =
-      squ_mat_zero n
-  end.
-Proof.
-intros; cbn.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  subst n; cbn.
-  apply square_matrix_eq; cbn.
-  now apply matrix_eq.
-}
-remember rngl_characteristic as c eqn:Hc.
-symmetry in Hc.
-specialize (rngl_characteristic_prop) as Hcp.
-rewrite Hc in Hcp.
-destruct c. {
-  intros.
-  apply square_matrix_neq; cbn.
-  rewrite mat_of_squ_mat_squ_mat_of_nat.
-  apply matrix_neq; cbn.
-  right; right.
-  intros H.
-  destruct n; [ easy | ].
-  specialize (H 0 0 (Nat.lt_0_succ _) (Nat.lt_0_succ _)).
-  cbn in H.
-  rewrite rngl_mul_1_r in H.
-  now specialize (Hcp i).
-}
-cbn in Hcp |-*.
-apply square_matrix_eq; cbn.
-apply matrix_eq; [ easy | easy | cbn ].
-intros * Hi Hn.
-rewrite mat_of_squ_mat_squ_mat_of_nat; cbn.
-destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-  now rewrite rngl_mul_1_r.
-}
-rewrite rngl_mul_0_r.
-apply rngl_add_0_l.
-Qed.
-
-Theorem matrix_eq_dec : ∀ n (MA MB : matrix T),
-  (∀ a b : T, {a = b} + {a ≠ b})
-  → mat_nrows MA = n
-  → mat_ncols MA = n
-  → mat_nrows MB = n
-  → mat_ncols MB = n
-  → {MA = MB} + {MA ≠ MB}.
-Proof.
-intros * Hab Hra Hca Hrb Hcb.
-destruct MA as (fa, ra, ca).
-destruct MB as (fb, rb, cb).
-cbn in Hra, Hca, Hrb, Hcb.
-subst ra ca rb cb.
-assert (∀ i j, {fa i j = fb i j} + {fa i j ≠ fb i j}). {
-  intros.
-  apply Hab.
-}
-induction n; intros; [ now left; apply matrix_eq | ].
-destruct IHn as [IHn| IHn]. {
-  injection IHn; clear IHn; intros IHn.
-  now left; subst fb.
-} {
-  right.
-  intros H1; apply IHn; clear IHn.
-  injection H1; clear H1; intros H1.
-  now subst fb.
-}
-Qed.
-
-Theorem squ_mat_opt_eq_dec : ∀ n,
-  if rngl_has_dec_eq then ∀ a b : square_matrix n, {a = b} + {a ≠ b}
-  else True.
-Proof.
-intros.
-specialize rngl_opt_eq_dec as rngl_eq_dec.
-remember rngl_has_dec_eq as x eqn:Hde; symmetry in Hde.
-destruct x; [ | easy ].
-destruct a as (a, Ha).
-destruct b as (b, Hb).
-move b before a.
-assert (H : {a = b} + {a ≠ b}). {
-  apply Bool.andb_true_iff in Ha.
-  apply Bool.andb_true_iff in Hb.
-  destruct Ha as (Hra, Hca).
-  destruct Hb as (Hrb, Hcb).
-  apply Nat.eqb_eq in Hra.
-  apply Nat.eqb_eq in Hca.
-  apply Nat.eqb_eq in Hrb.
-  apply Nat.eqb_eq in Hcb.
-  now apply (@matrix_eq_dec n).
-}
-destruct H as [H| H]. {
-  now left; apply square_matrix_eq.
-} {
-  now right; apply square_matrix_neq.
-}
-Qed.
-
-Definition squ_mat_ring_like_prop (n : nat) :
-    ring_like_prop (square_matrix n) :=
-  {| rngl_is_comm := false;
-     rngl_has_dec_eq := @rngl_has_dec_eq T ro rp;
-     rngl_has_dec_le := false;
-     rngl_has_1_neq_0 := (rngl_has_1_neq_0 && negb (Nat.eqb n 0))%bool;
-     rngl_is_integral := false;
-     rngl_characteristic := if Nat.eq_dec n 0 then 1 else rngl_characteristic;
-     rngl_add_comm := @squ_mat_add_comm n;
-     rngl_add_assoc := @squ_mat_add_assoc n;
-     rngl_add_0_l := @squ_mat_add_0_l n;
-     rngl_mul_assoc := @squ_mat_mul_assoc n;
-     rngl_mul_1_l := @squ_mat_mul_1_l n;
-     rngl_mul_add_distr_l := @squ_mat_mul_add_distr_l n;
-     rngl_opt_1_neq_0 := @squ_mat_1_neq_0 n;
-     rngl_opt_mul_comm := I;
-     rngl_opt_mul_1_r := @squ_mat_mul_1_r n;
-     rngl_opt_mul_add_distr_r := @squ_mat_mul_add_distr_r n;
-     rngl_opt_add_opp_l := @squ_mat_add_opp_l n;
-     rngl_opt_add_sub := I;
-     rngl_opt_mul_0_l := I;
-     rngl_opt_mul_0_r := I;
-     rngl_opt_mul_inv_l := I;
-     rngl_opt_mul_inv_r := I;
-     rngl_opt_mul_div_l := I;
-     rngl_opt_mul_div_r := I;
-     rngl_opt_eq_dec := @squ_mat_opt_eq_dec n;
-     rngl_opt_le_dec := I;
-     rngl_opt_integral := I;
-     rngl_characteristic_prop := @squ_mat_characteristic_prop n;
-     rngl_opt_le_refl := I;
-     rngl_opt_le_antisymm := I;
-     rngl_opt_le_trans := I;
-     rngl_opt_add_le_compat := I;
-     rngl_opt_mul_le_compat_nonneg := I;
-     rngl_opt_mul_le_compat_nonpos := I;
-     rngl_opt_mul_le_compat := I;
-     rngl_opt_not_le := I |}.
-
-Theorem mat_1_neq_0 :
-  ∀ n, mI (at_least_1 n) ≠ mZ (at_least_1 n) (at_least_1 n).
-Proof.
-intros.
-unfold mI, mZ.
-(**)
-apply matrix_neq.
-unfold at_least_1.
-cbn; intros H.
-specialize (H 0 0 (Nat.lt_0_succ _) (Nat.lt_0_succ _)).
-destruct (Nat.eq_dec 0 0); [ | easy ].
-now apply rngl_1_neq_0 in H.
-Qed.
-
-Theorem mat_add_opp_l' : ∀ n,
-  if
-    @rngl_has_opp
-      (matrix (at_least_1 (at_least_1 n)) (at_least_1 (at_least_1 n)) T)
-      (mat_ring_like_op (at_least_1 n))
-  then
-    ∀ a : matrix (at_least_1 (at_least_1 n)) (at_least_1 (at_least_1 n)) T,
-    @eq (matrix (at_least_1 (at_least_1 n)) (at_least_1 (at_least_1 n)) T)
-      (@rngl_add
-         (matrix (at_least_1 (at_least_1 n)) (at_least_1 (at_least_1 n)) T)
-         (mat_ring_like_op (at_least_1 n))
-         (@rngl_opp
-            (matrix (at_least_1 (at_least_1 n)) (at_least_1 (at_least_1 n)) T)
-            (mat_ring_like_op (at_least_1 n)) a) a)
-      (@rngl_zero
-         (matrix (at_least_1 (at_least_1 n)) (at_least_1 (at_least_1 n)) T)
-         (mat_ring_like_op (at_least_1 n)))
-  else True.
-Proof.
-intros.
-remember rngl_has_opp as x eqn:Hx.
-destruct x; [ | easy ].
-intros MA.
-apply matrix_eq; cbn.
-intros * Hi Hj.
-...
-Search (- _ + _)%F.
-...
-specialize @rngl_opt_add_opp_l as rngl_add_opp_l.
-specialize (rngl_add_opp_l _ (mat_ring_like_op n)).
-specialize
-  (rngl_add_opp_l
-     (matrix (at_least_1 (at_least_1 n)) (at_least_1 (at_least_1 n)) T)).
-specialize (rngl_add_opp_l (mat_ring_like_op (at_least_1 n))).
-rewrite <- Hx in rngl_add_opp_l.
-rewrite rngl_add_opp_l.
-Set Printing All.
-apply rngl_add_opp_l.
-...
-
-apply rngl_add_opp_l.
-
-
-apply Bool.andb_true_iff in Ha.
-destruct Ha as (Hra, Hca).
-apply Nat.eqb_eq in Hra.
-apply Nat.eqb_eq in Hca.
-rewrite mat_add_opp_l with (n := n); congruence.
-Qed.
-*)
 
 Context {Hro : @rngl_has_opp T ro = true}.
 
@@ -1472,58 +873,6 @@ intros MA.
 now apply mat_add_opp_l.
 Qed.
 
-(*
-Theorem mat_opt_add_opp_l : ∀ n (ro := mat_ring_like_op n),
-  if rngl_has_opp then
-    ∀ a : matrix n n T, (- a + a)%F = 0%F
-  else True.
-Proof.
-intros.
-specialize (@mat_add_opp_l n n) as H.
-remember rngl_has_opp as x eqn:Hx; symmetry in Hx.
-destruct x; [ | easy ].
-now apply H.
-Qed.
-...
-*)
-
-(*
-Theorem mat_opt_add_sub : ∀ n,
-  match @rngl_has_opp (matrix n n T) (mat_ring_like_op n) return Prop with
-  | true => True
-  | false =>
-      forall a b : matrix n n T,
-      @eq (matrix n n T)
-        (@rngl_sub (matrix n n T) (mat_ring_like_op n) (@rngl_add (matrix n n T) (mat_ring_like_op n) a b) b) a
-  end.
-intros.
-remember rngl_has_opp as x eqn:Hx; symmetry in Hx.
-destruct x; [ easy | ].
-intros MA MB.
-apply matrix_eq; cbn.
-intros * Hi Hj.
-unfold rngl_sub.
-rewrite Hx.
-cbn.
-apply rngl_add_sub.
-*)
-
-(*
-Theorem mat_opt_add_sub : ∀ n,
-  if @rngl_has_opp (matrix n n T) (mat_ring_like_op n) then True
-  else ∀ a b : matrix n n T, (a + b - b)%M = a.
-Proof.
-intros.
-remember rngl_has_opp as x eqn:Hx; symmetry in Hx.
-destruct x; [ easy | ].
-intros MA MB.
-apply matrix_eq; cbn.
-intros * Hi Hj.
-apply rngl_add_sub.
-Qed.
-Set Printing All.
-*)
-
 Theorem mat_opt_add_sub : ∀ n,
   if @rngl_has_opp (matrix n n T) _ then True
   else ∀ a b : matrix n n T, (a + b - b)%F = a.
@@ -1534,27 +883,6 @@ cbn in rngl_add_sub.
 unfold mat_ring_like_op; cbn.
 now destruct (@rngl_has_opp T ro).
 Qed.
-
-(*
-Theorem mat_opt_add_sub : ∀ n,
-  if rngl_has_opp then True else ∀ a b : matrix n n T, (a + b - b)%F = a.
-Proof.
-intros.
-remember rngl_has_opp as x eqn:Hx; symmetry in Hx.
-destruct x; [ easy | ].
-intros MA MB.
-apply matrix_eq; cbn.
-intros * Hi Hj.
-...
-unfold mro; cbn.
-unfold mat_add; cbn.
-Set Printing All.
-unfold mat_ring_like_op.
-unfold phony_squ_mat_inv; cbn.
-cbn.
-cbn.
-...
-*)
 
 Theorem mat_characteristic_prop : ∀ n,
   match
@@ -1576,7 +904,57 @@ Theorem mat_characteristic_prop : ∀ n,
            | right x => rngl_characteristic
            end) (@rngl_zero (matrix n n T) (mat_ring_like_op n))
   end.
-Admitted. (*
+Proof.
+intros.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n; cbn.
+  now apply matrix_eq.
+}
+remember rngl_characteristic as c eqn:Hc.
+symmetry in Hc.
+specialize (rngl_characteristic_prop) as Hcp.
+rewrite Hc in Hcp.
+destruct c. {
+  intros.
+  apply matrix_neq; cbn.
+  intros H.
+  destruct n; [ easy | ].
+  specialize (H 0 0 (Nat.lt_0_succ _) (Nat.lt_0_succ _)).
+  cbn in H.
+(**)
+  induction i; [ now specialize (Hcp 0) | ].
+  cbn in H.
+  specialize (Hcp i); cbn in Hcp.
+...
+  destruct i; [ now specialize (Hcp 0) | ].
+  destruct i; [ now specialize (Hcp 1) | ].
+  destruct i; [ now specialize (Hcp 2) | ].
+  destruct i; [ now specialize (Hcp 3) | ].
+...
+  cbn in Hcp.
+...
+  induction i; [ now specialize (Hcp 0) | ].
+  cbn in H.
+  cbn in H.
+...
+  specialize (Hcp i).
+Search rngl_of_nat.
+...
+  rewrite rngl_mul_1_r in H.
+  now specialize (Hcp i).
+}
+cbn in Hcp |-*.
+apply square_matrix_eq; cbn.
+apply matrix_eq; [ easy | easy | cbn ].
+intros * Hi Hn.
+rewrite mat_of_squ_mat_squ_mat_of_nat; cbn.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  now rewrite rngl_mul_1_r.
+}
+rewrite rngl_mul_0_r.
+apply rngl_add_0_l.
+Qed.
+...
 Theorem squ_mat_characteristic_prop : ∀ n,
   match
     (if Nat.eq_dec n 0 then 1 else rngl_characteristic)
@@ -1707,28 +1085,6 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_opt_mul_le_compat := I;
      rngl_opt_not_le := I |}.
 
-(*
-Theorem squ_mat_mul_scal_vect_comm :
-  rngl_is_comm = true →
-  ∀ n (M : matrix n n T) c V,
-  (c × (M • V)%SM)%V = (M • (c × V))%SM.
-Proof.
-intros Hic *.
-apply vector_eq; [ easy | ].
-intros * Hi.
-cbn in Hi.
-cbn - [ iter_seq ].
-rewrite rngl_mul_summation_distr_l.
-apply rngl_summation_eq_compat.
-intros j Hj.
-do 2 rewrite rngl_mul_assoc.
-f_equal.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
-rewrite Hic in rngl_mul_comm.
-apply rngl_mul_comm.
-Qed.
-*)
-
 Theorem vect_eq_dec :
   rngl_has_dec_eq = true →
   ∀ n (U V : vector n T), {U = V} + {U ≠ V}.
@@ -1754,65 +1110,7 @@ destruct IHn as [IHn| IHn]. {
 }
 Qed.
 
-(*
-Theorem squ_mat_subm_prop : ∀ n (A : matrix n n T) i j,
-  ((mat_nrows (subm (mat_of_squ_mat A) i j) =? n - 1) &&
-   (mat_ncols (subm (mat_of_squ_mat A) i j) =? n - 1))%bool = true.
-Proof.
-intros.
-destruct A as (A, Ha); cbn in Ha |-*.
-apply Bool.andb_true_iff in Ha.
-destruct Ha as (Hra, Hca).
-apply Nat.eqb_eq in Hra.
-apply Nat.eqb_eq in Hca.
-apply Bool.andb_true_iff.
-now split; apply Nat.eqb_eq; cbn; f_equal.
-Qed.
-
-Definition squ_mat_subm n (A : square_matrix n) i j : square_matrix (n - 1) :=
-  exist _ (subm (mat_of_squ_mat A) i j) (squ_mat_subm_prop A i j).
-
-Theorem squ_mat_transp_prop : ∀ n (M : square_matrix n),
-  ((mat_nrows (mat_transp (mat_of_squ_mat M)) =? n) &&
-   (mat_ncols (mat_transp (mat_of_squ_mat M)) =? n))%bool = true.
-Proof.
-intros.
-destruct M as (M, Hm); cbn.
-now rewrite Bool.andb_comm.
-Qed.
-
-Definition squ_mat_transp n (M : square_matrix n) : square_matrix n :=
-  exist _ (mat_transp (mat_of_squ_mat M)) (squ_mat_transp_prop M).
-
-Theorem mat_nrows_of_squ_mat : ∀ n (M : square_matrix n),
-  mat_nrows (mat_of_squ_mat M) = n.
-Proof.
-intros.
-destruct M as (M, Hm); cbn.
-apply Bool.andb_true_iff in Hm.
-destruct Hm as (H1, H2).
-now apply Nat.eqb_eq in H1.
-Qed.
-
-Theorem mat_ncols_of_squ_mat : ∀ n (M : square_matrix n),
-  mat_ncols (mat_of_squ_mat M) = n.
-Proof.
-intros.
-destruct M as (M, Hm); cbn.
-apply Bool.andb_true_iff in Hm.
-destruct Hm as (H1, H2).
-now apply Nat.eqb_eq in H2.
-Qed.
-*)
-
 (* *)
-
-(*
-Theorem fold_determinant :
-  ∀ T {ro : ring_like_op T} {so : ring_like_op T} (M : matrix T),
-  det_loop M (mat_ncols M) = determinant M.
-Proof. easy. Qed.
-*)
 
 End a.
 
@@ -1820,20 +1118,11 @@ Module matrix_Notations.
 
 Declare Scope M_scope.
 Declare Scope V_scope.
-(*
-Declare Scope SM_scope.
-*)
 Delimit Scope M_scope with M.
 Delimit Scope V_scope with V.
-(*
-Delimit Scope SM_scope with SM.
-*)
 
 Arguments det_loop {T ro} {n%nat} M%M i%nat.
 Arguments determinant {T ro} {n%nat} M%M.
-(*
-Arguments is_square_mat {T} M%M.
-*)
 Arguments mat_add_opp_r {T}%type {ro rp} {m n}%nat Hro M%M.
 Arguments mat_mul_mul_scal_l {T}%type {ro rp} Hic {m n p}%nat a%F MA%M.
 Arguments mat_mul_scal_l {T ro} {m n}%nat s%F M%M.
@@ -1843,24 +1132,11 @@ Arguments mat_mul_scal_vect_assoc {T}%type {ro rp} {m n}%nat a%F MA%M V%V.
 Arguments mat_vect_mul_assoc {T}%type {ro rp} {m n p}%nat (A B)%M V%V.
 Arguments mat_mul_1_l {T}%type {ro rp} {n}%nat M%M.
 Arguments mat_mul_1_r {T}%type {ro rp} {n}%nat M%M.
-(*
-Arguments mat_nrows {T} m%M.
-Arguments mat_ncols {T} m%M.
-*)
 Arguments mat_opp {T ro} {m n}%nat M%M.
 Arguments mat_sub {T ro} {m n}%nat MA%M MB%M.
 Arguments mI {T ro} n%nat.
 Arguments mZ {T ro} (m n)%nat.
 Arguments minus_one_pow {T ro}.
-(*
-Arguments squ_mat_zero {T}%type {ro} n%nat.
-Arguments squ_mat_one {T}%type {ro} n%nat.
-Arguments squ_mat_add {T}%type {ro} {n%nat} MA MB.
-Arguments squ_mat_mul {T}%type {ro} {n%nat} MA MB.
-Arguments squ_mat_ring_like_op {T ro}.
-Arguments squ_mat_mul_vect_r {T}%type {ro} [n]%nat M%SM V%V.
-Arguments squ_mat_mul_scal_vect_comm {T}%type {ro rp} Hic n M%M c%F V%V.
-*)
 Arguments subm {T} {m n}%nat M%M i%nat j%nat.
 Arguments vect_add {T ro} {n}%nat U%V V%V.
 Arguments vect_sub {T ro} {n}%nat U%V V%V.
@@ -1881,14 +1157,6 @@ Notation "A * B" := (mat_mul A B) : M_scope.
 Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
 Notation "- A" := (mat_opp A) : M_scope.
 Notation "A ⁺" := (mat_transp A) (at level 1, format "A ⁺") : M_scope.
-
-(*
-Notation "A * B" := (squ_mat_mul A B) : SM_scope.
-Notation "A + B" := (squ_mat_add A B) : SM_scope.
-Notation "A • V" := (squ_mat_mul_vect_r A V) (at level 40) : SM_scope.
-Notation "- A" := (squ_mat_opp A) : SM_scope.
-Notation "A ⁺" := (squ_mat_transp A) (at level 1, format "A ⁺") : SM_scope.
-*)
 
 Notation "U + V" := (vect_add U V) : V_scope.
 Notation "U - V" := (vect_sub U V) : V_scope.
