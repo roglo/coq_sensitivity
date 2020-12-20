@@ -169,8 +169,14 @@ rewrite Nat.sub_add. 2: {
 cbn - [ iter_seq Nat.pow ].
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
-...
   unfold eq_rect.
+Check (mA_transp_prop n eq_refl).
+Check (Eqdep_dec.eq_rect_eq_dec Bool.bool_dec).
+Check (Eqdep_dec.UIP_dec Bool.bool_dec).
+specialize Eqdep_dec.UIP_dec as H1.
+specialize rngl_opt_eq_dec as H.
+destruct rngl_has_dec_eq in H.
+specialize (H1 _ H); clear H.
 ...
   unfold transport.
 ...
