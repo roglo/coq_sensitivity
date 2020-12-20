@@ -371,26 +371,26 @@ Definition squ_mat_with_vect n (Vl : list (vector T)) :
  exist _ (mat_with_vect n Vl) (mat_with_vect_prop n Vl).
 
 (* In the real case, the symmetric matrix M is diagonalisable in the
-   sense that there exists an orthogonal matrix O (the columns of which
+   sense that there exists an orthogonal matrix U (the columns of which
    are eigenvectors) and a diagonal matrix D the coefficients of which
    are eigenvalues μ_i such that
-      M = O . D . O^t *)
+      M = U . D . U^t *)
 
 Theorem diagonalized_matrix_prop_1 :
   rngl_is_comm = true →
-  ∀ n (M : @square_matrix T n) ev eV mD mO,
+  ∀ n (M : @square_matrix T n) ev eV D U,
   is_symm_squ_mat M
   → eigenvalues_and_vectors (mat_of_squ_mat M) ev eV
-  → mD = squ_mat_with_diag n ev
-  → mO = squ_mat_with_vect n eV
-   → (M * mO = mO * mD)%SM.
+  → D = squ_mat_with_diag n ev
+  → U = squ_mat_with_vect n eV
+   → (M * U = U * D)%SM.
 Proof.
 intros Hic * Hsy Hvv Hd Ho.
 apply square_matrix_eq; cbn.
-subst mO mD; cbn.
-remember (mat_with_vect n eV) as mO eqn:Hmo.
-remember (mat_with_diag n ev) as mD eqn:Hmd.
-move mD before mO.
+subst U D; cbn.
+remember (mat_with_vect n eV) as U eqn:Hmo.
+remember (mat_with_diag n ev) as D eqn:Hmd.
+move D before U.
 unfold eigenvalues_and_vectors in Hvv.
 unfold is_symm_squ_mat in Hsy.
 destruct M as (M, Hm).
@@ -407,7 +407,7 @@ cbn - [ iter_seq ].
 rewrite Hr, Hc.
 intros * Hi Hj.
 rewrite Hmd in Hj; cbn in Hj.
-remember (mat_ncols mO) as x eqn:Hx.
+remember (mat_ncols U) as x eqn:Hx.
 rewrite Hmo in Hx; cbn in Hx; subst x.
 symmetry.
 rewrite (rngl_summation_split _ j); [ | flia Hj ].
@@ -521,12 +521,12 @@ Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   rngl_is_comm = true →
   rngl_has_dec_eq = true →
   rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
-  ∀ n (M : square_matrix n) ev eV mO,
+  ∀ n (M : square_matrix n) ev eV U,
   is_symm_squ_mat M
   → eigenvalues_and_vectors (mat_of_squ_mat M) ev eV
-  → mO = squ_mat_with_vect n eV
-  → (mO⁺ * mO = squ_mat_one n)%SM ∧
-     (mO * mO⁺ = squ_mat_one n)%SM.
+  → U = squ_mat_with_vect n eV
+  → (U⁺ * U = squ_mat_one n)%SM ∧
+     (U * U⁺ = squ_mat_one n)%SM.
 Proof.
 intros Hic Heq Hii * Hsy Hvv Hm.
 split. {
@@ -611,16 +611,16 @@ Abort.
 
 Theorem diagonalized_matrix_prop :
   rngl_is_comm = true →
-  ∀ n (M : square_matrix n) ev eV mD mO,
+  ∀ n (M : square_matrix n) ev eV D U,
   is_symm_squ_mat M
   → eigenvalues_and_vectors (mat_of_squ_mat M) ev eV
-  → mD = squ_mat_with_diag n ev
-  → mO = squ_mat_with_vect n eV
-   → M = (mO * mD * mO⁺)%SM.
+  → D = squ_mat_with_diag n ev
+  → U = squ_mat_with_vect n eV
+   → M = (U * D * U⁺)%SM.
 Proof.
 intros Hic * Hsy Hvv Hd Ho.
 specialize (diagonalized_matrix_prop_1 Hic) as H.
-specialize (H n M ev eV mD mO Hsy Hvv Hd Ho).
+specialize (H n M ev eV D U Hsy Hvv Hd Ho).
 rewrite <- H.
 rewrite <- squ_mat_mul_assoc; [ | easy ].
 Abort.
@@ -629,11 +629,11 @@ Abort.
    is equal to
       Σ (i = 1, n), μ_i * y_i ^ 2 / Σ (i = 1, n), y_i ^ 2 *)
 
-Theorem Rayleigh_quotient_from_ortho : ∀ n (M : square_matrix n) mD mO x y ev,
+Theorem Rayleigh_quotient_from_ortho : ∀ n (M : square_matrix n) D U x y ev,
   is_symm_squ_mat M
   → eigenvalues (mat_of_squ_mat M) ev
-  → M = (squ_mat_transp mO * mD * mO)%SM
-  → y = (squ_mat_transp mO • x)%SM
+  → M = (squ_mat_transp U * D * U)%SM
+  → y = (squ_mat_transp U • x)%SM
   → Rayleigh_quotient M x =
       (Σ (i = 1, n), nth i ev 0%F * rngl_squ (vect_el y i) /
        Σ (i = 1, n), rngl_squ (vect_el y i))%F.
