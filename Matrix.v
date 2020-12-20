@@ -921,34 +921,22 @@ destruct c. {
   destruct n; [ easy | ].
   specialize (H 0 0 (Nat.lt_0_succ _) (Nat.lt_0_succ _)).
   cbn in H.
-(**)
-  induction i; [ now specialize (Hcp 0) | ].
-  cbn in H.
-  specialize (Hcp i); cbn in Hcp.
-...
-  destruct i; [ now specialize (Hcp 0) | ].
-  destruct i; [ now specialize (Hcp 1) | ].
-  destruct i; [ now specialize (Hcp 2) | ].
-  destruct i; [ now specialize (Hcp 3) | ].
-...
-  cbn in Hcp.
-...
-  induction i; [ now specialize (Hcp 0) | ].
-  cbn in H.
-  cbn in H.
-...
-  specialize (Hcp i).
-Search rngl_of_nat.
-...
-  rewrite rngl_mul_1_r in H.
+  replace
+    (@mat_el (S n) (S n) T
+       (@rngl_of_nat (matrix (S n) (S n) T) (mat_ring_like_op (S n)) i)
+       0 0)%F
+  with (@rngl_of_nat T ro i) in H. 2: {
+    clear H.
+    induction i; [ easy | cbn ].
+    now rewrite <- IHi.
+  }
   now specialize (Hcp i).
 }
 cbn in Hcp |-*.
-apply square_matrix_eq; cbn.
-apply matrix_eq; [ easy | easy | cbn ].
+apply matrix_eq; cbn.
 intros * Hi Hn.
-rewrite mat_of_squ_mat_squ_mat_of_nat; cbn.
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+...
   now rewrite rngl_mul_1_r.
 }
 rewrite rngl_mul_0_r.
