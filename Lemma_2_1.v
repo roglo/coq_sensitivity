@@ -28,15 +28,18 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 
+(*
 Definition is_symm_mat (A : matrix T) :=
   ∀ i j, i < mat_nrows A → j < mat_nrows A →
   mat_el A i j = mat_el A j i.
 
 Definition is_symm_squ_mat n (A : square_matrix n) :=
   is_symm_mat (mat_of_squ_mat A).
+*)
 
-Definition princ_subm_1 (A : matrix T) n := subm A n n.
+Definition princ_subm_1 m n (A : matrix m n T) k := subm A k k.
 
+(*
 Theorem princ_subm_1_preserves_symm : ∀ (A : matrix T) n,
   is_symm_mat A
   → is_symm_mat (princ_subm_1 A n).
@@ -58,8 +61,13 @@ destruct (lt_dec i n) as [Hin| Hin]. {
   }
 }
 Qed.
+*)
 
-Definition mat_princ_subm (A : matrix T) l :=
+...
+
+(* mmm... ça sent le "transport", là *)
+
+Definition mat_princ_subm m n (A : matrix m n T) l :=
   fold_left (λ a i, subm a i i) l A.
 
 Theorem subm_z : ∀ f i j, subm (mk_mat f 0 0) i j = mZ 0.
