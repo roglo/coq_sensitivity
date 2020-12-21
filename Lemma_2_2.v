@@ -129,78 +129,13 @@ erewrite rngl_summation_eq_compat. 2: {
   now destruct (two_pow_n_mul_two n); cbn.
 }
 cbn - [ iter_seq Nat.pow ].
-...
-  destruct (mA_transp_prop n eq_refl).
-...
-replace
-  (mat_el
-     match mA_transp_prop n eq_refl in (_ = y) return (id y) with
-     | eq_refl => mat_of_mat_list_list [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]]
-     end i j)
-with
-  (mat_el (mat_of_mat_list_list [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]]) i j).
-2: {
-...
-
-Check (Eqdep_dec.eq_rect_eq_dec Bool.bool_dec).
-Check (Eqdep_dec.UIP_dec Bool.bool_dec).
-specialize Eqdep_dec.UIP_dec as H1.
-specialize rngl_opt_eq_dec as H.
-destruct rngl_has_dec_eq in H.
-specialize (H1 _ H); clear H.
-Check (mA_transp_prop n eq_refl).
-Check (mat_el (mat_of_mat_list_list [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]]) i j).
-...
-replace
-  (mat_el
-     match mA_transp_prop n eq_refl in (_ = y) return (id y) with
-     | eq_refl => mat_of_mat_list_list [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]]
-     end i j)
-  with
-  (match mA_transp_prop n eq_refl with
-   | eq_refl =>
-       mat_el (mat_of_mat_list_list [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]]) i j
-   end).
-replace
-  (mat_el
-     match mA_transp_prop n eq_refl in (_ = y) return (id y) with
-     | eq_refl => mat_of_mat_list_list [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]]
-     end j k)
-  with
-  (match mA_transp_prop n eq_refl with
-   | eq_refl =>
-       mat_el (mat_of_mat_list_list [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]]) j k
-   end).
-destruct (mA_transp_prop n eq_refl).
-reflexivity.
-destruct (mA_transp_prop n eq_refl) at 1.
-...
-  unfold transport.
-...
-  destruct (mA_transp_prop n eq_refl).
-...
-Search eq_rect.
-rewrite <- Eqdep_dec.eq_rect_eq_dec.
-rewrite f_equal_dep.
-cbn.
-...
-rewrite (Eqdep_dec.UIP_dec rngl_eq_dec) with (x := matrix (2 ^ n * 2) (2 ^ n * 2) T).
-...
-Theorem glop : ∀ m n p q (A : matrix m n T) P i j,
-  mat_el (transport A P : matrix p q T) i j = mat_el A i j.
-Proof.
-intros.
-unfold transport.
-...
-do 2 rewrite glop.
-cbn.
-...
-  rewrite (Nat.div_small j); [ | cbn in Hi; flia Hj Hi ].
-  rewrite (Nat.mod_small j); [ | cbn in Hi; flia Hj Hi ].
+rewrite rngl_add_comm.
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  destruct (two_pow_n_mul_two n); cbn.
   easy.
 }
 cbn - [ iter_seq Nat.pow ].
-rewrite rngl_add_comm.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   assert (H : 1 * 2 ^ n ≤ j < (1 + 1) * 2 ^ n). {
@@ -210,10 +145,12 @@ erewrite rngl_summation_eq_compat. 2: {
     enough (H : 0 < 2 ^ S n) by flia H Hj.
     now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
   }
+  unfold mat_list_list_el.
   rewrite (Nat_div_less_small 1); [ | easy ].
   rewrite (@Nat_mod_less_small 1 j); [ clear H | easy ].
   now rewrite Nat.mul_1_l.
 }
+...
 rewrite rngl_add_comm.
 destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
   rewrite (Nat.div_small i); [ | easy ].
