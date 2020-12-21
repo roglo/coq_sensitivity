@@ -124,20 +124,11 @@ rewrite Nat.sub_add. 2: {
   now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
 }
 cbn - [ iter_seq Nat.pow ].
-erewrite rngl_summation_eq_compat. 2: {
-  intros j Hj.
-  now destruct (two_pow_n_mul_two n); cbn.
-}
-cbn - [ iter_seq Nat.pow ].
 rewrite rngl_add_comm.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   destruct (two_pow_n_mul_two n); cbn.
-  easy.
-}
-cbn - [ iter_seq Nat.pow ].
-erewrite rngl_summation_eq_compat. 2: {
-  intros j Hj.
+  rewrite two_pow_n_mul_two in Hj.
   assert (H : 1 * 2 ^ n ≤ j < (1 + 1) * 2 ^ n). {
     rewrite Nat.mul_1_l.
     split; [ easy | ].
@@ -150,8 +141,13 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite (@Nat_mod_less_small 1 j); [ clear H | easy ].
   now rewrite Nat.mul_1_l.
 }
-...
 rewrite rngl_add_comm.
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  now destruct (two_pow_n_mul_two n); cbn.
+}
+cbn - [ iter_seq Nat.pow ].
+...
 destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
   rewrite (Nat.div_small i); [ | easy ].
   rewrite (Nat.mod_small i); [ | easy ].
