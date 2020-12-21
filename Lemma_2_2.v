@@ -67,7 +67,7 @@ Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
   match n with
   | 0 => mZ 1 1
   | S n' =>
-      rew [λ x, matrix x x T] two_pow_n_mul_two n' in
+      rew [λ m, matrix m m T] two_pow_n_mul_two n' in
       mat_of_mat_list_list
         [[mA n'; mI (2 ^ n')];
          [mI (2 ^ n'); (- mA n')%M]]
@@ -543,7 +543,18 @@ Qed.
 Definition base_vector_1 dim :=
   mk_vect dim (λ i, match i with 0 => 1%F | _ => 0%F end).
 
-Check two_pow_n_mul_two.
+Definition A_n_eigenvector_of_sqrt_n n μ (V : vector (2 ^ n) T) g
+  : vector (2 ^ S n) T :=
+  match n with
+  | 0 => base_vector_1 (2 ^ 1)
+  | S n' =>
+      (rew [λ x, matrix (fst x) (snd x) T] g in
+       mat_of_mat_list_list
+         [[(mA n' + μ × mI (2 ^ n'))%M]; [mI (2 ^ n')]]
+       • V)%V
+  end.
+
+...
 
 Definition A_n_eigenvector_of_sqrt_n n μ (V : vector (2 ^ S n) T) :=
   match n with
