@@ -416,8 +416,7 @@ Qed.
    This way, we have to prove that this pair eigen(value,vector)
    works *)
 
-...
-
+(*
 Theorem m_o_mll_2x2_2x1 : ∀ d M1 M2 M3 M4 M5 M6,
    is_square_mat M1
    → mat_ncols M1 = mat_ncols M2
@@ -518,7 +517,9 @@ destruct (lt_dec i (mat_nrows M1)) as [Hir1| Hir1]. {
   now rewrite <- Nat.add_assoc, Nat.add_comm, Nat.add_sub.
 }
 Qed.
+*)
 
+(*
 Theorem m_o_mll_2x1_mul_scal_l : ∀ d a MA MB,
  (mat_of_mat_list_list d [[a × MA]%M; [a × MB]%M] =
   a × mat_of_mat_list_list d [[MA]; [MB]])%M.
@@ -537,18 +538,48 @@ destruct (lt_dec i (mat_nrows MA)) as [Hia| Hia]. {
   rewrite (Nat_div_less_small 1); [ easy | flia Hi Hia ].
 }
 Qed.
+*)
 
 Definition base_vector_1 dim :=
-  mk_vect (λ i, match i with 0 => 1%F | _ => 0%F end) dim.
+  mk_vect dim (λ i, match i with 0 => 1%F | _ => 0%F end).
+
+Check two_pow_n_mul_two.
+
+Definition A_n_eigenvector_of_sqrt_n n μ (V : vector (2 ^ S n) T) :=
+  match n with
+  | 0 => base_vector_1 1
+  | S n' =>
+      (rew
+         [λ x, matrix (2 ^ n' * 2) (2 ^ n' * 2) T]
+         (*two_pow_n_mul_two n'*) 42
+       in
+       mat_of_mat_list_list
+         [[(mA n' + μ × mI (2 ^ n'))%M]; [mI (2 ^ n')]]
+       • V)%V
+  end.
+
+Definition A_n_eigenvector_of_sqrt_n n μ (V : vector (2 ^ S n) T) :=
+  match n with
+  | 0 => base_vector_1 1
+  | S n' =>
+      (rew [ λ x, matrix x ((2 ^ n' * length (hd [] [[(mA n' + μ × mI (2 ^ n'))%M]; [mI (2 ^ n')]]))) T] two_pow_n_mul_two n' in
+       mat_of_mat_list_list
+         [[(mA n' + μ × mI (2 ^ n'))%M]; [mI (2 ^ n')]]
+       • V)%V
+  end.
+
+...
 
 Definition A_n_eigenvector_of_sqrt_n n μ V :=
   match n with
   | 0 => base_vector_1 1
   | S n' =>
-      (mat_of_mat_list_list 0%F
+       mat_of_mat_list_list
          [[(mA n' + μ × mI (2 ^ n'))%M]; [mI (2 ^ n')]]
        • V)%V
   end.
+
+...
 
 Theorem A_n_eigen_formula_for_sqrt_n :
   rngl_is_comm = true →
