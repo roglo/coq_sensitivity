@@ -607,7 +607,13 @@ split. {
     apply rngl_mul_reg_r in H1; [ | easy | easy ].
     (* all eigenvalues are supposed to be different? *)
 (* https://math.stackexchange.com/questions/82467/eigenvectors-of-real-symmetric-matrices-are-orthogonal *)
-Abort.
+Print eigenvalues_and_vectors.
+(* my definition of eigenvalues_and_vectors is not good because it does not
+   imply that the eigenvalues are different and even the egenvectors are
+   different; it could be just one eigenvalue and its eigenvector repeated;
+   I could specify that all eigenvalues are different but, doing so, it is
+   not enough general, because an eigenvalue can have a multiplicity *)
+...
 
 Theorem diagonalized_matrix_prop :
   rngl_is_comm = true →
@@ -623,7 +629,7 @@ specialize (diagonalized_matrix_prop_1 Hic) as H.
 specialize (H n M ev eV D U Hsy Hvv Hd Ho).
 rewrite <- H.
 rewrite <- squ_mat_mul_assoc; [ | easy ].
-Abort.
+...
 
 (* changing variable x as y = O^T . x, the Rayleigh quotient R (M, x)
    is equal to
