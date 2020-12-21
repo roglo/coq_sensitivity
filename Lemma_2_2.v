@@ -146,7 +146,6 @@ erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   now destruct (two_pow_n_mul_two n); cbn.
 }
-cbn - [ iter_seq Nat.pow ].
 unfold mat_list_list_el.
 cbn - [ iter_seq Nat.pow ].
 destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
@@ -157,8 +156,14 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
     rewrite (Nat.div_small k); [ | easy ].
     rewrite (Nat.mod_small k); [ | easy ].
     cbn - [ iter_seq Nat.pow ].
-...
+    erewrite rngl_summation_eq_compat. 2: {
+      intros j Hj.
+      rewrite Nat.div_small; [ | flia Hi2n Hj ].
+      now rewrite Nat.mod_small; [ | flia Hi2n Hj ].
+    }
+    cbn - [ iter_seq Nat.pow ].
     rewrite IHn; [ | easy | easy ].
+...
     rewrite (rngl_summation_split _ (i + 2 ^ n)); [ | cbn; flia Hi Hi2n ].
     rewrite rngl_summation_split_last; [ | flia ].
     rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
