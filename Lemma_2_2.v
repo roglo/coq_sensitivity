@@ -90,6 +90,39 @@ Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
 Definition transport' A B x (H : A = B) := eq_rect A id x B H.
 *)
 
+Theorem pouet : ∀ n, 2 ^ n * 2 = 2 ^ S n.
+Proof.
+intros.
+now rewrite Nat.mul_comm.
+Qed.
+
+Import EqNotations.
+
+Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
+  match n with
+  | 0 => mZ 1 1
+  | S n' =>
+      let ll :=
+        [[mA n'; mI (2 ^ n')];
+         [mI (2 ^ n'); (- mA n')%M]]
+      in
+      rew [fun x => matrix x x T] (pouet n') in mat_of_mat_list_list ll
+  end.
+
+Print mA.
+
+(*
+Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
+  match n with
+  | 0 => mZ 1 1
+  | S n' =>
+      let ll :=
+        [[mA n'; mI (2 ^ n')];
+         [mI (2 ^ n'); (- mA n')%M]]
+      in
+      rew [id] mA_transp_prop n' eq_refl in mat_of_mat_list_list ll
+  end.
+
 Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
   match n with
   | 0 => mZ 1 1
@@ -100,6 +133,10 @@ Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
       in
       eq_rect _ id (mat_of_mat_list_list ll) _ (mA_transp_prop n' eq_refl)
   end.
+Import EqNotations.
+*)
+
+Print mA.
 
 (*
 transport = 
@@ -170,6 +207,11 @@ cbn - [ iter_seq Nat.pow ].
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   unfold eq_rect.
+  destruct (pouet n).
+  easy.
+}
+cbn - [ iter_seq Nat.pow ].
+...
   destruct (mA_transp_prop n eq_refl).
 ...
 replace
