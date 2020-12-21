@@ -163,7 +163,6 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
     }
     cbn - [ iter_seq Nat.pow ].
     rewrite IHn; [ | easy | easy ].
-...
     rewrite (rngl_summation_split _ (i + 2 ^ n)); [ | cbn; flia Hi Hi2n ].
     rewrite rngl_summation_split_last; [ | flia ].
     rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
@@ -209,6 +208,13 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
     rewrite (Nat_div_less_small 1); [ | easy ].
     rewrite (Nat_mod_less_small 1); [ clear H | easy ].
     rewrite Nat.mul_1_l.
+    cbn - [ iter_seq Nat.pow ].
+    erewrite rngl_summation_eq_compat. 2: {
+      intros j Hj.
+      rewrite Nat.div_small; [ | flia Hi2n Hj ].
+      rewrite Nat.mod_small; [ | flia Hi2n Hj ].
+      now cbn.
+    }
     cbn - [ iter_seq Nat.pow ].
     rewrite (rngl_summation_split _ (k - 2 ^ n)). 2: {
       split; [ flia | ].
@@ -288,6 +294,17 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
   rewrite (Nat_div_less_small 1); [ | easy ].
   rewrite (Nat_mod_less_small 1); [ clear H | easy ].
   rewrite Nat.mul_1_l.
+  cbn - [ iter_seq Nat.pow ].
+(**)
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j Hj.
+    assert (H : 0 < 2 ^ n). {
+      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+    }
+    rewrite Nat.div_small; [ | flia Hj H ].
+    rewrite Nat.mod_small; [ | flia Hj H ].
+    easy.
+  }
   cbn - [ iter_seq Nat.pow ].
   rewrite (rngl_summation_split _ (i - 2 ^ n)). 2: {
     split; [ flia | ].
@@ -398,6 +415,8 @@ Qed.
      We can take V, for example, as (1, 0, 0, 0....0), etc.
    This way, we have to prove that this pair eigen(value,vector)
    works *)
+
+...
 
 Theorem m_o_mll_2x2_2x1 : ∀ d M1 M2 M3 M4 M5 M6,
    is_square_mat M1
