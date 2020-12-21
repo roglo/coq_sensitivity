@@ -17,6 +17,7 @@ Set Implicit Arguments.
 
 Require Import Utf8 Arith.
 Import List List.ListNotations.
+Import EqNotations.
 
 Require Import Misc RingLike Matrix.
 Require Import RLsummation.
@@ -51,107 +52,26 @@ Definition mat_of_mat_list_list {m n} (mll : list (list (matrix m n T))) :
 
 (* sequence "An" *)
 
-(*
-Definition mA_transp_prop' n len (Hlen : 2 = len) :=
-  match Hlen with
-  | eq_refl =>
-      match
-        match Nat.mul_comm (2 ^ n) 2 in (_ = sn) return (sn = 2 ^ n * 2) with
-        | eq_refl => eq_refl
-        end in (_ = m) return matrix m m T = matrix (2 ^ S n) (2 ^ S n) T
-      with
-      | eq_refl => eq_refl
-      end
-  end.
-*)
-
-Theorem mA_transp_prop : ∀ n len,
-  2 = len
-  → matrix (2 ^ n * len) (2 ^ n * len) T =
-     matrix (2 ^ S n) (2 ^ S n) T.
-Proof.
-intros * Hlen; cbn.
-destruct Hlen.
-now rewrite Nat.mul_comm.
-Qed.
-
-(*
-Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
-  match n with
-  | 0 => mZ 1 1
-  | S n' =>
-      let ll :=
-        [[mA n'; mI (2 ^ n')];
-         [mI (2 ^ n'); (- mA n')%M]]
-      in
-      transport (mat_of_mat_list_list ll) (mA_transp_prop n' eq_refl)
-  end.
-
-Definition transport' A B x (H : A = B) := eq_rect A id x B H.
-*)
-
-Theorem pouet : ∀ n, 2 ^ n * 2 = 2 ^ S n.
+Theorem two_pow_n_mul_two : ∀ n, 2 ^ n * 2 = 2 ^ S n.
 Proof.
 intros.
 now rewrite Nat.mul_comm.
 Qed.
 
-Import EqNotations.
+(* the magic incancation "rew [λ x, ..." below allows to recursively
+   call mA through "mat_of_mat_list_list", transporting its type from
+   "matrix (2 ^ n' * 2) (2 ^ n' * 2) T" into type "matrix (2 ^ S n')
+   (2 ^ S n') T" *)
 
 Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
   match n with
   | 0 => mZ 1 1
   | S n' =>
-      let ll :=
+      rew [λ x, matrix x x T] two_pow_n_mul_two n' in
+      mat_of_mat_list_list
         [[mA n'; mI (2 ^ n')];
          [mI (2 ^ n'); (- mA n')%M]]
-      in
-      rew [fun x => matrix x x T] (pouet n') in mat_of_mat_list_list ll
   end.
-
-Print mA.
-
-(*
-Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
-  match n with
-  | 0 => mZ 1 1
-  | S n' =>
-      let ll :=
-        [[mA n'; mI (2 ^ n')];
-         [mI (2 ^ n'); (- mA n')%M]]
-      in
-      rew [id] mA_transp_prop n' eq_refl in mat_of_mat_list_list ll
-  end.
-
-Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
-  match n with
-  | 0 => mZ 1 1
-  | S n' =>
-      let ll :=
-        [[mA n'; mI (2 ^ n')];
-         [mI (2 ^ n'); (- mA n')%M]]
-      in
-      eq_rect _ id (mat_of_mat_list_list ll) _ (mA_transp_prop n' eq_refl)
-  end.
-Import EqNotations.
-*)
-
-Print mA.
-
-(*
-transport = 
-λ (A B : Type) (x : A) (H : A = B), match H in (_ = y) return y with
-                                    | eq_refl => x
-                                    end
-transport' = 
-λ (A B : Type) (x : A) (H : A = B), eq_rect A (λ t : Type, t) x B H
-     : ∀ A B : Type, A → A = B → (λ t : Type, t) B
-eq_rect = 
-λ (A : Type) (x : A) (P : A → Type) (f : P x) (y : A) (e : x = y),
-  match e in (_ = y0) return (P y0) with
-  | eq_refl => f
-  end
-*)
 
 (* *)
 
@@ -206,9 +126,7 @@ rewrite Nat.sub_add. 2: {
 cbn - [ iter_seq Nat.pow ].
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
-  unfold eq_rect.
-  destruct (pouet n).
-  easy.
+  now destruct (two_pow_n_mul_two n); cbn.
 }
 cbn - [ iter_seq Nat.pow ].
 ...

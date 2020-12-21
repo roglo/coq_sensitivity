@@ -1899,10 +1899,3 @@ Definition sumbool_and {A B C D : Prop} (P : sumbool A B) (Q : sumbool C D) :=
 
 Notation "a ∨∨ b" := (sumbool_or a b) (at level 85).
 Notation "a ∧∧ b" := (sumbool_and a b) (at level 80).
-
-(* *)
-
-Definition transport A B (x : A) (H : A = B) : B :=
-  match H in (_ = y) return y with
-  | eq_refl => x
-  end.
