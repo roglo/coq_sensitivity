@@ -170,6 +170,8 @@ cbn - [ iter_seq Nat.pow ].
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   unfold eq_rect.
+  destruct (mA_transp_prop n eq_refl).
+...
 replace
   (mat_el
      match mA_transp_prop n eq_refl in (_ = y) return (id y) with
