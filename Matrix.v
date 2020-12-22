@@ -846,6 +846,7 @@ Canonical Structure mat_ring_like_op n :
   ring_like_op (matrix n n T) :=
   {| rngl_has_opp := true;
      rngl_has_inv := false;
+     rngl_has_no_opp_but_sub := false;
      rngl_has_no_inv_but_div := false;
      rngl_is_ordered := false;
      rngl_zero := mZ n n;
@@ -1004,9 +1005,11 @@ now specialize (H 0 0 (Nat.lt_0_succ _) (Nat.lt_0_succ _)).
 Qed.
 
 Theorem mat_consistent : ∀ n,
-  @rngl_has_inv (matrix n n T) (mat_ring_like_op n) = false ∨
-  @rngl_has_no_inv_but_div (matrix n n T) (mat_ring_like_op n) = false.
-Proof. now left. Qed.
+  let TM := matrix n n T in
+  let rom := mat_ring_like_op n in
+  (@rngl_has_opp TM rom = false ∨ @rngl_has_no_opp_but_sub TM rom = false) ∧
+  (@rngl_has_inv TM rom = false ∨ @rngl_has_no_inv_but_div TM rom = false).
+Proof. now intros; split; right. Qed.
 
 Definition mat_ring_like_prop (n : nat) :
   ring_like_prop (matrix n n T) :=

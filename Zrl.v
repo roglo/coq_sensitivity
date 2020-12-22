@@ -14,6 +14,7 @@ Definition phony_Z_inv (x : Z) := 0%Z.
 Canonical Structure Z_ring_like_op : ring_like_op Z :=
   {| rngl_has_opp := true;
      rngl_has_inv := false;
+     rngl_has_no_opp_but_sub := false;
      rngl_has_no_inv_but_div := true;
      rngl_is_ordered := true;
      rngl_zero := 0%Z;
@@ -84,8 +85,12 @@ apply Heab.
 now apply Z.le_antisymm; apply Z.lt_le_incl.
 Qed.
 
-Theorem Z_consistent : rngl_has_inv = false ∨ rngl_has_no_inv_but_div = false.
-Proof. now left. Qed.
+Theorem Z_consistent :
+  (rngl_has_opp = false ∨ rngl_has_no_opp_but_sub = false) ∧
+  (rngl_has_inv = false ∨ rngl_has_no_inv_but_div = false).
+Proof.
+now split; [ right | left ].
+Qed.
 
 Definition Z_ring_like_prop : ring_like_prop Z :=
   {| rngl_is_comm := true;

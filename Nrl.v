@@ -13,6 +13,7 @@ Definition phony_Nat_inv (x : nat) := 0.
 Canonical Structure nat_ring_like_op : ring_like_op nat :=
   {| rngl_has_opp := false;
      rngl_has_inv := false;
+     rngl_has_no_opp_but_sub := true;
      rngl_has_no_inv_but_div := true;
      rngl_is_ordered := true;
      rngl_zero := 0;
@@ -60,8 +61,10 @@ apply Heab.
 now apply Nat.le_antisymm; apply Nat.lt_le_incl.
 Qed.
 
-Theorem Nat_consistent : rngl_has_inv = false ∨ rngl_has_no_inv_but_div = false.
-Proof. now left. Qed.
+Theorem Nat_consistent :
+  (rngl_has_opp = false ∨ rngl_has_no_opp_but_sub = false) ∧
+  (rngl_has_inv = false ∨ rngl_has_no_inv_but_div = false).
+Proof. now split; left. Qed.
 
 Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
   {| rngl_is_comm := true;
@@ -204,6 +207,7 @@ Definition phony_Zn_sub n (a b : Zn n) := a.
 Canonical Structure Zn_ring_like_op n : ring_like_op (Zn n) :=
   {| rngl_has_opp := true;
      rngl_has_inv := is_prime n;
+     rngl_has_no_opp_but_sub := false;
      rngl_has_no_inv_but_div := false;
      rngl_is_ordered := false; (* well, it is but not transitive *)
      rngl_zero := Zn_of_nat n 0;
@@ -431,8 +435,10 @@ cbn; symmetry.
 apply Nat.sub_diag.
 Qed.
 
-Theorem Zn_consistent : rngl_has_inv = false ∨ rngl_has_no_inv_but_div = false.
-Proof. now right. Qed.
+Theorem Zn_consistent :
+  (rngl_has_opp = false ∨ rngl_has_no_opp_but_sub = false) ∧
+  (rngl_has_inv = false ∨ rngl_has_no_inv_but_div = false).
+Proof. now split; right. Qed.
 
 Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
   {| rngl_is_comm := true;
