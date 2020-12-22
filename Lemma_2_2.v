@@ -36,19 +36,17 @@ Definition mat_of_scalar (c : T) := mk_mat 1 1 (λ i j, c).
 (* conversion matrix of matrices (actually list of list of matrices)
    into simple matrix *)
 
+(*
 Definition upper_left_mat_in_list_list {m n} mll : matrix m n T :=
   hd (mZ m n) (hd [] mll).
+*)
 
 Definition mat_list_list_el {m n} mll i j :=
-  let M : matrix m n T := upper_left_mat_in_list_list mll in
-  mat_el (nth (j / n) (nth (i / m) mll []) (mZ m n))
-    (i mod m) (j mod n).
+  mat_el (nth (j / n) (nth (i / m) mll []) (mZ m n)) (i mod m) (j mod n).
 
 Definition mat_of_mat_list_list {m n} (mll : list (list (matrix m n T))) :
     matrix _ _ T :=
-  let M := upper_left_mat_in_list_list mll in
-  mk_mat (m * length mll) (n * length (hd [] mll))
-    (mat_list_list_el mll).
+  mk_mat (m * length mll) (n * length (hd [] mll)) (mat_list_list_el mll).
 
 (* sequence "An" *)
 
@@ -611,7 +609,15 @@ f_equal.
 unfold mat_of_list_list_1_row_2_col.
 destruct (two_pow_n_mul_two (S n)).
 destruct (Nat.mul_1_r (2 ^ S n)).
-cbn - [ mat_of_list_list Nat.pow ].
+(**)
+remember (S n) as sn; cbn - [ mat_of_list_list Nat.pow ]; subst sn.
+remember (mA (S n)) as M1 eqn:HM1.
+remember (mI (2 ^ S n)) as M2 eqn:HM2.
+remember (M1 + μ × M2)%M as M5 eqn:HM5.
+move M2 before M1; move M5 before M2.
+specialize (m_o_mll_2x2_2x1 M1 M2 M2 (- M1)%M M5 M2) as H1.
+cbn in H1 |-*; rewrite H1; clear H1.
+...
 destruct (two_pow_n_mul_two n).
 cbn - [ mat_of_mat_list_list Nat.pow ].
 remember (mat_of_mat_list_list [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]]) as M1 eqn:HM1.
@@ -622,6 +628,14 @@ remember (M1 + μ × M2)%M as M5 eqn:HM5.
 move M5 before M2.
 specialize (m_o_mll_2x2_2x1 M1 M2 M2 (- M1)%M M5 M2) as H1.
 cbn in H1; rewrite H1; clear H1.
+(*
+remember (mat_of_mat_list_list [[M5]; [M2]]) as M52 eqn:HM52.
+cbn in M52.
+..
+Theorem glop : ∀ MA MB,
+  mat_of_mat_list_list [[MA]; [MB]] = (MA * MB)%M.
+...
+*)
 apply matrix_eq; cbn.
 rewrite Nat.mul_1_r.
 intros * Hi Hj.
@@ -654,6 +668,14 @@ destruct (lt_dec i (2 ^ n * 2)) as [Hi2n| Hi2n]. {
   cbn - [ iter_seq ].
   destruct (Nat.eq_dec j j) as [H| H]; [ clear H | easy ].
   rewrite rngl_mul_1_r.
+  rewrite HM5 at 1.
+  cbn - [ iter_seq ].
+  rewrite rngl_mul_add_distr_l.
+  rewrite rngl_mul_assoc.
+  rewrite Hμ.
+  rewrite HM5.
+  remember (S n) as sn; cbn - [ iter_seq ]; subst sn.
+Check lemma_2_A_n_2_eq_n_I.
 ...
 
 unfold mat_of_mat_list_list; cbn.
