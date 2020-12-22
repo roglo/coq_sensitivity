@@ -608,13 +608,13 @@ rewrite mat_mul_scal_vect_assoc.
 unfold mat_of_list_list_1_row_2_col.
 destruct (two_pow_n_mul_two (S n)).
 remember (S n) as sn; cbn - [ mat_of_list_list Nat.pow ]; subst sn.
+...
 (**)
 apply vector_eq.
 intros i Hi.
 cbn - [ mat_of_mat_list_list Nat.pow iter_seq ].
 apply rngl_summation_eq_compat.
 intros j Hj.
-...
 f_equal.
 ...
 erewrite rngl_summation_eq_compat. 2: {
