@@ -51,6 +51,7 @@ Require Import Utf8.
 Class ring_like_op T :=
   { rngl_has_opp : bool;
     rngl_has_inv : bool;
+    rngl_has_no_opp_but_sub : bool;
     rngl_has_no_inv_but_div : bool;
     rngl_is_ordered : bool;
     rngl_zero : T;
@@ -185,7 +186,8 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       else True;
     (* consistency *)
     rngl_consistent :
-      rngl_has_inv = false ∨ rngl_has_no_inv_but_div = false }.
+      (rngl_has_opp = false ∨ rngl_has_no_opp_but_sub = false) ∧
+      (rngl_has_inv = false ∨ rngl_has_no_inv_but_div = false) }.
 
 Fixpoint rngl_power {T} {ro : ring_like_op T} a n :=
   match n with

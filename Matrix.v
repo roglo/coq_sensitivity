@@ -1028,6 +1028,7 @@ Definition phony_squ_mat_inv n (M : square_matrix n) := M.
 Canonical Structure squ_mat_ring_like_op n : ring_like_op (square_matrix n) :=
   {| rngl_has_opp := true;
      rngl_has_inv := false;
+     rngl_has_no_opp_but_sub := false;
      rngl_has_no_inv_but_div := false;
      rngl_is_ordered := false;
      rngl_zero := squ_mat_zero n;
@@ -1367,9 +1368,11 @@ destruct H as [H| H]. {
 Qed.
 
 Theorem mat_consistent : ∀ n,
-  @rngl_has_inv (square_matrix n) (squ_mat_ring_like_op n) = false ∨
-  @rngl_has_no_inv_but_div (square_matrix n) (squ_mat_ring_like_op n) = false.
-Proof. now left. Qed.
+  let TM := square_matrix n in
+  let rom := squ_mat_ring_like_op n in
+  (@rngl_has_opp TM rom = false ∨ @rngl_has_no_opp_but_sub TM rom = false) ∧
+  (@rngl_has_inv TM rom = false ∨ @rngl_has_no_inv_but_div TM rom = false).
+Proof. now intros; split; right. Qed.
 
 Definition squ_mat_ring_like_prop (n : nat) :
     ring_like_prop (square_matrix n) :=
