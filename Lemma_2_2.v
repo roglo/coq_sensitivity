@@ -58,10 +58,17 @@ intros.
 now rewrite Nat.mul_comm.
 Qed.
 
-(* the magic incancation "rew [λ x, ..." below allows to recursively
-   call mA through "mat_of_mat_list_list", transporting its type from
-   "matrix (2 ^ n' * 2) (2 ^ n' * 2) T" into type "matrix (2 ^ S n')
-   (2 ^ S n') T" *)
+(* the magic incancation
+     rew [λ m, matrix m m T] two_pow_n_mul_two n' in
+   in mA definition below, transforms the type of the expression
+     mat_of_mat_list_list
+       [[mA n'; mI (2 ^ n')];
+        [mI (2 ^ n'); (- mA n')%M]]
+   following it, from
+     matrix (2 ^ n' * 2) (2 ^ n' * 2) T
+   into the equivalent
+     matrix (2 ^ S n') (2 ^ S n') T
+ *)
 
 Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
   match n with
