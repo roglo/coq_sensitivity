@@ -614,40 +614,63 @@ destruct (Nat.mul_1_r (2 ^ S n)).
 cbn - [ mat_of_list_list Nat.pow ].
 destruct (two_pow_n_mul_two n).
 cbn - [ mat_of_mat_list_list Nat.pow ].
-apply matrix_eq.
-cbn - [ iter_seq ].
+remember (mat_of_mat_list_list [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]]) as M1 eqn:HM1.
+remember (mI (2 ^ n * 2)) as M2 eqn:HM2.
+move M2 before M1.
+cbn in M1.
+remember (M1 + μ × M2)%M as M5 eqn:HM5.
+move M5 before M2.
+specialize (m_o_mll_2x2_2x1 M1 M2 M2 (- M1)%M M5 M2) as H1.
+cbn in H1; rewrite H1; clear H1.
+apply matrix_eq; cbn.
 rewrite Nat.mul_1_r.
 intros * Hi Hj.
+unfold mat_list_list_el.
+rewrite (Nat.div_small j); [ | easy ].
+rewrite (Nat.mod_small j); [ | easy ].
+cbn.
+destruct (lt_dec i (2 ^ n * 2)) as [Hi2n| Hi2n]. {
+  rewrite Nat.div_small; [ | easy ].
+  rewrite Nat.mod_small; [ | easy ].
+  cbn - [ iter_seq ].
+  rewrite rngl_add_comm.
+  rewrite (rngl_summation_split _ j); [ | flia Hj ].
+  rewrite rngl_summation_split_last; [ | flia ].
+  rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
+    intros k Hk.
+    rewrite HM2; cbn.
+    destruct (Nat.eq_dec (k - 1) j) as [H| H]; [ flia Hk H | ].
+    apply rngl_mul_0_r.
+  }
+  rewrite rngl_add_0_l.
+  rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
+    intros k Hk.
+    rewrite HM2; cbn.
+    destruct (Nat.eq_dec k j) as [H| H]; [ flia Hk H | ].
+    apply rngl_mul_0_r.
+  }
+  rewrite rngl_add_0_r.
+  rewrite HM2.
+  cbn - [ iter_seq ].
+  destruct (Nat.eq_dec j j) as [H| H]; [ clear H | easy ].
+  rewrite rngl_mul_1_r.
 ...
-specialize (m_o_mll_2x2_2x1) as H1.
-specialize (H1 _ (mA n) (mI (2 ^ n)) (mI (2 ^ n)) (- mA n)%M).
-Check m_o_mll_2x2_2x1.
-Check (mA n).
-Check (mI (2 ^ n)).
-Check (- mA n)%M.
-(- mA n)%M
-     : matrix (2 ^ n) (2 ^ n) T
-mI (2 ^ n)
-     : matrix (2 ^ n) (2 ^ n) T
-mA n
-     : matrix (2 ^ n) (2 ^ n) T
+
+unfold mat_of_mat_list_list; cbn.
+unfold mat_list_list_el.
+cbn.
 ...
-rewrite m_o_mll_2x2_2x1.
+subst M1 M2 M5.
+rewrite mat_mul_add_distr_l; [ | easy ].
+Check lemma_2_A_n_2_eq_n_I.
 ...
-rewrite HV.
-(**)
-remember (A_Sn_eigenvector_of_sqrt_Sn (S n) μ U)%V as U eqn:HU.
-destruct (two_pow_n_mul_two (S n)).
-...
-unfold A_Sn_eigenvector_of_sqrt_Sn.
-rewrite mat_vect_mul_assoc.
-cbn - [ iter_seq Nat.pow ].
-unfold mat_of_list_list_1_row_2_col.
-(*
-destruct (Nat.mul_1_r (2 ^ S n)).
-destruct (two_pow_n_mul_two n).
-*)
-Check m_o_mll_2x2_2x1.
+apply matrix_eq; cbn.
+rewrite Nat.mul_1_r.
+intros * Hi Hj.
+unfold mat_list_list_el.
+unfold mat_of_mat_list_list.
+cbn.
+rewrite lemma_2_A_n_2_eq_n_I; [ | easy ].
 ...
 rewrite m_o_mll_2x2_2x1.
 rewrite m_o_mll_2x2_2x1; [ | easy | | | easy | easy ]; cycle 1. {
