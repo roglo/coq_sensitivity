@@ -1048,7 +1048,7 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_opt_not_le := I;
      rngl_consistent := mat_consistent n |}.
 
-Theorem vect_eq_dec :
+Theorem vect_opt_eq_dec :
   rngl_has_dec_eq = true →
   ∀ n (U V : vector n T), {U = V} + {U ≠ V}.
 Proof.
@@ -1072,6 +1072,12 @@ destruct IHn as [IHn| IHn]. {
   now subst fv.
 }
 Qed.
+
+Theorem mat_vect_mul_0_r : ∀ m n (M : matrix m n T),
+  (M • vect_zero _ = vect_zero _)%V.
+Proof.
+intros.
+...
 
 (* *)
 
@@ -1111,7 +1117,7 @@ Arguments vect_zero {T ro} n%nat.
 Arguments vect_dot_product {T}%type {ro} {n}%nat (U V)%V.
 Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hic {n}%nat a%F (U V)%V.
 Arguments vect_scal_mul_dot_mul_comm {T}%type {ro rp} {n}%nat a%F (U V)%V.
-Arguments vect_eq_dec {T}%type {ro rp} _ n%nat U%V V%V.
+Arguments vect_opt_eq_dec {T}%type {ro rp} _ n%nat U%V V%V.
 Arguments vect_el {n}%nat {T}%type v%V c%nat.
 
 Notation "A + B" := (mat_add A B) : M_scope.

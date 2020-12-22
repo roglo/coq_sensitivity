@@ -605,6 +605,27 @@ rewrite HV.
 unfold A_Sn_eigenvector_of_sqrt_Sn.
 rewrite mat_vect_mul_assoc.
 rewrite mat_mul_scal_vect_assoc.
+destruct (vect_opt_eq_dec Hde _ U (vect_zero _)) as [Huz| Huz]. {
+  rewrite Huz.
+Search (_ • _)%V.
+...
+now do 2 rewrite mat_vect_mul_0_r.
+...
+Search (_ • vect_zero _)%V.
+S
+
+specialize vect_opt_eq_dec as vect_eq_dec.
+
+rewrite Hde in vect_eq_dec.
+
+assert (H : ∀ n (V : vector n T), {V = vect_zero n} + {V ≠ vect_zero n}). {
+  clear n V U HV Hμ.
+  intros.
+  destruct V as (fv).
+  destruct (vect_zero n) as (fz).
+...
+Check vect_opt_eq_dec.
+...
 f_equal.
 unfold mat_of_list_list_1_row_2_col.
 destruct (two_pow_n_mul_two (S n)).
