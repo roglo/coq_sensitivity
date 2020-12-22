@@ -607,7 +607,11 @@ rewrite mat_vect_mul_assoc.
 rewrite mat_mul_scal_vect_assoc.
 unfold mat_of_list_list_1_row_2_col.
 destruct (two_pow_n_mul_two (S n)).
-remember (S n) as sn; cbn - [ mat_of_list_list Nat.pow ]; subst sn.
+remember (S n) as sn; cbn - [ mat_of_list_list Nat.pow ] in HV |-*; subst sn.
+...
+unfold A_Sn_eigenvector_of_sqrt_Sn in HV.
+unfold mat_of_list_list_1_row_2_col in HV.
+destruct (two_pow_n_mul_two (S n)).
 ...
 (**)
 apply vector_eq.
