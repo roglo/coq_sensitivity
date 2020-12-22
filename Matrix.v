@@ -342,6 +342,9 @@ Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
 Notation "U · V" := (vect_dot_product U V) (at level 40) : V_scope.
 
+Theorem fold_mat_sub : ∀ m n (MA MB : matrix m n T), (MA + - MB = MA - MB)%M.
+Proof. easy. Qed.
+
 (* commutativity of addition *)
 
 Theorem mat_add_comm : ∀ {m n} (MA MB : matrix m n T), (MA + MB = MB + MA)%M.

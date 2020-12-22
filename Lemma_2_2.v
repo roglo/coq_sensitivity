@@ -617,6 +617,49 @@ remember (M1 + μ × M2)%M as M5 eqn:HM5.
 move M2 before M1; move M5 before M2.
 specialize (m_o_mll_2x2_2x1 M1 M2 M2 (- M1)%M M5 M2) as H1.
 cbn in H1 |-*; rewrite H1; clear H1.
+rewrite HM2.
+do 2 rewrite mat_mul_1_r.
+rewrite mat_mul_1_l.
+rewrite <- HM2.
+rewrite HM5.
+rewrite (mat_add_comm M1).
+rewrite <- mat_add_assoc; [ | easy ].
+rewrite fold_mat_sub.
+rewrite mat_add_opp_r; [ | easy ].
+rewrite (mat_add_comm (μ × M2)%M (mZ _ _)).
+rewrite mat_add_0_l; [ | easy ].
+rewrite mat_mul_add_distr_l; [ | easy ].
+rewrite HM1.
+specialize (lemma_2_A_n_2_eq_n_I Hro (S n)) as H1.
+remember (mI (2 ^ S n)) as x.
+cbn - [ mat_mul mA rngl_of_nat ] in H1 |-*.
+rewrite H1; clear H1; subst x.
+rewrite <- HM1.
+rewrite mat_mul_mul_scal_l; [ | easy ].
+rewrite HM2.
+rewrite mat_mul_1_r.
+rewrite <- HM2.
+apply matrix_eq.
+intros * Hi Hj.
+rewrite Nat.mul_1_r in Hj.
+cbn - [ rngl_of_nat ].
+unfold mat_list_list_el.
+set (tsn := 2 ^ n + (2 ^ n + 0)) in Hi, Hj |-*.
+rewrite (Nat.div_small j); [ | easy ].
+rewrite (Nat.mod_small j); [ | easy ].
+cbn - [ rngl_of_nat ].
+destruct (lt_dec i tsn) as [Hit| Hit]. {
+  rewrite (Nat.div_small i); [ | easy ].
+  rewrite (Nat.mod_small i); [ | easy ].
+  cbn - [ rngl_of_nat ].
+  rewrite rngl_mul_add_distr_l.
+  rewrite rngl_mul_assoc.
+  rewrite Hμ.
+  rewrite rngl_add_comm.
+  rewrite rngl_add_assoc.
+  rewrite rngl_add_comm.
+  f_equal.
+(* ok if i≠j, but not ok for i=j *)
 ...
 destruct (two_pow_n_mul_two n).
 cbn - [ mat_of_mat_list_list Nat.pow ].
