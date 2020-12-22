@@ -586,39 +586,28 @@ Theorem An_eigen_formula_for_sqrt_n :
   end.
 Proof.
 intros Hic Hro Hin Hde * Hμ.
-...
-
-Theorem A_Sn_eigen_formula_for_sqrt_Sn :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_has_dec_eq = true →
-  ∀ n μ U V,
-  V = A_Sn_eigenvector_of_sqrt_Sn n μ U
-  → (μ * μ)%F = rngl_of_nat (S n)
-  → (mA (S n) • V = μ × V)%V.
-Proof.
-intros Hic Hro Hin Hde * HV Hμ.
-...
 destruct n. {
+  intros HV.
   cbn in Hμ, HV |-*.
-  apply vector_eq; [ now subst V | ].
-  intros i Hi; cbn in Hi |-*.
-  subst V; cbn.
+  apply vector_eq.
+  intros i Hi.
+  rewrite Nat.lt_1_r in Hi; subst i; cbn.
   rewrite rngl_mul_0_l, rngl_add_0_l.
-  destruct i; [ | flia Hi ].
-  rewrite rngl_mul_1_r; symmetry; clear Hi.
   specialize rngl_integral as H.
   rewrite Hin in H; cbn in H.
   rewrite Hde in H.
   rewrite Bool.orb_true_r in H.
   apply (H eq_refl) in Hμ.
-  now destruct Hμ.
+  symmetry.
+  destruct Hμ; subst μ; apply rngl_mul_0_l.
 }
+intros U V HV.
 cbn - [ Nat.pow ] in HV.
 rewrite HV.
+unfold A_Sn_eigenvector_of_sqrt_Sn.
 rewrite mat_vect_mul_assoc.
 cbn - [ iter_seq Nat.pow ].
+...
 specialize (mA_is_square n) as Hasm.
 rewrite m_o_mll_2x2_2x1; [ | easy | | | easy | easy ]; cycle 1. {
   apply mA_ncols.
