@@ -605,38 +605,108 @@ rewrite HV.
 unfold A_Sn_eigenvector_of_sqrt_Sn.
 rewrite mat_vect_mul_assoc.
 rewrite mat_mul_scal_vect_assoc.
-destruct (vect_opt_eq_dec Hde _ U (vect_zero _)) as [Huz| Huz]. {
-  rewrite Huz.
-Search (_ • _)%V.
-...
-now do 2 rewrite mat_vect_mul_0_r.
-...
-Search (_ • vect_zero _)%V.
-S
-
-specialize vect_opt_eq_dec as vect_eq_dec.
-
-rewrite Hde in vect_eq_dec.
-
-assert (H : ∀ n (V : vector n T), {V = vect_zero n} + {V ≠ vect_zero n}). {
-  clear n V U HV Hμ.
-  intros.
-  destruct V as (fv).
-  destruct (vect_zero n) as (fz).
-...
-Check vect_opt_eq_dec.
-...
-f_equal.
 unfold mat_of_list_list_1_row_2_col.
 destruct (two_pow_n_mul_two (S n)).
-destruct (Nat.mul_1_r (2 ^ S n)).
-(**)
 remember (S n) as sn; cbn - [ mat_of_list_list Nat.pow ]; subst sn.
+(**)
+apply vector_eq.
+intros i Hi.
+cbn - [ mat_of_mat_list_list Nat.pow iter_seq ].
+apply rngl_summation_eq_compat.
+intros j Hj.
+...
+f_equal.
+...
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+
+  rewrite rngl_mul_assoc.
+
+rewrite <- rngl_mul_summation_distr_r.
+...
+(*
+destruct (vect_opt_eq_dec Hde _ U (vect_zero _)) as [Huz| Huz]. {
+  rewrite Huz.
+  rewrite mat_vect_mul_0_r; [ | easy ].
+  now rewrite mat_vect_mul_0_r.
+}
+*)
+Theorem vect_move_0_r :
+  ∀ n (VA VB : vector n T), (VA - VB = vect_zero _)%V → VA = VB.
+...
+apply vect_move_0_r.
+unfold vect_sub.
+Search (- (_ • _))%V.
+Theorem mat_vect_mul_opp_l : ∀ m n (M : matrix m n T) V, (- M • V = - (M • V))%V.
+...
+rewrite <- mat_vect_mul_opp_l.
+Search (_ • _ + _ • _)%V.
+Theorem mat_vect_mul_distr_r : ∀ m n (MA MB : matrix m n T) V, ((MA + MB) • V = MA • V + MB • V)%V.
+...
+rewrite <- mat_vect_mul_distr_r.
 remember (mA (S n)) as M1 eqn:HM1.
 remember (mI (2 ^ S n)) as M2 eqn:HM2.
 remember (M1 + μ × M2)%M as M5 eqn:HM5.
 move M2 before M1; move M5 before M2.
+remember
+             (@eq_rect nat (Init.Nat.mul (Nat.pow (S (S O)) (S n)) (S O))
+                (fun m : nat => matrix (Init.Nat.mul (Nat.pow (S (S O)) (S n)) (S (S O))) m T)
+                (@mat_of_mat_list_list (Nat.pow (S (S O)) (S n)) (Nat.pow (S (S O)) (S n))
+                   (@cons (list (matrix (Nat.pow (S (S O)) (S n)) (Nat.pow (S (S O)) (S n)) T))
+                      (@cons (matrix (Nat.pow (S (S O)) (S n)) (Nat.pow (S (S O)) (S n)) T) M5
+                         (@nil (matrix (Nat.pow (S (S O)) (S n)) (Nat.pow (S (S O)) (S n)) T)))
+                      (@cons (list (matrix (Nat.pow (S (S O)) (S n)) (Nat.pow (S (S O)) (S n)) T))
+                         (@cons (matrix (Nat.pow (S (S O)) (S n)) (Nat.pow (S (S O)) (S n)) T) M2
+                            (@nil (matrix (Nat.pow (S (S O)) (S n)) (Nat.pow (S (S O)) (S n)) T)))
+                         (@nil (list (matrix (Nat.pow (S (S O)) (S n)) (Nat.pow (S (S O)) (S n)) T))))))
+                (Nat.pow (S (S O)) (S n)) (Nat.mul_1_r (Nat.pow (S (S O)) (S n)))) as x eqn:Hx.
+remember (S n) as sn.
+cbn in x; subst sn.
+Search (mat_of_mat_list_list).
+...
+rewrite m_o_mll_2x2_2x1.
+destruct (Nat.mul_1_r (2 ^ S n)).
+
+remember (rew [λ m : nat, matrix (2 ^ S n * 2) m T] Nat.mul_1_r (2 ^ S n) in mat_of_mat_list_list [[M5]; [M2]])%M as x eqn:Hx.
+cbn in x.
+...
+unfold mat_of_list_list_1_row_2_col.
+destruct (two_pow_n_mul_two (S n)).
+...
+remember (mA (S n)) as M1 eqn:HM1.
+remember (mI (2 ^ S n)) as M2 eqn:HM2.
+remember (M1 + μ × M2)%M as M5 eqn:HM5.
+move M2 before M1; move M5 before M2.
+
+...
+Search (_ • (_ • _))%V.
+
+rewrite <- mat_vect_mul_distr_r.
+rewrite mat_
+...
+destruct (two_pow_n_mul_two (S n)).
+...
+(*
+f_equal.
+*)
+unfold mat_of_list_list_1_row_2_col.
+destruct (two_pow_n_mul_two (S n)).
+(**)
+remember (S n) as sn; cbn - [ mat_of_list_list Nat.pow ]; subst sn.
+(*
+destruct (Nat.mul_1_r (2 ^ S n)).
+*)
+remember (mA (S n)) as M1 eqn:HM1.
+remember (mI (2 ^ S n)) as M2 eqn:HM2.
+remember (M1 + μ × M2)%M as M5 eqn:HM5.
+move M2 before M1; move M5 before M2.
+(*
+clear U V Huz HV.
+*)
 specialize (m_o_mll_2x2_2x1 M1 M2 M2 (- M1)%M M5 M2) as H1.
+...
+destruct (Nat.mul_1_r (2 ^ S n)).
+...
 cbn in H1 |-*; rewrite H1; clear H1.
 rewrite HM2.
 do 2 rewrite mat_mul_1_r.

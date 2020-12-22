@@ -1077,7 +1077,12 @@ Theorem mat_vect_mul_0_r : ∀ m n (M : matrix m n T),
   (M • vect_zero _ = vect_zero _)%V.
 Proof.
 intros.
-...
+apply vector_eq.
+intros i Hi.
+cbn - [ iter_seq ].
+rewrite <- rngl_mul_summation_distr_r.
+apply rngl_mul_0_r.
+Qed.
 
 (* *)
 
