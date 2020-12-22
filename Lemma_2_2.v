@@ -423,20 +423,14 @@ Qed.
    This way, we have to prove that this pair eigen(value,vector)
    works *)
 
-(*
-Theorem m_o_mll_2x2_2x1 : ∀ d M1 M2 M3 M4 M5 M6,
-   is_square_mat M1
-   → mat_ncols M1 = mat_ncols M2
-   → mat_ncols M1 = mat_ncols M3
-   → mat_ncols M1 = mat_ncols M4
-   → mat_ncols M1 = mat_nrows M5
-   → (mat_of_mat_list_list d [[M1; M2]; [M3; M4]] *
-      mat_of_mat_list_list d [[M5]; [M6]])%M =
-     mat_of_mat_list_list d [[M1 * M5 + M2 * M6]; [M3 * M5 + M4 * M6]]%M.
+(* perhaps unnecessary theorem... *)
+Theorem m_o_mll_2x2_2x1 : ∀ n (M1 M2 M3 M4 M5 M6 : matrix n n T),
+  (mat_of_mat_list_list [[M1; M2]; [M3; M4]] *
+   mat_of_mat_list_list [[M5]; [M6]])%M =
+   mat_of_mat_list_list [[M1 * M5 + M2 * M6]; [M3 * M5 + M4 * M6]]%M.
 Proof.
-intros * Hsm1 Hc1c2 Hc1c3 Hc1c4 Hc1r5.
-unfold is_square_mat in Hsm1.
-apply matrix_eq; [ easy | easy | ].
+intros.
+apply matrix_eq.
 cbn - [ iter_seq ].
 intros * Hi Hj.
 rewrite Nat.mul_1_r in Hj.
@@ -446,13 +440,9 @@ unfold mat_list_list_el.
 cbn - [ iter_seq ].
 rewrite (Nat.div_small j); [ | flia Hj ].
 rewrite (Nat.mod_small j); [ | flia Hj ].
-rewrite <- Hc1c2, <- Hc1c3, <- Hc1c4, <- Hc1r5.
-rewrite (rngl_summation_split _ (mat_ncols M1)); [ | flia Hi ].
+rewrite (rngl_summation_split _ n); [ | flia Hi ].
 rewrite rngl_summation_split_last; [ | flia ].
-assert (H : mat_ncols M1 ≠ 0). {
-  intros H; rewrite H in Hsm1.
-  now rewrite Hsm1 in Hi; cbn in Hi.
-}
+assert (H : n ≠ 0) by flia Hj.
 rewrite Nat.div_same; [ | easy ].
 rewrite Nat.mod_same; [ clear H | easy ].
 erewrite rngl_summation_eq_compat. 2: {
@@ -463,7 +453,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ iter_seq ].
-erewrite (rngl_summation_eq_compat _ _ _ (mat_ncols M1 + 1)). 2: {
+erewrite (rngl_summation_eq_compat _ _ _ (n + 1)). 2: {
   intros k Hk.
   rewrite (Nat_div_less_small 1); [ | flia Hk ].
   rewrite (@Nat_mod_less_small 1 k); [ | flia Hk ].
@@ -471,28 +461,27 @@ erewrite (rngl_summation_eq_compat _ _ _ (mat_ncols M1 + 1)). 2: {
   easy.
 }
 cbn - [ iter_seq ].
-destruct (lt_dec i (mat_nrows M1)) as [Hir1| Hir1]. {
+destruct (lt_dec i n) as [Hir1| Hir1]. {
   rewrite Nat.div_small; [ | easy ].
   rewrite Nat.mod_small; [ | easy ].
   cbn - [ iter_seq ].
   rewrite <- rngl_add_assoc.
   f_equal. {
-    rewrite rngl_summation_shift; [ | flia Hsm1 Hir1 ].
+    rewrite rngl_summation_shift; [ | flia Hj ].
     apply rngl_summation_eq_compat.
     intros k Hk.
     now rewrite Nat.add_comm, Nat.add_sub.
   }
-  destruct (Nat.eq_dec (mat_ncols M1) 1) as [Hc11| Hc11]. {
-    rewrite Hc11; cbn.
+  destruct (Nat.eq_dec n 1) as [Hc11| Hc11]. {
+    subst n; cbn.
     now rewrite rngl_add_0_r, rngl_add_0_l.
   }
-  rewrite rngl_summation_shift; [ | flia Hsm1 Hir1 Hc11 ].
-  remember (mat_ncols M1) as c.
-  replace (c * 2 - 1 - (c + 1)) with (c - 2) by flia.
-  rewrite (rngl_summation_split_first _ _ (c - 1)); [ | flia Hc11 ].
-  rewrite (rngl_summation_shift _ 1); [ | flia Hc11 Hsm1 Hir1 ].
+  rewrite rngl_summation_shift; [ | flia Hc11 Hj ].
+  replace (n * 2 - 1 - (n + 1)) with (n - 2) by flia.
+  rewrite (rngl_summation_split_first _ _ (n - 1)); [ | flia Hc11 ].
+  rewrite (rngl_summation_shift _ 1); [ | flia Hc11 Hir1 ].
   f_equal.
-  replace (c - 1 - 1) with (c - 2) by flia.
+  replace (n - 1 - 1) with (n - 2) by flia.
   apply rngl_summation_eq_compat.
   intros k Hk.
   now rewrite <- Nat.add_assoc, Nat.add_comm, Nat.add_sub.
@@ -503,28 +492,26 @@ destruct (lt_dec i (mat_nrows M1)) as [Hir1| Hir1]. {
   cbn - [ iter_seq ].
   rewrite Nat.add_0_r, <- rngl_add_assoc.
   f_equal. {
-    rewrite rngl_summation_shift; [ | flia Hsm1 Hi ].
+    rewrite rngl_summation_shift; [ | flia Hi ].
     apply rngl_summation_eq_compat.
     intros k Hk.
     now rewrite Nat.add_comm, Nat.add_sub.
   }
-  destruct (Nat.eq_dec (mat_ncols M1) 1) as [Hc11| Hc11]. {
-    rewrite Hsm1, Hc11; cbn.
+  destruct (Nat.eq_dec n 1) as [Hc11| Hc11]. {
+    subst n; cbn.
     now rewrite rngl_add_0_r, rngl_add_0_l.
   }
-  rewrite rngl_summation_shift; [ | flia Hsm1 Hi Hc11 ].
-  remember (mat_ncols M1) as c.
-  replace (c * 2 - 1 - (c + 1)) with (c - 2) by flia.
-  rewrite (rngl_summation_split_first _ _ (c - 1)); [ | flia Hc11 ].
-  rewrite (rngl_summation_shift _ 1); [ | flia Hsm1 Hi Hc11 ].
+  rewrite rngl_summation_shift; [ | flia Hi Hc11 ].
+  replace (n * 2 - 1 - (n + 1)) with (n - 2) by flia.
+  rewrite (rngl_summation_split_first _ _ (n - 1)); [ | flia Hc11 ].
+  rewrite (rngl_summation_shift _ 1); [ | flia Hi Hc11 ].
   f_equal.
-  replace (c - 1 - 1) with (c - 2) by flia.
+  replace (n - 1 - 1) with (n - 2) by flia.
   apply rngl_summation_eq_compat.
   intros k Hk.
   now rewrite <- Nat.add_assoc, Nat.add_comm, Nat.add_sub.
 }
 Qed.
-*)
 
 (*
 Theorem m_o_mll_2x1_mul_scal_l : ∀ d a MA MB,
@@ -547,6 +534,17 @@ destruct (lt_dec i (mat_nrows MA)) as [Hia| Hia]. {
 Qed.
 *)
 
+Definition mat_of_list_list_1_row_2_col {n} (A B : matrix (2 ^ n) (2 ^ n) T) :
+    matrix (2 ^ S n) (2 ^ n) T :=
+  rew [λ m, matrix (2 ^ S n) m T] Nat.mul_1_r (2 ^ n) in
+  rew [λ m, matrix m (2 ^ n * 1) T] two_pow_n_mul_two n in
+  mat_of_mat_list_list [[A]; [B]].
+
+Definition A_Sn_eigenvector_of_sqrt_Sn n μ (V : vector (2 ^ n) T) :
+    vector (2 ^ S n) T :=
+  (mat_of_list_list_1_row_2_col (mA n + μ × mI (2 ^ n))%M (mI (2 ^ n)) • V)%V.
+
+(*
 Definition pre_matrix_of_A_Sn_eigenvector_of_sqr_Sn n μ :
     matrix (2 ^ S n) (2 ^ n) T :=
   rew [λ m, matrix (2 ^ S n) m T] Nat.mul_1_r (2 ^ n) in
@@ -556,6 +554,7 @@ Definition pre_matrix_of_A_Sn_eigenvector_of_sqr_Sn n μ :
 Definition A_Sn_eigenvector_of_sqrt_Sn n μ (V : vector (2 ^ n) T) :
     vector (2 ^ S n) T :=
   (pre_matrix_of_A_Sn_eigenvector_of_sqr_Sn n μ • V)%V.
+*)
 
 (*
 Definition base_vector_1 dim :=
@@ -603,10 +602,58 @@ destruct n. {
 }
 intros U V HV.
 cbn - [ Nat.pow ] in HV.
+remember (S n) as sn; cbn - [ Nat.pow ]; subst sn.
 rewrite HV.
 unfold A_Sn_eigenvector_of_sqrt_Sn.
 rewrite mat_vect_mul_assoc.
+rewrite mat_mul_scal_vect_assoc.
+f_equal.
+unfold mat_of_list_list_1_row_2_col.
+destruct (two_pow_n_mul_two (S n)).
+destruct (Nat.mul_1_r (2 ^ S n)).
+cbn - [ mat_of_list_list Nat.pow ].
+destruct (two_pow_n_mul_two n).
+cbn - [ mat_of_mat_list_list Nat.pow ].
+apply matrix_eq.
+cbn - [ iter_seq ].
+rewrite Nat.mul_1_r.
+intros * Hi Hj.
+...
+specialize (m_o_mll_2x2_2x1) as H1.
+specialize (H1 _ (mA n) (mI (2 ^ n)) (mI (2 ^ n)) (- mA n)%M).
+Check m_o_mll_2x2_2x1.
+Check (mA n).
+Check (mI (2 ^ n)).
+Check (- mA n)%M.
+(- mA n)%M
+     : matrix (2 ^ n) (2 ^ n) T
+mI (2 ^ n)
+     : matrix (2 ^ n) (2 ^ n) T
+mA n
+     : matrix (2 ^ n) (2 ^ n) T
+...
+rewrite m_o_mll_2x2_2x1.
+...
+rewrite HV.
+(**)
+remember (A_Sn_eigenvector_of_sqrt_Sn (S n) μ U)%V as U eqn:HU.
+destruct (two_pow_n_mul_two (S n)).
+...
+unfold A_Sn_eigenvector_of_sqrt_Sn.
+rewrite mat_vect_mul_assoc.
 cbn - [ iter_seq Nat.pow ].
+unfold mat_of_list_list_1_row_2_col.
+(*
+destruct (Nat.mul_1_r (2 ^ S n)).
+destruct (two_pow_n_mul_two n).
+*)
+Check m_o_mll_2x2_2x1.
+...
+rewrite m_o_mll_2x2_2x1.
+rewrite m_o_mll_2x2_2x1; [ | easy | | | easy | easy ]; cycle 1. {
+...
+destruct (two_pow_n_mul_two n).
+destruct (Nat.mul_1_r (2 ^ S n)).
 ...
 specialize (mA_is_square n) as Hasm.
 rewrite m_o_mll_2x2_2x1; [ | easy | | | easy | easy ]; cycle 1. {
