@@ -186,7 +186,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       else True;
     (* consistency *)
     rngl_consistent :
-      (rngl_has_opp = false ∨ rngl_has_no_opp_but_sub = false) ∧
+      (rngl_has_no_opp_but_sub = negb rngl_has_opp) ∧
       (rngl_has_inv = false ∨ rngl_has_no_inv_but_div = false) }.
 
 Fixpoint rngl_power {T} {ro : ring_like_op T} a n :=

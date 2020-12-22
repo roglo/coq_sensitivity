@@ -62,9 +62,9 @@ now apply Nat.le_antisymm; apply Nat.lt_le_incl.
 Qed.
 
 Theorem Nat_consistent :
-  (rngl_has_opp = false ∨ rngl_has_no_opp_but_sub = false) ∧
+  rngl_has_no_opp_but_sub = negb rngl_has_opp ∧
   (rngl_has_inv = false ∨ rngl_has_no_inv_but_div = false).
-Proof. now split; left. Qed.
+Proof. now split; [ easy | left ]. Qed.
 
 Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
   {| rngl_is_comm := true;
@@ -436,9 +436,9 @@ apply Nat.sub_diag.
 Qed.
 
 Theorem Zn_consistent :
-  (rngl_has_opp = false ∨ rngl_has_no_opp_but_sub = false) ∧
+  rngl_has_no_opp_but_sub = negb rngl_has_opp ∧
   (rngl_has_inv = false ∨ rngl_has_no_inv_but_div = false).
-Proof. now split; right. Qed.
+Proof. now split; [ easy | right ]. Qed.
 
 Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
   {| rngl_is_comm := true;

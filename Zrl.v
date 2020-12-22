@@ -86,10 +86,10 @@ now apply Z.le_antisymm; apply Z.lt_le_incl.
 Qed.
 
 Theorem Z_consistent :
-  (rngl_has_opp = false ∨ rngl_has_no_opp_but_sub = false) ∧
+  rngl_has_no_opp_but_sub = negb rngl_has_opp ∧
   (rngl_has_inv = false ∨ rngl_has_no_inv_but_div = false).
 Proof.
-now split; [ right | left ].
+now split; [ easy | left ].
 Qed.
 
 Definition Z_ring_like_prop : ring_like_prop Z :=

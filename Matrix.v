@@ -1370,9 +1370,9 @@ Qed.
 Theorem mat_consistent : ∀ n,
   let TM := square_matrix n in
   let rom := squ_mat_ring_like_op n in
-  (@rngl_has_opp TM rom = false ∨ @rngl_has_no_opp_but_sub TM rom = false) ∧
+  (@rngl_has_no_opp_but_sub TM rom = negb (@rngl_has_opp TM rom)) ∧
   (@rngl_has_inv TM rom = false ∨ @rngl_has_no_inv_but_div TM rom = false).
-Proof. now intros; split; right. Qed.
+Proof. now intros; split; [ easy | right ]. Qed.
 
 Definition squ_mat_ring_like_prop (n : nat) :
     ring_like_prop (square_matrix n) :=
