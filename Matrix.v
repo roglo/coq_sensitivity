@@ -1366,6 +1366,11 @@ destruct H as [H| H]. {
 }
 Qed.
 
+Theorem mat_consistent : ∀ n,
+  @rngl_has_inv (square_matrix n) (squ_mat_ring_like_op n) = false ∨
+  @rngl_has_no_inv_but_div (square_matrix n) (squ_mat_ring_like_op n) = false.
+Proof. now left. Qed.
+
 Definition squ_mat_ring_like_prop (n : nat) :
     ring_like_prop (square_matrix n) :=
   {| rngl_is_comm := false;
@@ -1403,7 +1408,8 @@ Definition squ_mat_ring_like_prop (n : nat) :
      rngl_opt_mul_le_compat_nonneg := I;
      rngl_opt_mul_le_compat_nonpos := I;
      rngl_opt_mul_le_compat := I;
-     rngl_opt_not_le := I |}.
+     rngl_opt_not_le := I;
+     rngl_consistent := mat_consistent n |}.
 
 Theorem squ_mat_mul_scal_vect_comm :
   rngl_is_comm = true →
