@@ -1000,6 +1000,11 @@ destruct n; [ easy | ].
 now specialize (H 0 0 (Nat.lt_0_succ _) (Nat.lt_0_succ _)).
 Qed.
 
+Theorem mat_consistent : ∀ n,
+  @rngl_has_inv (matrix n n T) (mat_ring_like_op n) = false ∨
+  @rngl_has_no_inv_but_div (matrix n n T) (mat_ring_like_op n) = false.
+Proof. now left. Qed.
+
 Definition mat_ring_like_prop (n : nat) :
   ring_like_prop (matrix n n T) :=
   {| rngl_is_comm := false;
@@ -1037,7 +1042,8 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_opt_mul_le_compat_nonneg := I;
      rngl_opt_mul_le_compat_nonpos := I;
      rngl_opt_mul_le_compat := I;
-     rngl_opt_not_le := I |}.
+     rngl_opt_not_le := I;
+     rngl_consistent := mat_consistent n |}.
 
 Theorem vect_eq_dec :
   rngl_has_dec_eq = true →

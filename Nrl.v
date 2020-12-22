@@ -60,6 +60,9 @@ apply Heab.
 now apply Nat.le_antisymm; apply Nat.lt_le_incl.
 Qed.
 
+Theorem Nat_consistent : rngl_has_inv = false ∨ rngl_has_no_inv_but_div = false.
+Proof. now left. Qed.
+
 Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
   {| rngl_is_comm := true;
      rngl_has_dec_eq := true;
@@ -96,7 +99,8 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_mul_le_compat_nonneg := I;
      rngl_opt_mul_le_compat_nonpos := I;
      rngl_opt_mul_le_compat := Nat_mul_le_compat;
-     rngl_opt_not_le := Nat_not_le |}.
+     rngl_opt_not_le := Nat_not_le;
+     rngl_consistent := Nat_consistent |}.
 
 (*
 Print nat_ring_like_op.
@@ -427,6 +431,9 @@ cbn; symmetry.
 apply Nat.sub_diag.
 Qed.
 
+Theorem Zn_consistent : rngl_has_inv = false ∨ rngl_has_no_inv_but_div = false.
+Proof. now right. Qed.
+
 Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
   {| rngl_is_comm := true;
      rngl_has_dec_eq := true;
@@ -463,7 +470,8 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_opt_mul_le_compat_nonneg := I;
      rngl_opt_mul_le_compat_nonpos := I;
      rngl_opt_mul_le_compat := I;
-     rngl_opt_not_le := I |}.
+     rngl_opt_not_le := I;
+     rngl_consistent := Zn_consistent |}.
 
 End a.
 
