@@ -540,62 +540,19 @@ destruct (lt_dec i (mat_nrows MA)) as [Hia| Hia]. {
 Qed.
 *)
 
-Definition pouet n μ :=
+Definition pre_matrix_of_A_Sn_eigenvector_of_sqr_Sn n μ :
+    matrix (2 ^ S n) (2 ^ n) T :=
   rew [λ m, matrix (2 ^ S n) m T] Nat.mul_1_r (2 ^ n) in
   rew [λ m, matrix m (2 ^ n * 1) T] two_pow_n_mul_two n in
   mat_of_mat_list_list [[(mA n + μ × mI (2 ^ n))%M]; [mI (2 ^ n)]].
 
-Check pouet.
+Definition A_Sn_eigenvector_of_sqrt_Sn n μ (V : vector (2 ^ n) T) :
+    vector (2 ^ S n) T :=
+  (pre_matrix_of_A_Sn_eigenvector_of_sqr_Sn n μ • V)%V.
 
-...
-
-Definition A_n_eigenvector_of_sqrt_n n μ (V : vector (2 ^ n) T)
-  : vector (2 ^ S n) T :=
-  ((rew [λ m, matrix (fst m) (snd m) T] glop (n, n) in
-    mat_of_mat_list_list [[(mA n + μ × mI (2 ^ n))%M]; [mI (2 ^ n)]])
-   • V)%V.
-
+(*
 Definition base_vector_1 dim :=
   mk_vect dim (λ i, match i with 0 => 1%F | _ => 0%F end).
-...
-
-Definition A_n_eigenvector_of_sqrt_n n μ (V : vector (2 ^ n) T) g
-  : vector (2 ^ S n) T :=
-  match n with
-  | 0 => base_vector_1 (2 ^ 1)
-  | S n' =>
-      rew [λ x, vector (2 ^ x) T] g in
-      (mat_of_mat_list_list
-        [[(mA n' + μ × mI (2 ^ n'))%M]; [mI (2 ^ n')]]
-       • V)%V
-  end.
-
-...
-
-Definition A_n_eigenvector_of_sqrt_n n μ (V : vector (2 ^ S n) T) :=
-  match n with
-  | 0 => base_vector_1 1
-  | S n' =>
-      (rew
-         [λ x, matrix (2 ^ n' * 2) (2 ^ n' * 2) T]
-         (*two_pow_n_mul_two n'*) 42
-       in
-       mat_of_mat_list_list
-         [[(mA n' + μ × mI (2 ^ n'))%M]; [mI (2 ^ n')]]
-       • V)%V
-  end.
-
-Definition A_n_eigenvector_of_sqrt_n n μ (V : vector (2 ^ S n) T) :=
-  match n with
-  | 0 => base_vector_1 1
-  | S n' =>
-      (rew [ λ x, matrix x ((2 ^ n' * length (hd [] [[(mA n' + μ × mI (2 ^ n'))%M]; [mI (2 ^ n')]]))) T] two_pow_n_mul_two n' in
-       mat_of_mat_list_list
-         [[(mA n' + μ × mI (2 ^ n'))%M]; [mI (2 ^ n')]]
-       • V)%V
-  end.
-
-...
 
 Definition A_n_eigenvector_of_sqrt_n n μ V :=
   match n with
@@ -605,20 +562,20 @@ Definition A_n_eigenvector_of_sqrt_n n μ V :=
          [[(mA n' + μ × mI (2 ^ n'))%M]; [mI (2 ^ n')]]
        • V)%V
   end.
+*)
 
-...
-
-Theorem A_n_eigen_formula_for_sqrt_n :
+Theorem A_Sn_eigen_formula_for_sqrt_Sn :
   rngl_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
   rngl_has_dec_eq = true →
   ∀ n μ U V,
-  V = A_n_eigenvector_of_sqrt_n n μ U
-  → (μ * μ)%F = rngl_of_nat n
-  → (mA n • V = μ × V)%V.
+  V = A_Sn_eigenvector_of_sqrt_Sn n μ U
+  → (μ * μ)%F = rngl_of_nat (S n)
+  → (mA (S n) • V = μ × V)%V.
 Proof.
 intros Hic Hro Hin Hde * HV Hμ.
+...
 destruct n. {
   cbn in Hμ, HV |-*.
   apply vector_eq; [ now subst V | ].
