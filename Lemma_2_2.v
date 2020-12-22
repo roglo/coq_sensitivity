@@ -571,6 +571,23 @@ Definition A_n_eigenvector_of_sqrt_n n μ V :=
   end.
 *)
 
+Theorem An_eigen_formula_for_sqrt_n :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_has_dec_eq = true →
+  ∀ n μ, (μ * μ)%F = rngl_of_nat n →
+  match n with
+  | 0 => ∀ V, (mA 0 • V = μ × V)%V
+  | S _ =>
+      ∀ U V,
+      V = A_Sn_eigenvector_of_sqrt_Sn n μ U
+      → (mA (S n) • V = μ × V)%V
+  end.
+Proof.
+intros Hic Hro Hin Hde * Hμ.
+...
+
 Theorem A_Sn_eigen_formula_for_sqrt_Sn :
   rngl_is_comm = true →
   rngl_has_opp = true →
