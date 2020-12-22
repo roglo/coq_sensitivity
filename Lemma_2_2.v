@@ -568,7 +568,7 @@ Definition A_n_eigenvector_of_sqrt_n n μ V :=
   end.
 *)
 
-Theorem An_eigen_formula_for_sqrt_n :
+Theorem An_eigen_equation_for_sqrt_n :
   rngl_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -957,7 +957,7 @@ split. {
   exists V.
   split; [ easy | ].
   split. 2: {
-    now apply A_n_eigen_formula_for_sqrt_n with (U := base_vector_1 42).
+    now apply A_n_eigen_equation_for_sqrt_n with (U := base_vector_1 42).
   }
   (* V ≠ vect_zero (2 ^ n) *)
   rewrite Hv; cbn.
