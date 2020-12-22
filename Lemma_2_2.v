@@ -540,17 +540,47 @@ destruct (lt_dec i (mat_nrows MA)) as [Hia| Hia]. {
 Qed.
 *)
 
+Print mA.
+Check two_pow_n_mul_two.
+
+Theorem glop : ∀ mn,
+  (2 ^ fst mn * 2, 2 ^ snd mn * 1) = (2 ^ S (fst mn), 2 ^ snd mn).
+Admitted.
+
+Definition pouet n μ : matrix (2 ^ S n) (2 ^ n * 1) T :=
+  rew [λ m, matrix m (2 ^ n * 1) T] two_pow_n_mul_two n in
+  mat_of_mat_list_list [[(mA n + μ × mI (2 ^ n))%M]; [mI (2 ^ n)]].
+
+Check pouet.
+...
+
+Print mA.
+
+Definition pouet n μ : matrix (2 ^ n * 2) (2 ^ n * 1) T :=
+  mat_of_mat_list_list [[(mA n + μ × mI (2 ^ n))%M]; [mI (2 ^ n)]].
+
+...
+
+Print pouet.
+
+Definition A_n_eigenvector_of_sqrt_n n μ (V : vector (2 ^ n) T)
+  : vector (2 ^ S n) T :=
+  ((rew [λ m, matrix (fst m) (snd m) T] glop (n, n) in
+    mat_of_mat_list_list [[(mA n + μ × mI (2 ^ n))%M]; [mI (2 ^ n)]])
+   • V)%V.
+
 Definition base_vector_1 dim :=
   mk_vect dim (λ i, match i with 0 => 1%F | _ => 0%F end).
+...
 
 Definition A_n_eigenvector_of_sqrt_n n μ (V : vector (2 ^ n) T) g
   : vector (2 ^ S n) T :=
   match n with
   | 0 => base_vector_1 (2 ^ 1)
   | S n' =>
-      (rew [λ x, matrix (fst x) (snd x) T] g in
-       mat_of_mat_list_list
-         [[(mA n' + μ × mI (2 ^ n'))%M]; [mI (2 ^ n')]]
+      rew [λ x, vector (2 ^ x) T] g in
+      (mat_of_mat_list_list
+        [[(mA n' + μ × mI (2 ^ n'))%M]; [mI (2 ^ n')]]
        • V)%V
   end.
 
