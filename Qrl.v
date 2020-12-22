@@ -13,7 +13,6 @@ Definition phony_Q_div (a b : Q) := a.
 Canonical Structure Q_ring_like_op : ring_like_op Q :=
   {| rngl_has_opp := true;
      rngl_has_inv := true;
-     rngl_has_no_opp_but_sub := false;
      rngl_has_no_inv_but_div := false;
      rngl_is_ordered := true;
      rngl_zero := 0%Q;
@@ -75,9 +74,8 @@ now apply Q.le_antisymm; apply Q.lt_le_incl.
 Qed.
 
 Theorem Q_consistent :
-  (rngl_has_no_opp_but_sub = negb rngl_has_opp) ∧
-  (rngl_has_inv = false ∨ rngl_has_no_inv_but_div = false).
-Proof. now split; [ easy | right ]. Qed.
+  rngl_has_inv = false ∨ rngl_has_no_inv_but_div = false.
+Proof. now right. Qed.
 
 Definition Q_ring_like_prop :=
   {| rngl_is_comm := true;
