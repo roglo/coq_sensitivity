@@ -568,6 +568,18 @@ Definition A_n_eigenvector_of_sqrt_n n μ V :=
   end.
 *)
 
+(*
+Theorem mA_diag_zero : ∀ n i, mat_el (mA n) i i = 0%F.
+Proof.
+intros.
+induction n; [ easy | cbn ].
+(* désespérant... ces types dépendants, ça me rappelle les coinductifs,
+   ça ne marche jamais, ça bloque tout le temps ; fait chier *)
+...
+destruct (two_pow_n_mul_two n).
+...
+*)
+
 Theorem An_eigen_equation_for_sqrt_n :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -670,6 +682,62 @@ destruct (lt_dec i (2 ^ S n)) as [Hi2n| Hi2n]. {
   cbn in Hx; subst x.
   remember (nth 0 _ _) as x eqn:Hx.
   cbn in Hx; subst x.
+  rewrite (rngl_summation_split _ j); [ | flia Hj ].
+  rewrite rngl_summation_split_last; [ | easy ].
+  rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
+    intros k Hk.
+    subst M2; cbn.
+    destruct (Nat.eq_dec (k - 1) j) as [H| H]; [ flia Hk H | ].
+    now do 2 rewrite rngl_mul_0_r.
+  }
+  rewrite rngl_add_0_l.
+  replace (mat_el M2 j j) with 1%F. 2: {
+    subst M2; cbn.
+    now destruct (Nat.eq_dec j j).
+  }
+  rewrite rngl_mul_1_r.
+  rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
+    intros k Hk.
+    subst M2; cbn.
+    destruct (Nat.eq_dec k j) as [H| H]; [ flia Hk H | ].
+    now do 2 rewrite rngl_mul_0_r.
+  }
+  rewrite rngl_add_0_r.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros k Hk.
+    rewrite (Nat_div_less_small 1); [ | flia Hk ].
+    rewrite (Nat_mod_less_small 1); [ | flia Hk ].
+    cbn - [ Nat.pow ].
+    now rewrite Nat.add_0_r.
+  }
+  cbn - [ iter_seq Nat.pow rngl_of_nat ].
+  destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+    subst j.
+    rewrite rngl_mul_1_r.
+...
+    rewrite HM1 at 1.
+    rewrite mA_diag_zero.
+...
+    replace (mat_el M1 i i) with 0%F. 2: {
+      subst M1; symmetry.
+rewrite mA_diag_0.
+      destruct (two_pow_n_mul_two n).
+...
+  rewrite rngl_summation_shift. 2: {
+    apply Nat.le_add_le_sub_r.
+    rewrite Nat.mul_comm.
+    clear.
+    remember (2 ^ S n) as x; cbn; subst x.
+    rewrite <- Nat.add_assoc.
+    apply Nat.add_le_mono_l.
+    rewrite Nat.add_0_r.
+    remember (1 + 1) as x; cbn; subst x.
+    rewrite Nat.add_0_r.
+    now apply Nat.add_le_mono; apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  }
+  rewrite Nat.sub_add_distr.
+  rewrite (Nat_sub_sub_swap _ 1).
+  replace (2 ^ S n * 2 - 2 ^ S n) with (2 ^ S n).
 ...
   unfold mat_mul in H1.
 ...
