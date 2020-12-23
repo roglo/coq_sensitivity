@@ -554,6 +554,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
     unfold vect_dot_product in Hvvz.
     specialize (Hvv i (nth i ev 0%F)) as H1.
     rewrite mat_nrows_of_squ_mat in H1.
+Abort. (*
 ...
     assert (H : 0 ≤ i < n) by (split; [ flia | easy ]).
     specialize (H1 H eq_refl); clear H.
@@ -721,6 +722,14 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
    different; it could be just one eigenvalue and its eigenvector repeated;
    I could specify that all eigenvalues are different but, doing so, it is
    not enough general, because an eigenvalue can have a multiplicity *)
+Abort.
+
+Theorem glop : ∀ n (MA MB : square_matrix n),
+  squ_mat_determ MA ≠ 0%F
+  → (MA * MB = squ_mat_one n)%SM
+  → (MB * MA = squ_mat_one n)%SM.
+Proof.
+intros * Hdet Hab.
 ...
 
 Theorem diagonalized_matrix_prop :

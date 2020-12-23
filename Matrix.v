@@ -1510,6 +1510,9 @@ destruct Hm as (H1, H2).
 now apply Nat.eqb_eq in H2.
 Qed.
 
+Definition squ_mat_determ n (M : square_matrix n) :=
+  determinant (proj1_sig M).
+
 (* *)
 
 Theorem fold_determinant :
@@ -1553,6 +1556,7 @@ Arguments squ_mat_mul {T}%type {ro} {n%nat} MA MB.
 Arguments squ_mat_ring_like_op {T ro}.
 Arguments squ_mat_mul_vect_r {T}%type {ro} [n]%nat M%SM V%V.
 Arguments squ_mat_mul_scal_vect_comm {T}%type {ro rp} Hic n M%M c%F V%V.
+Arguments squ_mat_determ {T}%type {ro} {n}%nat M%M.
 Arguments subm {T} M%M i%nat j%nat.
 Arguments vect_add {T ro} U%V V%V.
 Arguments vect_sub {T ro} U%V V%V.
