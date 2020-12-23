@@ -533,19 +533,30 @@ rewrite Hm; cbn.
 apply matrix_eq; [ easy | easy | ].
 cbn - [ iter_seq ].
 intros * Hi Hj.
-(* c'est la m... *)
-...
-remember (nth i eV (vect_zero n)) as vi eqn:Hvi.
-remember (nth j eV (vect_zero n)) as vj eqn:Hvj.
+remember (mk_vect (λ j, vect_el (nth j eV (vect_zero n)) i) n) as vi eqn:Hvi.
+remember (mk_vect (λ i, vect_el (nth i eV (vect_zero n)) j) n) as vj eqn:Hvj.
 move vj before vi.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  replace (vect_el (nth k eV (vect_zero n)) i) with (vect_el vi k). 2: {
+    now rewrite Hvi.
+  }
+  replace (vect_el (nth k eV (vect_zero n)) j) with (vect_el vj k). 2: {
+    now rewrite Hvj.
+  }
+  easy.
+}
+cbn - [ iter_seq ].
 (* problem: if vi=vj but i≠j (same eigenvalues), this does not work *)
 destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
   unfold eigenvalues_and_vectors in Hvv.
   enough (Hvvz : (vi · vj)%V = 0%F). {
     unfold vect_dot_product in Hvvz.
-    specialize (Hvv i (nth i ev 0%F) vi) as H1.
+    specialize (Hvv i (nth i ev 0%F)) as H1.
     rewrite mat_nrows_of_squ_mat in H1.
+...
     assert (H : 0 ≤ i < n) by (split; [ flia | easy ]).
+    specialize (H1 H eq_refl); clear H.
     specialize (H1 H eq_refl Hvi); clear H.
     destruct H1 as (H1 & H2 & H3).
     now rewrite H1 in Hvvz.
@@ -614,6 +625,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
    I could specify that all eigenvalues are different but, doing so, it is
    not enough general, because an eigenvalue can have a multiplicity *)
 ...
+*)
 
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   rngl_is_comm = true →
