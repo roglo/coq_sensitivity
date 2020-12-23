@@ -517,6 +517,14 @@ rewrite Hic in rngl_mul_comm.
 apply rngl_mul_comm.
 Qed.
 
+Theorem glop : ∀ n (MA MB : square_matrix n),
+  squ_mat_determ MA ≠ 0%F
+  → (MA * MB = squ_mat_one n)%SM
+  → (MB * MA = squ_mat_one n)%SM.
+Proof.
+intros * Hdet Hab.
+...
+
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   rngl_is_comm = true →
   rngl_has_dec_eq = true →
@@ -611,14 +619,6 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
    different; it could be just one eigenvalue and its eigenvector repeated;
    I could specify that all eigenvalues are different but, doing so, it is
    not enough general, because an eigenvalue can have a multiplicity *)
-...
-
-Theorem glop : ∀ n (MA MB : square_matrix n),
-  squ_mat_determ MA ≠ 0%F
-  → (MA * MB = squ_mat_one n)%SM
-  → (MB * MA = squ_mat_one n)%SM.
-Proof.
-intros * Hdet Hab.
 ...
 
 Theorem diagonalized_matrix_prop :
