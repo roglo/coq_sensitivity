@@ -528,12 +528,12 @@ Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   → (U * U⁺ = squ_mat_one n)%SM.
 Proof.
 intros Hic Heq Hii * Hsy Hvv Hm.
-...
 apply square_matrix_eq; cbn.
 rewrite Hm; cbn.
 apply matrix_eq; [ easy | easy | ].
 cbn - [ iter_seq ].
 intros * Hi Hj.
+(* c'est la m... *)
 ...
 remember (nth i eV (vect_zero n)) as vi eqn:Hvi.
 remember (nth j eV (vect_zero n)) as vj eqn:Hvj.
