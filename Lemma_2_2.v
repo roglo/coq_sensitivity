@@ -105,6 +105,24 @@ Qed.
 
 (* "We prove by induction that A_n^2 = nI" *)
 
+(*
+Theorem glop :
+  ∀ n i k i0 : nat,
+    2 ^ n ≤ i0 ≤ 2 ^ S n - 1
+    → (mat_el
+         (rew [λ m : nat, matrix m m T] two_pow_n_mul_two n in
+          mat_of_mat_list_list [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]]) i i0 *
+       mat_el
+         (rew [λ m : nat, matrix m m T] two_pow_n_mul_two n in
+          mat_of_mat_list_list [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]]) i0 k)%F = 
+  (mat_list_list_el [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]] i i0 *
+   mat_list_list_el [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]] i0 k)%F.
+Proof.
+intros.
+now destruct (two_pow_n_mul_two n).
+Show Proof.
+*)
+
 Theorem lemma_2_A_n_2_eq_n_I :
   rngl_has_opp = true →
   ∀ n, (mA n * mA n)%M = (rngl_of_nat n × mI (2 ^ n))%M.
