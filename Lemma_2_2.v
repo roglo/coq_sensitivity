@@ -569,10 +569,13 @@ Definition A_n_eigenvector_of_sqrt_n n μ V :=
 *)
 
 (*
-Theorem mA_diag_zero : ∀ n i, mat_el (mA n) i i = 0%F.
+Theorem mA_diag_zero :
+  rngl_has_opp = true →
+  ∀ n i, i < 2 ^ n → mat_el (mA n) i i = 0%F.
 Proof.
-intros.
-induction n; [ easy | cbn ].
+intros Hop * Hi2n.
+revert i Hi2n.
+induction n; intros; [ easy | cbn ].
 (* désespérant... ces types dépendants, ça me rappelle les coinductifs,
    ça ne marche jamais, ça bloque tout le temps ; fait chier *)
 ...
