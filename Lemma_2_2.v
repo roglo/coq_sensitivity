@@ -516,7 +516,37 @@ Definition A_n_eigenvector_of_sqrt_n n μ V :=
        • V)%V
   end.
 
-Theorem A_n_eigen_equation_for_sqrt_n :
+Theorem mA_diag_zero :
+  rngl_has_opp = true →
+  ∀ n i, i < 2 ^ n → mat_el (mA n) i i = 0%F.
+Proof.
+intros Hop * Hi2n.
+revert i Hi2n.
+induction n; intros; [ easy | cbn ].
+unfold mat_list_list_el; cbn.
+rewrite mA_nrows, mA_ncols.
+destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
+  rewrite (Nat.div_small i); [ | easy ].
+  rewrite (Nat.mod_small i); [ | easy ].
+  now apply IHn.
+}
+apply Nat.nlt_ge in Hin.
+rewrite (Nat_div_less_small 1). 2: {
+  rewrite Nat.mul_1_l.
+  now split.
+}
+rewrite (Nat_mod_less_small 1). 2: {
+  rewrite Nat.mul_1_l.
+  now split.
+}
+cbn.
+rewrite Nat.add_0_r.
+rewrite IHn; [ now apply rngl_opp_0 | ].
+cbn in Hi2n.
+flia Hi2n Hin.
+Qed.
+
+Theorem An_eigen_equation_for_sqrt_n :
   rngl_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -665,7 +695,7 @@ split. {
   exists V.
   split; [ easy | ].
   split. 2: {
-    now apply A_n_eigen_equation_for_sqrt_n with (U := base_vector_1 42).
+    now apply An_eigen_equation_for_sqrt_n with (U := base_vector_1 42).
   }
   (* V ≠ vect_zero (2 ^ n) *)
   rewrite Hv; cbn.
