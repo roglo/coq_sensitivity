@@ -8,6 +8,8 @@ Notation "x ≤ y" := (x <= y)%Z (at level 70, y at next level) : Z_scope.
 Notation "x ≤ y ≤ z" := (x <= y ∧ y <= z)%Z (at level 70, y at next level) :
   Z_scope.
 
+Definition Z_inversible x := x = 1%Z ∨ x = (-1)%Z.
+
 Definition phony_Z_sub (x y : Z) := 0%Z.
 Definition phony_Z_inv (x : Z) := 0%Z.
 
@@ -22,6 +24,7 @@ Canonical Structure Z_ring_like_op : ring_like_op Z :=
      rngl_opp := Z.opp;
      rngl_inv := phony_Z_inv;
      rngl_le := Z.le;
+     rngl_inversible := Z_inversible;
      rngl_opt_sub := phony_Z_sub;
      rngl_opt_div := Z.div |}.
 

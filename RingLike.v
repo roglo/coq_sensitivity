@@ -59,6 +59,7 @@ Class ring_like_op T :=
     rngl_opp : T → T;
     rngl_inv : T → T;
     rngl_le : T → T → Prop;
+    rngl_inversible : T → Prop;
     rngl_opt_sub : T → T → T;
     rngl_opt_div : T → T → T }.
 

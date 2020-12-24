@@ -7,6 +7,8 @@ Require Import Utf8.
 Require Import RingLike Rational.
 Import Q.Notations.
 
+Definition Q_inversible (a : Q) := a ≠ 0%Q.
+
 Definition phony_Q_sub (a b : Q) := a.
 Definition phony_Q_div (a b : Q) := a.
 
@@ -21,6 +23,7 @@ Canonical Structure Q_ring_like_op : ring_like_op Q :=
      rngl_opp := Q.opp;
      rngl_inv := Q.inv;
      rngl_le := Q.le;
+     rngl_inversible := Q_inversible;
      rngl_opt_sub := phony_Q_sub;
      rngl_opt_div := phony_Q_div |}.
 
