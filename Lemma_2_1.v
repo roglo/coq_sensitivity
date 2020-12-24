@@ -531,6 +531,7 @@ Theorem glop : ∀ n (MA MB : square_matrix n),
   → (MB * MA = squ_mat_one n)%SM.
 Proof.
 intros * Hdet Hab.
+Print comatrix.
 ...
 
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :

@@ -52,7 +52,6 @@ Class ring_like_op T :=
   { rngl_has_opp : bool;
     rngl_has_inv : bool;
     rngl_has_no_inv_but_div : bool;
-    rngl_is_ordered : bool;
     rngl_zero : T;
     rngl_one : T;
     rngl_add : T → T → T;
@@ -95,6 +94,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_has_dec_eq : bool;
     rngl_has_dec_le : bool;
     rngl_has_1_neq_0 : bool;
+    rngl_is_ordered : bool;
     rngl_is_integral : bool;
     rngl_characteristic : nat;
     rngl_add_comm : ∀ a b : T, (a + b = b + a)%F;
