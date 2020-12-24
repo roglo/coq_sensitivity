@@ -83,6 +83,8 @@ Notation "¹/ a" := (rngl_inv a) (at level 35, right associativity) :
 Notation "a ≤ b ≤ c" := (a ≤ b ∧ b ≤ c)%F (at level 70, b at next level) :
   ring_like_scope.
 
+Inductive not_applicable := NA.
+
 Fixpoint rngl_of_nat {T} {ro : ring_like_op T} n :=
   match n with
   | 0 => 0%F
@@ -104,53 +106,56 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_mul_1_l : ∀ a : T, (1 * a)%F = a;
     rngl_mul_add_distr_l : ∀ a b c : T, (a * (b + c) = a * b + a * c)%F;
     (* when 1 ≠ 0 *)
-    rngl_opt_1_neq_0 : if rngl_has_1_neq_0 then (1 ≠ 0)%F else True;
+    rngl_opt_1_neq_0 : if rngl_has_1_neq_0 then (1 ≠ 0)%F else not_applicable;
     (* when multiplication is commutative *)
     rngl_opt_mul_comm :
-      if rngl_is_comm then ∀ a b, (a * b = b * a)%F else True;
+      if rngl_is_comm then ∀ a b, (a * b = b * a)%F else not_applicable;
     (* when multiplication is not commutative *)
     rngl_opt_mul_1_r :
-      if rngl_is_comm then True else ∀ a, (a * 1 = a)%F;
+      if rngl_is_comm then not_applicable else ∀ a, (a * 1 = a)%F;
     rngl_opt_mul_add_distr_r :
-      if rngl_is_comm then True else
+      if rngl_is_comm then not_applicable else
        ∀ a b c, ((a + b) * c = a * c + b * c)%F;
     (* when has opposite *)
     rngl_opt_add_opp_l :
-      if rngl_has_opp then ∀ a : T, (- a + a = 0)%F else True;
+      if rngl_has_opp then ∀ a : T, (- a + a = 0)%F else not_applicable;
     (* when has not opposite *)
     rngl_opt_add_sub :
-      if rngl_has_opp then True else ∀ a b : T, (a + b - b = a)%F;
+      if rngl_has_opp then not_applicable else ∀ a b : T, (a + b - b = a)%F;
     rngl_opt_mul_0_l :
-      if rngl_has_opp then True else ∀ a, (0 * a = 0)%F;
+      if rngl_has_opp then not_applicable else ∀ a, (0 * a = 0)%F;
     rngl_opt_mul_0_r :
-      if rngl_has_opp then True else ∀ a, (a * 0 = 0)%F;
+      if rngl_has_opp then not_applicable else ∀ a, (a * 0 = 0)%F;
     (* when has inverse *)
     rngl_opt_mul_inv_l :
-      if rngl_has_inv then ∀ a : T, a ≠ 0%F → (¹/ a * a = 1)%F else True;
+      if rngl_has_inv then ∀ a : T, a ≠ 0%F → (¹/ a * a = 1)%F
+      else not_applicable;
     rngl_opt_mul_inv_r :
       if (rngl_has_inv && negb rngl_is_comm)%bool then
         ∀ a : T, a ≠ 0%F → (a / a = 1)%F
-      else True;
+      else not_applicable;
     (* when has no inverse but division *)
     rngl_opt_mul_div_l :
       if rngl_has_no_inv_but_div then
         ∀ a b : T, a ≠ 0%F → (a * b / a = b)%F
-      else True;
+      else not_applicable;
     rngl_opt_mul_div_r :
       if (rngl_has_no_inv_but_div && negb rngl_is_comm)%bool then
         ∀ a b : T, b ≠ 0%F → (a * b / b = a)%F
-      else True;
+      else not_applicable;
     (* when equality is decidable *)
     rngl_opt_eq_dec :
-      if rngl_has_dec_eq then ∀ a b : T, {a = b} + {a ≠ b} else True;
+      if rngl_has_dec_eq then ∀ a b : T, {a = b} + {a ≠ b}
+      else not_applicable;
     (* when le comparison is decidable *)
     rngl_opt_le_dec :
-      if rngl_has_dec_le then ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%F else True;
+      if rngl_has_dec_le then ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%F
+      else not_applicable;
     (* when has_no_zero_divisors *)
     rngl_opt_integral :
       if rngl_is_integral then
         ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
-      else True;
+      else not_applicable;
     (* characteristic *)
     rngl_characteristic_prop :
       match rngl_characteristic with
@@ -159,30 +164,32 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       end;
     (* when ordered *)
     rngl_opt_le_refl :
-      if rngl_is_ordered then ∀ a, (a ≤ a)%F else True;
+      if rngl_is_ordered then ∀ a, (a ≤ a)%F else not_applicable;
     rngl_opt_le_antisymm :
-      if rngl_is_ordered then ∀ a b, (a ≤ b → b ≤ a → a = b)%F else True;
+      if rngl_is_ordered then ∀ a b, (a ≤ b → b ≤ a → a = b)%F
+      else not_applicable;
     rngl_opt_le_trans :
-      if rngl_is_ordered then ∀ a b c, (a ≤ b → b ≤ c → a ≤ c)%F else True;
+      if rngl_is_ordered then ∀ a b c, (a ≤ b → b ≤ c → a ≤ c)%F
+      else not_applicable;
     rngl_opt_add_le_compat :
       if rngl_is_ordered then ∀ a b c d, (a ≤ b → c ≤ d → a + c ≤ b + d)%F
-      else True;
+      else not_applicable;
     rngl_opt_mul_le_compat_nonneg :
       if (rngl_is_ordered && rngl_has_opp)%bool then
         ∀ a b c d, (0 ≤ a ≤ c)%F → (0 ≤ b ≤ d)%F → (a * b ≤ c * d)%F
-      else True;
+      else not_applicable;
     rngl_opt_mul_le_compat_nonpos :
       if (rngl_is_ordered && rngl_has_opp)%bool then
         ∀ a b c d, (c ≤ a ≤ 0)%F → (d ≤ b ≤ 0)%F → (a * b ≤ c * d)%F
-      else True;
+      else not_applicable;
     rngl_opt_mul_le_compat :
       if (rngl_is_ordered && negb rngl_has_opp)%bool then
         ∀ a b c d, (a ≤ c)%F → (b ≤ d)%F → (a * b ≤ c * d)%F
-      else True;
+      else not_applicable;
     rngl_opt_not_le :
       if rngl_is_ordered then
         ∀ a b, (¬ a ≤ b → a = b ∨ b ≤ a)%F
-      else True;
+      else not_applicable;
     (* consistency *)
     rngl_consistent :
       rngl_has_inv = false ∨ rngl_has_no_inv_but_div = false }.
