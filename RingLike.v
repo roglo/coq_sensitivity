@@ -48,10 +48,6 @@
 
 Require Import Utf8.
 
-... change the names with "inversible": the notion I want to express
-    is that we can divide with it. E.g. in ℕ, we can divide by 2, but
-    not by 0
-
 Class ring_like_op T :=
   { rngl_has_opp : bool;
     rngl_has_inv : bool;
@@ -63,7 +59,7 @@ Class ring_like_op T :=
     rngl_opp : T → T;
     rngl_inv : T → T;
     rngl_le : T → T → Prop;
-    rngl_inversible : T → Prop;
+    rngl_divisor : T → Prop;
     rngl_opt_sub : T → T → T;
     rngl_opt_div : T → T → T }.
 
@@ -110,8 +106,8 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_mul_assoc : ∀ a b c : T, (a * (b * c) = (a * b) * c)%F;
     rngl_mul_1_l : ∀ a : T, (1 * a)%F = a;
     rngl_mul_add_distr_l : ∀ a b c : T, (a * (b + c) = a * b + a * c)%F;
-    rngl_inversible_mul : ∀ a b,
-      rngl_inversible (a * b)%F → rngl_inversible a ∧ rngl_inversible b;
+    rngl_divisor_mul : ∀ a b,
+      rngl_divisor (a * b)%F → rngl_divisor a ∧ rngl_divisor b;
     (* when 1 ≠ 0 *)
     rngl_opt_1_neq_0 : if rngl_has_1_neq_0 then (1 ≠ 0)%F else not_applicable;
     (* when multiplication is commutative *)
@@ -135,20 +131,20 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if rngl_has_opp then not_applicable else ∀ a, (a * 0 = 0)%F;
     (* when has inverse *)
     rngl_opt_mul_inv_l :
-      if rngl_has_inv then ∀ a : T, rngl_inversible a → (¹/ a * a = 1)%F
+      if rngl_has_inv then ∀ a : T, rngl_divisor a → (¹/ a * a = 1)%F
       else not_applicable;
     rngl_opt_mul_inv_r :
       if (rngl_has_inv && negb rngl_is_comm)%bool then
-        ∀ a : T, rngl_inversible a → (a / a = 1)%F
+        ∀ a : T, rngl_divisor a → (a / a = 1)%F
       else not_applicable;
     (* when has no inverse but division *)
     rngl_opt_mul_div_l :
       if rngl_has_no_inv_but_div then
-        ∀ a b : T, rngl_inversible a → (a * b / a = b)%F
+        ∀ a b : T, rngl_divisor a → (a * b / a = b)%F
       else not_applicable;
     rngl_opt_mul_div_r :
       if (rngl_has_no_inv_but_div && negb rngl_is_comm)%bool then
-        ∀ a b : T, rngl_inversible b → (a * b / b = a)%F
+        ∀ a b : T, rngl_divisor b → (a * b / b = a)%F
       else not_applicable;
     (* when equality is decidable *)
     rngl_opt_eq_dec :
@@ -162,7 +158,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_opt_integral :
       if rngl_is_integral then
         ∀ a b,
-        rngl_inversible a → rngl_inversible b → rngl_inversible (a * b)%F
+        rngl_divisor a → rngl_divisor b → rngl_divisor (a * b)%F
       else not_applicable;
     (* characteristic *)
     rngl_characteristic_prop :
@@ -277,7 +273,7 @@ Qed.
 
 Theorem rngl_mul_inv_r :
   rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
-  ∀ a : T, rngl_inversible a → (a / a = 1)%F.
+  ∀ a : T, rngl_divisor a → (a / a = 1)%F.
 Proof.
 intros Hii * Ha.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
@@ -303,7 +299,7 @@ Qed.
 
 Theorem rngl_mul_reg_l :
   rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
-  ∀ a b c, rngl_inversible a
+  ∀ a b c, rngl_divisor a
   → (a * b = a * c)%F
   → b = c.
 Proof.
@@ -327,7 +323,7 @@ Qed.
 
 Theorem rngl_mul_reg_r :
   rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
-  ∀ a b c, rngl_inversible c
+  ∀ a b c, rngl_divisor c
   → (a * c = b * c)%F
   → a = b.
 Proof.
@@ -550,7 +546,7 @@ Qed.
 Theorem rngl_integral :
   (rngl_is_integral || (rngl_has_inv && rngl_has_dec_eq))%bool = true →
   ∀ a b,
-  rngl_inversible a → rngl_inversible b → rngl_inversible (a * b)%F.
+  rngl_divisor a → rngl_divisor b → rngl_divisor (a * b)%F.
 Proof.
 intros Hdo * Ha Hb.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
@@ -563,13 +559,13 @@ cbn; clear rngl_integral.
 rewrite <- rngl_mul_1_l in Hb.
 rewrite <- (rngl_mul_inv_l a) in Hb; [ | easy ].
 rewrite <- rngl_mul_assoc in Hb.
-now specialize (rngl_inversible_mul _ _ Hb) as H1.
+now specialize (rngl_divisor_mul _ _ Hb) as H1.
 Qed.
 
 Theorem rngl_inv_mul :
   rngl_is_integral = true →
   rngl_has_inv = true →
-  ∀ a b, rngl_inversible a → rngl_inversible b →
+  ∀ a b, rngl_divisor a → rngl_divisor b →
   (¹/ (a * b) = ¹/ b * ¹/ a)%F.
 Proof.
 intros Hdo Hin * Haz Hbz.
@@ -618,7 +614,7 @@ Qed.
 
 Theorem rngl_mul_div_l :
   rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
-  ∀ a b : T, rngl_inversible b → (a * b / b)%F = a.
+  ∀ a b : T, rngl_divisor b → (a * b / b)%F = a.
 Proof.
 intros Hii a b Hbz.
 specialize rngl_opt_mul_div_l as rngl_mul_div_l.

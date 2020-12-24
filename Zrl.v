@@ -8,7 +8,7 @@ Notation "x ≤ y" := (x <= y)%Z (at level 70, y at next level) : Z_scope.
 Notation "x ≤ y ≤ z" := (x <= y ∧ y <= z)%Z (at level 70, y at next level) :
   Z_scope.
 
-Definition Z_inversible x := x ≠ 0%Z.
+Definition Z_divisor x := x ≠ 0%Z.
 
 Definition phony_Z_sub (x y : Z) := 0%Z.
 Definition phony_Z_inv (x : Z) := 0%Z.
@@ -24,16 +24,16 @@ Canonical Structure Z_ring_like_op : ring_like_op Z :=
      rngl_opp := Z.opp;
      rngl_inv := phony_Z_inv;
      rngl_le := Z.le;
-     rngl_inversible := Z_inversible;
+     rngl_divisor := Z_divisor;
      rngl_opt_sub := phony_Z_sub;
      rngl_opt_div := Z.div |}.
 
 Existing Instance Z_ring_like_op.
 
 Theorem Z_integral : ∀ a b : Z,
-  rngl_inversible a → rngl_inversible b → rngl_inversible (a * b)%F.
+  rngl_divisor a → rngl_divisor b → rngl_divisor (a * b)%F.
 Proof.
-cbn; unfold Z_inversible.
+cbn; unfold Z_divisor.
 intros * Ha Hb.
 intros H.
 apply Z.eq_mul_0 in H.
@@ -93,10 +93,10 @@ apply Heab.
 now apply Z.le_antisymm; apply Z.lt_le_incl.
 Qed.
 
-Theorem Z_inversible_mul :
-  ∀ a b : Z, rngl_inversible (a * b)%F → rngl_inversible a ∧ rngl_inversible b.
+Theorem Z_divisor_mul :
+  ∀ a b : Z, rngl_divisor (a * b)%F → rngl_divisor a ∧ rngl_divisor b.
 Proof.
-cbn; unfold Z_inversible.
+cbn; unfold Z_divisor.
 intros * Hab.
 apply Decidable.not_or.
 intros H.
@@ -125,7 +125,7 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_mul_assoc := Z.mul_assoc;
      rngl_mul_1_l := Z.mul_1_l;
      rngl_mul_add_distr_l := Z.mul_add_distr_l;
-     rngl_inversible_mul := Z_inversible_mul;
+     rngl_divisor_mul := Z_divisor_mul;
      rngl_opt_1_neq_0 := Z_1_neq_0;
      rngl_opt_mul_comm := Z.mul_comm;
      rngl_opt_mul_1_r := NA;
