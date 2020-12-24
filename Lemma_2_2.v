@@ -611,19 +611,21 @@ Theorem An_eigen_equation_for_sqrt_n :
   ∀ n μ, (μ * μ)%F = rngl_of_nat n →
   match n with
   | 0 => ∀ V, (mA 0 • V = μ × V)%V
-  | S _ =>
+  | S n' =>
       ∀ U V,
-      V = A_Sn_eigenvector_of_sqrt_Sn n μ U
-      → (mA (S n) • V = μ × V)%V
+      V = A_Sn_eigenvector_of_sqrt_Sn n' μ U
+      → (mA (S n') • V = μ × V)%V
   end.
 Proof.
+(* restart from "master" version" *)
+...
 intros Hic Hro Hin Hde * Hμ.
 destruct n. {
-  intros HV.
-  cbn in Hμ, HV |-*.
+  intros V.
+  cbn in Hμ, V |-*.
   apply vector_eq.
-  intros i Hi.
-  rewrite Nat.lt_1_r in Hi; subst i; cbn.
+  intros i Hi; cbn.
+  apply Nat.lt_1_r in Hi; subst i; cbn.
   rewrite rngl_mul_0_l, rngl_add_0_l.
   specialize rngl_integral as H.
   rewrite Hin in H; cbn in H.
@@ -638,14 +640,12 @@ intros U V HV.
 unfold A_Sn_eigenvector_of_sqrt_Sn in HV.
 unfold mat_of_list_list_1_row_2_col in HV.
 subst V.
-remember (S n) as sn eqn:Hsn.
 rewrite mat_vect_mul_assoc.
 cbn - [ iter_seq Nat.pow ].
-destruct (two_pow_n_mul_two sn).
+destruct (two_pow_n_mul_two n).
 cbn - [ iter_seq Nat.pow ].
-subst sn.
-remember (mA (S n)) as M1 eqn:HM1.
-remember (mI (2 ^ S n)) as M2 eqn:HM2.
+remember (mA n) as M1 eqn:HM1.
+remember (mI (2 ^ n)) as M2 eqn:HM2.
 remember (M1 + μ × M2)%M as M5 eqn:HM5.
 move M2 before M1; move M5 before M2.
 apply vector_eq.
@@ -655,24 +655,22 @@ rewrite rngl_mul_summation_distr_l.
 apply rngl_summation_eq_compat.
 intros j Hj.
 move j before i.
-remember (S n) as sn.
-destruct (Nat.mul_1_r (2 ^ sn)).
-subst sn.
+destruct (Nat.mul_1_r (2 ^ n)).
 cbn - [ iter_seq Nat.pow ].
 rewrite Nat.mul_1_r at 1.
 unfold mat_list_list_el.
-assert (Hz : 0 < 2 ^ S n). {
+assert (Hz : 0 < 2 ^ n). {
   apply Nat.neq_0_lt_0.
   now apply Nat.pow_nonzero.
 }
 rewrite (Nat.div_small j); [ | flia Hj Hz ].
 rewrite (Nat.mod_small j); [ | flia Hj Hz ].
-destruct (lt_dec i (2 ^ S n)) as [Hi2n| Hi2n]. {
+destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
   rewrite (Nat.div_small i); [ | flia Hi2n ].
   rewrite (Nat.mod_small i); [ | flia Hi2n ].
   remember (nth 0 _ _) as x; cbn in Heqx; subst x.
   remember (nth 0 _ _) as x; cbn in Heqx; subst x.
-  rewrite (rngl_summation_split _ (2 ^ S n)); [ | flia ].
+  rewrite (rngl_summation_split _ (2 ^ n)); [ | flia ].
   rewrite rngl_summation_split_last; [ | flia ].
   rewrite rngl_summation_shift; [ | flia Hz ].
   erewrite rngl_summation_eq_compat. 2: {
@@ -688,11 +686,11 @@ destruct (lt_dec i (2 ^ S n)) as [Hi2n| Hi2n]. {
   }
   cbn - [ iter_seq Nat.pow nth ].
   rewrite rngl_summation_add_distr; [ | easy ].
-  specialize (lemma_2_A_n_2_eq_n_I Hro (S n)) as H1.
+  specialize (lemma_2_A_n_2_eq_n_I Hro n) as H1.
   rewrite <- HM1 in H1.
   assert
     (H2 : ∀ i j,
-     mat_el (M1 * M1) i j = mat_el (rngl_of_nat (S n) × mI (2 ^ S n))%M i j). {
+     mat_el (M1 * M1) i j = mat_el (rngl_of_nat n × mI (2 ^ n))%M i j). {
     intros.
     now rewrite H1.
   }
@@ -759,12 +757,14 @@ destruct (lt_dec i (2 ^ S n)) as [Hi2n| Hi2n]. {
       rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
         intros k Hk.
         rewrite HM2; cbn - [ Nat.pow Nat.eq_dec ].
-        destruct (Nat.eq_dec 0 (k - 2 ^ S n)) as [H| H]; [ flia H Hk | ].
+        destruct (Nat.eq_dec 0 (k - 2 ^ n)) as [H| H]; [ flia H Hk | ].
         apply rngl_mul_0_l.
       }
       rewrite rngl_add_0_r.
-      (* works only if U(0) = 0, but why not? *)
-      (* on peut l'imposer, mais j'aimerais comprendre pourquoi *)
+...
+  ============================
+  ((rngl_of_nat (S n) + mat_el M2 0 0 * mat_el M2 0 0) * vect_el U 0)%F =
+  (rngl_of_nat (S (S n)) * vect_el U 0)%F
 ...
     rewrite (rngl_summation_split _ (i + 2 ^ S n)); [ | flia Hi2n ].
     destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
