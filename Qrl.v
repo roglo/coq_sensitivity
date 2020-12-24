@@ -10,8 +10,6 @@ Import Q.Notations.
 Definition phony_Q_sub (a b : Q) := a.
 Definition phony_Q_div (a b : Q) := a.
 
-Definition Q_divisor (a : Q) := a ≠ 0%Q.
-
 Canonical Structure Q_ring_like_op : ring_like_op Q :=
   {| rngl_has_opp := true;
      rngl_has_inv := true;
@@ -23,7 +21,6 @@ Canonical Structure Q_ring_like_op : ring_like_op Q :=
      rngl_opp := Q.opp;
      rngl_inv := Q.inv;
      rngl_le := Q.le;
-     rngl_divisor := Q_divisor;
      rngl_opt_sub := phony_Q_sub;
      rngl_opt_div := phony_Q_div |}.
 
@@ -75,20 +72,6 @@ apply Heab.
 now apply Q.le_antisymm; apply Q.lt_le_incl.
 Qed.
 
-Theorem Q_divisor_mul :
-  ∀ a b : Q, rngl_divisor (a * b)%F → rngl_divisor a ∧ rngl_divisor b.
-Proof.
-cbn; unfold Q_divisor.
-intros * Hab.
-apply Decidable.not_or.
-intros H.
-destruct H as [H| H]; [ subst a | subst b ]. {
-  now rewrite Q.mul_0_l in Hab.
-} {
-  now rewrite Q.mul_0_r in Hab.
-}
-Qed.
-
 Theorem Q_consistent :
   rngl_has_inv = false ∨ rngl_has_no_inv_but_div = false.
 Proof. now right. Qed.
@@ -107,7 +90,6 @@ Definition Q_ring_like_prop :=
      rngl_mul_assoc := Q.mul_assoc;
      rngl_mul_1_l := Q.mul_1_l;
      rngl_mul_add_distr_l := Q.mul_add_distr_l;
-     rngl_divisor_mul := Q_divisor_mul;
      rngl_opt_1_neq_0 := Q_1_neq_0;
      rngl_opt_mul_comm := Q.mul_comm;
      rngl_opt_mul_1_r := NA;

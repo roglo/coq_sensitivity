@@ -569,15 +569,6 @@ destruct n. {
   rewrite Hin in H; cbn in H.
   rewrite Hde in H.
   rewrite Bool.orb_true_r in H.
-  specialize (H eq_refl μ μ).
-  enough (Hdm : ¬ rngl_divisor (μ * μ)%F).
-  specialize rngl_opt_eq_dec as rngl_eq_dec.
-  rewrite Hde in rngl_eq_dec.
-  destruct (rngl_eq_dec μ 0%F) as [Hμz| Hμz]; [ easy | exfalso ].
-  apply Hdm.
-  apply H.
-(* mouais bon, marche pas *)
-...
   apply (H eq_refl) in Hμ.
   now destruct Hμ.
 }

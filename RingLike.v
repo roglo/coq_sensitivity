@@ -59,7 +59,6 @@ Class ring_like_op T :=
     rngl_opp : T → T;
     rngl_inv : T → T;
     rngl_le : T → T → Prop;
-    rngl_divisor : T → Prop;
     rngl_opt_sub : T → T → T;
     rngl_opt_div : T → T → T }.
 
@@ -106,8 +105,6 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_mul_assoc : ∀ a b c : T, (a * (b * c) = (a * b) * c)%F;
     rngl_mul_1_l : ∀ a : T, (1 * a)%F = a;
     rngl_mul_add_distr_l : ∀ a b c : T, (a * (b + c) = a * b + a * c)%F;
-    rngl_divisor_mul : ∀ a b,
-      rngl_divisor (a * b)%F → rngl_divisor a ∧ rngl_divisor b;
     (* when 1 ≠ 0 *)
     rngl_opt_1_neq_0 : if rngl_has_1_neq_0 then (1 ≠ 0)%F else not_applicable;
     (* when multiplication is commutative *)
@@ -131,20 +128,20 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if rngl_has_opp then not_applicable else ∀ a, (a * 0 = 0)%F;
     (* when has inverse *)
     rngl_opt_mul_inv_l :
-      if rngl_has_inv then ∀ a : T, rngl_divisor a → (¹/ a * a = 1)%F
+      if rngl_has_inv then ∀ a : T, a ≠ 0%F → (¹/ a * a = 1)%F
       else not_applicable;
     rngl_opt_mul_inv_r :
       if (rngl_has_inv && negb rngl_is_comm)%bool then
-        ∀ a : T, rngl_divisor a → (a / a = 1)%F
+        ∀ a : T, a ≠ 0%F → (a / a = 1)%F
       else not_applicable;
     (* when has no inverse but division *)
     rngl_opt_mul_div_l :
       if rngl_has_no_inv_but_div then
-        ∀ a b : T, rngl_divisor a → (a * b / a = b)%F
+        ∀ a b : T, a ≠ 0%F → (a * b / a = b)%F
       else not_applicable;
     rngl_opt_mul_div_r :
       if (rngl_has_no_inv_but_div && negb rngl_is_comm)%bool then
-        ∀ a b : T, rngl_divisor b → (a * b / b = a)%F
+        ∀ a b : T, b ≠ 0%F → (a * b / b = a)%F
       else not_applicable;
     (* when equality is decidable *)
     rngl_opt_eq_dec :
@@ -154,11 +151,10 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_opt_le_dec :
       if rngl_has_dec_le then ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%F
       else not_applicable;
-    (* when is integral  *)
+    (* when has_no_zero_divisors *)
     rngl_opt_integral :
       if rngl_is_integral then
-        ∀ a b,
-        rngl_divisor a → rngl_divisor b → rngl_divisor (a * b)%F
+        ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
       else not_applicable;
     (* characteristic *)
     rngl_characteristic_prop :
@@ -273,7 +269,7 @@ Qed.
 
 Theorem rngl_mul_inv_r :
   rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
-  ∀ a : T, rngl_divisor a → (a / a = 1)%F.
+  ∀ a : T, a ≠ 0%F → (a / a = 1)%F.
 Proof.
 intros Hii * Ha.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
@@ -299,7 +295,7 @@ Qed.
 
 Theorem rngl_mul_reg_l :
   rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
-  ∀ a b c, rngl_divisor a
+  ∀ a b c, a ≠ 0%F
   → (a * b = a * c)%F
   → b = c.
 Proof.
@@ -323,7 +319,7 @@ Qed.
 
 Theorem rngl_mul_reg_r :
   rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
-  ∀ a b c, rngl_divisor c
+  ∀ a b c, c ≠ 0%F
   → (a * c = b * c)%F
   → a = b.
 Proof.
@@ -545,10 +541,9 @@ Qed.
 
 Theorem rngl_integral :
   (rngl_is_integral || (rngl_has_inv && rngl_has_dec_eq))%bool = true →
-  ∀ a b,
-  rngl_divisor a → rngl_divisor b → rngl_divisor (a * b)%F.
+  ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F.
 Proof.
-intros Hdo * Ha Hb.
+intros Hdo * Hab.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
 specialize rngl_opt_eq_dec as rngl_eq_dec.
 specialize rngl_opt_integral as rngl_integral.
@@ -556,27 +551,35 @@ destruct rngl_is_integral; [ now apply rngl_integral | ].
 destruct rngl_has_inv; [ | easy ].
 destruct rngl_has_dec_eq; [ | easy ].
 cbn; clear rngl_integral.
-rewrite <- rngl_mul_1_l in Hb.
-rewrite <- (rngl_mul_inv_l a) in Hb; [ | easy ].
-rewrite <- rngl_mul_assoc in Hb.
-now specialize (rngl_divisor_mul _ _ Hb) as H1.
+assert (H : (¹/a * a * b = ¹/a * 0)%F). {
+  now rewrite <- rngl_mul_assoc, Hab.
+}
+rewrite rngl_mul_0_r in H.
+destruct (rngl_eq_dec a 0%F) as [Haz| Haz]; [ now left | ].
+rewrite rngl_mul_inv_l in H; [ | easy ].
+rewrite rngl_mul_1_l in H.
+now right.
 Qed.
 
 Theorem rngl_inv_mul :
   rngl_is_integral = true →
   rngl_has_inv = true →
-  ∀ a b, rngl_divisor a → rngl_divisor b →
-  (¹/ (a * b) = ¹/ b * ¹/ a)%F.
+  ∀ a b, a ≠ 0%F → b ≠ 0%F →(¹/ (a * b) = ¹/ b * ¹/ a)%F.
 Proof.
 intros Hdo Hin * Haz Hbz.
 specialize rngl_mul_reg_l as H1.
 specialize rngl_mul_inv_r as H2.
-specialize rngl_opt_integral as H3.
+specialize rngl_integral as H3.
 specialize rngl_opt_mul_div_l as rngl_mul_div_l.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
 unfold rngl_div in H2.
-rewrite Hdo in H3.
-specialize (H3 a b Haz Hbz).
+rewrite Hdo in H3; cbn in H3.
+specialize (H3 eq_refl).
+assert (Habz : (a * b)%F ≠ 0%F). {
+  intros H.
+  specialize (H3 a b H).
+  now destruct H3.
+}
 rewrite Hin in H2.
 specialize (H2 (or_introl eq_refl)).
 apply H1 with (a := (a * b)%F); [ now left | easy | ].
@@ -614,7 +617,7 @@ Qed.
 
 Theorem rngl_mul_div_l :
   rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
-  ∀ a b : T, rngl_divisor b → (a * b / b)%F = a.
+  ∀ a b : T, b ≠ 0%F → (a * b / b)%F = a.
 Proof.
 intros Hii a b Hbz.
 specialize rngl_opt_mul_div_l as rngl_mul_div_l.
