@@ -79,16 +79,16 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_mul_add_distr_l := Nat.mul_add_distr_l;
      rngl_opt_1_neq_0 := Nat_neq_1_0;
      rngl_opt_mul_comm := Nat.mul_comm;
-     rngl_opt_mul_1_r := I;
-     rngl_opt_mul_add_distr_r := I;
-     rngl_opt_add_opp_l := I;
+     rngl_opt_mul_1_r := NA;
+     rngl_opt_mul_add_distr_r := NA;
+     rngl_opt_add_opp_l := NA;
      rngl_opt_add_sub := Nat.add_sub;
      rngl_opt_mul_0_l := Nat.mul_0_l;
      rngl_opt_mul_0_r := Nat.mul_0_r;
-     rngl_opt_mul_inv_l := I;
-     rngl_opt_mul_inv_r := I;
+     rngl_opt_mul_inv_l := NA;
+     rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div_l := Nat_mul_div_l;
-     rngl_opt_mul_div_r := I;
+     rngl_opt_mul_div_r := NA;
      rngl_opt_eq_dec := Nat.eq_dec;
      rngl_opt_le_dec := le_dec;
      rngl_opt_integral := Nat_eq_mul_0;
@@ -97,8 +97,8 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_le_antisymm := Nat.le_antisymm;
      rngl_opt_le_trans := Nat.le_trans;
      rngl_opt_add_le_compat := Nat.add_le_mono;
-     rngl_opt_mul_le_compat_nonneg := I;
-     rngl_opt_mul_le_compat_nonpos := I;
+     rngl_opt_mul_le_compat_nonneg := NA;
+     rngl_opt_mul_le_compat_nonpos := NA;
      rngl_opt_mul_le_compat := Nat_mul_le_compat;
      rngl_opt_not_le := Nat_not_le;
      rngl_consistent := Nat_consistent |}.
@@ -301,7 +301,7 @@ now rewrite Nat.mul_add_distr_l.
 Qed.
 
 Theorem Zn_neq_1_0 :
-  if 1 <? n then (1 ≠ 0)%F else True.
+  if 1 <? n then (1 ≠ 0)%F else not_applicable.
 Proof.
 intros.
 remember (1 <? n) as b eqn:Hb.
@@ -350,7 +350,8 @@ destruct (Nat.eq_dec a b) as [Hab| Hab]; [ left | right ]. {
 Qed.
 
 Theorem Zn_opt_mul_inv_l :
-  if is_prime n then ∀ a : Zn n, a ≠ 0%F → (¹/ a * a)%F = 1%F else True.
+  if is_prime n then ∀ a : Zn n, a ≠ 0%F → (¹/ a * a)%F = 1%F
+  else not_applicable.
 Proof.
 intros.
 remember (is_prime n) as p eqn:Hp.
@@ -395,7 +396,7 @@ Qed.
 
 Theorem Zn_opt_mul_inv_r :
   if (is_prime n && negb true)%bool then ∀ a : Zn n, a ≠ 0%F → (a / a)%F = 1%F
-  else True.
+  else not_applicable.
 Proof.
 now rewrite Bool.andb_false_r.
 Qed.
@@ -451,28 +452,28 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_mul_add_distr_l := Zn_mul_add_distr_l;
      rngl_opt_1_neq_0 := Zn_neq_1_0;
      rngl_opt_mul_comm := Zn_mul_comm;
-     rngl_opt_mul_1_r := I;
-     rngl_opt_mul_add_distr_r := I;
+     rngl_opt_mul_1_r := NA;
+     rngl_opt_mul_add_distr_r := NA;
      rngl_opt_add_opp_l := Zn_add_opp_l;
-     rngl_opt_add_sub := I;
-     rngl_opt_mul_0_l := I;
-     rngl_opt_mul_0_r := I;
+     rngl_opt_add_sub := NA;
+     rngl_opt_mul_0_l := NA;
+     rngl_opt_mul_0_r := NA;
      rngl_opt_mul_inv_l := Zn_opt_mul_inv_l;
      rngl_opt_mul_inv_r := Zn_opt_mul_inv_r;
-     rngl_opt_mul_div_l := I;
-     rngl_opt_mul_div_r := I;
+     rngl_opt_mul_div_l := NA;
+     rngl_opt_mul_div_r := NA;
      rngl_opt_eq_dec := Zn_eq_dec;
-     rngl_opt_le_dec := I;
-     rngl_opt_integral := I;
+     rngl_opt_le_dec := NA;
+     rngl_opt_integral := NA;
      rngl_characteristic_prop := Zn_characteristic_prop;
-     rngl_opt_le_refl := I;
-     rngl_opt_le_antisymm := I;
-     rngl_opt_le_trans := I;
-     rngl_opt_add_le_compat := I;
-     rngl_opt_mul_le_compat_nonneg := I;
-     rngl_opt_mul_le_compat_nonpos := I;
-     rngl_opt_mul_le_compat := I;
-     rngl_opt_not_le := I;
+     rngl_opt_le_refl := NA;
+     rngl_opt_le_antisymm := NA;
+     rngl_opt_le_trans := NA;
+     rngl_opt_add_le_compat := NA;
+     rngl_opt_mul_le_compat_nonneg := NA;
+     rngl_opt_mul_le_compat_nonpos := NA;
+     rngl_opt_mul_le_compat := NA;
+     rngl_opt_not_le := NA;
      rngl_consistent := Zn_consistent |}.
 
 End a.

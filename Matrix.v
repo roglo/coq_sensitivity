@@ -876,7 +876,7 @@ now apply mat_add_opp_l.
 Qed.
 
 Theorem mat_opt_add_sub : ∀ n,
-  if @rngl_has_opp (matrix n n T) _ then True
+  if @rngl_has_opp (matrix n n T) _ then not_applicable
   else ∀ a b : matrix n n T, (a + b - b)%F = a.
 Proof.
 intros.
@@ -958,7 +958,8 @@ now rewrite rngl_add_0_l.
 Qed.
 
 Theorem mat_opt_eq_dec : ∀ n,
-  if rngl_has_dec_eq then ∀ a b : matrix n n T, {a = b} + {a ≠ b} else True.
+  if rngl_has_dec_eq then ∀ a b : matrix n n T, {a = b} + {a ≠ b}
+  else not_applicable.
 Proof.
 intros.
 specialize rngl_opt_eq_dec as rngl_eq_dec.
@@ -984,7 +985,8 @@ destruct IHn as [IHn| IHn]. {
 Qed.
 
 Theorem mat_1_neq_0 : ∀ n,
-  if rngl_has_1_neq_0 && negb (n =? 0) then @mI T ro n ≠ mZ n n else True.
+  if rngl_has_1_neq_0 && negb (n =? 0) then @mI T ro n ≠ mZ n n
+  else not_applicable.
 Proof.
 intros.
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
@@ -1024,29 +1026,29 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_mul_1_l := mat_mul_1_l;
      rngl_mul_add_distr_l := mat_mul_add_distr_l;
      rngl_opt_1_neq_0 := @mat_1_neq_0 n;
-     rngl_opt_mul_comm := I;
+     rngl_opt_mul_comm := NA;
      rngl_opt_mul_1_r := mat_mul_1_r;
      rngl_opt_mul_add_distr_r := mat_mul_add_distr_r;
      rngl_opt_add_opp_l := @mat_opt_add_opp_l n;
      rngl_opt_add_sub := mat_opt_add_sub n;
-     rngl_opt_mul_0_l := I;
-     rngl_opt_mul_0_r := I;
-     rngl_opt_mul_inv_l := I;
-     rngl_opt_mul_inv_r := I;
-     rngl_opt_mul_div_l := I;
-     rngl_opt_mul_div_r := I;
+     rngl_opt_mul_0_l := NA;
+     rngl_opt_mul_0_r := NA;
+     rngl_opt_mul_inv_l := NA;
+     rngl_opt_mul_inv_r := NA;
+     rngl_opt_mul_div_l := NA;
+     rngl_opt_mul_div_r := NA;
      rngl_opt_eq_dec := mat_opt_eq_dec n;
-     rngl_opt_le_dec := I;
-     rngl_opt_integral := I;
+     rngl_opt_le_dec := NA;
+     rngl_opt_integral := NA;
      rngl_characteristic_prop := @mat_characteristic_prop n;
-     rngl_opt_le_refl := I;
-     rngl_opt_le_antisymm := I;
-     rngl_opt_le_trans := I;
-     rngl_opt_add_le_compat := I;
-     rngl_opt_mul_le_compat_nonneg := I;
-     rngl_opt_mul_le_compat_nonpos := I;
-     rngl_opt_mul_le_compat := I;
-     rngl_opt_not_le := I;
+     rngl_opt_le_refl := NA;
+     rngl_opt_le_antisymm := NA;
+     rngl_opt_le_trans := NA;
+     rngl_opt_add_le_compat := NA;
+     rngl_opt_mul_le_compat_nonneg := NA;
+     rngl_opt_mul_le_compat_nonpos := NA;
+     rngl_opt_mul_le_compat := NA;
+     rngl_opt_not_le := NA;
      rngl_consistent := mat_consistent n |}.
 
 Theorem vect_opt_eq_dec :
