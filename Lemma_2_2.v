@@ -105,24 +105,6 @@ Qed.
 
 (* "We prove by induction that A_n^2 = nI" *)
 
-(*
-Theorem glop :
-  ∀ n i k i0 : nat,
-    2 ^ n ≤ i0 ≤ 2 ^ S n - 1
-    → (mat_el
-         (rew [λ m : nat, matrix m m T] two_pow_n_mul_two n in
-          mat_of_mat_list_list [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]]) i i0 *
-       mat_el
-         (rew [λ m : nat, matrix m m T] two_pow_n_mul_two n in
-          mat_of_mat_list_list [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]]) i0 k)%F = 
-  (mat_list_list_el [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]] i i0 *
-   mat_list_list_el [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]] i0 k)%F.
-Proof.
-intros.
-now destruct (two_pow_n_mul_two n).
-Show Proof.
-*)
-
 Theorem lemma_2_A_n_2_eq_n_I :
   rngl_has_opp = true →
   ∀ n, (mA n * mA n)%M = (rngl_of_nat n × mI (2 ^ n))%M.
@@ -586,7 +568,43 @@ Definition A_n_eigenvector_of_sqrt_n n μ V :=
   end.
 *)
 
+(**)
+Theorem glop :
+  ∀ n i k i0,
+  (mat_el
+         (rew [λ m : nat, matrix m m T] two_pow_n_mul_two n in
+          mat_of_mat_list_list [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]]) i i0 *
+       mat_el
+         (rew [λ m : nat, matrix m m T] two_pow_n_mul_two n in
+          mat_of_mat_list_list [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]]) i0 k)%F = 
+  (mat_list_list_el [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]] i i0 *
+   mat_list_list_el [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]] i0 k)%F.
+Proof.
+intros.
+refine (
+   let P : 2 ^ n * 2 = 2 ^ S n := two_pow_n_mul_two n in
+   rew dependent
+     [fun _ Q =>
+        (mat_el
+           (rew [λ m : nat, matrix m m T] Q in
+            mat_of_mat_list_list
+              [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]]) i i0 *
+         mat_el
+           (rew [λ m : nat, matrix m m T] Q in
+            mat_of_mat_list_list
+              [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]]) i0 k)%F =
+        (mat_list_list_el [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]] i i0 *
+         mat_list_list_el
+           [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]] i0 k)%F] P
+   in
+   eq_refl).
 (*
+destruct (two_pow_n_mul_two n).
+easy.
+*)
+Abort.
+
+(**)
 Theorem mA_diag_zero :
   rngl_has_opp = true →
   ∀ n i, i < 2 ^ n → mat_el (mA n) i i = 0%F.
@@ -594,12 +612,22 @@ Proof.
 intros Hop * Hi2n.
 revert i Hi2n.
 induction n; intros; [ easy | cbn ].
-(* désespérant... ces types dépendants, ça me rappelle les coinductifs,
-   ça ne marche jamais, ça bloque tout le temps ; fait chier *)
-...
+(* does not want to work this way:
 destruct (two_pow_n_mul_two n).
-...
 *)
+(* but work that way: *)
+refine
+  (rew dependent
+     [fun _ Q =>
+        mat_el
+          (rew [λ m : nat, matrix m m T] Q in
+              mat_of_mat_list_list
+                [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]]) i i =
+        0%F] (two_pow_n_mul_two n)
+   in _).
+cbn.
+...
+(**)
 
 Theorem An_eigen_equation_for_sqrt_n :
   rngl_is_comm = true →
