@@ -655,7 +655,7 @@ Theorem vect_mul_scal_reg_r :
   rngl_has_dec_eq = true →
   rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
   ∀ V a b,
-  V ≠ vect_zero (vect_nrows V)
+  (¬ ∀ i, i < vect_nrows V → ¬ rngl_divisor (vect_el V i))
   → (a × V = b × V)%V
   → a = b.
 Proof.
@@ -666,42 +666,14 @@ assert (Hiv : ∀ i, vect_el (a × V)%V i = vect_el (b × V)%V i). {
 }
 unfold vect_mul_scal_l in Hiv.
 cbn in Hiv.
-assert (Hn : ¬ ∀ i, i < vect_nrows V → vect_el V i = 0%F). {
-  intros H; apply Hvz.
-  apply vector_eq; [ easy | ].
-  cbn; intros * Hi.
-  now apply H.
-}
-assert (∃ i, vect_el V i ≠ 0%F). {
-  specialize rngl_opt_eq_dec as rngl_eq_dec.
-  rewrite Hde in rngl_eq_dec.
-  apply (not_forall_in_interv_imp_exist (a:=0) (b:=vect_nrows V - 1));
-    cycle 1. {
-    flia.
-  } {
-    intros Hnv.
-    apply Hn.
-    intros i Hi.
-    specialize (Hnv i).
-    assert (H : 0 ≤ i ≤ vect_nrows V - 1) by flia Hi.
-    specialize (Hnv H).
-    now destruct (rngl_eq_dec (vect_el V i) 0%F).
-  }
-  intros n.
-  unfold Decidable.decidable.
-  specialize (rngl_eq_dec (vect_el V n) 0%F) as [Hvnz| Hvnz]. {
-    now right.
-  } {
-    now left.
-  }
-}
-move Hiv at bottom.
-destruct H as (i, Hi).
-specialize (Hiv i).
-apply rngl_mul_reg_r in Hiv; [ easy | easy | ].
-Check rngl_mul_reg_r.
-...
-now apply rngl_mul_reg_r in Hiv.
+(**)
+specialize rngl_opt_eq_dec as rngl_eq_dec.
+rewrite Hde in rngl_eq_dec.
+destruct (rngl_eq_dec a b) as [Hnab| Hnab]; [ easy | exfalso ].
+apply Hvz; clear Hvz.
+intros i Hi Hdi.
+specialize (Hiv i) as H1.
+now apply rngl_mul_reg_r in H1.
 Qed.
 
 Theorem mat_mul_mul_scal_l :
@@ -1023,6 +995,18 @@ Qed.
 Definition squ_mat_opp n (M : square_matrix n) : square_matrix n :=
   exist _ (- mat_of_squ_mat M)%M (squ_mat_opp_prop M).
 
+Definition squ_mat_determ n (M : square_matrix n) :=
+  determinant (proj1_sig M).
+
+(*
+Definition squ_mat_divisor n (M : square_matrix n) := squ_mat_determ M ≠ 0%F.
+(* I first must prove that the product of determinants is the determinant
+   of the product, what is not simple.
+     Therefore, temporary version: *)
+*)
+Definition tmp_squ_mat_divisor n (M : square_matrix n) := False.
+(**)
+
 Definition phony_squ_mat_le n (MA MB : square_matrix n) := True.
 Definition phony_squ_mat_sub n (MA MB : square_matrix n) := MA.
 Definition phony_squ_mat_div n (MA MB : square_matrix n) := MA.
@@ -1039,6 +1023,7 @@ Canonical Structure squ_mat_ring_like_op n : ring_like_op (square_matrix n) :=
      rngl_opp := @squ_mat_opp n;
      rngl_inv := @phony_squ_mat_inv n;
      rngl_le := @phony_squ_mat_le n;
+     rngl_divisor := @tmp_squ_mat_divisor n;
      rngl_opt_sub := @phony_squ_mat_sub n;
      rngl_opt_div := @phony_squ_mat_div n |}.
 
@@ -1368,6 +1353,24 @@ destruct H as [H| H]. {
 }
 Qed.
 
+(*
+Theorem squ_mat_divisor_mul : ∀ n (a b : square_matrix n),
+  rngl_divisor (a * b)%F → rngl_divisor a ∧ rngl_divisor b.
+Proof.
+cbn; unfold squ_mat_divisor.
+intros * Hab.
+Search (determinant (_ * _)%M).
+(* I first must prove that the product of determinants is the determinant
+   of the product, what is not simple *)
+...
+*)
+Theorem tmp_squ_mat_divisor_mul : ∀ n (a b : square_matrix n),
+  rngl_divisor (a * b)%F → rngl_divisor a ∧ rngl_divisor b.
+Proof.
+cbn; unfold tmp_squ_mat_divisor.
+easy.
+Qed.
+
 Theorem mat_consistent : ∀ n,
   let TM := square_matrix n in
   let rom := squ_mat_ring_like_op n in
@@ -1389,6 +1392,7 @@ Definition squ_mat_ring_like_prop (n : nat) :
      rngl_mul_assoc := @squ_mat_mul_assoc n;
      rngl_mul_1_l := @squ_mat_mul_1_l n;
      rngl_mul_add_distr_l := @squ_mat_mul_add_distr_l n;
+     rngl_divisor_mul := @tmp_squ_mat_divisor_mul n;
      rngl_opt_1_neq_0 := @squ_mat_1_neq_0 n;
      rngl_opt_mul_comm := NA;
      rngl_opt_mul_1_r := @squ_mat_mul_1_r n;
@@ -1512,9 +1516,6 @@ apply Bool.andb_true_iff in Hm.
 destruct Hm as (H1, H2).
 now apply Nat.eqb_eq in H2.
 Qed.
-
-Definition squ_mat_determ n (M : square_matrix n) :=
-  determinant (proj1_sig M).
 
 (* *)
 
