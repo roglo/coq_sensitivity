@@ -7,8 +7,6 @@ Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Require Import Misc RingLike FermatLittle.
 
-Definition Nat_inversible n := n = 1.
-
 Definition phony_Nat_opp (x : nat) := 0.
 Definition phony_Nat_inv (x : nat) := 0.
 
@@ -23,7 +21,6 @@ Canonical Structure nat_ring_like_op : ring_like_op nat :=
      rngl_opp := phony_Nat_opp;
      rngl_inv := phony_Nat_inv;
      rngl_le := Nat.le;
-     rngl_inversible := Nat_inversible;
      rngl_opt_sub := Nat.sub;
      rngl_opt_div := Nat.div |}.
 
@@ -203,9 +200,6 @@ Definition Zn_div n (a b : Zn n) : Zn n :=
 Definition Zn_le n (a b : Zn n) : Prop :=
   proj1_sig a ≤ proj1_sig b.
 
-Definition Zn_inversible n (a : Zn n) :=
-  if is_prime n then proj1_sig a ≠ 0 else proj1_sig a = 1.
-
 Definition phony_Zn_sub n (a b : Zn n) := a.
 
 Canonical Structure Zn_ring_like_op n : ring_like_op (Zn n) :=
@@ -219,7 +213,6 @@ Canonical Structure Zn_ring_like_op n : ring_like_op (Zn n) :=
      rngl_opp := Zn_opp n;
      rngl_inv := Zn_inv n;
      rngl_le := Zn_le n;
-     rngl_inversible := Zn_inversible n;
      rngl_opt_sub := phony_Zn_sub n;
      rngl_opt_div := Zn_div n |}.
 
