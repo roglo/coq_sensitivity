@@ -1174,7 +1174,7 @@ split. {
   exists V.
   split; [ easy | ].
   split. 2: {
-    now apply A_n_eigen_equation_for_sqrt_n with (U := base_vector_1 42).
+    now apply An_eigen_equation_for_sqrt_n with (U := base_vector_1 42).
   }
   (* V ≠ vect_zero (2 ^ n) *)
   rewrite Hv; cbn.
