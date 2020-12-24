@@ -603,8 +603,6 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
 }
 Qed.
 
-...
-
 Theorem An_eigen_equation_for_sqrt_n :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -766,7 +764,7 @@ destruct (lt_dec i (2 ^ S n)) as [Hi2n| Hi2n]. {
       }
       rewrite rngl_add_0_r.
       (* works only if U(0) = 0, but why not? *)
-      (* on peut l'imposer, mais il faut comprendre pourquoi *)
+      (* on peut l'imposer, mais j'aimerais comprendre pourquoi *)
 ...
     rewrite (rngl_summation_split _ (i + 2 ^ S n)); [ | flia Hi2n ].
     destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
