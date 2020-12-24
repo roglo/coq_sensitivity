@@ -568,42 +568,6 @@ Definition A_n_eigenvector_of_sqrt_n n μ V :=
   end.
 *)
 
-(**)
-Theorem glop :
-  ∀ n i k i0,
-  (mat_el
-         (rew [λ m : nat, matrix m m T] two_pow_n_mul_two n in
-          mat_of_mat_list_list [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]]) i i0 *
-       mat_el
-         (rew [λ m : nat, matrix m m T] two_pow_n_mul_two n in
-          mat_of_mat_list_list [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]]) i0 k)%F = 
-  (mat_list_list_el [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]] i i0 *
-   mat_list_list_el [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]] i0 k)%F.
-Proof.
-intros.
-refine (
-   let P : 2 ^ n * 2 = 2 ^ S n := two_pow_n_mul_two n in
-   rew dependent
-     [fun _ Q =>
-        (mat_el
-           (rew [λ m : nat, matrix m m T] Q in
-            mat_of_mat_list_list
-              [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]]) i i0 *
-         mat_el
-           (rew [λ m : nat, matrix m m T] Q in
-            mat_of_mat_list_list
-              [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]]) i0 k)%F =
-        (mat_list_list_el [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]] i i0 *
-         mat_list_list_el
-           [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]] i0 k)%F] P
-   in
-   eq_refl).
-(*
-destruct (two_pow_n_mul_two n).
-easy.
-*)
-Abort.
-
 Theorem mA_diag_zero :
   rngl_has_opp = true →
   ∀ n i, i < 2 ^ n → mat_el (mA n) i i = 0%F.
@@ -640,9 +604,8 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
   apply IHn.
   cbn in Hi2n.
   flia Hi2n Hin.
+}
 Qed.
-
-...
 
 Theorem An_eigen_equation_for_sqrt_n :
   rngl_is_comm = true →
@@ -778,9 +741,40 @@ destruct (lt_dec i (2 ^ S n)) as [Hi2n| Hi2n]. {
   destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     subst j.
     rewrite rngl_mul_1_r.
-...
     rewrite HM1 at 1.
-    rewrite mA_diag_zero.
+    rewrite mA_diag_zero; [ | easy | easy ].
+    rewrite rngl_mul_0_l, rngl_add_0_r.
+    rewrite HM5.
+    cbn - [ iter_seq Nat.pow rngl_of_nat ].
+    replace (mat_el M2 i i) with 1%F. 2: {
+      rewrite HM2; cbn.
+      now destruct (Nat.eq_dec i i).
+    }
+    rewrite rngl_mul_1_r.
+    replace (mat_el M1 i i) with 0%F. 2: {
+      rewrite HM1; symmetry.
+      now apply mA_diag_zero.
+    }
+    rewrite rngl_add_0_l.
+    rewrite rngl_mul_assoc.
+    rewrite Hμ.
+    destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+      subst i.
+      rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
+        intros k Hk.
+        rewrite HM2; cbn - [ Nat.pow Nat.eq_dec ].
+        destruct (Nat.eq_dec 0 (k - 2 ^ S n)) as [H| H]; [ flia H Hk | ].
+        apply rngl_mul_0_l.
+      }
+      rewrite rngl_add_0_r.
+      (* works only if U(0) = 0, but why not? *)
+      (* on peut l'imposer, mais il faut comprendre pourquoi *)
+...
+    rewrite (rngl_summation_split _ (i + 2 ^ S n)); [ | flia Hi2n ].
+    destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+      subst i.
+...
+    rewrite rngl_summation_split_last; [ | flia Hi2n Hiz ].
 ...
     replace (mat_el M1 i i) with 0%F. 2: {
       subst M1; symmetry.
