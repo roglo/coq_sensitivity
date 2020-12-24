@@ -7,6 +7,8 @@ Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Require Import Misc RingLike FermatLittle.
 
+Definition Nat_inversible x := x ≠ 0.
+
 Definition phony_Nat_opp (x : nat) := 0.
 Definition phony_Nat_inv (x : nat) := 0.
 
@@ -21,13 +23,21 @@ Canonical Structure nat_ring_like_op : ring_like_op nat :=
      rngl_opp := phony_Nat_opp;
      rngl_inv := phony_Nat_inv;
      rngl_le := Nat.le;
+     rngl_inversible := Nat_inversible;
      rngl_opt_sub := Nat.sub;
      rngl_opt_div := Nat.div |}.
 
 Existing Instance nat_ring_like_op.
 
-Theorem Nat_eq_mul_0 : ∀ n m, n * m = 0 → n = 0 ∨ m = 0.
-Proof. now intros; apply Nat.eq_mul_0. Qed.
+Theorem Nat_integral : ∀ a b : nat,
+  rngl_inversible a → rngl_inversible b → rngl_inversible (a * b)%F.
+Proof.
+cbn; unfold Nat_inversible.
+intros * Ha Hb.
+intros H.
+apply Nat.eq_mul_0 in H.
+now destruct H.
+Qed.
 
 Theorem Nat_neq_1_0 : 1 ≠ 0.
 Proof. easy. Qed.
@@ -59,6 +69,21 @@ apply Heab.
 now apply Nat.le_antisymm; apply Nat.lt_le_incl.
 Qed.
 
+Theorem Nat_inversible_mul :
+  ∀ a b : nat,
+  rngl_inversible (a * b)%F → rngl_inversible a ∧ rngl_inversible b.
+Proof.
+cbn; unfold Nat_inversible.
+intros * Hab.
+apply Decidable.not_or.
+intros H.
+destruct H as [H| H]; [ subst a | subst b ]. {
+  now rewrite Nat.mul_0_l in Hab.
+} {
+  now rewrite Nat.mul_0_r in Hab.
+}
+Qed.
+
 Theorem Nat_consistent :
   rngl_has_inv = false ∨ rngl_has_no_inv_but_div = false.
 Proof. now left. Qed.
@@ -77,6 +102,7 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_mul_assoc := Nat.mul_assoc;
      rngl_mul_1_l := Nat.mul_1_l;
      rngl_mul_add_distr_l := Nat.mul_add_distr_l;
+     rngl_inversible_mul := Nat_inversible_mul;
      rngl_opt_1_neq_0 := Nat_neq_1_0;
      rngl_opt_mul_comm := Nat.mul_comm;
      rngl_opt_mul_1_r := NA;
@@ -91,7 +117,7 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_mul_div_r := NA;
      rngl_opt_eq_dec := Nat.eq_dec;
      rngl_opt_le_dec := le_dec;
-     rngl_opt_integral := Nat_eq_mul_0;
+     rngl_opt_integral := Nat_integral;
      rngl_characteristic_prop := nat_characteristic_prop;
      rngl_opt_le_refl := Nat.le_refl;
      rngl_opt_le_antisymm := Nat.le_antisymm;
@@ -202,6 +228,8 @@ Definition Zn_le n (a b : Zn n) : Prop :=
 
 Definition phony_Zn_sub n (a b : Zn n) := a.
 
+Definition Zn_inversible n (a : Zn n) := a ≠ Zn_of_nat n 0.
+
 Canonical Structure Zn_ring_like_op n : ring_like_op (Zn n) :=
   {| rngl_has_opp := true;
      rngl_has_inv := is_prime n;
@@ -213,6 +241,7 @@ Canonical Structure Zn_ring_like_op n : ring_like_op (Zn n) :=
      rngl_opp := Zn_opp n;
      rngl_inv := Zn_inv n;
      rngl_le := Zn_le n;
+     rngl_inversible := Zn_inversible n;
      rngl_opt_sub := phony_Zn_sub n;
      rngl_opt_div := Zn_div n |}.
 
@@ -432,6 +461,29 @@ cbn; symmetry.
 apply Nat.sub_diag.
 Qed.
 
+Theorem Zn_inversible_mul :
+  ∀ (a b : Zn n),
+  rngl_inversible (a * b)%F → rngl_inversible a ∧ rngl_inversible b.
+Proof.
+cbn; unfold Zn_inversible.
+intros * Hab.
+apply Decidable.not_or.
+intros H.
+apply Hab; clear Hab.
+apply Zn_eq; cbn - [ "mod" ].
+rewrite Nat.mod_0_l; [ | easy ].
+destruct H as [H| H]; [ subst a | subst b ]. {
+  cbn - [ "mod" ].
+  rewrite Nat.mod_0_l; [ | easy ].
+  now apply Nat.mod_0_l.
+} {
+  cbn - [ "mod" ].
+  rewrite Nat.mod_0_l; [ | easy ].
+  rewrite Nat.mul_0_r.
+  now apply Nat.mod_0_l.
+}
+Qed.
+
 Theorem Zn_consistent :
   rngl_has_inv = false ∨ rngl_has_no_inv_but_div = false.
 Proof. now right. Qed.
@@ -450,6 +502,7 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_mul_assoc := Zn_mul_assoc;
      rngl_mul_1_l := Zn_mul_1_l;
      rngl_mul_add_distr_l := Zn_mul_add_distr_l;
+     rngl_inversible_mul := Zn_inversible_mul;
      rngl_opt_1_neq_0 := Zn_neq_1_0;
      rngl_opt_mul_comm := Zn_mul_comm;
      rngl_opt_mul_1_r := NA;

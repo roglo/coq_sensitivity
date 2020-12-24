@@ -30,7 +30,7 @@ Canonical Structure Z_ring_like_op : ring_like_op Z :=
 
 Existing Instance Z_ring_like_op.
 
-Theorem Z_opt_integral : ∀ a b : Z,
+Theorem Z_integral : ∀ a b : Z,
   rngl_inversible a → rngl_inversible b → rngl_inversible (a * b)%F.
 Proof.
 cbn; unfold Z_inversible.
@@ -93,6 +93,20 @@ apply Heab.
 now apply Z.le_antisymm; apply Z.lt_le_incl.
 Qed.
 
+Theorem Z_inversible_mul :
+  ∀ a b : Z, rngl_inversible (a * b)%F → rngl_inversible a ∧ rngl_inversible b.
+Proof.
+cbn; unfold Z_inversible.
+intros * Hab.
+apply Decidable.not_or.
+intros H.
+destruct H as [H| H]; [ subst a | subst b ]. {
+  now rewrite Z.mul_0_l in Hab.
+} {
+  now rewrite Z.mul_0_r in Hab.
+}
+Qed.
+
 Theorem Z_consistent :
   rngl_has_inv = false ∨ rngl_has_no_inv_but_div = false.
 Proof. now left. Qed.
@@ -126,7 +140,7 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_opt_mul_div_r := NA;
      rngl_opt_eq_dec := Z.eq_dec;
      rngl_opt_le_dec := Z_le_dec;
-     rngl_opt_integral := Z_opt_integral;
+     rngl_opt_integral := Z_integral;
      rngl_characteristic_prop := Z_characteristic_prop;
      rngl_opt_le_refl := Z.le_refl;
      rngl_opt_le_antisymm := Z.le_antisymm;

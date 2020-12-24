@@ -48,6 +48,10 @@
 
 Require Import Utf8.
 
+... change the names with "inversible": the notion I want to express
+    is that we can divide with it. E.g. in ℕ, we can divide by 2, but
+    not by 0
+
 Class ring_like_op T :=
   { rngl_has_opp : bool;
     rngl_has_inv : bool;
