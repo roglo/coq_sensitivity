@@ -581,12 +581,8 @@ destruct (two_pow_n_mul_two n).
 (* but works that way: *)
 refine
   (rew dependent
-     [fun _ Q =>
-        mat_el
-          (rew [λ m : nat, matrix m m T] Q in
-              mat_of_mat_list_list
-                [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]]) i i =
-        0%F] (two_pow_n_mul_two n)
+     [fun _ Q => mat_el (rew [λ m : nat, matrix m m T] Q in _) i i = 0%F]
+     (two_pow_n_mul_two n)
    in _).
 cbn.
 unfold mat_list_list_el.
@@ -606,6 +602,8 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
   flia Hi2n Hin.
 }
 Qed.
+
+...
 
 Theorem An_eigen_equation_for_sqrt_n :
   rngl_is_comm = true →
