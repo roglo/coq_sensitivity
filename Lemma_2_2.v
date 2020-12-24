@@ -604,7 +604,6 @@ easy.
 *)
 Abort.
 
-(**)
 Theorem mA_diag_zero :
   rngl_has_opp = true →
   ∀ n i, i < 2 ^ n → mat_el (mA n) i i = 0%F.
@@ -612,10 +611,10 @@ Proof.
 intros Hop * Hi2n.
 revert i Hi2n.
 induction n; intros; [ easy | cbn ].
-(* does not want to work this way:
+(* destructions does not work this way (typing error):
 destruct (two_pow_n_mul_two n).
 *)
-(* but work that way: *)
+(* but works that way: *)
 refine
   (rew dependent
      [fun _ Q =>
@@ -626,8 +625,24 @@ refine
         0%F] (two_pow_n_mul_two n)
    in _).
 cbn.
+unfold mat_list_list_el.
+destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
+  rewrite (Nat.div_small i); [ | easy ].
+  rewrite (Nat.mod_small i); [ | easy ].
+  now apply IHn.
+} {
+  apply Nat.nlt_ge in Hin.
+  rewrite (Nat_div_less_small 1); [ | now rewrite Nat.mul_1_l ].
+  rewrite (Nat_mod_less_small 1); [ | now rewrite Nat.mul_1_l ].
+  cbn; rewrite Nat.add_0_r.
+  rewrite <- rngl_opp_involutive; [ | easy ].
+  rewrite rngl_opp_0; [ f_equal | easy ].
+  apply IHn.
+  cbn in Hi2n.
+  flia Hi2n Hin.
+Qed.
+
 ...
-(**)
 
 Theorem An_eigen_equation_for_sqrt_n :
   rngl_is_comm = true →
