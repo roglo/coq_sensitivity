@@ -17,7 +17,9 @@ Set Implicit Arguments.
 
 Require Import Utf8 Arith.
 Import List List.ListNotations.
+(*
 Import EqNotations.
+*)
 
 Require Import Misc RingLike Matrix.
 Require Import RLsummation.
@@ -72,11 +74,28 @@ Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
   match n with
   | 0 => mZ 1 1
   | S n' =>
+      eq_rect _ (λ m, matrix m m T)
+        (mat_of_mat_list_list
+           [[mA n'; mI (2 ^ n')];
+            [mI (2 ^ n'); (- mA n')%M]])
+        _ (two_pow_n_mul_two n')
+  end.
+
+(*
+Import EqNotations.
+
+Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
+  match n with
+  | 0 => mZ 1 1
+  | S n' =>
       rew [λ m, matrix m m T] two_pow_n_mul_two n' in
       mat_of_mat_list_list
         [[mA n'; mI (2 ^ n')];
          [mI (2 ^ n'); (- mA n')%M]]
   end.
+*)
+
+...
 
 (* *)
 
