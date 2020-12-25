@@ -583,18 +583,17 @@ Definition A_Sn_eigenvector_of_sqrt_Sn n μ (V : vector (2 ^ n) T) :
     vector (2 ^ S n) T :=
   (mat_of_list_list_1_row_2_col (mA n + μ × mI (2 ^ n))%M (mI (2 ^ n)) • V)%V.
 
-Definition mA_diag_zero_refine n M1 M2 ML i j v r :=
+Check mat_of_mat_list_list.
+
+Definition elim_2_pow_n_mul_2_in_m_of_mll_2_l n M i j v r :=
   match two_pow_n_mul_two n as Q in (_ = m) return
-    mat_el
-      (eq_rect (2 ^ n * 2) (λ m : nat, matrix m m T)
-         (mat_of_mat_list_list [[M1; M2]; ML]) m Q) i j = v
+    mat_el (eq_rect (2 ^ n * 2) (λ m : nat, matrix m m T) M m Q) i j = v i j
   with
   | eq_refl => r
   end :
     mat_el
-      (eq_rect (2 ^ n * 2) (λ m : nat, matrix m m T)
-         (mat_of_mat_list_list [[M1; M2]; ML]) 
-         (2 ^ S n) (two_pow_n_mul_two n)) i j = v.
+      (eq_rect (2 ^ n * 2) (λ m : nat, matrix m m T) M
+         (2 ^ S n) (two_pow_n_mul_two n)) i j = v i j.
 
 Theorem mA_diag_zero :
   rngl_has_opp = true →
@@ -603,8 +602,7 @@ Proof.
 intros Hop * Hi2n.
 revert i Hi2n.
 induction n; intros; [ easy | cbn ].
-apply mA_diag_zero_refine.
-cbn.
+etransitivity; [ now apply elim_2_pow_n_mul_2_in_m_of_mll_2_l | cbn ].
 unfold mat_list_list_el.
 destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
   rewrite (Nat.div_small i); [ | easy ].
@@ -621,6 +619,12 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
   cbn in Hi2n.
   flia Hi2n Hin.
 }
+Qed.
+
+Theorem rngl_mul_eq_if : ∀ a b c d, a = c → b = d → (a * b = c * d)%F.
+Proof.
+intros * Hac Hbd.
+now subst a b.
 Qed.
 
 Theorem An_eigen_equation_for_sqrt_n :
@@ -664,23 +668,6 @@ remember (mI (2 ^ n)) as M2 eqn:HM2.
 remember (M1 + μ × M2)%M as M5 eqn:HM5.
 move M2 before M1; move M5 before M2.
 f_equal.
-(*
-remember (mat_of_mat_list_list [[M1; M2]; [M2; (- M1)%M]]) as MA eqn:HMA.
-remember (mat_of_list_list_1_row_2_col _ _) as MB eqn:HMB.
-cbn in MA.
-remember
-  (@mat_mul T ro
-       (Nat.add (Nat.pow (S (S O)) n) (Nat.add (Nat.pow (S (S O)) n) O))
-       (Nat.add (Nat.pow (S (S O)) n) (Nat.add (Nat.pow (S (S O)) n) O))
-       (Nat.pow (S (S O)) n)
-       (@eq_rect nat (Init.Nat.mul (Nat.pow (S (S O)) n) (S (S O)))
-          (fun m : nat => matrix m m T) MA
-          (Nat.add (Nat.pow (S (S O)) n) (Nat.add (Nat.pow (S (S O)) n) O))
-          (two_pow_n_mul_two n)) MB) as MC eqn:HMC.
-move MB before MA.
-move MC before MB.
-cbn in MB.
-*)
 apply matrix_eq.
 intros * Hi Hj.
 remember (mat_of_mat_list_list [[M1; M2]; [M2; (- M1)%M]]) as MA eqn:HMA.
@@ -688,7 +675,13 @@ remember (mat_of_list_list_1_row_2_col _ _) as MB eqn:HMB.
 move MB before MA.
 cbn - [ Nat.pow ] in MA.
 rewrite HMA.
-Check mA_diag_zero_refine.
+cbn - [ iter_seq Nat.pow ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  apply rngl_mul_eq_if ; [ | reflexivity ].
+  now apply elim_2_pow_n_mul_2_in_m_of_mll_2_l.
+}
+cbn - [ iter_seq Nat.pow ].
 ...
 Import EqNotations.
 refine
