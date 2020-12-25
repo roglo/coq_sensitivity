@@ -617,7 +617,120 @@ Theorem An_eigen_equation_for_sqrt_n :
       → (mA (S n') • V = μ × V)%V
   end.
 Proof.
-(* restart from "master" version" *)
+intros Hic Hro Hin Hde * Hμ.
+destruct n. {
+  intros V.
+  cbn in Hμ, V |-*.
+  apply vector_eq.
+  intros i Hi; cbn in Hi |-*.
+  apply Nat.lt_1_r in Hi; subst i.
+  rewrite rngl_mul_0_l, rngl_add_0_l.
+  specialize rngl_integral as H.
+  rewrite Hin in H; cbn in H.
+  rewrite Hde in H.
+  rewrite Bool.orb_true_r in H.
+  apply (H eq_refl) in Hμ.
+  symmetry.
+  destruct Hμ; subst μ; apply rngl_mul_0_l.
+}
+intros * HV.
+subst V.
+unfold A_Sn_eigenvector_of_sqrt_Sn.
+rewrite mat_vect_mul_assoc.
+rewrite mat_mul_scal_vect_assoc.
+f_equal.
+unfold mat_of_list_list_1_row_2_col.
+destruct (Nat.mul_1_r (2 ^ n)).
+cbn.
+...
+destruct (two_pow_n_mul_two n).
+apply matrix_eq.
+intros * Hi Hj.
+cbn - [ iter_seq ].
+...
+destruct (two_pow_n_mul_two n).
+unfold mat_of_mat_list_list.
+refine
+  (rew dependent
+     [fun _ Q => mat_el (rew [λ m : nat, matrix m m T] Q in _) i j = _]
+     (two_pow_n_mul_two n)
+   in _).
+
+destruct (two_pow_n_mul_two n).
+..
+cbn - [ iter_seq ].
+...
+unfold mat_of_list_list_1_row_2_col.
+...
+destruct (two_pow_n_mul_two n).
+...
+refine
+  (rew dependent
+     [fun _ Q => mat_el (rew [λ m : nat, matrix m m T] Q in _) i j = 0%F]
+     (two_pow_n_mul_two n)
+   in _).
+...
+destruct (two_pow_n_mul_two n).
+cbn - [ iter_seq Nat.pow ].
+remember (mA n) as M1 eqn:HM1.
+remember (mI (2 ^ n)) as M2 eqn:HM2.
+remember (M1 + μ × M2)%M as M5 eqn:HM5.
+move M2 before M1; move M5 before M2.
+apply vector_eq.
+...
+destruct (two_pow_n_mul_two n).
+...
+rewrite m_o_mll_2x2_2x1; [ | easy | | | easy | easy ]; cycle 1. {
+  apply mA_ncols.
+} {
+  apply mA_ncols.
+}
+rewrite mat_mul_add_distr_l; [ | easy ].
+rewrite lemma_2_A_n_2_eq_n_I; [ | easy ].
+rewrite mat_mul_add_distr_l; [ | easy ].
+rewrite mat_mul_1_l; [ | easy | easy ].
+rewrite mat_mul_1_l; [ | easy | now rewrite mA_ncols ].
+rewrite mat_mul_1_l; [ | easy | easy ].
+rewrite mat_mul_1_r; [ | easy | now cbn; rewrite mA_nrows ].
+rewrite (mat_add_add_swap (mA n)).
+rewrite mat_fold_sub.
+rewrite mat_add_opp_r with (n0 := 2 ^ n); [ | easy | easy | ]. 2: {
+  symmetry; apply mA_nrows.
+}
+rewrite mA_nrows.
+rewrite mat_add_0_l; [ | easy | | easy ]. 2: {
+  now apply mat_mul_scal_l_is_square.
+}
+rewrite mat_add_add_swap; [ | easy ].
+remember (mI (2 ^ n)) as x eqn:Hx in |-*.
+remember (rngl_of_nat n × x + x)%M as y eqn:Hy.
+rewrite Hx in Hy at 1.
+replace x with (1%F × x)%M in Hy. 2: {
+  apply matrix_eq; [ easy | easy | ].
+  intros * Hi Hj.
+  apply rngl_mul_1_l.
+}
+subst x.
+rewrite <- mat_mul_scal_l_add_distr_r in Hy; [ | easy ].
+replace (rngl_of_nat n + 1)%F with (rngl_of_nat (S n)) in Hy. 2: {
+  clear HV Hμ Hasm Hy; cbn.
+  induction n; cbn. {
+    now rewrite rngl_add_0_l, rngl_add_0_r.
+  }
+  rewrite IHn, rngl_add_assoc; f_equal.
+  apply IHn.
+}
+subst y.
+rewrite <- Hμ.
+rewrite <- mat_mul_scal_l_mul_assoc; [ | easy ].
+rewrite mat_mul_mul_scal_l; [ | easy ].
+rewrite <- mat_mul_scal_add_distr_l; [ | easy ].
+rewrite m_o_mll_2x1_mul_scal_l.
+rewrite mat_mul_scal_vect_assoc.
+rewrite mat_mul_1_r; [ | easy | now rewrite mA_nrows ].
+rewrite mat_add_comm; [ easy | easy | easy | easy | cbn ].
+now rewrite mA_ncols.
+Qed.
 ...
 intros Hic Hro Hin Hde * Hμ.
 destruct n. {
