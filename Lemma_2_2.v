@@ -583,31 +583,19 @@ Definition A_Sn_eigenvector_of_sqrt_Sn n μ (V : vector (2 ^ n) T) :
     vector (2 ^ S n) T :=
   (mat_of_list_list_1_row_2_col (mA n + μ × mI (2 ^ n))%M (mI (2 ^ n)) • V)%V.
 
-(*
-Definition pre_matrix_of_A_Sn_eigenvector_of_sqr_Sn n μ :
-    matrix (2 ^ S n) (2 ^ n) T :=
-  rew [λ m, matrix (2 ^ S n) m T] Nat.mul_1_r (2 ^ n) in
-  rew [λ m, matrix m (2 ^ n * 1) T] two_pow_n_mul_two n in
-  mat_of_mat_list_list [[(mA n + μ × mI (2 ^ n))%M]; [mI (2 ^ n)]].
-
-Definition A_Sn_eigenvector_of_sqrt_Sn n μ (V : vector (2 ^ n) T) :
-    vector (2 ^ S n) T :=
-  (pre_matrix_of_A_Sn_eigenvector_of_sqr_Sn n μ • V)%V.
-*)
-
-(*
-Definition base_vector_1 dim :=
-  mk_vect dim (λ i, match i with 0 => 1%F | _ => 0%F end).
-
-Definition A_n_eigenvector_of_sqrt_n n μ V :=
-  match n with
-  | 0 => base_vector_1 1
-  | S n' =>
-       mat_of_mat_list_list
-         [[(mA n' + μ × mI (2 ^ n'))%M]; [mI (2 ^ n')]]
-       • V)%V
-  end.
-*)
+Definition mA_diag_zero_refine n M1 M2 ML i r :=
+  match two_pow_n_mul_two n as Q in (_ = m) return
+    mat_el
+      (eq_rect (2 ^ n * 2) (λ m : nat, matrix m m T)
+         (mat_of_mat_list_list [[M1; M2]; ML]) m Q)
+      i i = 0%F
+  with
+  | eq_refl => r
+  end :
+    mat_el
+      (eq_rect (2 ^ n * 2) (λ m : nat, matrix m m T)
+         (mat_of_mat_list_list [[M1; M2]; ML]) 
+         (2 ^ S n) (two_pow_n_mul_two n)) i i = 0%F.
 
 Theorem mA_diag_zero :
   rngl_has_opp = true →
@@ -616,49 +604,7 @@ Proof.
 intros Hop * Hi2n.
 revert i Hi2n.
 induction n; intros; [ easy | cbn ].
-(* destructions does not work this way (typing error):
-destruct (two_pow_n_mul_two n).
-*)
-(* but works that way: *)
-(*
-remember
-  (λ M1 M2 ML i j a goal,
-   rew dependent
-     [fun _ Q =>
-      mat_el
-        (rew [λ m : nat, matrix m m T] Q in
-         mat_of_mat_list_list [[M1; M2]; ML])
-        i j = a]
-     (two_pow_n_mul_two n)
-   in goal) as f eqn:Hf.
-refine (f _ _ _ i i 0%F _).
-*)
-(*
-"'rew' 'dependent' [ 'fun' y p => P ] H 'in' H'" := 
-match H as p in (eq _ y) return P with
-| eq_refl => H'
-end (default interpretation)
-*)
-unfold eq_rect.
-...
-remember
-  ((eq_rect (2 ^ n * 2) (λ m : nat, matrix m m T)
-      (mat_of_mat_list_list [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]])
-      (2 ^ n + (2 ^ n + 0)) (two_pow_n_mul_two n))) as M eqn:HM.
-unfold eq_rect in HM.
-...
-refine
-  (match two_pow_n_mul_two n as Q in (_ = _)
-   return mat_el (rew [λ m : nat, matrix m m T] Q in _) i i = _ with
-   | eq_refl => _
-   end).
-(*
-refine
-  (rew dependent
-     [fun _ Q => mat_el (rew [λ m : nat, matrix m m T] Q in _) i i = _]
-     (two_pow_n_mul_two n)
-   in _).
-*)
+apply mA_diag_zero_refine.
 cbn.
 unfold mat_list_list_el.
 destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
@@ -677,6 +623,8 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
   flia Hi2n Hin.
 }
 Qed.
+
+...
 
 Theorem An_eigen_equation_for_sqrt_n :
   rngl_is_comm = true →
@@ -744,18 +692,8 @@ move MB before MA.
 cbn in MA.
 Check eq_rect.
 Check (@eq_rect _ (λ m, matrix m m T)).
-Check
-  (match two_pow_n_mul_two n as Q in (_ = Q)
-   return mat_el (rew [λ m : nat, matrix m m T] Q in _) i j = mat_el (μ × MB) i j with
-   | eq_refl => eq_refl
-   end).
 ...
-      eq_rect _ (λ m, matrix m m T)
-        (mat_of_mat_list_list
-           [[mA n'; mI (2 ^ n')];
-            [mI (2 ^ n'); (- mA n')%M]])
-        _ (two_pow_n_mul_two n')
-...
+Import EqNotations.
 refine
   (rew dependent
      [fun _ Q => mat_el (rew [λ m : nat, matrix m m T] Q in
