@@ -555,6 +555,21 @@ intros.
 now rewrite Nat.mul_comm.
 Qed.
 
+(*
+Import EqNotations.
+Locate "rew".
+"'rew' [ P ] H 'in' H'" := eq_rect _ P H' _ H (default interpretation)
+*)
+
+Definition mat_of_list_list_1_row_2_col {n} (A B : matrix (2 ^ n) (2 ^ n) T) :
+    matrix (2 ^ S n) (2 ^ n) T :=
+  eq_rect _ (λ m, matrix (2 ^ S n) m T)
+    (eq_rect _ (λ m, matrix m (2 ^ n * 1) T)
+       (mat_of_mat_list_list [[A]; [B]]) _
+       (two_pow_n_mul_two n)) _
+    (Nat.mul_1_r (2 ^ n)).
+
+(*
 Import EqNotations.
 
 Definition mat_of_list_list_1_row_2_col {n} (A B : matrix (2 ^ n) (2 ^ n) T) :
@@ -562,6 +577,7 @@ Definition mat_of_list_list_1_row_2_col {n} (A B : matrix (2 ^ n) (2 ^ n) T) :
   rew [λ m, matrix (2 ^ S n) m T] Nat.mul_1_r (2 ^ n) in
   rew [λ m, matrix m (2 ^ n * 1) T] two_pow_n_mul_two' n in
   mat_of_mat_list_list [[A]; [B]].
+*)
 
 Definition A_Sn_eigenvector_of_sqrt_Sn n μ (V : vector (2 ^ n) T) :
     vector (2 ^ S n) T :=
@@ -623,6 +639,14 @@ match H as p in (eq _ y) return P with
 | eq_refl => H'
 end (default interpretation)
 *)
+unfold eq_rect.
+...
+remember
+  ((eq_rect (2 ^ n * 2) (λ m : nat, matrix m m T)
+      (mat_of_mat_list_list [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]])
+      (2 ^ n + (2 ^ n + 0)) (two_pow_n_mul_two n))) as M eqn:HM.
+unfold eq_rect in HM.
+...
 refine
   (match two_pow_n_mul_two n as Q in (_ = _)
    return mat_el (rew [λ m : nat, matrix m m T] Q in _) i i = _ with
@@ -720,9 +744,9 @@ move MB before MA.
 cbn in MA.
 Check eq_rect.
 Check (@eq_rect _ (λ m, matrix m m T)).
-refine
-  (match two_pow_n_mul_two n as Q in (_ = _)
-   return mat_el (rew [λ m : nat, matrix m m T] Q in _) i j = _ with
+Check
+  (match two_pow_n_mul_two n as Q in (_ = Q)
+   return mat_el (rew [λ m : nat, matrix m m T] Q in _) i j = mat_el (μ × MB) i j with
    | eq_refl => eq_refl
    end).
 ...
