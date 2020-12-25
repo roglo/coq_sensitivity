@@ -670,18 +670,17 @@ move M2 before M1; move M5 before M2.
 f_equal.
 apply matrix_eq.
 intros * Hi Hj.
+cbn - [ iter_seq Nat.pow ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  apply rngl_mul_eq_if; [ | reflexivity ].
+  now apply elim_2_pow_n_mul_2_in_m_of_mll_2_l.
+}
+cbn - [ iter_seq Nat.pow mat_of_mat_list_list ].
 remember (mat_of_mat_list_list [[M1; M2]; [M2; (- M1)%M]]) as MA eqn:HMA.
 remember (mat_of_list_list_1_row_2_col _ _) as MB eqn:HMB.
 move MB before MA.
 cbn - [ Nat.pow ] in MA.
-rewrite HMA.
-cbn - [ iter_seq Nat.pow ].
-erewrite rngl_summation_eq_compat. 2: {
-  intros k Hk.
-  apply rngl_mul_eq_if ; [ | reflexivity ].
-  now apply elim_2_pow_n_mul_2_in_m_of_mll_2_l.
-}
-cbn - [ iter_seq Nat.pow ].
 ...
 Import EqNotations.
 refine
