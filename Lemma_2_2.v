@@ -532,10 +532,16 @@ destruct (lt_dec i (mat_nrows MA)) as [Hia| Hia]. {
 Qed.
 *)
 
+Theorem two_pow_n_mul_two' : ∀ n, 2 ^ n * 2 = 2 ^ S n.
+Proof.
+intros.
+now rewrite Nat.mul_comm.
+Qed.
+
 Definition mat_of_list_list_1_row_2_col {n} (A B : matrix (2 ^ n) (2 ^ n) T) :
     matrix (2 ^ S n) (2 ^ n) T :=
   rew [λ m, matrix (2 ^ S n) m T] Nat.mul_1_r (2 ^ n) in
-  rew [λ m, matrix m (2 ^ n * 1) T] two_pow_n_mul_two n in
+  rew [λ m, matrix m (2 ^ n * 1) T] two_pow_n_mul_two' n in
   mat_of_mat_list_list [[A]; [B]].
 
 Definition A_Sn_eigenvector_of_sqrt_Sn n μ (V : vector (2 ^ n) T) :
@@ -581,7 +587,7 @@ destruct (two_pow_n_mul_two n).
 (* but works that way: *)
 refine
   (rew dependent
-     [fun _ Q => mat_el (rew [λ m : nat, matrix m m T] Q in _) i i = 0%F]
+     [fun _ Q => mat_el (rew [λ m : nat, matrix m m T] Q in _) i i = _]
      (two_pow_n_mul_two n)
    in _).
 cbn.
@@ -638,27 +644,38 @@ subst V.
 unfold A_Sn_eigenvector_of_sqrt_Sn.
 rewrite mat_vect_mul_assoc.
 rewrite mat_mul_scal_vect_assoc.
-f_equal.
-unfold mat_of_list_list_1_row_2_col.
-destruct (Nat.mul_1_r (2 ^ n)).
 cbn.
-...
-destruct (two_pow_n_mul_two n).
+remember (mA n) as M1 eqn:HM1.
+remember (mI (2 ^ n)) as M2 eqn:HM2.
+remember (M1 + μ × M2)%M as M5 eqn:HM5.
+move M2 before M1; move M5 before M2.
+f_equal.
 apply matrix_eq.
 intros * Hi Hj.
-cbn - [ iter_seq ].
+Print mat_of_list_list_1_row_2_col.
+...
+destruct (Nat.mul_1_r (2 ^ n)).
+...
+destruct (two_pow_n_mul_two' n).
+destruct (two_pow_n_mul_two n).
 ...
 destruct (two_pow_n_mul_two n).
-unfold mat_of_mat_list_list.
-refine
-  (rew dependent
-     [fun _ Q => mat_el (rew [λ m : nat, matrix m m T] Q in _) i j = _]
-     (two_pow_n_mul_two n)
-   in _).
-
-destruct (two_pow_n_mul_two n).
-..
+destruct (Nat.mul_1_r (2 ^ n)).
+destruct (two_pow_n_mul_two' n).
+apply vector_eq.
+intros * Hi.
 cbn - [ iter_seq ].
+apply rngl_summation_eq_compat.
+intros j Hj.
+destruct (Nat.mul_1_r (2 ^ n)).
+cbn - [ iter_seq ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+Search (mat_of_mat_list_list).
+...
+  unfold mat_of_mat_list_list.
+  unfold mat_list_list_el.
+  cbn.
 ...
 unfold mat_of_list_list_1_row_2_col.
 ...
