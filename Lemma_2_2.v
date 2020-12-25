@@ -585,21 +585,24 @@ induction n; intros; [ easy | cbn ].
 destruct (two_pow_n_mul_two n).
 *)
 (* but works that way: *)
+(*
+remember
+  (λ M1 M2 ML i j a goal,
+   rew dependent
+     [fun _ Q =>
+      mat_el
+        (rew [λ m : nat, matrix m m T] Q in
+         mat_of_mat_list_list [[M1; M2]; ML])
+        i j = a]
+     (two_pow_n_mul_two n)
+   in goal) as f eqn:Hf.
+refine (f _ _ _ i i 0%F _).
+*)
 refine
   (rew dependent
      [fun _ Q => mat_el (rew [λ m : nat, matrix m m T] Q in _) i i = _]
      (two_pow_n_mul_two n)
    in _).
-(*
-refine
-  (rew dependent
-     [fun _ Q => mat_el (rew [λ m : nat, matrix m m T] Q in
-      mat_of_mat_list_list [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]])
-        i i =
-      0%F]
-     (two_pow_n_mul_two n)
-   in _).
-*)
 cbn.
 unfold mat_list_list_el.
 destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
@@ -683,11 +686,10 @@ remember (mat_of_mat_list_list [[M1; M2]; [M2; (- M1)%M]]) as MA eqn:HMA.
 remember (mat_of_list_list_1_row_2_col _ _) as MB eqn:HMB.
 move MB before MA.
 cbn in MA.
-...
-refine
+Check
   (rew dependent
-     [fun _ Q => mat_el (rew [λ m : nat, matrix m m T] Q in
-      MA * MB
+     [fun _ Q => mat_el (rew [λ m : nat, matrix (2 ^ S n) m T] Q in
+      _
      )%M i j = _]
      (two_pow_n_mul_two n)
    in _).
