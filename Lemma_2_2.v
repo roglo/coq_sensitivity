@@ -583,19 +583,18 @@ Definition A_Sn_eigenvector_of_sqrt_Sn n μ (V : vector (2 ^ n) T) :
     vector (2 ^ S n) T :=
   (mat_of_list_list_1_row_2_col (mA n + μ × mI (2 ^ n))%M (mI (2 ^ n)) • V)%V.
 
-Definition mA_diag_zero_refine n M1 M2 ML i r :=
+Definition mA_diag_zero_refine n M1 M2 ML i j v r :=
   match two_pow_n_mul_two n as Q in (_ = m) return
     mat_el
       (eq_rect (2 ^ n * 2) (λ m : nat, matrix m m T)
-         (mat_of_mat_list_list [[M1; M2]; ML]) m Q)
-      i i = 0%F
+         (mat_of_mat_list_list [[M1; M2]; ML]) m Q) i j = v
   with
   | eq_refl => r
   end :
     mat_el
       (eq_rect (2 ^ n * 2) (λ m : nat, matrix m m T)
          (mat_of_mat_list_list [[M1; M2]; ML]) 
-         (2 ^ S n) (two_pow_n_mul_two n)) i i = 0%F.
+         (2 ^ S n) (two_pow_n_mul_two n)) i j = v.
 
 Theorem mA_diag_zero :
   rngl_has_opp = true →
@@ -623,8 +622,6 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
   flia Hi2n Hin.
 }
 Qed.
-
-...
 
 Theorem An_eigen_equation_for_sqrt_n :
   rngl_is_comm = true →
@@ -661,7 +658,7 @@ subst V.
 unfold A_Sn_eigenvector_of_sqrt_Sn.
 rewrite mat_vect_mul_assoc.
 rewrite mat_mul_scal_vect_assoc.
-cbn.
+cbn - [ Nat.pow ].
 remember (mA n) as M1 eqn:HM1.
 remember (mI (2 ^ n)) as M2 eqn:HM2.
 remember (M1 + μ × M2)%M as M5 eqn:HM5.
@@ -689,9 +686,9 @@ intros * Hi Hj.
 remember (mat_of_mat_list_list [[M1; M2]; [M2; (- M1)%M]]) as MA eqn:HMA.
 remember (mat_of_list_list_1_row_2_col _ _) as MB eqn:HMB.
 move MB before MA.
-cbn in MA.
-Check eq_rect.
-Check (@eq_rect _ (λ m, matrix m m T)).
+cbn - [ Nat.pow ] in MA.
+rewrite HMA.
+Check mA_diag_zero_refine.
 ...
 Import EqNotations.
 refine
