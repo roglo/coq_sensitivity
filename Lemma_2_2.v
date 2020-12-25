@@ -95,8 +95,6 @@ Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
   end.
 *)
 
-...
-
 (* *)
 
 (*
@@ -557,6 +555,8 @@ intros.
 now rewrite Nat.mul_comm.
 Qed.
 
+Import EqNotations.
+
 Definition mat_of_list_list_1_row_2_col {n} (A B : matrix (2 ^ n) (2 ^ n) T) :
     matrix (2 ^ S n) (2 ^ n) T :=
   rew [λ m, matrix (2 ^ S n) m T] Nat.mul_1_r (2 ^ n) in
@@ -617,11 +617,24 @@ remember
    in goal) as f eqn:Hf.
 refine (f _ _ _ i i 0%F _).
 *)
+(*
+"'rew' 'dependent' [ 'fun' y p => P ] H 'in' H'" := 
+match H as p in (eq _ y) return P with
+| eq_refl => H'
+end (default interpretation)
+*)
+refine
+  (match two_pow_n_mul_two n as Q in (_ = _)
+   return mat_el (rew [λ m : nat, matrix m m T] Q in _) i i = _ with
+   | eq_refl => _
+   end).
+(*
 refine
   (rew dependent
      [fun _ Q => mat_el (rew [λ m : nat, matrix m m T] Q in _) i i = _]
      (two_pow_n_mul_two n)
    in _).
+*)
 cbn.
 unfold mat_list_list_el.
 destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
@@ -705,13 +718,19 @@ remember (mat_of_mat_list_list [[M1; M2]; [M2; (- M1)%M]]) as MA eqn:HMA.
 remember (mat_of_list_list_1_row_2_col _ _) as MB eqn:HMB.
 move MB before MA.
 cbn in MA.
-Check
-  (rew dependent
-     [fun _ Q => mat_el (rew [λ m : nat, matrix (2 ^ S n) m T] Q in
-      _
-     )%M i j = _]
-     (two_pow_n_mul_two n)
-   in _).
+Check eq_rect.
+Check (@eq_rect _ (λ m, matrix m m T)).
+refine
+  (match two_pow_n_mul_two n as Q in (_ = _)
+   return mat_el (rew [λ m : nat, matrix m m T] Q in _) i j = _ with
+   | eq_refl => eq_refl
+   end).
+...
+      eq_rect _ (λ m, matrix m m T)
+        (mat_of_mat_list_list
+           [[mA n'; mI (2 ^ n')];
+            [mI (2 ^ n'); (- mA n')%M]])
+        _ (two_pow_n_mul_two n')
 ...
 refine
   (rew dependent
