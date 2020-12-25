@@ -656,13 +656,7 @@ remember (mat_of_mat_list_list [[M1; M2]; [M2; (- M1)%M]]) as MA eqn:HMA.
 remember (mat_of_list_list_1_row_2_col _ _) as MB eqn:HMB.
 move MB before MA.
 cbn in MA.
-...
-refine
-  (rew dependent
-     [fun _ Q => mat_el (rew [λ m : nat, matrix m m T] Q in _ * _) i j =
-      mat_el (μ × MB) i j]
-     (two_pow_n_mul_two n)
-   in _).
+cbn - [ iter_seq ].
 ...
 Print mat_of_list_list_1_row_2_col.
 destruct (Nat.mul_1_r (2 ^ n)).
