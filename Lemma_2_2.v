@@ -590,6 +590,16 @@ refine
      [fun _ Q => mat_el (rew [λ m : nat, matrix m m T] Q in _) i i = _]
      (two_pow_n_mul_two n)
    in _).
+(*
+refine
+  (rew dependent
+     [fun _ Q => mat_el (rew [λ m : nat, matrix m m T] Q in
+      mat_of_mat_list_list [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]])
+        i i =
+      0%F]
+     (two_pow_n_mul_two n)
+   in _).
+*)
 cbn.
 unfold mat_list_list_el.
 destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
@@ -650,12 +660,47 @@ remember (mI (2 ^ n)) as M2 eqn:HM2.
 remember (M1 + μ × M2)%M as M5 eqn:HM5.
 move M2 before M1; move M5 before M2.
 f_equal.
+(*
+remember (mat_of_mat_list_list [[M1; M2]; [M2; (- M1)%M]]) as MA eqn:HMA.
+remember (mat_of_list_list_1_row_2_col _ _) as MB eqn:HMB.
+cbn in MA.
+remember
+  (@mat_mul T ro
+       (Nat.add (Nat.pow (S (S O)) n) (Nat.add (Nat.pow (S (S O)) n) O))
+       (Nat.add (Nat.pow (S (S O)) n) (Nat.add (Nat.pow (S (S O)) n) O))
+       (Nat.pow (S (S O)) n)
+       (@eq_rect nat (Init.Nat.mul (Nat.pow (S (S O)) n) (S (S O)))
+          (fun m : nat => matrix m m T) MA
+          (Nat.add (Nat.pow (S (S O)) n) (Nat.add (Nat.pow (S (S O)) n) O))
+          (two_pow_n_mul_two n)) MB) as MC eqn:HMC.
+move MB before MA.
+move MC before MB.
+cbn in MB.
+*)
 apply matrix_eq.
 intros * Hi Hj.
 remember (mat_of_mat_list_list [[M1; M2]; [M2; (- M1)%M]]) as MA eqn:HMA.
 remember (mat_of_list_list_1_row_2_col _ _) as MB eqn:HMB.
 move MB before MA.
 cbn in MA.
+...
+refine
+  (rew dependent
+     [fun _ Q => mat_el (rew [λ m : nat, matrix m m T] Q in
+      MA * MB
+     )%M i j = _]
+     (two_pow_n_mul_two n)
+   in _).
+...
+refine
+  (rew dependent
+     [fun _ Q => mat_el (rew [λ m : nat, matrix m m T] Q in
+      mat_of_mat_list_list [[mA n; mI (2 ^ n)]; [mI (2 ^ n); (- mA n)%M]])
+        i i =
+      0%F]
+     (two_pow_n_mul_two n)
+   in _).
+...
 cbn - [ iter_seq ].
 ...
 Print mat_of_list_list_1_row_2_col.
