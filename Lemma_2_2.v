@@ -581,6 +581,9 @@ Definition mat_of_list_list_1_row_2_col {n} (A B : matrix (2 ^ n) (2 ^ n) T) :
   mat_of_mat_list_list [[A]; [B]].
 *)
 
+Definition base_vector_1 dim :=
+  mk_vect dim (λ i, match i with 0 => 1%F | _ => 0%F end).
+
 Definition A_Sn_eigenvector_of_sqrt_Sn n μ (V : vector (2 ^ n) T) :
     vector (2 ^ S n) T :=
   (mat_of_list_list_1_row_2_col (mA n + μ × mI (2 ^ n))%M (mI (2 ^ n)) • V)%V.
@@ -907,8 +910,7 @@ Theorem A_n_eigenvalue_squared_is_n :
   → (mA n • V = μ × V)%V
   → (μ * μ)%F = rngl_of_nat n.
 Proof.
-intros Hic Hro Hed Hin * Hvr Hvz Hav.
-...
+intros Hic Hro Hed Hin * Hvr Hav.
 specialize (lemma_2_A_n_2_eq_n_I Hro n) as Ha.
 (* μ * μ = rngl_of_nat n *)
 apply vect_mul_scal_reg_r with (V0 := V); [ easy | now left | congruence | ].
@@ -930,8 +932,7 @@ rewrite <- mat_mul_scal_vect_assoc.
 rewrite vect_mul_1_l; easy.
 Qed.
 
-Definition is_eigenvector_of_An n μ (V : vector T) :=
-  vect_nrows V = 2 ^ n ∧
+Definition is_eigenvector_of_An n μ (V : vector (2 ^ n) T) :=
   V ≠ vect_zero (2 ^ n) ∧
   (mA n • V = μ × V)%V.
 
@@ -948,18 +949,30 @@ Proof.
 intros Hic Hro Heq Hin H10 Hch *.
 split. {
   intros HV.
-  destruct HV as (V & Hvr & Hvz & Hv).
+  destruct HV as (V & Hvz & Hv).
   now apply A_n_eigenvalue_squared_is_n with (V := V).
 } {
   intros Hμ.
-  remember (A_n_eigenvector_of_sqrt_n n μ (base_vector_1 42)) as V eqn:Hv.
-  assert (Hvn : vect_nrows V = 2 ^ n). {
-    rewrite Hv; cbn.
-    unfold A_n_eigenvector_of_sqrt_n; cbn.
-    destruct n; [ easy | cbn ].
-    rewrite mA_nrows.
-    now rewrite Nat.mul_comm.
-  }
+  destruct n. {
+    cbn in Hμ |-*.
+    unfold is_eigenvector_of_An; cbn.
+    exists (base_vector_1 1).
+    split. {
+      intros H.
+      injection H; clear H; intros H.
+      set (f := λ i, match i with 0 => 1%F | S _ => 0%F end) in H.
+      set (g := λ _, 0%F) in H.
+      assert (H1 : ∀ i, f i = g i) by now rewrite H.
+      specialize (H1 0).
+      unfold f, g in H1; cbn in H1.
+      specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
+      rewrite H10 in rngl_1_neq_0.
+      now apply rngl_1_neq_0 in H1.
+    }
+Check An_eigen_equation_for_sqrt_n.
+...
+  remember (A_Sn_eigenvector_of_sqrt_Sn n μ (base_vector_1 (2 ^ n))) as V
+    eqn:Hv.
   exists V.
   split; [ easy | ].
   split. 2: {
