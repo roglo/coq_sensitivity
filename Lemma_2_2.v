@@ -1022,45 +1022,18 @@ split. {
   assert (H3 : ∀ i, f i = g i) by now rewrite H1.
   specialize (H3 0) as H4.
   unfold f, g in H4.
-...
-  rewrite Nat.mul_1_r in H4.
   rewrite rngl_summation_split_first in H4; [ | easy | flia ].
   unfold base_vector_1 in H4 at 1.
   cbn - [ iter_seq base_vector_1 ] in H4.
   rewrite rngl_mul_1_r in H4.
   unfold mat_list_list_el in H4 at 1.
   cbn - [ iter_seq base_vector_1 ] in H4.
-  assert (Hzca : 0 < mat_ncols (mA n)). {
-    rewrite mA_ncols.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  }
-  assert (Hzra : 0 < mat_nrows (mA n)). {
-    rewrite mA_nrows.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  }
-  rewrite Nat.div_small in H4; [ | easy ].
-  rewrite (Nat.mod_small 0) in H4; [ | easy ].
-  rewrite Nat.div_small in H4; [ | easy ].
-  rewrite (Nat.mod_small 0) in H4; [ | easy ].
+  rewrite Nat.div_small in H4; [ | now apply Nat.neq_0_lt_0, Nat.pow_nonzero ].
+  rewrite Nat.mod_small in H4; [ | now apply Nat.neq_0_lt_0, Nat.pow_nonzero ].
   cbn - [ iter_seq base_vector_1 ] in H4.
   rewrite rngl_mul_1_r in H4.
-  replace (mat_el (mA n) 0 0) with 0%F in H4. 2: {
-    clear.
-    induction n; [ easy | cbn ].
-    unfold mat_list_list_el; cbn.
-    rewrite Nat.div_0_l. 2: {
-      now rewrite mA_ncols; apply Nat.pow_nonzero.
-    }
-    rewrite Nat.div_0_l. 2: {
-      now rewrite mA_nrows; apply Nat.pow_nonzero.
-    }
-    rewrite Nat.mod_0_l. 2: {
-      now rewrite mA_nrows; apply Nat.pow_nonzero.
-    }
-    rewrite Nat.mod_0_l. 2: {
-      now rewrite mA_ncols; apply Nat.pow_nonzero.
-    }
-    apply IHn.
+  rewrite mA_diag_zero in H4; [ | easy | ]. 2: {
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
   }
   rewrite rngl_add_0_l in H4.
   rewrite all_0_rngl_summation_0 in H4; [ | easy | ]. 2: {
