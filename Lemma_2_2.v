@@ -723,7 +723,97 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
     now rewrite HM1 at 1 2 3.
   }
   cbn - [ iter_seq Nat.pow ].
-  specialize (lemma_2_A_n_2_eq_n_I Hro n) as H1.
+  rewrite rngl_summation_add_distr; [ | easy ].
+  assert
+    (H1 : ∀ i j,
+     mat_el (mA n * mA n) i j = mat_el (rngl_of_nat n × mI (2 ^ n)) i j). {
+    intros i' j'.
+    now rewrite lemma_2_A_n_2_eq_n_I.
+  }
+  specialize (H1 i j).
+  cbn - [ iter_seq ] in H1.
+  rewrite H1; clear H1.
+  rewrite (rngl_summation_split _ j); [ | flia Hj ].
+  rewrite rngl_summation_split_last; [ | flia ].
+  rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
+    intros k Hk.
+    rewrite HM2; cbn.
+    destruct (Nat.eq_dec (k - 1) j) as [Hkj| Hkj]; [ flia Hkj Hk | ].
+    now rewrite rngl_mul_assoc, rngl_mul_0_r.
+  }
+  rewrite rngl_add_0_l.
+  rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
+    intros k Hk.
+    rewrite HM2; cbn.
+    destruct (Nat.eq_dec k j) as [Hkj| Hkj]; [ flia Hkj Hk | ].
+    now rewrite rngl_mul_assoc, rngl_mul_0_r.
+  }
+  rewrite rngl_add_0_r.
+  rewrite HM2 at 1.
+  cbn - [ iter_seq ].
+  destruct (Nat.eq_dec j j) as [H| H]; [ clear H | easy ].
+  rewrite rngl_mul_1_r.
+  destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+    rewrite rngl_mul_1_r; subst j.
+    rewrite mA_diag_zero; [ | easy | easy ].
+    rewrite rngl_mul_0_l, rngl_add_0_r.
+    rewrite (rngl_summation_split _ i); [ | flia Hi2n ].
+    rewrite rngl_summation_split_last; [ | flia ].
+    rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
+      intros k Hk.
+      rewrite HM2; cbn.
+      destruct (Nat.eq_dec i (k - 1)) as [H| H]; [ flia H Hk | ].
+      apply rngl_mul_0_l.
+    }
+    rewrite rngl_add_0_l.
+    rewrite HM2 at 1 2.
+    cbn - [ iter_seq ].
+    destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
+    rewrite rngl_mul_1_l.
+    rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
+      intros k Hk.
+      rewrite HM2; cbn.
+      destruct (Nat.eq_dec i k) as [H| H]; [ flia H Hk | ].
+      apply rngl_mul_0_l.
+    }
+    rewrite rngl_add_0_r.
+    rewrite HM5; cbn.
+    rewrite HM2; cbn.
+    destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
+    rewrite rngl_mul_1_r.
+    rewrite HM1.
+    rewrite mA_diag_zero; [ | easy | easy ].
+    rewrite rngl_add_0_l.
+    now rewrite rngl_add_comm.
+  } {
+    rewrite rngl_mul_0_r, rngl_add_0_l.
+    rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
+      intros k Hk.
+      rewrite HM2; cbn.
+      destruct (Nat.eq_dec i k) as [H| H]; [ | now rewrite rngl_mul_0_l ].
+      subst k.
+      destruct (Nat.eq_dec i j) as [H| H]; [ easy | ].
+      apply rngl_mul_0_r.
+    }
+    rewrite rngl_add_0_r.
+    rewrite HM5; cbn.
+    rewrite HM2; cbn.
+    destruct (Nat.eq_dec i j) as [H| H]; [ easy | ].
+    rewrite rngl_mul_0_r, rngl_add_0_r.
+    specialize rngl_opt_mul_comm as rngl_mul_comm.
+    rewrite Hic in rngl_mul_comm.
+    now rewrite HM1, rngl_mul_comm.
+  }
+} {
+  apply Nat.nlt_ge in Hi2n.
+  rewrite (Nat_div_less_small 1). 2: {
+    now rewrite Nat.mul_1_l, Nat.mul_comm.
+  }
+  rewrite (Nat_mod_less_small 1). 2: {
+    now rewrite Nat.mul_1_l, Nat.mul_comm.
+  }
+  cbn - [ iter_seq ].
+  rewrite Nat.add_0_r.
 ...
 cbn - [ iter_seq Nat.pow ].
 subst MA MB M1 M2 M5.
