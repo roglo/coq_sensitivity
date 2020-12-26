@@ -969,7 +969,10 @@ split. {
       rewrite H10 in rngl_1_neq_0.
       now apply rngl_1_neq_0 in H1.
     }
-Check An_eigen_equation_for_sqrt_n.
+    specialize An_eigen_equation_for_sqrt_n as H1.
+    specialize (H1 Hic Hro Hin Heq).
+    now apply (H1 0).
+  }
 ...
   remember (A_Sn_eigenvector_of_sqrt_Sn n μ (base_vector_1 (2 ^ n))) as V
     eqn:Hv.
