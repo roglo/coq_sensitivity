@@ -539,6 +539,7 @@ rewrite Hic in rngl_mul_comm.
 apply rngl_mul_comm.
 Qed.
 
+(*
 Theorem glop : ∀ n (MA MB : matrix n n T),
   determinant MA ≠ 0%F
   → (MA * MB = mI n)%M
@@ -547,6 +548,7 @@ Proof.
 intros * Hdet Hab.
 Print comatrix.
 ...
+*)
 
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   rngl_is_comm = true →
