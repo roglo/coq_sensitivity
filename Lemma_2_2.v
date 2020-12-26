@@ -709,6 +709,20 @@ destruct (Nat.mul_1_r (2 ^ n)).
 destruct (two_pow_n_mul_two n).
 cbn - [ iter_seq Nat.pow ].
 rewrite H1; clear H1.
+unfold mat_list_list_el.
+rewrite (Nat.div_small j); [ | easy ].
+rewrite (Nat.mod_small j); [ | easy ].
+destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
+  rewrite (Nat.div_small i); [ | easy ].
+  rewrite (Nat.mod_small i); [ | easy ].
+  cbn - [ iter_seq Nat.pow ].
+  erewrite rngl_summation_eq_compat. 2: {
+    intros k Hk.
+    rewrite HM5 at 1; cbn.
+    rewrite rngl_mul_add_distr_l.
+    now rewrite HM1 at 1 2 3.
+  }
+  cbn - [ iter_seq Nat.pow ].
 ...
 cbn - [ iter_seq Nat.pow ].
 subst MA MB M1 M2 M5.
