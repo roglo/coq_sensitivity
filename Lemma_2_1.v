@@ -285,19 +285,13 @@ Theorem RQ_mul_scal_prop :
 Proof.
 intros (Hic & Hop & Hed & Hld & Hdo & Hin & Hor) * Hcz.
 unfold Rayleigh_quotient.
-...
-Check vect_eq_dec.
-destruct (vect_eq_dec Hed r x (vect_zero r)) as [Hxz| Hxz]. {
-  easy.
-} {
-  easy.
-} {
+destruct (vect_opt_eq_dec Hed n x (vect_zero n)) as [Hxz| Hxz]. {
   subst x; cbn.
   do 2 rewrite rngl_mul_0_l.
   do 3 rewrite rngl_mul_0_r.
   now rewrite rngl_mul_0_l.
 }
-rewrite <- squ_mat_mul_scal_vect_comm; [ | easy ].
+rewrite <- mat_mul_scal_vect_comm; [ | easy ].
 rewrite vect_dot_mul_scal_mul_comm; [ | easy ].
 rewrite vect_dot_mul_scal_mul_comm; [ | easy ].
 do 2 rewrite vect_scal_mul_dot_mul_comm.
@@ -328,7 +322,6 @@ rewrite H1; cycle 1. {
   apply rngl_integral in H.
   now destruct H.
 } {
-  subst r.
   intros H; apply Hxz.
   now apply eq_vect_squ_0.
 }
@@ -340,6 +333,8 @@ intros H; apply Hcz.
 apply rngl_integral in H.
 now destruct H.
 Qed.
+
+...
 
 Theorem Rayleigh_quotient_of_eigenvector :
   rngl_is_comm = true →
