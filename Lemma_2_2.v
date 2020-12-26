@@ -549,11 +549,13 @@ destruct (lt_dec i (mat_nrows MA)) as [Hia| Hia]. {
 Qed.
 *)
 
+(*
 Theorem two_pow_n_mul_two' : ∀ n, 2 ^ n * 2 = 2 ^ S n.
 Proof.
 intros.
 now rewrite Nat.mul_comm.
 Qed.
+*)
 
 (*
 Import EqNotations.
@@ -583,17 +585,22 @@ Definition A_Sn_eigenvector_of_sqrt_Sn n μ (V : vector (2 ^ n) T) :
     vector (2 ^ S n) T :=
   (mat_of_list_list_1_row_2_col (mA n + μ × mI (2 ^ n))%M (mI (2 ^ n)) • V)%V.
 
-Check mat_of_mat_list_list.
-
-Definition elim_2_pow_n_mul_2_in_m_of_mll_2_l n M i j v r :=
-  match two_pow_n_mul_two n as Q in (_ = m) return
-    mat_el (eq_rect (2 ^ n * 2) (λ m : nat, matrix m m T) M m Q) i j = v i j
-  with
-  | eq_refl => r
-  end :
-    mat_el
-      (eq_rect (2 ^ n * 2) (λ m : nat, matrix m m T) M
-         (2 ^ S n) (two_pow_n_mul_two n)) i j = v i j.
+Theorem elim_2_pow_n_mul_2 : ∀ n M i j f,
+  mat_el (eq_rect (2 ^ n * 2) (λ m, matrix m m T) M (2 ^ n * 2) eq_refl)
+    i j = f i j
+  → mat_el
+      (eq_rect (2 ^ n * 2) (λ m, matrix m m T) M (2 ^ S n)
+          (two_pow_n_mul_two n)) i j = 
+    f i j.
+Proof.
+intros * H.
+refine
+  (match two_pow_n_mul_two n as Q in (_ = m) return
+     mat_el (eq_rect (2 ^ n * 2) (λ m : nat, matrix m m T) M m Q) i j = f i j
+   with
+   | eq_refl => H
+   end).
+Qed.
 
 Theorem mA_diag_zero :
   rngl_has_opp = true →
@@ -602,7 +609,7 @@ Proof.
 intros Hop * Hi2n.
 revert i Hi2n.
 induction n; intros; [ easy | cbn ].
-etransitivity; [ now apply elim_2_pow_n_mul_2_in_m_of_mll_2_l | cbn ].
+etransitivity; [ now apply elim_2_pow_n_mul_2 | cbn ].
 unfold mat_list_list_el.
 destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
   rewrite (Nat.div_small i); [ | easy ].
@@ -674,13 +681,91 @@ cbn - [ iter_seq Nat.pow ].
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   apply rngl_mul_eq_if; [ | reflexivity ].
-  now apply elim_2_pow_n_mul_2_in_m_of_mll_2_l.
+  now apply elim_2_pow_n_mul_2.
 }
 cbn - [ iter_seq Nat.pow mat_of_mat_list_list ].
 remember (mat_of_mat_list_list [[M1; M2]; [M2; (- M1)%M]]) as MA eqn:HMA.
 remember (mat_of_list_list_1_row_2_col _ _) as MB eqn:HMB.
 move MB before MA.
 cbn - [ Nat.pow ] in MA.
+(**)
+assert
+  (H1 : ∀ i j,
+   mat_el
+     (mat_of_mat_list_list [[M1; M2]; [M2; - M1]] *
+      mat_of_mat_list_list [[M5]; [M2]])%M i j =
+   mat_el
+     (mat_of_mat_list_list
+        [[(M1 * M5 + M2 * M2)%M]; [(M2 * M5 + - M1 * M2)%M]]) i j). {
+  now rewrite (m_o_mll_2x2_2x1 M1 M2 M2 (- M1)%M M5 M2).
+}
+rewrite <- HMA in H1.
+cbn - [ iter_seq Nat.pow ] in H1.
+replace (2 ^ n * 2) with (2 ^ S n) in H1 by now rewrite Nat.mul_comm.
+specialize (H1 i j).
+rewrite HMB.
+unfold mat_of_list_list_1_row_2_col.
+destruct (Nat.mul_1_r (2 ^ n)).
+destruct (two_pow_n_mul_two n).
+cbn - [ iter_seq Nat.pow ].
+rewrite H1; clear H1.
+...
+cbn - [ iter_seq Nat.pow ].
+subst MA MB M1 M2 M5.
+cbn - [ iter_seq Nat.pow ].
+unfold mat_of_list_list_1_row_2_col.
+destruct (Nat.mul_1_r (2 ^ n)).
+destruct (two_pow_n_mul_two n).
+cbn - [ iter_seq Nat.pow ].
+unfold mat_list_list_el.
+rewrite (Nat.div_small j); [ | easy ].
+rewrite (Nat.mod_small j); [ | easy ].
+...
+apply matrix_neq in H1; [ easy | ].
+cbn - [ iter_seq Nat.pow ].
+rewrite Nat.mul_1_r.
+intros H.
+specialize (H i j Hi Hj).
+...
+rewrite (rngl_summation_split _ (2 ^ n)); [ | flia Hi ].
+rewrite rngl_summation_split_last; [ | flia ].
+...
+rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
+  intros k Hk.
+  rewrite (Nat.div_small (k - 1)); [ | flia Hk ].
+  rewrite (Nat.mod_small (k - 1)); [ | flia Hk ].
+  remember (nth (i / 2 ^ n)) as x eqn:Hx.
+  cbn - [ iter_seq Nat.pow ]; subst x.
+  destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
+    rewrite (Nat.div_small i); [ | easy ].
+    rewrite (Nat.mod_small i); [ | easy ].
+    cbn - [ iter_seq Nat.pow ].
+    destruct (Nat.eq_dec (k - 1) j) as [Hkj| Hkj]. {
+      rewrite Hkj.
+      rewrite mA_diag_zero; [ | easy | easy ].
+      rewrite rngl_add_0_l, rngl_mul_1_r.
+...
+cbn - [ iter_seq Nat.pow nth ].
+...
+rewrite (rngl_summation_split _ i); [ | flia Hi ].
+rewrite rngl_summation_split_last; [ | flia ].
+rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
+  intros k Hk.
+  rewrite HMA; cbn.
+  unfold mat_list_list_el.
+  destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
+    rewrite (Nat.div_small i); [ | easy ].
+    rewrite (Nat.mod_small i); [ | easy ].
+    rewrite (Nat.div_small (k - 1)); [ | flia Hk Hi2n ].
+    rewrite (Nat.mod_small (k - 1)); [ | flia Hk Hi2n ].
+    cbn.
+...
+  rewrite HMB, HM2.
+  unfold mat_of_list_list_1_row_2_col.
+  destruct (Nat.mul_1_r (2 ^ n)).
+  cbn - [ Nat.pow ].
+  destruct (two_pow_n_mul_two n).
+  cbn - [ Nat.pow ].
 ...
 Import EqNotations.
 refine
