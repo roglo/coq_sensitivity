@@ -210,23 +210,19 @@ Theorem eq_vect_squ_0 :
   ∀ n v, (v · v)%V = 0%F → v = vect_zero n.
 Proof.
 intros Hop Hed Hdo Hor * H.
-...
-remember (vect_nrows x) as r eqn:Hr.
 specialize rngl_opt_integral as rngl_integral.
 specialize rngl_opt_add_le_compat as rngl_add_le_compat.
 rewrite Hdo in rngl_integral.
 rewrite Hor in rngl_add_le_compat.
 unfold vect_dot_product in H.
-apply vector_eq; [ easy | cbn ].
+apply vector_eq.
 intros i Hi.
-rewrite <- Hr in H, Hi.
-remember (vect_el x) as f.
+remember (vect_el v) as f.
 revert i Hi.
-clear Hr.
-induction r; intros; [ easy | ].
+induction n; intros; [ easy | ].
 rewrite Nat.sub_succ, Nat.sub_0_r in H.
 rewrite rngl_summation_split_last in H; [ | flia ].
-destruct r. {
+destruct n. {
   cbn in H.
   rewrite rngl_add_0_l in H.
   specialize (rngl_integral _ _ H) as H1.
@@ -241,8 +237,9 @@ erewrite rngl_summation_eq_compat in H. 2: {
 }
 cbn - [ iter_seq ] in H.
 apply rngl_eq_add_0 in H; [ | easy | | ]; cycle 1. {
-  clear H IHr Hi.
-  induction r. {
+  clear H Hi IHn.
+  clear v Heqf.
+  induction n. {
     cbn; rewrite rngl_add_0_l.
     now apply rngl_0_le_squ.
   }
@@ -262,8 +259,11 @@ apply rngl_eq_add_0 in H; [ | easy | | ]; cycle 1. {
 }
 destruct H as (H1, H2).
 specialize (rngl_integral _ _ H2) as H3.
-destruct (Nat.eq_dec i (S r)) as [Hisr| Hisr]; [ now subst i; destruct H3 | ].
-apply IHr; [ | flia Hi Hisr ].
+destruct (Nat.eq_dec i (S n)) as [Hisn| Hisn]; [ now subst i; destruct H3 | ].
+eapply IHn.
+...
+...
+apply IHn; [ | flia Hi Hisr ].
 now rewrite Nat.sub_succ, Nat.sub_0_r.
 Qed.
 
