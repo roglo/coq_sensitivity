@@ -277,17 +277,16 @@ apply H4; [ flia Hi Hisn | ].
 now rewrite Nat.sub_0_r.
 Qed.
 
-...
-
 Theorem RQ_mul_scal_prop :
   is_ordered_field →
-  ∀ n (M : square_matrix n) x c,
+  ∀ n (M : matrix n n T) x c,
   c ≠ 0%F
   → Rayleigh_quotient M (c × x) = Rayleigh_quotient M x.
 Proof.
 intros (Hic & Hop & Hed & Hld & Hdo & Hin & Hor) * Hcz.
 unfold Rayleigh_quotient.
-remember (vect_nrows x) as r eqn:Hr.
+...
+Check vect_eq_dec.
 destruct (vect_eq_dec Hed r x (vect_zero r)) as [Hxz| Hxz]. {
   easy.
 } {
