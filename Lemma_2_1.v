@@ -334,8 +334,6 @@ apply rngl_integral in H.
 now destruct H.
 Qed.
 
-...
-
 Theorem Rayleigh_quotient_of_eigenvector :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -343,9 +341,9 @@ Theorem Rayleigh_quotient_of_eigenvector :
   rngl_is_integral = true →
   rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
   rngl_is_ordered = true →
-  ∀ n (M : square_matrix n) V μ,
-  V ≠ vect_zero (vect_nrows V)
-  → (M • V)%SM = (μ × V)%V
+  ∀ n (M : matrix n n T) V μ,
+  V ≠ vect_zero n
+  → (M • V)%V = (μ × V)%V
   → Rayleigh_quotient M V = μ.
 Proof.
 intros Hic Hop Hii Hdo Hor Hdl * Hvz Hmv.
@@ -357,17 +355,15 @@ intros H.
 now apply eq_vect_squ_0 in H.
 Qed.
 
-Definition is_orthogonal_matrix (M : matrix T) :=
-  (mat_transp M * M)%M = mI (mat_nrows M).
-
-Definition is_orthogonal_square_matrix n (M : square_matrix n) :=
-  is_orthogonal_matrix (mat_of_squ_mat M).
+Definition is_orthogonal_matrix n (M : matrix n n T) :=
+  (mat_transp M * M)%M = mI n.
 
 (* diagonal matrix with diagonal d being given *)
 
 Definition mat_with_diag n d :=
-  mk_mat (λ i j, if Nat.eq_dec i j then nth i d 0%F else 0%F) n n.
+  mk_mat n n (λ i j, if Nat.eq_dec i j then nth i d 0%F else 0%F).
 
+(*
 Theorem mat_with_diag_prop : ∀ n d,
   ((mat_nrows (mat_with_diag n d) =? n) &&
    (mat_ncols (mat_with_diag n d) =? n))%bool = true.
@@ -376,16 +372,14 @@ intros; cbn.
 apply Bool.andb_true_iff.
 now split; apply Nat.eqb_eq.
 Qed.
-
-(* diagonal square matrix with diagonal d being given *)
-
-Definition squ_mat_with_diag n d : square_matrix n :=
- exist _ (mat_with_diag n d) (mat_with_diag_prop n d).
+*)
 
 (* matrix with columns given as list of vectors *)
 
 Definition mat_with_vect n Vl :=
-  mk_mat (λ i j, vect_el (nth j Vl (vect_zero n)) i) n n.
+  mk_mat n n (λ i j, vect_el (nth j Vl (vect_zero n)) i).
+
+...
 
 (* square matrix with columns given as list of vectors *)
 
