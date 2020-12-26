@@ -605,6 +605,21 @@ refine
    end).
 Qed.
 
+(*
+Import EqNotations.
+
+Theorem toto : ∀ n M i j f,
+  mat_el (rew [λ m : nat, matrix m m T] eq_refl in M) i j = f i j
+  → mat_el (rew [λ m : nat, matrix m m T] two_pow_n_mul_two n in M) i j = f i j.
+Proof.
+intros * H.
+refine
+  (rew dependent
+     [fun _ Q => mat_el (rew [λ m, matrix m m T] Q in M) i j = f i j]
+     two_pow_n_mul_two n in H).
+Qed.
+*)
+
 Theorem mA_diag_zero :
   rngl_has_opp = true →
   ∀ n i, i < 2 ^ n → mat_el (mA n) i i = 0%F.
