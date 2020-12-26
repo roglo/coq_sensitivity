@@ -52,6 +52,29 @@
   \end{itemize}}
 }
 
+\frm{Record}{
+
+  \begin{tabular}{ll}
+  has\_opposite : bool & \only<9->{is\_archimedean : bool} \\
+  has\_inverse : bool & \only<9->{is\_complete : bool} \\
+  \only<2->{is\_commutative : bool} &
+    \only<9->{is\_algebraically\_closed : bool} \\
+  \only<3->{is\_ordered : bool} & \only<9->{is\_finite : bool} \\
+  \only<4->{is\_integral : bool} & \only<9->{...} \\
+  \only<5->{characteristic : nat} &
+  \only<10->{consistent :} \\
+  \only<6->{has\_decidable\_equality : bool} &
+  \only<10->{\hsp not} \\
+  \only<7->{has\_1\_different\_from\_0 : bool} &
+  \only<10->{\hsp \hsp (is\_algebraically\_closed and} \\
+  \only<8->{is\_euclidean : bool} &
+  \only<10->{\hsp \hsp is\_finite)} \\
+  \only<8->{is\_factorial : bool \\
+    is\_principal : bool }
+  \end{tabular}
+
+}
+
 %%%%%
 
 \section[Plan]{}
