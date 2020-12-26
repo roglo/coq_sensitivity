@@ -612,29 +612,29 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
 
 Theorem diagonalized_matrix_prop :
   rngl_is_comm = true →
-  ∀ n (M : square_matrix n) ev eV D U,
-  is_symm_squ_mat M
-  → eigenvalues_and_vectors (mat_of_squ_mat M) ev eV
-  → D = squ_mat_with_diag n ev
-  → U = squ_mat_with_vect n eV
-   → M = (U * D * U⁺)%SM.
+  ∀ n (M : matrix n n T) ev eV D U,
+  is_symm_mat M
+  → eigenvalues_and_vectors M ev eV
+  → D = mat_with_diag n ev
+  → U = mat_with_vect eV
+   → M = (U * D * U⁺)%M.
 Proof.
 intros Hic * Hsy Hvv Hd Ho.
 specialize (diagonalized_matrix_prop_1 Hic) as H.
 specialize (H n M ev eV D U Hsy Hvv Hd Ho).
 rewrite <- H.
-rewrite <- squ_mat_mul_assoc; [ | easy ].
+rewrite <- mat_mul_assoc; [ | easy ].
 ...
 
 (* changing variable x as y = O^T . x, the Rayleigh quotient R (M, x)
    is equal to
       Σ (i = 1, n), μ_i * y_i ^ 2 / Σ (i = 1, n), y_i ^ 2 *)
 
-Theorem Rayleigh_quotient_from_ortho : ∀ n (M : square_matrix n) D U x y ev,
-  is_symm_squ_mat M
-  → eigenvalues (mat_of_squ_mat M) ev
-  → M = (squ_mat_transp U * D * U)%SM
-  → y = (squ_mat_transp U • x)%SM
+Theorem Rayleigh_quotient_from_ortho : ∀ n (M : matrix n n T) D U x y ev,
+  is_symm_mat M
+  → eigenvalues M ev
+  → M = (mat_transp U * D * U)%M
+  → y = (mat_transp U • x)%V
   → Rayleigh_quotient M x =
       (Σ (i = 1, n), nth i ev 0%F * rngl_squ (vect_el y i) /
        Σ (i = 1, n), rngl_squ (vect_el y i))%F.
@@ -646,8 +646,8 @@ intros * Hsy Hev Hmin Hmax.
    eigenvalue of M) when x is v_min (the corresponding eigenvector).
    Similarly, R (M,x) ≤ μ_max and R (M,v_max) = μ_max *)
 
-Theorem glop : ∀ n (M : square_matrix n) x sev μ_min μ_max,
-  eigenvalues (mat_of_squ_mat M) sev
+Theorem glop : ∀ n (M : matrix n n T) x sev μ_min μ_max,
+  eigenvalues M sev
   → Sorted rngl_le sev
   → μ_min = hd 0%F sev
   → μ_max = last sev 0%F
@@ -663,13 +663,14 @@ intros * Hev Hsev Hmin Hmax.
 (* Lemma 2.1 *)
 
 Theorem lemma_2_1 :
-  ∀ n m l (A : square_matrix n) (B : square_matrix (n - length l)) seva sevb,
+  ∀ n m l (A : matrix n n T) (B : matrix (n - length l) (n - length l) T)
+    seva sevb,
   m = n - length l
   → m < n
-  → is_symm_squ_mat A
-  → B = princ_subm A l
-  → eigenvalues (mat_of_squ_mat A) seva
-  → eigenvalues (mat_of_squ_mat B) sevb
+  → is_symm_mat A
+  → B = mat_princ_subm A l
+  → eigenvalues A seva
+  → eigenvalues B sevb
   → Sorted rngl_le seva
   → Sorted rngl_le sevb
   → ∀ i, 1 ≤ i ≤ m →
