@@ -28,11 +28,10 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 
-(*
-Definition is_symm_mat (A : matrix T) :=
-  ∀ i j, i < mat_nrows A → j < mat_nrows A →
-  mat_el A i j = mat_el A j i.
+Definition is_symm_mat n (A : matrix n n T) :=
+  ∀ i j, i < n → j < n → mat_el A i j = mat_el A j i.
 
+(*
 Definition is_symm_squ_mat n (A : square_matrix n) :=
   is_symm_mat (mat_of_squ_mat A).
 *)
@@ -379,10 +378,7 @@ Qed.
 Definition mat_with_vect n Vl :=
   mk_mat n n (λ i j, vect_el (nth j Vl (vect_zero n)) i).
 
-...
-
-(* square matrix with columns given as list of vectors *)
-
+(*
 Theorem mat_with_vect_prop : ∀ n Vl,
   ((mat_nrows (mat_with_vect n Vl) =? n) &&
    (mat_ncols (mat_with_vect n Vl) =? n))%bool = true.
@@ -392,9 +388,9 @@ apply Bool.andb_true_iff.
 now split; apply Nat.eqb_eq.
 Qed.
 
-Definition squ_mat_with_vect n (Vl : list (vector T)) :
-   square_matrix n :=
+Definition mat_with_vect n (Vl : list (vector n T)) : matrix n n T :=
  exist _ (mat_with_vect n Vl) (mat_with_vect_prop n Vl).
+ *)
 
 (* In the real case, the symmetric matrix M is diagonalisable in the
    sense that there exists an orthogonal matrix U (the columns of which
@@ -404,21 +400,24 @@ Definition squ_mat_with_vect n (Vl : list (vector T)) :
 
 Theorem diagonalized_matrix_prop_1 :
   rngl_is_comm = true →
-  ∀ n (M : @square_matrix T n) ev eV D U,
-  is_symm_squ_mat M
-  → eigenvalues_and_vectors (mat_of_squ_mat M) ev eV
-  → D = squ_mat_with_diag n ev
-  → U = squ_mat_with_vect n eV
-   → (M * U = U * D)%SM.
+  ∀ n (M : matrix n n T) ev eV D U,
+  is_symm_mat M
+  → eigenvalues_and_vectors M ev eV
+  → D = mat_with_diag n ev
+  → U = mat_with_vect eV
+   → (M * U = U * D)%M.
 Proof.
 intros Hic * Hsy Hvv Hd Ho.
-apply square_matrix_eq; cbn.
+(*
+apply matrix_eq; cbn.
+*)
 subst U D; cbn.
-remember (mat_with_vect n eV) as U eqn:Hmo.
+remember (mat_with_vect eV) as U eqn:Hmo.
 remember (mat_with_diag n ev) as D eqn:Hmd.
 move D before U.
 unfold eigenvalues_and_vectors in Hvv.
-unfold is_symm_squ_mat in Hsy.
+unfold is_symm_mat in Hsy.
+(*
 destruct M as (M, Hm).
 cbn in Hsy, Hvv |-*.
 apply Bool.andb_true_iff in Hm.
@@ -426,15 +425,15 @@ destruct Hm as (Hr, Hc).
 apply Nat.eqb_eq in Hr.
 apply Nat.eqb_eq in Hc.
 rewrite Hr in Hvv.
-apply matrix_eq; [ now rewrite Hmo; cbn | | ]. {
-  now rewrite Hmo, Hmd; cbn.
-}
+*)
+apply matrix_eq.
 cbn - [ iter_seq ].
-rewrite Hr, Hc.
 intros * Hi Hj.
+(*
 rewrite Hmd in Hj; cbn in Hj.
 remember (mat_ncols U) as x eqn:Hx.
 rewrite Hmo in Hx; cbn in Hx; subst x.
+*)
 symmetry.
 rewrite (rngl_summation_split _ j); [ | flia Hj ].
 rewrite rngl_summation_split_last; [ | flia ].
@@ -459,23 +458,27 @@ cbn - [ iter_seq ].
 specialize (Hvv j (nth j ev 0%F) (nth j eV (vect_zero n))) as H1.
 assert (H : 0 ≤ j < n) by flia Hj.
 specialize (H1 H eq_refl eq_refl); clear H.
-destruct H1 as (Hvjz & Hvj & H1).
+destruct H1 as (Hvjz & H1).
 remember (nth j ev 0%F) as μ eqn:Hμ.
 remember (nth j eV (vect_zero n)) as V eqn:Hv.
 symmetry.
 assert (H : vect_el (M • V) i = vect_el (μ × V) i) by now rewrite H1.
 cbn - [ iter_seq ] in H.
+(*
 rewrite Hc in H.
+*)
 specialize rngl_opt_mul_comm as rngl_mul_comm.
 rewrite Hic in rngl_mul_comm.
 now rewrite rngl_mul_comm in H.
 Qed.
 
-Theorem mat_transp_invol : ∀ M : matrix T, (M⁺)⁺%M = M.
+Theorem mat_transp_invol : ∀ m n (M : matrix m n T), (M⁺)⁺%M = M.
 Proof.
 intros.
 now apply matrix_eq.
 Qed.
+
+...
 
 Theorem mat_transp_mul :
   rngl_is_comm = true →
