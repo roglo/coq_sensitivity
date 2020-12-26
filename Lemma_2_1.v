@@ -539,12 +539,10 @@ rewrite Hic in rngl_mul_comm.
 apply rngl_mul_comm.
 Qed.
 
-...
-
 Theorem glop : ∀ n (MA MB : matrix n n T),
-  squ_mat_determ MA ≠ 0%F
-  → (MA * MB = mat_one n)%M
-  → (MB * MA = mat_one n)%M.
+  determinant MA ≠ 0%F
+  → (MA * MB = mI n)%M
+  → (MB * MA = mI n)%M.
 Proof.
 intros * Hdet Hab.
 Print comatrix.
@@ -554,16 +552,18 @@ Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   rngl_is_comm = true →
   rngl_has_dec_eq = true →
   rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
-  ∀ n (M : square_matrix n) ev eV U,
-  is_symm_squ_mat M
-  → eigenvalues_and_vectors (mat_of_squ_mat M) ev eV
-  → U = squ_mat_with_vect n eV
-  → (U⁺ * U = squ_mat_one n)%SM.
+  ∀ n (M : matrix n n T) ev eV U,
+  is_symm_mat M
+  → eigenvalues_and_vectors M ev eV
+  → U = mat_with_vect eV
+  → (U⁺ * U = mI n)%M.
 Proof.
 intros Hic Heq Hii * Hsy Hvv Hm.
+(*
 apply square_matrix_eq; cbn.
+*)
 rewrite Hm; cbn.
-apply matrix_eq; [ easy | easy | ].
+apply matrix_eq.
 cbn - [ iter_seq ].
 intros * Hi Hj.
 remember (nth i eV (vect_zero n)) as vi eqn:Hvi.
@@ -572,63 +572,27 @@ move vj before vi.
 (* problem: if vi=vj but i≠j (same eigenvalues), this does not work *)
 destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
   unfold eigenvalues_and_vectors in Hvv.
-  enough (Hvvz : (vi · vj)%V = 0%F). {
-    unfold vect_dot_product in Hvvz.
-    specialize (Hvv i (nth i ev 0%F) vi) as H1.
-    rewrite mat_nrows_of_squ_mat in H1.
-    assert (H : 0 ≤ i < n) by (split; [ flia | easy ]).
-    specialize (H1 H eq_refl Hvi); clear H.
-    destruct H1 as (H1 & H2 & H3).
-    now rewrite H1 in Hvvz.
-  }
-  specialize (squ_mat_mul_vect_dot_vect Hic M vi vj) as H1.
-  (* ((M • vi)%SM · vj)%V = (vi · (M⁺ • vj)%SM)%V *)
-  assert (H : vect_nrows vi = n). {
-    specialize (Hvv i (nth i ev 0%F) vi) as H2.
-    rewrite mat_nrows_of_squ_mat in H2.
-    assert (H : 0 ≤ i < n) by flia Hi.
-    now specialize (H2 H eq_refl Hvi); clear H.
-  }
-  specialize (H1 H); clear H.
-  (* H1 : ((M • vi)%SM · vj)%V = (vi · (M⁺ • vj)%SM)%V *)
+  enough (Hvvz : (vi · vj)%V = 0%F) by easy.
+  specialize (mat_mul_vect_dot_vect Hic M vi vj) as H1.
+  (* H1 : ((M • vi) · vj)%V = (vi · (M⁺ • vj))%V *)
   specialize (Hvv i (nth i ev 0%F) vi) as H2.
-  rewrite mat_nrows_of_squ_mat in H2.
   assert (H : 0 ≤ i < n) by flia Hi.
   specialize (H2 H eq_refl Hvi); clear H.
-  destruct H2 as (_ & _& H2).
-  assert (H : (M • vi)%SM = (mat_of_squ_mat M • vi)%V). {
-    apply vector_eq; [ easy | ].
-    cbn - [ iter_seq ].
-    now rewrite mat_nrows_of_squ_mat.
-  }
-  rewrite H, H2 in H1.
-  clear H2 H.
-  replace (M⁺)%SM with M in H1. 2: {
-    apply square_matrix_eq; cbn.
+  destruct H2 as (_ & H2).
+  rewrite H2 in H1.
+  clear H2.
+  replace (M⁺)%M with M in H1. 2: {
     unfold mat_transp; cbn.
-    rewrite mat_nrows_of_squ_mat.
-    rewrite mat_ncols_of_squ_mat.
-    apply matrix_eq; cbn. {
-      now rewrite mat_nrows_of_squ_mat.
-    } {
-      now rewrite mat_ncols_of_squ_mat.
-    }
+    apply matrix_eq; cbn.
     intros i' j' Hi' Hj'.
-    rewrite Hsy; [ easy | easy | ].
-    now rewrite mat_nrows_of_squ_mat.
+    now rewrite Hsy.
   }
   specialize (Hvv j (nth j ev 0%F) vj) as H2.
-  rewrite mat_nrows_of_squ_mat in H2.
   assert (H : 0 ≤ j < n) by flia Hj.
   specialize (H2 H eq_refl Hvj); clear H.
-  destruct H2 as (_ & _& H2).
-  assert (H : (M • vj)%SM = (mat_of_squ_mat M • vj)%V). {
-    apply vector_eq; [ easy | ].
-    cbn - [ iter_seq ].
-    now rewrite mat_nrows_of_squ_mat.
-  }
-  rewrite H, H2 in H1.
-  clear H2 H.
+  destruct H2 as (_ & H2).
+  rewrite H2 in H1.
+  clear H2.
   rewrite vect_scal_mul_dot_mul_comm in H1.
   rewrite vect_dot_mul_scal_mul_comm in H1; [ | easy ].
   specialize rngl_opt_eq_dec as rngl_eq_dec.
