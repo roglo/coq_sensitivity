@@ -217,6 +217,7 @@ rewrite Hor in rngl_add_le_compat.
 unfold vect_dot_product in H.
 apply vector_eq.
 intros i Hi.
+...
 remember (vect_el v) as f.
 revert i Hi.
 induction n; intros; [ easy | ].
@@ -260,6 +261,8 @@ apply rngl_eq_add_0 in H; [ | easy | | ]; cycle 1. {
 destruct H as (H1, H2).
 specialize (rngl_integral _ _ H2) as H3.
 destruct (Nat.eq_dec i (S n)) as [Hisn| Hisn]; [ now subst i; destruct H3 | ].
+...
+specialize (IHn v).
 eapply IHn.
 ...
 ...
