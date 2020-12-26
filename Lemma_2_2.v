@@ -723,6 +723,7 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
     now rewrite HM1 at 1 2 3.
   }
   cbn - [ iter_seq Nat.pow ].
+  specialize (lemma_2_A_n_2_eq_n_I Hro n) as H1.
 ...
 cbn - [ iter_seq Nat.pow ].
 subst MA MB M1 M2 M5.
