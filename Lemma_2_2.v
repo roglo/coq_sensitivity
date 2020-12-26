@@ -38,11 +38,6 @@ Definition mat_of_scalar (c : T) := mk_mat 1 1 (λ i j, c).
 (* conversion matrix of matrices (actually list of list of matrices)
    into simple matrix *)
 
-(*
-Definition upper_left_mat_in_list_list {m n} mll : matrix m n T :=
-  hd (mZ m n) (hd [] mll).
-*)
-
 Definition mat_list_list_el {m n} mll i j :=
   mat_el (nth (j / n) (nth (i / m) mll []) (mZ m n)) (i mod m) (j mod n).
 
@@ -59,7 +54,11 @@ now rewrite Nat.mul_comm.
 Qed.
 
 (* the magic incancation
-     rew [λ m, matrix m m T] two_pow_n_mul_two n' in
+    eq_rect _ (λ m, matrix m m T)
+      (mat_of_mat_list_list
+         [[mA n'; mI (2 ^ n')];
+          [mI (2 ^ n'); (- mA n')%M]])
+      _ (two_pow_n_mul_two n')
    in mA definition below, transforms the type of the expression
      mat_of_mat_list_list
        [[mA n'; mI (2 ^ n')];
@@ -80,45 +79,6 @@ Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
             [mI (2 ^ n'); (- mA n')%M]])
         _ (two_pow_n_mul_two n')
   end.
-
-(*
-Import EqNotations.
-
-Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
-  match n with
-  | 0 => mZ 1 1
-  | S n' =>
-      rew [λ m, matrix m m T] two_pow_n_mul_two n' in
-      mat_of_mat_list_list
-        [[mA n'; mI (2 ^ n')];
-         [mI (2 ^ n'); (- mA n')%M]]
-  end.
-*)
-
-(* *)
-
-(*
-Theorem mA_nrows : ∀ n, mat_nrows (mA n) = 2 ^ n.
-Proof.
-intros.
-induction n; [ easy | cbn ].
-now rewrite IHn, Nat.mul_comm; cbn.
-Qed.
-
-Theorem mA_ncols : ∀ n, mat_ncols (mA n) = 2 ^ n.
-Proof.
-intros.
-induction n; [ easy | cbn ].
-now rewrite IHn, Nat.mul_comm; cbn.
-Qed.
-
-Theorem mA_is_square : ∀ n, is_square_mat (mA n).
-Proof.
-intros.
-unfold is_square_mat.
-now rewrite mA_nrows, mA_ncols.
-Qed.
-*)
 
 (* "We prove by induction that A_n^2 = nI" *)
 
@@ -317,7 +277,6 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
   rewrite (Nat_mod_less_small 1); [ clear H | easy ].
   rewrite Nat.mul_1_l.
   cbn - [ iter_seq Nat.pow ].
-(**)
   erewrite rngl_summation_eq_compat. 2: {
     intros j Hj.
     assert (H : 0 < 2 ^ n). {
@@ -434,11 +393,9 @@ Qed.
       (       I        )
    for any vector V of dimension 2^(n+1).
      There is going to be a special case for n = 0.
-     We can take V, for example, as (1, 0, 0, 0....0), etc.
    This way, we have to prove that this pair eigen(value,vector)
    works *)
 
-(* perhaps unnecessary theorem... *)
 Theorem m_o_mll_2x2_2x1 : ∀ n (M1 M2 M3 M4 M5 M6 : matrix n n T),
   (mat_of_mat_list_list [[M1; M2]; [M3; M4]] *
    mat_of_mat_list_list [[M5]; [M6]])%M =
@@ -528,41 +485,6 @@ destruct (lt_dec i n) as [Hir1| Hir1]. {
 }
 Qed.
 
-(*
-Theorem m_o_mll_2x1_mul_scal_l : ∀ d a MA MB,
- (mat_of_mat_list_list d [[a × MA]%M; [a × MB]%M] =
-  a × mat_of_mat_list_list d [[MA]; [MB]])%M.
-Proof.
-intros.
-apply matrix_eq; [ easy | easy | ].
-cbn; rewrite Nat.mul_1_r.
-intros * Hi Hj.
-unfold mat_list_list_el; cbn.
-rewrite Nat.div_small; [ | easy ].
-rewrite (Nat.mod_small j); [ | easy ].
-destruct (lt_dec i (mat_nrows MA)) as [Hia| Hia]. {
-  now rewrite Nat.div_small.
-} {
-  apply Nat.nlt_ge in Hia.
-  rewrite (Nat_div_less_small 1); [ easy | flia Hi Hia ].
-}
-Qed.
-*)
-
-(*
-Theorem two_pow_n_mul_two' : ∀ n, 2 ^ n * 2 = 2 ^ S n.
-Proof.
-intros.
-now rewrite Nat.mul_comm.
-Qed.
-*)
-
-(*
-Import EqNotations.
-Locate "rew".
-"'rew' [ P ] H 'in' H'" := eq_rect _ P H' _ H (default interpretation)
-*)
-
 Definition mat_of_list_list_1_row_2_col {n} (A B : matrix (2 ^ n) (2 ^ n) T) :
     matrix (2 ^ S n) (2 ^ n) T :=
   eq_rect _ (λ m, matrix (2 ^ S n) m T)
@@ -570,16 +492,6 @@ Definition mat_of_list_list_1_row_2_col {n} (A B : matrix (2 ^ n) (2 ^ n) T) :
        (mat_of_mat_list_list [[A]; [B]]) _
        (two_pow_n_mul_two n)) _
     (Nat.mul_1_r (2 ^ n)).
-
-(*
-Import EqNotations.
-
-Definition mat_of_list_list_1_row_2_col {n} (A B : matrix (2 ^ n) (2 ^ n) T) :
-    matrix (2 ^ S n) (2 ^ n) T :=
-  rew [λ m, matrix (2 ^ S n) m T] Nat.mul_1_r (2 ^ n) in
-  rew [λ m, matrix m (2 ^ n * 1) T] two_pow_n_mul_two' n in
-  mat_of_mat_list_list [[A]; [B]].
-*)
 
 Definition base_vector_1 dim :=
   mk_vect dim (λ i, match i with 0 => 1%F | _ => 0%F end).
@@ -604,21 +516,6 @@ refine
    | eq_refl => H
    end).
 Qed.
-
-(*
-Import EqNotations.
-
-Theorem toto : ∀ n M i j f,
-  mat_el (rew [λ m : nat, matrix m m T] eq_refl in M) i j = f i j
-  → mat_el (rew [λ m : nat, matrix m m T] two_pow_n_mul_two n in M) i j = f i j.
-Proof.
-intros * H.
-refine
-  (rew dependent
-     [fun _ Q => mat_el (rew [λ m, matrix m m T] Q in M) i j = f i j]
-     two_pow_n_mul_two n in H).
-Qed.
-*)
 
 Theorem mA_diag_zero :
   rngl_has_opp = true →
@@ -706,7 +603,6 @@ remember (mat_of_mat_list_list [[M1; M2]; [M2; (- M1)%M]]) as MA eqn:HMA.
 remember (mat_of_list_list_1_row_2_col _ _) as MB eqn:HMB.
 move MB before MA.
 cbn - [ Nat.pow ] in MA.
-(**)
 assert
   (H1 : ∀ i j,
    mat_el
