@@ -897,20 +897,18 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
 }
 Qed.
 
-...
-
 Theorem A_n_eigenvalue_squared_is_n :
   rngl_is_comm = true →
   rngl_has_opp = true →
   rngl_has_dec_eq = true →
   rngl_has_inv = true →
-  ∀ n μ V,
-  vect_nrows V = 2 ^ n
-  → V ≠ vect_zero (2 ^ n)
+  ∀ n μ (V : vector (2 ^ n) T),
+  V ≠ vect_zero (2 ^ n)
   → (mA n • V = μ × V)%V
   → (μ * μ)%F = rngl_of_nat n.
 Proof.
 intros Hic Hro Hed Hin * Hvr Hvz Hav.
+...
 specialize (lemma_2_A_n_2_eq_n_I Hro n) as Ha.
 (* μ * μ = rngl_of_nat n *)
 apply vect_mul_scal_reg_r with (V0 := V); [ easy | now left | congruence | ].
