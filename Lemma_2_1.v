@@ -63,12 +63,31 @@ destruct (lt_dec i n) as [Hin| Hin]. {
 Qed.
 *)
 
+Theorem Nat_sub_length_nil_r : ∀ n, n = n - @length nat [].
+Proof.
+intros.
+now rewrite Nat.sub_0_r.
+Qed.
+
+Theorem Nat_sub_1_sub_length : ∀ n l,
+  n - 1 - length l = n - S (@length nat l).
+Proof.
+intros.
+now rewrite <- Nat.sub_add_distr.
+Qed.
+
+Fixpoint mat_princ_subm n (A : matrix n n T) l :
+    matrix (n - length l) (n - length l) T :=
+  match l with
+  | [] =>
+      eq_rect _ (λ m, matrix m m T) A _ (Nat_sub_length_nil_r n)
+  | i :: l' =>
+      eq_rect _ (λ m, matrix m m T)
+        (mat_princ_subm (subm A i i) l')
+        _ (Nat_sub_1_sub_length n l')
+  end.
+
 ...
-
-(* mmm... ça sent le "transport", là *)
-
-Definition mat_princ_subm m n (A : matrix m n T) l :=
-  fold_left (λ a i, subm a i i) l A.
 
 Theorem subm_z : ∀ f i j, subm (mk_mat f 0 0) i j = mZ 0.
 Proof. now intros; apply matrix_eq. Qed.
