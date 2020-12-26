@@ -814,6 +814,13 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
   }
   cbn - [ iter_seq ].
   rewrite Nat.add_0_r.
+  remember (i - 2 ^ n) as k eqn:Hk.
+  assert (H : k < 2 ^ n) by flia Hi2n Hk Hi.
+  clear i Hi Hi2n Hk.
+  rename k into i.
+  rename H into Hi.
+  move i after j.
+  move Hi after Hj.
 ...
 cbn - [ iter_seq Nat.pow ].
 subst MA MB M1 M2 M5.
