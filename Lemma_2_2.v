@@ -973,43 +973,41 @@ split. {
     specialize (H1 Hic Hro Hin Heq).
     now apply (H1 0).
   }
-...
   remember (A_Sn_eigenvector_of_sqrt_Sn n μ (base_vector_1 (2 ^ n))) as V
     eqn:Hv.
   exists V.
-  split; [ easy | ].
   split. 2: {
-    now apply An_eigen_equation_for_sqrt_n with (U := base_vector_1 42).
+    specialize An_eigen_equation_for_sqrt_n as H1.
+    specialize (H1 Hic Hro Hin Heq).
+    specialize (H1 (S n) μ Hμ).
+    cbn - [ mA ] in H1.
+    specialize (H1 (base_vector_1 (2 ^ n))).
+    now specialize (H1 V Hv).
   }
   (* V ≠ vect_zero (2 ^ n) *)
-  rewrite Hv; cbn.
-  unfold A_n_eigenvector_of_sqrt_n; cbn.
-  destruct n. {
-    intros H.
-    injection H; clear H; intros H.
-    set (f := λ i, match i with 0 => 1%F | S _ => 0%F end) in H.
-    set (g := λ _, 0%F) in H.
-    assert (H1 : ∀ i, f i = g i) by now rewrite H.
-    specialize (H1 0).
-    unfold f, g in H1; cbn in H1.
-    specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
-    rewrite H10 in rngl_1_neq_0.
-    now apply rngl_1_neq_0 in H1.
-  }
+  subst V.
+  unfold A_Sn_eigenvector_of_sqrt_Sn.
+  unfold mat_of_list_list_1_row_2_col.
+  cbn - [ Nat.pow ].
+  destruct (two_pow_n_mul_two n).
+  destruct (Nat.mul_1_r (2 ^ n)).
+  cbn - [ Nat.pow ].
   intros H.
   remember base_vector_1 as ffff.
-  injection H; clear H; intros H1 H2.
+  injection H; clear H; intros H1.
   subst ffff.
+  rewrite Nat.mul_1_r in H1.
   set
     (f :=
        λ i,
-       (Σ (j = 0, mat_ncols (mA n) * 1 - 1),
-        mat_list_list_el 0 [[(mA n + μ × mI (2 ^ n))%M]; [mI (2 ^ n)]] i j *
-        vect_el (base_vector_1 42) j)%F) in H2.
-  set (g := λ _, 0%F) in H2.
-  assert (H3 : ∀ i, f i = g i) by now rewrite H2.
+       (Σ (j = 0, 2 ^ n - 1),
+        mat_list_list_el [[(mA n + μ × mI (2 ^ n))%M]; [mI (2 ^ n)]] i j *
+        vect_el (base_vector_1 (2 ^ n)) j)%F) in H1.
+  set (g := λ _, 0%F) in H1.
+  assert (H3 : ∀ i, f i = g i) by now rewrite H1.
   specialize (H3 0) as H4.
   unfold f, g in H4.
+...
   rewrite Nat.mul_1_r in H4.
   rewrite rngl_summation_split_first in H4; [ | easy | flia ].
   unfold base_vector_1 in H4 at 1.
