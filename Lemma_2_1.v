@@ -217,9 +217,13 @@ rewrite Hor in rngl_add_le_compat.
 unfold vect_dot_product in H.
 apply vector_eq.
 intros i Hi.
-...
+(**)
+cbn.
+revert v i Hi H.
+(*
 remember (vect_el v) as f.
 revert i Hi.
+*)
 induction n; intros; [ easy | ].
 rewrite Nat.sub_succ, Nat.sub_0_r in H.
 rewrite rngl_summation_split_last in H; [ | flia ].
@@ -239,7 +243,9 @@ erewrite rngl_summation_eq_compat in H. 2: {
 cbn - [ iter_seq ] in H.
 apply rngl_eq_add_0 in H; [ | easy | | ]; cycle 1. {
   clear H Hi IHn.
+(*
   clear v Heqf.
+*)
   induction n. {
     cbn; rewrite rngl_add_0_l.
     now apply rngl_0_le_squ.
@@ -253,22 +259,25 @@ apply rngl_eq_add_0 in H; [ | easy | | ]; cycle 1. {
   }
   cbn - [ iter_seq ].
   rewrite <- (rngl_add_0_r 0%F) at 1.
-  apply rngl_add_le_compat; [ easy | ].
-  now apply rngl_0_le_squ.
+  apply rngl_add_le_compat; [ | now apply rngl_0_le_squ ].
+  remember (mk_vect (S (S n)) (λ i, vect_el v i)) as u eqn:Hu.
+  specialize (IHn u) as H1.
+  now subst u.
 } {
   now apply rngl_0_le_squ.
 }
 destruct H as (H1, H2).
 specialize (rngl_integral _ _ H2) as H3.
 destruct (Nat.eq_dec i (S n)) as [Hisn| Hisn]; [ now subst i; destruct H3 | ].
-...
-specialize (IHn v).
-eapply IHn.
-...
-...
-apply IHn; [ | flia Hi Hisr ].
-now rewrite Nat.sub_succ, Nat.sub_0_r.
+remember (mk_vect (S n) (λ i, vect_el v i)) as u eqn:Hu.
+specialize (IHn u) as H4.
+subst u.
+cbn - [ iter_seq ] in H4.
+apply H4; [ flia Hi Hisn | ].
+now rewrite Nat.sub_0_r.
 Qed.
+
+...
 
 Theorem RQ_mul_scal_prop :
   is_ordered_field →
