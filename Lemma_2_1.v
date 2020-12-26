@@ -478,19 +478,15 @@ intros.
 now apply matrix_eq.
 Qed.
 
-...
-
 Theorem mat_transp_mul :
   rngl_is_comm = true →
-  ∀ MA MB : matrix T,
-  mat_ncols MA = mat_nrows MB
-  → ((MA * MB)⁺ = MB⁺ * MA⁺)%M.
+  ∀ m n p (MA : matrix m n T) (MB : matrix n p T),
+  ((MA * MB)⁺ = MB⁺ * MA⁺)%M.
 Proof.
-intros Hic * Hab.
-apply matrix_eq; [ easy | easy | ].
+intros Hic *.
+apply matrix_eq.
 cbn - [ iter_seq ].
 intros * Hi Hj.
-rewrite <- Hab.
 apply rngl_summation_eq_compat.
 intros k Hk.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
@@ -501,8 +497,9 @@ Qed.
 Theorem mI_transp_idemp : ∀ n, ((mI n)⁺)%M = mI n.
 Proof.
 intros.
-apply matrix_eq; [ easy | easy | cbn ].
+apply matrix_eq.
 intros * Hi Hj.
+cbn.
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   now subst i; destruct (Nat.eq_dec j j).
 } {
@@ -510,19 +507,15 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 }
 Qed.
 
-Theorem squ_mat_mul_vect_dot_vect :
+Theorem mat_mul_vect_dot_vect :
   rngl_is_comm = true →
-  ∀ n (M : square_matrix n) U V,
-  vect_nrows U = n
-  → ((M • U)%SM · V = U · (M⁺ • V)%SM)%V.
+  ∀ n (M : matrix n n T) U V,
+  ((M • U)%M · V = U · (M⁺ • V)%M)%V.
 Proof.
-intros Hic * Hun.
+intros Hic *.
 unfold vect_dot_product.
-unfold squ_mat_mul_vect_r, squ_mat_transp.
+unfold mat_mul_vect_r, mat_transp.
 cbn - [ iter_seq ].
-rewrite mat_nrows_of_squ_mat.
-rewrite mat_ncols_of_squ_mat.
-rewrite Hun.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   now rewrite rngl_mul_summation_distr_r.
@@ -546,10 +539,12 @@ rewrite Hic in rngl_mul_comm.
 apply rngl_mul_comm.
 Qed.
 
-Theorem glop : ∀ n (MA MB : square_matrix n),
+...
+
+Theorem glop : ∀ n (MA MB : matrix n n T),
   squ_mat_determ MA ≠ 0%F
-  → (MA * MB = squ_mat_one n)%SM
-  → (MB * MA = squ_mat_one n)%SM.
+  → (MA * MB = mat_one n)%M
+  → (MB * MA = mat_one n)%M.
 Proof.
 intros * Hdet Hab.
 Print comatrix.
