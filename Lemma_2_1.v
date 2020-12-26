@@ -82,17 +82,15 @@ Fixpoint mat_princ_subm n (A : matrix n n T) l :
   | [] =>
       eq_rect _ (λ m, matrix m m T) A _ (Nat_sub_length_nil_r n)
   | i :: l' =>
-      eq_rect _ (λ m, matrix m m T)
-        (mat_princ_subm (subm A i i) l')
-        _ (Nat_sub_1_sub_length n l')
+      eq_rect _ (λ m, matrix m m T) (mat_princ_subm (subm A i i) l') _
+        (Nat_sub_1_sub_length n l')
   end.
 
-...
-
-Theorem subm_z : ∀ f i j, subm (mk_mat f 0 0) i j = mZ 0.
+Theorem subm_z : ∀ f i j, subm (mk_mat 0 0 f) i j = mZ 0 0.
 Proof. now intros; apply matrix_eq. Qed.
 
-Theorem princ_subm_prop : ∀ n (A : square_matrix n) l,
+(*
+Theorem princ_subm_prop : ∀ n (A : matrix n n T) l,
   ((mat_nrows (mat_princ_subm (mat_of_squ_mat A) l) =? n - length l) &&
    (mat_ncols (mat_princ_subm (mat_of_squ_mat A) l) =? n - length l))%bool = true.
 Proof.
@@ -137,24 +135,24 @@ Qed.
 Definition princ_subm n (A : square_matrix n) (l : list nat) :
    square_matrix (n - length l) :=
  exist _ (mat_princ_subm (mat_of_squ_mat A) l) (princ_subm_prop A l).
+*)
 
-Definition eigenvalues M ev :=
-  ∀ μ, μ ∈ ev → ∃ V, V ≠ vect_zero (mat_nrows M) ∧ (M • V = μ × V)%V.
+Definition eigenvalues n M ev :=
+  ∀ μ, μ ∈ ev → ∃ V, V ≠ vect_zero n ∧ (M • V = μ × V)%V.
 
-Definition eigenvalues_and_vectors M ev eV :=
-  ∀ i μ V, 0 ≤ i < mat_nrows M →
+Definition eigenvalues_and_vectors n M ev eV :=
+  ∀ i μ V, 0 ≤ i < n →
   μ = nth i ev 0%F
-  → V = nth i eV (vect_zero (mat_nrows M))
-  → vect_nrows V = mat_nrows M ∧
-    V ≠ vect_zero (vect_nrows V) ∧
+  → V = nth i eV (vect_zero n)
+  → V ≠ vect_zero n ∧
     (M • V = μ × V)%V.
 
 (* Rayleigh quotient *)
 
-Definition Rayleigh_quotient n (M : square_matrix n) (x : vector T) :=
-  ((x · (M • x)%SM)%V / (x · x)%V)%F.
+Definition Rayleigh_quotient n (M : matrix n n T) (x : vector n T) :=
+  ((x · (M • x)%M)%V / (x · x)%V)%F.
 
-Arguments Rayleigh_quotient [n]%nat_scope M%SM x%V.
+Arguments Rayleigh_quotient [n]%nat_scope M%M x%V.
 
 Theorem rngl_0_le_squ :
   rngl_has_dec_le = true →
@@ -209,9 +207,10 @@ Theorem eq_vect_squ_0 :
   rngl_has_dec_le = true →
   rngl_is_integral = true →
   rngl_is_ordered = true →
-  ∀ x, (x · x)%V = 0%F → x = vect_zero (vect_nrows x).
+  ∀ n v, (v · v)%V = 0%F → v = vect_zero n.
 Proof.
 intros Hop Hed Hdo Hor * H.
+...
 remember (vect_nrows x) as r eqn:Hr.
 specialize rngl_opt_integral as rngl_integral.
 specialize rngl_opt_add_le_compat as rngl_add_le_compat.
