@@ -950,5 +950,3 @@ split. {
 Qed.
 
 End a.
-
-Inspect 1.
