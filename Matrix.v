@@ -425,13 +425,18 @@ Qed.
    point 3 *)
 (* doing it only when the first row is 0; can be generalized later *)
 
-Theorem glop : ∀ n (A : matrix n n T),
-  subm (subm A 0 0) 0 0 = subm (subm A 0 1) 0 0.
+Theorem glop : ∀ n (A : matrix n n T) k,
+  subm (subm A 0 (k + 1)) 0 0 = subm (subm A 0 0) 0 k.
 Proof.
 intros.
 apply matrix_eq.
 intros * Hi Hj; cbn.
-destruct (lt_dec (j + 1) 1) as [Hj1| Hj1]; [ flia Hj1 | easy ].
+destruct (lt_dec (j + 1) (k + 1)) as [Hjk1| Hjk1]. {
+  destruct (lt_dec j k) as [Hjk| Hjk]; [ easy | ].
+  flia Hjk1 Hjk.
+}
+destruct (lt_dec j k) as [Hjk| Hjk]; [ | easy ].
+flia Hjk1 Hjk.
 Qed.
 
 ...
