@@ -260,13 +260,12 @@ Definition det_from_col {n} (M : matrix n n T) j :=
 
 (* *)
 
-(* to be updated to new definition matrix m n T  if I need them ...
-
-Definition mat_mul_row_by_scal k M s :=
-  mk_mat
+Definition mat_mul_row_by_scal n k (M : matrix n n T) s :=
+  mk_mat n n
     (λ i j,
-     if Nat.eq_dec i k then (s * mat_el M i j)%F else mat_el M i j)
-    (mat_nrows M) (mat_ncols M).
+     if Nat.eq_dec i k then (s * mat_el M i j)%F else mat_el M i j).
+
+(* to be updated to new definition matrix m n T  if I need them ...
 
 Definition mat_swap_rows (M : matrix T) i1 i2 :=
   mk_mat
@@ -334,6 +333,453 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn - [ iter_seq ].
 now apply rngl_summation_add_distr.
 Qed.
+*)
+
+(* If we multiply a row (column) of A by a number, the determinant of
+   A will be multiplied by the same number. *)
+(* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html *)
+
+(* Well, since my definition of the discriminant only covers the
+   row 0, we can prove that only when i=0; this will able us to
+   prove next theorems, swapping rows by going via row 0 *)
+
+Theorem det_mul_row_0_by_scal :
+  rngl_is_comm = true →
+  ∀ n (A : matrix n n T) v,
+  n ≠ 0
+  → determinant (mat_mul_row_by_scal 0 A v) = (v * determinant A)%F.
+Proof.
+intros Hic * Hnz.
+unfold determinant; cbn.
+destruct n; [ easy | clear Hnz ].
+cbn - [ iter_seq ].
+rewrite rngl_mul_summation_distr_l.
+apply rngl_summation_eq_compat.
+intros j Hj.
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+rewrite Hic in rngl_mul_comm.
+rewrite (rngl_mul_comm (minus_one_pow j)).
+do 2 rewrite <- rngl_mul_assoc.
+f_equal.
+rewrite (rngl_mul_comm (mat_el A 0 j)).
+do 2 rewrite <- rngl_mul_assoc.
+f_equal.
+rewrite rngl_mul_comm; f_equal.
+f_equal.
+apply matrix_eq; cbn.
+rename j into k; rename Hj into Hk.
+intros i j Hi Hj.
+destruct (Nat.eq_dec (i + 1) 0) as [H| H]; [ flia H | easy ].
+Qed.
+
+...
+
+(* multilinearity *)
+
+(*
+Theorem glop : ∀ M a,
+  (a * determinant M)%F = determinant M.
+Proof.
+intros.
+...
+*)
+
+(* doesn't work
+Theorem determinant_multilinear_mul : ∀ M i a V,
+  mat_nrows M = mat_ncols M
+  → i < mat_nrows M
+  → determinant (mat_repl_vect i M (a × V)%V) =
+      (a * determinant (mat_repl_vect i M V))%F.
+Proof.
+intros * Hrc Hi.
+unfold vect_add, vect_mul_scal_l; cbn.
+unfold mat_repl_vect; cbn.
+rewrite <- Hrc.
+remember (mat_nrows M) as dim eqn:Hdim.
+symmetry in Hdim, Hrc.
+rename Hdim into Hrd.
+rename Hrc into Hcd.
+clear Hrd Hcd.
+revert i Hi V.
+induction dim; intros; [ easy | ].
+cbn - [ iter_seq ].
+rewrite rngl_mul_summation_distr_l; [ | easy | easy ].
+apply rngl_summation_eq_compat.
+intros j (_, Hj).
+symmetry.
+rewrite (rngl_c_mul_comm a).
+do 3 rewrite <- rngl_mul_assoc.
+f_equal.
+(**)
+unfold subm; cbn.
+rewrite Nat.sub_0_r.
+destruct (Nat.eq_dec j i) as [Hji| Hji]. {
+  subst j.
+  rewrite rngl_mul_assoc.
+  rewrite rngl_c_mul_comm.
+  rewrite rngl_mul_assoc.
+  f_equal; f_equal.
+  apply matrix_eq; [ easy | easy | cbn ].
+  clear Hj.
+  intros j k Hj Hk.
+  destruct (lt_dec k i) as [Hki| Hki]. {
+    destruct (Nat.eq_dec k i) as [H| H]; [ flia Hki H | easy ].
+  } {
+    destruct (Nat.eq_dec (k + 1) i) as [H| H]; [ flia Hki H | easy ].
+  }
+} {
+  f_equal.
+  symmetry.
+  destruct i. {
+...
+*)
+
+(*
+Theorem determinant_multilinear : ∀ M i a b U V,
+  i < mat_nrows M
+  → determinant (mat_repl_vect i M (a × U + b × V)%V) =
+       (a * determinant (mat_repl_vect i M U) +
+        b * determinant (mat_repl_vect i M V))%F.
+Proof.
+intros * Hi.
+unfold vect_add, vect_mul_scal_l; cbn.
+unfold mat_repl_vect; cbn.
+enough (H : mat_nrows M = mat_ncols M).
+rewrite <- H.
+remember (mat_nrows M) as dim eqn:Hdim.
+symmetry in Hdim, H.
+rename Hdim into Hrd.
+rename H into Hcd.
+clear Hrd Hcd.
+revert i Hi.
+induction dim; intros; [ easy | ].
+cbn - [ iter_seq ].
+destruct i. {
+  rewrite rngl_summation_split_first; [ | easy | flia ].
+  cbn - [ iter_seq ].
+  rewrite rngl_mul_1_l.
+...
+do 3 rewrite rngl_add_0_l, rngl_mul_1_l.
+  do 3 rewrite rngl_mul_1_r.
+  easy.
+  rewrite rngl_mul_1_r.
+...
+*)
+
+(* If the i-th row (column) in A is a sum of the i-th row (column) of
+   a matrix B and the i-th row (column) of a matrix C and all other
+   rows in B and C are equal to the corresponding rows in A (that is B
+   and C differ from A by one row only), then det(A)=det(B)+det(C). *)
+(* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html *)
+
+(* Well, since my definition of the discriminant only covers the
+   row 0, we can prove that only when i=0; this will able us to
+   prove the next theorem, swapping rows by going via row 0 *)
+
+Theorem det_sum_row_row : ∀ A B C n,
+  n ≠ 0
+  → mat_nrows A = n
+  → mat_nrows B = n
+  → mat_nrows C = n
+  → mat_ncols A = n
+  → mat_ncols B = n
+  → mat_ncols C = n
+  → (∀ j, mat_el A 0 j = (mat_el B 0 j + mat_el C 0 j)%F)
+  → (∀ i j, i ≠ 0 → mat_el B i j = mat_el A i j)
+  → (∀ i j, i ≠ 0 → mat_el C i j = mat_el A i j)
+  → determinant A = (determinant B + determinant C)%F.
+Proof.
+intros * Hnz Hra Hrb Hrc Hca Hcb Hcc Hbc Hb Hc.
+unfold determinant.
+rewrite Hca, Hcb, Hcc.
+destruct n; [ easy | clear Hnz ].
+cbn - [ iter_seq ].
+assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
+  intros.
+  apply matrix_eq; cbn; [ now rewrite Hra, Hrb | now rewrite Hca, Hcb | ].
+  intros i j' Hi Hj'.
+  destruct (lt_dec j' j); symmetry; apply Hb; flia.
+}
+assert (Hac : ∀ j, subm A 0 j = subm C 0 j). {
+  intros.
+  apply matrix_eq; cbn; [ now rewrite Hra, Hrc | now rewrite Hca, Hcc | ].
+  intros i j' Hi Hj'.
+  destruct (lt_dec j' j); symmetry; apply Hc; flia.
+}
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite Hbc.
+  rewrite rngl_mul_add_distr_l.
+  rewrite rngl_mul_add_distr_r.
+  rewrite Hab at 1.
+  rewrite Hac at 1.
+  easy.
+}
+cbn - [ iter_seq ].
+now apply rngl_summation_add_distr.
+Qed.
+
+(* If two rows (columns) in A are equal then det(A)=0. *)
+(* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html *)
+(* doing it only when the first row is 0; can be generalized later *)
+
+Theorem det_two_rows_are_eq : ∀ A i,
+  is_square_mat A
+  → 0 < i < mat_nrows A
+  → mat_ncols A ≠ 0
+  → (∀ j, mat_el A i j = mat_el A 0 j)
+  → determinant A = 0%F.
+Proof.
+intros * Hsm Hiz Hcz Ha.
+unfold is_square_mat in Hsm.
+unfold determinant.
+rewrite Hsm in Hiz.
+remember (mat_ncols A) as n eqn:Hn; symmetry in Hn.
+destruct n; [ easy | clear Hcz ].
+cbn - [ iter_seq ].
+(**)
+destruct n; [ flia Hiz | ].
+cbn - [ iter_seq ].
+rewrite (rngl_summation_split _ i); [ | flia Hiz ].
+rewrite rngl_summation_split_last; [ | flia ].
+rewrite rngl_summation_shift; [ | flia Hiz ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  now rewrite Nat.add_comm, Nat.add_sub.
+}
+cbn - [ iter_seq ].
+Abort.
+(* blocked by the present implementation of discriminant
+erewrite rngl_summation_eq_compat; [ | easy | ]. 2: {
+  intros j Hj.
+  rewrite (rngl_summation_split _ (i - 1)); [ | flia Hiz ].
+  rewrite Nat.sub_add; [ | easy ].
+  easy.
+}
+cbn - [ iter_seq ].
+...
+rewrite rngl_summation_split_first; [ | easy | flia ].
+cbn - [ iter_seq ].
+rewrite rngl_mul_1_l.
+rewrite (rngl_summation_split _ i); [ | flia Hiz ].
+rewrite rngl_summation_split_last;[ | easy ].
+...
+rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
+  intros k Hk.
+...
+*)
+
+(* If we add a row (column) of A multiplied by a scalar k to another
+   row (column) of A, then the determinant will not change. *)
+(* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html *)
+(* doing it only when the first row is 0; can be generalized later *)
+
+Theorem det_add_row_mul_scal_row : ∀ M v k,
+  is_square_mat M
+  → mat_nrows M ≠ 0
+  → determinant (mat_add_row_mul_scal_row M 0 v k) = determinant M.
+Proof.
+intros * Hsm Hrz.
+unfold is_square_mat in Hsm.
+remember
+  (mk_mat
+     (λ i j,
+      if Nat.eq_dec i 0 then (v * mat_el M k j)%F else mat_el M i j)
+     (mat_nrows M) (mat_ncols M)) as C eqn:Hc.
+rewrite (det_sum_row_row _ M C Hrz); cycle 7. {
+  now intros; rewrite Hc.
+} {
+  intros i j Hi.
+  now cbn; destruct (Nat.eq_dec i 0).
+} {
+  intros i j Hi; rewrite Hc; cbn.
+  now destruct (Nat.eq_dec i 0).
+} {
+  remember
+    (mk_mat (λ i j, if Nat.eq_dec i 0 then mat_el M k j else mat_el M i j)
+       (mat_nrows M) (mat_ncols M)) as D eqn:Hd.
+Abort. (* à finir...
+  specialize (det_mul_row_0_by_scal D v) as H1.
+  assert (H : mat_ncols D ≠ 0); [ subst D; cbn; congruence | ].
+  specialize (H1 H); clear H.
+  assert (H : mat_mul_row_by_scal 0 D v = C). {
+    unfold mat_mul_row_by_scal; rewrite Hc, Hd; cbn.
+    apply matrix_eq; [ easy | easy | cbn ].
+    intros i j Hi Hj.
+    now destruct (Nat.eq_dec i 0).
+  }
+  rewrite H in H1; clear H.
+  assert (H : determinant D = 0%F). {
+    rewrite Hd.
+Abort. (* blocked because needs the previous lemma
+...
+*)
+*)
+
+(* proof that the swapping two rows negates the determinant  *)
+
+Theorem det_swap_rows : ∀ M i j,
+  is_square_mat M
+  → i ≠ j
+  → i < mat_nrows M
+  → j < mat_nrows M
+  → determinant (mat_swap_rows M i j) = (- determinant M)%F.
+Proof.
+intros * Hsm Hij Hi Hj.
+(* look point 5 at
+https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html
+*)
+Abort. (*
+...
+intros * Hsm Hij Hi Hj.
+unfold is_square_mat in Hsm.
+unfold determinant; cbn.
+remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
+rename Hsm into Hr.
+destruct c; [ flia Hr Hi | ].
+remember (mat_swap_rows M i j) as M' eqn:HM'.
+cbn - [ iter_seq ].
+rewrite rng_opp_summation; [ | easy | easy ].
+destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+  subst i.
+  destruct c; [ flia Hr Hij Hj | ].
+(**)
+  symmetry.
+  rewrite rngl_summation_split_first; [ | easy | flia ].
+  rewrite (rngl_summation_split _ j); [ | flia Hr Hj ].
+  rewrite rngl_summation_split_last; [ | flia Hij ].
+  cbn - [ iter_seq mat_el ].
+  rewrite rngl_mul_1_l.
+  remember
+    (Σ (j0 = 0, c),
+     minus_one_pow j0 * mat_el (subm M 0 0) 0 j0 *
+     det_loop (subm (subm M 0 0) 0 j0) c)%F as K5.
+  remember
+    (Σ (i = 2, j),
+     - (minus_one_pow (i - 1) * mat_el M 0 (i - 1) *
+        (Σ (j0 = 0, c),
+         minus_one_pow j0 * mat_el (subm M 0 (i - 1)) 0 j0 *
+         det_loop (subm (subm M 0 (i - 1)) 0 j0) c)))%F as K6.
+  remember
+    (Σ (j0 = 0, c),
+     minus_one_pow j0 * mat_el (subm M 0 j) 0 j0 *
+     det_loop (subm (subm M 0 j) 0 j0) c)%F as K7.
+  remember
+    (Σ (i = j + 1, S c),
+     - (minus_one_pow i * mat_el M 0 i *
+        (Σ (j0 = 0, c),
+         minus_one_pow j0 * mat_el (subm M 0 i) 0 j0 *
+         det_loop (subm (subm M 0 i) 0 j0) c)))%F as K8.
+(* I should isolate "mat_el M j j" from K5 in order to get its
+   product with "mat_el M 0 0", the rest being a sub-discriminant
+   which is supposed to be equal to the equivalent in M' in the
+   rhs *)
+...
+  symmetry.
+...
+  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
+  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
+  rewrite (rngl_summation_split _ j); [ symmetry | flia Hr Hj ].
+  rewrite (rngl_summation_split _ j); [ symmetry | flia Hr Hj ].
+  rewrite rngl_summation_split_last; [ symmetry | flia Hij ].
+  rewrite rngl_summation_split_last; [ symmetry | flia Hij ].
+  cbn - [ iter_seq mat_el ].
+  do 2 rewrite rngl_mul_1_l.
+  remember
+     (Σ (j0 = 0, c),
+      minus_one_pow j0 * mat_el (subm M' 0 0) 0 j0 *
+      det_loop (subm (subm M' 0 0) 0 j0) c)%F as K1.
+  remember
+    (Σ (i = 2, j),
+     minus_one_pow (i - 1) * mat_el M' 0 (i - 1) *
+     (Σ (j0 = 0, c),
+      minus_one_pow j0 * mat_el (subm M' 0 (i - 1)) 0 j0 *
+      det_loop (subm (subm M' 0 (i - 1)) 0 j0) c))%F as
+      K2.
+  remember
+    (Σ (j0 = 0, c),
+     minus_one_pow j0 * mat_el (subm M' 0 j) 0 j0 *
+     det_loop (subm (subm M' 0 j) 0 j0) c)%F as K3.
+  remember
+    (Σ (i = j + 1, S c),
+     minus_one_pow i * mat_el M' 0 i *
+     (Σ (j0 = 0, c),
+      minus_one_pow j0 * mat_el (subm M' 0 i) 0 j0 *
+      det_loop (subm (subm M' 0 i) 0 j0) c))%F as K4.
+  remember
+    (Σ (j0 = 0, c),
+     minus_one_pow j0 * mat_el (subm M 0 0) 0 j0 *
+     det_loop (subm (subm M 0 0) 0 j0) c)%F as K5.
+  remember
+    (Σ (i = 2, j),
+     - (minus_one_pow (i - 1) * mat_el M 0 (i - 1) *
+        (Σ (j0 = 0, c),
+         minus_one_pow j0 * mat_el (subm M 0 (i - 1)) 0 j0 *
+         det_loop (subm (subm M 0 (i - 1)) 0 j0) c)))%F as K6.
+  remember
+    (Σ (j0 = 0, c),
+     minus_one_pow j0 * mat_el (subm M 0 j) 0 j0 *
+     det_loop (subm (subm M 0 j) 0 j0) c)%F as K7.
+  remember
+    (Σ (i = j + 1, S c),
+     - (minus_one_pow i * mat_el M 0 i *
+        (Σ (j0 = 0, c),
+         minus_one_pow j0 * mat_el (subm M 0 i) 0 j0 *
+         det_loop (subm (subm M 0 i) 0 j0) c)))%F as K8.
+...
+*)
+
+(* proof that det_from_row is equal to determinant *)
+
+Theorem det_from_row_is_det : ∀ M i,
+  mat_ncols M ≠ 0
+  → det_from_row M i = determinant M.
+Proof.
+intros * Hcz.
+destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+  subst i.
+  unfold determinant, det_from_row.
+  cbn - [ iter_seq ].
+  rewrite rngl_mul_1_l.
+  remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
+  destruct c; [ easy | clear Hcz ].
+  now rewrite Nat.sub_succ, Nat.sub_0_r.
+}
+apply not_eq_sym in Hiz.
+Abort. (*
+...
+specialize (det_swap_rows M Hiz) as H.
+apply (f_equal rng_opp) in H.
+rewrite rng_opp_involutive in H.
+rewrite <- H; clear H.
+apply not_eq_sym in Hiz.
+unfold det_from_row, determinant.
+cbn - [ iter_seq ].
+remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
+destruct c; [ easy | clear Hcz ].
+rewrite Nat.sub_succ, Nat.sub_0_r.
+cbn - [ iter_seq ].
+rewrite rngl_mul_summation_distr_l; [ | easy ].
+rewrite rng_opp_summation; [ | easy | easy ].
+apply rngl_summation_eq_compat; [ easy | ].
+intros j Hj.
+rewrite rngl_mul_comm.
+rewrite <- rngl_mul_assoc.
+rewrite <- rng_mul_opp_r.
+f_equal.
+rewrite rngl_mul_comm; symmetry.
+apply rng_opp_inj.
+rewrite rng_opp_involutive.
+...
+*)
+
+(*
+End in_ring.
+Require Import ZArith.
+Open Scope Z_scope.
+Existing Instance Z_ring_op.
+Compute determinant (mat_of_list_list 0 [[1; 2]; [3; 4]]).
+Compute determinant (mat_of_list_list 0 [[-2; 2; -3]; [-1; 1; 3]; [2; 0; -1]]). (* 18: seems good *)
 *)
 
 (* null matrix of dimension m × n *)
