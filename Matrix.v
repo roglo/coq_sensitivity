@@ -337,7 +337,8 @@ Qed.
 
 (* If we multiply a row (column) of A by a number, the determinant of
    A will be multiplied by the same number. *)
-(* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html *)
+(* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html
+   point 1 *)
 
 (* Well, since my definition of the discriminant only covers the
    row 0, we can prove that only when i=0; this will able us to
@@ -371,6 +372,100 @@ rename j into k; rename Hj into Hk.
 intros i j Hi Hj.
 destruct (Nat.eq_dec (i + 1) 0) as [H| H]; [ flia H | easy ].
 Qed.
+
+(* If the i-th row (column) in A is a sum of the i-th row (column) of
+   a matrix B and the i-th row (column) of a matrix C and all other
+   rows in B and C are equal to the corresponding rows in A (that is B
+   and C differ from A by one row only), then det(A)=det(B)+det(C). *)
+(* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html
+   point 2 *)
+
+(* Well, since my definition of the discriminant only covers the
+   row 0, we can prove that only when i=0; this will able us to
+   prove the next theorem, swapping rows by going via row 0 *)
+
+Theorem det_sum_row_row : ∀ n (A B C : matrix n n T),
+  n ≠ 0
+  → (∀ j, mat_el A 0 j = (mat_el B 0 j + mat_el C 0 j)%F)
+  → (∀ i j, i ≠ 0 → mat_el B i j = mat_el A i j)
+  → (∀ i j, i ≠ 0 → mat_el C i j = mat_el A i j)
+  → determinant A = (determinant B + determinant C)%F.
+Proof.
+intros * Hnz Hbc Hb Hc.
+unfold determinant.
+destruct n; [ easy | clear Hnz ].
+cbn - [ iter_seq ].
+assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
+  intros.
+  apply matrix_eq; cbn.
+  intros i j' Hi Hj'.
+  destruct (lt_dec j' j); symmetry; apply Hb; flia.
+}
+assert (Hac : ∀ j, subm A 0 j = subm C 0 j). {
+  intros.
+  apply matrix_eq; cbn.
+  intros i j' Hi Hj'.
+  destruct (lt_dec j' j); symmetry; apply Hc; flia.
+}
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite Hbc.
+  rewrite rngl_mul_add_distr_l.
+  rewrite rngl_mul_add_distr_r.
+  rewrite Hab at 1.
+  rewrite Hac at 1.
+  easy.
+}
+cbn - [ iter_seq ].
+now apply rngl_summation_add_distr.
+Qed.
+
+(* If two rows (columns) in A are equal then det(A)=0. *)
+(* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html
+   point 3 *)
+(* doing it only when the first row is 0; can be generalized later *)
+
+Theorem det_two_rows_are_eq : ∀ n (A : matrix n n T) i,
+  n ≠ 0
+  → 0 < i < n
+  → (∀ j, mat_el A i j = mat_el A 0 j)
+  → determinant A = 0%F.
+Proof.
+intros * Hnz Hiz Ha.
+unfold determinant.
+destruct n; [ easy | clear Hnz ].
+cbn - [ iter_seq ].
+(**)
+destruct n; [ flia Hiz | ].
+cbn - [ iter_seq ].
+rewrite (rngl_summation_split _ i); [ | flia Hiz ].
+rewrite rngl_summation_split_last; [ | flia ].
+rewrite rngl_summation_shift; [ | flia Hiz ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  now rewrite Nat.add_comm, Nat.add_sub.
+}
+cbn - [ iter_seq ].
+...
+(* blocked by the present implementation of discriminant
+erewrite rngl_summation_eq_compat; [ | easy | ]. 2: {
+  intros j Hj.
+  rewrite (rngl_summation_split _ (i - 1)); [ | flia Hiz ].
+  rewrite Nat.sub_add; [ | easy ].
+  easy.
+}
+cbn - [ iter_seq ].
+...
+rewrite rngl_summation_split_first; [ | easy | flia ].
+cbn - [ iter_seq ].
+rewrite rngl_mul_1_l.
+rewrite (rngl_summation_split _ i); [ | flia Hiz ].
+rewrite rngl_summation_split_last;[ | easy ].
+...
+rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
+  intros k Hk.
+...
+*)
 
 ...
 
@@ -463,109 +558,6 @@ do 3 rewrite rngl_add_0_l, rngl_mul_1_l.
   do 3 rewrite rngl_mul_1_r.
   easy.
   rewrite rngl_mul_1_r.
-...
-*)
-
-(* If the i-th row (column) in A is a sum of the i-th row (column) of
-   a matrix B and the i-th row (column) of a matrix C and all other
-   rows in B and C are equal to the corresponding rows in A (that is B
-   and C differ from A by one row only), then det(A)=det(B)+det(C). *)
-(* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html *)
-
-(* Well, since my definition of the discriminant only covers the
-   row 0, we can prove that only when i=0; this will able us to
-   prove the next theorem, swapping rows by going via row 0 *)
-
-Theorem det_sum_row_row : ∀ A B C n,
-  n ≠ 0
-  → mat_nrows A = n
-  → mat_nrows B = n
-  → mat_nrows C = n
-  → mat_ncols A = n
-  → mat_ncols B = n
-  → mat_ncols C = n
-  → (∀ j, mat_el A 0 j = (mat_el B 0 j + mat_el C 0 j)%F)
-  → (∀ i j, i ≠ 0 → mat_el B i j = mat_el A i j)
-  → (∀ i j, i ≠ 0 → mat_el C i j = mat_el A i j)
-  → determinant A = (determinant B + determinant C)%F.
-Proof.
-intros * Hnz Hra Hrb Hrc Hca Hcb Hcc Hbc Hb Hc.
-unfold determinant.
-rewrite Hca, Hcb, Hcc.
-destruct n; [ easy | clear Hnz ].
-cbn - [ iter_seq ].
-assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
-  intros.
-  apply matrix_eq; cbn; [ now rewrite Hra, Hrb | now rewrite Hca, Hcb | ].
-  intros i j' Hi Hj'.
-  destruct (lt_dec j' j); symmetry; apply Hb; flia.
-}
-assert (Hac : ∀ j, subm A 0 j = subm C 0 j). {
-  intros.
-  apply matrix_eq; cbn; [ now rewrite Hra, Hrc | now rewrite Hca, Hcc | ].
-  intros i j' Hi Hj'.
-  destruct (lt_dec j' j); symmetry; apply Hc; flia.
-}
-erewrite rngl_summation_eq_compat. 2: {
-  intros j Hj.
-  rewrite Hbc.
-  rewrite rngl_mul_add_distr_l.
-  rewrite rngl_mul_add_distr_r.
-  rewrite Hab at 1.
-  rewrite Hac at 1.
-  easy.
-}
-cbn - [ iter_seq ].
-now apply rngl_summation_add_distr.
-Qed.
-
-(* If two rows (columns) in A are equal then det(A)=0. *)
-(* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html *)
-(* doing it only when the first row is 0; can be generalized later *)
-
-Theorem det_two_rows_are_eq : ∀ A i,
-  is_square_mat A
-  → 0 < i < mat_nrows A
-  → mat_ncols A ≠ 0
-  → (∀ j, mat_el A i j = mat_el A 0 j)
-  → determinant A = 0%F.
-Proof.
-intros * Hsm Hiz Hcz Ha.
-unfold is_square_mat in Hsm.
-unfold determinant.
-rewrite Hsm in Hiz.
-remember (mat_ncols A) as n eqn:Hn; symmetry in Hn.
-destruct n; [ easy | clear Hcz ].
-cbn - [ iter_seq ].
-(**)
-destruct n; [ flia Hiz | ].
-cbn - [ iter_seq ].
-rewrite (rngl_summation_split _ i); [ | flia Hiz ].
-rewrite rngl_summation_split_last; [ | flia ].
-rewrite rngl_summation_shift; [ | flia Hiz ].
-erewrite rngl_summation_eq_compat. 2: {
-  intros j Hj.
-  now rewrite Nat.add_comm, Nat.add_sub.
-}
-cbn - [ iter_seq ].
-Abort.
-(* blocked by the present implementation of discriminant
-erewrite rngl_summation_eq_compat; [ | easy | ]. 2: {
-  intros j Hj.
-  rewrite (rngl_summation_split _ (i - 1)); [ | flia Hiz ].
-  rewrite Nat.sub_add; [ | easy ].
-  easy.
-}
-cbn - [ iter_seq ].
-...
-rewrite rngl_summation_split_first; [ | easy | flia ].
-cbn - [ iter_seq ].
-rewrite rngl_mul_1_l.
-rewrite (rngl_summation_split _ i); [ | flia Hiz ].
-rewrite rngl_summation_split_last;[ | easy ].
-...
-rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
-  intros k Hk.
 ...
 *)
 
