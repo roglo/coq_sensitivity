@@ -64,7 +64,7 @@ Definition eigenvalues n M ev :=
 
 Definition eigenvalues_and_vectors n M ev eV :=
   (∀ i j, 0 ≤ i < n → 0 ≤ j < n → i ≠ j → nth i ev 0%F ≠ nth j ev 0%F) ∧
-  (∀ i, 0 ≤ i < n → nth i eV (vect_zero n) ≠ vect_zero n) ∧
+  (∀ i, 0 ≤ i < n → ‖ nth i eV (vect_zero n) ‖ = 1%F) ∧
   ∀ i μ V, 0 ≤ i < n →
   μ = nth i ev 0%F
   → V = nth i eV (vect_zero n)
