@@ -64,7 +64,7 @@ Definition eigenvalues n M ev :=
 
 Definition eigenvalues_and_vectors n M ev eV :=
   (∀ i j, 0 ≤ i < n → 0 ≤ j < n → i ≠ j → nth i ev 0%F ≠ nth j ev 0%F) ∧
-  (∀ i, 0 ≤ i < n → ‖ nth i eV (vect_zero n) ‖ = 1%F) ∧
+  (∀ i, 0 ≤ i < n → vect_squ_norm (nth i eV (vect_zero n)) = 1%F) ∧
   ∀ i μ V, 0 ≤ i < n →
   μ = nth i ev 0%F
   → V = nth i eV (vect_zero n)
@@ -303,7 +303,7 @@ subst U D; cbn.
 remember (mat_with_vect eV) as U eqn:Hmo.
 remember (mat_with_diag n ev) as D eqn:Hmd.
 move D before U.
-destruct Hvv as (Hall_diff & Hall_nz & Hvv).
+destruct Hvv as (Hall_diff & Hall_norm_1 & Hvv).
 unfold is_symm_mat in Hsy.
 apply matrix_eq.
 cbn - [ iter_seq ].
@@ -430,7 +430,7 @@ remember (nth i eV (vect_zero n)) as vi eqn:Hvi.
 remember (nth j eV (vect_zero n)) as vj eqn:Hvj.
 move vj before vi.
 destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
-  destruct Hvv as (Hall_diff & Hall_nz & Hvv).
+  destruct Hvv as (Hall_diff & Hall_norm_1 & Hvv).
   enough (Hvvz : (vi · vj)%V = 0%F) by easy.
   specialize (mat_mul_vect_dot_vect Hic M vi vj) as H1.
   (* H1 : ((M • vi) · vj)%V = (vi · (M⁺ • vj))%V *)
@@ -466,12 +466,25 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
 }
 subst j.
 rewrite Hvj, <- Hvi.
-destruct Hvv as (Hall_diff & Hall_nz & Hvv).
-(* well, all vectors should have their norm equal to 1 *)
+destruct Hvv as (Hall_diff & Hall_norm_1 & Hvv).
+specialize (Hall_norm_1 i) as H1.
+rewrite <- Hvi in H1.
+apply H1; flia Hi.
+Qed.
+
+Theorem det_nz_inv_comm : ∀ n (MA MB : matrix n n T),
+  determinant MA ≠ 0%F
+  → (MA * MB = mI n)%M
+  → (MB * MA = mI n)%M.
+Proof.
+intros * Hdet Hab.
+Print comatrix.
 ...
 
 Theorem diagonalized_matrix_prop :
   rngl_is_comm = true →
+  rngl_has_dec_eq = true →
+  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
   ∀ n (M : matrix n n T) ev eV D U,
   is_symm_mat M
   → eigenvalues_and_vectors M ev eV
@@ -479,11 +492,16 @@ Theorem diagonalized_matrix_prop :
   → U = mat_with_vect eV
    → M = (U * D * U⁺)%M.
 Proof.
-intros Hic * Hsy Hvv Hd Ho.
-specialize (diagonalized_matrix_prop_1 Hic) as H.
-specialize (H n M ev eV D U Hsy Hvv Hd Ho).
-rewrite <- H.
+intros Hic Hed Hiv * Hsy Hvv Hd Ho.
+specialize (diagonalized_matrix_prop_1 Hic) as H1.
+specialize (H1 n M ev eV D U Hsy Hvv Hd Ho).
+rewrite <- H1.
 rewrite <- mat_mul_assoc; [ | easy ].
+rewrite (@det_nz_inv_comm _ _ U). 3: {
+  specialize for_symm_squ_mat_eigen_vect_mat_is_ortho as H2.
+  specialize (H2 Hic Hed Hiv n M ev eV).
+  now apply H2.
+} 2: {
 ...
 
 (* changing variable x as y = O^T . x, the Rayleigh quotient R (M, x)

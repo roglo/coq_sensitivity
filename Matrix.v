@@ -147,7 +147,7 @@ Definition vect_mul_scal_l s {n} (V : vector n T) :=
 Definition vect_dot_product {n} (U V : vector n T) :=
   (Σ (i = 0, n - 1), vect_el U i * vect_el V i)%F.
 
-Definition vect_norm n (V : vector n T) := vect_dot_product V V.
+Definition vect_squ_norm n (V : vector n T) := vect_dot_product V V.
 
 (* multiplication of a matrix by a scalar *)
 
@@ -1130,7 +1130,7 @@ Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hic {n}%nat a%F (U V)%V.
 Arguments vect_scal_mul_dot_mul_comm {T}%type {ro rp} {n}%nat a%F (U V)%V.
 Arguments vect_opt_eq_dec {T}%type {ro rp} _ n%nat U%V V%V.
 Arguments vect_el {n}%nat {T}%type v%V c%nat.
-Arguments vect_norm {T}%type {ro} {n}%nat V%V.
+Arguments vect_squ_norm {T}%type {ro} {n}%nat V%V.
 
 Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.
@@ -1145,7 +1145,5 @@ Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
 Notation "A • V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
 Notation "U · V" := (vect_dot_product U V) (at level 40) : V_scope.
 Notation "- V" := (vect_opp V) : V_scope.
-
-Notation "‖ V ‖" := (vect_norm V) (at level 20).
 
 End matrix_Notations.
