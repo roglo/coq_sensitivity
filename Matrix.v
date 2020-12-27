@@ -435,6 +435,7 @@ intros * Hnz Hiz Ha.
 unfold determinant.
 destruct n; [ easy | clear Hnz ].
 cbn - [ iter_seq ].
+...
 (**)
 destruct n; [ flia Hiz | ].
 cbn - [ iter_seq ].
