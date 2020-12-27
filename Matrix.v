@@ -423,6 +423,26 @@ Qed.
    point 3 *)
 (* doing it only when the first row is 0; can be generalized later *)
 
+Definition toto i k := k + Nat.b2n (i <? k).
+Definition titi i k := i + Nat.b2n (i <? k).
+
+Theorem glop : ∀ n (A : matrix n n T) i j k l,
+  subm (subm A i j) k l =
+  subm (subm A (toto i k) (toto j l)) (titi i k) (titi j l).
+Proof.
+intros.
+apply matrix_eq; cbn.
+intros i' j' Hi' Hj'.
+destruct (lt_dec (i' + 1) i) as [H1| H1]. {
+  destruct (lt_dec i' i) as [H| H]; [ clear H | flia H1 H ].
+  destruct (lt_dec (j' + 1) j) as [H2| H2]. {
+    destruct (lt_dec j' j) as [H| H]; [ clear H | flia H2 H ].
+    destruct (lt_dec j' l) as [H3| H3]. {
+
+...
+  destruct (lt_dec j' j) as [H2| H2]. {
+...
+
 Theorem glop : ∀ n (A : matrix n n T) i j,
   subm (subm A i j) 0 0 = subm (subm A 0 0) (i - 1) (j - 1).
 Proof.
