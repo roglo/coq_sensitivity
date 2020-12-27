@@ -179,6 +179,49 @@ Definition minus_one_pow n :=
   | _ => (- 1%F)%F
   end.
 
+Theorem minus_one_pow_succ :
+  rngl_has_opp = true →
+  ∀ i, minus_one_pow (S i) = (- minus_one_pow i)%F.
+Proof.
+intros Hop *.
+unfold minus_one_pow.
+remember (i mod 2) as k eqn:Hk; symmetry in Hk.
+destruct k. {
+  apply Nat.mod_divides in Hk; [ | easy ].
+  destruct Hk as (k, Hk); subst i.
+  rewrite <- Nat.add_1_l, Nat.mul_comm.
+  now rewrite Nat.mod_add.
+}
+destruct k. {
+  rewrite <- Nat.add_1_l.
+  rewrite <- Nat.add_mod_idemp_r; [ | easy ].
+  rewrite Hk; cbn.
+  symmetry.
+  now apply rngl_opp_involutive.
+}
+specialize (Nat.mod_upper_bound i 2) as H1.
+assert (H : 2 ≠ 0) by easy.
+specialize (H1 H); clear H.
+rewrite Hk in H1.
+flia H1.
+Qed.
+
+Theorem minus_one_pow_add_r :
+  rngl_has_opp = true →
+  ∀ i j, minus_one_pow (i + j) = (minus_one_pow i * minus_one_pow j)%F.
+Proof.
+intros Hop *.
+revert j.
+induction i; intros; [ now cbn; rewrite rngl_mul_1_l | ].
+rewrite Nat.add_succ_comm.
+rewrite IHi.
+rewrite minus_one_pow_succ; [ | easy ].
+rewrite minus_one_pow_succ; [ | easy ].
+rewrite rngl_mul_opp_l; [ | easy ].
+rewrite rngl_mul_opp_r; [ | easy ].
+easy.
+Qed.
+
 (* determinant *)
 
 Fixpoint det_loop {n} (M : matrix n n T) i :=
@@ -1100,8 +1143,10 @@ Declare Scope V_scope.
 Delimit Scope M_scope with M.
 Delimit Scope V_scope with V.
 
-Arguments det_loop {T ro} {n%nat} M%M i%nat.
 Arguments determinant {T ro} {n%nat} M%M.
+Arguments det_loop {T ro} {n%nat} M%M i%nat.
+Arguments det_from_row {T}%type {ro} {n}%nat M%M i%nat.
+Arguments det_from_col {T}%type {ro} {n}%nat M%M j%nat.
 Arguments comatrix {T}%type {ro} {n}%nat M%M.
 Arguments mat_el [m n]%nat [T]%type M%M : rename.
 Arguments mat_add_opp_r {T}%type {ro rp} {m n}%nat Hro M%M.

@@ -472,13 +472,46 @@ rewrite <- Hvi in H1.
 apply H1; flia Hi.
 Qed.
 
-Theorem mat_inv n (M : matrix n n T) :
-  (M * comatrix M)%M = (determinant M × mI n)%M.
+Theorem mat_inv :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  ∀ n (M : matrix n n T), (M * (comatrix M)⁺)%M = (determinant M × mI n)%M.
 Proof.
-intros.
+intros Hic Hop *.
 apply matrix_eq.
 intros * Hi Hj.
 cbn - [ iter_seq ].
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  subst j; clear Hj.
+  rewrite rngl_mul_1_r.
+  enough (H : det_from_row M i = determinant M). {
+    rewrite <- H.
+    unfold det_from_row.
+    rewrite rngl_mul_summation_distr_l.
+    apply rngl_summation_eq_compat.
+    intros j Hj.
+    do 3 rewrite rngl_mul_assoc.
+    f_equal.
+    specialize rngl_opt_mul_comm as rngl_mul_comm.
+    rewrite Hic in rngl_mul_comm.
+    rewrite rngl_mul_comm.
+    f_equal.
+    now apply minus_one_pow_add_r.
+  }
+...
+
+  unfold determinant.
+  induction n; [ easy | ].
+  rewrite Nat.sub_succ, Nat.sub_0_r at 1.
+  cbn - [ iter_seq ].
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j Hj.
+    specialize rngl_opt_mul_comm as rngl_mul_comm.
+    rewrite Hic in rngl_mul_comm.
+    rewrite rngl_mul_assoc, (rngl_mul_comm (mat_el M i j)).
+    easy.
+  }
+  cbn - [ iter_seq ].
 ...
 
 Theorem det_nz_inv_comm : ∀ n (MA MB : matrix n n T),
