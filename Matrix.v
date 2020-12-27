@@ -423,7 +423,6 @@ Qed.
    point 3 *)
 (* doing it only when the first row is 0; can be generalized later *)
 
-(*
 Theorem glop : ∀ n (A : matrix n n T) i j,
   subm (subm A i j) 0 0 = subm (subm A 0 0) (i - 1) (j - 1).
 Proof.
@@ -436,7 +435,6 @@ destruct
   (lt_dec (j' + 1) j) as [H3| H3],
   (lt_dec j' (j - 1)) as [H4| H4]; try easy; flia H1 H2 H3 H4.
 Qed.
-*)
 
 Theorem det_two_rows_are_eq : ∀ n (A : matrix n n T) i,
   n ≠ 0
@@ -448,7 +446,7 @@ intros * Hnz Hiz Ha.
 unfold determinant.
 destruct n; [ easy | clear Hnz ].
 cbn - [ iter_seq ].
-Abort. (*
+...
 destruct n; [ flia Hiz | ].
 cbn - [ iter_seq ].
 rewrite (rngl_summation_split _ i); [ | flia Hiz ].
@@ -599,7 +597,7 @@ rewrite (det_sum_row_row _ M C Hrz); cycle 1. {
   remember
     (mk_mat n n (λ i j, if Nat.eq_dec i 0 then mat_el M k j else mat_el M i j))
        as D eqn:Hd.
-Abort. (* à finir...
+... (* à finir...
   specialize (det_mul_row_0_by_scal D v) as H1.
   assert (H : mat_ncols D ≠ 0); [ subst D; cbn; congruence | ].
   specialize (H1 H); clear H.
@@ -612,7 +610,7 @@ Abort. (* à finir...
   rewrite H in H1; clear H.
   assert (H : determinant D = 0%F). {
     rewrite Hd.
-Abort. (* blocked because needs the previous lemma
+ (* blocked because needs the previous lemma
 ...
 *)
 *)
@@ -629,7 +627,7 @@ intros * Hij Hi Hj.
 (* look point 5 at
 https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html
 *)
-Abort. (*
+... (*
 ...
 intros * Hsm Hij Hi Hj.
 unfold is_square_mat in Hsm.
@@ -750,7 +748,7 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   now rewrite Nat.sub_0_r.
 }
 apply not_eq_sym in Hiz.
-Abort. (*
+... (*
 ...
 specialize (det_swap_rows M Hiz) as H.
 apply (f_equal rng_opp) in H.
