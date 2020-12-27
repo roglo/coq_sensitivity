@@ -265,22 +265,20 @@ Definition mat_mul_row_by_scal n k (M : matrix n n T) s :=
     (λ i j,
      if Nat.eq_dec i k then (s * mat_el M i j)%F else mat_el M i j).
 
-(* to be updated to new definition matrix m n T  if I need them ...
-
-Definition mat_swap_rows (M : matrix T) i1 i2 :=
-  mk_mat
+Definition mat_swap_rows n (M : matrix n n T) i1 i2 :=
+  mk_mat n n
     (λ i j,
      if Nat.eq_dec i i1 then mat_el M i2 j
      else if Nat.eq_dec i i2 then mat_el M i1 j
-     else mat_el M i j) (mat_nrows M) (mat_ncols M).
+     else mat_el M i j).
 
-Definition mat_add_row_mul_scal_row M i1 v i2 :=
-  mk_mat
+Definition mat_add_row_mul_scal_row n (M : matrix n n T) i1 v i2 :=
+  mk_mat n n
     (λ i j,
      if Nat.eq_dec i i1 then (mat_el M i1 j + v * mat_el M i2 j)%F
-     else mat_el M i j)
-   (mat_nrows M) (mat_nrows M).
+     else mat_el M i j).
 
+(*
 (* If the i-th row (column) in A is a sum of the i-th row (column) of
    a matrix B and the i-th row (column) of a matrix C and all other
    rows in B and C are equal to the corresponding rows in A (that is B
@@ -425,6 +423,7 @@ Qed.
    point 3 *)
 (* doing it only when the first row is 0; can be generalized later *)
 
+(*
 Theorem glop : ∀ n (A : matrix n n T) i j,
   subm (subm A i j) 0 0 = subm (subm A 0 0) (i - 1) (j - 1).
 Proof.
@@ -437,8 +436,7 @@ destruct
   (lt_dec (j' + 1) j) as [H3| H3],
   (lt_dec j' (j - 1)) as [H4| H4]; try easy; flia H1 H2 H3 H4.
 Qed.
-
-...
+*)
 
 Theorem det_two_rows_are_eq : ∀ n (A : matrix n n T) i,
   n ≠ 0
@@ -450,8 +448,7 @@ intros * Hnz Hiz Ha.
 unfold determinant.
 destruct n; [ easy | clear Hnz ].
 cbn - [ iter_seq ].
-...
-(**)
+Abort. (*
 destruct n; [ flia Hiz | ].
 cbn - [ iter_seq ].
 rewrite (rngl_summation_split _ i); [ | flia Hiz ].
@@ -463,7 +460,7 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn - [ iter_seq ].
 ...
-(* blocked by the present implementation of discriminant
+(* blocked by the present implementation of discriminant *)
 erewrite rngl_summation_eq_compat; [ | easy | ]. 2: {
   intros j Hj.
   rewrite (rngl_summation_split _ (i - 1)); [ | flia Hiz ].
@@ -482,8 +479,6 @@ rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
   intros k Hk.
 ...
 *)
-
-...
 
 (* multilinearity *)
 
@@ -582,19 +577,17 @@ do 3 rewrite rngl_add_0_l, rngl_mul_1_l.
 (* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html *)
 (* doing it only when the first row is 0; can be generalized later *)
 
-Theorem det_add_row_mul_scal_row : ∀ M v k,
-  is_square_mat M
-  → mat_nrows M ≠ 0
+Theorem det_add_row_mul_scal_row : ∀ n (M : matrix n n T) v k,
+  n ≠ 0
   → determinant (mat_add_row_mul_scal_row M 0 v k) = determinant M.
 Proof.
-intros * Hsm Hrz.
-unfold is_square_mat in Hsm.
+intros * Hrz.
 remember
-  (mk_mat
+  (mk_mat n n
      (λ i j,
-      if Nat.eq_dec i 0 then (v * mat_el M k j)%F else mat_el M i j)
-     (mat_nrows M) (mat_ncols M)) as C eqn:Hc.
-rewrite (det_sum_row_row _ M C Hrz); cycle 7. {
+      if Nat.eq_dec i 0 then (v * mat_el M k j)%F else mat_el M i j))
+   as C eqn:Hc.
+rewrite (det_sum_row_row _ M C Hrz); cycle 1. {
   now intros; rewrite Hc.
 } {
   intros i j Hi.
@@ -604,8 +597,8 @@ rewrite (det_sum_row_row _ M C Hrz); cycle 7. {
   now destruct (Nat.eq_dec i 0).
 } {
   remember
-    (mk_mat (λ i j, if Nat.eq_dec i 0 then mat_el M k j else mat_el M i j)
-       (mat_nrows M) (mat_ncols M)) as D eqn:Hd.
+    (mk_mat n n (λ i j, if Nat.eq_dec i 0 then mat_el M k j else mat_el M i j))
+       as D eqn:Hd.
 Abort. (* à finir...
   specialize (det_mul_row_0_by_scal D v) as H1.
   assert (H : mat_ncols D ≠ 0); [ subst D; cbn; congruence | ].
@@ -626,14 +619,13 @@ Abort. (* blocked because needs the previous lemma
 
 (* proof that the swapping two rows negates the determinant  *)
 
-Theorem det_swap_rows : ∀ M i j,
-  is_square_mat M
-  → i ≠ j
-  → i < mat_nrows M
-  → j < mat_nrows M
+Theorem det_swap_rows : ∀ n (M : matrix n n T) i j,
+  i ≠ j
+  → i < n
+  → j < n
   → determinant (mat_swap_rows M i j) = (- determinant M)%F.
 Proof.
-intros * Hsm Hij Hi Hj.
+intros * Hij Hi Hj.
 (* look point 5 at
 https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html
 *)
@@ -739,19 +731,23 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
 
 (* proof that det_from_row is equal to determinant *)
 
-Theorem det_from_row_is_det : ∀ M i,
-  mat_ncols M ≠ 0
+Theorem det_from_row_is_det : ∀ n (M : matrix n n T) i,
+  n ≠ 0
   → det_from_row M i = determinant M.
 Proof.
-intros * Hcz.
+intros * Hnz.
 destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   subst i.
   unfold determinant, det_from_row.
   cbn - [ iter_seq ].
   rewrite rngl_mul_1_l.
-  remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
-  destruct c; [ easy | clear Hcz ].
-  now rewrite Nat.sub_succ, Nat.sub_0_r.
+  destruct n; [ easy | clear Hnz ].
+  rewrite Nat.sub_succ, Nat.sub_0_r at 1.
+  cbn - [ iter_seq ].
+  apply rngl_summation_eq_compat.
+  intros i Hi.
+  f_equal; f_equal.
+  now rewrite Nat.sub_0_r.
 }
 apply not_eq_sym in Hiz.
 Abort. (*
