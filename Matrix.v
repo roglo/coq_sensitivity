@@ -1102,6 +1102,7 @@ Delimit Scope V_scope with V.
 
 Arguments det_loop {T ro} {n%nat} M%M i%nat.
 Arguments determinant {T ro} {n%nat} M%M.
+Arguments comatrix {T}%type {ro} {n}%nat M%M.
 Arguments mat_el [m n]%nat [T]%type M%M : rename.
 Arguments mat_add_opp_r {T}%type {ro rp} {m n}%nat Hro M%M.
 Arguments mat_mul_mul_scal_l {T}%type {ro rp} Hic {m n p}%nat a%F MA%M.

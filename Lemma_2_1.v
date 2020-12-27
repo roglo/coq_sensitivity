@@ -472,6 +472,15 @@ rewrite <- Hvi in H1.
 apply H1; flia Hi.
 Qed.
 
+Theorem mat_inv n (M : matrix n n T) :
+  (M * comatrix M)%M = (determinant M × mI n)%M.
+Proof.
+intros.
+apply matrix_eq.
+intros * Hi Hj.
+cbn - [ iter_seq ].
+...
+
 Theorem det_nz_inv_comm : ∀ n (MA MB : matrix n n T),
   determinant MA ≠ 0%F
   → (MA * MB = mI n)%M
