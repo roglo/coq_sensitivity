@@ -31,36 +31,7 @@ Context (rp : ring_like_prop T).
 Definition is_symm_mat n (A : matrix n n T) :=
   ∀ i j, i < n → j < n → mat_el A i j = mat_el A j i.
 
-(*
-Definition is_symm_squ_mat n (A : square_matrix n) :=
-  is_symm_mat (mat_of_squ_mat A).
-*)
-
 Definition princ_subm_1 m n (A : matrix m n T) k := subm A k k.
-
-(*
-Theorem princ_subm_1_preserves_symm : ∀ (A : matrix T) n,
-  is_symm_mat A
-  → is_symm_mat (princ_subm_1 A n).
-Proof.
-intros * Ha.
-unfold is_symm_mat in Ha |-*; cbn.
-intros i j Hi Hj.
-destruct (lt_dec i n) as [Hin| Hin]. {
-  destruct (lt_dec j n) as [Hjn| Hjn]. {
-    apply Ha; [ flia Hi | flia Hj ].
-  } {
-    apply Ha; [ flia Hi | flia Hj ].
-  }
-} {
-  destruct (lt_dec j n) as [Hjn| Hjn]. {
-    apply Ha; [ flia Hi | flia Hj ].
-  } {
-    apply Ha; [ flia Hi | flia Hj ].
-  }
-}
-Qed.
-*)
 
 Theorem Nat_sub_length_nil_r : ∀ n, n = n - @length nat [].
 Proof.
@@ -87,54 +58,6 @@ Fixpoint mat_princ_subm n (A : matrix n n T) l :
 
 Theorem subm_z : ∀ f i j, subm (mk_mat 0 0 f) i j = mZ 0 0.
 Proof. now intros; apply matrix_eq. Qed.
-
-(*
-Theorem princ_subm_prop : ∀ n (A : matrix n n T) l,
-  ((mat_nrows (mat_princ_subm (mat_of_squ_mat A) l) =? n - length l) &&
-   (mat_ncols (mat_princ_subm (mat_of_squ_mat A) l) =? n - length l))%bool = true.
-Proof.
-intros.
-apply Bool.andb_true_iff.
-revert n A.
-induction l as [| i]; intros. {
-  cbn; rewrite Nat.sub_0_r.
-  destruct A as (A, Ha); cbn in Ha |-*.
-  apply Bool.andb_true_iff in Ha.
-  destruct Ha as (Hra, Hca).
-  apply Nat.eqb_eq in Hra.
-  apply Nat.eqb_eq in Hca.
-  now split; apply Nat.eqb_eq.
-}
-cbn.
-unfold mat_princ_subm in IHl.
-destruct n. {
-  destruct A as (A, Ha); cbn in Ha |-*.
-  apply Bool.andb_true_iff in Ha.
-  destruct Ha as (Hra, Hca).
-  apply Nat.eqb_eq in Hra.
-  apply Nat.eqb_eq in Hca.
-  destruct A as (fa, ra, ca).
-  cbn in Hra, Hca.
-  subst ra ca.
-  rewrite subm_z.
-  clear.
-  replace (fold_left _ l (mZ 0)) with (mZ 0); [ easy | ].
-  symmetry.
-  induction l as [| i]; [ easy | cbn ].
-  replace (subm (mZ 0) i i) with (mZ 0); [ easy | ].
-  now apply matrix_eq.
-}
-rewrite Nat.sub_succ.
-specialize (IHl _ (squ_mat_subm A i i)) as (H1, H2).
-cbn in H1; rewrite Nat.sub_0_r in H1; rewrite H1.
-cbn in H2; rewrite Nat.sub_0_r in H2; rewrite H2.
-easy.
-Qed.
-
-Definition princ_subm n (A : square_matrix n) (l : list nat) :
-   square_matrix (n - length l) :=
- exist _ (mat_princ_subm (mat_of_squ_mat A) l) (princ_subm_prop A l).
-*)
 
 Definition eigenvalues n M ev :=
   ∀ μ, μ ∈ ev → ∃ V, V ≠ vect_zero n ∧ (M • V = μ × V)%V.
@@ -216,13 +139,8 @@ rewrite Hor in rngl_add_le_compat.
 unfold vect_dot_product in H.
 apply vector_eq.
 intros i Hi.
-(**)
 cbn.
 revert v i Hi H.
-(*
-remember (vect_el v) as f.
-revert i Hi.
-*)
 induction n; intros; [ easy | ].
 rewrite Nat.sub_succ, Nat.sub_0_r in H.
 rewrite rngl_summation_split_last in H; [ | flia ].
@@ -242,9 +160,6 @@ erewrite rngl_summation_eq_compat in H. 2: {
 cbn - [ iter_seq ] in H.
 apply rngl_eq_add_0 in H; [ | easy | | ]; cycle 1. {
   clear H Hi IHn.
-(*
-  clear v Heqf.
-*)
   induction n. {
     cbn; rewrite rngl_add_0_l.
     now apply rngl_0_le_squ.
@@ -362,35 +277,10 @@ Definition is_orthogonal_matrix n (M : matrix n n T) :=
 Definition mat_with_diag n d :=
   mk_mat n n (λ i j, if Nat.eq_dec i j then nth i d 0%F else 0%F).
 
-(*
-Theorem mat_with_diag_prop : ∀ n d,
-  ((mat_nrows (mat_with_diag n d) =? n) &&
-   (mat_ncols (mat_with_diag n d) =? n))%bool = true.
-Proof.
-intros; cbn.
-apply Bool.andb_true_iff.
-now split; apply Nat.eqb_eq.
-Qed.
-*)
-
 (* matrix with columns given as list of vectors *)
 
 Definition mat_with_vect n Vl :=
   mk_mat n n (λ i j, vect_el (nth j Vl (vect_zero n)) i).
-
-(*
-Theorem mat_with_vect_prop : ∀ n Vl,
-  ((mat_nrows (mat_with_vect n Vl) =? n) &&
-   (mat_ncols (mat_with_vect n Vl) =? n))%bool = true.
-Proof.
-intros; cbn.
-apply Bool.andb_true_iff.
-now split; apply Nat.eqb_eq.
-Qed.
-
-Definition mat_with_vect n (Vl : list (vector n T)) : matrix n n T :=
- exist _ (mat_with_vect n Vl) (mat_with_vect_prop n Vl).
- *)
 
 (* In the real case, the symmetric matrix M is diagonalisable in the
    sense that there exists an orthogonal matrix U (the columns of which
@@ -408,32 +298,15 @@ Theorem diagonalized_matrix_prop_1 :
    → (M * U = U * D)%M.
 Proof.
 intros Hic * Hsy Hvv Hd Ho.
-(*
-apply matrix_eq; cbn.
-*)
 subst U D; cbn.
 remember (mat_with_vect eV) as U eqn:Hmo.
 remember (mat_with_diag n ev) as D eqn:Hmd.
 move D before U.
 unfold eigenvalues_and_vectors in Hvv.
 unfold is_symm_mat in Hsy.
-(*
-destruct M as (M, Hm).
-cbn in Hsy, Hvv |-*.
-apply Bool.andb_true_iff in Hm.
-destruct Hm as (Hr, Hc).
-apply Nat.eqb_eq in Hr.
-apply Nat.eqb_eq in Hc.
-rewrite Hr in Hvv.
-*)
 apply matrix_eq.
 cbn - [ iter_seq ].
 intros * Hi Hj.
-(*
-rewrite Hmd in Hj; cbn in Hj.
-remember (mat_ncols U) as x eqn:Hx.
-rewrite Hmo in Hx; cbn in Hx; subst x.
-*)
 symmetry.
 rewrite (rngl_summation_split _ j); [ | flia Hj ].
 rewrite rngl_summation_split_last; [ | flia ].
@@ -464,9 +337,6 @@ remember (nth j eV (vect_zero n)) as V eqn:Hv.
 symmetry.
 assert (H : vect_el (M • V) i = vect_el (μ × V) i) by now rewrite H1.
 cbn - [ iter_seq ] in H.
-(*
-rewrite Hc in H.
-*)
 specialize rngl_opt_mul_comm as rngl_mul_comm.
 rewrite Hic in rngl_mul_comm.
 now rewrite rngl_mul_comm in H.
@@ -539,17 +409,6 @@ rewrite Hic in rngl_mul_comm.
 apply rngl_mul_comm.
 Qed.
 
-(*
-Theorem glop : ∀ n (MA MB : matrix n n T),
-  determinant MA ≠ 0%F
-  → (MA * MB = mI n)%M
-  → (MB * MA = mI n)%M.
-Proof.
-intros * Hdet Hab.
-Print comatrix.
-...
-*)
-
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   rngl_is_comm = true →
   rngl_has_dec_eq = true →
@@ -561,9 +420,6 @@ Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   → (U⁺ * U = mI n)%M.
 Proof.
 intros Hic Heq Hii * Hsy Hvv Hm.
-(*
-apply square_matrix_eq; cbn.
-*)
 rewrite Hm; cbn.
 apply matrix_eq.
 cbn - [ iter_seq ].
