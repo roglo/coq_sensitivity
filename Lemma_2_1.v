@@ -63,11 +63,12 @@ Definition eigenvalues n M ev :=
   ∀ μ, μ ∈ ev → ∃ V, V ≠ vect_zero n ∧ (M • V = μ × V)%V.
 
 Definition eigenvalues_and_vectors n M ev eV :=
+  (∀ i j, 0 ≤ i < n → 0 ≤ j < n → i ≠ j → nth i ev 0%F ≠ nth j ev 0%F) ∧
+  (∀ i, 0 ≤ i < n → nth i eV (vect_zero n) ≠ vect_zero n) ∧
   ∀ i μ V, 0 ≤ i < n →
   μ = nth i ev 0%F
   → V = nth i eV (vect_zero n)
-  → V ≠ vect_zero n ∧
-    (M • V = μ × V)%V.
+  → (M • V = μ × V)%V.
 
 (* Rayleigh quotient *)
 
@@ -302,7 +303,7 @@ subst U D; cbn.
 remember (mat_with_vect eV) as U eqn:Hmo.
 remember (mat_with_diag n ev) as D eqn:Hmd.
 move D before U.
-unfold eigenvalues_and_vectors in Hvv.
+destruct Hvv as (Hall_diff & Hall_nz & Hvv).
 unfold is_symm_mat in Hsy.
 apply matrix_eq.
 cbn - [ iter_seq ].
@@ -331,7 +332,6 @@ cbn - [ iter_seq ].
 specialize (Hvv j (nth j ev 0%F) (nth j eV (vect_zero n))) as H1.
 assert (H : 0 ≤ j < n) by flia Hj.
 specialize (H1 H eq_refl eq_refl); clear H.
-destruct H1 as (Hvjz & H1).
 remember (nth j ev 0%F) as μ eqn:Hμ.
 remember (nth j eV (vect_zero n)) as V eqn:Hv.
 symmetry.
@@ -409,6 +409,8 @@ rewrite Hic in rngl_mul_comm.
 apply rngl_mul_comm.
 Qed.
 
+(* https://math.stackexchange.com/questions/82467/eigenvectors-of-real-symmetric-matrices-are-orthogonal *)
+
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   rngl_is_comm = true →
   rngl_has_dec_eq = true →
@@ -427,16 +429,14 @@ intros * Hi Hj.
 remember (nth i eV (vect_zero n)) as vi eqn:Hvi.
 remember (nth j eV (vect_zero n)) as vj eqn:Hvj.
 move vj before vi.
-(* problem: if vi=vj but i≠j (same eigenvalues), this does not work *)
 destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
-  unfold eigenvalues_and_vectors in Hvv.
+  destruct Hvv as (Hall_diff & Hall_nz & Hvv).
   enough (Hvvz : (vi · vj)%V = 0%F) by easy.
   specialize (mat_mul_vect_dot_vect Hic M vi vj) as H1.
   (* H1 : ((M • vi) · vj)%V = (vi · (M⁺ • vj))%V *)
   specialize (Hvv i (nth i ev 0%F) vi) as H2.
   assert (H : 0 ≤ i < n) by flia Hi.
   specialize (H2 H eq_refl Hvi); clear H.
-  destruct H2 as (_ & H2).
   rewrite H2 in H1.
   clear H2.
   replace (M⁺)%M with M in H1. 2: {
@@ -448,7 +448,6 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
   specialize (Hvv j (nth j ev 0%F) vj) as H2.
   assert (H : 0 ≤ j < n) by flia Hj.
   specialize (H2 H eq_refl Hvj); clear H.
-  destruct H2 as (_ & H2).
   rewrite H2 in H1.
   clear H2.
   rewrite vect_scal_mul_dot_mul_comm in H1.
@@ -458,14 +457,16 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
   destruct (rngl_eq_dec (vi · vj)%V 0%F) as [Hvvij| Hvvij]; [ easy | ].
   exfalso.
   apply rngl_mul_reg_r in H1; [ | easy | easy ].
-  (* all eigenvalues are supposed to be different? *)
-  (* https://math.stackexchange.com/questions/82467/eigenvectors-of-real-symmetric-matrices-are-orthogonal *)
-  Print eigenvalues_and_vectors.
-  (* my definition of eigenvalues_and_vectors is not good because it does not
-   imply that the eigenvalues are different and even the egenvectors are
-   different; it could be just one eigenvalue and its eigenvector repeated;
-   I could specify that all eigenvalues are different but, doing so, it is
-   not enough general, because an eigenvalue can have a multiplicity *)
+  revert H1.
+  apply Hall_diff; [ | | easy ]. {
+    split; [ flia | easy ].
+  } {
+    split; [ flia | easy ].
+  }
+}
+subst j.
+rewrite Hvj, <- Hvi.
+destruct Hvv as (Hall_diff & Hall_nz & Hvv).
 ...
 
 Theorem diagonalized_matrix_prop :
