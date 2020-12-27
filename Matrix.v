@@ -426,9 +426,14 @@ Qed.
 (* doing it only when the first row is 0; can be generalized later *)
 
 Theorem glop : ∀ n (A : matrix n n T),
-  determinant (subm (subm A 0 0) 0 0) =
-  determinant (subm (subm A 0 1) 1 0).
-(* mmm... faut voir... *)
+  subm (subm A 0 0) 0 0 = subm (subm A 0 1) 0 0.
+Proof.
+intros.
+apply matrix_eq.
+intros * Hi Hj; cbn.
+destruct (lt_dec (j + 1) 1) as [Hj1| Hj1]; [ flia Hj1 | easy ].
+Qed.
+
 ...
 
 Theorem det_two_rows_are_eq : ∀ n (A : matrix n n T) i,
