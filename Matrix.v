@@ -425,6 +425,12 @@ Qed.
    point 3 *)
 (* doing it only when the first row is 0; can be generalized later *)
 
+Theorem glop : ∀ n (A : matrix n n T),
+  determinant (subm (subm A 0 0) 0 0) =
+  determinant (subm (subm A 0 1) 1 0).
+(* mmm... faut voir... *)
+...
+
 Theorem det_two_rows_are_eq : ∀ n (A : matrix n n T) i,
   n ≠ 0
   → 0 < i < n
