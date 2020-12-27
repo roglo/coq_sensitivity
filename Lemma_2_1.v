@@ -467,6 +467,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
 subst j.
 rewrite Hvj, <- Hvi.
 destruct Hvv as (Hall_diff & Hall_nz & Hvv).
+(* well, all vectors should have their norm equal to 1 *)
 ...
 
 Theorem diagonalized_matrix_prop :
