@@ -698,36 +698,8 @@ destruct i. {
   destruct Hiz as (_, Hiz).
   apply Nat.succ_lt_mono in Hiz.
   destruct n; [ easy | ].
+  clear Hiz.
   rewrite rngl_summation_split_first; [ | easy | flia ].
-(*
-  cbn - [ iter_seq det_loop ].
-  rewrite rngl_mul_1_l.
-  rewrite rngl_summation_split_first; [ | easy | flia ].
-  cbn - [ iter_seq det_loop ].
-  rewrite rngl_mul_opp_l; [ | easy ].
-  rewrite rngl_mul_1_l.
-  rewrite rngl_mul_opp_l; [ | easy ].
-  rewrite rngl_add_assoc.
-(*
-  rewrite fold_rngl_sub; [ | easy ].
-*)
-  remember (det_loop _ _) as x.
-  cbn - [ iter_seq ] in Heqx; subst x.
-  remember (det_loop _ _) as x.
-  cbn - [ iter_seq Nat.leb ] in Heqx; subst x.
-  remember (Nat.b2n _) as x; cbn in Heqx; subst x.
-  rewrite rngl_summation_split_first; [ | easy | flia ].
-  cbn - [ iter_seq Nat.leb subm ].
-  rewrite rngl_mul_1_l.
-  rewrite (rngl_summation_split_first _ 0 n); [ | flia ].
-  remember (Nat.b2n _) as x; cbn in Heqx; subst x.
-  rewrite Nat.add_0_l.
-  cbn - [ iter_seq Nat.leb subm ].
-  rewrite rngl_mul_1_l.
-  rewrite rngl_mul_add_distr_l.
-  rewrite rngl_mul_add_distr_l.
-...
-*)
   cbn - [ iter_seq ].
   rewrite rngl_mul_1_l.
   rewrite rngl_add_comm.
@@ -790,6 +762,59 @@ destruct i. {
     easy.
   }
   cbn - [ iter_seq Nat.leb ].
+(**)
+  destruct n. {
+    cbn in Heqx, Heqy |-*; subst x y; cbn.
+    rewrite rngl_mul_0_r, rngl_mul_0_r, rngl_add_0_r.
+    apply rngl_add_opp_r.
+  }
+  rewrite rngl_summation_split_first; [ | easy | flia ].
+  rewrite <- rngl_mul_summation_distr_l.
+  cbn - [ iter_seq Nat.leb subm det_loop ].
+  rewrite rngl_mul_1_l.
+  rewrite rngl_summation_split_first; [ | easy | flia ].
+  cbn - [ iter_seq Nat.leb subm det_loop ].
+  rewrite rngl_mul_1_l.
+  remember (Nat.b2n (2 <=? 0)) as z; cbn in Heqz; subst z.
+  rewrite rngl_mul_add_distr_l.
+  destruct n. {
+    cbn in Heqx, Heqy |-*; subst x y; cbn.
+    do 5 rewrite rngl_add_0_l.
+    do 2 rewrite rngl_mul_1_l.
+    rewrite rngl_mul_opp_l; [ | easy ].
+    rewrite rngl_mul_opp_l; [ | easy ].
+    rewrite rngl_mul_opp_l; [ | easy ].
+    rewrite rngl_mul_opp_l; [ | easy ].
+    do 2 rewrite rngl_mul_1_l.
+    do 2 rewrite rngl_mul_1_r.
+    rewrite rngl_add_0_r.
+    rewrite rngl_mul_opp_r; [ | easy ].
+    rewrite rngl_mul_opp_r; [ | easy ].
+    unfold rngl_sub; rewrite Hop.
+    rewrite rngl_opp_involutive; [ | easy ].
+    do 4 rewrite rngl_mul_assoc.
+    rewrite rngl_mul_opp_r; [ | easy ].
+    rewrite rngl_mul_opp_l; [ | easy ].
+    do 2 rewrite Ha.
+    rewrite rngl_add_assoc.
+    rewrite (rngl_add_add_swap (- _)%F).
+    rewrite (rngl_add_comm (- _)%F).
+    rewrite (rngl_mul_comm (mat_el A 0 2)).
+    rewrite fold_rngl_sub; [ | easy ].
+    rewrite fold_rngl_sub; [ | easy ].
+    rewrite rngl_add_opp_r, rngl_add_0_l.
+    rewrite (rngl_mul_comm (mat_el A 0 1)).
+    apply rngl_add_opp_r.
+  }
+  rewrite (rngl_summation_split_first _ 2 (S (S n))); [ | flia ].
+  rewrite rngl_summation_split_first; [ | easy | flia ].
+  remember (Nat.b2n (2 <=? 1)) as z; cbn in Heqz; subst z.
+  rewrite Nat.add_0_r.
+  cbn - [ iter_seq Nat.leb subm det_loop ].
+  rewrite rngl_mul_opp_l; [ | easy ].
+  rewrite rngl_mul_opp_l; [ | easy ].
+  rewrite rngl_mul_opp_l; [ | easy ].
+  do 2 rewrite rngl_mul_1_l.
 ...
   destruct n. {
     cbn in Heqx, Heqy |-*.

@@ -225,6 +225,18 @@ assert (m + p = p + m)%F as H by apply rngl_add_comm.
 rewrite H; reflexivity.
 Qed.
 
+Theorem rngl_mul_mul_swap :
+  rngl_is_comm = true →
+  ∀ n m p, (n * m * p = n * p * m)%F.
+Proof.
+intros Hic n m p; simpl.
+do 2 rewrite <- rngl_mul_assoc.
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+rewrite Hic in rngl_mul_comm.
+assert (m * p = p * m)%F as H by apply rngl_mul_comm.
+rewrite H; reflexivity.
+Qed.
+
 Theorem rngl_mul_add_distr_r : ∀ x y z,
   ((x + y) * z = x * z + y * z)%F.
 Proof.
