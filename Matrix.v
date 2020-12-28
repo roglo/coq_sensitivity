@@ -680,8 +680,6 @@ unfold δ_lt.
 now destruct i, j.
 Qed.
 
-...
-
 Theorem det_two_rows_are_eq : ∀ n (A : matrix n n T) i,
   n ≠ 0
   → 0 < i < n
@@ -692,6 +690,7 @@ intros * Hnz Hiz Ha.
 unfold determinant.
 destruct n; [ easy | clear Hnz ].
 cbn - [ iter_seq ].
+... (*
 ...
 destruct n; [ flia Hiz | ].
 cbn - [ iter_seq ].
@@ -725,14 +724,6 @@ rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
 *)
 
 (* multilinearity *)
-
-(*
-Theorem glop : ∀ M a,
-  (a * determinant M)%F = determinant M.
-Proof.
-intros.
-...
-*)
 
 (* doesn't work
 Theorem determinant_multilinear_mul : ∀ M i a V,
@@ -1538,31 +1529,29 @@ Proof.
 intros.
 apply matrix_eq.
 intros k l Hk Hl; cbn.
-destruct (lt_dec k i) as [Hki| Hki]. {
-  destruct (lt_dec l i) as [Hli| Hli]; [ easy | ].
-  apply Nat.nlt_ge in Hli.
-  destruct (Nat.eq_dec k (l + 1)) as [Hkl1| Hkl1]. {
-    flia Hki Hli Hkl1.
-  }
-  destruct (Nat.eq_dec k l) as [Hkl| Hkl]; [ | easy ].
-  flia Hki Hli Hkl.
-} {
-  apply Nat.nlt_ge in Hki.
-  destruct (lt_dec l i) as [Hli| Hli]. {
-    destruct (Nat.eq_dec (k + 1) l) as [Hkl1| Hkl1]. {
-      flia Hki Hli Hkl1.
-    }
-    destruct (Nat.eq_dec k l) as [Hkl| Hkl]; [ | easy ].
-    flia Hki Hli Hkl.
-  } {
-    apply Nat.nlt_ge in Hli.
+remember (i <=? k) as ki eqn:Hki; symmetry in Hki.
+remember (i <=? l) as li eqn:Hli; symmetry in Hli.
+destruct ki; cbn. {
+  destruct li; cbn. {
     destruct (Nat.eq_dec (k + 1) (l + 1)) as [Hkl1| Hkl1]. {
-      destruct (Nat.eq_dec k l) as [Hkl| Hkl]; [ easy | ].
-      flia Hkl1 Hkl.
+      destruct (Nat.eq_dec k l) as [Hkl| Hkl]; [ easy | flia Hkl1 Hkl ].
     } {
-      destruct (Nat.eq_dec k l) as [Hkl| Hkl]; [ | easy ].
-      flia Hkl1 Hkl.
+      destruct (Nat.eq_dec k l) as [Hkl| Hkl]; [ flia Hkl1 Hkl | easy ].
     }
+  } {
+    rewrite Nat.add_0_r.
+    apply Nat.leb_le in Hki; apply Nat.leb_nle in Hli.
+    destruct (Nat.eq_dec (k + 1) l) as [Hkl1| Hkl1]; [ flia Hki Hli Hkl1 | ].
+    destruct (Nat.eq_dec k l) as [Hkl| Hkl]; [ flia Hki Hli Hkl | easy ].
+  }
+} {
+  rewrite Nat.add_0_r.
+  destruct li; cbn. {
+    apply Nat.leb_nle in Hki; apply Nat.leb_le in Hli.
+    destruct (Nat.eq_dec k (l + 1)) as [Hkl1| Hkl1]; [ flia Hki Hli Hkl1 | ].
+    destruct (Nat.eq_dec k l) as [Hkl| Hkl]; [ flia Hki Hli Hkl | easy ].
+  } {
+    now rewrite Nat.add_0_r.
   }
 }
 Qed.
