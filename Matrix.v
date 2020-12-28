@@ -680,16 +680,72 @@ unfold δ_lt.
 now destruct i, j.
 Qed.
 
-Theorem det_two_rows_are_eq : ∀ n (A : matrix n n T) i,
+Theorem det_two_rows_are_eq :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  ∀ n (A : matrix n n T) i,
   n ≠ 0
   → 0 < i < n
   → (∀ j, mat_el A i j = mat_el A 0 j)
   → determinant A = 0%F.
 Proof.
-intros * Hnz Hiz Ha.
+intros Hic Hop * Hnz Hiz Ha.
 unfold determinant.
 destruct n; [ easy | clear Hnz ].
 cbn - [ iter_seq ].
+destruct i; [ easy | ].
+destruct i. {
+  destruct Hiz as (_, Hiz).
+  apply Nat.succ_lt_mono in Hiz.
+  destruct n; [ easy | ].
+  rewrite rngl_summation_split_first; [ | easy | flia ].
+  cbn - [ iter_seq ].
+  rewrite rngl_mul_1_l.
+  rewrite rngl_add_comm.
+  rewrite rngl_summation_split_first; [ | easy | flia ].
+  rewrite rngl_add_comm.
+  cbn - [ iter_seq Nat.leb ].
+  rewrite rngl_summation_split_first; [ | easy | flia ].
+  rewrite Nat.add_0_l.
+  rewrite (rngl_summation_split_first _ 0); [ | flia ].
+  cbn - [ iter_seq Nat.leb ].
+  replace (Nat.b2n (1 <=? 0)) with 0 by easy.
+  do 2 rewrite rngl_mul_1_l.
+  remember (iter_seq _ _ _ _) as x.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros i Hi.
+    replace (Nat.b2n (1 <=? i)) with 1 by now destruct i.
+    easy.
+  }
+  cbn - [ iter_seq Nat.leb ].
+  remember (iter_seq _ _ _ _) as y in |-*.
+  rewrite Ha.
+  rewrite Ha.
+  assert (H : subm (subm A 0 0) 0 0 = subm (subm A 0 1) 0 0). {
+    rewrite subm_subm_swap; cbn.
+    now specialize (subm_subm_swap A 0 1 0 0) as H1.
+  }
+  cbn in H; rewrite <- H; clear H.
+  rewrite rngl_mul_add_distr_l.
+  rewrite rngl_mul_add_distr_l.
+  do 2 rewrite rngl_add_assoc.
+  do 2 rewrite rngl_mul_assoc.
+  specialize rngl_opt_mul_comm as rngl_mul_comm.
+  rewrite Hic in rngl_mul_comm.
+  rewrite (rngl_mul_comm (mat_el A 0 0)).
+  rewrite rngl_mul_opp_l; [ | easy ].
+  rewrite rngl_mul_1_l.
+  rewrite rngl_mul_opp_l; [ | easy ].
+  rewrite rngl_mul_opp_l; [ | easy ].
+  remember (_ * _ * _)%F as z.
+  rewrite (rngl_add_add_swap z).
+  rewrite fold_rngl_sub; [ | easy ].
+  rewrite rngl_add_opp_r, rngl_add_0_l.
+  (* yeah! *)
+  clear z Heqz.
+  move y before x.
+  rewrite rngl_mul_opp_l; [ | easy ].
+  rewrite fold_rngl_sub; [ | easy ].
 ... (*
 ...
 destruct n; [ flia Hiz | ].
