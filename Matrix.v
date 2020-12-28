@@ -806,10 +806,20 @@ destruct i. {
     rewrite (rngl_mul_comm (mat_el A 0 1)).
     apply rngl_add_opp_r.
   }
+...
   rewrite (rngl_summation_split_first _ 2 (S (S n))); [ | flia ].
   rewrite rngl_summation_split_first; [ | easy | flia ].
   remember (Nat.b2n (2 <=? 1)) as z; cbn in Heqz; subst z.
   rewrite Nat.add_0_r.
+  cbn - [ iter_seq Nat.leb subm det_loop ].
+  rewrite rngl_mul_opp_l; [ | easy ].
+  rewrite rngl_mul_opp_l; [ | easy ].
+  rewrite rngl_mul_opp_l; [ | easy ].
+  do 2 rewrite rngl_mul_1_l.
+...
+  rewrite rngl_summation_split_first; [ | easy | flia ].
+  remember (Nat.b2n (2 <=? 2)) as z; cbn in Heqz; subst z.
+  replace (2 + 1) with 3 by easy.
   cbn - [ iter_seq Nat.leb subm det_loop ].
   rewrite rngl_mul_opp_l; [ | easy ].
   rewrite rngl_mul_opp_l; [ | easy ].
