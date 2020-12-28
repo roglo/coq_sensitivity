@@ -699,6 +699,17 @@ destruct i. {
   apply Nat.succ_lt_mono in Hiz.
   destruct n; [ easy | ].
   rewrite rngl_summation_split_first; [ | easy | flia ].
+(**)
+  cbn - [ iter_seq det_loop ].
+  rewrite rngl_mul_1_l.
+  rewrite rngl_summation_split_first; [ | easy | flia ].
+  cbn - [ iter_seq det_loop ].
+  rewrite rngl_mul_opp_l; [ | easy ].
+  rewrite rngl_mul_1_l.
+  rewrite rngl_mul_opp_l; [ | easy ].
+  rewrite rngl_add_assoc.
+  rewrite fold_rngl_sub; [ | easy ].
+...
   cbn - [ iter_seq ].
   rewrite rngl_mul_1_l.
   rewrite rngl_add_comm.
