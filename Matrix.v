@@ -418,7 +418,7 @@ Qed.
 (* doing it only when the first row is 0; can be generalized later *)
 
 Definition toto i k := k + Nat.b2n (i <? k).
-Definition titi i k := i + Nat.b2n (k <? i).
+Definition titi i k := i - Nat.b2n (k <? i).
 
 Theorem glop : ∀ n (A : matrix n n T) i j k l,
   subm (subm A i j) k l =
@@ -435,71 +435,121 @@ f_equal. {
   remember (i <=? i' + Nat.b2n a) as b eqn:Hb.
   remember (i <? k) as c eqn:Hc.
   remember (k <? i) as d eqn:Hd.
-  remember (i + Nat.b2n d <=? i') as e eqn:He.
+  remember (i - Nat.b2n d <=? i') as e eqn:He.
   remember (k + Nat.b2n c <=? i' + Nat.b2n e) as f eqn:Hf.
   move b before a; move c before b; move d before c; move e before d.
   move f before e.
   symmetry in Ha, Hb, Hc, Hd, He, Hf.
   destruct a, b, d, e, f; cbn; try easy; exfalso. {
-    apply Nat.leb_le in Ha.
-    apply Nat.leb_le in Hb.
-    apply Nat.leb_le in Hd.
-    apply Nat.leb_le in He.
-    apply Nat.leb_nle in Hf.
-    destruct c. {
-      apply Nat.ltb_lt in Hc.
-      cbn in Hb, Hd, He, Hf.
-      flia Ha Hb Hc Hd He Hf.
-    } {
-      apply Nat.ltb_nlt in Hc.
-      cbn in Hb, Hd, He, Hf.
-      flia Ha Hb Hc Hd He Hf.
-    }
+    apply Nat.leb_le in Ha; apply Nat.leb_le in Hb; apply Nat.leb_le in Hd.
+    apply Nat.leb_le in He; apply Nat.leb_nle in Hf.
+    destruct c; [ apply Nat.ltb_lt in Hc; flia Ha Hb Hc Hd He Hf | ].
+    cbn in Hf.
+    apply Nat.ltb_nlt in Hc; flia Ha Hb Hc Hd He Hf.
   } {
-    apply Nat.leb_le in Ha.
-    apply Nat.leb_le in Hb.
-    apply Nat.leb_le in Hd.
-    apply Nat.leb_nle in He.
-    apply Nat.leb_le in Hf.
-    destruct c. {
-      apply Nat.ltb_lt in Hc.
-      cbn in Hb, Hd, He, Hf.
-      flia Ha Hb Hc Hd He Hf.
-    } {
-      apply Nat.ltb_nlt in Hc.
-      cbn in Hb, Hd, He, Hf.
-apply Nat.nle_gt in He.
-apply Nat.nlt_ge in Hc.
-      flia Ha Hb Hc Hd He Hf.
-    }
+    apply Nat.leb_le in Ha; apply Nat.leb_le in Hb; apply Nat.leb_le in Hd.
+    apply Nat.leb_nle in He; apply Nat.leb_le in Hf.
+    destruct c; [ apply Nat.ltb_lt in Hc; flia Ha Hb Hc Hd He Hf | ].
+    apply Nat.ltb_nlt in Hc; flia Ha Hb Hc Hd He Hf.
+  } {
+    apply Nat.leb_le in Ha; apply Nat.leb_le in Hb; apply Nat.leb_le in Hd.
+    apply Nat.leb_nle in He; apply Nat.leb_nle in Hf.
+    destruct c; [ apply Nat.ltb_lt in Hc; flia Ha Hb Hc Hd He Hf | ].
+    apply Nat.ltb_nlt in Hc; flia Ha Hb Hc Hd He Hf.
+  } {
+    apply Nat.leb_le in Ha; apply Nat.leb_le in Hb; apply Nat.leb_nle in Hd.
+    apply Nat.leb_le in He; apply Nat.leb_nle in Hf.
+    destruct c; [ apply Nat.ltb_lt in Hc; flia Ha Hb Hc Hd He Hf | ].
+    cbn in Hf.
+    apply Nat.ltb_nlt in Hc; flia Ha Hb Hc Hd He Hf.
+  } {
+    apply Nat.leb_le in Ha; apply Nat.leb_le in Hb; apply Nat.leb_nle in Hd.
+    apply Nat.leb_nle in He; apply Nat.leb_le in Hf.
+    destruct c; [ apply Nat.ltb_lt in Hc; flia Ha Hb Hc Hd He Hf | ].
+    apply Nat.ltb_nlt in Hc; flia Ha Hb Hc Hd He Hf.
+  } {
+    apply Nat.leb_le in Ha; apply Nat.leb_le in Hb; apply Nat.leb_nle in Hd.
+    apply Nat.leb_nle in He; apply Nat.leb_nle in Hf.
+    destruct c; [ apply Nat.ltb_lt in Hc; flia Ha Hb Hc Hd He Hf | ].
+    apply Nat.ltb_nlt in Hc; flia Ha Hb Hc Hd He Hf.
+  } {
+    apply Nat.leb_le in Ha; apply Nat.leb_nle in Hb; apply Nat.leb_le in Hd.
+    apply Nat.leb_le in He; apply Nat.leb_le in Hf.
+    destruct c; [ apply Nat.ltb_lt in Hc; flia Ha Hb Hc Hd He Hf | ].
+    apply Nat.ltb_nlt in Hc; flia Ha Hb Hc Hd He Hf.
+  } {
+    apply Nat.leb_le in Ha; apply Nat.leb_nle in Hb; apply Nat.leb_le in Hd.
+    apply Nat.leb_nle in He; apply Nat.leb_nle in Hf.
+    destruct c; [ apply Nat.ltb_lt in Hc; flia Ha Hb Hc Hd He Hf | ].
+    apply Nat.ltb_nlt in Hc; flia Ha Hb Hc Hd He Hf.
+  } {
+    apply Nat.leb_le in Ha; apply Nat.leb_nle in Hb; apply Nat.leb_nle in Hd.
+    apply Nat.leb_le in He; apply Nat.leb_le in Hf.
+    destruct c; [ apply Nat.ltb_lt in Hc; flia Ha Hb Hc Hd He Hf | ].
+    apply Nat.ltb_nlt in Hc; flia Ha Hb Hc Hd He Hf.
+  } {
+    apply Nat.leb_le in Ha; apply Nat.leb_nle in Hb; apply Nat.leb_nle in Hd.
+    apply Nat.leb_nle in He; apply Nat.leb_nle in Hf.
+    destruct c; [ apply Nat.ltb_lt in Hc; flia Ha Hb Hc Hd He Hf | ].
+    apply Nat.ltb_nlt in Hc; flia Ha Hb Hc Hd He Hf.
+  } {
+    apply Nat.leb_nle in Ha; apply Nat.leb_le in Hb; apply Nat.leb_le in Hd.
+    apply Nat.leb_le in He; apply Nat.leb_le in Hf.
+    destruct c; [ apply Nat.ltb_lt in Hc; flia Ha Hb Hc Hd He Hf | ].
+    cbn in He.
+    apply Nat.ltb_nlt in Hc; flia Ha Hb Hc Hd He Hf.
+  } {
+    apply Nat.leb_nle in Ha; apply Nat.leb_le in Hb; apply Nat.leb_le in Hd.
+    apply Nat.leb_nle in He; apply Nat.leb_nle in Hf.
+    destruct c; [ apply Nat.ltb_lt in Hc; flia Ha Hb Hc Hd He Hf | ].
+    cbn in Hb.
+    apply Nat.ltb_nlt in Hc; flia Ha Hb Hc Hd He Hf.
+  } {
+    apply Nat.leb_nle in Ha; apply Nat.leb_le in Hb; apply Nat.leb_nle in Hd.
+    apply Nat.leb_le in He; apply Nat.leb_le in Hf.
+    destruct c; [ apply Nat.ltb_lt in Hc; flia Ha Hb Hc Hd He Hf | ].
+    cbn in Hb.
+    apply Nat.ltb_nlt in Hc; flia Ha Hb Hc Hd He Hf.
+  } {
+    apply Nat.leb_nle in Ha; apply Nat.leb_le in Hb; apply Nat.leb_nle in Hd.
+    apply Nat.leb_nle in He; apply Nat.leb_nle in Hf.
+    destruct c; [ apply Nat.ltb_lt in Hc; flia Ha Hb Hc Hd He Hf | ].
+    apply Nat.ltb_nlt in Hc; flia Ha Hb Hc Hd He Hf.
+  } {
+    apply Nat.leb_nle in Ha; apply Nat.leb_nle in Hb; apply Nat.leb_le in Hd.
+    apply Nat.leb_le in He; apply Nat.leb_le in Hf.
+    destruct c; [ apply Nat.ltb_lt in Hc; flia Ha Hb Hc Hd He Hf | ].
+    cbn in He.
+    apply Nat.ltb_nlt in Hc; flia Ha Hb Hc Hd He Hf.
+  } {
+    apply Nat.leb_nle in Ha; apply Nat.leb_nle in Hb; apply Nat.leb_le in Hd.
+    apply Nat.leb_le in He; apply Nat.leb_nle in Hf.
+    destruct c; [ apply Nat.ltb_lt in Hc; flia Ha Hb Hc Hd He Hf | ].
+    cbn in He.
+    apply Nat.ltb_nlt in Hc; flia Ha Hb Hc Hd He Hf.
+  } {
+    apply Nat.leb_nle in Ha; apply Nat.leb_nle in Hb; apply Nat.leb_le in Hd.
+    apply Nat.leb_nle in He; apply Nat.leb_le in Hf.
+    destruct c; [ apply Nat.ltb_lt in Hc; flia Ha Hb Hc Hd He Hf | ].
+    apply Nat.ltb_nlt in Hc; flia Ha Hb Hc Hd He Hf.
+  } {
+    apply Nat.leb_nle in Ha; apply Nat.leb_nle in Hb; apply Nat.leb_nle in Hd.
+    apply Nat.leb_le in He; apply Nat.leb_le in Hf.
+    destruct c; [ apply Nat.ltb_lt in Hc; flia Ha Hb Hc Hd He Hf | ].
+    apply Nat.ltb_nlt in Hc; flia Ha Hb Hc Hd He Hf.
+  } {
+    apply Nat.leb_nle in Ha; apply Nat.leb_nle in Hb; apply Nat.leb_nle in Hd.
+    apply Nat.leb_le in He; apply Nat.leb_nle in Hf.
+    destruct c; [ apply Nat.ltb_lt in Hc; flia Ha Hb Hc Hd He Hf | ].
+    apply Nat.ltb_nlt in Hc; flia Ha Hb Hc Hd He Hf.
+  } {
+    apply Nat.leb_nle in Ha; apply Nat.leb_nle in Hb; apply Nat.leb_nle in Hd.
+    apply Nat.leb_nle in He; apply Nat.leb_le in Hf.
+    destruct c; [ apply Nat.ltb_lt in Hc; flia Ha Hb Hc Hd He Hf | ].
+    apply Nat.ltb_nlt in Hc; flia Ha Hb Hc Hd He Hf.
+  }
+} {
 ...
-  f_equal. {
-    symmetry in Ha, Hb, Hc, Hd.
-    destruct b, d; [ easy | | | easy ]; exfalso. {
-      apply Nat.leb_le in Hb.
-      apply Nat.leb_nle in Hd.
-      destruct a, c. {
-        apply Nat.leb_le in Ha.
-        apply Nat.leb_le in Hc.
-        cbn in Hb, Hd.
-        flia Ha Hb Hc Hd.
-      } {
-        apply Nat.leb_le in Ha.
-        apply Nat.leb_nle in Hc.
-        cbn in Hb, Hd.
-        rewrite Nat.add_0_r in Hd.
-        apply Nat.nle_gt in Hd.
-        apply Nat.nle_gt in Hc.
-...
-        flia Ha Hb Hc Hd.
-...
-destruct (lt_dec (i' + 1) i) as [H1| H1]. {
-  destruct (lt_dec i' i) as [H| H]; [ clear H | flia H1 H ].
-  destruct (lt_dec (j' + 1) j) as [H2| H2]. {
-    destruct (lt_dec j' j) as [H| H]; [ clear H | flia H2 H ].
-    destruct (lt_dec j' l) as [H3| H3]. {
-...
-  destruct (lt_dec j' j) as [H2| H2]. {
 
 Theorem glop : ∀ n (A : matrix n n T) i j,
   subm (subm A i j) 0 0 = subm (subm A 0 0) (i - 1) (j - 1).
