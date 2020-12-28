@@ -790,6 +790,7 @@ destruct i. {
     easy.
   }
   cbn - [ iter_seq Nat.leb ].
+...
   destruct n. {
     cbn in Heqx, Heqy |-*.
     subst x y.
