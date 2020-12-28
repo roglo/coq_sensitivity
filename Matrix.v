@@ -699,7 +699,7 @@ destruct i. {
   apply Nat.succ_lt_mono in Hiz.
   destruct n; [ easy | ].
   rewrite rngl_summation_split_first; [ | easy | flia ].
-(**)
+(*
   cbn - [ iter_seq det_loop ].
   rewrite rngl_mul_1_l.
   rewrite rngl_summation_split_first; [ | easy | flia ].
@@ -708,7 +708,9 @@ destruct i. {
   rewrite rngl_mul_1_l.
   rewrite rngl_mul_opp_l; [ | easy ].
   rewrite rngl_add_assoc.
+(*
   rewrite fold_rngl_sub; [ | easy ].
+*)
   remember (det_loop _ _) as x.
   cbn - [ iter_seq ] in Heqx; subst x.
   remember (det_loop _ _) as x.
@@ -722,7 +724,10 @@ destruct i. {
   rewrite Nat.add_0_l.
   cbn - [ iter_seq Nat.leb subm ].
   rewrite rngl_mul_1_l.
+  rewrite rngl_mul_add_distr_l.
+  rewrite rngl_mul_add_distr_l.
 ...
+*)
   cbn - [ iter_seq ].
   rewrite rngl_mul_1_l.
   rewrite rngl_add_comm.
@@ -779,13 +784,12 @@ destruct i. {
     now intros i Hi; rewrite Ha.
   }
   cbn - [ iter_seq ] in Heqy.
-...
   erewrite rngl_summation_eq_compat. 2: {
     intros i Hi.
     rewrite rngl_mul_summation_distr_l.
     easy.
   }
-  cbn - [ iter_seq ].
+  cbn - [ iter_seq Nat.leb ].
   destruct n. {
     cbn in Heqx, Heqy |-*.
     subst x y.
@@ -793,6 +797,10 @@ destruct i. {
     rewrite rngl_add_0_r.
     apply rngl_add_opp_r.
   }
+  rewrite rngl_summation_split_first in Heqx; [ | easy | flia ].
+  rewrite rngl_summation_split_first in Heqy; [ | easy | flia ].
+  cbn - [ iter_seq det_loop ] in Heqx, Heqy.
+...
   rewrite rngl_summation_shift; [ | flia ].
   do 2 rewrite Nat.sub_succ.
   rewrite Nat.sub_0_r.
