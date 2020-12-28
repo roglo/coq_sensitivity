@@ -8,7 +8,7 @@ Import List List.ListNotations.
 Require Import Init.Nat.
 
 Require Import Misc.
-Require Import RingLike RLsummation.
+Require Import RingLike RLsummation RLproduct.
 
 (* matrices *)
 
@@ -679,6 +679,16 @@ rewrite subm_subm_swap.
 unfold δ_lt.
 now destruct i, j.
 Qed.
+
+Definition sign n (σ : vector n nat) :=
+  1%F.
+
+Theorem glop : ∀ n (M : matrix n n T),
+  ∃ σ : nat → vector n nat,
+  determinant M =
+    (Σ (i = 0, fact n - 1),
+     Π (j = 0, n - 1), (sign (σ i) * mat_el M j (vect_el (σ i) j)))%F.
+...
 
 Theorem det_two_rows_are_eq :
   rngl_is_comm = true →
