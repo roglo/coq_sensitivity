@@ -417,12 +417,11 @@ Qed.
    point 3 *)
 (* doing it only when the first row is 0; can be generalized later *)
 
-Definition swap_fst i k := k + Nat.b2n (i <? k).
-Definition swap_snd i k := i - Nat.b2n (k <? i).
+Definition δ_lt i k := Nat.b2n (i <? k).
 
 Theorem subm_subm_swap : ∀ n (A : matrix n n T) i j k l,
   subm (subm A i j) k l =
-  subm (subm A (swap_fst i k) (swap_fst j l)) (swap_snd i k) (swap_snd j l).
+  subm (subm A (k + δ_lt i k) (l + δ_lt j l)) (i - δ_lt k i) (j - δ_lt l j).
 Proof.
 intros.
 apply matrix_eq; cbn.
@@ -430,7 +429,7 @@ intros i' j' Hi' Hj'.
 f_equal. {
   do 2 rewrite <- Nat.add_assoc; f_equal.
   rewrite Nat.add_comm.
-  unfold swap_snd, swap_fst.
+  unfold δ_lt.
   remember (k <=? i') as a eqn:Ha.
   remember (i <=? i' + Nat.b2n a) as b eqn:Hb.
   remember (i <? k) as c eqn:Hc.
@@ -551,7 +550,7 @@ f_equal. {
 } {
   do 2 rewrite <- Nat.add_assoc; f_equal.
   rewrite Nat.add_comm.
-  unfold swap_fst, swap_snd.
+  unfold δ_lt.
   remember (l <=? j') as a eqn:Ha.
   remember (j <=? j' + Nat.b2n a) as b eqn:Hb.
   remember (j <? l) as c eqn:Hc.
@@ -565,7 +564,7 @@ f_equal. {
     apply Nat.leb_le in Ha; apply Nat.leb_le in Hb; apply Nat.leb_le in Hd.
     apply Nat.leb_le in He; apply Nat.leb_nle in Hf.
     destruct c; [ apply Nat.ltb_lt in Hc; flia Ha Hb Hc Hd He Hf | ].
-    cbn in Hf.
+    cbn in He, Hf.
     apply Nat.ltb_nlt in Hc; flia Ha Hb Hc Hd He Hf.
   } {
     apply Nat.leb_le in Ha; apply Nat.leb_le in Hb; apply Nat.leb_le in Hd.
@@ -602,7 +601,7 @@ f_equal. {
     apply Nat.leb_le in Ha; apply Nat.leb_nle in Hb; apply Nat.leb_le in Hd.
     apply Nat.leb_nle in He; apply Nat.leb_nle in Hf.
     destruct c; [ apply Nat.ltb_lt in Hc; flia Ha Hb Hc Hd He Hf | ].
-    apply Nat.ltb_nlt in Hc; flia Ha Hb Hc Hd He Hf.
+    apply Nat.ltb_nlt in Hc; cbn in Hc; flia Ha Hb Hc Hd He Hf.
   } {
     apply Nat.leb_le in Ha; apply Nat.leb_nle in Hb; apply Nat.leb_nle in Hd.
     apply Nat.leb_le in He; apply Nat.leb_le in Hf.
@@ -677,7 +676,7 @@ Theorem glop1 : ∀ n (A : matrix n n T) i j,
 Proof.
 intros.
 rewrite subm_subm_swap.
-unfold swap_fst, swap_snd.
+unfold δ_lt.
 now destruct i, j.
 Qed.
 
