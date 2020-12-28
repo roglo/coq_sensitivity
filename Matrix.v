@@ -684,10 +684,22 @@ Definition sign n (σ : vector n nat) :=
   1%F.
 
 Theorem glop : ∀ n (M : matrix n n T),
-  ∃ σ : nat → vector n nat,
-  determinant M =
-    (Σ (i = 0, fact n - 1),
-     Π (j = 0, n - 1), (sign (σ i) * mat_el M j (vect_el (σ i) j)))%F.
+  n ≠ 0
+  → ∃ σ : nat → vector n nat,
+    determinant M =
+      (Σ (i = 0, fact n - 1),
+       Π (j = 0, n - 1), (sign (σ i) * mat_el M j (vect_el (σ i) j)))%F.
+Proof.
+intros * Hnz.
+revert M.
+induction n; intros; [ easy | clear Hnz ].
+destruct n. {
+  exists (λ _, mk_vect 1 (λ _, 0)); cbn.
+  unfold sign; cbn.
+  rewrite rngl_add_0_l, rngl_mul_1_l.
+  now rewrite rngl_mul_1_r, rngl_mul_1_l, rngl_add_0_l.
+}
+specialize (IHn (Nat.neq_succ_0 _)).
 ...
 
 Theorem det_two_rows_are_eq :
