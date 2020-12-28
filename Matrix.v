@@ -746,6 +746,32 @@ destruct i. {
   move y before x.
   rewrite rngl_mul_opp_l; [ | easy ].
   rewrite fold_rngl_sub; [ | easy ].
+...
+  erewrite rngl_summation_eq_compat. 2: {
+    intros i Hi.
+    rewrite rngl_mul_summation_distr_l.
+    easy.
+  }
+  cbn - [ iter_seq ].
+  destruct n. {
+    cbn in Heqx, Heqy |-*.
+    subst x y.
+    do 2 rewrite rngl_mul_0_r.
+    rewrite rngl_add_0_r.
+    apply rngl_add_opp_r.
+  }
+  rewrite rngl_summation_shift; [ | flia ].
+  do 2 rewrite Nat.sub_succ.
+  rewrite Nat.sub_0_r.
+  rewrite rngl_summation_summation_exch'; [ | easy ].
+  rewrite rngl_summation_split_first; [ | easy | flia ].
+  erewrite rngl_summation_eq_compat. 2: {
+    intros i Hi.
+    cbn - [ det_loop ].
+    rewrite rngl_mul_1_l.
+    easy.
+  }
+  cbn - [ iter_seq det_loop Nat.leb ].
 ... (*
 ...
 destruct n; [ flia Hiz | ].
