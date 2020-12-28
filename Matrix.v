@@ -806,6 +806,7 @@ destruct i. {
     rewrite (rngl_mul_comm (mat_el A 0 1)).
     apply rngl_add_opp_r.
   }
+Abort. (*
 ...
   rewrite (rngl_summation_split_first _ 2 (S (S n))); [ | flia ].
   rewrite rngl_summation_split_first; [ | easy | flia ].
@@ -881,6 +882,7 @@ rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
   intros k Hk.
 ...
 *)
+*)
 
 (* multilinearity *)
 
@@ -934,9 +936,8 @@ destruct (Nat.eq_dec j i) as [Hji| Hji]. {
 ...
 *)
 
-(*
-Theorem determinant_multilinear : ∀ M i a b U V,
-  i < mat_nrows M
+Theorem determinant_multilinear : ∀ n (M : matrix n n T) i a b U V,
+  i < n
   → determinant (mat_repl_vect i M (a × U + b × V)%V) =
        (a * determinant (mat_repl_vect i M U) +
         b * determinant (mat_repl_vect i M V))%F.
@@ -944,20 +945,14 @@ Proof.
 intros * Hi.
 unfold vect_add, vect_mul_scal_l; cbn.
 unfold mat_repl_vect; cbn.
-enough (H : mat_nrows M = mat_ncols M).
-rewrite <- H.
-remember (mat_nrows M) as dim eqn:Hdim.
-symmetry in Hdim, H.
-rename Hdim into Hrd.
-rename H into Hcd.
-clear Hrd Hcd.
 revert i Hi.
-induction dim; intros; [ easy | ].
+induction n; intros; [ easy | ].
 cbn - [ iter_seq ].
 destruct i. {
   rewrite rngl_summation_split_first; [ | easy | flia ].
   cbn - [ iter_seq ].
   rewrite rngl_mul_1_l.
+Abort. (*
 ...
 do 3 rewrite rngl_add_0_l, rngl_mul_1_l.
   do 3 rewrite rngl_mul_1_r.
@@ -971,11 +966,13 @@ do 3 rewrite rngl_add_0_l, rngl_mul_1_l.
 (* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html *)
 (* doing it only when the first row is 0; can be generalized later *)
 
-Theorem det_add_row_mul_scal_row : ∀ n (M : matrix n n T) v k,
+Theorem det_add_row_mul_scal_row :
+  rngl_is_comm = true →
+  ∀ n (M : matrix n n T) v k,
   n ≠ 0
   → determinant (mat_add_row_mul_scal_row M 0 v k) = determinant M.
 Proof.
-intros * Hrz.
+intros Hic * Hrz.
 remember
   (mk_mat n n
      (λ i j,
@@ -993,17 +990,16 @@ rewrite (det_sum_row_row _ M C Hrz); cycle 1. {
   remember
     (mk_mat n n (λ i j, if Nat.eq_dec i 0 then mat_el M k j else mat_el M i j))
        as D eqn:Hd.
-... (* à finir...
-  specialize (det_mul_row_0_by_scal D v) as H1.
-  assert (H : mat_ncols D ≠ 0); [ subst D; cbn; congruence | ].
-  specialize (H1 H); clear H.
+  specialize (det_mul_row_0_by_scal Hic) as H1.
+  specialize (H1 n D v Hrz).
   assert (H : mat_mul_row_by_scal 0 D v = C). {
     unfold mat_mul_row_by_scal; rewrite Hc, Hd; cbn.
-    apply matrix_eq; [ easy | easy | cbn ].
+    apply matrix_eq; cbn.
     intros i j Hi Hj.
     now destruct (Nat.eq_dec i 0).
   }
   rewrite H in H1; clear H.
+...
   assert (H : determinant D = 0%F). {
     rewrite Hd.
  (* blocked because needs the previous lemma
