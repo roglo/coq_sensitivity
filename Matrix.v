@@ -158,13 +158,7 @@ Definition mat_mul_scal_l {m n} s (M : matrix m n T) :=
 
 Definition subm {m n} (M : matrix m n T) i j :=
   mk_mat (m - 1) (n - 1)
-    (λ k l,
-       if lt_dec k i then
-         if lt_dec l j then mat_el M k l
-         else mat_el M k (l + 1)
-       else
-         if lt_dec l j then mat_el M (k + 1) l
-         else mat_el M (k + 1) (l + 1)).
+    (λ k l, mat_el M (k + Nat.b2n (i <=? k)) (l + Nat.b2n (j <=? l))).
 
 (* matrix whose k-th column is replaced by a vector *)
 
@@ -433,15 +427,78 @@ Proof.
 intros.
 apply matrix_eq; cbn.
 intros i' j' Hi' Hj'.
+f_equal. {
+  do 2 rewrite <- Nat.add_assoc; f_equal.
+  rewrite Nat.add_comm.
+  unfold titi, toto.
+  remember (k <=? i') as a eqn:Ha.
+  remember (i <=? i' + Nat.b2n a) as b eqn:Hb.
+  remember (i <? k) as c eqn:Hc.
+  remember (i + Nat.b2n c <=? i') as d eqn:Hd.
+  remember (k + Nat.b2n c <=? i' + Nat.b2n d) as e eqn:He.
+  move b before a; move c before b; move d before c; move e before d.
+  symmetry in Ha, Hb, Hc, Hd, He.
+  destruct a, b, d, e; cbn; try easy; exfalso. {
+    apply Nat.leb_le in Ha.
+    apply Nat.leb_le in Hb.
+    apply Nat.leb_le in Hd.
+    apply Nat.leb_nle in He.
+    destruct c. {
+      apply Nat.ltb_lt in Hc.
+      cbn in Hb, Hd, He.
+      flia Ha Hb Hc Hd He.
+    } {
+      apply Nat.ltb_nlt in Hc.
+      cbn in Hb, Hd, He.
+      flia Ha Hb Hc Hd He.
+    }
+  } {
+    apply Nat.leb_le in Ha.
+    apply Nat.leb_le in Hb.
+    apply Nat.leb_nle in Hd.
+    apply Nat.leb_le in He.
+    destruct c. {
+      apply Nat.ltb_lt in Hc.
+      cbn in Hb, Hd, He.
+      flia Ha Hb Hc Hd He.
+    } {
+      apply Nat.ltb_nlt in Hc.
+      cbn in Hb, Hd, He.
+rewrite Nat.add_0_r in Hd, He.
+rewrite Nat.add_0_r in He.
+apply Nat.nlt_ge in Hc.
+apply Nat.nle_gt in Hd.
+...
+      flia Ha Hb Hc Hd He.
+    }
+...
+  f_equal. {
+    symmetry in Ha, Hb, Hc, Hd.
+    destruct b, d; [ easy | | | easy ]; exfalso. {
+      apply Nat.leb_le in Hb.
+      apply Nat.leb_nle in Hd.
+      destruct a, c. {
+        apply Nat.leb_le in Ha.
+        apply Nat.leb_le in Hc.
+        cbn in Hb, Hd.
+        flia Ha Hb Hc Hd.
+      } {
+        apply Nat.leb_le in Ha.
+        apply Nat.leb_nle in Hc.
+        cbn in Hb, Hd.
+        rewrite Nat.add_0_r in Hd.
+        apply Nat.nle_gt in Hd.
+        apply Nat.nle_gt in Hc.
+...
+        flia Ha Hb Hc Hd.
+...
 destruct (lt_dec (i' + 1) i) as [H1| H1]. {
   destruct (lt_dec i' i) as [H| H]; [ clear H | flia H1 H ].
   destruct (lt_dec (j' + 1) j) as [H2| H2]. {
     destruct (lt_dec j' j) as [H| H]; [ clear H | flia H2 H ].
     destruct (lt_dec j' l) as [H3| H3]. {
-
 ...
   destruct (lt_dec j' j) as [H2| H2]. {
-...
 
 Theorem glop : ∀ n (A : matrix n n T) i j,
   subm (subm A i j) 0 0 = subm (subm A 0 0) (i - 1) (j - 1).
@@ -449,12 +506,43 @@ Proof.
 intros.
 apply matrix_eq; cbn.
 intros i' j' Hi' Hj'.
-destruct
-  (lt_dec (i' + 1) i) as [H1| H1],
-  (lt_dec i' (i - 1)) as [H2| H2],
-  (lt_dec (j' + 1) j) as [H3| H3],
-  (lt_dec j' (j - 1)) as [H4| H4]; try easy; flia H1 H2 H3 H4.
+unfold Nat.b2n.
+f_equal. {
+  do 2 rewrite <- Nat.add_assoc; f_equal.
+  rewrite Nat.add_comm; f_equal.
+  remember (i <=? i' + 1) as a eqn:Ha.
+  remember (i - 1 <=? i') as b eqn:Hb.
+  symmetry in Ha, Hb.
+  move b before a.
+  destruct a, b; cbn; [ easy | | | easy ]. {
+    apply Nat.leb_le in Ha.
+    apply Nat.leb_nle in Hb.
+    flia Ha Hb.
+  } {
+    apply Nat.leb_nle in Ha.
+    apply Nat.leb_le in Hb.
+    flia Ha Hb.
+  }
+} {
+  do 2 rewrite <- Nat.add_assoc; f_equal.
+  rewrite Nat.add_comm; f_equal.
+  remember (j <=? j' + 1) as a eqn:Ha.
+  remember (j - 1 <=? j') as b eqn:Hb.
+  symmetry in Ha, Hb.
+  move b before a.
+  destruct a, b; cbn; [ easy | | | easy ]. {
+    apply Nat.leb_le in Ha.
+    apply Nat.leb_nle in Hb.
+    flia Ha Hb.
+  } {
+    apply Nat.leb_nle in Ha.
+    apply Nat.leb_le in Hb.
+    flia Ha Hb.
+  }
+}
 Qed.
+
+...
 
 Theorem det_two_rows_are_eq : ∀ n (A : matrix n n T) i,
   n ≠ 0
