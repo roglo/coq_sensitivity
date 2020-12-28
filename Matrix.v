@@ -700,6 +700,8 @@ destruct n. {
   now rewrite rngl_mul_1_r, rngl_mul_1_l, rngl_add_0_l.
 }
 specialize (IHn (Nat.neq_succ_0 _)).
+specialize (IHn (subm M 0 0)) as H1.
+destruct H1 as (σ, Hdet).
 ...
 
 Theorem det_two_rows_are_eq :
