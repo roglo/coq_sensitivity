@@ -693,6 +693,7 @@ intros Hic Hop * Hnz Hiz Ha.
 unfold determinant.
 destruct n; [ easy | clear Hnz ].
 cbn - [ iter_seq ].
+...
 destruct i; [ easy | ].
 destruct i. {
   destruct Hiz as (_, Hiz).
@@ -806,7 +807,6 @@ destruct i. {
     rewrite (rngl_mul_comm (mat_el A 0 1)).
     apply rngl_add_opp_r.
   }
-Abort. (*
 ...
   rewrite (rngl_summation_split_first _ 2 (S (S n))); [ | flia ].
   rewrite rngl_summation_split_first; [ | easy | flia ].
@@ -952,7 +952,6 @@ destruct i. {
   rewrite rngl_summation_split_first; [ | easy | flia ].
   cbn - [ iter_seq ].
   rewrite rngl_mul_1_l.
-Abort. (*
 ...
 do 3 rewrite rngl_add_0_l, rngl_mul_1_l.
   do 3 rewrite rngl_mul_1_r.
