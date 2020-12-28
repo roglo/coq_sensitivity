@@ -709,6 +709,19 @@ destruct i. {
   rewrite rngl_mul_opp_l; [ | easy ].
   rewrite rngl_add_assoc.
   rewrite fold_rngl_sub; [ | easy ].
+  remember (det_loop _ _) as x.
+  cbn - [ iter_seq ] in Heqx; subst x.
+  remember (det_loop _ _) as x.
+  cbn - [ iter_seq Nat.leb ] in Heqx; subst x.
+  remember (Nat.b2n _) as x; cbn in Heqx; subst x.
+  rewrite rngl_summation_split_first; [ | easy | flia ].
+  cbn - [ iter_seq Nat.leb subm ].
+  rewrite rngl_mul_1_l.
+  rewrite (rngl_summation_split_first _ 0 n); [ | flia ].
+  remember (Nat.b2n _) as x; cbn in Heqx; subst x.
+  rewrite Nat.add_0_l.
+  cbn - [ iter_seq Nat.leb subm ].
+  rewrite rngl_mul_1_l.
 ...
   cbn - [ iter_seq ].
   rewrite rngl_mul_1_l.
