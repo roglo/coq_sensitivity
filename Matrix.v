@@ -418,7 +418,7 @@ Qed.
 (* doing it only when the first row is 0; can be generalized later *)
 
 Definition toto i k := k + Nat.b2n (i <? k).
-Definition titi i k := i + Nat.b2n (i <? k).
+Definition titi i k := i + Nat.b2n (k <? i).
 
 Theorem glop : ∀ n (A : matrix n n T) i j k l,
   subm (subm A i j) k l =
@@ -434,42 +434,43 @@ f_equal. {
   remember (k <=? i') as a eqn:Ha.
   remember (i <=? i' + Nat.b2n a) as b eqn:Hb.
   remember (i <? k) as c eqn:Hc.
-  remember (i + Nat.b2n c <=? i') as d eqn:Hd.
-  remember (k + Nat.b2n c <=? i' + Nat.b2n d) as e eqn:He.
+  remember (k <? i) as d eqn:Hd.
+  remember (i + Nat.b2n d <=? i') as e eqn:He.
+  remember (k + Nat.b2n c <=? i' + Nat.b2n e) as f eqn:Hf.
   move b before a; move c before b; move d before c; move e before d.
-  symmetry in Ha, Hb, Hc, Hd, He.
-  destruct a, b, d, e; cbn; try easy; exfalso. {
+  move f before e.
+  symmetry in Ha, Hb, Hc, Hd, He, Hf.
+  destruct a, b, d, e, f; cbn; try easy; exfalso. {
     apply Nat.leb_le in Ha.
     apply Nat.leb_le in Hb.
     apply Nat.leb_le in Hd.
-    apply Nat.leb_nle in He.
+    apply Nat.leb_le in He.
+    apply Nat.leb_nle in Hf.
     destruct c. {
       apply Nat.ltb_lt in Hc.
-      cbn in Hb, Hd, He.
-      flia Ha Hb Hc Hd He.
+      cbn in Hb, Hd, He, Hf.
+      flia Ha Hb Hc Hd He Hf.
     } {
       apply Nat.ltb_nlt in Hc.
-      cbn in Hb, Hd, He.
-      flia Ha Hb Hc Hd He.
+      cbn in Hb, Hd, He, Hf.
+      flia Ha Hb Hc Hd He Hf.
     }
   } {
     apply Nat.leb_le in Ha.
     apply Nat.leb_le in Hb.
-    apply Nat.leb_nle in Hd.
-    apply Nat.leb_le in He.
+    apply Nat.leb_le in Hd.
+    apply Nat.leb_nle in He.
+    apply Nat.leb_le in Hf.
     destruct c. {
       apply Nat.ltb_lt in Hc.
-      cbn in Hb, Hd, He.
-      flia Ha Hb Hc Hd He.
+      cbn in Hb, Hd, He, Hf.
+      flia Ha Hb Hc Hd He Hf.
     } {
       apply Nat.ltb_nlt in Hc.
-      cbn in Hb, Hd, He.
-rewrite Nat.add_0_r in Hd, He.
-rewrite Nat.add_0_r in He.
+      cbn in Hb, Hd, He, Hf.
+apply Nat.nle_gt in He.
 apply Nat.nlt_ge in Hc.
-apply Nat.nle_gt in Hd.
-...
-      flia Ha Hb Hc Hd He.
+      flia Ha Hb Hc Hd He Hf.
     }
 ...
   f_equal. {
