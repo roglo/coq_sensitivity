@@ -746,6 +746,15 @@ destruct i. {
   move y before x.
   rewrite rngl_mul_opp_l; [ | easy ].
   rewrite fold_rngl_sub; [ | easy ].
+  rewrite rngl_summation_succ_succ.
+  erewrite rngl_summation_eq_compat in Heqx. 2: {
+    now intros i Hi; rewrite Ha.
+  }
+  cbn - [ iter_seq ] in Heqx.
+  erewrite rngl_summation_eq_compat in Heqy. 2: {
+    now intros i Hi; rewrite Ha.
+  }
+  cbn - [ iter_seq ] in Heqy.
 ...
   erewrite rngl_summation_eq_compat. 2: {
     intros i Hi.
