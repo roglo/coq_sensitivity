@@ -690,43 +690,28 @@ Definition insert n i (v : vector n nat) : vector (n + 1) nat :=
      else if lt_dec i j then vect_el v (j - 1)
      else n).
 
-Definition permut_succ n (σ_n : nat → vector (fact n) nat) j :
+Definition permut_succ n (σ_n : nat → vector (fact n) nat) i :
    vector (fact (S n)) nat :=
   mk_vect (fact (S n))
-    (λ i,
+    (λ j,
      let p := σ_n (i / fact n) in
      vect_el (insert (i mod fact n) p) j).
 
-Check permut_succ.
-
-Theorem glop : 1 = fact 0.
-Proof. easy. Qed.
-
-Fixpoint permut n i : vector (fact n) nat :=
+Fixpoint permut n : nat → vector (fact n) nat :=
   match n with
   | 0 =>
+      λ _,
       eq_rect _ (λ m, vector m nat)
-        (mk_vect 1 (λ i, 0)) _ glop
+        (mk_vect 1 (λ _, 0)) _ eq_refl
   | S n' =>
-      permut_succ n' (permut n') i
+      permut_succ n' (permut n')
   end.
 
-Compute (list_of_vect (permut 3 4)).
+Compute list_of_vect (insert 2 (vect_of_list 0 [1;0;2])).
+Compute (list_of_vect (permut 3 1)).
+Compute (list_of_vect (permut_succ 2 (λ i, vect_of_list 0 [7;8]) 2)).
 
 ...
-
-(*
-Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
-  match n with
-  | 0 => mZ 1 1
-  | S n' =>
-      eq_rect _ (λ m, matrix m m T)
-        (mat_of_mat_list_list
-           [[mA n'; mI (2 ^ n')];
-            [mI (2 ^ n'); (- mA n')%M]])
-        _ (two_pow_n_mul_two n')
-  end.
-*)
 
 Theorem glop : ∀ n (M : matrix n n T) σ,
   n ≠ 0
