@@ -683,19 +683,19 @@ Qed.
 Definition sign n (σ : vector n nat) :=
   1%F.
 
-Definition insert n k i (v : vector n nat) : vector (S n) nat :=
+Definition insert_zero n i (v : vector n nat) : vector (S n) nat :=
   mk_vect (S n)
     (λ j,
-     if lt_dec j i then vect_el v j
-     else if lt_dec i j then vect_el v (j - 1)
-     else k).
+     if lt_dec j i then S (vect_el v j)
+     else if lt_dec i j then S (vect_el v (j - 1))
+     else 0).
 
 Definition permut_succ n (σ_n : nat → vector n nat) i :
   vector (S n) nat :=
   mk_vect (S n)
     (λ j,
      let p := σ_n (i / S n) in
-     vect_el (insert n (i mod S n) p) j).
+     vect_el (insert_zero (i mod S n) p) j).
 
 Fixpoint permut n : nat → vector n nat :=
   match n with
@@ -726,17 +726,18 @@ destruct n. {
 }
 rewrite Nat.sub_succ, Nat.sub_0_r in IHn.
 specialize (IHn (Nat.neq_succ_0 _)).
-remember (S n) as sn; cbn - [ fact iter_seq "mod" "/" ]; subst sn.
+remember (S n) as sn.
+cbn - [ fact iter_seq "mod" "/" insert_zero ]; subst sn.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   now rewrite IHn.
 }
-cbn - [ fact iter_seq "mod" "/" permut ].
+cbn - [ fact iter_seq "mod" "/" permut insert_zero ].
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   now rewrite rngl_mul_summation_distr_l.
 }
-cbn - [ fact iter_seq "mod" "/" permut ].
+cbn - [ fact iter_seq "mod" "/" permut insert_zero ].
 rewrite rngl_summation_summation_distr; [ | easy ].
 rewrite <- Nat.sub_succ_l; [ | apply lt_O_fact ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
@@ -748,7 +749,7 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite rngl_product_succ_succ.
   easy.
 }
-cbn - [ fact iter_seq "mod" "/" permut ].
+cbn - [ fact iter_seq "mod" "/" permut insert_zero ].
 ...
 apply rngl_summation_eq_compat.
 intros i Hi.
