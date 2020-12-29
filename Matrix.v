@@ -741,6 +741,14 @@ rewrite rngl_summation_summation_distr; [ | easy ].
 rewrite <- Nat.sub_succ_l; [ | apply lt_O_fact ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
 rewrite <- Nat_fact_succ.
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_product_split_first; [ | easy | flia ].
+  rewrite rngl_product_succ_succ.
+  easy.
+}
+cbn - [ fact iter_seq "mod" "/" permut ].
 ...
 apply rngl_summation_eq_compat.
 intros i Hi.
