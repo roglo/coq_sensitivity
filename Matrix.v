@@ -731,16 +731,17 @@ erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   now rewrite IHn.
 }
-cbn - [ fact iter_seq "mod" "/" ].
+cbn - [ fact iter_seq "mod" "/" permut ].
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   now rewrite rngl_mul_summation_distr_l.
 }
-cbn - [ fact iter_seq "mod" "/" ].
+cbn - [ fact iter_seq "mod" "/" permut ].
 rewrite rngl_summation_summation_distr; [ | easy ].
 rewrite <- Nat.sub_succ_l; [ | apply lt_O_fact ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
 rewrite <- Nat_fact_succ.
+...
 apply rngl_summation_eq_compat.
 intros i Hi.
 ...
