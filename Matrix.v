@@ -702,30 +702,38 @@ Compute (map (λ i, list_of_vect (permut 2 i)) (seq 0 (fact 2))).
 Compute (map (λ i, list_of_vect (permut 3 i)) (seq 0 (fact 3))).
 Compute (map (λ i, list_of_vect (permut 4 i)) (seq 0 (fact 4))).
 
-Definition sign n (ε : vector n nat) :=
-  1%F.
+Definition signature {T} {ro : ring_like_op T} {n} (σ : vector n nat) :=
+  (Π (i = 0, n - 1), Π (j = i + 1, n - 1),
+   if lt_dec (vect_el σ i) (vect_el σ j) then 1 else (- 1%F))%F.
+
 (*
-  minus_one_pow (i / fact (S n)).
+Require Import Zrl.
+Require Import ZArith.
+
+Compute let ro := Z_ring_like_op in (signature (vect_of_list 0%nat [1%nat])).
+
+Compute let ro := Z_ring_like_op in let n := 4 in
+  (map (λ i, (list_of_vect (permut n i), signature (permut n i))) (seq 0 (fact n))).
 *)
 
 Theorem det_is_det_by_permut :
   rngl_is_comm = true →
-  ∀ n (M : matrix n n T) ε,
+  ∀ n (M : matrix n n T) σ,
   n ≠ 0
-  → ε = permut n
+  → σ = permut n
   → determinant M =
-      (Σ (k = 0, fact n - 1), sign (ε k) *
-       Π (i = 0, n - 1), mat_el M i (vect_el (ε k) i))%F.
+      (Σ (k = 0, fact n - 1), signature (σ k) *
+       Π (i = 0, n - 1), mat_el M i (vect_el (σ k) i))%F.
 Proof.
-intros Hic * Hnz Hε.
-subst ε.
+intros Hic * Hnz Hσ.
+subst σ.
 unfold determinant.
 revert M.
 induction n; intros; [ easy | clear Hnz ].
 destruct n. {
   cbn.
-  unfold sign.
-  do 2 rewrite rngl_mul_1_l.
+  unfold signature.
+  do 3 rewrite rngl_mul_1_l.
   now rewrite rngl_mul_1_r.
 }
 rewrite Nat.sub_succ, Nat.sub_0_r in IHn.
@@ -765,7 +773,7 @@ f_equal. 2: {
 }
 rewrite rngl_mul_mul_swap; [ | easy ].
 f_equal.
-(* presque ! maintenant, il faut que je définisse "sign" correctement *)
+unfold signature.
 ...
 
 Theorem det_two_rows_are_eq :
