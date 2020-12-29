@@ -708,10 +708,10 @@ Compute (map (λ i, list_of_vect (permut 4 i)) (seq 0 (fact 4))).
 
 Theorem glop : ∀ n (M : matrix n n T) σ,
   n ≠ 0
-  → σ = @permut n
+  → σ = permut n
   → determinant M =
-      (Σ (i = 0, fact n - 1),
-       Π (j = 0, n - 1), (sign (σ i) * mat_el M j (vect_el (σ i) j)))%F.
+      (Σ (k = 0, fact n - 1),
+       Π (i = 0, n - 1), (sign (σ k) * mat_el M i (vect_el (σ k) i)))%F.
 Proof.
 intros * Hnz Hσ.
 subst σ.
