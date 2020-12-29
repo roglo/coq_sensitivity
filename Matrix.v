@@ -683,19 +683,15 @@ Qed.
 Definition sign n (σ : vector n nat) :=
   1%F.
 
-Definition shift_insert_0 n i (v : vector n nat) : vector (S n) nat :=
+Definition insert_n {n} i (v : vector n nat) : vector (S n) nat :=
   mk_vect (S n)
     (λ j,
-     if lt_dec j i then S (vect_el v j)
-     else if lt_dec i j then S (vect_el v (j - 1))
-     else 0).
+     if lt_dec j i then vect_el v j
+     else if lt_dec i j then vect_el v (j - 1)
+     else n).
 
-Definition permut_succ n (σ_n : nat → vector n nat) i :
-  vector (S n) nat :=
-  mk_vect (S n)
-    (λ j,
-     let p := σ_n (i / S n) in
-     vect_el (shift_insert_0 (i mod S n) p) j).
+Definition permut_succ {n} (σ_n : nat → vector n nat) i :=
+  mk_vect (S n) (vect_el (insert_n (i mod S n) (σ_n (i / S n)))).
 
 Fixpoint permut n : nat → vector n nat :=
   match n with
@@ -705,6 +701,16 @@ Fixpoint permut n : nat → vector n nat :=
 
 Compute (map (λ i, list_of_vect (permut 3 i)) (seq 0 (fact 3))).
 Compute (map (λ i, list_of_vect (permut 4 i)) (seq 0 (fact 4))).
+
+... try to find an algorithm generating permutations in the
+    canonic order (alphabetic), because the determinant calculated
+    with recusion does that, so it will be easier to compare
+    the two versions of the determinants
+
+or a function, from
+  [[2; 1; 0]; [1; 2; 0]; [1; 0; 2]; [2; 0; 1]; [0; 2; 1]; [0; 1; 2]]
+to
+  [[0; 1; 2]; [0; 2; 1]; [1; 0; 2]; [1; 2; 0]; [2; 0; 1]; [2; 1; 0]]
 
 Theorem glop : ∀ n (M : matrix n n T) σ,
   n ≠ 0
