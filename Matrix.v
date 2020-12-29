@@ -683,19 +683,19 @@ Qed.
 Definition sign n (σ : vector n nat) :=
   1%F.
 
-Definition insert n i (v : vector n nat) : vector (S n) nat :=
+Definition insert n k i (v : vector n nat) : vector (S n) nat :=
   mk_vect (S n)
     (λ j,
      if lt_dec j i then vect_el v j
      else if lt_dec i j then vect_el v (j - 1)
-     else n).
+     else k).
 
 Definition permut_succ n (σ_n : nat → vector n nat) i :
-   vector (S n) nat :=
+  vector (S n) nat :=
   mk_vect (S n)
     (λ j,
      let p := σ_n (i / S n) in
-     vect_el (insert (i mod S n) p) j).
+     vect_el (insert n (i mod S n) p) j).
 
 Fixpoint permut n : nat → vector n nat :=
   match n with
