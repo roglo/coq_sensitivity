@@ -715,6 +715,7 @@ Theorem glop : ∀ n (M : matrix n n T) σ,
 Proof.
 intros * Hnz Hσ.
 subst σ.
+unfold determinant.
 revert M.
 induction n; intros; [ easy | clear Hnz ].
 destruct n. {
@@ -723,7 +724,25 @@ destruct n. {
   do 2 rewrite rngl_mul_1_l.
   now rewrite rngl_mul_1_r.
 }
+rewrite Nat.sub_succ, Nat.sub_0_r in IHn.
 specialize (IHn (Nat.neq_succ_0 _)).
+remember (S n) as sn; cbn - [ fact iter_seq "mod" "/" ]; subst sn.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  now rewrite IHn.
+}
+cbn - [ fact iter_seq "mod" "/" ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  now rewrite rngl_mul_summation_distr_l.
+}
+cbn - [ fact iter_seq "mod" "/" ].
+rewrite rngl_summation_summation_distr; [ | easy ].
+rewrite <- Nat.sub_succ_l; [ | apply lt_O_fact ].
+rewrite Nat.sub_succ, Nat.sub_0_r.
+rewrite <- Nat_fact_succ.
+apply rngl_summation_eq_compat.
+intros i Hi.
 ...
 
 Theorem det_two_rows_are_eq :
