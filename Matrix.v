@@ -683,8 +683,8 @@ Qed.
 Definition sign n (σ : vector n nat) :=
   1%F.
 
-Definition insert n i (v : vector n nat) : vector (n + 1) nat :=
-  mk_vect (n + 1)
+Definition insert n i (v : vector n nat) : vector (S n) nat :=
+  mk_vect (S n)
     (λ j,
      if lt_dec j i then vect_el v j
      else if lt_dec i j then vect_el v (j - 1)
