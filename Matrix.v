@@ -710,8 +710,8 @@ Theorem glop : ∀ n (M : matrix n n T) σ,
   n ≠ 0
   → σ = permut n
   → determinant M =
-      (Σ (k = 0, fact n - 1),
-       Π (i = 0, n - 1), (sign (σ k) * mat_el M i (vect_el (σ k) i)))%F.
+      (Σ (k = 0, fact n - 1), sign (σ k) *
+       Π (i = 0, n - 1), mat_el M i (vect_el (σ k) i))%F.
 Proof.
 intros * Hnz Hσ.
 subst σ.
@@ -750,6 +750,8 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ fact iter_seq "mod" "/" permut shift_insert_0 ].
+symmetry.
+cbn - [ fact iter_seq "mod" "/" permut ].
 ...
 apply rngl_summation_eq_compat.
 intros i Hi.
