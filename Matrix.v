@@ -685,10 +685,10 @@ Definition sign n (σ : vector n nat) :=
 
 Theorem glop : ∀ n (M : matrix n n T),
   n ≠ 0
-  → ∃ σ : nat → vector n nat,
+  → {σ : nat → vector n nat |
     determinant M =
       (Σ (i = 0, fact n - 1),
-       Π (j = 0, n - 1), (sign (σ i) * mat_el M j (vect_el (σ i) j)))%F.
+       Π (j = 0, n - 1), (sign (σ i) * mat_el M j (vect_el (σ i) j)))%F }.
 Proof.
 intros * Hnz.
 revert M.
@@ -700,6 +700,7 @@ destruct n. {
   now rewrite rngl_mul_1_r, rngl_mul_1_l, rngl_add_0_l.
 }
 specialize (IHn (Nat.neq_succ_0 _)).
+exists (λ i, mk_vect (S (S n)) (λ j, ...
 specialize (IHn (subm M 0 0)) as H1.
 destruct H1 as (σ, Hdet).
 ...
