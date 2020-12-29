@@ -680,18 +680,16 @@ unfold δ_lt.
 now destruct i, j.
 Qed.
 
-Definition sign n (σ : vector n nat) :=
-  1%F.
-
-Definition insert_n {n} i (v : vector n nat) : vector (S n) nat :=
-  mk_vect (S n)
-    (λ j,
-     if lt_dec j i then vect_el v j
-     else if lt_dec i j then vect_el v (j - 1)
-     else n).
+Definition permut_succ_vect_fun {n} (σ_n : nat → vector n nat) i j :=
+  match j with
+  | 0 => i / fact n
+  | S j' =>
+      vect_el (σ_n (i mod fact n)) j' +
+      Nat.b2n (i / fact n <=? vect_el (σ_n (i mod fact n)) j')
+  end.
 
 Definition permut_succ {n} (σ_n : nat → vector n nat) i :=
-  mk_vect (S n) (vect_el (insert_n (i mod S n) (σ_n (i / S n)))).
+  mk_vect (S n) (permut_succ_vect_fun σ_n i).
 
 Fixpoint permut n : nat → vector n nat :=
   match n with
@@ -699,27 +697,24 @@ Fixpoint permut n : nat → vector n nat :=
   | S n' => permut_succ (permut n')
   end.
 
+Compute (map (λ i, list_of_vect (permut 1 i)) (seq 0 (fact 1))).
+Compute (map (λ i, list_of_vect (permut 2 i)) (seq 0 (fact 2))).
 Compute (map (λ i, list_of_vect (permut 3 i)) (seq 0 (fact 3))).
 Compute (map (λ i, list_of_vect (permut 4 i)) (seq 0 (fact 4))).
 
-... try to find an algorithm generating permutations in the
-    canonic order (alphabetic), because the determinant calculated
-    with recusion does that, so it will be easier to compare
-    the two versions of the determinants
+Definition sign n (σ : vector n nat) :=
+  1%F.
 
-or a function, from
-  [[2; 1; 0]; [1; 2; 0]; [1; 0; 2]; [2; 0; 1]; [0; 2; 1]; [0; 1; 2]]
-to
-  [[0; 1; 2]; [0; 2; 1]; [1; 0; 2]; [1; 2; 0]; [2; 0; 1]; [2; 1; 0]]
-
-Theorem glop : ∀ n (M : matrix n n T) σ,
+Theorem det_is_det_by_permut :
+  rngl_is_comm = true →
+  ∀ n (M : matrix n n T) σ,
   n ≠ 0
   → σ = permut n
   → determinant M =
       (Σ (k = 0, fact n - 1), sign (σ k) *
        Π (i = 0, n - 1), mat_el M i (vect_el (σ k) i))%F.
 Proof.
-intros * Hnz Hσ.
+intros Hic * Hnz Hσ.
 subst σ.
 unfold determinant.
 revert M.
@@ -733,17 +728,17 @@ destruct n. {
 rewrite Nat.sub_succ, Nat.sub_0_r in IHn.
 specialize (IHn (Nat.neq_succ_0 _)).
 remember (S n) as sn.
-cbn - [ fact iter_seq "mod" "/" shift_insert_0 ]; subst sn.
+cbn - [ fact iter_seq "mod" "/" ]; subst sn.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   now rewrite IHn.
 }
-cbn - [ fact iter_seq "mod" "/" permut shift_insert_0 ].
+cbn - [ fact iter_seq "mod" "/" permut ].
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   now rewrite rngl_mul_summation_distr_l.
 }
-cbn - [ fact iter_seq "mod" "/" permut shift_insert_0 ].
+cbn - [ fact iter_seq "mod" "/" permut ].
 rewrite rngl_summation_summation_distr; [ | easy ].
 rewrite <- Nat.sub_succ_l; [ | apply lt_O_fact ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
@@ -755,12 +750,19 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite rngl_product_succ_succ.
   easy.
 }
-cbn - [ fact iter_seq "mod" "/" permut shift_insert_0 ].
-symmetry.
 cbn - [ fact iter_seq "mod" "/" permut ].
-...
+symmetry.
 apply rngl_summation_eq_compat.
 intros i Hi.
+do 2 rewrite rngl_mul_assoc.
+f_equal. 2: {
+  apply rngl_product_eq_compat; [ easy | ].
+  intros j Hj.
+  now rewrite Nat.add_1_r.
+}
+rewrite rngl_mul_mul_swap; [ | easy ].
+f_equal.
+(* presque ! maintenant, il faut que je définisse "sign" correctement *)
 ...
 
 Theorem det_two_rows_are_eq :
