@@ -694,8 +694,8 @@ Definition permut_succ n (σ_n : nat → vector n nat) i :
    vector (S n) nat :=
   mk_vect (S n)
     (λ j,
-     let p := σ_n (i / fact n) in
-     vect_el (insert (i mod fact n) p) j).
+     let p := σ_n (i / S n) in
+     vect_el (insert (i mod S n) p) j).
 
 Fixpoint permut n : nat → vector n nat :=
   match n with
@@ -703,38 +703,27 @@ Fixpoint permut n : nat → vector n nat :=
   | S n' => permut_succ (permut n')
   end.
 
-Compute list_of_vect (insert 2 (vect_of_list 0 [1;0;2])).
-Compute (list_of_vect (permut 3 0)).
-Compute (list_of_vect (permut 3 1)).
-Compute (list_of_vect (permut 3 2)).
-Compute (list_of_vect (permut 3 3)).
-Compute (list_of_vect (permut 3 4)).
-Compute (list_of_vect (permut 3 5)).
-Compute (list_of_vect (permut_succ 2 (λ i, vect_of_list 0 [7;8]) 2)).
-
-...
+Compute (map (λ i, list_of_vect (permut 3 i)) (seq 0 (fact 3))).
+Compute (map (λ i, list_of_vect (permut 4 i)) (seq 0 (fact 4))).
 
 Theorem glop : ∀ n (M : matrix n n T) σ,
   n ≠ 0
-  → σ = permut_succ n
-  → {σ : nat → vector n nat |
-    determinant M =
+  → σ = @permut n
+  → determinant M =
       (Σ (i = 0, fact n - 1),
-       Π (j = 0, n - 1), (sign (σ i) * mat_el M j (vect_el (σ i) j)))%F }.
+       Π (j = 0, n - 1), (sign (σ i) * mat_el M j (vect_el (σ i) j)))%F.
 Proof.
-intros * Hnz.
+intros * Hnz Hσ.
+subst σ.
 revert M.
 induction n; intros; [ easy | clear Hnz ].
 destruct n. {
-  exists (λ _, mk_vect 1 (λ _, 0)); cbn.
-  unfold sign; cbn.
-  rewrite rngl_add_0_l, rngl_mul_1_l.
-  now rewrite rngl_mul_1_r, rngl_mul_1_l, rngl_add_0_l.
+  cbn.
+  unfold sign.
+  do 2 rewrite rngl_mul_1_l.
+  now rewrite rngl_mul_1_r.
 }
 specialize (IHn (Nat.neq_succ_0 _)).
-exists (λ i, mk_vect (S (S n)) (λ j, ... proj1_sig (IHn (subm M 0 j)) ...
-specialize (IHn (subm M 0 0)) as H1.
-destruct H1 as (σ, Hdet).
 ...
 
 Theorem det_two_rows_are_eq :
