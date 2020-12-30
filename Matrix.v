@@ -298,25 +298,37 @@ Fixpoint signature n k :=
 
 Definition determinant' n (M : matrix n n T) :=
   (Σ (k = 0, fact n - 1), signature n k *
-   Π (i = 0, n - 1), mat_el M i (vect_el (permut n k) i))%F.
+   Π (i = 1, n), mat_el M (i - 1) (vect_el (permut n k) (i - 1)%nat))%F.
 
 (* Proof that both definitions of determinants are equal *)
 
 Theorem det_is_det_by_permut :
   rngl_is_comm = true →
-  ∀ n (M : matrix n n T), n ≠ 0 → determinant M = determinant' M.
+  ∀ n (M : matrix n n T), determinant M = determinant' M.
 Proof.
-intros Hic * Hnz.
+intros Hic *.
 unfold determinant, determinant'.
+destruct n; intros. {
+  cbn; rewrite rngl_add_0_l.
+  symmetry; apply rngl_mul_1_l.
+}
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_product_succ_succ.
+  erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
+    intros j Hj.
+    now rewrite Nat.sub_succ, Nat.sub_0_r.
+  }
+  easy.
+}
+cbn - [ iter_seq fact det_loop permut signature ].
 revert M.
-induction n; intros; [ easy | clear Hnz ].
-destruct n. {
+induction n; intros. {
   cbn.
   unfold signature.
   do 3 rewrite rngl_mul_1_l.
   now rewrite rngl_mul_1_r.
 }
-specialize (IHn (Nat.neq_succ_0 _)).
 remember (S n) as sn.
 cbn - [ fact iter_seq "mod" "/" ]; subst sn.
 erewrite rngl_summation_eq_compat. 2: {
@@ -332,7 +344,6 @@ cbn - [ fact iter_seq "mod" "/" permut ].
 rewrite rngl_summation_summation_distr; [ | easy ].
 rewrite <- Nat.sub_succ_l; [ | apply lt_O_fact ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
-rewrite Nat.sub_0_r.
 rewrite <- Nat_fact_succ.
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
@@ -792,13 +803,12 @@ Theorem det_two_rows_are_eq :
   rngl_is_comm = true →
   rngl_has_opp = true →
   ∀ n (A : matrix n n T) i,
-  n ≠ 0
-  → 0 < i < n
+  0 < i < n
   → (∀ j, mat_el A i j = mat_el A 0 j)
   → determinant A = 0%F.
 Proof.
-intros Hic Hop * Hnz Hiz Ha.
-rewrite det_is_det_by_permut; [ | easy | easy ].
+intros Hic Hop * Hiz Ha.
+rewrite det_is_det_by_permut; [ | easy ].
 unfold determinant'.
 ...
 induction n; [ easy | clear Hnz ].
