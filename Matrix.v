@@ -809,7 +809,7 @@ Fixpoint nat_of_permut n (v : vector n nat) : nat :=
       d * fact n' +
       nat_of_permut
         (mk_vect n'
-           (λ i, vect_el v (i + 1) - Nat.b2n (d <? vect_el v (i + 1))))
+           (λ i, vect_el v (S i) - Nat.b2n (d <? vect_el v (S i))))
   end.
 
 Compute  nat_of_permut (permut 3 0).
@@ -819,22 +819,52 @@ Compute  nat_of_permut (permut 3 3).
 Compute  nat_of_permut (permut 3 4).
 Compute  nat_of_permut (permut 3 5).
 
-Theorem glop : ∀ n k, nat_of_permut (permut n k) = k.
+Theorem nat_of_permut_permut : ∀ n k,
+  k < fact n
+  → nat_of_permut (permut n k) = k.
 Proof.
-intros.
-revert n.
-induction k; intros. {
-  induction n; [ easy | ].
+intros * Hkn.
+revert k Hkn.
+induction n; intros; [ now apply Nat.lt_1_r in Hkn | cbn ].
+specialize (Nat.div_mod k (fact n) (fact_neq_0 _)) as H1.
+rewrite Nat.mul_comm in H1.
+replace (k / fact n * fact n) with (k - k mod fact n) by flia H1.
+rewrite <- Nat.add_sub_swap; [ | apply Nat.mod_le, fact_neq_0 ].
+apply Nat.add_sub_eq_r; f_equal.
+clear H1.
+rewrite <- (IHn (k mod fact n)) at 1. 2: {
+  apply Nat.mod_upper_bound, fact_neq_0.
+}
+f_equal.
+apply vector_eq.
+intros i Hi; cbn.
+symmetry.
+apply Nat.add_sub_eq_r.
+f_equal.
+remember (Nat.b2n (_ <=? _)) as b eqn:Hb.
+rewrite Nat.add_comm.
+symmetry in Hb.
+destruct b. 2: {
   cbn.
-  rewrite Nat.div_0_l; [ | apply fact_neq_0 ].
-  rewrite Nat.mul_0_l, Nat.add_0_l.
-Print nat_of_permut.
-...
-  induction n; [ easy | ].
-  cbn - [ "mod" ].
-  rewrite Nat.div_0_l; [ | now apply Nat.pow_nonzero ].
-  rewrite Nat.mod_0_l; [ | easy ].
-...
+  destruct b; [ easy | exfalso ].
+  unfold Nat.b2n in Hb.
+  destruct (k / fact n <=? _); flia Hb.
+}
+cbn.
+remember (vect_el (permut n _) i) as x eqn:Hx.
+symmetry in Hx.
+destruct x; [ easy | ].
+unfold Nat.b2n in Hb |-*.
+remember (k / fact n) as y eqn:Hy; symmetry in Hy.
+remember (y <=? S x) as c eqn:Hc; symmetry in Hc.
+destruct c; [ easy | clear Hb ].
+apply Nat.leb_gt in Hc.
+remember (y <=? x) as b eqn:Hb.
+symmetry in Hb.
+destruct b; [ | easy ].
+apply Nat.leb_le in Hb.
+flia Hb Hc.
+Qed.
 
 Theorem det_two_rows_are_eq :
   rngl_is_comm = true →
@@ -872,6 +902,8 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ iter_seq fact signature permut ].
+Check nat_of_permut_permut.
+...
 assert
   (H :
    ∀ k, ∃ k', k' ≠ k ∧
@@ -880,7 +912,6 @@ assert
    (∀ j, j ≠ 0 → j ≠ i →
     vect_el (permut (S n) k') j = vect_el (permut (S n) k) j)). {
   intros k.
-Theorem glop : ∀ k, permut_val n (permut n) k = k.
 ...
 induction n; [ easy | clear Hnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
