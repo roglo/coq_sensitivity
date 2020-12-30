@@ -874,6 +874,30 @@ Theorem summation_pair : ∀ b e f g,
      Σ (i = b, e), if lt_dec i (g i) then f i + f (g i) else 0)%F.
 Proof.
 intros * Hg.
+destruct (le_dec b e) as [Hbe| Hbe]. 2: {
+  apply Nat.nle_gt in Hbe.
+  rewrite rngl_summation_empty; [ | easy ].
+  rewrite rngl_summation_empty; [ | easy ].
+  easy.
+}
+unfold iter_seq.
+remember (S e - b) as len eqn:Hlen.
+assert (H : ∀ i, i < len → g (b + i) < b + len ∧ g (b + i) ≠ b + i). {
+  intros i Hi.
+  specialize (Hg (b + i)).
+  assert (H : b ≤ b + i ≤ e). {
+    split; [ flia | ].
+    flia Hbe Hi Hlen.
+  }
+  specialize (Hg H); clear H.
+  split; [ | easy ].
+  flia Hg Hlen.
+}
+move H before Hg; clear Hg; rename H into Hg.
+clear e Hbe Hlen.
+revert b Hg.
+induction len; intros; [ easy | ].
+cbn.
 ...
 
 Theorem det_two_rows_are_eq :
