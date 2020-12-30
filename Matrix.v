@@ -800,8 +800,10 @@ Proof.
 intros Hic Hop * Hnz Hiz Ha.
 rewrite det_is_det_by_permut; [ | easy | easy ].
 unfold determinant'.
-destruct n; [ easy | clear Hnz ].
-cbn - [ iter_seq fact signature ].
+...
+induction n; [ easy | clear Hnz ].
+rewrite Nat.sub_succ, Nat.sub_0_r.
+cbn - [ iter_seq fact ].
 ...
 destruct i; [ easy | ].
 destruct i. {
