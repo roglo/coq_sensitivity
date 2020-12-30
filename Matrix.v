@@ -702,9 +702,15 @@ Compute (map (λ i, list_of_vect (permut 2 i)) (seq 0 (fact 2))).
 Compute (map (λ i, list_of_vect (permut 3 i)) (seq 0 (fact 3))).
 Compute (map (λ i, list_of_vect (permut 4 i)) (seq 0 (fact 4))).
 
-Definition signature {n} (σ : vector n nat) :=
+Definition signature {n} (σ : nat → vector n nat) k :=
   (Π (i = 0, n - 1), Π (j = i + 1, n - 1),
-   if lt_dec (vect_el σ i) (vect_el σ j) then 1 else (- 1%F))%F.
+   if lt_dec (vect_el (σ k) i) (vect_el (σ k) j) then 1 else (- 1%F))%F.
+
+(* signature is supposed to have this property
+  signature (permut_succ (permut (S n))) i =
+    (minus_one_pow (i / fact (S n)) *
+     signature (permut (S n)) (i mod fact (S n)))%F
+*)
 
 (*
 End a.
@@ -723,7 +729,7 @@ Theorem det_is_det_by_permut :
   n ≠ 0
   → σ = permut n
   → determinant M =
-      (Σ (k = 0, fact n - 1), signature (σ k) *
+      (Σ (k = 0, fact n - 1), signature σ k *
        Π (i = 0, n - 1), mat_el M i (vect_el (σ k) i))%F.
 Proof.
 intros Hic * Hnz Hσ.
