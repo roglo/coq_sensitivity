@@ -866,6 +866,16 @@ apply Nat.leb_le in Hb.
 flia Hb Hc.
 Qed.
 
+Check nat_of_permut_permut.
+
+Theorem summation_pair : ∀ b e f g,
+  (∀ i, b ≤ i ≤ e → b ≤ g i ≤ e ∧ g i ≠ i)
+  → (Σ (i = b, e), f i =
+     Σ (i = b, e), if lt_dec i (g i) then f i + f (g i) else 0)%F.
+Proof.
+intros * Hg.
+...
+
 Theorem det_two_rows_are_eq :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -902,11 +912,8 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ iter_seq fact signature permut ].
-Check nat_of_permut_permut.
-Require Import Permutation.
-Theorem glop : ∀ n f g h,
-  (∀ i, 1 ≤ i ≤ 2 * n → ...
-  (Σ (i = 1, 2 * n), f i = Σ (i = 1, n), (f (g i) + f (h i)))%F.
+...
+erewrite summation_pair.
 ...
 Theorem rngl_summation_permut : ∀ b e f g,
   Permutation (seq b (S e - b)) (map g (seq b (S e - b)))
