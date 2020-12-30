@@ -712,6 +712,23 @@ Definition signature {n} (σ : nat → vector n nat) k :=
      signature (permut (S n)) (i mod fact (S n)))%F
 *)
 
+Definition signature' n k :=
+  (Π (i = 0, n - 1), Π (j = i + 1, n - 1),
+   if lt_dec (vect_el (permut n k) i) (vect_el (permut n k) j) then 1
+   else (- 1%F))%F.
+
+Fixpoint signature'' n k :=
+  match n with
+  | 0 => 1%F
+  | S n' =>
+      (minus_one_pow (k / fact n') * signature'' n' (k mod fact n'))%F
+  end.
+
+(*
+  signature' (S (S n)) i
+  (minus_one_pow (i / fact (S n)) * signature' (S n) (i mod fact (S n)))%F =
+*)
+
 (*
 End a.
 Require Import Zrl.
@@ -729,7 +746,7 @@ Theorem det_is_det_by_permut :
   n ≠ 0
   → σ = permut n
   → determinant M =
-      (Σ (k = 0, fact n - 1), signature σ k *
+      (Σ (k = 0, fact n - 1), signature'' n k *
        Π (i = 0, n - 1), mat_el M i (vect_el (σ k) i))%F.
 Proof.
 intros Hic * Hnz Hσ.
@@ -772,16 +789,21 @@ cbn - [ fact iter_seq "mod" "/" permut ].
 symmetry.
 apply rngl_summation_eq_compat.
 intros i Hi.
-do 2 rewrite rngl_mul_assoc.
+do 3 rewrite rngl_mul_assoc.
 f_equal. 2: {
   apply rngl_product_eq_compat; [ easy | ].
   intros j Hj.
   now rewrite Nat.add_1_r.
 }
 rewrite rngl_mul_mul_swap; [ | easy ].
+rewrite <- rngl_mul_assoc.
+rewrite rngl_mul_mul_swap; [ | easy ].
 f_equal.
-...
-unfold signature.
+rewrite rngl_mul_assoc.
+rewrite rngl_mul_mul_swap; [ | easy ].
+now rewrite rngl_mul_assoc.
+Qed.
+
 ...
 
 Theorem det_two_rows_are_eq :
