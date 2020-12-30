@@ -801,23 +801,16 @@ unfold δ_lt.
 now destruct i, j.
 Qed.
 
-Definition val_of_permut n (v : vector n nat) : nat :=
-  fold_left (λ acc a, acc * n + vect_el v a) (seq 0 n) 0.
-
-Definition permut_of_val n k : vector n nat :=
-  mk_vect n (λ i, k / (n ^ (n - S i)) mod n).
-
-Compute list_of_vect (permut 3 2).
-Compute list_of_vect (permut_of_val 3 (val_of_permut (permut 3 2))).
-Compute val_of_permut (permut_of_val 3 15).
-
-Compute list_of_vect (permut 3 0).
-Print permut.
-
-Definition nat_of_permut n (v : vector n nat) : nat :=
-  vect_el v 0 * fact (n - 1) +
-...
-  vect_el v 1...
+Fixpoint nat_of_permut n (v : vector n nat) : nat :=
+  match n with
+  | 0 => 0
+  | S n' =>
+      let d := vect_el v 0 in
+      d * fact n' +
+      nat_of_permut
+        (mk_vect n'
+           (λ i, vect_el v (i + 1) - Nat.b2n (d <? vect_el v (i + 1))))
+  end.
 
 Compute  nat_of_permut (permut 3 0).
 Compute  nat_of_permut (permut 3 1).
@@ -825,13 +818,17 @@ Compute  nat_of_permut (permut 3 2).
 Compute  nat_of_permut (permut 3 3).
 Compute  nat_of_permut (permut 3 4).
 Compute  nat_of_permut (permut 3 5).
-...
 
-Theorem glop : ∀ n k, val_of_permut (permut_of_val n k) = k.
+Theorem glop : ∀ n k, nat_of_permut (permut n k) = k.
 Proof.
 intros.
 revert n.
-induction k; intros; cbn. {
+induction k; intros. {
+  induction n; [ easy | ].
+  cbn.
+  rewrite Nat.div_0_l; [ | apply fact_neq_0 ].
+  rewrite Nat.mul_0_l, Nat.add_0_l.
+Print nat_of_permut.
 ...
   induction n; [ easy | ].
   cbn - [ "mod" ].
