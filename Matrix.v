@@ -810,6 +810,31 @@ Proof.
 intros Hic Hop * Hiz Ha.
 rewrite det_is_det_by_permut; [ | easy ].
 unfold determinant'.
+destruct n; [ flia Hiz | ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite rngl_product_succ_succ.
+  erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
+    intros k Hk.
+    now rewrite Nat.sub_succ, Nat.sub_0_r.
+  }
+  easy.
+}
+cbn - [ iter_seq fact signature permut ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite rngl_product_split_first; [ | easy | flia ].
+  rewrite (rngl_product_split _ i); [ | flia Hiz ].
+  rewrite rngl_product_split_last; [ | easy ].
+  do 3 rewrite rngl_mul_assoc.
+  rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_mul_swap; [ | easy ].
+  rewrite rngl_mul_assoc.
+  rewrite rngl_mul_mul_swap; [ | easy ].
+  rewrite Ha.
+  easy.
+}
+cbn - [ iter_seq fact signature permut ].
 ...
 induction n; [ easy | clear Hnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r.

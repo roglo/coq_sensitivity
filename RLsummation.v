@@ -263,7 +263,8 @@ assert (Hll : len1 ≤ len2) by flia Hlen1 Hlen2 Hjk.
 clear - rp Hll.
 revert b len2 Hll.
 induction len1; intros. {
-  now cbn; rewrite rngl_add_0_l, Nat.add_0_r, Nat.sub_0_r.
+  cbn; rewrite Nat.add_0_r, Nat.sub_0_r; symmetry.
+  apply rngl_add_0_l.
 }
 destruct len2; [ flia Hll | ].
 apply Nat.succ_le_mono in Hll; cbn.
