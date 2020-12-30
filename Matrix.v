@@ -839,7 +839,9 @@ assert
   (H :
    ∀ k, ∃ k', k' ≠ k ∧
    vect_el (permut (S n) k') 0 = vect_el (permut (S n) k) i ∧
-   vect_el (permut (S n) k') i = vect_el (permut (S n) k) 0). {
+   vect_el (permut (S n) k') i = vect_el (permut (S n) k) 0 ∧
+   (∀ j, j ≠ 0 → j ≠ i →
+    vect_el (permut (S n) k') j = vect_el (permut (S n) k) j)). {
   intros k.
 ...
 induction n; [ easy | clear Hnz ].
