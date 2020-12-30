@@ -799,6 +799,28 @@ unfold δ_lt.
 now destruct i, j.
 Qed.
 
+Definition val_of_permut n (v : vector n nat) : nat :=
+  fold_left (λ acc a, acc * n + vect_el v a) (seq 0 n) 0.
+
+Definition permut_of_val n k : vector n nat :=
+  mk_vect n (λ i, k / (n ^ (n - S i)) mod n).
+
+Compute list_of_vect (permut 3 2).
+Compute list_of_vect (permut_of_val 3 (val_of_permut (permut 3 2))).
+Compute val_of_permut (permut_of_val 3 15).
+
+Theorem glop : ∀ n k, val_of_permut (permut_of_val n k) = k.
+Proof.
+intros.
+revert n.
+induction k; intros; cbn. {
+...
+  induction n; [ easy | ].
+  cbn - [ "mod" ].
+  rewrite Nat.div_0_l; [ | now apply Nat.pow_nonzero ].
+  rewrite Nat.mod_0_l; [ | easy ].
+...
+
 Theorem det_two_rows_are_eq :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -843,6 +865,7 @@ assert
    (∀ j, j ≠ 0 → j ≠ i →
     vect_el (permut (S n) k') j = vect_el (permut (S n) k) j)). {
   intros k.
+Theorem glop : ∀ k, permut_val n (permut n) k = k.
 ...
 induction n; [ easy | clear Hnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
