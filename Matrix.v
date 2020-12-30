@@ -880,8 +880,11 @@ destruct (le_dec b e) as [Hbe| Hbe]. 2: {
   rewrite rngl_summation_empty; [ | easy ].
   easy.
 }
+...
 unfold iter_seq.
 remember (S e - b) as len eqn:Hlen.
+replace e with (b + len - 1) in Hg by flia Hbe Hlen.
+(*
 assert (H : ∀ i, i < len → g (b + i) < b + len ∧ g (b + i) ≠ b + i). {
   intros i Hi.
   specialize (Hg (b + i)).
@@ -894,24 +897,45 @@ assert (H : ∀ i, i < len → g (b + i) < b + len ∧ g (b + i) ≠ b + i). {
   flia Hg Hlen.
 }
 move H before Hg; clear Hg; rename H into Hg.
+*)
 clear e Hbe Hlen.
 revert b Hg.
 induction len; intros; [ easy | ].
 cbn.
+(*
+destruct len. {
+  cbn.
+  specialize (Hg b).
+  rewrite Nat.add_sub in Hg.
+  assert (H : b ≤ b ≤ b) by flia.
+  specialize (Hg H); clear H.
+  flia Hg.
+}
+*)
 do 2 rewrite rngl_add_0_l.
 rewrite fold_left_rngl_add_fun_from_0; [ symmetry | easy ].
 rewrite fold_left_rngl_add_fun_from_0; [ symmetry | easy ].
 destruct (lt_dec b (g b)) as [Hgb| Hgb]. {
   rewrite <- rngl_add_assoc.
   f_equal.
-  rewrite <- IHlen.
 ...
-  rewrite IHlen. 2: {
+  rewrite <- IHlen. 2: {
     intros i Hi.
+    specialize (Hg i) as H1.
+    assert (H : b ≤ i ≤ b + S len - 1) by flia Hi Hgb.
+    specialize (H1 H); clear H.
+    split; [ | easy ].
+    split; [ | flia H1 ].
+...
     do 2 rewrite Nat.add_succ_comm.
     apply Hg; flia Hi.
   }
-  f_equal.
+...
+             fold_left (λ (c : T) (i : nat), c + f i) (seq (S b) len) 0%F =
+  (f (g b) + fold_left (λ (c : T) (i : nat), c + f i) (seq (S b) len) 0)%F
+
+  (f b + fold_left (λ (c : T) (i : nat), c + f i) (seq (S b) len) 0)%F =
+         fold_left (λ (c : T) (i : nat), c + f i) (seq (S b) len) 0%F
 ...
 
 Theorem det_two_rows_are_eq :
