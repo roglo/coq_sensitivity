@@ -898,6 +898,20 @@ clear e Hbe Hlen.
 revert b Hg.
 induction len; intros; [ easy | ].
 cbn.
+do 2 rewrite rngl_add_0_l.
+rewrite fold_left_rngl_add_fun_from_0; [ symmetry | easy ].
+rewrite fold_left_rngl_add_fun_from_0; [ symmetry | easy ].
+destruct (lt_dec b (g b)) as [Hgb| Hgb]. {
+  rewrite <- rngl_add_assoc.
+  f_equal.
+  rewrite <- IHlen.
+...
+  rewrite IHlen. 2: {
+    intros i Hi.
+    do 2 rewrite Nat.add_succ_comm.
+    apply Hg; flia Hi.
+  }
+  f_equal.
 ...
 
 Theorem det_two_rows_are_eq :
