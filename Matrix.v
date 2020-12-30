@@ -835,6 +835,12 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ iter_seq fact signature permut ].
+assert
+  (H :
+   ∀ k, ∃ k', k' ≠ k ∧
+   vect_el (permut (S n) k') 0 = vect_el (permut (S n) k) i ∧
+   vect_el (permut (S n) k') i = vect_el (permut (S n) k) 0). {
+  intros k.
 ...
 induction n; [ easy | clear Hnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
