@@ -272,13 +272,15 @@ Definition permut_succ_vect_fun {n} (σ_n : nat → vector n nat) i j :=
       Nat.b2n (i / fact n <=? vect_el (σ_n (i mod fact n)) j')
   end.
 
+(*
 Definition permut_succ {n} (σ_n : nat → vector n nat) i :=
   mk_vect (S n) (permut_succ_vect_fun σ_n i).
+*)
 
 Fixpoint permut n : nat → vector n nat :=
   match n with
   | 0 => λ _, mk_vect 0 (λ _, 0)
-  | S n' => permut_succ (permut n')
+  | S n' => λ i, mk_vect (S n') (permut_succ_vect_fun (permut n') i)
   end.
 
 (*
@@ -808,6 +810,22 @@ Definition permut_of_val n k : vector n nat :=
 Compute list_of_vect (permut 3 2).
 Compute list_of_vect (permut_of_val 3 (val_of_permut (permut 3 2))).
 Compute val_of_permut (permut_of_val 3 15).
+
+Compute list_of_vect (permut 3 0).
+Print permut.
+
+Definition nat_of_permut n (v : vector n nat) : nat :=
+  vect_el v 0 * fact (n - 1) +
+...
+  vect_el v 1...
+
+Compute  nat_of_permut (permut 3 0).
+Compute  nat_of_permut (permut 3 1).
+Compute  nat_of_permut (permut 3 2).
+Compute  nat_of_permut (permut 3 3).
+Compute  nat_of_permut (permut 3 4).
+Compute  nat_of_permut (permut 3 5).
+...
 
 Theorem glop : ∀ n k, val_of_permut (permut_of_val n k) = k.
 Proof.
