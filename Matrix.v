@@ -680,16 +680,16 @@ unfold δ_lt.
 now destruct i, j.
 Qed.
 
-Definition permut_succ_vect_fun {n} (ε_n : nat → vector n nat) i j :=
+Definition permut_succ_vect_fun {n} (σ_n : nat → vector n nat) i j :=
   match j with
   | 0 => i / fact n
   | S j' =>
-      vect_el (ε_n (i mod fact n)) j' +
-      Nat.b2n (i / fact n <=? vect_el (ε_n (i mod fact n)) j')
+      vect_el (σ_n (i mod fact n)) j' +
+      Nat.b2n (i / fact n <=? vect_el (σ_n (i mod fact n)) j')
   end.
 
-Definition permut_succ {n} (ε_n : nat → vector n nat) i :=
-  mk_vect (S n) (permut_succ_vect_fun ε_n i).
+Definition permut_succ {n} (σ_n : nat → vector n nat) i :=
+  mk_vect (S n) (permut_succ_vect_fun σ_n i).
 
 Fixpoint permut n : nat → vector n nat :=
   match n with
@@ -702,18 +702,19 @@ Compute (map (λ i, list_of_vect (permut 2 i)) (seq 0 (fact 2))).
 Compute (map (λ i, list_of_vect (permut 3 i)) (seq 0 (fact 3))).
 Compute (map (λ i, list_of_vect (permut 4 i)) (seq 0 (fact 4))).
 
-Definition signature {T} {ro : ring_like_op T} {n} (σ : vector n nat) :=
+Definition signature {n} (σ : vector n nat) :=
   (Π (i = 0, n - 1), Π (j = i + 1, n - 1),
    if lt_dec (vect_el σ i) (vect_el σ j) then 1 else (- 1%F))%F.
 
 (*
+End a.
 Require Import Zrl.
 Require Import ZArith.
 
-Compute let ro := Z_ring_like_op in (signature (vect_of_list 0%nat [1%nat])).
+Compute let ro := Z_ring_like_op in (signature _ (vect_of_list 0%nat [1%nat])).
 
 Compute let ro := Z_ring_like_op in let n := 4 in
-  (map (λ i, (list_of_vect (permut n i), signature (permut n i))) (seq 0 (fact n))).
+  (map (λ i, (list_of_vect (permut n i), signature _ (permut n i))) (seq 0 (fact n))).
 *)
 
 Theorem det_is_det_by_permut :
@@ -773,6 +774,7 @@ f_equal. 2: {
 }
 rewrite rngl_mul_mul_swap; [ | easy ].
 f_equal.
+...
 unfold signature.
 ...
 
