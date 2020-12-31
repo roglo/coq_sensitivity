@@ -926,7 +926,6 @@ destruct (lt_dec b (g b)) as [Hbg| Hbg]. {
     clear H.
     specialize (Hgbe _ H1) as H2.
 ...
-*)
   rewrite Nat.add_succ_l.
   do 3 rewrite rngl_summation_succ_succ.
   rewrite IHlen with (g := λ i, g (S i)); cycle 1. {
@@ -942,6 +941,7 @@ destruct (lt_dec b (g b)) as [Hbg| Hbg]. {
     clear H.
     split; [ | flia H1 ].
 ...
+*)
   destruct len. {
     rewrite Nat.add_0_r.
     rewrite rngl_summation_only_one; [ | easy ].
@@ -952,7 +952,12 @@ destruct (lt_dec b (g b)) as [Hbg| Hbg]. {
     }
     symmetry; apply rngl_add_0_l.
   }
-  erewrite IHlen.
+  rewrite IHlen with (g := g); cycle 1. {
+    intros i Hi.
+    specialize (Hgbe i) as H1.
+    assert (H : b ≤ i ≤ S b + S len) by flia Hi.
+    specialize (H1 H).
+    split; [ | easy ].
 ...
   rewrite IHlen with (g := g); cycle 1. {
     intros i Hi.
