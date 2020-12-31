@@ -952,6 +952,7 @@ destruct (lt_dec b (g b)) as [Hbg| Hbg]. {
     }
     symmetry; apply rngl_add_0_l.
   }
+...
   rewrite IHlen with (g := g); cycle 1. {
     intros i Hi.
     specialize (Hgbe i) as H1.
