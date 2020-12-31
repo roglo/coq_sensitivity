@@ -874,7 +874,7 @@ Theorem glop : ∀ b e f g,
   → (∀ i, b ≤ i ≤ e → g (g i) = i)
   → (Σ (i = b, e), f i =
      Σ (i = b, e), (if lt_dec i (g i) then f i else 0) +
-     Σ (i = b, e), if lt_dec i (g i) then 0 else f i)%F.
+     Σ (i = b, e), (if lt_dec i (g i) then f (g i) else 0))%F.
 Proof.
 intros * Hgbe Hgii Hggi.
 destruct (le_dec b e) as [Hbe| Hbe]. 2: {
@@ -898,11 +898,50 @@ rewrite Nat.sub_succ, Nat.sub_0_r in Hgbe, Hgii, Hggi |-*.
 clear Hbe Hlen.
 revert f g b Hgbe Hgii Hggi.
 induction len; intros. {
-  rewrite Nat.add_0_r.
-  rewrite rngl_summation_only_one; [ | easy ].
-  rewrite rngl_summation_only_one; [ | easy ].
-  rewrite rngl_summation_only_one; [ | easy ].
-  rewrite Nat.add_0_r in Hgbe.
+  rewrite Nat.add_0_r in Hgbe, Hgii.
+  specialize (Hgbe b) as H1.
+  specialize (Hgii b) as H2.
+  assert (H : b ≤ b ≤ b) by easy.
+  specialize (H1 H); specialize (H2 H); clear H.
+  flia H1 H2.
+}
+rewrite (rngl_summation_split_first _ b); [ | flia ].
+rewrite (rngl_summation_split_first _ b); [ | flia ].
+rewrite (rngl_summation_split_first _ b); [ | flia ].
+destruct (lt_dec b (g b)) as [Hbg| Hbg]. {
+  rewrite <- rngl_add_assoc; f_equal.
+  rewrite <- Nat.add_succ_comm in Hgbe |-*.
+  rewrite (rngl_summation_split _ (g b)). 2: {
+    specialize (Hgbe b) as H1.
+    assert (b ≤ b ≤ S b + len) by flia.
+    specialize (H1 H); clear H.
+    flia H1.
+  }
+  rewrite rngl_summation_split_last; [ | easy ].
+  rewrite rngl_add_assoc.
+  rewrite rngl_add_add_swap; symmetry.
+  rewrite rngl_add_add_swap; symmetry.
+  f_equal.
+  symmetry.
+  rewrite (rngl_summation_split _ (g b)). 2: {
+    specialize (Hgbe b) as H1.
+    assert (b ≤ b ≤ S b + len) by flia.
+    specialize (H1 H); clear H.
+    flia H1.
+  }
+  rewrite rngl_summation_split_last; [ | easy ].
+  symmetry.
+  rewrite Hggi; [ | flia ].
+  destruct (lt_dec (g b) b) as [H| H]; [ flia Hbg H | clear H ].
+  rewrite rngl_add_0_r.
+...
+  rewrite IHlen with (g := λ i, S (g i)); cycle 1. {
+    intros i Hi.
+    specialize (Hgbe i) as H1.
+    assert (H : b ≤ S i ≤ S b + len).
+    specialize (H1 H); clear H.
+    split; [ | easy ].
+...
   destruct (lt_dec b (g b)) as [Hbg| Hbg]; [ now rewrite rngl_add_0_r | ].
   apply Nat.nlt_ge in Hbg.
   rewrite rngl_add_0_l.
