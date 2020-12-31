@@ -882,6 +882,8 @@ destruct (le_dec b e) as [Hbe| Hbe]. 2: {
   rewrite rngl_summation_empty; [ | easy ].
   easy.
 }
+...
+(* experimentation by looking at the first item *)
 rewrite rngl_summation_split_first; [ symmetry | easy | easy ].
 rewrite rngl_summation_split_first; [ symmetry | easy | easy ].
 destruct (lt_dec b (g b)) as [Hbg| Hbg]. 2: {
