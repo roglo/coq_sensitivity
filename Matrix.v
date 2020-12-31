@@ -952,6 +952,31 @@ destruct (lt_dec b (g b)) as [Hbg| Hbg]. {
     }
     symmetry; apply rngl_add_0_l.
   }
+  rewrite Nat.add_succ_r.
+  cbn - [ iter_seq ].
+  do 3 rewrite rngl_summation_succ_succ.
+  destruct len. {
+    rewrite Nat.add_0_r.
+    cbn.
+    destruct b; cbn. {
+      do 3 rewrite rngl_add_0_l.
+      destruct (lt_dec 1 (g 1)) as [H1g1| H1g1]. {
+        rewrite rngl_add_0_l.
+        rewrite <- rngl_add_assoc; f_equal.
+        destruct (lt_dec 2 (g 2)) as [H2g2| H2g2]. {
+          now rewrite rngl_add_0_r.
+        }
+        now rewrite rngl_add_0_l.
+      }
+      rewrite rngl_add_0_l.
+      destruct (lt_dec 2 (g 2)) as [H2g2| H2g2]. {
+        now rewrite rngl_add_0_r, rngl_add_comm.
+      }
+      now rewrite rngl_add_0_l.
+    }
+    destruct b. {
+      cbn.
+      (* ouais, bon, fait chier *)
 ...
   rewrite IHlen with (g := g); cycle 1. {
     intros i Hi.
