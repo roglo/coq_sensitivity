@@ -868,6 +868,168 @@ Qed.
 
 Check nat_of_permut_permut.
 
+Theorem glop : ∀ b e f g,
+  (∀ i, b ≤ i ≤ e → b ≤ g i ≤ e)
+  → (∀ i, b ≤ i ≤ e → g i ≠ i)
+  → (∀ i, b ≤ i ≤ e → g (g i) = i)
+  → (Σ (i = b, e), f i =
+     Σ (i = b, e), (if lt_dec i (g i) then f i else 0) +
+     Σ (i = b, e), if lt_dec i (g i) then 0 else f (g i))%F.
+Proof.
+intros * Hgbe Hgii Hggi.
+destruct (le_dec b e) as [Hbe| Hbe]. 2: {
+  apply Nat.nle_gt in Hbe.
+  rewrite rngl_summation_empty; [ | easy ].
+  rewrite rngl_summation_empty; [ | easy ].
+  rewrite rngl_summation_empty; [ | easy ].
+  symmetry; apply rngl_add_0_l.
+}
+remember (S e - b) as len eqn:Hlen.
+replace e with (b + len - 1) in * by flia Hbe Hlen.
+clear e.
+destruct len. {
+  destruct b; [ easy | cbn in Hbe; flia Hbe ].
+}
+rewrite <- Nat.add_sub_assoc; [ | flia ].
+rewrite <- Nat.add_sub_assoc in Hgbe; [ | flia ].
+rewrite <- Nat.add_sub_assoc in Hgii; [ | flia ].
+rewrite <- Nat.add_sub_assoc in Hggi; [ | flia ].
+rewrite Nat.sub_succ, Nat.sub_0_r in Hgbe, Hgii, Hggi |-*.
+clear Hbe Hlen.
+revert f g b Hgbe Hgii Hggi.
+induction len; intros. {
+  rewrite Nat.add_0_r.
+  rewrite rngl_summation_only_one; [ | easy ].
+  rewrite rngl_summation_only_one; [ | easy ].
+  rewrite rngl_summation_only_one; [ | easy ].
+  rewrite Nat.add_0_r in Hgbe.
+  destruct (lt_dec b (g b)) as [Hbg| Hbg]; [ now rewrite rngl_add_0_r | ].
+  apply Nat.nlt_ge in Hbg.
+  rewrite rngl_add_0_l.
+  specialize (Hgbe b).
+  now replace (g b) with b by flia Hgbe.
+}
+rewrite (rngl_summation_split_first _ b); [ | flia ].
+rewrite (rngl_summation_split_first _ b); [ | flia ].
+rewrite (rngl_summation_split_first _ b); [ | flia ].
+destruct (lt_dec b (g b)) as [Hbg| Hbg]. {
+  rewrite rngl_add_0_l.
+  rewrite <- rngl_add_assoc; f_equal.
+  rewrite <- Nat.add_succ_comm in Hgbe, Hgii, Hggi |-*.
+...
+  rewrite IHlen with (g := g); cycle 1. {
+    intros i Hi.
+    specialize (Hgbe i) as H1.
+    assert (H : b ≤ i ≤ S b + len) by flia Hi.
+    specialize (H1 H); clear H.
+    split; [ | easy ].
+...
+  rewrite IHlen with (g := λ i, S (g i)); cycle 1. {
+    intros i Hi.
+    specialize (Hgbe i) as H1.
+    assert (H : b ≤ i ≤ S b + len) by flia Hi.
+    specialize (H1 H); clear H.
+    split; [ flia H1 | ].
+    cbn.
+    apply -> Nat.succ_le_mono.
+...
+  apply IHlen. {
+    intros i Hi.
+...
+rewrite IHlen; cycle 1. {
+  intros i Hi.
+  split; [ | apply Hgbe; flia Hi ].
+...
+rewrite rngl_add_0_l.
+assert (H : ∀ i, i ≤ len → b ≤ g (b + i) ≤ b + len). {
+  intros i Hi; apply Hgbe; flia Hi.
+}
+move H before Hgbe; clear Hgbe; rename H into Hgbe.
+assert (H : ∀ i, i ≤ len → g (b + i) ≠ b + i). {
+  intros i Hi; apply Hgii; flia Hi.
+}
+move H before Hgii; clear Hgii; rename H into Hgii.
+assert (H : ∀ i, i ≤ len → g (g (b + i)) = b + i). {
+  intros i Hi; apply Hggi; flia Hi.
+}
+move H before Hggi; clear Hggi; rename H into Hggi.
+rewrite rngl_summation_shift; [ symmetry | flia ].
+rewrite rngl_summation_shift; [ symmetry | flia ].
+rewrite Nat.add_comm, Nat.add_sub.
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_summation_shift; [ | flia ].
+  now rewrite Nat.add_sub.
+}
+symmetry.
+revert b g Hgbe Hgii Hggi.
+induction len; intros. {
+  rewrite rngl_summation_only_one; [ | easy ].
+  rewrite rngl_summation_only_one; [ | easy ].
+  rewrite rngl_summation_only_one; [ | easy ].
+  rewrite Nat.add_0_r in Hgbe |-*.
+  destruct (lt_dec b (g b)) as [Hbg| Hbg]; [ easy | ].
+  apply Nat.nlt_ge in Hbg.
+  specialize (Hgbe 0 (le_refl _)).
+  rewrite Nat.add_0_r in Hgbe.
+  now replace (g b) with b by flia Hgbe.
+}
+rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
+rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
+rewrite Nat.add_0_r.
+destruct (lt_dec b (g b)) as [Hgb| Hgb]. {
+  f_equal.
+  do 2 rewrite rngl_summation_succ_succ.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros * Hi.
+    now rewrite <- Nat.add_succ_comm.
+  }
+  symmetry.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros * Hi.
+    now rewrite <- Nat.add_succ_comm.
+  }
+  symmetry.
+...
+  rewrite IHlen with (g := λ i, g (i - 1)); cycle 1. {
+    intros i Hi.
+    specialize (Hgbe i) as H1.
+...
+    assert (H : S i ≤ S len) by flia Hi.
+    specialize (H1 H); clear H.
+    do 2 rewrite Nat.add_succ_comm.
+    split; [ | easy ].
+...
+  rewrite IHlen; cycle 1. {
+    intros i Hi.
+    specialize (Hgbe (S i)) as H1.
+    assert (H : S i ≤ S len) by flia Hi.
+    specialize (H1 H); clear H.
+    do 2 rewrite Nat.add_succ_comm.
+    split; [ | easy ].
+    destruct (Nat.eq_dec (g (b + S i)) b) as [Hgbi| Hgbi]; [ | flia H1 Hgbi ].
+...
+  rewrite IHlen; cycle 1. {
+    intros i Hi.
+    specialize (Hgbe i) as H1.
+    specialize (Hgii i) as H2.
+    specialize (Hggi i) as H3.
+    assert (H : b ≤ i ≤ S b + len) by flia Hi.
+    specialize (H1 H).
+    specialize (H2 H).
+    specialize (H3 H); clear H.
+    split; [ | easy ].
+    destruct (Nat.eq_dec b (g i)) as [Hbg| Hbg]; [ | flia H1 Hbg ].
+    subst b.
+    specialize (Hgbe (g i)) as H4.
+    specialize (Hgii (g i)) as H5.
+    specialize (Hggi (g i)) as H6.
+    rewrite H3 in H4, H5, H6.
+    clear H1 H5 H6.
+    rewrite H3 in Hgb.
+...
+
 Theorem summation_pair : ∀ b e f g,
   (∀ i, b ≤ i ≤ e → b ≤ g i ≤ e)
   → (∀ i, b ≤ i ≤ e → g i ≠ i)
