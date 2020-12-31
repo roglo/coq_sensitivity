@@ -874,7 +874,7 @@ Theorem glop : ∀ b e f g,
   → (∀ i, b ≤ i ≤ e → g (g i) = i)
   → (Σ (i = b, e), f i =
      Σ (i = b, e), (if lt_dec i (g i) then f i else 0) +
-     Σ (i = b, e), if lt_dec i (g i) then 0 else f (g i))%F.
+     Σ (i = b, e), if lt_dec i (g i) then 0 else f i)%F.
 Proof.
 intros * Hgbe Hgii Hggi.
 destruct (le_dec b e) as [Hbe| Hbe]. 2: {
@@ -916,6 +916,43 @@ destruct (lt_dec b (g b)) as [Hbg| Hbg]. {
   rewrite rngl_add_0_l.
   rewrite <- rngl_add_assoc; f_equal.
   rewrite <- Nat.add_succ_comm in Hgbe, Hgii, Hggi |-*.
+(*
+  apply IHlen. {
+    intros i Hi.
+    specialize (Hgbe i) as H1.
+    split; [ | flia Hi H1 ].
+    assert (H : b ≤ i ≤ S b + len) by flia Hi.
+    specialize (H1 H).
+    clear H.
+    specialize (Hgbe _ H1) as H2.
+...
+*)
+  rewrite Nat.add_succ_l.
+  do 3 rewrite rngl_summation_succ_succ.
+  rewrite IHlen with (g := λ i, g (S i)); cycle 1. {
+    intros i Hi.
+    specialize (Hgbe (S i)) as H1.
+    assert (H : b ≤ S i ≤ S b + len) by flia Hi.
+    specialize (H1 H).
+    split; [ easy | ].
+...
+    specialize (Hgbe (S i)) as H1.
+    assert (H : b ≤ S i ≤ S b + len) by flia Hi.
+    specialize (H1 H).
+    clear H.
+    split; [ | flia H1 ].
+...
+  destruct len. {
+    rewrite Nat.add_0_r.
+    rewrite rngl_summation_only_one; [ | easy ].
+    rewrite rngl_summation_only_one; [ | easy ].
+    rewrite rngl_summation_only_one; [ | easy ].
+    destruct (lt_dec (S b) (g (S b))) as [Hsbg| Hsbg]. {
+      symmetry; apply rngl_add_0_r.
+    }
+    symmetry; apply rngl_add_0_l.
+  }
+  erewrite IHlen.
 ...
   rewrite IHlen with (g := g); cycle 1. {
     intros i Hi.
