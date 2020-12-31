@@ -869,11 +869,13 @@ Qed.
 Check nat_of_permut_permut.
 
 Theorem summation_pair : ∀ b e f g,
-  (∀ i, b ≤ i ≤ e → b ≤ g i ≤ e ∧ g i ≠ i ∧ g (g i) = i)
+  (∀ i, b ≤ i ≤ e → b ≤ g i ≤ e)
+  → (∀ i, b ≤ i ≤ e → g i ≠ i)
+  → (∀ i, b ≤ i ≤ e → g (g i) = i)
   → (Σ (i = b, e), f i =
      Σ (i = b, e), if lt_dec i (g i) then f i + f (g i) else 0)%F.
 Proof.
-intros * Hg.
+intros * Hgbe Hgii Hggi.
 destruct (le_dec b e) as [Hbe| Hbe]. 2: {
   apply Nat.nle_gt in Hbe.
   rewrite rngl_summation_empty; [ | easy ].
@@ -884,31 +886,28 @@ rewrite rngl_summation_split_first; [ symmetry | easy | easy ].
 rewrite rngl_summation_split_first; [ symmetry | easy | easy ].
 destruct (lt_dec b (g b)) as [Hbg| Hbg]. 2: {
   apply Nat.nlt_ge in Hbg.
-  specialize (Hg b) as H1.
+  specialize (Hgbe b) as H1.
+  specialize (Hgii b) as H2.
   assert (H : b ≤ b ≤ e) by flia Hbe.
-  specialize (H1 H); clear H.
-  flia Hbg H1.
+  specialize (H1 H); specialize (H2 H); clear H.
+  flia Hbg H1 H2.
 }
 rewrite <- rngl_add_assoc; f_equal.
 symmetry.
 rewrite (rngl_summation_split _ (g b)). 2: {
   split; [ flia Hbg | ].
   apply -> Nat.succ_le_mono.
-  apply Hg; flia Hbe.
+  apply Hgbe; flia Hbe.
 }
 rewrite rngl_summation_split_last; [ | easy ].
-destruct (lt_dec (g b) (g (g b))) as [Hgb| Hgb]. {
-  specialize (Hg b) as H1.
-  assert (H : b ≤ b ≤ e) by flia Hbe.
-  specialize (H1 H); clear H.
-  flia Hbg Hgb H1.
-}
+rewrite Hggi; [ | flia Hbe ].
+destruct (lt_dec (g b) b) as [H| H]; [ flia Hbg H | clear H ].
 rewrite rngl_add_0_r.
 symmetry.
 rewrite (rngl_summation_split _ (g b)). 2: {
   split; [ flia Hbg | ].
   apply -> Nat.succ_le_mono.
-  apply Hg; flia Hbe.
+  apply Hgbe; flia Hbe.
 }
 rewrite rngl_summation_split_last; [ | easy ].
 rewrite rngl_add_comm, rngl_add_assoc, rngl_add_comm.
