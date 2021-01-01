@@ -896,6 +896,37 @@ rewrite <- Nat.add_sub_assoc in Hgii; [ | flia ].
 rewrite <- Nat.add_sub_assoc in Hggi; [ | flia ].
 rewrite Nat.sub_succ, Nat.sub_0_r in Hgbe, Hgii, Hggi |-*.
 clear Hbe Hlen.
+(**)
+rewrite (rngl_summation_split_first _ b); [ | flia ].
+rewrite (rngl_summation_split_first _ b); [ | flia ].
+rewrite (rngl_summation_split_first _ b); [ | flia ].
+destruct (lt_dec b (g b)) as [Hbgb| Hbgb]. {
+  rewrite <- rngl_add_assoc; f_equal.
+  rewrite (rngl_summation_split _ (g b)). 2: {
+    split; [ flia Hbgb | ].
+    apply -> Nat.succ_le_mono.
+    apply Hgbe; flia.
+  }
+  rewrite (rngl_summation_split_last _ _ (g b)); [ | easy ].
+  rewrite rngl_add_assoc.
+  rewrite rngl_add_add_swap; symmetry.
+  rewrite rngl_add_add_swap; symmetry; f_equal.
+  rewrite (rngl_summation_split _ (g b) _ (S b)). 2: {
+    split; [ flia Hbgb | ].
+    apply -> Nat.succ_le_mono.
+    apply Hgbe; flia.
+  }
+  rewrite (rngl_summation_split_last _ (S b) (g b)); [ | easy ].
+  rewrite (rngl_summation_split _ (g b) _ (S b)). 2: {
+    split; [ flia Hbgb | ].
+    apply -> Nat.succ_le_mono.
+    apply Hgbe; flia.
+  }
+  rewrite (rngl_summation_split_last _ (S b) (g b)); [ | easy ].
+  rewrite Hggi; [ | flia ].
+  destruct (lt_dec (g b) b) as [H| H]; [ flia Hbgb H | clear H ].
+  do 2 rewrite rngl_add_0_r.
+...
 revert f g b Hgbe Hgii Hggi.
 induction len; intros. {
   rewrite Nat.add_0_r in Hgbe, Hgii.
