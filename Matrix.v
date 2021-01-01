@@ -880,20 +880,16 @@ Definition swap_nat i j k :=
 Definition vect_swap_elem n (v : vector n nat) i j :=
   mk_vect n (λ k, vect_el v (swap_nat i j k)).
 
-Compute nat_of_permut (permut 4 15).
-Compute nat_of_permut (vect_swap_elem (permut 4 15) 0 2).
-Compute let n := 4 in let '(i, j) := (0, 2) in nat_of_permut (vect_swap_elem (permut n 15) i j).
-Compute let n := 4 in let '(i, j) := (0, 2) in list_of_vect (permut n (nat_of_permut (vect_swap_elem (permut n 15) i j))).
-Compute let n := 4 in let '(i, j) := (0, 2) in nat_of_permut (vect_swap_elem (permut n (nat_of_permut (vect_swap_elem (permut n 15) i j))) i j).
+Definition swap_in_permut n i j k := vect_swap_elem (permut n k) i j.
 
-Definition swap_in_permut n k i j := vect_swap_elem (permut n k) i j.
+Compute let n := 4 in let '(i, j) := (0, 2) in nat_of_permut (swap_in_permut n i j (nat_of_permut (swap_in_permut n i j 13))).
 
 Theorem pouet : ∀ n i j k,
   i < n
   → j < n
   → k < fact n
   → nat_of_permut
-      (swap_in_permut n (nat_of_permut (swap_in_permut n k i j)) i j) = k.
+      (swap_in_permut n i j (nat_of_permut (swap_in_permut n i j k))) = k.
 Proof.
 intros * Hi Hj Hk.
 revert i j k Hi Hj Hk.
