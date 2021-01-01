@@ -801,15 +801,17 @@ unfold δ_lt.
 now destruct i, j.
 Qed.
 
+Definition nat_of_permut_sub_vect n (v : vector n nat) n' :=
+  let d := vect_el v 0 in
+  mk_vect n' (λ i, vect_el v (S i) - Nat.b2n (d <? vect_el v (S i))).
+
 Fixpoint nat_of_permut n (v : vector n nat) : nat :=
   match n with
   | 0 => 0
   | S n' =>
       let d := vect_el v 0 in
       d * fact n' +
-      nat_of_permut
-        (mk_vect n'
-           (λ i, vect_el v (S i) - Nat.b2n (d <? vect_el v (S i))))
+      nat_of_permut (nat_of_permut_sub_vect v n')
   end.
 
 Compute  nat_of_permut (permut 3 0).
@@ -896,8 +898,7 @@ Proof.
 intros * Hi Hj Hk.
 revert i j k Hi Hj Hk.
 induction n; intros; [ easy | ].
-remember (nat_of_permut (swap_in_permut (S n) k i j)) as m eqn:Hm.
-cbn.
+cbn - [ nat_of_permut_sub_vect ].
 ...
 
 Compute list_of_vect (permut 2 1).
