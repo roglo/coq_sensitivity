@@ -868,6 +868,43 @@ Qed.
 
 Check nat_of_permut_permut.
 
+Compute map (λ i, list_of_vect (permut 4 i)) (seq 0 (fact 4)).
+
+Definition swap_nat i j k :=
+  if Nat.eq_dec k i then j
+  else if Nat.eq_dec k j then i
+  else k.
+
+Definition vect_swap_elem n (v : vector n nat) i j :=
+  mk_vect n (λ k, vect_el v (swap_nat i j k)).
+
+Compute nat_of_permut (permut 4 15).
+Compute nat_of_permut (vect_swap_elem (permut 4 15) 0 2).
+Compute let n := 4 in let '(i, j) := (0, 2) in nat_of_permut (vect_swap_elem (permut n 15) i j).
+Compute let n := 4 in let '(i, j) := (0, 2) in list_of_vect (permut n (nat_of_permut (vect_swap_elem (permut n 15) i j))).
+Compute let n := 4 in let '(i, j) := (0, 2) in nat_of_permut (vect_swap_elem (permut n (nat_of_permut (vect_swap_elem (permut n 15) i j))) i j).
+
+Definition swap_in_permut n k i j := vect_swap_elem (permut n k) i j.
+
+Theorem pouet : ∀ n i j k,
+  i < n
+  → j < n
+  → k < fact n
+  → nat_of_permut
+      (swap_in_permut n (nat_of_permut (swap_in_permut n k i j)) i j) = k.
+Proof.
+intros * Hi Hj Hk.
+revert i j k Hi Hj Hk.
+induction n; intros; [ easy | ].
+remember (nat_of_permut (swap_in_permut (S n) k i j)) as m eqn:Hm.
+cbn.
+...
+
+Compute list_of_vect (permut 2 1).
+Compute list_of_vect (permut 2 2).
+Compute list_of_vect (permut 2 3).
+...
+
 Theorem glop : ∀ b e f g,
   (∀ i, b ≤ i ≤ e → b ≤ g i ≤ e)
   → (∀ i, b ≤ i ≤ e → g i ≠ i)
