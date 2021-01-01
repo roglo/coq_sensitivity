@@ -868,6 +868,46 @@ apply Nat.leb_le in Hb.
 flia Hb Hc.
 Qed.
 
+Import Permutation.
+
+Theorem rngl_summation_permut : ∀ n l1 l2,
+  Permutation l1 l2
+  → length l1 = n
+  → length l2 = n
+  → (Σ (i = 0, n), nth i l1 0 = Σ (i = 0, n), nth i l2 0)%F.
+Proof.
+intros * Hl H1 H2.
+revert n H1 H2.
+induction Hl; intros; [ easy | | | ]. {
+  destruct n; [ easy | ].
+  cbn in H1, H2.
+  apply Nat.succ_inj in H1.
+  apply Nat.succ_inj in H2.
+  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
+  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
+  do 2 rewrite rngl_summation_succ_succ.
+  now rewrite IHHl.
+} {
+  destruct n; [ easy | ].
+  destruct n; [ easy | ].
+  cbn in H1, H2.
+  do 2 apply Nat.succ_inj in H1.
+  do 2 apply Nat.succ_inj in H2.
+  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
+  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
+  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
+  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
+  do 2 rewrite rngl_add_assoc.
+  do 4 rewrite rngl_summation_succ_succ.
+  f_equal; apply rngl_add_comm.
+} {
+  specialize (Permutation_length Hl2) as H3.
+  rewrite H2 in H3.
+  rewrite IHHl1; [ | easy | easy ].
+  now rewrite IHHl2.
+}
+Qed.
+
 Check nat_of_permut_permut.
 
 Compute map (λ i, list_of_vect (permut 4 i)) (seq 0 (fact 4)).
