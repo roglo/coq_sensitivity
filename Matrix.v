@@ -908,7 +908,35 @@ induction Hl; intros; [ easy | | | ]. {
 }
 Qed.
 
-Check nat_of_permut_permut.
+(* list of terms in determinant' (determinant by sum of products of
+   permutations *)
+
+Definition determinant'_list {n} (M : matrix n n T) :=
+  map (λ k,
+    (signature n k *
+     Π (i = 1, n), mat_el M (i - 1) (vect_el (permut n k) (i - 1)%nat))%F)
+    (seq 0 (fact n)).
+
+Theorem determinant'_by_list : ∀ n (M : matrix n n T),
+  determinant' M = (Σ (k = 0, fact n - 1), nth k (determinant'_list M) 0)%F.
+Proof.
+intros.
+unfold determinant', determinant'_list.
+apply rngl_summation_eq_compat; intros k Hk.
+assert (Hkn : k < fact n). {
+  specialize (fact_neq_0 n) as Hn.
+  flia Hk Hn.
+}
+rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+now rewrite Nat.add_0_l.
+Qed.
+
+Inspect 3.
+
+...
+
+(* *)
 
 Compute map (λ i, list_of_vect (permut 4 i)) (seq 0 (fact 4)).
 
