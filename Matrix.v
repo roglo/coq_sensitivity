@@ -959,8 +959,6 @@ apply rngl_summation_permut; [ now symmetry | | ]. {
 }
 Qed.
 
-...
-
 (* *)
 
 Compute map (λ i, list_of_vect (permut 4 i)) (seq 0 (fact 4)).
@@ -974,6 +972,21 @@ Definition vect_swap_elem n (v : vector n nat) i j :=
   mk_vect n (λ k, vect_el v (swap_nat i j k)).
 
 Definition swap_in_permut n i j k := vect_swap_elem (permut n k) i j.
+
+Theorem pouet : ∀ n (M : matrix n n T) l r1 r2,
+  n ≠ 0
+  → l =
+      map (λ k,
+        (- signature n k *
+         Π (i = 1, n),
+         mat_el M (i - 1) (vect_el (swap_in_permut n r1 r2 k) (i - 1)%nat))%F)
+        (seq 0 (fact n))
+  → Permutation l (determinant'_list M).
+Proof.
+intros * Hnz Hl.
+unfold determinant'_list; subst l.
+induction n; [ easy | clear Hnz ].
+...
 
 Compute let n := 4 in let '(i, j) := (0, 2) in nat_of_permut (swap_in_permut n i j (nat_of_permut (swap_in_permut n i j 13))).
 
