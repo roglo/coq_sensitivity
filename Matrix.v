@@ -874,21 +874,26 @@ Theorem rngl_summation_permut : ∀ n l1 l2,
   Permutation l1 l2
   → length l1 = n
   → length l2 = n
-  → (Σ (i = 0, n), nth i l1 0 = Σ (i = 0, n), nth i l2 0)%F.
+  → (Σ (i = 0, n - 1), nth i l1 0 = Σ (i = 0, n - 1), nth i l2 0)%F.
 Proof.
 intros * Hl H1 H2.
+destruct n. {
+  apply length_zero_iff_nil in H1.
+  apply length_zero_iff_nil in H2.
+  now subst l1 l2.
+}
+rewrite Nat.sub_succ, Nat.sub_0_r.
 revert n H1 H2.
 induction Hl; intros; [ easy | | | ]. {
-  destruct n; [ easy | ].
   cbn in H1, H2.
   apply Nat.succ_inj in H1.
   apply Nat.succ_inj in H2.
   rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
   rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
+  destruct n; [ easy | ].
   do 2 rewrite rngl_summation_succ_succ.
   now rewrite IHHl.
 } {
-  destruct n; [ easy | ].
   destruct n; [ easy | ].
   cbn in H1, H2.
   do 2 apply Nat.succ_inj in H1.
@@ -898,8 +903,11 @@ induction Hl; intros; [ easy | | | ]. {
   rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
   rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
   do 2 rewrite rngl_add_assoc.
-  do 4 rewrite rngl_summation_succ_succ.
-  f_equal; apply rngl_add_comm.
+  do 2 rewrite rngl_summation_succ_succ.
+  f_equal; [ apply rngl_add_comm | ].
+  apply rngl_summation_eq_compat.
+  intros i Hi; cbn.
+  destruct i; [ flia Hi | easy ].
 } {
   specialize (Permutation_length Hl2) as H3.
   rewrite H2 in H3.
@@ -932,7 +940,24 @@ rewrite seq_nth; [ | easy ].
 now rewrite Nat.add_0_l.
 Qed.
 
-Inspect 3.
+Theorem det_is_det_by_any_permut :
+  rngl_is_comm = true
+  → ∀ n (M : matrix n n T) l,
+  Permutation l (determinant'_list M)
+  → determinant M = (Σ (k = 0, fact n - 1), nth k l 0)%F.
+Proof.
+intros Hic * Hl.
+rewrite det_is_det_by_permut; [ | easy ].
+rewrite determinant'_by_list.
+apply rngl_summation_permut; [ now symmetry | | ]. {
+  unfold determinant'_list.
+  now rewrite map_length, seq_length.
+} {
+  apply Permutation_length in Hl.
+  unfold determinant'_list in Hl.
+  now rewrite map_length, seq_length in Hl.
+}
+Qed.
 
 ...
 
