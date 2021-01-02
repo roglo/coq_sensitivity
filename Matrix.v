@@ -381,7 +381,9 @@ Theorem permut_surjective : ∀ n k j,
   → j < n
   → ∃ i : nat, i < n ∧ vect_el (permut n k) i = j.
 Proof.
-Admitted.
+intros * Hkn Hjn.
+Search permut.
+...
 
 (*
 Compute (map (λ i, list_of_vect (permut 3 i)) (seq 0 (fact 3))).
@@ -1232,10 +1234,6 @@ rewrite rngl_add_comm.
 do 2 rewrite rngl_mul_assoc.
 now rewrite <- rngl_mul_add_distr_r.
 Qed.
-
-Inspect 1.
-
-...
 
 (* *)
 
