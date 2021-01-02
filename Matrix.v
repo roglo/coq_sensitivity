@@ -284,15 +284,27 @@ Fixpoint permut n : nat → vector n nat :=
   end.
 
 Theorem permut_injective : ∀ n k i j,
-  0 ≤ i < n
-  → 0 ≤ j < n
+  i < n
+  → j < n
   → vect_el (permut n k) i = vect_el (permut n k) j
   → i = j.
 Proof.
-intros * Hi Hj Hp.
-revert k i j Hi Hj Hp.
-induction n; intros; [ flia Hi | ].
-cbn in Hp.
+intros * Hi Hj Hij.
+revert k i j Hi Hj Hij.
+destruct n; intros; [ flia Hi | ].
+cbn in Hij.
+revert n k j Hi Hj Hij.
+induction i; intros; cbn in Hij. {
+  clear Hi.
+  revert n k Hj Hij.
+  induction j; intros; [ easy | exfalso ].
+  cbn in Hij.
+  remember (k / fact n) as p eqn:Hp.
+  remember (vect_el (permut n (k mod fact n)) j) as q eqn:Hq.
+  move q before p.
+  destruct n; [ flia Hj | ].
+  apply Nat.succ_lt_mono in Hj.
+  specialize (IHj _ k Hj) as H1.
 ...
 
 (*
