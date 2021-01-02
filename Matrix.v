@@ -376,13 +376,45 @@ destruct b1. {
 }
 Qed.
 
+Print permut_succ_vect_fun.
+
+(* i such that vect_el (permut n k) i = j *)
+
+Fixpoint permut_inv n k (j : nat) :=
+  match n with
+  | 0 => 0
+  | S n' =>
+      if lt_dec k (fact n) then permut_inv n' k j + 1
+      else 42
+  end.
+
+...
+
 Theorem permut_surjective : ∀ n k j,
   k < fact n
   → j < n
   → ∃ i : nat, i < n ∧ vect_el (permut n k) i = j.
 Proof.
 intros * Hkn Hjn.
-Search permut.
+destruct n; [ easy | ].
+cbn.
+revert k j Hkn Hjn.
+induction n; intros. {
+  cbn in Hkn.
+  rewrite Nat.lt_1_r in Hkn; subst k.
+  rewrite Nat.lt_1_r in Hjn; subst j.
+  exists 0.
+  split; [ apply Nat.lt_0_1 | easy ].
+}
+cbn.
+destruct j. {
+  destruct (lt_dec k (fact (S n))) as [Hksn| Hksn]. {
+    exists 0.
+    split; [ flia | ].
+    cbn - [ fact ].
+    now apply Nat.div_small.
+  }
+  apply Nat.nlt_ge in Hksn.
 ...
 
 (*
