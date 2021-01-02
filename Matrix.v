@@ -358,7 +358,23 @@ destruct b1. {
     flia Hb1 Hb2 Hij.
   }
 } {
-...
+  apply Nat.leb_gt in Hb1.
+  destruct b2. {
+    apply Nat.leb_le in Hb2.
+    cbn in Hij.
+    flia Hb1 Hb2 Hij.
+  } {
+    apply Nat.leb_gt in Hb2.
+    cbn in Hij.
+    do 2 rewrite Nat.add_0_r in Hij.
+    move Hij at top; subst r; clear Hb2.
+    rewrite Hq in Hr.
+    apply IHn with (k := k mod fact n); [ | easy | easy | easy ].
+    apply Nat.mod_upper_bound.
+    apply fact_neq_0.
+  }
+}
+Qed.
 
 (*
 Compute (map (λ i, list_of_vect (permut 3 i)) (seq 0 (fact 3))).
@@ -1120,44 +1136,132 @@ enough (Hp : ∃ p, 1 ≤ p ≤ n ∧ vect_el (permut n k) (p - 1) = i). {
     destruct (Nat.eq_dec (vect_el (permut n k) (j - 2)) i) as [Hpj| Hpj]. {
       exfalso.
       rewrite <- Hpp in Hpj.
-...
-apply permut_injective in Hpj.
-flia Hp Hj Hpj.
-...
+      apply permut_injective in Hpj; cycle 1. {
+        specialize (fact_neq_0 n) as Hnz.
+        flia Hk Hnz.
+      } {
+        flia Hp Hj.
+      } {
+        flia Hp.
+      }
+      flia Hj Hpj.
     }
     easy.
   }
   rewrite (rngl_mul_comm (iter_seq _ _ _ _)).
   rewrite rngl_add_comm.
-  rewrite (rngl_product_split _ j); [ | flia Hj ].
+  rewrite (rngl_product_split _ p); [ | flia Hp ].
   rewrite rngl_product_split_last; [ | easy ].
+  erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
+    intros j Hj.
+    replace (j - 1 - 1) with (j - 2) by flia.
+    destruct (Nat.eq_dec (vect_el (permut n k) (j - 2)) i) as [Hpj| Hpj]. {
+      exfalso.
+      rewrite <- Hpp in Hpj.
+      apply permut_injective in Hpj; cycle 1. {
+        specialize (fact_neq_0 n) as Hnz.
+        flia Hk Hnz.
+      } {
+        flia Hp Hj.
+      } {
+        flia Hp.
+      }
+      flia Hj Hpj.
+    }
+    easy.
+  }
   rewrite (rngl_mul_comm (iter_seq _ _ _ _)).
   rewrite rngl_add_comm.
   symmetry.
-  rewrite (rngl_product_split _ j); [ | flia Hj ].
+  rewrite (rngl_product_split _ p); [ | flia Hp ].
   rewrite rngl_product_split_last; [ | easy ].
+  erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
+    intros j Hj.
+    replace (j - 1 - 1) with (j - 2) by flia.
+    destruct (Nat.eq_dec (vect_el (permut n k) (j - 2)) i) as [Hpj| Hpj]. {
+      exfalso.
+      rewrite <- Hpp in Hpj.
+      apply permut_injective in Hpj; cycle 1. {
+        specialize (fact_neq_0 n) as Hnz.
+        flia Hk Hnz.
+      } {
+        flia Hp Hj.
+      } {
+        flia Hp.
+      }
+      flia Hj Hpj.
+    }
+    easy.
+  }
   rewrite (rngl_mul_comm (iter_seq _ _ _ _)).
-  rewrite Hjp.
+  rewrite Hpp.
   destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
-...
-intros * Hi.
-unfold vect_add, vect_mul_scal_l; cbn.
-unfold mat_repl_vect; cbn.
-revert i Hi.
-induction n; intros; [ easy | ].
-cbn - [ iter_seq ].
-destruct i. {
-  rewrite rngl_summation_split_first; [ | easy | flia ].
+  do 4 rewrite rngl_mul_assoc.
+  remember
+    (Π (i0 = 2, p), mat_el M (i0 - 2) (vect_el (permut n k) (i0 - 2)%nat))%F
+    as q eqn:Hq.
+  rewrite (rngl_mul_mul_swap Hic _ _ q).
+  do 3 rewrite (rngl_mul_comm _ q).
+  do 5 rewrite <- rngl_mul_assoc.
+  rewrite <- rngl_mul_add_distr_l.
+  f_equal.
+  clear q Hq.
+  erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
+    intros j Hj.
+    destruct (Nat.eq_dec (vect_el (permut n k) (j - 1)) i) as [Hpj| Hpj]. {
+      rewrite <- Hpp in Hpj.
+      apply permut_injective in Hpj; cycle 1. {
+        specialize (fact_neq_0 n) as Hnz.
+        flia Hk Hnz.
+      } {
+        flia Hp Hj.
+      } {
+        flia Hp.
+      }
+      flia Hj Hpj.
+    }
+    easy.
+  }
+  symmetry.
+  erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
+    intros j Hj.
+    destruct (Nat.eq_dec (vect_el (permut n k) (j - 1)) i) as [Hpj| Hpj]. {
+      rewrite <- Hpp in Hpj.
+      apply permut_injective in Hpj; cycle 1. {
+        specialize (fact_neq_0 n) as Hnz.
+        flia Hk Hnz.
+      } {
+        flia Hp Hj.
+      } {
+        flia Hp.
+      }
+      flia Hj Hpj.
+    }
+    easy.
+  }
+  rewrite rngl_add_comm.
+  erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
+    intros j Hj.
+    destruct (Nat.eq_dec (vect_el (permut n k) (j - 1)) i) as [Hpj| Hpj]. {
+      rewrite <- Hpp in Hpj.
+      apply permut_injective in Hpj; cycle 1. {
+        specialize (fact_neq_0 n) as Hnz.
+        flia Hk Hnz.
+      } {
+        flia Hp Hj.
+      } {
+        flia Hp.
+      }
+      flia Hj Hpj.
+    }
+    easy.
+  }
   cbn - [ iter_seq ].
-  rewrite rngl_mul_1_l.
-...
-do 3 rewrite rngl_add_0_l, rngl_mul_1_l.
-  do 3 rewrite rngl_mul_1_r.
-  easy.
-  rewrite rngl_mul_1_r.
-...
-*)
-
+  rewrite rngl_add_comm.
+  do 2 rewrite rngl_mul_assoc.
+  now rewrite <- rngl_mul_add_distr_r.
+}
+(* ouais, faut montrer que c'est surjectif, ouais *)
 ...
 
 (* *)
