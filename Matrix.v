@@ -985,7 +985,15 @@ Theorem pouet : ∀ n (M : matrix n n T) l r1 r2,
 Proof.
 intros * Hnz Hl.
 unfold determinant'_list; subst l.
-induction n; [ easy | clear Hnz ].
+destruct n; [ easy | clear Hnz ].
+replace (fact (S n)) with (1 + (fact (S n) - 1)). 2: {
+  rewrite Nat.add_comm, Nat.sub_add; [ easy | ].
+  apply Nat.neq_0_lt_0, fact_neq_0.
+}
+rewrite seq_app.
+cbn - [ iter_seq signature swap_in_permut permut fact ].
+Print Permutation.
+Search (Permutation (_ :: _)).
 ...
 cbn - [ iter_seq signature swap_in_permut permut ].
 rewrite seq_app.
