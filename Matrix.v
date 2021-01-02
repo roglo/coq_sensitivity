@@ -959,6 +959,101 @@ apply rngl_summation_permut; [ now symmetry | | ]. {
 }
 Qed.
 
+(* multilinearity *)
+
+(*
+Theorem determinant_multilinear_mul :
+  rngl_is_comm = true
+  → ∀ n (M : matrix n n T) i a V,
+    i < n
+    → determinant (mat_repl_vect i M (a × V)%V) =
+        (a * determinant (mat_repl_vect i M V))%F.
+Proof.
+intros Hic * Hi.
+unfold vect_add, vect_mul_scal_l; cbn.
+unfold mat_repl_vect; cbn.
+revert i Hi V.
+induction n; intros; [ easy | ].
+cbn - [ iter_seq ].
+rewrite rngl_mul_summation_distr_l.
+apply rngl_summation_eq_compat.
+intros j (_, Hj).
+symmetry.
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+rewrite Hic in rngl_mul_comm.
+rewrite (rngl_mul_comm a).
+do 3 rewrite <- rngl_mul_assoc.
+f_equal.
+(**)
+unfold subm; cbn.
+*)
+
+Theorem determinant_multilinear :
+  rngl_is_comm = true
+  → ∀ n (M : matrix n n T) i a b U V,
+    i < n
+    → determinant (mat_repl_vect i M (a × U + b × V)%V) =
+         (a * determinant (mat_repl_vect i M U) +
+          b * determinant (mat_repl_vect i M V))%F.
+Proof.
+intros Hic * Hi.
+rewrite det_is_det_by_permut; [ | easy ].
+rewrite det_is_det_by_permut; [ | easy ].
+rewrite det_is_det_by_permut; [ | easy ].
+unfold determinant'.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
+    intros j Hj.
+    now cbn.
+  }
+  easy.
+}
+cbn - [ iter_seq ].
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+rewrite Hic in rngl_mul_comm.
+rewrite rngl_mul_summation_distr_l.
+rewrite rngl_mul_summation_distr_l.
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  rewrite rngl_mul_assoc.
+  now rewrite (rngl_mul_comm a).
+}
+rewrite rngl_add_comm.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  rewrite rngl_mul_assoc.
+  now rewrite (rngl_mul_comm b).
+}
+rewrite rngl_add_comm.
+rewrite <- rngl_summation_add_distr; [ | easy ].
+apply rngl_summation_eq_compat.
+intros k Hk.
+do 2 rewrite <- rngl_mul_assoc.
+rewrite <- rngl_mul_add_distr_l.
+f_equal.
+...
+intros * Hi.
+unfold vect_add, vect_mul_scal_l; cbn.
+unfold mat_repl_vect; cbn.
+revert i Hi.
+induction n; intros; [ easy | ].
+cbn - [ iter_seq ].
+destruct i. {
+  rewrite rngl_summation_split_first; [ | easy | flia ].
+  cbn - [ iter_seq ].
+  rewrite rngl_mul_1_l.
+...
+do 3 rewrite rngl_add_0_l, rngl_mul_1_l.
+  do 3 rewrite rngl_mul_1_r.
+  easy.
+  rewrite rngl_mul_1_r.
+...
+*)
+
+...
+
 (* *)
 
 Compute map (λ i, list_of_vect (permut 4 i)) (seq 0 (fact 4)).
