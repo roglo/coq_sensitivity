@@ -987,6 +987,14 @@ intros * Hnz Hl.
 unfold determinant'_list; subst l.
 induction n; [ easy | clear Hnz ].
 ...
+cbn - [ iter_seq signature swap_in_permut permut ].
+rewrite seq_app.
+do 2 rewrite map_app.
+cbn - [ iter_seq signature swap_in_permut permut ].
+...
+Search (Permutation (_ ++ _)).
+Print Permutation.
+...
 
 Compute let n := 4 in let '(i, j) := (0, 2) in nat_of_permut (swap_in_permut n i j (nat_of_permut (swap_in_permut n i j 13))).
 
