@@ -291,7 +291,8 @@ Theorem permut_injective : ∀ n k i j,
   → i = j.
 Proof.
 intros * Hk Hi Hj Hij.
-destruct n; [ flia Hi | ].
+revert k i j Hk Hi Hj Hij.
+induction n; intros; [ flia Hi | ].
 cbn in Hij.
 destruct i. {
   clear Hi; cbn in Hij.
@@ -332,37 +333,31 @@ destruct j; [ exfalso | ]. {
 f_equal.
 cbn in Hij.
 apply Nat.succ_lt_mono in Hj.
-...
 remember (k / fact n) as p eqn:Hp.
-  remember (vect_el (permut n (k mod fact n)) i) as q eqn:Hq.
-  move q before p.
-  remember (p <=? q) as b eqn:Hb; symmetry in Hb.
-  destruct b. {
-    apply Nat.leb_le in Hb.
+remember (vect_el (permut n (k mod fact n)) i) as q eqn:Hq.
+remember (vect_el (permut n (k mod fact n)) j) as r eqn:Hr.
+move q before p; move r before q.
+remember (p <=? q) as b1 eqn:Hb1; symmetry in Hb1.
+remember (p <=? r) as b2 eqn:Hb2; symmetry in Hb2.
+move b2 before b1.
+destruct b1. {
+  apply Nat.leb_le in Hb1.
+  destruct b2. {
+    apply Nat.leb_le in Hb2.
     cbn in Hij.
-    flia Hb Hij.
+    do 2 rewrite Nat.add_1_r in Hij.
+    apply Nat.succ_inj in Hij.
+    move Hij at top; subst r; clear Hb2.
+    rewrite Hq in Hr.
+    apply IHn with (k := k mod fact n); [ | easy | easy | easy ].
+    apply Nat.mod_upper_bound.
+    apply fact_neq_0.
   } {
-    apply Nat.leb_nle in Hb.
+    apply Nat.leb_gt in Hb2.
     cbn in Hij.
-    flia Hb Hij.
+    flia Hb1 Hb2 Hij.
   }
-...
-intros * Hi Hj Hij.
-revert k i j Hi Hj Hij.
-destruct n; intros; [ flia Hi | ].
-cbn in Hij.
-revert n k j Hi Hj Hij.
-induction i; intros; cbn in Hij. {
-  clear Hi.
-  revert n k Hj Hij.
-  induction j; intros; [ easy | exfalso ].
-  cbn in Hij.
-  remember (k / fact n) as p eqn:Hp.
-  remember (vect_el (permut n (k mod fact n)) j) as q eqn:Hq.
-  move q before p.
-  destruct n; [ flia Hj | ].
-  apply Nat.succ_lt_mono in Hj.
-  specialize (IHj _ k Hj) as H1.
+} {
 ...
 
 (*
