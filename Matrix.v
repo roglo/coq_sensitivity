@@ -284,11 +284,69 @@ Fixpoint permut n : nat → vector n nat :=
   end.
 
 Theorem permut_injective : ∀ n k i j,
-  i < n
+  k < fact n
+  → i < n
   → j < n
   → vect_el (permut n k) i = vect_el (permut n k) j
   → i = j.
 Proof.
+intros * Hk Hi Hj Hij.
+destruct n; [ flia Hi | ].
+cbn in Hij.
+destruct i. {
+  clear Hi; cbn in Hij.
+  destruct j; [ easy | exfalso ].
+  cbn in Hij.
+  remember (k / fact n) as p eqn:Hp.
+  remember (vect_el (permut n (k mod fact n)) j) as q eqn:Hq.
+  move q before p.
+  remember (p <=? q) as b eqn:Hb; symmetry in Hb.
+  destruct b. {
+    apply Nat.leb_le in Hb.
+    cbn in Hij.
+    flia Hb Hij.
+  } {
+    apply Nat.leb_nle in Hb.
+    cbn in Hij.
+    flia Hb Hij.
+  }
+}
+apply Nat.succ_lt_mono in Hi.
+cbn in Hij.
+destruct j; [ exfalso | ]. {
+  clear Hj; cbn in Hij.
+  remember (k / fact n) as p eqn:Hp.
+  remember (vect_el (permut n (k mod fact n)) i) as q eqn:Hq.
+  move q before p.
+  remember (p <=? q) as b eqn:Hb; symmetry in Hb.
+  destruct b. {
+    apply Nat.leb_le in Hb.
+    cbn in Hij.
+    flia Hb Hij.
+  } {
+    apply Nat.leb_nle in Hb.
+    cbn in Hij.
+    flia Hb Hij.
+  }
+}
+f_equal.
+cbn in Hij.
+apply Nat.succ_lt_mono in Hj.
+...
+remember (k / fact n) as p eqn:Hp.
+  remember (vect_el (permut n (k mod fact n)) i) as q eqn:Hq.
+  move q before p.
+  remember (p <=? q) as b eqn:Hb; symmetry in Hb.
+  destruct b. {
+    apply Nat.leb_le in Hb.
+    cbn in Hij.
+    flia Hb Hij.
+  } {
+    apply Nat.leb_nle in Hb.
+    cbn in Hij.
+    flia Hb Hij.
+  }
+...
 intros * Hi Hj Hij.
 revert k i j Hi Hj Hij.
 destruct n; intros; [ flia Hi | ].
