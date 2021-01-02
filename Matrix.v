@@ -1033,6 +1033,31 @@ intros k Hk.
 do 2 rewrite <- rngl_mul_assoc.
 rewrite <- rngl_mul_add_distr_l.
 f_equal.
+enough (Hp : ∃ p, 1 ≤ p ≤ n ∧ vect_el (permut n k) (p - 1) = i). {
+  destruct Hp as (p & Hp & Hpp).
+  rewrite (rngl_product_split _ p); [ | flia Hp ].
+  rewrite rngl_product_split_last; [ | easy ].
+  erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
+    intros j Hj.
+    replace (j - 1 - 1) with (j - 2) by flia.
+    destruct (Nat.eq_dec (vect_el (permut n k) (j - 2)) i) as [Hpj| Hpj]. {
+      exfalso.
+...
+    }
+    easy.
+  }
+  rewrite (rngl_mul_comm (iter_seq _ _ _ _)).
+  rewrite rngl_add_comm.
+  rewrite (rngl_product_split _ j); [ | flia Hj ].
+  rewrite rngl_product_split_last; [ | easy ].
+  rewrite (rngl_mul_comm (iter_seq _ _ _ _)).
+  rewrite rngl_add_comm.
+  symmetry.
+  rewrite (rngl_product_split _ j); [ | flia Hj ].
+  rewrite rngl_product_split_last; [ | easy ].
+  rewrite (rngl_mul_comm (iter_seq _ _ _ _)).
+  rewrite Hjp.
+  destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
 ...
 intros * Hi.
 unfold vect_add, vect_mul_scal_l; cbn.
