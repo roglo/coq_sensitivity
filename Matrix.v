@@ -283,6 +283,18 @@ Fixpoint permut n : nat → vector n nat :=
   | S n' => λ i, mk_vect (S n') (permut_succ_vect_fun (permut n') i)
   end.
 
+Theorem permut_injective : ∀ n k i j,
+  0 ≤ i < n
+  → 0 ≤ j < n
+  → vect_el (permut n k) i = vect_el (permut n k) j
+  → i = j.
+Proof.
+intros * Hi Hj Hp.
+revert k i j Hi Hj Hp.
+induction n; intros; [ flia Hi | ].
+cbn in Hp.
+...
+
 (*
 Compute (map (λ i, list_of_vect (permut 3 i)) (seq 0 (fact 3))).
 *)
@@ -1042,6 +1054,10 @@ enough (Hp : ∃ p, 1 ≤ p ≤ n ∧ vect_el (permut n k) (p - 1) = i). {
     replace (j - 1 - 1) with (j - 2) by flia.
     destruct (Nat.eq_dec (vect_el (permut n k) (j - 2)) i) as [Hpj| Hpj]. {
       exfalso.
+      rewrite <- Hpp in Hpj.
+...
+apply permut_injective in Hpj.
+flia Hp Hj Hpj.
 ...
     }
     easy.
