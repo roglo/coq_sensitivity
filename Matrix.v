@@ -388,8 +388,6 @@ Fixpoint permut_inv n k (j : nat) :=
       else 42
   end.
 
-...
-
 Theorem permut_surjective : ∀ n k j,
   k < fact n
   → j < n
@@ -397,7 +395,6 @@ Theorem permut_surjective : ∀ n k j,
 Proof.
 intros * Hkn Hjn.
 destruct n; [ easy | ].
-cbn.
 revert k j Hkn Hjn.
 induction n; intros. {
   cbn in Hkn.
