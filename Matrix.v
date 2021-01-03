@@ -384,12 +384,11 @@ Fixpoint permut_inv n k (j : nat) :=
   match n with
   | 0 => 0
   | S n' =>
-      if Nat.eq_dec (k / fact n') j then 0
-      else
-        if lt_dec j (k / fact n') then
-          permut_inv n' (k mod fact n') j + 1
-        else
-          permut_inv n' (k mod fact n') (j - 1) + 1
+      if lt_dec j (k / fact n') then
+        S (permut_inv n' (k mod fact n') j)
+      else if lt_dec (k / fact n') j then
+        S (permut_inv n' (k mod fact n') (j - 1))
+      else 0
   end.
 
 Compute (map (λ i, list_of_vect (permut 3 i)) (seq 0 (fact 3))).
@@ -398,6 +397,36 @@ Compute permut_inv 3 4 0.
 Compute permut_inv 3 4 1.
 Compute permut_inv 3 4 2.
 
+Compute vect_el (permut 3 4) (permut_inv 3 4 1).
+Compute permut_inv 3 4 (vect_el (permut 3 4) 1).
+
+Theorem permut_inv_upper_bound : ∀ n k j,
+  n ≠ 0
+  → k < fact n
+  → j < n
+  → permut_inv n k j < n.
+Proof.
+intros * Hnz Hkn Hjn.
+revert k j Hkn Hjn.
+induction n; intros; [ easy | clear Hnz ].
+cbn.
+destruct (lt_dec j (k / fact n)) as [Hjkn| Hjkn]. {
+  apply -> Nat.succ_lt_mono.
+  destruct n. {
+    cbn in Hkn.
+    apply Nat.lt_1_r in Hkn; subst k.
+    now cbn in Hjkn.
+  }
+  destruct j. {
+    cbn - [ fact ].
+    destruct (lt_dec 0 (k mod fact (S n) / fact n)) as [Hzk| Hzk]; [ | flia ].
+    apply -> Nat.succ_lt_mono.
+...
+
+Theorem permut_permut_inv : ∀ n k j,
+  vect_el (permut n k) (permut_inv n k j) = j.
+Proof.
+intros.
 ...
 
 Theorem permut_surjective : ∀ n k j,
@@ -405,6 +434,23 @@ Theorem permut_surjective : ∀ n k j,
   → j < n
   → ∃ i : nat, i < n ∧ vect_el (permut n k) i = j.
 Proof.
+intros * Hkn Hjn.
+exists (permut_inv n k j).
+destruct n; [ easy | ].
+split. {
+  cbn.
+  destruct (lt_dec j (k / fact n)) as [Hjk| Hjk]. {
+    apply -> Nat.succ_lt_mono.
+...
+  }
+  destruct (lt_dec (k / fact n) j) as [Hkj| Hkj]. {
+    apply -> Nat.succ_lt_mono.
+...
+  }
+  flia.
+}
+apply permut_permut_inv.
+...
 intros * Hkn Hjn.
 destruct n; [ easy | ].
 revert k j Hkn Hjn.
