@@ -407,12 +407,11 @@ Compute permut_inv 3 4 (vect_el (permut 3 4) 1).
 
 Theorem permut_inv_upper_bound : ∀ n k j,
   k < fact (S n)
-  → j < S n
   → j < k / fact n
   → permut_inv n (k mod fact n) j < n.
 Proof.
-intros * Hkn Hjn Hjkn.
-revert j k Hkn Hjn Hjkn.
+intros * Hkn Hjkn.
+revert j k Hkn Hjkn.
 induction n; intros. {
   now apply Nat.lt_1_r in Hkn; subst k.
 }
@@ -428,32 +427,15 @@ destruct (lt_dec j (k mod fact (S n) / fact n)) as [H1| H1]. {
     apply Nat.lt_le_incl.
     apply Nat.mod_upper_bound; apply fact_neq_0.
   } {
-    apply IHn; [ | flia Hjn Hjsn | easy ].
+    apply IHn; [ | easy ].
     apply Nat.mod_upper_bound, fact_neq_0.
   }
 }
 apply Nat.nlt_ge in H1.
-destruct (lt_dec (k mod fact (S n) / fact n) j) as [H2| H2]. {
-  clear H1.
-  destruct (Nat.eq_dec j (S n)) as [Hjsn| Hjsn]. {
-    subst j.
-    clear - Hkn Hjkn; exfalso.
-    apply Nat.nlt_ge in Hjkn; apply Hjkn; clear Hjkn.
-    apply Nat.div_lt_upper_bound; [ apply fact_neq_0 | ].
-    rewrite Nat_fact_succ in Hkn.
-    now rewrite Nat.mul_comm.
-  } {
-    apply -> Nat.succ_lt_mono.
+destruct (lt_dec (k mod fact (S n) / fact n) j) as [H2| H2]; [ | flia ].
+clear H1.
+apply -> Nat.succ_lt_mono.
 ...
-    apply IHn; [ | flia Hjn Hjsn | ]. 2: {
-      apply Nat.succ_le_mono in Hjn.
-      (* counter example: k = S n * fact (S n) *)
-...
-    apply Nat.mod_upper_bound, fact_neq_0.
-  }
-}
-...
-*)
 
 Theorem permut_inv_upper_bound : ∀ n k j,
   n ≠ 0
