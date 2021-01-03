@@ -401,6 +401,74 @@ Compute vect_el (permut 3 4) (permut_inv 3 4 1).
 Compute permut_inv 3 4 (vect_el (permut 3 4) 1).
 
 Theorem permut_inv_upper_bound : ∀ n k j,
+  k < fact (S n)
+  → j < S n
+  → j < k / fact n
+  → permut_inv n (k mod fact n) j < n.
+Proof.
+intros * Hkn Hjn Hjkn.
+revert j k Hkn Hjn Hjkn.
+induction n; intros. {
+  now apply Nat.lt_1_r in Hkn; subst k.
+}
+cbn - [ fact ].
+destruct (lt_dec j (k mod fact (S n) / fact n)) as [H1| H1]. {
+  apply -> Nat.succ_lt_mono.
+  destruct (Nat.eq_dec j (S n)) as [Hjsn| Hjsn]. {
+    subst j.
+    exfalso; apply Nat.nle_gt in H1; apply H1.
+    apply Nat.div_le_upper_bound; [ apply fact_neq_0 | ].
+    rewrite Nat.mul_comm.
+    replace (S n * fact n) with (fact (S n)) by easy.
+    apply Nat.lt_le_incl.
+    apply Nat.mod_upper_bound; apply fact_neq_0.
+  } {
+    apply IHn; [ | flia Hjn Hjsn | easy ].
+    apply Nat.mod_upper_bound, fact_neq_0.
+  }
+}
+apply Nat.nlt_ge in H1.
+destruct (lt_dec (k mod fact (S n) / fact n) j) as [H2| H2]. {
+  clear H1.
+  destruct (Nat.eq_dec j (S n)) as [Hjsn| Hjsn]. {
+    subst j.
+    exfalso; apply Nat.nle_gt in H2; apply H2; clear H2.
+    clear Hjn.
+...
+    remember (S n) as sn; cbn in Hkn; subst sn.
+...
+    specialize (Nat.div_mod k (fact (S n))) as H1.
+    specialize (H1 (fact_neq_0 _)).
+...
+    transitivity (k / fact (S n) - 1). {
+      now apply Nat.le_add_le_sub_l.
+    }
+    rewrite Nat_fact_succ.
+    rewrite <- Nat.div_div; [ | easy | apply fact_neq_0 ].
+    apply Nat.le_sub_le_add_l.
+    replace 1 with (fact n / fact n). 2: {
+      apply Nat.div_same, fact_neq_0.
+    }
+    rewrite Nat_add_div_same. 2: {
+      now exists 1; rewrite Nat.mul_1_l.
+    }
+    apply Nat.div_le_mono; [ apply fact_neq_0 | ].
+    apply Nat.div_le_upper_bound; [ easy | ].
+...
+    apply Nat.div_le_upper_bound; [ apply fact_neq_0 | ].
+    rewrite Nat.mul_comm.
+    replace (S n * fact n) with (fact (S n)) by easy.
+    apply Nat.lt_le_incl.
+    apply Nat.mod_upper_bound; apply fact_neq_0.
+  } {
+    apply IHn; [ | flia Hjn Hjsn | easy ].
+    apply Nat.mod_upper_bound, fact_neq_0.
+  }
+}
+...
+*)
+
+Theorem permut_inv_upper_bound : ∀ n k j,
   n ≠ 0
   → k < fact n
   → j < n
@@ -417,17 +485,32 @@ destruct (lt_dec j (k / fact n)) as [Hjkn| Hjkn]. {
     apply Nat.lt_1_r in Hkn; subst k.
     now cbn in Hjkn.
   }
+...
+  destruct (Nat.eq_dec j (S n)) as [Hjsn| Hjsn]. {
+    subst j.
+    exfalso; apply Nat.nle_gt in Hjkn; apply Hjkn.
+    apply Nat.div_le_upper_bound; [ apply fact_neq_0 | ].
+    rewrite Nat.mul_comm.
+    replace (S n * fact n) with (fact (S n)) by easy.
+    apply Nat.lt_le_incl.
+    apply Nat.mod_upper_bound; apply fact_neq_0.
+  } {
+    apply IHn.
+...
+(*
   destruct j. {
+    clear Hjn.
     cbn - [ fact ].
     destruct (lt_dec 0 (k mod fact (S n) / fact n)) as [Hzk| Hzk]; [ | flia ].
     apply -> Nat.succ_lt_mono.
+*)
 ...
 
 Theorem permut_permut_inv : ∀ n k j,
   vect_el (permut n k) (permut_inv n k j) = j.
 Proof.
 intros.
-...
+Abort.
 
 Theorem permut_surjective : ∀ n k j,
   k < fact n
