@@ -378,16 +378,17 @@ Qed.
 
 Print permut_succ_vect_fun.
 
-(* i such that vect_el (permut n k) i = j
+(* i such that vect_el (permut n k) i = j *)
 
 Fixpoint permut_inv n k (j : nat) :=
   match n with
   | 0 => 0
   | S n' =>
-      if lt_dec k (fact n) then permut_inv n' k j + 1
+      if lt_dec k (fact n') then permut_inv n' k j + 1
       else 42
   end.
-*)
+
+...
 
 Theorem permut_surjective : ∀ n k j,
   k < fact n
