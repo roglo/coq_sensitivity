@@ -396,6 +396,11 @@ Compute list_of_vect (permut 3 4).
 Compute permut_inv 3 4 0.
 Compute permut_inv 3 4 1.
 Compute permut_inv 3 4 2.
+Compute list_of_vect (permut 4 12).
+Compute permut_inv 4 12 0.
+Compute permut_inv 4 12 1.
+Compute permut_inv 4 12 2.
+Compute permut_inv 4 12 3.
 
 Compute vect_el (permut 3 4) (permut_inv 3 4 1).
 Compute permut_inv 3 4 (vect_el (permut 3 4) 1).
@@ -432,36 +437,18 @@ destruct (lt_dec (k mod fact (S n) / fact n) j) as [H2| H2]. {
   clear H1.
   destruct (Nat.eq_dec j (S n)) as [Hjsn| Hjsn]. {
     subst j.
-    exfalso; apply Nat.nle_gt in H2; apply H2; clear H2.
-    clear Hjn.
-...
-    remember (S n) as sn; cbn in Hkn; subst sn.
-...
-    specialize (Nat.div_mod k (fact (S n))) as H1.
-    specialize (H1 (fact_neq_0 _)).
-...
-    transitivity (k / fact (S n) - 1). {
-      now apply Nat.le_add_le_sub_l.
-    }
-    rewrite Nat_fact_succ.
-    rewrite <- Nat.div_div; [ | easy | apply fact_neq_0 ].
-    apply Nat.le_sub_le_add_l.
-    replace 1 with (fact n / fact n). 2: {
-      apply Nat.div_same, fact_neq_0.
-    }
-    rewrite Nat_add_div_same. 2: {
-      now exists 1; rewrite Nat.mul_1_l.
-    }
-    apply Nat.div_le_mono; [ apply fact_neq_0 | ].
-    apply Nat.div_le_upper_bound; [ easy | ].
-...
-    apply Nat.div_le_upper_bound; [ apply fact_neq_0 | ].
-    rewrite Nat.mul_comm.
-    replace (S n * fact n) with (fact (S n)) by easy.
-    apply Nat.lt_le_incl.
-    apply Nat.mod_upper_bound; apply fact_neq_0.
+    clear - Hkn Hjkn; exfalso.
+    apply Nat.nlt_ge in Hjkn; apply Hjkn; clear Hjkn.
+    apply Nat.div_lt_upper_bound; [ apply fact_neq_0 | ].
+    rewrite Nat_fact_succ in Hkn.
+    now rewrite Nat.mul_comm.
   } {
-    apply IHn; [ | flia Hjn Hjsn | easy ].
+    apply -> Nat.succ_lt_mono.
+...
+    apply IHn; [ | flia Hjn Hjsn | ]. 2: {
+      apply Nat.succ_le_mono in Hjn.
+      (* counter example: k = S n * fact (S n) *)
+...
     apply Nat.mod_upper_bound, fact_neq_0.
   }
 }
