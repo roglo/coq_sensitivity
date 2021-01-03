@@ -283,99 +283,6 @@ Fixpoint permut n : nat → vector n nat :=
   | S n' => λ i, mk_vect (S n') (permut_succ_vect_fun (permut n') i)
   end.
 
-Theorem permut_injective : ∀ n k i j,
-  k < fact n
-  → i < n
-  → j < n
-  → vect_el (permut n k) i = vect_el (permut n k) j
-  → i = j.
-Proof.
-intros * Hk Hi Hj Hij.
-revert k i j Hk Hi Hj Hij.
-induction n; intros; [ flia Hi | ].
-cbn in Hij.
-destruct i. {
-  clear Hi; cbn in Hij.
-  destruct j; [ easy | exfalso ].
-  cbn in Hij.
-  remember (k / fact n) as p eqn:Hp.
-  remember (vect_el (permut n (k mod fact n)) j) as q eqn:Hq.
-  move q before p.
-  remember (p <=? q) as b eqn:Hb; symmetry in Hb.
-  destruct b. {
-    apply Nat.leb_le in Hb.
-    cbn in Hij.
-    flia Hb Hij.
-  } {
-    apply Nat.leb_nle in Hb.
-    cbn in Hij.
-    flia Hb Hij.
-  }
-}
-apply Nat.succ_lt_mono in Hi.
-cbn in Hij.
-destruct j; [ exfalso | ]. {
-  clear Hj; cbn in Hij.
-  remember (k / fact n) as p eqn:Hp.
-  remember (vect_el (permut n (k mod fact n)) i) as q eqn:Hq.
-  move q before p.
-  remember (p <=? q) as b eqn:Hb; symmetry in Hb.
-  destruct b. {
-    apply Nat.leb_le in Hb.
-    cbn in Hij.
-    flia Hb Hij.
-  } {
-    apply Nat.leb_nle in Hb.
-    cbn in Hij.
-    flia Hb Hij.
-  }
-}
-f_equal.
-cbn in Hij.
-apply Nat.succ_lt_mono in Hj.
-remember (k / fact n) as p eqn:Hp.
-remember (vect_el (permut n (k mod fact n)) i) as q eqn:Hq.
-remember (vect_el (permut n (k mod fact n)) j) as r eqn:Hr.
-move q before p; move r before q.
-remember (p <=? q) as b1 eqn:Hb1; symmetry in Hb1.
-remember (p <=? r) as b2 eqn:Hb2; symmetry in Hb2.
-move b2 before b1.
-destruct b1. {
-  apply Nat.leb_le in Hb1.
-  destruct b2. {
-    apply Nat.leb_le in Hb2.
-    cbn in Hij.
-    do 2 rewrite Nat.add_1_r in Hij.
-    apply Nat.succ_inj in Hij.
-    move Hij at top; subst r; clear Hb2.
-    rewrite Hq in Hr.
-    apply IHn with (k := k mod fact n); [ | easy | easy | easy ].
-    apply Nat.mod_upper_bound.
-    apply fact_neq_0.
-  } {
-    apply Nat.leb_gt in Hb2.
-    cbn in Hij.
-    flia Hb1 Hb2 Hij.
-  }
-} {
-  apply Nat.leb_gt in Hb1.
-  destruct b2. {
-    apply Nat.leb_le in Hb2.
-    cbn in Hij.
-    flia Hb1 Hb2 Hij.
-  } {
-    apply Nat.leb_gt in Hb2.
-    cbn in Hij.
-    do 2 rewrite Nat.add_0_r in Hij.
-    move Hij at top; subst r; clear Hb2.
-    rewrite Hq in Hr.
-    apply IHn with (k := k mod fact n); [ | easy | easy | easy ].
-    apply Nat.mod_upper_bound.
-    apply fact_neq_0.
-  }
-}
-Qed.
-
 Print permut_succ_vect_fun.
 
 (* i such that vect_el (permut n k) i = j *)
@@ -448,10 +355,105 @@ destruct (lt_dec j (k / fact n)) as [Hjkn| Hjkn]. {
 Qed.
 
 Theorem permut_permut_inv : ∀ n k j,
-  vect_el (permut n k) (permut_inv n k j) = j.
+  j < n
+  → k < fact n
+  → vect_el (permut n k) (permut_inv n k j) = j.
 Proof.
-intros.
-...
+intros * Hjn Hkn.
+revert j k Hjn Hkn.
+induction n; intros; [ easy | ].
+cbn.
+destruct (lt_dec j (k / fact n)) as [Hjkn| Hjkn]. {
+  cbn.
+  destruct n. {
+    rewrite Nat.div_1_r in Hjkn; cbn in Hkn.
+    flia Hkn Hjkn.
+  }
+  destruct (lt_dec k (fact (S n))) as [Hksn| Hksn]. {
+    now rewrite Nat.div_small in Hjkn.
+  }
+  apply Nat.nlt_ge in Hksn.
+  destruct (Nat.eq_dec j (S n)) as [Hjsn| Hjsn]. {
+    subst j.
+    clear Hjn.
+    exfalso; apply Nat.nle_gt in Hjkn; apply Hjkn; clear Hjkn.
+    rewrite Nat_fact_succ in Hkn.
+    rewrite Nat.mul_comm in Hkn.
+    apply Nat.lt_succ_r.
+    apply Nat.div_lt_upper_bound; [ | easy ].
+    apply fact_neq_0.
+  }
+  rewrite IHn; [ | flia Hjn Hjsn | ]. 2: {
+    apply Nat.mod_upper_bound, fact_neq_0.
+  }
+  remember (k / fact (S n) <=? j) as b eqn:Hb.
+  symmetry in Hb.
+  destruct b; [ exfalso | apply Nat.add_0_r ].
+  apply Nat.leb_le in Hb.
+  flia Hjkn Hb.
+} {
+  apply Nat.nlt_ge in Hjkn.
+  destruct (lt_dec (k / fact n) j) as [Hkj| Hkj]. 2: {
+    apply Nat.nlt_ge in Hkj; cbn.
+    now apply Nat.le_antisymm.
+  }
+  clear Hjkn.
+  destruct j; [ easy | ].
+  rewrite Nat.sub_succ, Nat.sub_0_r.
+  cbn.
+  destruct n; [ flia Hjn | ].
+  apply Nat.succ_lt_mono in Hjn.
+  rewrite IHn; [ | easy | ]. 2: {
+    apply Nat.mod_upper_bound, fact_neq_0.
+  }
+  remember (k / fact (S n) <=? j) as b eqn:Hb.
+  symmetry in Hb.
+  destruct b; [ apply Nat.add_1_r | exfalso ].
+  apply Nat.leb_nle in Hb.
+  now apply Nat.succ_le_mono in Hkj.
+}
+Qed.
+
+Theorem permut_inv_permut : ∀ n k i,
+  i < n
+  → k < fact n
+  → permut_inv n k (vect_el (permut n k) i) = i.
+Proof.
+intros * Hi Hkn.
+revert k i Hi Hkn.
+induction n; intros; [ flia Hi | ].
+destruct i. {
+  clear Hi; cbn.
+  remember (k / fact n) as p eqn:Hp.
+  destruct (lt_dec p p) as [H| H]; [ flia H | easy ].
+}
+apply Nat.succ_lt_mono in Hi.
+cbn.
+remember (k / fact n) as p eqn:Hp.
+remember (vect_el (permut n (k mod fact n)) i) as q eqn:Hq.
+move q before p.
+remember (p <=? q) as b eqn:Hb; symmetry in Hb.
+destruct b. {
+  apply Nat.leb_le in Hb; cbn.
+  destruct (lt_dec (q + 1) p) as [Hpq| Hqp]; [ flia Hb Hpq | ].
+  apply Nat.nlt_ge in Hqp.
+  destruct (lt_dec p (q + 1)) as [Hpq| Hpq]; [ | flia Hb Hpq ].
+  clear Hpq Hqp.
+  f_equal.
+  rewrite Nat.add_sub.
+  rewrite Hq.
+  apply IHn; [ easy | ].
+  apply Nat.mod_upper_bound, fact_neq_0.
+} {
+  apply Nat.leb_gt in Hb; cbn.
+  rewrite Nat.add_0_r.
+  destruct (lt_dec q p) as [H| H]; [ clear H | flia Hb H ].
+  f_equal.
+  rewrite Hq.
+  apply IHn; [ easy | ].
+  apply Nat.mod_upper_bound, fact_neq_0.
+}
+Qed.
 
 Theorem permut_surjective : ∀ n k j,
   k < fact n
@@ -492,38 +494,23 @@ split. {
     apply Nat.mod_upper_bound, fact_neq_0.
   }
 }
-...
-apply permut_permut_inv.
-...
-intros * Hkn Hjn.
-destruct n; [ easy | ].
-revert k j Hkn Hjn.
-induction n; intros. {
-  cbn in Hkn.
-  rewrite Nat.lt_1_r in Hkn; subst k.
-  rewrite Nat.lt_1_r in Hjn; subst j.
-  exists 0.
-  split; [ apply Nat.lt_0_1 | easy ].
-}
-(**)
-destruct (Nat.eq_dec j (k / fact (S n))) as [Hjk| Hjk]. {
-  exists 0.
-  split; [ flia | easy ].
-}
-remember (S n) as sn; cbn; subst sn.
-...
-specialize (IHn (k mod fact (S n))) as H1.
-...
-cbn.
-destruct j. {
-  destruct (lt_dec k (fact (S n))) as [Hksn| Hksn]. {
-    exists 0.
-    split; [ flia | ].
-    cbn - [ fact ].
-    now apply Nat.div_small.
-  }
-  apply Nat.nlt_ge in Hksn.
-...
+now apply permut_permut_inv.
+Qed.
+
+Theorem permut_injective : ∀ n k i j,
+  k < fact n
+  → i < n
+  → j < n
+  → vect_el (permut n k) i = vect_el (permut n k) j
+  → i = j.
+Proof.
+intros * Hk Hi Hj Hij.
+assert (Hnz : n ≠ 0) by flia Hi.
+rewrite <- permut_inv_permut with (n := n) (k := k); [ | easy | easy ].
+symmetry.
+rewrite <- permut_inv_permut with (n := n) (k := k); [ | easy | easy ].
+now f_equal.
+Qed.
 
 (*
 Compute (map (λ i, list_of_vect (permut 3 i)) (seq 0 (fact 3))).
@@ -1203,33 +1190,6 @@ Qed.
 
 (* multilinearity *)
 
-(*
-Theorem determinant_multilinear_mul :
-  rngl_is_comm = true
-  → ∀ n (M : matrix n n T) i a V,
-    i < n
-    → determinant (mat_repl_vect i M (a × V)%V) =
-        (a * determinant (mat_repl_vect i M V))%F.
-Proof.
-intros Hic * Hi.
-unfold vect_add, vect_mul_scal_l; cbn.
-unfold mat_repl_vect; cbn.
-revert i Hi V.
-induction n; intros; [ easy | ].
-cbn - [ iter_seq ].
-rewrite rngl_mul_summation_distr_l.
-apply rngl_summation_eq_compat.
-intros j (_, Hj).
-symmetry.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
-rewrite Hic in rngl_mul_comm.
-rewrite (rngl_mul_comm a).
-do 3 rewrite <- rngl_mul_assoc.
-f_equal.
-(**)
-unfold subm; cbn.
-*)
-
 Theorem determinant_multilinear :
   rngl_is_comm = true
   → ∀ n (M : matrix n n T) i a b U V,
@@ -1374,6 +1334,8 @@ rewrite rngl_add_comm.
 do 2 rewrite rngl_mul_assoc.
 now rewrite <- rngl_mul_add_distr_r.
 Qed.
+
+...
 
 (* *)
 
