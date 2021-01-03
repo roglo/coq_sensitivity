@@ -1335,12 +1335,13 @@ do 2 rewrite rngl_mul_assoc.
 now rewrite <- rngl_mul_add_distr_r.
 Qed.
 
-...
+Inspect 1.
 
 (* *)
 
 Compute map (λ i, list_of_vect (permut 4 i)) (seq 0 (fact 4)).
 
+(*
 Definition swap_nat i j k :=
   if Nat.eq_dec k i then j
   else if Nat.eq_dec k j then i
@@ -1701,7 +1702,9 @@ destruct (lt_dec b (g b)) as [Hgb| Hgb]. {
     clear H1 H5 H6.
     rewrite H3 in Hgb.
 ...
+*)
 
+(*
 Theorem summation_pair : ∀ b e f g,
   (∀ i, b ≤ i ≤ e → b ≤ g i ≤ e)
   → (∀ i, b ≤ i ≤ e → g i ≠ i)
@@ -1805,6 +1808,7 @@ destruct (lt_dec b (g b)) as [Hgb| Hgb]. {
   (f b + fold_left (λ (c : T) (i : nat), c + f i) (seq (S b) len) 0)%F =
          fold_left (λ (c : T) (i : nat), c + f i) (seq (S b) len) 0%F
 ...
+*)
 
 Theorem det_two_rows_are_eq :
   rngl_is_comm = true →
