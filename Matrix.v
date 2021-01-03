@@ -378,7 +378,7 @@ Qed.
 
 Print permut_succ_vect_fun.
 
-(* i such that vect_el (permut n k) i = j *)
+(* i such that vect_el (permut n k) i = j
 
 Fixpoint permut_inv n k (j : nat) :=
   match n with
@@ -387,6 +387,7 @@ Fixpoint permut_inv n k (j : nat) :=
       if lt_dec k (fact n) then permut_inv n' k j + 1
       else 42
   end.
+*)
 
 Theorem permut_surjective : ∀ n k j,
   k < fact n
@@ -403,6 +404,15 @@ induction n; intros. {
   exists 0.
   split; [ apply Nat.lt_0_1 | easy ].
 }
+(**)
+destruct (Nat.eq_dec j (k / fact (S n))) as [Hjk| Hjk]. {
+  exists 0.
+  split; [ flia | easy ].
+}
+remember (S n) as sn; cbn; subst sn.
+...
+specialize (IHn (k mod fact (S n))) as H1.
+...
 cbn.
 destruct j. {
   destruct (lt_dec k (fact (S n))) as [Hksn| Hksn]. {
