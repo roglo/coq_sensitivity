@@ -387,16 +387,16 @@ Fixpoint permut_inv n k (j : nat) :=
       if Nat.eq_dec (k / fact n') j then 0
       else
         if lt_dec j (k / fact n') then
-          permut_inv n' (k mod fact n') j
+          permut_inv n' (k mod fact n') j + 1
         else
-          permut_inv n' (k mod fact n') (j - 1)
+          permut_inv n' (k mod fact n') (j - 1) + 1
   end.
 
 Compute (map (λ i, list_of_vect (permut 3 i)) (seq 0 (fact 3))).
-Compute list_of_vect (permut 3 2).
-Compute permut_inv 3 2 0.
-Compute permut_inv 3 2 1.
-Compute permut_inv 3 2 2.
+Compute list_of_vect (permut 3 4).
+Compute permut_inv 3 4 0.
+Compute permut_inv 3 4 1.
+Compute permut_inv 3 4 2.
 
 ...
 
