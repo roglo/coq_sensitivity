@@ -316,9 +316,11 @@ Definition permut_swap_last (p q : nat) n k :=
         else if Nat.eq_dec i q then n - 1
         else i)).
 
+(*
 Compute (map (λ i, list_of_vect (permut_swap_last 0 1 3 i)) (seq 0 (fact 3))).
 Compute (map (λ i, list_of_vect (permut_swap_last 0 2 3 i)) (seq 0 (fact 3))).
 Compute (map (λ i, list_of_vect (permut_swap_last 1 2 3 i)) (seq 0 (fact 3))).
+*)
 
 (*
 Compute list_of_vect (permut 4 13).
@@ -1084,12 +1086,14 @@ Fixpoint nat_of_permut n (v : vector n nat) : nat :=
       nat_of_permut (nat_of_permut_sub_vect v n')
   end.
 
+(*
 Compute  nat_of_permut (permut 3 0).
 Compute  nat_of_permut (permut 3 1).
 Compute  nat_of_permut (permut 3 2).
 Compute  nat_of_permut (permut 3 3).
 Compute  nat_of_permut (permut 3 4).
 Compute  nat_of_permut (permut 3 5).
+*)
 
 Theorem nat_of_permut_permut : ∀ n k,
   k < fact n
@@ -1378,7 +1382,9 @@ Qed.
 
 (* *)
 
+(*
 Compute map (λ i, list_of_vect (permut 4 i)) (seq 0 (fact 4)).
+*)
 
 (*
 Definition swap_nat i j k :=
@@ -1875,7 +1881,6 @@ change
   (Σ (k = 0, fact (S n) - 1),
    signature (S n) k *
    Π (j = 0, n), mat_el A j (vect_el (permut (S n) k) j) = 0)%F.
-Abort. (*
 ...
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
