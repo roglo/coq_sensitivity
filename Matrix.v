@@ -1444,8 +1444,9 @@ apply NoDup_Permutation_bis; cycle 1. {
   intros x.
   rewrite in_map_iff.
   intros (y & Hx & Hy); subst x.
-  rewrite in_seq in Hy.
+  rewrite in_seq in Hy; cbn in Hy.
   destruct Hy as (_, Hy).
+  apply in_map_iff.
 ...
 }
 apply FinFun.Injective_map_NoDup; [ | apply seq_NoDup ].
