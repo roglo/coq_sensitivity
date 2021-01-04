@@ -302,26 +302,6 @@ Fixpoint permut n k : vector n nat :=
    useful to prove aternativity, if I can do it.
    we have: permut_swap_last (n-2) (n-1) n k = permut n k *)
 
-Definition permut_swap_last (p q : nat) n k :=
-  mk_vect n
-    (λ i,
-     vect_el
-       (mk_vect n
-         (λ i,
-          vect_el (permut n k)
-            (if Nat.eq_dec i (n - 2) then p
-             else if Nat.eq_dec i p then n - 2
-             else i)))
-       (if Nat.eq_dec i (n - 1) then q
-        else if Nat.eq_dec i q then n - 1
-        else i)).
-
-(*
-Compute (map (λ i, list_of_vect (permut_swap_last 0 1 3 i)) (seq 0 (fact 3))).
-Compute (map (λ i, list_of_vect (permut_swap_last 0 2 3 i)) (seq 0 (fact 3))).
-Compute (map (λ i, list_of_vect (permut_swap_last 1 2 3 i)) (seq 0 (fact 3))).
-*)
-
 (*
 Compute list_of_vect (permut 4 13).
      = [2; 0; 3; 1]
@@ -1386,7 +1366,6 @@ Qed.
 Compute map (λ i, list_of_vect (permut 4 i)) (seq 0 (fact 4)).
 *)
 
-(*
 Definition swap_nat i j k :=
   if Nat.eq_dec k i then j
   else if Nat.eq_dec k j then i
@@ -1397,6 +1376,18 @@ Definition vect_swap_elem n (v : vector n nat) i j :=
 
 Definition swap_in_permut n i j k := vect_swap_elem (permut n k) i j.
 
+Definition permut_swap_last (p q : nat) n k :=
+  vect_swap_elem (vect_swap_elem (permut n k) p (n - 2)) q (n - 1).
+
+(**)
+Compute (map (λ i, list_of_vect (permut_swap_last 0 1 3 i)) (seq 0 (fact 3))).
+Compute (map (λ i, list_of_vect (permut_swap_last 0 2 3 i)) (seq 0 (fact 3))).
+Compute (map (λ i, list_of_vect (permut_swap_last 1 2 3 i)) (seq 0 (fact 3))).
+(**)
+
+...
+
+(*
 Theorem pouet : ∀ n (M : matrix n n T) l r1 r2,
   n ≠ 0
   → l =
