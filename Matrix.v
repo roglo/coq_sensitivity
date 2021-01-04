@@ -1847,6 +1847,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ iter_seq fact signature permut ].
+...
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   rewrite rngl_product_split_first; [ | easy | flia ].
