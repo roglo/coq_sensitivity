@@ -290,10 +290,10 @@ Definition permut_succ_vect_fun {n} (σ_n : nat → vector n nat) i j :=
       Nat.b2n (i / fact n <=? vect_el (σ_n (i mod fact n)) j')
   end.
 
-Fixpoint permut n : nat → vector n nat :=
+Fixpoint permut n k : vector n nat :=
   match n with
-  | 0 => λ _, mk_vect 0 (λ _, 0)
-  | S n' => λ i, mk_vect (S n') (permut_succ_vect_fun (permut n') i)
+  | 0 => mk_vect 0 (λ _, 0)
+  | S n' => mk_vect (S n') (permut_succ_vect_fun (permut n') k)
   end.
 
 (*
@@ -1350,8 +1350,6 @@ do 2 rewrite rngl_mul_assoc.
 now rewrite <- rngl_mul_add_distr_r.
 Qed.
 
-Inspect 1.
-
 (* *)
 
 Compute map (λ i, list_of_vect (permut 4 i)) (seq 0 (fact 4)).
@@ -1825,6 +1823,10 @@ destruct (lt_dec b (g b)) as [Hgb| Hgb]. {
 ...
 *)
 
+Print permut.
+
+...
+
 Theorem det_two_rows_are_eq :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -1850,7 +1852,7 @@ cbn - [ iter_seq fact signature permut ].
 change
   (Σ (k = 0, fact (S n) - 1),
    signature (S n) k *
-   Π (i1 = 0, n), mat_el A i1 (vect_el (permut (S n) k) i1) = 0)%F.
+   Π (j = 0, n), mat_el A j (vect_el (permut (S n) k) j) = 0)%F.
 ...
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
