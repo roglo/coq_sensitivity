@@ -296,6 +296,11 @@ Fixpoint permut n k : vector n nat :=
   | S n' => mk_vect (S n') (permut_succ_vect_fun (permut n') k)
   end.
 
+(* other order of permutations where ranks p & q are swapped
+   with the last two numbers, allowing consecutive permutations
+   to have the p-th and the q-th numbers swapped; perhaps
+   useful to prove aternativity, if I can do it *)
+
 Definition permut_swap_last (p q : nat) n k :=
   mk_vect n
     (λ i,
