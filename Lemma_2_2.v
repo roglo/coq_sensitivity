@@ -45,9 +45,15 @@ Definition mat_of_mat_list_list {m n} (mll : list (list (matrix m n T))) :
     matrix _ _ T :=
   mk_mat (m * length mll) (n * length (hd [] mll)) (mat_list_list_el mll).
 
+(*
+Theorem mat_el_eq_rect : ∀ m n m' n' (M : matrix m n T) (p : (m, n) = (m', n')),
+  mat_el (eq_rect (m, n) (λ u, matrix (fst u) (snd u) T) M (m', n') p) = mat_el M.
+Proof. now intros; destruct p. Qed.
+*)
 Theorem mat_el_eq_rect : ∀ m n (M : matrix m m T) (p : m = n),
   mat_el (eq_rect m (λ u, matrix u u T) M n p) = mat_el M.
 Proof. now intros; destruct p. Qed.
+(**)
 
 (* sequence "An" *)
 
