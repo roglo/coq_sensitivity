@@ -1416,6 +1416,20 @@ rewrite seq_nth; [ | easy ].
 now rewrite Nat.add_0_l.
 Qed.
 
+Definition permut_swap_with_0 p n k :=
+  vect_swap_elem (permut n k) 0 p.
+
+Compute (map (λ i, list_of_vect (permut_swap_with_0 0 3 i)) (seq 0 (fact 3))).
+Compute (map (λ i, list_of_vect (permut_swap_with_0 1 3 i)) (seq 0 (fact 3))).
+Compute (map (λ i, list_of_vect (permut_swap_with_0 2 3 i)) (seq 0 (fact 3))).
+
+(* k' such that permut_swap_with_0 p n k = permut n k' *)
+
+Definition permut_nth_of_swap_with_0 (p n k : nat) :=
+  if Nat.eq_dec p 0 then k
+  else
+...
+
 Definition permut_swap (p q : nat) n k :=
   vect_swap_elem (permut n k) p q.
 
