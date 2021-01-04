@@ -296,6 +296,26 @@ Fixpoint permut n k : vector n nat :=
   | S n' => mk_vect (S n') (permut_succ_vect_fun (permut n') k)
   end.
 
+Definition permut_swap_last (p q : nat) n k :=
+  mk_vect n
+    (λ i,
+     vect_el
+       (mk_vect n
+         (λ i,
+          vect_el (permut n k)
+            (if Nat.eq_dec i (n - 2) then p
+             else if Nat.eq_dec i p then n - 2
+             else i)))
+       (if Nat.eq_dec i (n - 1) then q
+        else if Nat.eq_dec i q then n - 1
+        else i)).
+
+Compute (map (λ i, list_of_vect (permut_swap_last 0 1 3 i)) (seq 0 (fact 3))).
+Compute (map (λ i, list_of_vect (permut_swap_last 0 2 3 i)) (seq 0 (fact 3))).
+Compute (map (λ i, list_of_vect (permut_swap_last 1 2 3 i)) (seq 0 (fact 3))).
+
+...
+
 (*
 Compute list_of_vect (permut 4 13).
      = [2; 0; 3; 1]
@@ -314,6 +334,7 @@ Fixpoint permut_inv n k (j : nat) :=
       else 0
   end.
 
+(*
 Compute (map (λ i, list_of_vect (permut 3 i)) (seq 0 (fact 3))).
 Compute list_of_vect (permut 3 4).
 Compute permut_inv 3 4 0.
@@ -327,6 +348,7 @@ Compute permut_inv 4 12 3.
 
 Compute vect_el (permut 3 4) (permut_inv 3 4 1).
 Compute permut_inv 3 4 (vect_el (permut 3 4) 1).
+*)
 
 Theorem permut_inv_upper_bound : ∀ n k j,
   k < fact n
@@ -1822,10 +1844,6 @@ destruct (lt_dec b (g b)) as [Hgb| Hgb]. {
          fold_left (λ (c : T) (i : nat), c + f i) (seq (S b) len) 0%F
 ...
 *)
-
-Print permut.
-
-...
 
 Theorem det_two_rows_are_eq :
   rngl_is_comm = true →
