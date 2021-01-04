@@ -45,6 +45,10 @@ Definition mat_of_mat_list_list {m n} (mll : list (list (matrix m n T))) :
     matrix _ _ T :=
   mk_mat (m * length mll) (n * length (hd [] mll)) (mat_list_list_el mll).
 
+Theorem mat_el_eq_rect : ∀ m n (M : matrix m m T) (p : m = n),
+  mat_el (eq_rect m (λ u, matrix u u T) M n p) = mat_el M.
+Proof. now intros; destruct p. Qed.
+
 (* sequence "An" *)
 
 Theorem two_pow_n_mul_two : ∀ n, 2 ^ n * 2 = 2 ^ S n.
@@ -109,8 +113,7 @@ cbn - [ iter_seq Nat.pow ].
 rewrite rngl_add_comm.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
-  destruct (two_pow_n_mul_two n); cbn.
-  rewrite two_pow_n_mul_two in Hj.
+  rewrite mat_el_eq_rect; cbn.
   assert (H : 1 * 2 ^ n ≤ j < (1 + 1) * 2 ^ n). {
     rewrite Nat.mul_1_l.
     split; [ easy | ].
@@ -126,7 +129,7 @@ erewrite rngl_summation_eq_compat. 2: {
 rewrite rngl_add_comm.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
-  now destruct (two_pow_n_mul_two n); cbn.
+  now rewrite mat_el_eq_rect; cbn.
 }
 unfold mat_list_list_el.
 cbn - [ iter_seq Nat.pow ].
@@ -504,10 +507,6 @@ Definition A_Sn_eigenvector_of_sqrt_Sn n μ (V : vector (2 ^ n) T) :
 ...
 *)
 
-Theorem mat_el_eq_rect : ∀ m n (M : matrix m m T) i j (p : m = n),
-  mat_el (eq_rect m (λ u, matrix u u T) M n p) i j = mat_el M i j.
-Proof. now intros; destruct p. Qed.
-
 Theorem mA_diag_zero :
   rngl_has_opp = true →
   ∀ n i, i < 2 ^ n → mat_el (mA n) i i = 0%F.
@@ -515,7 +514,7 @@ Proof.
 intros Hop * Hi2n.
 revert i Hi2n.
 induction n; intros; [ easy | cbn ].
-etransitivity; [ now apply mat_el_eq_rect | cbn ].
+etransitivity; [ now rewrite mat_el_eq_rect | cbn ].
 unfold mat_list_list_el.
 destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
   rewrite (Nat.div_small i); [ | easy ].
@@ -587,7 +586,7 @@ cbn - [ iter_seq Nat.pow ].
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   apply rngl_mul_eq_if; [ | reflexivity ].
-  now apply mat_el_eq_rect.
+  now rewrite mat_el_eq_rect.
 }
 cbn - [ iter_seq Nat.pow mat_of_mat_list_list ].
 remember (mat_of_mat_list_list [[M1; M2]; [M2; (- M1)%M]]) as MA eqn:HMA.
