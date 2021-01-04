@@ -1379,12 +1379,12 @@ Definition swap_in_permut n i j k := vect_swap_elem (permut n k) i j.
 Definition permut_swap_last (p q : nat) n k :=
   vect_swap_elem (vect_swap_elem (permut n k) p (n - 2)) q (n - 1).
 
-(**)
+(*
 Compute (map (λ i, list_of_vect (permut_swap_last 0 1 3 i)) (seq 0 (fact 3))).
 Compute (map (λ i, list_of_vect (permut_swap_last 0 2 3 i)) (seq 0 (fact 3))).
 Compute (map (λ i, list_of_vect (permut_swap_last 1 2 3 i)) (seq 0 (fact 3))).
 Compute (map (λ i, list_of_vect (permut_swap_last 0 1 6 i)) (seq 0 (fact 6))).
-(**)
+*)
 
 (* yet another definition of determinant *)
 
@@ -1416,22 +1416,17 @@ rewrite seq_nth; [ | easy ].
 now rewrite Nat.add_0_l.
 Qed.
 
-Check nat_bijection_Permutation.
+Definition permut_swap (p q : nat) n k :=
+  vect_swap_elem (permut n k) p q.
 
-(*
-Theorem glop_nat_bijection_Permutation n f :
-  FinFun.bFun n f ->
-  FinFun.Injective f ->
-  let l := seq 0 n in Permutation (map f l) l.
-Proof.
- intros Hf BD.
- apply NoDup_Permutation_bis; auto using FinFun.Injective_map_NoDup, seq_NoDup.
- * now rewrite map_length.
- * intros x. rewrite in_map_iff. intros (y & <- & Hy').
-   rewrite in_seq in *. simpl in *.
-   destruct Hy' as (_,Hy'). auto with arith.
-Qed.
-*)
+(* k' such that permut_swap p q n k = permut n k' *)
+
+Definition permut_nth_of_swap (p q n k : nat) :=
+...
+
+Theorem permut_swap_permut : ∀ p q n k,
+  permut_swap p q n k = permut n (permut_nth_of_swap p q n k).
+...
 
 Theorem determinant'_determinant''_permut : ∀ n p q (M : matrix n n T),
   Permutation (determinant'_list M) (determinant''_list p q M).
