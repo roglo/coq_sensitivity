@@ -8,7 +8,7 @@ Import List List.ListNotations.
 
 Notation "'Π' ( i = b , e ) , g" :=
   (iter_seq b e (λ c i, (c * g)%F) 1%F)
-  (at level 45, i at level 0, b at level 60, e at level 60) :
+  (at level 35, i at level 0, b at level 60, e at level 60) :
      ring_like_scope.
 
 Section a.

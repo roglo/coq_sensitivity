@@ -1847,6 +1847,10 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ iter_seq fact signature permut ].
+change
+  (Σ (k = 0, fact (S n) - 1),
+   signature (S n) k *
+   Π (i1 = 0, n), mat_el A i1 (vect_el (permut (S n) k) i1) = 0)%F.
 ...
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
