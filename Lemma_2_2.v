@@ -504,8 +504,8 @@ Definition A_Sn_eigenvector_of_sqrt_Sn n μ (V : vector (2 ^ n) T) :
 ...
 *)
 
-Theorem mat_el_eq_rect : ∀ a b (M : matrix a a T) i j (p : a = b),
-  mat_el (eq_rect a (λ m, matrix m m T) M b p) i j = mat_el M i j.
+Theorem mat_el_eq_rect : ∀ m n (M : matrix m m T) i j (p : m = n),
+  mat_el (eq_rect m (λ u, matrix u u T) M n p) i j = mat_el M i j.
 Proof. now intros; destruct p. Qed.
 
 Theorem mA_diag_zero :
