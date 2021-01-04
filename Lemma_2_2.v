@@ -500,22 +500,13 @@ Definition A_Sn_eigenvector_of_sqrt_Sn n μ (V : vector (2 ^ n) T) :
     vector (2 ^ S n) T :=
   (mat_of_list_list_1_row_2_col (mA n + μ × mI (2 ^ n))%M (mI (2 ^ n)) • V)%V.
 
-Theorem elim_2_pow_n_mul_2 : ∀ n M i j f,
-  mat_el (eq_rect (2 ^ n * 2) (λ m, matrix m m T) M (2 ^ n * 2) eq_refl)
-    i j = f i j
-  → mat_el
-      (eq_rect (2 ^ n * 2) (λ m, matrix m m T) M (2 ^ S n)
-          (two_pow_n_mul_two n)) i j = 
-    f i j.
-Proof.
-intros * H.
-refine
-  (match two_pow_n_mul_two n as Q in (_ = m) return
-     mat_el (eq_rect (2 ^ n * 2) (λ m : nat, matrix m m T) M m Q) i j = f i j
-   with
-   | eq_refl => H
-   end).
-Qed.
+(*
+...
+*)
+
+Theorem mat_el_eq_rect : ∀ a b (M : matrix a a T) i j (p : a = b),
+  mat_el (eq_rect a (λ m, matrix m m T) M b p) i j = mat_el M i j.
+Proof. now intros; destruct p. Qed.
 
 Theorem mA_diag_zero :
   rngl_has_opp = true →
@@ -524,7 +515,7 @@ Proof.
 intros Hop * Hi2n.
 revert i Hi2n.
 induction n; intros; [ easy | cbn ].
-etransitivity; [ now apply elim_2_pow_n_mul_2 | cbn ].
+etransitivity; [ now apply mat_el_eq_rect | cbn ].
 unfold mat_list_list_el.
 destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
   rewrite (Nat.div_small i); [ | easy ].
@@ -596,7 +587,7 @@ cbn - [ iter_seq Nat.pow ].
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   apply rngl_mul_eq_if; [ | reflexivity ].
-  now apply elim_2_pow_n_mul_2.
+  now apply mat_el_eq_rect.
 }
 cbn - [ iter_seq Nat.pow mat_of_mat_list_list ].
 remember (mat_of_mat_list_list [[M1; M2]; [M2; (- M1)%M]]) as MA eqn:HMA.

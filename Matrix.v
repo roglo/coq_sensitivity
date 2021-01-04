@@ -299,7 +299,8 @@ Fixpoint permut n k : vector n nat :=
 (* other order of permutations where ranks p & q are swapped
    with the last two numbers, allowing consecutive permutations
    to have the p-th and the q-th numbers swapped; perhaps
-   useful to prove aternativity, if I can do it *)
+   useful to prove aternativity, if I can do it.
+   we have: permut_swap_last (n-2) (n-1) n k = permut n k *)
 
 Definition permut_swap_last (p q : nat) n k :=
   mk_vect n
@@ -318,8 +319,6 @@ Definition permut_swap_last (p q : nat) n k :=
 Compute (map (λ i, list_of_vect (permut_swap_last 0 1 3 i)) (seq 0 (fact 3))).
 Compute (map (λ i, list_of_vect (permut_swap_last 0 2 3 i)) (seq 0 (fact 3))).
 Compute (map (λ i, list_of_vect (permut_swap_last 1 2 3 i)) (seq 0 (fact 3))).
-
-...
 
 (*
 Compute list_of_vect (permut 4 13).
@@ -1876,6 +1875,7 @@ change
   (Σ (k = 0, fact (S n) - 1),
    signature (S n) k *
    Π (j = 0, n), mat_el A j (vect_el (permut (S n) k) j) = 0)%F.
+Abort. (*
 ...
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
@@ -2157,6 +2157,7 @@ destruct (Nat.eq_dec j i) as [Hji| Hji]. {
 ...
 *)
 
+(*
 Theorem determinant_multilinear : ∀ n (M : matrix n n T) i a b U V,
   i < n
   → determinant (mat_repl_vect i M (a × U + b × V)%V) =
@@ -2219,6 +2220,7 @@ rewrite (det_sum_row_row _ M C Hrz); cycle 1. {
     now destruct (Nat.eq_dec i 0).
   }
   rewrite H in H1; clear H.
+Abort. (*
 ...
   assert (H : determinant D = 0%F). {
     rewrite Hd.
@@ -2239,7 +2241,7 @@ intros * Hij Hi Hj.
 (* look point 5 at
 https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html
 *)
-... (*
+Abort. (*
 ...
 intros * Hsm Hij Hi Hj.
 unfold is_square_mat in Hsm.
@@ -2360,7 +2362,7 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   now rewrite Nat.sub_0_r.
 }
 apply not_eq_sym in Hiz.
-... (*
+Abort. (*
 ...
 specialize (det_swap_rows M Hiz) as H.
 apply (f_equal rng_opp) in H.
