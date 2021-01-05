@@ -605,6 +605,18 @@ apply Nat.leb_le in Hb.
 flia Hb Hc.
 Qed.
 
+Theorem permut_nat_of_permut : ∀ n v,
+  permut n (nat_of_permut v) = v.
+Proof.
+intros.
+revert v.
+induction n; intros; [ now apply vector_eq | ].
+apply vector_eq.
+intros i Hi.
+cbn.
+Print permut_succ_vect_fun.
+...
+
 (* list of terms in determinant' (determinant by sum of products of
    permutations *)
 
@@ -732,7 +744,89 @@ Definition permut_nth_of_swap_with_0 (p n k : nat) :=
 Definition permut_swap_last (p q : nat) n k :=
   vect_swap_elem (vect_swap_elem (permut n k) p (n - 2)) q (n - 1).
 
+(* yet another definition of determinant *)
+
+Definition determinant'' p q n (M : matrix n n T) :=
+  (Σ (k = 0, fact n - 1), signature n k *
+   Π (i = 1, n),
+   mat_el M (i - 1) (vect_el (permut_swap_last p q n k) (i - 1)%nat))%F.
+
+Definition determinant''_list p q {n} (M : matrix n n T) :=
+  map (λ k,
+    (signature n k *
+     Π (i = 1, n),
+     mat_el M (i - 1) (vect_el (permut_swap_last p q n k) (i - 1)%nat))%F)
+    (seq 0 (fact n)).
+
+Theorem determinant''_by_list : ∀ n p q (M : matrix n n T),
+  determinant'' p q M =
+    (Σ (k = 0, fact n - 1), nth k (determinant''_list p q M) 0)%F.
+Proof.
+intros.
+unfold determinant'', determinant''_list.
+apply rngl_summation_eq_compat; intros k Hk.
+assert (Hkn : k < fact n). {
+  specialize (fact_neq_0 n) as Hn.
+  flia Hk Hn.
+}
+rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+now rewrite Nat.add_0_l.
+Qed.
+
+Theorem determinant'_determinant''_permut : ∀ n p q (M : matrix n n T),
+  Permutation (determinant'_list M) (determinant''_list p q M).
+Proof.
+intros.
+symmetry.
+unfold determinant'_list, determinant''_list.
+apply NoDup_Permutation_bis; cycle 1. {
+  now do 2 rewrite map_length.
+} {
+  intros x.
+  rewrite in_map_iff.
+  intros (y & Hx & Hy); subst x.
+  rewrite in_seq in Hy; cbn in Hy.
+  destruct Hy as (_, Hy).
+  apply in_map_iff.
+  exists (nat_of_permut (permut_swap_last p q n y)).
+  split. {
+    f_equal. 2: {
+      apply rngl_product_eq_compat; [ easy | ].
+      intros i Hi.
+      f_equal.
+Search nat_of_permut.
 ...
+now rewrite permut_nat_of_permut.
+...
+unfold permut_swap_last.
+...
+}
+apply FinFun.Injective_map_NoDup; [ | apply seq_NoDup ].
+unfold FinFun.Injective.
+intros x y Hxy.
+(* pas gagné *)
+...
+
+(* yet another proof that it is equal to determinant *)
+
+Theorem det_is_det_by_permut'' :
+  rngl_is_comm = true →
+  ∀ n (M : matrix n n T) p q, determinant M = determinant'' p q M.
+Proof.
+intros Hic *.
+rewrite det_is_det_by_permut; [ | easy ].
+rewrite determinant'_by_list.
+rewrite determinant''_by_list.
+apply rngl_summation_permut; cycle 1. {
+  unfold determinant'_list.
+  now rewrite map_length, seq_length.
+} {
+  unfold determinant''_list.
+  now rewrite map_length, seq_length.
+}
+...
+
 
 (* *)
 
@@ -1122,77 +1216,6 @@ Compute (map (λ i, list_of_vect (permut_swap_last 1 2 3 i)) (seq 0 (fact 3))).
 Compute (map (λ i, list_of_vect (permut_swap_last 0 1 6 i)) (seq 0 (fact 6))).
 *)
 
-(* yet another definition of determinant *)
-
-Definition determinant'' p q n (M : matrix n n T) :=
-  (Σ (k = 0, fact n - 1), signature n k *
-   Π (i = 1, n),
-   mat_el M (i - 1) (vect_el (permut_swap_last p q n k) (i - 1)%nat))%F.
-
-Definition determinant''_list p q {n} (M : matrix n n T) :=
-  map (λ k,
-    (signature n k *
-     Π (i = 1, n),
-     mat_el M (i - 1) (vect_el (permut_swap_last p q n k) (i - 1)%nat))%F)
-    (seq 0 (fact n)).
-
-Theorem determinant''_by_list : ∀ n p q (M : matrix n n T),
-  determinant'' p q M =
-    (Σ (k = 0, fact n - 1), nth k (determinant''_list p q M) 0)%F.
-Proof.
-intros.
-unfold determinant'', determinant''_list.
-apply rngl_summation_eq_compat; intros k Hk.
-assert (Hkn : k < fact n). {
-  specialize (fact_neq_0 n) as Hn.
-  flia Hk Hn.
-}
-rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
-rewrite seq_nth; [ | easy ].
-now rewrite Nat.add_0_l.
-Qed.
-
-...
-
-Theorem determinant'_determinant''_permut : ∀ n p q (M : matrix n n T),
-  Permutation (determinant'_list M) (determinant''_list p q M).
-Proof.
-intros.
-unfold determinant'_list, determinant''_list.
-apply NoDup_Permutation_bis; cycle 1. {
-  now do 2 rewrite map_length.
-} {
-  intros x.
-  rewrite in_map_iff.
-  intros (y & Hx & Hy); subst x.
-  rewrite in_seq in Hy; cbn in Hy.
-  destruct Hy as (_, Hy).
-  apply in_map_iff.
-...
-}
-apply FinFun.Injective_map_NoDup; [ | apply seq_NoDup ].
-unfold FinFun.Injective.
-intros x y Hxy.
-(* pas gagné *)
-...
-
-(* yet another proof that it is equal to determinant *)
-
-Theorem det_is_det_by_permut'' :
-  rngl_is_comm = true →
-  ∀ n (M : matrix n n T) p q, determinant M = determinant'' p q M.
-Proof.
-intros Hic *.
-rewrite det_is_det_by_permut; [ | easy ].
-rewrite determinant'_by_list.
-rewrite determinant''_by_list.
-apply rngl_summation_permut; cycle 1. {
-  unfold determinant'_list.
-  now rewrite map_length, seq_length.
-} {
-  unfold determinant''_list.
-  now rewrite map_length, seq_length.
-}
 ...
 
 Theorem det_two_rows_are_eq :
