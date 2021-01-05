@@ -763,6 +763,10 @@ remember (vect_el v 0 <=? vect_el (permut n k) j) as b eqn:Hb.
 symmetry in Hb.
 destruct b. {
   apply Nat.leb_le in Hb; cbn.
+Print nat_of_permut_sub_vect.
+...
+  specialize (IHn (nat_of_permut_sub_vect v n)) as H1.
+  rewrite Hk in H1.
 ...
   clear IHn Hj.
   revert v Hvn Hn.
