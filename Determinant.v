@@ -813,10 +813,6 @@ destruct b. {
 }
 Qed.
 
-Inspect 2.
-
-...
-
 (* list of terms in determinant' (determinant by sum of products of
    permutations *)
 
@@ -974,10 +970,42 @@ rewrite seq_nth; [ | easy ].
 now rewrite Nat.add_0_l.
 Qed.
 
-Theorem determinant'_determinant''_permut : ∀ n p q (M : matrix n n T),
-  Permutation (determinant'_list M) (determinant''_list p q M).
+Theorem vect_el_permut_ub : ∀ n k i,
+  k < fact n
+  → i < n
+  → vect_el (permut n k) i < n.
 Proof.
-intros.
+intros * Hkn Hin.
+revert k i Hkn Hin.
+induction n; intros; [ easy | cbn ].
+unfold permut_succ_vect_fun.
+destruct i. {
+  rewrite Nat_fact_succ, Nat.mul_comm in Hkn.
+  apply Nat.div_lt_upper_bound; [ | easy ].
+  apply fact_neq_0.
+}
+apply Nat.succ_lt_mono in Hin.
+remember (k / fact n <=? vect_el (permut n (k mod fact n)) i) as b eqn:Hb.
+symmetry in Hb.
+destruct b. {
+  cbn; rewrite Nat.add_1_r.
+  apply -> Nat.succ_lt_mono.
+  apply IHn; [ | easy ].
+  apply Nat.mod_upper_bound, fact_neq_0.
+}
+cbn; rewrite Nat.add_0_r.
+apply Nat.leb_gt in Hb.
+etransitivity; [ apply Hb | ].
+rewrite Nat_fact_succ, Nat.mul_comm in Hkn.
+apply Nat.div_lt_upper_bound; [ | easy ].
+apply fact_neq_0.
+Qed.
+
+Theorem determinant'_determinant''_permut : ∀ n p q (M : matrix n n T),
+  p < q < n
+  → Permutation (determinant'_list M) (determinant''_list p q M).
+Proof.
+intros * (Hpq, Hqn).
 symmetry.
 unfold determinant'_list, determinant''_list.
 apply NoDup_Permutation_bis; cycle 1. {
@@ -995,9 +1023,30 @@ apply NoDup_Permutation_bis; cycle 1. {
       apply rngl_product_eq_compat; [ easy | ].
       intros i Hi.
       f_equal.
-Search nat_of_permut.
-...
-now rewrite permut_nat_of_permut.
+      rewrite permut_nat_of_permut; [ easy | | ]. {
+        intros j Hj.
+        unfold permut_swap_last.
+        unfold vect_swap_elem; cbn.
+        unfold swap_nat.
+        apply vect_el_permut_ub; [ easy | ].
+        destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
+          destruct (Nat.eq_dec (n - 1) p) as [Hnp| Hnp]; [ flia Hj | ].
+          destruct (Nat.eq_dec (n - 1) (n - 2)) as [Hnn| Hnn]. {
+            flia Hpq Hjq Hj.
+          }
+          flia Hj.
+        }
+        destruct (Nat.eq_dec j (n - 1)) as [Hjn| Hjn]. {
+          destruct (Nat.eq_dec q p) as [Hqp| Hqp]; [ flia Hqp Hpq | ].
+          destruct (Nat.eq_dec q (n - 2)) as [H| H]; [ flia Hpq H | easy ].
+        }
+        destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ flia Hj | ].
+        destruct (Nat.eq_dec j (n - 2)) as [H| H]; [ flia Hpq Hqn | easy ].
+      } {
+        intros j k Hj Hk.
+        unfold permut_swap_last.
+        unfold vect_swap_elem; cbn.
+(* mmm... nothing prevent j to be equal to k *)
 ...
 unfold permut_swap_last.
 ...
