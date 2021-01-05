@@ -1,5 +1,5 @@
-Determinant.vio: Determinant.v Matrix.vio
-Determinant.vo Determinant.glob Determinant.v.beautified Determinant.required_vo: Determinant.v Matrix.vo
+Determinant.vio: Determinant.v Misc.vio RingLike.vio Matrix.vio RLsummation.vio RLproduct.vio
+Determinant.vo Determinant.glob Determinant.v.beautified Determinant.required_vo: Determinant.v Misc.vo RingLike.vo Matrix.vo RLsummation.vo RLproduct.vo
 FermatLittle.vio: FermatLittle.v Misc.vio
 FermatLittle.vo FermatLittle.glob FermatLittle.v.beautified FermatLittle.required_vo: FermatLittle.v Misc.vo
 GQ.vio: GQ.v Misc.vio PQ.vio Nat_ggcd.vio

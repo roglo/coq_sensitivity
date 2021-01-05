@@ -479,37 +479,6 @@ Compute (map (λ i, list_of_vect (permut 3 i)) (seq 0 (fact 3))).
 
 (* *)
 
-Definition mat_mul_row_by_scal n k (M : matrix n n T) s :=
-  mk_mat n n
-    (λ i j,
-     if Nat.eq_dec i k then (s * mat_el M i j)%F else mat_el M i j).
-
-Definition mat_swap_rows n (M : matrix n n T) i1 i2 :=
-  mk_mat n n
-    (λ i j,
-     if Nat.eq_dec i i1 then mat_el M i2 j
-     else if Nat.eq_dec i i2 then mat_el M i1 j
-     else mat_el M i j).
-
-Definition mat_add_row_mul_scal_row n (M : matrix n n T) i1 v i2 :=
-  mk_mat n n
-    (λ i j,
-     if Nat.eq_dec i i1 then (mat_el M i1 j + v * mat_el M i2 j)%F
-     else mat_el M i j).
-
-Definition nat_of_permut_sub_vect n (v : vector n nat) n' :=
-  let d := vect_el v 0 in
-  mk_vect n' (λ i, vect_el v (S i) - Nat.b2n (d <? vect_el v (S i))).
-
-Fixpoint nat_of_permut n (v : vector n nat) : nat :=
-  match n with
-  | 0 => 0
-  | S n' =>
-      let d := vect_el v 0 in
-      d * fact n' +
-      nat_of_permut (nat_of_permut_sub_vect v n')
-  end.
-
 (*
 Compute  nat_of_permut (permut 3 0).
 Compute  nat_of_permut (permut 3 1).
@@ -518,101 +487,6 @@ Compute  nat_of_permut (permut 3 3).
 Compute  nat_of_permut (permut 3 4).
 Compute  nat_of_permut (permut 3 5).
 *)
-
-Theorem nat_of_permut_permut : ∀ n k,
-  k < fact n
-  → nat_of_permut (permut n k) = k.
-Proof.
-intros * Hkn.
-revert k Hkn.
-induction n; intros; [ now apply Nat.lt_1_r in Hkn | cbn ].
-specialize (Nat.div_mod k (fact n) (fact_neq_0 _)) as H1.
-rewrite Nat.mul_comm in H1.
-replace (k / fact n * fact n) with (k - k mod fact n) by flia H1.
-rewrite <- Nat.add_sub_swap; [ | apply Nat.mod_le, fact_neq_0 ].
-apply Nat.add_sub_eq_r; f_equal.
-clear H1.
-rewrite <- (IHn (k mod fact n)) at 1. 2: {
-  apply Nat.mod_upper_bound, fact_neq_0.
-}
-f_equal.
-apply vector_eq.
-intros i Hi; cbn.
-symmetry.
-apply Nat.add_sub_eq_r.
-f_equal.
-remember (Nat.b2n (_ <=? _)) as b eqn:Hb.
-rewrite Nat.add_comm.
-symmetry in Hb.
-destruct b. 2: {
-  cbn.
-  destruct b; [ easy | exfalso ].
-  unfold Nat.b2n in Hb.
-  destruct (k / fact n <=? _); flia Hb.
-}
-cbn.
-remember (vect_el (permut n _) i) as x eqn:Hx.
-symmetry in Hx.
-destruct x; [ easy | ].
-unfold Nat.b2n in Hb |-*.
-remember (k / fact n) as y eqn:Hy; symmetry in Hy.
-remember (y <=? S x) as c eqn:Hc; symmetry in Hc.
-destruct c; [ easy | clear Hb ].
-apply Nat.leb_gt in Hc.
-remember (y <=? x) as b eqn:Hb.
-symmetry in Hb.
-destruct b; [ | easy ].
-apply Nat.leb_le in Hb.
-flia Hb Hc.
-Qed.
-
-Import Permutation.
-
-Theorem rngl_summation_permut : ∀ n l1 l2,
-  Permutation l1 l2
-  → length l1 = n
-  → length l2 = n
-  → (Σ (i = 0, n - 1), nth i l1 0 = Σ (i = 0, n - 1), nth i l2 0)%F.
-Proof.
-intros * Hl H1 H2.
-destruct n. {
-  apply length_zero_iff_nil in H1.
-  apply length_zero_iff_nil in H2.
-  now subst l1 l2.
-}
-rewrite Nat.sub_succ, Nat.sub_0_r.
-revert n H1 H2.
-induction Hl; intros; [ easy | | | ]. {
-  cbn in H1, H2.
-  apply Nat.succ_inj in H1.
-  apply Nat.succ_inj in H2.
-  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
-  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
-  destruct n; [ easy | ].
-  do 2 rewrite rngl_summation_succ_succ.
-  now rewrite IHHl.
-} {
-  destruct n; [ easy | ].
-  cbn in H1, H2.
-  do 2 apply Nat.succ_inj in H1.
-  do 2 apply Nat.succ_inj in H2.
-  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
-  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
-  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
-  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
-  do 2 rewrite rngl_add_assoc.
-  do 2 rewrite rngl_summation_succ_succ.
-  f_equal; [ apply rngl_add_comm | ].
-  apply rngl_summation_eq_compat.
-  intros i Hi; cbn.
-  destruct i; [ flia Hi | easy ].
-} {
-  specialize (Permutation_length Hl2) as H3.
-  rewrite H2 in H3.
-  rewrite IHHl1; [ | easy | easy ].
-  now rewrite IHHl2.
-}
-Qed.
 
 (* *)
 
@@ -1902,7 +1776,7 @@ Declare Scope V_scope.
 Delimit Scope M_scope with M.
 Delimit Scope V_scope with V.
 
-Arguments mat_el [m n]%nat [T]%type M%M : rename.
+Arguments mat_el [m n]%nat [T]%type M%M (i j)%nat : rename.
 Arguments mat_add_opp_r {T}%type {ro rp} {m n}%nat Hro M%M.
 Arguments mat_mul_mul_scal_l {T}%type {ro rp} Hic {m n p}%nat a%F MA%M.
 Arguments mat_mul_scal_l {T ro} {m n}%nat s%F M%M.
