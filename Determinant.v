@@ -696,8 +696,6 @@ apply rngl_summation_permut; [ now symmetry | | ]. {
 }
 Qed.
 
-...
-
 (* order of permutations where ranks p & q are swapped with the
    last two numbers, allowing consecutive permutations
    to have the p-th and the q-th numbers swapped; perhaps
@@ -730,28 +728,6 @@ Compute (map (λ i, list_of_vect (permut_swap_with_0 2 3 i)) (seq 0 (fact 3))).
 
 Definition permut_nth_of_swap_with_0 (p n k : nat) :=
   nat_of_permut (permut_swap_with_0 p n k).
-
-Compute (map (λ i, nat_of_permut (permut 3 i)) (seq 0 (fact 3))).
-Compute (map (λ i, nat_of_permut (permut_swap_with_0 1 3 i)) (seq 0 (fact 3))).
-
-Compute (map (λ i, list_of_vect (permut 3 (permut_nth_of_swap_with_0 0 3 i))) (seq 0 (fact 3))).
-Compute (map (λ i, list_of_vect (permut 3 (permut_nth_of_swap_with_0 1 3 i))) (seq 0 (fact 3))).
-Compute (map (λ i, list_of_vect (permut 3 (permut_nth_of_swap_with_0 2 3 i))) (seq 0 (fact 3))).
-
-(*
-Compute (map (λ i, list_of_vect (permut 3 i)) (seq 0 (fact 3))).
-*)
-
-(* *)
-
-(*
-Compute  nat_of_permut (permut 3 0).
-Compute  nat_of_permut (permut 3 1).
-Compute  nat_of_permut (permut 3 2).
-Compute  nat_of_permut (permut 3 3).
-Compute  nat_of_permut (permut 3 4).
-Compute  nat_of_permut (permut 3 5).
-*)
 
 Definition permut_swap_last (p q : nat) n k :=
   vect_swap_elem (vect_swap_elem (permut n k) p (n - 2)) q (n - 1).
