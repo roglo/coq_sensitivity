@@ -70,6 +70,246 @@ Definition det_from_col {n} (M : matrix n n T) j :=
      final result: 2;0;3;1
   *)
 
+Definition permut_succ_vect_fun {n} (σ_n : nat → vector n nat) i j :=
+  match j with
+  | 0 => i / fact n
+  | S j' =>
+      vect_el (σ_n (i mod fact n)) j' +
+      Nat.b2n (i / fact n <=? vect_el (σ_n (i mod fact n)) j')
+  end.
+
+Fixpoint permut n k : vector n nat :=
+  match n with
+  | 0 => mk_vect 0 (λ _, 0)
+  | S n' => mk_vect (S n') (permut_succ_vect_fun (permut n') k)
+  end.
+
+Fixpoint permut_inv n k (j : nat) :=
+  match n with
+  | 0 => 0
+  | S n' =>
+      if lt_dec j (k / fact n') then
+        S (permut_inv n' (k mod fact n') j)
+      else if lt_dec (k / fact n') j then
+        S (permut_inv n' (k mod fact n') (j - 1))
+      else 0
+  end.
+
+(*
+Compute (map (λ i, list_of_vect (permut 3 i)) (seq 0 (fact 3))).
+Compute list_of_vect (permut 3 4).
+Compute permut_inv 3 4 0.
+Compute permut_inv 3 4 1.
+Compute permut_inv 3 4 2.
+Compute list_of_vect (permut 4 12).
+Compute permut_inv 4 12 0.
+Compute permut_inv 4 12 1.
+Compute permut_inv 4 12 2.
+Compute permut_inv 4 12 3.
+
+Compute vect_el (permut 3 4) (permut_inv 3 4 1).
+Compute permut_inv 3 4 (vect_el (permut 3 4) 1).
+*)
+
+Theorem permut_inv_upper_bound : ∀ n k j,
+  k < fact n
+  → j < n
+  → permut_inv n k j < n.
+Proof.
+intros * Hkn Hjn.
+revert k j Hkn Hjn.
+induction n; intros; [ easy | ].
+cbn.
+destruct (lt_dec j (k / fact n)) as [Hjkn| Hjkn]. {
+  apply -> Nat.succ_lt_mono.
+  destruct n. {
+    cbn in Hkn.
+    apply Nat.lt_1_r in Hkn; subst k.
+    now cbn in Hjkn.
+  }
+  destruct (Nat.eq_dec j (S n)) as [Hjsn| Hjsn]. {
+    subst j.
+    clear Hjn.
+    exfalso; apply Nat.nle_gt in Hjkn; apply Hjkn; clear Hjkn.
+    rewrite Nat_fact_succ in Hkn.
+    rewrite Nat.mul_comm in Hkn.
+    apply Nat.lt_succ_r.
+    apply Nat.div_lt_upper_bound; [ | easy ].
+    apply fact_neq_0.
+  } {
+    apply IHn; [ | flia Hjn Hjsn ].
+    apply Nat.mod_upper_bound, fact_neq_0.
+  }
+} {
+  apply Nat.nlt_ge in Hjkn.
+  destruct (lt_dec (k / fact n) j) as [Hknj| Hknj]; [ | flia ].
+  apply -> Nat.succ_lt_mono.
+  destruct n. {
+    now apply Nat.lt_1_r in Hjn; subst j.
+  }
+  apply IHn; [ | flia Hjn Hknj ].
+  apply Nat.mod_upper_bound, fact_neq_0.
+}
+Qed.
+
+Theorem permut_permut_inv : ∀ n k j,
+  j < n
+  → k < fact n
+  → vect_el (permut n k) (permut_inv n k j) = j.
+Proof.
+intros * Hjn Hkn.
+revert j k Hjn Hkn.
+induction n; intros; [ easy | ].
+cbn.
+destruct (lt_dec j (k / fact n)) as [Hjkn| Hjkn]. {
+  cbn.
+  destruct n. {
+    rewrite Nat.div_1_r in Hjkn; cbn in Hkn.
+    flia Hkn Hjkn.
+  }
+  destruct (lt_dec k (fact (S n))) as [Hksn| Hksn]. {
+    now rewrite Nat.div_small in Hjkn.
+  }
+  apply Nat.nlt_ge in Hksn.
+  destruct (Nat.eq_dec j (S n)) as [Hjsn| Hjsn]. {
+    subst j.
+    clear Hjn.
+    exfalso; apply Nat.nle_gt in Hjkn; apply Hjkn; clear Hjkn.
+    rewrite Nat_fact_succ in Hkn.
+    rewrite Nat.mul_comm in Hkn.
+    apply Nat.lt_succ_r.
+    apply Nat.div_lt_upper_bound; [ | easy ].
+    apply fact_neq_0.
+  }
+  rewrite IHn; [ | flia Hjn Hjsn | ]. 2: {
+    apply Nat.mod_upper_bound, fact_neq_0.
+  }
+  remember (k / fact (S n) <=? j) as b eqn:Hb.
+  symmetry in Hb.
+  destruct b; [ exfalso | apply Nat.add_0_r ].
+  apply Nat.leb_le in Hb.
+  flia Hjkn Hb.
+} {
+  apply Nat.nlt_ge in Hjkn.
+  destruct (lt_dec (k / fact n) j) as [Hkj| Hkj]. 2: {
+    apply Nat.nlt_ge in Hkj; cbn.
+    now apply Nat.le_antisymm.
+  }
+  clear Hjkn.
+  destruct j; [ easy | ].
+  rewrite Nat.sub_succ, Nat.sub_0_r.
+  cbn.
+  destruct n; [ flia Hjn | ].
+  apply Nat.succ_lt_mono in Hjn.
+  rewrite IHn; [ | easy | ]. 2: {
+    apply Nat.mod_upper_bound, fact_neq_0.
+  }
+  remember (k / fact (S n) <=? j) as b eqn:Hb.
+  symmetry in Hb.
+  destruct b; [ apply Nat.add_1_r | exfalso ].
+  apply Nat.leb_nle in Hb.
+  now apply Nat.succ_le_mono in Hkj.
+}
+Qed.
+
+Theorem permut_inv_permut : ∀ n k i,
+  i < n
+  → k < fact n
+  → permut_inv n k (vect_el (permut n k) i) = i.
+Proof.
+intros * Hi Hkn.
+revert k i Hi Hkn.
+induction n; intros; [ flia Hi | ].
+destruct i. {
+  clear Hi; cbn.
+  remember (k / fact n) as p eqn:Hp.
+  destruct (lt_dec p p) as [H| H]; [ flia H | easy ].
+}
+apply Nat.succ_lt_mono in Hi.
+cbn.
+remember (k / fact n) as p eqn:Hp.
+remember (vect_el (permut n (k mod fact n)) i) as q eqn:Hq.
+move q before p.
+remember (p <=? q) as b eqn:Hb; symmetry in Hb.
+destruct b. {
+  apply Nat.leb_le in Hb; cbn.
+  destruct (lt_dec (q + 1) p) as [Hpq| Hqp]; [ flia Hb Hpq | ].
+  apply Nat.nlt_ge in Hqp.
+  destruct (lt_dec p (q + 1)) as [Hpq| Hpq]; [ | flia Hb Hpq ].
+  clear Hpq Hqp.
+  f_equal.
+  rewrite Nat.add_sub.
+  rewrite Hq.
+  apply IHn; [ easy | ].
+  apply Nat.mod_upper_bound, fact_neq_0.
+} {
+  apply Nat.leb_gt in Hb; cbn.
+  rewrite Nat.add_0_r.
+  destruct (lt_dec q p) as [H| H]; [ clear H | flia Hb H ].
+  f_equal.
+  rewrite Hq.
+  apply IHn; [ easy | ].
+  apply Nat.mod_upper_bound, fact_neq_0.
+}
+Qed.
+
+Theorem permut_surjective : ∀ n k j,
+  k < fact n
+  → j < n
+  → ∃ i : nat, i < n ∧ vect_el (permut n k) i = j.
+Proof.
+intros * Hkn Hjn.
+exists (permut_inv n k j).
+destruct n; [ easy | ].
+split. {
+  cbn.
+  destruct (lt_dec j (k / fact n)) as [Hjk| Hjk]. {
+    apply -> Nat.succ_lt_mono.
+    destruct n. {
+      now apply Nat.lt_1_r in Hkn; subst k.
+    }
+    destruct (Nat.eq_dec j (S n)) as [Hjsn| Hjsn]. {
+      subst j; clear Hjn.
+      apply Nat.nle_gt in Hjk.
+      exfalso; apply Hjk; clear Hjk.
+      rewrite Nat_fact_succ in Hkn.
+      rewrite Nat.mul_comm in Hkn.
+      apply Nat.lt_succ_r.
+      apply Nat.div_lt_upper_bound; [ | easy ].
+      apply fact_neq_0.
+    }
+    apply permut_inv_upper_bound; [ | flia Hjn Hjsn ].
+    apply Nat.mod_upper_bound, fact_neq_0.
+  } {
+    apply Nat.nlt_ge in Hjk.
+    destruct (lt_dec (k / fact n) j) as [Hkj| Hkj]; [ | flia ].
+    apply -> Nat.succ_lt_mono.
+    destruct n. {
+      apply Nat.lt_1_r in Hkn; subst k.
+      flia Hjn Hkj.
+    }
+    apply permut_inv_upper_bound; [ | flia Hjn Hkj ].
+    apply Nat.mod_upper_bound, fact_neq_0.
+  }
+}
+now apply permut_permut_inv.
+Qed.
+
+Theorem permut_injective : ∀ n k i j,
+  k < fact n
+  → i < n
+  → j < n
+  → vect_el (permut n k) i = vect_el (permut n k) j
+  → i = j.
+Proof.
+intros * Hk Hi Hj Hij.
+assert (Hnz : n ≠ 0) by flia Hi.
+rewrite <- permut_inv_permut with (n := n) (k := k); [ | easy | easy ].
+symmetry.
+rewrite <- permut_inv_permut with (n := n) (k := k); [ | easy | easy ].
+now f_equal.
+Qed.
+
 (* signature of the k-th permutation of "permut" above *)
 
 Fixpoint signature n k :=
@@ -156,25 +396,154 @@ rewrite rngl_mul_mul_swap; [ | easy ].
 now rewrite rngl_mul_assoc.
 Qed.
 
-(* *)
+(* multilinearity *)
 
-Definition mat_mul_row_by_scal n k (M : matrix n n T) s :=
-  mk_mat n n
-    (λ i j,
-     if Nat.eq_dec i k then (s * mat_el M i j)%F else mat_el M i j).
+Theorem determinant_multilinear :
+  rngl_is_comm = true
+  → ∀ n (M : matrix n n T) i a b U V,
+    i < n
+    → determinant (mat_repl_vect i M (a × U + b × V)%V) =
+         (a * determinant (mat_repl_vect i M U) +
+          b * determinant (mat_repl_vect i M V))%F.
+Proof.
+intros Hic * Hi.
+rewrite det_is_det_by_permut; [ | easy ].
+rewrite det_is_det_by_permut; [ | easy ].
+rewrite det_is_det_by_permut; [ | easy ].
+unfold determinant'.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
+    intros j Hj.
+    now cbn.
+  }
+  easy.
+}
+cbn - [ iter_seq ].
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+rewrite Hic in rngl_mul_comm.
+rewrite rngl_mul_summation_distr_l.
+rewrite rngl_mul_summation_distr_l.
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  rewrite rngl_mul_assoc.
+  now rewrite (rngl_mul_comm a).
+}
+rewrite rngl_add_comm.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  rewrite rngl_mul_assoc.
+  now rewrite (rngl_mul_comm b).
+}
+rewrite rngl_add_comm.
+rewrite <- rngl_summation_add_distr; [ | easy ].
+apply rngl_summation_eq_compat.
+intros k Hk.
+do 2 rewrite <- rngl_mul_assoc.
+rewrite <- rngl_mul_add_distr_l.
+f_equal.
+assert (Hkn : k < fact n). {
+  specialize (fact_neq_0 n) as Hnz.
+  flia Hk Hnz.
+}
+specialize (permut_surjective Hkn Hi) as Hp.
+destruct Hp as (p & Hp & Hpp).
+rewrite (rngl_product_split _ (p + 1)); [ | flia Hp ].
+rewrite rngl_product_split_last; [ | flia ].
+erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
+  intros j Hj.
+  replace (j - 1 - 1) with (j - 2) by flia.
+  destruct (Nat.eq_dec (vect_el (permut n k) (j - 2)) i) as [Hpj| Hpj]. {
+    exfalso.
+    rewrite <- Hpp in Hpj.
+    apply permut_injective in Hpj; [ | easy | flia Hp Hj | easy ].
+    flia Hj Hpj.
+  }
+  easy.
+}
+rewrite (rngl_mul_comm (iter_seq _ _ _ _)).
+rewrite rngl_add_comm.
+rewrite (rngl_product_split _ (p + 1)); [ | flia Hp ].
+rewrite rngl_product_split_last; [ | flia ].
+erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
+  intros j Hj.
+  replace (j - 1 - 1) with (j - 2) by flia.
+  destruct (Nat.eq_dec (vect_el (permut n k) (j - 2)) i) as [Hpj| Hpj]. {
+    exfalso.
+    rewrite <- Hpp in Hpj.
+    apply permut_injective in Hpj; [ | easy | flia Hp Hj | easy ].
+    flia Hj Hpj.
+  }
+  easy.
+}
+rewrite (rngl_mul_comm (iter_seq _ _ _ _)).
+rewrite rngl_add_comm.
+symmetry.
+rewrite (rngl_product_split _ (p + 1)); [ | flia Hp ].
+rewrite rngl_product_split_last; [ | flia ].
+erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
+  intros j Hj.
+  replace (j - 1 - 1) with (j - 2) by flia.
+  destruct (Nat.eq_dec (vect_el (permut n k) (j - 2)) i) as [Hpj| Hpj]. {
+    exfalso.
+    rewrite <- Hpp in Hpj.
+    apply permut_injective in Hpj; [ | easy | flia Hp Hj | easy ].
+    flia Hj Hpj.
+  }
+  easy.
+}
+rewrite (rngl_mul_comm (iter_seq _ _ _ _)).
+rewrite Nat.add_sub.
+rewrite Hpp.
+destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
+do 4 rewrite rngl_mul_assoc.
+remember
+  (Π (i0 = 2, p + 1),
+   mat_el M (i0 - 2) (vect_el (permut n k) (i0 - 2)%nat))%F
+  as q eqn:Hq.
+rewrite (rngl_mul_mul_swap Hic _ _ q).
+do 3 rewrite (rngl_mul_comm _ q).
+do 5 rewrite <- rngl_mul_assoc.
+rewrite <- rngl_mul_add_distr_l.
+f_equal.
+clear q Hq.
+erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
+  intros j Hj.
+  destruct (Nat.eq_dec (vect_el (permut n k) (j - 1)) i) as [Hpj| Hpj]. {
+    rewrite <- Hpp in Hpj.
+    apply permut_injective in Hpj; [ | easy | flia Hp Hj | easy ].
+    flia Hj Hpj.
+  }
+  easy.
+}
+symmetry.
+erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
+  intros j Hj.
+  destruct (Nat.eq_dec (vect_el (permut n k) (j - 1)) i) as [Hpj| Hpj]. {
+    rewrite <- Hpp in Hpj.
+    apply permut_injective in Hpj; [ | easy | flia Hp Hj | easy ].
+    flia Hj Hpj.
+  }
+  easy.
+}
+rewrite rngl_add_comm.
+erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
+  intros j Hj.
+  destruct (Nat.eq_dec (vect_el (permut n k) (j - 1)) i) as [Hpj| Hpj]. {
+    rewrite <- Hpp in Hpj.
+    apply permut_injective in Hpj; [ | easy | flia Hp Hj | easy ].
+    flia Hj Hpj.
+  }
+  easy.
+}
+cbn - [ iter_seq ].
+rewrite rngl_add_comm.
+do 2 rewrite rngl_mul_assoc.
+now rewrite <- rngl_mul_add_distr_r.
+Qed.
 
-Definition mat_swap_rows n (M : matrix n n T) i1 i2 :=
-  mk_mat n n
-    (λ i j,
-     if Nat.eq_dec i i1 then mat_el M i2 j
-     else if Nat.eq_dec i i2 then mat_el M i1 j
-     else mat_el M i j).
-
-Definition mat_add_row_mul_scal_row n (M : matrix n n T) i1 v i2 :=
-  mk_mat n n
-    (λ i j,
-     if Nat.eq_dec i i1 then (mat_el M i1 j + v * mat_el M i2 j)%F
-     else mat_el M i j).
+(* compute the rank of a given permutation *)
 
 Definition nat_of_permut_sub_vect n (v : vector n nat) n' :=
   let d := vect_el v 0 in
@@ -235,6 +604,88 @@ destruct b; [ | easy ].
 apply Nat.leb_le in Hb.
 flia Hb Hc.
 Qed.
+
+(* order of permutations where ranks p & q are swapped with the
+   last two numbers, allowing consecutive permutations
+   to have the p-th and the q-th numbers swapped; perhaps
+   useful to prove aternativity, if I can do it.
+   we have: permut_swap_last (n-2) (n-1) n k = permut n k *)
+
+(*
+Compute list_of_vect (permut 4 13).
+     = [2; 0; 3; 1]
+*)
+
+Definition swap_nat i j k :=
+  if Nat.eq_dec k i then j
+  else if Nat.eq_dec k j then i
+  else k.
+
+Definition vect_swap_elem n (v : vector n nat) i j :=
+  mk_vect n (λ k, vect_el v (swap_nat i j k)).
+
+(* i such that vect_el (permut n k) i = j *)
+
+Definition permut_swap_with_0 p n k :=
+  vect_swap_elem (permut n k) 0 p.
+
+Compute (map (λ i, list_of_vect (permut_swap_with_0 0 3 i)) (seq 0 (fact 3))).
+Compute (map (λ i, list_of_vect (permut_swap_with_0 1 3 i)) (seq 0 (fact 3))).
+Compute (map (λ i, list_of_vect (permut_swap_with_0 2 3 i)) (seq 0 (fact 3))).
+
+(* k' such that permut_swap_with_0 p n k = permut n k' *)
+
+Definition permut_nth_of_swap_with_0 (p n k : nat) :=
+  nat_of_permut (permut_swap_with_0 p n k).
+
+Compute (map (λ i, nat_of_permut (permut 3 i)) (seq 0 (fact 3))).
+Compute (map (λ i, nat_of_permut (permut_swap_with_0 1 3 i)) (seq 0 (fact 3))).
+
+Compute (map (λ i, list_of_vect (permut 3 (permut_nth_of_swap_with_0 0 3 i))) (seq 0 (fact 3))).
+Compute (map (λ i, list_of_vect (permut 3 (permut_nth_of_swap_with_0 1 3 i))) (seq 0 (fact 3))).
+Compute (map (λ i, list_of_vect (permut 3 (permut_nth_of_swap_with_0 2 3 i))) (seq 0 (fact 3))).
+
+(*
+Compute (map (λ i, list_of_vect (permut 3 i)) (seq 0 (fact 3))).
+*)
+
+(* *)
+
+(*
+Compute  nat_of_permut (permut 3 0).
+Compute  nat_of_permut (permut 3 1).
+Compute  nat_of_permut (permut 3 2).
+Compute  nat_of_permut (permut 3 3).
+Compute  nat_of_permut (permut 3 4).
+Compute  nat_of_permut (permut 3 5).
+*)
+
+Definition permut_swap_last (p q : nat) n k :=
+  vect_swap_elem (vect_swap_elem (permut n k) p (n - 2)) q (n - 1).
+
+...
+
+(* *)
+
+Definition mat_mul_row_by_scal n k (M : matrix n n T) s :=
+  mk_mat n n
+    (λ i j,
+     if Nat.eq_dec i k then (s * mat_el M i j)%F else mat_el M i j).
+
+Definition mat_swap_rows n (M : matrix n n T) i1 i2 :=
+  mk_mat n n
+    (λ i j,
+     if Nat.eq_dec i i1 then mat_el M i2 j
+     else if Nat.eq_dec i i2 then mat_el M i1 j
+     else mat_el M i j).
+
+Definition mat_add_row_mul_scal_row n (M : matrix n n T) i1 v i2 :=
+  mk_mat n n
+    (λ i j,
+     if Nat.eq_dec i i1 then (mat_el M i1 j + v * mat_el M i2 j)%F
+     else mat_el M i j).
+
+...
 
 (* If we multiply a row (column) of A by a number, the determinant of
    A will be multiplied by the same number. *)
@@ -680,152 +1131,18 @@ apply rngl_summation_permut; [ now symmetry | | ]. {
 }
 Qed.
 
-(* multilinearity *)
+(*
+Compute map (λ i, list_of_vect (permut 4 i)) (seq 0 (fact 4)).
+*)
 
-Theorem determinant_multilinear :
-  rngl_is_comm = true
-  → ∀ n (M : matrix n n T) i a b U V,
-    i < n
-    → determinant (mat_repl_vect i M (a × U + b × V)%V) =
-         (a * determinant (mat_repl_vect i M U) +
-          b * determinant (mat_repl_vect i M V))%F.
-Proof.
-intros Hic * Hi.
-rewrite det_is_det_by_permut; [ | easy ].
-rewrite det_is_det_by_permut; [ | easy ].
-rewrite det_is_det_by_permut; [ | easy ].
-unfold determinant'.
-erewrite rngl_summation_eq_compat. 2: {
-  intros k Hk.
-  erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
-    intros j Hj.
-    now cbn.
-  }
-  easy.
-}
-cbn - [ iter_seq ].
-specialize rngl_opt_mul_comm as rngl_mul_comm.
-rewrite Hic in rngl_mul_comm.
-rewrite rngl_mul_summation_distr_l.
-rewrite rngl_mul_summation_distr_l.
-symmetry.
-erewrite rngl_summation_eq_compat. 2: {
-  intros k Hk.
-  rewrite rngl_mul_assoc.
-  now rewrite (rngl_mul_comm a).
-}
-rewrite rngl_add_comm.
-erewrite rngl_summation_eq_compat. 2: {
-  intros k Hk.
-  rewrite rngl_mul_assoc.
-  now rewrite (rngl_mul_comm b).
-}
-rewrite rngl_add_comm.
-rewrite <- rngl_summation_add_distr; [ | easy ].
-apply rngl_summation_eq_compat.
-intros k Hk.
-do 2 rewrite <- rngl_mul_assoc.
-rewrite <- rngl_mul_add_distr_l.
-f_equal.
-assert (Hkn : k < fact n). {
-  specialize (fact_neq_0 n) as Hnz.
-  flia Hk Hnz.
-}
-specialize (permut_surjective Hkn Hi) as Hp.
-destruct Hp as (p & Hp & Hpp).
-rewrite (rngl_product_split _ (p + 1)); [ | flia Hp ].
-rewrite rngl_product_split_last; [ | flia ].
-erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
-  intros j Hj.
-  replace (j - 1 - 1) with (j - 2) by flia.
-  destruct (Nat.eq_dec (vect_el (permut n k) (j - 2)) i) as [Hpj| Hpj]. {
-    exfalso.
-    rewrite <- Hpp in Hpj.
-    apply permut_injective in Hpj; [ | easy | flia Hp Hj | easy ].
-    flia Hj Hpj.
-  }
-  easy.
-}
-rewrite (rngl_mul_comm (iter_seq _ _ _ _)).
-rewrite rngl_add_comm.
-rewrite (rngl_product_split _ (p + 1)); [ | flia Hp ].
-rewrite rngl_product_split_last; [ | flia ].
-erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
-  intros j Hj.
-  replace (j - 1 - 1) with (j - 2) by flia.
-  destruct (Nat.eq_dec (vect_el (permut n k) (j - 2)) i) as [Hpj| Hpj]. {
-    exfalso.
-    rewrite <- Hpp in Hpj.
-    apply permut_injective in Hpj; [ | easy | flia Hp Hj | easy ].
-    flia Hj Hpj.
-  }
-  easy.
-}
-rewrite (rngl_mul_comm (iter_seq _ _ _ _)).
-rewrite rngl_add_comm.
-symmetry.
-rewrite (rngl_product_split _ (p + 1)); [ | flia Hp ].
-rewrite rngl_product_split_last; [ | flia ].
-erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
-  intros j Hj.
-  replace (j - 1 - 1) with (j - 2) by flia.
-  destruct (Nat.eq_dec (vect_el (permut n k) (j - 2)) i) as [Hpj| Hpj]. {
-    exfalso.
-    rewrite <- Hpp in Hpj.
-    apply permut_injective in Hpj; [ | easy | flia Hp Hj | easy ].
-    flia Hj Hpj.
-  }
-  easy.
-}
-rewrite (rngl_mul_comm (iter_seq _ _ _ _)).
-rewrite Nat.add_sub.
-rewrite Hpp.
-destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
-do 4 rewrite rngl_mul_assoc.
-remember
-  (Π (i0 = 2, p + 1),
-   mat_el M (i0 - 2) (vect_el (permut n k) (i0 - 2)%nat))%F
-  as q eqn:Hq.
-rewrite (rngl_mul_mul_swap Hic _ _ q).
-do 3 rewrite (rngl_mul_comm _ q).
-do 5 rewrite <- rngl_mul_assoc.
-rewrite <- rngl_mul_add_distr_l.
-f_equal.
-clear q Hq.
-erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
-  intros j Hj.
-  destruct (Nat.eq_dec (vect_el (permut n k) (j - 1)) i) as [Hpj| Hpj]. {
-    rewrite <- Hpp in Hpj.
-    apply permut_injective in Hpj; [ | easy | flia Hp Hj | easy ].
-    flia Hj Hpj.
-  }
-  easy.
-}
-symmetry.
-erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
-  intros j Hj.
-  destruct (Nat.eq_dec (vect_el (permut n k) (j - 1)) i) as [Hpj| Hpj]. {
-    rewrite <- Hpp in Hpj.
-    apply permut_injective in Hpj; [ | easy | flia Hp Hj | easy ].
-    flia Hj Hpj.
-  }
-  easy.
-}
-rewrite rngl_add_comm.
-erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
-  intros j Hj.
-  destruct (Nat.eq_dec (vect_el (permut n k) (j - 1)) i) as [Hpj| Hpj]. {
-    rewrite <- Hpp in Hpj.
-    apply permut_injective in Hpj; [ | easy | flia Hp Hj | easy ].
-    flia Hj Hpj.
-  }
-  easy.
-}
-cbn - [ iter_seq ].
-rewrite rngl_add_comm.
-do 2 rewrite rngl_mul_assoc.
-now rewrite <- rngl_mul_add_distr_r.
-Qed.
+Definition swap_in_permut n i j k := vect_swap_elem (permut n k) i j.
+
+(*
+Compute (map (λ i, list_of_vect (permut_swap_last 0 1 3 i)) (seq 0 (fact 3))).
+Compute (map (λ i, list_of_vect (permut_swap_last 0 2 3 i)) (seq 0 (fact 3))).
+Compute (map (λ i, list_of_vect (permut_swap_last 1 2 3 i)) (seq 0 (fact 3))).
+Compute (map (λ i, list_of_vect (permut_swap_last 0 1 6 i)) (seq 0 (fact 6))).
+*)
 
 (* yet another definition of determinant *)
 
@@ -856,25 +1173,6 @@ rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
 now rewrite Nat.add_0_l.
 Qed.
-
-Definition permut_swap_with_0 p n k :=
-  vect_swap_elem (permut n k) 0 p.
-
-Compute (map (λ i, list_of_vect (permut_swap_with_0 0 3 i)) (seq 0 (fact 3))).
-Compute (map (λ i, list_of_vect (permut_swap_with_0 1 3 i)) (seq 0 (fact 3))).
-Compute (map (λ i, list_of_vect (permut_swap_with_0 2 3 i)) (seq 0 (fact 3))).
-
-(* k' such that permut_swap_with_0 p n k = permut n k' *)
-
-Definition permut_nth_of_swap_with_0 (p n k : nat) :=
-  nat_of_permut (permut_swap_with_0 p n k).
-
-Compute (map (λ i, nat_of_permut (permut 3 i)) (seq 0 (fact 3))).
-Compute (map (λ i, nat_of_permut (permut_swap_with_0 1 3 i)) (seq 0 (fact 3))).
-
-Compute (map (λ i, list_of_vect (permut 3 (permut_nth_of_swap_with_0 0 3 i))) (seq 0 (fact 3))).
-Compute (map (λ i, list_of_vect (permut 3 (permut_nth_of_swap_with_0 1 3 i))) (seq 0 (fact 3))).
-Compute (map (λ i, list_of_vect (permut 3 (permut_nth_of_swap_with_0 2 3 i))) (seq 0 (fact 3))).
 
 ...
 
