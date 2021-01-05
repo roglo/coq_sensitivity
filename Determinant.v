@@ -605,19 +605,52 @@ apply Nat.leb_le in Hb.
 flia Hb Hc.
 Qed.
 
+(*
 Theorem glop : ∀ n (v : vector n nat),
-  (∀ i, i < S n → vect_el v i < S n)
-  → (∀ i j, i < S n → j < S n → vect_el v i ≠ vect_el v j)
-  → nat_of_permut (nat_of_permut_sub_vect v n) < fact n.
+  (∀ i, i < S n → vect_el v i < n)
+  → (∀ i j, i < n → j < n → vect_el v i ≠ vect_el v j)
+  → nat_of_permut v < fact n.
 Proof.
 intros * Hvn Hn.
 revert v Hvn Hn.
 induction n; intros; [ cbn; flia | ].
 cbn - [ fact "<?" ].
-Abort. (*
+Print nat_of_permut_sub_vect.
+...
 specialize (IHn (nat_of_permut_sub_vect v (S n))) as H1.
 ...
 *)
+
+Theorem Nat_b2n_upper_bound : ∀ b, Nat.b2n b ≤ 1.
+Proof.
+intros; destruct b; cbn; flia.
+Qed.
+
+Theorem vect_el_nat_of_permut_ub : ∀ n (v : vector (S n) nat) i,
+  (∀ i, i < S n → vect_el v i < S n)
+  → (∀ i j, i < S n → j < S n → vect_el v i ≠ vect_el v j)
+  → i < n
+  → vect_el (nat_of_permut_sub_vect v n) i < n.
+Proof.
+intros * Hvn Hn Hin.
+revert v i Hvn Hn Hin.
+induction n; intros; [ easy | ].
+cbn - [ "<?" ].
+remember (vect_el v 0 <? vect_el v (S i)) as b eqn:Hb.
+symmetry in Hb.
+specialize (Hvn (S i)) as H1.
+assert (H : S i < S (S n)) by flia Hin.
+specialize (H1 H); clear H.
+destruct b; cbn; [ flia H1 | ].
+rewrite Nat.sub_0_r.
+destruct (Nat.eq_dec (vect_el v (S i)) (S n)) as [Hvi| Hvi]; [ | flia H1 Hvi ].
+specialize (Hvn 0 (Nat.lt_0_succ _)) as H2.
+apply Nat.ltb_ge in Hb.
+specialize (Hn 0 (S i) (Nat.lt_0_succ _)) as H3.
+assert (H : S i < S (S n)) by flia Hin.
+specialize (H3 H); clear H.
+flia Hb H1 Hvi H2 H3.
+Qed.
 
 Theorem nat_of_permut_upper_bound : ∀ n (v : vector n nat),
   (∀ i, i < n → vect_el v i < n)
@@ -627,8 +660,37 @@ Proof.
 intros * Hvn Hn.
 revert v Hvn Hn.
 induction n; intros; [ cbn; flia | ].
+cbn.
+rewrite Nat.add_comm.
+apply Nat.add_lt_le_mono. {
+  apply IHn. {
+    intros i Hi.
+    now apply vect_el_nat_of_permut_ub.
+  } {
+    intros i j Hi Hj.
+...
+apply Nat.add_lt_le_mono. 2: {
+  apply Nat.mul_le_mono_r.
+  specialize (Hvn 0 (Nat.lt_0_succ _)).
+  flia Hvn.
+}
+apply IHn. {
+  intros i Hi.
+  clear - Hi Hvn.
+  induction n; [ easy | ].
+  cbn - [ "<?" ].
+  specialize (Hvn (S i)).
+  assert (H : S i < S (S n)) by flia Hi.
+  specialize (Hvn H); clear H.
+...
+  specialize (Nat_b2n_upper_bound (vect_el v 0 <? vect_el v (S i))) as H1.
+Search (Nat.b2n _ ≤ _).
+specialize (Nat
+...
+  assert (H : Nat.b2n  ≤ 1).
+...
 cbn - [ fact ].
-Abort. (*
+...
 specialize (IHn (nat_of_permut_sub_vect v n)) as H1.
 assert (H : ∀ i, i < n → vect_el (nat_of_permut_sub_vect v n) i < n). {
   intros * Hin.
@@ -661,6 +723,9 @@ destruct j. {
   rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
   rewrite <- Nat.add_0_r; f_equal.
   apply Nat.div_small.
+Print nat_of_permut_sub_vect.
+Print nat_of_permut.
+...
   clear IHn Hj.
   revert v Hvn Hn.
   induction n; intros; [ cbn; flia | ].
