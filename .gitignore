@@ -1,4 +1,5 @@
 *.aux
+*.bak
 *.glob
 .lia.cache
 *.vo
