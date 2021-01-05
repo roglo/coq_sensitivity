@@ -763,7 +763,58 @@ remember (vect_el v 0 <=? vect_el (permut n k) j) as b eqn:Hb.
 symmetry in Hb.
 destruct b. {
   apply Nat.leb_le in Hb; cbn.
-Print nat_of_permut_sub_vect.
+  rewrite <- Hk in Hb |-*.
+  assert (H1 : ∀ i, i < n → vect_el (nat_of_permut_sub_vect v n) i < n). {
+    intros i Hi.
+    now apply vect_el_nat_of_permut_ub.
+  }
+  assert
+    (H2 : ∀ i j : nat,
+     i < n
+     → j < n
+     → vect_el (nat_of_permut_sub_vect v n) i ≠
+       vect_el (nat_of_permut_sub_vect v n) j). {
+    intros i m Hi Hm.
+    now apply vect_el_nat_of_permut_diff.
+  }
+  rewrite IHn in Hb |-*; [ | easy | easy | easy | easy ].
+  cbn - [ "<?" ] in Hb |-*.
+  remember (vect_el v 0 <? vect_el v (S j)) as b1 eqn:Hb1.
+  symmetry in Hb1.
+  destruct b1. {
+    apply Nat.ltb_lt in Hb1; cbn.
+    apply Nat.sub_add; flia Hb1.
+  } {
+    apply Nat.ltb_ge in Hb1; exfalso.
+    cbn in Hb.
+    rewrite Nat.sub_0_r in Hb.
+    apply (Hn 0 (S j) (Nat.lt_0_succ _) Hj).
+    now apply Nat.le_antisymm.
+  }
+} {
+  apply Nat.leb_gt in Hb; cbn.
+  rewrite Nat.add_0_r.
+  rewrite <- Hk in Hb |-*.
+  rewrite IHn in Hb |-*; [ | | | | ].
+  cbn - [ "<?" ] in Hb; exfalso.
+  remember (vect_el v 0 <? vect_el v (S j)) as b1 eqn:Hb1.
+  symmetry in Hb1.
+  destruct b1. {
+    apply Nat.ltb_lt in Hb1; cbn in Hb |-*.
+    flia Hb1 Hb.
+  } {
+    apply Nat.ltb_ge in Hb1.
+    cbn in Hb.
+    rewrite Nat.sub_0_r in Hb.
+...
+    apply (Hn 0 (S j) (Nat.lt_0_succ _) Hj).
+    now apply Nat.le_antisymm.
+  }
+...
+      rewrite <- Hk in Hb.
+      rewrite IHn in Hb. {
+        cbn - [ "<?" ] in Hb.
+        remember (vect_el v 0 <? vect_el v (S j))
 ...
   specialize (IHn (nat_of_permut_sub_vect v n)) as H1.
   rewrite Hk in H1.
