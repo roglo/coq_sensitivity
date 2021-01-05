@@ -633,23 +633,65 @@ Theorem vect_el_nat_of_permut_ub : ∀ n (v : vector (S n) nat) i,
   → vect_el (nat_of_permut_sub_vect v n) i < n.
 Proof.
 intros * Hvn Hn Hin.
-revert v i Hvn Hn Hin.
-induction n; intros; [ easy | ].
+destruct n; [ easy | ].
 cbn - [ "<?" ].
 remember (vect_el v 0 <? vect_el v (S i)) as b eqn:Hb.
 symmetry in Hb.
 specialize (Hvn (S i)) as H1.
+specialize (Hn 0 (S i) (Nat.lt_0_succ _)) as H2.
 assert (H : S i < S (S n)) by flia Hin.
-specialize (H1 H); clear H.
+specialize (H1 H); specialize (H2 H); clear H.
 destruct b; cbn; [ flia H1 | ].
 rewrite Nat.sub_0_r.
-destruct (Nat.eq_dec (vect_el v (S i)) (S n)) as [Hvi| Hvi]; [ | flia H1 Hvi ].
-specialize (Hvn 0 (Nat.lt_0_succ _)) as H2.
 apply Nat.ltb_ge in Hb.
-specialize (Hn 0 (S i) (Nat.lt_0_succ _)) as H3.
-assert (H : S i < S (S n)) by flia Hin.
-specialize (H3 H); clear H.
-flia Hb H1 Hvi H2 H3.
+destruct (Nat.eq_dec (vect_el v (S i)) (S n)) as [Hvi| Hvi]; [ | flia H1 Hvi ].
+specialize (Hvn 0 (Nat.lt_0_succ _)) as H3.
+flia Hb H1 H2 H3 Hvi.
+Qed.
+
+Theorem vect_el_nat_of_permut_diff : ∀ n (v : vector (S n) nat) i j,
+  (∀ i, i < S n → vect_el v i < S n)
+  → (∀ i j, i < S n → j < S n → vect_el v i ≠ vect_el v j)
+  → i < n
+  → j < n
+  → vect_el (nat_of_permut_sub_vect v n) i ≠ vect_el (nat_of_permut_sub_vect v n) j.
+Proof.
+intros * Hvn Hn Hin Hjn.
+destruct n; [ easy | ].
+cbn - [ "<?" ].
+remember (vect_el v 0 <? vect_el v (S i)) as bi eqn:Hbi.
+remember (vect_el v 0 <? vect_el v (S j)) as bj eqn:Hbj.
+symmetry in Hbi, Hbj.
+move bj before bi.
+destruct bi; cbn. {
+  apply Nat.ltb_lt in Hbi.
+  destruct bj; cbn. {
+    apply Nat.ltb_lt in Hbj.
+    apply Nat.succ_lt_mono in Hin.
+    apply Nat.succ_lt_mono in Hjn.
+    specialize (Hn (S i) (S j) Hin Hjn) as Hs.
+    flia Hbi Hbj Hs.
+  } {
+    apply Nat.ltb_ge in Hbj.
+    apply Nat.succ_lt_mono in Hjn.
+    specialize (Hn 0 (S j) (Nat.lt_0_succ _) Hjn) as H1.
+    flia Hbi Hbj H1.
+  }
+} {
+  apply Nat.ltb_ge in Hbi.
+  destruct bj; cbn. {
+    apply Nat.ltb_lt in Hbj.
+    apply Nat.succ_lt_mono in Hin.
+    specialize (Hn 0 (S i) (Nat.lt_0_succ _) Hin) as H1.
+    flia Hbi Hbj H1.
+  } {
+    apply Nat.ltb_ge in Hbj.
+    apply Nat.succ_lt_mono in Hin.
+    apply Nat.succ_lt_mono in Hjn.
+    specialize (Hn (S i) (S j) Hin Hjn) as Hs.
+    flia Hbi Hbj Hs.
+  }
+}
 Qed.
 
 Theorem nat_of_permut_upper_bound : ∀ n (v : vector n nat),
@@ -668,44 +710,13 @@ apply Nat.add_lt_le_mono. {
     now apply vect_el_nat_of_permut_ub.
   } {
     intros i j Hi Hj.
-...
-apply Nat.add_lt_le_mono. 2: {
-  apply Nat.mul_le_mono_r.
-  specialize (Hvn 0 (Nat.lt_0_succ _)).
-  flia Hvn.
+    now apply vect_el_nat_of_permut_diff.
+  }
 }
-apply IHn. {
-  intros i Hi.
-  clear - Hi Hvn.
-  induction n; [ easy | ].
-  cbn - [ "<?" ].
-  specialize (Hvn (S i)).
-  assert (H : S i < S (S n)) by flia Hi.
-  specialize (Hvn H); clear H.
-...
-  specialize (Nat_b2n_upper_bound (vect_el v 0 <? vect_el v (S i))) as H1.
-Search (Nat.b2n _ ≤ _).
-specialize (Nat
-...
-  assert (H : Nat.b2n  ≤ 1).
-...
-cbn - [ fact ].
-...
-specialize (IHn (nat_of_permut_sub_vect v n)) as H1.
-assert (H : ∀ i, i < n → vect_el (nat_of_permut_sub_vect v n) i < n). {
-  intros * Hin.
-  cbn - [ "<?" ].
-  specialize (Hvn (S i)).
-  assert (H : S i < S n) by flia Hin.
-  specialize (Hvn H); clear H.
-  apply Nat.succ_le_mono in Hvn.
-  eapply lt_le_trans; [ | apply Hvn ].
-...
-specialize (H1 H); clear H.
-...
-  etransitivity; [ | apply Hvn ].
-...
-*)
+apply Nat.mul_le_mono_r.
+specialize (Hvn 0 (Nat.lt_0_succ _)).
+flia Hvn.
+Qed.
 
 Theorem permut_nat_of_permut : ∀ n v,
   (∀ i, i < n → vect_el v i < n)
@@ -716,15 +727,42 @@ intros * Hvn Hn.
 revert v Hvn Hn.
 induction n; intros; [ now apply vector_eq | ].
 apply vector_eq.
-intros j Hj.
-cbn.
+intros j Hj; cbn.
 destruct j. {
-  cbn.
+  cbn; clear Hj.
   rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
   rewrite <- Nat.add_0_r; f_equal.
   apply Nat.div_small.
-Print nat_of_permut_sub_vect.
-Print nat_of_permut.
+  apply nat_of_permut_upper_bound. {
+    intros i Hi.
+    now apply vect_el_nat_of_permut_ub.
+  } {
+    intros i j Hi Hj.
+    now apply vect_el_nat_of_permut_diff.
+  }
+}
+cbn.
+remember (nat_of_permut (nat_of_permut_sub_vect v n)) as k eqn:Hk.
+symmetry in Hk.
+rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
+rewrite Nat_mod_add_l_mul_r; [ | apply fact_neq_0 ].
+assert (Hkn : k < fact n). {
+  rewrite <- Hk.
+  apply nat_of_permut_upper_bound. {
+    intros i Hi.
+    now apply vect_el_nat_of_permut_ub.
+  } {
+    intros i m Hi Hm.
+    now apply vect_el_nat_of_permut_diff.
+  }
+}
+rewrite Nat.div_small; [ | easy ].
+rewrite Nat.mod_small; [ | easy ].
+rewrite Nat.add_0_r.
+remember (vect_el v 0 <=? vect_el (permut n k) j) as b eqn:Hb.
+symmetry in Hb.
+destruct b. {
+  apply Nat.leb_le in Hb; cbn.
 ...
   clear IHn Hj.
   revert v Hvn Hn.
