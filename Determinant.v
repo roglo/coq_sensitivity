@@ -558,53 +558,6 @@ Fixpoint nat_of_permut n (v : vector n nat) : nat :=
       nat_of_permut (nat_of_permut_sub_vect v n')
   end.
 
-Theorem nat_of_permut_permut : ∀ n k,
-  k < fact n
-  → nat_of_permut (permut n k) = k.
-Proof.
-intros * Hkn.
-revert k Hkn.
-induction n; intros; [ now apply Nat.lt_1_r in Hkn | cbn ].
-specialize (Nat.div_mod k (fact n) (fact_neq_0 _)) as H1.
-rewrite Nat.mul_comm in H1.
-replace (k / fact n * fact n) with (k - k mod fact n) by flia H1.
-rewrite <- Nat.add_sub_swap; [ | apply Nat.mod_le, fact_neq_0 ].
-apply Nat.add_sub_eq_r; f_equal.
-clear H1.
-rewrite <- (IHn (k mod fact n)) at 1. 2: {
-  apply Nat.mod_upper_bound, fact_neq_0.
-}
-f_equal.
-apply vector_eq.
-intros i Hi; cbn.
-symmetry.
-apply Nat.add_sub_eq_r.
-f_equal.
-remember (Nat.b2n (_ <=? _)) as b eqn:Hb.
-rewrite Nat.add_comm.
-symmetry in Hb.
-destruct b. 2: {
-  cbn.
-  destruct b; [ easy | exfalso ].
-  unfold Nat.b2n in Hb.
-  destruct (k / fact n <=? _); flia Hb.
-}
-cbn.
-remember (vect_el (permut n _) i) as x eqn:Hx.
-symmetry in Hx.
-destruct x; [ easy | ].
-unfold Nat.b2n in Hb |-*.
-remember (k / fact n) as y eqn:Hy; symmetry in Hy.
-remember (y <=? S x) as c eqn:Hc; symmetry in Hc.
-destruct c; [ easy | clear Hb ].
-apply Nat.leb_gt in Hc.
-remember (y <=? x) as b eqn:Hb.
-symmetry in Hb.
-destruct b; [ | easy ].
-apply Nat.leb_le in Hb.
-flia Hb Hc.
-Qed.
-
 (*
 Theorem glop : ∀ n (v : vector n nat),
   (∀ i, i < S n → vect_el v i < n)
@@ -718,6 +671,53 @@ specialize (Hvn 0 (Nat.lt_0_succ _)).
 flia Hvn.
 Qed.
 
+Theorem nat_of_permut_permut : ∀ n k,
+  k < fact n
+  → nat_of_permut (permut n k) = k.
+Proof.
+intros * Hkn.
+revert k Hkn.
+induction n; intros; [ now apply Nat.lt_1_r in Hkn | cbn ].
+specialize (Nat.div_mod k (fact n) (fact_neq_0 _)) as H1.
+rewrite Nat.mul_comm in H1.
+replace (k / fact n * fact n) with (k - k mod fact n) by flia H1.
+rewrite <- Nat.add_sub_swap; [ | apply Nat.mod_le, fact_neq_0 ].
+apply Nat.add_sub_eq_r; f_equal.
+clear H1.
+rewrite <- (IHn (k mod fact n)) at 1. 2: {
+  apply Nat.mod_upper_bound, fact_neq_0.
+}
+f_equal.
+apply vector_eq.
+intros i Hi; cbn.
+symmetry.
+apply Nat.add_sub_eq_r.
+f_equal.
+remember (Nat.b2n (_ <=? _)) as b eqn:Hb.
+rewrite Nat.add_comm.
+symmetry in Hb.
+destruct b. 2: {
+  cbn.
+  destruct b; [ easy | exfalso ].
+  unfold Nat.b2n in Hb.
+  destruct (k / fact n <=? _); flia Hb.
+}
+cbn.
+remember (vect_el (permut n _) i) as x eqn:Hx.
+symmetry in Hx.
+destruct x; [ easy | ].
+unfold Nat.b2n in Hb |-*.
+remember (k / fact n) as y eqn:Hy; symmetry in Hy.
+remember (y <=? S x) as c eqn:Hc; symmetry in Hc.
+destruct c; [ easy | clear Hb ].
+apply Nat.leb_gt in Hc.
+remember (y <=? x) as b eqn:Hb.
+symmetry in Hb.
+destruct b; [ | easy ].
+apply Nat.leb_le in Hb.
+flia Hb Hc.
+Qed.
+
 Theorem permut_nat_of_permut : ∀ n v,
   (∀ i, i < n → vect_el v i < n)
   → (∀ i j, i < n → j < n → vect_el v i ≠ vect_el v j)
@@ -761,22 +761,22 @@ rewrite Nat.mod_small; [ | easy ].
 rewrite Nat.add_0_r.
 remember (vect_el v 0 <=? vect_el (permut n k) j) as b eqn:Hb.
 symmetry in Hb.
+assert (H1 : ∀ i, i < n → vect_el (nat_of_permut_sub_vect v n) i < n). {
+  intros i Hi.
+  now apply vect_el_nat_of_permut_ub.
+}
+assert
+(H2 : ∀ i j : nat,
+    i < n
+    → j < n
+    → vect_el (nat_of_permut_sub_vect v n) i ≠
+      vect_el (nat_of_permut_sub_vect v n) j). {
+  intros i m Hi Hm.
+  now apply vect_el_nat_of_permut_diff.
+}
 destruct b. {
   apply Nat.leb_le in Hb; cbn.
   rewrite <- Hk in Hb |-*.
-  assert (H1 : ∀ i, i < n → vect_el (nat_of_permut_sub_vect v n) i < n). {
-    intros i Hi.
-    now apply vect_el_nat_of_permut_ub.
-  }
-  assert
-    (H2 : ∀ i j : nat,
-     i < n
-     → j < n
-     → vect_el (nat_of_permut_sub_vect v n) i ≠
-       vect_el (nat_of_permut_sub_vect v n) j). {
-    intros i m Hi Hm.
-    now apply vect_el_nat_of_permut_diff.
-  }
   rewrite IHn in Hb |-*; [ | easy | easy | easy | easy ].
   cbn - [ "<?" ] in Hb |-*.
   remember (vect_el v 0 <? vect_el v (S j)) as b1 eqn:Hb1.
@@ -795,111 +795,25 @@ destruct b. {
   apply Nat.leb_gt in Hb; cbn.
   rewrite Nat.add_0_r.
   rewrite <- Hk in Hb |-*.
-  rewrite IHn in Hb |-*; [ | | | | ].
-  cbn - [ "<?" ] in Hb; exfalso.
+(**)
   remember (vect_el v 0 <? vect_el v (S j)) as b1 eqn:Hb1.
   symmetry in Hb1.
   destruct b1. {
-    apply Nat.ltb_lt in Hb1; cbn in Hb |-*.
+    rewrite IHn in Hb; [ | easy | easy ].
+    cbn - [ "<?" ] in Hb.
+    rewrite Hb1 in Hb; cbn in Hb.
+    apply Nat.ltb_lt in Hb1.
     flia Hb1 Hb.
   } {
-    apply Nat.ltb_ge in Hb1.
-    cbn in Hb.
-    rewrite Nat.sub_0_r in Hb.
-...
-    apply (Hn 0 (S j) (Nat.lt_0_succ _) Hj).
-    now apply Nat.le_antisymm.
-  }
-...
-      rewrite <- Hk in Hb.
-      rewrite IHn in Hb. {
-        cbn - [ "<?" ] in Hb.
-        remember (vect_el v 0 <? vect_el v (S j))
-...
-  specialize (IHn (nat_of_permut_sub_vect v n)) as H1.
-  rewrite Hk in H1.
-...
-  clear IHn Hj.
-  revert v Hvn Hn.
-  induction n; intros; [ cbn; flia | ].
-(**)
-  cbn - [ "<?" ].
-  rewrite Nat.add_comm.
-  apply Nat.add_lt_le_mono. {
-...
-    apply IHn. {
-      intros i Hi.
-      cbn - [ "<?" ].
-...
-  destruct n. {
+    rewrite IHn; [ | easy | easy ].
     cbn - [ "<?" ].
-    rewrite Nat.mul_1_r, Nat.add_0_r.
-    specialize (Hvn 0 Nat.lt_0_2) as H1.
-    specialize (Hvn 1 Nat.lt_1_2) as H2.
-    specialize (Hn 0 1 Nat.lt_0_2 Nat.lt_1_2) as H3.
-    destruct (vect_el v 0) as [| v1]. {
-      destruct (vect_el v 1); [ easy | cbn; flia H2 ].
-    }
-    destruct v1; [ | flia H1 ].
-    destruct (vect_el v 1); [ cbn; flia | ].
-    flia H2 H3.
+    rewrite Hb1; cbn.
+    apply Nat.sub_0_r.
   }
-  destruct n. {
-    cbn - [ "<?" ].
-    do 2 rewrite Nat.mul_1_r.
-    rewrite Nat.add_0_r.
-    specialize (Hn 0 1 (Nat.lt_0_succ _)) as H01.
-    assert (H : 1 < 3) by flia.
-    specialize (H01 H); clear H.
-    specialize (Hn 0 2 (Nat.lt_0_succ _)) as H02.
-    assert (H : 2 < 3) by flia.
-    specialize (H02 H); clear H.
-    specialize (Hn 1 2) as H12.
-    assert (H : 1 < 3) by flia.
-    specialize (H12 H (Nat.lt_succ_diag_r _)); clear H.
-    remember (vect_el v 0) as a1 eqn:Ha1.
-    remember (vect_el v 1) as a2 eqn:Ha2.
-    remember (vect_el v 2) as a3 eqn:Ha3.
-    symmetry in Ha1, Ha2, Ha3.
-    move a2 before a1; move a3 before a2.
-    destruct a1. {
-      cbn.
-      destruct a2; [ easy | cbn ].
-      destruct a3; [ easy | cbn ].
-      do 2 rewrite Nat.sub_0_r.
-      destruct a3. {
-        cbn.
-        destruct a2; [ easy | ].
-        destruct a2; [ flia | ].
-        specialize (Hvn 1) as H1.
-        assert (H : 1 < 3) by flia.
-        specialize (H1 H); clear H.
-        rewrite Ha2 in H1.
-        flia H1.
-      }
-      destruct a3. {
-        destruct a2; [ cbn; flia | ].
-        destruct a2; [ easy | ].
-        specialize (Hvn 1) as H1.
-        assert (H : 1 < 3) by flia.
-        specialize (H1 H); clear H.
-        rewrite Ha2 in H1.
-        flia H1.
-      }
-      specialize (Hvn 2) as H1.
-      assert (H : 2 < 3) by flia.
-      specialize (H1 H); clear H.
-      rewrite Ha3 in H1.
-      flia H1.
-    }
-...
-Print nat_of_permut.
+}
+Qed.
 
-  revert v.
-  induction n; intros; [ cbn; flia | ].
-  unfold nat_of_permut_sub_vect.
-  cbn - [ fact nat_of_permut ].
-...
+Inspect 2.
 
 ...
 
