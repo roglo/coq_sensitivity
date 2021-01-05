@@ -1423,9 +1423,25 @@ Compute (map (λ i, list_of_vect (permut_swap_with_0 0 3 i)) (seq 0 (fact 3))).
 Compute (map (λ i, list_of_vect (permut_swap_with_0 1 3 i)) (seq 0 (fact 3))).
 Compute (map (λ i, list_of_vect (permut_swap_with_0 2 3 i)) (seq 0 (fact 3))).
 
+(* k such that "permut n k = v" for a given v *)
+
+Check vect_opt_eq_dec.
+...
+
+Fixpoint which_permut_loop n (v : vector n nat) k :=
+  match k with
+  | 0 => None
+  | S k' =>
+
+Definition which_permut n (v : vector n nat) :=
+
+...
+
 (* k' such that permut_swap_with_0 p n k = permut n k' *)
 
 Definition permut_nth_of_swap_with_0 (p n k : nat) :=
+  permut_inv n k (permut_swap_with_0 p n k).
+
   if Nat.eq_dec p 0 then k
   else
 ...
