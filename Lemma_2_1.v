@@ -17,7 +17,7 @@ Require Import Utf8 Arith.
 Import List List.ListNotations.
 Require Import Permutation Sorted.
 
-Require Import Misc Matrix.
+Require Import Misc Matrix Determinant.
 Require Import RingLike.
 Require Import RLsummation.
 Import matrix_Notations.
