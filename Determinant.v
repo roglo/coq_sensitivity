@@ -605,6 +605,99 @@ apply Nat.leb_le in Hb.
 flia Hb Hc.
 Qed.
 
+(* list of terms in determinant' (determinant by sum of products of
+   permutations *)
+
+Definition determinant'_list {n} (M : matrix n n T) :=
+  map (λ k,
+    (signature n k *
+     Π (i = 1, n), mat_el M (i - 1) (vect_el (permut n k) (i - 1)%nat))%F)
+    (seq 0 (fact n)).
+
+Theorem determinant'_by_list : ∀ n (M : matrix n n T),
+  determinant' M = (Σ (k = 0, fact n - 1), nth k (determinant'_list M) 0)%F.
+Proof.
+intros.
+unfold determinant', determinant'_list.
+apply rngl_summation_eq_compat; intros k Hk.
+assert (Hkn : k < fact n). {
+  specialize (fact_neq_0 n) as Hn.
+  flia Hk Hn.
+}
+rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+now rewrite Nat.add_0_l.
+Qed.
+
+Import Permutation.
+
+Theorem rngl_summation_permut : ∀ n l1 l2,
+  Permutation l1 l2
+  → length l1 = n
+  → length l2 = n
+  → (Σ (i = 0, n - 1), nth i l1 0 = Σ (i = 0, n - 1), nth i l2 0)%F.
+Proof.
+intros * Hl H1 H2.
+destruct n. {
+  apply length_zero_iff_nil in H1.
+  apply length_zero_iff_nil in H2.
+  now subst l1 l2.
+}
+rewrite Nat.sub_succ, Nat.sub_0_r.
+revert n H1 H2.
+induction Hl; intros; [ easy | | | ]. {
+  cbn in H1, H2.
+  apply Nat.succ_inj in H1.
+  apply Nat.succ_inj in H2.
+  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
+  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
+  destruct n; [ easy | ].
+  do 2 rewrite rngl_summation_succ_succ.
+  now rewrite IHHl.
+} {
+  destruct n; [ easy | ].
+  cbn in H1, H2.
+  do 2 apply Nat.succ_inj in H1.
+  do 2 apply Nat.succ_inj in H2.
+  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
+  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
+  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
+  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
+  do 2 rewrite rngl_add_assoc.
+  do 2 rewrite rngl_summation_succ_succ.
+  f_equal; [ apply rngl_add_comm | ].
+  apply rngl_summation_eq_compat.
+  intros i Hi; cbn.
+  destruct i; [ flia Hi | easy ].
+} {
+  specialize (Permutation_length Hl2) as H3.
+  rewrite H2 in H3.
+  rewrite IHHl1; [ | easy | easy ].
+  now rewrite IHHl2.
+}
+Qed.
+
+Theorem det_is_det_by_any_permut :
+  rngl_is_comm = true
+  → ∀ n (M : matrix n n T) l,
+  Permutation l (determinant'_list M)
+  → determinant M = (Σ (k = 0, fact n - 1), nth k l 0)%F.
+Proof.
+intros Hic * Hl.
+rewrite det_is_det_by_permut; [ | easy ].
+rewrite determinant'_by_list.
+apply rngl_summation_permut; [ now symmetry | | ]. {
+  unfold determinant'_list.
+  now rewrite map_length, seq_length.
+} {
+  apply Permutation_length in Hl.
+  unfold determinant'_list in Hl.
+  now rewrite map_length, seq_length in Hl.
+}
+Qed.
+
+...
+
 (* order of permutations where ranks p & q are swapped with the
    last two numbers, allowing consecutive permutations
    to have the p-th and the q-th numbers swapped; perhaps
@@ -1038,97 +1131,6 @@ intros.
 rewrite subm_subm_swap.
 unfold δ_lt.
 now destruct i, j.
-Qed.
-
-(* list of terms in determinant' (determinant by sum of products of
-   permutations *)
-
-Definition determinant'_list {n} (M : matrix n n T) :=
-  map (λ k,
-    (signature n k *
-     Π (i = 1, n), mat_el M (i - 1) (vect_el (permut n k) (i - 1)%nat))%F)
-    (seq 0 (fact n)).
-
-Theorem determinant'_by_list : ∀ n (M : matrix n n T),
-  determinant' M = (Σ (k = 0, fact n - 1), nth k (determinant'_list M) 0)%F.
-Proof.
-intros.
-unfold determinant', determinant'_list.
-apply rngl_summation_eq_compat; intros k Hk.
-assert (Hkn : k < fact n). {
-  specialize (fact_neq_0 n) as Hn.
-  flia Hk Hn.
-}
-rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
-rewrite seq_nth; [ | easy ].
-now rewrite Nat.add_0_l.
-Qed.
-
-Import Permutation.
-
-Theorem rngl_summation_permut : ∀ n l1 l2,
-  Permutation l1 l2
-  → length l1 = n
-  → length l2 = n
-  → (Σ (i = 0, n - 1), nth i l1 0 = Σ (i = 0, n - 1), nth i l2 0)%F.
-Proof.
-intros * Hl H1 H2.
-destruct n. {
-  apply length_zero_iff_nil in H1.
-  apply length_zero_iff_nil in H2.
-  now subst l1 l2.
-}
-rewrite Nat.sub_succ, Nat.sub_0_r.
-revert n H1 H2.
-induction Hl; intros; [ easy | | | ]. {
-  cbn in H1, H2.
-  apply Nat.succ_inj in H1.
-  apply Nat.succ_inj in H2.
-  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
-  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
-  destruct n; [ easy | ].
-  do 2 rewrite rngl_summation_succ_succ.
-  now rewrite IHHl.
-} {
-  destruct n; [ easy | ].
-  cbn in H1, H2.
-  do 2 apply Nat.succ_inj in H1.
-  do 2 apply Nat.succ_inj in H2.
-  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
-  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
-  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
-  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
-  do 2 rewrite rngl_add_assoc.
-  do 2 rewrite rngl_summation_succ_succ.
-  f_equal; [ apply rngl_add_comm | ].
-  apply rngl_summation_eq_compat.
-  intros i Hi; cbn.
-  destruct i; [ flia Hi | easy ].
-} {
-  specialize (Permutation_length Hl2) as H3.
-  rewrite H2 in H3.
-  rewrite IHHl1; [ | easy | easy ].
-  now rewrite IHHl2.
-}
-Qed.
-
-Theorem det_is_det_by_any_permut :
-  rngl_is_comm = true
-  → ∀ n (M : matrix n n T) l,
-  Permutation l (determinant'_list M)
-  → determinant M = (Σ (k = 0, fact n - 1), nth k l 0)%F.
-Proof.
-intros Hic * Hl.
-rewrite det_is_det_by_permut; [ | easy ].
-rewrite determinant'_by_list.
-apply rngl_summation_permut; [ now symmetry | | ]. {
-  unfold determinant'_list.
-  now rewrite map_length, seq_length.
-} {
-  apply Permutation_length in Hl.
-  unfold determinant'_list in Hl.
-  now rewrite map_length, seq_length in Hl.
-}
 Qed.
 
 (*
