@@ -70,12 +70,12 @@ Definition det_from_col {n} (M : matrix n n T) j :=
      final result: 2;0;3;1
   *)
 
-Definition permut_succ_vect_fun {n} (σ_n : nat → vector n nat) i j :=
+Definition permut_succ_vect_fun {n} (σ_n : nat → vector n nat) k j :=
   match j with
-  | 0 => i / fact n
+  | 0 => k / fact n
   | S j' =>
-      vect_el (σ_n (i mod fact n)) j' +
-      Nat.b2n (i / fact n <=? vect_el (σ_n (i mod fact n)) j')
+      vect_el (σ_n (k mod fact n)) j' +
+      Nat.b2n (k / fact n <=? vect_el (σ_n (k mod fact n)) j')
   end.
 
 Fixpoint permut n k : vector n nat :=
@@ -612,9 +612,31 @@ intros.
 revert v.
 induction n; intros; [ now apply vector_eq | ].
 apply vector_eq.
-intros i Hi.
+intros j Hj.
 cbn.
-Print permut_succ_vect_fun.
+destruct j. {
+  cbn.
+  rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
+  rewrite <- Nat.add_0_r; f_equal.
+  apply Nat.div_small.
+  clear IHn Hj.
+Theorem nat_of_permut_upper_bound : ∀ n (v : vector n nat),
+  (∀ i, i < n → vect_el v i < n)
+  → nat_of_permut v < fact n.
+Proof.
+intros * Hvn.
+revert v Hvn.
+induction n; intros; [ cbn; flia | ].
+Print nat_of_permut.
+...
+Print nat_of_permut.
+
+  revert v.
+  induction n; intros; [ cbn; flia | ].
+  unfold nat_of_permut_sub_vect.
+  cbn - [ fact nat_of_permut ].
+...
+
 ...
 
 (* list of terms in determinant' (determinant by sum of products of
