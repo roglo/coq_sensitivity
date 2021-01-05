@@ -605,11 +605,37 @@ apply Nat.leb_le in Hb.
 flia Hb Hc.
 Qed.
 
-Theorem permut_nat_of_permut : ∀ n v,
-  permut n (nat_of_permut v) = v.
+Theorem nat_of_permut_upper_bound : ∀ n (v : vector n nat),
+  (∀ i, i < n → vect_el v i < n)
+  → nat_of_permut v < fact n.
 Proof.
-intros.
-revert v.
+intros * Hvn.
+revert v Hvn.
+induction n; intros; [ cbn; flia | ].
+cbn - [ fact ].
+specialize (IHn (nat_of_permut_sub_vect v n)) as H1.
+assert (H : ∀ i, i < n → vect_el (nat_of_permut_sub_vect v n) i < n). {
+  intros * Hin.
+  cbn - [ "<?" ].
+  specialize (Hvn (S i)).
+  assert (H : S i < S n) by flia Hin.
+  specialize (Hvn H); clear H.
+  apply Nat.succ_le_mono in Hvn.
+  eapply lt_le_trans; [ | apply Hvn ].
+Abort. (*
+}
+specialize (H1 H); clear H.
+...
+  etransitivity; [ | apply Hvn ].
+...
+*)
+
+Theorem permut_nat_of_permut : ∀ n v,
+  (∀ i, i < n → vect_el v i < n)
+  → permut n (nat_of_permut v) = v.
+Proof.
+intros * Hvn.
+revert v Hvn.
 induction n; intros; [ now apply vector_eq | ].
 apply vector_eq.
 intros j Hj.
@@ -620,14 +646,10 @@ destruct j. {
   rewrite <- Nat.add_0_r; f_equal.
   apply Nat.div_small.
   clear IHn Hj.
-Theorem nat_of_permut_upper_bound : ∀ n (v : vector n nat),
-  (∀ i, i < n → vect_el v i < n)
-  → nat_of_permut v < fact n.
-Proof.
-intros * Hvn.
-revert v Hvn.
-induction n; intros; [ cbn; flia | ].
-Print nat_of_permut.
+  destruct n; [ cbn; flia | ].
+  destruct n. {
+    cbn - [ "<?" ].
+    rewrite Nat.mul_1_r, Nat.add_0_r.
 ...
 Print nat_of_permut.
 
