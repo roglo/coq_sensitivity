@@ -1209,7 +1209,8 @@ apply NoDup_Permutation_bis; cycle 1. {
              (nat_of_permut_sub_vect
                 (vect_swap_elem (permut (S n) y) p (n - 1)) n))
           as x eqn:Hx.
-        move x after y.
+        move x after y; move Hx after Hy.
+Print signature.
 ...
   destruct (lt_dec q (n - 1)) as [Hqn1| Hqn1]. {
     exists (nat_of_permut (permut_swap_last p q n y)).
