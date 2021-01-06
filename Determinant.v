@@ -70,7 +70,7 @@ Definition det_from_col {n} (M : matrix n n T) j :=
      final result: 2;0;3;1
   *)
 
-Definition permut_succ_vect_fun {n} (σ_n : nat → vector n nat) k j :=
+Definition permut_fun {n} (σ_n : nat → vector n nat) k j :=
   match j with
   | 0 => k / fact n
   | S j' =>
@@ -81,7 +81,7 @@ Definition permut_succ_vect_fun {n} (σ_n : nat → vector n nat) k j :=
 Fixpoint permut n k : vector n nat :=
   match n with
   | 0 => mk_vect 0 (λ _, 0)
-  | S n' => mk_vect (S n') (permut_succ_vect_fun (permut n') k)
+  | S n' => mk_vect (S n') (permut_fun (permut n') k)
   end.
 
 Fixpoint permut_inv n k (j : nat) :=
@@ -985,7 +985,7 @@ Proof.
 intros * Hkn Hin.
 revert k i Hkn Hin.
 induction n; intros; [ easy | cbn ].
-unfold permut_succ_vect_fun.
+unfold permut_fun.
 destruct i. {
   rewrite Nat_fact_succ, Nat.mul_comm in Hkn.
   apply Nat.div_lt_upper_bound; [ | easy ].
@@ -1245,7 +1245,7 @@ apply NoDup_Permutation_bis; cycle 1. {
 ...
 destruct n; [ easy | ].
 cbn.
-Search (permut_succ_vect_fun _ _ _ ≠ _).
+Search (permut_fun _ _ _ ≠ _).
 Search (vect_el _ _ = vect_el _ _).
 apply vect_el_nat_of_permut_diff.
 ...
