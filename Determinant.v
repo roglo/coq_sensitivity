@@ -1085,7 +1085,44 @@ destruct (Nat.eq_dec j q) as [H1| H1]. {
     destruct (Nat.eq_dec (n - 1) p) as [H4| H4]; [ now subst j | ].
     destruct (Nat.eq_dec (n - 1) (n - 2)) as [H5| H5]; [ now subst j | easy ].
   }
-...
+  destruct (Nat.eq_dec j (n - 1)) as [H3| H3]. {
+    subst j.
+    destruct (Nat.eq_dec q p) as [H| H]; [ subst q; flia Hpq | clear H ].
+    destruct (Nat.eq_dec k (n - 1)) as [H| H]; [ now subst k | clear H ].
+    destruct (Nat.eq_dec q (n - 2)) as [H3| H3]. {
+      subst q.
+      destruct (Nat.eq_dec k p) as [H3| H3]; [ now subst k p | ].
+      now destruct (Nat.eq_dec k (n - 2)); subst k.
+    }
+    destruct (Nat.eq_dec k p) as [H4| H4]; [ now subst k | ].
+    destruct (Nat.eq_dec k (n - 2)) as [H5| H5]; [ subst k q; flia Hpq  | ].
+    now subst k.
+  }
+  destruct (Nat.eq_dec k (n - 1)) as [H4| H4]; [ subst k | ]. {
+    destruct (Nat.eq_dec j p) as [H4| H4]; [ subst j | ]. {
+      destruct (Nat.eq_dec q p) as [H5| H5]; [ now subst q | ].
+      now destruct (Nat.eq_dec q (n - 2)); subst q.
+    }
+    destruct (Nat.eq_dec q p) as [H5| H5]; [ subst q; flia Hpq | ].
+    destruct (Nat.eq_dec j (n - 2)) as [H6| H6]; [ subst j | ]. {
+      now destruct (Nat.eq_dec q (n - 2)); subst q.
+    }
+    now destruct (Nat.eq_dec q (n - 2)); subst q.
+  }
+  destruct (Nat.eq_dec j p) as [H5| H5]; [ subst j | ]. {
+    destruct (Nat.eq_dec k p) as [H5| H5]; [ now subst k | ].
+    destruct (Nat.eq_dec k (n - 2)) as [H6| H6]; [ now subst k | ].
+    now subst k.
+  }
+  destruct (Nat.eq_dec k p) as [H6| H6]; [ subst k | ]. {
+    destruct (Nat.eq_dec j (n - 2)) as [H6| H6]; [ now subst p | easy ].
+  }
+  destruct (Nat.eq_dec j (n - 2)) as [H7| H7]; [ subst j | ]. {
+    now destruct (Nat.eq_dec k (n - 2)); subst k.
+  }
+  now destruct (Nat.eq_dec k (n - 2)); subst k.
+}
+Qed.
 
 Theorem determinant'_determinant''_permut : ∀ n p q (M : matrix n n T),
   p < q < n
@@ -1135,94 +1172,9 @@ apply NoDup_Permutation_bis; cycle 1. {
         unfold vect_swap_elem; cbn.
         intros Hjke.
         apply permut_injective in Hjke; [ | easy | | ]. {
-...
-          unfold swap_nat in Hjke.
-          destruct (Nat.eq_dec j q) as [H1| H1]. {
-            subst j; clear Hj.
-            destruct (Nat.eq_dec k q) as [H1| H1]; [ now subst k | ].
-            clear H1.
-            destruct (Nat.eq_dec (n - 1) p) as [H1| H1]. {
-              subst p; flia Hpq Hqn.
-            }
-            destruct (Nat.eq_dec (n - 1) (n - 2)) as [H2| H2]. {
-              destruct n; [ easy | ].
-              destruct n; [ | flia H2 ].
-              apply Nat.lt_1_r in Hqn; subst q.
-              now apply Nat.lt_1_r in Hk; subst k.
-            }
-            destruct (Nat.eq_dec k (n - 1)) as [H3| H3]. {
-              subst k.
-              destruct (Nat.eq_dec q p) as [H4| H4]; [ now subst q | ].
-              destruct (Nat.eq_dec q (n - 2)) as [H5| H5]; [ now subst p | ].
-              now subst q.
-            }
-            destruct (Nat.eq_dec k p) as [H4| H4]; [ easy | ].
-            destruct (Nat.eq_dec k (n - 2)) as [H5| H5]; [ now subst p | ].
-            now subst k.
-          } {
-            destruct (Nat.eq_dec k q) as [H2| H2]. {
-              subst k; clear Hk H1.
-              destruct (Nat.eq_dec j (n - 1)) as [H1| H1]. {
-                subst j.
-                destruct (Nat.eq_dec q p) as [H| H]; [ subst q; flia Hpq | ].
-                clear H Hj.
-                destruct (Nat.eq_dec (n - 1) p) as [H1| H1]. {
-                  subst p; flia Hpq Hqn.
-                }
-                destruct (Nat.eq_dec q (n - 1)) as [H| H]; [ now subst q | ].
-                clear H.
-                destruct (Nat.eq_dec q (n - 2)) as [H| H]. {
-                  subst q.
-                  destruct (Nat.eq_dec (n - 1) (n - 2)) as [H| H]. {
-...
-            clear H1.
-            destruct (Nat.eq_dec (n - 1) p) as [H1| H1]. {
-              subst p; flia Hpq Hqn.
-            }
-            destruct (Nat.eq_dec (n - 1) (n - 2)) as [H2| H2]. {
-              destruct n; [ easy | ].
-              destruct n; [ | flia H2 ].
-              apply Nat.lt_1_r in Hqn; subst q.
-              now apply Nat.lt_1_r in Hk; subst k.
-            }
-            destruct (Nat.eq_dec k (n - 1)) as [H3| H3]. {
-              subst k.
-              destruct (Nat.eq_dec q p) as [H4| H4]; [ now subst q | ].
-              destruct (Nat.eq_dec q (n - 2)) as [H5| H5]; [ now subst p | ].
-              now subst q.
-            }
-            destruct (Nat.eq_dec k p) as [H4| H4]; [ easy | ].
-            destruct (Nat.eq_dec k (n - 2)) as [H5| H5]; [ now subst p | ].
-            now subst k.
-          }
-...
-          unfold swap_nat in Hjke at 2 4.
-          unfold swap_nat in Hjke at 1 3.
-          destruct (Nat.eq_dec (swap_nat q (n - 1) j) p) as [H1| H1]. {
-            destruct (Nat.eq_dec (swap_nat q (n - 1) k) p) as [H2| H2]. {
-              unfold swap_nat in H1, H2.
-              destruct (Nat.eq_dec j q) as [H3| H3]. {
-                subst j.
-                destruct (Nat.eq_dec k q) as [H4| H4]; [ now subst k | ].
-                subst p.
-                destruct (Nat.eq_dec k (n - 1)) as [H5| H5]; [ | easy ].
-                now subst q.
-              }
-              destruct (Nat.eq_dec k q) as [H4| H4]. {
-                subst k p.
-                destruct (Nat.eq_dec j (n - 1)) as [H5| H5]. {
-                  now subst q.
-                }
-                now subst j.
-              }
-              destruct (Nat.eq_dec j (n - 1)) as [H5| H5]. {
-                subst q; flia Hpq.
-              }
-              destruct (Nat.eq_dec k (n - 1)) as [H6| H6]. {
-                subst q; flia Hpq.
-              }
-              now subst j p.
-            }
+          revert Hjke.
+          now apply swap_nat_swap_nat.
+        } {
 ...
 destruct n; [ easy | ].
 cbn.
