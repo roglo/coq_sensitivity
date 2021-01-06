@@ -1140,17 +1140,23 @@ Qed.
 End a.
 Require Import Zrl.
 Require Import ZArith.
+Compute (map (λ i, list_of_vect (permut 3 i)) (seq 0 (fact 3))).
+Compute (map (λ i, minus_one_pow (vect_el (permut 3 i) 2)) (seq 0 (fact 3))).
+Compute (map (λ i, minus_one_pow (vect_el (permut 4 i) 3)) (seq 0 (fact 4))).
 Compute @signature _ Z_ring_like_op 4 0.
 Compute @signature _ Z_ring_like_op 4 (nat_of_permut (permut_swap_last 0 1 4 0)).
 ...
 signature n (nat_of_permut (permut_swap_last p q n y)) = signature n y
 *)
 
-Theorem determinant'_determinant''_permut : ∀ n p q (M : matrix n n T),
+Theorem determinant'_determinant''_permut :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  ∀ n p q (M : matrix n n T),
   p < q < n
   → Permutation (determinant'_list M) (determinant''_list p q M).
 Proof.
-intros * (Hpq, Hqn).
+intros Hic Hop * (Hpq, Hqn).
 symmetry.
 unfold determinant'_list, determinant''_list.
 apply NoDup_Permutation_bis; cycle 1. {
@@ -1198,6 +1204,13 @@ apply NoDup_Permutation_bis; cycle 1. {
                    (vect_swap_elem
                       {| vect_el := permut_fun (permut n) y |} 0 (n - 1)) n))
             as x eqn:Hx.
+          rewrite Nat.add_comm.
+          rewrite minus_one_pow_add_r; [ | easy | easy ].
+          rewrite rngl_mul_mul_swap; [ | easy ].
+          replace (permut_fun (permut n) y) with (vect_el (permut (S n) y)) by easy.
+          replace {| vect_el := permut_fun (permut n) y |} with
+            (permut (S n) y) in Hx by easy.
+Check minus_one_pow.
 ...
   destruct (lt_dec q (n - 1)) as [Hqn1| Hqn1]. {
     exists (nat_of_permut (permut_swap_last p q n y)).
