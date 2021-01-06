@@ -1136,6 +1136,16 @@ destruct (Nat.eq_dec k i); [ easy | ].
 now destruct (Nat.eq_dec k j).
 Qed.
 
+(*
+End a.
+Require Import Zrl.
+Require Import ZArith.
+Compute @signature _ Z_ring_like_op 4 0.
+Compute @signature _ Z_ring_like_op 4 (nat_of_permut (permut_swap_last 0 1 4 0)).
+...
+signature n (nat_of_permut (permut_swap_last p q n y)) = signature n y
+*)
+
 Theorem determinant'_determinant''_permut : ∀ n p q (M : matrix n n T),
   p < q < n
   → Permutation (determinant'_list M) (determinant''_list p q M).
@@ -1152,51 +1162,74 @@ apply NoDup_Permutation_bis; cycle 1. {
   rewrite in_seq in Hy; cbn in Hy.
   destruct Hy as (_, Hy).
   apply in_map_iff.
-  exists (nat_of_permut (permut_swap_last p q n y)).
-  split. {
-    f_equal. 2: {
-      apply rngl_product_eq_compat; [ easy | ].
+(**)
+  destruct (Nat.eq_dec q (n - 1)) as [Hqn1| Hqn1]. {
+    subst q; clear Hqn.
+    unfold permut_swap_last.
+    remember (vect_swap_elem (permut n y) p (n - 2)) as v eqn:Hv.
+    unfold vect_swap_elem.
+    cbn - [ iter_seq ].
+    erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
       intros i Hi.
-      f_equal.
-      rewrite permut_nat_of_permut; [ easy | | ]. {
-        intros j Hj.
-        unfold permut_swap_last.
-        unfold vect_swap_elem; cbn.
+      replace (swap_nat (n - 1) (n - 1) (i - 1)) with (i - 1). 2: {
         unfold swap_nat.
-        apply vect_el_permut_ub; [ easy | ].
-        destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
-          destruct (Nat.eq_dec (n - 1) p) as [Hnp| Hnp]; [ flia Hj | ].
-          destruct (Nat.eq_dec (n - 1) (n - 2)) as [Hnn| Hnn]. {
-            flia Hpq Hjq Hj.
+        now destruct (Nat.eq_dec (i - 1) (n - 1)).
+      }
+      easy.
+    }
+    cbn - [ iter_seq ].
+...
+  destruct (lt_dec q (n - 1)) as [Hqn1| Hqn1]. {
+    exists (nat_of_permut (permut_swap_last p q n y)).
+    split. {
+      f_equal. 2: {
+        apply rngl_product_eq_compat; [ easy | ].
+        intros i Hi.
+        f_equal.
+        rewrite permut_nat_of_permut; [ easy | | ]. {
+          intros j Hj.
+          unfold permut_swap_last.
+          unfold vect_swap_elem; cbn.
+          unfold swap_nat.
+          apply vect_el_permut_ub; [ easy | ].
+          destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
+            destruct (Nat.eq_dec (n - 1) p) as [Hnp| Hnp]; [ flia Hj | ].
+            destruct (Nat.eq_dec (n - 1) (n - 2)) as [Hnn| Hnn]. {
+              flia Hpq Hjq Hj.
+            }
+            flia Hj.
           }
-          flia Hj.
-        }
-        destruct (Nat.eq_dec j (n - 1)) as [Hjn| Hjn]. {
-          destruct (Nat.eq_dec q p) as [Hqp| Hqp]; [ flia Hqp Hpq | ].
-          destruct (Nat.eq_dec q (n - 2)) as [H| H]; [ flia Hpq H | easy ].
-        }
-        destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ flia Hj | ].
-        destruct (Nat.eq_dec j (n - 2)) as [H| H]; [ flia Hpq Hqn | easy ].
-      } {
-        intros j k Hj Hk Hjk.
-        move i before y; move j before i; move k before j.
-        unfold permut_swap_last.
-        unfold vect_swap_elem; cbn.
-        intros Hjke.
-        apply permut_injective in Hjke; [ | easy | | ]. {
-          revert Hjke.
-          now apply swap_nat_swap_nat.
+          destruct (Nat.eq_dec j (n - 1)) as [Hjn| Hjn]. {
+            destruct (Nat.eq_dec q p) as [Hqp| Hqp]; [ flia Hqp Hpq | ].
+            destruct (Nat.eq_dec q (n - 2)) as [H| H]; [ flia Hpq H | easy ].
+          }
+          destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ flia Hj | ].
+          destruct (Nat.eq_dec j (n - 2)) as [H| H]; [ flia Hpq Hqn | easy ].
         } {
-          apply swap_nat_lt; [ flia Hpq Hqn | flia Hj | ].
-          apply swap_nat_lt; [ easy | | easy ].
-          flia Hpq Hqn.
-        } {
-          apply swap_nat_lt; [ flia Hpq Hqn | flia Hj | ].
-          apply swap_nat_lt; [ easy | | easy ].
-          flia Hpq Hqn.
+          intros j k Hj Hk Hjk.
+          move i before y; move j before i; move k before j.
+          unfold permut_swap_last.
+          unfold vect_swap_elem; cbn.
+          intros Hjke.
+          apply permut_injective in Hjke; [ | easy | | ]. {
+            revert Hjke.
+            now apply swap_nat_swap_nat.
+          } {
+            apply swap_nat_lt; [ flia Hpq Hqn | flia Hj | ].
+            apply swap_nat_lt; [ easy | | easy ].
+            flia Hpq Hqn.
+          } {
+            apply swap_nat_lt; [ flia Hpq Hqn | flia Hj | ].
+            apply swap_nat_lt; [ easy | | easy ].
+            flia Hpq Hqn.
+          }
         }
       }
-    }
+      clear Hqn.
+      revert p q y Hpq Hqn1 Hy.
+      induction n; intros; [ easy | ].
+      cbn.
+      rewrite Nat.sub_0_r.
 ...
 destruct n; [ easy | ].
 cbn.
