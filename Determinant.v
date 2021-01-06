@@ -1149,6 +1149,16 @@ Compute @signature _ Z_ring_like_op 4 (nat_of_permut (permut_swap_last 0 1 4 0))
 signature n (nat_of_permut (permut_swap_last p q n y)) = signature n y
 *)
 
+Theorem vect_swap_elem_same : ∀ n (v : vector n nat) i,
+  vect_swap_elem v i i = v.
+Proof.
+intros.
+apply vector_eq; cbn.
+intros j Hj.
+unfold swap_nat.
+destruct (Nat.eq_dec j i); [ now subst i | easy ].
+Qed.
+
 Theorem determinant'_determinant''_permut :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -1173,12 +1183,20 @@ apply NoDup_Permutation_bis; cycle 1. {
     (nat_of_permut
        (if Nat.eq_dec q (n - 1) then vect_swap_elem (permut n y) p (n - 2)
         else permut_swap_last p q n y)) as x eqn:Hx.
+  move x after y.
   exists x.
   split. {
     destruct (Nat.eq_dec q (n - 1)) as [Hqn1| Hqn1]. {
       subst q; clear Hqn.
-(**)
-      replace (signature n x) with (signature n y)%F. 2: {
+      destruct (Nat.eq_dec p (n - 2)) as [Hpn2| Hpn2]. {
+        subst p; clear Hpq.
+        rewrite vect_swap_elem_same in Hx.
+        rewrite nat_of_permut_permut in Hx; [ subst x | easy ].
+        f_equal.
+        unfold permut_swap_last.
+        now do 2 rewrite vect_swap_elem_same.
+      }
+      replace (signature n x) with (- signature n y)%F. 2: {
         subst x; cbn.
         destruct n; [ easy | ].
         cbn.
@@ -1195,14 +1213,46 @@ apply NoDup_Permutation_bis; cycle 1. {
           now rewrite Nat.add_0_r.
         }
         destruct n. {
-          destruct p. {
-            cbn - [ "/" "mod" ].
-            rewrite Nat.add_0_l, Nat.add_0_r.
-            do 4 rewrite Nat.div_1_r.
-            do 2 rewrite Nat.mul_1_r.
-            do 2 rewrite Nat.mod_1_r.
-            cbn - [ "/" "mod" ].
-            (* galère *)
+          destruct p; [ | flia Hpq Hpn2 ].
+          clear Hpq Hpn2.
+          cbn - [ "/" "mod" ].
+          rewrite Nat.add_0_l, Nat.add_0_r.
+          do 4 rewrite Nat.div_1_r.
+          do 2 rewrite Nat.mul_1_r.
+          do 2 rewrite Nat.mod_1_r.
+          cbn - [ "/" "mod" ].
+          destruct y; [ now cbn; repeat rewrite rngl_mul_1_r | ].
+          destruct y. {
+            cbn; repeat rewrite rngl_mul_1_r.
+            rewrite rngl_mul_opp_r; [ | easy ].
+            rewrite rngl_mul_1_r.
+            now apply rngl_opp_involutive.
+          }
+          destruct y. {
+            cbn; repeat rewrite rngl_mul_1_r.
+            now apply rngl_opp_involutive.
+          }
+          destruct y. {
+            cbn; repeat rewrite rngl_mul_1_r.
+            rewrite rngl_mul_opp_r; [ | easy ].
+            rewrite rngl_mul_1_l, rngl_mul_1_r.
+            now apply rngl_opp_involutive.
+          }
+          destruct y. {
+            cbn; repeat rewrite rngl_mul_1_r.
+            rewrite rngl_mul_opp_r; [ | easy ].
+            now rewrite rngl_mul_1_r.
+          }
+          destruct y. {
+            cbn; repeat rewrite rngl_mul_1_r.
+            rewrite rngl_mul_opp_r; [ | easy ].
+            rewrite rngl_mul_opp_r; [ | easy ].
+            rewrite rngl_mul_opp_l; [ | easy ].
+            easy.
+          }
+          cbn in Hy; flia Hy.
+        }
+        destruct n. {
 ...
       replace (signature n x) with (- signature n y)%F. 2: {
         subst x; cbn.
