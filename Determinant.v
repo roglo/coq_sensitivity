@@ -1185,6 +1185,11 @@ apply NoDup_Permutation_bis; cycle 1. {
       cbn - [ iter_seq ]; symmetry.
       f_equal. {
         subst v; cbn.
+        revert p y Hpq Hy.
+        induction n; intros; [ easy | ].
+        cbn.
+        destruct p. {
+          cbn.
 ...
   destruct (lt_dec q (n - 1)) as [Hqn1| Hqn1]. {
     exists (nat_of_permut (permut_swap_last p q n y)).
