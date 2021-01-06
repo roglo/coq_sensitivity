@@ -1193,24 +1193,23 @@ apply NoDup_Permutation_bis; cycle 1. {
         subst v; cbn.
         revert p y Hpq Hy.
         induction n; intros; [ easy | ].
-        cbn.
-        destruct p. {
-          cbn.
-          rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
-          rewrite Nat_mod_add_l_mul_r; [ | apply fact_neq_0 ].
-          remember
-            (nat_of_permut
-                (nat_of_permut_sub_vect
-                   (vect_swap_elem
-                      {| vect_el := permut_fun (permut n) y |} 0 (n - 1)) n))
-            as x eqn:Hx.
-          rewrite Nat.add_comm.
-          rewrite minus_one_pow_add_r; [ | easy | easy ].
-          rewrite rngl_mul_mul_swap; [ | easy ].
-          replace (permut_fun (permut n) y) with (vect_el (permut (S n) y)) by easy.
-          replace {| vect_el := permut_fun (permut n) y |} with
-            (permut (S n) y) in Hx by easy.
-Check minus_one_pow.
+        rewrite Nat.sub_succ, Nat.sub_0_r in Hpq.
+        rewrite Nat.sub_succ; cbn.
+        rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
+        rewrite Nat_mod_add_l_mul_r; [ | apply fact_neq_0 ].
+        rewrite Nat.add_comm.
+        rewrite minus_one_pow_add_r; [ | easy | easy ].
+        rewrite rngl_mul_mul_swap; [ | easy ].
+        replace {| vect_el := permut_fun (permut n) y |} with
+          (permut (S n) y) by easy.
+        replace (permut_fun (permut n) y) with (vect_el (permut (S n) y))
+          by easy.
+        remember
+          (nat_of_permut
+             (nat_of_permut_sub_vect
+                (vect_swap_elem (permut (S n) y) p (n - 1)) n))
+          as x eqn:Hx.
+        move x after y.
 ...
   destruct (lt_dec q (n - 1)) as [Hqn1| Hqn1]. {
     exists (nat_of_permut (permut_swap_last p q n y)).
