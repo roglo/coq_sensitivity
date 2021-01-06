@@ -1168,15 +1168,58 @@ apply NoDup_Permutation_bis; cycle 1. {
   rewrite in_seq in Hy; cbn in Hy.
   destruct Hy as (_, Hy).
   apply in_map_iff.
-...
 (**)
-  exists
+  remember
     (nat_of_permut
        (if Nat.eq_dec q (n - 1) then vect_swap_elem (permut n y) p (n - 2)
-        else permut_swap_last p q n y)).
+        else permut_swap_last p q n y)) as x eqn:Hx.
+  exists x.
   split. {
     destruct (Nat.eq_dec q (n - 1)) as [Hqn1| Hqn1]. {
       subst q; clear Hqn.
+(**)
+      replace (signature n x) with (signature n y)%F. 2: {
+        subst x; cbn.
+        destruct n; [ easy | ].
+        cbn.
+        destruct n; [ easy | ].
+        destruct n. {
+          apply Nat.lt_1_r in Hpq; subst p.
+          cbn - [ "/" ].
+          rewrite Nat.add_0_r, Nat.add_0_l.
+          do 3 rewrite Nat.div_1_r.
+          do 2 rewrite Nat.mul_1_r; cbn.
+          do 3 rewrite rngl_mul_1_r.
+          destruct y; [ easy | ].
+          cbn.
+          now rewrite Nat.add_0_r.
+        }
+        destruct n. {
+          destruct p. {
+            cbn - [ "/" "mod" ].
+            rewrite Nat.add_0_l, Nat.add_0_r.
+            do 4 rewrite Nat.div_1_r.
+            do 2 rewrite Nat.mul_1_r.
+            do 2 rewrite Nat.mod_1_r.
+            cbn - [ "/" "mod" ].
+            (* galère *)
+...
+      replace (signature n x) with (- signature n y)%F. 2: {
+        subst x; cbn.
+        destruct n; [ easy | ].
+        cbn.
+        destruct n; [ easy | ].
+        destruct n. {
+          apply Nat.lt_1_r in Hpq; subst p.
+          cbn - [ "/" ].
+          rewrite Nat.add_0_r, Nat.add_0_l.
+          do 3 rewrite Nat.div_1_r.
+          do 2 rewrite Nat.mul_1_r; cbn.
+          do 3 rewrite rngl_mul_1_r.
+          destruct y. {
+            cbn.
+            (* ah merde *)
+...
       unfold permut_swap_last.
       remember (vect_swap_elem (permut n y) p (n - 2)) as v eqn:Hv.
       unfold vect_swap_elem.
@@ -1213,6 +1256,7 @@ apply NoDup_Permutation_bis; cycle 1. {
         move x after y; move Hx after Hy.
 Print nat_of_permut.
 Print signature.
+...
   IHn : matrix n n T
         → ∀ p y : nat,
             p < n - 1
