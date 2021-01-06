@@ -1190,6 +1190,14 @@ apply NoDup_Permutation_bis; cycle 1. {
         cbn.
         destruct p. {
           cbn.
+          rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
+          rewrite Nat_mod_add_l_mul_r; [ | apply fact_neq_0 ].
+          remember
+            (nat_of_permut
+                (nat_of_permut_sub_vect
+                   (vect_swap_elem
+                      {| vect_el := permut_fun (permut n) y |} 0 (n - 1)) n))
+            as x eqn:Hx.
 ...
   destruct (lt_dec q (n - 1)) as [Hqn1| Hqn1]. {
     exists (nat_of_permut (permut_swap_last p q n y)).
