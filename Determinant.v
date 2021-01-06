@@ -1168,6 +1168,7 @@ apply NoDup_Permutation_bis; cycle 1. {
   rewrite in_seq in Hy; cbn in Hy.
   destruct Hy as (_, Hy).
   apply in_map_iff.
+...
 (**)
   exists
     (nat_of_permut
@@ -1210,7 +1211,20 @@ apply NoDup_Permutation_bis; cycle 1. {
                 (vect_swap_elem (permut (S n) y) p (n - 1)) n))
           as x eqn:Hx.
         move x after y; move Hx after Hy.
+Print nat_of_permut.
 Print signature.
+  IHn : matrix n n T
+        → ∀ p y : nat,
+            p < n - 1
+            → y < fact n → signature n (nat_of_permut (vect_swap_elem (permut n y) p (n - 2))) = signature n y
+  p, x, y : nat
+  Hpq : p < n
+  Hx : x = nat_of_permut (nat_of_permut_sub_vect (vect_swap_elem (permut (S n) y) p (n - 1)) n)
+  Hy : y < fact (S n)
+  ============================
+  (minus_one_pow (x / fact n) * signature n (x mod fact n) *
+   minus_one_pow (vect_el (permut (S n) y) (swap_nat p (n - 1) 0)))%F =
+  (minus_one_pow (y / fact n) * signature n (y mod fact n))%F
 ...
   destruct (lt_dec q (n - 1)) as [Hqn1| Hqn1]. {
     exists (nat_of_permut (permut_swap_last p q n y)).
