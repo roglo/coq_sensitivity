@@ -581,7 +581,7 @@ Qed.
 
 Theorem vect_el_nat_of_permut_ub : ∀ n (v : vector (S n) nat) i,
   (∀ i, i < S n → vect_el v i < S n)
-  → (∀ i j, i < S n → j < S n → vect_el v i ≠ vect_el v j)
+  → (∀ i j, i < S n → j < S n → i ≠ j → vect_el v i ≠ vect_el v j)
   → i < n
   → vect_el (nat_of_permut_sub_vect v n) i < n.
 Proof.
@@ -604,12 +604,14 @@ Qed.
 
 Theorem vect_el_nat_of_permut_diff : ∀ n (v : vector (S n) nat) i j,
   (∀ i, i < S n → vect_el v i < S n)
-  → (∀ i j, i < S n → j < S n → vect_el v i ≠ vect_el v j)
+  → (∀ i j, i < S n → j < S n → i ≠ j → vect_el v i ≠ vect_el v j)
   → i < n
   → j < n
-  → vect_el (nat_of_permut_sub_vect v n) i ≠ vect_el (nat_of_permut_sub_vect v n) j.
+  → i ≠ j
+  → vect_el (nat_of_permut_sub_vect v n) i ≠
+    vect_el (nat_of_permut_sub_vect v n) j.
 Proof.
-intros * Hvn Hn Hin Hjn.
+intros * Hvn Hn Hin Hjn Hij.
 destruct n; [ easy | ].
 cbn - [ "<?" ].
 remember (vect_el v 0 <? vect_el v (S i)) as bi eqn:Hbi.
@@ -623,6 +625,8 @@ destruct bi; cbn. {
     apply Nat.succ_lt_mono in Hin.
     apply Nat.succ_lt_mono in Hjn.
     specialize (Hn (S i) (S j) Hin Hjn) as Hs.
+    assert (H : S i ≠ S j) by flia Hij.
+    specialize (Hs H); clear H.
     flia Hbi Hbj Hs.
   } {
     apply Nat.ltb_ge in Hbj.
@@ -642,6 +646,8 @@ destruct bi; cbn. {
     apply Nat.succ_lt_mono in Hin.
     apply Nat.succ_lt_mono in Hjn.
     specialize (Hn (S i) (S j) Hin Hjn) as Hs.
+    assert (H : S i ≠ S j) by flia Hij.
+    specialize (Hs H); clear H.
     flia Hbi Hbj Hs.
   }
 }
@@ -649,7 +655,7 @@ Qed.
 
 Theorem nat_of_permut_upper_bound : ∀ n (v : vector n nat),
   (∀ i, i < n → vect_el v i < n)
-  → (∀ i j, i < n → j < n → vect_el v i ≠ vect_el v j)
+  → (∀ i j, i < n → j < n → i ≠ j → vect_el v i ≠ vect_el v j)
   → nat_of_permut v < fact n.
 Proof.
 intros * Hvn Hn.
@@ -720,7 +726,7 @@ Qed.
 
 Theorem permut_nat_of_permut : ∀ n v,
   (∀ i, i < n → vect_el v i < n)
-  → (∀ i j, i < n → j < n → vect_el v i ≠ vect_el v j)
+  → (∀ i j, i < n → j < n → i ≠ j → vect_el v i ≠ vect_el v j)
   → permut n (nat_of_permut v) = v.
 Proof.
 intros * Hvn Hn.
@@ -769,9 +775,10 @@ assert
 (H2 : ∀ i j : nat,
     i < n
     → j < n
+    → i ≠ j
     → vect_el (nat_of_permut_sub_vect v n) i ≠
       vect_el (nat_of_permut_sub_vect v n) j). {
-  intros i m Hi Hm.
+  intros i m Hi Hm Him.
   now apply vect_el_nat_of_permut_diff.
 }
 destruct b. {
@@ -788,7 +795,7 @@ destruct b. {
     apply Nat.ltb_ge in Hb1; exfalso.
     cbn in Hb.
     rewrite Nat.sub_0_r in Hb.
-    apply (Hn 0 (S j) (Nat.lt_0_succ _) Hj).
+    apply (Hn 0 (S j) (Nat.lt_0_succ _) Hj); [ easy | ].
     now apply Nat.le_antisymm.
   }
 } {
@@ -1001,6 +1008,85 @@ apply Nat.div_lt_upper_bound; [ | easy ].
 apply fact_neq_0.
 Qed.
 
+Theorem swap_nat_swap_nat : ∀ n p q j k,
+  p < q < n
+  → j < n
+  → k < n
+  → j ≠ k
+  → swap_nat p (n - 2) (swap_nat q (n - 1) j) ≠
+    swap_nat p (n - 2) (swap_nat q (n - 1) k).
+Proof.
+intros * (Hpq, Hqn) Hjn Hkn Hjk Hjke.
+unfold swap_nat in Hjke.
+destruct (Nat.eq_dec j q) as [H1| H1]. {
+  subst j.
+  destruct (Nat.eq_dec k q) as [H1| H1]; [ now subst k | ].
+  clear H1.
+  destruct (Nat.eq_dec (n - 1) p) as [H1| H1]. {
+    subst p; flia Hpq Hqn.
+  }
+  destruct (Nat.eq_dec (n - 1) (n - 2)) as [H2| H2]. {
+    destruct n; [ easy | ].
+    destruct n; [ | flia H2 ].
+    apply Nat.lt_1_r in Hqn; subst q.
+    now apply Nat.lt_1_r in Hkn; subst k.
+  }
+  destruct (Nat.eq_dec k (n - 1)) as [H3| H3]. {
+    subst k.
+    destruct (Nat.eq_dec q p) as [H4| H4]; [ now subst q | ].
+    destruct (Nat.eq_dec q (n - 2)) as [H5| H5]; [ now subst p | ].
+    now subst q.
+  }
+  destruct (Nat.eq_dec k p) as [H4| H4]; [ easy | ].
+  destruct (Nat.eq_dec k (n - 2)) as [H5| H5]; [ now subst p | ].
+  now subst k.
+} {
+  destruct (Nat.eq_dec k q) as [H2| H2]. {
+    subst k; clear Hkn H1.
+    destruct (Nat.eq_dec j (n - 1)) as [H1| H1]. {
+      subst j.
+      destruct (Nat.eq_dec q p) as [H| H]; [ subst q; flia Hpq | ].
+      clear H Hjn.
+      destruct (Nat.eq_dec (n - 1) p) as [H1| H1]. {
+        subst p; flia Hpq Hqn.
+      }
+      destruct (Nat.eq_dec q (n - 1)) as [H| H]; [ now subst q | ].
+      clear H.
+      destruct (Nat.eq_dec q (n - 2)) as [H2| H2]. {
+        subst q.
+        destruct (Nat.eq_dec (n - 1) (n - 2)) as [H| H]. {
+          destruct n; [ easy | ].
+          destruct n; [ | flia H ].
+          flia Hpq.
+        }
+        now symmetry in Hjke.
+      }
+      destruct (Nat.eq_dec (n - 1) (n - 2)) as [H3| H3]. {
+        subst q; flia Hpq.
+      }
+      now symmetry in Hjke.
+    }
+    destruct (Nat.eq_dec j p) as [H2| H2]. {
+      subst j.
+      destruct (Nat.eq_dec (n - 1) p) as [H3| H3]; [ now subst p | ].
+      destruct (Nat.eq_dec (n - 1) (n - 2)) as [H2| H2]; [ now subst p | ].
+      destruct n; [ easy | ].
+      destruct n; [ flia H2 | flia Hjke ].
+    }
+    destruct (Nat.eq_dec j (n - 2)) as [H3| H3]. {
+      subst j.
+      destruct (Nat.eq_dec (n - 1) p) as [H3| H3]. {
+        now subst p; symmetry in Hjke.
+      }
+      destruct (Nat.eq_dec (n - 1) (n - 2)) as [H4| H4]; [ | now subst p ].
+      destruct n; [ easy | ].
+      destruct n; [ easy | flia H4 ].
+    }
+    destruct (Nat.eq_dec (n - 1) p) as [H4| H4]; [ now subst j | ].
+    destruct (Nat.eq_dec (n - 1) (n - 2)) as [H5| H5]; [ now subst j | easy ].
+  }
+...
+
 Theorem determinant'_determinant''_permut : ∀ n p q (M : matrix n n T),
   p < q < n
   → Permutation (determinant'_list M) (determinant''_list p q M).
@@ -1017,14 +1103,12 @@ apply NoDup_Permutation_bis; cycle 1. {
   rewrite in_seq in Hy; cbn in Hy.
   destruct Hy as (_, Hy).
   apply in_map_iff.
-...
   exists (nat_of_permut (permut_swap_last p q n y)).
   split. {
     f_equal. 2: {
       apply rngl_product_eq_compat; [ easy | ].
       intros i Hi.
       f_equal.
-...
       rewrite permut_nat_of_permut; [ easy | | ]. {
         intros j Hj.
         unfold permut_swap_last.
@@ -1045,10 +1129,106 @@ apply NoDup_Permutation_bis; cycle 1. {
         destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ flia Hj | ].
         destruct (Nat.eq_dec j (n - 2)) as [H| H]; [ flia Hpq Hqn | easy ].
       } {
-        intros j k Hj Hk.
+        intros j k Hj Hk Hjk.
+        move i before y; move j before i; move k before j.
         unfold permut_swap_last.
         unfold vect_swap_elem; cbn.
-(* mmm... nothing prevent j to be equal to k *)
+        intros Hjke.
+        apply permut_injective in Hjke; [ | easy | | ]. {
+...
+          unfold swap_nat in Hjke.
+          destruct (Nat.eq_dec j q) as [H1| H1]. {
+            subst j; clear Hj.
+            destruct (Nat.eq_dec k q) as [H1| H1]; [ now subst k | ].
+            clear H1.
+            destruct (Nat.eq_dec (n - 1) p) as [H1| H1]. {
+              subst p; flia Hpq Hqn.
+            }
+            destruct (Nat.eq_dec (n - 1) (n - 2)) as [H2| H2]. {
+              destruct n; [ easy | ].
+              destruct n; [ | flia H2 ].
+              apply Nat.lt_1_r in Hqn; subst q.
+              now apply Nat.lt_1_r in Hk; subst k.
+            }
+            destruct (Nat.eq_dec k (n - 1)) as [H3| H3]. {
+              subst k.
+              destruct (Nat.eq_dec q p) as [H4| H4]; [ now subst q | ].
+              destruct (Nat.eq_dec q (n - 2)) as [H5| H5]; [ now subst p | ].
+              now subst q.
+            }
+            destruct (Nat.eq_dec k p) as [H4| H4]; [ easy | ].
+            destruct (Nat.eq_dec k (n - 2)) as [H5| H5]; [ now subst p | ].
+            now subst k.
+          } {
+            destruct (Nat.eq_dec k q) as [H2| H2]. {
+              subst k; clear Hk H1.
+              destruct (Nat.eq_dec j (n - 1)) as [H1| H1]. {
+                subst j.
+                destruct (Nat.eq_dec q p) as [H| H]; [ subst q; flia Hpq | ].
+                clear H Hj.
+                destruct (Nat.eq_dec (n - 1) p) as [H1| H1]. {
+                  subst p; flia Hpq Hqn.
+                }
+                destruct (Nat.eq_dec q (n - 1)) as [H| H]; [ now subst q | ].
+                clear H.
+                destruct (Nat.eq_dec q (n - 2)) as [H| H]. {
+                  subst q.
+                  destruct (Nat.eq_dec (n - 1) (n - 2)) as [H| H]. {
+...
+            clear H1.
+            destruct (Nat.eq_dec (n - 1) p) as [H1| H1]. {
+              subst p; flia Hpq Hqn.
+            }
+            destruct (Nat.eq_dec (n - 1) (n - 2)) as [H2| H2]. {
+              destruct n; [ easy | ].
+              destruct n; [ | flia H2 ].
+              apply Nat.lt_1_r in Hqn; subst q.
+              now apply Nat.lt_1_r in Hk; subst k.
+            }
+            destruct (Nat.eq_dec k (n - 1)) as [H3| H3]. {
+              subst k.
+              destruct (Nat.eq_dec q p) as [H4| H4]; [ now subst q | ].
+              destruct (Nat.eq_dec q (n - 2)) as [H5| H5]; [ now subst p | ].
+              now subst q.
+            }
+            destruct (Nat.eq_dec k p) as [H4| H4]; [ easy | ].
+            destruct (Nat.eq_dec k (n - 2)) as [H5| H5]; [ now subst p | ].
+            now subst k.
+          }
+...
+          unfold swap_nat in Hjke at 2 4.
+          unfold swap_nat in Hjke at 1 3.
+          destruct (Nat.eq_dec (swap_nat q (n - 1) j) p) as [H1| H1]. {
+            destruct (Nat.eq_dec (swap_nat q (n - 1) k) p) as [H2| H2]. {
+              unfold swap_nat in H1, H2.
+              destruct (Nat.eq_dec j q) as [H3| H3]. {
+                subst j.
+                destruct (Nat.eq_dec k q) as [H4| H4]; [ now subst k | ].
+                subst p.
+                destruct (Nat.eq_dec k (n - 1)) as [H5| H5]; [ | easy ].
+                now subst q.
+              }
+              destruct (Nat.eq_dec k q) as [H4| H4]. {
+                subst k p.
+                destruct (Nat.eq_dec j (n - 1)) as [H5| H5]. {
+                  now subst q.
+                }
+                now subst j.
+              }
+              destruct (Nat.eq_dec j (n - 1)) as [H5| H5]. {
+                subst q; flia Hpq.
+              }
+              destruct (Nat.eq_dec k (n - 1)) as [H6| H6]. {
+                subst q; flia Hpq.
+              }
+              now subst j p.
+            }
+...
+destruct n; [ easy | ].
+cbn.
+Search (permut_succ_vect_fun _ _ _ ≠ _).
+Search (vect_el _ _ = vect_el _ _).
+apply vect_el_nat_of_permut_diff.
 ...
 unfold permut_swap_last.
 ...
