@@ -52,7 +52,37 @@
   \end{itemize}}
 }
 
-\frm{Record - Axioms 1}{
+\frm{Record 1 - Operations}{
+
+  {\footnotesize
+    \only<1-2>{Record}\only<3->{Class} ring\_like\_op T := \\
+    \hsp
+    \begin{tabular}{ll}
+      \{ zero : T; \\
+      \ \ \ one : T; \\
+      \ \ \ add : T $\rightarrow$ T $\rightarrow$ T; \\
+      \ \ \ mul : T $\rightarrow$ T $\rightarrow$ T; \\
+      \ \ \ opp : T $\rightarrow$ T; \\
+      \ \ \ inv : T $\rightarrow$ T \}
+    \end{tabular}}
+
+  \vsp
+
+  \only<2->{
+    {\footnotesize
+      \begin{tabular}{l}
+        Notation "0" := rngl\_zero. \\
+        Notation "1" := rngl\_one. \\
+        Notation "a + b" := (rngl\_add a b). \\
+        Notation "a * b" := (rngl\_mul a b). \\
+        Notation "- a" := (rngl\_opp a). \\
+        Notation "1/ a" := (rngl\_inv a). \\
+      \end{tabular}}
+    }
+
+}
+
+\frm{Record 2 - properties}{
 
   \begin{tabular}{ll}
   has\_opposite : bool & \only<9->{is\_archimedean : bool} \\
@@ -72,6 +102,10 @@
   \only<8->{is\_factorial : bool \\
     is\_principal : bool }
   \end{tabular}
+
+}
+
+\frm{Record 2 - axioms}{
 
 }
 
