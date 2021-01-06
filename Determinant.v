@@ -1124,6 +1124,18 @@ destruct (Nat.eq_dec j q) as [H1| H1]. {
 }
 Qed.
 
+Theorem swap_nat_lt : ∀ i j k n,
+  i < n
+  → j < n
+  → k < n
+  → swap_nat i j k < n.
+Proof.
+intros * Hi Hj Hk.
+unfold swap_nat.
+destruct (Nat.eq_dec k i); [ easy | ].
+now destruct (Nat.eq_dec k j).
+Qed.
+
 Theorem determinant'_determinant''_permut : ∀ n p q (M : matrix n n T),
   p < q < n
   → Permutation (determinant'_list M) (determinant''_list p q M).
@@ -1175,6 +1187,16 @@ apply NoDup_Permutation_bis; cycle 1. {
           revert Hjke.
           now apply swap_nat_swap_nat.
         } {
+          apply swap_nat_lt; [ flia Hpq Hqn | flia Hj | ].
+          apply swap_nat_lt; [ easy | | easy ].
+          flia Hpq Hqn.
+        } {
+          apply swap_nat_lt; [ flia Hpq Hqn | flia Hj | ].
+          apply swap_nat_lt; [ easy | | easy ].
+          flia Hpq Hqn.
+        }
+      }
+    }
 ...
 destruct n; [ easy | ].
 cbn.
