@@ -1017,12 +1017,14 @@ apply NoDup_Permutation_bis; cycle 1. {
   rewrite in_seq in Hy; cbn in Hy.
   destruct Hy as (_, Hy).
   apply in_map_iff.
+...
   exists (nat_of_permut (permut_swap_last p q n y)).
   split. {
     f_equal. 2: {
       apply rngl_product_eq_compat; [ easy | ].
       intros i Hi.
       f_equal.
+...
       rewrite permut_nat_of_permut; [ easy | | ]. {
         intros j Hj.
         unfold permut_swap_last.
