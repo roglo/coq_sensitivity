@@ -1163,21 +1163,28 @@ apply NoDup_Permutation_bis; cycle 1. {
   destruct Hy as (_, Hy).
   apply in_map_iff.
 (**)
-  destruct (Nat.eq_dec q (n - 1)) as [Hqn1| Hqn1]. {
-    subst q; clear Hqn.
-    unfold permut_swap_last.
-    remember (vect_swap_elem (permut n y) p (n - 2)) as v eqn:Hv.
-    unfold vect_swap_elem.
-    cbn - [ iter_seq ].
-    erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
-      intros i Hi.
-      replace (swap_nat (n - 1) (n - 1) (i - 1)) with (i - 1). 2: {
-        unfold swap_nat.
-        now destruct (Nat.eq_dec (i - 1) (n - 1)).
+  exists
+    (nat_of_permut
+       (if Nat.eq_dec q (n - 1) then vect_swap_elem (permut n y) p (n - 2)
+        else permut_swap_last p q n y)).
+  split. {
+    destruct (Nat.eq_dec q (n - 1)) as [Hqn1| Hqn1]. {
+      subst q; clear Hqn.
+      unfold permut_swap_last.
+      remember (vect_swap_elem (permut n y) p (n - 2)) as v eqn:Hv.
+      unfold vect_swap_elem.
+      cbn - [ iter_seq ]; symmetry.
+      erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
+        intros i Hi.
+        replace (swap_nat (n - 1) (n - 1) (i - 1)) with (i - 1). 2: {
+          unfold swap_nat.
+          now destruct (Nat.eq_dec (i - 1) (n - 1)).
+        }
+        easy.
       }
-      easy.
-    }
-    cbn - [ iter_seq ].
+      cbn - [ iter_seq ]; symmetry.
+      f_equal. {
+        subst v; cbn.
 ...
   destruct (lt_dec q (n - 1)) as [Hqn1| Hqn1]. {
     exists (nat_of_permut (permut_swap_last p q n y)).
