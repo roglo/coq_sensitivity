@@ -1199,9 +1199,8 @@ apply NoDup_Permutation_bis; cycle 1. {
       assert (Hp : p < n - 2) by flia Hpq Hpn2.
       clear Hpq Hpn2.
       replace (signature n x) with (- signature n y)%F. 2: {
-        subst x; cbn.
-        clear M.
-(**)
+        subst x; cbn; clear M.
+...
         revert p y Hy Hp.
         induction n; intros; [ easy | cbn ].
         rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
