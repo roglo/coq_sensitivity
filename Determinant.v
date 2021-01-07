@@ -1208,7 +1208,7 @@ apply NoDup_Permutation_bis; cycle 1. {
         rewrite <- rngl_mul_opp_r; [ | easy ].
         rewrite Nat.sub_succ in Hp.
         destruct p. {
-          cbn.
+          cbn; clear IHn.
 ...
         rewrite IHn with (p := p + 1); cycle 2. {
 ...
