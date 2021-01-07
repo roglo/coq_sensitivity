@@ -1196,10 +1196,22 @@ apply NoDup_Permutation_bis; cycle 1. {
         unfold permut_swap_last.
         now do 2 rewrite vect_swap_elem_same.
       }
+      assert (Hp : p < n - 2) by flia Hpq Hpn2.
+      clear Hpq Hpn2.
       replace (signature n x) with (- signature n y)%F. 2: {
         subst x; cbn.
-        destruct n; [ easy | ].
-        cbn.
+        clear M.
+        revert p y Hy Hp.
+        induction n; intros; [ easy | cbn ].
+        rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
+        rewrite Nat_mod_add_l_mul_r; [ | apply fact_neq_0 ].
+        rewrite <- rngl_mul_opp_r; [ | easy ].
+        rewrite Nat.sub_succ in Hp.
+        destruct p. {
+          cbn.
+...
+        rewrite IHn with (p := p + 1); cycle 2. {
+...
         destruct n; [ easy | ].
         destruct n. {
           apply Nat.lt_1_r in Hpq; subst p.
