@@ -356,6 +356,37 @@ setoid_rewrite Nat.add_comm.
 apply sgn_diff_add_mono_l.
 Qed.
 
+(*
+Theorem sgn_diff_add_mono_r_small : ∀ a b c d,
+  a ≠ b
+  → c ≤ 1
+  → d ≤ 1
+  → sgn_diff (a + c) (b + d) = sgn_diff a b.
+Proof.
+intros * Hab Hc Hd.
+unfold sgn_diff.
+destruct (lt_dec (a + c) (b + d)) as [Habcd| Habcd]. {
+  destruct (lt_dec a b) as [Hlab| Hlab]; [ easy | exfalso ].
+  apply Hlab; clear Hlab.
+  destruct c. {
+    destruct d; [ flia Habcd | ].
+    destruct d; [ | flia Hd ].
+    flia Hab Habcd.
+  }
+  destruct c; [ | flia Hc ].
+  destruct d; [ flia Hab Habcd | ].
+  destruct d; [ | flia Hd ].
+  flia Habcd.
+}
+destruct (lt_dec a b) as [Hlab| Hlab]; [ exfalso | easy ].
+apply Habcd; clear Habcd.
+destruct c; [ flia Hlab | ].
+destruct c; [ | flia Hc ].
+destruct d. {
+  rewrite Nat.add_0_r.
+...
+*)
+
 (* equality ε on permut and ε_permut *)
 
 Theorem ε_permut_ε_permut : ∀ n k, ε (permut n k) = ε_permut n k.
@@ -384,6 +415,23 @@ erewrite (rngl_product_eq_compat _ _ _ 2). 2: {
   easy.
 }
 cbn - [ iter_seq ].
+(**)
+rewrite rngl_product_succ_succ.
+remember (Π (_ = _, _), _)%F as x eqn:Hx.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite Nat.add_succ_l.
+  erewrite rngl_product_succ_succ.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    do 2 rewrite Nat.sub_succ.
+    easy.
+  }
+  cbn - [ iter_seq ].
+  easy.
+}
+cbn - [ iter_seq ].
+...
 destruct (lt_dec k (fact n)) as [Hkn| Hkn]. {
   rewrite Nat.div_small; [ | easy ].
   rewrite Nat.mod_small; [ | easy ].
