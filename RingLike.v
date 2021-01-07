@@ -83,6 +83,8 @@ Notation "¹/ a" := (rngl_inv a) (at level 35, right associativity) :
 Notation "a ≤ b ≤ c" := (a ≤ b ∧ b ≤ c)%F (at level 70, b at next level) :
   ring_like_scope.
 
+Notation "- 1" := (rngl_opp rngl_one) : ring_like_scope.
+
 Inductive not_applicable := NA.
 
 Fixpoint rngl_of_nat {T} {ro : ring_like_op T} n :=

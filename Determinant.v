@@ -312,17 +312,35 @@ Qed.
 
 (* signature of the k-th permutation of "permut" above *)
 
-Fixpoint signature n k :=
+Fixpoint ε_permut n k :=
   match n with
   | 0 => 1%F
-  | S n' => (minus_one_pow (k / fact n') * signature n' (k mod fact n'))%F
+  | S n' => (minus_one_pow (k / fact n') * ε_permut n' (k mod fact n'))%F
   end.
+
+(* signature of a permutation *)
+
+Definition sgn_diff a b := if lt_dec a b then (- 1)%F else 1%F.
+
+Definition ε {n} (p : vector n nat) :=
+  (Π (i = 1, n), Π (j = i + 1, n), sgn_diff (vect_el p j) (vect_el p i))%F.
+
+(* equality ε on permut and ε_permut *)
+
+Theorem ε_permut_ε_permut : ∀ n k, ε (permut n k) = ε_permut n k.
+Proof.
+intros.
+unfold ε.
+revert k.
+induction n; intros; [ easy | ].
+cbn - [ iter_seq ].
+...
 
 (* definition of determinant by sum of products involving all
    permutations *)
 
 Definition determinant' n (M : matrix n n T) :=
-  (Σ (k = 0, fact n - 1), signature n k *
+  (Σ (k = 0, fact n - 1), ε (permut n k) *
    Π (i = 1, n), mat_el M (i - 1) (vect_el (permut n k) (i - 1)%nat))%F.
 
 (* Proof that both definitions of determinants are equal *)
@@ -346,11 +364,10 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ iter_seq fact det_loop permut signature ].
+cbn - [ iter_seq fact det_loop permut ε ].
 revert M.
 induction n; intros. {
   cbn.
-  unfold signature.
   do 3 rewrite rngl_mul_1_l.
   now rewrite rngl_mul_1_r.
 }
@@ -381,6 +398,7 @@ cbn - [ fact iter_seq "mod" "/" permut ].
 symmetry.
 apply rngl_summation_eq_compat.
 intros i Hi.
+...
 do 3 rewrite rngl_mul_assoc.
 f_equal. 2: {
   apply rngl_product_eq_compat; [ easy | ].
