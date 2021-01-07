@@ -1159,6 +1159,28 @@ unfold swap_nat.
 destruct (Nat.eq_dec j i); [ now subst i | easy ].
 Qed.
 
+Theorem signature_swap :
+  rngl_has_opp = true →
+  ∀ n p q k,
+  p < q < n
+  → k < fact n
+  → signature n (nat_of_permut (vect_swap_elem (permut n k) p q)) = (- signature n k)%F.
+Proof.
+intros Hop * (Hpq, Hqn) Hk.
+revert k Hk.
+induction n; intros; [ easy | cbn ].
+rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
+rewrite Nat_mod_add_l_mul_r; [ | apply fact_neq_0 ].
+rewrite <- rngl_mul_opp_r; [ | easy ].
+f_equal. 2: {
+  rename Hqn into Hqsn.
+  destruct (Nat.eq_dec q n) as [Hqn| Hqn]. {
+    subst q; clear Hqsn IHn.
+    destruct n; [ easy | ].
+    cbn - [ nat_of_permut vect_swap_elem permut_fun permut fact ].
+Print permut_fun.
+...
+
 Theorem determinant'_determinant''_permut :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -1201,6 +1223,8 @@ apply NoDup_Permutation_bis; cycle 1. {
       replace (signature n x) with (- signature n y)%F. 2: {
         subst x; cbn; clear M; symmetry.
         rename y into k; rename Hy into Hk.
+...
+        apply signature_swap.
 Print nat_of_permut.
 ...
         revert p y Hy Hp.
