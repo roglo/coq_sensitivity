@@ -346,7 +346,8 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 cbn - [ iter_seq ].
-Abort.
+Print sgn_diff.
+...
 
 (* definition of determinant by sum of products involving all
    permutations *)
