@@ -1209,6 +1209,11 @@ apply NoDup_Permutation_bis; cycle 1. {
         rewrite Nat.sub_succ in Hp.
         destruct p. {
           cbn; clear IHn.
+          rewrite minus_one_pow_add_r; [ | easy | easy ].
+          replace (permut_fun (permut n) y) with (vect_el (permut (S n) y))
+            by easy.
+          unfold vect_swap_elem.
+          cbn - [ permut ].
 ...
         rewrite IHn with (p := p + 1); cycle 2. {
 ...
