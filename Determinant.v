@@ -325,6 +325,21 @@ Definition sgn_diff a b := if lt_dec a b then (- 1)%F else 1%F.
 Definition ε {n} (p : vector n nat) :=
   (Π (i = 1, n), Π (j = i + 1, n), sgn_diff (vect_el p j) (vect_el p i))%F.
 
+Theorem sgn_diff_add_mono_r : ∀ a b c,
+  sgn_diff (a + c) (b + c) = sgn_diff a b.
+Proof.
+intros.
+unfold sgn_diff.
+destruct (lt_dec (a + c) (b + c)) as [Habc| Habc]. {
+  destruct (lt_dec a b) as [Hab| Hab]; [ easy | ].
+  exfalso; apply Hab; clear Hab.
+  now apply Nat.add_lt_mono_r in Habc.
+}
+destruct (lt_dec a b) as [Hab| Hab]; [ | easy ].
+exfalso; apply Habc; clear Habc.
+now apply Nat.add_lt_mono_r.
+Qed.
+
 (* equality ε on permut and ε_permut *)
 
 Theorem ε_permut_ε_permut : ∀ n k, ε (permut n k) = ε_permut n k.
@@ -346,7 +361,30 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 cbn - [ iter_seq ].
-Print sgn_diff.
+destruct (lt_dec k (fact n)) as [Hkn| Hkn]. {
+  rewrite Nat.div_small; [ | easy ].
+  rewrite Nat.mod_small; [ | easy ].
+  cbn - [ iter_seq ].
+  rewrite rngl_mul_1_l.
+  rewrite rngl_product_succ_succ.
+  erewrite rngl_product_eq_compat. 2: {
+    intros i Hi.
+    rewrite Nat.add_succ_l.
+    erewrite rngl_product_succ_succ.
+    erewrite rngl_product_eq_compat. 2: {
+      intros j Hj.
+      rewrite sgn_diff_add_mono_r.
+      now do 2 rewrite Nat.sub_succ, Nat.sub_0_r.
+    }
+    easy.
+  }
+  cbn - [ iter_seq ].
+  rewrite rngl_product_split_first; [ | easy | flia ].
+  rewrite IHn.
+  cbn - [ iter_seq ].
+  rewrite <- rngl_mul_1_l; f_equal.
+...
+  rewrite all_1_rngl_product_1.
 ...
 
 (* definition of determinant by sum of products involving all
