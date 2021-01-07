@@ -1201,6 +1201,7 @@ apply NoDup_Permutation_bis; cycle 1. {
       replace (signature n x) with (- signature n y)%F. 2: {
         subst x; cbn.
         clear M.
+(**)
         revert p y Hy Hp.
         induction n; intros; [ easy | cbn ].
         rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
@@ -1214,24 +1215,16 @@ apply NoDup_Permutation_bis; cycle 1. {
             by easy.
           unfold vect_swap_elem.
           cbn - [ permut ].
-...
-        rewrite IHn with (p := p + 1); cycle 2. {
+          destruct y. {
+            rewrite Nat.div_0_l; [ | apply fact_neq_0 ].
+            rewrite Nat.mod_0_l; [ | apply fact_neq_0 ].
+            cbn; rewrite rngl_mul_1_l.
 ...
         destruct n; [ easy | ].
+        destruct n; [ easy | ].
+        destruct n; [ easy | ].
         destruct n. {
-          apply Nat.lt_1_r in Hpq; subst p.
-          cbn - [ "/" ].
-          rewrite Nat.add_0_r, Nat.add_0_l.
-          do 3 rewrite Nat.div_1_r.
-          do 2 rewrite Nat.mul_1_r; cbn.
-          do 3 rewrite rngl_mul_1_r.
-          destruct y; [ easy | ].
-          cbn.
-          now rewrite Nat.add_0_r.
-        }
-        destruct n. {
-          destruct p; [ | flia Hpq Hpn2 ].
-          clear Hpq Hpn2.
+          destruct p; [ | flia Hp ].
           cbn - [ "/" "mod" ].
           rewrite Nat.add_0_l, Nat.add_0_r.
           do 4 rewrite Nat.div_1_r.
