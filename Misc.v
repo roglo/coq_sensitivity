@@ -1584,6 +1584,30 @@ intros.
 now specialize (Hll d (S i)).
 Qed.
 
+Theorem iter_seq_eq_compat : ∀ A b k g h (f : A → A → A) d,
+  (∀ i, b ≤ i ≤ k → g i = h i)
+  → iter_seq b k (λ c i, f c (g i)) d =
+    iter_seq b k (λ c i, f c (h i)) d.
+Proof.
+intros * Hgh.
+unfold iter_seq.
+remember (S k - b) as len eqn:Hlen.
+assert (∀ i, b ≤ i < b + len → g i = h i). {
+  intros i Hi.
+  apply Hgh; flia Hlen Hi.
+}
+clear k Hgh Hlen.
+rename H into Hb.
+revert b Hb.
+induction len; intros; [ easy | cbn ].
+rewrite <- Hb; [ | flia ].
+apply List_fold_left_ext_in.
+intros k c Hk.
+apply in_seq in Hk.
+rewrite Hb; [ easy | ].
+flia Hk.
+Qed.
+
 Theorem NoDup_app_app_swap {A} : ∀ l1 l2 l3 : list A,
   NoDup (l1 ++ l2 ++ l3) → NoDup (l1 ++ l3 ++ l2).
 Proof.

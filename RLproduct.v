@@ -101,24 +101,7 @@ Theorem rngl_product_eq_compat : ∀ g h b k,
   → (Π (i = b, k), g i = Π (i = b, k), h i)%F.
 Proof.
 intros * Hgh.
-unfold iter_seq.
-remember (S k - b) as len eqn:Hlen.
-assert (∀ i, b ≤ i < b + len → g i = h i). {
-  intros i Hi.
-  apply Hgh; flia Hlen Hi.
-}
-clear k Hgh Hlen.
-rename H into Hb.
-revert b Hb.
-induction len; intros; [ easy | cbn ].
-do 2 rewrite rngl_mul_1_l.
-rewrite fold_left_rngl_mul_fun_from_1; symmetry.
-rewrite fold_left_rngl_mul_fun_from_1; symmetry.
-f_equal; [ apply Hb; flia | ].
-apply IHlen.
-intros i Hi.
-apply Hb.
-flia Hi.
+now apply iter_seq_eq_compat.
 Qed.
 
 Theorem rngl_product_succ_succ : ∀ b k g,

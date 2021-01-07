@@ -334,6 +334,18 @@ unfold ε.
 revert k.
 induction n; intros; [ easy | ].
 cbn - [ iter_seq ].
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    unfold permut_fun.
+    replace i with (S (i - 1)) at 1 by flia Hi.
+    replace j with (S (j - 1)) at 1 by flia Hj.
+    easy.
+  }
+  easy.
+}
+cbn - [ iter_seq ].
 ...
 
 (* definition of determinant by sum of products involving all

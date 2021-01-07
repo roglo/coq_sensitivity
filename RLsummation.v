@@ -152,30 +152,6 @@ apply in_seq in Hj.
 f_equal; f_equal; flia.
 Qed.
 
-Theorem iter_seq_eq_compat : ∀ A b k g h (add : A → A → A) d,
-  (∀ i, b ≤ i ≤ k → g i = h i)
-  → iter_seq b k (λ c i, add c (g i)) d =
-    iter_seq b k (λ c i, add c (h i)) d.
-Proof.
-intros * Hgh.
-unfold iter_seq.
-remember (S k - b) as len eqn:Hlen.
-assert (∀ i, b ≤ i < b + len → g i = h i). {
-  intros i Hi.
-  apply Hgh; flia Hlen Hi.
-}
-clear k Hgh Hlen.
-rename H into Hb.
-revert b Hb.
-induction len; intros; [ easy | cbn ].
-rewrite <- Hb; [ | flia ].
-apply List_fold_left_ext_in.
-intros k c Hk.
-apply in_seq in Hk.
-rewrite Hb; [ easy | ].
-flia Hk.
-Qed.
-
 Theorem rngl_summation_eq_compat : ∀ g h b k,
   (∀ i, b ≤ i ≤ k → (g i = h i)%F)
   → (Σ (i = b, k), g i = Σ (i = b, k), h i)%F.
