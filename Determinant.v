@@ -417,7 +417,7 @@ erewrite (rngl_product_eq_compat _ _ _ 2). 2: {
 cbn - [ iter_seq ].
 (**)
 rewrite rngl_product_succ_succ.
-remember (Π (_ = _, _), _)%F as x eqn:Hx.
+remember (Π (i = _, _), _)%F as x eqn:Hx.
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
   rewrite Nat.add_succ_l.
@@ -431,6 +431,7 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 cbn - [ iter_seq ].
+rewrite <- IHn.
 ...
 destruct (lt_dec k (fact n)) as [Hkn| Hkn]. {
   rewrite Nat.div_small; [ | easy ].
