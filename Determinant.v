@@ -325,6 +325,13 @@ Definition sgn_diff a b := if lt_dec a b then (- 1)%F else 1%F.
 Definition ε {n} (p : vector n nat) :=
   (Π (i = 1, n), Π (j = i + 1, n), sgn_diff (vect_el p j) (vect_el p i))%F.
 
+Theorem sgn_diff_diag : ∀ i, sgn_diff i i = 1%F.
+Proof.
+intros.
+unfold sgn_diff.
+destruct (lt_dec i i) as [H| H]; [ flia H | easy ].
+Qed.
+
 Theorem sgn_diff_add_mono_r : ∀ a b c,
   sgn_diff (a + c) (b + c) = sgn_diff a b.
 Proof.
@@ -380,11 +387,28 @@ destruct (lt_dec k (fact n)) as [Hkn| Hkn]. {
   }
   cbn - [ iter_seq ].
   rewrite rngl_product_split_first; [ | easy | flia ].
-  rewrite IHn.
   cbn - [ iter_seq ].
+  rewrite IHn.
   rewrite <- rngl_mul_1_l; f_equal.
-...
-  rewrite all_1_rngl_product_1.
+  apply all_1_rngl_product_1; [ easy | ].
+  intros i Hi.
+  unfold sgn_diff.
+  destruct (lt_dec (vect_el (permut n k) i) (vect_el (permut n k) 0))
+    as [H1| H1]; [ exfalso | easy ].
+  destruct n; [ flia Hi | ].
+  cbn in H1.
+  apply Nat.nle_gt in H1; apply H1; clear H1.
+  unfold permut_fun.
+  destruct i; [ flia Hi | ].
+  remember (vect_el (permut n (k mod fact n)) i) as x eqn:Hx.
+  remember (k / fact n <=? x) as b eqn:Hb.
+  symmetry in Hb.
+  destruct b. {
+    apply Nat.leb_le in Hb.
+    flia Hb.
+  }
+  apply Nat.leb_gt in Hb; cbn.
+  rewrite Nat.add_0_r.
 ...
 
 (* definition of determinant by sum of products involving all
