@@ -346,13 +346,13 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 cbn - [ iter_seq ].
-...
+Abort.
 
 (* definition of determinant by sum of products involving all
    permutations *)
 
 Definition determinant' n (M : matrix n n T) :=
-  (Σ (k = 0, fact n - 1), ε (permut n k) *
+  (Σ (k = 0, fact n - 1), ε_permut n k *
    Π (i = 1, n), mat_el M (i - 1) (vect_el (permut n k) (i - 1)%nat))%F.
 
 (* Proof that both definitions of determinants are equal *)
@@ -370,7 +370,7 @@ destruct n; intros. {
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_product_succ_succ.
-  erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
+  erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
     now rewrite Nat.sub_succ, Nat.sub_0_r.
   }
@@ -410,10 +410,9 @@ cbn - [ fact iter_seq "mod" "/" permut ].
 symmetry.
 apply rngl_summation_eq_compat.
 intros i Hi.
-...
 do 3 rewrite rngl_mul_assoc.
 f_equal. 2: {
-  apply rngl_product_eq_compat; [ easy | ].
+  apply rngl_product_eq_compat.
   intros j Hj.
   now rewrite Nat.add_1_r.
 }
@@ -443,7 +442,7 @@ rewrite det_is_det_by_permut; [ | easy ].
 unfold determinant'.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
-  erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
+  erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
     now cbn.
   }
@@ -481,7 +480,7 @@ specialize (permut_surjective Hkn Hi) as Hp.
 destruct Hp as (p & Hp & Hpp).
 rewrite (rngl_product_split _ (p + 1)); [ | flia Hp ].
 rewrite rngl_product_split_last; [ | flia ].
-erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
+erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   replace (j - 1 - 1) with (j - 2) by flia.
   destruct (Nat.eq_dec (vect_el (permut n k) (j - 2)) i) as [Hpj| Hpj]. {
@@ -496,7 +495,7 @@ rewrite (rngl_mul_comm (iter_seq _ _ _ _)).
 rewrite rngl_add_comm.
 rewrite (rngl_product_split _ (p + 1)); [ | flia Hp ].
 rewrite rngl_product_split_last; [ | flia ].
-erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
+erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   replace (j - 1 - 1) with (j - 2) by flia.
   destruct (Nat.eq_dec (vect_el (permut n k) (j - 2)) i) as [Hpj| Hpj]. {
@@ -512,7 +511,7 @@ rewrite rngl_add_comm.
 symmetry.
 rewrite (rngl_product_split _ (p + 1)); [ | flia Hp ].
 rewrite rngl_product_split_last; [ | flia ].
-erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
+erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   replace (j - 1 - 1) with (j - 2) by flia.
   destruct (Nat.eq_dec (vect_el (permut n k) (j - 2)) i) as [Hpj| Hpj]. {
@@ -538,7 +537,7 @@ do 5 rewrite <- rngl_mul_assoc.
 rewrite <- rngl_mul_add_distr_l.
 f_equal.
 clear q Hq.
-erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
+erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   destruct (Nat.eq_dec (vect_el (permut n k) (j - 1)) i) as [Hpj| Hpj]. {
     rewrite <- Hpp in Hpj.
@@ -548,7 +547,7 @@ erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
   easy.
 }
 symmetry.
-erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
+erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   destruct (Nat.eq_dec (vect_el (permut n k) (j - 1)) i) as [Hpj| Hpj]. {
     rewrite <- Hpp in Hpj.
@@ -558,7 +557,7 @@ erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
   easy.
 }
 rewrite rngl_add_comm.
-erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
+erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   destruct (Nat.eq_dec (vect_el (permut n k) (j - 1)) i) as [Hpj| Hpj]. {
     rewrite <- Hpp in Hpj.
@@ -855,7 +854,7 @@ Qed.
 
 Definition determinant'_list {n} (M : matrix n n T) :=
   map (λ k,
-    (signature n k *
+    (ε_permut n k *
      Π (i = 1, n), mat_el M (i - 1) (vect_el (permut n k) (i - 1)%nat))%F)
     (seq 0 (fact n)).
 
@@ -980,13 +979,13 @@ Definition permut_swap_last (p q : nat) n k :=
 (* yet another definition of determinant *)
 
 Definition determinant'' p q n (M : matrix n n T) :=
-  (Σ (k = 0, fact n - 1), signature n k *
+  (Σ (k = 0, fact n - 1), ε_permut n k *
    Π (i = 1, n),
    mat_el M (i - 1) (vect_el (permut_swap_last p q n k) (i - 1)%nat))%F.
 
 Definition determinant''_list p q {n} (M : matrix n n T) :=
   map (λ k,
-    (signature n k *
+    (ε_permut n k *
      Π (i = 1, n),
      mat_el M (i - 1) (vect_el (permut_swap_last p q n k) (i - 1)%nat))%F)
     (seq 0 (fact n)).
@@ -1194,10 +1193,10 @@ Theorem signature_swap :
   ∀ n p q k,
   p < q < n
   → k < fact n
-  → signature n (nat_of_permut (vect_swap_elem (permut n k) p q)) = (- signature n k)%F.
+  → ε_permut n (nat_of_permut (vect_swap_elem (permut n k) p q)) = (- ε_permut n k)%F.
 Proof.
 intros Hop * (Hpq, Hqn) Hk.
-unfold signature.
+unfold ε_permut.
 ...
 intros Hop * (Hpq, Hqn) Hk.
 revert k Hk.
@@ -1253,11 +1252,11 @@ apply NoDup_Permutation_bis; cycle 1. {
       }
       assert (Hp : p < n - 2) by flia Hpq Hpn2.
       clear Hpq Hpn2.
-      replace (signature n x) with (- signature n y)%F. 2: {
+      replace (ε_permut n x) with (- ε_permut n y)%F. 2: {
         subst x; cbn; clear M; symmetry.
         rename y into k; rename Hy into Hk.
 ...
-        apply signature_swap.
+        apply ε_permut_swap.
 Print nat_of_permut.
 ...
         revert p y Hy Hp.
@@ -1322,7 +1321,7 @@ Print nat_of_permut.
         }
         destruct n. {
 ...
-      replace (signature n x) with (- signature n y)%F. 2: {
+      replace (ε_permut n x) with (- ε_permut n y)%F. 2: {
         subst x; cbn.
         destruct n; [ easy | ].
         cbn.
@@ -1373,20 +1372,20 @@ Print nat_of_permut.
           as x eqn:Hx.
         move x after y; move Hx after Hy.
 Print nat_of_permut.
-Print signature.
+Print ε_permut.
 ...
   IHn : matrix n n T
         → ∀ p y : nat,
             p < n - 1
-            → y < fact n → signature n (nat_of_permut (vect_swap_elem (permut n y) p (n - 2))) = signature n y
+            → y < fact n → ε_permut n (nat_of_permut (vect_swap_elem (permut n y) p (n - 2))) = ε_permut n y
   p, x, y : nat
   Hpq : p < n
   Hx : x = nat_of_permut (nat_of_permut_sub_vect (vect_swap_elem (permut (S n) y) p (n - 1)) n)
   Hy : y < fact (S n)
   ============================
-  (minus_one_pow (x / fact n) * signature n (x mod fact n) *
+  (minus_one_pow (x / fact n) * ε_permut n (x mod fact n) *
    minus_one_pow (vect_el (permut (S n) y) (swap_nat p (n - 1) 0)))%F =
-  (minus_one_pow (y / fact n) * signature n (y mod fact n))%F
+  (minus_one_pow (y / fact n) * ε_permut n (y mod fact n))%F
 ...
   destruct (lt_dec q (n - 1)) as [Hqn1| Hqn1]. {
     exists (nat_of_permut (permut_swap_last p q n y)).
@@ -1886,10 +1885,10 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ iter_seq fact signature permut ].
+cbn - [ iter_seq fact ε_permut permut ].
 change
   (Σ (k = 0, fact (S n) - 1),
-   signature (S n) k *
+   ε_permut (S n) k *
    Π (j = 0, n), mat_el A j (vect_el (permut (S n) k) j) = 0)%F.
 ...
 erewrite rngl_summation_eq_compat. 2: {
@@ -1905,7 +1904,7 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite Ha.
   easy.
 }
-cbn - [ iter_seq fact signature permut ].
+cbn - [ iter_seq fact ε_permut permut ].
 ...
 erewrite summation_pair.
 ...
