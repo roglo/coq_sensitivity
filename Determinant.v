@@ -1167,6 +1167,9 @@ Theorem signature_swap :
   → signature n (nat_of_permut (vect_swap_elem (permut n k) p q)) = (- signature n k)%F.
 Proof.
 intros Hop * (Hpq, Hqn) Hk.
+unfold signature.
+...
+intros Hop * (Hpq, Hqn) Hk.
 revert k Hk.
 induction n; intros; [ easy | cbn ].
 rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
