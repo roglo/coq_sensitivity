@@ -323,7 +323,8 @@ Fixpoint ε_permut n k :=
 Definition sgn_diff a b := if lt_dec a b then (- 1)%F else 1%F.
 
 Definition ε {n} (p : vector n nat) :=
-  (Π (i = 1, n), Π (j = i + 1, n), sgn_diff (vect_el p j) (vect_el p i))%F.
+  (Π (i = 1, n), Π (j = i + 1, n),
+   sgn_diff (vect_el p (j - 1)) (vect_el p (i - 1)))%F.
 
 Theorem sgn_diff_diag : ∀ i, sgn_diff i i = 1%F.
 Proof.
@@ -332,19 +333,27 @@ unfold sgn_diff.
 destruct (lt_dec i i) as [H| H]; [ flia H | easy ].
 Qed.
 
+Theorem sgn_diff_add_mono_l : ∀ a b c,
+  sgn_diff (a + b) (a + c) = sgn_diff b c.
+Proof.
+intros.
+unfold sgn_diff.
+destruct (lt_dec (a + b) (a + c)) as [Habc| Habc]. {
+  destruct (lt_dec b c) as [Hbc| Hbc]; [ easy | ].
+  exfalso; apply Hbc; clear Hbc.
+  now apply Nat.add_lt_mono_l in Habc.
+}
+destruct (lt_dec b c) as [Hbc| Hbc]; [ | easy ].
+exfalso; apply Habc; clear Habc.
+now apply Nat.add_lt_mono_l.
+Qed.
+
 Theorem sgn_diff_add_mono_r : ∀ a b c,
   sgn_diff (a + c) (b + c) = sgn_diff a b.
 Proof.
 intros.
-unfold sgn_diff.
-destruct (lt_dec (a + c) (b + c)) as [Habc| Habc]. {
-  destruct (lt_dec a b) as [Hab| Hab]; [ easy | ].
-  exfalso; apply Hab; clear Hab.
-  now apply Nat.add_lt_mono_r in Habc.
-}
-destruct (lt_dec a b) as [Hab| Hab]; [ | easy ].
-exfalso; apply Habc; clear Habc.
-now apply Nat.add_lt_mono_r.
+setoid_rewrite Nat.add_comm.
+apply sgn_diff_add_mono_l.
 Qed.
 
 (* equality ε on permut and ε_permut *)
@@ -356,14 +365,21 @@ unfold ε.
 revert k.
 induction n; intros; [ easy | ].
 cbn - [ iter_seq ].
+(**)
+rewrite rngl_product_split_first; [ | easy | flia ].
+cbn - [ iter_seq ].
+rewrite rngl_product_succ_succ.
 erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  now rewrite Nat.sub_succ, Nat.sub_0_r.
+}
+erewrite (rngl_product_eq_compat _ _ _ 2). 2: {
   intros i Hi.
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
-    unfold permut_fun.
-    replace i with (S (i - 1)) at 1 by flia Hi.
-    replace j with (S (j - 1)) at 1 by flia Hj.
-    easy.
+    replace (i - 1) with (S (i - 2)) by flia Hi.
+    replace (j - 1) with (S (j - 2)) by flia Hj Hi.
+    now cbn.
   }
   easy.
 }
@@ -372,7 +388,8 @@ destruct (lt_dec k (fact n)) as [Hkn| Hkn]. {
   rewrite Nat.div_small; [ | easy ].
   rewrite Nat.mod_small; [ | easy ].
   cbn - [ iter_seq ].
-  rewrite rngl_mul_1_l.
+  rewrite all_1_rngl_product_1; [ | easy | easy ].
+  do 2 rewrite rngl_mul_1_l.
   rewrite rngl_product_succ_succ.
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
@@ -381,34 +398,14 @@ destruct (lt_dec k (fact n)) as [Hkn| Hkn]. {
     erewrite rngl_product_eq_compat. 2: {
       intros j Hj.
       rewrite sgn_diff_add_mono_r.
-      now do 2 rewrite Nat.sub_succ, Nat.sub_0_r.
+      now do 2 rewrite Nat.sub_succ.
     }
     easy.
   }
   cbn - [ iter_seq ].
-  rewrite rngl_product_split_first; [ | easy | flia ].
-  cbn - [ iter_seq ].
-  rewrite IHn.
-  rewrite <- rngl_mul_1_l; f_equal.
-  apply all_1_rngl_product_1; [ easy | ].
-  intros i Hi.
-  unfold sgn_diff.
-  destruct (lt_dec (vect_el (permut n k) i) (vect_el (permut n k) 0))
-    as [H1| H1]; [ exfalso | easy ].
-  destruct n; [ flia Hi | ].
-  cbn in H1.
-  apply Nat.nle_gt in H1; apply H1; clear H1.
-  unfold permut_fun.
-  destruct i; [ flia Hi | ].
-  remember (vect_el (permut n (k mod fact n)) i) as x eqn:Hx.
-  remember (k / fact n <=? x) as b eqn:Hb.
-  symmetry in Hb.
-  destruct b. {
-    apply Nat.leb_le in Hb.
-    flia Hb.
-  }
-  apply Nat.leb_gt in Hb; cbn.
-  rewrite Nat.add_0_r.
+  apply IHn.
+}
+apply Nat.nlt_ge in Hkn.
 ...
 
 (* definition of determinant by sum of products involving all
