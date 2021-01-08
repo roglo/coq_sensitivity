@@ -542,6 +542,7 @@ destruct (lt_dec k (2 * fact n)) as [Hk2n| Hk2n]. {
   apply rngl_product_eq_compat.
   intros j Hj.
   (* chuis pas sûr *)
+  (* trop compliqué ; en plus, c'est juste *un* cas *)
 ...
 
 (* definition of determinant by sum of products involving all
