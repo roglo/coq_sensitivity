@@ -1312,6 +1312,7 @@ Theorem signature_swap :
 Proof.
 intros Hop * (Hpq, Hqn) Hk.
 unfold ε_permut.
+... (*
 ...
 intros Hop * (Hpq, Hqn) Hk.
 revert k Hk.
@@ -1327,6 +1328,7 @@ f_equal. 2: {
     cbn - [ nat_of_permut vect_swap_elem permut_fun permut fact ].
 Print permut_fun.
 ...
+*)
 
 Theorem determinant'_determinant''_permut :
   rngl_is_comm = true →
@@ -1370,6 +1372,7 @@ apply NoDup_Permutation_bis; cycle 1. {
       replace (ε_permut n x) with (- ε_permut n y)%F. 2: {
         subst x; cbn; clear M; symmetry.
         rename y into k; rename Hy into Hk.
+... (*
 ...
         apply ε_permut_swap.
 Print nat_of_permut.
@@ -1568,6 +1571,7 @@ unfold FinFun.Injective.
 intros x y Hxy.
 (* pas gagné *)
 ...
+*)
 
 (* yet another proof that it is equal to determinant *)
 
@@ -1588,7 +1592,6 @@ apply rngl_summation_permut; cycle 1. {
 }
 ...
 
-
 (* *)
 
 Definition mat_mul_row_by_scal n k (M : matrix n n T) s :=
@@ -1608,8 +1611,6 @@ Definition mat_add_row_mul_scal_row n (M : matrix n n T) i1 v i2 :=
     (λ i j,
      if Nat.eq_dec i i1 then (mat_el M i1 j + v * mat_el M i2 j)%F
      else mat_el M i j).
-
-...
 
 (* If we multiply a row (column) of A by a number, the determinant of
    A will be multiplied by the same number. *)
@@ -1977,8 +1978,6 @@ Compute (map (λ i, list_of_vect (permut_swap_last 1 2 3 i)) (seq 0 (fact 3))).
 Compute (map (λ i, list_of_vect (permut_swap_last 0 1 6 i)) (seq 0 (fact 6))).
 *)
 
-...
-
 Theorem det_two_rows_are_eq :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -1994,6 +1993,7 @@ destruct n; [ flia Hiz | ].
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   rewrite rngl_product_succ_succ.
+... (*
   erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
     intros k Hk.
     now rewrite Nat.sub_succ, Nat.sub_0_r.
@@ -2272,7 +2272,7 @@ rewrite (det_sum_row_row _ M C Hrz); cycle 1. {
     now destruct (Nat.eq_dec i 0).
   }
   rewrite H in H1; clear H.
-Abort. (*
+... (*
 ...
   assert (H : determinant D = 0%F). {
     rewrite Hd.
@@ -2293,7 +2293,7 @@ intros * Hij Hi Hj.
 (* look point 5 at
 https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html
 *)
-Abort. (*
+... (*
 ...
 intros * Hsm Hij Hi Hj.
 unfold is_square_mat in Hsm.
@@ -2414,7 +2414,7 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   now rewrite Nat.sub_0_r.
 }
 apply not_eq_sym in Hiz.
-Abort. (*
+... (*
 ...
 specialize (det_swap_rows M Hiz) as H.
 apply (f_equal rng_opp) in H.
@@ -2509,6 +2509,8 @@ Qed.
 
 Definition comatrix {n} (M : matrix n n T) : matrix n n T :=
   {| mat_el i j := (minus_one_pow (i + j) * determinant (subm M i j))%F |}.
+
+End a.
 
 Arguments det_loop {T ro} {n}%nat M%M i%nat.
 Arguments determinant {T ro n} M%M.

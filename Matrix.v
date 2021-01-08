@@ -725,7 +725,7 @@ Arguments vect_el {n}%nat {T}%type v%V.
 Notation "A • V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
 Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
-Notation "U · V" := (vect_dot_product U V) (at level 40) : V_scope.
+Notation "≺ U , V ≻" := (vect_dot_product U V) (at level 35).
 
 Theorem fold_mat_sub : ∀ m n (MA MB : matrix m n T), (MA + - MB = MA - MB)%M.
 Proof. easy. Qed.
@@ -1124,7 +1124,7 @@ Qed.
 Theorem vect_dot_mul_scal_mul_comm :
   rngl_is_comm = true →
   ∀ {n} (a : T) (U V : vector n T),
-  (U · (a × V) = (a * (U · V))%F)%V.
+  ≺ U, a × V ≻ = (a * ≺ U, V ≻)%F.
 Proof.
 intros Hic *.
 unfold vect_dot_product.
@@ -1139,7 +1139,7 @@ apply rngl_mul_comm.
 Qed.
 
 Theorem vect_scal_mul_dot_mul_comm : ∀ {n} (a : T) (U V : vector n T),
-  ((a × U) · V = (a * (U · V))%F)%V.
+  ≺ a × U, V ≻ = (a * ≺ U, V ≻)%F.
 Proof.
 intros.
 unfold vect_dot_product.
@@ -1523,7 +1523,7 @@ Notation "U + V" := (vect_add U V) : V_scope.
 Notation "U - V" := (vect_sub U V) : V_scope.
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
 Notation "A • V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
-Notation "U · V" := (vect_dot_product U V) (at level 40) : V_scope.
+Notation "≺ U , V ≻" := (vect_dot_product U V) (at level 35).
 Notation "- V" := (vect_opp V) : V_scope.
 
 End matrix_Notations.

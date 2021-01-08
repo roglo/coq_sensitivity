@@ -73,7 +73,7 @@ Definition eigenvalues_and_vectors n M ev eV :=
 (* Rayleigh quotient *)
 
 Definition Rayleigh_quotient n (M : matrix n n T) (x : vector n T) :=
-  ((x · (M • x)%M)%V / (x · x)%V)%F.
+  (≺ x, M • x ≻ / ≺ x, x ≻)%F.
 
 Arguments Rayleigh_quotient [n]%nat_scope M%M x%V.
 
@@ -130,7 +130,7 @@ Theorem eq_vect_squ_0 :
   rngl_has_dec_le = true →
   rngl_is_integral = true →
   rngl_is_ordered = true →
-  ∀ n v, (v · v)%V = 0%F → v = vect_zero n.
+  ∀ n v, ≺ v, v ≻ = 0%F → v = vect_zero n.
 Proof.
 intros Hop Hed Hdo Hor * H.
 specialize rngl_opt_integral as rngl_integral.
@@ -380,7 +380,7 @@ Qed.
 Theorem mat_mul_vect_dot_vect :
   rngl_is_comm = true →
   ∀ n (M : matrix n n T) U V,
-  ((M • U)%M · V = U · (M⁺ • V)%M)%V.
+  ≺ M • U, V ≻ = ≺ U, M⁺ • V ≻.
 Proof.
 intros Hic *.
 unfold vect_dot_product.
@@ -431,7 +431,7 @@ remember (nth j eV (vect_zero n)) as vj eqn:Hvj.
 move vj before vi.
 destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
   destruct Hvv as (Hall_diff & Hall_norm_1 & Hvv).
-  enough (Hvvz : (vi · vj)%V = 0%F) by easy.
+  enough (Hvvz : ≺ vi, vj ≻ = 0%F) by easy.
   specialize (mat_mul_vect_dot_vect Hic M vi vj) as H1.
   (* H1 : ((M • vi) · vj)%V = (vi · (M⁺ • vj))%V *)
   specialize (Hvv i (nth i ev 0%F) vi) as H2.
@@ -454,7 +454,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
   rewrite vect_dot_mul_scal_mul_comm in H1; [ | easy ].
   specialize rngl_opt_eq_dec as rngl_eq_dec.
   rewrite Heq in rngl_eq_dec.
-  destruct (rngl_eq_dec (vi · vj)%V 0%F) as [Hvvij| Hvvij]; [ easy | ].
+  destruct (rngl_eq_dec (≺ vi, vj ≻) 0%F) as [Hvvij| Hvvij]; [ easy | ].
   exfalso.
   apply rngl_mul_reg_r in H1; [ | easy | easy ].
   revert H1.
@@ -498,8 +498,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     f_equal.
     now apply minus_one_pow_add_r.
   }
-...
-
+... (*
   unfold determinant.
   induction n; [ easy | ].
   rewrite Nat.sub_succ, Nat.sub_0_r at 1.
@@ -513,6 +512,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   }
   cbn - [ iter_seq ].
 ...
+*)
 
 Theorem det_nz_inv_comm : ∀ n (MA MB : matrix n n T),
   determinant MA ≠ 0%F
@@ -539,12 +539,14 @@ specialize (diagonalized_matrix_prop_1 Hic) as H1.
 specialize (H1 n M ev eV D U Hsy Hvv Hd Ho).
 rewrite <- H1.
 rewrite <- mat_mul_assoc; [ | easy ].
+... (*
 rewrite (@det_nz_inv_comm _ _ U). 3: {
   specialize for_symm_squ_mat_eigen_vect_mat_is_ortho as H2.
   specialize (H2 Hic Hed Hiv n M ev eV).
   now apply H2.
 } 2: {
 ...
+*)
 
 (* changing variable x as y = O^T . x, the Rayleigh quotient R (M, x)
    is equal to
