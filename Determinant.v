@@ -470,31 +470,78 @@ destruct (lt_dec k (2 * fact n)) as [Hk2n| Hk2n]. {
     }
     rewrite all_1_rngl_product_1; [ | easy | ]. 2: {
       intros i Hi.
-      destruct (lt_dec (vect_el (permut (S n) k) (i - 1)) 1) as [Hni| Hni]. {
-        exfalso.
-        apply Nat.lt_1_r in Hni.
-        cbn in Hi.
-        rewrite (Nat_div_less_small 1) in Hi; [ | now rewrite Nat.mul_1_l ].
-        rewrite (Nat_mod_less_small 1) in Hi; [ | now rewrite Nat.mul_1_l ].
-        cbn in Hi.
-        rewrite Nat.add_0_r in Hi.
-        specialize (@permut_inv_permut (S n) k (i - 1)) as H1.
-        assert (H : i - 1 < S n). {
-          specialize (@permut_inv_upper_bound n (k - fact n) 0) as H2.
-          assert (H : k - fact n < fact n) by (cbn in Hk2n; flia Hk2n).
-          specialize (H2 H); clear H.
-          assert (H : 0 < n). {
-            destruct n; [ | flia ].
-            cbn in Hksn, Hkn; flia Hksn Hkn.
-          }
-          specialize (H2 H); clear H.
-          flia Hi H2.
+      destruct (lt_dec (vect_el (permut (S n) k) (i - 1)) 1) as [Hni| Hni].
+      2: easy.
+      exfalso.
+      apply Nat.lt_1_r in Hni.
+      cbn in Hi.
+      rewrite (Nat_div_less_small 1) in Hi; [ | now rewrite Nat.mul_1_l ].
+      rewrite (Nat_mod_less_small 1) in Hi; [ | now rewrite Nat.mul_1_l ].
+      cbn in Hi.
+      rewrite Nat.add_0_r in Hi.
+      specialize (@permut_inv_permut (S n) k (i - 1)) as H1.
+      assert (H : i - 1 < S n). {
+        specialize (@permut_inv_upper_bound n (k - fact n) 0) as H2.
+        assert (H : k - fact n < fact n) by (cbn in Hk2n; flia Hk2n).
+        specialize (H2 H); clear H.
+        assert (H : 0 < n). {
+          destruct n; [ | flia ].
+          cbn in Hksn, Hkn; flia Hksn Hkn.
         }
-        specialize (H1 H Hksn); clear H.
-        rewrite Hni in H1.
-        cbn in H1.
-        rewrite (Nat_div_less_small 1) in H1; [ | now rewrite Nat.mul_1_l ].
-        cbn in H1.
+        specialize (H2 H); clear H.
+        flia Hi H2.
+      }
+      specialize (H1 H Hksn); clear H.
+      rewrite Hni in H1.
+      cbn in H1.
+      rewrite (Nat_div_less_small 1) in H1; [ | now rewrite Nat.mul_1_l ].
+      rewrite (Nat_mod_less_small 1) in H1; [ | now rewrite Nat.mul_1_l ].
+      rewrite Nat.mul_1_l in H1.
+      cbn in H1.
+      flia Hi H1.
+    }
+    rewrite rngl_mul_1_l.
+    rewrite all_1_rngl_product_1; [ | easy | ]. 2: {
+      intros i Hi.
+      destruct (lt_dec (vect_el (permut (S n) k) i) 1) as [Hni| Hni].
+      2: easy.
+      exfalso.
+      apply Nat.lt_1_r in Hni.
+      cbn in Hi.
+      rewrite (Nat_div_less_small 1) in Hi; [ | now rewrite Nat.mul_1_l ].
+      rewrite (Nat_mod_less_small 1) in Hi; [ | now rewrite Nat.mul_1_l ].
+      cbn in Hi.
+      rewrite Nat.add_0_r in Hi.
+      specialize (@permut_inv_permut (S n) k i) as H1.
+      assert (H : i < S n). {
+        specialize (@permut_inv_upper_bound n (k - fact n) 0) as H2.
+        assert (H : k - fact n < fact n) by (cbn in Hk2n; flia Hk2n).
+        specialize (H2 H); clear H.
+        assert (H : 0 < n). {
+          destruct n; [ | flia ].
+          cbn in Hksn, Hkn; flia Hksn Hkn.
+        }
+        specialize (H2 H); clear H.
+        flia Hi H2.
+      }
+      specialize (H1 H Hksn); clear H.
+      rewrite Hni in H1.
+      cbn in H1.
+      rewrite (Nat_div_less_small 1) in H1; [ | now rewrite Nat.mul_1_l ].
+      rewrite (Nat_mod_less_small 1) in H1; [ | now rewrite Nat.mul_1_l ].
+      rewrite Nat.mul_1_l in H1.
+      cbn in H1.
+      flia Hi H1.
+    }
+    rewrite permut_permut_inv; [ | flia | easy ].
+    cbn; apply rngl_mul_1_r.
+  }
+  rewrite <- IHn; [ | cbn in Hk2n; flia Hk2n ].
+  apply rngl_product_eq_compat.
+  intros i Hi.
+  apply rngl_product_eq_compat.
+  intros j Hj.
+  (* chuis pas sûr *)
 ...
 
 (* definition of determinant by sum of products involving all
