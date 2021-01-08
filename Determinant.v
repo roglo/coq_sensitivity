@@ -455,6 +455,12 @@ destruct (lt_dec k (2 * fact n)) as [Hk2n| Hk2n]. {
   rewrite (Nat_mod_less_small 1); [ | now rewrite Nat.mul_1_l ].
   rewrite Nat.mul_1_l.
   cbn - [ iter_seq "<=?" ].
+  f_equal. {
+    unfold sgn_diff.
+    replace (permut_fun (permut n) k) with (vect_el (permut (S n) k)) by easy.
+    rewrite (rngl_product_split _ (permut_inv (S n) k 0)). 2: {
+      split; [ flia | ].
+      apply -> Nat.succ_le_mono.
 ...
 
 (* definition of determinant by sum of products involving all
