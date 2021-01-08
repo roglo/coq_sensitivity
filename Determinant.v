@@ -1386,14 +1386,14 @@ destruct (Nat.eq_dec j i); [ now subst i | easy ].
 Qed.
 
 Theorem glop : ∀ p q n k k',
-  n ≠ 0
+  p < q < n
   → k' = nat_of_permut (vect_swap_elem (permut n k) p q)
   → ε_permut n k' = (- ε_permut n k)%F.
 Proof.
-intros * Hnz Hk'.
+intros * Hpqn Hk'.
 subst k'.
-revert k.
-induction n; intros; [ easy | clear Hnz ].
+revert p q k Hpqn.
+induction n; intros; [ easy | ].
 cbn - [ nat_of_permut permut ].
 ...
 
