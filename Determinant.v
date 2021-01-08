@@ -389,11 +389,11 @@ destruct d. {
 
 (* equality ε on permut and ε_permut *)
 
-Theorem ε_permut_ε_permut : ∀ n k, ε (permut n k) = ε_permut n k.
+Theorem ε_permut_ε_permut : ∀ n k, k < fact n → ε (permut n k) = ε_permut n k.
 Proof.
-intros.
+intros * Hkn.
 unfold ε.
-revert k.
+revert k Hkn.
 induction n; intros; [ easy | ].
 cbn - [ iter_seq ].
 (**)
@@ -432,6 +432,7 @@ erewrite rngl_product_eq_compat. 2: {
 }
 cbn - [ iter_seq ].
 subst x.
+rename Hkn into Hksn.
 destruct (lt_dec k (fact n)) as [Hkn| Hkn]. {
   rewrite Nat.div_small; [ | easy ].
   rewrite Nat.mod_small; [ | easy ].
@@ -447,7 +448,7 @@ destruct (lt_dec k (fact n)) as [Hkn| Hkn]. {
     easy.
   }
   cbn - [ iter_seq ].
-  apply IHn.
+  now apply IHn.
 }
 apply Nat.nlt_ge in Hkn.
 destruct (lt_dec k (2 * fact n)) as [Hk2n| Hk2n]. {
@@ -460,7 +461,40 @@ destruct (lt_dec k (2 * fact n)) as [Hk2n| Hk2n]. {
     replace (permut_fun (permut n) k) with (vect_el (permut (S n) k)) by easy.
     rewrite (rngl_product_split _ (permut_inv (S n) k 0)). 2: {
       split; [ flia | ].
-      apply -> Nat.succ_le_mono.
+      apply permut_inv_upper_bound; [ easy | flia ].
+    }
+    rewrite rngl_product_split_last. 2: {
+      cbn.
+      rewrite (Nat_div_less_small 1); [ | now rewrite Nat.mul_1_l ].
+      cbn; flia.
+    }
+    rewrite all_1_rngl_product_1; [ | easy | ]. 2: {
+      intros i Hi.
+      destruct (lt_dec (vect_el (permut (S n) k) (i - 1)) 1) as [Hni| Hni]. {
+        exfalso.
+        apply Nat.lt_1_r in Hni.
+        cbn in Hi.
+        rewrite (Nat_div_less_small 1) in Hi; [ | now rewrite Nat.mul_1_l ].
+        rewrite (Nat_mod_less_small 1) in Hi; [ | now rewrite Nat.mul_1_l ].
+        cbn in Hi.
+        rewrite Nat.add_0_r in Hi.
+        specialize (@permut_inv_permut (S n) k (i - 1)) as H1.
+        assert (H : i - 1 < S n). {
+          specialize (@permut_inv_upper_bound n (k - fact n) 0) as H2.
+          assert (H : k - fact n < fact n) by (cbn in Hk2n; flia Hk2n).
+          specialize (H2 H); clear H.
+          assert (H : 0 < n). {
+            destruct n; [ | flia ].
+            cbn in Hksn, Hkn; flia Hksn Hkn.
+          }
+          specialize (H2 H); clear H.
+          flia Hi H2.
+        }
+        specialize (H1 H Hksn); clear H.
+        rewrite Hni in H1.
+        cbn in H1.
+        rewrite (Nat_div_less_small 1) in H1; [ | now rewrite Nat.mul_1_l ].
+        cbn in H1.
 ...
 
 (* definition of determinant by sum of products involving all
