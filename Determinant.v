@@ -431,23 +431,18 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 cbn - [ iter_seq ].
-rewrite <- IHn.
-...
+subst x.
 destruct (lt_dec k (fact n)) as [Hkn| Hkn]. {
   rewrite Nat.div_small; [ | easy ].
   rewrite Nat.mod_small; [ | easy ].
   cbn - [ iter_seq ].
   rewrite all_1_rngl_product_1; [ | easy | easy ].
   do 2 rewrite rngl_mul_1_l.
-  rewrite rngl_product_succ_succ.
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
-    rewrite Nat.add_succ_l.
-    erewrite rngl_product_succ_succ.
     erewrite rngl_product_eq_compat. 2: {
       intros j Hj.
-      rewrite sgn_diff_add_mono_r.
-      now do 2 rewrite Nat.sub_succ.
+      now rewrite sgn_diff_add_mono_r.
     }
     easy.
   }
@@ -455,6 +450,11 @@ destruct (lt_dec k (fact n)) as [Hkn| Hkn]. {
   apply IHn.
 }
 apply Nat.nlt_ge in Hkn.
+destruct (lt_dec k (2 * fact n)) as [Hk2n| Hk2n]. {
+  rewrite (Nat_div_less_small 1); [ | now rewrite Nat.mul_1_l ].
+  rewrite (Nat_mod_less_small 1); [ | now rewrite Nat.mul_1_l ].
+  rewrite Nat.mul_1_l.
+  cbn - [ iter_seq "<=?" ].
 ...
 
 (* definition of determinant by sum of products involving all
