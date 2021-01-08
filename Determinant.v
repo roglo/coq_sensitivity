@@ -543,7 +543,7 @@ destruct (lt_dec k (2 * fact n)) as [Hk2n| Hk2n]. {
   intros j Hj.
   (* chuis pas sûr *)
   (* trop compliqué ; en plus, c'est juste *un* cas *)
-...
+Abort.
 
 (* definition of determinant by sum of products involving all
    permutations *)
@@ -1384,6 +1384,18 @@ intros j Hj.
 unfold swap_nat.
 destruct (Nat.eq_dec j i); [ now subst i | easy ].
 Qed.
+
+Theorem glop : ∀ p q n k k',
+  n ≠ 0
+  → k' = nat_of_permut (vect_swap_elem (permut n k) p q)
+  → ε_permut n k' = (- ε_permut n k)%F.
+Proof.
+intros * Hnz Hk'.
+subst k'.
+revert k.
+induction n; intros; [ easy | clear Hnz ].
+cbn - [ nat_of_permut permut ].
+...
 
 Theorem signature_swap :
   rngl_has_opp = true →
