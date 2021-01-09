@@ -1407,12 +1407,19 @@ erewrite rngl_product_eq_compat. 2: {
   now rewrite <- (rngl_product_mul_distr _ Hic).
 }
 cbn - [ iter_seq ].
+...
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
     remember (vect_el σ₂ (i - 1)) as l eqn:Hl.
     remember (vect_el σ₂ (j - 1)) as k eqn:Hk.
+...
+  Hl : l = vect_el σ₂ (i - 1)
+  k : nat
+  Hk : k = vect_el σ₂ (j - 1)
+  ============================
+  (sgn_diff (vect_el σ₁ k) (vect_el σ₁ l) * sgn_diff k l)%F = ?h0 j
 ...
 
 apply rngl_product_eq_compat.
