@@ -1402,6 +1402,21 @@ Proof.
 intros Hic *.
 unfold ε.
 rewrite <- (rngl_product_mul_distr _ Hic).
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  now rewrite <- (rngl_product_mul_distr _ Hic).
+}
+cbn - [ iter_seq ].
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    remember (vect_el σ₂ (i - 1)) as l eqn:Hl.
+    remember (vect_el σ₂ (j - 1)) as k eqn:Hk.
+...
+
+apply rngl_product_eq_compat.
+intros j Hj.
 ...
 
 Theorem glop : ∀ n (σ₁ σ₂ : vector n nat),
