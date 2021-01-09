@@ -1416,6 +1416,9 @@ erewrite (rngl_product_eq_compat _ _ _ (p + 1)). 2: {
   now rewrite Nat.sub_0_r.
 }
 cbn - [ iter_seq permut ].
+(* hyper compliqué, même sur le papier ; faudrait trouver un
+   raccourci, trouver des propriétés de ε, de vect_swap_elem,
+   que sais-je... *)
 ...
 destruct (Nat.eq_dec p 0) as [Hpz| Hpz]. {
   subst p.
