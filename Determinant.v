@@ -1161,9 +1161,11 @@ Definition vect_swap_elem n (v : vector n nat) i j :=
 Definition permut_swap_with_0 p n k :=
   vect_swap_elem (permut n k) 0 p.
 
+(*
 Compute (map (λ i, list_of_vect (permut_swap_with_0 0 3 i)) (seq 0 (fact 3))).
 Compute (map (λ i, list_of_vect (permut_swap_with_0 1 3 i)) (seq 0 (fact 3))).
 Compute (map (λ i, list_of_vect (permut_swap_with_0 2 3 i)) (seq 0 (fact 3))).
+*)
 
 (* k' such that permut_swap_with_0 p n k = permut n k' *)
 
@@ -1384,6 +1386,29 @@ intros j Hj.
 unfold swap_nat.
 destruct (Nat.eq_dec j i); [ now subst i | easy ].
 Qed.
+
+Definition permut_comp {n} (σ₁ σ₂ : vector n nat) :=
+  mk_vect n (λ i, vect_el σ₁ (vect_el σ₂ i)).
+
+Notation "σ₁ ° σ₂" := (permut_comp σ₁ σ₂) (at level 40).
+
+(* https://fr.wikipedia.org/wiki/Signature_d%27une_permutation#Une_transposition_est_impaire *)
+
+Theorem pouet :
+  rngl_is_comm = true →
+  ∀ n (σ₁ σ₂ : vector n nat),
+  (ε (σ₁ ° σ₂) * ε σ₂)%F = ε σ₁.
+Proof.
+intros Hic *.
+unfold ε.
+rewrite <- (rngl_product_mul_distr _ Hic).
+...
+
+Theorem glop : ∀ n (σ₁ σ₂ : vector n nat),
+  ε (σ₁ ° σ₂) = (ε σ₁ * ε σ₂)%F.
+Proof.
+intros.
+...
 
 Theorem glop : ∀ p q n k k',
   p < q < n

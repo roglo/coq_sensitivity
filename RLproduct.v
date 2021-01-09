@@ -100,19 +100,7 @@ Theorem rngl_product_split_last : ∀ b k g,
   → (Π (i = b, k), g i = (Π (i = S b, k), g (i - 1)%nat) * g k)%F.
 Proof.
 intros * Hbk.
-unfold iter_seq.
-remember (S k - S b) as len eqn:Hlen.
-rewrite Nat.sub_succ in Hlen.
-replace (S k - b) with (S len) by flia Hbk Hlen.
-replace k with (b + len) by flia Hbk Hlen.
-rewrite <- seq_shift.
-rewrite List_fold_left_map.
-rewrite List_seq_succ_r.
-rewrite fold_left_app.
-cbn; f_equal.
-apply List_fold_left_ext_in.
-intros i c Hi.
-now rewrite Nat.sub_0_r.
+now apply iter_seq_split_last.
 Qed.
 
 Theorem rngl_product_eq_compat : ∀ g h b k,
@@ -127,15 +115,32 @@ Theorem rngl_product_succ_succ : ∀ b k g,
   (Π (i = S b, S k), g i = Π (i = b, k), g (S i))%F.
 Proof.
 intros b k g.
-apply iter_succ_succ.
+apply iter_seq_succ_succ.
 Qed.
 
 Theorem rngl_product_empty : ∀ g b k,
   k < b → (Π (i = b, k), g i = 1)%F.
 Proof.
 intros * Hkb.
-unfold iter_seq.
-now replace (S k - b) with 0 by flia Hkb.
+now apply iter_seq_empty.
+Qed.
+
+Theorem rngl_product_mul_distr :
+  rngl_is_comm = true →
+  ∀ g h b k,
+  (Π (i = b, k), (g i * h i) =
+   (Π (i = b, k), g i) * Π (i = b, k), h i)%F.
+Proof.
+intros Hic g h b k.
+apply iter_seq_distr. {
+  apply rngl_mul_1_l.
+} {
+  specialize rngl_opt_mul_comm as rngl_mul_comm.
+  rewrite Hic in rngl_mul_comm.
+  apply rngl_mul_comm.
+} {
+  apply rngl_mul_assoc.
+}
 Qed.
 
 End a.

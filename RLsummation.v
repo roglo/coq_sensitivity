@@ -105,19 +105,7 @@ Theorem rngl_summation_split_last : ∀ b k g,
   → (Σ (i = b, k), g i = Σ (i = S b, k), g (i - 1)%nat + g k)%F.
 Proof.
 intros * Hbk.
-unfold iter_seq.
-remember (S k - S b) as len eqn:Hlen.
-rewrite Nat.sub_succ in Hlen.
-replace (S k - b) with (S len) by flia Hbk Hlen.
-replace k with (b + len) by flia Hbk Hlen.
-rewrite <- seq_shift.
-rewrite List_fold_left_map.
-rewrite List_seq_succ_r.
-rewrite fold_left_app.
-cbn; f_equal.
-apply List_fold_left_ext_in.
-intros i c Hi.
-now rewrite Nat.sub_0_r.
+now apply iter_seq_split_last.
 Qed.
 
 Theorem rngl_summation_rtl : ∀ g b k,
@@ -164,15 +152,14 @@ Theorem rngl_summation_empty : ∀ g b k,
   k < b → (Σ (i = b, k), g i = 0)%F.
 Proof.
 intros * Hkb.
-unfold iter_seq.
-now replace (S k - b) with 0 by flia Hkb.
+now apply iter_seq_empty.
 Qed.
 
 Theorem rngl_summation_succ_succ : ∀ b k g,
   (Σ (i = S b, S k), g i = Σ (i = b, k), g (S i))%F.
 Proof.
 intros b k g.
-apply iter_succ_succ.
+apply iter_seq_succ_succ.
 Qed.
 
 Theorem rngl_summation_shift : ∀ b g k,
@@ -189,39 +176,13 @@ Theorem rngl_summation_add_distr : ∀ g h b k,
    Σ (i = b, k), g i + Σ (i = b, k), h i)%F.
 Proof.
 intros g h b k.
-destruct (le_dec b k) as [Hbk| Hbk]. {
-  revert b Hbk.
-  induction k; intros. {
-    apply Nat.le_0_r in Hbk; subst b; cbn.
-    now do 3 rewrite rngl_add_0_l.
-  }
-  rewrite (rngl_summation_split_last b); [ | easy ].
-  rewrite (rngl_summation_split_last b); [ | easy ].
-  rewrite (rngl_summation_split_last b); [ | easy ].
-  do 2 rewrite rngl_add_assoc; f_equal.
-  rewrite rngl_add_add_swap; f_equal.
-  destruct (eq_nat_dec b (S k)) as [Hbek| Hbek]. {
-    subst b.
-    rewrite rngl_summation_empty; [ | flia ].
-    rewrite rngl_summation_empty; [ | flia ].
-    rewrite rngl_summation_empty; [ | flia ].
-    symmetry; apply rngl_add_0_l.
-  }
-  do 3 rewrite rngl_summation_succ_succ.
-  rewrite rngl_summation_eq_compat
-    with (h := λ i, (g i + h i)%F). 2: {
-    intros * Hi.
-    now rewrite Nat.sub_succ, Nat.sub_0_r.
-  }
-  rewrite IHk; [ | flia Hbk Hbek ].
-  now f_equal; apply rngl_summation_eq_compat; intros i Hi;
-    rewrite Nat.sub_succ, Nat.sub_0_r.
+apply iter_seq_distr. {
+  apply rngl_add_0_l.
+} {
+  apply rngl_add_comm.
+} {
+  apply rngl_add_assoc.
 }
-apply Nat.nle_gt in Hbk.
-rewrite rngl_summation_empty; [ | easy ].
-rewrite rngl_summation_empty; [ | easy ].
-rewrite rngl_summation_empty; [ | easy ].
-symmetry; apply rngl_add_0_l.
 Qed.
 
 Theorem rngl_summation_split : ∀ j g b k,
