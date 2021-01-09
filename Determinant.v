@@ -1391,9 +1391,39 @@ Theorem glop : ∀ p q n k k',
   → ε (permut n k') = (- ε (permut n k))%F.
 Proof.
 intros * Hpqn Hk'.
+unfold ε.
 revert p q k k' Hpqn Hk'.
 induction n; intros; [ easy | ].
-unfold ε.
+rewrite (rngl_product_split _ (S p)); [ | flia Hpqn ].
+rewrite rngl_product_split_last; [ | flia ].
+rewrite rngl_product_succ_succ.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite Nat.sub_add; [ | flia Hi ].
+  rewrite rngl_product_succ_succ.
+  rewrite Nat.sub_succ, Nat.sub_0_r.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    now rewrite Nat.sub_succ, Nat.sub_0_r.
+  }
+  easy.
+}
+cbn - [ iter_seq permut ].
+rewrite rngl_product_succ_succ.
+erewrite (rngl_product_eq_compat _ _ _ (p + 1)). 2: {
+  intros i Hi.
+  rewrite Nat.sub_succ, Nat.sub_0_r.
+  now rewrite Nat.sub_0_r.
+}
+cbn - [ iter_seq permut ].
+...
+destruct (Nat.eq_dec p 0) as [Hpz| Hpz]. {
+  subst p.
+  rewrite rngl_product_empty; [ | flia ].
+  rewrite rngl_mul_1_l, Nat.add_0_l.
+  destruct (lt_dec q 2) as [Hq2| Hq2]. {
+    destruct q; [ flia Hpqn | ].
+    destruct q; [ | flia Hq2 ].
 ...
 
 Theorem glop : ∀ p q n k k',

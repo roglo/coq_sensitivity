@@ -130,4 +130,12 @@ intros b k g.
 apply iter_succ_succ.
 Qed.
 
+Theorem rngl_product_empty : ∀ g b k,
+  k < b → (Π (i = b, k), g i = 1)%F.
+Proof.
+intros * Hkb.
+unfold iter_seq.
+now replace (S k - b) with 0 by flia Hkb.
+Qed.
+
 End a.
