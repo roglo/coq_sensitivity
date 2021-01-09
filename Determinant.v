@@ -1388,6 +1388,17 @@ Qed.
 Theorem glop : ∀ p q n k k',
   p < q < n
   → k' = nat_of_permut (vect_swap_elem (permut n k) p q)
+  → ε (permut n k') = (- ε (permut n k))%F.
+Proof.
+intros * Hpqn Hk'.
+revert p q k k' Hpqn Hk'.
+induction n; intros; [ easy | ].
+unfold ε.
+...
+
+Theorem glop : ∀ p q n k k',
+  p < q < n
+  → k' = nat_of_permut (vect_swap_elem (permut n k) p q)
   → ε_permut n k' = (- ε_permut n k)%F.
 Proof.
 intros * Hpqn Hk'.
