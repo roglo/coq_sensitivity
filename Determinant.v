@@ -1391,8 +1391,7 @@ Theorem glop : ∀ p q n k k',
   → ε_permut n k' = (- ε_permut n k)%F.
 Proof.
 intros * Hpqn Hk'.
-subst k'.
-revert p q k Hpqn.
+revert p q k k' Hpqn Hk'.
 induction n; intros; [ easy | ].
 cbn - [ nat_of_permut permut ].
 ...
