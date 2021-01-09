@@ -1394,6 +1394,9 @@ intros * Hpqn Hk'.
 revert p q k k' Hpqn Hk'.
 induction n; intros; [ easy | ].
 cbn - [ nat_of_permut permut ].
+(* nothing can be said about "minus_one_pow (k' / fact n)" and
+   "minus_one_pow (k / fact n)": they can be equal or not;
+   difficult to predict (I tested examples) *)
 ...
 
 Theorem signature_swap :
