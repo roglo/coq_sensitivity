@@ -1419,6 +1419,7 @@ cbn - [ iter_seq permut ].
 (* hyper compliqué, même sur le papier ; faudrait trouver un
    raccourci, trouver des propriétés de ε, de vect_swap_elem,
    que sais-je... *)
+(* voir https://fr.wikipedia.org/wiki/Signature_d%27une_permutation#Une_transposition_est_impaire et essayer de l'implémenter *)
 ...
 destruct (Nat.eq_dec p 0) as [Hpz| Hpz]. {
   subst p.
