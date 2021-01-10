@@ -343,26 +343,8 @@ Theorem rngl_summation_ub_add_distr : ∀ a b f,
   (Σ (i = 0, a + b), f i)%F = (Σ (i = 0, a), f i + Σ (i = S a, a + b), f i)%F.
 Proof.
 intros.
-revert b.
-induction a; intros. {
-  rewrite Nat.add_0_l.
-  unfold iter_seq at 2.
-  cbn - [ iter_seq ].
-  rewrite rngl_add_0_l.
-  apply rngl_summation_split_first; flia.
-}
-rewrite Nat.add_succ_comm.
-rewrite IHa.
-rewrite (rngl_summation_split_last 0 (S a)); [ | flia ].
-rewrite rngl_summation_succ_succ.
-rewrite <- rngl_add_assoc.
-f_equal. {
-  apply rngl_summation_eq_compat.
-  intros i Hi.
-  now rewrite Nat.sub_succ, Nat.sub_0_r.
-} {
-  rewrite rngl_summation_split_first; [ easy | flia ].
-}
+rewrite (rngl_summation_split a); [ | flia ].
+now rewrite Nat.add_1_r.
 Qed.
 
 Theorem rngl_summation_summation_distr : ∀ a b f,

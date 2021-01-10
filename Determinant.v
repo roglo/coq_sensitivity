@@ -1417,12 +1417,19 @@ replace (Π (i = _, _), Π (j = _, _), _)%F with
    produit de produits censé être égal à un autre produit de produits,
    dans un autre ordre, et, pour le formaliser, c'est pas mieux *)
 ...
+(**)
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
     remember (vect_el σ₂ (i - 1)) as l eqn:Hl.
     remember (vect_el σ₂ (j - 1)) as k eqn:Hk.
+(* i varies from 1 to n
+   j varies from i+1 to n
+   ⇒
+   k varies from vect_el σ₂ i to vect_el σ₂ n-1
+   l varies from vect_el σ₂ 0 to vect_el σ₂ n-1
+*)
 ...
   Hl : l = vect_el σ₂ (i - 1)
   k : nat
