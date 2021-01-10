@@ -189,30 +189,14 @@ Theorem rngl_summation_split : ∀ j g b k,
   b ≤ S j ≤ S k
   → (Σ (i = b, k), g i = Σ (i = b, j), g i + Σ (i = j+1, k), g i)%F.
 Proof.
-intros * (Hbj, Hjk).
-unfold iter_seq.
-remember (S j - b) as len1 eqn:Hlen1.
-remember (S k - b) as len2 eqn:Hlen2.
-move len2 before len1.
-replace (S k - (j + 1)) with (len2 - len1) by flia Hlen1 Hlen2 Hbj.
-replace (j + 1) with (b + len1) by flia Hlen1 Hbj.
-assert (Hll : len1 ≤ len2) by flia Hlen1 Hlen2 Hjk.
-clear - rp Hll.
-revert b len2 Hll.
-induction len1; intros. {
-  cbn; rewrite Nat.add_0_r, Nat.sub_0_r; symmetry.
+intros * Hbjk.
+apply iter_seq_split; [ | | | easy ]. {
   apply rngl_add_0_l.
+} {
+  apply rngl_add_0_r.
+} {
+  apply rngl_add_assoc.
 }
-destruct len2; [ flia Hll | ].
-apply Nat.succ_le_mono in Hll; cbn.
-rewrite rngl_add_0_l.
-rewrite (fold_left_rngl_add_fun_from_0 (g b)).
-rewrite (fold_left_rngl_add_fun_from_0 (g b)).
-rewrite <- rngl_add_assoc; f_equal.
-replace len2 with (len1 + (len2 - len1)) at 1 by flia Hll.
-rewrite seq_app, fold_left_app.
-rewrite fold_left_rngl_add_fun_from_0.
-now rewrite Nat.add_succ_comm.
 Qed.
 
 Theorem mul_iter_seq_distr_l : ∀ A a b e f (add mul : A → A → A) d

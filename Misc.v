@@ -1679,6 +1679,41 @@ intros i c Hi.
 now rewrite Nat.sub_0_r.
 Qed.
 
+Theorem iter_seq_split : ∀ T j g b k op d
+  (op_d_l : ∀ x, op d x = x)
+  (op_d_r : ∀ x, op x d = x)
+  (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
+   b ≤ S j ≤ S k
+  → iter_seq b k (λ (c : T) (i : nat), op c (g i)) d =
+    op (iter_seq b j (λ (c : T) (i : nat), op c (g i)) d)
+      (iter_seq (j + 1) k (λ (c : T) (i : nat), op c (g i)) d).
+Proof.
+intros * op_d_l op_d_r op_assoc (Hbj, Hjk).
+unfold iter_seq.
+remember (S j - b) as len1 eqn:Hlen1.
+remember (S k - b) as len2 eqn:Hlen2.
+move len2 before len1.
+replace (S k - (j + 1)) with (len2 - len1) by flia Hlen1 Hlen2 Hbj.
+replace (j + 1) with (b + len1) by flia Hlen1 Hbj.
+assert (Hll : len1 ≤ len2) by flia Hlen1 Hlen2 Hjk.
+clear - Hll op_d_l op_d_r op_assoc.
+revert b len2 Hll.
+induction len1; intros. {
+  cbn; rewrite Nat.add_0_r, Nat.sub_0_r; symmetry.
+  apply op_d_l.
+}
+destruct len2; [ flia Hll | ].
+apply Nat.succ_le_mono in Hll; cbn.
+rewrite op_d_l.
+rewrite (iter_seq_op_fun_from_d (g b) _ _ _ d); [ | easy | easy | easy ].
+rewrite (iter_seq_op_fun_from_d (g b) _ _ _ d); [ | easy | easy | easy ].
+rewrite <- op_assoc; f_equal.
+replace len2 with (len1 + (len2 - len1)) at 1 by flia Hll.
+rewrite seq_app, fold_left_app.
+rewrite (iter_seq_op_fun_from_d _ _ _ _ d); [ | easy | easy | easy ].
+now rewrite Nat.add_succ_comm.
+Qed.
+
 Theorem iter_seq_distr : ∀ T op d g h b k
   (op_d_l : ∀ x, op d x = x)
   (op_comm : ∀ a b, op a b = op b a)
