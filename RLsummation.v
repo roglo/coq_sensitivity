@@ -22,11 +22,13 @@ Theorem fold_left_rngl_add_fun_from_0 : ∀ a l (f : nat → _),
    a + fold_left (λ c i, c + f i) l 0)%F.
 Proof.
 intros.
-revert a.
-induction l as [| x l]; intros; [ symmetry; apply rngl_add_0_r | cbn ].
-rewrite IHl; symmetry; rewrite IHl.
-rewrite rngl_add_0_l.
-apply rngl_add_assoc.
+apply iter_seq_op_fun_from_d. {
+  apply rngl_add_0_l.
+} {
+  apply rngl_add_0_r.
+} {
+  apply rngl_add_assoc.
+}
 Qed.
 
 Theorem all_0_rngl_summation_0 : ∀ b e f,
@@ -89,15 +91,13 @@ Theorem rngl_summation_split_first : ∀ b k g,
   → (Σ (i = b, k), g i)%F = (g b + Σ (i = S b, k), g i)%F.
 Proof.
 intros * Hbk.
-unfold iter_seq.
-remember (S k - b) as len eqn:Hlen.
-replace (S k - S b) with (len - 1) by flia Hlen.
-assert (H : len ≠ 0) by flia Hlen Hbk.
-clear k Hbk Hlen.
-rename H into Hlen.
-destruct len; [ easy | cbn ].
-rewrite rngl_add_0_l, Nat.sub_0_r.
-apply fold_left_rngl_add_fun_from_0.
+apply iter_seq_split_first; [ | | | easy ]. {
+  apply rngl_add_0_l.
+} {
+  apply rngl_add_0_r.
+} {
+  apply rngl_add_assoc.
+}
 Qed.
 
 Theorem rngl_summation_split_last : ∀ b k g,

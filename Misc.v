@@ -1617,6 +1617,47 @@ unfold iter_seq.
 now replace (S k - b) with 0 by flia Hkb.
 Qed.
 
+Theorem iter_seq_op_fun_from_d : ∀ T a l (f : nat → _) op d
+  (op_d_l : ∀ x, op d x = x)
+  (op_d_r : ∀ x, op x d = x)
+  (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
+  fold_left (λ (c : T) (i : nat), op c (f i)) l a =
+  op a (fold_left (λ (c : T) (i : nat), op c (f i)) l d).
+Proof.
+intros.
+revert a.
+induction l as [| x l]; intros; [ symmetry; apply op_d_r | cbn ].
+rewrite IHl; symmetry; rewrite IHl.
+rewrite op_d_l.
+apply op_assoc.
+Qed.
+
+Theorem iter_seq_split_first : ∀ T b k g op d
+  (op_d_l : ∀ x, op d x = x)
+  (op_d_r : ∀ x, op x d = x)
+  (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
+  b ≤ k
+  → iter_seq b k (λ (c : T) (i : nat), op c (g i)) d =
+    op (g b) (iter_seq (S b) k (λ (c : T) (i : nat), op c (g i)) d).
+Proof.
+intros * op_d_l op_d_r op_assoc Hbk.
+unfold iter_seq.
+remember (S k - b) as len eqn:Hlen.
+replace (S k - S b) with (len - 1) by flia Hlen.
+assert (H : len ≠ 0) by flia Hlen Hbk.
+clear k Hbk Hlen.
+rename H into Hlen.
+destruct len; [ easy | cbn ].
+rewrite op_d_l, Nat.sub_0_r.
+apply iter_seq_op_fun_from_d. {
+  apply op_d_l.
+} {
+  apply op_d_r.
+} {
+  apply op_assoc.
+}
+Qed.
+
 Theorem iter_seq_split_last : ∀ T b k g (op : T → T → T) d,
   b ≤ k
   → iter_seq b k (λ (c : T) (i : nat), op c (g i)) d =

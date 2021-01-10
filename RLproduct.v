@@ -23,11 +23,13 @@ Theorem fold_left_rngl_mul_fun_from_1 : ∀ a l (f : nat → _),
    a * fold_left (λ c i, c * f i) l 1)%F.
 Proof.
 intros.
-revert a.
-induction l as [| x l]; intros; [ symmetry; apply rngl_mul_1_r | cbn ].
-rewrite IHl; symmetry; rewrite IHl.
-rewrite rngl_mul_1_l.
-apply rngl_mul_assoc.
+apply iter_seq_op_fun_from_d. {
+  apply rngl_mul_1_l.
+} {
+  apply rngl_mul_1_r.
+} {
+  apply rngl_mul_assoc.
+}
 Qed.
 
 Theorem all_1_rngl_product_1 : ∀ b e f,
@@ -84,15 +86,13 @@ Theorem rngl_product_split_first : ∀ b k g,
   → (Π (i = b, k), g i)%F = (g b * Π (i = S b, k), g i)%F.
 Proof.
 intros * Hbk.
-unfold iter_seq.
-remember (S k - b) as len eqn:Hlen.
-replace (S k - S b) with (len - 1) by flia Hlen.
-assert (H : len ≠ 0) by flia Hlen Hbk.
-clear k Hbk Hlen.
-rename H into Hlen.
-destruct len; [ easy | cbn ].
-rewrite rngl_mul_1_l, Nat.sub_0_r.
-apply fold_left_rngl_mul_fun_from_1.
+apply iter_seq_split_first; [ | | | easy ]. {
+  apply rngl_mul_1_l.
+} {
+  apply rngl_mul_1_r.
+} {
+  apply rngl_mul_assoc.
+}
 Qed.
 
 Theorem rngl_product_split_last : ∀ b k g,
