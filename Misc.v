@@ -1574,7 +1574,7 @@ Qed.
 
 (* common for summations and products *)
 
-Theorem iter_seq_op_fun_from_d : ∀ T a l (f : nat → _) op d
+Theorem iter_seq_op_fun_from_d : ∀ T d op a l (f : nat → _)
   (op_d_l : ∀ x, op d x = x)
   (op_d_r : ∀ x, op x d = x)
   (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
@@ -1601,7 +1601,7 @@ unfold iter_seq.
 remember (S e - b) as n eqn:Hn.
 revert b Hz Hn.
 induction n; intros; [ easy | cbn ].
-rewrite (iter_seq_op_fun_from_d _ _ _ _ d); [ | easy | easy | easy ].
+rewrite (iter_seq_op_fun_from_d d); [ | easy | easy | easy ].
 rewrite IHn; [ | | flia Hn ]. {
   rewrite Hz; [ | flia Hn ].
   rewrite op_d_l.
@@ -1611,7 +1611,7 @@ intros i Hi.
 apply Hz; flia Hi.
 Qed.
 
-Theorem iter_seq_split_first : ∀ T b k g op d
+Theorem iter_seq_split_first : ∀ T d op b k g
   (op_d_l : ∀ x, op d x = x)
   (op_d_r : ∀ x, op x d = x)
   (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
@@ -1637,7 +1637,7 @@ apply iter_seq_op_fun_from_d. {
 }
 Qed.
 
-Theorem iter_seq_split_last : ∀ T b k g (op : T → T → T) d,
+Theorem iter_seq_split_last : ∀ T d (op : T → T → T) b k g,
   b ≤ k
   → iter_seq b k (λ (c : T) (i : nat), op c (g i)) d =
     op (iter_seq (S b) k (λ (c : T) (i : nat), op c (g (i - 1)%nat)) d) (g k).
@@ -1658,7 +1658,7 @@ intros i c Hi.
 now rewrite Nat.sub_0_r.
 Qed.
 
-Theorem iter_seq_split : ∀ T j g b k op d
+Theorem iter_seq_split : ∀ T d op j g b k
   (op_d_l : ∀ x, op d x = x)
   (op_d_r : ∀ x, op x d = x)
   (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
@@ -1684,19 +1684,19 @@ induction len1; intros. {
 destruct len2; [ flia Hll | ].
 apply Nat.succ_le_mono in Hll; cbn.
 rewrite op_d_l.
-rewrite (iter_seq_op_fun_from_d (g b) _ _ _ d); [ | easy | easy | easy ].
-rewrite (iter_seq_op_fun_from_d (g b) _ _ _ d); [ | easy | easy | easy ].
+rewrite (iter_seq_op_fun_from_d d _ (g b)); [ | easy | easy | easy ].
+rewrite (iter_seq_op_fun_from_d d _ (g b)); [ | easy | easy | easy ].
 rewrite <- op_assoc; f_equal.
 replace len2 with (len1 + (len2 - len1)) at 1 by flia Hll.
 rewrite seq_app, fold_left_app.
-rewrite (iter_seq_op_fun_from_d _ _ _ _ d); [ | easy | easy | easy ].
+rewrite (iter_seq_op_fun_from_d d); [ | easy | easy | easy ].
 now rewrite Nat.add_succ_comm.
 Qed.
 
-Theorem iter_seq_eq_compat : ∀ A b k g h (f : A → A → A) d,
+Theorem iter_seq_eq_compat : ∀ T d (op : T → T → T) b k g h,
   (∀ i, b ≤ i ≤ k → g i = h i)
-  → iter_seq b k (λ c i, f c (g i)) d =
-    iter_seq b k (λ c i, f c (h i)) d.
+  → iter_seq b k (λ c i, op c (g i)) d =
+    iter_seq b k (λ c i, op c (h i)) d.
 Proof.
 intros * Hgh.
 unfold iter_seq.
@@ -1717,7 +1717,7 @@ rewrite Hb; [ easy | ].
 flia Hk.
 Qed.
 
-Theorem iter_seq_succ_succ : ∀ {T} b k f (d : T),
+Theorem iter_seq_succ_succ : ∀ {T} (d : T) b k f,
   iter_seq (S b) (S k) f d =
   iter_seq b k (λ c i, f c (S i)) d.
 Proof.
@@ -1729,7 +1729,7 @@ rewrite <- seq_shift.
 now rewrite List_fold_left_map.
 Qed.
 
-Theorem iter_seq_empty : ∀ T b k g (op : T → T → T) d,
+Theorem iter_seq_empty : ∀ T d (op : T → T → T) b k g,
   k < b
   → iter_seq b k (λ (c : T) (i : nat), op c (g i)) d = d.
 Proof.
@@ -1738,7 +1738,7 @@ unfold iter_seq.
 now replace (S k - b) with 0 by flia Hkb.
 Qed.
 
-Theorem iter_seq_distr : ∀ T op d g h b k
+Theorem iter_seq_distr : ∀ T d op g h b k
   (op_d_l : ∀ x, op d x = x)
   (op_comm : ∀ a b, op a b = op b a)
   (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
@@ -1754,9 +1754,9 @@ destruct (le_dec b k) as [Hbk| Hbk]. {
     apply Nat.le_0_r in Hbk; subst b; cbn.
     now do 3 rewrite op_d_l.
   }
-  rewrite (@iter_seq_split_last T b); [ | easy ].
-  rewrite (@iter_seq_split_last T b); [ | easy ].
-  rewrite (@iter_seq_split_last T b); [ | easy ].
+  rewrite (@iter_seq_split_last T _ _ b); [ | easy ].
+  rewrite (@iter_seq_split_last T _ _ b); [ | easy ].
+  rewrite (@iter_seq_split_last T _ _ b); [ | easy ].
   do 2 rewrite op_assoc; f_equal.
   rewrite (op_comm (iter_seq _ _ _ _)).
   rewrite (op_comm (iter_seq _ _ _ _)).
