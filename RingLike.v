@@ -665,6 +665,23 @@ destruct rngl_is_comm. {
 }
 Qed.
 
+Theorem rngl_opp_add_distr :
+  rngl_has_opp = true →
+  ∀ a b, (- (a + b) = - a - b)%F.
+Proof.
+intros Hro *.
+specialize (fold_rngl_sub Hro) as H.
+apply rngl_add_reg_l with (c := (b + a)%F).
+unfold rngl_sub.
+rewrite Hro.
+rewrite rngl_add_assoc.
+do 3 rewrite H.
+rewrite rngl_add_sub.
+rewrite rngl_add_comm.
+rewrite rngl_add_opp_r.
+now rewrite rngl_add_opp_r.
+Qed.
+
 End a.
 
 Arguments rngl_add_opp_l {T}%type {ro rp} Hro.
