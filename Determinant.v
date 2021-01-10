@@ -1407,6 +1407,10 @@ erewrite rngl_product_eq_compat. 2: {
   now rewrite <- (rngl_product_mul_distr _ Hic).
 }
 cbn - [ iter_seq ].
+(**)
+replace (Π (i = _, _), Π (j = _, _), _)%F with
+  (Π (k = 1, n), Π (l = 1, n),
+   (sgn_diff (vect_el σ₁ k) (vect_el σ₁ l) * sgn_diff k l))%F. 2: {
 ...
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
