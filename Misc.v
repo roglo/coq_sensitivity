@@ -178,18 +178,6 @@ unfold iter_seq.
 now replace (S (b + len - 1) - b) with len by flia Hblen.
 Qed.
 
-Theorem iter_seq_succ_succ : ∀ {T} b k f (d : T),
-  iter_seq (S b) (S k) f d =
-  iter_seq b k (λ c i, f c (S i)) d.
-Proof.
-intros.
-unfold iter_seq.
-rewrite Nat.sub_succ.
-remember (S k - b)%nat as len; clear Heqlen.
-rewrite <- seq_shift.
-now rewrite List_fold_left_map.
-Qed.
-
 Theorem List_seq_succ_r : ∀ sta len,
   seq sta (S len) = seq sta len ++ [sta + len].
 Proof.
@@ -1584,38 +1572,7 @@ intros.
 now specialize (Hll d (S i)).
 Qed.
 
-Theorem iter_seq_eq_compat : ∀ A b k g h (f : A → A → A) d,
-  (∀ i, b ≤ i ≤ k → g i = h i)
-  → iter_seq b k (λ c i, f c (g i)) d =
-    iter_seq b k (λ c i, f c (h i)) d.
-Proof.
-intros * Hgh.
-unfold iter_seq.
-remember (S k - b) as len eqn:Hlen.
-assert (∀ i, b ≤ i < b + len → g i = h i). {
-  intros i Hi.
-  apply Hgh; flia Hlen Hi.
-}
-clear k Hgh Hlen.
-rename H into Hb.
-revert b Hb.
-induction len; intros; [ easy | cbn ].
-rewrite <- Hb; [ | flia ].
-apply List_fold_left_ext_in.
-intros k c Hk.
-apply in_seq in Hk.
-rewrite Hb; [ easy | ].
-flia Hk.
-Qed.
-
-Theorem iter_seq_empty : ∀ T b k g (op : T → T → T) d,
-  k < b
-  → iter_seq b k (λ (c : T) (i : nat), op c (g i)) d = d.
-Proof.
-intros * Hkb.
-unfold iter_seq.
-now replace (S k - b) with 0 by flia Hkb.
-Qed.
+(* common for summations and products *)
 
 Theorem iter_seq_op_fun_from_d : ∀ T a l (f : nat → _) op d
   (op_d_l : ∀ x, op d x = x)
@@ -1736,6 +1693,51 @@ rewrite (iter_seq_op_fun_from_d _ _ _ _ d); [ | easy | easy | easy ].
 now rewrite Nat.add_succ_comm.
 Qed.
 
+Theorem iter_seq_eq_compat : ∀ A b k g h (f : A → A → A) d,
+  (∀ i, b ≤ i ≤ k → g i = h i)
+  → iter_seq b k (λ c i, f c (g i)) d =
+    iter_seq b k (λ c i, f c (h i)) d.
+Proof.
+intros * Hgh.
+unfold iter_seq.
+remember (S k - b) as len eqn:Hlen.
+assert (∀ i, b ≤ i < b + len → g i = h i). {
+  intros i Hi.
+  apply Hgh; flia Hlen Hi.
+}
+clear k Hgh Hlen.
+rename H into Hb.
+revert b Hb.
+induction len; intros; [ easy | cbn ].
+rewrite <- Hb; [ | flia ].
+apply List_fold_left_ext_in.
+intros k c Hk.
+apply in_seq in Hk.
+rewrite Hb; [ easy | ].
+flia Hk.
+Qed.
+
+Theorem iter_seq_succ_succ : ∀ {T} b k f (d : T),
+  iter_seq (S b) (S k) f d =
+  iter_seq b k (λ c i, f c (S i)) d.
+Proof.
+intros.
+unfold iter_seq.
+rewrite Nat.sub_succ.
+remember (S k - b)%nat as len; clear Heqlen.
+rewrite <- seq_shift.
+now rewrite List_fold_left_map.
+Qed.
+
+Theorem iter_seq_empty : ∀ T b k g (op : T → T → T) d,
+  k < b
+  → iter_seq b k (λ (c : T) (i : nat), op c (g i)) d = d.
+Proof.
+intros * Hkb.
+unfold iter_seq.
+now replace (S k - b) with 0 by flia Hkb.
+Qed.
+
 Theorem iter_seq_distr : ∀ T op d g h b k
   (op_d_l : ∀ x, op d x = x)
   (op_comm : ∀ a b, op a b = op b a)
@@ -1782,6 +1784,8 @@ rewrite iter_seq_empty; [ | easy ].
 rewrite iter_seq_empty; [ | easy ].
 symmetry; apply op_d_l.
 Qed.
+
+(* *)
 
 Theorem NoDup_app_app_swap {A} : ∀ l1 l2 l3 : list A,
   NoDup (l1 ++ l2 ++ l3) → NoDup (l1 ++ l3 ++ l2).

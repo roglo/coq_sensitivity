@@ -46,20 +46,6 @@ apply iter_seq_all_d; [ | | | easy ]. {
 }
 Qed.
 
-Theorem rngl_product_split : ∀ j g b k,
-  b ≤ S j ≤ S k
-  → (Π (i = b, k), g i = (Π (i = b, j), g i) * (Π (i = j+1, k), g i))%F.
-Proof.
-intros * Hbjk.
-apply iter_seq_split; [ | | | easy ]. {
-  apply rngl_mul_1_l.
-} {
-  apply rngl_mul_1_r.
-} {
-  apply rngl_mul_assoc.
-}
-Qed.
-
 Theorem rngl_product_split_first : ∀ b k g,
   b ≤ k
   → (Π (i = b, k), g i)%F = (g b * Π (i = S b, k), g i)%F.
@@ -80,6 +66,20 @@ Theorem rngl_product_split_last : ∀ b k g,
 Proof.
 intros * Hbk.
 now apply iter_seq_split_last.
+Qed.
+
+Theorem rngl_product_split : ∀ j g b k,
+  b ≤ S j ≤ S k
+  → (Π (i = b, k), g i = (Π (i = b, j), g i) * (Π (i = j+1, k), g i))%F.
+Proof.
+intros * Hbjk.
+apply iter_seq_split; [ | | | easy ]. {
+  apply rngl_mul_1_l.
+} {
+  apply rngl_mul_1_r.
+} {
+  apply rngl_mul_assoc.
+}
 Qed.
 
 Theorem rngl_product_eq_compat : ∀ g h b k,

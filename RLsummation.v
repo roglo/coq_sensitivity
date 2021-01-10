@@ -45,6 +45,78 @@ apply iter_seq_all_d; [ | | | easy ]. {
 }
 Qed.
 
+Theorem rngl_summation_split_first : ∀ b k g,
+  b ≤ k
+  → (Σ (i = b, k), g i)%F = (g b + Σ (i = S b, k), g i)%F.
+Proof.
+intros * Hbk.
+apply iter_seq_split_first; [ | | | easy ]. {
+  apply rngl_add_0_l.
+} {
+  apply rngl_add_0_r.
+} {
+  apply rngl_add_assoc.
+}
+Qed.
+
+Theorem rngl_summation_split_last : ∀ b k g,
+  b ≤ k
+  → (Σ (i = b, k), g i = Σ (i = S b, k), g (i - 1)%nat + g k)%F.
+Proof.
+intros * Hbk.
+now apply iter_seq_split_last.
+Qed.
+
+Theorem rngl_summation_split : ∀ j g b k,
+  b ≤ S j ≤ S k
+  → (Σ (i = b, k), g i = Σ (i = b, j), g i + Σ (i = j+1, k), g i)%F.
+Proof.
+intros * Hbjk.
+apply iter_seq_split; [ | | | easy ]. {
+  apply rngl_add_0_l.
+} {
+  apply rngl_add_0_r.
+} {
+  apply rngl_add_assoc.
+}
+Qed.
+
+Theorem rngl_summation_eq_compat : ∀ g h b k,
+  (∀ i, b ≤ i ≤ k → (g i = h i)%F)
+  → (Σ (i = b, k), g i = Σ (i = b, k), h i)%F.
+Proof.
+intros * Hgh.
+now apply iter_seq_eq_compat.
+Qed.
+
+Theorem rngl_summation_succ_succ : ∀ b k g,
+  (Σ (i = S b, S k), g i = Σ (i = b, k), g (S i))%F.
+Proof.
+intros b k g.
+apply iter_seq_succ_succ.
+Qed.
+
+Theorem rngl_summation_empty : ∀ g b k,
+  k < b → (Σ (i = b, k), g i = 0)%F.
+Proof.
+intros * Hkb.
+now apply iter_seq_empty.
+Qed.
+
+Theorem rngl_summation_add_distr : ∀ g h b k,
+  (Σ (i = b, k), (g i + h i) =
+   Σ (i = b, k), g i + Σ (i = b, k), h i)%F.
+Proof.
+intros g h b k.
+apply iter_seq_distr. {
+  apply rngl_add_0_l.
+} {
+  apply rngl_add_comm.
+} {
+  apply rngl_add_assoc.
+}
+Qed.
+
 Theorem rngl_opp_add_distr :
   rngl_has_opp = true →
   ∀ a b, (- (a + b) = - a - b)%F.
@@ -81,28 +153,6 @@ unfold rngl_sub.
 now rewrite Hro.
 Qed.
 
-Theorem rngl_summation_split_first : ∀ b k g,
-  b ≤ k
-  → (Σ (i = b, k), g i)%F = (g b + Σ (i = S b, k), g i)%F.
-Proof.
-intros * Hbk.
-apply iter_seq_split_first; [ | | | easy ]. {
-  apply rngl_add_0_l.
-} {
-  apply rngl_add_0_r.
-} {
-  apply rngl_add_assoc.
-}
-Qed.
-
-Theorem rngl_summation_split_last : ∀ b k g,
-  b ≤ k
-  → (Σ (i = b, k), g i = Σ (i = S b, k), g (i - 1)%nat + g k)%F.
-Proof.
-intros * Hbk.
-now apply iter_seq_split_last.
-Qed.
-
 Theorem rngl_summation_rtl : ∀ g b k,
   (Σ (i = b, k), g i = Σ (i = b, k), g (k + b - i)%nat)%F.
 Proof.
@@ -135,28 +185,6 @@ apply in_seq in Hj.
 f_equal; f_equal; flia.
 Qed.
 
-Theorem rngl_summation_eq_compat : ∀ g h b k,
-  (∀ i, b ≤ i ≤ k → (g i = h i)%F)
-  → (Σ (i = b, k), g i = Σ (i = b, k), h i)%F.
-Proof.
-intros * Hgh.
-now apply iter_seq_eq_compat.
-Qed.
-
-Theorem rngl_summation_empty : ∀ g b k,
-  k < b → (Σ (i = b, k), g i = 0)%F.
-Proof.
-intros * Hkb.
-now apply iter_seq_empty.
-Qed.
-
-Theorem rngl_summation_succ_succ : ∀ b k g,
-  (Σ (i = S b, S k), g i = Σ (i = b, k), g (S i))%F.
-Proof.
-intros b k g.
-apply iter_seq_succ_succ.
-Qed.
-
 Theorem rngl_summation_shift : ∀ b g k,
   b ≤ k
   → (Σ (i = b, k), g i =
@@ -164,34 +192,6 @@ Theorem rngl_summation_shift : ∀ b g k,
 Proof.
 intros b g k Hbk.
 now apply iter_shift.
-Qed.
-
-Theorem rngl_summation_add_distr : ∀ g h b k,
-  (Σ (i = b, k), (g i + h i) =
-   Σ (i = b, k), g i + Σ (i = b, k), h i)%F.
-Proof.
-intros g h b k.
-apply iter_seq_distr. {
-  apply rngl_add_0_l.
-} {
-  apply rngl_add_comm.
-} {
-  apply rngl_add_assoc.
-}
-Qed.
-
-Theorem rngl_summation_split : ∀ j g b k,
-  b ≤ S j ≤ S k
-  → (Σ (i = b, k), g i = Σ (i = b, j), g i + Σ (i = j+1, k), g i)%F.
-Proof.
-intros * Hbjk.
-apply iter_seq_split; [ | | | easy ]. {
-  apply rngl_add_0_l.
-} {
-  apply rngl_add_0_r.
-} {
-  apply rngl_add_assoc.
-}
 Qed.
 
 Theorem mul_iter_seq_distr_l : ∀ A a b e f (add mul : A → A → A) d
