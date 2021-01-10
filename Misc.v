@@ -1632,6 +1632,28 @@ rewrite op_d_l.
 apply op_assoc.
 Qed.
 
+Theorem iter_seq_all_d : ∀ T d op b e f
+  (op_d_l : ∀ x, op d x = x)
+  (op_d_r : ∀ x, op x d = x)
+  (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
+  (∀ i : nat, b ≤ i ≤ e → f i = d)
+  → iter_seq b e (λ (c : T) (i : nat), op c (f i)) d = d.
+Proof.
+intros * op_d_l od_d_r op_assoc Hz.
+unfold iter_seq.
+remember (S e - b) as n eqn:Hn.
+revert b Hz Hn.
+induction n; intros; [ easy | cbn ].
+rewrite (iter_seq_op_fun_from_d _ _ _ _ d); [ | easy | easy | easy ].
+rewrite IHn; [ | | flia Hn ]. {
+  rewrite Hz; [ | flia Hn ].
+  rewrite op_d_l.
+  apply op_d_l.
+}
+intros i Hi.
+apply Hz; flia Hi.
+Qed.
+
 Theorem iter_seq_split_first : ∀ T b k g op d
   (op_d_l : ∀ x, op d x = x)
   (op_d_r : ∀ x, op x d = x)

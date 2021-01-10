@@ -37,18 +37,13 @@ Theorem all_1_rngl_product_1 : ∀ b e f,
   → (Π (i = b, e), f i = 1)%F.
 Proof.
 intros * Hz.
-unfold iter_seq.
-remember (S e - b) as n eqn:Hn.
-revert b Hz Hn.
-induction n; intros; [ easy | cbn ].
-rewrite fold_left_rngl_mul_fun_from_1.
-rewrite IHn; [ | | flia Hn ]. {
-  rewrite Hz; [ | flia Hn ].
-  rewrite rngl_mul_1_l.
-  now rewrite rngl_mul_1_l.
+apply iter_seq_all_d; [ | | | easy ]. {
+  apply rngl_mul_1_l.
+} {
+  apply rngl_mul_1_r.
+} {
+  apply rngl_mul_assoc.
 }
-intros i Hi.
-apply Hz; flia Hi.
 Qed.
 
 Theorem rngl_product_split : ∀ j g b k,

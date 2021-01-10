@@ -36,18 +36,13 @@ Theorem all_0_rngl_summation_0 : ∀ b e f,
   → (Σ (i = b, e), f i = 0)%F.
 Proof.
 intros * Hz.
-unfold iter_seq.
-remember (S e - b) as n eqn:Hn.
-revert b Hz Hn.
-induction n; intros; [ easy | cbn ].
-rewrite fold_left_rngl_add_fun_from_0.
-rewrite IHn; [ | | flia Hn ]. {
-  rewrite Hz; [ | flia Hn ].
-  rewrite rngl_add_0_l.
-  now rewrite rngl_add_0_l.
+apply iter_seq_all_d; [ | | | easy ]. {
+  apply rngl_add_0_l.
+} {
+  apply rngl_add_0_r.
+} {
+  apply rngl_add_assoc.
 }
-intros i Hi.
-apply Hz; flia Hi.
 Qed.
 
 Theorem rngl_opp_add_distr :
