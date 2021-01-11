@@ -131,18 +131,14 @@ Theorem rngl_opp_summation :
   ∀ b e f, ((- Σ (i = b, e), f i) = Σ (i = b, e), (- f i))%F.
 Proof.
 intros Hro *.
-unfold iter_seq.
-remember (S e - b) as len.
-clear e Heqlen.
-revert b.
-induction len; intros; [ now apply rngl_opp_0 | ].
-rewrite List_seq_succ_r; cbn.
-rewrite fold_left_app; cbn.
-rewrite fold_left_app; cbn.
-rewrite <- IHlen.
-rewrite rngl_opp_add_distr; [ | easy ].
-unfold rngl_sub.
-now rewrite Hro.
+apply iter_seq_inv. {
+  now apply rngl_opp_0.
+} {
+  intros.
+  rewrite fold_rngl_sub; [ | easy ].
+  rewrite rngl_add_comm.
+  now apply rngl_opp_add_distr.
+}
 Qed.
 
 Theorem rngl_summation_rtl : ∀ g b k,

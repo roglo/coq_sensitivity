@@ -1785,6 +1785,25 @@ rewrite iter_seq_empty; [ | easy ].
 symmetry; apply op_d_l.
 Qed.
 
+Theorem iter_seq_inv : ∀ T d op inv b e f
+  (inv_d : inv d = d)
+  (inv_op_distr : ∀ a b, inv (op a b) = op (inv a) (inv b)),
+  inv (iter_seq b e (λ (c : T) (i : nat), op c (f i)) d) =
+  iter_seq b e (λ (c : T) (i : nat), op c (inv (f i))) d.
+Proof.
+intros.
+unfold iter_seq.
+remember (S e - b) as len.
+clear e Heqlen.
+revert b.
+induction len; intros; [ now apply inv_d | ].
+rewrite List_seq_succ_r; cbn.
+rewrite fold_left_app; cbn.
+rewrite fold_left_app; cbn.
+rewrite <- IHlen.
+now rewrite inv_op_distr.
+Qed.
+
 (* *)
 
 Theorem NoDup_app_app_swap {A} : ∀ l1 l2 l3 : list A,

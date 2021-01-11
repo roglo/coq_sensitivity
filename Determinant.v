@@ -1425,6 +1425,7 @@ replace (Π (i = _, _), Π (j = _, _), _)%F with
   (Π (k = 1, n), Π (l = k + 1, n),
    (sgn_diff (vect_el σ₁ k) (vect_el σ₁ l) * sgn_diff k l))%F. 2: {
 ...
+(*
 replace (Π (i = _, _), Π (j = _, _), _)%F with
   (Π (k = 1, n), Π (l = 1, n),
    (sgn_diff (vect_el σ₁ k) (vect_el σ₁ l) * sgn_diff k l))%F. 2: {
@@ -1453,12 +1454,12 @@ erewrite rngl_product_eq_compat. 2: {
 apply rngl_product_eq_compat.
 intros j Hj.
 ...
+*)
 
 Theorem glop : ∀ n (σ₁ σ₂ : vector n nat),
   ε (σ₁ ° σ₂) = (ε σ₁ * ε σ₂)%F.
 Proof.
-intros.
-...
+Abort.
 
 Theorem glop : ∀ p q n k k',
   p < q < n
@@ -1495,6 +1496,7 @@ cbn - [ iter_seq permut ].
    raccourci, trouver des propriétés de ε, de vect_swap_elem,
    que sais-je... *)
 (* voir https://fr.wikipedia.org/wiki/Signature_d%27une_permutation#Une_transposition_est_impaire et essayer de l'implémenter *)
+Abort. (*
 ...
 destruct (Nat.eq_dec p 0) as [Hpz| Hpz]. {
   subst p.
@@ -1504,6 +1506,7 @@ destruct (Nat.eq_dec p 0) as [Hpz| Hpz]. {
     destruct q; [ flia Hpqn | ].
     destruct q; [ | flia Hq2 ].
 ...
+*)
 
 Theorem glop : ∀ p q n k k',
   p < q < n
@@ -1517,7 +1520,7 @@ cbn - [ nat_of_permut permut ].
 (* nothing can be said about "minus_one_pow (k' / fact n)" and
    "minus_one_pow (k / fact n)": they can be equal or not;
    difficult to predict (I tested examples) *)
-...
+Abort.
 
 Theorem signature_swap :
   rngl_has_opp = true →
@@ -1528,8 +1531,7 @@ Theorem signature_swap :
 Proof.
 intros Hop * (Hpq, Hqn) Hk.
 unfold ε_permut.
-... (*
-...
+Abort. (*
 intros Hop * (Hpq, Hqn) Hk.
 revert k Hk.
 induction n; intros; [ easy | cbn ].
@@ -1588,7 +1590,7 @@ apply NoDup_Permutation_bis; cycle 1. {
       replace (ε_permut n x) with (- ε_permut n y)%F. 2: {
         subst x; cbn; clear M; symmetry.
         rename y into k; rename Hy into Hk.
-... (*
+Abort. (*
 ...
         apply ε_permut_swap.
 Print nat_of_permut.
@@ -1806,7 +1808,7 @@ apply rngl_summation_permut; cycle 1. {
   unfold determinant''_list.
   now rewrite map_length, seq_length.
 }
-...
+Abort.
 
 (* *)
 
@@ -2209,7 +2211,7 @@ destruct n; [ flia Hiz | ].
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   rewrite rngl_product_succ_succ.
-... (*
+Abort. (*
   erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
     intros k Hk.
     now rewrite Nat.sub_succ, Nat.sub_0_r.
@@ -2488,7 +2490,7 @@ rewrite (det_sum_row_row _ M C Hrz); cycle 1. {
     now destruct (Nat.eq_dec i 0).
   }
   rewrite H in H1; clear H.
-... (*
+Abort. (*
 ...
   assert (H : determinant D = 0%F). {
     rewrite Hd.
@@ -2509,8 +2511,7 @@ intros * Hij Hi Hj.
 (* look point 5 at
 https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html
 *)
-... (*
-...
+Abort. (*
 intros * Hsm Hij Hi Hj.
 unfold is_square_mat in Hsm.
 unfold determinant; cbn.
@@ -2630,8 +2631,7 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   now rewrite Nat.sub_0_r.
 }
 apply not_eq_sym in Hiz.
-... (*
-...
+Abort. (*
 specialize (det_swap_rows M Hiz) as H.
 apply (f_equal rng_opp) in H.
 rewrite rng_opp_involutive in H.

@@ -122,4 +122,32 @@ apply iter_seq_distr. {
 }
 Qed.
 
+(*
+Theorem rngl_inv_product :
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  ∀ b e f, ((¹/ Π (i = b, e), f i) = Π (i = b, e), (¹/ f i))%F.
+Proof.
+intros Hro H10 *.
+apply iter_seq_inv. {
+  specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
+  specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
+  rewrite Hro in rngl_mul_inv_l.
+  rewrite H10 in rngl_1_neq_0.
+  specialize (rngl_mul_inv_l 1%F rngl_1_neq_0) as H1.
+  now rewrite rngl_mul_1_r in H1.
+} {
+  intros.
+Search (¹/ (_ * _))%F.
+symmetry.
+Check rngl_inv_mul.
+...
+  rewrite rngl_inv_mul_distr.
+
+  rewrite fold_rngl_inv; [ | easy ].
+  now apply rngl_opp_add_distr.
+}
+Qed.
+*)
+
 End a.

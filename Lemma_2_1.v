@@ -212,7 +212,7 @@ rewrite vect_dot_mul_scal_mul_comm; [ | easy ].
 do 2 rewrite vect_scal_mul_dot_mul_comm.
 do 2 rewrite rngl_mul_assoc.
 unfold rngl_div.
-specialize (rngl_inv_mul Hdo Hin) as H1.
+specialize (rngl_inv_mul_distr Hdo Hin) as H1.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
 specialize rngl_opt_integral as rngl_integral.

@@ -575,7 +575,7 @@ rewrite rngl_mul_1_l in H.
 now right.
 Qed.
 
-Theorem rngl_inv_mul :
+Theorem rngl_inv_mul_distr :
   rngl_is_integral = true →
   rngl_has_inv = true →
   ∀ a b, a ≠ 0%F → b ≠ 0%F →(¹/ (a * b) = ¹/ b * ¹/ a)%F.
@@ -584,8 +584,6 @@ intros Hdo Hin * Haz Hbz.
 specialize rngl_mul_reg_l as H1.
 specialize rngl_mul_inv_r as H2.
 specialize rngl_integral as H3.
-specialize rngl_opt_mul_div_l as rngl_mul_div_l.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
 unfold rngl_div in H2.
 rewrite Hdo in H3; cbn in H3.
 specialize (H3 eq_refl).
@@ -667,17 +665,16 @@ Qed.
 
 Theorem rngl_opp_add_distr :
   rngl_has_opp = true →
-  ∀ a b, (- (a + b) = - a - b)%F.
+  ∀ a b, (- (a + b) = - b - a)%F.
 Proof.
 intros Hro *.
 specialize (fold_rngl_sub Hro) as H.
-apply rngl_add_reg_l with (c := (b + a)%F).
+apply rngl_add_reg_l with (c := (a + b)%F).
 unfold rngl_sub.
 rewrite Hro.
 rewrite rngl_add_assoc.
 do 3 rewrite H.
 rewrite rngl_add_sub.
-rewrite rngl_add_comm.
 rewrite rngl_add_opp_r.
 now rewrite rngl_add_opp_r.
 Qed.
@@ -688,7 +685,7 @@ Arguments rngl_add_opp_l {T}%type {ro rp} Hro.
 Arguments rngl_add_opp_r {T}%type {ro rp} x%F.
 Arguments rngl_add_reg_l {T}%type {ro rp} (a b c)%F.
 Arguments rngl_add_sub {T}%type {ro rp} (a b)%F.
-Arguments rngl_inv_mul {T}%type {ro rp} Hin Hdo a%F b%F.
+Arguments rngl_inv_mul_distr {T}%type {ro rp} Hin Hdo a%F b%F.
 Arguments rngl_integral {T}%type {ro rp}.
 Arguments rngl_mul_opp_opp {T}%type {ro rp} Hro.
 Arguments rngl_mul_0_l {T}%type {ro rp} a%F.
@@ -696,3 +693,4 @@ Arguments rngl_mul_opp_r {T}%type {ro rp} Hro.
 Arguments rngl_mul_reg_r {T}%type {ro rp} Hii (a b c)%F.
 Arguments rngl_mul_0_r {T}%type {ro rp} a%F.
 Arguments rngl_opp_0 {T}%type {ro rp}.
+Arguments rngl_opp_add_distr {T}%type {ro rp} Hop a%F b%F.
