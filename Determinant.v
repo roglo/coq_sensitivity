@@ -1538,6 +1538,8 @@ apply rngl_mul_reg_r with (c := y); [ now left | | ]. {
   apply rngl_product_integral in Hij.
   destruct Hij as (j & Hj & Hij).
 ...
+apply rngl_sub_move_0_r in Hij.
+...
   apply IHn; clear IHn.
   rewrite <- Hij; clear Hij.
   intros i Hi.

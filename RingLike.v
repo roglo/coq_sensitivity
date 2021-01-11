@@ -697,6 +697,12 @@ rewrite rngl_add_opp_r.
 now rewrite rngl_add_opp_r.
 Qed.
 
+Theorem rngl_sub_move_0_r : ∀ a b : T, (a - b)%F = 0%F → a = b.
+Proof.
+intros * Hab.
+Search (_ - _)%F.
+...
+
 End a.
 
 Arguments rngl_add_opp_l {T}%type {ro rp} Hro.
