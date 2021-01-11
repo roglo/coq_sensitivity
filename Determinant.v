@@ -329,11 +329,19 @@ Definition ε {n} (p : vector n nat) :=
 *)
 
 Definition ε {n} (p : vector n nat) :=
-  (Π (i = 1, n), Π (j = i + 1, n),
-   rngl_of_nat ((vect_el p (j - 1) - vect_el p (i - 1)) / (j - i)))%F.
+  ((Π (i = 1, n), Π (j = i + 1, n),
+    (rngl_of_nat (vect_el p (j - 1)) - rngl_of_nat (vect_el p (i - 1)))) /
+   (Π (i = 1, n), Π (j = i + 1, n),
+    (rngl_of_nat j - rngl_of_nat i)))%F.
 
-...
+(*
+End a.
+Require Import Zrl ZArith.
+Compute (ε_permut Z_ring_like_op 3 4).
+Compute (ε Z_ring_like_op (permut 3 4)).
+*)
 
+(*
 Theorem sgn_diff_diag : ∀ i, sgn_diff i i = 1%F.
 Proof.
 intros.
@@ -363,6 +371,7 @@ intros.
 setoid_rewrite Nat.add_comm.
 apply sgn_diff_add_mono_l.
 Qed.
+*)
 
 (*
 Theorem sgn_diff_add_mono_r_small : ∀ a b c d,
@@ -397,8 +406,41 @@ destruct d. {
 
 (* equality ε on permut and ε_permut *)
 
-Theorem ε_permut_ε_permut : ∀ n k, k < fact n → ε (permut n k) = ε_permut n k.
+Theorem ε_permut_ε_permut :
+  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  rngl_has_1_neq_0 = true →
+  ∀ n k, k < fact n → ε (permut n k) = ε_permut n k.
 Proof.
+intros Hin H10 * Hkn.
+unfold ε.
+revert k Hkn.
+induction n; intros. {
+  apply rngl_mul_inv_r; [ easy | cbn ].
+  specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
+  now rewrite H10 in rngl_1_neq_0.
+}
+cbn - [ iter_seq ].
+Abort. (*
+(**)
+rewrite rngl_product_split_first; [ | easy | flia ].
+cbn - [ iter_seq ].
+rewrite rngl_product_succ_succ.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  now rewrite Nat.sub_succ, Nat.sub_0_r.
+}
+erewrite (rngl_product_eq_compat _ _ _ 2). 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    replace (i - 1) with (S (i - 2)) by flia Hi.
+    replace (j - 1) with (S (j - 2)) by flia Hj Hi.
+    now cbn.
+  }
+  easy.
+}
+cbn - [ iter_seq ].
+...
 intros * Hkn.
 unfold ε.
 revert k Hkn.
@@ -552,6 +594,7 @@ destruct (lt_dec k (2 * fact n)) as [Hk2n| Hk2n]. {
   (* chuis pas sûr *)
   (* trop compliqué ; en plus, c'est juste *un* cas *)
 Abort.
+*)
 
 (* definition of determinant by sum of products involving all
    permutations *)
@@ -1473,6 +1516,7 @@ Proof.
 intros Hic *.
 unfold ε.
 cbn - [ iter_seq ].
+...
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
 ...
