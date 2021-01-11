@@ -1394,6 +1394,7 @@ Notation "σ₁ ° σ₂" := (permut_comp σ₁ σ₂) (at level 40).
 
 (* https://fr.wikipedia.org/wiki/Signature_d%27une_permutation#Une_transposition_est_impaire *)
 
+(*
 Theorem pouet :
   rngl_is_comm = true →
   ∀ n (σ₁ σ₂ : vector n nat),
@@ -1455,11 +1456,32 @@ apply rngl_product_eq_compat.
 intros j Hj.
 ...
 *)
+*)
 
-Theorem glop : ∀ n (σ₁ σ₂ : vector n nat),
-  ε (σ₁ ° σ₂) = (ε σ₁ * ε σ₂)%F.
+Theorem glop :
+  rngl_is_comm = true →
+  ∀ n (σ₁ σ₂ : vector n nat), ε (σ₁ ° σ₂) = (ε σ₁ * ε σ₂)%F.
 Proof.
-Abort.
+intros Hic *.
+unfold ε.
+cbn - [ iter_seq ].
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+...
+rewrite <- (rngl_product_mul_distr _ Hic).
+symmetry.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  now rewrite <- (rngl_product_mul_distr _ Hic).
+}
+cbn - [ iter_seq ].
+symmetry.
+apply rngl_product_eq_compat.
+intros i Hi.
+apply rngl_product_eq_compat.
+intros j Hj.
+unfold sgn_diff.
+...
 
 Theorem glop : ∀ p q n k k',
   p < q < n
