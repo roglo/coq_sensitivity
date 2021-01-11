@@ -697,11 +697,53 @@ rewrite rngl_add_opp_r.
 now rewrite rngl_add_opp_r.
 Qed.
 
-Theorem rngl_sub_move_0_r : ∀ a b : T, (a - b)%F = 0%F → a = b.
+Theorem rngl_sub_move_0_r :
+  rngl_has_opp = true →
+  ∀ a b : T, (a - b)%F = 0%F → a = b.
 Proof.
-intros * Hab.
-Search (_ - _)%F.
-...
+intros Hop * Hab.
+apply (rngl_add_compat_r _ _ b) in Hab.
+unfold rngl_sub in Hab.
+rewrite Hop in Hab.
+rewrite <- rngl_add_assoc in Hab.
+rewrite rngl_add_opp_l in Hab; [ | easy ].
+now rewrite rngl_add_0_r, rngl_add_0_l in Hab.
+Qed.
+
+Theorem eq_rngl_of_nat_0 :
+  rngl_characteristic = 0 →
+  ∀ i, rngl_of_nat i = 0%F → i = 0.
+Proof.
+intros Hch * Hi.
+induction i; [ easy | exfalso ].
+cbn in Hi.
+specialize rngl_characteristic_prop as rngl_char_prop.
+rewrite Hch in rngl_char_prop.
+now specialize (rngl_char_prop i) as H.
+Qed.
+
+Theorem rngl_of_nat_inj :
+  rngl_characteristic = 0 →
+  ∀ i j,
+  rngl_of_nat i = rngl_of_nat j
+  → i = j.
+Proof.
+intros Hch * Hij.
+revert i Hij.
+induction j; intros. {
+  cbn in Hij.
+  now apply eq_rngl_of_nat_0 in Hij.
+}
+destruct i. {
+  exfalso.
+  symmetry in Hij.
+  now apply eq_rngl_of_nat_0 in Hij.
+}
+f_equal.
+cbn in Hij.
+apply rngl_add_reg_l in Hij.
+now apply IHj.
+Qed.
 
 End a.
 

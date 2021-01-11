@@ -1510,24 +1510,27 @@ intros j Hj.
 *)
 
 Theorem signature_comp :
-  rngl_is_comm = true →
+  rngl_has_opp = true →
   rngl_has_inv = true →
+  rngl_is_comm = true →
   rngl_has_1_neq_0 = true →
   rngl_is_integral = true →
+  rngl_characteristic = 0 →
   ∀ n (σ₁ σ₂ : vector n nat), ε (σ₁ ° σ₂) = (ε σ₁ * ε σ₂)%F.
 Proof.
-intros Hic Hin H10 Hit *.
+intros Hop Hin Hic H10 Hit Hch *.
 unfold ε.
 cbn - [ iter_seq ].
 remember (Π (i = _, _), _)%F as x eqn:Hx in |-*.
 remember (Π (i = _, _), _)%F as y eqn:Hy in |-*.
 remember (Π (i = _, _), _)%F as z eqn:Hz in |-*.
 remember (Π (i = _, _), _)%F as t eqn:Ht in |-*.
+move y before x; move z before y; move t before z.
 unfold rngl_div.
 rewrite Hin.
 rewrite rngl_mul_assoc; f_equal.
 rewrite rngl_mul_mul_swap; [ | easy ].
-apply rngl_mul_reg_r with (c := y); [ now left | | ]. {
+assert (Hyz : y ≠ 0%F). {
   intros Hij; rewrite Hy in Hij.
   clear x z t Hx Hy Hz Ht.
   clear σ₁ σ₂.
@@ -1537,35 +1540,15 @@ apply rngl_mul_reg_r with (c := y); [ now left | | ]. {
   destruct Hij as (i & Hi & Hij).
   apply rngl_product_integral in Hij.
   destruct Hij as (j & Hj & Hij).
-...
-apply rngl_sub_move_0_r in Hij.
-...
-  apply IHn; clear IHn.
-  rewrite <- Hij; clear Hij.
-  intros i Hi.
-  destruct n; [ flia Hi | ].
-  symmetry.
-  rewrite rngl_product_split_first; [ | easy | easy ].
-  rewrite rngl_add_sub, rngl_mul_1_l.
-  apply rngl_product_eq_compat.
-  intros j Hj.
-...
-erewrite rngl_product_eq_compat. 2: {
-  intros i Hi.
-...
-rewrite <- (rngl_product_mul_distr _ Hic).
-symmetry.
-erewrite rngl_product_eq_compat. 2: {
-  intros i Hi.
-  now rewrite <- (rngl_product_mul_distr _ Hic).
+  apply rngl_sub_move_0_r in Hij; [ | easy ].
+  apply rngl_of_nat_inj in Hij; [ flia Hi Hj Hij | easy ].
 }
-cbn - [ iter_seq ].
-symmetry.
-apply rngl_product_eq_compat.
-intros i Hi.
-apply rngl_product_eq_compat.
-intros j Hj.
-unfold sgn_diff.
+apply rngl_mul_reg_r with (c := y); [ now left | easy | ].
+rewrite <- rngl_mul_assoc.
+specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
+rewrite Hin in rngl_mul_inv_l.
+rewrite rngl_mul_inv_l; [ | easy ].
+rewrite rngl_mul_1_r.
 ...
 
 Theorem glop : ∀ p q n k k',
