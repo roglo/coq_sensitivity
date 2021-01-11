@@ -1409,13 +1409,20 @@ erewrite rngl_product_eq_compat. 2: {
 cbn - [ iter_seq ].
 (**)
 replace (Π (i = _, _), Π (j = _, _), _)%F with
+  (Π (i = 1, n),
+   (Π (j = 1, n),
+    (sgn_diff (vect_el σ₁ (vect_el σ₂ (j - 1)))
+       (vect_el σ₁ (vect_el σ₂ (i - 1))) *
+     sgn_diff (vect_el σ₂ (j - 1)) (vect_el σ₂ (i - 1)))))%F. 2: {
+  apply rngl_product_eq_compat.
+  intros i Hi.
+  erewrite (rngl_product_split _ i); [ | flia Hi ].
+  rewrite <- rngl_mul_1_l.
+  f_equal.
+...
+replace (Π (i = _, _), Π (j = _, _), _)%F with
   (Π (k = 1, n), Π (l = 1, n),
    (sgn_diff (vect_el σ₁ k) (vect_el σ₁ l) * sgn_diff k l))%F. 2: {
-(* finalement, c'est aussi compliqué d'essayer de prouver ça ; je me
-   retrouve systématiquement soit avec une somme de produits censés
-   s'annuler 2 à 2, mais faut formaliser ça, soit, ici, avec un
-   produit de produits censé être égal à un autre produit de produits,
-   dans un autre ordre, et, pour le formaliser, c'est pas mieux *)
 ...
 (**)
 erewrite rngl_product_eq_compat. 2: {
