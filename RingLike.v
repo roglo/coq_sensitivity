@@ -471,6 +471,24 @@ transitivity (0 + - 0)%F. {
 apply H.
 Qed.
 
+Theorem rngl_inv_1 :
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  (¹/ 1 = 1)%F.
+Proof.
+intros Hin H10.
+specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
+rewrite H10 in rngl_1_neq_0.
+specialize rngl_mul_inv_r as H.
+unfold rngl_div in H.
+rewrite Hin in H.
+transitivity (1 * ¹/ 1)%F. {
+  symmetry.
+  apply rngl_mul_1_l.
+}
+apply H; [ now left | easy ].
+Qed.
+
 Theorem rngl_sub_0_r : ∀ a, (a - 0 = a)%F.
 Proof.
 intros.
