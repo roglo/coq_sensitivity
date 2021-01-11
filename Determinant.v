@@ -1536,7 +1536,6 @@ apply rngl_mul_reg_r with (c := y); [ now left | | ]. {
     now rewrite H10 in rngl_1_neq_0.
   }
   apply IHn; clear IHn.
-...
   rewrite rngl_product_split_last in Hij; [ | flia ].
   rewrite all_1_rngl_product_1 with (b := S n + 1) in Hij; [ | easy | ]. 2: {
     intros i Hi; flia Hi.
@@ -1551,11 +1550,28 @@ apply rngl_mul_reg_r with (c := y); [ now left | | ]. {
     easy.
   }
   cbn - [ iter_seq ] in Hij.
+  destruct n; [ easy | ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros i Hi.
+    rewrite Nat.add_1_r.
+    rewrite rngl_product_succ_succ.
+    cbn - [ iter_seq ].
+    easy.
+  }
+  cbn - [ iter_seq ].
+  erewrite rngl_product_eq_compat in Hij. 2: {
+    intros i Hi.
+    rewrite rngl_product_split_first; [ | easy | easy ].
+    rewrite rngl_add_sub, rngl_mul_1_l.
+    easy.
+  }
+  cbn - [ iter_seq ] in Hij.
+  erewrite rngl_product_eq_compat. 2: {
+    intros i Hi.
+...
   apply IHn; clear IHn.
   rewrite <- Hij; clear Hij.
-  apply rngl_product_eq_compat.
   intros i Hi.
-  rewrite Nat.add_1_r.
   destruct n; [ flia Hi | ].
   symmetry.
   rewrite rngl_product_split_first; [ | easy | easy ].
