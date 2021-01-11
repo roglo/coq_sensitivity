@@ -320,11 +320,19 @@ Fixpoint ε_permut n k :=
 
 (* signature of a permutation *)
 
+(*
 Definition sgn_diff a b := if lt_dec a b then (- 1)%F else 1%F.
 
 Definition ε {n} (p : vector n nat) :=
   (Π (i = 1, n), Π (j = i + 1, n),
    sgn_diff (vect_el p (j - 1)) (vect_el p (i - 1)))%F.
+*)
+
+Definition ε {n} (p : vector n nat) :=
+  (Π (i = 1, n), Π (j = i + 1, n),
+   rngl_of_nat ((vect_el p (j - 1) - vect_el p (i - 1)) / (j - i)))%F.
+
+...
 
 Theorem sgn_diff_diag : ∀ i, sgn_diff i i = 1%F.
 Proof.
