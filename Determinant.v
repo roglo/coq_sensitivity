@@ -1511,11 +1511,23 @@ intros j Hj.
 
 Theorem glop :
   rngl_is_comm = true →
+  rngl_has_inv = true →
   ∀ n (σ₁ σ₂ : vector n nat), ε (σ₁ ° σ₂) = (ε σ₁ * ε σ₂)%F.
 Proof.
-intros Hic *.
+intros Hic Hin *.
 unfold ε.
 cbn - [ iter_seq ].
+remember (Π (i = _, _), _)%F as x eqn:Hx in |-*.
+remember (Π (i = _, _), _)%F as y eqn:Hy in |-*.
+remember (Π (i = _, _), _)%F as z eqn:Hz in |-*.
+remember (Π (i = _, _), _)%F as t eqn:Ht in |-*.
+unfold rngl_div.
+rewrite Hin.
+rewrite rngl_mul_assoc; f_equal.
+...
+
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
 ...
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
