@@ -1509,13 +1509,14 @@ intros j Hj.
 *)
 *)
 
-Theorem glop :
+Theorem signature_comp :
   rngl_is_comm = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
   ∀ n (σ₁ σ₂ : vector n nat), ε (σ₁ ° σ₂) = (ε σ₁ * ε σ₂)%F.
 Proof.
-intros Hic Hin H10 *.
+intros Hic Hin H10 Hit *.
 unfold ε.
 cbn - [ iter_seq ].
 remember (Π (i = _, _), _)%F as x eqn:Hx in |-*.
@@ -1530,44 +1531,12 @@ apply rngl_mul_reg_r with (c := y); [ now left | | ]. {
   intros Hij; rewrite Hy in Hij.
   clear x z t Hx Hy Hz Ht.
   clear σ₁ σ₂.
-  induction n. {
-    cbn in Hij.
-    specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
-    now rewrite H10 in rngl_1_neq_0.
-  }
-  apply IHn; clear IHn.
-  rewrite rngl_product_split_last in Hij; [ | flia ].
-  rewrite all_1_rngl_product_1 with (b := S n + 1) in Hij; [ | easy | ]. 2: {
-    intros i Hi; flia Hi.
-  }
-  rewrite rngl_mul_1_r in Hij.
-  rewrite rngl_product_succ_succ in Hij.
-  erewrite rngl_product_eq_compat in Hij. 2: {
-    intros i Hi.
-    rewrite Nat.sub_add; [ | flia ].
-    rewrite rngl_product_succ_succ.
-    rewrite Nat.sub_succ, Nat.sub_0_r.
-    easy.
-  }
-  cbn - [ iter_seq ] in Hij.
-  destruct n; [ easy | ].
-  erewrite rngl_product_eq_compat. 2: {
-    intros i Hi.
-    rewrite Nat.add_1_r.
-    rewrite rngl_product_succ_succ.
-    cbn - [ iter_seq ].
-    easy.
-  }
-  cbn - [ iter_seq ].
-  erewrite rngl_product_eq_compat in Hij. 2: {
-    intros i Hi.
-    rewrite rngl_product_split_first; [ | easy | easy ].
-    rewrite rngl_add_sub, rngl_mul_1_l.
-    easy.
-  }
-  cbn - [ iter_seq ] in Hij.
-  erewrite rngl_product_eq_compat. 2: {
-    intros i Hi.
+  specialize @rngl_product_opt_integral as rngl_product_integral.
+  specialize (rngl_product_integral T ro rp Hit H10).
+  apply rngl_product_integral in Hij.
+  destruct Hij as (i & Hi & Hij).
+  apply rngl_product_integral in Hij.
+  destruct Hij as (j & Hj & Hij).
 ...
   apply IHn; clear IHn.
   rewrite <- Hij; clear Hij.

@@ -122,4 +122,45 @@ apply iter_seq_distr. {
 }
 Qed.
 
+Theorem rngl_product_opt_integral :
+  rngl_is_integral = true →
+  rngl_has_1_neq_0 = true →
+  ∀ b e f,
+  (Π (i = b, e), f i = 0)%F
+  → ∃ i, b ≤ i ≤ e ∧ f i = 0%F.
+Proof.
+intros Hin H10 * Hz.
+unfold iter_seq in Hz.
+remember (S e - b) as len eqn:Hlen in Hz.
+destruct len. {
+  cbn in Hz.
+  specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
+  now rewrite H10 in rngl_1_neq_0.
+}
+replace e with (b + len) by flia Hlen.
+clear e Hlen.
+revert b Hz.
+induction len; intros. {
+  cbn in Hz.
+  rewrite rngl_mul_1_l in Hz.
+  exists b.
+  now rewrite Nat.add_0_r.
+}
+rewrite List_seq_succ_r in Hz.
+rewrite fold_left_app in Hz.
+remember (S len) as s; cbn in Hz; subst s.
+specialize rngl_opt_integral as rngl_integral.
+rewrite Hin in rngl_integral.
+apply rngl_integral in Hz.
+destruct Hz as [Hz| Hz]. {
+  apply IHlen in Hz.
+  destruct Hz as (i, Hi).
+  exists i.
+  split; [ flia Hi | easy ].
+} {
+  exists (b + S len).
+  split; [ flia | easy ].
+}
+Qed.
+
 End a.
