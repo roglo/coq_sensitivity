@@ -336,11 +336,16 @@ Definition ε {n} (p : vector n nat) :=
     (rngl_of_nat j - rngl_of_nat i)))%F.
 *)
 
+Definition δ i j v := if Nat.eq_dec i j then 1%F else v.
 Definition ip {n} (p : vector n nat) i := rngl_of_nat (vect_el p i).
 
 Definition ε {n} (p : vector n nat) :=
   ((Π (i = 1, n), Π (j = i + 1, n), (ip p (j - 1) - ip p (i - 1))) /
    (Π (i = 1, n), Π (j = i + 1, n), rngl_of_nat (j - i)))%F.
+
+Definition ε' {n} (p : vector n nat) :=
+  ((Π (i = 1, n), Π (j = 1, n), δ i j (ip p (max i j - 1) - ip p (min i j - 1))) /
+   (Π (i = 1, n), Π (j = 1, n), δ i j (rngl_of_nat (max i j - min i j))))%F.
 
 (*
 Definition ε' {n} (p : vector n nat) :=
@@ -353,15 +358,11 @@ End a.
 Require Import Zrl ZArith.
 Compute (ε_permut Z_ring_like_op 2 1).
 Compute (ε Z_ring_like_op (permut 2 1)).
-(*
 Compute (ε' Z_ring_like_op (permut 2 1)).
-*)
 Compute (list_of_vect (permut 2 1)).
 Compute (map (λ k, (ε_permut Z_ring_like_op 4 k)) (seq 0 (fact 4))).
 Compute (map (λ k, (ε Z_ring_like_op (permut 4 k))) (seq 0 (fact 4))).
-(*
 Compute (map (λ k, (ε' Z_ring_like_op (permut 4 k))) (seq 0 (fact 4))).
-*)
 Compute let ro := Z_ring_like_op in let n := 4  in
   (Π (i = 1, n), (Π (j = i + 1, n), (rngl_of_nat j - rngl_of_nat i)))%F.
 Compute let ro := Z_ring_like_op in let n := 4  in
@@ -1589,12 +1590,41 @@ assert (Hyz : y ≠ 0%F). {
   apply eq_rngl_of_nat_0 in Hij; [ | easy ].
   flia Hi Hj Hij.
 }
+assert (Htz : t ≠ 0%F). {
+  intros Hij; rewrite Ht in Hij.
+  clear x z t Hx Hy Hz Ht.
+  clear σ₁.
+  specialize @rngl_product_opt_integral as rngl_product_integral.
+  specialize (rngl_product_integral T ro rp Hit H10).
+  apply rngl_product_integral in Hij.
+  destruct Hij as (i & Hi & Hij).
+  apply rngl_product_integral in Hij.
+  destruct Hij as (j & Hj & Hij).
+  apply rngl_sub_move_0_r in Hij; [ | easy ].
+  (* mouais, admettons *)
+  admit.
+}
 apply rngl_mul_reg_r with (c := y); [ now left | easy | ].
 rewrite <- rngl_mul_assoc.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
 rewrite Hin in rngl_mul_inv_l.
 rewrite rngl_mul_inv_l; [ | easy ].
 rewrite rngl_mul_1_r.
+enough (H : (x / t = z / y)%F). {
+  assert (H' : (x / t * t = z / y * t)%F) by now rewrite H.
+  unfold rngl_div in H'.
+  rewrite Hin in H'.
+  rewrite <- rngl_mul_assoc in H'.
+  rewrite rngl_mul_inv_l in H'; [ | easy ].
+  rewrite rngl_mul_1_r in H'.
+  rewrite H'.
+  rewrite rngl_mul_mul_swap; [ | easy ].
+  f_equal.
+  rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_inv_l; [ | easy ].
+  apply rngl_mul_1_r.
+}
+subst x t.
 ...
 
 Theorem glop : ∀ p q n k k',
