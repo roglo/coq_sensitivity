@@ -340,12 +340,12 @@ Definition δ i j v := if Nat.eq_dec i j then 1%F else v.
 Definition ip {n} (p : vector n nat) i := rngl_of_nat (vect_el p i).
 
 Definition ε {n} (p : vector n nat) :=
-  ((Π (i = 1, n), Π (j = 1, n), δ i j (ip p (j - 1) - ip p (i - 1))) /
-   (Π (i = 1, n), Π (j = 1, n), δ i j (rngl_of_nat j - rngl_of_nat i)))%F.
-
-Definition ε' {n} (p : vector n nat) :=
   ((Π (i = 1, n), Π (j = i + 1, n), δ i j (ip p (j - 1) - ip p (i - 1))) /
    (Π (i = 1, n), Π (j = i + 1, n), δ i j (rngl_of_nat j - rngl_of_nat i)))%F.
+
+Definition ε' {n} (p : vector n nat) :=
+  ((Π (i = 1, n), Π (j = 1, n), δ i j (ip p (j - 1) - ip p (i - 1))) /
+   (Π (i = 1, n), Π (j = 1, n), δ i j (rngl_of_nat j - rngl_of_nat i)))%F.
 
 (**)
 End a.
@@ -354,9 +354,9 @@ Compute (ε_permut Z_ring_like_op 2 1).
 Compute (ε Z_ring_like_op (permut 2 1)).
 Compute (ε' Z_ring_like_op (permut 2 1)).
 Compute (list_of_vect (permut 2 1)).
+Compute (map (λ k, (ε_permut Z_ring_like_op 4 k)) (seq 0 (fact 4))).
 Compute (map (λ k, (ε Z_ring_like_op (permut 4 k))) (seq 0 (fact 4))).
 Compute (map (λ k, (ε' Z_ring_like_op (permut 4 k))) (seq 0 (fact 4))).
-Compute (map (λ k, (ε_permut Z_ring_like_op 4 k)) (seq 0 (fact 4))).
 ...
 *)
 
