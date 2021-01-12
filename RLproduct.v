@@ -163,4 +163,66 @@ destruct Hz as [Hz| Hz]. {
 }
 Qed.
 
+(* à voir...
+Theorem rngl_inv_product :
+  rngl_is_comm = true →
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
+  ∀ b e f,
+  (∀ i, b ≤ i ≤ e → f i ≠ 0%F)
+  → ((¹/ Π (i = b, e), f i) = Π (i = b, e), (¹/ f i))%F.
+Proof.
+intros Hic Hin H10 Hit * Hnz.
+unfold iter_seq.
+remember (S e - b) as len.
+destruct len; [ now apply rngl_inv_1 | ].
+replace e with (b + len) in Hnz by flia Heqlen.
+clear e Heqlen.
+revert b Hnz.
+induction len; intros. {
+  cbn.
+  now do 2 rewrite rngl_mul_1_l.
+}
+rewrite List_seq_succ_r; cbn.
+do 2 rewrite rngl_mul_1_l.
+rewrite fold_left_app; cbn.
+rewrite fold_left_app; cbn.
+rewrite iter_seq_op_fun_from_d with (d := 1%F).
+...
+rewrite <- IHlen.
+rewrite rngl_inv_mul_distr; [ | easy | easy | | ]. {
+  specialize rngl_opt_mul_comm as rngl_mul_comm.
+  rewrite Hic in rngl_mul_comm.
+  apply rngl_mul_comm.
+}
+...intros Hic Hin H10 Hit * Hnz.
+unfold iter_seq.
+remember (S e - b) as len.
+clear e Heqlen.
+revert b.
+induction len; intros; [ now apply rngl_inv_1 | ].
+rewrite List_seq_succ_r; cbn.
+rewrite fold_left_app; cbn.
+rewrite fold_left_app; cbn.
+rewrite <- IHlen.
+rewrite rngl_inv_mul_distr; [ | easy | easy | | ]. {
+  specialize rngl_opt_mul_comm as rngl_mul_comm.
+  rewrite Hic in rngl_mul_comm.
+  apply rngl_mul_comm.
+}
+...
+rewrite rngl_inv_mul_distr; [ | easy | easy | | ]; cycle 1. {
+now rewrite inv_op_distr.
+...
+intros Hin H10 Hit * Hnz.
+apply iter_seq_inv. {
+  now apply rngl_inv_1.
+} {
+Check iter_seq_inv.
+  intros a c.
+  rewrite rngl_inv_mul_distr; [ | easy | easy | | ]; cycle 1. {
+...
+*)
+
 End a.
