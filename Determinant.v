@@ -362,6 +362,10 @@ Compute (map (λ k, (ε Z_ring_like_op (permut 4 k))) (seq 0 (fact 4))).
 (*
 Compute (map (λ k, (ε' Z_ring_like_op (permut 4 k))) (seq 0 (fact 4))).
 *)
+Compute let ro := Z_ring_like_op in let n := 4  in
+  (Π (i = 1, n), (Π (j = i + 1, n), (rngl_of_nat j - rngl_of_nat i)))%F.
+Compute let ro := Z_ring_like_op in let n := 4  in
+  (Π (i = 1, n), (Π (j = i + 1, n), (ip _ (permut n 13) (j - 1) - ip _ (permut n 13) (i - 1))))%F.
 *)
 
 (*
@@ -1572,8 +1576,6 @@ specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
 rewrite Hin in rngl_mul_inv_l.
 rewrite rngl_mul_inv_l; [ | easy ].
 rewrite rngl_mul_1_r.
-assert (y = t). {
-  subst y t.
 ...
 
 Theorem glop : ∀ p q n k k',
