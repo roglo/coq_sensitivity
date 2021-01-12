@@ -366,6 +366,27 @@ Compute let ro := Z_ring_like_op in let n := 4  in
   (Π (i = 1, n), (Π (j = i + 1, n), (rngl_of_nat j - rngl_of_nat i)))%F.
 Compute let ro := Z_ring_like_op in let n := 4  in
   (Π (i = 1, n), (Π (j = i + 1, n), (ip _ (permut n 13) (j - 1) - ip _ (permut n 13) (i - 1))))%F.
+
+Compute let n := 4 in let σ₁ := permut n 13 in let σ₂ := permut n 4 in
+       (Π (i = 1, n),
+        (Π (j = i + 1, n),
+         (rngl_of_nat (vect_el σ₁ (vect_el σ₂ (j - 1))) - rngl_of_nat (vect_el σ₁ (vect_el σ₂ (i - 1))))))%F.
+Compute let n := 4 in let σ₁ := permut n 13 in let σ₂ := permut n 4 in
+  (Π (i = 1, n), (Π (j = i + 1, n), (rngl_of_nat j - rngl_of_nat i)))%F.
+
+Compute let n := 4 in let σ₁ := permut n 13 in let σ₂ := permut n 4 in
+  (Π (i = 1, n), (Π (j = i + 1, n), (ip _ σ₁ (j - 1) - ip _ σ₁ (i - 1))))%F.
+Compute let n := 4 in let σ₁ := permut n 13 in let σ₂ := permut n 4 in
+  (Π (i = 1, n), (Π (j = i + 1, n), (ip _ σ₂ (j - 1) - ip _ σ₂ (i - 1))))%F.
+...
+  Hx : x =
+       (Π (i = 1, n),
+        (Π (j = i + 1, n),
+         (rngl_of_nat (vect_el σ₁ (vect_el σ₂ (j - 1))) - rngl_of_nat (vect_el σ₁ (vect_el σ₂ (i - 1))))))%F
+  Hy : y = (Π (i = 1, n), (Π (j = i + 1, n), (rngl_of_nat j - rngl_of_nat i)))%F
+  Hz : z = (Π (i = 1, n), (Π (j = i + 1, n), (ip σ₁ (j - 1) - ip σ₁ (i - 1))))%F
+  Ht : t = (Π (i = 1, n), (Π (j = i + 1, n), (ip σ₂ (j - 1) - ip σ₂ (i - 1))))%F
+  (x * y)%F = (z * t)%F
 *)
 
 (*
@@ -1451,8 +1472,6 @@ Compute (map (λ i, minus_one_pow (vect_el (permut 3 i) 2)) (seq 0 (fact 3))).
 Compute (map (λ i, minus_one_pow (vect_el (permut 4 i) 3)) (seq 0 (fact 4))).
 Compute @signature _ Z_ring_like_op 4 0.
 Compute @signature _ Z_ring_like_op 4 (nat_of_permut (permut_swap_last 0 1 4 0)).
-...
-signature n (nat_of_permut (permut_swap_last p q n y)) = signature n y
 *)
 
 Theorem vect_swap_elem_same : ∀ n (v : vector n nat) i,
