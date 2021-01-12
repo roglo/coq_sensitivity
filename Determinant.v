@@ -351,9 +351,12 @@ Definition ε' {n} (p : vector n nat) :=
 End a.
 Require Import Zrl ZArith.
 Compute (ε_permut Z_ring_like_op 2 1).
-Compute (ε Z_ring_like_op (permut 2 0)).
+Compute (ε Z_ring_like_op (permut 2 1)).
 Compute (ε' Z_ring_like_op (permut 2 1)).
 Compute (list_of_vect (permut 2 1)).
+Compute (map (λ k, (ε Z_ring_like_op (permut 4 k))) (seq 0 (fact 4))).
+Compute (map (λ k, (ε' Z_ring_like_op (permut 4 k))) (seq 0 (fact 4))).
+Compute (map (λ k, (ε_permut Z_ring_like_op 4 k)) (seq 0 (fact 4))).
 ...
 *)
 
