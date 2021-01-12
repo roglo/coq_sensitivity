@@ -340,7 +340,7 @@ Definition ip {n} (p : vector n nat) i := rngl_of_nat (vect_el p i).
 
 Definition ε {n} (p : vector n nat) :=
   ((Π (i = 1, n), Π (j = i + 1, n), (ip p (j - 1) - ip p (i - 1))) /
-   (Π (i = 1, n), Π (j = i + 1, n), (rngl_of_nat j - rngl_of_nat i)))%F.
+   (Π (i = 1, n), Π (j = i + 1, n), rngl_of_nat (j - i)))%F.
 
 (*
 Definition ε' {n} (p : vector n nat) :=
@@ -1586,8 +1586,8 @@ assert (Hyz : y ≠ 0%F). {
   destruct Hij as (i & Hi & Hij).
   apply rngl_product_integral in Hij.
   destruct Hij as (j & Hj & Hij).
-  apply rngl_sub_move_0_r in Hij; [ | easy ].
-  apply rngl_of_nat_inj in Hij; [ flia Hi Hj Hij | easy ].
+  apply eq_rngl_of_nat_0 in Hij; [ | easy ].
+  flia Hi Hj Hij.
 }
 apply rngl_mul_reg_r with (c := y); [ now left | easy | ].
 rewrite <- rngl_mul_assoc.
