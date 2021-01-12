@@ -1624,7 +1624,11 @@ enough (H : (x / t = z / y)%F). {
   rewrite rngl_mul_inv_l; [ | easy ].
   apply rngl_mul_1_r.
 }
+unfold rngl_div.
+rewrite Hin.
 subst x t.
+Search (- Σ (_ = _, _), _)%F.
+Search (¹/ Π (_ = _, _), _)%F.
 ...
 
 Theorem glop : ∀ p q n k k',
