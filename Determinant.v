@@ -328,17 +328,33 @@ Definition ε {n} (p : vector n nat) :=
    sgn_diff (vect_el p (j - 1)) (vect_el p (i - 1)))%F.
 *)
 
+(*
 Definition ε {n} (p : vector n nat) :=
   ((Π (i = 1, n), Π (j = i + 1, n),
     (rngl_of_nat (vect_el p (j - 1)) - rngl_of_nat (vect_el p (i - 1)))) /
    (Π (i = 1, n), Π (j = i + 1, n),
     (rngl_of_nat j - rngl_of_nat i)))%F.
+*)
 
-(*
+Definition δ i j v := if Nat.eq_dec i j then 1%F else v.
+Definition ip {n} (p : vector n nat) i := rngl_of_nat (vect_el p i).
+
+Definition ε {n} (p : vector n nat) :=
+  ((Π (i = 1, n), Π (j = 1, n), δ i j (ip p (j - 1) - ip p (i - 1))) /
+   (Π (i = 1, n), Π (j = 1, n), δ i j (rngl_of_nat j - rngl_of_nat i)))%F.
+
+Definition ε' {n} (p : vector n nat) :=
+  ((Π (i = 1, n), Π (j = i + 1, n), δ i j (ip p (j - 1) - ip p (i - 1))) /
+   (Π (i = 1, n), Π (j = i + 1, n), δ i j (rngl_of_nat j - rngl_of_nat i)))%F.
+
+(**)
 End a.
 Require Import Zrl ZArith.
-Compute (ε_permut Z_ring_like_op 3 4).
-Compute (ε Z_ring_like_op (permut 3 4)).
+Compute (ε_permut Z_ring_like_op 2 1).
+Compute (ε Z_ring_like_op (permut 2 0)).
+Compute (ε' Z_ring_like_op (permut 2 1)).
+Compute (list_of_vect (permut 2 1)).
+...
 *)
 
 (*
@@ -1549,6 +1565,8 @@ specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
 rewrite Hin in rngl_mul_inv_l.
 rewrite rngl_mul_inv_l; [ | easy ].
 rewrite rngl_mul_1_r.
+assert (y = t). {
+  subst y t.
 ...
 
 Theorem glop : ∀ p q n k k',
