@@ -1628,6 +1628,7 @@ specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
 rewrite Hin in rngl_mul_inv_l.
 rewrite rngl_mul_inv_l; [ | easy ].
 rewrite rngl_mul_1_r.
+unfold δ in Hx, Hy, Hz, Ht.
 (*
 Abort.
 End a.
