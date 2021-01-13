@@ -1629,24 +1629,30 @@ rewrite Hin in rngl_mul_inv_l.
 rewrite rngl_mul_inv_l; [ | easy ].
 rewrite rngl_mul_1_r.
 unfold δ in Hx, Hy, Hz, Ht.
+...
 (*
 Abort.
 End a.
 About δ.
 Arguments δ {T}%type {ro} (i j u v)%nat.
 Require Import Zrl ZArith.
-(* x *)
-Compute let n := 4 in let σ₂ := canon_permut n 13 in let σ₁ := canon_permut n 8 in let ro := Z_ring_like_op in
-  (Π (i = 1, n), (Π (j = 1, n), δ i j (vect_el σ₁ (vect_el σ₂ (i - 1))) (vect_el σ₁ (vect_el σ₂ (j - 1)))))%F.
-(* y *)
-Compute let n := 4 in let σ₂ := canon_permut n 13 in let σ₁ := canon_permut n 8 in let ro := Z_ring_like_op in
-  (Π (i = 1, n), (Π (j = 1, n), δ i j i j))%F.
-(* z *)
-Compute let n := 4 in let σ₂ := canon_permut n 13 in let σ₁ := canon_permut n 8 in let ro := Z_ring_like_op in
-  (Π (i = 1, n), (Π (j = 1, n), δ i j (vect_el σ₁ (i - 1)) (vect_el σ₁ (j - 1))))%F.
-(* t *)
-Compute let n := 4 in let σ₂ := canon_permut n 13 in let σ₁ := canon_permut n 8 in let ro := Z_ring_like_op in
-  (Π (i = 1, n), (Π (j = 1, n), δ i j (vect_el σ₂ (i - 1)) (vect_el σ₂ (j - 1))))%F.
+Open Scope Z_scope.
+Compute let n := 4%nat in
+  map
+    (λ k, let σ₂ := canon_permut n k in let σ₁ := canon_permut n 8 in let ro := Z_ring_like_op in
+     ((Π (i = 1, n), (Π (j = 1, n), δ i j (vect_el σ₁ (vect_el σ₂ (i - 1))) (vect_el σ₁ (vect_el σ₂ (j - 1)))))%F,
+      (Π (i = 1, n), (Π (j = 1, n), δ i j i j))%F,
+      (Π (i = 1, n), (Π (j = 1, n), δ i j (vect_el σ₁ (i - 1)) (vect_el σ₁ (j - 1))))%F,
+      (Π (i = 1, n), (Π (j = 1, n), δ i j (vect_el σ₂ (i - 1)) (vect_el σ₂ (j - 1))))%F))
+    (seq 0 (fact n)).
+Compute let n := 4%nat in
+  map
+    (λ k, let σ₂ := canon_permut n k in let σ₁ := canon_permut n 5 in let ro := Z_ring_like_op in
+     ((Π (i = 1, n), (Π (j = 1, n), δ i j (vect_el σ₁ (vect_el σ₂ (i - 1))) (vect_el σ₁ (vect_el σ₂ (j - 1)))))%F,
+      (Π (i = 1, n), (Π (j = 1, n), δ i j i j))%F,
+      (Π (i = 1, n), (Π (j = 1, n), δ i j (vect_el σ₁ (i - 1)) (vect_el σ₁ (j - 1))))%F,
+      (Π (i = 1, n), (Π (j = 1, n), δ i j (vect_el σ₂ (i - 1)) (vect_el σ₂ (j - 1))))%F))
+    (seq 0 (fact n)).
 *)
 ...
 enough (H : (x / t = z / y)%F). {
