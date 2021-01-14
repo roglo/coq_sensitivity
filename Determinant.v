@@ -349,11 +349,48 @@ Definition ε' {n} (p : vector n nat) :=
 
 (* compte du nombre de transpositions.
    trier P par échanges et compter le nombres d'échanges (transpositions) *)
-Definition ε''_loop {n} (P : vector n nat) it :=
-  match it with
-  | 0 => 1%F
-  | S it' =>
-      if Nat.lt_dec (vect_el p 0) (vect_el p 1) then 1%F else (-1)%F) *
+...
+Fixpoint list_iteration list :=
+  match list with
+  | [] => list
+  | x :: l =>
+      match l with
+      | [] => list
+      | y :: l' =>
+          if lt_dec x y then x :: list_iteration l
+          else y :: list_iteration (x :: l)
+      end
+  end.
+...
+
+Fixpoint ε''_loop l :=
+  match l with
+  | [] => 0
+  | x :: l' =>
+      match l' with
+      | [] => 0
+      | y :: l'' => (ε''_loop l' + Nat.b2n (x <? y)) mod 2
+      end
+  end.
+
+...
+
+Fixpoint ε''_loop l :=
+  match l with
+  | [] => 1%F
+  | x :: l' =>
+      match l' with
+      | [] => 1%F
+      | y :: l'' =>
+          ((if lt_dec x y then 1%F else (-1)%F) * ε''_loop l'')%F
+      end
+  end.
+
+  match l with
+  | [] | [_] => 1%F
+  | x :: y :: l' =>
+      ((if lt_dec x y then 1%F else (-1)%F) * ε''_loop (y :: l'))%F
+  end.
 ...
 
 (*
