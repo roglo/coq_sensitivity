@@ -163,6 +163,7 @@ destruct Hz as [Hz| Hz]. {
 }
 Qed.
 
+(*  a version without commutativity, but inverted product would be better *)
 Theorem rngl_inv_product :
   rngl_is_comm = true →
   rngl_has_inv = true →
@@ -233,3 +234,5 @@ destruct Hzz as [Hzz| Hzz]. {
 Qed.
 
 End a.
+
+Arguments rngl_inv_product {T}%type {ro rp} _ _ _ _ (b e)%nat f.

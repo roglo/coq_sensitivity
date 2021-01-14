@@ -368,7 +368,9 @@ Fixpoint insertion_sort list :=
       (l'', xorb odd' odd'')
   end.
 
+(*
 Compute let n := 5 in (map (λ k, insertion_sort (list_of_vect (canon_permut n k))) (seq 0 (fact n))).
+*)
 
 Definition ε'' {n} (p : vector n nat) :=
   if snd (insertion_sort (list_of_vect p)) then (-1)%F else 1%F.
@@ -1640,6 +1642,7 @@ apply rngl_mul_reg_r with (c := (¹/ t)%F); [ now left | | ]. {
 rewrite <- rngl_mul_assoc.
 rewrite (rngl_mul_comm t), rngl_mul_inv_l; [ | easy ].
 rewrite rngl_mul_1_r.
+Check rngl_inv_product.
 ...
 rewrite rngl_mul_mul_swap; [ | easy ].
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
