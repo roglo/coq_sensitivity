@@ -347,68 +347,46 @@ Definition ε' {n} (p : vector n nat) :=
   ((Π (i = 1, n), Π (j = 1, n), δ i j (vect_el p (i - 1)) (vect_el p (j - 1))) /
    (Π (i = 1, n), Π (j = 1, n), δ i j i j))%F.
 
-(* compte du nombre de transpositions.
-   trier P par échanges et compter le nombres d'échanges (transpositions) *)
-...
-Fixpoint list_iteration list :=
+(* signature by counting the number of transpositions *)
+
+Fixpoint insert x list :=
   match list with
-  | [] => list
+  | [] => ([x], false)
+  | y :: l =>
+      if lt_dec x y then (x :: list, false)
+      else
+        let '(l', odd) := insert x l in
+        (y :: l', negb odd)
+  end.
+
+Fixpoint insertion_sort list :=
+  match list with
+  | [] => (list, false)
   | x :: l =>
-      match l with
-      | [] => list
-      | y :: l' =>
-          if lt_dec x y then x :: list_iteration l
-          else y :: list_iteration (x :: l)
-      end
+      let (l', odd') := insertion_sort l in
+      let '(l'', odd'') := insert x l' in
+      (l'', xorb odd' odd'')
   end.
-...
 
-Fixpoint ε''_loop l :=
-  match l with
-  | [] => 0
-  | x :: l' =>
-      match l' with
-      | [] => 0
-      | y :: l'' => (ε''_loop l' + Nat.b2n (x <? y)) mod 2
-      end
-  end.
+Compute let n := 5 in (map (λ k, insertion_sort (list_of_vect (canon_permut n k))) (seq 0 (fact n))).
+
+Definition ε'' {n} (p : vector n nat) :=
+  if snd (insertion_sort (list_of_vect p)) then (-1)%F else 1%F.
 
 ...
-
-Fixpoint ε''_loop l :=
-  match l with
-  | [] => 1%F
-  | x :: l' =>
-      match l' with
-      | [] => 1%F
-      | y :: l'' =>
-          ((if lt_dec x y then 1%F else (-1)%F) * ε''_loop l'')%F
-      end
-  end.
-
-  match l with
-  | [] | [_] => 1%F
-  | x :: y :: l' =>
-      ((if lt_dec x y then 1%F else (-1)%F) * ε''_loop (y :: l'))%F
-  end.
-...
-
-(*
-Definition ε' {n} (p : vector n nat) :=
-  ((Π (i = 1, n), Π (j = 1, n), δ i j (ip p (j - 1) - ip p (i - 1))) /
-   (Π (i = 1, n), Π (j = 1, n), δ i j (rngl_of_nat j - rngl_of_nat i)))%F.
-*)
 
 (*
 End a.
 Require Import Zrl ZArith.
-Compute (ε_permut Z_ring_like_op 2 1).
-Compute (ε Z_ring_like_op (permut 2 1)).
-Compute (ε' Z_ring_like_op (permut 2 1)).
-Compute (list_of_vect (permut 2 1)).
-Compute (map (λ k, (ε_permut Z_ring_like_op 4 k)) (seq 0 (fact 4))).
-Compute (map (λ k, (ε Z_ring_like_op (permut 4 k))) (seq 0 (fact 4))).
-Compute (map (λ k, (ε' Z_ring_like_op (permut 4 k))) (seq 0 (fact 4))).
+Compute (ε_canon_permut Z_ring_like_op 2 1).
+Compute (ε Z_ring_like_op (canon_permut 2 1)).
+Compute (ε' Z_ring_like_op (canon_permut 2 1)).
+Compute (ε'' Z_ring_like_op (canon_permut 2 1)).
+Compute (list_of_vect (canon_permut 2 1)).
+Compute (map (λ k, (ε_canon_permut Z_ring_like_op 4 k)) (seq 0 (fact 4))).
+Compute (map (λ k, (ε Z_ring_like_op (canon_permut 4 k))) (seq 0 (fact 4))).
+Compute (map (λ k, (ε' Z_ring_like_op (canon_permut 4 k))) (seq 0 (fact 4))).
+Compute (map (λ k, (ε'' Z_ring_like_op (canon_permut 4 k))) (seq 0 (fact 4))).
 Compute let ro := Z_ring_like_op in let n := 4  in
   (Π (i = 1, n), (Π (j = i + 1, n), (rngl_of_nat j - rngl_of_nat i)))%F.
 Compute let ro := Z_ring_like_op in let n := 4  in
