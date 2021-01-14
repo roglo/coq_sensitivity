@@ -1651,6 +1651,9 @@ rewrite Hin in rngl_mul_inv_l.
 rewrite rngl_mul_inv_l; [ | easy ].
 rewrite rngl_mul_1_r.
 unfold δ in Hx, Hy, Hz, Ht.
+(* according to wikipedia (fr), we should have x/t = z/y, because
+   z/y is x/t with a changt or variable j→σ₂(j) (something like
+   that, but I must prove it *)
 ...
 (*
 Abort.
