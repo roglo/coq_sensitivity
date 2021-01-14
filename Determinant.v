@@ -373,8 +373,6 @@ Compute let n := 5 in (map (λ k, insertion_sort (list_of_vect (canon_permut n k
 Definition ε'' {n} (p : vector n nat) :=
   if snd (insertion_sort (list_of_vect p)) then (-1)%F else 1%F.
 
-...
-
 (*
 End a.
 Require Import Zrl ZArith.
@@ -1593,8 +1591,37 @@ Theorem signature_comp :
   rngl_characteristic = 0 →
   ∀ n (σ₁ σ₂ : vector n nat),
   is_permut σ₂
-  → ε' (σ₁ ° σ₂) = (ε' σ₁ * ε' σ₂)%F.
+  → ε'' (σ₁ ° σ₂) = (ε'' σ₁ * ε'' σ₂)%F.
 Proof.
+intros Hop Hin Hic H10 Hit Hch * Hperm.
+unfold ε''.
+unfold list_of_vect.
+induction n. {
+  cbn; symmetry.
+  apply rngl_mul_1_l.
+}
+cbn.
+remember (insertion_sort _) as x eqn:Hx in |-*.
+remember (insertion_sort _) as y eqn:Hy in |-*.
+remember (insertion_sort _) as z eqn:Hz in |-*.
+destruct x as (lx, xb).
+destruct y as (ly, yb).
+destruct z as (lz, zb).
+remember (insert _ _) as a eqn:Ha in |-*.
+remember (insert _ _) as b eqn:Hb in |-*.
+remember (insert _ _) as c eqn:Hc in |-*.
+destruct a as (la, ab).
+destruct b as (lb, bb).
+destruct c as (lc, cb).
+cbn.
+remember (xorb xb ab) as tx eqn:Htx; symmetry in Htx.
+remember (xorb yb bb) as ty eqn:Hty; symmetry in Hty.
+remember (xorb zb cb) as tz eqn:Htz; symmetry in Htz.
+destruct tx, ty, tz. {
+  exfalso.
+Search (xorb _ _ = true).
+(* c'compliqué *)
+...
 intros Hop Hin Hic H10 Hit Hch * Hperm.
 unfold ε'.
 cbn - [ iter_seq ].
