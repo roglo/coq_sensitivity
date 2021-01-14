@@ -1710,6 +1710,18 @@ erewrite rngl_product_eq_compat. 2: {
 symmetry.
 (* probably provable by changement of variable *)
 ...
+Theorem glop : ∀ n f g,
+  (Π (i = 1, n), (Π (j = 1, n), f (g i) (g j)) =
+   Π (i = 1, n), (Π (j = 1, n), f i j))%F.
+...
+symmetry.
+rewrite <- glop with (g := vect_el σ₂).
+apply rngl_product_eq_compat.
+intros i Hi.
+apply rngl_product_eq_compat.
+intros j Hj.
+move j before i.
+...
 rewrite rngl_mul_mul_swap; [ | easy ].
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
 rewrite H10 in rngl_1_neq_0.
