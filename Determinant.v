@@ -1642,7 +1642,19 @@ apply rngl_mul_reg_r with (c := (¹/ t)%F); [ now left | | ]. {
 rewrite <- rngl_mul_assoc.
 rewrite (rngl_mul_comm t), rngl_mul_inv_l; [ | easy ].
 rewrite rngl_mul_1_r.
-Check rngl_inv_product.
+subst y t.
+rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
+  intros i Hi.
+...
+}
+rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
+  intros i Hi.
+  (* à prouver *)
+...
+}
+subst x z.
+erewrite <- rngl_product_mul_distr; [ | easy ].
+erewrite <- rngl_product_mul_distr; [ | easy ].
 ...
 rewrite rngl_mul_mul_swap; [ | easy ].
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
