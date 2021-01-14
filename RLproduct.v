@@ -163,7 +163,6 @@ destruct Hz as [Hz| Hz]. {
 }
 Qed.
 
-(* à voir...
 Theorem rngl_inv_product :
   rngl_is_comm = true →
   rngl_has_inv = true →
@@ -174,6 +173,10 @@ Theorem rngl_inv_product :
   → ((¹/ Π (i = b, e), f i) = Π (i = b, e), (¹/ f i))%F.
 Proof.
 intros Hic Hin H10 Hit * Hnz.
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+rewrite Hic in rngl_mul_comm.
+specialize rngl_opt_integral as rngl_integral.
+rewrite Hit in rngl_integral.
 unfold iter_seq.
 remember (S e - b) as len.
 destruct len; [ now apply rngl_inv_1 | ].
@@ -184,45 +187,49 @@ induction len; intros. {
   cbn.
   now do 2 rewrite rngl_mul_1_l.
 }
-rewrite List_seq_succ_r; cbn.
-do 2 rewrite rngl_mul_1_l.
-rewrite fold_left_app; cbn.
-rewrite fold_left_app; cbn.
-rewrite iter_seq_op_fun_from_d with (d := 1%F).
-...
-rewrite <- IHlen.
-rewrite rngl_inv_mul_distr; [ | easy | easy | | ]. {
-  specialize rngl_opt_mul_comm as rngl_mul_comm.
-  rewrite Hic in rngl_mul_comm.
-  apply rngl_mul_comm.
+(**)
+rewrite List_seq_succ_r.
+do 2 rewrite fold_left_app.
+rewrite <- IHlen. 2: {
+  intros i Hi.
+  apply Hnz; flia Hi.
 }
-...intros Hic Hin H10 Hit * Hnz.
-unfold iter_seq.
-remember (S e - b) as len.
-clear e Heqlen.
-revert b.
-induction len; intros; [ now apply rngl_inv_1 | ].
-rewrite List_seq_succ_r; cbn.
-rewrite fold_left_app; cbn.
-rewrite fold_left_app; cbn.
-rewrite <- IHlen.
-rewrite rngl_inv_mul_distr; [ | easy | easy | | ]. {
-  specialize rngl_opt_mul_comm as rngl_mul_comm.
-  rewrite Hic in rngl_mul_comm.
-  apply rngl_mul_comm.
-}
-...
-rewrite rngl_inv_mul_distr; [ | easy | easy | | ]; cycle 1. {
-now rewrite inv_op_distr.
-...
-intros Hin H10 Hit * Hnz.
-apply iter_seq_inv. {
-  now apply rngl_inv_1.
+rewrite iter_seq_op_fun_from_d with (d := 1%F); cycle 1. {
+  apply rngl_mul_1_l.
 } {
-Check iter_seq_inv.
-  intros a c.
-  rewrite rngl_inv_mul_distr; [ | easy | easy | | ]; cycle 1. {
-...
-*)
+  apply rngl_mul_1_r.
+} {
+  apply rngl_mul_assoc.
+}
+symmetry.
+rewrite iter_seq_op_fun_from_d with (d := 1%F); cycle 1. {
+  apply rngl_mul_1_l.
+} {
+  apply rngl_mul_1_r.
+} {
+  apply rngl_mul_assoc.
+}
+symmetry; cbn.
+do 3 rewrite rngl_mul_1_l.
+rewrite rngl_mul_comm.
+apply rngl_inv_mul_distr; [ easy | easy | apply Hnz; flia | ].
+clear IHlen.
+revert b Hnz.
+induction len; intros; [ apply Hnz; flia | ].
+rewrite List_seq_succ_r.
+rewrite fold_left_app.
+cbn - [ seq ].
+intros Hzz.
+apply rngl_integral in Hzz.
+destruct Hzz as [Hzz| Hzz]. {
+  revert Hzz.
+  apply IHlen.
+  intros i Hi.
+  apply Hnz; flia Hi.
+} {
+  revert Hzz.
+  apply Hnz; flia.
+}
+Qed.
 
 End a.
