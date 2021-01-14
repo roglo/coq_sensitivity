@@ -347,6 +347,15 @@ Definition ε' {n} (p : vector n nat) :=
   ((Π (i = 1, n), Π (j = 1, n), δ i j (vect_el p (i - 1)) (vect_el p (j - 1))) /
    (Π (i = 1, n), Π (j = 1, n), δ i j i j))%F.
 
+(* compte du nombre de transpositions.
+   trier P par échanges et compter le nombres d'échanges (transpositions) *)
+Definition ε''_loop {n} (P : vector n nat) it :=
+  match it with
+  | 0 => 1%F
+  | S it' =>
+      if Nat.lt_dec (vect_el p 0) (vect_el p 1) then 1%F else (-1)%F) *
+...
+
 (*
 Definition ε' {n} (p : vector n nat) :=
   ((Π (i = 1, n), Π (j = 1, n), δ i j (ip p (j - 1) - ip p (i - 1))) /
