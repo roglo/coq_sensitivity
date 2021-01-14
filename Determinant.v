@@ -1644,17 +1644,70 @@ rewrite (rngl_mul_comm t), rngl_mul_inv_l; [ | easy ].
 rewrite rngl_mul_1_r.
 subst y t.
 rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
-  intros i Hi.
-...
+  intros i Hi Hij.
+  specialize @rngl_product_opt_integral as rngl_product_integral.
+  specialize (rngl_product_integral T ro rp Hit H10).
+  apply rngl_product_integral in Hij.
+  destruct Hij as (j & Hj & Hij).
+  unfold δ in Hij.
+  destruct (lt_dec i j) as [Hlij| Hlij]; [ | easy ].
+  apply rngl_sub_move_0_r in Hij; [ | easy ].
+  apply rngl_of_nat_inj in Hij; [ | easy ].
+  destruct Hperm as (Hp1, Hp2).
+  specialize (Hp2 (j - 1) (i - 1)) as H1.
+  assert (H : j - 1 < n) by flia Hj.
+  specialize (H1 H); clear H.
+  assert (H : i - 1 < n) by flia Hi.
+  now specialize (H1 H); clear H.
 }
 rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
-  intros i Hi.
-  (* à prouver *)
-...
+  intros i Hi Hij.
+  specialize @rngl_product_opt_integral as rngl_product_integral.
+  specialize (rngl_product_integral T ro rp Hit H10).
+  apply rngl_product_integral in Hij.
+  destruct Hij as (j & Hj & Hij).
+  unfold δ in Hij.
+  destruct (lt_dec i j) as [Hlij| Hlij]; [ | easy ].
+  apply rngl_sub_move_0_r in Hij; [ | easy ].
+  apply rngl_of_nat_inj in Hij; [ | easy ].
+  flia Hlij Hij.
 }
 subst x z.
 erewrite <- rngl_product_mul_distr; [ | easy ].
 erewrite <- rngl_product_mul_distr; [ | easy ].
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
+    intros j Hj Hij.
+    unfold δ in Hij.
+    destruct (lt_dec i j) as [Hlij| Hlij]; [ | easy ].
+    apply rngl_sub_move_0_r in Hij; [ | easy ].
+    apply rngl_of_nat_inj in Hij; [ | easy ].
+    destruct Hperm as (Hp1, Hp2).
+    specialize (Hp2 (j - 1) (i - 1)) as H1.
+    assert (H : j - 1 < n) by flia Hj.
+    specialize (H1 H); clear H.
+    assert (H : i - 1 < n) by flia Hi.
+    now specialize (H1 H); clear H.
+  }
+  erewrite <- rngl_product_mul_distr; [ | easy ].
+  easy.
+}
+symmetry.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
+    intros j Hj Hij.
+    unfold δ in Hij.
+    destruct (lt_dec i j) as [Hlij| Hlij]; [ | easy ].
+    apply rngl_sub_move_0_r in Hij; [ | easy ].
+    apply rngl_of_nat_inj in Hij; [ | easy ].
+    flia Hlij Hij.
+  }
+  erewrite <- rngl_product_mul_distr; [ | easy ].
+  easy.
+}
+symmetry.
 ...
 rewrite rngl_mul_mul_swap; [ | easy ].
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
