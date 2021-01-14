@@ -1708,6 +1708,7 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 symmetry.
+(* probably provable by changement of variable *)
 ...
 rewrite rngl_mul_mul_swap; [ | easy ].
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
