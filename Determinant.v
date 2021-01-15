@@ -1711,7 +1711,9 @@ symmetry.
 (* probably provable by changement of variable *)
 remember (vect_el σ₁) as f eqn:Hf.
 remember (vect_el σ₂) as g eqn:Hg.
-Abort.
+unfold iter_seq.
+rewrite Nat.sub_succ, Nat.sub_0_r.
+...
 
 Theorem glop : ∀ l f g h,
   (Π (i ∈ l), f (g i) = Π (i ∈ h l), f i)%F.
