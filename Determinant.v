@@ -1605,7 +1605,6 @@ Fixpoint permut_find n (σ : vector n nat) i j :=
   | S i' => if Nat.eq_dec (vect_el σ i') j then i' else permut_find σ i' j
   end.
 
-(*
 Fixpoint permut_fun_find (f : nat → nat) i j :=
   match i with
   | 0 => 0
@@ -1613,13 +1612,13 @@ Fixpoint permut_fun_find (f : nat → nat) i j :=
   end.
 
 Theorem permut_permut_fun_find : ∀ n (σ : vector n nat) i j,
-  i < n
-  → permut_find σ i j = permut_fun_find (vect_el σ) i j.
+  permut_find σ i j = permut_fun_find (vect_el σ) i j.
 Proof.
-intros * Hin.
-induction n; [ easy | cbn ].
-...
-*)
+intros.
+induction i; [ easy | cbn ].
+destruct (Nat.eq_dec (vect_el σ i) j) as [Hij| Hij]; [ easy | ].
+apply IHi.
+Qed.
 
 Definition permut_inv n (σ : vector n nat) := mk_vect n (permut_find σ n).
 
@@ -1633,13 +1632,54 @@ Theorem permut_inv_prop : ∀ n (σ : vector n nat) i,
   → i < n
   → vect_el σ (vect_el (permut_inv σ) i) = i.
 Proof.
-(*
-intros * Hperm Hin; cbn.
-unfold is_permut in Hperm.
+intros * (Hp1, Hp2) Hin; cbn.
+rewrite permut_permut_fun_find.
 remember (vect_el σ) as f eqn:Hf.
-remember (permut_find σ n) as g eqn:Hg.
+clear σ Hf.
+destruct n; [ easy | cbn ].
+destruct (Nat.eq_dec (f n) i) as [Hni| Hni]; [ easy | ].
+destruct n. {
+  specialize (Hp1 _ Hin) as H1; cbn.
+  apply Nat.lt_1_r in Hin.
+  apply Nat.lt_1_r in H1.
+  now subst i.
+}
+cbn.
+destruct (Nat.eq_dec (f n) i) as [Hsni| Hsni]; [ easy | ].
+destruct n. {
+  specialize (Hp1 _ Hin) as H1; cbn.
+  specialize (Hp1 1 (Nat.lt_succ_diag_r _)) as H2.
+  specialize (Hp2 0 1 (Nat.lt_0_succ _) (Nat.lt_succ_diag_r _)) as H3.
+  destruct i. {
+    remember (f 0) as x eqn:Hx; symmetry in Hx.
+    destruct x; [ easy | exfalso ].
+    destruct x; [ | flia H1 ].
+    flia Hni Hx H2 H3.
+  }
+  destruct i; [ | flia Hin ].
+  remember (f 0) as x eqn:Hx; symmetry in Hx.
+  destruct x; [ flia Hni H1 H3 | ].
+  destruct x; [ easy | exfalso ].
+  specialize (Hp1 0 (Nat.lt_0_succ _)) as H4.
+  flia Hx H4.
+}
 ...
-*)
+revert i Hin.
+induction n; intros; [ easy | cbn ].
+destruct (Nat.eq_dec (f n) i) as [Hni| Hni]; [ easy | ].
+destruct i. {
+
+  destruct n. {
+    cbn.
+    specialize (Hp1 0 Nat.lt_0_1).
+    now apply Nat.lt_1_r in Hp1.
+  }
+  cbn.
+  destruct (Nat.eq_dec (f n) 0) as [Hnz| Hnz]; [ easy | ].
+  apply IHn.
+...
+apply IHn.
+...
 intros * Hperm Hin; cbn.
 induction i; intros; cbn. {
   destruct n; [ easy | ].
