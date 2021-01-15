@@ -1599,27 +1599,35 @@ Definition is_permut {n} (σ : vector n nat) :=
   (∀ i, i < n → vect_el σ i < n) ∧
   (∀ i j, i < n → j < n → vect_el σ i ≠ vect_el σ j).
 
-Theorem permut_has_invert : ∀ n (σ : vector n nat),
-  is_permut σ
-  → ∃ σ' : vector n nat,
-     is_permut σ' ∧ ∀ i, 1 ≤ i ≤ n → vect_el σ (vect_el σ' i) = i.
-Proof.
-intros * Hperm.
-destruct Hperm as (Hp1, Hp2).
-Search canon_permut.
-Print canon_permut_inv.
-Print find.
 Fixpoint permut_find n (σ : vector n nat) i j :=
   match i with
   | 0 => 0
-  | S i' => if Nat.eq_dec (vect_el σ i) j then i else permut_find σ i' j
+  | S i' => if Nat.eq_dec (vect_el σ i') j then i' else permut_find σ i' j
   end.
-Definition permut_inv n (σ : vector n nat) :=
-  mk_vect n (permut_find σ n).
-Compute list_of_vect (canon_permut 4 7).
-Compute list_of_vect (permut_inv (canon_permut 4 7)).
+
+Definition permut_inv n (σ : vector n nat) := mk_vect n (permut_find σ n).
+
+Theorem permut_inv_prop : ∀ n (σ : vector n nat) i,
+  is_permut σ
+  → i < n
+  → vect_el σ (vect_el (permut_inv σ) i) = i.
+Proof.
+intros * Hperm Hin; cbn.
+revert i Hin.
+induction n; intros; [ easy | cbn ].
+destruct (Nat.eq_dec (vect_el σ n) i) as [Hni| Hni]; [ easy | ].
 ...
-Check permut_inv.
+
+Theorem permut_has_invert : ∀ n (σ : vector n nat),
+  is_permut σ
+  → ∃ σ' : vector n nat,
+     is_permut σ' ∧ ∀ i, i < n → vect_el σ (vect_el σ' i) = i.
+Proof.
+intros * Hperm.
+destruct Hperm as (Hp1, Hp2).
+exists (permut_inv σ).
+
+split. {
 ...
 
 Theorem signature_comp :
