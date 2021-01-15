@@ -1709,6 +1709,8 @@ erewrite rngl_product_eq_compat. 2: {
 }
 symmetry.
 (* probably provable by changement of variable *)
+remember (vect_el σ₁) as f eqn:Hf.
+remember (vect_el σ₂) as g eqn:Hg.
 ...
 Theorem glop : ∀ n f g,
   (Π (i = 1, n), (Π (j = 1, n), f (g i) (g j)) =
