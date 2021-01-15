@@ -1632,14 +1632,14 @@ Theorem glop : ∀ f i k n,
   (∀ i, i < n → f i < n)
   → (∀ i j, i < n → j < n → i ≠ j → f i ≠ f j)
   → i < n
-  → n ≤ k
+  → i < k
   → f (permut_fun_find f k i) = i.
 Proof.
-intros * Hfi Hff Hik Hkn.
-revert i n Hfi Hff Hik Hkn.
-induction k; intros; [ flia Hik Hkn | ].
-cbn.
+intros * Hfi Hff Hin Hik.
+revert i n Hfi Hff Hin Hik.
+induction k; intros; [ easy | cbn ].
 destruct (Nat.eq_dec (f k) i) as [Hki| Hki]; [ easy | ].
+...
 destruct n; [ flia Hik | ].
 apply Nat.succ_le_mono in Hkn.
 destruct i. {
@@ -1673,8 +1673,7 @@ intros * (Hp1, Hp2) Hin; cbn.
 rewrite permut_permut_fun_find.
 remember (vect_el σ) as f eqn:Hf.
 clear σ Hf.
-destruct n; [ easy | ].
-cbn.
+destruct n; [ easy | cbn ].
 destruct (Nat.eq_dec (f n) i) as [Hni| Hni]; [ easy | ].
 ...
 revert i Hin.
