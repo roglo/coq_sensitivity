@@ -1597,7 +1597,7 @@ Qed.
 
 Definition is_permut {n} (σ : vector n nat) :=
   (∀ i, i < n → vect_el σ i < n) ∧
-  (∀ i j, i < n → j < n → vect_el σ i ≠ vect_el σ j).
+  (∀ i j, i < n → j < n → i ≠ j → vect_el σ i ≠ vect_el σ j).
 
 Fixpoint permut_find n (σ : vector n nat) i j :=
   match i with
@@ -1627,6 +1627,43 @@ Compute let n := 5 in let k := 3 in (list_of_vect (canon_permut n k), list_of_ve
 Compute let n := 4 in map (λ k, list_of_vect (permut_inv (canon_permut n k))) (seq 0 (fact n)).
 *)
 
+(*
+Theorem glop : ∀ f i k n,
+  (∀ i, i < n → f i < n)
+  → (∀ i j, i < n → j < n → i ≠ j → f i ≠ f j)
+  → i < n
+  → n ≤ k
+  → f (permut_fun_find f k i) = i.
+Proof.
+intros * Hfi Hff Hik Hkn.
+revert i n Hfi Hff Hik Hkn.
+induction k; intros; [ flia Hik Hkn | ].
+cbn.
+destruct (Nat.eq_dec (f k) i) as [Hki| Hki]; [ easy | ].
+destruct n; [ flia Hik | ].
+apply Nat.succ_le_mono in Hkn.
+destruct i. {
+  clear IHk.
+  clear Hik.
+  revert n Hfi Hff Hkn.
+  induction k; intros. {
+    exfalso.
+    apply Nat.le_0_r in Hkn; subst n.
+    specialize (Hfi 0 Nat.lt_0_1).
+    flia Hfi Hki.
+  }
+  cbn.
+  destruct (Nat.eq_dec (f k) 0) as [H1| H1]; [ easy | ].
+  destruct n. {
+apply IHk with (n := n).
+destruct i. {
+  destruct k. {
+    cbn.
+...
+apply IHk with (n := n); [ easy | easy | | flia Hkn ].
+...
+*)
+
 Theorem permut_inv_prop : ∀ n (σ : vector n nat) i,
   is_permut σ
   → i < n
@@ -1636,6 +1673,10 @@ intros * (Hp1, Hp2) Hin; cbn.
 rewrite permut_permut_fun_find.
 remember (vect_el σ) as f eqn:Hf.
 clear σ Hf.
+destruct n; [ easy | ].
+cbn.
+destruct (Nat.eq_dec (f n) i) as [Hni| Hni]; [ easy | ].
+...
 revert i Hin.
 induction n; intros; [ easy | cbn ].
 destruct (Nat.eq_dec (f n) i) as [Hni| Hni]; [ easy | ].
