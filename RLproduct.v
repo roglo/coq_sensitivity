@@ -135,7 +135,7 @@ Theorem rngl_product_opt_integral :
   → ∃ i, b ≤ i ≤ e ∧ f i = 0%F.
 Proof.
 intros Hin H10 * Hz.
-unfold iter_seq in Hz.
+unfold iter_seq, iter_list in Hz.
 remember (S e - b) as len eqn:Hlen in Hz.
 destruct len. {
   cbn in Hz.
@@ -183,7 +183,7 @@ specialize rngl_opt_mul_comm as rngl_mul_comm.
 rewrite Hic in rngl_mul_comm.
 specialize rngl_opt_integral as rngl_integral.
 rewrite Hit in rngl_integral.
-unfold iter_seq.
+unfold iter_seq, iter_list.
 remember (S e - b) as len.
 destruct len; [ now apply rngl_inv_1 | ].
 replace e with (b + len) in Hnz by flia Heqlen.
@@ -193,7 +193,6 @@ induction len; intros. {
   cbn.
   now do 2 rewrite rngl_mul_1_l.
 }
-(**)
 rewrite List_seq_succ_r.
 do 2 rewrite fold_left_app.
 rewrite <- IHlen. 2: {

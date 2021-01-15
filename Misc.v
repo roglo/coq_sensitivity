@@ -68,7 +68,7 @@ Definition iter_list {T} (l : list nat) f (d : T) := fold_left f l d.
    in order to later define syntaxes : Max, Σ, Π, ...
    e.g. "Σ (i = b, e), f i", "Π (i = b, e), f i" *)
 
-Definition iter_seq {T} b e f (d : T) := fold_left f (seq b (S e - b)) d.
+Definition iter_seq {T} b e f (d : T) := iter_list (seq b (S e - b)) f d.
 
 (* maximum of several values *)
 
@@ -199,7 +199,7 @@ Theorem iter_shift : ∀ {T} b k f (d : T),
     iter_seq 0 (k - b) (λ c i, f c (b + i)) d.
 Proof.
 intros * Hbk.
-unfold iter_seq.
+unfold iter_seq, iter_list.
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | easy ].
 remember (S k - b)%nat as len; clear Heqlen.
@@ -1604,7 +1604,7 @@ Theorem iter_seq_all_d : ∀ T d op b e f
   → iter_seq b e (λ (c : T) (i : nat), op c (f i)) d = d.
 Proof.
 intros * op_d_l od_d_r op_assoc Hz.
-unfold iter_seq.
+unfold iter_seq, iter_list.
 remember (S e - b) as n eqn:Hn.
 revert b Hz Hn.
 induction n; intros; [ easy | cbn ].
@@ -1650,7 +1650,7 @@ Theorem iter_seq_split_last : ∀ T d (op : T → T → T) b k g,
     op (iter_seq (S b) k (λ (c : T) (i : nat), op c (g (i - 1)%nat)) d) (g k).
 Proof.
 intros * Hbk.
-unfold iter_seq.
+unfold iter_seq, iter_list.
 remember (S k - S b) as len eqn:Hlen.
 rewrite Nat.sub_succ in Hlen.
 replace (S k - b) with (S len) by flia Hbk Hlen.
@@ -1729,7 +1729,7 @@ Theorem iter_seq_succ_succ : ∀ {T} (d : T) b k f,
   iter_seq b k (λ c i, f c (S i)) d.
 Proof.
 intros.
-unfold iter_seq.
+unfold iter_seq, iter_list.
 rewrite Nat.sub_succ.
 remember (S k - b)%nat as len; clear Heqlen.
 rewrite <- seq_shift.
@@ -1799,7 +1799,7 @@ Theorem iter_seq_inv : ∀ T d op inv b e f
   iter_seq b e (λ (c : T) (i : nat), op c (inv (f i))) d.
 Proof.
 intros.
-unfold iter_seq.
+unfold iter_seq, iter_list.
 remember (S e - b) as len.
 clear e Heqlen.
 revert b.

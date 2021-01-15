@@ -1711,10 +1711,12 @@ symmetry.
 (* probably provable by changement of variable *)
 remember (vect_el σ₁) as f eqn:Hf.
 remember (vect_el σ₂) as g eqn:Hg.
+Abort.
+
 Theorem glop : ∀ l f g h,
   (Π (i ∈ l), f (g i) = Π (i ∈ h l), f i)%F.
+Abort. (*
 ...
-
 Theorem glop : ∀ l f (g : nat → T) (h : list nat → _),
   fold_left (λ a i, a * f (g i))%F l 1%F =
   fold_left (λ a i, a * f i)%F (h l) 1%F.
@@ -1832,11 +1834,12 @@ subst x t.
 Search (- Σ (_ = _, _), _)%F.
 Search (¹/ Π (_ = _, _), _)%F.
 ...
+*)
 
 Theorem glop : ∀ p q n k k',
   p < q < n
-  → k' = nat_of_permut (vect_swap_elem (permut n k) p q)
-  → ε (permut n k') = (- ε (permut n k))%F.
+  → k' = nat_of_canon_permut (vect_swap_elem (canon_permut n k) p q)
+  → ε (canon_permut n k') = (- ε (canon_permut n k))%F.
 Proof.
 intros * Hpqn Hk'.
 unfold ε.
@@ -1856,14 +1859,14 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ iter_seq permut ].
+cbn - [ iter_seq canon_permut ].
 rewrite rngl_product_succ_succ.
 erewrite (rngl_product_eq_compat _ _ _ (p + 1)). 2: {
   intros i Hi.
   rewrite Nat.sub_succ, Nat.sub_0_r.
   now rewrite Nat.sub_0_r.
 }
-cbn - [ iter_seq permut ].
+cbn - [ iter_seq canon_permut ].
 (* hyper compliqué, même sur le papier ; faudrait trouver un
    raccourci, trouver des propriétés de ε, de vect_swap_elem,
    que sais-je... *)
@@ -1882,13 +1885,13 @@ destruct (Nat.eq_dec p 0) as [Hpz| Hpz]. {
 
 Theorem glop : ∀ p q n k k',
   p < q < n
-  → k' = nat_of_permut (vect_swap_elem (permut n k) p q)
-  → ε_permut n k' = (- ε_permut n k)%F.
+  → k' = nat_of_canon_permut (vect_swap_elem (canon_permut n k) p q)
+  → ε_canon_permut n k' = (- ε_canon_permut n k)%F.
 Proof.
 intros * Hpqn Hk'.
 revert p q k k' Hpqn Hk'.
 induction n; intros; [ easy | ].
-cbn - [ nat_of_permut permut ].
+cbn - [ nat_of_canon_permut canon_permut ].
 (* nothing can be said about "minus_one_pow (k' / fact n)" and
    "minus_one_pow (k / fact n)": they can be equal or not;
    difficult to predict (I tested examples) *)
@@ -1899,10 +1902,12 @@ Theorem signature_swap :
   ∀ n p q k,
   p < q < n
   → k < fact n
-  → ε_permut n (nat_of_permut (vect_swap_elem (permut n k) p q)) = (- ε_permut n k)%F.
+  → ε_canon_permut n
+       (nat_of_canon_permut (vect_swap_elem (canon_permut n k) p q)) =
+     (- ε_canon_permut n k)%F.
 Proof.
 intros Hop * (Hpq, Hqn) Hk.
-unfold ε_permut.
+unfold ε_canon_permut.
 Abort. (*
 intros Hop * (Hpq, Hqn) Hk.
 revert k Hk.
@@ -1941,9 +1946,11 @@ apply NoDup_Permutation_bis; cycle 1. {
   apply in_map_iff.
 (**)
   remember
-    (nat_of_permut
-       (if Nat.eq_dec q (n - 1) then vect_swap_elem (permut n y) p (n - 2)
-        else permut_swap_last p q n y)) as x eqn:Hx.
+    (nat_of_canon_permut
+       (if Nat.eq_dec q (n - 1) then
+          vect_swap_elem (canon_permut n y) p (n - 2)
+        else
+          canon_permut_swap_last p q n y)) as x eqn:Hx.
   move x after y.
   exists x.
   split. {
@@ -1952,14 +1959,14 @@ apply NoDup_Permutation_bis; cycle 1. {
       destruct (Nat.eq_dec p (n - 2)) as [Hpn2| Hpn2]. {
         subst p; clear Hpq.
         rewrite vect_swap_elem_same in Hx.
-        rewrite nat_of_permut_permut in Hx; [ subst x | easy ].
+        rewrite nat_of_canon_permut_permut in Hx; [ subst x | easy ].
         f_equal.
-        unfold permut_swap_last.
+        unfold canon_permut_swap_last.
         now do 2 rewrite vect_swap_elem_same.
       }
       assert (Hp : p < n - 2) by flia Hpq Hpn2.
       clear Hpq Hpn2.
-      replace (ε_permut n x) with (- ε_permut n y)%F. 2: {
+      replace (ε_canon_permut n x) with (- ε_canon_permut n y)%F. 2: {
         subst x; cbn; clear M; symmetry.
         rename y into k; rename Hy into Hk.
 Abort. (*
@@ -2170,7 +2177,7 @@ Theorem det_is_det_by_permut'' :
   ∀ n (M : matrix n n T) p q, determinant M = determinant'' p q M.
 Proof.
 intros Hic *.
-rewrite det_is_det_by_permut; [ | easy ].
+rewrite det_is_det_by_canon_permut; [ | easy ].
 rewrite determinant'_by_list.
 rewrite determinant''_by_list.
 apply rngl_summation_permut; cycle 1. {
@@ -2559,7 +2566,7 @@ Qed.
 Compute map (λ i, list_of_vect (permut 4 i)) (seq 0 (fact 4)).
 *)
 
-Definition swap_in_permut n i j k := vect_swap_elem (permut n k) i j.
+Definition swap_in_permut n i j k := vect_swap_elem (canon_permut n k) i j.
 
 (*
 Compute (map (λ i, list_of_vect (permut_swap_last 0 1 3 i)) (seq 0 (fact 3))).
@@ -2577,7 +2584,7 @@ Theorem det_two_rows_are_eq :
   → determinant A = 0%F.
 Proof.
 intros Hic Hop * Hiz Ha.
-rewrite det_is_det_by_permut; [ | easy ].
+rewrite det_is_det_by_canon_permut; [ | easy ].
 unfold determinant'.
 destruct n; [ flia Hiz | ].
 erewrite rngl_summation_eq_compat. 2: {

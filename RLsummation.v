@@ -11,6 +11,11 @@ Notation "'Σ' ( i = b , e ) , g" :=
   (at level 45, i at level 0, b at level 60, e at level 60) :
     ring_like_scope.
 
+Notation "'Σ' ( i ∈ l ) , g" :=
+  (iter_list l (λ c i, (c + g)%F) 0%F)
+  (at level 45, i at level 0, l at level 60) :
+     ring_like_scope.
+
 Section a.
 
 Context {T : Type}.
@@ -152,7 +157,7 @@ destruct (le_dec (S k) b) as [Hkb| Hkb]. {
 }
 apply Nat.nle_gt in Hkb.
 apply -> Nat.lt_succ_r in Hkb.
-unfold iter_seq.
+unfold iter_seq, iter_list.
 remember (S k - b) as len eqn:Hlen.
 replace k with (b + len - 1) by flia Hkb Hlen.
 clear Hlen Hkb.
@@ -179,7 +184,7 @@ Theorem mul_iter_seq_distr_l : ∀ A a b e f (add mul : A → A → A) d
   iter_seq b e (λ c i, add c (mul a (f i))) (mul a d).
 Proof.
 intros.
-unfold iter_seq.
+unfold iter_seq, iter_list.
 remember (S e - b) as n eqn:Hn.
 clear e Hn.
 revert b d.
@@ -202,7 +207,7 @@ Theorem rngl_mul_summation_distr_r : ∀ a b e f,
   ((Σ (i = b, e), f i) * a = Σ (i = b, e), f i * a)%F.
 Proof.
 intros.
-unfold iter_seq.
+unfold iter_seq, iter_list.
 remember (S e - b) as n eqn:Hn.
 revert e a b Hn.
 induction n; intros; [ now apply rngl_mul_0_l | cbn ].
@@ -329,7 +334,7 @@ Theorem rngl_summation_summation_shift : ∀ g k,
 Proof.
 intros g k.
 apply rngl_summation_eq_compat; intros i Hi.
-unfold iter_seq.
+unfold iter_seq, iter_list.
 rewrite Nat.sub_0_r.
 rewrite Nat.sub_succ_l; [ | now destruct Hi ].
 now rewrite <- fold_left_add_seq_add, Nat.add_0_l.
