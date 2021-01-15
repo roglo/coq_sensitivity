@@ -1509,7 +1509,7 @@ Arguments vect_dot_product {T}%type {ro} {n}%nat (U V)%V.
 Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hic {n}%nat a%F (U V)%V.
 Arguments vect_scal_mul_dot_mul_comm {T}%type {ro rp} {n}%nat a%F (U V)%V.
 Arguments vect_opt_eq_dec {T}%type {ro rp} _ n%nat U%V V%V.
-Arguments vect_el {n}%nat {T}%type v%V c%nat.
+Arguments vect_el [n]%nat [T]%type _%V _%nat.
 Arguments vect_squ_norm {T}%type {ro} {n}%nat V%V.
 
 Notation "A + B" := (mat_add A B) : M_scope.
