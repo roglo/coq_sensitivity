@@ -1580,9 +1580,33 @@ intros j Hj.
 *)
 *)
 
+Theorem rngl_product_change_var : ∀ b e f g h,
+  (∀ i, b ≤ i ≤ e → g (h i) = i)
+  → (Π (i = b, e), f i = Π (i ∈ map h (seq b (S e - b))), f (g i))%F.
+Proof.
+intros * Hgh.
+unfold iter_seq, iter_list.
+rewrite List_fold_left_map.
+apply List_fold_left_ext_in.
+intros i c Hi.
+f_equal; f_equal; symmetry.
+apply Hgh.
+apply in_seq in Hi.
+flia Hi.
+Qed.
+
 Definition is_permut {n} (σ : vector n nat) :=
   (∀ i, i < n → vect_el σ i < n) ∧
   (∀ i j, i < n → j < n → vect_el σ i ≠ vect_el σ j).
+
+Theorem permut_has_invert : ∀ n (σ : vector n nat),
+  is_permut σ
+  → ∃ σ' : vector n nat,
+     is_permut σ' ∧ ∀ i, 1 ≤ i ≤ n → vect_el σ (vect_el σ' i) = i.
+Proof.
+intros * Hperm.
+destruct Hperm as (Hp1, Hp2).
+...
 
 Theorem signature_comp :
   rngl_has_opp = true →
@@ -1708,27 +1732,12 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 symmetry.
-(* probably provable by changement of variable *)
-remember (vect_el σ₁) as f eqn:Hf.
-remember (vect_el σ₂) as g eqn:Hg.
-Theorem rngl_product_change_var : ∀ b e f g h,
-  (∀ i, b ≤ i ≤ e → g (h i) = i)
-  → (Π (i = b, e), f i = Π (i ∈ map h (seq b (S e - b))), f (g i))%F.
-Proof.
-intros * Hgh.
-unfold iter_seq, iter_list.
-rewrite List_fold_left_map.
-apply List_fold_left_ext_in.
-intros i c Hi.
-f_equal; f_equal; symmetry.
-apply Hgh.
-apply in_seq in Hi.
-flia Hi.
-Qed.
+(* changement of variable *)
 ...
-rewrite rngl_product_change_var with (g := vect_el σ₂) (h := vect_el σ₂).
+specialize (permut_has_invert Hperm) as H1.
+destruct H1 as (σ'₂ & Hperm' & Hσ'₂).
+rewrite rngl_product_change_var with (g := vect_el σ₂) (h := vect_el σ'₂).
 unfold is_permut in Hperm.
-Search is_permut.
 ...
 symmetry.
 rewrite <- glop with (g := vect_el σ₂).
