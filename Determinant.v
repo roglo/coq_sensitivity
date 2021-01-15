@@ -1605,16 +1605,47 @@ Fixpoint permut_find n (σ : vector n nat) i j :=
   | S i' => if Nat.eq_dec (vect_el σ i') j then i' else permut_find σ i' j
   end.
 
+(*
+Fixpoint permut_fun_find (f : nat → nat) i j :=
+  match i with
+  | 0 => 0
+  | S i' => if Nat.eq_dec (f i') j then i' else permut_fun_find f i' j
+  end.
+
+Theorem permut_permut_fun_find : ∀ n (σ : vector n nat) i j,
+  i < n
+  → permut_find σ i j = permut_fun_find (vect_el σ) i j.
+Proof.
+intros * Hin.
+induction n; [ easy | cbn ].
+...
+*)
+
 Definition permut_inv n (σ : vector n nat) := mk_vect n (permut_find σ n).
+
+(*
+Compute let n := 5 in let k := 3 in (list_of_vect (canon_permut n k), list_of_vect (permut_inv (canon_permut n k))).
+Compute let n := 4 in map (λ k, list_of_vect (permut_inv (canon_permut n k))) (seq 0 (fact n)).
+*)
 
 Theorem permut_inv_prop : ∀ n (σ : vector n nat) i,
   is_permut σ
   → i < n
   → vect_el σ (vect_el (permut_inv σ) i) = i.
 Proof.
+(*
 intros * Hperm Hin; cbn.
-revert i Hin.
-induction n; intros; [ easy | cbn ].
+unfold is_permut in Hperm.
+remember (vect_el σ) as f eqn:Hf.
+remember (permut_find σ n) as g eqn:Hg.
+...
+*)
+intros * Hperm Hin; cbn.
+induction i; intros; cbn. {
+  destruct n; [ easy | ].
+  cbn.
+...
+; [ easy | cbn ].
 destruct (Nat.eq_dec (vect_el σ n) i) as [Hni| Hni]; [ easy | ].
 ...
 
