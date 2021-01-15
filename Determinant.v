@@ -1711,26 +1711,24 @@ symmetry.
 (* probably provable by changement of variable *)
 remember (vect_el σ₁) as f eqn:Hf.
 remember (vect_el σ₂) as g eqn:Hg.
-unfold iter_seq.
-rewrite Nat.sub_succ, Nat.sub_0_r.
+Theorem rngl_product_change_var : ∀ b e f g h,
+  (∀ i, b ≤ i ≤ e → g (h i) = i)
+  → (Π (i = b, e), f i = Π (i ∈ map h (seq b (S e - b))), f (g i))%F.
+Proof.
+intros * Hgh.
+unfold iter_seq, iter_list.
+rewrite List_fold_left_map.
+apply List_fold_left_ext_in.
+intros i c Hi.
+f_equal; f_equal; symmetry.
+apply Hgh.
+apply in_seq in Hi.
+flia Hi.
+Qed.
 ...
-
-Theorem glop : ∀ l f g h,
-  (Π (i ∈ l), f (g i) = Π (i ∈ h l), f i)%F.
-Abort. (*
-...
-Theorem glop : ∀ l f (g : nat → T) (h : list nat → _),
-  fold_left (λ a i, a * f (g i))%F l 1%F =
-  fold_left (λ a i, a * f i)%F (h l) 1%F.
-...
-  (Π (i ∈ l), f (g i) = Π (i ∈ h l), f i)%F.
-...
-Theorem glop : ∀ b e f g h,
-  (Π (i = b, e), f (g i) = Π (i = h b, h e), f i)%F.
-...
-Theorem glop : ∀ n f g,
-  (Π (i = 1, n), (Π (j = 1, n), f (g i) (g j)) =
-   Π (i = 1, n), (Π (j = 1, n), f i j))%F.
+rewrite rngl_product_change_var with (g := vect_el σ₂) (h := vect_el σ₂).
+unfold is_permut in Hperm.
+Search is_permut.
 ...
 symmetry.
 rewrite <- glop with (g := vect_el σ₂).
