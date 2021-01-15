@@ -1711,6 +1711,18 @@ symmetry.
 (* probably provable by changement of variable *)
 remember (vect_el σ₁) as f eqn:Hf.
 remember (vect_el σ₂) as g eqn:Hg.
+Theorem glop : ∀ l f g h,
+  (Π (i ∈ l), f (g i) = Π (i ∈ h l), f i)%F.
+...
+
+Theorem glop : ∀ l f (g : nat → T) (h : list nat → _),
+  fold_left (λ a i, a * f (g i))%F l 1%F =
+  fold_left (λ a i, a * f i)%F (h l) 1%F.
+...
+  (Π (i ∈ l), f (g i) = Π (i ∈ h l), f i)%F.
+...
+Theorem glop : ∀ b e f g h,
+  (Π (i = b, e), f (g i) = Π (i = h b, h e), f i)%F.
 ...
 Theorem glop : ∀ n f g,
   (Π (i = 1, n), (Π (j = 1, n), f (g i) (g j)) =

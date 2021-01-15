@@ -58,8 +58,15 @@ intros A B l a.
 now induction l.
 Qed.
 
-(* iterations of indexed sequences
-   allowing to define syntaxes : Max, Σ, etc. *)
+(* iterations in list of naturals
+   in order to later define syntaxes : Max, Σ, Π, ...
+   e.g. "Σ (i ∈ l), f i", "Π (i ∈ l), f i", ... *)
+
+Definition iter_list {T} (l : list nat) f (d : T) := fold_left f l d.
+
+(* iterations in indexed sequences
+   in order to later define syntaxes : Max, Σ, Π, ...
+   e.g. "Σ (i = b, e), f i", "Π (i = b, e), f i" *)
 
 Definition iter_seq {T} b e f (d : T) := fold_left f (seq b (S e - b)) d.
 

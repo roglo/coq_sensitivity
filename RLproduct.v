@@ -11,6 +11,11 @@ Notation "'Π' ( i = b , e ) , g" :=
   (at level 35, i at level 0, b at level 60, e at level 60) :
      ring_like_scope.
 
+Notation "'Π' ( i ∈ l ) , g" :=
+  (iter_list l (λ c i, (c * g)%F) 1%F)
+  (at level 35, i at level 0, l at level 60) :
+     ring_like_scope.
+
 Section a.
 
 Context {T : Type}.
