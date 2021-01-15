@@ -1627,6 +1627,24 @@ Compute let n := 5 in let k := 3 in (list_of_vect (canon_permut n k), list_of_ve
 Compute let n := 4 in map (λ k, list_of_vect (permut_inv (canon_permut n k))) (seq 0 (fact n)).
 *)
 
+Theorem glop : ∀ f i k n,
+  (∀ i, i < n → f i < n)
+  → (∀ i j, i < n → j < n → f i ≠ f j)
+  → i < k
+  → k ≤ n
+  → f (permut_fun_find f k i) = i.
+Proof.
+intros * Hfi Hff Hik Hkn.
+revert i n Hfi Hff Hik Hkn.
+induction k; intros; [ easy | ].
+cbn.
+destruct (Nat.eq_dec (f k) i) as [Hki| Hki]; [ easy | ].
+destruct i. {
+  destruct n; [ easy | ].
+...
+apply IHk with (n := n); [ easy | easy | | flia Hkn ].
+...
+
 Theorem permut_inv_prop : ∀ n (σ : vector n nat) i,
   is_permut σ
   → i < n
