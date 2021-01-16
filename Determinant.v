@@ -1664,7 +1664,32 @@ apply IHk with (n := n); [ easy | easy | | flia Hkn ].
 ...
 *)
 
-Theorem permut_inv_prop : ∀ n (σ : vector n nat) i,
+Theorem permut_inv_permut_prop : ∀ n (σ : vector n nat) i,
+  is_permut σ
+  → i < n
+  → vect_el (permut_inv σ) (vect_el σ i) = i.
+Proof.
+intros * (_, Hp2) Hin; cbn.
+rewrite permut_list_find.
+remember (vect_el σ) as f eqn:Hf.
+clear σ Hf.
+revert i Hin.
+induction n; intros; [ easy | cbn ].
+destruct (Nat.eq_dec (f n) (f i)) as [Hfni| Hfni]. {
+  apply Hp2; [ flia | easy | easy ].
+}
+rename Hin into Hisn.
+assert (Hin : i < n). {
+  destruct (Nat.eq_dec n i) as [H| H]; [ now subst n | ].
+  flia Hisn H.
+}
+clear Hisn.
+apply IHn; [ | easy ].
+intros j k Hj Hk Hjk.
+apply Hp2; [ flia Hj | flia Hk | easy ].
+Qed.
+
+Theorem permut_permut_inv_prop : ∀ n (σ : vector n nat) i,
   is_permut σ
   → i < n
   → vect_el σ (vect_el (permut_inv σ) i) = i.
@@ -1673,14 +1698,24 @@ intros * (Hp1, Hp2) Hin; cbn.
 rewrite permut_list_find.
 remember (vect_el σ) as f eqn:Hf.
 clear σ Hf.
-...
-clear Hp1.
 revert i Hin.
 induction n; intros; [ easy | cbn ].
 destruct (Nat.eq_dec (f n) i) as [Hni| Hni]; [ easy | ].
+rename Hin into Hisn.
+destruct (Nat.eq_dec i n) as [Hin| Hin]. {
+  subst i; clear Hisn.
+  assert (H1 : f n < n). {
+    specialize (Hp1 n (Nat.lt_succ_diag_r _)) as H1.
+    flia Hni H1.
+  }
+  clear Hni; rename H1 into Hfnn.
+...
+  clear IHn.
+  induction n; [ easy | cbn ].
+  destruct (Nat.eq_dec (f n) (S n)) as [Hfnsn| Hfnsn]; [ easy | ].
+...
 destruct i. {
   clear Hin.
-
 ...
 induction n; [ easy | cbn ].
 destruct (Nat.eq_dec (f n) i) as [Hni| Hni]; [ easy | ].
