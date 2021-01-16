@@ -1666,8 +1666,9 @@ Definition permut_inv n (σ : vector n nat) :=
      end).
 
 (**)
-Compute let n := 5 in let k := 3 in (list_of_vect (canon_permut n k), list_of_vect (permut_inv (canon_permut n k))).
-Compute let n := 5 in let k := 3 in (list_of_vect (canon_permut n k), list_of_vect (permut_inv' (canon_permut n k))).
+Compute let n := 4 in let k := 3 in (list_of_vect (canon_permut n k), list_of_vect (permut_inv (canon_permut n k))).
+Compute let n := 4 in let k := 3 in (list_of_vect (canon_permut n k), list_of_vect (permut_inv' (canon_permut n k))).
+...
 Compute let n := 4 in map (λ k, list_of_vect (permut_inv (canon_permut n k))) (seq 0 (fact n)).
 Compute let n := 4 in map (λ k, list_of_vect (permut_inv' (canon_permut n k))) (seq 0 (fact n)).
 ...
