@@ -1698,7 +1698,39 @@ intros * (Hp1, Hp2) Hin; cbn.
 rewrite permut_list_find.
 remember (vect_el σ) as f eqn:Hf.
 clear σ Hf.
-(**)
+...
+revert f Hp1 i Hin.
+induction n; intros; [ easy | cbn ].
+destruct (Nat.eq_dec (f n) i) as [Hni| Hni]; [ easy | ].
+rename Hin into Hisn.
+destruct n; [ exfalso | ]. {
+  apply Nat.lt_1_r in Hisn; subst i.
+  specialize (Hp1 0 Nat.lt_0_1).
+  flia Hp1 Hni.
+}
+cbn.
+destruct (Nat.eq_dec (f n) i) as [Hfni| Hfni]; [ easy | ].
+specialize (IHn (λ i, f i - 1)).
+cbn - [ permut_fun_find ] in IHn.
+assert (H : ∀ i : nat, i < S n → f i - 1 < S n). {
+  intros j Hj.
+  specialize (Hp1 j).
+  assert (H : j < S (S n)) by flia Hj.
+  specialize (Hp1 H); clear H.
+  flia Hp1.
+}
+specialize (IHn H); clear H.
+assert (H : ∀ i j : nat, i < S n → j < S n → f i - 1 = f j - 1 → i = j). {
+  intros j k Hj Hk Hjk.
+...
+  apply Hp2; [ flia Hj | flia Hk | ].
+...
+  specialize (Hp1 (S j)).
+  assert (H : S j < S (S n)) by flia Hj.
+  specialize (Hp1 H); clear H.
+...
+cbn in IHn.
+...
 assert (Hsurj : ∀ i, i < n → ∃ j, j < n ∧ f j = i). {
   clear i Hin.
   intros i Hi.
