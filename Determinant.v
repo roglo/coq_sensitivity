@@ -1929,15 +1929,26 @@ induction k; intros; cbn. {
   specialize (Hfn 0 (le_refl _)).
   rewrite Nat.add_0_r in Hp1, Hp2, Hi, Hfn.
 ...
-  revert i Hi Hfni.
+  revert i Hi Hfn.
   induction n; intros; [ exfalso | cbn ]. {
-    apply Nat.le_0_r in Hfn.
-    now apply Nat.le_0_r in Hi; subst i.
+    apply Nat.le_0_r in Hi; subst i.
+    specialize (Hp1 0 (le_refl _)).
+    now apply Nat.le_0_r in Hp1.
   }
   destruct (Nat.eq_dec (f n) i) as [Hfni'| Hfni']; [ easy | ].
-  destruct (lt_dec n (f n)) as [Hnfn| Hnfn]. {
+  destruct (Nat.eq_dec i (S n)) as [Hisn| Hisn]. {
+    subst i; clear Hi.
+    clear IHn.
+    induction n; [ exfalso | cbn ]. {
+      specialize (Hp1 0 Nat.le_0_1) as H1.
+      specialize (Hp1 1 (le_refl _)) as H2.
+      enough (H : 0 = 1); [ easy | ].
+      apply Hp2; [ flia | flia | ].
+      flia Hfni' Hfn H1 H2.
+    }
+    destruct (Nat.eq_dec (f n) (S (S n))) as [Hfns| Hfns]; [ easy | ].
 ...
-  apply IHn; [ | | | easy ]. {
+  apply IHn; [ | | | easy ].
 ...
 destruct n; [ exfalso | cbn ]. {
   cbn in Hfn.
