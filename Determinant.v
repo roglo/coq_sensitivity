@@ -1607,14 +1607,14 @@ Fixpoint permut_find n (σ : vector n nat) i j :=
 
 Definition permut_inv n (σ : vector n nat) := mk_vect n (permut_find σ n).
 
-Fixpoint permut_fun_find (f : nat → nat) n i :=
+Fixpoint fun_find (f : nat → nat) n i :=
   match n with
   | 0 => 42
-  | S n' => if Nat.eq_dec (f n') i then n' else permut_fun_find f n' i
+  | S n' => if Nat.eq_dec (f n') i then n' else fun_find f n' i
   end.
 
 Theorem permut_list_find : ∀ n (σ : vector n nat) i j,
-  permut_find σ i j = permut_fun_find (vect_el σ) i j.
+  permut_find σ i j = fun_find (vect_el σ) i j.
 Proof.
 intros.
 induction i; [ easy | cbn ].
@@ -1627,17 +1627,71 @@ Compute let n := 4 in let k := 3 in (list_of_vect (canon_permut n k), list_of_ve
 Compute let n := 4 in map (λ k, list_of_vect (permut_inv (canon_permut n k))) (seq 0 (fact n)).
 *)
 
-(*
+(**)
 Theorem glop : ∀ f i k n,
   (∀ i, i < n → f i < n)
-  → (∀ i j, i < n → j < n → i ≠ j → f i ≠ f j)
+  → (∀ i j, i < n → j < n → f i = f j → i = j)
   → i < n ≤ k
-  → f (permut_fun_find f k i) = i.
+  → f (fun_find f k i) = i.
 Proof.
 intros * Hfi Hff (Hin, Hnk).
-revert i n Hfi Hff Hin Hnk.
+revert f n Hfi Hff i Hin Hnk.
 induction k; intros; [ flia Hin Hnk | cbn ].
 destruct (Nat.eq_dec (f k) i) as [Hki| Hki]; [ easy | ].
+destruct (Nat.eq_dec n (S k)) as [Hnsk| Hnks]. 2: {
+  apply IHk with (n := n); [ easy | easy | easy | ].
+  flia Hnk Hnks.
+}
+clear Hnk; subst n.
+destruct (Nat.eq_dec (f k) k) as [Hfkk| Hfkk]. {
+  apply IHk with (n := k); [ | | | easy ]. 3: {
+    flia Hin Hki Hfkk.
+  } {
+    intros j Hj.
+    specialize (Hfi j) as H1.
+    assert (H : j < S k) by flia Hj.
+    specialize (H1 H); clear H.
+    destruct (Nat.eq_dec (f j) k) as [Hfjk| Hfjk]. {
+      rewrite <- Hfkk in Hfjk.
+      apply Hff in Hfjk; [ flia Hj Hfjk | flia Hj | flia ].
+    }
+    specialize (Hfi j) as H2.
+    assert (H : j < S k) by flia Hj.
+    specialize (H2 H); clear H.
+    flia Hfjk H2.
+  } {
+    intros m n Hm Hn Hmn.
+    apply Hff; [ flia Hm | flia Hn | easy ].
+  }
+}
+destruct (Nat.eq_dec i k) as [Hik| Hik]. {
+  subst i; clear Hin Hki.
+  clear IHk.
+...
+  clear - Hfi Hfkk.
+  induction k. {
+    specialize (Hfi 0 Nat.lt_0_1) as H1.
+    flia Hfkk H1.
+  }
+  cbn.
+  destruct (Nat.eq_dec (f k) (S k)) as [Hfksk| Hfksk]; [ easy | ].
+...
+apply IHk with (n := k); try easy.
+...
+  eapply lt_le_trans; [ apply Hin | ].
+  apply -> Nat.succ_le_mono.
+  specialize (
+...
+specialize (Hfi k (Nat.lt_succ_diag_r _)) as H1.
+...
+destruct (Nat.eq_dec i k) as [Hik| Hik]. 2: {
+  apply IHk with (n := k); [ | | flia Hik Hin | easy ]. {
+    intros j Hj.
+...
+    destruct j. {
+      destruct k; [ easy | ].
+      clear Hj.
+apply IHk with (
 ...
 destruct n; [ flia Hik | ].
 apply Nat.succ_le_mono in Hkn.
@@ -1697,8 +1751,9 @@ intros * (Hp1, Hp2) Hin; cbn.
 rewrite permut_list_find.
 remember (vect_el σ) as f eqn:Hf.
 clear σ Hf.
-Print permut_fun_find.
+Print fun_find.
 ...
+(*
 revert f Hp1 i Hin.
 induction n; intros; [ easy | cbn ].
 destruct (Nat.eq_dec (f n) i) as [Hni| Hni]; [ easy | ].
@@ -1711,7 +1766,7 @@ destruct n; [ exfalso | ]. {
 cbn.
 destruct (Nat.eq_dec (f n) i) as [Hfni| Hfni]; [ easy | ].
 specialize (IHn (λ i, f i - 1)).
-cbn - [ permut_fun_find ] in IHn.
+cbn - [ fun_find ] in IHn.
 assert (H : ∀ i : nat, i < S n → f i - 1 < S n). {
   intros j Hj.
   specialize (Hp1 j).
@@ -1731,11 +1786,11 @@ assert (H : ∀ i j : nat, i < S n → j < S n → f i - 1 = f j - 1 → i = j).
 ...
 cbn in IHn.
 ...
+*)
 assert (Hsurj : ∀ i, i < n → ∃ j, j < n ∧ f j = i). {
   clear i Hin.
   intros i Hi.
-...
-(**)
+(*
   destruct n; [ easy | ].
   destruct n. {
     exists 0.
@@ -1791,7 +1846,9 @@ assert (Hsurj : ∀ i, i < n → ∃ j, j < n ∧ f j = i). {
     split; [ flia | easy ].
   }
 ...
-  revert i Hi.
+*)
+...
+  revert f Hp1 Hp2 i Hi.
   induction n; intros; [ easy | ].
 ...
   Hp1 : ∀ i : nat, i < S n → f i < S n
@@ -1801,7 +1858,7 @@ assert (Hsurj : ∀ i, i < n → ∃ j, j < n ∧ f j = i). {
   i : nat
   Hi : i < S n
   ============================
-  f (permut_fun_find f n i) = i
+  f (fun_find f n i) = i
 ...
 (**)
 revert f i Hin Hp1 Hp2.
@@ -1850,7 +1907,7 @@ destruct (Nat.eq_dec i n) as [Hin'| Hin']. {
   destruct (Nat.eq_dec (f n) (S n)) as [H1| H1]; [ easy | ].
 ...
 intros * (Hp1, Hp2) Hin; cbn.
-rewrite permut_permut_fun_find.
+rewrite permut_fun_find.
 remember (vect_el σ) as f eqn:Hf.
 clear σ Hf.
 destruct n; [ easy | cbn ].
