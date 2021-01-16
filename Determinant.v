@@ -1631,13 +1631,12 @@ Compute let n := 4 in map (λ k, list_of_vect (permut_inv (canon_permut n k))) (
 Theorem glop : ∀ f i k n,
   (∀ i, i < n → f i < n)
   → (∀ i j, i < n → j < n → i ≠ j → f i ≠ f j)
-  → i < n
-  → i < k
+  → i < n ≤ k
   → f (permut_fun_find f k i) = i.
 Proof.
-intros * Hfi Hff Hin Hik.
-revert i n Hfi Hff Hin Hik.
-induction k; intros; [ easy | cbn ].
+intros * Hfi Hff (Hin, Hnk).
+revert i n Hfi Hff Hin Hnk.
+induction k; intros; [ flia Hin Hnk | cbn ].
 destruct (Nat.eq_dec (f k) i) as [Hki| Hki]; [ easy | ].
 ...
 destruct n; [ flia Hik | ].
@@ -1698,6 +1697,7 @@ intros * (Hp1, Hp2) Hin; cbn.
 rewrite permut_list_find.
 remember (vect_el σ) as f eqn:Hf.
 clear σ Hf.
+Print permut_fun_find.
 ...
 revert f Hp1 i Hin.
 induction n; intros; [ easy | cbn ].
