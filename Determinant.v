@@ -1605,13 +1605,12 @@ Fixpoint permut_find n (σ : vector n nat) i j :=
   | S i' => if Nat.eq_dec (vect_el σ i') j then i' else permut_find σ i' j
   end.
 
-Definition permut_inv' n (σ : vector n nat) := mk_vect n (permut_find σ n).
+Definition permut_inv n (σ : vector n nat) := mk_vect n (permut_find σ n).
 
-(*
-Fixpoint permut_fun_find (f : nat → nat) n i :=
-  match n with
+Fixpoint permut_fun_find (f : nat → nat) i j :=
+  match i with
   | 0 => 42
-  | S n' => if Nat.eq_dec (f n') i then n' else permut_fun_find f n' i
+  | S i' => if Nat.eq_dec (f i') j then i' else permut_fun_find f i' j
   end.
 
 Theorem permut_list_find : ∀ n (σ : vector n nat) i j,
@@ -1623,56 +1622,10 @@ destruct (Nat.eq_dec (vect_el σ i) j) as [Hij| Hij]; [ easy | ].
 apply IHi.
 Qed.
 
-Theorem permut_list_find : ∀ n (σ : vector n nat) i,
-  is_permut σ
-  → permut_find σ n i =
-    match find (λ j, j =? i) (list_of_vect σ) with
-    | None => 42
-    | Some j => j
-    end.
-Proof.
-intros * (Hp1, Hp2).
-unfold list_of_vect.
-remember (vect_el σ) as f eqn:Hf.
-Print permut_find.
-...
-revert i.
-induction n; intros; [ easy | cbn ].
-destruct (Nat.eq_dec (vect_el σ n) i) as [Hni| Hni]. {
-  cbn.
-  remember (vect_el σ 0 =? i) as b eqn:Hb; symmetry in Hb.
-  destruct b. {
-    apply Nat.eqb_eq in Hb.
-    rewrite <- Hni in Hb.
-    apply Hp2 in Hb; [ subst n | flia | flia ].
-    specialize (Hp1 0 Nat.lt_0_1).
-    now apply Nat.lt_1_r in Hp1.
-  } {
-    apply Nat.eqb_neq in Hb.
-Search (find _ (map _ _)).
-...
-induction i; [ easy | cbn ].
-destruct (Nat.eq_dec (vect_el σ i) j) as [Hij| Hij]; [ easy | ].
-apply IHi.
-Qed.
-*)
-
-Definition permut_inv n (σ : vector n nat) :=
-  mk_vect n
-    (λ i,
-     match find (Nat.eqb i) (list_of_vect σ) with
-     | None => 42
-     | Some j => j
-     end).
-
-(**)
+(*
 Compute let n := 4 in let k := 3 in (list_of_vect (canon_permut n k), list_of_vect (permut_inv (canon_permut n k))).
-Compute let n := 4 in let k := 3 in (list_of_vect (canon_permut n k), list_of_vect (permut_inv' (canon_permut n k))).
-...
 Compute let n := 4 in map (λ k, list_of_vect (permut_inv (canon_permut n k))) (seq 0 (fact n)).
-Compute let n := 4 in map (λ k, list_of_vect (permut_inv' (canon_permut n k))) (seq 0 (fact n)).
-...
-(**)
+*)
 
 (*
 Theorem glop : ∀ f i k n,
@@ -1717,8 +1670,7 @@ Theorem permut_inv_prop : ∀ n (σ : vector n nat) i,
   → vect_el σ (vect_el (permut_inv σ) i) = i.
 Proof.
 intros * (Hp1, Hp2) Hin; cbn.
-...
-rewrite permut_permut_fun_find.
+rewrite permut_list_find.
 remember (vect_el σ) as f eqn:Hf.
 clear σ Hf.
 destruct n; [ easy | cbn ].
