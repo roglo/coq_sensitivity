@@ -1766,6 +1766,30 @@ destruct n; [ exfalso | cbn ]. {
 rename Hfni into Hfsni.
 destruct (Nat.eq_dec (f n) i) as [Hfni| Hfni]; [ easy | ].
 destruct n; [ exfalso | cbn ]. {
+  specialize (Hp1 0 Nat.lt_0_2) as H1.
+  specialize (Hp1 1 Nat.lt_1_2) as H2.
+  remember (f 0) as i0 eqn:Hi0; symmetry in Hi0.
+  remember (f 1) as i1 eqn:Hi1; symmetry in Hi1.
+  destruct i0, i1. {
+    assert (0 = 1); [ | easy ].
+    apply Hp2; [ easy | flia | congruence ].
+  } {
+    destruct i1; [ | flia H2 ].
+    flia Hin Hfni Hfsni.
+  } {
+    destruct i0; [ | flia H1 ].
+    flia Hin Hfni Hfsni.
+  } {
+    destruct i0; [ | flia H1 ].
+    destruct i1; [ | flia H2 ].
+    assert (0 = 1); [ | easy ].
+    apply Hp2; [ flia | easy | congruence ].
+  }
+}
+rename Hfsni into Hfssni.
+rename Hfni into Hfsni.
+destruct (Nat.eq_dec (f n) i) as [Hfni| Hfni]; [ easy | ].
+destruct n; [ exfalso | cbn ]. {
 ...
 
 Theorem permut_permut_inv_prop : ∀ n (σ : vector n nat) i,
