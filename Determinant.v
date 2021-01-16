@@ -1758,16 +1758,17 @@ Proof.
 intros * Hp1 Hp2 Hin.
 destruct n; [ easy | cbn ].
 destruct (Nat.eq_dec (f n) i) as [Hfni| Hfni]; [ easy | ].
+specialize (Hp1 0 (Nat.lt_0_succ _)) as H1.
 destruct n; [ exfalso | cbn ]. {
-  apply Nat.lt_1_r in Hin; subst i.
-  specialize (Hp1 0 Nat.lt_0_1).
-  now apply Nat.lt_1_r in Hp1.
+  flia Hin Hfni H1.
 }
 rename Hfni into Hfsni.
 destruct (Nat.eq_dec (f n) i) as [Hfni| Hfni]; [ easy | ].
+move Hfni before Hfsni.
+specialize (Hp1 1) as H2.
+assert (H : 1 < S (S n)) by flia.
+specialize (H2 H); clear H.
 destruct n; [ exfalso | cbn ]. {
-  specialize (Hp1 0 Nat.lt_0_2) as H1.
-  specialize (Hp1 1 Nat.lt_1_2) as H2.
   remember (f 0) as i0 eqn:Hi0; symmetry in Hi0.
   remember (f 1) as i1 eqn:Hi1; symmetry in Hi1.
   destruct i0, i1. {
@@ -1789,6 +1790,10 @@ destruct n; [ exfalso | cbn ]. {
 rename Hfsni into Hfssni.
 rename Hfni into Hfsni.
 destruct (Nat.eq_dec (f n) i) as [Hfni| Hfni]; [ easy | ].
+move Hfni before Hfsni.
+specialize (Hp1 2) as H3.
+assert (H : 2 < S (S (S n))) by flia.
+specialize (H3 H); clear H.
 destruct n; [ exfalso | cbn ]. {
 ...
 
