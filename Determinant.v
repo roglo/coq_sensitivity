@@ -1607,10 +1607,10 @@ Fixpoint permut_find n (σ : vector n nat) i j :=
 
 Definition permut_inv n (σ : vector n nat) := mk_vect n (permut_find σ n).
 
-Fixpoint permut_fun_find (f : nat → nat) i j :=
-  match i with
+Fixpoint permut_fun_find (f : nat → nat) n i :=
+  match n with
   | 0 => 42
-  | S i' => if Nat.eq_dec (f i') j then i' else permut_fun_find f i' j
+  | S n' => if Nat.eq_dec (f n') i then n' else permut_fun_find f n' i
   end.
 
 Theorem permut_list_find : ∀ n (σ : vector n nat) i j,
@@ -1698,17 +1698,99 @@ intros * (Hp1, Hp2) Hin; cbn.
 rewrite permut_list_find.
 remember (vect_el σ) as f eqn:Hf.
 clear σ Hf.
-revert i Hin.
+(**)
+assert (Hsurj : ∀ i, i < n → ∃ j, j < n ∧ f j = i). {
+  clear i Hin.
+  intros i Hi.
+(**)
+  destruct n; [ easy | ].
+  destruct n. {
+    exists 0.
+    split; [ flia | ].
+    specialize (Hp1 _ Hi).
+    apply Nat.lt_1_r in Hp1.
+    apply Nat.lt_1_r in Hi.
+    now subst i.
+  }
+  destruct n. {
+    specialize (Hp1 _ Hi) as H1.
+    assert (H2 : ∀ j, j < 2 → f i = f j → i = j). {
+      now intros; apply Hp2.
+    }
+    remember (f 0) as k eqn:Hk; symmetry in Hk.
+    remember (f 1) as l eqn:Hl; symmetry in Hl.
+    move l before k.
+    destruct i. {
+      destruct k. {
+        exists 0.
+        split; [ flia | easy ].
+      }
+      destruct k; [ | flia H1 Hk ].
+      exists 1.
+      split; [ flia | ].
+      destruct l; [ easy | exfalso ].
+      destruct l. 2: {
+        specialize (Hp1 1 (Nat.lt_1_2)).
+        flia Hp1 Hl.
+      }
+      specialize (H2 _ Nat.lt_1_2).
+      rewrite Hk, Hl in H2.
+      now specialize (H2 eq_refl).
+    }
+    destruct i; [ | flia Hi ].
+    destruct k. {
+      exists 1.
+      split; [ flia | ].
+      destruct l. {
+        specialize (Hp2 0 1 Nat.lt_0_2 Nat.lt_1_2).
+        rewrite Hk, Hl in Hp2.
+        now specialize (Hp2 eq_refl).
+      }
+      destruct l; [ easy | ].
+      specialize (Hp1 1 Nat.lt_1_2).
+      flia Hp1 Hl.
+    }
+    destruct k. 2: {
+      specialize (Hp1 0 Nat.lt_0_2).
+      flia Hp1 Hk.
+    }
+    exists 0.
+    split; [ flia | easy ].
+  }
+...
+  revert i Hi.
+  induction n; intros; [ easy | ].
+...
+  Hp1 : ∀ i : nat, i < S n → f i < S n
+  Hp2 : ∀ i j : nat, i < S n → j < S n → f i = f j → i = j
+  IHn : (∀ i : nat, i < n → f i < n)
+        → (∀ i j : nat, i < n → j < n → f i = f j → i = j) → ∀ i : nat, i < n → ∃ j : nat, f j = i
+  i : nat
+  Hi : i < S n
+  ============================
+  f (permut_fun_find f n i) = i
+...
+(**)
+revert f i Hin Hp1 Hp2.
 induction n; intros; [ easy | cbn ].
 destruct (Nat.eq_dec (f n) i) as [Hni| Hni]; [ easy | ].
 rename Hin into Hisn.
+specialize (IHn (λ i, i - 1)) as H1.
+cbn in H1.
+...
 destruct (Nat.eq_dec i n) as [Hin| Hin]. {
   subst i; clear Hisn.
+...
   assert (H1 : f n < n). {
     specialize (Hp1 n (Nat.lt_succ_diag_r _)) as H1.
     flia Hni H1.
   }
   clear Hni; rename H1 into Hfnn.
+...
+}
+apply IHn; [ | | flia Hisn Hin ]. {
+  intros j Hj.
+  destruct (Nat.eq_dec (f j) n) as [Hfjn| Hfjn]. {
 ...
   clear IHn.
   induction n; [ easy | cbn ].
