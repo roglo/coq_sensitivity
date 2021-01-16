@@ -1702,6 +1702,7 @@ clear σ Hf.
 assert (Hsurj : ∀ i, i < n → ∃ j, j < n ∧ f j = i). {
   clear i Hin.
   intros i Hi.
+...
 (**)
   destruct n; [ easy | ].
   destruct n. {
