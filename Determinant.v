@@ -1673,7 +1673,16 @@ intros * (Hp1, Hp2) Hin; cbn.
 rewrite permut_list_find.
 remember (vect_el σ) as f eqn:Hf.
 clear σ Hf.
-destruct n; [ easy | cbn ].
+...
+clear Hp1.
+revert i Hin.
+induction n; intros; [ easy | cbn ].
+destruct (Nat.eq_dec (f n) i) as [Hni| Hni]; [ easy | ].
+destruct i. {
+  clear Hin.
+
+...
+induction n; [ easy | cbn ].
 destruct (Nat.eq_dec (f n) i) as [Hni| Hni]; [ easy | ].
 ...
 revert i Hin.
