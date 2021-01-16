@@ -1896,7 +1896,25 @@ remember (f 3) as i3 eqn:Hi3; symmetry in Hi3.
 move i3 before i2.
 move H3 before H2.
 move Hfi0 before Hfi1.
+remember 3 as k eqn:Hk.
+assert (Hfn : ∀ j, j ≤ k → f (n + j) ≠ i ∧ f (n + j) ≤ n + k). {
+  intros j Hjk.
+  subst k.
+  split. {
+    rewrite Nat.add_comm.
+    destruct j; [ easy | ].
+    destruct j; [ easy | ].
+    destruct j; [ easy | ].
+    destruct j; [ easy | ].
+    flia Hjk.
+  }
+  enough (H : f (n + j) < S (S (S (S n)))) by flia H.
+  apply Hp1.
+  flia Hjk.
+}
+clear Hfi3 Hfi2 Hfi1 Hfi0.
 destruct n; [ exfalso | cbn ]. {
+  cbn in Hfn.
 ...
 
 Theorem permut_permut_inv_prop : ∀ n (σ : vector n nat) i,
