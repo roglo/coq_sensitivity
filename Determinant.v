@@ -1627,7 +1627,39 @@ Compute let n := 4 in let k := 3 in (list_of_vect (canon_permut n k), list_of_ve
 Compute let n := 4 in map (λ k, list_of_vect (permut_inv (canon_permut n k))) (seq 0 (fact n)).
 *)
 
-(**)
+Theorem fun_find_prop : ∀ f n i,
+  (∀ i j, i < n → j < n → f i = f j → i = j)
+  → i < n
+  → fun_find f n (f i) = i.
+Proof.
+intros * Hp2 Hin.
+revert i Hin.
+induction n; intros; [ easy | cbn ].
+destruct (Nat.eq_dec (f n) (f i)) as [Hfni| Hfni]. {
+  apply Hp2; [ flia | easy | easy ].
+}
+rename Hin into Hisn.
+assert (Hin : i < n). {
+  destruct (Nat.eq_dec n i) as [H| H]; [ now subst n | ].
+  flia Hisn H.
+}
+clear Hisn.
+apply IHn; [ | easy ].
+intros j k Hj Hk Hjk.
+apply Hp2; [ flia Hj | flia Hk | easy ].
+Qed.
+
+Theorem permut_inv_permut_prop : ∀ n (σ : vector n nat) i,
+  is_permut σ
+  → i < n
+  → vect_el (permut_inv σ) (vect_el σ i) = i.
+Proof.
+intros * (_, Hp2) Hin; cbn.
+rewrite permut_list_find.
+now apply fun_find_prop.
+Qed.
+
+(*
 Theorem glop : ∀ f i k n,
   (∀ i, i < n → f i < n)
   → (∀ i j, i < n → j < n → f i = f j → i = j)
@@ -1717,30 +1749,15 @@ apply IHk with (n := n); [ easy | easy | | flia Hkn ].
 ...
 *)
 
-Theorem permut_inv_permut_prop : ∀ n (σ : vector n nat) i,
-  is_permut σ
+Theorem glop : ∀ f i n,
+  (∀ i, i < n → f i < n)
+  → (∀ i j, i < n → j < n → f i = f j → i = j)
   → i < n
-  → vect_el (permut_inv σ) (vect_el σ i) = i.
+  → f (fun_find f n i) = i.
 Proof.
-intros * (_, Hp2) Hin; cbn.
-rewrite permut_list_find.
-remember (vect_el σ) as f eqn:Hf.
-clear σ Hf.
-revert i Hin.
-induction n; intros; [ easy | cbn ].
-destruct (Nat.eq_dec (f n) (f i)) as [Hfni| Hfni]. {
-  apply Hp2; [ flia | easy | easy ].
-}
-rename Hin into Hisn.
-assert (Hin : i < n). {
-  destruct (Nat.eq_dec n i) as [H| H]; [ now subst n | ].
-  flia Hisn H.
-}
-clear Hisn.
-apply IHn; [ | easy ].
-intros j k Hj Hk Hjk.
-apply Hp2; [ flia Hj | flia Hk | easy ].
-Qed.
+intros * Hp1 Hp2 Hin.
+Print fun_find.
+...
 
 Theorem permut_permut_inv_prop : ∀ n (σ : vector n nat) i,
   is_permut σ
