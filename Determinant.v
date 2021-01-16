@@ -1897,24 +1897,58 @@ move i3 before i2.
 move H3 before H2.
 move Hfi0 before Hfi1.
 remember 3 as k eqn:Hk.
-assert (Hfn : ∀ j, j ≤ k → f (n + j) ≠ i ∧ f (n + j) ≤ n + k). {
+assert (Hfn : ∀ j, j ≤ k → f (n + j) ≠ i). {
   intros j Hjk.
   subst k.
-  split. {
-    rewrite Nat.add_comm.
-    destruct j; [ easy | ].
-    destruct j; [ easy | ].
-    destruct j; [ easy | ].
-    destruct j; [ easy | ].
-    flia Hjk.
-  }
-  enough (H : f (n + j) < S (S (S (S n)))) by flia H.
-  apply Hp1.
+  rewrite Nat.add_comm.
+  destruct j; [ easy | ].
+  destruct j; [ easy | ].
+  destruct j; [ easy | ].
+  destruct j; [ easy | ].
   flia Hjk.
 }
-clear Hfi3 Hfi2 Hfi1 Hfi0.
+clear Hfi0 Hfi1 Hfi2 Hfi3.
+assert (Hi : i ≤ n + k) by flia Hin Hk.
+clear Hin.
+assert (H : ∀ i, i ≤ n + k → f i ≤ n + k). {
+  intros j Hj.
+  specialize (Hp1 j).
+  assert (H : j < S (S (S (S n)))) by flia Hj Hk.
+  specialize (Hp1 H); clear H.
+  flia Hk Hp1.
+}
+clear Hp1; rename H into Hp1.
+assert (H : ∀ i j, i ≤ n + k → j ≤ n + k → f i = f j → i = j). {
+  intros a b Ha Hb Hab.
+  apply Hp2; [ flia Hk Ha | flia Hk Hb | easy ].
+}
+clear Hp2; rename H into Hp2.
+clear - Hfn Hi Hp1 Hp2.
+revert i n Hi Hfn Hp1 Hp2.
+induction k; intros; cbn. {
+  specialize (Hfn 0 (le_refl _)).
+  rewrite Nat.add_0_r in Hp1, Hp2, Hi, Hfn.
+...
+  revert i Hi Hfni.
+  induction n; intros; [ exfalso | cbn ]. {
+    apply Nat.le_0_r in Hfn.
+    now apply Nat.le_0_r in Hi; subst i.
+  }
+  destruct (Nat.eq_dec (f n) i) as [Hfni'| Hfni']; [ easy | ].
+  destruct (lt_dec n (f n)) as [Hnfn| Hnfn]. {
+...
+  apply IHn; [ | | | easy ]. {
+...
 destruct n; [ exfalso | cbn ]. {
   cbn in Hfn.
+  remember (f 0) as i0 eqn:Hi0; symmetry in Hi0.
+  specialize (Hfn 0 (Nat.le_0_l _)) as H0.
+  destruct H0 as (H0, Hf0).
+  specialize (Hfn 1) as H1.
+  assert (H : 1 ≤ k) by flia Hk.
+  specialize (H1 H); clear H.
+  destruct H1 as (H1, Hf1).
+  destruct i0. {
 ...
 
 Theorem permut_permut_inv_prop : ∀ n (σ : vector n nat) i,
