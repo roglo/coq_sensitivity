@@ -1757,50 +1757,55 @@ Theorem glop : ∀ f i n,
 Proof.
 intros * Hp1 Hp2 Hin.
 destruct n; [ easy | cbn ].
-destruct (Nat.eq_dec (f n) i) as [Hfni| Hfni]; [ easy | ].
-specialize (Hp1 0 (Nat.lt_0_succ _)) as H1.
+destruct (Nat.eq_dec (f n) i) as [Hfi0| Hfi0]; [ easy | ].
+specialize (Hp1 0 (Nat.lt_0_succ _)) as H0.
 remember (f 0) as i0 eqn:Hi0; symmetry in Hi0.
+move i0 before i.
+move H0 before Hin.
 destruct n; [ exfalso | cbn ]. {
-  rewrite Hi0 in Hfni.
-  flia Hin Hfni H1.
+  rewrite Hi0 in Hfi0.
+  flia Hin Hfi0 H0.
 }
-rename Hfni into Hfsni.
-destruct (Nat.eq_dec (f n) i) as [Hfni| Hfni]; [ easy | ].
-move Hfni before Hfsni.
-specialize (Hp1 1) as H2.
+rename Hfi0 into Hfi1.
+destruct (Nat.eq_dec (f n) i) as [Hfi0| Hfi0]; [ easy | ].
+specialize (Hp1 1) as H1.
 assert (H : 1 < S (S n)) by flia.
-specialize (H2 H); clear H.
+specialize (H1 H); clear H.
 remember (f 1) as i1 eqn:Hi1; symmetry in Hi1.
 move i1 before i0.
+move H1 before H0.
+move Hfi0 before Hfi1.
 destruct n; [ exfalso | cbn ]. {
-  rewrite Hi0 in Hfni.
-  rewrite Hi1 in Hfsni.
+  rewrite Hi0 in Hfi0.
+  rewrite Hi1 in Hfi1.
   destruct i0. {
     destruct i1. {
       enough (0 = 1); [ easy | ].
       apply Hp2; [ easy | flia | congruence ].
     }
-    destruct i1; [ | flia H2 ].
-    flia Hin Hfni Hfsni.
+    destruct i1; [ | flia H1 ].
+    flia Hin Hfi0 Hfi1.
   }
-  destruct i0; [ | flia H1 ].
-  destruct i1; [ flia Hin Hfni Hfsni | ].
-  destruct i1; [ | flia H2 ].
+  destruct i0; [ | flia H0 ].
+  destruct i1; [ flia Hin Hfi0 Hfi1 | ].
+  destruct i1; [ | flia H1 ].
   enough (0 = 1); [ easy | ].
   apply Hp2; [ flia | flia | congruence ].
 }
-rename Hfsni into Hfssni.
-rename Hfni into Hfsni.
-destruct (Nat.eq_dec (f n) i) as [Hfni| Hfni]; [ easy | ].
-move Hfni before Hfsni.
-specialize (Hp1 2) as H3.
+rename Hfi1 into Hfi2.
+rename Hfi0 into Hfi1.
+destruct (Nat.eq_dec (f n) i) as [Hfi0| Hfi0]; [ easy | ].
+specialize (Hp1 2) as H2.
 assert (H : 2 < S (S (S n))) by flia.
-specialize (H3 H); clear H.
+specialize (H2 H); clear H.
 remember (f 2) as i2 eqn:Hi2; symmetry in Hi2.
+move i2 before i1.
+move H2 before H1.
+move Hfi0 before Hfi1.
 destruct n; [ exfalso | cbn ]. {
-  rewrite Hi0 in Hfni.
-  rewrite Hi1 in Hfsni.
-  rewrite Hi2 in Hfssni.
+  rewrite Hi0 in Hfi0.
+  rewrite Hi1 in Hfi1.
+  rewrite Hi2 in Hfi2.
   destruct i0. {
     destruct i1. {
       enough (0 = 1); [ easy | ].
@@ -1815,16 +1820,16 @@ destruct n; [ exfalso | cbn ]. {
         enough (1 = 2); [ easy | ].
         apply Hp2; [ easy | flia | congruence ].
       }
-      destruct i2; [ | flia H3 ].
-      flia Hin Hfni Hfsni Hfssni.
+      destruct i2; [ | flia H2 ].
+      flia Hin Hfi0 Hfi1 Hfi2.
     }
-    destruct i1; [ | flia H2 ].
+    destruct i1; [ | flia H1 ].
     destruct i2. {
       enough (0 = 2); [ easy | ].
       apply Hp2; [ easy | flia | congruence ].
     }
-    destruct i2; [ flia Hin Hfni Hfsni Hfssni | ].
-    destruct i2; [ | flia H3 ].
+    destruct i2; [ flia Hin Hfi0 Hfi1 Hfi2 | ].
+    destruct i2; [ | flia H2 ].
     enough (1 = 2); [ easy | ].
     apply Hp2; [ flia | flia | congruence ].
   }
@@ -1838,57 +1843,59 @@ destruct n; [ exfalso | cbn ]. {
         enough (0 = 2); [ easy | ].
         apply Hp2; [ flia | flia | congruence ].
       }
-      destruct i2; [ | flia H3 ].
-      flia Hin Hfni Hfsni Hfssni.
+      destruct i2; [ | flia H2 ].
+      flia Hin Hfi0 Hfi1 Hfi2.
     }
     destruct i1. {
       enough (0 = 1); [ easy | ].
       apply Hp2; [ flia | flia | congruence ].
     }
-    destruct i1; [ | flia H2 ].
-    destruct i2; [ flia Hin Hfni Hfsni Hfssni | ].
+    destruct i1; [ | flia H1 ].
+    destruct i2; [ flia Hin Hfi0 Hfi1 Hfi2 | ].
     destruct i2. {
       enough (0 = 2); [ easy | ].
       apply Hp2; [ flia | flia | congruence ].
     }
-    destruct i2; [ | flia H3 ].
+    destruct i2; [ | flia H2 ].
     enough (1 = 2); [ easy | ].
     apply Hp2; [ flia | flia | congruence ].
   }
-  destruct i0; [ | flia H1 ].
+  destruct i0; [ | flia H0 ].
   destruct i1. {
     destruct i2. {
       enough (1 = 2); [ easy | ].
       apply Hp2; [ flia | flia | congruence ].
     }
-    destruct i2; [ flia Hin Hfni Hfsni Hfssni | ].
-    destruct i2; [ | flia H3 ].
+    destruct i2; [ flia Hin Hfi0 Hfi1 Hfi2 | ].
+    destruct i2; [ | flia H2 ].
     enough (0 = 2); [ easy | ].
     apply Hp2; [ flia | flia | congruence ].
   }
   destruct i1. {
-    destruct i2; [ flia Hin Hfni Hfsni Hfssni | ].
+    destruct i2; [ flia Hin Hfi0 Hfi1 Hfi2 | ].
     destruct i2. {
       enough (1 = 2); [ easy | ].
       apply Hp2; [ flia | flia | congruence ].
     }
-    destruct i2; [ | flia H3 ].
+    destruct i2; [ | flia H2 ].
     enough (0 = 2); [ easy | ].
     apply Hp2; [ flia | flia | congruence ].
   }
-  destruct i1; [ | flia H2 ].
+  destruct i1; [ | flia H1 ].
   enough (0 = 1); [ easy | ].
   apply Hp2; [ flia | flia | congruence ].
 }
-rename Hfssni into Hfsssni.
-rename Hfsni into Hfssni.
-rename Hfni into Hfsni.
-destruct (Nat.eq_dec (f n) i) as [Hfni| Hfni]; [ easy | ].
-move Hfni before Hfsni.
-specialize (Hp1 3) as H4.
+rename Hfi2 into Hfi3.
+rename Hfi1 into Hfi2.
+rename Hfi0 into Hfi1.
+destruct (Nat.eq_dec (f n) i) as [Hfi0| Hfi0]; [ easy | ].
+specialize (Hp1 3) as H3.
 assert (H : 3 < S (S (S (S n)))) by flia.
-specialize (H4 H); clear H.
+specialize (H3 H); clear H.
 remember (f 3) as i3 eqn:Hi3; symmetry in Hi3.
+move i3 before i2.
+move H3 before H2.
+move Hfi0 before Hfi1.
 destruct n; [ exfalso | cbn ]. {
 ...
 
