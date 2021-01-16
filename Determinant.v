@@ -1756,7 +1756,16 @@ Theorem glop : ∀ f i n,
   → f (fun_find f n i) = i.
 Proof.
 intros * Hp1 Hp2 Hin.
-Print fun_find.
+destruct n; [ easy | cbn ].
+destruct (Nat.eq_dec (f n) i) as [Hfni| Hfni]; [ easy | ].
+destruct n; [ exfalso | cbn ]. {
+  apply Nat.lt_1_r in Hin; subst i.
+  specialize (Hp1 0 Nat.lt_0_1).
+  now apply Nat.lt_1_r in Hp1.
+}
+rename Hfni into Hfsni.
+destruct (Nat.eq_dec (f n) i) as [Hfni| Hfni]; [ easy | ].
+destruct n; [ exfalso | cbn ]. {
 ...
 
 Theorem permut_permut_inv_prop : ∀ n (σ : vector n nat) i,
