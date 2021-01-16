@@ -1924,11 +1924,41 @@ assert (H : ∀ i j, i ≤ n + k → j ≤ n + k → f i = f j → i = j). {
 }
 clear Hp2; rename H into Hp2.
 clear - Hfn Hi Hp1 Hp2.
+revert i k Hfn Hi Hp1 Hp2.
+induction n; intros; [ exfalso | cbn ]. {
+  cbn in Hfn, Hi, Hp1, Hp2.
+...
+  revert i Hfn Hi.
+  induction k; intros. {
+    apply Nat.le_0_r in Hi; subst i.
+    specialize (Hp1 0 (le_refl _)) as H1.
+    specialize (Hfn 0 (le_refl _)) as H2.
+    now apply Nat.le_0_r in H1.
+  }
+...
+  destruct (Nat.eq_dec i (S k)) as [Hisk| Hisk]. {
+    subst i; clear Hi.
+    apply IHk with (i := k); [ | | | easy ]. {
+      intros i Hik.
+      assert (H : i ≤ S k) by flia Hik.
+      specialize (Hp1 i H) as H1.
+      specialize (Hfn i H) as H2; clear H.
+      flia H1 H2.
+    } {
+      intros i j Hi Hj Hij.
+      apply Hp2; [ flia Hi | flia Hj | easy ].
+    } {
+      intros j Hj.
+...
+      assert (H : j ≤ S k) by flia Hj.
+      specialize (Hp1 j H) as H1.
+      specialize (Hfn j H) as H2; clear H.
+      assert (H3 : f j ≤ k) by flia H1 H2.
+...
 revert i n Hi Hfn Hp1 Hp2.
 induction k; intros; cbn. {
   specialize (Hfn 0 (le_refl _)).
   rewrite Nat.add_0_r in Hp1, Hp2, Hi, Hfn.
-...
   revert i Hi Hfn.
   induction n; intros; [ exfalso | cbn ]. {
     apply Nat.le_0_r in Hi; subst i.
@@ -1936,6 +1966,12 @@ induction k; intros; cbn. {
     now apply Nat.le_0_r in Hp1.
   }
   destruct (Nat.eq_dec (f n) i) as [Hfni'| Hfni']; [ easy | ].
+  destruct n; [ exfalso | cbn ]. {
+...
+  }
+  destruct (Nat.eq_dec (f n) i) as [Hfni| Hfni]; [ easy | ].
+...
+
   destruct (Nat.eq_dec i (S n)) as [Hisn| Hisn]. {
     subst i; clear Hi.
     clear IHn.
