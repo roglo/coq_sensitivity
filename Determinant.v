@@ -1752,6 +1752,21 @@ remember (vect_el σ) as f eqn:Hf.
 now apply f_fun_find.
 Qed.
 
+Theorem permut_find_ub : ∀ i k n (σ : vector n nat),
+  (∀ i, i < n → vect_el σ i < n)
+  → i < n
+  → n ≤ k
+  → permut_find σ k i < n.
+Proof.
+intros * Hub Hin Hnk.
+rewrite permut_list_find.
+revert i n σ Hub Hin Hnk.
+induction k; intros; [ flia Hin Hnk | cbn ].
+destruct (Nat.eq_dec (vect_el σ k) i) as [Hki| Hki]. {
+Print permut_find.
+Search fun_find.
+...
+
 Theorem permut_has_invert : ∀ n (σ : vector n nat),
   is_permut σ
   → ∃ σ' : vector n nat,
@@ -1764,6 +1779,7 @@ split. {
   split. {
     intros i Hin; cbn.
 (**)
+...
     induction n; [ easy | cbn ].
     destruct (Nat.eq_dec (vect_el σ n) i) as [Hni| Hni]; [ flia | ].
 ...
