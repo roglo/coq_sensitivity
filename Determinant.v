@@ -909,22 +909,6 @@ Fixpoint nat_of_canon_permut n (v : vector n nat) : nat :=
       nat_of_canon_permut (nat_of_canon_permut_sub_vect v n')
   end.
 
-(*
-Theorem glop : ∀ n (v : vector n nat),
-  (∀ i, i < S n → vect_el v i < n)
-  → (∀ i j, i < n → j < n → vect_el v i ≠ vect_el v j)
-  → nat_of_permut v < fact n.
-Proof.
-intros * Hvn Hn.
-revert v Hvn Hn.
-induction n; intros; [ cbn; flia | ].
-cbn - [ fact "<?" ].
-Print nat_of_permut_sub_vect.
-...
-specialize (IHn (nat_of_permut_sub_vect v (S n))) as H1.
-...
-*)
-
 Theorem Nat_b2n_upper_bound : ∀ b, Nat.b2n b ≤ 1.
 Proof.
 intros; destruct b; cbn; flia.
@@ -1515,72 +1499,6 @@ Definition permut_comp {n} (σ₁ σ₂ : vector n nat) :=
 
 Notation "σ₁ ° σ₂" := (permut_comp σ₁ σ₂) (at level 40).
 
-(* https://fr.wikipedia.org/wiki/Signature_d%27une_permutation#Une_transposition_est_impaire *)
-
-(*
-Theorem pouet :
-  rngl_is_comm = true →
-  ∀ n (σ₁ σ₂ : vector n nat),
-  (ε (σ₁ ° σ₂) * ε σ₂)%F = ε σ₁.
-Proof.
-intros Hic *.
-unfold ε.
-rewrite <- (rngl_product_mul_distr _ Hic).
-erewrite rngl_product_eq_compat. 2: {
-  intros i Hi.
-  now rewrite <- (rngl_product_mul_distr _ Hic).
-}
-cbn - [ iter_seq ].
-(*
-replace (Π (i = _, _), Π (j = _, _), _)%F with
-  (Π (i = 1, n),
-   (Π (j = 1, n),
-    (sgn_diff (vect_el σ₁ (vect_el σ₂ (j - 1)))
-       (vect_el σ₁ (vect_el σ₂ (i - 1))) *
-     sgn_diff (vect_el σ₂ (j - 1)) (vect_el σ₂ (i - 1)))))%F. 2: {
-  apply rngl_product_eq_compat.
-  intros i Hi.
-  erewrite (rngl_product_split _ i); [ | flia Hi ].
-  rewrite <- rngl_mul_1_l.
-  f_equal.
-...
-*)
-replace (Π (i = _, _), Π (j = _, _), _)%F with
-  (Π (k = 1, n), Π (l = k + 1, n),
-   (sgn_diff (vect_el σ₁ k) (vect_el σ₁ l) * sgn_diff k l))%F. 2: {
-...
-(*
-replace (Π (i = _, _), Π (j = _, _), _)%F with
-  (Π (k = 1, n), Π (l = 1, n),
-   (sgn_diff (vect_el σ₁ k) (vect_el σ₁ l) * sgn_diff k l))%F. 2: {
-...
-(**)
-erewrite rngl_product_eq_compat. 2: {
-  intros i Hi.
-  erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    remember (vect_el σ₂ (i - 1)) as l eqn:Hl.
-    remember (vect_el σ₂ (j - 1)) as k eqn:Hk.
-(* i varies from 1 to n
-   j varies from i+1 to n
-   ⇒
-   k varies from vect_el σ₂ i to vect_el σ₂ n-1
-   l varies from vect_el σ₂ 0 to vect_el σ₂ n-1
-*)
-...
-  Hl : l = vect_el σ₂ (i - 1)
-  k : nat
-  Hk : k = vect_el σ₂ (j - 1)
-  ============================
-  (sgn_diff (vect_el σ₁ k) (vect_el σ₁ l) * sgn_diff k l)%F = ?h0 j
-...
-
-apply rngl_product_eq_compat.
-intros j Hj.
-...
-*)
-*)
-
 Theorem rngl_product_change_var : ∀ b e f g h,
   (∀ i, b ≤ i ≤ e → g (h i) = i)
   → (Π (i = b, e), f i = Π (i ∈ map h (seq b (S e - b))), f (g i))%F.
@@ -1650,7 +1568,7 @@ intros j k Hj Hk Hjk.
 apply Hp2; [ flia Hj | flia Hk | easy ].
 Qed.
 
-Theorem permut_inv_permut_prop : ∀ n (σ : vector n nat) i,
+Theorem permut_inv_permut : ∀ n (σ : vector n nat) i,
   is_permut σ
   → i < n
   → vect_el (permut_inv σ) (vect_el σ i) = i.
@@ -1663,41 +1581,13 @@ Qed.
 (* the proof that "vect_el σ (vect_el (permut_inv σ) i) = i"
    is proven by the pigeonhole principle *)
 
-(*
-Fixpoint find_dup (la : list (nat * nat)) :=
-  match la with
-  | [] => None
-  | (n, a) :: la' =>
-      match find (λ nb, snd nb =? a) la' with
-      | None => find_dup la'
-      | Some (n', _) => Some (n, n')
-      end
-  end.
-
-Definition pigeonhole_fun a (f : nat → nat) :=
-  match find_dup (map (λ n, (n, f n)) (seq 0 a)) with
-  | Some (n, n') => (n, n')
-  | None => (0, 0)
-  end.
-
-Theorem pigeonhole : ∀ a b f,
-  b < a
-  → (∀ x, x < a → f x < b)
-  → ∀ x x', pigeonhole_fun a f = (x, x')
-  → x < a ∧ x' < a ∧ x ≠ x' ∧ f x = f x'.
-Proof.
-intros * Hba Hf * Hpf.
-(* to be copied from my github coq_euler_prod_form *)
-Admitted.
-*)
-
 Definition fun_find' f n i :=
   let '(x, x') :=
     pigeonhole_fun (S n) (λ j, if Nat.eq_dec j n then i else f j)
   in
   if Nat.eq_dec x n then x' else x.
 
-Theorem glop : ∀ f n,
+Theorem pigeonhole' : ∀ f n,
   (∀ i, i < n → f i < n)
   → (∀ i j, i < n → j < n → f i = f j → i = j)
   → ∀ i, i < n
@@ -1840,7 +1730,7 @@ apply Hfub.
 flia Hj Hjn.
 Qed.
 
-Theorem glop'' : ∀ f n,
+Theorem f_fun_find : ∀ f n,
   (∀ i, i < n → f i < n)
   → (∀ i j, i < n → j < n → f i = f j → i = j)
   → ∀ i, i < n
@@ -1848,284 +1738,10 @@ Theorem glop'' : ∀ f n,
 Proof.
 intros * Hp1 Hp2 * Hin.
 rewrite fun_find_fun_find'; [ | easy | easy | easy ].
-apply (proj2 (glop f Hp1 Hp2 Hin eq_refl)).
-...
-enough (H : pouet f n i = fun_find f n i) by now rewrite H in H1.
-destruct n; [ easy | cbn ].
-unfold pouet.
-unfold pigeonhole_fun.
-destruct (Nat.eq_dec (f n) i) as [Hfni| Hfni]. {
-  subst i.
-  cbn - [ Nat.eq_dec ].
-  destruct (Nat.eq_dec 1 (S n)) as [H2| H2]. {
-    apply Nat.succ_inj in H2; subst n.
-    destruct (Nat.eq_dec 0 1) as [H| H]; [ easy | clear H ].
-    now apply Nat.lt_1_r in Hin; rewrite Hin.
-  }
-  destruct (Nat.eq_dec 0 (S n)) as [H| H]; [ easy | clear H ].
-  remember (f 1 =? f 0) as b eqn:Hb; symmetry in Hb.
-  destruct b. {
-    apply Nat.eqb_eq in Hb.
-    apply Hp2 in Hb; [ easy | flia H2 | flia ].
-  }
-...
-specialize (glop f Hp1 Hp2 Hin (pouet f n i)) as H1.
-...
-intros * Hp1 Hp2 * Hin.
-destruct n; [ easy | cbn ].
-destruct (Nat.eq_dec (f n) i) as [Hfi0| Hfi0]; [ easy | ].
-(**)
-specialize (@pigeonhole_exist (S n) n) as H1.
-...
-specialize (H1 (λ j, if lt_dec i j then f j else f (j + 1))).
-specialize (H1 (Nat.lt_succ_diag_r _)).
-cbn in H1.
-assert (∀ j, j < S n → (if lt_dec i j then f j else f (j + 1)) < n). {
-  intros j Hj.
-  destruct (lt_dec i j) as [Hij| Hij]. {
-    specialize (Hp1 _ Hj) as H3.
-...
-specialize (Hp1 0 (Nat.lt_0_succ _)) as H0.
-remember (f 0) as i0 eqn:Hi0; symmetry in Hi0.
-move i0 before i.
-move H0 before Hin.
-destruct n; [ exfalso | cbn ]. {
-  rewrite Hi0 in Hfi0.
-  flia Hin Hfi0 H0.
-}
-rename Hfi0 into Hfi1.
-destruct (Nat.eq_dec (f n) i) as [Hfi0| Hfi0]; [ easy | ].
-specialize (Hp1 1) as H1.
-assert (H : 1 < S (S n)) by flia.
-specialize (H1 H); clear H.
-remember (f 1) as i1 eqn:Hi1; symmetry in Hi1.
-move i1 before i0.
-move H1 before H0.
-move Hfi0 before Hfi1.
-destruct n; [ exfalso | cbn ]. {
-  rewrite Hi0 in Hfi0.
-  rewrite Hi1 in Hfi1.
-  destruct i0. {
-    destruct i1. {
-      enough (0 = 1); [ easy | ].
-      apply Hp2; [ easy | flia | congruence ].
-    }
-    destruct i1; [ | flia H1 ].
-    flia Hin Hfi0 Hfi1.
-  }
-  destruct i0; [ | flia H0 ].
-  destruct i1; [ flia Hin Hfi0 Hfi1 | ].
-  destruct i1; [ | flia H1 ].
-  enough (0 = 1); [ easy | ].
-  apply Hp2; [ flia | flia | congruence ].
-}
-rename Hfi1 into Hfi2.
-rename Hfi0 into Hfi1.
-destruct (Nat.eq_dec (f n) i) as [Hfi0| Hfi0]; [ easy | ].
-specialize (Hp1 2) as H2.
-assert (H : 2 < S (S (S n))) by flia.
-specialize (H2 H); clear H.
-remember (f 2) as i2 eqn:Hi2; symmetry in Hi2.
-move i2 before i1.
-move H2 before H1.
-move Hfi0 before Hfi1.
-destruct n; [ exfalso | cbn ]. {
-  rewrite Hi0 in Hfi0.
-  rewrite Hi1 in Hfi1.
-  rewrite Hi2 in Hfi2.
-  destruct i0. {
-    destruct i1. {
-      enough (0 = 1); [ easy | ].
-      apply Hp2; [ easy | flia | congruence ].
-    }
-    destruct i1. {
-      destruct i2. {
-        enough (0 = 2); [ easy | ].
-        apply Hp2; [ easy | flia | congruence ].
-      }
-      destruct i2. {
-        enough (1 = 2); [ easy | ].
-        apply Hp2; [ easy | flia | congruence ].
-      }
-      destruct i2; [ | flia H2 ].
-      flia Hin Hfi0 Hfi1 Hfi2.
-    }
-    destruct i1; [ | flia H1 ].
-    destruct i2. {
-      enough (0 = 2); [ easy | ].
-      apply Hp2; [ easy | flia | congruence ].
-    }
-    destruct i2; [ flia Hin Hfi0 Hfi1 Hfi2 | ].
-    destruct i2; [ | flia H2 ].
-    enough (1 = 2); [ easy | ].
-    apply Hp2; [ flia | flia | congruence ].
-  }
-  destruct i0. {
-    destruct i1. {
-      destruct i2. {
-        enough (1 = 2); [ easy | ].
-        apply Hp2; [ flia | flia | congruence ].
-      }
-      destruct i2. {
-        enough (0 = 2); [ easy | ].
-        apply Hp2; [ flia | flia | congruence ].
-      }
-      destruct i2; [ | flia H2 ].
-      flia Hin Hfi0 Hfi1 Hfi2.
-    }
-    destruct i1. {
-      enough (0 = 1); [ easy | ].
-      apply Hp2; [ flia | flia | congruence ].
-    }
-    destruct i1; [ | flia H1 ].
-    destruct i2; [ flia Hin Hfi0 Hfi1 Hfi2 | ].
-    destruct i2. {
-      enough (0 = 2); [ easy | ].
-      apply Hp2; [ flia | flia | congruence ].
-    }
-    destruct i2; [ | flia H2 ].
-    enough (1 = 2); [ easy | ].
-    apply Hp2; [ flia | flia | congruence ].
-  }
-  destruct i0; [ | flia H0 ].
-  destruct i1. {
-    destruct i2. {
-      enough (1 = 2); [ easy | ].
-      apply Hp2; [ flia | flia | congruence ].
-    }
-    destruct i2; [ flia Hin Hfi0 Hfi1 Hfi2 | ].
-    destruct i2; [ | flia H2 ].
-    enough (0 = 2); [ easy | ].
-    apply Hp2; [ flia | flia | congruence ].
-  }
-  destruct i1. {
-    destruct i2; [ flia Hin Hfi0 Hfi1 Hfi2 | ].
-    destruct i2. {
-      enough (1 = 2); [ easy | ].
-      apply Hp2; [ flia | flia | congruence ].
-    }
-    destruct i2; [ | flia H2 ].
-    enough (0 = 2); [ easy | ].
-    apply Hp2; [ flia | flia | congruence ].
-  }
-  destruct i1; [ | flia H1 ].
-  enough (0 = 1); [ easy | ].
-  apply Hp2; [ flia | flia | congruence ].
-}
-rename Hfi2 into Hfi3.
-rename Hfi1 into Hfi2.
-rename Hfi0 into Hfi1.
-destruct (Nat.eq_dec (f n) i) as [Hfi0| Hfi0]; [ easy | ].
-specialize (Hp1 3) as H3.
-assert (H : 3 < S (S (S (S n)))) by flia.
-specialize (H3 H); clear H.
-remember (f 3) as i3 eqn:Hi3; symmetry in Hi3.
-move i3 before i2.
-move H3 before H2.
-move Hfi0 before Hfi1.
-remember 3 as k eqn:Hk.
-assert (Hfn : ∀ j, j ≤ k → f (n + j) ≠ i). {
-  intros j Hjk.
-  subst k.
-  rewrite Nat.add_comm.
-  destruct j; [ easy | ].
-  destruct j; [ easy | ].
-  destruct j; [ easy | ].
-  destruct j; [ easy | ].
-  flia Hjk.
-}
-clear Hfi0 Hfi1 Hfi2 Hfi3.
-assert (Hi : i ≤ n + k) by flia Hin Hk.
-clear Hin.
-assert (H : ∀ i, i ≤ n + k → f i ≤ n + k). {
-  intros j Hj.
-  specialize (Hp1 j).
-  assert (H : j < S (S (S (S n)))) by flia Hj Hk.
-  specialize (Hp1 H); clear H.
-  flia Hk Hp1.
-}
-clear Hp1; rename H into Hp1.
-assert (H : ∀ i j, i ≤ n + k → j ≤ n + k → f i = f j → i = j). {
-  intros a b Ha Hb Hab.
-  apply Hp2; [ flia Hk Ha | flia Hk Hb | easy ].
-}
-clear Hp2; rename H into Hp2.
-clear - Hfn Hi Hp1 Hp2.
-revert i k Hfn Hi Hp1 Hp2.
-induction n; intros; [ exfalso | cbn ]. {
-  cbn in Hfn, Hi, Hp1, Hp2.
-...
-  revert i Hfn Hi.
-  induction k; intros. {
-    apply Nat.le_0_r in Hi; subst i.
-    specialize (Hp1 0 (le_refl _)) as H1.
-    specialize (Hfn 0 (le_refl _)) as H2.
-    now apply Nat.le_0_r in H1.
-  }
-...
-  destruct (Nat.eq_dec i (S k)) as [Hisk| Hisk]. {
-    subst i; clear Hi.
-    apply IHk with (i := k); [ | | | easy ]. {
-      intros i Hik.
-      assert (H : i ≤ S k) by flia Hik.
-      specialize (Hp1 i H) as H1.
-      specialize (Hfn i H) as H2; clear H.
-      flia H1 H2.
-    } {
-      intros i j Hi Hj Hij.
-      apply Hp2; [ flia Hi | flia Hj | easy ].
-    } {
-      intros j Hj.
-...
-      assert (H : j ≤ S k) by flia Hj.
-      specialize (Hp1 j H) as H1.
-      specialize (Hfn j H) as H2; clear H.
-      assert (H3 : f j ≤ k) by flia H1 H2.
-...
-revert i n Hi Hfn Hp1 Hp2.
-induction k; intros; cbn. {
-  specialize (Hfn 0 (le_refl _)).
-  rewrite Nat.add_0_r in Hp1, Hp2, Hi, Hfn.
-  revert i Hi Hfn.
-  induction n; intros; [ exfalso | cbn ]. {
-    apply Nat.le_0_r in Hi; subst i.
-    specialize (Hp1 0 (le_refl _)).
-    now apply Nat.le_0_r in Hp1.
-  }
-  destruct (Nat.eq_dec (f n) i) as [Hfni'| Hfni']; [ easy | ].
-  destruct n; [ exfalso | cbn ]. {
-...
-  }
-  destruct (Nat.eq_dec (f n) i) as [Hfni| Hfni]; [ easy | ].
-...
+apply (proj2 (pigeonhole' f Hp1 Hp2 Hin eq_refl)).
+Qed.
 
-  destruct (Nat.eq_dec i (S n)) as [Hisn| Hisn]. {
-    subst i; clear Hi.
-    clear IHn.
-    induction n; [ exfalso | cbn ]. {
-      specialize (Hp1 0 Nat.le_0_1) as H1.
-      specialize (Hp1 1 (le_refl _)) as H2.
-      enough (H : 0 = 1); [ easy | ].
-      apply Hp2; [ flia | flia | ].
-      flia Hfni' Hfn H1 H2.
-    }
-    destruct (Nat.eq_dec (f n) (S (S n))) as [Hfns| Hfns]; [ easy | ].
-...
-  apply IHn; [ | | | easy ].
-...
-destruct n; [ exfalso | cbn ]. {
-  cbn in Hfn.
-  remember (f 0) as i0 eqn:Hi0; symmetry in Hi0.
-  specialize (Hfn 0 (Nat.le_0_l _)) as H0.
-  destruct H0 as (H0, Hf0).
-  specialize (Hfn 1) as H1.
-  assert (H : 1 ≤ k) by flia Hk.
-  specialize (H1 H); clear H.
-  destruct H1 as (H1, Hf1).
-  destruct i0. {
-...
-
-Theorem permut_permut_inv_prop : ∀ n (σ : vector n nat) i,
+Theorem permut_permut_inv : ∀ n (σ : vector n nat) i,
   is_permut σ
   → i < n
   → vect_el σ (vect_el (permut_inv σ) i) = i.
@@ -2133,217 +1749,12 @@ Proof.
 intros * (Hp1, Hp2) Hin; cbn.
 rewrite permut_list_find.
 remember (vect_el σ) as f eqn:Hf.
-clear σ Hf.
-Print fun_find.
-...
-(*
-revert f Hp1 i Hin.
-induction n; intros; [ easy | cbn ].
-destruct (Nat.eq_dec (f n) i) as [Hni| Hni]; [ easy | ].
-rename Hin into Hisn.
-destruct n; [ exfalso | ]. {
-  apply Nat.lt_1_r in Hisn; subst i.
-  specialize (Hp1 0 Nat.lt_0_1).
-  flia Hp1 Hni.
-}
-cbn.
-destruct (Nat.eq_dec (f n) i) as [Hfni| Hfni]; [ easy | ].
-specialize (IHn (λ i, f i - 1)).
-cbn - [ fun_find ] in IHn.
-assert (H : ∀ i : nat, i < S n → f i - 1 < S n). {
-  intros j Hj.
-  specialize (Hp1 j).
-  assert (H : j < S (S n)) by flia Hj.
-  specialize (Hp1 H); clear H.
-  flia Hp1.
-}
-specialize (IHn H); clear H.
-assert (H : ∀ i j : nat, i < S n → j < S n → f i - 1 = f j - 1 → i = j). {
-  intros j k Hj Hk Hjk.
-...
-  apply Hp2; [ flia Hj | flia Hk | ].
-...
-  specialize (Hp1 (S j)).
-  assert (H : S j < S (S n)) by flia Hj.
-  specialize (Hp1 H); clear H.
-...
-cbn in IHn.
-...
-*)
-assert (Hsurj : ∀ i, i < n → ∃ j, j < n ∧ f j = i). {
-  clear i Hin.
-  intros i Hi.
-(*
-  destruct n; [ easy | ].
-  destruct n. {
-    exists 0.
-    split; [ flia | ].
-    specialize (Hp1 _ Hi).
-    apply Nat.lt_1_r in Hp1.
-    apply Nat.lt_1_r in Hi.
-    now subst i.
-  }
-  destruct n. {
-    specialize (Hp1 _ Hi) as H1.
-    assert (H2 : ∀ j, j < 2 → f i = f j → i = j). {
-      now intros; apply Hp2.
-    }
-    remember (f 0) as k eqn:Hk; symmetry in Hk.
-    remember (f 1) as l eqn:Hl; symmetry in Hl.
-    move l before k.
-    destruct i. {
-      destruct k. {
-        exists 0.
-        split; [ flia | easy ].
-      }
-      destruct k; [ | flia H1 Hk ].
-      exists 1.
-      split; [ flia | ].
-      destruct l; [ easy | exfalso ].
-      destruct l. 2: {
-        specialize (Hp1 1 (Nat.lt_1_2)).
-        flia Hp1 Hl.
-      }
-      specialize (H2 _ Nat.lt_1_2).
-      rewrite Hk, Hl in H2.
-      now specialize (H2 eq_refl).
-    }
-    destruct i; [ | flia Hi ].
-    destruct k. {
-      exists 1.
-      split; [ flia | ].
-      destruct l. {
-        specialize (Hp2 0 1 Nat.lt_0_2 Nat.lt_1_2).
-        rewrite Hk, Hl in Hp2.
-        now specialize (Hp2 eq_refl).
-      }
-      destruct l; [ easy | ].
-      specialize (Hp1 1 Nat.lt_1_2).
-      flia Hp1 Hl.
-    }
-    destruct k. 2: {
-      specialize (Hp1 0 Nat.lt_0_2).
-      flia Hp1 Hk.
-    }
-    exists 0.
-    split; [ flia | easy ].
-  }
-...
-*)
-...
-  revert f Hp1 Hp2 i Hi.
-  induction n; intros; [ easy | ].
-...
-  Hp1 : ∀ i : nat, i < S n → f i < S n
-  Hp2 : ∀ i j : nat, i < S n → j < S n → f i = f j → i = j
-  IHn : (∀ i : nat, i < n → f i < n)
-        → (∀ i j : nat, i < n → j < n → f i = f j → i = j) → ∀ i : nat, i < n → ∃ j : nat, f j = i
-  i : nat
-  Hi : i < S n
-  ============================
-  f (fun_find f n i) = i
-...
-(**)
-revert f i Hin Hp1 Hp2.
-induction n; intros; [ easy | cbn ].
-destruct (Nat.eq_dec (f n) i) as [Hni| Hni]; [ easy | ].
-rename Hin into Hisn.
-specialize (IHn (λ i, i - 1)) as H1.
-cbn in H1.
-...
-destruct (Nat.eq_dec i n) as [Hin| Hin]. {
-  subst i; clear Hisn.
-...
-  assert (H1 : f n < n). {
-    specialize (Hp1 n (Nat.lt_succ_diag_r _)) as H1.
-    flia Hni H1.
-  }
-  clear Hni; rename H1 into Hfnn.
-...
-}
-apply IHn; [ | | flia Hisn Hin ]. {
-  intros j Hj.
-  destruct (Nat.eq_dec (f j) n) as [Hfjn| Hfjn]. {
-...
-  clear IHn.
-  induction n; [ easy | cbn ].
-  destruct (Nat.eq_dec (f n) (S n)) as [Hfnsn| Hfnsn]; [ easy | ].
-...
-destruct i. {
-  clear Hin.
-...
-induction n; [ easy | cbn ].
-destruct (Nat.eq_dec (f n) i) as [Hni| Hni]; [ easy | ].
-...
-revert i Hin.
-induction n; intros; [ easy | cbn ].
-destruct (Nat.eq_dec (f n) i) as [Hni| Hni]; [ easy | ].
-...
-destruct (Nat.eq_dec i n) as [Hin'| Hin']. {
-  subst i.
-  clear Hin.
-  destruct n. {
-    specialize (Hp1 0 Nat.lt_0_1).
-    flia Hp1 Hni.
-  }
-  cbn.
-  destruct (Nat.eq_dec (f n) (S n)) as [H1| H1]; [ easy | ].
-...
-intros * (Hp1, Hp2) Hin; cbn.
-rewrite permut_fun_find.
-remember (vect_el σ) as f eqn:Hf.
-clear σ Hf.
-destruct n; [ easy | cbn ].
-destruct (Nat.eq_dec (f n) i) as [Hni| Hni]; [ easy | ].
-destruct n. {
-  specialize (Hp1 _ Hin) as H1; cbn.
-  apply Nat.lt_1_r in Hin.
-  apply Nat.lt_1_r in H1.
-  now subst i.
-}
-cbn.
-destruct (Nat.eq_dec (f n) i) as [Hsni| Hsni]; [ easy | ].
-destruct n. {
-  specialize (Hp1 _ Hin) as H1; cbn.
-  specialize (Hp1 1 (Nat.lt_succ_diag_r _)) as H2.
-  specialize (Hp2 0 1 (Nat.lt_0_succ _) (Nat.lt_succ_diag_r _)) as H3.
-  destruct i. {
-    remember (f 0) as x eqn:Hx; symmetry in Hx.
-    destruct x; [ easy | exfalso ].
-    destruct x; [ | flia H1 ].
-    flia Hni Hx H2 H3.
-  }
-  destruct i; [ | flia Hin ].
-  remember (f 0) as x eqn:Hx; symmetry in Hx.
-  destruct x; [ flia Hni H1 H3 | ].
-  destruct x; [ easy | exfalso ].
-  specialize (Hp1 0 (Nat.lt_0_succ _)) as H4.
-  flia Hx H4.
-}
-...
-revert i Hin.
-induction n; intros; [ easy | cbn ].
-destruct (Nat.eq_dec (f n) i) as [Hni| Hni]; [ easy | ].
-destruct i. {
+now apply f_fun_find.
+Qed.
 
-  destruct n. {
-    cbn.
-    specialize (Hp1 0 Nat.lt_0_1).
-    now apply Nat.lt_1_r in Hp1.
-  }
-  cbn.
-  destruct (Nat.eq_dec (f n) 0) as [Hnz| Hnz]; [ easy | ].
-  apply IHn.
-...
-apply IHn.
-...
-intros * Hperm Hin; cbn.
-induction i; intros; cbn. {
-  destruct n; [ easy | ].
-  cbn.
-...
-; [ easy | cbn ].
-destruct (Nat.eq_dec (vect_el σ n) i) as [Hni| Hni]; [ easy | ].
+Check permut_inv_permut.
+Check permut_permut_inv.
+
 ...
 
 Theorem permut_has_invert : ∀ n (σ : vector n nat),
