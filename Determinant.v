@@ -1734,6 +1734,32 @@ destruct (Nat.eq_dec x n) as [H2| H2]. {
 }
 Qed.
 
+Theorem pouet : ∀ f n i, i < n → fun_find f n i = fun_find' f n i.
+Proof.
+intros * Hin.
+unfold fun_find'.
+remember (pigeonhole_fun _ _) as xx eqn:Hxx.
+symmetry in Hxx.
+destruct xx as (j, j').
+unfold pigeonhole_fun in Hxx.
+remember (find_dup _) as fd eqn:Hfd.
+symmetry in Hfd.
+destruct fd as [(x, x')| ]. {
+  injection Hxx; clear Hxx; intros; subst x x'.
+  apply find_dup_some in Hfd.
+  destruct Hfd as (y & la1 & la2 & la3 & Hfd).
+...
+
+destruct (Nat.eq_dec j n) as [Hjn| Hjn]. {
+  subst j.
+  rename j' into j.
+  revert f i j Hin Hxx.
+  induction n; intros; [ easy | cbn ].
+  destruct (Nat.eq_dec (f n) i) as [Hfni| Hfni]. {
+    subst i.
+Print pigeonhole_fun.
+...
+
 Theorem glop'' : ∀ f n,
   (∀ i, i < n → f i < n)
   → (∀ i j, i < n → j < n → f i = f j → i = j)
