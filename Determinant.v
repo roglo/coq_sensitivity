@@ -1752,21 +1752,49 @@ remember (vect_el σ) as f eqn:Hf.
 now apply f_fun_find.
 Qed.
 
-Check permut_inv_permut.
-Check permut_permut_inv.
-
-...
-
 Theorem permut_has_invert : ∀ n (σ : vector n nat),
   is_permut σ
   → ∃ σ' : vector n nat,
      is_permut σ' ∧ ∀ i, i < n → vect_el σ (vect_el σ' i) = i.
 Proof.
 intros * Hperm.
-destruct Hperm as (Hp1, Hp2).
 exists (permut_inv σ).
-
+destruct Hperm as (Hp1, Hp2).
 split. {
+  split. {
+    intros i Hin; cbn.
+(**)
+    induction n; [ easy | cbn ].
+    destruct (Nat.eq_dec (vect_el σ n) i) as [Hni| Hni]; [ flia | ].
+...
+
+Print permut_find.
+    rewrite permut_list_find.
+    rewrite fun_find_fun_find'; [ | easy | easy | easy ].
+    unfold fun_find'.
+    remember (pigeonhole_fun _ _) as xx eqn:Hxx.
+    symmetry in Hxx; destruct xx as (x, x').
+    destruct (Nat.eq_dec x n) as [Hxn| Hxn]. {
+      subst x.
+      unfold pigeonhole_fun in Hxx.
+Search find_dup.
+...
+Search permut_find.
+permut_find = 
+fix permut_find (n : nat) (σ : vector n nat) (i j : nat) {struct i} : nat :=
+  match i with
+  | 0 => 42
+  | S i' => if Nat.eq_dec (vect_el σ i') j then i' else permut_find n σ i' j
+  end
+     : ∀ n : nat, vector n nat → nat → nat → nat
+
+fun_find = 
+fix fun_find (f : nat → nat) (n i : nat) {struct n} : nat :=
+  match n with
+  | 0 => 42
+  | S n' => if Nat.eq_dec (f n') i then n' else fun_find f n' i
+  end
+     : (nat → nat) → nat → nat → nat
 ...
 
 Theorem signature_comp :
