@@ -1662,8 +1662,6 @@ Qed.
 (* the proof that "vect_el σ (vect_el (permut_inv σ) i) = i"
    should be proven by the pigeonhole principle ; to be verified *)
 
-...
-
 Fixpoint find_dup (la : list (nat * nat)) :=
   match la with
   | [] => None
@@ -1689,7 +1687,6 @@ Proof.
 intros * Hba Hf * Hpf.
 (* to be copied from my github coq_euler_prod_form *)
 Admitted.
-...
 
 (*
 ∀ x x', x < a → x' < a → x ≠ x' → f x ≠ f x'
