@@ -1749,6 +1749,11 @@ apply IHk with (n := n); [ easy | easy | | flia Hkn ].
 ...
 *)
 
+(*
+∀ x x', x < a → x' < a → x ≠ x' → f x ≠ f x'
+∃ x x', x < a ∧ x' < a ∧ x ≠ x' ∧ f x = f x'.
+*)
+
 Theorem pigeonhole_exist : ∀ a b f,
   b < a
   → (∀ x, x < a → f x < b)
