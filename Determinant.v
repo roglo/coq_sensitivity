@@ -1688,26 +1688,80 @@ intros * Hba Hf * Hpf.
 (* to be copied from my github coq_euler_prod_form *)
 Admitted.
 
-(*
-∀ x x', x < a → x' < a → x ≠ x' → f x ≠ f x'
-∃ x x', x < a ∧ x' < a ∧ x ≠ x' ∧ f x = f x'.
-*)
+Definition fun_find' f n i :=
+  let '(x, x') :=
+    pigeonhole_fun (S n) (λ j, if Nat.eq_dec j n then i else f j)
+  in
+  if Nat.eq_dec x n then x' else x.
 
 Theorem glop : ∀ f n,
   (∀ i, i < n → f i < n)
   → (∀ i j, i < n → j < n → f i = f j → i = j)
   → ∀ i, i < n
-  → ∃ j, j < n ∧ f j = i.
+  → ∀ j, j = fun_find' f n i
+  → j < n ∧ f j = i.
+Proof.
+intros * Hp1 Hp2 * Hin * Hj.
+subst j.
+unfold fun_find'.
+remember (pigeonhole_fun _ _) as xx eqn:Hxx.
+symmetry in Hxx.
+destruct xx as (x, x').
+specialize pigeonhole as H1.
+specialize (H1 (S n) n).
+specialize (H1 (λ j, if Nat.eq_dec j n then i else f j)).
+specialize (H1 (Nat.lt_succ_diag_r n)).
+cbn in H1.
+assert (H : ∀ j, j < S n → (if Nat.eq_dec j n then i else f j) < n). {
+  intros j Hj.
+  destruct (Nat.eq_dec j n) as [Hjn| Hjn]; [ now subst j | ].
+  apply Hp1; flia Hj Hjn.
+}
+specialize (H1 H x x' Hxx); clear H.
+destruct H1 as (Hxn & Hx'n & Hxx' & H1).
+destruct (Nat.eq_dec x n) as [H2| H2]. {
+  subst x.
+  destruct (Nat.eq_dec x' n) as [H2| H2]; [ now subst x' | ].
+  split; [ flia Hx'n H2 | easy ].
+} {
+  destruct (Nat.eq_dec x' n) as [H3| H3]. {
+    split; [ flia Hxn H2 | easy ].
+  }
+  apply Hp2 in H1; [ easy | flia Hxn H2 | flia Hx'n H3 ].
+}
+Qed.
+
+Theorem glop'' : ∀ f n,
+  (∀ i, i < n → f i < n)
+  → (∀ i j, i < n → j < n → f i = f j → i = j)
+  → ∀ i, i < n
+  → f (fun_find' f n i) = i.
 Proof.
 intros * Hp1 Hp2 * Hin.
+apply (proj2 (glop f Hp1 Hp2 Hin eq_refl)).
 ...
 
-Theorem glop : ∀ f n,
-  (∀ i, i < n → f i < n)
-  → (∀ i j, i < n → j < n → f i = f j → i = j)
-  → ∀ i, i < n
-  → f (fun_find f n i) = i.
-Proof.
+enough (H : pouet f n i = fun_find f n i) by now rewrite H in H1.
+destruct n; [ easy | cbn ].
+unfold pouet.
+unfold pigeonhole_fun.
+destruct (Nat.eq_dec (f n) i) as [Hfni| Hfni]. {
+  subst i.
+  cbn - [ Nat.eq_dec ].
+  destruct (Nat.eq_dec 1 (S n)) as [H2| H2]. {
+    apply Nat.succ_inj in H2; subst n.
+    destruct (Nat.eq_dec 0 1) as [H| H]; [ easy | clear H ].
+    now apply Nat.lt_1_r in Hin; rewrite Hin.
+  }
+  destruct (Nat.eq_dec 0 (S n)) as [H| H]; [ easy | clear H ].
+  remember (f 1 =? f 0) as b eqn:Hb; symmetry in Hb.
+  destruct b. {
+    apply Nat.eqb_eq in Hb.
+    apply Hp2 in Hb; [ easy | flia H2 | flia ].
+  }
+...
+specialize (glop f Hp1 Hp2 Hin (pouet f n i)) as H1.
+...
 intros * Hp1 Hp2 * Hin.
 destruct n; [ easy | cbn ].
 destruct (Nat.eq_dec (f n) i) as [Hfi0| Hfi0]; [ easy | ].
