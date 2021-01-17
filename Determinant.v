@@ -1749,6 +1749,15 @@ apply IHk with (n := n); [ easy | easy | | flia Hkn ].
 ...
 *)
 
+Theorem pigeonhole_exist : ∀ a b f,
+  b < a
+  → (∀ x, x < a → f x < b)
+  → ∃ x x', x < a ∧ x' < a ∧ x ≠ x' ∧ f x = f x'.
+Proof.
+intros * Hba Hf.
+(* to be copied from my github coq_euler_prod_form *)
+Admitted.
+
 Theorem glop : ∀ f i n,
   (∀ i, i < n → f i < n)
   → (∀ i j, i < n → j < n → f i = f j → i = j)
@@ -1758,6 +1767,16 @@ Proof.
 intros * Hp1 Hp2 Hin.
 destruct n; [ easy | cbn ].
 destruct (Nat.eq_dec (f n) i) as [Hfi0| Hfi0]; [ easy | ].
+(**)
+specialize (@pigeonhole_exist (S n) n) as H1.
+specialize (H1 (λ j, if lt_dec i j then f j else f (j + 1))).
+specialize (H1 (Nat.lt_succ_diag_r _)).
+cbn in H1.
+assert (∀ j, j < S n → (if lt_dec i j then f j else f (j + 1)) < n). {
+  intros j Hj.
+  destruct (lt_dec i j) as [Hij| Hij]. {
+    specialize (Hp1 _ Hj) as H3.
+...
 specialize (Hp1 0 (Nat.lt_0_succ _)) as H0.
 remember (f 0) as i0 eqn:Hi0; symmetry in Hi0.
 move i0 before i.
