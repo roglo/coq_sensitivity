@@ -1821,7 +1821,19 @@ replace (if Nat.eq_dec _ _ then _ else _) with 0. 2: {
 }
 specialize (proj1 (NoDup_map_iff 0 _ _) Hfd) as H1.
 rewrite seq_length in H1.
-cbn - [ Nat.eq_dec nth ] in H1.
+assert
+  (H2 : ∀ j k,
+   j < S n
+   → k < S n
+   → (if Nat.eq_dec j n then i else f j) = (if Nat.eq_dec k n then i else f k)
+   → j = k). {
+  intros j k Hj Hk.
+  specialize (H1 j k Hj Hk).
+  now do 2 rewrite seq_nth in H1.
+}
+clear H1; rename H2 into H1.
+...
+cbn - [ Nat.eq_dec nth seq ] in H1.
 ...
 apply (NoDup_map_iff 0).
     intros x x' Hx Hx' Hxx.
