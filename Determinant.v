@@ -1774,9 +1774,59 @@ destruct fd as [(x, x')| ]. {
     }
     apply in_seq in H.
     flia Hin' H.
+  }
+  destruct (Nat.eq_dec j' n) as [Hjn'| Hjn']. {
+    subst j' i.
+    apply fun_find_prop; [ easy | ].
+    assert (H : j ∈ seq 0 (S n)). {
+      rewrite Hfd.
+      apply in_app_iff; right.
+      now left.
+    }
+    apply in_seq in H.
+    flia Hjn H.
+  }
+  apply Hinj in Hij; cycle 1. {
+    assert (H : j ∈ seq 0 (S n)). {
+      rewrite Hfd.
+      apply in_app_iff; right.
+      now left.
+    }
+    apply in_seq in H.
+    flia Hjn H.
   } {
-    destruct (Nat.eq_dec j' n) as [Hjn'| Hjn']. {
-      subst j'.
+    assert (H : j' ∈ seq 0 (S n)). {
+      rewrite Hfd.
+      apply in_app_iff; right; right.
+      now apply in_app_iff; right; left.
+    }
+    apply in_seq in H.
+    flia Hjn' H.
+  }
+  subst j'.
+  exfalso.
+  specialize (seq_NoDup (S n) 0) as H1.
+  rewrite Hfd in H1.
+  apply NoDup_app_remove_l in H1.
+  rewrite app_comm_cons in H1.
+  specialize (proj1 (NoDup_app_iff _ _) H1) as (_ & _ & H2).
+  specialize (H2 j (or_introl eq_refl)).
+  apply H2.
+  now left.
+}
+injection Hxx; clear Hxx; intros; subst j j'.
+apply find_dup_none in Hfd.
+replace (if Nat.eq_dec _ _ then _ else _) with 0. 2: {
+  now destruct (Nat.eq_dec 0 n).
+}
+specialize (proj1 (NoDup_map_iff 0 _ _) Hfd) as H1.
+rewrite seq_length in H1.
+cbn - [ Nat.eq_dec nth ] in H1.
+...
+apply (NoDup_map_iff 0).
+    intros x x' Hx Hx' Hxx.
+    rewrite seq_length in Hx, Hx', H1.
+    rewrite seq_nth in Hxx; [ | easy ].
 ...
 
 Theorem glop'' : ∀ f n,
