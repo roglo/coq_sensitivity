@@ -1734,12 +1734,13 @@ destruct (Nat.eq_dec x n) as [H2| H2]. {
 }
 Qed.
 
-Theorem pouet : ∀ f n,
-  (∀ i j, i < n → j < n → f i = f j → i = j)
+Theorem fun_find_fun_find' : ∀ f n,
+  (∀ i, i < n → f i < n)
+  → (∀ i j, i < n → j < n → f i = f j → i = j)
   → ∀ i, i < n
   → fun_find f n i = fun_find' f n i.
 Proof.
-intros * Hinj * Hin.
+intros * Hfub Hinj * Hin.
 unfold fun_find'.
 remember (pigeonhole_fun _ _) as xx eqn:Hxx.
 symmetry in Hxx.
@@ -1832,25 +1833,23 @@ assert
   now do 2 rewrite seq_nth in H1.
 }
 clear H1; rename H2 into H1.
-...
-cbn - [ Nat.eq_dec nth seq ] in H1.
-...
-apply (NoDup_map_iff 0).
-    intros x x' Hx Hx' Hxx.
-    rewrite seq_length in Hx, Hx', H1.
-    rewrite seq_nth in Hxx; [ | easy ].
-...
+apply not_NoDup_map_f_seq with (b := n) in Hfd; [ easy | flia | ].
+intros j Hj.
+destruct (Nat.eq_dec j n) as [Hjn| Hjn]; [ easy | ].
+apply Hfub.
+flia Hj Hjn.
+Qed.
 
 Theorem glop'' : ∀ f n,
   (∀ i, i < n → f i < n)
   → (∀ i j, i < n → j < n → f i = f j → i = j)
   → ∀ i, i < n
-  → f (fun_find' f n i) = i.
+  → f (fun_find f n i) = i.
 Proof.
 intros * Hp1 Hp2 * Hin.
+rewrite fun_find_fun_find'; [ | easy | easy | easy ].
 apply (proj2 (glop f Hp1 Hp2 Hin eq_refl)).
 ...
-
 enough (H : pouet f n i = fun_find f n i) by now rewrite H in H1.
 destruct n; [ easy | cbn ].
 unfold pouet.
