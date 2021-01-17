@@ -1769,6 +1769,7 @@ destruct n; [ easy | cbn ].
 destruct (Nat.eq_dec (f n) i) as [Hfi0| Hfi0]; [ easy | ].
 (**)
 specialize (@pigeonhole_exist (S n) n) as H1.
+...
 specialize (H1 (λ j, if lt_dec i j then f j else f (j + 1))).
 specialize (H1 (Nat.lt_succ_diag_r _)).
 cbn in H1.
