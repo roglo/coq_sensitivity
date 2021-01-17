@@ -1659,117 +1659,59 @@ rewrite permut_list_find.
 now apply fun_find_prop.
 Qed.
 
-(*
-Theorem glop : ∀ f i k n,
-  (∀ i, i < n → f i < n)
-  → (∀ i j, i < n → j < n → f i = f j → i = j)
-  → i < n ≤ k
-  → f (fun_find f k i) = i.
+(* the proof that "vect_el σ (vect_el (permut_inv σ) i) = i"
+   should be proven by the pigeonhole principle ; to be verified *)
+
+...
+
+Fixpoint find_dup (la : list (nat * nat)) :=
+  match la with
+  | [] => None
+  | (n, a) :: la' =>
+      match find (λ nb, snd nb =? a) la' with
+      | None => find_dup la'
+      | Some (n', _) => Some (n, n')
+      end
+  end.
+
+Definition pigeonhole_fun a (f : nat → nat) :=
+  match find_dup (map (λ n, (n, f n)) (seq 0 a)) with
+  | Some (n, n') => (n, n')
+  | None => (0, 0)
+  end.
+
+Theorem pigeonhole : ∀ a b f,
+  b < a
+  → (∀ x, x < a → f x < b)
+  → ∀ x x', pigeonhole_fun a f = (x, x')
+  → x < a ∧ x' < a ∧ x ≠ x' ∧ f x = f x'.
 Proof.
-intros * Hfi Hff (Hin, Hnk).
-revert f n Hfi Hff i Hin Hnk.
-induction k; intros; [ flia Hin Hnk | cbn ].
-destruct (Nat.eq_dec (f k) i) as [Hki| Hki]; [ easy | ].
-destruct (Nat.eq_dec n (S k)) as [Hnsk| Hnks]. 2: {
-  apply IHk with (n := n); [ easy | easy | easy | ].
-  flia Hnk Hnks.
-}
-clear Hnk; subst n.
-destruct (Nat.eq_dec (f k) k) as [Hfkk| Hfkk]. {
-  apply IHk with (n := k); [ | | | easy ]. 3: {
-    flia Hin Hki Hfkk.
-  } {
-    intros j Hj.
-    specialize (Hfi j) as H1.
-    assert (H : j < S k) by flia Hj.
-    specialize (H1 H); clear H.
-    destruct (Nat.eq_dec (f j) k) as [Hfjk| Hfjk]. {
-      rewrite <- Hfkk in Hfjk.
-      apply Hff in Hfjk; [ flia Hj Hfjk | flia Hj | flia ].
-    }
-    specialize (Hfi j) as H2.
-    assert (H : j < S k) by flia Hj.
-    specialize (H2 H); clear H.
-    flia Hfjk H2.
-  } {
-    intros m n Hm Hn Hmn.
-    apply Hff; [ flia Hm | flia Hn | easy ].
-  }
-}
-destruct (Nat.eq_dec i k) as [Hik| Hik]. {
-  subst i; clear Hin Hki.
-  clear IHk.
+intros * Hba Hf * Hpf.
+(* to be copied from my github coq_euler_prod_form *)
+Admitted.
 ...
-  clear - Hfi Hfkk.
-  induction k. {
-    specialize (Hfi 0 Nat.lt_0_1) as H1.
-    flia Hfkk H1.
-  }
-  cbn.
-  destruct (Nat.eq_dec (f k) (S k)) as [Hfksk| Hfksk]; [ easy | ].
-...
-apply IHk with (n := k); try easy.
-...
-  eapply lt_le_trans; [ apply Hin | ].
-  apply -> Nat.succ_le_mono.
-  specialize (
-...
-specialize (Hfi k (Nat.lt_succ_diag_r _)) as H1.
-...
-destruct (Nat.eq_dec i k) as [Hik| Hik]. 2: {
-  apply IHk with (n := k); [ | | flia Hik Hin | easy ]. {
-    intros j Hj.
-...
-    destruct j. {
-      destruct k; [ easy | ].
-      clear Hj.
-apply IHk with (
-...
-destruct n; [ flia Hik | ].
-apply Nat.succ_le_mono in Hkn.
-destruct i. {
-  clear IHk.
-  clear Hik.
-  revert n Hfi Hff Hkn.
-  induction k; intros. {
-    exfalso.
-    apply Nat.le_0_r in Hkn; subst n.
-    specialize (Hfi 0 Nat.lt_0_1).
-    flia Hfi Hki.
-  }
-  cbn.
-  destruct (Nat.eq_dec (f k) 0) as [H1| H1]; [ easy | ].
-  destruct n. {
-apply IHk with (n := n).
-destruct i. {
-  destruct k. {
-    cbn.
-...
-apply IHk with (n := n); [ easy | easy | | flia Hkn ].
-...
-*)
 
 (*
 ∀ x x', x < a → x' < a → x ≠ x' → f x ≠ f x'
 ∃ x x', x < a ∧ x' < a ∧ x ≠ x' ∧ f x = f x'.
 *)
 
-Theorem pigeonhole_exist : ∀ a b f,
-  b < a
-  → (∀ x, x < a → f x < b)
-  → ∃ x x', x < a ∧ x' < a ∧ x ≠ x' ∧ f x = f x'.
-Proof.
-intros * Hba Hf.
-(* to be copied from my github coq_euler_prod_form *)
-Admitted.
-
-Theorem glop : ∀ f i n,
+Theorem glop : ∀ f n,
   (∀ i, i < n → f i < n)
   → (∀ i j, i < n → j < n → f i = f j → i = j)
-  → i < n
+  → ∀ i, i < n
+  → ∃ j, j < n ∧ f j = i.
+Proof.
+intros * Hp1 Hp2 * Hin.
+...
+
+Theorem glop : ∀ f n,
+  (∀ i, i < n → f i < n)
+  → (∀ i j, i < n → j < n → f i = f j → i = j)
+  → ∀ i, i < n
   → f (fun_find f n i) = i.
 Proof.
-intros * Hp1 Hp2 Hin.
+intros * Hp1 Hp2 * Hin.
 destruct n; [ easy | cbn ].
 destruct (Nat.eq_dec (f n) i) as [Hfi0| Hfi0]; [ easy | ].
 (**)
