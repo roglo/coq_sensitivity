@@ -8,60 +8,60 @@ Require Import Utf8 Arith.
 Import List List.ListNotations.
 Require Import Misc.
 
-Fixpoint find_dup (la : list (nat * nat)) :=
+Fixpoint find_dup f (la : list nat) :=
   match la with
   | [] => None
-  | (n, a) :: la' =>
-      match find (λ nb, snd nb =? a) la' with
-      | None => find_dup la'
-      | Some (n', _) => Some (n, n')
+  | n :: la' =>
+      match find (λ n', f n' =? f n) la' with
+      | None => find_dup f la'
+      | Some n' => Some (n, n')
       end
   end.
 
 Definition pigeonhole_fun a (f : nat → nat) :=
-  match find_dup (List.map (λ n, (n, f n)) (seq 0 a)) with
+  match find_dup f (seq 0 a) with
   | Some (n, n') => (n, n')
   | None => (0, 0)
   end.
 
-Theorem find_dup_some : ∀ x x' la,
-  find_dup la = Some (x, x')
-  → ∃ y la1 la2 la3,
-     la = la1 ++ (x, y) :: la2 ++ (x', y) :: la3.
+Theorem find_dup_some : ∀ f x x' la,
+  find_dup f la = Some (x, x')
+  → f x = f x' ∧
+     ∃ la1 la2 la3, la = la1 ++ x :: la2 ++ x' :: la3.
 Proof.
 intros * Hfd.
 induction la as [| a]; [ easy | ].
 cbn in Hfd.
-destruct a as (n, a).
-remember (find (λ nb, snd nb =? a) la) as r eqn:Hr.
+remember (find (λ x', f x' =? f a) la) as r eqn:Hr.
 symmetry in Hr.
-destruct r as [(n', b)| ]. {
-  injection Hfd; clear Hfd; intros; subst n n'.
-  exists b, []; cbn.
+destruct r as [n'| ]. {
+  injection Hfd; clear Hfd; intros; subst x x'.
   apply find_some in Hr; cbn in Hr.
   destruct Hr as (Hx'la, Hba).
-  apply Nat.eqb_eq in Hba; subst b.
+  apply Nat.eqb_eq in Hba.
+  split; [ easy | ].
+  exists []; cbn.
   apply in_split in Hx'la.
   destruct Hx'la as (l1 & l2 & Hll).
   exists l1, l2.
   now rewrite Hll.
 } {
   specialize (IHla Hfd).
-  destruct IHla as (y & la1 & la2 & la3 & Hll).
-  now exists y, ((n, a) :: la1), la2, la3; rewrite Hll.
+  destruct IHla as (H & la1 & la2 & la3 & Hll).
+  split; [ easy | ].
+  now exists (a :: la1), la2, la3; rewrite Hll.
 }
 Qed.
 
-Theorem find_dup_none : ∀ la,
-  find_dup la = None → NoDup (map snd la).
+Theorem find_dup_none : ∀ f la,
+  find_dup f la = None → NoDup (map f la).
 Proof.
 intros * Hnd.
 induction la as [| a]; [ constructor | cbn ].
 constructor. {
   cbn in Hnd.
-  destruct a as (n, a).
   remember (find _ _) as b eqn:Hb; symmetry in Hb.
-  destruct b; [ now destruct p | ].
+  destruct b; [ easy | ].
   specialize (find_none _ _ Hb) as H1; cbn in H1; cbn.
   intros Ha.
   specialize (IHla Hnd).
@@ -70,7 +70,6 @@ constructor. {
   cbn in Ha.
   cbn in IHla.
   destruct Ha as [Ha| Ha]. {
-    subst a.
     specialize (H1 b (or_introl eq_refl)).
     now apply Nat.eqb_neq in H1.
   } {
@@ -84,9 +83,8 @@ constructor. {
 } {
   apply IHla.
   cbn in Hnd.
-  destruct a as (n, a).
   remember (find _ _) as b eqn:Hb; symmetry in Hb.
-  destruct b; [ now destruct p | easy ].
+  now destruct b.
 }
 Qed.
 
@@ -98,40 +96,28 @@ Theorem pigeonhole : ∀ a b f,
 Proof.
 intros * Hba Hf * Hpf.
 unfold pigeonhole_fun in Hpf.
-remember (find_dup _) as fd eqn:Hfd.
+remember (find_dup _ _) as fd eqn:Hfd.
 symmetry in Hfd.
 destruct fd as [(n, n') |]. {
   injection Hpf; clear Hpf; intros; subst n n'.
-  specialize (find_dup_some _ _ _ Hfd) as (y & la1 & la2 & la3 & Hll).
-  assert (Hxy : (x, y) ∈ map (λ n, (n, f n)) (seq 0 a)). {
+  specialize (find_dup_some f _ _ _ Hfd) as (Hfxx & la1 & la2 & la3 & Hll).
+  assert (Hxy : x ∈ seq 0 a). {
     rewrite Hll.
     apply in_app_iff.
     now right; left.
   }
-  apply in_map_iff in Hxy.
-  destruct Hxy as (z & Hxy & Hz).
-  injection Hxy; clear Hxy; intros; subst z y.
-  assert (Hxy : (x', f x) ∈ map (λ n, (n, f n)) (seq 0 a)). {
+  apply in_seq in Hxy; cbn in Hxy.
+  destruct Hxy as (_, Hxa).
+  assert (Hx' : x' ∈ seq 0 a). {
     rewrite Hll.
-    apply in_app_iff.
-    right; right.
-    apply in_app_iff.
-    now right; left.
+    apply in_app_iff; right; right.
+    now apply in_app_iff; right; left.
   }
-  apply in_map_iff in Hxy.
-  destruct Hxy as (z & Hxy & Hz').
-  injection Hxy; clear Hxy; intros Hff H1; subst z.
-  apply in_seq in Hz.
-  apply in_seq in Hz'.
+  apply in_seq in Hx'.
   split; [ easy | ].
   split; [ easy | ].
   split; [ | easy ].
-  clear - Hll.
-  assert (H : NoDup (map (λ n, (n, f n)) (seq 0 a))). {
-    apply FinFun.Injective_map_NoDup; [ | apply seq_NoDup ].
-    intros b c Hbc.
-    now injection Hbc.
-  }
+  specialize (seq_NoDup a 0) as H.
   rewrite Hll in H.
   apply NoDup_remove_2 in H.
   intros Hxx; apply H; subst x'.
@@ -139,8 +125,6 @@ destruct fd as [(n, n') |]. {
   now apply in_app_iff; right; left.
 } {
   apply find_dup_none in Hfd.
-  rewrite map_map in Hfd.
-  cbn in Hfd.
   exfalso; clear x x' Hpf.
   revert a f Hba Hf Hfd.
   induction b; intros; [ now specialize (Hf _ Hba) | ].

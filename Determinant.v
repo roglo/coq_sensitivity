@@ -1734,30 +1734,49 @@ destruct (Nat.eq_dec x n) as [H2| H2]. {
 }
 Qed.
 
-Theorem pouet : ∀ f n i, i < n → fun_find f n i = fun_find' f n i.
+Theorem pouet : ∀ f n,
+  (∀ i j, i < n → j < n → f i = f j → i = j)
+  → ∀ i, i < n
+  → fun_find f n i = fun_find' f n i.
 Proof.
-intros * Hin.
+intros * Hinj * Hin.
 unfold fun_find'.
 remember (pigeonhole_fun _ _) as xx eqn:Hxx.
 symmetry in Hxx.
 destruct xx as (j, j').
 unfold pigeonhole_fun in Hxx.
-remember (find_dup _) as fd eqn:Hfd.
+remember (find_dup _ _) as fd eqn:Hfd.
 symmetry in Hfd.
 destruct fd as [(x, x')| ]. {
   injection Hxx; clear Hxx; intros; subst x x'.
   apply find_dup_some in Hfd.
-  destruct Hfd as (y & la1 & la2 & la3 & Hfd).
-...
-
-destruct (Nat.eq_dec j n) as [Hjn| Hjn]. {
-  subst j.
-  rename j' into j.
-  revert f i j Hin Hxx.
-  induction n; intros; [ easy | cbn ].
-  destruct (Nat.eq_dec (f n) i) as [Hfni| Hfni]. {
+  destruct Hfd as (Hij & la1 & la2 & la3 & Hfd).
+  destruct (Nat.eq_dec j n) as [Hjn| Hjn]. {
+    subst j.
+    destruct (Nat.eq_dec j' n) as [Hin'| Hin']. {
+      subst j'; clear Hij.
+      exfalso.
+      specialize (seq_NoDup (S n) 0) as H1.
+      rewrite Hfd in H1.
+      apply NoDup_app_remove_l in H1.
+      rewrite app_comm_cons in H1.
+      specialize (proj1 (NoDup_app_iff _ _) H1) as (_ & _ & H2).
+      specialize (H2 n (or_introl eq_refl)).
+      apply H2.
+      now left.
+    }
     subst i.
-Print pigeonhole_fun.
+    apply fun_find_prop; [ easy | ].
+    assert (H : j' ∈ seq 0 (S n)). {
+      rewrite Hfd.
+      apply in_app_iff; right; right.
+      now apply in_app_iff; right; left.
+    }
+    apply in_seq in H.
+    flia Hin' H.
+  } {
+    destruct (Nat.eq_dec j' n) as [Hjn'| Hjn']. {
+      subst j'.
 ...
 
 Theorem glop'' : ∀ f n,
