@@ -6,6 +6,7 @@ Import List List.ListNotations.
 
 Require Import Misc RingLike Matrix.
 Require Import RLsummation RLproduct.
+Require Import Pigeonhole.
 Import matrix_Notations.
 
 Section a.
@@ -1660,8 +1661,9 @@ now apply fun_find_prop.
 Qed.
 
 (* the proof that "vect_el σ (vect_el (permut_inv σ) i) = i"
-   should be proven by the pigeonhole principle ; to be verified *)
+   is proven by the pigeonhole principle *)
 
+(*
 Fixpoint find_dup (la : list (nat * nat)) :=
   match la with
   | [] => None
@@ -1687,6 +1689,7 @@ Proof.
 intros * Hba Hf * Hpf.
 (* to be copied from my github coq_euler_prod_form *)
 Admitted.
+*)
 
 Definition fun_find' f n i :=
   let '(x, x') :=

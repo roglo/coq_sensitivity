@@ -1,5 +1,5 @@
-Determinant.vio: Determinant.v Misc.vio RingLike.vio Matrix.vio RLsummation.vio RLproduct.vio
-Determinant.vo Determinant.glob Determinant.v.beautified Determinant.required_vo: Determinant.v Misc.vo RingLike.vo Matrix.vo RLsummation.vo RLproduct.vo
+Determinant.vio: Determinant.v Misc.vio RingLike.vio Matrix.vio RLsummation.vio RLproduct.vio Pigeonhole.vio
+Determinant.vo Determinant.glob Determinant.v.beautified Determinant.required_vo: Determinant.v Misc.vo RingLike.vo Matrix.vo RLsummation.vo RLproduct.vo Pigeonhole.vo
 FermatLittle.vio: FermatLittle.v Misc.vio
 FermatLittle.vo FermatLittle.glob FermatLittle.v.beautified FermatLittle.required_vo: FermatLittle.v Misc.vo
 GQ.vio: GQ.v Misc.vio PQ.vio Nat_ggcd.vio
@@ -18,6 +18,8 @@ Nrl.vio: Nrl.v Misc.vio RingLike.vio FermatLittle.vio
 Nrl.vo Nrl.glob Nrl.v.beautified Nrl.required_vo: Nrl.v Misc.vo RingLike.vo FermatLittle.vo
 PQ.vio: PQ.v Misc.vio Nat_ggcd.vio
 PQ.vo PQ.glob PQ.v.beautified PQ.required_vo: PQ.v Misc.vo Nat_ggcd.vo
+Pigeonhole.vio: Pigeonhole.v Misc.vio
+Pigeonhole.vo Pigeonhole.glob Pigeonhole.v.beautified Pigeonhole.required_vo: Pigeonhole.v Misc.vo
 Qrl.vio: Qrl.v RingLike.vio Rational.vio
 Qrl.vo Qrl.glob Qrl.v.beautified Qrl.required_vo: Qrl.v RingLike.vo Rational.vo
 RLproduct.vio: RLproduct.v Misc.vio RingLike.vio
