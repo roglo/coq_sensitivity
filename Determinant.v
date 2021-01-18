@@ -1775,7 +1775,29 @@ split. {
         apply List_seq_nothing_after_last.
       }
       now injection Hxx; clear Hxx; intros; subst n x'.
-    }
+    } {
+      unfold pigeonhole_fun in Hxx.
+      remember (find_dup _ _) as fd eqn:Hfd; symmetry in Hfd.
+      destruct fd as [(n'', n')| ]. {
+        injection Hxx; clear Hxx; intros; subst x x'.
+        apply find_dup_some in Hfd.
+        destruct Hfd as (Hij & la1 & la2 & la3 & Hfd).
+        destruct (Nat.eq_dec n'' n) as [Hn''n| Hn''n]; [ now subst n'' | ].
+        destruct (Nat.eq_dec n' n) as [Hn'n| Hn'n]. {
+          subst n'.
+          now apply List_sorted_in_seq in Hfd.
+        }
+        assert (H : n' ∈ seq 0 (S n)). {
+          rewrite Hfd.
+          apply in_app_iff; right; right.
+          now apply in_app_iff; right; left.
+        }
+        apply in_seq in H.
+        apply List_sorted_in_seq in Hfd.
+        apply (Nat.lt_le_trans _ n'); [ easy | flia H ].
+      }
+...
+      now injection Hxx; clear Hxx; intros; subst n x'.
 ...
         apply (f_equal (λ l, last l 0)) in Hfd.
         rewrite List_last_seq in Hfd.
