@@ -1624,50 +1624,6 @@ destruct (Nat.eq_dec x n) as [H2| H2]. {
 }
 Qed.
 
-Theorem seq_nothing_after_last : ∀ n n' la1 la2 la3,
-  ¬ seq 0 (S n) = la1 ++ n :: la2 ++ n' :: la3.
-Proof.
-intros * Hs.
-assert (H : n < n'). {
-...
-  assert (H : Sorted.Sorted lt (seq 0 (S n))). {
-    apply Sorted_Sorted_seq.
-  }
-  rewrite Hs in H.
-  rewrite app_comm_cons in H.
-  apply Sorted.Sorted_StronglySorted in H. 2: {
-     intros x y z Hxy Hyz.
-     now transitivity y.
-  }
-  inversion H. 2: {
-...
-apply Sorted_Sorted_app in H.
-destruct H as (_, H).
-cbn in H.
-Search Sorted.Sorted.
-apply Sorted.Sorted_inv in H.
-destruct H as (_, H).
-Search (Sorted.HdRel).
-apply Sorted_HdRel_app in H.
-destruct H as (_, H).
-Search (Sorted.HdRel _ _ (_ :: _)).
-now apply Sorted.HdRel_inv in H.
-
-...
-intros * Hs.
-rewrite List_seq_succ_r in Hs; cbn in Hs.
-revert la3 Hs.
-induction n; intros. {
-  cbn in Hs.
-  apply (f_equal length) in Hs.
-  cbn in Hs.
-  rewrite app_length in Hs; cbn in Hs.
-  rewrite app_length in Hs; cbn in Hs.
-  now do 3 rewrite Nat.add_succ_r in Hs.
-}
-rewrite List_seq_succ_r in Hs.
-...
-
 Theorem fun_find_fun_find' : ∀ f n,
   (∀ i, i < n → f i < n)
   → (∀ i j, i < n → j < n → f i = f j → i = j)
@@ -1691,14 +1647,8 @@ destruct fd as [(x, x')| ]. {
     destruct (Nat.eq_dec j' n) as [Hin'| Hin']. {
       subst j'; clear Hij.
       exfalso.
-      specialize (seq_NoDup (S n) 0) as H1.
-      rewrite Hfd in H1.
-      apply NoDup_app_remove_l in H1.
-      rewrite app_comm_cons in H1.
-      specialize (proj1 (NoDup_app_iff _ _) H1) as (_ & _ & H2).
-      specialize (H2 n (or_introl eq_refl)).
-      apply H2.
-      now left.
+      revert Hfd.
+      apply List_seq_nothing_after_last.
     }
     subst i.
     apply fun_find_prop; [ easy | ].
@@ -1796,23 +1746,6 @@ remember (vect_el σ) as f eqn:Hf.
 now apply f_fun_find.
 Qed.
 
-(*
-Theorem permut_find_ub : ∀ i k n (σ : vector n nat),
-  (∀ i, i < n → vect_el σ i < n)
-  → i < n
-  → n ≤ k
-  → permut_find σ k i < n.
-Proof.
-intros * Hub Hin Hnk.
-rewrite permut_list_find.
-revert i n σ Hub Hin Hnk.
-induction k; intros; [ flia Hin Hnk | cbn ].
-destruct (Nat.eq_dec (vect_el σ k) i) as [Hki| Hki]. {
-Print permut_find.
-Search fun_find.
-...
-*)
-
 Theorem permut_has_invert : ∀ n (σ : vector n nat),
   is_permut σ
   → ∃ σ' : vector n nat,
@@ -1838,10 +1771,11 @@ split. {
         apply find_dup_some in Hfd.
         destruct Hfd as (Hij & la1 & la2 & la3 & Hfd).
         exfalso.
-...
-revert Hfd.
-apply seq_nothing_after_last.
-        clear - Hfd.
+        revert Hfd.
+        apply List_seq_nothing_after_last.
+      }
+      now injection Hxx; clear Hxx; intros; subst n x'.
+    }
 ...
         apply (f_equal (λ l, last l 0)) in Hfd.
         rewrite List_last_seq in Hfd.
