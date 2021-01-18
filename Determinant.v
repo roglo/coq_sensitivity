@@ -1746,147 +1746,143 @@ remember (vect_el σ) as f eqn:Hf.
 now apply f_fun_find.
 Qed.
 
-Theorem permut_has_invert : ∀ n (σ : vector n nat),
+Theorem permut_inv_is_permut : ∀ n (σ : vector n nat),
   is_permut σ
-  → ∃ σ' : vector n nat,
-     is_permut σ' ∧ ∀ i, i < n → vect_el σ (vect_el σ' i) = i.
+  → is_permut (permut_inv σ).
 Proof.
 intros * Hperm.
-exists (permut_inv σ).
 destruct Hperm as (Hp1, Hp2).
 split. {
-  split. {
-    intros i Hin; cbn.
-    rewrite permut_list_find.
-    rewrite fun_find_fun_find'; [ | easy | easy | easy ].
-    unfold fun_find'.
-    remember (pigeonhole_fun _ _) as xx eqn:Hxx.
-    symmetry in Hxx; destruct xx as (x, x').
-    destruct (Nat.eq_dec x n) as [Hxn| Hxn]. {
-      subst x.
-      unfold pigeonhole_fun in Hxx.
-      remember (find_dup _ _) as fd eqn:Hfd; symmetry in Hfd.
-      destruct fd as [(x, n')| ]. {
-        injection Hxx; clear Hxx; intros; subst x x'.
-        apply find_dup_some in Hfd.
-        destruct Hfd as (Hij & la1 & la2 & la3 & Hfd).
-        exfalso.
-        revert Hfd.
-        apply List_seq_nothing_after_last.
-      }
-      now injection Hxx; clear Hxx; intros; subst n x'.
-    } {
-      unfold pigeonhole_fun in Hxx.
-      remember (find_dup _ _) as fd eqn:Hfd; symmetry in Hfd.
-      destruct fd as [(n'', n')| ]. {
-        injection Hxx; clear Hxx; intros; subst x x'.
-        apply find_dup_some in Hfd.
-        destruct Hfd as (Hij & la1 & la2 & la3 & Hfd).
-        destruct (Nat.eq_dec n'' n) as [Hn''n| Hn''n]; [ now subst n'' | ].
-        destruct (Nat.eq_dec n' n) as [Hn'n| Hn'n]. {
-          subst n'.
-          now apply List_sorted_in_seq in Hfd.
-        }
-        assert (H : n' ∈ seq 0 (S n)). {
-          rewrite Hfd.
-          apply in_app_iff; right; right.
-          now apply in_app_iff; right; left.
-        }
-        apply in_seq in H.
-        apply List_sorted_in_seq in Hfd.
-        apply (Nat.lt_le_trans _ n'); [ easy | flia H ].
-      }
-      injection Hxx; clear Hxx; intros; subst x x'.
-      flia Hin.
-    }
-  }
-  intros i j Hi Hj Hij.
-  cbn in Hij.
-  do 2 rewrite permut_list_find in Hij.
-  rewrite fun_find_fun_find' in Hij; [ | easy | easy | easy ].
-  rewrite fun_find_fun_find' in Hij; [ | easy | easy | easy ].
-  unfold fun_find' in Hij.
-  remember (pigeonhole_fun _ _) as xx eqn:Hxx in Hij.
-  remember (pigeonhole_fun _ _) as yy eqn:Hyy in Hij.
+  intros i Hin; cbn.
+  rewrite permut_list_find.
+  rewrite fun_find_fun_find'; [ | easy | easy | easy ].
+  unfold fun_find'.
+  remember (pigeonhole_fun _ _) as xx eqn:Hxx.
   symmetry in Hxx; destruct xx as (x, x').
-  symmetry in Hyy; destruct yy as (y, y').
-  move y before x; move y' before x'.
-  unfold pigeonhole_fun in Hxx, Hyy.
-  remember (find_dup _ _) as fdi eqn:Hfdi in Hxx.
-  remember (find_dup _ _) as fdj eqn:Hfdj in Hyy.
-  symmetry in Hfdi, Hfdj.
-  move fdj before fdi.
-  move Hfdj before Hfdi.
-  destruct fdi as [(x1, x2)| ]. {
-    injection Hxx; clear Hxx; intros; subst x1 x2.
-    apply find_dup_some in Hfdi.
-    destruct Hfdi as (Hij1 & la1 & la2 & la3 & Hfdi).
-    destruct (Nat.eq_dec x n) as [Hxn| Hxn]. {
-      subst x.
-      now apply List_seq_nothing_after_last in Hfdi.
+  destruct (Nat.eq_dec x n) as [Hxn| Hxn]. {
+    subst x.
+    unfold pigeonhole_fun in Hxx.
+    remember (find_dup _ _) as fd eqn:Hfd; symmetry in Hfd.
+    destruct fd as [(x, n')| ]. {
+      injection Hxx; clear Hxx; intros; subst x x'.
+      apply find_dup_some in Hfd.
+      destruct Hfd as (Hij & la1 & la2 & la3 & Hfd).
+      exfalso.
+      revert Hfd.
+      apply List_seq_nothing_after_last.
     }
-    destruct fdj as [(x1, x2)| ]. {
-      injection Hyy; clear Hyy; intros; subst x1 x2.
-      apply find_dup_some in Hfdj.
-      destruct Hfdj as (Hij2 & lb1 & lb2 & lb3 & Hfdj).
-      destruct (Nat.eq_dec y n) as [Hyn| Hyn]; subst y. {
-        now apply List_seq_nothing_after_last in Hfdj.
+    now injection Hxx; clear Hxx; intros; subst n x'.
+  } {
+    unfold pigeonhole_fun in Hxx.
+    remember (find_dup _ _) as fd eqn:Hfd; symmetry in Hfd.
+    destruct fd as [(n'', n')| ]. {
+      injection Hxx; clear Hxx; intros; subst x x'.
+      apply find_dup_some in Hfd.
+      destruct Hfd as (Hij & la1 & la2 & la3 & Hfd).
+      destruct (Nat.eq_dec n'' n) as [Hn''n| Hn''n]; [ now subst n'' | ].
+      destruct (Nat.eq_dec n' n) as [Hn'n| Hn'n]. {
+        subst n'.
+        now apply List_sorted_in_seq in Hfd.
       }
-      clear Hyn.
-      destruct (Nat.eq_dec x' n) as [Hx'n| Hx'n]. {
-        subst x'.
-        destruct (Nat.eq_dec y' n) as [Hy'n| Hy'n]; [ congruence | ].
-        apply Hp2 in Hij2; cycle 1. {
-          assert (H : x ∈ seq 0 (S n)). {
-            rewrite Hfdi.
-            now apply in_app_iff; right; left.
-          }
-          apply in_seq in H; cbn in H; flia Hxn H.
-        } {
-          assert (H : y' ∈ seq 0 (S n)). {
-            rewrite Hfdj.
-            apply in_app_iff; right; right.
-            now apply in_app_iff; right; left.
-          }
-          apply in_seq in H; cbn in H; flia Hy'n H.
-        }
-        subst y'.
-        apply List_sorted_in_seq in Hfdj.
-        now apply Nat.lt_irrefl in Hfdj.
+      assert (H : n' ∈ seq 0 (S n)). {
+        rewrite Hfd.
+        apply in_app_iff; right; right.
+        now apply in_app_iff; right; left.
       }
-      apply Hp2 in Hij1; cycle 1. {
+      apply in_seq in H.
+      apply List_sorted_in_seq in Hfd.
+      apply (Nat.lt_le_trans _ n'); [ easy | flia H ].
+    }
+    injection Hxx; clear Hxx; intros; subst x x'.
+    flia Hin.
+  }
+}
+intros i j Hi Hj Hij.
+cbn in Hij.
+do 2 rewrite permut_list_find in Hij.
+rewrite fun_find_fun_find' in Hij; [ | easy | easy | easy ].
+rewrite fun_find_fun_find' in Hij; [ | easy | easy | easy ].
+unfold fun_find' in Hij.
+remember (pigeonhole_fun _ _) as xx eqn:Hxx in Hij.
+remember (pigeonhole_fun _ _) as yy eqn:Hyy in Hij.
+symmetry in Hxx; destruct xx as (x, x').
+symmetry in Hyy; destruct yy as (y, y').
+move y before x; move y' before x'.
+unfold pigeonhole_fun in Hxx, Hyy.
+remember (find_dup _ _) as fdi eqn:Hfdi in Hxx.
+remember (find_dup _ _) as fdj eqn:Hfdj in Hyy.
+symmetry in Hfdi, Hfdj.
+move fdj before fdi.
+move Hfdj before Hfdi.
+destruct fdi as [(x1, x2)| ]. {
+  injection Hxx; clear Hxx; intros; subst x1 x2.
+  apply find_dup_some in Hfdi.
+  destruct Hfdi as (Hij1 & la1 & la2 & la3 & Hfdi).
+  destruct (Nat.eq_dec x n) as [Hxn| Hxn]. {
+    subst x.
+    now apply List_seq_nothing_after_last in Hfdi.
+  }
+  destruct fdj as [(x1, x2)| ]. {
+    injection Hyy; clear Hyy; intros; subst x1 x2.
+    apply find_dup_some in Hfdj.
+    destruct Hfdj as (Hij2 & lb1 & lb2 & lb3 & Hfdj).
+    destruct (Nat.eq_dec y n) as [Hyn| Hyn]; subst y. {
+      now apply List_seq_nothing_after_last in Hfdj.
+    }
+    clear Hyn.
+    destruct (Nat.eq_dec x' n) as [Hx'n| Hx'n]. {
+      subst x'.
+      destruct (Nat.eq_dec y' n) as [Hy'n| Hy'n]; [ congruence | ].
+      apply Hp2 in Hij2; cycle 1. {
         assert (H : x ∈ seq 0 (S n)). {
           rewrite Hfdi.
           now apply in_app_iff; right; left.
         }
         apply in_seq in H; cbn in H; flia Hxn H.
       } {
-        assert (H : x' ∈ seq 0 (S n)). {
-          rewrite Hfdi.
+        assert (H : y' ∈ seq 0 (S n)). {
+          rewrite Hfdj.
           apply in_app_iff; right; right.
           now apply in_app_iff; right; left.
         }
-        apply in_seq in H; cbn in H; flia Hx'n H.
+        apply in_seq in H; cbn in H; flia Hy'n H.
       }
-      subst x'.
-      apply List_sorted_in_seq in Hfdi.
-      now apply Nat.lt_irrefl in Hfdi.
+      subst y'.
+      apply List_sorted_in_seq in Hfdj.
+      now apply Nat.lt_irrefl in Hfdj.
     }
-    apply find_dup_none in Hfdj.
-    exfalso; revert Hfdj.
-    apply not_NoDup_map_f_seq with (b := n); [ flia | ].
-    intros k Hk.
-    destruct (Nat.eq_dec k n) as [Hkn| Hkn]; [ easy | ].
-    apply Hp1; flia Hk Hkn.
+    apply Hp2 in Hij1; cycle 1. {
+      assert (H : x ∈ seq 0 (S n)). {
+        rewrite Hfdi.
+        now apply in_app_iff; right; left.
+      }
+      apply in_seq in H; cbn in H; flia Hxn H.
+    } {
+      assert (H : x' ∈ seq 0 (S n)). {
+        rewrite Hfdi.
+        apply in_app_iff; right; right.
+        now apply in_app_iff; right; left.
+      }
+      apply in_seq in H; cbn in H; flia Hx'n H.
+    }
+    subst x'.
+    apply List_sorted_in_seq in Hfdi.
+    now apply Nat.lt_irrefl in Hfdi.
   }
-  apply find_dup_none in Hfdi.
-  exfalso; revert Hfdi.
+  apply find_dup_none in Hfdj.
+  exfalso; revert Hfdj.
   apply not_NoDup_map_f_seq with (b := n); [ flia | ].
   intros k Hk.
   destruct (Nat.eq_dec k n) as [Hkn| Hkn]; [ easy | ].
   apply Hp1; flia Hk Hkn.
 }
-...
+apply find_dup_none in Hfdi.
+exfalso; revert Hfdi.
+apply not_NoDup_map_f_seq with (b := n); [ flia | ].
+intros k Hk.
+destruct (Nat.eq_dec k n) as [Hkn| Hkn]; [ easy | ].
+apply Hp1; flia Hk Hkn.
+Qed.
 
 Theorem signature_comp :
   rngl_has_opp = true →
@@ -1932,11 +1928,7 @@ assert (Htz : t ≠ 0%F). {
   apply rngl_sub_move_0_r in Hij; [ | easy ].
   apply rngl_of_nat_inj in Hij; [ | easy ].
   destruct Hperm as (Hp1, Hp2).
-  specialize (Hp2 (j - 1) (i - 1)) as H1.
-  assert (H : j - 1 < n) by flia Hj.
-  specialize (H1 H); clear H.
-  assert (H : i - 1 < n) by flia Hi.
-  now specialize (H1 H); clear H.
+  apply Hp2 in Hij; [ flia Hi Hj Hlij Hij | flia Hj | flia Hi ].
 }
 apply rngl_mul_reg_r with (c := (¹/ t)%F); [ now left | | ]. {
   specialize (rngl_mul_inv_l t Htz) as H1.
@@ -1958,11 +1950,7 @@ rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
   apply rngl_sub_move_0_r in Hij; [ | easy ].
   apply rngl_of_nat_inj in Hij; [ | easy ].
   destruct Hperm as (Hp1, Hp2).
-  specialize (Hp2 (j - 1) (i - 1)) as H1.
-  assert (H : j - 1 < n) by flia Hj.
-  specialize (H1 H); clear H.
-  assert (H : i - 1 < n) by flia Hi.
-  now specialize (H1 H); clear H.
+  apply Hp2 in Hij; [ flia Hi Hj Hlij Hij | flia Hj | flia Hi ].
 }
 rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
   intros i Hi Hij.
@@ -1988,11 +1976,7 @@ erewrite rngl_product_eq_compat. 2: {
     apply rngl_sub_move_0_r in Hij; [ | easy ].
     apply rngl_of_nat_inj in Hij; [ | easy ].
     destruct Hperm as (Hp1, Hp2).
-    specialize (Hp2 (j - 1) (i - 1)) as H1.
-    assert (H : j - 1 < n) by flia Hj.
-    specialize (H1 H); clear H.
-    assert (H : i - 1 < n) by flia Hi.
-    now specialize (H1 H); clear H.
+    apply Hp2 in Hij; [ flia Hi Hj Hlij Hij | flia Hj | flia Hi ].
   }
   erewrite <- rngl_product_mul_distr; [ | easy ].
   easy.
