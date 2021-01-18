@@ -2072,6 +2072,7 @@ erewrite rngl_product_list_eq_compat. 2: {
 }
 cbn - [ iter_seq iter_list seq ].
 symmetry.
+...
 eapply rngl_product_list_eq_compat.
 intros i Hi.
 eapply rngl_product_list_eq_compat.
