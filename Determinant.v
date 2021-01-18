@@ -1884,6 +1884,63 @@ destruct (Nat.eq_dec k n) as [Hkn| Hkn]; [ easy | ].
 apply Hp1; flia Hk Hkn.
 Qed.
 
+Theorem δ_shift : ∀ i j u v, δ (i + 1) (j + 1) u v = δ i j u v.
+Proof.
+intros.
+unfold δ.
+destruct (lt_dec i j) as [Hij| Hij]. {
+  destruct (lt_dec (i + 1) (j + 1)) as [Hij1| Hij1]; [ easy | ].
+  flia Hij Hij1.
+} {
+  destruct (lt_dec (i + 1) (j + 1)) as [Hij1| Hij1]; [ | easy ].
+  flia Hij Hij1.
+}
+Qed.
+
+Theorem δ_shift_right : ∀ i j u v, δ i j (u + 1) (v + 1) = δ i j u v.
+Proof.
+intros.
+unfold δ.
+destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
+setoid_rewrite Nat.add_comm; cbn.
+rewrite rngl_add_comm.
+specialize rngl_opt_add_sub as rngl_add_sub.
+remember rngl_has_opp as b eqn:Hop.
+symmetry in Hop.
+destruct b. {
+  unfold rngl_sub.
+  rewrite Hop.
+  rewrite rngl_opp_add_distr; [ | easy ].
+  unfold rngl_sub.
+  rewrite Hop.
+  rewrite rngl_add_assoc.
+  rewrite rngl_add_add_swap.
+  rewrite <- (rngl_add_assoc (rngl_of_nat v)).
+  rewrite fold_rngl_sub; [ | easy ].
+  rewrite fold_rngl_sub; [ | easy ].
+  rewrite fold_rngl_sub; [ | easy ].
+  rewrite rngl_add_opp_r.
+  now rewrite rngl_add_0_r.
+} {
+Search (_ + _ - (_ + _)).
+...
+(* to put as an axiom instead of rngl_opt_add_sub in RingLike.v *)
+Theorem glop : ∀ a b c, (a + c - (b + c) = a - b)%F.
+Proof.
+intros.
+specialize rngl_opt_add_sub as rngl_add_sub.
+remember rngl_has_opp as ho eqn:Hop.
+symmetry in Hop.
+destruct ho. {
+...
+} {
+  rewrite <- (rngl_add_sub c b) at 1.
+Search (_ + (_ - _))%F.
+...
+  rewrite (rngl_add_comm a).
+
+...
+
 Theorem signature_comp :
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -2036,6 +2093,7 @@ erewrite rngl_product_list_eq_compat. 2: {
       rewrite <- Hm.
       now apply Hperm.
     }
+    do 2 rewrite δ_shift.
     easy.
   }
   rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
@@ -2045,6 +2103,26 @@ erewrite rngl_product_list_eq_compat. 2: {
 cbn - [ iter_seq iter_list seq ].
 symmetry.
 rewrite rngl_product_shift; [ | flia Hnz ].
+(**)
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite (Nat.add_comm 1 i), Nat.add_sub.
+  erewrite rngl_product_shift; [ | flia Hnz ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite (Nat.add_comm 1 j), Nat.add_sub.
+    do 2 rewrite δ_shift.
+...
+    easy.
+  }
+  easy.
+}
+cbn - [ iter_seq iter_list seq ].
+symmetry.
+unfold iter_seq.
+rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
+rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
+...
 rewrite rngl_product_change_var with
   (g := vect_el (permut_inv σ₂)) (h := vect_el σ₂). 2: {
   intros i Hi.
