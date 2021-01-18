@@ -1743,32 +1743,21 @@ rewrite (fold_left_op_fun_from_d d); [ | easy | easy | easy ].
 now rewrite Nat.add_succ_comm.
 Qed.
 
-Theorem iter_list_eq_compat : ∀ T d (op : T → T → T) l g h
-  (op_d_l : ∀ x, op d x = x)
-  (op_d_r : ∀ x, op x d = x)
-  (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
-  (∀ i, i < length l → g i = h i)
+Theorem iter_list_eq_compat : ∀ T d (op : T → T → T) l g h,
+  (∀ i, i ∈ l → g i = h i)
   → iter_list l (λ (c : T) (i : nat), op c (g i)) d =
      iter_list l (λ (c : T) (i : nat), op c (h i)) d.
 Proof.
-intros; rename H into Hgh.
+intros * Hgh.
 unfold iter_list.
-induction l as [| a]; [ easy | cbn ].
-rewrite (fold_left_op_fun_from_d d); [ symmetry | easy | easy | easy ].
-rewrite (fold_left_op_fun_from_d d); [ symmetry | easy | easy | easy ].
-rewrite IHl. 2: {
-  intros i Hi.
-...
-
-symmetry in Hlen.
-induction len; intros; [ easy | cbn ].
-rewrite <- Hb; [ | flia ].
-apply List_fold_left_ext_in.
-intros k c Hk.
-apply in_seq in Hk.
-rewrite Hb; [ easy | ].
-flia Hk.
-...
+revert d.
+induction l as [| a]; intros; [ easy | cbn ].
+rewrite Hgh; [ | now left ].
+apply IHl.
+intros i Hi.
+apply Hgh.
+now right.
+Qed.
 
 Theorem iter_seq_eq_compat : ∀ T d (op : T → T → T) b k g h,
   (∀ i, b ≤ i ≤ k → g i = h i)
@@ -1776,23 +1765,11 @@ Theorem iter_seq_eq_compat : ∀ T d (op : T → T → T) b k g h,
     iter_seq b k (λ c i, op c (h i)) d.
 Proof.
 intros * Hgh.
-unfold iter_seq.
-remember (S k - b) as len eqn:Hlen.
-assert (∀ i, b ≤ i < b + len → g i = h i). {
-  intros i Hi.
-  apply Hgh; flia Hlen Hi.
-}
-clear k Hgh Hlen.
-...
-rename H into Hb.
-revert b Hb.
-induction len; intros; [ easy | cbn ].
-rewrite <- Hb; [ | flia ].
-apply List_fold_left_ext_in.
-intros k c Hk.
-apply in_seq in Hk.
-rewrite Hb; [ easy | ].
-flia Hk.
+apply iter_list_eq_compat.
+intros i Hi.
+apply Hgh.
+apply in_seq in Hi.
+flia Hi.
 Qed.
 
 Theorem iter_seq_succ_succ : ∀ {T} (d : T) b k f,

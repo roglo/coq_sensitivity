@@ -27,7 +27,7 @@ Theorem fold_left_rngl_add_fun_from_0 : ∀ a l (f : nat → _),
    a + fold_left (λ c i, c + f i) l 0)%F.
 Proof.
 intros.
-apply iter_seq_op_fun_from_d. {
+apply fold_left_op_fun_from_d. {
   apply rngl_add_0_l.
 } {
   apply rngl_add_0_r.

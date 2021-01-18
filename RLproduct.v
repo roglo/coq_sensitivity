@@ -28,7 +28,7 @@ Theorem fold_left_rngl_mul_fun_from_1 : ∀ a l (f : nat → _),
    a * fold_left (λ c i, c * f i) l 1)%F.
 Proof.
 intros.
-apply iter_seq_op_fun_from_d. {
+apply fold_left_op_fun_from_d. {
   apply rngl_mul_1_l.
 } {
   apply rngl_mul_1_r.
@@ -96,14 +96,11 @@ now apply iter_seq_eq_compat.
 Qed.
 
 Theorem rngl_product_list_eq_compat : ∀ g h l,
-  (∀ i, i < length l → (g i = h i)%F)
+  (∀ i, i ∈ l → (g i = h i)%F)
   → (Π (i ∈ l), g i = Π (i ∈ l), h i)%F.
 Proof.
 intros * Hgh.
-...
-apply iter_list_eq_compat.
-...
-apply iter_seq_eq_compat.
+now apply iter_list_eq_compat.
 Qed.
 
 Theorem rngl_product_succ_succ : ∀ b k g,
@@ -219,7 +216,7 @@ rewrite <- IHlen. 2: {
   intros i Hi.
   apply Hnz; flia Hi.
 }
-rewrite iter_seq_op_fun_from_d with (d := 1%F); cycle 1. {
+rewrite fold_left_op_fun_from_d with (d := 1%F); cycle 1. {
   apply rngl_mul_1_l.
 } {
   apply rngl_mul_1_r.
@@ -227,7 +224,7 @@ rewrite iter_seq_op_fun_from_d with (d := 1%F); cycle 1. {
   apply rngl_mul_assoc.
 }
 symmetry.
-rewrite iter_seq_op_fun_from_d with (d := 1%F); cycle 1. {
+rewrite fold_left_op_fun_from_d with (d := 1%F); cycle 1. {
   apply rngl_mul_1_l.
 } {
   apply rngl_mul_1_r.
