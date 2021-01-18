@@ -1997,19 +1997,14 @@ erewrite rngl_product_eq_compat. 2: {
 }
 symmetry.
 (* changement of variable *)
-Check rngl_product_change_var.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+rewrite rngl_product_shift; [ | flia Hnz ].
 rewrite rngl_product_change_var with
   (g := λ i, vect_el σ₂ i)
   (h := λ i, vect_el (permut_inv σ₂) i). 2: {
   intros i Hi.
-  rewrite permut_permut_inv.
-...
-  rewrite permut_permut_inv; [ easy | ].
-...
-rewrite rngl_product_change_var with
-  (g := vect_el σ₂) (h := vect_el (permut_inv σ₂)). 2: {
-  intros i Hi.
-  apply permut_permut_inv; [ easy | ].
+  rewrite permut_permut_inv; [ easy | easy | flia Hi Hnz ].
+}
 ...
 specialize (permut_has_invert Hperm) as H1.
 destruct H1 as (σ'₂ & Hperm' & Hσ'₂).

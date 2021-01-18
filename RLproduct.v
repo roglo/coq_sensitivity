@@ -127,6 +127,15 @@ apply iter_seq_distr. {
 }
 Qed.
 
+Theorem rngl_product_shift : ∀ b g k,
+  b ≤ k
+  → (Π (i = b, k), g i =
+     Π (i = 0, k - b), g (b + i)%nat)%F.
+Proof.
+intros b g k Hbk.
+now apply iter_shift.
+Qed.
+
 Theorem rngl_product_opt_integral :
   rngl_is_integral = true →
   rngl_has_1_neq_0 = true →
