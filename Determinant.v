@@ -1628,9 +1628,34 @@ Theorem seq_nothing_after_last : ∀ n n' la1 la2 la3,
   ¬ seq 0 (S n) = la1 ++ n :: la2 ++ n' :: la3.
 Proof.
 intros * Hs.
-rewrite List_seq_succ_r in Hs; cbn in Hs.
+assert (H : n < n'). {
+...
+  assert (H : Sorted.Sorted lt (seq 0 (S n))). {
+    apply Sorted_Sorted_seq.
+  }
+  rewrite Hs in H.
+  rewrite app_comm_cons in H.
+  apply Sorted.Sorted_StronglySorted in H. 2: {
+     intros x y z Hxy Hyz.
+     now transitivity y.
+  }
+  inversion H. 2: {
+...
+apply Sorted_Sorted_app in H.
+destruct H as (_, H).
+cbn in H.
+Search Sorted.Sorted.
+apply Sorted.Sorted_inv in H.
+destruct H as (_, H).
+Search (Sorted.HdRel).
+apply Sorted_HdRel_app in H.
+destruct H as (_, H).
+Search (Sorted.HdRel _ _ (_ :: _)).
+now apply Sorted.HdRel_inv in H.
+
 ...
 intros * Hs.
+rewrite List_seq_succ_r in Hs; cbn in Hs.
 revert la3 Hs.
 induction n; intros. {
   cbn in Hs.
