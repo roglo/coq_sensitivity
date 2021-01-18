@@ -1812,6 +1812,36 @@ split. {
   symmetry in Hyy; destruct yy as (y, y').
   move y before x; move y' before x'.
   unfold pigeonhole_fun in Hxx, Hyy.
+  remember (find_dup _ _) as fdi eqn:Hfdi in Hxx.
+  remember (find_dup _ _) as fdj eqn:Hfdj in Hyy.
+  symmetry in Hfdi, Hfdj.
+  move fdj before fdi.
+  move Hfdj before Hfdi.
+  destruct fdi as [(x1, x2)| ]. {
+    injection Hxx; clear Hxx; intros; subst x1 x2.
+    apply find_dup_some in Hfdi.
+    destruct Hfdi as (Hij1 & la1 & la2 & la3 & Hfdi).
+    destruct fdj as [(x1, x2)| ]. {
+      injection Hyy; clear Hyy; intros; subst x1 x2.
+      apply find_dup_some in Hfdj.
+      destruct Hfdj as (Hij2 & lb1 & lb2 & lb3 & Hfdj).
+      destruct (Nat.eq_dec x n) as [Hxn| Hxn]. {
+        subst x.
+        destruct (Nat.eq_dec y n) as [Hyn| Hyn]. {
+          subst y y'.
+          destruct (Nat.eq_dec x' n) as [Hx'n| Hx'n]. {
+            subst x'; clear Hij1 Hij2.
+            apply List_sorted_in_seq in Hfdi.
+            now apply Nat.lt_irrefl in Hfdi.
+          }
+          congruence.
+        }
+        subst x'.
+        destruct (Nat.eq_dec y' n) as [Hy'n| Hy'n]. {
+          subst y'.
+          destruct (Nat.eq_dec y n) as [H| H]; [ easy | clear H ].
+          congruence.
+        }
 ...
   destruct (Nat.eq_dec x n) as [Hxn| Hxn]. {
     subst x.
