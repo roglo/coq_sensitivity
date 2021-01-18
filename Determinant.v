@@ -2007,6 +2007,8 @@ rewrite rngl_product_change_var with
 rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
 ...
+erewrite rngl_product_list_eq_compat. 2: {
+...
 specialize (permut_has_invert Hperm) as H1.
 destruct H1 as (σ'₂ & Hperm' & Hσ'₂).
 rewrite rngl_product_change_var with (g := vect_el σ₂) (h := vect_el σ'₂).

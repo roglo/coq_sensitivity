@@ -95,6 +95,17 @@ intros * Hgh.
 now apply iter_seq_eq_compat.
 Qed.
 
+Theorem rngl_product_list_eq_compat : ∀ g h l,
+  (∀ i, i < length l → (g i = h i)%F)
+  → (Π (i ∈ l), g i = Π (i ∈ l), h i)%F.
+Proof.
+intros * Hgh.
+...
+apply iter_list_eq_compat.
+...
+apply iter_seq_eq_compat.
+Qed.
+
 Theorem rngl_product_succ_succ : ∀ b k g,
   (Π (i = S b, S k), g i = Π (i = b, k), g (S i))%F.
 Proof.

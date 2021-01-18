@@ -1624,7 +1624,7 @@ Qed.
 
 (* common for summations and products *)
 
-Theorem iter_seq_op_fun_from_d : ∀ T d op a l (f : nat → _)
+Theorem fold_left_op_fun_from_d : ∀ T d op a l (f : nat → _)
   (op_d_l : ∀ x, op d x = x)
   (op_d_r : ∀ x, op x d = x)
   (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
@@ -1651,7 +1651,7 @@ unfold iter_seq, iter_list.
 remember (S e - b) as n eqn:Hn.
 revert b Hz Hn.
 induction n; intros; [ easy | cbn ].
-rewrite (iter_seq_op_fun_from_d d); [ | easy | easy | easy ].
+rewrite (fold_left_op_fun_from_d d); [ | easy | easy | easy ].
 rewrite IHn; [ | | flia Hn ]. {
   rewrite Hz; [ | flia Hn ].
   rewrite op_d_l.
@@ -1678,7 +1678,7 @@ clear k Hbk Hlen.
 rename H into Hlen.
 destruct len; [ easy | cbn ].
 rewrite op_d_l, Nat.sub_0_r.
-apply iter_seq_op_fun_from_d. {
+apply fold_left_op_fun_from_d. {
   apply op_d_l.
 } {
   apply op_d_r.
@@ -1734,14 +1734,41 @@ induction len1; intros. {
 destruct len2; [ flia Hll | ].
 apply Nat.succ_le_mono in Hll; cbn.
 rewrite op_d_l.
-rewrite (iter_seq_op_fun_from_d d _ (g b)); [ | easy | easy | easy ].
-rewrite (iter_seq_op_fun_from_d d _ (g b)); [ | easy | easy | easy ].
+rewrite (fold_left_op_fun_from_d d _ (g b)); [ | easy | easy | easy ].
+rewrite (fold_left_op_fun_from_d d _ (g b)); [ | easy | easy | easy ].
 rewrite <- op_assoc; f_equal.
 replace len2 with (len1 + (len2 - len1)) at 1 by flia Hll.
 rewrite seq_app, fold_left_app.
-rewrite (iter_seq_op_fun_from_d d); [ | easy | easy | easy ].
+rewrite (fold_left_op_fun_from_d d); [ | easy | easy | easy ].
 now rewrite Nat.add_succ_comm.
 Qed.
+
+Theorem iter_list_eq_compat : ∀ T d (op : T → T → T) l g h
+  (op_d_l : ∀ x, op d x = x)
+  (op_d_r : ∀ x, op x d = x)
+  (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
+  (∀ i, i < length l → g i = h i)
+  → iter_list l (λ (c : T) (i : nat), op c (g i)) d =
+     iter_list l (λ (c : T) (i : nat), op c (h i)) d.
+Proof.
+intros; rename H into Hgh.
+unfold iter_list.
+induction l as [| a]; [ easy | cbn ].
+rewrite (fold_left_op_fun_from_d d); [ symmetry | easy | easy | easy ].
+rewrite (fold_left_op_fun_from_d d); [ symmetry | easy | easy | easy ].
+rewrite IHl. 2: {
+  intros i Hi.
+...
+
+symmetry in Hlen.
+induction len; intros; [ easy | cbn ].
+rewrite <- Hb; [ | flia ].
+apply List_fold_left_ext_in.
+intros k c Hk.
+apply in_seq in Hk.
+rewrite Hb; [ easy | ].
+flia Hk.
+...
 
 Theorem iter_seq_eq_compat : ∀ T d (op : T → T → T) b k g h,
   (∀ i, b ≤ i ≤ k → g i = h i)
@@ -1756,6 +1783,7 @@ assert (∀ i, b ≤ i < b + len → g i = h i). {
   apply Hgh; flia Hlen Hi.
 }
 clear k Hgh Hlen.
+...
 rename H into Hb.
 revert b Hb.
 induction len; intros; [ easy | cbn ].
