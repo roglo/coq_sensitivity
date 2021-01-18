@@ -2000,11 +2000,12 @@ symmetry.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 rewrite rngl_product_shift; [ | flia Hnz ].
 rewrite rngl_product_change_var with
-  (g := λ i, vect_el σ₂ i)
-  (h := λ i, vect_el (permut_inv σ₂) i). 2: {
+  (g := vect_el (permut_inv σ₂)) (h :=vect_el σ₂). 2: {
   intros i Hi.
-  rewrite permut_permut_inv; [ easy | easy | flia Hi Hnz ].
+  rewrite permut_inv_permut; [ easy | easy | flia Hi Hnz ].
 }
+rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
+rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
 ...
 specialize (permut_has_invert Hperm) as H1.
 destruct H1 as (σ'₂ & Hperm' & Hσ'₂).
