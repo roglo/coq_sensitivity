@@ -1624,6 +1624,25 @@ destruct (Nat.eq_dec x n) as [H2| H2]. {
 }
 Qed.
 
+Theorem seq_nothing_after_last : ∀ n n' la1 la2 la3,
+  ¬ seq 0 (S n) = la1 ++ n :: la2 ++ n' :: la3.
+Proof.
+intros * Hs.
+rewrite List_seq_succ_r in Hs; cbn in Hs.
+...
+intros * Hs.
+revert la3 Hs.
+induction n; intros. {
+  cbn in Hs.
+  apply (f_equal length) in Hs.
+  cbn in Hs.
+  rewrite app_length in Hs; cbn in Hs.
+  rewrite app_length in Hs; cbn in Hs.
+  now do 3 rewrite Nat.add_succ_r in Hs.
+}
+rewrite List_seq_succ_r in Hs.
+...
+
 Theorem fun_find_fun_find' : ∀ f n,
   (∀ i, i < n → f i < n)
   → (∀ i j, i < n → j < n → f i = f j → i = j)
@@ -1752,6 +1771,7 @@ remember (vect_el σ) as f eqn:Hf.
 now apply f_fun_find.
 Qed.
 
+(*
 Theorem permut_find_ub : ∀ i k n (σ : vector n nat),
   (∀ i, i < n → vect_el σ i < n)
   → i < n
@@ -1766,6 +1786,7 @@ destruct (Nat.eq_dec (vect_el σ k) i) as [Hki| Hki]. {
 Print permut_find.
 Search fun_find.
 ...
+*)
 
 Theorem permut_has_invert : ∀ n (σ : vector n nat),
   is_permut σ
@@ -1778,6 +1799,41 @@ destruct Hperm as (Hp1, Hp2).
 split. {
   split. {
     intros i Hin; cbn.
+    rewrite permut_list_find.
+    rewrite fun_find_fun_find'; [ | easy | easy | easy ].
+    unfold fun_find'.
+    remember (pigeonhole_fun _ _) as xx eqn:Hxx.
+    symmetry in Hxx; destruct xx as (x, x').
+    destruct (Nat.eq_dec x n) as [Hxn| Hxn]. {
+      subst x.
+      unfold pigeonhole_fun in Hxx.
+      remember (find_dup _ _) as fd eqn:Hfd; symmetry in Hfd.
+      destruct fd as [(x, n')| ]. {
+        injection Hxx; clear Hxx; intros; subst x x'.
+        apply find_dup_some in Hfd.
+        destruct Hfd as (Hij & la1 & la2 & la3 & Hfd).
+        exfalso.
+...
+revert Hfd.
+apply seq_nothing_after_last.
+        clear - Hfd.
+...
+        apply (f_equal (λ l, last l 0)) in Hfd.
+        rewrite List_last_seq in Hfd.
+        rewrite seq_last in Hfd.
+...
+        apply (f_equal length) in Hfd.
+        rewrite seq_length in Hfd.
+induction n; cbn in Hfd.
+        do 2 rewrite List_app_cons in Hfd.
+...
+        rewrite List_seq_succ_r in Hfd.
+        cbn in Hfd.
+        symmetry in Hfd.
+        do 2 rewrite List_app_cons in Hfd.
+        do 2 rewrite app_assoc in Hfd.
+        apply app_inj_tail in Hfd.
+...
 (**)
 ...
     induction n; [ easy | cbn ].
