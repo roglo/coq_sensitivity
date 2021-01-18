@@ -1796,8 +1796,26 @@ split. {
         apply List_sorted_in_seq in Hfd.
         apply (Nat.lt_le_trans _ n'); [ easy | flia H ].
       }
+      injection Hxx; clear Hxx; intros; subst x x'.
+      flia Hin.
+    }
+  }
+  intros i j Hi Hj Hij.
+  cbn in Hij.
+  do 2 rewrite permut_list_find in Hij.
+  rewrite fun_find_fun_find' in Hij; [ | easy | easy | easy ].
+  rewrite fun_find_fun_find' in Hij; [ | easy | easy | easy ].
+  unfold fun_find' in Hij.
+  remember (pigeonhole_fun _ _) as xx eqn:Hxx in Hij.
+  remember (pigeonhole_fun _ _) as yy eqn:Hyy in Hij.
+  symmetry in Hxx; destruct xx as (x, x').
+  symmetry in Hyy; destruct yy as (y, y').
+  move y before x; move y' before x'.
+  unfold pigeonhole_fun in Hxx, Hyy.
 ...
-      now injection Hxx; clear Hxx; intros; subst n x'.
+  destruct (Nat.eq_dec x n) as [Hxn| Hxn]. {
+    subst x.
+      unfold pigeonhole_fun in Hxx.
 ...
         apply (f_equal (λ l, last l 0)) in Hfd.
         rewrite List_last_seq in Hfd.
