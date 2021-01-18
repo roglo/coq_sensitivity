@@ -1854,6 +1854,68 @@ split. {
         apply List_sorted_in_seq in Hfdj.
         now apply Nat.lt_irrefl in Hfdj.
       }
+      apply Hp2 in Hij1; cycle 1. {
+        assert (H : x ∈ seq 0 (S n)). {
+          rewrite Hfdi.
+          now apply in_app_iff; right; left.
+        }
+        apply in_seq in H; cbn in H; flia Hxn H.
+      } {
+        assert (H : x' ∈ seq 0 (S n)). {
+          rewrite Hfdi.
+          apply in_app_iff; right; right.
+          now apply in_app_iff; right; left.
+        }
+        apply in_seq in H; cbn in H; flia Hx'n H.
+      }
+      subst x'.
+      apply List_sorted_in_seq in Hfdi.
+      now apply Nat.lt_irrefl in Hfdi.
+    }
+    injection Hyy; clear Hyy; intros; subst y y'.
+    assert (H : x = 0) by now destruct (Nat.eq_dec 0 n).
+    clear Hij; subst x.
+    apply find_dup_none in Hfdj.
+    specialize (proj1 (NoDup_map_iff 0 _ _) Hfdj) as H1.
+    rewrite seq_length in H1.
+(**)
+    destruct (Nat.eq_dec x' n) as [Hx'n| Hx'n]. {
+      subst x'.
+...
+(*
+    destruct (Nat.eq_dec x' n) as [Hx'n| Hx'n]. {
+      subst x'.
+*)
+(*
+    apply Hp2; [ easy | easy | ].
+    assert (Hvi : vect_el σ i < S n). {
+      apply Nat.lt_le_incl.
+      apply -> Nat.succ_lt_mono.
+      now apply Hp1.
+    }
+    assert (Hvj : vect_el σ j < S n). {
+      apply Nat.lt_le_incl.
+      apply -> Nat.succ_lt_mono.
+      now apply Hp1.
+    }
+    apply H1; [ easy | easy | ].
+    rewrite seq_nth; [ | easy ].
+    rewrite seq_nth; [ | easy ].
+    cbn - [ Nat.eq_dec ].
+    destruct (Nat.eq_dec (vect_el σ i) n) as [Hin| Hin]. {
+      destruct (Nat.eq_dec (vect_el σ j) n) as [Hjn| Hjn]; [ easy | ].
+*)
+(*
+    apply H1; [ flia Hi | flia Hj | ].
+    rewrite seq_nth; [ | flia Hi ].
+    rewrite seq_nth; [ | flia Hj ].
+    cbn - [ Nat.eq_dec ].
+    destruct (Nat.eq_dec i n) as [H| H]; [ flia Hi H | clear H ].
+    destruct (Nat.eq_dec j n) as [H| H]; [ flia Hj H | clear H ].
+    destruct (Nat.eq_dec x' n) as [Hx'n| Hx'n]. {
+      subst x'.
+*)
+...
       destruct (Nat.eq_dec y' n) as [Hy'n| Hy'n]. {
         subst y'.
         apply Hp2 in Hij1; cycle 1. {
