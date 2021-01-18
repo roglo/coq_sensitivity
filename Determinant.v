@@ -1872,129 +1872,20 @@ split. {
       apply List_sorted_in_seq in Hfdi.
       now apply Nat.lt_irrefl in Hfdi.
     }
-    injection Hyy; clear Hyy; intros; subst y y'.
-    assert (H : x = 0) by now destruct (Nat.eq_dec 0 n).
-    clear Hij; subst x.
     apply find_dup_none in Hfdj.
-    specialize (proj1 (NoDup_map_iff 0 _ _) Hfdj) as H1.
-    rewrite seq_length in H1.
-(**)
-    destruct (Nat.eq_dec x' n) as [Hx'n| Hx'n]. {
-      subst x'.
-...
-(*
-    destruct (Nat.eq_dec x' n) as [Hx'n| Hx'n]. {
-      subst x'.
-*)
-(*
-    apply Hp2; [ easy | easy | ].
-    assert (Hvi : vect_el σ i < S n). {
-      apply Nat.lt_le_incl.
-      apply -> Nat.succ_lt_mono.
-      now apply Hp1.
-    }
-    assert (Hvj : vect_el σ j < S n). {
-      apply Nat.lt_le_incl.
-      apply -> Nat.succ_lt_mono.
-      now apply Hp1.
-    }
-    apply H1; [ easy | easy | ].
-    rewrite seq_nth; [ | easy ].
-    rewrite seq_nth; [ | easy ].
-    cbn - [ Nat.eq_dec ].
-    destruct (Nat.eq_dec (vect_el σ i) n) as [Hin| Hin]. {
-      destruct (Nat.eq_dec (vect_el σ j) n) as [Hjn| Hjn]; [ easy | ].
-*)
-(*
-    apply H1; [ flia Hi | flia Hj | ].
-    rewrite seq_nth; [ | flia Hi ].
-    rewrite seq_nth; [ | flia Hj ].
-    cbn - [ Nat.eq_dec ].
-    destruct (Nat.eq_dec i n) as [H| H]; [ flia Hi H | clear H ].
-    destruct (Nat.eq_dec j n) as [H| H]; [ flia Hj H | clear H ].
-    destruct (Nat.eq_dec x' n) as [Hx'n| Hx'n]. {
-      subst x'.
-*)
-...
-      destruct (Nat.eq_dec y' n) as [Hy'n| Hy'n]. {
-        subst y'.
-        apply Hp2 in Hij1; cycle 1. {
-          assert (H : x ∈ seq 0 (S n)). {
-            rewrite Hfdi.
-            now apply in_app_iff; right; left.
-          }
-          apply in_seq in H; cbn in H; flia Hxn H.
-        } {
-          assert (H : x' ∈ seq 0 (S n)). {
-            rewrite Hfdi.
-            apply in_app_iff; right; right.
-            now apply in_app_iff; right; left.
-          }
-          apply in_seq in H; cbn in H; flia Hx'n H.
-        }
-        subst x'.
-        apply List_sorted_in_seq in Hfdi.
-        now apply Nat.lt_irrefl in Hfdi.
-      }
-...
-      destruct (Nat.eq_dec x n) as [Hxn| Hxn]. {
-        subst x.
-        now apply List_seq_nothing_after_last in Hfdi.
-      }
-...
-  destruct (Nat.eq_dec x n) as [Hxn| Hxn]. {
-    subst x.
-      unfold pigeonhole_fun in Hxx.
-...
-        apply (f_equal (λ l, last l 0)) in Hfd.
-        rewrite List_last_seq in Hfd.
-        rewrite seq_last in Hfd.
-...
-        apply (f_equal length) in Hfd.
-        rewrite seq_length in Hfd.
-induction n; cbn in Hfd.
-        do 2 rewrite List_app_cons in Hfd.
-...
-        rewrite List_seq_succ_r in Hfd.
-        cbn in Hfd.
-        symmetry in Hfd.
-        do 2 rewrite List_app_cons in Hfd.
-        do 2 rewrite app_assoc in Hfd.
-        apply app_inj_tail in Hfd.
-...
-(**)
-...
-    induction n; [ easy | cbn ].
-    destruct (Nat.eq_dec (vect_el σ n) i) as [Hni| Hni]; [ flia | ].
-...
-
-Print permut_find.
-    rewrite permut_list_find.
-    rewrite fun_find_fun_find'; [ | easy | easy | easy ].
-    unfold fun_find'.
-    remember (pigeonhole_fun _ _) as xx eqn:Hxx.
-    symmetry in Hxx; destruct xx as (x, x').
-    destruct (Nat.eq_dec x n) as [Hxn| Hxn]. {
-      subst x.
-      unfold pigeonhole_fun in Hxx.
-Search find_dup.
-...
-Search permut_find.
-permut_find = 
-fix permut_find (n : nat) (σ : vector n nat) (i j : nat) {struct i} : nat :=
-  match i with
-  | 0 => 42
-  | S i' => if Nat.eq_dec (vect_el σ i') j then i' else permut_find n σ i' j
-  end
-     : ∀ n : nat, vector n nat → nat → nat → nat
-
-fun_find = 
-fix fun_find (f : nat → nat) (n i : nat) {struct n} : nat :=
-  match n with
-  | 0 => 42
-  | S n' => if Nat.eq_dec (f n') i then n' else fun_find f n' i
-  end
-     : (nat → nat) → nat → nat → nat
+    exfalso; revert Hfdj.
+    apply not_NoDup_map_f_seq with (b := n); [ flia | ].
+    intros k Hk.
+    destruct (Nat.eq_dec k n) as [Hkn| Hkn]; [ easy | ].
+    apply Hp1; flia Hk Hkn.
+  }
+  apply find_dup_none in Hfdi.
+  exfalso; revert Hfdi.
+  apply not_NoDup_map_f_seq with (b := n); [ flia | ].
+  intros k Hk.
+  destruct (Nat.eq_dec k n) as [Hkn| Hkn]; [ easy | ].
+  apply Hp1; flia Hk Hkn.
+}
 ...
 
 Theorem signature_comp :
