@@ -2008,10 +2008,17 @@ rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
 erewrite rngl_product_list_eq_compat. 2: {
   intros i Hi.
-  erewrite rngl_product_eq_compat. 2: {
+  erewrite rngl_product_shift; [ | flia Hnz ].
+  rewrite rngl_product_change_var with
+    (g := vect_el (permut_inv σ₂)) (h :=vect_el σ₂). 2: {
     intros j Hj.
-    rewrite Nat.add_comm.
-    rewrite Nat.add_sub.
+    apply permut_inv_permut; [ easy | flia Hj Hnz ].
+  }
+  erewrite rngl_product_list_eq_compat. 2: {
+    intros j Hj.
+    rewrite (Nat.add_comm 1 (vect_el (permut_inv σ₂) i)).
+    rewrite (Nat.add_comm 1 (vect_el (permut_inv σ₂) j)).
+    do 2 rewrite Nat.add_sub.
     apply in_map_iff in Hi.
     destruct Hi as (k & Hk & Hks).
     apply in_seq in Hks.
@@ -2019,11 +2026,23 @@ erewrite rngl_product_list_eq_compat. 2: {
       rewrite <- Hk.
       now apply Hperm.
     }
+    apply in_map_iff in Hj.
+    destruct Hj as (m & Hm & Hms).
+    apply in_seq in Hms.
+    cbn in Hms.
+    rewrite <- Nat.sub_succ_l in Hms; [ | flia Hnz ].
+    rewrite Nat.sub_succ, Nat.sub_0_r in Hms.
+    rewrite permut_permut_inv; [ | easy | ]. 2: {
+      rewrite <- Hm.
+      now apply Hperm.
+    }
     easy.
   }
+  rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
+  rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
   easy.
 }
-cbn - [ iter_seq ].
+cbn - [ iter_seq iter_list seq ].
 ...
 specialize (permut_has_invert Hperm) as H1.
 destruct H1 as (σ'₂ & Hperm' & Hσ'₂).
