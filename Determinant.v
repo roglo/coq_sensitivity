@@ -1821,27 +1821,64 @@ split. {
     injection Hxx; clear Hxx; intros; subst x1 x2.
     apply find_dup_some in Hfdi.
     destruct Hfdi as (Hij1 & la1 & la2 & la3 & Hfdi).
+    destruct (Nat.eq_dec x n) as [Hxn| Hxn]. {
+      subst x.
+      now apply List_seq_nothing_after_last in Hfdi.
+    }
     destruct fdj as [(x1, x2)| ]. {
       injection Hyy; clear Hyy; intros; subst x1 x2.
       apply find_dup_some in Hfdj.
       destruct Hfdj as (Hij2 & lb1 & lb2 & lb3 & Hfdj).
-      destruct (Nat.eq_dec x n) as [Hxn| Hxn]. {
-        subst x.
-        destruct (Nat.eq_dec y n) as [Hyn| Hyn]. {
-          subst y y'.
-          destruct (Nat.eq_dec x' n) as [Hx'n| Hx'n]. {
-            subst x'; clear Hij1 Hij2.
-            apply List_sorted_in_seq in Hfdi.
-            now apply Nat.lt_irrefl in Hfdi.
+      destruct (Nat.eq_dec y n) as [Hyn| Hyn]; subst y. {
+        now apply List_seq_nothing_after_last in Hfdj.
+      }
+      clear Hyn.
+      destruct (Nat.eq_dec x' n) as [Hx'n| Hx'n]. {
+        subst x'.
+        destruct (Nat.eq_dec y' n) as [Hy'n| Hy'n]; [ congruence | ].
+        apply Hp2 in Hij2; cycle 1. {
+          assert (H : x ∈ seq 0 (S n)). {
+            rewrite Hfdi.
+            now apply in_app_iff; right; left.
           }
-          congruence.
+          apply in_seq in H; cbn in H; flia Hxn H.
+        } {
+          assert (H : y' ∈ seq 0 (S n)). {
+            rewrite Hfdj.
+            apply in_app_iff; right; right.
+            now apply in_app_iff; right; left.
+          }
+          apply in_seq in H; cbn in H; flia Hy'n H.
+        }
+        subst y'.
+        apply List_sorted_in_seq in Hfdj.
+        now apply Nat.lt_irrefl in Hfdj.
+      }
+      destruct (Nat.eq_dec y' n) as [Hy'n| Hy'n]. {
+        subst y'.
+        apply Hp2 in Hij1; cycle 1. {
+          assert (H : x ∈ seq 0 (S n)). {
+            rewrite Hfdi.
+            now apply in_app_iff; right; left.
+          }
+          apply in_seq in H; cbn in H; flia Hxn H.
+        } {
+          assert (H : x' ∈ seq 0 (S n)). {
+            rewrite Hfdi.
+            apply in_app_iff; right; right.
+            now apply in_app_iff; right; left.
+          }
+          apply in_seq in H; cbn in H; flia Hx'n H.
         }
         subst x'.
-        destruct (Nat.eq_dec y' n) as [Hy'n| Hy'n]. {
-          subst y'.
-          destruct (Nat.eq_dec y n) as [H| H]; [ easy | clear H ].
-          congruence.
-        }
+        apply List_sorted_in_seq in Hfdi.
+        now apply Nat.lt_irrefl in Hfdi.
+      }
+...
+      destruct (Nat.eq_dec x n) as [Hxn| Hxn]. {
+        subst x.
+        now apply List_seq_nothing_after_last in Hfdi.
+      }
 ...
   destruct (Nat.eq_dec x n) as [Hxn| Hxn]. {
     subst x.
