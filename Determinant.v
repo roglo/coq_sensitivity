@@ -2043,6 +2043,91 @@ erewrite rngl_product_list_eq_compat. 2: {
   easy.
 }
 cbn - [ iter_seq iter_list seq ].
+symmetry.
+rewrite rngl_product_shift; [ | flia Hnz ].
+rewrite rngl_product_change_var with
+  (g := vect_el (permut_inv σ₂)) (h := vect_el σ₂). 2: {
+  intros i Hi.
+  rewrite permut_inv_permut; [ easy | easy | flia Hi Hnz ].
+}
+rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
+rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
+erewrite rngl_product_list_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_shift; [ | flia Hnz ].
+  rewrite rngl_product_change_var with
+    (g := vect_el (permut_inv σ₂)) (h := vect_el σ₂). 2: {
+    intros j Hj.
+    apply permut_inv_permut; [ easy | flia Hj Hnz ].
+  }
+  erewrite rngl_product_list_eq_compat. 2: {
+    intros j Hj.
+    rewrite (Nat.add_comm 1 (vect_el (permut_inv σ₂) i)).
+    rewrite (Nat.add_comm 1 (vect_el (permut_inv σ₂) j)).
+    now do 2 rewrite Nat.add_sub.
+  }
+  rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
+  rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
+  easy.
+}
+cbn - [ iter_seq iter_list seq ].
+symmetry.
+eapply rngl_product_list_eq_compat.
+intros i Hi.
+eapply rngl_product_list_eq_compat.
+intros j Hj.
+unfold δ.
+destruct (lt_dec (permut_find σ₂ n i + 1) (permut_find σ₂ n j + 1)) as
+  [H1| H1]. {
+...
+  rewrite rngl_product_change_var with
+    (g := vect_el (permut_inv σ₂)) (h :=vect_el σ₂). 2: {
+    intros j Hj.
+    apply permut_inv_permut; [ easy | flia Hj Hnz ].
+  }
+  erewrite rngl_product_list_eq_compat. 2: {
+    intros j Hj.
+    rewrite (Nat.add_comm 1 (vect_el (permut_inv σ₂) i)).
+    rewrite (Nat.add_comm 1 (vect_el (permut_inv σ₂) j)).
+    do 2 rewrite Nat.add_sub.
+    apply in_map_iff in Hi.
+    destruct Hi as (k & Hk & Hks).
+    apply in_seq in Hks.
+    rewrite permut_permut_inv; [ | easy | ]. 2: {
+      rewrite <- Hk.
+      now apply Hperm.
+    }
+    apply in_map_iff in Hj.
+    destruct Hj as (m & Hm & Hms).
+    apply in_seq in Hms.
+    cbn in Hms.
+    rewrite <- Nat.sub_succ_l in Hms; [ | flia Hnz ].
+    rewrite Nat.sub_succ, Nat.sub_0_r in Hms.
+    rewrite permut_permut_inv; [ | easy | ]. 2: {
+      rewrite <- Hm.
+      now apply Hperm.
+    }
+    easy.
+  }
+...
+rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
+rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
+erewrite rngl_product_list_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_shift; [ | flia Hnz ].
+  rewrite rngl_product_change_var with
+    (g := vect_el (permut_inv σ₂)) (h :=vect_el σ₂). 2: {
+    intros j Hj.
+    apply permut_inv_permut; [ easy | flia Hj Hnz ].
+  }
+...
+  rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
+  rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
+...
+  easy.
+}
+cbn - [ iter_seq iter_list seq ].
+symmetry.
 ...
 specialize (permut_has_invert Hperm) as H1.
 destruct H1 as (σ'₂ & Hperm' & Hσ'₂).
