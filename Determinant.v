@@ -1946,6 +1946,15 @@ induction P; [ easy | | | ]. {
 }
 Qed.
 
+Theorem permut_Permutation : ∀ n (σ : vector n nat),
+  is_permut σ
+  → Permutation (map (vect_el σ) (seq 0 n)) (seq 0 n).
+Proof.
+clear T ro rp.
+intros * (Hp1, Hp2).
+Search (_ → Permutation _ _).
+...
+
 Theorem signature_comp :
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -2128,9 +2137,13 @@ rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
 unfold δ.
 erewrite rngl_product_change_list with (lb := seq 0 n); [ | easy | ]. 2: {
-  clear - Hperm.
+...
+  now apply permut_Permutation.
+}
+...
   destruct Hperm as (Hp1, Hp2).
 (**)
+...
   remember (vect_el σ₂) as f eqn:Hf; clear σ₂ Hf.
 ...
   revert f Hp1 Hp2.
