@@ -1922,6 +1922,36 @@ destruct b. {
   rewrite rngl_add_opp_r.
   now rewrite rngl_add_0_r.
 } {
+  rewrite (rngl_add_comm 1%F).
+Theorem glop : ∀ a b c, (a + c - (b + c) = a - b)%F.
+Proof.
+intros.
+remember rngl_has_opp as ho eqn:Hho; symmetry in Hho.
+destruct ho. {
+  unfold rngl_sub; rewrite Hho.
+  rewrite rngl_opp_add_distr; [ | easy ].
+  unfold rngl_sub; rewrite Hho.
+  rewrite rngl_add_assoc.
+  rewrite <- (rngl_add_assoc a).
+  rewrite fold_rngl_sub; [ | easy ].
+  rewrite fold_rngl_sub; [ | easy ].
+  rewrite fold_rngl_sub; [ | easy ].
+  now rewrite rngl_add_opp_r, rngl_add_0_r.
+} {
+enough (H : ∀ a b c, (a = b + c → a - b = c)%F). {
+apply H.
+assert (H' : ∀ a b, (a + b - b = a)%F). {
+  intros d e.
+  apply H, rngl_add_comm.
+}
+rewrite rngl_add_add_swap.
+f_equal.
+rewrite rngl_add_comm; symmetry.
+...
+  specialize rngl_opt_add_sub as rngl_add_sub.
+  rewrite Hho in rngl_add_sub.
+  specialize (rngl_add_sub (a - b)%F (b + c)%F) as H1.
+...
 Search (_ + _ - (_ + _)).
 ...
 (* to put as an axiom instead of rngl_opt_add_sub in RingLike.v *)
