@@ -1181,22 +1181,46 @@ Qed.
 
 Import Permutation.
 
+(* to be moved to Misc.v *)
+Theorem iter_list_cons : ∀ d op a la f
+  (op_d_l : ∀ x, op d x = x)
+  (op_d_r : ∀ x, op x d = x)
+  (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
+  iter_list (a :: la) (λ (c : T) (i : nat), op c (f i)) d =
+  op (f a) (iter_list la (λ (c : T) (i : nat), op c (f i)) d).
+Proof.
+intros.
+unfold iter_list; cbn.
+rewrite op_d_l.
+now apply (fold_left_op_fun_from_d d).
+Qed.
+
+(* to be moved to RLsummation.v *)
 Theorem rngl_summation_list_cons : ∀ a la f,
   (Σ (i ∈ a :: la), f i = f a + Σ (i ∈ la), f i)%F.
 Proof.
 intros.
-unfold iter_list; cbn.
-rewrite rngl_add_0_l.
-now apply fold_left_rngl_add_fun_from_0.
+apply iter_list_cons. {
+  apply rngl_add_0_l.
+} {
+  apply rngl_add_0_r.
+} {
+  apply rngl_add_assoc.
+}
 Qed.
 
-Theorem rngl_summation_list_permut : ∀ n (l1 l2 : list nat) f,
+Theorem iter_list_permut : ∀ n (d : T) (op : T → T → T) (l1 l2 : list nat) f
+  (op_d_l : ∀ x, op d x = x)
+  (op_d_r : ∀ x, op x d = x)
+  (op_comm : ∀ a b, op a b = op b a)
+  (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
   Permutation l1 l2
   → length l1 = n
   → length l2 = n
-  → (Σ (i ∈ l1), f i = Σ (i ∈ l2), f i)%F.
+  → iter_list l1 (λ (c : T) (i : nat), op c (f i)) d =
+    iter_list l2 (λ (c : T) (i : nat), op c (f i)) d.
 Proof.
-intros * Hl H1 H2.
+intros * op_d_l op_d_r op_comm op_assoc Hl H1 H2.
 destruct n. {
   apply length_zero_iff_nil in H1.
   apply length_zero_iff_nil in H2.
@@ -1207,8 +1231,8 @@ induction Hl; intros; [ easy | | | ]. {
   cbn in H1, H2.
   apply Nat.succ_inj in H1.
   apply Nat.succ_inj in H2.
-  rewrite rngl_summation_list_cons.
-  rewrite rngl_summation_list_cons.
+  rewrite iter_list_cons; [ | easy | easy | easy ].
+  rewrite iter_list_cons; [ | easy | easy | easy ].
   f_equal.
   destruct n. {
     apply length_zero_iff_nil in H1.
@@ -1221,15 +1245,33 @@ induction Hl; intros; [ easy | | | ]. {
   cbn in H1, H2.
   do 2 apply Nat.succ_inj in H1.
   do 2 apply Nat.succ_inj in H2.
-  do 4 rewrite rngl_summation_list_cons.
-  do 2 rewrite rngl_add_assoc.
-  f_equal; apply rngl_add_comm.
+  do 4 (rewrite iter_list_cons; [ | easy | easy | easy ]).
+  do 2 rewrite op_assoc.
+  f_equal; apply op_comm.
 } {
   specialize (Permutation_length Hl2) as H3.
   rewrite H2 in H3.
   rewrite (IHHl1 n); [ | easy | easy ].
   rewrite (IHHl2 n); [ | easy | easy ].
   easy.
+}
+Qed.
+
+Theorem rngl_summation_list_permut : ∀ n (l1 l2 : list nat) f,
+  Permutation l1 l2
+  → length l1 = n
+  → length l2 = n
+  → (Σ (i ∈ l1), f i = Σ (i ∈ l2), f i)%F.
+Proof.
+intros * Hl H1 H2.
+apply (@iter_list_permut n); [ | | | | easy | easy | easy ]. {
+  apply rngl_add_0_l.
+} {
+  apply rngl_add_0_r.
+} {
+  apply rngl_add_comm.
+} {
+  apply rngl_add_assoc.
 }
 Qed.
 
