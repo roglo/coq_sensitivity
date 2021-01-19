@@ -1897,79 +1897,31 @@ destruct (lt_dec i j) as [Hij| Hij]. {
 }
 Qed.
 
-Theorem δ_shift_right : ∀ i j u v, δ i j (u + 1) (v + 1) = δ i j u v.
+Theorem δ_shift_right :
+  rngl_has_opp = true →
+  ∀ i j u v, δ i j (u + 1) (v + 1) = δ i j u v.
 Proof.
-intros.
+intros Hop *.
 unfold δ.
 destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
 setoid_rewrite Nat.add_comm; cbn.
 rewrite rngl_add_comm.
 specialize rngl_opt_add_sub as rngl_add_sub.
-remember rngl_has_opp as b eqn:Hop.
-symmetry in Hop.
-destruct b. {
-  unfold rngl_sub.
-  rewrite Hop.
-  rewrite rngl_opp_add_distr; [ | easy ].
-  unfold rngl_sub.
-  rewrite Hop.
-  rewrite rngl_add_assoc.
-  rewrite rngl_add_add_swap.
-  rewrite <- (rngl_add_assoc (rngl_of_nat v)).
-  rewrite fold_rngl_sub; [ | easy ].
-  rewrite fold_rngl_sub; [ | easy ].
-  rewrite fold_rngl_sub; [ | easy ].
-  rewrite rngl_add_opp_r.
-  now rewrite rngl_add_0_r.
-} {
-  rewrite (rngl_add_comm 1%F).
-Theorem glop : ∀ a b c, (a + c - (b + c) = a - b)%F.
-Proof.
-intros.
-remember rngl_has_opp as ho eqn:Hho; symmetry in Hho.
-destruct ho. {
-  unfold rngl_sub; rewrite Hho.
-  rewrite rngl_opp_add_distr; [ | easy ].
-  unfold rngl_sub; rewrite Hho.
-  rewrite rngl_add_assoc.
-  rewrite <- (rngl_add_assoc a).
-  rewrite fold_rngl_sub; [ | easy ].
-  rewrite fold_rngl_sub; [ | easy ].
-  rewrite fold_rngl_sub; [ | easy ].
-  now rewrite rngl_add_opp_r, rngl_add_0_r.
-} {
-enough (H : ∀ a b c, (a = b + c → a - b = c)%F). {
-apply H.
-assert (H' : ∀ a b, (a + b - b = a)%F). {
-  intros d e.
-  apply H, rngl_add_comm.
-}
+rewrite Hop in rngl_add_sub.
+unfold rngl_sub.
+rewrite Hop.
+rewrite rngl_opp_add_distr; [ | easy ].
+unfold rngl_sub.
+rewrite Hop.
+rewrite rngl_add_assoc.
 rewrite rngl_add_add_swap.
-f_equal.
-rewrite rngl_add_comm; symmetry.
-...
-  specialize rngl_opt_add_sub as rngl_add_sub.
-  rewrite Hho in rngl_add_sub.
-  specialize (rngl_add_sub (a - b)%F (b + c)%F) as H1.
-...
-Search (_ + _ - (_ + _)).
-...
-(* to put as an axiom instead of rngl_opt_add_sub in RingLike.v *)
-Theorem glop : ∀ a b c, (a + c - (b + c) = a - b)%F.
-Proof.
-intros.
-specialize rngl_opt_add_sub as rngl_add_sub.
-remember rngl_has_opp as ho eqn:Hop.
-symmetry in Hop.
-destruct ho. {
-...
-} {
-  rewrite <- (rngl_add_sub c b) at 1.
-Search (_ + (_ - _))%F.
-...
-  rewrite (rngl_add_comm a).
-
-...
+rewrite <- (rngl_add_assoc (rngl_of_nat v)).
+rewrite fold_rngl_sub; [ | easy ].
+rewrite fold_rngl_sub; [ | easy ].
+rewrite fold_rngl_sub; [ | easy ].
+rewrite rngl_add_opp_r.
+now rewrite rngl_add_0_r.
+Qed.
 
 Theorem signature_comp :
   rngl_has_opp = true →
@@ -2142,8 +2094,7 @@ erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
     rewrite (Nat.add_comm 1 j), Nat.add_sub.
     do 2 rewrite δ_shift.
-...
-    easy.
+    now rewrite δ_shift_right.
   }
   easy.
 }
