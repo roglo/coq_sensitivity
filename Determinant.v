@@ -2103,6 +2103,7 @@ symmetry.
 unfold iter_seq.
 rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
+unfold δ.
 ...
 rewrite rngl_product_change_var with
   (g := vect_el (permut_inv σ₂)) (h := vect_el σ₂). 2: {
