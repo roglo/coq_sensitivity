@@ -2128,6 +2128,27 @@ rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
 unfold δ.
 erewrite rngl_product_change_list with (lb := seq 0 n); [ | easy | ]. 2: {
+  clear - Hperm.
+  destruct Hperm as (Hp1, Hp2).
+(**)
+  remember (vect_el σ₂) as f eqn:Hf; clear σ₂ Hf.
+...
+  revert f Hp1 Hp2.
+  induction n; intros; [ constructor | ].
+  rewrite List_seq_succ_r; cbn.
+  rewrite map_app; cbn.
+  destruct (Nat.eq_dec (f n) n) as [H1| H1]. {
+    rewrite H1.
+    apply Permutation_app; [ | easy ].
+    apply IHn. {
+      intros i Hi.
+Search (_ → Permutation (_ ++ _) _).
+...
+  induction n; [ constructor | cbn ].
+  destruct (Nat.eq_dec (vect_el σ₂ 0) 0) as [H1| H1]. {
+    rewrite H1.
+    constructor.
+  }
 ...
 rewrite rngl_product_change_var with
   (g := vect_el (permut_inv σ₂)) (h := vect_el σ₂). 2: {
