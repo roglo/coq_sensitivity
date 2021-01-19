@@ -1209,18 +1209,19 @@ apply iter_list_cons. {
 }
 Qed.
 
-Theorem iter_list_permut : ∀ n (d : T) (op : T → T → T) (l1 l2 : list nat) f
+Theorem iter_list_permut : ∀ (d : T) (op : T → T → T) (l1 l2 : list nat) f
   (op_d_l : ∀ x, op d x = x)
   (op_d_r : ∀ x, op x d = x)
   (op_comm : ∀ a b, op a b = op b a)
   (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
   Permutation l1 l2
-  → length l1 = n
-  → length l2 = n
   → iter_list l1 (λ (c : T) (i : nat), op c (f i)) d =
     iter_list l2 (λ (c : T) (i : nat), op c (f i)) d.
 Proof.
-intros * op_d_l op_d_r op_comm op_assoc Hl H1 H2.
+intros * op_d_l op_d_r op_comm op_assoc Hl.
+specialize (Permutation_length Hl) as H1.
+remember (length l2) as n eqn:H2.
+move H1 after H2; symmetry in H2.
 destruct n. {
   apply length_zero_iff_nil in H1.
   apply length_zero_iff_nil in H2.
@@ -1257,14 +1258,12 @@ induction Hl; intros; [ easy | | | ]. {
 }
 Qed.
 
-Theorem rngl_summation_list_permut : ∀ n (l1 l2 : list nat) f,
+Theorem rngl_summation_list_permut : ∀ (l1 l2 : list nat) f,
   Permutation l1 l2
-  → length l1 = n
-  → length l2 = n
   → (Σ (i ∈ l1), f i = Σ (i ∈ l2), f i)%F.
 Proof.
-intros * Hl H1 H2.
-apply (@iter_list_permut n); [ | | | | easy | easy | easy ]. {
+intros * Hl.
+apply iter_list_permut; [ | | | | easy ]. {
   apply rngl_add_0_l.
 } {
   apply rngl_add_0_r.
@@ -1274,8 +1273,6 @@ apply (@iter_list_permut n); [ | | | | easy | easy | easy ]. {
   apply rngl_add_assoc.
 }
 Qed.
-
-...
 
 Theorem rngl_summation_permut : ∀ n l1 l2,
   Permutation l1 l2
