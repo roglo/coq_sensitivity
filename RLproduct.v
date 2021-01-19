@@ -103,6 +103,15 @@ intros * Hgh.
 now apply iter_list_eq_compat.
 Qed.
 
+Theorem rngl_product_list_cons : ∀ a la f,
+  (Π (i ∈ a :: la), f i = f a * Π (i ∈ la), f i)%F.
+Proof.
+intros.
+unfold iter_list; cbn.
+rewrite rngl_mul_1_l.
+now apply fold_left_rngl_mul_fun_from_1.
+Qed.
+
 Theorem rngl_product_succ_succ : ∀ b k g,
   (Π (i = S b, S k), g i = Π (i = b, k), g (S i))%F.
 Proof.

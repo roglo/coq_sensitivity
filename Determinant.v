@@ -1923,6 +1923,29 @@ rewrite rngl_add_opp_r.
 now rewrite rngl_add_0_r.
 Qed.
 
+Theorem rngl_product_change_list :
+  rngl_is_comm = true →
+  ∀ la lb f,
+  Permutation la lb
+  → (Π (i ∈ la), f i = Π (i ∈ lb), f i)%F.
+Proof.
+intros Hic * P.
+induction P; [ easy | | | ]. {
+  rewrite rngl_product_list_cons; [ | easy ].
+  rewrite rngl_product_list_cons; [ | easy ].
+  now rewrite IHP.
+} {
+  do 4 (rewrite rngl_product_list_cons; [ | easy ]).
+  do 2 rewrite rngl_mul_assoc.
+  f_equal.
+  specialize rngl_opt_mul_comm as rngl_mul_comm.
+  rewrite Hic in rngl_mul_comm.
+  apply rngl_mul_comm.
+} {
+  etransitivity; [ apply IHP1 | apply IHP2 ].
+}
+Qed.
+
 Theorem signature_comp :
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -2104,13 +2127,7 @@ unfold iter_seq.
 rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
 unfold δ.
-Check rngl_product_change_var.
-Search (Π (_ ∈ _), _)%F.
-Theorem rngl_product_change_list : ∀ la lb f,
-  Permutation la lb
-  → (Π (i ∈ la), f i = Π (i ∈ lb), f i)%F.
-...
-erewrite rngl_product_change_list with (la := seq 0 n) (lb := map (vect_el σ₂) (seq 0 n)).
+erewrite rngl_product_change_list with (lb := seq 0 n); [ | easy | ]. 2: {
 ...
 rewrite rngl_product_change_var with
   (g := vect_el (permut_inv σ₂)) (h := vect_el σ₂). 2: {
