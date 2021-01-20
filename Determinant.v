@@ -2395,6 +2395,16 @@ rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
 erewrite rngl_product_change_list with (lb := seq 0 n); [ | easy | ]. 2: {
   now apply permut_Permutation.
 }
+erewrite rngl_product_list_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_change_list with (lb := seq 0 n); [ | easy | ]. 2: {
+    now apply permut_Permutation.
+  }
+  easy.
+}
+cbn - [ iter_seq ].
+unfold δ.
+(* ouais, faut réfléchir... faut peut-être que je change les lb := ci-dessus *)
 ...
   destruct Hperm as (Hp1, Hp2).
 (**)
