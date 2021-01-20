@@ -2049,16 +2049,26 @@ induction P; [ easy | | | ]. {
 }
 Qed.
 
+Theorem permut_fun_without_last : ∀ n i (f : _ → nat),
+  i = permut_fun_inv f (S n) n
+  → ∃ g,
+     is_permut_fun g n ∧
+     map f (seq 0 i ++ seq (S i) (n - i)) = map g (seq 0 n).
+Proof.
+intros * Hi.
+...
+
 Theorem permut_fun_Permutation : ∀ f n,
   is_permut_fun f n
   → Permutation (map f (seq 0 n)) (seq 0 n).
 Proof.
 intros * Hp.
 symmetry.
-induction n; [ easy | ].
-remember (map _ _) as m in |-*; cbn; subst m.
-remember (permut_fun_inv f (S n) 0) as i eqn:Hi.
-remember (seq 1 n) as s eqn:Hs.
+revert f Hp.
+induction n; intros; [ easy | ].
+rewrite List_seq_succ_r at 1.
+remember (permut_fun_inv f (S n) n) as i eqn:Hi.
+remember (seq 0 n) as s eqn:Hs.
 rewrite (List_seq_cut i); subst s. 2: {
   subst i.
   apply in_seq.
@@ -2070,7 +2080,13 @@ rewrite Nat.sub_0_r; cbn.
 rewrite map_app; cbn.
 rewrite Hi at 2.
 rewrite fun_permut_fun_inv; [ | easy | flia ].
-apply Permutation_cons_app.
+apply Permutation_elt.
+rewrite app_nil_r.
+rewrite <- map_app.
+...
+destruct (permut_fun_without_last n f Hi) as (g & Hpg & Hg).
+rewrite Hg.
+now apply IHn.
 ...
 
 Theorem permut_Permutation : ∀ n (σ : vector n nat),
