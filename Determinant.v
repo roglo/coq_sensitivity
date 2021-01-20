@@ -41,6 +41,21 @@ Definition det_from_col {n} (M : matrix n n T) j :=
    Σ (i = 0, n - 1),
      minus_one_pow i * mat_el M i j * determinant (subm M i j))%F.
 
+(* things about making permutations *)
+
+Definition is_permut {n} (σ : vector n nat) :=
+  (∀ i, i < n → vect_el σ i < n) ∧
+  (∀ i j, i < n → j < n → vect_el σ i = vect_el σ j → i = j).
+
+Theorem vect_el_permut_ub : ∀ n (σ : vector n nat) i,
+  is_permut σ → i < n → vect_el σ i < n.
+Proof.
+clear T ro rp.
+intros * Hp Hin.
+destruct Hp as (Hp1, Hp2).
+now apply Hp1.
+Qed.
+
 (* Alternative version of the determinant: sum of product of the
    factors a_{i,σ(i)} where σ goes through all permutations of
    the naturals of the interval [0, n-1].
@@ -1407,6 +1422,8 @@ rewrite seq_nth; [ | easy ].
 now rewrite Nat.add_0_l.
 Qed.
 
+(* perhaps rather prove is_permut (canon_permut n k) and
+   use vect_el_permut_ub *)
 Theorem vect_el_canon_permut_ub : ∀ n k i,
   k < fact n
   → i < n
@@ -1606,10 +1623,6 @@ apply Hgh.
 apply in_seq in Hi.
 flia Hi.
 Qed.
-
-Definition is_permut {n} (σ : vector n nat) :=
-  (∀ i, i < n → vect_el σ i < n) ∧
-  (∀ i j, i < n → j < n → vect_el σ i = vect_el σ j → i = j).
 
 Fixpoint permut_find n (σ : vector n nat) i j :=
   match i with
@@ -2039,30 +2052,24 @@ induction P; [ easy | | | ]. {
 }
 Qed.
 
-Theorem permut_in : ∀ n (σ : vector n nat) i,
-  is_permut σ → i < n → vect_el σ i ∈ seq 0 n.
-Proof.
-intros * Hp Hin.
-...
-
 Theorem permut_Permutation : ∀ n (σ : vector n nat),
   is_permut σ
   → Permutation (map (vect_el σ) (seq 0 n)) (seq 0 n).
 Proof.
 clear T ro rp.
 intros * Hp.
-induction n; [ easy | ].
 symmetry.
+induction n; [ easy | ].
 remember (map _ _) as m; cbn; subst m.
 remember (vect_el (permut_inv σ) 0) as i eqn:Hi.
 remember (seq 1 n) as s eqn:Hs.
 rewrite (List_seq_cut i); subst s. 2: {
   subst i.
-Search (vect_el _ _ ∈ _).
-...
-  apply permut_in; [ | flia ].
-Search is_permut.
-... suite ok.
+  apply in_seq.
+  split; [ flia | ].
+  apply vect_el_permut_ub; [ | flia ].
+  now apply permut_inv_is_permut.
+}
 rewrite Nat.sub_0_r; cbn.
 rewrite map_app; cbn.
 rewrite Hi at 2.
