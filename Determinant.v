@@ -2086,6 +2086,30 @@ split. 2: {
     exfalso; apply Hjsn; clear Hjsn.
     now apply in_seq in Hj.
   }
+  destruct n. {
+    cbn in Hi.
+    destruct (Nat.eq_dec (a 1) 1) as [H| H]; [ easy | clear H ].
+    destruct i; [ easy | ].
+    destruct i; [ easy | ].
+    cbn.
+...
+    replace i with 0; [ easy | ].
+    destruct Hp as (Hp1, Hp2).
+    destruct (Nat.eq_dec (a 0) 1) as [Ha1| Ha1]; [ easy | ].
+...
+  symmetry.
+  rewrite (List_seq_cut i). 2: {
+    apply in_seq.
+    split; [ flia | cbn ].
+    enough (H : i < S (S n)) by flia Hsni H.
+    rewrite Hi.
+    apply permut_fun_ub; [ | flia ].
+    apply permut_fun_inv_is_permut.
+    split. {
+      intros j Hj.
+      destruct Hp as (Hp1, Hp2).
+      destruct (Nat.eq_dec j (S n)) as [Hjsn| Hjsn]. {
+        subst j.
 ...
 Search permut_fun_inv.
 Search (_ (permut_fun_inv _ _)).
