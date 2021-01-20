@@ -193,6 +193,21 @@ rewrite <- Nat.add_1_r.
 now rewrite seq_app.
 Qed.
 
+Theorem List_seq_cut : ∀ i sta len,
+  i ∈ seq sta len
+  → seq sta len = seq sta (i - sta) ++ [i] ++ seq (S i) (sta + len - S i).
+Proof.
+intros * His.
+apply in_seq in His.
+replace len with (i - sta + (len - (i - sta))) at 1 by flia His.
+rewrite seq_app.
+f_equal.
+replace (sta + (i - sta)) with i by flia His.
+replace (len - (i - sta)) with (1 + (sta + len - S i)) by flia His.
+rewrite seq_app; cbn.
+now rewrite Nat.add_1_r.
+Qed.
+
 Theorem List_sorted_in_seq : ∀ sta len a b la1 la2 la3,
   seq sta len = la1 ++ a :: la2 ++ b :: la3 → a < b.
 Proof.

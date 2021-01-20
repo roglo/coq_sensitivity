@@ -2039,13 +2039,35 @@ induction P; [ easy | | | ]. {
 }
 Qed.
 
+Theorem permut_in : ∀ n (σ : vector n nat) i,
+  is_permut σ → i < n → vect_el σ i ∈ seq 0 n.
+Proof.
+intros * Hp Hin.
+...
+
 Theorem permut_Permutation : ∀ n (σ : vector n nat),
   is_permut σ
   → Permutation (map (vect_el σ) (seq 0 n)) (seq 0 n).
 Proof.
 clear T ro rp.
-intros * (Hp1, Hp2).
-Search (_ → Permutation _ _).
+intros * Hp.
+induction n; [ easy | ].
+symmetry.
+remember (map _ _) as m; cbn; subst m.
+remember (vect_el (permut_inv σ) 0) as i eqn:Hi.
+remember (seq 1 n) as s eqn:Hs.
+rewrite (List_seq_cut i); subst s. 2: {
+  subst i.
+Search (vect_el _ _ ∈ _).
+...
+  apply permut_in; [ | flia ].
+Search is_permut.
+... suite ok.
+rewrite Nat.sub_0_r; cbn.
+rewrite map_app; cbn.
+rewrite Hi at 2.
+rewrite permut_permut_inv; [ | easy | flia ].
+apply Permutation_cons_app.
 ...
 
 Theorem signature_comp :
