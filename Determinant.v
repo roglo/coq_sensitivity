@@ -43,14 +43,21 @@ Definition det_from_col {n} (M : matrix n n T) j :=
 
 (* things about making permutations *)
 
-Definition is_permut {n} (σ : vector n nat) :=
-  (∀ i, i < n → vect_el σ i < n) ∧
-  (∀ i j, i < n → j < n → vect_el σ i = vect_el σ j → i = j).
+Definition is_permut_fun f n :=
+  (∀ i, i < n → f i < n) ∧
+  (∀ i j, i < n → j < n → f i = f j → i = j).
+
+Definition is_permut {n} (σ : vector n nat) := is_permut_fun (vect_el σ) n.
+
+Theorem permut_fun_ub : ∀ n f i, is_permut_fun f n → i < n → f i < n.
+Proof.
+intros * Hp Hin.
+now apply Hp.
+Qed.
 
 Theorem vect_el_permut_ub : ∀ n (σ : vector n nat) i,
   is_permut σ → i < n → vect_el σ i < n.
 Proof.
-clear T ro rp.
 intros * Hp Hin.
 destruct Hp as (Hp1, Hp2).
 now apply Hp1.
@@ -168,6 +175,7 @@ destruct (lt_dec j (k / fact n)) as [Hjkn| Hjkn]. {
 }
 Qed.
 
+(* should use permut_fun_blah_blah... *)
 Theorem canon_permut_permut_inv : ∀ n k j,
   j < n
   → k < fact n
@@ -228,6 +236,8 @@ destruct (lt_dec j (k / fact n)) as [Hjkn| Hjkn]. {
 }
 Qed.
 
+(* perhaps, I could prove it by proving that canon_inv_permut
+   is indeed the invert (permut_inv) of canon_permut *)
 Theorem canon_permut_inv_permut : ∀ n k i,
   i < n
   → k < fact n
@@ -1624,28 +1634,14 @@ apply in_seq in Hi.
 flia Hi.
 Qed.
 
-Fixpoint permut_find n (σ : vector n nat) i j :=
+Fixpoint permut_fun_inv f i j :=
   match i with
   | 0 => 42
-  | S i' => if Nat.eq_dec (vect_el σ i') j then i' else permut_find σ i' j
+  | S i' => if Nat.eq_dec (f i') j then i' else permut_fun_inv f i' j
   end.
 
-Definition permut_inv n (σ : vector n nat) := mk_vect n (permut_find σ n).
-
-Fixpoint fun_find (f : nat → nat) n i :=
-  match n with
-  | 0 => 42
-  | S n' => if Nat.eq_dec (f n') i then n' else fun_find f n' i
-  end.
-
-Theorem permut_list_find : ∀ n (σ : vector n nat) i j,
-  permut_find σ i j = fun_find (vect_el σ) i j.
-Proof.
-intros.
-induction i; [ easy | cbn ].
-destruct (Nat.eq_dec (vect_el σ i) j) as [Hij| Hij]; [ easy | ].
-apply IHi.
-Qed.
+Definition permut_inv n (σ : vector n nat) :=
+  mk_vect n (permut_fun_inv (vect_el σ) n).
 
 (*
 Compute let n := 4 in let k := 3 in (list_of_vect (canon_permut n k), list_of_vect (permut_inv (canon_permut n k))).
@@ -1655,7 +1651,7 @@ Compute let n := 4 in map (λ k, list_of_vect (permut_inv (canon_permut n k))) (
 Theorem fun_find_prop : ∀ f n i,
   (∀ i j, i < n → j < n → f i = f j → i = j)
   → i < n
-  → fun_find f n (f i) = i.
+  → permut_fun_inv f n (f i) = i.
 Proof.
 intros * Hp2 Hin.
 revert i Hin.
@@ -1674,20 +1670,19 @@ intros j k Hj Hk Hjk.
 apply Hp2; [ flia Hj | flia Hk | easy ].
 Qed.
 
-Theorem permut_inv_permut : ∀ n (σ : vector n nat) i,
+Theorem permut_inv_permut : ∀ n (σ : vector n nat),
   is_permut σ
-  → i < n
+  → ∀ i, i < n
   → vect_el (permut_inv σ) (vect_el σ i) = i.
 Proof.
-intros * (_, Hp2) Hin; cbn.
-rewrite permut_list_find.
+intros * (_, Hp2) * Hin; cbn.
 now apply fun_find_prop.
 Qed.
 
 (* the proof that "vect_el σ (vect_el (permut_inv σ) i) = i"
    is proven by the pigeonhole principle *)
 
-Definition fun_find' f n i :=
+Definition permut_fun_inv' f n i :=
   let '(x, x') :=
     pigeonhole_fun (S n) (λ j, if Nat.eq_dec j n then i else f j)
   in
@@ -1697,12 +1692,12 @@ Theorem pigeonhole' : ∀ f n,
   (∀ i, i < n → f i < n)
   → (∀ i j, i < n → j < n → f i = f j → i = j)
   → ∀ i, i < n
-  → ∀ j, j = fun_find' f n i
+  → ∀ j, j = permut_fun_inv' f n i
   → j < n ∧ f j = i.
 Proof.
 intros * Hp1 Hp2 * Hin * Hj.
 subst j.
-unfold fun_find'.
+unfold permut_fun_inv'.
 remember (pigeonhole_fun _ _) as xx eqn:Hxx.
 symmetry in Hxx.
 destruct xx as (x, x').
@@ -1730,14 +1725,13 @@ destruct (Nat.eq_dec x n) as [H2| H2]. {
 }
 Qed.
 
-Theorem fun_find_fun_find' : ∀ f n,
-  (∀ i, i < n → f i < n)
-  → (∀ i j, i < n → j < n → f i = f j → i = j)
+Theorem fun_find_permut_fun_inv' : ∀ f n,
+  is_permut_fun f n
   → ∀ i, i < n
-  → fun_find f n i = fun_find' f n i.
+  → permut_fun_inv f n i = permut_fun_inv' f n i.
 Proof.
-intros * Hfub Hinj * Hin.
-unfold fun_find'.
+intros * (Hfub, Hinj) * Hin.
+unfold permut_fun_inv'.
 remember (pigeonhole_fun _ _) as xx eqn:Hxx.
 symmetry in Hxx.
 destruct xx as (j, j').
@@ -1830,39 +1824,35 @@ apply Hfub.
 flia Hj Hjn.
 Qed.
 
-Theorem f_fun_find : ∀ f n,
-  (∀ i, i < n → f i < n)
-  → (∀ i j, i < n → j < n → f i = f j → i = j)
+Theorem fun_permut_fun_inv : ∀ f n,
+  is_permut_fun f n
   → ∀ i, i < n
-  → f (fun_find f n i) = i.
+  → f (permut_fun_inv f n i) = i.
 Proof.
-intros * Hp1 Hp2 * Hin.
-rewrite fun_find_fun_find'; [ | easy | easy | easy ].
+intros * (Hp1, Hp2) * Hin.
+rewrite fun_find_permut_fun_inv'; [ | easy | easy ].
 apply (proj2 (pigeonhole' f Hp1 Hp2 Hin eq_refl)).
 Qed.
 
-Theorem permut_permut_inv : ∀ n (σ : vector n nat) i,
+Theorem permut_permut_inv : ∀ n (σ : vector n nat),
   is_permut σ
-  → i < n
+  → ∀ i, i < n
   → vect_el σ (vect_el (permut_inv σ) i) = i.
 Proof.
-intros * (Hp1, Hp2) Hin; cbn.
-rewrite permut_list_find.
-remember (vect_el σ) as f eqn:Hf.
-now apply f_fun_find.
+intros * Hp * Hin; cbn.
+now apply fun_permut_fun_inv.
 Qed.
 
-Theorem permut_inv_is_permut : ∀ n (σ : vector n nat),
-  is_permut σ
-  → is_permut (permut_inv σ).
+Theorem permut_fun_inv_is_permut : ∀ n f,
+  is_permut_fun f n
+  → is_permut_fun (permut_fun_inv f n) n.
 Proof.
-intros * Hperm.
-destruct Hperm as (Hp1, Hp2).
+intros * Hp.
+destruct Hp as (Hp1, Hp2).
 split. {
   intros i Hin; cbn.
-  rewrite permut_list_find.
-  rewrite fun_find_fun_find'; [ | easy | easy | easy ].
-  unfold fun_find'.
+  rewrite fun_find_permut_fun_inv'; [ | easy | easy ].
+  unfold permut_fun_inv'.
   remember (pigeonhole_fun _ _) as xx eqn:Hxx.
   symmetry in Hxx; destruct xx as (x, x').
   destruct (Nat.eq_dec x n) as [Hxn| Hxn]. {
@@ -1905,10 +1895,9 @@ split. {
 }
 intros i j Hi Hj Hij.
 cbn in Hij.
-do 2 rewrite permut_list_find in Hij.
-rewrite fun_find_fun_find' in Hij; [ | easy | easy | easy ].
-rewrite fun_find_fun_find' in Hij; [ | easy | easy | easy ].
-unfold fun_find' in Hij.
+rewrite fun_find_permut_fun_inv' in Hij; [ | easy | easy ].
+rewrite fun_find_permut_fun_inv' in Hij; [ | easy | easy ].
+unfold permut_fun_inv' in Hij.
 remember (pigeonhole_fun _ _) as xx eqn:Hxx in Hij.
 remember (pigeonhole_fun _ _) as yy eqn:Hyy in Hij.
 symmetry in Hxx; destruct xx as (x, x').
@@ -1990,6 +1979,14 @@ destruct (Nat.eq_dec k n) as [Hkn| Hkn]; [ easy | ].
 apply Hp1; flia Hk Hkn.
 Qed.
 
+Theorem permut_inv_is_permut : ∀ n (σ : vector n nat),
+  is_permut σ
+  → is_permut (permut_inv σ).
+Proof.
+intros * Hperm.
+now apply permut_fun_inv_is_permut.
+Qed.
+
 Theorem δ_shift : ∀ i j u v, δ (i + 1) (j + 1) u v = δ i j u v.
 Proof.
 intros.
@@ -2052,29 +2049,37 @@ induction P; [ easy | | | ]. {
 }
 Qed.
 
-Theorem permut_Permutation : ∀ n (σ : vector n nat),
-  is_permut σ
-  → Permutation (map (vect_el σ) (seq 0 n)) (seq 0 n).
+Theorem permut_fun_Permutation : ∀ f n,
+  is_permut_fun f n
+  → Permutation (map f (seq 0 n)) (seq 0 n).
 Proof.
-clear T ro rp.
-intros * Hp.
 symmetry.
 induction n; [ easy | ].
-remember (map _ _) as m; cbn; subst m.
-remember (vect_el (permut_inv σ) 0) as i eqn:Hi.
+remember (map _ _) as m in |-*; cbn; subst m.
+remember (permut_fun_inv f (S n) 0) as i eqn:Hi.
 remember (seq 1 n) as s eqn:Hs.
 rewrite (List_seq_cut i); subst s. 2: {
   subst i.
   apply in_seq.
   split; [ flia | ].
-  apply vect_el_permut_ub; [ | flia ].
-  now apply permut_inv_is_permut.
+  apply permut_fun_ub; [ | flia ].
+  now apply permut_fun_inv_is_permut.
 }
 rewrite Nat.sub_0_r; cbn.
 rewrite map_app; cbn.
 rewrite Hi at 2.
-rewrite permut_permut_inv; [ | easy | flia ].
+rewrite fun_permut_fun_inv; [ | easy | flia ].
 apply Permutation_cons_app.
+...
+
+Theorem permut_Permutation : ∀ n (σ : vector n nat),
+  is_permut σ
+  → Permutation (map (vect_el σ) (seq 0 n)) (seq 0 n).
+Proof.
+intros * Hp.
+unfold is_permut in Hp.
+remember (vect_el σ) as f.
+clear σ Heqf.
 ...
 
 Theorem signature_comp :
