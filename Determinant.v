@@ -2056,18 +2056,19 @@ Theorem permut_fun_without_last : ∀ n i (f : _ → nat),
      map f (seq 0 i ++ seq (S i) (n - i)) = map g (seq 0 n).
 Proof.
 intros * Hi.
+Compute (let n := 5 in let i := 3 in seq 0 i ++ seq (S i) (n - i)).
 ...
 
 Theorem permut_fun_Permutation : ∀ f n,
   is_permut_fun f n
   → Permutation (map f (seq 0 n)) (seq 0 n).
 Proof.
-intros * Hp.
+intros a n * Hp.
 symmetry.
-revert f Hp.
+revert a Hp.
 induction n; intros; [ easy | ].
 rewrite List_seq_succ_r at 1.
-remember (permut_fun_inv f (S n) n) as i eqn:Hi.
+remember (permut_fun_inv a (S n) n) as i eqn:Hi.
 remember (seq 0 n) as s eqn:Hs.
 rewrite (List_seq_cut i); subst s. 2: {
   subst i.
@@ -2083,6 +2084,7 @@ rewrite fun_permut_fun_inv; [ | easy | flia ].
 apply Permutation_elt.
 rewrite app_nil_r.
 rewrite <- map_app.
+Compute (let n := 5 in let i := 3 in seq 0 i ++ seq (S i) (n - i)).
 ...
 destruct (permut_fun_without_last n f Hi) as (g & Hpg & Hg).
 rewrite Hg.
