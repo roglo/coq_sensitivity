@@ -2050,19 +2050,23 @@ induction P; [ easy | | | ]. {
 Qed.
 
 Theorem permut_fun_without_last : ∀ n i (a : _ → nat),
-  n ≠ 0
-  → is_permut_fun a n
+  is_permut_fun a (S n)
   → i = permut_fun_inv a (S n) n
   → ∃ b,
      is_permut_fun b n ∧
      map a (seq 0 i ++ seq (S i) (n - i)) = map b (seq 0 n).
 Proof.
-intros * Hnz Hp Hi.
+intros * Hp Hi.
 exists (λ j, if lt_dec j i then a j else a (j + 1)).
 split. 2: {
-  cbn.
-  revert i Hi.
-  induction n; intros; [ easy | clear Hnz ].
+  destruct n. {
+    cbn in Hi; cbn.
+    destruct (Nat.eq_dec (a 0) 0) as [Haz| Haz]; [ now subst i | exfalso ].
+    apply Haz.
+    destruct Hp as (Hp1, Hp2).
+    enough (H : a 0 < 1) by flia H.
+    apply Hp1; flia.
+  }
   destruct (Nat.eq_dec (a (S n)) (S n)) as [Han| Han]. {
     remember (S n) as sn; cbn in Hi; subst sn.
     rewrite Han in Hi.
@@ -2086,17 +2090,6 @@ split. 2: {
     exfalso; apply Hjsn; clear Hjsn.
     now apply in_seq in Hj.
   }
-  destruct n. {
-    cbn in Hi.
-    destruct (Nat.eq_dec (a 1) 1) as [H| H]; [ easy | clear H ].
-    destruct i; [ easy | ].
-    destruct i; [ easy | ].
-    cbn.
-...
-    replace i with 0; [ easy | ].
-    destruct Hp as (Hp1, Hp2).
-    destruct (Nat.eq_dec (a 0) 1) as [Ha1| Ha1]; [ easy | ].
-...
   symmetry.
   rewrite (List_seq_cut i). 2: {
     apply in_seq.
@@ -2104,58 +2097,37 @@ split. 2: {
     enough (H : i < S (S n)) by flia Hsni H.
     rewrite Hi.
     apply permut_fun_ub; [ | flia ].
-    apply permut_fun_inv_is_permut.
-    split. {
-      intros j Hj.
-      destruct Hp as (Hp1, Hp2).
-      destruct (Nat.eq_dec j (S n)) as [Hjsn| Hjsn]. {
-        subst j.
-...
-Search permut_fun_inv.
-Search (_ (permut_fun_inv _ _)).
-    rewrite Nat.sub_diag; cbn.
-    f_equal.
-    rewrite app_nil_r.
-    rewrite 
-...
-  assert (Hisn : a i < S n). {
-    apply Hp.
-    destruct Hp as (Hp1, Hp2).
-    apply 
-    rewrite Hi.
-Print is_permut_fun.
-...
-    apply Hip.
-Search (permut_fun_inv _ _ _ < _).
-    apply permut_fun_ub; [ | ].
-Search (is_permut_fun (permut_fun_inv _ _)).
-Check permut_fun_inv_is_permut.
-    apply is_permut_fun_inv.
-...
-  destruct (Nat.eq_dec i (S n)) as [Hsni| Hsni]. {
-    assert (i < 
-...
-    exfalso; apply Han.
-    rewrite <- Hsni at 1.
-    rewrite Hi.
-...
-    apply fun_permut_fun_inv.
-...
-    move Hsni at top; subst i.
-    rewrite Nat.sub_diag.
-    cbn; f_equal.
-    rewrite app_nil_r.
-    apply map_ext_in.
+    now apply permut_fun_inv_is_permut.
+  }
+  symmetry; cbn - [ "-" ].
+  rewrite Nat.sub_0_r, Nat.sub_succ.
+  rewrite Nat.sub_succ_l. 2: {
+    assert (H : i < S (S n)). {
+      rewrite Hi.
+      apply permut_fun_ub; [ | flia ].
+      now apply permut_fun_inv_is_permut.
+    }
+    flia Hsni H.
+  }
+  do 2 rewrite map_app.
+  f_equal. {
+    apply map_ext_in_iff.
     intros j Hj.
-...
-  replace (seq (S i) (S n - i)) with (seq (S i) (n - i) ++ [S n]). 2: {
-    destruct n. {
-      destruct i; [ easy | ].
-      cbn in Hi |-*.
-
-
-cbn.
-cbn in Hi.
+    destruct (lt_dec j i) as [Hji| Hji]; [ easy | ].
+    now apply in_seq in Hj.
+  }
+  cbn.
+  destruct (lt_dec i i) as [H| H]; [ now apply lt_irrefl in H | clear H ].
+  rewrite Nat.add_1_r; f_equal.
+  rewrite <- seq_shift.
+  rewrite map_map.
+  apply map_ext_in_iff.
+  intros j Hj.
+  rewrite Nat.add_1_r.
+  destruct (lt_dec j i) as [Hji| Hji]; [ | easy ].
+  apply in_seq in Hj.
+  flia Hj Hji.
+}
 ...
 
 Theorem permut_fun_Permutation : ∀ f n,
