@@ -2049,14 +2049,52 @@ induction P; [ easy | | | ]. {
 }
 Qed.
 
-Theorem permut_fun_without_last : ∀ n i (f : _ → nat),
-  i = permut_fun_inv f (S n) n
-  → ∃ g,
-     is_permut_fun g n ∧
-     map f (seq 0 i ++ seq (S i) (n - i)) = map g (seq 0 n).
+Theorem permut_fun_without_last : ∀ n i (a : _ → nat),
+  n ≠ 0
+  → is_permut_fun a n
+  → i = permut_fun_inv a (S n) n
+  → ∃ b,
+     is_permut_fun b n ∧
+     map a (seq 0 i ++ seq (S i) (n - i)) = map b (seq 0 n).
 Proof.
-intros * Hi.
-Compute (let n := 5 in let i := 3 in seq 0 i ++ seq (S i) (n - i)).
+intros * Hnz Hp Hi.
+exists (λ j, if lt_dec j i then a j else a (j + 1)).
+split. 2: {
+  cbn.
+  revert i Hi.
+  induction n; intros; [ easy | clear Hnz ].
+  remember (S n) as sn; cbn in Hi; subst sn.
+  destruct (Nat.eq_dec (a (S n)) (S n)) as [Han| Han]. {
+    subst i.
+    rewrite Nat.sub_diag; cbn.
+    f_equal.
+    rewrite app_nil_r.
+    apply map_ext_in.
+    intros i Hi.
+    apply in_seq in Hi.
+    now destruct (lt_dec i (S n)).
+  }
+  destruct (Nat.eq_dec i (S n)) as [Hsni| Hsni]. {
+    exfalso; apply Han.
+    rewrite <- Hsni at 1.
+    rewrite Hi.
+    apply fun_permut_fun_inv.
+...
+    move Hsni at top; subst i.
+    rewrite Nat.sub_diag.
+    cbn; f_equal.
+    rewrite app_nil_r.
+    apply map_ext_in.
+    intros j Hj.
+...
+  replace (seq (S i) (S n - i)) with (seq (S i) (n - i) ++ [S n]). 2: {
+    destruct n. {
+      destruct i; [ easy | ].
+      cbn in Hi |-*.
+
+
+cbn.
+cbn in Hi.
 ...
 
 Theorem permut_fun_Permutation : ∀ f n,
