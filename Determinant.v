@@ -2128,6 +2128,24 @@ split. 2: {
   apply in_seq in Hj.
   flia Hj Hji.
 }
+split. {
+  intros j Hj.
+  assert (Hin : a i = n). {
+    rewrite Hi.
+    apply fun_permut_fun_inv; [ easy | flia ].
+  }
+  destruct (lt_dec j i) as [Hji| Hji]. {
+    destruct (Nat.eq_dec (a j) n) as [Hajn| Hajn]. {
+      rewrite <- Hajn in Hin.
+      apply Hp in Hin; [ flia Hji Hin | | flia Hj ].
+      rewrite Hi.
+      apply permut_fun_ub; [ | flia ].
+      now apply permut_fun_inv_is_permut.
+    }
+    enough (H : a j < S n) by flia Hajn H.
+    apply Hp; flia Hj.
+  }
+  apply Nat.nlt_ge in Hji.
 ...
 
 Theorem permut_fun_Permutation : ∀ f n,
