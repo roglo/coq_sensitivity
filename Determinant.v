@@ -2053,6 +2053,7 @@ Theorem permut_fun_Permutation : ∀ f n,
   is_permut_fun f n
   → Permutation (map f (seq 0 n)) (seq 0 n).
 Proof.
+intros * Hp.
 symmetry.
 induction n; [ easy | ].
 remember (map _ _) as m in |-*; cbn; subst m.
