@@ -2063,8 +2063,10 @@ split. 2: {
   cbn.
   revert i Hi.
   induction n; intros; [ easy | clear Hnz ].
-  remember (S n) as sn; cbn in Hi; subst sn.
   destruct (Nat.eq_dec (a (S n)) (S n)) as [Han| Han]. {
+    remember (S n) as sn; cbn in Hi; subst sn.
+    rewrite Han in Hi.
+    destruct (Nat.eq_dec (S n) (S n)) as [H| H]; [ clear H | easy ].
     subst i.
     rewrite Nat.sub_diag; cbn.
     f_equal.
@@ -2078,6 +2080,75 @@ split. 2: {
     exfalso; apply Han.
     rewrite <- Hsni at 1.
     rewrite Hi.
+    apply fun_permut_fun_inv; [ | flia ].
+    destruct Hp as (Hp1, Hp2).
+    split. {
+      intros j Hj.
+      specialize (Hp1 j) as H1.
+...
+      enough (a j < S n) by flia H.
+      apply Hp1.
+    rewrite fun_permut_fun_inv; [ easy | | ].
+    remember (S n) as sn; cbn in Hi; subst sn.
+    destruct (Nat.eq_dec (a (S n)) (S n)) as [H| H]; [ easy | clear H ].
+    specialize (permut_fun_ub) as Hub.
+    specialize (Hub (S (S n))).
+    specialize (Hub (permut_fun_inv a (S n))).
+    specialize (Hub (S n)).
+    specialize (Hub a (S n)).
+...
+    specialize (permut_fun_inv_is_permut Hp) as Hip.
+    cbn in Hi.
+Print permut_fun_inv.
+...
+  assert (Hin : i < S n). {
+    rewrite Hi.
+    specialize (permut_fun_ub) as Hub.
+    specialize (Hub (S (S n))).
+...
+  specialize (Hub (permut_fun_inv a (S n))).
+  specialize (permut_fun_inv_is_permut Hp) as Hip.
+...
+  destruct (Nat.eq_dec i (S n)) as [Hsni| Hsni]. {
+    move Hsni at top; subst i.
+    exfalso; apply Han.
+    rewrite Hi at 1.
+Check fun_permut_fun_inv.
+destruct Hp as (Hp1, Hp2).
+specialize (Hp1 (permut_fun_inv a (S n) (S n))) as H1.
+destruct Hip as (Hip1, Hip2).
+    apply fun_permut_fun_inv.
+...
+Search permut_fun_inv.
+Search (_ (permut_fun_inv _ _)).
+
+
+    rewrite Nat.sub_diag; cbn.
+    f_equal.
+    rewrite app_nil_r.
+    rewrite 
+...
+  assert (Hisn : a i < S n). {
+    apply Hp.
+    destruct Hp as (Hp1, Hp2).
+    apply 
+    rewrite Hi.
+Print is_permut_fun.
+...
+    apply Hip.
+Search (permut_fun_inv _ _ _ < _).
+    apply permut_fun_ub; [ | ].
+Search (is_permut_fun (permut_fun_inv _ _)).
+Check permut_fun_inv_is_permut.
+    apply is_permut_fun_inv.
+...
+  destruct (Nat.eq_dec i (S n)) as [Hsni| Hsni]. {
+    assert (i < 
+...
+    exfalso; apply Han.
+    rewrite <- Hsni at 1.
+    rewrite Hi.
+...
     apply fun_permut_fun_inv.
 ...
     move Hsni at top; subst i.
