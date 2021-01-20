@@ -2146,7 +2146,31 @@ split. {
     apply Hp; flia Hj.
   }
   apply Nat.nlt_ge in Hji.
-...
+  destruct Hp as (Hp1, Hp2).
+  apply Nat.succ_lt_mono in Hj.
+  specialize (Hp1 _ Hj) as H1.
+  rewrite Nat.add_1_r.
+  destruct (Nat.eq_dec (a (S j)) n) as [Hajn| Hajn]. {
+    rewrite <- Hajn in Hin.
+    apply Hp2 in Hin; [ flia Hin Hji | flia Hj Hji | easy ].
+  }
+  flia H1 Hajn.
+}
+intros j k Hj Hk Hjk.
+destruct (lt_dec j i) as [Hji| Hji]. {
+  destruct (lt_dec k i) as [Hki| Hki]. {
+    apply Hp in Hjk; [ easy | flia Hj | flia Hk ].
+  }
+  apply Nat.nlt_ge in Hki.
+  apply Hp in Hjk; [ flia Hji Hki Hjk | flia Hj | flia Hk ].
+}
+destruct (lt_dec k i) as [Hki| Hki]. {
+  apply Hp in Hjk; [ | flia Hj | flia Hk ].
+  apply Nat.nlt_ge in Hji.
+  flia Hji Hki Hjk.
+}
+apply Hp in Hjk; [ flia Hjk | flia Hj | flia Hk ].
+Qed.
 
 Theorem permut_fun_Permutation : ∀ f n,
   is_permut_fun f n
@@ -2173,12 +2197,10 @@ rewrite fun_permut_fun_inv; [ | easy | flia ].
 apply Permutation_elt.
 rewrite app_nil_r.
 rewrite <- map_app.
-Compute (let n := 5 in let i := 3 in seq 0 i ++ seq (S i) (n - i)).
-...
-destruct (permut_fun_without_last n f Hi) as (g & Hpg & Hg).
+destruct (permut_fun_without_last Hp Hi) as (g & Hpg & Hg).
 rewrite Hg.
 now apply IHn.
-...
+Qed.
 
 Theorem permut_Permutation : ∀ n (σ : vector n nat),
   is_permut σ
@@ -2187,8 +2209,8 @@ Proof.
 intros * Hp.
 unfold is_permut in Hp.
 remember (vect_el σ) as f.
-clear σ Heqf.
-...
+now apply permut_fun_Permutation.
+Qed.
 
 Theorem signature_comp :
   rngl_has_opp = true →
@@ -2370,9 +2392,7 @@ symmetry.
 unfold iter_seq.
 rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
-unfold δ.
 erewrite rngl_product_change_list with (lb := seq 0 n); [ | easy | ]. 2: {
-...
   now apply permut_Permutation.
 }
 ...
