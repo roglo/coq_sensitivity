@@ -2397,13 +2397,25 @@ erewrite rngl_product_change_list with (lb := seq 0 n); [ | easy | ]. 2: {
 }
 erewrite rngl_product_list_eq_compat. 2: {
   intros i Hi.
+(**)
+  erewrite rngl_product_change_list with (lb := map (vect_el σ₁) (seq 0 n)); [ | easy | ]. 2: {
+    transitivity (seq 0 n).
+    now apply permut_Permutation.
+    symmetry.
+    apply permut_Permutation.
+    admit.
+  }
+(*
   erewrite rngl_product_change_list with (lb := seq 0 n); [ | easy | ]. 2: {
     now apply permut_Permutation.
   }
+*)
   easy.
 }
 cbn - [ iter_seq ].
 unfold δ.
+Search permut_fun_inv.
+...
 (* ouais, faut réfléchir... faut peut-être que je change les lb := ci-dessus *)
 ...
   destruct Hperm as (Hp1, Hp2).
