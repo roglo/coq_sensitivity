@@ -2364,6 +2364,7 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 symmetry.
+(*
 ...
 Theorem rngl_product_permut : ∀ n σ,
   is_permut_fun σ n
@@ -2390,6 +2391,7 @@ easy.
 }
 symmetry.
 ...
+*)
 (* changement of variable *)
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 rewrite rngl_product_shift; [ | flia Hnz ].
@@ -2402,7 +2404,86 @@ rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
 erewrite rngl_product_list_eq_compat. 2: {
   intros i Hi.
-  erewrite rngl_product_shift; [ | flia Hnz ].
+  rewrite rngl_product_shift; [ | flia Hnz ].
+  rewrite rngl_product_change_var with
+    (g := vect_el (permut_inv σ₂)) (h :=vect_el σ₂). 2: {
+    intros j Hj.
+    rewrite permut_inv_permut; [ easy | easy | flia Hj Hnz ].
+  }
+  rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
+  rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
+  erewrite rngl_product_list_eq_compat. 2: {
+    intros j Hj.
+    rewrite Nat_ltb_mono_l.
+    do 2 rewrite Nat.add_comm, Nat.add_sub.
+    rewrite permut_permut_inv; [ | easy | ]. 2: {
+      apply in_map_iff in Hj.
+      destruct Hj as (k & Hk & Hkn).
+      apply in_seq in Hkn.
+      rewrite <- Hk.
+      now apply Hperm.
+    }
+    rewrite permut_permut_inv; [ | easy | ]. 2: {
+      apply in_map_iff in Hi.
+      destruct Hi as (k & Hk & Hkn).
+      apply in_seq in Hkn.
+      rewrite <- Hk.
+      now apply Hperm.
+    }
+    easy.
+  }
+  easy.
+}
+symmetry.
+rewrite rngl_product_shift; [ | flia Hnz ].
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_product_shift; [ | flia Hnz ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite Nat_ltb_mono_l.
+    rewrite Nat.add_comm, Nat.add_sub.
+    rewrite Nat.add_comm, Nat.add_sub.
+    do 2 rewrite Nat.add_1_r.
+    cbn - [ "<?" ].
+    do 2 rewrite (rngl_add_comm 1%F).
+    unfold rngl_sub.
+    rewrite Hop.
+    rewrite rngl_opp_add_distr; [ | easy ].
+    unfold rngl_sub.
+    rewrite Hop.
+    rewrite rngl_add_assoc.
+    rewrite fold_rngl_sub; [ | easy ].
+    rewrite fold_rngl_sub; [ | easy ].
+    rewrite fold_rngl_sub; [ | easy ].
+    rewrite rngl_add_sub.
+    easy.
+  }
+  easy.
+}
+symmetry.
+...
+Search (_ + _ - _)%F.
+cbn - [ iter_list "<?" ].
+...
+    rewrite permut_inv_permut; [ easy | easy | flia Hj Hnz ].
+    intros j Hj.
+    rewrite Nat_ltb_mono_l.
+    do 2 rewrite Nat.add_comm, Nat.add_sub.
+    rewrite permut_permut_inv; [ | easy | ]. 2: {
+      apply in_map_iff in Hi.
+      destruct Hi as (k & Hk & Hkn).
+      apply in_seq in Hkn.
+      rewrite <- Hk.
+      now apply Hperm.
+    }
+    easy.
+  }
+  cbn - [ iter_list "<?" ].
+...
+  easy.
+}
+...
   rewrite rngl_product_change_var with
     (g := vect_el (permut_inv σ₂)) (h :=vect_el σ₂). 2: {
     intros j Hj.

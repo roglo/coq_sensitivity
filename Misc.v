@@ -2192,6 +2192,22 @@ destruct ij. {
 }
 Qed.
 
+Theorem Nat_ltb_mono_l : ∀ a b c, (a + b <? a + c) = (b <? c).
+Proof.
+intros.
+remember (_ <? _) as x eqn:Hx in |-*; symmetry in Hx.
+remember (_ <? _) as y eqn:Hy in |-*; symmetry in Hy.
+destruct x, y; [ easy | | | easy ]. {
+  apply Nat.ltb_lt in Hx.
+  apply Nat.ltb_nlt in Hy.
+  flia Hx Hy.
+} {
+  apply Nat.ltb_nlt in Hx.
+  apply Nat.ltb_lt in Hy.
+  flia Hx Hy.
+}
+Qed.
+
 Definition bool_of_sumbool {A B : Prop} (P : sumbool A B) :=
   match P with
   | left _ _ => true
