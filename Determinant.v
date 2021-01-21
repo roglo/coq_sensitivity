@@ -362,7 +362,7 @@ Definition ε {n} (p : vector n nat) :=
     (rngl_of_nat j - rngl_of_nat i)))%F.
 *)
 
-Definition δ i j u v := if lt_dec i j then (rngl_of_nat v - rngl_of_nat u)%F else 1%F.
+Definition δ i j u v := if i <? j then (rngl_of_nat v - rngl_of_nat u)%F else 1%F.
 Definition ip {n} (p : vector n nat) i := rngl_of_nat (vect_el p i).
 
 Definition ε {n} (p : vector n nat) :=
@@ -1991,6 +1991,7 @@ Theorem δ_shift : ∀ i j u v, δ (i + 1) (j + 1) u v = δ i j u v.
 Proof.
 intros.
 unfold δ.
+do 2 rewrite if_ltb_lt_dec.
 destruct (lt_dec i j) as [Hij| Hij]. {
   destruct (lt_dec (i + 1) (j + 1)) as [Hij1| Hij1]; [ easy | ].
   flia Hij Hij1.
@@ -2006,6 +2007,7 @@ Theorem δ_shift_right :
 Proof.
 intros Hop *.
 unfold δ.
+do 2 rewrite if_ltb_lt_dec.
 destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
 setoid_rewrite Nat.add_comm; cbn.
 rewrite rngl_add_comm.
@@ -2212,6 +2214,17 @@ remember (vect_el σ) as f.
 now apply permut_fun_Permutation.
 Qed.
 
+Theorem rngl_product_permut : ∀ n σ,
+  is_permut_fun σ n
+  → ∀ f, (Π (i = 1, n), f i (σ (i - 1)%nat) = Π (i = 1, n), f i (i - 1)%nat)%F.
+Proof.
+intros * Hp *.
+...
+unfold iter_seq.
+Search (Π (_ ∈ _), _ = Π (_ ∈ _), _)%F.
+Check rngl_product_change_var.
+...
+
 Theorem signature_comp :
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -2252,6 +2265,7 @@ assert (Htz : t ≠ 0%F). {
   apply rngl_product_integral in Hij.
   destruct Hij as (j & Hj & Hij).
   unfold δ in Hij.
+  rewrite if_ltb_lt_dec in Hij.
   destruct (lt_dec i j) as [Hlij| Hlij]; [ | easy ].
   apply rngl_sub_move_0_r in Hij; [ | easy ].
   apply rngl_of_nat_inj in Hij; [ | easy ].
@@ -2274,6 +2288,7 @@ rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
   apply rngl_product_integral in Hij.
   destruct Hij as (j & Hj & Hij).
   unfold δ in Hij.
+  rewrite if_ltb_lt_dec in Hij.
   destruct (lt_dec i j) as [Hlij| Hlij]; [ | easy ].
   apply rngl_sub_move_0_r in Hij; [ | easy ].
   apply rngl_of_nat_inj in Hij; [ | easy ].
@@ -2287,6 +2302,7 @@ rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
   apply rngl_product_integral in Hij.
   destruct Hij as (j & Hj & Hij).
   unfold δ in Hij.
+  rewrite if_ltb_lt_dec in Hij.
   destruct (lt_dec i j) as [Hlij| Hlij]; [ | easy ].
   apply rngl_sub_move_0_r in Hij; [ | easy ].
   apply rngl_of_nat_inj in Hij; [ | easy ].
@@ -2300,6 +2316,7 @@ erewrite rngl_product_eq_compat. 2: {
   rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
     intros j Hj Hij.
     unfold δ in Hij.
+    rewrite if_ltb_lt_dec in Hij.
     destruct (lt_dec i j) as [Hlij| Hlij]; [ | easy ].
     apply rngl_sub_move_0_r in Hij; [ | easy ].
     apply rngl_of_nat_inj in Hij; [ | easy ].
@@ -2315,6 +2332,7 @@ erewrite rngl_product_eq_compat. 2: {
   rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
     intros j Hj Hij.
     unfold δ in Hij.
+    rewrite if_ltb_lt_dec in Hij.
     destruct (lt_dec i j) as [Hlij| Hlij]; [ | easy ].
     apply rngl_sub_move_0_r in Hij; [ | easy ].
     apply rngl_of_nat_inj in Hij; [ | easy ].
@@ -2324,6 +2342,58 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 symmetry.
+(* compression of the δ-s and use division instead of mult inv *)
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    move j before i.
+    unfold δ.
+    rewrite rngl_inv_if_then_else_distr.
+    rewrite rngl_mul_if_then_else_distr.
+    rewrite fold_rngl_div; [ | easy ].
+    rewrite rngl_inv_1; [ | easy | easy ].
+    rewrite rngl_mul_1_l.
+    easy.
+  }
+  easy.
+}
+symmetry.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    move j before i.
+    unfold δ.
+    rewrite rngl_inv_if_then_else_distr.
+    rewrite rngl_mul_if_then_else_distr.
+    rewrite fold_rngl_div; [ | easy ].
+    rewrite rngl_inv_1; [ | easy | easy ].
+    rewrite rngl_mul_1_l.
+    easy.
+  }
+  easy.
+}
+symmetry.
+...
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  specialize rngl_product_permut as H1.
+  specialize (H1 n (vect_el σ₂)).
+  specialize (H1 Hperm).
+specialize
+  (H1
+(λ j σj,
+   if i <? j
+    then
+     (rngl_of_nat (vect_el σ₁ σj) - rngl_of_nat (vect_el σ₁ (vect_el σ₂ (i - 1)%nat))) /
+     (rngl_of_nat σj - rngl_of_nat (vect_el σ₂ (i - 1)%nat))
+    else 1)%F).
+rewrite H1.
+easy.
+}
+symmetry.
+...
 (* changement of variable *)
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 rewrite rngl_product_shift; [ | flia Hnz ].
@@ -2397,7 +2467,7 @@ erewrite rngl_product_change_list with (lb := seq 0 n); [ | easy | ]. 2: {
 }
 erewrite rngl_product_list_eq_compat. 2: {
   intros i Hi.
-(**)
+(*
   erewrite rngl_product_change_list with (lb := map (vect_el σ₁) (seq 0 n)); [ | easy | ]. 2: {
     transitivity (seq 0 n).
     now apply permut_Permutation.
@@ -2405,16 +2475,18 @@ erewrite rngl_product_list_eq_compat. 2: {
     apply permut_Permutation.
     admit.
   }
-(*
+*)
   erewrite rngl_product_change_list with (lb := seq 0 n); [ | easy | ]. 2: {
     now apply permut_Permutation.
   }
-*)
+(**)
   easy.
 }
 cbn - [ iter_seq ].
 unfold δ.
 Search permut_fun_inv.
+Check permut_Permutation.
+Check rngl_product_change_list.
 ...
 (* ouais, faut réfléchir... faut peut-être que je change les lb := ci-dessus *)
 ...

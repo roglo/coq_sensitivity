@@ -388,6 +388,23 @@ unfold rngl_sub.
 now rewrite Hro.
 Qed.
 
+Theorem fold_rngl_div :
+  rngl_has_inv = true →
+  ∀ a b, (a * ¹/ b)%F = (a / b)%F.
+Proof.
+intros Hin *.
+unfold rngl_div.
+now rewrite Hin.
+Qed.
+
+Theorem rngl_inv_if_then_else_distr : ∀ (c : bool) a b,
+  (¹/ (if c then a else b) = if c then ¹/ a else ¹/ b)%F.
+Proof. now destruct c. Qed.
+
+Theorem rngl_mul_if_then_else_distr : ∀ (x : bool) a b c d,
+  ((if x then a else b) * (if x then c else d) = if x then a * c else b * d)%F.
+Proof. now destruct x. Qed.
+
 Theorem rngl_add_opp_l :
   rngl_has_opp = true →
  ∀ x, (- x + x = 0)%F.

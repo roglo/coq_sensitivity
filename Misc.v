@@ -2177,6 +2177,21 @@ Definition bsort {A} (le : A → A → bool) := iter_merge le [].
 
 (* *)
 
+Theorem if_ltb_lt_dec : ∀ A i j (a b : A),
+  (if i <? j then a else b) = (if lt_dec i j then a else b).
+Proof.
+intros.
+remember (i <? j) as ij eqn:Hij.
+symmetry in Hij.
+destruct ij. {
+  apply Nat.ltb_lt in Hij.
+  now destruct (lt_dec i j).
+} {
+  apply Nat.ltb_nlt in Hij.
+  now destruct (lt_dec i j).
+}
+Qed.
+
 Definition bool_of_sumbool {A B : Prop} (P : sumbool A B) :=
   match P with
   | left _ _ => true
