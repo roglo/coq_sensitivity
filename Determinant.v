@@ -2214,17 +2214,6 @@ remember (vect_el σ) as f.
 now apply permut_fun_Permutation.
 Qed.
 
-Theorem rngl_product_permut : ∀ n σ,
-  is_permut_fun σ n
-  → ∀ f, (Π (i = 1, n), f i (σ (i - 1)%nat) = Π (i = 1, n), f i (i - 1)%nat)%F.
-Proof.
-intros * Hp *.
-...
-unfold iter_seq.
-Search (Π (_ ∈ _), _ = Π (_ ∈ _), _)%F.
-Check rngl_product_change_var.
-...
-
 Theorem signature_comp :
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -2375,6 +2364,13 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 symmetry.
+...
+Theorem rngl_product_permut : ∀ n σ,
+  is_permut_fun σ n
+  → ∀ f,
+     (Π (i = 1, n), f i (σ (i - 1)%nat) = Π (i = 1, n), f i (i - 1)%nat)%F.
+Proof.
+intros * Hp *.
 ...
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
