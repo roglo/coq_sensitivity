@@ -62,7 +62,7 @@ Qed.
    in order to later define syntaxes : Max, Σ, Π, ...
    e.g. "Σ (i ∈ l), f i", "Π (i ∈ l), f i", ... *)
 
-Definition iter_list {T} (l : list nat) f (d : T) := fold_left f l d.
+Definition iter_list {A B} (l : list B) f (d : A) := fold_left f l d.
 
 (* iterations in indexed sequences
    in order to later define syntaxes : Max, Σ, Π, ...
@@ -1639,12 +1639,12 @@ Qed.
 
 (* common for summations and products *)
 
-Theorem fold_left_op_fun_from_d : ∀ T d op a l (f : nat → _)
+Theorem fold_left_op_fun_from_d : ∀ T A d op a l (f : A → _)
   (op_d_l : ∀ x, op d x = x)
   (op_d_r : ∀ x, op x d = x)
   (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
-  fold_left (λ (c : T) (i : nat), op c (f i)) l a =
-  op a (fold_left (λ (c : T) (i : nat), op c (f i)) l d).
+  fold_left (λ (c : T) i, op c (f i)) l a =
+  op a (fold_left (λ (c : T) i, op c (f i)) l d).
 Proof.
 intros.
 revert a.
@@ -1758,10 +1758,10 @@ rewrite (fold_left_op_fun_from_d d); [ | easy | easy | easy ].
 now rewrite Nat.add_succ_comm.
 Qed.
 
-Theorem iter_list_eq_compat : ∀ T d (op : T → T → T) l g h,
+Theorem iter_list_eq_compat : ∀ A B d (op : A → A → A) (l : list B) g h,
   (∀ i, i ∈ l → g i = h i)
-  → iter_list l (λ (c : T) (i : nat), op c (g i)) d =
-     iter_list l (λ (c : T) (i : nat), op c (h i)) d.
+  → iter_list l (λ c i, op c (g i)) d =
+     iter_list l (λ c i, op c (h i)) d.
 Proof.
 intros * Hgh.
 unfold iter_list.

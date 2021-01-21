@@ -1207,12 +1207,12 @@ Qed.
 Import Permutation.
 
 (* to be moved to Misc.v *)
-Theorem iter_list_cons : ∀ d op a la f
+Theorem iter_list_cons : ∀ A d op (a : A) la f
   (op_d_l : ∀ x, op d x = x)
   (op_d_r : ∀ x, op x d = x)
   (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
-  iter_list (a :: la) (λ (c : T) (i : nat), op c (f i)) d =
-  op (f a) (iter_list la (λ (c : T) (i : nat), op c (f i)) d).
+  iter_list (a :: la) (λ (c : T) i, op c (f i)) d =
+  op (f a) (iter_list la (λ (c : T) i, op c (f i)) d).
 Proof.
 intros.
 unfold iter_list; cbn.
@@ -1221,7 +1221,7 @@ now apply (fold_left_op_fun_from_d d).
 Qed.
 
 (* to be moved to RLsummation.v *)
-Theorem rngl_summation_list_cons : ∀ a la f,
+Theorem rngl_summation_list_cons : ∀ A (a : A) la f,
   (Σ (i ∈ a :: la), f i = f a + Σ (i ∈ la), f i)%F.
 Proof.
 intros.
@@ -1619,7 +1619,7 @@ Definition permut_comp {n} (σ₁ σ₂ : vector n nat) :=
 
 Notation "σ₁ ° σ₂" := (permut_comp σ₁ σ₂) (at level 40).
 
-Theorem rngl_product_change_var : ∀ b e f g h,
+Theorem rngl_product_change_var : ∀ A b e f g (h : _ → A),
   (∀ i, b ≤ i ≤ e → g (h i) = i)
   → (Π (i = b, e), f i = Π (i ∈ map h (seq b (S e - b))), f (g i))%F.
 Proof.
@@ -2030,7 +2030,7 @@ Qed.
 
 Theorem rngl_product_change_list :
   rngl_is_comm = true →
-  ∀ la lb f,
+  ∀ A (la lb : list A) f,
   Permutation la lb
   → (Π (i ∈ la), f i = Π (i ∈ lb), f i)%F.
 Proof.

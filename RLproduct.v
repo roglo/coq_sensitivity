@@ -23,7 +23,7 @@ Context (ro : ring_like_op T).
 Context {rp : ring_like_prop T}.
 Existing Instance ro.
 
-Theorem fold_left_rngl_mul_fun_from_1 : ∀ a l (f : nat → _),
+Theorem fold_left_rngl_mul_fun_from_1 : ∀ A a l (f : A → _),
   (fold_left (λ c i, c * f i) l a =
    a * fold_left (λ c i, c * f i) l 1)%F.
 Proof.
@@ -95,7 +95,7 @@ intros * Hgh.
 now apply iter_seq_eq_compat.
 Qed.
 
-Theorem rngl_product_list_eq_compat : ∀ g h l,
+Theorem rngl_product_list_eq_compat : ∀ A g h (l : list A),
   (∀ i, i ∈ l → (g i = h i)%F)
   → (Π (i ∈ l), g i = Π (i ∈ l), h i)%F.
 Proof.
@@ -103,7 +103,7 @@ intros * Hgh.
 now apply iter_list_eq_compat.
 Qed.
 
-Theorem rngl_product_list_cons : ∀ a la f,
+Theorem rngl_product_list_cons : ∀ A (a : A) la f,
   (Π (i ∈ a :: la), f i = f a * Π (i ∈ la), f i)%F.
 Proof.
 intros.
