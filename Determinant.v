@@ -2214,6 +2214,23 @@ remember (vect_el σ) as f.
 now apply permut_fun_Permutation.
 Qed.
 
+Theorem product_product_if_permut : ∀ n σ f,
+  is_permut_fun σ n
+  → (∀ i j, f i j = f j i)
+  → (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), if σ i <? σ j then f i j else 1))%F =
+     (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), if i <? j then f i j else 1))%F.
+Proof.
+intros * Hp Hfij.
+Check combine.
+Theorem glop : ∀ A B la lb (f : A → B → T),
+  (Π (i ∈ la), Π (j ∈ lb), f i j)%F =
+  (Π (k ∈ combine la lb), f (fst k) (snd k))%F.
+Proof.
+Admitted.
+rewrite glop.
+rewrite glop.
+...
+
 Theorem signature_comp :
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -2236,7 +2253,6 @@ move y before x; move z before y; move t before z.
 unfold rngl_div.
 rewrite Hin.
 rewrite rngl_mul_assoc; f_equal.
-(**)
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
 rewrite H10 in rngl_1_neq_0.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
@@ -2364,34 +2380,6 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 symmetry.
-(*
-...
-Theorem rngl_product_permut : ∀ n σ,
-  is_permut_fun σ n
-  → ∀ f,
-     (Π (i = 1, n), f i (σ (i - 1)%nat) = Π (i = 1, n), f i (i - 1)%nat)%F.
-Proof.
-intros * Hp *.
-...
-erewrite rngl_product_eq_compat. 2: {
-  intros i Hi.
-  specialize rngl_product_permut as H1.
-  specialize (H1 n (vect_el σ₂)).
-  specialize (H1 Hperm).
-specialize
-  (H1
-(λ j σj,
-   if i <? j
-    then
-     (rngl_of_nat (vect_el σ₁ σj) - rngl_of_nat (vect_el σ₁ (vect_el σ₂ (i - 1)%nat))) /
-     (rngl_of_nat σj - rngl_of_nat (vect_el σ₂ (i - 1)%nat))
-    else 1)%F).
-rewrite H1.
-easy.
-}
-symmetry.
-...
-*)
 (* changement of variable *)
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 rewrite rngl_product_shift; [ | flia Hnz ].
@@ -2475,13 +2463,8 @@ unfold iter_seq.
 rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
 symmetry.
-Theorem glop : ∀ n σ f,
-  is_permut_fun σ n
-  → (∀ i j, f i j = f j i)
-  → (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), if σ i <? σ j then f i j else 1))%F =
-     (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), if i <? j then f i j else 1))%F.
 ...
-apply glop. 2: {
+apply product_product_if_permut. 2: {
   intros.
 ...
 Search (_ + _ - _)%F.
