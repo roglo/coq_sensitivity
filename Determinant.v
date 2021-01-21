@@ -2434,6 +2434,16 @@ erewrite rngl_product_list_eq_compat. 2: {
   }
   easy.
 }
+erewrite rngl_product_list_eq_compat. 2: {
+  intros j Hj.
+  erewrite rngl_product_change_list; [ | easy | ]. 2: {
+    now apply permut_Permutation.
+  }
+  easy.
+}
+erewrite rngl_product_change_list; [ | easy | ]. 2: {
+  now apply permut_Permutation.
+}
 symmetry.
 rewrite rngl_product_shift; [ | flia Hnz ].
 erewrite rngl_product_eq_compat. 2: {
@@ -2461,7 +2471,18 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
+unfold iter_seq.
+rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
+rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
 symmetry.
+Theorem glop : ∀ n σ f,
+  is_permut_fun σ n
+  → (∀ i j, f i j = f j i)
+  → (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), if σ i <? σ j then f i j else 1))%F =
+     (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), if i <? j then f i j else 1))%F.
+...
+apply glop. 2: {
+  intros.
 ...
 Search (_ + _ - _)%F.
 cbn - [ iter_list "<?" ].
