@@ -2270,6 +2270,22 @@ rewrite (rngl_inv_product_list ro); [ | easy | easy | easy | easy | ]. 2: {
 }
 subst a.
 rewrite <- (rngl_product_list_mul_distr ro); [ | easy ].
+erewrite rngl_product_list_eq_compat. 2 :{
+  intros i Hi.
+  rewrite (rngl_inv_product_list ro); [ | easy | easy | easy | easy | ]. 2: {
+    intros j Hj.
+    destruct (i <? j); [ | easy ].
+    apply Hfijnz.
+  }
+  rewrite <- (rngl_product_list_mul_distr ro); [ | easy ].
+  erewrite rngl_product_list_eq_compat. 2: {
+    intros j Hj.
+    rewrite fold_rngl_div; [ | easy ].
+    easy.
+  }
+  easy.
+}
+cbn - [ iter_list "<?" ].
 ...
 
 Theorem signature_comp :
