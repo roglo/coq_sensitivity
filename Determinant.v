@@ -2300,9 +2300,14 @@ rewrite rngl_div_1_r; [ | now left | easy ].
 apply rngl_mul_1_l.
 Qed.
 
+Compute (seq 0 (2 * 2 - 1)).
+
 Theorem rngl_product_by_anti_diagonal : ∀ n f,
   (Π (i ∈ seq 0 n), Π (j ∈ seq 0 n), f i j)%F =
-  (Π (k ∈ seq 0 n), Π (i ∈ seq 0 n), Π (j = k - i, n - i - k - 1), f i j)%F.
+  (Π (k ∈ seq 0 (2 * n - 1)), Π (i ∈ seq 0 k), if ... n - k <? i
+(*
+  (Π (k ∈ seq 0 n), Π (i ∈ seq (k - n) k), f i (k - i)%nat)%F.
+*)
 Proof.
 intros.
 induction n; [ easy | ].
