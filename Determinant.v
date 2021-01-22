@@ -2227,7 +2227,7 @@ Qed.
 Theorem product_product_if_permut_div :
   rngl_is_comm = true →
   rngl_has_1_neq_0 = true →
-  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  rngl_has_inv = true →
   ∀ n σ f,
   is_permut_fun σ n
   → (∀ i j, f i j = f j i)
@@ -2236,8 +2236,10 @@ Theorem product_product_if_permut_div :
       ((if σ i <? σ j then f i j else 1) / (if i <? j then f i j else 1)))%F =
      1%F.
 Proof.
-intros Hic H10 Hid * Hp Hfij Hfijnz.
+intros Hic H10 Hin * Hp Hfij Hfijnz.
+specialize rngl_opt_mul_comm as rngl_mul_comm.
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
+rewrite Hic in rngl_mul_comm.
 rewrite H10 in rngl_1_neq_0.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 rewrite rngl_product_seq_product; [ | easy ].
@@ -2253,13 +2255,13 @@ destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
   subst n; cbn - [ "<?" ].
   do 2 rewrite Nat.ltb_irrefl.
   do 2 rewrite rngl_mul_1_l.
-  now apply rngl_mul_inv_r.
+  apply rngl_mul_inv_r; [ now left | easy ].
 }
 (* extract i=0 j=1 and i=1 j=0 that must compensate each other *)
 rewrite rngl_product_split_first; [ | easy | flia Hnz Hn1 ].
 rewrite rngl_product_split_first; [ | easy | flia Hnz Hn1 ].
 do 2 rewrite Nat.ltb_irrefl.
-rewrite rngl_mul_inv_r; [ | easy | easy ].
+rewrite rngl_mul_inv_r; [ | now left | easy ].
 rewrite rngl_mul_1_l.
 rewrite rngl_product_split_first; [ | easy | flia Hnz Hn1 ].
 rewrite rngl_mul_mul_swap; [ | easy ].
@@ -2278,16 +2280,31 @@ replace (a / b * (c / d))%F with 1%F. 2: {
     destruct (lt_dec 0 1) as [H| H]; [ clear H | flia H ].
     destruct (lt_dec 1 0) as [H| H]; [ flia H | clear H ].
     rewrite Hfij.
-    rewrite rngl_mul_inv_r; [ | easy | apply Hfijnz ].
+    rewrite rngl_mul_inv_r; [ | now left | apply Hfijnz ].
     rewrite rngl_mul_1_l.
-    now rewrite rngl_mul_inv_r.
+    apply rngl_mul_inv_r; [ now left | easy ].
   }
-  destruct (lt_dec (σ 1) (σ 0)) as [H| H]; [ clear H | ]. {
+  destruct (lt_dec (σ 1) (σ 0)) as [H2| H2]. {
     destruct (lt_dec 0 1) as [H| H]; [ clear H | flia H ].
     destruct (lt_dec 1 0) as [H| H]; [ flia H | clear H ].
     rewrite Hfij.
-    rewrite rngl_div_1_r; [ | easy | easy ].
+    rewrite rngl_div_1_r; [ | now left | easy ].
     rewrite Hfij.
+    rewrite rngl_div_1_l; [ | easy ].
+    rewrite rngl_mul_comm.
+    rewrite fold_rngl_div; [ | easy ].
+    apply rngl_mul_inv_r; [ now left | ].
+    apply Hfijnz.
+  }
+  exfalso.
+  apply Nat.nlt_ge in H1.
+  apply Nat.nlt_ge in H2.
+  apply Nat.le_antisymm in H1; [ | easy ].
+  enough (H : 0 = 1) by easy.
+  apply Hp; [ flia Hnz | flia Hnz Hn1 | easy ].
+}
+rewrite rngl_mul_1_l.
+(* ok; what do I do, now? *)
 ...
 
 Theorem product_product_if_permut :

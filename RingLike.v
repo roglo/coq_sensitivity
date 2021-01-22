@@ -506,6 +506,16 @@ transitivity (1 * ¹/ 1)%F. {
 apply H; [ now left | easy ].
 Qed.
 
+Theorem rngl_div_1_l :
+  rngl_has_inv = true →
+  ∀ a, (1 / a = ¹/ a)%F.
+Proof.
+intros Hin *.
+unfold rngl_div.
+rewrite Hin.
+apply rngl_mul_1_l.
+Qed.
+
 Theorem rngl_div_1_r :
   rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
   rngl_has_1_neq_0 = true →
