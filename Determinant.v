@@ -2234,7 +2234,7 @@ Theorem product_product_if_permut :
   ∀ n σ f,
   is_permut_fun σ n
   → (∀ i j, f i j = f j i)
-  → (∀ i j, f i j ≠ 0%F) (* not required but to simplify *)
+  → (∀ i j, f i j ≠ 0%F) (* not mandatory but to simplify *)
   → (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), if σ i <? σ j then f i j else 1))%F =
     (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), if i <? j then f i j else 1))%F.
 Proof.
