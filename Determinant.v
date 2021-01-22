@@ -2216,17 +2216,18 @@ Qed.
 
 Theorem product_product_if_permut :
   rngl_has_opp = true →
-  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  rngl_has_inv = true →
   rngl_is_integral = true →
   rngl_has_1_neq_0 = true →
   rngl_has_dec_eq = true →
   ∀ n σ f,
   is_permut_fun σ n
   → (∀ i j, f i j = f j i)
+  → (∀ i j, f i j ≠ 0%F) (* not required but to simplify *)
   → (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), if σ i <? σ j then f i j else 1))%F =
     (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), if i <? j then f i j else 1))%F.
 Proof.
-intros Hop Hid Hin H10 Hed * Hp Hfij.
+intros Hop Hid Hin H10 Hed * Hp Hfij Hfijnz.
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
 specialize rngl_opt_eq_dec as rngl_eq_dec.
 rewrite H10 in rngl_1_neq_0.
@@ -2243,59 +2244,28 @@ destruct (rngl_eq_dec b 0%F) as [Hbz| Hbz]. {
   apply rngl_product_list_integral in Hb.
   destruct Hb as (j & Hjs & Hb).
   move j before i.
-  replace n with (S (n - 1) - 0) at 1 by flia Hnz.
-  unfold iter_list at 1.
-  rewrite fold_iter_seq.
-  apply in_seq in His.
-  rewrite (rngl_product_split _ (permut_fun_inv σ n i)). 2: {
-    split; [ flia | ].
-    apply -> Nat.succ_le_mono.
-    enough (H : permut_fun_inv σ n i < n) by flia H Hnz.
-    apply permut_fun_ub; [ | easy ].
-    now apply permut_fun_inv_is_permut.
-  }
-  rewrite rngl_product_split_last; [ | flia ].
-  rewrite fun_permut_fun_inv; [ | easy | easy ].
-  remember (Π (i = _, _), _)%F as a eqn:Ha in |-*.
-  replace n with (S (n - 1) - 0) at 1 by flia Hnz.
-  unfold iter_list at 1.
-  rewrite fold_iter_seq.
-  apply in_seq in Hjs.
-  rewrite (rngl_product_split _ (permut_fun_inv σ n j)). 2: {
-    split; [ flia | ].
-    apply -> Nat.succ_le_mono.
-    enough (H : permut_fun_inv σ n j < n) by flia H Hnz.
-    apply permut_fun_ub; [ | easy ].
-    now apply permut_fun_inv_is_permut.
-  }
-  rewrite rngl_product_split_last; [ | flia ].
-  rewrite fun_permut_fun_inv; [ | easy | easy ].
-  remember (Π (i = _, _), _)%F as c eqn:Hc in |-*.
+  rewrite if_ltb_lt_dec in Hb.
+  destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
+  now specialize (Hfijnz i j).
+}
+apply rngl_mul_reg_r with (c := (¹/ b)%F); [ now left | | ]. {
+  intros Hbiz.
+  apply (f_equal (rngl_mul b)) in Hbiz.
+  rewrite fold_rngl_div in Hbiz; [ | easy ].
+  rewrite rngl_mul_inv_r in Hbiz; [ | now left | easy ].
+  now rewrite rngl_mul_0_r in Hbiz.
+}
+remember (_ * _)%F as c.
+rewrite fold_rngl_div; [ | easy ].
+rewrite rngl_mul_inv_r; [ | now left | easy ].
+subst c b.
 ...
-  remember (Π (i = _, _), _)%F as a eqn:Ha in |-*.
-  replace n with (S (n - 1) - 0) at 1 by flia Hnz.
-
-...
-apply rngl_mul_reg_r with (c := (¹/ b)%F); [ easy | | ].
-Search (¹/ _ = _)%F.
-Search (
-...
-
-apply rngl_div_move_1_r; [ easy | ].
-apply rngl_sub_move_0_r; [ easy | ].
-Search ((Π (_ ∈ _), _) + (Π (_ ∈ _), _))%F.
-Search ((Σ (_ ∈ _), _) + (Σ (_ ∈ _), _))%F.
-Search ((Σ (_ = _, _), _) + (Σ (_ = _, _), _))%F.
+Search (¹/ Π (_ ∈ _), _)%F.
+rewrite rngl_inv_product_list.
+subst a.
 Search ((Π (_ = _, _), _) * (Π (_ = _, _), _))%F.
-...
-Check combine.
-Theorem glop : ∀ A B la lb (f : A → B → T),
-  (Π (i ∈ la), Π (j ∈ lb), f i j)%F =
-  (Π (k ∈ combine la lb), f (fst k) (snd k))%F.
-Proof.
-Admitted.
-rewrite glop.
-rewrite glop.
+Search ((Π (_ ∈ _), _) * (Π (_ ∈ _), _))%F.
+
 ...
 
 Theorem signature_comp :

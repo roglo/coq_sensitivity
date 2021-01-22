@@ -202,6 +202,76 @@ split; [ flia His | easy ].
 Qed.
 
 (*  a version without commutativity, but inverted product would be better *)
+Theorem rngl_inv_product_list :
+  rngl_is_comm = true →
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
+  ∀ A (l : list A) f,
+  (∀ i, i ∈ l → f i ≠ 0%F)
+  → ((¹/ Π (i ∈ l), f i) = Π (i ∈ l), (¹/ f i))%F.
+Proof.
+intros Hic Hin H10 Hit * Hnz.
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+rewrite Hic in rngl_mul_comm.
+specialize rngl_opt_integral as rngl_integral.
+rewrite Hit in rngl_integral.
+unfold iter_list.
+...
+remember (S e - b) as len.
+destruct len; [ now apply rngl_inv_1 | ].
+replace e with (b + len) in Hnz by flia Heqlen.
+clear e Heqlen.
+revert b Hnz.
+induction len; intros. {
+  cbn.
+  now do 2 rewrite rngl_mul_1_l.
+}
+rewrite List_seq_succ_r.
+do 2 rewrite fold_left_app.
+rewrite <- IHlen. 2: {
+  intros i Hi.
+  apply Hnz; flia Hi.
+}
+rewrite fold_left_op_fun_from_d with (d := 1%F); cycle 1. {
+  apply rngl_mul_1_l.
+} {
+  apply rngl_mul_1_r.
+} {
+  apply rngl_mul_assoc.
+}
+symmetry.
+rewrite fold_left_op_fun_from_d with (d := 1%F); cycle 1. {
+  apply rngl_mul_1_l.
+} {
+  apply rngl_mul_1_r.
+} {
+  apply rngl_mul_assoc.
+}
+symmetry; cbn.
+do 3 rewrite rngl_mul_1_l.
+rewrite rngl_mul_comm.
+apply rngl_inv_mul_distr; [ easy | easy | apply Hnz; flia | ].
+clear IHlen.
+revert b Hnz.
+induction len; intros; [ apply Hnz; flia | ].
+rewrite List_seq_succ_r.
+rewrite fold_left_app.
+cbn - [ seq ].
+intros Hzz.
+apply rngl_integral in Hzz.
+destruct Hzz as [Hzz| Hzz]. {
+  revert Hzz.
+  apply IHlen.
+  intros i Hi.
+  apply Hnz; flia Hi.
+} {
+  revert Hzz.
+  apply Hnz; flia.
+}
+Qed.
+...
+
 Theorem rngl_inv_product :
   rngl_is_comm = true →
   rngl_has_inv = true →
@@ -211,6 +281,13 @@ Theorem rngl_inv_product :
   (∀ i, b ≤ i ≤ e → f i ≠ 0%F)
   → ((¹/ Π (i = b, e), f i) = Π (i = b, e), (¹/ f i))%F.
 Proof.
+intros Hic Hin H10 Hit * Hnz.
+...
+apply rngl_inv_product_list; try easy.
+intros i Hi.
+apply in_seq in Hi.
+apply Hnz; flia Hi.
+...
 intros Hic Hin H10 Hit * Hnz.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
 rewrite Hic in rngl_mul_comm.
