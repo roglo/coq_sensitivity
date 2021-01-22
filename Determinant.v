@@ -2215,6 +2215,7 @@ now apply permut_fun_Permutation.
 Qed.
 
 Theorem product_product_if_permut :
+  rngl_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
   rngl_is_integral = true →
@@ -2227,18 +2228,18 @@ Theorem product_product_if_permut :
   → (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), if σ i <? σ j then f i j else 1))%F =
     (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), if i <? j then f i j else 1))%F.
 Proof.
-intros Hop Hid Hin H10 Hed * Hp Hfij Hfijnz.
+intros Hic Hop Hid Hin H10 Hed * Hp Hfij Hfijnz.
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
 specialize rngl_opt_eq_dec as rngl_eq_dec.
+specialize @rngl_product_list_opt_integral as rngl_product_list_integral.
 rewrite H10 in rngl_1_neq_0.
 rewrite Hed in rngl_eq_dec.
+specialize (rngl_product_list_integral T ro rp Hin H10).
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 remember (Π (i ∈ _), _)%F as a eqn:Ha in |-*.
 remember (Π (i ∈ _), _)%F as b eqn:Hb in |-*.
 destruct (rngl_eq_dec b 0%F) as [Hbz| Hbz]. {
   rewrite Hbz in Hb |-*; clear Hbz; subst a; symmetry in Hb.
-  specialize @rngl_product_list_opt_integral as rngl_product_list_integral.
-  specialize (rngl_product_list_integral T ro rp Hin H10).
   apply rngl_product_list_integral in Hb.
   destruct Hb as (i & His & Hb).
   apply rngl_product_list_integral in Hb.
@@ -2259,13 +2260,16 @@ remember (_ * _)%F as c.
 rewrite fold_rngl_div; [ | easy ].
 rewrite rngl_mul_inv_r; [ | now left | easy ].
 subst c b.
-...
-Search (¹/ Π (_ ∈ _), _)%F.
-rewrite rngl_inv_product_list.
+rewrite (rngl_inv_product_list ro); [ | easy | easy | easy | easy | ]. 2: {
+  intros i Hi H1.
+  apply rngl_product_list_integral in H1.
+  destruct H1 as (j & Hjs & Hijz).
+  destruct (i <? j); [ | easy ].
+  revert Hijz.
+  apply Hfijnz.
+}
 subst a.
-Search ((Π (_ = _, _), _) * (Π (_ = _, _), _))%F.
-Search ((Π (_ ∈ _), _) * (Π (_ ∈ _), _))%F.
-
+rewrite <- (rngl_product_list_mul_distr ro); [ | easy ].
 ...
 
 Theorem signature_comp :

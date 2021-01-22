@@ -1812,6 +1812,41 @@ unfold iter_seq.
 now replace (S k - b) with 0 by flia Hkb.
 Qed.
 
+Theorem iter_list_distr : ∀ T A d op g h (l : list A)
+  (op_d_l : ∀ x, op d x = x)
+  (op_comm : ∀ a b, op a b = op b a)
+  (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
+  iter_list l (λ (c : T) (i : A), op c (op (g i) (h i))) d =
+  op (iter_list l (λ (c : T) (i : A), op c (g i)) d)
+    (iter_list l (λ (c : T) (i : A), op c (h i)) d).
+Proof.
+intros.
+induction l as [| a]; [ symmetry; apply op_d_l | cbn ].
+rewrite (fold_left_op_fun_from_d d); [ | easy | | easy ]. 2: {
+  intros; rewrite op_comm; apply op_d_l.
+}
+symmetry.
+rewrite (fold_left_op_fun_from_d d); [ | easy | | easy ]. 2: {
+  intros; rewrite op_comm; apply op_d_l.
+}
+rewrite fold_iter_list.
+rewrite (fold_left_op_fun_from_d d); [ | easy | | easy ]. 2: {
+  intros; rewrite op_comm; apply op_d_l.
+}
+do 2 rewrite fold_iter_list.
+rewrite IHl.
+remember (iter_list _ _ _) as b eqn:Hb in |-*.
+remember (iter_list _ _ _) as c eqn:Hc in |-*.
+do 3 rewrite op_d_l.
+do 2 rewrite op_assoc.
+f_equal.
+symmetry.
+rewrite (op_comm _ b).
+rewrite op_assoc.
+f_equal.
+apply op_comm.
+Qed.
+
 Theorem iter_seq_distr : ∀ T d op g h b k
   (op_d_l : ∀ x, op d x = x)
   (op_comm : ∀ a b, op a b = op b a)
@@ -1822,41 +1857,7 @@ Theorem iter_seq_distr : ∀ T d op g h b k
     (iter_seq b k (λ (c : T) (i : nat), op c (h i)) d).
 Proof.
 intros.
-destruct (le_dec b k) as [Hbk| Hbk]. {
-  revert b Hbk.
-  induction k; intros. {
-    apply Nat.le_0_r in Hbk; subst b; cbn.
-    now do 3 rewrite op_d_l.
-  }
-  rewrite (@iter_seq_split_last T _ _ b); [ | easy ].
-  rewrite (@iter_seq_split_last T _ _ b); [ | easy ].
-  rewrite (@iter_seq_split_last T _ _ b); [ | easy ].
-  do 2 rewrite op_assoc; f_equal.
-  rewrite (op_comm (iter_seq _ _ _ _)).
-  rewrite (op_comm (iter_seq _ _ _ _)).
-  rewrite <- op_assoc.
-  f_equal.
-  destruct (eq_nat_dec b (S k)) as [Hbek| Hbek]. {
-    subst b.
-    rewrite iter_seq_empty; [ | flia ].
-    rewrite iter_seq_empty; [ | flia ].
-    rewrite iter_seq_empty; [ | flia ].
-    symmetry; apply op_d_l.
-  }
-  do 3 rewrite iter_seq_succ_succ.
-  rewrite iter_seq_eq_compat with (h := λ i, op (g i) (h i)). 2: {
-    intros * Hi.
-    now rewrite Nat.sub_succ, Nat.sub_0_r.
-  }
-  rewrite IHk; [ | flia Hbk Hbek ].
-  now f_equal; apply iter_seq_eq_compat; intros i Hi;
-    rewrite Nat.sub_succ, Nat.sub_0_r.
-}
-apply Nat.nle_gt in Hbk.
-rewrite iter_seq_empty; [ | easy ].
-rewrite iter_seq_empty; [ | easy ].
-rewrite iter_seq_empty; [ | easy ].
-symmetry; apply op_d_l.
+now apply iter_list_distr.
 Qed.
 
 Theorem iter_seq_inv : ∀ T d op inv b e f

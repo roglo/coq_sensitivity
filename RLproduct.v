@@ -126,22 +126,32 @@ intros * Hkb.
 now apply iter_seq_empty.
 Qed.
 
-Theorem rngl_product_mul_distr :
+Theorem rngl_product_list_mul_distr :
   rngl_is_comm = true →
-  ∀ g h b k,
-  (Π (i = b, k), (g i * h i) =
-   (Π (i = b, k), g i) * Π (i = b, k), h i)%F.
+  ∀ A g h (l : list A),
+  (Π (i ∈ l), (g i * h i) =
+  (Π (i ∈ l), g i) * Π (i ∈ l), h i)%F.
 Proof.
-intros Hic g h b k.
-apply iter_seq_distr. {
+intros Hic *.
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+rewrite Hic in rngl_mul_comm.
+apply iter_list_distr. {
   apply rngl_mul_1_l.
 } {
-  specialize rngl_opt_mul_comm as rngl_mul_comm.
-  rewrite Hic in rngl_mul_comm.
   apply rngl_mul_comm.
 } {
   apply rngl_mul_assoc.
 }
+Qed.
+
+Theorem rngl_product_mul_distr :
+  rngl_is_comm = true →
+  ∀ g h b k,
+  (Π (i = b, k), (g i * h i) =
+  (Π (i = b, k), g i) * Π (i = b, k), h i)%F.
+Proof.
+intros Hic g h b k.
+now apply rngl_product_list_mul_distr.
 Qed.
 
 Theorem rngl_product_shift : ∀ b g k,
@@ -201,7 +211,8 @@ exists i.
 split; [ flia His | easy ].
 Qed.
 
-(*  a version without commutativity, but inverted product would be better *)
+(*  a version without commutativity, but product with reverse list
+    would be better *)
 Theorem rngl_inv_product_list :
   rngl_is_comm = true →
   rngl_has_inv = true →
@@ -217,60 +228,39 @@ rewrite Hic in rngl_mul_comm.
 specialize rngl_opt_integral as rngl_integral.
 rewrite Hit in rngl_integral.
 unfold iter_list.
-...
-remember (S e - b) as len.
-destruct len; [ now apply rngl_inv_1 | ].
-replace e with (b + len) in Hnz by flia Heqlen.
-clear e Heqlen.
-revert b Hnz.
-induction len; intros. {
-  cbn.
-  now do 2 rewrite rngl_mul_1_l.
-}
-rewrite List_seq_succ_r.
-do 2 rewrite fold_left_app.
-rewrite <- IHlen. 2: {
-  intros i Hi.
-  apply Hnz; flia Hi.
-}
-rewrite fold_left_op_fun_from_d with (d := 1%F); cycle 1. {
+induction l as [| a]; [ now apply rngl_inv_1 | cbn ].
+do 2 rewrite rngl_mul_1_l.
+rewrite (fold_left_op_fun_from_d 1%F); cycle 1. {
   apply rngl_mul_1_l.
 } {
   apply rngl_mul_1_r.
 } {
   apply rngl_mul_assoc.
+}
+rewrite rngl_inv_mul_distr; [ | easy | easy | | ]; cycle 1. {
+  now apply Hnz; left.
+} {
+  intros H1.
+  rewrite fold_iter_list in H1.
+  specialize (rngl_product_list_opt_integral Hit H10) as H2.
+  specialize (H2 A l f H1).
+  destruct H2 as (i & Hil & Hfi).
+  now revert Hfi; apply Hnz; right.
+}
+rewrite IHl. 2: {
+  intros i Hi.
+  now apply Hnz; right.
 }
 symmetry.
-rewrite fold_left_op_fun_from_d with (d := 1%F); cycle 1. {
+rewrite rngl_mul_comm.
+apply fold_left_op_fun_from_d. {
   apply rngl_mul_1_l.
 } {
   apply rngl_mul_1_r.
 } {
   apply rngl_mul_assoc.
 }
-symmetry; cbn.
-do 3 rewrite rngl_mul_1_l.
-rewrite rngl_mul_comm.
-apply rngl_inv_mul_distr; [ easy | easy | apply Hnz; flia | ].
-clear IHlen.
-revert b Hnz.
-induction len; intros; [ apply Hnz; flia | ].
-rewrite List_seq_succ_r.
-rewrite fold_left_app.
-cbn - [ seq ].
-intros Hzz.
-apply rngl_integral in Hzz.
-destruct Hzz as [Hzz| Hzz]. {
-  revert Hzz.
-  apply IHlen.
-  intros i Hi.
-  apply Hnz; flia Hi.
-} {
-  revert Hzz.
-  apply Hnz; flia.
-}
 Qed.
-...
 
 Theorem rngl_inv_product :
   rngl_is_comm = true →
@@ -282,69 +272,10 @@ Theorem rngl_inv_product :
   → ((¹/ Π (i = b, e), f i) = Π (i = b, e), (¹/ f i))%F.
 Proof.
 intros Hic Hin H10 Hit * Hnz.
-...
 apply rngl_inv_product_list; try easy.
 intros i Hi.
 apply in_seq in Hi.
 apply Hnz; flia Hi.
-...
-intros Hic Hin H10 Hit * Hnz.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
-rewrite Hic in rngl_mul_comm.
-specialize rngl_opt_integral as rngl_integral.
-rewrite Hit in rngl_integral.
-unfold iter_seq, iter_list.
-remember (S e - b) as len.
-destruct len; [ now apply rngl_inv_1 | ].
-replace e with (b + len) in Hnz by flia Heqlen.
-clear e Heqlen.
-revert b Hnz.
-induction len; intros. {
-  cbn.
-  now do 2 rewrite rngl_mul_1_l.
-}
-rewrite List_seq_succ_r.
-do 2 rewrite fold_left_app.
-rewrite <- IHlen. 2: {
-  intros i Hi.
-  apply Hnz; flia Hi.
-}
-rewrite fold_left_op_fun_from_d with (d := 1%F); cycle 1. {
-  apply rngl_mul_1_l.
-} {
-  apply rngl_mul_1_r.
-} {
-  apply rngl_mul_assoc.
-}
-symmetry.
-rewrite fold_left_op_fun_from_d with (d := 1%F); cycle 1. {
-  apply rngl_mul_1_l.
-} {
-  apply rngl_mul_1_r.
-} {
-  apply rngl_mul_assoc.
-}
-symmetry; cbn.
-do 3 rewrite rngl_mul_1_l.
-rewrite rngl_mul_comm.
-apply rngl_inv_mul_distr; [ easy | easy | apply Hnz; flia | ].
-clear IHlen.
-revert b Hnz.
-induction len; intros; [ apply Hnz; flia | ].
-rewrite List_seq_succ_r.
-rewrite fold_left_app.
-cbn - [ seq ].
-intros Hzz.
-apply rngl_integral in Hzz.
-destruct Hzz as [Hzz| Hzz]. {
-  revert Hzz.
-  apply IHlen.
-  intros i Hi.
-  apply Hnz; flia Hi.
-} {
-  revert Hzz.
-  apply Hnz; flia.
-}
 Qed.
 
 End a.
