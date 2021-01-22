@@ -2302,20 +2302,45 @@ Qed.
 
 Compute (seq 0 (2 * 2 - 1)).
 
-Theorem rngl_product_by_anti_diagonal : ∀ n f,
+Theorem rngl_product_by_anti_diagonal :
+  rngl_is_comm = true →
+  ∀ n f,
   (Π (i ∈ seq 0 n), Π (j ∈ seq 0 n), f i j)%F =
-  (Π (k ∈ seq 0 (2 * n - 1)), Π (i ∈ seq 0 (k + 1)),
+  (Π (k ∈ seq 0 (2 * n - 1)), Π (i = 0, min (n - 1) k),
    (if k <? n + i then f i (k - i)%nat else 1))%F.
 Proof.
-intros.
+intros Hic *.
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+rewrite Hic in rngl_mul_comm.
 induction n; [ easy | ].
 cbn - [ iter_list "-" ].
 destruct n; [ easy | ].
 destruct n. {
   cbn.
   repeat rewrite rngl_mul_1_l.
-(* bobo.... !!! *)
+  now repeat rewrite rngl_mul_assoc.
 }
+destruct n. {
+  cbn.
+  repeat rewrite rngl_mul_1_l.
+  repeat rewrite rngl_mul_assoc.
+  f_equal; f_equal.
+  repeat rewrite <- rngl_mul_assoc.
+  f_equal; f_equal.
+  rewrite rngl_mul_comm, <- rngl_mul_assoc.
+  f_equal.
+  rewrite rngl_mul_comm.
+  f_equal; f_equal.
+  apply rngl_mul_comm.
+}
+destruct n. {
+  cbn.
+  repeat rewrite rngl_mul_1_l.
+  repeat rewrite rngl_mul_assoc.
+  f_equal; f_equal.
+  repeat rewrite <- rngl_mul_assoc.
+  f_equal; f_equal.
+  repeat rewrite rngl_mul_assoc.
 ...
 
 Theorem product_product_if_permut_div :
