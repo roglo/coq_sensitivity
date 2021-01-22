@@ -2219,7 +2219,7 @@ Theorem product_product_if_permut_div : ∀ n σ f,
   → (∀ i j, f i j = f j i)
   → (Π (i ∈ seq 0 n), Π (j ∈ seq 0 n),
       ((if σ i <? σ j then f i j else 1) / (if i <? j then f i j else 1)))%F =
-  1%F.
+     1%F.
 Proof.
 intros * Hp Hfij.
 ...
