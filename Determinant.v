@@ -2214,14 +2214,80 @@ remember (vect_el σ) as f.
 now apply permut_fun_Permutation.
 Qed.
 
-Theorem product_product_if_permut_div : ∀ n σ f,
+Theorem rngl_product_seq_product : ∀ b len f,
+  len ≠ 0
+  → (Π (i ∈ seq b len), f i = Π (i = b, b + len - 1), f i)%F.
+Proof.
+intros * Hlen.
+unfold iter_seq.
+f_equal; f_equal.
+flia Hlen.
+Qed.
+
+Theorem product_product_if_permut_div :
+  rngl_is_comm = true →
+  rngl_has_1_neq_0 = true →
+  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  ∀ n σ f,
   is_permut_fun σ n
   → (∀ i j, f i j = f j i)
+  → (∀ i j, f i j ≠ 0%F) (* not mandatory but to simplify *)
   → (Π (i ∈ seq 0 n), Π (j ∈ seq 0 n),
       ((if σ i <? σ j then f i j else 1) / (if i <? j then f i j else 1)))%F =
      1%F.
 Proof.
-intros * Hp Hfij.
+intros Hic H10 Hid * Hp Hfij Hfijnz.
+specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
+rewrite H10 in rngl_1_neq_0.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+rewrite rngl_product_seq_product; [ | easy ].
+rewrite Nat.add_0_l.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_product_seq_product; [ | easy ].
+  now rewrite Nat.add_0_l.
+}
+cbn - [ iter_seq "<?" ].
+(* remove i=0 j=0 *)
+destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
+  subst n; cbn - [ "<?" ].
+  do 2 rewrite Nat.ltb_irrefl.
+  do 2 rewrite rngl_mul_1_l.
+  now apply rngl_mul_inv_r.
+}
+(* extract i=0 j=1 and i=1 j=0 that must compensate each other *)
+rewrite rngl_product_split_first; [ | easy | flia Hnz Hn1 ].
+rewrite rngl_product_split_first; [ | easy | flia Hnz Hn1 ].
+do 2 rewrite Nat.ltb_irrefl.
+rewrite rngl_mul_inv_r; [ | easy | easy ].
+rewrite rngl_mul_1_l.
+rewrite rngl_product_split_first; [ | easy | flia Hnz Hn1 ].
+rewrite rngl_mul_mul_swap; [ | easy ].
+rewrite rngl_product_split_first; [ | easy | flia Hnz Hn1 ].
+rewrite rngl_product_split_first; [ | easy | flia Hnz Hn1 ].
+do 2 rewrite rngl_mul_assoc.
+remember (if _ <? _ then _ else _) as a eqn:Ha in |-*.
+remember (if _ <? _ then _ else _) as b eqn:Hb in |-*.
+remember (if _ <? _ then _ else _) as c eqn:Hc in |-*.
+remember (if _ <? _ then _ else _) as d eqn:Hd in |-*.
+replace (a / b * (c / d))%F with 1%F. 2: {
+  subst a b c d; symmetry.
+  do 4 rewrite if_ltb_lt_dec.
+  destruct (lt_dec (σ 0) (σ 1)) as [H1| H1]. {
+    destruct (lt_dec (σ 1) (σ 0)) as [H| H]; [ flia H1 H | clear H ].
+    destruct (lt_dec 0 1) as [H| H]; [ clear H | flia H ].
+    destruct (lt_dec 1 0) as [H| H]; [ flia H | clear H ].
+    rewrite Hfij.
+    rewrite rngl_mul_inv_r; [ | easy | apply Hfijnz ].
+    rewrite rngl_mul_1_l.
+    now rewrite rngl_mul_inv_r.
+  }
+  destruct (lt_dec (σ 1) (σ 0)) as [H| H]; [ clear H | ]. {
+    destruct (lt_dec 0 1) as [H| H]; [ clear H | flia H ].
+    destruct (lt_dec 1 0) as [H| H]; [ flia H | clear H ].
+    rewrite Hfij.
+    rewrite rngl_div_1_r; [ | easy | easy ].
+    rewrite Hfij.
 ...
 
 Theorem product_product_if_permut :

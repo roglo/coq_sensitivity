@@ -506,6 +506,26 @@ transitivity (1 * ¹/ 1)%F. {
 apply H; [ now left | easy ].
 Qed.
 
+Theorem rngl_div_1_r :
+  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  rngl_has_1_neq_0 = true →
+  ∀ a, (a / 1 = a)%F.
+Proof.
+intros Hid H10 *.
+specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
+specialize rngl_opt_mul_div_l as rngl_mul_div_l.
+rewrite H10 in rngl_1_neq_0.
+destruct Hid as [Hid| Hid]. {
+  unfold rngl_div; rewrite Hid.
+  rewrite rngl_inv_1; [ | easy | easy ].
+  apply rngl_mul_1_r.
+} {
+  rewrite Hid in rngl_mul_div_l.
+  specialize (rngl_mul_div_l 1%F a rngl_1_neq_0) as H1.
+  now rewrite rngl_mul_1_l in H1.
+}
+Qed.
+
 Theorem rngl_sub_0_r : ∀ a, (a - 0 = a)%F.
 Proof.
 intros.
