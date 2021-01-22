@@ -2214,6 +2214,16 @@ remember (vect_el σ) as f.
 now apply permut_fun_Permutation.
 Qed.
 
+Theorem product_product_if_permut_div : ∀ n σ f,
+  is_permut_fun σ n
+  → (∀ i j, f i j = f j i)
+  → (Π (i ∈ seq 0 n), Π (j ∈ seq 0 n),
+      ((if σ i <? σ j then f i j else 1) / (if i <? j then f i j else 1)))%F =
+  1%F.
+Proof.
+intros * Hp Hfij.
+...
+
 Theorem product_product_if_permut :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -2286,6 +2296,8 @@ erewrite rngl_product_list_eq_compat. 2 :{
   easy.
 }
 cbn - [ iter_list "<?" ].
+...
+now apply product_product_if_permut_div.
 ...
 
 Theorem signature_comp :
