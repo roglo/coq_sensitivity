@@ -2300,6 +2300,13 @@ rewrite rngl_div_1_r; [ | now left | easy ].
 apply rngl_mul_1_l.
 Qed.
 
+Theorem rngl_product_by_anti_diagonal : ∀ n f,
+  (Π (i ∈ seq 0 n), Π (j ∈ seq 0 n), f i j)%F =
+  (Π (k ∈ seq 0 n), Π (i ∈ seq 0 n), Π (j = k - i, n - 1), f i j)%F.
+Proof.
+intros.
+...
+
 Theorem product_product_if_permut_div :
   rngl_is_comm = true →
   rngl_has_1_neq_0 = true →
@@ -2312,6 +2319,13 @@ Theorem product_product_if_permut_div :
       ((if σ i <? σ j then f i j else 1) / (if i <? j then f i j else 1)))%F =
      1%F.
 Proof.
+intros Hic H10 Hin * Hp Hfij Hfijnz.
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
+rewrite Hic in rngl_mul_comm.
+rewrite H10 in rngl_1_neq_0.
+rewrite rngl_product_by_anti_diagonal.
+...
 intros Hic H10 Hin * Hp Hfij Hfijnz.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
