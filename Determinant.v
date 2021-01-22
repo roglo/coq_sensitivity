@@ -2302,9 +2302,20 @@ Qed.
 
 Theorem rngl_product_by_anti_diagonal : ∀ n f,
   (Π (i ∈ seq 0 n), Π (j ∈ seq 0 n), f i j)%F =
-  (Π (k ∈ seq 0 n), Π (i ∈ seq 0 n), Π (j = k - i, n - 1), f i j)%F.
+  (Π (k ∈ seq 0 n), Π (i ∈ seq 0 n), Π (j = k - i, n - i - k - 1), f i j)%F.
 Proof.
 intros.
+induction n; [ easy | ].
+cbn - [ iter_list "-" ].
+destruct n. {
+  cbn; symmetry.
+  now rewrite rngl_mul_1_l.
+}
+destruct n. {
+  cbn.
+  repeat rewrite rngl_mul_1_l.
+(* bobo.... !!! *)
+}
 ...
 
 Theorem product_product_if_permut_div :
