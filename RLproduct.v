@@ -153,6 +153,39 @@ intros b g k Hbk.
 now apply iter_shift.
 Qed.
 
+Theorem rngl_product_list_opt_integral :
+  rngl_is_integral = true →
+  rngl_has_1_neq_0 = true →
+  ∀ A (l : list A) f,
+  (Π (i ∈ l), f i)%F = 0%F
+  → ∃ i, i ∈ l ∧ f i = 0%F.
+Proof.
+intros Hin H10 * Hz.
+specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
+specialize rngl_opt_integral as rngl_integral.
+rewrite H10 in rngl_1_neq_0.
+rewrite Hin in rngl_integral.
+induction l as [| a]; [ easy | ].
+cbn in Hz.
+rewrite rngl_mul_1_l in Hz.
+rewrite (fold_left_op_fun_from_d 1%F) in Hz; cycle 1. {
+  apply rngl_mul_1_l.
+} {
+  apply rngl_mul_1_r.
+} {
+  apply rngl_mul_assoc.
+}
+rewrite fold_iter_list in Hz.
+apply rngl_integral in Hz.
+destruct Hz as [Hz| Hz]. {
+  exists a.
+  split; [ now left | easy ].
+}
+destruct (IHl Hz) as (i & Hil & Hfi).
+exists i.
+split; [ now right | easy ].
+Qed.
+
 Theorem rngl_product_opt_integral :
   rngl_is_integral = true →
   rngl_has_1_neq_0 = true →
@@ -161,37 +194,11 @@ Theorem rngl_product_opt_integral :
   → ∃ i, b ≤ i ≤ e ∧ f i = 0%F.
 Proof.
 intros Hin H10 * Hz.
-unfold iter_seq, iter_list in Hz.
-remember (S e - b) as len eqn:Hlen in Hz.
-destruct len. {
-  cbn in Hz.
-  specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
-  now rewrite H10 in rngl_1_neq_0.
-}
-replace e with (b + len) by flia Hlen.
-clear e Hlen.
-revert b Hz.
-induction len; intros. {
-  cbn in Hz.
-  rewrite rngl_mul_1_l in Hz.
-  exists b.
-  now rewrite Nat.add_0_r.
-}
-rewrite List_seq_succ_r in Hz.
-rewrite fold_left_app in Hz.
-remember (S len) as s; cbn in Hz; subst s.
-specialize rngl_opt_integral as rngl_integral.
-rewrite Hin in rngl_integral.
-apply rngl_integral in Hz.
-destruct Hz as [Hz| Hz]. {
-  apply IHlen in Hz.
-  destruct Hz as (i, Hi).
-  exists i.
-  split; [ flia Hi | easy ].
-} {
-  exists (b + S len).
-  split; [ flia | easy ].
-}
+apply rngl_product_list_opt_integral in Hz; [ | easy | easy ].
+destruct Hz as (i & His & Hfi).
+apply in_seq in His.
+exists i.
+split; [ flia His | easy ].
 Qed.
 
 (*  a version without commutativity, but inverted product would be better *)

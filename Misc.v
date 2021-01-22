@@ -172,6 +172,10 @@ intros i Hbie.
 apply Hgh; flia Hbie.
 Qed.
 
+Theorem fold_iter_list : ∀ {A B} (f : A → B → A) l d,
+  fold_left f l d = iter_list l f d.
+Proof. easy. Qed.
+
 Theorem fold_iter_seq : ∀ {T} b e f (d : T),
   fold_left f (seq b (S e - b)) d = iter_seq b e f d.
 Proof. easy. Qed.
