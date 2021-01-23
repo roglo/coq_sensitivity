@@ -2301,11 +2301,54 @@ rewrite rngl_div_1_r; [ | now left | easy ].
 apply rngl_mul_1_l.
 Qed.
 
+Notation "'Cons' ( i = b , e ) , g" :=
+  (iter_seq b e (λ c i, g :: c) [])
+  (at level 55, i at level 0, b at level 60, e at level 60, g at level 55).
+
+Notation "'Cons' ( i ∈ l ) , g" :=
+  (iter_list l (λ c i, g :: c) [])
+  (at level 55, i at level 0, l at level 60, g at level 55).
+
+Notation "'App' ( i ∈ l ) , g" :=
+  (iter_list l (λ c i, c ++ [g]) [])
+  (at level 55, i at level 0, l at level 60).
+
+Compute let n := 4 in Cons (i ∈ seq 0 n), i + 17.
+Compute let n := 4 in App (i ∈ seq 0 n), i + 17.
+
+Print Grammar constr.
+
+Theorem toto :
+  ∀ n (f : _ → _ → T),
+  Cons (i ∈ seq 0 n), Cons (j ∈ seq 0 n), f i j =
+  match n with
+  | 0 => []
+  | S n' =>
+      Cons (k ∈ seq 0 n'), (Cons (i = 0, k), f i (k - i)) ++
+      Cons (k ∈ seq n' n), (Cons (i = k - n', n'), f i (k - i))
+  end.
+Proof.
+intros.
+destruct n; [ easy | ].
+destruct n; [ easy | ].
+destruct n. {
+  cbn.
+(* c'est faux, mais c'est l'idée, quoi... *)
+  admit.
+}
+destruct n. {
+  cbn.
+  admit.
+}
+destruct n. {
+  cbn.
+...
+
 Theorem rngl_product_by_anti_diagonal :
   rngl_is_comm = true →
   ∀ n f,
   (Π (i ∈ seq 0 n), Π (j ∈ seq 0 n), f i j)%F =
-(**)
+(*
   match n with
   | 0 => 1%F
   | S n' =>
@@ -2313,14 +2356,14 @@ Theorem rngl_product_by_anti_diagonal :
        (Π (i = 0, n'), f i (n' - i)%nat) *
        (Π (k ∈ seq n n'), (Π (i = k - n', n'), f i (k - i)%nat)))%F
   end.
-(*
+*)
   match n with
   | 0 => 1%F
   | S n' =>
       ((Π (k ∈ seq 0 n'), (Π (i = 0, k), f i (k - i)%nat)) *
        (Π (k ∈ seq n' n), (Π (i = k - n', n'), f i (k - i)%nat)))%F
   end.
-*)
+(**)
 (*
   match n with
   | 0 => 1%F
@@ -2347,11 +2390,11 @@ induction n; [ easy | ].
 induction n; [ now cbn; rewrite rngl_mul_1_r | ].
 *)
 cbn - [ iter_list "-" ].
-(*
-destruct n; [ now cbn; symmetry; rewrite rngl_mul_1_l | ].
-*)
-destruct n; [ now cbn; rewrite rngl_mul_1_r | ].
 (**)
+destruct n; [ now cbn; symmetry; rewrite rngl_mul_1_l | ].
+(*
+destruct n; [ now cbn; rewrite rngl_mul_1_r | ].
+*)
 destruct n. {
   cbn.
   repeat rewrite rngl_mul_1_l.
@@ -2378,7 +2421,7 @@ destruct n. {
   repeat rewrite <- rngl_mul_assoc.
   f_equal; f_equal.
   repeat rewrite rngl_mul_assoc.
-...
+Admitted.
 
 Theorem product_product_if_permut_div :
   rngl_is_comm = true →
@@ -2397,7 +2440,17 @@ specialize rngl_opt_mul_comm as rngl_mul_comm.
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
 rewrite Hic in rngl_mul_comm.
 rewrite H10 in rngl_1_neq_0.
-rewrite rngl_product_by_anti_diagonal.
+rewrite rngl_product_by_anti_diagonal; [ | easy ].
+destruct n; [ easy | ].
+revert σ Hp.
+induction n; intros. {
+  cbn - [ "<?" ].
+  do 2 rewrite if_ltb_lt_dec.
+  destruct (lt_dec (σ 0) (σ 0)) as [H| H]; [ flia H | clear H ].
+  destruct (lt_dec 0 0) as [H| H]; [ flia H | clear H ].
+  rewrite rngl_div_1_r; [ | now left | easy ].
+  now do 3 rewrite rngl_mul_1_l.
+}
 ...
 intros Hic H10 Hin * Hp Hfij Hfijnz.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
