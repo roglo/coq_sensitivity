@@ -2301,6 +2301,9 @@ rewrite rngl_div_1_r; [ | now left | easy ].
 apply rngl_mul_1_l.
 Qed.
 
+(*
+(* je fais juste joujou pour voir... *)
+
 Notation "'Cons' ( i = b , e ) , g" :=
   (iter_seq b e (λ c i, g :: c) [])
   (at level 55, i at level 0, b at level 60, e at level 60, g at level 55).
@@ -2342,60 +2345,28 @@ destruct n. {
 }
 destruct n. {
   cbn.
-(* je fais juste joujou pour voir... *)
 ...
+*)
 
 Theorem rngl_product_by_anti_diagonal :
   rngl_is_comm = true →
   ∀ n f,
   (Π (i ∈ seq 0 n), Π (j ∈ seq 0 n), f i j)%F =
-(*
-  match n with
-  | 0 => 1%F
-  | S n' =>
-      ((Π (k ∈ seq 0 n'), (Π (i = 0, k), f i (k - i)%nat)) *
-       (Π (i = 0, n'), f i (n' - i)%nat) *
-       (Π (k ∈ seq n n'), (Π (i = k - n', n'), f i (k - i)%nat)))%F
-  end.
-*)
   match n with
   | 0 => 1%F
   | S n' =>
       ((Π (k ∈ seq 0 n'), (Π (i = 0, k), f i (k - i)%nat)) *
        (Π (k ∈ seq n' n), (Π (i = k - n', n'), f i (k - i)%nat)))%F
   end.
-(**)
-(*
-  match n with
-  | 0 => 1%F
-  | S n' =>
-      ((Π (k ∈ seq 0 n), (Π (i = 0, k), f i (k - i)%nat)) *
-       (Π (k ∈ seq n n'), (Π (i = k - n', n'), f i (k - i)%nat)))%F
-  end.
-*)
-(*
-  ((Π (k ∈ seq 0 n), (Π (i = 0, k), f i (k - i)%nat)) *
-   (Π (k ∈ seq n (n - 1)), (Π (i = k - (n - 1), n - 1), f i (k - i)%nat)))%F.
-*)
-(*
-  (Π (k ∈ seq 0 (2 * n - 1)), Π (i = 0, min (n - 1) k),
-   (if k <? n + i then f i (k - i)%nat else 1))%F.
-*)
 Proof.
 intros Hic *.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
 rewrite Hic in rngl_mul_comm.
-(**)
 induction n; [ easy | ].
-(*
-induction n; [ now cbn; rewrite rngl_mul_1_r | ].
-*)
+...
+cbn.
 cbn - [ iter_list "-" ].
-(**)
 destruct n; [ now cbn; symmetry; rewrite rngl_mul_1_l | ].
-(*
-destruct n; [ now cbn; rewrite rngl_mul_1_r | ].
-*)
 destruct n. {
   cbn.
   repeat rewrite rngl_mul_1_l.
@@ -2422,7 +2393,7 @@ destruct n. {
   repeat rewrite <- rngl_mul_assoc.
   f_equal; f_equal.
   repeat rewrite rngl_mul_assoc.
-Admitted.
+...
 
 Theorem product_product_if_permut_div :
   rngl_is_comm = true →
