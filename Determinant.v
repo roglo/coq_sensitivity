@@ -2436,59 +2436,29 @@ destruct n. {
   repeat rewrite rngl_mul_1_l.
   repeat rewrite <- rngl_mul_assoc.
   f_equal.
-(**)
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  do 4 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
   f_equal.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  do 4 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
   f_equal.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  do 4 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
   f_equal; f_equal.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  do 2 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
   f_equal.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  do 8 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
   f_equal.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  do 3 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
   f_equal.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  do 5 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
   f_equal.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  do 4 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
   f_equal.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  do 2 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
   f_equal.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  do 1 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
   f_equal.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  do 3 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
   f_equal.
-  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  do 1 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
   f_equal.
   rewrite rngl_mul_comm.
   easy.
