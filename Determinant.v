@@ -2342,6 +2342,7 @@ destruct n. {
 }
 destruct n. {
   cbn.
+(* je fais juste joujou pour voir... *)
 ...
 
 Theorem rngl_product_by_anti_diagonal :
