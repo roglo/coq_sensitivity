@@ -2348,15 +2348,8 @@ destruct n. {
 ...
 *)
 
-(* to be moved to Misc.v *)
-Theorem iter_list_app : ∀ A B (d : A) (f : A → B → A) la lb,
-  iter_list (la ++ lb) f d = iter_list lb f (iter_list la f d).
-Proof.
-intros.
-unfold iter_list.
-now rewrite fold_left_app.
-Qed.
-
+(* mouais, bon, c'est sûrement vrai, mais galère à prouver, sans
+   compter que c'est peut-être même pas suffisant...
 Theorem rngl_product_by_anti_diagonal :
   rngl_is_comm = true →
   ∀ n f,

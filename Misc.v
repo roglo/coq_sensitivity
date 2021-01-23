@@ -1767,6 +1767,14 @@ rewrite (fold_left_op_fun_from_d d); [ | easy | easy | easy ].
 now rewrite Nat.add_succ_comm.
 Qed.
 
+Theorem iter_list_app : ∀ A B (d : A) (f : A → B → A) la lb,
+  iter_list (la ++ lb) f d = iter_list lb f (iter_list la f d).
+Proof.
+intros.
+unfold iter_list.
+now rewrite fold_left_app.
+Qed.
+
 Theorem iter_list_eq_compat : ∀ A B d (op : A → A → A) (l : list B) g h,
   (∀ i, i ∈ l → g i = h i)
   → iter_list l (λ c i, op c (g i)) d =
