@@ -2305,13 +2305,21 @@ Theorem rngl_product_by_anti_diagonal :
   rngl_is_comm = true →
   ∀ n f,
   (Π (i ∈ seq 0 n), Π (j ∈ seq 0 n), f i j)%F =
-(**)
+(*
+  match n with
+  | 0 => 1%F
+  | S n' =>
+      ((Π (k ∈ seq 0 n'), (Π (i = 0, k), f i (k - i)%nat)) *
+       (Π (k ∈ seq 0 n), (Π (i = k, n'), f i (k + n' - i)%nat)))%F
+  end.
+*)
   match n with
   | 0 => 1%F
   | S n' =>
       ((Π (k ∈ seq 0 n'), (Π (i = 0, k), f i (k - i)%nat)) *
        (Π (k ∈ seq n' n), (Π (i = k - n', n'), f i (k - i)%nat)))%F
   end.
+(**)
 (*
   match n with
   | 0 => 1%F
