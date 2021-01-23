@@ -2348,6 +2348,15 @@ destruct n. {
 ...
 *)
 
+(* to be moved to Misc.v *)
+Theorem iter_list_app : ∀ A B (d : A) (f : A → B → A) la lb,
+  iter_list (la ++ lb) f d = iter_list lb f (iter_list la f d).
+Proof.
+intros.
+unfold iter_list.
+now rewrite fold_left_app.
+Qed.
+
 Theorem rngl_product_by_anti_diagonal :
   rngl_is_comm = true →
   ∀ n f,
@@ -2362,8 +2371,26 @@ Proof.
 intros Hic *.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
 rewrite Hic in rngl_mul_comm.
-induction n; [ easy | ].
+destruct n; [ easy | ].
+induction n. {
+  unfold iter_seq, iter_list; cbn.
+  now repeat rewrite rngl_mul_1_l.
+}
+rewrite List_seq_succ_r; cbn - [ seq ].
+rewrite iter_list_app.
+unfold iter_list at 1; cbn - [ seq ].
+erewrite rngl_product_list_eq_compat. 2: {
+  intros i Hi.
+  rewrite iter_list_app.
+  unfold iter_list at 1; cbn - [ seq ].
+  easy.
+}
+cbn - [ seq ].
 ...
+intros Hic *.
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+rewrite Hic in rngl_mul_comm.
+destruct n; [ easy | ].
 destruct n. {
   now unfold iter_seq, iter_list; cbn; symmetry; rewrite rngl_mul_1_l.
 }
