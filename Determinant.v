@@ -2535,6 +2535,18 @@ rewrite Hic in rngl_mul_comm.
 rewrite H10 in rngl_1_neq_0.
 rewrite rngl_product_product_by_swap; [ | easy ].
 (* ça devrait le faire *)
+rewrite all_1_rngl_product_list_1; [ | easy | ]. 2: {
+  intros i Hi.
+  do 2 rewrite if_ltb_lt_dec.
+  destruct (lt_dec _ _) as [H| H]; [ flia H | clear H ].
+  destruct (lt_dec _ _) as [H| H]; [ flia H | clear H ].
+  apply rngl_div_1_r; [ now left | easy ].
+}
+rewrite rngl_mul_1_l.
+apply all_1_rngl_product_list_1; [ easy | ].
+intros i Hi.
+apply all_1_rngl_product_list_1; [ easy | ].
+intros j Hj.
 ...
 intros Hic H10 Hin * Hp Hfij Hfijnz.
 specialize rngl_opt_mul_comm as rngl_mul_comm.

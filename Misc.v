@@ -1663,6 +1663,26 @@ rewrite op_d_l.
 apply op_assoc.
 Qed.
 
+Theorem iter_list_all_d : ∀ T A d op (l : list A) f
+  (op_d_l : ∀ x, op d x = x)
+  (op_d_r : ∀ x, op x d = x)
+  (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
+  (∀ i, i ∈ l → f i = d)
+  → iter_list l (λ (c : T) i, op c (f i)) d = d.
+Proof.
+intros * op_d_l op_d_r op_assoc Hz.
+unfold iter_list.
+induction l as [| a]; [ easy | cbn ].
+rewrite (fold_left_op_fun_from_d d); [ | easy | easy | easy ].
+rewrite IHl. {
+  rewrite op_d_l, op_d_r.
+  now apply Hz; left.
+}
+intros i Hi.
+apply Hz.
+now right.
+Qed.
+
 Theorem iter_seq_all_d : ∀ T d op b e f
   (op_d_l : ∀ x, op d x = x)
   (op_d_r : ∀ x, op x d = x)
@@ -1671,17 +1691,9 @@ Theorem iter_seq_all_d : ∀ T d op b e f
   → iter_seq b e (λ (c : T) (i : nat), op c (f i)) d = d.
 Proof.
 intros * op_d_l od_d_r op_assoc Hz.
-unfold iter_seq, iter_list.
-remember (S e - b) as n eqn:Hn.
-revert b Hz Hn.
-induction n; intros; [ easy | cbn ].
-rewrite (fold_left_op_fun_from_d d); [ | easy | easy | easy ].
-rewrite IHn; [ | | flia Hn ]. {
-  rewrite Hz; [ | flia Hn ].
-  rewrite op_d_l.
-  apply op_d_l.
-}
+apply iter_list_all_d; [ easy | easy | easy | ].
 intros i Hi.
+apply in_seq in Hi.
 apply Hz; flia Hi.
 Qed.
 
