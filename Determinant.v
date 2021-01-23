@@ -1208,34 +1208,6 @@ Qed.
 
 Import Permutation.
 
-(* to be moved to Misc.v *)
-Theorem iter_list_cons : ∀ A d op (a : A) la f
-  (op_d_l : ∀ x, op d x = x)
-  (op_d_r : ∀ x, op x d = x)
-  (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
-  iter_list (a :: la) (λ (c : T) i, op c (f i)) d =
-  op (f a) (iter_list la (λ (c : T) i, op c (f i)) d).
-Proof.
-intros.
-unfold iter_list; cbn.
-rewrite op_d_l.
-now apply (fold_left_op_fun_from_d d).
-Qed.
-
-(* to be moved to RLsummation.v *)
-Theorem rngl_summation_list_cons : ∀ A (a : A) la f,
-  (Σ (i ∈ a :: la), f i = f a + Σ (i ∈ la), f i)%F.
-Proof.
-intros.
-apply iter_list_cons. {
-  apply rngl_add_0_l.
-} {
-  apply rngl_add_0_r.
-} {
-  apply rngl_add_assoc.
-}
-Qed.
-
 Theorem iter_list_permut : ∀ (d : T) (op : T → T → T) (l1 l2 : list nat) f
   (op_d_l : ∀ x, op d x = x)
   (op_d_r : ∀ x, op x d = x)

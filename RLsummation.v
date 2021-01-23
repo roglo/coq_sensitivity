@@ -419,6 +419,19 @@ f_equal. {
 }
 Qed.
 
+Theorem rngl_summation_list_cons : ∀ A (a : A) la f,
+  (Σ (i ∈ a :: la), f i = f a + Σ (i ∈ la), f i)%F.
+Proof.
+intros.
+apply iter_list_cons. {
+  apply rngl_add_0_l.
+} {
+  apply rngl_add_0_r.
+} {
+  apply rngl_add_assoc.
+}
+Qed.
+
 End a.
 
 Arguments rngl_mul_summation_distr_l {T ro rp} a b e f.

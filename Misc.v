@@ -1775,6 +1775,19 @@ unfold iter_list.
 now rewrite fold_left_app.
 Qed.
 
+Theorem iter_list_cons : ∀ A B d op (a : B) la f
+  (op_d_l : ∀ x, op d x = x)
+  (op_d_r : ∀ x, op x d = x)
+  (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
+  iter_list (a :: la) (λ (c : A) i, op c (f i)) d =
+  op (f a) (iter_list la (λ (c : A) i, op c (f i)) d).
+Proof.
+intros.
+unfold iter_list; cbn.
+rewrite op_d_l.
+now apply (fold_left_op_fun_from_d d).
+Qed.
+
 Theorem iter_list_eq_compat : ∀ A B d (op : A → A → A) (l : list B) g h,
   (∀ i, i ∈ l → g i = h i)
   → iter_list l (λ c i, op c (g i)) d =
