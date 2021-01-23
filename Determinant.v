@@ -2301,8 +2301,6 @@ rewrite rngl_div_1_r; [ | now left | easy ].
 apply rngl_mul_1_l.
 Qed.
 
-Compute (seq 0 (2 * 2 - 1)).
-
 Theorem rngl_product_by_anti_diagonal :
   rngl_is_comm = true →
   ∀ n f,
@@ -2310,14 +2308,6 @@ Theorem rngl_product_by_anti_diagonal :
 (**)
   ((Π (k ∈ seq 0 n), (Π (i = 0, k), f i (k - i)%nat)) *
    (Π (k ∈ seq n (n - 1)), (Π (i = k - (n - 1), n - 1), f i (k - i)%nat)))%F.
-(*
-  ((Π (k ∈ seq 0 n),
-    (Π (i = 0, k),
-     f i (k - i)%nat)) *
-   (Π (k ∈ seq n (n - 1)),
-    (Π (i = k - (n - 1), n - 1),
-     if k <? n + i then f i (k - i)%nat else 1)))%F.
-*)
 (*
   (Π (k ∈ seq 0 (2 * n - 1)), Π (i = 0, min (n - 1) k),
    (if k <? n + i then f i (k - i)%nat else 1))%F.
