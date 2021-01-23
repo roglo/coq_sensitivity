@@ -2305,21 +2305,22 @@ Theorem rngl_product_by_anti_diagonal :
   rngl_is_comm = true →
   ∀ n f,
   (Π (i ∈ seq 0 n), Π (j ∈ seq 0 n), f i j)%F =
-(*
+(**)
   match n with
   | 0 => 1%F
   | S n' =>
       ((Π (k ∈ seq 0 n'), (Π (i = 0, k), f i (k - i)%nat)) *
-       (Π (k ∈ seq 0 n), (Π (i = k, n'), f i (k + n' - i)%nat)))%F
+       (Π (i = 0, n'), f i (n' - i)%nat) *
+       (Π (k ∈ seq n n'), (Π (i = k - n', n'), f i (k - i)%nat)))%F
   end.
-*)
+(*
   match n with
   | 0 => 1%F
   | S n' =>
       ((Π (k ∈ seq 0 n'), (Π (i = 0, k), f i (k - i)%nat)) *
        (Π (k ∈ seq n' n), (Π (i = k - n', n'), f i (k - i)%nat)))%F
   end.
-(**)
+*)
 (*
   match n with
   | 0 => 1%F
@@ -2346,11 +2347,11 @@ induction n; [ easy | ].
 induction n; [ now cbn; rewrite rngl_mul_1_r | ].
 *)
 cbn - [ iter_list "-" ].
-(**)
-destruct n; [ now cbn; symmetry; rewrite rngl_mul_1_l | ].
 (*
-destruct n; [ now cbn; rewrite rngl_mul_1_r | ].
+destruct n; [ now cbn; symmetry; rewrite rngl_mul_1_l | ].
 *)
+destruct n; [ now cbn; rewrite rngl_mul_1_r | ].
+(**)
 destruct n. {
   cbn.
   repeat rewrite rngl_mul_1_l.
