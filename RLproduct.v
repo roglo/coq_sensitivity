@@ -281,3 +281,6 @@ Qed.
 End a.
 
 Arguments rngl_inv_product {T}%type {ro rp} _ _ _ _ (b e)%nat f.
+Arguments rngl_product_list_mul_distr {T}%type {ro rp} _ A%type
+  (g h)%function l%list_scope.
+Arguments rngl_product_split {T}%type {ro rp} j%nat g%function (b k)%nat.
