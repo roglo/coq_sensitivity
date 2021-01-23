@@ -2320,8 +2320,6 @@ Notation "'App' ( i ∈ l ) , g" :=
 Compute let n := 4 in Cons (i ∈ seq 0 n), i + 17.
 Compute let n := 4 in App (i ∈ seq 0 n), i + 17.
 
-Print Grammar constr.
-
 Theorem toto :
   ∀ n (f : _ → _ → T),
   Cons (i ∈ seq 0 n), Cons (j ∈ seq 0 n), f i j =
@@ -2333,6 +2331,7 @@ Theorem toto :
   end.
 Proof.
 intros.
+unfold iter_seq, iter_list.
 destruct n; [ easy | ].
 destruct n; [ easy | ].
 destruct n. {
