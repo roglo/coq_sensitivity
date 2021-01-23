@@ -146,6 +146,7 @@ induction n; intros; [ easy | ].
 rewrite Nat.sub_succ, Nat.sub_0_r in H.
 rewrite rngl_summation_split_last in H; [ | flia ].
 destruct n. {
+  unfold iter_seq, iter_list in H.
   cbn in H.
   rewrite rngl_add_0_l in H.
   specialize (rngl_integral _ _ H) as H1.
@@ -162,6 +163,7 @@ cbn - [ iter_seq ] in H.
 apply rngl_eq_add_0 in H; [ | easy | | ]; cycle 1. {
   clear H Hi IHn.
   induction n. {
+    unfold iter_seq, iter_list.
     cbn; rewrite rngl_add_0_l.
     now apply rngl_0_le_squ.
   }
@@ -202,6 +204,8 @@ intros (Hic & Hop & Hed & Hld & Hdo & Hin & Hor) * Hcz.
 unfold Rayleigh_quotient.
 destruct (vect_opt_eq_dec Hed n x (vect_zero n)) as [Hxz| Hxz]. {
   subst x; cbn.
+  unfold vect_dot_product, iter_seq, iter_list; cbn.
+  unfold iter_seq, iter_list; cbn.
   do 2 rewrite rngl_mul_0_l.
   do 3 rewrite rngl_mul_0_r.
   now rewrite rngl_mul_0_l.
@@ -539,7 +543,8 @@ specialize (diagonalized_matrix_prop_1 Hic) as H1.
 specialize (H1 n M ev eV D U Hsy Hvv Hd Ho).
 rewrite <- H1.
 rewrite <- mat_mul_assoc; [ | easy ].
-... (*
+...
+(*
 rewrite (@det_nz_inv_comm _ _ U). 3: {
   specialize for_symm_squ_mat_eigen_vect_mat_is_ortho as H2.
   specialize (H2 Hic Hed Hiv n M ev eV).

@@ -220,465 +220,6 @@ Arguments vect_el {n}%nat {T} v%V.
 Notation "U + V" := (vect_add U V) : V_scope.
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
 
-(*
-Theorem pouet : ∀ n (M : matrix n n T) l r1 r2,
-  n ≠ 0
-  → l =
-      map (λ k,
-        (- signature n k *
-         Π (i = 1, n),
-         mat_el M (i - 1) (vect_el (swap_in_permut n r1 r2 k) (i - 1)%nat))%F)
-        (seq 0 (fact n))
-  → Permutation l (determinant'_list M).
-Proof.
-intros * Hnz Hl.
-unfold determinant'_list; subst l.
-destruct n; [ easy | clear Hnz ].
-replace (fact (S n)) with (1 + (fact (S n) - 1)). 2: {
-  rewrite Nat.add_comm, Nat.sub_add; [ easy | ].
-  apply Nat.neq_0_lt_0, fact_neq_0.
-}
-rewrite seq_app.
-cbn - [ iter_seq signature swap_in_permut permut fact ].
-Print Permutation.
-Search (Permutation (_ :: _)).
-...
-cbn - [ iter_seq signature swap_in_permut permut ].
-rewrite seq_app.
-do 2 rewrite map_app.
-cbn - [ iter_seq signature swap_in_permut permut ].
-...
-Search (Permutation (_ ++ _)).
-Print Permutation.
-...
-
-Compute let n := 4 in let '(i, j) := (0, 2) in nat_of_permut (swap_in_permut n i j (nat_of_permut (swap_in_permut n i j 13))).
-
-Theorem pouet : ∀ n i j k,
-  i < n
-  → j < n
-  → k < fact n
-  → nat_of_permut
-      (swap_in_permut n i j (nat_of_permut (swap_in_permut n i j k))) = k.
-Proof.
-intros * Hi Hj Hk.
-revert i j k Hi Hj Hk.
-induction n; intros; [ easy | ].
-cbn - [ nat_of_permut_sub_vect ].
-...
-
-Compute list_of_vect (permut 2 1).
-Compute list_of_vect (permut 2 2).
-Compute list_of_vect (permut 2 3).
-...
-
-Theorem glop : ∀ b e f g,
-  (∀ i, b ≤ i ≤ e → b ≤ g i ≤ e)
-  → (∀ i, b ≤ i ≤ e → g i ≠ i)
-  → (∀ i, b ≤ i ≤ e → g (g i) = i)
-  → (Σ (i = b, e), f i =
-     Σ (i = b, e), (if lt_dec i (g i) then f i else 0) +
-     Σ (i = b, e), (if lt_dec i (g i) then f (g i) else 0))%F.
-Proof.
-intros * Hgbe Hgii Hggi.
-destruct (le_dec b e) as [Hbe| Hbe]. 2: {
-  apply Nat.nle_gt in Hbe.
-  rewrite rngl_summation_empty; [ | easy ].
-  rewrite rngl_summation_empty; [ | easy ].
-  rewrite rngl_summation_empty; [ | easy ].
-  symmetry; apply rngl_add_0_l.
-}
-remember (S e - b) as len eqn:Hlen.
-replace e with (b + len - 1) in * by flia Hbe Hlen.
-clear e.
-destruct len. {
-  destruct b; [ easy | cbn in Hbe; flia Hbe ].
-}
-rewrite <- Nat.add_sub_assoc; [ | flia ].
-rewrite <- Nat.add_sub_assoc in Hgbe; [ | flia ].
-rewrite <- Nat.add_sub_assoc in Hgii; [ | flia ].
-rewrite <- Nat.add_sub_assoc in Hggi; [ | flia ].
-rewrite Nat.sub_succ, Nat.sub_0_r in Hgbe, Hgii, Hggi |-*.
-clear Hbe Hlen.
-(**)
-rewrite (rngl_summation_split_first _ b); [ | flia ].
-rewrite (rngl_summation_split_first _ b); [ | flia ].
-rewrite (rngl_summation_split_first _ b); [ | flia ].
-destruct (lt_dec b (g b)) as [Hbgb| Hbgb]. {
-  rewrite <- rngl_add_assoc; f_equal.
-  rewrite (rngl_summation_split _ (g b)). 2: {
-    split; [ flia Hbgb | ].
-    apply -> Nat.succ_le_mono.
-    apply Hgbe; flia.
-  }
-  rewrite (rngl_summation_split_last _ _ (g b)); [ | easy ].
-  rewrite rngl_add_assoc.
-  rewrite rngl_add_add_swap; symmetry.
-  rewrite rngl_add_add_swap; symmetry; f_equal.
-  rewrite (rngl_summation_split _ (g b) _ (S b)). 2: {
-    split; [ flia Hbgb | ].
-    apply -> Nat.succ_le_mono.
-    apply Hgbe; flia.
-  }
-  rewrite (rngl_summation_split_last _ (S b) (g b)); [ | easy ].
-  rewrite (rngl_summation_split _ (g b) _ (S b)). 2: {
-    split; [ flia Hbgb | ].
-    apply -> Nat.succ_le_mono.
-    apply Hgbe; flia.
-  }
-  rewrite (rngl_summation_split_last _ (S b) (g b)); [ | easy ].
-  rewrite Hggi; [ | flia ].
-  destruct (lt_dec (g b) b) as [H| H]; [ flia Hbgb H | clear H ].
-  do 2 rewrite rngl_add_0_r.
-...
-revert f g b Hgbe Hgii Hggi.
-induction len; intros. {
-  rewrite Nat.add_0_r in Hgbe, Hgii.
-  specialize (Hgbe b) as H1.
-  specialize (Hgii b) as H2.
-  assert (H : b ≤ b ≤ b) by easy.
-  specialize (H1 H); specialize (H2 H); clear H.
-  flia H1 H2.
-}
-rewrite (rngl_summation_split_first _ b); [ | flia ].
-rewrite (rngl_summation_split_first _ b); [ | flia ].
-rewrite (rngl_summation_split_first _ b); [ | flia ].
-destruct (lt_dec b (g b)) as [Hbg| Hbg]. {
-  rewrite <- rngl_add_assoc; f_equal.
-  rewrite <- Nat.add_succ_comm in Hgbe |-*.
-  rewrite (rngl_summation_split _ (g b)). 2: {
-    specialize (Hgbe b) as H1.
-    assert (b ≤ b ≤ S b + len) by flia.
-    specialize (H1 H); clear H.
-    flia H1.
-  }
-  rewrite rngl_summation_split_last; [ | easy ].
-  rewrite rngl_add_assoc.
-  rewrite rngl_add_add_swap; symmetry.
-  rewrite rngl_add_add_swap; symmetry.
-  f_equal.
-  symmetry.
-  rewrite (rngl_summation_split _ (g b)). 2: {
-    specialize (Hgbe b) as H1.
-    assert (b ≤ b ≤ S b + len) by flia.
-    specialize (H1 H); clear H.
-    flia H1.
-  }
-  rewrite rngl_summation_split_last; [ | easy ].
-  symmetry.
-  rewrite Hggi; [ | flia ].
-  destruct (lt_dec (g b) b) as [H| H]; [ flia Hbg H | clear H ].
-  rewrite rngl_add_0_r.
-...
-  rewrite IHlen with (g := λ i, S (g i)); cycle 1. {
-    intros i Hi.
-    specialize (Hgbe i) as H1.
-    assert (H : b ≤ S i ≤ S b + len).
-    specialize (H1 H); clear H.
-    split; [ | easy ].
-...
-  destruct (lt_dec b (g b)) as [Hbg| Hbg]; [ now rewrite rngl_add_0_r | ].
-  apply Nat.nlt_ge in Hbg.
-  rewrite rngl_add_0_l.
-  specialize (Hgbe b).
-  now replace (g b) with b by flia Hgbe.
-}
-rewrite (rngl_summation_split_first _ b); [ | flia ].
-rewrite (rngl_summation_split_first _ b); [ | flia ].
-rewrite (rngl_summation_split_first _ b); [ | flia ].
-destruct (lt_dec b (g b)) as [Hbg| Hbg]. {
-  rewrite rngl_add_0_l.
-  rewrite <- rngl_add_assoc; f_equal.
-  rewrite <- Nat.add_succ_comm in Hgbe, Hgii, Hggi |-*.
-(*
-  apply IHlen. {
-    intros i Hi.
-    specialize (Hgbe i) as H1.
-    split; [ | flia Hi H1 ].
-    assert (H : b ≤ i ≤ S b + len) by flia Hi.
-    specialize (H1 H).
-    clear H.
-    specialize (Hgbe _ H1) as H2.
-...
-  rewrite Nat.add_succ_l.
-  do 3 rewrite rngl_summation_succ_succ.
-  rewrite IHlen with (g := λ i, g (S i)); cycle 1. {
-    intros i Hi.
-    specialize (Hgbe (S i)) as H1.
-    assert (H : b ≤ S i ≤ S b + len) by flia Hi.
-    specialize (H1 H).
-    split; [ easy | ].
-...
-    specialize (Hgbe (S i)) as H1.
-    assert (H : b ≤ S i ≤ S b + len) by flia Hi.
-    specialize (H1 H).
-    clear H.
-    split; [ | flia H1 ].
-...
-*)
-  destruct len. {
-    rewrite Nat.add_0_r.
-    rewrite rngl_summation_only_one; [ | easy ].
-    rewrite rngl_summation_only_one; [ | easy ].
-    rewrite rngl_summation_only_one; [ | easy ].
-    destruct (lt_dec (S b) (g (S b))) as [Hsbg| Hsbg]. {
-      symmetry; apply rngl_add_0_r.
-    }
-    symmetry; apply rngl_add_0_l.
-  }
-  rewrite Nat.add_succ_r.
-  cbn - [ iter_seq ].
-  do 3 rewrite rngl_summation_succ_succ.
-  destruct len. {
-    rewrite Nat.add_0_r.
-    cbn.
-    destruct b; cbn. {
-      do 3 rewrite rngl_add_0_l.
-      destruct (lt_dec 1 (g 1)) as [H1g1| H1g1]. {
-        rewrite rngl_add_0_l.
-        rewrite <- rngl_add_assoc; f_equal.
-        destruct (lt_dec 2 (g 2)) as [H2g2| H2g2]. {
-          now rewrite rngl_add_0_r.
-        }
-        now rewrite rngl_add_0_l.
-      }
-      rewrite rngl_add_0_l.
-      destruct (lt_dec 2 (g 2)) as [H2g2| H2g2]. {
-        now rewrite rngl_add_0_r, rngl_add_comm.
-      }
-      now rewrite rngl_add_0_l.
-    }
-    destruct b. {
-      cbn.
-      (* ouais, bon, fait chier *)
-...
-  rewrite IHlen with (g := g); cycle 1. {
-    intros i Hi.
-    specialize (Hgbe i) as H1.
-    assert (H : b ≤ i ≤ S b + S len) by flia Hi.
-    specialize (H1 H).
-    split; [ | easy ].
-...
-  rewrite IHlen with (g := g); cycle 1. {
-    intros i Hi.
-    specialize (Hgbe i) as H1.
-    assert (H : b ≤ i ≤ S b + len) by flia Hi.
-    specialize (H1 H); clear H.
-    split; [ | easy ].
-...
-  rewrite IHlen with (g := λ i, S (g i)); cycle 1. {
-    intros i Hi.
-    specialize (Hgbe i) as H1.
-    assert (H : b ≤ i ≤ S b + len) by flia Hi.
-    specialize (H1 H); clear H.
-    split; [ flia H1 | ].
-    cbn.
-    apply -> Nat.succ_le_mono.
-...
-  apply IHlen. {
-    intros i Hi.
-...
-rewrite IHlen; cycle 1. {
-  intros i Hi.
-  split; [ | apply Hgbe; flia Hi ].
-...
-rewrite rngl_add_0_l.
-assert (H : ∀ i, i ≤ len → b ≤ g (b + i) ≤ b + len). {
-  intros i Hi; apply Hgbe; flia Hi.
-}
-move H before Hgbe; clear Hgbe; rename H into Hgbe.
-assert (H : ∀ i, i ≤ len → g (b + i) ≠ b + i). {
-  intros i Hi; apply Hgii; flia Hi.
-}
-move H before Hgii; clear Hgii; rename H into Hgii.
-assert (H : ∀ i, i ≤ len → g (g (b + i)) = b + i). {
-  intros i Hi; apply Hggi; flia Hi.
-}
-move H before Hggi; clear Hggi; rename H into Hggi.
-rewrite rngl_summation_shift; [ symmetry | flia ].
-rewrite rngl_summation_shift; [ symmetry | flia ].
-rewrite Nat.add_comm, Nat.add_sub.
-symmetry.
-erewrite rngl_summation_eq_compat. 2: {
-  intros i Hi.
-  rewrite rngl_summation_shift; [ | flia ].
-  now rewrite Nat.add_sub.
-}
-symmetry.
-revert b g Hgbe Hgii Hggi.
-induction len; intros. {
-  rewrite rngl_summation_only_one; [ | easy ].
-  rewrite rngl_summation_only_one; [ | easy ].
-  rewrite rngl_summation_only_one; [ | easy ].
-  rewrite Nat.add_0_r in Hgbe |-*.
-  destruct (lt_dec b (g b)) as [Hbg| Hbg]; [ easy | ].
-  apply Nat.nlt_ge in Hbg.
-  specialize (Hgbe 0 (le_refl _)).
-  rewrite Nat.add_0_r in Hgbe.
-  now replace (g b) with b by flia Hgbe.
-}
-rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
-rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
-rewrite Nat.add_0_r.
-destruct (lt_dec b (g b)) as [Hgb| Hgb]. {
-  f_equal.
-  do 2 rewrite rngl_summation_succ_succ.
-  erewrite rngl_summation_eq_compat. 2: {
-    intros * Hi.
-    now rewrite <- Nat.add_succ_comm.
-  }
-  symmetry.
-  erewrite rngl_summation_eq_compat. 2: {
-    intros * Hi.
-    now rewrite <- Nat.add_succ_comm.
-  }
-  symmetry.
-...
-  rewrite IHlen with (g := λ i, g (i - 1)); cycle 1. {
-    intros i Hi.
-    specialize (Hgbe i) as H1.
-...
-    assert (H : S i ≤ S len) by flia Hi.
-    specialize (H1 H); clear H.
-    do 2 rewrite Nat.add_succ_comm.
-    split; [ | easy ].
-...
-  rewrite IHlen; cycle 1. {
-    intros i Hi.
-    specialize (Hgbe (S i)) as H1.
-    assert (H : S i ≤ S len) by flia Hi.
-    specialize (H1 H); clear H.
-    do 2 rewrite Nat.add_succ_comm.
-    split; [ | easy ].
-    destruct (Nat.eq_dec (g (b + S i)) b) as [Hgbi| Hgbi]; [ | flia H1 Hgbi ].
-...
-  rewrite IHlen; cycle 1. {
-    intros i Hi.
-    specialize (Hgbe i) as H1.
-    specialize (Hgii i) as H2.
-    specialize (Hggi i) as H3.
-    assert (H : b ≤ i ≤ S b + len) by flia Hi.
-    specialize (H1 H).
-    specialize (H2 H).
-    specialize (H3 H); clear H.
-    split; [ | easy ].
-    destruct (Nat.eq_dec b (g i)) as [Hbg| Hbg]; [ | flia H1 Hbg ].
-    subst b.
-    specialize (Hgbe (g i)) as H4.
-    specialize (Hgii (g i)) as H5.
-    specialize (Hggi (g i)) as H6.
-    rewrite H3 in H4, H5, H6.
-    clear H1 H5 H6.
-    rewrite H3 in Hgb.
-...
-*)
-
-(*
-Theorem summation_pair : ∀ b e f g,
-  (∀ i, b ≤ i ≤ e → b ≤ g i ≤ e)
-  → (∀ i, b ≤ i ≤ e → g i ≠ i)
-  → (∀ i, b ≤ i ≤ e → g (g i) = i)
-  → (Σ (i = b, e), f i =
-     Σ (i = b, e), if lt_dec i (g i) then f i + f (g i) else 0)%F.
-Proof.
-intros * Hgbe Hgii Hggi.
-destruct (le_dec b e) as [Hbe| Hbe]. 2: {
-  apply Nat.nle_gt in Hbe.
-  rewrite rngl_summation_empty; [ | easy ].
-  rewrite rngl_summation_empty; [ | easy ].
-  easy.
-}
-...
-(* experimentation by looking at the first item *)
-rewrite rngl_summation_split_first; [ symmetry | easy | easy ].
-rewrite rngl_summation_split_first; [ symmetry | easy | easy ].
-destruct (lt_dec b (g b)) as [Hbg| Hbg]. 2: {
-  apply Nat.nlt_ge in Hbg.
-  specialize (Hgbe b) as H1.
-  specialize (Hgii b) as H2.
-  assert (H : b ≤ b ≤ e) by flia Hbe.
-  specialize (H1 H); specialize (H2 H); clear H.
-  flia Hbg H1 H2.
-}
-rewrite <- rngl_add_assoc; f_equal.
-symmetry.
-rewrite (rngl_summation_split _ (g b)). 2: {
-  split; [ flia Hbg | ].
-  apply -> Nat.succ_le_mono.
-  apply Hgbe; flia Hbe.
-}
-rewrite rngl_summation_split_last; [ | easy ].
-rewrite Hggi; [ | flia Hbe ].
-destruct (lt_dec (g b) b) as [H| H]; [ flia Hbg H | clear H ].
-rewrite rngl_add_0_r.
-symmetry.
-rewrite (rngl_summation_split _ (g b)). 2: {
-  split; [ flia Hbg | ].
-  apply -> Nat.succ_le_mono.
-  apply Hgbe; flia Hbe.
-}
-rewrite rngl_summation_split_last; [ | easy ].
-rewrite rngl_add_comm, rngl_add_assoc, rngl_add_comm.
-f_equal; rewrite rngl_add_comm.
-...
-unfold iter_seq.
-remember (S e - b) as len eqn:Hlen.
-replace e with (b + len - 1) in Hg by flia Hbe Hlen.
-(*
-assert (H : ∀ i, i < len → g (b + i) < b + len ∧ g (b + i) ≠ b + i). {
-  intros i Hi.
-  specialize (Hg (b + i)).
-  assert (H : b ≤ b + i ≤ e). {
-    split; [ flia | ].
-    flia Hbe Hi Hlen.
-  }
-  specialize (Hg H); clear H.
-  split; [ | easy ].
-  flia Hg Hlen.
-}
-move H before Hg; clear Hg; rename H into Hg.
-*)
-clear e Hbe Hlen.
-revert b Hg.
-induction len; intros; [ easy | ].
-cbn.
-(*
-destruct len. {
-  cbn.
-  specialize (Hg b).
-  rewrite Nat.add_sub in Hg.
-  assert (H : b ≤ b ≤ b) by flia.
-  specialize (Hg H); clear H.
-  flia Hg.
-}
-*)
-do 2 rewrite rngl_add_0_l.
-rewrite fold_left_rngl_add_fun_from_0; [ symmetry | easy ].
-rewrite fold_left_rngl_add_fun_from_0; [ symmetry | easy ].
-destruct (lt_dec b (g b)) as [Hgb| Hgb]. {
-  rewrite <- rngl_add_assoc.
-  f_equal.
-...
-  rewrite <- IHlen. 2: {
-    intros i Hi.
-    specialize (Hg i) as H1.
-    assert (H : b ≤ i ≤ b + S len - 1) by flia Hi Hgb.
-    specialize (H1 H); clear H.
-    split; [ | easy ].
-    split; [ | flia H1 ].
-...
-    do 2 rewrite Nat.add_succ_comm.
-    apply Hg; flia Hi.
-  }
-...
-             fold_left (λ (c : T) (i : nat), c + f i) (seq (S b) len) 0%F =
-  (f (g b) + fold_left (λ (c : T) (i : nat), c + f i) (seq (S b) len) 0)%F
-
-  (f b + fold_left (λ (c : T) (i : nat), c + f i) (seq (S b) len) 0)%F =
-         fold_left (λ (c : T) (i : nat), c + f i) (seq (S b) len) 0%F
-...
-*)
-
 (* null matrix of dimension m × n *)
 
 Definition mZ m n : matrix m n T :=
@@ -801,7 +342,7 @@ Theorem mat_mul_1_l : ∀ {n} (M : matrix n n T), (mI n * M)%M = M.
 Proof.
 intros.
 apply matrix_eq.
-cbn - [ iter_seq ].
+cbn.
 intros * Hi Hj.
 rewrite (rngl_summation_split _ i); [ | flia Hi ].
 rewrite rngl_summation_split_last; [ | flia ].
@@ -824,7 +365,7 @@ Theorem mat_mul_1_r : ∀ {n} (M : matrix n n T), (M * mI n)%M = M.
 Proof.
 intros.
 apply matrix_eq.
-cbn - [ iter_seq ].
+cbn.
 intros * Hi Hj.
 rewrite (rngl_summation_split _ j); [ | flia Hj ].
 rewrite rngl_summation_split_last; [ | flia ].
@@ -846,8 +387,7 @@ Qed.
 Theorem vect_mul_1_l : ∀ {n} (V : vector n T), (mI n • V)%V = V.
 Proof.
 intros.
-apply vector_eq.
-cbn - [ iter_seq ].
+apply vector_eq; cbn.
 intros * Hi.
 rewrite (rngl_summation_split _ i); [ | flia Hi ].
 rewrite rngl_summation_split_last; [ | flia ].
@@ -875,13 +415,13 @@ Proof.
 intros.
 apply matrix_eq.
 intros i j Hi Hj.
-cbn - [ iter_seq ].
+cbn.
 cbn in Hi, Hj.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   now apply rngl_mul_summation_distr_l.
 }
-cbn - [ iter_seq ].
+cbn.
 rewrite rngl_summation_summation_exch'; [ | easy ].
 apply rngl_summation_eq_compat.
 intros k Hk.
@@ -889,7 +429,7 @@ erewrite rngl_summation_eq_compat. 2: {
   intros l Hl.
   now rewrite rngl_mul_assoc.
 }
-cbn - [ iter_seq ].
+cbn.
 symmetry.
 now apply rngl_mul_summation_distr_r.
 Qed.
@@ -903,13 +443,13 @@ Proof.
 intros.
 apply matrix_eq.
 intros i j Hi Hj.
-cbn - [ iter_seq ].
+cbn.
 cbn in Hi, Hj.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   apply rngl_mul_add_distr_l.
 }
-cbn - [ iter_seq ].
+cbn.
 now apply rngl_summation_add_distr.
 Qed.
 
@@ -922,13 +462,13 @@ Proof.
 intros.
 apply matrix_eq.
 intros i j Hi Hj.
-cbn - [ iter_seq ].
+cbn.
 cbn in Hi, Hj.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   apply rngl_mul_add_distr_r.
 }
-cbn - [ iter_seq ].
+cbn.
 now rewrite rngl_summation_add_distr.
 Qed.
 
@@ -1023,7 +563,7 @@ specialize rngl_opt_mul_comm as rngl_mul_comm.
 rewrite Hic in rngl_mul_comm.
 apply matrix_eq.
 intros * Hi Hj.
-cbn - [ iter_seq ].
+cbn.
 rewrite rngl_mul_summation_distr_l.
 apply rngl_summation_eq_compat.
 intros k Hk.
@@ -1065,7 +605,7 @@ erewrite rngl_summation_eq_compat. 2: {
   now rewrite rngl_mul_summation_distr_r.
 }
 symmetry.
-cbn - [ iter_seq ].
+cbn.
 rewrite rngl_summation_summation_exch'; [ | easy ].
 apply rngl_summation_eq_compat.
 intros j Hj.
@@ -1084,7 +624,7 @@ intros i Hi.
 cbn in Hi.
 unfold mat_mul_vect_r.
 unfold mat_mul.
-cbn - [ iter_seq ].
+cbn.
 now apply mat_vect_mul_assoc_as_sums.
 Qed.
 
@@ -1095,7 +635,7 @@ intros.
 apply vector_eq.
 intros i Hi.
 cbn in Hi.
-cbn - [ iter_seq ].
+cbn.
 rewrite rngl_mul_summation_distr_l.
 apply rngl_summation_eq_compat.
 intros j Hj.
@@ -1110,7 +650,7 @@ intros Hic *.
 apply vector_eq.
 intros i Hi.
 cbn in Hi.
-cbn - [ iter_seq ].
+cbn.
 rewrite rngl_mul_summation_distr_l.
 apply rngl_summation_eq_compat.
 intros j Hj.
@@ -1466,7 +1006,7 @@ Proof.
 intros.
 apply vector_eq.
 intros i Hi.
-cbn - [ iter_seq ].
+cbn.
 rewrite <- rngl_mul_summation_distr_r.
 apply rngl_mul_0_r.
 Qed.

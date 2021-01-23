@@ -239,7 +239,7 @@ erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   now rewrite Nat.sub_succ, Nat.sub_0_r.
 }
-cbn - [ iter_seq ].
+cbn.
 rewrite IHk.
 symmetry.
 rewrite rngl_summation_split_last; [ | flia ].
@@ -248,7 +248,7 @@ erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   now rewrite Nat.sub_succ, Nat.sub_0_r.
 }
-cbn - [ iter_seq ].
+cbn.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_summation_split_last; [ | flia Hi ].
@@ -259,7 +259,7 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ iter_seq ].
+cbn.
 rewrite rngl_summation_add_distr.
 rewrite <- rngl_add_assoc.
 f_equal.
@@ -280,6 +280,7 @@ Proof.
 intros.
 revert l.
 induction k; intros. {
+  unfold iter_seq, iter_list.
   cbn; do 3 rewrite rngl_add_0_l.
   apply List_fold_left_ext_in.
   intros i c Hi.
@@ -295,7 +296,7 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ iter_seq ].
+cbn.
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
@@ -307,7 +308,7 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ iter_seq ].
+cbn.
 rewrite IHk.
 apply rngl_summation_add_distr.
 Qed.
@@ -355,8 +356,8 @@ Proof.
 intros.
 revert b.
 induction a; intros. {
-  unfold iter_seq at 1.
-  cbn - [ iter_seq "mod" "/" ].
+  unfold iter_seq at 1, iter_list at 1.
+  cbn - [ "mod" "/" ].
   rewrite rngl_add_0_l, Nat.add_sub.
   apply rngl_summation_eq_compat.
   intros i Hi.
@@ -374,7 +375,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 remember (S a) as x.
-cbn - [ iter_seq "mod" "/" ]; subst x.
+cbn - [ "mod" "/" ]; subst x.
 rewrite IHa.
 rewrite Nat.sub_0_r.
 rewrite (Nat.add_comm b).
@@ -390,8 +391,8 @@ f_equal. {
   rewrite Nat.div_mul; [ | easy ].
   rewrite Nat.mod_mul; [ | easy ].
   destruct b. {
-    unfold iter_seq at 1.
-    cbn - [ iter_seq "mod" "/" ].
+    unfold iter_seq at 1, iter_list at 1.
+    cbn - [ "mod" "/" ].
     rewrite rngl_add_0_l.
     rewrite rngl_summation_empty; [ | flia ].
     now rewrite rngl_add_0_r.

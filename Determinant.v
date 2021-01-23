@@ -519,11 +519,10 @@ induction n; intros. {
   specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
   now rewrite H10 in rngl_1_neq_0.
 }
-cbn - [ iter_seq ].
+cbn.
 Abort. (*
-(**)
 rewrite rngl_product_split_first; [ | easy | flia ].
-cbn - [ iter_seq ].
+cbn.
 rewrite rngl_product_succ_succ.
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
@@ -539,16 +538,16 @@ erewrite (rngl_product_eq_compat _ _ _ 2). 2: {
   }
   easy.
 }
-cbn - [ iter_seq ].
+cbn.
 ...
 intros * Hkn.
 unfold ε.
 revert k Hkn.
 induction n; intros; [ easy | ].
-cbn - [ iter_seq ].
+cbn.
 (**)
 rewrite rngl_product_split_first; [ | easy | flia ].
-cbn - [ iter_seq ].
+cbn.
 rewrite rngl_product_succ_succ.
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
@@ -564,7 +563,7 @@ erewrite (rngl_product_eq_compat _ _ _ 2). 2: {
   }
   easy.
 }
-cbn - [ iter_seq ].
+cbn.
 (**)
 rewrite rngl_product_succ_succ.
 remember (Π (i = _, _), _)%F as x eqn:Hx.
@@ -577,16 +576,16 @@ erewrite rngl_product_eq_compat. 2: {
     do 2 rewrite Nat.sub_succ.
     easy.
   }
-  cbn - [ iter_seq ].
+  cbn.
   easy.
 }
-cbn - [ iter_seq ].
+cbn.
 subst x.
 rename Hkn into Hksn.
 destruct (lt_dec k (fact n)) as [Hkn| Hkn]. {
   rewrite Nat.div_small; [ | easy ].
   rewrite Nat.mod_small; [ | easy ].
-  cbn - [ iter_seq ].
+  cbn.
   rewrite all_1_rngl_product_1; [ | easy | easy ].
   do 2 rewrite rngl_mul_1_l.
   erewrite rngl_product_eq_compat. 2: {
@@ -597,7 +596,7 @@ destruct (lt_dec k (fact n)) as [Hkn| Hkn]. {
     }
     easy.
   }
-  cbn - [ iter_seq ].
+  cbn.
   now apply IHn.
 }
 apply Nat.nlt_ge in Hkn.
@@ -605,7 +604,7 @@ destruct (lt_dec k (2 * fact n)) as [Hk2n| Hk2n]. {
   rewrite (Nat_div_less_small 1); [ | now rewrite Nat.mul_1_l ].
   rewrite (Nat_mod_less_small 1); [ | now rewrite Nat.mul_1_l ].
   rewrite Nat.mul_1_l.
-  cbn - [ iter_seq "<=?" ].
+  cbn - [ "<=?" ].
   f_equal. {
     unfold sgn_diff.
     replace (permut_fun (permut n) k) with (vect_el (permut (S n) k)) by easy.
@@ -693,7 +692,7 @@ destruct (lt_dec k (2 * fact n)) as [Hk2n| Hk2n]. {
   intros j Hj.
   (* chuis pas sûr *)
   (* trop compliqué ; en plus, c'est juste *un* cas *)
-Abort.
+...
 *)
 
 (* definition of determinant by sum of products involving all
@@ -712,6 +711,7 @@ Proof.
 intros Hic *.
 unfold determinant, determinant'.
 destruct n; intros. {
+  unfold iter_seq, iter_list.
   cbn; rewrite rngl_add_0_l.
   symmetry; apply rngl_mul_1_l.
 }
@@ -724,10 +724,11 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ iter_seq fact det_loop canon_permut ε ].
+cbn - [ fact det_loop canon_permut ε ].
 revert M.
 induction n; intros. {
   cbn.
+  unfold iter_seq, iter_list; cbn.
   do 3 rewrite rngl_mul_1_l.
   now rewrite rngl_mul_1_r.
 }
@@ -796,7 +797,7 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ iter_seq ].
+cbn.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
 rewrite Hic in rngl_mul_comm.
 rewrite rngl_mul_summation_distr_l.
@@ -914,7 +915,7 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ iter_seq ].
+cbn.
 rewrite rngl_add_comm.
 do 2 rewrite rngl_mul_assoc.
 now rewrite <- rngl_mul_add_distr_r.
@@ -2364,16 +2365,16 @@ specialize rngl_opt_mul_comm as rngl_mul_comm.
 rewrite Hic in rngl_mul_comm.
 induction n; [ easy | ].
 ...
-cbn.
-cbn - [ iter_list "-" ].
-destruct n; [ now cbn; symmetry; rewrite rngl_mul_1_l | ].
 destruct n. {
-  cbn.
+  now unfold iter_seq, iter_list; cbn; symmetry; rewrite rngl_mul_1_l.
+}
+destruct n. {
+  unfold iter_seq, iter_list; cbn.
   repeat rewrite rngl_mul_1_l.
   now repeat rewrite rngl_mul_assoc.
 }
 destruct n. {
-  cbn.
+  unfold iter_seq, iter_list; cbn.
   repeat rewrite rngl_mul_1_l.
   repeat rewrite rngl_mul_assoc.
   f_equal; f_equal.
@@ -2386,7 +2387,7 @@ destruct n. {
   apply rngl_mul_comm.
 }
 destruct n. {
-  cbn.
+  unfold iter_seq, iter_list; cbn.
   repeat rewrite rngl_mul_1_l.
   repeat rewrite rngl_mul_assoc.
   f_equal; f_equal.
@@ -2394,6 +2395,7 @@ destruct n. {
   f_equal; f_equal.
   repeat rewrite rngl_mul_assoc.
 ...
+*)
 
 Theorem product_product_if_permut_div :
   rngl_is_comm = true →
@@ -2412,6 +2414,7 @@ specialize rngl_opt_mul_comm as rngl_mul_comm.
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
 rewrite Hic in rngl_mul_comm.
 rewrite H10 in rngl_1_neq_0.
+...
 rewrite rngl_product_by_anti_diagonal; [ | easy ].
 destruct n; [ easy | ].
 revert σ Hp.
@@ -2437,7 +2440,7 @@ erewrite rngl_product_eq_compat. 2: {
   rewrite rngl_product_seq_product; [ | easy ].
   now rewrite Nat.add_0_l.
 }
-cbn - [ iter_seq "<?" ].
+cbn - [ "<?" ].
 (* remove i=0 j=0 *)
 destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
   subst n; cbn - [ "<?" ].
@@ -2460,6 +2463,7 @@ rewrite (@permut_swap_mul_cancel n); try easy; [ | flia Hnz | flia Hnz Hn1 ].
 rewrite rngl_mul_1_l.
 (* ok; what do I do, now? *)
 ...
+*)
 
 Theorem product_product_if_permut :
   rngl_is_comm = true →
@@ -2532,10 +2536,11 @@ erewrite rngl_product_list_eq_compat. 2 :{
   }
   easy.
 }
-cbn - [ iter_list "<?" ].
+cbn - [ "<?" ].
 ...
 now apply product_product_if_permut_div.
 ...
+*)
 
 Theorem signature_comp :
   rngl_has_opp = true →
@@ -2550,7 +2555,7 @@ Theorem signature_comp :
 Proof.
 intros Hop Hin Hic H10 Hit Hch * Hperm.
 unfold ε'.
-cbn - [ iter_seq ].
+cbn.
 remember (Π (i = _, _), _)%F as x eqn:Hx in |-*.
 remember (Π (i = _, _), _)%F as y eqn:Hy in |-*.
 remember (Π (i = _, _), _)%F as z eqn:Hz in |-*.
@@ -2774,7 +2779,7 @@ apply product_product_if_permut. 2: {
   intros.
 ...
 Search (_ + _ - _)%F.
-cbn - [ iter_list "<?" ].
+cbn - [ "<?" ].
 ...
     rewrite permut_inv_permut; [ easy | easy | flia Hj Hnz ].
     intros j Hj.
@@ -2789,7 +2794,7 @@ cbn - [ iter_list "<?" ].
     }
     easy.
   }
-  cbn - [ iter_list "<?" ].
+  cbn - [ "<?" ].
 ...
   easy.
 }
@@ -2828,7 +2833,7 @@ cbn - [ iter_list "<?" ].
   rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
   easy.
 }
-cbn - [ iter_seq iter_list seq ].
+cbn - [ seq ].
 symmetry.
 rewrite rngl_product_shift; [ | flia Hnz ].
 (**)
@@ -2844,7 +2849,7 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ iter_seq iter_list seq ].
+cbn - [ seq ].
 symmetry.
 unfold iter_seq.
 rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
@@ -2869,7 +2874,7 @@ erewrite rngl_product_list_eq_compat. 2: {
 (**)
   easy.
 }
-cbn - [ iter_seq ].
+cbn.
 unfold δ.
 Search permut_fun_inv.
 Check permut_Permutation.
@@ -2924,7 +2929,7 @@ erewrite rngl_product_list_eq_compat. 2: {
   rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
   easy.
 }
-cbn - [ iter_seq iter_list seq ].
+cbn - [ seq ].
 symmetry.
 ...
 eapply rngl_product_list_eq_compat.
@@ -2981,7 +2986,7 @@ erewrite rngl_product_list_eq_compat. 2: {
 ...
   easy.
 }
-cbn - [ iter_seq iter_list seq ].
+cbn - [ seq ].
 symmetry.
 ...
 specialize (permut_has_invert Hperm) as H1.
@@ -3118,19 +3123,18 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ iter_seq canon_permut ].
+cbn - [ canon_permut ].
 rewrite rngl_product_succ_succ.
 erewrite (rngl_product_eq_compat _ _ _ (p + 1)). 2: {
   intros i Hi.
   rewrite Nat.sub_succ, Nat.sub_0_r.
   now rewrite Nat.sub_0_r.
 }
-cbn - [ iter_seq canon_permut ].
+cbn - [ canon_permut ].
 (* hyper compliqué, même sur le papier ; faudrait trouver un
    raccourci, trouver des propriétés de ε, de vect_swap_elem,
    que sais-je... *)
 (* voir https://fr.wikipedia.org/wiki/Signature_d%27une_permutation#Une_transposition_est_impaire et essayer de l'implémenter *)
-Abort. (*
 ...
 destruct (Nat.eq_dec p 0) as [Hpz| Hpz]. {
   subst p.
@@ -3154,7 +3158,7 @@ cbn - [ nat_of_canon_permut canon_permut ].
 (* nothing can be said about "minus_one_pow (k' / fact n)" and
    "minus_one_pow (k / fact n)": they can be equal or not;
    difficult to predict (I tested examples) *)
-Abort.
+...
 
 Theorem signature_swap :
   rngl_has_opp = true →
@@ -3167,7 +3171,7 @@ Theorem signature_swap :
 Proof.
 intros Hop * (Hpq, Hqn) Hk.
 unfold ε_canon_permut.
-Abort. (*
+...
 intros Hop * (Hpq, Hqn) Hk.
 revert k Hk.
 induction n; intros; [ easy | cbn ].
@@ -3228,7 +3232,6 @@ apply NoDup_Permutation_bis; cycle 1. {
       replace (ε_canon_permut n x) with (- ε_canon_permut n y)%F. 2: {
         subst x; cbn; clear M; symmetry.
         rename y into k; rename Hy into Hk.
-Abort. (*
 ...
         apply ε_permut_swap.
 Print nat_of_permut.
@@ -3314,7 +3317,7 @@ Print nat_of_permut.
       unfold permut_swap_last.
       remember (vect_swap_elem (permut n y) p (n - 2)) as v eqn:Hv.
       unfold vect_swap_elem.
-      cbn - [ iter_seq ]; symmetry.
+      cbn; symmetry.
       erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
         intros i Hi.
         replace (swap_nat (n - 1) (n - 1) (i - 1)) with (i - 1). 2: {
@@ -3323,7 +3326,7 @@ Print nat_of_permut.
         }
         easy.
       }
-      cbn - [ iter_seq ]; symmetry.
+      cbn; symmetry.
       f_equal. {
         subst v; cbn.
         revert p y Hpq Hy.
@@ -3446,7 +3449,7 @@ apply rngl_summation_permut; cycle 1. {
   unfold determinant''_list.
   now rewrite map_length, seq_length.
 }
-Abort.
+...
 
 (* *)
 
@@ -3486,7 +3489,7 @@ Proof.
 intros Hic * Hnz.
 unfold determinant; cbn.
 destruct n; [ easy | clear Hnz ].
-cbn - [ iter_seq ].
+cbn.
 rewrite rngl_mul_summation_distr_l.
 apply rngl_summation_eq_compat.
 intros j Hj.
@@ -3527,7 +3530,7 @@ Proof.
 intros * Hnz Hbc Hb Hc.
 unfold determinant.
 destruct n; [ easy | clear Hnz ].
-cbn - [ iter_seq ].
+cbn.
 assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
   intros.
   apply matrix_eq; cbn.
@@ -3549,7 +3552,7 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite Hac at 1.
   easy.
 }
-cbn - [ iter_seq ].
+cbn.
 now apply rngl_summation_add_distr.
 Qed.
 
@@ -3849,14 +3852,14 @@ destruct n; [ flia Hiz | ].
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   rewrite rngl_product_succ_succ.
-Abort. (*
+...
   erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
     intros k Hk.
     now rewrite Nat.sub_succ, Nat.sub_0_r.
   }
   easy.
 }
-cbn - [ iter_seq fact ε_permut permut ].
+cbn - [ fact ε_permut permut ].
 change
   (Σ (k = 0, fact (S n) - 1),
    ε_permut (S n) k *
@@ -3875,7 +3878,7 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite Ha.
   easy.
 }
-cbn - [ iter_seq fact ε_permut permut ].
+cbn - [ fact ε_permut permut ].
 ...
 erewrite summation_pair.
 ...
@@ -3898,7 +3901,7 @@ assert
 ...
 induction n; [ easy | clear Hnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
-cbn - [ iter_seq fact ].
+cbn - [ fact ].
 ...
 destruct i; [ easy | ].
 destruct i. {
@@ -3907,16 +3910,16 @@ destruct i. {
   destruct n; [ easy | ].
   clear Hiz.
   rewrite rngl_summation_split_first; [ | easy | flia ].
-  cbn - [ iter_seq ].
+  cbn.
   rewrite rngl_mul_1_l.
   rewrite rngl_add_comm.
   rewrite rngl_summation_split_first; [ | easy | flia ].
   rewrite rngl_add_comm.
-  cbn - [ iter_seq Nat.leb ].
+  cbn - [ Nat.leb ].
   rewrite rngl_summation_split_first; [ | easy | flia ].
   rewrite Nat.add_0_l.
   rewrite (rngl_summation_split_first _ 0); [ | flia ].
-  cbn - [ iter_seq Nat.leb ].
+  cbn - [ Nat.leb ].
   replace (Nat.b2n (1 <=? 0)) with 0 by easy.
   do 2 rewrite rngl_mul_1_l.
   remember (iter_seq _ _ _ _) as x.
@@ -3925,7 +3928,7 @@ destruct i. {
     replace (Nat.b2n (1 <=? i)) with 1 by now destruct i.
     easy.
   }
-  cbn - [ iter_seq Nat.leb ].
+  cbn - [ Nat.leb ].
   remember (iter_seq _ _ _ _) as y in |-*.
   rewrite Ha.
   rewrite Ha.
@@ -3958,17 +3961,17 @@ destruct i. {
   erewrite rngl_summation_eq_compat in Heqx. 2: {
     now intros i Hi; rewrite Ha.
   }
-  cbn - [ iter_seq ] in Heqx.
+  cbn in Heqx.
   erewrite rngl_summation_eq_compat in Heqy. 2: {
     now intros i Hi; rewrite Ha.
   }
-  cbn - [ iter_seq ] in Heqy.
+  cbn in Heqy.
   erewrite rngl_summation_eq_compat. 2: {
     intros i Hi.
     rewrite rngl_mul_summation_distr_l.
     easy.
   }
-  cbn - [ iter_seq Nat.leb ].
+  cbn - [ Nat.leb ].
 (**)
   destruct n. {
     cbn in Heqx, Heqy |-*; subst x y; cbn.
@@ -3977,10 +3980,10 @@ destruct i. {
   }
   rewrite rngl_summation_split_first; [ | easy | flia ].
   rewrite <- rngl_mul_summation_distr_l.
-  cbn - [ iter_seq Nat.leb subm det_loop ].
+  cbn - [ Nat.leb subm det_loop ].
   rewrite rngl_mul_1_l.
   rewrite rngl_summation_split_first; [ | easy | flia ].
-  cbn - [ iter_seq Nat.leb subm det_loop ].
+  cbn - [ Nat.leb subm det_loop ].
   rewrite rngl_mul_1_l.
   remember (Nat.b2n (2 <=? 0)) as z; cbn in Heqz; subst z.
   rewrite rngl_mul_add_distr_l.
@@ -4018,7 +4021,7 @@ destruct i. {
   rewrite rngl_summation_split_first; [ | easy | flia ].
   remember (Nat.b2n (2 <=? 1)) as z; cbn in Heqz; subst z.
   rewrite Nat.add_0_r.
-  cbn - [ iter_seq Nat.leb subm det_loop ].
+  cbn - [ Nat.leb subm det_loop ].
   rewrite rngl_mul_opp_l; [ | easy ].
   rewrite rngl_mul_opp_l; [ | easy ].
   rewrite rngl_mul_opp_l; [ | easy ].
@@ -4027,7 +4030,7 @@ destruct i. {
   rewrite rngl_summation_split_first; [ | easy | flia ].
   remember (Nat.b2n (2 <=? 2)) as z; cbn in Heqz; subst z.
   replace (2 + 1) with 3 by easy.
-  cbn - [ iter_seq Nat.leb subm det_loop ].
+  cbn - [ Nat.leb subm det_loop ].
   rewrite rngl_mul_opp_l; [ | easy ].
   rewrite rngl_mul_opp_l; [ | easy ].
   rewrite rngl_mul_opp_l; [ | easy ].
@@ -4042,7 +4045,7 @@ destruct i. {
   }
   rewrite rngl_summation_split_first in Heqx; [ | easy | flia ].
   rewrite rngl_summation_split_first in Heqy; [ | easy | flia ].
-  cbn - [ iter_seq det_loop ] in Heqx, Heqy.
+  cbn - [ det_loop ] in Heqx, Heqy.
 ...
   rewrite rngl_summation_shift; [ | flia ].
   do 2 rewrite Nat.sub_succ.
@@ -4055,11 +4058,11 @@ destruct i. {
     rewrite rngl_mul_1_l.
     easy.
   }
-  cbn - [ iter_seq det_loop Nat.leb ].
+  cbn - [ det_loop Nat.leb ].
 ... (*
 ...
 destruct n; [ flia Hiz | ].
-cbn - [ iter_seq ].
+cbn.
 rewrite (rngl_summation_split _ i); [ | flia Hiz ].
 rewrite rngl_summation_split_last; [ | flia ].
 rewrite rngl_summation_shift; [ | flia Hiz ].
@@ -4067,7 +4070,7 @@ erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   now rewrite Nat.add_comm, Nat.add_sub.
 }
-cbn - [ iter_seq ].
+cbn.
 ...
 (* blocked by the present implementation of discriminant *)
 erewrite rngl_summation_eq_compat; [ | easy | ]. 2: {
@@ -4076,10 +4079,10 @@ erewrite rngl_summation_eq_compat; [ | easy | ]. 2: {
   rewrite Nat.sub_add; [ | easy ].
   easy.
 }
-cbn - [ iter_seq ].
+cbn.
 ...
 rewrite rngl_summation_split_first; [ | easy | flia ].
-cbn - [ iter_seq ].
+cbn.
 rewrite rngl_mul_1_l.
 rewrite (rngl_summation_split _ i); [ | flia Hiz ].
 rewrite rngl_summation_split_last;[ | easy ].
@@ -4128,7 +4131,6 @@ rewrite (det_sum_row_row _ M C Hrz); cycle 1. {
     now destruct (Nat.eq_dec i 0).
   }
   rewrite H in H1; clear H.
-Abort. (*
 ...
   assert (H : determinant D = 0%F). {
     rewrite Hd.
@@ -4149,7 +4151,7 @@ intros * Hij Hi Hj.
 (* look point 5 at
 https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html
 *)
-Abort. (*
+...
 intros * Hsm Hij Hi Hj.
 unfold is_square_mat in Hsm.
 unfold determinant; cbn.
@@ -4157,7 +4159,7 @@ remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
 rename Hsm into Hr.
 destruct c; [ flia Hr Hi | ].
 remember (mat_swap_rows M i j) as M' eqn:HM'.
-cbn - [ iter_seq ].
+cbn.
 rewrite rng_opp_summation; [ | easy | easy ].
 destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   subst i.
@@ -4167,7 +4169,7 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   rewrite rngl_summation_split_first; [ | easy | flia ].
   rewrite (rngl_summation_split _ j); [ | flia Hr Hj ].
   rewrite rngl_summation_split_last; [ | flia Hij ].
-  cbn - [ iter_seq mat_el ].
+  cbn - [ mat_el ].
   rewrite rngl_mul_1_l.
   remember
     (Σ (j0 = 0, c),
@@ -4202,7 +4204,7 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   rewrite (rngl_summation_split _ j); [ symmetry | flia Hr Hj ].
   rewrite rngl_summation_split_last; [ symmetry | flia Hij ].
   rewrite rngl_summation_split_last; [ symmetry | flia Hij ].
-  cbn - [ iter_seq mat_el ].
+  cbn - [ mat_el ].
   do 2 rewrite rngl_mul_1_l.
   remember
      (Σ (j0 = 0, c),
@@ -4258,29 +4260,29 @@ intros * Hnz.
 destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   subst i.
   unfold determinant, det_from_row.
-  cbn - [ iter_seq ].
+  cbn.
   rewrite rngl_mul_1_l.
   destruct n; [ easy | clear Hnz ].
   rewrite Nat.sub_succ, Nat.sub_0_r at 1.
-  cbn - [ iter_seq ].
+  cbn.
   apply rngl_summation_eq_compat.
   intros i Hi.
   f_equal; f_equal.
   now rewrite Nat.sub_0_r.
 }
 apply not_eq_sym in Hiz.
-Abort. (*
+...
 specialize (det_swap_rows M Hiz) as H.
 apply (f_equal rng_opp) in H.
 rewrite rng_opp_involutive in H.
 rewrite <- H; clear H.
 apply not_eq_sym in Hiz.
 unfold det_from_row, determinant.
-cbn - [ iter_seq ].
+cbn.
 remember (mat_ncols M) as c eqn:Hc; symmetry in Hc.
 destruct c; [ easy | clear Hcz ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
-cbn - [ iter_seq ].
+cbn.
 rewrite rngl_mul_summation_distr_l; [ | easy ].
 rewrite rng_opp_summation; [ | easy | easy ].
 apply rngl_summation_eq_compat; [ easy | ].
@@ -4332,7 +4334,7 @@ intros * Hnz Hra Hrb Hrc Hca Hcb Hcc Hbc Hb Hc.
 unfold determinant.
 rewrite Hca, Hcb, Hcc.
 destruct n; [ easy | clear Hnz ].
-cbn - [ iter_seq ].
+cbn.
 assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
   intros.
   apply matrix_eq; cbn; [ now rewrite Hra, Hrb | now rewrite Hca, Hcb | ].
@@ -4354,7 +4356,7 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite Hac at 1.
   easy.
 }
-cbn - [ iter_seq ].
+cbn.
 now apply rngl_summation_add_distr.
 Qed.
 *)

@@ -176,7 +176,7 @@ specialize rngl_opt_integral as rngl_integral.
 rewrite H10 in rngl_1_neq_0.
 rewrite Hin in rngl_integral.
 induction l as [| a]; [ easy | ].
-cbn in Hz.
+unfold iter_list in Hz; cbn in Hz.
 rewrite rngl_mul_1_l in Hz.
 rewrite (fold_left_op_fun_from_d 1%F) in Hz; cycle 1. {
   apply rngl_mul_1_l.

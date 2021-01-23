@@ -70,6 +70,9 @@ Definition iter_list {A B} (l : list B) f (d : A) := fold_left f l d.
 
 Definition iter_seq {T} b e f (d : T) := iter_list (seq b (S e - b)) f d.
 
+Arguments iter_seq : simpl never.
+Arguments iter_list : simpl never.
+
 (* maximum of several values *)
 
 Notation "'Max' ( i = b , e ) , g" :=
@@ -111,6 +114,7 @@ revert b Hf.
 induction len; intros. {
   now apply Hf; rewrite Nat.add_0_r.
 }
+unfold iter_list.
 remember (S len) as slen; cbn; subst slen.
 rewrite fold_left_max_fun_from_0.
 remember (fold_left _ _ _) as x eqn:Hx.
@@ -139,6 +143,7 @@ revert b Hf.
 induction len; intros. {
   now apply Hf; rewrite Nat.add_0_r.
 }
+unfold iter_list.
 remember (S len) as slen; cbn; subst slen.
 rewrite fold_left_max_fun_from_0.
 remember (fold_left _ _ _) as x eqn:Hx.
@@ -158,12 +163,12 @@ Theorem Max_le_compat : ∀ b e g h,
   → Max (i = b, e), g i ≤ Max (i = b, e), h i.
 Proof.
 intros * Hgh.
-unfold iter_seq.
+unfold iter_seq, iter_list; cbn - [ "-" ].
 remember (S e - b) as n eqn:Hn.
 remember 0 as a eqn:Ha; clear Ha.
 revert a b Hn Hgh.
 induction n as [| n IHn]; intros; [ easy | cbn ].
-setoid_rewrite fold_left_max_fun_from_0.
+do 2 rewrite (fold_left_max_fun_from_0 (max _ _)).
 do 2 rewrite <- Nat.max_assoc.
 apply Nat.max_le_compat_l.
 apply Nat.max_le_compat; [ apply Hgh; flia Hn | ].
@@ -1689,7 +1694,7 @@ Theorem iter_seq_split_first : ∀ T d op b k g
     op (g b) (iter_seq (S b) k (λ (c : T) (i : nat), op c (g i)) d).
 Proof.
 intros * op_d_l op_d_r op_assoc Hbk.
-unfold iter_seq.
+unfold iter_seq, iter_list.
 remember (S k - b) as len eqn:Hlen.
 replace (S k - S b) with (len - 1) by flia Hlen.
 assert (H : len ≠ 0) by flia Hlen Hbk.
@@ -1737,7 +1742,7 @@ Theorem iter_seq_split : ∀ T d op j g b k
       (iter_seq (j + 1) k (λ (c : T) (i : nat), op c (g i)) d).
 Proof.
 intros * op_d_l op_d_r op_assoc (Hbj, Hjk).
-unfold iter_seq.
+unfold iter_seq, iter_list.
 remember (S j - b) as len1 eqn:Hlen1.
 remember (S k - b) as len2 eqn:Hlen2.
 move len2 before len1.
@@ -1821,6 +1826,7 @@ Theorem iter_list_distr : ∀ T A d op g h (l : list A)
     (iter_list l (λ (c : T) (i : A), op c (h i)) d).
 Proof.
 intros.
+unfold iter_list.
 induction l as [| a]; [ symmetry; apply op_d_l | cbn ].
 rewrite (fold_left_op_fun_from_d d); [ | easy | | easy ]. 2: {
   intros; rewrite op_comm; apply op_d_l.
@@ -1833,8 +1839,8 @@ rewrite fold_iter_list.
 rewrite (fold_left_op_fun_from_d d); [ | easy | | easy ]. 2: {
   intros; rewrite op_comm; apply op_d_l.
 }
-do 2 rewrite fold_iter_list.
 rewrite IHl.
+do 2 rewrite fold_iter_list.
 remember (iter_list _ _ _) as b eqn:Hb in |-*.
 remember (iter_list _ _ _) as c eqn:Hc in |-*.
 do 3 rewrite op_d_l.
