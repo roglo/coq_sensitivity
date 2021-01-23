@@ -2388,6 +2388,96 @@ destruct n. {
 ...
 *)
 
+Theorem glop :
+  rngl_is_comm = true →
+  ∀ n f,
+  (Π (i ∈ seq 0 n), Π (j ∈ seq 0 n), f i j)%F =
+  ((Π (i ∈ seq 0 n), f i i) *
+   (Π (i ∈ seq 0 (n - 1)), Π (j = i + 1, n - 1), (f i j * f j i)))%F.
+Proof.
+intros Hic *.
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+rewrite Hic in rngl_mul_comm.
+destruct n. {
+  unfold iter_seq, iter_list; cbn.
+  now rewrite rngl_mul_1_l.
+}
+destruct n. {
+  unfold iter_seq, iter_list; cbn.
+  now rewrite rngl_mul_1_l, rngl_mul_1_r.
+}
+destruct n. {
+  unfold iter_seq, iter_list; cbn.
+  repeat rewrite rngl_mul_1_l.
+  repeat rewrite <- rngl_mul_assoc.
+  f_equal.
+  now rewrite rngl_mul_assoc, rngl_mul_comm.
+}
+destruct n. {
+  unfold iter_seq, iter_list; cbn.
+  repeat rewrite rngl_mul_1_l.
+  repeat rewrite <- rngl_mul_assoc.
+  f_equal.
+  repeat rewrite rngl_mul_assoc.
+  rewrite rngl_mul_mul_swap; [ f_equal | easy ].
+  rewrite rngl_mul_mul_swap; [ symmetry | easy ].
+  rewrite rngl_mul_mul_swap; [ symmetry | easy ].
+  f_equal.
+  rewrite rngl_mul_mul_swap; [ f_equal | easy ].
+  rewrite rngl_mul_comm.
+  repeat rewrite rngl_mul_assoc.
+  rewrite rngl_mul_comm.
+  repeat rewrite <- rngl_mul_assoc.
+  f_equal; f_equal; f_equal.
+  apply rngl_mul_comm.
+}
+destruct n. {
+  unfold iter_seq, iter_list; cbn.
+  repeat rewrite rngl_mul_1_l.
+  repeat rewrite <- rngl_mul_assoc.
+  f_equal.
+  repeat rewrite rngl_mul_assoc.
+  rewrite rngl_mul_mul_swap; [ f_equal | easy ].
+  rewrite rngl_mul_mul_swap; [ symmetry | easy ].
+  rewrite rngl_mul_mul_swap; [ symmetry | easy ].
+  f_equal.
+  rewrite rngl_mul_comm.
+  repeat rewrite rngl_mul_assoc.
+  rewrite rngl_mul_comm.
+  repeat rewrite rngl_mul_assoc.
+  f_equal.
+  rewrite rngl_mul_mul_swap; [ symmetry | easy ].
+  rewrite rngl_mul_mul_swap; [ symmetry | easy ].
+  f_equal.
+  rewrite rngl_mul_comm.
+  repeat rewrite rngl_mul_assoc.
+  rewrite rngl_mul_comm.
+  repeat rewrite rngl_mul_assoc.
+  f_equal; f_equal.
+  repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; symmetry.
+  rewrite rngl_mul_comm; symmetry.
+  repeat rewrite <- rngl_mul_assoc.
+  f_equal.
+  rewrite rngl_mul_comm.
+  repeat rewrite <- rngl_mul_assoc.
+  f_equal; f_equal.
+  symmetry.
+  rewrite rngl_mul_comm.
+  repeat rewrite <- rngl_mul_assoc.
+  f_equal.
+  rewrite rngl_mul_comm.
+  repeat rewrite <- rngl_mul_assoc.
+  f_equal.
+  rewrite rngl_mul_comm; symmetry.
+  rewrite rngl_mul_comm; symmetry.
+  repeat rewrite <- rngl_mul_assoc.
+  f_equal.
+  rewrite rngl_mul_comm.
+  now repeat rewrite <- rngl_mul_assoc.
+}
+...
+
 Theorem product_product_if_permut_div :
   rngl_is_comm = true →
   rngl_has_1_neq_0 = true →
