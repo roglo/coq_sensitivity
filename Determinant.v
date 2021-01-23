@@ -2309,9 +2309,17 @@ Theorem rngl_product_by_anti_diagonal :
   match n with
   | 0 => 1%F
   | S n' =>
+      ((Π (k ∈ seq 0 n'), (Π (i = 0, k), f i (k - i)%nat)) *
+       (Π (k ∈ seq n' n), (Π (i = k - n', n'), f i (k - i)%nat)))%F
+  end.
+(*
+  match n with
+  | 0 => 1%F
+  | S n' =>
       ((Π (k ∈ seq 0 n), (Π (i = 0, k), f i (k - i)%nat)) *
        (Π (k ∈ seq n n'), (Π (i = k - n', n'), f i (k - i)%nat)))%F
   end.
+*)
 (*
   ((Π (k ∈ seq 0 n), (Π (i = 0, k), f i (k - i)%nat)) *
    (Π (k ∈ seq n (n - 1)), (Π (i = k - (n - 1), n - 1), f i (k - i)%nat)))%F.
@@ -2330,7 +2338,11 @@ induction n; [ easy | ].
 induction n; [ now cbn; rewrite rngl_mul_1_r | ].
 *)
 cbn - [ iter_list "-" ].
+(**)
+destruct n; [ now cbn; symmetry; rewrite rngl_mul_1_l | ].
+(*
 destruct n; [ now cbn; rewrite rngl_mul_1_r | ].
+*)
 destruct n. {
   cbn.
   repeat rewrite rngl_mul_1_l.
