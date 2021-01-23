@@ -8,6 +8,7 @@ Require Import Misc RingLike Matrix.
 Require Import RLsummation RLproduct.
 Require Import Pigeonhole.
 Import matrix_Notations.
+Import Init.Nat.
 
 Section a.
 
@@ -2306,15 +2307,28 @@ Theorem rngl_product_by_anti_diagonal :
   rngl_is_comm = true →
   ∀ n f,
   (Π (i ∈ seq 0 n), Π (j ∈ seq 0 n), f i j)%F =
+(**)
+  ((Π (k ∈ seq 0 n), (Π (i = 0, k), f i (k - i)%nat)) *
+   (Π (k ∈ seq n (n - 1)), (Π (i = k - (n - 1), n - 1), f i (k - i)%nat)))%F.
+(*
+  ((Π (k ∈ seq 0 n),
+    (Π (i = 0, k),
+     f i (k - i)%nat)) *
+   (Π (k ∈ seq n (n - 1)),
+    (Π (i = k - (n - 1), n - 1),
+     if k <? n + i then f i (k - i)%nat else 1)))%F.
+*)
+(*
   (Π (k ∈ seq 0 (2 * n - 1)), Π (i = 0, min (n - 1) k),
    (if k <? n + i then f i (k - i)%nat else 1))%F.
+*)
 Proof.
 intros Hic *.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
 rewrite Hic in rngl_mul_comm.
-induction n; [ easy | ].
+induction n; [ now cbn; rewrite rngl_mul_1_r | ].
 cbn - [ iter_list "-" ].
-destruct n; [ easy | ].
+destruct n; [ now cbn; rewrite rngl_mul_1_r | ].
 destruct n. {
   cbn.
   repeat rewrite rngl_mul_1_l.
