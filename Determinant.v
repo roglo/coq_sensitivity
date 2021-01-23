@@ -2547,44 +2547,10 @@ apply all_1_rngl_product_list_1; [ easy | ].
 intros i Hi.
 apply all_1_rngl_product_list_1; [ easy | ].
 intros j Hj.
-...
-intros Hic H10 Hin * Hp Hfij Hfijnz.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
-specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
-rewrite Hic in rngl_mul_comm.
-rewrite H10 in rngl_1_neq_0.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
-rewrite rngl_product_seq_product; [ | easy ].
-rewrite Nat.add_0_l.
-erewrite rngl_product_eq_compat. 2: {
-  intros i Hi.
-  rewrite rngl_product_seq_product; [ | easy ].
-  now rewrite Nat.add_0_l.
-}
-cbn - [ "<?" ].
-(* remove i=0 j=0 *)
-destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
-  subst n; cbn - [ "<?" ].
-  do 2 rewrite Nat.ltb_irrefl.
-  do 2 rewrite rngl_mul_1_l.
-  apply rngl_mul_inv_r; [ now left | easy ].
-}
-(* extract i=0 j=1 and i=1 j=0 that must compensate each other *)
-rewrite rngl_product_split_first; [ | easy | flia Hnz Hn1 ].
-rewrite rngl_product_split_first; [ | easy | flia Hnz Hn1 ].
-do 2 rewrite Nat.ltb_irrefl.
-rewrite rngl_mul_inv_r; [ | now left | easy ].
-rewrite rngl_mul_1_l.
-rewrite rngl_product_split_first; [ | easy | flia Hnz Hn1 ].
-rewrite rngl_mul_mul_swap; [ | easy ].
-rewrite rngl_product_split_first; [ | easy | flia Hnz Hn1 ].
-rewrite rngl_product_split_first; [ | easy | flia Hnz Hn1 ].
-do 2 rewrite rngl_mul_assoc.
-rewrite (@permut_swap_mul_cancel n); try easy; [ | flia Hnz | flia Hnz Hn1 ].
-rewrite rngl_mul_1_l.
-(* ok; what do I do, now? *)
-...
-*)
+apply in_seq in Hi.
+apply in_seq in Hj.
+apply (@permut_swap_mul_cancel n); try easy; [ flia Hi | flia Hj ].
+Qed.
 
 Theorem product_product_if_permut :
   rngl_is_comm = true →
@@ -2641,7 +2607,7 @@ rewrite (rngl_inv_product_list ro); [ | easy | easy | easy | easy | ]. 2: {
   apply Hfijnz.
 }
 subst a.
-rewrite <- (rngl_product_list_mul_distr ro); [ | easy ].
+rewrite <- rngl_product_list_mul_distr; [ | easy ].
 erewrite rngl_product_list_eq_compat. 2 :{
   intros i Hi.
   rewrite (rngl_inv_product_list ro); [ | easy | easy | easy | easy | ]. 2: {
@@ -2649,7 +2615,7 @@ erewrite rngl_product_list_eq_compat. 2 :{
     destruct (i <? j); [ | easy ].
     apply Hfijnz.
   }
-  rewrite <- (rngl_product_list_mul_distr ro); [ | easy ].
+  rewrite <- rngl_product_list_mul_distr; [ | easy ].
   erewrite rngl_product_list_eq_compat. 2: {
     intros j Hj.
     rewrite fold_rngl_div; [ | easy ].
@@ -2658,15 +2624,14 @@ erewrite rngl_product_list_eq_compat. 2 :{
   easy.
 }
 cbn - [ "<?" ].
-...
 now apply product_product_if_permut_div.
-...
-*)
+Qed.
 
 Theorem signature_comp :
   rngl_has_opp = true →
   rngl_has_inv = true →
   rngl_is_comm = true →
+  rngl_has_dec_eq = true →
   rngl_has_1_neq_0 = true →
   rngl_is_integral = true →
   rngl_characteristic = 0 →
@@ -2674,7 +2639,7 @@ Theorem signature_comp :
   is_permut σ₂
   → ε' (σ₁ ° σ₂) = (ε' σ₁ * ε' σ₂)%F.
 Proof.
-intros Hop Hin Hic H10 Hit Hch * Hperm.
+intros Hop Hin Hic Hde H10 Hit Hch * Hperm.
 unfold ε'.
 cbn.
 remember (Π (i = _, _), _)%F as x eqn:Hx in |-*.
@@ -2895,9 +2860,15 @@ unfold iter_seq.
 rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
 symmetry.
+apply product_product_if_permut; try easy. {
+  now apply permut_inv_is_permut.
+} {
+  intros i j.
 ...
-apply product_product_if_permut. 2: {
-  intros.
+} {
+  intros i j.
+...
+}
 ...
 Search (_ + _ - _)%F.
 cbn - [ "<?" ].
