@@ -2436,45 +2436,62 @@ destruct n. {
   repeat rewrite rngl_mul_1_l.
   repeat rewrite <- rngl_mul_assoc.
   f_equal.
-  repeat rewrite rngl_mul_assoc.
-  rewrite rngl_mul_mul_swap; [ f_equal | easy ].
-  rewrite rngl_mul_mul_swap; [ symmetry | easy ].
-  rewrite rngl_mul_mul_swap; [ symmetry | easy ].
+(**)
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
   f_equal.
-  rewrite rngl_mul_comm.
-  repeat rewrite rngl_mul_assoc.
-  rewrite rngl_mul_comm.
-  repeat rewrite rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
   f_equal.
-  rewrite rngl_mul_mul_swap; [ symmetry | easy ].
-  rewrite rngl_mul_mul_swap; [ symmetry | easy ].
-  f_equal.
-  rewrite rngl_mul_comm.
-  repeat rewrite rngl_mul_assoc.
-  rewrite rngl_mul_comm.
-  repeat rewrite rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
   f_equal; f_equal.
-  repeat rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; symmetry.
-  rewrite rngl_mul_comm; symmetry.
-  repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  f_equal.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  f_equal.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  f_equal.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  f_equal.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  f_equal.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  f_equal.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  f_equal.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
+  f_equal.
+  rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc.
   f_equal.
   rewrite rngl_mul_comm.
-  repeat rewrite <- rngl_mul_assoc.
-  f_equal; f_equal.
-  symmetry.
-  rewrite rngl_mul_comm.
-  repeat rewrite <- rngl_mul_assoc.
-  f_equal.
-  rewrite rngl_mul_comm.
-  repeat rewrite <- rngl_mul_assoc.
-  f_equal.
-  rewrite rngl_mul_comm; symmetry.
-  rewrite rngl_mul_comm; symmetry.
-  repeat rewrite <- rngl_mul_assoc.
-  f_equal.
-  rewrite rngl_mul_comm.
-  now repeat rewrite <- rngl_mul_assoc.
+  easy.
 }
 ...
 
