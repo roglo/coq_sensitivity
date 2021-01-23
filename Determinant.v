@@ -2388,13 +2388,18 @@ destruct n. {
 ...
 *)
 
-Theorem glop :
+Theorem rngl_product_product_by_swap :
   rngl_is_comm = true →
   ∀ n f,
   (Π (i ∈ seq 0 n), Π (j ∈ seq 0 n), f i j)%F =
   ((Π (i ∈ seq 0 n), f i i) *
    (Π (i ∈ seq 0 (n - 1)), Π (j = i + 1, n - 1), (f i j * f j i)))%F.
 Proof.
+intros Hic *.
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+rewrite Hic in rngl_mul_comm.
+(* experiment below shows that it should work *)
+...
 intros Hic *.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
 rewrite Hic in rngl_mul_comm.
@@ -2460,8 +2465,56 @@ destruct n. {
   f_equal.
   do 1 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
   f_equal.
-  rewrite rngl_mul_comm.
-  easy.
+  apply rngl_mul_comm.
+}
+destruct n. {
+  unfold iter_seq, iter_list; cbn.
+  repeat rewrite rngl_mul_1_l.
+  repeat rewrite <- rngl_mul_assoc.
+  f_equal.
+  do 5 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
+  f_equal.
+  do 5 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
+  f_equal.
+  do 5 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
+  f_equal.
+  do 5 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
+  f_equal; f_equal.
+  do 3 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
+  f_equal.
+  do 15 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
+  f_equal.
+  do 5 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
+  f_equal.
+  do 11 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
+  f_equal.
+  do 7 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
+  f_equal.
+  do 7 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
+  f_equal.
+  do 9 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
+  f_equal.
+  do 3 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
+  f_equal.
+  do 2 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
+  f_equal.
+  do 8 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
+  f_equal.
+  do 3 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
+  f_equal.
+  do 5 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
+  f_equal.
+  do 4 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
+  f_equal.
+  do 2 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
+  f_equal.
+  do 1 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
+  f_equal.
+  do 3 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
+  f_equal.
+  do 1 (rewrite rngl_mul_comm; repeat rewrite <- rngl_mul_assoc).
+  f_equal.
+  apply rngl_mul_comm.
 }
 ...
 
@@ -2482,18 +2535,7 @@ specialize rngl_opt_mul_comm as rngl_mul_comm.
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
 rewrite Hic in rngl_mul_comm.
 rewrite H10 in rngl_1_neq_0.
-...
-rewrite rngl_product_by_anti_diagonal; [ | easy ].
-destruct n; [ easy | ].
-revert σ Hp.
-induction n; intros. {
-  cbn - [ "<?" ].
-  do 2 rewrite if_ltb_lt_dec.
-  destruct (lt_dec (σ 0) (σ 0)) as [H| H]; [ flia H | clear H ].
-  destruct (lt_dec 0 0) as [H| H]; [ flia H | clear H ].
-  rewrite rngl_div_1_r; [ | now left | easy ].
-  now do 3 rewrite rngl_mul_1_l.
-}
+rewrite rngl_product_product_by_swap; [ | easy ].
 ...
 intros Hic H10 Hin * Hp Hfij Hfijnz.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
