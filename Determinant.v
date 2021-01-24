@@ -2778,6 +2778,31 @@ apply product_product_if_permut; try easy. {
 }
 Qed.
 
+Search ε.
+
+Print ε_canon_permut.
+
+...
+
+determinant = λ (n : nat) (M : matrix n n T), det_loop M n
+     : ∀ n : nat, matrix n n T → T
+
+determinant' = 
+λ (n : nat) (M : matrix n n T),
+  (Σ (k = 0, fact n - 1),
+   ε_canon_permut n k *
+   Π (i = 1, n), mat_el M (i - 1) (vect_el (canon_permut n k) (i - 1)))%F
+     : ∀ n : nat, matrix n n T → T
+
+determinant'' = 
+λ (p q n : nat) (M : matrix n n T),
+  (Σ (k = 0, fact n - 1),
+   ε_canon_permut n k *
+   Π (i = 1, n), mat_el M (i - 1) (vect_el (canon_permut_swap_last p q n k) (i - 1)))%F
+     : nat → nat → ∀ n : nat, matrix n n T → T
+
+...
+
 Theorem glop : ∀ p q n k k',
   p < q < n
   → k' = nat_of_canon_permut (vect_swap_elem (canon_permut n k) p q)
