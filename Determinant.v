@@ -3859,6 +3859,7 @@ intros * Hij Hi Hj.
 (* look point 5 at
 https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html
 *)
+Abort. (*
 ...
 intros * Hsm Hij Hi Hj.
 unfold is_square_mat in Hsm.
@@ -3979,6 +3980,7 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   now rewrite Nat.sub_0_r.
 }
 apply not_eq_sym in Hiz.
+Abort. (*
 ...
 specialize (det_swap_rows M Hiz) as H.
 apply (f_equal rng_opp) in H.

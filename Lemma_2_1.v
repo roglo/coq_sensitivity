@@ -502,7 +502,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     f_equal.
     now apply minus_one_pow_add_r.
   }
-... (*
+Abort. (*
   unfold determinant.
   induction n; [ easy | ].
   rewrite Nat.sub_succ, Nat.sub_0_r at 1.
@@ -525,7 +525,7 @@ Theorem det_nz_inv_comm : ∀ n (MA MB : matrix n n T),
 Proof.
 intros * Hdet Hab.
 Print comatrix.
-...
+Abort.
 
 Theorem diagonalized_matrix_prop :
   rngl_is_comm = true →
