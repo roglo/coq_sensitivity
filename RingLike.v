@@ -46,6 +46,7 @@
    What a mess!
 *)
 
+Set Nested Proofs Allowed.
 Require Import Utf8.
 
 Class ring_like_op T :=
@@ -379,6 +380,14 @@ intros a b c Hab.
 now rewrite Hab.
 Qed.
 
+Theorem rngl_div_compat_l :
+  rngl_has_inv = true →
+  ∀ a b c, c ≠ 0%F → (a = b)%F → (a / c = b / c)%F.
+Proof.
+intros Hin a b c Hcz Hab.
+now rewrite Hab.
+Qed.
+
 Theorem fold_rngl_sub :
   rngl_has_opp = true →
   ∀ a b, (a + - b)%F = (a - b)%F.
@@ -560,6 +569,26 @@ split; intros H. {
 }
 Qed.
 
+Theorem rngl_mul_move_1_r :
+  rngl_has_inv = true → ∀ a b : T, b ≠ 0%F → (a * b)%F = 1%F ↔ a = (¹/ b)%F.
+Proof.
+intros Hin * Hbz.
+split; intros H. {
+  apply rngl_div_compat_l with (c := b) in H; [ | easy | easy ].
+  unfold rngl_div in H.
+  rewrite Hin in H.
+  rewrite <- rngl_mul_assoc in H.
+  rewrite fold_rngl_div in H; [ | easy ].
+  rewrite rngl_mul_inv_r in H; [ | now left | easy ].
+  now rewrite rngl_mul_1_r, rngl_mul_1_l in H.
+} {
+  rewrite H.
+  specialize (rngl_opt_mul_inv_l) as H1.
+  rewrite Hin in H1.
+  now apply H1.
+}
+Qed.
+
 Theorem rngl_opp_involutive :
   rngl_has_opp = true →
   ∀ x, (- - x)%F = x.
@@ -570,6 +599,38 @@ specialize rngl_add_opp_r as H.
 unfold rngl_sub in H.
 rewrite Hro in H.
 now apply rngl_add_move_0_r.
+Qed.
+
+Theorem rngl_inv_neq_0 :
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  ∀ a, a ≠ 0%F → (¹/ a ≠ 0)%F.
+Proof.
+intros Hin H10 * Haz H1.
+symmetry in H1.
+apply rngl_mul_move_1_r in H1; [ | easy | easy ].
+rewrite rngl_mul_0_l in H1.
+specialize rngl_opt_1_neq_0 as H2.
+symmetry in H1.
+now rewrite H10 in H2.
+Qed.
+
+Theorem rngl_inv_involutive :
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  ∀ x, x ≠ 0%F → (¹/ ¹/ x)%F = x.
+Proof.
+intros Hin H10 * Hxz.
+symmetry.
+specialize (rngl_mul_inv_r (or_introl Hin)) as H.
+unfold rngl_div in H.
+rewrite Hin in H.
+specialize (rngl_mul_move_1_r Hin) as H1.
+apply H1. 2: {
+  rewrite fold_rngl_div; [ | easy ].
+  apply rngl_mul_inv_r; [ now left | easy ].
+}
+now apply rngl_inv_neq_0.
 Qed.
 
 Theorem rngl_mul_opp_l :
@@ -616,6 +677,17 @@ intros Hro * H.
 rewrite <- (rngl_opp_involutive Hro a).
 rewrite H.
 now apply rngl_opp_involutive.
+Qed.
+
+Theorem rngl_inv_inj :
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  ∀ a b, a ≠ 0%F → b ≠ 0%F →(¹/ a = ¹/ b)%F → a = b.
+Proof.
+intros Hin H10 * Haz Hbz H.
+rewrite <- (rngl_inv_involutive Hin H10 a); [ | easy ].
+rewrite H.
+now apply rngl_inv_involutive.
 Qed.
 
 Theorem rngl_integral :
@@ -744,6 +816,17 @@ rewrite rngl_add_opp_r.
 now rewrite rngl_add_opp_r.
 Qed.
 
+Theorem rngl_opp_sub_distr :
+  rngl_has_opp = true →
+  ∀ a b, (- (a - b) = b - a)%F.
+Proof.
+intros Hro *.
+unfold rngl_sub at 1.
+rewrite Hro.
+rewrite rngl_opp_add_distr; [ | easy ].
+now rewrite rngl_opp_involutive.
+Qed.
+
 Theorem rngl_sub_move_0_r :
   rngl_has_opp = true →
   ∀ a b : T, (a - b)%F = 0%F → a = b.
@@ -790,6 +873,38 @@ f_equal.
 cbn in Hij.
 apply rngl_add_reg_l in Hij.
 now apply IHj.
+Qed.
+
+Theorem rngl_opp_inv :
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  ∀ a, a ≠ 0%F → (- ¹/ a = ¹/ (- a))%F.
+Proof.
+intros Hop Hin H10 * Haz.
+assert (Hoaz : (- a)%F ≠ 0%F). {
+  intros H.
+  apply (f_equal rngl_opp) in H.
+  rewrite rngl_opp_involutive in H; [ | easy ].
+  now rewrite rngl_opp_0 in H.
+}
+apply (rngl_mul_reg_l (or_introl Hin) (- a)%F); [ easy | ].
+specialize (rngl_opt_mul_inv_l) as H1.
+specialize (rngl_opt_mul_inv_r) as H2.
+specialize (rngl_opt_mul_comm) as H3.
+rewrite Hin in H1, H2.
+rewrite rngl_mul_opp_opp; [ | easy ].
+destruct rngl_is_comm. {
+  symmetry.
+  rewrite H3, H1; [ | easy ].
+  now rewrite H3, H1.
+} {
+  cbn in H2.
+  rewrite fold_rngl_div; [ | easy ].
+  rewrite fold_rngl_div; [ | easy ].
+  rewrite H2; [ | easy ].
+  now rewrite H2.
+}
 Qed.
 
 End a.

@@ -2864,6 +2864,77 @@ apply product_product_if_permut; try easy. {
   now apply permut_inv_is_permut.
 } {
   intros i j.
+  rewrite <- rngl_opp_sub_distr; [ | easy ].
+  unfold rngl_div.
+  rewrite Hin.
+  rewrite rngl_mul_opp_l; [ | easy ].
+  rewrite <- rngl_mul_opp_r; [ | easy ].
+  f_equal.
+  rewrite rngl_opp_inv; [ | easy | easy | easy | ]. 2: {
+    intros H.
+    apply rngl_sub_move_0_r in H; [ | easy ].
+    apply rngl_of_nat_inj in H; [ | easy ].
+(* y manque un truc, là *)
+...
+intros Hop Hin H10 * Haz.
+apply rngl_inv_inj; [ easy | easy | | | ]. {
+  intros H.
+  apply (f_equal rngl_opp) in H.
+  rewrite rngl_opp_involutive in H; [ | easy ].
+  rewrite rngl_opp_0 in H; [ | easy ].
+  now apply rngl_inv_neq_0 in H.
+} {
+  apply rngl_inv_neq_0; [ easy | easy | ].
+  intros H.
+  apply (f_equal rngl_opp) in H.
+  rewrite rngl_opp_involutive in H; [ | easy ].
+  now rewrite rngl_opp_0 in H.
+} {
+  rewrite rngl_inv_involutive; [ | easy | easy | ]. 2: {
+    intros H.
+    apply (f_equal rngl_opp) in H.
+    rewrite rngl_opp_involutive in H; [ | easy ].
+    now rewrite rngl_opp_0 in H; [ | easy ].
+  }
+  apply rngl_opp_inj; [ easy | ].
+  rewrite rngl_opp_involutive; [ | easy ].
+Search (- ¹/ _)%F.
+Search (¹/ - _)%F.
+...
+rewrite <- rngl_div_1_l; [ | easy ].
+unfold rngl_div.
+rewrite Hin.
+symmetry.
+rewrite <- rngl_div_1_l; [ | easy ].
+unfold rngl_div.
+rewrite Hin.
+...
+Check rngl_inv_involutive.
+enough (H : (¹/ (- ¹/ a) = ¹/ ¹/ (- a))%F). {
+  rewrite rngl_inv_involutive in H.
+...
+rewrite <- rngl_div_1_l; [ | easy ].
+unfold rngl_div.
+rewrite Hin.
+symmetry.
+rewrite <- rngl_div_1_l; [ | easy ].
+unfold rngl_div.
+rewrite Hin.
+...
+rewrite rngl_opp_inv.
+
+Require Import QArith.
+Search (- (_ * _))%Z.
+Search (- (_ * _))%Q.
+Search (Qopp (Qmult _ _)).
+Check (_ + _)%Q.
+
+Search (- 1 / _)%Q.
+
+Search (- ¹/ _)%F.
+Search (Q.opp (Q.inv _)).
+About Q.inv.
+Search (- / _)%Q.
 ...
 } {
   intros i j.
