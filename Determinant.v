@@ -354,151 +354,15 @@ Definition ε {n} (p : vector n nat) :=
   ((Π (i = 1, n), Π (j = 1, n), δ i j (vect_el p (i - 1)) (vect_el p (j - 1))) /
    (Π (i = 1, n), Π (j = 1, n), δ i j i j))%F.
 
-Definition ε' {n} (p : vector n nat) :=
-  ((Π (i = 1, n), Π (j = i + 1, n), (ip p (j - 1) - ip p (i - 1))) /
-   (Π (i = 1, n), Π (j = i + 1, n), rngl_of_nat (j - i)))%F.
-
-(* signature by counting the number of transpositions *)
-
-Fixpoint insert x list :=
-  match list with
-  | [] => ([x], false)
-  | y :: l =>
-      if lt_dec x y then (x :: list, false)
-      else
-        let '(l', odd) := insert x l in
-        (y :: l', negb odd)
-  end.
-
-Fixpoint insertion_sort list :=
-  match list with
-  | [] => (list, false)
-  | x :: l =>
-      let (l', odd') := insertion_sort l in
-      let '(l'', odd'') := insert x l' in
-      (l'', xorb odd' odd'')
-  end.
-
-(*
-Compute let n := 5 in (map (λ k, insertion_sort (list_of_vect (canon_permut n k))) (seq 0 (fact n))).
-*)
-
-(*
-Definition ε'' {n} (p : vector n nat) :=
-  if snd (insertion_sort (list_of_vect p)) then (-1)%F else 1%F.
-*)
-
-(*
-End a.
-Require Import Zrl ZArith.
-Compute (ε_canon_permut Z_ring_like_op 2 1).
-Compute (ε Z_ring_like_op (canon_permut 2 1)).
-Compute (ε' Z_ring_like_op (canon_permut 2 1)).
-Compute (ε'' Z_ring_like_op (canon_permut 2 1)).
-Compute (list_of_vect (canon_permut 2 1)).
-Compute (map (λ k, (ε_canon_permut Z_ring_like_op 4 k)) (seq 0 (fact 4))).
-Compute (map (λ k, (ε Z_ring_like_op (canon_permut 4 k))) (seq 0 (fact 4))).
-Compute (map (λ k, (ε' Z_ring_like_op (canon_permut 4 k))) (seq 0 (fact 4))).
-Compute (map (λ k, (ε'' Z_ring_like_op (canon_permut 4 k))) (seq 0 (fact 4))).
-Compute let ro := Z_ring_like_op in let n := 4  in
-  (Π (i = 1, n), (Π (j = i + 1, n), (rngl_of_nat j - rngl_of_nat i)))%F.
-Compute let ro := Z_ring_like_op in let n := 4  in
-  (Π (i = 1, n), (Π (j = i + 1, n), (ip _ (permut n 13) (j - 1) - ip _ (permut n 13) (i - 1))))%F.
-
-Compute let n := 4 in let σ₁ := permut n 13 in let σ₂ := permut n 4 in
-       (Π (i = 1, n),
-        (Π (j = i + 1, n),
-         (rngl_of_nat (vect_el σ₁ (vect_el σ₂ (j - 1))) - rngl_of_nat (vect_el σ₁ (vect_el σ₂ (i - 1))))))%F.
-Compute let n := 4 in let σ₁ := permut n 13 in let σ₂ := permut n 4 in
-  (Π (i = 1, n), (Π (j = i + 1, n), (rngl_of_nat j - rngl_of_nat i)))%F.
-
-Compute let n := 4 in let σ₁ := permut n 13 in let σ₂ := permut n 4 in
-  (Π (i = 1, n), (Π (j = i + 1, n), (ip _ σ₁ (j - 1) - ip _ σ₁ (i - 1))))%F.
-Compute let n := 4 in let σ₁ := permut n 13 in let σ₂ := permut n 4 in
-  (Π (i = 1, n), (Π (j = i + 1, n), (ip _ σ₂ (j - 1) - ip _ σ₂ (i - 1))))%F.
-...
-  Hx : x =
-       (Π (i = 1, n),
-        (Π (j = i + 1, n),
-         (rngl_of_nat (vect_el σ₁ (vect_el σ₂ (j - 1))) - rngl_of_nat (vect_el σ₁ (vect_el σ₂ (i - 1))))))%F
-  Hy : y = (Π (i = 1, n), (Π (j = i + 1, n), (rngl_of_nat j - rngl_of_nat i)))%F
-  Hz : z = (Π (i = 1, n), (Π (j = i + 1, n), (ip σ₁ (j - 1) - ip σ₁ (i - 1))))%F
-  Ht : t = (Π (i = 1, n), (Π (j = i + 1, n), (ip σ₂ (j - 1) - ip σ₂ (i - 1))))%F
-  (x * y)%F = (z * t)%F
-*)
-
-(*
-Theorem sgn_diff_diag : ∀ i, sgn_diff i i = 1%F.
-Proof.
-intros.
-unfold sgn_diff.
-destruct (lt_dec i i) as [H| H]; [ flia H | easy ].
-Qed.
-
-Theorem sgn_diff_add_mono_l : ∀ a b c,
-  sgn_diff (a + b) (a + c) = sgn_diff b c.
-Proof.
-intros.
-unfold sgn_diff.
-destruct (lt_dec (a + b) (a + c)) as [Habc| Habc]. {
-  destruct (lt_dec b c) as [Hbc| Hbc]; [ easy | ].
-  exfalso; apply Hbc; clear Hbc.
-  now apply Nat.add_lt_mono_l in Habc.
-}
-destruct (lt_dec b c) as [Hbc| Hbc]; [ | easy ].
-exfalso; apply Habc; clear Habc.
-now apply Nat.add_lt_mono_l.
-Qed.
-
-Theorem sgn_diff_add_mono_r : ∀ a b c,
-  sgn_diff (a + c) (b + c) = sgn_diff a b.
-Proof.
-intros.
-setoid_rewrite Nat.add_comm.
-apply sgn_diff_add_mono_l.
-Qed.
-*)
-
-(*
-Theorem sgn_diff_add_mono_r_small : ∀ a b c d,
-  a ≠ b
-  → c ≤ 1
-  → d ≤ 1
-  → sgn_diff (a + c) (b + d) = sgn_diff a b.
-Proof.
-intros * Hab Hc Hd.
-unfold sgn_diff.
-destruct (lt_dec (a + c) (b + d)) as [Habcd| Habcd]. {
-  destruct (lt_dec a b) as [Hlab| Hlab]; [ easy | exfalso ].
-  apply Hlab; clear Hlab.
-  destruct c. {
-    destruct d; [ flia Habcd | ].
-    destruct d; [ | flia Hd ].
-    flia Hab Habcd.
-  }
-  destruct c; [ | flia Hc ].
-  destruct d; [ flia Hab Habcd | ].
-  destruct d; [ | flia Hd ].
-  flia Habcd.
-}
-destruct (lt_dec a b) as [Hlab| Hlab]; [ exfalso | easy ].
-apply Habcd; clear Habcd.
-destruct c; [ flia Hlab | ].
-destruct c; [ | flia Hc ].
-destruct d. {
-  rewrite Nat.add_0_r.
-...
-*)
-
 (* equality ε on permut and ε_permut *)
 
 Theorem ε_canon_permut_ε_canon_permut :
   rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
   rngl_has_1_neq_0 = true →
-  ∀ n k, k < fact n → ε' (canon_permut n k) = ε_canon_permut n k.
+  ∀ n k, k < fact n → ε (canon_permut n k) = ε_canon_permut n k.
 Proof.
 intros Hin H10 * Hkn.
-unfold ε'.
+unfold ε.
 revert k Hkn.
 induction n; intros. {
   apply rngl_mul_inv_r; [ easy | cbn ].
@@ -710,7 +574,7 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ fact det_loop canon_permut ε' ].
+cbn - [ fact det_loop canon_permut ε ].
 revert M.
 induction n; intros. {
   cbn.
