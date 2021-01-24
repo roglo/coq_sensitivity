@@ -347,32 +347,16 @@ Fixpoint ε_canon_permut n k :=
 
 (* signature of a permutation *)
 
-(*
-Definition sgn_diff a b := if lt_dec a b then (- 1)%F else 1%F.
-
-Definition ε {n} (p : vector n nat) :=
-  (Π (i = 1, n), Π (j = i + 1, n),
-   sgn_diff (vect_el p (j - 1)) (vect_el p (i - 1)))%F.
-*)
-
-(*
-Definition ε {n} (p : vector n nat) :=
-  ((Π (i = 1, n), Π (j = i + 1, n),
-    (rngl_of_nat (vect_el p (j - 1)) - rngl_of_nat (vect_el p (i - 1)))) /
-   (Π (i = 1, n), Π (j = i + 1, n),
-    (rngl_of_nat j - rngl_of_nat i)))%F.
-*)
-
 Definition δ i j u v := if i <? j then (rngl_of_nat v - rngl_of_nat u)%F else 1%F.
 Definition ip {n} (p : vector n nat) i := rngl_of_nat (vect_el p i).
 
 Definition ε {n} (p : vector n nat) :=
-  ((Π (i = 1, n), Π (j = i + 1, n), (ip p (j - 1) - ip p (i - 1))) /
-   (Π (i = 1, n), Π (j = i + 1, n), rngl_of_nat (j - i)))%F.
-
-Definition ε' {n} (p : vector n nat) :=
   ((Π (i = 1, n), Π (j = 1, n), δ i j (vect_el p (i - 1)) (vect_el p (j - 1))) /
    (Π (i = 1, n), Π (j = 1, n), δ i j i j))%F.
+
+Definition ε' {n} (p : vector n nat) :=
+  ((Π (i = 1, n), Π (j = i + 1, n), (ip p (j - 1) - ip p (i - 1))) /
+   (Π (i = 1, n), Π (j = i + 1, n), rngl_of_nat (j - i)))%F.
 
 (* signature by counting the number of transpositions *)
 
@@ -399,8 +383,10 @@ Fixpoint insertion_sort list :=
 Compute let n := 5 in (map (λ k, insertion_sort (list_of_vect (canon_permut n k))) (seq 0 (fact n))).
 *)
 
+(*
 Definition ε'' {n} (p : vector n nat) :=
   if snd (insertion_sort (list_of_vect p)) then (-1)%F else 1%F.
+*)
 
 (*
 End a.
@@ -509,10 +495,10 @@ destruct d. {
 Theorem ε_canon_permut_ε_canon_permut :
   rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
   rngl_has_1_neq_0 = true →
-  ∀ n k, k < fact n → ε (canon_permut n k) = ε_canon_permut n k.
+  ∀ n k, k < fact n → ε' (canon_permut n k) = ε_canon_permut n k.
 Proof.
 intros Hin H10 * Hkn.
-unfold ε.
+unfold ε'.
 revert k Hkn.
 induction n; intros. {
   apply rngl_mul_inv_r; [ easy | cbn ].
@@ -724,7 +710,7 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ fact det_loop canon_permut ε ].
+cbn - [ fact det_loop canon_permut ε' ].
 revert M.
 induction n; intros. {
   cbn.
@@ -2652,10 +2638,10 @@ Theorem signature_comp :
   ∀ n (σ₁ σ₂ : vector n nat),
   is_permut σ₁
   → is_permut σ₂
-  → ε' (σ₁ ° σ₂) = (ε' σ₁ * ε' σ₂)%F.
+  → ε (σ₁ ° σ₂) = (ε σ₁ * ε σ₂)%F.
 Proof.
 intros Hop Hin Hic Hde H10 Hit Hch * Hp1 Hp2.
-unfold ε'.
+unfold ε.
 cbn.
 remember (Π (i = _, _), _)%F as x eqn:Hx in |-*.
 remember (Π (i = _, _), _)%F as y eqn:Hy in |-*.
