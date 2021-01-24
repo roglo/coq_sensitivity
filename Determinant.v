@@ -2778,8 +2778,6 @@ apply product_product_if_permut; try easy. {
 }
 Qed.
 
-...
-
 Theorem glop : ∀ p q n k k',
   p < q < n
   → k' = nat_of_canon_permut (vect_swap_elem (canon_permut n k) p q)
@@ -2789,12 +2787,12 @@ intros * Hpqn Hk'.
 unfold ε.
 revert p q k k' Hpqn Hk'.
 induction n; intros; [ easy | ].
-rewrite (rngl_product_split _ (S p)); [ | flia Hpqn ].
+rewrite (rngl_product_split (S p)); [ | flia Hpqn ].
 rewrite rngl_product_split_last; [ | flia ].
 rewrite rngl_product_succ_succ.
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
-  rewrite Nat.sub_add; [ | flia Hi ].
+(**)
   rewrite rngl_product_succ_succ.
   rewrite Nat.sub_succ, Nat.sub_0_r.
   erewrite rngl_product_eq_compat. 2: {
@@ -2804,6 +2802,7 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 cbn - [ canon_permut ].
+Abort. (*
 rewrite rngl_product_succ_succ.
 erewrite (rngl_product_eq_compat _ _ _ (p + 1)). 2: {
   intros i Hi.
@@ -2838,7 +2837,7 @@ cbn - [ nat_of_canon_permut canon_permut ].
 (* nothing can be said about "minus_one_pow (k' / fact n)" and
    "minus_one_pow (k / fact n)": they can be equal or not;
    difficult to predict (I tested examples) *)
-...
+Abort.
 
 Theorem signature_swap :
   rngl_has_opp = true →
@@ -2851,6 +2850,7 @@ Theorem signature_swap :
 Proof.
 intros Hop * (Hpq, Hqn) Hk.
 unfold ε_canon_permut.
+Abort. (*
 ...
 intros Hop * (Hpq, Hqn) Hk.
 revert k Hk.
@@ -2912,6 +2912,7 @@ apply NoDup_Permutation_bis; cycle 1. {
       replace (ε_canon_permut n x) with (- ε_canon_permut n y)%F. 2: {
         subst x; cbn; clear M; symmetry.
         rename y into k; rename Hy into Hk.
+Abort. (*
 ...
         apply ε_permut_swap.
 Print nat_of_permut.
@@ -3129,7 +3130,7 @@ apply rngl_summation_permut; cycle 1. {
   unfold determinant''_list.
   now rewrite map_length, seq_length.
 }
-...
+Abort.
 
 (* *)
 
@@ -3532,7 +3533,7 @@ destruct n; [ flia Hiz | ].
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   rewrite rngl_product_succ_succ.
-...
+Abort. (*
   erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
     intros k Hk.
     now rewrite Nat.sub_succ, Nat.sub_0_r.
@@ -3798,21 +3799,21 @@ rewrite (det_sum_row_row _ M C Hrz); cycle 1. {
 } {
   intros i j Hi; rewrite Hc; cbn.
   now destruct (Nat.eq_dec i 0).
-} {
-  remember
-    (mk_mat n n (λ i j, if Nat.eq_dec i 0 then mat_el M k j else mat_el M i j))
-       as D eqn:Hd.
-  specialize (det_mul_row_0_by_scal Hic) as H1.
-  specialize (H1 n D v Hrz).
-  assert (H : mat_mul_row_by_scal 0 D v = C). {
-    unfold mat_mul_row_by_scal; rewrite Hc, Hd; cbn.
-    apply matrix_eq; cbn.
-    intros i j Hi Hj.
-    now destruct (Nat.eq_dec i 0).
-  }
-  rewrite H in H1; clear H.
+}
+remember
+  (mk_mat n n (λ i j, if Nat.eq_dec i 0 then mat_el M k j else mat_el M i j))
+    as D eqn:Hd.
+specialize (det_mul_row_0_by_scal Hic) as H1.
+specialize (H1 n D v Hrz).
+assert (H : mat_mul_row_by_scal 0 D v = C). {
+  unfold mat_mul_row_by_scal; rewrite Hc, Hd; cbn.
+  apply matrix_eq; cbn.
+  intros i j Hi Hj.
+  now destruct (Nat.eq_dec i 0).
+}
+rewrite H in H1; clear H.
+assert (H : determinant D = 0%F). {
 ...
-  assert (H : determinant D = 0%F). {
     rewrite Hd.
  (* blocked because needs the previous lemma
 ...
