@@ -2782,6 +2782,7 @@ Search ε.
 
 Print ε_canon_permut.
 
+(*
 ...
 
 determinant = λ (n : nat) (M : matrix n n T), det_loop M n
@@ -2800,8 +2801,8 @@ determinant'' =
    ε_canon_permut n k *
    Π (i = 1, n), mat_el M (i - 1) (vect_el (canon_permut_swap_last p q n k) (i - 1)))%F
      : nat → nat → ∀ n : nat, matrix n n T → T
-
 ...
+*)
 
 Theorem glop : ∀ p q n k k',
   p < q < n
@@ -3838,6 +3839,7 @@ assert (H : mat_mul_row_by_scal 0 D v = C). {
 }
 rewrite H in H1; clear H.
 assert (H : determinant D = 0%F). {
+Abort. (*
 ...
     rewrite Hd.
  (* blocked because needs the previous lemma
