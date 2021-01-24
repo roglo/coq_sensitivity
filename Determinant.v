@@ -2204,7 +2204,7 @@ Theorem permut_swap_mul_cancel : ∀ n σ f,
   rngl_has_1_neq_0 = true →
   is_permut_fun σ n
   → (∀ i j, f i j = f j i)
-  → (∀ i j, f i j ≠ 0%F)
+  → (∀ i j, i ≠ j → f i j ≠ 0%F)
   → ∀ i j, i < n → j < n →
     (((if σ i <? σ j then f i j else 1) / (if i <? j then f i j else 1)) *
      ((if σ j <? σ i then f j i else 1) / (if j <? i then f j i else 1)))%F =
@@ -2221,7 +2221,7 @@ destruct (lt_dec (σ i) (σ j)) as [H1| H1]. {
   destruct (lt_dec i j) as [H3| H3]. {
     destruct (lt_dec j i) as [H| H]; [ flia H3 H | clear H ].
     rewrite Hfij.
-    rewrite rngl_mul_inv_r; [ | now left | apply Hfijnz ].
+    rewrite rngl_mul_inv_r; [ | now left | apply Hfijnz; flia H3 ].
     rewrite rngl_mul_1_l.
     apply rngl_mul_inv_r; [ now left | easy ].
   }
@@ -2230,7 +2230,7 @@ destruct (lt_dec (σ i) (σ j)) as [H1| H1]. {
     rewrite rngl_div_1_r; [ | now left | easy ].
     rewrite rngl_div_1_l; [ | easy ].
     rewrite fold_rngl_div; [ | easy ].
-    apply rngl_mul_inv_r; [ now left | easy ].
+    apply rngl_mul_inv_r; [ now left | apply Hfijnz; flia H4 ].
   }
   exfalso.
   apply Nat.nlt_ge in H3.
@@ -2246,13 +2246,13 @@ destruct (lt_dec (σ j) (σ i)) as [H2| H2]. {
     rewrite rngl_div_1_l; [ | easy ].
     rewrite rngl_mul_comm.
     rewrite fold_rngl_div; [ | easy ].
-    apply rngl_mul_inv_r; [ now left | easy ].
+    apply rngl_mul_inv_r; [ now left | apply Hfijnz; flia H3 ].
   }
   destruct (lt_dec j i) as [H4| H4]. {
     rewrite Hfij.
     rewrite rngl_div_1_r; [ | now left | easy ].
     rewrite rngl_mul_1_l.
-    apply rngl_mul_inv_r; [ now left | easy ].
+    apply rngl_mul_inv_r; [ now left | apply Hfijnz; flia H4 ].
   }
   exfalso.
   apply Nat.nlt_ge in H3.
@@ -2523,7 +2523,7 @@ Theorem product_product_if_permut_div :
   ∀ n σ f,
   is_permut_fun σ n
   → (∀ i j, f i j = f j i)
-  → (∀ i j, f i j ≠ 0%F)
+  → (∀ i j, i ≠ j → f i j ≠ 0%F)
   → (Π (i ∈ seq 0 n), Π (j ∈ seq 0 n),
       ((if σ i <? σ j then f i j else 1) / (if i <? j then f i j else 1)))%F =
      1%F.
@@ -2562,7 +2562,7 @@ Theorem product_product_if_permut :
   ∀ n σ f,
   is_permut_fun σ n
   → (∀ i j, f i j = f j i)
-  → (∀ i j, f i j ≠ 0%F) (* not mandatory but to simplify *)
+  → (∀ i j, i ≠ j → f i j ≠ 0%F)
   → (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), if σ i <? σ j then f i j else 1))%F =
     (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), if i <? j then f i j else 1))%F.
 Proof.
@@ -2585,7 +2585,8 @@ destruct (rngl_eq_dec b 0%F) as [Hbz| Hbz]. {
   move j before i.
   rewrite if_ltb_lt_dec in Hb.
   destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
-  now specialize (Hfijnz i j).
+  exfalso; revert Hb.
+  apply Hfijnz; flia Hij.
 }
 apply rngl_mul_reg_r with (c := (¹/ b)%F); [ now left | | ]. {
   intros Hbiz.
@@ -2602,9 +2603,10 @@ rewrite (rngl_inv_product_list ro); [ | easy | easy | easy | easy | ]. 2: {
   intros i Hi H1.
   apply rngl_product_list_integral in H1.
   destruct H1 as (j & Hjs & Hijz).
-  destruct (i <? j); [ | easy ].
+  rewrite if_ltb_lt_dec in Hijz.
+  destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
   revert Hijz.
-  apply Hfijnz.
+  apply Hfijnz; flia Hij.
 }
 subst a.
 rewrite <- rngl_product_list_mul_distr; [ | easy ].
@@ -2612,8 +2614,9 @@ erewrite rngl_product_list_eq_compat. 2 :{
   intros i Hi.
   rewrite (rngl_inv_product_list ro); [ | easy | easy | easy | easy | ]. 2: {
     intros j Hj.
-    destruct (i <? j); [ | easy ].
-    apply Hfijnz.
+    rewrite if_ltb_lt_dec.
+    destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
+    apply Hfijnz; flia Hij.
   }
   rewrite <- rngl_product_list_mul_distr; [ | easy ].
   erewrite rngl_product_list_eq_compat. 2: {
@@ -2780,11 +2783,32 @@ symmetry.
 (* changement of variable *)
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 rewrite rngl_product_shift; [ | flia Hnz ].
+(**)
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    now rewrite (Nat.add_comm 1), Nat.add_sub.
+  }
+  easy.
+}
+cbn - [ "<?" ].
+(* when
+     i + 1 < i0
+   we have
+     i + 1 ≠ 0
+   therefore, the denominator
+     rngl_of_nat (vect_el σ₂ (i0 - 1)) - rngl_of_nat (vect_el σ₂ i)
+   is different from 0, and it is ok.
+
+   But after the change of variable, the denominator can be 0: problem! *)
 rewrite rngl_product_change_var with
-  (g := vect_el (permut_inv σ₂)) (h :=vect_el σ₂). 2: {
+  (g := vect_el (permut_inv σ₂)) (h := vect_el σ₂). 2: {
   intros i Hi.
   rewrite permut_inv_permut; [ easy | easy | flia Hi Hnz ].
 }
+(* problem *)
+...
 rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
 erewrite rngl_product_list_eq_compat. 2: {
@@ -2860,6 +2884,7 @@ unfold iter_seq.
 rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
 symmetry.
+...
 apply product_product_if_permut; try easy. {
   now apply permut_inv_is_permut.
 } {
