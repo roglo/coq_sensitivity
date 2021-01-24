@@ -2928,8 +2928,6 @@ apply product_product_if_permut; try easy. {
 }
 Qed.
 
-Inspect 1.
-
 ...
 
 Theorem glop : ∀ p q n k k',
