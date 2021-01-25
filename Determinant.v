@@ -350,200 +350,11 @@ Fixpoint ε_canon_permut n k :=
 Definition δ i j u v := if i <? j then (rngl_of_nat v - rngl_of_nat u)%F else 1%F.
 Definition ip {n} (p : vector n nat) i := rngl_of_nat (vect_el p i).
 
-Definition ε {n} (p : vector n nat) :=
-  ((Π (i = 1, n), Π (j = 1, n), δ i j (vect_el p (i - 1)) (vect_el p (j - 1))) /
+Definition ε_fun f n :=
+  ((Π (i = 1, n), Π (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
    (Π (i = 1, n), Π (j = 1, n), δ i j i j))%F.
 
-(* equality ε on permut and ε_permut *)
-
-Theorem ε_canon_permut_ε_canon_permut :
-  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
-  rngl_has_1_neq_0 = true →
-  ∀ n k, k < fact n → ε (canon_permut n k) = ε_canon_permut n k.
-Proof.
-intros Hin H10 * Hkn.
-unfold ε.
-revert k Hkn.
-induction n; intros. {
-  apply rngl_mul_inv_r; [ easy | cbn ].
-  specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
-  now rewrite H10 in rngl_1_neq_0.
-}
-cbn.
-Abort. (*
-rewrite rngl_product_split_first; [ | easy | flia ].
-cbn.
-rewrite rngl_product_succ_succ.
-erewrite rngl_product_eq_compat. 2: {
-  intros i Hi.
-  now rewrite Nat.sub_succ, Nat.sub_0_r.
-}
-erewrite (rngl_product_eq_compat _ _ _ 2). 2: {
-  intros i Hi.
-  erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    replace (i - 1) with (S (i - 2)) by flia Hi.
-    replace (j - 1) with (S (j - 2)) by flia Hj Hi.
-    now cbn.
-  }
-  easy.
-}
-cbn.
-...
-intros * Hkn.
-unfold ε.
-revert k Hkn.
-induction n; intros; [ easy | ].
-cbn.
-(**)
-rewrite rngl_product_split_first; [ | easy | flia ].
-cbn.
-rewrite rngl_product_succ_succ.
-erewrite rngl_product_eq_compat. 2: {
-  intros i Hi.
-  now rewrite Nat.sub_succ, Nat.sub_0_r.
-}
-erewrite (rngl_product_eq_compat _ _ _ 2). 2: {
-  intros i Hi.
-  erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    replace (i - 1) with (S (i - 2)) by flia Hi.
-    replace (j - 1) with (S (j - 2)) by flia Hj Hi.
-    now cbn.
-  }
-  easy.
-}
-cbn.
-(**)
-rewrite rngl_product_succ_succ.
-remember (Π (i = _, _), _)%F as x eqn:Hx.
-erewrite rngl_product_eq_compat. 2: {
-  intros i Hi.
-  rewrite Nat.add_succ_l.
-  erewrite rngl_product_succ_succ.
-  erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    do 2 rewrite Nat.sub_succ.
-    easy.
-  }
-  cbn.
-  easy.
-}
-cbn.
-subst x.
-rename Hkn into Hksn.
-destruct (lt_dec k (fact n)) as [Hkn| Hkn]. {
-  rewrite Nat.div_small; [ | easy ].
-  rewrite Nat.mod_small; [ | easy ].
-  cbn.
-  rewrite all_1_rngl_product_1; [ | easy | easy ].
-  do 2 rewrite rngl_mul_1_l.
-  erewrite rngl_product_eq_compat. 2: {
-    intros i Hi.
-    erewrite rngl_product_eq_compat. 2: {
-      intros j Hj.
-      now rewrite sgn_diff_add_mono_r.
-    }
-    easy.
-  }
-  cbn.
-  now apply IHn.
-}
-apply Nat.nlt_ge in Hkn.
-destruct (lt_dec k (2 * fact n)) as [Hk2n| Hk2n]. {
-  rewrite (Nat_div_less_small 1); [ | now rewrite Nat.mul_1_l ].
-  rewrite (Nat_mod_less_small 1); [ | now rewrite Nat.mul_1_l ].
-  rewrite Nat.mul_1_l.
-  cbn - [ "<=?" ].
-  f_equal. {
-    unfold sgn_diff.
-    replace (permut_fun (permut n) k) with (vect_el (permut (S n) k)) by easy.
-    rewrite (rngl_product_split _ (permut_inv (S n) k 0)). 2: {
-      split; [ flia | ].
-      apply permut_inv_upper_bound; [ easy | flia ].
-    }
-    rewrite rngl_product_split_last. 2: {
-      cbn.
-      rewrite (Nat_div_less_small 1); [ | now rewrite Nat.mul_1_l ].
-      cbn; flia.
-    }
-    rewrite all_1_rngl_product_1; [ | easy | ]. 2: {
-      intros i Hi.
-      destruct (lt_dec (vect_el (permut (S n) k) (i - 1)) 1) as [Hni| Hni].
-      2: easy.
-      exfalso.
-      apply Nat.lt_1_r in Hni.
-      cbn in Hi.
-      rewrite (Nat_div_less_small 1) in Hi; [ | now rewrite Nat.mul_1_l ].
-      rewrite (Nat_mod_less_small 1) in Hi; [ | now rewrite Nat.mul_1_l ].
-      cbn in Hi.
-      rewrite Nat.add_0_r in Hi.
-      specialize (@permut_inv_permut (S n) k (i - 1)) as H1.
-      assert (H : i - 1 < S n). {
-        specialize (@permut_inv_upper_bound n (k - fact n) 0) as H2.
-        assert (H : k - fact n < fact n) by (cbn in Hk2n; flia Hk2n).
-        specialize (H2 H); clear H.
-        assert (H : 0 < n). {
-          destruct n; [ | flia ].
-          cbn in Hksn, Hkn; flia Hksn Hkn.
-        }
-        specialize (H2 H); clear H.
-        flia Hi H2.
-      }
-      specialize (H1 H Hksn); clear H.
-      rewrite Hni in H1.
-      cbn in H1.
-      rewrite (Nat_div_less_small 1) in H1; [ | now rewrite Nat.mul_1_l ].
-      rewrite (Nat_mod_less_small 1) in H1; [ | now rewrite Nat.mul_1_l ].
-      rewrite Nat.mul_1_l in H1.
-      cbn in H1.
-      flia Hi H1.
-    }
-    rewrite rngl_mul_1_l.
-    rewrite all_1_rngl_product_1; [ | easy | ]. 2: {
-      intros i Hi.
-      destruct (lt_dec (vect_el (permut (S n) k) i) 1) as [Hni| Hni].
-      2: easy.
-      exfalso.
-      apply Nat.lt_1_r in Hni.
-      cbn in Hi.
-      rewrite (Nat_div_less_small 1) in Hi; [ | now rewrite Nat.mul_1_l ].
-      rewrite (Nat_mod_less_small 1) in Hi; [ | now rewrite Nat.mul_1_l ].
-      cbn in Hi.
-      rewrite Nat.add_0_r in Hi.
-      specialize (@permut_inv_permut (S n) k i) as H1.
-      assert (H : i < S n). {
-        specialize (@permut_inv_upper_bound n (k - fact n) 0) as H2.
-        assert (H : k - fact n < fact n) by (cbn in Hk2n; flia Hk2n).
-        specialize (H2 H); clear H.
-        assert (H : 0 < n). {
-          destruct n; [ | flia ].
-          cbn in Hksn, Hkn; flia Hksn Hkn.
-        }
-        specialize (H2 H); clear H.
-        flia Hi H2.
-      }
-      specialize (H1 H Hksn); clear H.
-      rewrite Hni in H1.
-      cbn in H1.
-      rewrite (Nat_div_less_small 1) in H1; [ | now rewrite Nat.mul_1_l ].
-      rewrite (Nat_mod_less_small 1) in H1; [ | now rewrite Nat.mul_1_l ].
-      rewrite Nat.mul_1_l in H1.
-      cbn in H1.
-      flia Hi H1.
-    }
-    rewrite permut_permut_inv; [ | flia | easy ].
-    cbn; apply rngl_mul_1_r.
-  }
-  rewrite <- IHn; [ | cbn in Hk2n; flia Hk2n ].
-  apply rngl_product_eq_compat.
-  intros i Hi.
-  apply rngl_product_eq_compat.
-  intros j Hj.
-  (* chuis pas sûr *)
-  (* trop compliqué ; en plus, c'est juste *un* cas *)
-...
-*)
+Definition ε {n} (p : vector n nat) := ε_fun (vect_el p) n.
 
 (* definition of determinant by sum of products involving all
    permutations *)
@@ -1438,8 +1249,10 @@ unfold swap_nat.
 destruct (Nat.eq_dec j i); [ now subst i | easy ].
 Qed.
 
+Definition comp {A B C} (f : B → C) (g : A → B) x := f (g x).
+
 Definition permut_comp {n} (σ₁ σ₂ : vector n nat) :=
-  mk_vect n (λ i, vect_el σ₁ (vect_el σ₂ i)).
+  mk_vect n (comp (vect_el σ₁) (vect_el σ₂)).
 
 Notation "σ₁ ° σ₂" := (permut_comp σ₁ σ₂) (at level 40).
 
@@ -2491,7 +2304,7 @@ cbn - [ "<?" ].
 now apply product_product_if_permut_div.
 Qed.
 
-Theorem signature_comp :
+Theorem signature_comp_fun :
   rngl_has_opp = true →
   rngl_has_inv = true →
   rngl_is_comm = true →
@@ -2499,14 +2312,13 @@ Theorem signature_comp :
   rngl_has_1_neq_0 = true →
   rngl_is_integral = true →
   rngl_characteristic = 0 →
-  ∀ n (σ₁ σ₂ : vector n nat),
-  is_permut σ₁
-  → is_permut σ₂
-  → ε (σ₁ ° σ₂) = (ε σ₁ * ε σ₂)%F.
+  ∀ n f g,
+  is_permut_fun f n
+  → is_permut_fun g n
+  → ε_fun (comp f g) n = (ε_fun f n * ε_fun g n)%F.
 Proof.
 intros Hop Hin Hic Hde H10 Hit Hch * Hp1 Hp2.
-unfold ε.
-cbn.
+unfold ε_fun, comp; cbn.
 remember (Π (i = _, _), _)%F as x eqn:Hx in |-*.
 remember (Π (i = _, _), _)%F as y eqn:Hy in |-*.
 remember (Π (i = _, _), _)%F as z eqn:Hz in |-*.
@@ -2524,7 +2336,7 @@ rewrite Hic in rngl_mul_comm.
 assert (Htz : t ≠ 0%F). {
   intros Hij; rewrite Ht in Hij.
   clear x z t Hx Hy Hz Ht.
-  clear σ₁ Hp1.
+  clear f Hp1.
   specialize @rngl_product_opt_integral as rngl_product_integral.
   specialize (rngl_product_integral T ro rp Hit H10).
   apply rngl_product_integral in Hij.
@@ -2653,10 +2465,9 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 cbn - [ "<?" ].
-rewrite rngl_product_change_var with
-  (g := vect_el (permut_inv σ₂)) (h := vect_el σ₂). 2: {
+rewrite rngl_product_change_var with (g := permut_fun_inv g n) (h := g). 2: {
   intros i Hi.
-  rewrite permut_inv_permut; [ easy | easy | flia Hi Hnz ].
+  rewrite fun_find_prop; [ easy | apply Hp2 | flia Hi Hnz ].
 }
 rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
@@ -2664,9 +2475,9 @@ erewrite rngl_product_list_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_product_shift; [ | flia Hnz ].
   rewrite rngl_product_change_var with
-    (g := vect_el (permut_inv σ₂)) (h :=vect_el σ₂). 2: {
+      (g := permut_fun_inv g n) (h := g). 2: {
     intros j Hj.
-    rewrite permut_inv_permut; [ easy | easy | flia Hj Hnz ].
+    rewrite fun_find_prop; [ easy | apply Hp2 | flia Hj Hnz ].
   }
   rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
   rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
@@ -2674,15 +2485,15 @@ erewrite rngl_product_list_eq_compat. 2: {
     intros j Hj.
     rewrite (Nat.add_comm _ 1).
     rewrite Nat_ltb_mono_l.
-    rewrite permut_permut_inv; [ | easy | ]. 2: {
+    rewrite fun_permut_fun_inv; [ | apply Hp2 | ]. 2: {
       apply in_map_iff in Hi.
       destruct Hi as (k & Hk & Hkn).
       apply in_seq in Hkn.
       rewrite <- Hk.
       now apply Hp2.
     }
-    rewrite (Nat.add_comm 1), Nat.add_sub.
-    rewrite permut_permut_inv; [ | easy | ]. 2: {
+    rewrite Nat.add_comm, Nat.add_sub.
+    rewrite fun_permut_fun_inv; [ | apply Hp2 | ]. 2: {
       apply in_map_iff in Hj.
       destruct Hj as (k & Hk & Hkn).
       apply in_seq in Hkn.
@@ -2697,13 +2508,13 @@ cbn - [ "<?" ].
 erewrite rngl_product_list_eq_compat. 2: {
   intros j Hj.
   erewrite rngl_product_change_list; [ | easy | ]. 2: {
-    now apply permut_Permutation.
+    now apply permut_fun_Permutation.
   }
   easy.
 }
 cbn - [ "<?" ].
 erewrite rngl_product_change_list; [ | easy | ]. 2: {
-  now apply permut_Permutation.
+  now apply permut_fun_Permutation.
 }
 symmetry.
 rewrite rngl_product_shift; [ | flia Hnz ].
@@ -2737,7 +2548,7 @@ rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
 symmetry.
 apply product_product_if_permut; try easy. {
-  now apply permut_inv_is_permut.
+  now apply permut_fun_inv_is_permut.
 } {
   intros i j.
   destruct (Nat.eq_dec i j) as [Hij| Hij]; [ now subst j | ].
@@ -2777,6 +2588,224 @@ apply product_product_if_permut; try easy. {
   }
 }
 Qed.
+
+Theorem signature_comp :
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_comm = true →
+  rngl_has_dec_eq = true →
+  rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
+  rngl_characteristic = 0 →
+  ∀ n (σ₁ σ₂ : vector n nat),
+  is_permut σ₁
+  → is_permut σ₂
+  → ε (σ₁ ° σ₂) = (ε σ₁ * ε σ₂)%F.
+Proof.
+intros Hop Hin Hic Hde H10 Hit Hch * Hp1 Hp2.
+now apply signature_comp_fun.
+Qed.
+
+(* equality ε on permut and ε_permut *)
+
+Theorem ε_canon_permut_ε_canon_permut :
+  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  rngl_has_1_neq_0 = true →
+  ∀ n k, k < fact n → ε (canon_permut n k) = ε_canon_permut n k.
+Proof.
+intros Hin H10 * Hkn.
+unfold ε.
+destruct n. {
+  apply rngl_mul_inv_r; [ easy | cbn ].
+  specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
+  now rewrite H10 in rngl_1_neq_0.
+}
+cbn.
+Print canon_permut_fun.
+Check signature_comp_fun.
+Print canon_permut.
+...
+intros Hin H10 * Hkn.
+revert k Hkn.
+induction n; intros. {
+  apply rngl_mul_inv_r; [ easy | cbn ].
+  specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
+  now rewrite H10 in rngl_1_neq_0.
+}
+...
+rewrite rngl_product_split_first; [ | easy | flia ].
+cbn.
+rewrite rngl_product_succ_succ.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  now rewrite Nat.sub_succ, Nat.sub_0_r.
+}
+erewrite (rngl_product_eq_compat _ _ _ 2). 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    replace (i - 1) with (S (i - 2)) by flia Hi.
+    replace (j - 1) with (S (j - 2)) by flia Hj Hi.
+    now cbn.
+  }
+  easy.
+}
+cbn.
+...
+intros * Hkn.
+unfold ε.
+revert k Hkn.
+induction n; intros; [ easy | ].
+cbn.
+(**)
+rewrite rngl_product_split_first; [ | easy | flia ].
+cbn.
+rewrite rngl_product_succ_succ.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  now rewrite Nat.sub_succ, Nat.sub_0_r.
+}
+erewrite (rngl_product_eq_compat _ _ _ 2). 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    replace (i - 1) with (S (i - 2)) by flia Hi.
+    replace (j - 1) with (S (j - 2)) by flia Hj Hi.
+    now cbn.
+  }
+  easy.
+}
+cbn.
+(**)
+rewrite rngl_product_succ_succ.
+remember (Π (i = _, _), _)%F as x eqn:Hx.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite Nat.add_succ_l.
+  erewrite rngl_product_succ_succ.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    do 2 rewrite Nat.sub_succ.
+    easy.
+  }
+  cbn.
+  easy.
+}
+cbn.
+subst x.
+rename Hkn into Hksn.
+destruct (lt_dec k (fact n)) as [Hkn| Hkn]. {
+  rewrite Nat.div_small; [ | easy ].
+  rewrite Nat.mod_small; [ | easy ].
+  cbn.
+  rewrite all_1_rngl_product_1; [ | easy | easy ].
+  do 2 rewrite rngl_mul_1_l.
+  erewrite rngl_product_eq_compat. 2: {
+    intros i Hi.
+    erewrite rngl_product_eq_compat. 2: {
+      intros j Hj.
+      now rewrite sgn_diff_add_mono_r.
+    }
+    easy.
+  }
+  cbn.
+  now apply IHn.
+}
+apply Nat.nlt_ge in Hkn.
+destruct (lt_dec k (2 * fact n)) as [Hk2n| Hk2n]. {
+  rewrite (Nat_div_less_small 1); [ | now rewrite Nat.mul_1_l ].
+  rewrite (Nat_mod_less_small 1); [ | now rewrite Nat.mul_1_l ].
+  rewrite Nat.mul_1_l.
+  cbn - [ "<=?" ].
+  f_equal. {
+    unfold sgn_diff.
+    replace (permut_fun (permut n) k) with (vect_el (permut (S n) k)) by easy.
+    rewrite (rngl_product_split _ (permut_inv (S n) k 0)). 2: {
+      split; [ flia | ].
+      apply permut_inv_upper_bound; [ easy | flia ].
+    }
+    rewrite rngl_product_split_last. 2: {
+      cbn.
+      rewrite (Nat_div_less_small 1); [ | now rewrite Nat.mul_1_l ].
+      cbn; flia.
+    }
+    rewrite all_1_rngl_product_1; [ | easy | ]. 2: {
+      intros i Hi.
+      destruct (lt_dec (vect_el (permut (S n) k) (i - 1)) 1) as [Hni| Hni].
+      2: easy.
+      exfalso.
+      apply Nat.lt_1_r in Hni.
+      cbn in Hi.
+      rewrite (Nat_div_less_small 1) in Hi; [ | now rewrite Nat.mul_1_l ].
+      rewrite (Nat_mod_less_small 1) in Hi; [ | now rewrite Nat.mul_1_l ].
+      cbn in Hi.
+      rewrite Nat.add_0_r in Hi.
+      specialize (@permut_inv_permut (S n) k (i - 1)) as H1.
+      assert (H : i - 1 < S n). {
+        specialize (@permut_inv_upper_bound n (k - fact n) 0) as H2.
+        assert (H : k - fact n < fact n) by (cbn in Hk2n; flia Hk2n).
+        specialize (H2 H); clear H.
+        assert (H : 0 < n). {
+          destruct n; [ | flia ].
+          cbn in Hksn, Hkn; flia Hksn Hkn.
+        }
+        specialize (H2 H); clear H.
+        flia Hi H2.
+      }
+      specialize (H1 H Hksn); clear H.
+      rewrite Hni in H1.
+      cbn in H1.
+      rewrite (Nat_div_less_small 1) in H1; [ | now rewrite Nat.mul_1_l ].
+      rewrite (Nat_mod_less_small 1) in H1; [ | now rewrite Nat.mul_1_l ].
+      rewrite Nat.mul_1_l in H1.
+      cbn in H1.
+      flia Hi H1.
+    }
+    rewrite rngl_mul_1_l.
+    rewrite all_1_rngl_product_1; [ | easy | ]. 2: {
+      intros i Hi.
+      destruct (lt_dec (vect_el (permut (S n) k) i) 1) as [Hni| Hni].
+      2: easy.
+      exfalso.
+      apply Nat.lt_1_r in Hni.
+      cbn in Hi.
+      rewrite (Nat_div_less_small 1) in Hi; [ | now rewrite Nat.mul_1_l ].
+      rewrite (Nat_mod_less_small 1) in Hi; [ | now rewrite Nat.mul_1_l ].
+      cbn in Hi.
+      rewrite Nat.add_0_r in Hi.
+      specialize (@permut_inv_permut (S n) k i) as H1.
+      assert (H : i < S n). {
+        specialize (@permut_inv_upper_bound n (k - fact n) 0) as H2.
+        assert (H : k - fact n < fact n) by (cbn in Hk2n; flia Hk2n).
+        specialize (H2 H); clear H.
+        assert (H : 0 < n). {
+          destruct n; [ | flia ].
+          cbn in Hksn, Hkn; flia Hksn Hkn.
+        }
+        specialize (H2 H); clear H.
+        flia Hi H2.
+      }
+      specialize (H1 H Hksn); clear H.
+      rewrite Hni in H1.
+      cbn in H1.
+      rewrite (Nat_div_less_small 1) in H1; [ | now rewrite Nat.mul_1_l ].
+      rewrite (Nat_mod_less_small 1) in H1; [ | now rewrite Nat.mul_1_l ].
+      rewrite Nat.mul_1_l in H1.
+      cbn in H1.
+      flia Hi H1.
+    }
+    rewrite permut_permut_inv; [ | flia | easy ].
+    cbn; apply rngl_mul_1_r.
+  }
+  rewrite <- IHn; [ | cbn in Hk2n; flia Hk2n ].
+  apply rngl_product_eq_compat.
+  intros i Hi.
+  apply rngl_product_eq_compat.
+  intros j Hj.
+  (* chuis pas sûr *)
+  (* trop compliqué ; en plus, c'est juste *un* cas *)
+...
+*)
 
 (*
 Search ε.
@@ -3558,9 +3587,12 @@ intros Hic Hop * Hiz Ha.
 rewrite det_is_det_by_canon_permut; [ | easy ].
 unfold determinant'.
 destruct n; [ flia Hiz | ].
+...
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   rewrite rngl_product_succ_succ.
+Check signature_comp.
+...
 Abort. (*
   erewrite rngl_product_eq_compat; [ | easy | ]. 2: {
     intros k Hk.
