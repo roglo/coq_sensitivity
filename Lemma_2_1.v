@@ -527,6 +527,25 @@ intros * Hdet Hab.
 Print comatrix.
 Abort.
 
+Theorem mat_with_eigen_vect_mul_transp_l :
+  ∀ n (M : matrix n n T) ev eV U,
+  is_symm_mat M
+  → eigenvalues_and_vectors M ev eV
+  → U = mat_with_vect eV
+  → (U⁺ * U)%M = mI n.
+Proof.
+intros * Hsy Hvv Hu.
+...
+
+Theorem mat_with_eigen_vect_mul_transp_r :
+  ∀ n (M : matrix n n T) ev eV U,
+  is_symm_mat M
+  → eigenvalues_and_vectors M ev eV
+  → U = mat_with_vect eV
+  → (U * U⁺)%M = mI n.
+Proof.
+...
+
 Theorem diagonalized_matrix_prop :
   rngl_is_comm = true →
   rngl_has_dec_eq = true →
@@ -538,11 +557,13 @@ Theorem diagonalized_matrix_prop :
   → U = mat_with_vect eV
    → M = (U * D * U⁺)%M.
 Proof.
-intros Hic Hed Hiv * Hsy Hvv Hd Ho.
+intros Hic Hed Hiv * Hsy Hvv Hd Hu.
 specialize (diagonalized_matrix_prop_1 Hic) as H1.
-specialize (H1 n M ev eV D U Hsy Hvv Hd Ho).
+specialize (H1 n M ev eV D U Hsy Hvv Hd Hu).
 rewrite <- H1.
 rewrite <- mat_mul_assoc; [ | easy ].
+...
+rewrite (mat_with_eigen_vect_mul_transpr Hsy Hvv Hu).
 ...
 (*
 rewrite (@det_nz_inv_comm _ _ U). 3: {
