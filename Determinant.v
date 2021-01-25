@@ -321,13 +321,15 @@ rewrite <- canon_permut_inv_permut with (n := n) (k := k); [ | easy | easy ].
 now f_equal.
 Qed.
 
-(* signature of the k-th permutation of "canon_permut" above *)
+(* signature of the k-th permutation of "canon_permut" above
 
 Fixpoint ε_canon_permut n k :=
   match n with
   | 0 => 1%F
   | S n' => (minus_one_pow (k / fact n') * ε_canon_permut n' (k mod fact n'))%F
   end.
+
+*)
 
 (* signature of a permutation *)
 
@@ -344,20 +346,24 @@ Definition ε {n} (p : vector n nat) := ε_fun (vect_el p) n.
    permutations *)
 
 Definition determinant' n (M : matrix n n T) :=
-  (Σ (k = 0, fact n - 1), ε_canon_permut n k *
+  (Σ (k = 0, fact n - 1), ε (canon_permut n k) *
    Π (i = 1, n), mat_el M (i - 1) (vect_el (canon_permut n k) (i - 1)%nat))%F.
 
 (* Proof that both definitions of determinants are equal *)
 
 Theorem det_is_det_by_canon_permut :
   rngl_is_comm = true →
+  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  rngl_has_1_neq_0 = true →
   ∀ n (M : matrix n n T), determinant M = determinant' M.
 Proof.
-intros Hic *.
+intros Hic Hiv H10 *.
 unfold determinant, determinant'.
 destruct n; intros. {
   unfold iter_seq, iter_list.
   cbn; rewrite rngl_add_0_l.
+  unfold ε, ε_fun, iter_seq, iter_list; cbn.
+  rewrite rngl_div_1_r; [ | easy | easy ].
   symmetry; apply rngl_mul_1_l.
 }
 erewrite rngl_summation_eq_compat. 2: {
@@ -373,9 +379,11 @@ cbn - [ fact det_loop canon_permut ε ].
 revert M.
 induction n; intros. {
   cbn.
-  unfold iter_seq, iter_list; cbn.
+  unfold ε, ε_fun, iter_seq, iter_list; cbn.
+  do 2 rewrite rngl_add_0_l.
   do 3 rewrite rngl_mul_1_l.
-  now rewrite rngl_mul_1_r.
+  rewrite rngl_div_1_r; [ | easy | easy ].
+  now rewrite rngl_mul_1_l, rngl_mul_1_r.
 }
 remember (S n) as sn.
 cbn - [ fact iter_seq "mod" "/" ]; subst sn.
@@ -404,14 +412,22 @@ cbn - [ fact iter_seq "mod" "/" canon_permut ].
 symmetry.
 apply rngl_summation_eq_compat.
 intros i Hi.
-do 3 rewrite rngl_mul_assoc.
+do 2 rewrite rngl_mul_assoc.
 f_equal. 2: {
   apply rngl_product_eq_compat.
   intros j Hj.
   now rewrite Nat.add_1_r.
 }
 rewrite rngl_mul_mul_swap; [ | easy ].
+f_equal.
+...
+Print canon_permut.
+Print canon_permut_fun.
+cbn - [ fact ].
+...
 rewrite <- rngl_mul_assoc.
+...
+f_equal.
 rewrite rngl_mul_mul_swap; [ | easy ].
 f_equal.
 rewrite rngl_mul_assoc.
