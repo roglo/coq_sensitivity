@@ -62,7 +62,7 @@ Proof. now intros; apply matrix_eq. Qed.
 Definition eigenvalues n M ev :=
   ∀ μ, μ ∈ ev → ∃ V, V ≠ vect_zero n ∧ (M • V = μ × V)%V.
 
-Definition eigenvalues_and_vectors n M ev eV :=
+Definition eigenvalues_and_norm_vectors n M ev eV :=
   (∀ i j, 0 ≤ i < n → 0 ≤ j < n → i ≠ j → nth i ev 0%F ≠ nth j ev 0%F) ∧
   (∀ i, 0 ≤ i < n → vect_squ_norm (nth i eV (vect_zero n)) = 1%F) ∧
   ∀ i μ V, 0 ≤ i < n →
@@ -297,7 +297,7 @@ Theorem diagonalized_matrix_prop_1 :
   rngl_is_comm = true →
   ∀ n (M : matrix n n T) ev eV D U,
   is_symm_mat M
-  → eigenvalues_and_vectors M ev eV
+  → eigenvalues_and_norm_vectors M ev eV
   → D = mat_with_diag n ev
   → U = mat_with_vect eV
    → (M * U = U * D)%M.
@@ -421,7 +421,7 @@ Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
   ∀ n (M : matrix n n T) ev eV U,
   is_symm_mat M
-  → eigenvalues_and_vectors M ev eV
+  → eigenvalues_and_norm_vectors M ev eV
   → U = mat_with_vect eV
   → (U⁺ * U = mI n)%M.
 Proof.
@@ -527,23 +527,33 @@ intros * Hdet Hab.
 Print comatrix.
 Abort.
 
+(* Obviously true if I can prove that the eigenvectors are orthogonormal,
+   since
+     U is a matrix whose columns are eigenvectors
+     U⁺ is therefore a matrix whose rows are eigenvectors
+   Diagonal elements of "U⁺ * U", are the norm of the eigenvectors, and
+   Non-diagonal elements of "U⁺ * U" are the scalar product of the
+   eigenvectors
+*)
 Theorem mat_with_eigen_vect_mul_transp_l :
   ∀ n (M : matrix n n T) ev eV U,
   is_symm_mat M
-  → eigenvalues_and_vectors M ev eV
+  → eigenvalues_and_norm_vectors M ev eV
   → U = mat_with_vect eV
   → (U⁺ * U)%M = mI n.
 Proof.
 intros * Hsy Hvv Hu.
 ...
 
+(* but how to prove that one? *)
 Theorem mat_with_eigen_vect_mul_transp_r :
   ∀ n (M : matrix n n T) ev eV U,
   is_symm_mat M
-  → eigenvalues_and_vectors M ev eV
+  → eigenvalues_and_norm_vectors M ev eV
   → U = mat_with_vect eV
   → (U * U⁺)%M = mI n.
 Proof.
+intros * Hsy Hvv Hu.
 ...
 
 Theorem diagonalized_matrix_prop :
@@ -552,7 +562,7 @@ Theorem diagonalized_matrix_prop :
   rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
   ∀ n (M : matrix n n T) ev eV D U,
   is_symm_mat M
-  → eigenvalues_and_vectors M ev eV
+  → eigenvalues_and_norm_vectors M ev eV
   → D = mat_with_diag n ev
   → U = mat_with_vect eV
    → M = (U * D * U⁺)%M.

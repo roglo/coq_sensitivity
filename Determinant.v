@@ -2778,9 +2778,11 @@ apply product_product_if_permut; try easy. {
 }
 Qed.
 
+(*
 Search ε.
 
 Print ε_canon_permut.
+*)
 
 (*
 ...
