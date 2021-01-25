@@ -543,6 +543,18 @@ Theorem mat_with_eigen_vect_mul_transp_l :
   → (U⁺ * U)%M = mI n.
 Proof.
 intros * Hsy Hvv Hu.
+apply matrix_eq.
+intros i j Hi Hj.
+subst U; cbn.
+unfold eigenvalues_and_norm_vectors in Hvv.
+destruct Hvv as (Hall_diff & Hall_norm_1 & Hvv).
+unfold is_symm_mat in Hsy.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  subst j; clear Hj; cbn.
+  specialize (Hall_norm_1 i) as H1.
+  assert (H : 0 ≤ i < n) by (split; [ flia | easy ]).
+  now specialize (H1 H).
+}
 ...
 
 (* but how to prove that one? *)
