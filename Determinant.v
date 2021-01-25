@@ -2621,6 +2621,7 @@ destruct n. {
   now rewrite H10 in rngl_1_neq_0.
 }
 cbn.
+Admitted. (*
 Print canon_permut_fun.
 Check signature_comp_fun.
 Print canon_permut.
@@ -2806,6 +2807,94 @@ destruct (lt_dec k (2 * fact n)) as [Hk2n| Hk2n]. {
   (* trop compliqué ; en plus, c'est juste *un* cas *)
 ...
 *)
+
+Definition mat_swap_rows n i1 i2 (M : matrix n n T) :=
+  mk_mat n n
+    (λ i j,
+     if Nat.eq_dec i i1 then mat_el M i2 j
+     else if Nat.eq_dec i i2 then mat_el M i1 j
+     else mat_el M i j).
+
+Theorem glop :
+  rngl_is_comm = true →
+  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  rngl_has_1_neq_0 = true →
+  ∀ n (M : matrix n n T) p q,
+  p ≠ q
+  → determinant (mat_swap_rows p q M) = (- determinant M)%F.
+Proof.
+intros Hic Hin H10 * Hpq.
+do 2 (rewrite det_is_det_by_canon_permut; [ | easy ]).
+unfold determinant'.
+specialize (fact_neq_0 n) as Hn.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite <- ε_canon_permut_ε_canon_permut; [ | easy | easy | flia Hi Hn ].
+  easy.
+}
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite <- ε_canon_permut_ε_canon_permut; [ | easy | easy | flia Hi Hn ].
+  easy.
+}
+symmetry.
+unfold ε.
+remember (vect_el (canon_permut n i)) as σ eqn:Hσ.
+...
+
+(* If we add a row (column) of A multiplied by a scalar k to another
+   row (column) of A, then the determinant will not change. *)
+(* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html *)
+(* doing it only when the first row is 0; can be generalized later *)
+
+Definition mat_add_row_mul_scal_row n (M : matrix n n T) i1 v i2 :=
+  mk_mat n n
+    (λ i j,
+     if Nat.eq_dec i i1 then (mat_el M i1 j + v * mat_el M i2 j)%F
+     else mat_el M i j).
+
+Theorem det_add_row_mul_scal_row :
+  rngl_is_comm = true →
+  ∀ n (M : matrix n n T) v k,
+  n ≠ 0
+  → determinant (mat_add_row_mul_scal_row M 0 v k) = determinant M.
+Proof.
+intros Hic * Hrz.
+remember
+  (mk_mat n n
+     (λ i j,
+      if Nat.eq_dec i 0 then (v * mat_el M k j)%F else mat_el M i j))
+   as C eqn:Hc.
+rewrite (det_sum_row_row _ M C Hrz); cycle 1. {
+  now intros; rewrite Hc.
+} {
+  intros i j Hi.
+  now cbn; destruct (Nat.eq_dec i 0).
+} {
+  intros i j Hi; rewrite Hc; cbn.
+  now destruct (Nat.eq_dec i 0).
+}
+remember
+  (mk_mat n n (λ i j, if Nat.eq_dec i 0 then mat_el M k j else mat_el M i j))
+    as D eqn:Hd.
+specialize (det_mul_row_0_by_scal Hic) as H1.
+specialize (H1 n D v Hrz).
+assert (H : mat_mul_row_by_scal 0 D v = C). {
+  unfold mat_mul_row_by_scal; rewrite Hc, Hd; cbn.
+  apply matrix_eq; cbn.
+  intros i j Hi Hj.
+  now destruct (Nat.eq_dec i 0).
+}
+rewrite H in H1; clear H.
+assert (H : determinant D = 0%F). {
+...
+    rewrite Hd.
+ (* blocked because needs the previous lemma
+...
+*)
+
+...
 
 (*
 Search ε.
@@ -3195,19 +3284,6 @@ Definition mat_mul_row_by_scal n k (M : matrix n n T) s :=
   mk_mat n n
     (λ i j,
      if Nat.eq_dec i k then (s * mat_el M i j)%F else mat_el M i j).
-
-Definition mat_swap_rows n (M : matrix n n T) i1 i2 :=
-  mk_mat n n
-    (λ i j,
-     if Nat.eq_dec i i1 then mat_el M i2 j
-     else if Nat.eq_dec i i2 then mat_el M i1 j
-     else mat_el M i j).
-
-Definition mat_add_row_mul_scal_row n (M : matrix n n T) i1 v i2 :=
-  mk_mat n n
-    (λ i j,
-     if Nat.eq_dec i i1 then (mat_el M i1 j + v * mat_el M i2 j)%F
-     else mat_el M i j).
 
 (* If we multiply a row (column) of A by a number, the determinant of
    A will be multiplied by the same number. *)
@@ -3830,53 +3906,6 @@ rewrite rngl_summation_split_last;[ | easy ].
 ...
 rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
   intros k Hk.
-...
-*)
-*)
-
-(* If we add a row (column) of A multiplied by a scalar k to another
-   row (column) of A, then the determinant will not change. *)
-(* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html *)
-(* doing it only when the first row is 0; can be generalized later *)
-
-Theorem det_add_row_mul_scal_row :
-  rngl_is_comm = true →
-  ∀ n (M : matrix n n T) v k,
-  n ≠ 0
-  → determinant (mat_add_row_mul_scal_row M 0 v k) = determinant M.
-Proof.
-intros Hic * Hrz.
-remember
-  (mk_mat n n
-     (λ i j,
-      if Nat.eq_dec i 0 then (v * mat_el M k j)%F else mat_el M i j))
-   as C eqn:Hc.
-rewrite (det_sum_row_row _ M C Hrz); cycle 1. {
-  now intros; rewrite Hc.
-} {
-  intros i j Hi.
-  now cbn; destruct (Nat.eq_dec i 0).
-} {
-  intros i j Hi; rewrite Hc; cbn.
-  now destruct (Nat.eq_dec i 0).
-}
-remember
-  (mk_mat n n (λ i j, if Nat.eq_dec i 0 then mat_el M k j else mat_el M i j))
-    as D eqn:Hd.
-specialize (det_mul_row_0_by_scal Hic) as H1.
-specialize (H1 n D v Hrz).
-assert (H : mat_mul_row_by_scal 0 D v = C). {
-  unfold mat_mul_row_by_scal; rewrite Hc, Hd; cbn.
-  apply matrix_eq; cbn.
-  intros i j Hi Hj.
-  now destruct (Nat.eq_dec i 0).
-}
-rewrite H in H1; clear H.
-assert (H : determinant D = 0%F). {
-Abort. (*
-...
-    rewrite Hd.
- (* blocked because needs the previous lemma
 ...
 *)
 *)
