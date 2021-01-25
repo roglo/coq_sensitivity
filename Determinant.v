@@ -2447,6 +2447,45 @@ Definition mat_swap_rows n i1 i2 (M : matrix n n T) :=
      else if Nat.eq_dec i i2 then mat_el M i1 j
      else mat_el M i j).
 
+Theorem ε_canon_permut_ε_canon_permut :
+  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  rngl_has_1_neq_0 = true →
+  ∀ n k, k < fact n → ε (canon_permut n k) = ε_canon_permut n k.
+Proof.
+intros Hin H10 * Hkn.
+unfold ε.
+destruct n. {
+  apply rngl_mul_inv_r; [ easy | cbn ].
+  specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
+  now rewrite H10 in rngl_1_neq_0.
+}
+cbn.
+Print ε_fun.
+Print ε_canon_permut.
+...
+
+Theorem glop :
+  rngl_is_comm = true →
+  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  rngl_has_1_neq_0 = true →
+  ∀ n (M : matrix n n T) p q,
+  p ≠ q
+  → p < n
+  → q < n
+  → determinant (mat_swap_rows p q M) = (- determinant M)%F.
+Proof.
+intros Hic Hiv H10 * Hpq Hp Hq.
+rewrite det_is_det_by_canon_permut; [ | easy ].
+unfold determinant'.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+...
+  rewrite <- ε_canon_permut_ε_canon_permut; [ | easy | easy | ]. 2: {
+    specialize (fact_neq_0 n) as Hnz.
+    flia Hi Hnz.
+  }
+  easy.
+}
 ...
 
 (* If we add a row (column) of A multiplied by a scalar k to another
