@@ -527,37 +527,7 @@ intros * Hdet Hab.
 Print comatrix.
 Abort.
 
-(* Obviously true if I can prove that the eigenvectors are orthogonormal,
-   since
-     U is a matrix whose columns are eigenvectors
-     U⁺ is therefore a matrix whose rows are eigenvectors
-   Diagonal elements of "U⁺ * U", are the norm of the eigenvectors, and
-   Non-diagonal elements of "U⁺ * U" are the scalar product of the
-   eigenvectors
-*)
-Theorem mat_with_eigen_vect_mul_transp_l :
-  ∀ n (M : matrix n n T) ev eV U,
-  is_symm_mat M
-  → eigenvalues_and_norm_vectors M ev eV
-  → U = mat_with_vect eV
-  → (U⁺ * U)%M = mI n.
-Proof.
-intros * Hsy Hvv Hu.
-apply matrix_eq.
-intros i j Hi Hj.
-subst U; cbn.
-unfold eigenvalues_and_norm_vectors in Hvv.
-destruct Hvv as (Hall_diff & Hall_norm_1 & Hvv).
-unfold is_symm_mat in Hsy.
-destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-  subst j; clear Hj; cbn.
-  specialize (Hall_norm_1 i) as H1.
-  assert (H : 0 ≤ i < n) by (split; [ flia | easy ]).
-  now specialize (H1 H).
-}
-...
-
-(* but how to prove that one? *)
+(* how to prove that one? *)
 Theorem mat_with_eigen_vect_mul_transp_r :
   ∀ n (M : matrix n n T) ev eV U,
   is_symm_mat M
