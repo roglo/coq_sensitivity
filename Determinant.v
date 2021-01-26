@@ -1630,7 +1630,11 @@ unfold ε, ε_fun; cbn - [ canon_permut ].
 remember (vect_el (canon_permut (S n) k)) as σ eqn:Hσ.
 remember (vect_el (canon_permut n (k mod fact n))) as σ' eqn:Hσ'.
 move σ' before σ.
-Print ε_fun.
+(*
+  σ(0) = k/n!
+  σ(i+1) = σ'(i)      if σ'(i) < k/n!
+  σ(i+1) = σ'(i)+1    if σ'(i) ≥ k/n!
+*)
 ...
 rewrite (rngl_product_split (k / fact n)). 2: {
   split; [ flia | ].
