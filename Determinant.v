@@ -444,8 +444,20 @@ Abort.
 Theorem ε_of_canon_permut_succ :
   ∀ n k,
   k < fact (S n)
-  → ε (canon_permut (S n) k) = (minus_one_pow (k / fact n) * ε (canon_permut n (k mod fact n)))%F.
+  → ε (canon_permut (S n) k) =
+    (minus_one_pow (k / fact n) * ε (canon_permut n (k mod fact n)))%F.
 Proof.
+intros * Hkn.
+unfold ε; cbn.
+revert k Hkn.
+induction n; intros. {
+  apply Nat.lt_1_r in Hkn; subst k; cbn.
+  rewrite rngl_mul_1_l.
+  unfold ε_fun; cbn.
+  unfold iter_seq, iter_list; cbn.
+  now do 2 rewrite rngl_mul_1_l.
+}
+cbn - [ fact ].
 ...
 
 (* Proof that both definitions of determinants are equal *)
