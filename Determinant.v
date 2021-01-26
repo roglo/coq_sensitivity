@@ -1682,14 +1682,29 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 cbn - [ "<?" ].
+rewrite rngl_mul_comm.
 unfold δ at 1.
-erewrite rngl_product_eq_compat with (b := 2). 2: {
+rewrite rngl_product_succ_succ.
+erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
-  replace (i - 1) with (S (i - 2)) by flia Hi.
+  replace (S i - 1) with (S (i - 1)) by flia Hi.
+  rewrite rngl_product_succ_succ.
+  rewrite rngl_product_split_first; [ | easy | flia ].
+  rewrite if_ltb_lt_dec.
+  destruct (lt_dec (S i) 1) as [H| H]; [ flia H | clear H ].
+  rewrite rngl_mul_1_l.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite Nat.sub_succ, Nat.sub_0_r.
+    replace (S i <? S j) with (i <? j) by easy.
+    remember (i <? j) as b.
+    replace j with (S (j - 1)) at 1 by flia Hj.
+    subst b.
+    easy.
+  }
   easy.
 }
 cbn - [ "<?" ].
-rewrite rngl_product_succ_succ.
 ...
 }
 rewrite rngl_product_split_last. {
