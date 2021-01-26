@@ -344,38 +344,73 @@ Definition ε {n} (p : vector n nat) := ε_fun (vect_el p) n.
    permutations *)
 
 Definition determinant' n (M : matrix n n T) :=
-  (Σ (k = 0, fact n - 1), ε (canon_permut n k) *
+  (Σ (k = 0, fact n - 1), ε_canon_permut n k *
    Π (i = 1, n), mat_el M (i - 1) (vect_el (canon_permut n k) (i - 1)%nat))%F.
+
+Theorem ε_canon_permut_succ : ∀ n k,
+  k < fact (S n)
+  → ε_canon_permut (S n) k =
+     (minus_one_pow (k / fact n) * ε_canon_permut n (k mod fact n))%F.
+Proof. easy. Qed.
+
+Theorem ε_canon_permut_ε_canon_permut :
+  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  rngl_has_1_neq_0 = true →
+  ∀ n k, k < fact n → ε (canon_permut n k) = ε_canon_permut n k.
+Proof.
+intros Hin H10 * Hkn.
+unfold ε.
+destruct n. {
+  apply rngl_mul_inv_r; [ easy | cbn ].
+  specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
+  now rewrite H10 in rngl_1_neq_0.
+}
+cbn.
+...
 
 Theorem minus_one_pow_ε :
   rngl_has_opp = true →
   rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
   rngl_has_1_neq_0 = true →
-  ∀ n i,
-  i < fact (S n)
-  → ε (canon_permut (S n) i) =
-    (minus_one_pow (i / fact n) * ε (canon_permut n (i mod fact n)))%F.
+  ∀ n k,
+  k < fact (S n)
+  → ε (canon_permut (S n) k) =
+    (minus_one_pow (k / fact n) * ε (canon_permut n (k mod fact n)))%F.
 Proof.
-intros Hop Hiv H10 * Hi.
-revert i Hi.
+(*
+intros Hop Hiv H10 * Hk.
+rewrite ε_canon_permut_ε_canon_permut.
+rewrite ε_canon_permut_ε_canon_permut.
+apply ε_canon_permut_succ.
+...
+unfold ε.
+cbn - [ canon_permut ].
+...
+*)
+intros Hop Hiv H10 * Hk.
+revert k Hk.
 induction n; intros. {
-  apply Nat.lt_1_r in Hi; subst i.
+  apply Nat.lt_1_r in Hk; subst k.
   cbn - [ "/" "mod" canon_permut ].
   rewrite Nat.div_1_r, Nat.mod_1_r.
   unfold ε, ε_fun; cbn.
   unfold iter_seq, iter_list; cbn.
   now do 3 rewrite rngl_mul_1_l.
 }
+(*
+unfold ε.
+remember (S n) as sn; cbn; subst sn.
+*)
 destruct n. {
-  cbn in Hi.
-  destruct i. {
+  cbn in Hk.
+  destruct k. {
     unfold ε, ε_fun; cbn.
     unfold iter_seq, iter_list; cbn.
     rewrite rngl_add_0_r, rngl_sub_0_r.
     rewrite rngl_add_sub.
     now do 5 rewrite rngl_mul_1_l.
   }
-  destruct i; [ cbn | flia Hi ].
+  destruct k; [ cbn | flia Hk ].
   unfold ε, ε_fun; cbn.
   unfold iter_seq, iter_list; cbn.
   rewrite rngl_add_0_r.
@@ -387,23 +422,22 @@ destruct n. {
   rewrite rngl_div_1_r; [ | easy | easy ].
   easy.
 }
+Abort.
+
 ...
 
 (* Proof that both definitions of determinants are equal *)
 
 Theorem det_is_det_by_canon_permut :
   rngl_is_comm = true →
-  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
-  rngl_has_1_neq_0 = true →
   ∀ n (M : matrix n n T), determinant M = determinant' M.
 Proof.
-intros Hic Hiv H10 *.
+intros Hic *.
 unfold determinant, determinant'.
 destruct n; intros. {
   unfold iter_seq, iter_list.
   cbn; rewrite rngl_add_0_l.
   unfold ε, ε_fun, iter_seq, iter_list; cbn.
-  rewrite rngl_div_1_r; [ | easy | easy ].
   symmetry; apply rngl_mul_1_l.
 }
 erewrite rngl_summation_eq_compat. 2: {
@@ -422,8 +456,7 @@ induction n; intros. {
   unfold ε, ε_fun, iter_seq, iter_list; cbn.
   do 2 rewrite rngl_add_0_l.
   do 3 rewrite rngl_mul_1_l.
-  rewrite rngl_div_1_r; [ | easy | easy ].
-  now rewrite rngl_mul_1_l, rngl_mul_1_r.
+  now rewrite rngl_mul_1_r.
 }
 remember (S n) as sn.
 cbn - [ fact "mod" "/" canon_permut ]; subst sn.
@@ -452,24 +485,22 @@ cbn - [ fact "mod" "/" canon_permut ].
 symmetry.
 apply rngl_summation_eq_compat.
 intros i Hi.
-do 2 rewrite rngl_mul_assoc.
+do 3 rewrite rngl_mul_assoc.
 f_equal. 2: {
   apply rngl_product_eq_compat.
   intros j Hj.
   now rewrite Nat.add_1_r.
 }
 rewrite rngl_mul_mul_swap; [ | easy ].
+do 3 rewrite <- rngl_mul_assoc.
 f_equal.
-remember (S n) as sn.
-clear n Heqsn IHn.
-rename sn into n.
-destruct Hi as (_, Hi).
-symmetry.
-...
-apply minus_one_pow_ε.
-specialize (fact_neq_0 (S n)) as Hnz.
-flia Hi Hnz.
-...
+rewrite rngl_mul_assoc, rngl_mul_mul_swap; symmetry; [ | easy ].
+rewrite rngl_mul_mul_swap; [ | easy ].
+f_equal.
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+rewrite Hic in rngl_mul_comm.
+apply rngl_mul_comm.
+Qed.
 
 (* multilinearity *)
 
@@ -2498,23 +2529,6 @@ Definition mat_swap_rows n i1 i2 (M : matrix n n T) :=
      if Nat.eq_dec i i1 then mat_el M i2 j
      else if Nat.eq_dec i i2 then mat_el M i1 j
      else mat_el M i j).
-
-Theorem ε_canon_permut_ε_canon_permut :
-  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
-  rngl_has_1_neq_0 = true →
-  ∀ n k, k < fact n → ε (canon_permut n k) = ε_canon_permut n k.
-Proof.
-intros Hin H10 * Hkn.
-unfold ε.
-destruct n. {
-  apply rngl_mul_inv_r; [ easy | cbn ].
-  specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
-  now rewrite H10 in rngl_1_neq_0.
-}
-cbn.
-Print ε_fun.
-Print ε_canon_permut.
-...
 
 Theorem glop :
   rngl_is_comm = true →
