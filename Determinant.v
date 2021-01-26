@@ -1618,14 +1618,14 @@ destruct n. {
 Theorem canon_permut_succ_values : ∀ n k σ σ',
   σ = vect_el (canon_permut (S n) k)
   → σ' = vect_el (canon_permut n (k mod fact n))
-  → ∀ i, i < S n →
+  → ∀ i,
     σ i =
     match i with
     | 0 => k / fact n
     | S i' => if σ' i' <? k / fact n then σ' i' else σ' i' + 1
     end.
 Proof.
-intros * Hσ Hσ' i Hi.
+intros * Hσ Hσ' i.
 destruct i; [ now subst σ | ].
 subst σ; cbn - [ "<?" ].
 subst σ'; cbn - [ "<?" ].
@@ -1653,6 +1653,8 @@ unfold ε, ε_fun; cbn - [ canon_permut ].
 remember (vect_el (canon_permut (S n) k)) as σ eqn:Hσ.
 remember (vect_el (canon_permut n (k mod fact n))) as σ' eqn:Hσ'.
 move σ' before σ.
+specialize (canon_permut_succ_values Hσ Hσ') as Hσσ.
+...
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
   erewrite rngl_product_eq_compat. 2: {
