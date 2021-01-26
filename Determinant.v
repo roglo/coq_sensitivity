@@ -353,8 +353,8 @@ Theorem minus_one_pow_ε :
   rngl_has_1_neq_0 = true →
   ∀ n i,
   i < fact (S n)
-  → (minus_one_pow (i / fact n) * ε (canon_permut n (i mod fact n)))%F =
-     ε (canon_permut (S n) i).
+  → ε (canon_permut (S n) i) =
+    (minus_one_pow (i / fact n) * ε (canon_permut n (i mod fact n)))%F.
 Proof.
 intros Hop Hiv H10 * Hi.
 revert i Hi.
@@ -366,7 +366,6 @@ induction n; intros. {
   unfold iter_seq, iter_list; cbn.
   now do 3 rewrite rngl_mul_1_l.
 }
-cbn - [ "/" "mod" canon_permut fact ].
 destruct n. {
   cbn in Hi.
   destruct i. {
@@ -374,14 +373,14 @@ destruct n. {
     unfold iter_seq, iter_list; cbn.
     rewrite rngl_add_0_r, rngl_sub_0_r.
     rewrite rngl_add_sub.
-    now do 6 rewrite rngl_mul_1_l.
+    now do 5 rewrite rngl_mul_1_l.
   }
   destruct i; [ cbn | flia Hi ].
   unfold ε, ε_fun; cbn.
   unfold iter_seq, iter_list; cbn.
   rewrite rngl_add_0_r.
   rewrite rngl_add_sub.
-  do 7 rewrite rngl_mul_1_l.
+  do 6 rewrite rngl_mul_1_l.
   unfold rngl_sub.
   rewrite Hop, rngl_add_0_l.
   rewrite rngl_div_1_r; [ | easy | easy ].
@@ -465,6 +464,7 @@ remember (S n) as sn.
 clear n Heqsn IHn.
 rename sn into n.
 destruct Hi as (_, Hi).
+symmetry.
 ...
 apply minus_one_pow_ε.
 specialize (fact_neq_0 (S n)) as Hnz.
