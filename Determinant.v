@@ -321,15 +321,13 @@ rewrite <- canon_permut_inv_permut with (n := n) (k := k); [ | easy | easy ].
 now f_equal.
 Qed.
 
-(* signature of the k-th permutation of "canon_permut" above
+(* signature of the k-th permutation of "canon_permut" above *)
 
 Fixpoint ε_canon_permut n k :=
   match n with
   | 0 => 1%F
   | S n' => (minus_one_pow (k / fact n') * ε_canon_permut n' (k mod fact n'))%F
   end.
-
-*)
 
 (* signature of a permutation *)
 
@@ -348,6 +346,49 @@ Definition ε {n} (p : vector n nat) := ε_fun (vect_el p) n.
 Definition determinant' n (M : matrix n n T) :=
   (Σ (k = 0, fact n - 1), ε (canon_permut n k) *
    Π (i = 1, n), mat_el M (i - 1) (vect_el (canon_permut n k) (i - 1)%nat))%F.
+
+Theorem minus_one_pow_ε :
+  rngl_has_opp = true →
+  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  rngl_has_1_neq_0 = true →
+  ∀ n i,
+  i < fact (S n)
+  → (minus_one_pow (i / fact n) * ε (canon_permut n (i mod fact n)))%F =
+     ε (canon_permut (S n) i).
+Proof.
+intros Hop Hiv H10 * Hi.
+revert i Hi.
+induction n; intros. {
+  apply Nat.lt_1_r in Hi; subst i.
+  cbn - [ "/" "mod" canon_permut ].
+  rewrite Nat.div_1_r, Nat.mod_1_r.
+  unfold ε, ε_fun; cbn.
+  unfold iter_seq, iter_list; cbn.
+  now do 3 rewrite rngl_mul_1_l.
+}
+cbn - [ "/" "mod" canon_permut fact ].
+destruct n. {
+  cbn in Hi.
+  destruct i. {
+    unfold ε, ε_fun; cbn.
+    unfold iter_seq, iter_list; cbn.
+    rewrite rngl_add_0_r, rngl_sub_0_r.
+    rewrite rngl_add_sub.
+    now do 6 rewrite rngl_mul_1_l.
+  }
+  destruct i; [ cbn | flia Hi ].
+  unfold ε, ε_fun; cbn.
+  unfold iter_seq, iter_list; cbn.
+  rewrite rngl_add_0_r.
+  rewrite rngl_add_sub.
+  do 7 rewrite rngl_mul_1_l.
+  unfold rngl_sub.
+  rewrite Hop, rngl_add_0_l.
+  rewrite rngl_div_1_r; [ | easy | easy ].
+  rewrite rngl_div_1_r; [ | easy | easy ].
+  easy.
+}
+...
 
 (* Proof that both definitions of determinants are equal *)
 
@@ -386,17 +427,17 @@ induction n; intros. {
   now rewrite rngl_mul_1_l, rngl_mul_1_r.
 }
 remember (S n) as sn.
-cbn - [ fact iter_seq "mod" "/" ]; subst sn.
+cbn - [ fact "mod" "/" canon_permut ]; subst sn.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   now rewrite IHn.
 }
-cbn - [ fact iter_seq "mod" "/" canon_permut ].
+cbn - [ fact "mod" "/" canon_permut ].
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   now rewrite rngl_mul_summation_distr_l.
 }
-cbn - [ fact iter_seq "mod" "/" canon_permut ].
+cbn - [ fact "mod" "/" canon_permut ].
 rewrite rngl_summation_summation_distr; [ | easy ].
 rewrite <- Nat.sub_succ_l; [ | apply lt_O_fact ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
@@ -408,7 +449,7 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite rngl_product_succ_succ.
   easy.
 }
-cbn - [ fact iter_seq "mod" "/" canon_permut ].
+cbn - [ fact "mod" "/" canon_permut ].
 symmetry.
 apply rngl_summation_eq_compat.
 intros i Hi.
@@ -420,20 +461,15 @@ f_equal. 2: {
 }
 rewrite rngl_mul_mul_swap; [ | easy ].
 f_equal.
+remember (S n) as sn.
+clear n Heqsn IHn.
+rename sn into n.
+destruct Hi as (_, Hi).
 ...
-Print canon_permut.
-Print canon_permut_fun.
-cbn - [ fact ].
+apply minus_one_pow_ε.
+specialize (fact_neq_0 (S n)) as Hnz.
+flia Hi Hnz.
 ...
-rewrite <- rngl_mul_assoc.
-...
-f_equal.
-rewrite rngl_mul_mul_swap; [ | easy ].
-f_equal.
-rewrite rngl_mul_assoc.
-rewrite rngl_mul_mul_swap; [ | easy ].
-now rewrite rngl_mul_assoc.
-Qed.
 
 (* multilinearity *)
 
