@@ -344,7 +344,7 @@ Definition ε {n} (p : vector n nat) := ε_fun (vect_el p) n.
    permutations *)
 
 Definition determinant' n (M : matrix n n T) :=
-  (Σ (k = 0, fact n - 1), ε_canon_permut n k *
+  (Σ (k = 0, fact n - 1), ε (canon_permut n k) *
    Π (i = 1, n), mat_el M (i - 1) (vect_el (canon_permut n k) (i - 1)%nat))%F.
 
 Theorem ε_canon_permut_succ : ∀ n k,
@@ -371,6 +371,7 @@ rewrite <- IHn. 2: {
   apply Nat.mod_upper_bound.
   apply fact_neq_0.
 }
+Abort. (*
 ...
 unfold ε_fun.
 unfold rngl_div.
@@ -382,6 +383,7 @@ destruct rngl_is_comm. {
 rewrite rngl_mul_comm.
 f_equal.
 ...
+*)
 
 Theorem minus_one_pow_ε :
   rngl_has_opp = true →
@@ -439,20 +441,28 @@ destruct n. {
 }
 Abort.
 
+Theorem ε_of_canon_permut_succ :
+  ∀ n k,
+  k < fact (S n)
+  → ε (canon_permut (S n) k) = (minus_one_pow (k / fact n) * ε (canon_permut n (k mod fact n)))%F.
+Proof.
 ...
 
 (* Proof that both definitions of determinants are equal *)
 
 Theorem det_is_det_by_canon_permut :
   rngl_is_comm = true →
+  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  rngl_has_1_neq_0 = true →
   ∀ n (M : matrix n n T), determinant M = determinant' M.
 Proof.
-intros Hic *.
+intros Hic Hin H10 *.
 unfold determinant, determinant'.
 destruct n; intros. {
   unfold iter_seq, iter_list.
   cbn; rewrite rngl_add_0_l.
   unfold ε, ε_fun, iter_seq, iter_list; cbn.
+  rewrite rngl_div_1_r; [ | easy | easy ].
   symmetry; apply rngl_mul_1_l.
 }
 erewrite rngl_summation_eq_compat. 2: {
@@ -471,6 +481,8 @@ induction n; intros. {
   unfold ε, ε_fun, iter_seq, iter_list; cbn.
   do 2 rewrite rngl_add_0_l.
   do 3 rewrite rngl_mul_1_l.
+  rewrite rngl_div_1_r; [ | easy | easy ].
+  rewrite rngl_mul_1_l.
   now rewrite rngl_mul_1_r.
 }
 remember (S n) as sn.
@@ -499,15 +511,25 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn - [ fact "mod" "/" canon_permut ].
 symmetry.
 apply rngl_summation_eq_compat.
-intros i Hi.
-do 3 rewrite rngl_mul_assoc.
+intros k Hk.
+do 2 rewrite rngl_mul_assoc.
 f_equal. 2: {
   apply rngl_product_eq_compat.
-  intros j Hj.
+  intros i Hi.
   now rewrite Nat.add_1_r.
 }
 rewrite rngl_mul_mul_swap; [ | easy ].
-do 3 rewrite <- rngl_mul_assoc.
+symmetry.
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+rewrite Hic in rngl_mul_comm.
+f_equal.
+...
+apply ε_of_canon_permut_succ.
+specialize (fact_neq_0 (S (S n))) as Hnz.
+flia Hk Hnz.
+...
+(*
+rewrite <- rngl_mul_assoc.
 f_equal.
 rewrite rngl_mul_assoc, rngl_mul_mul_swap; symmetry; [ | easy ].
 rewrite rngl_mul_mul_swap; [ | easy ].
@@ -515,7 +537,8 @@ f_equal.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
 rewrite Hic in rngl_mul_comm.
 apply rngl_mul_comm.
-Qed.
+*)
+...
 
 (* multilinearity *)
 
