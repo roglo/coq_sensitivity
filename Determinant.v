@@ -372,6 +372,7 @@ rewrite <- IHn. 2: {
   apply Nat.mod_upper_bound.
   apply fact_neq_0.
 }
+Abort. (*
 ...
 unfold ε_fun.
 unfold rngl_div.
@@ -383,7 +384,9 @@ destruct rngl_is_comm. {
 rewrite rngl_mul_comm.
 f_equal.
 ...
+*)
 
+(*
 Theorem minus_one_pow_ε :
   rngl_has_opp = true →
   rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
@@ -411,7 +414,6 @@ induction n; intros. {
   rewrite Nat.div_1_r, Nat.mod_1_r.
   unfold ε, ε_fun; cbn.
   unfold iter_seq, iter_list; cbn.
-...
   now do 3 rewrite rngl_mul_1_l.
 }
 (*
