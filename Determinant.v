@@ -1615,6 +1615,29 @@ destruct n. {
 }
 *)
 
+Theorem canon_permut_succ_values : ∀ n k σ σ',
+  σ = vect_el (canon_permut (S n) k)
+  → σ' = vect_el (canon_permut n (k mod fact n))
+  → ∀ i, i < S n →
+    σ i =
+    match i with
+    | 0 => k / fact n
+    | S i' => if σ' i' <? k / fact n then σ' i' else σ' i' + 1
+    end.
+Proof.
+intros * Hσ Hσ' i Hi.
+destruct i; [ now subst σ | ].
+subst σ; cbn - [ "<?" ].
+subst σ'; cbn - [ "<?" ].
+rewrite Nat.leb_antisym.
+unfold Nat.b2n.
+rewrite if_ltb_lt_dec.
+rewrite negb_if.
+rewrite if_ltb_lt_dec.
+destruct (lt_dec _ _) as [H1| H1]; [ | easy ].
+apply Nat.add_0_r.
+Qed.
+
 Theorem ε_of_canon_permut_succ :
   rngl_is_comm = true →
   rngl_has_inv = true →
@@ -1630,16 +1653,43 @@ unfold ε, ε_fun; cbn - [ canon_permut ].
 remember (vect_el (canon_permut (S n) k)) as σ eqn:Hσ.
 remember (vect_el (canon_permut n (k mod fact n))) as σ' eqn:Hσ'.
 move σ' before σ.
-(*
-  σ(0) = k/n!
-  σ(i+1) = σ'(i)      if σ'(i) < k/n!
-  σ(i+1) = σ'(i)+1    if σ'(i) ≥ k/n!
-*)
-...
-rewrite (rngl_product_split (k / fact n)). 2: {
-  split; [ flia | ].
-  apply -> Nat.succ_le_mono.
-  rewrite Nat_fact_succ in Hkn.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite (@canon_permut_succ_values n k σ σ'); [ | easy | easy | flia Hi ].
+    rewrite (@canon_permut_succ_values n k σ σ'); [ | easy | easy | flia Hj ].
+    easy.
+  }
+  easy.
+}
+cbn - [ "<?" ].
+rewrite rngl_product_split_first; [ | easy | flia ].
+rewrite Nat.sub_diag.
+rewrite rngl_product_split_first; [ | easy | flia ].
+rewrite Nat.sub_diag.
+unfold δ at 1.
+unfold "<?" at 1, "<=?".
+rewrite rngl_mul_1_l.
+rewrite rngl_product_succ_succ.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite Nat.sub_succ, Nat.sub_0_r.
+  unfold δ.
+  rewrite if_ltb_lt_dec.
+  destruct (lt_dec 1 (S i)) as [H| H]; [ clear H | flia Hi H ].
+  replace i with (S (i - 1)) at 1 by flia Hi.
+  easy.
+}
+cbn - [ "<?" ].
+unfold δ at 1.
+erewrite rngl_product_eq_compat with (b := 2). 2: {
+  intros i Hi.
+  replace (i - 1) with (S (i - 2)) by flia Hi.
+  easy.
+}
+cbn - [ "<?" ].
+rewrite rngl_product_succ_succ.
 ...
 }
 rewrite rngl_product_split_last. {

@@ -2236,6 +2236,21 @@ destruct ij. {
 }
 Qed.
 
+Theorem if_leb_le_dec : ∀ A i j (a b : A),
+  (if i <=? j then a else b) = (if le_dec i j then a else b).
+Proof.
+intros.
+remember (i <=? j) as ij eqn:Hij.
+symmetry in Hij.
+destruct ij. {
+  apply Nat.leb_le in Hij.
+  now destruct (le_dec i j).
+} {
+  apply Nat.leb_nle in Hij.
+  now destruct (le_dec i j).
+}
+Qed.
+
 Theorem Nat_ltb_mono_l : ∀ a b c, (a + b <? a + c) = (b <? c).
 Proof.
 intros.
