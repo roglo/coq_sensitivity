@@ -359,6 +359,7 @@ Theorem ε_canon_permut_ε_canon_permut :
   ∀ n k, k < fact n → ε (canon_permut n k) = ε_canon_permut n k.
 Proof.
 intros Hin H10 * Hkn.
+unfold ε.
 revert k Hkn.
 induction n; intros. {
   apply rngl_mul_inv_r; [ easy | cbn ].
@@ -366,6 +367,20 @@ induction n; intros. {
   now rewrite H10 in rngl_1_neq_0.
 }
 cbn.
+rewrite <- IHn. 2: {
+  apply Nat.mod_upper_bound.
+  apply fact_neq_0.
+}
+...
+unfold ε_fun.
+unfold rngl_div.
+destruct rngl_has_inv. {
+rewrite rngl_mul_assoc.
+rewrite rngl_mul_mul_swap. {
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+destruct rngl_is_comm. {
+rewrite rngl_mul_comm.
+f_equal.
 ...
 
 Theorem minus_one_pow_ε :
