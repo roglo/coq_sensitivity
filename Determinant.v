@@ -448,6 +448,40 @@ Theorem ε_of_canon_permut_succ :
     (minus_one_pow (k / fact n) * ε (canon_permut n (k mod fact n)))%F.
 Proof.
 intros * Hkn.
+unfold ε, ε_fun; cbn.
+rewrite (rngl_product_split (k / fact n)). {
+rewrite rngl_product_split_last. {
+remember (Π (i = _, _), _)%F as a eqn:Ha in |-*.
+remember (Π (j = _, _), _)%F as b eqn:Hb in |-*.
+remember (Π (i = _, _), _)%F as c eqn:Hc in |-*.
+remember (Π (i = _, _), _)%F as d eqn:Hd in |-*.
+remember (Π (i = _, _), _)%F as e eqn:He in |-*.
+remember (Π (i = _, _), _)%F as f eqn:Hf in |-*.
+move b before a; move c before b; move d before c.
+move e before d; move f before e.
+...
+intros * Hkn.
+unfold ε, ε_fun; cbn.
+rewrite rngl_product_shift; [ | flia ].
+rewrite Nat.sub_succ, Nat.sub_0_r.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_product_shift; [ | flia ].
+  rewrite Nat.sub_succ, Nat.sub_0_r.
+  rewrite Nat.add_comm, Nat.add_sub.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite (Nat.add_comm 1 j), Nat.add_sub.
+    unfold δ.
+    rewrite (Nat.add_comm i), (Nat.add_comm j).
+    rewrite Nat_ltb_mono_l.
+    easy.
+  }
+  easy.
+}
+cbn - [ "<?" ].
+...
+intros * Hkn.
 unfold ε; cbn.
 revert k Hkn.
 induction n; intros. {
