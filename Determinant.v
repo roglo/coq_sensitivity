@@ -334,6 +334,7 @@ Fixpoint ε_canon_permut n k :=
 Definition δ i j u v := if i <? j then (rngl_of_nat v - rngl_of_nat u)%F else 1%F.
 Definition ip {n} (p : vector n nat) i := rngl_of_nat (vect_el p i).
 
+(* change one day into Π Π (_/_) instead of Π Π _ / Π _ *)
 Definition ε_fun f n :=
   ((Π (i = 1, n), Π (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
    (Π (i = 1, n), Π (j = 1, n), δ i j i j))%F.
@@ -371,7 +372,6 @@ rewrite <- IHn. 2: {
   apply Nat.mod_upper_bound.
   apply fact_neq_0.
 }
-Abort. (*
 ...
 unfold ε_fun.
 unfold rngl_div.
@@ -383,7 +383,6 @@ destruct rngl_is_comm. {
 rewrite rngl_mul_comm.
 f_equal.
 ...
-*)
 
 Theorem minus_one_pow_ε :
   rngl_has_opp = true →
@@ -412,6 +411,7 @@ induction n; intros. {
   rewrite Nat.div_1_r, Nat.mod_1_r.
   unfold ε, ε_fun; cbn.
   unfold iter_seq, iter_list; cbn.
+...
   now do 3 rewrite rngl_mul_1_l.
 }
 (*
@@ -439,17 +439,31 @@ destruct n. {
   rewrite rngl_div_1_r; [ | easy | easy ].
   easy.
 }
-Abort.
+*)
 
 Theorem ε_of_canon_permut_succ :
+  rngl_is_comm = true →
+  rngl_has_inv = true →
   ∀ n k,
   k < fact (S n)
   → ε (canon_permut (S n) k) =
     (minus_one_pow (k / fact n) * ε (canon_permut n (k mod fact n)))%F.
 Proof.
-intros * Hkn.
-unfold ε, ε_fun; cbn.
-rewrite (rngl_product_split (k / fact n)). {
+intros Hic Hin * Hkn.
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+rewrite Hic in rngl_mul_comm.
+unfold ε, ε_fun; cbn - [ canon_permut ].
+remember (vect_el (canon_permut (S n) k)) as σ eqn:Hσ.
+remember (vect_el (canon_permut n (k mod fact n))) as σ' eqn:Hσ'.
+move σ' before σ.
+Print ε_fun.
+...
+rewrite (rngl_product_split (k / fact n)). 2: {
+  split; [ flia | ].
+  apply -> Nat.succ_le_mono.
+  rewrite Nat_fact_succ in Hkn.
+...
+}
 rewrite rngl_product_split_last. {
 remember (Π (i = _, _), _)%F as a eqn:Ha in |-*.
 remember (Π (j = _, _), _)%F as b eqn:Hb in |-*.
@@ -459,6 +473,12 @@ remember (Π (i = _, _), _)%F as e eqn:He in |-*.
 remember (Π (i = _, _), _)%F as f eqn:Hf in |-*.
 move b before a; move c before b; move d before c.
 move e before d; move f before e.
+rewrite rngl_mul_mul_swap; [ | easy ].
+unfold rngl_div.
+rewrite Hin.
+rewrite <- rngl_mul_assoc.
+f_equal. 2: {
+  subst b d e f.
 ...
 intros * Hkn.
 unfold ε, ε_fun; cbn.
@@ -493,6 +513,7 @@ induction n; intros. {
 }
 cbn - [ fact ].
 ...
+*)
 
 (* Proof that both definitions of determinants are equal *)
 
@@ -508,7 +529,9 @@ destruct n; intros. {
   unfold iter_seq, iter_list.
   cbn; rewrite rngl_add_0_l.
   unfold ε, ε_fun, iter_seq, iter_list; cbn.
+(*
   rewrite rngl_div_1_r; [ | easy | easy ].
+*)
   symmetry; apply rngl_mul_1_l.
 }
 erewrite rngl_summation_eq_compat. 2: {
@@ -585,6 +608,7 @@ rewrite Hic in rngl_mul_comm.
 apply rngl_mul_comm.
 *)
 ...
+*)
 
 (* multilinearity *)
 
