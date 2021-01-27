@@ -1297,6 +1297,7 @@ intros Hop Hin Hic H10 Hit Hch * Hp2 Hs.
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
 rewrite H10 in rngl_1_neq_0.
 unfold rngl_div; rewrite Hin.
+(* 1 *)
 rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
   intros i Hi Hij.
   specialize @rngl_product_opt_integral as rngl_product_integral.
@@ -1310,20 +1311,6 @@ rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
   apply rngl_of_nat_inj in Hij; [ | easy ].
   apply Hp2 in Hij; [ flia Hi Hj Hlij Hij | flia Hj | flia Hi ].
 }
-rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
-  intros i Hi Hij.
-  specialize @rngl_product_opt_integral as rngl_product_integral.
-  specialize (rngl_product_integral T ro rp Hit H10).
-  apply rngl_product_integral in Hij.
-  destruct Hij as (j & Hj & Hij).
-  unfold δ in Hij.
-  rewrite if_ltb_lt_dec in Hij.
-  destruct (lt_dec i j) as [Hlij| Hlij]; [ | easy ].
-  apply rngl_sub_move_0_r in Hij; [ | easy ].
-  apply rngl_of_nat_inj in Hij; [ | easy ].
-  flia Hlij Hij.
-}
-erewrite <- rngl_product_mul_distr; [ | easy ].
 erewrite <- rngl_product_mul_distr; [ | easy ].
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
@@ -1339,23 +1326,7 @@ erewrite rngl_product_eq_compat. 2: {
   erewrite <- rngl_product_mul_distr; [ | easy ].
   easy.
 }
-symmetry.
-erewrite rngl_product_eq_compat. 2: {
-  intros i Hi.
-  rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
-    intros j Hj Hij.
-    unfold δ in Hij.
-    rewrite if_ltb_lt_dec in Hij.
-    destruct (lt_dec i j) as [Hlij| Hlij]; [ | easy ].
-    apply rngl_sub_move_0_r in Hij; [ | easy ].
-    apply rngl_of_nat_inj in Hij; [ | easy ].
-    flia Hlij Hij.
-  }
-  erewrite <- rngl_product_mul_distr; [ | easy ].
-  easy.
-}
-symmetry.
-(* compression of the δ-s and use division instead of mult inv *)
+cbn.
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
   erewrite rngl_product_eq_compat. 2: {
@@ -1372,6 +1343,35 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 symmetry.
+(* 2 *)
+rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
+  intros i Hi Hij.
+  specialize @rngl_product_opt_integral as rngl_product_integral.
+  specialize (rngl_product_integral T ro rp Hit H10).
+  apply rngl_product_integral in Hij.
+  destruct Hij as (j & Hj & Hij).
+  unfold δ in Hij.
+  rewrite if_ltb_lt_dec in Hij.
+  destruct (lt_dec i j) as [Hlij| Hlij]; [ | easy ].
+  apply rngl_sub_move_0_r in Hij; [ | easy ].
+  apply rngl_of_nat_inj in Hij; [ | easy ].
+  flia Hlij Hij.
+}
+erewrite <- rngl_product_mul_distr; [ | easy ].
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
+    intros j Hj Hij.
+    unfold δ in Hij.
+    rewrite if_ltb_lt_dec in Hij.
+    destruct (lt_dec i j) as [Hlij| Hlij]; [ | easy ].
+    apply rngl_sub_move_0_r in Hij; [ | easy ].
+    apply rngl_of_nat_inj in Hij; [ | easy ].
+    flia Hlij Hij.
+  }
+  erewrite <- rngl_product_mul_distr; [ | easy ].
+  easy.
+}
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
   erewrite rngl_product_eq_compat. 2: {
@@ -1389,6 +1389,8 @@ erewrite rngl_product_eq_compat. 2: {
 }
 now symmetry.
 Qed.
+
+...
 
 Theorem signature_comp_fun_expand :
   rngl_has_opp = true →
