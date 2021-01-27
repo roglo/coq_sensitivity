@@ -1287,9 +1287,10 @@ Theorem signature_comp_fun_expand_2 :
          (rngl_of_nat j - rngl_of_nat i)
        else 1)))%F
   → (Π (i = 1, n),
-        (Π (j = 1, n), δ i j (f (g (i - 1)%nat)) (f (g (j - 1)%nat))) /
+     (Π (j = 1, n), δ i j (f (g (i - 1)%nat)) (f (g (j - 1)%nat))) /
      Π (i = 1, n), (Π (j = 1, n), δ i j (g (i - 1)%nat) (g (j - 1)%nat)))%F =
-    (Π (i = 1, n), (Π (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
+    (Π (i = 1, n),
+     (Π (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
      Π (i = 1, n), (Π (j = 1, n), δ i j i j))%F.
 Proof.
 intros Hop Hin Hic H10 Hit Hch * Hp2 Hs.
