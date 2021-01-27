@@ -1640,20 +1640,119 @@ Qed.
 
 Theorem ε_of_canon_permut_succ :
   rngl_is_comm = true →
+  rngl_has_opp = true →
   rngl_has_inv = true →
   ∀ n k,
   k < fact (S n)
   → ε (canon_permut (S n) k) =
     (minus_one_pow (k / fact n) * ε (canon_permut n (k mod fact n)))%F.
 Proof.
-intros Hic Hin * Hkn.
+intros Hic Hop Hin * Hkn.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
 rewrite Hic in rngl_mul_comm.
 unfold ε, ε_fun; cbn - [ canon_permut ].
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  apply Nat.lt_1_r in Hkn.
+  subst k; cbn.
+  unfold iter_seq, iter_list; cbn.
+  now repeat rewrite rngl_mul_1_l.
+}
 remember (vect_el (canon_permut (S n) k)) as σ eqn:Hσ.
 remember (vect_el (canon_permut n (k mod fact n))) as σ' eqn:Hσ'.
 move σ' before σ.
 specialize (canon_permut_succ_values Hσ Hσ') as Hσσ.
+(**)
+rewrite rngl_product_succ_succ.
+rewrite rngl_product_succ_succ.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_product_succ_succ.
+  rewrite Nat.sub_succ, Nat.sub_0_r.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite Nat.sub_succ, Nat.sub_0_r.
+    replace (δ (S i) _ _ _) with (δ i j (σ i) (σ j)) by easy.
+    easy.
+  }
+  easy.
+}
+remember (iter_seq _ _ _ _) as x eqn:Hx.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_product_succ_succ.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    replace (δ (S i) _ _ _) with (δ i j i j). 2: {
+      unfold δ; cbn - [ "<?" ].
+      rewrite rngl_add_comm.
+      unfold rngl_sub; rewrite Hop.
+      rewrite rngl_opp_add_distr; [ | easy ].
+      unfold rngl_sub; rewrite Hop.
+      rewrite (rngl_add_comm _ (-1)%F).
+      rewrite <- rngl_add_assoc.
+      rewrite (rngl_add_assoc 1%F).
+      rewrite fold_rngl_sub; [ | easy ].
+      rewrite fold_rngl_sub; [ | easy ].
+      rewrite fold_rngl_sub; [ | easy ].
+      rewrite rngl_add_opp_r.
+      unfold rngl_sub; rewrite Hop.
+      rewrite rngl_add_0_l.
+      rewrite fold_rngl_sub; [ | easy ].
+      easy.
+    }
+    easy.
+  }
+  easy.
+}
+subst x; symmetry.
+rewrite rngl_product_shift; [ | flia Hnz ].
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_product_shift; [ | flia Hnz ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite (Nat.add_comm _ i), Nat.add_sub.
+    rewrite (Nat.add_comm _ j), Nat.add_sub.
+    replace (δ (i + 1) _ _ _) with (δ i j (σ' i) (σ' j)). 2: {
+      now do 2 rewrite Nat.add_1_r.
+    }
+    easy.
+  }
+  easy.
+}
+remember (Π (i = _, _), _)%F as x eqn:Hx.
+rewrite rngl_product_shift; [ | flia Hnz ].
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_product_shift; [ | flia Hnz ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    replace (δ (1 + i) _ _ _) with (δ i j i j). 2: {
+      unfold δ.
+      cbn - [ "<?" ].
+      rewrite rngl_add_comm.
+      unfold rngl_sub; rewrite Hop.
+      rewrite rngl_opp_add_distr; [ | easy ].
+      unfold rngl_sub; rewrite Hop.
+      rewrite (rngl_add_comm _ (-1)%F).
+      rewrite <- rngl_add_assoc.
+      rewrite (rngl_add_assoc 1%F).
+      rewrite fold_rngl_sub; [ | easy ].
+      rewrite fold_rngl_sub; [ | easy ].
+      rewrite fold_rngl_sub; [ | easy ].
+      rewrite rngl_add_opp_r.
+      unfold rngl_sub; rewrite Hop.
+      rewrite rngl_add_0_l.
+      rewrite fold_rngl_sub; [ | easy ].
+      easy.
+    }
+    easy.
+  }
+  easy.
+}
+subst x; symmetry.
+...
 (**)
 rewrite rngl_product_split_first; [ | easy | flia ].
 rewrite rngl_product_split_first; [ | easy | flia ].
@@ -1692,6 +1791,7 @@ erewrite rngl_product_eq_compat. 2: {
 }
 cbn - [ "<?" ].
 set (σ₀ := k / fact n) in Hσσ |-*.
+unfold δ.
 ...
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
