@@ -1763,7 +1763,6 @@ remember (vect_el (canon_permut (S n) k)) as σ eqn:Hσ.
 remember (vect_el (canon_permut n (k mod fact n))) as σ' eqn:Hσ'.
 move σ' before σ.
 specialize (canon_permut_succ_values Hσ Hσ') as Hσσ.
-(**)
 rewrite rngl_product_succ_succ.
 rewrite rngl_product_succ_succ.
 erewrite rngl_product_eq_compat. 2: {
