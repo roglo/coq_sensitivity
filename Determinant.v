@@ -1212,7 +1212,7 @@ Qed.
 
 (* ε (σ₁ ° σ₂) = ε σ₁ * ε σ₂ *)
 
-Theorem signature_comp_fun_expand :
+Theorem signature_comp_fun_expand_1 :
   rngl_has_opp = true →
   rngl_has_inv = true →
   rngl_is_comm = true →
@@ -1222,19 +1222,10 @@ Theorem signature_comp_fun_expand :
   ∀ n f g,
   is_permut_fun g n
   → (Π (i = 1, n),
-     (Π (j = 1, n),
-      (if i <? j
-       then
-        (rngl_of_nat (f (g (j - 1)%nat)) - rngl_of_nat (f (g (i - 1)%nat))) /
-        (rngl_of_nat (g (j - 1)%nat) - rngl_of_nat (g (i - 1)%nat))
-       else 1)))%F =
-    (Π (i = 1, n),
-     (Π (j = 1, n),
-      (if i <? j
-       then
-         (rngl_of_nat (f (j - 1)%nat) - rngl_of_nat (f (i - 1)%nat)) /
-         (rngl_of_nat j - rngl_of_nat i)
-       else 1)))%F
+        (Π (j = 1, n), δ i j (f (g (i - 1)%nat)) (f (g (j - 1)%nat))) /
+      Π (i = 1, n), (Π (j = 1, n), δ i j (g (i - 1)%nat) (g (j - 1)%nat)))%F =
+     (Π (i = 1, n), (Π (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
+      Π (i = 1, n), (Π (j = 1, n), δ i j i j))%F
   → ε_fun (comp f g) n = (ε_fun f n * ε_fun g n)%F.
 Proof.
 intros Hop Hin Hic H10 Hit Hch * Hp2 Hs.
@@ -1281,6 +1272,45 @@ rewrite <- rngl_mul_assoc.
 rewrite (rngl_mul_comm t), rngl_mul_inv_l; [ | easy ].
 rewrite rngl_mul_1_r.
 subst z t.
+rewrite fold_rngl_div; [ | easy ].
+rewrite fold_rngl_div; [ | easy ].
+subst x y.
+easy.
+Qed.
+
+Theorem signature_comp_fun_expand_2 :
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_comm = true →
+  rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
+  rngl_characteristic = 0 →
+  ∀ n f g,
+  is_permut_fun g n
+  → (Π (i = 1, n),
+     (Π (j = 1, n),
+      (if i <? j
+       then
+        (rngl_of_nat (f (g (j - 1)%nat)) - rngl_of_nat (f (g (i - 1)%nat))) /
+        (rngl_of_nat (g (j - 1)%nat) - rngl_of_nat (g (i - 1)%nat))
+       else 1)))%F =
+    (Π (i = 1, n),
+     (Π (j = 1, n),
+      (if i <? j
+       then
+         (rngl_of_nat (f (j - 1)%nat) - rngl_of_nat (f (i - 1)%nat)) /
+         (rngl_of_nat j - rngl_of_nat i)
+       else 1)))%F
+  → (Π (i = 1, n),
+        (Π (j = 1, n), δ i j (f (g (i - 1)%nat)) (f (g (j - 1)%nat))) /
+     Π (i = 1, n), (Π (j = 1, n), δ i j (g (i - 1)%nat) (g (j - 1)%nat)))%F =
+    (Π (i = 1, n), (Π (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
+     Π (i = 1, n), (Π (j = 1, n), δ i j i j))%F.
+Proof.
+intros Hop Hin Hic H10 Hit Hch * Hp2 Hs.
+specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
+rewrite H10 in rngl_1_neq_0.
+unfold rngl_div; rewrite Hin.
 rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
   intros i Hi Hij.
   specialize @rngl_product_opt_integral as rngl_product_integral.
@@ -1307,7 +1337,6 @@ rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
   apply rngl_of_nat_inj in Hij; [ | easy ].
   flia Hlij Hij.
 }
-subst x y.
 erewrite <- rngl_product_mul_distr; [ | easy ].
 erewrite <- rngl_product_mul_distr; [ | easy ].
 erewrite rngl_product_eq_compat. 2: {
@@ -1373,6 +1402,36 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 now symmetry.
+Qed.
+
+Theorem signature_comp_fun_expand :
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_comm = true →
+  rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
+  rngl_characteristic = 0 →
+  ∀ n f g,
+  is_permut_fun g n
+  → (Π (i = 1, n),
+     (Π (j = 1, n),
+      (if i <? j
+       then
+        (rngl_of_nat (f (g (j - 1)%nat)) - rngl_of_nat (f (g (i - 1)%nat))) /
+        (rngl_of_nat (g (j - 1)%nat) - rngl_of_nat (g (i - 1)%nat))
+       else 1)))%F =
+    (Π (i = 1, n),
+     (Π (j = 1, n),
+      (if i <? j
+       then
+         (rngl_of_nat (f (j - 1)%nat) - rngl_of_nat (f (i - 1)%nat)) /
+         (rngl_of_nat j - rngl_of_nat i)
+       else 1)))%F
+  → ε_fun (comp f g) n = (ε_fun f n * ε_fun g n)%F.
+Proof.
+intros Hop Hin Hic H10 Hit Hch * Hp2 Hs.
+apply signature_comp_fun_expand_1; try easy.
+now apply signature_comp_fun_expand_2.
 Qed.
 
 Theorem signature_comp_fun_changement_of_variable :
