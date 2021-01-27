@@ -1239,14 +1239,15 @@ Theorem signature_comp_fun_expand :
 Proof.
 intros Hop Hin Hic H10 Hit Hch * Hp2 Hs.
 unfold ε_fun, comp; cbn.
+unfold rngl_div.
+rewrite Hin.
+rewrite rngl_mul_assoc.
+f_equal.
 remember (Π (i = _, _), _)%F as x eqn:Hx in |-*.
 remember (Π (i = _, _), _)%F as y eqn:Hy in |-*.
 remember (Π (i = _, _), _)%F as z eqn:Hz in |-*.
 remember (Π (i = _, _), _)%F as t eqn:Ht in |-*.
 move y before x; move z before y; move t before z.
-unfold rngl_div.
-rewrite Hin.
-rewrite rngl_mul_assoc; f_equal.
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
 rewrite H10 in rngl_1_neq_0.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
@@ -1255,7 +1256,7 @@ specialize rngl_opt_mul_comm as rngl_mul_comm.
 rewrite Hic in rngl_mul_comm.
 assert (Htz : t ≠ 0%F). {
   intros Hij; rewrite Ht in Hij.
-  clear x z t Hx Hy Hz Ht.
+  clear x y t Hx Hy Hz Ht.
   clear f Hs.
   specialize @rngl_product_opt_integral as rngl_product_integral.
   specialize (rngl_product_integral T ro rp Hit H10).
@@ -1279,7 +1280,7 @@ apply rngl_mul_reg_r with (c := (¹/ t)%F); [ now left | | ]. {
 rewrite <- rngl_mul_assoc.
 rewrite (rngl_mul_comm t), rngl_mul_inv_l; [ | easy ].
 rewrite rngl_mul_1_r.
-subst y t.
+subst z t.
 rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
   intros i Hi Hij.
   specialize @rngl_product_opt_integral as rngl_product_integral.
@@ -1306,7 +1307,7 @@ rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
   apply rngl_of_nat_inj in Hij; [ | easy ].
   flia Hlij Hij.
 }
-subst x z.
+subst x y.
 erewrite <- rngl_product_mul_distr; [ | easy ].
 erewrite <- rngl_product_mul_distr; [ | easy ].
 erewrite rngl_product_eq_compat. 2: {
