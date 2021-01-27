@@ -1654,6 +1654,44 @@ remember (vect_el (canon_permut (S n) k)) as σ eqn:Hσ.
 remember (vect_el (canon_permut n (k mod fact n))) as σ' eqn:Hσ'.
 move σ' before σ.
 specialize (canon_permut_succ_values Hσ Hσ') as Hσσ.
+(**)
+rewrite rngl_product_split_first; [ | easy | flia ].
+rewrite rngl_product_split_first; [ | easy | flia ].
+rewrite Nat.sub_diag.
+unfold δ at 1.
+rewrite if_ltb_lt_dec.
+destruct (lt_dec 1 1) as [H| H]; [ flia H | clear H ].
+rewrite rngl_mul_1_l.
+erewrite rngl_product_eq_compat. 2: {
+  intros j Hj.
+  unfold δ.
+  rewrite if_ltb_lt_dec.
+  destruct (lt_dec 1 j) as [H| H]; [ clear H | flia Hj H ].
+  remember (rngl_of_nat _) as x.
+  rewrite Hσσ; subst x.
+  easy.
+}
+cbn.
+rewrite rngl_mul_comm.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_product_split_first; [ | easy | flia ].
+  unfold δ at 1.
+  rewrite if_ltb_lt_dec.
+  destruct (lt_dec i 1) as [H| H]; [ flia H Hi | clear H ].
+  rewrite rngl_mul_1_l.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite Hσσ.
+    replace (i - 1) with (S (i - 2)) by flia Hi.
+    replace (j - 1) with (S (j - 2)) by flia Hj.
+    rewrite Hσσ.
+    easy.
+  }
+  easy.
+}
+cbn - [ "<?" ].
+set (σ₀ := k / fact n) in Hσσ |-*.
 ...
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
