@@ -1237,7 +1237,7 @@ Theorem signature_comp_fun_expand_1 :
   → (Π (i = 1, n),
         (Π (j = 1, n), δ i j (f (g (i - 1)%nat)) (f (g (j - 1)%nat))) /
       Π (i = 1, n), (Π (j = 1, n), δ i j (g (i - 1)%nat) (g (j - 1)%nat)))%F =
-     (Π (i = 1, n), (Π (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
+    (Π (i = 1, n), (Π (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
       Π (i = 1, n), (Π (j = 1, n), δ i j i j))%F
   → ε_fun (comp f g) n = (ε_fun f n * ε_fun g n)%F.
 Proof.
@@ -1273,13 +1273,13 @@ Theorem signature_comp_fun_expand_2_1 :
   ∀ n f g,
   is_permut_fun g n
   → (Π (i = 1, n),
-     (Π (j = 1, n), δ i j (f (g (i - 1)%nat)) (f (g (j - 1)%nat))) /
+      (Π (j = 1, n), δ i j (f (g (i - 1)%nat)) (f (g (j - 1)%nat))) /
      Π (i = 1, n), (Π (j = 1, n), δ i j (g (i - 1)%nat) (g (j - 1)%nat)))%F =
     (Π (i = 1, n),
-     (Π (j = 1, n),
-      (if i <? j then
-        (rngl_of_nat (f (g (j - 1)%nat)) - rngl_of_nat (f (g (i - 1)%nat))) /
-        (rngl_of_nat (g (j - 1)%nat) - rngl_of_nat (g (i - 1)%nat))
+      (Π (j = 1, n),
+       (if i <? j then
+         (rngl_of_nat (f (g (j - 1)%nat)) - rngl_of_nat (f (g (i - 1)%nat))) /
+         (rngl_of_nat (g (j - 1)%nat) - rngl_of_nat (g (i - 1)%nat))
        else 1)))%F.
 Proof.
 intros Hop Hin Hic H10 Hit Hch * Hp2.
