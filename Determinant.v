@@ -1263,7 +1263,7 @@ destruct Hp2 as (Hp21, Hp22).
 apply Hp22 in Hij; [ flia Hi Hj Hlij Hij | flia Hj | flia Hi ].
 Qed.
 
-Theorem signature_comp_fun_expand_2 :
+Theorem signature_comp_fun_expand_2_1 :
   rngl_has_opp = true →
   rngl_has_inv = true →
   rngl_is_comm = true →
@@ -1273,31 +1273,19 @@ Theorem signature_comp_fun_expand_2 :
   ∀ n f g,
   is_permut_fun g n
   → (Π (i = 1, n),
-     (Π (j = 1, n),
-      (if i <? j
-       then
-        (rngl_of_nat (f (g (j - 1)%nat)) - rngl_of_nat (f (g (i - 1)%nat))) /
-        (rngl_of_nat (g (j - 1)%nat) - rngl_of_nat (g (i - 1)%nat))
-       else 1)))%F =
-    (Π (i = 1, n),
-     (Π (j = 1, n),
-      (if i <? j
-       then
-         (rngl_of_nat (f (j - 1)%nat) - rngl_of_nat (f (i - 1)%nat)) /
-         (rngl_of_nat j - rngl_of_nat i)
-       else 1)))%F
-  → (Π (i = 1, n),
      (Π (j = 1, n), δ i j (f (g (i - 1)%nat)) (f (g (j - 1)%nat))) /
      Π (i = 1, n), (Π (j = 1, n), δ i j (g (i - 1)%nat) (g (j - 1)%nat)))%F =
     (Π (i = 1, n),
-     (Π (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
-     Π (i = 1, n), (Π (j = 1, n), δ i j i j))%F.
+     (Π (j = 1, n),
+      (if i <? j then
+        (rngl_of_nat (f (g (j - 1)%nat)) - rngl_of_nat (f (g (i - 1)%nat))) /
+        (rngl_of_nat (g (j - 1)%nat) - rngl_of_nat (g (i - 1)%nat))
+       else 1)))%F.
 Proof.
-intros Hop Hin Hic H10 Hit Hch * Hp2 Hs.
+intros Hop Hin Hic H10 Hit Hch * Hp2.
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
 rewrite H10 in rngl_1_neq_0.
 unfold rngl_div; rewrite Hin.
-(* 1 *)
 rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
   intros i Hi Hij.
   specialize @rngl_product_opt_integral as rngl_product_integral.
@@ -1326,7 +1314,7 @@ erewrite rngl_product_eq_compat. 2: {
   erewrite <- rngl_product_mul_distr; [ | easy ].
   easy.
 }
-cbn.
+cbn - [ "<?" ].
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
   erewrite rngl_product_eq_compat. 2: {
@@ -1342,8 +1330,32 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
-symmetry.
-(* 2 *)
+cbn - [ "<?" ].
+unfold rngl_div; rewrite Hin.
+easy.
+Qed.
+
+Theorem signature_comp_fun_expand_2_2 :
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_comm = true →
+  rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
+  rngl_characteristic = 0 →
+  ∀ n f,
+  (Π (i = 1, n), (Π (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
+   Π (i = 1, n), (Π (j = 1, n), δ i j i j))%F =
+  (Π (i = 1, n),
+   (Π (j = 1, n),
+    (if i <? j then
+      (rngl_of_nat (f (j - 1)%nat) - rngl_of_nat (f (i - 1)%nat)) /
+      (rngl_of_nat j - rngl_of_nat i)
+     else 1)))%F.
+Proof.
+intros Hop Hin Hic H10 Hit Hch *.
+specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
+rewrite H10 in rngl_1_neq_0.
+unfold rngl_div; rewrite Hin.
 rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
   intros i Hi Hij.
   specialize @rngl_product_opt_integral as rngl_product_integral.
@@ -1387,39 +1399,8 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
-now symmetry.
-Qed.
-
-...
-
-Theorem signature_comp_fun_expand :
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_is_comm = true →
-  rngl_has_1_neq_0 = true →
-  rngl_is_integral = true →
-  rngl_characteristic = 0 →
-  ∀ n f g,
-  is_permut_fun g n
-  → (Π (i = 1, n),
-     (Π (j = 1, n),
-      (if i <? j
-       then
-        (rngl_of_nat (f (g (j - 1)%nat)) - rngl_of_nat (f (g (i - 1)%nat))) /
-        (rngl_of_nat (g (j - 1)%nat) - rngl_of_nat (g (i - 1)%nat))
-       else 1)))%F =
-    (Π (i = 1, n),
-     (Π (j = 1, n),
-      (if i <? j
-       then
-         (rngl_of_nat (f (j - 1)%nat) - rngl_of_nat (f (i - 1)%nat)) /
-         (rngl_of_nat j - rngl_of_nat i)
-       else 1)))%F
-  → ε_fun (comp f g) n = (ε_fun f n * ε_fun g n)%F.
-Proof.
-intros Hop Hin Hic H10 Hit Hch * Hp2 Hs.
-apply signature_comp_fun_expand_1; try easy.
-now apply signature_comp_fun_expand_2.
+unfold rngl_div; rewrite Hin.
+easy.
 Qed.
 
 Theorem signature_comp_fun_changement_of_variable :
@@ -1596,7 +1577,9 @@ Theorem signature_comp_fun :
   → ε_fun (comp f g) n = (ε_fun f n * ε_fun g n)%F.
 Proof.
 intros Hop Hin Hic Hde H10 Hit Hch * Hp1 Hp2.
-apply signature_comp_fun_expand; try easy.
+apply signature_comp_fun_expand_1; try easy.
+rewrite signature_comp_fun_expand_2_1; try easy.
+rewrite signature_comp_fun_expand_2_2; try easy.
 now apply signature_comp_fun_changement_of_variable.
 Qed.
 
