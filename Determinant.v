@@ -1210,22 +1210,32 @@ cbn - [ "<?" ].
 now apply product_product_if_permut_div.
 Qed.
 
-(* ε (σ₁ ° σ₂) = ε σ₁ * ε σ₂ *)
-
-Theorem signature_comp_fun :
+Theorem signature_comp_fun_expand :
   rngl_has_opp = true →
   rngl_has_inv = true →
   rngl_is_comm = true →
-  rngl_has_dec_eq = true →
   rngl_has_1_neq_0 = true →
   rngl_is_integral = true →
   rngl_characteristic = 0 →
   ∀ n f g,
-  is_permut_fun f n
-  → is_permut_fun g n
+  is_permut_fun g n
+  → (Π (i = 1, n),
+     (Π (j = 1, n),
+      (if i <? j
+       then
+        (rngl_of_nat (f (g (j - 1)%nat)) - rngl_of_nat (f (g (i - 1)%nat))) /
+        (rngl_of_nat (g (j - 1)%nat) - rngl_of_nat (g (i - 1)%nat))
+       else 1)))%F =
+    (Π (i = 1, n),
+     (Π (j = 1, n),
+      (if i <? j
+       then
+         (rngl_of_nat (f (j - 1)%nat) - rngl_of_nat (f (i - 1)%nat)) /
+         (rngl_of_nat j - rngl_of_nat i)
+       else 1)))%F
   → ε_fun (comp f g) n = (ε_fun f n * ε_fun g n)%F.
 Proof.
-intros Hop Hin Hic Hde H10 Hit Hch * Hp1 Hp2.
+intros Hop Hin Hic H10 Hit Hch * Hp2 Hs.
 unfold ε_fun, comp; cbn.
 remember (Π (i = _, _), _)%F as x eqn:Hx in |-*.
 remember (Π (i = _, _), _)%F as y eqn:Hy in |-*.
@@ -1244,7 +1254,7 @@ rewrite Hic in rngl_mul_comm.
 assert (Htz : t ≠ 0%F). {
   intros Hij; rewrite Ht in Hij.
   clear x z t Hx Hy Hz Ht.
-  clear f Hp1.
+  clear f Hs.
   specialize @rngl_product_opt_integral as rngl_product_integral.
   specialize (rngl_product_integral T ro rp Hit H10).
   apply rngl_product_integral in Hij.
@@ -1359,7 +1369,26 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
-symmetry.
+now symmetry.
+Qed.
+
+(* ε (σ₁ ° σ₂) = ε σ₁ * ε σ₂ *)
+
+Theorem signature_comp_fun :
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_comm = true →
+  rngl_has_dec_eq = true →
+  rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
+  rngl_characteristic = 0 →
+  ∀ n f g,
+  is_permut_fun f n
+  → is_permut_fun g n
+  → ε_fun (comp f g) n = (ε_fun f n * ε_fun g n)%F.
+Proof.
+intros Hop Hin Hic Hde H10 Hit Hch * Hp1 Hp2.
+apply signature_comp_fun_expand; try easy.
 (* changement of variable *)
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 rewrite rngl_product_shift; [ | flia Hnz ].
