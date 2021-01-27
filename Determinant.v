@@ -1212,10 +1212,23 @@ Qed.
 
 (* ε (σ₁ ° σ₂) = ε σ₁ * ε σ₂ *)
 
+Theorem rngl_div_mul_div :
+  rngl_has_inv = true →
+  ∀ x y z, y ≠ 0%F → ((x / y) * (y / z))%F = (x / z)%F.
+Proof.
+intros Hin * Hs.
+unfold rngl_div; rewrite Hin.
+rewrite rngl_mul_assoc; f_equal.
+rewrite <- rngl_mul_assoc.
+specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
+rewrite Hin in rngl_mul_inv_l.
+rewrite rngl_mul_inv_l; [ | easy ].
+apply rngl_mul_1_r.
+Qed.
+
 Theorem signature_comp_fun_expand_1 :
   rngl_has_opp = true →
   rngl_has_inv = true →
-  rngl_is_comm = true →
   rngl_has_1_neq_0 = true →
   rngl_is_integral = true →
   rngl_characteristic = 0 →
@@ -1228,27 +1241,13 @@ Theorem signature_comp_fun_expand_1 :
       Π (i = 1, n), (Π (j = 1, n), δ i j i j))%F
   → ε_fun (comp f g) n = (ε_fun f n * ε_fun g n)%F.
 Proof.
-intros Hop Hin Hic H10 Hit Hch * Hp2 Hs.
+intros Hop Hin H10 Hit Hch * Hp2 Hs.
 unfold ε_fun, comp; cbn.
-remember (Π (i = _, _), _)%F as x eqn:Hx in Hs |-*.
-remember (Π (i = _, _), _)%F as y eqn:Hy in Hs |-*.
-remember (Π (i = _, _), _)%F as z eqn:Hz in Hs |-*.
-remember (Π (i = _, _), _)%F as t eqn:Ht in Hs |-*.
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
 rewrite H10 in rngl_1_neq_0.
-unfold rngl_div.
-rewrite Hin.
-rewrite rngl_mul_assoc.
-f_equal.
-apply (f_equal (λ u, rngl_mul u y)) in Hs.
-unfold rngl_div in Hs.
-rewrite Hin in Hs.
-rewrite <- rngl_mul_assoc in Hs.
-specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
-rewrite Hin in rngl_mul_inv_l.
-rewrite rngl_mul_inv_l in Hs; [ now rewrite rngl_mul_1_r in Hs | ].
-intros Hij; rewrite Hy in Hij.
-clear x y t Hx Hy Hz Ht Hs.
+rewrite <- Hs; symmetry.
+apply rngl_div_mul_div; [ easy | ].
+intros Hij.
 specialize @rngl_product_opt_integral as rngl_product_integral.
 specialize (rngl_product_integral T ro rp Hit H10).
 apply rngl_product_integral in Hij.
