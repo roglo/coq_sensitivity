@@ -1308,6 +1308,7 @@ Theorem signature_comp_fun_expand_2 :
      Π (i = 1, n), (Π (j = 1, n), δ i j i j))%F.
 Proof.
 intros Hop Hin Hic H10 Hit Hch * Hp2 Hs.
+...
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
 rewrite H10 in rngl_1_neq_0.
 unfold rngl_div; rewrite Hin.
@@ -1868,7 +1869,7 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 subst x; symmetry.
-...
+..
 (**)
 rewrite rngl_product_split_first; [ | easy | flia ].
 rewrite rngl_product_split_first; [ | easy | flia ].
