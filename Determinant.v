@@ -1210,6 +1210,8 @@ cbn - [ "<?" ].
 now apply product_product_if_permut_div.
 Qed.
 
+(* ε (σ₁ ° σ₂) = ε σ₁ * ε σ₂ *)
+
 Theorem signature_comp_fun_expand :
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -1371,8 +1373,6 @@ erewrite rngl_product_eq_compat. 2: {
 }
 now symmetry.
 Qed.
-
-(* ε (σ₁ ° σ₂) = ε σ₁ * ε σ₂ *)
 
 Theorem signature_comp_fun :
   rngl_has_opp = true →
