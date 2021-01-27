@@ -1374,7 +1374,7 @@ erewrite rngl_product_eq_compat. 2: {
 now symmetry.
 Qed.
 
-Theorem signature_comp_fun :
+Theorem signature_comp_fun_changement_of_variable :
   rngl_has_opp = true →
   rngl_has_inv = true →
   rngl_is_comm = true →
@@ -1385,11 +1385,20 @@ Theorem signature_comp_fun :
   ∀ n f g,
   is_permut_fun f n
   → is_permut_fun g n
-  → ε_fun (comp f g) n = (ε_fun f n * ε_fun g n)%F.
+  → (Π (i = 1, n),
+     (Π (j = 1, n),
+      (if i <? j then
+         (rngl_of_nat (f (g (j - 1)%nat)) - rngl_of_nat (f (g (i - 1)%nat))) /
+         (rngl_of_nat (g (j - 1)%nat) - rngl_of_nat (g (i - 1)%nat))
+       else 1)))%F =
+    (Π (i = 1, n),
+     (Π (j = 1, n),
+      (if i <? j then
+         (rngl_of_nat (f (j - 1)%nat) - rngl_of_nat (f (i - 1)%nat)) /
+         (rngl_of_nat j - rngl_of_nat i)
+       else 1)))%F.
 Proof.
 intros Hop Hin Hic Hde H10 Hit Hch * Hp1 Hp2.
-apply signature_comp_fun_expand; try easy.
-(* changement of variable *)
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 rewrite rngl_product_shift; [ | flia Hnz ].
 erewrite rngl_product_eq_compat. 2: {
@@ -1523,6 +1532,24 @@ apply product_product_if_permut; try easy. {
     now apply Hij; symmetry.
   }
 }
+Qed.
+
+Theorem signature_comp_fun :
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_comm = true →
+  rngl_has_dec_eq = true →
+  rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
+  rngl_characteristic = 0 →
+  ∀ n f g,
+  is_permut_fun f n
+  → is_permut_fun g n
+  → ε_fun (comp f g) n = (ε_fun f n * ε_fun g n)%F.
+Proof.
+intros Hop Hin Hic Hde H10 Hit Hch * Hp1 Hp2.
+apply signature_comp_fun_expand; try easy.
+now apply signature_comp_fun_changement_of_variable.
 Qed.
 
 Theorem signature_comp :
