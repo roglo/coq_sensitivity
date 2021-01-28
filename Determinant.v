@@ -1234,6 +1234,26 @@ apply rngl_product_product_div_eq_1; try easy. {
 now apply product_product_if_permut_div.
 Qed.
 
+Theorem rngl_of_nat_sub :
+  rngl_has_opp = true →
+  ∀ i j,
+  i < j
+  → (rngl_of_nat j - rngl_of_nat i)%F = rngl_of_nat (j - i).
+Proof.
+intros Hop * Hij.
+revert j Hij.
+induction i; intros; cbn. {
+  rewrite rngl_sub_0_r; f_equal.
+  now destruct j.
+}
+destruct j; [ easy | cbn ].
+rewrite rngl_add_comm.
+rewrite rngl_sub_add_distr; [ | easy ].
+rewrite rngl_add_sub.
+apply IHi.
+now apply Nat.succ_lt_mono in Hij.
+Qed.
+
 (* ε (σ₁ ° σ₂) = ε σ₁ * ε σ₂ *)
 
 Theorem signature_comp_fun_expand_1 :
@@ -1359,7 +1379,7 @@ Theorem signature_comp_fun_expand_2_2 :
    (Π (j = 1, n),
     (if i <? j then
       (rngl_of_nat (f (j - 1)%nat) - rngl_of_nat (f (i - 1)%nat)) /
-      (rngl_of_nat j - rngl_of_nat i)
+      rngl_of_nat (j - i)
      else 1)))%F.
 Proof.
 intros Hop Hin Hic H10 Hit Hch *.
@@ -1410,7 +1430,14 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 unfold rngl_div; rewrite Hin.
-easy.
+apply rngl_product_eq_compat.
+intros i Hi.
+apply rngl_product_eq_compat.
+intros j Hj.
+do 2 rewrite if_ltb_lt_dec.
+destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
+f_equal; f_equal.
+now apply rngl_of_nat_sub.
 Qed.
 
 Theorem signature_comp_fun_changement_of_variable :
@@ -1434,7 +1461,7 @@ Theorem signature_comp_fun_changement_of_variable :
      (Π (j = 1, n),
       (if i <? j then
          (rngl_of_nat (f (j - 1)%nat) - rngl_of_nat (f (i - 1)%nat)) /
-         (rngl_of_nat j - rngl_of_nat i)
+         rngl_of_nat (j - i)
        else 1)))%F.
 Proof.
 intros Hop Hin Hic Hde H10 Hit Hch * Hp1 Hp2.
@@ -1512,17 +1539,6 @@ erewrite rngl_product_eq_compat. 2: {
     rewrite Nat.add_comm, Nat.add_sub.
     do 2 rewrite Nat.add_1_r.
     cbn - [ "<?" ].
-    do 2 rewrite (rngl_add_comm 1%F).
-    unfold rngl_sub.
-    rewrite Hop.
-    rewrite rngl_opp_add_distr; [ | easy ].
-    unfold rngl_sub.
-    rewrite Hop.
-    rewrite rngl_add_assoc.
-    rewrite fold_rngl_sub; [ | easy ].
-    rewrite fold_rngl_sub; [ | easy ].
-    rewrite fold_rngl_sub; [ | easy ].
-    rewrite rngl_add_sub.
     easy.
   }
   easy.
@@ -1531,7 +1547,16 @@ unfold iter_seq.
 rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
 symmetry.
-apply product_product_if_permut; try easy. {
+rewrite product_product_if_permut; try easy. {
+  apply rngl_product_list_eq_compat.
+  intros i Hi.
+  apply rngl_product_list_eq_compat.
+  intros j Hj.
+  do 2 rewrite if_ltb_lt_dec.
+  destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
+  f_equal.
+  now apply rngl_of_nat_sub.
+} {
   now apply permut_fun_inv_is_permut.
 } {
   intros i j.

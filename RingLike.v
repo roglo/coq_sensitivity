@@ -840,6 +840,18 @@ rewrite rngl_add_opp_l in Hab; [ | easy ].
 now rewrite rngl_add_0_r, rngl_add_0_l in Hab.
 Qed.
 
+Theorem rngl_sub_add_distr :
+  rngl_has_opp = true →
+  ∀ a b c, (a - (b + c) = a - b - c)%F.
+Proof.
+intros Hop *.
+unfold rngl_sub.
+rewrite rngl_opp_add_distr; [ | easy ].
+unfold rngl_sub; rewrite Hop.
+rewrite rngl_add_assoc.
+apply rngl_add_add_swap.
+Qed.
+
 Theorem eq_rngl_of_nat_0 :
   rngl_characteristic = 0 →
   ∀ i, rngl_of_nat i = 0%F → i = 0.
