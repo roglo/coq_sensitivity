@@ -333,7 +333,6 @@ Fixpoint ε_canon_permut n k :=
 (* signature of a permutation *)
 
 Definition δ i j u v := if i <? j then (rngl_of_nat v - rngl_of_nat u)%F else 1%F.
-Definition ip {n} (p : vector n nat) i := rngl_of_nat (vect_el p i).
 
 (* change one day into Π Π (_/_) instead of Π Π _ / Π _ *)
 Definition ε_fun f n :=
@@ -1769,6 +1768,9 @@ Theorem ε_of_canon_permut_succ :
   → ε (canon_permut (S n) k) =
     (minus_one_pow (k / fact n) * ε (canon_permut n (k mod fact n)))%F.
 Proof.
+intros Hic Hop Hin * Hkn.
+unfold ε, ε_fun.
+...
 intros Hic Hop Hin * Hkn.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
 rewrite Hic in rngl_mul_comm.
