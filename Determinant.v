@@ -391,8 +391,6 @@ Fixpoint ε_canon_permut n k :=
 
 (* signature of a permutation *)
 
-Definition δ i j u v := if i <? j then (rngl_of_nat v - rngl_of_nat u)%F else 1%F.
-
 Definition ε_fun f n :=
   (Π (i = 1, n), Π (j = 1, n),
    if i <? j then
@@ -403,6 +401,8 @@ Definition ε_fun f n :=
 Definition ε {n} (p : vector n nat) := ε_fun (vect_el p) n.
 
 (* old version that should be removed one day *)
+
+Definition δ i j u v := if i <? j then (rngl_of_nat v - rngl_of_nat u)%F else 1%F.
 
 Definition old_ε_fun f n :=
   ((Π (i = 1, n), Π (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
