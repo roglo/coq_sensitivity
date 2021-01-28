@@ -1958,7 +1958,29 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 cbn.
-(* séparer le sign_diff du reste → deux produits *)
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    unfold rngl_div.
+    rewrite Hin.
+    rewrite <- rngl_mul_assoc.
+    easy.
+  }
+  cbn.
+  rewrite rngl_product_mul_distr; [ | easy ].
+  easy.
+}
+cbn.
+rewrite rngl_product_mul_distr; [ | easy ].
+rewrite <- rngl_mul_1_r; f_equal.
+...
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_product_mul_distr; [ | easy ].
+  easy.
+}
+cbn.
 ...
 
 Theorem ε_ws_ε : ∀ n (p : vector n nat), ε p = ε_ws p.
