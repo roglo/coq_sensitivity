@@ -1126,21 +1126,19 @@ apply in_seq in Hj.
 apply (@permut_swap_mul_cancel n); try easy; [ flia Hi | flia Hj ].
 Qed.
 
-Theorem product_product_if_permut :
+Theorem rngl_product_product_div_eq_1 :
   rngl_is_comm = true →
-  rngl_has_opp = true →
   rngl_has_inv = true →
   rngl_is_integral = true →
   rngl_has_1_neq_0 = true →
   rngl_has_dec_eq = true →
-  ∀ n σ f,
-  is_permut_fun σ n
-  → (∀ i j, f i j = f j i)
-  → (∀ i j, i < n → j < n → i ≠ j → f i j ≠ 0%F)
-  → (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), if σ i <? σ j then f i j else 1))%F =
-    (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), if i <? j then f i j else 1))%F.
+  ∀ n f g,
+  (∀ i j, i < n → j < n → g i j ≠ 0%F)
+  → (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), (f i j / g i j)))%F = 1%F
+  → (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), f i j))%F =
+    (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), g i j))%F.
 Proof.
-intros Hic Hop Hid Hin H10 Hed * Hp Hfij Hfijnz.
+intros Hic Hid Hin H10 Hed * Hg Hs.
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
 specialize rngl_opt_eq_dec as rngl_eq_dec.
 specialize @rngl_product_list_opt_integral as rngl_product_list_integral.
@@ -1157,12 +1155,10 @@ destruct (rngl_eq_dec b 0%F) as [Hbz| Hbz]. {
   apply rngl_product_list_integral in Hb.
   destruct Hb as (j & Hjs & Hb).
   move j before i.
-  rewrite if_ltb_lt_dec in Hb.
-  destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
   exfalso; revert Hb.
   apply in_seq in His.
   apply in_seq in Hjs.
-  apply Hfijnz; [ easy | easy | flia Hij ].
+  now apply Hg.
 }
 apply rngl_mul_reg_r with (c := (¹/ b)%F); [ now left | | ]. {
   intros Hbiz.
@@ -1175,28 +1171,25 @@ remember (_ * _)%F as c.
 rewrite fold_rngl_div; [ | easy ].
 rewrite rngl_mul_inv_r; [ | now left | easy ].
 subst c b.
-rewrite (rngl_inv_product_list ro); [ | easy | easy | easy | easy | ]. 2: {
+rewrite rngl_inv_product_list; [ | easy | easy | easy | easy | ]. 2: {
   intros i Hi H1.
   apply rngl_product_list_integral in H1.
   destruct H1 as (j & Hjs & Hijz).
-  rewrite if_ltb_lt_dec in Hijz.
-  destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
+  exfalso.
   revert Hijz.
   apply in_seq in Hi.
   apply in_seq in Hjs.
-  apply Hfijnz; [ easy | easy | flia Hij ].
+  now apply Hg.
 }
 subst a.
 rewrite <- rngl_product_list_mul_distr; [ | easy ].
 erewrite rngl_product_list_eq_compat. 2 :{
   intros i Hi.
-  rewrite (rngl_inv_product_list ro); [ | easy | easy | easy | easy | ]. 2: {
+  rewrite rngl_inv_product_list; [ | easy | easy | easy | easy | ]. 2: {
     intros j Hj.
-    rewrite if_ltb_lt_dec.
-    destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
     apply in_seq in Hi.
     apply in_seq in Hj.
-    apply Hfijnz; [ easy | easy | flia Hij ].
+    now apply Hg.
   }
   rewrite <- rngl_product_list_mul_distr; [ | easy ].
   erewrite rngl_product_list_eq_compat. 2: {
@@ -1206,7 +1199,31 @@ erewrite rngl_product_list_eq_compat. 2 :{
   }
   easy.
 }
-cbn - [ "<?" ].
+easy.
+Qed.
+
+Theorem product_product_if_permut :
+  rngl_is_comm = true →
+  rngl_has_inv = true →
+  rngl_is_integral = true →
+  rngl_has_1_neq_0 = true →
+  rngl_has_dec_eq = true →
+  ∀ n σ f,
+  is_permut_fun σ n
+  → (∀ i j, f i j = f j i)
+  → (∀ i j, i < n → j < n → i ≠ j → f i j ≠ 0%F)
+  → (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), if σ i <? σ j then f i j else 1))%F =
+    (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), if i <? j then f i j else 1))%F.
+Proof.
+intros Hic Hid Hin H10 Hed * Hp Hfij Hfijnz.
+specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
+rewrite H10 in rngl_1_neq_0.
+apply rngl_product_product_div_eq_1; try easy. {
+  intros i j Hi Hj.
+  rewrite if_ltb_lt_dec.
+  destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
+  apply Hfijnz; [ easy | easy | flia Hij ].
+}
 now apply product_product_if_permut_div.
 Qed.
 
