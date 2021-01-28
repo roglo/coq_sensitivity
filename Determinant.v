@@ -1962,9 +1962,22 @@ erewrite rngl_product_eq_compat. 2: {
 cbn.
 rewrite rngl_product_mul_distr; [ | easy ].
 rewrite <- rngl_mul_1_r; f_equal.
-...
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite fold_rngl_div; [ | easy ].
+    easy.
+  }
+  cbn.
+  rewrite rngl_product_div_distr; try easy.
+  intros j Hj.
+  intros H.
+  apply eq_rngl_of_nat_0 in H; [ | easy ].
+  flia Hj H.
+}
+cbn.
+...
   rewrite rngl_product_mul_distr; [ | easy ].
   easy.
 }
