@@ -393,14 +393,9 @@ Fixpoint ε_canon_permut n k :=
 
 Definition sign_diff u v := if v <? u then 1%F else (-1)%F.
 
-...
-
-(* tain, je comprends pas; cette formule me paraît fausse, mais pourtant, en la
-   testant, ça marche *)
-
 Definition new_ε_fun f n :=
-  ((Π (i = 1, n), Π (j = 1, n),
-    if i <? j then sign_diff (f (j - 1)%nat) (f (i - 1)%nat) else 1))%F.
+  (Π (i = 1, n), Π (j = 1, n),
+   if i <? j then sign_diff (f (j - 1)%nat) (f (i - 1)%nat) else 1)%F.
 
 Definition new_ε {n} (p : vector n nat) := new_ε_fun (vect_el p) n.
 
@@ -417,7 +412,7 @@ Definition ε {n} (p : vector n nat) := ε_fun (vect_el p) n.
 
 *)
 
-(* old version
+(* old version *)
 
 Definition δ i j u v := if i <? j then (rngl_of_nat v - rngl_of_nat u)%F else 1%F.
 
@@ -427,7 +422,7 @@ Definition old_ε_fun f n :=
 
 Definition old_ε {n} (p : vector n nat) := old_ε_fun (vect_el p) n.
 
-*)
+(**)
 
 (*
 End a.
@@ -436,17 +431,15 @@ Require Import ZArith.
 Compute (list_of_vect (canon_permut 4 1)).
 Compute let n := 3 in let i := 1 in list_of_vect (canon_permut n i).
 Compute let n := 3 in let i := 1 in new_ε_fun Z_ring_like_op (vect_el (canon_permut n i)) n.
-(*
 Compute let n := 3 in let i := 1 in old_ε_fun Z_ring_like_op (vect_el (canon_permut n i)) n.
-*)
 Compute let n := 3 in let i := 1 in new_ε Z_ring_like_op (canon_permut n i).
-(*
 Compute let n := 3 in let i := 1 in old_ε Z_ring_like_op (canon_permut n i).
-*)
-Compute let n := 4 in map (λ i, (new_ε Z_ring_like_op (canon_permut n i))) (seq 0 (fact n)).
-(*
+Compute let n := 4 in map (λ i, (ε_canon_permut Z_ring_like_op n i)) (seq 0 (fact n)).
 Compute let n := 4 in map (λ i, (old_ε Z_ring_like_op (canon_permut n i))) (seq 0 (fact n)).
-*)
+Compute let n := 4 in map (λ i, (new_ε Z_ring_like_op (canon_permut n i))) (seq 0 (fact n)).
+Compute let n := 5 in map (λ i, (ε_canon_permut Z_ring_like_op n i)) (seq 0 (fact n)).
+Compute let n := 5 in map (λ i, (old_ε Z_ring_like_op (canon_permut n i))) (seq 0 (fact n)).
+Compute let n := 5 in map (λ i, (new_ε Z_ring_like_op (canon_permut n i))) (seq 0 (fact n)).
 *)
 
 (*
