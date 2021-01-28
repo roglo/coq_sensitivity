@@ -1964,6 +1964,7 @@ erewrite rngl_product_eq_compat. 2: {
 cbn.
 rewrite rngl_product_mul_distr; [ | easy ].
 rewrite <- rngl_mul_1_r; f_equal.
+(**)
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
   erewrite rngl_product_eq_compat. 2: {
