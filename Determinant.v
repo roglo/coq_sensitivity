@@ -391,7 +391,7 @@ Fixpoint ε_canon_permut n k :=
 
 (* new version of signature of a permutation *)
 
-Definition sign_diff u v := if u <? v then (-1)%F else 1%F.
+Definition sign_diff u v := if v <? u then 1%F else (-1)%F.
 
 Definition new_ε_fun f n :=
   ((Π (i = 1, n), Π (j = 1, n),
@@ -1791,8 +1791,7 @@ Theorem signature_comp_fun :
   → new_ε_fun (comp f g) n = (new_ε_fun f n * new_ε_fun g n)%F.
 Proof.
 intros Hop Hin Hic Hde H10 Hit Hch * Hp1 Hp2.
-unfold new_ε_fun.
-unfold sign_diff.
+unfold new_ε_fun, sign_diff, comp.
 ...
 intros Hop Hin Hic Hde H10 Hit Hch * Hp1 Hp2.
 rewrite ε_fun_old_ε_fun; try easy.
