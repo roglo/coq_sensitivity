@@ -907,6 +907,20 @@ destruct rngl_is_comm. {
 }
 Qed.
 
+Theorem rngl_div_mul_div :
+  rngl_has_inv = true →
+  ∀ x y z, y ≠ 0%F → ((x / y) * (y / z))%F = (x / z)%F.
+Proof.
+intros Hin * Hs.
+unfold rngl_div; rewrite Hin.
+rewrite rngl_mul_assoc; f_equal.
+rewrite <- rngl_mul_assoc.
+specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
+rewrite Hin in rngl_mul_inv_l.
+rewrite rngl_mul_inv_l; [ | easy ].
+apply rngl_mul_1_r.
+Qed.
+
 End a.
 
 Arguments rngl_add_opp_l {T}%type {ro rp} Hro.

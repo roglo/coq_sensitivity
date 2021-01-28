@@ -1234,20 +1234,6 @@ apply rngl_product_product_div_eq_1; try easy. {
 now apply product_product_if_permut_div.
 Qed.
 
-Theorem rngl_div_mul_div :
-  rngl_has_inv = true →
-  ∀ x y z, y ≠ 0%F → ((x / y) * (y / z))%F = (x / z)%F.
-Proof.
-intros Hin * Hs.
-unfold rngl_div; rewrite Hin.
-rewrite rngl_mul_assoc; f_equal.
-rewrite <- rngl_mul_assoc.
-specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
-rewrite Hin in rngl_mul_inv_l.
-rewrite rngl_mul_inv_l; [ | easy ].
-apply rngl_mul_1_r.
-Qed.
-
 (* ε (σ₁ ° σ₂) = ε σ₁ * ε σ₂ *)
 
 Theorem signature_comp_fun_expand_1 :
