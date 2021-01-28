@@ -389,7 +389,17 @@ Fixpoint ε_canon_permut n k :=
   | S n' => (minus_one_pow (k / fact n') * ε_canon_permut n' (k mod fact n'))%F
   end.
 
-(* signature of a permutation *)
+(* new version of signature of a permutation *)
+
+Definition sign_diff u v := if u <? v then (-1)%F else 1%F.
+
+Definition new_ε_fun f n :=
+  ((Π (i = 1, n), Π (j = 1, n),
+    if i <? j then sign_diff (f (j - 1)%nat) (f (i - 1)%nat) else 1))%F.
+
+Definition new_ε {n} (p : vector n nat) := new_ε_fun (vect_el p) n.
+
+(* signature of a permutation : wrong!
 
 Definition ε_fun f n :=
   (Π (i = 1, n), Π (j = 1, n),
@@ -400,6 +410,8 @@ Definition ε_fun f n :=
 
 Definition ε {n} (p : vector n nat) := ε_fun (vect_el p) n.
 
+*)
+
 (* old version that should be removed one day *)
 
 Definition δ i j u v := if i <? j then (rngl_of_nat v - rngl_of_nat u)%F else 1%F.
@@ -408,6 +420,26 @@ Definition old_ε_fun f n :=
   ((Π (i = 1, n), Π (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
    (Π (i = 1, n), Π (j = 1, n), δ i j i j))%F.
 
+Definition old_ε {n} (p : vector n nat) := old_ε_fun (vect_el p) n.
+
+(*
+End a.
+Require Import Zrl.
+Require Import ZArith.
+Compute (list_of_vect (canon_permut 4 1)).
+Compute let n := 3 in let i := 1 in list_of_vect (canon_permut n i).
+Compute let n := 3 in let i := 1 in new_ε_fun Z_ring_like_op (vect_el (canon_permut n i)) n.
+Compute let n := 3 in let i := 1 in old_ε_fun Z_ring_like_op (vect_el (canon_permut n i)) n.
+Compute let n := 3 in let i := 1 in new_ε Z_ring_like_op (canon_permut n i).
+Compute let n := 3 in let i := 1 in old_ε Z_ring_like_op (canon_permut n i).
+Compute let n := 4 in map (λ i, (new_ε Z_ring_like_op (canon_permut n i))) (seq 0 (fact n)).
+Compute let n := 4 in map (λ i, (old_ε Z_ring_like_op (canon_permut n i))) (seq 0 (fact n)).
+...
+*)
+
+(* warning: the rngl_has_inv is true, but should be false; however the new
+   version of ε does not divides, therefore it is correct. But when old_ε
+   is removed, all rngl_has_inv = true should be removed *)
 Theorem ε_fun_old_ε_fun :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -415,13 +447,13 @@ Theorem ε_fun_old_ε_fun :
   rngl_has_1_neq_0 = true →
   rngl_is_integral = true →
   rngl_characteristic = 0 →
-  ∀ f n, ε_fun f n = old_ε_fun f n.
+  ∀ f n, new_ε_fun f n = old_ε_fun f n.
 Proof.
 intros Hic Hop Hin H10 Hit Hch *.
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
 rewrite H10 in rngl_1_neq_0.
-unfold ε_fun, old_ε_fun.
-unfold rngl_div at 2.
+unfold new_ε_fun, old_ε_fun.
+unfold rngl_div.
 rewrite Hin.
 rewrite rngl_inv_product_comm; try easy. 2: {
   intros i Hi.
@@ -477,11 +509,17 @@ rewrite rngl_inv_product_comm; try easy. 2: {
   flia Hij H.
 }
 rewrite <- rngl_product_mul_distr; [ | easy ].
+(**)
+unfold δ, sign_diff.
+(* c'est la cata, tout est cassé *)
+...
 apply rngl_product_eq_compat.
 intros j Hj.
 unfold δ.
-do 3 rewrite if_ltb_lt_dec.
+unfold sign_diff.
+do 4 rewrite if_ltb_lt_dec.
 destruct (lt_dec i j) as [Hij| Hij]. {
+...
   unfold rngl_div; rewrite Hin.
   f_equal; f_equal.
   symmetry.
@@ -490,6 +528,8 @@ destruct (lt_dec i j) as [Hij| Hij]. {
 rewrite rngl_inv_1; [ | easy | easy ].
 symmetry; apply rngl_mul_1_l.
 Qed.
+
+...
 
 (* *)
 
