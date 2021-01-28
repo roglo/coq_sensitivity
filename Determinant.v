@@ -1813,6 +1813,7 @@ unfold δ.
 rewrite rngl_product_product_if.
 rewrite rngl_product_product_if.
 rewrite rngl_product_product_if.
+Check rngl_div_mul_div.
 ...
 
 Theorem ε_ws_ε : ∀ n (p : vector n nat), ε p = ε_ws p.
