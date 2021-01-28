@@ -2,7 +2,7 @@
 
 Set Nested Proofs Allowed.
 
-Require Import Utf8 Arith.
+Require Import Utf8 Arith Permutation.
 Require Import Misc RingLike.
 Import List List.ListNotations.
 
@@ -225,25 +225,40 @@ exists i.
 split; [ flia His | easy ].
 Qed.
 
-(*  a version without commutativity, but product with reverse list
-    would be better *)
-Theorem rngl_inv_product_list :
+Theorem rngl_product_list_permut :
   rngl_is_comm = true →
+  ∀ A (l1 l2 : list A) f,
+  Permutation l1 l2
+  → (Π (i ∈ l1), f i = Π (i ∈ l2), f i)%F.
+Proof.
+intros Hic * Hl.
+apply iter_list_permut; [ | | | | easy ]. {
+  apply rngl_mul_1_l.
+} {
+  apply rngl_mul_1_r.
+} {
+  specialize rngl_opt_mul_comm as rngl_mul_comm.
+  rewrite Hic in rngl_mul_comm.
+  apply rngl_mul_comm.
+} {
+  apply rngl_mul_assoc.
+}
+Qed.
+
+Theorem rngl_inv_product_list :
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
   rngl_is_integral = true →
   ∀ A (l : list A) f,
   (∀ i, i ∈ l → f i ≠ 0%F)
-  → ((¹/ Π (i ∈ l), f i) = Π (i ∈ l), (¹/ f i))%F.
+  → ((¹/ Π (i ∈ l), f i) = Π (i ∈ rev l), (¹/ f i))%F.
 Proof.
-intros Hic Hin H10 Hit * Hnz.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
-rewrite Hic in rngl_mul_comm.
+intros Hin H10 Hit * Hnz.
 specialize rngl_opt_integral as rngl_integral.
 rewrite Hit in rngl_integral.
 unfold iter_list.
 induction l as [| a]; [ now apply rngl_inv_1 | cbn ].
-do 2 rewrite rngl_mul_1_l.
+rewrite rngl_mul_1_l.
 rewrite (fold_left_op_fun_from_d 1%F); cycle 1. {
   apply rngl_mul_1_l.
 } {
@@ -266,17 +281,76 @@ rewrite IHl. 2: {
   now apply Hnz; right.
 }
 symmetry.
-rewrite rngl_mul_comm.
-apply fold_left_op_fun_from_d. {
-  apply rngl_mul_1_l.
-} {
-  apply rngl_mul_1_r.
-} {
-  apply rngl_mul_assoc.
-}
+apply fold_left_app.
 Qed.
 
 Theorem rngl_inv_product :
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
+  ∀ b e f,
+  (∀ i, b ≤ i ≤ e → f i ≠ 0%F)
+  → ((¹/ Π (i = b, e), f i) = Π (i = b, e), (¹/ f (b + e - i)%nat))%F.
+Proof.
+intros Hin H10 Hit * Hnz.
+unfold iter_seq.
+rewrite rngl_inv_product_list; [ | easy | easy | easy | ]. 2: {
+  intros i Hi.
+  apply in_seq in Hi.
+  apply Hnz; flia Hi.
+}
+unfold iter_list.
+remember (S e - b) as len eqn:Hlen.
+destruct len; [ easy | ].
+replace e with (b + len) in Hnz |-* by flia Hlen.
+clear e Hlen.
+revert b Hnz.
+induction len; intros. {
+  cbn.
+  do 2 rewrite rngl_mul_1_l.
+  now rewrite Nat.add_0_r, Nat.add_sub.
+}
+symmetry.
+rewrite List_seq_succ_r at 1.
+symmetry.
+remember (S len) as sl; cbn; subst sl.
+rewrite fold_left_app.
+rewrite fold_left_app.
+rewrite IHlen. 2: {
+  intros i Hi.
+  apply Hnz; flia Hi.
+}
+cbn - [ "-" ].
+do 2 rewrite rngl_mul_1_l.
+replace (b + (b + S len) - (b + S len)) with b by flia.
+f_equal.
+replace (S (b + S (b + len)) - S b) with (S (b + len)) by flia.
+replace (b + (b + S len) - b) with (S (b + len)) by flia.
+rewrite <- seq_shift.
+rewrite List_fold_left_map; cbn.
+apply List_fold_left_ext_in.
+intros c d Hc.
+f_equal; f_equal; f_equal.
+flia.
+Qed.
+
+Theorem rngl_inv_product_list_comm :
+  rngl_is_comm = true →
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
+  ∀ A (l : list A) f,
+  (∀ i, i ∈ l → f i ≠ 0%F)
+  → ((¹/ Π (i ∈ l), f i) = Π (i ∈ l), (¹/ f i))%F.
+Proof.
+intros Hic Hin H10 Hit * Hnz.
+rewrite rngl_inv_product_list; [ | easy | easy | easy | easy ].
+apply rngl_product_list_permut; [ easy | ].
+symmetry.
+apply Permutation_rev.
+Qed.
+
+Theorem rngl_inv_product_comm :
   rngl_is_comm = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
@@ -286,7 +360,7 @@ Theorem rngl_inv_product :
   → ((¹/ Π (i = b, e), f i) = Π (i = b, e), (¹/ f i))%F.
 Proof.
 intros Hic Hin H10 Hit * Hnz.
-apply rngl_inv_product_list; try easy.
+apply rngl_inv_product_list_comm; try easy.
 intros i Hi.
 apply in_seq in Hi.
 apply Hnz; flia Hi.
@@ -294,9 +368,12 @@ Qed.
 
 End a.
 
-Arguments rngl_inv_product {T}%type {ro rp} _ _ _ _ (b e)%nat f.
 Arguments rngl_product_list_mul_distr {T}%type {ro rp} _ A%type
   (g h)%function l%list.
 Arguments rngl_product_split {T}%type {ro rp} j%nat g%function (b k)%nat.
-Arguments rngl_inv_product_list {T}%type {ro rp} _ _ _ _ {A}%type l%list
+Arguments rngl_inv_product {T}%type {ro rp} _ _ _ (b e)%nat f.
+Arguments rngl_inv_product_list {T}%type {ro rp} _ _ _ {A}%type l%list
   (f _)%function.
+Arguments rngl_inv_product_comm {T}%type {ro rp} _ _ _ _ (b e)%nat f.
+Arguments rngl_product_list_permut {T}%type {ro rp} _ A%type (l1 l2)%list
+  _%function.

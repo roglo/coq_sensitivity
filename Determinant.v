@@ -1171,7 +1171,8 @@ remember (_ * _)%F as c.
 rewrite fold_rngl_div; [ | easy ].
 rewrite rngl_mul_inv_r; [ | now left | easy ].
 subst c b.
-rewrite rngl_inv_product_list; [ | easy | easy | easy | easy | ]. 2: {
+(**)
+rewrite rngl_inv_product_list; [ | easy | easy | easy | ]. 2: {
   intros i Hi H1.
   apply rngl_product_list_integral in H1.
   destruct H1 as (j & Hjs & Hijz).
@@ -1182,14 +1183,20 @@ rewrite rngl_inv_product_list; [ | easy | easy | easy | easy | ]. 2: {
   now apply Hg.
 }
 subst a.
+erewrite rngl_product_list_permut with (l1 := rev _); [ | easy | ]. 2: {
+  symmetry; apply Permutation_rev.
+}
 rewrite <- rngl_product_list_mul_distr; [ | easy ].
 erewrite rngl_product_list_eq_compat. 2 :{
   intros i Hi.
-  rewrite rngl_inv_product_list; [ | easy | easy | easy | easy | ]. 2: {
+  rewrite rngl_inv_product_list; [ | easy | easy | easy | ]. 2: {
     intros j Hj.
     apply in_seq in Hi.
     apply in_seq in Hj.
     now apply Hg.
+  }
+  erewrite rngl_product_list_permut with (l1 := rev _); [ | easy | ]. 2: {
+    symmetry; apply Permutation_rev.
   }
   rewrite <- rngl_product_list_mul_distr; [ | easy ].
   erewrite rngl_product_list_eq_compat. 2: {
@@ -1303,7 +1310,7 @@ intros Hop Hin Hic H10 Hit Hch * Hp2.
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
 rewrite H10 in rngl_1_neq_0.
 unfold rngl_div; rewrite Hin.
-rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
+rewrite rngl_inv_product_comm; [ | easy | easy | easy | easy | ]. 2: {
   intros i Hi Hij.
   specialize @rngl_product_opt_integral as rngl_product_integral.
   specialize (rngl_product_integral T ro rp Hit H10).
@@ -1319,7 +1326,7 @@ rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
 erewrite <- rngl_product_mul_distr; [ | easy ].
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
-  rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
+  rewrite rngl_inv_product_comm; [ | easy | easy | easy | easy | ]. 2: {
     intros j Hj Hij.
     unfold δ in Hij.
     rewrite if_ltb_lt_dec in Hij.
@@ -1373,7 +1380,7 @@ intros Hop Hin Hic H10 Hit Hch *.
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
 rewrite H10 in rngl_1_neq_0.
 unfold rngl_div; rewrite Hin.
-rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
+rewrite rngl_inv_product_comm; [ | easy | easy | easy | easy | ]. 2: {
   intros i Hi Hij.
   specialize @rngl_product_opt_integral as rngl_product_integral.
   specialize (rngl_product_integral T ro rp Hit H10).
@@ -1389,7 +1396,7 @@ rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
 erewrite <- rngl_product_mul_distr; [ | easy ].
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
-  rewrite rngl_inv_product; [ | easy | easy | easy | easy | ]. 2: {
+  rewrite rngl_inv_product_comm; [ | easy | easy | easy | easy | ]. 2: {
     intros j Hj Hij.
     unfold δ in Hij.
     rewrite if_ltb_lt_dec in Hij.
@@ -2527,70 +2534,7 @@ rewrite seq_nth; [ | easy ].
 now rewrite Nat.add_0_l.
 Qed.
 
-Theorem iter_list_permut : ∀ (d : T) (op : T → T → T) (l1 l2 : list nat) f
-  (op_d_l : ∀ x, op d x = x)
-  (op_d_r : ∀ x, op x d = x)
-  (op_comm : ∀ a b, op a b = op b a)
-  (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
-  Permutation l1 l2
-  → iter_list l1 (λ (c : T) (i : nat), op c (f i)) d =
-    iter_list l2 (λ (c : T) (i : nat), op c (f i)) d.
-Proof.
-intros * op_d_l op_d_r op_comm op_assoc Hl.
-specialize (Permutation_length Hl) as H1.
-remember (length l2) as n eqn:H2.
-move H1 after H2; symmetry in H2.
-destruct n. {
-  apply length_zero_iff_nil in H1.
-  apply length_zero_iff_nil in H2.
-  now subst l1 l2.
-}
-revert n H1 H2.
-induction Hl; intros; [ easy | | | ]. {
-  cbn in H1, H2.
-  apply Nat.succ_inj in H1.
-  apply Nat.succ_inj in H2.
-  rewrite iter_list_cons; [ | easy | easy | easy ].
-  rewrite iter_list_cons; [ | easy | easy | easy ].
-  f_equal.
-  destruct n. {
-    apply length_zero_iff_nil in H1.
-    apply length_zero_iff_nil in H2.
-    now subst l l'.
-  }
-  now apply IHHl with (n := n).
-} {
-  destruct n; [ easy | ].
-  cbn in H1, H2.
-  do 2 apply Nat.succ_inj in H1.
-  do 2 apply Nat.succ_inj in H2.
-  do 4 (rewrite iter_list_cons; [ | easy | easy | easy ]).
-  do 2 rewrite op_assoc.
-  f_equal; apply op_comm.
-} {
-  specialize (Permutation_length Hl2) as H3.
-  rewrite H2 in H3.
-  rewrite (IHHl1 n); [ | easy | easy ].
-  rewrite (IHHl2 n); [ | easy | easy ].
-  easy.
-}
-Qed.
-
-Theorem rngl_summation_list_permut : ∀ (l1 l2 : list nat) f,
-  Permutation l1 l2
-  → (Σ (i ∈ l1), f i = Σ (i ∈ l2), f i)%F.
-Proof.
-intros * Hl.
-apply iter_list_permut; [ | | | | easy ]. {
-  apply rngl_add_0_l.
-} {
-  apply rngl_add_0_r.
-} {
-  apply rngl_add_comm.
-} {
-  apply rngl_add_assoc.
-}
-Qed.
+...
 
 Theorem rngl_summation_permut : ∀ n l1 l2,
   Permutation l1 l2

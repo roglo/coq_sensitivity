@@ -2154,6 +2154,55 @@ induction Hperm using Permutation_ind; [ easy | | | ]. {
 etransitivity; [ apply IHHperm1 | apply IHHperm2 ].
 Qed.
 
+Theorem iter_list_permut : ∀ T A (d : T) (op : T → T → T) (l1 l2 : list A) f
+  (op_d_l : ∀ x, op d x = x)
+  (op_d_r : ∀ x, op x d = x)
+  (op_comm : ∀ a b, op a b = op b a)
+  (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
+  Permutation l1 l2
+  → iter_list l1 (λ (c : T) i, op c (f i)) d =
+    iter_list l2 (λ (c : T) i, op c (f i)) d.
+Proof.
+intros * op_d_l op_d_r op_comm op_assoc Hl.
+specialize (Permutation_length Hl) as H1.
+remember (length l2) as n eqn:H2.
+move H1 after H2; symmetry in H2.
+destruct n. {
+  apply length_zero_iff_nil in H1.
+  apply length_zero_iff_nil in H2.
+  now subst l1 l2.
+}
+revert n H1 H2.
+induction Hl; intros; [ easy | | | ]. {
+  cbn in H1, H2.
+  apply Nat.succ_inj in H1.
+  apply Nat.succ_inj in H2.
+  rewrite iter_list_cons; [ | easy | easy | easy ].
+  rewrite iter_list_cons; [ | easy | easy | easy ].
+  f_equal.
+  destruct n. {
+    apply length_zero_iff_nil in H1.
+    apply length_zero_iff_nil in H2.
+    now subst l l'.
+  }
+  now apply IHHl with (n := n).
+} {
+  destruct n; [ easy | ].
+  cbn in H1, H2.
+  do 2 apply Nat.succ_inj in H1.
+  do 2 apply Nat.succ_inj in H2.
+  do 4 (rewrite iter_list_cons; [ | easy | easy | easy ]).
+  do 2 rewrite op_assoc.
+  f_equal; apply op_comm.
+} {
+  specialize (Permutation_length Hl2) as H3.
+  rewrite H2 in H3.
+  rewrite (IHHl1 n); [ | easy | easy ].
+  rewrite (IHHl2 n); [ | easy | easy ].
+  easy.
+}
+Qed.
+
 Theorem not_forall_in_interv_imp_exist : ∀ a b (P : nat → Prop),
   (∀ n, decidable (P n))
   → a ≤ b

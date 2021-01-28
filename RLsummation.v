@@ -2,7 +2,7 @@
 
 Set Nested Proofs Allowed.
 
-Require Import Utf8 Arith.
+Require Import Utf8 Arith Permutation.
 Require Import Misc RingLike.
 Import List List.ListNotations.
 
@@ -427,6 +427,22 @@ apply iter_list_cons. {
   apply rngl_add_0_l.
 } {
   apply rngl_add_0_r.
+} {
+  apply rngl_add_assoc.
+}
+Qed.
+
+Theorem rngl_summation_list_permut : ∀ A (l1 l2 : list A) f,
+  Permutation l1 l2
+  → (Σ (i ∈ l1), f i = Σ (i ∈ l2), f i)%F.
+Proof.
+intros * Hl.
+apply iter_list_permut; [ | | | | easy ]. {
+  apply rngl_add_0_l.
+} {
+  apply rngl_add_0_r.
+} {
+  apply rngl_add_comm.
 } {
   apply rngl_add_assoc.
 }
