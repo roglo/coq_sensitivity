@@ -412,7 +412,7 @@ Definition ε {n} (p : vector n nat) := ε_fun (vect_el p) n.
 
 *)
 
-(* old version that should be removed one day *)
+(* old version
 
 Definition δ i j u v := if i <? j then (rngl_of_nat v - rngl_of_nat u)%F else 1%F.
 
@@ -422,6 +422,8 @@ Definition old_ε_fun f n :=
 
 Definition old_ε {n} (p : vector n nat) := old_ε_fun (vect_el p) n.
 
+*)
+
 (*
 End a.
 Require Import Zrl.
@@ -429,17 +431,20 @@ Require Import ZArith.
 Compute (list_of_vect (canon_permut 4 1)).
 Compute let n := 3 in let i := 1 in list_of_vect (canon_permut n i).
 Compute let n := 3 in let i := 1 in new_ε_fun Z_ring_like_op (vect_el (canon_permut n i)) n.
+(*
 Compute let n := 3 in let i := 1 in old_ε_fun Z_ring_like_op (vect_el (canon_permut n i)) n.
+*)
 Compute let n := 3 in let i := 1 in new_ε Z_ring_like_op (canon_permut n i).
+(*
 Compute let n := 3 in let i := 1 in old_ε Z_ring_like_op (canon_permut n i).
+*)
 Compute let n := 4 in map (λ i, (new_ε Z_ring_like_op (canon_permut n i))) (seq 0 (fact n)).
+(*
 Compute let n := 4 in map (λ i, (old_ε Z_ring_like_op (canon_permut n i))) (seq 0 (fact n)).
-...
+*)
 *)
 
-(* warning: the rngl_has_inv is true, but should be false; however the new
-   version of ε does not divides, therefore it is correct. But when old_ε
-   is removed, all rngl_has_inv = true should be removed *)
+(*
 Theorem ε_fun_old_ε_fun :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -528,8 +533,7 @@ destruct (lt_dec i j) as [Hij| Hij]. {
 rewrite rngl_inv_1; [ | easy | easy ].
 symmetry; apply rngl_mul_1_l.
 Qed.
-
-...
+*)
 
 (* *)
 
@@ -1425,6 +1429,7 @@ Qed.
 
 (* ε (σ₁ ° σ₂) = ε σ₁ * ε σ₂ *)
 
+(*
 Theorem signature_comp_fun_expand_1 :
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -1438,7 +1443,7 @@ Theorem signature_comp_fun_expand_1 :
       Π (i = 1, n), (Π (j = 1, n), δ i j (g (i - 1)%nat) (g (j - 1)%nat)))%F =
     (Π (i = 1, n), (Π (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
       Π (i = 1, n), (Π (j = 1, n), δ i j i j))%F
-  → old_ε_fun (comp f g) n = (old_ε_fun f n * old_ε_fun g n)%F.
+  → new_ε_fun (comp f g) n = (new_ε_fun f n * new_ε_fun g n)%F.
 Proof.
 intros Hop Hin H10 Hit Hch * Hp2 Hs.
 unfold old_ε_fun, comp; cbn - [ "<?" ].
@@ -1461,7 +1466,9 @@ apply rngl_of_nat_inj in Hij; [ | easy ].
 destruct Hp2 as (Hp21, Hp22).
 apply Hp22 in Hij; [ flia Hi Hj Hlij Hij | flia Hj | flia Hi ].
 Qed.
+*)
 
+(*
 Theorem signature_comp_fun_expand_2_1 :
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -1533,7 +1540,9 @@ cbn - [ "<?" ].
 unfold rngl_div; rewrite Hin.
 easy.
 Qed.
+*)
 
+(*
 Theorem signature_comp_fun_expand_2_2 :
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -1608,6 +1617,7 @@ destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
 f_equal; f_equal.
 now apply rngl_of_nat_sub.
 Qed.
+*)
 
 Theorem signature_comp_fun_changement_of_variable :
   rngl_has_opp = true →
@@ -1778,8 +1788,12 @@ Theorem signature_comp_fun :
   ∀ n f g,
   is_permut_fun f n
   → is_permut_fun g n
-  → ε_fun (comp f g) n = (ε_fun f n * ε_fun g n)%F.
+  → new_ε_fun (comp f g) n = (new_ε_fun f n * new_ε_fun g n)%F.
 Proof.
+intros Hop Hin Hic Hde H10 Hit Hch * Hp1 Hp2.
+unfold new_ε_fun.
+unfold sign_diff.
+...
 intros Hop Hin Hic Hde H10 Hit Hch * Hp1 Hp2.
 rewrite ε_fun_old_ε_fun; try easy.
 rewrite ε_fun_old_ε_fun; try easy.
