@@ -341,6 +341,30 @@ Definition ε_fun f n :=
 
 Definition ε {n} (p : vector n nat) := ε_fun (vect_el p) n.
 
+(* alternative version of signature of a permutation
+   using only signs: ws = with sign *)
+
+Definition sign_diff u v := if v <? u then 1%F else (-1)%F.
+
+Definition ε_fun_ws f n :=
+  (Π (i = 1, n), Π (j = 1, n),
+   if i <? j then sign_diff (f (j - 1)%nat) (f (i - 1)%nat) else 1)%F.
+
+Definition ε_ws {n} (p : vector n nat) := ε_fun_ws (vect_el p) n.
+
+(*
+End a.
+Require Import Zrl.
+Require Import ZArith.
+Compute (list_of_vect (canon_permut 4 1)).
+Compute let n := 4 in map (λ i, (ε_canon_permut Z_ring_like_op n i)) (seq 0 (fact n)).
+Compute let n := 4 in map (λ i, (ε Z_ring_like_op (canon_permut n i))) (seq 0 (fact n)).
+Compute let n := 4 in map (λ i, (ε_ws Z_ring_like_op (canon_permut n i))) (seq 0 (fact n)).
+Compute let n := 5 in map (λ i, (ε_canon_permut Z_ring_like_op n i)) (seq 0 (fact n)).
+Compute let n := 5 in map (λ i, (ε Z_ring_like_op (canon_permut n i))) (seq 0 (fact n)).
+Compute let n := 5 in map (λ i, (ε_ws Z_ring_like_op (canon_permut n i))) (seq 0 (fact n)).
+*)
+
 (* *)
 
 Definition comp {A B C} (f : B → C) (g : A → B) x := f (g x).
@@ -1759,6 +1783,47 @@ destruct (lt_dec _ _) as [H1| H1]; [ | easy ].
 apply Nat.add_0_r.
 Qed.
 
+(* equality of both definitions of ε: ε and ε_ws *)
+
+Theorem rngl_product_product_if : ∀ b e f,
+  (Π (i = b, e), Π (j = b, e), if i <? j then f i j else 1)%F =
+  (Π (i = b, e), Π (j = i + 1, e), f i j)%F.
+Proof.
+intros.
+apply rngl_product_eq_compat.
+intros i Hi.
+rewrite (rngl_product_split i); [ | flia Hi ].
+rewrite all_1_rngl_product_1; [ | easy | ]. 2: {
+  intros j Hj.
+  rewrite if_ltb_lt_dec.
+  destruct (lt_dec i j) as [H| H]; [ flia Hj H | easy ].
+}
+rewrite rngl_mul_1_l.
+apply rngl_product_eq_compat.
+intros j Hj.
+rewrite if_ltb_lt_dec.
+destruct (lt_dec i j) as [H| H]; [ easy | flia Hj H ].
+Qed.
+
+Theorem ε_ws_ε_fun : ∀ σ n, ε_fun σ n = ε_fun_ws σ n.
+Proof.
+intros.
+unfold ε_fun, ε_fun_ws.
+unfold δ.
+rewrite rngl_product_product_if.
+rewrite rngl_product_product_if.
+rewrite rngl_product_product_if.
+...
+
+Theorem ε_ws_ε : ∀ n (p : vector n nat), ε p = ε_ws p.
+Proof.
+intros.
+...
+apply ε_ws_ε_fun.
+...
+
+(* equality of ε (canon_permut) and ε_canon_permut *)
+
 Theorem ε_of_canon_permut_succ :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -1770,6 +1835,7 @@ Theorem ε_of_canon_permut_succ :
 Proof.
 intros Hic Hop Hin * Hkn.
 unfold ε, ε_fun.
+(* use ε_ws *)
 ...
 intros Hic Hop Hin * Hkn.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
