@@ -1916,21 +1916,9 @@ rewrite <- rngl_product_div_distr; try easy. 2: {
 }
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
-(*
-  remember (iter_seq _ _ _ _) as x.
-  erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    rewrite rngl_of_nat_sub; [ easy | easy | flia Hj ].
-  }
-  subst x.
-*)
   rewrite <- rngl_product_div_distr; try easy.
   intros j Hj.
   intros H.
-(*
-  apply eq_rngl_of_nat_0 in H; [ | easy ].
-  flia Hj H.
-*)
   apply rngl_sub_move_0_r in H; [ | easy ].
   apply rngl_of_nat_inj in H; [ | easy ].
   flia Hj H.
