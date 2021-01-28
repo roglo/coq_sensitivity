@@ -393,6 +393,11 @@ Fixpoint ε_canon_permut n k :=
 
 Definition sign_diff u v := if v <? u then 1%F else (-1)%F.
 
+...
+
+(* tain, je comprends pas; cette formule me paraît fausse, mais pourtant, en la
+   testant, ça marche *)
+
 Definition new_ε_fun f n :=
   ((Π (i = 1, n), Π (j = 1, n),
     if i <? j then sign_diff (f (j - 1)%nat) (f (i - 1)%nat) else 1))%F.
