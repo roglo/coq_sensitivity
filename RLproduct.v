@@ -366,9 +366,29 @@ apply in_seq in Hi.
 apply Hnz; flia Hi.
 Qed.
 
+Theorem rngl_product_div_distr :
+  rngl_is_comm = true →
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
+  ∀ b e f g,
+  (∀ i, b ≤ i ≤ e → g i ≠ 0%F)
+  → (Π (i = b, e), (f i / g i))%F =
+    ((Π (i = b, e), f i) / (Π (i = b, e), g i))%F.
+Proof.
+intros Hic Hin H10 Hit * Hg.
+unfold rngl_div.
+rewrite Hin.
+rewrite rngl_product_mul_distr; [ | easy ].
+f_equal; symmetry.
+now apply rngl_inv_product_comm.
+Qed.
+
 End a.
 
 Arguments rngl_product_mul_distr {T}%type {ro rp} _ (g h)%function (b k)%nat.
+Arguments rngl_product_div_distr {T}%type {ro rp} _ _ _ _ (b e)%nat
+  (f g)%function.
 Arguments rngl_product_list_mul_distr {T}%type {ro rp} _ A%type
   (g h)%function l%list.
 Arguments rngl_product_split {T}%type {ro rp} j%nat g%function (b k)%nat.

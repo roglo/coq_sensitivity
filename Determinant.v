@@ -345,6 +345,7 @@ Definition ε {n} (p : vector n nat) := ε_fun (vect_el p) n.
    using only signs: ws = with sign *)
 
 Definition sign_diff u v := if v <? u then 1%F else (-1)%F.
+Definition abs_diff u v := if v <? u then u - v else v - u.
 
 Definition ε_fun_ws f n :=
   (Π (i = 1, n), Π (j = 1, n),
@@ -1277,6 +1278,45 @@ apply IHi.
 now apply Nat.succ_lt_mono in Hij.
 Qed.
 
+Theorem rngl_of_nat_add : ∀ a b,
+  (rngl_of_nat a + rngl_of_nat b)%F = rngl_of_nat (a + b).
+Proof.
+intros.
+induction a; [ apply rngl_add_0_l | ].
+now cbn; rewrite <- rngl_add_assoc; f_equal.
+Qed.
+
+Theorem rngl_of_nat_mul : ∀ a b,
+  (rngl_of_nat a * rngl_of_nat b)%F = rngl_of_nat (a * b).
+Proof.
+intros.
+induction a; [ apply rngl_mul_0_l | cbn ].
+rewrite rngl_mul_add_distr_r.
+rewrite rngl_mul_1_l.
+rewrite IHa.
+apply rngl_of_nat_add.
+Qed.
+
+Theorem rngl_product_rngl_of_nat :
+  ∀ n, (Π (i = 1, n), rngl_of_nat i)%F = rngl_of_nat (fact n).
+Proof.
+intros.
+induction n. {
+  rewrite rngl_product_empty; [ | flia ].
+  symmetry; apply rngl_add_0_r.
+}
+rewrite rngl_product_split_last; [ | flia ].
+rewrite rngl_product_succ_succ.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  now rewrite Nat.sub_succ, Nat.sub_0_r.
+}
+rewrite IHn.
+rewrite Nat_fact_succ.
+rewrite Nat.mul_comm.
+apply rngl_of_nat_mul.
+Qed.
+
 (* ε (σ₁ ° σ₂) = ε σ₁ * ε σ₂ *)
 
 Theorem signature_comp_fun_expand_1 :
@@ -1805,15 +1845,120 @@ rewrite if_ltb_lt_dec.
 destruct (lt_dec i j) as [H| H]; [ easy | flia Hj H ].
 Qed.
 
-Theorem ε_ws_ε_fun : ∀ σ n, ε_fun σ n = ε_fun_ws σ n.
+Theorem rngl_sub_is_mul_sign_abs :
+  rngl_has_opp = true →
+  ∀ a b,
+  (rngl_of_nat a - rngl_of_nat b)%F =
+  (sign_diff a b * rngl_of_nat (abs_diff a b))%F.
 Proof.
-intros.
-unfold ε_fun, ε_fun_ws.
-unfold δ.
+intros Hop *.
+unfold sign_diff, abs_diff.
+do 2 rewrite if_ltb_lt_dec.
+destruct (lt_dec b a) as [Hba| Hba]. {
+  rewrite rngl_mul_1_l.
+  now apply rngl_of_nat_sub.
+} {
+  apply Nat.nlt_ge in Hba.
+  destruct (Nat.eq_dec a b) as [Hab| Hab]. {
+    subst b.
+    rewrite rngl_add_opp_r, Nat.sub_diag; cbn.
+    symmetry.
+    apply rngl_mul_0_r.
+  }
+  rewrite <- rngl_opp_sub_distr; [ | easy ].
+  rewrite rngl_of_nat_sub; [ | easy | flia Hba Hab ].
+  rewrite rngl_mul_opp_l; [ | easy ].
+  now rewrite rngl_mul_1_l.
+}
+Qed.
+
+Theorem ε_ws_ε_fun :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
+  rngl_characteristic = 0 →
+  ∀ σ n, ε_fun σ n = ε_fun_ws σ n.
+Proof.
+intros Hic Hop Hin H10 Hit Hch *.
+specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
+rewrite H10 in rngl_1_neq_0.
+unfold ε_fun, ε_fun_ws, δ.
 rewrite rngl_product_product_if.
 rewrite rngl_product_product_if.
 rewrite rngl_product_product_if.
-Check rngl_div_mul_div.
+rewrite <- rngl_product_div_distr; try easy. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite rngl_of_nat_sub; [ | easy | flia Hj ].
+    easy.
+  }
+  cbn.
+  destruct (Nat.eq_dec i n) as [Hein| Hein]. {
+    subst i.
+    rewrite rngl_product_empty; [ easy | flia ].
+  }
+  rewrite rngl_product_shift; [ | flia Hi Hein ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    replace (i + 1 + j - i) with (S j) by flia.
+    easy.
+  }
+  cbn - [ rngl_of_nat ].
+  erewrite <- rngl_product_succ_succ.
+  replace (S (n - (i + 1))) with (n - i) by flia Hi Hein.
+  rewrite rngl_product_rngl_of_nat.
+  intros H.
+  apply eq_rngl_of_nat_0 in H; [ | easy ].
+  now apply fact_neq_0 in H.
+}
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+(*
+  remember (iter_seq _ _ _ _) as x.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite rngl_of_nat_sub; [ easy | easy | flia Hj ].
+  }
+  subst x.
+*)
+  rewrite <- rngl_product_div_distr; try easy.
+  intros j Hj.
+  intros H.
+(*
+  apply eq_rngl_of_nat_0 in H; [ | easy ].
+  flia Hj H.
+*)
+  apply rngl_sub_move_0_r in H; [ | easy ].
+  apply rngl_of_nat_inj in H; [ | easy ].
+  flia Hj H.
+}
+cbn.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite rngl_sub_is_mul_sign_abs; [ | easy ].
+    rewrite rngl_sub_is_mul_sign_abs; [ | easy ].
+    replace (sign_diff j i) with 1%F. 2: {
+      unfold sign_diff.
+      rewrite if_ltb_lt_dec.
+      destruct (lt_dec i j) as [H| H]; [ easy | flia Hj H ].
+    }
+    rewrite rngl_mul_1_l.
+    replace (rngl_of_nat (abs_diff j i)) with (rngl_of_nat (j - i)). 2: {
+      unfold abs_diff.
+      rewrite if_ltb_lt_dec.
+      destruct (lt_dec i j) as [H| H]; [ easy | flia Hj H ].
+    }
+    easy.
+  }
+  easy.
+}
+cbn.
+(* séparer le sign_diff du reste → deux produits *)
 ...
 
 Theorem ε_ws_ε : ∀ n (p : vector n nat), ε p = ε_ws p.
