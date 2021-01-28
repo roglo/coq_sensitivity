@@ -322,65 +322,6 @@ rewrite <- canon_permut_inv_permut with (n := n) (k := k); [ | easy | easy ].
 now f_equal.
 Qed.
 
-Theorem rngl_of_nat_sub :
-  rngl_has_opp = true →
-  ∀ i j,
-  i < j
-  → (rngl_of_nat j - rngl_of_nat i)%F = rngl_of_nat (j - i).
-Proof.
-intros Hop * Hij.
-revert j Hij.
-induction i; intros; cbn. {
-  rewrite rngl_sub_0_r; f_equal.
-  now destruct j.
-}
-destruct j; [ easy | cbn ].
-rewrite rngl_add_comm.
-rewrite rngl_sub_add_distr; [ | easy ].
-rewrite rngl_add_sub.
-apply IHi.
-now apply Nat.succ_lt_mono in Hij.
-Qed.
-
-Theorem rngl_of_nat_add : ∀ a b,
-  (rngl_of_nat a + rngl_of_nat b)%F = rngl_of_nat (a + b).
-Proof.
-intros.
-induction a; [ apply rngl_add_0_l | ].
-now cbn; rewrite <- rngl_add_assoc; f_equal.
-Qed.
-
-Theorem rngl_of_nat_mul : ∀ a b,
-  (rngl_of_nat a * rngl_of_nat b)%F = rngl_of_nat (a * b).
-Proof.
-intros.
-induction a; [ apply rngl_mul_0_l | cbn ].
-rewrite rngl_mul_add_distr_r.
-rewrite rngl_mul_1_l.
-rewrite IHa.
-apply rngl_of_nat_add.
-Qed.
-
-Theorem rngl_product_rngl_of_nat :
-  ∀ n, (Π (i = 1, n), rngl_of_nat i)%F = rngl_of_nat (fact n).
-Proof.
-intros.
-induction n. {
-  rewrite rngl_product_empty; [ | flia ].
-  symmetry; apply rngl_add_0_r.
-}
-rewrite rngl_product_split_last; [ | flia ].
-rewrite rngl_product_succ_succ.
-erewrite rngl_product_eq_compat. 2: {
-  intros i Hi.
-  now rewrite Nat.sub_succ, Nat.sub_0_r.
-}
-rewrite IHn.
-rewrite Nat_fact_succ.
-rewrite Nat.mul_comm.
-apply rngl_of_nat_mul.
-Qed.
-
 (* signature of the k-th permutation of "canon_permut" above *)
 
 Fixpoint ε_canon_permut n k :=
@@ -389,149 +330,16 @@ Fixpoint ε_canon_permut n k :=
   | S n' => (minus_one_pow (k / fact n') * ε_canon_permut n' (k mod fact n'))%F
   end.
 
-(* new version of signature of a permutation *)
-
-Definition sign_diff u v := if v <? u then 1%F else (-1)%F.
-
-Definition new_ε_fun f n :=
-  (Π (i = 1, n), Π (j = 1, n),
-   if i <? j then sign_diff (f (j - 1)%nat) (f (i - 1)%nat) else 1)%F.
-
-Definition new_ε {n} (p : vector n nat) := new_ε_fun (vect_el p) n.
-
-(* signature of a permutation : wrong!
-
-Definition ε_fun f n :=
-  (Π (i = 1, n), Π (j = 1, n),
-   if i <? j then
-     (rngl_of_nat (f (j - 1)%nat) - rngl_of_nat (f (i - 1)%nat)) /
-     rngl_of_nat (j - i)
-   else 1)%F.
-
-Definition ε {n} (p : vector n nat) := ε_fun (vect_el p) n.
-
-*)
-
-(* old version *)
+(* signature of a permutation *)
 
 Definition δ i j u v := if i <? j then (rngl_of_nat v - rngl_of_nat u)%F else 1%F.
 
-Definition old_ε_fun f n :=
+(* change one day into Π Π (_/_) instead of Π Π _ / Π _ *)
+Definition ε_fun f n :=
   ((Π (i = 1, n), Π (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
    (Π (i = 1, n), Π (j = 1, n), δ i j i j))%F.
 
-Definition old_ε {n} (p : vector n nat) := old_ε_fun (vect_el p) n.
-
-(**)
-
-(*
-End a.
-Require Import Zrl.
-Require Import ZArith.
-Compute (list_of_vect (canon_permut 4 1)).
-Compute let n := 3 in let i := 1 in list_of_vect (canon_permut n i).
-Compute let n := 3 in let i := 1 in new_ε_fun Z_ring_like_op (vect_el (canon_permut n i)) n.
-Compute let n := 3 in let i := 1 in old_ε_fun Z_ring_like_op (vect_el (canon_permut n i)) n.
-Compute let n := 3 in let i := 1 in new_ε Z_ring_like_op (canon_permut n i).
-Compute let n := 3 in let i := 1 in old_ε Z_ring_like_op (canon_permut n i).
-Compute let n := 4 in map (λ i, (ε_canon_permut Z_ring_like_op n i)) (seq 0 (fact n)).
-Compute let n := 4 in map (λ i, (old_ε Z_ring_like_op (canon_permut n i))) (seq 0 (fact n)).
-Compute let n := 4 in map (λ i, (new_ε Z_ring_like_op (canon_permut n i))) (seq 0 (fact n)).
-Compute let n := 5 in map (λ i, (ε_canon_permut Z_ring_like_op n i)) (seq 0 (fact n)).
-Compute let n := 5 in map (λ i, (old_ε Z_ring_like_op (canon_permut n i))) (seq 0 (fact n)).
-Compute let n := 5 in map (λ i, (new_ε Z_ring_like_op (canon_permut n i))) (seq 0 (fact n)).
-*)
-
-(*
-Theorem ε_fun_old_ε_fun :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_has_1_neq_0 = true →
-  rngl_is_integral = true →
-  rngl_characteristic = 0 →
-  ∀ f n, new_ε_fun f n = old_ε_fun f n.
-Proof.
-intros Hic Hop Hin H10 Hit Hch *.
-specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
-rewrite H10 in rngl_1_neq_0.
-unfold new_ε_fun, old_ε_fun.
-unfold rngl_div.
-rewrite Hin.
-rewrite rngl_inv_product_comm; try easy. 2: {
-  intros i Hi.
-  unfold δ.
-  rewrite (rngl_product_split i); [ | flia Hi ].
-  rewrite rngl_product_split_last; [ | easy ].
-  rewrite all_1_rngl_product_1; [ | easy | ]. 2: {
-    intros j Hj.
-    rewrite if_ltb_lt_dec.
-    destruct (lt_dec i (j - 1)) as [H| H]; [ flia Hj H | easy ].
-  }
-  rewrite rngl_mul_1_l.
-  rewrite if_ltb_lt_dec.
-  destruct (lt_dec i i) as [H| H]; [ flia H | clear H ].
-  rewrite rngl_mul_1_l.
-  erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    rewrite if_ltb_lt_dec.
-    destruct (lt_dec i j) as [H| H]; [ | flia Hj H ].
-    rewrite rngl_of_nat_sub; [ | easy | easy ].
-    easy.
-  }
-  cbn.
-  destruct (Nat.eq_dec i n) as [Hein| Hein]. {
-    subst i.
-    rewrite rngl_product_empty; [ easy | flia ].
-  }
-  rewrite rngl_product_shift; [ | flia Hi Hein ].
-  erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    replace (i + 1 + j - i) with (S j) by flia.
-    easy.
-  }
-  cbn - [ rngl_of_nat ].
-  erewrite <- rngl_product_succ_succ.
-  replace (S (n - (i + 1))) with (n - i) by flia Hi Hein.
-  rewrite rngl_product_rngl_of_nat.
-  intros H.
-  apply eq_rngl_of_nat_0 in H; [ | easy ].
-  now apply fact_neq_0 in H.
-}
-rewrite <- rngl_product_mul_distr; [ | easy ].
-apply rngl_product_eq_compat.
-intros i Hi.
-rewrite rngl_inv_product_comm; try easy. 2: {
-  intros j Hj.
-  unfold δ.
-  rewrite if_ltb_lt_dec.
-  destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
-  rewrite rngl_of_nat_sub; [ | easy | easy ].
-  intros H.
-  apply eq_rngl_of_nat_0 in H; [ | easy ].
-  flia Hij H.
-}
-rewrite <- rngl_product_mul_distr; [ | easy ].
-(**)
-unfold δ, sign_diff.
-(* c'est la cata, tout est cassé *)
-...
-apply rngl_product_eq_compat.
-intros j Hj.
-unfold δ.
-unfold sign_diff.
-do 4 rewrite if_ltb_lt_dec.
-destruct (lt_dec i j) as [Hij| Hij]. {
-...
-  unfold rngl_div; rewrite Hin.
-  f_equal; f_equal.
-  symmetry.
-  now apply rngl_of_nat_sub.
-}
-rewrite rngl_inv_1; [ | easy | easy ].
-symmetry; apply rngl_mul_1_l.
-Qed.
-*)
+Definition ε {n} (p : vector n nat) := ε_fun (vect_el p) n.
 
 (* *)
 
@@ -1425,9 +1233,28 @@ apply rngl_product_product_div_eq_1; try easy. {
 now apply product_product_if_permut_div.
 Qed.
 
+Theorem rngl_of_nat_sub :
+  rngl_has_opp = true →
+  ∀ i j,
+  i < j
+  → (rngl_of_nat j - rngl_of_nat i)%F = rngl_of_nat (j - i).
+Proof.
+intros Hop * Hij.
+revert j Hij.
+induction i; intros; cbn. {
+  rewrite rngl_sub_0_r; f_equal.
+  now destruct j.
+}
+destruct j; [ easy | cbn ].
+rewrite rngl_add_comm.
+rewrite rngl_sub_add_distr; [ | easy ].
+rewrite rngl_add_sub.
+apply IHi.
+now apply Nat.succ_lt_mono in Hij.
+Qed.
+
 (* ε (σ₁ ° σ₂) = ε σ₁ * ε σ₂ *)
 
-(*
 Theorem signature_comp_fun_expand_1 :
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -1441,10 +1268,10 @@ Theorem signature_comp_fun_expand_1 :
       Π (i = 1, n), (Π (j = 1, n), δ i j (g (i - 1)%nat) (g (j - 1)%nat)))%F =
     (Π (i = 1, n), (Π (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
       Π (i = 1, n), (Π (j = 1, n), δ i j i j))%F
-  → new_ε_fun (comp f g) n = (new_ε_fun f n * new_ε_fun g n)%F.
+  → ε_fun (comp f g) n = (ε_fun f n * ε_fun g n)%F.
 Proof.
 intros Hop Hin H10 Hit Hch * Hp2 Hs.
-unfold old_ε_fun, comp; cbn - [ "<?" ].
+unfold ε_fun, comp; cbn.
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
 rewrite H10 in rngl_1_neq_0.
 rewrite <- Hs; symmetry.
@@ -1464,9 +1291,7 @@ apply rngl_of_nat_inj in Hij; [ | easy ].
 destruct Hp2 as (Hp21, Hp22).
 apply Hp22 in Hij; [ flia Hi Hj Hlij Hij | flia Hj | flia Hi ].
 Qed.
-*)
 
-(*
 Theorem signature_comp_fun_expand_2_1 :
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -1538,9 +1363,7 @@ cbn - [ "<?" ].
 unfold rngl_div; rewrite Hin.
 easy.
 Qed.
-*)
 
-(*
 Theorem signature_comp_fun_expand_2_2 :
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -1615,7 +1438,6 @@ destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
 f_equal; f_equal.
 now apply rngl_of_nat_sub.
 Qed.
-*)
 
 Theorem signature_comp_fun_changement_of_variable :
   rngl_has_opp = true →
@@ -1786,15 +1608,9 @@ Theorem signature_comp_fun :
   ∀ n f g,
   is_permut_fun f n
   → is_permut_fun g n
-  → new_ε_fun (comp f g) n = (new_ε_fun f n * new_ε_fun g n)%F.
+  → ε_fun (comp f g) n = (ε_fun f n * ε_fun g n)%F.
 Proof.
 intros Hop Hin Hic Hde H10 Hit Hch * Hp1 Hp2.
-unfold new_ε_fun, sign_diff, comp.
-...
-intros Hop Hin Hic Hde H10 Hit Hch * Hp1 Hp2.
-rewrite ε_fun_old_ε_fun; try easy.
-rewrite ε_fun_old_ε_fun; try easy.
-rewrite ε_fun_old_ε_fun; try easy.
 apply signature_comp_fun_expand_1; try easy.
 rewrite signature_comp_fun_expand_2_1; try easy.
 rewrite signature_comp_fun_expand_2_2; try easy.
@@ -1839,14 +1655,19 @@ Proof.
 intros Hin H10 * Hkn.
 unfold ε.
 revert k Hkn.
-induction n; intros; [ apply rngl_product_empty; flia | ].
+induction n; intros. {
+  apply rngl_mul_inv_r; [ easy | cbn ].
+  specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
+  now rewrite H10 in rngl_1_neq_0.
+}
 cbn.
 rewrite <- IHn. 2: {
   apply Nat.mod_upper_bound.
   apply fact_neq_0.
 }
-unfold ε_fun.
+Abort. (*
 ...
+unfold ε_fun.
 unfold rngl_div.
 destruct rngl_has_inv. {
 rewrite rngl_mul_assoc.
