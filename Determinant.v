@@ -2029,6 +2029,7 @@ rewrite rngl_product_div_distr; try easy. 2: {
   apply eq_rngl_of_nat_0 in Hji; [ | easy ].
   flia Hj Hji.
 }
+...
 (* changt de var *)
 rewrite rngl_product_change_var with (g := permut_fun_inv σ n) (h := σ). 2: {
   intros i Hi.
@@ -2079,20 +2080,30 @@ rewrite rngl_product_list_permut with (l2 := seq 0 n); [ | easy | ]. 2: {
 rewrite rngl_product_seq_product; [ | easy ].
 rewrite Nat.add_0_l.
 set (f := λ i, permut_fun_inv σ n i).
+apply eq_rngl_div_1; [ now left | | ]. {
+  intros H.
+  apply (rngl_product_opt_integral Hit H10) in H.
+  destruct H as (i & Hi & H).
+  apply (rngl_product_opt_integral Hit H10) in H.
+  destruct H as (j & Hj & H).
+  apply eq_rngl_of_nat_0 in H; [ | easy ].
+  flia Hj H.
+}
+apply rngl_product_eq_compat.
+intros i Hi.
+unfold iter_seq.
+replace (S (n - 1) - (i + 1)) with (n - (i + 1)) by flia.
+replace (map σ _) with (seq (i + 1) (n - (i + 1))). 2: {
 ...
-erewrite rngl_product_eq_compat. 2: {
-  intros i Hi.
-Check permut_fun_Permutation.
-...
-Search (Π (_ ∈ seq _ _), _)%F.
-
-
-  remember (permut_fun_inv σ n i + 1) as b eqn:Hb.
-...
-  rewrite rngl_product_list_permut with (l2 := seq b (n - b));
-    [ | easy | ]. 2: {
-    apply permut_fun_Permutation.
-  }
+  destruct Hi as (_, Hi).
+  destruct n; [ easy | clear Hnz ].
+  rewrite Nat.sub_succ, Nat.sub_0_r in Hi.
+  replace (S n - (i + 1)) with (n - i) by flia.
+  replace (S n - (f i + 1)) with (n - f i) by flia.
+  subst f.
+  revert i Hi.
+  induction n; intros; [ easy | ].
+  destruct i. {
 ...
 
 Theorem ε_ws_ε : ∀ n (p : vector n nat), ε p = ε_ws p.

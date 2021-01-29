@@ -963,6 +963,15 @@ destruct hi. {
 }
 Qed.
 
+Theorem eq_rngl_div_1 :
+  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+   ∀ a b, b ≠ 0%F → a = b → (a / b = 1)%F.
+Proof.
+intros Hiv * Hbz Hab.
+subst a.
+now apply rngl_mul_inv_r.
+Qed.
+
 End a.
 
 Arguments rngl_add_opp_l {T}%type {ro rp} Hro.
