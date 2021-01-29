@@ -2270,6 +2270,34 @@ f_equal. {
     easy.
   }
   cbn - [ "<?" ].
+  rewrite rngl_product_shift; [ | flia Hnz ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros i (_, Hi).
+    rewrite Nat.add_comm, Nat.add_sub.
+    easy.
+  }
+  cbn - [ "<?" ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros i (_, Hi).
+    replace (if x <? _ then _ else _) with
+      (if x <? σ' i then 1%F
+       else if x <? σ' i + 1 then 1%F
+       else (-1)%F). 2: {
+      do 4 rewrite if_ltb_lt_dec.
+      destruct (lt_dec x (σ' i)) as [H2| H2]. {
+        destruct (lt_dec (σ' i) x) as [H| H]; [ flia H2 H | clear H ].
+        destruct (lt_dec x (σ' i + 1)) as [H3| H3]; [ easy | ].
+        flia H2 H3.
+      } {
+        destruct (lt_dec (σ' i) x) as [H3| H3]; [ | easy ].
+        destruct (lt_dec x (σ' i)) as [H| H]; [ flia H2 H | clear H ].
+        destruct (lt_dec x (σ' i + 1)) as [H4| H4]; [ | easy ].
+        flia H3 H4.
+      }
+    }
+    easy.
+  }
+  cbn - [ "<?" ].
 ...
     replace (if x <? _ then _ else _) with
        (if x <? σ' (i - 1) then 1%F else (-1)%F). 2: {
