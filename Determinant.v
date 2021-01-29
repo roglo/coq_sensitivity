@@ -2029,7 +2029,17 @@ rewrite rngl_product_div_distr; try easy. 2: {
   apply eq_rngl_of_nat_0 in Hji; [ | easy ].
   flia Hj Hji.
 }
-...
+apply eq_rngl_div_1; [ now left | | ]. {
+  intros H.
+  apply (rngl_product_opt_integral Hit H10) in H.
+  destruct H as (i & Hi & H).
+  apply (rngl_product_opt_integral Hit H10) in H.
+  destruct H as (j & Hj & H).
+  apply eq_rngl_of_nat_0 in H; [ | easy ].
+  flia Hj H.
+}
+rewrite <- rngl_product_product_if; symmetry.
+rewrite <- rngl_product_product_if; symmetry.
 (* changt de var *)
 rewrite rngl_product_change_var with (g := permut_fun_inv σ n) (h := σ). 2: {
   intros i Hi.
@@ -2070,30 +2080,40 @@ erewrite rngl_product_list_eq_compat. 2: {
     }
     easy.
   }
-  cbn - [ "-" ].
+  cbn - [ "-" "<?" ].
   easy.
 }
-cbn - [ "-" ].
+cbn - [ "-" "<?" ].
+rewrite Nat.sub_0_r.
 rewrite rngl_product_list_permut with (l2 := seq 0 n); [ | easy | ]. 2: {
   now apply permut_fun_Permutation.
 }
 rewrite rngl_product_seq_product; [ | easy ].
 rewrite Nat.add_0_l.
-set (f := λ i, permut_fun_inv σ n i).
-apply eq_rngl_div_1; [ now left | | ]. {
-  intros H.
-  apply (rngl_product_opt_integral Hit H10) in H.
-  destruct H as (i & Hi & H).
-  apply (rngl_product_opt_integral Hit H10) in H.
-  destruct H as (j & Hj & H).
-  apply eq_rngl_of_nat_0 in H; [ | easy ].
-  flia Hj H.
-}
 apply rngl_product_eq_compat.
 intros i Hi.
 unfold iter_seq.
+rewrite Nat.sub_0_r.
+rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
+rewrite Nat.sub_succ, Nat.sub_0_r.
+...
 replace (S (n - 1) - (i + 1)) with (n - (i + 1)) by flia.
-replace (map σ _) with (seq (i + 1) (n - (i + 1))). 2: {
+symmetry.
+erewrite rngl_product_list_eq_compat. 2: {
+  intros j Hj.
+  replace (j - i) with (abs_diff j i). 2: {
+    unfold abs_diff.
+    apply in_seq in Hj.
+    rewrite if_ltb_lt_dec.
+    destruct (lt_dec i j) as [H| H]; [ easy | ].
+    flia Hj H.
+  }
+  easy.
+}
+cbn.
+apply rngl_product_change_list; [ easy | ].
+symmetry.
+Search (Permutation _ (seq _ _)).
 ...
   destruct Hi as (_, Hi).
   destruct n; [ easy | clear Hnz ].
