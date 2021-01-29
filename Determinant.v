@@ -2240,6 +2240,7 @@ f_equal. {
   remember (vect_el (canon_permut n (k mod fact n))) as σ' eqn:Hσ'.
   specialize (canon_permut_succ_values Hσ Hσ') as H1.
   unfold sign_diff.
+(*
   assert (Hσs : ∀ i, i < n → σ (S i) ≠ σ 0). {
     intros i Hi H.
     specialize canon_permut_is_permut as H2.
@@ -2247,7 +2248,7 @@ f_equal. {
     rewrite Hσ in H.
     apply H2 in H; [ easy | flia Hi | flia ].
   }
-  rewrite H1 in Hσs.
+*)
 (*
   replace (vect_el (canon_permut (S n) k) 0) with (k / fact n) by easy.
 *)
