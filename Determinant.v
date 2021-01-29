@@ -2280,76 +2280,16 @@ f_equal. {
   erewrite rngl_product_eq_compat. 2: {
     intros i (_, Hi).
     replace (if x <? _ then _ else _) with
-      (if x <? σ' i then 1%F
-       else if x <? σ' i + 1 then 1%F
-       else (-1)%F). 2: {
-      do 4 rewrite if_ltb_lt_dec.
-      destruct (lt_dec x (σ' i)) as [H2| H2]. {
-        destruct (lt_dec (σ' i) x) as [H| H]; [ flia H2 H | clear H ].
-        destruct (lt_dec x (σ' i + 1)) as [H3| H3]; [ easy | ].
-        flia H2 H3.
-      } {
-        destruct (lt_dec (σ' i) x) as [H3| H3]; [ | easy ].
-        destruct (lt_dec x (σ' i)) as [H| H]; [ flia H2 H | clear H ].
-        destruct (lt_dec x (σ' i + 1)) as [H4| H4]; [ | easy ].
-        flia H3 H4.
-      }
+      (if x <? σ' i + 1 then 1%F else (-1)%F). 2: {
+      do 3 rewrite if_ltb_lt_dec.
+      destruct (lt_dec (σ' i) x) as [H2| H2]; [ | easy ].
+      destruct (lt_dec x (σ' i)) as [H| H]; [ flia H H2 | clear H ].
+      destruct (lt_dec x (σ' i + 1)) as [H3| H3]; [ | easy ].
+      flia H2 H3.
     }
     easy.
   }
   cbn - [ "<?" ].
-...
-    replace (if x <? _ then _ else _) with
-       (if x <? σ' (i - 1) then 1%F else (-1)%F). 2: {
-      do 3 rewrite if_ltb_lt_dec.
-      remember (σ' (i - 1)) as y eqn:Hy.
-      destruct (lt_dec x y) as [Hxy| Hxy]. {
-        destruct (lt_dec x y) as [H| H]; [ clear H | flia Hxy H ].
-        destruct (lt_dec y x) as [H| H]; [ flia Hxy H | clear H ].
-        destruct (lt_dec x (y + 1)) as [H| H]; [ easy | flia Hxy H ].
-      } {
-(*
-        specialize (Hσs (i - 1)) as H2.
-        assert (H3 : i - 1 < n) by flia Hi.
-        specialize (H2 H3); clear H3.
-        rewrite H1 in H2.
-        rewrite if_ltb_lt_dec in H2.
-        rewrite <- Hy in H2.
-*)
-        destruct (lt_dec y x) as [Hyx| Hyx]. {
-          destruct (lt_dec x y) as [H| H]; [ flia Hxy H | easy ].
-        }
-        destruct (lt_dec x (y + 1)) as [H| H]; [ | flia Hxy Hyx H ].
-...
-
-        apply Nat.nlt_ge in Hxy.
-        apply Nat.nlt_ge in Hyx.
-        replace y with x in Hy by flia Hxy Hyx.
-        replace x with (σ 0) in Hy by now subst x; rewrite H1.
-        destruct i; [ flia Hi | ].
-        rewrite Nat.sub_succ, Nat.sub_0_r in Hy.
-...
-        replace (σ' (i - 1)) with (σ i) in Hy. 2: {
-          rewrite H1.
-          replace i with (S (i - 1)) by flia Hi.
-          destruct i; [ flia Hi | ].
-          rewrite Nat.sub_succ, Nat.sub_0_r.
-          rewrite Nat.sub_succ, Nat.sub_0_r.
-          rewrite Nat.sub_succ, Nat.sub_0_r in Hy.
-          rewrite if_ltb_lt_dec.
-          rewrite <- Hy, H1.
-          destruct (lt_dec x x) as [H2| H2]; [ flia H2 | ].
-...
-        rewrite Hx in Hy.
-        rewrite <- Hx in Hy; symmetry in Hy.
-        rewrite Hx in Hy.
-...
-    rewrite H1.
-...
-unfold ε, ε_fun.
-remember (vect_el (canon_permut (S n) k)) as σ eqn:Hσ.
-remember (vect_el (canon_permut n (k mod fact n))) as σ' eqn:Hσ'.
-rewrite rngl_product_succ_succ.
 ...
 intros Hic Hop Hin * Hkn.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
