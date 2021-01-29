@@ -2010,21 +2010,23 @@ cbn - [ "-" ].
 erewrite rngl_product_shift; [ | flia Hnz ].
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
+  rewrite (Nat.add_comm 1).
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
-    rewrite Nat.add_comm, Nat.add_sub.
+    rewrite Nat.add_sub.
     easy.
   }
   remember (iter_seq _ _ _ _) as x.
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
-    now rewrite Nat.sub_succ.
+    now rewrite Nat.add_1_r, Nat.sub_succ.
   }
   subst x.
   easy.
 }
 cbn.
 ...
+(* changt de var *)
 rewrite rngl_product_change_var with (g := permut_fun_inv σ n) (h := σ). 2: {
   intros i Hi.
   destruct Hp as (Hp1, Hp2).
@@ -2033,7 +2035,6 @@ rewrite rngl_product_change_var with (g := permut_fun_inv σ n) (h := σ). 2: {
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
-...
 erewrite rngl_product_list_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_product_change_var with (g := permut_fun_inv σ n) (h := σ). 2: {
@@ -2054,33 +2055,21 @@ erewrite rngl_product_list_eq_compat. 2: {
       apply Hp1.
       flia Hsk Hi Hnz.
     }
+    apply in_map_iff in Hi.
+    destruct Hi as (l & Hl & Hsl).
+    apply in_seq in Hsl.
+    rewrite fun_permut_fun_inv; [ | easy | ]. 2: {
+      destruct Hp as (Hp1, Hp2).
+      rewrite <- Hl.
+      apply Hp1.
+      easy.
+    }
     easy.
   }
   cbn - [ "-" ].
   easy.
 }
 cbn - [ "-" ].
-...
-
-  rewrite rngl_product_shift; [ | ].
-  destruct (Nat.eq_dec i n) as [Hein| Hein]. {
-    subst i.
-    rewrite rngl_product_empty; [ | flia ].
-
-  rewrite rngl_product_shift; [ | ].
-...
-  rewrite rngl_product_change_var with (g := permut_fun_inv σ n) (h := σ). 2: {
-    intros j Hj.
-    destruct Hp as (Hp1, Hp2).
-    rewrite fun_find_prop; [ easy | easy | ].
-...
-  }
-
-...
-  rewrite rngl_product_mul_distr; [ | easy ].
-  easy.
-}
-cbn.
 ...
 
 Theorem ε_ws_ε : ∀ n (p : vector n nat), ε p = ε_ws p.
