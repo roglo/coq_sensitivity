@@ -1340,8 +1340,7 @@ rewrite H10 in rngl_1_neq_0.
 rewrite <- Hs; symmetry.
 apply rngl_div_mul_div; [ easy | ].
 intros Hij.
-specialize @rngl_product_opt_integral as rngl_product_integral.
-specialize (rngl_product_integral T ro rp Hit H10).
+specialize (rngl_product_opt_integral Hit H10) as rngl_product_integral.
 apply rngl_product_integral in Hij.
 destruct Hij as (i & Hi & Hij).
 apply rngl_product_integral in Hij.
@@ -1380,8 +1379,7 @@ rewrite H10 in rngl_1_neq_0.
 unfold rngl_div; rewrite Hin.
 rewrite rngl_inv_product_comm; [ | easy | easy | easy | easy | ]. 2: {
   intros i Hi Hij.
-  specialize @rngl_product_opt_integral as rngl_product_integral.
-  specialize (rngl_product_integral T ro rp Hit H10).
+  specialize (rngl_product_opt_integral Hit H10) as rngl_product_integral.
   apply rngl_product_integral in Hij.
   destruct Hij as (j & Hj & Hij).
   unfold δ in Hij.
@@ -2024,7 +2022,13 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 cbn.
-...
+rewrite rngl_product_div_distr; try easy. 2: {
+  intros i Hi H.
+  apply (rngl_product_opt_integral Hit H10) in H.
+  destruct H as (j & Hj & Hji).
+  apply eq_rngl_of_nat_0 in Hji; [ | easy ].
+  flia Hj Hji.
+}
 (* changt de var *)
 rewrite rngl_product_change_var with (g := permut_fun_inv σ n) (h := σ). 2: {
   intros i Hi.
@@ -2069,6 +2073,26 @@ erewrite rngl_product_list_eq_compat. 2: {
   easy.
 }
 cbn - [ "-" ].
+rewrite rngl_product_list_permut with (l2 := seq 0 n); [ | easy | ]. 2: {
+  now apply permut_fun_Permutation.
+}
+rewrite rngl_product_seq_product; [ | easy ].
+rewrite Nat.add_0_l.
+set (f := λ i, permut_fun_inv σ n i).
+...
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+Check permut_fun_Permutation.
+...
+Search (Π (_ ∈ seq _ _), _)%F.
+
+
+  remember (permut_fun_inv σ n i + 1) as b eqn:Hb.
+...
+  rewrite rngl_product_list_permut with (l2 := seq b (n - b));
+    [ | easy | ]. 2: {
+    apply permut_fun_Permutation.
+  }
 ...
 
 Theorem ε_ws_ε : ∀ n (p : vector n nat), ε p = ε_ws p.
