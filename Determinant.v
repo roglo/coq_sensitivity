@@ -2290,6 +2290,16 @@ f_equal. {
     easy.
   }
   cbn - [ "<?" ].
+  rewrite rngl_product_change_var with (g := permut_fun_inv σ' n) (h := σ').
+  2: {
+    intros i (_, Hi).
+    apply fun_find_prop; [ | flia Hnz Hi ].
+    enough (H : is_permut_fun σ' n) by apply H.
+    rewrite Hσ'.
+    apply canon_permut_is_permut.
+    apply Nat.mod_upper_bound.
+    apply fact_neq_0.
+  }
 ...
 intros Hic Hop Hin * Hkn.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
