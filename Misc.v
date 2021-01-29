@@ -2330,3 +2330,5 @@ Definition sumbool_and {A B C D : Prop} (P : sumbool A B) (Q : sumbool C D) :=
 
 Notation "a ∨∨ b" := (sumbool_or a b) (at level 85).
 Notation "a ∧∧ b" := (sumbool_and a b) (at level 80).
+
+Arguments iter_list {A B}%type l%list f%function : simpl never.
