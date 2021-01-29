@@ -2290,15 +2290,32 @@ f_equal. {
     easy.
   }
   cbn - [ "<?" ].
-  rewrite rngl_product_change_var with (g := permut_fun_inv σ' n) (h := σ').
-  2: {
-    intros i (_, Hi).
-    apply fun_find_prop; [ | flia Hnz Hi ].
-    enough (H : is_permut_fun σ' n) by apply H.
+  assert (Hp : is_permut_fun σ' n). {
     rewrite Hσ'.
     apply canon_permut_is_permut.
     apply Nat.mod_upper_bound.
     apply fact_neq_0.
+  }
+  rewrite rngl_product_change_var with (g := permut_fun_inv σ' n) (h := σ').
+  2: {
+    intros i (_, Hi).
+    apply fun_find_prop; [ | flia Hnz Hi ].
+    apply Hp.
+  }
+  rewrite Nat.sub_0_r.
+  rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
+  rewrite Nat.sub_succ, Nat.sub_0_r.
+  erewrite rngl_product_list_eq_compat. 2: {
+    intros i Hi.
+    apply in_map_iff in Hi.
+    destruct Hi as (j & Hji & Hj).
+    apply in_seq in Hj.
+    rewrite fun_permut_fun_inv; [ easy | easy | ].
+    now rewrite <- Hji; apply Hp.
+  }
+  cbn - [ "<?" seq ].
+  rewrite rngl_product_change_list with (lb := seq 0 n); [ | easy | ]. 2: {
+    now apply permut_fun_Permutation.
   }
 ...
 intros Hic Hop Hin * Hkn.
