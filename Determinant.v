@@ -2215,6 +2215,8 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 }
 rewrite rngl_product_succ_succ.
 rewrite rngl_product_split_first; [ | flia ].
+rewrite Nat.sub_diag.
+...
 f_equal. {
   rewrite rngl_product_shift; [ | flia ].
   rewrite Nat.sub_succ, Nat.sub_0_r.
