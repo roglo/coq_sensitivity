@@ -1875,12 +1875,13 @@ Theorem ε_ws_ε_fun :
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
   rngl_is_integral = true →
+  rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
   ∀ σ n,
   is_permut_fun σ n
   → ε_fun σ n = ε_fun_ws σ n.
 Proof.
-intros Hic Hop Hin H10 Hit Hch * Hp.
+intros Hic Hop Hin H10 Hit Hde Hch * Hp.
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
 rewrite H10 in rngl_1_neq_0.
 unfold ε_fun, ε_fun_ws, δ.
@@ -1961,7 +1962,6 @@ erewrite rngl_product_eq_compat. 2: {
 cbn.
 rewrite rngl_product_mul_distr; [ | easy ].
 rewrite <- rngl_mul_1_r; f_equal.
-(**)
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
   erewrite rngl_product_eq_compat. 2: {
@@ -1981,15 +1981,6 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n.
   rewrite rngl_product_empty; [ easy | flia ].
 }
-(*
-destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
-  subst n.
-  unfold iter_seq, iter_list; cbn.
-  rewrite rngl_mul_1_l.
-  rewrite rngl_div_1_l; [ | easy ].
-  now apply rngl_inv_1.
-}
-*)
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
   replace n with (S (n - 1)) at 1 2 by flia Hnz.
@@ -2088,49 +2079,67 @@ rewrite Nat.sub_0_r.
 rewrite rngl_product_list_permut with (l2 := seq 0 n); [ | easy | ]. 2: {
   now apply permut_fun_Permutation.
 }
-rewrite rngl_product_seq_product; [ | easy ].
-rewrite Nat.add_0_l.
-apply rngl_product_eq_compat.
-intros i Hi.
-unfold iter_seq.
-rewrite Nat.sub_0_r.
-rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
-rewrite Nat.sub_succ, Nat.sub_0_r.
-...
-replace (S (n - 1) - (i + 1)) with (n - (i + 1)) by flia.
-symmetry.
 erewrite rngl_product_list_eq_compat. 2: {
-  intros j Hj.
-  replace (j - i) with (abs_diff j i). 2: {
-    unfold abs_diff.
-    apply in_seq in Hj.
-    rewrite if_ltb_lt_dec.
-    destruct (lt_dec i j) as [H| H]; [ easy | ].
-    flia Hj H.
+  intros i Hi.
+  rewrite rngl_product_change_list with (lb := seq 0 n); [ | easy | ]. 2: {
+    now apply permut_fun_Permutation.
   }
   easy.
 }
-cbn.
-apply rngl_product_change_list; [ easy | ].
-symmetry.
-Search (Permutation _ (seq _ _)).
-...
-  destruct Hi as (_, Hi).
-  destruct n; [ easy | clear Hnz ].
-  rewrite Nat.sub_succ, Nat.sub_0_r in Hi.
-  replace (S n - (i + 1)) with (n - i) by flia.
-  replace (S n - (f i + 1)) with (n - f i) by flia.
-  subst f.
-  revert i Hi.
-  induction n; intros; [ easy | ].
-  destruct i. {
-...
+cbn - [ "<?" ].
+rewrite product_product_if_permut; try easy; cycle 1. {
+  now apply permut_fun_inv_is_permut.
+} {
+  intros.
+  unfold abs_diff.
+  do 2 rewrite if_ltb_lt_dec.
+  destruct (lt_dec i j) as [Hij| Hij]. {
+    destruct (lt_dec j i) as [Hji| Hji]; [ flia Hij Hji | easy ].
+  } {
+    destruct (lt_dec j i) as [Hji| Hji]; [ easy | ].
+    now replace i with j by flia Hij Hji.
+  }
+} {
+  intros * Hi Hj Hij H.
+  apply eq_rngl_of_nat_0 in H; [ | easy ].
+  unfold abs_diff in H.
+  rewrite if_ltb_lt_dec in H.
+  destruct (lt_dec i j) as [Hlij| Hlij]; flia Hij Hlij H.
+}
+rewrite rngl_product_seq_product; [ | easy ].
+rewrite Nat.add_0_l.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_product_seq_product; [ | easy ].
+  rewrite Nat.add_0_l.
+  easy.
+}
+cbn - [ "<?" ].
+unfold abs_diff.
+apply rngl_product_eq_compat.
+intros i Hi.
+apply rngl_product_eq_compat.
+intros j Hj.
+do 3 rewrite if_ltb_lt_dec.
+now destruct (lt_dec i j).
+Qed.
 
-Theorem ε_ws_ε : ∀ n (p : vector n nat), ε p = ε_ws p.
+Theorem ε_ws_ε :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ n (p : vector n nat),
+  is_permut p
+  → ε p = ε_ws p.
 Proof.
-intros.
-...
-apply ε_ws_ε_fun.
+intros Hic Hop Hin H10 Hit Hde Hch *.
+now apply ε_ws_ε_fun.
+Qed.
+
 ...
 
 (* equality of ε (canon_permut) and ε_canon_permut *)
