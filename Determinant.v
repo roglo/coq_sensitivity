@@ -2216,7 +2216,6 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 rewrite rngl_product_succ_succ.
 rewrite rngl_product_split_first; [ | flia ].
 rewrite Nat.sub_diag.
-...
 f_equal. {
   rewrite rngl_product_shift; [ | flia ].
   rewrite Nat.sub_succ, Nat.sub_0_r.
@@ -2224,7 +2223,6 @@ f_equal. {
     intros i Hi.
     replace (1 <? 1 + i) with (0 <? i) by easy.
     rewrite Nat.add_comm, Nat.add_sub.
-    rewrite Nat.sub_diag.
     easy.
   }
   cbn - [ "<?" canon_permut ].
@@ -2238,6 +2236,86 @@ f_equal. {
     easy.
   }
   cbn - [ canon_permut ].
+  remember (vect_el (canon_permut (S n) k)) as σ eqn:Hσ.
+  remember (vect_el (canon_permut n (k mod fact n))) as σ' eqn:Hσ'.
+  specialize (canon_permut_succ_values Hσ Hσ') as H1.
+  unfold sign_diff.
+  assert (Hσs : ∀ i, i < n → σ (S i) ≠ σ 0). {
+    intros i Hi H.
+    specialize canon_permut_is_permut as H2.
+    specialize (H2 (S n) k Hkn).
+    rewrite Hσ in H.
+    apply H2 in H; [ easy | flia Hi | flia ].
+  }
+  rewrite H1 in Hσs.
+(*
+  replace (vect_el (canon_permut (S n) k) 0) with (k / fact n) by easy.
+*)
+  erewrite rngl_product_eq_compat. 2: {
+    intros i Hi.
+    rewrite H1.
+    replace i with (S (i - 1)) at 1 by flia Hi.
+    easy.
+  }
+  cbn - [ "<?" ].
+  remember (k / fact n) as x eqn:Hx.
+  erewrite rngl_product_eq_compat. 2: {
+    intros i Hi.
+(**)
+    rewrite <- Nat.sub_succ_l; [ | easy ].
+    rewrite Nat.sub_succ, Nat.sub_0_r.
+    rewrite H1.
+    replace i with (S (i - 1)) at 1 by flia Hi.
+    easy.
+  }
+  cbn - [ "<?" ].
+...
+    replace (if x <? _ then _ else _) with
+       (if x <? σ' (i - 1) then 1%F else (-1)%F). 2: {
+      do 3 rewrite if_ltb_lt_dec.
+      remember (σ' (i - 1)) as y eqn:Hy.
+      destruct (lt_dec x y) as [Hxy| Hxy]. {
+        destruct (lt_dec x y) as [H| H]; [ clear H | flia Hxy H ].
+        destruct (lt_dec y x) as [H| H]; [ flia Hxy H | clear H ].
+        destruct (lt_dec x (y + 1)) as [H| H]; [ easy | flia Hxy H ].
+      } {
+(*
+        specialize (Hσs (i - 1)) as H2.
+        assert (H3 : i - 1 < n) by flia Hi.
+        specialize (H2 H3); clear H3.
+        rewrite H1 in H2.
+        rewrite if_ltb_lt_dec in H2.
+        rewrite <- Hy in H2.
+*)
+        destruct (lt_dec y x) as [Hyx| Hyx]. {
+          destruct (lt_dec x y) as [H| H]; [ flia Hxy H | easy ].
+        }
+        destruct (lt_dec x (y + 1)) as [H| H]; [ | flia Hxy Hyx H ].
+...
+
+        apply Nat.nlt_ge in Hxy.
+        apply Nat.nlt_ge in Hyx.
+        replace y with x in Hy by flia Hxy Hyx.
+        replace x with (σ 0) in Hy by now subst x; rewrite H1.
+        destruct i; [ flia Hi | ].
+        rewrite Nat.sub_succ, Nat.sub_0_r in Hy.
+...
+        replace (σ' (i - 1)) with (σ i) in Hy. 2: {
+          rewrite H1.
+          replace i with (S (i - 1)) by flia Hi.
+          destruct i; [ flia Hi | ].
+          rewrite Nat.sub_succ, Nat.sub_0_r.
+          rewrite Nat.sub_succ, Nat.sub_0_r.
+          rewrite Nat.sub_succ, Nat.sub_0_r in Hy.
+          rewrite if_ltb_lt_dec.
+          rewrite <- Hy, H1.
+          destruct (lt_dec x x) as [H2| H2]; [ flia H2 | ].
+...
+        rewrite Hx in Hy.
+        rewrite <- Hx in Hy; symmetry in Hy.
+        rewrite Hx in Hy.
+...
+    rewrite H1.
 ...
 unfold ε, ε_fun.
 remember (vect_el (canon_permut (S n) k)) as σ eqn:Hσ.
