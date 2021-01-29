@@ -334,7 +334,6 @@ Fixpoint ε_canon_permut n k :=
 
 Definition δ i j u v := if i <? j then (rngl_of_nat v - rngl_of_nat u)%F else 1%F.
 
-(* change one day into Π Π (_/_) instead of Π Π _ / Π _ *)
 Definition ε_fun f n :=
   ((Π (i = 1, n), Π (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
    (Π (i = 1, n), Π (j = 1, n), δ i j i j))%F.
