@@ -2140,7 +2140,50 @@ intros Hic Hop Hin H10 Hit Hde Hch *.
 now apply ε_ws_ε_fun.
 Qed.
 
-...
+Theorem vect_el_canon_permut_ub : ∀ n k i,
+  k < fact n
+  → i < n
+  → vect_el (canon_permut n k) i < n.
+Proof.
+intros * Hkn Hin.
+revert k i Hkn Hin.
+induction n; intros; [ easy | cbn ].
+unfold canon_permut_fun.
+destruct i. {
+  rewrite Nat_fact_succ, Nat.mul_comm in Hkn.
+  apply Nat.div_lt_upper_bound; [ | easy ].
+  apply fact_neq_0.
+}
+apply Nat.succ_lt_mono in Hin.
+remember (k / fact n <=? vect_el (canon_permut n (k mod fact n)) i) as b eqn:Hb.
+symmetry in Hb.
+destruct b. {
+  cbn; rewrite Nat.add_1_r.
+  apply -> Nat.succ_lt_mono.
+  apply IHn; [ | easy ].
+  apply Nat.mod_upper_bound, fact_neq_0.
+}
+cbn; rewrite Nat.add_0_r.
+apply Nat.leb_gt in Hb.
+etransitivity; [ apply Hb | ].
+rewrite Nat_fact_succ, Nat.mul_comm in Hkn.
+apply Nat.div_lt_upper_bound; [ | easy ].
+apply fact_neq_0.
+Qed.
+
+Theorem canon_permut_is_permut : ∀ n k,
+  k < fact n
+  → is_permut (canon_permut n k).
+Proof.
+intros * Hkn.
+split. {
+  intros i Hi.
+  now apply vect_el_canon_permut_ub.
+} {
+  intros * Hi Hj Hij.
+  now apply canon_permut_injective in Hij.
+}
+Qed.
 
 (* equality of ε (canon_permut) and ε_canon_permut *)
 
@@ -2148,14 +2191,56 @@ Theorem ε_of_canon_permut_succ :
   rngl_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
   ∀ n k,
   k < fact (S n)
   → ε (canon_permut (S n) k) =
     (minus_one_pow (k / fact n) * ε (canon_permut n (k mod fact n)))%F.
 Proof.
-intros Hic Hop Hin * Hkn.
+intros Hic Hop Hin H10 Hit Hde Hch * Hkn.
+rewrite ε_ws_ε; try easy; [ | now apply canon_permut_is_permut ].
+unfold ε_ws, ε_fun_ws.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  unfold ε, ε_fun.
+  subst n.
+  apply Nat.lt_1_r in Hkn.
+  subst k; cbn.
+  unfold iter_seq, iter_list; cbn.
+  repeat rewrite rngl_mul_1_l.
+  rewrite rngl_div_1_l; [ | easy ].
+  now symmetry; apply rngl_inv_1.
+}
+rewrite rngl_product_succ_succ.
+rewrite rngl_product_split_first; [ | flia ].
+f_equal. {
+  rewrite rngl_product_shift; [ | flia ].
+  rewrite Nat.sub_succ, Nat.sub_0_r.
+  erewrite rngl_product_eq_compat. 2: {
+    intros i Hi.
+    replace (1 <? 1 + i) with (0 <? i) by easy.
+    rewrite Nat.add_comm, Nat.add_sub.
+    rewrite Nat.sub_diag.
+    easy.
+  }
+  cbn - [ "<?" canon_permut ].
+  rewrite rngl_product_split_first; [ | flia ].
+  replace (0 <? 0) with false by easy.
+  rewrite rngl_mul_1_l.
+  erewrite rngl_product_eq_compat. 2: {
+    intros i Hi.
+    rewrite if_ltb_lt_dec.
+    destruct (lt_dec 0 i) as [H| H]; [ clear H | flia Hi H ].
+    easy.
+  }
+  cbn - [ canon_permut ].
+...
 unfold ε, ε_fun.
-(* use ε_ws *)
+remember (vect_el (canon_permut (S n) k)) as σ eqn:Hσ.
+remember (vect_el (canon_permut n (k mod fact n))) as σ' eqn:Hσ'.
+rewrite rngl_product_succ_succ.
 ...
 intros Hic Hop Hin * Hkn.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
@@ -3051,38 +3136,7 @@ rewrite seq_nth; [ | easy ].
 now rewrite Nat.add_0_l.
 Qed.
 
-(* perhaps rather prove is_permut (canon_permut n k) and
-   use vect_el_permut_ub *)
-Theorem vect_el_canon_permut_ub : ∀ n k i,
-  k < fact n
-  → i < n
-  → vect_el (canon_permut n k) i < n.
-Proof.
-intros * Hkn Hin.
-revert k i Hkn Hin.
-induction n; intros; [ easy | cbn ].
-unfold canon_permut_fun.
-destruct i. {
-  rewrite Nat_fact_succ, Nat.mul_comm in Hkn.
-  apply Nat.div_lt_upper_bound; [ | easy ].
-  apply fact_neq_0.
-}
-apply Nat.succ_lt_mono in Hin.
-remember (k / fact n <=? vect_el (canon_permut n (k mod fact n)) i) as b eqn:Hb.
-symmetry in Hb.
-destruct b. {
-  cbn; rewrite Nat.add_1_r.
-  apply -> Nat.succ_lt_mono.
-  apply IHn; [ | easy ].
-  apply Nat.mod_upper_bound, fact_neq_0.
-}
-cbn; rewrite Nat.add_0_r.
-apply Nat.leb_gt in Hb.
-etransitivity; [ apply Hb | ].
-rewrite Nat_fact_succ, Nat.mul_comm in Hkn.
-apply Nat.div_lt_upper_bound; [ | easy ].
-apply fact_neq_0.
-Qed.
+...
 
 Theorem swap_nat_swap_nat : ∀ n p q j k,
   p < q < n

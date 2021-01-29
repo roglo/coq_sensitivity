@@ -400,3 +400,4 @@ Arguments rngl_product_mul_distr {T}%type {ro rp} _ (g h)%function (b k)%nat.
 Arguments rngl_product_split {T}%type {ro rp} j%nat g%function (b k)%nat.
 Arguments rngl_product_succ_succ {T}%type {ro} (b k)%nat g%function.
 Arguments rngl_product_opt_integral {T}%type {ro rp} _ _ (b e)%nat f%function.
+Arguments rngl_product_split_first {T}%type {ro rp} (b k)%nat g%function.
