@@ -3070,8 +3070,7 @@ Theorem det_is_det_by_any_permut :
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hl.
 rewrite det_is_det_by_canon_permut; try easy.
-...
-rewrite determinant'_by_list.
+rewrite determinant'_by_list; try easy.
 apply rngl_summation_permut; [ now symmetry | | ]. {
   unfold determinant'_list.
   now rewrite map_length, seq_length.
@@ -3132,8 +3131,6 @@ rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
 now rewrite Nat.add_0_l.
 Qed.
-
-...
 
 Theorem swap_nat_swap_nat : ∀ n p q j k,
   p < q < n
@@ -3351,17 +3348,22 @@ Definition mat_swap_rows n i1 i2 (M : matrix n n T) :=
 
 Theorem glop :
   rngl_is_comm = true →
-  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_integral = true →
   rngl_has_1_neq_0 = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
   ∀ n (M : matrix n n T) p q,
   p ≠ q
   → p < n
   → q < n
   → determinant (mat_swap_rows p q M) = (- determinant M)%F.
 Proof.
-intros Hic Hiv H10 * Hpq Hp Hq.
-rewrite det_is_det_by_canon_permut; [ | easy ].
+intros Hic Hop Hin Hit H10 Hde Hch * Hpq Hp Hq.
+rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
+...
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
 ...
