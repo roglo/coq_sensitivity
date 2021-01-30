@@ -3057,14 +3057,20 @@ induction Hl; intros; [ easy | | | ]. {
 Qed.
 
 Theorem det_is_det_by_any_permut :
-  rngl_is_comm = true
-  → ∀ n (M : matrix n n T) l,
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_integral = true →
+  rngl_has_1_neq_0 = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ n (M : matrix n n T) l,
   Permutation l (determinant'_list M)
   → determinant M = (Σ (k = 0, fact n - 1), nth k l 0)%F.
 Proof.
-intros Hic * Hl.
+intros Hic Hop Hin Hit H10 Hde Hch * Hl.
+rewrite det_is_det_by_canon_permut; try easy.
 ...
-rewrite det_is_det_by_canon_permut; [ | easy ].
 rewrite determinant'_by_list.
 apply rngl_summation_permut; [ now symmetry | | ]. {
   unfold determinant'_list.
