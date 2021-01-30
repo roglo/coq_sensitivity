@@ -3619,6 +3619,27 @@ rewrite Nat.add_0_l.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   remember (ε (canon_permut n (g k))) as x eqn:Hx.
+  unfold g in Hx.
+  specialize signature_comp as H1.
+  specialize (H1 Hop Hin Hic Hde H10 Hit Hch n).
+  specialize signature_comp_fun as H2.
+  specialize (H2 Hop Hin Hic Hde H10 Hit Hch n).
+  specialize (H1 (canon_permut n k)).
+  specialize (H1 (permut_swap p q (canon_permut n k))).
+  unfold "°" in H1.
+  unfold comp in H1; cbn in H1.
+(* chais pas *)
+...
+  unfold ε in H1; cbn in H1.
+  unfold comp in H1; cbn in H1.
+cbn in H1.
+  cbn in H1.
+...
+Check @ε.
+  specialize
+    (H2 (λ k, canon_permut n (nat_of_canon_permut (permut_swap p q k)))).
+  remember (ε (canon_permut n (g k))) as x eqn:Hx.
+Search ε.
 (**)
   unfold ε, ε_fun in Hx.
   unfold g in Hx.
