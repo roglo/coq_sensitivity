@@ -2380,6 +2380,21 @@ rewrite ε_ws_ε; try easy. 2: {
   apply fact_neq_0.
 }
 unfold ε_ws, ε_fun_ws.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_product_succ_succ.
+  rewrite rngl_product_split_first; [ | flia ].
+  rewrite if_ltb_lt_dec.
+  destruct (lt_dec (S i) 1) as [H| H]; [ flia H | clear H ].
+  rewrite rngl_mul_1_l.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    replace (S i <? S j) with (i <? j) by easy.
+    now do 2 rewrite Nat.sub_succ, Nat.sub_0_r.
+  }
+  easy.
+}
+cbn - [ canon_permut "<?" ].
 ...
 intros Hic Hop Hin * Hkn.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
