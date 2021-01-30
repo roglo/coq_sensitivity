@@ -3378,6 +3378,32 @@ destruct (Nat.eq_dec i q) as [H| H]; [ easy | clear H ].
 easy.
 Qed.
 
+Theorem swap_nat_is_permut_fun : ∀ p q n,
+  p < n → q < n → is_permut_fun (swap_nat p q) n.
+Proof.
+intros * Hp Hq.
+split. {
+  intros i Hi.
+  unfold swap_nat.
+  destruct (Nat.eq_dec i p) as [Hip| Hip]; [ easy | ].
+  now destruct (Nat.eq_dec i q).
+} {
+  intros i j Hi Hj Hs.
+  unfold swap_nat in Hs.
+  destruct (Nat.eq_dec i p) as [Hip| Hip]. {
+    destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ congruence | ].
+    destruct (Nat.eq_dec j q) as [Hjq| Hjq]; congruence.
+  }
+  destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
+    destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ congruence | ].
+    destruct (Nat.eq_dec j q) as [Hjq| Hjq]; congruence.
+  }
+  destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ easy | ].
+  destruct (Nat.eq_dec j q) as [Hjq| Hjq]; [ easy | ].
+  easy.
+}
+Qed.
+
 Notation "n !" := (fact n) (at level 1, format "n !").
 
 Theorem determinant_swap_rows_is_neg :
@@ -3427,6 +3453,9 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ mat_swap_rows ].
+Search swap_nat.
+...
+(* ah bin non... *)
 rewrite rngl_summation_change_var with
   (g := swap_nat p q) (h := swap_nat p q). 2: {
   intros i j.
@@ -3438,7 +3467,9 @@ rewrite <- Nat.sub_succ_l. 2: {
   apply fact_neq_0.
 }
 rewrite Nat.sub_succ, Nat.sub_0_r.
-Check mat_el.
+rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
+  apply permut_fun_Permutation.
+  apply swap_nat_is_permut_fun.
 ...
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
@@ -3458,7 +3489,6 @@ Search ε_ws.
 cbn - [ mat_swap_rows ].
 Search ε_ws.
 Check det_is_det_by_any_permut.
-(* me rappelle plus comment il fallait faire *)
 ...
 
 (* If we add a row (column) of A multiplied by a scalar k to another
