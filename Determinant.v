@@ -3460,12 +3460,15 @@ erewrite rngl_summation_eq_compat. 2: {
   flia Hk Hnz.
 }
 cbn - [ mat_swap_rows ].
-...
-
-Search ε_ws.
-Search swap_nat.
-Print canon_permut.
-Print canon_permut_fun.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  rewrite rngl_product_list_permut with (l2 := seq 0 n); [ | easy | ]. 2: {
+    apply permut_fun_Permutation.
+    now apply swap_nat_is_permut_fun.
+  }
+  easy.
+}
+cbn - [ mat_swap_rows ].
 ...
 (* ah bin non... *)
 rewrite rngl_summation_change_var with
