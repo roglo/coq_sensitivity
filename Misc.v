@@ -10,6 +10,7 @@ Arguments length {A}.
 (* "fast" lia, to improve compilation speed *)
 Tactic Notation "flia" hyp_list(Hs) := clear - Hs; lia.
 
+Notation "n !" := (fact n) (at level 1, format "n !").
 Notation "x '∈' l" := (List.In x l) (at level 70).
 Notation "x '∉' l" := (¬ List.In x l) (at level 70).
 

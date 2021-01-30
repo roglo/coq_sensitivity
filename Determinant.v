@@ -3404,8 +3404,6 @@ split. {
 }
 Qed.
 
-Notation "n !" := (fact n) (at level 1, format "n !").
-
 Theorem determinant_swap_rows_is_neg :
   rngl_is_comm = true →
   rngl_has_opp = true →
