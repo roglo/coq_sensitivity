@@ -380,6 +380,21 @@ Fixpoint permut_fun_inv f i j :=
   | S i' => if Nat.eq_dec (f i') j then i' else permut_fun_inv f i' j
   end.
 
+Theorem rngl_summation_change_var : ∀ A b e f g (h : _ → A),
+  (∀ i, b ≤ i ≤ e → g (h i) = i)
+  → (Σ (i = b, e), f i = Σ (i ∈ map h (seq b (S e - b))), f (g i))%F.
+Proof.
+intros * Hgh.
+unfold iter_seq, iter_list.
+rewrite List_fold_left_map.
+apply List_fold_left_ext_in.
+intros i c Hi.
+f_equal; f_equal; symmetry.
+apply Hgh.
+apply in_seq in Hi.
+flia Hi.
+Qed.
+
 Theorem rngl_product_change_var : ∀ A b e f g (h : _ → A),
   (∀ i, b ≤ i ≤ e → g (h i) = i)
   → (Π (i = b, e), f i = Π (i ∈ map h (seq b (S e - b))), f (g i))%F.
@@ -3346,7 +3361,26 @@ Definition mat_swap_rows n i1 i2 (M : matrix n n T) :=
      else if Nat.eq_dec i i2 then mat_el M i1 j
      else mat_el M i j).
 
-Theorem glop :
+Theorem swap_nat_involutive : ∀ p q i,
+  swap_nat p q (swap_nat p q i) = i.
+Proof.
+intros.
+unfold swap_nat.
+destruct (Nat.eq_dec i p) as [Hip| Hip]. {
+  destruct (Nat.eq_dec q p) as [Hqp| Hqp]; [ congruence | ].
+  destruct (Nat.eq_dec q q) as [H| H]; [ congruence | easy ].
+}
+destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
+  destruct (Nat.eq_dec p p) as [H| H]; [ congruence | easy ].
+}
+destruct (Nat.eq_dec i p) as [H| H]; [ easy | clear H ].
+destruct (Nat.eq_dec i q) as [H| H]; [ easy | clear H ].
+easy.
+Qed.
+
+Notation "n !" := (fact n) (at level 1, format "n !").
+
+Theorem determinant_swap_rows_is_neg :
   rngl_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -3370,6 +3404,59 @@ erewrite rngl_summation_eq_compat. 2: {
   flia Hk Hnz.
 }
 cbn - [ mat_swap_rows ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  rewrite rngl_product_shift; [ | flia Hp ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros i Hi.
+    now rewrite Nat.add_comm, Nat.add_sub.
+  }
+  easy.
+}
+cbn - [ mat_swap_rows ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  rewrite rngl_product_change_var with
+    (g := swap_nat p q) (h := swap_nat p q). 2: {
+    intros i Hi.
+    apply swap_nat_involutive.
+  }
+  rewrite Nat.sub_0_r.
+  rewrite <- Nat.sub_succ_l; [ | flia Hp ].
+  rewrite Nat.sub_succ, Nat.sub_0_r.
+  easy.
+}
+cbn - [ mat_swap_rows ].
+rewrite rngl_summation_change_var with
+  (g := swap_nat p q) (h := swap_nat p q). 2: {
+  intros i j.
+  apply swap_nat_involutive.
+}
+rewrite Nat.sub_0_r.
+rewrite <- Nat.sub_succ_l. 2: {
+  apply Nat.neq_0_lt_0.
+  apply fact_neq_0.
+}
+rewrite Nat.sub_succ, Nat.sub_0_r.
+Check mat_el.
+...
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  rewrite <- ε_of_canon_permut_ε; try easy.
+  specialize (fact_neq_0 n) as Hnz.
+  flia Hk Hnz.
+}
+cbn - [ mat_swap_rows ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+Search ε_ws.
+
+  rewrite <- ε_of_canon_permut_ε; try easy.
+  specialize (fact_neq_0 n) as Hnz.
+  flia Hk Hnz.
+}
+cbn - [ mat_swap_rows ].
+Search ε_ws.
 Check det_is_det_by_any_permut.
 (* me rappelle plus comment il fallait faire *)
 ...
