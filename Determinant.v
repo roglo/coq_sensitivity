@@ -2752,12 +2752,11 @@ intros; destruct b; cbn; flia.
 Qed.
 
 Theorem vect_el_nat_of_canon_permut_ub : ∀ n (v : vector (S n) nat) i,
-  (∀ i, i < S n → vect_el v i < S n)
-  → (∀ i j, i < S n → j < S n → i ≠ j → vect_el v i ≠ vect_el v j)
+  is_permut v
   → i < n
   → vect_el (nat_of_canon_permut_sub_vect v n) i < n.
 Proof.
-intros * Hvn Hn Hin.
+intros * (Hvn, Hn) Hin.
 destruct n; [ easy | ].
 cbn - [ "<?" ].
 remember (vect_el v 0 <? vect_el v (S i)) as b eqn:Hb.
@@ -2784,6 +2783,7 @@ Theorem vect_el_nat_of_canon_permut_diff : ∀ n (v : vector (S n) nat) i j,
     vect_el (nat_of_canon_permut_sub_vect v n) j.
 Proof.
 intros * Hvn Hn Hin Hjn Hij.
+...
 destruct n; [ easy | ].
 cbn - [ "<?" ].
 remember (vect_el v 0 <? vect_el v (S i)) as bi eqn:Hbi.
@@ -2826,11 +2826,10 @@ destruct bi; cbn. {
 Qed.
 
 Theorem nat_of_canon_permut_upper_bound : ∀ n (v : vector n nat),
-  (∀ i, i < n → vect_el v i < n)
-  → (∀ i j, i < n → j < n → i ≠ j → vect_el v i ≠ vect_el v j)
+  is_permut v
   → nat_of_canon_permut v < fact n.
 Proof.
-intros * Hvn Hn.
+intros * (Hvn, Hn).
 revert v Hvn Hn.
 induction n; intros; [ cbn; flia | ].
 cbn.
@@ -2841,6 +2840,7 @@ apply Nat.add_lt_le_mono. {
     now apply vect_el_nat_of_canon_permut_ub.
   } {
     intros i j Hi Hj.
+...
     now apply vect_el_nat_of_canon_permut_diff.
   }
 }
@@ -2895,6 +2895,103 @@ destruct b; [ | easy ].
 apply Nat.leb_le in Hb.
 flia Hb Hc.
 Qed.
+
+Theorem permut_nat_of_canon_permut : ∀ n v,
+  is_permut v
+  → canon_permut n (nat_of_canon_permut v) = v.
+Proof.
+intros * (Hvn, Hn).
+revert v Hvn Hn.
+induction n; intros; [ now apply vector_eq | ].
+apply vector_eq.
+intros j Hj; cbn.
+destruct j. {
+  cbn; clear Hj.
+  rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
+  rewrite <- Nat.add_0_r; f_equal.
+  apply Nat.div_small.
+  apply nat_of_canon_permut_upper_bound. {
+    intros i Hi.
+    apply vect_el_nat_of_canon_permut_ub.
+easy.
+...
+  } {
+    intros i j Hi Hj.
+    now apply vect_el_nat_of_canon_permut_diff.
+  }
+}
+cbn.
+remember (nat_of_canon_permut (nat_of_canon_permut_sub_vect v n)) as k eqn:Hk.
+symmetry in Hk.
+rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
+rewrite Nat_mod_add_l_mul_r; [ | apply fact_neq_0 ].
+assert (Hkn : k < fact n). {
+  rewrite <- Hk.
+  apply nat_of_canon_permut_upper_bound. {
+    intros i Hi.
+    now apply vect_el_nat_of_canon_permut_ub.
+  } {
+    intros i m Hi Hm.
+    now apply vect_el_nat_of_canon_permut_diff.
+  }
+}
+rewrite Nat.div_small; [ | easy ].
+rewrite Nat.mod_small; [ | easy ].
+rewrite Nat.add_0_r.
+remember (vect_el v 0 <=? vect_el (canon_permut n k) j) as b eqn:Hb.
+symmetry in Hb.
+assert (H1 : ∀ i, i < n → vect_el (nat_of_canon_permut_sub_vect v n) i < n). {
+  intros i Hi.
+  now apply vect_el_nat_of_canon_permut_ub.
+}
+assert
+(H2 : ∀ i j : nat,
+    i < n
+    → j < n
+    → i ≠ j
+    → vect_el (nat_of_canon_permut_sub_vect v n) i ≠
+      vect_el (nat_of_canon_permut_sub_vect v n) j). {
+  intros i m Hi Hm Him.
+  now apply vect_el_nat_of_canon_permut_diff.
+}
+destruct b. {
+  apply Nat.leb_le in Hb; cbn.
+  rewrite <- Hk in Hb |-*.
+  rewrite IHn in Hb |-*; [ | easy | easy | easy | easy ].
+  cbn - [ "<?" ] in Hb |-*.
+  remember (vect_el v 0 <? vect_el v (S j)) as b1 eqn:Hb1.
+  symmetry in Hb1.
+  destruct b1. {
+    apply Nat.ltb_lt in Hb1; cbn.
+    apply Nat.sub_add; flia Hb1.
+  } {
+    apply Nat.ltb_ge in Hb1; exfalso.
+    cbn in Hb.
+    rewrite Nat.sub_0_r in Hb.
+    apply (Hn 0 (S j) (Nat.lt_0_succ _) Hj); [ easy | ].
+    now apply Nat.le_antisymm.
+  }
+} {
+  apply Nat.leb_gt in Hb; cbn.
+  rewrite Nat.add_0_r.
+  rewrite <- Hk in Hb |-*.
+  remember (vect_el v 0 <? vect_el v (S j)) as b1 eqn:Hb1.
+  symmetry in Hb1.
+  destruct b1. {
+    rewrite IHn in Hb; [ | easy | easy ].
+    cbn - [ "<?" ] in Hb.
+    rewrite Hb1 in Hb; cbn in Hb.
+    apply Nat.ltb_lt in Hb1.
+    flia Hb1 Hb.
+  } {
+    rewrite IHn; [ | easy | easy ].
+    cbn - [ "<?" ].
+    rewrite Hb1; cbn.
+    apply Nat.sub_0_r.
+  }
+}
+Qed.
+...
 
 Theorem permut_nat_of_canon_permut : ∀ n v,
   (∀ i, i < n → vect_el v i < n)
@@ -3119,8 +3216,16 @@ Definition canon_permut_swap_last (p q : nat) n k :=
 
 (* *)
 
+Definition permut_fun_swap (p q : nat) (σ : nat → nat) :=
+  λ i, σ (swap_nat p q i).
+
 Definition permut_swap {n} (p q : nat) (σ : vector n nat) :=
+  mk_vect n (permut_fun_swap p q (vect_el σ)).
+
+(*
+Definition permut_swap' {n} (p q : nat) (σ : vector n nat) :=
   vect_swap_elem σ p q.
+*)
 
 (* yet another definition of determinant *)
 
@@ -3152,6 +3257,7 @@ rewrite seq_nth; [ | easy ].
 now rewrite Nat.add_0_l.
 Qed.
 
+(* perhaps should use swap_nat_injective, below *)
 Theorem swap_nat_swap_nat : ∀ n p q j k,
   p < q < n
   → j < n
@@ -3383,6 +3489,15 @@ destruct (Nat.eq_dec i q) as [H| H]; [ easy | clear H ].
 easy.
 Qed.
 
+Theorem swap_nat_injective : ∀ p q i j,
+  swap_nat p q i = swap_nat p q j
+  → i = j.
+Proof.
+intros * Hpq.
+apply (f_equal (swap_nat p q)) in Hpq.
+now do 2 rewrite swap_nat_involutive in Hpq.
+Qed.
+
 Theorem permut_swap_involutive : ∀ n p q (σ : vector n nat),
   permut_swap p q (permut_swap p q σ) = σ.
 Proof.
@@ -3391,6 +3506,7 @@ unfold permut_swap.
 unfold vect_swap_elem; cbn.
 apply vector_eq.
 intros i Hi; cbn.
+unfold permut_fun_swap.
 now rewrite swap_nat_involutive.
 Qed.
 
@@ -3420,23 +3536,59 @@ split. {
 }
 Qed.
 
+Theorem permut_swap_fun_is_permut : ∀ p q σ n,
+  p < n
+  → q < n
+  → is_permut_fun σ n
+  → is_permut_fun (permut_fun_swap p q σ) n.
+Proof.
+intros * Hp Hq Hσ.
+unfold permut_fun_swap.
+split. {
+  intros i Hi.
+  unfold swap_nat.
+  destruct (Nat.eq_dec i p) as [Hip| Hip]; [ now apply Hσ | ].
+  destruct (Nat.eq_dec i q) as [Hiq| Hiq]; [ now apply Hσ | ].
+  now apply Hσ.
+} {
+  intros i j Hi Hj Hs.
+  unfold swap_nat in Hs.
+  destruct (Nat.eq_dec i p) as [Hip| Hip]. {
+    destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ congruence | ].
+    destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
+      apply Hσ in Hs; [ congruence | easy | easy ].
+    } {
+      apply Hσ in Hs; [ congruence | easy | easy ].
+    }
+  }
+  destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
+    destruct (Nat.eq_dec j p) as [Hjp| Hjp]. {
+      apply Hσ in Hs; [ congruence | easy | easy ].
+    }
+    destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
+      apply Hσ in Hs; [ congruence | easy | easy ].
+    }
+    apply Hσ in Hs; [ congruence | easy | easy ].
+  }
+  destruct (Nat.eq_dec j p) as [Hjp| Hjp]. {
+    apply Hσ in Hs; [ congruence | easy | easy ].
+  }
+  destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
+    apply Hσ in Hs; [ congruence | easy | easy ].
+  }
+  apply Hσ in Hs; [ congruence | easy | easy ].
+}
+Qed.
+
 Theorem permut_swap_is_permut : ∀ n p q (σ : vector n nat),
-  is_permut σ
+  p < n
+  → q < n
+  → is_permut σ
   → is_permut (permut_swap p q σ).
 Proof.
-intros * Hp.
-unfold is_permut.
-unfold permut_swap; cbn.
-unfold is_permut in Hp.
-...
-unfold permut_swap.
-split. {
-  intros i Hi; cbn.
-
-
-unfold vect_swap_elem.
-cbn.
-...
+intros * Hp Hq Hσ.
+now apply permut_swap_fun_is_permut.
+Qed.
 
 Theorem determinant_swap_rows_is_neg :
   rngl_is_comm = true →
@@ -3508,9 +3660,86 @@ rewrite rngl_summation_change_var with (g := g) (h := g). 2: {
   rewrite permut_nat_of_canon_permut; cycle 1. {
     intros i Hi.
     apply vect_el_permut_ub; [ | easy ].
-Search permut_swap.
+    apply permut_swap_is_permut; [ easy | easy | ].
+    apply canon_permut_is_permut.
+    specialize (fact_neq_0 n) as Hn.
+    flia Hk Hn.
+  } {
+    intros * Hi Hj Hij H.
+    apply canon_permut_injective in H; cycle 1. {
+      specialize (fact_neq_0 n) as Hn.
+      flia Hk Hn.
+    } {
+      now apply swap_nat_lt.
+    } {
+      now apply swap_nat_lt.
+    }
+    now apply swap_nat_injective in H.
+  }
+  rewrite permut_swap_involutive.
+  apply nat_of_canon_permut_permut.
+  specialize (fact_neq_0 n) as Hn.
+  flia Hk Hn.
+}
+rewrite Nat.sub_0_r.
+rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
+rewrite Nat.sub_succ, Nat.sub_0_r.
+erewrite rngl_summation_list_permut; [ | easy | ]. 2: {
+  apply permut_fun_Permutation.
+  subst g; cbn.
+  split. {
+    intros k Hk.
+    apply nat_of_canon_permut_upper_bound. {
+      intros i Hi.
+      apply vect_el_permut_ub; [ | easy ].
+      apply permut_swap_is_permut; [ easy | easy | ].
+      apply canon_permut_is_permut.
+      specialize (fact_neq_0 n) as Hn.
+      flia Hk Hn.
+    } {
+      intros * Hi Hj Hij H.
+      apply canon_permut_injective in H; cycle 1. {
+        specialize (fact_neq_0 n) as Hn.
+        flia Hk Hn.
+      } {
+        now apply swap_nat_lt.
+      } {
+        now apply swap_nat_lt.
+      }
+      now apply swap_nat_injective in H.
+    }
+  } {
+    intros * Hi Hj H.
+    apply (f_equal (canon_permut n)) in H.
+Check permut_nat_of_canon_permut.
 ...
-    apply permut_swap_is_permut.
+    rewrite permut_nat_of_canon_permut in H.
+...
+Search (canon_permut _ _ = canon_permut _ _).
+
+    apply canon_permut_injective in H; cycle 1. {
+      specialize (fact_neq_0 n) as Hn.
+      flia Hk Hn.
+    } {
+      now apply swap_nat_lt.
+    } {
+      now apply swap_nat_lt.
+    }
+    now apply swap_nat_injective in H.
+  }
+  rewrite permut_swap_involutive.
+  apply nat_of_canon_permut_permut.
+  specialize (fact_neq_0 n) as Hn.
+  flia Hk Hn.
+
+    rewrite permut_swap_involutive.
+    apply nat_of_canon_permut_permut.
+    specialize (fact_neq_0 n) as Hn.
+    flia Hk Hn.
+...
+Search (vect_el _ _ < _).
+...
+Search (vect_el _ _ = vect_el _ _).
 ...
   rewrite permut_swap_involutive.
   apply nat_of_canon_permut_permut.
