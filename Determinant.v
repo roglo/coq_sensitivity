@@ -3117,6 +3117,11 @@ Definition canon_permut_nth_of_swap_with_0 (p n k : nat) :=
 Definition canon_permut_swap_last (p q : nat) n k :=
   vect_swap_elem (vect_swap_elem (canon_permut n k) p (n - 2)) q (n - 1).
 
+(* *)
+
+Definition permut_swap {n} (p q : nat) (σ : vector n nat) :=
+  vect_swap_elem σ p q.
+
 (* yet another definition of determinant *)
 
 Definition determinant'' p q n (M : matrix n n T) :=
@@ -3378,6 +3383,17 @@ destruct (Nat.eq_dec i q) as [H| H]; [ easy | clear H ].
 easy.
 Qed.
 
+Theorem permut_swap_involutive : ∀ n p q (σ : vector n nat),
+  permut_swap p q (permut_swap p q σ) = σ.
+Proof.
+intros.
+unfold permut_swap.
+unfold vect_swap_elem; cbn.
+apply vector_eq.
+intros i Hi; cbn.
+now rewrite swap_nat_involutive.
+Qed.
+
 Theorem swap_nat_is_permut_fun : ∀ p q n,
   p < n → q < n → is_permut_fun (swap_nat p q) n.
 Proof.
@@ -3403,6 +3419,24 @@ split. {
   easy.
 }
 Qed.
+
+Theorem permut_swap_is_permut : ∀ n p q (σ : vector n nat),
+  is_permut σ
+  → is_permut (permut_swap p q σ).
+Proof.
+intros * Hp.
+unfold is_permut.
+unfold permut_swap; cbn.
+unfold is_permut in Hp.
+...
+unfold permut_swap.
+split. {
+  intros i Hi; cbn.
+
+
+unfold vect_swap_elem.
+cbn.
+...
 
 Theorem determinant_swap_rows_is_neg :
   rngl_is_comm = true →
@@ -3467,6 +3501,22 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ mat_swap_rows ].
+set (g := λ k, nat_of_canon_permut (permut_swap p q (canon_permut n k))).
+rewrite rngl_summation_change_var with (g := g) (h := g). 2: {
+  intros k (_, Hk).
+  subst g; cbn.
+  rewrite permut_nat_of_canon_permut; cycle 1. {
+    intros i Hi.
+    apply vect_el_permut_ub; [ | easy ].
+Search permut_swap.
+...
+    apply permut_swap_is_permut.
+...
+  rewrite permut_swap_involutive.
+  apply nat_of_canon_permut_permut.
+  specialize (fact_neq_0 n) as Hn.
+  flia Hk Hn.
+}
 ...
 (* ah bin non... *)
 rewrite rngl_summation_change_var with
