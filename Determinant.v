@@ -3363,16 +3363,14 @@ Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hpq Hp Hq.
 rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
-...
 erewrite rngl_summation_eq_compat. 2: {
-  intros i Hi.
-...
-  rewrite <- ε_canon_permut_ε_canon_permut; [ | easy | easy | ]. 2: {
-    specialize (fact_neq_0 n) as Hnz.
-    flia Hi Hnz.
-  }
-  easy.
+  intros k Hk.
+  rewrite ε_of_canon_permut_ε with (n := n) (k := k); try easy.
+  specialize (fact_neq_0 n) as Hnz.
+  flia Hk Hnz.
 }
+cbn - [ mat_swap_rows ].
+(* me rappelle plus comment il fallait faire *)
 ...
 
 (* If we add a row (column) of A multiplied by a scalar k to another
