@@ -3453,7 +3453,19 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ mat_swap_rows ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  rewrite <- ε_of_canon_permut_ε; try easy.
+  specialize (fact_neq_0 n) as Hnz.
+  flia Hk Hnz.
+}
+cbn - [ mat_swap_rows ].
+...
+
+Search ε_ws.
 Search swap_nat.
+Print canon_permut.
+Print canon_permut_fun.
 ...
 (* ah bin non... *)
 rewrite rngl_summation_change_var with
