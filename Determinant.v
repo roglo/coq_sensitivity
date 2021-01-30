@@ -2395,6 +2395,33 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 cbn - [ canon_permut "<?" ].
+apply rngl_product_eq_compat.
+intros i Hi.
+apply rngl_product_eq_compat.
+intros j Hj.
+move j before i.
+do 2 rewrite if_ltb_lt_dec.
+destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
+remember (vect_el (canon_permut (S n) k)) as σ eqn:Hσ.
+remember (vect_el (canon_permut n (k mod fact n))) as σ' eqn:Hσ'.
+move σ' before σ.
+do 2 rewrite (canon_permut_succ_values Hσ Hσ').
+destruct j; [ flia Hj | ].
+destruct i; [ flia Hi | ].
+rewrite Nat.sub_succ, Nat.sub_0_r.
+rewrite Nat.sub_succ, Nat.sub_0_r.
+do 2 rewrite if_ltb_lt_dec.
+destruct (lt_dec (σ' j) (k / fact n)) as [Hsfj| Hsfj]. {
+  destruct (lt_dec (σ' i) (k / fact n)) as [Hsfi| Hsfi]; [ easy | ].
+  unfold sign_diff.
+  do 2 rewrite if_ltb_lt_dec.
+  destruct (lt_dec (σ' i + 1) (σ' j)) as [Hsi1j| Hsi1j]. {
+    destruct (lt_dec (σ' i) (σ' j)) as [Hsij| Hsij]; [ easy | ].
+    flia Hsi1j Hsij.
+  }
+  destruct (lt_dec (σ' i) (σ' j)) as [Hsij| Hsij]; [ | easy ].
+  flia Hsij Hsfj Hsfi.
+}
 ...
 intros Hic Hop Hin * Hkn.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
