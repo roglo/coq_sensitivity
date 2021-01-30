@@ -307,7 +307,7 @@ split. {
 now apply canon_permut_permut_inv.
 Qed.
 
-Theorem canon_permut_injective : ∀ n k i j,
+Theorem canon_permut_vect_injective : ∀ n k i j,
   k < fact n
   → i < n
   → j < n
@@ -2206,7 +2206,7 @@ split. {
   now apply vect_el_canon_permut_ub.
 } {
   intros * Hi Hj Hij.
-  now apply canon_permut_injective in Hij.
+  now apply canon_permut_vect_injective in Hij.
 }
 Qed.
 
@@ -2645,7 +2645,7 @@ erewrite rngl_product_eq_compat. 2: {
   destruct (Nat.eq_dec (vect_el (canon_permut n k) (j - 2)) i) as [Hpj| Hpj]. {
     exfalso.
     rewrite <- Hpp in Hpj.
-    apply canon_permut_injective in Hpj; [ | easy | flia Hp Hj | easy ].
+    apply canon_permut_vect_injective in Hpj; [ | easy | flia Hp Hj | easy ].
     flia Hj Hpj.
   }
   easy.
@@ -2660,7 +2660,7 @@ erewrite rngl_product_eq_compat. 2: {
   destruct (Nat.eq_dec (vect_el (canon_permut n k) (j - 2)) i) as [Hpj| Hpj]. {
     exfalso.
     rewrite <- Hpp in Hpj.
-    apply canon_permut_injective in Hpj; [ | easy | flia Hp Hj | easy ].
+    apply canon_permut_vect_injective in Hpj; [ | easy | flia Hp Hj | easy ].
     flia Hj Hpj.
   }
   easy.
@@ -2676,7 +2676,7 @@ erewrite rngl_product_eq_compat. 2: {
   destruct (Nat.eq_dec (vect_el (canon_permut n k) (j - 2)) i) as [Hpj| Hpj]. {
     exfalso.
     rewrite <- Hpp in Hpj.
-    apply canon_permut_injective in Hpj; [ | easy | flia Hp Hj | easy ].
+    apply canon_permut_vect_injective in Hpj; [ | easy | flia Hp Hj | easy ].
     flia Hj Hpj.
   }
   easy.
@@ -2700,7 +2700,7 @@ erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   destruct (Nat.eq_dec (vect_el (canon_permut n k) (j - 1)) i) as [Hpj| Hpj]. {
     rewrite <- Hpp in Hpj.
-    apply canon_permut_injective in Hpj; [ | easy | flia Hp Hj | easy ].
+    apply canon_permut_vect_injective in Hpj; [ | easy | flia Hp Hj | easy ].
     flia Hj Hpj.
   }
   easy.
@@ -2710,7 +2710,7 @@ erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   destruct (Nat.eq_dec (vect_el (canon_permut n k) (j - 1)) i) as [Hpj| Hpj]. {
     rewrite <- Hpp in Hpj.
-    apply canon_permut_injective in Hpj; [ | easy | flia Hp Hj | easy ].
+    apply canon_permut_vect_injective in Hpj; [ | easy | flia Hp Hj | easy ].
     flia Hj Hpj.
   }
   easy.
@@ -2720,7 +2720,7 @@ erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   destruct (Nat.eq_dec (vect_el (canon_permut n k) (j - 1)) i) as [Hpj| Hpj]. {
     rewrite <- Hpp in Hpj.
-    apply canon_permut_injective in Hpj; [ | easy | flia Hp Hj | easy ].
+    apply canon_permut_vect_injective in Hpj; [ | easy | flia Hp Hj | easy ].
     flia Hj Hpj.
   }
   easy.
@@ -2773,7 +2773,7 @@ specialize (Hvn 0 (Nat.lt_0_succ _)) as H3.
 flia Hb H1 H2 H3 Hvi.
 Qed.
 
-Theorem vect_el_nat_of_canon_permut_diff : ∀ n (v : vector (S n) nat) i j,
+Theorem vect_el_nat_of_canon_permut_injective : ∀ n (v : vector (S n) nat) i j,
   is_permut v
   → i < n
   → j < n
@@ -2842,7 +2842,7 @@ apply Nat.add_lt_le_mono. {
     now apply vect_el_nat_of_canon_permut_ub.
   } {
     intros i j Hi Hj.
-    now apply vect_el_nat_of_canon_permut_diff.
+    now apply vect_el_nat_of_canon_permut_injective.
   }
 }
 apply Nat.mul_le_mono_r.
@@ -2917,7 +2917,7 @@ destruct j. {
     now apply vect_el_nat_of_canon_permut_ub.
   } {
     intros i j Hi Hj.
-    now apply vect_el_nat_of_canon_permut_diff.
+    now apply vect_el_nat_of_canon_permut_injective.
   }
 }
 cbn.
@@ -2933,7 +2933,7 @@ assert (Hkn : k < fact n). {
     now apply vect_el_nat_of_canon_permut_ub.
   } {
     intros i m Hi Hm.
-    now apply vect_el_nat_of_canon_permut_diff.
+    now apply vect_el_nat_of_canon_permut_injective.
   }
 }
 rewrite Nat.div_small; [ | easy ].
@@ -2953,7 +2953,7 @@ assert
       vect_el (nat_of_canon_permut_sub_vect v n) j
     → i = j). {
   intros i m Hi Hm Him.
-  now apply vect_el_nat_of_canon_permut_diff in Him.
+  now apply vect_el_nat_of_canon_permut_injective in Him.
 }
 destruct b. {
   apply Nat.leb_le in Hb; cbn.
@@ -3602,6 +3602,7 @@ erewrite rngl_summation_list_permut; [ | easy | ]. 2: {
     rewrite permut_nat_of_canon_permut in H.
     rewrite permut_nat_of_canon_permut in H.
     apply permut_swap_injective in H.
+Search canon_permut.
 ...
     eapply canon_permut_injective.
 Search (canon_permut _ _ = canon_permut _ _).
