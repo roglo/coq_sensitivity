@@ -1708,11 +1708,22 @@ Theorem ε_canon_permut_succ : ∀ n k,
      (minus_one_pow (k / fact n) * ε_canon_permut n (k mod fact n))%F.
 Proof. easy. Qed.
 
+(*
 Theorem ε_canon_permut_ε_canon_permut :
   rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
   rngl_has_1_neq_0 = true →
   ∀ n k, k < fact n → ε (canon_permut n k) = ε_canon_permut n k.
 Proof.
+intros Hin H10 * Hkn.
+destruct n. {
+  unfold ε, ε_fun; cbn.
+  unfold iter_seq, iter_list; cbn.
+  now apply rngl_div_1_r.
+}
+Search ε_canon_permut.
+...
+rewrite ε_canon_permut_succ; [ | easy ].
+...
 intros Hin H10 * Hkn.
 unfold ε.
 revert k Hkn.
@@ -1726,7 +1737,6 @@ rewrite <- IHn. 2: {
   apply Nat.mod_upper_bound.
   apply fact_neq_0.
 }
-Abort. (*
 ...
 unfold ε_fun.
 unfold rngl_div.
@@ -2442,27 +2452,52 @@ destruct (lt_dec (σ' i) (σ' j)) as [Hsij| Hsij]; [ | easy ].
 flia Hsi1j Hsij.
 Qed.
 
-Inspect 1.
-
-...
+Theorem ε_of_canon_permut_ε :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ n k,
+  k < fact n
+  → ε (canon_permut n k) = ε_canon_permut n k.
+Proof.
+intros Hic Hop Hin H10 Hit Hde Hch * Hkn.
+revert k Hkn.
+induction n; intros. {
+  cbn; unfold ε, ε_fun; cbn.
+  unfold iter_seq, iter_list; cbn.
+  apply rngl_div_1_r; [ now left | easy ].
+}
+rewrite ε_canon_permut_succ; [ | easy ].
+rewrite ε_of_canon_permut_succ; try easy.
+f_equal.
+apply IHn.
+apply Nat.mod_upper_bound.
+apply fact_neq_0.
+Qed.
 
 (* Proof that both definitions of determinants are equal *)
 
 Theorem det_is_det_by_canon_permut :
   rngl_is_comm = true →
-  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_integral = true →
   rngl_has_1_neq_0 = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
   ∀ n (M : matrix n n T), determinant M = determinant' M.
 Proof.
-intros Hic Hin H10 *.
+intros Hic Hop Hin Hit H10 Hde Hch *.
 unfold determinant, determinant'.
 destruct n; intros. {
   unfold iter_seq, iter_list.
   cbn; rewrite rngl_add_0_l.
   unfold ε, ε_fun, iter_seq, iter_list; cbn.
-(*
-  rewrite rngl_div_1_r; [ | easy | easy ].
-*)
+  rewrite rngl_div_1_r; [ | now left | easy ].
   symmetry; apply rngl_mul_1_l.
 }
 erewrite rngl_summation_eq_compat. 2: {
@@ -2481,7 +2516,7 @@ induction n; intros. {
   unfold ε, ε_fun, iter_seq, iter_list; cbn.
   do 2 rewrite rngl_add_0_l.
   do 3 rewrite rngl_mul_1_l.
-  rewrite rngl_div_1_r; [ | easy | easy ].
+  rewrite rngl_div_1_r; [ | now left | easy ].
   rewrite rngl_mul_1_l.
   now rewrite rngl_mul_1_r.
 }
@@ -2504,7 +2539,7 @@ rewrite <- Nat_fact_succ.
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
-  rewrite rngl_product_split_first; [ | easy | flia ].
+  rewrite rngl_product_split_first; [ | flia ].
   rewrite rngl_product_succ_succ.
   easy.
 }
@@ -2523,38 +2558,31 @@ symmetry.
 specialize rngl_opt_mul_comm as rngl_mul_comm.
 rewrite Hic in rngl_mul_comm.
 f_equal.
-...
-apply ε_of_canon_permut_succ.
+apply ε_of_canon_permut_succ; try easy.
 specialize (fact_neq_0 (S (S n))) as Hnz.
 flia Hk Hnz.
-...
-(*
-rewrite <- rngl_mul_assoc.
-f_equal.
-rewrite rngl_mul_assoc, rngl_mul_mul_swap; symmetry; [ | easy ].
-rewrite rngl_mul_mul_swap; [ | easy ].
-f_equal.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
-rewrite Hic in rngl_mul_comm.
-apply rngl_mul_comm.
-*)
-...
-*)
+Qed.
 
 (* multilinearity *)
 
 Theorem determinant_multilinear :
-  rngl_is_comm = true
-  → ∀ n (M : matrix n n T) i a b U V,
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_integral = true →
+  rngl_has_1_neq_0 = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ n (M : matrix n n T) i a b U V,
     i < n
     → determinant (mat_repl_vect i M (a × U + b × V)%V) =
          (a * determinant (mat_repl_vect i M U) +
           b * determinant (mat_repl_vect i M V))%F.
 Proof.
-intros Hic * Hi.
-rewrite det_is_det_by_canon_permut; [ | easy ].
-rewrite det_is_det_by_canon_permut; [ | easy ].
-rewrite det_is_det_by_canon_permut; [ | easy ].
+intros Hic Hop Hin Hit H10 Hde Hch * Hi.
+rewrite det_is_det_by_canon_permut; try easy.
+rewrite det_is_det_by_canon_permut; try easy.
+rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
@@ -2957,10 +2985,18 @@ Definition determinant'_list {n} (M : matrix n n T) :=
      Π (i = 1, n), mat_el M (i - 1) (vect_el (canon_permut n k) (i - 1)%nat))%F)
     (seq 0 (fact n)).
 
-Theorem determinant'_by_list : ∀ n (M : matrix n n T),
+Theorem determinant'_by_list :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ n (M : matrix n n T),
   determinant' M = (Σ (k = 0, fact n - 1), nth k (determinant'_list M) 0)%F.
 Proof.
-intros.
+intros Hic Hop Hin H10 Hit Hde Hch *.
 unfold determinant', determinant'_list.
 apply rngl_summation_eq_compat; intros k Hk.
 assert (Hkn : k < fact n). {
@@ -2969,10 +3005,10 @@ assert (Hkn : k < fact n). {
 }
 rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
-now rewrite Nat.add_0_l.
+rewrite Nat.add_0_l.
+f_equal.
+now apply ε_of_canon_permut_ε.
 Qed.
-
-...
 
 Theorem rngl_summation_permut : ∀ n l1 l2,
   Permutation l1 l2
@@ -3027,6 +3063,7 @@ Theorem det_is_det_by_any_permut :
   → determinant M = (Σ (k = 0, fact n - 1), nth k l 0)%F.
 Proof.
 intros Hic * Hl.
+...
 rewrite det_is_det_by_canon_permut; [ | easy ].
 rewrite determinant'_by_list.
 apply rngl_summation_permut; [ now symmetry | | ]. {
