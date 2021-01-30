@@ -3370,6 +3370,7 @@ erewrite rngl_summation_eq_compat. 2: {
   flia Hk Hnz.
 }
 cbn - [ mat_swap_rows ].
+Check det_is_det_by_any_permut.
 (* me rappelle plus comment il fallait faire *)
 ...
 
