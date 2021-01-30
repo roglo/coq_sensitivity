@@ -265,7 +265,7 @@ destruct b. {
 }
 Qed.
 
-Theorem canon_permut_surjective : ∀ n k j,
+Theorem canon_permut_vect_surjective : ∀ n k j,
   k < fact n
   → j < n
   → ∃ i : nat, i < n ∧ vect_el (canon_permut n k) i = j.
@@ -908,16 +908,6 @@ rewrite <- map_app.
 destruct (permut_fun_without_last Hp Hi) as (g & Hpg & Hg).
 rewrite Hg.
 now apply IHn.
-Qed.
-
-Theorem rngl_product_seq_product : ∀ b len f,
-  len ≠ 0
-  → (Π (i ∈ seq b len), f i = Π (i = b, b + len - 1), f i)%F.
-Proof.
-intros * Hlen.
-unfold iter_seq.
-f_equal; f_equal.
-flia Hlen.
 Qed.
 
 Theorem rngl_product_product_by_swap :
@@ -2635,7 +2625,7 @@ assert (Hkn : k < fact n). {
   specialize (fact_neq_0 n) as Hnz.
   flia Hk Hnz.
 }
-specialize (canon_permut_surjective Hkn Hi) as Hp.
+specialize (canon_permut_vect_surjective Hkn Hi) as Hp.
 destruct Hp as (p & Hp & Hpp).
 rewrite (rngl_product_split (p + 1)); [ | flia Hp ].
 rewrite rngl_product_split_last; [ | flia ].
@@ -3624,6 +3614,68 @@ erewrite rngl_summation_list_permut; [ | easy | ]. 2: {
     now apply canon_permut_injective in H.
   }
 }
+rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
+rewrite Nat.add_0_l.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  remember (ε (canon_permut n (g k))) as x eqn:Hx.
+(**)
+  unfold ε, ε_fun in Hx.
+  unfold g in Hx.
+  erewrite rngl_product_eq_compat in Hx. 2: {
+    intros i Hi.
+    erewrite rngl_product_eq_compat. 2: {
+      intros j Hj.
+      move j before i.
+      rewrite permut_nat_of_canon_permut. 2: {
+        apply permut_swap_is_permut; [ easy | easy | ].
+        apply canon_permut_is_permut.
+        specialize (fact_neq_0 n) as Hn.
+        flia Hk Hn.
+      }
+      unfold permut_swap; cbn.
+      unfold permut_fun_swap.
+      easy.
+    }
+    easy.
+  }
+  cbn in Hx.
+Print δ.
+...
+  rewrite ε_ws_ε in Hx.
+  unfold ε_ws, ε_fun_ws in Hx.
+  erewrite rngl_product_eq_compat in Hx. 2: {
+    intros i Hi.
+    erewrite rngl_product_eq_compat. 2: {
+      intros j Hj.
+      unfold g.
+      unfold sign_diff.
+      rewrite permut_nat_of_canon_permut. 2: {
+        apply permut_swap_is_permut; [ easy | easy | ].
+        apply canon_permut_is_permut.
+        specialize (fact_neq_0 n) as Hn.
+        flia Hk Hn.
+      }
+      unfold permut_swap; cbn.
+      unfold permut_fun_swap.
+      unfold swap_nat.
+      easy.
+    }
+    easy.
+  }
+  cbn in Hx.
+...
+(*
+  rewrite ε_of_canon_permut_ε in Hx.
+  unfold g in Hx.
+  cbn in Hx.
+  unfold ε_canon_permut in Hx.
+  cbn in Hx.
+*)
+(*
+  rewrite ε_ws_ε in Hx.
+  unfold ε_ws, ε_fun_ws in Hx.
+*)
 ...
 
 (* If we add a row (column) of A multiplied by a scalar k to another

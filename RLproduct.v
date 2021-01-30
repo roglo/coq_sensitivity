@@ -384,6 +384,16 @@ f_equal; symmetry.
 now apply rngl_inv_product_comm.
 Qed.
 
+Theorem rngl_product_seq_product : ∀ b len f,
+  len ≠ 0
+  → (Π (i ∈ seq b len), f i = Π (i = b, b + len - 1), f i)%F.
+Proof.
+intros * Hlen.
+unfold iter_seq.
+f_equal; f_equal.
+flia Hlen.
+Qed.
+
 End a.
 
 Arguments rngl_product_div_distr {T}%type {ro rp} _ _ _ _ (b e)%nat
