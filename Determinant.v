@@ -3618,86 +3618,12 @@ rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
-  remember (ε (canon_permut n (g k))) as x eqn:Hx.
-...
-  unfold g in Hx.
-  specialize signature_comp as H1.
-  specialize (H1 Hop Hin Hic Hde H10 Hit Hch n).
-  specialize signature_comp_fun as H2.
-  specialize (H2 Hop Hin Hic Hde H10 Hit Hch n).
-  specialize (H1 (canon_permut n k)).
-  specialize (H1 (permut_swap p q (canon_permut n k))).
-  unfold "°" in H1.
-  unfold comp in H1; cbn in H1.
-(* chais pas *)
-...
-  unfold ε in H1; cbn in H1.
-  unfold comp in H1; cbn in H1.
-cbn in H1.
-  cbn in H1.
-...
-Check @ε.
-  specialize
-    (H2 (λ k, canon_permut n (nat_of_canon_permut (permut_swap p q k)))).
-  remember (ε (canon_permut n (g k))) as x eqn:Hx.
-Search ε.
-(**)
-  unfold ε, ε_fun in Hx.
-  unfold g in Hx.
-  erewrite rngl_product_eq_compat in Hx. 2: {
-    intros i Hi.
-    erewrite rngl_product_eq_compat. 2: {
-      intros j Hj.
-      move j before i.
-      rewrite permut_nat_of_canon_permut. 2: {
-        apply permut_swap_is_permut; [ easy | easy | ].
-        apply canon_permut_is_permut.
-        specialize (fact_neq_0 n) as Hn.
-        flia Hk Hn.
-      }
-      unfold permut_swap; cbn.
-      unfold permut_fun_swap.
-      easy.
-    }
-    easy.
-  }
-  cbn in Hx.
-Print δ.
-...
-  rewrite ε_ws_ε in Hx.
-  unfold ε_ws, ε_fun_ws in Hx.
-  erewrite rngl_product_eq_compat in Hx. 2: {
-    intros i Hi.
-    erewrite rngl_product_eq_compat. 2: {
-      intros j Hj.
-      unfold g.
-      unfold sign_diff.
-      rewrite permut_nat_of_canon_permut. 2: {
-        apply permut_swap_is_permut; [ easy | easy | ].
-        apply canon_permut_is_permut.
-        specialize (fact_neq_0 n) as Hn.
-        flia Hk Hn.
-      }
-      unfold permut_swap; cbn.
-      unfold permut_fun_swap.
-      unfold swap_nat.
-      easy.
-    }
-    easy.
-  }
-  cbn in Hx.
-...
-(*
-  rewrite ε_of_canon_permut_ε in Hx.
-  unfold g in Hx.
-  cbn in Hx.
-  unfold ε_canon_permut in Hx.
-  cbn in Hx.
-*)
-(*
-  rewrite ε_ws_ε in Hx.
-  unfold ε_ws, ε_fun_ws in Hx.
-*)
+  assert (H : ε (canon_permut n (g k)) = (- ε (canon_permut n k))%F). {
+    unfold ε, ε_fun.
+    unfold rngl_div.
+    rewrite Hin.
+    rewrite <- rngl_mul_opp_l; [ | easy ].
+    f_equal.
 ...
 
 (* If we add a row (column) of A multiplied by a scalar k to another
