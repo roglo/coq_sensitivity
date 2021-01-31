@@ -3618,12 +3618,27 @@ rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
+  assert (Hkn : k < n!). {
+    specialize (fact_neq_0 n) as Hn.
+    flia Hk Hn.
+  }
   assert (H : ε (canon_permut n (g k)) = (- ε (canon_permut n k))%F). {
-    unfold ε, ε_fun.
-    unfold rngl_div.
-    rewrite Hin.
-    rewrite <- rngl_mul_opp_l; [ | easy ].
-    f_equal.
+    unfold g.
+    rewrite permut_nat_of_canon_permut. 2: {
+      apply permut_swap_is_permut; [ easy | easy | ].
+      now apply canon_permut_is_permut.
+    }
+    specialize signature_comp as H1.
+    specialize (H1 Hop Hin Hic Hde H10 Hit Hch n).
+    specialize (H1 (canon_permut n (g k)) (canon_permut n k)).
+    assert (H : is_permut (canon_permut n (g k))). {
+      apply canon_permut_is_permut.
+      unfold g.
+      apply nat_of_canon_permut_upper_bound.
+      apply permut_swap_is_permut; [ easy | easy | ].
+      now apply canon_permut_is_permut.
+    }
+    specialize (H1 H (canon_permut_is_permut n Hkn)); clear H.
 ...
 
 (* If we add a row (column) of A multiplied by a scalar k to another
