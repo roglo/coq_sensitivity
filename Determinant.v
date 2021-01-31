@@ -3649,10 +3649,9 @@ erewrite rngl_summation_eq_compat. 2: {
        ε (permut_swap p q (canon_permut n k) ° canon_permut n k) = (-1)%F). {
       clear H1.
       unfold "°", comp.
-      unfold ε, ε_fun.
-      cbn.
-...
-Search (_ → _ / _ = _)%F.
+      unfold ε, ε_fun; cbn.
+      unfold permut_fun_swap.
+      set (f := vect_el (canon_permut n k)).
 ...
 
 (* If we add a row (column) of A multiplied by a scalar k to another
