@@ -3639,6 +3639,20 @@ erewrite rngl_summation_eq_compat. 2: {
       now apply canon_permut_is_permut.
     }
     specialize (H1 H (canon_permut_is_permut n Hkn)); clear H.
+    unfold g in H1.
+    rewrite permut_nat_of_canon_permut in H1. 2: {
+      apply permut_swap_is_permut; [ easy | easy | ].
+      now apply canon_permut_is_permut.
+    }
+    assert
+      (H2 :
+       ε (permut_swap p q (canon_permut n k) ° canon_permut n k) = (-1)%F). {
+      clear H1.
+      unfold "°", comp.
+      unfold ε, ε_fun.
+      cbn.
+...
+Search (_ → _ / _ = _)%F.
 ...
 
 (* If we add a row (column) of A multiplied by a scalar k to another
