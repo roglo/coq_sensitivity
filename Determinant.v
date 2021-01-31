@@ -3616,6 +3616,7 @@ erewrite rngl_summation_list_permut; [ | easy | ]. 2: {
 }
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
+...
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   assert (Hkn : k < n!). {
