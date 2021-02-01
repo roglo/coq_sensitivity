@@ -3535,7 +3535,6 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ mat_swap_rows ].
-...
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   rewrite rngl_product_change_var with
@@ -3586,6 +3585,87 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ mat_swap_rows ].
+(**)
+set (f := λ k i, vect_el (canon_permut n k) (swap_nat p q i)).
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  assert (Hkn : k < n!). {
+    specialize (fact_neq_0 n) as Hn.
+    flia Hk Hn.
+  }
+  erewrite rngl_product_seq_product; [ | flia Hp ].
+  rewrite Nat.add_0_l.
+  erewrite rngl_product_eq_compat. 2: {
+    intros i Hi.
+    now fold (f k i).
+  }
+  replace (canon_permut n k) with (mk_vect n (λ i, f k (swap_nat p q i))). 2: {
+    apply vector_eq.
+    intros i Hi; cbn.
+    unfold f; cbn.
+    now rewrite swap_nat_involutive.
+  }
+  replace (mk_vect n (λ i, f k (swap_nat p q i))) with
+    (mk_vect n (f k) ° mk_vect n (swap_nat p q)) by easy.
+  rewrite signature_comp; try easy. {
+    subst f; cbn.
+    split; cbn. {
+      intros i Hi.
+      apply vect_el_permut_ub; [ now apply canon_permut_is_permut | ].
+      now apply swap_nat_lt.
+    } {
+      intros * Hi Hj Hij.
+      apply canon_permut_vect_injective in Hij; [ | easy | | ]; cycle 1. {
+        now apply swap_nat_lt.
+      } {
+        now apply swap_nat_lt.
+      }
+      now apply swap_nat_injective in Hij.
+    }
+  } {
+    split; cbn. {
+      intros i Hi.
+      now apply swap_nat_lt.
+    } {
+      intros * Hi Hj Hij.
+      now apply swap_nat_injective in Hij.
+    }
+  }
+}
+cbn.
+...
+  set (g := λ k, nat_of_canon_permut (permut_swap p q (canon_permut n k))).
+  replace (canon_permut n k) with
+...
+}
+cbn.
+...
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  set (g := swap_nat p q).
+  erewrite rngl_product_seq_product; [ | flia Hp ].
+  rewrite Nat.add_0_l.
+  rewrite Nat.sub_0_r, <- Nat.sub_succ_l; [ | flia Hp ].
+  rewrite Nat.sub_succ, Nat.sub_0_r.
+  erewrite rngl_product_change_var with (g := g) (h := g). 2: {
+    intros i Hi.
+    apply swap_nat_involutive.
+  }
+  erewrite rngl_product_list_eq_compat. 2: {
+    intros i Hi.
+    unfold g.
+    now rewrite swap_nat_involutive.
+  }
+  rewrite rngl_product_change_list with (lb := seq 0 n); [ | easy | ]. 2: {
+    apply permut_fun_Permutation.
+    now apply swap_nat_is_permut_fun.
+  }
+  rewrite rngl_product_seq_product; [ | flia Hp ].
+  rewrite Nat.add_0_l.
+  easy.
+}
+cbn.
+...
 rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
 symmetry.
@@ -3645,6 +3725,7 @@ erewrite rngl_summation_list_permut; [ | easy | ]. 2: {
 }
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
+...
 (**)
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
