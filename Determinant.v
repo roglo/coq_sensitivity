@@ -3586,7 +3586,7 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn - [ mat_swap_rows ].
 (**)
-set (f := λ k i, vect_el (canon_permut n k) (swap_nat p q i)).
+set (f := λ k, vect_swap_elem (canon_permut n k) p q).
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   assert (Hkn : k < n!). {
@@ -3597,16 +3597,16 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite Nat.add_0_l.
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
-    now fold (f k i).
+    now replace (vect_el _ _) with (vect_el (f k) i).
   }
-  replace (canon_permut n k) with (mk_vect n (λ i, f k (swap_nat p q i))). 2: {
+  cbn - [ f ].
+  replace (canon_permut n k) with (mk_vect n (λ i, vect_el (f k) (swap_nat p q i))). 2: {
     apply vector_eq.
     intros i Hi; cbn.
-    unfold f; cbn.
     now rewrite swap_nat_involutive.
   }
-  replace (mk_vect n (λ i, f k (swap_nat p q i))) with
-    (mk_vect n (f k) ° mk_vect n (swap_nat p q)) by easy.
+  replace (mk_vect n (λ i, vect_el (f k) (swap_nat p q i))) with
+    (f k ° mk_vect n (swap_nat p q)) by easy.
   rewrite signature_comp; try easy. {
     subst f; cbn.
     split; cbn. {
@@ -3632,13 +3632,7 @@ erewrite rngl_summation_eq_compat. 2: {
     }
   }
 }
-cbn.
-...
-  set (g := λ k, nat_of_canon_permut (permut_swap p q (canon_permut n k))).
-  replace (canon_permut n k) with
-...
-}
-cbn.
+cbn - [ f ].
 ...
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
