@@ -3508,6 +3508,12 @@ rewrite nat_of_canon_permut_permut in Hij; [ | easy ].
 easy.
 Qed.
 
+Theorem ε_swap_nat : ∀ n p q, ε (mk_vect n (swap_nat p q)) = (-1)%F.
+Proof.
+intros.
+unfold ε, ε_fun; cbn.
+...
+
 Theorem determinant_swap_rows_is_neg :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -3633,6 +3639,10 @@ erewrite rngl_summation_eq_compat. 2: {
   }
 }
 cbn - [ f ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros k (_, Hk).
+...
+  rewrite ε_swap_nat.
 ...
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
