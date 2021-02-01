@@ -1263,21 +1263,18 @@ now apply product_product_if_permut_div.
 Qed.
 
 Theorem rngl_of_nat_sub :
-  rngl_has_opp = true →
   ∀ i j,
   i < j
   → (rngl_of_nat j - rngl_of_nat i)%F = rngl_of_nat (j - i).
 Proof.
-intros Hop * Hij.
+intros * Hij.
 revert j Hij.
 induction i; intros; cbn. {
   rewrite rngl_sub_0_r; f_equal.
   now destruct j.
 }
 destruct j; [ easy | cbn ].
-rewrite rngl_add_comm.
-rewrite rngl_sub_add_distr; [ | easy ].
-rewrite rngl_add_sub.
+rewrite rngl_add_sub_simpl_l.
 apply IHi.
 now apply Nat.succ_lt_mono in Hij.
 Qed.
@@ -1878,7 +1875,7 @@ destruct (lt_dec b a) as [Hba| Hba]. {
     apply rngl_mul_0_r.
   }
   rewrite <- rngl_opp_sub_distr; [ | easy ].
-  rewrite rngl_of_nat_sub; [ | easy | flia Hba Hab ].
+  rewrite rngl_of_nat_sub; [ | flia Hba Hab ].
   rewrite rngl_mul_opp_l; [ | easy ].
   now rewrite rngl_mul_1_l.
 }
@@ -1907,7 +1904,7 @@ rewrite <- rngl_product_div_distr; try easy. 2: {
   intros i Hi.
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
-    rewrite rngl_of_nat_sub; [ | easy | flia Hj ].
+    rewrite rngl_of_nat_sub; [ | flia Hj ].
     easy.
   }
   cbn.
@@ -3548,35 +3545,24 @@ erewrite rngl_product_eq_compat. 2: {
       rewrite <- (Nat.add_1_l j).
       apply Nat_ltb_mono_l.
     }
-    replace (rngl_of_nat (j - 1) - rngl_of_nat (i - 1))%F with
-      (rngl_of_nat j - rngl_of_nat i)%F. 2: {
+    replace (if i <? j then _ else 1%F) with
+      (if i <? j then rngl_of_nat (j - i) else 1)%F. 2: {
+      do 2 rewrite if_ltb_lt_dec.
+      destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
       destruct i; [ easy | ].
       destruct j; [ easy | ].
+      rewrite Nat.sub_succ.
       do 2 rewrite Nat.sub_succ, Nat.sub_0_r; cbn.
-      apply rngl_add_sub_simpl_l.
-...
-      specialize rngl_opt_add_sub_simpl_l as rngl_add_sub_simpl_l.
-...
-  erewrite rngl_product_eq_compat. 2: {
-    intros j (_, Hj).
-    destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ flia Hj Hjp | ].
-    destruct (Nat.eq_dec (j - 1) q) as [Hjq| Hjq]; [ flia Hj Hjq Hpq Hq | ].
+      apply Nat.succ_lt_mono in Hij.
+      symmetry.
+      now apply rngl_of_nat_sub.
+    }
     easy.
   }
-...
-destruct (Nat.eq_dec p p) as [H| H]; [ clear H | now exfalso; apply H ].
-...
-erewrite rngl_product_eq_compat. 2: {
-  intros i (_, Hi).
-  rewrite (rngl_product_split p); [ | flia Hpq Hq ].
-  rewrite rngl_product_split_last; [ | flia ].
+  cbn - [ "<?" ].
   destruct (Nat.eq_dec p p) as [H| H]; [ clear H | now exfalso; apply H ].
-  erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    destruct (Nat.eq_dec (j - 1) p) as [Hjp| Hjp]; [ flia Hj Hjp | ].
-    destruct (Nat.eq_dec (j - 1) q) as [Hjq| Hjq]; [ flia Hj Hjq Hpq Hq | ].
-    easy.
-  }
+  rewrite if_ltb_lt_dec.
+  destruct (lt_dec (i - 1) p) as [H| H]; [ clear H | flia Hi H ].
   easy.
 }
 cbn - [ "<?" ].
