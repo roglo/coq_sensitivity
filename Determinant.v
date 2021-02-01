@@ -3575,6 +3575,54 @@ cbn - [ "<?" ].
 rewrite all_1_rngl_product_1; [ | easy | easy ].
 rewrite rngl_mul_1_l.
 destruct (Nat.eq_dec p p) as [H| H]; [ clear H | easy ].
+rewrite (rngl_product_split p); [ | flia Hpq Hq ].
+rewrite rngl_product_split_last; [ | flia ].
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite if_ltb_lt_dec.
+  destruct (lt_dec p (i - 1)) as [H| H]; [ flia Hi H | easy ].
+}
+cbn - [ "<?" ].
+rewrite all_1_rngl_product_1; [ | easy | easy ].
+rewrite rngl_mul_1_l.
+rewrite if_ltb_lt_dec.
+destruct (lt_dec p p) as [H| H]; [ flia H | clear H ].
+rewrite rngl_mul_1_l.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite if_ltb_lt_dec.
+  destruct (lt_dec p i) as [H| H]; [ clear H | flia Hi H ].
+  destruct (Nat.eq_dec i p) as [H| H]; [ flia Hi H | clear H ].
+  now rewrite if_ltb_lt_dec.
+}
+cbn - [ "<?" ].
+remember (Π (i = _, _), _)%F as x eqn:Hx.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  destruct (Nat.eq_dec i p) as [H| H]; [ flia Hi H | clear H ].
+  rewrite (rngl_product_split i); [ | flia Hi ].
+  rewrite rngl_product_split_last; [ | flia ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite if_ltb_lt_dec.
+    destruct (lt_dec i (j - 1)) as [H| H]; [ flia Hj H | easy ].
+  }
+  rewrite all_1_rngl_product_1; [ | easy | easy ].
+  rewrite rngl_mul_1_l.
+  rewrite if_ltb_lt_dec.
+  destruct (lt_dec i i) as [H| H]; [ flia H | clear H ].
+  rewrite rngl_mul_1_l.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite if_ltb_lt_dec.
+    destruct (lt_dec i j) as [H| H]; [ clear H | flia Hj H ].
+    rewrite if_ltb_lt_dec.
+    destruct (Nat.eq_dec j p) as [H| H]; [ flia Hi Hj H | clear H ].
+    easy.
+  }
+  easy.
+}
+subst x.
 ...
     destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ flia Hj Hjp | ].
     destruct (Nat.eq_dec (j - 1) q) as [Hjq| Hjq]; [ flia Hpq Hj Hjq | ].
