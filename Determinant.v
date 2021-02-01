@@ -3503,6 +3503,101 @@ rewrite nat_of_canon_permut_permut in Hij; [ | easy ].
 easy.
 Qed.
 
+Theorem swap_nat_is_permut : ∀ n p q,
+  p < n
+  → q < n
+  → is_permut (mk_vect n (swap_nat p q)).
+Proof.
+intros.
+now apply swap_nat_is_permut_fun.
+Qed.
+
+Theorem ε_swap_nat :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ n p q,
+  p < q
+  → q < n
+  → ε (mk_vect n (swap_nat p q)) = (-1)%F.
+Proof.
+intros Hic Hop Hin H10 Hit Hde Hch * Hpq Hq.
+rewrite ε_ws_ε; try easy. 2: {
+  apply swap_nat_is_permut; [ flia Hpq Hq | easy ].
+}
+unfold ε_ws; cbn.
+unfold ε_fun_ws.
+unfold sign_diff.
+unfold swap_nat.
+rewrite rngl_product_shift; [ | flia Hq ].
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_product_shift; [ | flia Hq ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite (Nat.add_comm 1 j), Nat.add_sub.
+    rewrite (Nat.add_comm 1 i), Nat.add_sub.
+    rewrite Nat_ltb_mono_r.
+    easy.
+  }
+  easy.
+}
+cbn - [ "<?" ].
+rewrite (rngl_product_split p); [ | flia Hpq Hq ].
+rewrite rngl_product_split_last; [ | flia ].
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  destruct (Nat.eq_dec (i - 1) p) as [Hip| Hip]; [ flia Hi Hip | ].
+  destruct (Nat.eq_dec (i - 1) q) as [Hiq| Hiq]; [ flia Hi Hiq Hpq Hq | ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros j (_, Hj).
+    do 2 rewrite if_ltb_lt_dec.
+    destruct (Nat.eq_dec j p) as [Hjp| Hjp]. {
+      destruct (lt_dec (i - 1) j) as [Hij| Hij]; [ | flia Hi Hjp Hij ].
+      destruct (lt_dec (i - 1) q) as [Hiq'| Hiq']; [ | flia Hpq Hjp Hij Hiq' ].
+      easy.
+    }
+    cbn.
+    destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
+      destruct (lt_dec (i - 1) p) as [Hip'| Hip']; [ | flia Hi Hip' ].
+      now destruct (lt_dec (i - 1) j).
+    }
+    now destruct (lt_dec (i - 1) j).
+  }
+  cbn.
+  now rewrite all_1_rngl_product_1.
+}
+cbn - [ "<?" ].
+rewrite all_1_rngl_product_1; [ | easy | easy ].
+rewrite rngl_mul_1_l.
+destruct (Nat.eq_dec p p) as [H| H]; [ clear H | easy ].
+...
+    destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ flia Hj Hjp | ].
+    destruct (Nat.eq_dec (j - 1) q) as [Hjq| Hjq]; [ flia Hpq Hj Hjq | ].
+    replace (i - 1 <? j - 1) with (i <? j). 2: {
+      destruct i; [ easy | ].
+      destruct j; [ easy | ].
+      do 2 rewrite Nat.sub_succ, Nat.sub_0_r.
+      rewrite <- (Nat.add_1_l i).
+      rewrite <- (Nat.add_1_l j).
+      apply Nat_ltb_mono_l.
+    }
+    replace (if i <? j then _ else 1%F) with
+      (if i <? j then rngl_of_nat (j - i) else 1)%F. 2: {
+      do 2 rewrite if_ltb_lt_dec.
+      destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
+      destruct i; [ easy | ].
+      destruct j; [ easy | ].
+      rewrite Nat.sub_succ.
+      do 2 rewrite Nat.sub_succ, Nat.sub_0_r; cbn.
+      apply Nat.succ_lt_mono in Hij.
+      symmetry.
+...
+
 Theorem ε_swap_nat : ∀ n p q,
   p < q
   → q < n
