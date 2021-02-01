@@ -3645,6 +3645,21 @@ erewrite rngl_summation_list_permut; [ | easy | ]. 2: {
 }
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
+(**)
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  assert (Hkn : k < n!). {
+    specialize (fact_neq_0 n) as Hn.
+    flia Hk Hn.
+  }
+  rewrite rngl_product_seq_product; [ | flia Hp ].
+  rewrite Nat.add_0_l.
+  erewrite rngl_product_eq_compat. 2: {
+    intros i (_, Hi).
+    unfold g.
+Search (nat_of_canon_permut (permut_swap _ _ _)).
+Search (permut_swap _ _ (canon_permut _ _)).
+...
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   assert (Hkn : k < n!). {
