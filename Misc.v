@@ -2317,6 +2317,14 @@ destruct x, y; [ easy | | | easy ]. {
 }
 Qed.
 
+Theorem Nat_ltb_mono_r : ∀ a b c, (a + c <? b + c) = (a <? b).
+Proof.
+intros.
+rewrite (Nat.add_comm a).
+rewrite (Nat.add_comm b).
+apply Nat_ltb_mono_l.
+Qed.
+
 Definition bool_of_sumbool {A B : Prop} (P : sumbool A B) :=
   match P with
   | left _ _ => true

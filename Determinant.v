@@ -3508,10 +3508,78 @@ rewrite nat_of_canon_permut_permut in Hij; [ | easy ].
 easy.
 Qed.
 
-Theorem ε_swap_nat : ∀ n p q, ε (mk_vect n (swap_nat p q)) = (-1)%F.
+Theorem ε_swap_nat : ∀ n p q,
+  p < q
+  → q < n
+  → ε (mk_vect n (swap_nat p q)) = (-1)%F.
 Proof.
-intros.
+intros * Hpq Hq.
 unfold ε, ε_fun; cbn.
+unfold δ, swap_nat.
+rewrite rngl_product_shift; [ | flia Hq ].
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_product_shift; [ | flia Hq ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite (Nat.add_comm 1 j), Nat.add_sub.
+    rewrite (Nat.add_comm 1 i), Nat.add_sub.
+    rewrite Nat_ltb_mono_r.
+    easy.
+  }
+  easy.
+}
+cbn - [ "<?" ].
+rewrite (rngl_product_split p); [ | flia Hpq Hq ].
+rewrite rngl_product_split_last; [ | flia ].
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  destruct (Nat.eq_dec (i - 1) p) as [Hip| Hip]; [ flia Hi Hip | ].
+  destruct (Nat.eq_dec (i - 1) q) as [Hiq| Hiq]; [ flia Hi Hiq Hpq Hq | ].
+  rewrite (rngl_product_split p); [ | flia Hpq Hq ].
+  rewrite rngl_product_split_last; [ | flia ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    destruct (Nat.eq_dec (j - 1) p) as [Hjp| Hjp]; [ flia Hj Hjp | ].
+    destruct (Nat.eq_dec (j - 1) q) as [Hjq| Hjq]; [ flia Hpq Hj Hjq | ].
+    replace (i - 1 <? j - 1) with (i <? j). 2: {
+      destruct i; [ easy | ].
+      destruct j; [ easy | ].
+      do 2 rewrite Nat.sub_succ, Nat.sub_0_r.
+      rewrite <- (Nat.add_1_l i).
+      rewrite <- (Nat.add_1_l j).
+      apply Nat_ltb_mono_l.
+    }
+    replace (rngl_of_nat (j - 1) - rngl_of_nat (i - 1))%F with
+      (rngl_of_nat j - rngl_of_nat i)%F. 2: {
+      destruct i; [ easy | ].
+      destruct j; [ easy | ].
+      do 2 rewrite Nat.sub_succ, Nat.sub_0_r.
+      cbn.
+...
+  erewrite rngl_product_eq_compat. 2: {
+    intros j (_, Hj).
+    destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ flia Hj Hjp | ].
+    destruct (Nat.eq_dec (j - 1) q) as [Hjq| Hjq]; [ flia Hj Hjq Hpq Hq | ].
+    easy.
+  }
+...
+destruct (Nat.eq_dec p p) as [H| H]; [ clear H | now exfalso; apply H ].
+...
+erewrite rngl_product_eq_compat. 2: {
+  intros i (_, Hi).
+  rewrite (rngl_product_split p); [ | flia Hpq Hq ].
+  rewrite rngl_product_split_last; [ | flia ].
+  destruct (Nat.eq_dec p p) as [H| H]; [ clear H | now exfalso; apply H ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    destruct (Nat.eq_dec (j - 1) p) as [Hjp| Hjp]; [ flia Hj Hjp | ].
+    destruct (Nat.eq_dec (j - 1) q) as [Hjq| Hjq]; [ flia Hj Hjq Hpq Hq | ].
+    easy.
+  }
+  easy.
+}
+cbn - [ "<?" ].
 ...
 
 Theorem determinant_swap_rows_is_neg :
