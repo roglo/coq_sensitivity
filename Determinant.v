@@ -3527,26 +3527,12 @@ rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
-  rewrite ε_of_canon_permut_ε with (n := n) (k := k); try easy.
-  specialize (fact_neq_0 n) as Hnz.
-  flia Hk Hnz.
-}
-cbn - [ mat_swap_rows ].
-erewrite rngl_summation_eq_compat. 2: {
-  intros k Hk.
   rewrite rngl_product_shift; [ | flia Hp ].
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
     now rewrite Nat.add_comm, Nat.add_sub.
   }
   easy.
-}
-cbn - [ mat_swap_rows ].
-erewrite rngl_summation_eq_compat. 2: {
-  intros k Hk.
-  rewrite <- ε_of_canon_permut_ε; try easy.
-  specialize (fact_neq_0 n) as Hnz.
-  flia Hk Hnz.
 }
 cbn - [ mat_swap_rows ].
 erewrite rngl_summation_eq_compat. 2: {
@@ -3599,6 +3585,20 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ mat_swap_rows ].
+rewrite det_is_det_by_canon_permut; try easy.
+unfold determinant'.
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  rewrite rngl_product_shift; [ | flia Hp ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros i Hi.
+    now rewrite Nat.add_comm, Nat.add_sub.
+  }
+  easy.
+}
+cbn - [ mat_swap_rows ].
+symmetry.
 ...
 set (g := λ k, nat_of_canon_permut (permut_swap p q (canon_permut n k))).
 rewrite rngl_summation_change_var with (g := g) (h := g). 2: {
@@ -3645,7 +3645,6 @@ erewrite rngl_summation_list_permut; [ | easy | ]. 2: {
 }
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
-...
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   assert (Hkn : k < n!). {
