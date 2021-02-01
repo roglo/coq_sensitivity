@@ -123,8 +123,11 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_opt_add_opp_l :
       if rngl_has_opp then ∀ a : T, (- a + a = 0)%F else not_applicable;
     (* when has not opposite *)
-    rngl_opt_add_sub :
-      if rngl_has_opp then not_applicable else ∀ a b : T, (a + b - b = a)%F;
+    rngl_opt_add_sub_simpl_l :
+      if rngl_has_opp then not_applicable
+       else ∀ a b c : T, (a + b - (a + c) = b - c)%F;
+    rngl_opt_sub_0_r :
+      if rngl_has_opp then not_applicable else ∀ a, (a - 0 = a)%F;
     rngl_opt_mul_0_l :
       if rngl_has_opp then not_applicable else ∀ a, (0 * a = 0)%F;
     rngl_opt_mul_0_r :
@@ -424,41 +427,25 @@ rewrite Hro in rngl_add_opp_l.
 apply rngl_add_opp_l.
 Qed.
 
-Theorem rngl_add_opp_r : ∀ x, (x - x = 0)%F.
-Proof.
-intros.
-specialize rngl_opt_add_opp_l as rngl_add_opp_l.
-specialize rngl_opt_add_sub as rngl_add_sub.
-unfold rngl_sub in rngl_add_sub |-*.
-destruct rngl_has_opp. {
-  rewrite rngl_add_comm.
-  apply rngl_add_opp_l.
-} {
-  specialize (rngl_add_sub 0%F x).
-  now rewrite rngl_add_0_l in rngl_add_sub.
-}
-Qed.
-
 Theorem rngl_add_sub : ∀ a b, (a + b - b = a)%F.
 Proof.
 intros.
 specialize rngl_opt_add_opp_l as rngl_add_opp_l.
-specialize rngl_opt_add_sub as rngl_add_sub.
-unfold rngl_sub in rngl_add_sub |-*.
-destruct rngl_has_opp. {
+specialize rngl_opt_add_sub_simpl_l as rngl_add_sub_simpl_l.
+specialize rngl_opt_sub_0_r as rngl_sub_0_r.
+remember rngl_has_opp as op eqn:Hop.
+symmetry in Hop.
+destruct op. {
+  unfold rngl_sub.
+  rewrite Hop.
   rewrite <- rngl_add_assoc.
   rewrite (rngl_add_comm b).
   now rewrite rngl_add_opp_l, rngl_add_0_r.
 } {
-  apply rngl_add_sub.
+  specialize (rngl_add_sub_simpl_l b a 0%F) as H1.
+  rewrite rngl_add_comm, rngl_add_0_r in H1.
+  now rewrite rngl_sub_0_r in H1.
 }
-Qed.
-
-Theorem rngl_add_reg_r : ∀ a b c, (a + c = b + c)%F → (a = b)%F.
-Proof.
-intros * Habc.
-eapply rngl_sub_compat_l with (c := c) in Habc.
-now do 2 rewrite rngl_add_sub in Habc.
 Qed.
 
 Theorem rngl_add_reg_l : ∀ a b c, (c + a = c + b)%F → (a = b)%F.
@@ -466,6 +453,95 @@ Proof.
 intros * Habc.
 eapply rngl_sub_compat_l with (c := c) in Habc.
 now do 2 rewrite rngl_add_comm, rngl_add_sub in Habc.
+Qed.
+
+Theorem rngl_add_opp_r : ∀ x, (x - x = 0)%F.
+Proof.
+intros.
+specialize rngl_opt_add_opp_l as rngl_add_opp_l.
+specialize rngl_opt_add_sub_simpl_l as rngl_add_sub_simpl_l.
+specialize rngl_opt_sub_0_r as rngl_sub_0_r.
+remember rngl_has_opp as op eqn:Hop.
+symmetry in Hop.
+destruct op. {
+  unfold rngl_sub; rewrite Hop.
+  rewrite rngl_add_comm.
+  apply rngl_add_opp_l.
+} {
+  specialize (rngl_add_sub_simpl_l x 0%F 0%F) as H1.
+  rewrite rngl_add_0_r in H1.
+  now rewrite rngl_sub_0_r in H1.
+}
+Qed.
+
+Theorem rngl_opp_0 : rngl_has_opp = true → (- 0 = 0)%F.
+Proof.
+intros Hro.
+specialize rngl_add_opp_r as H.
+unfold rngl_sub in H.
+rewrite Hro in H.
+transitivity (0 + - 0)%F. {
+  symmetry.
+  apply rngl_add_0_l.
+}
+apply H.
+Qed.
+
+Theorem rngl_sub_0_r : ∀ a, (a - 0 = a)%F.
+Proof.
+intros.
+specialize rngl_opt_sub_0_r as rngl_sub_0_r.
+remember rngl_has_opp as op eqn:Hop.
+symmetry in Hop.
+destruct op. {
+  unfold rngl_sub; rewrite Hop.
+  rewrite rngl_opp_0; [ | easy ].
+  apply rngl_add_0_r.
+} {
+  apply rngl_sub_0_r.
+}
+Qed.
+
+Theorem rngl_opp_add_distr :
+  rngl_has_opp = true →
+  ∀ a b, (- (a + b) = - b - a)%F.
+Proof.
+intros Hro *.
+specialize (fold_rngl_sub Hro) as H.
+apply rngl_add_reg_l with (c := (a + b)%F).
+unfold rngl_sub.
+rewrite Hro.
+rewrite rngl_add_assoc.
+do 3 rewrite H.
+rewrite rngl_add_sub.
+rewrite rngl_add_opp_r.
+now rewrite rngl_add_opp_r.
+Qed.
+
+Theorem rngl_add_sub_simpl_l : ∀ a b c : T, (a + b - (a + c) = b - c)%F.
+Proof.
+intros.
+specialize rngl_opt_add_sub_simpl_l as rngl_add_sub_simpl_l.
+remember rngl_has_opp as op eqn:Hop.
+symmetry in Hop.
+destruct op; [ | easy ].
+unfold rngl_sub; rewrite Hop.
+rewrite rngl_opp_add_distr; [ | easy ].
+unfold rngl_sub; rewrite Hop.
+rewrite rngl_add_assoc.
+rewrite rngl_add_add_swap.
+rewrite (rngl_add_add_swap a).
+rewrite fold_rngl_sub; [ | easy ].
+rewrite fold_rngl_sub; [ | easy ].
+rewrite fold_rngl_sub; [ | easy ].
+now rewrite rngl_add_opp_r, rngl_add_0_l.
+Qed.
+
+Theorem rngl_add_reg_r : ∀ a b c, (a + c = b + c)%F → (a = b)%F.
+Proof.
+intros * Habc.
+eapply rngl_sub_compat_l with (c := c) in Habc.
+now do 2 rewrite rngl_add_sub in Habc.
 Qed.
 
 Theorem rngl_mul_0_l : ∀ a, (0 * a = 0)%F.
@@ -482,19 +558,6 @@ intros.
 apply (rngl_add_reg_r _ _ (a * 1)%F).
 rewrite <- rngl_mul_add_distr_l.
 now do 2 rewrite rngl_add_0_l.
-Qed.
-
-Theorem rngl_opp_0 : rngl_has_opp = true → (- 0 = 0)%F.
-Proof.
-intros Hro.
-specialize rngl_add_opp_r as H.
-unfold rngl_sub in H.
-rewrite Hro in H.
-transitivity (0 + - 0)%F. {
-  symmetry.
-  apply rngl_add_0_l.
-}
-apply H.
 Qed.
 
 Theorem rngl_inv_1 :
@@ -543,13 +606,6 @@ destruct Hid as [Hid| Hid]. {
   specialize (rngl_mul_div_l 1%F a rngl_1_neq_0) as H1.
   now rewrite rngl_mul_1_l in H1.
 }
-Qed.
-
-Theorem rngl_sub_0_r : ∀ a, (a - 0 = a)%F.
-Proof.
-intros.
-specialize (rngl_add_sub a 0%F) as H.
-now rewrite rngl_add_0_r in H.
 Qed.
 
 Theorem rngl_add_move_0_r :
@@ -798,22 +854,6 @@ destruct rngl_is_comm. {
   rewrite rngl_mul_inv_r; [ | easy ].
   apply rngl_mul_1_r.
 }
-Qed.
-
-Theorem rngl_opp_add_distr :
-  rngl_has_opp = true →
-  ∀ a b, (- (a + b) = - b - a)%F.
-Proof.
-intros Hro *.
-specialize (fold_rngl_sub Hro) as H.
-apply rngl_add_reg_l with (c := (a + b)%F).
-unfold rngl_sub.
-rewrite Hro.
-rewrite rngl_add_assoc.
-do 3 rewrite H.
-rewrite rngl_add_sub.
-rewrite rngl_add_opp_r.
-now rewrite rngl_add_opp_r.
 Qed.
 
 Theorem rngl_opp_sub_distr :

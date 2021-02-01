@@ -799,17 +799,6 @@ intros MA.
 now apply mat_add_opp_l.
 Qed.
 
-Theorem mat_opt_add_sub : ∀ n,
-  if @rngl_has_opp (matrix n n T) _ then not_applicable
-  else ∀ a b : matrix n n T, (a + b - b)%F = a.
-Proof.
-intros.
-specialize rngl_opt_add_sub as rngl_add_sub.
-cbn in rngl_add_sub.
-unfold mat_ring_like_op; cbn.
-now destruct (@rngl_has_opp T ro).
-Qed.
-
 Theorem mat_characteristic_prop : ∀ n,
   match
     match Nat.eq_dec n O return nat with
@@ -954,7 +943,8 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_opt_mul_1_r := mat_mul_1_r;
      rngl_opt_mul_add_distr_r := mat_mul_add_distr_r;
      rngl_opt_add_opp_l := @mat_opt_add_opp_l n;
-     rngl_opt_add_sub := mat_opt_add_sub n;
+     rngl_opt_add_sub_simpl_l := NA;
+     rngl_opt_sub_0_r := NA;
      rngl_opt_mul_0_l := NA;
      rngl_opt_mul_0_r := NA;
      rngl_opt_mul_inv_l := NA;

@@ -59,6 +59,9 @@ apply Heab.
 now apply Nat.le_antisymm; apply Nat.lt_le_incl.
 Qed.
 
+Theorem Nat_add_sub_simpl_l : ∀ a b c, (a + b - (a + c)) = (b - c).
+Proof. flia. Qed.
+
 Theorem Nat_consistent :
   rngl_has_inv = false ∨ rngl_has_no_inv_but_div = false.
 Proof. now left. Qed.
@@ -82,7 +85,8 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_mul_1_r := NA;
      rngl_opt_mul_add_distr_r := NA;
      rngl_opt_add_opp_l := NA;
-     rngl_opt_add_sub := Nat.add_sub;
+     rngl_opt_add_sub_simpl_l := Nat_add_sub_simpl_l;
+     rngl_opt_sub_0_r := Nat.sub_0_r;
      rngl_opt_mul_0_l := Nat.mul_0_l;
      rngl_opt_mul_0_r := Nat.mul_0_r;
      rngl_opt_mul_inv_l := NA;
@@ -455,7 +459,8 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_opt_mul_1_r := NA;
      rngl_opt_mul_add_distr_r := NA;
      rngl_opt_add_opp_l := Zn_add_opp_l;
-     rngl_opt_add_sub := NA;
+     rngl_opt_add_sub_simpl_l := NA;
+     rngl_opt_sub_0_r := NA;
      rngl_opt_mul_0_l := NA;
      rngl_opt_mul_0_r := NA;
      rngl_opt_mul_inv_l := Zn_opt_mul_inv_l;

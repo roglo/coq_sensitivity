@@ -3334,8 +3334,6 @@ do 2 rewrite if_ltb_lt_dec.
 destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
 setoid_rewrite Nat.add_comm; cbn.
 rewrite rngl_add_comm.
-specialize rngl_opt_add_sub as rngl_add_sub.
-rewrite Hop in rngl_add_sub.
 unfold rngl_sub.
 rewrite Hop.
 rewrite rngl_opp_add_distr; [ | easy ].
@@ -3554,8 +3552,10 @@ erewrite rngl_product_eq_compat. 2: {
       (rngl_of_nat j - rngl_of_nat i)%F. 2: {
       destruct i; [ easy | ].
       destruct j; [ easy | ].
-      do 2 rewrite Nat.sub_succ, Nat.sub_0_r.
-      cbn.
+      do 2 rewrite Nat.sub_succ, Nat.sub_0_r; cbn.
+      apply rngl_add_sub_simpl_l.
+...
+      specialize rngl_opt_add_sub_simpl_l as rngl_add_sub_simpl_l.
 ...
   erewrite rngl_product_eq_compat. 2: {
     intros j (_, Hj).
