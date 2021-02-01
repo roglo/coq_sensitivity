@@ -448,6 +448,16 @@ apply iter_list_permut; [ | | | | easy ]. {
 }
 Qed.
 
+Theorem rngl_summation_seq_summation : ∀ b len f,
+  len ≠ 0
+  → (Σ (i ∈ seq b len), f i = Σ (i = b, b + len - 1), f i)%F.
+Proof.
+intros * Hlen.
+unfold iter_seq.
+f_equal; f_equal.
+flia Hlen.
+Qed.
+
 End a.
 
 Arguments rngl_mul_summation_distr_l {T ro rp} a b e f.
