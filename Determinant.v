@@ -3535,6 +3535,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ mat_swap_rows ].
+...
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   rewrite rngl_product_change_var with
@@ -3599,7 +3600,6 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn - [ mat_swap_rows ].
 symmetry.
-...
 set (g := λ k, nat_of_canon_permut (permut_swap p q (canon_permut n k))).
 rewrite rngl_summation_change_var with (g := g) (h := g). 2: {
   intros k (_, Hk).
