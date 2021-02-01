@@ -3571,15 +3571,34 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ mat_swap_rows ].
-...
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   erewrite rngl_product_list_eq_compat. 2: {
     intros i Hi.
-    replace (mat_el _ _ _) with ...
-    unfold mat_swap_rows; cbn.
-    unfold swap_nat.
-
+    replace (mat_el _ _ _) with
+      (mat_el M i (vect_el (canon_permut n k) (swap_nat p q i))). 2: {
+      cbn.
+      unfold swap_nat.
+      destruct (Nat.eq_dec i p) as [Hip| Hip]. {
+        subst i.
+        apply Nat.neq_sym in Hpq.
+        destruct (Nat.eq_dec q p) as [Hqp| Hqp]; [ easy | ].
+        now destruct (Nat.eq_dec q q).
+      }
+      destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
+        subst i.
+        apply Nat.neq_sym in Hpq.
+        now destruct (Nat.eq_dec p p).
+      }
+      destruct (Nat.eq_dec i p) as [H| H]; [ easy | clear H ].
+      destruct (Nat.eq_dec i q) as [H| H]; [ easy | clear H ].
+      easy.
+    }
+    easy.
+  }
+  easy.
+}
+cbn - [ mat_swap_rows ].
 ...
 set (g := λ k, nat_of_canon_permut (permut_swap p q (canon_permut n k))).
 rewrite rngl_summation_change_var with (g := g) (h := g). 2: {
