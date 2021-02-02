@@ -4232,8 +4232,24 @@ Theorem subm_mat_swap_rows : ∀ n (M : matrix n n T) p q r,
 Proof.
 intros.
 apply matrix_eq.
-intros i j Hi Hj.
-cbn.
+intros i j Hi Hj; cbn.
+remember (p <=? i) as bpi eqn:Hbpi.
+remember (r <=? j) as brj eqn:Hbrj.
+remember (q <=? i) as bqi eqn:Hbqi.
+move brj before bpi; move bqi before brj.
+symmetry in Hbpi, Hbrj, Hbqi.
+destruct bpi; cbn. {
+  apply Nat.leb_le in Hbpi.
+  destruct (Nat.eq_dec (i + 1) p) as [H| H]; [ flia Hbpi H | clear H ].
+  destruct bqi; cbn. {
+    apply Nat.leb_le in Hbqi.
+    destruct (Nat.eq_dec (i + 1) q) as [H| H]; [ flia Hbqi H | clear H ].
+    easy.
+  } {
+    rewrite Nat.add_0_r.
+    apply Nat.leb_gt in Hbqi.
+    destruct (Nat.eq_dec (i + 1) q) as [Hiq| Hiq]. {
+(* bin non, du coup, c'est faux *)
 ...
 
 (* Laplace formulas *)
