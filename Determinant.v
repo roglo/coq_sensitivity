@@ -4227,6 +4227,7 @@ Definition swap_in_permut n i j k := vect_swap_elem (canon_permut n k) i j.
 Definition comatrix {n} (M : matrix n n T) : matrix n n T :=
   {| mat_el i j := (minus_one_pow (i + j) * determinant (subm M i j))%F |}.
 
+(*
 Theorem subm_mat_swap_rows : ∀ n (M : matrix n n T) p q r,
   subm (mat_swap_rows p q M) p r = subm M q r.
 Proof.
@@ -4251,6 +4252,38 @@ destruct bpi; cbn. {
     destruct (Nat.eq_dec (i + 1) q) as [Hiq| Hiq]. {
 (* bin non, du coup, c'est faux *)
 ...
+*)
+
+Theorem subm_mat_swap_rows_0_1 : ∀ n (M : matrix n n T) r,
+  subm (mat_swap_rows 0 1 M) 0 r = subm M 1 r.
+Proof.
+intros.
+apply matrix_eq.
+intros i j Hi Hj; cbn.
+destruct (Nat.eq_dec (i + 1) 0) as [H| H]; [ flia H | clear H ].
+destruct (Nat.eq_dec (i + 1) 1) as [H| H]. {
+  now replace i with 0 by flia H.
+}
+now destruct i.
+Qed.
+
+Theorem subm_mat_swap_rows_0_2 :
+  rngl_has_opp = true →
+  ∀ n (M : matrix n n T) r,
+  n ≠ 0
+  → det_loop (subm (mat_swap_rows 0 2 M) 0 r) n =
+    (- det_loop (subm M 2 r) n)%F.
+Proof.
+intros Hop * Hnz.
+destruct n; [ easy | clear Hnz; cbn ].
+rewrite rngl_opp_summation; [ | easy | easy ].
+apply rngl_summation_eq_compat.
+intros i (_, Hi).
+rewrite <- rngl_mul_opp_l; [ | easy ].
+rewrite <- rngl_mul_opp_r; [ | easy ].
+do 2 rewrite <- rngl_mul_assoc.
+f_equal.
+...
 
 (* Laplace formulas *)
 
@@ -4269,8 +4302,8 @@ Theorem laplace_formula_on_rows :
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hlin.
 unfold determinant.
-destruct n; [ easy | clear Hnz; cbn ].
-rewrite Nat.sub_0_r at 1.
+destruct n; [ easy | clear Hnz ].
+rewrite Nat.sub_succ, Nat.sub_0_r.
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
@@ -4305,10 +4338,31 @@ destruct i. {
     f_equal; cbn.
     now apply minus_one_pow_succ.
   }
-...
-  rewrite subm_mat_swap_rows.
+  f_equal; [ | apply Nat.sub_0_r ].
+  symmetry; apply subm_mat_swap_rows_0_1.
+}
+destruct i. {
+  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ flia Hlin Hnz | ].
+  specialize (determinant_alternating Hic Hop Hin Hit H10 Hde Hch) as H1.
+  specialize (H1 _ M 0 2 (Nat.neq_0_succ _) (Nat.lt_0_succ _) Hlin).
+  cbn in H1.
+  apply (f_equal rngl_opp) in H1.
+  rewrite rngl_opp_involutive in H1; [ | easy ].
+  rewrite <- H1.
+  rewrite rngl_opp_summation; [ | easy | easy ].
+  apply rngl_summation_eq_compat.
+  intros i (_, Hi).
+  rewrite <- rngl_mul_opp_r; [ | easy ].
+  f_equal. {
+    f_equal; cbn.
+    rewrite minus_one_pow_succ; [ | easy | easy ].
+    rewrite minus_one_pow_succ; [ | easy | easy ].
+    now apply rngl_opp_involutive.
+  }
+  rewrite Nat.sub_0_r at 2.
+  symmetry.
+  rewrite <- rngl_opp_involutive; [ | easy ].
   f_equal.
-  apply Nat.sub_0_r.
 ...
 Check determinant_alternating.
 ...
