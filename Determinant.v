@@ -3722,6 +3722,48 @@ destruct (Nat.eq_dec i p) as [Hip| Hip]. {
 }
 Qed.
 
+Theorem vect_swap_elem_is_permut : ∀ n (σ : vector n nat) p q,
+  p < n
+  → q < n
+  → is_permut σ
+  → is_permut (vect_swap_elem σ p q).
+Proof.
+intros * Hp Hq Hσ.
+split; cbn. {
+  intros i Hi.
+  apply vect_el_permut_ub; [ easy | ].
+  now apply swap_nat_lt.
+} {
+  intros * Hi Hj Hij.
+  unfold swap_nat in Hij.
+  destruct (Nat.eq_dec i p) as [Hip| Hip]. {
+    destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ congruence | ].
+    destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
+      subst i j.
+      now apply Hσ.
+    }
+    apply Nat.neq_sym in Hjq.
+    now apply Hσ in Hij.
+  }
+  destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
+    destruct (Nat.eq_dec j p) as [Hjp| Hjp]. {
+      subst i j.
+      now apply Hσ.
+    }
+    destruct (Nat.eq_dec j q) as [Hjq| Hjq]; [ congruence | ].
+    apply Nat.neq_sym in Hjp.
+    now apply Hσ in Hij.
+  }
+  destruct (Nat.eq_dec j p) as [Hjp| Hjp]. {
+    now apply Hσ in Hij.
+  }
+  destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
+    now apply Hσ in Hij.
+  }
+  now apply Hσ in Hij.
+}
+Qed.
+
 Theorem determinant_swap_rows_is_neg :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -3864,23 +3906,42 @@ symmetry.
 set (g := λ k, nat_of_canon_permut (f k)).
 rewrite rngl_summation_change_var with (g := g) (h := g). 2: {
   intros k (_, Hk).
+  assert (Hkn : k < n!). {
+    specialize (fact_neq_0 n) as Hn.
+    flia Hk Hn.
+  }
   unfold g, f.
   rewrite permut_nat_of_canon_permut. 2: {
-Search (is_permut (vect_swap_elem _ _ _)).
-...
-    vect_swap_elem_is_permut.
+    apply vect_swap_elem_is_permut; [ easy | easy | ].
+    now apply canon_permut_is_permut.
+  }
   rewrite vect_swap_elem_involutive.
-  apply nat_of_canon_permut_permut.
+  now apply nat_of_canon_permut_permut.
+}
+rewrite Nat.sub_0_r.
+rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
+rewrite Nat.sub_succ, Nat.sub_0_r.
+rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
+  apply permut_fun_Permutation.
+  unfold g.
 ...
+}
 erewrite rngl_summation_list_eq_compat. 2: {
   intros k Hk.
-  unfold f, g.
-  rewrite permut_nat_of_canon_permut.
+  assert (Hkn : k < n!). {
+    apply in_seq in Hk.
+    specialize (fact_neq_0 n) as Hn.
+    flia Hk Hn.
+  }
+  unfold g, f.
+  rewrite permut_nat_of_canon_permut. 2: {
+    apply vect_swap_elem_is_permut; [ easy | easy | ].
+    now apply canon_permut_is_permut.
+  }
   rewrite vect_swap_elem_involutive.
   easy.
 }
-Search determinant'.
-rewrite det_is_det_by_canon_permut.
+rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
 (* devrait le faire *)
 ...
