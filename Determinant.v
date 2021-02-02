@@ -4227,8 +4227,16 @@ Definition swap_in_permut n i j k := vect_swap_elem (canon_permut n k) i j.
 Definition comatrix {n} (M : matrix n n T) : matrix n n T :=
   {| mat_el i j := (minus_one_pow (i + j) * determinant (subm M i j))%F |}.
 
-Print determinant.
-Print det_loop.
+Theorem subm_mat_swap_rows : ∀ n (M : matrix n n T) p q r,
+  subm (mat_swap_rows p q M) p r = subm M q r.
+Proof.
+intros.
+apply matrix_eq.
+intros i j Hi Hj.
+cbn.
+...
+
+(* Laplace formulas *)
 
 Theorem laplace_formula_on_rows :
   rngl_is_comm = true →
@@ -4267,11 +4275,24 @@ destruct i. {
 destruct i. {
   destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ flia Hlin Hnz | ].
   specialize (determinant_alternating Hic Hop Hin Hit H10 Hde Hch) as H1.
-  specialize (H1 _ M 1 0 (Nat.neq_succ_0 _) Hlin (Nat.lt_0_succ _)).
+  specialize (H1 _ M 0 1 (Nat.neq_0_succ _) (Nat.lt_0_succ _) Hlin).
   cbn in H1.
-  specialize (determinant_alternating Hic Hop Hin Hit H10 Hde Hch) as H2.
-  specialize (H2 _ M 0 1 (Nat.neq_0_succ _) (Nat.lt_0_succ _) Hlin).
-  cbn in H2.
+  apply (f_equal rngl_opp) in H1.
+  rewrite rngl_opp_involutive in H1; [ | easy ].
+  rewrite <- H1.
+  rewrite rngl_opp_summation; [ | easy | easy ].
+  apply rngl_summation_eq_compat.
+  intros i (_, Hi).
+  rewrite <- rngl_mul_opp_l; [ | easy ].
+  rewrite <- rngl_mul_opp_l; [ | easy ].
+  f_equal. {
+    f_equal; cbn.
+    now apply minus_one_pow_succ.
+  }
+...
+  rewrite subm_mat_swap_rows.
+  f_equal.
+  apply Nat.sub_0_r.
 ...
 Check determinant_alternating.
 ...
