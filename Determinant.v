@@ -3863,6 +3863,14 @@ rewrite rngl_mul_1_l.
 symmetry.
 set (g := λ k, nat_of_canon_permut (f k)).
 rewrite rngl_summation_change_var with (g := g) (h := g). 2: {
+  intros k (_, Hk).
+  unfold g, f.
+  rewrite permut_nat_of_canon_permut. 2: {
+Search (is_permut (vect_swap_elem _ _ _)).
+...
+    vect_swap_elem_is_permut.
+  rewrite vect_swap_elem_involutive.
+  apply nat_of_canon_permut_permut.
 ...
 erewrite rngl_summation_list_eq_compat. 2: {
   intros k Hk.
