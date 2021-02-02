@@ -4251,6 +4251,31 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     rewrite det_is_det_by_canon_permut; try easy.
   }
   unfold determinant'.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j (_, Hj).
+    rewrite rngl_mul_summation_distr_l.
+    rewrite rngl_mul_summation_distr_l.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros k Hk.
+      do 2 rewrite rngl_mul_assoc.
+      rewrite (rngl_mul_mul_swap Hic (mat_el M i j)).
+      specialize rngl_opt_mul_comm as rngl_mul_comm.
+      rewrite Hic in rngl_mul_comm.
+      rewrite (rngl_mul_comm (mat_el M i j)).
+      do 2 rewrite <- rngl_mul_assoc.
+      easy.
+    }
+    cbn - [ canon_permut subm ].
+    easy.
+  }
+  cbn - [ canon_permut subm ].
+  rewrite rngl_summation_summation_exch'; [ | easy ].
+  erewrite rngl_summation_eq_compat. 2: {
+    intros k Hk.
+    rewrite <- rngl_mul_summation_distr_l.
+    easy.
+  }
+  cbn - [ canon_permut subm ].
 ...
 
 End a.
