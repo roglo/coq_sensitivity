@@ -4250,6 +4250,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
+Check determinant_alternating.
 ...
 
 Theorem mat_comat_mul :
