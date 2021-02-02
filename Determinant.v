@@ -4227,16 +4227,29 @@ Definition swap_in_permut n i j k := vect_swap_elem (canon_permut n k) i j.
 Definition comatrix {n} (M : matrix n n T) : matrix n n T :=
   {| mat_el i j := (minus_one_pow (i + j) * determinant (subm M i j))%F |}.
 
-Theorem mat_comat_mul : ∀ n (M : matrix n n T),
+Theorem mat_comat_mul :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_integral = true →
+  rngl_has_1_neq_0 = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ n (M : matrix n n T),
   (M * (comatrix M)⁺ = determinant M × mI n)%M.
 Proof.
-intros.
+intros Hic Hop Hin Hit H10 Hde Hch *.
 apply matrix_eq.
 intros i j Hi Hj; cbn.
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   subst j; clear Hj.
   rewrite rngl_mul_1_r.
-  rewrite det_is_det_by_canon_permut.
+  rewrite det_is_det_by_canon_permut; try easy.
+  unfold determinant'.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j Hj.
+    rewrite det_is_det_by_canon_permut; try easy.
+  }
   unfold determinant'.
 ...
 
