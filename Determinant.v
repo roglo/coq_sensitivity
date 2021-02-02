@@ -3398,6 +3398,15 @@ intros i Hi; cbn.
 now rewrite swap_nat_involutive.
 Qed.
 
+Theorem vect_swap_elem_injective : ∀ n (u v : vector n nat) p q,
+  vect_swap_elem u p q = vect_swap_elem v p q
+  → u = v.
+Proof.
+intros * Huv.
+apply (f_equal (λ u, vect_swap_elem u p q)) in Huv.
+now do 2 rewrite vect_swap_elem_involutive in Huv.
+Qed.
+
 Theorem permut_swap_involutive : ∀ n p q (σ : vector n nat),
   permut_swap p q (permut_swap p q σ) = σ.
 Proof.
@@ -3764,7 +3773,20 @@ split; cbn. {
 }
 Qed.
 
-Theorem determinant_swap_rows_is_neg :
+Theorem nat_of_canon_permut_injective : ∀ n (σ₁ σ₂ : vector n nat),
+  is_permut σ₁
+  → is_permut σ₂
+  → nat_of_canon_permut σ₁ = nat_of_canon_permut σ₂
+  → σ₁ = σ₂.
+Proof.
+intros * Hσ₁ Hσ₂ Hσσ.
+apply (f_equal (canon_permut n)) in Hσσ.
+rewrite permut_nat_of_canon_permut in Hσσ; [ | easy ].
+rewrite permut_nat_of_canon_permut in Hσσ; [ | easy ].
+easy.
+Qed.
+
+Theorem determinant_alternating :
   rngl_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -3923,8 +3945,24 @@ rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
 rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
   apply permut_fun_Permutation.
-  unfold g.
-...
+  unfold g, f.
+  split. {
+    intros i Hi.
+    apply nat_of_canon_permut_upper_bound.
+    apply vect_swap_elem_is_permut; [ easy | easy | ].
+    now apply canon_permut_is_permut.
+  } {
+    intros * Hi Hj Hij.
+    apply nat_of_canon_permut_injective in Hij; cycle 1. {
+      apply vect_swap_elem_is_permut; [ easy | easy | ].
+      now apply canon_permut_is_permut.
+    } {
+      apply vect_swap_elem_is_permut; [ easy | easy | ].
+      now apply canon_permut_is_permut.
+    }
+    apply vect_swap_elem_injective in Hij.
+    now apply canon_permut_injective in Hij.
+  }
 }
 erewrite rngl_summation_list_eq_compat. 2: {
   intros k Hk.
@@ -3943,7 +3981,18 @@ erewrite rngl_summation_list_eq_compat. 2: {
 }
 rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
-(* devrait le faire *)
+rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
+rewrite Nat.add_0_l.
+apply rngl_summation_eq_compat.
+intros k Hk; f_equal.
+rewrite rngl_product_shift; [ | flia Hp ].
+apply rngl_product_eq_compat.
+intros i Hi.
+now rewrite Nat.add_comm, Nat.add_sub.
+Qed.
+
+Inspect 1.
+
 ...
 
 (* If we add a row (column) of A multiplied by a scalar k to another
