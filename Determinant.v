@@ -3512,6 +3512,16 @@ intros.
 now apply swap_nat_is_permut_fun.
 Qed.
 
+(* complicated proof; could be proven by saying that
+    1 = ε id = ε (swap_nat ° swap_nat) = ε (swap_nat) * ε (swap_nat)
+  thefore
+    (ε swap_nat)² = 1
+  therefore
+    ε swap_nat = 1 or ε swap_nat = -1
+  except that
+    1/ how to prove that x²=1 → x=1 or x=-1 ?
+    2/ how to prove that ε swap_nat ≠ 1 ?
+ *)
 Theorem ε_swap_nat :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -3624,39 +3634,53 @@ erewrite rngl_product_eq_compat. 2: {
 }
 subst x.
 rewrite <- rngl_product_mul_distr; [ | easy ].
+rewrite (rngl_product_split q); [ | flia Hpq Hq ].
+rewrite rngl_product_split_last; [ | flia Hpq ].
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
-  destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
-    destruct (lt_dec q p) as [H| H]; [ flia Hpq H | clear H ].
-    rewrite all_1_rngl_product_1; [ | easy | ]. 2: {
-      intros j Hj.
-      destruct (Nat.eq_dec j q) as [H| H]; [ flia Hiq Hj H | clear H ].
-      destruct (lt_dec p j) as [Hpj| Hpj]; [ easy | flia Hi Hiq Hj Hpj ].
-    }
-    now rewrite rngl_mul_1_r.
+  destruct (Nat.eq_dec (i - 1) q) as [H| H]; [ flia Hi H | clear H ].
+  destruct (lt_dec q (i - 1)) as [H| H]; [ flia Hi H | clear H ].
+  rewrite Nat.sub_add; [ | flia Hi ].
+  rewrite (rngl_product_split q); [ | flia Hq Hi ].
+  rewrite rngl_product_split_last; [ | easy ].
+  rewrite all_1_rngl_product_1; [ | easy | ]. 2: {
+    intros j Hj.
+    destruct (Nat.eq_dec (j - 1) q) as [H| H]; [ flia Hj H | clear H ].
+    destruct (lt_dec (i - 1) (j - 1)) as [H| H]; [ easy | flia Hj H Hi ].
   }
-  cbn.
-...
-    destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ flia Hj Hjp | ].
-    destruct (Nat.eq_dec (j - 1) q) as [Hjq| Hjq]; [ flia Hpq Hj Hjq | ].
-    replace (i - 1 <? j - 1) with (i <? j). 2: {
-      destruct i; [ easy | ].
-      destruct j; [ easy | ].
-      do 2 rewrite Nat.sub_succ, Nat.sub_0_r.
-      rewrite <- (Nat.add_1_l i).
-      rewrite <- (Nat.add_1_l j).
-      apply Nat_ltb_mono_l.
-    }
-    replace (if i <? j then _ else 1%F) with
-      (if i <? j then rngl_of_nat (j - i) else 1)%F. 2: {
-      do 2 rewrite if_ltb_lt_dec.
-      destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
-      destruct i; [ easy | ].
-      destruct j; [ easy | ].
-      rewrite Nat.sub_succ.
-      do 2 rewrite Nat.sub_succ, Nat.sub_0_r; cbn.
-      apply Nat.succ_lt_mono in Hij.
-      symmetry.
+  rewrite rngl_mul_1_l.
+  destruct (Nat.eq_dec q q) as [H| H]; [ clear H | flia H ].
+  destruct (lt_dec (i - 1) p) as [H| H]; [ flia Hi H | clear H ].
+  rewrite all_1_rngl_product_1; [ | easy | ]. 2: {
+    intros j Hj.
+    destruct (Nat.eq_dec j q) as [H| H]; [ flia Hj H | clear H ].
+    destruct (lt_dec (i - 1) j) as [H| H]; [ easy | flia Hj H Hi ].
+  }
+  rewrite rngl_mul_1_r.
+  rewrite rngl_mul_opp_opp; [ | easy ].
+  now rewrite rngl_mul_1_l.
+}
+rewrite all_1_rngl_product_1; [ | easy | easy ].
+rewrite rngl_mul_1_l.
+destruct (Nat.eq_dec q q) as [H| H]; [ clear H | easy ].
+destruct (lt_dec q p) as [H| H]; [ flia Hpq H | clear H ].
+rewrite <- rngl_mul_1_r.
+rewrite <- rngl_mul_assoc.
+f_equal.
+rewrite <- rngl_product_mul_distr; [ | easy ].
+apply all_1_rngl_product_1; [ easy | ].
+intros i Hi.
+destruct (Nat.eq_dec i q) as [H| H]; [ flia Hi H | clear H ].
+destruct (lt_dec p i) as [H| H]; [ clear H | flia Hpq Hi H ].
+rewrite rngl_mul_1_l.
+destruct (lt_dec q i) as [H| H]; [ clear H | flia Hi H ].
+rewrite rngl_mul_1_l.
+apply all_1_rngl_product_1; [ easy | ].
+intros j Hj.
+destruct (Nat.eq_dec j q) as [H| H]; [ flia Hi Hj H | clear H ].
+destruct (lt_dec i j) as [H| H]; [ easy | flia Hj H ].
+Qed.
+
 ...
 
 Theorem ε_swap_nat : ∀ n p q,
