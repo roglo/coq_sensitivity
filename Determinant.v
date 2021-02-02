@@ -4239,6 +4239,8 @@ Theorem mat_comat_mul :
   (M * (comatrix M)⁺ = determinant M × mI n)%M.
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch *.
+...
+intros Hic Hop Hin Hit H10 Hde Hch *.
 apply matrix_eq.
 intros i j Hi Hj; cbn.
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
