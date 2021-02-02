@@ -352,19 +352,6 @@ Definition ε_fun_ws f n :=
 
 Definition ε_ws {n} (p : vector n nat) := ε_fun_ws (vect_el p) n.
 
-(*
-End a.
-Require Import Zrl.
-Require Import ZArith.
-Compute (list_of_vect (canon_permut 4 1)).
-Compute let n := 4 in map (λ i, (ε_canon_permut Z_ring_like_op n i)) (seq 0 (fact n)).
-Compute let n := 4 in map (λ i, (ε Z_ring_like_op (canon_permut n i))) (seq 0 (fact n)).
-Compute let n := 4 in map (λ i, (ε_ws Z_ring_like_op (canon_permut n i))) (seq 0 (fact n)).
-Compute let n := 5 in map (λ i, (ε_canon_permut Z_ring_like_op n i)) (seq 0 (fact n)).
-Compute let n := 5 in map (λ i, (ε Z_ring_like_op (canon_permut n i))) (seq 0 (fact n)).
-Compute let n := 5 in map (λ i, (ε_ws Z_ring_like_op (canon_permut n i))) (seq 0 (fact n)).
-*)
-
 (* *)
 
 Definition comp {A B C} (f : B → C) (g : A → B) x := f (g x).
@@ -1199,7 +1186,6 @@ remember (_ * _)%F as c.
 rewrite fold_rngl_div; [ | easy ].
 rewrite rngl_mul_inv_r; [ | now left | easy ].
 subst c b.
-(**)
 rewrite rngl_inv_product_list; [ | easy | easy | easy | ]. 2: {
   intros i Hi H1.
   apply rngl_product_list_integral in H1.
@@ -1710,105 +1696,6 @@ Theorem ε_canon_permut_succ : ∀ n k,
      (minus_one_pow (k / fact n) * ε_canon_permut n (k mod fact n))%F.
 Proof. easy. Qed.
 
-(*
-Theorem ε_canon_permut_ε_canon_permut :
-  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
-  rngl_has_1_neq_0 = true →
-  ∀ n k, k < fact n → ε (canon_permut n k) = ε_canon_permut n k.
-Proof.
-intros Hin H10 * Hkn.
-destruct n. {
-  unfold ε, ε_fun; cbn.
-  unfold iter_seq, iter_list; cbn.
-  now apply rngl_div_1_r.
-}
-Search ε_canon_permut.
-...
-rewrite ε_canon_permut_succ; [ | easy ].
-...
-intros Hin H10 * Hkn.
-unfold ε.
-revert k Hkn.
-induction n; intros. {
-  apply rngl_mul_inv_r; [ easy | cbn ].
-  specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
-  now rewrite H10 in rngl_1_neq_0.
-}
-cbn.
-rewrite <- IHn. 2: {
-  apply Nat.mod_upper_bound.
-  apply fact_neq_0.
-}
-...
-unfold ε_fun.
-unfold rngl_div.
-destruct rngl_has_inv. {
-rewrite rngl_mul_assoc.
-rewrite rngl_mul_mul_swap. {
-specialize rngl_opt_mul_comm as rngl_mul_comm.
-destruct rngl_is_comm. {
-rewrite rngl_mul_comm.
-f_equal.
-...
-*)
-
-(*
-Theorem minus_one_pow_ε :
-  rngl_has_opp = true →
-  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
-  rngl_has_1_neq_0 = true →
-  ∀ n k,
-  k < fact (S n)
-  → ε (canon_permut (S n) k) =
-    (minus_one_pow (k / fact n) * ε (canon_permut n (k mod fact n)))%F.
-Proof.
-(*
-intros Hop Hiv H10 * Hk.
-rewrite ε_canon_permut_ε_canon_permut.
-rewrite ε_canon_permut_ε_canon_permut.
-apply ε_canon_permut_succ.
-...
-unfold ε.
-cbn - [ canon_permut ].
-...
-*)
-intros Hop Hiv H10 * Hk.
-revert k Hk.
-induction n; intros. {
-  apply Nat.lt_1_r in Hk; subst k.
-  cbn - [ "/" "mod" canon_permut ].
-  rewrite Nat.div_1_r, Nat.mod_1_r.
-  unfold ε, ε_fun; cbn.
-  unfold iter_seq, iter_list; cbn.
-  now do 3 rewrite rngl_mul_1_l.
-}
-(*
-unfold ε.
-remember (S n) as sn; cbn; subst sn.
-*)
-destruct n. {
-  cbn in Hk.
-  destruct k. {
-    unfold ε, ε_fun; cbn.
-    unfold iter_seq, iter_list; cbn.
-    rewrite rngl_add_0_r, rngl_sub_0_r.
-    rewrite rngl_add_sub.
-    now do 5 rewrite rngl_mul_1_l.
-  }
-  destruct k; [ cbn | flia Hk ].
-  unfold ε, ε_fun; cbn.
-  unfold iter_seq, iter_list; cbn.
-  rewrite rngl_add_0_r.
-  rewrite rngl_add_sub.
-  do 6 rewrite rngl_mul_1_l.
-  unfold rngl_sub.
-  rewrite Hop, rngl_add_0_l.
-  rewrite rngl_div_1_r; [ | easy | easy ].
-  rewrite rngl_div_1_r; [ | easy | easy ].
-  easy.
-}
-*)
-
 Theorem canon_permut_succ_values : ∀ n k σ σ',
   σ = vect_el (canon_permut (S n) k)
   → σ' = vect_el (canon_permut n (k mod fact n))
@@ -2252,18 +2139,6 @@ f_equal. {
   remember (vect_el (canon_permut n (k mod fact n))) as σ' eqn:Hσ'.
   specialize (canon_permut_succ_values Hσ Hσ') as H1.
   unfold sign_diff.
-(*
-  assert (Hσs : ∀ i, i < n → σ (S i) ≠ σ 0). {
-    intros i Hi H.
-    specialize canon_permut_is_permut as H2.
-    specialize (H2 (S n) k Hkn).
-    rewrite Hσ in H.
-    apply H2 in H; [ easy | flia Hi | flia ].
-  }
-*)
-(*
-  replace (vect_el (canon_permut (S n) k) 0) with (k / fact n) by easy.
-*)
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
     rewrite H1.
@@ -2274,7 +2149,6 @@ f_equal. {
   remember (k / fact n) as x eqn:Hx.
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
-(**)
     rewrite <- Nat.sub_succ_l; [ | easy ].
     rewrite Nat.sub_succ, Nat.sub_0_r.
     rewrite H1.
@@ -3115,11 +2989,6 @@ Definition permut_fun_swap (p q : nat) (σ : nat → nat) :=
 Definition permut_swap {n} (p q : nat) (σ : vector n nat) :=
   mk_vect n (permut_fun_swap p q (vect_el σ)).
 
-(*
-Definition permut_swap' {n} (p q : nat) (σ : vector n nat) :=
-  vect_swap_elem σ p q.
-*)
-
 (* yet another definition of determinant *)
 
 Definition determinant'' p q n (M : matrix n n T) :=
@@ -3530,16 +3399,6 @@ intros.
 now apply swap_nat_is_permut_fun.
 Qed.
 
-(* complicated proof; could be proven by saying that
-    1 = ε id = ε (swap_nat ° swap_nat) = ε (swap_nat) * ε (swap_nat)
-  thefore
-    (ε swap_nat)² = 1
-  therefore
-    ε swap_nat = 1 or ε swap_nat = -1
-  except that
-    1/ how to prove that x²=1 → x=1 or x=-1 ?
-    2/ how to prove that ε swap_nat ≠ 1 ?
- *)
 Theorem ε_swap_nat_lt :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -3863,7 +3722,6 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ mat_swap_rows ].
-(**)
 set (f := λ k, vect_swap_elem (canon_permut n k) p q).
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
