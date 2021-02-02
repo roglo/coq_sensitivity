@@ -94,6 +94,14 @@ intros * Hgh.
 now apply iter_seq_eq_compat.
 Qed.
 
+Theorem rngl_summation_list_eq_compat : ∀ A g h (l : list A),
+  (∀ i, i ∈ l → (g i = h i)%F)
+  → (Σ (i ∈ l), g i = Σ (i ∈ l), h i)%F.
+Proof.
+intros * Hgh.
+now apply iter_list_eq_compat.
+Qed.
+
 Theorem rngl_summation_succ_succ : ∀ b k g,
   (Σ (i = S b, S k), g i = Σ (i = b, k), g (S i))%F.
 Proof.

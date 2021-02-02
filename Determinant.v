@@ -3389,6 +3389,15 @@ apply (f_equal (swap_nat p q)) in Hpq.
 now do 2 rewrite swap_nat_involutive in Hpq.
 Qed.
 
+Theorem vect_swap_elem_involutive : ∀ n (v : vector n nat) p q,
+  vect_swap_elem (vect_swap_elem v p q) p q = v.
+Proof.
+intros.
+apply vector_eq.
+intros i Hi; cbn.
+now rewrite swap_nat_involutive.
+Qed.
+
 Theorem permut_swap_involutive : ∀ n p q (σ : vector n nat),
   permut_swap p q (permut_swap p q σ) = σ.
 Proof.
@@ -3852,6 +3861,20 @@ rewrite rngl_mul_opp_l; [ | easy ].
 f_equal.
 rewrite rngl_mul_1_l.
 symmetry.
+set (g := λ k, nat_of_canon_permut (f k)).
+rewrite rngl_summation_change_var with (g := g) (h := g). 2: {
+...
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros k Hk.
+  unfold f, g.
+  rewrite permut_nat_of_canon_permut.
+  rewrite vect_swap_elem_involutive.
+  easy.
+}
+Search determinant'.
+rewrite det_is_det_by_canon_permut.
+unfold determinant'.
+(* devrait le faire *)
 ...
 
 (* If we add a row (column) of A multiplied by a scalar k to another
