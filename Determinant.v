@@ -4232,11 +4232,18 @@ Print det_loop.
 
 Theorem laplace_formula_on_rows :
   rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_integral = true →
+  rngl_has_1_neq_0 = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
   ∀ n (M : matrix n n T) i,
   n ≠ 0
+  → i < n
   → determinant M = (Σ (j = 0, n - 1), mat_el M i j * mat_el (comatrix M) i j)%F.
 Proof.
-intros Hic * Hnz.
+intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hlin.
 unfold determinant.
 destruct n; [ easy | clear Hnz; cbn ].
 rewrite Nat.sub_0_r at 1.
@@ -4257,6 +4264,15 @@ destruct i. {
   f_equal; f_equal.
   apply Nat.sub_0_r.
 }
+destruct i. {
+  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ flia Hlin Hnz | ].
+  specialize (determinant_alternating Hic Hop Hin Hit H10 Hde Hch) as H1.
+  specialize (H1 _ M 1 0 (Nat.neq_succ_0 _) Hlin (Nat.lt_0_succ _)).
+  cbn in H1.
+  specialize (determinant_alternating Hic Hop Hin Hit H10 Hde Hch) as H2.
+  specialize (H2 _ M 0 1 (Nat.neq_0_succ _) (Nat.lt_0_succ _) Hlin).
+  cbn in H2.
+...
 Check determinant_alternating.
 ...
 
