@@ -4230,7 +4230,37 @@ Definition comatrix {n} (M : matrix n n T) : matrix n n T :=
 Print determinant.
 Print det_loop.
 
-Theorem laplace_formula :
+Theorem laplace_formula_on_rows :
+  rngl_is_comm = true →
+  ∀ n (M : matrix n n T) i,
+  n ≠ 0
+  → determinant M = (Σ (j = 0, n - 1), mat_el M i j * mat_el (comatrix M) i j)%F.
+Proof.
+intros Hic * Hnz.
+unfold determinant.
+destruct n; [ easy | clear Hnz; cbn ].
+rewrite Nat.sub_0_r at 1.
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  specialize rngl_opt_mul_comm as rngl_mul_comm.
+  rewrite Hic in rngl_mul_comm.
+  rewrite rngl_mul_comm.
+  rewrite rngl_mul_mul_swap; [ | easy ].
+  easy.
+}
+cbn.
+destruct i. {
+  apply rngl_summation_eq_compat.
+  intros i (_, Hi).
+  rewrite Nat.add_0_l.
+  f_equal; f_equal.
+  apply Nat.sub_0_r.
+}
+Check determinant_alternating.
+...
+
+Theorem laplace_formula_on_cols :
   rngl_is_comm = true →
   ∀ n (M : matrix n n T) j,
   n ≠ 0
@@ -4250,6 +4280,10 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
+destruct j. {
+  apply rngl_summation_eq_compat.
+  intros i (_, Hi).
+  rewrite Nat.add_0_r.
 Check determinant_alternating.
 ...
 
