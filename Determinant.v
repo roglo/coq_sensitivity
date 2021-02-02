@@ -3623,6 +3623,19 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 subst x.
+rewrite <- rngl_product_mul_distr; [ | easy ].
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
+    destruct (lt_dec q p) as [H| H]; [ flia Hpq H | clear H ].
+    rewrite all_1_rngl_product_1; [ | easy | ]. 2: {
+      intros j Hj.
+      destruct (Nat.eq_dec j q) as [H| H]; [ flia Hiq Hj H | clear H ].
+      destruct (lt_dec p j) as [Hpj| Hpj]; [ easy | flia Hi Hiq Hj Hpj ].
+    }
+    now rewrite rngl_mul_1_r.
+  }
+  cbn.
 ...
     destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ flia Hj Hjp | ].
     destruct (Nat.eq_dec (j - 1) q) as [Hjq| Hjq]; [ flia Hpq Hj Hjq | ].
