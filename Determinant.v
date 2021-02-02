@@ -3991,10 +3991,6 @@ intros i Hi.
 now rewrite Nat.add_comm, Nat.add_sub.
 Qed.
 
-Inspect 1.
-
-...
-
 (* If we add a row (column) of A multiplied by a scalar k to another
    row (column) of A, then the determinant will not change. *)
 (* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html *)
