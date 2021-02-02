@@ -4268,14 +4268,22 @@ now destruct i.
 Qed.
 
 Theorem subm_mat_swap_rows_0_2 :
+(*
+  rngl_is_comm = true →
+*)
   rngl_has_opp = true →
-  ∀ n (M : matrix n n T) r,
-  n ≠ 0
+  ∀ n (M : matrix (S n) (S n) T) r,
+  2 ≤ n
+  → r ≤ n
   → det_loop (subm (mat_swap_rows 0 2 M) 0 r) n =
     (- det_loop (subm M 2 r) n)%F.
 Proof.
-intros Hop * Hnz.
-destruct n; [ easy | clear Hnz; cbn ].
+intros (*Hic*) Hop * Hn2 Hrn.
+(*
+specialize rngl_opt_mul_comm as rngl_mul_comm.
+rewrite Hic in rngl_mul_comm.
+*)
+destruct n; [ easy | cbn ].
 rewrite rngl_opp_summation; [ | easy | easy ].
 apply rngl_summation_eq_compat.
 intros i (_, Hi).
@@ -4283,7 +4291,18 @@ rewrite <- rngl_mul_opp_l; [ | easy ].
 rewrite <- rngl_mul_opp_r; [ | easy ].
 do 2 rewrite <- rngl_mul_assoc.
 f_equal.
-...
+destruct n; [ flia Hn2 | clear Hn2 ].
+destruct n. {
+  cbn.
+  unfold iter_seq, iter_list; cbn.
+  do 2 rewrite rngl_add_0_l.
+  do 2 rewrite rngl_mul_1_l.
+  do 2 rewrite rngl_mul_1_r.
+  destruct i. {
+    cbn.
+    destruct r. {
+      cbn.
+Abort.
 
 (* Laplace formulas *)
 
@@ -4348,18 +4367,28 @@ destruct i. {
   cbn in H1.
   apply (f_equal rngl_opp) in H1.
   rewrite rngl_opp_involutive in H1; [ | easy ].
-  rewrite <- H1.
+  rewrite <- H1; clear H1.
   rewrite rngl_opp_summation; [ | easy | easy ].
+(**)
+  erewrite rngl_summation_eq_compat. 2: {
+    intros i (_, Hi); cbn.
+    rewrite minus_one_pow_succ; [ | easy | easy ].
+    rewrite minus_one_pow_succ; [ | easy | easy ].
+    rewrite rngl_opp_involutive; [ | easy ].
+    easy.
+  }
+  cbn; symmetry.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros i (_, Hi); cbn.
+    rewrite <- rngl_mul_opp_r; [ | easy ].
+    easy.
+  }
+  cbn; symmetry.
+(**)
+...
   apply rngl_summation_eq_compat.
   intros i (_, Hi).
-  rewrite <- rngl_mul_opp_r; [ | easy ].
-  f_equal. {
-    f_equal; cbn.
-    rewrite minus_one_pow_succ; [ | easy | easy ].
-    rewrite minus_one_pow_succ; [ | easy | easy ].
-    now apply rngl_opp_involutive.
-  }
-  rewrite Nat.sub_0_r at 2.
+  f_equal.
   symmetry.
   rewrite <- rngl_opp_involutive; [ | easy ].
   f_equal.
