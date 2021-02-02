@@ -4227,6 +4227,31 @@ Definition swap_in_permut n i j k := vect_swap_elem (canon_permut n k) i j.
 Definition comatrix {n} (M : matrix n n T) : matrix n n T :=
   {| mat_el i j := (minus_one_pow (i + j) * determinant (subm M i j))%F |}.
 
+Print determinant.
+Print det_loop.
+
+Theorem laplace_formula :
+  rngl_is_comm = true →
+  ∀ n (M : matrix n n T) j,
+  n ≠ 0
+  → determinant M = (Σ (i = 0, n - 1), mat_el M i j * mat_el (comatrix M) i j)%F.
+Proof.
+intros Hic * Hnz.
+unfold determinant.
+destruct n; [ easy | clear Hnz; cbn ].
+rewrite Nat.sub_0_r at 1.
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  specialize rngl_opt_mul_comm as rngl_mul_comm.
+  rewrite Hic in rngl_mul_comm.
+  rewrite rngl_mul_comm.
+  rewrite rngl_mul_mul_swap; [ | easy ].
+  easy.
+}
+cbn.
+...
+
 Theorem mat_comat_mul :
   rngl_is_comm = true →
   rngl_has_opp = true →
