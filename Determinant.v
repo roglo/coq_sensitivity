@@ -4315,10 +4315,36 @@ destruct i. {
   cbn; symmetry.
   erewrite rngl_summation_eq_compat. 2: {
     intros i (_, Hi); cbn.
-    rewrite <- rngl_mul_opp_r; [ | easy ].
+    rewrite <- rngl_mul_opp_l; [ | easy ].
+    rewrite <- rngl_mul_opp_l; [ | easy ].
     easy.
   }
   cbn; symmetry.
+  rewrite (rngl_summation_split _ 2); [ symmetry | flia Hlin ].
+  rewrite (rngl_summation_split _ 2); [ symmetry | flia Hlin ].
+  rewrite rngl_summation_split_last; [ symmetry | flia ].
+  rewrite rngl_summation_split_last; [ symmetry | flia ].
+  cbn.
+  rewrite rngl_mul_1_l.
+  destruct n; [ easy | ].
+  destruct n; [ flia Hlin | clear Hnz Hlin ].
+  destruct n. {
+    f_equal.
+...
+  set (g := swap_nat 0 2).
+  rewrite rngl_summation_change_var with (g := g) (h := g). 2: {
+    intros k (_, Hk).
+    apply swap_nat_involutive.
+  }
+  rewrite Nat.sub_0_r.
+  unfold g.
+  rewrite rngl_summation_list_permut with (l2 := seq 0 (S n)); [ | easy | ]. 2: {
+    apply permut_fun_Permutation.
+    apply swap_nat_is_permut; [ flia | easy ].
+  }
+  rewrite rngl_summation_seq_summation; [ | easy ].
+  rewrite Nat.add_0_l, Nat.sub_succ.
+  rewrite Nat.sub_0_r at 1.
 ...
   apply rngl_summation_eq_compat.
   intros i (_, Hi).
