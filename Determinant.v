@@ -4227,8 +4227,6 @@ Definition swap_in_permut n i j k := vect_swap_elem (canon_permut n k) i j.
 Definition comatrix {n} (M : matrix n n T) : matrix n n T :=
   {| mat_el i j := (minus_one_pow (i + j) * determinant (subm M i j))%F |}.
 
-...
-
 Theorem subm_mat_swap_rows_0_1 : ∀ n (M : matrix n n T) r,
   subm (mat_swap_rows 0 1 M) 0 r = subm M 1 r.
 Proof.
@@ -4351,33 +4349,6 @@ destruct n. {
 Check determinant_alternating.
 ...
 
-Theorem laplace_formula_on_cols :
-  rngl_is_comm = true →
-  ∀ n (M : matrix n n T) j,
-  n ≠ 0
-  → determinant M = (Σ (i = 0, n - 1), mat_el M i j * mat_el (comatrix M) i j)%F.
-Proof.
-intros Hic * Hnz.
-unfold determinant.
-destruct n; [ easy | clear Hnz; cbn ].
-rewrite Nat.sub_0_r at 1.
-symmetry.
-erewrite rngl_summation_eq_compat. 2: {
-  intros i Hi.
-  specialize rngl_opt_mul_comm as rngl_mul_comm.
-  rewrite Hic in rngl_mul_comm.
-  rewrite rngl_mul_comm.
-  rewrite rngl_mul_mul_swap; [ | easy ].
-  easy.
-}
-cbn.
-destruct j. {
-  apply rngl_summation_eq_compat.
-  intros i (_, Hi).
-  rewrite Nat.add_0_r.
-Check determinant_alternating.
-...
-
 Theorem mat_comat_mul :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -4390,45 +4361,6 @@ Theorem mat_comat_mul :
   (M * (comatrix M)⁺ = determinant M × mI n)%M.
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch *.
-...
-intros Hic Hop Hin Hit H10 Hde Hch *.
-apply matrix_eq.
-intros i j Hi Hj; cbn.
-destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-  subst j; clear Hj.
-  rewrite rngl_mul_1_r.
-  rewrite det_is_det_by_canon_permut; try easy.
-  unfold determinant'.
-  erewrite rngl_summation_eq_compat. 2: {
-    intros j Hj.
-    rewrite det_is_det_by_canon_permut; try easy.
-  }
-  unfold determinant'.
-  erewrite rngl_summation_eq_compat. 2: {
-    intros j (_, Hj).
-    rewrite rngl_mul_summation_distr_l.
-    rewrite rngl_mul_summation_distr_l.
-    erewrite rngl_summation_eq_compat. 2: {
-      intros k Hk.
-      do 2 rewrite rngl_mul_assoc.
-      rewrite (rngl_mul_mul_swap Hic (mat_el M i j)).
-      specialize rngl_opt_mul_comm as rngl_mul_comm.
-      rewrite Hic in rngl_mul_comm.
-      rewrite (rngl_mul_comm (mat_el M i j)).
-      do 2 rewrite <- rngl_mul_assoc.
-      easy.
-    }
-    cbn - [ canon_permut subm ].
-    easy.
-  }
-  cbn - [ canon_permut subm ].
-  rewrite rngl_summation_summation_exch'; [ | easy ].
-  erewrite rngl_summation_eq_compat. 2: {
-    intros k Hk.
-    rewrite <- rngl_mul_summation_distr_l.
-    easy.
-  }
-  cbn - [ canon_permut subm ].
 ...
 
 End a.
