@@ -4227,32 +4227,7 @@ Definition swap_in_permut n i j k := vect_swap_elem (canon_permut n k) i j.
 Definition comatrix {n} (M : matrix n n T) : matrix n n T :=
   {| mat_el i j := (minus_one_pow (i + j) * determinant (subm M i j))%F |}.
 
-(*
-Theorem subm_mat_swap_rows : ∀ n (M : matrix n n T) p q r,
-  subm (mat_swap_rows p q M) p r = subm M q r.
-Proof.
-intros.
-apply matrix_eq.
-intros i j Hi Hj; cbn.
-remember (p <=? i) as bpi eqn:Hbpi.
-remember (r <=? j) as brj eqn:Hbrj.
-remember (q <=? i) as bqi eqn:Hbqi.
-move brj before bpi; move bqi before brj.
-symmetry in Hbpi, Hbrj, Hbqi.
-destruct bpi; cbn. {
-  apply Nat.leb_le in Hbpi.
-  destruct (Nat.eq_dec (i + 1) p) as [H| H]; [ flia Hbpi H | clear H ].
-  destruct bqi; cbn. {
-    apply Nat.leb_le in Hbqi.
-    destruct (Nat.eq_dec (i + 1) q) as [H| H]; [ flia Hbqi H | clear H ].
-    easy.
-  } {
-    rewrite Nat.add_0_r.
-    apply Nat.leb_gt in Hbqi.
-    destruct (Nat.eq_dec (i + 1) q) as [Hiq| Hiq]. {
-(* bin non, du coup, c'est faux *)
 ...
-*)
 
 Theorem subm_mat_swap_rows_0_1 : ∀ n (M : matrix n n T) r,
   subm (mat_swap_rows 0 1 M) 0 r = subm M 1 r.
@@ -4266,43 +4241,6 @@ destruct (Nat.eq_dec (i + 1) 1) as [H| H]. {
 }
 now destruct i.
 Qed.
-
-Theorem subm_mat_swap_rows_0_2 :
-(*
-  rngl_is_comm = true →
-*)
-  rngl_has_opp = true →
-  ∀ n (M : matrix (S n) (S n) T) r,
-  2 ≤ n
-  → r ≤ n
-  → det_loop (subm (mat_swap_rows 0 2 M) 0 r) n =
-    (- det_loop (subm M 2 r) n)%F.
-Proof.
-intros (*Hic*) Hop * Hn2 Hrn.
-(*
-specialize rngl_opt_mul_comm as rngl_mul_comm.
-rewrite Hic in rngl_mul_comm.
-*)
-destruct n; [ easy | cbn ].
-rewrite rngl_opp_summation; [ | easy | easy ].
-apply rngl_summation_eq_compat.
-intros i (_, Hi).
-rewrite <- rngl_mul_opp_l; [ | easy ].
-rewrite <- rngl_mul_opp_r; [ | easy ].
-do 2 rewrite <- rngl_mul_assoc.
-f_equal.
-destruct n; [ flia Hn2 | clear Hn2 ].
-destruct n. {
-  cbn.
-  unfold iter_seq, iter_list; cbn.
-  do 2 rewrite rngl_add_0_l.
-  do 2 rewrite rngl_mul_1_l.
-  do 2 rewrite rngl_mul_1_r.
-  destruct i. {
-    cbn.
-    destruct r. {
-      cbn.
-Abort.
 
 (* Laplace formulas *)
 
@@ -4369,7 +4307,6 @@ destruct i. {
   rewrite rngl_opp_involutive in H1; [ | easy ].
   rewrite <- H1; clear H1.
   rewrite rngl_opp_summation; [ | easy | easy ].
-(**)
   erewrite rngl_summation_eq_compat. 2: {
     intros i (_, Hi); cbn.
     rewrite minus_one_pow_succ; [ | easy | easy ].
