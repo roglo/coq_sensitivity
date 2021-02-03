@@ -4314,6 +4314,10 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ determinant ].
+(**)
+rewrite H1; cbn.
+rewrite rngl_opp_summation; [ | easy | easy ].
+unfold determinant.
 ...
 destruct (Nat.eq_dec i n) as [Hein| Hein]. {
   subst i; clear Hlin.
