@@ -4319,6 +4319,7 @@ destruct i. {
     easy.
   }
   cbn; symmetry.
+...
   apply rngl_summation_eq_compat.
   intros i (_, Hi).
   f_equal.
@@ -4345,6 +4346,29 @@ destruct n. {
     cbn.
     destruct j. {
       cbn.
+...
+
+Abort.
+End a.
+Check comatrix.
+Require Import ZArith.
+Require Import Zrl.
+Open Scope Z_scope.
+Compute (list_list_of_mat (mat_of_list_list 0 [[-2;-1;-1];[-2;-1;1];[-1;-1;3]])).
+Compute (determinant Z_ring_like_op (let M := mat_of_list_list 0 [[-2;-1;-1];[-2;-1;1];[-1;-1;3]] in M)).
+Arguments determinant {T ro} {n}%nat.
+Arguments comatrix {T ro} {n}%nat.
+Compute (let _ := Z_ring_like_op in let M := mat_of_list_list 0 [[-2;-1;-1];[-2;-1;1];[-1;-1;3]] in determinant M).
+Definition mat_nrows {m n T} (M : matrix m n T) := m.
+Compute (let _ := Z_ring_like_op in let M := mat_of_list_list 0 [[-2;-1;-1];[-2;-1;1];[-1;-1;3]] in let i := 3%nat in let n := mat_nrows M in (Σ (j = 0, n - 1), mat_el M i j * mat_el (comatrix M) i j)%F).
+Compute (let _ := Z_ring_like_op in let M := mat_of_list_list 0 [[-2;-1;-1];[-2;-1;1];[-1;-1;3]] in (mat_el M 1 1 * mat_el M 0 2)%F = (- mat_el M 0 1 * mat_el M 1 2)%F).
+Compute (let _ := Z_ring_like_op in let M := mat_of_list_list 0 [[1;1;-1];[2;0;1];[2;1;-1]] in (mat_el M 1 1 * mat_el M 0 2)%F = (- mat_el M 0 1 * mat_el M 1 2)%F).
+Compute (let _ := Z_ring_like_op in let M := mat_of_list_list 0 [[1;1;-1];[2;0;1];[2;1;-1]] in determinant M).
+Compute (let _ := Z_ring_like_op in let M := mat_of_list_list 0 [[1;1;-1];[2;0;1];[2;1;-1]] in let n := mat_nrows M in let i := 2%nat in (Σ (j = 0, n - 1), mat_el M i j * mat_el (comatrix M) i j)%F).
+...
+...
+Compute (list_list_of_mat (comatrix Z_ring_like_op (mat_of_list_list 0 [[-2;-1;-1];[-2;-1;1];[-1;-1;3]]))).
+  → determinant M = (Σ (j = 0, n - 1), mat_el M i j * mat_el (comatrix M) i j)%F.
 ...
 Check determinant_alternating.
 ...
