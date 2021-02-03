@@ -4309,7 +4309,53 @@ destruct i. {
   destruct n; [ easy | ].
   destruct n; [ flia Hlin | clear Hnz Hlin ].
   destruct n. {
-    f_equal.
+    f_equal; f_equal. 2: {
+      rewrite rngl_mul_opp_l; [ | easy ].
+      rewrite rngl_mul_1_l.
+      rewrite rngl_mul_opp_l; [ | easy ].
+      rewrite <- rngl_mul_opp_r; [ | easy ].
+      f_equal; cbn.
+      unfold iter_seq, iter_list; cbn.
+      do 6 rewrite rngl_add_0_l.
+      do 4 rewrite rngl_mul_1_l.
+      do 4 rewrite rngl_mul_1_r.
+      rewrite rngl_opp_add_distr; [ | easy ].
+      rewrite <- rngl_mul_opp_l; [ | easy ].
+      rewrite <- rngl_mul_opp_l; [ | easy ].
+      rewrite rngl_opp_involutive; [ | easy ].
+      rewrite rngl_mul_1_l.
+      rewrite rngl_mul_comm; [ | easy ].
+      rewrite rngl_mul_opp_l; [ | easy ].
+      rewrite rngl_mul_1_l.
+      rewrite rngl_mul_opp_l; [ | easy ].
+      rewrite fold_rngl_sub; [ | easy ].
+      f_equal.
+      now apply rngl_mul_comm.
+    }
+    cbn.
+    unfold iter_seq, iter_list; cbn.
+    do 12 rewrite rngl_add_0_l.
+    do 7 rewrite rngl_mul_1_l.
+    do 6 rewrite rngl_mul_1_r.
+    do 14 (rewrite rngl_mul_opp_l; [ | easy ]).
+    do 4 rewrite rngl_mul_1_l.
+...
+    rewrite rngl_mul_opp_l; [ | easy ].
+    rewrite rngl_mul_opp_l; [ | easy ].
+    rewrite rngl_mul_opp_l; [ | easy ].
+    rewrite rngl_opp_add_distr; [ | easy ].
+      rewrite <- rngl_mul_opp_l; [ | easy ].
+      rewrite <- rngl_mul_opp_l; [ | easy ].
+      rewrite rngl_opp_involutive; [ | easy ].
+      rewrite rngl_mul_1_l.
+      rewrite rngl_mul_comm; [ | easy ].
+      rewrite rngl_mul_opp_l; [ | easy ].
+      rewrite rngl_mul_1_l.
+      rewrite rngl_mul_opp_l; [ | easy ].
+      rewrite fold_rngl_sub; [ | easy ].
+      f_equal.
+      now apply rngl_mul_comm.
+
 ...
   set (g := swap_nat 0 2).
   rewrite rngl_summation_change_var with (g := g) (h := g). 2: {
