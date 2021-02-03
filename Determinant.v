@@ -4296,7 +4296,25 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   apply Nat.sub_0_r.
 }
 destruct n; [ easy | clear Hnz ].
-replace (S n - 1) with n by flia; cbn.
+replace (S n - 1) with n by flia.
+specialize (determinant_alternating Hic Hop Hin Hit H10 Hde Hch) as H1.
+specialize (H1 (S n) M 0 i).
+assert (H : 0 ≠ i) by flia Hiz.
+specialize (H1 H); clear H.
+specialize (H1 (Nat.lt_0_succ _) Hlin).
+apply (f_equal rngl_opp) in H1.
+rewrite rngl_opp_involutive in H1; [ | easy ].
+symmetry in H1.
+unfold comatrix.
+cbn - [ determinant ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite rngl_mul_comm; [ | easy ].
+  rewrite rngl_mul_mul_swap; [ | easy ].
+  easy.
+}
+cbn - [ determinant ].
+...
 destruct (Nat.eq_dec i n) as [Hein| Hein]. {
   subst i; clear Hlin.
 ...
