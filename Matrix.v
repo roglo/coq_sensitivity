@@ -896,7 +896,9 @@ Theorem mat_1_neq_0 : ∀ n,
   else not_applicable.
 Proof.
 intros.
+(*
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
+*)
 remember (rngl_has_1_neq_0 && negb (n =? 0)) as b eqn:Hb.
 symmetry in Hb.
 destruct b; [ | easy ].
@@ -904,11 +906,11 @@ apply Bool.andb_true_iff in Hb.
 destruct Hb as (H10, Hb).
 apply Bool.negb_true_iff in Hb.
 apply Nat.eqb_neq in Hb.
-rewrite H10 in rngl_1_neq_0.
 apply matrix_neq.
 intros H; cbn in H.
 destruct n; [ easy | ].
-now specialize (H 0 0 (Nat.lt_0_succ _) (Nat.lt_0_succ _)).
+specialize (H 0 0 (Nat.lt_0_succ _) (Nat.lt_0_succ _)).
+now apply rngl_1_neq_0 in H.
 Qed.
 
 Theorem mat_consistent : ∀ n,

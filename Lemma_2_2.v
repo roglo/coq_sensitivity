@@ -863,8 +863,6 @@ split. {
       assert (H1 : ∀ i, f i = g i) by now rewrite H.
       specialize (H1 0).
       unfold f, g in H1; cbn in H1.
-      specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
-      rewrite H10 in rngl_1_neq_0.
       now apply rngl_1_neq_0 in H1.
     }
     specialize An_eigen_equation_for_sqrt_n as H1.

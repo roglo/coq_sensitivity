@@ -1034,8 +1034,6 @@ Theorem permut_swap_mul_cancel : ∀ n σ f,
     1%F.
 Proof.
 intros * Hic Hin H10 Hp Hfij Hfijnz * Hlin Hljn.
-specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
-rewrite H10 in rngl_1_neq_0.
 do 4 rewrite if_ltb_lt_dec.
 destruct (lt_dec (σ i) (σ j)) as [H1| H1]. {
   destruct (lt_dec (σ j) (σ i)) as [H| H]; [ flia H1 H | clear H ].
@@ -1046,7 +1044,7 @@ destruct (lt_dec (σ i) (σ j)) as [H1| H1]. {
       apply Hfijnz; [ easy | easy | flia H3 ].
     }
     rewrite rngl_mul_1_l.
-    apply rngl_mul_inv_r; [ now left | easy ].
+    apply rngl_mul_inv_r; [ now left | now apply rngl_1_neq_0 ].
   }
   destruct (lt_dec j i) as [H4| H4]. {
     rewrite Hfij.
@@ -1113,8 +1111,6 @@ Theorem product_product_if_permut_div :
      1%F.
 Proof.
 intros Hic H10 Hin * Hp Hfij Hfijnz.
-specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
-rewrite H10 in rngl_1_neq_0.
 rewrite rngl_product_product_by_swap; [ | easy ].
 rewrite all_1_rngl_product_list_1; [ | easy | ]. 2: {
   intros i Hi.
@@ -1146,10 +1142,8 @@ Theorem rngl_product_product_div_eq_1 :
     (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), g i j))%F.
 Proof.
 intros Hic Hid Hin H10 Hed * Hg Hs.
-specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
 specialize rngl_opt_eq_dec as rngl_eq_dec.
 specialize @rngl_product_list_opt_integral as rngl_product_list_integral.
-rewrite H10 in rngl_1_neq_0.
 rewrite Hed in rngl_eq_dec.
 specialize (rngl_product_list_integral T ro rp Hin H10).
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
@@ -1172,7 +1166,8 @@ apply rngl_mul_reg_r with (c := (¹/ b)%F); [ now left | | ]. {
   apply (f_equal (rngl_mul b)) in Hbiz.
   rewrite fold_rngl_div in Hbiz; [ | easy ].
   rewrite rngl_mul_inv_r in Hbiz; [ | now left | easy ].
-  now rewrite rngl_mul_0_r in Hbiz.
+  rewrite rngl_mul_0_r in Hbiz.
+  now apply rngl_1_neq_0 in Hbiz.
 }
 remember (_ * _)%F as c.
 rewrite fold_rngl_div; [ | easy ].
@@ -1229,12 +1224,10 @@ Theorem product_product_if_permut :
     (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), if i <? j then f i j else 1))%F.
 Proof.
 intros Hic Hid Hin H10 Hed * Hp Hfij Hfijnz.
-specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
-rewrite H10 in rngl_1_neq_0.
 apply rngl_product_product_div_eq_1; try easy. {
   intros i j Hi Hj.
   rewrite if_ltb_lt_dec.
-  destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
+  destruct (lt_dec i j) as [Hij| Hij]; [ | now apply rngl_1_neq_0 ].
   apply Hfijnz; [ easy | easy | flia Hij ].
 }
 now apply product_product_if_permut_div.
@@ -1315,8 +1308,6 @@ Theorem signature_comp_fun_expand_1 :
 Proof.
 intros Hop Hin H10 Hit Hch * Hp2 Hs.
 unfold ε_fun, comp; cbn.
-specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
-rewrite H10 in rngl_1_neq_0.
 rewrite <- Hs; symmetry.
 apply rngl_div_mul_div; [ easy | ].
 intros Hij.
@@ -1327,7 +1318,7 @@ apply rngl_product_integral in Hij.
 destruct Hij as (j & Hj & Hij).
 unfold δ in Hij.
 rewrite if_ltb_lt_dec in Hij.
-destruct (lt_dec i j) as [Hlij| Hlij]; [ | easy ].
+destruct (lt_dec i j) as [Hlij| Hlij]; [ | now apply rngl_1_neq_0 ].
 apply rngl_sub_move_0_r in Hij; [ | easy ].
 apply rngl_of_nat_inj in Hij; [ | easy ].
 destruct Hp2 as (Hp21, Hp22).
@@ -1354,8 +1345,6 @@ Theorem signature_comp_fun_expand_2_1 :
        else 1)))%F.
 Proof.
 intros Hop Hin Hic H10 Hit Hch * Hp2.
-specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
-rewrite H10 in rngl_1_neq_0.
 unfold rngl_div; rewrite Hin.
 rewrite rngl_inv_product_comm; [ | easy | easy | easy | easy | ]. 2: {
   intros i Hi Hij.
@@ -1364,7 +1353,7 @@ rewrite rngl_inv_product_comm; [ | easy | easy | easy | easy | ]. 2: {
   destruct Hij as (j & Hj & Hij).
   unfold δ in Hij.
   rewrite if_ltb_lt_dec in Hij.
-  destruct (lt_dec i j) as [Hlij| Hlij]; [ | easy ].
+  destruct (lt_dec i j) as [Hlij| Hlij]; [ | now apply rngl_1_neq_0 in Hij ].
   apply rngl_sub_move_0_r in Hij; [ | easy ].
   apply rngl_of_nat_inj in Hij; [ | easy ].
   apply Hp2 in Hij; [ flia Hi Hj Hlij Hij | flia Hj | flia Hi ].
@@ -1376,7 +1365,7 @@ erewrite rngl_product_eq_compat. 2: {
     intros j Hj Hij.
     unfold δ in Hij.
     rewrite if_ltb_lt_dec in Hij.
-    destruct (lt_dec i j) as [Hlij| Hlij]; [ | easy ].
+    destruct (lt_dec i j) as [Hlij| Hlij]; [ | now apply rngl_1_neq_0 in Hij ].
     apply rngl_sub_move_0_r in Hij; [ | easy ].
     apply rngl_of_nat_inj in Hij; [ | easy ].
     apply Hp2 in Hij; [ flia Hi Hj Hlij Hij | flia Hj | flia Hi ].
@@ -1423,8 +1412,6 @@ Theorem signature_comp_fun_expand_2_2 :
      else 1)))%F.
 Proof.
 intros Hop Hin Hic H10 Hit Hch *.
-specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
-rewrite H10 in rngl_1_neq_0.
 unfold rngl_div; rewrite Hin.
 rewrite rngl_inv_product_comm; [ | easy | easy | easy | easy | ]. 2: {
   intros i Hi Hij.
@@ -1434,7 +1421,7 @@ rewrite rngl_inv_product_comm; [ | easy | easy | easy | easy | ]. 2: {
   destruct Hij as (j & Hj & Hij).
   unfold δ in Hij.
   rewrite if_ltb_lt_dec in Hij.
-  destruct (lt_dec i j) as [Hlij| Hlij]; [ | easy ].
+  destruct (lt_dec i j) as [Hlij| Hlij]; [ | now apply rngl_1_neq_0 in Hij ].
   apply rngl_sub_move_0_r in Hij; [ | easy ].
   apply rngl_of_nat_inj in Hij; [ | easy ].
   flia Hlij Hij.
@@ -1446,7 +1433,7 @@ erewrite rngl_product_eq_compat. 2: {
     intros j Hj Hij.
     unfold δ in Hij.
     rewrite if_ltb_lt_dec in Hij.
-    destruct (lt_dec i j) as [Hlij| Hlij]; [ | easy ].
+    destruct (lt_dec i j) as [Hlij| Hlij]; [ | now apply rngl_1_neq_0 in Hij ].
     apply rngl_sub_move_0_r in Hij; [ | easy ].
     apply rngl_of_nat_inj in Hij; [ | easy ].
     flia Hlij Hij.
@@ -1773,8 +1760,6 @@ Theorem ε_ws_ε_fun :
   → ε_fun σ n = ε_fun_ws σ n.
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hp.
-specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
-rewrite H10 in rngl_1_neq_0.
 unfold ε_fun, ε_fun_ws, δ.
 rewrite rngl_product_product_if.
 rewrite rngl_product_product_if.
@@ -1789,7 +1774,7 @@ rewrite <- rngl_product_div_distr; try easy. 2: {
   cbn.
   destruct (Nat.eq_dec i n) as [Hein| Hein]. {
     subst i.
-    rewrite rngl_product_empty; [ easy | flia ].
+    rewrite rngl_product_empty; [ now apply rngl_1_neq_0 | flia ].
   }
   rewrite rngl_product_shift; [ | flia Hi Hein ].
   erewrite rngl_product_eq_compat. 2: {
@@ -3845,12 +3830,31 @@ Theorem determinant_alternating_permut :
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
   ∀ n (M : matrix n n T) σ,
-  is_permut σ
+  n ≠ 0
+  → is_permut σ
   → determinant (mat_permut_rows σ M) = (ε σ * determinant M)%F.
 Proof.
-intros Hic Hop Hin Hit H10 Hde Hch * Hp.
-
+intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hp.
+destruct n; [ easy | clear Hnz ].
+induction n. {
+  cbn.
+  unfold iter_seq, iter_list; cbn.
+  do 2 rewrite rngl_add_0_l.
+  do 2 rewrite rngl_mul_1_l, rngl_mul_1_r.
+  destruct Hp as (Hp1, Hp2).
+  specialize (Hp1 0 Nat.lt_0_1).
+  apply Nat.lt_1_r in Hp1; rewrite Hp1.
+  symmetry; rewrite <- rngl_mul_1_l; f_equal.
+  unfold ε, ε_fun; cbn.
+  unfold iter_seq, iter_list; cbn.
+  apply rngl_mul_inv_r; [ now left | ].
+  do 2 rewrite rngl_mul_1_l.
 ...
+  apply rngl_1_neq_0.
+  specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
+  rewrite H10 in rngl_1_neq_0.
+...
+*)
 
 (* If we add a row (column) of A multiplied by a scalar k to another
    row (column) of A, then the determinant will not change. *)
@@ -4494,6 +4498,7 @@ destruct i. {
 ...
 Check determinant_alternating.
 ...
+*)
 
 Theorem mat_comat_mul :
   rngl_is_comm = true →
@@ -4508,6 +4513,7 @@ Theorem mat_comat_mul :
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch *.
 ...
+*)
 
 End a.
 

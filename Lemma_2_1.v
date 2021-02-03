@@ -492,7 +492,8 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     f_equal.
     now apply minus_one_pow_add_r.
   }
-Abort. (*
+...
+(*
   unfold determinant.
   induction n; [ easy | ].
   rewrite Nat.sub_succ, Nat.sub_0_r at 1.
@@ -515,7 +516,7 @@ Theorem det_nz_inv_comm : ∀ n (MA MB : matrix n n T),
 Proof.
 intros * Hdet Hab.
 Print comatrix.
-Abort.
+...
 
 (* how to prove that one? *)
 Theorem mat_with_eigen_vect_mul_transp_r :
@@ -555,6 +556,7 @@ rewrite (@det_nz_inv_comm _ _ U). 3: {
 } 2: {
 ...
 *)
+*)
 
 (* changing variable x as y = O^T . x, the Rayleigh quotient R (M, x)
    is equal to
@@ -571,6 +573,7 @@ Theorem Rayleigh_quotient_from_ortho : ∀ n (M : matrix n n T) D U x y ev,
 Proof.
 intros * Hsy Hev Hmin Hmax.
 ...
+*)
 
 (* The Rayleigh quotient reaches its minimum value μ_min (the smallest
    eigenvalue of M) when x is v_min (the corresponding eigenvector).
@@ -585,6 +588,7 @@ Theorem glop : ∀ n (M : matrix n n T) x sev μ_min μ_max,
 Proof.
 intros * Hev Hsev Hmin Hmax.
 ...
+*)
 
 (* min-max theorem, or variational theorem, or Courant–Fischer–Weyl min-max principle *)
 

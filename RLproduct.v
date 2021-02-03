@@ -183,11 +183,9 @@ Theorem rngl_product_list_opt_integral :
   → ∃ i, i ∈ l ∧ f i = 0%F.
 Proof.
 intros Hin H10 * Hz.
-specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
 specialize rngl_opt_integral as rngl_integral.
-rewrite H10 in rngl_1_neq_0.
 rewrite Hin in rngl_integral.
-induction l as [| a]; [ easy | ].
+induction l as [| a]; [ now apply rngl_1_neq_0 in Hz | ].
 unfold iter_list in Hz; cbn in Hz.
 rewrite rngl_mul_1_l in Hz.
 rewrite (fold_left_op_fun_from_d 1%F) in Hz; cycle 1. {

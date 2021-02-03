@@ -228,6 +228,15 @@ rewrite Hic in H.
 apply H.
 Qed.
 
+Theorem rngl_1_neq_0 :
+  rngl_has_1_neq_0 = true →
+  (1 ≠ 0)%F.
+Proof.
+intros H10.
+specialize rngl_opt_1_neq_0 as H.
+now rewrite H10 in H.
+Qed.
+
 Theorem rngl_mul_add_distr_r : ∀ x y z,
   ((x + y) * z = x * z + y * z)%F.
 Proof.
@@ -578,8 +587,6 @@ Theorem rngl_inv_1 :
   (¹/ 1 = 1)%F.
 Proof.
 intros Hin H10.
-specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
-rewrite H10 in rngl_1_neq_0.
 specialize rngl_mul_inv_r as H.
 unfold rngl_div in H.
 rewrite Hin in H.
@@ -587,7 +594,8 @@ transitivity (1 * ¹/ 1)%F. {
   symmetry.
   apply rngl_mul_1_l.
 }
-apply H; [ now left | easy ].
+apply H; [ now left | ].
+now apply rngl_1_neq_0.
 Qed.
 
 Theorem rngl_div_1_l :
@@ -606,17 +614,16 @@ Theorem rngl_div_1_r :
   ∀ a, (a / 1 = a)%F.
 Proof.
 intros Hid H10 *.
-specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
 specialize rngl_opt_mul_div_l as rngl_mul_div_l.
-rewrite H10 in rngl_1_neq_0.
 destruct Hid as [Hid| Hid]. {
   unfold rngl_div; rewrite Hid.
   rewrite rngl_inv_1; [ | easy | easy ].
   apply rngl_mul_1_r.
 } {
   rewrite Hid in rngl_mul_div_l.
-  specialize (rngl_mul_div_l 1%F a rngl_1_neq_0) as H1.
-  now rewrite rngl_mul_1_l in H1.
+  specialize (rngl_mul_div_l 1%F a) as H1.
+  rewrite rngl_mul_1_l in H1.
+  now apply H1, rngl_1_neq_0.
 }
 Qed.
 
@@ -678,9 +685,8 @@ intros Hin H10 * Haz H1.
 symmetry in H1.
 apply rngl_mul_move_1_r in H1; [ | easy | easy ].
 rewrite rngl_mul_0_l in H1.
-specialize rngl_opt_1_neq_0 as H2.
-symmetry in H1.
-now rewrite H10 in H2.
+symmetry in H1; revert H1.
+now apply rngl_1_neq_0.
 Qed.
 
 Theorem rngl_inv_involutive :
