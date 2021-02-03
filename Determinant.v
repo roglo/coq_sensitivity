@@ -2931,13 +2931,13 @@ apply rngl_summation_permut; [ now symmetry | | ]. {
 }
 Qed.
 
-Definition swap_nat i j k :=
+Definition transposition i j k :=
   if Nat.eq_dec k i then j
   else if Nat.eq_dec k j then i
   else k.
 
 Definition vect_swap_elem n (v : vector n nat) i j :=
-  mk_vect n (λ k, vect_el v (swap_nat i j k)).
+  mk_vect n (λ k, vect_el v (transposition i j k)).
 
 (* i such that vect_el (permut n k) i = j *)
 
@@ -2955,7 +2955,7 @@ Definition canon_permut_swap_last (p q : nat) n k :=
 (* *)
 
 Definition permut_fun_swap (p q : nat) (σ : nat → nat) :=
-  λ i, σ (swap_nat p q i).
+  λ i, σ (transposition p q i).
 
 Definition permut_swap {n} (p q : nat) (σ : vector n nat) :=
   mk_vect n (permut_fun_swap p q (vect_el σ)).
@@ -2990,17 +2990,17 @@ rewrite seq_nth; [ | easy ].
 now rewrite Nat.add_0_l.
 Qed.
 
-(* perhaps should use swap_nat_injective, below *)
-Theorem swap_nat_swap_nat : ∀ n p q j k,
+(* perhaps should use transposition_injective, below *)
+Theorem transposition_transposition : ∀ n p q j k,
   p < q < n
   → j < n
   → k < n
   → j ≠ k
-  → swap_nat p (n - 2) (swap_nat q (n - 1) j) ≠
-    swap_nat p (n - 2) (swap_nat q (n - 1) k).
+  → transposition p (n - 2) (transposition q (n - 1) j) ≠
+    transposition p (n - 2) (transposition q (n - 1) k).
 Proof.
 intros * (Hpq, Hqn) Hjn Hkn Hjk Hjke.
-unfold swap_nat in Hjke.
+unfold transposition in Hjke.
 destruct (Nat.eq_dec j q) as [H1| H1]. {
   subst j.
   destruct (Nat.eq_dec k q) as [H1| H1]; [ now subst k | ].
@@ -3107,14 +3107,14 @@ destruct (Nat.eq_dec j q) as [H1| H1]. {
 }
 Qed.
 
-Theorem swap_nat_lt : ∀ i j k n,
+Theorem transposition_lt : ∀ i j k n,
   i < n
   → j < n
   → k < n
-  → swap_nat i j k < n.
+  → transposition i j k < n.
 Proof.
 intros * Hi Hj Hk.
-unfold swap_nat.
+unfold transposition.
 destruct (Nat.eq_dec k i); [ easy | ].
 now destruct (Nat.eq_dec k j).
 Qed.
@@ -3125,7 +3125,7 @@ Proof.
 intros.
 apply vector_eq; cbn.
 intros j Hj.
-unfold swap_nat.
+unfold transposition.
 destruct (Nat.eq_dec j i); [ now subst i | easy ].
 Qed.
 
@@ -3203,11 +3203,11 @@ Definition mat_swap_rows n i1 i2 (M : matrix n n T) :=
      else if Nat.eq_dec i i2 then mat_el M i1 j
      else mat_el M i j).
 
-Theorem swap_nat_involutive : ∀ p q i,
-  swap_nat p q (swap_nat p q i) = i.
+Theorem transposition_involutive : ∀ p q i,
+  transposition p q (transposition p q i) = i.
 Proof.
 intros.
-unfold swap_nat.
+unfold transposition.
 destruct (Nat.eq_dec i p) as [Hip| Hip]. {
   destruct (Nat.eq_dec q p) as [Hqp| Hqp]; [ congruence | ].
   destruct (Nat.eq_dec q q) as [H| H]; [ congruence | easy ].
@@ -3220,13 +3220,13 @@ destruct (Nat.eq_dec i q) as [H| H]; [ easy | clear H ].
 easy.
 Qed.
 
-Theorem swap_nat_injective : ∀ p q i j,
-  swap_nat p q i = swap_nat p q j
+Theorem transposition_injective : ∀ p q i j,
+  transposition p q i = transposition p q j
   → i = j.
 Proof.
 intros * Hpq.
-apply (f_equal (swap_nat p q)) in Hpq.
-now do 2 rewrite swap_nat_involutive in Hpq.
+apply (f_equal (transposition p q)) in Hpq.
+now do 2 rewrite transposition_involutive in Hpq.
 Qed.
 
 Theorem vect_swap_elem_involutive : ∀ n (v : vector n nat) p q,
@@ -3235,7 +3235,7 @@ Proof.
 intros.
 apply vector_eq.
 intros i Hi; cbn.
-now rewrite swap_nat_involutive.
+now rewrite transposition_involutive.
 Qed.
 
 Theorem vect_swap_elem_injective : ∀ n (u v : vector n nat) p q,
@@ -3256,7 +3256,7 @@ unfold vect_swap_elem; cbn.
 apply vector_eq.
 intros i Hi; cbn.
 unfold permut_fun_swap.
-now rewrite swap_nat_involutive.
+now rewrite transposition_involutive.
 Qed.
 
 Theorem permut_swap_injective : ∀ n p q (σ σ' : vector n nat),
@@ -3268,18 +3268,18 @@ apply (f_equal (permut_swap p q)) in H.
 now do 2 rewrite permut_swap_involutive in H.
 Qed.
 
-Theorem swap_nat_is_permut_fun : ∀ p q n,
-  p < n → q < n → is_permut_fun (swap_nat p q) n.
+Theorem transposition_is_permut_fun : ∀ p q n,
+  p < n → q < n → is_permut_fun (transposition p q) n.
 Proof.
 intros * Hp Hq.
 split. {
   intros i Hi.
-  unfold swap_nat.
+  unfold transposition.
   destruct (Nat.eq_dec i p) as [Hip| Hip]; [ easy | ].
   now destruct (Nat.eq_dec i q).
 } {
   intros i j Hi Hj Hs.
-  unfold swap_nat in Hs.
+  unfold transposition in Hs.
   destruct (Nat.eq_dec i p) as [Hip| Hip]. {
     destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ congruence | ].
     destruct (Nat.eq_dec j q) as [Hjq| Hjq]; congruence.
@@ -3304,13 +3304,13 @@ intros * Hp Hq Hσ.
 unfold permut_fun_swap.
 split. {
   intros i Hi.
-  unfold swap_nat.
+  unfold transposition.
   destruct (Nat.eq_dec i p) as [Hip| Hip]; [ now apply Hσ | ].
   destruct (Nat.eq_dec i q) as [Hiq| Hiq]; [ now apply Hσ | ].
   now apply Hσ.
 } {
   intros i j Hi Hj Hs.
-  unfold swap_nat in Hs.
+  unfold transposition in Hs.
   destruct (Nat.eq_dec i p) as [Hip| Hip]. {
     destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ congruence | ].
     destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
@@ -3361,16 +3361,16 @@ rewrite nat_of_canon_permut_permut in Hij; [ | easy ].
 easy.
 Qed.
 
-Theorem swap_nat_is_permut : ∀ n p q,
+Theorem transposition_is_permut : ∀ n p q,
   p < n
   → q < n
-  → is_permut (mk_vect n (swap_nat p q)).
+  → is_permut (mk_vect n (transposition p q)).
 Proof.
 intros.
-now apply swap_nat_is_permut_fun.
+now apply transposition_is_permut_fun.
 Qed.
 
-Theorem ε_swap_nat_lt :
+Theorem transposition_signature_lt :
   rngl_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -3381,16 +3381,16 @@ Theorem ε_swap_nat_lt :
   ∀ n p q,
   p < q
   → q < n
-  → ε (mk_vect n (swap_nat p q)) = (-1)%F.
+  → ε (mk_vect n (transposition p q)) = (-1)%F.
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hpq Hq.
 rewrite ε_ws_ε; try easy. 2: {
-  apply swap_nat_is_permut; [ flia Hpq Hq | easy ].
+  apply transposition_is_permut; [ flia Hpq Hq | easy ].
 }
 unfold ε_ws; cbn.
 unfold ε_fun_ws.
 unfold sign_diff.
-unfold swap_nat.
+unfold transposition.
 rewrite rngl_product_shift; [ | flia Hq ].
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
@@ -3529,7 +3529,7 @@ destruct (Nat.eq_dec j q) as [H| H]; [ flia Hi Hj H | clear H ].
 destruct (lt_dec i j) as [H| H]; [ easy | flia Hj H ].
 Qed.
 
-Theorem ε_swap_nat :
+Theorem transposition_signature :
   rngl_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -3541,19 +3541,19 @@ Theorem ε_swap_nat :
   p ≠ q
   → p < n
   → q < n
-  → ε (mk_vect n (swap_nat p q)) = (-1)%F.
+  → ε (mk_vect n (transposition p q)) = (-1)%F.
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hpq Hp Hq.
 destruct (lt_dec p q) as [Hpq'| Hpq']. {
-  now apply ε_swap_nat_lt.
+  now apply transposition_signature_lt.
 }
 apply Nat.nlt_ge in Hpq'.
 assert (H : q < p) by flia Hpq Hpq'.
-rewrite <- ε_swap_nat_lt with (p := q) (q := p) (n := n); try easy.
+rewrite <- transposition_signature_lt with (p := q) (q := p) (n := n); try easy.
 f_equal.
 apply vector_eq.
 intros i Hi; cbn.
-unfold swap_nat.
+unfold transposition.
 destruct (Nat.eq_dec i p) as [Hip| Hip]. {
   destruct (Nat.eq_dec i q) as [Hiq| Hiq]; [ congruence | easy ].
 } {
@@ -3571,10 +3571,10 @@ intros * Hp Hq Hσ.
 split; cbn. {
   intros i Hi.
   apply vect_el_permut_ub; [ easy | ].
-  now apply swap_nat_lt.
+  now apply transposition_lt.
 } {
   intros * Hi Hj Hij.
-  unfold swap_nat in Hij.
+  unfold transposition in Hij.
   destruct (Nat.eq_dec i p) as [Hip| Hip]. {
     destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ congruence | ].
     destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
@@ -3646,9 +3646,9 @@ cbn - [ mat_swap_rows ].
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   rewrite rngl_product_change_var with
-    (g := swap_nat p q) (h := swap_nat p q). 2: {
+    (g := transposition p q) (h := transposition p q). 2: {
     intros i Hi.
-    apply swap_nat_involutive.
+    apply transposition_involutive.
   }
   rewrite Nat.sub_0_r.
   rewrite <- Nat.sub_succ_l; [ | flia Hp ].
@@ -3660,7 +3660,7 @@ erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   rewrite rngl_product_list_permut with (l2 := seq 0 n); [ | easy | ]. 2: {
     apply permut_fun_Permutation.
-    now apply swap_nat_is_permut_fun.
+    now apply transposition_is_permut_fun.
   }
   easy.
 }
@@ -3670,9 +3670,9 @@ erewrite rngl_summation_eq_compat. 2: {
   erewrite rngl_product_list_eq_compat. 2: {
     intros i Hi.
     replace (mat_el _ _ _) with
-      (mat_el M i (vect_el (canon_permut n k) (swap_nat p q i))). 2: {
+      (mat_el M i (vect_el (canon_permut n k) (transposition p q i))). 2: {
       cbn.
-      unfold swap_nat.
+      unfold transposition.
       destruct (Nat.eq_dec i p) as [Hip| Hip]. {
         subst i.
         apply Nat.neq_sym in Hpq.
@@ -3707,35 +3707,35 @@ erewrite rngl_summation_eq_compat. 2: {
     now replace (vect_el _ _) with (vect_el (f k) i).
   }
   cbn - [ f ].
-  replace (canon_permut n k) with (mk_vect n (λ i, vect_el (f k) (swap_nat p q i))). 2: {
+  replace (canon_permut n k) with (mk_vect n (λ i, vect_el (f k) (transposition p q i))). 2: {
     apply vector_eq.
     intros i Hi; cbn.
-    now rewrite swap_nat_involutive.
+    now rewrite transposition_involutive.
   }
-  replace (mk_vect n (λ i, vect_el (f k) (swap_nat p q i))) with
-    (f k ° mk_vect n (swap_nat p q)) by easy.
+  replace (mk_vect n (λ i, vect_el (f k) (transposition p q i))) with
+    (f k ° mk_vect n (transposition p q)) by easy.
   rewrite signature_comp; try easy. {
     subst f; cbn.
     split; cbn. {
       intros i Hi.
       apply vect_el_permut_ub; [ now apply canon_permut_is_permut | ].
-      now apply swap_nat_lt.
+      now apply transposition_lt.
     } {
       intros * Hi Hj Hij.
       apply canon_permut_vect_injective in Hij; [ | easy | | ]; cycle 1. {
-        now apply swap_nat_lt.
+        now apply transposition_lt.
       } {
-        now apply swap_nat_lt.
+        now apply transposition_lt.
       }
-      now apply swap_nat_injective in Hij.
+      now apply transposition_injective in Hij.
     }
   } {
     split; cbn. {
       intros i Hi.
-      now apply swap_nat_lt.
+      now apply transposition_lt.
     } {
       intros * Hi Hj Hij.
-      now apply swap_nat_injective in Hij.
+      now apply transposition_injective in Hij.
     }
   }
 }
@@ -3744,7 +3744,7 @@ erewrite rngl_summation_eq_compat. 2: {
   intros k (_, Hk).
   rewrite (rngl_mul_comm Hic (ε (f k))).
   rewrite <- rngl_mul_assoc.
-  now rewrite ε_swap_nat.
+  now rewrite transposition_signature.
 }
 cbn - [ f ].
 rewrite <- rngl_mul_summation_distr_l.
