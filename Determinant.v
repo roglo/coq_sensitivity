@@ -4384,14 +4384,32 @@ destruct i. {
     easy.
   }
   cbn; symmetry.
-(**)
-...
   apply rngl_summation_eq_compat.
   intros i (_, Hi).
   f_equal.
   symmetry.
   rewrite <- rngl_opp_involutive; [ | easy ].
   f_equal.
+(**)
+destruct n; [ easy | cbn ].
+rewrite rngl_opp_summation; [ | easy | easy ].
+apply rngl_summation_eq_compat.
+intros j (_, Hj).
+rewrite <- rngl_mul_opp_l; [ | easy ].
+rewrite <- rngl_mul_opp_r; [ | easy ].
+do 2 rewrite <- rngl_mul_assoc.
+f_equal.
+destruct n; [ flia Hlin | clear Hlin Hnz ].
+destruct n. {
+  cbn.
+  unfold iter_seq, iter_list; cbn.
+  do 2 rewrite rngl_add_0_l.
+  do 2 rewrite rngl_mul_1_l.
+  do 2 rewrite rngl_mul_1_r.
+  destruct i. {
+    cbn.
+    destruct j. {
+      cbn.
 ...
 Check determinant_alternating.
 ...
