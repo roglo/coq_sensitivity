@@ -4339,92 +4339,23 @@ destruct i. {
     do 6 rewrite rngl_mul_1_r.
     do 14 (rewrite rngl_mul_opp_l; [ | easy ]).
     do 4 rewrite rngl_mul_1_l.
-...
-    rewrite rngl_mul_opp_l; [ | easy ].
-    rewrite rngl_mul_opp_l; [ | easy ].
-    rewrite rngl_mul_opp_l; [ | easy ].
-    rewrite rngl_opp_add_distr; [ | easy ].
-      rewrite <- rngl_mul_opp_l; [ | easy ].
-      rewrite <- rngl_mul_opp_l; [ | easy ].
-      rewrite rngl_opp_involutive; [ | easy ].
-      rewrite rngl_mul_1_l.
-      rewrite rngl_mul_comm; [ | easy ].
-      rewrite rngl_mul_opp_l; [ | easy ].
-      rewrite rngl_mul_1_l.
-      rewrite rngl_mul_opp_l; [ | easy ].
-      rewrite fold_rngl_sub; [ | easy ].
-      f_equal.
-      now apply rngl_mul_comm.
-
-...
-  set (g := swap_nat 0 2).
-  rewrite rngl_summation_change_var with (g := g) (h := g). 2: {
-    intros k (_, Hk).
-    apply swap_nat_involutive.
+    do 4 rewrite rngl_mul_add_distr_l.
+    do 4 (rewrite rngl_mul_opp_r; [ | easy ]).
+    do 2 (rewrite rngl_opp_add_distr; [ | easy ]).
+    do 8 rewrite rngl_mul_assoc.
+    do 3 (rewrite rngl_opp_involutive; [ | easy ]).
+    unfold rngl_sub; rewrite Hop.
+    do 2 rewrite rngl_add_assoc.
+    rewrite rngl_mul_mul_swap; [ | easy ].
+    do 4 rewrite <- rngl_add_assoc.
+    f_equal; rewrite rngl_mul_mul_swap; [ | easy ].
+    f_equal; rewrite rngl_mul_mul_swap; [ | easy ].
+    f_equal; rewrite rngl_mul_mul_swap; [ | easy ].
+    easy.
   }
-  rewrite Nat.sub_0_r.
-  unfold g.
-  rewrite rngl_summation_list_permut with (l2 := seq 0 (S n)); [ | easy | ]. 2: {
-    apply permut_fun_Permutation.
-    apply swap_nat_is_permut; [ flia | easy ].
-  }
-  rewrite rngl_summation_seq_summation; [ | easy ].
-  rewrite Nat.add_0_l, Nat.sub_succ.
-  rewrite Nat.sub_0_r at 1.
-...
-  apply rngl_summation_eq_compat.
-  intros i (_, Hi).
-  f_equal.
-  symmetry.
-  rewrite <- rngl_opp_involutive; [ | easy ].
-  f_equal.
-(**)
-destruct n; [ easy | cbn ].
-rewrite rngl_opp_summation; [ | easy | easy ].
-apply rngl_summation_eq_compat.
-intros j (_, Hj).
-rewrite <- rngl_mul_opp_l; [ | easy ].
-rewrite <- rngl_mul_opp_r; [ | easy ].
-do 2 rewrite <- rngl_mul_assoc.
-f_equal.
-destruct n; [ flia Hlin | clear Hlin Hnz ].
-destruct n. {
-  cbn.
-  unfold iter_seq, iter_list; cbn.
-  do 2 rewrite rngl_add_0_l.
-  do 2 rewrite rngl_mul_1_l.
-  do 2 rewrite rngl_mul_1_r.
-  destruct i. {
-    cbn.
-    destruct j. {
-      cbn.
-...
-
-Abort.
-End a.
-Check comatrix.
-Require Import ZArith.
-Require Import Zrl.
-Open Scope Z_scope.
-Compute (list_list_of_mat (mat_of_list_list 0 [[-2;-1;-1];[-2;-1;1];[-1;-1;3]])).
-Compute (determinant Z_ring_like_op (let M := mat_of_list_list 0 [[-2;-1;-1];[-2;-1;1];[-1;-1;3]] in M)).
-Arguments determinant {T ro} {n}%nat.
-Arguments comatrix {T ro} {n}%nat.
-Compute (let _ := Z_ring_like_op in let M := mat_of_list_list 0 [[-2;-1;-1];[-2;-1;1];[-1;-1;3]] in determinant M).
-Definition mat_nrows {m n T} (M : matrix m n T) := m.
-Compute (let _ := Z_ring_like_op in let M := mat_of_list_list 0 [[-2;-1;-1];[-2;-1;1];[-1;-1;3]] in let i := 3%nat in let n := mat_nrows M in (Σ (j = 0, n - 1), mat_el M i j * mat_el (comatrix M) i j)%F).
-Compute (let _ := Z_ring_like_op in let M := mat_of_list_list 0 [[-2;-1;-1];[-2;-1;1];[-1;-1;3]] in (mat_el M 1 1 * mat_el M 0 2)%F = (- mat_el M 0 1 * mat_el M 1 2)%F).
-Compute (let _ := Z_ring_like_op in let M := mat_of_list_list 0 [[1;1;-1];[2;0;1];[2;1;-1]] in (mat_el M 1 1 * mat_el M 0 2)%F = (- mat_el M 0 1 * mat_el M 1 2)%F).
-Compute (let _ := Z_ring_like_op in let M := mat_of_list_list 0 [[1;1;-1];[2;0;1];[2;1;-1]] in determinant M).
-Compute (let _ := Z_ring_like_op in let M := mat_of_list_list 0 [[1;1;-1];[2;0;1];[2;1;-1]] in let n := mat_nrows M in let i := 2%nat in (Σ (j = 0, n - 1), mat_el M i j * mat_el (comatrix M) i j)%F).
-...
-...
-Compute (list_list_of_mat (comatrix Z_ring_like_op (mat_of_list_list 0 [[-2;-1;-1];[-2;-1;1];[-1;-1;3]]))).
-  → determinant M = (Σ (j = 0, n - 1), mat_el M i j * mat_el (comatrix M) i j)%F.
 ...
 Check determinant_alternating.
 ...
-*)
 
 Theorem mat_comat_mul :
   rngl_is_comm = true →
