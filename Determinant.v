@@ -3818,8 +3818,46 @@ intros i Hi.
 now rewrite Nat.add_comm, Nat.add_sub.
 Qed.
 
+Definition mat_permut_fun_rows n (σ : nat → nat) (M : matrix n n T) :=
+  mk_mat n n (λ i j, mat_el M (σ i) j).
+
 Definition mat_permut_rows n (σ : vector n nat) (M : matrix n n T) :=
-  mk_mat n n (λ i j, mat_el M (vect_el σ i) j).
+  mat_permut_fun_rows (vect_el σ) M.
+
+Theorem determinant_alternating_permut_fun :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_integral = true →
+  rngl_has_1_neq_0 = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ n (M : matrix n n T) σ,
+  n ≠ 0
+  → is_permut_fun σ n
+  → determinant (mat_permut_fun_rows σ M) = (ε_fun σ n * determinant M)%F.
+Proof.
+intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hp.
+destruct n; [ easy | clear Hnz ].
+cbn.
+revert σ M Hp.
+induction n; intros. {
+  cbn.
+  unfold iter_seq, iter_list; cbn.
+  do 2 rewrite rngl_add_0_l.
+  do 2 rewrite rngl_mul_1_l, rngl_mul_1_r.
+  destruct Hp as (Hp1, Hp2).
+  specialize (Hp1 0 Nat.lt_0_1).
+  apply Nat.lt_1_r in Hp1; rewrite Hp1.
+  symmetry; rewrite <- rngl_mul_1_l; f_equal.
+  unfold ε, ε_fun; cbn.
+  unfold iter_seq, iter_list; cbn.
+  apply rngl_mul_inv_r; [ now left | ].
+  do 2 rewrite rngl_mul_1_l.
+  now apply rngl_1_neq_0.
+}
+cbn.
+...
 
 Theorem determinant_alternating_permut :
   rngl_is_comm = true →
@@ -3835,26 +3873,9 @@ Theorem determinant_alternating_permut :
   → determinant (mat_permut_rows σ M) = (ε σ * determinant M)%F.
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hp.
-destruct n; [ easy | clear Hnz ].
-induction n. {
-  cbn.
-  unfold iter_seq, iter_list; cbn.
-  do 2 rewrite rngl_add_0_l.
-  do 2 rewrite rngl_mul_1_l, rngl_mul_1_r.
-  destruct Hp as (Hp1, Hp2).
-  specialize (Hp1 0 Nat.lt_0_1).
-  apply Nat.lt_1_r in Hp1; rewrite Hp1.
-  symmetry; rewrite <- rngl_mul_1_l; f_equal.
-  unfold ε, ε_fun; cbn.
-  unfold iter_seq, iter_list; cbn.
-  apply rngl_mul_inv_r; [ now left | ].
-  do 2 rewrite rngl_mul_1_l.
 ...
-  apply rngl_1_neq_0.
-  specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
-  rewrite H10 in rngl_1_neq_0.
+now apply determinant_alternating_permut_fun.
 ...
-*)
 
 (* If we add a row (column) of A multiplied by a scalar k to another
    row (column) of A, then the determinant will not change. *)
