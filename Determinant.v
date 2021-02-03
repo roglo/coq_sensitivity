@@ -3833,6 +3833,25 @@ intros i Hi.
 now rewrite Nat.add_comm, Nat.add_sub.
 Qed.
 
+Definition mat_permut_rows n (σ : vector n nat) (M : matrix n n T) :=
+  mk_mat n n (λ i j, mat_el M (vect_el σ i) j).
+
+Theorem determinant_alternating_permut :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_integral = true →
+  rngl_has_1_neq_0 = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ n (M : matrix n n T) σ,
+  is_permut σ
+  → determinant (mat_permut_rows σ M) = (ε σ * determinant M)%F.
+Proof.
+intros Hic Hop Hin Hit H10 Hde Hch * Hp.
+
+...
+
 (* If we add a row (column) of A multiplied by a scalar k to another
    row (column) of A, then the determinant will not change. *)
 (* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html *)
