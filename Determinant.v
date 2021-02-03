@@ -3838,7 +3838,6 @@ Theorem determinant_alternating_permut_fun :
   → determinant (mat_permut_fun_rows σ M) = (ε_fun σ n * determinant M)%F.
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hp.
-destruct n; [ easy | clear Hnz; cbn ].
 ...
 intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hp.
 destruct n; [ easy | clear Hnz; cbn ].
