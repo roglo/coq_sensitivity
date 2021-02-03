@@ -706,8 +706,6 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
     rewrite HM2; cbn.
     destruct (Nat.eq_dec i j) as [H| H]; [ easy | ].
     rewrite rngl_mul_0_r, rngl_add_0_r.
-    specialize rngl_opt_mul_comm as rngl_mul_comm.
-    rewrite Hic in rngl_mul_comm.
     now rewrite HM1, rngl_mul_comm.
   }
 } {

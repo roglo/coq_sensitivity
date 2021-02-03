@@ -559,18 +559,16 @@ Theorem mat_mul_mul_scal_l :
   (MA * (a × MB) = a × (MA * MB))%M.
 Proof.
 intros Hic *.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
-rewrite Hic in rngl_mul_comm.
 apply matrix_eq.
 intros * Hi Hj.
 cbn.
 rewrite rngl_mul_summation_distr_l.
 apply rngl_summation_eq_compat.
 intros k Hk.
-rewrite rngl_mul_comm.
+rewrite rngl_mul_comm; [ | easy ].
 rewrite <- rngl_mul_assoc.
 f_equal.
-apply rngl_mul_comm.
+now apply rngl_mul_comm.
 Qed.
 
 Theorem mat_mul_scal_add_distr_l : ∀ {m n} a (MA MB : matrix m n T),
@@ -656,9 +654,7 @@ apply rngl_summation_eq_compat.
 intros j Hj.
 do 2 rewrite rngl_mul_assoc.
 f_equal.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
-rewrite Hic in rngl_mul_comm.
-apply rngl_mul_comm.
+now apply rngl_mul_comm.
 Qed.
 
 Theorem vect_dot_mul_scal_mul_comm :
@@ -673,9 +669,7 @@ apply rngl_summation_eq_compat.
 intros j Hj; cbn.
 do 2 rewrite rngl_mul_assoc.
 f_equal.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
-rewrite Hic in rngl_mul_comm.
-apply rngl_mul_comm.
+now apply rngl_mul_comm.
 Qed.
 
 Theorem vect_scal_mul_dot_mul_comm : ∀ {n} (a : T) (U V : vector n T),

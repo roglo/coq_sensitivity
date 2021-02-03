@@ -589,9 +589,7 @@ induction P; [ easy | | | ]. {
   do 4 (rewrite rngl_product_list_cons; [ | easy ]).
   do 2 rewrite rngl_mul_assoc.
   f_equal.
-  specialize rngl_opt_mul_comm as rngl_mul_comm.
-  rewrite Hic in rngl_mul_comm.
-  apply rngl_mul_comm.
+  now apply rngl_mul_comm.
 } {
   etransitivity; [ apply IHP1 | apply IHP2 ].
 }
@@ -905,8 +903,6 @@ Theorem rngl_product_product_by_swap :
    (Π (i ∈ seq 0 (n - 1)), Π (j = i + 1, n - 1), (f i j * f j i)))%F.
 Proof.
 intros Hic *.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
-rewrite Hic in rngl_mul_comm.
 induction n. {
   unfold iter_seq, iter_list; cbn.
   now rewrite rngl_mul_1_l.
@@ -920,7 +916,7 @@ destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
   do 5 rewrite rngl_mul_1_l.
   repeat rewrite <- rngl_mul_assoc.
   f_equal; symmetry.
-  rewrite rngl_mul_comm.
+  rewrite rngl_mul_comm; [ | easy ].
   now rewrite rngl_mul_assoc.
 }
 erewrite rngl_product_list_eq_compat. 2: {
@@ -942,7 +938,7 @@ rewrite iter_list_app; cbn.
 unfold iter_list at 4 6; cbn.
 do 3 rewrite <- rngl_mul_assoc.
 f_equal.
-rewrite (rngl_mul_comm (f n n)).
+rewrite (rngl_mul_comm Hic (f n n)).
 do 2 rewrite rngl_mul_assoc.
 f_equal.
 symmetry.
@@ -1002,10 +998,10 @@ erewrite rngl_product_list_eq_compat. 2: {
 rewrite rngl_product_list_mul_distr; [ | easy ].
 symmetry.
 rewrite <- rngl_mul_assoc.
-rewrite rngl_mul_comm.
+rewrite rngl_mul_comm; [ | easy ].
 do 3 rewrite <- rngl_mul_assoc.
 f_equal.
-rewrite rngl_mul_comm.
+rewrite rngl_mul_comm; [ | easy ].
 rewrite <- rngl_mul_assoc.
 f_equal.
 symmetry.
@@ -1038,9 +1034,7 @@ Theorem permut_swap_mul_cancel : ∀ n σ f,
     1%F.
 Proof.
 intros * Hic Hin H10 Hp Hfij Hfijnz * Hlin Hljn.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
-rewrite Hic in rngl_mul_comm.
 rewrite H10 in rngl_1_neq_0.
 do 4 rewrite if_ltb_lt_dec.
 destruct (lt_dec (σ i) (σ j)) as [H1| H1]. {
@@ -1074,7 +1068,7 @@ destruct (lt_dec (σ j) (σ i)) as [H2| H2]. {
     rewrite Hfij.
     rewrite rngl_div_1_r; [ | now left | easy ].
     rewrite rngl_div_1_l; [ | easy ].
-    rewrite rngl_mul_comm.
+    rewrite rngl_mul_comm; [ | easy ].
     rewrite fold_rngl_div; [ | easy ].
     apply rngl_mul_inv_r; [ now left | ].
     apply Hfijnz; [ easy | easy | flia H3 ].
@@ -1119,9 +1113,7 @@ Theorem product_product_if_permut_div :
      1%F.
 Proof.
 intros Hic H10 Hin * Hp Hfij Hfijnz.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
 specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
-rewrite Hic in rngl_mul_comm.
 rewrite H10 in rngl_1_neq_0.
 rewrite rngl_product_product_by_swap; [ | easy ].
 rewrite all_1_rngl_product_list_1; [ | easy | ]. 2: {
@@ -2254,9 +2246,7 @@ f_equal. {
   rewrite IHx.
   symmetry.
   rewrite minus_one_pow_succ; [ | easy | easy ].
-  specialize rngl_opt_mul_comm as rngl_mul_comm.
-  rewrite Hic in rngl_mul_comm.
-  rewrite rngl_mul_comm.
+  rewrite rngl_mul_comm; [ | easy ].
   rewrite rngl_mul_opp_l; [ | easy ].
   now rewrite rngl_mul_1_l.
 }
@@ -2431,8 +2421,6 @@ f_equal. 2: {
 }
 rewrite rngl_mul_mul_swap; [ | easy ].
 symmetry.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
-rewrite Hic in rngl_mul_comm.
 f_equal.
 apply ε_of_canon_permut_succ; try easy.
 specialize (fact_neq_0 (S (S n))) as Hnz.
@@ -2469,21 +2457,19 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
-rewrite Hic in rngl_mul_comm.
 rewrite rngl_mul_summation_distr_l.
 rewrite rngl_mul_summation_distr_l.
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   rewrite rngl_mul_assoc.
-  now rewrite (rngl_mul_comm a).
+  now rewrite (rngl_mul_comm Hic a).
 }
 rewrite rngl_add_comm.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   rewrite rngl_mul_assoc.
-  now rewrite (rngl_mul_comm b).
+  now rewrite (rngl_mul_comm Hic b).
 }
 rewrite rngl_add_comm.
 rewrite <- rngl_summation_add_distr; [ | easy ].
@@ -2511,7 +2497,7 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
-rewrite (rngl_mul_comm (iter_seq _ _ _ _)).
+rewrite (rngl_mul_comm Hic (iter_seq _ _ _ _)).
 rewrite rngl_add_comm.
 rewrite (rngl_product_split (p + 1)); [ | flia Hp ].
 rewrite rngl_product_split_last; [ | flia ].
@@ -2526,7 +2512,7 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
-rewrite (rngl_mul_comm (iter_seq _ _ _ _)).
+rewrite (rngl_mul_comm Hic (iter_seq _ _ _ _)).
 rewrite rngl_add_comm.
 symmetry.
 rewrite (rngl_product_split (p + 1)); [ | flia Hp ].
@@ -2542,7 +2528,7 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
-rewrite (rngl_mul_comm (iter_seq _ _ _ _)).
+rewrite (rngl_mul_comm Hic (iter_seq _ _ _ _)).
 rewrite Nat.add_sub.
 rewrite Hpp.
 destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
@@ -2552,7 +2538,7 @@ remember
    mat_el M (i0 - 2) (vect_el (canon_permut n k) (i0 - 2)%nat))%F
   as q eqn:Hq.
 rewrite (rngl_mul_mul_swap Hic _ _ q).
-do 3 rewrite (rngl_mul_comm _ q).
+do 3 rewrite (rngl_mul_comm Hic _ q).
 do 5 rewrite <- rngl_mul_assoc.
 rewrite <- rngl_mul_add_distr_l.
 f_equal.
@@ -3771,9 +3757,7 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn - [ f ].
 erewrite rngl_summation_eq_compat. 2: {
   intros k (_, Hk).
-  specialize rngl_opt_mul_comm as rngl_mul_comm.
-  rewrite Hic in rngl_mul_comm.
-  rewrite (rngl_mul_comm (ε (f k))).
+  rewrite (rngl_mul_comm Hic (ε (f k))).
   rewrite <- rngl_mul_assoc.
   now rewrite ε_swap_nat.
 }
@@ -3889,15 +3873,13 @@ cbn.
 rewrite rngl_mul_summation_distr_l.
 apply rngl_summation_eq_compat.
 intros j Hj.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
-rewrite Hic in rngl_mul_comm.
-rewrite (rngl_mul_comm (minus_one_pow j)).
+rewrite (rngl_mul_comm Hic (minus_one_pow j)).
 do 2 rewrite <- rngl_mul_assoc.
 f_equal.
-rewrite (rngl_mul_comm (mat_el A 0 j)).
+rewrite (rngl_mul_comm Hic (mat_el A 0 j)).
 do 2 rewrite <- rngl_mul_assoc.
 f_equal.
-rewrite rngl_mul_comm; f_equal.
+rewrite rngl_mul_comm; [ f_equal | easy ].
 f_equal.
 apply matrix_eq; cbn.
 rename j into k; rename Hj into Hk.
@@ -4262,9 +4244,7 @@ rewrite Nat.sub_succ, Nat.sub_0_r.
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
-  specialize rngl_opt_mul_comm as rngl_mul_comm.
-  rewrite Hic in rngl_mul_comm.
-  rewrite rngl_mul_comm.
+  rewrite rngl_mul_comm; [ | easy ].
   rewrite rngl_mul_mul_swap; [ | easy ].
   easy.
 }
@@ -4398,6 +4378,7 @@ Compute (list_list_of_mat (comatrix Z_ring_like_op (mat_of_list_list 0 [[-2;-1;-
 ...
 Check determinant_alternating.
 ...
+*)
 
 Theorem mat_comat_mul :
   rngl_is_comm = true →

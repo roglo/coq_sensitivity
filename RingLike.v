@@ -216,6 +216,47 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 
+(* theorems easier to use *)
+
+Theorem rngl_mul_comm :
+  rngl_is_comm = true →
+  ∀ a b, (a * b = b * a)%F.
+Proof.
+intros Hic *.
+specialize rngl_opt_mul_comm as H.
+rewrite Hic in H.
+apply H.
+Qed.
+
+Theorem rngl_mul_add_distr_r : ∀ x y z,
+  ((x + y) * z = x * z + y * z)%F.
+Proof.
+intros x y z; simpl.
+specialize rngl_opt_mul_add_distr_r as rngl_mul_add_distr_r.
+remember rngl_is_comm as ic eqn:Hic.
+symmetry in Hic.
+destruct ic. {
+  rewrite rngl_mul_comm; [ | easy ].
+  rewrite rngl_mul_add_distr_l.
+  rewrite rngl_mul_comm; [ | easy ].
+  now rewrite (rngl_mul_comm Hic z).
+} {
+  apply rngl_mul_add_distr_r.
+}
+Qed.
+
+Theorem rngl_mul_1_r : ∀ a, (a * 1 = a)%F.
+Proof.
+intros.
+specialize rngl_opt_mul_1_r as rngl_mul_1_r.
+remember rngl_is_comm as ic eqn:Hic.
+symmetry in Hic.
+destruct ic; [ | easy ].
+now rewrite rngl_mul_comm, rngl_mul_1_l.
+Qed.
+
+(* *)
+
 Theorem rngl_add_0_r : ∀ a, (a + 0 = a)%F.
 Proof.
 intros a; simpl.
@@ -237,26 +278,8 @@ Theorem rngl_mul_mul_swap :
 Proof.
 intros Hic n m p; simpl.
 do 2 rewrite <- rngl_mul_assoc.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
-rewrite Hic in rngl_mul_comm.
-assert (m * p = p * m)%F as H by apply rngl_mul_comm.
+assert (m * p = p * m)%F as H by now apply rngl_mul_comm.
 rewrite H; reflexivity.
-Qed.
-
-Theorem rngl_mul_add_distr_r : ∀ x y z,
-  ((x + y) * z = x * z + y * z)%F.
-Proof.
-intros x y z; simpl.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
-specialize rngl_opt_mul_add_distr_r as rngl_mul_add_distr_r.
-destruct rngl_is_comm. {
-  rewrite rngl_mul_comm.
-  rewrite rngl_mul_add_distr_l.
-  rewrite rngl_mul_comm.
-  now rewrite (rngl_mul_comm z).
-} {
-  apply rngl_mul_add_distr_r.
-}
 Qed.
 
 Theorem rngl_add_compat_l : ∀ a b c,
@@ -273,18 +296,6 @@ intros a b c Hab.
 now rewrite Hab.
 Qed.
 
-Theorem rngl_mul_1_r : ∀ a, (a * 1 = a)%F.
-Proof.
-intros.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
-specialize rngl_opt_mul_1_r as rngl_mul_1_r.
-destruct rngl_is_comm. {
-  now rewrite rngl_mul_comm, rngl_mul_1_l.
-} {
-  apply rngl_mul_1_r.
-}
-Qed.
-
 Theorem rngl_mul_inv_r :
   rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
   ∀ a : T, a ≠ 0%F → (a / a = 1)%F.
@@ -292,12 +303,13 @@ Proof.
 intros Hii * Ha.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
 specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
 specialize rngl_opt_mul_div_l as rngl_mul_div_l.
 unfold rngl_div in rngl_mul_inv_r, rngl_mul_div_l |-*.
 destruct rngl_has_inv. {
-  destruct rngl_is_comm. {
-    rewrite rngl_mul_comm.
+  remember rngl_is_comm as ic eqn:Hic.
+  symmetry in Hic.
+  destruct ic. {
+    rewrite rngl_mul_comm; [ | easy ].
     now apply rngl_mul_inv_l.
   } {
     cbn in rngl_mul_inv_r.
@@ -344,17 +356,17 @@ Proof.
 intros Hii * Hcz Hab.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
 specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
 specialize rngl_opt_mul_div_r as rngl_mul_div_r.
 specialize rngl_opt_mul_div_l as rngl_mul_div_l.
+remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
 assert (H : (a * c / c = b * c / c)%F) by now rewrite Hab.
 unfold rngl_div in H, rngl_mul_inv_r.
 do 2 rewrite <- rngl_mul_assoc in H.
 unfold rngl_div in rngl_mul_div_l.
 unfold rngl_div in rngl_mul_div_r.
 destruct rngl_has_inv. {
-  destruct rngl_is_comm. {
-    rewrite (rngl_mul_comm c) in H.
+  destruct ic. {
+    rewrite (rngl_mul_comm Hic c) in H.
     rewrite rngl_mul_inv_l in H; [ | easy ].
     now do 2 rewrite rngl_mul_1_r in H.
   } {
@@ -364,9 +376,9 @@ destruct rngl_has_inv. {
 } {
   destruct Hii as [Hii'| Hii']; [ easy | ].
   rewrite Hii' in rngl_mul_div_l, rngl_mul_div_r.
-  destruct rngl_is_comm. {
-    rewrite (rngl_mul_comm a) in H.
-    rewrite (rngl_mul_comm b) in H.
+  destruct ic. {
+    rewrite (rngl_mul_comm Hic a) in H.
+    rewrite (rngl_mul_comm Hic b) in H.
     rewrite rngl_mul_div_l in H; [ | easy ].
     now rewrite rngl_mul_div_l in H.
   } {
@@ -827,20 +839,20 @@ Proof.
 intros Hii a b Hbz.
 specialize rngl_opt_mul_div_l as rngl_mul_div_l.
 specialize rngl_opt_mul_div_r as rngl_mul_div_r.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
 specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
-destruct rngl_is_comm. {
+remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
+destruct ic. {
   unfold rngl_div in rngl_mul_div_l |-*.
   destruct rngl_has_inv. {
     rewrite <- rngl_mul_assoc.
-    rewrite (rngl_mul_comm b).
+    rewrite (rngl_mul_comm Hic b).
     rewrite rngl_mul_inv_l; [ | easy ].
     apply rngl_mul_1_r.
   }
   destruct Hii as [Hii| Hii]; [ easy | ].
   rewrite Hii in rngl_mul_div_l.
-  rewrite rngl_mul_comm.
+  rewrite rngl_mul_comm; [ | easy ].
   now apply rngl_mul_div_l.
 } {
   destruct rngl_has_no_inv_but_div. {
@@ -943,13 +955,16 @@ assert (Hoaz : (- a)%F ≠ 0%F). {
 apply (rngl_mul_reg_l (or_introl Hin) (- a)%F); [ easy | ].
 specialize (rngl_opt_mul_inv_l) as H1.
 specialize (rngl_opt_mul_inv_r) as H2.
-specialize (rngl_opt_mul_comm) as H3.
-rewrite Hin in H1, H2.
+remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
+rewrite Hin in H1, H2; cbn in H1, H2.
 rewrite rngl_mul_opp_opp; [ | easy ].
-destruct rngl_is_comm. {
+destruct ic. {
   symmetry.
-  rewrite H3, H1; [ | easy ].
-  now rewrite H3, H1.
+  rewrite rngl_mul_comm; [ | easy ].
+  rewrite H1; [ | easy ].
+  rewrite rngl_mul_comm; [ | easy ].
+  rewrite H1; [ | easy ].
+  easy.
 } {
   cbn in H2.
   rewrite fold_rngl_div; [ | easy ].
@@ -980,8 +995,8 @@ Proof.
 intros Hiv * Haz.
 specialize rngl_opt_mul_div_l as rngl_mul_div_l.
 specialize rngl_opt_mul_div_r as rngl_mul_div_r.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
 remember rngl_has_inv as hi eqn:Hin; symmetry in Hin.
+remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
 destruct hi. {
   unfold rngl_div.
   now rewrite Hin, rngl_mul_0_l.
@@ -992,9 +1007,8 @@ destruct hi. {
   destruct Hiv as [Hiv| Hiv]; [ easy | ].
   rewrite Hiv in rngl_mul_div_l, rngl_mul_div_r.
   cbn in rngl_mul_div_r.
-  remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
   destruct ic. {
-    rewrite rngl_mul_comm.
+    rewrite rngl_mul_comm; [ | easy ].
     now apply rngl_mul_div_l.
   } {
     cbn in rngl_mul_div_r.

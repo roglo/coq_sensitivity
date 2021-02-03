@@ -217,7 +217,6 @@ do 2 rewrite vect_scal_mul_dot_mul_comm.
 do 2 rewrite rngl_mul_assoc.
 unfold rngl_div.
 specialize (rngl_inv_mul_distr Hdo Hin) as H1.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
 specialize rngl_opt_integral as rngl_integral.
 specialize rngl_opt_add_le_compat as rngl_add_le_compat.
@@ -226,7 +225,6 @@ specialize rngl_opt_mul_le_compat_nonpos as rngl_mul_le_compat_nonpos.
 specialize rngl_opt_not_le as rngl_not_le.
 specialize rngl_opt_le_refl as rngl_le_refl.
 specialize rngl_opt_le_dec as rngl_le_dec.
-rewrite Hic in rngl_mul_comm.
 rewrite Hin in rngl_mul_inv_l |-*.
 rewrite Hdo in rngl_integral.
 rewrite Hor in rngl_le_refl.
@@ -245,7 +243,7 @@ rewrite H1; cycle 1. {
   now apply eq_vect_squ_0.
 }
 rewrite rngl_mul_assoc.
-rewrite rngl_mul_comm.
+rewrite rngl_mul_comm; [ | easy ].
 do 2 rewrite rngl_mul_assoc.
 rewrite rngl_mul_inv_l; [ now rewrite rngl_mul_1_l | ].
 intros H; apply Hcz.
@@ -341,8 +339,6 @@ remember (nth j eV (vect_zero n)) as V eqn:Hv.
 symmetry.
 assert (H : vect_el (M • V) i = vect_el (μ × V) i) by now rewrite H1.
 cbn - [ iter_seq ] in H.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
-rewrite Hic in rngl_mul_comm.
 now rewrite rngl_mul_comm in H.
 Qed.
 
@@ -363,9 +359,7 @@ cbn - [ iter_seq ].
 intros * Hi Hj.
 apply rngl_summation_eq_compat.
 intros k Hk.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
-rewrite Hic in rngl_mul_comm.
-apply rngl_mul_comm.
+now apply rngl_mul_comm.
 Qed.
 
 Theorem mI_transp_idemp : ∀ n, ((mI n)⁺)%M = mI n.
@@ -408,9 +402,7 @@ intros i Hi.
 apply rngl_summation_eq_compat.
 intros j Hj.
 rewrite rngl_mul_assoc; f_equal.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
-rewrite Hic in rngl_mul_comm.
-apply rngl_mul_comm.
+now apply rngl_mul_comm.
 Qed.
 
 (* https://math.stackexchange.com/questions/82467/eigenvectors-of-real-symmetric-matrices-are-orthogonal *)
@@ -496,9 +488,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     intros j Hj.
     do 3 rewrite rngl_mul_assoc.
     f_equal.
-    specialize rngl_opt_mul_comm as rngl_mul_comm.
-    rewrite Hic in rngl_mul_comm.
-    rewrite rngl_mul_comm.
+    rewrite rngl_mul_comm; [ | easy ].
     f_equal.
     now apply minus_one_pow_add_r.
   }

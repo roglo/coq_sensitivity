@@ -147,12 +147,10 @@ Theorem rngl_product_list_mul_distr :
   (Π (i ∈ l), g i) * Π (i ∈ l), h i)%F.
 Proof.
 intros Hic *.
-specialize rngl_opt_mul_comm as rngl_mul_comm.
-rewrite Hic in rngl_mul_comm.
 apply iter_list_distr. {
   apply rngl_mul_1_l.
 } {
-  apply rngl_mul_comm.
+  now apply rngl_mul_comm.
 } {
   apply rngl_mul_assoc.
 }
@@ -237,9 +235,7 @@ apply iter_list_permut; [ | | | | easy ]. {
 } {
   apply rngl_mul_1_r.
 } {
-  specialize rngl_opt_mul_comm as rngl_mul_comm.
-  rewrite Hic in rngl_mul_comm.
-  apply rngl_mul_comm.
+  now apply rngl_mul_comm.
 } {
   apply rngl_mul_assoc.
 }
