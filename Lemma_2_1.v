@@ -127,9 +127,7 @@ Theorem eq_vect_squ_0 :
   ∀ n v, ≺ v, v ≻ = 0%F → v = vect_zero n.
 Proof.
 intros Hop Hed Hdo Hor * H.
-specialize rngl_opt_integral as rngl_integral.
 specialize rngl_opt_add_le_compat as rngl_add_le_compat.
-rewrite Hdo in rngl_integral.
 rewrite Hor in rngl_add_le_compat.
 unfold vect_dot_product in H.
 apply vector_eq.
@@ -143,9 +141,9 @@ destruct n. {
   unfold iter_seq, iter_list in H.
   cbn in H.
   rewrite rngl_add_0_l in H.
-  specialize (rngl_integral _ _ H) as H1.
   apply Nat.lt_1_r in Hi; subst i.
-  now destruct H1.
+  apply rngl_integral in H; [ | now rewrite Hdo ].
+  now destruct H.
 }
 rewrite rngl_summation_shift in H; [ | flia ].
 rewrite Nat.sub_succ, Nat.sub_0_r in H.
@@ -178,8 +176,8 @@ apply rngl_eq_add_0 in H; [ | easy | | ]; cycle 1. {
   now apply rngl_0_le_squ.
 }
 destruct H as (H1, H2).
-specialize (rngl_integral _ _ H2) as H3.
-destruct (Nat.eq_dec i (S n)) as [Hisn| Hisn]; [ now subst i; destruct H3 | ].
+apply rngl_integral in H2; [ | now rewrite Hdo ].
+destruct (Nat.eq_dec i (S n)) as [Hisn| Hisn]; [ now subst i; destruct H2 | ].
 remember (mk_vect (S n) (λ i, vect_el v i)) as u eqn:Hu.
 specialize (IHn u) as H4.
 subst u.
@@ -212,14 +210,12 @@ do 2 rewrite rngl_mul_assoc.
 unfold rngl_div.
 specialize (rngl_inv_mul_distr Hdo Hin) as H1.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
-specialize rngl_opt_integral as rngl_integral.
 specialize rngl_opt_add_le_compat as rngl_add_le_compat.
 rewrite Hin in rngl_mul_inv_l |-*.
-rewrite Hdo in rngl_integral.
 rewrite Hor in rngl_add_le_compat.
 rewrite H1; cycle 1. {
   intros H; apply Hcz.
-  apply rngl_integral in H.
+  apply rngl_integral in H; [ | now rewrite Hdo ].
   now destruct H.
 } {
   intros H; apply Hxz.
@@ -230,7 +226,7 @@ rewrite rngl_mul_comm; [ | easy ].
 do 2 rewrite rngl_mul_assoc.
 rewrite rngl_mul_inv_l; [ now rewrite rngl_mul_1_l | ].
 intros H; apply Hcz.
-apply rngl_integral in H.
+apply rngl_integral in H; [ | now rewrite Hdo ].
 now destruct H.
 Qed.
 
