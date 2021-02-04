@@ -175,7 +175,7 @@ intros b g k Hbk.
 now apply iter_shift.
 Qed.
 
-Theorem rngl_product_list_opt_integral :
+Theorem rngl_product_list_integral :
   rngl_is_integral = true →
   rngl_has_1_neq_0 = true →
   ∀ A (l : list A) f,
@@ -206,7 +206,7 @@ exists i.
 split; [ now right | easy ].
 Qed.
 
-Theorem rngl_product_opt_integral :
+Theorem rngl_product_integral :
   rngl_is_integral = true →
   rngl_has_1_neq_0 = true →
   ∀ b e f,
@@ -214,7 +214,7 @@ Theorem rngl_product_opt_integral :
   → ∃ i, b ≤ i ≤ e ∧ f i = 0%F.
 Proof.
 intros Hin H10 * Hz.
-apply rngl_product_list_opt_integral in Hz; [ | easy | easy ].
+apply rngl_product_list_integral in Hz; [ | easy | easy ].
 destruct Hz as (i & His & Hfi).
 apply in_seq in His.
 exists i.
@@ -265,7 +265,7 @@ rewrite rngl_inv_mul_distr; [ | easy | easy | | ]; cycle 1. {
 } {
   intros H1.
   rewrite fold_iter_list in H1.
-  specialize (rngl_product_list_opt_integral Hit H10) as H2.
+  specialize (rngl_product_list_integral Hit H10) as H2.
   specialize (H2 A l f H1).
   destruct H2 as (i & Hil & Hfi).
   now revert Hfi; apply Hnz; right.
@@ -403,5 +403,6 @@ Arguments rngl_product_list_permut {T}%type {ro rp} _ A%type (l1 l2)%list
 Arguments rngl_product_mul_distr {T}%type {ro rp} _ (g h)%function (b k)%nat.
 Arguments rngl_product_split {T}%type {ro rp} j%nat g%function (b k)%nat.
 Arguments rngl_product_succ_succ {T}%type {ro} (b k)%nat g%function.
-Arguments rngl_product_opt_integral {T}%type {ro rp} _ _ (b e)%nat f%function.
+Arguments rngl_product_integral {T}%type {ro rp} _ _ (b e)%nat f%function.
+Arguments rngl_product_list_integral {T}%type {ro rp} _ _ A%type l%list f%function.
 Arguments rngl_product_split_first {T}%type {ro rp} (b k)%nat g%function.

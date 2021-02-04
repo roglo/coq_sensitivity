@@ -674,11 +674,12 @@ Theorem determinant_alternating_permut_fun :
   → determinant (mat_permut_fun_rows σ M) = (ε_fun σ n * determinant M)%F.
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hp.
+(* prove that any permutation is a sequence of transpositions
+   then apply determinant alternating in sequence *)
+...
 Check determinant_alternating.
 Check det_is_det_by_any_permut.
 Print determinant'_list.
-(* prove that any permutation is a sequence of transpositions
-   then apply determinant alternating in sequence *)
 ...
 intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hp.
 destruct n; [ easy | clear Hnz; cbn ].

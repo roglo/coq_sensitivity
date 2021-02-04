@@ -1031,16 +1031,14 @@ Theorem rngl_product_product_div_eq_1 :
     (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), g i j))%F.
 Proof.
 intros Hic Hid Hin H10 Hde * Hg Hs.
-specialize @rngl_product_list_opt_integral as rngl_product_list_integral.
-specialize (rngl_product_list_integral T ro rp Hin H10).
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 remember (Π (i ∈ _), _)%F as a eqn:Ha in |-*.
 remember (Π (i ∈ _), _)%F as b eqn:Hb in |-*.
 destruct (rngl_eq_dec Hde b 0%F) as [Hbz| Hbz]. {
   rewrite Hbz in Hb |-*; clear Hbz; subst a; symmetry in Hb.
-  apply rngl_product_list_integral in Hb.
+  apply rngl_product_list_integral in Hb; [ | easy | easy ].
   destruct Hb as (i & His & Hb).
-  apply rngl_product_list_integral in Hb.
+  apply rngl_product_list_integral in Hb; [ | easy | easy ].
   destruct Hb as (j & Hjs & Hb).
   move j before i.
   exfalso; revert Hb.
@@ -1062,7 +1060,7 @@ rewrite rngl_mul_inv_r; [ | now left | easy ].
 subst c b.
 rewrite rngl_inv_product_list; [ | easy | easy | easy | ]. 2: {
   intros i Hi H1.
-  apply rngl_product_list_integral in H1.
+  apply rngl_product_list_integral in H1; [ | easy | easy ].
   destruct H1 as (j & Hjs & Hijz).
   exfalso.
   revert Hijz.
@@ -1498,16 +1496,16 @@ erewrite rngl_product_eq_compat. 2: {
 cbn.
 rewrite rngl_product_div_distr; try easy. 2: {
   intros i Hi H.
-  apply (rngl_product_opt_integral Hit H10) in H.
+  apply (rngl_product_integral Hit H10) in H.
   destruct H as (j & Hj & Hji).
   apply eq_rngl_of_nat_0 in Hji; [ | easy ].
   flia Hj Hji.
 }
 apply eq_rngl_div_1; [ now left | | ]. {
   intros H.
-  apply (rngl_product_opt_integral Hit H10) in H.
+  apply (rngl_product_integral Hit H10) in H.
   destruct H as (i & Hi & H).
-  apply (rngl_product_opt_integral Hit H10) in H.
+  apply (rngl_product_integral Hit H10) in H.
   destruct H as (j & Hj & H).
   apply eq_rngl_of_nat_0 in H; [ | easy ].
   flia Hj H.
@@ -1921,10 +1919,9 @@ unfold ε_fun, comp; cbn.
 rewrite <- Hs; symmetry.
 apply rngl_div_mul_div; [ easy | ].
 intros Hij.
-specialize (rngl_product_opt_integral Hit H10) as rngl_product_integral.
-apply rngl_product_integral in Hij.
+apply rngl_product_integral in Hij; [ | easy | easy ].
 destruct Hij as (i & Hi & Hij).
-apply rngl_product_integral in Hij.
+apply rngl_product_integral in Hij; [ | easy | easy ].
 destruct Hij as (j & Hj & Hij).
 unfold δ in Hij.
 rewrite if_ltb_lt_dec in Hij.
@@ -1958,8 +1955,7 @@ intros Hop Hin Hic H10 Hit Hch * Hp2.
 unfold rngl_div; rewrite Hin.
 rewrite rngl_inv_product_comm; [ | easy | easy | easy | easy | ]. 2: {
   intros i Hi Hij.
-  specialize (rngl_product_opt_integral Hit H10) as rngl_product_integral.
-  apply rngl_product_integral in Hij.
+  apply rngl_product_integral in Hij; [ | easy | easy ].
   destruct Hij as (j & Hj & Hij).
   unfold δ in Hij.
   rewrite if_ltb_lt_dec in Hij.
@@ -2025,9 +2021,7 @@ intros Hop Hin Hic H10 Hit Hch *.
 unfold rngl_div; rewrite Hin.
 rewrite rngl_inv_product_comm; [ | easy | easy | easy | easy | ]. 2: {
   intros i Hi Hij.
-  specialize @rngl_product_opt_integral as rngl_product_integral.
-  specialize (rngl_product_integral T ro rp Hit H10).
-  apply rngl_product_integral in Hij.
+  apply rngl_product_integral in Hij; [ | easy | easy ].
   destruct Hij as (j & Hj & Hij).
   unfold δ in Hij.
   rewrite if_ltb_lt_dec in Hij.
