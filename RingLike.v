@@ -220,6 +220,14 @@ destruct ic; [ | easy ].
 now rewrite rngl_mul_comm, rngl_mul_1_l.
 Qed.
 
+Theorem rngl_eq_dec : rngl_has_dec_eq = true → ∀ a b : T, {a = b} + {a ≠ b}.
+Proof.
+intros Hde *.
+specialize rngl_opt_eq_dec as H.
+rewrite Hde in H.
+apply H.
+Qed.
+
 (* *)
 
 Theorem rngl_add_0_r : ∀ a, (a + 0 = a)%F.
@@ -726,17 +734,17 @@ Theorem rngl_integral :
 Proof.
 intros Hdo * Hab.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
-specialize rngl_opt_eq_dec as rngl_eq_dec.
 specialize rngl_opt_integral as rngl_integral.
 destruct rngl_is_integral; [ now apply rngl_integral | ].
 destruct rngl_has_inv; [ | easy ].
-destruct rngl_has_dec_eq; [ | easy ].
+remember rngl_has_dec_eq as de eqn:Hde; symmetry in Hde.
+destruct de; [ | easy ].
 cbn; clear rngl_integral.
 assert (H : (¹/a * a * b = ¹/a * 0)%F). {
   now rewrite <- rngl_mul_assoc, Hab.
 }
 rewrite rngl_mul_0_r in H.
-destruct (rngl_eq_dec a 0%F) as [Haz| Haz]; [ now left | ].
+destruct (rngl_eq_dec Hde a 0%F) as [Haz| Haz]; [ now left | ].
 rewrite rngl_mul_inv_l in H; [ | easy ].
 rewrite rngl_mul_1_l in H.
 now right.

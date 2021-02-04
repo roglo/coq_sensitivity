@@ -145,8 +145,6 @@ assert (Hn : ¬ ∀ i, i < n → vect_el V i = 0%F). {
   now apply H.
 }
 assert (∃ i, vect_el V i ≠ 0%F). {
-  specialize rngl_opt_eq_dec as rngl_eq_dec.
-  rewrite Hde in rngl_eq_dec.
   apply (not_forall_in_interv_imp_exist (a:=0) (b:=n-1));
     cycle 1. {
     flia.
@@ -157,11 +155,11 @@ assert (∃ i, vect_el V i ≠ 0%F). {
     specialize (Hnv i).
     assert (H : 0 ≤ i ≤ n - 1) by flia Hi.
     specialize (Hnv H).
-    now destruct (rngl_eq_dec (vect_el V i) 0%F).
+    now destruct (rngl_eq_dec Hde (vect_el V i) 0%F).
   }
   intros k.
   unfold Decidable.decidable.
-  specialize (rngl_eq_dec (vect_el V k) 0%F) as [Hvnz| Hvnz]. {
+  specialize (rngl_eq_dec Hde (vect_el V k) 0%F) as [Hvnz| Hvnz]. {
     now right.
   } {
     now left.
@@ -203,14 +201,12 @@ Theorem vect_opt_eq_dec :
   rngl_has_dec_eq = true →
   ∀ n (U V : vector n T), {U = V} + {U ≠ V}.
 Proof.
-intros Hed *.
-specialize rngl_opt_eq_dec as rngl_eq_dec.
-rewrite Hed in rngl_eq_dec.
+intros Hde *.
 destruct U as (fu).
 destruct V as (fv).
 assert (H : ∀ i, {fu i = fv i} + {fu i ≠ fv i}). {
   intros.
-  apply rngl_eq_dec.
+  apply (rngl_eq_dec Hde).
 }
 induction n; intros; [ now left; apply vector_eq | ].
 destruct IHn as [IHn| IHn]. {

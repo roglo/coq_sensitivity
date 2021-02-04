@@ -678,15 +678,14 @@ Theorem mat_opt_eq_dec : ∀ n,
   else not_applicable.
 Proof.
 intros.
-specialize rngl_opt_eq_dec as rngl_eq_dec.
-remember rngl_has_dec_eq as x eqn:Hde; symmetry in Hde.
-destruct x; [ | easy ].
+remember rngl_has_dec_eq as de eqn:Hde; symmetry in Hde.
+destruct de; [ | easy ].
 intros MA MB.
 destruct MA as (fa).
 destruct MB as (fb).
 assert (∀ i j, {fa i j = fb i j} + {fa i j ≠ fb i j}). {
   intros.
-  apply rngl_eq_dec.
+  now apply rngl_eq_dec.
 }
 induction n; intros; [ now left; apply matrix_eq | ].
 destruct IHn as [IHn| IHn]. {

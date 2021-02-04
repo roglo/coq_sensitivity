@@ -1030,15 +1030,13 @@ Theorem rngl_product_product_div_eq_1 :
   → (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), f i j))%F =
     (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), g i j))%F.
 Proof.
-intros Hic Hid Hin H10 Hed * Hg Hs.
-specialize rngl_opt_eq_dec as rngl_eq_dec.
+intros Hic Hid Hin H10 Hde * Hg Hs.
 specialize @rngl_product_list_opt_integral as rngl_product_list_integral.
-rewrite Hed in rngl_eq_dec.
 specialize (rngl_product_list_integral T ro rp Hin H10).
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 remember (Π (i ∈ _), _)%F as a eqn:Ha in |-*.
 remember (Π (i ∈ _), _)%F as b eqn:Hb in |-*.
-destruct (rngl_eq_dec b 0%F) as [Hbz| Hbz]. {
+destruct (rngl_eq_dec Hde b 0%F) as [Hbz| Hbz]. {
   rewrite Hbz in Hb |-*; clear Hbz; subst a; symmetry in Hb.
   apply rngl_product_list_integral in Hb.
   destruct Hb as (i & His & Hb).
