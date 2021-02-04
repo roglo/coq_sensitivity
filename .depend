@@ -8,8 +8,8 @@ Lemma_2_1.vio: Lemma_2_1.v Misc.vio Matrix.vio Determinant.vio RingLike.vio RLsu
 Lemma_2_1.vo Lemma_2_1.glob Lemma_2_1.v.beautified Lemma_2_1.required_vo: Lemma_2_1.v Misc.vo Matrix.vo Determinant.vo RingLike.vo RLsummation.vo
 Lemma_2_2.vio: Lemma_2_2.v Misc.vio RingLike.vio Matrix.vio RLsummation.vio
 Lemma_2_2.vo Lemma_2_2.glob Lemma_2_2.v.beautified Lemma_2_2.required_vo: Lemma_2_2.v Misc.vo RingLike.vo Matrix.vo RLsummation.vo
-Matrix.vio: Matrix.v Misc.vio RingLike.vio RLsummation.vio RLproduct.vio
-Matrix.vo Matrix.glob Matrix.v.beautified Matrix.required_vo: Matrix.v Misc.vo RingLike.vo RLsummation.vo RLproduct.vo
+Matrix.vio: Matrix.v Misc.vio RingLike.vio RLsummation.vio RLproduct.vio Vector.vio
+Matrix.vo Matrix.glob Matrix.v.beautified Matrix.required_vo: Matrix.v Misc.vo RingLike.vo RLsummation.vo RLproduct.vo Vector.vo
 Misc.vio: Misc.v 
 Misc.vo Misc.glob Misc.v.beautified Misc.required_vo: Misc.v 
 Nat_ggcd.vio: Nat_ggcd.v Misc.vio
@@ -34,5 +34,7 @@ RingLike.vio: RingLike.v
 RingLike.vo RingLike.glob RingLike.v.beautified RingLike.required_vo: RingLike.v 
 Sensitivity.vio: Sensitivity.v Misc.vio
 Sensitivity.vo Sensitivity.glob Sensitivity.v.beautified Sensitivity.required_vo: Sensitivity.v Misc.vo
+Vector.vio: Vector.v RingLike.vio
+Vector.vo Vector.glob Vector.v.beautified Vector.required_vo: Vector.v RingLike.vo
 Zrl.vio: Zrl.v RingLike.vio
 Zrl.vo Zrl.glob Zrl.v.beautified Zrl.required_vo: Zrl.v RingLike.vo
