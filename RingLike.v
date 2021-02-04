@@ -174,6 +174,15 @@ Context {rp : ring_like_prop T}.
 
 (* theorems easier to use *)
 
+Theorem rngl_1_neq_0 :
+  rngl_has_1_neq_0 = true →
+  (1 ≠ 0)%F.
+Proof.
+intros H10.
+specialize rngl_opt_1_neq_0 as H.
+now rewrite H10 in H.
+Qed.
+
 Theorem rngl_mul_comm :
   rngl_is_comm = true →
   ∀ a b, (a * b = b * a)%F.
@@ -184,13 +193,14 @@ rewrite Hic in H.
 apply H.
 Qed.
 
-Theorem rngl_1_neq_0 :
-  rngl_has_1_neq_0 = true →
-  (1 ≠ 0)%F.
+Theorem rngl_mul_1_r : ∀ a, (a * 1 = a)%F.
 Proof.
-intros H10.
-specialize rngl_opt_1_neq_0 as H.
-now rewrite H10 in H.
+intros.
+specialize rngl_opt_mul_1_r as rngl_mul_1_r.
+remember rngl_is_comm as ic eqn:Hic.
+symmetry in Hic.
+destruct ic; [ | easy ].
+now rewrite rngl_mul_comm, rngl_mul_1_l.
 Qed.
 
 Theorem rngl_mul_add_distr_r : ∀ x y z,
@@ -210,15 +220,91 @@ destruct ic. {
 }
 Qed.
 
-Theorem rngl_mul_1_r : ∀ a, (a * 1 = a)%F.
+Theorem rngl_add_opp_l :
+  rngl_has_opp = true →
+ ∀ x, (- x + x = 0)%F.
 Proof.
-intros.
-specialize rngl_opt_mul_1_r as rngl_mul_1_r.
-remember rngl_is_comm as ic eqn:Hic.
-symmetry in Hic.
-destruct ic; [ | easy ].
-now rewrite rngl_mul_comm, rngl_mul_1_l.
+intros Hro *.
+specialize rngl_opt_add_opp_l as H.
+rewrite Hro in H.
+apply H.
 Qed.
+
+(*
+    rngl_opt_add_sub_simpl_l :
+      if rngl_has_opp then not_applicable
+       else ∀ a b c : T, (a + b - (a + c) = b - c)%F;
+    rngl_opt_sub_0_r :
+      if rngl_has_opp then not_applicable else ∀ a, (a - 0 = a)%F;
+    rngl_opt_mul_0_l :
+      if rngl_has_opp then not_applicable else ∀ a, (0 * a = 0)%F;
+    rngl_opt_mul_0_r :
+      if rngl_has_opp then not_applicable else ∀ a, (a * 0 = 0)%F;
+    (* when has inverse *)
+    rngl_opt_mul_inv_l :
+      if rngl_has_inv then ∀ a : T, a ≠ 0%F → (¹/ a * a = 1)%F
+      else not_applicable;
+    rngl_opt_mul_inv_r :
+      if (rngl_has_inv && negb rngl_is_comm)%bool then
+        ∀ a : T, a ≠ 0%F → (a / a = 1)%F
+      else not_applicable;
+    (* when has no inverse but division *)
+    rngl_opt_mul_div_l :
+      if rngl_has_no_inv_but_div then
+        ∀ a b : T, a ≠ 0%F → (a * b / a = b)%F
+      else not_applicable;
+    rngl_opt_mul_div_r :
+      if (rngl_has_no_inv_but_div && negb rngl_is_comm)%bool then
+        ∀ a b : T, b ≠ 0%F → (a * b / b = a)%F
+      else not_applicable;
+    (* when equality is decidable *)
+    rngl_opt_eq_dec :
+      if rngl_has_dec_eq then ∀ a b : T, {a = b} + {a ≠ b}
+      else not_applicable;
+    (* when le comparison is decidable *)
+    rngl_opt_le_dec :
+      if rngl_has_dec_le then ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%F
+      else not_applicable;
+    (* when has_no_zero_divisors *)
+    rngl_opt_integral :
+      if rngl_is_integral then
+        ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
+      else not_applicable;
+    (* characteristic *)
+    rngl_characteristic_prop :
+      match rngl_characteristic with
+      | 0 => ∀ i, rngl_of_nat (S i) ≠ 0%F
+      | n => rngl_of_nat n = 0%F
+      end;
+    (* when ordered *)
+    rngl_opt_le_refl :
+      if rngl_is_ordered then ∀ a, (a ≤ a)%F else not_applicable;
+    rngl_opt_le_antisymm :
+      if rngl_is_ordered then ∀ a b, (a ≤ b → b ≤ a → a = b)%F
+      else not_applicable;
+    rngl_opt_le_trans :
+      if rngl_is_ordered then ∀ a b c, (a ≤ b → b ≤ c → a ≤ c)%F
+      else not_applicable;
+    rngl_opt_add_le_compat :
+      if rngl_is_ordered then ∀ a b c d, (a ≤ b → c ≤ d → a + c ≤ b + d)%F
+      else not_applicable;
+    rngl_opt_mul_le_compat_nonneg :
+      if (rngl_is_ordered && rngl_has_opp)%bool then
+        ∀ a b c d, (0 ≤ a ≤ c)%F → (0 ≤ b ≤ d)%F → (a * b ≤ c * d)%F
+      else not_applicable;
+    rngl_opt_mul_le_compat_nonpos :
+      if (rngl_is_ordered && rngl_has_opp)%bool then
+        ∀ a b c d, (c ≤ a ≤ 0)%F → (d ≤ b ≤ 0)%F → (a * b ≤ c * d)%F
+      else not_applicable;
+    rngl_opt_mul_le_compat :
+      if (rngl_is_ordered && negb rngl_has_opp)%bool then
+        ∀ a b c d, (a ≤ c)%F → (b ≤ d)%F → (a * b ≤ c * d)%F
+      else not_applicable;
+    rngl_opt_not_le :
+      if rngl_is_ordered then
+        ∀ a b, (¬ a ≤ b → a = b ∨ b ≤ a)%F
+      else not_applicable;
+*)
 
 Theorem rngl_eq_dec : rngl_has_dec_eq = true → ∀ a b : T, {a = b} + {a ≠ b}.
 Proof.
@@ -228,6 +314,7 @@ rewrite Hde in H.
 apply H.
 Qed.
 
+(*
 Theorem rngl_le_dec :
   rngl_has_dec_le = true →
   ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%F.
@@ -237,6 +324,7 @@ specialize rngl_opt_le_dec as H.
 rewrite Hdl in H.
 apply H.
 Qed.
+*)
 
 (* *)
 
@@ -411,16 +499,6 @@ Proof. now destruct c. Qed.
 Theorem rngl_mul_if_then_else_distr : ∀ (x : bool) a b c d,
   ((if x then a else b) * (if x then c else d) = if x then a * c else b * d)%F.
 Proof. now destruct x. Qed.
-
-Theorem rngl_add_opp_l :
-  rngl_has_opp = true →
- ∀ x, (- x + x = 0)%F.
-Proof.
-intros Hro *.
-specialize rngl_opt_add_opp_l as rngl_add_opp_l.
-rewrite Hro in rngl_add_opp_l.
-apply rngl_add_opp_l.
-Qed.
 
 Theorem rngl_add_sub : ∀ a b, (a + b - b = a)%F.
 Proof.
