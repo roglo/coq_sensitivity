@@ -377,11 +377,17 @@ Qed.
       if (rngl_is_ordered && negb rngl_has_opp)%bool then
         ∀ a b c d, (a ≤ c)%F → (b ≤ d)%F → (a * b ≤ c * d)%F
       else not_applicable;
-    rngl_opt_not_le :
-      if rngl_is_ordered then
-        ∀ a b, (¬ a ≤ b → a = b ∨ b ≤ a)%F
-      else not_applicable;
 *)
+
+Theorem rngl_not_le :
+  rngl_is_ordered = true →
+  ∀ a b, (¬ a ≤ b → a = b ∨ b ≤ a)%F.
+Proof.
+intros Hor *.
+specialize rngl_opt_not_le as H.
+rewrite Hor in H.
+apply H.
+Qed.
 
 (* *)
 
