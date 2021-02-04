@@ -660,7 +660,23 @@ intros i Hi.
 now rewrite Nat.add_comm, Nat.add_sub.
 Qed.
 
+Compute partition (Nat.eqb 3) [1;2;3;4;5;6].
+
+
+Print Module List.
+
+Definition transposition_list_of_permutation_list (σ : list nat) i :=
+  | [] => []
+  | j :: l' =>
+      if j =? i then transposition_list_of_permutation_list l' (S i)
+      else
+        let (pl, l'') := glop i l in
+(* bin non, parce que le nombre d'itérations max, c'est n² *)
+...
+
 Definition transposition_list_of_permutation n (σ : vector n nat) :=
+  transposition_list_of_permutation_list (list_of_vect σ) 0.
+
 ...
 
 Theorem determinant_alternating_permut_fun :
