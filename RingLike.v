@@ -358,10 +358,17 @@ Qed.
     rngl_opt_le_trans :
       if rngl_is_ordered then ∀ a b c, (a ≤ b → b ≤ c → a ≤ c)%F
       else not_applicable;
-    rngl_opt_add_le_compat :
-      if rngl_is_ordered then ∀ a b c d, (a ≤ b → c ≤ d → a + c ≤ b + d)%F
-      else not_applicable;
 *)
+
+Theorem rngl_add_le_compat :
+  rngl_is_ordered = true →
+  ∀ a b c d, (a ≤ b → c ≤ d → a + c ≤ b + d)%F.
+Proof.
+intros H1 *.
+specialize rngl_opt_add_le_compat as H.
+rewrite H1 in H.
+apply H.
+Qed.
 
 Theorem rngl_mul_le_compat_nonneg :
   (rngl_is_ordered && rngl_has_opp)%bool = true →
@@ -956,20 +963,19 @@ Theorem rngl_eq_add_0 :
 Proof.
 intros Hor * Haz Hbz Hab.
 specialize rngl_opt_le_antisymm as rngl_le_antisymm.
-specialize rngl_opt_add_le_compat as rngl_add_le_compat.
-rewrite Hor in rngl_le_antisymm, rngl_add_le_compat.
+rewrite Hor in rngl_le_antisymm.
 split. {
   apply rngl_le_antisymm in Haz; [ easy | ].
   rewrite <- Hab.
   remember (a + b)%F as ab.
   rewrite <- (rngl_add_0_r a); subst ab.
-  apply rngl_add_le_compat; [ now apply rngl_le_refl | easy ].
+  apply rngl_add_le_compat; [ easy | now apply rngl_le_refl | easy ].
 } {
   apply rngl_le_antisymm in Hbz; [ easy | ].
   rewrite <- Hab.
   remember (a + b)%F as ab.
   rewrite <- (rngl_add_0_l b); subst ab.
-  apply rngl_add_le_compat; [ easy | now apply rngl_le_refl ].
+  apply rngl_add_le_compat; [ easy | easy | now apply rngl_le_refl ].
 }
 Qed.
 

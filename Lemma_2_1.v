@@ -127,8 +127,6 @@ Theorem eq_vect_squ_0 :
   ∀ n v, ≺ v, v ≻ = 0%F → v = vect_zero n.
 Proof.
 intros Hop Hed Hdo Hor * H.
-specialize rngl_opt_add_le_compat as rngl_add_le_compat.
-rewrite Hor in rngl_add_le_compat.
 unfold vect_dot_product in H.
 apply vector_eq.
 intros i Hi.
@@ -168,7 +166,7 @@ apply rngl_eq_add_0 in H; [ | easy | | ]; cycle 1. {
   }
   cbn - [ iter_seq ].
   rewrite <- (rngl_add_0_r 0%F) at 1.
-  apply rngl_add_le_compat; [ | now apply rngl_0_le_squ ].
+  apply rngl_add_le_compat; [ easy | | now apply rngl_0_le_squ ].
   remember (mk_vect (S (S n)) (λ i, vect_el v i)) as u eqn:Hu.
   specialize (IHn u) as H1.
   now subst u.
@@ -210,9 +208,7 @@ do 2 rewrite rngl_mul_assoc.
 unfold rngl_div.
 specialize (rngl_inv_mul_distr Hdo Hin) as H1.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
-specialize rngl_opt_add_le_compat as rngl_add_le_compat.
 rewrite Hin in rngl_mul_inv_l |-*.
-rewrite Hor in rngl_add_le_compat.
 rewrite H1; cycle 1. {
   intros H; apply Hcz.
   apply rngl_integral in H; [ | now rewrite Hdo ].
