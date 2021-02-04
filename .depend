@@ -6,20 +6,22 @@ GQ.vio: GQ.v Misc.vio PQ.vio Nat_ggcd.vio
 GQ.vo GQ.glob GQ.v.beautified GQ.required_vo: GQ.v Misc.vo PQ.vo Nat_ggcd.vo
 Lemma_2_1.vio: Lemma_2_1.v Misc.vio Matrix.vio Determinant.vio RingLike.vio RLsummation.vio
 Lemma_2_1.vo Lemma_2_1.glob Lemma_2_1.v.beautified Lemma_2_1.required_vo: Lemma_2_1.v Misc.vo Matrix.vo Determinant.vo RingLike.vo RLsummation.vo
-Lemma_2_2.vio: Lemma_2_2.v Misc.vio RingLike.vio Matrix.vio RLsummation.vio
-Lemma_2_2.vo Lemma_2_2.glob Lemma_2_2.v.beautified Lemma_2_2.required_vo: Lemma_2_2.v Misc.vo RingLike.vo Matrix.vo RLsummation.vo
-Matrix.vio: Matrix.v Misc.vio RingLike.vio RLsummation.vio RLproduct.vio Vector.vio
-Matrix.vo Matrix.glob Matrix.v.beautified Matrix.required_vo: Matrix.v Misc.vo RingLike.vo RLsummation.vo RLproduct.vo Vector.vo
+Lemma_2_2.vio: Lemma_2_2.v Misc.vio RingLike.vio MyVector.vio Matrix.vio RLsummation.vio
+Lemma_2_2.vo Lemma_2_2.glob Lemma_2_2.v.beautified Lemma_2_2.required_vo: Lemma_2_2.v Misc.vo RingLike.vo MyVector.vo Matrix.vo RLsummation.vo
+Matrix.vio: Matrix.v Misc.vio RingLike.vio RLsummation.vio RLproduct.vio MyVector.vio
+Matrix.vo Matrix.glob Matrix.v.beautified Matrix.required_vo: Matrix.v Misc.vo RingLike.vo RLsummation.vo RLproduct.vo MyVector.vo
 Misc.vio: Misc.v 
 Misc.vo Misc.glob Misc.v.beautified Misc.required_vo: Misc.v 
+MyVector.vio: MyVector.v Misc.vio RingLike.vio
+MyVector.vo MyVector.glob MyVector.v.beautified MyVector.required_vo: MyVector.v Misc.vo RingLike.vo
 Nat_ggcd.vio: Nat_ggcd.v Misc.vio
 Nat_ggcd.vo Nat_ggcd.glob Nat_ggcd.v.beautified Nat_ggcd.required_vo: Nat_ggcd.v Misc.vo
 Nrl.vio: Nrl.v Misc.vio RingLike.vio FermatLittle.vio
 Nrl.vo Nrl.glob Nrl.v.beautified Nrl.required_vo: Nrl.v Misc.vo RingLike.vo FermatLittle.vo
 PQ.vio: PQ.v Misc.vio Nat_ggcd.vio
 PQ.vo PQ.glob PQ.v.beautified PQ.required_vo: PQ.v Misc.vo Nat_ggcd.vo
-PermutSeq.vio: PermutSeq.v Misc.vio RingLike.vio Matrix.vio RLproduct.vio Pigeonhole.vio
-PermutSeq.vo PermutSeq.glob PermutSeq.v.beautified PermutSeq.required_vo: PermutSeq.v Misc.vo RingLike.vo Matrix.vo RLproduct.vo Pigeonhole.vo
+PermutSeq.vio: PermutSeq.v Misc.vio RingLike.vio MyVector.vio RLproduct.vio Pigeonhole.vio
+PermutSeq.vo PermutSeq.glob PermutSeq.v.beautified PermutSeq.required_vo: PermutSeq.v Misc.vo RingLike.vo MyVector.vo RLproduct.vo Pigeonhole.vo
 Pigeonhole.vio: Pigeonhole.v Misc.vio
 Pigeonhole.vo Pigeonhole.glob Pigeonhole.v.beautified Pigeonhole.required_vo: Pigeonhole.v Misc.vo
 Qrl.vio: Qrl.v RingLike.vio Rational.vio
@@ -34,7 +36,5 @@ RingLike.vio: RingLike.v
 RingLike.vo RingLike.glob RingLike.v.beautified RingLike.required_vo: RingLike.v 
 Sensitivity.vio: Sensitivity.v Misc.vio
 Sensitivity.vo Sensitivity.glob Sensitivity.v.beautified Sensitivity.required_vo: Sensitivity.v Misc.vo
-Vector.vio: Vector.v RingLike.vio
-Vector.vo Vector.glob Vector.v.beautified Vector.required_vo: Vector.v RingLike.vo
 Zrl.vio: Zrl.v RingLike.vio
 Zrl.vo Zrl.glob Zrl.v.beautified Zrl.required_vo: Zrl.v RingLike.vo

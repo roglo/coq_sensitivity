@@ -9,9 +9,7 @@ Require Import Init.Nat.
 
 Require Import Misc.
 Require Import RingLike RLsummation RLproduct.
-From Top Require Import Vector.
-
-...
+Require Import MyVector.
 
 (* matrices *)
 
@@ -135,41 +133,6 @@ Definition mat_mul_scal_l {m n} s (M : matrix m n T) :=
 
 Definition mat_repl_vect {m n} k (M : matrix m n T) (V : vector m T) :=
   mk_mat m n (λ i j, if Nat.eq_dec j k then vect_el V i else mat_el M i j).
-
-(* (-1) ^ n *)
-
-Definition minus_one_pow n :=
-  match n mod 2 with
-  | 0 => 1%F
-  | _ => (- 1%F)%F
-  end.
-
-Theorem minus_one_pow_succ :
-  rngl_has_opp = true →
-  ∀ i, minus_one_pow (S i) = (- minus_one_pow i)%F.
-Proof.
-intros Hop *.
-unfold minus_one_pow.
-remember (i mod 2) as k eqn:Hk; symmetry in Hk.
-destruct k. {
-  apply Nat.mod_divides in Hk; [ | easy ].
-  destruct Hk as (k, Hk); subst i.
-  rewrite <- Nat.add_1_l, Nat.mul_comm.
-  now rewrite Nat.mod_add.
-}
-destruct k. {
-  rewrite <- Nat.add_1_l.
-  rewrite <- Nat.add_mod_idemp_r; [ | easy ].
-  rewrite Hk; cbn.
-  symmetry.
-  now apply rngl_opp_involutive.
-}
-specialize (Nat.mod_upper_bound i 2) as H1.
-assert (H : 2 ≠ 0) by easy.
-specialize (H1 H); clear H.
-rewrite Hk in H1.
-flia H1.
-Qed.
 
 Theorem minus_one_pow_add_r :
   rngl_has_opp = true →

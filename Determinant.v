@@ -5,7 +5,7 @@ Require Import Utf8 Arith Bool.
 Require Import Permutation.
 Import List List.ListNotations.
 
-Require Import Misc RingLike Matrix PermutSeq.
+Require Import Misc RingLike MyVector Matrix PermutSeq.
 Require Import RLsummation RLproduct.
 Import matrix_Notations.
 
@@ -24,6 +24,12 @@ Fixpoint det_loop {n} (M : matrix n n T) i :=
       (Σ (j = 0, i'),
        minus_one_pow j * mat_el M 0 j * det_loop (subm M 0 j) i')%F
   end.
+
+Definition mat_permut_fun_rows n (σ : nat → nat) (M : matrix n n T) :=
+  mk_mat n n (λ i j, mat_el M (σ i) j).
+
+Definition mat_permut_rows n (σ : vector n nat) (M : matrix n n T) :=
+  mat_permut_fun_rows (vect_el σ) M.
 
 Definition determinant {n} (M : matrix n n T) := det_loop M n.
 
@@ -443,6 +449,13 @@ rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
 now rewrite Nat.add_0_l.
 Qed.
+
+Definition mat_swap_rows n i1 i2 (M : matrix n n T) :=
+  mk_mat n n
+    (λ i j,
+     if Nat.eq_dec i i1 then mat_el M i2 j
+     else if Nat.eq_dec i i2 then mat_el M i1 j
+     else mat_el M i j).
 
 Theorem determinant_alternating :
   rngl_is_comm = true →

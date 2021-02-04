@@ -21,7 +21,7 @@ Import List List.ListNotations.
 Import EqNotations.
 *)
 
-Require Import Misc RingLike Matrix.
+Require Import Misc RingLike MyVector Matrix.
 Require Import RLsummation.
 Import matrix_Notations.
 

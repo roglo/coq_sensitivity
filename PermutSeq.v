@@ -7,7 +7,7 @@ Require Import Utf8 Arith Bool.
 Require Import Permutation.
 Import List List.ListNotations.
 
-Require Import Misc RingLike Matrix.
+Require Import Misc RingLike (*Matrix*)MyVector.
 Require Import (*RLsummation*) RLproduct.
 Require Import Pigeonhole.
 (*
@@ -109,12 +109,6 @@ split; cbn. {
   now apply Hσ in Hij.
 }
 Qed.
-
-Definition mat_permut_fun_rows n (σ : nat → nat) (M : matrix n n T) :=
-  mk_mat n n (λ i j, mat_el M (σ i) j).
-
-Definition mat_permut_rows n (σ : vector n nat) (M : matrix n n T) :=
-  mat_permut_fun_rows (vect_el σ) M.
 
 (*
    Canonical Permutations.
@@ -2374,13 +2368,6 @@ now apply permut_fun_Permutation.
 Qed.
 *)
 
-Definition mat_swap_rows n i1 i2 (M : matrix n n T) :=
-  mk_mat n n
-    (λ i j,
-     if Nat.eq_dec i i1 then mat_el M i2 j
-     else if Nat.eq_dec i i2 then mat_el M i1 j
-     else mat_el M i j).
-
 Theorem transposition_involutive : ∀ p q i,
   transposition p q (transposition p q i) = i.
 Proof.
@@ -2771,7 +2758,7 @@ f_equal. {
   rewrite Nat.sub_succ, Nat.sub_0_r.
   rewrite IHx.
   symmetry.
-  rewrite minus_one_pow_succ; [ | easy | easy ].
+  rewrite minus_one_pow_succ; [ | easy ].
   rewrite rngl_mul_comm; [ | easy ].
   rewrite rngl_mul_opp_l; [ | easy ].
   now rewrite rngl_mul_1_l.
