@@ -2282,6 +2282,66 @@ intros Hop Hin Hic Hde H10 Hit Hch * Hp1 Hp2.
 now apply signature_comp_fun.
 Qed.
 
+Theorem nat_of_canon_permut_permut : ∀ n k,
+  k < fact n
+  → nat_of_canon_permut (canon_permut n k) = k.
+Proof.
+intros * Hkn.
+revert k Hkn.
+induction n; intros; [ now apply Nat.lt_1_r in Hkn | cbn ].
+specialize (Nat.div_mod k (fact n) (fact_neq_0 _)) as H1.
+rewrite Nat.mul_comm in H1.
+replace (k / fact n * fact n) with (k - k mod fact n) by flia H1.
+rewrite <- Nat.add_sub_swap; [ | apply Nat.mod_le, fact_neq_0 ].
+apply Nat.add_sub_eq_r; f_equal.
+clear H1.
+rewrite <- (IHn (k mod fact n)) at 1. 2: {
+  apply Nat.mod_upper_bound, fact_neq_0.
+}
+f_equal.
+apply vector_eq.
+intros i Hi; cbn.
+symmetry.
+apply Nat.add_sub_eq_r.
+f_equal.
+remember (Nat.b2n (_ <=? _)) as b eqn:Hb.
+rewrite Nat.add_comm.
+symmetry in Hb.
+destruct b. 2: {
+  cbn.
+  destruct b; [ easy | exfalso ].
+  unfold Nat.b2n in Hb.
+  destruct (k / fact n <=? _); flia Hb.
+}
+cbn.
+remember (vect_el (canon_permut n _) i) as x eqn:Hx.
+symmetry in Hx.
+destruct x; [ easy | ].
+unfold Nat.b2n in Hb |-*.
+remember (k / fact n) as y eqn:Hy; symmetry in Hy.
+remember (y <=? S x) as c eqn:Hc; symmetry in Hc.
+destruct c; [ easy | clear Hb ].
+apply Nat.leb_gt in Hc.
+remember (y <=? x) as b eqn:Hb.
+symmetry in Hb.
+destruct b; [ | easy ].
+apply Nat.leb_le in Hb.
+flia Hb Hc.
+Qed.
+
+Theorem canon_permut_injective : ∀ n i j,
+  i < fact n
+  → j < fact n
+  → canon_permut n i = canon_permut n j
+  → i = j.
+Proof.
+intros * Hi Hj Hij.
+apply (f_equal (@nat_of_canon_permut n)) in Hij.
+rewrite nat_of_canon_permut_permut in Hij; [ | easy ].
+rewrite nat_of_canon_permut_permut in Hij; [ | easy ].
+easy.
+Qed.
+
 End a.
 
 Arguments ε {T}%type {ro} {n}%nat p.
