@@ -549,11 +549,11 @@ Theorem An_eigen_equation_for_sqrt_n :
   rngl_has_dec_eq = true →
   ∀ n μ, (μ * μ)%F = rngl_of_nat n →
   match n with
-  | 0 => ∀ V, (mA 0 • V)%M = (μ × V)%V
+  | 0 => ∀ V, (mA 0 • V = μ × V)%V
   | S n' =>
       ∀ U V,
       V = A_Sn_eigenvector_of_sqrt_Sn n' μ U
-      → (mA (S n') • V)%M = (μ × V)%V
+      → (mA (S n') • V = μ × V)%V
   end.
 Proof.
 intros Hic Hro Hin Hde * Hμ.
@@ -805,7 +805,7 @@ Theorem A_n_eigenvalue_squared_is_n :
   rngl_has_inv = true →
   ∀ n μ (V : vector (2 ^ n) T),
   V ≠ vect_zero (2 ^ n)
-  → (mA n • V)%M = (μ × V)%V
+  → (mA n • V = μ × V)%V
   → (μ * μ)%F = rngl_of_nat n.
 Proof.
 intros Hic Hro Hed Hin * Hvr Hav.
@@ -831,8 +831,7 @@ rewrite vect_mul_1_l; easy.
 Qed.
 
 Definition is_eigenvector_of_An n μ (V : vector (2 ^ n) T) :=
-  V ≠ vect_zero (2 ^ n) ∧
-  (mA n • V)%M = (μ × V)%V.
+  V ≠ vect_zero (2 ^ n) ∧ (mA n • V = μ × V)%V.
 
 Theorem μ_is_ev_of_An_iff_μ2_eq_n :
   rngl_is_comm = true →

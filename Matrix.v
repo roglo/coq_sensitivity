@@ -160,6 +160,7 @@ Notation "- A" := (mat_opp A) : M_scope.
 Arguments mat_mul_vect_r {T ro m n} M%M V%V.
 
 Notation "A • V" := (mat_mul_vect_r A V) (at level 40) : M_scope.
+Notation "A • V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
 Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
 
 Theorem fold_mat_sub : ∀ m n (MA MB : matrix m n T), (MA + - MB = MA - MB)%M.
@@ -462,7 +463,8 @@ now apply mat_vect_mul_assoc_as_sums.
 Qed.
 
 Theorem mat_mul_scal_vect_assoc {m n} :
-  ∀ a (MA : matrix m n T) (V : vector n T), (a × (MA • V)%M)%V = ((a × MA) • V)%M.
+  ∀ a (MA : matrix m n T) (V : vector n T),
+  (a × (MA • V))%V = ((a × MA) • V)%M.
 Proof.
 intros.
 apply vector_eq.
@@ -477,7 +479,7 @@ Qed.
 
 Theorem mat_mul_scal_vect_comm :
   rngl_is_comm = true →
-  ∀ {m n} a (MA : matrix m n T) V, (a × (MA • V)%M = (MA • (a × V))%M)%V.
+  ∀ {m n} a (MA : matrix m n T) V, (a × (MA • V) = MA • (a × V))%V.
 Proof.
 intros Hic *.
 apply vector_eq.
@@ -770,7 +772,7 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_consistent := mat_consistent n |}.
 
 Theorem mat_vect_mul_0_r : ∀ m n (M : matrix m n T),
-  (M • vect_zero _)%M = (vect_zero _)%V.
+  (M • vect_zero _ = vect_zero _)%V.
 Proof.
 intros.
 apply vector_eq.
@@ -814,5 +816,6 @@ Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
 Notation "- A" := (mat_opp A) : M_scope.
 Notation "A ⁺" := (mat_transp A) (at level 1, format "A ⁺") : M_scope.
 Notation "A • V" := (mat_mul_vect_r A V) (at level 40) : M_scope.
+Notation "A • V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
 
 End matrix_Notations.

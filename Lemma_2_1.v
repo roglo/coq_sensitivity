@@ -60,7 +60,7 @@ Theorem subm_z : ∀ f i j, subm (mk_mat 0 0 f) i j = mZ 0 0.
 Proof. now intros; apply matrix_eq. Qed.
 
 Definition eigenvalues n M ev :=
-  ∀ μ, μ ∈ ev → ∃ V, V ≠ vect_zero n ∧ (M • V)%M = (μ × V)%V.
+  ∀ μ, μ ∈ ev → ∃ V, V ≠ vect_zero n ∧ (M • V = μ × V)%V.
 
 Definition eigenvalues_and_norm_vectors n M ev eV :=
   (∀ i j, 0 ≤ i < n → 0 ≤ j < n → i ≠ j → nth i ev 0%F ≠ nth j ev 0%F) ∧
@@ -68,12 +68,12 @@ Definition eigenvalues_and_norm_vectors n M ev eV :=
   ∀ i μ V, 0 ≤ i < n →
   μ = nth i ev 0%F
   → V = nth i eV (vect_zero n)
-  → (M • V)%M = (μ × V)%V.
+  → (M • V = μ × V)%V.
 
 (* Rayleigh quotient *)
 
 Definition Rayleigh_quotient n (M : matrix n n T) (x : vector n T) :=
-  (≺ x, (M • x)%M ≻ / ≺ x, x ≻)%F.
+  (≺ x, M • x ≻ / ≺ x, x ≻)%F.
 
 Arguments Rayleigh_quotient [n]%nat_scope M%M x%V.
 
@@ -256,7 +256,7 @@ Theorem Rayleigh_quotient_of_eigenvector :
   rngl_is_ordered = true →
   ∀ n (M : matrix n n T) V μ,
   V ≠ vect_zero n
-  → (M • V)%M = (μ × V)%V
+  → (M • V = μ × V)%V
   → Rayleigh_quotient M V = μ.
 Proof.
 intros Hic Hop Hii Hdo Hor Hdl * Hvz Hmv.
@@ -333,7 +333,7 @@ specialize (H1 H eq_refl eq_refl); clear H.
 remember (nth j ev 0%F) as μ eqn:Hμ.
 remember (nth j eV (vect_zero n)) as V eqn:Hv.
 symmetry.
-assert (H : vect_el (M • V)%M i = vect_el (μ × V) i) by now rewrite H1.
+assert (H : vect_el (M • V) i = vect_el (μ × V) i) by now rewrite H1.
 cbn - [ iter_seq ] in H.
 now rewrite rngl_mul_comm in H.
 Qed.
@@ -374,7 +374,7 @@ Qed.
 Theorem mat_mul_vect_dot_vect :
   rngl_is_comm = true →
   ∀ n (M : matrix n n T) U V,
-  ≺ (M • U)%M, V ≻ = ≺ U, (M⁺ • V)%M ≻.
+  ≺ M • U, V ≻ = ≺ U, M⁺ • V ≻.
 Proof.
 intros Hic *.
 unfold vect_dot_product.
