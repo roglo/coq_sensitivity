@@ -107,5 +107,19 @@ Qed.
 
 End a.
 
+Declare Scope V_scope.
+Delimit Scope V_scope with V.
+
+Arguments vect_el {n}%nat {T}%type v%V.
+Arguments vect_mul_scal_l {T ro} s%F {n}%nat V%V.
+Arguments vect_dot_product {T}%type {ro n} (U V)%V.
+Arguments vect_add {T}%type {ro} {n}%nat (U V)%V.
+
 Arguments minus_one_pow {T}%type {ro} n%nat.
 Arguments minus_one_pow_succ {T}%type {ro rp} _ i%nat.
+
+Notation "U + V" := (vect_add U V) : V_scope.
+Notation "U - V" := (vect_sub U V) : V_scope.
+Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
+Notation "≺ U , V ≻" := (vect_dot_product U V) (at level 35).
+Notation "- V" := (vect_opp V) : V_scope.

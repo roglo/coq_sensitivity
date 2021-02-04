@@ -122,18 +122,6 @@ Definition mat_mul_scal_l {m n} s (M : matrix m n T) :=
 Definition mat_repl_vect {m n} k (M : matrix m n T) (V : vector m T) :=
   mk_mat m n (λ i j, if Nat.eq_dec j k then vect_el V i else mat_el M i j).
 
-(* *)
-
-(* should be moved to MyVector.v *)
-
-Declare Scope V_scope.
-Delimit Scope V_scope with V.
-
-Arguments vect_el {n}%nat {T} v%V.
-
-Notation "U + V" := (vect_add U V) : V_scope.
-Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
-
 (* null matrix of dimension m × n *)
 
 Definition mZ m n : matrix m n T :=
@@ -169,18 +157,10 @@ Notation "A * B" := (mat_mul A B) : M_scope.
 Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
 Notation "- A" := (mat_opp A) : M_scope.
 
-Declare Scope V_scope.
-Delimit Scope V_scope with V.
-
 Arguments mat_mul_vect_r {T ro m n} M%M V%V.
-Arguments vect_mul_scal_l {T ro} s%F {n}%nat V%V.
-Arguments vect_dot_product {T}%type {ro n} (U V)%V.
-Arguments vect_el {n}%nat {T}%type v%V.
 
-Notation "A • V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
+Notation "A • V" := (mat_mul_vect_r A V) (at level 40) : M_scope.
 Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
-Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
-Notation "≺ U , V ≻" := (vect_dot_product U V) (at level 35).
 
 Theorem fold_mat_sub : ∀ m n (MA MB : matrix m n T), (MA + - MB = MA - MB)%M.
 Proof. easy. Qed.
@@ -298,7 +278,7 @@ rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
 now rewrite rngl_add_0_l, rngl_add_0_r.
 Qed.
 
-Theorem vect_mul_1_l : ∀ {n} (V : vector n T), (mI n • V)%V = V.
+Theorem vect_mul_1_l : ∀ {n} (V : vector n T), (mI n • V)%M = V.
 Proof.
 intros.
 apply vector_eq; cbn.
@@ -408,7 +388,7 @@ intros * Hi Hj; cbn.
 apply rngl_mul_assoc.
 Qed.
 
-Theorem vect_mul_scal_l_mul_assoc {n} : ∀ a b (V : vector n T),
+Theorem vect_mul_scal_l_mul_assoc {n} : ∀ (a b : T) (V : vector n T),
   (a × (b × V))%V = ((a * b)%F × V)%V.
 Proof.
 intros.
@@ -528,7 +508,7 @@ Qed.
 
 Theorem mat_vect_mul_assoc {m n p} :
   ∀ (A : matrix m n T) (B : matrix n p T) (V : vector p T),
-  (A • (B • V) = (A * B) • V)%V.
+  (A • (B • V) = (A * B) • V)%M.
 Proof.
 intros.
 apply vector_eq.
@@ -541,7 +521,7 @@ now apply mat_vect_mul_assoc_as_sums.
 Qed.
 
 Theorem mat_mul_scal_vect_assoc {m n} :
-  ∀ a (MA : matrix m n T) (V : vector n T), (a × (MA • V) = (a × MA) • V)%V.
+  ∀ a (MA : matrix m n T) (V : vector n T), (a × (MA • V)%M)%V = ((a × MA) • V)%M.
 Proof.
 intros.
 apply vector_eq.
@@ -556,7 +536,7 @@ Qed.
 
 Theorem mat_mul_scal_vect_comm :
   rngl_is_comm = true →
-  ∀ {m n} a (MA : matrix m n T) V, (a × (MA • V) = MA • (a × V))%V.
+  ∀ {m n} a (MA : matrix m n T) V, (a × (MA • V)%M = (MA • (a × V))%M)%V.
 Proof.
 intros Hic *.
 apply vector_eq.
@@ -901,7 +881,7 @@ destruct IHn as [IHn| IHn]. {
 Qed.
 
 Theorem mat_vect_mul_0_r : ∀ m n (M : matrix m n T),
-  (M • vect_zero _ = vect_zero _)%V.
+  (M • vect_zero _)%M = (vect_zero _)%V.
 Proof.
 intros.
 apply vector_eq.
@@ -918,9 +898,7 @@ End a.
 Module matrix_Notations.
 
 Declare Scope M_scope.
-Declare Scope V_scope.
 Delimit Scope M_scope with M.
-Delimit Scope V_scope with V.
 
 Arguments mat_el [m n]%nat [T]%type M%M (i j)%nat : rename.
 Arguments mat_add_opp_r {T}%type {ro rp} {m n}%nat Hro M%M.
@@ -958,12 +936,6 @@ Notation "A * B" := (mat_mul A B) : M_scope.
 Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
 Notation "- A" := (mat_opp A) : M_scope.
 Notation "A ⁺" := (mat_transp A) (at level 1, format "A ⁺") : M_scope.
-
-Notation "U + V" := (vect_add U V) : V_scope.
-Notation "U - V" := (vect_sub U V) : V_scope.
-Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
-Notation "A • V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
-Notation "≺ U , V ≻" := (vect_dot_product U V) (at level 35).
-Notation "- V" := (vect_opp V) : V_scope.
+Notation "A • V" := (mat_mul_vect_r A V) (at level 40) : M_scope.
 
 End matrix_Notations.
