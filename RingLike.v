@@ -232,59 +232,18 @@ Qed.
 
 (*
 Theorem rngl_add_sub_simpl_l : ∀ a b c : T, (a + b - (a + c) = b - c)%F.
-Proof.
-intros.
-specialize rngl_opt_add_sub_simpl_l as rngl_add_sub_simpl_l.
-remember rngl_has_opp as op eqn:Hop.
-symmetry in Hop.
-destruct op; [ | easy ].
-unfold rngl_sub; rewrite Hop.
-rewrite rngl_opp_add_distr; [ | easy ].
-unfold rngl_sub; rewrite Hop.
-rewrite rngl_add_assoc.
-rewrite rngl_add_add_swap.
-rewrite (rngl_add_add_swap a).
-rewrite fold_rngl_sub; [ | easy ].
-rewrite fold_rngl_sub; [ | easy ].
-rewrite fold_rngl_sub; [ | easy ].
-now rewrite rngl_add_opp_r, rngl_add_0_l.
-Qed.
 *)
 
 (*
 Theorem rngl_sub_0_r : ∀ a, (a - 0 = a)%F.
-Proof.
-intros.
-specialize rngl_opt_sub_0_r as rngl_sub_0_r.
-remember rngl_has_opp as op eqn:Hop.
-symmetry in Hop.
-destruct op. {
-  unfold rngl_sub; rewrite Hop.
-  rewrite rngl_opp_0; [ | easy ].
-  apply rngl_add_0_r.
-} {
-  apply rngl_sub_0_r.
-}
-Qed.
 *)
 
 (*
 Theorem rngl_mul_0_l : ∀ a, (0 * a = 0)%F.
-Proof.
-intros a.
-apply (rngl_add_reg_r _ _ (1 * a)%F).
-rewrite <- rngl_mul_add_distr_r.
-now do 2 rewrite rngl_add_0_l.
-Qed.
 *)
 
 (*
 Theorem rngl_mul_0_r : ∀ a, (a * 0 = 0)%F.
-Proof.
-intros.
-apply (rngl_add_reg_r _ _ (a * 1)%F).
-rewrite <- rngl_mul_add_distr_l.
-now do 2 rewrite rngl_add_0_l.
 Qed.
 *)
 
@@ -322,23 +281,18 @@ rewrite Hde in H.
 apply H.
 Qed.
 
-(*
-    rngl_opt_le_dec :
-      if rngl_has_dec_le then ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%F
-      else not_applicable;
-    (* when has_no_zero_divisors *)
-*)
+Theorem rngl_le_dec :
+  rngl_has_dec_le = true →
+  ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%F.
+Proof.
+intros H1 *.
+specialize rngl_opt_le_dec as H.
+rewrite H1 in H.
+apply H.
+Qed.
 
 (*
 Theorem rngl_integral :
-  rngl_is_integral = true →
-  ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F.
-Proof.
-intros Hit *.
-specialize rngl_opte_integral as H.
-rewrite Hit in H.
-apply H.
-Qed.
 *)
 
 (*
@@ -415,16 +369,6 @@ apply H.
 Qed.
 
 (* *)
-
-Theorem rngl_le_dec :
-  rngl_has_dec_le = true →
-  ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%F.
-Proof.
-intros Hdl *.
-specialize rngl_opt_le_dec as H.
-rewrite Hdl in H.
-apply H.
-Qed.
 
 Theorem rngl_add_0_r : ∀ a, (a + 0 = a)%F.
 Proof.
