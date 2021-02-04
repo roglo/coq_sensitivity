@@ -473,8 +473,6 @@ Abort. (*
   cbn - [ iter_seq ].
   erewrite rngl_summation_eq_compat. 2: {
     intros j Hj.
-    specialize rngl_opt_mul_comm as rngl_mul_comm.
-    rewrite Hic in rngl_mul_comm.
     rewrite rngl_mul_assoc, (rngl_mul_comm (mat_el M i j)).
     easy.
   }
