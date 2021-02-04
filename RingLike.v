@@ -228,6 +228,16 @@ rewrite Hde in H.
 apply H.
 Qed.
 
+Theorem rngl_le_dec :
+  rngl_has_dec_le = true →
+  ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%F.
+Proof.
+intros Hdl *.
+specialize rngl_opt_le_dec as H.
+rewrite Hdl in H.
+apply H.
+Qed.
+
 (* *)
 
 Theorem rngl_add_0_r : ∀ a, (a + 0 = a)%F.

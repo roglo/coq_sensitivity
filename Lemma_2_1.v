@@ -60,7 +60,7 @@ Theorem subm_z : ∀ f i j, subm (mk_mat 0 0 f) i j = mZ 0 0.
 Proof. now intros; apply matrix_eq. Qed.
 
 Definition eigenvalues n M ev :=
-  ∀ μ, μ ∈ ev → ∃ V, V ≠ vect_zero n ∧ (M • V = μ × V)%V.
+  ∀ μ, μ ∈ ev → ∃ V, V ≠ vect_zero n ∧ (M • V)%M = (μ × V)%V.
 
 Definition eigenvalues_and_norm_vectors n M ev eV :=
   (∀ i j, 0 ≤ i < n → 0 ≤ j < n → i ≠ j → nth i ev 0%F ≠ nth j ev 0%F) ∧
@@ -68,12 +68,12 @@ Definition eigenvalues_and_norm_vectors n M ev eV :=
   ∀ i μ V, 0 ≤ i < n →
   μ = nth i ev 0%F
   → V = nth i eV (vect_zero n)
-  → (M • V = μ × V)%V.
+  → (M • V)%M = (μ × V)%V.
 
 (* Rayleigh quotient *)
 
 Definition Rayleigh_quotient n (M : matrix n n T) (x : vector n T) :=
-  (≺ x, M • x ≻ / ≺ x, x ≻)%F.
+  (≺ x, (M • x)%M ≻ / ≺ x, x ≻)%F.
 
 Arguments Rayleigh_quotient [n]%nat_scope M%M x%V.
 
@@ -84,18 +84,16 @@ Theorem rngl_0_le_squ :
   ∀ n, (0 ≤ n * n)%F.
 Proof.
 intros Hld Hop Hor *.
-specialize rngl_opt_le_dec as rngl_le_dec.
 specialize rngl_opt_le_refl as rngl_le_refl.
 specialize rngl_opt_mul_le_compat_nonneg as rngl_mul_le_compat_nonneg.
 specialize rngl_opt_mul_le_compat_nonpos as rngl_mul_le_compat_nonpos.
 specialize rngl_opt_not_le as rngl_not_le.
-rewrite Hld in rngl_le_dec.
 rewrite Hor in rngl_le_refl.
 rewrite Hor, Hop in rngl_mul_le_compat_nonneg.
 rewrite Hor, Hop in rngl_mul_le_compat_nonpos.
 rewrite <- (rngl_mul_0_r 0).
 rewrite Hor in rngl_not_le.
-destruct (rngl_le_dec 0%F n) as [Hnz| Hnz]. {
+destruct (rngl_le_dec Hld 0%F n) as [Hnz| Hnz]. {
   apply rngl_mul_le_compat_nonneg. {
     split; [ now apply rngl_le_refl | easy ].
   } {
@@ -224,7 +222,6 @@ specialize rngl_opt_mul_le_compat_nonneg as rngl_mul_le_compat_nonneg.
 specialize rngl_opt_mul_le_compat_nonpos as rngl_mul_le_compat_nonpos.
 specialize rngl_opt_not_le as rngl_not_le.
 specialize rngl_opt_le_refl as rngl_le_refl.
-specialize rngl_opt_le_dec as rngl_le_dec.
 rewrite Hin in rngl_mul_inv_l |-*.
 rewrite Hdo in rngl_integral.
 rewrite Hor in rngl_le_refl.
@@ -232,7 +229,6 @@ rewrite Hor in rngl_add_le_compat.
 rewrite Hor, Hop in rngl_mul_le_compat_nonneg.
 rewrite Hor, Hop in rngl_mul_le_compat_nonpos.
 rewrite Hor in rngl_not_le.
-rewrite Hld in rngl_le_dec.
 cbn in rngl_mul_le_compat_nonneg, rngl_mul_le_compat_nonpos.
 rewrite H1; cycle 1. {
   intros H; apply Hcz.
@@ -260,7 +256,7 @@ Theorem Rayleigh_quotient_of_eigenvector :
   rngl_is_ordered = true →
   ∀ n (M : matrix n n T) V μ,
   V ≠ vect_zero n
-  → (M • V)%V = (μ × V)%V
+  → (M • V)%M = (μ × V)%V
   → Rayleigh_quotient M V = μ.
 Proof.
 intros Hic Hop Hii Hdo Hor Hdl * Hvz Hmv.
@@ -337,7 +333,7 @@ specialize (H1 H eq_refl eq_refl); clear H.
 remember (nth j ev 0%F) as μ eqn:Hμ.
 remember (nth j eV (vect_zero n)) as V eqn:Hv.
 symmetry.
-assert (H : vect_el (M • V) i = vect_el (μ × V) i) by now rewrite H1.
+assert (H : vect_el (M • V)%M i = vect_el (μ × V) i) by now rewrite H1.
 cbn - [ iter_seq ] in H.
 now rewrite rngl_mul_comm in H.
 Qed.
@@ -378,7 +374,7 @@ Qed.
 Theorem mat_mul_vect_dot_vect :
   rngl_is_comm = true →
   ∀ n (M : matrix n n T) U V,
-  ≺ M • U, V ≻ = ≺ U, M⁺ • V ≻.
+  ≺ (M • U)%M, V ≻ = ≺ U, (M⁺ • V)%M ≻.
 Proof.
 intros Hic *.
 unfold vect_dot_product.
@@ -566,7 +562,7 @@ Theorem Rayleigh_quotient_from_ortho : ∀ n (M : matrix n n T) D U x y ev,
   is_symm_mat M
   → eigenvalues M ev
   → M = (mat_transp U * D * U)%M
-  → y = (mat_transp U • x)%V
+  → y = (mat_transp U • x)%M
   → Rayleigh_quotient M x =
       (Σ (i = 1, n), nth i ev 0%F * rngl_squ (vect_el y i) /
        Σ (i = 1, n), rngl_squ (vect_el y i))%F.
