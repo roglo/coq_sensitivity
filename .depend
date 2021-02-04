@@ -18,8 +18,8 @@ Nrl.vio: Nrl.v Misc.vio RingLike.vio FermatLittle.vio
 Nrl.vo Nrl.glob Nrl.v.beautified Nrl.required_vo: Nrl.v Misc.vo RingLike.vo FermatLittle.vo
 PQ.vio: PQ.v Misc.vio Nat_ggcd.vio
 PQ.vo PQ.glob PQ.v.beautified PQ.required_vo: PQ.v Misc.vo Nat_ggcd.vo
-PermutSeq.vio: PermutSeq.v RingLike.vio Matrix.vio
-PermutSeq.vo PermutSeq.glob PermutSeq.v.beautified PermutSeq.required_vo: PermutSeq.v RingLike.vo Matrix.vo
+PermutSeq.vio: PermutSeq.v Misc.vio RingLike.vio Matrix.vio
+PermutSeq.vo PermutSeq.glob PermutSeq.v.beautified PermutSeq.required_vo: PermutSeq.v Misc.vo RingLike.vo Matrix.vo
 Pigeonhole.vio: Pigeonhole.v Misc.vio
 Pigeonhole.vo Pigeonhole.glob Pigeonhole.v.beautified Pigeonhole.required_vo: Pigeonhole.v Misc.vo
 Qrl.vio: Qrl.v RingLike.vio Rational.vio
