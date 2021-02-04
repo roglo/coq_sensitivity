@@ -89,6 +89,22 @@ rewrite Hk in H1.
 flia H1.
 Qed.
 
+Theorem minus_one_pow_add_r :
+  rngl_has_opp = true →
+  ∀ i j, minus_one_pow (i + j) = (minus_one_pow i * minus_one_pow j)%F.
+Proof.
+intros Hop *.
+revert j.
+induction i; intros; [ now cbn; rewrite rngl_mul_1_l | ].
+rewrite Nat.add_succ_comm.
+rewrite IHi.
+rewrite minus_one_pow_succ; [ | easy ].
+rewrite minus_one_pow_succ; [ | easy ].
+rewrite rngl_mul_opp_l; [ | easy ].
+rewrite rngl_mul_opp_r; [ | easy ].
+easy.
+Qed.
+
 End a.
 
 Arguments minus_one_pow {T}%type {ro} n%nat.

@@ -122,23 +122,9 @@ Definition mat_mul_scal_l {m n} s (M : matrix m n T) :=
 Definition mat_repl_vect {m n} k (M : matrix m n T) (V : vector m T) :=
   mk_mat m n (λ i j, if Nat.eq_dec j k then vect_el V i else mat_el M i j).
 
-Theorem minus_one_pow_add_r :
-  rngl_has_opp = true →
-  ∀ i j, minus_one_pow (i + j) = (minus_one_pow i * minus_one_pow j)%F.
-Proof.
-intros Hop *.
-revert j.
-induction i; intros; [ now cbn; rewrite rngl_mul_1_l | ].
-rewrite Nat.add_succ_comm.
-rewrite IHi.
-rewrite minus_one_pow_succ; [ | easy ].
-rewrite minus_one_pow_succ; [ | easy ].
-rewrite rngl_mul_opp_l; [ | easy ].
-rewrite rngl_mul_opp_r; [ | easy ].
-easy.
-Qed.
-
 (* *)
+
+(* should be moved to MyVector.v *)
 
 Declare Scope V_scope.
 Delimit Scope V_scope with V.
