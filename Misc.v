@@ -2325,6 +2325,11 @@ rewrite (Nat.add_comm b).
 apply Nat_ltb_mono_l.
 Qed.
 
+Theorem Nat_b2n_upper_bound : ∀ b, Nat.b2n b ≤ 1.
+Proof.
+intros; destruct b; cbn; flia.
+Qed.
+
 Definition bool_of_sumbool {A B : Prop} (P : sumbool A B) :=
   match P with
   | left _ _ => true
