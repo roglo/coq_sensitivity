@@ -2869,14 +2869,169 @@ apply Nat.mod_upper_bound.
 apply fact_neq_0.
 Qed.
 
+Definition permut_inv n (σ : vector n nat) :=
+  mk_vect n (permut_fun_inv (vect_el σ) n).
+
+Theorem permut_inv_is_permut : ∀ n (σ : vector n nat),
+  is_permut σ
+  → is_permut (permut_inv σ).
+Proof.
+intros * Hperm.
+now apply permut_fun_inv_is_permut.
+Qed.
+
+Theorem canon_permut_inv_upper_bound : ∀ n k j,
+  k < fact n
+  → j < n
+  → canon_permut_inv n k j < n.
+Proof.
+intros * Hkn Hjn.
+revert k j Hkn Hjn.
+induction n; intros; [ easy | ].
+cbn.
+destruct (lt_dec j (k / fact n)) as [Hjkn| Hjkn]. {
+  apply -> Nat.succ_lt_mono.
+  destruct n. {
+    cbn in Hkn.
+    apply Nat.lt_1_r in Hkn; subst k.
+    now cbn in Hjkn.
+  }
+  destruct (Nat.eq_dec j (S n)) as [Hjsn| Hjsn]. {
+    subst j.
+    clear Hjn.
+    exfalso; apply Nat.nle_gt in Hjkn; apply Hjkn; clear Hjkn.
+    rewrite Nat_fact_succ in Hkn.
+    rewrite Nat.mul_comm in Hkn.
+    apply Nat.lt_succ_r.
+    apply Nat.div_lt_upper_bound; [ | easy ].
+    apply fact_neq_0.
+  } {
+    apply IHn; [ | flia Hjn Hjsn ].
+    apply Nat.mod_upper_bound, fact_neq_0.
+  }
+} {
+  apply Nat.nlt_ge in Hjkn.
+  destruct (lt_dec (k / fact n) j) as [Hknj| Hknj]; [ | flia ].
+  apply -> Nat.succ_lt_mono.
+  destruct n. {
+    now apply Nat.lt_1_r in Hjn; subst j.
+  }
+  apply IHn; [ | flia Hjn Hknj ].
+  apply Nat.mod_upper_bound, fact_neq_0.
+}
+Qed.
+
+(* should use permut_fun_blah_blah... *)
+Theorem canon_permut_permut_inv : ∀ n k j,
+  j < n
+  → k < fact n
+  → vect_el (canon_permut n k) (canon_permut_inv n k j) = j.
+Proof.
+intros * Hjn Hkn.
+revert j k Hjn Hkn.
+induction n; intros; [ easy | ].
+cbn.
+destruct (lt_dec j (k / fact n)) as [Hjkn| Hjkn]. {
+  cbn.
+  destruct n. {
+    rewrite Nat.div_1_r in Hjkn; cbn in Hkn.
+    flia Hkn Hjkn.
+  }
+  destruct (lt_dec k (fact (S n))) as [Hksn| Hksn]. {
+    now rewrite Nat.div_small in Hjkn.
+  }
+  apply Nat.nlt_ge in Hksn.
+  destruct (Nat.eq_dec j (S n)) as [Hjsn| Hjsn]. {
+    subst j.
+    clear Hjn.
+    exfalso; apply Nat.nle_gt in Hjkn; apply Hjkn; clear Hjkn.
+    rewrite Nat_fact_succ in Hkn.
+    rewrite Nat.mul_comm in Hkn.
+    apply Nat.lt_succ_r.
+    apply Nat.div_lt_upper_bound; [ | easy ].
+    apply fact_neq_0.
+  }
+  rewrite IHn; [ | flia Hjn Hjsn | ]. 2: {
+    apply Nat.mod_upper_bound, fact_neq_0.
+  }
+  remember (k / fact (S n) <=? j) as b eqn:Hb.
+  symmetry in Hb.
+  destruct b; [ exfalso | apply Nat.add_0_r ].
+  apply Nat.leb_le in Hb.
+  flia Hjkn Hb.
+} {
+  apply Nat.nlt_ge in Hjkn.
+  destruct (lt_dec (k / fact n) j) as [Hkj| Hkj]. 2: {
+    apply Nat.nlt_ge in Hkj; cbn.
+    now apply Nat.le_antisymm.
+  }
+  clear Hjkn.
+  destruct j; [ easy | ].
+  rewrite Nat.sub_succ, Nat.sub_0_r.
+  cbn.
+  destruct n; [ flia Hjn | ].
+  apply Nat.succ_lt_mono in Hjn.
+  rewrite IHn; [ | easy | ]. 2: {
+    apply Nat.mod_upper_bound, fact_neq_0.
+  }
+  remember (k / fact (S n) <=? j) as b eqn:Hb.
+  symmetry in Hb.
+  destruct b; [ apply Nat.add_1_r | exfalso ].
+  apply Nat.leb_nle in Hb.
+  now apply Nat.succ_le_mono in Hkj.
+}
+Qed.
+
+Theorem canon_permut_vect_surjective : ∀ n k j,
+  k < fact n
+  → j < n
+  → ∃ i : nat, i < n ∧ vect_el (canon_permut n k) i = j.
+Proof.
+intros * Hkn Hjn.
+exists (canon_permut_inv n k j).
+destruct n; [ easy | ].
+split. {
+  cbn.
+  destruct (lt_dec j (k / fact n)) as [Hjk| Hjk]. {
+    apply -> Nat.succ_lt_mono.
+    destruct n. {
+      now apply Nat.lt_1_r in Hkn; subst k.
+    }
+    destruct (Nat.eq_dec j (S n)) as [Hjsn| Hjsn]. {
+      subst j; clear Hjn.
+      apply Nat.nle_gt in Hjk.
+      exfalso; apply Hjk; clear Hjk.
+      rewrite Nat_fact_succ in Hkn.
+      rewrite Nat.mul_comm in Hkn.
+      apply Nat.lt_succ_r.
+      apply Nat.div_lt_upper_bound; [ | easy ].
+      apply fact_neq_0.
+    }
+    apply canon_permut_inv_upper_bound; [ | flia Hjn Hjsn ].
+    apply Nat.mod_upper_bound, fact_neq_0.
+  } {
+    apply Nat.nlt_ge in Hjk.
+    destruct (lt_dec (k / fact n) j) as [Hkj| Hkj]; [ | flia ].
+    apply -> Nat.succ_lt_mono.
+    destruct n. {
+      apply Nat.lt_1_r in Hkn; subst k.
+      flia Hjn Hkj.
+    }
+    apply canon_permut_inv_upper_bound; [ | flia Hjn Hkj ].
+    apply Nat.mod_upper_bound, fact_neq_0.
+  }
+}
+now apply canon_permut_permut_inv.
+Qed.
+
 End a.
 
 Arguments ε {T}%type {ro} {n}%nat p.
 Arguments ε_fun {T}%type {ro} f%function n%nat.
 Arguments ε_canon_permut {T}%type {ro} (n k)%nat.
 Arguments ε_of_canon_permut_succ {T}%type {ro rp} _ _ _ _ _ _ _ n%nat [k]%nat.
+Arguments ε_of_canon_permut_ε {T}%type {ro rp} _ _ _ _ _ _ _ n%nat [k]%nat.
 Arguments ε_ws_ε {T}%type {ro rp} _ _ _ _ _ _ _ {n}%nat [p].
 Arguments rngl_product_change_list {T}%type {ro rp} _ [A]%type [la lb]%list f%function.
 Arguments signature_comp {T}%type {ro rp} _ _ _ _ _ _ _ [n]%nat [σ₁ σ₂].
 Arguments transposition_signature {T}%type {ro rp} _ _ _ _ _ _ _ [n p q]%nat.
-Arguments ε_of_canon_permut_ε {T}%type {ro rp} _ _ _ _ _ _ _ n%nat [k]%nat.
