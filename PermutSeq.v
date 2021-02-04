@@ -2285,7 +2285,9 @@ Qed.
 End a.
 
 Arguments ε {T}%type {ro} {n}%nat p.
+Arguments ε_fun {T}%type {ro} f%function n%nat.
 Arguments ε_canon_permut {T}%type {ro} (n k)%nat.
 Arguments ε_ws_ε {T}%type {ro rp} _ _ _ _ _ _ _ {n}%nat [p].
 Arguments rngl_product_change_list {T}%type {ro rp} _ [A]%type [la lb]%list f%function.
 Arguments signature_comp {T}%type {ro rp} _ _ _ _ _ _ _ [n]%nat [σ₁ σ₂].
+Arguments transposition_signature {T}%type {ro rp} _ _ _ _ _ _ _ [n p q]%nat.
