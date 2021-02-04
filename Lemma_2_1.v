@@ -84,11 +84,9 @@ Theorem rngl_0_le_squ :
   ∀ n, (0 ≤ n * n)%F.
 Proof.
 intros Hld Hop Hor *.
-specialize rngl_opt_le_refl as rngl_le_refl.
 specialize rngl_opt_mul_le_compat_nonneg as rngl_mul_le_compat_nonneg.
 specialize rngl_opt_mul_le_compat_nonpos as rngl_mul_le_compat_nonpos.
 specialize rngl_opt_not_le as rngl_not_le.
-rewrite Hor in rngl_le_refl.
 rewrite Hor, Hop in rngl_mul_le_compat_nonneg.
 rewrite Hor, Hop in rngl_mul_le_compat_nonpos.
 rewrite <- (rngl_mul_0_r 0).
@@ -104,12 +102,12 @@ destruct (rngl_le_dec Hld 0%F n) as [Hnz| Hnz]. {
     split; [ | now apply rngl_le_refl ].
     apply rngl_not_le in Hnz.
     destruct Hnz as [Hnz| Hnz]; [ | easy ].
-    rewrite <- Hnz; apply rngl_le_refl.
+    now rewrite <- Hnz; apply rngl_le_refl.
   } {
     split; [ | now apply rngl_le_refl ].
     apply rngl_not_le in Hnz.
     destruct Hnz as [Hnz| Hnz]; [ | easy ].
-    rewrite <- Hnz; apply rngl_le_refl.
+    now rewrite <- Hnz; apply rngl_le_refl.
   }
 }
 Qed.
@@ -221,10 +219,8 @@ specialize rngl_opt_add_le_compat as rngl_add_le_compat.
 specialize rngl_opt_mul_le_compat_nonneg as rngl_mul_le_compat_nonneg.
 specialize rngl_opt_mul_le_compat_nonpos as rngl_mul_le_compat_nonpos.
 specialize rngl_opt_not_le as rngl_not_le.
-specialize rngl_opt_le_refl as rngl_le_refl.
 rewrite Hin in rngl_mul_inv_l |-*.
 rewrite Hdo in rngl_integral.
-rewrite Hor in rngl_le_refl.
 rewrite Hor in rngl_add_le_compat.
 rewrite Hor, Hop in rngl_mul_le_compat_nonneg.
 rewrite Hor, Hop in rngl_mul_le_compat_nonpos.
@@ -488,6 +484,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     f_equal.
     now apply minus_one_pow_add_r.
   }
+Abort. (*
 ...
 (*
   unfold determinant.
@@ -568,6 +565,7 @@ Theorem Rayleigh_quotient_from_ortho : ∀ n (M : matrix n n T) D U x y ev,
        Σ (i = 1, n), rngl_squ (vect_el y i))%F.
 Proof.
 intros * Hsy Hev Hmin Hmax.
+Abort. (*
 ...
 *)
 
@@ -583,12 +581,11 @@ Theorem glop : ∀ n (M : matrix n n T) x sev μ_min μ_max,
   → (μ_min ≤ Rayleigh_quotient M x ≤ μ_max)%F.
 Proof.
 intros * Hev Hsev Hmin Hmax.
+Abort. (*
 ...
 *)
 
 (* min-max theorem, or variational theorem, or Courant–Fischer–Weyl min-max principle *)
-
-...
 
 (* Lemma 2.1 *)
 
@@ -607,6 +604,8 @@ Theorem lemma_2_1 :
     (nth (i-n+m) seva 0%F ≤ nth i sevb 0%F ≤ nth i seva 0%F)%F.
 Proof.
 intros * Hm Hmn Hisa Hb Heva Hevb Hsa Hsb * Him.
+Abort. (*
 ...
+*)
 
-End in_ring_like.
+End a.
