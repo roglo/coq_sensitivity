@@ -423,9 +423,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
   clear H2.
   rewrite vect_scal_mul_dot_mul_comm in H1.
   rewrite vect_dot_mul_scal_mul_comm in H1; [ | easy ].
-  specialize rngl_opt_eq_dec as rngl_eq_dec.
-  rewrite Heq in rngl_eq_dec.
-  destruct (rngl_eq_dec (≺ vi, vj ≻) 0%F) as [Hvvij| Hvvij]; [ easy | ].
+  destruct (rngl_eq_dec Heq (≺ vi, vj ≻) 0%F) as [Hvvij| Hvvij]; [ easy | ].
   exfalso.
   apply rngl_mul_reg_r in H1; [ | easy | easy ].
   revert H1.
