@@ -305,11 +305,17 @@ Qed.
       if (rngl_has_no_inv_but_div && negb rngl_is_comm)%bool then
         ∀ a b : T, b ≠ 0%F → (a * b / b = a)%F
       else not_applicable;
-    (* when equality is decidable *)
-    rngl_opt_eq_dec :
-      if rngl_has_dec_eq then ∀ a b : T, {a = b} + {a ≠ b}
-      else not_applicable;
-    (* when le comparison is decidable *)
+*)
+
+Theorem rngl_eq_dec : rngl_has_dec_eq = true → ∀ a b : T, {a = b} + {a ≠ b}.
+Proof.
+intros Hde *.
+specialize rngl_opt_eq_dec as H.
+rewrite Hde in H.
+apply H.
+Qed.
+
+(*
     rngl_opt_le_dec :
       if rngl_has_dec_le then ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%F
       else not_applicable;
@@ -353,14 +359,6 @@ Qed.
         ∀ a b, (¬ a ≤ b → a = b ∨ b ≤ a)%F
       else not_applicable;
 *)
-
-Theorem rngl_eq_dec : rngl_has_dec_eq = true → ∀ a b : T, {a = b} + {a ≠ b}.
-Proof.
-intros Hde *.
-specialize rngl_opt_eq_dec as H.
-rewrite Hde in H.
-apply H.
-Qed.
 
 (*
 Theorem rngl_le_dec :
