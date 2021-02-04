@@ -269,11 +269,26 @@ Qed.
 *)
 
 (*
-    rngl_opt_mul_0_l :
-      if rngl_has_opp then not_applicable else ∀ a, (0 * a = 0)%F;
-    rngl_opt_mul_0_r :
-      if rngl_has_opp then not_applicable else ∀ a, (a * 0 = 0)%F;
-    (* when has inverse *)
+Theorem rngl_mul_0_l : ∀ a, (0 * a = 0)%F.
+Proof.
+intros a.
+apply (rngl_add_reg_r _ _ (1 * a)%F).
+rewrite <- rngl_mul_add_distr_r.
+now do 2 rewrite rngl_add_0_l.
+Qed.
+*)
+
+(*
+Theorem rngl_mul_0_r : ∀ a, (a * 0 = 0)%F.
+Proof.
+intros.
+apply (rngl_add_reg_r _ _ (a * 1)%F).
+rewrite <- rngl_mul_add_distr_l.
+now do 2 rewrite rngl_add_0_l.
+Qed.
+*)
+
+(*
     rngl_opt_mul_inv_l :
       if rngl_has_inv then ∀ a : T, a ≠ 0%F → (¹/ a * a = 1)%F
       else not_applicable;
