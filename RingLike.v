@@ -362,11 +362,17 @@ rewrite Hor in H.
 apply H.
 Qed.
 
+Theorem rngl_mul_le_compat_nonpos :
+  (rngl_is_ordered && rngl_has_opp)%bool = true →
+  ∀ a b c d, (c ≤ a ≤ 0)%F → (d ≤ b ≤ 0)%F → (a * b ≤ c * d)%F.
+Proof.
+intros Hor *.
+specialize rngl_opt_mul_le_compat_nonpos as H.
+rewrite Hor in H.
+apply H.
+Qed.
+
 (*
-    rngl_opt_mul_le_compat_nonpos :
-      if (rngl_is_ordered && rngl_has_opp)%bool then
-        ∀ a b c d, (c ≤ a ≤ 0)%F → (d ≤ b ≤ 0)%F → (a * b ≤ c * d)%F
-      else not_applicable;
     rngl_opt_mul_le_compat :
       if (rngl_is_ordered && negb rngl_has_opp)%bool then
         ∀ a b c d, (a ≤ c)%F → (b ≤ d)%F → (a * b ≤ c * d)%F
