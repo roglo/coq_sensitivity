@@ -1391,4 +1391,3 @@ Arguments det_loop {T ro} {n%nat} M%M i%nat.
 Arguments det_from_row {T}%type {ro} {n}%nat M%M i%nat.
 Arguments det_from_col {T}%type {ro} {n}%nat M%M j%nat.
 Arguments comatrix {T}%type {ro} {n}%nat M%M.
-y
