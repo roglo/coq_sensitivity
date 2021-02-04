@@ -1216,45 +1216,6 @@ intros * Hp * Hin; cbn.
 now apply fun_permut_fun_inv.
 Qed.
 
-Theorem δ_shift : ∀ i j u v, δ (i + 1) (j + 1) u v = δ i j u v.
-Proof.
-intros.
-unfold δ.
-do 2 rewrite if_ltb_lt_dec.
-destruct (lt_dec i j) as [Hij| Hij]. {
-  destruct (lt_dec (i + 1) (j + 1)) as [Hij1| Hij1]; [ easy | ].
-  flia Hij Hij1.
-} {
-  destruct (lt_dec (i + 1) (j + 1)) as [Hij1| Hij1]; [ | easy ].
-  flia Hij Hij1.
-}
-Qed.
-
-Theorem δ_shift_right :
-  rngl_has_opp = true →
-  ∀ i j u v, δ i j (u + 1) (v + 1) = δ i j u v.
-Proof.
-intros Hop *.
-unfold δ.
-do 2 rewrite if_ltb_lt_dec.
-destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
-setoid_rewrite Nat.add_comm; cbn.
-rewrite rngl_add_comm.
-unfold rngl_sub.
-rewrite Hop.
-rewrite rngl_opp_add_distr; [ | easy ].
-unfold rngl_sub.
-rewrite Hop.
-rewrite rngl_add_assoc.
-rewrite rngl_add_add_swap.
-rewrite <- (rngl_add_assoc (rngl_of_nat v)).
-rewrite fold_rngl_sub; [ | easy ].
-rewrite fold_rngl_sub; [ | easy ].
-rewrite fold_rngl_sub; [ | easy ].
-rewrite rngl_add_opp_r.
-now rewrite rngl_add_0_r.
-Qed.
-
 Theorem permut_Permutation : ∀ n (σ : vector n nat),
   is_permut σ
   → Permutation (map (vect_el σ) (seq 0 n)) (seq 0 n).
