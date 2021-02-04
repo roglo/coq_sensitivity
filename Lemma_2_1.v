@@ -84,15 +84,15 @@ Theorem rngl_0_le_squ :
   ∀ n, (0 ≤ n * n)%F.
 Proof.
 intros Hld Hop Hor *.
-specialize rngl_opt_mul_le_compat_nonneg as rngl_mul_le_compat_nonneg.
 specialize rngl_opt_mul_le_compat_nonpos as rngl_mul_le_compat_nonpos.
 specialize rngl_opt_not_le as rngl_not_le.
-rewrite Hor, Hop in rngl_mul_le_compat_nonneg.
 rewrite Hor, Hop in rngl_mul_le_compat_nonpos.
 rewrite <- (rngl_mul_0_r 0).
 rewrite Hor in rngl_not_le.
 destruct (rngl_le_dec Hld 0%F n) as [Hnz| Hnz]. {
   apply rngl_mul_le_compat_nonneg. {
+    now rewrite Hor, Hop.
+  } {
     split; [ now apply rngl_le_refl | easy ].
   } {
     split; [ now apply rngl_le_refl | easy ].
@@ -216,16 +216,14 @@ specialize (rngl_inv_mul_distr Hdo Hin) as H1.
 specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
 specialize rngl_opt_integral as rngl_integral.
 specialize rngl_opt_add_le_compat as rngl_add_le_compat.
-specialize rngl_opt_mul_le_compat_nonneg as rngl_mul_le_compat_nonneg.
 specialize rngl_opt_mul_le_compat_nonpos as rngl_mul_le_compat_nonpos.
 specialize rngl_opt_not_le as rngl_not_le.
 rewrite Hin in rngl_mul_inv_l |-*.
 rewrite Hdo in rngl_integral.
 rewrite Hor in rngl_add_le_compat.
-rewrite Hor, Hop in rngl_mul_le_compat_nonneg.
 rewrite Hor, Hop in rngl_mul_le_compat_nonpos.
 rewrite Hor in rngl_not_le.
-cbn in rngl_mul_le_compat_nonneg, rngl_mul_le_compat_nonpos.
+cbn in rngl_mul_le_compat_nonpos.
 rewrite H1; cycle 1. {
   intros H; apply Hcz.
   apply rngl_integral in H.
