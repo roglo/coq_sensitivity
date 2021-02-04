@@ -7,13 +7,9 @@ Require Import Utf8 Arith Bool.
 Require Import Permutation.
 Import List List.ListNotations.
 
-Require Import Misc RingLike (*Matrix*)MyVector.
-Require Import (*RLsummation*) RLproduct.
+Require Import Misc RingLike MyVector.
+Require Import RLproduct.
 Require Import Pigeonhole.
-(*
-Import matrix_Notations.
-Import Init.Nat.
-*)
 
 Definition comp {A B C} (f : B → C) (g : A → B) x := f (g x).
 

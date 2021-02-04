@@ -700,6 +700,7 @@ induction n; intros. {
 }
 cbn.
 ...
+*)
 
 Theorem determinant_alternating_permut :
   rngl_is_comm = true →
@@ -718,6 +719,7 @@ intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hp.
 ...
 now apply determinant_alternating_permut_fun.
 ...
+*)
 
 (* If we add a row (column) of A multiplied by a scalar k to another
    row (column) of A, then the determinant will not change. *)
