@@ -207,8 +207,7 @@ do 2 rewrite vect_scal_mul_dot_mul_comm.
 do 2 rewrite rngl_mul_assoc.
 unfold rngl_div.
 specialize (rngl_inv_mul_distr Hdo Hin) as H1.
-specialize rngl_opt_mul_inv_l as rngl_mul_inv_l.
-rewrite Hin in rngl_mul_inv_l |-*.
+rewrite Hin.
 rewrite H1; cycle 1. {
   intros H; apply Hcz.
   apply rngl_integral in H; [ | now rewrite Hdo ].
@@ -220,7 +219,7 @@ rewrite H1; cycle 1. {
 rewrite rngl_mul_assoc.
 rewrite rngl_mul_comm; [ | easy ].
 do 2 rewrite rngl_mul_assoc.
-rewrite rngl_mul_inv_l; [ now rewrite rngl_mul_1_l | ].
+rewrite rngl_mul_inv_l; [ now rewrite rngl_mul_1_l | easy | ].
 intros H; apply Hcz.
 apply rngl_integral in H; [ | now rewrite Hdo ].
 now destruct H.
