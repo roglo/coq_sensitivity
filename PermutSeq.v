@@ -2210,9 +2210,7 @@ rewrite product_product_if_permut; try easy. {
   unfold rngl_div.
   rewrite Hin.
   intros H.
-  specialize rngl_opt_integral as rngl_integral.
-  rewrite Hit in rngl_integral.
-  apply rngl_integral in H.
+  apply rngl_integral in H; [ | now rewrite Hit ].
   destruct H as [H| H]. {
     apply rngl_sub_move_0_r in H; [ | easy ].
     apply rngl_of_nat_inj in H; [ | easy ].
@@ -3009,6 +3007,7 @@ Arguments ε_canon_permut {T}%type {ro} (n k)%nat.
 Arguments ε_of_canon_permut_succ {T}%type {ro rp} _ _ _ _ _ _ _ n%nat [k]%nat.
 Arguments ε_of_canon_permut_ε {T}%type {ro rp} _ _ _ _ _ _ _ n%nat [k]%nat.
 Arguments ε_ws_ε {T}%type {ro rp} _ _ _ _ _ _ _ {n}%nat [p].
-Arguments rngl_product_change_list {T}%type {ro rp} _ [A]%type [la lb]%list f%function.
+Arguments rngl_product_change_list {T}%type {ro rp} _ [A]%type [la lb]%list
+  f%function.
 Arguments signature_comp {T}%type {ro rp} _ _ _ _ _ _ _ [n]%nat [σ₁ σ₂].
 Arguments transposition_signature {T}%type {ro rp} _ _ _ _ _ _ _ [n p q]%nat.

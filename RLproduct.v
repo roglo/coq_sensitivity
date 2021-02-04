@@ -183,8 +183,6 @@ Theorem rngl_product_list_integral :
   → ∃ i, i ∈ l ∧ f i = 0%F.
 Proof.
 intros Hin H10 * Hz.
-specialize rngl_opt_integral as rngl_integral.
-rewrite Hin in rngl_integral.
 induction l as [| a]; [ now apply rngl_1_neq_0 in Hz | ].
 unfold iter_list in Hz; cbn in Hz.
 rewrite rngl_mul_1_l in Hz.
@@ -196,7 +194,7 @@ rewrite (fold_left_op_fun_from_d 1%F) in Hz; cycle 1. {
   apply rngl_mul_assoc.
 }
 rewrite fold_iter_list in Hz.
-apply rngl_integral in Hz.
+apply rngl_integral in Hz; [ | now rewrite Hin ].
 destruct Hz as [Hz| Hz]. {
   exists a.
   split; [ now left | easy ].
@@ -248,8 +246,6 @@ Theorem rngl_inv_product_list :
   → ((¹/ Π (i ∈ l), f i) = Π (i ∈ rev l), (¹/ f i))%F.
 Proof.
 intros Hin H10 Hit * Hnz.
-specialize rngl_opt_integral as rngl_integral.
-rewrite Hit in rngl_integral.
 unfold iter_list.
 induction l as [| a]; [ now apply rngl_inv_1 | cbn ].
 rewrite rngl_mul_1_l.

@@ -320,10 +320,21 @@ Qed.
       if rngl_has_dec_le then ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%F
       else not_applicable;
     (* when has_no_zero_divisors *)
-    rngl_opt_integral :
-      if rngl_is_integral then
-        ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
-      else not_applicable;
+*)
+
+(*
+Theorem rngl_integral :
+  rngl_is_integral = true →
+  ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F.
+Proof.
+intros Hit *.
+specialize rngl_opte_integral as H.
+rewrite Hit in H.
+apply H.
+Qed.
+*)
+
+(*
     (* characteristic *)
     rngl_characteristic_prop :
       match rngl_characteristic with
