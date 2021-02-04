@@ -7,9 +7,7 @@ Import List List.ListNotations.
 
 Require Import Misc RingLike Matrix PermutSeq.
 Require Import RLsummation RLproduct.
-Require Import Pigeonhole.
 Import matrix_Notations.
-Import Init.Nat.
 
 Section a.
 
