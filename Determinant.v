@@ -676,7 +676,6 @@ Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hp.
 (* prove that any permutation is a sequence of transpositions
    then apply determinant alternating in sequence *)
-Abort. (*
 ...
 Check determinant_alternating.
 Check det_is_det_by_any_permut.
@@ -718,7 +717,6 @@ Theorem determinant_alternating_permut :
   → determinant (mat_permut_rows σ M) = (ε σ * determinant M)%F.
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hp.
-Abort. (*
 ...
 now apply determinant_alternating_permut_fun.
 ...
@@ -1209,7 +1207,6 @@ cbn - [ determinant ].
 rewrite H1; cbn.
 rewrite rngl_opp_summation; [ | easy | easy ].
 unfold determinant.
-Abort. (*
 ...
 destruct (Nat.eq_dec i n) as [Hein| Hein]. {
   subst i; clear Hlin.
@@ -1381,7 +1378,6 @@ Theorem mat_comat_mul :
   (M * (comatrix M)⁺ = determinant M × mI n)%M.
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch *.
-Abort. (*
 ...
 *)
 
