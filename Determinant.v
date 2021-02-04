@@ -662,6 +662,8 @@ Theorem determinant_alternating_permut_fun :
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hp.
 Check determinant_alternating.
+Check det_is_det_by_any_permut.
+Print determinant'_list.
 ...
 intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hp.
 destruct n; [ easy | clear Hnz; cbn ].
