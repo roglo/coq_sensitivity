@@ -197,7 +197,7 @@ intros j Hj; cbn.
 symmetry; apply rngl_mul_assoc.
 Qed.
 
-Theorem vect_opt_eq_dec :
+Theorem vect_eq_dec :
   rngl_has_dec_eq = true →
   ∀ n (U V : vector n T), {U = V} + {U ≠ V}.
 Proof.
@@ -234,7 +234,7 @@ Arguments vect_zero {T ro} n%nat.
 Arguments vect_dot_product {T}%type {ro} {n}%nat (U V)%V.
 Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hic {n}%nat a%F (U V)%V.
 Arguments vect_scal_mul_dot_mul_comm {T}%type {ro rp} {n}%nat a%F (U V)%V.
-Arguments vect_opt_eq_dec {T}%type {ro rp} _ n%nat U%V V%V.
+Arguments vect_eq_dec {T}%type {ro rp} _ n%nat U%V V%V.
 Arguments vect_el {n}%nat {T}%type v%V UUU%nat.
 Arguments vect_squ_norm {T}%type {ro} {n}%nat V%V.
 

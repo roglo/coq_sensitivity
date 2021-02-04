@@ -192,7 +192,7 @@ Theorem RQ_mul_scal_prop :
 Proof.
 intros (Hic & Hop & Hed & Hld & Hdo & Hin & Hor) * Hcz.
 unfold Rayleigh_quotient.
-destruct (vect_opt_eq_dec Hed n x (vect_zero n)) as [Hxz| Hxz]. {
+destruct (vect_eq_dec Hed n x (vect_zero n)) as [Hxz| Hxz]. {
   subst x; cbn.
   unfold vect_dot_product, iter_seq, iter_list; cbn.
   unfold iter_seq, iter_list; cbn.
