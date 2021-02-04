@@ -112,18 +112,6 @@ Definition mat_vect_concat {m n} (M : matrix m n T) (V : vector m T) :
 Definition mat_mul_vect_r {m n} (M : matrix m n T) (V : vector n T) :=
   mk_vect m (λ i, (Σ (j = 0, n - 1), mat_el M i j * vect_el V j)%F).
 
-(* multiplication of a vector by a scalar *)
-
-Definition vect_mul_scal_l s {n} (V : vector n T) :=
-  mk_vect n (λ i, s * vect_el V i)%F.
-
-(* dot product *)
-
-Definition vect_dot_product {n} (U V : vector n T) :=
-  (Σ (i = 0, n - 1), vect_el U i * vect_el V i)%F.
-
-Definition vect_squ_norm n (V : vector n T) := vect_dot_product V V.
-
 (* multiplication of a matrix by a scalar *)
 
 Definition mat_mul_scal_l {m n} s (M : matrix m n T) :=

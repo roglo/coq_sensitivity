@@ -10,7 +10,7 @@ Require Import Init.Nat.
 *)
 
 Require Import Misc.
-Require Import RingLike (* RLsummation RLproduct*).
+Require Import RingLike RLsummation (*RLproduct*).
 
 Record vector (n : nat) T := mk_vect
   { vect_el : nat → T }.
@@ -43,6 +43,18 @@ Definition vect_opp {n} (V : vector n T) :=
   mk_vect n (λ i, (- vect_el V i)%F).
 
 Definition vect_sub {n} (U V : vector n T) := vect_add U (vect_opp V).
+
+(* multiplication of a vector by a scalar *)
+
+Definition vect_mul_scal_l s {n} (V : vector n T) :=
+  mk_vect n (λ i, s * vect_el V i)%F.
+
+(* dot product *)
+
+Definition vect_dot_product {n} (U V : vector n T) :=
+  (Σ (i = 0, n - 1), vect_el U i * vect_el V i)%F.
+
+Definition vect_squ_norm n (V : vector n T) := vect_dot_product V V.
 
 Definition minus_one_pow n :=
   match n mod 2 with

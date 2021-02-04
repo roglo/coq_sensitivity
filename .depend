@@ -12,8 +12,8 @@ Matrix.vio: Matrix.v Misc.vio RingLike.vio RLsummation.vio RLproduct.vio MyVecto
 Matrix.vo Matrix.glob Matrix.v.beautified Matrix.required_vo: Matrix.v Misc.vo RingLike.vo RLsummation.vo RLproduct.vo MyVector.vo
 Misc.vio: Misc.v 
 Misc.vo Misc.glob Misc.v.beautified Misc.required_vo: Misc.v 
-MyVector.vio: MyVector.v Misc.vio RingLike.vio
-MyVector.vo MyVector.glob MyVector.v.beautified MyVector.required_vo: MyVector.v Misc.vo RingLike.vo
+MyVector.vio: MyVector.v Misc.vio RingLike.vio RLsummation.vio
+MyVector.vo MyVector.glob MyVector.v.beautified MyVector.required_vo: MyVector.v Misc.vo RingLike.vo RLsummation.vo
 Nat_ggcd.vio: Nat_ggcd.v Misc.vio
 Nat_ggcd.vo Nat_ggcd.glob Nat_ggcd.v.beautified Nat_ggcd.required_vo: Nat_ggcd.v Misc.vo
 Nrl.vio: Nrl.v Misc.vio RingLike.vio FermatLittle.vio
