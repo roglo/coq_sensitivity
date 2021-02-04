@@ -231,11 +231,44 @@ apply H.
 Qed.
 
 (*
-    rngl_opt_add_sub_simpl_l :
-      if rngl_has_opp then not_applicable
-       else ∀ a b c : T, (a + b - (a + c) = b - c)%F;
-    rngl_opt_sub_0_r :
-      if rngl_has_opp then not_applicable else ∀ a, (a - 0 = a)%F;
+Theorem rngl_add_sub_simpl_l : ∀ a b c : T, (a + b - (a + c) = b - c)%F.
+Proof.
+intros.
+specialize rngl_opt_add_sub_simpl_l as rngl_add_sub_simpl_l.
+remember rngl_has_opp as op eqn:Hop.
+symmetry in Hop.
+destruct op; [ | easy ].
+unfold rngl_sub; rewrite Hop.
+rewrite rngl_opp_add_distr; [ | easy ].
+unfold rngl_sub; rewrite Hop.
+rewrite rngl_add_assoc.
+rewrite rngl_add_add_swap.
+rewrite (rngl_add_add_swap a).
+rewrite fold_rngl_sub; [ | easy ].
+rewrite fold_rngl_sub; [ | easy ].
+rewrite fold_rngl_sub; [ | easy ].
+now rewrite rngl_add_opp_r, rngl_add_0_l.
+Qed.
+*)
+
+(*
+Theorem rngl_sub_0_r : ∀ a, (a - 0 = a)%F.
+Proof.
+intros.
+specialize rngl_opt_sub_0_r as rngl_sub_0_r.
+remember rngl_has_opp as op eqn:Hop.
+symmetry in Hop.
+destruct op. {
+  unfold rngl_sub; rewrite Hop.
+  rewrite rngl_opp_0; [ | easy ].
+  apply rngl_add_0_r.
+} {
+  apply rngl_sub_0_r.
+}
+Qed.
+*)
+
+(*
     rngl_opt_mul_0_l :
       if rngl_has_opp then not_applicable else ∀ a, (0 * a = 0)%F;
     rngl_opt_mul_0_r :
