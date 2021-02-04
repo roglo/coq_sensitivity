@@ -108,6 +108,8 @@ Qed.
 Declare Scope V_scope.
 Delimit Scope V_scope with V.
 
+Arguments vect_dot_product {n}%nat (U V)%V.
+
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
 Notation "≺ U , V ≻" := (vect_dot_product U V) (at level 35).
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
@@ -170,10 +172,6 @@ destruct H as (i, Hi).
 specialize (Hiv i).
 now apply rngl_mul_reg_r in Hiv.
 Qed.
-
-Arguments vect_dot_product {n}%nat (U V)%V.
-
-...
 
 Theorem vect_dot_mul_scal_mul_comm :
   rngl_is_comm = true →
