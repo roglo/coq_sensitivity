@@ -199,15 +199,48 @@ intros j Hj; cbn.
 symmetry; apply rngl_mul_assoc.
 Qed.
 
+Theorem vect_opt_eq_dec :
+  rngl_has_dec_eq = true →
+  ∀ n (U V : vector n T), {U = V} + {U ≠ V}.
+Proof.
+intros Hed *.
+specialize rngl_opt_eq_dec as rngl_eq_dec.
+rewrite Hed in rngl_eq_dec.
+destruct U as (fu).
+destruct V as (fv).
+assert (H : ∀ i, {fu i = fv i} + {fu i ≠ fv i}). {
+  intros.
+  apply rngl_eq_dec.
+}
+induction n; intros; [ now left; apply vector_eq | ].
+destruct IHn as [IHn| IHn]. {
+  injection IHn; clear IHn; intros IHn.
+  now left; subst fv.
+} {
+  right.
+  intros H1; apply IHn; clear IHn.
+  injection H1; clear H1; intros H1.
+  now subst fv.
+}
+Qed.
+
 End a.
 
 Declare Scope V_scope.
 Delimit Scope V_scope with V.
 
-Arguments vect_el {n}%nat {T}%type v%V.
-Arguments vect_mul_scal_l {T ro} s%F {n}%nat V%V.
-Arguments vect_dot_product {T}%type {ro n} (U V)%V.
 Arguments vect_add {T}%type {ro} {n}%nat (U V)%V.
+Arguments vect_sub {T ro} {n}%nat U%V V%V.
+Arguments vect_opp {T ro} {n}%nat V%V.
+Arguments vect_mul_scal_l {T ro} s%F {n}%nat V%V.
+Arguments vect_mul_scal_reg_r {T}%type {ro rp} Hde Hii {n}%nat V%V (a b)%F.
+Arguments vect_zero {T ro} n%nat.
+Arguments vect_dot_product {T}%type {ro} {n}%nat (U V)%V.
+Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hic {n}%nat a%F (U V)%V.
+Arguments vect_scal_mul_dot_mul_comm {T}%type {ro rp} {n}%nat a%F (U V)%V.
+Arguments vect_opt_eq_dec {T}%type {ro rp} _ n%nat U%V V%V.
+Arguments vect_el {n}%nat {T}%type v%V UUU%nat.
+Arguments vect_squ_norm {T}%type {ro} {n}%nat V%V.
 
 Arguments minus_one_pow {T}%type {ro} n%nat.
 Arguments minus_one_pow_succ {T}%type {ro rp} _ i%nat.
