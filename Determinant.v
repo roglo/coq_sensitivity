@@ -660,6 +660,9 @@ intros i Hi.
 now rewrite Nat.add_comm, Nat.add_sub.
 Qed.
 
+Definition transposition_list_of_permutation n (σ : vector n nat) :=
+...
+
 Theorem determinant_alternating_permut_fun :
   rngl_is_comm = true →
   rngl_has_opp = true →
