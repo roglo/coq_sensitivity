@@ -665,92 +665,35 @@ Qed.
 Fixpoint first_non_fixpoint i l :=
   match l with
   | [] => None
-  | j :: l' => if i =? j then first_non_fixpoint (i + 1) l' else Some i
+  | j :: l' => if i =? j then first_non_fixpoint (i + 1) l' else Some (i, j)
   end.
 
-Definition swap i j l :=
-  firstn (min i j) l ++ [nth (max i j) l 0] ++
-  skipn (min i j + 1) (firstn (max i j) l) ++
-  [nth (min i j) l 0] ++
-  skipn (max i j + 1) l.
-
-Fixpoint tlop_loop it l :=
+Fixpoint tvop_loop n it (σ : vector n nat) :=
   match it with
-  | 0 => [(42, 42)]
+  | 0 => []
   | S it' =>
-      match first_non_fixpoint 0 l with
+      match first_non_fixpoint 0 (list_of_vect σ) with
       | None => []
-      | Some a => (a, nth a l 0) :: tlop_loop it' (swap a (nth a l 0) l)
+      | Some (i, j) =>
+          let σ' :=
+            mk_vect n
+              (λ k, vect_el σ (if k =? i then j else if k =? j then i else k))
+          in
+          (i, j) :: tvop_loop it' σ'
       end
   end.
 
-Definition transposition_list_of_permutation n (σ : vector n nat) :=
-  tlop_loop n (list_of_vect σ).
+Definition tvop {n} (σ : vector n nat) := tvop_loop n σ.
 
-Compute (transposition_list_of_permutation (vect_of_list 0 [4;5;1;2;0;3])).
-Compute (first_non_fixpoint 0 [0;5;1;2;4;3]).
-[4;5;1;2;0;3]
-[0;5;1;2;4;3]
-...
-
-[0;3;1;2;4;5]
-...
-
-Fixpoint orbit_loop n (σ : vector n nat) i iter :=
-  match iter with
-  | 0 => []
-  | S it =>
-      let l := orbit_loop σ (vect_el σ i) it in
-      if existsb (Nat.eqb i) l then l else i :: l
-  end.
-
-Definition orbit n (σ : vector n nat) i := orbit_loop σ i n.
-
-Compute orbit (vect_of_list 0 [0;1;2;3;4]) 4.
-Compute orbit (vect_of_list 0 [1;0;2;3;4]) 0.
-Compute orbit (vect_of_list 0 [0;1;2;4;3]) 4.
-Compute orbit (vect_of_list 0 [0;1;3;2;4]) 1.
-Compute orbit (vect_of_list 0 [1;4;3;2;0]) 1.
-Compute orbit (vect_of_list 0 [1;2;3;4;0]) 3.
-
-...
-
-Fixpoint vect_nth_find {A n} (f : A → bool) (v : vector n A) i iter :=
-  match iter with
-  | 0 => None
-  | S it =>
-      if f (vect_el v i) then Some i else vect_nth_find f v (i + 1) it
-  end.
-
-Fixpoint gen_transp i j :=
-  match j with
-  | 0 => [(7, i)]
-  | S j' => if j =? i then [(22,i)] else (j', j) :: gen_transp i j'
-  end.
-
-Fixpoint tlop_loop n (σ : vector n nat) i iter :=
-  match iter with
-  | 0 => []
-  | S it =>
-      match vect_nth_find (Nat.eqb i) σ i (n + 42) with
-      | None => [(18,i)]
-      | Some j => gen_transp i j ++ tlop_loop σ (i + 1) it
-      end
-  end.
-
-Definition transposition_list_of_permutation n (σ : vector n nat) :=
-  tlop_loop σ 0 (n + 42).
-
-Compute (transposition_list_of_permutation (vect_of_list 0 [1;0;3;2])).
-...
-Compute (transposition_list_of_permutation (vect_of_list 0 [0;1;2;3])).
-Compute (transposition_list_of_permutation (vect_of_list 0 [0;1;3;2])).
-Compute (transposition_list_of_permutation (vect_of_list 0 [0;2;1;3])).
-Compute (transposition_list_of_permutation (vect_of_list 0 [0;2;3;1])).
-Compute (transposition_list_of_permutation (vect_of_list 0 [0;3;1;2])).
-Compute (transposition_list_of_permutation (vect_of_list 0 [0;3;2;1])).
-Compute (transposition_list_of_permutation (vect_of_list 0 [1;0;2;3])).
-Compute (transposition_list_of_permutation (vect_of_list 0 [1;0;3;2])).
+Compute (tvop (vect_of_list 0 [0;5;1;2;4;3])).
+Compute (tvop (vect_of_list 0 [0;4;1;2;5;3])).
+Compute (tvop (vect_of_list 0 [1;0;2;3;4;5])).
+Compute (tvop (vect_of_list 0 [1;2;0;3;4;5])).
+Compute (tvop (vect_of_list 0 [5;4;3;2;1;0])).
+Compute (tvop (vect_of_list 0 [4;0;1;2;3;5])).
+Compute (tvop (vect_of_list 0 [3;4;0;1;2;5])).
+Compute let n := 3 in map (λ k, list_of_vect (canon_permut n k)) (seq 0 n!).
+Compute let n := 5 in map (λ k, (list_of_vect (canon_permut n k), tvop (canon_permut n k))) (seq 0 n!).
 
 ...
 
