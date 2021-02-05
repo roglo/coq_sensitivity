@@ -680,7 +680,7 @@ Fixpoint tlop_loop it l :=
   | S it' =>
       match first_non_fixpoint 0 l with
       | None => []
-      | Some a => (a, nth 0 l a) :: tlop_loop it' (swap a (nth 0 l a) l)
+      | Some a => (a, nth a l 0) :: tlop_loop it' (swap a (nth a l 0) l)
       end
   end.
 
@@ -688,11 +688,12 @@ Definition transposition_list_of_permutation n (σ : vector n nat) :=
   tlop_loop n (list_of_vect σ).
 
 Compute (transposition_list_of_permutation (vect_of_list 0 [4;5;1;2;0;3])).
+Compute (first_non_fixpoint 0 [0;5;1;2;4;3]).
 [4;5;1;2;0;3]
 [0;5;1;2;4;3]
-[0;1;5;2;4;3]
-[0;1;5;2;4;3]
+...
 
+[0;3;1;2;4;5]
 ...
 
 Fixpoint orbit_loop n (σ : vector n nat) i iter :=
