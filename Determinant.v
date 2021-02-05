@@ -660,40 +660,51 @@ intros i Hi.
 now rewrite Nat.add_comm, Nat.add_sub.
 Qed.
 
-(* https://fr.wikipedia.org/wiki/Permutation#Algorithme_de_d.C3.A9composition *)
+(* transpositiona list of permutation *)
 
-Fixpoint first_non_fixpoint i l :=
-  match l with
-  | [] => None
-  | j :: l' => if i =? j then first_non_fixpoint (i + 1) l' else Some (i, j)
+Fixpoint first_non_fixpoint it i σ :=
+  match it with
+  | 0 => None
+  | S it' =>
+      if i =? σ i then first_non_fixpoint it' (i + 1) σ else Some (i, σ i)
   end.
 
-Fixpoint tvop_loop n it (σ : vector n nat) :=
+Fixpoint tvop_loop n it (σ : nat → nat) :=
   match it with
   | 0 => []
   | S it' =>
-      match first_non_fixpoint 0 (list_of_vect σ) with
+      match first_non_fixpoint n 0 σ with
       | None => []
       | Some (i, j) =>
-          let σ' :=
-            mk_vect n
-              (λ k, vect_el σ (if k =? i then j else if k =? j then i else k))
-          in
-          (i, j) :: tvop_loop it' σ'
+          let σ' k := if k =? i then j else if k =? j then i else k in
+          transposition i j :: tvop_loop n it' σ'
       end
   end.
 
-Definition tvop {n} (σ : vector n nat) := tvop_loop n σ.
+Print transposition.
 
-Compute (tvop (vect_of_list 0 [0;5;1;2;4;3])).
-Compute (tvop (vect_of_list 0 [0;4;1;2;5;3])).
-Compute (tvop (vect_of_list 0 [1;0;2;3;4;5])).
-Compute (tvop (vect_of_list 0 [1;2;0;3;4;5])).
-Compute (tvop (vect_of_list 0 [5;4;3;2;1;0])).
-Compute (tvop (vect_of_list 0 [4;0;1;2;3;5])).
-Compute (tvop (vect_of_list 0 [3;4;0;1;2;5])).
-Compute let n := 3 in map (λ k, list_of_vect (canon_permut n k)) (seq 0 n!).
-Compute let n := 5 in map (λ k, (list_of_vect (canon_permut n k), tvop (canon_permut n k))) (seq 0 n!).
+...
+
+Definition transp_list_of_permut_fun {n} (σ : nat → nat) := tvop_loop n n σ.
+
+...
+
+Definition transp_list_of_permut {n} (σ : vector n nat) := tvop_loop n σ.
+
+Print transposition.
+Locate "°".
+Print permut_comp.
+
+Theorem apply_transp_list_of_permut : ∀ n (σ : nat → nat),
+  is_permut_fun σ n
+  → iter_list (transp_list_of_permut σ) (λ v τ, comp τ v) σ =
+    mk_vect n (λ i, i).
+...
+
+Theorem apply_transp_list_of_permut : ∀ n (σ : vector n nat),
+  is_permut σ
+  → iter_list (transp_list_of_permut σ) (λ v τ, τ ° v) σ =
+    mk_vect n (λ i, i).
 
 ...
 

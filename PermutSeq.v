@@ -37,9 +37,7 @@ Fixpoint permut_fun_inv f i j :=
   end.
 
 Definition transposition i j k :=
-  if Nat.eq_dec k i then j
-  else if Nat.eq_dec k j then i
-  else k.
+  if k =? i then j else if k =? j then i else k.
 
 Definition vect_swap_elem n (v : vector n nat) i j :=
   mk_vect n (λ k, vect_el v (transposition i j k)).
@@ -60,6 +58,7 @@ Theorem transposition_lt : ∀ i j k n,
 Proof.
 intros * Hi Hj Hk.
 unfold transposition.
+do 2 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec k i); [ easy | ].
 now destruct (Nat.eq_dec k j).
 Qed.
@@ -78,6 +77,7 @@ split; cbn. {
 } {
   intros * Hi Hj Hij.
   unfold transposition in Hij.
+  do 4 rewrite if_eqb_eq_dec in Hij.
   destruct (Nat.eq_dec i p) as [Hip| Hip]. {
     destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ congruence | ].
     destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
@@ -1638,12 +1638,14 @@ unfold permut_fun_swap.
 split. {
   intros i Hi.
   unfold transposition.
+  do 2 rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec i p) as [Hip| Hip]; [ now apply Hσ | ].
   destruct (Nat.eq_dec i q) as [Hiq| Hiq]; [ now apply Hσ | ].
   now apply Hσ.
 } {
   intros i j Hi Hj Hs.
   unfold transposition in Hs.
+  do 4 rewrite if_eqb_eq_dec in Hs.
   destruct (Nat.eq_dec i p) as [Hip| Hip]. {
     destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ congruence | ].
     destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
@@ -1678,11 +1680,13 @@ intros * Hp Hq.
 split. {
   intros i Hi.
   unfold transposition.
+  do 2 rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec i p) as [Hip| Hip]; [ easy | ].
   now destruct (Nat.eq_dec i q).
 } {
   intros i j Hi Hj Hs.
   unfold transposition in Hs.
+  do 4 rewrite if_eqb_eq_dec in Hs.
   destruct (Nat.eq_dec i p) as [Hip| Hip]. {
     destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ congruence | ].
     destruct (Nat.eq_dec j q) as [Hjq| Hjq]; congruence.
@@ -1745,11 +1749,13 @@ rewrite (rngl_product_split p); [ | flia Hpq Hq ].
 rewrite rngl_product_split_last; [ | flia ].
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
+  do 2 rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec (i - 1) p) as [Hip| Hip]; [ flia Hi Hip | ].
   destruct (Nat.eq_dec (i - 1) q) as [Hiq| Hiq]; [ flia Hi Hiq Hpq Hq | ].
   erewrite rngl_product_eq_compat. 2: {
     intros j (_, Hj).
     do 2 rewrite if_ltb_lt_dec.
+    do 2 rewrite if_eqb_eq_dec.
     destruct (Nat.eq_dec j p) as [Hjp| Hjp]. {
       destruct (lt_dec (i - 1) j) as [Hij| Hij]; [ | flia Hi Hjp Hij ].
       destruct (lt_dec (i - 1) q) as [Hiq'| Hiq']; [ | flia Hpq Hjp Hij Hiq' ].
@@ -1793,6 +1799,7 @@ cbn - [ "<?" ].
 remember (Π (i = _, _), _)%F as x eqn:Hx.
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
+  do 2 rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec i p) as [H| H]; [ flia Hi H | clear H ].
   rewrite (rngl_product_split i); [ | flia Hi ].
   rewrite rngl_product_split_last; [ | flia ].
@@ -1810,7 +1817,7 @@ erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
     rewrite if_ltb_lt_dec.
     destruct (lt_dec i j) as [H| H]; [ clear H | flia Hj H ].
-    rewrite if_ltb_lt_dec.
+    rewrite if_ltb_lt_dec, if_eqb_eq_dec.
     destruct (Nat.eq_dec j p) as [H| H]; [ flia Hi Hj H | clear H ].
     easy.
   }
@@ -1820,8 +1827,10 @@ subst x.
 rewrite <- rngl_product_mul_distr; [ | easy ].
 rewrite (rngl_product_split q); [ | flia Hpq Hq ].
 rewrite rngl_product_split_last; [ | flia Hpq ].
+do 2 rewrite Nat.eqb_refl.
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
+  do 2 rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec (i - 1) q) as [H| H]; [ flia Hi H | clear H ].
   destruct (lt_dec q (i - 1)) as [H| H]; [ flia Hi H | clear H ].
   rewrite Nat.sub_add; [ | flia Hi ].
@@ -1829,14 +1838,16 @@ erewrite rngl_product_eq_compat. 2: {
   rewrite rngl_product_split_last; [ | easy ].
   rewrite all_1_rngl_product_1; [ | easy | ]. 2: {
     intros j Hj.
+    rewrite if_eqb_eq_dec.
     destruct (Nat.eq_dec (j - 1) q) as [H| H]; [ flia Hj H | clear H ].
     destruct (lt_dec (i - 1) (j - 1)) as [H| H]; [ easy | flia Hj H Hi ].
   }
   rewrite rngl_mul_1_l.
-  destruct (Nat.eq_dec q q) as [H| H]; [ clear H | flia H ].
+  rewrite Nat.eqb_refl.
   destruct (lt_dec (i - 1) p) as [H| H]; [ flia Hi H | clear H ].
   rewrite all_1_rngl_product_1; [ | easy | ]. 2: {
     intros j Hj.
+    rewrite if_eqb_eq_dec.
     destruct (Nat.eq_dec j q) as [H| H]; [ flia Hj H | clear H ].
     destruct (lt_dec (i - 1) j) as [H| H]; [ easy | flia Hj H Hi ].
   }
@@ -1844,6 +1855,8 @@ erewrite rngl_product_eq_compat. 2: {
   rewrite rngl_mul_opp_opp; [ | easy ].
   now rewrite rngl_mul_1_l.
 }
+rewrite all_1_rngl_product_1; [ | easy | ]. 2: {
+...
 rewrite all_1_rngl_product_1; [ | easy | easy ].
 rewrite rngl_mul_1_l.
 destruct (Nat.eq_dec q q) as [H| H]; [ clear H | easy ].

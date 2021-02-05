@@ -2271,6 +2271,21 @@ Definition bsort {A} (le : A → A → bool) := iter_merge le [].
 
 (* *)
 
+Theorem if_eqb_eq_dec : ∀ A i j (a b : A),
+  (if i =? j then a else b) = (if Nat.eq_dec i j then a else b).
+Proof.
+intros.
+remember (i =? j) as ij eqn:Hij.
+symmetry in Hij.
+destruct ij. {
+  apply Nat.eqb_eq in Hij.
+  now destruct (Nat.eq_dec i j).
+} {
+  apply Nat.eqb_neq in Hij.
+  now destruct (Nat.eq_dec i j).
+}
+Qed.
+
 Theorem if_ltb_lt_dec : ∀ A i j (a b : A),
   (if i <? j then a else b) = (if lt_dec i j then a else b).
 Proof.
