@@ -662,9 +662,6 @@ Qed.
 
 Compute partition (Nat.eqb 3) [1;2;3;4;5;6].
 
-
-Print Module List.
-
 Definition transposition_list_of_permutation_list (σ : list nat) i :=
   | [] => []
   | j :: l' =>
