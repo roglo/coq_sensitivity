@@ -1852,14 +1852,16 @@ erewrite rngl_product_eq_compat. 2: {
     destruct (lt_dec (i - 1) j) as [H| H]; [ easy | flia Hj H Hi ].
   }
   rewrite rngl_mul_1_r.
+  destruct (Nat.eq_dec (i - 1) p) as [H| H]; [ flia Hi H | clear H ].
+  destruct (lt_dec q (i - 1)) as [H| H]; [ flia Hi H | clear H ].
   rewrite rngl_mul_opp_opp; [ | easy ].
   now rewrite rngl_mul_1_l.
 }
-rewrite all_1_rngl_product_1; [ | easy | ]. 2: {
-...
 rewrite all_1_rngl_product_1; [ | easy | easy ].
 rewrite rngl_mul_1_l.
 destruct (Nat.eq_dec q q) as [H| H]; [ clear H | easy ].
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec q p) as [H| H]; [ flia Hpq H | clear H ].
 destruct (lt_dec q p) as [H| H]; [ flia Hpq H | clear H ].
 rewrite <- rngl_mul_1_r.
 rewrite <- rngl_mul_assoc.
@@ -1867,13 +1869,16 @@ f_equal.
 rewrite <- rngl_product_mul_distr; [ | easy ].
 apply all_1_rngl_product_1; [ easy | ].
 intros i Hi.
+do 2 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec i q) as [H| H]; [ flia Hi H | clear H ].
+destruct (Nat.eq_dec i p) as [H| H]; [ flia Hpq Hi H | clear H ].
 destruct (lt_dec p i) as [H| H]; [ clear H | flia Hpq Hi H ].
 rewrite rngl_mul_1_l.
 destruct (lt_dec q i) as [H| H]; [ clear H | flia Hi H ].
 rewrite rngl_mul_1_l.
 apply all_1_rngl_product_1; [ easy | ].
 intros j Hj.
+rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec j q) as [H| H]; [ flia Hi Hj H | clear H ].
 destruct (lt_dec i j) as [H| H]; [ easy | flia Hj H ].
 Qed.
@@ -1903,6 +1908,7 @@ f_equal.
 apply vector_eq.
 intros i Hi; cbn.
 unfold transposition.
+do 4 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec i p) as [Hip| Hip]. {
   destruct (Nat.eq_dec i q) as [Hiq| Hiq]; [ congruence | easy ].
 } {
@@ -2372,6 +2378,7 @@ Theorem transposition_involutive : ∀ p q i,
 Proof.
 intros.
 unfold transposition.
+do 4 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec i p) as [Hip| Hip]. {
   destruct (Nat.eq_dec q p) as [Hqp| Hqp]; [ congruence | ].
   destruct (Nat.eq_dec q q) as [H| H]; [ congruence | easy ].
