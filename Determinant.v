@@ -514,6 +514,7 @@ erewrite rngl_summation_eq_compat. 2: {
       (mat_el M i (vect_el (canon_permut n k) (transposition p q i))). 2: {
       cbn.
       unfold transposition.
+      do 2 rewrite if_eqb_eq_dec.
       destruct (Nat.eq_dec i p) as [Hip| Hip]. {
         subst i.
         apply Nat.neq_sym in Hpq.
@@ -677,35 +678,41 @@ Fixpoint tvop_loop n it (σ : nat → nat) :=
       | None => []
       | Some (i, j) =>
           let σ' k := if k =? i then j else if k =? j then i else k in
-          transposition i j :: tvop_loop n it' σ'
+          (i, j) :: tvop_loop n it' σ'
       end
   end.
 
-Print transposition.
+Definition transp_list_of_permut_fun n (σ : nat → nat) := tvop_loop n n σ.
 
-...
+Definition transp_list_of_permut {n} (σ : vector n nat) :=
+  transp_list_of_permut_fun n (vect_el σ).
 
-Definition transp_list_of_permut_fun {n} (σ : nat → nat) := tvop_loop n n σ.
+Definition transp_fun_of_nat_pair '(i, j) := transposition i j.
+Definition transp_of_nat_pair n '(i, j) :=
+  mk_vect n (transp_fun_of_nat_pair (i, j)).
 
-...
-
-Definition transp_list_of_permut {n} (σ : vector n nat) := tvop_loop n σ.
-
-Print transposition.
-Locate "°".
-Print permut_comp.
-
-Theorem apply_transp_list_of_permut : ∀ n (σ : nat → nat),
+Theorem apply_transp_list_of_permut_is_id : ∀ n (σ : nat → nat),
   is_permut_fun σ n
-  → iter_list (transp_list_of_permut σ) (λ v τ, comp τ v) σ =
-    mk_vect n (λ i, i).
+  → ∀ i,
+    iter_list
+      (map transp_fun_of_nat_pair (transp_list_of_permut_fun n σ))
+      comp σ i = i.
+Proof.
+intros * Hp k.
 ...
 
 Theorem apply_transp_list_of_permut : ∀ n (σ : vector n nat),
   is_permut σ
-  → iter_list (transp_list_of_permut σ) (λ v τ, τ ° v) σ =
+  → iter_list (map (transp_of_nat_pair n) (transp_list_of_permut σ))
+      (λ v τ, τ ° v) σ =
     mk_vect n (λ i, i).
-
+Proof.
+intros * Hp.
+apply vector_eq.
+intros i Hi; cbn.
+unfold transp_of_nat_pair.
+unfold transp_list_of_permut.
+rename i into k.
 ...
 
 Theorem determinant_alternating_permut_fun :
