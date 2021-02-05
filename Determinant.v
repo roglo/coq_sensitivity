@@ -668,23 +668,30 @@ Fixpoint first_non_fixpoint i l :=
   | j :: l' => if i =? j then first_non_fixpoint (i + 1) l' else Some i
   end.
 
-Print Module List.
-...
-
 Definition swap i j l :=
-  
+  firstn (min i j) l ++ [nth (max i j) l 0] ++
+  skipn (min i j + 1) (firstn (max i j) l) ++
+  [nth (min i j) l 0] ++
+  skipn (max i j + 1) l.
 
-
-Fixpoint tlop_loop l :=
-  match first_non_fixpoint 0 l with
-  | None => []
-  | Some a => (a, nth 0 l a) :: tlop_loop (swap a (nth 0 l a) l)
+Fixpoint tlop_loop it l :=
+  match it with
+  | 0 => [(42, 42)]
+  | S it' =>
+      match first_non_fixpoint 0 l with
+      | None => []
+      | Some a => (a, nth 0 l a) :: tlop_loop it' (swap a (nth 0 l a) l)
+      end
   end.
 
 Definition transposition_list_of_permutation n (σ : vector n nat) :=
-  tlop_loop (list_of_vect σ).
+  tlop_loop n (list_of_vect σ).
 
-Compute (tlop_loop [4;5;1;2;0;3]).
+Compute (transposition_list_of_permutation (vect_of_list 0 [4;5;1;2;0;3])).
+[4;5;1;2;0;3]
+[0;5;1;2;4;3]
+[0;1;5;2;4;3]
+[0;1;5;2;4;3]
 
 ...
 
