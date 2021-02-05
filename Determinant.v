@@ -660,19 +660,42 @@ intros i Hi.
 now rewrite Nat.add_comm, Nat.add_sub.
 Qed.
 
-Compute partition (Nat.eqb 3) [1;2;3;4;5;6].
+Fixpoint vect_nth_find {A n} (f : A → bool) (v : vector n A) i iter :=
+  match iter with
+  | 0 => None
+  | S it =>
+      if f (vect_el v i) then Some i else vect_nth_find f v (i + 1) it
+  end.
 
-Definition transposition_list_of_permutation_list (σ : list nat) i :=
-  | [] => []
-  | j :: l' =>
-      if j =? i then transposition_list_of_permutation_list l' (S i)
-      else
-        let (pl, l'') := glop i l in
-(* bin non, parce que le nombre d'itérations max, c'est n² *)
-...
+Fixpoint gen_transp i j :=
+  match j with
+  | 0 => [(7, i)]
+  | S j' => if j =? i then [(22,i)] else (j', j) :: gen_transp i j'
+  end.
+
+Fixpoint tlop_loop n (σ : vector n nat) i iter :=
+  match iter with
+  | 0 => []
+  | S it =>
+      match vect_nth_find (Nat.eqb i) σ i (n + 42) with
+      | None => [(18,i)]
+      | Some j => gen_transp i j ++ tlop_loop σ (i + 1) it
+      end
+  end.
 
 Definition transposition_list_of_permutation n (σ : vector n nat) :=
-  transposition_list_of_permutation_list (list_of_vect σ) 0.
+  tlop_loop σ 0 (n + 42).
+
+Compute (transposition_list_of_permutation (vect_of_list 0 [1;0;3;2])).
+...
+Compute (transposition_list_of_permutation (vect_of_list 0 [0;1;2;3])).
+Compute (transposition_list_of_permutation (vect_of_list 0 [0;1;3;2])).
+Compute (transposition_list_of_permutation (vect_of_list 0 [0;2;1;3])).
+Compute (transposition_list_of_permutation (vect_of_list 0 [0;2;3;1])).
+Compute (transposition_list_of_permutation (vect_of_list 0 [0;3;1;2])).
+Compute (transposition_list_of_permutation (vect_of_list 0 [0;3;2;1])).
+Compute (transposition_list_of_permutation (vect_of_list 0 [1;0;2;3])).
+Compute (transposition_list_of_permutation (vect_of_list 0 [1;0;3;2])).
 
 ...
 
