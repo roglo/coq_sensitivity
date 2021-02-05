@@ -660,7 +660,33 @@ intros i Hi.
 now rewrite Nat.add_comm, Nat.add_sub.
 Qed.
 
+(* https://fr.wikipedia.org/wiki/Permutation#Algorithme_de_d.C3.A9composition *)
+
+Fixpoint first_non_fixpoint i l :=
+  match l with
+  | [] => None
+  | j :: l' => if i =? j then first_non_fixpoint (i + 1) l' else Some i
+  end.
+
 Print Module List.
+...
+
+Definition swap i j l :=
+  
+
+
+Fixpoint tlop_loop l :=
+  match first_non_fixpoint 0 l with
+  | None => []
+  | Some a => (a, nth 0 l a) :: tlop_loop (swap a (nth 0 l a) l)
+  end.
+
+Definition transposition_list_of_permutation n (σ : vector n nat) :=
+  tlop_loop (list_of_vect σ).
+
+Compute (tlop_loop [4;5;1;2;0;3]).
+
+...
 
 Fixpoint orbit_loop n (σ : vector n nat) i iter :=
   match iter with
