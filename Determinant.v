@@ -660,6 +660,27 @@ intros i Hi.
 now rewrite Nat.add_comm, Nat.add_sub.
 Qed.
 
+Print Module List.
+
+Fixpoint orbit_loop n (σ : vector n nat) i iter :=
+  match iter with
+  | 0 => []
+  | S it =>
+      let l := orbit_loop σ (vect_el σ i) it in
+      if existsb (Nat.eqb i) l then l else i :: l
+  end.
+
+Definition orbit n (σ : vector n nat) i := orbit_loop σ i n.
+
+Compute orbit (vect_of_list 0 [0;1;2;3;4]) 4.
+Compute orbit (vect_of_list 0 [1;0;2;3;4]) 0.
+Compute orbit (vect_of_list 0 [0;1;2;4;3]) 4.
+Compute orbit (vect_of_list 0 [0;1;3;2;4]) 1.
+Compute orbit (vect_of_list 0 [1;4;3;2;0]) 1.
+Compute orbit (vect_of_list 0 [1;2;3;4;0]) 3.
+
+...
+
 Fixpoint vect_nth_find {A n} (f : A → bool) (v : vector n A) i iter :=
   match iter with
   | 0 => None
