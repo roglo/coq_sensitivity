@@ -663,19 +663,22 @@ Qed.
 
 (* transpositions list of permutation *)
 
-(* https://fr.wikipedia.org/wiki/Permutation#Algorithme_de_d.C3.A9composition *)
-
-Fixpoint first_non_fixpoint i l :=
-  match l with
-  | [] => None
-  | j :: l' => if i =? j then first_non_fixpoint (i + 1) l' else Some (i, j)
+Fixpoint first_non_fixpoint it i l :=
+  match it with
+  | 0 => None
+  | S it' =>
+      match l with
+      | [] => None
+      | j :: l' =>
+          if i =? j then first_non_fixpoint it' (i + 1) l' else Some (i, j)
+      end
   end.
 
 Fixpoint tvop_loop n it (σ : vector n nat) :=
   match it with
   | 0 => []
   | S it' =>
-      match first_non_fixpoint 0 (list_of_vect σ) with
+      match first_non_fixpoint n 0 (list_of_vect σ) with
       | None => []
       | Some (i, j) =>
           let σ' :=
@@ -695,7 +698,7 @@ Compute (tvop (vect_of_list 0 [1;2;0;3;4;5])).
 Compute (tvop (vect_of_list 0 [5;4;3;2;1;0])).
 Compute (tvop (vect_of_list 0 [4;0;1;2;3;5])).
 Compute (tvop (vect_of_list 0 [3;4;0;1;2;5])).
-Compute let n := 3 in map (λ k, list_of_vect (canon_permut n k)) (seq 0 n!).
+Compute let n := 3 in map (λ k, list_of_vect (canon_permut n k)) (seq 0 n!).z
 Compute let n := 5 in map (λ k, (list_of_vect (canon_permut n k), tvop (canon_permut n k))) (seq 0 n!).
 
 ...
