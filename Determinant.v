@@ -676,7 +676,9 @@ Fixpoint tvop_loop it n (σ : nat → nat) :=
       match first_non_fixpoint n 0 σ with
       | None => []
       | Some i =>
-          let σ' k := σ (if k =? i then σ i else if k =? σ i then i else k) in
+          let σ' k :=
+            if σ k =? i then σ i else if σ k =? σ i then i else σ k
+          in
           (i, σ i) :: tvop_loop it' n σ'
       end
   end.
@@ -699,9 +701,32 @@ Compute (transp_list_of_permut (vect_of_list 0 [1;0;2;3;4;5])).
 Compute (transp_list_of_permut (vect_of_list 0 [1;2;0;3;4;5])).
 Compute (transp_list_of_permut (vect_of_list 0 [5;4;3;2;1;0])).
 Compute (transp_list_of_permut (vect_of_list 0 [4;0;1;2;3;5])).
+(*
+     = [(0, 4); (1, 4); (2, 4); (3, 4)]
+     = τ 3 4 ° τ 2 4 ° τ 1 4 ° τ 0 4 ° id
+[0;1;2;3;4;5] → τ 0 4
+[4;1;2;3;0;5] → τ 1 4
+[4;0;2;3;1;5] → τ 2 4
+[4;0;1;3;2;5] → τ 3 4
+[4;0;1;2;3;5]
+*)
+
 Compute (transp_list_of_permut (vect_of_list 0 [3;4;0;1;2;5])).
 Compute let n := 4 in map (λ k, list_of_vect (canon_permut n k)) (seq 0 n!).
 Compute let n := 4 in map (λ k, (list_of_vect (canon_permut n k), transp_list_of_permut (canon_permut n k))) (seq 0 n!).
+
+Compute let σ := vect_of_list 0 [1;2;0] in let n := vect_size σ in list_of_vect (iter_list (map (transp_of_nat_pair n) (transp_list_of_permut σ)) (λ σ τ, τ ° σ) σ).
+Compute let σ := vect_of_list 0 [1;2;0] in let n := vect_size σ in list_of_vect (iter_list (map (transp_of_nat_pair n) (transp_list_of_permut σ)) (λ σ τ, σ ° τ) (mk_vect n (λ i, i))).
+
+Compute let σ := vect_of_list 0 [0;5;1;2;4;3] in let n := vect_size σ in list_of_vect (iter_list (map (transp_of_nat_pair n) (transp_list_of_permut σ)) (λ σ τ, τ ° σ) σ).
+Compute let σ := vect_of_list 0 [0;5;1;2;4;3] in let n := vect_size σ in list_of_vect (iter_list (map (transp_of_nat_pair n) (transp_list_of_permut σ)) (λ σ τ, σ ° τ) (mk_vect n (λ i, i))).
+
+...
+
+Compute let σ := vect_of_list 0 [3;4;0;1;2;5] in let n := vect_size σ in list_of_vect (iter_list (map (transp_of_nat_pair n) (transp_list_of_permut σ)) (λ σ τ, τ ° σ) σ).
+
+...
+
 
 Compute let σ := vect_of_list 0 [1;2;0] in let n := vect_size σ in list_of_vect (iter_list (map (transp_of_nat_pair n) (transp_list_of_permut σ)) (λ σ τ, σ ° τ) σ).
 
