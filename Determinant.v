@@ -739,12 +739,24 @@ destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
   remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
   destruct x as [j| ]. {
     rewrite iter_list_cons; [ | easy | easy | easy ].
-    unfold comp at 1.
+    cbn.
     rewrite IHit; try easy; [ | flia Hit Hnsit | ]. {
       unfold comp; cbn.
       apply transposition_involutive.
     }
     admit.
+  }
+  unfold iter_list.
+  cbn.
+  admit.
+}
+subst n; cbn.
+remember (σ 0) as σ₀ eqn:Hσ₀; symmetry in Hσ₀.
+destruct σ₀. {
+  remember (first_non_fixpoint it 1 σ) as x eqn:Hx; symmetry in Hx.
+  destruct x as [j| ]. {
+    rewrite iter_list_cons; [ | easy | easy | easy ].
+    cbn.
 ...
 
 Theorem iter_compose_transp_fun : ∀ n (σ : nat → nat),
