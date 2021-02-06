@@ -760,6 +760,8 @@ destruct σ₀. {
     unfold transposition.
     do 2 rewrite if_eqb_eq_dec.
     destruct (Nat.eq_dec (σ' i) j) as [Hσij| Hσij]. {
+      f_equal; rewrite <- Hσij.
+      rewrite <- Hσ'; cbn.
 ...
 
 Theorem iter_compose_transp_fun : ∀ n (σ : nat → nat),
