@@ -693,8 +693,6 @@ Definition transp_fun_of_nat_pair '(i, j) := transposition i j.
 Definition transp_of_nat_pair n '(i, j) :=
   mk_vect n (transp_fun_of_nat_pair (i, j)).
 
-Definition vect_size {T n} (v : vector n T) := n.
-
 (*
 Compute transp_list_of_permut (vect_of_list 0 [0;5;1;2;4;3]).
 Compute transp_list_of_permut (vect_of_list 0 [0;4;1;2;5;3]).

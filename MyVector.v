@@ -220,6 +220,8 @@ destruct IHn as [IHn| IHn]. {
 }
 Qed.
 
+Definition vect_size {T n} (v : vector n T) := n.
+
 End a.
 
 Declare Scope V_scope.
