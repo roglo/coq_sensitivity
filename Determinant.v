@@ -719,8 +719,7 @@ Compute let σ := vect_of_list 0 [1;2;0] in let n := vect_size σ in list_of_vec
 Compute let σ := vect_of_list 0 [0;5;1;2;4;3] in let n := vect_size σ in list_of_vect (iter_list (map (transp_of_nat_pair n) (transp_list_of_permut σ)) (λ σ τ, τ ° σ) σ).
 Compute let σ := vect_of_list 0 [0;5;1;2;4;3] in let n := vect_size σ in list_of_vect (iter_list (map (transp_of_nat_pair n) (transp_list_of_permut σ)) (λ σ τ, σ ° τ) (mk_vect n (λ i, i))).
 
-Print tvop_loop.
-
+(*
 Theorem glop : ∀ n (σ : vector n nat) it,
   is_permut σ
   → n ≤ it
@@ -729,6 +728,14 @@ Theorem glop : ∀ n (σ : vector n nat) it,
     (iter_list (map (transp_of_nat_pair n) (tvop_loop it n (vect_el σ)))
        (λ σ τ, τ ° σ) σ) i = i.
 Proof.
+intros * Hp Hit * Hin.
+unfold iter_list.
+revert i n σ Hit Hin Hp.
+induction it; intros; [ flia Hit Hin | cbn ].
+remember (first_non_fixpoint n 0 (vect_el σ)) as x eqn:Hx; symmetry in Hx.
+destruct x as [j| ]. {
+  cbn.
+...
 intros * Hp Hit * Hin.
 destruct it; [ flia Hit Hin | ].
 cbn.
@@ -824,6 +831,7 @@ destruct it. {
   unfold transposition, comp; cbn.
 (* etc. *)
 ...
+*)
 
 Theorem iter_transp_list_of_permut : ∀ n (σ : vector n nat),
   is_permut σ
@@ -831,11 +839,30 @@ Theorem iter_transp_list_of_permut : ∀ n (σ : vector n nat),
        (λ σ τ, τ ° σ) σ = mk_vect n (λ i, i).
 Proof.
 intros * Hp.
+unfold iter_list.
+rewrite List_fold_left_map.
+unfold transp_list_of_permut.
+destruct σ as (σ).
+cbn.
+unfold is_permut in Hp; cbn in Hp.
+apply vector_eq.
+intros i Hi; cbn.
+cbn.
+unfold transp_list_of_permut_fun.
+Print tvop_loop.
+...
+intros * Hp.
 apply vector_eq.
 intros i Hi; cbn.
 unfold transp_list_of_permut.
-unfold transp_list_of_permut_fun.
-Print tvop_loop.
+destruct σ as (σ).
+unfold is_permut in Hp.
+cbn in Hp.
+cbn.
+unfold "°".
+cbn.
+unfold transp_of_nat_pair.
+cbn.
 ...
 
 Theorem glop : ∀ n σ,
