@@ -674,22 +674,25 @@ Fixpoint first_non_fixpoint it i l :=
       end
   end.
 
-Fixpoint tvop_loop n it (σ : vector n nat) :=
+Fixpoint list_of_vect_fun n (σ : nat → nat) :=
+  match n with
+  | 0 => []
+  | S n' => σ 0 :: list_of_vect_fun n' (λ i, σ (i + 1))
+  end.
+
+Fixpoint tvop_loop it n (σ : nat → nat) :=
   match it with
   | 0 => []
   | S it' =>
-      match first_non_fixpoint n 0 (list_of_vect σ) with
+      match first_non_fixpoint n 0 (list_of_vect_fun n σ) with
       | None => []
       | Some (i, j) =>
-          let σ' :=
-            mk_vect n
-              (λ k, vect_el σ (if k =? i then j else if k =? j then i else k))
-          in
-          (i, j) :: tvop_loop it' σ'
+          let σ' k := σ (if k =? i then j else if k =? j then i else k) in
+          (i, j) :: tvop_loop it' n σ'
       end
   end.
 
-Definition tvop {n} (σ : vector n nat) := tvop_loop n σ.
+Definition tvop {n} (σ : vector n nat) := tvop_loop n n (vect_el σ).
 
 Compute (tvop (vect_of_list 0 [0;5;1;2;4;3])).
 Compute (tvop (vect_of_list 0 [0;4;1;2;5;3])).
@@ -698,8 +701,8 @@ Compute (tvop (vect_of_list 0 [1;2;0;3;4;5])).
 Compute (tvop (vect_of_list 0 [5;4;3;2;1;0])).
 Compute (tvop (vect_of_list 0 [4;0;1;2;3;5])).
 Compute (tvop (vect_of_list 0 [3;4;0;1;2;5])).
-Compute let n := 3 in map (λ k, list_of_vect (canon_permut n k)) (seq 0 n!).z
-Compute let n := 5 in map (λ k, (list_of_vect (canon_permut n k), tvop (canon_permut n k))) (seq 0 n!).
+Compute let n := 4 in map (λ k, list_of_vect (canon_permut n k)) (seq 0 n!).
+Compute let n := 4 in map (λ k, (list_of_vect (canon_permut n k), tvop (canon_permut n k))) (seq 0 n!).
 
 ...
 
