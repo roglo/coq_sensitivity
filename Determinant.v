@@ -757,6 +757,11 @@ destruct σ₀. {
   destruct x as [j| ]. {
     rewrite iter_list_cons; [ | easy | easy | easy ].
     cbn.
+    remember (Comp (k ∈ _), _) as σ' eqn:Hσ'.
+    symmetry in Hσ'.
+    unfold transposition.
+    do 2 rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec (σ' i) j) as [Hσij| Hσij]. {
 ...
 
 Theorem iter_compose_transp_fun : ∀ n (σ : nat → nat),
