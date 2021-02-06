@@ -719,18 +719,35 @@ Compute let σ := vect_of_list 0 [1;2;0] in let n := vect_size σ in list_of_vec
 Compute let σ := vect_of_list 0 [0;5;1;2;4;3] in let n := vect_size σ in list_of_vect (iter_list (map (transp_of_nat_pair n) (transp_list_of_permut σ)) (λ σ τ, τ ° σ) σ).
 Compute let σ := vect_of_list 0 [0;5;1;2;4;3] in let n := vect_size σ in list_of_vect (iter_list (map (transp_of_nat_pair n) (transp_list_of_permut σ)) (λ σ τ, σ ° τ) (mk_vect n (λ i, i))).
 
+Print tvop_loop.
+
+Theorem glop : ∀ n (σ : vector n nat) it,
+  is_permut σ
+  → n ≤ it
+  → ∀ i, i < n →
+  vect_el
+    (iter_list (map (transp_of_nat_pair n) (tvop_loop it n (vect_el σ)))
+       (λ σ τ, τ ° σ) σ) i = i.
+Proof.
+intros * Hp Hit * Hin.
+destruct it; [ flia Hit Hin | ].
+cbn.
+remember (first_non_fixpoint n 0 (vect_el σ)) as x eqn:Hx; symmetry in Hx.
+destruct x as [j| ]. {
+  cbn.
 ...
 
-Compute let σ := vect_of_list 0 [3;4;0;1;2;5] in let n := vect_size σ in list_of_vect (iter_list (map (transp_of_nat_pair n) (transp_list_of_permut σ)) (λ σ τ, τ ° σ) σ).
-
-...
-
-
-Compute let σ := vect_of_list 0 [1;2;0] in let n := vect_size σ in list_of_vect (iter_list (map (transp_of_nat_pair n) (transp_list_of_permut σ)) (λ σ τ, σ ° τ) σ).
-
-Compute let σ := vect_of_list 0 [0;5;1;2;4;3] in let n := vect_size σ in list_of_vect (iter_list (map (transp_of_nat_pair n) (transp_list_of_permut σ)) (λ σ τ, σ ° τ) σ).
-Compute let σ := vect_of_list 0 [3;4;0;1;2;5] in let n := vect_size σ in list_of_vect (iter_list (map (transp_of_nat_pair n) (transp_list_of_permut σ)) (λ σ τ, σ ° τ) σ).
-
+Theorem iter_transp_list_of_permut : ∀ n (σ : vector n nat),
+  is_permut σ
+  → iter_list (map (transp_of_nat_pair n) (transp_list_of_permut σ))
+       (λ σ τ, τ ° σ) σ = mk_vect n (λ i, i).
+Proof.
+intros * Hp.
+apply vector_eq.
+intros i Hi; cbn.
+unfold transp_list_of_permut.
+unfold transp_list_of_permut_fun.
+Print tvop_loop.
 ...
 
 Theorem glop : ∀ n σ,
@@ -758,20 +775,6 @@ Theorem apply_transp_list_of_permut_is_id : ∀ n (σ : nat → nat),
 Proof.
 intros * Hp k.
 unfold transp_list_of_permut_fun.
-...
-
-Theorem apply_transp_list_of_permut : ∀ n (σ : vector n nat),
-  is_permut σ
-  → iter_list (map (transp_of_nat_pair n) (transp_list_of_permut σ))
-      (λ v τ, τ ° v) σ =
-    mk_vect n (λ i, i).
-Proof.
-intros * Hp.
-apply vector_eq.
-intros i Hi; cbn.
-unfold transp_of_nat_pair.
-unfold transp_list_of_permut.
-rename i into k.
 ...
 
 Theorem determinant_alternating_permut_fun :
