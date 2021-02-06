@@ -719,6 +719,49 @@ Compute let σ := vect_of_list 0 [1;2;0] in let n := vect_size σ in list_of_vec
 Compute let σ := vect_of_list 0 [0;5;1;2;4;3] in let n := vect_size σ in list_of_vect (iter_list (map (transp_of_nat_pair n) (transp_list_of_permut σ)) (λ σ τ, τ ° σ) σ).
 Compute let σ := vect_of_list 0 [0;5;1;2;4;3] in let n := vect_size σ in list_of_vect (iter_list (map (transp_of_nat_pair n) (transp_list_of_permut σ)) (λ σ τ, σ ° τ) (mk_vect n (λ i, i))).
 
+Notation "'Comp' ( i ∈ l ) , g" :=
+  (iter_list l (λ c i, comp c g) (λ i, i))
+  (at level 35, i at level 0, l at level 60).
+
+Definition list_of_fun {A} n (f : _ → A) := map f (seq 0 n).
+
+Compute let σ := vect_of_list 0 [0;5;1;2;4;3] in let n := vect_size σ in list_of_fun n (Comp (τ ∈ transp_list_of_permut_fun n (vect_el σ)), transp_fun_of_nat_pair τ).
+
+Search (map _ (seq _ _)).
+
+Theorem iter_compose_transp_fun : ∀ n (σ : nat → nat),
+  is_permut_fun σ n
+  → Comp (τ ∈ transp_list_of_permut_fun n σ), transp_fun_of_nat_pair τ = σ.
+Proof.
+intros * Hp.
+...
+
+Theorem iter_compose_transp : ∀ n (σ : vector n nat),
+  is_permut σ
+  → Comp (τ ∈ transp_list_of_permut σ), transp_fun_of_nat_pair τ = vect_el σ.
+Proof.
+intros * Hp.
+...
+apply iter_compose_transp_fun.
+easy.
+...
+
+Theorem iter_transp_list_of_permut : ∀ n (σ : vector n nat),
+  is_permut σ
+  → iter_list (transp_list_of_permut σ)
+       (λ σ τ, σ ° transp_of_nat_pair n τ) (mk_vect n (λ i, i)) = σ.
+...
+
+Theorem iter_transp_list_of_permut : ∀ n (σ : vector n nat),
+  is_permut σ
+  → iter_list (map (transp_of_nat_pair n) (transp_list_of_permut σ))
+       (λ σ τ, σ ° τ) (mk_vect n (λ i, i)) = σ.
+Proof.
+intros * Hp.
+unfold iter_list.
+rewrite List_fold_left_map.
+...
+
 (*
 Theorem glop : ∀ n (σ : vector n nat) it,
   is_permut σ
