@@ -724,11 +724,57 @@ Definition list_of_fun {A} n (f : _ → A) := map f (seq 0 n).
 Compute let σ := vect_of_list 0 [0;5;1;2;4;3] in let n := vect_size σ in list_of_fun n (Comp (τ ∈ transp_list_of_permut_fun n (vect_el σ)), transp_fun_of_nat_pair τ).
 *)
 
-Theorem iter_compose_transp_fun : ∀ n (σ : nat → nat),
-  is_permut_fun σ n
-  → Comp (τ ∈ transp_list_of_permut_fun n σ), transp_fun_of_nat_pair τ = σ.
+Theorem glop : ∀ it n (σ : nat → nat),
+  n ≠ 0
+  → n ≤ it
+  → is_permut_fun σ n
+  → ∀ i, i < n
+  → (Comp (τ ∈ tvop_loop it n σ), transp_fun_of_nat_pair τ) i = σ i.
 Proof.
-intros * Hp.
+intros * Hnz Hit Hp * Hin.
+revert σ n i Hnz Hit Hp Hin.
+induction it; intros; [ flia Hnz Hit | ].
+destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
+  cbn.
+  remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
+  destruct x as [j| ]. {
+    rewrite iter_list_cons; [ | easy | easy | easy ].
+    unfold comp at 1.
+    rewrite IHit; try easy; [ | flia Hit Hnsit | ]. {
+      unfold comp; cbn.
+      apply transposition_involutive.
+    }
+    admit.
+...
+
+Theorem iter_compose_transp_fun : ∀ n (σ : nat → nat),
+  n ≠ 0
+  → is_permut_fun σ n
+  → ∀ i, i < n
+  → (Comp (τ ∈ transp_list_of_permut_fun n σ), transp_fun_of_nat_pair τ) i = σ i.
+Proof.
+intros * Hnz Hp * Hin.
+...
+apply glop.
+...
+unfold transp_list_of_permut_fun.
+...
+revert i σ Hin Hp.
+induction n; intros; [ easy | clear Hnz ].
+Print transp_list_of_permut_fun.
+...
+intros * Hnz Hp * Hin.
+destruct n; [ easy | clear Hnz ].
+unfold iter_list.
+revert i σ Hp Hin.
+induction n; intros. {
+  apply Nat.lt_1_r in Hin; subst i; cbn.
+  remember (σ 0) as σ₀ eqn:Hσ₀; symmetry in Hσ₀.
+  now destruct σ₀.
+}
+remember (S n) as sn; cbn; subst sn.
+remember (σ 0) as σ₀ eqn:Hσ₀; symmetry in Hσ₀.
+destruct σ₀. {
 ...
 
 Theorem iter_compose_transp : ∀ n (σ : vector n nat),
