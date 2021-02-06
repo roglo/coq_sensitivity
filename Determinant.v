@@ -21,8 +21,8 @@ Fixpoint det_loop {n} (M : matrix n n T) i :=
   match i with
   | 0 => 1%F
   | S i' =>
-      (Σ (j = 0, i'),
-       minus_one_pow j * mat_el M 0 j * det_loop (subm M 0 j) i')%F
+      Σ (j = 0, i'),
+      minus_one_pow j * mat_el M 0 j * det_loop (subm M 0 j) i'
   end.
 
 Definition mat_permut_fun_rows n (σ : nat → nat) (M : matrix n n T) :=
@@ -62,7 +62,7 @@ Definition det_from_col {n} (M : matrix n n T) j :=
 
 Theorem rngl_summation_change_var : ∀ A b e f g (h : _ → A),
   (∀ i, b ≤ i ≤ e → g (h i) = i)
-  → (Σ (i = b, e), f i = Σ (i ∈ map h (seq b (S e - b))), f (g i))%F.
+  → Σ (i = b, e), f i = Σ (i ∈ map h (seq b (S e - b))), f (g i).
 Proof.
 intros * Hgh.
 unfold iter_seq, iter_list.
@@ -79,8 +79,9 @@ Qed.
    permutations *)
 
 Definition determinant' n (M : matrix n n T) :=
-  (Σ (k = 0, fact n - 1), ε (canon_permut n k) *
-   Π (i = 1, n), mat_el M (i - 1) (vect_el (canon_permut n k) (i - 1)%nat))%F.
+  Σ (k = 0, fact n - 1),
+    ε (canon_permut n k) *
+    Π (i = 1, n), mat_el M (i - 1) (vect_el (canon_permut n k) (i - 1)).
 
 (* Proof that both definitions of determinants are equal *)
 
@@ -333,7 +334,7 @@ Theorem determinant'_by_list :
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
   ∀ n (M : matrix n n T),
-  determinant' M = (Σ (k = 0, fact n - 1), nth k (determinant'_list M) 0)%F.
+  determinant' M = Σ (k = 0, fact n - 1), nth k (determinant'_list M) 0.
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch *.
 unfold determinant', determinant'_list.
@@ -353,7 +354,7 @@ Theorem rngl_summation_permut : ∀ n l1 l2,
   Permutation l1 l2
   → length l1 = n
   → length l2 = n
-  → (Σ (i = 0, n - 1), nth i l1 0 = Σ (i = 0, n - 1), nth i l2 0)%F.
+  → Σ (i = 0, n - 1), nth i l1 0 = Σ (i = 0, n - 1), nth i l2 0.
 Proof.
 intros * Hl H1 H2.
 destruct n. {
@@ -405,7 +406,7 @@ Theorem det_is_det_by_any_permut :
   rngl_characteristic = 0 →
   ∀ n (M : matrix n n T) l,
   Permutation l (determinant'_list M)
-  → determinant M = (Σ (k = 0, fact n - 1), nth k l 0)%F.
+  → determinant M = Σ (k = 0, fact n - 1), nth k l 0.
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hl.
 rewrite det_is_det_by_canon_permut; try easy.
@@ -423,20 +424,21 @@ Qed.
 (* yet another definition of determinant *)
 
 Definition determinant'' p q n (M : matrix n n T) :=
-  (Σ (k = 0, fact n - 1), ε_canon_permut n k *
-   Π (i = 1, n),
-   mat_el M (i - 1) (vect_el (canon_permut_swap_last p q n k) (i - 1)%nat))%F.
+  Σ (k = 0, fact n - 1),
+    ε_canon_permut n k *
+    Π (i = 1, n),
+    mat_el M (i - 1) (vect_el (canon_permut_swap_last p q n k) (i - 1)).
 
 Definition determinant''_list p q {n} (M : matrix n n T) :=
   map (λ k,
     (ε_canon_permut n k *
      Π (i = 1, n),
-     mat_el M (i - 1) (vect_el (canon_permut_swap_last p q n k) (i - 1)%nat))%F)
+     mat_el M (i - 1) (vect_el (canon_permut_swap_last p q n k) (i - 1)))%F)
     (seq 0 (fact n)).
 
 Theorem determinant''_by_list : ∀ n p q (M : matrix n n T),
   determinant'' p q M =
-    (Σ (k = 0, fact n - 1), nth k (determinant''_list p q M) 0)%F.
+    Σ (k = 0, fact n - 1), nth k (determinant''_list p q M) 0.
 Proof.
 intros.
 unfold determinant'', determinant''_list.
@@ -693,21 +695,13 @@ Definition transp_of_nat_pair n '(i, j) :=
 
 Definition vect_size {T n} (v : vector n T) := n.
 
+(*
 Compute transp_list_of_permut (vect_of_list 0 [0;5;1;2;4;3]).
 Compute transp_list_of_permut (vect_of_list 0 [0;4;1;2;5;3]).
 Compute (transp_list_of_permut (vect_of_list 0 [1;0;2;3;4;5])).
 Compute (transp_list_of_permut (vect_of_list 0 [1;2;0;3;4;5])).
 Compute (transp_list_of_permut (vect_of_list 0 [5;4;3;2;1;0])).
 Compute (transp_list_of_permut (vect_of_list 0 [4;0;1;2;3;5])).
-(*
-     = [(0, 4); (1, 4); (2, 4); (3, 4)]
-     = τ 3 4 ° τ 2 4 ° τ 1 4 ° τ 0 4 ° id
-[0;1;2;3;4;5] → τ 0 4
-[4;1;2;3;0;5] → τ 1 4
-[4;0;2;3;1;5] → τ 2 4
-[4;0;1;3;2;5] → τ 3 4
-[4;0;1;2;3;5]
-*)
 Compute (transp_list_of_permut (vect_of_list 0 [3;4;0;1;2;5])).
 
 Compute let n := 4 in map (λ k, list_of_vect (canon_permut n k)) (seq 0 n!).
@@ -718,6 +712,7 @@ Compute let σ := vect_of_list 0 [1;2;0] in let n := vect_size σ in list_of_vec
 
 Compute let σ := vect_of_list 0 [0;5;1;2;4;3] in let n := vect_size σ in list_of_vect (iter_list (map (transp_of_nat_pair n) (transp_list_of_permut σ)) (λ σ τ, τ ° σ) σ).
 Compute let σ := vect_of_list 0 [0;5;1;2;4;3] in let n := vect_size σ in list_of_vect (iter_list (map (transp_of_nat_pair n) (transp_list_of_permut σ)) (λ σ τ, σ ° τ) (mk_vect n (λ i, i))).
+*)
 
 Notation "'Comp' ( i ∈ l ) , g" :=
   (iter_list l (λ c i, comp c g) (λ i, i))
@@ -725,9 +720,9 @@ Notation "'Comp' ( i ∈ l ) , g" :=
 
 Definition list_of_fun {A} n (f : _ → A) := map f (seq 0 n).
 
+(*
 Compute let σ := vect_of_list 0 [0;5;1;2;4;3] in let n := vect_size σ in list_of_fun n (Comp (τ ∈ transp_list_of_permut_fun n (vect_el σ)), transp_fun_of_nat_pair τ).
-
-Search (map _ (seq _ _)).
+*)
 
 Theorem iter_compose_transp_fun : ∀ n (σ : nat → nat),
   is_permut_fun σ n
@@ -1399,7 +1394,7 @@ Theorem laplace_formula_on_rows :
   ∀ n (M : matrix n n T) i,
   n ≠ 0
   → i < n
-  → determinant M = (Σ (j = 0, n - 1), mat_el M i j * mat_el (comatrix M) i j)%F.
+  → determinant M = Σ (j = 0, n - 1), mat_el M i j * mat_el (comatrix M) i j.
 Proof.
 (*
 intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hlin.

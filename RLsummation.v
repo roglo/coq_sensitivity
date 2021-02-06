@@ -8,13 +8,11 @@ Import List List.ListNotations.
 
 Notation "'Σ' ( i = b , e ) , g" :=
   (iter_seq b e (λ c i, (c + g)%F) 0%F)
-  (at level 45, i at level 0, b at level 60, e at level 60) :
-    ring_like_scope.
+  (at level 45, i at level 0, b at level 60, e at level 60).
 
 Notation "'Σ' ( i ∈ l ) , g" :=
   (iter_list l (λ c i, (c + g)%F) 0%F)
-  (at level 45, i at level 0, l at level 60) :
-     ring_like_scope.
+  (at level 45, i at level 0, l at level 60).
 
 Section a.
 
@@ -38,7 +36,7 @@ Qed.
 
 Theorem all_0_rngl_summation_0 : ∀ b e f,
   (∀ i, b ≤ i ≤ e → f i = 0%F)
-  → (Σ (i = b, e), f i = 0)%F.
+  → Σ (i = b, e), f i = 0%F.
 Proof.
 intros * Hz.
 apply iter_seq_all_d; [ | | | easy ]. {
@@ -52,7 +50,7 @@ Qed.
 
 Theorem rngl_summation_split_first : ∀ b k g,
   b ≤ k
-  → (Σ (i = b, k), g i)%F = (g b + Σ (i = S b, k), g i)%F.
+  → Σ (i = b, k), g i = (g b + Σ (i = S b, k), g i)%F.
 Proof.
 intros * Hbk.
 apply iter_seq_split_first; [ | | | easy ]. {

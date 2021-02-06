@@ -83,7 +83,7 @@ Definition mat_add {ro : ring_like_op T} {m n} (MA MB : matrix m n T) :
 
 Definition mat_mul {ro : ring_like_op T} {m n p}
     (MA : matrix m n T) (MB : matrix n p T) : matrix m p T :=
-  {| mat_el i k := (Σ (j = 0, n - 1), mat_el MA i j * mat_el MB j k)%F |}.
+  {| mat_el i k := Σ (j = 0, n - 1), mat_el MA i j * mat_el MB j k |}.
 
 (* opposite *)
 
@@ -110,7 +110,7 @@ Definition mat_vect_concat {m n} (M : matrix m n T) (V : vector m T) :
 (* multiplication of a matrix by a vector *)
 
 Definition mat_mul_vect_r {m n} (M : matrix m n T) (V : vector n T) :=
-  mk_vect m (λ i, (Σ (j = 0, n - 1), mat_el M i j * vect_el V j)%F).
+  mk_vect m (λ i, Σ (j = 0, n - 1), mat_el M i j * vect_el V j).
 
 (* multiplication of a matrix by a scalar *)
 
@@ -421,12 +421,12 @@ Qed.
 Theorem mat_vect_mul_assoc_as_sums :
   ∀ {m n p} (A : matrix m n T) (B : matrix n p T) (V : vector p T) i,
   i < m
-  → (Σ (j = 0, n - 1),
+  → Σ (j = 0, n - 1),
        mat_el A i j *
-       (Σ (k = 0, p - 1), mat_el B j k * vect_el V k))%F =
-    (Σ (j = 0, p - 1),
+       (Σ (k = 0, p - 1), mat_el B j k * vect_el V k) =
+     Σ (j = 0, p - 1),
        (Σ (k = 0, n - 1), mat_el A i k * mat_el B k j) *
-       vect_el V j)%F.
+        vect_el V j.
 Proof.
 intros * Hi.
 erewrite rngl_summation_eq_compat. 2: {

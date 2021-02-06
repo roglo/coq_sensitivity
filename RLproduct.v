@@ -8,13 +8,11 @@ Import List List.ListNotations.
 
 Notation "'Π' ( i = b , e ) , g" :=
   (iter_seq b e (λ c i, (c * g)%F) 1%F)
-  (at level 35, i at level 0, b at level 60, e at level 60) :
-     ring_like_scope.
+  (at level 35, i at level 0, b at level 60, e at level 60).
 
 Notation "'Π' ( i ∈ l ) , g" :=
   (iter_list l (λ c i, (c * g)%F) 1%F)
-  (at level 35, i at level 0, l at level 60) :
-     ring_like_scope.
+  (at level 35, i at level 0, l at level 60).
 
 Section a.
 
@@ -39,7 +37,7 @@ Qed.
 
 Theorem all_1_rngl_product_1 : ∀ b e f,
   (∀ i, b ≤ i ≤ e → f i = 1%F)
-  → (Π (i = b, e), f i = 1)%F.
+  → Π (i = b, e), f i = 1%F.
 Proof.
 intros * Hz.
 apply iter_seq_all_d; [ | | | easy ]. {
@@ -53,7 +51,7 @@ Qed.
 
 Theorem all_1_rngl_product_list_1 : ∀ A (l : list A) f,
   (∀ i, i ∈ l → f i = 1%F)
-  → (Π (i ∈ l), f i = 1)%F.
+  → Π (i ∈ l), f i = 1%F.
 Proof.
 intros * Hz.
 apply iter_list_all_d; [ | | | easy ]. {
@@ -67,7 +65,7 @@ Qed.
 
 Theorem rngl_product_split_first : ∀ b k g,
   b ≤ k
-  → (Π (i = b, k), g i)%F = (g b * Π (i = S b, k), g i)%F.
+  → Π (i = b, k), g i = (g b * Π (i = S b, k), g i)%F.
 Proof.
 intros * Hbk.
 apply iter_seq_split_first; [ | | | easy ]. {
@@ -81,7 +79,7 @@ Qed.
 
 Theorem rngl_product_split_last : ∀ b k g,
   b ≤ k
-  → (Π (i = b, k), g i = (Π (i = S b, k), g (i - 1)%nat) * g k)%F.
+  → Π (i = b, k), g i = (Π (i = S b, k), g (i - 1)%nat * g k)%F.
 Proof.
 intros * Hbk.
 now apply iter_seq_split_last.
@@ -89,7 +87,7 @@ Qed.
 
 Theorem rngl_product_split : ∀ j g b k,
   b ≤ S j ≤ S k
-  → (Π (i = b, k), g i = (Π (i = b, j), g i) * (Π (i = j+1, k), g i))%F.
+  → Π (i = b, k), g i = ((Π (i = b, j), g i) * (Π (i = j+1, k), g i))%F.
 Proof.
 intros * Hbjk.
 apply iter_seq_split; [ | | | easy ]. {
