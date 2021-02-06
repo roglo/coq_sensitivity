@@ -666,8 +666,7 @@ Qed.
 Fixpoint first_non_fixpoint it i σ :=
   match it with
   | 0 => None
-  | S it' =>
-      if i =? σ i then first_non_fixpoint it' (i + 1) σ else Some (i, σ i)
+  | S it' => if i =? σ i then first_non_fixpoint it' (i + 1) σ else Some i
   end.
 
 Fixpoint tvop_loop it n (σ : nat → nat) :=
@@ -676,9 +675,9 @@ Fixpoint tvop_loop it n (σ : nat → nat) :=
   | S it' =>
       match first_non_fixpoint n 0 σ with
       | None => []
-      | Some (i, j) =>
-          let σ' k := σ (if k =? i then j else if k =? j then i else k) in
-          (i, j) :: tvop_loop it' n σ'
+      | Some i =>
+          let σ' k := σ (if k =? i then σ i else if k =? σ i then i else k) in
+          (i, σ i) :: tvop_loop it' n σ'
       end
   end.
 
@@ -692,6 +691,8 @@ Definition transp_fun_of_nat_pair '(i, j) := transposition i j.
 Definition transp_of_nat_pair n '(i, j) :=
   mk_vect n (transp_fun_of_nat_pair (i, j)).
 
+Definition vect_size {T n} (v : vector n T) := n.
+
 Compute transp_list_of_permut (vect_of_list 0 [0;5;1;2;4;3]).
 Compute transp_list_of_permut (vect_of_list 0 [0;4;1;2;5;3]).
 Compute (transp_list_of_permut (vect_of_list 0 [1;0;2;3;4;5])).
@@ -701,6 +702,11 @@ Compute (transp_list_of_permut (vect_of_list 0 [4;0;1;2;3;5])).
 Compute (transp_list_of_permut (vect_of_list 0 [3;4;0;1;2;5])).
 Compute let n := 4 in map (λ k, list_of_vect (canon_permut n k)) (seq 0 n!).
 Compute let n := 4 in map (λ k, (list_of_vect (canon_permut n k), transp_list_of_permut (canon_permut n k))) (seq 0 n!).
+
+Compute let σ := vect_of_list 0 [1;2;0] in let n := vect_size σ in list_of_vect (iter_list (map (transp_of_nat_pair n) (transp_list_of_permut σ)) (λ σ τ, σ ° τ) σ).
+
+Compute let σ := vect_of_list 0 [0;5;1;2;4;3] in let n := vect_size σ in list_of_vect (iter_list (map (transp_of_nat_pair n) (transp_list_of_permut σ)) (λ σ τ, σ ° τ) σ).
+Compute let σ := vect_of_list 0 [3;4;0;1;2;5] in let n := vect_size σ in list_of_vect (iter_list (map (transp_of_nat_pair n) (transp_list_of_permut σ)) (λ σ τ, σ ° τ) σ).
 
 ...
 
