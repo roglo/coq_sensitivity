@@ -691,6 +691,20 @@ Definition transp_fun_of_nat_pair '(i, j) := transposition i j.
 Definition transp_of_nat_pair n '(i, j) :=
   mk_vect n (transp_fun_of_nat_pair (i, j)).
 
+Compute transp_list_of_permut (vect_of_list 0 [0;5;1;2;4;3]).
+Compute transp_list_of_permut (vect_of_list 0 [0;4;1;2;5;3]).
+...
+Compute (tvop (vect_of_list 0 [1;0;2;3;4;5])).
+Compute (tvop (vect_of_list 0 [1;2;0;3;4;5])).
+Compute (tvop (vect_of_list 0 [5;4;3;2;1;0])).
+Compute (tvop (vect_of_list 0 [4;0;1;2;3;5])).
+Compute (tvop (vect_of_list 0 [3;4;0;1;2;5])).
+Compute let n := 3 in map (λ k, list_of_vect (canon_permut n k)) (seq 0 n!).
+Compute let n := 5 in map (λ k, (list_of_vect (canon_permut n k), tvop (canon_permut n k))) (seq 0 n!).
+Print transposition.
+
+...
+
 Theorem glop : ∀ n σ,
   n ≠ 0
   → is_permut_fun σ n
