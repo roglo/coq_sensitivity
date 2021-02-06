@@ -691,6 +691,22 @@ Definition transp_fun_of_nat_pair '(i, j) := transposition i j.
 Definition transp_of_nat_pair n '(i, j) :=
   mk_vect n (transp_fun_of_nat_pair (i, j)).
 
+Theorem glop : ∀ n σ,
+  n ≠ 0
+  → is_permut_fun σ n
+  → ∀ k it,
+    n ≤ it
+    → iter_list (map transp_fun_of_nat_pair (tvop_loop n it σ)) comp σ k = k.
+Proof.
+intros * Hnz Hp * Hit.
+destruct it; [ flia Hnz Hit | ].
+cbn.
+remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
+destruct x as [(i, j)| ]. {
+  cbn.
+  unfold iter_list; cbn.
+...
+
 Theorem apply_transp_list_of_permut_is_id : ∀ n (σ : nat → nat),
   is_permut_fun σ n
   → ∀ i,
@@ -699,6 +715,7 @@ Theorem apply_transp_list_of_permut_is_id : ∀ n (σ : nat → nat),
       comp σ i = i.
 Proof.
 intros * Hp k.
+unfold transp_list_of_permut_fun.
 ...
 
 Theorem apply_transp_list_of_permut : ∀ n (σ : vector n nat),
