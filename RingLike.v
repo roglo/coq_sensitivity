@@ -187,9 +187,9 @@ Theorem rngl_mul_comm :
   rngl_is_comm = true →
   ∀ a b, (a * b = b * a)%F.
 Proof.
-intros Hic *.
+intros H1 *.
 specialize rngl_opt_mul_comm as H.
-rewrite Hic in H.
+rewrite H1 in H.
 apply H.
 Qed.
 
@@ -222,11 +222,11 @@ Qed.
 
 Theorem rngl_add_opp_l :
   rngl_has_opp = true →
- ∀ x, (- x + x = 0)%F.
+  ∀ x, (- x + x = 0)%F.
 Proof.
-intros Hro *.
+intros H1 *.
 specialize rngl_opt_add_opp_l as H.
-rewrite Hro in H.
+rewrite H1 in H.
 apply H.
 Qed.
 
