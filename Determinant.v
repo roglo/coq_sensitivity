@@ -732,9 +732,97 @@ Proof.
 intros * Hp Hit * Hin.
 destruct it; [ flia Hit Hin | ].
 cbn.
-remember (first_non_fixpoint n 0 (vect_el σ)) as x eqn:Hx; symmetry in Hx.
-destruct x as [j| ]. {
+destruct it. {
   cbn.
+  destruct n; [ easy | ].
+  apply Nat.succ_le_mono in Hit.
+  apply Nat.le_0_r in Hit; subst n.
+  apply Nat.lt_1_r in Hin; subst i.
+  cbn.
+  remember (vect_el σ 0) as σ₀ eqn:Hσ₀; symmetry in Hσ₀.
+  destruct σ₀; [ easy | cbn ].
+  rewrite Hσ₀; cbn.
+  unfold iter_list; cbn.
+  rewrite Hσ₀; cbn.
+  now rewrite Nat.eqb_refl.
+}
+destruct it. {
+  cbn.
+  destruct n; [ easy | ].
+  apply Nat.succ_le_mono in Hit.
+  destruct n. {
+    apply Nat.lt_1_r in Hin; subst i.
+    cbn.
+    remember (vect_el σ 0) as σ₀ eqn:Hσ₀; symmetry in Hσ₀.
+    destruct σ₀; [ easy | cbn ].
+    rewrite Hσ₀; cbn.
+    unfold iter_list; cbn.
+    unfold comp.
+    rewrite Hσ₀; cbn.
+    rewrite Nat.eqb_refl; cbn.
+    rewrite Hσ₀; cbn.
+    now rewrite Nat.eqb_refl.
+  }
+  apply Nat.succ_le_mono in Hit.
+  apply Nat.le_0_r in Hit; subst n.
+  cbn.
+  unfold transposition; cbn.
+  unfold comp; cbn.
+  remember (vect_el σ 0) as σ₀ eqn:Hσ₀; symmetry in Hσ₀.
+  destruct σ₀. {
+    cbn.
+    remember (vect_el σ 1) as σ₁ eqn:Hσ₁; symmetry in Hσ₁.
+    destruct σ₁. {
+      rewrite Hσ₁; cbn.
+      unfold transposition, comp; cbn.
+      unfold iter_list; cbn.
+      destruct i; [ now rewrite Hσ₀ | ].
+      destruct i; [ | flia Hin ].
+      rewrite Hσ₀, Hσ₁; cbn.
+      apply Hp; [ flia | flia | congruence ].
+    }
+    destruct σ₁. {
+      cbn.
+      unfold iter_list; cbn.
+      destruct i; [ easy | ].
+      destruct i; [ easy | ].
+      flia Hin.
+    }
+    rewrite Hσ₁.
+    cbn.
+    unfold transposition, comp; cbn.
+    rewrite Nat.eqb_refl; cbn.
+    unfold iter_list; cbn.
+    destruct i; [ now rewrite Hσ₀ | ].
+    destruct i; [ rewrite Hσ₁ | flia Hin ].
+    cbn.
+    now rewrite Nat.eqb_refl.
+  }
+  rewrite Hσ₀; cbn.
+  rewrite Nat.eqb_refl.
+  remember (vect_el σ 1) as σ₁ eqn:Hσ₁; symmetry in Hσ₁.
+  destruct σ₁. {
+    cbn.
+    unfold transposition, comp; cbn.
+    destruct σ₀. {
+      cbn.
+      unfold iter_list; cbn.
+      destruct i; [ now rewrite Hσ₀ | ].
+      destruct i; [ now rewrite Hσ₁ | flia Hin ].
+    }
+    cbn.
+    unfold transposition, comp; cbn.
+    unfold iter_list; cbn.
+    destruct i. {
+      rewrite Hσ₀, Hσ₁; cbn.
+      now rewrite Nat.eqb_refl.
+    }
+    destruct i; [ | flia Hin ].
+    rewrite Hσ₁; cbn.
+    now rewrite Nat.eqb_refl.
+  }
+  unfold transposition, comp; cbn.
+(* etc. *)
 ...
 
 Theorem iter_transp_list_of_permut : ∀ n (σ : vector n nat),
