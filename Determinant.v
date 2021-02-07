@@ -730,6 +730,8 @@ Theorem glop : ∀ it n (σ : nat → nat),
   → (Comp (τ ∈ tvop_loop it n σ), transp_fun_of_nat_pair τ) i = σ i.
 Proof.
 intros * Hnz Hit Hp * Hin.
+...
+intros * Hnz Hit Hp * Hin.
 revert σ n i Hnz Hit Hp Hin.
 induction it; intros; [ flia Hnz Hit | ].
 destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
@@ -761,6 +763,16 @@ destruct σ₀. {
     do 2 rewrite if_eqb_eq_dec.
     destruct (Nat.eq_dec (σ' i) j) as [Hσij| Hσij]. {
       f_equal; rewrite <- Hσij.
+      admit.
+    }
+    destruct (Nat.eq_dec (σ' i) (σ j)) as [Hσσ| Hσσ]. {
+      admit.
+    }
+    admit.
+  }
+  admit.
+}
+...
       rewrite <- Hσ'; cbn.
 ...
 
