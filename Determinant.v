@@ -778,13 +778,15 @@ destruct σ₀. {
     rewrite iter_list_cons; [ cbn | easy | easy | easy ].
     apply first_non_fixpoint_Some_if in Hx.
     destruct Hx as (Hk, Hj).
-...
-    remember (Comp (k ∈ _), _) as σ' eqn:Hσ'.
-    symmetry in Hσ'.
+    remember ((Comp (k ∈ _), _) _) as m eqn:Hm.
+    symmetry in Hm.
     unfold transposition.
     do 2 rewrite if_eqb_eq_dec.
-    destruct (Nat.eq_dec (σ' i) j) as [Hσij| Hσij]. {
+    destruct (Nat.eq_dec m j) as [Hmj| Hmj]. {
+      move Hmj at top; subst m.
+...
       f_equal; rewrite <- Hσij.
+...
       admit.
     }
     destruct (Nat.eq_dec (σ' i) (σ j)) as [Hσσ| Hσσ]. {
