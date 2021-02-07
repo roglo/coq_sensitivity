@@ -704,6 +704,15 @@ Compute (transp_list_of_permut (vect_of_list 0 [3;4;0;1;2;5])).
 
 Compute let n := 4 in map (λ k, list_of_vect (canon_permut n k)) (seq 0 n!).
 Compute let n := 4 in map (λ k, (list_of_vect (canon_permut n k), transp_list_of_permut (canon_permut n k))) (seq 0 n!).
+Compute let n := 2 in length (filter (λ ij, snd ij =? 1) (map (λ k, (list_of_vect (canon_permut n k), length (transp_list_of_permut (canon_permut n k)))) (seq 0 n!))).
+(*
+1;15;85;225;274;120
+1;10;35;50;24
+1;6;11;6
+1;3;2
+1;1
+(Stirling numbers)
+*)
 Compute let σ := vect_of_list 0 [1;2;0] in let n := vect_size σ in list_of_vect (iter_list (map (transp_of_nat_pair n) (transp_list_of_permut σ)) (λ σ τ, τ ° σ) σ).
 Compute let σ := vect_of_list 0 [1;2;0] in let n := vect_size σ in list_of_vect (iter_list (map (transp_of_nat_pair n) (transp_list_of_permut σ)) (λ σ τ, σ ° τ) (mk_vect n (λ i, i))).
 
