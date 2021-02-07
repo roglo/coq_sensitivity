@@ -722,6 +722,27 @@ Definition list_of_fun {A} n (f : _ → A) := map f (seq 0 n).
 Compute let σ := vect_of_list 0 [0;5;1;2;4;3] in let n := vect_size σ in list_of_fun n (Comp (τ ∈ transp_list_of_permut_fun n (vect_el σ)), transp_fun_of_nat_pair τ).
 *)
 
+Theorem first_non_fixpoint_Some_if : ∀ σ it i j,
+  first_non_fixpoint it i σ = Some j
+  → (∀ k, i ≤ k < j → σ k = k) ∧ σ j ≠ j.
+Proof.
+intros * Hs.
+revert σ i j Hs.
+induction it; intros; [ easy | cbn in Hs ].
+rewrite if_eqb_eq_dec in Hs.
+destruct (Nat.eq_dec i (σ i)) as [Hii| Hii]. {
+  specialize (IHit σ (i + 1) j Hs) as (H1, H2).
+  split; [ | easy ].
+  intros k Hk.
+  destruct (Nat.eq_dec i k) as [Hik| Hik]; [ now subst k | ].
+  apply H1; flia Hk Hik.
+} {
+  injection Hs; clear Hs; intros; subst j.
+  split; [ | now apply Nat.neq_sym ].
+  intros k Hk; flia Hk.
+}
+Qed.
+
 Theorem glop : ∀ it n (σ : nat → nat),
   n ≠ 0
   → n ≤ it
@@ -729,8 +750,6 @@ Theorem glop : ∀ it n (σ : nat → nat),
   → ∀ i, i < n
   → (Comp (τ ∈ tvop_loop it n σ), transp_fun_of_nat_pair τ) i = σ i.
 Proof.
-intros * Hnz Hit Hp * Hin.
-...
 intros * Hnz Hit Hp * Hin.
 revert σ n i Hnz Hit Hp Hin.
 induction it; intros; [ flia Hnz Hit | ].
@@ -751,12 +770,15 @@ destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
   admit.
 }
 subst n; cbn.
+clear Hit Hnz.
 remember (σ 0) as σ₀ eqn:Hσ₀; symmetry in Hσ₀.
 destruct σ₀. {
   remember (first_non_fixpoint it 1 σ) as x eqn:Hx; symmetry in Hx.
   destruct x as [j| ]. {
-    rewrite iter_list_cons; [ | easy | easy | easy ].
-    cbn.
+    rewrite iter_list_cons; [ cbn | easy | easy | easy ].
+    apply first_non_fixpoint_Some_if in Hx.
+    destruct Hx as (Hk, Hj).
+...
     remember (Comp (k ∈ _), _) as σ' eqn:Hσ'.
     symmetry in Hσ'.
     unfold transposition.
