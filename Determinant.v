@@ -798,6 +798,7 @@ destruct σ₀. {
         rewrite if_eqb_eq_dec.
         now destruct (Nat.eq_dec (σ j) j).
       }
+      remember (comp (transposition j (σ j)) σ) as σ' eqn:Hσ'.
 ...
       f_equal; rewrite <- Hσij.
 ...
