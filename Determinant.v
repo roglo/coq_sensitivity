@@ -831,17 +831,24 @@ destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
     split; [ flia | easy ].
   }
 }
+cbn.
 subst n.
 clear Hit Hnz.
-cbn.
-remember (σ 0) as σ₀ eqn:Hσ₀; symmetry in Hσ₀.
-destruct σ₀. {
-  remember (first_non_fixpoint it 1 σ) as x eqn:Hx; symmetry in Hx.
-  destruct x as [j| ]. {
-    apply first_non_fixpoint_Some_if in Hx.
-    destruct Hx as (Hj1 & Hj2 & Hj3).
-    cbn.
-    rewrite iter_list_cons; [ | easy | easy | easy ].
+remember (first_non_fixpoint (S it) 0 σ) as x eqn:Hx; symmetry in Hx.
+destruct x as [j| ]. {
+  apply first_non_fixpoint_Some_if in Hx.
+  destruct Hx as (Hj1 & Hj2 & Hj3).
+  cbn.
+  rewrite iter_list_cons; [ | easy | easy | easy ].
+  remember (transposition j (σ j)) as τ eqn:Hτ.
+  remember (Comp (f ∈ _), _) as σ' eqn:Hσ'.
+  unfold comp.
+  destruct (Nat.eq_dec (σ' i) j) as [Hij| Hij]. {
+    rewrite Hij.
+    rewrite Hτ.
+    unfold transposition.
+    rewrite Nat.eqb_refl.
+...
     unfold comp.
     remember (iter_list _ _ _) as σ' eqn:Hσ'.
     unfold transposition.
