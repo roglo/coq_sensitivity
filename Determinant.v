@@ -9,6 +9,9 @@ Require Import Misc RingLike MyVector Matrix PermutSeq.
 Require Import RLsummation RLproduct.
 Import matrix_Notations.
 
+Definition list_of_fun {A} n (f : _ → A) := map f (seq 0 n).
+Definition fun_of_list {A} (d : A) l i := nth i l d.
+
 Section a.
 
 Context {T : Type}.
@@ -720,12 +723,6 @@ Compute let σ := vect_of_list 0 [0;5;1;2;4;3] in let n := vect_size σ in list_
 Compute let σ := vect_of_list 0 [0;5;1;2;4;3] in let n := vect_size σ in list_of_vect (iter_list (map (transp_of_nat_pair n) (transp_list_of_permut σ)) (λ σ τ, σ ° τ) (mk_vect n (λ i, i))).
 *)
 
-Notation "'Comp' ( i ∈ l ) , g" :=
-  (iter_list l (λ c i, comp c g) (λ i, i))
-  (at level 35, i at level 0, l at level 60).
-
-Definition list_of_fun {A} n (f : _ → A) := map f (seq 0 n).
-
 (*
 Compute let σ := vect_of_list 0 [0;5;1;2;4;3] in let n := vect_size σ in list_of_fun n (Comp (τ ∈ transp_list_of_permut_fun n (vect_el σ)), transp_fun_of_nat_pair τ).
 *)
@@ -751,36 +748,44 @@ destruct (Nat.eq_dec i (σ i)) as [Hii| Hii]. {
 }
 Qed.
 
-Theorem comp_is_permut_fun : ∀ n (σ₁ σ₂ : nat → nat),
-  is_permut_fun σ₁ n
-  → is_permut_fun σ₂ n
-  → is_permut_fun (comp σ₁ σ₂) n.
-Proof.
-intros * Hp1 Hp2.
-split. {
-  intros i Hi.
-  now apply Hp1, Hp2.
-} {
-  intros i j Hi Hj Hc.
-  apply Hp2; [ easy | easy | ].
-  apply Hp1; [ now apply Hp2 | now apply Hp2 | easy ].
-}
-Qed.
+Fixpoint nb_of_fits n σ :=
+  match n with
+  | 0 => 0
+  | S n' => nb_of_fits n' σ + Nat.b2n (σ n' =? n')
+  end.
 
-Theorem comp_list_is_permut_fun : ∀ n l,
-  (∀ σ, σ ∈ l → is_permut_fun σ n)
-  → is_permut_fun (Comp (σ ∈ l), σ) n.
+(*
+Compute let n := 4 in (map (λ k, (list_of_vect (canon_permut n k), nb_of_fits n (fun_of_list 0 (list_of_vect (canon_permut n k))))) (seq 0 n!)).
+*)
+
+Theorem glop : ∀ it n σ,
+  it ≠ 0
+  → nb_of_fits n σ < n
+  → nb_of_fits n σ <
+     nb_of_fits n
+       (Comp (τ ∈ map transp_fun_of_nat_pair (tvop_loop it n σ)), τ).
 Proof.
-intros * Hl.
-induction l as [| σ]; [ easy | ].
-rewrite iter_list_cons; [ | easy | easy | easy ].
-apply comp_is_permut_fun. 2: {
-  apply IHl.
-  intros σ' Hσ'.
-  now apply Hl; right.
-}
-now apply Hl; left.
-Qed.
+intros * Hit Hn.
+revert n σ Hn.
+destruct it; intros; [ easy | clear Hit; cbn ].
+remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
+destruct x as [i| ]. {
+  cbn.
+  rewrite iter_list_cons; [ | easy | easy | easy ].
+  apply first_non_fixpoint_Some_if in Hx.
+  destruct Hx as (Hk, Hi).
+...
+
+Theorem glop : ∀ it n (σ : nat → nat),
+  n ≠ 0
+  → n ≤ it
+  → is_permut_fun σ n
+  → ∀ i, i < n
+  → (Comp (τ ∈ map transp_fun_of_nat_pair (tvop_loop it n σ)), τ) i = σ i.
+Proof.
+intros * Hnz Hit Hp * Hin.
+Print tvop_loop.
+...
 
 Theorem glop : ∀ it n (σ : nat → nat),
   n ≠ 0

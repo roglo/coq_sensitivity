@@ -18,6 +18,10 @@ Definition permut_comp {n} (σ₁ σ₂ : vector n nat) :=
 
 Notation "σ₁ ° σ₂" := (permut_comp σ₁ σ₂) (at level 40).
 
+Notation "'Comp' ( i ∈ l ) , g" :=
+  (iter_list l (λ c i, comp c g) (λ i, i))
+  (at level 35, i at level 0, l at level 60).
+
 Section a.
 
 Context {T : Type}.
@@ -3017,6 +3021,37 @@ split. {
   }
 }
 now apply canon_permut_permut_inv.
+Qed.
+
+Theorem comp_is_permut_fun : ∀ n (σ₁ σ₂ : nat → nat),
+  is_permut_fun σ₁ n
+  → is_permut_fun σ₂ n
+  → is_permut_fun (comp σ₁ σ₂) n.
+Proof.
+intros * Hp1 Hp2.
+split. {
+  intros i Hi.
+  now apply Hp1, Hp2.
+} {
+  intros i j Hi Hj Hc.
+  apply Hp2; [ easy | easy | ].
+  apply Hp1; [ now apply Hp2 | now apply Hp2 | easy ].
+}
+Qed.
+
+Theorem comp_list_is_permut_fun : ∀ n l,
+  (∀ σ, σ ∈ l → is_permut_fun σ n)
+  → is_permut_fun (Comp (σ ∈ l), σ) n.
+Proof.
+intros * Hl.
+induction l as [| σ]; [ easy | ].
+rewrite iter_list_cons; [ | easy | easy | easy ].
+apply comp_is_permut_fun. 2: {
+  apply IHl.
+  intros σ' Hσ'.
+  now apply Hl; right.
+}
+now apply Hl; left.
 Qed.
 
 End a.
