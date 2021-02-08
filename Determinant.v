@@ -799,8 +799,29 @@ destruct σ₀. {
         now destruct (Nat.eq_dec (σ j) j).
       }
       remember (comp (transposition j (σ j)) σ) as σ' eqn:Hσ'.
+      assert
+        (H2 : ∀ k, k < S it →
+         σ' k = if σ k =? j then σ j else if k =? j then j else σ k). {
+        rewrite Hσ'.
+        intros k Hk'; unfold comp, transposition.
+        do 4 rewrite if_eqb_eq_dec.
+        destruct (Nat.eq_dec (σ k) j) as [H2| H2]; [ easy | ].
+        destruct (Nat.eq_dec k j) as [H3| H3]. {
+          subst k.
+          rewrite <- if_eqb_eq_dec.
+          now rewrite Nat.eqb_refl.
+        }
+        destruct (Nat.eq_dec (σ k) (σ j)) as [H4| H4]; [ | easy ].
+        destruct Hp as (Hp1, Hp2).
+        exfalso.
+        apply Hp2 in H4; [ easy | easy | ].
+        rewrite <- H1.
+        rewrite Hσ'; unfold comp, transposition.
+        rewrite Nat.eqb_refl.
+        rewrite if_eqb_eq_dec.
+        destruct (Nat.eq_dec (σ j) j) as [H5| H5]; [ easy | ].
 ...
-      f_equal; rewrite <- Hσij.
+      }
 ...
       admit.
     }
