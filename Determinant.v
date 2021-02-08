@@ -751,6 +751,22 @@ destruct (Nat.eq_dec i (σ i)) as [Hii| Hii]. {
 }
 Qed.
 
+Theorem comp_is_permut_fun : ∀ n (σ₁ σ₂ : nat → nat),
+  is_permut_fun σ₁ n
+  → is_permut_fun σ₂ n
+  → is_permut_fun (comp σ₁ σ₂) n.
+Proof.
+intros * Hp1 Hp2.
+split. {
+  intros i Hi.
+  now apply Hp1, Hp2.
+} {
+  intros i j Hi Hj Hc.
+  apply Hp2; [ easy | easy | ].
+  apply Hp1; [ now apply Hp2 | now apply Hp2 | easy ].
+}
+Qed.
+
 Theorem glop : ∀ it n (σ : nat → nat),
   n ≠ 0
   → n ≤ it
@@ -799,6 +815,11 @@ destruct σ₀. {
         now destruct (Nat.eq_dec (σ j) j).
       }
       remember (comp (transposition j (σ j)) σ) as σ' eqn:Hσ'.
+      assert (Hp' : is_permut_fun σ' (S it)). {
+        rewrite Hσ'.
+        apply comp_is_permut_fun; [ | easy ].
+        apply transposition_is_permut_fun; [ | apply Hp ].
+...
       assert
         (H2 : ∀ k, k < S it →
          σ' k = if σ k =? j then σ j else if k =? j then j else σ k). {
