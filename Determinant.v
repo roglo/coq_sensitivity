@@ -831,6 +831,39 @@ destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
     split; [ flia | easy ].
   }
 }
+subst n.
+clear Hit Hnz.
+cbn.
+remember (σ 0) as σ₀ eqn:Hσ₀; symmetry in Hσ₀.
+destruct σ₀. {
+  remember (first_non_fixpoint it 1 σ) as x eqn:Hx; symmetry in Hx.
+  destruct x as [j| ]. {
+    apply first_non_fixpoint_Some_if in Hx.
+    destruct Hx as (Hj1 & Hj2 & Hj3).
+    cbn.
+    rewrite iter_list_cons; [ | easy | easy | easy ].
+    unfold comp.
+    remember (iter_list _ _ _) as σ' eqn:Hσ'.
+    unfold transposition.
+    do 2 rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec (σ' i) j) as [Hσij| Hσij]. {
+...
+      rewrite <- Hσij.
+      subst σ'.
+      unfold iter_list.
+      destruct it; [ easy | ].
+      cbn.
+      unfold transposition.
+      rewrite Hσ₀.
+      repeat rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec 0 j) as [H| H]; [ now subst j | clear H ].
+      destruct (Nat.eq_dec 0 (σ j)) as [H| H]. {
+        exfalso; apply Hj3.
+        apply Hp; try easy.
+        rewrite <- H; flia.
+        now rewrite <- H.
+      }
+      destruct (Nat.eq_dec (σ 1) j) as [H1| H1].
 ...
 
 Theorem iter_compose_transp_fun : ∀ n (σ : nat → nat),
