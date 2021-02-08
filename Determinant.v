@@ -748,6 +748,7 @@ destruct (Nat.eq_dec i (σ i)) as [Hii| Hii]. {
 }
 Qed.
 
+(*
 Fixpoint nb_of_fits n σ :=
   match n with
   | 0 => 0
@@ -774,7 +775,11 @@ destruct x as [i| ]. {
   rewrite iter_list_cons; [ | easy | easy | easy ].
   apply first_non_fixpoint_Some_if in Hx.
   destruct Hx as (Hk, Hi).
+  destruct n; [ easy | clear Hn ].
+  cbn.
+  induction n; cbn.
 ...
+*)
 
 Theorem glop : ∀ it n (σ : nat → nat),
   n ≠ 0
@@ -784,7 +789,65 @@ Theorem glop : ∀ it n (σ : nat → nat),
   → (Comp (τ ∈ map transp_fun_of_nat_pair (tvop_loop it n σ)), τ) i = σ i.
 Proof.
 intros * Hnz Hit Hp * Hin.
-Print tvop_loop.
+revert σ n i Hnz Hit Hp Hin.
+induction it; intros; [ flia Hnz Hit | ].
+destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
+  cbn.
+  remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
+  destruct x as [j| ]. {
+    apply first_non_fixpoint_Some_if in Hx.
+    destruct Hx as (Hj1, Hj2).
+    cbn.
+    rewrite iter_list_cons; [ | easy | easy | easy ].
+    unfold comp.
+    rewrite IHit; [ | easy | flia Hit Hnsit | | easy ]. {
+      apply transposition_involutive.
+    }
+...
+specialize (IHit (comp (transposition j (σ j)) σ)) as H1.
+specialize (H1 n i).
+    rewrite IHit; try easy; [ | flia Hit Hnsit | ]. {
+      unfold comp; cbn.
+      apply transposition_involutive.
+    }
+    admit.
+  }
+  unfold iter_list.
+  cbn.
+  admit.
+}
+subst n; cbn.
+clear Hit Hnz.
+remember (σ 0) as σ₀ eqn:Hσ₀; symmetry in Hσ₀.
+destruct σ₀. {
+  remember (first_non_fixpoint it 1 σ) as x eqn:Hx; symmetry in Hx.
+  destruct x as [j| ]. {
+    rewrite iter_list_cons; [ cbn | easy | easy | easy ].
+    apply first_non_fixpoint_Some_if in Hx.
+    destruct Hx as (Hk, Hj).
+    remember ((Comp (k ∈ _), _) _) as m eqn:Hm.
+    symmetry in Hm.
+    unfold transposition.
+    do 2 rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec m j) as [Hmj| Hmj]. {
+      move Hmj at top; subst m.
+      assert (H1 : comp (transposition j (σ j)) σ j = j). {
+        unfold comp, transposition.
+        rewrite Nat.eqb_refl.
+        rewrite if_eqb_eq_dec.
+        now destruct (Nat.eq_dec (σ j) j).
+      }
+      remember (comp (transposition j (σ j)) σ) as σ' eqn:Hσ'.
+      assert (Hp' : is_permut_fun σ' (S it)). {
+        rewrite Hσ'.
+        apply comp_is_permut_fun; [ | easy ].
+        apply transposition_is_permut_fun; [ | apply Hp ].
+        specialize comp_list_is_permut_fun as H2.
+        specialize (H2 (S it)).
+        specialize (H2 (map transp_fun_of_nat_pair (tvop_loop it (S it) σ'))).
+        assert (H : (∀ σ : nat → nat, σ ∈ map transp_fun_of_nat_pair (tvop_loop it (S it) σ') → is_permut_fun σ (S it))). {
+          intros σ'' H.
+...
 ...
 
 Theorem glop : ∀ it n (σ : nat → nat),
