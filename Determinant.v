@@ -767,6 +767,21 @@ split. {
 }
 Qed.
 
+Theorem comp_list_is_permut_fun : ∀ n l,
+  (∀ σ, σ ∈ l → is_permut_fun σ n)
+  → is_permut_fun (Comp (σ ∈ l), σ) n.
+Proof.
+intros * Hl.
+induction l as [| σ]; [ easy | ].
+rewrite iter_list_cons; [ | easy | easy | easy ].
+apply comp_is_permut_fun. 2: {
+  apply IHl.
+  intros σ' Hσ'.
+  now apply Hl; right.
+}
+now apply Hl; left.
+Qed.
+
 Theorem glop : ∀ it n (σ : nat → nat),
   n ≠ 0
   → n ≤ it
@@ -819,6 +834,11 @@ destruct σ₀. {
         rewrite Hσ'.
         apply comp_is_permut_fun; [ | easy ].
         apply transposition_is_permut_fun; [ | apply Hp ].
+        specialize comp_list_is_permut_fun as H2.
+        specialize (H2 (S it)).
+        specialize (H2 (map transp_fun_of_nat_pair (tvop_loop it (S it) σ'))).
+        assert (H : (∀ σ : nat → nat, σ ∈ map transp_fun_of_nat_pair (tvop_loop it (S it) σ') → is_permut_fun σ (S it))). {
+          intros σ'' H.
 ...
       assert
         (H2 : ∀ k, k < S it →
