@@ -729,23 +729,41 @@ Compute let σ := vect_of_list 0 [0;5;1;2;4;3] in let n := vect_size σ in list_
 
 Theorem first_non_fixpoint_Some_if : ∀ σ it i j,
   first_non_fixpoint it i σ = Some j
-  → (∀ k, i ≤ k < j → σ k = k) ∧ σ j ≠ j.
+  → j < i + it ∧ (∀ k, i ≤ k < j → σ k = k) ∧ σ j ≠ j.
 Proof.
 intros * Hs.
 revert σ i j Hs.
 induction it; intros; [ easy | cbn in Hs ].
 rewrite if_eqb_eq_dec in Hs.
 destruct (Nat.eq_dec i (σ i)) as [Hii| Hii]. {
-  specialize (IHit σ (i + 1) j Hs) as (H1, H2).
+  specialize (IHit σ (i + 1) j Hs) as (H1 & H2 & H3).
+  rewrite <- Nat.add_assoc in H1.
+  split; [ easy | ].
   split; [ | easy ].
   intros k Hk.
   destruct (Nat.eq_dec i k) as [Hik| Hik]; [ now subst k | ].
-  apply H1; flia Hk Hik.
+  apply H2; flia Hk Hik.
 } {
   injection Hs; clear Hs; intros; subst j.
+  split; [ flia | ].
   split; [ | now apply Nat.neq_sym ].
   intros k Hk; flia Hk.
 }
+Qed.
+
+Theorem first_non_fixpoint_None_if : ∀ σ it i,
+  first_non_fixpoint it i σ = None
+  → ∀ k, i ≤ k < i + it → k = σ k.
+Proof.
+intros * Hs k Hik.
+revert σ i k Hik Hs.
+induction it; intros; [ flia Hik | ].
+cbn in Hs.
+rewrite if_eqb_eq_dec in Hs.
+destruct (Nat.eq_dec i (σ i)) as [H1| H1]; [ | easy ].
+destruct (Nat.eq_dec i k) as [H2| H2]; [ now subst i | ].
+eapply IHit; [ | apply Hs ].
+flia Hik H2.
 Qed.
 
 (*
@@ -796,7 +814,7 @@ destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
   remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
   destruct x as [j| ]. {
     apply first_non_fixpoint_Some_if in Hx.
-    destruct Hx as (Hj1, Hj2).
+    destruct Hx as (Hj1 & Hj2 & Hj3).
     cbn.
     rewrite iter_list_cons; [ | easy | easy | easy ].
     unfold comp.
@@ -806,149 +824,13 @@ destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
     specialize comp_is_permut_fun as H1.
     specialize (H1 n (transposition j (σ j))).
     apply H1; [ | easy ].
-    apply transposition_is_permut_fun; [ | apply Hp ].
-...
-Check (is_permut_fun (transposition _ _)).
-...
-specialize (IHit (comp (transposition j (σ j)) σ)) as H1.
-specialize (H1 n i).
-    rewrite IHit; try easy; [ | flia Hit Hnsit | ]. {
-      unfold comp; cbn.
-      apply transposition_involutive.
-    }
-    admit.
+    apply transposition_is_permut_fun; [ easy | now apply Hp ].
+  } {
+    unfold iter_list; cbn.
+    apply first_non_fixpoint_None_if with (k := i) in Hx; [ easy | ].
+    split; [ flia | easy ].
   }
-  unfold iter_list.
-  cbn.
-  admit.
 }
-subst n; cbn.
-clear Hit Hnz.
-remember (σ 0) as σ₀ eqn:Hσ₀; symmetry in Hσ₀.
-destruct σ₀. {
-  remember (first_non_fixpoint it 1 σ) as x eqn:Hx; symmetry in Hx.
-  destruct x as [j| ]. {
-    rewrite iter_list_cons; [ cbn | easy | easy | easy ].
-    apply first_non_fixpoint_Some_if in Hx.
-    destruct Hx as (Hk, Hj).
-    remember ((Comp (k ∈ _), _) _) as m eqn:Hm.
-    symmetry in Hm.
-    unfold transposition.
-    do 2 rewrite if_eqb_eq_dec.
-    destruct (Nat.eq_dec m j) as [Hmj| Hmj]. {
-      move Hmj at top; subst m.
-      assert (H1 : comp (transposition j (σ j)) σ j = j). {
-        unfold comp, transposition.
-        rewrite Nat.eqb_refl.
-        rewrite if_eqb_eq_dec.
-        now destruct (Nat.eq_dec (σ j) j).
-      }
-      remember (comp (transposition j (σ j)) σ) as σ' eqn:Hσ'.
-      assert (Hp' : is_permut_fun σ' (S it)). {
-        rewrite Hσ'.
-        apply comp_is_permut_fun; [ | easy ].
-        apply transposition_is_permut_fun; [ | apply Hp ].
-        specialize comp_list_is_permut_fun as H2.
-        specialize (H2 (S it)).
-        specialize (H2 (map transp_fun_of_nat_pair (tvop_loop it (S it) σ'))).
-        assert (H : (∀ σ : nat → nat, σ ∈ map transp_fun_of_nat_pair (tvop_loop it (S it) σ') → is_permut_fun σ (S it))). {
-          intros σ'' H.
-...
-...
-
-Theorem glop : ∀ it n (σ : nat → nat),
-  n ≠ 0
-  → n ≤ it
-  → is_permut_fun σ n
-  → ∀ i, i < n
-  → (Comp (τ ∈ tvop_loop it n σ), transp_fun_of_nat_pair τ) i = σ i.
-Proof.
-intros * Hnz Hit Hp * Hin.
-revert σ n i Hnz Hit Hp Hin.
-induction it; intros; [ flia Hnz Hit | ].
-destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
-  cbn.
-  remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
-  destruct x as [j| ]. {
-    rewrite iter_list_cons; [ | easy | easy | easy ].
-    cbn.
-    rewrite IHit; try easy; [ | flia Hit Hnsit | ]. {
-      unfold comp; cbn.
-      apply transposition_involutive.
-    }
-    admit.
-  }
-  unfold iter_list.
-  cbn.
-  admit.
-}
-subst n; cbn.
-clear Hit Hnz.
-remember (σ 0) as σ₀ eqn:Hσ₀; symmetry in Hσ₀.
-destruct σ₀. {
-  remember (first_non_fixpoint it 1 σ) as x eqn:Hx; symmetry in Hx.
-  destruct x as [j| ]. {
-    rewrite iter_list_cons; [ cbn | easy | easy | easy ].
-    apply first_non_fixpoint_Some_if in Hx.
-    destruct Hx as (Hk, Hj).
-    remember ((Comp (k ∈ _), _) _) as m eqn:Hm.
-    symmetry in Hm.
-    unfold transposition.
-    do 2 rewrite if_eqb_eq_dec.
-    destruct (Nat.eq_dec m j) as [Hmj| Hmj]. {
-      move Hmj at top; subst m.
-      assert (H1 : comp (transposition j (σ j)) σ j = j). {
-        unfold comp, transposition.
-        rewrite Nat.eqb_refl.
-        rewrite if_eqb_eq_dec.
-        now destruct (Nat.eq_dec (σ j) j).
-      }
-      remember (comp (transposition j (σ j)) σ) as σ' eqn:Hσ'.
-      assert (Hp' : is_permut_fun σ' (S it)). {
-        rewrite Hσ'.
-        apply comp_is_permut_fun; [ | easy ].
-        apply transposition_is_permut_fun; [ | apply Hp ].
-        specialize comp_list_is_permut_fun as H2.
-        specialize (H2 (S it)).
-        specialize (H2 (map transp_fun_of_nat_pair (tvop_loop it (S it) σ'))).
-        assert (H : (∀ σ : nat → nat, σ ∈ map transp_fun_of_nat_pair (tvop_loop it (S it) σ') → is_permut_fun σ (S it))). {
-          intros σ'' H.
-...
-      assert
-        (H2 : ∀ k, k < S it →
-         σ' k = if σ k =? j then σ j else if k =? j then j else σ k). {
-        rewrite Hσ'.
-        intros k Hk'; unfold comp, transposition.
-        do 4 rewrite if_eqb_eq_dec.
-        destruct (Nat.eq_dec (σ k) j) as [H2| H2]; [ easy | ].
-        destruct (Nat.eq_dec k j) as [H3| H3]. {
-          subst k.
-          rewrite <- if_eqb_eq_dec.
-          now rewrite Nat.eqb_refl.
-        }
-        destruct (Nat.eq_dec (σ k) (σ j)) as [H4| H4]; [ | easy ].
-        destruct Hp as (Hp1, Hp2).
-        exfalso.
-        apply Hp2 in H4; [ easy | easy | ].
-        rewrite <- H1.
-        rewrite Hσ'; unfold comp, transposition.
-        rewrite Nat.eqb_refl.
-        rewrite if_eqb_eq_dec.
-        destruct (Nat.eq_dec (σ j) j) as [H5| H5]; [ easy | ].
-...
-      }
-...
-      admit.
-    }
-    destruct (Nat.eq_dec (σ' i) (σ j)) as [Hσσ| Hσσ]. {
-      admit.
-    }
-    admit.
-  }
-  admit.
-}
-...
-      rewrite <- Hσ'; cbn.
 ...
 
 Theorem iter_compose_transp_fun : ∀ n (σ : nat → nat),
