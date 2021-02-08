@@ -803,6 +803,12 @@ destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
     rewrite IHit; [ | easy | flia Hit Hnsit | | easy ]. {
       apply transposition_involutive.
     }
+    specialize comp_is_permut_fun as H1.
+    specialize (H1 n (transposition j (σ j))).
+    apply H1; [ | easy ].
+    apply transposition_is_permut_fun; [ | apply Hp ].
+...
+Check (is_permut_fun (transposition _ _)).
 ...
 specialize (IHit (comp (transposition j (σ j)) σ)) as H1.
 specialize (H1 n i).
