@@ -853,6 +853,7 @@ destruct it. {
   now apply Nat.lt_1_r in Hj1; subst j.
 }
 cbn in Hσ'.
+Abort. (*
 ...
     unfold comp.
     remember (iter_list _ _ _) as σ' eqn:Hσ'.
@@ -877,6 +878,7 @@ cbn in Hσ'.
       }
       destruct (Nat.eq_dec (σ 1) j) as [H1| H1].
 ...
+*)
 
 Theorem iter_compose_transp_fun : ∀ n (σ : nat → nat),
   n ≠ 0
@@ -885,6 +887,7 @@ Theorem iter_compose_transp_fun : ∀ n (σ : nat → nat),
   → (Comp (τ ∈ transp_list_of_permut_fun n σ), transp_fun_of_nat_pair τ) i = σ i.
 Proof.
 intros * Hnz Hp * Hin.
+Abort. (*
 ...
 apply glop.
 ...
@@ -907,22 +910,25 @@ remember (S n) as sn; cbn; subst sn.
 remember (σ 0) as σ₀ eqn:Hσ₀; symmetry in Hσ₀.
 destruct σ₀. {
 ...
+*)
 
 Theorem iter_compose_transp : ∀ n (σ : vector n nat),
   is_permut σ
   → Comp (τ ∈ transp_list_of_permut σ), transp_fun_of_nat_pair τ = vect_el σ.
 Proof.
 intros * Hp.
+Abort. (*
 ...
 apply iter_compose_transp_fun.
 easy.
 ...
+*)
 
 Theorem iter_transp_list_of_permut : ∀ n (σ : vector n nat),
   is_permut σ
   → iter_list (transp_list_of_permut σ)
        (λ σ τ, σ ° transp_of_nat_pair n τ) (mk_vect n (λ i, i)) = σ.
-...
+Abort.
 
 Theorem iter_transp_list_of_permut : ∀ n (σ : vector n nat),
   is_permut σ
@@ -932,7 +938,9 @@ Proof.
 intros * Hp.
 unfold iter_list.
 rewrite List_fold_left_map.
+Abort. (*
 ...
+*)
 
 (*
 Theorem glop : ∀ n (σ : vector n nat) it,
@@ -1064,7 +1072,7 @@ apply vector_eq.
 intros i Hi; cbn.
 cbn.
 unfold transp_list_of_permut_fun.
-Print tvop_loop.
+Abort. (*
 ...
 intros * Hp.
 apply vector_eq.
@@ -1079,6 +1087,7 @@ cbn.
 unfold transp_of_nat_pair.
 cbn.
 ...
+*)
 
 Theorem glop : ∀ n σ,
   n ≠ 0
@@ -1091,10 +1100,12 @@ intros * Hnz Hp * Hit.
 destruct it; [ flia Hnz Hit | ].
 cbn.
 remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
+Abort. (*
 destruct x as [(i, j)| ]. {
   cbn.
   unfold iter_list; cbn.
 ...
+*)
 
 Theorem apply_transp_list_of_permut_is_id : ∀ n (σ : nat → nat),
   is_permut_fun σ n
@@ -1105,7 +1116,9 @@ Theorem apply_transp_list_of_permut_is_id : ∀ n (σ : nat → nat),
 Proof.
 intros * Hp k.
 unfold transp_list_of_permut_fun.
+Abort. (*
 ...
+*)
 
 Theorem determinant_alternating_permut_fun :
   rngl_is_comm = true →
