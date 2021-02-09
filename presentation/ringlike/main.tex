@@ -118,7 +118,7 @@
     \end{tabular}
   \end{center}
 
-  \vsp
+  \vspace{1mm}
 
   \only<2-3>{
     \begin{tabular}{ll}
@@ -131,12 +131,47 @@
     \end{tabular}
   }
 
+  \only<4-6>{
+    \begin{tabular}{l}
+      x * y = y * x \\
+      \only<5-6>{
+        apply mul\_comm. \\
+        \only<6-6>{
+          Unable to unify \\
+          \hsp "if is\_comm then $\forall$ a b, a * b = b * a \\
+          \hsp else not\_applicable" with x * y = y * x.}}
+    \end{tabular}
+  }
+
+  \only<7>{
+    \begin{tabular}{l}
+      Theorem mul\_comm' : \\
+      \hsp is\_comm = true
+      $\rightarrow$ $\forall$ a b, a * b = b * a.
+    \end{tabular}
+  }
+
+}
+
+\frm{Axiom Instanciation \& Application - 2}{
+
+  \begin{center}
+    \begin{tabular}{ll}
+      \only<3->{& is\_comm : bool; \\}
+      & mul\_1\_l : $\forall$ a, 1 * a = a; \\
+      \only<2>{& mul\_1\_r : $\forall$ a, a * 1 = a; \\}
+      \only<3->{
+        & mul\_1\_r : \\
+        & \hsp if is\_comm then not\_applicable \\
+        & \hsp else $\forall$ a, a * 1 = a; \\}
+    \end{tabular}
+  \end{center}
+
+  \vspace{1mm}
+
   \only<4>{
     \begin{tabular}{l}
-      apply mul\_comm. \\
-      Unable to unify \\
-      \hsp "if is\_comm then $\forall$ a b, a * b = b * a \\
-      \hsp else not\_applicable" with x * y = y * x.
+      Theorem mul\_1\_r' : $\forall$ a, a * 1 = a. \\
     \end{tabular}
   }
 
