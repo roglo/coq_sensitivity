@@ -1136,8 +1136,8 @@ Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hp.
 (* prove that any permutation is a sequence of transpositions
    then apply determinant alternating in sequence *)
-...
 Check determinant_alternating.
+...
 Check det_is_det_by_any_permut.
 Print determinant'_list.
 ...
