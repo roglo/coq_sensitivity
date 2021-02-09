@@ -28,11 +28,11 @@ Fixpoint det_loop {n} (M : matrix n n T) i :=
       minus_one_pow j * mat_el M 0 j * det_loop (subm M 0 j) i'
   end.
 
-Definition mat_permut_fun_rows n (σ : nat → nat) (M : matrix n n T) :=
+Definition mat_permut_rows_fun n (σ : nat → nat) (M : matrix n n T) :=
   mk_mat n n (λ i j, mat_el M (σ i) j).
 
 Definition mat_permut_rows n (σ : vector n nat) (M : matrix n n T) :=
-  mat_permut_fun_rows (vect_el σ) M.
+  mat_permut_rows_fun (vect_el σ) M.
 
 Definition determinant {n} (M : matrix n n T) := det_loop M n.
 
@@ -1131,7 +1131,7 @@ Theorem determinant_alternating_permut_fun :
   ∀ n (M : matrix n n T) σ,
   n ≠ 0
   → is_permut_fun σ n
-  → determinant (mat_permut_fun_rows σ M) = (ε_fun σ n * determinant M)%F.
+  → determinant (mat_permut_rows_fun σ M) = (ε_fun σ n * determinant M)%F.
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hp.
 (* prove that any permutation is a sequence of transpositions
