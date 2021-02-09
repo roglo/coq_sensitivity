@@ -107,7 +107,7 @@
 
 }
 
-\frm{Problem}{
+\frm{Axiom Instanciation \& Application}{
 
   \begin{center}
     \begin{tabular}{l}
@@ -123,7 +123,7 @@
   \only<2-3>{
     \begin{tabular}{ll}
       \only<2-3>{\underline{nat}} &
-      \only<3-3>{\underline{matrices}} \\
+      \only<3-3>{\underline{matrix}} \\
       \only<2-3>{is\_comm := true;} &
       \only<3-3>{is\_comm := false;} \\
       \only<2-3>{mul\_comm := Nat.mul\_comm;} &
@@ -136,7 +136,7 @@
       apply mul\_comm. \\
       Unable to unify \\
       \hsp "if is\_comm then $\forall$ a b, a * b = b * a \\
-      \hsp else not\_applicable" with a * b = b * a.
+      \hsp else not\_applicable" with x * y = y * x.
     \end{tabular}
   }
 
