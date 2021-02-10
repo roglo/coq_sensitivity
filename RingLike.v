@@ -1154,6 +1154,17 @@ subst a.
 now apply rngl_mul_inv_r.
 Qed.
 
+Theorem rngl_mul_sub_distr_l : ∀ a b c,
+  (a * (b - c) = a * b - a * c)%F.
+Proof.
+intros.
+remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
+destruct op. 2: {
+  specialize rngl_opt_add_sub_simpl_l as H1.
+  rewrite Hop in H1.
+(* ah bin non, je peux pas le démontrer *)
+...
+
 End a.
 
 Arguments rngl_add_opp_l {T}%type {ro rp} Hro.
