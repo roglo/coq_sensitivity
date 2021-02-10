@@ -848,11 +848,6 @@ destruct x as [j| ]. {
     rewrite Hτ.
     unfold transposition.
     rewrite Nat.eqb_refl.
-destruct it. {
-  apply Nat.lt_1_r in Hin; subst i.
-  now apply Nat.lt_1_r in Hj1; subst j.
-}
-cbn in Hσ'.
 Abort. (*
 ...
     unfold comp.
@@ -1116,7 +1111,6 @@ Theorem apply_transp_list_of_permut_is_id : ∀ n (σ : nat → nat),
 Proof.
 intros * Hp k.
 unfold transp_list_of_permut_fun.
-Abort. (*
 ...
 *)
 
