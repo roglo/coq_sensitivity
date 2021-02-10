@@ -1163,7 +1163,7 @@ destruct op. 2: {
   specialize rngl_opt_add_sub_simpl_l as H1.
   rewrite Hop in H1.
 (* ah bin non, je peux pas le démontrer *)
-...
+  Abort.
 
 End a.
 
