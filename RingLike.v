@@ -28,6 +28,9 @@
      - ordered or not
      - totally ordered or not
      - valuated or not
+     - principal or not
+     - factorial or not
+     - euclidean or not
      - with associative addition or multiplication or not
      - with commutative addition or not
      - with 0 or without, right or left
