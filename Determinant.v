@@ -848,6 +848,9 @@ destruct x as [j| ]. {
     rewrite Hτ.
     unfold transposition.
     rewrite Nat.eqb_refl.
+    destruct (Nat.eq_dec i j) as [Heij| Heij]; [ now subst i | ].
+    exfalso.
+    destruct (Nat.eq_dec (σ i) j) as [Hisj| Hisj]. {
 ...
     unfold comp.
     remember (iter_list _ _ _) as σ' eqn:Hσ'.
