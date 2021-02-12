@@ -121,10 +121,12 @@ Class ring_like_prop T {ro : ring_like_op T} :=
        else ∀ a b c : T, (a + b - (a + c) = b - c)%F;
     rngl_opt_sub_0_r :
       if rngl_has_opp then not_applicable else ∀ a, (a - 0 = a)%F;
-    rngl_opt_mul_0_l :
-      if rngl_has_opp then not_applicable else ∀ a, (0 * a = 0)%F;
-    rngl_opt_mul_0_r :
-      if rngl_has_opp then not_applicable else ∀ a, (a * 0 = 0)%F;
+    rngl_opt_mul_sub_distr_l :
+      if rngl_has_opp then not_applicable
+      else ∀ a b c : T, (a * (b - c) = a * b - a * c)%F;
+    rngl_opt_mul_sub_distr_r :
+      if (rngl_has_opp || rngl_is_comm)%bool then not_applicable
+      else ∀ a b c : T, ((a - b) * c = a * c - b * c)%F;
     (* when has inverse *)
     rngl_opt_mul_inv_l :
       if rngl_has_inv then ∀ a : T, a ≠ 0%F → (¹/ a * a = 1)%F

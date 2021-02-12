@@ -1111,6 +1111,7 @@ Theorem apply_transp_list_of_permut_is_id : ∀ n (σ : nat → nat),
 Proof.
 intros * Hp k.
 unfold transp_list_of_permut_fun.
+Abort. (*
 ...
 *)
 
