@@ -871,6 +871,8 @@ destruct x as [i| ]. {
     destruct n; [ easy | ].
     destruct Hk as [Hk| Hk]; [ subst k; flia | easy ].
   }
+Print first_non_transp.
+...
   destruct Hk as [Hk| Hk]. {
     subst k.
     destruct Hx as (Hj & Hk & Hsj).
