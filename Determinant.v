@@ -881,6 +881,13 @@ destruct x as [j| ]. {
   destruct Hx as (Hj1 & Hj2 & Hj3).
   cbn - [ where_is ].
   rewrite iter_list_cons; [ | easy | easy | easy ].
+  remember (where_is (S it) σ j) as k eqn:Hk.
+  destruct (lt_dec i j) as [Hij| Hij]. {
+    specialize (Hj2 i) as H1.
+    assert (H : 0 ≤ i < j) by flia Hij.
+    specialize (H1 H); clear H.
+    rewrite H1.
+...
   remember (transposition j (σ j)) as τ eqn:Hτ.
   remember (Comp (f ∈ _), _) as σ' eqn:Hσ'.
   unfold comp.
