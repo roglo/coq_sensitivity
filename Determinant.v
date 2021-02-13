@@ -674,7 +674,7 @@ Fixpoint first_non_fixpoint it i σ :=
   | S it' => if i =? σ i then first_non_fixpoint it' (i + 1) σ else Some i
   end.
 
-Fixpoint tvop_loop it n (σ : nat → nat) :=
+Fixpoint tlopf_loop it n (σ : nat → nat) :=
   match it with
   | 0 => []
   | S it' =>
@@ -682,11 +682,11 @@ Fixpoint tvop_loop it n (σ : nat → nat) :=
       | None => []
       | Some i =>
           let σ' := comp (transposition i (σ i)) σ in
-          (i, σ i) :: tvop_loop it' n σ'
+          (i, σ i) :: tlopf_loop it' n σ'
       end
   end.
 
-Definition transp_list_of_permut_fun n (σ : nat → nat) := tvop_loop n n σ.
+Definition transp_list_of_permut_fun n (σ : nat → nat) := tlopf_loop n n σ.
 
 Definition transp_list_of_permut {n} (σ : vector n nat) :=
   transp_list_of_permut_fun n (vect_el σ).
@@ -782,7 +782,7 @@ Theorem glop : ∀ it n σ,
   → nb_of_fits n σ < n
   → nb_of_fits n σ <
      nb_of_fits n
-       (Comp (τ ∈ map transp_fun_of_nat_pair (tvop_loop it n σ)), τ).
+       (Comp (τ ∈ map transp_fun_of_nat_pair (tlopf_loop it n σ)), τ).
 Proof.
 intros * Hit Hn.
 revert n σ Hn.
@@ -804,7 +804,7 @@ Theorem glop : ∀ it n (σ : nat → nat),
   → n ≤ it
   → is_permut_fun σ n
   → ∀ i, i < n
-  → (Comp (τ ∈ map transp_fun_of_nat_pair (tvop_loop it n σ)), τ) i = σ i.
+  → (Comp (τ ∈ map transp_fun_of_nat_pair (tlopf_loop it n σ)), τ) i = σ i.
 Proof.
 intros * Hnz Hit Hp * Hin.
 revert σ n i Hnz Hit Hp Hin.
@@ -945,7 +945,7 @@ Theorem glop : ∀ n (σ : vector n nat) it,
   → n ≤ it
   → ∀ i, i < n →
   vect_el
-    (iter_list (map (transp_of_nat_pair n) (tvop_loop it n (vect_el σ)))
+    (iter_list (map (transp_of_nat_pair n) (tlopf_loop it n (vect_el σ)))
        (λ σ τ, τ ° σ) σ) i = i.
 Proof.
 intros * Hp Hit * Hin.
@@ -1091,7 +1091,7 @@ Theorem glop : ∀ n σ,
   → is_permut_fun σ n
   → ∀ k it,
     n ≤ it
-    → iter_list (map transp_fun_of_nat_pair (tvop_loop n it σ)) comp σ k = k.
+    → iter_list (map transp_fun_of_nat_pair (tlopf_loop n it σ)) comp σ k = k.
 Proof.
 intros * Hnz Hp * Hit.
 destruct it; [ flia Hnz Hit | ].
