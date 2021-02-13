@@ -918,6 +918,27 @@ symmetry.
 apply Hkk; flia Hj.
 Qed.
 
+Theorem Comp_tfonp_tlopf : ∀ σ it n i,
+  σ i = i
+  → (Comp (j ∈ map transp_fun_of_nat_pair (tlopf_loop' it n σ)), j) i = i.
+Proof.
+intros * Hii.
+revert σ n i Hii.
+induction it; intros; [ easy | ].
+cbn.
+remember (first_non_transp n σ) as x eqn:Hx; symmetry in Hx.
+destruct x as [(i', j')| ]. {
+  apply first_non_transp_Some_if in Hx.
+  destruct Hx as (Hjn & Hkn & Hi & Hj & Hkj).
+  cbn.
+  rewrite iter_list_cons; [ | easy | easy | easy ].
+  unfold comp at 1.
+  rewrite IHit. 2: {
+    unfold comp, transposition.
+    do 2 rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec (σ i) i') as [H| H].
+...
+
 Theorem glop : ∀ it n (σ : nat → nat),
   n ≠ 0
   → n ≤ it
@@ -972,7 +993,59 @@ destruct x as [(j, k)| ]. {
   destruct (lt_dec i j) as [Hij| Hij]. {
     specialize (Hj _ Hij) as H1.
     rewrite H1.
+    remember (Comp (m ∈ _), _) as σ' eqn:Hσ'.
+    enough (H : σ' i = i). {
+      unfold comp; rewrite H.
+      unfold transposition.
+      do 2 rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec i j) as [H2| H2]; [ flia H2 Hij | clear H2 ].
+      destruct (Nat.eq_dec i k) as [H2| H2]; [ | easy ].
+      congruence.
+    }
+    subst σ'.
+    enough
+      (H :
+       (Comp
+          (m ∈ map transp_fun_of_nat_pair (tlopf_loop' it n σ)), m) i = i). {
+...
+apply Comp_tfonp_tlopf.
+...
+      clear.
+      revert j k.
+      induction it; intros; [ easy | ].
+      cbn.
+      remember (first_non_transp n (comp (transposition j k) σ)) as x eqn:Hx.
+      symmetry in Hx.
+      destruct x as [(i', j')| ]. {
+        cbn.
+        rewrite iter_list_cons; [ | easy | easy | easy ].
+        unfold comp at 1.
+        rewrite IHit.
+...
+    enough (Hk : j < k).
     unfold comp at 1.
+    clear IHit Hnsit.
+    clear Hj Hjj Hkj H1.
+    revert σ Hp.
+    revert j k Hjn Hkn Hij Hk.
+    induction it; intros. {
+      cbn.
+      unfold iter_list; cbn.
+      unfold transposition.
+      do 2 rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec i j) as [H| H]; [ flia Hij H | clear H ].
+      destruct (Nat.eq_dec i k) as [H| H]; [ | easy ].
+      flia Hij Hk H.
+    }
+    cbn.
+    remember (first_non_transp n (comp (transposition j k) σ)) as x eqn:Hx.
+    symmetry in Hx.
+    destruct x as [(i', j')| ]. {
+      cbn.
+      rewrite iter_list_cons; [ | easy | easy | easy ].
+      unfold comp at 1; cbn.
+      apply first_non_transp_Some_if in Hx.
+      rewrite IHit; try easy.
 ...
 remember (first_non_fixpoint (S it) 0 σ) as x eqn:Hx; symmetry in Hx.
 destruct x as [j| ]. {
