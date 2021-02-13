@@ -697,14 +697,23 @@ Fixpoint where_is n (σ : nat → nat) i :=
   | S n' => if σ n' =? i then n' else where_is n' σ i
   end.
 
+Definition first_non_transp it n (σ : nat → nat) :=
+  match it with
+  | 0 => None
+  | S it' =>
+      match first_non_fixpoint n 0 σ with
+      | None => None
+      | Some i => Some (i, where_is n σ i)
+      end
+  end.
+
 Fixpoint tlopf_loop' it n (σ : nat → nat) :=
   match it with
   | 0 => []
   | S it' =>
-      match first_non_fixpoint n 0 σ with
+      match first_non_transp n 0 σ with
       | None => []
-      | Some i =>
-          let j := where_is n σ i in
+      | Some (i, j) =>
           let σ' := comp (transposition i j) σ in
           (i, j) :: tlopf_loop' it' n σ'
       end
@@ -840,6 +849,11 @@ revert σ n i Hnz Hit Hp Hin.
 induction it; intros; [ flia Hnz Hit | ].
 destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
   cbn.
+  remember (first_non_transp n 0 σ) as x eqn:Hx; symmetry in Hx.
+  destruct x as [(j, k)| ]. {.
+...
+    apply first_non_transp_Some_if in Hx.
+..
   remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
   destruct x as [j| ]. {
     apply first_non_fixpoint_Some_if in Hx.
