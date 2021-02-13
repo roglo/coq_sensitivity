@@ -833,6 +833,25 @@ destruct x as [i| ]. {
 ...
 *)
 
+Theorem where_is_prop : ∀ n σ i j,
+  where_is n σ i = j
+  → j = 0 ∨ (σ j = i ∧ j < n).
+Proof.
+intros * Hw.
+revert i j Hw.
+induction n; intros; [ now left | ].
+cbn in Hw.
+rewrite if_eqb_eq_dec in Hw.
+destruct (Nat.eq_dec (σ n) i) as [H1| H1]. {
+  subst j; right.
+  split; [ easy | flia ].
+}
+specialize (IHn i j Hw) as H2.
+destruct H2 as [H2| H2]; [ now left | ].
+right; split; [ easy | ].
+flia H2.
+Qed.
+
 Theorem first_non_transp_Some_if : ∀ n σ j k,
   first_non_transp n σ = Some (j, k)
   → j < n ∧ k < n ∧
@@ -847,27 +866,19 @@ destruct x as [i| ]. {
   injection Hfnt; clear Hfnt; intros Hk Hi; subst i.
   apply first_non_fixpoint_Some_if in Hx.
   split; [ easy | ].
+  apply where_is_prop in Hk.
   split. {
-Print where_is.
-Theorem where_is_prop : ∀ n σ i j,
-  where_is n σ n = j
-  → j = 0 ∨ σ j = i.
-Proof.
-intros * Hw.
-revert i j Hw.
-induction n; intros; [ now left | ].
-cbn in Hw.
-rewrite if_eqb_eq_dec in Hw.
-destruct (Nat.eq_dec (σ n) (S n)) as [H1| H1]. {
-  subst j.
-  apply IHn.
-  destruct n; [ easy | cbn ].
-  rewrite if_eqb_eq_dec.
-...
-    unfold where_is in Hk.
-...
-induction n; intros; [ easy | easy ].
-
+    destruct n; [ easy | ].
+    destruct Hk as [Hk| Hk]; [ subst k; flia | easy ].
+  }
+  destruct Hk as [Hk| Hk]. {
+    subst k.
+    destruct Hx as (Hj & Hk & Hsj).
+    split. {
+      intros i Hi.
+      apply Hk; split; [ flia | easy ].
+    }
+    split; [ easy | ].
 ...
 
 Theorem glop : ∀ it n (σ : nat → nat),
