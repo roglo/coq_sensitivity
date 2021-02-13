@@ -697,21 +697,17 @@ Fixpoint where_is n (σ : nat → nat) i :=
   | S n' => if σ n' =? i then n' else where_is n' σ i
   end.
 
-Definition first_non_transp it n (σ : nat → nat) :=
-  match it with
-  | 0 => None
-  | S it' =>
-      match first_non_fixpoint n 0 σ with
-      | None => None
-      | Some i => Some (i, where_is n σ i)
-      end
+Definition first_non_transp n (σ : nat → nat) :=
+  match first_non_fixpoint n 0 σ with
+  | None => None
+  | Some i => Some (i, where_is n σ i)
   end.
 
 Fixpoint tlopf_loop' it n (σ : nat → nat) :=
   match it with
   | 0 => []
   | S it' =>
-      match first_non_transp n 0 σ with
+      match first_non_transp n σ with
       | None => []
       | Some (i, j) =>
           let σ' := comp (transposition i j) σ in
@@ -836,6 +832,43 @@ destruct x as [i| ]. {
   induction n; cbn.
 ...
 *)
+
+Theorem first_non_transp_Some_if : ∀ n σ j k,
+  first_non_transp n σ = Some (j, k)
+  → j < n ∧ k < n ∧
+    (∀ i, i < j → σ i = i) ∧
+    σ j ≠ j ∧
+    σ k = j.
+Proof.
+intros * Hfnt.
+unfold first_non_transp in Hfnt.
+remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
+destruct x as [i| ]. {
+  injection Hfnt; clear Hfnt; intros Hk Hi; subst i.
+  apply first_non_fixpoint_Some_if in Hx.
+  split; [ easy | ].
+  split. {
+Print where_is.
+Theorem where_is_prop : ∀ n σ i j,
+  where_is n σ n = j
+  → j = 0 ∨ σ j = i.
+Proof.
+intros * Hw.
+revert i j Hw.
+induction n; intros; [ now left | ].
+cbn in Hw.
+rewrite if_eqb_eq_dec in Hw.
+destruct (Nat.eq_dec (σ n) (S n)) as [H1| H1]. {
+  subst j.
+  apply IHn.
+  destruct n; [ easy | cbn ].
+  rewrite if_eqb_eq_dec.
+...
+    unfold where_is in Hk.
+...
+induction n; intros; [ easy | easy ].
+
+...
 
 Theorem glop : ∀ it n (σ : nat → nat),
   n ≠ 0
