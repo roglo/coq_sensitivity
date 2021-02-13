@@ -884,8 +884,10 @@ destruct x as [j| ]. {
   remember (transposition j (σ j)) as τ eqn:Hτ.
   remember (Comp (f ∈ _), _) as σ' eqn:Hσ'.
   unfold comp.
-...
+  unfold transposition.
+  do 2 rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec (σ' i) j) as [Hij| Hij]. {
+...
     rewrite Hij.
     rewrite Hτ.
     unfold transposition.
