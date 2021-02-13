@@ -854,6 +854,21 @@ specialize (IHn i j Hw) as H2.
 split; [ easy | flia H2 ].
 Qed.
 
+Theorem where_is_None_if : ∀ n σ i,
+  where_is n σ i = None
+  → ∀ j, j < n → σ j ≠ i.
+Proof.
+intros * Hw j Hj.
+revert i j Hw Hj.
+induction n; intros; [ easy | ].
+cbn in Hw.
+rewrite if_eqb_eq_dec in Hw.
+destruct (Nat.eq_dec (σ n) i) as [H1| H1]; [ easy | ].
+destruct (Nat.eq_dec j n) as [Hjn| Hjn]; [ now subst j | ].
+apply IHn; [ easy | ].
+flia Hj Hjn.
+Qed.
+
 Theorem first_non_transp_Some_if : ∀ n σ j k,
   first_non_transp n σ = Some (j, k)
   → j < n ∧ k < n ∧
@@ -878,6 +893,31 @@ intros j Hm.
 apply Hk; flia Hm.
 Qed.
 
+Theorem first_non_transp_None_if : ∀ n σ,
+  first_non_transp n σ = None
+  → match first_non_fixpoint n 0 σ with
+     | Some i => (∀ j, j < i → j = σ j) ∧ where_is n σ i = None
+     | None => ∀ k, k < n → k = σ k
+    end.
+Proof.
+intros * Hfnt.
+unfold first_non_transp in Hfnt.
+remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
+destruct x as [i| ]. 2: {
+  intros k Hk.
+  specialize first_non_fixpoint_None_if as H1.
+  apply (H1 σ n 0 Hx).
+  split; [ flia | easy ].
+}
+destruct (where_is n σ i); [ easy | ].
+split; [ | easy ].
+apply first_non_fixpoint_Some_if in Hx.
+destruct Hx as (Hin & Hkk & Hii).
+intros j Hj.
+symmetry.
+apply Hkk; flia Hj.
+Qed.
+
 Theorem glop : ∀ it n (σ : nat → nat),
   n ≠ 0
   → n ≤ it
@@ -891,14 +931,9 @@ induction it; intros; [ flia Hnz Hit | ].
 destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
   cbn.
   remember (first_non_transp n σ) as x eqn:Hx; symmetry in Hx.
-  destruct x as [(j, k)| ]. {.
+  destruct x as [(j, k)| ]. {
     apply first_non_transp_Some_if in Hx.
     destruct Hx as (Hjn & Hkn & Hii & Hj & Hkj).
-..
-  remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
-  destruct x as [j| ]. {
-    apply first_non_fixpoint_Some_if in Hx.
-    destruct Hx as (Hj1 & Hj2 & Hj3).
     cbn.
     rewrite iter_list_cons; [ | easy | easy | easy ].
     unfold comp.
@@ -906,6 +941,22 @@ destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
       apply transposition_involutive.
     }
     specialize comp_is_permut_fun as H1.
+    apply (H1 _ (transposition j k) σ); [ | easy ].
+    now apply transposition_is_permut_fun.
+  }
+  cbn.
+  unfold iter_list; cbn.
+  apply first_non_transp_None_if in Hx.
+  remember (first_non_fixpoint n 0 σ) as y eqn:Hy; symmetry in Hy.
+  destruct y as [j| ]. {
+    apply first_non_fixpoint_Some_if in Hy.
+    destruct Hx as (Hx & Hnj).
+    specialize where_is_None_if as H1.
+    specialize (H1 _ _ _ Hnj).
+    apply Hx.
+    apply Nat.nle_gt; intros H2.
+...
+    specialize (H1 n).
     specialize (H1 n (transposition j (where_is n σ j))).
     apply H1; [ | easy ].
     apply transposition_is_permut_fun; [ easy | ].
