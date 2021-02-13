@@ -839,21 +839,19 @@ destruct x as [i| ]. {
 
 Theorem where_is_Some_if : ∀ n σ i j,
   where_is n σ i = Some j
-  → j = 0 ∨ (σ j = i ∧ j < n).
+  → σ j = i ∧ j < n.
 Proof.
 intros * Hw.
 revert i j Hw.
-induction n; intros; [ now left | ].
+induction n; intros; [ easy | ].
 cbn in Hw.
 rewrite if_eqb_eq_dec in Hw.
 destruct (Nat.eq_dec (σ n) i) as [H1| H1]. {
-  injection Hw; intros; subst j; right.
+  injection Hw; intros; subst j.
   split; [ easy | flia ].
 }
 specialize (IHn i j Hw) as H2.
-destruct H2 as [H2| H2]; [ now left | ].
-right; split; [ easy | ].
-flia H2.
+split; [ easy | flia H2 ].
 Qed.
 
 Theorem first_non_transp_Some_if : ∀ n σ j k,
@@ -866,42 +864,19 @@ Proof.
 intros * Hfnt.
 unfold first_non_transp in Hfnt.
 remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
-destruct x as [i| ]. {
-  apply first_non_fixpoint_Some_if in Hx.
-  destruct Hx as (Hj & Hk & Hsj).
-  remember (where_is n σ i) as y eqn:Hy; symmetry in Hy.
-  destruct y as [m| ]. {
-    injection Hfnt; clear Hfnt; intros; subst m j.
-    apply where_is_Some_if in Hy.
-    split; [ easy | ].
-    destruct Hy as [Hy| Hy]. {
-      subst k.
-      split; [ flia Hj | ].
-      split. {
-        intros j Hm.
-        apply Hk; flia Hm.
-      }
-      split; [ easy | ].
-...
-  injection Hfnt; clear Hfnt; intros Hk Hi; subst i.
-  apply first_non_fixpoint_Some_if in Hx.
-  split; [ easy | ].
-  apply where_is_prop in Hk.
-  split. {
-    destruct n; [ easy | ].
-    destruct Hk as [Hk| Hk]; [ subst k; flia | easy ].
-  }
-Print first_non_transp.
-...
-  destruct Hk as [Hk| Hk]. {
-    subst k.
-    destruct Hx as (Hj & Hk & Hsj).
-    split. {
-      intros i Hi.
-      apply Hk; split; [ flia | easy ].
-    }
-    split; [ easy | ].
-...
+destruct x as [i| ]; [ | easy ].
+apply first_non_fixpoint_Some_if in Hx.
+destruct Hx as (Hj & Hk & Hsj).
+remember (where_is n σ i) as y eqn:Hy; symmetry in Hy.
+destruct y as [m| ]; [ | easy ].
+injection Hfnt; clear Hfnt; intros; subst m j.
+apply where_is_Some_if in Hy.
+split; [ easy | ].
+split; [ easy | ].
+split; [ | easy ].
+intros j Hm.
+apply Hk; flia Hm.
+Qed.
 
 Theorem glop : ∀ it n (σ : nat → nat),
   n ≠ 0
@@ -915,10 +890,10 @@ revert σ n i Hnz Hit Hp Hin.
 induction it; intros; [ flia Hnz Hit | ].
 destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
   cbn.
-  remember (first_non_transp n 0 σ) as x eqn:Hx; symmetry in Hx.
+  remember (first_non_transp n σ) as x eqn:Hx; symmetry in Hx.
   destruct x as [(j, k)| ]. {.
-...
     apply first_non_transp_Some_if in Hx.
+    destruct Hx as (Hjn & Hkn & Hii & Hj & Hkj).
 ..
   remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
   destruct x as [j| ]. {
