@@ -691,6 +691,30 @@ Definition transp_list_of_permut_fun n (σ : nat → nat) := tlopf_loop n n σ.
 Definition transp_list_of_permut {n} (σ : vector n nat) :=
   transp_list_of_permut_fun n (vect_el σ).
 
+Fixpoint where_is n (σ : nat → nat) i :=
+  match n with
+  | 0 => 0
+  | S n' => if σ n' =? i then n' else where_is n' σ i
+  end.
+
+Fixpoint tlopf_loop' it n (σ : nat → nat) :=
+  match it with
+  | 0 => []
+  | S it' =>
+      match first_non_fixpoint n 0 σ with
+      | None => []
+      | Some i =>
+          let j := where_is n σ i in
+          let σ' := comp (transposition i j) σ in
+          (i, j) :: tlopf_loop' it' n σ'
+      end
+  end.
+
+Definition transp_list_of_permut_fun' n (σ : nat → nat) := tlopf_loop' n n σ.
+
+Definition transp_list_of_permut' {n} (σ : vector n nat) :=
+  transp_list_of_permut_fun' n (vect_el σ).
+
 Definition transp_fun_of_nat_pair '(i, j) := transposition i j.
 
 Definition transp_of_nat_pair n '(i, j) :=
@@ -698,7 +722,11 @@ Definition transp_of_nat_pair n '(i, j) :=
 
 (*
 Compute transp_list_of_permut (vect_of_list 0 [0;5;1;2;4;3]).
+Compute transp_list_of_permut' (vect_of_list 0 [0;5;1;2;4;3]).
 Compute transp_list_of_permut (vect_of_list 0 [0;4;1;2;5;3]).
+(*     = [(1, 4); (2, 4); (3, 4); (4, 5)] *)
+Compute transp_list_of_permut' (vect_of_list 0 [0;4;1;2;5;3]).
+(*     = [(1, 2); (1, 3); (1, 5); (1, 4)] *)
 Compute (transp_list_of_permut (vect_of_list 0 [1;0;2;3;4;5])).
 Compute (transp_list_of_permut (vect_of_list 0 [1;2;0;3;4;5])).
 Compute (transp_list_of_permut (vect_of_list 0 [5;4;3;2;1;0])).
@@ -707,6 +735,7 @@ Compute (transp_list_of_permut (vect_of_list 0 [3;4;0;1;2;5])).
 
 Compute let n := 4 in map (λ k, list_of_vect (canon_permut n k)) (seq 0 n!).
 Compute let n := 4 in map (λ k, (list_of_vect (canon_permut n k), transp_list_of_permut (canon_permut n k))) (seq 0 n!).
+Compute let n := 4 in map (λ k, (list_of_vect (canon_permut n k), transp_list_of_permut' (canon_permut n k))) (seq 0 n!).
 Compute let n := 2 in length (filter (λ ij, snd ij =? 1) (map (λ k, (list_of_vect (canon_permut n k), length (transp_list_of_permut (canon_permut n k)))) (seq 0 n!))).
 (*
 1;15;85;225;274;120
@@ -798,6 +827,73 @@ destruct x as [i| ]. {
   induction n; cbn.
 ...
 *)
+
+Theorem glop : ∀ it n (σ : nat → nat),
+  n ≠ 0
+  → n ≤ it
+  → is_permut_fun σ n
+  → ∀ i, i < n
+  → (Comp (τ ∈ map transp_fun_of_nat_pair (tlopf_loop' it n σ)), τ) i = σ i.
+Proof.
+intros * Hnz Hit Hp * Hin.
+revert σ n i Hnz Hit Hp Hin.
+induction it; intros; [ flia Hnz Hit | ].
+destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
+  cbn.
+  remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
+  destruct x as [j| ]. {
+    apply first_non_fixpoint_Some_if in Hx.
+    destruct Hx as (Hj1 & Hj2 & Hj3).
+    cbn.
+    rewrite iter_list_cons; [ | easy | easy | easy ].
+    unfold comp.
+    rewrite IHit; [ | easy | flia Hit Hnsit | | easy ]. {
+      apply transposition_involutive.
+    }
+    specialize comp_is_permut_fun as H1.
+    specialize (H1 n (transposition j (where_is n σ j))).
+    apply H1; [ | easy ].
+    apply transposition_is_permut_fun; [ easy | ].
+    clear - Hnz.
+    destruct n; [ easy | clear Hnz ].
+    revert j.
+    induction n; intros. {
+      cbn.
+      rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec (σ 0) j); flia.
+    }
+    remember (S n) as sn; cbn; subst sn.
+    rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec (σ (S n)) j) as [Hnj| Hnj]; [ flia | ].
+    transitivity (S n); [ easy | flia ].
+  } {
+    unfold iter_list; cbn.
+    apply first_non_fixpoint_None_if with (k := i) in Hx; [ easy | ].
+    split; [ flia | easy ].
+  }
+}
+cbn.
+subst n.
+clear Hit Hnz.
+remember (first_non_fixpoint (S it) 0 σ) as x eqn:Hx; symmetry in Hx.
+destruct x as [j| ]. {
+  apply first_non_fixpoint_Some_if in Hx.
+  destruct Hx as (Hj1 & Hj2 & Hj3).
+  cbn - [ where_is ].
+  rewrite iter_list_cons; [ | easy | easy | easy ].
+  remember (transposition j (σ j)) as τ eqn:Hτ.
+  remember (Comp (f ∈ _), _) as σ' eqn:Hσ'.
+  unfold comp.
+...
+  destruct (Nat.eq_dec (σ' i) j) as [Hij| Hij]. {
+    rewrite Hij.
+    rewrite Hτ.
+    unfold transposition.
+    rewrite Nat.eqb_refl.
+    destruct (Nat.eq_dec i j) as [Heij| Heij]; [ now subst i | ].
+    exfalso.
+    destruct (Nat.eq_dec (σ i) j) as [Hisj| Hisj]. {
+...
 
 Theorem glop : ∀ it n (σ : nat → nat),
   n ≠ 0
