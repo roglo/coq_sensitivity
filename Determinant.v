@@ -693,14 +693,18 @@ Definition transp_list_of_permut {n} (σ : vector n nat) :=
 
 Fixpoint where_is n (σ : nat → nat) i :=
   match n with
-  | 0 => 0
-  | S n' => if σ n' =? i then n' else where_is n' σ i
+  | 0 => None
+  | S n' => if σ n' =? i then Some n' else where_is n' σ i
   end.
 
 Definition first_non_transp n (σ : nat → nat) :=
   match first_non_fixpoint n 0 σ with
   | None => None
-  | Some i => Some (i, where_is n σ i)
+  | Some i =>
+      match where_is n σ i with
+      | None => None
+      | Some j => Some (i, j)
+      end
   end.
 
 Fixpoint tlopf_loop' it n (σ : nat → nat) :=
@@ -833,8 +837,8 @@ destruct x as [i| ]. {
 ...
 *)
 
-Theorem where_is_prop : ∀ n σ i j,
-  where_is n σ i = j
+Theorem where_is_Some_if : ∀ n σ i j,
+  where_is n σ i = Some j
   → j = 0 ∨ (σ j = i ∧ j < n).
 Proof.
 intros * Hw.
@@ -843,7 +847,7 @@ induction n; intros; [ now left | ].
 cbn in Hw.
 rewrite if_eqb_eq_dec in Hw.
 destruct (Nat.eq_dec (σ n) i) as [H1| H1]. {
-  subst j; right.
+  injection Hw; intros; subst j; right.
   split; [ easy | flia ].
 }
 specialize (IHn i j Hw) as H2.
@@ -863,6 +867,7 @@ intros * Hfnt.
 unfold first_non_transp in Hfnt.
 remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
 destruct x as [i| ]. {
+...
   injection Hfnt; clear Hfnt; intros Hk Hi; subst i.
   apply first_non_fixpoint_Some_if in Hx.
   split; [ easy | ].
