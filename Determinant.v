@@ -961,32 +961,19 @@ destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
   apply permut_fun_ub; [ | easy ].
   now apply permut_fun_inv_is_permut.
 }
-...
-    specialize (H1 n).
-    specialize (H1 n (transposition j (where_is n σ j))).
-    apply H1; [ | easy ].
-    apply transposition_is_permut_fun; [ easy | ].
-    clear - Hnz.
-    destruct n; [ easy | clear Hnz ].
-    revert j.
-    induction n; intros. {
-      cbn.
-      rewrite if_eqb_eq_dec.
-      destruct (Nat.eq_dec (σ 0) j); flia.
-    }
-    remember (S n) as sn; cbn; subst sn.
-    rewrite if_eqb_eq_dec.
-    destruct (Nat.eq_dec (σ (S n)) j) as [Hnj| Hnj]; [ flia | ].
-    transitivity (S n); [ easy | flia ].
-  } {
-    unfold iter_list; cbn.
-    apply first_non_fixpoint_None_if with (k := i) in Hx; [ easy | ].
-    split; [ flia | easy ].
-  }
-}
 cbn.
-subst n.
 clear Hit Hnz.
+remember (first_non_transp n σ) as x eqn:Hx; symmetry in Hx.
+destruct x as [(j, k)| ]. {
+  apply first_non_transp_Some_if in Hx.
+  destruct Hx as (Hjn & Hkn & Hj & Hjj & Hkj).
+  cbn.
+  rewrite iter_list_cons; [ | easy | easy | easy ].
+  destruct (lt_dec i j) as [Hij| Hij]. {
+    specialize (Hj _ Hij) as H1.
+    rewrite H1.
+    unfold comp at 1.
+...
 remember (first_non_fixpoint (S it) 0 σ) as x eqn:Hx; symmetry in Hx.
 destruct x as [j| ]. {
   apply first_non_fixpoint_Some_if in Hx.
