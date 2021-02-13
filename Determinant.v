@@ -948,13 +948,19 @@ destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
   unfold iter_list; cbn.
   apply first_non_transp_None_if in Hx.
   remember (first_non_fixpoint n 0 σ) as y eqn:Hy; symmetry in Hy.
-  destruct y as [j| ]. {
-    apply first_non_fixpoint_Some_if in Hy.
-    destruct Hx as (Hx & Hnj).
-    specialize where_is_None_if as H1.
-    specialize (H1 _ _ _ Hnj).
-    apply Hx.
-    apply Nat.nle_gt; intros H2.
+  destruct y as [j| ]; [ | now apply Hx ].
+  apply first_non_fixpoint_Some_if in Hy.
+  destruct Hx as (Hx & Hnj).
+  specialize where_is_None_if as H1.
+  specialize (H1 _ _ _ Hnj).
+  specialize (fun_permut_fun_inv) as H2.
+  specialize (H2 σ n Hp j).
+  destruct Hy as (Hj & Hkj & Hjj).
+  specialize (H2 Hj).
+  exfalso; apply (H1 (permut_fun_inv σ n j)); [ | easy ].
+  apply permut_fun_ub; [ | easy ].
+  now apply permut_fun_inv_is_permut.
+}
 ...
     specialize (H1 n).
     specialize (H1 n (transposition j (where_is n σ j))).
