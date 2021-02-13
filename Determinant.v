@@ -867,6 +867,21 @@ intros * Hfnt.
 unfold first_non_transp in Hfnt.
 remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
 destruct x as [i| ]. {
+  apply first_non_fixpoint_Some_if in Hx.
+  destruct Hx as (Hj & Hk & Hsj).
+  remember (where_is n σ i) as y eqn:Hy; symmetry in Hy.
+  destruct y as [m| ]. {
+    injection Hfnt; clear Hfnt; intros; subst m j.
+    apply where_is_Some_if in Hy.
+    split; [ easy | ].
+    destruct Hy as [Hy| Hy]. {
+      subst k.
+      split; [ flia Hj | ].
+      split. {
+        intros j Hm.
+        apply Hk; flia Hm.
+      }
+      split; [ easy | ].
 ...
   injection Hfnt; clear Hfnt; intros Hk Hi; subst i.
   apply first_non_fixpoint_Some_if in Hx.
