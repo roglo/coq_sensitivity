@@ -1058,6 +1058,7 @@ destruct x as [(j, k)| ]. {
     congruence.
   }
   apply Nat.nlt_ge in Hij.
+...
   destruct (Nat.eq_dec i j) as [Heij| Heij]. {
     move Heij at top; subst i.
     clear Hij Hin.
