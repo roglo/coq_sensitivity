@@ -923,21 +923,31 @@ Theorem Comp_tfonp_tlopf : ∀ σ it n i,
   → (Comp (j ∈ map transp_fun_of_nat_pair (tlopf_loop' it n σ)), j) i = i.
 Proof.
 intros * Hii.
-revert σ n i Hii.
-induction it; intros; [ easy | ].
-cbn.
+revert σ Hii.
+induction it; intros; [ easy | cbn ].
 remember (first_non_transp n σ) as x eqn:Hx; symmetry in Hx.
-destruct x as [(i', j')| ]. {
-  apply first_non_transp_Some_if in Hx.
-  destruct Hx as (Hjn & Hkn & Hi & Hj & Hkj).
-  cbn.
-  rewrite iter_list_cons; [ | easy | easy | easy ].
-  unfold comp at 1.
-  rewrite IHit. 2: {
-    unfold comp, transposition.
-    do 2 rewrite if_eqb_eq_dec.
-    destruct (Nat.eq_dec (σ i) i') as [H| H].
-...
+destruct x as [(i', j')| ]; [ | easy ].
+apply first_non_transp_Some_if in Hx.
+destruct Hx as (Hjn & Hkn & Hi & Hj & Hkj).
+cbn.
+rewrite iter_list_cons; [ | easy | easy | easy ].
+unfold comp at 1.
+rewrite IHit. 2: {
+  unfold comp, transposition.
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (σ i) i') as [H1| H1]. {
+    rewrite Hii in H1.
+    now move H1 at top; subst i'.
+  }
+  destruct (Nat.eq_dec (σ i) j') as [H2| H2]; [ | easy ].
+  congruence.
+}
+unfold transposition.
+do 2 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec i i') as [Hii'| Hii']; [ congruence | ].
+destruct (Nat.eq_dec i j') as [Hij| Hij]; [ | easy ].
+congruence.
+Qed.
 
 Theorem glop : ∀ it n (σ : nat → nat),
   n ≠ 0
@@ -1007,8 +1017,13 @@ destruct x as [(j, k)| ]. {
       (H :
        (Comp
           (m ∈ map transp_fun_of_nat_pair (tlopf_loop' it n σ)), m) i = i). {
-...
-apply Comp_tfonp_tlopf.
+      apply Comp_tfonp_tlopf.
+      unfold comp, transposition.
+      do 2 rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec (σ i) j) as [H2| H2]; [ congruence | ].
+      destruct (Nat.eq_dec (σ i) k) as [H3| H3]; [ | easy ].
+      congruence.
+    }
 ...
       clear.
       revert j k.
