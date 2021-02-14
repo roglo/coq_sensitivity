@@ -1058,7 +1058,6 @@ destruct x as [(j, k)| ]. {
     congruence.
   }
   apply Nat.nlt_ge in Hij.
-...
   destruct (Nat.eq_dec i j) as [Heij| Heij]. {
     move Heij at top; subst i.
     clear Hij Hin.
@@ -1074,47 +1073,15 @@ destruct x as [(j, k)| ]. {
         apply Hsjj; clear Hsjj.
         subst σ'.
         enough (H : (Comp (i ∈ map transp_fun_of_nat_pair (tlopf_loop' it n (transposition j k))), i) (σ j) = j). {
-          destruct it; [ easy | ].
-          cbn in H; cbn.
-          remember (first_non_transp n (comp (transposition j k) σ)) as x eqn:Hx.
-          symmetry in Hx.
-          destruct x as [(i', j')| ]. {
-            cbn.
-            rewrite iter_list_cons; [ | easy | easy | easy ].
-            apply first_non_transp_Some_if in Hx.
-            destruct Hx as (Hin' & Hjn' & Hj' & Hjj' & Hkj').
-            remember (first_non_transp n (transposition j k)) as y eqn:Hy.
-            symmetry in Hy.
-            destruct y as [(i'', j'')| ]. {
-              cbn in H.
-              rewrite iter_list_cons in H; [ | easy | easy | easy ].
-              apply first_non_transp_Some_if in Hy.
-              destruct Hy as (Hin & Hjn'' & Hj'' & Hjj'' & Hkj'').
+          apply Comp_tfonp_tlopf.
+          unfold comp, transposition.
+          do 2 rewrite if_eqb_eq_dec.
+          destruct (Nat.eq_dec (σ j) j) as [H1| H1]; [ easy | clear H1 ].
+          now destruct (Nat.eq_dec (σ j) k).
+        }
+        rewrite Hsjk.
 ...
-        clear IHit Hnsit Hjk.
-        revert σ j k Hp Hjn Hkn Hj Hjj Hkj Hsjk Hejk.
-        induction it; intros; [ easy | cbn ].
-        remember (first_non_transp n (comp (transposition j k) σ)) as x eqn:Hx.
-        symmetry in Hx.
-        destruct x as [(i', j')| ]. {
-          cbn.
-          rewrite iter_list_cons; [ | easy | easy | easy ].
-          unfold comp at 1.
-
-
-          specialize (IHit (comp (transposition j k) σ)) as H1.
-          specialize (H1 i' j').
-          rewrite IHit with (j := i') (k := j') (σ := comp (transposition j k) σ).
-...
-        enough
-          (H :
-           (Comp
-              (i ∈
-               map transp_fun_of_nat_pair
-                 (tlopf_loop' it n (transposition j k))), i) k =
-           j). {
-          destruct it; [ easy | ].
-          cbn in H; cbn.
+        enough (H : (Comp (i ∈ map transp_fun_of_nat_pair (tlopf_loop' it n (λ i, i))), i) j = j). {
 ...
       clear.
       revert j k.
