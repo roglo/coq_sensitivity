@@ -957,14 +957,38 @@ Theorem glop : ∀ it n (σ : nat → nat),
   → (Comp (τ ∈ map transp_fun_of_nat_pair (tlopf_loop' it n σ)), τ) i = σ i.
 Proof.
 intros * Hnz Hit Hp * Hin.
-destruct (Nat.eq_dec i (σ i)) as [Hisi| Hisi]. {
-  rewrite <- Hisi.
-  now apply Comp_tfonp_tlopf.
-}
-...
-intros * Hnz Hit Hp * Hin.
 revert σ n i Hnz Hit Hp Hin.
 induction it; intros; [ flia Hnz Hit | ].
+(**)
+destruct n; [ easy | ].
+cbn.
+...
+assert
+  (H :
+   (Comp
+      (τ ∈ map transp_fun_of_nat_pair (tlopf_loop' (S (S it)) n σ)),
+       τ) i = σ i). {
+  remember (S it) as x eqn:Hx; cbn; subst x.
+  remember (first_non_transp n σ) as x eqn:Hx.
+  symmetry in Hx.
+  destruct x as [(i', j')| ]. {
+    apply first_non_transp_Some_if in Hx.
+    destruct Hx as (Hjn & Hkn & Hj & Hjj & Hkj).
+    remember (S it) as x; cbn; subst x.
+    rewrite iter_list_cons; [ | easy | easy | easy ].
+    unfold comp at 1.
+    cbn.
+    remember (first_non_transp n (comp (transposition i' j') σ)) as x eqn:Hx.
+    symmetry in Hx.
+    destruct x as [(i'', j'')| ]. {
+      apply first_non_transp_Some_if in Hx.
+      destruct Hx as (Hjn' & Hkn' & Hj' & Hjj' & Hkj').
+      cbn.
+      rewrite iter_list_cons; [ | easy | easy | easy ].
+      unfold comp at 1.
+      destruct n. {
+      rewrite IHit; try easy.
+...
 destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
   cbn.
   remember (first_non_transp n σ) as x eqn:Hx; symmetry in Hx.
@@ -998,6 +1022,34 @@ destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
   apply permut_fun_ub; [ | easy ].
   now apply permut_fun_inv_is_permut.
 }
+(**)
+subst n.
+clear Hit Hnz.
+assert
+  (H :
+   (Comp
+      (τ ∈ map transp_fun_of_nat_pair (tlopf_loop' (S (S it)) (S it) σ)),
+       τ) i = σ i). {
+  remember (S it) as n eqn:Hn; cbn; subst n.
+  remember (first_non_transp (S it) σ) as x eqn:Hx.
+  symmetry in Hx.
+  destruct x as [(i', j')| ]. {
+    apply first_non_transp_Some_if in Hx.
+    destruct Hx as (Hjn & Hkn & Hj & Hjj & Hkj).
+    remember (S it) as n; cbn; subst n.
+    rewrite iter_list_cons; [ | easy | easy | easy ].
+    unfold comp at 1.
+    remember (comp (transposition i' j') σ) as σ' eqn:Hσ'.
+    cbn.
+    remember (first_non_transp (S it) σ') as y eqn:Hy.
+    symmetry in Hy.
+    destruct y as [(i'', j'')| ]. {
+      cbn.
+      rewrite iter_list_cons; [ | easy | easy | easy ].
+      unfold comp at 1.
+...
+      rewrite IHit.
+...
 cbn.
 clear Hit Hnz.
 remember (first_non_transp n σ) as x eqn:Hx; symmetry in Hx.
