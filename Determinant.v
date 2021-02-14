@@ -1075,6 +1075,20 @@ destruct x as [(j, k)| ]. {
         enough (H : (Comp (i ∈ map transp_fun_of_nat_pair (tlopf_loop' it n (transposition j k))), i) (σ j) = j). {
           destruct it; [ easy | ].
           cbn in H; cbn.
+          remember (first_non_transp n (comp (transposition j k) σ)) as x eqn:Hx.
+          symmetry in Hx.
+          destruct x as [(i', j')| ]. {
+            cbn.
+            rewrite iter_list_cons; [ | easy | easy | easy ].
+            apply first_non_transp_Some_if in Hx.
+            destruct Hx as (Hin' & Hjn' & Hj' & Hjj' & Hkj').
+            remember (first_non_transp n (transposition j k)) as y eqn:Hy.
+            symmetry in Hy.
+            destruct y as [(i'', j'')| ]. {
+              cbn in H.
+              rewrite iter_list_cons in H; [ | easy | easy | easy ].
+              apply first_non_transp_Some_if in Hy.
+              destruct Hy as (Hin & Hjn'' & Hj'' & Hjj'' & Hkj'').
 ...
         clear IHit Hnsit Hjk.
         revert σ j k Hp Hjn Hkn Hj Hjj Hkj Hsjk Hejk.
