@@ -992,7 +992,7 @@ destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
   apply permut_fun_ub; [ | easy ].
   now apply permut_fun_inv_is_permut.
 }
-(**)
+...
 cbn.
 subst n.
 clear Hit Hnz Hin.
