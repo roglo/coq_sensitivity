@@ -1072,6 +1072,24 @@ destruct x as [(j, k)| ]. {
         destruct (Nat.eq_dec j k) as [Hejk| Hejk]; [ easy | exfalso ].
         apply Hsjj; clear Hsjj.
         subst σ'.
+        enough (H : (Comp (i ∈ map transp_fun_of_nat_pair (tlopf_loop' it n (transposition j k))), i) (σ j) = j). {
+          destruct it; [ easy | ].
+          cbn in H; cbn.
+...
+        clear IHit Hnsit Hjk.
+        revert σ j k Hp Hjn Hkn Hj Hjj Hkj Hsjk Hejk.
+        induction it; intros; [ easy | cbn ].
+        remember (first_non_transp n (comp (transposition j k) σ)) as x eqn:Hx.
+        symmetry in Hx.
+        destruct x as [(i', j')| ]. {
+          cbn.
+          rewrite iter_list_cons; [ | easy | easy | easy ].
+          unfold comp at 1.
+
+
+          specialize (IHit (comp (transposition j k) σ)) as H1.
+          specialize (H1 i' j').
+          rewrite IHit with (j := i') (k := j') (σ := comp (transposition j k) σ).
 ...
         enough
           (H :
