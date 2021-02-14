@@ -1059,7 +1059,29 @@ destruct x as [(j, k)| ]. {
   }
   apply Nat.nlt_ge in Hij.
   destruct (Nat.eq_dec i j) as [Heij| Heij]. {
-    move Heij at top; subst j.
+    move Heij at top; subst i.
+    clear Hij Hin.
+    destruct (Nat.eq_dec (σ j) k) as [Hsjk| Hsjk]. {
+      rewrite Hsjk.
+      unfold comp at 1.
+      remember (Comp (i ∈ _), _) as σ' eqn:Hσ'.
+      unfold transposition.
+      do 2 rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec (σ' j) j) as [Hsjj| Hsjj]; [ easy | ].
+      destruct (Nat.eq_dec (σ' j) k) as [Hjk| Hjk]. {
+        destruct (Nat.eq_dec j k) as [Hejk| Hejk]; [ easy | exfalso ].
+        apply Hsjj; clear Hsjj.
+        subst σ'.
+...
+        enough
+          (H :
+           (Comp
+              (i ∈
+               map transp_fun_of_nat_pair
+                 (tlopf_loop' it n (transposition j k))), i) k =
+           j). {
+          destruct it; [ easy | ].
+          cbn in H; cbn.
 ...
       clear.
       revert j k.
