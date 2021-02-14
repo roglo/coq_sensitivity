@@ -957,6 +957,12 @@ Theorem glop : ∀ it n (σ : nat → nat),
   → (Comp (τ ∈ map transp_fun_of_nat_pair (tlopf_loop' it n σ)), τ) i = σ i.
 Proof.
 intros * Hnz Hit Hp * Hin.
+destruct (Nat.eq_dec i (σ i)) as [Hisi| Hisi]. {
+  rewrite <- Hisi.
+  now apply Comp_tfonp_tlopf.
+}
+...
+intros * Hnz Hit Hp * Hin.
 revert σ n i Hnz Hit Hp Hin.
 induction it; intros; [ flia Hnz Hit | ].
 destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
