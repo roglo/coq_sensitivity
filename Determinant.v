@@ -1024,6 +1024,42 @@ destruct x as [(j, k)| ]. {
       destruct (Nat.eq_dec (σ i) k) as [H3| H3]; [ | easy ].
       congruence.
     }
+    clear IHit.
+    clear Hnsit.
+    clear j Hjn Hj Hjj Hkj Hij.
+    revert n σ i Hp Hin Hkn H1.
+    induction it; intros; [ easy | ].
+    cbn.
+    remember (first_non_transp n σ) as x eqn:Hx.
+    symmetry in Hx.
+    destruct x as [(i', j')| ]; [ | easy ].
+    apply first_non_transp_Some_if in Hx.
+    destruct Hx as (Hin' & Hjn' & Hj & Hjj & Hkj).
+    cbn.
+    rewrite iter_list_cons; [ | easy | easy | easy ].
+    unfold comp at 1.
+    rewrite IHit; [ | | easy | easy | ]; cycle 1. {
+      apply comp_is_permut_fun; [ | easy ].
+      now apply transposition_is_permut_fun.
+    } {
+      unfold comp, transposition.
+      do 2 rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec (σ i) i') as [Hii| Hii]. {
+        apply Hp; [ easy | easy | ].
+        congruence.
+      }
+      destruct (Nat.eq_dec (σ i) j') as [Hij'| Hij']; [ | easy ].
+      congruence.
+    }
+    unfold transposition.
+    do 2 rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec i i') as [H| Hii]; [ congruence | ].
+    destruct (Nat.eq_dec i j') as [H| H]; [ | easy ].
+    congruence.
+  }
+  apply Nat.nlt_ge in Hij.
+  destruct (Nat.eq_dec i j) as [Heij| Heij]. {
+    move Heij at top; subst j.
 ...
       clear.
       revert j k.
