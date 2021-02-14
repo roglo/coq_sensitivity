@@ -1080,6 +1080,7 @@ destruct x as [(j, k)| ]. {
           now destruct (Nat.eq_dec (σ j) k).
         }
         rewrite Hsjk.
+(* désespérant tellement c'est compliqué *)
 ...
         enough (H : (Comp (i ∈ map transp_fun_of_nat_pair (tlopf_loop' it n (λ i, i))), i) j = j). {
 ...
