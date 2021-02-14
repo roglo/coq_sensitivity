@@ -992,6 +992,14 @@ destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
   apply permut_fun_ub; [ | easy ].
   now apply permut_fun_inv_is_permut.
 }
+cbn.
+remember (first_non_transp n σ) as x eqn:Hx; symmetry in Hx.
+destruct x as [(j, k)| ]. {
+  apply first_non_transp_Some_if in Hx.
+  destruct Hx as (Hjn & Hkn & Hii & Hj & Hkj).
+  cbn.
+  rewrite iter_list_cons; [ | easy | easy | easy ].
+  unfold comp at 1.
 ...
 cbn.
 subst n.
