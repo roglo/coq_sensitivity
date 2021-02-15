@@ -767,7 +767,7 @@ Compute let σ := vect_of_list 0 [0;5;1;2;4;3] in let n := vect_size σ in list_
 
 Theorem first_non_fixpoint_Some_iff : ∀ σ it i j,
   first_non_fixpoint it i σ = Some j
-  ↔ j - i < it ∧ (∀ k, i ≤ k < j → σ k = k) ∧ σ j ≠ j.
+  ↔ i ≤ j ∧ j - i < it ∧ (∀ k, i ≤ k < j → σ k = k) ∧ σ j ≠ j.
 Proof.
 intros.
 split. {
@@ -776,36 +776,37 @@ split. {
   induction it; intros; [ easy | cbn in Hs ].
   rewrite if_eqb_eq_dec in Hs.
   destruct (Nat.eq_dec i (σ i)) as [Hii| Hii]. {
-    specialize (IHit σ (i + 1) j Hs) as (H1 & H2 & H3).
+    specialize (IHit σ (i + 1) j Hs) as (H1 & H2 & H3 & H4).
     split; [ flia H1 | ].
+    split; [ flia H2 | ].
     split; [ | easy ].
     intros k Hk.
     destruct (Nat.eq_dec i k) as [Hik| Hik]; [ now subst k | ].
-    apply H2; flia Hk Hik.
+    apply H3; flia Hk Hik.
   } {
     injection Hs; clear Hs; intros; subst j.
+    split; [ flia | ].
     split; [ flia | ].
     split; [ | now apply Nat.neq_sym ].
     intros k Hk; flia Hk.
   }
 } {
-  intros (Hji & Hj & Hjj).
-  revert i Hji Hj.
-  induction it; intros; [ easy | ].
-  cbn.
+  intros (Hij & Hji & Hj & Hjj).
+  revert i j Hij Hji Hj Hjj.
+  induction it; intros; [ easy | cbn ].
   rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec i (σ i)) as [Hii| Hii]. {
-    destruct (lt_dec i j) as [Hij| Hij]. {
-      apply IHit; [ flia Hji Hij | ].
-      intros k Hk.
-      apply Hj.
-      flia Hk.
-    }
-    apply Nat.nlt_ge in Hij.
-...
-    apply Hjj, Hj.
-Print first_non_fixpoint.
-...
+    assert (Heij : i ≠ j) by now intros H; symmetry in Hii; subst i.
+    apply IHit; [ flia Hij Hji Heij | flia Hij Hji Heij | | easy ].
+    intros k Hk.
+    apply Hj.
+    flia Hk.
+  }
+  destruct (Nat.eq_dec i j) as [Heij| Heij]; [ congruence | exfalso ].
+  assert (H : i ≤ i < j) by flia Hij Heij.
+  specialize (Hj _ H) as H1.
+  now symmetry in H1.
+}
 Qed.
 
 Theorem first_non_fixpoint_None_if : ∀ σ it i,
@@ -914,8 +915,9 @@ intros * Hfnt.
 unfold first_non_transp in Hfnt.
 remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
 destruct x as [i| ]; [ | easy ].
-apply first_non_fixpoint_Some_if in Hx.
-destruct Hx as (Hj & Hk & Hsj).
+apply first_non_fixpoint_Some_iff in Hx.
+destruct Hx as (Hi & Hj & Hk & Hsj).
+rewrite Nat.sub_0_r in Hj.
 remember (where_is n σ i) as y eqn:Hy; symmetry in Hy.
 destruct y as [m| ]; [ | easy ].
 injection Hfnt; clear Hfnt; intros; subst m j.
@@ -945,8 +947,9 @@ destruct x as [i| ]. 2: {
 }
 destruct (where_is n σ i); [ easy | ].
 split; [ | easy ].
-apply first_non_fixpoint_Some_if in Hx.
-destruct Hx as (Hin & Hkk & Hii).
+apply first_non_fixpoint_Some_iff in Hx.
+destruct Hx as (Hi & Hin & Hkk & Hii).
+rewrite Nat.sub_0_r in Hin.
 intros j Hj.
 symmetry.
 apply Hkk; flia Hj.
@@ -1030,13 +1033,14 @@ destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
   apply first_non_transp_None_if in Hx.
   remember (first_non_fixpoint n 0 σ) as y eqn:Hy; symmetry in Hy.
   destruct y as [j| ]; [ | now apply Hx ].
-  apply first_non_fixpoint_Some_if in Hy.
+  apply first_non_fixpoint_Some_iff in Hy.
   destruct Hx as (Hx & Hnj).
   specialize where_is_None_iff as H1.
   specialize (proj1 (H1 _ _ _) Hnj) as H2.
   specialize (fun_permut_fun_inv) as H3.
   specialize (H3 σ n Hp j).
-  destruct Hy as (Hj & Hkj & Hjj).
+  destruct Hy as (Hjz & Hj & Hkj & Hjj).
+  rewrite Nat.sub_0_r in Hj.
   specialize (H3 Hj).
   exfalso; apply (H2 (permut_fun_inv σ n j)); [ | easy ].
   apply permut_fun_ub; [ | easy ].
@@ -1051,15 +1055,15 @@ destruct x as [(j, k)| ]. 2: {
   symmetry in Hy.
   destruct y as [j| ]. {
     destruct Hx as (Hj & Hwj).
-    apply first_non_fixpoint_Some_if in Hy.
-    destruct Hy as (Hjn & Hkj & Hjj).
+    apply first_non_fixpoint_Some_iff in Hy.
+    destruct Hy as (Hjz & Hjn & Hkj & Hjj).
     specialize (proj1 (where_is_None_iff _ _ _) Hwj) as H1.
     destruct (lt_dec i j) as [Hij| Hij]; [ now apply Hj | ].
     apply Nat.nlt_ge in Hij.
     destruct (Nat.eq_dec i j) as [Heij| Heij]. {
       move Heij at top; subst i.
       destruct j. {
-        clear Hij Hjn Hkj Hj.
+        clear Hij Hjn Hkj Hj Hjz.
 (* c'est faux, mon truc. Ou alors il y a une information que j'ai perdue. *)
 ...
 
