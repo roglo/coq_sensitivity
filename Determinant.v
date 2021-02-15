@@ -854,19 +854,34 @@ specialize (IHn i j Hw) as H2.
 split; [ easy | flia H2 ].
 Qed.
 
-Theorem where_is_None_if : ∀ n σ i,
+Theorem where_is_None_iff : ∀ n σ i,
   where_is n σ i = None
-  → ∀ j, j < n → σ j ≠ i.
+  ↔ ∀ j, j < n → σ j ≠ i.
 Proof.
-intros * Hw j Hj.
-revert i j Hw Hj.
-induction n; intros; [ easy | ].
-cbn in Hw.
-rewrite if_eqb_eq_dec in Hw.
-destruct (Nat.eq_dec (σ n) i) as [H1| H1]; [ easy | ].
-destruct (Nat.eq_dec j n) as [Hjn| Hjn]; [ now subst j | ].
-apply IHn; [ easy | ].
-flia Hj Hjn.
+intros.
+split. {
+  intros Hw j Hj.
+  revert i j Hw Hj.
+  induction n; intros; [ easy | ].
+  cbn in Hw.
+  rewrite if_eqb_eq_dec in Hw.
+  destruct (Nat.eq_dec (σ n) i) as [H1| H1]; [ easy | ].
+  destruct (Nat.eq_dec j n) as [Hjn| Hjn]; [ now subst j | ].
+  apply IHn; [ easy | ].
+  flia Hj Hjn.
+} {
+  intros Hn.
+  revert i Hn.
+  induction n; intros; [ easy | cbn ].
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (σ n) i) as [Hi| Hi]. {
+    exfalso.
+    now specialize (Hn n (Nat.lt_succ_diag_r _)).
+  }
+  apply IHn.
+  intros j Hm.
+  apply Hn; flia Hm.
+}
 Qed.
 
 Theorem first_non_transp_Some_if : ∀ n σ j k,
@@ -998,13 +1013,13 @@ destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
   destruct y as [j| ]; [ | now apply Hx ].
   apply first_non_fixpoint_Some_if in Hy.
   destruct Hx as (Hx & Hnj).
-  specialize where_is_None_if as H1.
-  specialize (H1 _ _ _ Hnj).
-  specialize (fun_permut_fun_inv) as H2.
-  specialize (H2 σ n Hp j).
+  specialize where_is_None_iff as H1.
+  specialize (proj1 (H1 _ _ _) Hnj) as H2.
+  specialize (fun_permut_fun_inv) as H3.
+  specialize (H3 σ n Hp j).
   destruct Hy as (Hj & Hkj & Hjj).
-  specialize (H2 Hj).
-  exfalso; apply (H1 (permut_fun_inv σ n j)); [ | easy ].
+  specialize (H3 Hj).
+  exfalso; apply (H2 (permut_fun_inv σ n j)); [ | easy ].
   apply permut_fun_ub; [ | easy ].
   now apply permut_fun_inv_is_permut.
 }
@@ -1019,7 +1034,7 @@ destruct x as [(j, k)| ]. 2: {
     destruct Hx as (Hj & Hwj).
     apply first_non_fixpoint_Some_if in Hy.
     destruct Hy as (Hjn & Hkj & Hjj).
-    specialize (where_is_None_if _ Hwj) as H1.
+    specialize (proj1 (where_is_None_iff _ _ _) Hwj) as H1.
     destruct (lt_dec i j) as [Hij| Hij]; [ now apply Hj | ].
     apply Nat.nlt_ge in Hij.
     destruct (Nat.eq_dec i j) as [Heij| Heij]. {
