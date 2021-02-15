@@ -1033,6 +1033,9 @@ destruct x as [(j, k)| ]. {
   destruct (Nat.eq_dec i j) as [Heij| Heij]. {
     move Heij at top; subst i.
     clear Hij Hin.
+    destruct (Nat.eq_dec (σ j) k) as [Hsjk| Hsjk]. {
+Print tlopf_loop'.
+...
     destruct it. {
       subst n.
       apply Nat.lt_1_r in Hjn.
@@ -1047,6 +1050,7 @@ destruct x as [(j, k)| ]. {
       rewrite iter_list_cons; [ | easy | easy | easy ].
       apply first_non_transp_Some_if in Hx.
       destruct Hx as (Hjn' & Hkn' & Hi' & Hii' & Hkj').
+      unfold comp at 1.
 ...
 rewrite Comp_tfonp_tlopf_2.
 ...
