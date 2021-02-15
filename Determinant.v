@@ -1000,6 +1000,20 @@ destruct x as [(j, k)| ]. {
   cbn.
   rewrite iter_list_cons; [ | easy | easy | easy ].
   unfold comp at 1.
+  destruct (lt_dec i j) as [Hij| Hij]. {
+    specialize (Hii _ Hij) as H1.
+    rewrite Comp_tfonp_tlopf. 2: {
+      unfold comp, transposition.
+      do 2 rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec (σ i) j) as [Hsij| Hsij]; [ congruence | ].
+      destruct (Nat.eq_dec (σ i) k) as [Hsik| Hsik]; [ congruence | easy ].
+    }
+    unfold transposition.
+    do 2 rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec i j) as [Hsij| Hsij]; [ congruence | ].
+    destruct (Nat.eq_dec i k) as [Hsik| Hsik]; [ congruence | easy ].
+  }
+  apply Nat.nlt_ge in Hij.
 ...
 cbn.
 subst n.
