@@ -1024,6 +1024,9 @@ destruct x as [(j, k)| ]. 2: {
     apply Nat.nlt_ge in Hij.
     destruct (Nat.eq_dec i j) as [Heij| Heij]. {
       move Heij at top; subst i.
+      destruct j. {
+        clear Hij Hjn Hkj Hj.
+(* c'est faux, mon truc. Ou alors il y a une information que j'ai perdue. *)
 ...
 
 destruct x as [(j, k)| ]. {
