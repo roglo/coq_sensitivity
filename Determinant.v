@@ -1014,6 +1014,10 @@ destruct x as [(j, k)| ]. {
     destruct (Nat.eq_dec i k) as [Hsik| Hsik]; [ congruence | easy ].
   }
   apply Nat.nlt_ge in Hij.
+  destruct (Nat.eq_dec i j) as [Heij| Heij]. {
+    move Heij at top; subst i.
+    clear Hij Hin.
+    rewrite <- Hkj.
 Check Comp_tfonp_tlopf.
 ...
 cbn.
