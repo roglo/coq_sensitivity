@@ -929,30 +929,50 @@ intros j Hm.
 apply Hk; flia Hm.
 Qed.
 
-Theorem first_non_transp_None_if : ∀ n σ,
+Theorem first_non_transp_None_iff : ∀ n σ,
   first_non_transp n σ = None
-  → match first_non_fixpoint n 0 σ with
+  ↔ match first_non_fixpoint n 0 σ with
      | Some i => (∀ j, j < i → j = σ j) ∧ where_is n σ i = None
      | None => ∀ k, k < n → k = σ k
     end.
 Proof.
-intros * Hfnt.
-unfold first_non_transp in Hfnt.
-remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
-destruct x as [i| ]. 2: {
-  intros k Hk.
-  specialize first_non_fixpoint_None_if as H1.
-  apply (H1 σ n 0 Hx).
-  split; [ flia | easy ].
-}
-destruct (where_is n σ i); [ easy | ].
-split; [ | easy ].
-apply first_non_fixpoint_Some_iff in Hx.
-destruct Hx as (Hi & Hin & Hkk & Hii).
-rewrite Nat.sub_0_r in Hin.
-intros j Hj.
-symmetry.
-apply Hkk; flia Hj.
+intros.
+split. {
+  intros Hfnt.
+  unfold first_non_transp in Hfnt.
+  remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
+  destruct x as [i| ]. 2: {
+    intros k Hk.
+    specialize first_non_fixpoint_None_if as H1.
+    apply (H1 σ n 0 Hx).
+    split; [ flia | easy ].
+  }
+  destruct (where_is n σ i); [ easy | ].
+  split; [ | easy ].
+  apply first_non_fixpoint_Some_iff in Hx.
+  destruct Hx as (Hi & Hin & Hkk & Hii).
+  rewrite Nat.sub_0_r in Hin.
+  intros j Hj.
+  symmetry.
+  apply Hkk; flia Hj.
+} {
+  intros Hn.
+  remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
+  destruct x as [i| ]. {
+    destruct Hn as (Hj, Hni).
+    apply first_non_fixpoint_Some_iff in Hx.
+    destruct Hx as (Hi & Hin & Hkk & Hii).
+    rewrite Nat.sub_0_r in Hin.
+    destruct n; [ flia Hin | ].
+    cbn in Hni.
+...
+    specialize first_non_fixpoint_None_if as H1.
+    specialize (H1 σ
+...
+    apply (H1 σ n 0).
+    split; [ flia | easy ].
+
+...
 Qed.
 
 Theorem Comp_tfonp_tlopf : ∀ σ it n i,
