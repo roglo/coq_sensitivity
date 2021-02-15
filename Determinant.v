@@ -957,22 +957,12 @@ split. {
   apply Hkk; flia Hj.
 } {
   intros Hn.
+  unfold first_non_transp.
   remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
-  destruct x as [i| ]. {
-    destruct Hn as (Hj, Hni).
-    apply first_non_fixpoint_Some_iff in Hx.
-    destruct Hx as (Hi & Hin & Hkk & Hii).
-    rewrite Nat.sub_0_r in Hin.
-    destruct n; [ flia Hin | ].
-    cbn in Hni.
-...
-    specialize first_non_fixpoint_None_if as H1.
-    specialize (H1 σ
-...
-    apply (H1 σ n 0).
-    split; [ flia | easy ].
-
-...
+  destruct x as [i| ]; [ | easy ].
+  destruct Hn as (Hj, Hni).
+  now rewrite Hni.
+}
 Qed.
 
 Theorem Comp_tfonp_tlopf : ∀ σ it n i,
@@ -1050,7 +1040,7 @@ destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
   }
   cbn.
   unfold iter_list; cbn.
-  apply first_non_transp_None_if in Hx.
+  apply first_non_transp_None_iff in Hx.
   remember (first_non_fixpoint n 0 σ) as y eqn:Hy; symmetry in Hy.
   destruct y as [j| ]; [ | now apply Hx ].
   apply first_non_fixpoint_Some_iff in Hy.
@@ -1070,7 +1060,7 @@ cbn.
 remember (first_non_transp n σ) as x eqn:Hx; symmetry in Hx.
 destruct x as [(j, k)| ]. 2: {
   unfold iter_list; cbn.
-  apply first_non_transp_None_if in Hx.
+  apply first_non_transp_None_iff in Hx.
   remember (first_non_fixpoint n 0 σ) as y eqn:Hy.
   symmetry in Hy.
   destruct y as [j| ]. {
@@ -1084,7 +1074,9 @@ destruct x as [(j, k)| ]. 2: {
       move Heij at top; subst i.
       destruct j. {
         clear Hij Hjn Hkj Hj Hjz.
-(* c'est faux, mon truc. Ou alors il y a une information que j'ai perdue. *)
+        destruct Hp as (Hp1, Hp2).
+(* il y en a forcément un qui vaut 0, dans les σ :
+   donc contradiction dans H1 *)
 ...
 
 destruct x as [(j, k)| ]. {
