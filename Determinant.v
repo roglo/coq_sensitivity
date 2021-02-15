@@ -1014,6 +1014,7 @@ destruct x as [(j, k)| ]. {
     destruct (Nat.eq_dec i k) as [Hsik| Hsik]; [ congruence | easy ].
   }
   apply Nat.nlt_ge in Hij.
+Check Comp_tfonp_tlopf.
 ...
 cbn.
 subst n.
