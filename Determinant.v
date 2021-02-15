@@ -1010,6 +1010,22 @@ destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
 }
 cbn.
 remember (first_non_transp n σ) as x eqn:Hx; symmetry in Hx.
+destruct x as [(j, k)| ]. 2: {
+  unfold iter_list; cbn.
+  apply first_non_transp_None_if in Hx.
+  remember (first_non_fixpoint n 0 σ) as y eqn:Hy.
+  symmetry in Hy.
+  destruct y as [j| ]. {
+    destruct Hx as (Hj & Hwj).
+    apply first_non_fixpoint_Some_if in Hy.
+    destruct Hy as (Hjn & Hkj & Hjj).
+    specialize (where_is_None_if _ Hwj) as H1.
+    destruct (lt_dec i j) as [Hij| Hij]; [ now apply Hj | ].
+    apply Nat.nlt_ge in Hij.
+    destruct (Nat.eq_dec i j) as [Heij| Heij]. {
+      move Heij at top; subst i.
+...
+
 destruct x as [(j, k)| ]. {
   apply first_non_transp_Some_if in Hx.
   destruct Hx as (Hjn & Hkn & Hii & Hj & Hkj).
