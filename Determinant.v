@@ -949,6 +949,22 @@ destruct (Nat.eq_dec i j') as [Hij| Hij]; [ | easy ].
 congruence.
 Qed.
 
+Theorem Comp_tfonp_tlopf_2 : ∀ it n σ j k,
+  (Comp
+     (i ∈
+      map transp_fun_of_nat_pair
+        (tlopf_loop' it n (comp (transposition j k) σ))), i) j =
+  (Comp
+     (i ∈
+      map transp_fun_of_nat_pair
+        (tlopf_loop' it n (transposition j k))), i) (σ j).
+Proof.
+intros.
+induction it. {
+  cbn.
+  unfold iter_list; cbn.
+Abort.
+
 Theorem glop : ∀ it n (σ : nat → nat),
   n ≠ 0
   → n ≤ it
@@ -1017,6 +1033,23 @@ destruct x as [(j, k)| ]. {
   destruct (Nat.eq_dec i j) as [Heij| Heij]. {
     move Heij at top; subst i.
     clear Hij Hin.
+    destruct it. {
+      subst n.
+      apply Nat.lt_1_r in Hjn.
+      apply Nat.lt_1_r in Hkn.
+      congruence.
+    }
+    cbn.
+    remember (first_non_transp n (comp (transposition j k) σ)) as x eqn:Hx.
+    symmetry in Hx.
+    destruct x as [(i', j')| ]. {
+      cbn.
+      rewrite iter_list_cons; [ | easy | easy | easy ].
+      apply first_non_transp_Some_if in Hx.
+      destruct Hx as (Hjn' & Hkn' & Hi' & Hii' & Hkj').
+...
+rewrite Comp_tfonp_tlopf_2.
+...
     rewrite <- Hkj.
 Check Comp_tfonp_tlopf.
 ...
