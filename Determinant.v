@@ -765,28 +765,39 @@ Compute let σ := vect_of_list 0 [0;5;1;2;4;3] in let n := vect_size σ in list_
 Compute let σ := vect_of_list 0 [0;5;1;2;4;3] in let n := vect_size σ in list_of_fun n (Comp (τ ∈ transp_list_of_permut_fun n (vect_el σ)), transp_fun_of_nat_pair τ).
 *)
 
-Theorem first_non_fixpoint_Some_if : ∀ σ it i j,
+Theorem first_non_fixpoint_Some_iff : ∀ σ it i j,
   first_non_fixpoint it i σ = Some j
-  → j < i + it ∧ (∀ k, i ≤ k < j → σ k = k) ∧ σ j ≠ j.
+  ↔ j < i + it ∧ (∀ k, i ≤ k < j → σ k = k) ∧ σ j ≠ j.
 Proof.
-intros * Hs.
-revert σ i j Hs.
-induction it; intros; [ easy | cbn in Hs ].
-rewrite if_eqb_eq_dec in Hs.
-destruct (Nat.eq_dec i (σ i)) as [Hii| Hii]. {
-  specialize (IHit σ (i + 1) j Hs) as (H1 & H2 & H3).
-  rewrite <- Nat.add_assoc in H1.
-  split; [ easy | ].
-  split; [ | easy ].
-  intros k Hk.
-  destruct (Nat.eq_dec i k) as [Hik| Hik]; [ now subst k | ].
-  apply H2; flia Hk Hik.
+intros.
+split. {
+  intros Hs.
+  revert σ i j Hs.
+  induction it; intros; [ easy | cbn in Hs ].
+  rewrite if_eqb_eq_dec in Hs.
+  destruct (Nat.eq_dec i (σ i)) as [Hii| Hii]. {
+    specialize (IHit σ (i + 1) j Hs) as (H1 & H2 & H3).
+    rewrite <- Nat.add_assoc in H1.
+    split; [ easy | ].
+    split; [ | easy ].
+    intros k Hk.
+    destruct (Nat.eq_dec i k) as [Hik| Hik]; [ now subst k | ].
+    apply H2; flia Hk Hik.
+  } {
+    injection Hs; clear Hs; intros; subst j.
+    split; [ flia | ].
+    split; [ | now apply Nat.neq_sym ].
+    intros k Hk; flia Hk.
+  }
 } {
-  injection Hs; clear Hs; intros; subst j.
-  split; [ flia | ].
-  split; [ | now apply Nat.neq_sym ].
-  intros k Hk; flia Hk.
-}
+  intros (Hji & Hj & Hjj).
+  induction it; intros. {
+    cbn.
+    exfalso.
+...
+    apply Hjj, Hj.
+Print first_non_fixpoint.
+...
 Qed.
 
 Theorem first_non_fixpoint_None_if : ∀ σ it i,
