@@ -876,35 +876,33 @@ Qed.
 
 Theorem where_is_None_iff : ∀ n σ i j,
   where_is n σ i j = None
-  ↔ ∀ k, k - j < n → σ k ≠ k.
+  ↔ ∀ k, j ≤ k < j + n → σ k ≠ i.
 Proof.
 intros.
 split. {
   intros Hw k Hk.
   revert i j k Hw Hk.
-  induction n; intros; [ easy | ].
+  induction n; intros; [ flia Hk | ].
   cbn in Hw.
   rewrite if_eqb_eq_dec in Hw.
   destruct (Nat.eq_dec (σ j) i) as [H1| H1]; [ easy | ].
+  destruct (Nat.eq_dec k j) as [Hkj| Hkj]; [ now subst k | ].
   apply IHn with (i := i) (j := j + 1); [ easy | ].
-...
-  flia Hk.
-...
-  destruct (Nat.eq_dec j n) as [Hjn| Hjn]; [ now subst j | ].
-  apply IHn; [ easy | ].
-  flia Hj Hjn.
+  flia Hk Hkj.
 } {
   intros Hn.
-  revert i Hn.
+  revert i j Hn.
   induction n; intros; [ easy | cbn ].
   rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec (σ n) i) as [Hi| Hi]. {
+  destruct (Nat.eq_dec (σ j) i) as [Hi| Hi]. {
     exfalso.
-    now specialize (Hn n (Nat.lt_succ_diag_r _)).
+    specialize (Hn j) as H1.
+    assert (H : j ≤ j < j + S n) by flia.
+    now specialize (H1 H); clear H.
   }
   apply IHn.
-  intros j Hm.
-  apply Hn; flia Hm.
+  intros k Hk.
+  apply Hn; flia Hk.
 }
 Qed.
 
@@ -922,10 +920,11 @@ destruct x as [i| ]; [ | easy ].
 apply first_non_fixpoint_Some_iff in Hx.
 destruct Hx as (Hi & Hj & Hk & Hsj).
 rewrite Nat.sub_0_r in Hj.
-remember (where_is n σ i) as y eqn:Hy; symmetry in Hy.
+remember (where_is n σ i 0) as y eqn:Hy; symmetry in Hy.
 destruct y as [m| ]; [ | easy ].
 injection Hfnt; clear Hfnt; intros; subst m j.
 apply where_is_Some_if in Hy.
+rewrite Nat.sub_0_r in Hy.
 split; [ easy | ].
 split; [ easy | ].
 split; [ | easy ].
@@ -936,7 +935,7 @@ Qed.
 Theorem first_non_transp_None_iff : ∀ n σ,
   first_non_transp n σ = None
   ↔ match first_non_fixpoint n 0 σ with
-     | Some i => (∀ j, j < i → j = σ j) ∧ where_is n σ i = None
+     | Some i => (∀ j, j < i → j = σ j) ∧ where_is n σ i 0 = None
      | None => ∀ k, k < n → k = σ k
     end.
 Proof.
@@ -951,7 +950,7 @@ split. {
     apply (H1 σ n 0 Hx).
     split; [ flia | easy ].
   }
-  destruct (where_is n σ i); [ easy | ].
+  destruct (where_is n σ i 0); [ easy | ].
   split; [ | easy ].
   apply first_non_fixpoint_Some_iff in Hx.
   destruct Hx as (Hi & Hin & Hkk & Hii).
@@ -1039,8 +1038,8 @@ destruct x as [(i', j')| ]. {
 
 Theorem where_is_enough_iter : ∀ n m σ i j,
   n ≤ m
-  → where_is n σ i = Some j
-  → where_is m σ i = Some j.
+  → where_is n σ i 0 = Some j
+  → where_is m σ i 0 = Some j.
 Proof.
 intros * Hnm Hij.
 revert i j n σ Hnm Hij.
@@ -1053,6 +1052,7 @@ destruct (Nat.eq_dec (σ m) i) as [Hsmi| Hsmi]. {
   cbn in Hij.
   rewrite if_eqb_eq_dec in Hij.
   destruct (Nat.eq_dec (σ n) i) as [Hsni| Hsni]. {
+...
     injection Hij; clear Hij; intros H; move H at top; subst j.
 Print where_is.
 ...
