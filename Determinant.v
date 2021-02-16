@@ -1044,6 +1044,9 @@ induction n; intros; [ now destruct it1, it2 | ].
 destruct it1; [ easy | ].
 destruct it2; [ easy | ].
 cbn.
+Print first_non_transp.
+Print first_non_fixpoint.
+Print where_is.
 ...
 intros * Hit1 Hit2.
 revert n σ it2 Hit1 Hit2.
