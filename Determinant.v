@@ -1063,23 +1063,20 @@ destruct x as [(j, k)| ]. 2: {
   apply first_non_transp_None_iff in Hx.
   remember (first_non_fixpoint n 0 σ) as y eqn:Hy.
   symmetry in Hy.
-  destruct y as [j| ]. {
-    destruct Hx as (Hj & Hwj).
-    apply first_non_fixpoint_Some_iff in Hy.
-    destruct Hy as (Hjz & Hjn & Hkj & Hjj).
-    specialize (proj1 (where_is_None_iff _ _ _) Hwj) as H1.
-    destruct (lt_dec i j) as [Hij| Hij]; [ now apply Hj | ].
-    apply Nat.nlt_ge in Hij.
-    destruct (Nat.eq_dec i j) as [Heij| Heij]. {
-      move Heij at top; subst i.
-      destruct j. {
-        clear Hij Hjn Hkj Hj Hjz.
-        destruct Hp as (Hp1, Hp2).
-(* il y en a forcément un qui vaut 0, dans les σ :
-   donc contradiction dans H1 *)
-...
-
-destruct x as [(j, k)| ]. {
+  destruct y as [j| ]; [ | now apply Hx ].
+  destruct Hx as (Hj & Hwj).
+  apply first_non_fixpoint_Some_iff in Hy.
+  rewrite Nat.sub_0_r in Hy.
+  destruct Hy as (Hjz & Hjn & Hkj & Hjj).
+  specialize (proj1 (where_is_None_iff _ _ _) Hwj) as H1.
+  specialize (H1 (permut_fun_inv σ n j)) as H2.
+  assert (H : permut_fun_inv σ n j < n). {
+    apply permut_fun_ub; [ | easy ].
+    now apply permut_fun_inv_is_permut.
+  }
+  specialize (H2 H); clear H.
+  now rewrite fun_permut_fun_inv in H2.
+} {
   apply first_non_transp_Some_if in Hx.
   destruct Hx as (Hjn & Hkn & Hii & Hj & Hkj).
   cbn.
