@@ -1033,6 +1033,40 @@ destruct x as [(i', j')| ]. {
 ...
 *)
 
+Theorem glop : ∀ n σ it1 it2,
+  n ≤ it1
+  → n ≤ it2
+  → tlopf_loop' it1 n σ = tlopf_loop' it2 n σ.
+Proof.
+intros * Hit1 Hit2.
+revert it1 it2 σ Hit1 Hit2.
+induction n; intros; [ now destruct it1, it2 | ].
+destruct it1; [ easy | ].
+destruct it2; [ easy | ].
+cbn.
+...
+intros * Hit1 Hit2.
+revert n σ it2 Hit1 Hit2.
+induction it1; intros. {
+  apply Nat.le_0_r in Hit1.
+  subst n; cbn.
+  now destruct it2.
+}
+cbn.
+remember (first_non_transp n σ) as x eqn:Hx.
+symmetry in Hx.
+destruct x as [(i, j)| ]. {
+  apply first_non_transp_Some_if in Hx.
+  destruct Hx as (Hin & Hjn & Hi & Hii & Hji).
+  destruct n; [ easy | ].
+Print tlopf_loop'.
+Print first_non_transp.
+Print where_is.
+...
+
+Definition transp_list_of_permut_fun' n (σ : nat → nat) := tlopf_loop' n n σ.
+...
+
 Theorem glop : ∀ it n (σ : nat → nat),
   n ≠ 0
   → n ≤ it
