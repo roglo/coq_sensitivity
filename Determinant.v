@@ -859,7 +859,7 @@ destruct x as [i| ]. {
 
 Theorem where_is_Some_if : ∀ n σ i j k,
   where_is n σ i j = Some k
-  → σ k = i ∧ k < n.
+  → σ k = i ∧ k - j < n.
 Proof.
 intros * Hw.
 revert i j k Hw.
@@ -868,25 +868,28 @@ cbn in Hw.
 rewrite if_eqb_eq_dec in Hw.
 destruct (Nat.eq_dec (σ j) i) as [H1| H1]. {
   injection Hw; intros; subst j.
-  split; [ easy | ].
-...
+  split; [ easy | flia ].
 }
-specialize (IHn i j Hw) as H2.
+specialize (IHn i _ k Hw) as H2.
 split; [ easy | flia H2 ].
 Qed.
 
-Theorem where_is_None_iff : ∀ n σ i,
-  where_is n σ i = None
-  ↔ ∀ j, j < n → σ j ≠ i.
+Theorem where_is_None_iff : ∀ n σ i j,
+  where_is n σ i j = None
+  ↔ ∀ k, k - j < n → σ k ≠ k.
 Proof.
 intros.
 split. {
-  intros Hw j Hj.
-  revert i j Hw Hj.
+  intros Hw k Hk.
+  revert i j k Hw Hk.
   induction n; intros; [ easy | ].
   cbn in Hw.
   rewrite if_eqb_eq_dec in Hw.
-  destruct (Nat.eq_dec (σ n) i) as [H1| H1]; [ easy | ].
+  destruct (Nat.eq_dec (σ j) i) as [H1| H1]; [ easy | ].
+  apply IHn with (i := i) (j := j + 1); [ easy | ].
+...
+  flia Hk.
+...
   destruct (Nat.eq_dec j n) as [Hjn| Hjn]; [ now subst j | ].
   apply IHn; [ easy | ].
   flia Hj Hjn.
