@@ -1117,25 +1117,33 @@ destruct x as [(j, k)| ]. 2: {
     destruct (Nat.eq_dec i k) as [Hsik| Hsik]; [ congruence | easy ].
   }
   apply Nat.nlt_ge in Hij.
+...
   destruct (Nat.eq_dec i j) as [Heij| Heij]. {
     move Heij at top; subst i.
     clear Hij Hin.
-...
-    destruct (Nat.eq_dec (σ j) k) as [Hsjk| Hsjk]. {
-      destruct it. {
-        unfold iter_list; cbn.
-        unfold transposition.
-        now rewrite Nat.eqb_refl.
-      }
+    clear IHit.
+    clear Hit.
+    clear Hnz.
+    revert σ j k n Hp Hnsit Hjn Hkn Hii Hj Hkj.
+    induction it; intros. {
+      unfold iter_list; cbn.
+      unfold transposition.
+      rewrite Nat.eqb_refl.
+      subst n.
+      apply Nat.lt_1_r in Hjn.
+      apply Nat.lt_1_r in Hkn.
+      now subst j k.
+    }
+    cbn.
+    remember (first_non_transp n (comp (transposition j k) σ)) as x eqn:Hx.
+    symmetry in Hx.
+    destruct x as [(i', j')| ]. {
       cbn.
-      remember (first_non_transp n (comp (transposition j k) σ)) as x eqn:Hx.
-      symmetry in Hx.
-      destruct x as [(i', j')| ]. {
-        cbn.
-        rewrite iter_list_cons; [ | easy | easy | easy ].
-        apply first_non_transp_Some_if in Hx.
-        destruct Hx as (Hjn' & Hkn' & Hi' & Hii' & Hkj').
-        unfold comp at 1.
+      rewrite iter_list_cons; [ | easy | easy | easy ].
+      apply first_non_transp_Some_if in Hx.
+      destruct Hx as (Hjn' & Hkn' & Hi' & Hii' & Hkj').
+      unfold comp at 1.
+      rewrite IHit.
 ...
 rewrite Comp_tfonp_tlopf_2.
 ...
