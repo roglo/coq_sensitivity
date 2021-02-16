@@ -1033,6 +1033,68 @@ destruct x as [(i', j')| ]. {
 ...
 *)
 
+Theorem where_is_enough_iter : ∀ n m σ i j,
+  n ≤ m
+  → where_is n σ i = Some j
+  → where_is m σ i = Some j.
+Proof.
+intros * Hnm Hij.
+revert i j n σ Hnm Hij.
+induction m; intros; cbn. {
+  now apply Nat.le_0_r in Hnm; subst n.
+}
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (σ m) i) as [Hsmi| Hsmi]. {
+  destruct n; [ easy | ].
+  cbn in Hij.
+  rewrite if_eqb_eq_dec in Hij.
+  destruct (Nat.eq_dec (σ n) i) as [Hsni| Hsni]. {
+    injection Hij; clear Hij; intros H; move H at top; subst j.
+Print where_is.
+...
+
+Theorem first_non_fixpoint_enough_iter : ∀ n m σ i j,
+  n ≤ m
+  → first_non_fixpoint n i σ = Some j
+  → first_non_fixpoint m i σ = Some j.
+Proof.
+intros * Hnm Hij.
+revert i j n σ Hnm Hij.
+induction m; intros; cbn. {
+  now apply Nat.le_0_r in Hnm; subst n.
+}
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec i (σ i)) as [Hii| Hii]. {
+  destruct n; [ easy | ].
+  cbn in Hij.
+  rewrite <- Hii, Nat.eqb_refl in Hij.
+  apply Nat.succ_le_mono in Hnm.
+  now apply IHm with (n := n).
+}
+apply first_non_fixpoint_Some_iff in Hij.
+destruct Hij as (Hij & Hjin & Hikj & Hjj).
+destruct (Nat.eq_dec i j) as [H1| H1]; [ now subst i | ].
+exfalso; apply Hii; symmetry.
+apply Hikj.
+split; [ flia | flia Hij H1 ].
+Qed.
+
+Theorem first_non_transp_enough_iter : ∀ n m σ i j,
+  n ≤ m
+  → first_non_transp n σ = Some (i, j)
+  → first_non_transp m σ = Some (i, j).
+Proof.
+intros * Hnm Hij.
+unfold first_non_transp in Hij |-*.
+remember (first_non_fixpoint n 0 σ) as x eqn:Hx.
+remember (first_non_fixpoint m 0 σ) as y eqn:Hy.
+symmetry in Hx, Hy.
+destruct x as [i'| ]. {
+  apply first_non_fixpoint_enough_iter with (m := m) in Hx; [ | easy ].
+  rewrite Hx in Hy; subst y.
+Print where_is.
+...
+
 Theorem glop : ∀ n σ it1 it2,
   n ≤ it1
   → n ≤ it2
@@ -1044,6 +1106,10 @@ induction n; intros; [ now destruct it1, it2 | ].
 destruct it1; [ easy | ].
 destruct it2; [ easy | ].
 cbn.
+remember (first_non_transp (S n) σ) as x eqn:Hx.
+symmetry in Hx.
+destruct x as [(i, j)| ]. {
+  f_equal.
 Print first_non_transp.
 Print first_non_fixpoint.
 Print where_is.
