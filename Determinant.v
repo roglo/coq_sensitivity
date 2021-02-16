@@ -997,20 +997,39 @@ congruence.
 Qed.
 
 Theorem Comp_tfonp_tlopf_2 : ∀ it n σ j k,
-  (Comp
-     (i ∈
-      map transp_fun_of_nat_pair
-        (tlopf_loop' it n (comp (transposition j k) σ))), i) j =
-  (Comp
-     (i ∈
-      map transp_fun_of_nat_pair
-        (tlopf_loop' it n (transposition j k))), i) (σ j).
+  it ≠ 0
+  → (Comp
+       (i ∈
+        map transp_fun_of_nat_pair
+          (tlopf_loop' it n (comp (transposition j k) σ))), i) j =
+    (Comp
+       (i ∈
+        map transp_fun_of_nat_pair
+          (tlopf_loop' it n (transposition j k))), i) (σ j).
 Proof.
-intros.
-induction it. {
+intros * Hit.
+destruct it; [ easy |  ].
+cbn.
+remember (first_non_transp n (comp (transposition j k) σ)) as x eqn:Hx.
+symmetry in Hx.
+destruct x as [(i', j')| ]. {
   cbn.
-  unfold iter_list; cbn.
-Abort.
+  rewrite iter_list_cons; [ | easy | easy | easy ].
+  apply first_non_transp_Some_if in Hx.
+  destruct Hx as (Hi'n & Hj'n & Hsii & Hcti' & Hctj').
+  remember (first_non_transp n (transposition j k)) as y eqn:Hy.
+  symmetry in Hy.
+  destruct y as [(i'', j'')| ]. {
+    cbn.
+    rewrite iter_list_cons; [ | easy | easy | easy ].
+    apply first_non_transp_Some_if in Hy.
+    destruct Hy as (Hi''n & Hj''n & Hsii'' & Hcti'' & Hctj'').
+    destruct (lt_dec (σ i') i'') as [Hii''| Hii'']. {
+      specialize (Hsii'' _ Hii'') as H1.
+      unfold comp in Hcti'.
+      rewrite H1 in Hcti'.
+(* pfff... c'est trop la merde... trop compliqué... *)
+...
 
 Theorem glop : ∀ it n (σ : nat → nat),
   n ≠ 0
@@ -1100,7 +1119,7 @@ destruct x as [(j, k)| ]. 2: {
     move Heij at top; subst i.
     clear Hij Hin.
     destruct (Nat.eq_dec (σ j) k) as [Hsjk| Hsjk]. {
-Print tlopf_loop'.
+Search tlopf_loop'.
 ...
     destruct it. {
       subst n.
