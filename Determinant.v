@@ -1120,6 +1120,7 @@ destruct x as [(j, k)| ]. 2: {
   destruct (Nat.eq_dec i j) as [Heij| Heij]. {
     move Heij at top; subst i.
     clear Hij Hin.
+...
     destruct (Nat.eq_dec (σ j) k) as [Hsjk| Hsjk]. {
       destruct it. {
         unfold iter_list; cbn.
