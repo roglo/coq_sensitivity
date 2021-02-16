@@ -691,17 +691,17 @@ Definition transp_list_of_permut_fun n (σ : nat → nat) := tlopf_loop n n σ.
 Definition transp_list_of_permut {n} (σ : vector n nat) :=
   transp_list_of_permut_fun n (vect_el σ).
 
-Fixpoint where_is n (σ : nat → nat) i :=
-  match n with
+Fixpoint where_is it (σ : nat → nat) i j :=
+  match it with
   | 0 => None
-  | S n' => if σ n' =? i then Some n' else where_is n' σ i
+  | S it' => if σ j =? i then Some j else where_is it' σ i (j + 1)
   end.
 
 Definition first_non_transp n (σ : nat → nat) :=
   match first_non_fixpoint n 0 σ with
   | None => None
   | Some i =>
-      match where_is n σ i with
+      match where_is n σ i 0 with
       | None => None
       | Some j => Some (i, j)
       end
@@ -857,18 +857,19 @@ destruct x as [i| ]. {
 ...
 *)
 
-Theorem where_is_Some_if : ∀ n σ i j,
-  where_is n σ i = Some j
-  → σ j = i ∧ j < n.
+Theorem where_is_Some_if : ∀ n σ i j k,
+  where_is n σ i j = Some k
+  → σ k = i ∧ k < n.
 Proof.
 intros * Hw.
-revert i j Hw.
+revert i j k Hw.
 induction n; intros; [ easy | ].
 cbn in Hw.
 rewrite if_eqb_eq_dec in Hw.
-destruct (Nat.eq_dec (σ n) i) as [H1| H1]. {
+destruct (Nat.eq_dec (σ j) i) as [H1| H1]. {
   injection Hw; intros; subst j.
-  split; [ easy | flia ].
+  split; [ easy | ].
+...
 }
 specialize (IHn i j Hw) as H2.
 split; [ easy | flia H2 ].
