@@ -1118,11 +1118,12 @@ Fixpoint nb_good_loop it i σ :=
 Definition nb_good n σ := nb_good_loop n 0 σ.
 
 Theorem glop : ∀ n σ i j k,
-  first_non_transp n σ = Some (i, j)
+  is_permut_fun σ n
+  → first_non_transp n σ = Some (i, j)
   → nb_good_loop n k σ < nb_good_loop n k (comp (transposition i j) σ).
 Proof.
-intros * Hn.
-revert σ i j k Hn.
+intros * Hperm Hn.
+revert σ i j k Hn Hperm.
 induction n; intros; [ easy | cbn ].
 unfold Nat.b2n.
 do 2 rewrite if_eqb_eq_dec.
@@ -1131,6 +1132,65 @@ destruct (Nat.eq_dec (σ k) k) as [Hsk| Hsk]. {
     cbn.
     apply -> Nat.succ_lt_mono.
     apply IHn.
+    unfold first_non_transp in Hn |-*.
+    cbn in Hn.
+    remember (σ 0) as m eqn:Hm.
+    symmetry in Hm.
+    destruct m. {
+      remember (first_non_fixpoint n 0 σ) as x eqn:Hx.
+      symmetry in Hx.
+      destruct x as [p| ]. {
+        apply first_non_fixpoint_Some_iff in Hx.
+        rewrite Nat.sub_0_r in Hx.
+        destruct Hx as (_ & Hpn & Hp & Hpp).
+        remember (first_non_fixpoint n 1 σ) as y eqn:Hy.
+        symmetry in Hy.
+        destruct y as [q| ]. {
+          apply first_non_fixpoint_Some_iff in Hy.
+          destruct Hy as (Hq & Hqn & Hqk & Hqq).
+          rewrite if_eqb_eq_dec in Hn.
+          destruct (Nat.eq_dec 0 q) as [H| H]; [ flia H Hq | clear H ].
+          assert (Hp1 : 1 ≤ p). {
+            destruct p; [ easy | flia ].
+          }
+          assert (H : p = q). {
+            destruct (lt_dec p q) as [H1| H1]. {
+              assert (H : 1 ≤ p < q) by easy.
+              now specialize (Hqk _ H); clear H.
+            }
+            destruct (lt_dec q p) as [H2| H2]. {
+              assert (H : 0 ≤ q < p) by flia H2.
+              now specialize (Hp _ H); clear H.
+            }
+            flia H1 H2.
+          }
+          subst q.
+          clear Hqq Hqn Hq.
+          remember (where_is n σ p 1) as x eqn:Hx.
+          symmetry in Hx.
+          destruct x as [r| ]; [ | easy ].
+          injection Hn; clear Hn; intros; subst p r.
+          remember (where_is n σ i 0) as y eqn:Hy.
+          symmetry in Hy.
+          destruct y as [s| ]. {
+            f_equal; f_equal.
+            apply where_is_Some_if in Hy.
+            rewrite Nat.sub_0_r in Hy.
+            destruct Hy as (Hsi, Hsn).
+            apply where_is_Some_if in Hx.
+            destruct Hx as (Hji & Hjn).
+            rewrite <- Hji in Hsi.
+            apply Hperm; [ flia Hsn | | easy ].
+            flia Hjn.
+          }
+          specialize (proj1 (where_is_None_iff _ _ _ _) Hy) as H1.
+          cbn in H1.
+          apply where_is_Some_if in Hx.
+          destruct Hx as (Hsji & Hj).
+...
+          exfalso; revert Hsji.
+          apply H1.
+          split; [ flia | ].
 ...
 
 Theorem glop : ∀ n σ i j,
