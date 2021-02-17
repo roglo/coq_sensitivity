@@ -1126,8 +1126,10 @@ intros * Hperm Hn.
 revert σ i j k Hn Hperm.
 induction n; intros; [ easy | cbn ].
 unfold Nat.b2n.
+(*
 apply first_non_transp_Some_if in Hn.
 destruct Hn as (Hisn & Hjsn & Hi & Hii & Hji).
+*)
 do 2 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec (σ k) k) as [Hsk| Hsk]. {
   destruct (Nat.eq_dec (comp (transposition i j) σ k) k) as [Hcz| Hcz]. {
@@ -1135,7 +1137,11 @@ destruct (Nat.eq_dec (σ k) k) as [Hsk| Hsk]. {
     apply -> Nat.succ_lt_mono.
     unfold comp, transposition in Hcz.
     do 2 rewrite if_eqb_eq_dec in Hcz.
-    destruct (Nat.eq_dec (σ k) i) as [Hski| Hski]; [ congruence | ].
+    destruct (Nat.eq_dec (σ k) i) as [Hski| Hski]. {
+      apply first_non_transp_Some_if in Hn.
+      destruct Hn as (Hisn & Hjsn & Hi & Hii & Hji).
+      congruence.
+    }
     destruct (Nat.eq_dec (σ k) j) as [Hskj| Hskj]; [ congruence | ].
     clear Hcz.
 ...
