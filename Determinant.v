@@ -1122,6 +1122,7 @@ destruct it2; [ now rewrite Nat.le_0_r in Hit2; subst n | cbn ].
 remember (first_non_transp n σ) as x eqn:Hx; symmetry in Hx.
 destruct x as [(i, j)| ]; [ | easy ].
 f_equal.
+Print tlopf_loop'.
 ...
 intros * Hit1 Hit2.
 revert it1 it2 σ Hit1 Hit2.
