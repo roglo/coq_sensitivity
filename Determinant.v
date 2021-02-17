@@ -1188,6 +1188,12 @@ destruct (Nat.eq_dec (σ k) k) as [Hsk| Hsk]. {
           apply where_is_Some_if in Hx.
           destruct Hx as (Hsji & Hj).
 ...
+          specialize (H1 (permut_fun_inv σ (S n) i)).
+          assert (H : 0 ≤ permut_fun_inv σ (S n) i < n). {
+            split; [ flia | ].
+            apply permut_fun_ub; [ | easy ].
+            apply permut_fun_inv_is_permut.
+...
           exfalso; revert Hsji.
           apply H1.
           split; [ flia | ].
