@@ -1122,6 +1122,13 @@ destruct it2; [ now rewrite Nat.le_0_r in Hit2; subst n | cbn ].
 remember (first_non_transp n σ) as x eqn:Hx; symmetry in Hx.
 destruct x as [(i, j)| ]; [ | easy ].
 f_equal.
+apply first_non_transp_Some_if in Hx.
+destruct Hx as (Hin & Hjn & Hi & Hsi & Hsj).
+destruct n; [ easy | ].
+apply Nat.succ_le_mono in Hit1.
+apply Nat.succ_le_mono in Hit2.
+set (σ' := comp (transposition i j) σ).
+specialize (IHit1 n σ' it2 Hit1 Hit2) as H1.
 Print tlopf_loop'.
 ...
 intros * Hit1 Hit2.
