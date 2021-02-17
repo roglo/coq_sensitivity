@@ -1131,6 +1131,7 @@ apply Nat.succ_le_mono in Hit1.
 apply Nat.succ_le_mono in Hit2.
 set (σ' := comp (transposition i j) σ).
 specialize (IHit1 n σ' it2 Hit1 Hit2) as H1.
+Print tlopf_loop'.
 ...
 Restart.
 intros * Hit1 Hit2.
