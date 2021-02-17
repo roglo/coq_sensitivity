@@ -1123,7 +1123,8 @@ Theorem glop : ∀ n σ i j k,
   → nb_good_loop n k σ < nb_good_loop n k (comp (transposition i j) σ).
 Proof.
 intros * Hperm Hn.
-revert σ i j k Hn Hperm.
+clear Hperm.
+revert σ i j k Hn (*Hperm*).
 induction n; intros; [ easy | cbn ].
 unfold Nat.b2n.
 (*
