@@ -1053,10 +1053,13 @@ destruct (Nat.eq_dec (σ j) i) as [Hsmi| Hsmi]. {
   rewrite if_eqb_eq_dec in Hij.
   now destruct (Nat.eq_dec (σ j) i).
 }
-...
-    injection Hij; clear Hij; intros H; move H at top; subst j.
-Print where_is.
-...
+destruct n; [ easy | ].
+apply Nat.succ_le_mono in Hnm.
+cbn in Hij.
+rewrite if_eqb_eq_dec in Hij.
+destruct (Nat.eq_dec (σ j) i) as [Hji| Hji]; [ easy | ].
+now apply IHm with (n := n).
+Qed.
 
 Theorem first_non_fixpoint_enough_iter : ∀ n m σ i j,
   n ≤ m
@@ -1097,7 +1100,6 @@ symmetry in Hx, Hy.
 destruct x as [i'| ]. {
   apply first_non_fixpoint_enough_iter with (m := m) in Hx; [ | easy ].
   rewrite Hx in Hy; subst y.
-Print where_is.
 ...
 
 Theorem glop : ∀ n σ it1 it2,
