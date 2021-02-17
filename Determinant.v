@@ -1097,16 +1097,32 @@ unfold first_non_transp in Hij |-*.
 remember (first_non_fixpoint n 0 σ) as x eqn:Hx.
 remember (first_non_fixpoint m 0 σ) as y eqn:Hy.
 symmetry in Hx, Hy.
-destruct x as [i'| ]. {
-  apply first_non_fixpoint_enough_iter with (m := m) in Hx; [ | easy ].
-  rewrite Hx in Hy; subst y.
-...
+destruct x as [i'| ]; [ | easy ].
+apply first_non_fixpoint_enough_iter with (m := m) in Hx; [ | easy ].
+rewrite Hx in Hy; subst y.
+remember (where_is n σ i' 0) as y eqn:Hy; symmetry in Hy.
+destruct y as [j'| ]; [ | easy ].
+injection Hij; clear Hij; intros; subst i' j'.
+now rewrite where_is_enough_iter with (n := n) (k := j).
+Qed.
 
-Theorem glop : ∀ n σ it1 it2,
+Theorem tlopf_loop'_enough_iter : ∀ n σ it1 it2,
   n ≤ it1
   → n ≤ it2
   → tlopf_loop' it1 n σ = tlopf_loop' it2 n σ.
 Proof.
+intros * Hit1 Hit2.
+revert n σ it2 Hit1 Hit2.
+induction it1; intros. {
+  apply Nat.le_0_r in Hit1; subst n; cbn.
+  now destruct it2.
+}
+cbn.
+destruct it2; [ now rewrite Nat.le_0_r in Hit2; subst n | cbn ].
+remember (first_non_transp n σ) as x eqn:Hx; symmetry in Hx.
+destruct x as [(i, j)| ]; [ | easy ].
+f_equal.
+...
 intros * Hit1 Hit2.
 revert it1 it2 σ Hit1 Hit2.
 induction n; intros; [ now destruct it1, it2 | ].
@@ -1115,8 +1131,8 @@ destruct it2; [ easy | ].
 cbn.
 remember (first_non_transp (S n) σ) as x eqn:Hx.
 symmetry in Hx.
-destruct x as [(i, j)| ]. {
-  f_equal.
+destruct x as [(i, j)| ]; [ | easy ].
+f_equal.
 Print first_non_transp.
 Print first_non_fixpoint.
 Print where_is.
