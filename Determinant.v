@@ -1036,22 +1036,23 @@ destruct x as [(i', j')| ]. {
 ...
 *)
 
-Theorem where_is_enough_iter : ∀ n m σ i j,
+Theorem where_is_enough_iter : ∀ n m σ i j k,
   n ≤ m
-  → where_is n σ i 0 = Some j
-  → where_is m σ i 0 = Some j.
+  → where_is n σ i j = Some k
+  → where_is m σ i j = Some k.
 Proof.
 intros * Hnm Hij.
-revert i j n σ Hnm Hij.
+revert i j k n σ Hnm Hij.
 induction m; intros; cbn. {
   now apply Nat.le_0_r in Hnm; subst n.
 }
 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec (σ m) i) as [Hsmi| Hsmi]. {
+destruct (Nat.eq_dec (σ j) i) as [Hsmi| Hsmi]. {
   destruct n; [ easy | ].
   cbn in Hij.
   rewrite if_eqb_eq_dec in Hij.
-  destruct (Nat.eq_dec (σ n) i) as [Hsni| Hsni]. {
+  now destruct (Nat.eq_dec (σ j) i).
+}
 ...
     injection Hij; clear Hij; intros H; move H at top; subst j.
 Print where_is.
