@@ -1106,6 +1106,11 @@ injection Hij; clear Hij; intros; subst i' j'.
 now rewrite where_is_enough_iter with (n := n) (k := j).
 Qed.
 
+Theorem glop : ∀ n σ,
+  ¬ (∀ i, i < n → σ i = i)
+  → nb_good ...
+...
+
 Theorem tlopf_loop'_enough_iter : ∀ n σ it1 it2,
   n ≤ it1
   → n ≤ it2
