@@ -1106,7 +1106,32 @@ injection Hij; clear Hij; intros; subst i' j'.
 now rewrite where_is_enough_iter with (n := n) (k := j).
 Qed.
 
+(*
 Definition nb_good n σ := length (filter (λ i, σ i =? i) (seq 0 n)).
+*)
+Fixpoint nb_good_loop it i σ :=
+  match it with
+  | 0 => 0
+  | S it' => Nat.b2n (σ i =? i) + nb_good_loop it' (i + 1) σ
+  end.
+
+Definition nb_good n σ := nb_good_loop n 0 σ.
+
+Theorem glop : ∀ n σ i j k,
+  first_non_transp n σ = Some (i, j)
+  → nb_good_loop n k σ < nb_good_loop n k (comp (transposition i j) σ).
+Proof.
+intros * Hn.
+revert σ i j k Hn.
+induction n; intros; [ easy | cbn ].
+unfold Nat.b2n.
+do 2 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (σ k) k) as [Hsk| Hsk]. {
+  destruct (Nat.eq_dec (comp (transposition i j) σ k) k) as [Hcz| Hcz]. {
+    cbn.
+    apply -> Nat.succ_lt_mono.
+    apply IHn.
+...
 
 Theorem glop : ∀ n σ i j,
   first_non_transp n σ = Some (i, j)
@@ -1114,13 +1139,7 @@ Theorem glop : ∀ n σ i j,
 Proof.
 intros * Hn.
 unfold nb_good.
-revert σ i j Hn.
-induction n; intros; [ easy | cbn ].
-do 2 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec (σ 0) 0) as [Hsz| Hsz]. {
-  destruct (Nat.eq_dec (comp (transposition i j) σ 0) 0) as [Hcz| Hcz]. {
-    cbn.
-    apply -> Nat.succ_lt_mono.
+...
     apply first_non_transp_Some_if in Hn.
     destruct Hn as (Hin & Hjn & Hi & Hii & Hji).
 ...
