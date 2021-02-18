@@ -1118,12 +1118,10 @@ Fixpoint nb_good_loop it i σ :=
 Definition nb_good n σ := nb_good_loop n 0 σ.
 
 Theorem glop : ∀ n σ i j k,
-  is_permut_fun σ n
-  → first_non_transp n σ = Some (i, j)
+  first_non_transp n σ = Some (i, j)
   → nb_good_loop n k σ < nb_good_loop n k (comp (transposition i j) σ).
 Proof.
-intros * Hperm Hn.
-clear Hperm.
+intros * Hn.
 apply first_non_transp_Some_if in Hn.
 destruct Hn as (Hni & Hnj & Hi & Hii & Hji).
 revert σ i j k Hni Hnj Hi Hii Hji.
