@@ -1124,6 +1124,7 @@ Theorem glop : ∀ n σ i j k,
   → nb_good_loop n k σ < nb_good_loop n k (comp (transposition i j) σ).
 Proof.
 intros * Hp Hn Hkn.
+...
 apply first_transp_Some_if in Hn.
 destruct Hn as (Hin & Hjn & Hi & Hii & Hji).
 move Hkn before Hjn.
