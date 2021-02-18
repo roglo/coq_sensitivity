@@ -1124,6 +1124,27 @@ Theorem glop : ∀ n σ i j k,
 Proof.
 intros * Hperm Hn.
 clear Hperm.
+apply first_non_transp_Some_if in Hn.
+destruct Hn as (Hni & Hnj & Hi & Hii & Hji).
+revert σ i j k Hni Hnj Hi Hii Hji.
+induction n; intros; [ easy | cbn ].
+unfold Nat.b2n.
+do 2 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (σ k) k) as [Hsk| Hsk]. {
+  destruct (Nat.eq_dec (comp (transposition i j) σ k) k) as [Hcz| Hcz]. {
+    cbn.
+    apply -> Nat.succ_lt_mono.
+    unfold comp, transposition in Hcz.
+    do 2 rewrite if_eqb_eq_dec in Hcz.
+    destruct (Nat.eq_dec (σ k) i) as [Hski| Hski]; [ congruence | ].
+    destruct (Nat.eq_dec (σ k) j) as [Hskj| Hskj]; [ congruence | ].
+    clear Hcz.
+    destruct i. {
+      destruct j; [ easy | ].
+      clear Hni Hi.
+...
+intros * Hperm Hn.
+clear Hperm.
 revert σ i j k Hn (*Hperm*).
 induction n; intros; [ easy | cbn ].
 unfold Nat.b2n.
@@ -1145,6 +1166,14 @@ destruct (Nat.eq_dec (σ k) k) as [Hsk| Hsk]. {
     }
     destruct (Nat.eq_dec (σ k) j) as [Hskj| Hskj]; [ congruence | ].
     clear Hcz.
+    unfold first_non_transp in Hn.
+    remember (first_non_fixpoint (S n) 0 σ) as x eqn:Hx.
+    symmetry in Hx.
+    destruct x as [i1| ]; [ | easy ].
+    remember (where_is (S n) σ i1 0) as y eqn:Hy.
+    symmetry in Hy.
+    destruct y as [j1| ]; [ | easy ].
+    injection Hn; clear Hn; intros; subst i1 j1.
 ...
 intros * Hperm Hn.
 revert σ i j k Hn Hperm.
