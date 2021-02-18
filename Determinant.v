@@ -1129,7 +1129,19 @@ destruct Hn as (Hin & Hjn & Hi & Hii & Hji).
 move Hkn before Hjn.
 revert n i j k Hp Hin Hjn Hkn Hi Hii Hji.
 induction it; intros. {
-  cbn.
+  cbn; exfalso.
+  clear k Hkn.
+  destruct n; [ easy | ].
+  destruct n. {
+    apply Nat.lt_1_r in Hin.
+    apply Nat.lt_1_r in Hjn.
+    now subst i j.
+  }
+  destruct n. {
+    destruct i. {
+      destruct j; [ easy | ].
+      destruct j; [ | flia Hjn ].
+(* caca *)
 ...
 intros * Hp Hn Hkn.
 apply first_transp_Some_if in Hn.
