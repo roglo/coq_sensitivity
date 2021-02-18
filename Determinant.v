@@ -1125,7 +1125,8 @@ Theorem glop : ∀ n σ i j k,
 Proof.
 intros * Hp Hn Hkn.
 apply first_transp_Some_if in Hn.
-destruct Hn as (Hni & Hnj & Hi & Hii & Hji).
+destruct Hn as (Hin & Hjn & Hi & Hii & Hji).
+move Hkn before Hjn.
 destruct n; intros; [ easy | cbn ].
 unfold Nat.b2n.
 unfold comp at 1, transposition at 1.
@@ -1136,8 +1137,8 @@ destruct (Nat.eq_dec (σ k) k) as [Hkk| Hkk]. {
   rewrite Hkk, <- if_eqb_eq_dec, Nat.eqb_refl.
   apply -> Nat.succ_lt_mono.
   destruct n. {
-    apply Nat.lt_1_r in Hni; subst i.
-    now apply Nat.lt_1_r in Hnj; subst j.
+    apply Nat.lt_1_r in Hin; subst i.
+    now apply Nat.lt_1_r in Hjn; subst j.
   }
   cbn.
   unfold Nat.b2n.
@@ -1153,16 +1154,16 @@ destruct (Nat.eq_dec (σ k) k) as [Hkk| Hkk]. {
       exfalso.
       destruct i. {
         destruct j; [ congruence | ].
-        destruct j; [ | flia Hnj ].
+        destruct j; [ | flia Hjn ].
         destruct k; [ easy | ].
         destruct k; [ easy | flia Hkn  ].
       }
-      destruct i; [ | flia Hni ].
+      destruct i; [ | flia Hin ].
       destruct j. {
         destruct k; [ easy | ].
         destruct k; [ easy | flia Hkn ].
       }
-      destruct j; [ easy | flia Hnj ].
+      destruct j; [ easy | flia Hjn ].
     }
     cbn.
     destruct n. {
@@ -1179,6 +1180,15 @@ destruct (Nat.eq_dec (σ k) k) as [Hkk| Hkk]. {
           congruence.
         }
         exfalso.
+        destruct i. {
+          destruct j; [ congruence | ].
+          destruct j. {
+            destruct k; [ easy | ].
+            destruct k; [ easy | ].
+            destruct k; [ | flia Hkn ].
+            clear Hki Hkj Hk1i Hk1j Hk2i Hk2j.
+            cbn in Hkk1, Hkk2.
+(* ah bin non, ça marche pas *)
 ...
 intros * Hn.
 apply first_transp_Some_if in Hn.
