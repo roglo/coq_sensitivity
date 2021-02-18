@@ -1156,6 +1156,7 @@ destruct (Nat.eq_dec (σ k) k) as [Hkk| Hkk]. {
         destruct k; [ easy | ].
         destruct k. {
           destruct Hp as (Hp1, Hp2).
+(* hypotheses to be added to make it work *)
 ...
 intros * Hn.
 apply first_transp_Some_if in Hn.
