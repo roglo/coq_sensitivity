@@ -1142,6 +1142,22 @@ destruct (Nat.eq_dec (σ k) k) as [Hsk| Hsk]. {
     destruct i. {
       destruct j; [ easy | ].
       clear Hni Hi.
+      rewrite Nat.add_1_r.
+      destruct n; [ flia Hnj | cbn ].
+      unfold Nat.b2n.
+      unfold comp at 1.
+      unfold transposition at 1.
+      do 4 rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec (σ (S k)) (S k)) as [Hkk| Hkk]. {
+        destruct (Nat.eq_dec (σ (S k)) 0) as [Hk1| Hk1]; [ congruence | ].
+        destruct (Nat.eq_dec (σ (S k)) (S j)) as [Hkj| Hkj]; [ congruence | ].
+        rewrite Hkk.
+        rewrite <- if_eqb_eq_dec.
+        rewrite Nat.eqb_refl.
+        apply -> Nat.succ_lt_mono.
+        destruct n. {
+          cbn.
+          replace j with 0 in * by flia Hnj.
 ...
 intros * Hperm Hn.
 clear Hperm.
