@@ -697,7 +697,7 @@ Fixpoint where_is it (σ : nat → nat) i j :=
   | S it' => if σ j =? i then Some j else where_is it' σ i (j + 1)
   end.
 
-Definition first_non_transp n (σ : nat → nat) :=
+Definition first_transp n (σ : nat → nat) :=
   match first_non_fixpoint n 0 σ with
   | None => None
   | Some i =>
@@ -711,7 +711,7 @@ Fixpoint tlopf_loop' it n (σ : nat → nat) :=
   match it with
   | 0 => []
   | S it' =>
-      match first_non_transp n σ with
+      match first_transp n σ with
       | None => []
       | Some (i, j) =>
           let σ' := comp (transposition i j) σ in
@@ -906,15 +906,15 @@ split. {
 }
 Qed.
 
-Theorem first_non_transp_Some_if : ∀ n σ j k,
-  first_non_transp n σ = Some (j, k)
+Theorem first_transp_Some_if : ∀ n σ j k,
+  first_transp n σ = Some (j, k)
   → j < n ∧ k < n ∧
     (∀ i, i < j → σ i = i) ∧
     σ j ≠ j ∧
     σ k = j.
 Proof.
 intros * Hfnt.
-unfold first_non_transp in Hfnt.
+unfold first_transp in Hfnt.
 remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
 destruct x as [i| ]; [ | easy ].
 apply first_non_fixpoint_Some_iff in Hx.
@@ -932,8 +932,8 @@ intros j Hm.
 apply Hk; flia Hm.
 Qed.
 
-Theorem first_non_transp_None_iff : ∀ n σ,
-  first_non_transp n σ = None
+Theorem first_transp_None_iff : ∀ n σ,
+  first_transp n σ = None
   ↔ match first_non_fixpoint n 0 σ with
      | Some i => (∀ j, j < i → j = σ j) ∧ where_is n σ i 0 = None
      | None => ∀ k, k < n → k = σ k
@@ -942,7 +942,7 @@ Proof.
 intros.
 split. {
   intros Hfnt.
-  unfold first_non_transp in Hfnt.
+  unfold first_transp in Hfnt.
   remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
   destruct x as [i| ]. 2: {
     intros k Hk.
@@ -960,7 +960,7 @@ split. {
   apply Hkk; flia Hj.
 } {
   intros Hn.
-  unfold first_non_transp.
+  unfold first_transp.
   remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
   destruct x as [i| ]; [ | easy ].
   destruct Hn as (Hj, Hni).
@@ -975,9 +975,9 @@ Proof.
 intros * Hii.
 revert σ Hii.
 induction it; intros; [ easy | cbn ].
-remember (first_non_transp n σ) as x eqn:Hx; symmetry in Hx.
+remember (first_transp n σ) as x eqn:Hx; symmetry in Hx.
 destruct x as [(i', j')| ]; [ | easy ].
-apply first_non_transp_Some_if in Hx.
+apply first_transp_Some_if in Hx.
 destruct Hx as (Hjn & Hkn & Hi & Hj & Hkj).
 cbn.
 rewrite iter_list_cons; [ | easy | easy | easy ].
@@ -1014,19 +1014,19 @@ Proof.
 intros * Hit.
 destruct it; [ easy |  clear Hit ].
 cbn.
-remember (first_non_transp n (comp (transposition j k) σ)) as x eqn:Hx.
+remember (first_transp n (comp (transposition j k) σ)) as x eqn:Hx.
 symmetry in Hx.
 destruct x as [(i', j')| ]. {
   cbn.
   rewrite iter_list_cons; [ | easy | easy | easy ].
-  apply first_non_transp_Some_if in Hx.
+  apply first_transp_Some_if in Hx.
   destruct Hx as (Hi'n & Hj'n & Hsii & Hcti' & Hctj').
-  remember (first_non_transp n (transposition j k)) as y eqn:Hy.
+  remember (first_transp n (transposition j k)) as y eqn:Hy.
   symmetry in Hy.
   destruct y as [(i'', j'')| ]. {
     cbn.
     rewrite iter_list_cons; [ | easy | easy | easy ].
-    apply first_non_transp_Some_if in Hy.
+    apply first_transp_Some_if in Hy.
     destruct Hy as (Hi''n & Hj''n & Hsii'' & Hcti'' & Hctj'').
     destruct (lt_dec (σ i') i'') as [Hii''| Hii'']. {
       specialize (Hsii'' _ Hii'') as H1.
@@ -1087,13 +1087,13 @@ apply Hikj.
 split; [ flia | flia Hij H1 ].
 Qed.
 
-Theorem first_non_transp_enough_iter : ∀ n m σ i j,
+Theorem first_transp_enough_iter : ∀ n m σ i j,
   n ≤ m
-  → first_non_transp n σ = Some (i, j)
-  → first_non_transp m σ = Some (i, j).
+  → first_transp n σ = Some (i, j)
+  → first_transp m σ = Some (i, j).
 Proof.
 intros * Hnm Hij.
-unfold first_non_transp in Hij |-*.
+unfold first_transp in Hij |-*.
 remember (first_non_fixpoint n 0 σ) as x eqn:Hx.
 remember (first_non_fixpoint m 0 σ) as y eqn:Hy.
 symmetry in Hx, Hy.
@@ -1118,11 +1118,16 @@ Fixpoint nb_good_loop it i σ :=
 Definition nb_good n σ := nb_good_loop n 0 σ.
 
 Theorem glop : ∀ n σ i j k,
-  first_non_transp n σ = Some (i, j)
+  first_transp n σ = Some (i, j)
   → nb_good_loop n k σ < nb_good_loop n k (comp (transposition i j) σ).
 Proof.
 intros * Hn.
-apply first_non_transp_Some_if in Hn.
+apply first_transp_Some_if in Hn.
+destruct Hn as (Hni & Hnj & Hi & Hii & Hji).
+Print nb_good_loop.
+...
+intros * Hn.
+apply first_transp_Some_if in Hn.
 destruct Hn as (Hni & Hnj & Hi & Hii & Hji).
 revert σ i j k Hni Hnj Hi Hii Hji.
 induction n; intros; [ easy | cbn ].
@@ -1163,7 +1168,7 @@ revert σ i j k Hn (*Hperm*).
 induction n; intros; [ easy | cbn ].
 unfold Nat.b2n.
 (*
-apply first_non_transp_Some_if in Hn.
+apply first_transp_Some_if in Hn.
 destruct Hn as (Hisn & Hjsn & Hi & Hii & Hji).
 *)
 do 2 rewrite if_eqb_eq_dec.
@@ -1174,13 +1179,13 @@ destruct (Nat.eq_dec (σ k) k) as [Hsk| Hsk]. {
     unfold comp, transposition in Hcz.
     do 2 rewrite if_eqb_eq_dec in Hcz.
     destruct (Nat.eq_dec (σ k) i) as [Hski| Hski]. {
-      apply first_non_transp_Some_if in Hn.
+      apply first_transp_Some_if in Hn.
       destruct Hn as (Hisn & Hjsn & Hi & Hii & Hji).
       congruence.
     }
     destruct (Nat.eq_dec (σ k) j) as [Hskj| Hskj]; [ congruence | ].
     clear Hcz.
-    unfold first_non_transp in Hn.
+    unfold first_transp in Hn.
     remember (first_non_fixpoint (S n) 0 σ) as x eqn:Hx.
     symmetry in Hx.
     destruct x as [i1| ]; [ | easy ].
@@ -1201,7 +1206,7 @@ destruct (Nat.eq_dec (σ k) k) as [Hsk| Hsk]. {
 (**)
 ...
     apply IHn.
-    unfold first_non_transp in Hn |-*.
+    unfold first_transp in Hn |-*.
     cbn in Hn.
     remember (σ 0) as m eqn:Hm.
     symmetry in Hm.
@@ -1269,13 +1274,13 @@ destruct (Nat.eq_dec (σ k) k) as [Hsk| Hsk]. {
 ...
 
 Theorem glop : ∀ n σ i j,
-  first_non_transp n σ = Some (i, j)
+  first_transp n σ = Some (i, j)
   → nb_good n σ < nb_good n (comp (transposition i j) σ).
 Proof.
 intros * Hn.
 unfold nb_good.
 ...
-    apply first_non_transp_Some_if in Hn.
+    apply first_transp_Some_if in Hn.
     destruct Hn as (Hin & Hjn & Hi & Hii & Hji).
 ...
 
@@ -1292,11 +1297,11 @@ induction it1; intros. {
 }
 cbn.
 destruct it2; [ now rewrite Nat.le_0_r in Hit2; subst n | cbn ].
-remember (first_non_transp n σ) as x eqn:Hx; symmetry in Hx.
+remember (first_transp n σ) as x eqn:Hx; symmetry in Hx.
 destruct x as [(i, j)| ]; [ | easy ].
 f_equal.
 (*
-apply first_non_transp_Some_if in Hx.
+apply first_transp_Some_if in Hx.
 destruct Hx as (Hin & Hjn & Hi & Hsi & Hsj).
 *)
 destruct n; [ easy | ].
@@ -1313,7 +1318,7 @@ induction n; intros; [ now destruct it1, it2 | ].
 destruct it1; [ easy | ].
 destruct it2; [ easy | ].
 cbn.
-remember (first_non_transp (S n) σ) as x eqn:Hx.
+remember (first_transp (S n) σ) as x eqn:Hx.
 symmetry in Hx.
 destruct x as [(i, j)| ]; [ | easy ].
 f_equal.
@@ -1325,13 +1330,13 @@ specialize (IHn it1 it2 σ Hit1 Hit2) as H1.
   IHn : ∀ (it1 it2 : nat) (σ : nat → nat), n ≤ it1 → n ≤ it2 → tlopf_loop' it1 n σ = tlopf_loop' it2 n σ
   Hit1 : n ≤ it1
   Hit2 : n ≤ it2
-  Hx : first_non_transp (S n) σ = Some (i, j)
+  Hx : first_transp (S n) σ = Some (i, j)
   σ' := comp (transposition i j) σ : nat → nat
   H1 : tlopf_loop' it1 n σ = tlopf_loop' it2 n σ
   ============================
   tlopf_loop' it1 (S n) σ' = tlopf_loop' it2 (S n) σ'
 
-Print first_non_transp.
+Print first_transp.
 Print first_non_fixpoint.
 Print where_is.
 ...
@@ -1343,14 +1348,14 @@ induction it1; intros. {
   now destruct it2.
 }
 cbn.
-remember (first_non_transp n σ) as x eqn:Hx.
+remember (first_transp n σ) as x eqn:Hx.
 symmetry in Hx.
 destruct x as [(i, j)| ]. {
-  apply first_non_transp_Some_if in Hx.
+  apply first_transp_Some_if in Hx.
   destruct Hx as (Hin & Hjn & Hi & Hii & Hji).
   destruct n; [ easy | ].
 Print tlopf_loop'.
-Print first_non_transp.
+Print first_transp.
 Print where_is.
 ...
 
@@ -1369,9 +1374,9 @@ revert σ n i Hnz Hit Hp Hin.
 induction it; intros; [ flia Hnz Hit | ].
 destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
   cbn.
-  remember (first_non_transp n σ) as x eqn:Hx; symmetry in Hx.
+  remember (first_transp n σ) as x eqn:Hx; symmetry in Hx.
   destruct x as [(j, k)| ]. {
-    apply first_non_transp_Some_if in Hx.
+    apply first_transp_Some_if in Hx.
     destruct Hx as (Hjn & Hkn & Hii & Hj & Hkj).
     cbn.
     rewrite iter_list_cons; [ | easy | easy | easy ].
@@ -1385,7 +1390,7 @@ destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
   }
   cbn.
   unfold iter_list; cbn.
-  apply first_non_transp_None_iff in Hx.
+  apply first_transp_None_iff in Hx.
   remember (first_non_fixpoint n 0 σ) as y eqn:Hy; symmetry in Hy.
   destruct y as [j| ]; [ | now apply Hx ].
   apply first_non_fixpoint_Some_iff in Hy.
@@ -1402,10 +1407,10 @@ destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
   now apply permut_fun_inv_is_permut.
 }
 cbn.
-remember (first_non_transp n σ) as x eqn:Hx; symmetry in Hx.
+remember (first_transp n σ) as x eqn:Hx; symmetry in Hx.
 destruct x as [(j, k)| ]. 2: {
   unfold iter_list; cbn.
-  apply first_non_transp_None_iff in Hx.
+  apply first_transp_None_iff in Hx.
   remember (first_non_fixpoint n 0 σ) as y eqn:Hy.
   symmetry in Hy.
   destruct y as [j| ]; [ | now apply Hx ].
@@ -1422,7 +1427,7 @@ destruct x as [(j, k)| ]. 2: {
   specialize (H2 H); clear H.
   now rewrite fun_permut_fun_inv in H2.
 } {
-  apply first_non_transp_Some_if in Hx.
+  apply first_transp_Some_if in Hx.
   destruct Hx as (Hjn & Hkn & Hii & Hj & Hkj).
   cbn.
   rewrite iter_list_cons; [ | easy | easy | easy ].
@@ -1459,12 +1464,12 @@ destruct x as [(j, k)| ]. 2: {
       now subst j k.
     }
     cbn.
-    remember (first_non_transp n (comp (transposition j k) σ)) as x eqn:Hx.
+    remember (first_transp n (comp (transposition j k) σ)) as x eqn:Hx.
     symmetry in Hx.
     destruct x as [(i', j')| ]. {
       cbn.
       rewrite iter_list_cons; [ | easy | easy | easy ].
-      apply first_non_transp_Some_if in Hx.
+      apply first_transp_Some_if in Hx.
       destruct Hx as (Hjn' & Hkn' & Hi' & Hii' & Hkj').
       unfold comp at 1.
       rewrite IHit.
@@ -1477,9 +1482,9 @@ Check Comp_tfonp_tlopf.
 cbn.
 subst n.
 clear Hit Hnz Hin.
-remember (first_non_transp (S it) σ) as x eqn:Hx; symmetry in Hx.
+remember (first_transp (S it) σ) as x eqn:Hx; symmetry in Hx.
 destruct x as [(j, k)| ]. {
-  apply first_non_transp_Some_if in Hx.
+  apply first_transp_Some_if in Hx.
   destruct Hx as (Hjn & Hkn & Hj & Hjj & Hkj).
   cbn.
   rewrite iter_list_cons; [ | easy | easy | easy ].
@@ -1490,7 +1495,7 @@ destruct x as [(j, k)| ]. {
     (Comp (i0 ∈ map transp_fun_of_nat_pair (tlopf_loop' (S it) (S it) (comp (transposition j k) σ))), i0) i =
   σ i). {
     cbn.
-    remember (first_non_transp (S it) (comp (transposition j k) σ)) as x eqn:Hx.
+    remember (first_transp (S it) (comp (transposition j k) σ)) as x eqn:Hx.
     symmetry in Hx.
     destruct x as [(i', j')| ]. {
       cbn.
@@ -1528,10 +1533,10 @@ destruct x as [(j, k)| ]. {
     revert n σ i Hp Hin Hkn H1.
     induction it; intros; [ easy | ].
     cbn.
-    remember (first_non_transp n σ) as x eqn:Hx.
+    remember (first_transp n σ) as x eqn:Hx.
     symmetry in Hx.
     destruct x as [(i', j')| ]; [ | easy ].
-    apply first_non_transp_Some_if in Hx.
+    apply first_transp_Some_if in Hx.
     destruct Hx as (Hin' & Hjn' & Hj & Hjj & Hkj).
     cbn.
     rewrite iter_list_cons; [ | easy | easy | easy ].
@@ -1586,7 +1591,7 @@ destruct x as [(j, k)| ]. {
       revert j k.
       induction it; intros; [ easy | ].
       cbn.
-      remember (first_non_transp n (comp (transposition j k) σ)) as x eqn:Hx.
+      remember (first_transp n (comp (transposition j k) σ)) as x eqn:Hx.
       symmetry in Hx.
       destruct x as [(i', j')| ]. {
         cbn.
@@ -1610,13 +1615,13 @@ destruct x as [(j, k)| ]. {
       flia Hij Hk H.
     }
     cbn.
-    remember (first_non_transp n (comp (transposition j k) σ)) as x eqn:Hx.
+    remember (first_transp n (comp (transposition j k) σ)) as x eqn:Hx.
     symmetry in Hx.
     destruct x as [(i', j')| ]. {
       cbn.
       rewrite iter_list_cons; [ | easy | easy | easy ].
       unfold comp at 1; cbn.
-      apply first_non_transp_Some_if in Hx.
+      apply first_transp_Some_if in Hx.
       rewrite IHit; try easy.
 ...
 remember (first_non_fixpoint (S it) 0 σ) as x eqn:Hx; symmetry in Hx.
