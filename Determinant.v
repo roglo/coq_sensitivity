@@ -1165,6 +1165,20 @@ destruct (Nat.eq_dec (σ k) k) as [Hkk| Hkk]. {
       destruct j; [ easy | flia Hnj ].
     }
     cbn.
+    destruct n. {
+      cbn.
+      do 2 rewrite Nat.add_0_r.
+      unfold Nat.b2n.
+      unfold comp, transposition.
+      do 4 rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec (σ (k + 2)) (k + 2)) as [Hkk2| Hkk2]. {
+        destruct (Nat.eq_dec (σ (k + 2)) i) as [Hk2i| Hk2i]. {
+          congruence.
+        }
+        destruct (Nat.eq_dec (σ (k + 2)) j) as [Hk2j| Hk2j]. {
+          congruence.
+        }
+        exfalso.
 ...
 intros * Hn.
 apply first_transp_Some_if in Hn.
