@@ -1164,11 +1164,36 @@ Theorem rngl_mul_sub_distr_l : ∀ a b c,
 Proof.
 intros.
 remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
-destruct op. 2: {
-  specialize rngl_opt_add_sub_simpl_l as H1.
+destruct op. {
+  unfold rngl_sub; rewrite Hop.
+  rewrite rngl_mul_add_distr_l.
+  now rewrite rngl_mul_opp_r.
+} {
+  specialize rngl_opt_mul_sub_distr_l as H1.
+  now rewrite Hop in H1.
+}
+Qed.
+
+Theorem rngl_mul_sub_distr_r : ∀ a b c,
+  ((a - b) * c = a * c - b * c)%F.
+Proof.
+intros.
+remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
+destruct op. {
+  unfold rngl_sub; rewrite Hop.
+  rewrite rngl_mul_add_distr_r.
+  now rewrite rngl_mul_opp_l.
+} {
+  specialize rngl_opt_mul_sub_distr_r as H1.
   rewrite Hop in H1.
-(* ah bin non, je peux pas le démontrer *)
-  Abort.
+  remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
+  destruct ic; [ | apply H1 ].
+  specialize rngl_opt_mul_comm as rngl_mul_comm.
+  rewrite Hic in rngl_mul_comm.
+  rewrite rngl_mul_comm, rngl_mul_sub_distr_l.
+  now rewrite (rngl_mul_comm a), (rngl_mul_comm b).
+}
+Qed.
 
 End a.
 
