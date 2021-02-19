@@ -1128,6 +1128,27 @@ apply first_transp_Some_if in Hn.
 destruct Hn as (Hin & Hjn & Hi & Hii & Hji).
 move Hkn before Hjn.
 revert n i j k Hp Hin Hjn Hkn Hi Hii Hji.
+(**)
+destruct it; intros. 2: {
+  destruct it. {
+    cbn.
+    unfold Nat.b2n, comp, transposition.
+    do 4 rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec (σ k) k) as [Hkk| Hkk]. {
+      destruct (Nat.eq_dec (σ k) i) as [Hki| Hki]. {
+        exfalso.
+        rewrite Hki in Hkk.
+        now subst k.
+      }
+      destruct (Nat.eq_dec (σ k) j) as [Hkj| Hkj]. {
+        exfalso.
+        rewrite Hkj in Hkk.
+        now subst k.
+      }
+      exfalso.
+      rewrite Hkk in Hki, Hkj.
+(* ça va pas marcher, ça. Pour peu que n soit suffisamment grand, euh... *)
+...
 induction it; intros. {
   cbn.
   destruct n; [ easy | ].
