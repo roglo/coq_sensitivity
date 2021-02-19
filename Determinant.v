@@ -1129,8 +1129,7 @@ destruct Hn as (Hin & Hjn & Hi & Hii & Hji).
 move Hkn before Hjn.
 revert n i j k Hp Hin Hjn Hkn Hi Hii Hji.
 induction it; intros. {
-  cbn; exfalso.
-  clear k Hkn.
+  cbn.
   destruct n; [ easy | ].
   destruct n. {
     apply Nat.lt_1_r in Hin.
