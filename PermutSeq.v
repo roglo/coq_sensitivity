@@ -503,7 +503,7 @@ destruct (lt_dec b a) as [Hba| Hba]. {
   apply Nat.nlt_ge in Hba.
   destruct (Nat.eq_dec a b) as [Hab| Hab]. {
     subst b.
-    rewrite rngl_add_opp_r, Nat.sub_diag; cbn.
+    rewrite rngl_sub_diag, Nat.sub_diag; cbn.
     symmetry.
     apply rngl_mul_0_r.
   }

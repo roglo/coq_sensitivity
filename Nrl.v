@@ -68,6 +68,37 @@ intros.
 apply Nat.mul_sub_distr_l.
 Qed.
 
+Theorem Nat_add_sub_add_sub : ∀ a b : nat, (a + (b - a)) = (b + (a - b)).
+Proof.
+intros.
+destruct (lt_dec a b) as [Hab| Hab]. {
+  apply Nat.lt_le_incl in Hab.
+  apply Nat.sub_0_le in Hab.
+  rewrite Hab, Nat.add_0_r.
+  rewrite Nat.add_sub_assoc; [ | now apply Nat.sub_0_le in Hab ].
+  now rewrite Nat.add_comm, Nat.add_sub.
+} {
+  apply Nat.nlt_ge in Hab.
+  apply Nat.sub_0_le in Hab.
+  rewrite Hab, Nat.add_0_r.
+  rewrite Nat.add_sub_assoc; [ | now apply Nat.sub_0_le in Hab ].
+  now rewrite Nat.add_comm, Nat.add_sub.
+}
+Qed.
+
+Theorem Nat_sub_sub_sub_add : ∀ a b c, a - b - c = a - (b + c).
+Proof.
+intros.
+symmetry.
+apply Nat.sub_add_distr.
+Qed.
+
+Theorem Nat_add_reg_l : ∀ a b c, a + b = a + c → b = c.
+Proof.
+intros * Habc.
+now apply Nat.add_cancel_l in Habc.
+Qed.
+
 Theorem Nat_consistent :
   rngl_has_inv = false ∨ rngl_has_no_inv_but_div = false.
 Proof. now left. Qed.
@@ -91,9 +122,11 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_mul_1_r := NA;
      rngl_opt_mul_add_distr_r := NA;
      rngl_opt_add_opp_l := NA;
-     rngl_opt_add_sub_simpl_l := Nat_add_sub_simpl_l;
-     rngl_opt_sub_0_r := Nat.sub_0_r;
-     rngl_opt_sub_add_distr := Nat.sub_add_distr;
+     rngl_opt_add_sub_add_sub := Nat_add_sub_add_sub;
+     rngl_opt_sub_sub_sub_add := Nat_sub_sub_sub_add;
+     rngl_opt_sub_diag := Nat.sub_diag;
+     rngl_opt_add_reg_l := Nat_add_reg_l;
+     rngl_opt_sub_0_l := Nat.sub_0_l;
      rngl_opt_mul_sub_distr_l := Nat_mul_sub_distr_l;
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := NA;
@@ -466,9 +499,11 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_opt_mul_1_r := NA;
      rngl_opt_mul_add_distr_r := NA;
      rngl_opt_add_opp_l := Zn_add_opp_l;
-     rngl_opt_add_sub_simpl_l := NA;
-     rngl_opt_sub_0_r := NA;
-     rngl_opt_sub_add_distr := NA;
+     rngl_opt_add_sub_add_sub := NA;
+     rngl_opt_sub_sub_sub_add := NA;
+     rngl_opt_sub_diag := NA;
+     rngl_opt_add_reg_l := NA;
+     rngl_opt_sub_0_l := NA;
      rngl_opt_mul_sub_distr_l := NA;
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := Zn_opt_mul_inv_l;

@@ -225,10 +225,8 @@ Proof.
 intros Hro *.
 apply matrix_eq; cbn.
 intros * Hi Hj.
-specialize rngl_add_opp_r as H.
-unfold rngl_sub in H.
-rewrite Hro in H.
-apply H.
+rewrite fold_rngl_sub; [ | easy ].
+apply rngl_sub_diag.
 Qed.
 
 (* multiplication left and right with identity *)
@@ -749,9 +747,11 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_opt_mul_1_r := mat_mul_1_r;
      rngl_opt_mul_add_distr_r := mat_mul_add_distr_r;
      rngl_opt_add_opp_l := @mat_opt_add_opp_l n;
-     rngl_opt_add_sub_simpl_l := NA;
-     rngl_opt_sub_0_r := NA;
-     rngl_opt_sub_add_distr := NA;
+     rngl_opt_add_sub_add_sub := NA;
+     rngl_opt_sub_sub_sub_add := NA;
+     rngl_opt_sub_diag := NA;
+     rngl_opt_add_reg_l := NA;
+     rngl_opt_sub_0_l := NA;
      rngl_opt_mul_sub_distr_l := NA;
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := NA;
