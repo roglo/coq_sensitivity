@@ -1120,7 +1120,7 @@ Definition nb_good n σ := nb_good_loop n 0 σ.
 Theorem glop : ∀ it n σ i j k,
   is_permut_fun σ n
   → first_transp n σ = Some (i, j)
-  → k + it ≤ n
+  → n ≤ k + it
   → nb_good_loop it k σ < nb_good_loop it k (comp (transposition i j) σ).
 Proof.
 intros * Hp Hn Hkn.
@@ -1129,7 +1129,19 @@ destruct Hn as (Hin & Hjn & Hi & Hii & Hji).
 move Hkn before Hjn.
 revert n i j k Hp Hin Hjn Hkn Hi Hii Hji.
 (**)
-destruct it; intros. 2: {
+induction it; intros. 2: {
+  cbn.
+  unfold Nat.b2n.
+  unfold comp at 1, transposition at 1.
+  do 4 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (σ k) k) as [Hkk| Hkk]. {
+    destruct (Nat.eq_dec (σ k) i) as [Hki| Hki]; [ congruence | ].
+    destruct (Nat.eq_dec (σ k) j) as [Hkj| Hkj]; [ congruence | ].
+    destruct (Nat.eq_dec (σ k) k) as [H| H]; [ clear H | easy ].
+    apply -> Nat.succ_lt_mono.
+    apply IHit with (n := n); try easy; flia Hkn.
+  }
+...
   destruct it. {
     cbn.
     unfold Nat.b2n, comp, transposition.
