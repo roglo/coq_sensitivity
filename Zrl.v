@@ -108,6 +108,7 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_opt_add_opp_l := Z.add_opp_diag_l;
      rngl_opt_add_sub_simpl_l := NA;
      rngl_opt_sub_0_r := NA;
+     rngl_opt_sub_add_distr := NA;
      rngl_opt_mul_sub_distr_l := NA;
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := NA;

@@ -121,6 +121,9 @@ Class ring_like_prop T {ro : ring_like_op T} :=
        else ∀ a b c : T, (a + b - (a + c) = b - c)%F;
     rngl_opt_sub_0_r :
       if rngl_has_opp then not_applicable else ∀ a, (a - 0 = a)%F;
+    rngl_opt_sub_add_distr :
+      if rngl_has_opp then not_applicable
+      else ∀ a b c, (a - (b + c) = a - b - c)%F;
     rngl_opt_mul_sub_distr_l :
       if rngl_has_opp then not_applicable
       else ∀ a b c : T, (a * (b - c) = a * b - a * c)%F;
@@ -1031,15 +1034,21 @@ now rewrite rngl_add_0_r, rngl_add_0_l in Hab.
 Qed.
 
 Theorem rngl_sub_add_distr :
-  rngl_has_opp = true →
   ∀ a b c, (a - (b + c) = a - b - c)%F.
 Proof.
-intros Hop *.
-unfold rngl_sub.
-rewrite rngl_opp_add_distr; [ | easy ].
-unfold rngl_sub; rewrite Hop.
-rewrite rngl_add_assoc.
-apply rngl_add_add_swap.
+intros.
+remember rngl_has_opp as op eqn:Hop.
+symmetry in Hop.
+destruct op. {
+  unfold rngl_sub.
+  rewrite rngl_opp_add_distr; [ | easy ].
+  unfold rngl_sub; rewrite Hop.
+  rewrite rngl_add_assoc.
+  apply rngl_add_add_swap.
+} {
+  specialize rngl_opt_sub_add_distr as H1.
+  now rewrite Hop in H1.
+}
 Qed.
 
 Theorem eq_rngl_of_nat_0 :
