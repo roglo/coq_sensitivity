@@ -168,7 +168,7 @@ assert (∃ i, vect_el V i ≠ 0%F). {
 move Hiv at bottom.
 destruct H as (i, Hi).
 specialize (Hiv i).
-now apply rngl_mul_reg_r in Hiv.
+now apply rngl_mul_cancel_r in Hiv.
 Qed.
 
 Theorem vect_dot_mul_scal_mul_comm :

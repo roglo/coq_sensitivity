@@ -124,7 +124,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       else ∀ a b c, ((a - b) - c = a - (b + c))%F;
     rngl_opt_sub_diag :
       if rngl_has_opp then not_applicable else ∀ a, (a - a = 0)%F;
-    rngl_opt_add_reg_l :
+    rngl_opt_add_cancel_l :
       if rngl_has_opp then not_applicable
       else ∀ a b c, (a + b = a + c)%F → (b = c)%F;
     rngl_opt_sub_0_l :
@@ -400,12 +400,12 @@ rewrite Hor, Hop in H.
 apply H.
 Qed.
 
-(*
-    rngl_opt_mul_le_compat :
-      if (rngl_is_ordered && negb rngl_has_opp)%bool then
-        ∀ a b c d, (a ≤ c)%F → (b ≤ d)%F → (a * b ≤ c * d)%F
-      else not_applicable;
-*)
+Theorem rngl_sub_0_l : rngl_has_opp = false → ∀ a, (0 - a = 0)%F.
+Proof.
+intros H1 *.
+specialize rngl_opt_sub_0_l as H.
+now rewrite H1 in H.
+Qed.
 
 Theorem rngl_not_le :
   rngl_is_ordered = true →
@@ -485,7 +485,7 @@ destruct iv. {
 }
 Qed.
 
-Theorem rngl_mul_reg_l :
+Theorem rngl_mul_cancel_l :
   rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
   ∀ a b c, a ≠ 0%F
   → (a * b = a * c)%F
@@ -509,7 +509,7 @@ destruct iv. {
 }
 Qed.
 
-Theorem rngl_mul_reg_r :
+Theorem rngl_mul_cancel_r :
   rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
   ∀ a b c, c ≠ 0%F
   → (a * c = b * c)%F
@@ -607,7 +607,7 @@ destruct op. {
 }
 Qed.
 
-Theorem rngl_add_reg_l : ∀ a b c, (a + b = a + c)%F → (b = c)%F.
+Theorem rngl_add_cancel_l : ∀ a b c, (a + b = a + c)%F → (b = c)%F.
 Proof.
 intros * Habc.
 remember rngl_has_opp as op eqn:Hop.
@@ -622,7 +622,7 @@ destruct op. {
   rewrite rngl_sub_diag in Habc.
   now do 2 rewrite rngl_add_0_r in Habc.
 } {
-  specialize rngl_opt_add_reg_l as H1.
+  specialize rngl_opt_add_cancel_l as H1.
   rewrite Hop in H1.
   now apply H1 in Habc.
 }
@@ -645,7 +645,7 @@ destruct op. {
   specialize (H1 b (a + b)%F).
   rewrite (rngl_add_comm a) in H1.
   rewrite <- rngl_add_assoc in H1.
-  apply rngl_add_reg_l in H1.
+  apply rngl_add_cancel_l in H1.
   specialize rngl_opt_sub_sub_sub_add as H2.
   rewrite Hop in H2.
   rewrite <- H2 in H1.
@@ -682,9 +682,8 @@ destruct op. {
   specialize rngl_opt_add_sub_add_sub as H1.
   rewrite Hop in H1.
   specialize (H1 a 0%F).
-  specialize rngl_opt_sub_0_l as H2.
-  rewrite Hop in H2.
-  now rewrite H2, rngl_add_0_r, rngl_add_0_l in H1.
+  rewrite rngl_sub_0_l in H1; [ | easy ].
+  now rewrite rngl_add_0_r, rngl_add_0_l in H1.
 }
 Qed.
 
@@ -693,7 +692,7 @@ Theorem rngl_opp_add_distr :
   ∀ a b, (- (a + b) = - b - a)%F.
 Proof.
 intros Hro *.
-apply rngl_add_reg_l with (a := (a + b)%F).
+apply rngl_add_cancel_l with (a := (a + b)%F).
 rewrite (fold_rngl_sub Hro).
 rewrite rngl_sub_diag.
 unfold rngl_sub.
@@ -963,7 +962,7 @@ Theorem rngl_inv_mul_distr :
   ∀ a b, a ≠ 0%F → b ≠ 0%F →(¹/ (a * b) = ¹/ b * ¹/ a)%F.
 Proof.
 intros Hdo Hin * Haz Hbz.
-specialize rngl_mul_reg_l as H1.
+specialize rngl_mul_cancel_l as H1.
 specialize rngl_mul_inv_r as H2.
 specialize rngl_integral as H3.
 unfold rngl_div in H2.
@@ -1116,7 +1115,7 @@ destruct i. {
 }
 f_equal.
 cbn in Hij.
-apply rngl_add_reg_l in Hij.
+apply rngl_add_cancel_l in Hij.
 now apply IHj.
 Qed.
 
@@ -1133,7 +1132,7 @@ assert (Hoaz : (- a)%F ≠ 0%F). {
   rewrite rngl_opp_involutive in H; [ | easy ].
   now rewrite rngl_opp_0 in H.
 }
-apply (rngl_mul_reg_l (or_introl Hin) (- a)%F); [ easy | ].
+apply (rngl_mul_cancel_l (or_introl Hin) (- a)%F); [ easy | ].
 specialize (rngl_opt_mul_inv_r) as H2.
 remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
 rewrite Hin in H2; cbn in H2.
@@ -1244,14 +1243,14 @@ End a.
 
 Arguments rngl_add_opp_l {T}%type {ro rp} Hro.
 Arguments rngl_sub_diag {T}%type {ro rp} a%F.
-Arguments rngl_add_reg_l {T}%type {ro rp} (a b c)%F.
+Arguments rngl_add_cancel_l {T}%type {ro rp} (a b c)%F.
 Arguments rngl_add_sub {T}%type {ro rp} (a b)%F.
 Arguments rngl_inv_mul_distr {T}%type {ro rp} Hin Hdo a%F b%F.
 Arguments rngl_integral {T}%type {ro rp}.
 Arguments rngl_mul_opp_opp {T}%type {ro rp} Hro.
 Arguments rngl_mul_0_l {T}%type {ro rp} a%F.
 Arguments rngl_mul_opp_r {T}%type {ro rp} Hro.
-Arguments rngl_mul_reg_r {T}%type {ro rp} Hii (a b c)%F.
+Arguments rngl_mul_cancel_r {T}%type {ro rp} Hii (a b c)%F.
 Arguments rngl_mul_0_r {T}%type {ro rp} a%F.
 Arguments rngl_opp_0 {T}%type {ro rp}.
 Arguments rngl_opp_add_distr {T}%type {ro rp} Hop a%F b%F.
