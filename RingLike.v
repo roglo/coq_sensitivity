@@ -35,7 +35,7 @@
      - with commutative addition or not
      - with 0 or without, right or left
      - with 1 or without, right or left
-     - with specific subtraction or not
+     - with specific subtraction (monus) or not
      - with specific division or not
      and so on. *)
 
@@ -53,14 +53,14 @@ Class ring_like_op T :=
     rngl_opp : T → T;
     rngl_inv : T → T;
     rngl_le : T → T → Prop;
-    rngl_opt_sub : T → T → T;
+    rngl_monus : T → T → T;
     rngl_opt_div : T → T → T }.
 
 Declare Scope ring_like_scope.
 Delimit Scope ring_like_scope with F.
 
 Definition rngl_sub {T} {R : ring_like_op T} a b :=
-  if rngl_has_opp then rngl_add a (rngl_opp b) else rngl_opt_sub a b.
+  if rngl_has_opp then rngl_add a (rngl_opp b) else rngl_monus a b.
 Definition rngl_div {T} {R : ring_like_op T} a b :=
   if rngl_has_inv then rngl_mul a (rngl_inv b) else rngl_opt_div a b.
 

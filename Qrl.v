@@ -7,7 +7,7 @@ Require Import Utf8.
 Require Import RingLike Rational.
 Import Q.Notations.
 
-Definition phony_Q_sub (a b : Q) := a.
+Definition phony_Q_monus (a b : Q) := a.
 Definition phony_Q_div (a b : Q) := a.
 
 Canonical Structure Q_ring_like_op : ring_like_op Q :=
@@ -21,7 +21,7 @@ Canonical Structure Q_ring_like_op : ring_like_op Q :=
      rngl_opp := Q.opp;
      rngl_inv := Q.inv;
      rngl_le := Q.le;
-     rngl_opt_sub := phony_Q_sub;
+     rngl_monus := phony_Q_monus;
      rngl_opt_div := phony_Q_div |}.
 
 Existing Instance Q_ring_like_op.
