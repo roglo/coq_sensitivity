@@ -371,22 +371,24 @@ apply H.
 Qed.
 
 Theorem rngl_mul_le_compat_nonneg :
-  (rngl_is_ordered && rngl_has_opp)%bool = true →
+  rngl_is_ordered = true →
+  rngl_has_opp = true →
   ∀ a b c d, (0 ≤ a ≤ c)%F → (0 ≤ b ≤ d)%F → (a * b ≤ c * d)%F.
 Proof.
-intros Hor *.
+intros Hor Hop *.
 specialize rngl_opt_mul_le_compat_nonneg as H.
-rewrite Hor in H.
+rewrite Hor, Hop in H.
 apply H.
 Qed.
 
 Theorem rngl_mul_le_compat_nonpos :
-  (rngl_is_ordered && rngl_has_opp)%bool = true →
+  rngl_is_ordered = true →
+  rngl_has_opp = true →
   ∀ a b c d, (c ≤ a ≤ 0)%F → (d ≤ b ≤ 0)%F → (a * b ≤ c * d)%F.
 Proof.
-intros Hor *.
+intros Hor Hop *.
 specialize rngl_opt_mul_le_compat_nonpos as H.
-rewrite Hor in H.
+rewrite Hor, Hop in H.
 apply H.
 Qed.
 
