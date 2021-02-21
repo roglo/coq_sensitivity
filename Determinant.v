@@ -1239,6 +1239,76 @@ Definition nb_good n σ := nb_good_loop n 0 σ.
 Theorem glop : ∀ it n σ i j k,
   is_permut_fun σ n
   → first_transp n σ = Some (i, j)
+  → k ≤ i
+  → n = k + it
+  → nb_good_loop it k σ < nb_good_loop it k (comp (transposition i j) σ).
+Proof.
+intros * Hp Hn Hki Hknit.
+apply first_transp_Some_iff in Hn.
+destruct Hn as (Hijn & Hi & Hii & Hij & Hji).
+revert k Hki Hknit.
+induction it; intros; [ flia Hijn Hki Hknit | cbn ].
+replace (k + S it) with (k + 1 + it) in Hknit by flia.
+unfold Nat.b2n.
+unfold comp at 1, transposition at 1.
+do 4 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (σ k) k) as [Hkk| Hkk]. {
+  destruct (Nat.eq_dec (σ k) i) as [Hski| Hski]; [ congruence | ].
+  destruct (Nat.eq_dec (σ k) j) as [Hkj| Hkj]; [ congruence | ].
+  destruct (Nat.eq_dec (σ k) k) as [H| H]; [ clear H | easy ].
+  apply -> Nat.succ_lt_mono.
+  destruct (Nat.eq_dec k i) as [Hk1i| Hk1i]; [ congruence | ].
+  apply IHit; try easy; flia Hki Hk1i.
+}
+rewrite Nat.add_0_l.
+destruct (Nat.eq_dec (σ k) i) as [Hski| Hski]. {
+  destruct (Nat.eq_dec j k) as [Hjk| Hjk]. 2: {
+    destruct (Nat.eq_dec k i) as [Hk1i| Hk1i]; [ congruence | ].
+    apply IHit; try easy; flia Hki Hk1i.
+  }
+  etransitivity; [ apply Nat.lt_succ_diag_r | ].
+  apply -> Nat.succ_lt_mono.
+  destruct (Nat.eq_dec k i) as [Hk1i| Hk1i]; [ congruence | ].
+  apply IHit; try easy; flia Hki Hk1i.
+}
+destruct (Nat.eq_dec (σ k) j) as [Hkj| Hkj]. {
+  destruct (Nat.eq_dec i k) as [Hik| Hik]. 2: {
+    apply IHit; try easy; flia Hki Hik.
+  }
+  move Hik at top; subst k.
+...
+  specialize (IHit (k + 1)) as H1.
+...
+  etransitivity; [ apply Nat.lt_succ_diag_r | ].
+  apply -> Nat.succ_lt_mono.
+...
+  apply IHit; try easy.
+...
+congruence.
+  }
+...
+  destruct (Nat.eq_dec (σ k) k) as [H| H]; [ easy | clear H ].
+  now apply IHit.
+}
+exfalso.
+clear k Hknit.
+...
+destruct it; [ easy | clear Hit ].
+cbn.
+replace (k + S it) with (k + 1 + it) in Hknit by flia.
+unfold Nat.b2n.
+unfold comp at 1, transposition at 1.
+do 4 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (σ k) k) as [Hkk| Hkk]. {
+  destruct (Nat.eq_dec (σ k) i) as [Hki| Hki]; [ congruence | ].
+  destruct (Nat.eq_dec (σ k) j) as [Hkj| Hkj]; [ congruence | ].
+  destruct (Nat.eq_dec (σ k) k) as [H| H]; [ clear H | easy ].
+  apply -> Nat.succ_lt_mono.
+...
+
+Theorem glop : ∀ it n σ i j k,
+  is_permut_fun σ n
+  → first_transp n σ = Some (i, j)
   → n = k + it
   → nb_good_loop it k σ < nb_good_loop it k (comp (transposition i j) σ).
 Proof.
