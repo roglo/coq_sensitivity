@@ -944,6 +944,7 @@ Theorem first_transp_Some_iff : ∀ n σ j k,
   ↔ j < k < n ∧
     (∀ i, i < j → σ i = i) ∧
     σ j ≠ j ∧
+    (∀ i, j < i < k → σ i ≠ j) ∧
     σ k = j.
 Proof.
 intros.
@@ -969,18 +970,24 @@ split. {
     destruct Hy as (Hski, Hkn).
     congruence.
   }
+  split. {
+    intros j Hm.
+    apply Hk; flia Hm.
+  }
+  split; [ easy | ].
   split; [ | easy ].
-  intros j Hm.
-  apply Hk; flia Hm.
+  intros j Hjk.
+  apply Hy.
+  split; [ flia | easy ].
 } {
-  intros ((Hjk & Hkn) & Hj & Hjj & Hkj).
+  intros ((Hjkn & Hkn) & Hj & Hjj & Hjk & Hkj).
   unfold first_transp.
   remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
   destruct x as [i| ]. 2: {
     specialize first_non_fixpoint_None_if as H1.
     specialize (H1 σ n 0 Hx).
     cbn in H1.
-    assert (H : 0 ≤ j < n) by flia Hjk Hkn.
+    assert (H : 0 ≤ j < n) by flia Hjkn Hkn.
     specialize (H1 j H); clear H.
     now symmetry in H1.
   }
@@ -1022,36 +1029,26 @@ split. {
   }
   f_equal; f_equal; [ easy | ].
   move Hij at top; subst i.
-...
-  apply where_is_Some_if in Hy.
-  rewrite Nat.sub_0_r in Hy.
-  destruct Hy as (Hmi & Hmn).
-  f_equal; f_equal. {
-...
-  split; [ easy | ].
-  split; [ easy | ].
-  split; [ | easy ].
-  intros j Hm.
-  apply Hk; flia Hm.
-...
-    assert (H : 0 ≤ j < i). {
-      split; [ flia | ].
-      apply Nat.nle_gt; intros Hij.
-      destruct (Nat.eq_dec i j) as [Heij| Heij]. {
-        subst i.
-...
-   apply where_is_None_iff in Hy.
-...
-  destruct y as [m| ]; [ | easy ].
-  injection Hfnt; clear Hfnt; intros; subst m j.
-  apply where_is_Some_if in Hy.
-  rewrite Nat.sub_0_r in Hy.
-  split; [ easy | ].
-  split; [ easy | ].
-  split; [ | easy ].
-  intros j Hm.
-  apply Hk; flia Hm.
-
+  clear Hii.
+  destruct (lt_dec m j) as [Hmj| Hmj]. {
+    assert (H : 0 ≤ m < j) by flia Hmj.
+    specialize (Hi _ H).
+    congruence.
+  }
+  destruct (lt_dec k m) as [Hkm| Hkm]. {
+    assert (H : 0 ≤ k < m) by flia Hkm.
+    now specialize (Hsi _ H).
+  }
+  destruct (lt_dec m k) as [Hmk| Hmk]. {
+    assert (H : j < m < k). {
+      split; [ | easy ].
+      destruct (Nat.eq_dec j m) as [Hjm| Hjm]; [ congruence | ].
+      flia Hmj Hjm.
+    }
+    now specialize (Hjk _ H); clear H.
+  }
+  flia Hkm Hmk.
+}
 Qed.
 
 Theorem first_transp_None_iff : ∀ n σ,
@@ -1099,7 +1096,7 @@ revert σ Hii.
 induction it; intros; [ easy | cbn ].
 remember (first_transp n σ) as x eqn:Hx; symmetry in Hx.
 destruct x as [(i', j')| ]; [ | easy ].
-apply first_transp_Some_if in Hx.
+apply first_transp_Some_iff in Hx.
 destruct Hx as (Hjn & Hkn & Hi & Hj & Hkj).
 cbn.
 rewrite iter_list_cons; [ | easy | easy | easy ].
@@ -1246,9 +1243,8 @@ Theorem glop : ∀ it n σ i j k,
   → nb_good_loop it k σ < nb_good_loop it k (comp (transposition i j) σ).
 Proof.
 intros * Hp Hn Hkn.
-apply first_transp_Some_if in Hn.
-destruct Hn as (Hin & Hjn & Hi & Hii & Hji).
-move Hkn before Hjn.
+apply first_transp_Some_iff in Hn.
+destruct Hn as (Hijn & Hi & Hii & Hij & Hji).
 revert k Hkn.
 induction it; intros. 2: {
   cbn.
