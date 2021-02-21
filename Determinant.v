@@ -1236,6 +1236,7 @@ Fixpoint nb_good_loop it i σ :=
 
 Definition nb_good n σ := nb_good_loop n 0 σ.
 
+(*
 Theorem glip : ∀ it n σ i j k,
   is_permut_fun σ n
   → j < n
@@ -1256,6 +1257,7 @@ destruct (Nat.eq_dec (σ (i + 1)) (i + 1)) as [Hsii| Hsii]. {
   destruct (Nat.eq_dec (σ (i + 1)) j) as [Hij| Hij]. {
     destruct (Nat.eq_dec k (i + 1)) as [Hki| Hki]; [ now apply IHit | ].
 ...
+*)
 
 Theorem glop : ∀ it n σ i j k,
   is_permut_fun σ n
@@ -1297,6 +1299,8 @@ destruct (Nat.eq_dec (σ k) j) as [Hkj| Hkj]. {
     apply IHit; try easy; flia Hki Hik.
   }
   move Hik at top; subst k.
+  clear Hki Hski Hkk.
+  move Hkj before Hji.
 ...
   now apply glip with (n := n).
 ...
