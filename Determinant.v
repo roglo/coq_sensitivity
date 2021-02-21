@@ -1010,6 +1010,18 @@ split. {
   apply where_is_Some_iff in Hy.
   cbn in Hy.
   destruct Hy as (Hmi & (_ & Hmn) & Hsi).
+  assert (Hij : i = j). {
+    destruct (lt_dec i j) as [Hij| Hij]. {
+      now specialize (Hj _ Hij).
+    }
+    destruct (lt_dec j i) as [Hji| Hji]. {
+      assert (H : 0 ≤ j < i) by flia Hji.
+      now specialize (Hi _ H); clear H.
+    }
+    flia Hij Hji.
+  }
+  f_equal; f_equal; [ easy | ].
+  move Hij at top; subst i.
 ...
   apply where_is_Some_if in Hy.
   rewrite Nat.sub_0_r in Hy.
