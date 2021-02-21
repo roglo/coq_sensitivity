@@ -1128,9 +1128,6 @@ apply first_transp_Some_if in Hn.
 destruct Hn as (Hin & Hjn & Hi & Hii & Hji).
 move Hkn before Hjn.
 revert k Hkn.
-(*
-revert n i j k Hp Hin Hjn Hkn Hi Hii Hji.
-*)
 induction it; intros. 2: {
   cbn.
   replace (k + S it) with (k + 1 + it) in Hkn by flia.
