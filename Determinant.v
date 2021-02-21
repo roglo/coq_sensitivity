@@ -908,7 +908,7 @@ Qed.
 
 Theorem first_transp_Some_if : ∀ n σ j k,
   first_transp n σ = Some (j, k)
-  ↔ j < n ∧ k < n ∧
+  ↔ j < k < n ∧
     (∀ i, i < j → σ i = i) ∧
     σ j ≠ j ∧
     σ k = j.
@@ -920,27 +920,34 @@ split. {
   remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
   destruct x as [i| ]; [ | easy ].
   apply first_non_fixpoint_Some_iff in Hx.
-  destruct Hx as (Hi & Hj & Hk & Hsj).
-  rewrite Nat.sub_0_r in Hj.
+  rewrite Nat.sub_0_r in Hx.
+  destruct Hx as (_ & Hj & Hk & Hsj).
   remember (where_is n σ i 0) as y eqn:Hy; symmetry in Hy.
   destruct y as [m| ]; [ | easy ].
   injection Hfnt; clear Hfnt; intros; subst m j.
   apply where_is_Some_if in Hy.
   rewrite Nat.sub_0_r in Hy.
-  split; [ easy | ].
-  split; [ easy | ].
+  split. {
+    split; [ | easy ].
+    apply Nat.nle_gt; intros Hik.
+    destruct (Nat.eq_dec k i) as [Hki| Hki]; [ now subst k | ].
+    assert (H : 0 ≤ k < i) by flia Hik Hki.
+    specialize (Hk _ H); clear H.
+    destruct Hy as (Hski, Hkn).
+    congruence.
+  }
   split; [ | easy ].
   intros j Hm.
   apply Hk; flia Hm.
 } {
-  intros (Hjn & Hkn & Hj & Hjj & Hkj).
+  intros ((Hjk & Hkn) & Hj & Hjj & Hkj).
   unfold first_transp.
   remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
   destruct x as [i| ]. 2: {
     specialize first_non_fixpoint_None_if as H1.
     specialize (H1 σ n 0 Hx).
     cbn in H1.
-    assert (H : 0 ≤ j < n) by flia Hjn.
+    assert (H : 0 ≤ j < n) by flia Hjk Hkn.
     specialize (H1 j H); clear H.
     now symmetry in H1.
   }
@@ -951,6 +958,15 @@ split. {
   destruct y as [m| ]. 2: {
     specialize (proj1 (where_is_None_iff _ _ _ _) Hy) as H1.
     cbn in H1.
+    destruct (Nat.eq_dec i j) as [Heij| Heij]. {
+      subst i; clear Hii Hi.
+Print first_transp.
+...
+    assert (H : 0 ≤ j < i). {
+      split; [ flia | ].
+      apply Nat.nle_gt; intros Hij.
+      destruct (Nat.eq_dec i j) as [Heij| Heij]. {
+        subst i.
 ...
    apply where_is_None_iff in Hy.
 ...
