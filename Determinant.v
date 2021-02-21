@@ -859,7 +859,7 @@ destruct x as [i| ]. {
 
 Theorem where_is_Some_iff : ∀ n σ i j k,
   where_is n σ i j = Some k
-  ↔ σ k = i ∧ k - j < n.
+  ↔ σ k = i ∧ j ≤ k < j + n ∧ (∀ p, j ≤ p < k → σ p ≠ i).
 Proof.
 intros.
 split. {
@@ -870,18 +870,41 @@ split. {
   rewrite if_eqb_eq_dec in Hw.
   destruct (Nat.eq_dec (σ j) i) as [H1| H1]. {
     injection Hw; intros; subst j.
-    split; [ easy | flia ].
+    split; [ easy | ].
+    split; flia.
   }
   specialize (IHn i _ k Hw) as H2.
-  split; [ easy | flia H2 ].
+  split; [ easy | ].
+  split; [ flia H2 | ].
+  destruct H2 as (Hki & Hkjn & Hp).
+  intros p Hjp.
+  destruct (Nat.eq_dec p j) as [Hpj| Hpj]; [ congruence | ].
+  apply Hp.
+  split; [ | easy ].
+  flia Hjp Hpj.
 } {
-  intros (Hski & Hkjn).
-  revert i j k Hski Hkjn.
-  induction n; intros; [ easy | ].
-  cbn.
+  intros (Hski & Hkjn & Hjk).
+  revert i j k Hski Hkjn Hjk.
+  induction n; intros; [ flia Hkjn | cbn ].
   rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec (σ j) i) as [Hsji| Hsji]. {
-..
+    f_equal.
+    destruct (Nat.eq_dec j k) as [H| Hnjk]; [ easy | exfalso ].
+    specialize (Hjk j).
+    assert (H : j ≤ j < k) by flia Hkjn Hnjk.
+    now specialize (Hjk H); clear H.
+  }
+  apply IHn; [ easy | | ]. {
+    split; [ | flia Hkjn ].
+    destruct (Nat.eq_dec j k) as [Hejk| Hnjk]; [ | flia Hkjn Hnjk ].
+    now subst k.
+  }
+  intros p Hp.
+  apply Hjk.
+  split; [ | flia Hp ].
+  destruct (Nat.eq_dec j k) as [Hejk| Hnjk]; [ flia Hp Hkjn | ].
+  flia Hp Hnjk.
+}
 Qed.
 
 Theorem where_is_None_iff : ∀ n σ i j,
@@ -935,8 +958,8 @@ split. {
   remember (where_is n σ i 0) as y eqn:Hy; symmetry in Hy.
   destruct y as [m| ]; [ | easy ].
   injection Hfnt; clear Hfnt; intros; subst m j.
-  apply where_is_Some_if in Hy.
-  rewrite Nat.sub_0_r in Hy.
+  apply where_is_Some_iff in Hy.
+  cbn in Hy.
   split. {
     split; [ | easy ].
     apply Nat.nle_gt; intros Hik.
@@ -984,6 +1007,9 @@ split. {
     exfalso; apply Hjj.
     apply Hi; flia Hji.
   }
+  apply where_is_Some_iff in Hy.
+  cbn in Hy.
+  destruct Hy as (Hmi & (_ & Hmn) & Hsi).
 ...
   apply where_is_Some_if in Hy.
   rewrite Nat.sub_0_r in Hy.
