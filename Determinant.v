@@ -1236,6 +1236,27 @@ Fixpoint nb_good_loop it i σ :=
 
 Definition nb_good n σ := nb_good_loop n 0 σ.
 
+Theorem glip : ∀ it n σ i j k,
+  is_permut_fun σ n
+  → j < n
+  → n = i + 1 + it
+  → nb_good_loop it (i + 1) σ <
+    1 + nb_good_loop it (i + 1) (comp (transposition j k) σ).
+Proof.
+intros * Hp Hjn Hnit.
+revert i j k Hjn Hnit.
+induction it; intros; [ apply Nat.lt_0_1 | cbn ].
+replace (i + 1 + S it) with (i + 1 + 1 + it) in Hnit by flia.
+unfold Nat.b2n.
+unfold comp at 1, transposition at 1.
+do 4 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (σ (i + 1)) (i + 1)) as [Hsii| Hsii]. {
+  apply -> Nat.succ_lt_mono.
+  destruct (Nat.eq_dec (σ (i + 1)) i) as [H| H]; [ flia Hsii H | clear H ].
+  destruct (Nat.eq_dec (σ (i + 1)) j) as [Hij| Hij]. {
+    destruct (Nat.eq_dec k (i + 1)) as [Hki| Hki]; [ now apply IHit | ].
+...
+
 Theorem glop : ∀ it n σ i j k,
   is_permut_fun σ n
   → first_transp n σ = Some (i, j)
@@ -1276,6 +1297,11 @@ destruct (Nat.eq_dec (σ k) j) as [Hkj| Hkj]. {
     apply IHit; try easy; flia Hki Hik.
   }
   move Hik at top; subst k.
+...
+  now apply glip with (n := n).
+...
+  revert i Hknit.
+  induction it; intros; [ cbn; flia | cbn ].
 ...
   specialize (IHit (k + 1)) as H1.
 ...
