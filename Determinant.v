@@ -857,21 +857,31 @@ destruct x as [i| ]. {
 ...
 *)
 
-Theorem where_is_Some_if : ∀ n σ i j k,
+Theorem where_is_Some_iff : ∀ n σ i j k,
   where_is n σ i j = Some k
-  → σ k = i ∧ k - j < n.
+  ↔ σ k = i ∧ k - j < n.
 Proof.
-intros * Hw.
-revert i j k Hw.
-induction n; intros; [ easy | ].
-cbn in Hw.
-rewrite if_eqb_eq_dec in Hw.
-destruct (Nat.eq_dec (σ j) i) as [H1| H1]. {
-  injection Hw; intros; subst j.
-  split; [ easy | flia ].
-}
-specialize (IHn i _ k Hw) as H2.
-split; [ easy | flia H2 ].
+intros.
+split. {
+  intros Hw.
+  revert i j k Hw.
+  induction n; intros; [ easy | ].
+  cbn in Hw.
+  rewrite if_eqb_eq_dec in Hw.
+  destruct (Nat.eq_dec (σ j) i) as [H1| H1]. {
+    injection Hw; intros; subst j.
+    split; [ easy | flia ].
+  }
+  specialize (IHn i _ k Hw) as H2.
+  split; [ easy | flia H2 ].
+} {
+  intros (Hski & Hkjn).
+  revert i j k Hski Hkjn.
+  induction n; intros; [ easy | ].
+  cbn.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (σ j) i) as [Hsji| Hsji]. {
+..
 Qed.
 
 Theorem where_is_None_iff : ∀ n σ i j,
@@ -906,7 +916,7 @@ split. {
 }
 Qed.
 
-Theorem first_transp_Some_if : ∀ n σ j k,
+Theorem first_transp_Some_iff : ∀ n σ j k,
   first_transp n σ = Some (j, k)
   ↔ j < k < n ∧
     (∀ i, i < j → σ i = i) ∧
@@ -960,7 +970,31 @@ split. {
     cbn in H1.
     destruct (Nat.eq_dec i j) as [Heij| Heij]. {
       subst i; clear Hii Hi.
-Print first_transp.
+      assert (H : 0 ≤ k < n). {
+        split; [ flia | easy ].
+      }
+      now specialize (H1 _ H); clear H.
+    }
+    assert (Hji : j < i). {
+      apply Nat.nle_gt.
+      intros Hij.
+      assert (H : i < j) by flia Heij Hij.
+      now specialize (Hj _ H); clear H.
+    }
+    exfalso; apply Hjj.
+    apply Hi; flia Hji.
+  }
+...
+  apply where_is_Some_if in Hy.
+  rewrite Nat.sub_0_r in Hy.
+  destruct Hy as (Hmi & Hmn).
+  f_equal; f_equal. {
+...
+  split; [ easy | ].
+  split; [ easy | ].
+  split; [ | easy ].
+  intros j Hm.
+  apply Hk; flia Hm.
 ...
     assert (H : 0 ≤ j < i). {
       split; [ flia | ].
