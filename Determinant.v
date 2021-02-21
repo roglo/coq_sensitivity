@@ -908,28 +908,62 @@ Qed.
 
 Theorem first_transp_Some_if : ∀ n σ j k,
   first_transp n σ = Some (j, k)
-  → j < n ∧ k < n ∧
+  ↔ j < n ∧ k < n ∧
     (∀ i, i < j → σ i = i) ∧
     σ j ≠ j ∧
     σ k = j.
 Proof.
-intros * Hfnt.
-unfold first_transp in Hfnt.
-remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
-destruct x as [i| ]; [ | easy ].
-apply first_non_fixpoint_Some_iff in Hx.
-destruct Hx as (Hi & Hj & Hk & Hsj).
-rewrite Nat.sub_0_r in Hj.
-remember (where_is n σ i 0) as y eqn:Hy; symmetry in Hy.
-destruct y as [m| ]; [ | easy ].
-injection Hfnt; clear Hfnt; intros; subst m j.
-apply where_is_Some_if in Hy.
-rewrite Nat.sub_0_r in Hy.
-split; [ easy | ].
-split; [ easy | ].
-split; [ | easy ].
-intros j Hm.
-apply Hk; flia Hm.
+intros.
+split. {
+  intros Hfnt.
+  unfold first_transp in Hfnt.
+  remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
+  destruct x as [i| ]; [ | easy ].
+  apply first_non_fixpoint_Some_iff in Hx.
+  destruct Hx as (Hi & Hj & Hk & Hsj).
+  rewrite Nat.sub_0_r in Hj.
+  remember (where_is n σ i 0) as y eqn:Hy; symmetry in Hy.
+  destruct y as [m| ]; [ | easy ].
+  injection Hfnt; clear Hfnt; intros; subst m j.
+  apply where_is_Some_if in Hy.
+  rewrite Nat.sub_0_r in Hy.
+  split; [ easy | ].
+  split; [ easy | ].
+  split; [ | easy ].
+  intros j Hm.
+  apply Hk; flia Hm.
+} {
+  intros (Hjn & Hkn & Hj & Hjj & Hkj).
+  unfold first_transp.
+  remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
+  destruct x as [i| ]. 2: {
+    specialize first_non_fixpoint_None_if as H1.
+    specialize (H1 σ n 0 Hx).
+    cbn in H1.
+    assert (H : 0 ≤ j < n) by flia Hjn.
+    specialize (H1 j H); clear H.
+    now symmetry in H1.
+  }
+  apply first_non_fixpoint_Some_iff in Hx.
+  rewrite Nat.sub_0_r in Hx.
+  destruct Hx as (_ & Hin & Hi & Hii).
+  remember (where_is n σ i 0) as y eqn:Hy; symmetry in Hy.
+  destruct y as [m| ]. 2: {
+    specialize (proj1 (where_is_None_iff _ _ _ _) Hy) as H1.
+    cbn in H1.
+...
+   apply where_is_None_iff in Hy.
+...
+  destruct y as [m| ]; [ | easy ].
+  injection Hfnt; clear Hfnt; intros; subst m j.
+  apply where_is_Some_if in Hy.
+  rewrite Nat.sub_0_r in Hy.
+  split; [ easy | ].
+  split; [ easy | ].
+  split; [ | easy ].
+  intros j Hm.
+  apply Hk; flia Hm.
+
 Qed.
 
 Theorem first_transp_None_iff : ∀ n σ,
