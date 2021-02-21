@@ -1301,6 +1301,26 @@ destruct (Nat.eq_dec (σ k) j) as [Hkj| Hkj]. {
   move Hik at top; subst k.
   clear Hki Hski Hkk.
   move Hkj before Hji.
+  clear IHit.
+  clear Hi Hii.
+  revert i j Hijn Hij Hji Hkj Hknit.
+  induction it; intros; [ apply Nat.lt_0_1 | cbn ].
+  replace (i + 1 + S it) with (i + 1 + 1 + it) in Hknit by flia.
+  unfold Nat.b2n.
+  unfold comp at 1, transposition at 1.
+  do 4 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (σ (i + 1)) (i + 1)) as [Hsii| Hsii]. {
+    apply -> Nat.succ_lt_mono.
+    destruct (Nat.eq_dec (σ (i + 1)) i) as [H| H]; [ flia Hsii H | clear H ].
+    destruct (Nat.eq_dec (σ (i + 1)) j) as [Hi1j| Hi1j]. {
+      rewrite Hsii in Hi1j.
+      move Hi1j at top; subst j.
+      rewrite Hji in Hsii.
+      flia Hsii.
+    }
+    destruct (Nat.eq_dec (σ (i + 1)) (i + 1)) as [H| H]; [ clear H | easy ].
+...
+    apply IHit.
 ...
   now apply glip with (n := n).
 ...
