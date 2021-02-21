@@ -1127,10 +1127,13 @@ intros * Hp Hn Hkn.
 apply first_transp_Some_if in Hn.
 destruct Hn as (Hin & Hjn & Hi & Hii & Hji).
 move Hkn before Hjn.
+revert k Hkn.
+(*
 revert n i j k Hp Hin Hjn Hkn Hi Hii Hji.
-(**)
+*)
 induction it; intros. 2: {
   cbn.
+  replace (k + S it) with (k + 1 + it) in Hkn by flia.
   unfold Nat.b2n.
   unfold comp at 1, transposition at 1.
   do 4 rewrite if_eqb_eq_dec.
@@ -1139,8 +1142,26 @@ induction it; intros. 2: {
     destruct (Nat.eq_dec (σ k) j) as [Hkj| Hkj]; [ congruence | ].
     destruct (Nat.eq_dec (σ k) k) as [H| H]; [ clear H | easy ].
     apply -> Nat.succ_lt_mono.
-    apply IHit with (n := n); try easy; flia Hkn.
+    now apply IHit.
   }
+  rewrite Nat.add_0_l.
+  destruct (Nat.eq_dec (σ k) i) as [Hki| Hki]. {
+    destruct (Nat.eq_dec j k) as [Hjk| Hjk]; [ | now apply IHit ].
+    etransitivity; [ apply Nat.lt_succ_diag_r | ].
+    apply -> Nat.succ_lt_mono.
+    now apply IHit.
+  }
+  destruct (Nat.eq_dec (σ k) j) as [Hkj| Hkj]. {
+    destruct (Nat.eq_dec i k) as [Hik| Hik]; [ | now apply IHit ].
+    etransitivity; [ apply Nat.lt_succ_diag_r | ].
+    apply -> Nat.succ_lt_mono.
+    now apply IHit.
+  }
+  destruct (Nat.eq_dec (σ k) k) as [H| H]; [ easy | clear H ].
+  now apply IHit.
+}
+exfalso.
+clear k Hkn.
 ...
   destruct it. {
     cbn.
