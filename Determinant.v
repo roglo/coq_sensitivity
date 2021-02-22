@@ -1225,9 +1225,6 @@ injection Hij; clear Hij; intros; subst i' j'.
 now rewrite where_is_enough_iter with (n := n) (k := j).
 Qed.
 
-(*
-Definition nb_good n σ := length (filter (λ i, σ i =? i) (seq 0 n)).
-*)
 Fixpoint nb_good_loop it i σ :=
   match it with
   | 0 => 0
@@ -1236,28 +1233,13 @@ Fixpoint nb_good_loop it i σ :=
 
 Definition nb_good n σ := nb_good_loop n 0 σ.
 
-(*
-Theorem glip : ∀ it n σ i j k,
-  is_permut_fun σ n
-  → j < n
-  → n = i + 1 + it
-  → nb_good_loop it (i + 1) σ <
-    1 + nb_good_loop it (i + 1) (comp (transposition j k) σ).
+Theorem nb_good_loop_comp_transp : ∀ it σ i j k,
+  j < i
+  → k < i
+  → nb_good_loop it i (comp (transposition j k) σ) = nb_good_loop it i σ.
 Proof.
-intros * Hp Hjn Hnit.
-revert i j k Hjn Hnit.
-induction it; intros; [ apply Nat.lt_0_1 | cbn ].
-replace (i + 1 + S it) with (i + 1 + 1 + it) in Hnit by flia.
-unfold Nat.b2n.
-unfold comp at 1, transposition at 1.
-do 4 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec (σ (i + 1)) (i + 1)) as [Hsii| Hsii]. {
-  apply -> Nat.succ_lt_mono.
-  destruct (Nat.eq_dec (σ (i + 1)) i) as [H| H]; [ flia Hsii H | clear H ].
-  destruct (Nat.eq_dec (σ (i + 1)) j) as [Hij| Hij]. {
-    destruct (Nat.eq_dec k (i + 1)) as [Hki| Hki]; [ now apply IHit | ].
+intros * Hji Hki.
 ...
-*)
 
 Theorem glop : ∀ it n σ i j k,
   is_permut_fun σ n
@@ -1321,8 +1303,8 @@ destruct (Nat.eq_dec (σ k) j) as [Hkj| Hkj]. {
       cbn; f_equal.
       move Hji1 at top; subst j.
       clear.
-(* say that, in "transposition i (i + 1)", it is actually about
-   "transposition j k" where j and k are ≤ i *)
+...
+apply nb_good_loop_comp_transp; flia.
 ...
       revert i.
       induction it; intros; [ easy | cbn ].
