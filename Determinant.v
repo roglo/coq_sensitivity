@@ -1269,6 +1269,54 @@ Theorem nb_good_loop_comp_transp' : ∀ n it σ i j k,
   → nb_good_loop it i (comp (transposition k j) σ) = nb_good_loop it i σ + 1.
 Proof.
 intros * Hp Hijn Hki Hkj Hnit.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  move Hij at top; subst j.
+  destruct Hijn as (_, Hijn).
+  revert i Hijn Hki Hnit Hkj.
+  induction it; intros; [ flia Hijn Hnit | cbn ].
+  unfold comp at 1, transposition at 1.
+  unfold Nat.b2n.
+  do 4 rewrite if_eqb_eq_dec.
+  replace (i + S it) with (i + 1 + it) in Hnit by flia.
+  destruct (Nat.eq_dec (σ i) k) as [Hsik| Hsik]. {
+    rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
+    destruct (Nat.eq_dec (σ i) i) as [Hsii| Hsii]. {
+      flia Hki Hsik Hsii.
+    }
+    rewrite nb_good_loop_comp_transp; [ | flia Hki | flia ].
+    apply Nat.add_comm.
+  }
+  destruct (Nat.eq_dec (σ i) i) as [Hsii| Hsii]. {
+    rewrite <- Hsii in Hkj.
+    apply Hp in Hkj; [ | flia Hijn Hki | easy ].
+    flia Hki Hkj.
+  }
+  destruct (Nat.eq_dec (σ i) i) as [H| H]; [ easy | clear H ].
+  cbn.
+(* il n'y a aucune raison que ça soit vrai, ça *)
+...
+  rewrite <- Hsii in Hkj.
+    apply Hp in Hkj; [ | flia Hijn Hki | easy ].
+    flia Hki Hkj.
+  }
+
+
+  apply IHit; [ flia Hijn Hsji | flia Hki | easy | easy ].
+}
+destruct (Nat.eq_dec (σ i) j) as [Hsij| Hsij]. {
+  rewrite <- Hkj in Hsij.
+  apply Hp in Hsij; [ flia Hki Hsij | flia Hijn | flia Hki Hijn ].
+}
+rewrite <- Nat.add_assoc; f_equal.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
+  apply IHit; [ | flia Hki | easy | easy ].
+  flia Hijn Hij.
+}
+move Hij at top; subst j.
+apply IHit.
+...
+...
+intros * Hp Hijn Hki Hkj Hnit.
 revert i j Hijn Hki Hnit Hkj.
 induction it; intros; [ flia Hijn Hnit | cbn ].
 unfold comp at 1, transposition at 1.
