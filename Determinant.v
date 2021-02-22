@@ -1276,18 +1276,10 @@ unfold Nat.b2n.
 do 4 rewrite if_eqb_eq_dec.
 replace (i + S it) with (i + 1 + it) in Hnit by flia.
 destruct (Nat.eq_dec (σ i) k) as [Hsik| Hsik]. {
-  destruct (Nat.eq_dec j i) as [Hji| Hji]. {
-...
-    destruct (Nat.eq_dec (σ i) i) as [H| H]; [ | clear H ]. {
-      flia Hki Hsik H.
-    }
-    rewrite (Nat.add_comm 1).
-    cbn; f_equal.
-    move Hji at top; subst j.
-    apply nb_good_loop_comp_transp; flia Hki.
-  }
+  destruct (Nat.eq_dec j i) as [Hji| Hji]; [ flia Hijn Hji | ].
   destruct (Nat.eq_dec (σ i) i) as [H| H]; [ flia Hsik Hki H | clear H ].
   cbn.
+...
   apply IHit; [ | flia Hki | easy ].
 
 flia Hijn Hji.
