@@ -1281,22 +1281,25 @@ destruct (Nat.eq_dec (σ i) k) as [Hsik| Hsik]. {
     destruct (Nat.eq_dec (σ i) i) as [Hsii| Hsii]. {
       flia Hki Hsik Hsii.
     }
-...
+    rewrite nb_good_loop_comp_transp; [ | flia Hki | flia ].
+    apply Nat.add_comm.
+  }
+  destruct (Nat.eq_dec (σ i) i) as [Hsii| Hsii]. {
+    flia Hki Hsik Hsii.
+  }
+  apply IHit; [ flia Hijn Hsji | flia Hki | easy ].
+}
 destruct (Nat.eq_dec (σ i) j) as [Hsij| Hsij]. {
   rewrite <- Hkj in Hsij.
   apply Hp in Hsij; [ flia Hki Hsij | flia Hijn | flia Hki Hijn ].
 }
 rewrite <- Nat.add_assoc; f_equal.
-destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-  move Hij at top; subst j.
-apply IHit; try easy.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
+  apply IHit; [ | flia Hki | easy ].
+  flia Hijn Hij.
+}
+move Hij at top; subst j.
 ...
-
-remember (i + 1 + 1) as x; rewrite <- Nat.add_assoc; subst x.
-f_equal.
-apply IHit; [ | flia Hki | easy ].
-...
-*)
 
 Theorem glop : ∀ it n σ i j k,
   is_permut_fun σ n
