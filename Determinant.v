@@ -1332,6 +1332,25 @@ destruct (Nat.eq_dec (σ k) j) as [Hkj| Hkj]. {
       flia Hijn Hji1.
     }
   }
+  destruct (Nat.eq_dec (σ (i + 1)) j) as [Hsij| Hsij]. {
+    destruct (Nat.eq_dec i (i + 1)) as [H| H]; [ flia H | clear H ].
+      destruct (Nat.eq_dec (σ (i + 1)) (i + 1)) as [Hsii1| Hsii1]. {
+...
+        flia Hsii H.
+      }
+      rewrite (Nat.add_comm 1).
+      cbn; f_equal.
+      move Hji1 at top; subst j.
+      apply nb_good_loop_comp_transp; flia.
+    }
+    destruct (Nat.eq_dec (σ (i + 1)) (i + 1)) as [H| H]; [ flia Hsii H | ]. {
+      clear H.
+      exfalso.
+      revert Hsii.
+      apply Hij.
+      flia Hijn Hji1.
+    }
+  }
 ...
       revert i.
       induction it; intros; [ easy | cbn ].
