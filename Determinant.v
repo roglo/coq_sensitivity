@@ -1361,6 +1361,11 @@ destruct (Nat.eq_dec k i) as [Heki| Heki]. 2: {
 }
 move Heki at top; subst k.
 clear Hski Hkk Hki.
+move Hkj before Hii.
+...
+(* il faudrait que σ i = j pour que ce truc-là marche *)
+rewrite (@nb_good_loop_comp_transp' n); try easy; try flia.
+flia Hijn.
 ...
   revert i Hijn Hij Hji Hkj Hknit.
   induction it; intros; [ flia Hijn Hknit | cbn ].
