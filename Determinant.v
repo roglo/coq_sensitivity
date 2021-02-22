@@ -1305,7 +1305,38 @@ destruct (Nat.eq_dec (σ k) j) as [Hkj| Hkj]. {
   replace (nb_good_loop it (i + 1) (comp _ _)) with
     (nb_good_loop it (i + 1) σ + 1); [ flia | ].
   symmetry.
-  clear IHit Hji Hi Hii.
+(*
+  clear IHit Hi Hii.
+*)
+  destruct it; [ flia Hijn Hknit | cbn ].
+  unfold comp at 1, transposition at 1.
+  unfold Nat.b2n.
+  do 4 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (σ (i + 1)) i) as [Hsii| Hsii]. {
+    destruct (Nat.eq_dec j (i + 1)) as [Hji1| Hji1]. {
+      destruct (Nat.eq_dec (σ (i + 1)) (i + 1)) as [H| H]; [ | clear H ]. {
+        flia Hsii H.
+      }
+      rewrite (Nat.add_comm 1).
+      cbn; f_equal.
+      move Hji1 at top; subst j.
+      clear.
+(* say that, in "transposition i (i + 1)", it is actually about
+   "transposition j k" where j and k are ≤ i *)
+...
+      revert i.
+      induction it; intros; [ easy | cbn ].
+      unfold comp at 1, transposition at 1.
+      unfold Nat.b2n.
+      do 4 rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec (σ (i + 1 + 1)) i) as [Hii| Hii]. {
+        rewrite Hii.
+        destruct (Nat.eq_dec (i + 1) (i + 1 + 1)) as [H| H]; [ flia H | ].
+        clear H; cbn.
+        destruct (Nat.eq_dec i (i + 1 + 1)) as [H| H]; [ flia H | clear H ].
+        cbn.
+...
+        apply IHit.
 ...
   clear IHit.
   clear Hi Hii.
