@@ -1277,9 +1277,17 @@ do 4 rewrite if_eqb_eq_dec.
 replace (i + S it) with (i + 1 + it) in Hnit by flia.
 destruct (Nat.eq_dec (σ i) k) as [Hsik| Hsik]. {
   destruct (Nat.eq_dec j i) as [Hji| Hji]; [ flia Hijn Hji | ].
-  destruct (Nat.eq_dec (σ i) i) as [H| H]; [ flia Hsik Hki H | clear H ].
+  destruct (Nat.eq_dec (σ i) i) as [Hsii| Hsii]; [ flia Hsik Hki Hsii | ].
   cbn.
+  destruct (Nat.eq_dec j (i + 1)) as [Hji1| Hji1]. {
+    move Hji1 at top; subst j.
+    clear Hji.
+...
   apply IHit; [ | flia Hki | easy ].
+  destruct (Nat.eq_dec j (i + 1)) as [Hji1| Hji1]; [ | flia Hijn Hji1 ].
+  exfalso.
+  move Hji1 at top; subst j.
+  clear Hji.
 ...
 flia Hijn Hji.
 }
