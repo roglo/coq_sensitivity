@@ -1262,7 +1262,7 @@ Qed.
 
 Theorem nb_good_loop_comp_transp' : ∀ n it σ i j k,
   is_permut_fun σ n
-  → i < j < n
+  → i ≤ j < n
   → k < i
   → σ k = j
   → n = i + it
@@ -1276,6 +1276,13 @@ unfold Nat.b2n.
 do 4 rewrite if_eqb_eq_dec.
 replace (i + S it) with (i + 1 + it) in Hnit by flia.
 destruct (Nat.eq_dec (σ i) k) as [Hsik| Hsik]. {
+  destruct (Nat.eq_dec j i) as [Hji| Hji]. {
+    move Hji at top; subst j.
+    rewrite Hsik.
+    destruct (Nat.eq_dec k i) as [H| H]; [ flia Hki H | clear H ].
+    rewrite Nat.add_0_l.
+    rewrite Nat.add_comm; f_equal.
+...
   destruct (Nat.eq_dec j i) as [Hji| Hji]; [ flia Hijn Hji | ].
   destruct (Nat.eq_dec (σ i) i) as [Hsii| Hsii]; [ flia Hsik Hki Hsii | ].
   cbn.
