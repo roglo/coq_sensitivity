@@ -1239,7 +1239,26 @@ Theorem nb_good_loop_comp_transp : ∀ it σ i j k,
   → nb_good_loop it i (comp (transposition j k) σ) = nb_good_loop it i σ.
 Proof.
 intros * Hji Hki.
-...
+revert i Hji Hki.
+induction it; intros; [ easy | cbn ].
+unfold Nat.b2n, comp at 1, transposition at 1.
+do 4 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (σ i) j) as [Hsij| Hsij]. {
+  destruct (Nat.eq_dec k i) as [H| H]; [ flia Hki H | clear H ].
+  destruct (Nat.eq_dec (σ i) i) as [Hsii| Hsii]. {
+    flia Hji Hsij Hsii.
+  }
+  apply IHit; [ flia Hji | flia Hki ].
+}
+destruct (Nat.eq_dec (σ i) k) as [Hsik| Hsik]. {
+  destruct (Nat.eq_dec j i) as [H| H]; [ flia Hji H | clear H ].
+  destruct (Nat.eq_dec (σ i) i) as [Hsii| Hsii]. {
+    flia Hki Hsik Hsii.
+  }
+  apply IHit; [ flia Hji | flia Hki ].
+}
+rewrite IHit; [ easy | flia Hji | flia Hki ].
+Qed.
 
 Theorem glop : ∀ it n σ i j k,
   is_permut_fun σ n
@@ -1249,6 +1268,7 @@ Theorem glop : ∀ it n σ i j k,
   → nb_good_loop it k σ < nb_good_loop it k (comp (transposition i j) σ).
 Proof.
 intros * Hp Hn Hki Hknit.
+clear Hp.
 apply first_transp_Some_iff in Hn.
 destruct Hn as (Hijn & Hi & Hii & Hij & Hji).
 revert k Hki Hknit.
@@ -1302,9 +1322,16 @@ destruct (Nat.eq_dec (σ k) j) as [Hkj| Hkj]. {
       rewrite (Nat.add_comm 1).
       cbn; f_equal.
       move Hji1 at top; subst j.
-      clear.
-...
-apply nb_good_loop_comp_transp; flia.
+      apply nb_good_loop_comp_transp; flia.
+    }
+    destruct (Nat.eq_dec (σ (i + 1)) (i + 1)) as [H| H]; [ flia Hsii H | ]. {
+      clear H.
+      exfalso.
+      revert Hsii.
+      apply Hij.
+      flia Hijn Hji1.
+    }
+  }
 ...
       revert i.
       induction it; intros; [ easy | cbn ].
