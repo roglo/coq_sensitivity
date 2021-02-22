@@ -1260,14 +1260,48 @@ destruct (Nat.eq_dec (σ i) k) as [Hsik| Hsik]. {
 rewrite IHit; [ easy | flia Hji | flia Hki ].
 Qed.
 
-Theorem nb_good_loop_comp_transp' : ∀ it σ i j k,
-  i < j ≤ k
-  → σ i = k
-  → σ k ≠ k
-  → nb_good_loop it j (comp (transposition i k) σ) = nb_good_loop it j σ + 1.
+Theorem nb_good_loop_comp_transp' : ∀ n it σ i j k,
+  is_permut_fun σ n
+  → i < j < n
+  → k < i
+  → σ k = j
+  → n = i + it
+  → nb_good_loop it i (comp (transposition k j) σ) = nb_good_loop it i σ + 1.
 Proof.
-intros * Hijk Hik Hkk.
+intros * Hp Hijn Hki Hkj Hnit.
+revert i Hijn Hki Hnit.
+induction it; intros; [ flia Hijn Hnit | cbn ].
+unfold comp at 1, transposition at 1.
+unfold Nat.b2n.
+do 4 rewrite if_eqb_eq_dec.
+replace (i + S it) with (i + 1 + it) in Hnit by flia.
+destruct (Nat.eq_dec (σ i) k) as [Hsik| Hsik]. {
+  destruct (Nat.eq_dec j i) as [Hji| Hji]. {
 ...
+    destruct (Nat.eq_dec (σ i) i) as [H| H]; [ | clear H ]. {
+      flia Hki Hsik H.
+    }
+    rewrite (Nat.add_comm 1).
+    cbn; f_equal.
+    move Hji at top; subst j.
+    apply nb_good_loop_comp_transp; flia Hki.
+  }
+  destruct (Nat.eq_dec (σ i) i) as [H| H]; [ flia Hsik Hki H | clear H ].
+  cbn.
+  apply IHit; [ | flia Hki | easy ].
+
+flia Hijn Hji.
+}
+destruct (Nat.eq_dec (σ i) j) as [Hsij| Hsij]. {
+  rewrite <- Hkj in Hsij.
+  apply Hp in Hsij; [ flia Hki Hsij | flia Hijn | flia Hki Hijn ].
+}
+remember (i + 1 + 1) as x; rewrite <- Nat.add_assoc; subst x.
+f_equal.
+Abort. (*
+apply IHit; [ | flia Hki | easy ].
+...
+*)
 
 Theorem glop : ∀ it n σ i j k,
   is_permut_fun σ n
@@ -1315,13 +1349,12 @@ destruct (Nat.eq_dec (σ k) j) as [Hkj| Hkj]. {
   replace (nb_good_loop it (i + 1) (comp _ _)) with
     (nb_good_loop it (i + 1) σ + 1); [ flia | ].
   symmetry.
+  clear Hi Hii IHit.
 ...
-apply nb_good_loop_comp_transp'.
-flia Hijn.
-easy.
-rewrite <- Hkj at 2.
-intros H.
-apply Hp in H; [ flia H Hijn | easy | flia Hijn ].
+  apply nb_good_loop_comp_transp' with (n := n); [ easy | | | easy | easy ]. {
+    flia Hijn.
+  }
+  flia.
 ...
   revert i Hijn Hij Hji Hkj Hknit.
   induction it; intros; [ flia Hijn Hknit | cbn ].
@@ -1353,6 +1386,11 @@ apply Hp in H; [ flia H Hijn | easy | flia Hijn ].
   }
   remember (i + 1 + 1) as x; rewrite <- Nat.add_assoc; subst x.
   f_equal.
+  destruct it. {
+    exfalso.
+    assert (j = i + 1) by flia Hknit Hijn.
+    now move H at top; subst j.
+  }
 ...
       revert i.
       induction it; intros; [ easy | cbn ].
