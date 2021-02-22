@@ -1276,35 +1276,19 @@ unfold Nat.b2n.
 do 4 rewrite if_eqb_eq_dec.
 replace (i + S it) with (i + 1 + it) in Hnit by flia.
 destruct (Nat.eq_dec (σ i) k) as [Hsik| Hsik]. {
-  destruct (Nat.eq_dec j i) as [Hji| Hji]. {
-    move Hji at top; subst j.
-    rewrite Hsik.
-    destruct (Nat.eq_dec k i) as [H| H]; [ flia Hki H | clear H ].
-    rewrite Nat.add_0_l.
-    rewrite Nat.add_comm; f_equal.
 ...
-  destruct (Nat.eq_dec j i) as [Hji| Hji]; [ flia Hijn Hji | ].
-  destruct (Nat.eq_dec (σ i) i) as [Hsii| Hsii]; [ flia Hsik Hki Hsii | ].
-  cbn.
-  destruct (Nat.eq_dec j (i + 1)) as [Hji1| Hji1]. {
-    move Hji1 at top; subst j.
-    clear Hji.
-...
-  apply IHit; [ | flia Hki | easy ].
-  destruct (Nat.eq_dec j (i + 1)) as [Hji1| Hji1]; [ | flia Hijn Hji1 ].
-  exfalso.
-  move Hji1 at top; subst j.
-  clear Hji.
-...
-flia Hijn Hji.
-}
 destruct (Nat.eq_dec (σ i) j) as [Hsij| Hsij]. {
   rewrite <- Hkj in Hsij.
   apply Hp in Hsij; [ flia Hki Hsij | flia Hijn | flia Hki Hijn ].
 }
+rewrite <- Nat.add_assoc; f_equal.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  move Hij at top; subst j.
+apply IHit; try easy.
+...
+
 remember (i + 1 + 1) as x; rewrite <- Nat.add_assoc; subst x.
 f_equal.
-Abort. (*
 apply IHit; [ | flia Hki | easy ].
 ...
 *)
