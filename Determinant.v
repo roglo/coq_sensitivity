@@ -1324,7 +1324,7 @@ destruct (Nat.eq_dec (σ k) k) as [Hkk| Hkk]. {
   destruct (Nat.eq_dec (σ k) k) as [H| H]; [ clear H | easy ].
   apply -> Nat.succ_lt_mono.
   destruct (Nat.eq_dec k i) as [Hk1i| Hk1i]; [ congruence | ].
-  apply IHit; try easy; flia Hki Hk1i.
+  apply IHit; [ flia Hki Hk1i | easy ].
 }
 rewrite Nat.add_0_l.
 destruct (Nat.eq_dec (σ k) i) as [Hski| Hski]. {
@@ -1335,11 +1335,11 @@ destruct (Nat.eq_dec (σ k) i) as [Hski| Hski]. {
   etransitivity; [ apply Nat.lt_succ_diag_r | ].
   apply -> Nat.succ_lt_mono.
   destruct (Nat.eq_dec k i) as [Hk1i| Hk1i]; [ congruence | ].
-  apply IHit; try easy; flia Hki Hk1i.
+  apply IHit; [ flia Hki Hk1i | easy ].
 }
 destruct (Nat.eq_dec (σ k) j) as [Hkj| Hkj]. {
   destruct (Nat.eq_dec i k) as [Hik| Hik]. 2: {
-    apply IHit; try easy; flia Hki Hik.
+    apply IHit; [ flia Hki Hik | easy ].
   }
   move Hik at top; subst k.
   clear Hki Hski Hkk.
@@ -1353,11 +1353,9 @@ destruct (Nat.eq_dec (σ k) j) as [Hkj| Hkj]. {
   }
   flia.
 }
-destruct (Nat.eq_dec (σ k) k) as [H| H]; [ easy | clear H ].
-cbn.
+destruct (Nat.eq_dec (σ k) k) as [H| H]; [ easy | clear H; cbn ].
 destruct (Nat.eq_dec k i) as [Heki| Heki]. 2: {
-  apply IHit; [ | easy ].
-  flia Hki Heki.
+  apply IHit; [ flia Hki Heki | easy ].
 }
 move Heki at top; subst k.
 clear Hski Hkk Hki.
