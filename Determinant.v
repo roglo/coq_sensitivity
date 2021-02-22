@@ -1307,9 +1307,7 @@ destruct (Nat.eq_dec (σ k) j) as [Hkj| Hkj]. {
   replace (nb_good_loop it (i + 1) (comp _ _)) with
     (nb_good_loop it (i + 1) σ + 1); [ flia | ].
   symmetry.
-(*
-  clear IHit Hi Hii.
-*)
+...
   destruct it; [ flia Hijn Hknit | cbn ].
   unfold comp at 1, transposition at 1.
   unfold Nat.b2n.
@@ -1335,6 +1333,11 @@ destruct (Nat.eq_dec (σ k) j) as [Hkj| Hkj]. {
   destruct (Nat.eq_dec (σ (i + 1)) j) as [Hsij| Hsij]. {
     destruct (Nat.eq_dec i (i + 1)) as [H| H]; [ flia H | clear H ].
       destruct (Nat.eq_dec (σ (i + 1)) (i + 1)) as [Hsii1| Hsii1]. {
+        rewrite Nat.add_0_l.
+        rewrite (Nat.add_comm 1 (nb_good_loop _ _ _)).
+        remember (i + 1 + 1) as x; rewrite <- Nat.add_assoc; subst x; cbn.
+        destruct it. {
+          cbn.
 ...
         flia Hsii H.
       }
