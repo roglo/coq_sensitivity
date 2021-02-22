@@ -1269,7 +1269,7 @@ Theorem nb_good_loop_comp_transp' : ∀ n it σ i j k,
   → nb_good_loop it i (comp (transposition k j) σ) = nb_good_loop it i σ + 1.
 Proof.
 intros * Hp Hijn Hki Hkj Hnit.
-revert i Hijn Hki Hnit.
+revert i j Hijn Hki Hnit Hkj.
 induction it; intros; [ flia Hijn Hnit | cbn ].
 unfold comp at 1, transposition at 1.
 unfold Nat.b2n.
@@ -1287,7 +1287,7 @@ destruct (Nat.eq_dec (σ i) k) as [Hsik| Hsik]. {
   destruct (Nat.eq_dec (σ i) i) as [Hsii| Hsii]. {
     flia Hki Hsik Hsii.
   }
-  apply IHit; [ flia Hijn Hsji | flia Hki | easy ].
+  apply IHit; [ flia Hijn Hsji | flia Hki | easy | easy ].
 }
 destruct (Nat.eq_dec (σ i) j) as [Hsij| Hsij]. {
   rewrite <- Hkj in Hsij.
@@ -1295,10 +1295,13 @@ destruct (Nat.eq_dec (σ i) j) as [Hsij| Hsij]. {
 }
 rewrite <- Nat.add_assoc; f_equal.
 destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
-  apply IHit; [ | flia Hki | easy ].
+  apply IHit; [ | flia Hki | easy | easy ].
   flia Hijn Hij.
 }
 move Hij at top; subst j.
+apply IHit.
+...
+rewrite nb_good_loop_comp_transp; [ | flia Hki | flia ].
 ...
 
 Theorem glop : ∀ it n σ i j k,
