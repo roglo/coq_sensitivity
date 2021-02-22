@@ -1279,9 +1279,8 @@ destruct (Nat.eq_dec (σ i) k) as [Hsik| Hsik]. {
   destruct (Nat.eq_dec j i) as [Hji| Hji]; [ flia Hijn Hji | ].
   destruct (Nat.eq_dec (σ i) i) as [H| H]; [ flia Hsik Hki H | clear H ].
   cbn.
-...
   apply IHit; [ | flia Hki | easy ].
-
+...
 flia Hijn Hji.
 }
 destruct (Nat.eq_dec (σ i) j) as [Hsij| Hsij]. {
