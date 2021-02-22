@@ -1301,6 +1301,10 @@ destruct (Nat.eq_dec (σ k) j) as [Hkj| Hkj]. {
   move Hik at top; subst k.
   clear Hki Hski Hkk.
   move Hkj before Hji.
+(**)
+  replace (nb_good_loop it (i + 1) (comp _ _)) with
+    (nb_good_loop it (i + 1) σ + 2); [ flia | ].
+...
   clear IHit.
   clear Hi Hii.
   revert i j Hijn Hij Hji Hkj Hknit.
