@@ -1362,6 +1362,7 @@ rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec (σ i) j) as [H| H]; [ easy | clear H ].
 rewrite Nat.add_0_r; f_equal.
 ...
+rewrite IHit; try easy.
 rewrite nb_good_loop_comp_transp' with (n := n); try easy.
 ...
 
