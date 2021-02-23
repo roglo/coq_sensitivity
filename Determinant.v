@@ -1307,6 +1307,69 @@ Theorem glop : ∀ it n σ i j k,
   → first_transp n σ = Some (i, j)
   → k ≤ i
   → n = k + it
+  → nb_good_loop it k (comp (transposition i j) σ) =
+     nb_good_loop it k σ + 1 + Nat.b2n (σ i =? j).
+Proof.
+intros * Hp Hn Hki Hknit.
+apply first_transp_Some_iff in Hn.
+destruct Hn as (Hijn & Hi & Hii & Hij & Hji).
+revert k Hki Hknit.
+revert i j Hijn Hi Hii Hij Hji.
+revert σ Hp.
+induction it; intros; [ flia Hijn Hki Hknit | cbn ].
+replace (k + S it) with (k + 1 + it) in Hknit by flia.
+unfold Nat.b2n.
+unfold comp at 1, transposition at 1.
+do 4 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (σ k) i) as [Hski| Hski]. {
+  destruct (Nat.eq_dec j k) as [H| H]; [ flia Hijn Hki H | clear H ].
+  destruct (Nat.eq_dec (σ k) k) as [Hkk| Hkk]. {
+    rewrite Hski in Hkk.
+    move Hkk at top; subst k.
+    rewrite <- Hski in Hji.
+    now apply Hp in Hji.
+  }
+  rewrite IHit; try easy.
+  destruct (Nat.eq_dec i k) as [H| H]; [ | flia H Hki ].
+  move H at top; subst k.
+  rewrite <- Hski in Hji.
+  now apply Hp in Hji.
+}
+destruct (Nat.eq_dec (σ k) j) as [Hkj| Hkj]. {
+  destruct (Nat.eq_dec i k) as [Hik| Hik]. {
+    move Hik at top; subst k.
+    destruct (Nat.eq_dec (σ i) i) as [H| H]; [ easy | clear H ].
+    rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec (σ i) j) as [H| H]; [ clear H | easy ].
+    rewrite nb_good_loop_comp_transp' with (n := n); try easy;
+      [ flia | flia Hijn | flia ].
+  }
+  rewrite IHit; try easy; [ | flia Hki Hik ].
+  do 2 rewrite Nat.add_assoc.
+  f_equal; f_equal; f_equal.
+  destruct (Nat.eq_dec (σ k) k) as [Hskk| Hskk]; [ | easy ].
+  congruence.
+}
+do 2 rewrite <- Nat.add_assoc.
+f_equal.
+destruct (Nat.eq_dec i k) as [Heik| Heik]. 2: {
+  rewrite IHit; try easy; [ | flia Hki Heik ].
+  symmetry.
+  apply Nat.add_assoc.
+}
+move Heik at top; subst k.
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (σ i) j) as [H| H]; [ easy | clear H ].
+rewrite Nat.add_0_r; f_equal.
+...
+rewrite nb_good_loop_comp_transp' with (n := n); try easy.
+...
+
+Theorem glop : ∀ it n σ i j k,
+  is_permut_fun σ n
+  → first_transp n σ = Some (i, j)
+  → k ≤ i
+  → n = k + it
   → nb_good_loop it k σ < nb_good_loop it k (comp (transposition i j) σ).
 Proof.
 intros * Hp Hn Hki Hknit.
