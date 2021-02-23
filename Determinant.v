@@ -1314,6 +1314,7 @@ apply first_transp_Some_iff in Hn.
 destruct Hn as (Hijn & Hi & Hii & Hij & Hji).
 revert k Hki Hknit.
 revert i j Hijn Hi Hii Hij Hji.
+revert σ Hp.
 induction it; intros; [ flia Hijn Hki Hknit | cbn ].
 replace (k + S it) with (k + 1 + it) in Hknit by flia.
 unfold Nat.b2n.
@@ -1361,8 +1362,26 @@ destruct (Nat.eq_dec k i) as [Heki| Heki]. 2: {
 move Heki at top; subst k.
 clear Hski Hkk Hki.
 move Hkj before Hii.
+...
+transitivity (nb_good_loop it i σ). {
+...
 remember (first_transp n σ) as x eqn:Hx; symmetry in Hx.
 destruct x as [(i', j')| ]. {
+  apply first_transp_Some_iff in Hx.
+  destruct Hx as (Hijn' & Hi' & Hii' & Hij' & Hji').
+  specialize (IHit i' j') as H1.
+  specialize (H1 Hijn' Hi' Hii' Hij' Hji').
+  specialize (H1 (i + 1)).
+...
+  assert (Hi1i : i + 1 ≤ i'). {
+    apply Nat.nlt_ge.
+    intros H.
+    destruct (Nat.eq_dec i i') as [H2| H2]. {
+      move H2 at top; subst i'; clear H Hi' Hii'.
+      rewrite <- Hji in Hji'.
+      apply Hp in Hji'; [ | easy | easy ].
+      move Hji' at top; subst j'.
+      move Hij' before Hij; clear Hij Hijn'
 ...
 (* il faudrait que σ i = j pour que ce truc-là marche *)
 rewrite (@nb_good_loop_comp_transp' n); try easy; try flia.
