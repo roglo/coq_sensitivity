@@ -1305,7 +1305,7 @@ Qed.
 Theorem glop : ∀ it n σ i j k,
   is_permut_fun σ n
   → first_transp n σ = Some (i, j)
-  → k ≤ i
+  → k < i
   → n = k + it
   → nb_good_loop it k (comp (transposition i j) σ) =
      nb_good_loop it k σ + 1 + Nat.b2n (σ i =? j).
@@ -1330,10 +1330,11 @@ destruct (Nat.eq_dec (σ k) i) as [Hski| Hski]. {
     now apply Hp in Hji.
   }
   rewrite IHit; try easy.
-  destruct (Nat.eq_dec i k) as [H| H]; [ | flia H Hki ].
-  move H at top; subst k.
+  destruct (Nat.eq_dec i (k + 1)) as [H| H]; [ | flia H Hki ].
+  move H at top; subst i.
   rewrite <- Hski in Hji.
-  now apply Hp in Hji.
+  apply Hp in Hji; [ | easy | flia Hijn ].
+  flia Hji Hijn.
 }
 destruct (Nat.eq_dec (σ k) j) as [Hkj| Hkj]. {
   destruct (Nat.eq_dec i k) as [Hik| Hik]. {
@@ -1344,23 +1345,22 @@ destruct (Nat.eq_dec (σ k) j) as [Hkj| Hkj]. {
     rewrite nb_good_loop_comp_transp' with (n := n); try easy;
       [ flia | flia Hijn | flia ].
   }
-  rewrite IHit; try easy; [ | flia Hki Hik ].
-  do 2 rewrite Nat.add_assoc.
-  f_equal; f_equal; f_equal.
-  destruct (Nat.eq_dec (σ k) k) as [Hskk| Hskk]; [ | easy ].
-  congruence.
+  rewrite IHit; try easy. 2: {
+    destruct (Nat.eq_dec i (k + 1)) as [H| H]; [ | flia H Hki ].
+    move H at top; subst i.
+    rewrite Hi in Hkj; [ | flia ].
+    now move Hkj at top; subst j.
+  }
+  do 3 rewrite <- Nat.add_assoc.
+  f_equal.
+  rewrite Hkj.
+  destruct (Nat.eq_dec j k) as [Hjk| Hjk]; [ | easy ].
+  flia Hki Hijn Hjk.
 }
 do 2 rewrite <- Nat.add_assoc.
 f_equal.
-destruct (Nat.eq_dec i k) as [Heik| Heik]. 2: {
-  rewrite IHit; try easy; [ | flia Hki Heik ].
-  symmetry.
-  apply Nat.add_assoc.
-}
-move Heik at top; subst k.
 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec (σ i) j) as [H| H]; [ easy | clear H ].
-rewrite Nat.add_0_r; f_equal.
+destruct (Nat.eq_dec (σ i) j) as [Hsij| Hsij]. {
 ...
 rewrite IHit; try easy.
 rewrite nb_good_loop_comp_transp' with (n := n); try easy.
