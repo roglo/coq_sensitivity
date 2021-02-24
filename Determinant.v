@@ -1367,8 +1367,9 @@ destruct (lt_dec (k + 1) i) as [Hk1i| Hk1i]. {
 assert (H : i = k + 1) by flia Hki Hk1i.
 move H at top; subst i.
 clear Hk1i Hki.
+destruct (Nat.eq_dec (σ (k + 1)) j) as [Hk1j| Hk1j]; cbn. {
 ...
-destruct (Nat.eq_dec (σ i) j) as [Hsij| Hsij]. 2: {
+}
 ...
 rewrite IHit; try easy.
 rewrite nb_good_loop_comp_transp' with (n := n); try easy.
