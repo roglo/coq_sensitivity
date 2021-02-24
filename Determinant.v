@@ -1418,6 +1418,7 @@ clear Hk1i Hki.
 destruct (Nat.eq_dec (σ (k + 1)) j) as [Hk1j| Hk1j]; cbn. {
   now apply nb_good_loop_comp_transp'' with (n := n).
 }
+rename k into i.
 ...
 now apply nb_good_loop_comp_transp''' with (n := n).
 Qed.
