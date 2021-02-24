@@ -1182,20 +1182,20 @@ replace (i + 1 + S it) with (i + 1 + 1 + it) in Hnit by flia.
 destruct (Nat.eq_dec (i + 1) j) as [Hij| Hij]; [ flia Hji1 Hij | ].
 destruct (Nat.eq_dec (i + 1) k) as [Hik| Hik]; [ flia Hkin Hik | ].
 f_equal.
-...
 apply IHit; try easy.
-...
+Abort.
 
-Theorem nb_good_loop_comp_transp' : ∀ n it σ i j k,
+Theorem nb_good_loop_comp_transp' : ∀ n it σ i k,
   is_permut_fun σ n
-  → i ≤ j < n
-  → k < i
-  → σ k = j
-  → σ j = k
-  → n = i + it
-  → nb_good_loop it i (comp σ (transposition k j)) = nb_good_loop it i σ + 1.
+  → k < i < n
+  → σ k = i
+  → σ i = k
+  → n = i + 1 + it
+  → nb_good_loop it (i + 1) (comp σ (transposition k i)) =
+    nb_good_loop it (i + 1) σ.
 Proof.
-intros * Hp Hijn Hki Hkj Hjk Hnit.
+intros * Hp Hkin Hki Hik Hnit.
+...
 revert i j Hijn Hki Hnit Hkj Hjk.
 induction it; intros; [ flia Hijn Hnit | cbn ].
 unfold comp at 1, transposition at 1, Nat.b2n.
