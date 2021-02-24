@@ -1233,6 +1233,8 @@ Fixpoint nb_good_loop it i σ :=
 
 Definition nb_good n σ := nb_good_loop n 0 σ.
 
+...
+
 Theorem nb_good_loop_comp_transp : ∀ it σ i j k,
   j < i
   → k < i
@@ -1348,7 +1350,8 @@ destruct (Nat.eq_dec (σ i) i) as [Hsii| Hsii]. {
 }
 destruct (Nat.eq_dec (σ i) j) as [H| H]; [ easy | clear H ].
 destruct (Nat.eq_dec (σ i) i) as [H| H]; [ easy | clear H; cbn ].
-...
+(* mon truc est à l'envers : c'est σ o τ et non τ o σ *)
+Abort.
 
 Theorem glop : ∀ it n σ i j k,
   is_permut_fun σ n
@@ -1423,196 +1426,6 @@ rename k into i.
 now apply nb_good_loop_comp_transp''' with (n := n).
 Qed.
 
-...
-
-Theorem glop : ∀ it n σ i j k,
-  is_permut_fun σ n
-  → first_transp n σ = Some (i, j)
-  → k ≤ i
-  → n = k + it
-  → nb_good_loop it k σ < nb_good_loop it k (comp (transposition i j) σ).
-Proof.
-intros * Hp Hn Hki Hknit.
-apply first_transp_Some_iff in Hn.
-destruct Hn as (Hijn & Hi & Hii & Hij & Hji).
-revert k Hki Hknit.
-revert i j Hijn Hi Hii Hij Hji.
-revert σ Hp.
-induction it; intros; [ flia Hijn Hki Hknit | cbn ].
-replace (k + S it) with (k + 1 + it) in Hknit by flia.
-unfold Nat.b2n.
-unfold comp at 1, transposition at 1.
-do 4 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec (σ k) k) as [Hkk| Hkk]. {
-  destruct (Nat.eq_dec (σ k) i) as [Hski| Hski]; [ congruence | ].
-  destruct (Nat.eq_dec (σ k) j) as [Hkj| Hkj]; [ congruence | ].
-  destruct (Nat.eq_dec (σ k) k) as [H| H]; [ clear H | easy ].
-  apply -> Nat.succ_lt_mono.
-  destruct (Nat.eq_dec k i) as [Hk1i| Hk1i]; [ congruence | ].
-  apply IHit; try easy; flia Hki Hk1i.
-}
-rewrite Nat.add_0_l.
-destruct (Nat.eq_dec (σ k) i) as [Hski| Hski]. {
-  destruct (Nat.eq_dec j k) as [Hjk| Hjk]. 2: {
-    destruct (Nat.eq_dec k i) as [Hk1i| Hk1i]; [ congruence | ].
-    apply IHit; try easy; flia Hki Hk1i.
-  }
-  etransitivity; [ apply Nat.lt_succ_diag_r | ].
-  apply -> Nat.succ_lt_mono.
-  destruct (Nat.eq_dec k i) as [Hk1i| Hk1i]; [ congruence | ].
-  apply IHit; try easy; flia Hki Hk1i.
-}
-destruct (Nat.eq_dec (σ k) j) as [Hkj| Hkj]. {
-  destruct (Nat.eq_dec i k) as [Hik| Hik]. 2: {
-    apply IHit; try easy; flia Hki Hik.
-  }
-  move Hik at top; subst k.
-  clear Hki Hski Hkk.
-  move Hkj before Hji.
-  replace (nb_good_loop it (i + 1) (comp _ _)) with
-    (nb_good_loop it (i + 1) σ + 1); [ flia | ].
-  symmetry.
-  clear Hi Hii IHit.
-  apply (@nb_good_loop_comp_transp' n); [ easy | | | easy | easy | easy ]. {
-    flia Hijn.
-  }
-  flia.
-}
-destruct (Nat.eq_dec (σ k) k) as [H| H]; [ easy | clear H; cbn ].
-destruct (Nat.eq_dec k i) as [Heki| Heki]. 2: {
-  apply IHit; try easy; flia Hki Heki.
-}
-move Heki at top; subst k.
-clear Hski Hkk Hki.
-move Hkj before Hii.
-...
-transitivity (nb_good_loop it i σ). {
-...
-remember (first_transp n σ) as x eqn:Hx; symmetry in Hx.
-destruct x as [(i', j')| ]. {
-  apply first_transp_Some_iff in Hx.
-  destruct Hx as (Hijn' & Hi' & Hii' & Hij' & Hji').
-  specialize (IHit i' j') as H1.
-  specialize (H1 Hijn' Hi' Hii' Hij' Hji').
-  specialize (H1 (i + 1)).
-...
-  assert (Hi1i : i + 1 ≤ i'). {
-    apply Nat.nlt_ge.
-    intros H.
-    destruct (Nat.eq_dec i i') as [H2| H2]. {
-      move H2 at top; subst i'; clear H Hi' Hii'.
-      rewrite <- Hji in Hji'.
-      apply Hp in Hji'; [ | easy | easy ].
-      move Hji' at top; subst j'.
-      move Hij' before Hij; clear Hij Hijn'
-...
-(* il faudrait que σ i = j pour que ce truc-là marche *)
-rewrite (@nb_good_loop_comp_transp' n); try easy; try flia.
-flia Hijn.
-...
-  revert i Hijn Hij Hji Hkj Hknit.
-  induction it; intros; [ flia Hijn Hknit | cbn ].
-  unfold comp at 1, transposition at 1.
-  unfold Nat.b2n.
-  do 4 rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec (σ (i + 1)) i) as [Hsii| Hsii]. {
-    destruct (Nat.eq_dec j (i + 1)) as [Hji1| Hji1]. {
-      destruct (Nat.eq_dec (σ (i + 1)) (i + 1)) as [H| H]; [ | clear H ]. {
-        flia Hsii H.
-      }
-      rewrite (Nat.add_comm 1).
-      cbn; f_equal.
-      move Hji1 at top; subst j.
-      apply nb_good_loop_comp_transp; flia.
-    }
-    destruct (Nat.eq_dec (σ (i + 1)) (i + 1)) as [H| H]; [ flia Hsii H | ]. {
-      clear H.
-      exfalso.
-      revert Hsii.
-      apply Hij.
-      flia Hijn Hji1.
-    }
-  }
-  destruct (Nat.eq_dec (σ (i + 1)) j) as [Hsij| Hsij]. {
-    rewrite <- Hkj in Hsij.
-    apply Hp in Hsij; [ | flia Hijn | flia Hijn ].
-    flia Hsij.
-  }
-  remember (i + 1 + 1) as x; rewrite <- Nat.add_assoc; subst x.
-  f_equal.
-  destruct it. {
-    exfalso.
-    assert (j = i + 1) by flia Hknit Hijn.
-    now move H at top; subst j.
-  }
-...
-      revert i.
-      induction it; intros; [ easy | cbn ].
-      unfold comp at 1, transposition at 1.
-      unfold Nat.b2n.
-      do 4 rewrite if_eqb_eq_dec.
-      destruct (Nat.eq_dec (σ (i + 1 + 1)) i) as [Hii| Hii]. {
-        rewrite Hii.
-        destruct (Nat.eq_dec (i + 1) (i + 1 + 1)) as [H| H]; [ flia H | ].
-        clear H; cbn.
-        destruct (Nat.eq_dec i (i + 1 + 1)) as [H| H]; [ flia H | clear H ].
-        cbn.
-...
-        apply IHit.
-...
-  clear IHit.
-  clear Hi Hii.
-  revert i j Hijn Hij Hji Hkj Hknit.
-  induction it; intros; [ apply Nat.lt_0_1 | cbn ].
-  replace (i + 1 + S it) with (i + 1 + 1 + it) in Hknit by flia.
-  unfold Nat.b2n.
-  unfold comp at 1, transposition at 1.
-  do 4 rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec (σ (i + 1)) (i + 1)) as [Hsii| Hsii]. {
-    apply -> Nat.succ_lt_mono.
-    destruct (Nat.eq_dec (σ (i + 1)) i) as [H| H]; [ flia Hsii H | clear H ].
-    destruct (Nat.eq_dec (σ (i + 1)) j) as [Hi1j| Hi1j]. {
-      rewrite Hsii in Hi1j.
-      move Hi1j at top; subst j.
-      rewrite Hji in Hsii.
-      flia Hsii.
-    }
-    destruct (Nat.eq_dec (σ (i + 1)) (i + 1)) as [H| H]; [ clear H | easy ].
-...
-    apply IHit.
-...
-  now apply glip with (n := n).
-...
-  revert i Hknit.
-  induction it; intros; [ cbn; flia | cbn ].
-...
-  specialize (IHit (k + 1)) as H1.
-...
-  etransitivity; [ apply Nat.lt_succ_diag_r | ].
-  apply -> Nat.succ_lt_mono.
-...
-  apply IHit; try easy.
-...
-congruence.
-  }
-...
-  destruct (Nat.eq_dec (σ k) k) as [H| H]; [ easy | clear H ].
-  now apply IHit.
-}
-exfalso.
-clear k Hknit.
-...
-destruct it; [ easy | clear Hit ].
-cbn.
-replace (k + S it) with (k + 1 + it) in Hknit by flia.
-unfold Nat.b2n.
-unfold comp at 1, transposition at 1.
-do 4 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec (σ k) k) as [Hkk| Hkk]. {
-  destruct (Nat.eq_dec (σ k) i) as [Hki| Hki]; [ congruence | ].
-  destruct (Nat.eq_dec (σ k) j) as [Hkj| Hkj]; [ congruence | ].
-  destruct (Nat.eq_dec (σ k) k) as [H| H]; [ clear H | easy ].
-  apply -> Nat.succ_lt_mono.
 ...
 
 Theorem glop : ∀ it n σ i j k,
