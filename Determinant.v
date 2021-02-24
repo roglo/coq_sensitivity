@@ -1312,7 +1312,19 @@ Theorem nb_good_loop_comp_transp'' : ∀ n it σ i j,
     nb_good_loop it i σ + 2.
 Proof.
 intros * Hp Hijn Hij Hji Hnit.
-...
+revert i j Hijn Hij Hji Hnit.
+induction it; intros; [ flia Hijn Hnit | cbn ].
+unfold comp at 1, transposition at 1.
+unfold Nat.b2n.
+rewrite Hij.
+rewrite Nat.eqb_refl.
+do 3 rewrite if_eqb_eq_dec.
+replace (i + S it) with (i + 1 + it) in Hnit by flia.
+destruct (Nat.eq_dec j i) as [H| H]; [ flia Hijn H | clear H ].
+rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
+rewrite nb_good_loop_comp_transp' with (n := n); try easy; [ flia Hijn | ].
+flia.
+Qed.
 
 Theorem glop : ∀ it n σ i j k,
   is_permut_fun σ n
@@ -1380,7 +1392,6 @@ assert (H : i = k + 1) by flia Hki Hk1i.
 move H at top; subst i.
 clear Hk1i Hki.
 destruct (Nat.eq_dec (σ (k + 1)) j) as [Hk1j| Hk1j]; cbn. {
-...
   now apply nb_good_loop_comp_transp'' with (n := n).
 }
 ...
