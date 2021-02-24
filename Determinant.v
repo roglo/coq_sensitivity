@@ -1163,39 +1163,38 @@ Fixpoint nb_good_loop it i σ :=
 
 Definition nb_good n σ := nb_good_loop n 0 σ.
 
-Theorem nb_good_loop_comp_transp'' : ∀ n it σ i j k,
+Theorem nb_good_loop_comp_transp : ∀ n it σ i j k,
   is_permut_fun σ n
   → k < i < n
-  → j < i + 1
-  → σ k = i
-  → σ i = k
+  → j ≤ i
   → n = i + 1 + it
   → nb_good_loop it (i + 1) (comp σ (transposition k j)) =
     nb_good_loop it (i + 1) σ.
 Proof.
-intros * Hn Hkin Hji1 Hski Hsik Hnit.
-revert i k Hkin Hji1 Hski Hsik Hnit.
+intros * Hp Hkin Hji Hnit.
+revert k i j Hkin Hji Hnit.
 induction it; intros; [ easy | cbn ].
 unfold comp at 1, transposition at 1, Nat.b2n.
 do 4 rewrite if_eqb_eq_dec.
 replace (i + 1 + S it) with (i + 1 + 1 + it) in Hnit by flia.
-destruct (Nat.eq_dec (i + 1) j) as [Hij| Hij]; [ flia Hji1 Hij | ].
-destruct (Nat.eq_dec (i + 1) k) as [Hik| Hik]; [ flia Hkin Hik | ].
+destruct (Nat.eq_dec (i + 1) k) as [H| H]; [ flia Hkin H | clear H ].
+destruct (Nat.eq_dec (i + 1) j) as [H| H]; [ flia Hji H | clear H ].
 f_equal.
-apply IHit; try easy.
-Abort.
+apply IHit; [ | flia Hji | easy ].
+split; [ flia Hkin | ].
+flia Hnit.
+Qed.
 
-Theorem nb_good_loop_comp_transp' : ∀ n it σ i k,
+Theorem nb_good_loop_comp_transp' : ∀ n it σ i j k,
   is_permut_fun σ n
-  → k < i < n
-  → σ k = i
-  → σ i = k
-  → n = i + 1 + it
-  → nb_good_loop it (i + 1) (comp σ (transposition k i)) =
-    nb_good_loop it (i + 1) σ.
+  → i ≤ j < n
+  → k < i
+  → σ k = j
+  → σ j = k
+  → n = i + it
+  → nb_good_loop it i (comp σ (transposition k j)) = nb_good_loop it i σ + 1.
 Proof.
-intros * Hp Hkin Hki Hik Hnit.
-...
+intros * Hp Hijn Hki Hkj Hjk Hnit.
 revert i j Hijn Hki Hnit Hkj Hjk.
 induction it; intros; [ flia Hijn Hnit | cbn ].
 unfold comp at 1, transposition at 1, Nat.b2n.
@@ -1211,9 +1210,15 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     now symmetry in Hkj.
   }
   rewrite Nat.add_0_l, Nat.add_comm; f_equal.
-...
+  now apply nb_good_loop_comp_transp with (n := n).
+}
+rewrite <- Nat.add_assoc.
+f_equal.
+apply IHit; [ | flia Hki | easy | easy | easy ].
+flia Hijn Hij.
+Qed.
 
-Theorem nb_good_loop_comp_transp : ∀ n it σ i j,
+Theorem nb_good_loop_comp_transp'' : ∀ n it σ i j,
   is_permut_fun σ n
   → i < j < n
   → σ i = j
@@ -1229,7 +1234,7 @@ rewrite Nat.eqb_refl.
 rewrite Hsij, Hsji.
 rewrite Nat.eqb_refl.
 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec j i) as [Hji| Hji]; [ flia Hn Hji | ].
+destruct (Nat.eq_dec j i) as [H| H]; [ flia Hn H | clear H ].
 rewrite Nat.add_0_l.
 rewrite (Nat.add_comm _ 2); cbn.
 f_equal.
@@ -1237,7 +1242,7 @@ rewrite <- (Nat.add_1_r (nb_good_loop _ _ _)).
 replace (i + S it) with (i + 1 + it) in Hnit by flia.
 apply nb_good_loop_comp_transp' with (n := n); try easy; [ | flia ].
 flia Hn.
-...
+Qed.
 
 Theorem glop : ∀ it n σ i j k,
   is_permut_fun σ n
@@ -1269,6 +1274,9 @@ induction it; intros. 2: {
   rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec (σ (i + 1)) j) as [Hsij| Hsij]. {
     rewrite <- Nat.add_assoc; cbn.
+    now apply nb_good_loop_comp_transp'' with (n := n).
+  }
+  rewrite Nat.add_0_r.
 ...
 
 Theorem nb_good_loop_comp_transp : ∀ it σ i j k,
