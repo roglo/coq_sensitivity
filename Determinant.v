@@ -1165,13 +1165,25 @@ Definition nb_good n σ := nb_good_loop n 0 σ.
 
 Theorem nb_good_loop_comp_transp : ∀ n it σ i j,
   is_permut_fun σ n
-  → i + 1 < j < n
-  → σ (i + 1) ≠ i + 1
-  → (∀ i0 : nat, i + 1 < i0 < j → σ i0 ≠ i + 1)
-  → σ (i + 1) = j
-  → σ j = i + 1
-  → n = i + 1 + it
-  → nb_good_loop it (i + 1) (comp σ (transposition (i + 1) j)) = nb_good_loop it (i + 1) σ + 2.
+  → i < j < n
+  → σ i = j
+  → σ j = i
+  → n = i + it
+  → nb_good_loop it i (comp σ (transposition i j)) = nb_good_loop it i σ + 2.
+Proof.
+intros * Hp Hn Hsij Hsji Hnit.
+revert i j Hn Hsij Hsji Hnit.
+induction it; intros; [ flia Hn Hnit | cbn ].
+unfold comp at 1, transposition at 1, Nat.b2n.
+rewrite Nat.eqb_refl.
+rewrite Hsij, Hsji.
+rewrite Nat.eqb_refl.
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec j i) as [Hji| Hji]; [ flia Hn Hji | ].
+rewrite Nat.add_0_l.
+rewrite (Nat.add_comm _ 2); cbn.
+f_equal.
+rewrite <- (Nat.add_1_r (nb_good_loop _ _ _)).
 ...
 
 Theorem glop : ∀ it n σ i j k,
