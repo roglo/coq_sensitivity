@@ -1163,6 +1163,26 @@ Fixpoint nb_good_loop it i σ :=
 
 Definition nb_good n σ := nb_good_loop n 0 σ.
 
+Theorem nb_good_loop_comp_transp'' : ∀ n it σ i k,
+  is_permut_fun σ n
+  → k < i < n
+  → σ k = i
+  → σ i = k
+  → n = i + 1 + it
+  → nb_good_loop it (i + 1) (comp σ (transposition k i)) =
+    nb_good_loop it (i + 1) σ.
+Proof.
+intros * Hn Hkin Hski Hsik Hnit.
+revert i k Hkin Hski Hsik Hnit.
+induction it; intros; [ easy | cbn ].
+unfold comp at 1, transposition at 1, Nat.b2n.
+do 4 rewrite if_eqb_eq_dec.
+replace (i + 1 + S it) with (i + 1 + 1 + it) in Hnit by flia.
+destruct (Nat.eq_dec (i + 1) k) as [Hik| Hik]; [ flia Hkin Hik | ].
+destruct (Nat.eq_dec (i + 1) i) as [H| H]; [ flia H | clear H ].
+f_equal.
+...
+
 Theorem nb_good_loop_comp_transp' : ∀ n it σ i j k,
   is_permut_fun σ n
   → i ≤ j < n
