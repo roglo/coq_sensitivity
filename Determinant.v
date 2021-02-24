@@ -1218,6 +1218,51 @@ apply IHit; [ | flia Hki | easy | easy | easy ].
 flia Hijn Hij.
 Qed.
 
+Theorem nb_good_loop_comp_transp'2 : ∀ n it σ i j,
+  is_permut_fun σ n
+  → i < j < n
+  → σ j = i
+  → σ i ≠ j
+  → n = i + it
+  → nb_good_loop it i (comp σ (transposition i j)) =
+    nb_good_loop it i σ + 1.
+Proof.
+intros * Hp Hijn Hsji Hsij Hnit.
+revert i j Hijn Hsji Hsij Hnit.
+destruct it; intros; [ flia Hijn Hnit | cbn ].
+unfold comp at 1, transposition at 1, Nat.b2n.
+rewrite Nat.eqb_refl.
+rewrite Hsji.
+rewrite Nat.eqb_refl.
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (σ i) i) as [Hsii| Hsii]. {
+  rewrite <- Hsii in Hsji.
+  apply Hp in Hsji; [ | easy | flia Hijn ].
+  flia Hijn Hsji.
+}
+rewrite Nat.add_0_l.
+rewrite Nat.add_comm.
+f_equal.
+replace (i + S it) with (i + 1 + it) in Hnit by flia.
+clear Hsii.
+revert i j Hijn Hsji Hsij Hnit.
+induction it; intros; [ easy | cbn ].
+unfold comp at 1, transposition at 1, Nat.b2n.
+do 4 rewrite if_eqb_eq_dec.
+replace (i + 1 + S it) with (i + 1 + 1 + it) in Hnit by flia.
+destruct (Nat.eq_dec (i + 1) i) as [H| H]; [ flia H | clear H ].
+destruct (Nat.eq_dec (i + 1) j) as [Hi1j| Hi1j]. {
+  destruct (Nat.eq_dec (σ i) (i + 1)) as [Hsii| Hsii]; [ congruence | ].
+  destruct (Nat.eq_dec (σ (i + 1)) (i + 1)) as [H| H]; [ congruence | ].
+  clear H; cbn.
+  rewrite nb_good_loop_comp_transp with (n := n); try easy; [ flia Hijn | ].
+  flia Hi1j.
+}
+f_equal.
+...
+rewrite nb_good_loop_comp_transp with (n := n); try easy; [ flia Hijn | ].
+...
+
 Theorem nb_good_loop_comp_transp'' : ∀ n it σ i j,
   is_permut_fun σ n
   → i < j < n
