@@ -1302,6 +1302,18 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
 now move Hij at top; subst j.
 Qed.
 
+Theorem nb_good_loop_comp_transp'' : ∀ n it σ i j,
+  is_permut_fun σ n
+  → i < j < n
+  → σ i = j
+  → σ j = i
+  → n = i + it
+  → nb_good_loop it i (comp (transposition i j) σ) =
+    nb_good_loop it i σ + 2.
+Proof.
+intros * Hp Hijn Hij Hji Hnit.
+...
+
 Theorem glop : ∀ it n σ i j k,
   is_permut_fun σ n
   → first_transp n σ = Some (i, j)
@@ -1369,6 +1381,7 @@ move H at top; subst i.
 clear Hk1i Hki.
 destruct (Nat.eq_dec (σ (k + 1)) j) as [Hk1j| Hk1j]; cbn. {
 ...
+  now apply nb_good_loop_comp_transp'' with (n := n).
 }
 ...
 rewrite IHit; try easy.
