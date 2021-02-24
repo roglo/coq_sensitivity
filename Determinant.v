@@ -1360,7 +1360,15 @@ destruct (Nat.eq_dec (σ k) j) as [Hkj| Hkj]. {
 do 2 rewrite <- Nat.add_assoc.
 f_equal.
 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec (σ i) j) as [Hsij| Hsij]. {
+destruct (lt_dec (k + 1) i) as [Hk1i| Hk1i]. {
+  rewrite <- if_eqb_eq_dec, Nat.add_assoc.
+  now apply IHit.
+}
+assert (H : i = k + 1) by flia Hki Hk1i.
+move H at top; subst i.
+clear Hk1i Hki.
+...
+destruct (Nat.eq_dec (σ i) j) as [Hsij| Hsij]. 2: {
 ...
 rewrite IHit; try easy.
 rewrite nb_good_loop_comp_transp' with (n := n); try easy.
