@@ -824,39 +824,6 @@ eapply IHit; [ | apply Hs ].
 flia Hik H2.
 Qed.
 
-(*
-Fixpoint nb_of_fits n σ :=
-  match n with
-  | 0 => 0
-  | S n' => nb_of_fits n' σ + Nat.b2n (σ n' =? n')
-  end.
-
-(*
-Compute let n := 4 in (map (λ k, (list_of_vect (canon_permut n k), nb_of_fits n (fun_of_list 0 (list_of_vect (canon_permut n k))))) (seq 0 n!)).
-*)
-
-Theorem glop : ∀ it n σ,
-  it ≠ 0
-  → nb_of_fits n σ < n
-  → nb_of_fits n σ <
-     nb_of_fits n
-       (Comp (τ ∈ map transp_fun_of_nat_pair (tlopf_loop it n σ)), τ).
-Proof.
-intros * Hit Hn.
-revert n σ Hn.
-destruct it; intros; [ easy | clear Hit; cbn ].
-remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
-destruct x as [i| ]. {
-  cbn.
-  rewrite iter_list_cons; [ | easy | easy | easy ].
-  apply first_non_fixpoint_Some_if in Hx.
-  destruct Hx as (Hk, Hi).
-  destruct n; [ easy | clear Hn ].
-  cbn.
-  induction n; cbn.
-...
-*)
-
 Theorem where_is_Some_iff : ∀ n σ i j k,
   where_is n σ i j = Some k
   ↔ σ k = i ∧ j ≤ k < j + n ∧ (∀ p, j ≤ p < k → σ p ≠ i).
@@ -1118,43 +1085,6 @@ destruct (Nat.eq_dec i j') as [Hij| Hij]; [ | easy ].
 congruence.
 Qed.
 
-(*
-Theorem Comp_tfonp_tlopf_2 : ∀ it n σ j k,
-  it ≠ 0
-  → (Comp
-       (i ∈
-        map transp_fun_of_nat_pair
-          (tlopf_loop' it n (comp (transposition j k) σ))), i) j =
-    (Comp
-       (i ∈
-        map transp_fun_of_nat_pair
-          (tlopf_loop' it n (transposition j k))), i) (σ j).
-Proof.
-intros * Hit.
-destruct it; [ easy |  clear Hit ].
-cbn.
-remember (first_transp n (comp (transposition j k) σ)) as x eqn:Hx.
-symmetry in Hx.
-destruct x as [(i', j')| ]. {
-  cbn.
-  rewrite iter_list_cons; [ | easy | easy | easy ].
-  apply first_transp_Some_if in Hx.
-  destruct Hx as (Hi'n & Hj'n & Hsii & Hcti' & Hctj').
-  remember (first_transp n (transposition j k)) as y eqn:Hy.
-  symmetry in Hy.
-  destruct y as [(i'', j'')| ]. {
-    cbn.
-    rewrite iter_list_cons; [ | easy | easy | easy ].
-    apply first_transp_Some_if in Hy.
-    destruct Hy as (Hi''n & Hj''n & Hsii'' & Hcti'' & Hctj'').
-    destruct (lt_dec (σ i') i'') as [Hii''| Hii'']. {
-      specialize (Hsii'' _ Hii'') as H1.
-      unfold comp in Hcti'.
-      rewrite H1 in Hcti'.
-(* pfff... c'est trop la merde... trop compliqué... *)
-...
-*)
-
 Theorem where_is_enough_iter : ∀ n m σ i j k,
   n ≤ m
   → where_is n σ i j = Some k
@@ -1233,6 +1163,33 @@ Fixpoint nb_good_loop it i σ :=
 
 Definition nb_good n σ := nb_good_loop n 0 σ.
 
+Theorem glop : ∀ it n σ i j k,
+  is_permut_fun σ n
+  → first_transp n σ = Some (i, j)
+  → k < i
+  → n = k + it
+  → nb_good_loop it k (comp σ (transposition i j)) =
+    nb_good_loop it k σ + 1 + Nat.b2n (σ i =? j).
+Proof.
+intros * Hp Hn Hki Hknit.
+apply first_transp_Some_iff in Hn.
+destruct Hn as (Hijn & Hi & Hii & Hij & Hji).
+revert k Hknit Hki.
+induction it; intros. 2: {
+  cbn.
+  replace (k + S it) with (k + 1 + it) in Hknit by flia.
+  unfold Nat.b2n.
+  unfold comp at 1, transposition at 1.
+  do 4 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec k i) as [H| H]; [ flia Hki H | clear H ].
+  destruct (Nat.eq_dec k j) as [H| H]; [ flia Hijn Hki H | clear H ].
+  do 2 rewrite <- Nat.add_assoc.
+  f_equal.
+  rewrite Nat.add_assoc.
+  destruct (lt_dec (k + 1) i) as [Hk1i| Hk1i]; [ now rewrite IHit | ].
+  replace i with (k + 1) in * by flia Hki Hk1i.
+  clear Hki Hk1i.
+  clear i; rename k into i.
 ...
 
 Theorem nb_good_loop_comp_transp : ∀ it σ i j k,
@@ -1351,7 +1308,7 @@ destruct (Nat.eq_dec (σ i) i) as [Hsii| Hsii]. {
 destruct (Nat.eq_dec (σ i) j) as [H| H]; [ easy | clear H ].
 destruct (Nat.eq_dec (σ i) i) as [H| H]; [ easy | clear H; cbn ].
 (* mon truc est à l'envers : c'est σ o τ et non τ o σ *)
-Abort.
+...
 
 Theorem glop : ∀ it n σ i j k,
   is_permut_fun σ n
