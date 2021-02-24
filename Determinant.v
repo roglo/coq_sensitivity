@@ -1312,8 +1312,7 @@ Theorem nb_good_loop_comp_transp'' : ∀ n it σ i j,
     nb_good_loop it i σ + 2.
 Proof.
 intros * Hp Hijn Hij Hji Hnit.
-revert i j Hijn Hij Hji Hnit.
-induction it; intros; [ flia Hijn Hnit | cbn ].
+destruct it; intros; [ flia Hijn Hnit | cbn ].
 unfold comp at 1, transposition at 1.
 unfold Nat.b2n.
 rewrite Hij.
