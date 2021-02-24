@@ -1178,32 +1178,16 @@ induction it; intros; [ flia Hijn Hnit | cbn ].
 unfold comp at 1, transposition at 1, Nat.b2n.
 do 4 rewrite if_eqb_eq_dec.
 replace (i + S it) with (i + 1 + it) in Hnit by flia.
-...
-destruct (Nat.eq_dec (σ i) k) as [Hsik| Hsik]. {
-  destruct (Nat.eq_dec j i) as [Hsji| Hsji]. {
-    move Hsji at top; subst j.
-    destruct (Nat.eq_dec (σ i) i) as [Hsii| Hsii]. {
-      flia Hki Hsik Hsii.
-    }
-    rewrite nb_good_loop_comp_transp; [ | flia Hki | flia ].
-    apply Nat.add_comm.
-  }
+destruct (Nat.eq_dec i k) as [Hik| Hik]; [ flia Hki Hik | ].
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  rewrite Hkj, <- Hij, <- if_eqb_eq_dec, Nat.eqb_refl.
+  move Hij at top; subst j.
   destruct (Nat.eq_dec (σ i) i) as [Hsii| Hsii]. {
-    flia Hki Hsik Hsii.
+    rewrite <- Hsii in Hkj.
+    apply Hp in Hkj; [ | flia Hijn Hki| easy ].
+    now symmetry in Hkj.
   }
-  apply IHit; [ flia Hijn Hsji | flia Hki | easy | easy | easy ].
-}
-destruct (Nat.eq_dec (σ i) j) as [Hsij| Hsij]. {
-  rewrite <- Hkj in Hsij.
-  apply Hp in Hsij; [ flia Hki Hsij | flia Hijn | flia Hki Hijn ].
-}
-rewrite <- Nat.add_assoc; f_equal.
-destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
-  apply IHit; [ | flia Hki | easy | easy | easy ].
-  flia Hijn Hij.
-}
-now move Hij at top; subst j.
-Qed.
+  rewrite Nat.add_0_l, Nat.add_comm; f_equal.
 ...
 
 Theorem nb_good_loop_comp_transp : ∀ n it σ i j,
