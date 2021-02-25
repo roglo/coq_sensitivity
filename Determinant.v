@@ -758,7 +758,9 @@ Fixpoint nb_good_loop it i σ :=
 
 Definition nb_good n σ := nb_good_loop n 0 σ.
 
+(*
 Require Import Pigeonhole.
+*)
 
 Theorem nb_good_loop_comp_transp : ∀ n it σ i,
   is_permut_fun σ n
@@ -776,6 +778,7 @@ induction it; intros; cbn. {
   exfalso.
   destruct Hp as (Hp1, Hp2).
   rewrite Nat.add_0_r in Hnit.
+...
   specialize (pigeonhole) as H1.
   specialize (H1 n i σ Hin).
   assert (H : ∀ x, x < n → σ x < i). {
@@ -787,7 +790,6 @@ induction it; intros; cbn. {
       specialize (Hp1 _ Hin).
       flia Hp1 Hsii Hnit.
     }
-    
 ...
   destruct i. {
     cbn in Hnit; subst n.
