@@ -776,13 +776,21 @@ induction it; intros; cbn. {
 }
 replace (k + S it) with (k + 1 + it) in Hnit by flia.
 unfold comp at 1, transposition at 1, Nat.b2n.
-do 4 rewrite if_eqb_eq_dec.
+do 5 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec (σ k) i) as [Hski| Hski]. {
   destruct (Nat.eq_dec k i) as [Heki| Heki]; [ congruence | ].
   assert (H : 0 ≤ k < i) by flia Hki Heki.
   specialize (Hi _ H); clear H.
   congruence.
 }
+destruct (Nat.eq_dec (σ k) (σ i)) as [Hsksi| Hsksi]. {
+  destruct (Nat.eq_dec i k) as [Hik| Hik]. {
+    move Hik at top; subst k.
+    clear Hsksi Hski Hki.
+    destruct (Nat.eq_dec (σ i) i) as [H| H]; [ easy | clear H ].
+    rewrite Nat.add_0_l.
+    destruct (Nat.eq_dec (σ (σ i)) i) as [Hssii| Hssii]. {
+      rewrite Nat.add_comm; f_equal.
 ...
 
 Fixpoint where_is it (σ : nat → nat) i j :=
