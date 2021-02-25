@@ -758,6 +758,39 @@ Fixpoint nb_good_loop it i σ :=
 
 Definition nb_good n σ := nb_good_loop n 0 σ.
 
+Theorem nb_good_loop_comp_transp : ∀ n it σ i k,
+  is_permut_fun σ n
+  → k < i ≤ n
+  → σ k < i
+  → n = i + it
+  → nb_good_loop it i (comp (transposition k (σ k)) σ) =
+    nb_good_loop it i σ.
+Proof.
+intros * Hp Hkin Hski Hnit.
+revert i k Hkin Hski Hnit.
+induction it; intros; [ easy | cbn ].
+replace (i + S it) with (i + 1 + it) in Hnit by flia.
+unfold comp at 1, transposition at 1, Nat.b2n.
+do 4 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (σ i) k) as [Hsik| Hsik]. {
+  rewrite Hsik.
+  destruct (Nat.eq_dec k i) as [H| H]; [ flia Hkin H | clear H ].
+  rewrite Nat.add_0_l.
+  destruct (Nat.eq_dec (σ k) i) as [H| H]; [ flia Hski H | clear H ].
+  rewrite Nat.add_0_l.
+  apply IHit; try easy; [ | flia Hski ].
+  split; [ flia Hkin | ].
+  flia Hnit.
+}
+destruct (Nat.eq_dec (σ i) (σ k)) as [Hsisk| Hsisk]. {
+  apply Hp in Hsisk; [ flia Hkin Hsisk | | flia Hkin ].
+  flia Hnit.
+}
+f_equal.
+apply IHit; [ | flia Hski | easy ].
+split; [ flia Hkin | flia Hnit ].
+Qed.
+
 Theorem nb_good_loop_comp_transp' : ∀ n it σ i,
   is_permut_fun σ n
   → i < n
@@ -788,6 +821,13 @@ destruct (Nat.eq_dec (σ (i + 1)) i) as [Hsi1i| Hsi1i]. {
   rewrite Nat.add_0_l.
   destruct (Nat.eq_dec (σ i) (i + 1)) as [Hsi1| Hsi1]. {
     rewrite Nat.add_comm; f_equal.
+    apply nb_good_loop_comp_transp with (n := n); try easy. {
+      split; [ flia | flia Hnit ].
+    }
+    flia Hsi1.
+  }
+  cbn.
+(* peut-etre qu'il faut généraliser ce théorème ? *)
 ...
 
 Theorem nb_good_loop_comp_transp_eq : ∀ it n σ i k,
