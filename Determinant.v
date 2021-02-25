@@ -779,17 +779,9 @@ unfold comp at 1, transposition at 1, Nat.b2n.
 do 4 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec (σ k) i) as [Hski| Hski]. {
   destruct (Nat.eq_dec k i) as [Heki| Heki]; [ congruence | ].
-  destruct (Nat.eq_dec (σ i) k) as [Hsik| Hsik]. {
-    assert (H : 0 ≤ k < i) by flia Hki Heki.
-    specialize (Hi _ H); clear H.
-    rewrite <- Hi in Hsik.
-    symmetry in Hsik.
-    apply Hp in Hsik; [ easy | flia Hin Hki | easy ].
-  }
-  destruct (Nat.eq_dec (σ k) k) as [Hskk| Hskk]; [ congruence | ].
-  cbn.
-  assert (Hk1i : k + 1 ≤ i) by flia Hki Heki.
-  now apply IHit.
+  assert (H : 0 ≤ k < i) by flia Hki Heki.
+  specialize (Hi _ H); clear H.
+  congruence.
 }
 ...
 
