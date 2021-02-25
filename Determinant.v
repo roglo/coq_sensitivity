@@ -802,6 +802,7 @@ Theorem nb_good_loop_comp_transp' : ∀ n it σ i k,
     nb_good_loop it k σ + 1.
 Proof.
 intros * Hp Hikn Hskk Hsii Hssii Hnit.
+...
 revert i k Hikn Hskk Hsii Hssii Hnit.
 induction it; intros; cbn. {
   exfalso.
