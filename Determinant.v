@@ -821,6 +821,14 @@ induction it; intros; cbn. {
     flia Hnit H1 Hsii.
   }
   destruct d. {
+    specialize (Hsii 0 (Nat.lt_0_succ _)) as H2.
+    specialize (Hsii 1 (Nat.lt_succ_diag_r _)) as H3.
+    rewrite Nat.add_0_r in H2.
+    apply H2; clear H2.
+    destruct (lt_dec (σ i) i) as [Hsii'| Hsii']. {
+      specialize (Hskk _ Hsii') as H4.
+      congruence.
+    }
 ...
   destruct (Nat.eq_dec (σ i) (i + 1)) as [Hsii1| Hsii1]. {
     rewrite Hsii1 in Hssi.
