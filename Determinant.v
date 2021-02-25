@@ -791,6 +791,159 @@ apply IHit; [ | flia Hski | easy ].
 split; [ flia Hkin | flia Hnit ].
 Qed.
 
+Theorem nb_good_loop_comp_transp'3 : ∀ n it σ i d,
+  is_permut_fun σ n
+  → i < n
+  → (∀ k, 0 ≤ k < i → σ k = k)
+  → (∀ k, k < d → σ (i + k) ≠ i)
+  → σ (σ i) = i
+  → n = i + d + it
+  → nb_good_loop it (i + d) (comp (transposition i (σ i)) σ) =
+     nb_good_loop it (i + d) σ + 1.
+Proof.
+intros * Hp Hin Hskk Hsii Hssi Hnit.
+revert i d Hin Hskk Hsii Hssi Hnit.
+induction it; intros; cbn. {
+  exfalso.
+  destruct Hp as (Hp1, Hp2).
+  rewrite Nat.add_0_r in Hnit.
+  specialize (Hp1 i Hin) as H1.
+(**)
+  induction d; [ flia Hin Hnit | ].
+,,,
+  destruct (Nat.eq_dec (σ i) (i + 1)) as [Hsii1| Hsii1]. {
+    rewrite Hsii1 in Hssi.
+    revert Hssi.
+    apply Hsii.
+...
+    now rewrite Hsii1 in Hssi.
+  }
+  destruct (Nat.eq_dec (σ i) (i + 2)) as [Hsii2| Hsii2]. {
+    now rewrite Hsii2 in Hssi.
+  }
+  assert (H : 0 ≤ σ i < i) by flia H1 Hsii Hsii1 Hsii2 Hnit.
+...
+  destruct d; [ flia Hin Hnit | ].
+  destruct (Nat.eq_dec (σ i) (i + d)) as [Hsii1| Hsii1]. {
+    rewrite Hsii1 in Hssi.
+    revert Hssi.
+    apply Hsii; flia.
+  }
+...
+  assert (H : 0 ≤ σ i < i). {
+    split; [ flia | ].
+...
+    clear - H1 Hsii Hsii1 Hnit.
+    revert n i Hsii Hnit H1 Hsii1.
+    induction d; intros; [ flia Hnit H1 Hsii1 | ].
+    destruct n; [ easy | ].
+
+    apply IHd with (n := n). {
+      intros k Hk.
+      apply Hsii; flia Hk.
+    } {
+      flia Hnit.
+    } {
+      destruct (Nat.eq_dec (σ i) n) as [H2| H2]. {
+        now replace n with (i + S d) in H2 by flia Hnit.
+      }
+      flia H1 H2.
+    } {
+...
+  specialize (Hskk _ H).
+  specialize (Hsii 0 (Nat.lt_0_succ _)).
+  rewrite Nat.add_0_r in Hsii.
+  congruence.
+
+  assert (H : 0 ≤ σ i < i) by flia H1 Hsii Hsii1 Hnit.
+  specialize (Hskk _ H).
+  congruence.
+}
+replace (i + 1 + 1 + S it) with (i + 2 + 1 + it) in Hnit by flia.
+unfold comp at 1, transposition at 1, Nat.b2n.
+do 4 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (σ (i + 2)) i) as [Hsi2i| Hsi2i]. {
+  rewrite Hsi2i.
+  destruct (Nat.eq_dec i (i + 2)) as [H| H]; [ flia H | clear H ].
+  rewrite Nat.add_0_l.
+  destruct (Nat.eq_dec (σ i) (i + 2)) as [Hsi2| Hsi2]. {
+    rewrite Nat.add_comm; f_equal.
+    apply nb_good_loop_comp_transp with (n := n); try easy. {
+      split; [ flia | flia Hnit ].
+    }
+    flia Hsi2.
+  }
+  cbn.
+  rewrite <- Hssi in Hsi2i at 2.
+  apply Nat.neq_sym in Hsi2.
+  apply Hp in Hsi2i; [ easy | flia Hnit | ].
+  now apply Hp.
+}
+destruct (Nat.eq_dec (σ (i + 2)) (σ i)) as [H| H]. {
+  apply Hp in H; [ flia H | flia Hnit | easy ].
+}
+clear H.
+do 2 rewrite <- Nat.add_assoc; f_equal.
+...
+*)
+
+Theorem nb_good_loop_comp_transp'3 : ∀ n it σ i,
+  is_permut_fun σ n
+  → i < n
+  → (∀ k, 0 ≤ k < i → σ k = k)
+  → σ i ≠ i
+  → σ (i + 1) ≠ i
+  → σ (i + 2) ≠ i
+  → σ (σ i) = i
+  → n = i + 2 + 1 + it
+  → nb_good_loop it (i + (2 + 1)) (comp (transposition i (σ i)) σ) =
+    nb_good_loop it (i + (2 + 1)) σ + 1.
+Proof.
+intros * Hp Hin Hskk Hsii Hsi1i Hsi2i Hssi Hnit.
+revert i Hin Hskk Hsii Hsi1i Hsi2i Hssi Hnit.
+induction it; intros; cbn. {
+  exfalso.
+  destruct Hp as (Hp1, Hp2).
+  rewrite Nat.add_0_r in Hnit.
+  specialize (Hp1 i Hin) as H1.
+  destruct (Nat.eq_dec (σ i) (i + 1)) as [Hsii1| Hsii1]. {
+    now rewrite Hsii1 in Hssi.
+  }
+  destruct (Nat.eq_dec (σ i) (i + 2)) as [Hsii2| Hsii2]. {
+    now rewrite Hsii2 in Hssi.
+  }
+  assert (H : 0 ≤ σ i < i) by flia H1 Hsii Hsii1 Hsii2 Hnit.
+  specialize (Hskk _ H).
+  congruence.
+}
+...
+replace (i + 1 + 1 + S it) with (i + 2 + 1 + it) in Hnit by flia.
+unfold comp at 1, transposition at 1, Nat.b2n.
+do 4 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (σ (i + 2)) i) as [Hsi2i| Hsi2i]. {
+  rewrite Hsi2i.
+  destruct (Nat.eq_dec i (i + 2)) as [H| H]; [ flia H | clear H ].
+  rewrite Nat.add_0_l.
+  destruct (Nat.eq_dec (σ i) (i + 2)) as [Hsi2| Hsi2]. {
+    rewrite Nat.add_comm; f_equal.
+    apply nb_good_loop_comp_transp with (n := n); try easy. {
+      split; [ flia | flia Hnit ].
+    }
+    flia Hsi2.
+  }
+  cbn.
+  rewrite <- Hssi in Hsi2i at 2.
+  apply Nat.neq_sym in Hsi2.
+  apply Hp in Hsi2i; [ easy | flia Hnit | ].
+  now apply Hp.
+}
+destruct (Nat.eq_dec (σ (i + 2)) (σ i)) as [H| H]. {
+  apply Hp in H; [ flia H | flia Hnit | easy ].
+}
+clear H.
+do 2 rewrite <- Nat.add_assoc; f_equal.
+...
+
 Theorem nb_good_loop_comp_transp'2 : ∀ n it σ i,
   is_permut_fun σ n
   → i < n
