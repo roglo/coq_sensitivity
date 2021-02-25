@@ -767,7 +767,10 @@ Theorem nb_good_loop_comp_transp : ∀ n it σ i,
   → nb_good_loop it (i + 1) (comp (transposition i (σ i)) σ) =
     nb_good_loop it (i + 1) σ + 1.
 Proof.
-...
+intros * Hp Hin Hsii Hssii Hnit.
+revert i Hin Hsii Hssii Hnit.
+induction it; intros; cbn.
+Abort.
 
 Theorem nb_good_loop_comp_transp_eq : ∀ it n σ i k,
   is_permut_fun σ n
