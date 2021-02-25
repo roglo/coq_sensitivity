@@ -794,7 +794,7 @@ Qed.
 Theorem nb_good_loop_comp_transp'3 : ∀ n it σ i d,
   is_permut_fun σ n
   → i < n
-  → (∀ k, 0 ≤ k < i → σ k = k)
+  → (∀ k, k < i → σ k = k)
   → (∀ k, k < d → σ (i + k) ≠ i)
   → σ (σ i) = i
   → n = i + d + it
@@ -809,7 +809,19 @@ induction it; intros; cbn. {
   rewrite Nat.add_0_r in Hnit.
   specialize (Hp1 i Hin) as H1.
 (**)
-  induction d; [ flia Hin Hnit | ].
+  destruct d; [ flia Hin Hnit | ].
+  destruct d. {
+    specialize (Hsii 0 Nat.lt_0_1).
+    rewrite Nat.add_0_r in Hsii.
+    apply Hsii; clear Hsii.
+    destruct (lt_dec (σ i) i) as [Hsii| Hsii]. {
+      specialize (Hskk _ Hsii) as H2.
+      congruence.
+    }
+    apply Nat.nlt_ge in Hsii.
+    apply le_antisym; [ | easy ].
+...
+    apply Hp2; [ easy | easy | ].
 ,,,
   destruct (Nat.eq_dec (σ i) (i + 1)) as [Hsii1| Hsii1]. {
     rewrite Hsii1 in Hssi.
