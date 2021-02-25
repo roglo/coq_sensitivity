@@ -818,12 +818,10 @@ induction it; intros; cbn. {
       specialize (Hskk _ Hsii) as H2.
       congruence.
     }
-    apply Nat.nlt_ge in Hsii.
+    flia Hnit H1 Hsii.
+  }
+  destruct d. {
 ...
-    apply le_antisym; [ | easy ].
-...
-    apply Hp2; [ easy | easy | ].
-,,,
   destruct (Nat.eq_dec (σ i) (i + 1)) as [Hsii1| Hsii1]. {
     rewrite Hsii1 in Hssi.
     revert Hssi.
