@@ -819,6 +819,7 @@ induction it; intros; cbn. {
       congruence.
     }
     apply Nat.nlt_ge in Hsii.
+...
     apply le_antisym; [ | easy ].
 ...
     apply Hp2; [ easy | easy | ].
