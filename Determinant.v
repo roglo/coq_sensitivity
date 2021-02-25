@@ -691,6 +691,108 @@ Definition transp_list_of_permut_fun n (σ : nat → nat) := tlopf_loop n n σ.
 Definition transp_list_of_permut {n} (σ : vector n nat) :=
   transp_list_of_permut_fun n (vect_el σ).
 
+Theorem first_non_fixpoint_Some_iff : ∀ σ it i j,
+  first_non_fixpoint it i σ = Some j
+  ↔ i ≤ j ∧ j - i < it ∧ (∀ k, i ≤ k < j → σ k = k) ∧ σ j ≠ j.
+Proof.
+intros.
+split. {
+  intros Hs.
+  revert σ i j Hs.
+  induction it; intros; [ easy | cbn in Hs ].
+  rewrite if_eqb_eq_dec in Hs.
+  destruct (Nat.eq_dec i (σ i)) as [Hii| Hii]. {
+    specialize (IHit σ (i + 1) j Hs) as (H1 & H2 & H3 & H4).
+    split; [ flia H1 | ].
+    split; [ flia H2 | ].
+    split; [ | easy ].
+    intros k Hk.
+    destruct (Nat.eq_dec i k) as [Hik| Hik]; [ now subst k | ].
+    apply H3; flia Hk Hik.
+  } {
+    injection Hs; clear Hs; intros; subst j.
+    split; [ flia | ].
+    split; [ flia | ].
+    split; [ | now apply Nat.neq_sym ].
+    intros k Hk; flia Hk.
+  }
+} {
+  intros (Hij & Hji & Hj & Hjj).
+  revert i j Hij Hji Hj Hjj.
+  induction it; intros; [ easy | cbn ].
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i (σ i)) as [Hii| Hii]. {
+    assert (Heij : i ≠ j) by now intros H; symmetry in Hii; subst i.
+    apply IHit; [ flia Hij Hji Heij | flia Hij Hji Heij | | easy ].
+    intros k Hk.
+    apply Hj.
+    flia Hk.
+  }
+  destruct (Nat.eq_dec i j) as [Heij| Heij]; [ congruence | exfalso ].
+  assert (H : i ≤ i < j) by flia Hij Heij.
+  specialize (Hj _ H) as H1.
+  now symmetry in H1.
+}
+Qed.
+
+Theorem first_non_fixpoint_None_if : ∀ σ it i,
+  first_non_fixpoint it i σ = None
+  → ∀ k, i ≤ k < i + it → k = σ k.
+Proof.
+intros * Hs k Hik.
+revert σ i k Hik Hs.
+induction it; intros; [ flia Hik | ].
+cbn in Hs.
+rewrite if_eqb_eq_dec in Hs.
+destruct (Nat.eq_dec i (σ i)) as [H1| H1]; [ | easy ].
+destruct (Nat.eq_dec i k) as [H2| H2]; [ now subst i | ].
+eapply IHit; [ | apply Hs ].
+flia Hik H2.
+Qed.
+
+Fixpoint nb_good_loop it i σ :=
+  match it with
+  | 0 => 0
+  | S it' => Nat.b2n (σ i =? i) + nb_good_loop it' (i + 1) σ
+  end.
+
+Definition nb_good n σ := nb_good_loop n 0 σ.
+
+Theorem nb_good_loop_comp_transp_eq : ∀ it n σ i k,
+  is_permut_fun σ n
+  → first_non_fixpoint n 0 σ = Some i
+  → k ≤ i
+  → n = k + it
+  → nb_good_loop it k (comp (transposition i (σ i)) σ) =
+    nb_good_loop it k σ + 1 + Nat.b2n (σ (σ i) =? i).
+Proof.
+intros * Hp Hi Hki Hnit.
+apply first_non_fixpoint_Some_iff in Hi.
+rewrite Nat.sub_0_r in Hi.
+destruct Hi as (_ & Hin & Hi & Hsii).
+revert i k Hin Hi Hsii Hki Hnit.
+induction it; intros; cbn. {
+  flia Hin Hki Hnit.
+}
+replace (k + S it) with (k + 1 + it) in Hnit by flia.
+unfold comp at 1, transposition at 1, Nat.b2n.
+do 4 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (σ k) i) as [Hski| Hski]. {
+  destruct (Nat.eq_dec k i) as [Heki| Heki]; [ congruence | ].
+  destruct (Nat.eq_dec (σ i) k) as [Hsik| Hsik]. {
+    assert (H : 0 ≤ k < i) by flia Hki Heki.
+    specialize (Hi _ H); clear H.
+    rewrite <- Hi in Hsik.
+    symmetry in Hsik.
+    apply Hp in Hsik; [ easy | flia Hin Hki | easy ].
+  }
+  destruct (Nat.eq_dec (σ k) k) as [Hskk| Hskk]; [ congruence | ].
+  cbn.
+  assert (Hk1i : k + 1 ≤ i) by flia Hki Heki.
+  now apply IHit.
+}
+...
+
 Fixpoint where_is it (σ : nat → nat) i j :=
   match it with
   | 0 => None
@@ -764,65 +866,6 @@ Compute let σ := vect_of_list 0 [0;5;1;2;4;3] in let n := vect_size σ in list_
 (*
 Compute let σ := vect_of_list 0 [0;5;1;2;4;3] in let n := vect_size σ in list_of_fun n (Comp (τ ∈ transp_list_of_permut_fun n (vect_el σ)), transp_fun_of_nat_pair τ).
 *)
-
-Theorem first_non_fixpoint_Some_iff : ∀ σ it i j,
-  first_non_fixpoint it i σ = Some j
-  ↔ i ≤ j ∧ j - i < it ∧ (∀ k, i ≤ k < j → σ k = k) ∧ σ j ≠ j.
-Proof.
-intros.
-split. {
-  intros Hs.
-  revert σ i j Hs.
-  induction it; intros; [ easy | cbn in Hs ].
-  rewrite if_eqb_eq_dec in Hs.
-  destruct (Nat.eq_dec i (σ i)) as [Hii| Hii]. {
-    specialize (IHit σ (i + 1) j Hs) as (H1 & H2 & H3 & H4).
-    split; [ flia H1 | ].
-    split; [ flia H2 | ].
-    split; [ | easy ].
-    intros k Hk.
-    destruct (Nat.eq_dec i k) as [Hik| Hik]; [ now subst k | ].
-    apply H3; flia Hk Hik.
-  } {
-    injection Hs; clear Hs; intros; subst j.
-    split; [ flia | ].
-    split; [ flia | ].
-    split; [ | now apply Nat.neq_sym ].
-    intros k Hk; flia Hk.
-  }
-} {
-  intros (Hij & Hji & Hj & Hjj).
-  revert i j Hij Hji Hj Hjj.
-  induction it; intros; [ easy | cbn ].
-  rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec i (σ i)) as [Hii| Hii]. {
-    assert (Heij : i ≠ j) by now intros H; symmetry in Hii; subst i.
-    apply IHit; [ flia Hij Hji Heij | flia Hij Hji Heij | | easy ].
-    intros k Hk.
-    apply Hj.
-    flia Hk.
-  }
-  destruct (Nat.eq_dec i j) as [Heij| Heij]; [ congruence | exfalso ].
-  assert (H : i ≤ i < j) by flia Hij Heij.
-  specialize (Hj _ H) as H1.
-  now symmetry in H1.
-}
-Qed.
-
-Theorem first_non_fixpoint_None_if : ∀ σ it i,
-  first_non_fixpoint it i σ = None
-  → ∀ k, i ≤ k < i + it → k = σ k.
-Proof.
-intros * Hs k Hik.
-revert σ i k Hik Hs.
-induction it; intros; [ flia Hik | ].
-cbn in Hs.
-rewrite if_eqb_eq_dec in Hs.
-destruct (Nat.eq_dec i (σ i)) as [H1| H1]; [ | easy ].
-destruct (Nat.eq_dec i k) as [H2| H2]; [ now subst i | ].
-eapply IHit; [ | apply Hs ].
-flia Hik H2.
-Qed.
 
 Theorem where_is_Some_iff : ∀ n σ i j k,
   where_is n σ i j = Some k
@@ -1154,14 +1197,6 @@ destruct y as [j'| ]; [ | easy ].
 injection Hij; clear Hij; intros; subst i' j'.
 now rewrite where_is_enough_iter with (n := n) (k := j).
 Qed.
-
-Fixpoint nb_good_loop it i σ :=
-  match it with
-  | 0 => 0
-  | S it' => Nat.b2n (σ i =? i) + nb_good_loop it' (i + 1) σ
-  end.
-
-Definition nb_good n σ := nb_good_loop n 0 σ.
 
 Theorem nb_good_loop_comp_transp : ∀ n it σ i j k,
   is_permut_fun σ n
