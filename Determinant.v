@@ -758,11 +758,7 @@ Fixpoint nb_good_loop it i σ :=
 
 Definition nb_good n σ := nb_good_loop n 0 σ.
 
-(*
-Require Import Pigeonhole.
-*)
-
-Theorem nb_good_loop_comp_transp : ∀ n it σ i,
+Theorem nb_good_loop_comp_transp' : ∀ n it σ i,
   is_permut_fun σ n
   → i < n
   → (∀ k, 0 ≤ k < i → σ k = k)
@@ -778,25 +774,20 @@ induction it; intros; cbn. {
   exfalso.
   destruct Hp as (Hp1, Hp2).
   rewrite Nat.add_0_r in Hnit.
-...
-  specialize (pigeonhole) as H1.
-  specialize (H1 n i σ Hin).
-  assert (H : ∀ x, x < n → σ x < i). {
-    intros x Hx.
-    specialize (Hp1 _ Hx) as H2.
-    destruct (Nat.eq_dec (σ x) i) as [Hxi| Hxi]. {
-...
-      subst x.
-      specialize (Hp1 _ Hin).
-      flia Hp1 Hsii Hnit.
-    }
-...
-  destruct i. {
-    cbn in Hnit; subst n.
-    destruct Hp as (Hp1, Hp2).
-    specialize (Hp1 0 Nat.lt_0_1).
-    now apply Nat.lt_1_r in Hp1.
-  }
+  specialize (Hp1 i Hin) as H1.
+  assert (H : 0 ≤ σ i < i) by flia Hsii H1 Hnit.
+  specialize (Hskk _ H).
+  congruence.
+}
+replace (i + 1 + S it) with (i + 1 + 1 + it) in Hnit by flia.
+unfold comp at 1, transposition at 1, Nat.b2n.
+do 4 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (σ (i + 1)) i) as [Hsi1i| Hsi1i]. {
+  rewrite Hsi1i.
+  destruct (Nat.eq_dec i (i + 1)) as [H| H]; [ flia H | clear H ].
+  rewrite Nat.add_0_l.
+  destruct (Nat.eq_dec (σ i) (i + 1)) as [Hsi1| Hsi1]. {
+    rewrite Nat.add_comm; f_equal.
 ...
 
 Theorem nb_good_loop_comp_transp_eq : ∀ it n σ i k,
@@ -833,7 +824,7 @@ destruct (Nat.eq_dec (σ k) (σ i)) as [Hsksi| Hsksi]. {
     destruct (Nat.eq_dec (σ (σ i)) i) as [Hssii| Hssii]. {
       rewrite Nat.add_comm; f_equal.
 ...
-      now apply nb_good_loop_comp_transp with (n := n).
+      now apply nb_good_loop_comp_transp' with (n := n).
 ...
 
 Fixpoint where_is it (σ : nat → nat) i j :=
