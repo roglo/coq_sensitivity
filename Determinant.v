@@ -794,6 +794,7 @@ Qed.
 Theorem nb_good_loop_comp_transp'3 : ∀ n it σ i d,
   is_permut_fun σ n
   → i < n
+  → d ≠ 0
   → (∀ k, k < i → σ k = k)
   → (∀ k, k < d → σ (i + k) ≠ i)
   → σ (σ i) = i
@@ -801,8 +802,8 @@ Theorem nb_good_loop_comp_transp'3 : ∀ n it σ i d,
   → nb_good_loop it (i + d) (comp (transposition i (σ i)) σ) =
      nb_good_loop it (i + d) σ + 1.
 Proof.
-intros * Hp Hin Hskk Hsii Hssi Hnit.
-revert i d Hin Hskk Hsii Hssi Hnit.
+intros * Hp Hin Hdz Hskk Hsii Hssi Hnit.
+revert i d Hin Hdz Hskk Hsii Hssi Hnit.
 induction it; intros; cbn. {
   exfalso.
   destruct Hp as (Hp1, Hp2).
@@ -831,7 +832,10 @@ destruct (Nat.eq_dec (σ (i + d)) i) as [Hsi2i| Hsi2i]. {
   rewrite Hsi2i.
   destruct (Nat.eq_dec (σ i) (i + d)) as [Hsiid| Hsiid]. {
     destruct (Nat.eq_dec i (i + d)) as [Hiid| Hiid]. {
-      replace d with 0 in * by flia Hiid.
+...
+      flia Hdz 
+
+      now replace d with 0 in  by flia Hiid.
       clear Hiid.
       rewrite Nat.add_0_l in Hnit.
       rewrite Nat.add_0_r in Hsi2i, Hsiid |-*.
