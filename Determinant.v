@@ -797,14 +797,20 @@ Theorem nb_good_loop_comp_transp2 : ∀ n it σ i k,
   → (∀ k, k < i → σ k = k)
   → σ i ≠ i
   → σ (σ i) ≠ i
-  → σ (σ i) ≠ σ i
   → n = i + 1 + it
   → i + 1 ≤ k < n
   → nb_good_loop it k (comp (transposition i (σ i)) σ) =
     nb_good_loop it k σ.
 Proof.
-intros * Hp Hin Hsi Hsii Hssii Hssisi Hnit Hik.
-revert i k Hin Hsi Hsii Hssii Hssisi Hnit Hik.
+intros * Hp Hin Hsi Hsii Hssii Hnit Hik.
+(*
+assert (Hssisi : σ (σ i) ≠ σ i). {
+  intros H.
+  apply Hp in H; [ easy | | easy ].
+  now apply Hp.
+}
+*)
+revert i k Hin Hsi Hsii Hssii Hnit Hik.
 induction it; intros; [ easy | cbn ].
 replace (i + 1 + S it) with (i + 1 + 1 + it) in Hnit by flia.
 unfold comp at 1, transposition at 1, Nat.b2n.
