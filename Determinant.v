@@ -831,10 +831,9 @@ do 4 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec (σ (i + d)) i) as [Hsi2i| Hsi2i]. {
   rewrite Hsi2i.
   destruct (Nat.eq_dec (σ i) (i + d)) as [Hsiid| Hsiid]. {
-    destruct (Nat.eq_dec i (i + d)) as [Hiid| Hiid]. {
+    destruct (Nat.eq_dec i (i + d)) as [H| H]; [ flia Hdz H | clear H ].
+    rewrite Nat.add_0_l, Nat.add_comm; f_equal.
 ...
-      flia Hdz 
-
       now replace d with 0 in  by flia Hiid.
       clear Hiid.
       rewrite Nat.add_0_l in Hnit.
