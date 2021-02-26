@@ -791,6 +791,33 @@ apply IHit; [ | flia Hski | easy ].
 split; [ flia Hkin | flia Hnit ].
 Qed.
 
+(*
+Theorem glop : ∀ n σ i k,
+  is_permut_fun σ n
+  → i < n
+  → (∀ k, k < i → σ k = k)
+  → σ i ≠ i
+  → σ (σ i) ≠ i
+  → i + 1 ≤ k < n
+  → ∀ p, k ≤ p → comp (transposition i (σ i)) σ p = σ p.
+Proof.
+intros * Hp Hin Hsi Hsii Hssii Hsik p Hkp.
+unfold comp, transposition; cbn.
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (σ p) i) as [Hspi| Hspi]. {
+  destruct (Nat.eq_dec (σ i) p) as [Hpsi| Hpsi]. {
+    now rewrite <- Hpsi in Hspi.
+  }
+...
+intros * Hp Hin Hsi Hsii Hssii Hsik p Hkp.
+revert i k Hin Hsi Hsii Hssii Hsik Hkp.
+induction p; intros; [ flia Hsik Hkp | cbn ].
+unfold comp, transposition; cbn.
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (σ (S p)
+...
+*)
+
 Theorem nb_good_loop_comp_transp2 : ∀ n it σ i k,
   is_permut_fun σ n
   → i < n
