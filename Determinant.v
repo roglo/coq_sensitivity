@@ -808,81 +808,42 @@ induction it; intros; cbn. {
   destruct Hp as (Hp1, Hp2).
   rewrite Nat.add_0_r in Hnit.
   specialize (Hp1 i Hin) as H1.
-(**)
-  destruct d; [ flia Hin Hnit | ].
-  destruct d. {
-    specialize (Hsii 0 Nat.lt_0_1).
-    rewrite Nat.add_0_r in Hsii.
-    apply Hsii; clear Hsii.
-    destruct (lt_dec (σ i) i) as [Hsii| Hsii]. {
-      specialize (Hskk _ Hsii) as H2.
-      congruence.
-    }
-    flia Hnit H1 Hsii.
+  clear - d Hin Hnit Hsii Hskk Hssi H1.
+  assert (Hisi : i ≤ σ i). {
+    apply Nat.nlt_ge; intros H2.
+    specialize (Hskk (σ i) H2) as H3.
+    flia Hssi H2 H3.
   }
-  destruct d. {
-    specialize (Hsii 0 (Nat.lt_0_succ _)) as H2.
-    specialize (Hsii 1 (Nat.lt_succ_diag_r _)) as H3.
-    rewrite Nat.add_0_r in H2.
-    apply H2; clear H2.
-    destruct (lt_dec (σ i) i) as [Hsii'| Hsii']. {
-      specialize (Hskk _ Hsii') as H4.
-      congruence.
-    }
-...
-  destruct (Nat.eq_dec (σ i) (i + 1)) as [Hsii1| Hsii1]. {
-    rewrite Hsii1 in Hssi.
-    revert Hssi.
-    apply Hsii.
-...
-    now rewrite Hsii1 in Hssi.
+  specialize (Hsii (σ i - i)) as H2.
+  assert (H : σ i - i < d). {
+    apply Nat.add_lt_mono_r with (p := i).
+    rewrite (Nat.add_comm d), <- Hnit.
+    now rewrite Nat.sub_add.
   }
-  destruct (Nat.eq_dec (σ i) (i + 2)) as [Hsii2| Hsii2]. {
-    now rewrite Hsii2 in Hssi.
-  }
-  assert (H : 0 ≤ σ i < i) by flia H1 Hsii Hsii1 Hsii2 Hnit.
-...
-  destruct d; [ flia Hin Hnit | ].
-  destruct (Nat.eq_dec (σ i) (i + d)) as [Hsii1| Hsii1]. {
-    rewrite Hsii1 in Hssi.
-    revert Hssi.
-    apply Hsii; flia.
-  }
-...
-  assert (H : 0 ≤ σ i < i). {
-    split; [ flia | ].
-...
-    clear - H1 Hsii Hsii1 Hnit.
-    revert n i Hsii Hnit H1 Hsii1.
-    induction d; intros; [ flia Hnit H1 Hsii1 | ].
-    destruct n; [ easy | ].
-
-    apply IHd with (n := n). {
-      intros k Hk.
-      apply Hsii; flia Hk.
-    } {
-      flia Hnit.
-    } {
-      destruct (Nat.eq_dec (σ i) n) as [H2| H2]. {
-        now replace n with (i + S d) in H2 by flia Hnit.
-      }
-      flia H1 H2.
-    } {
-...
-  specialize (Hskk _ H).
-  specialize (Hsii 0 (Nat.lt_0_succ _)).
-  rewrite Nat.add_0_r in Hsii.
-  congruence.
-
-  assert (H : 0 ≤ σ i < i) by flia H1 Hsii Hsii1 Hnit.
-  specialize (Hskk _ H).
-  congruence.
+  specialize (H2 H); clear H.
+  rewrite Nat.add_sub_assoc in H2; [ | easy ].
+  now rewrite Nat.add_comm, Nat.add_sub in H2.
 }
-replace (i + 1 + 1 + S it) with (i + 2 + 1 + it) in Hnit by flia.
+replace (i + d + S it) with (i + (d + 1) + it) in Hnit by flia.
 unfold comp at 1, transposition at 1, Nat.b2n.
 do 4 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec (σ (i + 2)) i) as [Hsi2i| Hsi2i]. {
+destruct (Nat.eq_dec (σ (i + d)) i) as [Hsi2i| Hsi2i]. {
   rewrite Hsi2i.
+  destruct (Nat.eq_dec (σ i) (i + d)) as [Hsiid| Hsiid]. {
+    destruct (Nat.eq_dec i (i + d)) as [Hiid| Hiid]. {
+      replace d with 0 in * by flia Hiid.
+      clear Hiid.
+      rewrite Nat.add_0_l in Hnit.
+      rewrite Nat.add_0_r in Hsi2i, Hsiid |-*.
+      clear Hsi2i Hsii.
+      rewrite <- Nat.add_assoc; f_equal.
+...
+      apply IHit; try easy.
+      intros k Hk.
+      apply Nat.lt_1_r in Hk; subst k.
+      rewrite Nat.add_0_r.
+      apply Hsii.
+...
   destruct (Nat.eq_dec i (i + 2)) as [H| H]; [ flia H | clear H ].
   rewrite Nat.add_0_l.
   destruct (Nat.eq_dec (σ i) (i + 2)) as [Hsi2| Hsi2]. {
@@ -904,7 +865,7 @@ destruct (Nat.eq_dec (σ (i + 2)) (σ i)) as [H| H]. {
 clear H.
 do 2 rewrite <- Nat.add_assoc; f_equal.
 ...
-*)
+...
 
 Theorem nb_good_loop_comp_transp'3 : ∀ n it σ i,
   is_permut_fun σ n
