@@ -840,6 +840,98 @@ destruct (Nat.eq_dec (σ (S p)
 ...
 *)
 
+Theorem comp_transp_permut_id : ∀ n σ i j k,
+  is_permut_fun σ n
+  → i < k
+  → k < j < n
+  → σ k = i
+  → comp (transposition i (σ i)) σ j = σ j.
+Proof.
+intros * Hp Hikn Hkp Hski.
+unfold comp, transposition.
+do 2 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (σ j) i) as [Hsji| Hsji]. {
+  exfalso.
+  rewrite <- Hski in Hsji.
+  apply Hp in Hsji; [ flia Hkp Hsji | easy | flia Hkp ].
+}
+destruct (Nat.eq_dec (σ j) (σ i)) as [Hspi| Hspi]; [ | easy ].
+apply Hp in Hspi; [ | easy | flia Hikn Hkp ].
+flia Hikn Hkp Hspi.
+Qed.
+
+Theorem nb_good_loop_comp_transp_permit_id : ∀ n it σ i k,
+  is_permut_fun σ n
+  → i < n
+  → k < n
+  → (∀ j, k ≤ j → comp (transposition i (σ i)) σ j = σ j)
+  → nb_good_loop it k (comp (transposition i (σ i)) σ) =
+    nb_good_loop it k σ.
+Proof.
+intros * Hp Hin Hkn Hj.
+revert i k Hin Hkn Hj.
+induction it; intros; [ easy | cbn ].
+unfold comp at 1, transposition at 1, Nat.b2n.
+do 4 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (σ k) i) as [Hski| Hski]. {
+  rewrite Hski.
+  destruct (Nat.eq_dec i k) as [Hik| Hik]. {
+    move Hik at top; subst k.
+    rewrite Hski.
+    rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
+    f_equal.
+    clear.
+    remember (i + 1) as k eqn:Hk; clear Hk.
+    revert i k.
+    induction it; intros; [ easy | cbn ].
+    unfold comp at 1, transposition at 1, Nat.b2n.
+    do 4 rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec (σ k) i) as [Hki| Hki]. {
+      rewrite Hki.
+      now rewrite IHit.
+    }
+    now rewrite IHit.
+  }
+  destruct (Nat.eq_dec (σ i) k) as [Hsik| Hsik]. {
+    exfalso.
+    specialize (Hj k (le_refl _)).
+    unfold comp, transposition in Hj.
+    rewrite Hski, Nat.eqb_refl in Hj.
+    apply Hik, Hp; [ easy | easy | congruence ].
+  }
+  f_equal.
+  specialize (Hj k (le_refl _)).
+  unfold comp, transposition in Hj.
+  rewrite Hski, Nat.eqb_refl in Hj.
+  rewrite <- Hj in Hski.
+  apply Hp in Hski; [ congruence | easy | easy ].
+}
+destruct (Nat.eq_dec (σ k) (σ i)) as [Hsksi| Hsksi]. {
+  apply Hp in Hsksi; [ | easy | easy ].
+  subst k.
+  rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
+  destruct (Nat.eq_dec (σ i) i) as [H| H]; [ easy | clear H ].
+  specialize (Hj i (le_refl _)).
+  unfold comp, transposition in Hj.
+  rewrite if_eqb_eq_dec in Hj.
+  destruct (Nat.eq_dec (σ i) i) as [H| H]; [ easy | clear H ].
+  rewrite Nat.eqb_refl in Hj.
+  congruence.
+}
+f_equal.
+...
+specialize (Hj k (le_refl _)).
+unfold comp, transposition in Hj.
+do 2 rewrite if_eqb_eq_dec in Hj.
+destruct (Nat.eq_dec (σ k) i) as [H| H]; [ easy | clear H ].
+destruct (Nat.eq_dec (σ k) (σ i)) as [H| H]; [ easy | clear H ].
+
+rewrite Nat.eqb_refl in Hj.
+  congruence.
+
+rewrite IHit; [ easy | easy | | ].
+...
+
 Theorem nb_good_loop_comp_transp3 : ∀ n it σ i k,
   is_permut_fun σ n
   → i < k < n
@@ -848,11 +940,14 @@ Theorem nb_good_loop_comp_transp3 : ∀ n it σ i k,
   → σ i ≠ k
   → σ (σ i) ≠ i
   → σ k = i
-  → σ k ≠ k
   → n = i + 1 + 1 + it
   → nb_good_loop it (k + 1) (comp (transposition i (σ i)) σ) =
     nb_good_loop it (k + 1) σ.
 Proof.
+intros.
+destruct it; [ easy | cbn ].
+unfold comp at 1, transposition at 1, Nat.b2n.
+do 4 rewrite if_eqb_eq_dec.
 ...
 
 Theorem nb_good_loop_comp_transp2 : ∀ n it σ i k,
