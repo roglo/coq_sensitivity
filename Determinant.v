@@ -933,14 +933,13 @@ Qed.
 Theorem nb_good_loop_comp_transp3 : ∀ n it σ i k,
   is_permut_fun σ n
   → i < k < n
-  → σ (σ i) ≠ i
   → σ k = i
   → n = k + 1 + it
   → nb_good_loop it (k + 1) (comp (transposition i (σ i)) σ) =
     nb_good_loop it (k + 1) σ.
 Proof.
-intros * Hp Hikn Hssii Hski Hnit.
-revert i k Hikn Hssii Hski Hnit.
+intros * Hp Hikn Hski Hnit.
+revert i k Hikn Hski Hnit.
 induction it; intros; [ easy | cbn ].
 unfold comp at 1, transposition at 1, Nat.b2n.
 do 4 rewrite if_eqb_eq_dec.
