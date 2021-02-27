@@ -1037,6 +1037,46 @@ Theorem glop : ∀ n it σ i,
     nb_good_loop it (i + 1) σ.
 Proof.
 intros * Hp Hi Hsii Hssii Hssisi Hnit.
+remember (σ i) as j eqn:Hj; symmetry in Hj.
+remember (permut_fun_inv σ n i) as k eqn:Hk.
+assert (Hkd : σ k = i). {
+  subst k.
+  apply fun_permut_fun_inv; [ easy | flia Hnit ].
+}
+assert (Hik : i < k). {
+  assert (H1 : i ≤ k). {
+    apply Nat.nlt_ge; intros H.
+    apply Hi in H.
+    rewrite Hkd in H; move H at top; subst k.
+    congruence.
+  }
+  destruct (Nat.eq_dec i k) as [Hik| Hik]; [ | flia Hik H1 ].
+  move Hik at top; subst k.
+  congruence.
+}
+assert (Hjk : j ≠ k). {
+  now intros H; move H at top; subst k.
+}
+assert (Hij : i < j). {
+  apply Nat.nle_gt; intros H.
+  assert (H' : j < i) by flia Hsii H.
+  now apply Hi in H'.
+}
+clear Hk.
+clear Hi.
+clear Hj.
+clear Hsii.
+clear Hssii.
+...
+revert i j k Hssisi Hnit Hkd Hik Hjk Hij.
+induction it; intros; [ easy | cbn ].
+replace (i + 1 + S it) with (i + 1 + 1 + it) in Hnit by flia.
+unfold comp at 1, transposition at 1, Nat.b2n.
+do 4 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (σ (i + 1)) i) as [Hsi1i| Hsi1i]. {
+  rewrite Hsi1i.
+  destruct (Nat.eq_dec i (i + 1)) as [H| H]; [ flia H | clear H ].
+  rewrite Nat.add_0_l.
 ...
 
 Theorem nb_good_loop_comp_transp' : ∀ n it σ i d,
