@@ -758,6 +758,7 @@ Fixpoint nb_good_loop it i σ :=
 
 Definition nb_good n σ := nb_good_loop n 0 σ.
 
+(*
 Theorem nb_good_loop_comp_transp : ∀ n it σ i j k,
   is_permut_fun σ n
   → n = i + it
@@ -777,6 +778,7 @@ destruct (Nat.eq_dec k i) as [Hki| Hki]. {
     apply IHit; flia Hnit.
   }
 ...
+*)
 
 Theorem nb_good_loop_comp_transp : ∀ n it σ i k,
   is_permut_fun σ n
@@ -838,6 +840,21 @@ destruct (Nat.eq_dec (σ (S p)
 ...
 *)
 
+Theorem nb_good_loop_comp_transp3 : ∀ n it σ i k,
+  is_permut_fun σ n
+  → i < k < n
+  → (∀ k, k < i → σ k = k)
+  → σ i ≠ i
+  → σ i ≠ k
+  → σ (σ i) ≠ i
+  → σ k = i
+  → σ k ≠ k
+  → n = i + 1 + 1 + it
+  → nb_good_loop it (k + 1) (comp (transposition i (σ i)) σ) =
+    nb_good_loop it (k + 1) σ.
+Proof.
+...
+
 Theorem nb_good_loop_comp_transp2 : ∀ n it σ i k,
   is_permut_fun σ n
   → i < n
@@ -871,12 +888,15 @@ destruct (Nat.eq_dec (σ k) i) as [Hsi1i| Hsi1i]. {
   }
   cbn.
 ...
+  apply nb_good_loop_comp_transp3 with (n := n); try easy.
+  flia Hik.
+...
+  apply IHit; try easy.
+...
   apply nb_good_loop_comp_transp with (n := n); try easy. {
     split; [ | flia Hik ].
     flia Hik.
   } {
-...
-  apply IHit.
 ...
   rewrite Hsik.
   destruct (Nat.eq_dec k i) as [H| H]; [ flia Hkin H | clear H ].
