@@ -946,6 +946,8 @@ destruct (Nat.eq_dec (k + 1) n) as [Hk1n| Hk1n]. {
   destruct it; [ easy | ].
   flia H6 Hk1n.
 }
+(*
+...
 apply nb_good_loop_comp_transp_permit_id with (n := n); try easy. {
   flia H0.
 } {
@@ -955,11 +957,16 @@ intros j Hj.
 unfold comp, transposition.
 do 2 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec (σ j) i) as [Hsji| Hsji]. {
+  rewrite <- H5 in Hsji.
+  apply H in Hsji; [ | | easy ]. 2: {
+...
+  rewrite Hsji.
 ...
   rewrite <- H5 in Hsji.
   apply H in Hsji; [ | | easy ]. 2: {
 ...
 intros.
+*)
 destruct it; [ easy | cbn ].
 unfold comp at 1, transposition at 1, Nat.b2n.
 do 4 rewrite if_eqb_eq_dec.
