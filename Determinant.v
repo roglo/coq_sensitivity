@@ -864,12 +864,13 @@ Theorem nb_good_loop_comp_transp_permit_id : ∀ n it σ i k,
   is_permut_fun σ n
   → i < n
   → k < n
+  → n = k + it
   → (∀ j, k ≤ j → comp (transposition i (σ i)) σ j = σ j)
   → nb_good_loop it k (comp (transposition i (σ i)) σ) =
     nb_good_loop it k σ.
 Proof.
-intros * Hp Hin Hkn Hj.
-revert i k Hin Hkn Hj.
+intros * Hp Hin Hkn Hnit Hj.
+revert i k Hin Hkn Hj Hnit.
 induction it; intros; [ easy | cbn ].
 unfold comp at 1, transposition at 1, Nat.b2n.
 do 4 rewrite if_eqb_eq_dec.
@@ -919,18 +920,14 @@ destruct (Nat.eq_dec (σ k) (σ i)) as [Hsksi| Hsksi]. {
   congruence.
 }
 f_equal.
-...
-specialize (Hj k (le_refl _)).
-unfold comp, transposition in Hj.
-do 2 rewrite if_eqb_eq_dec in Hj.
-destruct (Nat.eq_dec (σ k) i) as [H| H]; [ easy | clear H ].
-destruct (Nat.eq_dec (σ k) (σ i)) as [H| H]; [ easy | clear H ].
-
-rewrite Nat.eqb_refl in Hj.
-  congruence.
-
-rewrite IHit; [ easy | easy | | ].
-...
+destruct (Nat.eq_dec (k + 1) n) as [Hk1n| Hk1n]. {
+  destruct it; [ easy | ].
+  flia Hnit Hk1n.
+}
+rewrite IHit; [ easy | easy | flia Hkn Hk1n | | flia Hnit ].
+intros j Hkj.
+apply Hj; flia Hkj.
+Qed.
 
 Theorem nb_good_loop_comp_transp3 : ∀ n it σ i k,
   is_permut_fun σ n
@@ -940,10 +937,28 @@ Theorem nb_good_loop_comp_transp3 : ∀ n it σ i k,
   → σ i ≠ k
   → σ (σ i) ≠ i
   → σ k = i
-  → n = i + 1 + 1 + it
+  → n = k + 1 + it
   → nb_good_loop it (k + 1) (comp (transposition i (σ i)) σ) =
     nb_good_loop it (k + 1) σ.
 Proof.
+intros.
+destruct (Nat.eq_dec (k + 1) n) as [Hk1n| Hk1n]. {
+  destruct it; [ easy | ].
+  flia H6 Hk1n.
+}
+apply nb_good_loop_comp_transp_permit_id with (n := n); try easy. {
+  flia H0.
+} {
+  flia H0 Hk1n.
+}
+intros j Hj.
+unfold comp, transposition.
+do 2 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (σ j) i) as [Hsji| Hsji]. {
+...
+  rewrite <- H5 in Hsji.
+  apply H in Hsji; [ | | easy ]. 2: {
+...
 intros.
 destruct it; [ easy | cbn ].
 unfold comp at 1, transposition at 1, Nat.b2n.
