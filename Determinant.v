@@ -1062,21 +1062,34 @@ assert (Hij : i < j). {
   assert (H' : j < i) by flia Hsii H.
   now apply Hi in H'.
 }
+assert (Hkn : k < n). {
+  rewrite Hk.
+  apply permut_fun_ub; [ | flia Hnit ].
+  now apply permut_fun_inv_is_permut.
+}
 clear Hk.
 clear Hi.
 clear Hj.
 clear Hsii.
 clear Hssii.
-...
-revert i j k Hssisi Hnit Hkd Hik Hjk Hij.
+remember (i + 1) as p eqn:Hp'.
+assert (Hip : i < p) by flia Hp'.
+clear Hp'.
+revert i j k p Hssisi Hnit Hkd Hik Hjk Hij Hip Hkn.
 induction it; intros; [ easy | cbn ].
-replace (i + 1 + S it) with (i + 1 + 1 + it) in Hnit by flia.
+replace (p + S it) with (p + 1 + it) in Hnit by flia.
 unfold comp at 1, transposition at 1, Nat.b2n.
 do 4 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec (σ (i + 1)) i) as [Hsi1i| Hsi1i]. {
-  rewrite Hsi1i.
-  destruct (Nat.eq_dec i (i + 1)) as [H| H]; [ flia H | clear H ].
-  rewrite Nat.add_0_l.
+destruct (Nat.eq_dec (σ p) i) as [Hspi| Hspi]. {
+  rewrite Hspi.
+  rewrite <- Hkd in Hspi.
+  apply Hp in Hspi; [ | flia Hnit | easy ].
+  move Hspi at top; subst p.
+  destruct (Nat.eq_dec j k) as [H| H]; [ easy | clear H ].
+  destruct (Nat.eq_dec i k) as [H| H]; [ flia Hip H | clear H ].
+  cbn.
+  apply IHit with (k := k); try easy; flia Hip.
+}
 ...
 
 Theorem nb_good_loop_comp_transp' : ∀ n it σ i d,
