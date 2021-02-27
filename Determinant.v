@@ -929,7 +929,7 @@ intros j Hkj.
 apply Hj; flia Hkj.
 Qed.
 
-(**)
+(*
 Theorem nb_good_loop_comp_transp3 : ∀ n it σ i k,
   is_permut_fun σ n
   → i < k < n
@@ -960,6 +960,7 @@ apply IHit; try easy. {
 ...
 apply nb_good_loop_comp_transp_permit_id with (n := n); try easy.
 ...
+*)
 
 (*
 Theorem nb_good_loop_comp_transp2 : ∀ n it σ i k,
@@ -1024,6 +1025,19 @@ split; [ flia Hkin | flia Hnit ].
 Qed.
 ...
 *)
+
+Theorem glop : ∀ n it σ i,
+  is_permut_fun σ n
+  → (∀ k, k < i → σ k = k)
+  → σ i ≠ i
+  → σ (σ i) ≠ i
+  → σ (σ i) ≠ σ i
+  → n = i + 1 + it
+  → nb_good_loop it (i + 1) (comp (transposition i (σ i)) σ) =
+    nb_good_loop it (i + 1) σ.
+Proof.
+intros * Hp Hi Hsii Hssii Hssisi Hnit.
+...
 
 Theorem nb_good_loop_comp_transp' : ∀ n it σ i d,
   is_permut_fun σ n
