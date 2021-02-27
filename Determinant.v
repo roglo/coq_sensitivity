@@ -970,6 +970,12 @@ intros.
 destruct it; [ easy | cbn ].
 unfold comp at 1, transposition at 1, Nat.b2n.
 do 4 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (σ (k + 1)) i) as [Hsk1i| Hsk1i]. {
+  rewrite Hsk1i.
+  destruct (Nat.eq_dec (σ i) (k + 1)) as [Hsik1| Hsik1]. {
+    destruct (Nat.eq_dec i (k + 1)) as [Hik1| Hik1]. {
+      flia H0 Hik1.
+    }
 ...
 
 Theorem nb_good_loop_comp_transp2 : ∀ n it σ i k,
