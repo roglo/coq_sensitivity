@@ -933,31 +933,31 @@ Qed.
 Theorem nb_good_loop_comp_transp3 : ∀ n it σ i k,
   is_permut_fun σ n
   → i < k < n
-  → σ i ≠ k
   → σ (σ i) ≠ i
   → σ k = i
   → n = k + 1 + it
   → nb_good_loop it (k + 1) (comp (transposition i (σ i)) σ) =
     nb_good_loop it (k + 1) σ.
 Proof.
-intros * Hp Hikn Hsik Hssii Hski Hnit.
-destruct (Nat.eq_dec (k + 1) n) as [Hk1n| Hk1n]. {
-  destruct it; [ easy | ].
-  flia Hnit Hk1n.
-}
-revert i k Hikn Hsik Hssii Hski Hnit Hk1n.
+intros * Hp Hikn Hssii Hski Hnit.
+revert i k Hikn Hssii Hski Hnit.
 induction it; intros; [ easy | cbn ].
 unfold comp at 1, transposition at 1, Nat.b2n.
 do 4 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec (σ (k + 1)) i) as [Hsk1i| Hsk1i]. {
   rewrite <- Hski in Hsk1i.
-  apply Hp in Hsk1i; [ flia Hsk1i | flia Hikn Hk1n | easy ].
+  apply Hp in Hsk1i; [ flia Hsk1i | flia Hnit | easy ].
 }
 destruct (Nat.eq_dec (σ (k + 1)) (σ i)) as [Hsk1si| Hsk1si]. {
-  apply Hp in Hsk1si; [ | flia Hikn Hk1n | flia Hikn ].
+  apply Hp in Hsk1si; [ | flia Hnit | flia Hikn ].
   flia Hikn Hsk1si.
 }
 f_equal.
+replace (k + 1 + S it) with (k + 1 + 1 + it) in Hnit by flia.
+apply IHit; try easy. {
+  split; [ flia Hikn | ].
+  flia Hnit.
+}
 ...
 apply nb_good_loop_comp_transp_permit_id with (n := n); try easy.
 ...
