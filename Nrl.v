@@ -536,9 +536,3 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_consistent := Zn_consistent |}.
 
 End a.
-
-(* not satisfactory: rngl_opt_mul_div_l and div_r should be ok if n
-   is prime; examples of non prime and prime:
-Compute (let n := 6 in let ro := Zn_ring_like_op n in proj1_sig (Zn_of_nat n 3 * Zn_of_nat n 2 / Zn_of_nat n 2)%F).
-Compute (let n := 7 in let ro := Zn_ring_like_op n in proj1_sig (Zn_of_nat n 3 * Zn_of_nat n 2 / Zn_of_nat n 2)%F).
-*)
