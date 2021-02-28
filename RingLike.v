@@ -43,8 +43,7 @@ Set Nested Proofs Allowed.
 Require Import Utf8.
 
 Class ring_like_op T :=
-  { rngl_has_no_inv_but_div : bool;
-    rngl_zero : T;
+  { rngl_zero : T;
     rngl_one : T;
     rngl_add : T → T → T;
     rngl_mul : T → T → T;
@@ -52,7 +51,7 @@ Class ring_like_op T :=
     rngl_opt_inv : option (T → T);
     rngl_le : T → T → Prop;
     rngl_monus : T → T → T;
-    rngl_opt_div : T → T → T }.
+    rngl_opt_div : option (T → T → T) }.
 
 Declare Scope ring_like_scope.
 Delimit Scope ring_like_scope with F.
@@ -81,10 +80,22 @@ Definition rngl_inv {T} {R : ring_like_op T} a :=
   | None => rngl_zero
   end.
 
+Definition rngl_has_no_inv_but_div {T} {R : ring_like_op T} :=
+  match rngl_opt_div with
+  | Some _ => true
+  | None => false
+  end.
+
+Definition rngl_spec_div {T} {R : ring_like_op T} a b :=
+  match rngl_opt_div with
+  | Some rngl_spec_div => rngl_spec_div a b
+  | None => rngl_zero
+  end.
+
 Definition rngl_sub {T} {R : ring_like_op T} a b :=
   if rngl_has_opp then rngl_add a (rngl_opp b) else rngl_monus a b.
 Definition rngl_div {T} {R : ring_like_op T} a b :=
-  if rngl_has_inv then rngl_mul a (rngl_inv b) else rngl_opt_div a b.
+  if rngl_has_inv then rngl_mul a (rngl_inv b) else rngl_spec_div a b.
 
 Notation "0" := rngl_zero : ring_like_scope.
 Notation "1" := rngl_one : ring_like_scope.

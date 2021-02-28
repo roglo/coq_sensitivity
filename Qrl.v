@@ -8,11 +8,9 @@ Require Import RingLike Rational.
 Import Q.Notations.
 
 Definition phony_Q_monus (a b : Q) := a.
-Definition phony_Q_div (a b : Q) := a.
 
 Canonical Structure Q_ring_like_op : ring_like_op Q :=
-  {| rngl_has_no_inv_but_div := false;
-     rngl_zero := 0%Q;
+  {| rngl_zero := 0%Q;
      rngl_one := 1%Q;
      rngl_add := Q.add;
      rngl_mul := Q.mul;
@@ -20,7 +18,7 @@ Canonical Structure Q_ring_like_op : ring_like_op Q :=
      rngl_opt_inv := Some Q.inv;
      rngl_le := Q.le;
      rngl_monus := phony_Q_monus;
-     rngl_opt_div := phony_Q_div |}.
+     rngl_opt_div := None |}.
 
 Existing Instance Q_ring_like_op.
 

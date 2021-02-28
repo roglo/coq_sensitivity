@@ -564,14 +564,12 @@ apply rngl_mul_1_l.
 Qed.
 
 Definition phony_mat_le n (MA MB : matrix n n T) := True.
-Definition phony_mat_div n (MA MB : matrix n n T) := MA.
 
 Definition at_least_1 n := S (n - 1).
 
 Canonical Structure mat_ring_like_op n :
   ring_like_op (matrix n n T) :=
-  {| rngl_has_no_inv_but_div := false;
-     rngl_zero := mZ n n;
+  {| rngl_zero := mZ n n;
      rngl_one := mI n;
      rngl_add := @mat_add T _ n n;
      rngl_mul := @mat_mul T _ n n n;
@@ -579,7 +577,7 @@ Canonical Structure mat_ring_like_op n :
      rngl_opt_inv := None;
      rngl_le := @phony_mat_le n;
      rngl_monus := @mat_sub T ro n n;
-     rngl_opt_div := @phony_mat_div n |}.
+     rngl_opt_div := None |}.
 
 (**)
 Existing Instance mat_ring_like_op.

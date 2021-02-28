@@ -11,8 +11,7 @@ Notation "x ≤ y ≤ z" := (x <= y ∧ y <= z)%Z (at level 70, y at next level)
 Definition phony_Z_monus (x y : Z) := 0%Z.
 
 Canonical Structure Z_ring_like_op : ring_like_op Z :=
-  {| rngl_has_no_inv_but_div := true;
-     rngl_zero := 0%Z;
+  {| rngl_zero := 0%Z;
      rngl_one := 1%Z;
      rngl_add := Z.add;
      rngl_mul := Z.mul;
@@ -20,7 +19,7 @@ Canonical Structure Z_ring_like_op : ring_like_op Z :=
      rngl_opt_inv := None;
      rngl_le := Z.le;
      rngl_monus := phony_Z_monus;
-     rngl_opt_div := Z.div |}.
+     rngl_opt_div := Some Z.div |}.
 
 Existing Instance Z_ring_like_op.
 

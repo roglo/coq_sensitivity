@@ -8,8 +8,7 @@ Require Import Utf8 Arith.
 Require Import Misc RingLike FermatLittle.
 
 Canonical Structure nat_ring_like_op : ring_like_op nat :=
-  {| rngl_has_no_inv_but_div := true;
-     rngl_zero := 0;
+  {| rngl_zero := 0;
      rngl_one := 1;
      rngl_add := Nat.add;
      rngl_mul := Nat.mul;
@@ -17,7 +16,7 @@ Canonical Structure nat_ring_like_op : ring_like_op nat :=
      rngl_opt_inv := None;
      rngl_le := Nat.le;
      rngl_monus := Nat.sub;
-     rngl_opt_div := Nat.div |}.
+     rngl_opt_div := Some Nat.div |}.
 
 Existing Instance nat_ring_like_op.
 
@@ -242,8 +241,7 @@ Definition Zn_le n (a b : Zn n) : Prop :=
 Definition phony_Zn_monus n (a b : Zn n) := a.
 
 Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
-  {| rngl_has_no_inv_but_div := false;
-     rngl_zero := Zn_of_nat n 0;
+  {| rngl_zero := Zn_of_nat n 0;
      rngl_one := Zn_of_nat n 1;
      rngl_add := Zn_add n;
      rngl_mul := Zn_mul n;
@@ -251,7 +249,7 @@ Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
      rngl_opt_inv := if is_prime n then Some (Zn_inv n) else None;
      rngl_le := Zn_le n;
      rngl_monus := phony_Zn_monus n;
-     rngl_opt_div := Zn_div n |}.
+     rngl_opt_div := None |}.
 
 Existing Instance Zn_ring_like_op.
 
