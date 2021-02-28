@@ -8,8 +8,6 @@ Notation "x ≤ y" := (x <= y)%Z (at level 70, y at next level) : Z_scope.
 Notation "x ≤ y ≤ z" := (x <= y ∧ y <= z)%Z (at level 70, y at next level) :
   Z_scope.
 
-Definition phony_Z_monus (x y : Z) := 0%Z.
-
 Canonical Structure Z_ring_like_op : ring_like_op Z :=
   {| rngl_zero := 0%Z;
      rngl_one := 1%Z;
@@ -18,7 +16,7 @@ Canonical Structure Z_ring_like_op : ring_like_op Z :=
      rngl_opt_opp := Some Z.opp;
      rngl_opt_inv := None;
      rngl_le := Z.le;
-     rngl_monus := phony_Z_monus;
+     rngl_opt_monus := None;
      rngl_opt_eucl_div := Some Z.div_eucl |}.
 
 Existing Instance Z_ring_like_op.

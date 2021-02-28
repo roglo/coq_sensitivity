@@ -56,7 +56,7 @@ Class ring_like_op T :=
     rngl_opt_opp : option (T → T);
     rngl_opt_inv : option (T → T);
     rngl_le : T → T → Prop;
-    rngl_monus : T → T → T;
+    rngl_opt_monus : option (T → T → T);
     rngl_opt_eucl_div : option (T → T → T * T) }.
 
 Declare Scope ring_like_scope.
@@ -80,6 +80,12 @@ Definition rngl_opp {T} {R : ring_like_op T} a :=
 Definition rngl_inv {T} {R : ring_like_op T} a :=
   match rngl_opt_inv with
   | Some rngl_inv => rngl_inv a
+  | None => rngl_zero
+  end.
+
+Definition rngl_monus {T} {R : ring_like_op T} a b :=
+  match rngl_opt_monus with
+  | Some rngl_monus => rngl_monus a b
   | None => rngl_zero
   end.
 

@@ -576,7 +576,7 @@ Canonical Structure mat_ring_like_op n :
      rngl_opt_opp := Some (@mat_opp T _ n n);
      rngl_opt_inv := None;
      rngl_le := @phony_mat_le n;
-     rngl_monus := @mat_sub T ro n n;
+     rngl_opt_monus := Some (@mat_sub T ro n n);
      rngl_opt_eucl_div := None |}.
 
 (**)

@@ -17,7 +17,7 @@ Canonical Structure nat_ring_like_op : ring_like_op nat :=
      rngl_opt_opp := None;
      rngl_opt_inv := None;
      rngl_le := Nat.le;
-     rngl_monus := Nat.sub;
+     rngl_opt_monus := Some Nat.sub;
      rngl_opt_eucl_div := Some Nat_eucl_div |}.
 
 Existing Instance nat_ring_like_op.
@@ -240,8 +240,6 @@ Definition Zn_div n (a b : Zn n) : Zn n :=
 Definition Zn_le n (a b : Zn n) : Prop :=
   proj1_sig a ≤ proj1_sig b.
 
-Definition phony_Zn_monus n (a b : Zn n) := a.
-
 Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
   {| rngl_zero := Zn_of_nat n 0;
      rngl_one := Zn_of_nat n 1;
@@ -250,7 +248,7 @@ Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
      rngl_opt_opp := Some (Zn_opp n);
      rngl_opt_inv := if is_prime n then Some (Zn_inv n) else None;
      rngl_le := Zn_le n;
-     rngl_monus := phony_Zn_monus n;
+     rngl_opt_monus := None;
      rngl_opt_eucl_div := None |}.
 
 Existing Instance Zn_ring_like_op.
