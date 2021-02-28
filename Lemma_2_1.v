@@ -86,17 +86,13 @@ Proof.
 intros Hld Hop Hor *.
 rewrite <- (rngl_mul_0_r 0).
 destruct (rngl_le_dec Hld 0%F n) as [Hnz| Hnz]. {
-  apply rngl_mul_le_compat_nonneg. {
-    now rewrite Hor, Hop.
-  } {
+  apply rngl_mul_le_compat_nonneg; [ easy | easy | | ]. {
     split; [ now apply rngl_le_refl | easy ].
   } {
     split; [ now apply rngl_le_refl | easy ].
   }
 } {
-  apply rngl_mul_le_compat_nonpos. {
-    now rewrite Hor, Hop.
-  } {
+  apply rngl_mul_le_compat_nonpos; [ easy | easy | | ]. {
     split; [ | now apply rngl_le_refl ].
     apply rngl_not_le in Hnz; [ | easy ].
     destruct Hnz as [Hnz| Hnz]; [ | easy ].
@@ -230,7 +226,7 @@ Theorem Rayleigh_quotient_of_eigenvector :
   rngl_has_opp = true →
   rngl_has_dec_le = true →
   rngl_is_integral = true →
-  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  rngl_has_inv = true ∨ rngl_has_eucl_div = true →
   rngl_is_ordered = true →
   ∀ n (M : matrix n n T) V μ,
   V ≠ vect_zero n
@@ -384,7 +380,7 @@ Qed.
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   rngl_is_comm = true →
   rngl_has_dec_eq = true →
-  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  rngl_has_inv = true ∨ rngl_has_eucl_div = true →
   ∀ n (M : matrix n n T) ev eV U,
   is_symm_mat M
   → eigenvalues_and_norm_vectors M ev eV
@@ -424,7 +420,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
   rewrite vect_dot_mul_scal_mul_comm in H1; [ | easy ].
   destruct (rngl_eq_dec Heq (≺ vi, vj ≻) 0%F) as [Hvvij| Hvvij]; [ easy | ].
   exfalso.
-  apply rngl_mul_reg_r in H1; [ | easy | easy ].
+  apply rngl_mul_cancel_r in H1; [ | easy | easy ].
   revert H1.
   apply Hall_diff; [ | | easy ]. {
     split; [ flia | easy ].

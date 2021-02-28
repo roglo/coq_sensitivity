@@ -1209,6 +1209,7 @@ destruct (Nat.eq_dec (σ k) (σ i)) as [Hsksi| Hsksi]. {
       apply Hp in Hssisi; [ easy | | easy ].
       now apply Hp.
     }
+Abort. (*
 ...
     apply nb_good_loop_comp_transp2 with (n := n); try easy.
     intros k Hk.
@@ -1220,6 +1221,7 @@ destruct (Nat.eq_dec (σ k) (σ i)) as [Hsksi| Hsksi]. {
 ...
     rewrite IHit; try easy.
 ...
+*)
 
 Fixpoint where_is it (σ : nat → nat) i j :=
   match it with
@@ -1626,7 +1628,7 @@ injection Hij; clear Hij; intros; subst i' j'.
 now rewrite where_is_enough_iter with (n := n) (k := j).
 Qed.
 
-Theorem nb_good_loop_comp_transp : ∀ n it σ i j k,
+Theorem old_nb_good_loop_comp_transp_2 : ∀ n it σ i j k,
   is_permut_fun σ n
   → k < i < n
   → j ≤ i
@@ -1648,7 +1650,7 @@ split; [ flia Hkin | ].
 flia Hnit.
 Qed.
 
-Theorem nb_good_loop_comp_transp' : ∀ n it σ i j k,
+Theorem old_nb_good_loop_comp_transp' : ∀ n it σ i j k,
   is_permut_fun σ n
   → i ≤ j < n
   → k < i
@@ -1673,6 +1675,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     now symmetry in Hkj.
   }
   rewrite Nat.add_0_l, Nat.add_comm; f_equal.
+Abort. (*
   now apply nb_good_loop_comp_transp with (n := n).
 }
 rewrite <- Nat.add_assoc.
@@ -1680,6 +1683,7 @@ f_equal.
 apply IHit; [ | flia Hki | easy | easy | easy ].
 flia Hijn Hij.
 Qed.
+*)
 
 Theorem nb_good_loop_comp_transp2 : ∀ n it σ i j k,
   is_permut_fun σ n
@@ -1703,6 +1707,7 @@ destruct (Nat.eq_dec k j) as [Hkj| Hkj]. {
   destruct (Nat.eq_dec (σ k) k) as [H| H]; [ congruence | ].
   move Hkj at top; subst k.
   clear H; cbn.
+Abort. (*
   now apply nb_good_loop_comp_transp with (n := n).
 }
 destruct (Nat.eq_dec (σ k) k) as [Hskk| Hskk]. {
@@ -1714,6 +1719,7 @@ destruct (Nat.eq_dec (σ k) k) as [Hskk| Hskk]. {
 apply IHit; try easy; [ | flia Hik ].
 flia Hkjn Hkj.
 Qed.
+*)
 
 Theorem nb_good_loop_comp_transp'2 : ∀ n it σ i j,
   is_permut_fun σ n
@@ -1742,9 +1748,11 @@ rewrite Nat.add_comm.
 f_equal.
 replace (i + S it) with (i + 1 + it) in Hnit by flia.
 clear Hsii.
+Abort. (*
 apply nb_good_loop_comp_transp2 with (n := n); try easy; [ | flia ].
 flia Hijn.
 Qed.
+*)
 
 Theorem nb_good_loop_comp_transp'' : ∀ n it σ i j,
   is_permut_fun σ n
@@ -1768,9 +1776,11 @@ rewrite (Nat.add_comm _ 2); cbn.
 f_equal.
 rewrite <- (Nat.add_1_r (nb_good_loop _ _ _)).
 replace (i + S it) with (i + 1 + it) in Hnit by flia.
+Abort. (*
 apply nb_good_loop_comp_transp' with (n := n); try easy; [ | flia ].
 flia Hn.
 Qed.
+*)
 
 Theorem nb_good_loop_comp_transp_eq : ∀ it n σ i j k,
   is_permut_fun σ n
@@ -1802,6 +1812,7 @@ induction it; intros. 2: {
   rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec (σ (i + 1)) j) as [Hsij| Hsij]. {
     rewrite <- Nat.add_assoc; cbn.
+Abort. (*
     now apply nb_good_loop_comp_transp'' with (n := n).
   }
   rewrite Nat.add_0_r.
@@ -1809,8 +1820,7 @@ induction it; intros. 2: {
 }
 flia Hijn Hknit Hki.
 Qed.
-
-...
+*)
 
 Theorem tlopf_loop'_enough_iter : ∀ n σ it1 it2,
   n ≤ it1
@@ -1838,6 +1848,7 @@ apply Nat.succ_le_mono in Hit2.
 set (σ' := comp (transposition i j) σ).
 specialize (IHit1 n σ' it2 Hit1 Hit2) as H1.
 Print tlopf_loop'.
+Abort. (*
 ...
 Restart.
 intros * Hit1 Hit2.
@@ -1886,9 +1897,12 @@ Print tlopf_loop'.
 Print first_transp.
 Print where_is.
 ...
+*)
 
+(*
 Definition transp_list_of_permut_fun' n (σ : nat → nat) := tlopf_loop' n n σ.
 ...
+*)
 
 Theorem glop : ∀ it n (σ : nat → nat),
   n ≠ 0
@@ -1904,6 +1918,7 @@ destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
   cbn.
   remember (first_transp n σ) as x eqn:Hx; symmetry in Hx.
   destruct x as [(j, k)| ]. {
+Abort. (*
     apply first_transp_Some_if in Hx.
     destruct Hx as (Hjn & Hkn & Hii & Hj & Hkj).
     cbn.
@@ -2180,6 +2195,7 @@ destruct x as [j| ]. {
     exfalso.
     destruct (Nat.eq_dec (σ i) j) as [Hisj| Hisj]. {
 ...
+*)
 
 Theorem glop : ∀ it n (σ : nat → nat),
   n ≠ 0
@@ -2195,6 +2211,7 @@ destruct (Nat.eq_dec n (S it)) as [Hnsit| Hnsit]. 2: {
   cbn.
   remember (first_non_fixpoint n 0 σ) as x eqn:Hx; symmetry in Hx.
   destruct x as [j| ]. {
+Abort. (*
     apply first_non_fixpoint_Some_if in Hx.
     destruct Hx as (Hj1 & Hj2 & Hj3).
     cbn.
@@ -2516,6 +2533,7 @@ intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hp.
 (* prove that any permutation is a sequence of transpositions
    then apply determinant alternating in sequence *)
 Check determinant_alternating.
+Abort. (*
 ...
 Check det_is_det_by_any_permut.
 Print determinant'_list.
@@ -2556,6 +2574,7 @@ Theorem determinant_alternating_permut :
   → determinant (mat_permut_rows σ M) = (ε σ * determinant M)%F.
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hp.
+Abort. (*
 ...
 now apply determinant_alternating_permut_fun.
 ...
@@ -3046,6 +3065,7 @@ cbn - [ determinant ].
 rewrite H1; cbn.
 rewrite rngl_opp_summation; [ | easy | easy ].
 unfold determinant.
+Abort. (*
 ...
 destruct (Nat.eq_dec i n) as [Hein| Hein]. {
   subst i; clear Hlin.
@@ -3217,6 +3237,7 @@ Theorem mat_comat_mul :
   (M * (comatrix M)⁺ = determinant M × mI n)%M.
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch *.
+Abort. (*
 ...
 *)
 
