@@ -60,8 +60,8 @@
       \ \ \ one : T; \\
       \ \ \ add : T $\rightarrow$ T $\rightarrow$ T; \\
       \ \ \ mul : T $\rightarrow$ T $\rightarrow$ T; \\
-      \ \ \ opp : T $\rightarrow$ T; \\
-      \ \ \ inv : T $\rightarrow$ T \}
+      \ \ \ opt\_opp : option (T $\rightarrow$ T); \\
+      \ \ \ opt\_inv : option (T $\rightarrow$ T) \}
     \end{tabular}}
 
   \vsp
@@ -74,18 +74,32 @@
         Notation "a + b" := (add a b). \\
         Notation "a * b" := (mul a b). \\
         Notation "- a" := (opp a). \\
-        Notation "1/ a" := (inv a). \\
+        Notation "$^1$/ a" := (inv a). \\
       \end{tabular}}
     }
+
+  \vsp
+
+  \only<3->{
+    {\footnotesize
+      \begin{tabular}{l}
+        Definition opp a :=
+        match opt\_opp with Some f =$>$ f a $|$ None =$>$ zero end \\
+        Definition inv a :=
+        match opt\_inv with Some f =$>$ f a $|$ None =$>$ zero end \\
+      \end{tabular}}
+  }
 
 }
 
 \frm{Record 2 - properties}{
 
   \begin{tabular}{ll}
-  has\_opposite : bool & \only<9->{is\_archimedean : bool} \\
-  has\_inverse : bool & \only<9->{is\_complete : bool} \\
-  \only<2->{is\_commutative : bool} &
+  opt\_opp : option (T $\rightarrow$ T); &
+  \only<9->{is\_archimedean : bool} \\
+  opt\_inv : option (T $\rightarrow$ T); &
+  \only<9->{is\_complete : bool} \\
+  \only<2->{is\_comm : bool} &
     \only<9->{is\_algebraically\_closed : bool} \\
   \only<3->{is\_ordered : bool} & \only<9->{is\_finite : bool} \\
   \only<4->{is\_integral : bool} & \only<9->{...} \\
