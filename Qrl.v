@@ -100,6 +100,7 @@ Definition Q_ring_like_prop :=
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div_l := NA;
      rngl_opt_mul_div_r := NA;
+     rngl_opt_eucl_div_prop := NA;
      rngl_opt_eq_dec := Q.eq_dec;
      rngl_opt_le_dec := Q.le_dec;
      rngl_opt_integral := NA;

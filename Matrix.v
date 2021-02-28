@@ -753,6 +753,7 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div_l := NA;
      rngl_opt_mul_div_r := NA;
+     rngl_opt_eucl_div_prop := NA;
      rngl_opt_eq_dec := mat_opt_eq_dec n;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;

@@ -64,6 +64,19 @@ intros.
 apply Nat.mul_sub_distr_l.
 Qed.
 
+Theorem Nat_eucl_div_prop : ∀ a b q r : nat,
+  b ≠ 0%nat
+  → rngl_eucl_div a b = (q, r)
+  → a = (b * q + r)%F.
+Proof.
+intros * Hbz Hab.
+unfold rngl_eucl_div in Hab.
+cbn in Hab.
+unfold Nat_eucl_div in Hab.
+injection Hab; clear Hab; intros H1 H2; subst q r.
+now apply Nat.div_mod.
+Qed.
+
 Theorem Nat_add_sub_add_sub : ∀ a b : nat, (a + (b - a)) = (b + (a - b)).
 Proof.
 intros.
@@ -129,6 +142,7 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div_l := Nat_mul_div_l;
      rngl_opt_mul_div_r := NA;
+     rngl_opt_eucl_div_prop := Nat_eucl_div_prop;
      rngl_opt_eq_dec := Nat.eq_dec;
      rngl_opt_le_dec := le_dec;
      rngl_opt_integral := Nat_eq_mul_0;
@@ -506,6 +520,7 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_opt_mul_inv_r := Zn_opt_mul_inv_r;
      rngl_opt_mul_div_l := NA;
      rngl_opt_mul_div_r := NA;
+     rngl_opt_eucl_div_prop := NA;
      rngl_opt_eq_dec := Zn_eq_dec;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;

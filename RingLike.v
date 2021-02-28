@@ -104,6 +104,12 @@ Definition rngl_mod {T} {R : ring_like_op T} a b :=
   | None => rngl_zero
   end.
 
+Definition rngl_eucl_div {T} {R : ring_like_op T} a b :=
+  match rngl_opt_eucl_div with
+  | Some rngl_eucl_div => rngl_eucl_div a b
+  | None => (rngl_zero, rngl_zero)
+  end.
+
 Definition rngl_sub {T} {R : ring_like_op T} a b :=
   if rngl_has_opp then rngl_add a (rngl_opp b)
   else if rngl_has_monus then rngl_monus a b
@@ -200,6 +206,13 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_opt_mul_div_r :
       if (rngl_has_eucl_div && negb rngl_is_comm)%bool then
         ∀ a b : T, b ≠ 0%F → (a * b / b = a)%F
+      else not_applicable;
+    (* property of the euclidean division *)
+    (* should add the extra property that N(r) < N(b) but I need
+       to define the norm first *)
+    rngl_opt_eucl_div_prop :
+      if rngl_has_eucl_div then
+        ∀ a b q r, b ≠ 0%F → rngl_eucl_div a b = (q, r) → a = (b * q + r)%F
       else not_applicable;
     (* when equality is decidable *)
     rngl_opt_eq_dec :

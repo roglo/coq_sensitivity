@@ -53,6 +53,18 @@ rewrite Z.mul_comm.
 now apply Z.div_mul.
 Qed.
 
+Theorem Z_eucl_div_prop : ∀ a b q r : Z,
+  b ≠ 0%Z
+  → rngl_eucl_div a b = (q, r)
+  → a = (b * q + r)%F.
+Proof.
+intros * Hbz Hab.
+unfold rngl_eucl_div in Hab.
+cbn in Hab.
+specialize (Z.div_eucl_eq a b Hbz) as H1.
+now rewrite Hab in H1.
+Qed.
+
 Theorem Z_mul_le_compat_nonneg : ∀ a b c d,
   (0 ≤ a ≤ c → 0 ≤ b ≤ d → a * b ≤ c * d)%Z.
 Proof.
@@ -111,6 +123,7 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div_l := Z_mul_div_l;
      rngl_opt_mul_div_r := NA;
+     rngl_opt_eucl_div_prop := Z_eucl_div_prop;
      rngl_opt_eq_dec := Z.eq_dec;
      rngl_opt_le_dec := Z_le_dec;
      rngl_opt_integral := Z_eq_mul_0;
