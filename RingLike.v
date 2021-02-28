@@ -68,6 +68,9 @@ Definition rngl_has_opp {T} {R : ring_like_op T} :=
 Definition rngl_has_inv {T} {R : ring_like_op T} :=
   bool_of_option rngl_opt_inv.
 
+Definition rngl_has_monus {T} {R : ring_like_op T} :=
+  bool_of_option rngl_opt_monus.
+
 Definition rngl_has_eucl_div {T} {R : ring_like_op T} :=
   bool_of_option rngl_opt_eucl_div.
 
@@ -102,7 +105,9 @@ Definition rngl_mod {T} {R : ring_like_op T} a b :=
   end.
 
 Definition rngl_sub {T} {R : ring_like_op T} a b :=
-  if rngl_has_opp then rngl_add a (rngl_opp b) else rngl_monus a b.
+  if rngl_has_opp then rngl_add a (rngl_opp b)
+  else if rngl_has_monus then rngl_monus a b
+  else rngl_zero.
 Definition rngl_div {T} {R : ring_like_op T} a b :=
   if rngl_has_inv then rngl_mul a (rngl_inv b)
   else if rngl_has_eucl_div then rngl_quo a b
