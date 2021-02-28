@@ -7,14 +7,14 @@
      ring_like_prop, holding their properties.
    In class ring_like_prop, we can set,
      to make a semiring:
-        rngl_has_opp = false
-        rngl_has_inv = false
+        rngl_opt_opp = None
+        rngl_has_inv = None
      to make a ring:
-        rngl_has_opp = true
-        rngl_has_inv = false
+        rngl_has_opp = Some opp, where opp is the opposite function
+        rngl_has_inv = None
      to make a field:
-        rngl_has_opp = true
-        rngl_has_inv = true
+        rngl_has_opp = Some opp, where opp is the opposite function
+        rngl_has_inv = Some inv, where opp is the inverse function
    They can be commutative or not by setting rngl_is_comm to true or false.
    There are many other properties that are implemented here or could be
    implemented :
@@ -43,21 +43,43 @@ Set Nested Proofs Allowed.
 Require Import Utf8.
 
 Class ring_like_op T :=
-  { rngl_has_opp : bool;
-    rngl_has_inv : bool;
-    rngl_has_no_inv_but_div : bool;
+  { rngl_has_no_inv_but_div : bool;
     rngl_zero : T;
     rngl_one : T;
     rngl_add : T → T → T;
     rngl_mul : T → T → T;
-    rngl_opp : T → T;
-    rngl_inv : T → T;
+    rngl_opt_opp : option (T → T);
+    rngl_opt_inv : option (T → T);
     rngl_le : T → T → Prop;
     rngl_monus : T → T → T;
     rngl_opt_div : T → T → T }.
 
 Declare Scope ring_like_scope.
 Delimit Scope ring_like_scope with F.
+
+Definition rngl_has_opp {T} {R : ring_like_op T} :=
+  match rngl_opt_opp with
+  | Some _ => true
+  | None => false
+  end.
+
+Definition rngl_opp {T} {R : ring_like_op T} a :=
+  match rngl_opt_opp with
+  | Some rngl_opp => rngl_opp a
+  | None => rngl_zero
+  end.
+
+Definition rngl_has_inv {T} {R : ring_like_op T} :=
+  match rngl_opt_inv with
+  | Some _ => true
+  | None => false
+  end.
+
+Definition rngl_inv {T} {R : ring_like_op T} a :=
+  match rngl_opt_inv with
+  | Some rngl_inv => rngl_inv a
+  | None => rngl_zero
+  end.
 
 Definition rngl_sub {T} {R : ring_like_op T} a b :=
   if rngl_has_opp then rngl_add a (rngl_opp b) else rngl_monus a b.

@@ -7,19 +7,14 @@ Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Require Import Misc RingLike FermatLittle.
 
-Definition phony_Nat_opp (x : nat) := 0.
-Definition phony_Nat_inv (x : nat) := 0.
-
 Canonical Structure nat_ring_like_op : ring_like_op nat :=
-  {| rngl_has_opp := false;
-     rngl_has_inv := false;
-     rngl_has_no_inv_but_div := true;
+  {| rngl_has_no_inv_but_div := true;
      rngl_zero := 0;
      rngl_one := 1;
      rngl_add := Nat.add;
      rngl_mul := Nat.mul;
-     rngl_opp := phony_Nat_opp;
-     rngl_inv := phony_Nat_inv;
+     rngl_opt_opp := None;
+     rngl_opt_inv := None;
      rngl_le := Nat.le;
      rngl_monus := Nat.sub;
      rngl_opt_div := Nat.div |}.
@@ -246,16 +241,14 @@ Definition Zn_le n (a b : Zn n) : Prop :=
 
 Definition phony_Zn_monus n (a b : Zn n) := a.
 
-Canonical Structure Zn_ring_like_op n : ring_like_op (Zn n) :=
-  {| rngl_has_opp := true;
-     rngl_has_inv := is_prime n;
-     rngl_has_no_inv_but_div := false;
+Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
+  {| rngl_has_no_inv_but_div := false;
      rngl_zero := Zn_of_nat n 0;
      rngl_one := Zn_of_nat n 1;
      rngl_add := Zn_add n;
      rngl_mul := Zn_mul n;
-     rngl_opp := Zn_opp n;
-     rngl_inv := Zn_inv n;
+     rngl_opt_opp := Some (Zn_opp n);
+     rngl_opt_inv := if is_prime n then Some (Zn_inv n) else None;
      rngl_le := Zn_le n;
      rngl_monus := phony_Zn_monus n;
      rngl_opt_div := Zn_div n |}.
@@ -394,10 +387,11 @@ destruct (Nat.eq_dec a b) as [Hab| Hab]; [ left | right ]. {
 Qed.
 
 Theorem Zn_opt_mul_inv_l :
-  if is_prime n then ∀ a : Zn n, a ≠ 0%F → (¹/ a * a)%F = 1%F
+  if rngl_has_inv then ∀ a : Zn n, a ≠ 0%F → (¹/ a * a)%F = 1%F
   else not_applicable.
 Proof.
 intros.
+unfold rngl_has_inv; cbn.
 remember (is_prime n) as p eqn:Hp.
 symmetry in Hp.
 destruct p; [ | easy ].
@@ -414,6 +408,10 @@ rewrite (Nat.mod_small 1). 2: {
   apply -> Nat.succ_lt_mono.
   flia Hn2.
 }
+unfold rngl_inv.
+cbn - [ "/" "mod" ].
+rewrite Hp.
+cbn - [ "/" "mod" ].
 rewrite Nat.mul_mod_idemp_l; [ | easy ].
 replace (at_least_1 n) with n. 2: {
   destruct n as [| n']; [ easy | ].
@@ -439,7 +437,7 @@ destruct c; [ now rewrite Nat.mul_comm in Hc | flia Hn2 ].
 Qed.
 
 Theorem Zn_opt_mul_inv_r :
-  if (is_prime n && negb true)%bool then ∀ a : Zn n, a ≠ 0%F → (a / a)%F = 1%F
+  if (rngl_has_inv && negb true)%bool then ∀ a : Zn n, a ≠ 0%F → (a / a)%F = 1%F
   else not_applicable.
 Proof.
 now rewrite Bool.andb_false_r.
@@ -485,7 +483,7 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_has_dec_eq := true;
      rngl_has_dec_le := false;
      rngl_has_1_neq_0 := 1 <? n;
-     rngl_is_ordered := false; (* well, it is but not transitive *)
+     rngl_is_ordered := false; (* well, it is, but not transitive *)
      rngl_is_integral := false;
      rngl_characteristic := at_least_1 n;
      rngl_add_comm := Zn_add_comm;
