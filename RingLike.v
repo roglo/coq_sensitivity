@@ -104,7 +104,9 @@ Definition rngl_mod {T} {R : ring_like_op T} a b :=
 Definition rngl_sub {T} {R : ring_like_op T} a b :=
   if rngl_has_opp then rngl_add a (rngl_opp b) else rngl_monus a b.
 Definition rngl_div {T} {R : ring_like_op T} a b :=
-  if rngl_has_inv then rngl_mul a (rngl_inv b) else rngl_quo a b.
+  if rngl_has_inv then rngl_mul a (rngl_inv b)
+  else if rngl_has_eucl_div then rngl_quo a b
+  else rngl_zero.
 
 Notation "0" := rngl_zero : ring_like_scope.
 Notation "1" := rngl_one : ring_like_scope.
@@ -520,8 +522,8 @@ destruct iv. {
     now apply rngl_mul_inv_r.
   }
 } {
-  destruct Hii as [Hii'| Hii']; [ easy | ].
-  rewrite Hii' in rngl_mul_div_l.
+  destruct Hii as [Hii| Hii]; [ easy | ].
+  rewrite Hii in rngl_mul_div_l |-*.
   specialize (rngl_mul_div_l a 1%F Ha) as H.
   now rewrite rngl_mul_1_r in H.
 }
@@ -545,7 +547,7 @@ destruct iv. {
   now do 2 rewrite rngl_mul_1_l in H1.
 } {
   destruct Hii as [Hii'| Hii']; [ easy | ].
-  rewrite Hii' in rngl_mul_div_l.
+  rewrite Hii' in rngl_mul_div_l, H2.
   rewrite rngl_mul_div_l in H2; [ | easy ].
   now rewrite rngl_mul_div_l in H2.
 }
@@ -579,7 +581,7 @@ destruct iv. {
   }
 } {
   destruct Hii as [Hii'| Hii']; [ easy | ].
-  rewrite Hii' in rngl_mul_div_l, rngl_mul_div_r.
+  rewrite Hii' in rngl_mul_div_l, rngl_mul_div_r, H.
   destruct ic. {
     rewrite (rngl_mul_comm Hic a) in H.
     rewrite (rngl_mul_comm Hic b) in H.
@@ -1067,7 +1069,7 @@ destruct ic. {
     apply rngl_mul_1_r.
   }
   destruct Hii as [Hii| Hii]; [ easy | ].
-  rewrite Hii in rngl_mul_div_l.
+  rewrite Hii in rngl_mul_div_l |-*.
   rewrite rngl_mul_comm; [ | easy ].
   now apply rngl_mul_div_l.
 } {
