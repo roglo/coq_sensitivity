@@ -8,13 +8,13 @@
    In class ring_like_prop, we can set,
      to make a semiring:
         rngl_opt_opp = None
-        rngl_has_inv = None
+        rngl_opt_inv = None
      to make a ring:
-        rngl_has_opp = Some opp, where opp is the opposite function
-        rngl_has_inv = None
+        rngl_opt_opp = Some opp, where opp is the opposite function
+        rngl_opt_inv = None
      to make a field:
-        rngl_has_opp = Some opp, where opp is the opposite function
-        rngl_has_inv = Some inv, where opp is the inverse function
+        rngl_opt_opp = Some opp, where opp is the opposite function
+        rngl_opt_inv = Some inv, where opp is the inverse function
    They can be commutative or not by setting rngl_is_comm to true or false.
    There are many other properties that are implemented here or could be
    implemented :
