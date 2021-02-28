@@ -42,6 +42,12 @@
 Set Nested Proofs Allowed.
 Require Import Utf8.
 
+Definition bool_of_option {T} (x : option T) :=
+  match x with
+  | Some _ => true
+  | None => false
+  end.
+
 Class ring_like_op T :=
   { rngl_zero : T;
     rngl_one : T;
@@ -51,27 +57,24 @@ Class ring_like_op T :=
     rngl_opt_inv : option (T → T);
     rngl_le : T → T → Prop;
     rngl_monus : T → T → T;
-    rngl_opt_div : option (T → T → T) }.
+    rngl_opt_eucl_div : option (T → T → T * T) }.
 
 Declare Scope ring_like_scope.
 Delimit Scope ring_like_scope with F.
 
 Definition rngl_has_opp {T} {R : ring_like_op T} :=
-  match rngl_opt_opp with
-  | Some _ => true
-  | None => false
-  end.
+  bool_of_option rngl_opt_opp.
+
+Definition rngl_has_inv {T} {R : ring_like_op T} :=
+  bool_of_option rngl_opt_inv.
+
+Definition rngl_has_eucl_div {T} {R : ring_like_op T} :=
+  bool_of_option rngl_opt_eucl_div.
 
 Definition rngl_opp {T} {R : ring_like_op T} a :=
   match rngl_opt_opp with
   | Some rngl_opp => rngl_opp a
   | None => rngl_zero
-  end.
-
-Definition rngl_has_inv {T} {R : ring_like_op T} :=
-  match rngl_opt_inv with
-  | Some _ => true
-  | None => false
   end.
 
 Definition rngl_inv {T} {R : ring_like_op T} a :=
@@ -80,22 +83,22 @@ Definition rngl_inv {T} {R : ring_like_op T} a :=
   | None => rngl_zero
   end.
 
-Definition rngl_has_no_inv_but_div {T} {R : ring_like_op T} :=
-  match rngl_opt_div with
-  | Some _ => true
-  | None => false
+Definition rngl_quo {T} {R : ring_like_op T} a b :=
+  match rngl_opt_eucl_div with
+  | Some rngl_eucl_div => fst (rngl_eucl_div a b)
+  | None => rngl_zero
   end.
 
-Definition rngl_spec_div {T} {R : ring_like_op T} a b :=
-  match rngl_opt_div with
-  | Some rngl_spec_div => rngl_spec_div a b
+Definition rngl_mod {T} {R : ring_like_op T} a b :=
+  match rngl_opt_eucl_div with
+  | Some rngl_eucl_div => snd (rngl_eucl_div a b)
   | None => rngl_zero
   end.
 
 Definition rngl_sub {T} {R : ring_like_op T} a b :=
   if rngl_has_opp then rngl_add a (rngl_opp b) else rngl_monus a b.
 Definition rngl_div {T} {R : ring_like_op T} a b :=
-  if rngl_has_inv then rngl_mul a (rngl_inv b) else rngl_spec_div a b.
+  if rngl_has_inv then rngl_mul a (rngl_inv b) else rngl_quo a b.
 
 Notation "0" := rngl_zero : ring_like_scope.
 Notation "1" := rngl_one : ring_like_scope.
@@ -178,11 +181,11 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       else not_applicable;
     (* when has no inverse but division *)
     rngl_opt_mul_div_l :
-      if rngl_has_no_inv_but_div then
+      if rngl_has_eucl_div then
         ∀ a b : T, a ≠ 0%F → (a * b / a = b)%F
       else not_applicable;
     rngl_opt_mul_div_r :
-      if (rngl_has_no_inv_but_div && negb rngl_is_comm)%bool then
+      if (rngl_has_eucl_div && negb rngl_is_comm)%bool then
         ∀ a b : T, b ≠ 0%F → (a * b / b = a)%F
       else not_applicable;
     (* when equality is decidable *)
@@ -234,7 +237,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       else not_applicable;
     (* consistency *)
     rngl_consistent :
-      rngl_has_inv = false ∨ rngl_has_no_inv_but_div = false }.
+      rngl_has_inv = false ∨ rngl_has_eucl_div = false }.
 
 Fixpoint rngl_power {T} {ro : ring_like_op T} a n :=
   match n with
@@ -492,7 +495,7 @@ now rewrite Hab.
 Qed.
 
 Theorem rngl_mul_inv_r :
-  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  rngl_has_inv = true ∨ rngl_has_eucl_div = true →
   ∀ a : T, a ≠ 0%F → (a / a = 1)%F.
 Proof.
 intros Hii * Ha.
@@ -519,7 +522,7 @@ destruct iv. {
 Qed.
 
 Theorem rngl_mul_cancel_l :
-  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  rngl_has_inv = true ∨ rngl_has_eucl_div = true →
   ∀ a b c, a ≠ 0%F
   → (a * b = a * c)%F
   → b = c.
@@ -543,7 +546,7 @@ destruct iv. {
 Qed.
 
 Theorem rngl_mul_cancel_r :
-  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  rngl_has_inv = true ∨ rngl_has_eucl_div = true →
   ∀ a b c, c ≠ 0%F
   → (a * c = b * c)%F
   → a = b.
@@ -813,7 +816,7 @@ apply rngl_mul_1_l.
 Qed.
 
 Theorem rngl_div_1_r :
-  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  rngl_has_inv = true ∨ rngl_has_eucl_div = true →
   rngl_has_1_neq_0 = true →
   ∀ a, (a / 1 = a)%F.
 Proof.
@@ -1040,7 +1043,7 @@ split. {
 Qed.
 
 Theorem rngl_mul_div_l :
-  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  rngl_has_inv = true ∨ rngl_has_eucl_div = true →
   ∀ a b : T, b ≠ 0%F → (a * b / b)%F = a.
 Proof.
 intros Hii a b Hbz.
@@ -1062,7 +1065,7 @@ destruct ic. {
   rewrite rngl_mul_comm; [ | easy ].
   now apply rngl_mul_div_l.
 } {
-  destruct rngl_has_no_inv_but_div. {
+  destruct rngl_has_eucl_div. {
     cbn in rngl_mul_div_r.
     now apply rngl_mul_div_r.
   }
@@ -1199,7 +1202,7 @@ apply rngl_mul_1_r.
 Qed.
 
 Theorem rngl_div_0_l :
-  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  rngl_has_inv = true ∨ rngl_has_eucl_div = true →
   ∀ a, a ≠ 0%F → (0 / a)%F = 0%F.
 Proof.
 intros Hiv * Haz.
@@ -1228,7 +1231,7 @@ destruct hi. {
 Qed.
 
 Theorem eq_rngl_div_1 :
-  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  rngl_has_inv = true ∨ rngl_has_eucl_div = true →
    ∀ a b, b ≠ 0%F → a = b → (a / b = 1)%F.
 Proof.
 intros Hiv * Hbz Hab.

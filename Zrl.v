@@ -19,7 +19,7 @@ Canonical Structure Z_ring_like_op : ring_like_op Z :=
      rngl_opt_inv := None;
      rngl_le := Z.le;
      rngl_monus := phony_Z_monus;
-     rngl_opt_div := Some Z.div |}.
+     rngl_opt_eucl_div := Some Z.div_eucl |}.
 
 Existing Instance Z_ring_like_op.
 
@@ -80,7 +80,7 @@ now apply Z.le_antisymm; apply Z.lt_le_incl.
 Qed.
 
 Theorem Z_consistent :
-  rngl_has_inv = false ∨ rngl_has_no_inv_but_div = false.
+  rngl_has_inv = false ∨ rngl_has_eucl_div = false.
 Proof. now left. Qed.
 
 Definition Z_ring_like_prop : ring_like_prop Z :=

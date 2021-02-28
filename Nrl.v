@@ -7,6 +7,8 @@ Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Require Import Misc RingLike FermatLittle.
 
+Definition Nat_eucl_div a b := (a / b, a mod b).
+
 Canonical Structure nat_ring_like_op : ring_like_op nat :=
   {| rngl_zero := 0;
      rngl_one := 1;
@@ -16,7 +18,7 @@ Canonical Structure nat_ring_like_op : ring_like_op nat :=
      rngl_opt_inv := None;
      rngl_le := Nat.le;
      rngl_monus := Nat.sub;
-     rngl_opt_div := Some Nat.div |}.
+     rngl_opt_eucl_div := Some Nat_eucl_div |}.
 
 Existing Instance nat_ring_like_op.
 
@@ -94,7 +96,7 @@ now apply Nat.add_cancel_l in Habc.
 Qed.
 
 Theorem Nat_consistent :
-  rngl_has_inv = false ∨ rngl_has_no_inv_but_div = false.
+  rngl_has_inv = false ∨ rngl_has_eucl_div = false.
 Proof. now left. Qed.
 
 Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
@@ -249,7 +251,7 @@ Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
      rngl_opt_inv := if is_prime n then Some (Zn_inv n) else None;
      rngl_le := Zn_le n;
      rngl_monus := phony_Zn_monus n;
-     rngl_opt_div := None |}.
+     rngl_opt_eucl_div := None |}.
 
 Existing Instance Zn_ring_like_op.
 
@@ -392,7 +394,7 @@ intros.
 unfold rngl_has_inv; cbn.
 remember (is_prime n) as p eqn:Hp.
 symmetry in Hp.
-destruct p; [ | easy ].
+destruct p; [ cbn | easy ].
 intros * Haz.
 destruct (lt_dec n 2) as [Hn2| Hn2]. {
   destruct n; [ easy | ].
@@ -473,7 +475,7 @@ apply Nat.sub_diag.
 Qed.
 
 Theorem Zn_consistent :
-  rngl_has_inv = false ∨ rngl_has_no_inv_but_div = false.
+  rngl_has_inv = false ∨ rngl_has_eucl_div = false.
 Proof. now right. Qed.
 
 Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=

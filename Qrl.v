@@ -18,7 +18,7 @@ Canonical Structure Q_ring_like_op : ring_like_op Q :=
      rngl_opt_inv := Some Q.inv;
      rngl_le := Q.le;
      rngl_monus := phony_Q_monus;
-     rngl_opt_div := None |}.
+     rngl_opt_eucl_div := None |}.
 
 Existing Instance Q_ring_like_op.
 
@@ -69,7 +69,7 @@ now apply Q.le_antisymm; apply Q.lt_le_incl.
 Qed.
 
 Theorem Q_consistent :
-  rngl_has_inv = false ∨ rngl_has_no_inv_but_div = false.
+  rngl_has_inv = false ∨ rngl_has_eucl_div = false.
 Proof. now right. Qed.
 
 Definition Q_ring_like_prop :=

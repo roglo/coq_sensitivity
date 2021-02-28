@@ -125,7 +125,7 @@ Qed.
 
 Theorem vect_mul_scal_reg_r :
   rngl_has_dec_eq = true →
-  rngl_has_inv = true ∨ rngl_has_no_inv_but_div = true →
+  rngl_has_inv = true ∨ rngl_has_eucl_div = true →
   ∀ {n} (V : vector n T) a b,
   V ≠ vect_zero n
   → (a × V = b × V)%V
