@@ -14,9 +14,9 @@ Canonical Structure Q_ring_like_op : ring_like_op Q :=
      rngl_mul := Q.mul;
      rngl_opt_opp := Some Q.opp;
      rngl_opt_inv := Some Q.inv;
-     rngl_le := Q.le;
      rngl_opt_monus := None;
-     rngl_opt_eucl_div := None |}.
+     rngl_opt_eucl_div := None;
+     rngl_le := Q.le |}.
 
 Existing Instance Q_ring_like_op.
 

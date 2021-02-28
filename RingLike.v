@@ -55,9 +55,9 @@ Class ring_like_op T :=
     rngl_mul : T → T → T;
     rngl_opt_opp : option (T → T);
     rngl_opt_inv : option (T → T);
-    rngl_le : T → T → Prop;
     rngl_opt_monus : option (T → T → T);
-    rngl_opt_eucl_div : option (T → T → T * T) }.
+    rngl_opt_eucl_div : option (T → T → T * T);
+    rngl_le : T → T → Prop }.
 
 Declare Scope ring_like_scope.
 Delimit Scope ring_like_scope with F.

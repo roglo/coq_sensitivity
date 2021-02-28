@@ -16,9 +16,9 @@ Canonical Structure nat_ring_like_op : ring_like_op nat :=
      rngl_mul := Nat.mul;
      rngl_opt_opp := None;
      rngl_opt_inv := None;
-     rngl_le := Nat.le;
      rngl_opt_monus := Some Nat.sub;
-     rngl_opt_eucl_div := Some Nat_eucl_div |}.
+     rngl_opt_eucl_div := Some Nat_eucl_div;
+     rngl_le := Nat.le |}.
 
 Existing Instance nat_ring_like_op.
 
@@ -261,9 +261,9 @@ Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
      rngl_mul := Zn_mul n;
      rngl_opt_opp := Some (Zn_opp n);
      rngl_opt_inv := if is_prime n then Some (Zn_inv n) else None;
-     rngl_le := Zn_le n;
      rngl_opt_monus := None;
-     rngl_opt_eucl_div := None |}.
+     rngl_opt_eucl_div := None;
+     rngl_le := Zn_le n |}.
 
 Existing Instance Zn_ring_like_op.
 

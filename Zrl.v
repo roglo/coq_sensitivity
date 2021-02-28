@@ -15,9 +15,9 @@ Canonical Structure Z_ring_like_op : ring_like_op Z :=
      rngl_mul := Z.mul;
      rngl_opt_opp := Some Z.opp;
      rngl_opt_inv := None;
-     rngl_le := Z.le;
      rngl_opt_monus := None;
-     rngl_opt_eucl_div := Some Z.div_eucl |}.
+     rngl_opt_eucl_div := Some Z.div_eucl;
+     rngl_le := Z.le |}.
 
 Existing Instance Z_ring_like_op.
 
