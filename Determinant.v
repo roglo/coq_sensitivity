@@ -1199,31 +1199,40 @@ destruct (Nat.eq_dec (σ k) i) as [Hski| Hski]. {
   congruence.
 }
 destruct (Nat.eq_dec (σ k) (σ i)) as [Hsksi| Hsksi]. {
-  destruct (Nat.eq_dec i k) as [Hik| Hik]. {
-    move Hik at top; subst k.
-    clear Hsksi Hski Hki.
-    destruct (Nat.eq_dec (σ i) i) as [H| H]; [ easy | clear H ].
-    rewrite Nat.add_0_l.
-    destruct (Nat.eq_dec (σ (σ i)) i) as [Hssii| Hssii]. {
-      rewrite Nat.add_comm; f_equal.
-      apply nb_good_loop_comp_transp' with (n := n); try easy. {
-        intros k Hk.
-        apply Hi.
-        split; [ flia | easy ].
-      }
+  apply Hp in Hsksi; [ | flia Hnit | easy ].
+  move Hsksi at top; subst k.
+  rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
+  clear Hski Hki.
+  destruct (Nat.eq_dec (σ i) i) as [H| H]; [ easy | clear H ].
+  rewrite Nat.add_0_l.
+  destruct (Nat.eq_dec (σ (σ i)) i) as [Hssii| Hssii]. {
+    rewrite Nat.add_comm; f_equal.
+    apply nb_good_loop_comp_transp' with (n := n); try easy. {
       intros k Hk.
-      destruct k; [ | flia Hk ].
-      now rewrite Nat.add_0_r.
+      apply Hi.
+      split; [ flia | easy ].
     }
-    rewrite Nat.add_comm, Nat.add_0_r; f_equal.
-    destruct (Nat.eq_dec (σ (σ i)) (σ i)) as [Hssisi| Hssisi]. {
-      apply Hp in Hssisi; [ easy | | easy ].
-      now apply Hp.
-    }
-    apply nb_good_loop_comp_transp2 with (n := n); try easy.
     intros k Hk.
-    apply Hi; flia Hk.
+    destruct k; [ | flia Hk ].
+    now rewrite Nat.add_0_r.
   }
+  rewrite Nat.add_comm, Nat.add_0_r; f_equal.
+  destruct (Nat.eq_dec (σ (σ i)) (σ i)) as [Hssisi| Hssisi]. {
+    apply Hp in Hssisi; [ easy | | easy ].
+    now apply Hp.
+  }
+  apply nb_good_loop_comp_transp2 with (n := n); try easy.
+  intros k Hk.
+  apply Hi; flia Hk.
+}
+do 2 rewrite <- Nat.add_assoc.
+f_equal.
+...
+destruct (Nat.eq_dec (k + 1) i) as [Hk1i| Hk1i]. {
+  move Hk1i at top; subst i.
+  clear Hki.
+...
+rewrite IHit; try easy. 2: {
 ...
 
 Fixpoint where_is it (σ : nat → nat) i j :=
