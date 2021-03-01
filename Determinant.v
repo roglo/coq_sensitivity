@@ -1227,12 +1227,18 @@ destruct (Nat.eq_dec (σ k) (σ i)) as [Hsksi| Hsksi]. {
 }
 do 2 rewrite <- Nat.add_assoc.
 f_equal.
-...
-destruct (Nat.eq_dec (k + 1) i) as [Hk1i| Hk1i]. {
-  move Hk1i at top; subst i.
-  clear Hki.
-...
-rewrite IHit; try easy. 2: {
+destruct (Nat.eq_dec k i) as [Hk1i| Hk1i]. {
+  now move Hk1i at top; subst k.
+}
+rewrite IHit; try easy; [ | flia Hki Hk1i ].
+unfold Nat.b2n.
+rewrite if_eqb_eq_dec.
+symmetry.
+apply Nat.add_assoc.
+Qed.
+
+Inspect 1.
+
 ...
 
 Fixpoint where_is it (σ : nat → nat) i j :=
