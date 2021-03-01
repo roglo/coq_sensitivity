@@ -1026,7 +1026,7 @@ Qed.
 ...
 *)
 
-Theorem glop : ∀ n it σ i,
+Theorem nb_good_loop_comp_transp2 : ∀ n it σ i,
   is_permut_fun σ n
   → (∀ k, k < i → σ k = k)
   → σ i ≠ i
@@ -1090,6 +1090,21 @@ destruct (Nat.eq_dec (σ p) i) as [Hspi| Hspi]. {
   cbn.
   apply IHit with (k := k); try easy; flia Hip.
 }
+destruct (Nat.eq_dec (σ p) j) as [Hspj| Hspj]. {
+  rewrite Hspj.
+  destruct (Nat.eq_dec i p) as [H| H]; [ flia Hip H | clear H ].
+  destruct (Nat.eq_dec j p) as [Hjp| Hjp]. {
+    now move Hjp at top; subst p.
+  }
+  cbn.
+  apply IHit with (k := k); try easy; flia Hip.
+}
+f_equal.
+apply IHit with (k := k); try easy; flia Hip.
+Qed.
+
+Inspect 1.
+
 ...
 
 Theorem nb_good_loop_comp_transp' : ∀ n it σ i d,
