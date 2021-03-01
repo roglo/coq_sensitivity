@@ -1103,10 +1103,6 @@ f_equal.
 apply IHit with (k := k); try easy; flia Hip.
 Qed.
 
-Inspect 1.
-
-...
-
 Theorem nb_good_loop_comp_transp' : ∀ n it σ i d,
   is_permut_fun σ n
   → i < n
@@ -1224,19 +1220,11 @@ destruct (Nat.eq_dec (σ k) (σ i)) as [Hsksi| Hsksi]. {
       apply Hp in Hssisi; [ easy | | easy ].
       now apply Hp.
     }
-Abort. (*
-...
     apply nb_good_loop_comp_transp2 with (n := n); try easy.
     intros k Hk.
     apply Hi; flia Hk.
+  }
 ...
-    apply nb_good_loop_comp_transp with (n := n); try easy. {
-      split; [ flia | flia Hnit ].
-    }
-...
-    rewrite IHit; try easy.
-...
-*)
 
 Fixpoint where_is it (σ : nat → nat) i j :=
   match it with
