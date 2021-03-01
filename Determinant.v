@@ -1237,8 +1237,6 @@ symmetry.
 apply Nat.add_assoc.
 Qed.
 
-Inspect 1.
-
 Theorem first_non_fixpoint_enough_iter : ∀ n m σ i j,
   n ≤ m
   → first_non_fixpoint n i σ = Some j
@@ -1279,6 +1277,11 @@ Theorem determinant_alternating_permut_fun :
   → determinant (mat_permut_rows_fun σ M) = (ε_fun σ n * determinant M)%F.
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hp.
+remember (transp_list_of_permut_fun n σ) as trl eqn:Htrl.
+Search transp_list_of_permut_fun.
+Print transp_list_of_permut_fun.
+Print tlopf_loop.
+...
 (* prove that any permutation is a sequence of transpositions
    then apply determinant alternating in sequence *)
 Check determinant_alternating.
