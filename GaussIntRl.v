@@ -3,36 +3,59 @@ Require Import Utf8 ZArith.
 Require Import RingLike.
 Open Scope Z_scope.
 
-Record gauss_int := mk_gi { gi_r : Z; gi_i : Z }.
+Record gauss_int := mk_gi { gi_re : Z; gi_im : Z }.
 
 Definition gi_zero := mk_gi 0 0.
 Definition gi_one := mk_gi 1 0.
+Definition gi_i := mk_gi 0 1.
 
-Definition gi_add α β := mk_gi (gi_r α + gi_r β) (gi_i α + gi_i β).
+Definition gi_add α β := mk_gi (gi_re α + gi_re β) (gi_im α + gi_im β).
 Definition gi_mul α β :=
-  mk_gi (gi_r α * gi_r β - gi_i α * gi_i β)
-    (gi_r α * gi_i β + gi_i α * gi_r β).
-Definition gi_opp α := mk_gi (- gi_r α) (- gi_i α).
+  mk_gi (gi_re α * gi_re β - gi_im α * gi_im β)
+    (gi_re α * gi_im β + gi_im α * gi_re β).
+Definition gi_opp α := mk_gi (- gi_re α) (- gi_im α).
 
-Definition gi_gauge (α : gauss_int) := 0%nat.
-Definition gi_eucl_div α β :=
-  let d := gi_r β * gi_r β + gi_i β * gi_i β in
-  let γ := (gi_r α * gi_r β + gi_i α * gi_i β) / d in
-  let γ' := (gi_i α * gi_r β - gi_r α * gi_i β) / d in
-  let q := mk_gi γ γ' in
-  (q, gi_add α (gi_opp (gi_mul β q))).
-(* but could be also
-       mk_gi (γ + 1) γ', or
-       mk_gi γ (γ' + 1), or
-       mk_gi (γ + 1) (γ' + 1).
-   It depends on gauge and the values of α and β.
- *)
+Definition gi_sub α β := gi_add α (gi_opp β).
+Definition gi_conj α := mk_gi (gi_re α) (- gi_im α).
 
 Declare Scope G_scope.
 Delimit Scope G_scope with G.
 Notation "0" := gi_zero : G_scope.
 Notation "1" := gi_one : G_scope.
-Notation "- x" := (gi_opp x) : G_scope.
+Notation "'ⁱ'" := gi_i (at level 0) : G_scope.
+Notation "- α" := (gi_opp α) : G_scope.
+Notation "α + β" := (gi_add α β) : G_scope.
+Notation "α * β" := (gi_mul α β) : G_scope.
+Notation "α - β" := (gi_sub α β) : G_scope.
+
+Definition gi_gauge (α : gauss_int) :=
+  Z.abs_nat (gi_re α * gi_re α + gi_im α + gi_im α)%Z.
+
+Definition gi_eucl_div α β :=
+  let d := gi_re β * gi_re β + gi_im β * gi_im β in
+(**)
+  let γ := gi_re (α * gi_conj β)%G / d in
+  let γ' := gi_im (α * gi_conj β)%G / d in
+(*
+  let γ := (gi_re α * gi_re β + gi_im α * gi_im β) / d in
+  let γ' := (gi_im α * gi_re β - gi_re α * gi_im β) / d in
+*)
+  let q :=
+    if lt_dec (gi_gauge (α - β * mk_gi γ γ')%G) (gi_gauge β) then
+      mk_gi γ γ'
+    else if lt_dec (gi_gauge (α - β * mk_gi (γ + 1) γ')%G) (gi_gauge β) then
+      mk_gi (γ + 1) γ'
+    else if lt_dec (gi_gauge (α - β * mk_gi γ (γ' + 1))%G) (gi_gauge β) then
+      mk_gi γ (γ' + 1)
+    else if
+      lt_dec (gi_gauge (α - β * mk_gi (γ + 1) (γ' + 1))%G) (gi_gauge β)
+    then
+      mk_gi (γ + 1) (γ' + 1)
+    else
+      0%G
+  in
+  let r := (α - β * q)%G in
+  (q, r).
 
 Definition phony_gi_le (a b : gauss_int) := False.
 
@@ -46,5 +69,3 @@ Canonical Structure gauss_int_ring_like_op : ring_like_op gauss_int :=
      rngl_opt_monus := None;
      rngl_opt_eucl_div := Some (gi_eucl_div, gi_gauge);
      rngl_le := phony_gi_le |}.
-
-Print gauss_int_ring_like_op.
