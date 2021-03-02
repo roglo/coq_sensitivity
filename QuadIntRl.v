@@ -85,7 +85,13 @@ Notation "〈 b √ d 〉" := (mk_qi d 0 b)
   (at level 1, b at level 35, format "〈  b  √ d  〉") : QI_scope.
 Notation "〈 √ d 〉" := (mk_qi d 0 1)
   (at level 1, format "〈  √ d  〉") : QI_scope.
-Notation "〈 'ⁱ' 〉" := (mk_qi (-1) 0 1)
+Notation "'〈' a + b '𝑖' 〉" := (mk_qi (-1) a b)
+  (at level 1, a at level 35, b at level 35 ,
+   format "〈  a  +  b  𝑖  〉") : QI_scope.
+Notation "'〈' b '𝑖' 〉" := (mk_qi (-1) 0 b)
+  (at level 1, b at level 35 ,
+   format "〈  b  𝑖  〉") : QI_scope.
+Notation "〈 '𝑖' 〉" := (mk_qi (-1) 0 1)
   (at level 1) : QI_scope.
 
 Compute (〈 -36 + 242 √-1 〉 / 〈 50 + 50 √-1 〉)%QI.
@@ -93,3 +99,5 @@ Compute (〈 0 + 1 √-1 〉 * 〈 0 + 1 √-1 〉)%QI.
 Compute (1 / 〈 0 + -1 √-1 〉)%QI.
 Compute (1 / 〈 -1 √-1 〉)%QI.
 Compute (〈 0 + 0 √42 〉 / 〈 0 + 0 √42 〉 )%QI.
+Compute (mk_qi (-1) 3 2).
+Compute (mk_qi (-1) 0 2).
