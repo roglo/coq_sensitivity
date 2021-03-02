@@ -79,3 +79,8 @@ Canonical Structure quad_int_ring_like_op {d} : ring_like_op (quad_int d) :=
 
 Compute (mk_qi (-1) (- 36) 242 / mk_qi (-1) 50 50)%QI.
 Compute (mk_qi 1 (- 36) 242 / mk_qi 1 50 50)%QI.
+Compute (mk_qi (-1) 0 1 * mk_qi (-1) 0 1)%QI.
+Compute (1 / mk_qi (-1) 0 1)%QI.
+Compute (1 / mk_qi (-1) 0 (- 1))%QI.
+Compute (mk_qi 1 22 0 / mk_qi 1 7 0)%QI.
+Compute (@qi_zero 42 / @qi_zero 42)%QI.
