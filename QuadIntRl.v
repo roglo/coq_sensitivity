@@ -95,9 +95,9 @@ Notation "〈 '𝑖' 〉" := (mk_qi (-1) 0 1)
   (at level 1) : QI_scope.
 
 Compute (〈 -36 + 242 √-1 〉 / 〈 50 + 50 √-1 〉)%QI.
-Compute (〈 0 + 1 √-1 〉 * 〈 0 + 1 √-1 〉)%QI.
-Compute (1 / 〈 0 + -1 √-1 〉)%QI.
-Compute (1 / 〈 -1 √-1 〉)%QI.
-Compute (〈 0 + 0 √42 〉 / 〈 0 + 0 √42 〉 )%QI.
-Compute (mk_qi (-1) 3 2).
-Compute (mk_qi (-1) 0 2).
+Compute (〈 𝑖 〉 * 〈 𝑖 〉)%QI.
+Compute (1 / 〈 𝑖 〉)%QI.
+Compute (1 / 〈 -1 𝑖 〉)%QI.
+Compute (〈 0 √42 〉 / 〈 0 √42 〉 )%QI.
+Check (mk_qi (-1) 3 2).
+Check (mk_qi (-1) 0 2).
