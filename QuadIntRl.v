@@ -32,17 +32,12 @@ Notation "α * β" := (qi_mul α β) : QI_scope.
 Notation "α - β" := (qi_sub α β) : QI_scope.
 
 Definition qi_gauge {d} (α : quad_int d) :=
-  Z.abs_nat (qi_re α * qi_re α - d * qi_im α + qi_im α)%Z.
+  Z.abs_nat (qi_re (α * qi_conj α)%QI).
 
 Definition qi_eucl_div {d} (α β : quad_int d) :=
-  let den := qi_re β * qi_re β + qi_im β * qi_im β in
-(**)
+  let den := qi_re (β * qi_conj β)%QI in
   let γ := qi_re (α * qi_conj β)%QI / den in
   let γ' := qi_im (α * qi_conj β)%QI / den in
-(*
-  let γ := (qi_re α * qi_re β + qi_im α * qi_im β) / d in
-  let γ' := (qi_im α * qi_re β - qi_re α * qi_im β) / d in
-*)
   let q :=
     if lt_dec (qi_gauge (α - β * mk_qi d γ γ')%QI) (qi_gauge β) then
       mk_qi d γ γ'
@@ -79,6 +74,7 @@ Canonical Structure quad_int_ring_like_op {d} : ring_like_op (quad_int d) :=
 
 Compute (mk_qi (-1) (- 36) 242 / mk_qi (-1) 50 50)%QI.
 Compute (mk_qi 1 (- 36) 242 / mk_qi 1 50 50)%QI.
+...
 Compute (mk_qi (-1) 0 1 * mk_qi (-1) 0 1)%QI.
 Compute (1 / mk_qi (-1) 0 1)%QI.
 Compute (1 / mk_qi (-1) 0 (- 1))%QI.
