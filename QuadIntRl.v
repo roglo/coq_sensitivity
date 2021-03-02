@@ -30,6 +30,9 @@ Notation "- α" := (qi_opp α) : QI_scope.
 Notation "α + β" := (qi_add α β) : QI_scope.
 Notation "α * β" := (qi_mul α β) : QI_scope.
 Notation "α - β" := (qi_sub α β) : QI_scope.
+Notation "'〈' a + b √ d 〉" := (mk_qi d a b)
+  (at level 1, a at level 35, b at level 35 ,
+   format "〈  a  +  b  √ d  〉") : QI_scope.
 
 Definition qi_gauge {d} (α : quad_int d) :=
   Z.abs_nat (qi_re (α * qi_conj α)%QI).
@@ -72,13 +75,21 @@ Canonical Structure quad_int_ring_like_op {d} : ring_like_op (quad_int d) :=
      rngl_opt_eucl_div := Some (qi_eucl_div, qi_gauge);
      rngl_le := phony_qi_le |}.
 
-Notation "'〈' a + b √ 3" := ({| qi_re := a; qi_im := b |}) (at level 1) :
-  QI_scope.
-
 Compute (mk_qi (-1) (- 36) 242 / mk_qi (-1) 50 50)%QI.
-...
 Compute (mk_qi (-1) 0 1 * mk_qi (-1) 0 1)%QI.
 Compute (1 / mk_qi (-1) 0 1)%QI.
 Compute (1 / mk_qi (-1) 0 (- 1))%QI.
-Compute (mk_qi 1 22 0 / mk_qi 1 7 0)%QI.
 Compute (@qi_zero 42 / @qi_zero 42)%QI.
+
+Notation "〈 b √ d 〉" := (mk_qi d 0 b)
+  (at level 1, b at level 35, format "〈  b  √ d  〉") : QI_scope.
+Notation "〈 √ d 〉" := (mk_qi d 0 1)
+  (at level 1, format "〈  √ d  〉") : QI_scope.
+Notation "〈 'ⁱ' 〉" := (mk_qi (-1) 0 1)
+  (at level 1) : QI_scope.
+
+Compute (〈 -36 + 242 √-1 〉 / 〈 50 + 50 √-1 〉)%QI.
+Compute (〈 0 + 1 √-1 〉 * 〈 0 + 1 √-1 〉)%QI.
+Compute (1 / 〈 0 + -1 √-1 〉)%QI.
+Compute (1 / 〈 -1 √-1 〉)%QI.
+Compute (〈 0 + 0 √42 〉 / 〈 0 + 0 √42 〉 )%QI.
