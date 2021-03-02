@@ -17,7 +17,7 @@ Canonical Structure nat_ring_like_op : ring_like_op nat :=
      rngl_opt_opp := None;
      rngl_opt_inv := None;
      rngl_opt_monus := Some Nat.sub;
-     rngl_opt_eucl_div := Some Nat_eucl_div;
+     rngl_opt_eucl_div := Some (Nat_eucl_div, id);
      rngl_le := Nat.le |}.
 
 Existing Instance nat_ring_like_op.
@@ -67,14 +67,15 @@ Qed.
 Theorem Nat_eucl_div_prop : ∀ a b q r : nat,
   b ≠ 0%nat
   → rngl_eucl_div a b = (q, r)
-  → a = (b * q + r)%F.
+  → a = (b * q + r)%F ∧ id r < id b.
 Proof.
 intros * Hbz Hab.
 unfold rngl_eucl_div in Hab.
 cbn in Hab.
 unfold Nat_eucl_div in Hab.
 injection Hab; clear Hab; intros H1 H2; subst q r.
-now apply Nat.div_mod.
+split; [ now apply Nat.div_mod | ].
+now apply Nat.mod_upper_bound.
 Qed.
 
 Theorem Nat_add_sub_add_sub : ∀ a b : nat, (a + (b - a)) = (b + (a - b)).

@@ -56,7 +56,7 @@ Class ring_like_op T :=
     rngl_opt_opp : option (T → T);
     rngl_opt_inv : option (T → T);
     rngl_opt_monus : option (T → T → T);
-    rngl_opt_eucl_div : option (T → T → T * T);
+    rngl_opt_eucl_div : option ((T → T → T * T) * (T → nat));
     rngl_le : T → T → Prop }.
 
 Declare Scope ring_like_scope.
@@ -94,19 +94,25 @@ Definition rngl_monus {T} {R : ring_like_op T} a b :=
 
 Definition rngl_quo {T} {R : ring_like_op T} a b :=
   match rngl_opt_eucl_div with
-  | Some rngl_eucl_div => fst (rngl_eucl_div a b)
+  | Some (rngl_eucl_div, rngl_gauge) => fst (rngl_eucl_div a b)
   | None => rngl_zero
   end.
 
 Definition rngl_mod {T} {R : ring_like_op T} a b :=
   match rngl_opt_eucl_div with
-  | Some rngl_eucl_div => snd (rngl_eucl_div a b)
+  | Some (rngl_eucl_div, rngl_gauge) => snd (rngl_eucl_div a b)
   | None => rngl_zero
+  end.
+
+Definition rngl_gauge {T} {R : ring_like_op T} (a : T) :=
+  match rngl_opt_eucl_div with
+  | Some (rngl_eucl_div, rngl_gauge) => rngl_gauge a
+  | None => 0
   end.
 
 Definition rngl_eucl_div {T} {R : ring_like_op T} a b :=
   match rngl_opt_eucl_div with
-  | Some rngl_eucl_div => rngl_eucl_div a b
+  | Some (rngl_eucl_div, rngl_gauge) => rngl_eucl_div a b
   | None => (rngl_zero, rngl_zero)
   end.
 
@@ -212,7 +218,10 @@ Class ring_like_prop T {ro : ring_like_op T} :=
        to define the norm first *)
     rngl_opt_eucl_div_prop :
       if rngl_has_eucl_div then
-        ∀ a b q r, b ≠ 0%F → rngl_eucl_div a b = (q, r) → a = (b * q + r)%F
+        ∀ a b q r,
+        b ≠ 0%F
+        → rngl_eucl_div a b = (q, r)
+        → a = (b * q + r)%F ∧ rngl_gauge r < rngl_gauge b
       else not_applicable;
     (* when equality is decidable *)
     rngl_opt_eq_dec :

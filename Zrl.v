@@ -16,7 +16,7 @@ Canonical Structure Z_ring_like_op : ring_like_op Z :=
      rngl_opt_opp := Some Z.opp;
      rngl_opt_inv := None;
      rngl_opt_monus := None;
-     rngl_opt_eucl_div := Some Z.div_eucl;
+     rngl_opt_eucl_div := Some (Z.div_eucl, Z.abs_nat);
      rngl_le := Z.le |}.
 
 Existing Instance Z_ring_like_op.
@@ -56,13 +56,38 @@ Qed.
 Theorem Z_eucl_div_prop : ∀ a b q r : Z,
   b ≠ 0%Z
   → rngl_eucl_div a b = (q, r)
-  → a = (b * q + r)%F.
+  → a = (b * q + r)%F ∧ Z.abs_nat r < Z.abs_nat b.
 Proof.
 intros * Hbz Hab.
-unfold rngl_eucl_div in Hab.
 cbn in Hab.
-specialize (Z.div_eucl_eq a b Hbz) as H1.
-now rewrite Hab in H1.
+specialize (Z_div_mod_full a b Hbz) as H1.
+rewrite Hab in H1.
+destruct H1 as (H1, H2).
+split; [ easy | ].
+unfold Remainder in H2.
+destruct H2 as [H2| H2]; [ now apply Zabs_nat_lt | ].
+destruct b as [| b| b]; [ easy | | ]. {
+  destruct H2 as (H2, H3).
+  apply Z.nle_gt in H2.
+  exfalso; apply H2; clear H2.
+  transitivity 0%Z; [ easy | ].
+  apply Zle_0_pos.
+}
+destruct r as [| r| r]. {
+  apply Pos2Nat.is_pos.
+} {
+  destruct H2 as (H2, H3).
+  apply Z.nlt_ge in H3.
+  exfalso; apply H3; clear H3.
+  apply Pos2Z.pos_is_pos.
+}
+cbn.
+destruct H2 as (H2, H3).
+apply Pos2Nat.inj_lt.
+apply Pos.lt_nle.
+intros H.
+apply Pos2Z.neg_le_neg in H.
+now apply Z.nlt_ge in H.
 Qed.
 
 Theorem Z_mul_le_compat_nonneg : ∀ a b c d,
