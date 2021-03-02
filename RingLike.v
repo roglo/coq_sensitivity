@@ -221,7 +221,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
         ∀ a b q r,
         b ≠ 0%F
         → rngl_eucl_div a b = (q, r)
-        → a = (b * q + r)%F ∧ rngl_gauge r < rngl_gauge b
+         → a = (b * q + r)%F ∧ rngl_gauge r < rngl_gauge b
       else not_applicable;
     (* when equality is decidable *)
     rngl_opt_eq_dec :
