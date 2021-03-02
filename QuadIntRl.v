@@ -72,8 +72,10 @@ Canonical Structure quad_int_ring_like_op {d} : ring_like_op (quad_int d) :=
      rngl_opt_eucl_div := Some (qi_eucl_div, qi_gauge);
      rngl_le := phony_qi_le |}.
 
+Notation "'〈' a + b √ 3" := ({| qi_re := a; qi_im := b |}) (at level 1) :
+  QI_scope.
+
 Compute (mk_qi (-1) (- 36) 242 / mk_qi (-1) 50 50)%QI.
-Compute (mk_qi 1 (- 36) 242 / mk_qi 1 50 50)%QI.
 ...
 Compute (mk_qi (-1) 0 1 * mk_qi (-1) 0 1)%QI.
 Compute (1 / mk_qi (-1) 0 1)%QI.
