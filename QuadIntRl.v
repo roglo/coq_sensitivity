@@ -119,3 +119,69 @@ Compute (mk_qi (-1) 1 2 * mk_qi (-1) 1 (-2))%QI.
 Compute (mk_qi (-1) 2 3 * mk_qi (-1) 2 (-3))%QI.
 Compute (mk_qi (-1) 1 2 * mk_qi (-1) 2 3)%QI.
 Compute (mk_qi (-1) 1 2 * mk_qi (-1) 2 (-3))%QI.
+
+Section a.
+
+Context {d : Z}.
+Context (ro := @quad_int_ring_like_op d).
+Existing Instance ro.
+
+Theorem quad_int_add_comm : ∀ a b, (a + b)%F = (b + a)%F.
+Proof.
+intros; cbn.
+unfold "+"%QI.
+now rewrite Z.add_comm, (Z.add_comm (qi_im b)).
+Qed.
+
+Theorem quad_int_add_assoc : ∀ a b c : quad_int d,
+  (a + (b + c))%F = (a + b + c)%F.
+Proof.
+intros; cbn.
+unfold "+"%QI; cbn.
+now do 2 rewrite Z.add_assoc.
+Qed.
+
+Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
+  {| rngl_is_comm := true;
+     rngl_has_dec_eq := true;
+     rngl_has_dec_le := true;
+     rngl_has_1_neq_0 := true;
+     rngl_is_ordered := true;
+     rngl_is_integral := true;
+     rngl_characteristic := 0;
+     rngl_add_comm := quad_int_add_comm;
+     rngl_add_assoc := quad_int_add_assoc |}.
+     rngl_add_0_l := Nat.add_0_l;
+     rngl_mul_assoc := Nat.mul_assoc;
+     rngl_mul_1_l := Nat.mul_1_l;
+     rngl_mul_add_distr_l := Nat.mul_add_distr_l;
+     rngl_opt_1_neq_0 := Nat_neq_1_0;
+     rngl_opt_mul_comm := Nat.mul_comm;
+     rngl_opt_mul_1_r := NA;
+     rngl_opt_mul_add_distr_r := NA;
+     rngl_opt_add_opp_l := NA;
+     rngl_opt_add_sub_add_sub := Nat_add_sub_add_sub;
+     rngl_opt_sub_sub_sub_add := Nat_sub_sub_sub_add;
+     rngl_opt_sub_diag := Nat.sub_diag;
+     rngl_opt_add_cancel_l := Nat_add_reg_l;
+     rngl_opt_sub_0_l := Nat.sub_0_l;
+     rngl_opt_mul_sub_distr_l := Nat_mul_sub_distr_l;
+     rngl_opt_mul_sub_distr_r := NA;
+     rngl_opt_mul_inv_l := NA;
+     rngl_opt_mul_inv_r := NA;
+     rngl_opt_mul_div_l := Nat_mul_div_l;
+     rngl_opt_mul_div_r := NA;
+     rngl_opt_eucl_div_prop := Nat_eucl_div_prop;
+     rngl_opt_eq_dec := Nat.eq_dec;
+     rngl_opt_le_dec := le_dec;
+     rngl_opt_integral := Nat_eq_mul_0;
+     rngl_characteristic_prop := nat_characteristic_prop;
+     rngl_opt_le_refl := Nat.le_refl;
+     rngl_opt_le_antisymm := Nat.le_antisymm;
+     rngl_opt_le_trans := Nat.le_trans;
+     rngl_opt_add_le_compat := Nat.add_le_mono;
+     rngl_opt_mul_le_compat_nonneg := NA;
+     rngl_opt_mul_le_compat_nonpos := NA;
+     rngl_opt_mul_le_compat := Nat_mul_le_compat;
+     rngl_opt_not_le := Nat_not_le;
+     rngl_consistent := Nat_consistent |}.
