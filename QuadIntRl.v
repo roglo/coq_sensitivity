@@ -1,3 +1,17 @@
+(* quadratic integers *)
+(* actually, this implementation is not correct: quadratic integers
+   are supposed to be of the form a+ωb where
+      ω = √d         if d ≡ 2,3 (mod 4)
+      ω = (1+√d)/2   if d ≡ 1 (mod 4)
+   but here I just implemented the case 1 mod 4 as the other cases,
+   all numbers being of the form a+b√d, because I don't understand
+   well why there is this difference, between 1 mod 4 and mod others.
+     Ok, because they are supposed to be solutions of the equation
+   x²+bx+c=0, but 1/ in what this equation is so important 2/ this
+   difference between 1 mod 4 and 2,3 mod 4 is ugly (personal
+   opinion, but it may change)
+*)
+
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
@@ -101,3 +115,7 @@ Compute (1 / 〈 -1 𝑖 〉)%QI.
 Compute (〈 0 √42 〉 / 〈 0 √42 〉 )%QI.
 Check (mk_qi (-1) 3 2).
 Check (mk_qi (-1) 0 2).
+Compute (mk_qi (-1) 1 2 * mk_qi (-1) 1 (-2))%QI.
+Compute (mk_qi (-1) 2 3 * mk_qi (-1) 2 (-3))%QI.
+Compute (mk_qi (-1) 1 2 * mk_qi (-1) 2 3)%QI.
+Compute (mk_qi (-1) 1 2 * mk_qi (-1) 2 (-3))%QI.
