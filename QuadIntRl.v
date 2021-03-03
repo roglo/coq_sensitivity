@@ -196,8 +196,9 @@ Qed.
 
 Theorem quad_int_mul_div_l : ∀ a b : quad_int d, a ≠ 0%F → (a * b / a)%F = b.
 Proof.
-intros * Ha.
-cbn in Ha.
+intros * Haz.
+cbn in Haz.
+unfold "0"%QI in Haz.
 cbn - [ qi_eucl_div ].
 remember (a * b)%QI as ab eqn:Hab.
 move ab before b.
@@ -212,6 +213,20 @@ destruct (lt_dec (qi_gauge r1) (qi_gauge a)) as [H1| H1]. {
   rewrite Hab; cbn.
   destruct a as (a, a'), b as (b, b'); cbn.
   f_equal. {
+    remember ((a * b + d * a' * b') * a + d * (a * b' + a' * b) * - a')
+      as x eqn:Hx.
+    ring_simplify in Hx; subst x.
+    remember (a * a + d * a' * - a') as x eqn:Hx.
+    ring_simplify in Hx; subst x.
+    rewrite Z.mul_comm.
+    rewrite <- Z.mul_assoc.
+    rewrite <- Z.mul_sub_distr_l.
+    apply Z.div_mul.
+    cbn in Haz.
+    intros H; apply Haz; clear Haz.
+    apply -> Z.sub_move_0_r in H.
+    f_equal. {
+(* an hypothesis, such that d is not a perfect square, is required here *)
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
