@@ -228,6 +228,8 @@ destruct (lt_dec (qi_gauge r1) (qi_gauge a)) as [H1| H1]. {
     f_equal. {
 (* an hypothesis, such that d is not a perfect square, is required here *)
 Check Z.gauss.
+(* but perhaps a*b/a=b should be just proved in the theory, if I add the
+   "good" property for the stathm (gauge)? *)
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
