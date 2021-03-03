@@ -227,6 +227,7 @@ destruct (lt_dec (qi_gauge r1) (qi_gauge a)) as [H1| H1]. {
     apply -> Z.sub_move_0_r in H.
     f_equal. {
 (* an hypothesis, such that d is not a perfect square, is required here *)
+Check Z.gauss.
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
