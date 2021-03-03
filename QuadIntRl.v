@@ -38,6 +38,10 @@ Definition qi_conj d (α : quad_int d) := mk_qi d (qi_re α) (- qi_im α).
 
 Declare Scope QI_scope.
 Delimit Scope QI_scope with QI.
+
+Arguments qi_re [d]%Z q%QI.
+Arguments qi_im [d]%Z q%QI.
+
 Notation "0" := qi_zero : QI_scope.
 Notation "1" := qi_one : QI_scope.
 Notation "- α" := (qi_opp α) : QI_scope.
@@ -141,6 +145,75 @@ unfold "+"%QI; cbn.
 now do 2 rewrite Z.add_assoc.
 Qed.
 
+Theorem quad_int_add_0_l : ∀ a : quad_int d, (0 + a)%F = a.
+Proof.
+intros; cbn.
+unfold "+"%QI; cbn.
+now destruct a.
+Qed.
+
+Theorem quad_int_mul_assoc : ∀ a b c : quad_int d,
+  (a * (b * c))%F = (a * b * c)%F.
+Proof.
+intros; cbn.
+unfold "*"%QI; cbn.
+f_equal; ring.
+Qed.
+
+Theorem quad_int_mul_1_l : ∀ a : quad_int d, (1 * a)%F = a.
+Proof.
+intros; cbn.
+unfold "*"%QI.
+destruct a as (a, a'); cbn.
+rewrite Z.mul_0_r, Z.mul_0_l, Z.add_0_r.
+now destruct a, a'.
+Qed.
+
+Theorem quad_int_mul_add_distr_l : ∀ a b c : quad_int d,
+  (a * (b + c))%F = (a * b + a * c)%F.
+Proof.
+intros; cbn.
+unfold "*"%QI, "+"%QI; cbn.
+f_equal; ring.
+Qed.
+
+Theorem quad_int_neq_1_0 : 1%F ≠ 0%F.
+Proof. easy. Qed.
+
+Theorem quad_int_mul_comm : ∀ a b : quad_int d, (a * b)%F = (b * a)%F.
+Proof.
+intros; cbn.
+unfold "*"%QI; cbn.
+f_equal; ring.
+Qed.
+
+Theorem quad_int_add_opp_l : ∀ a : quad_int d, (- a + a)%F = 0%F.
+Proof.
+intros; cbn.
+unfold qi_opp, "+"%QI, "0"%QI; cbn.
+f_equal; ring.
+Qed.
+
+Theorem quad_int_mul_div_l : ∀ a b : quad_int d, a ≠ 0%F → (a * b / a)%F = b.
+Proof.
+intros * Ha.
+cbn in Ha.
+cbn - [ qi_eucl_div ].
+remember (a * b)%QI as ab eqn:Hab.
+move ab before b.
+cbn - [ qi_conj qi_mul ].
+remember (qi_re (a * qi_conj a)) as den eqn:Hden.
+remember (qi_re (ab * qi_conj a) / den) as γ eqn:Hγ.
+remember (qi_im (ab * qi_conj a) / den) as γ' eqn:Hγ'.
+move γ before den; move γ' before γ.
+remember (ab - a * 〈 γ + γ' √d 〉)%QI as r1 eqn:Hr1.
+destruct (lt_dec (qi_gauge r1) (qi_gauge a)) as [H1| H1]. {
+  rewrite Hγ, Hγ', Hden; cbn.
+  rewrite Hab; cbn.
+  destruct a as (a, a'), b as (b, b'); cbn.
+  f_equal. {
+...
+
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
   {| rngl_is_comm := true;
      rngl_has_dec_eq := true;
@@ -150,27 +223,27 @@ Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
      rngl_is_integral := true;
      rngl_characteristic := 0;
      rngl_add_comm := quad_int_add_comm;
-     rngl_add_assoc := quad_int_add_assoc |}.
-     rngl_add_0_l := Nat.add_0_l;
-     rngl_mul_assoc := Nat.mul_assoc;
-     rngl_mul_1_l := Nat.mul_1_l;
-     rngl_mul_add_distr_l := Nat.mul_add_distr_l;
-     rngl_opt_1_neq_0 := Nat_neq_1_0;
-     rngl_opt_mul_comm := Nat.mul_comm;
+     rngl_add_assoc := quad_int_add_assoc;
+     rngl_add_0_l := quad_int_add_0_l;
+     rngl_mul_assoc := quad_int_mul_assoc;
+     rngl_mul_1_l := quad_int_mul_1_l;
+     rngl_mul_add_distr_l := quad_int_mul_add_distr_l;
+     rngl_opt_1_neq_0 := quad_int_neq_1_0;
+     rngl_opt_mul_comm := quad_int_mul_comm;
      rngl_opt_mul_1_r := NA;
      rngl_opt_mul_add_distr_r := NA;
-     rngl_opt_add_opp_l := NA;
-     rngl_opt_add_sub_add_sub := Nat_add_sub_add_sub;
-     rngl_opt_sub_sub_sub_add := Nat_sub_sub_sub_add;
-     rngl_opt_sub_diag := Nat.sub_diag;
-     rngl_opt_add_cancel_l := Nat_add_reg_l;
-     rngl_opt_sub_0_l := Nat.sub_0_l;
-     rngl_opt_mul_sub_distr_l := Nat_mul_sub_distr_l;
+     rngl_opt_add_opp_l := quad_int_add_opp_l;
+     rngl_opt_add_sub_add_sub := NA;
+     rngl_opt_sub_sub_sub_add := NA;
+     rngl_opt_sub_diag := NA;
+     rngl_opt_add_cancel_l := NA;
+     rngl_opt_sub_0_l := NA;
+     rngl_opt_mul_sub_distr_l := NA;
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := NA;
      rngl_opt_mul_inv_r := NA;
-     rngl_opt_mul_div_l := Nat_mul_div_l;
-     rngl_opt_mul_div_r := NA;
+     rngl_opt_mul_div_l := quad_int_mul_div_l |}.
+     rngl_opt_mul_div_r := NA |}.
      rngl_opt_eucl_div_prop := Nat_eucl_div_prop;
      rngl_opt_eq_dec := Nat.eq_dec;
      rngl_opt_le_dec := le_dec;
