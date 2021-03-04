@@ -17,6 +17,9 @@
 \pgfdeclareimage[interpolate=true,height=1.44cm]{ordo23}{images/ordo23}
 \pgfdeclareimage[interpolate=true,height=2cm]{ordo3coro}{images/ordo3coro}
 
+\def\dotminus{\mathbin{\ooalign{\hss\raise1ex\hbox{.}\hss\cr
+  \mathsurround=0pt$-$}}}
+
 \begin{document}
 
 \title[Irif - Inria]
@@ -50,7 +53,7 @@
   \end{itemize}}
 }
 
-\frm{Record 1 - Operations}{
+\frm{Theory - part 1 - Operations}{
 
   {\footnotesize
     \only<1-2>{Record}\only<3->{Class} ring\_like\_op T := \\
@@ -92,7 +95,7 @@
 
 }
 
-\frm{Record 2 - properties}{
+\frm{Theory - part 2 - properties}{
 
   \begin{tabular}{ll}
   opt\_opp : option (T $\rightarrow$ T); &
@@ -117,7 +120,7 @@
 
 }
 
-\frm{Instanciation \& Application}{
+\frm{Optional properties}{
 
   \begin{center}
     \begin{tabular}{l}
@@ -170,7 +173,7 @@
 
 }
 
-\frm{Instanciation \& Application - 2}{
+\frm{Optional property - 2}{
 
   \begin{center}
     \begin{tabular}{ll}
@@ -198,14 +201,68 @@
 
   \hspace{1mm}
   \begin{tabular}{l}
-    x + y = x + z $\implies$ y = z \\
-    \only<2->{\\ x + y = x + z \\}
-    \only<3->{- x + (x + y) = - x + (x + z)
+    a + b = a + c $\implies$ b = c \\
+    \only<2->{\\ a + b = a + c \\}
+    \only<3->{- a + (a + b) = - a + (a + c)
       \only<7->{ $\leftarrow$ opposite exists!}\\}
-    \only<4->{(- x + x) + y = (- x + x) + z \\}
-    \only<5->{0 + y = 0 + z \\}
-    \only<6->{y = z \\}
+    \only<4->{(- a + a) + b = (- a + a) + c \\}
+    \only<5->{0 + b = 0 + c \\}
+    \only<6->{b = c \\}
   \end{tabular}
+
+  \vsp
+
+  \only<8>{
+    Not provable on semi-rings algebra ($\mathbb{N}$)
+    \begin{itemize}
+    \item using induction?
+    \item using subtraction?
+    \end{itemize}
+  }
+}
+
+\frm{Subtraction: Monus}{
+
+  \hspace{1mm}
+  \begin{tabular}{ll}
+    $\forall$ a b & a + (b $\dotminus$ a) = b + (a $\dotminus$ b) \\
+    $\forall$ a b c &
+    (a $\dotminus$ b) $\dotminus$ c = a $\dotminus$ (b + c) \\
+    $\forall$ a & a $\dotminus$ a = 0 \\
+    $\forall$ a & 0 $\dotminus$ a = 0
+  \end{tabular}
+
+  \only<2->{
+    \vsp
+    but...
+  }
+
+  \only<3->{
+    \vsp
+    \hspace{1mm}
+    \begin{tabular}{ll}
+      $\forall$ a b c & a + b = a + c $\implies$ b = c \\
+    \end{tabular}
+
+    \hspace{5mm}
+    cannot be proven anyway
+  }
+
+  \only<4->{
+    \vsp
+    \hspace{1mm}
+    \begin{tabular}{l}
+      I had to add it, as a separate property!
+    \end{tabular}
+  }
+
+  \only<5->{
+    \vsp
+    \hspace{1mm}
+    \begin{tabular}{ll}
+      $\forall$ a b & a + b - b = a \\
+    \end{tabular}
+  }
 
 }
 

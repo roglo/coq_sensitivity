@@ -185,11 +185,11 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       else ∀ a b c, ((a - b) - c = a - (b + c))%F;
     rngl_opt_sub_diag :
       if rngl_has_opp then not_applicable else ∀ a, (a - a = 0)%F;
+    rngl_opt_sub_0_l :
+      if rngl_has_opp then not_applicable else ∀ a, (0 - a = 0)%F;
     rngl_opt_add_cancel_l :
       if rngl_has_opp then not_applicable
       else ∀ a b c, (a + b = a + c)%F → (b = c)%F;
-    rngl_opt_sub_0_l :
-      if rngl_has_opp then not_applicable else ∀ a, (0 - a = 0)%F;
     rngl_opt_mul_sub_distr_l :
       if rngl_has_opp then not_applicable
       else ∀ a b c : T, (a * (b - c) = a * b - a * c)%F;

@@ -194,44 +194,6 @@ unfold qi_opp, "+"%QI, "0"%QI; cbn.
 f_equal; ring.
 Qed.
 
-Theorem quad_int_mul_div_l : ∀ a b : quad_int d, a ≠ 0%F → (a * b / a)%F = b.
-Proof.
-intros * Haz.
-cbn in Haz.
-unfold "0"%QI in Haz.
-cbn - [ qi_eucl_div ].
-remember (a * b)%QI as ab eqn:Hab.
-move ab before b.
-cbn - [ qi_conj qi_mul ].
-remember (qi_re (a * qi_conj a)) as den eqn:Hden.
-remember (qi_re (ab * qi_conj a) / den) as γ eqn:Hγ.
-remember (qi_im (ab * qi_conj a) / den) as γ' eqn:Hγ'.
-move γ before den; move γ' before γ.
-remember (ab - a * 〈 γ + γ' √d 〉)%QI as r1 eqn:Hr1.
-destruct (lt_dec (qi_gauge r1) (qi_gauge a)) as [H1| H1]. {
-  rewrite Hγ, Hγ', Hden; cbn.
-  rewrite Hab; cbn.
-  destruct a as (a, a'), b as (b, b'); cbn.
-  f_equal. {
-    remember ((a * b + d * a' * b') * a + d * (a * b' + a' * b) * - a')
-      as x eqn:Hx.
-    ring_simplify in Hx; subst x.
-    remember (a * a + d * a' * - a') as x eqn:Hx.
-    ring_simplify in Hx; subst x.
-    rewrite Z.mul_comm.
-    rewrite <- Z.mul_assoc.
-    rewrite <- Z.mul_sub_distr_l.
-    apply Z.div_mul.
-    cbn in Haz.
-    intros H; apply Haz; clear Haz.
-    apply -> Z.sub_move_0_r in H.
-    f_equal. {
-(* an hypothesis, such that d is not a perfect square, is required here *)
-Check Z.gauss.
-(* but perhaps a*b/a=b should be just proved in the theory, if I add the
-   "good" property for the stathm (gauge)? *)
-...
-
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
   {| rngl_is_comm := true;
      rngl_has_dec_eq := true;
@@ -259,9 +221,7 @@ Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
      rngl_opt_mul_sub_distr_l := NA;
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := NA;
-     rngl_opt_mul_inv_r := NA;
-     rngl_opt_mul_div_l := quad_int_mul_div_l |}.
-     rngl_opt_mul_div_r := NA |}.
+     rngl_opt_mul_inv_r := NA |}.
      rngl_opt_eucl_div_prop := Nat_eucl_div_prop;
      rngl_opt_eq_dec := Nat.eq_dec;
      rngl_opt_le_dec := le_dec;
