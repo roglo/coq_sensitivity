@@ -97,6 +97,10 @@ Theorem Z_gauge_prop : ∀ a b : Z,
 Proof.
 intros * Haz Hbz; cbn.
 split. {
+  unfold Z.abs_nat.
+  destruct a as [| a| a]; [ apply Nat.le_0_l | | ].
+Search (Z.abs_nat _ ≤ _).
+  split. {
 ...
 
 Theorem Z_mul_le_compat_nonneg : ∀ a b c d,
