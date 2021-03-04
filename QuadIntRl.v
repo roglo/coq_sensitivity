@@ -224,13 +224,46 @@ set (γ' := qi_im (a * qi_conj b) / den) in Hab.
 destruct (lt_dec (qi_gauge (a - b * 〈 γ + γ' √d 〉)%QI) (qi_gauge b))
   as [H1| H1]. {
   injection Hab; clear Hab; intros Hr Hq.
-  subst r.
-  rewrite Hq.
-  split. {
-    rewrite quad_int_add_sub_assoc.
-    rewrite quad_int_add_comm.
-    symmetry; apply quad_int_add_sub.
-  } {
+  subst r q.
+  split; [ | easy ].
+  rewrite quad_int_add_sub_assoc.
+  rewrite quad_int_add_comm.
+  symmetry; apply quad_int_add_sub.
+}
+destruct (lt_dec (qi_gauge (a - b * 〈 (γ + 1) + γ' √d 〉)%QI) (qi_gauge b))
+  as [H2| H2]. {
+  injection Hab; clear Hab; intros Hr Hq.
+  subst r q.
+  split; [ | easy ].
+  rewrite quad_int_add_sub_assoc.
+  rewrite quad_int_add_comm.
+  symmetry; apply quad_int_add_sub.
+}
+destruct (lt_dec (qi_gauge (a - b * 〈 γ + (γ' + 1) √d 〉)%QI) (qi_gauge b))
+  as [H3| H3]. {
+  injection Hab; clear Hab; intros Hr Hq.
+  subst r q.
+  split; [ | easy ].
+  rewrite quad_int_add_sub_assoc.
+  rewrite quad_int_add_comm.
+  symmetry; apply quad_int_add_sub.
+}
+destruct (lt_dec (qi_gauge (a - b * 〈 (γ + 1) + (γ' + 1) √d 〉)%QI) (qi_gauge b))
+  as [H4| H4]. {
+  injection Hab; clear Hab; intros Hr Hq.
+  subst r q.
+  split; [ | easy ].
+  rewrite quad_int_add_sub_assoc.
+  rewrite quad_int_add_comm.
+  symmetry; apply quad_int_add_sub.
+}
+injection Hab; clear Hab; intros Hr Hq.
+subst r q.
+split. {
+  rewrite quad_int_add_sub_assoc.
+  rewrite quad_int_add_comm.
+  symmetry; apply quad_int_add_sub.
+}
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
