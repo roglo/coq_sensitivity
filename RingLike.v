@@ -841,74 +841,28 @@ destruct Hii as [Hii| Hii]. {
   rewrite rngl_mul_inv_l in H2; [ | easy | easy ].
   now do 2 rewrite rngl_mul_1_l in H2.
 } {
-  assert (H3 : (a * b / a = a * c / a)%F) by now rewrite Hbc.
+  assert (H : (a * b / a = a * c / a)%F) by now rewrite Hbc.
   specialize (rngl_mul_div_l (or_intror Hii)) as H1.
-  rewrite rngl_mul_comm in H3; [ | easy ].
-  rewrite H1 in H3; [ | easy ].
-  rewrite rngl_mul_comm in H3; [ | easy ].
-  now rewrite H1 in H3.
+  rewrite rngl_mul_comm in H; [ | easy ].
+  rewrite H1 in H; [ | easy ].
+  rewrite rngl_mul_comm in H; [ | easy ].
+  now rewrite H1 in H.
 }
 Qed.
 
 Theorem rngl_mul_cancel_r :
-  rngl_has_inv = true ∨ rngl_has_eucl_div = true →
+  rngl_has_inv = true ∨
+    rngl_has_eucl_div = true ∧ rngl_is_comm = true ∧ rngl_has_opp = true ∧
+    rngl_has_dec_eq = true →
   ∀ a b c, c ≠ 0%F
   → (a * c = b * c)%F
   → a = b.
 Proof.
 intros Hii * Hcz Hab.
-remember rngl_has_inv as iv eqn:Hiv; symmetry in Hiv.
-destruct iv. {
-  specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
-  remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
-  assert (H : (a * c / c = b * c / c)%F) by now rewrite Hab.
-  unfold rngl_div in H, rngl_mul_inv_r.
-  rewrite Hiv in H.
-  do 2 rewrite <- rngl_mul_assoc in H.
-  destruct ic. {
-    rewrite (rngl_mul_comm Hic c) in H.
-    rewrite rngl_mul_inv_l in H; [ | easy | easy ].
-    now do 2 rewrite rngl_mul_1_r in H.
-  } {
-    rewrite Hiv in rngl_mul_inv_r.
-    rewrite rngl_mul_inv_r in H; [ | easy ].
-    now do 2 rewrite rngl_mul_1_r in H.
-  }
-} {
-...
-intros Hii * Hcz Hab.
-specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
-specialize rngl_opt_mul_div_r as rngl_mul_div_r.
-specialize rngl_opt_mul_div_l as rngl_mul_div_l.
-remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
 assert (H : (a * c / c = b * c / c)%F) by now rewrite Hab.
-unfold rngl_div in H, rngl_mul_inv_r.
-do 2 rewrite <- rngl_mul_assoc in H.
-unfold rngl_div in rngl_mul_div_l.
-unfold rngl_div in rngl_mul_div_r.
-remember rngl_has_inv as iv eqn:Hiv; symmetry in Hiv.
-destruct iv. {
-  destruct ic. {
-    rewrite (rngl_mul_comm Hic c) in H.
-    rewrite rngl_mul_inv_l in H; [ | easy | easy ].
-    now do 2 rewrite rngl_mul_1_r in H.
-  } {
-    rewrite rngl_mul_inv_r in H; [ | easy ].
-    now do 2 rewrite rngl_mul_1_r in H.
-  }
-} {
-  destruct Hii as [Hii'| Hii']; [ easy | ].
-  rewrite Hii' in rngl_mul_div_l, rngl_mul_div_r, H.
-  destruct ic. {
-    rewrite (rngl_mul_comm Hic a) in H.
-    rewrite (rngl_mul_comm Hic b) in H.
-    rewrite rngl_mul_div_l in H; [ | easy ].
-    now rewrite rngl_mul_div_l in H.
-  } {
-    rewrite rngl_mul_div_r in H; [ | easy ].
-    now rewrite rngl_mul_div_r in H.
-  }
-}
+rewrite rngl_mul_div_l in H; [ | easy | easy ].
+rewrite rngl_mul_div_l in H; [ | easy | easy ].
+easy.
 Qed.
 
 Theorem rngl_div_compat_l :
@@ -1040,6 +994,7 @@ Theorem rngl_div_1_r :
   ∀ a, (a / 1 = a)%F.
 Proof.
 intros Hid H10 *.
+...
 specialize rngl_opt_mul_div_l as rngl_mul_div_l.
 destruct Hid as [Hid| Hid]. {
   unfold rngl_div; rewrite Hid.
