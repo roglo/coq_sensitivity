@@ -210,6 +210,21 @@ destruct a as (a, a'); cbn.
 f_equal; ring.
 Qed.
 
+Theorem quad_int_mul_0_r : ∀ a : quad_int d, (a * 0 = 0)%QI.
+Proof.
+intros.
+unfold "*"%QI, "0"%QI; cbn.
+f_equal; ring.
+Qed.
+
+Theorem quad_int_sub_0_r : ∀ a : quad_int d, (a - 0 = a)%QI.
+Proof.
+intros.
+unfold qi_sub, "+"%QI, qi_opp; cbn.
+do 2 rewrite Z.add_0_r.
+now destruct a.
+Qed.
+
 Theorem quad_int_eucl_div : ∀ a b q r : quad_int d,
   b ≠ 0%F
   → rngl_eucl_div a b = (q, r)
@@ -264,6 +279,8 @@ split. {
   rewrite quad_int_add_comm.
   symmetry; apply quad_int_add_sub.
 }
+rewrite quad_int_mul_0_r.
+rewrite quad_int_sub_0_r.
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
