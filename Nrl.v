@@ -78,6 +78,25 @@ split; [ now apply Nat.div_mod | ].
 now apply Nat.mod_upper_bound.
 Qed.
 
+Theorem Nat_rngl_gauge_prop : ∀ a b : nat,
+  a ≠ 0%F
+  → b ≠ 0%F
+  → rngl_gauge a ≤ rngl_gauge (a * b)%F ∧ rngl_gauge b ≤ rngl_gauge (a * b)%F.
+Proof.
+intros * Haz Hbz.
+cbn; unfold id.
+cbn in Haz, Hbz.
+split. {
+  remember (a * b) as x.
+  rewrite <- (Nat.mul_1_r a); subst x.
+  apply Nat.mul_le_mono_l; flia Hbz.
+} {
+  remember (a * b) as x.
+  rewrite <- (Nat.mul_1_l b); subst x.
+  apply Nat.mul_le_mono_r; flia Haz.
+}
+Qed.
+
 Theorem Nat_add_sub_add_sub : ∀ a b : nat, (a + (b - a)) = (b + (a - b)).
 Proof.
 intros.
@@ -141,9 +160,8 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := NA;
      rngl_opt_mul_inv_r := NA;
-     rngl_opt_mul_div_l := Nat_mul_div_l;
-     rngl_opt_mul_div_r := NA;
      rngl_opt_eucl_div_prop := Nat_eucl_div_prop;
+     rngl_opt_gauge_prop := Nat_rngl_gauge_prop;
      rngl_opt_eq_dec := Nat.eq_dec;
      rngl_opt_le_dec := le_dec;
      rngl_opt_integral := Nat_eq_mul_0;
@@ -519,9 +537,8 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := Zn_opt_mul_inv_l;
      rngl_opt_mul_inv_r := Zn_opt_mul_inv_r;
-     rngl_opt_mul_div_l := NA;
-     rngl_opt_mul_div_r := NA;
      rngl_opt_eucl_div_prop := NA;
+     rngl_opt_gauge_prop := NA;
      rngl_opt_eq_dec := Zn_eq_dec;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;
