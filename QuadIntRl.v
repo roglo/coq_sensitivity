@@ -194,6 +194,24 @@ unfold qi_opp, "+"%QI, "0"%QI; cbn.
 f_equal; ring.
 Qed.
 
+Theorem quad_int_eucl_div : ∀ a b q r : quad_int d,
+  b ≠ 0%F
+  → rngl_eucl_div a b = (q, r)
+  → a = (b * q + r)%F ∧ (rngl_gauge r < rngl_gauge b)%nat.
+Proof.
+intros * Hbz Hab.
+cbn in Hab |-*.
+unfold qi_eucl_div in Hab.
+set (den := qi_re (b * qi_conj b)) in Hab.
+set (γ := qi_re (a * qi_conj b) / den) in Hab.
+set (γ' := qi_im (a * qi_conj b) / den) in Hab.
+destruct (lt_dec (qi_gauge (a - b * 〈 γ + γ' √d 〉)%QI) (qi_gauge b))
+  as [H1| H1]. {
+  injection Hab; clear Hab; intros Hr Hq.
+  subst r.
+  rewrite Hq.
+...
+
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
   {| rngl_is_comm := true;
      rngl_has_dec_eq := true;
@@ -221,8 +239,9 @@ Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
      rngl_opt_mul_sub_distr_l := NA;
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := NA;
-     rngl_opt_mul_inv_r := NA |}.
-     rngl_opt_eucl_div_prop := Nat_eucl_div_prop;
+     rngl_opt_mul_inv_r := NA;
+     rngl_opt_eucl_div_prop := quad_int_eucl_div |}.
+     rngl_opt_gauge_prop := ?rngl_opt_gauge_prop;
      rngl_opt_eq_dec := Nat.eq_dec;
      rngl_opt_le_dec := le_dec;
      rngl_opt_integral := Nat_eq_mul_0;
