@@ -291,8 +291,10 @@ apply Nat.nlt_ge in H3.
 apply Nat.nlt_ge in H4.
 Print qi_gauge.
 (* it is supposed to depend on d; there is a solution only for d =
-     –11, –7, –3, –2, –1, 2, 3, 5, 6, 7, 11, 13, 17, 19, 21,
-     29, 33, 37, 41, 57, 73 *)
+       –11, –7, –3, –2, –1, 2, 3, 5, 6, 7, 11, 13, 17, 19, 21,
+       29, 33, 37, 41, 57, 73
+   and it is not even true because my definition of quadratic
+   integers is wrong for d ≡ 1 mod 4 *)
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
