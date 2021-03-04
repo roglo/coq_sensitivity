@@ -811,7 +811,7 @@ Proof.
 intros Hic Hro Hed Hin * Hvr Hav.
 specialize (lemma_2_A_n_2_eq_n_I Hro n) as Ha.
 (* μ * μ = rngl_of_nat n *)
-apply vect_mul_scal_reg_r with (V0 := V); [ easy | now left | congruence | ].
+apply vect_mul_scal_reg_r with (V0 := V); [ now left | easy | easy | ].
 (* (μ * μ) × V = rngl_of_nat n × V *)
 rewrite <- vect_mul_scal_l_mul_assoc; [ | easy ].
 (* μ × (μ × V) = rngl_of_nat n × V *)
