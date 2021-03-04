@@ -272,6 +272,7 @@ destruct (lt_dec (qi_gauge (a - b * 〈 (γ + 1) + (γ' + 1) √d 〉)%QI) (qi_g
   rewrite quad_int_add_comm.
   symmetry; apply quad_int_add_sub.
 }
+(**)
 injection Hab; clear Hab; intros Hr Hq.
 subst r q.
 split. {
@@ -281,6 +282,14 @@ split. {
 }
 rewrite quad_int_mul_0_r.
 rewrite quad_int_sub_0_r.
+(*
+exfalso; clear q r Hab.
+*)
+apply Nat.nlt_ge in H1.
+apply Nat.nlt_ge in H2.
+apply Nat.nlt_ge in H3.
+apply Nat.nlt_ge in H4.
+Print qi_gauge.
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
