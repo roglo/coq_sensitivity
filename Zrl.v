@@ -90,6 +90,15 @@ apply Pos2Z.neg_le_neg in H.
 now apply Z.nlt_ge in H.
 Qed.
 
+Theorem Z_gauge_prop : ∀ a b : Z,
+  a ≠ 0%F
+  → b ≠ 0%F
+  → rngl_gauge a ≤ rngl_gauge (a * b)%F ∧ rngl_gauge b ≤ rngl_gauge (a * b)%F.
+Proof.
+intros * Haz Hbz; cbn.
+split. {
+...
+
 Theorem Z_mul_le_compat_nonneg : ∀ a b c d,
   (0 ≤ a ≤ c → 0 ≤ b ≤ d → a * b ≤ c * d)%Z.
 Proof.
@@ -146,9 +155,8 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := NA;
      rngl_opt_mul_inv_r := NA;
-     rngl_opt_mul_div_l := Z_mul_div_l;
-     rngl_opt_mul_div_r := NA;
      rngl_opt_eucl_div_prop := Z_eucl_div_prop;
+     rngl_opt_gauge_prop := Z_gauge_prop;
      rngl_opt_eq_dec := Z.eq_dec;
      rngl_opt_le_dec := Z_le_dec;
      rngl_opt_integral := Z_eq_mul_0;
