@@ -130,7 +130,7 @@ Context {d : Z}.
 Context (ro := @quad_int_ring_like_op d).
 Existing Instance ro.
 
-Theorem quad_int_add_comm : ∀ a b, (a + b)%F = (b + a)%F.
+Theorem quad_int_add_comm : ∀ a b : quad_int d, (a + b)%QI = (b + a)%QI.
 Proof.
 intros; cbn.
 unfold "+"%QI.
@@ -194,6 +194,22 @@ unfold qi_opp, "+"%QI, "0"%QI; cbn.
 f_equal; ring.
 Qed.
 
+Theorem quad_int_add_sub_assoc: ∀ a b c : quad_int d,
+  (a + (b - c))%QI = (a + b - c)%QI.
+Proof.
+intros.
+unfold qi_sub, qi_opp, qi_add; cbn.
+f_equal; ring.
+Qed.
+
+Theorem quad_int_add_sub : ∀ a b : quad_int d, (a + b - b = a)%QI.
+Proof.
+intros.
+unfold qi_sub, qi_opp, qi_add; cbn.
+destruct a as (a, a'); cbn.
+f_equal; ring.
+Qed.
+
 Theorem quad_int_eucl_div : ∀ a b q r : quad_int d,
   b ≠ 0%F
   → rngl_eucl_div a b = (q, r)
@@ -210,6 +226,11 @@ destruct (lt_dec (qi_gauge (a - b * 〈 γ + γ' √d 〉)%QI) (qi_gauge b))
   injection Hab; clear Hab; intros Hr Hq.
   subst r.
   rewrite Hq.
+  split. {
+    rewrite quad_int_add_sub_assoc.
+    rewrite quad_int_add_comm.
+    symmetry; apply quad_int_add_sub.
+  } {
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
