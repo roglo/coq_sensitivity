@@ -818,6 +818,14 @@ destruct iv. {
 }
 Qed.
 
+(*
+Theorem glop :
+  rngl_has_eucl_div = true → rngl_is_integral = true.
+Proof.
+intros Hed.
+...
+*)
+
 Theorem rngl_mul_cancel_l :
   rngl_has_inv = true ∨ rngl_has_eucl_div = true →
   ∀ a b c, a ≠ 0%F
@@ -825,7 +833,25 @@ Theorem rngl_mul_cancel_l :
   → b = c.
 Proof.
 intros Hii * Haz Hbc.
-specialize rngl_mul_div_l as H1.
+assert (H2 : (¹/ a * (a * b) = ¹/ a * (a * c))%F) by now rewrite Hbc.
+assert (H3 : (a * b / a = a * c / a)%F) by now rewrite Hbc.
+destruct Hii as [Hii| Hii]. {
+  do 2 rewrite rngl_mul_assoc in H2.
+  rewrite rngl_mul_inv_l in H2; [ | easy | easy ].
+  now do 2 rewrite rngl_mul_1_l in H2.
+} {
+  specialize rngl_mul_div_l as H1.
+...
+  specialize (H1 (or_introl Hii)).
+  rewrite H1 in H2; [ | easy | easy ].
+  now do 2 rewrite rngl_mul_1_l in H1.
+...
+  rewrite Hii in H1; cbn in H1.
+
+  do 2 rewrite rngl_mul_assoc in H1.
+  rewrite rngl_mul_inv_l in H1; [ | easy | easy ].
+  now do 2 rewrite rngl_mul_1_l in H1.
+remember rngl_has_inv as iv eqn:Hiv; symmetry in Hiv.
 ...
 intros Hii * Haz Hbc.
 specialize rngl_opt_mul_div_l as rngl_mul_div_l.
