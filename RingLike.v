@@ -204,17 +204,6 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if (rngl_has_inv && negb rngl_is_comm)%bool then
         ∀ a : T, a ≠ 0%F → (a / a = 1)%F
       else not_applicable;
-(*
-    (* when has no inverse but division *)
-    rngl_opt_mul_div_l :
-      if rngl_has_eucl_div then
-        ∀ a b : T, a ≠ 0%F → (a * b / a = b)%F
-      else not_applicable;
-    rngl_opt_mul_div_r :
-      if (rngl_has_eucl_div && negb rngl_is_comm)%bool then
-        ∀ a b : T, b ≠ 0%F → (a * b / b = a)%F
-      else not_applicable;
-*)
     (* property of the euclidean division *)
     rngl_opt_eucl_div_prop :
       if rngl_has_eucl_div then
