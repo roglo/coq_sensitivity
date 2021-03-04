@@ -1266,34 +1266,16 @@ apply rngl_mul_1_r.
 Qed.
 
 Theorem rngl_div_0_l :
-  rngl_has_inv = true ∨ rngl_has_eucl_div = true →
+  rngl_has_inv = true ∨
+    rngl_has_eucl_div = true ∧ rngl_is_comm = true ∧ rngl_has_opp = true ∧
+    rngl_has_dec_eq = true →
   ∀ a, a ≠ 0%F → (0 / a)%F = 0%F.
 Proof.
 intros Hiv * Haz.
-...
-intros Hiv * Haz.
-specialize rngl_opt_mul_div_l as rngl_mul_div_l.
-specialize rngl_opt_mul_div_r as rngl_mul_div_r.
-remember rngl_has_inv as hi eqn:Hin; symmetry in Hin.
-remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
-destruct hi. {
-  unfold rngl_div.
-  now rewrite Hin, rngl_mul_0_l.
-} {
-  remember (0 / a)%F as x eqn:Hx.
-  replace 0%F with (0 * a)%F in Hx; [ | apply rngl_mul_0_l ].
-  subst x.
-  destruct Hiv as [Hiv| Hiv]; [ easy | ].
-  rewrite Hiv in rngl_mul_div_l, rngl_mul_div_r.
-  cbn in rngl_mul_div_r.
-  destruct ic. {
-    rewrite rngl_mul_comm; [ | easy ].
-    now apply rngl_mul_div_l.
-  } {
-    cbn in rngl_mul_div_r.
-    now apply rngl_mul_div_r.
-  }
-}
+remember (0 / a)%F as x eqn:Hx.
+replace 0%F with (0 * a)%F in Hx; [ | apply rngl_mul_0_l ].
+subst x.
+now apply rngl_mul_div_l.
 Qed.
 
 Theorem eq_rngl_div_1 :
@@ -1302,6 +1284,7 @@ Theorem eq_rngl_div_1 :
 Proof.
 intros Hiv * Hbz Hab.
 subst a.
+...
 now apply rngl_mul_inv_r.
 Qed.
 
