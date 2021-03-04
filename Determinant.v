@@ -1278,6 +1278,7 @@ Theorem determinant_alternating_permut_fun :
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hp.
 remember (transp_list_of_permut_fun n σ) as trl eqn:Htrl.
+Print mat_permut_rows_fun.
 Search transp_list_of_permut_fun.
 Print transp_list_of_permut_fun.
 Print tlopf_loop.
