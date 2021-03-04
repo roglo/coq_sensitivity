@@ -827,47 +827,26 @@ intros Hed.
 *)
 
 Theorem rngl_mul_cancel_l :
-  rngl_has_inv = true ∨ rngl_has_eucl_div = true →
+  rngl_has_inv = true ∨
+    rngl_has_eucl_div = true ∧ rngl_is_comm = true ∧ rngl_has_opp = true ∧
+    rngl_has_dec_eq = true →
   ∀ a b c, a ≠ 0%F
   → (a * b = a * c)%F
   → b = c.
 Proof.
 intros Hii * Haz Hbc.
-assert (H2 : (¹/ a * (a * b) = ¹/ a * (a * c))%F) by now rewrite Hbc.
-assert (H3 : (a * b / a = a * c / a)%F) by now rewrite Hbc.
 destruct Hii as [Hii| Hii]. {
+  assert (H2 : (¹/ a * (a * b) = ¹/ a * (a * c))%F) by now rewrite Hbc.
   do 2 rewrite rngl_mul_assoc in H2.
   rewrite rngl_mul_inv_l in H2; [ | easy | easy ].
   now do 2 rewrite rngl_mul_1_l in H2.
 } {
-  specialize rngl_mul_div_l as H1.
-...
-  specialize (H1 (or_introl Hii)).
-  rewrite H1 in H2; [ | easy | easy ].
-  now do 2 rewrite rngl_mul_1_l in H1.
-...
-  rewrite Hii in H1; cbn in H1.
-
-  do 2 rewrite rngl_mul_assoc in H1.
-  rewrite rngl_mul_inv_l in H1; [ | easy | easy ].
-  now do 2 rewrite rngl_mul_1_l in H1.
-remember rngl_has_inv as iv eqn:Hiv; symmetry in Hiv.
-...
-intros Hii * Haz Hbc.
-specialize rngl_opt_mul_div_l as rngl_mul_div_l.
-assert (H1 : (¹/ a * (a * b) = ¹/ a * (a * c))%F) by now rewrite Hbc.
-assert (H2 : (a * b / a = a * c / a)%F) by now rewrite Hbc.
-unfold rngl_div in H2, rngl_mul_div_l.
-remember rngl_has_inv as iv eqn:Hiv; symmetry in Hiv.
-destruct iv. {
-  do 2 rewrite rngl_mul_assoc in H1.
-  rewrite rngl_mul_inv_l in H1; [ | easy | easy ].
-  now do 2 rewrite rngl_mul_1_l in H1.
-} {
-  destruct Hii as [Hii'| Hii']; [ easy | ].
-  rewrite Hii' in rngl_mul_div_l, H2.
-  rewrite rngl_mul_div_l in H2; [ | easy ].
-  now rewrite rngl_mul_div_l in H2.
+  assert (H3 : (a * b / a = a * c / a)%F) by now rewrite Hbc.
+  specialize (rngl_mul_div_l (or_intror Hii)) as H1.
+  rewrite rngl_mul_comm in H3; [ | easy ].
+  rewrite H1 in H3; [ | easy ].
+  rewrite rngl_mul_comm in H3; [ | easy ].
+  now rewrite H1 in H3.
 }
 Qed.
 
@@ -879,6 +858,7 @@ Theorem rngl_mul_cancel_r :
 Proof.
 intros Hii * Hcz Hab.
 specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
+...
 specialize rngl_opt_mul_div_r as rngl_mul_div_r.
 specialize rngl_opt_mul_div_l as rngl_mul_div_l.
 remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
