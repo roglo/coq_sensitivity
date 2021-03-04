@@ -857,8 +857,27 @@ Theorem rngl_mul_cancel_r :
   → a = b.
 Proof.
 intros Hii * Hcz Hab.
-specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
+remember rngl_has_inv as iv eqn:Hiv; symmetry in Hiv.
+destruct iv. {
+  specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
+  remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
+  assert (H : (a * c / c = b * c / c)%F) by now rewrite Hab.
+  unfold rngl_div in H, rngl_mul_inv_r.
+  rewrite Hiv in H.
+  do 2 rewrite <- rngl_mul_assoc in H.
+  destruct ic. {
+    rewrite (rngl_mul_comm Hic c) in H.
+    rewrite rngl_mul_inv_l in H; [ | easy | easy ].
+    now do 2 rewrite rngl_mul_1_r in H.
+  } {
+    rewrite Hiv in rngl_mul_inv_r.
+    rewrite rngl_mul_inv_r in H; [ | easy ].
+    now do 2 rewrite rngl_mul_1_r in H.
+  }
+} {
 ...
+intros Hii * Hcz Hab.
+specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
 specialize rngl_opt_mul_div_r as rngl_mul_div_r.
 specialize rngl_opt_mul_div_l as rngl_mul_div_l.
 remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
