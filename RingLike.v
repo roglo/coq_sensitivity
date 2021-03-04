@@ -989,23 +989,15 @@ apply rngl_mul_1_l.
 Qed.
 
 Theorem rngl_div_1_r :
-  rngl_has_inv = true ∨ rngl_has_eucl_div = true →
+  rngl_has_inv = true ∨
+    rngl_has_eucl_div = true ∧ rngl_is_comm = true ∧ rngl_has_opp = true ∧
+    rngl_has_dec_eq = true →
   rngl_has_1_neq_0 = true →
   ∀ a, (a / 1 = a)%F.
 Proof.
 intros Hid H10 *.
-...
-specialize rngl_opt_mul_div_l as rngl_mul_div_l.
-destruct Hid as [Hid| Hid]. {
-  unfold rngl_div; rewrite Hid.
-  rewrite rngl_inv_1; [ | easy | easy ].
-  apply rngl_mul_1_r.
-} {
-  rewrite Hid in rngl_mul_div_l.
-  specialize (rngl_mul_div_l 1%F a) as H1.
-  rewrite rngl_mul_1_l in H1.
-  now apply H1, rngl_1_neq_0.
-}
+specialize (rngl_mul_div_l Hid a 1%F (rngl_1_neq_0 H10)) as H1.
+now rewrite rngl_mul_1_r in H1.
 Qed.
 
 Theorem rngl_mul_move_1_r :
@@ -1111,28 +1103,6 @@ intros Hin H10 * Haz Hbz H.
 rewrite <- (rngl_inv_involutive Hin H10 a); [ | easy ].
 rewrite H.
 now apply rngl_inv_involutive.
-Qed.
-
-Theorem rngl_integral :
-  (rngl_is_integral || (rngl_has_inv && rngl_has_dec_eq))%bool = true →
-  ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F.
-Proof.
-intros Hdo * Hab.
-specialize rngl_opt_integral as rngl_integral.
-destruct rngl_is_integral; [ now apply rngl_integral | ].
-remember rngl_has_inv as iv eqn:Hiv; symmetry in Hiv.
-destruct iv; [ | easy ].
-remember rngl_has_dec_eq as de eqn:Hde; symmetry in Hde.
-destruct de; [ | easy ].
-cbn; clear rngl_integral.
-assert (H : (¹/a * a * b = ¹/a * 0)%F). {
-  now rewrite <- rngl_mul_assoc, Hab.
-}
-rewrite rngl_mul_0_r in H.
-destruct (rngl_eq_dec Hde a 0%F) as [Haz| Haz]; [ now left | ].
-rewrite rngl_mul_inv_l in H; [ | easy | easy ].
-rewrite rngl_mul_1_l in H.
-now right.
 Qed.
 
 Theorem rngl_inv_mul_distr :
@@ -1299,6 +1269,8 @@ Theorem rngl_div_0_l :
   rngl_has_inv = true ∨ rngl_has_eucl_div = true →
   ∀ a, a ≠ 0%F → (0 / a)%F = 0%F.
 Proof.
+intros Hiv * Haz.
+...
 intros Hiv * Haz.
 specialize rngl_opt_mul_div_l as rngl_mul_div_l.
 specialize rngl_opt_mul_div_r as rngl_mul_div_r.
