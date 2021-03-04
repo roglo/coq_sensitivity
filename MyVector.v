@@ -124,14 +124,15 @@ apply rngl_mul_assoc.
 Qed.
 
 Theorem vect_mul_scal_reg_r :
+  rngl_has_inv = true ∨
+    rngl_has_eucl_div = true ∧ rngl_is_comm = true ∧ rngl_has_opp = true →
   rngl_has_dec_eq = true →
-  rngl_has_inv = true ∨ rngl_has_eucl_div = true →
   ∀ {n} (V : vector n T) a b,
   V ≠ vect_zero n
   → (a × V = b × V)%V
   → a = b.
 Proof.
-intros Hde Hii * Hvz Hab.
+intros Hii Hde * Hvz Hab.
 assert (Hiv : ∀ i, vect_el (a × V)%V i = vect_el (b × V)%V i). {
   intros i.
   now rewrite Hab.
@@ -168,7 +169,8 @@ assert (∃ i, vect_el V i ≠ 0%F). {
 move Hiv at bottom.
 destruct H as (i, Hi).
 specialize (Hiv i).
-now apply rngl_mul_cancel_r in Hiv.
+apply rngl_mul_cancel_r in Hiv; [ easy | | easy ].
+destruct Hii as [Hii| Hii]; [ now left | now right ].
 Qed.
 
 Theorem vect_dot_mul_scal_mul_comm :
