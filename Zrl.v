@@ -96,12 +96,42 @@ Theorem Z_gauge_prop : ∀ a b : Z,
   → rngl_gauge a ≤ rngl_gauge (a * b)%F ∧ rngl_gauge b ≤ rngl_gauge (a * b)%F.
 Proof.
 intros * Haz Hbz; cbn.
-split. {
-  unfold Z.abs_nat.
-  destruct a as [| a| a]; [ apply Nat.le_0_l | | ].
-Search (Z.abs_nat _ ≤ _).
-  split. {
-...
+assert (∀ a b, a ≠ 0%F → b ≠ 0%F → Z.abs_nat a ≤ Z.abs_nat (a * b)). {
+  clear a b Haz Hbz; intros * Haz Hbz.
+  destruct a as [| a| a]; [ apply Nat.le_0_l | | ]. {
+    destruct b as [| b| b]; cbn; [ easy | | ]. {
+      apply Pos2Nat.inj_le.
+      remember (a * b)%positive as x.
+      rewrite <- (Pos.mul_1_r a); subst x.
+      apply Pos.mul_le_mono_l.
+      apply Pos.le_1_l.
+    } {
+      apply Pos2Nat.inj_le.
+      remember (a * b)%positive as x.
+      rewrite <- (Pos.mul_1_r a); subst x.
+      apply Pos.mul_le_mono_l.
+      apply Pos.le_1_l.
+    }
+  } {
+    destruct b as [| b| b]; cbn; [ easy | | ]. {
+      apply Pos2Nat.inj_le.
+      remember (a * b)%positive as x.
+      rewrite <- (Pos.mul_1_r a); subst x.
+      apply Pos.mul_le_mono_l.
+      apply Pos.le_1_l.
+    } {
+      apply Pos2Nat.inj_le.
+      remember (a * b)%positive as x.
+      rewrite <- (Pos.mul_1_r a); subst x.
+      apply Pos.mul_le_mono_l.
+      apply Pos.le_1_l.
+    }
+  }
+}
+split; [ now apply H | ].
+rewrite Z.mul_comm.
+now apply H.
+Qed.
 
 Theorem Z_mul_le_compat_nonneg : ∀ a b c d,
   (0 ≤ a ≤ c → 0 ≤ b ≤ d → a * b ≤ c * d)%Z.
