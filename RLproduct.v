@@ -174,13 +174,14 @@ now apply iter_shift.
 Qed.
 
 Theorem rngl_product_list_integral :
+  rngl_has_opp = true ∨ rngl_has_monus = true →
   rngl_is_integral = true →
   rngl_has_1_neq_0 = true →
   ∀ A (l : list A) f,
   (Π (i ∈ l), f i)%F = 0%F
   → ∃ i, i ∈ l ∧ f i = 0%F.
 Proof.
-intros Hin H10 * Hz.
+intros Hom Hin H10 * Hz.
 induction l as [| a]; [ now apply rngl_1_neq_0 in Hz | ].
 unfold iter_list in Hz; cbn in Hz.
 rewrite rngl_mul_1_l in Hz.
@@ -192,7 +193,7 @@ rewrite (fold_left_op_fun_from_d 1%F) in Hz; cycle 1. {
   apply rngl_mul_assoc.
 }
 rewrite fold_iter_list in Hz.
-apply rngl_integral in Hz; [ | now rewrite Hin ].
+apply rngl_integral in Hz; [ | easy | now rewrite Hin ].
 destruct Hz as [Hz| Hz]. {
   exists a.
   split; [ now left | easy ].
@@ -203,14 +204,15 @@ split; [ now right | easy ].
 Qed.
 
 Theorem rngl_product_integral :
+  rngl_has_opp = true ∨ rngl_has_monus = true →
   rngl_is_integral = true →
   rngl_has_1_neq_0 = true →
   ∀ b e f,
   (Π (i = b, e), f i = 0)%F
   → ∃ i, b ≤ i ≤ e ∧ f i = 0%F.
 Proof.
-intros Hin H10 * Hz.
-apply rngl_product_list_integral in Hz; [ | easy | easy ].
+intros Hom Hin H10 * Hz.
+apply rngl_product_list_integral in Hz; [ | easy | easy | easy ].
 destruct Hz as (i & His & Hfi).
 apply in_seq in His.
 exists i.
@@ -236,6 +238,7 @@ apply iter_list_permut; [ | | | | easy ]. {
 Qed.
 
 Theorem rngl_inv_product_list :
+  rngl_has_opp = true ∨ rngl_has_monus = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
   rngl_is_integral = true →
@@ -243,7 +246,7 @@ Theorem rngl_inv_product_list :
   (∀ i, i ∈ l → f i ≠ 0%F)
   → ((¹/ Π (i ∈ l), f i) = Π (i ∈ rev l), (¹/ f i))%F.
 Proof.
-intros Hin H10 Hit * Hnz.
+intros Hom Hin H10 Hit * Hnz.
 unfold iter_list.
 induction l as [| a]; [ now apply rngl_inv_1 | cbn ].
 rewrite rngl_mul_1_l.
@@ -254,12 +257,12 @@ rewrite (fold_left_op_fun_from_d 1%F); cycle 1. {
 } {
   apply rngl_mul_assoc.
 }
-rewrite rngl_inv_mul_distr; [ | easy | easy | | ]; cycle 1. {
+rewrite rngl_inv_mul_distr; [ | easy | easy | easy | | ]; cycle 1. {
   now apply Hnz; left.
 } {
   intros H1.
   rewrite fold_iter_list in H1.
-  specialize (rngl_product_list_integral Hit H10) as H2.
+  specialize (rngl_product_list_integral Hom Hit H10) as H2.
   specialize (H2 A l f H1).
   destruct H2 as (i & Hil & Hfi).
   now revert Hfi; apply Hnz; right.
@@ -273,6 +276,7 @@ apply fold_left_app.
 Qed.
 
 Theorem rngl_inv_product :
+  rngl_has_opp = true ∨ rngl_has_monus = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
   rngl_is_integral = true →
@@ -280,9 +284,9 @@ Theorem rngl_inv_product :
   (∀ i, b ≤ i ≤ e → f i ≠ 0%F)
   → ((¹/ Π (i = b, e), f i) = Π (i = b, e), (¹/ f (b + e - i)%nat))%F.
 Proof.
-intros Hin H10 Hit * Hnz.
+intros Hom Hin H10 Hit * Hnz.
 unfold iter_seq.
-rewrite rngl_inv_product_list; [ | easy | easy | easy | ]. 2: {
+rewrite rngl_inv_product_list; [ | easy | easy | easy | easy | ]. 2: {
   intros i Hi.
   apply in_seq in Hi.
   apply Hnz; flia Hi.
@@ -323,6 +327,7 @@ flia.
 Qed.
 
 Theorem rngl_inv_product_list_comm :
+  rngl_has_opp = true ∨ rngl_has_monus = true →
   rngl_is_comm = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
@@ -331,14 +336,15 @@ Theorem rngl_inv_product_list_comm :
   (∀ i, i ∈ l → f i ≠ 0%F)
   → ((¹/ Π (i ∈ l), f i) = Π (i ∈ l), (¹/ f i))%F.
 Proof.
-intros Hic Hin H10 Hit * Hnz.
-rewrite rngl_inv_product_list; [ | easy | easy | easy | easy ].
+intros Hom Hic Hin H10 Hit * Hnz.
+rewrite rngl_inv_product_list; [ | easy | easy | easy | easy | easy ].
 apply rngl_product_list_permut; [ easy | ].
 symmetry.
 apply Permutation_rev.
 Qed.
 
 Theorem rngl_inv_product_comm :
+  rngl_has_opp = true ∨ rngl_has_monus = true →
   rngl_is_comm = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
@@ -347,7 +353,7 @@ Theorem rngl_inv_product_comm :
   (∀ i, b ≤ i ≤ e → f i ≠ 0%F)
   → ((¹/ Π (i = b, e), f i) = Π (i = b, e), (¹/ f i))%F.
 Proof.
-intros Hic Hin H10 Hit * Hnz.
+intros Hom Hic Hin H10 Hit * Hnz.
 apply rngl_inv_product_list_comm; try easy.
 intros i Hi.
 apply in_seq in Hi.
@@ -355,6 +361,7 @@ apply Hnz; flia Hi.
 Qed.
 
 Theorem rngl_product_div_distr :
+  rngl_has_opp = true ∨ rngl_has_monus = true →
   rngl_is_comm = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
@@ -364,7 +371,7 @@ Theorem rngl_product_div_distr :
   → (Π (i = b, e), (f i / g i))%F =
     ((Π (i = b, e), f i) / (Π (i = b, e), g i))%F.
 Proof.
-intros Hic Hin H10 Hit * Hg.
+intros Hom Hic Hin H10 Hit * Hg.
 unfold rngl_div.
 rewrite Hin.
 rewrite rngl_product_mul_distr; [ | easy ].
@@ -384,11 +391,11 @@ Qed.
 
 End a.
 
-Arguments rngl_product_div_distr {T}%type {ro rp} _ _ _ _ (b e)%nat
+Arguments rngl_product_div_distr {T}%type {ro rp} _ _ _ _ _ (b e)%nat
   (f g)%function.
-Arguments rngl_inv_product {T}%type {ro rp} _ _ _ (b e)%nat f.
-Arguments rngl_inv_product_comm {T}%type {ro rp} _ _ _ _ (b e)%nat f.
-Arguments rngl_inv_product_list {T}%type {ro rp} _ _ _ {A}%type l%list
+Arguments rngl_inv_product {T}%type {ro rp} _ _ _ _ (b e)%nat f.
+Arguments rngl_inv_product_comm {T}%type {ro rp} _ _ _ _ _ (b e)%nat f.
+Arguments rngl_inv_product_list {T}%type {ro rp} _ _ _ _ {A}%type l%list
   (f _)%function.
 Arguments rngl_product_list_mul_distr {T}%type {ro rp} _ A%type
   (g h)%function l%list.
@@ -397,6 +404,6 @@ Arguments rngl_product_list_permut {T}%type {ro rp} _ A%type (l1 l2)%list
 Arguments rngl_product_mul_distr {T}%type {ro rp} _ (g h)%function (b k)%nat.
 Arguments rngl_product_split {T}%type {ro rp} j%nat g%function (b k)%nat.
 Arguments rngl_product_succ_succ {T}%type {ro} (b k)%nat g%function.
-Arguments rngl_product_integral {T}%type {ro rp} _ _ (b e)%nat f%function.
-Arguments rngl_product_list_integral {T}%type {ro rp} _ _ A%type l%list f%function.
+Arguments rngl_product_integral {T}%type {ro rp} _ _ _ (b e)%nat f%function.
+Arguments rngl_product_list_integral {T}%type {ro rp} _ _ _ A%type l%list f%function.
 Arguments rngl_product_split_first {T}%type {ro rp} (b k)%nat g%function.

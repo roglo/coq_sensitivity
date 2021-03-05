@@ -139,6 +139,7 @@ Section a.
 Context {T : Type}.
 Context (ro : ring_like_op T).
 Context {rp : ring_like_prop T}.
+Context {Hro : @rngl_has_opp T ro = true}.
 
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
@@ -209,20 +210,18 @@ Qed.
 (* addition left and right with opposite *)
 
 Theorem mat_add_opp_l {m n} :
-  rngl_has_opp = true →
   ∀ (M : matrix m n T), (- M + M = mZ m n)%M.
 Proof.
-intros Hro *.
+intros.
 apply matrix_eq; cbn.
 intros * Hi Hj.
 now apply rngl_add_opp_l.
 Qed.
 
 Theorem mat_add_opp_r {m n} :
-  rngl_has_opp = true →
   ∀ (M : matrix m n T), (M - M = mZ m n)%M.
 Proof.
-intros Hro *.
+intros.
 apply matrix_eq; cbn.
 intros * Hi Hj.
 rewrite fold_rngl_sub; [ | easy ].
@@ -244,12 +243,12 @@ rewrite rngl_mul_1_l.
 rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
   intros k Hk.
   destruct (Nat.eq_dec i (k - 1)) as [H| H]; [ flia H Hk | ].
-  now apply rngl_mul_0_l.
+  now apply rngl_mul_0_l; left.
 }
 rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
   intros k Hk.
   destruct (Nat.eq_dec i k) as [H| H]; [ flia H Hk | ].
-  now apply rngl_mul_0_l.
+  now apply rngl_mul_0_l; left.
 }
 now rewrite rngl_add_0_l, rngl_add_0_r.
 Qed.
@@ -267,12 +266,12 @@ rewrite rngl_mul_1_r.
 rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
   intros k Hk.
   destruct (Nat.eq_dec (k - 1) j) as [H| H]; [ flia H Hk | ].
-  now apply rngl_mul_0_r.
+  now apply rngl_mul_0_r; left.
 }
 rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
   intros k Hk.
   destruct (Nat.eq_dec k j) as [H| H]; [ flia H Hk | ].
-  now apply rngl_mul_0_r.
+  now apply rngl_mul_0_r; left.
 }
 now rewrite rngl_add_0_l, rngl_add_0_r.
 Qed.
@@ -289,12 +288,12 @@ rewrite rngl_mul_1_l.
 rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
   intros k Hk.
   destruct (Nat.eq_dec i (k - 1)) as [H| H]; [ flia H Hk | ].
-  now apply rngl_mul_0_l.
+  now apply rngl_mul_0_l; left.
 }
 rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
   intros k Hk.
   destruct (Nat.eq_dec i k) as [H| H]; [ flia H Hk | ].
-  now apply rngl_mul_0_l.
+  now apply rngl_mul_0_l; left.
 }
 now rewrite rngl_add_0_l, rngl_add_0_r.
 Qed.
@@ -312,7 +311,7 @@ cbn.
 cbn in Hi, Hj.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
-  now apply rngl_mul_summation_distr_l.
+  now apply rngl_mul_summation_distr_l; left.
 }
 cbn.
 rewrite rngl_summation_summation_exch'; [ | easy ].
@@ -324,7 +323,7 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn.
 symmetry.
-now apply rngl_mul_summation_distr_r.
+now apply rngl_mul_summation_distr_r; left.
 Qed.
 
 (* left distributivity of multiplication over addition *)
@@ -396,7 +395,7 @@ intros Hic *.
 apply matrix_eq.
 intros * Hi Hj.
 cbn.
-rewrite rngl_mul_summation_distr_l.
+rewrite rngl_mul_summation_distr_l; [ | now left ].
 apply rngl_summation_eq_compat.
 intros k Hk.
 rewrite rngl_mul_comm; [ | easy ].
@@ -429,12 +428,12 @@ Proof.
 intros * Hi.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
-  now rewrite rngl_mul_summation_distr_l.
+  rewrite rngl_mul_summation_distr_l; [ easy | now left ].
 }
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
-  now rewrite rngl_mul_summation_distr_r.
+  rewrite rngl_mul_summation_distr_r; [ easy | now left ].
 }
 symmetry.
 cbn.
@@ -469,7 +468,7 @@ apply vector_eq.
 intros i Hi.
 cbn in Hi.
 cbn.
-rewrite rngl_mul_summation_distr_l.
+rewrite rngl_mul_summation_distr_l; [ | now left ].
 apply rngl_summation_eq_compat.
 intros j Hj.
 apply rngl_mul_assoc.
@@ -484,7 +483,7 @@ apply vector_eq.
 intros i Hi.
 cbn in Hi.
 cbn.
-rewrite rngl_mul_summation_distr_l.
+rewrite rngl_mul_summation_distr_l; [ | now left ].
 apply rngl_summation_eq_compat.
 intros j Hj.
 do 2 rewrite rngl_mul_assoc.
@@ -575,15 +574,13 @@ Canonical Structure mat_ring_like_op n :
      rngl_mul := @mat_mul T _ n n n;
      rngl_opt_opp := Some (@mat_opp T _ n n);
      rngl_opt_inv := None;
-     rngl_opt_monus := Some (@mat_sub T ro n n);
+     rngl_opt_monus := None;
      rngl_opt_eucl_div := None;
      rngl_le := @phony_mat_le n |}.
 
 (**)
 Existing Instance mat_ring_like_op.
 (**)
-
-Context {Hro : @rngl_has_opp T ro = true}.
 
 Theorem mat_opt_add_opp_l : ∀ n,
   if @rngl_has_opp (matrix n n T) _ then
@@ -774,8 +771,8 @@ intros.
 apply vector_eq.
 intros i Hi.
 cbn.
-rewrite <- rngl_mul_summation_distr_r.
-apply rngl_mul_0_r.
+rewrite <- rngl_mul_summation_distr_r; [ | now left ].
+now apply rngl_mul_0_r; left.
 Qed.
 
 (* *)
@@ -788,22 +785,22 @@ Declare Scope M_scope.
 Delimit Scope M_scope with M.
 
 Arguments mat_el [m n]%nat [T]%type M%M (i j)%nat : rename.
-Arguments mat_add_opp_r {T}%type {ro rp} {m n}%nat Hro M%M.
-Arguments mat_mul_mul_scal_l {T}%type {ro rp} Hic {m n p}%nat a%F MA%M.
+Arguments mat_add_opp_r {T}%type {ro rp} Hro {m n}%nat M%M.
+Arguments mat_mul_mul_scal_l {T}%type {ro rp} Hro Hic {m n p}%nat a%F MA%M.
 Arguments mat_mul_scal_l {T ro} {m n}%nat s%F M%M.
 Arguments mat_mul_vect_r {T ro} {m n}%nat M%M V%V.
-Arguments mat_mul_scal_vect_comm {T}%type {ro rp} Hic {m n}%nat a%F MA%M V%V.
-Arguments mat_mul_scal_vect_assoc {T}%type {ro rp} {m n}%nat a%F MA%M V%V.
-Arguments mat_vect_mul_assoc {T}%type {ro rp} {m n p}%nat (A B)%M V%V.
-Arguments mat_mul_1_l {T}%type {ro rp} {n}%nat M%M.
-Arguments mat_mul_1_r {T}%type {ro rp} {n}%nat M%M.
+Arguments mat_mul_scal_vect_comm {T}%type {ro rp} Hro Hic {m n}%nat a%F MA%M V%V.
+Arguments mat_mul_scal_vect_assoc {T}%type {ro rp} Hro {m n}%nat a%F MA%M V%V.
+Arguments mat_vect_mul_assoc {T}%type {ro rp} Hro {m n p}%nat (A B)%M V%V.
+Arguments mat_mul_1_l {T}%type {ro rp} Hro {n}%nat M%M.
+Arguments mat_mul_1_r {T}%type {ro rp} Hro {n}%nat M%M.
 Arguments mat_opp {T ro} {m n}%nat M%M.
 Arguments mat_sub {T ro} {m n}%nat MA%M MB%M.
 Arguments mI {T ro} n%nat.
 Arguments mZ {T ro} (m n)%nat.
 Arguments minus_one_pow {T ro}.
 Arguments subm {T} {m n}%nat M%M i%nat j%nat.
-Arguments vect_mul_1_l {T}%type {ro rp} {n}%nat V%V.
+Arguments vect_mul_1_l {T}%type {ro rp} Hro {n}%nat V%V.
 
 Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.

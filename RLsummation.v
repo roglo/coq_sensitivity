@@ -19,6 +19,7 @@ Section a.
 Context {T : Type}.
 Context (ro : ring_like_op T).
 Context {rp : ring_like_prop T}.
+Context {Hom : rngl_has_opp = true ∨ rngl_has_monus = true}.
 
 Theorem fold_left_rngl_add_fun_from_0 : ∀ a l (f : nat → _),
   (fold_left (λ c i, c + f i) l a =
@@ -466,5 +467,5 @@ Qed.
 
 End a.
 
-Arguments rngl_mul_summation_distr_l {T ro rp} a b e f.
-Arguments rngl_mul_summation_distr_r {T ro rp} a b e f.
+Arguments rngl_mul_summation_distr_l {T ro rp} Hom a b e f.
+Arguments rngl_mul_summation_distr_r {T ro rp} Hom a b e f.

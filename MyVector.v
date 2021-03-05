@@ -174,13 +174,14 @@ destruct Hii as [Hii| Hii]; [ now left | now right ].
 Qed.
 
 Theorem vect_dot_mul_scal_mul_comm :
+  rngl_has_opp = true ∨ rngl_has_monus = true →
   rngl_is_comm = true →
   ∀ {n} (a : T) (U V : vector n T),
   ≺ U, a × V ≻ = (a * ≺ U, V ≻)%F.
 Proof.
-intros Hic *.
+intros Hom Hic *.
 unfold vect_dot_product.
-rewrite rngl_mul_summation_distr_l.
+rewrite rngl_mul_summation_distr_l; [ | easy ].
 apply rngl_summation_eq_compat.
 intros j Hj; cbn.
 do 2 rewrite rngl_mul_assoc.
@@ -188,12 +189,14 @@ f_equal.
 now apply rngl_mul_comm.
 Qed.
 
-Theorem vect_scal_mul_dot_mul_comm : ∀ {n} (a : T) (U V : vector n T),
+Theorem vect_scal_mul_dot_mul_comm :
+  rngl_has_opp = true ∨ rngl_has_monus = true →
+  ∀ {n} (a : T) (U V : vector n T),
   ≺ a × U, V ≻ = (a * ≺ U, V ≻)%F.
 Proof.
-intros.
+intros Hom *.
 unfold vect_dot_product.
-rewrite rngl_mul_summation_distr_l.
+rewrite rngl_mul_summation_distr_l; [ | easy ].
 apply rngl_summation_eq_compat.
 intros j Hj; cbn.
 symmetry; apply rngl_mul_assoc.
@@ -236,8 +239,9 @@ Arguments vect_mul_scal_l {T ro} s%F {n}%nat V%V.
 Arguments vect_mul_scal_reg_r {T}%type {ro rp} Hde Hii {n}%nat V%V (a b)%F.
 Arguments vect_zero {T ro} n%nat.
 Arguments vect_dot_product {T}%type {ro} {n}%nat (U V)%V.
-Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hic {n}%nat a%F (U V)%V.
-Arguments vect_scal_mul_dot_mul_comm {T}%type {ro rp} {n}%nat a%F (U V)%V.
+Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hom Hic
+  {n}%nat a%F (U V)%V.
+Arguments vect_scal_mul_dot_mul_comm {T}%type {ro rp} Hom {n}%nat a%F (U V)%V.
 Arguments vect_eq_dec {T}%type {ro rp} _ n%nat U%V V%V.
 Arguments vect_el {n}%nat {T}%type v%V UUU%nat.
 Arguments vect_squ_norm {T}%type {ro} {n}%nat V%V.
