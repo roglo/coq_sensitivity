@@ -196,9 +196,9 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if rngl_has_monus then ∀ a b c : T, (a * (b - c) = a * b - a * c)%F
       else not_applicable;
     rngl_opt_mul_sub_distr_r :
-      if rngl_is_comm then not_applicable
-      else if rngl_has_monus then
-        ∀ a b c : T, ((a - b) * c = a * c - b * c)%F
+      if rngl_has_monus then
+        if rngl_is_comm then not_applicable
+        else ∀ a b c : T, ((a - b) * c = a * c - b * c)%F
       else not_applicable;
     (* when has inverse *)
     rngl_opt_mul_inv_l :
