@@ -196,8 +196,10 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if rngl_has_monus then ∀ a b c : T, (a * (b - c) = a * b - a * c)%F
       else not_applicable;
     rngl_opt_mul_sub_distr_r :
-      if (rngl_has_opp || rngl_is_comm)%bool then not_applicable
-      else ∀ a b c : T, ((a - b) * c = a * c - b * c)%F;
+      if rngl_is_comm then not_applicable
+      else if rngl_has_monus then
+        ∀ a b c : T, ((a - b) * c = a * c - b * c)%F
+      else not_applicable;
     (* when has inverse *)
     rngl_opt_mul_inv_l :
       if rngl_has_inv then ∀ a : T, a ≠ 0%F → (¹/ a * a = 1)%F
@@ -1345,13 +1347,16 @@ destruct op. {
 remember rngl_has_monus as mo eqn:Hmo; symmetry in Hmo.
 destruct mo. {
   specialize rngl_opt_mul_sub_distr_r as H1.
-  rewrite Hop in H1.
   remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
-  destruct ic; [ | apply H1 ].
-  specialize rngl_opt_mul_comm as rngl_mul_comm.
-  rewrite Hic in rngl_mul_comm.
-  rewrite rngl_mul_comm, rngl_mul_sub_distr_l; [ | now right ].
-  now rewrite (rngl_mul_comm a), (rngl_mul_comm b).
+  destruct ic. {
+    specialize rngl_opt_mul_comm as rngl_mul_comm.
+    rewrite Hic in rngl_mul_comm.
+    rewrite rngl_mul_comm, rngl_mul_sub_distr_l; [ | now right ].
+    now rewrite (rngl_mul_comm a), (rngl_mul_comm b).
+  } {
+    rewrite Hmo in H1.
+    apply H1.
+  }
 }
 now destruct Hom.
 Qed.
