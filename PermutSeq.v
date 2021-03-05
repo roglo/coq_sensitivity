@@ -2216,8 +2216,9 @@ rewrite product_product_if_permut; try easy. {
   do 2 rewrite if_ltb_lt_dec.
   destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
   f_equal.
-...
-  now apply rngl_of_nat_sub.
+  apply rngl_of_nat_sub; [ now left | easy ].
+} {
+  now left.
 } {
   now apply permut_fun_inv_is_permut.
 } {
@@ -2241,7 +2242,7 @@ rewrite product_product_if_permut; try easy. {
   unfold rngl_div.
   rewrite Hin.
   intros H.
-  apply rngl_integral in H; [ | now rewrite Hit ].
+  apply rngl_integral in H; [ | now left | now rewrite Hit ].
   destruct H as [H| H]. {
     apply rngl_sub_move_0_r in H; [ | easy ].
     apply rngl_of_nat_inj in H; [ | easy ].
@@ -2249,7 +2250,7 @@ rewrite product_product_if_permut; try easy. {
     now apply Hp1 in H.
   } {
     revert H.
-    apply rngl_inv_neq_0; [ easy | easy | ].
+    apply rngl_inv_neq_0; [ now left | easy | easy | ].
     intros H.
     apply rngl_sub_move_0_r in H; [ | easy ].
     apply rngl_of_nat_inj in H; [ | easy ].
