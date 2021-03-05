@@ -771,7 +771,7 @@ destruct iv. {
   specialize rngl_opt_eucl_div_prop as H1.
   specialize rngl_opt_gauge_prop as H2.
   unfold rngl_div, rngl_quo.
-  destruct Hii as (Hii & Hco & Hop & Heq). (* Hop & Heq & Hit *)
+  destruct Hii as (Hii & Hco & Hop & Heq).
   rewrite Hii in H1, H2 |-*.
   rewrite Hiv.
   unfold rngl_has_eucl_div in Hii.

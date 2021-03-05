@@ -304,6 +304,11 @@ apply Nat.nlt_ge in H2.
 apply Nat.nlt_ge in H3.
 apply Nat.nlt_ge in H4.
 unfold having_eucl_div in Hhed.
+destruct (Z.eq_dec d (-1)) as [Hd1| Hd1]. {
+  subst d; clear Hhed.
+  move ro at top; move a after b; move γ after γ'.
+  move H1 after H4; move H2 after H4; move H3 after H4.
+  move Hbz before b.
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
