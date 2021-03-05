@@ -190,8 +190,8 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if rngl_has_monus then ∀ a, (0 - a = 0)%F
       else not_applicable;
     rngl_opt_add_cancel_l :
-      if rngl_has_opp then not_applicable
-      else ∀ a b c, (a + b = a + c)%F → (b = c)%F;
+      if rngl_has_monus then ∀ a b c, (a + b = a + c)%F → (b = c)%F
+      else not_applicable;
     rngl_opt_mul_sub_distr_l :
       if rngl_has_opp then not_applicable
       else ∀ a b c : T, (a * (b - c) = a * b - a * c)%F;
@@ -524,7 +524,7 @@ remember rngl_has_monus as mo eqn:Hmo.
 symmetry in Hmo.
 destruct mo. {
   specialize rngl_opt_add_cancel_l as H1.
-  rewrite Hop in H1.
+  rewrite Hmo in H1.
   now apply H1 in Habc.
 }
 now destruct Hom.
