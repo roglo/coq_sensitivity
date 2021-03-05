@@ -136,7 +136,7 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn - [ fact "mod" "/" canon_permut ].
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
-  now rewrite rngl_mul_summation_distr_l.
+  rewrite rngl_mul_summation_distr_l; [ easy | now left ].
 }
 cbn - [ fact "mod" "/" canon_permut ].
 rewrite rngl_summation_summation_distr; [ | easy ].
@@ -198,8 +198,8 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
-rewrite rngl_mul_summation_distr_l.
-rewrite rngl_mul_summation_distr_l.
+rewrite rngl_mul_summation_distr_l; [ | now left ].
+rewrite rngl_mul_summation_distr_l; [ | now left ].
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
@@ -595,7 +595,7 @@ erewrite rngl_summation_eq_compat. 2: {
   now rewrite transposition_signature.
 }
 cbn - [ f ].
-rewrite <- rngl_mul_summation_distr_l.
+rewrite <- rngl_mul_summation_distr_l; [ | now left ].
 rewrite rngl_mul_opp_l; [ | easy ].
 f_equal.
 rewrite rngl_mul_1_l.
@@ -1361,16 +1361,17 @@ Definition mat_mul_row_by_scal n k (M : matrix n n T) s :=
    prove next theorems, swapping rows by going via row 0 *)
 
 Theorem det_mul_row_0_by_scal :
+  rngl_has_opp = true ∨ rngl_has_monus = true →
   rngl_is_comm = true →
   ∀ n (A : matrix n n T) v,
   n ≠ 0
   → determinant (mat_mul_row_by_scal 0 A v) = (v * determinant A)%F.
 Proof.
-intros Hic * Hnz.
+intros Hom Hic * Hnz.
 unfold determinant; cbn.
 destruct n; [ easy | clear Hnz ].
 cbn.
-rewrite rngl_mul_summation_distr_l.
+rewrite rngl_mul_summation_distr_l; [ | easy ].
 apply rngl_summation_eq_compat.
 intros j Hj.
 rewrite (rngl_mul_comm Hic (minus_one_pow j)).
