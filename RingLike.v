@@ -187,7 +187,8 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if rngl_has_monus then ∀ a, (a - a = 0)%F
       else not_applicable;
     rngl_opt_sub_0_l :
-      if rngl_has_opp then not_applicable else ∀ a, (0 - a = 0)%F;
+      if rngl_has_monus then ∀ a, (0 - a = 0)%F
+      else not_applicable;
     rngl_opt_add_cancel_l :
       if rngl_has_opp then not_applicable
       else ∀ a b c, (a + b = a + c)%F → (b = c)%F;
@@ -413,7 +414,7 @@ rewrite Hor, Hop in H.
 apply H.
 Qed.
 
-Theorem rngl_sub_0_l : rngl_has_opp = false → ∀ a, (0 - a = 0)%F.
+Theorem rngl_sub_0_l : rngl_has_monus = true → ∀ a, (0 - a = 0)%F.
 Proof.
 intros H1 *.
 specialize rngl_opt_sub_0_l as H.
@@ -557,7 +558,7 @@ destruct mo. {
   rewrite <- H2 in H1.
   rewrite rngl_sub_diag in H1; [ | now rewrite Hop, Hmo ].
   specialize rngl_opt_sub_0_l as H3.
-  rewrite Hop in H3.
+  rewrite Hmo in H3.
   rewrite H3, rngl_add_0_r in H1.
   now rewrite rngl_add_comm in H1.
 }
