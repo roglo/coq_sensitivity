@@ -16,6 +16,8 @@ Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
 Require Import Utf8 ZArith.
+Import List List.ListNotations.
+
 Require Import RingLike.
 Open Scope Z_scope.
 
@@ -82,6 +84,10 @@ Notation "α / β" := (qi_div α β) : QI_scope.
 
 Definition phony_qi_le {d} (a b : quad_int d) := False.
 
+Definition having_eucl_div :=
+  [-11; -7; -3; -2; -1; 2; 3; 5; 6; 7; 11; 13; 17; 19; 21;
+   29; 33; 37; 41; 57; 73].
+
 Canonical Structure quad_int_ring_like_op {d} : ring_like_op (quad_int d) :=
   {| rngl_zero := @qi_zero d;
      rngl_one := @qi_one d;
@@ -90,7 +96,9 @@ Canonical Structure quad_int_ring_like_op {d} : ring_like_op (quad_int d) :=
      rngl_opt_opp := Some (@qi_opp d);
      rngl_opt_inv := None;
      rngl_opt_monus := None;
-     rngl_opt_eucl_div := Some (qi_eucl_div, qi_gauge);
+     rngl_opt_eucl_div :=
+       if In_dec Z.eq_dec d having_eucl_div then Some (qi_eucl_div, qi_gauge)
+       else None;
      rngl_le := phony_qi_le |}.
 
 Compute (mk_qi (-1) (- 36) 242 / mk_qi (-1) 50 50)%QI.
@@ -225,13 +233,19 @@ do 2 rewrite Z.add_0_r.
 now destruct a.
 Qed.
 
-Theorem quad_int_eucl_div : ∀ a b q r : quad_int d,
-  b ≠ 0%F
-  → rngl_eucl_div a b = (q, r)
-  → a = (b * q + r)%F ∧ (rngl_gauge r < rngl_gauge b)%nat.
+Theorem quad_int_eucl_div :
+  if rngl_has_eucl_div then
+    ∀ a b q r : quad_int d,
+    b ≠ 0%F
+    → rngl_eucl_div a b = (q, r)
+    → a = (b * q + r)%F ∧ (rngl_gauge r < rngl_gauge b)%nat
+  else not_applicable.
 Proof.
+intros.
+unfold rngl_has_eucl_div, rngl_eucl_div, rngl_gauge.
+cbn - [ In_dec ].
+destruct (in_dec Z.eq_dec d having_eucl_div) as [Hhed| Hhed]; [ cbn | easy ].
 intros * Hbz Hab.
-cbn in Hab |-*.
 unfold qi_eucl_div in Hab.
 set (den := qi_re (b * qi_conj b)) in Hab.
 set (γ := qi_re (a * qi_conj b) / den) in Hab.
@@ -289,12 +303,7 @@ apply Nat.nlt_ge in H1.
 apply Nat.nlt_ge in H2.
 apply Nat.nlt_ge in H3.
 apply Nat.nlt_ge in H4.
-Print qi_gauge.
-(* it is supposed to depend on d; there is a solution only for d =
-       –11, –7, –3, –2, –1, 2, 3, 5, 6, 7, 11, 13, 17, 19, 21,
-       29, 33, 37, 41, 57, 73
-   and it is not even true because my definition of quadratic
-   integers is wrong for d ≡ 1 mod 4 *)
+unfold having_eucl_div in Hhed.
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
@@ -326,6 +335,7 @@ Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
      rngl_opt_mul_inv_l := NA;
      rngl_opt_mul_inv_r := NA;
      rngl_opt_eucl_div_prop := quad_int_eucl_div |}.
+
      rngl_opt_gauge_prop := ?rngl_opt_gauge_prop;
      rngl_opt_eq_dec := Nat.eq_dec;
      rngl_opt_le_dec := le_dec;
