@@ -193,8 +193,8 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if rngl_has_monus then ∀ a b c, (a + b = a + c)%F → (b = c)%F
       else not_applicable;
     rngl_opt_mul_sub_distr_l :
-      if rngl_has_opp then not_applicable
-      else ∀ a b c : T, (a * (b - c) = a * b - a * c)%F;
+      if rngl_has_monus then ∀ a b c : T, (a * (b - c) = a * b - a * c)%F
+      else not_applicable;
     rngl_opt_mul_sub_distr_r :
       if (rngl_has_opp || rngl_is_comm)%bool then not_applicable
       else ∀ a b c : T, ((a - b) * c = a * c - b * c)%F;
@@ -641,19 +641,23 @@ rewrite rngl_add_comm in H.
 now apply rngl_add_move_0_r in H.
 Qed.
 
-Theorem rngl_mul_sub_distr_l : ∀ a b c,
-  (a * (b - c) = a * b - a * c)%F.
+Theorem rngl_mul_sub_distr_l :
+  rngl_has_opp = true ∨ rngl_has_monus = true →
+  ∀ a b c, (a * (b - c) = a * b - a * c)%F.
 Proof.
-intros.
+intros Hom *.
 remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
 destruct op. {
   unfold rngl_sub; rewrite Hop.
   rewrite rngl_mul_add_distr_l.
   now rewrite rngl_mul_opp_r.
-} {
-  specialize rngl_opt_mul_sub_distr_l as H1.
-  now rewrite Hop in H1.
 }
+remember rngl_has_monus as mo eqn:Hmo; symmetry in Hmo.
+destruct mo. {
+  specialize rngl_opt_mul_sub_distr_l as H1.
+  now rewrite Hmo in H1.
+}
+now destruct Hom.
 Qed.
 
 Theorem rngl_integral :
@@ -750,7 +754,7 @@ destruct iv. {
   apply rngl_add_sub_eq_l in Haa; [ | now left ].
   remember (a * q)%F as x.
   replace a with (a * 1)%F in Haa by apply rngl_mul_1_r; subst x.
-  rewrite <- rngl_mul_sub_distr_l in Haa.
+  rewrite <- rngl_mul_sub_distr_l in Haa; [ | now left ].
   specialize rngl_opt_eq_dec as H3.
   rewrite Heq in H3.
   specialize (H2 a (1 - q)%F Haz).
@@ -815,7 +819,7 @@ destruct iv. {
   symmetry in Haa.
   apply rngl_add_sub_eq_l in Haa; [ | now left ].
   rewrite rngl_mul_comm in Haa; [ | easy ].
-  rewrite <- rngl_mul_sub_distr_l in Haa.
+  rewrite <- rngl_mul_sub_distr_l in Haa; [ | now left ].
   specialize rngl_opt_eq_dec as H3.
   rewrite Heq in H3.
   specialize (H2 b (a - q)%F Hbz).
@@ -1327,25 +1331,29 @@ subst a.
 now apply rngl_mul_inv_r.
 Qed.
 
-Theorem rngl_mul_sub_distr_r : ∀ a b c,
-  ((a - b) * c = a * c - b * c)%F.
+Theorem rngl_mul_sub_distr_r :
+  rngl_has_opp = true ∨ rngl_has_monus = true →
+  ∀ a b c, ((a - b) * c = a * c - b * c)%F.
 Proof.
-intros.
+intros Hom *.
 remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
 destruct op. {
   unfold rngl_sub; rewrite Hop.
   rewrite rngl_mul_add_distr_r.
   now rewrite rngl_mul_opp_l.
-} {
+}
+remember rngl_has_monus as mo eqn:Hmo; symmetry in Hmo.
+destruct mo. {
   specialize rngl_opt_mul_sub_distr_r as H1.
   rewrite Hop in H1.
   remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
   destruct ic; [ | apply H1 ].
   specialize rngl_opt_mul_comm as rngl_mul_comm.
   rewrite Hic in rngl_mul_comm.
-  rewrite rngl_mul_comm, rngl_mul_sub_distr_l.
+  rewrite rngl_mul_comm, rngl_mul_sub_distr_l; [ | now right ].
   now rewrite (rngl_mul_comm a), (rngl_mul_comm b).
 }
+now destruct Hom.
 Qed.
 
 End a.
