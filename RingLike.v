@@ -176,7 +176,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* when has opposite *)
     rngl_opt_add_opp_l :
       if rngl_has_opp then ∀ a : T, (- a + a = 0)%F else not_applicable;
-    (* when has not opposite *)
+    (* when has monus... *)
     rngl_opt_add_sub_add_sub :
       if rngl_has_monus then ∀ a b, (a + (b - a) = b + (a - b))%F
       else not_applicable;
