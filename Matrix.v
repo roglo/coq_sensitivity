@@ -225,7 +225,7 @@ intros.
 apply matrix_eq; cbn.
 intros * Hi Hj.
 rewrite fold_rngl_sub; [ | easy ].
-apply rngl_sub_diag.
+now apply rngl_sub_diag; left.
 Qed.
 
 (* multiplication left and right with identity *)

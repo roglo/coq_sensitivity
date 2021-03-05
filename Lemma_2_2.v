@@ -262,7 +262,7 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
     rewrite rngl_add_0_l.
     rewrite rngl_add_assoc.
     rewrite (@fold_rngl_sub _ _ Hro).
-    rewrite rngl_sub_diag.
+    rewrite rngl_sub_diag; [ | now left ].
     rewrite rngl_add_0_l.
     destruct (Nat.eq_dec i k) as [Hik| Hik]; [ flia Hi2n Hk2n Hik | ].
     rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
@@ -350,7 +350,7 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
     rewrite rngl_mul_1_r.
     rewrite rngl_add_assoc.
     rewrite (@fold_rngl_sub _ _ Hro).
-    rewrite rngl_sub_diag.
+    rewrite rngl_sub_diag; [ | now left ].
     rewrite rngl_add_0_l.
     rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
       intros j Hj.
@@ -790,7 +790,7 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
   rewrite (rngl_add_add_swap (mat_el (mA n) i j)).
   rewrite HM1 at 1.
   rewrite fold_rngl_sub; [ | easy ].
-  rewrite rngl_sub_diag, rngl_add_0_l.
+  rewrite rngl_sub_diag, rngl_add_0_l; [ | now left ].
   rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
     intros k Hk.
     rewrite HM2; cbn.
