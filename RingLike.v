@@ -181,8 +181,8 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if rngl_has_monus then ∀ a b, (a + (b - a) = b + (a - b))%F
       else not_applicable;
     rngl_opt_sub_sub_sub_add :
-      if rngl_has_opp then not_applicable
-      else ∀ a b c, ((a - b) - c = a - (b + c))%F;
+      if rngl_has_monus then ∀ a b c, ((a - b) - c = a - (b + c))%F
+      else not_applicable;
     rngl_opt_sub_diag :
       if rngl_has_opp then not_applicable else ∀ a, (a - a = 0)%F;
     rngl_opt_sub_0_l :
@@ -540,7 +540,7 @@ destruct mo. {
   rewrite <- rngl_add_assoc in H1.
   apply rngl_add_cancel_l in H1.
   specialize rngl_opt_sub_sub_sub_add as H2.
-  rewrite Hop in H2.
+  rewrite Hmo in H2.
   rewrite <- H2 in H1.
   rewrite rngl_sub_diag in H1.
   specialize rngl_opt_sub_0_l as H3.
@@ -946,15 +946,19 @@ destruct op. {
   rewrite fold_rngl_sub; [ | easy ].
   rewrite fold_rngl_sub; [ | easy ].
   now rewrite rngl_sub_diag, rngl_add_0_l.
-} {
+}
+remember rngl_has_monus as mo eqn:Hmo.
+symmetry in Hmo.
+destruct mo. {
   specialize rngl_opt_sub_sub_sub_add as H1.
-  rewrite Hop in H1.
+  rewrite Hmo in H1.
   rewrite <- H1.
   rewrite rngl_add_comm.
   rewrite rngl_add_sub; [ easy | ].
   destruct Hom as [Hom| Hom]; [ easy | ].
   now right.
 }
+now destruct Hom.
 Qed.
 
 Theorem rngl_mul_0_l :
@@ -1177,9 +1181,10 @@ now rewrite rngl_opp_involutive.
 Qed.
 
 Theorem rngl_sub_add_distr :
+  rngl_has_opp = true ∨ rngl_has_monus = true →
   ∀ a b c, (a - (b + c) = a - b - c)%F.
 Proof.
-intros.
+intros Hom *.
 remember rngl_has_opp as op eqn:Hop.
 symmetry in Hop.
 destruct op. {
@@ -1188,10 +1193,14 @@ destruct op. {
   unfold rngl_sub; rewrite Hop.
   rewrite rngl_add_assoc.
   apply rngl_add_add_swap.
-} {
-  specialize rngl_opt_sub_sub_sub_add as H1.
-  now rewrite Hop in H1.
 }
+remember rngl_has_monus as mo eqn:Hmo.
+symmetry in Hmo.
+destruct mo. {
+  specialize rngl_opt_sub_sub_sub_add as H1.
+  now rewrite Hmo in H1.
+}
+now destruct Hom.
 Qed.
 
 Theorem eq_rngl_of_nat_0 :
