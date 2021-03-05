@@ -1361,7 +1361,7 @@ Definition mat_mul_row_by_scal n k (M : matrix n n T) s :=
    prove next theorems, swapping rows by going via row 0 *)
 
 Theorem det_mul_row_0_by_scal :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_is_comm = true →
   ∀ n (A : matrix n n T) v,
   n ≠ 0

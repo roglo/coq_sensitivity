@@ -174,7 +174,7 @@ now apply iter_shift.
 Qed.
 
 Theorem rngl_product_list_integral :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_is_integral = true →
   rngl_has_1_neq_0 = true →
   ∀ A (l : list A) f,
@@ -204,7 +204,7 @@ split; [ now right | easy ].
 Qed.
 
 Theorem rngl_product_integral :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_is_integral = true →
   rngl_has_1_neq_0 = true →
   ∀ b e f,
@@ -238,7 +238,7 @@ apply iter_list_permut; [ | | | | easy ]. {
 Qed.
 
 Theorem rngl_inv_product_list :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
   rngl_is_integral = true →
@@ -276,7 +276,7 @@ apply fold_left_app.
 Qed.
 
 Theorem rngl_inv_product :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
   rngl_is_integral = true →
@@ -327,7 +327,7 @@ flia.
 Qed.
 
 Theorem rngl_inv_product_list_comm :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_is_comm = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
@@ -344,7 +344,7 @@ apply Permutation_rev.
 Qed.
 
 Theorem rngl_inv_product_comm :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_is_comm = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
@@ -361,7 +361,7 @@ apply Hnz; flia Hi.
 Qed.
 
 Theorem rngl_product_div_distr :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_is_comm = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →

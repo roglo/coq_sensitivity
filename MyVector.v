@@ -5,9 +5,6 @@ Set Implicit Arguments.
 
 Require Import Utf8 Arith (*Bool*).
 Import List List.ListNotations.
-(*
-Require Import Init.Nat.
-*)
 
 Require Import Misc.
 Require Import RingLike RLsummation (*RLproduct*).
@@ -174,7 +171,7 @@ destruct Hii as [Hii| Hii]; [ now left | now right ].
 Qed.
 
 Theorem vect_dot_mul_scal_mul_comm :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_is_comm = true →
   ∀ {n} (a : T) (U V : vector n T),
   ≺ U, a × V ≻ = (a * ≺ U, V ≻)%F.
@@ -190,7 +187,7 @@ now apply rngl_mul_comm.
 Qed.
 
 Theorem vect_scal_mul_dot_mul_comm :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   ∀ {n} (a : T) (U V : vector n T),
   ≺ a × U, V ≻ = (a * ≺ U, V ≻)%F.
 Proof.

@@ -432,7 +432,7 @@ destruct (lt_dec i j) as [H| H]; [ easy | flia Hj H ].
 Qed.
 
 Theorem rngl_of_nat_sub :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   ∀ i j,
   i < j
   → (rngl_of_nat j - rngl_of_nat i)%F = rngl_of_nat (j - i).
@@ -458,7 +458,7 @@ now cbn; rewrite <- rngl_add_assoc; f_equal.
 Qed.
 
 Theorem rngl_of_nat_mul :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   ∀ a b, (rngl_of_nat a * rngl_of_nat b)%F = rngl_of_nat (a * b).
 Proof.
 intros Hom *.
@@ -470,7 +470,7 @@ apply rngl_of_nat_add.
 Qed.
 
 Theorem rngl_product_rngl_of_nat :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   ∀ n, (Π (i = 1, n), rngl_of_nat i)%F = rngl_of_nat (fact n).
 Proof.
 intros Hom *.
@@ -1026,7 +1026,7 @@ induction P; [ easy | | | ]. {
 Qed.
 
 Theorem rngl_product_product_div_eq_1 :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_is_comm = true →
   rngl_has_inv = true →
   rngl_is_integral = true →
@@ -1338,7 +1338,7 @@ apply (@permut_swap_mul_cancel n); try easy; [ flia Hi | flia Hj ].
 Qed.
 
 Theorem product_product_if_permut :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_is_comm = true →
   rngl_has_inv = true →
   rngl_is_integral = true →

@@ -35,7 +35,7 @@
      - with commutative addition or not
      - with 0 or without, right or left
      - with 1 or without, right or left
-     - with specific subtraction (monus) or not
+     - with specific subtraction (sous) or not
      - with specific division or not
      and so on. *)
 
@@ -55,7 +55,7 @@ Class ring_like_op T :=
     rngl_mul : T → T → T;
     rngl_opt_opp : option (T → T);
     rngl_opt_inv : option (T → T);
-    rngl_opt_monus : option (T → T → T);
+    rngl_opt_sous : option (T → T → T);
     rngl_opt_eucl_div : option ((T → T → T * T) * (T → nat));
     rngl_le : T → T → Prop }.
 
@@ -68,8 +68,8 @@ Definition rngl_has_opp {T} {R : ring_like_op T} :=
 Definition rngl_has_inv {T} {R : ring_like_op T} :=
   bool_of_option rngl_opt_inv.
 
-Definition rngl_has_monus {T} {R : ring_like_op T} :=
-  bool_of_option rngl_opt_monus.
+Definition rngl_has_sous {T} {R : ring_like_op T} :=
+  bool_of_option rngl_opt_sous.
 
 Definition rngl_has_eucl_div {T} {R : ring_like_op T} :=
   bool_of_option rngl_opt_eucl_div.
@@ -86,9 +86,9 @@ Definition rngl_inv {T} {R : ring_like_op T} a :=
   | None => rngl_zero
   end.
 
-Definition rngl_monus {T} {R : ring_like_op T} a b :=
-  match rngl_opt_monus with
-  | Some rngl_monus => rngl_monus a b
+Definition rngl_sous {T} {R : ring_like_op T} a b :=
+  match rngl_opt_sous with
+  | Some rngl_sous => rngl_sous a b
   | None => rngl_zero
   end.
 
@@ -118,7 +118,7 @@ Definition rngl_eucl_div {T} {R : ring_like_op T} a b :=
 
 Definition rngl_sub {T} {R : ring_like_op T} a b :=
   if rngl_has_opp then rngl_add a (rngl_opp b)
-  else if rngl_has_monus then rngl_monus a b
+  else if rngl_has_sous then rngl_sous a b
   else rngl_zero.
 Definition rngl_div {T} {R : ring_like_op T} a b :=
   if rngl_has_inv then rngl_mul a (rngl_inv b)
@@ -176,27 +176,21 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* when has opposite *)
     rngl_opt_add_opp_l :
       if rngl_has_opp then ∀ a : T, (- a + a = 0)%F else not_applicable;
-    (* when has monus... *)
-    rngl_opt_add_sub_add_sub :
-      if rngl_has_monus then ∀ a b, (a + (b - a) = b + (a - b))%F
+    (* when has sous *)
+    rngl_opt_add_sub :
+      if rngl_has_sous then ∀ a b, (a + b - b)%F = a
       else not_applicable;
     rngl_opt_sub_sub_sub_add :
-      if rngl_has_monus then ∀ a b c, ((a - b) - c = a - (b + c))%F
+      if rngl_has_sous then ∀ a b c, ((a - b) - c = a - (b + c))%F
       else not_applicable;
     rngl_opt_sub_diag :
-      if rngl_has_monus then ∀ a, (a - a = 0)%F
-      else not_applicable;
-    rngl_opt_sub_0_l :
-      if rngl_has_monus then ∀ a, (0 - a = 0)%F
-      else not_applicable;
-    rngl_opt_add_cancel_l :
-      if rngl_has_monus then ∀ a b c, (a + b = a + c)%F → (b = c)%F
+      if rngl_has_sous then ∀ a, (a - a = 0)%F
       else not_applicable;
     rngl_opt_mul_sub_distr_l :
-      if rngl_has_monus then ∀ a b c : T, (a * (b - c) = a * b - a * c)%F
+      if rngl_has_sous then ∀ a b c : T, (a * (b - c) = a * b - a * c)%F
       else not_applicable;
     rngl_opt_mul_sub_distr_r :
-      if rngl_has_monus then
+      if rngl_has_sous then
         if rngl_is_comm then not_applicable
         else ∀ a b c : T, ((a - b) * c = a * c - b * c)%F
       else not_applicable;
@@ -416,13 +410,6 @@ rewrite Hor, Hop in H.
 apply H.
 Qed.
 
-Theorem rngl_sub_0_l : rngl_has_monus = true → ∀ a, (0 - a = 0)%F.
-Proof.
-intros H1 *.
-specialize rngl_opt_sub_0_l as H.
-now rewrite H1 in H.
-Qed.
-
 Theorem rngl_not_le :
   rngl_is_ordered = true →
   ∀ a b, (¬ a ≤ b → a = b ∨ b ≤ a)%F.
@@ -484,7 +471,7 @@ now rewrite Hro.
 Qed.
 
 Theorem rngl_sub_diag :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   ∀ a, (a - a = 0)%F.
 Proof.
 intros Hom *.
@@ -496,7 +483,7 @@ destruct op. {
   rewrite rngl_add_comm.
   now apply rngl_add_opp_l.
 }
-remember rngl_has_monus as mo eqn:Hmo.
+remember rngl_has_sous as mo eqn:Hmo.
 symmetry in Hmo.
 destruct mo. {
   specialize rngl_opt_sub_diag as H1.
@@ -505,8 +492,32 @@ destruct mo. {
 now destruct Hom.
 Qed.
 
+Theorem rngl_add_sub :
+  rngl_has_opp = true ∨ rngl_has_sous = true →
+  ∀ a b, (a + b - b = a)%F.
+Proof.
+intros Hom *.
+remember rngl_has_opp as op eqn:Hop.
+symmetry in Hop.
+destruct op. {
+  unfold rngl_sub.
+  rewrite Hop.
+  rewrite <- rngl_add_assoc.
+  rewrite (rngl_add_comm b).
+  now rewrite rngl_add_opp_l, rngl_add_0_r.
+}
+remember rngl_has_sous as mo eqn:Hmo.
+symmetry in Hmo.
+destruct mo. {
+  specialize rngl_opt_add_sub as H1.
+  rewrite Hmo in H1.
+  apply H1.
+}
+now destruct Hom.
+Qed.
+
 Theorem rngl_add_cancel_l :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   ∀ a b c, (a + b = a + c)%F → (b = c)%F.
 Proof.
 intros Hom * Habc.
@@ -522,53 +533,21 @@ destruct op. {
   rewrite rngl_sub_diag in Habc; [ | now rewrite Hop ].
   now do 2 rewrite rngl_add_0_r in Habc.
 }
-remember rngl_has_monus as mo eqn:Hmo.
+remember rngl_has_sous as mo eqn:Hmo.
 symmetry in Hmo.
 destruct mo. {
-  specialize rngl_opt_add_cancel_l as H1.
+  specialize rngl_opt_add_sub as H1.
   rewrite Hmo in H1.
-  now apply H1 in Habc.
-}
-now destruct Hom.
-Qed.
-
-Theorem rngl_add_sub :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
-  ∀ a b, (a + b - b = a)%F.
-Proof.
-intros Hom *.
-remember rngl_has_opp as op eqn:Hop.
-symmetry in Hop.
-destruct op. {
-  unfold rngl_sub.
-  rewrite Hop.
-  rewrite <- rngl_add_assoc.
-  rewrite (rngl_add_comm b).
-  now rewrite rngl_add_opp_l, rngl_add_0_r.
-}
-remember rngl_has_monus as mo eqn:Hmo.
-symmetry in Hmo.
-destruct mo. {
-  specialize rngl_opt_add_sub_add_sub as H1.
-  rewrite Hmo in H1.
-  specialize (H1 b (a + b)%F).
-  rewrite (rngl_add_comm a) in H1.
-  rewrite <- rngl_add_assoc in H1.
-  apply rngl_add_cancel_l in H1; [ | now rewrite Hop, Hmo ].
-  specialize rngl_opt_sub_sub_sub_add as H2.
-  rewrite Hmo in H2.
-  rewrite <- H2 in H1.
-  rewrite rngl_sub_diag in H1; [ | now rewrite Hop, Hmo ].
-  specialize rngl_opt_sub_0_l as H3.
-  rewrite Hmo in H3.
-  rewrite H3, rngl_add_0_r in H1.
-  now rewrite rngl_add_comm in H1.
+  specialize (H1 c a) as H2.
+  rewrite rngl_add_comm, <- Habc in H2.
+  rewrite rngl_add_comm in H2.
+  now rewrite H1 in H2.
 }
 now destruct Hom.
 Qed.
 
 Theorem rngl_add_sub_eq_l :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   ∀ a b c, (a + b = c → c - a = b)%F.
 Proof.
 intros Hom * Hab.
@@ -578,7 +557,7 @@ now apply rngl_add_sub.
 Qed.
 
 Theorem rngl_add_sub_eq_r :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
    ∀ a b c, (a + b = c → c - b = a)%F.
 Proof.
 intros Hom * Hab.
@@ -594,7 +573,7 @@ now rewrite Hab.
 Qed.
 
 Theorem rngl_add_reg_r :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   ∀ a b c, (a + c = b + c)%F → (a = b)%F.
 Proof.
 intros Hom * Habc.
@@ -603,7 +582,7 @@ now do 2 rewrite rngl_add_sub in Habc.
 Qed.
 
 Theorem rngl_mul_0_r :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   ∀ a, (a * 0 = 0)%F.
 Proof.
 intros Hom *.
@@ -644,7 +623,7 @@ now apply rngl_add_move_0_r in H.
 Qed.
 
 Theorem rngl_mul_sub_distr_l :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   ∀ a b c, (a * (b - c) = a * b - a * c)%F.
 Proof.
 intros Hom *.
@@ -654,7 +633,7 @@ destruct op. {
   rewrite rngl_mul_add_distr_l.
   now rewrite rngl_mul_opp_r.
 }
-remember rngl_has_monus as mo eqn:Hmo; symmetry in Hmo.
+remember rngl_has_sous as mo eqn:Hmo; symmetry in Hmo.
 destruct mo. {
   specialize rngl_opt_mul_sub_distr_l as H1.
   now rewrite Hmo in H1.
@@ -663,7 +642,7 @@ now destruct Hom.
 Qed.
 
 Theorem rngl_integral :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   (rngl_is_integral || (rngl_has_inv && rngl_has_dec_eq))%bool = true →
   ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F.
 Proof.
@@ -907,7 +886,7 @@ now apply rngl_sub_diag; left.
 Qed.
 
 Theorem rngl_sub_0_r :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   ∀ a, (a - 0 = a)%F.
 Proof.
 intros Hom *.
@@ -919,14 +898,13 @@ destruct op. {
   rewrite rngl_opp_0; [ | easy ].
   apply rngl_add_0_r.
 }
-remember rngl_has_monus as mo eqn:Hmo.
+remember rngl_has_sous as mo eqn:Hmo.
 symmetry in Hmo.
 destruct mo. {
-  specialize rngl_opt_add_sub_add_sub as H1.
+  specialize rngl_opt_add_sub as H1.
   rewrite Hmo in H1.
-  specialize (H1 a 0%F).
-  rewrite rngl_sub_0_l in H1; [ | easy ].
-  now rewrite rngl_add_0_r, rngl_add_0_l in H1.
+  specialize (H1 a 0%F) as H2.
+  now rewrite rngl_add_0_r in H2.
 }
 now destruct Hom.
 Qed.
@@ -949,7 +927,7 @@ now apply rngl_sub_diag; left.
 Qed.
 
 Theorem rngl_add_sub_simpl_l :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   ∀ a b c : T, (a + b - (a + c) = b - c)%F.
 Proof.
 intros Hom *.
@@ -967,7 +945,7 @@ destruct op. {
   rewrite fold_rngl_sub; [ | easy ].
   rewrite rngl_sub_diag, rngl_add_0_l; [ easy | now left ].
 }
-remember rngl_has_monus as mo eqn:Hmo.
+remember rngl_has_sous as mo eqn:Hmo.
 symmetry in Hmo.
 destruct mo. {
   specialize rngl_opt_sub_sub_sub_add as H1.
@@ -982,7 +960,7 @@ now destruct Hom.
 Qed.
 
 Theorem rngl_mul_0_l :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   ∀ a, (0 * a = 0)%F.
 Proof.
 intros Hom a.
@@ -1062,7 +1040,7 @@ now apply rngl_add_move_0_r.
 Qed.
 
 Theorem rngl_inv_neq_0 :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
   ∀ a, a ≠ 0%F → (¹/ a ≠ 0)%F.
@@ -1076,7 +1054,7 @@ now apply rngl_1_neq_0.
 Qed.
 
 Theorem rngl_inv_involutive :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
   ∀ x, x ≠ 0%F → (¹/ ¹/ x)%F = x.
@@ -1127,7 +1105,7 @@ now apply rngl_opp_involutive.
 Qed.
 
 Theorem rngl_inv_inj :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
   ∀ a b, a ≠ 0%F → b ≠ 0%F →(¹/ a = ¹/ b)%F → a = b.
@@ -1139,7 +1117,7 @@ now apply rngl_inv_involutive.
 Qed.
 
 Theorem rngl_inv_mul_distr :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_is_integral = true →
   rngl_has_inv = true →
   ∀ a b, a ≠ 0%F → b ≠ 0%F →(¹/ (a * b) = ¹/ b * ¹/ a)%F.
@@ -1201,7 +1179,7 @@ now rewrite rngl_opp_involutive.
 Qed.
 
 Theorem rngl_sub_add_distr :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   ∀ a b c, (a - (b + c) = a - b - c)%F.
 Proof.
 intros Hom *.
@@ -1214,7 +1192,7 @@ destruct op. {
   rewrite rngl_add_assoc.
   apply rngl_add_add_swap.
 }
-remember rngl_has_monus as mo eqn:Hmo.
+remember rngl_has_sous as mo eqn:Hmo.
 symmetry in Hmo.
 destruct mo. {
   specialize rngl_opt_sub_sub_sub_add as H1.
@@ -1236,7 +1214,7 @@ now specialize (rngl_char_prop i) as H.
 Qed.
 
 Theorem rngl_of_nat_inj :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_characteristic = 0 →
   ∀ i j,
   rngl_of_nat i = rngl_of_nat j
@@ -1306,7 +1284,7 @@ apply rngl_mul_1_r.
 Qed.
 
 Theorem rngl_div_0_l :
-  rngl_has_inv = true ∧ (rngl_has_opp = true ∨ rngl_has_monus = true) ∨
+  rngl_has_inv = true ∧ (rngl_has_opp = true ∨ rngl_has_sous = true) ∨
     rngl_has_eucl_div = true ∧ rngl_is_comm = true ∧ rngl_has_opp = true ∧
     rngl_has_dec_eq = true →
   ∀ a, a ≠ 0%F → (0 / a)%F = 0%F.
@@ -1334,7 +1312,7 @@ now apply rngl_mul_inv_r.
 Qed.
 
 Theorem rngl_mul_sub_distr_r :
-  rngl_has_opp = true ∨ rngl_has_monus = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   ∀ a b c, ((a - b) * c = a * c - b * c)%F.
 Proof.
 intros Hom *.
@@ -1344,7 +1322,7 @@ destruct op. {
   rewrite rngl_mul_add_distr_r.
   now rewrite rngl_mul_opp_l.
 }
-remember rngl_has_monus as mo eqn:Hmo; symmetry in Hmo.
+remember rngl_has_sous as mo eqn:Hmo; symmetry in Hmo.
 destruct mo. {
   specialize rngl_opt_mul_sub_distr_r as H1.
   remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.

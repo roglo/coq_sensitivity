@@ -574,7 +574,7 @@ Canonical Structure mat_ring_like_op n :
      rngl_mul := @mat_mul T _ n n n;
      rngl_opt_opp := Some (@mat_opp T _ n n);
      rngl_opt_inv := None;
-     rngl_opt_monus := None;
+     rngl_opt_sous := None;
      rngl_opt_eucl_div := None;
      rngl_le := @phony_mat_le n |}.
 
@@ -739,11 +739,9 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_opt_mul_1_r := mat_mul_1_r;
      rngl_opt_mul_add_distr_r := mat_mul_add_distr_r;
      rngl_opt_add_opp_l := @mat_opt_add_opp_l n;
-     rngl_opt_add_sub_add_sub := NA;
+     rngl_opt_add_sub := NA;
      rngl_opt_sub_sub_sub_add := NA;
      rngl_opt_sub_diag := NA;
-     rngl_opt_sub_0_l := NA;
-     rngl_opt_add_cancel_l := NA;
      rngl_opt_mul_sub_distr_l := NA;
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := NA;
