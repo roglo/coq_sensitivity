@@ -1278,6 +1278,7 @@ Theorem determinant_alternating_permut_fun :
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hp.
 remember (transp_list_of_permut_fun n σ) as trl eqn:Htrl.
+Abort. (*
 Print mat_permut_rows_fun.
 Search transp_list_of_permut_fun.
 Print transp_list_of_permut_fun.
@@ -1355,7 +1356,7 @@ Definition mat_mul_row_by_scal n k (M : matrix n n T) s :=
 (* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html
    point 1 *)
 
-(* Well, since my definition of the discriminant only covers the
+(* Well, since my definition of the determinant only covers the
    row 0, we can prove that only when i=0; this will able us to
    prove next theorems, swapping rows by going via row 0 *)
 
@@ -1736,51 +1737,8 @@ Theorem laplace_formula_on_rows :
   → i < n
   → determinant M = Σ (j = 0, n - 1), mat_el M i j * mat_el (comatrix M) i j.
 Proof.
-(*
 intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hlin.
-destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
-  subst i.
-  unfold determinant.
-  destruct n; [ easy | cbn ].
-  symmetry.
-  rewrite Nat.sub_0_r at 1.
-  apply rngl_summation_eq_compat.
-  intros j Hj.
-  rewrite rngl_mul_comm; [ | easy ].
-  rewrite rngl_mul_mul_swap; [ | easy ].
-  f_equal; f_equal.
-  apply Nat.sub_0_r.
-}
-destruct (le_dec n 1) as [Hn1| Hn1]. {
-  destruct n; [ easy | ].
-  destruct n; [ flia Hlin Hiz | flia Hn1 ].
-}
-apply Nat.nle_gt in Hn1.
-unfold comatrix; symmetry; cbn.
-destruct (Nat.eq_dec i (n - 1)) as [Hin1| Hin1]. {
-  unfold comatrix; symmetry; cbn.
-  destruct n; [ easy | clear Hnz; cbn ].
-  rewrite Nat.sub_succ, Nat.sub_0_r in Hin1; subst i.
 ...
-erewrite rngl_summation_eq_compat. 2: {
-  intros j (_, Hj).
-  specialize (determinant_alternating Hic Hop Hin Hit H10 Hde Hch) as H1.
-  apply Nat.neq_0_lt_0 in Hnz.
-  specialize (H1 _ (subm M i j) i 0 Hiz).
-...
-  assert (0 < n - 1) by flia Hn1.
-...
-  specialize (H1 _ M i 0 Hiz Hlin Hnz).
-  apply (f_equal rngl_opp) in H1.
-  rewrite rngl_opp_involutive in H1; [ | easy ].
-  rewrite <- H1.
-unfold determinant.
-destruct n; [ easy | clear Hnz Hiz ].
-cbn - [ mat_swap_rows ].
-rewrite Nat.sub_0_r at 1.
-...
-*)
-intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hlin.
 destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   subst i.
   unfold determinant.
@@ -1816,8 +1774,8 @@ cbn - [ determinant ].
 (**)
 rewrite H1; cbn.
 rewrite rngl_opp_summation; [ | easy | easy ].
+...
 unfold determinant.
-Abort. (*
 ...
 destruct (Nat.eq_dec i n) as [Hein| Hein]. {
   subst i; clear Hlin.
