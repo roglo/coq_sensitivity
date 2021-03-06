@@ -676,7 +676,7 @@ rewrite rngl_add_opp_l in Hab; [ | easy ].
 now rewrite rngl_add_0_r, rngl_add_0_l in Hab.
 Qed.
 
-(* exist in Arith, but by principle I don't add Import Arith in the
+(* exist in Arith, but by principle I don't want Import Arith in the
    present module *)
 Theorem Nat_nlt_ge : ∀ a b, a ≤ b → not (b < a).
 Proof.
