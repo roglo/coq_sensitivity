@@ -1,5 +1,6 @@
 \documentclass[t]{beamer}
 \input{common.tex}
+\usepackage{ulem}
 
 % Images
 \pgfdeclareimage[interpolate=true,height=0.7cm]{ordo1}{images/ordo1}
@@ -256,12 +257,35 @@
     \end{tabular}
   }
 
-  \only<5->{
+}
+
+\frm{Subtraction: 2nd version}{
+
+  \hspace{1mm}
+  \begin{tabular}{ll}
+    \sout{$\forall$ a b} &
+    \sout{a + (b $\dotminus$ a) = b + (a $\dotminus$ b)} \\
+    $\forall$ a b c &
+    (a $\dotminus$ b) $\dotminus$ c = a $\dotminus$ (b + c) \\
+    $\forall$ a & a $\dotminus$ a = 0 \\
+    \sout{$\forall$ a} & \sout{0 $\dotminus$ a = 0} \\
+    $\forall$ a b & a + b $\dotminus$ b = a \\
+  \end{tabular}
+
+  \only<2->{
+    \vsp
+    and...
+  }
+
+  \only<3->{
     \vsp
     \hspace{1mm}
     \begin{tabular}{ll}
-      $\forall$ a b & a + b - b = a \\
+      $\forall$ a b c & a + b = a + c $\implies$ b = c \\
     \end{tabular}
+
+    \hspace{3mm}
+    is provable
   }
 
 }
