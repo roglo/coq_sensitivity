@@ -95,7 +95,7 @@ Canonical Structure quad_int_ring_like_op {d} : ring_like_op (quad_int d) :=
      rngl_mul := @qi_mul d;
      rngl_opt_opp := Some (@qi_opp d);
      rngl_opt_inv := None;
-     rngl_opt_monus := None;
+     rngl_opt_sous := None;
      rngl_opt_eucl_div :=
        if In_dec Z.eq_dec d having_eucl_div then Some (qi_eucl_div, qi_gauge)
        else None;
