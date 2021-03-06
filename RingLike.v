@@ -1201,38 +1201,18 @@ now destruct Hom.
 Qed.
 
 Theorem rngl_sub_sub_distr :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp = true →
   ∀ a b c, (a - (b - c) = a - b + c)%F.
 Proof.
-intros Hom *.
-remember rngl_has_opp as op eqn:Hop.
-symmetry in Hop.
-destruct op. {
-  unfold rngl_sub.
-  rewrite Hop.
-  rewrite rngl_opp_add_distr; [ | easy ].
-  rewrite rngl_opp_involutive; [ | easy ].
-  unfold rngl_sub; rewrite Hop.
-  rewrite rngl_add_assoc.
-  apply rngl_add_add_swap.
-}
-remember rngl_has_sous as mo eqn:Hmo.
-symmetry in Hmo.
-destruct mo. {
-  specialize rngl_opt_sub_sub_sub_add as H1.
-  rewrite Hmo in H1.
-(* probably has to be added in the axioms *)
-Require Import Arith.
-Search (_ - (_ + _))%nat.
-Search (_ - (_ - _))%nat.
-(* ah, tiens, ça n'a pas l'air bon dans ℕ *)
-(* faut peut-être limiter ce théorème aux has_opp = true *)
-Compute (let '(a, b, c) := (3, 2, 4) in (a - (b - c), a - b + c)).
-...
-}
-now destruct Hom.
+intros Hop *.
+unfold rngl_sub.
+rewrite Hop.
+rewrite rngl_opp_add_distr; [ | easy ].
+rewrite rngl_opp_involutive; [ | easy ].
+unfold rngl_sub; rewrite Hop.
+rewrite rngl_add_assoc.
+apply rngl_add_add_swap.
 Qed.
-...
 
 Theorem eq_rngl_of_nat_0 :
   rngl_characteristic = 0 →
