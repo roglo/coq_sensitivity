@@ -183,11 +183,6 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_opt_sub_sub_sub_add :
       if rngl_has_sous then ∀ a b c, ((a - b) - c = a - (b + c))%F
       else not_applicable;
-(*
-    rngl_opt_sub_diag :
-      if rngl_has_sous then ∀ a, (a - a = 0)%F
-      else not_applicable;
-*)
     rngl_opt_mul_sub_distr_l :
       if rngl_has_sous then ∀ a b c : T, (a * (b - c) = a * b - a * c)%F
       else not_applicable;
