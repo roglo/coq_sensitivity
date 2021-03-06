@@ -741,7 +741,6 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_opt_add_opp_l := @mat_opt_add_opp_l n;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_sub_sub_add := NA;
-     rngl_opt_sub_diag := NA;
      rngl_opt_mul_sub_distr_l := NA;
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := NA;
