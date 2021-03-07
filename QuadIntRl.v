@@ -88,7 +88,7 @@ Definition having_eucl_div :=
   [-11; -7; -3; -2; -1; 2; 3; 5; 6; 7; 11; 13; 17; 19; 21;
    29; 33; 37; 41; 57; 73].
 
-Canonical Structure quad_int_ring_like_op {d} : ring_like_op (quad_int d) :=
+Definition quad_int_ring_like_op {d} : ring_like_op (quad_int d) :=
   {| rngl_zero := @qi_zero d;
      rngl_one := @qi_one d;
      rngl_add := @qi_add d;
@@ -309,7 +309,6 @@ destruct (Z.eq_dec d (-1)) as [Hd1| Hd1]. {
   move ro at top; move a after b; move γ after γ'.
   move H1 after H4; move H2 after H4; move H3 after H4.
   move Hbz before b.
-Print qi_gauge.
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
