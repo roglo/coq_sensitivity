@@ -309,6 +309,7 @@ destruct (Z.eq_dec d (-1)) as [Hd1| Hd1]. {
   move ro at top; move a after b; move γ after γ'.
   move H1 after H4; move H2 after H4; move H3 after H4.
   move Hbz before b.
+Print qi_gauge.
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
