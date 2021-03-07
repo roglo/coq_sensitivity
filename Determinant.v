@@ -1739,7 +1739,20 @@ Theorem laplace_formula_on_rows :
   → determinant M = Σ (j = 0, n - 1), mat_el M i j * mat_el (comatrix M) i j.
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hlin.
+unfold determinant.
+destruct n; [ easy | clear Hnz; cbn ].
+rewrite Nat.sub_0_r at 1.
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite Nat.sub_0_r at 2.
+  rewrite rngl_mul_comm; [ | easy ].
+  rewrite rngl_mul_mul_swap; [ | easy ].
+  easy.
+}
+symmetry.
 ...
+intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hlin.
 destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   subst i.
   unfold determinant.
