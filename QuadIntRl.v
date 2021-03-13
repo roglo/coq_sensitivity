@@ -70,26 +70,36 @@ Notation "〈 '𝑖' 〉" := (mk_qi (-1) 0 1)
 Definition qi_gauge {d} (α : quad_int d) :=
   Z.abs_nat (qi_re (α * qi_conj α)%QI).
 
-Definition old_qi_eucl_div {d} (α β : quad_int d) :=
+Definition old_qi_eucl_quo_list {d} (α β : quad_int d) :=
   let den := qi_re (β * qi_conj β)%QI in
   let γ := qi_re (α * qi_conj β)%QI / den in
   let γ' := qi_im (α * qi_conj β)%QI / den in
-  let q :=
-(*    if lt_dec (qi_gauge (α - β * mk_qi d γ γ')%QI) (qi_gauge β) then
-      mk_qi d γ γ'
-    else *) if lt_dec (qi_gauge (α - β * mk_qi d (γ + 1) γ')%QI) (qi_gauge β) then
-      mk_qi d (γ + 1) γ'
-    else if lt_dec (qi_gauge (α - β * mk_qi d  γ (γ' + 1))%QI) (qi_gauge β) then
-      mk_qi d γ (γ' + 1)
-    else if
-      lt_dec (qi_gauge (α - β * mk_qi d (γ + 1) (γ' + 1))%QI) (qi_gauge β)
-    then
-      mk_qi d (γ + 1) (γ' + 1)
-    else
-      0%QI
+  let ql := [] in
+  let ql1 :=
+    if lt_dec (qi_gauge (α - β * mk_qi d γ γ')%QI) (qi_gauge β) then
+      mk_qi d γ γ' :: ql
+    else ql
   in
-  let r := (α - β * q)%QI in
-  (q, r).
+  let ql2 :=
+    if lt_dec (qi_gauge (α - β * mk_qi d (γ + 1) γ')%QI) (qi_gauge β) then
+      mk_qi d (γ + 1) γ' :: ql1
+    else ql1
+  in
+  let ql3 :=
+      if lt_dec (qi_gauge (α - β * mk_qi d  γ (γ' + 1))%QI) (qi_gauge β) then
+        mk_qi d γ (γ' + 1) :: ql2
+      else ql2
+  in
+  let ql4 :=
+      if lt_dec (qi_gauge (α - β * mk_qi d (γ + 1) (γ' + 1))%QI) (qi_gauge β)
+      then
+        mk_qi d (γ + 1) (γ' + 1) :: ql3
+      else ql3
+  in
+  ql4.
+
+Definition old_qi_eucl_div {d} (α β : quad_int d) :=
+  map (λ q, (q, (α - β * q)%QI)) (old_qi_eucl_quo_list α β).
 
 Compute (Z.div_eucl 23 4).
 Compute (Z.div_eucl (-23) 4).
@@ -111,34 +121,33 @@ Compute (Z_div_eucl' (-23) (-4)).
 
 Search Z.div_eucl.
 
-Definition qi_eucl_div d (α β : quad_int d) :=
-  let den := qi_re (β * qi_conj β)%QI in
-  let '(γ₁, r₁) := Z.div_eucl (qi_re (α * qi_conj β)) den in
-  let '(γ'₁, r'₁) := Z.div_eucl (qi_im (α * qi_conj β)) den in
-  let '(γ, r) :=
-    if Z_lt_dec r₁ (den / 2) then (γ₁, r₁) else (γ₁ + 1, r₁ - den)
-  in
-  let '(γ', r') :=
-    if Z_lt_dec r'₁ (den / 2) then (γ'₁, r'₁) else (γ'₁ + 1, r'₁ - den)
-  in
-  (mk_qi d γ γ', mk_qi d r r', den, r₁).
-
-Check old_qi_eucl_div.
-Check qi_eucl_div.
-
-Compute (old_qi_eucl_div (mk_qi (-1) (- 36) 242) (mk_qi (-1) 50 50)).
-Compute (qi_eucl_div (mk_qi (-1) (- 36) 242) (mk_qi (-1) 50 50)).
-Compute (qi_eucl_div (mk_qi (-1) 36 242) (mk_qi (-1) 50 50)).
-...
-
-Compute (mk_qi (-1) 0 1 * mk_qi (-1) 0 1)%QI.
-Compute (1 / mk_qi (-1) 0 1)%QI.
-Compute (1 / mk_qi (-1) 0 (- 1))%QI.
-Compute (@qi_zero 42 / @qi_zero 42)%QI.
+Definition qi_eucl_div d (a b : quad_int d) :=
+  let den := qi_re (b * qi_conj b)%QI in
+  let '(γ₁, r₁) := Z.div_eucl (qi_re (a * qi_conj b)) den in
+  let '(γ'₁, r'₁) := Z.div_eucl (qi_im (a* qi_conj b)) den in
+  let γ := if Z_le_dec r₁ (den / 2) then γ₁ else γ₁ + 1 in
+  let γ' := if Z_le_dec r'₁ (den / 2) then γ'₁ else γ'₁ + 1 in
+  let q := mk_qi d γ γ' in
+  let r := (a - b * q)%QI in
+  (q, r).
 
 Definition qi_div d (α β : quad_int d) := fst (qi_eucl_div α β).
 
 Notation "α / β" := (qi_div α β) : QI_scope.
+
+Compute (qi_eucl_div (mk_qi (-1) (- 36) 242) (mk_qi (-1) 50 50)).
+Compute (old_qi_eucl_div (mk_qi (-1) (- 36) 242) (mk_qi (-1) 50 50)).
+Compute (qi_eucl_div (mk_qi (-1) 36 242) (mk_qi (-1) 50 50)).
+Compute (old_qi_eucl_div (mk_qi (-1) 36 242) (mk_qi (-1) 50 50)).
+Compute (mk_qi (-1) 0 1 * mk_qi (-1) 0 1)%QI.
+Check qi_eucl_div 1%QI (mk_qi (-1) 0 1).
+Compute (qi_eucl_div 1%QI (mk_qi (-1) 0 1)).
+Compute (old_qi_eucl_div 1%QI (mk_qi (-1) 0 1)).
+Compute (1 / mk_qi (-1) 0 1)%QI.
+Compute (1 / mk_qi (-1) 0 (- 1))%QI.
+Compute (@qi_zero 42 / @qi_zero 42)%QI.
+
+...
 
 Definition phony_qi_le {d} (a b : quad_int d) := False.
 
