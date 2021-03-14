@@ -308,9 +308,37 @@ cbn - [ In_dec ].
 destruct (in_dec Z.eq_dec d having_eucl_div) as [Hhed| Hhed]; [ cbn | easy ].
 intros * Hbz Hab.
 unfold qi_eucl_div in Hab.
+set (bb := qi_re (b * qi_conj b)) in Hab.
+remember (Z.div_eucl (qi_re (a * qi_conj b)) bb) as γr eqn:Hγr.
+symmetry in Hγr.
+destruct γr as (γ₁, r₁).
+remember (Z.div_eucl (qi_im (a * qi_conj b)) bb) as γr' eqn:Hγr'.
+symmetry in Hγr'.
+destruct γr' as (γ'₁, r'₁).
+move γ'₁ before γ₁.
+move r'₁ before r₁.
+remember (if Z_le_dec _ _ then _ else _) as q₁ eqn:Hq₁ in Hab.
+remember (if Z_le_dec _ _ then _ else _) as q'₁ eqn:Hq'₁ in Hab.
+move q'₁ before q₁.
+injection Hab; clear Hab; intros Hr Hq.
+symmetry in Hr, Hq.
+rewrite <- Hq in Hr.
+split. {
+  rewrite Hr.
+  rewrite quad_int_add_sub_assoc.
+  rewrite quad_int_add_comm.
+  symmetry.
+  apply quad_int_add_sub.
+}
+destruct (Z_le_dec (2 * r₁) bb) as [Hrbb| Hrbb]. {
+  destruct (Z_le_dec (2 * r'₁) bb) as [Hr'bb| Hr'bb]. {
 ...
-set (den := qi_re (b * qi_conj b)) in Hab.
-set (γ := qi_re (a * qi_conj b) / den) in Hab.
+(* mouais, bon, faut que je ne continue ça que sur les valeurs de d
+   où c'est censé marcher. J'avais commencé avec √-1, c'est-à-dire i,
+   faut que je ne le fasse que pour lui, du moins dans un premier
+   temps *)
+...
+set (γ₁ := qi_re (a * qi_conj b) / bb) in Hab.
 set (γ' := qi_im (a * qi_conj b) / den) in Hab.
 destruct (lt_dec (qi_gauge (a - b * 〈 γ + γ' √d 〉)%QI) (qi_gauge b))
   as [H1| H1]. {
