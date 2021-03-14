@@ -127,14 +127,12 @@ Compute (Z_div_eucl' 23 (-4)).
 Compute (Z_div_eucl' (-23) (-4)).
 *)
 
-Search Z.div_eucl.
-
 Definition qi_eucl_div d (a b : quad_int d) :=
-  let den := qi_re (b * qi_conj b)%QI in
-  let '(γ₁, r₁) := Z.div_eucl (qi_re (a * qi_conj b)) den in
-  let '(γ'₁, r'₁) := Z.div_eucl (qi_im (a* qi_conj b)) den in
-  let γ := if Z_le_dec (2 * r₁) den then γ₁ else γ₁ + 1 in
-  let γ' := if Z_le_dec (2 * r'₁) den then γ'₁ else γ'₁ + 1 in
+  let bb := qi_re (b * qi_conj b)%QI in
+  let '(γ₁, r₁) := Z.div_eucl (qi_re (a * qi_conj b)) bb in
+  let '(γ'₁, r'₁) := Z.div_eucl (qi_im (a* qi_conj b)) bb in
+  let γ := if Z_le_dec (2 * r₁) bb then γ₁ else γ₁ + 1 in
+  let γ' := if Z_le_dec (2 * r'₁) bb then γ'₁ else γ'₁ + 1 in
   let q := mk_qi d γ γ' in
   let r := (a - b * q)%QI in
   (q, r).
