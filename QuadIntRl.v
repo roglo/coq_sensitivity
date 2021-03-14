@@ -294,8 +294,11 @@ do 2 rewrite Z.add_0_r.
 now destruct a.
 Qed.
 
+Definition square_free d :=
+...
+
 Theorem quad_int_eucl_div :
-  d ≠ 0 →
+  square_free d && d ≠ 1 →
   if rngl_has_eucl_div then
     ∀ a b q r : quad_int d,
     b ≠ 0%F
