@@ -294,6 +294,7 @@ do 2 rewrite Z.add_0_r.
 now destruct a.
 Qed.
 
+(* https://en.wikipedia.org/wiki/Square-free_integer *)
 Definition square_free d :=
 ...
 
