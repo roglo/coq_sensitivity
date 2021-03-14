@@ -50,8 +50,8 @@ Notation "- α" := (qi_opp α) : QI_scope.
 Notation "α + β" := (qi_add α β) : QI_scope.
 Notation "α * β" := (qi_mul α β) : QI_scope.
 Notation "α - β" := (qi_sub α β) : QI_scope.
-Notation "'〈' a + b √ d 〉" := (mk_qi d a b)
-  (at level 1, a at level 35, b at level 35 ,
+Notation "'〈' a + b '√' d 〉" := (mk_qi d a b)
+  (at level 1, a at level 35, b at level 35,
    format "〈  a  +  b  √ d  〉") : QI_scope.
 
 Notation "〈 b √ d 〉" := (mk_qi d 0 b)
@@ -67,7 +67,7 @@ Notation "'〈' a - b '𝑖' 〉" := (mk_qi (-1) a (Zneg b))
 Notation "'〈' b '𝑖' 〉" := (mk_qi (-1) 0 b)
   (at level 1, b at level 35, format "〈  b  𝑖  〉") : QI_scope.
 Notation "'〈' a 〉" := (mk_qi (-1) a 0)
-  (at level 1, format "〈  a  〉") : QI_scope.
+  (at level 1, format "〈  a  〉", a at level 35) : QI_scope.
 Notation "'〈' 0 〉" := (mk_qi (-1) 0 0)
   (at level 1, format "〈  0  〉") : QI_scope.
 Notation "〈 - '𝑖' 〉" := (mk_qi (-1) 0 (-1))
@@ -127,10 +127,10 @@ Compute (Z_div_eucl' 23 (-4)).
 Compute (Z_div_eucl' (-23) (-4)).
 *)
 
-Definition qi_eucl_div d (a b : quad_int d) :=
+Definition qi_eucl_div {d} (a b : quad_int d) :=
   let bb := qi_re (b * qi_conj b)%QI in
   let '(γ₁, r₁) := Z.div_eucl (qi_re (a * qi_conj b)) bb in
-  let '(γ'₁, r'₁) := Z.div_eucl (qi_im (a* qi_conj b)) bb in
+  let '(γ'₁, r'₁) := Z.div_eucl (qi_im (a * qi_conj b)) bb in
   let γ := if Z_le_dec (2 * r₁) bb then γ₁ else γ₁ + 1 in
   let γ' := if Z_le_dec (2 * r'₁) bb then γ'₁ else γ'₁ + 1 in
   let q := mk_qi d γ γ' in
@@ -156,8 +156,6 @@ Check (mk_qi (-1) 0 3).
 Check (mk_qi (-1) 0 0).
 Check (mk_qi (-1) 2 (-3)).
 
-...
-
 Definition phony_qi_le {d} (a b : quad_int d) := False.
 
 Definition having_eucl_div :=
@@ -182,8 +180,6 @@ Compute (mk_qi (-1) 0 1 * mk_qi (-1) 0 1)%QI.
 Compute (1 / mk_qi (-1) 0 1)%QI.
 Compute (1 / mk_qi (-1) 0 (- 1))%QI.
 Compute (@qi_zero 42 / @qi_zero 42)%QI.
-
-...
 
 Compute (〈 -36 + 242 √-1 〉 / 〈 50 + 50 √-1 〉)%QI.
 Compute (〈 𝑖 〉 * 〈 𝑖 〉)%QI.
@@ -312,6 +308,7 @@ cbn - [ In_dec ].
 destruct (in_dec Z.eq_dec d having_eucl_div) as [Hhed| Hhed]; [ cbn | easy ].
 intros * Hbz Hab.
 unfold qi_eucl_div in Hab.
+...
 set (den := qi_re (b * qi_conj b)) in Hab.
 set (γ := qi_re (a * qi_conj b) / den) in Hab.
 set (γ' := qi_im (a * qi_conj b) / den) in Hab.
