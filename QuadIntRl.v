@@ -295,19 +295,19 @@ now destruct a.
 Qed.
 
 Theorem quad_int_eucl_div :
+  d ≠ 0 →
   if rngl_has_eucl_div then
-    d ≠ 0 →
     ∀ a b q r : quad_int d,
     b ≠ 0%F
     → rngl_eucl_div a b = (q, r)
     → a = (b * q + r)%F ∧ (rngl_gauge r < rngl_gauge b)%nat
   else not_applicable.
 Proof.
-intros.
+intros Hdz.
 unfold rngl_has_eucl_div, rngl_eucl_div, rngl_gauge.
 cbn - [ In_dec ].
 destruct (in_dec Z.eq_dec d having_eucl_div) as [Hhed| Hhed]; [ cbn | easy ].
-intros Hdz * Hbz Hab.
+intros * Hbz Hab.
 unfold qi_eucl_div in Hab.
 set (bb := qi_re (b * qi_conj b)) in Hab.
 remember (Z.div_eucl (qi_re (a * qi_conj b)) bb) as γr eqn:Hγr.
