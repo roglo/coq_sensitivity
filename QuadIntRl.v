@@ -296,6 +296,7 @@ Qed.
 
 Theorem quad_int_eucl_div :
   if rngl_has_eucl_div then
+    d ≠ 0 →
     ∀ a b q r : quad_int d,
     b ≠ 0%F
     → rngl_eucl_div a b = (q, r)
@@ -306,7 +307,7 @@ intros.
 unfold rngl_has_eucl_div, rngl_eucl_div, rngl_gauge.
 cbn - [ In_dec ].
 destruct (in_dec Z.eq_dec d having_eucl_div) as [Hhed| Hhed]; [ cbn | easy ].
-intros * Hbz Hab.
+intros Hdz * Hbz Hab.
 unfold qi_eucl_div in Hab.
 set (bb := qi_re (b * qi_conj b)) in Hab.
 remember (Z.div_eucl (qi_re (a * qi_conj b)) bb) as γr eqn:Hγr.
@@ -330,76 +331,34 @@ split. {
   symmetry.
   apply quad_int_add_sub.
 }
+specialize (Z.div_eucl_eq (qi_re (a * qi_conj b)) bb) as H1.
+rewrite Hγr in H1.
+assert (Hbbz : bb ≠ 0). {
+  intros H2; apply Hbz.
+  unfold bb in H2.
+  destruct b as (b₁, b'₁).
+  cbn in H2.
+  rewrite Z.mul_opp_r in H2.
+  apply Z.add_move_0_r in H2.
+  rewrite Z.opp_involutive in H2.
+  unfold qi_zero.
+  f_equal.
+...
+  destruct d; [ easy | | ]. {
+    destruct b'₁ as [| b'₁| b'₁]. {
+      rewrite Z.mul_0_r in H2.
+      apply -> Z.eq_square_0 in H2; subst b₁.
+      easy.
+    } {
+...
+rewrite Hγr in H1.
 destruct (Z_le_dec (2 * r₁) bb) as [Hrbb| Hrbb]. {
+  subst q₁.
   destruct (Z_le_dec (2 * r'₁) bb) as [Hr'bb| Hr'bb]. {
-...
-(* mouais, bon, faut que je ne continue ça que sur les valeurs de d
-   où c'est censé marcher. J'avais commencé avec √-1, c'est-à-dire i,
-   faut que je ne le fasse que pour lui, du moins dans un premier
-   temps *)
-...
-set (γ₁ := qi_re (a * qi_conj b) / bb) in Hab.
-set (γ' := qi_im (a * qi_conj b) / den) in Hab.
-destruct (lt_dec (qi_gauge (a - b * 〈 γ + γ' √d 〉)%QI) (qi_gauge b))
-  as [H1| H1]. {
-  injection Hab; clear Hab; intros Hr Hq.
-  subst r q.
-  split; [ | easy ].
-  rewrite quad_int_add_sub_assoc.
-  rewrite quad_int_add_comm.
-  symmetry; apply quad_int_add_sub.
-}
-destruct (lt_dec (qi_gauge (a - b * 〈 (γ + 1) + γ' √d 〉)%QI) (qi_gauge b))
-  as [H2| H2]. {
-  injection Hab; clear Hab; intros Hr Hq.
-  subst r q.
-  split; [ | easy ].
-  rewrite quad_int_add_sub_assoc.
-  rewrite quad_int_add_comm.
-  symmetry; apply quad_int_add_sub.
-}
-destruct (lt_dec (qi_gauge (a - b * 〈 γ + (γ' + 1) √d 〉)%QI) (qi_gauge b))
-  as [H3| H3]. {
-  injection Hab; clear Hab; intros Hr Hq.
-  subst r q.
-  split; [ | easy ].
-  rewrite quad_int_add_sub_assoc.
-  rewrite quad_int_add_comm.
-  symmetry; apply quad_int_add_sub.
-}
-destruct (lt_dec (qi_gauge (a - b * 〈 (γ + 1) + (γ' + 1) √d 〉)%QI) (qi_gauge b))
-  as [H4| H4]. {
-  injection Hab; clear Hab; intros Hr Hq.
-  subst r q.
-  split; [ | easy ].
-  rewrite quad_int_add_sub_assoc.
-  rewrite quad_int_add_comm.
-  symmetry; apply quad_int_add_sub.
-}
-(**)
-injection Hab; clear Hab; intros Hr Hq.
-subst r q.
-split. {
-  rewrite quad_int_add_sub_assoc.
-  rewrite quad_int_add_comm.
-  symmetry; apply quad_int_add_sub.
-}
-rewrite quad_int_mul_0_r.
-rewrite quad_int_sub_0_r.
-(*
-exfalso; clear q r Hab.
-*)
-apply Nat.nlt_ge in H1.
-apply Nat.nlt_ge in H2.
-apply Nat.nlt_ge in H3.
-apply Nat.nlt_ge in H4.
-unfold having_eucl_div in Hhed.
-destruct (Z.eq_dec d (-1)) as [Hd1| Hd1]. {
-  subst d; clear Hhed.
-  move ro at top; move a after b; move γ after γ'.
-  move H1 after H4; move H2 after H4; move H3 after H4.
-  move Hbz before b.
-Print qi_gauge.
+    subst q'₁.
+    destruct (Z.eq_dec d (-1)) as [Hd1| Hd1]. {
+      subst d.
+Search Z.div_eucl.
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
