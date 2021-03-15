@@ -335,6 +335,13 @@ Compute filter nat_is_square (seq 0 120).
 
 Definition is_square z := nat_is_square (Z.abs_nat z).
 
+Theorem nat_not_square_not_mul_square : ∀ a b c,
+  nat_is_square a = false
+  → (b * b)%nat ≠ (a * c * c)%nat.
+Proof.
+intros * Hsqa Hbac.
+...
+
 Theorem not_square_not_mul_square : ∀ a b c,
   is_square a = false → b * b = a * c * c → b = 0 ∧ c = 0.
 Proof.
@@ -342,6 +349,21 @@ intros * Hnsq Hbac.
 destruct a as [| a| a]; [ easy | | ]. {
   unfold is_square in Hnsq.
   rewrite Zabs2Nat.inj_pos in Hnsq.
+  destruct c as [| c| c]. {
+    rewrite Z.mul_0_r in Hbac.
+    apply Z.eq_mul_0 in Hbac.
+    now destruct Hbac.
+  } {
+    exfalso.
+    cbn in Hbac.
+    destruct b as [| b| b]; [ easy | | ]. {
+      cbn in Hbac.
+      injection Hbac; clear Hbac; intros Hbac.
+      apply Pos2Nat.inj_iff in Hbac.
+      do 3 rewrite Pos2Nat.inj_mul in Hbac.
+      revert Hbac.
+...
+      now apply nat_not_square_not_mul_square.
 ...
 } {
 ...
