@@ -315,14 +315,39 @@ Close Scope Z_scope.
 Compute filter nat_square_free (seq 1 120).
 *)
 
-Definition nat_not_a_square n := ...
+Fixpoint nat_is_square_loop it n d :=
+  match it with
+  | O => false
+  | S it' =>
+      match Nat.compare (d * d) n with
+      | Eq => true
+      | Gt => false
+      | Lt => nat_is_square_loop it' n (S d)
+      end
+  end.
 
+Definition nat_is_square n := nat_is_square_loop (S n) n 0.
+
+(*
+Close Scope Z_scope.
+Compute filter nat_is_square (seq 0 120).
+*)
+
+Definition is_square z := nat_is_square (Z.abs_nat z).
+
+Theorem not_square_not_mul_square : ∀ a b c,
+  is_square a = false → b * b = a * c * c → b = 0 ∧ c = 0.
+Proof.
+intros * Hnsq Hbac.
+destruct a as [| a| a]; [ easy | | ]. {
+  unfold is_square in Hnsq.
+  rewrite Zabs2Nat.inj_pos in Hnsq.
+  admit.
+} {
 ...
 
-Definition not_a_square z := nat_not_a_square (Z.abs_nat z).
-
 Theorem quad_int_eucl_div :
-  square_free d = true ∧ d ≠ 1 →
+  is_square d = false →
   if rngl_has_eucl_div then
     ∀ a b q r : quad_int d,
     b ≠ 0%F
@@ -330,7 +355,7 @@ Theorem quad_int_eucl_div :
     → a = (b * q + r)%F ∧ (rngl_gauge r < rngl_gauge b)%nat
   else not_applicable.
 Proof.
-intros (Hdsf, Hd1).
+intros Hdsqu.
 unfold rngl_has_eucl_div, rngl_eucl_div, rngl_gauge.
 cbn - [ In_dec ].
 destruct (in_dec Z.eq_dec d having_eucl_div) as [Hhed| Hhed]; [ cbn | easy ].
@@ -369,7 +394,9 @@ assert (Hbbz : bb ≠ 0). {
   apply Z.add_move_0_r in H2.
   rewrite Z.opp_involutive in H2.
   unfold qi_zero.
-  f_equal.
+...
+  apply not_square_not_mul_square in H2; [ | easy ].
+  now destruct H2; subst b₁ b'₁.
 ...
   destruct d; [ easy | | ]. {
     destruct b'₁ as [| b'₁| b'₁]. {
