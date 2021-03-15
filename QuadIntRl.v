@@ -337,7 +337,8 @@ Definition is_square z := nat_is_square (Z.abs_nat z).
 
 Theorem nat_not_square_not_mul_square : ∀ a b c,
   nat_is_square a = false
-  → (b * b)%nat ≠ (a * c * c)%nat.
+  → (b * b)%nat = (a * c * c)%nat
+  → b = 0%nat ∧ c = 0%nat.
 Proof.
 intros * Hsqa Hbac.
 ...
@@ -361,9 +362,20 @@ destruct a as [| a| a]; [ easy | | ]. {
       injection Hbac; clear Hbac; intros Hbac.
       apply Pos2Nat.inj_iff in Hbac.
       do 3 rewrite Pos2Nat.inj_mul in Hbac.
-      revert Hbac.
 ...
-      now apply nat_not_square_not_mul_square.
+      apply nat_not_square_not_mul_square in Hbac; [ | easy ].
+      destruct Hbac as (H1, _).
+      specialize (Pos2Nat.is_pos b) as H2.
+      now rewrite H1 in H2.
+    } {
+      cbn in Hbac.
+      injection Hbac; clear Hbac; intros Hbac.
+      apply Pos2Nat.inj_iff in Hbac.
+      do 3 rewrite Pos2Nat.inj_mul in Hbac.
+      apply nat_not_square_not_mul_square in Hbac; [ | easy ].
+      destruct Hbac as (H1, _).
+      specialize (Pos2Nat.is_pos b) as H2.
+      now rewrite H1 in H2.
 ...
 } {
 ...
