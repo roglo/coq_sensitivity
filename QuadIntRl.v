@@ -336,14 +336,61 @@ Compute filter nat_is_square (seq 0 120).
 Definition is_square z := nat_is_square (Z.abs_nat z).
 
 Open Scope nat_scope.
+
+Print nat_is_square_loop.
+
+Theorem nat_is_square_loop_false_if : ∀ it n d,
+  n < it - d
+  → nat_is_square_loop it n d = false
+  → ∀ a, n ≠ a * a.
+Proof.
+clear.
+intros * Hit Hsq a.
+revert a n d Hit Hsq.
+induction it; intros; [ easy | ].
+cbn in Hsq.
+remember (d * d ?= n) as b eqn:Hb; symmetry in Hb.
+destruct b; [ easy | | ]. {
+  apply Nat.compare_lt_iff in Hb.
+  destruct n; [ easy | ].
+Print nat_is_square_loop.
+...
+
+Theorem nat_is_square_false_if : ∀ a,
+  nat_is_square a = false
+  → ∀ b, b ≠ a * a.
+Proof.
+intros * Hsq *.
+unfold nat_is_square in Hsq.
+...
+
 Theorem nat_not_square_not_mul_square_gen : ∀ it a b c d,
   (S b = it + d)%nat
+  → b ≠ 0
   → nat_is_square_loop it b d = false
   → (a * a)%nat = (b * c * c)%nat
+(*
   → a = 0%nat ∧ c = 0%nat.
+*)
+  → a = 0%nat.
 Proof.
 clear d ro.
-intros * Hit Hsq Habc.
+intros * Hit Hbz Hsq Habc.
+...
+clear Hbz.
+...
+destruct (Nat.eq_dec a 0) as [Haz| Haz]; [ easy | ].
+(*
+  split; [ easy | ].
+  rewrite Haz in Habc.
+  symmetry in Habc; cbn in Habc.
+  apply Nat.eq_mul_0 in Habc.
+  destruct Habc as [Habc| Habc]; [ | easy].
+  apply Nat.eq_mul_0 in Habc.
+  now destruct Habc.
+}
+*)
+exfalso.
 destruct (Nat.eq_dec (Nat.gcd a c) 0) as [Hgz| Hgz]. {
   now apply Nat.gcd_eq_0 in Hgz.
 }
@@ -357,6 +404,18 @@ rewrite Nat.divide_div_mul_exact in Habc; [ | easy | ]. 2: {
 remember (a / Nat.gcd a c) as a' eqn:Ha'.
 remember (c / Nat.gcd a c) as c' eqn:Hc'.
 move c' before a'.
+destruct (Nat.eq_dec a' 0) as [Ha'z| Ha'z]. {
+  move Ha'z at top; subst a'.
+  symmetry in Ha'.
+  apply Nat.div_small_iff in Ha'; [ | easy ].
+  apply Nat.nle_gt in Ha'; apply Ha'.
+  specialize (Nat.gcd_divide_l a c) as H1.
+  destruct H1 as (ka, H1).
+  rewrite H1 at 2.
+  destruct ka; [ easy | ].
+  apply Nat.le_add_r.
+}
+move Ha'z before Haz.
 rewrite (Nat.mul_comm a) in Habc.
 rewrite Nat.mul_shuffle0 in Habc.
 apply (f_equal (λ x, Nat.div x (Nat.gcd a c))) in Habc.
@@ -383,6 +442,24 @@ assert (H : Nat.divide a' (c' * b)). {
 specialize (H1 H Hg); clear H.
 destruct H1 as (ka, Ha).
 rewrite Ha in Habc.
+rewrite (Nat.mul_comm ka) in Habc.
+do 2 rewrite <- Nat.mul_assoc in Habc.
+apply Nat.mul_cancel_l in Habc; [ | easy ].
+rewrite Nat.mul_assoc in Habc.
+specialize (Nat.gauss a' c' (ka * c')) as H1.
+rewrite (Nat.mul_comm c') in H1.
+rewrite <- Habc in H1.
+specialize (H1 (Nat.divide_refl _) Hg).
+destruct H1 as (kc, Hc).
+rewrite Hc in Habc.
+rewrite (Nat.mul_comm kc) in Habc.
+replace a' with (a' * 1) in Habc at 1 by apply Nat.mul_1_r.
+rewrite <- Nat.mul_assoc in Habc.
+apply Nat.mul_cancel_l in Habc; [ | easy ].
+symmetry in Habc.
+apply Nat.eq_mul_1 in Habc.
+move Habc at top; destruct Habc; subst kc c'.
+rewrite Nat.mul_1_l, Nat.mul_1_r in Hc; subst ka.
 ...
 specialize (Nat.gauss (a' * a') (c' * c') b) as H2.
 assert (Hgg : Nat.gcd (a' * a') (c' * c') = 1). {
