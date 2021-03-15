@@ -18,7 +18,7 @@ Set Implicit Arguments.
 Require Import Utf8 ZArith.
 Import List List.ListNotations.
 
-Require Import RingLike.
+Require Import Misc RingLike.
 Open Scope Z_scope.
 
 Record quad_int (d : Z) := mk_qi { qi_re : Z; qi_im : Z }.
@@ -344,6 +344,27 @@ Theorem nat_is_square_loop_false_if : ∀ it n d,
   → nat_is_square_loop it n d = false
   → ∀ a, n ≠ a * a.
 Proof.
+clear.
+intros * Hit Hsq a.
+(* mais non, mais c'est pas bon, ça...
+   car a peut être inférieur à d ;
+   on commence à d, mais c'est mal, c'est un péché *)
+...
+revert a n d Hit Hsq.
+induction it; intros; [ easy | ].
+cbn in Hsq.
+remember (d * d ?= n) as b eqn:Hb; symmetry in Hb.
+destruct b; [ easy | | ]. {
+  apply Nat.compare_lt_iff in Hb.
+  destruct n; [ easy | ].
+  apply IHit with (d := S d).
+...
+  destruct it; [ flia Hit | ].
+
+...
+cbn in Hsq.
+...
+
 clear.
 intros * Hit Hsq a.
 revert a n d Hit Hsq.
