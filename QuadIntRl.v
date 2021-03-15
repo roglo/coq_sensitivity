@@ -371,6 +371,9 @@ assert (Hg : Nat.gcd a' c' = 1). {
   rewrite Ha', Hc'.
   now apply Nat.gcd_div_gcd.
 }
+specialize (Nat.gauss (a' * a') (c' * c') b) as H2.
+Search (_ * _ = 2).
+...
 specialize (Nat.gauss b a' a') as H2.
 destruct (Nat.eq_dec (Nat.gcd b a') 1) as [Hba1| Hba1]. {
   assert (H : Nat.divide b (a' * a')). {
