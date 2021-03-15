@@ -294,6 +294,7 @@ do 2 rewrite Z.add_0_r.
 now destruct a.
 Qed.
 
+(*
 Fixpoint squ_fr_loop it n d (same : bool) :=
   match it with
   | O => false
@@ -309,11 +310,16 @@ Definition nat_square_free n := squ_fr_loop n n 2 false.
 
 Definition square_free z := nat_square_free (Z.abs_nat z).
 
-(*
 Compute filter square_free (map (λ n, Z.of_nat n -  60) (seq 1 120)).
 Close Scope Z_scope.
 Compute filter nat_square_free (seq 1 120).
 *)
+
+Definition nat_not_a_square n := ...
+
+...
+
+Definition not_a_square z := nat_not_a_square (Z.abs_nat z).
 
 Theorem quad_int_eucl_div :
   square_free d = true ∧ d ≠ 1 →
