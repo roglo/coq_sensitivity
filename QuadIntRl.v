@@ -336,7 +336,7 @@ Compute filter nat_is_square (seq 0 120).
 Definition is_square z := nat_is_square (Z.abs_nat z).
 
 Theorem nat_not_square_not_mul_square_gen : ∀ it a b c d,
-  (it = S a + d)%nat
+  (S a = it + d)%nat
   → nat_is_square_loop it a d = false
   → (b * b)%nat = (a * c * c)%nat
   → b = 0%nat ∧ c = 0%nat.
@@ -344,6 +344,10 @@ Proof.
 clear d ro.
 intros * Hit Hsq Hbac.
 revert a b c d Hit Hsq Hbac.
+induction it; intros. {
+  cbn in Hsq.
+  clear Hsq.
+...
 induction it; intros; [ easy | ].
 destruct a. {
   cbn in Hsq.
