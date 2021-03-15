@@ -371,7 +371,35 @@ assert (Hg : Nat.gcd a' c' = 1). {
   rewrite Ha', Hc'.
   now apply Nat.gcd_div_gcd.
 }
+specialize (Nat.gauss a' c' b) as H1.
+assert (H : Nat.divide a' (c' * b)). {
+  specialize (Nat.gauss a' c' (c' * b)) as H2.
+  rewrite (Nat.mul_comm c') in H2.
+  rewrite (Nat.mul_comm c') in H2.
+  rewrite <- Habc in H2.
+  specialize (H2 (Nat.divide_factor_l _ _) Hg).
+  now rewrite Nat.mul_comm in H2.
+}
+specialize (H1 H Hg); clear H.
+destruct H1 as (ka, Ha).
+rewrite Ha in Habc.
+...
 specialize (Nat.gauss (a' * a') (c' * c') b) as H2.
+assert (Hgg : Nat.gcd (a' * a') (c' * c') = 1). {
+  specialize (Nat.gauss a' c' (c' * b)) as H3.
+  rewrite (Nat.mul_comm c') in H3.
+  rewrite (Nat.mul_comm c') in H3.
+  rewrite <- Habc in H3.
+  specialize (H3 (Nat.divide_factor_l _ _) Hg).
+  rewrite Nat.mul_comm in H3.
+  specialize (Nat.gauss a' c' b H3 Hg) as H4.
+
+
+Search (Nat.gcd (_ * _)).
+  apply Nat.bezout_1_gcd.
+  unfold Nat.Bezout.
+Search (Nat.gcd _ _ = 1).
+...
 Search (_ * _ = 2).
 ...
 specialize (Nat.gauss b a' a') as H2.
