@@ -339,6 +339,7 @@ Open Scope nat_scope.
 
 Print nat_is_square_loop.
 
+(*
 Theorem nat_is_square_loop_false_if : ∀ it n d,
   n < it - d
   → nat_is_square_loop it n d = false
@@ -364,7 +365,6 @@ destruct b; [ easy | | ]. {
 ...
 cbn in Hsq.
 ...
-
 clear.
 intros * Hit Hsq a.
 revert a n d Hit Hsq.
@@ -376,13 +376,34 @@ destruct b; [ easy | | ]. {
   destruct n; [ easy | ].
 Print nat_is_square_loop.
 ...
+*)
 
 Theorem nat_is_square_false_if : ∀ a,
   nat_is_square a = false
-  → ∀ b, b ≠ a * a.
+  → ∀ b, b * b ≠ a.
 Proof.
+clear.
 intros * Hsq *.
 unfold nat_is_square in Hsq.
+cbn in Hsq.
+destruct a; [ easy | cbn in Hsq ].
+destruct a; [ easy | cbn in Hsq ].
+destruct a. {
+  intros H.
+  destruct b; [ easy | ].
+  destruct b; [ easy | flia H ].
+}
+destruct a. {
+  intros H.
+  destruct b; [ easy | ].
+  destruct b; [ easy | flia H ].
+}
+destruct a. {
+  intros H.
+  destruct b; [ easy | ].
+  destruct b; [ easy | ].
+  destruct b; [ easy | flia H ].
+}
 ...
 
 Theorem nat_not_square_not_mul_square_gen : ∀ it a b c d,
