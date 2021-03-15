@@ -342,7 +342,7 @@ intros * Hnsq Hbac.
 destruct a as [| a| a]; [ easy | | ]. {
   unfold is_square in Hnsq.
   rewrite Zabs2Nat.inj_pos in Hnsq.
-  admit.
+...
 } {
 ...
 
