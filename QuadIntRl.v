@@ -341,6 +341,23 @@ Theorem nat_not_square_not_mul_square_gen : ∀ it a b c d,
   → (b * b)%nat = (a * c * c)%nat
   → b = 0%nat ∧ c = 0%nat.
 Proof.
+(*
+clear d ro.
+intros * Hit Hsq Hbac.
+specialize (Nat.div_mod (b * b) a) as H1.
+enough (Haz : a ≠ O).
+specialize (H1 Haz).
+rewrite Hbac in H1.
+symmetry in H1.
+apply Nat.add_sub_eq_l in H1.
+rewrite <- Nat.mul_assoc in H1.
+rewrite <- Nat.mul_sub_distr_l in H1.
+do 2 rewrite (Nat.mul_comm a) in H1.
+rewrite Nat.mod_mul in H1.
+apply Nat.eq_mul_0_l in H1.
+apply Nat.sub_0_le in H1.
+...
+*)
 clear d ro.
 intros * Hit Hsq Hbac.
 revert a b c d Hit Hsq Hbac.
