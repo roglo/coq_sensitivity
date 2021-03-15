@@ -294,7 +294,6 @@ do 2 rewrite Z.add_0_r.
 now destruct a.
 Qed.
 
-(* https://en.wikipedia.org/wiki/Square-free_integer *)
 Fixpoint squ_fr_loop it n d (same : bool) :=
   match it with
   | O => false
