@@ -335,12 +335,78 @@ Compute filter nat_is_square (seq 0 120).
 
 Definition is_square z := nat_is_square (Z.abs_nat z).
 
+Open Scope nat_scope.
 Theorem nat_not_square_not_mul_square_gen : ∀ it a b c d,
-  (S a = it + d)%nat
-  → nat_is_square_loop it a d = false
-  → (b * b)%nat = (a * c * c)%nat
-  → b = 0%nat ∧ c = 0%nat.
+  (S b = it + d)%nat
+  → nat_is_square_loop it b d = false
+  → (a * a)%nat = (b * c * c)%nat
+  → a = 0%nat ∧ c = 0%nat.
 Proof.
+clear d ro.
+intros * Hit Hsq Habc.
+destruct (Nat.eq_dec (Nat.gcd a c) 0) as [Hgz| Hgz]. {
+  now apply Nat.gcd_eq_0 in Hgz.
+}
+apply (f_equal (λ x, Nat.div x (Nat.gcd a c))) in Habc.
+rewrite Nat.divide_div_mul_exact in Habc; [ | easy | ]. 2: {
+  apply Nat.gcd_divide_l.
+}
+rewrite Nat.divide_div_mul_exact in Habc; [ | easy | ]. 2: {
+  apply Nat.gcd_divide_r.
+}
+remember (a / Nat.gcd a c) as a' eqn:Ha'.
+remember (c / Nat.gcd a c) as c' eqn:Hc'.
+move c' before a'.
+rewrite (Nat.mul_comm a) in Habc.
+rewrite Nat.mul_shuffle0 in Habc.
+apply (f_equal (λ x, Nat.div x (Nat.gcd a c))) in Habc.
+rewrite Nat.divide_div_mul_exact in Habc; [ | easy | ]. 2: {
+  apply Nat.gcd_divide_l.
+}
+rewrite Nat.divide_div_mul_exact in Habc; [ | easy | ]. 2: {
+  apply Nat.gcd_divide_r.
+}
+rewrite <- Ha', <- Hc' in Habc.
+assert (Hg : Nat.gcd a' c' = 1). {
+  rewrite Ha', Hc'.
+  now apply Nat.gcd_div_gcd.
+}
+specialize (Nat.gauss b a' a') as H2.
+destruct (Nat.eq_dec (Nat.gcd b a') 1) as [Hba1| Hba1]. {
+  assert (H : Nat.divide b (a' * a')). {
+    rewrite Habc, <- Nat.mul_assoc.
+    apply Nat.divide_factor_l.
+  }
+  specialize (H2 H Hba1).
+  destruct H as (k, H).
+...
+specialize (Nat.gcd_div_gcd (a * a) (c * c)) as H2.
+specialize (Nat.gcd_div_gcd a c (Nat.gcd a c) Hgz eq_refl) as H2.
+...
+assert (H1 : Nat.divide b (a' * a')). {
+  rewrite Habc.
+  rewrite <- Nat.mul_assoc.
+  apply Nat.divide_factor_l.
+}
+unfold Nat.divide in H1.
+destruct H1 as (k, H1).
+Search (Nat.divide).
+...
+assert (H : Nat.gcd (a' * a') (c' * c') = 1). {
+  rewrite Ha', Hc' at 2.
+  rewrite <- Nat.divide_div_mul_exact; [ | easy | ]. 2: {
+    apply Nat.gcd_divide_l.
+  }
+Search (Nat.gcd (_ / _)).
+Search (_ * (_ / Nat.gcd _ _)).
+rewrite
+...
+specialize (Nat.gcd_div_gcd) as H2.
+
+Search (_ * (_ / Nat.gcd _ _)).
+rewrite Nat.gcd_div_swap.
+rewrite <- Nat.lcm_equiv1.
+...
 (*
 clear d ro.
 intros * Hit Hsq Hbac.
