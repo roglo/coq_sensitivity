@@ -295,11 +295,29 @@ now destruct a.
 Qed.
 
 (* https://en.wikipedia.org/wiki/Square-free_integer *)
-Definition square_free d :=
-...
+Fixpoint squ_fr_loop it n d (same : bool) :=
+  match it with
+  | O => false
+  | S it' =>
+      if lt_dec n d then true
+      else if Nat.eq_dec (n mod d) 0 then
+        if same then false
+        else squ_fr_loop it' (n / d)%nat d true
+      else squ_fr_loop it' n (S d) false
+  end.
+
+Definition nat_square_free n := squ_fr_loop n n 2 false.
+
+Definition square_free z := nat_square_free (Z.abs_nat z).
+
+(*
+Compute filter square_free (map (λ n, Z.of_nat n -  60) (seq 1 120)).
+Close Scope Z_scope.
+Compute filter nat_square_free (seq 1 120).
+*)
 
 Theorem quad_int_eucl_div :
-  square_free d && d ≠ 1 →
+  square_free d = true ∧ d ≠ 1 →
   if rngl_has_eucl_div then
     ∀ a b q r : quad_int d,
     b ≠ 0%F
@@ -307,7 +325,7 @@ Theorem quad_int_eucl_div :
     → a = (b * q + r)%F ∧ (rngl_gauge r < rngl_gauge b)%nat
   else not_applicable.
 Proof.
-intros Hdz.
+intros (Hdsf, Hd1).
 unfold rngl_has_eucl_div, rngl_eucl_div, rngl_gauge.
 cbn - [ In_dec ].
 destruct (in_dec Z.eq_dec d having_eucl_div) as [Hhed| Hhed]; [ cbn | easy ].
