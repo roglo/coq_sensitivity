@@ -294,26 +294,29 @@ do 2 rewrite Z.add_0_r.
 now destruct a.
 Qed.
 
-(*
-Fixpoint squ_fr_loop it n d (same : bool) :=
+Fixpoint squ_free_loop it n d (same : bool) :=
   match it with
   | O => false
   | S it' =>
       if lt_dec n d then true
       else if Nat.eq_dec (n mod d) 0 then
         if same then false
-        else squ_fr_loop it' (n / d)%nat d true
-      else squ_fr_loop it' n (S d) false
+        else squ_free_loop it' (n / d)%nat d true
+      else squ_free_loop it' n (S d) false
   end.
 
-Definition nat_square_free n := squ_fr_loop n n 2 false.
+Definition nat_square_free n := squ_free_loop n n 2 false.
 
 Definition square_free z := nat_square_free (Z.abs_nat z).
 
 Compute filter square_free (map (λ n, Z.of_nat n -  60) (seq 1 120)).
 Close Scope Z_scope.
 Compute filter nat_square_free (seq 1 120).
-*)
+
+...
+
+(* should be removed, because the real property I have to
+   deal with is square_free, not is_square *)
 
 Fixpoint nat_is_square_loop it n d :=
   match it with
