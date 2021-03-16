@@ -390,14 +390,22 @@ Qed.
 
 Print squ_free_loop.
 
-Theorem nat_squ_free_loop_true_if : ∀ it a d same,
-  a ≤ it
-  → a ≠ 0
-  → squ_free_loop it a d same = true
-  → ∀ b c, 2 ≤ d ≤ c → a ≠ b * c * c.
+Theorem nat_squ_free_loop_true_if : ∀ it n d same,
+  n ≤ it
+  → n ≠ 0
+  → squ_free_loop it n d same = true
+  → ∀ b c, 2 ≤ d ≤ c → n ≠ b * c * c.
 Proof.
 clear.
 intros * Hit Haz Hsq b c Hdc.
+Print squ_free_loop.
+...
+n < d ∨
+(n mod d = 0 ∧ same = false ∧ squ_free_loop (it - 1) (n /d) d true) ∨
+squ_free_loop (it - 1) n (d + 1) false
+...
+nat_square_free = λ n : nat, squ_free_loop n n 2 false
+...
 revert a b c d same Hit Haz Hsq Hdc.
 induction it; intros; [ easy | ].
 cbn in Hsq.
@@ -413,6 +421,7 @@ destruct (lt_dec a d) as [Had| Had]. {
 apply Nat.nlt_ge in Had.
 destruct (Nat.eq_dec (a mod d) 0) as [Hadz| Hadz]. {
   destruct same; [ easy | ].
+...
   specialize (IHit (a / d) b c d true) as H1.
   assert (H : a / d ≤ it). {
     apply Nat.mul_le_mono_pos_r with (p := d); [ flia Hdc | ].
