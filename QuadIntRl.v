@@ -616,7 +616,6 @@ destruct (Nat.eq_dec a' 0) as [Ha'z| Ha'z]. {
   apply Nat.le_add_r.
 }
 move Ha'z before Haz.
-...
 rewrite (Nat.mul_comm a) in Habc.
 rewrite Nat.mul_shuffle0 in Habc.
 apply (f_equal (λ x, Nat.div x (Nat.gcd a c))) in Habc.
@@ -631,6 +630,7 @@ assert (Hg : Nat.gcd a' c' = 1). {
   rewrite Ha', Hc'.
   now apply Nat.gcd_div_gcd.
 }
+...
 specialize (Nat.gauss a' c' b) as H1.
 ...
 
