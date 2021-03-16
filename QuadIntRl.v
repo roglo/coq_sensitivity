@@ -573,12 +573,65 @@ cbn in Hsq.
 *)
 
 Theorem nat_not_square_not_mul_square : ∀ a b c,
-  nat_is_square a = false
-  → (b * b)%nat = (a * c * c)%nat
-  → b = 0%nat ∧ c = 0%nat.
+  nat_is_square b = false
+  → (a * a)%nat = (b * c * c)%nat
+  → a = 0%nat ∧ c = 0%nat.
 Proof.
-intros * Hsqa Hbac.
-specialize (nat_is_square_false_if Hsqa) as Hsq'.
+intros * Hsqb Habc.
+specialize (nat_is_square_false_if Hsqb) as Hsq'.
+destruct (Nat.eq_dec a 0) as [Haz| Haz]. {
+  split; [ easy | ].
+  rewrite Haz in Habc.
+  symmetry in Habc; cbn in Habc.
+  apply Nat.eq_mul_0 in Habc.
+  destruct Habc as [Habc| Habc]; [ | easy].
+  apply Nat.eq_mul_0 in Habc.
+  destruct Habc; [ | easy ].
+  subst b.
+  now specialize (Hsq' 0).
+}
+destruct (Nat.eq_dec (Nat.gcd a c) 0) as [Hgz| Hgz]. {
+  now apply Nat.gcd_eq_0 in Hgz.
+}
+apply (f_equal (λ x, Nat.div x (Nat.gcd a c))) in Habc.
+rewrite Nat.divide_div_mul_exact in Habc; [ | easy | ]. 2: {
+  apply Nat.gcd_divide_l.
+}
+rewrite Nat.divide_div_mul_exact in Habc; [ | easy | ]. 2: {
+  apply Nat.gcd_divide_r.
+}
+remember (a / Nat.gcd a c) as a' eqn:Ha'.
+remember (c / Nat.gcd a c) as c' eqn:Hc'.
+move c' before a'.
+destruct (Nat.eq_dec a' 0) as [Ha'z| Ha'z]. {
+  move Ha'z at top; subst a'.
+  symmetry in Ha'.
+  apply Nat.div_small_iff in Ha'; [ | easy ].
+  exfalso.
+  apply Nat.nle_gt in Ha'; apply Ha'.
+  specialize (Nat.gcd_divide_l a c) as H1.
+  destruct H1 as (ka, H1).
+  rewrite H1 at 2.
+  destruct ka; [ easy | ].
+  apply Nat.le_add_r.
+}
+move Ha'z before Haz.
+...
+rewrite (Nat.mul_comm a) in Habc.
+rewrite Nat.mul_shuffle0 in Habc.
+apply (f_equal (λ x, Nat.div x (Nat.gcd a c))) in Habc.
+rewrite Nat.divide_div_mul_exact in Habc; [ | easy | ]. 2: {
+  apply Nat.gcd_divide_l.
+}
+rewrite Nat.divide_div_mul_exact in Habc; [ | easy | ]. 2: {
+  apply Nat.gcd_divide_r.
+}
+rewrite <- Ha', <- Hc' in Habc.
+assert (Hg : Nat.gcd a' c' = 1). {
+  rewrite Ha', Hc'.
+  now apply Nat.gcd_div_gcd.
+}
+specialize (Nat.gauss a' c' b) as H1.
 ...
 
 Theorem not_square_not_mul_square : ∀ a b c,
