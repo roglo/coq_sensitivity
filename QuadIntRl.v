@@ -590,6 +590,7 @@ destruct (Nat.eq_dec a 0) as [Haz| Haz]. {
   subst b.
   now specialize (Hsq' 0).
 }
+exfalso.
 destruct (Nat.eq_dec (Nat.gcd a c) 0) as [Hgz| Hgz]. {
   now apply Nat.gcd_eq_0 in Hgz.
 }
@@ -607,7 +608,6 @@ destruct (Nat.eq_dec a' 0) as [Ha'z| Ha'z]. {
   move Ha'z at top; subst a'.
   symmetry in Ha'.
   apply Nat.div_small_iff in Ha'; [ | easy ].
-  exfalso.
   apply Nat.nle_gt in Ha'; apply Ha'.
   specialize (Nat.gcd_divide_l a c) as H1.
   destruct H1 as (ka, H1).
@@ -630,6 +630,16 @@ assert (Hg : Nat.gcd a' c' = 1). {
   rewrite Ha', Hc'.
   now apply Nat.gcd_div_gcd.
 }
+assert (Hgg : Nat.gcd (a' * a') (c' * c') = 1). {
+  now apply Nat_gcd_1_mul_l; apply Nat_gcd_1_mul_r.
+}
+...
+specialize (Nat.gauss (a' * a') (c' * c') b) as H1.
+rewrite (Nat.mul_comm _ b) in H1.
+rewrite Nat.mul_assoc, <- Habc in H1.
+specialize (H1 (Nat.divide_refl _) Hgg).
+
+rewrite Habc in H1.
 ...
 specialize (Nat.gauss a' c' b) as H1.
 ...
