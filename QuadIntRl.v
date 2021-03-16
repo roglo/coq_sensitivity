@@ -430,6 +430,16 @@ destruct (Nat.eq_dec (a mod d) 0) as [Hadz| Hadz]. {
     flia Haz Hit Had.
   }
   specialize (H1 H); clear H.
+  assert (H : a / d ≠ 0). {
+    apply Nat.mod_divides in Hadz; [ | flia Hdc ].
+    destruct Hadz as (k, Hk).
+    rewrite Hk.
+    rewrite (Nat.mul_comm d).
+    rewrite Nat.div_mul; [ | flia Hdc ].
+    intros H; subst k.
+    now rewrite Nat.mul_0_r in Hk.
+  }
+  specialize (H1 H Hsq Hdc); clear H.
 ...
   apply IHit with (d := d) (same := true); [ | easy | easy | ].
 ...
