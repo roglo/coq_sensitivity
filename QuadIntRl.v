@@ -337,75 +337,54 @@ Definition is_square z := nat_is_square (Z.abs_nat z).
 
 Open Scope nat_scope.
 
-Print nat_is_square_loop.
-
-(*
 Theorem nat_is_square_loop_false_if : ∀ it n d,
-  n < it - d
+  it + d = S n
   → nat_is_square_loop it n d = false
-  → ∀ a, n ≠ a * a.
+  → ∀ a, d ≤ a → n ≠ a * a.
 Proof.
 clear.
-intros * Hit Hsq a.
-(* mais non, mais c'est pas bon, ça...
-   car a peut être inférieur à d ;
-   on commence à d, mais c'est mal, c'est un péché *)
-...
-revert a n d Hit Hsq.
-induction it; intros; [ easy | ].
+intros * Hit Hsq a Had.
+revert a n d Hit Hsq Had.
+induction it; intros. {
+  cbn in Hit; subst d.
+  intros H; subst n.
+  clear Hsq.
+  apply Nat.nlt_ge in Had; apply Had; clear Had.
+  induction a; [ cbn; flia | cbn ].
+  apply -> Nat.succ_lt_mono.
+  apply (lt_le_trans _ (S (a * a))); [ easy | ].
+  apply -> Nat.succ_le_mono.
+  rewrite (Nat.mul_comm _ (S a)); cbn.
+  flia.
+}
 cbn in Hsq.
 remember (d * d ?= n) as b eqn:Hb; symmetry in Hb.
 destruct b; [ easy | | ]. {
   apply Nat.compare_lt_iff in Hb.
   destruct n; [ easy | ].
-  apply IHit with (d := S d).
-...
-  destruct it; [ flia Hit | ].
-
-...
-cbn in Hsq.
-...
-clear.
-intros * Hit Hsq a.
-revert a n d Hit Hsq.
-induction it; intros; [ easy | ].
-cbn in Hsq.
-remember (d * d ?= n) as b eqn:Hb; symmetry in Hb.
-destruct b; [ easy | | ]. {
-  apply Nat.compare_lt_iff in Hb.
-  destruct n; [ easy | ].
-Print nat_is_square_loop.
-...
-*)
+  destruct (Nat.eq_dec d a) as [Hda| Hda]. {
+    subst a; flia Hb.
+  }
+  apply IHit with (d := S d); [ flia Hit | easy | flia Had Hda ].
+} {
+  apply Nat.compare_gt_iff in Hb.
+  intros H; subst n.
+  apply Nat.nle_gt in Hb; apply Hb; clear Hb.
+  now apply Nat.mul_le_mono.
+}
+Qed.
 
 Theorem nat_is_square_false_if : ∀ a,
   nat_is_square a = false
-  → ∀ b, b * b ≠ a.
+  → ∀ b, a ≠ b * b.
 Proof.
 clear.
 intros * Hsq *.
-unfold nat_is_square in Hsq.
-cbn in Hsq.
-destruct a; [ easy | cbn in Hsq ].
-destruct a; [ easy | cbn in Hsq ].
-destruct a. {
-  intros H.
-  destruct b; [ easy | ].
-  destruct b; [ easy | flia H ].
-}
-destruct a. {
-  intros H.
-  destruct b; [ easy | ].
-  destruct b; [ easy | flia H ].
-}
-destruct a. {
-  intros H.
-  destruct b; [ easy | ].
-  destruct b; [ easy | ].
-  destruct b; [ easy | flia H ].
-}
-...
+apply nat_is_square_loop_false_if with (a := b) in Hsq; [ easy | easy | ].
+apply Nat.le_0_l.
+Qed.
 
+(*
 Theorem nat_not_square_not_mul_square_gen : ∀ it a b c d,
   (S b = it + d)%nat
   → b ≠ 0
@@ -418,6 +397,7 @@ Theorem nat_not_square_not_mul_square_gen : ∀ it a b c d,
 Proof.
 clear d ro.
 intros * Hit Hbz Hsq Habc.
+specialize nat_is_square_false_if as Hsq'.
 ...
 clear Hbz.
 ...
@@ -590,6 +570,7 @@ destruct a. {
 Print nat_is_square_loop.
 cbn in Hsq.
 ...
+*)
 
 Theorem nat_not_square_not_mul_square : ∀ a b c,
   nat_is_square a = false
@@ -597,7 +578,7 @@ Theorem nat_not_square_not_mul_square : ∀ a b c,
   → b = 0%nat ∧ c = 0%nat.
 Proof.
 intros * Hsqa Hbac.
-unfold nat_is_square in Hsqa.
+specialize (nat_is_square_false_if Hsqa) as Hsq'.
 ...
 
 Theorem not_square_not_mul_square : ∀ a b c,
