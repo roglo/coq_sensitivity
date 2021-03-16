@@ -633,6 +633,11 @@ assert (Hg : Nat.gcd a' c' = 1). {
 assert (Hgg : Nat.gcd (a' * a') (c' * c') = 1). {
   now apply Nat_gcd_1_mul_l; apply Nat_gcd_1_mul_r.
 }
+assert (H1 : Nat.divide b a'). {
+Check Hsq'.
+...
+Check Nat.gauss.
+specialize (Nat.gauss (c' * c') a' a') as H1.
 ...
 specialize (Nat.gauss (a' * a') (c' * c') b) as H1.
 rewrite (Nat.mul_comm _ b) in H1.
