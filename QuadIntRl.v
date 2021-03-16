@@ -633,8 +633,13 @@ assert (Hg : Nat.gcd a' c' = 1). {
 assert (Hgg : Nat.gcd (a' * a') (c' * c') = 1). {
   now apply Nat_gcd_1_mul_l; apply Nat_gcd_1_mul_r.
 }
-assert (H1 : Nat.divide b a'). {
-Check Hsq'.
+specialize (Nat.gauss (a' * a') (c' * c') b) as H1.
+rewrite (Nat.mul_comm _ b) in H1.
+rewrite Nat.mul_assoc, <- Habc in H1.
+specialize (H1 (Nat.divide_refl _) Hgg).
+destruct H1 as (ka, H1).
+(* would be ok if b held no squares, but provided that
+   a'≠1; in that case → contradiction *)
 ...
 Check Nat.gauss.
 specialize (Nat.gauss (c' * c') a' a') as H1.
