@@ -294,6 +294,8 @@ do 2 rewrite Z.add_0_r.
 now destruct a.
 Qed.
 
+(* square free integers *)
+
 Fixpoint squ_free_loop it n d (same : bool) :=
   match it with
   | O => false
@@ -313,10 +315,8 @@ Compute filter square_free (map (λ n, Z.of_nat n -  60) (seq 1 120)).
 Close Scope Z_scope.
 Compute filter nat_square_free (seq 1 120).
 
-...
-
-(* should be removed, because the real property I have to
-   deal with is square_free, not is_square *)
+(* should be removed and its theorems, because the real property I have to
+   deal with is square_free, not is_square
 
 Fixpoint nat_is_square_loop it n d :=
   match it with
@@ -386,12 +386,55 @@ intros * Hsq *.
 apply nat_is_square_loop_false_if with (a := b) in Hsq; [ easy | easy | ].
 apply Nat.le_0_l.
 Qed.
+*)
 
-Theorem nat_not_square_not_mul_square : ∀ a b c,
-  nat_is_square b = false
+Print squ_free_loop.
+
+Theorem nat_squ_free_loop_true_if : ∀ it a d same,
+  a ≤ it
+  → a ≠ 0
+  → squ_free_loop it a d same = true
+  → ∀ b c, d ≤ c → a ≠ b * c * c.
+Proof.
+clear.
+intros * Hit Haz Hsq b c Hdc.
+revert a b c d same Hit Haz Hsq Hdc.
+induction it; intros; [ easy | ].
+cbn in Hsq.
+destruct (lt_dec a d) as [Had| Had]. {
+  clear Hsq.
+  intros H; subst a.
+  apply Nat.nle_gt in Had; apply Had; clear Had.
+  destruct b; [ easy | ].
+  rewrite <- Nat.mul_assoc; cbn.
+  destruct c; [ now rewrite Nat.mul_comm in Haz | ].
+  cbn; flia Hdc.
+}
+apply Nat.nlt_ge in Had.
+destruct (Nat.eq_dec (a mod d) 0) as [Hadz| Hadz]. {
+  destruct same; [ easy | ].
+...
+
+Theorem nat_square_free_true_if : ∀ a,
+  nat_square_free a = true
+  → ∀ b c, 2 ≤ c → a ≠ b * c * c.
+Proof.
+clear.
+intros a Ha b c Hc.
+...
+now apply nat_squ_free_loop_true_if with (it := a) (d := 2) (same := false).
+...
+
+Theorem nat_square_free_not_mul_square : ∀ a b c,
+  nat_square_free b = true
   → (a * a)%nat = (b * c * c)%nat
   → a = 0%nat ∧ c = 0%nat.
 Proof.
+clear.
+intros * Hsqb Habc.
+...
+specialize (nat_square_free_true_if Hsqb) as Hsq'.
+...
 intros * Hsqb Habc.
 specialize (nat_is_square_false_if Hsqb) as Hsq'.
 destruct (Nat.eq_dec a 0) as [Haz| Haz]. {
