@@ -394,7 +394,7 @@ Theorem nat_squ_free_loop_true_if : ∀ it a d same,
   a ≤ it
   → a ≠ 0
   → squ_free_loop it a d same = true
-  → ∀ b c, d ≤ c → a ≠ b * c * c.
+  → ∀ b c, 2 ≤ d ≤ c → a ≠ b * c * c.
 Proof.
 clear.
 intros * Hit Haz Hsq b c Hdc.
@@ -413,6 +413,25 @@ destruct (lt_dec a d) as [Had| Had]. {
 apply Nat.nlt_ge in Had.
 destruct (Nat.eq_dec (a mod d) 0) as [Hadz| Hadz]. {
   destruct same; [ easy | ].
+  specialize (IHit (a / d) b c d true) as H1.
+  assert (H : a / d ≤ it). {
+    apply Nat.mul_le_mono_pos_r with (p := d); [ flia Hdc | ].
+    apply Nat.mod_divides in Hadz; [ | flia Hdc ].
+    destruct Hadz as (k, Hk).
+    rewrite Hk.
+    rewrite (Nat.mul_comm d).
+    rewrite Nat.div_mul; [ | flia Hdc ].
+    rewrite Nat.mul_comm, <- Hk.
+    transitivity (S it); [ easy | ].
+    rewrite Nat.mul_comm.
+    destruct d as [| d']; [ flia Hdc | cbn ].
+    destruct d'; [ flia Hdc | cbn ].
+    destruct it; [ | flia ].
+    flia Haz Hit Had.
+  }
+  specialize (H1 H); clear H.
+...
+  apply IHit with (d := d) (same := true); [ | easy | easy | ].
 ...
 
 Theorem nat_square_free_true_if : ∀ a,
