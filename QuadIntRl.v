@@ -473,7 +473,25 @@ destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
   destruct Hndz as (k, Hk).
   rewrite Nat.mul_comm in Hk; subst n.
   rewrite Nat.div_mul in Hdbs; [ | easy ].
+(*
 ...
+  apply IHit with (d := d); [ easy | ].
+  destruct it; [ easy | ].
+  cbn in Hdbs |-*.
+  destruct (lt_dec k d) as [Hkd| Hkd]; [ easy | ].
+  apply Nat.nlt_ge in Hkd.
+  destruct (lt_dec (k * d) d) as[ Hkdd| Hkdd]. {
+    now apply Nat.nle_gt in Hkdd.
+  }
+  clear Hkdd.
+  rewrite Nat.mod_mul; [ | easy ].
+  destruct (Nat.eq_dec 0 0) as [H| H]; [ clear H | easy ].
+  rewrite Nat.div_mul; [ | easy ].
+  destruct (Nat.eq_dec (k mod d) 0) as [Hkdz| Hkdz]. {
+    injection Hdbs; clear Hdbs; intros; subst a.
+    destruct it; cbn.
+...
+*)
   destruct it; [ easy | cbn in Hdbs ].
   destruct (lt_dec k d) as [Hkd| Hkd]; [ easy | ].
   apply Nat.nlt_ge in Hkd.
@@ -485,10 +503,20 @@ destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
     now exists k'.
   }
 ...
-  apply IHit with (d := d); [ easy | cbn ].
+  destruct it; [ easy | ].
+  remember (S d) as sd; cbn in Hdbs; subst sd.
+  destruct (lt_dec k (S d)) as [Hksd| Hksd]; [ easy | ].
+  apply Nat.nlt_ge in Hksd.
+  destruct (Nat.eq_dec (k mod S d) 0) as [Hksdz| Hksdz]. {
+    apply Nat.mod_divides in Hksdz; [ | easy ].
+    destruct Hksdz as (k', Hk').
+...
+  apply IHit with (d := S d); [ easy | ].
+  remember (S d) as sd; cbn; subst sd.
   destruct (lt_dec (k * d) d) as [Hkdd| Hkdd]. {
     now apply Nat.nle_gt in Hkdd.
   }
+  clear Hkdd.
 ...
 div_by_squ_loop it (k * d / d) d true = Some a.
 ...
