@@ -515,8 +515,8 @@ Qed.
 Print div_by_squ_loop.
 
 Theorem div_by_squ_loop_some_only_if : ∀ it n d a b,
-  d ≤ a
-  → 2 * (a - d) < it
+  0 < d ≤ a
+  → 2 * (S a - d) < it
   → n ≠ 0
   → n = b * a * a
   → div_by_squ_loop it n d false = Some a.
@@ -529,27 +529,23 @@ induction it; intros; [ easy | ].
 cbn.
 destruct (lt_dec (b * a * a) d) as [Hnd| Hnd]. {
   destruct b; [ easy | ].
-  destruct a. {
-    now apply Nat.le_0_r in Hda; subst d.
-  }
+  destruct a; [ flia Hda | ].
   flia Hda Hnd.
 }
 apply Nat.nlt_ge in Hnd.
-destruct (Nat.eq_dec d 0) as [Hdz| Hdz]. {
-  subst d; cbn.
-  rewrite Nat.sub_0_r in Hit.
-  destruct it; cbn. {
-    destruct a; [ flia Hnz | ].
-    flia Hit.
+destruct (Nat.eq_dec ((b * a * a) mod d) 0) as [Hnmz| Hnmz]. {
+  apply Nat.mod_divides in Hnmz; [ | flia Hda ].
+  destruct Hnmz as (k, Hk).
+  rewrite (Nat.mul_comm d) in Hk; rewrite Hk.
+  rewrite Nat.div_mul; [ | flia Hda ].
+  destruct it. {
+    destruct d; [ easy | ].
+    rewrite Nat.sub_succ in Hit.
+    remember (a - n) as c eqn:Hc; symmetry in Hc.
+    destruct c; [ flia Hda Hc | flia Hit ].
   }
-  destruct a; [ easy | ].
-...
-destruct (Nat.eq_dec ((b * a * a) mod d) 0) as [Hnz| Hnz]. {
   cbn.
-  apply Nat.mod_divides in Hnz.
-
-
-Print div_by_squ_loop.
+  destruct (lt_dec k d) as [Hkd| Hkd]. {
 ...
 
 Theorem nat_div_by_square_some_if : ∀ n a,
