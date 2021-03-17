@@ -482,8 +482,9 @@ Theorem div_by_squ_loop_some_if : ∀ it n d a,
   → ∃ b : nat, n = b * a * a.
 Proof.
 clear.
-intros * Hdz Hdbs.
-revert n d a Hdz Hdbs.
+intros * Hdz.
+intros Hdbs.
+revert n d Hdz Hdbs.
 induction it; intros; [ easy | cbn in Hdbs ].
 destruct (lt_dec n d) as [Hnd| Hnd]; [ easy | ].
 apply Nat.nlt_ge in Hnd.
@@ -503,7 +504,7 @@ destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
     rewrite Nat.mul_comm in Hk'; subst k.
     now exists k'.
   }
-  specialize (IHit k (S d) a (Nat.neq_succ_0 _) Hdbs) as H1.
+  specialize (IHit k (S d) (Nat.neq_succ_0 _) Hdbs) as H1.
   destruct H1 as (k', Hk').
   subst k.
   exists (k' * d); flia.
@@ -511,11 +512,13 @@ destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
 now apply IHit with (d := S d).
 Qed.
 
-Theorem nat_div_by_square_some_if : ∀ n a,
+Theorem nat_div_by_square_some_iff : ∀ n a,
   nat_div_by_square n = Some a
   → ∃ b : nat, n = b * a * a.
 Proof.
-intros * Hdbs.
+clear.
+intros *.
+intros Hdbs.
 now apply div_by_squ_loop_some_if in Hdbs.
 Qed.
 
