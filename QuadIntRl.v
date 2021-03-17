@@ -517,18 +517,39 @@ Print div_by_squ_loop.
 Theorem div_by_squ_loop_some_only_if : ∀ it n d a b,
   d ≤ a
   → 2 * (a - d) < it
+  → n ≠ 0
   → n = b * a * a
   → div_by_squ_loop it n d false = Some a.
 Proof.
 clear.
-intros * Hda Hit Hn.
+intros * Hda Hit Hnz Hn.
 subst n.
-revert d a b Hda Hit.
+revert d a b Hda Hit Hnz.
 induction it; intros; [ easy | ].
 cbn.
 destruct (lt_dec (b * a * a) d) as [Hnd| Hnd]. {
-  destruct (Nat.eq_dec b 0) as [Hbz| Hbz]. {
-    subst b.
+  destruct b; [ easy | ].
+  destruct a. {
+    now apply Nat.le_0_r in Hda; subst d.
+  }
+  flia Hda Hnd.
+}
+apply Nat.nlt_ge in Hnd.
+destruct (Nat.eq_dec d 0) as [Hdz| Hdz]. {
+  subst d; cbn.
+  rewrite Nat.sub_0_r in Hit.
+  destruct it; cbn. {
+    destruct a; [ flia Hnz | ].
+    flia Hit.
+  }
+  destruct a; [ easy | ].
+...
+destruct (Nat.eq_dec ((b * a * a) mod d) 0) as [Hnz| Hnz]. {
+  cbn.
+  apply Nat.mod_divides in Hnz.
+
+
+Print div_by_squ_loop.
 ...
 
 Theorem nat_div_by_square_some_if : ∀ n a,
