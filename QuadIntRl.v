@@ -476,7 +476,7 @@ destruct (Nat.eq_dec (k mod d) 0) as [Hkdz| Hkdz]. {
 now apply IHit.
 Qed.
 
-Theorem div_by_squ_loop_if : ∀ it n d a,
+Theorem div_by_squ_loop_some_if : ∀ it n d a,
   d ≠ 0
   → div_by_squ_loop it n d false = Some a
   → ∃ b : nat, n = b * a * a.
@@ -492,26 +492,8 @@ destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
   destruct Hndz as (k, Hk).
   rewrite Nat.mul_comm in Hk; subst n.
   rewrite Nat.div_mul in Hdbs; [ | easy ].
-(*
-...
-  apply IHit with (d := d); [ easy | ].
-  destruct it; [ easy | ].
-  cbn in Hdbs |-*.
-  destruct (lt_dec k d) as [Hkd| Hkd]; [ easy | ].
-  apply Nat.nlt_ge in Hkd.
-  destruct (lt_dec (k * d) d) as[ Hkdd| Hkdd]. {
-    now apply Nat.nle_gt in Hkdd.
-  }
-  clear Hkdd.
-  rewrite Nat.mod_mul; [ | easy ].
-  destruct (Nat.eq_dec 0 0) as [H| H]; [ clear H | easy ].
-  rewrite Nat.div_mul; [ | easy ].
-  destruct (Nat.eq_dec (k mod d) 0) as [Hkdz| Hkdz]. {
-    injection Hdbs; clear Hdbs; intros; subst a.
-    destruct it; cbn.
-...
-*)
-  destruct it; [ easy | cbn in Hdbs ].
+  apply div_by_squ_loop_more_iter in Hdbs.
+  cbn in Hdbs.
   destruct (lt_dec k d) as [Hkd| Hkd]; [ easy | ].
   apply Nat.nlt_ge in Hkd.
   destruct (Nat.eq_dec (k mod d) 0) as [Hkdz| Hkdz]. {
@@ -521,101 +503,13 @@ destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
     rewrite Nat.mul_comm in Hk'; subst k.
     now exists k'.
   }
-  apply div_by_squ_loop_more_iter in Hdbs.
-  apply IHit with (d := S d); [ easy | ].
-  remember (S d) as sd; cbn in Hdbs |-*; subst sd.
-  destruct (lt_dec k (S d)) as [Hksd| Hksd]; [ easy | ].
-  apply Nat.nlt_ge in Hksd.
-  destruct (lt_dec (k * d) (S d)) as [Hkdsd| Hkdsd]. {
-    assert (H : k * d = d) by flia Hnd Hkdsd.
-    destruct d; [ easy | ].
-    destruct k; [ easy | ].
-    destruct k; [ | flia H ].
-    flia Hksd.
-  }
-  apply Nat.nlt_ge in Hkdsd.
-  destruct (Nat.eq_dec (k mod S d) 0) as [Hksdz| Hksdz]. {
-    apply Nat.mod_divides in Hksdz; [ | easy ].
-    destruct Hksdz as (k', Hk').
-    rewrite Nat.mul_comm in Hk'; subst k.
-    rewrite Nat.div_mul in Hdbs; [ | easy ].
-    rewrite Nat.mul_shuffle0.
-    rewrite Nat.mod_mul; [ | easy ].
-    rewrite Nat.div_mul; [ | easy ].
-    cbn - [ "/" ].
-    clear - Hdbs.
-    rename k' into k.
-...
-    revert k d a Hdbs.
-    induction it; intros; [ easy | ].
-    remember (S d) as sd; cbn in Hdbs |-*; subst sd.
-...
-    apply div_by_squ_loop_more_iter in Hdbs.
-    remember (S d) as sd; cbn in Hdbs; subst sd.
-...
-    rewrite Nat.mul_comm in H; cbn in H.
-    cbn in H.
-      cbn in H.
-  destruct (Nat.eq_dec (k mod S d) 0) as [Hksdz| Hksdz]. {
-
-...
-  cbn in Hdbs |-*.
-  destruct (lt_dec (k * d) d) as [Hkdd| Hkdd]. {
-    now apply Nat.nle_gt in Hkdd.
-  }
-  clear Hkdd.
-...
-  destruct it; [ easy | ].
-  remember (S d) as sd; cbn in Hdbs; subst sd.
-  destruct (lt_dec k (S d)) as [Hksd| Hksd]; [ easy | ].
-  apply Nat.nlt_ge in Hksd.
-  destruct (Nat.eq_dec (k mod S d) 0) as [Hksdz| Hksdz]. {
-    apply Nat.mod_divides in Hksdz; [ | easy ].
-    destruct Hksdz as (k', Hk').
-    apply IHit with (d := S d); [ easy | ].
-  remember (S d) as sd; cbn; subst sd.
-  destruct (lt_dec (k * d) d) as [Hkdd| Hkdd]. {
-    now apply Nat.nle_gt in Hkdd.
-  }
-  clear Hkdd.
-...
-div_by_squ_loop it (k * d / d) d true = Some a.
-...
-  specialize (IHit (k * d) d a Hdz) as H1.
-  apply H1.
-  cbn.
-
-...
-  subst n.
-
-  destruct same. {
-    injection Hdbs; clear Hdbs; intros; subst a.
-Print div_by_squ_loop.
-...
-    specialize (IHit k d true d Hdz) as H1.
-    destruct it. {
-      cbn in H1.
-...
-    apply IHit with (d := d) (same := true); [ easy | ].
-...
-    destruct it; cbn.
-Print div_by_squ_loop.
-...
-    specialize (IHit (n / d) d true d) as H1.
-    apply IHit with (d := d) (same := true); [ easy | ].
-    destruct it; cbn.
-...
-
-Theorem nat_div_by_square_iff : ∀ a d,
-  nat_div_by_square a = Some d
-  ↔ ∃ b, a = b * d * d.
-Proof.
-clear.
-intros.
-split. {
-  intros Hdbs.
-  unfold nat_div_by_square in Hdbs.
-...
+  specialize (IHit k (S d) a (Nat.neq_succ_0 _) Hdbs) as H1.
+  destruct H1 as (k', Hk').
+  subst k.
+  exists (k' * d); flia.
+}
+now apply IHit with (d := S d).
+Qed.
 
 Theorem nat_square_free_true_if : ∀ a,
   nat_square_free a = true
