@@ -512,6 +512,25 @@ destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
 now apply IHit with (d := S d).
 Qed.
 
+Print div_by_squ_loop.
+
+Theorem div_by_squ_loop_some_only_if : ∀ it n d a b,
+  d ≤ a
+  → 2 * (a - d) < it
+  → n = b * a * a
+  → div_by_squ_loop it n d false = Some a.
+Proof.
+clear.
+intros * Hda Hit Hn.
+subst n.
+revert d a b Hda Hit.
+induction it; intros; [ easy | ].
+cbn.
+destruct (lt_dec (b * a * a) d) as [Hnd| Hnd]. {
+  destruct (Nat.eq_dec b 0) as [Hbz| Hbz]. {
+    subst b.
+...
+
 Theorem nat_div_by_square_some_if : ∀ n a,
   nat_div_by_square n = Some a
   → ∃ b : nat, n = b * a * a.
