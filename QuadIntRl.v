@@ -519,6 +519,7 @@ Proof.
 clear.
 intros *.
 intros Hdbs.
+unfold nat_div_by_square in Hdbs.
 now apply div_by_squ_loop_some_if in Hdbs.
 Qed.
 
