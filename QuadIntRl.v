@@ -511,6 +511,16 @@ destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
 now apply IHit with (d := S d).
 Qed.
 
+Theorem nat_div_by_square_some_if : ∀ n a,
+  nat_div_by_square n = Some a
+  → ∃ b : nat, n = b * a * a.
+Proof.
+intros * Hdbs.
+now apply div_by_squ_loop_some_if in Hdbs.
+Qed.
+
+...
+
 Theorem nat_square_free_true_if : ∀ a,
   nat_square_free a = true
   → ∀ b c, 2 ≤ c → a ≠ b * c * c.
