@@ -296,18 +296,20 @@ Qed.
 
 (* square free integers *)
 
-Fixpoint squ_free_loop it n d (same : bool) :=
+Fixpoint div_by_squ_loop it n d (same : bool) :=
   match it with
-  | O => false
+  | O => None
   | S it' =>
-      if lt_dec n d then true
+      if lt_dec n d then None
       else if Nat.eq_dec (n mod d) 0 then
-        if same then false
-        else squ_free_loop it' (n / d)%nat d true
-      else squ_free_loop it' n (S d) false
+        if same then Some d
+        else div_by_squ_loop it' (n / d)%nat d true
+      else div_by_squ_loop it' n (S d) false
   end.
 
-Definition nat_square_free n := squ_free_loop n n 2 false.
+Definition nat_div_by_square n := div_by_squ_loop n n 2 false.
+
+Definition nat_square_free n := negb (bool_of_option (nat_div_by_square n)).
 
 Definition square_free z := nat_square_free (Z.abs_nat z).
 
@@ -388,6 +390,7 @@ apply Nat.le_0_l.
 Qed.
 *)
 
+(*
 Print squ_free_loop.
 
 Theorem nat_squ_free_loop_true_if : ∀ it n d same,
@@ -452,6 +455,78 @@ destruct (Nat.eq_dec (a mod d) 0) as [Hadz| Hadz]. {
 ...
   apply IHit with (d := d) (same := true); [ | easy | easy | ].
 ...
+*)
+
+Theorem div_by_squ_loop_if : ∀ it n d a,
+  d ≠ 0
+  → div_by_squ_loop it n d false = Some a
+  → ∃ b : nat, n = b * a * a.
+Proof.
+clear.
+intros * Hdz Hdbs.
+revert n d a Hdz Hdbs.
+induction it; intros; [ easy | cbn in Hdbs ].
+destruct (lt_dec n d) as [Hnd| Hnd]; [ easy | ].
+apply Nat.nlt_ge in Hnd.
+destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
+  apply Nat.mod_divides in Hndz; [ | easy ].
+  destruct Hndz as (k, Hk).
+  rewrite Nat.mul_comm in Hk; subst n.
+  rewrite Nat.div_mul in Hdbs; [ | easy ].
+...
+  destruct it; [ easy | cbn in Hdbs ].
+  destruct (lt_dec k d) as [Hkd| Hkd]; [ easy | ].
+  apply Nat.nlt_ge in Hkd.
+  destruct (Nat.eq_dec (k mod d) 0) as [Hkdz| Hkdz]. {
+    injection Hdbs; clear Hdbs; intros; subst a.
+    apply Nat.mod_divides in Hkdz; [ | easy ].
+    destruct Hkdz as (k', Hk').
+    rewrite Nat.mul_comm in Hk'; subst k.
+    now exists k'.
+  }
+...
+  apply IHit with (d := d); [ easy | cbn ].
+  destruct (lt_dec (k * d) d) as [Hkdd| Hkdd]. {
+    now apply Nat.nle_gt in Hkdd.
+  }
+...
+div_by_squ_loop it (k * d / d) d true = Some a.
+...
+  specialize (IHit (k * d) d a Hdz) as H1.
+  apply H1.
+  cbn.
+
+...
+  subst n.
+
+  destruct same. {
+    injection Hdbs; clear Hdbs; intros; subst a.
+Print div_by_squ_loop.
+...
+    specialize (IHit k d true d Hdz) as H1.
+    destruct it. {
+      cbn in H1.
+...
+    apply IHit with (d := d) (same := true); [ easy | ].
+...
+    destruct it; cbn.
+Print div_by_squ_loop.
+...
+    specialize (IHit (n / d) d true d) as H1.
+    apply IHit with (d := d) (same := true); [ easy | ].
+    destruct it; cbn.
+...
+
+Theorem nat_div_by_square_iff : ∀ a d,
+  nat_div_by_square a = Some d
+  ↔ ∃ b, a = b * d * d.
+Proof.
+clear.
+intros.
+split. {
+  intros Hdbs.
+  unfold nat_div_by_square in Hdbs.
+...
 
 Theorem nat_square_free_true_if : ∀ a,
   nat_square_free a = true
@@ -459,6 +534,10 @@ Theorem nat_square_free_true_if : ∀ a,
 Proof.
 clear.
 intros a Ha b c Hc.
+unfold nat_square_free in Ha.
+remember (nat_div_by_square a) as dbs eqn:Hdbs.
+symmetry in Hdbs.
+destruct dbs as [| d]; [ easy | clear Ha ].
 ...
 now apply nat_squ_free_loop_true_if with (it := a) (d := 2) (same := false).
 ...
