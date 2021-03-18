@@ -525,6 +525,8 @@ clear.
 intros * Hda Hit Hnz Hn.
 subst n.
 ...
+48 = 3 * 4 * 4 = 12 * 2 * 2
+...
 revert d a b Hda Hit Hnz.
 induction it; intros; [ easy | ].
 cbn.
