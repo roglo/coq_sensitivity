@@ -533,6 +533,22 @@ destruct (lt_dec (b * a * a) d) as [Hnd| Hnd]. {
   flia Hda Hnd.
 }
 apply Nat.nlt_ge in Hnd.
+(**)
+destruct (Nat.eq_dec a d) as [Had| Had]. {
+  subst d.
+  rewrite Nat.mod_mul; [ | flia Hda ].
+  rewrite Nat.div_mul; [ | flia Hda ].
+  cbn.
+  destruct it. {
+    rewrite Nat.sub_succ_l in Hit; [ | easy ].
+    rewrite Nat.sub_diag in Hit; flia Hit.
+  }
+  cbn.
+  rewrite Nat.mod_mul; [ cbn | flia Hda ].
+  destruct (lt_dec (b * a) a) as [Hbaa| Hbaa]; [ | easy ].
+  destruct b; [ easy | ].
+  flia Hbaa.
+}
 destruct (Nat.eq_dec ((b * a * a) mod d) 0) as [Hnmz| Hnmz]. {
   apply Nat.mod_divides in Hnmz; [ | flia Hda ].
   destruct Hnmz as (k, Hk).
