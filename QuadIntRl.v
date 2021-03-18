@@ -524,6 +524,7 @@ Proof.
 clear.
 intros * Hda Hit Hnz Hn.
 subst n.
+...
 revert d a b Hda Hit Hnz.
 induction it; intros; [ easy | ].
 cbn.
