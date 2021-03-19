@@ -630,6 +630,9 @@ destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
   }
   destruct same; [ easy | ].
   destruct (Nat.eq_dec (k * d) it) as [Hkdi| Hkdi]. {
+(**)
+    clear Hit.
+...
     destruct it; [ easy | ].
     cbn in Hdbs.
     destruct (lt_dec k d) as [Hkd| Hkd]. {
@@ -657,7 +660,6 @@ destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
     destruct (Nat.eq_dec (k mod d) 0) as [Hkdz'| Hkdz']; [ easy | ].
     clear Hkdz'.
 ....
-
   apply IHit with (d := d) (same := true); try easy. {
     destruct it. {
       (* devrait le faire *)
@@ -666,20 +668,22 @@ destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
     cbn in Hdbs.
     destruct (lt_dec k d) as [Hkd| Hkd]. {
 ...
+*)
 
 Theorem nat_square_free_true_if : ∀ a,
-  nat_square_free a = true
+  a ≠ 0
+  → nat_square_free a = true
   → ∀ b c, 2 ≤ c → a ≠ b * c * c.
 Proof.
 clear.
-intros a Ha b c Hc.
+intros a Haz Ha b c Hc.
 unfold nat_square_free in Ha.
 remember (nat_div_by_square a) as dbs eqn:Hdbs.
 symmetry in Hdbs.
 destruct dbs as [| d]; [ easy | clear Ha ].
 unfold nat_div_by_square in Hdbs.
 ...
-now apply nat_squ_free_loop_true_if with (it := a) (d := 2) (same := false).
+now apply div_by_squ_loop_none_if with (it := a) (d := 2) (same := false).
 ...
 
 Theorem nat_square_free_not_mul_square : ∀ a b c,
