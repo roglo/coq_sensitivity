@@ -580,16 +580,16 @@ Qed.
 
 Print div_by_squ_loop.
 
-Theorem div_by_squ_loop_none_if : ∀ it n d,
+Theorem div_by_squ_loop_none_if : ∀ it n d same,
   n ≠ 0
   → n ≤ it
-  → div_by_squ_loop it n d false = None
+  → div_by_squ_loop it n d same = None
   → 2 ≤ d
   → ∀ b c, d ≤ c → n ≠ b * c * c.
 Proof.
 clear.
 intros * Hnz Hit Hdbs Hd * Hdc.
-revert n d Hnz Hit Hdbs Hd b c Hdc.
+revert n d same Hnz Hit Hdbs Hd b c Hdc.
 induction it; intros. {
   now apply Nat.le_0_r in Hit.
 }
@@ -622,12 +622,14 @@ destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
     cbn in Hdbs.
     rewrite Nat.mod_mul in Hdbs; [ | flia Hd ].
     cbn in Hdbs.
-    destruct (lt_dec (k' * d) d) as [Hkdd| Hkdd]; [ | easy ].
+    destruct (lt_dec (k' * d) d) as [Hkdd| Hkdd]; [ | now destruct same ].
     clear Hdbs.
     exfalso; apply Nat.nle_gt in Hkdd.
     apply Hkdd; clear Hkdd.
     destruct k'; [ easy | cbn; flia ].
   }
+  destruct same; [ easy | ].
+  apply IHit with (d := d) (same := true); try easy.
 ...
 
 Theorem nat_square_free_true_if : ∀ a,
