@@ -512,8 +512,7 @@ destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
 now apply IHit with (d := S d).
 Qed.
 
-Print div_by_squ_loop.
-
+(*
 Theorem div_by_squ_loop_some_only_if : ∀ it n d a b,
   0 < d ≤ a
   → 2 * (S a - d) < it
@@ -524,7 +523,7 @@ Proof.
 clear.
 intros * Hda Hit Hnz Hn.
 subst n.
-...
+ ...
 48 = 3 * 4 * 4 = 12 * 2 * 2
 ...
 revert d a b Hda Hit Hnz.
@@ -566,6 +565,7 @@ destruct (Nat.eq_dec ((b * a * a) mod d) 0) as [Hnmz| Hnmz]. {
   cbn.
   destruct (lt_dec k d) as [Hkd| Hkd]. {
 ...
+*)
 
 Theorem nat_div_by_square_some_if : ∀ n a,
   nat_div_by_square n = Some a
@@ -578,8 +578,6 @@ unfold nat_div_by_square in Hdbs.
 now apply div_by_squ_loop_some_if in Hdbs.
 Qed.
 
-...
-
 Theorem nat_square_free_true_if : ∀ a,
   nat_square_free a = true
   → ∀ b c, 2 ≤ c → a ≠ b * c * c.
@@ -590,6 +588,7 @@ unfold nat_square_free in Ha.
 remember (nat_div_by_square a) as dbs eqn:Hdbs.
 symmetry in Hdbs.
 destruct dbs as [| d]; [ easy | clear Ha ].
+unfold nat_div_by_square in Hdbs.
 ...
 now apply nat_squ_free_loop_true_if with (it := a) (d := 2) (same := false).
 ...
