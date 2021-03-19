@@ -616,6 +616,18 @@ destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
     rewrite Nat.mul_comm in Hk'; subst k.
     destruct it. {
       clear Hdbs.
+      (* devrait le faire *)
+      admit.
+    }
+    cbn in Hdbs.
+    rewrite Nat.mod_mul in Hdbs; [ | flia Hd ].
+    cbn in Hdbs.
+    destruct (lt_dec (k' * d) d) as [Hkdd| Hkdd]; [ | easy ].
+    clear Hdbs.
+    exfalso; apply Nat.nle_gt in Hkdd.
+    apply Hkdd; clear Hkdd.
+    destruct k'; [ easy | cbn; flia ].
+  }
 ...
 
 Theorem nat_square_free_true_if : ∀ a,
