@@ -629,7 +629,27 @@ destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
     destruct k'; [ easy | cbn; flia ].
   }
   destruct same; [ easy | ].
-  apply IHit with (d := d) (same := true); try easy.
+  destruct (Nat.eq_dec (k * d) it) as [Hkdi| Hkdi]. {
+    destruct it; [ easy | ].
+    cbn in Hdbs.
+    destruct (lt_dec k d) as [Hkd| Hkd]. {
+      destruct (Nat.eq_dec b 0) as [Hbz| Hbz]; [ now subst b | ].
+      enough (H : k * d < b * c * c) by flia H.
+      destruct (Nat.eq_dec d c) as [Hdc'| Hdc']. {
+        subst d.
+Search (_ * _ < _ * _).
+apply Nat.mul_lt_mono_
+...
+      apply Nat.mul_lt_mono_nonneg; [ flia | | flia | ].
+....
+
+  apply IHit with (d := d) (same := true); try easy. {
+    destruct it. {
+      (* devrait le faire *)
+      admit.
+    }
+    cbn in Hdbs.
+    destruct (lt_dec k d) as [Hkd| Hkd]. {
 ...
 
 Theorem nat_square_free_true_if : ∀ a,
