@@ -578,6 +578,41 @@ unfold nat_div_by_square in Hdbs.
 now apply div_by_squ_loop_some_if in Hdbs.
 Qed.
 
+Print div_by_squ_loop.
+
+Theorem div_by_squ_loop_none_if : ∀ it n d,
+  n ≠ 0
+  → n ≤ it
+  → div_by_squ_loop it n d false = None
+  → 2 ≤ d
+  → ∀ b c, d ≤ c → n ≠ b * c * c.
+Proof.
+clear.
+intros * Hnz Hit Hdbs Hd * Hdc.
+revert n d Hnz Hit Hdbs Hd b c Hdc.
+induction it; intros. {
+  now apply Nat.le_0_r in Hit.
+}
+cbn in Hdbs.
+destruct (lt_dec n d) as [Hnd| Hnd]. {
+  clear Hdbs.
+  intros Hn.
+  subst n.
+  apply Nat.nle_gt in Hnd; apply Hnd; clear Hnd.
+  transitivity c; [ easy | ].
+  destruct b; [ easy | ].
+  cbn; rewrite Nat.mul_comm.
+  destruct c; [ easy | cbn; flia ].
+}
+apply Nat.nlt_ge in Hnd.
+destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
+  apply Nat.mod_divides in Hndz; [ | flia Hd ].
+  destruct Hndz as (k, Hk).
+  rewrite Nat.mul_comm in Hk.
+  subst n.
+  rewrite Nat.div_mul in Hdbs; [ | flia Hd ].
+...
+
 Theorem nat_square_free_true_if : ∀ a,
   nat_square_free a = true
   → ∀ b c, 2 ≤ c → a ≠ b * c * c.
