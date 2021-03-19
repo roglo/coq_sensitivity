@@ -637,10 +637,25 @@ destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
       enough (H : k * d < b * c * c) by flia H.
       destruct (Nat.eq_dec d c) as [Hdc'| Hdc']. {
         subst d.
-Search (_ * _ < _ * _).
-apply Nat.mul_lt_mono_
-...
-      apply Nat.mul_lt_mono_nonneg; [ flia | | flia | ].
+        apply Nat_le_neq_lt. {
+          apply Nat.mul_le_mono_r.
+          destruct b; [ easy | ].
+          cbn; flia Hkd.
+        }
+        intros H.
+        apply Nat.mul_cancel_r in H; [ | flia Hd ].
+        apply Nat.nle_gt in Hkd; apply Hkd.
+        rewrite H.
+        destruct b; [ easy | cbn; flia ].
+      }
+      apply Nat.mul_lt_mono_nonneg; [ flia | | flia | flia Hdc Hdc' ].
+      apply (Nat.lt_le_trans _ d); [ easy | ].
+      destruct b; [ easy | ].
+      cbn; flia Hdc.
+    }
+    apply Nat.nlt_ge in Hkd.
+    destruct (Nat.eq_dec (k mod d) 0) as [Hkdz'| Hkdz']; [ easy | ].
+    clear Hkdz'.
 ....
 
   apply IHit with (d := d) (same := true); try easy. {
