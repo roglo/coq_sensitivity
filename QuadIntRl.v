@@ -608,9 +608,14 @@ apply Nat.nlt_ge in Hnd.
 destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
   apply Nat.mod_divides in Hndz; [ | flia Hd ].
   destruct Hndz as (k, Hk).
-  rewrite Nat.mul_comm in Hk.
-  subst n.
+  rewrite Nat.mul_comm in Hk; subst n.
   rewrite Nat.div_mul in Hdbs; [ | flia Hd ].
+  destruct (Nat.eq_dec (k mod d) 0) as [Hkdz| Hkdz]. {
+    apply Nat.mod_divides in Hkdz; [ | flia Hd ].
+    destruct Hkdz as (k', Hk').
+    rewrite Nat.mul_comm in Hk'; subst k.
+    destruct it. {
+      clear Hdbs.
 ...
 
 Theorem nat_square_free_true_if : ∀ a,
