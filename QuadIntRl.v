@@ -633,6 +633,13 @@ destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
 (**)
     clear Hit.
     specialize (IHit k d true) as H1.
+    assert (H : k ≠ 0) by now apply Nat.neq_mul_0 in Hnz.
+    specialize (H1 H); clear H.
+    assert (H : k ≤ it). {
+      rewrite <- Hkdi.
+      destruct d; [ flia Hd | flia ].
+    }
+    specialize (H1 H Hdbs Hd); clear H.
 ...
     destruct it; [ easy | ].
     cbn in Hdbs.
