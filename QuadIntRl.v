@@ -296,170 +296,37 @@ Qed.
 
 (* square free integers *)
 
-Fixpoint div_by_squ_loop it n d (same : bool) :=
+Fixpoint old_div_by_squ_loop it n d (same : bool) :=
   match it with
   | O => None
   | S it' =>
       if lt_dec n d then None
       else if Nat.eq_dec (n mod d) 0 then
         if same then Some d
-        else div_by_squ_loop it' (n / d)%nat d true
-      else div_by_squ_loop it' n (S d) false
+        else old_div_by_squ_loop it' (n / d)%nat d true
+      else old_div_by_squ_loop it' n (S d) false
   end.
 
-Definition nat_div_by_square n := div_by_squ_loop n n 2 false.
+Definition old_nat_div_by_square n := old_div_by_squ_loop n n 2 false.
 
-Definition nat_square_free n := negb (bool_of_option (nat_div_by_square n)).
+Definition old_nat_square_free n :=
+  negb (bool_of_option (old_nat_div_by_square n)).
 
-Definition square_free z := nat_square_free (Z.abs_nat z).
+Definition nat_square_free' n :=
+  forallb (λ d, negb (n mod (d * d) =? 0)%nat) (seq 2 (n - 2)).
 
-Compute filter square_free (map (λ n, Z.of_nat n -  60) (seq 1 120)).
+Definition old_square_free z := old_nat_square_free (Z.abs_nat z).
+Definition square_free' z := nat_square_free' (Z.abs_nat z).
+
+Compute filter old_square_free (map (λ n, Z.of_nat n -  60) (seq 1 120)).
+Compute filter square_free' (map (λ n, Z.of_nat n -  60) (seq 1 120)).
 Close Scope Z_scope.
-Compute filter nat_square_free (seq 1 120).
+Compute filter old_nat_square_free (seq 1 120).
+Compute filter nat_square_free' (seq 1 120).
 
-(* should be removed and its theorems, because the real property I have to
-   deal with is square_free, not is_square
-
-Fixpoint nat_is_square_loop it n d :=
-  match it with
-  | O => false
-  | S it' =>
-      match Nat.compare (d * d) n with
-      | Eq => true
-      | Gt => false
-      | Lt => nat_is_square_loop it' n (S d)
-      end
-  end.
-
-Definition nat_is_square n := nat_is_square_loop (S n) n 0.
-
-(*
-Close Scope Z_scope.
-Compute filter nat_is_square (seq 0 120).
-*)
-
-Definition is_square z := nat_is_square (Z.abs_nat z).
-
-Open Scope nat_scope.
-
-Theorem nat_is_square_loop_false_if : ∀ it n d,
-  it + d = S n
-  → nat_is_square_loop it n d = false
-  → ∀ a, d ≤ a → n ≠ a * a.
-Proof.
-clear.
-intros * Hit Hsq a Had.
-revert a n d Hit Hsq Had.
-induction it; intros. {
-  cbn in Hit; subst d.
-  intros H; subst n.
-  clear Hsq.
-  apply Nat.nlt_ge in Had; apply Had; clear Had.
-  induction a; [ cbn; flia | cbn ].
-  apply -> Nat.succ_lt_mono.
-  apply (lt_le_trans _ (S (a * a))); [ easy | ].
-  apply -> Nat.succ_le_mono.
-  rewrite (Nat.mul_comm _ (S a)); cbn.
-  flia.
-}
-cbn in Hsq.
-remember (d * d ?= n) as b eqn:Hb; symmetry in Hb.
-destruct b; [ easy | | ]. {
-  apply Nat.compare_lt_iff in Hb.
-  destruct n; [ easy | ].
-  destruct (Nat.eq_dec d a) as [Hda| Hda]. {
-    subst a; flia Hb.
-  }
-  apply IHit with (d := S d); [ flia Hit | easy | flia Had Hda ].
-} {
-  apply Nat.compare_gt_iff in Hb.
-  intros H; subst n.
-  apply Nat.nle_gt in Hb; apply Hb; clear Hb.
-  now apply Nat.mul_le_mono.
-}
-Qed.
-
-Theorem nat_is_square_false_if : ∀ a,
-  nat_is_square a = false
-  → ∀ b, a ≠ b * b.
-Proof.
-clear.
-intros * Hsq *.
-apply nat_is_square_loop_false_if with (a := b) in Hsq; [ easy | easy | ].
-apply Nat.le_0_l.
-Qed.
-*)
-
-(*
-Print squ_free_loop.
-
-Theorem nat_squ_free_loop_true_if : ∀ it n d same,
-  n ≤ it
-  → n ≠ 0
-  → squ_free_loop it n d same = true
-  → ∀ b c, 2 ≤ d ≤ c → n ≠ b * c * c.
-Proof.
-clear.
-intros * Hit Haz Hsq b c Hdc.
-Print squ_free_loop.
-...
-n < d ∨
-(n mod d = 0 ∧ same = false ∧ squ_free_loop (it - 1) (n /d) d true) ∨
-squ_free_loop (it - 1) n (d + 1) false
-...
-nat_square_free = λ n : nat, squ_free_loop n n 2 false
-...
-revert a b c d same Hit Haz Hsq Hdc.
-induction it; intros; [ easy | ].
-cbn in Hsq.
-destruct (lt_dec a d) as [Had| Had]. {
-  clear Hsq.
-  intros H; subst a.
-  apply Nat.nle_gt in Had; apply Had; clear Had.
-  destruct b; [ easy | ].
-  rewrite <- Nat.mul_assoc; cbn.
-  destruct c; [ now rewrite Nat.mul_comm in Haz | ].
-  cbn; flia Hdc.
-}
-apply Nat.nlt_ge in Had.
-destruct (Nat.eq_dec (a mod d) 0) as [Hadz| Hadz]. {
-  destruct same; [ easy | ].
-...
-  specialize (IHit (a / d) b c d true) as H1.
-  assert (H : a / d ≤ it). {
-    apply Nat.mul_le_mono_pos_r with (p := d); [ flia Hdc | ].
-    apply Nat.mod_divides in Hadz; [ | flia Hdc ].
-    destruct Hadz as (k, Hk).
-    rewrite Hk.
-    rewrite (Nat.mul_comm d).
-    rewrite Nat.div_mul; [ | flia Hdc ].
-    rewrite Nat.mul_comm, <- Hk.
-    transitivity (S it); [ easy | ].
-    rewrite Nat.mul_comm.
-    destruct d as [| d']; [ flia Hdc | cbn ].
-    destruct d'; [ flia Hdc | cbn ].
-    destruct it; [ | flia ].
-    flia Haz Hit Had.
-  }
-  specialize (H1 H); clear H.
-  assert (H : a / d ≠ 0). {
-    apply Nat.mod_divides in Hadz; [ | flia Hdc ].
-    destruct Hadz as (k, Hk).
-    rewrite Hk.
-    rewrite (Nat.mul_comm d).
-    rewrite Nat.div_mul; [ | flia Hdc ].
-    intros H; subst k.
-    now rewrite Nat.mul_0_r in Hk.
-  }
-  specialize (H1 H Hsq Hdc); clear H.
-...
-  apply IHit with (d := d) (same := true); [ | easy | easy | ].
-...
-*)
-
-Theorem div_by_squ_loop_more_iter : ∀ it k d a same,
-  div_by_squ_loop it k d same = Some a
-  → div_by_squ_loop (S it) k d same = Some a.
+Theorem old_div_by_squ_loop_more_iter : ∀ it k d a same,
+  old_div_by_squ_loop it k d same = Some a
+  → old_div_by_squ_loop (S it) k d same = Some a.
 Proof.
 clear.
 intros * Hdbs.
@@ -476,9 +343,9 @@ destruct (Nat.eq_dec (k mod d) 0) as [Hkdz| Hkdz]. {
 now apply IHit.
 Qed.
 
-Theorem div_by_squ_loop_some_if : ∀ it n d a,
+Theorem old_div_by_squ_loop_some_if : ∀ it n d a,
   d ≠ 0
-  → div_by_squ_loop it n d false = Some a
+  → old_div_by_squ_loop it n d false = Some a
   → ∃ b : nat, n = b * a * a.
 Proof.
 clear.
@@ -493,7 +360,7 @@ destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
   destruct Hndz as (k, Hk).
   rewrite Nat.mul_comm in Hk; subst n.
   rewrite Nat.div_mul in Hdbs; [ | easy ].
-  apply div_by_squ_loop_more_iter in Hdbs.
+  apply old_div_by_squ_loop_more_iter in Hdbs.
   cbn in Hdbs.
   destruct (lt_dec k d) as [Hkd| Hkd]; [ easy | ].
   apply Nat.nlt_ge in Hkd.
@@ -512,78 +379,22 @@ destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
 now apply IHit with (d := S d).
 Qed.
 
-(*
-Theorem div_by_squ_loop_some_only_if : ∀ it n d a b,
-  0 < d ≤ a
-  → 2 * (S a - d) < it
-  → n ≠ 0
-  → n = b * a * a
-  → div_by_squ_loop it n d false = Some a.
-Proof.
-clear.
-intros * Hda Hit Hnz Hn.
-subst n.
- ...
-48 = 3 * 4 * 4 = 12 * 2 * 2
-...
-revert d a b Hda Hit Hnz.
-induction it; intros; [ easy | ].
-cbn.
-destruct (lt_dec (b * a * a) d) as [Hnd| Hnd]. {
-  destruct b; [ easy | ].
-  destruct a; [ flia Hda | ].
-  flia Hda Hnd.
-}
-apply Nat.nlt_ge in Hnd.
-(**)
-destruct (Nat.eq_dec a d) as [Had| Had]. {
-  subst d.
-  rewrite Nat.mod_mul; [ | flia Hda ].
-  rewrite Nat.div_mul; [ | flia Hda ].
-  cbn.
-  destruct it. {
-    rewrite Nat.sub_succ_l in Hit; [ | easy ].
-    rewrite Nat.sub_diag in Hit; flia Hit.
-  }
-  cbn.
-  rewrite Nat.mod_mul; [ cbn | flia Hda ].
-  destruct (lt_dec (b * a) a) as [Hbaa| Hbaa]; [ | easy ].
-  destruct b; [ easy | ].
-  flia Hbaa.
-}
-destruct (Nat.eq_dec ((b * a * a) mod d) 0) as [Hnmz| Hnmz]. {
-  apply Nat.mod_divides in Hnmz; [ | flia Hda ].
-  destruct Hnmz as (k, Hk).
-  rewrite (Nat.mul_comm d) in Hk; rewrite Hk.
-  rewrite Nat.div_mul; [ | flia Hda ].
-  destruct it. {
-    destruct d; [ easy | ].
-    rewrite Nat.sub_succ in Hit.
-    remember (a - n) as c eqn:Hc; symmetry in Hc.
-    destruct c; [ flia Hda Hc | flia Hit ].
-  }
-  cbn.
-  destruct (lt_dec k d) as [Hkd| Hkd]. {
-...
-*)
-
-Theorem nat_div_by_square_some_if : ∀ n a,
-  nat_div_by_square n = Some a
+Theorem old_nat_div_by_square_some_if : ∀ n a,
+  old_nat_div_by_square n = Some a
   → ∃ b : nat, n = b * a * a.
 Proof.
 clear.
 intros *.
 intros Hdbs.
-unfold nat_div_by_square in Hdbs.
-now apply div_by_squ_loop_some_if in Hdbs.
+unfold old_nat_div_by_square in Hdbs.
+now apply old_div_by_squ_loop_some_if in Hdbs.
 Qed.
 
-Print div_by_squ_loop.
-
-Theorem div_by_squ_loop_none_if : ∀ it n d same,
+(*
+Theorem old_div_by_squ_loop_none_if : ∀ it n d same,
   n ≠ 0
   → n ≤ it
-  → div_by_squ_loop it n d same = None
+  → old_div_by_squ_loop it n d same = None
   → 2 ≤ d
   → ∀ b c, d ≤ c → n ≠ b * c * c.
 Proof.
@@ -708,24 +519,27 @@ destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
 ...
 *)
 
-Theorem nat_square_free_true_if : ∀ a,
+(*
+Theorem old_nat_square_free_true_if : ∀ a,
   a ≠ 0
-  → nat_square_free a = true
+  → old_nat_square_free a = true
   → ∀ b c, 2 ≤ c → a ≠ b * c * c.
 Proof.
 clear.
 intros a Haz Ha b c Hc.
-unfold nat_square_free in Ha.
-remember (nat_div_by_square a) as dbs eqn:Hdbs.
+unfold old_nat_square_free in Ha.
+remember (old_nat_div_by_square a) as dbs eqn:Hdbs.
 symmetry in Hdbs.
 destruct dbs as [| d]; [ easy | clear Ha ].
-unfold nat_div_by_square in Hdbs.
+unfold old_nat_div_by_square in Hdbs.
 ...
 now apply div_by_squ_loop_none_if with (it := a) (d := 2) (same := false).
 ...
+*)
 
-Theorem nat_square_free_not_mul_square : ∀ a b c,
-  nat_square_free b = true
+(*
+Theorem old_nat_square_free_not_mul_square : ∀ a b c,
+  old_nat_square_free b = true
   → (a * a)%nat = (b * c * c)%nat
   → a = 0%nat ∧ c = 0%nat.
 Proof.
@@ -810,7 +624,9 @@ rewrite Habc in H1.
 ...
 specialize (Nat.gauss a' c' b) as H1.
 ...
+*)
 
+(*
 Theorem not_square_not_mul_square : ∀ a b c,
   is_square a = false → b * b = a * c * c → b = 0 ∧ c = 0.
 Proof.
@@ -847,9 +663,11 @@ destruct a as [| a| a]; [ easy | | ]. {
 ...
 } {
 ...
+*)
+Open Scope Z_scope.
 
 Theorem quad_int_eucl_div :
-  is_square d = false →
+  square_free' d = false →
   if rngl_has_eucl_div then
     ∀ a b q r : quad_int d,
     b ≠ 0%F
