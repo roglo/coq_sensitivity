@@ -631,8 +631,8 @@ destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
   }
   destruct same; [ easy | ].
   destruct (Nat.eq_dec (k * d) it) as [Hkdi| Hkdi]. {
-(**)
     clear Hit.
+(*
     specialize (IHit k d true) as H1.
     assert (H : k ≠ 0) by now apply Nat.neq_mul_0 in Hnz.
     specialize (H1 H); clear H.
@@ -641,7 +641,8 @@ destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
       destruct d; [ flia Hd | flia ].
     }
     specialize (H1 H Hdbs Hd); clear H.
-...
+    intros H.
+*)
     destruct it; [ easy | ].
     cbn in Hdbs.
     destruct (lt_dec k d) as [Hkd| Hkd]. {
@@ -668,6 +669,12 @@ destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
     apply Nat.nlt_ge in Hkd.
     destruct (Nat.eq_dec (k mod d) 0) as [Hkdz'| Hkdz']; [ easy | ].
     clear Hkdz'.
+    destruct it. {
+      apply Nat.eq_mul_1 in Hkdi.
+      destruct Hkdi as (H1, H2).
+      now rewrite H1, H2 in Hkdz.
+    }
+    cbn - [ Nat.eq_dec "/" "mod" ] in Hdbs.
 ....
   apply IHit with (d := d) (same := true); try easy. {
     destruct it. {
