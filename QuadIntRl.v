@@ -589,6 +589,9 @@ Theorem div_by_squ_loop_none_if : ∀ it n d same,
 Proof.
 clear.
 intros * Hnz Hit Hdbs Hd * Hdc.
+...
+clear.
+intros * Hnz Hit Hdbs Hd * Hdc.
 revert n d same Hnz Hit Hdbs Hd b c Hdc.
 induction it; intros. {
   now apply Nat.le_0_r in Hit.
