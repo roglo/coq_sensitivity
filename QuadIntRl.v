@@ -616,8 +616,9 @@ destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
     rewrite Nat.mul_comm in Hk'; subst k.
     destruct it. {
       clear Hdbs.
-      (* devrait le faire *)
-      admit.
+      assert (H : k' * d * d = 1) by flia Hnz Hit.
+      apply Nat.eq_mul_1 in H.
+      flia Hd H.
     }
     cbn in Hdbs.
     rewrite Nat.mod_mul in Hdbs; [ | flia Hd ].
