@@ -675,6 +675,16 @@ destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
       now rewrite H1, H2 in Hkdz.
     }
     cbn - [ Nat.eq_dec "/" "mod" ] in Hdbs.
+    destruct (lt_dec k (S d)) as [Hksd| Hksd]. {
+      replace k with d in Hkdz by flia Hkd Hksd.
+      rewrite Nat.mod_same in Hkdz; [ easy | flia Hd ].
+    }
+    apply Nat.nlt_ge in Hksd; clear Hkd.
+    destruct (Nat.eq_dec (k mod S d) 0) as [Hksdz| Hksdz]. {
+      apply Nat.mod_divides in Hksdz; [ | easy ].
+      destruct Hksdz as (k', Hk').
+      rewrite Nat.mul_comm in Hk'; subst k.
+      rewrite Nat.div_mul in Hdbs; [ | easy ].
 ....
   apply IHit with (d := d) (same := true); try easy. {
     destruct it. {
