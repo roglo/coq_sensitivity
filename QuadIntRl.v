@@ -632,6 +632,7 @@ destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
   destruct (Nat.eq_dec (k * d) it) as [Hkdi| Hkdi]. {
 (**)
     clear Hit.
+    specialize (IHit k d true) as H1.
 ...
     destruct it; [ easy | ].
     cbn in Hdbs.
