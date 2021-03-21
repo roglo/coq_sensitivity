@@ -312,18 +312,59 @@ Definition old_nat_div_by_square n := old_div_by_squ_loop n n 2 false.
 Definition old_nat_square_free n :=
   negb (bool_of_option (old_nat_div_by_square n)).
 
+Close Scope Z_scope.
+
+Definition bnat_square_free' n :=
+  (negb (n =? 0) &&
+   forallb (λ d, negb (n mod (d * d) =? 0)) (seq 2 (n - 2)))%bool.
+
 Definition nat_square_free' n :=
-  (negb (n =? 0)%nat &&
-   forallb (λ d, negb (n mod (d * d) =? 0)%nat) (seq 2 (n - 2)))%bool.
+  n ≠ 0 ∧ ∀ d, 2 ≤ d < n → n mod (d * d) ≠ 0.
 
 Definition old_square_free z := old_nat_square_free (Z.abs_nat z).
-Definition square_free' z := nat_square_free' (Z.abs_nat z).
+Definition bsquare_free' z := bnat_square_free' (Z.abs_nat z).
 
+Open Scope Z_scope.
 Compute filter old_square_free (map (λ n, Z.of_nat n -  60) (seq 1 120)).
-Compute filter square_free' (map (λ n, Z.of_nat n -  60) (seq 1 120)).
+Compute filter bsquare_free' (map (λ n, Z.of_nat n -  60) (seq 1 120)).
 Close Scope Z_scope.
 Compute filter old_nat_square_free (seq 1 120).
-Compute filter nat_square_free' (seq 1 120).
+Compute filter bnat_square_free' (seq 1 120).
+
+Theorem nat_square_free_bnat_square_free : ∀ n,
+  nat_square_free' n ↔ bnat_square_free' n = true.
+Proof.
+clear.
+intros.
+unfold nat_square_free', bnat_square_free'.
+split; intros Hn. {
+  destruct Hn as (Hnz, Hn).
+  apply Bool.andb_true_iff.
+  split. {
+    apply Bool.negb_true_iff.
+    now apply Nat.eqb_neq.
+  }
+  apply forallb_forall.
+  intros d Hd.
+  apply Bool.negb_true_iff.
+  apply Nat.eqb_neq.
+  apply Hn.
+  apply in_seq in Hd.
+  flia Hd.
+} {
+  apply Bool.andb_true_iff in Hn.
+  destruct Hn as (Hnz, Hn).
+  apply Bool.negb_true_iff in Hnz.
+  apply Nat.eqb_neq in Hnz.
+  split; [ easy | ].
+  intros d Hd.
+  specialize (proj1 (forallb_forall _ _) Hn d) as H1.
+  assert (H : d ∈ seq 2 (n - 2)) by (apply in_seq; flia Hd).
+  specialize (H1 H); clear H; cbn in H1.
+  apply Bool.negb_true_iff in H1.
+  now apply Nat.eqb_neq in H1.
+}
+Qed.
 
 Theorem old_div_by_squ_loop_more_iter : ∀ it k d a same,
   old_div_by_squ_loop it k d same = Some a
@@ -538,6 +579,17 @@ now apply div_by_squ_loop_none_if with (it := a) (d := 2) (same := false).
 ...
 *)
 
+Theorem nat_square_free_not_mul_square : ∀ a b c,
+  nat_square_free' b
+  → (a * a)%nat = (b * c * c)%nat
+  → a = 0%nat ∧ c = 0%nat.
+Proof.
+clear.
+intros * Hsqfb Habc.
+unfold nat_square_free' in Hsqfb.
+destruct Hsqfb as (Hbz, Hsqfb).
+...
+
 (*
 Theorem old_nat_square_free_not_mul_square : ∀ a b c,
   old_nat_square_free b = true
@@ -648,6 +700,8 @@ destruct a as [| a| a]; [ easy | | ]. {
       injection Hbac; clear Hbac; intros Hbac.
       apply Pos2Nat.inj_iff in Hbac.
       do 3 rewrite Pos2Nat.inj_mul in Hbac.
+...
+      apply nat_square_free_not_mul_square in Hbac; [ | easy ].
 ...
       apply nat_not_square_not_mul_square in Hbac; [ | easy ].
       destruct Hbac as (H1, _).
