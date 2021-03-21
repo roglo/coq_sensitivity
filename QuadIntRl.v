@@ -313,7 +313,8 @@ Definition old_nat_square_free n :=
   negb (bool_of_option (old_nat_div_by_square n)).
 
 Definition nat_square_free' n :=
-  forallb (λ d, negb (n mod (d * d) =? 0)%nat) (seq 2 (n - 2)).
+  (negb (n =? 0)%nat &&
+   forallb (λ d, negb (n mod (d * d) =? 0)%nat) (seq 2 (n - 2)))%bool.
 
 Definition old_square_free z := old_nat_square_free (Z.abs_nat z).
 Definition square_free' z := nat_square_free' (Z.abs_nat z).
@@ -626,14 +627,15 @@ specialize (Nat.gauss a' c' b) as H1.
 ...
 *)
 
-(*
-Theorem not_square_not_mul_square : ∀ a b c,
-  is_square a = false → b * b = a * c * c → b = 0 ∧ c = 0.
+Open Scope Z_scope.
+
+Theorem square_free_not_mul_square : ∀ a b c,
+  a ≠ 1 → square_free' a = true → b * b = a * c * c → b = 0 ∧ c = 0.
 Proof.
-intros * Hnsq Hbac.
+intros * Ha1 Hasf Hbac.
 destruct a as [| a| a]; [ easy | | ]. {
-  unfold is_square in Hnsq.
-  rewrite Zabs2Nat.inj_pos in Hnsq.
+  unfold square_free' in Hasf.
+  rewrite Zabs2Nat.inj_pos in Hasf.
   destruct c as [| c| c]. {
     rewrite Z.mul_0_r in Hbac.
     apply Z.eq_mul_0 in Hbac.
@@ -664,10 +666,9 @@ destruct a as [| a| a]; [ easy | | ]. {
 } {
 ...
 *)
-Open Scope Z_scope.
 
 Theorem quad_int_eucl_div :
-  square_free' d = false →
+  square_free' d = true →
   if rngl_has_eucl_div then
     ∀ a b q r : quad_int d,
     b ≠ 0%F
@@ -715,7 +716,7 @@ assert (Hbbz : bb ≠ 0). {
   rewrite Z.opp_involutive in H2.
   unfold qi_zero.
 ...
-  apply not_square_not_mul_square in H2; [ | easy ].
+  apply square_free_not_mul_square in H2; [ | easy ].
   now destruct H2; subst b₁ b'₁.
 ...
   destruct d; [ easy | | ]. {
