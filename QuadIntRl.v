@@ -323,6 +323,7 @@ Definition nat_square_free' n :=
 
 Definition old_square_free z := old_nat_square_free (Z.abs_nat z).
 Definition bsquare_free' z := bnat_square_free' (Z.abs_nat z).
+Definition square_free' z := nat_square_free' (Z.abs_nat z).
 
 Open Scope Z_scope.
 Compute filter old_square_free (map (λ n, Z.of_nat n -  60) (seq 1 120)).
@@ -580,12 +581,13 @@ now apply div_by_squ_loop_none_if with (it := a) (d := 2) (same := false).
 *)
 
 Theorem nat_square_free_not_mul_square : ∀ a b c,
-  nat_square_free' b
+  b ≠ 1
+  → nat_square_free' b
   → (a * a)%nat = (b * c * c)%nat
   → a = 0%nat ∧ c = 0%nat.
 Proof.
 clear.
-intros * Hsqfb Habc.
+intros * Hb1 Hsqfb Habc.
 unfold nat_square_free' in Hsqfb.
 destruct Hsqfb as (Hbz, Hsqfb).
 ...
@@ -682,12 +684,19 @@ specialize (Nat.gauss a' c' b) as H1.
 Open Scope Z_scope.
 
 Theorem square_free_not_mul_square : ∀ a b c,
-  a ≠ 1 → square_free' a = true → b * b = a * c * c → b = 0 ∧ c = 0.
+  a ≠ 1 → square_free' a → b * b = a * c * c → b = 0 ∧ c = 0.
 Proof.
+clear.
 intros * Ha1 Hasf Hbac.
-destruct a as [| a| a]; [ easy | | ]. {
+destruct a as [| a| a]. {
+  now unfold square_free', nat_square_free' in Hasf.
+}  {
   unfold square_free' in Hasf.
   rewrite Zabs2Nat.inj_pos in Hasf.
+(*
+  unfold nat_square_free' in Hasf.
+  destruct Hasf as (_, Hasf).
+*)
   destruct c as [| c| c]. {
     rewrite Z.mul_0_r in Hbac.
     apply Z.eq_mul_0 in Hbac.
@@ -701,9 +710,12 @@ destruct a as [| a| a]; [ easy | | ]. {
       apply Pos2Nat.inj_iff in Hbac.
       do 3 rewrite Pos2Nat.inj_mul in Hbac.
 ...
-      apply nat_square_free_not_mul_square in Hbac; [ | easy ].
+      apply nat_square_free_not_mul_square in Hbac; [ | | easy ]. 2: {
+        intros H; apply Ha1.
+        replace 1%nat with (Pos.to_nat 1) in H by easy.
+        now apply Pos2Nat.inj_iff in H; subst a.
+      } {
 ...
-      apply nat_not_square_not_mul_square in Hbac; [ | easy ].
       destruct Hbac as (H1, _).
       specialize (Pos2Nat.is_pos b) as H2.
       now rewrite H1 in H2.
