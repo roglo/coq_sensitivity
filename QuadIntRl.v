@@ -519,7 +519,7 @@ Search (_ * _ = Z.neg _).
 ...
 
 Theorem quad_int_eucl_div :
-  square_free' d = true →
+  d ≠ 1 → square_free d →
   if rngl_has_eucl_div then
     ∀ a b q r : quad_int d,
     b ≠ 0%F
@@ -527,7 +527,7 @@ Theorem quad_int_eucl_div :
     → a = (b * q + r)%F ∧ (rngl_gauge r < rngl_gauge b)%nat
   else not_applicable.
 Proof.
-intros Hdsqu.
+intros Hd1 Hdsqu.
 unfold rngl_has_eucl_div, rngl_eucl_div, rngl_gauge.
 cbn - [ In_dec ].
 destruct (in_dec Z.eq_dec d having_eucl_div) as [Hhed| Hhed]; [ cbn | easy ].
@@ -566,9 +566,9 @@ assert (Hbbz : bb ≠ 0). {
   apply Z.add_move_0_r in H2.
   rewrite Z.opp_involutive in H2.
   unfold qi_zero.
-...
-  apply square_free_not_mul_square in H2; [ | easy ].
+  apply square_free_not_mul_square in H2; [ | easy | easy ].
   now destruct H2; subst b₁ b'₁.
+}
 ...
   destruct d; [ easy | | ]. {
     destruct b'₁ as [| b'₁| b'₁]. {
