@@ -515,8 +515,21 @@ destruct a as [| a| a]. {
     now destruct Hbac.
   } {
     cbn in Hbac.
-Search (_ * _ = Z.neg _).
-...
+    exfalso.
+    specialize (Pos2Z.neg_is_neg (a * c * c)) as H1.
+    rewrite <- Hbac in H1.
+    apply Z.nle_gt in H1; apply H1; clear H1.
+    apply Z.square_nonneg.
+  } {
+    cbn in Hbac.
+    exfalso.
+    specialize (Pos2Z.neg_is_neg (a * c * c)) as H1.
+    rewrite <- Hbac in H1.
+    apply Z.nle_gt in H1; apply H1; clear H1.
+    apply Z.square_nonneg.
+  }
+}
+Qed.
 
 Theorem quad_int_eucl_div :
   d ≠ 1 → square_free d →
@@ -569,6 +582,7 @@ assert (Hbbz : bb ≠ 0). {
   apply square_free_not_mul_square in H2; [ | easy | easy ].
   now destruct H2; subst b₁ b'₁.
 }
+specialize (H1 Hbbz).
 ...
   destruct d; [ easy | | ]. {
     destruct b'₁ as [| b'₁| b'₁]. {
