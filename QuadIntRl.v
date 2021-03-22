@@ -296,22 +296,6 @@ Qed.
 
 (* square free integers *)
 
-Fixpoint old_div_by_squ_loop it n d (same : bool) :=
-  match it with
-  | O => None
-  | S it' =>
-      if lt_dec n d then None
-      else if Nat.eq_dec (n mod d) 0 then
-        if same then Some d
-        else old_div_by_squ_loop it' (n / d)%nat d true
-      else old_div_by_squ_loop it' n (S d) false
-  end.
-
-Definition old_nat_div_by_square n := old_div_by_squ_loop n n 2 false.
-
-Definition old_nat_square_free n :=
-  negb (bool_of_option (old_nat_div_by_square n)).
-
 Close Scope Z_scope.
 
 Definition bnat_square_free' n :=
@@ -321,15 +305,12 @@ Definition bnat_square_free' n :=
 Definition nat_square_free' n :=
   n ≠ 0 ∧ ∀ d, 2 ≤ d < n → n mod (d * d) ≠ 0.
 
-Definition old_square_free z := old_nat_square_free (Z.abs_nat z).
 Definition bsquare_free' z := bnat_square_free' (Z.abs_nat z).
 Definition square_free' z := nat_square_free' (Z.abs_nat z).
 
 Open Scope Z_scope.
-Compute filter old_square_free (map (λ n, Z.of_nat n -  60) (seq 1 120)).
 Compute filter bsquare_free' (map (λ n, Z.of_nat n -  60) (seq 1 120)).
 Close Scope Z_scope.
-Compute filter old_nat_square_free (seq 1 120).
 Compute filter bnat_square_free' (seq 1 120).
 
 Theorem nat_square_free_bnat_square_free : ∀ n,
@@ -366,219 +347,6 @@ split; intros Hn. {
   now apply Nat.eqb_neq in H1.
 }
 Qed.
-
-Theorem old_div_by_squ_loop_more_iter : ∀ it k d a same,
-  old_div_by_squ_loop it k d same = Some a
-  → old_div_by_squ_loop (S it) k d same = Some a.
-Proof.
-clear.
-intros * Hdbs.
-revert k d a same Hdbs.
-induction it; intros; [ easy | ].
-remember (S it) as it'; cbn; subst it'.
-cbn in Hdbs.
-destruct (lt_dec k d) as [Hkd| Hkd]; [ easy | ].
-apply Nat.nlt_ge in Hkd.
-destruct (Nat.eq_dec (k mod d) 0) as [Hkdz| Hkdz]. {
-  destruct same; [ easy | ].
-  now apply IHit.
-}
-now apply IHit.
-Qed.
-
-Theorem old_div_by_squ_loop_some_if : ∀ it n d a,
-  d ≠ 0
-  → old_div_by_squ_loop it n d false = Some a
-  → ∃ b : nat, n = b * a * a.
-Proof.
-clear.
-intros * Hdz.
-intros Hdbs.
-revert n d Hdz Hdbs.
-induction it; intros; [ easy | cbn in Hdbs ].
-destruct (lt_dec n d) as [Hnd| Hnd]; [ easy | ].
-apply Nat.nlt_ge in Hnd.
-destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
-  apply Nat.mod_divides in Hndz; [ | easy ].
-  destruct Hndz as (k, Hk).
-  rewrite Nat.mul_comm in Hk; subst n.
-  rewrite Nat.div_mul in Hdbs; [ | easy ].
-  apply old_div_by_squ_loop_more_iter in Hdbs.
-  cbn in Hdbs.
-  destruct (lt_dec k d) as [Hkd| Hkd]; [ easy | ].
-  apply Nat.nlt_ge in Hkd.
-  destruct (Nat.eq_dec (k mod d) 0) as [Hkdz| Hkdz]. {
-    injection Hdbs; clear Hdbs; intros; subst a.
-    apply Nat.mod_divides in Hkdz; [ | easy ].
-    destruct Hkdz as (k', Hk').
-    rewrite Nat.mul_comm in Hk'; subst k.
-    now exists k'.
-  }
-  specialize (IHit k (S d) (Nat.neq_succ_0 _) Hdbs) as H1.
-  destruct H1 as (k', Hk').
-  subst k.
-  exists (k' * d); flia.
-}
-now apply IHit with (d := S d).
-Qed.
-
-Theorem old_nat_div_by_square_some_if : ∀ n a,
-  old_nat_div_by_square n = Some a
-  → ∃ b : nat, n = b * a * a.
-Proof.
-clear.
-intros *.
-intros Hdbs.
-unfold old_nat_div_by_square in Hdbs.
-now apply old_div_by_squ_loop_some_if in Hdbs.
-Qed.
-
-(*
-Theorem old_div_by_squ_loop_none_if : ∀ it n d same,
-  n ≠ 0
-  → n ≤ it
-  → old_div_by_squ_loop it n d same = None
-  → 2 ≤ d
-  → ∀ b c, d ≤ c → n ≠ b * c * c.
-Proof.
-clear.
-intros * Hnz Hit Hdbs Hd * Hdc.
-...
-clear.
-intros * Hnz Hit Hdbs Hd * Hdc.
-revert n d same Hnz Hit Hdbs Hd b c Hdc.
-induction it; intros. {
-  now apply Nat.le_0_r in Hit.
-}
-cbn in Hdbs.
-destruct (lt_dec n d) as [Hnd| Hnd]. {
-  clear Hdbs.
-  intros Hn.
-  subst n.
-  apply Nat.nle_gt in Hnd; apply Hnd; clear Hnd.
-  transitivity c; [ easy | ].
-  destruct b; [ easy | ].
-  cbn; rewrite Nat.mul_comm.
-  destruct c; [ easy | cbn; flia ].
-}
-apply Nat.nlt_ge in Hnd.
-destruct (Nat.eq_dec (n mod d) 0) as [Hndz| Hndz]. {
-  apply Nat.mod_divides in Hndz; [ | flia Hd ].
-  destruct Hndz as (k, Hk).
-  rewrite Nat.mul_comm in Hk; subst n.
-  rewrite Nat.div_mul in Hdbs; [ | flia Hd ].
-  destruct (Nat.eq_dec (k mod d) 0) as [Hkdz| Hkdz]. {
-    apply Nat.mod_divides in Hkdz; [ | flia Hd ].
-    destruct Hkdz as (k', Hk').
-    rewrite Nat.mul_comm in Hk'; subst k.
-    destruct it. {
-      clear Hdbs.
-      assert (H : k' * d * d = 1) by flia Hnz Hit.
-      apply Nat.eq_mul_1 in H.
-      flia Hd H.
-    }
-    cbn in Hdbs.
-    rewrite Nat.mod_mul in Hdbs; [ | flia Hd ].
-    cbn in Hdbs.
-    destruct (lt_dec (k' * d) d) as [Hkdd| Hkdd]; [ | now destruct same ].
-    clear Hdbs.
-    exfalso; apply Nat.nle_gt in Hkdd.
-    apply Hkdd; clear Hkdd.
-    destruct k'; [ easy | cbn; flia ].
-  }
-  destruct same; [ easy | ].
-  destruct (Nat.eq_dec (k * d) it) as [Hkdi| Hkdi]. {
-    clear Hit.
-(*
-    specialize (IHit k d true) as H1.
-    assert (H : k ≠ 0) by now apply Nat.neq_mul_0 in Hnz.
-    specialize (H1 H); clear H.
-    assert (H : k ≤ it). {
-      rewrite <- Hkdi.
-      destruct d; [ flia Hd | flia ].
-    }
-    specialize (H1 H Hdbs Hd); clear H.
-    intros H.
-*)
-    destruct it; [ easy | ].
-    cbn in Hdbs.
-    destruct (lt_dec k d) as [Hkd| Hkd]. {
-      destruct (Nat.eq_dec b 0) as [Hbz| Hbz]; [ now subst b | ].
-      enough (H : k * d < b * c * c) by flia H.
-      destruct (Nat.eq_dec d c) as [Hdc'| Hdc']. {
-        subst d.
-        apply Nat_le_neq_lt. {
-          apply Nat.mul_le_mono_r.
-          destruct b; [ easy | ].
-          cbn; flia Hkd.
-        }
-        intros H.
-        apply Nat.mul_cancel_r in H; [ | flia Hd ].
-        apply Nat.nle_gt in Hkd; apply Hkd.
-        rewrite H.
-        destruct b; [ easy | cbn; flia ].
-      }
-      apply Nat.mul_lt_mono_nonneg; [ flia | | flia | flia Hdc Hdc' ].
-      apply (Nat.lt_le_trans _ d); [ easy | ].
-      destruct b; [ easy | ].
-      cbn; flia Hdc.
-    }
-    apply Nat.nlt_ge in Hkd.
-    destruct (Nat.eq_dec (k mod d) 0) as [Hkdz'| Hkdz']; [ easy | ].
-    clear Hkdz'.
-    destruct it. {
-      apply Nat.eq_mul_1 in Hkdi.
-      destruct Hkdi as (H1, H2).
-      now rewrite H1, H2 in Hkdz.
-    }
-    cbn - [ Nat.eq_dec "/" "mod" ] in Hdbs.
-    destruct (lt_dec k (S d)) as [Hksd| Hksd]. {
-      replace k with d in Hkdz by flia Hkd Hksd.
-      rewrite Nat.mod_same in Hkdz; [ easy | flia Hd ].
-    }
-    apply Nat.nlt_ge in Hksd; clear Hkd.
-    destruct (Nat.eq_dec (k mod S d) 0) as [Hksdz| Hksdz]. {
-      apply Nat.mod_divides in Hksdz; [ | easy ].
-      destruct Hksdz as (k', Hk').
-      rewrite Nat.mul_comm in Hk'; subst k.
-      rewrite Nat.div_mul in Hdbs; [ | easy ].
-      destruct it. {
-        clear Hdbs.
-        replace d with 1 in *; [ easy | ].
-        destruct d as [| d']; [ easy | ].
-        destruct d'; [ easy | ].
-        destruct k'; [ easy | ].
-        flia Hkdi.
-      }
-      cbn - [ Nat.eq_dec "/" "mod" ] in Hdbs.
-....
-  apply IHit with (d := d) (same := true); try easy. {
-    destruct it. {
-      (* devrait le faire *)
-      admit.
-    }
-    cbn in Hdbs.
-    destruct (lt_dec k d) as [Hkd| Hkd]. {
-...
-*)
-
-(*
-Theorem old_nat_square_free_true_if : ∀ a,
-  a ≠ 0
-  → old_nat_square_free a = true
-  → ∀ b c, 2 ≤ c → a ≠ b * c * c.
-Proof.
-clear.
-intros a Haz Ha b c Hc.
-unfold old_nat_square_free in Ha.
-remember (old_nat_div_by_square a) as dbs eqn:Hdbs.
-symmetry in Hdbs.
-destruct dbs as [| d]; [ easy | clear Ha ].
-unfold old_nat_div_by_square in Hdbs.
-...
-now apply div_by_squ_loop_none_if with (it := a) (d := 2) (same := false).
-...
-*)
 
 Theorem nat_square_free_mul_square_gcd_1_false : ∀ a b c,
   b ≠ 1
@@ -688,95 +456,6 @@ assert (Hg : Nat.gcd a' c' = 1). {
 now apply nat_square_free_mul_square_gcd_1_false in Habc.
 Qed.
 
-(*
-Theorem old_nat_square_free_not_mul_square : ∀ a b c,
-  old_nat_square_free b = true
-  → (a * a)%nat = (b * c * c)%nat
-  → a = 0%nat ∧ c = 0%nat.
-Proof.
-clear.
-intros * Hsqb Habc.
-...
-specialize (nat_square_free_true_if Hsqb) as Hsq'.
-...
-intros * Hsqb Habc.
-specialize (nat_is_square_false_if Hsqb) as Hsq'.
-destruct (Nat.eq_dec a 0) as [Haz| Haz]. {
-  split; [ easy | ].
-  rewrite Haz in Habc.
-  symmetry in Habc; cbn in Habc.
-  apply Nat.eq_mul_0 in Habc.
-  destruct Habc as [Habc| Habc]; [ | easy].
-  apply Nat.eq_mul_0 in Habc.
-  destruct Habc; [ | easy ].
-  subst b.
-  now specialize (Hsq' 0).
-}
-exfalso.
-destruct (Nat.eq_dec (Nat.gcd a c) 0) as [Hgz| Hgz]. {
-  now apply Nat.gcd_eq_0 in Hgz.
-}
-apply (f_equal (λ x, Nat.div x (Nat.gcd a c))) in Habc.
-rewrite Nat.divide_div_mul_exact in Habc; [ | easy | ]. 2: {
-  apply Nat.gcd_divide_l.
-}
-rewrite Nat.divide_div_mul_exact in Habc; [ | easy | ]. 2: {
-  apply Nat.gcd_divide_r.
-}
-remember (a / Nat.gcd a c) as a' eqn:Ha'.
-remember (c / Nat.gcd a c) as c' eqn:Hc'.
-move c' before a'.
-destruct (Nat.eq_dec a' 0) as [Ha'z| Ha'z]. {
-  move Ha'z at top; subst a'.
-  symmetry in Ha'.
-  apply Nat.div_small_iff in Ha'; [ | easy ].
-  apply Nat.nle_gt in Ha'; apply Ha'.
-  specialize (Nat.gcd_divide_l a c) as H1.
-  destruct H1 as (ka, H1).
-  rewrite H1 at 2.
-  destruct ka; [ easy | ].
-  apply Nat.le_add_r.
-}
-move Ha'z before Haz.
-rewrite (Nat.mul_comm a) in Habc.
-rewrite Nat.mul_shuffle0 in Habc.
-apply (f_equal (λ x, Nat.div x (Nat.gcd a c))) in Habc.
-rewrite Nat.divide_div_mul_exact in Habc; [ | easy | ]. 2: {
-  apply Nat.gcd_divide_l.
-}
-rewrite Nat.divide_div_mul_exact in Habc; [ | easy | ]. 2: {
-  apply Nat.gcd_divide_r.
-}
-rewrite <- Ha', <- Hc' in Habc.
-assert (Hg : Nat.gcd a' c' = 1). {
-  rewrite Ha', Hc'.
-  now apply Nat.gcd_div_gcd.
-}
-assert (Hgg : Nat.gcd (a' * a') (c' * c') = 1). {
-  now apply Nat_gcd_1_mul_l; apply Nat_gcd_1_mul_r.
-}
-specialize (Nat.gauss (a' * a') (c' * c') b) as H1.
-rewrite (Nat.mul_comm _ b) in H1.
-rewrite Nat.mul_assoc, <- Habc in H1.
-specialize (H1 (Nat.divide_refl _) Hgg).
-destruct H1 as (ka, H1).
-(* would be ok if b held no squares, but provided that
-   a'≠1; in that case → contradiction *)
-...
-Check Nat.gauss.
-specialize (Nat.gauss (c' * c') a' a') as H1.
-...
-specialize (Nat.gauss (a' * a') (c' * c') b) as H1.
-rewrite (Nat.mul_comm _ b) in H1.
-rewrite Nat.mul_assoc, <- Habc in H1.
-specialize (H1 (Nat.divide_refl _) Hgg).
-
-rewrite Habc in H1.
-...
-specialize (Nat.gauss a' c' b) as H1.
-...
-*)
-
 Open Scope Z_scope.
 
 Theorem square_free_not_mul_square : ∀ a b c,
@@ -789,10 +468,6 @@ destruct a as [| a| a]. {
 }  {
   unfold square_free' in Hasf.
   rewrite Zabs2Nat.inj_pos in Hasf.
-(*
-  unfold nat_square_free' in Hasf.
-  destruct Hasf as (_, Hasf).
-*)
   destruct c as [| c| c]. {
     rewrite Z.mul_0_r in Hbac.
     apply Z.eq_mul_0 in Hbac.
