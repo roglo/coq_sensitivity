@@ -568,8 +568,8 @@ split. {
   symmetry.
   apply quad_int_add_sub.
 }
-specialize (Z.div_eucl_eq (qi_re (a * qi_conj b)) bb) as H1.
-rewrite Hγr in H1.
+unfold qi_gauge.
+fold bb.
 assert (Hbbz : bb ≠ 0). {
   intros H2; apply Hbz.
   unfold bb in H2.
@@ -582,23 +582,10 @@ assert (Hbbz : bb ≠ 0). {
   apply square_free_not_mul_square in H2; [ | easy | easy ].
   now destruct H2; subst b₁ b'₁.
 }
-specialize (H1 Hbbz).
-...
-  destruct d; [ easy | | ]. {
-    destruct b'₁ as [| b'₁| b'₁]. {
-      rewrite Z.mul_0_r in H2.
-      apply -> Z.eq_square_0 in H2; subst b₁.
-      easy.
-    } {
-...
+specialize (Z.div_eucl_eq (qi_re (a * qi_conj b)) bb Hbbz) as H1.
 rewrite Hγr in H1.
-destruct (Z_le_dec (2 * r₁) bb) as [Hrbb| Hrbb]. {
-  subst q₁.
-  destruct (Z_le_dec (2 * r'₁) bb) as [Hr'bb| Hr'bb]. {
-    subst q'₁.
-    destruct (Z.eq_dec d (-1)) as [Hd1| Hd1]. {
-      subst d.
-Search Z.div_eucl.
+specialize (Z.div_eucl_eq (qi_im (a * qi_conj b)) bb Hbbz) as H2.
+rewrite Hγr' in H2.
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
