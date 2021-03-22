@@ -359,14 +359,13 @@ clear.
 intros * Hb1 Hsqfb Habc Hac.
 unfold nat_square_free in Hsqfb.
 destruct Hsqfb as (Hbz, Hsqfb).
-specialize (Nat.gauss (a * a) (c * c) b) as H1.
-rewrite (Nat.mul_comm _ b) in H1.
-rewrite Nat.mul_assoc, <- Habc in H1.
-specialize (H1 (Nat.divide_refl _)).
-assert (H : Nat.gcd (a * a) (c * c) = 1). {
-  now apply Nat_gcd_1_mul_l; apply Nat_gcd_1_mul_r.
+assert (H1 : Nat.divide (a * a) b). {
+  apply Nat.gauss with (m := c * c). 2: {
+    now apply Nat_gcd_1_mul_l; apply Nat_gcd_1_mul_r.
+  }
+  rewrite (Nat.mul_comm _ b).
+  now rewrite Nat.mul_assoc, <- Habc.
 }
-specialize (H1 H); clear H.
 destruct H1 as (ka, H1).
 replace b with (b * 1) in H1 by apply Nat.mul_1_r.
 rewrite Habc in H1.
