@@ -357,27 +357,26 @@ Theorem nat_square_free_mul_square_gcd_1_false : ∀ a b c,
 Proof.
 clear.
 intros * Hb1 Hsqfb Habc Hac.
-assert (Hgg : Nat.gcd (a * a) (c * c) = 1). {
-  now apply Nat_gcd_1_mul_l; apply Nat_gcd_1_mul_r.
-}
+unfold nat_square_free in Hsqfb.
+destruct Hsqfb as (Hbz, Hsqfb).
 specialize (Nat.gauss (a * a) (c * c) b) as H1.
 rewrite (Nat.mul_comm _ b) in H1.
 rewrite Nat.mul_assoc, <- Habc in H1.
-specialize (H1 (Nat.divide_refl _) Hgg).
+specialize (H1 (Nat.divide_refl _)).
+assert (H : Nat.gcd (a * a) (c * c) = 1). {
+  now apply Nat_gcd_1_mul_l; apply Nat_gcd_1_mul_r.
+}
+specialize (H1 H); clear H.
 destruct H1 as (ka, H1).
 replace b with (b * 1) in H1 by apply Nat.mul_1_r.
 rewrite Habc in H1.
 rewrite (Nat.mul_comm ka) in H1.
 do 2 rewrite <- Nat.mul_assoc in H1.
-apply Nat.mul_cancel_l in H1. 2: {
-  now unfold nat_square_free in Hsqfb.
-}
+apply Nat.mul_cancel_l in H1; [ | easy ].
 symmetry in H1.
 apply Nat.eq_mul_1 in H1.
 destruct H1 as (H1, H2); subst c.
 do 2 rewrite Nat.mul_1_r in Habc.
-unfold nat_square_free in Hsqfb.
-destruct Hsqfb as (Hbz, Hsqfb).
 assert (Ha2 : 2 ≤ a < b). {
   symmetry in Habc.
   split. {
@@ -393,6 +392,8 @@ specialize (Hsqfb a Ha2) as H1.
 rewrite Habc in H1; apply H1.
 now apply Nat.mod_same.
 Qed.
+
+...
 
 Theorem nat_square_free_not_mul_square : ∀ a b c,
   b ≠ 1
