@@ -485,19 +485,18 @@ destruct a as [| a| a]. {
         replace 1%nat with (Pos.to_nat 1) in H by easy.
         now apply Pos2Nat.inj_iff in H; subst a.
       } {
-...
-      destruct Hbac as (H1, _).
-      specialize (Pos2Nat.is_pos b) as H2.
-      now rewrite H1 in H2.
+        destruct Hbac as (H1, _).
+        specialize (Pos2Nat.is_succ b) as H2.
+        destruct H2 as (n, H2).
+        now rewrite H1 in H2.
+      }
     } {
       cbn in Hbac.
       injection Hbac; clear Hbac; intros Hbac.
       apply Pos2Nat.inj_iff in Hbac.
       do 3 rewrite Pos2Nat.inj_mul in Hbac.
-      apply nat_not_square_not_mul_square in Hbac; [ | easy ].
-      destruct Hbac as (H1, _).
-      specialize (Pos2Nat.is_pos b) as H2.
-      now rewrite H1 in H2.
+      apply nat_square_free_not_mul_square in Hbac; [ | | easy ]. 2: {
+        intros H; rewrite H in Hasf.
 ...
 } {
 ...
