@@ -583,10 +583,15 @@ assert (Hbbz : bb ≠ 0). {
   apply square_free_not_mul_square in H2; [ | easy | easy ].
   now destruct H2; subst b₁ b'₁.
 }
-specialize (Z.div_eucl_eq (qi_re (a * qi_conj b)) bb Hbbz) as H1.
+Search Z.div_eucl.
+specialize (Z_div_mod_full (qi_re (a * qi_conj b)) bb Hbbz) as H1.
 rewrite Hγr in H1.
-specialize (Z.div_eucl_eq (qi_im (a * qi_conj b)) bb Hbbz) as H2.
+specialize (Z_div_mod_full (qi_im (a * qi_conj b)) bb Hbbz) as H2.
 rewrite Hγr' in H2.
+destruct H1 as (Hre, Hrer).
+destruct H2 as (Him, Himr).
+move Him before Hre.
+unfold Remainder in Hrer, Himr.
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
