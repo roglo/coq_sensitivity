@@ -509,6 +509,13 @@ destruct a as [| a| a]. {
     now specialize (H1 c Hbac).
   }
 } {
+  destruct c as [| c| c]. {
+    rewrite Z.mul_0_r in Hbac.
+    apply Z.eq_mul_0 in Hbac.
+    now destruct Hbac.
+  } {
+    cbn in Hbac.
+Search (_ * _ = Z.neg _).
 ...
 
 Theorem quad_int_eucl_div :
