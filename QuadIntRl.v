@@ -592,6 +592,12 @@ destruct H1 as (Hre, Hrer).
 destruct H2 as (Him, Himr).
 move Him before Hre.
 unfold Remainder in Hrer, Himr.
+(* mmm... c'est compliqué... mais en tous cas, pour l'instant, il
+   n'y a pas de contraintes sur la valeur de d, à part de n'avoir
+   pas de facteur carré (square free) ; mais normalement, la
+   condition sur la jauge n'est censée marcher que sur
+   la liste having_eucl_div, bien que... bon, ma définition est
+   incorrecte sur les d=4n+1 (je fais des ℤ(√d) au lieu de ℚ(√d)) *)
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
