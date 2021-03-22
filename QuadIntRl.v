@@ -592,6 +592,8 @@ destruct H1 as (Hre, Hrer).
 destruct H2 as (Him, Himr).
 move Him before Hre.
 unfold Remainder in Hrer, Himr.
+set (rr := qi_re (r * qi_conj r)).
+move rr before bb.
 (* mmm... c'est compliqué... mais en tous cas, pour l'instant, il
    n'y a pas de contraintes sur la valeur de d, à part de n'avoir
    pas de facteur carré (square free) ; mais normalement, la
