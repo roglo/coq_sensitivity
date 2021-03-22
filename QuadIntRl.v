@@ -298,27 +298,27 @@ Qed.
 
 Close Scope Z_scope.
 
-Definition bnat_square_free' n :=
+Definition bnat_square_free n :=
   (negb (n =? 0) &&
    forallb (λ d, negb (n mod (d * d) =? 0)) (seq 2 (n - 2)))%bool.
 
-Definition nat_square_free' n :=
+Definition nat_square_free n :=
   n ≠ 0 ∧ ∀ d, 2 ≤ d < n → n mod (d * d) ≠ 0.
 
-Definition bsquare_free' z := bnat_square_free' (Z.abs_nat z).
-Definition square_free' z := nat_square_free' (Z.abs_nat z).
+Definition bsquare_free z := bnat_square_free (Z.abs_nat z).
+Definition square_free z := nat_square_free (Z.abs_nat z).
 
 Open Scope Z_scope.
-Compute filter bsquare_free' (map (λ n, Z.of_nat n -  60) (seq 1 120)).
+Compute filter bsquare_free (map (λ n, Z.of_nat n -  60) (seq 1 120)).
 Close Scope Z_scope.
-Compute filter bnat_square_free' (seq 1 120).
+Compute filter bnat_square_free (seq 1 120).
 
 Theorem nat_square_free_bnat_square_free : ∀ n,
-  nat_square_free' n ↔ bnat_square_free' n = true.
+  nat_square_free n ↔ bnat_square_free n = true.
 Proof.
 clear.
 intros.
-unfold nat_square_free', bnat_square_free'.
+unfold nat_square_free, bnat_square_free.
 split; intros Hn. {
   destruct Hn as (Hnz, Hn).
   apply Bool.andb_true_iff.
@@ -350,7 +350,7 @@ Qed.
 
 Theorem nat_square_free_mul_square_gcd_1_false : ∀ a b c,
   b ≠ 1
-  → nat_square_free' b
+  → nat_square_free b
   → a * a = b * c * c
   → Nat.gcd a c = 1
   → False.
@@ -370,13 +370,13 @@ rewrite Habc in H1.
 rewrite (Nat.mul_comm ka) in H1.
 do 2 rewrite <- Nat.mul_assoc in H1.
 apply Nat.mul_cancel_l in H1. 2: {
-  now unfold nat_square_free' in Hsqfb.
+  now unfold nat_square_free in Hsqfb.
 }
 symmetry in H1.
 apply Nat.eq_mul_1 in H1.
 destruct H1 as (H1, H2); subst c.
 do 2 rewrite Nat.mul_1_r in Habc.
-unfold nat_square_free' in Hsqfb.
+unfold nat_square_free in Hsqfb.
 destruct Hsqfb as (Hbz, Hsqfb).
 assert (Ha2 : 2 ≤ a < b). {
   symmetry in Habc.
@@ -396,7 +396,7 @@ Qed.
 
 Theorem nat_square_free_not_mul_square : ∀ a b c,
   b ≠ 1
-  → nat_square_free' b
+  → nat_square_free b
   → (a * a)%nat = (b * c * c)%nat
   → a = 0%nat ∧ c = 0%nat.
 Proof.
@@ -409,7 +409,7 @@ destruct (Nat.eq_dec a 0) as [Haz| Haz]. {
   apply Nat.eq_mul_0 in Habc.
   destruct Habc as [Habc| Habc]; [ | easy].
   apply Nat.eq_mul_0 in Habc.
-  unfold nat_square_free' in Hsqfb.
+  unfold nat_square_free in Hsqfb.
   destruct Hsqfb as (Hbz, Hsqfb).
   now destruct Habc.
 }
@@ -459,14 +459,14 @@ Qed.
 Open Scope Z_scope.
 
 Theorem square_free_not_mul_square : ∀ a b c,
-  a ≠ 1 → square_free' a → b * b = a * c * c → b = 0 ∧ c = 0.
+  a ≠ 1 → square_free a → b * b = a * c * c → b = 0 ∧ c = 0.
 Proof.
 clear.
 intros * Ha1 Hasf Hbac.
 destruct a as [| a| a]. {
-  now unfold square_free', nat_square_free' in Hasf.
+  now unfold square_free, nat_square_free in Hasf.
 }  {
-  unfold square_free' in Hasf.
+  unfold square_free in Hasf.
   rewrite Zabs2Nat.inj_pos in Hasf.
   destruct c as [| c| c]. {
     rewrite Z.mul_0_r in Hbac.
