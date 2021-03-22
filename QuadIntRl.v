@@ -466,13 +466,8 @@ destruct a as [| a| a]. {
 }  {
   unfold square_free in Hasf.
   rewrite Zabs2Nat.inj_pos in Hasf.
-  destruct c as [| c| c]. {
-    rewrite Z.mul_0_r in Hbac.
-    apply Z.eq_mul_0 in Hbac.
-    now destruct Hbac.
-  } {
-    exfalso.
-    cbn in Hbac.
+  assert (H1 : ∀ c, b * b = Z.pos (a * c * c) → False). {
+    clear c Hbac; intros c Hbac.
     destruct b as [| b| b]; [ easy | | ]. {
       cbn in Hbac.
       injection Hbac; clear Hbac; intros Hbac.
@@ -504,12 +499,17 @@ destruct a as [| a| a]. {
       now rewrite H1 in H2.
     }
   }
-  exfalso.
-  cbn in Hbac.
-...
+  destruct c as [| c| c]. {
+    rewrite Z.mul_0_r in Hbac.
+    apply Z.eq_mul_0 in Hbac.
+    now destruct Hbac.
+  } {
+    now specialize (H1 c Hbac).
+  } {
+    now specialize (H1 c Hbac).
+  }
 } {
 ...
-*)
 
 Theorem quad_int_eucl_div :
   square_free' d = true →
