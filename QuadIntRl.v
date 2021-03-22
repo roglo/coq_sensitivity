@@ -494,7 +494,18 @@ destruct a as [| a| a]. {
       apply Pos2Nat.inj_iff in Hbac.
       do 3 rewrite Pos2Nat.inj_mul in Hbac.
       apply nat_square_free_not_mul_square in Hbac; [ | | easy ]. 2: {
-        intros H; rewrite H in Hasf.
+        intros H; apply Ha1.
+        rewrite <- positive_nat_Z.
+        now rewrite H.
+      }
+      destruct Hbac as (H1, _).
+      specialize (Pos2Nat.is_succ b) as H2.
+      destruct H2 as (n, H2).
+      now rewrite H1 in H2.
+    }
+  }
+  exfalso.
+  cbn in Hbac.
 ...
 } {
 ...
