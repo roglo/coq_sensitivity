@@ -531,8 +531,10 @@ destruct a as [| a| a]. {
 }
 Qed.
 
+Context {Hd1 : d ≠ 1}.
+Context {Hdsqu : square_free d}.
+
 Theorem quad_int_eucl_div :
-  d ≠ 1 → square_free d →
   if rngl_has_eucl_div then
     ∀ a b q r : quad_int d,
     b ≠ 0%F
@@ -540,7 +542,6 @@ Theorem quad_int_eucl_div :
     → a = (b * q + r)%F ∧ (rngl_gauge r < rngl_gauge b)%nat
   else not_applicable.
 Proof.
-intros Hd1 Hdsqu.
 unfold rngl_has_eucl_div, rngl_eucl_div, rngl_gauge.
 cbn - [ In_dec ].
 destruct (in_dec Z.eq_dec d having_eucl_div) as [Hhed| Hhed]; [ cbn | easy ].
@@ -607,17 +608,28 @@ Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
      rngl_opt_mul_1_r := NA;
      rngl_opt_mul_add_distr_r := NA;
      rngl_opt_add_opp_l := quad_int_add_opp_l;
-     rngl_opt_add_sub_add_sub := NA;
+     rngl_opt_add_sub := NA;
      rngl_opt_sub_sub_sub_add := NA;
-     rngl_opt_sub_diag := NA;
-     rngl_opt_add_cancel_l := NA;
-     rngl_opt_sub_0_l := NA;
      rngl_opt_mul_sub_distr_l := NA;
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := NA;
      rngl_opt_mul_inv_r := NA;
      rngl_opt_eucl_div_prop := quad_int_eucl_div |}.
-
+     rngl_opt_gauge_prop := ?rngl_opt_gauge_prop;
+     rngl_opt_eq_dec := ?rngl_opt_eq_dec;
+     rngl_opt_le_dec := ?rngl_opt_le_dec;
+     rngl_opt_integral := ?rngl_opt_integral;
+     rngl_characteristic_prop := ?rngl_characteristic_prop;
+     rngl_opt_le_refl := ?rngl_opt_le_refl;
+     rngl_opt_le_antisymm := ?rngl_opt_le_antisymm;
+     rngl_opt_le_trans := ?rngl_opt_le_trans;
+     rngl_opt_add_le_compat := ?rngl_opt_add_le_compat;
+     rngl_opt_mul_le_compat_nonneg := ?rngl_opt_mul_le_compat_nonneg;
+     rngl_opt_mul_le_compat_nonpos := ?rngl_opt_mul_le_compat_nonpos;
+     rngl_opt_mul_le_compat := ?rngl_opt_mul_le_compat;
+     rngl_opt_not_le := ?rngl_opt_not_le;
+     rngl_consistent := ?rngl_consistent |}.
+...
      rngl_opt_gauge_prop := ?rngl_opt_gauge_prop;
      rngl_opt_eq_dec := Nat.eq_dec;
      rngl_opt_le_dec := le_dec;
