@@ -392,8 +392,6 @@ rewrite Habc in H1; apply H1.
 now apply Nat.mod_same.
 Qed.
 
-...
-
 Theorem nat_square_free_not_mul_square : ∀ a b c,
   b ≠ 1
   → nat_square_free b
