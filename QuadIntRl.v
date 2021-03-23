@@ -383,7 +383,7 @@ rewrite Nat.mul_1_r in Hnab.
 now exists a.
 Qed.
 
-(* should be sufficient if not square instead of not square free *)
+(* should be sufficient if not square instead of square free *)
 ...
 Theorem nat_square_free_not_mul_square : ∀ a b c,
   b ≠ 1
