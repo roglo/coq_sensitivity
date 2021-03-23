@@ -348,6 +348,17 @@ split; intros Hn. {
 }
 Qed.
 
+Definition is_square n := ∃ d, d * d = n.
+
+(* ça va pas, ce nom *)
+Theorem mul_of_square_is_square : ∀ a b c,
+  2 ≤ b
+  → a * a = b * c * c
+  → Nat.gcd a c = 1
+  → is_square b.
+Proof.
+...
+
 Theorem nat_square_free_mul_square_gcd_1_false : ∀ a b c,
   b ≠ 1
   → nat_square_free b
