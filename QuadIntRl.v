@@ -539,6 +539,21 @@ destruct a as [| a| a]. {
 }
 Qed.
 
+Theorem Z_sqr_abs_1 : ∀ z, Z.abs_nat z = 1%nat → z * z = 1.
+Proof.
+clear.
+intros * Hz1.
+destruct z as [| z| z]; [ easy | | ]. {
+  cbn in Hz1 |-*.
+  replace 1%nat with (Pos.to_nat 1) in Hz1 by easy.
+  now apply Pos2Nat.inj in Hz1; subst z.
+} {
+  cbn in Hz1 |-*.
+  replace 1%nat with (Pos.to_nat 1) in Hz1 by easy.
+  now apply Pos2Nat.inj in Hz1; subst z.
+}
+Qed.
+
 Context {Hd1 : d ≠ 1}.
 Context {Hdsqu : square_free d}.
 
@@ -576,9 +591,14 @@ assert (H : 2 ≤ Z.abs_nat k < Z.abs_nat z). {
   remember (Z.abs_nat k) as n eqn:Hn; symmetry in Hn.
   destruct n. 2: {
     destruct n; [ | cbn; flia ].
+    apply Z_sqr_abs_1 in Hn.
+    now rewrite Hk in Hn.
+  }
+...
     exfalso; apply Hz1; clear Hz1.
     rewrite <- Hk.
     clear - Hn.
+Search (Z.abs_nat).
 ...
 Search (Z.abs_nat _ = Z.abs_nat _).
 Search (Z.abs_nat _ * _)%nat.
