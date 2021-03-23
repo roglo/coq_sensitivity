@@ -576,6 +576,18 @@ assert (H : 2 ≤ Z.abs_nat k < Z.abs_nat z). {
   remember (Z.abs_nat k) as n eqn:Hn; symmetry in Hn.
   destruct n. 2: {
     destruct n; [ | cbn; flia ].
+    exfalso; apply Hz1; clear Hz1.
+    rewrite <- Hk.
+    clear - Hn.
+...
+Search (Z.abs_nat _ = Z.abs_nat _).
+Search (Z.abs_nat _ * _)%nat.
+Zabs2Nat.inj_mul: ∀ n m : Z, Z.abs_nat (n * m) = (Z.abs_nat n * Z.abs_nat m)%nat
+...
+Search (Z.abs_nat).
+    apply (f_equal Z.to_nat) in Hk.
+Search (Z.to_nat (_ * _)).
+
 Search (Z.abs_nat _ = _).
 ...
     replace 1%nat with (Z.abs_nat 1) in Hn by easy.
