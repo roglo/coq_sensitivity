@@ -690,6 +690,14 @@ move rr before bb.
    condition sur la jauge n'est censée marcher que sur
    la liste having_eucl_div, bien que... bon, ma définition est
    incorrecte sur les d=4n+1 (je fais des ℤ(√d) au lieu de ℚ(√d)) *)
+destruct (Z.eq_dec d (-1)) as [Hdm1| Hdm1]. {
+  move Hdm1 at top; subst d.
+  clear Hd1 Hhed Hdsqu.
+  move q at top; move b at top; move a at top.
+  destruct (Z_le_dec (2 * r₁) bb) as [Hrbb| Hrbb]. {
+    subst q₁.
+    destruct (Z_le_dec (2 * r'₁) bb) as [Hr'bb| Hr'bb]. {
+      subst q'₁.
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
