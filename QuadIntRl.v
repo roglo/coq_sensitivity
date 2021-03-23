@@ -350,26 +350,16 @@ Qed.
 
 Definition is_square n := ∃ d, d * d = n.
 
-(* ça va pas, ce nom *)
-Theorem mul_of_square_is_square : ∀ a b c,
-  2 ≤ b
-  → a * a = b * c * c
+Theorem square_mul_of_square_is_square : ∀ a b c,
+  a * a = b * c * c
   → Nat.gcd a c = 1
   → is_square b.
 Proof.
-...
-
-Theorem nat_square_free_mul_square_gcd_1_false : ∀ a b c,
-  b ≠ 1
-  → nat_square_free b
-  → a * a = b * c * c
-  → Nat.gcd a c = 1
-  → False.
-Proof.
-clear.
-intros * Hb1 Hsqfb Habc Hac.
-unfold nat_square_free in Hsqfb.
-destruct Hsqfb as (Hbz, Hsqfb).
+intros * Habc Hac.
+destruct (Nat.eq_dec b 0) as [Hbz| Hbz]. {
+  subst b.
+  now exists 0.
+}
 assert (H1 : Nat.divide (a * a) b). {
   apply Nat.gauss with (m := c * c). 2: {
     now apply Nat_gcd_1_mul_l; apply Nat_gcd_1_mul_r.
@@ -387,22 +377,11 @@ symmetry in H1.
 apply Nat.eq_mul_1 in H1.
 destruct H1 as (H1, H2); subst c.
 do 2 rewrite Nat.mul_1_r in Habc.
-assert (Ha2 : 2 ≤ a < b). {
-  symmetry in Habc.
-  split. {
-    destruct a; [ easy | ].
-    destruct a; [ easy | ].
-    flia.
-  }
-  rewrite Habc.
-  destruct a; [ easy | cbn ].
-  destruct a; [ easy | cbn; flia ].
-}
-specialize (Hsqfb a Ha2) as H1.
-rewrite Habc in H1; apply H1.
-now apply Nat.mod_same.
+now exists a.
 Qed.
 
+(* do the same version for Z as for nat above *)
+...
 Theorem nat_square_free_not_mul_square : ∀ a b c,
   b ≠ 1
   → nat_square_free b
@@ -462,7 +441,20 @@ assert (Hg : Nat.gcd a' c' = 1). {
   rewrite Ha', Hc'.
   now apply Nat.gcd_div_gcd.
 }
-now apply nat_square_free_mul_square_gcd_1_false in Habc.
+(**)
+apply square_mul_of_square_is_square in Habc; [ | easy ].
+destruct Habc as (k, Hk); subst b.
+destruct Hsqfb as (Hkz2, Hsqfb).
+destruct (Nat.eq_dec k 0) as [Hkz| Hkz]; [ subst k; flia Hkz2 | ].
+destruct (Nat.eq_dec k 1) as [Hk1| Hk1]; [ now subst k | ].
+specialize (Hsqfb k) as H1.
+assert (H : 2 ≤ k < k * k). {
+  split; [ flia Hkz Hk1 | ].
+  destruct k; [ easy | ].
+  destruct k; [ easy | cbn; flia ].
+}
+specialize (H1 H); clear H.
+now apply H1, Nat.mod_same.
 Qed.
 
 Open Scope Z_scope.
