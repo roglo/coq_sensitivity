@@ -350,9 +350,9 @@ Qed.
 
 Definition is_square n := ∃ d, d * d = n.
 
-(* si une racine carrée d'un nombre b est un rationnel (a/c ci-dessous),
-   alors ce nombre b est un carré ; ça prouve, entre autres, que √2
-   n'est pas rationnel *)
+(* si une racine carrée d'un nombre entier b est un rationnel (a/c
+   ci-dessous), alors ce nombre b est un carré ; ça prouve, entre
+   autres, que √2 n'est pas rationnel *)
 ...
 Theorem square_mul_of_square_is_square : ∀ a b c,
   a * a = b * c * c
