@@ -542,10 +542,67 @@ Qed.
 Context {Hd1 : d ≠ 1}.
 Context {Hdsqu : square_free d}.
 
-Theorem square_free_not_square : ∀ z, square_free z → ¬ Z_is_square z.
+Theorem square_free_not_square : ∀ z, z ≠ 1 → square_free z → ¬ Z_is_square z.
 Proof.
 clear.
-intros z (Hnz, Hsf) (k, Hk).
+intros z Hz1 (Hnz, Hsf) (k, Hk).
+specialize (Hsf (Z.abs_nat k)) as H1.
+assert (H : 2 ≤ Z.abs_nat k < Z.abs_nat z). {
+  split. {
+    destruct k as [| k| k]; [ now subst z | | ]. {
+      cbn in Hk; cbn.
+      remember (Pos.to_nat k) as n eqn:Hn; symmetry in Hn.
+      destruct n. {
+        specialize (Pos2Nat.is_pos k) as H2.
+        now rewrite Hn in H2.
+      }
+      destruct n; [ | flia ].
+      replace 1%nat with (Pos.to_nat 1) in Hn by easy.
+      now apply Pos2Nat.inj in Hn; subst k; subst z.
+    } {
+      cbn in Hk; cbn.
+      remember (Pos.to_nat k) as n eqn:Hn; symmetry in Hn.
+      destruct n. {
+        specialize (Pos2Nat.is_pos k) as H2.
+        now rewrite Hn in H2.
+      }
+      destruct n; [ | flia ].
+      replace 1%nat with (Pos.to_nat 1) in Hn by easy.
+      now apply Pos2Nat.inj in Hn; subst k; subst z.
+    }
+  }
+  rewrite <- Hk.
+  rewrite Zabs2Nat.inj_mul.
+  remember (Z.abs_nat k) as n eqn:Hn; symmetry in Hn.
+  destruct n. 2: {
+    destruct n; [ | cbn; flia ].
+Search (Z.abs_nat _ = _).
+...
+    replace 1%nat with (Z.abs_nat 1) in Hn by easy.
+Search (Z.abs_nat _ = Z.abs_nat _).
+    replace 1%nat with (Pos.to_nat 1) in Hn by easy.
+    apply Pos2Nat.inj in Hn.
+; subst k; subst z.
+Search (Z.abs_nat _ < _)%nat.
+...
+  apply Zabs2Nat.inj_lt.
+...
+apply (Hsf (Z.to_nat k)). 2: {
+  rewrite <- Hk; cbn.
+  rewrite Zabs2Nat.inj_mul.
+...
+  rewrite <- Z2Nat.inj_mul.
+
+  rewrite <- N
+specialize (Hsf (Z.to_nat k)) as H1.
+apply H1. 
+
+assert (H : 2 ≤ Z.to_nat k < Z.abs_nat z). {
+  split. {
+    destruct k as [| k| k]; [ now subst z | | ]. {
+...
+    destruct z as [| z| z]; [ easy | | ]. {
+...
 ...
 intros (k, Hk).
     destruct Hdsqu as (Hdz, Hasf).
@@ -556,6 +613,7 @@ intros (k, Hk).
         destruct k as [| k| k]; [ now subst d | | ]. {
           destruct
 ...
+*)
 
 Theorem quad_int_eucl_div :
   if rngl_has_eucl_div then
