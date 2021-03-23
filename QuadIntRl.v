@@ -554,6 +554,23 @@ destruct z as [| z| z]; [ easy | | ]. {
 }
 Qed.
 
+Theorem Z_eq_abs_nat_0 : ∀ z, Z.abs_nat z = 0%nat → z = 0.
+Proof.
+clear.
+intros * Hz.
+destruct z as [| z| z]; [ easy | | ]. {
+  cbn in Hz.
+  specialize (Pos2Nat.is_pos z) as H1.
+  rewrite <- Hz in H1.
+  flia H1.
+} {
+  cbn in Hz.
+  specialize (Pos2Nat.is_pos z) as H1.
+  rewrite <- Hz in H1.
+  flia H1.
+}
+Qed.
+
 Context {Hd1 : d ≠ 1}.
 Context {Hdsqu : square_free d}.
 
@@ -594,58 +611,17 @@ assert (H : 2 ≤ Z.abs_nat k < Z.abs_nat z). {
     apply Z_sqr_abs_1 in Hn.
     now rewrite Hk in Hn.
   }
-...
-    exfalso; apply Hz1; clear Hz1.
-    rewrite <- Hk.
-    clear - Hn.
-Search (Z.abs_nat).
-...
-Search (Z.abs_nat _ = Z.abs_nat _).
-Search (Z.abs_nat _ * _)%nat.
-Zabs2Nat.inj_mul: ∀ n m : Z, Z.abs_nat (n * m) = (Z.abs_nat n * Z.abs_nat m)%nat
-...
-Search (Z.abs_nat).
-    apply (f_equal Z.to_nat) in Hk.
-Search (Z.to_nat (_ * _)).
-
-Search (Z.abs_nat _ = _).
-...
-    replace 1%nat with (Z.abs_nat 1) in Hn by easy.
-Search (Z.abs_nat _ = Z.abs_nat _).
-    replace 1%nat with (Pos.to_nat 1) in Hn by easy.
-    apply Pos2Nat.inj in Hn.
-; subst k; subst z.
-Search (Z.abs_nat _ < _)%nat.
-...
-  apply Zabs2Nat.inj_lt.
-...
-apply (Hsf (Z.to_nat k)). 2: {
-  rewrite <- Hk; cbn.
-  rewrite Zabs2Nat.inj_mul.
-...
-  rewrite <- Z2Nat.inj_mul.
-
-  rewrite <- N
-specialize (Hsf (Z.to_nat k)) as H1.
-apply H1. 
-
-assert (H : 2 ≤ Z.to_nat k < Z.abs_nat z). {
-  split. {
-    destruct k as [| k| k]; [ now subst z | | ]. {
-...
-    destruct z as [| z| z]; [ easy | | ]. {
-...
-...
-intros (k, Hk).
-    destruct Hdsqu as (Hdz, Hasf).
-    specialize (Hasf (Z.to_nat k)).
-    rewrite <- Hk in Hdz, Hasf.
-    assert (H : 2 ≤ Z.to_nat k < Z.abs_nat (k * k)). {
-      split. {
-        destruct k as [| k| k]; [ now subst d | | ]. {
-          destruct
-...
-*)
+  apply Z_eq_abs_nat_0 in Hn.
+  now subst k; subst z.
+}
+specialize (H1 H); clear H.
+apply H1; clear H1.
+rewrite <- Hk.
+rewrite Zabs2Nat.inj_mul.
+apply Nat.mod_same.
+rewrite <- Hk in Hnz.
+now rewrite Zabs2Nat.inj_mul in Hnz.
+Qed.
 
 Theorem quad_int_eucl_div :
   if rngl_has_eucl_div then
@@ -694,15 +670,8 @@ assert (Hbbz : bb ≠ 0). {
   rewrite Z.opp_involutive in H2.
   unfold qi_zero.
   apply square_free_not_mul_square in H2; [ | easy | ]. 2: {
-...
     now apply square_free_not_square.
-  } {
-    apply Hasf.
-    exists (Z.of_nat k).
-    rewrite <- Nat2Z.inj_mul, Hk.
-    apply positive_nat_Z.
-...
-  apply square_free_not_mul_square in H2; [ | easy | easy ].
+  }
   now destruct H2; subst b₁ b'₁.
 }
 specialize (Z_div_mod_full (qi_re (a * qi_conj b)) bb Hbbz) as H1.
