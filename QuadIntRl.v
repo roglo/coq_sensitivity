@@ -350,42 +350,40 @@ Qed.
 
 Definition is_square n := ∃ d, d * d = n.
 
-(* si une racine carrée d'un nombre entier b est un rationnel (a/c
-   ci-dessous), alors ce nombre b est un carré ; ça prouve, entre
-   autres, que √2 n'est pas rationnel *)
-...
-Theorem square_mul_of_square_is_square : ∀ a b c,
-  a * a = b * c * c
-  → Nat.gcd a c = 1
-  → is_square b.
+Theorem sqr_of_not_squ_is_not_rat : ∀ n,
+  ¬ is_square n
+  → ∀ a b, Nat.gcd a b = 1
+  → n * b ^ 2 ≠ a ^ 2.
 Proof.
-intros * Habc Hac.
-destruct (Nat.eq_dec b 0) as [Hbz| Hbz]. {
-  subst b.
+clear.
+intros * Hn * Hab Hnab.
+apply Hn; clear Hn.
+cbn in Hnab; do 2 rewrite Nat.mul_1_r in Hnab.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
   now exists 0.
 }
-assert (H1 : Nat.divide (a * a) b). {
-  apply Nat.gauss with (m := c * c). 2: {
+assert (H1 : Nat.divide (a * a) n). {
+  apply Nat.gauss with (m := b * b). 2: {
     now apply Nat_gcd_1_mul_l; apply Nat_gcd_1_mul_r.
   }
-  rewrite (Nat.mul_comm _ b).
-  now rewrite Nat.mul_assoc, <- Habc.
+  rewrite (Nat.mul_comm _ n).
+  now rewrite Hnab.
 }
 destruct H1 as (ka, H1).
-replace b with (b * 1) in H1 by apply Nat.mul_1_r.
-rewrite Habc in H1.
+replace n with (n * 1) in H1 by apply Nat.mul_1_r.
+rewrite <- Hnab in H1.
 rewrite (Nat.mul_comm ka) in H1.
 do 2 rewrite <- Nat.mul_assoc in H1.
 apply Nat.mul_cancel_l in H1; [ | easy ].
 symmetry in H1.
 apply Nat.eq_mul_1 in H1.
-destruct H1 as (H1, H2); subst c.
-do 2 rewrite Nat.mul_1_r in Habc.
+destruct H1 as (H1, H2); subst b.
+rewrite Nat.mul_1_r in Hnab.
 now exists a.
 Qed.
 
 (* do the same version for Z as for nat above *)
-...
 Theorem nat_square_free_not_mul_square : ∀ a b c,
   b ≠ 1
   → nat_square_free b
@@ -446,8 +444,12 @@ assert (Hg : Nat.gcd a' c' = 1). {
   now apply Nat.gcd_div_gcd.
 }
 (**)
-apply square_mul_of_square_is_square in Habc; [ | easy ].
-destruct Habc as (k, Hk); subst b.
+symmetry in Habc; revert Habc.
+rewrite <- Nat.mul_assoc.
+do 2 rewrite <- Nat.pow_2_r.
+apply sqr_of_not_squ_is_not_rat; [ | easy ].
+intros Hb.
+destruct Hb as (k, Hk); subst b.
 destruct Hsqfb as (Hkz2, Hsqfb).
 destruct (Nat.eq_dec k 0) as [Hkz| Hkz]; [ subst k; flia Hkz2 | ].
 destruct (Nat.eq_dec k 1) as [Hk1| Hk1]; [ now subst k | ].
