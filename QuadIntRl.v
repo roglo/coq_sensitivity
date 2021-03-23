@@ -349,6 +349,7 @@ split; intros Hn. {
 Qed.
 
 Definition is_square n := ∃ d, d * d = n.
+Definition Z_is_square z := ∃ d, (d * d)%Z = z.
 
 Theorem sqr_of_not_squ_is_not_rat : ∀ n,
   ¬ is_square n
@@ -383,11 +384,9 @@ rewrite Nat.mul_1_r in Hnab.
 now exists a.
 Qed.
 
-(* should be sufficient if not square instead of square free *)
-...
 Theorem nat_square_free_not_mul_square : ∀ a b c,
   b ≠ 1
-  → nat_square_free b
+  → ¬ is_square b
   → (a * a)%nat = (b * c * c)%nat
   → a = 0%nat ∧ c = 0%nat.
 Proof.
@@ -401,8 +400,9 @@ destruct (Nat.eq_dec a 0) as [Haz| Haz]. {
   destruct Habc as [Habc| Habc]; [ | easy].
   apply Nat.eq_mul_0 in Habc.
   unfold nat_square_free in Hsqfb.
-  destruct Hsqfb as (Hbz, Hsqfb).
-  now destruct Habc.
+  unfold is_square in Hsqfb.
+  destruct Habc as [H| H]; [ | easy ].
+  now exfalso; apply Hsqfb; exists 0.
 }
 exfalso.
 destruct (Nat.eq_dec (Nat.gcd a c) 0) as [Hgz| Hgz]. {
@@ -444,38 +444,25 @@ assert (Hg : Nat.gcd a' c' = 1). {
   rewrite Ha', Hc'.
   now apply Nat.gcd_div_gcd.
 }
-(**)
 symmetry in Habc; revert Habc.
 rewrite <- Nat.mul_assoc.
 do 2 rewrite <- Nat.pow_2_r.
 apply sqr_of_not_squ_is_not_rat; [ | easy ].
 intros Hb.
 destruct Hb as (k, Hk); subst b.
-destruct Hsqfb as (Hkz2, Hsqfb).
-destruct (Nat.eq_dec k 0) as [Hkz| Hkz]; [ subst k; flia Hkz2 | ].
-destruct (Nat.eq_dec k 1) as [Hk1| Hk1]; [ now subst k | ].
-specialize (Hsqfb k) as H1.
-assert (H : 2 ≤ k < k * k). {
-  split; [ flia Hkz Hk1 | ].
-  destruct k; [ easy | ].
-  destruct k; [ easy | cbn; flia ].
-}
-specialize (H1 H); clear H.
-now apply H1, Nat.mod_same.
+now apply Hsqfb; exists k.
 Qed.
 
 Open Scope Z_scope.
 
 Theorem square_free_not_mul_square : ∀ a b c,
-  a ≠ 1 → square_free a → b * b = a * c * c → b = 0 ∧ c = 0.
+  a ≠ 1 → ¬ Z_is_square a → b * b = a * c * c → b = 0 ∧ c = 0.
 Proof.
 clear.
 intros * Ha1 Hasf Hbac.
 destruct a as [| a| a]. {
-  now unfold square_free, nat_square_free in Hasf.
+  now exfalso; apply Hasf; exists 0.
 }  {
-  unfold square_free in Hasf.
-  rewrite Zabs2Nat.inj_pos in Hasf.
   assert (H1 : ∀ c, b * b = Z.pos (a * c * c) → False). {
     clear c Hbac; intros c Hbac.
     destruct b as [| b| b]; [ easy | | ]. {
@@ -483,25 +470,36 @@ destruct a as [| a| a]. {
       injection Hbac; clear Hbac; intros Hbac.
       apply Pos2Nat.inj_iff in Hbac.
       do 3 rewrite Pos2Nat.inj_mul in Hbac.
-      apply nat_square_free_not_mul_square in Hbac; [ | | easy ]. 2: {
+      apply nat_square_free_not_mul_square in Hbac; cycle 1. {
         intros H; apply Ha1.
         replace 1%nat with (Pos.to_nat 1) in H by easy.
         now apply Pos2Nat.inj_iff in H; subst a.
       } {
-        destruct Hbac as (H1, _).
-        specialize (Pos2Nat.is_succ b) as H2.
-        destruct H2 as (n, H2).
-        now rewrite H1 in H2.
+        intros (k, Hk).
+        apply Hasf.
+        exists (Z.of_nat k).
+        rewrite <- Nat2Z.inj_mul, Hk.
+        apply positive_nat_Z.
       }
+      destruct Hbac as (H1, _).
+      specialize (Pos2Nat.is_succ b) as H2.
+      destruct H2 as (n, H2).
+      now rewrite H1 in H2.
     } {
       cbn in Hbac.
       injection Hbac; clear Hbac; intros Hbac.
       apply Pos2Nat.inj_iff in Hbac.
       do 3 rewrite Pos2Nat.inj_mul in Hbac.
-      apply nat_square_free_not_mul_square in Hbac; [ | | easy ]. 2: {
+      apply nat_square_free_not_mul_square in Hbac; cycle 1. {
         intros H; apply Ha1.
         rewrite <- positive_nat_Z.
         now rewrite H.
+      } {
+        intros (k, Hk).
+        apply Hasf.
+        exists (Z.of_nat k).
+        rewrite <- Nat2Z.inj_mul, Hk.
+        apply positive_nat_Z.
       }
       destruct Hbac as (H1, _).
       specialize (Pos2Nat.is_succ b) as H2.
@@ -543,6 +541,21 @@ Qed.
 
 Context {Hd1 : d ≠ 1}.
 Context {Hdsqu : square_free d}.
+
+Theorem square_free_not_square : ∀ z, square_free z → ¬ Z_is_square z.
+Proof.
+clear.
+intros z (Hnz, Hsf) (k, Hk).
+...
+intros (k, Hk).
+    destruct Hdsqu as (Hdz, Hasf).
+    specialize (Hasf (Z.to_nat k)).
+    rewrite <- Hk in Hdz, Hasf.
+    assert (H : 2 ≤ Z.to_nat k < Z.abs_nat (k * k)). {
+      split. {
+        destruct k as [| k| k]; [ now subst d | | ]. {
+          destruct
+...
 
 Theorem quad_int_eucl_div :
   if rngl_has_eucl_div then
@@ -590,10 +603,18 @@ assert (Hbbz : bb ≠ 0). {
   apply Z.add_move_0_r in H2.
   rewrite Z.opp_involutive in H2.
   unfold qi_zero.
+  apply square_free_not_mul_square in H2; [ | easy | ]. 2: {
+...
+    now apply square_free_not_square.
+  } {
+    apply Hasf.
+    exists (Z.of_nat k).
+    rewrite <- Nat2Z.inj_mul, Hk.
+    apply positive_nat_Z.
+...
   apply square_free_not_mul_square in H2; [ | easy | easy ].
   now destruct H2; subst b₁ b'₁.
 }
-Search Z.div_eucl.
 specialize (Z_div_mod_full (qi_re (a * qi_conj b)) bb Hbbz) as H1.
 rewrite Hγr in H1.
 specialize (Z_div_mod_full (qi_im (a * qi_conj b)) bb Hbbz) as H2.
