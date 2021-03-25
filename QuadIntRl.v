@@ -304,7 +304,22 @@ Qed.
 Theorem quad_int_mul_add_distr_r : ∀ (a b c : quad_int d),
   ((a + b) * c = a * c + b * c)%QI.
 Proof.
-...
+intros.
+unfold qi_add, qi_mul; cbn.
+f_equal; ring.
+Qed.
+
+Theorem quad_int_mul_sub_distr_r : ∀ (a b c : quad_int d),
+  ((a - b) * c = a * c - b * c)%QI.
+Proof.
+intros.
+unfold qi_sub.
+rewrite quad_int_mul_add_distr_r.
+f_equal.
+apply quad_int_mul_opp_l.
+Qed.
+
+End a.
 
 (* square free integers *)
 
@@ -583,6 +598,12 @@ destruct z as [| z| z]; [ easy | | ]. {
 }
 Qed.
 
+Section a.
+
+Context {d : Z}.
+Context (ro := @quad_int_ring_like_op d).
+Existing Instance ro.
+
 Context {Hd1 : d ≠ 1}.
 Context {Hdsqu : square_free d}.
 
@@ -712,15 +733,8 @@ destruct (Z.eq_dec d (-1)) as [Hdm1| Hdm1]. {
       subst q'₁.
       assert (Hrb : (r * qi_conj b = 〈 r₁ + r'₁ 𝑖 〉)%QI). {
         rewrite Hr.
-Search ((_ + _) * _)%QI.
-Theorem qi_mul_sub_distr_r : ∀ (a b c : quad_int d), ((a - b) * c = a * c - b * c)%QI.
-Proof.
-intros.
-unfold qi_sub.
 ...
-rewrite quad_int_mul_add_distr_r.
-f_equal.
-apply quad_int_mul_opp_l.
+        rewrite quad_int_mul_sub_distr_r.
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
