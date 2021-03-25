@@ -340,7 +340,13 @@ Proof. intros. easy. Qed.
 
 Theorem quad_int_mul_re_im : ∀ a b c,
  (〈 (a * b) + (a * c) √ d 〉 = 〈 a + 0 √ d 〉 * 〈 b + c √ d 〉)%QI.
-Admitted.
+Proof.
+intros.
+unfold qi_mul; cbn.
+rewrite Z.mul_0_r.
+rewrite Z.mul_0_l.
+now do 2 rewrite Z.add_0_r.
+Qed.
 
 End a.
 
@@ -771,6 +777,10 @@ destruct (Z.eq_dec d (-1)) as [Hdm1| Hdm1]. {
         rewrite quad_int_mul_comm.
         f_equal; f_equal.
         unfold bb.
+        rewrite <- qi_re_im.
+        f_equal; symmetry.
+        cbn; ring.
+      }
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
