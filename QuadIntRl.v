@@ -58,14 +58,14 @@ Notation "〈 b √ d 〉" := (mk_qi d 0 b)
   (at level 1, b at level 35, format "〈  b  √ d  〉") : QI_scope.
 Notation "〈 √ d 〉" := (mk_qi d 0 1)
   (at level 1, format "〈  √ d  〉") : QI_scope.
-Notation "'〈' a + '𝑖' b 〉" := (mk_qi (-1) a b)
+Notation "'〈' a + b '𝑖' 〉" := (mk_qi (-1) a b)
   (at level 1, a at level 35, b at level 35,
-   format "〈  a  +  𝑖  b  〉") : QI_scope.
-Notation "'〈' a - '𝑖' b 〉" := (mk_qi (-1) a (Zneg b))
+   format "〈  a  +  b  𝑖  〉") : QI_scope.
+Notation "'〈' a - b '𝑖' 〉" := (mk_qi (-1) a (Zneg b))
   (at level 1, a at level 35, b at level 35,
-   format "〈  a  -  𝑖  b  〉") : QI_scope.
-Notation "'〈' '𝑖' b 〉" := (mk_qi (-1) 0 b)
-  (at level 1, b at level 35, format "〈  𝑖  b  〉") : QI_scope.
+   format "〈  a  -  b  𝑖  〉") : QI_scope.
+Notation "'〈' b '𝑖' 〉" := (mk_qi (-1) 0 b)
+  (at level 1, b at level 35, format "〈  b  𝑖  〉") : QI_scope.
 Notation "'〈' a 〉" := (mk_qi (-1) a 0)
   (at level 1, format "〈  a  〉", a at level 35) : QI_scope.
 Notation "'〈' 0 〉" := (mk_qi (-1) 0 0)
@@ -78,61 +78,17 @@ Notation "〈 '𝑖' 〉" := (mk_qi (-1) 0 1)
 Definition qi_gauge {d} (α : quad_int d) :=
   Z.abs_nat (qi_re (α * qi_conj α)%QI).
 
-Definition old_qi_eucl_quo_list {d} (α β : quad_int d) :=
-  let den := qi_re (β * qi_conj β)%QI in
-  let γ := qi_re (α * qi_conj β)%QI / den in
-  let γ' := qi_im (α * qi_conj β)%QI / den in
-  let ql := [] in
-  let ql1 :=
-    if lt_dec (qi_gauge (α - β * mk_qi d γ γ')%QI) (qi_gauge β) then
-      mk_qi d γ γ' :: ql
-    else ql
-  in
-  let ql2 :=
-    if lt_dec (qi_gauge (α - β * mk_qi d (γ + 1) γ')%QI) (qi_gauge β) then
-      mk_qi d (γ + 1) γ' :: ql1
-    else ql1
-  in
-  let ql3 :=
-      if lt_dec (qi_gauge (α - β * mk_qi d  γ (γ' + 1))%QI) (qi_gauge β) then
-        mk_qi d γ (γ' + 1) :: ql2
-      else ql2
-  in
-  let ql4 :=
-      if lt_dec (qi_gauge (α - β * mk_qi d (γ + 1) (γ' + 1))%QI) (qi_gauge β)
-      then
-        mk_qi d (γ + 1) (γ' + 1) :: ql3
-      else ql3
-  in
-  ql4.
-
-Definition old_qi_eucl_div {d} (α β : quad_int d) :=
-  map (λ q, (q, (α - β * q)%QI)) (old_qi_eucl_quo_list α β).
-
 Compute (Z.div_eucl 23 4).
 Compute (Z.div_eucl (-23) 4).
 Compute (Z.div_eucl 23 (-4)).
 Compute (Z.div_eucl (-23) (-4)).
 
-(*
-Definition Z_div_eucl' a b :=
-  if Z_lt_dec b 0 then
-    let '(q, r) := Z.div_eucl a b in
-    (q + 1, r - b)
-  else Z.div_eucl a b.
-
-Compute (Z_div_eucl' 23 4).
-Compute (Z_div_eucl' (-23) 4).
-Compute (Z_div_eucl' 23 (-4)).
-Compute (Z_div_eucl' (-23) (-4)).
-*)
-
 Definition qi_eucl_div {d} (a b : quad_int d) :=
   let bb := qi_re (b * qi_conj b)%QI in
   let '(γ₁, r₁) := Z.div_eucl (qi_re (a * qi_conj b)) bb in
   let '(γ'₁, r'₁) := Z.div_eucl (qi_im (a * qi_conj b)) bb in
-  let γ := if Z_le_dec (2 * r₁) bb then γ₁ else γ₁ + 1 in
-  let γ' := if Z_le_dec (2 * r'₁) bb then γ'₁ else γ'₁ + 1 in
+  let γ := γ₁ + if Z_le_dec (2 * r₁) bb then 0 else 1 in
+  let γ' := γ'₁ + if Z_le_dec (2 * r'₁) bb then 0 else 1 in
   let q := mk_qi d γ γ' in
   let r := (a - b * q)%QI in
   (q, r).
@@ -142,13 +98,10 @@ Definition qi_div d (α β : quad_int d) := fst (qi_eucl_div α β).
 Notation "α / β" := (qi_div α β) : QI_scope.
 
 Compute (qi_eucl_div (mk_qi (-1) (- 36) 242) (mk_qi (-1) 50 50)).
-Compute (old_qi_eucl_div (mk_qi (-1) (- 36) 242) (mk_qi (-1) 50 50)).
 Compute (qi_eucl_div (mk_qi (-1) 36 242) (mk_qi (-1) 50 50)).
-Compute (old_qi_eucl_div (mk_qi (-1) 36 242) (mk_qi (-1) 50 50)).
 Compute (mk_qi (-1) 0 1 * mk_qi (-1) 0 1)%QI.
 Check qi_eucl_div 1%QI (mk_qi (-1) 0 1).
 Compute (qi_eucl_div 1%QI (mk_qi (-1) 0 1)).
-Compute (old_qi_eucl_div 1%QI (mk_qi (-1) 0 1)).
 Compute (1 / mk_qi (-1) 0 1)%QI.
 Compute (1 / mk_qi (-1) 0 (- 1))%QI.
 Compute (@qi_zero 42 / @qi_zero 42)%QI.
@@ -760,7 +713,8 @@ destruct (Z.eq_dec d (-1)) as [Hdm1| Hdm1]. {
     subst q₁.
     destruct (Z_le_dec (2 * r'₁) bb) as [Hr'bb| Hr'bb]. {
       subst q'₁.
-      assert (Hrb : (r * qi_conj b = 〈 r₁ + 𝑖 r'₁ 〉)%QI). {
+      do 2 rewrite Z.add_0_r in Hq.
+      assert (Hrb : (r * qi_conj b = 〈 r₁ + r'₁ 𝑖 〉)%QI). {
         rewrite Hr.
         rewrite quad_int_mul_sub_distr_r.
         rewrite (quad_int_mul_comm b).
