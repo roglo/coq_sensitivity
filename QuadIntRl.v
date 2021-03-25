@@ -660,9 +660,9 @@ symmetry in Hγr'.
 destruct γr' as (γ'₁, r'₁).
 move γ'₁ before γ₁.
 move r'₁ before r₁.
-remember (if Z_le_dec _ _ then _ else _) as q₁ eqn:Hq₁ in Hab.
-remember (if Z_le_dec _ _ then _ else _) as q'₁ eqn:Hq'₁ in Hab.
-move q'₁ before q₁.
+remember (if Z_le_dec _ _ then _ else _) as d₁ eqn:Hd₁ in Hab.
+remember (if Z_le_dec _ _ then _ else _) as d'₁ eqn:Hd'₁ in Hab.
+move d'₁ before d₁.
 injection Hab; clear Hab; intros Hr Hq.
 symmetry in Hr, Hq.
 rewrite <- Hq in Hr.
@@ -699,6 +699,31 @@ move Him before Hre.
 unfold Remainder in Hrer, Himr.
 set (rr := qi_re (r * qi_conj r)).
 move rr before bb.
+...
+assert
+  (Hrb : (r * qi_conj b = 〈 r₁ + r'₁ √ d 〉 + 〈 bb * d₁ + bb * d'₁ √ d 〉)%QI). {
+  rewrite Hr.
+  rewrite quad_int_mul_sub_distr_r.
+  rewrite (quad_int_mul_comm b).
+  rewrite <- quad_int_mul_assoc.
+  apply quad_int_add_sub_eq_l.
+  symmetry.
+  remember (a * qi_conj b)%QI as ab eqn:Hab.
+  rewrite <- (qi_re_im ab).
+  subst ab.
+  rewrite Hre, Him.
+  rewrite quad_int_add_re_im.
+  rewrite quad_int_mul_re_im.
+...
+  rewrite <- Hq.
+        rewrite quad_int_mul_comm.
+        f_equal; f_equal.
+        unfold bb.
+        rewrite <- qi_re_im.
+        f_equal; symmetry.
+        cbn; ring.
+      }
+(**)
 (* mmm... c'est compliqué... mais en tous cas, pour l'instant, il
    n'y a pas de contraintes sur la valeur de d, à part de n'avoir
    pas de facteur carré (square free) ; mais normalement, la
@@ -710,9 +735,9 @@ destruct (Z.eq_dec d (-1)) as [Hdm1| Hdm1]. {
   clear Hd1 Hhed Hdsqu.
   move q at top; move b at top; move a at top.
   destruct (Z_le_dec (2 * r₁) bb) as [Hrbb| Hrbb]. {
-    subst q₁.
+    subst d₁.
     destruct (Z_le_dec (2 * r'₁) bb) as [Hr'bb| Hr'bb]. {
-      subst q'₁.
+      subst d'₁.
       do 2 rewrite Z.add_0_r in Hq.
       assert (Hrb : (r * qi_conj b = 〈 r₁ + r'₁ 𝑖 〉)%QI). {
         rewrite Hr.
