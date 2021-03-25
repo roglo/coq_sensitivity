@@ -698,6 +698,7 @@ destruct (Z.eq_dec d (-1)) as [Hdm1| Hdm1]. {
     subst q₁.
     destruct (Z_le_dec (2 * r'₁) bb) as [Hr'bb| Hr'bb]. {
       subst q'₁.
+      assert (Hrb : (r * qi_conj b = 〈 r₁ + r'₁ 𝑖 〉)%QI). {
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
