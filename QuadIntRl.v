@@ -58,14 +58,14 @@ Notation "〈 b √ d 〉" := (mk_qi d 0 b)
   (at level 1, b at level 35, format "〈  b  √ d  〉") : QI_scope.
 Notation "〈 √ d 〉" := (mk_qi d 0 1)
   (at level 1, format "〈  √ d  〉") : QI_scope.
-Notation "'〈' a + b '𝑖' 〉" := (mk_qi (-1) a b)
+Notation "'〈' a + '𝑖' b 〉" := (mk_qi (-1) a b)
   (at level 1, a at level 35, b at level 35,
-   format "〈  a  +  b  𝑖  〉") : QI_scope.
-Notation "'〈' a - b '𝑖' 〉" := (mk_qi (-1) a (Zneg b))
+   format "〈  a  +  𝑖  b  〉") : QI_scope.
+Notation "'〈' a - '𝑖' b 〉" := (mk_qi (-1) a (Zneg b))
   (at level 1, a at level 35, b at level 35,
-   format "〈  a  -  b  𝑖  〉") : QI_scope.
-Notation "'〈' b '𝑖' 〉" := (mk_qi (-1) 0 b)
-  (at level 1, b at level 35, format "〈  b  𝑖  〉") : QI_scope.
+   format "〈  a  -  𝑖  b  〉") : QI_scope.
+Notation "'〈' '𝑖' b 〉" := (mk_qi (-1) 0 b)
+  (at level 1, b at level 35, format "〈  𝑖  b  〉") : QI_scope.
 Notation "'〈' a 〉" := (mk_qi (-1) a 0)
   (at level 1, format "〈  a  〉", a at level 35) : QI_scope.
 Notation "'〈' 0 〉" := (mk_qi (-1) 0 0)
@@ -184,7 +184,7 @@ Compute (@qi_zero 42 / @qi_zero 42)%QI.
 Compute (〈 -36 + 242 √-1 〉 / 〈 50 + 50 √-1 〉)%QI.
 Compute (〈 𝑖 〉 * 〈 𝑖 〉)%QI.
 Compute (1 / 〈 𝑖 〉)%QI.
-Compute (1 / 〈 -1 𝑖 〉)%QI.
+Compute (1 / 〈 - 𝑖 〉)%QI.
 Compute (〈 0 √42 〉 / 〈 0 √42 〉 )%QI.
 Check (mk_qi (-1) 3 2).
 Check (mk_qi (-1) 0 2).
@@ -760,7 +760,7 @@ destruct (Z.eq_dec d (-1)) as [Hdm1| Hdm1]. {
     subst q₁.
     destruct (Z_le_dec (2 * r'₁) bb) as [Hr'bb| Hr'bb]. {
       subst q'₁.
-      assert (Hrb : (r * qi_conj b = 〈 r₁ + r'₁ 𝑖 〉)%QI). {
+      assert (Hrb : (r * qi_conj b = 〈 r₁ + 𝑖 r'₁ 〉)%QI). {
         rewrite Hr.
         rewrite quad_int_mul_sub_distr_r.
         rewrite (quad_int_mul_comm b).
