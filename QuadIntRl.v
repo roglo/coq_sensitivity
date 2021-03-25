@@ -334,6 +334,14 @@ rewrite quad_int_add_comm.
 apply quad_int_add_sub.
 Qed.
 
+Theorem quad_int_add_re_im : ∀ a b c e : Z,
+  (〈 (a + b) + (c + e) √ d 〉 = 〈 a + c √ d 〉 + 〈 b + e √ d 〉)%QI.
+Proof. intros. easy. Qed.
+
+Theorem quad_int_mul_re_im : ∀ a b c,
+ (〈 (a * b) + (a * c) √ d 〉 = 〈 a + 0 √ d 〉 * 〈 b + c √ d 〉)%QI.
+Admitted.
+
 End a.
 
 (* square free integers *)
@@ -757,7 +765,12 @@ destruct (Z.eq_dec d (-1)) as [Hdm1| Hdm1]. {
         rewrite <- (qi_re_im ab).
         subst ab.
         rewrite Hre, Him.
-(* bb = qi_re bb, en fait *)
+        rewrite quad_int_add_re_im.
+        rewrite quad_int_mul_re_im.
+        rewrite <- Hq.
+        rewrite quad_int_mul_comm.
+        f_equal; f_equal.
+        unfold bb.
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
