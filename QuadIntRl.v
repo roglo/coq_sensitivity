@@ -199,6 +199,12 @@ Context [d : Z].
 Context (ro := @quad_int_ring_like_op d).
 Existing Instance ro.
 
+Theorem qi_re_im : ∀ (a : quad_int d), 〈 qi_re a + (qi_im a) √ d 〉%QI = a.
+Proof.
+intros.
+now destruct a.
+Qed.
+
 Theorem quad_int_add_comm : ∀ a b : quad_int d, (a + b)%QI = (b + a)%QI.
 Proof.
 intros; cbn.
@@ -319,10 +325,13 @@ f_equal.
 apply quad_int_mul_opp_l.
 Qed.
 
-Theorem qi_re_im : ∀ (a : quad_int d), 〈 qi_re a + (qi_im a) √ d 〉%QI = a.
+Theorem quad_int_add_sub_eq_l : ∀ a b c : quad_int d,
+  (a + b = c → c - a = b)%QI.
 Proof.
-intros.
-now destruct a.
+intros * Habc.
+subst c.
+rewrite quad_int_add_comm.
+apply quad_int_add_sub.
 Qed.
 
 End a.
@@ -742,13 +751,13 @@ destruct (Z.eq_dec d (-1)) as [Hdm1| Hdm1]. {
         rewrite quad_int_mul_sub_distr_r.
         rewrite (quad_int_mul_comm b).
         rewrite <- quad_int_mul_assoc.
-...
+        apply quad_int_add_sub_eq_l.
+        symmetry.
         remember (a * qi_conj b)%QI as ab eqn:Hab.
         rewrite <- (qi_re_im ab).
-        rewrite Him, Hre.
+        subst ab.
+        rewrite Hre, Him.
 (* bb = qi_re bb, en fait *)
-...
-        rewrite <- (qi_re_im ab).
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
