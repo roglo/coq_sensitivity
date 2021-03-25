@@ -222,7 +222,7 @@ now destruct a.
 Qed.
 
 Theorem quad_int_mul_assoc : ∀ a b c : quad_int d,
-  (a * (b * c))%F = (a * b * c)%F.
+  (a * (b * c))%QI = (a * b * c)%QI.
 Proof.
 intros; cbn.
 unfold "*"%QI; cbn.
@@ -249,7 +249,7 @@ Qed.
 Theorem quad_int_neq_1_0 : 1%F ≠ 0%F.
 Proof. easy. Qed.
 
-Theorem quad_int_mul_comm : ∀ a b : quad_int d, (a * b)%F = (b * a)%F.
+Theorem quad_int_mul_comm : ∀ a b : quad_int d, (a * b)%QI = (b * a)%QI.
 Proof.
 intros; cbn.
 unfold "*"%QI; cbn.
@@ -741,6 +741,10 @@ destruct (Z.eq_dec d (-1)) as [Hdm1| Hdm1]. {
         rewrite Hr.
         rewrite quad_int_mul_sub_distr_r.
         remember (a * qi_conj b)%QI as ab eqn:Hab.
+        rewrite (quad_int_mul_comm b).
+        rewrite <- quad_int_mul_assoc.
+(* bb = qi_re bb, en fait *)
+...
         rewrite <- (qi_re_im ab).
         rewrite Him, Hre.
 ...
