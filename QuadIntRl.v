@@ -294,6 +294,18 @@ do 2 rewrite Z.add_0_r.
 now destruct a.
 Qed.
 
+Theorem quad_int_mul_opp_l : ∀ (a b : quad_int d), (- a * b = - (a * b))%QI.
+Proof.
+intros.
+unfold qi_opp, qi_mul; cbn.
+f_equal; ring.
+Qed.
+
+Theorem quad_int_mul_add_distr_r : ∀ (a b c : quad_int d),
+  ((a + b) * c = a * c + b * c)%QI.
+Proof.
+...
+
 (* square free integers *)
 
 Close Scope Z_scope.
@@ -699,6 +711,16 @@ destruct (Z.eq_dec d (-1)) as [Hdm1| Hdm1]. {
     destruct (Z_le_dec (2 * r'₁) bb) as [Hr'bb| Hr'bb]. {
       subst q'₁.
       assert (Hrb : (r * qi_conj b = 〈 r₁ + r'₁ 𝑖 〉)%QI). {
+        rewrite Hr.
+Search ((_ + _) * _)%QI.
+Theorem qi_mul_sub_distr_r : ∀ (a b c : quad_int d), ((a - b) * c = a * c - b * c)%QI.
+Proof.
+intros.
+unfold qi_sub.
+...
+rewrite quad_int_mul_add_distr_r.
+f_equal.
+apply quad_int_mul_opp_l.
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
