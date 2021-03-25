@@ -734,6 +734,7 @@ destruct (Z.eq_dec d (-1)) as [Hdm1| Hdm1]. {
       assert (Hrb : (r * qi_conj b = 〈 r₁ + r'₁ 𝑖 〉)%QI). {
         rewrite Hr.
         rewrite quad_int_mul_sub_distr_r.
+        remember (a * qi_conj b)%QI as ab eqn:Hab.
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
