@@ -195,7 +195,7 @@ Compute (mk_qi (-1) 1 2 * mk_qi (-1) 2 (-3))%QI.
 
 Section a.
 
-Context {d : Z}.
+Context [d : Z].
 Context (ro := @quad_int_ring_like_op d).
 Existing Instance ro.
 
@@ -600,7 +600,7 @@ Qed.
 
 Section a.
 
-Context {d : Z}.
+Context [d : Z].
 Context (ro := @quad_int_ring_like_op d).
 Existing Instance ro.
 
@@ -733,7 +733,6 @@ destruct (Z.eq_dec d (-1)) as [Hdm1| Hdm1]. {
       subst q'₁.
       assert (Hrb : (r * qi_conj b = 〈 r₁ + r'₁ 𝑖 〉)%QI). {
         rewrite Hr.
-...
         rewrite quad_int_mul_sub_distr_r.
 ...
 
