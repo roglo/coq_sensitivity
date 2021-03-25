@@ -319,6 +319,12 @@ f_equal.
 apply quad_int_mul_opp_l.
 Qed.
 
+Theorem qi_re_im : ∀ (a : quad_int d), 〈 qi_re a + (qi_im a) √ d 〉%QI = a.
+Proof.
+intros.
+now destruct a.
+Qed.
+
 End a.
 
 (* square free integers *)
@@ -735,6 +741,8 @@ destruct (Z.eq_dec d (-1)) as [Hdm1| Hdm1]. {
         rewrite Hr.
         rewrite quad_int_mul_sub_distr_r.
         remember (a * qi_conj b)%QI as ab eqn:Hab.
+        rewrite <- (qi_re_im ab).
+        rewrite Him, Hre.
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
