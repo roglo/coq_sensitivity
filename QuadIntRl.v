@@ -325,6 +325,14 @@ unfold qi_add; cbn.
 f_equal; ring.
 Qed.
 
+Theorem quad_int_mul_mul_swap : ∀ a b c : quad_int d,
+  (a * b * c = a * c * b)%QI.
+Proof.
+intros.
+unfold qi_mul; cbn.
+f_equal; ring.
+Qed.
+
 Theorem quad_int_sub_diag : ∀ a : quad_int d, (a - a = 0)%QI.
 Proof.
 intros.
@@ -366,6 +374,14 @@ Proof.
 intros.
 unfold qi_conj, qi_mul; cbn.
 f_equal; ring.
+Qed.
+
+Theorem qi_conj_involutive : ∀ a : quad_int d, qi_conj (qi_conj a) = a.
+Proof.
+intros.
+unfold qi_conj; cbn.
+rewrite Z.opp_involutive.
+apply qi_re_im.
 Qed.
 
 End a.
@@ -834,6 +850,16 @@ destruct (Z.eq_dec d (-1)) as [Hdm1| Hdm1]. {
       do 2 rewrite <- Z.pow_mul_l in H1.
       unfold rq in H1.
       rewrite qi_conj_mul in H1.
+      rewrite qi_conj_involutive in H1.
+      rewrite (quad_int_mul_mul_swap) in H1.
+      rewrite (quad_int_mul_assoc r) in H1.
+      rewrite <- (qi_re_im (r * qi_conj r)%QI) in H1.
+      fold rr in H1.
+      rewrite qi_im_mul_conj in H1.
+      rewrite <- quad_int_mul_assoc in H1.
+      rewrite <- (qi_re_im (b * qi_conj b)%QI) in H1.
+      fold bb in H1.
+      rewrite qi_im_mul_conj in H1.
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
