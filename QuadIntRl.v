@@ -787,6 +787,13 @@ destruct H1 as (Hre, Hrer).
 destruct H2 as (Him, Himr).
 move Him before Hre.
 unfold Remainder in Hrer, Himr.
+assert (Hbbp : 0 < bb). {
+  unfold bb; cbn.
+(* ah oui, non, uniquement si d < 0 *)
+...
+destruct Hrer as [Hrer| Hrer]. 2: {
+flia Hrer Hbbp.
+...
 set (rr := qi_re (r * qi_conj r)).
 move rr before bb.
 assert
