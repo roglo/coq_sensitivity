@@ -875,28 +875,6 @@ destruct (Z.eq_dec d (-1)) as [Hdm1| Hdm1]. {
       assert (H2 : 2 ^ 2 * rr * bb <= bb ^ 2 + bb ^ 2). {
         rewrite H1.
         apply Z.add_le_mono. {
-Search (_ ^ _ <= _ ^ _).
-Theorem Z_pow_le_mono_l : ∀ a b c, 0 <= b → a <= b → a ^ c <= b ^ c.
-Proof.
-intros * Hbz Hab.
-specialize (Z.lt_trichotomy a 0) as [H1| [H1| H1]]. {
-Search (_ < 0).
-Search (_ ^ _ <= _).
-Search (_ ^ _ <= _ ^ _).
-...
-revert a b Hbz Hab.
-induction c as [| c| c]; intros; [ easy | | ]. {
-Print Z.pow_le_mono_l.
-Search (Z.pow_pos _ _).
-Search two_power_pos.
-...
-apply Z_pow_le_mono_l; [ | easy ].
-...
-          destruct (Z_le_dec r₁ 0) as [Hrz| Hrz]. {
-Search (_
-          do 2 rewrite Z.pow_2_r.
-Search (_ * _ <= _ * _).
-          apply Z.pow_le_mono_l.
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
