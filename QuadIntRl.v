@@ -325,6 +325,34 @@ unfold qi_add; cbn.
 f_equal; ring.
 Qed.
 
+Theorem quad_int_sub_diag : ∀ a : quad_int d, (a - a = 0)%QI.
+Proof.
+intros.
+unfold qi_sub, qi_add, qi_zero; cbn.
+f_equal; ring.
+Qed.
+
+Theorem qi_im_mul_conj : ∀ a : quad_int d, qi_im (a * qi_conj a) = 0.
+Proof.
+intros.
+cbn; ring.
+Qed.
+
+Theorem quad_int_mul_0_l : ∀ a : quad_int d, (0 * a = 0)%QI.
+Proof.
+intros.
+unfold qi_mul, qi_zero; cbn.
+f_equal; ring.
+Qed.
+
+Theorem quad_int_add_0_r : ∀ a : quad_int d, (a + 0 = a)%QI.
+Proof.
+intros.
+unfold qi_add; cbn.
+do 2 rewrite Z.add_0_r.
+apply qi_re_im.
+Qed.
+
 End a.
 
 (* square free integers *)
@@ -741,39 +769,15 @@ assert
   rewrite quad_int_add_sub_swap.
   rewrite (quad_int_mul_comm q).
   rewrite <- quad_int_mul_sub_distr_r.
-...
-  apply quad_int_sub_move_r.
-...
-Check Z.sub_move_l.
-Check Z.sub_move_r.
-Check quad_int_sub_move_r.
-Z.sub_move_r: ∀ n m p : Z, n - m = p ↔ n = p + m
-Check quad_int_add_sub_eq_l.
-Search (_ - _ = _)%Z.
-Search (_ + _ = _ ↔ _ - _ = _)%Z.
-Search (_ - _ = _ ↔ _ + _ = _)%Z.
-Search (_ - _ = _)%Z.
-...
   rewrite quad_int_add_comm.
-Check quad_int_add_sub_eq_l.
-...
-  apply quad_int_add_sub_eq_l.
-  remember (a * qi_conj b)%QI as ab eqn:Hab.
-  rewrite <- (qi_re_im ab).
-  subst ab.
-  rewrite Hre, Him.
-  rewrite quad_int_add_re_im.
-  rewrite quad_int_mul_re_im.
-...
-  rewrite <- Hq.
-        rewrite quad_int_mul_comm.
-        f_equal; f_equal.
-        unfold bb.
-        rewrite <- qi_re_im.
-        f_equal; symmetry.
-        cbn; ring.
-      }
-(**)
+  apply quad_int_sub_move_r.
+  rewrite quad_int_sub_diag; symmetry.
+  rewrite <- (qi_re_im (b * qi_conj b)%QI).
+  fold bb.
+  rewrite qi_im_mul_conj.
+  rewrite quad_int_sub_diag.
+  apply quad_int_mul_0_l.
+}
 (* mmm... c'est compliqué... mais en tous cas, pour l'instant, il
    n'y a pas de contraintes sur la valeur de d, à part de n'avoir
    pas de facteur carré (square free) ; mais normalement, la
@@ -789,27 +793,9 @@ destruct (Z.eq_dec d (-1)) as [Hdm1| Hdm1]. {
     destruct (Z_le_dec (2 * r'₁) bb) as [Hr'bb| Hr'bb]. {
       subst d'₁.
       do 2 rewrite Z.add_0_r in Hq.
-      assert (Hrb : (r * qi_conj b = 〈 r₁ + r'₁ 𝑖 〉)%QI). {
-        rewrite Hr.
-        rewrite quad_int_mul_sub_distr_r.
-        rewrite (quad_int_mul_comm b).
-        rewrite <- quad_int_mul_assoc.
-        apply quad_int_add_sub_eq_l.
-        symmetry.
-        remember (a * qi_conj b)%QI as ab eqn:Hab.
-        rewrite <- (qi_re_im ab).
-        subst ab.
-        rewrite Hre, Him.
-        rewrite quad_int_add_re_im.
-        rewrite quad_int_mul_re_im.
-        rewrite <- Hq.
-        rewrite quad_int_mul_comm.
-        f_equal; f_equal.
-        unfold bb.
-        rewrite <- qi_re_im.
-        f_equal; symmetry.
-        cbn; ring.
-      }
+      rewrite Z.mul_0_r in Hrb.
+      rewrite quad_int_add_0_r in Hrb.
+      symmetry in Hrb.
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
