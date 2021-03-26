@@ -332,6 +332,13 @@ unfold qi_sub, qi_add, qi_zero; cbn.
 f_equal; ring.
 Qed.
 
+Theorem qi_re_mul_conj : ∀ a : quad_int d,
+  qi_re (a * qi_conj a) = qi_re a ^ 2 - d * qi_im a ^ 2.
+Proof.
+intros.
+cbn; ring.
+Qed.
+
 Theorem qi_im_mul_conj : ∀ a : quad_int d, qi_im (a * qi_conj a) = 0.
 Proof.
 intros.
@@ -796,6 +803,23 @@ destruct (Z.eq_dec d (-1)) as [Hdm1| Hdm1]. {
       rewrite Z.mul_0_r in Hrb.
       rewrite quad_int_add_0_r in Hrb.
       symmetry in Hrb.
+      set (rq := (r * qi_conj b)%QI) in Hrb.
+      assert (H1 : (rq * qi_conj rq = 〈 (r₁ ^ 2 + r'₁ ^ 2) 〉)%QI). {
+        rewrite <- (qi_re_im (rq * qi_conj rq)%QI).
+        rewrite qi_im_mul_conj.
+        rewrite qi_re_mul_conj.
+        f_equal.
+        unfold Z.sub.
+        rewrite <- Z.mul_opp_l.
+        rewrite Z.mul_1_l.
+        now rewrite Hrb.
+      }
+(*
+      rewrite <- (qi_re_im (rq * qi_conj rq)%QI) in H1.
+      rewrite qi_re_mul_conj in H1.
+      rewrite qi_im_mul_conj in H1.
+*)
+      apply (f_equal (qi_mul (mk_qi _ 4 0))) in H1.
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
