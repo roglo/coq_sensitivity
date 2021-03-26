@@ -278,13 +278,21 @@ f_equal.
 apply quad_int_mul_opp_l.
 Qed.
 
-Theorem quad_int_add_sub_eq_l : ∀ a b c : quad_int d,
-  (a + b = c → c - a = b)%QI.
+Theorem quad_int_sub_move_r : ∀ a b c : quad_int d,
+  (a - b = c ↔ a = b + c)%QI.
 Proof.
-intros * Habc.
-subst c.
-rewrite quad_int_add_comm.
-apply quad_int_add_sub.
+intros.
+split; intros H1. {
+  subst c.
+  rewrite quad_int_add_sub_assoc.
+  rewrite quad_int_add_comm.
+  symmetry.
+  apply quad_int_add_sub.
+} {
+  subst a.
+  rewrite quad_int_add_comm.
+  apply quad_int_add_sub.
+}
 Qed.
 
 Theorem quad_int_add_re_im : ∀ a b c e : Z,
@@ -299,6 +307,22 @@ unfold qi_mul; cbn.
 rewrite Z.mul_0_r.
 rewrite Z.mul_0_l.
 now do 2 rewrite Z.add_0_r.
+Qed.
+
+Theorem quad_int_add_sub_swap : ∀ a b c : quad_int d,
+  (a + b - c = a - c + b)%QI.
+Proof.
+intros.
+unfold qi_sub, qi_add; cbn.
+f_equal; ring.
+Qed.
+
+Theorem quad_int_add_add_swap : ∀ a b c : quad_int d,
+  (a + b + c = a + c + b)%QI.
+Proof.
+intros.
+unfold qi_add; cbn.
+f_equal; ring.
 Qed.
 
 End a.
@@ -699,15 +723,41 @@ move Him before Hre.
 unfold Remainder in Hrer, Himr.
 set (rr := qi_re (r * qi_conj r)).
 move rr before bb.
-...
 assert
-  (Hrb : (r * qi_conj b = 〈 r₁ + r'₁ √ d 〉 + 〈 bb * d₁ + bb * d'₁ √ d 〉)%QI). {
+  (Hrb : (〈 r₁ + r'₁ √ d 〉 = r * qi_conj b + 〈 (bb * d₁) + (bb * d'₁) √ d 〉)%QI). {
   rewrite Hr.
   rewrite quad_int_mul_sub_distr_r.
+  rewrite <- (qi_re_im (a * qi_conj b)%QI).
+  rewrite Hre, Him.
+  rewrite <- quad_int_add_sub_swap.
+  rewrite quad_int_add_re_im.
+  rewrite quad_int_add_add_swap.
+  rewrite <- quad_int_add_re_im.
+  do 2 rewrite <- Z.mul_add_distr_l.
+  rewrite quad_int_mul_re_im.
+  rewrite <- Hq.
   rewrite (quad_int_mul_comm b).
   rewrite <- quad_int_mul_assoc.
+  rewrite quad_int_add_sub_swap.
+  rewrite (quad_int_mul_comm q).
+  rewrite <- quad_int_mul_sub_distr_r.
+...
+  apply quad_int_sub_move_r.
+...
+Check Z.sub_move_l.
+Check Z.sub_move_r.
+Check quad_int_sub_move_r.
+Z.sub_move_r: ∀ n m p : Z, n - m = p ↔ n = p + m
+Check quad_int_add_sub_eq_l.
+Search (_ - _ = _)%Z.
+Search (_ + _ = _ ↔ _ - _ = _)%Z.
+Search (_ - _ = _ ↔ _ + _ = _)%Z.
+Search (_ - _ = _)%Z.
+...
+  rewrite quad_int_add_comm.
+Check quad_int_add_sub_eq_l.
+...
   apply quad_int_add_sub_eq_l.
-  symmetry.
   remember (a * qi_conj b)%QI as ab eqn:Hab.
   rewrite <- (qi_re_im ab).
   subst ab.
