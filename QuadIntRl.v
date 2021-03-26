@@ -384,6 +384,13 @@ rewrite Z.opp_involutive.
 apply qi_re_im.
 Qed.
 
+Theorem quad_int_mul_re_re : ∀ a b, (〈 a 〉 * 〈 b 〉 = 〈 (a * b) 〉)%QI.
+Proof.
+intros.
+unfold qi_mul; cbn.
+f_equal; ring.
+Qed.
+
 End a.
 
 (* square free integers *)
@@ -860,6 +867,36 @@ destruct (Z.eq_dec d (-1)) as [Hdm1| Hdm1]. {
       rewrite <- (qi_re_im (b * qi_conj b)%QI) in H1.
       fold bb in H1.
       rewrite qi_im_mul_conj in H1.
+      do 2 rewrite quad_int_mul_re_re in H1.
+      rewrite Z.mul_assoc in H1.
+      remember (_ * _ * _) as x eqn:Hx in H1.
+      remember (_ + _) as y eqn:Hy in H1.
+      injection H1; clear H1; intros H1; subst x y.
+      assert (H2 : 2 ^ 2 * rr * bb <= bb ^ 2 + bb ^ 2). {
+        rewrite H1.
+        apply Z.add_le_mono. {
+Search (_ ^ _ <= _ ^ _).
+Theorem Z_pow_le_mono_l : ∀ a b c, 0 <= b → a <= b → a ^ c <= b ^ c.
+Proof.
+intros * Hbz Hab.
+specialize (Z.lt_trichotomy a 0) as [H1| [H1| H1]]. {
+Search (_ < 0).
+Search (_ ^ _ <= _).
+Search (_ ^ _ <= _ ^ _).
+...
+revert a b Hbz Hab.
+induction c as [| c| c]; intros; [ easy | | ]. {
+Print Z.pow_le_mono_l.
+Search (Z.pow_pos _ _).
+Search two_power_pos.
+...
+apply Z_pow_le_mono_l; [ | easy ].
+...
+          destruct (Z_le_dec r₁ 0) as [Hrz| Hrz]. {
+Search (_
+          do 2 rewrite Z.pow_2_r.
+Search (_ * _ <= _ * _).
+          apply Z.pow_le_mono_l.
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
