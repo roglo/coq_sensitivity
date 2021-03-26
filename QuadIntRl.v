@@ -814,17 +814,16 @@ destruct (Z.eq_dec d (-1)) as [Hdm1| Hdm1]. {
         rewrite Z.mul_1_l.
         now rewrite Hrb.
       }
-(*
-      rewrite <- (qi_re_im (rq * qi_conj rq)%QI) in H1.
-      rewrite qi_re_mul_conj in H1.
-      rewrite qi_im_mul_conj in H1.
-*)
       apply (f_equal (qi_mul (mk_qi _ 4 0))) in H1.
       unfold qi_mul in H1 at 3.
       unfold qi_im in H1.
       do 2 rewrite Z.mul_0_r in H1.
       rewrite Z.mul_0_l in H1.
       do 2 rewrite Z.add_0_r in H1.
+      cbn - [ qi_mul Z.pow Z.mul ] in H1.
+      rewrite Z.mul_add_distr_l in H1.
+      replace 4 with (2 ^ 2) in H1 by easy.
+      do 2 rewrite <- Z.pow_mul_l in H1.
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
