@@ -360,6 +360,14 @@ do 2 rewrite Z.add_0_r.
 apply qi_re_im.
 Qed.
 
+Theorem qi_conj_mul : ∀ a b : quad_int d,
+  (qi_conj (a * b) = qi_conj a * qi_conj b)%QI.
+Proof.
+intros.
+unfold qi_conj, qi_mul; cbn.
+f_equal; ring.
+Qed.
+
 End a.
 
 (* square free integers *)
@@ -824,6 +832,8 @@ destruct (Z.eq_dec d (-1)) as [Hdm1| Hdm1]. {
       rewrite Z.mul_add_distr_l in H1.
       replace 4 with (2 ^ 2) in H1 by easy.
       do 2 rewrite <- Z.pow_mul_l in H1.
+      unfold rq in H1.
+      rewrite qi_conj_mul in H1.
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
