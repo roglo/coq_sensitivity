@@ -79,7 +79,10 @@ Definition qi_gauge {d} (α : quad_int d) :=
   Z.abs_nat (qi_re (α * qi_conj α)%QI).
 
 Definition delta_quot r b :=
-  if Z_le_dec (2 * r) b then 0 else 1.
+  if Z_le_dec 0 r then
+    if Z_le_dec (2 * r) b then 0 else 1
+  else
+    if Z_le_dec b (2 * r) then 42 else 18.
 
 Definition qi_eucl_div {d} (a b : quad_int d) :=
   let bb := qi_re (b * qi_conj b)%QI in
@@ -91,7 +94,7 @@ Definition qi_eucl_div {d} (a b : quad_int d) :=
   let r := (a - b * q)%QI in
   (q, r).
 
-Print Remainder.
+(* bizarre... *)
 ...
 
 (* remainder always same sign as divisor *)
