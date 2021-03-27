@@ -93,6 +93,19 @@ Definition qi_eucl_div {d} (a b : quad_int d) :=
   let r := (a - b * q)%QI in
   (q, r).
 
+Compute (Z.div_eucl 14 4).
+Compute (Z.div_eucl (-14) 4).
+Compute (Z.div_eucl 14 (-4)).
+Compute (Z.div_eucl (-14) (-4)).
+(* remainder always same sign as divisor *)
+...
+Compute (14 - 4 * (3 + 0)).
+Compute (14 - 4 * (3 + 1)).
+Compute (Z.div_eucl 14 (-4)).
+Compute (14 - (-4) * (-4)).
+Compute (14 - (-4 + 1) * (-4)).
+...
+
 Definition qi_div d (α β : quad_int d) := fst (qi_eucl_div α β).
 
 Notation "α / β" := (qi_div α β) : QI_scope.
