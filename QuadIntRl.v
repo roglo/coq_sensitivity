@@ -95,11 +95,11 @@ Definition qi_eucl_div {d} (a b : quad_int d) :=
   (q, r).
 
 (* bizarre... *)
-...
 
 (* remainder always same sign as divisor *)
 Compute let '(a, b) := (9, 4) in
-(a, b, Z.div_eucl a b, qi_eucl_div (mk_qi 2 a 0) (mk_qi 2 b 0)).
+(a, b, Z.div_eucl a b, qi_eucl_div (mk_qi 2 a 15) (mk_qi 2 b 42)).
+...
 Compute let '(a, b) := (11, 4) in
 (a, b, Z.div_eucl a b, qi_eucl_div (mk_qi 2 a 0) (mk_qi 2 b 0)).
 Compute let '(a, b) := (9, -4) in
