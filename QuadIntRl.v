@@ -78,33 +78,57 @@ Notation "〈 '𝑖' 〉" := (mk_qi (-1) 0 1)
 Definition qi_gauge {d} (α : quad_int d) :=
   Z.abs_nat (qi_re (α * qi_conj α)%QI).
 
-Compute (Z.div_eucl 23 4).
-Compute (Z.div_eucl (-23) 4).
-Compute (Z.div_eucl 23 (-4)).
-Compute (Z.div_eucl (-23) (-4)).
+Definition delta_quot r b :=
+  if Z_le_dec (2 * r) b then 0 else 1.
 
 Definition qi_eucl_div {d} (a b : quad_int d) :=
   let bb := qi_re (b * qi_conj b)%QI in
   let '(γ₁, r₁) := Z.div_eucl (qi_re (a * qi_conj b)) bb in
   let '(γ'₁, r'₁) := Z.div_eucl (qi_im (a * qi_conj b)) bb in
-  let γ := γ₁ + if Z_le_dec (2 * r₁) bb then 0 else 1 in
-  let γ' := γ'₁ + if Z_le_dec (2 * r'₁) bb then 0 else 1 in
+  let γ := γ₁ + delta_quot r₁ bb in
+  let γ' := γ'₁ + delta_quot r'₁ bb in
   let q := mk_qi d γ γ' in
   let r := (a - b * q)%QI in
   (q, r).
 
-Compute (Z.div_eucl 14 4).
-Compute (Z.div_eucl (-14) 4).
-Compute (Z.div_eucl 14 (-4)).
-Compute (Z.div_eucl (-14) (-4)).
+Print Remainder.
+...
+
 (* remainder always same sign as divisor *)
-...
-Compute (14 - 4 * (3 + 0)).
-Compute (14 - 4 * (3 + 1)).
-Compute (Z.div_eucl 14 (-4)).
-Compute (14 - (-4) * (-4)).
-Compute (14 - (-4 + 1) * (-4)).
-...
+Compute let '(a, b) := (9, 4) in
+(a, b, Z.div_eucl a b, qi_eucl_div (mk_qi 2 a 0) (mk_qi 2 b 0)).
+Compute let '(a, b) := (11, 4) in
+(a, b, Z.div_eucl a b, qi_eucl_div (mk_qi 2 a 0) (mk_qi 2 b 0)).
+Compute let '(a, b) := (9, -4) in
+(a, b, Z.div_eucl a b, qi_eucl_div (mk_qi 2 a 0) (mk_qi 2 b 0)).
+Compute let '(a, b) := (11, -4) in
+(a, b, Z.div_eucl a b, qi_eucl_div (mk_qi 2 a 0) (mk_qi 2 b 0)).
+Compute let '(a, b) := (-9, -4) in
+(a, b, Z.div_eucl a b, qi_eucl_div (mk_qi 2 a 0) (mk_qi 2 b 0)).
+Compute let '(a, b) := (-11, -4) in
+(a, b, Z.div_eucl a b, qi_eucl_div (mk_qi 2 a 0) (mk_qi 2 b 0)).
+Compute let '(a, b) := (-9, 4) in
+(a, b, Z.div_eucl a b, qi_eucl_div (mk_qi 2 a 0) (mk_qi 2 b 0)).
+Compute let '(a, b) := (-11, 4) in
+(a, b, Z.div_eucl a b, qi_eucl_div (mk_qi 2 a 0) (mk_qi 2 b 0)).
+(*
+     = (9, 4, (2, 1), (〈 2 + 0 √2 〉%QI, 〈 1 + 0 √2 〉%QI))
+     : Z * Z * (Z * Z) * (quad_int 2 * quad_int 2)
+     = (11, 4, (2, 3), (〈 3 + 0 √2 〉%QI, 〈 -1 + 0 √2 〉%QI))
+     : Z * Z * (Z * Z) * (quad_int 2 * quad_int 2)
+     = (9, -4, (-3, -3), (〈 -2 + 0 √2 〉%QI, 〈 1 + 0 √2 〉%QI))
+     : Z * Z * (Z * Z) * (quad_int 2 * quad_int 2)
+     = (11, -4, (-3, -1), (〈 -3 + 0 √2 〉%QI, 〈 -1 + 0 √2 〉%QI))
+     : Z * Z * (Z * Z) * (quad_int 2 * quad_int 2)
+     = (-9, -4, (2, -1), (〈 2 + 0 √2 〉%QI, 〈 -1 + 0 √2 〉%QI))
+     : Z * Z * (Z * Z) * (quad_int 2 * quad_int 2)
+     = (-11, -4, (2, -3), (〈 3 + 0 √2 〉%QI, 〈 1 + 0 √2 〉%QI))
+     : Z * Z * (Z * Z) * (quad_int 2 * quad_int 2)
+     = (-9, 4, (-3, 3), (〈 -2 + 0 √2 〉%QI, 〈 -1 + 0 √2 〉%QI))
+     : Z * Z * (Z * Z) * (quad_int 2 * quad_int 2)
+     = (-11, 4, (-3, 1), (〈 -3 + 0 √2 〉%QI, 〈 1 + 0 √2 〉%QI))
+     : Z * Z * (Z * Z) * (quad_int 2 * quad_int 2)
+*)
 
 Definition qi_div d (α β : quad_int d) := fst (qi_eucl_div α β).
 
@@ -763,6 +787,7 @@ symmetry in Hγr'.
 destruct γr' as (γ'₁, r'₁).
 move γ'₁ before γ₁.
 move r'₁ before r₁.
+unfold delta_quot in Hab.
 remember (if Z_le_dec _ _ then _ else _) as d₁ eqn:Hd₁ in Hab.
 remember (if Z_le_dec _ _ then _ else _) as d'₁ eqn:Hd'₁ in Hab.
 move d'₁ before d₁.
