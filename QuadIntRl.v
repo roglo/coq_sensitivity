@@ -94,7 +94,26 @@ Definition qi_eucl_div {d} (a b : quad_int d) :=
   let r := (a - b * q)%QI in
   (q, r).
 
-(* bizarre... *)
+...
+
+(*
+ Par exemple :
+si a=−6+17i et si b=7+i on tape :
+iquo(-6+17*i,7+i)
+et on obtient : -1+3*i
+irem(-6+17*i,7+i)
+et on obtient : 4-3*i
+iquorem(-6+17*i,7+i)
+et on obtient : [-1+3*i,4-3*i]
+*)
+Compute let '(a, b) := (mk_qi (-1) (-6) 17, mk_qi (-1) 7 1) in (a, b, qi_eucl_div a b).
+(*
+     = (〈 -6 + 17 𝑖 〉%QI, 〈 7 + 1 𝑖 〉%QI, (〈 -1 + 2 𝑖 〉%QI, 〈 3 + 4 𝑖 〉%QI))
+*)
+
+...
+Compute let '(a, b) := (mk_qi (-1) 7 1, mk_qi (-1) 4 (-3)) in (a, b, qi_eucl_div a b).
+...
 
 (* remainder always same sign as divisor *)
 Compute let '(a, b) := (9, 4) in
