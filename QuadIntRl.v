@@ -828,15 +828,6 @@ destruct H1 as (Hre, Hrer).
 destruct H2 as (Him, Himr).
 move Him before Hre.
 unfold Remainder in Hrer, Himr.
-assert (Hbbp : 0 < bb). {
-  unfold bb; cbn.
-(* ah oui, non, uniquement si d < 0 *)
-  admit.
-}
-destruct Hrer as [Hrer| Hrer]; [ | flia Hrer Hbbp ].
-destruct Himr as [Himr| Himr]; [ | flia Himr Hbbp ].
-destruct (Z_le_dec 0 r₁) as [H| H]; [ clear H | flia H Hrer ].
-destruct (Z_le_dec 0 r'₁) as [H| H]; [ clear H | flia H Himr ].
 set (rr := qi_re (r * qi_conj r)).
 move rr before bb.
 assert
@@ -877,6 +868,14 @@ destruct (Z.eq_dec d (-1)) as [Hdm1| Hdm1]. {
   move Hdm1 at top; subst d.
   clear Hd1 Hhed Hdsqu.
   move q at top; move b at top; move a at top.
+  assert (Hbbp : 0 < bb). {
+    unfold bb.
+...
+}
+destruct Hrer as [Hrer| Hrer]; [ | flia Hrer Hbbp ].
+destruct Himr as [Himr| Himr]; [ | flia Himr Hbbp ].
+destruct (Z_le_dec 0 r₁) as [H| H]; [ clear H | flia H Hrer ].
+destruct (Z_le_dec 0 r'₁) as [H| H]; [ clear H | flia H Himr ].
   destruct (Z_le_dec (2 * r₁) bb) as [Hrbb| Hrbb]. {
     subst d₁.
     destruct (Z_le_dec (2 * r'₁) bb) as [Hr'bb| Hr'bb]. {
@@ -939,7 +938,10 @@ destruct (Z.eq_dec d (-1)) as [Hdm1| Hdm1]. {
       replace (bb + bb) with (2 * bb) in H2 by flia.
       rewrite <- Z.mul_assoc in H2.
       apply Z.mul_le_mono_pos_l in H2; [ | flia Hrer ].
+...
+    } {
 Search (Z.abs_nat _ < Z.abs_nat _).
+      subst d'₁.
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
