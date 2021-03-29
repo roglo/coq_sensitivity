@@ -99,7 +99,7 @@ Definition qi_eucl_div {d} (a b : quad_int d) :=
 (* remainder always same sign as divisor *)
 Compute let '(a, b) := (9, 4) in
 (a, b, Z.div_eucl a b, qi_eucl_div (mk_qi 2 a 15) (mk_qi 2 b 42)).
-...
+(**)
 Compute let '(a, b) := (11, 4) in
 (a, b, Z.div_eucl a b, qi_eucl_div (mk_qi 2 a 0) (mk_qi 2 b 0)).
 Compute let '(a, b) := (9, -4) in
@@ -831,10 +831,12 @@ unfold Remainder in Hrer, Himr.
 assert (Hbbp : 0 < bb). {
   unfold bb; cbn.
 (* ah oui, non, uniquement si d < 0 *)
-...
-destruct Hrer as [Hrer| Hrer]. 2: {
-flia Hrer Hbbp.
-...
+  admit.
+}
+destruct Hrer as [Hrer| Hrer]; [ | flia Hrer Hbbp ].
+destruct Himr as [Himr| Himr]; [ | flia Himr Hbbp ].
+destruct (Z_le_dec 0 r₁) as [H| H]; [ clear H | flia H Hrer ].
+destruct (Z_le_dec 0 r'₁) as [H| H]; [ clear H | flia H Himr ].
 set (rr := qi_re (r * qi_conj r)).
 move rr before bb.
 assert
@@ -870,6 +872,7 @@ assert
    condition sur la jauge n'est censée marcher que sur
    la liste having_eucl_div, bien que... bon, ma définition est
    incorrecte sur les d=4n+1 (je fais des ℤ(√d) au lieu de ℚ(√d)) *)
+(* voyons avec d=-1, les entiers de Gauss *)
 destruct (Z.eq_dec d (-1)) as [Hdm1| Hdm1]. {
   move Hdm1 at top; subst d.
   clear Hd1 Hhed Hdsqu.
@@ -923,6 +926,20 @@ destruct (Z.eq_dec d (-1)) as [Hdm1| Hdm1]. {
       assert (H2 : 2 ^ 2 * rr * bb <= bb ^ 2 + bb ^ 2). {
         rewrite H1.
         apply Z.add_le_mono. {
+          apply Z.pow_le_mono_l.
+          split; [ flia Hrer | easy ].
+        } {
+          apply Z.pow_le_mono_l.
+          split; [ flia Himr | easy ].
+        }
+      }
+      do 2 rewrite Z.pow_2_r in H2.
+      rewrite <- Z.mul_add_distr_r in H2.
+      apply Z.mul_le_mono_pos_r in H2; [ | flia Hrer ].
+      replace (bb + bb) with (2 * bb) in H2 by flia.
+      rewrite <- Z.mul_assoc in H2.
+      apply Z.mul_le_mono_pos_l in H2; [ | flia Hrer ].
+Search (Z.abs_nat _ < Z.abs_nat _).
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
