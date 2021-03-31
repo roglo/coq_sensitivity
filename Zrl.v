@@ -9,43 +9,6 @@ Notation "x ≤ y" := (x <= y)%Z (at level 70, y at next level) : Z_scope.
 Notation "x ≤ y ≤ z" := (x <= y ∧ y <= z)%Z (at level 70, y at next level) :
   Z_scope.
 
-Compute (7 / 4)%Z.
-Compute (7 / (-4))%Z.
-Compute ((- 7) / (-4))%Z.
-Compute ((- 7) / 4)%Z.
-Print Z.div.
-Compute (Z.div_eucl 7 4).
-Compute (Z.div_eucl 7 (-4)).
-Compute (Z.div_eucl (-7) (-4)).
-Compute (Z.div_eucl (-7) 4).
-Search Z.div_eucl.
-Print Z.div_eucl.
-
-Print Module ZArith.
-
-Print ZDivFloor.
-Print ZDivTrunc.
-
-Require Import ZDivTrunc.
-Print ZArith.
-
-...
-
-Compute (Z.div_eucl 7 4).
-Compute (Z.div_eucl 7 (-4)).
-Compute (Z.div_eucl (-7) (-4)).
-Compute (Z.div_eucl (-7) 4).
-
-Print Module ZDivEucl.
-Print Module ZEuclidProp.
-
-Print ZDivTrunc.ZQuotProp.
-Print Module ZDivTrunc.
-
-Check ZQuotProp.
-
-...
-
 Canonical Structure Z_ring_like_op : ring_like_op Z :=
   {| rngl_zero := 0%Z;
      rngl_one := 1%Z;
@@ -54,7 +17,7 @@ Canonical Structure Z_ring_like_op : ring_like_op Z :=
      rngl_opt_opp := Some Z.opp;
      rngl_opt_inv := None;
      rngl_opt_sous := None;
-     rngl_opt_divi := Some Z.div;
+     rngl_opt_divi := Some Z.quot;
      rngl_le := Z.le |}.
 
 Existing Instance Z_ring_like_op.
@@ -84,134 +47,12 @@ apply Z.lt_sub_lt_add_r.
 now rewrite Z.sub_diag.
 Qed.
 
-Theorem Z_mul_div_l : ∀ a b : Z, a ≠ 0%F → (a * b / a)%F = b.
+Theorem Z_mul_div_l : ∀ a b : Z, a ≠ 0%F → (a * b ÷ a)%Z = b.
 Proof.
 intros * Haz.
 rewrite Z.mul_comm.
-now apply Z.div_mul.
+now apply Z.quot_mul.
 Qed.
-
-Theorem Z_div_div_div_mul : ∀ a b c : Z,
-  b ≠ 0%Z
-  → c ≠ 0%Z
-  → (a / b / c)%Z = (a / (b * c))%Z.
-Proof.
-intros * Hbz Hcz.
-destruct (Z_lt_dec 0 c) as [Hc| Hc]. {
-  now apply Z.div_div.
-}
-Search (_ / (- _))%Z.
-rewrite <- Z.div_opp_opp; [ | easy ].
-Search (- (_ / _))%Z.
-Compute (7 / 4)%Z.
-Compute (7 / (-4))%Z.
-Compute ((- 7) / (-4))%Z.
-Compute ((- 7) / 4)%Z.
-Print Z.div.
-Compute (Z.div_eucl 7 4).
-Compute (Z.div_eucl 7 (-4)).
-Compute (Z.div_eucl (-7) (-4)).
-Compute (Z.div_eucl (-7) 4).
-Search Z.div_eucl.
-Print Remainder.
-Search (- _ / _)%Z.
-Compute (Z.div_eucl (-17) 5).
-...
-Z_div_mod_full: ∀ a b : Z, b ≠ 0%Z → let (q, r) := Z.div_eucl a b in a = (b * q + r)%Z ∧ Remainder r b
-Remainder = λ r b : Z, (0 <= r < b)%Z ∨ (b < r <= 0)%Z
-...
-rewrite <- Z_div_zero_opp_r.
-...
-
-apply Z.nlt_ge in Hc.
-apply Z.div_div; [ easy | ].
-About Z.div_div.
-Search (_ / (_ * _))%Z.
-...
-Search (_ / _ / _)%Z.
-...
-
-(*
-Theorem Z_eucl_div_prop : ∀ a b q r : Z,
-  b ≠ 0%Z
-  → rngl_eucl_div a b = (q, r)
-  → a = (b * q + r)%F ∧ Z.abs_nat r < Z.abs_nat b.
-Proof.
-intros * Hbz Hab.
-cbn in Hab.
-specialize (Z_div_mod_full a b Hbz) as H1.
-rewrite Hab in H1.
-destruct H1 as (H1, H2).
-split; [ easy | ].
-unfold Remainder in H2.
-destruct H2 as [H2| H2]; [ now apply Zabs_nat_lt | ].
-destruct b as [| b| b]; [ easy | | ]. {
-  destruct H2 as (H2, H3).
-  apply Z.nle_gt in H2.
-  exfalso; apply H2; clear H2.
-  transitivity 0%Z; [ easy | ].
-  apply Zle_0_pos.
-}
-destruct r as [| r| r]. {
-  apply Pos2Nat.is_pos.
-} {
-  destruct H2 as (H2, H3).
-  apply Z.nlt_ge in H3.
-  exfalso; apply H3; clear H3.
-  apply Pos2Z.pos_is_pos.
-}
-cbn.
-destruct H2 as (H2, H3).
-apply Pos2Nat.inj_lt.
-apply Pos.lt_nle.
-intros H.
-apply Pos2Z.neg_le_neg in H.
-now apply Z.nlt_ge in H.
-Qed.
-
-Theorem Z_gauge_prop : ∀ a b : Z,
-  a ≠ 0%F
-  → b ≠ 0%F
-  → rngl_gauge a ≤ rngl_gauge (a * b)%F ∧ rngl_gauge b ≤ rngl_gauge (a * b)%F.
-Proof.
-intros * Haz Hbz; cbn.
-assert (∀ a b, a ≠ 0%F → b ≠ 0%F → Z.abs_nat a ≤ Z.abs_nat (a * b)). {
-  clear a b Haz Hbz; intros * Haz Hbz.
-  destruct a as [| a| a]; [ apply Nat.le_0_l | | ]. {
-    destruct b as [| b| b]; cbn; [ easy | | ]. {
-      apply Pos2Nat.inj_le.
-      remember (a * b)%positive as x.
-      rewrite <- (Pos.mul_1_r a); subst x.
-      apply Pos.mul_le_mono_l.
-      apply Pos.le_1_l.
-    } {
-      apply Pos2Nat.inj_le.
-      remember (a * b)%positive as x.
-      rewrite <- (Pos.mul_1_r a); subst x.
-      apply Pos.mul_le_mono_l.
-      apply Pos.le_1_l.
-    }
-  } {
-    destruct b as [| b| b]; cbn; [ easy | | ]. {
-      apply Pos2Nat.inj_le.
-      remember (a * b)%positive as x.
-      rewrite <- (Pos.mul_1_r a); subst x.
-      apply Pos.mul_le_mono_l.
-      apply Pos.le_1_l.
-    } {
-      apply Pos2Nat.inj_le.
-      remember (a * b)%positive as x.
-      rewrite <- (Pos.mul_1_r a); subst x.
-      apply Pos.mul_le_mono_l.
-      apply Pos.le_1_l.
-    }
-  }
-}
-split; [ now apply H | ].
-rewrite Z.mul_comm.
-now apply H.
-Qed.
-*)
 
 Theorem Z_mul_le_compat_nonneg : ∀ a b c d,
   (0 ≤ a ≤ c → 0 ≤ b ≤ d → a * b ≤ c * d)%Z.
@@ -269,7 +110,7 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div_l := Z_mul_div_l;
      rngl_opt_mul_div_r := NA;
-     rngl_opt_div_div_div_mul := Z_div_div_div_mul;
+     rngl_opt_div_div_div_mul := Z.quot_quot;
      rngl_opt_eq_dec := Z.eq_dec;
      rngl_opt_le_dec := Z_le_dec;
      rngl_opt_integral := Z_eq_mul_0;
