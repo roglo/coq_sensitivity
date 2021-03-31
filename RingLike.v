@@ -620,6 +620,23 @@ destruct mo. {
 now destruct Hom.
 Qed.
 
+Theorem rngl_integral_ :
+  rngl_has_divi = true →
+  rngl_has_dec_eq = true →
+  ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F.
+Proof.
+intros Hdi Hed * Hab.
+specialize (rngl_opt_mul_div_l) as H1.
+specialize (rngl_opt_mul_div_r) as H2.
+specialize (rngl_opt_div_div_div_mul) as H3.
+rewrite Hdi in H1, H2, H3; cbn in H2.
+destruct (rngl_eq_dec Hed a 0%F) as [Haz| Haz]; [ now left | ].
+right.
+specialize (H1 a b Haz).
+rewrite Hab in H1.
+Search (0 / _)%F.
+...
+
 Theorem rngl_integral :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   (rngl_is_integral || (rngl_has_inv && rngl_has_dec_eq))%bool = true →
