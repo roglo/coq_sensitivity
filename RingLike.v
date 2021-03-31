@@ -699,15 +699,14 @@ Qed.
 
 Theorem rngl_div_0_l :
   rngl_has_inv = true ∧ (rngl_has_opp = true ∨ rngl_has_sous = true) ∨
-    rngl_has_divi = true ∧ rngl_is_comm = true ∧ rngl_has_opp = true ∧
-    rngl_has_dec_eq = true →
+  (rngl_has_divi = true ∧ (rngl_has_opp = true ∨ rngl_has_sous = true)) →
   ∀ a, a ≠ 0%F → (0 / a)%F = 0%F.
 Proof.
 intros Hiv * Haz.
 remember (0 / a)%F as x eqn:Hx.
 replace 0%F with (0 * a)%F in Hx. 2: {
   apply rngl_mul_0_l.
-  destruct Hiv as [Hiv| Hiv]; [ easy | now left ].
+  now destruct Hiv.
 }
 subst x.
 apply rngl_mul_div_l; [ | easy ].
