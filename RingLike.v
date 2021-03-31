@@ -691,8 +691,7 @@ Qed.
 
 Theorem rngl_mul_inv_r :
   rngl_has_inv = true ∨
-  (rngl_has_eucl_div = true ∧ rngl_has_opp = true ∧
-   rngl_has_dec_eq = true ∧ rngl_is_integral = true) →
+  (rngl_has_eucl_div = true ∧ rngl_has_opp = true ∧ rngl_has_dec_eq = true) →
   ∀ a : T, a ≠ 0%F → (a / a = 1)%F.
 Proof.
 intros Hii * Haz.
@@ -716,7 +715,7 @@ destruct iv. {
   specialize rngl_opt_eucl_div_prop as H1.
   specialize rngl_opt_gauge_prop as H2.
   unfold rngl_div, rngl_quo.
-  destruct Hii as (Hii & Hop & Heq & Hit).
+  destruct Hii as (Hii & Hop & Heq).
   rewrite Hii in H1, H2 |-*.
   rewrite Hiv.
   unfold rngl_has_eucl_div in Hii.
@@ -1315,8 +1314,7 @@ Qed.
 
 Theorem eq_rngl_div_1 :
   rngl_has_inv = true ∨
-    rngl_has_eucl_div = true ∧ rngl_has_opp = true ∧ rngl_has_dec_eq = true ∧
-    rngl_is_integral = true →
+  rngl_has_eucl_div = true ∧ rngl_has_opp = true ∧ rngl_has_dec_eq = true →
    ∀ a b, b ≠ 0%F → a = b → (a / b = 1)%F.
 Proof.
 intros Hiv * Hbz Hab.
