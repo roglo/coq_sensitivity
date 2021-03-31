@@ -570,6 +570,16 @@ rewrite <- rngl_mul_add_distr_l.
 now do 2 rewrite rngl_add_0_l.
 Qed.
 
+Theorem rngl_mul_0_l :
+  rngl_has_opp = true ∨ rngl_has_sous = true →
+  ∀ a, (0 * a = 0)%F.
+Proof.
+intros Hom a.
+apply (rngl_add_cancel_r Hom _ _ (1 * a)%F).
+rewrite <- rngl_mul_add_distr_r.
+now do 2 rewrite rngl_add_0_l.
+Qed.
+
 Theorem rngl_add_move_0_r :
   rngl_has_opp = true →
   ∀ a b, (a + b = 0)%F ↔ (a = - b)%F.
@@ -620,22 +630,51 @@ destruct mo. {
 now destruct Hom.
 Qed.
 
-Theorem rngl_integral_ :
+Theorem rngl_div_0_l :
+  rngl_has_divi = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
+  ∀ a, a ≠ 0%F → (0 / a = 0)%F.
+Proof.
+intros Hdi Hos * Haz.
+specialize (rngl_opt_mul_div_l) as H1.
+specialize (rngl_opt_mul_div_r) as H2.
+specialize (rngl_opt_div_div_div_mul) as H3.
+rewrite Hdi in H1, H2, H3; cbn in H2.
+remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
+destruct ic. {
+  cbn in H2.
+  specialize (H1 a 0%F Haz).
+  now rewrite rngl_mul_0_r in H1.
+} {
+  cbn in H2.
+  specialize (H2 0%F a Haz).
+  now rewrite rngl_mul_0_l in H2.
+}
+Qed.
+
+Theorem rngl_integral_bis :
   rngl_has_divi = true →
   rngl_has_dec_eq = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F.
 Proof.
-intros Hdi Hed * Hab.
+intros Hdi Hed Hos * Hab.
 specialize (rngl_opt_mul_div_l) as H1.
 specialize (rngl_opt_mul_div_r) as H2.
 specialize (rngl_opt_div_div_div_mul) as H3.
 rewrite Hdi in H1, H2, H3; cbn in H2.
 destruct (rngl_eq_dec Hed a 0%F) as [Haz| Haz]; [ now left | ].
 right.
-specialize (H1 a b Haz).
-rewrite Hab in H1.
-Search (0 / _)%F.
+specialize (H1 a b Haz) as H4.
+rewrite Hab in H4.
+rewrite <- H4.
+now apply rngl_div_0_l.
+Qed.
+
 ...
+
+  (rngl_is_integral ||
+   ((rngl_has_inv || rngl_has_divi) && rngl_has_dec_eq))%bool = true →
 
 Theorem rngl_integral :
   rngl_has_opp = true ∨ rngl_has_sous = true →
@@ -902,16 +941,6 @@ destruct mo. {
   now right.
 }
 now destruct Hom.
-Qed.
-
-Theorem rngl_mul_0_l :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
-  ∀ a, (0 * a = 0)%F.
-Proof.
-intros Hom a.
-apply (rngl_add_cancel_r Hom _ _ (1 * a)%F).
-rewrite <- rngl_mul_add_distr_r.
-now do 2 rewrite rngl_add_0_l.
 Qed.
 
 Theorem rngl_inv_1 :
