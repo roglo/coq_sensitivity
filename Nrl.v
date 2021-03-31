@@ -7,8 +7,6 @@ Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Require Import Misc RingLike FermatLittle.
 
-Definition Nat_eucl_div a b := (a / b, a mod b).
-
 Canonical Structure nat_ring_like_op : ring_like_op nat :=
   {| rngl_zero := 0;
      rngl_one := 1;
@@ -17,7 +15,7 @@ Canonical Structure nat_ring_like_op : ring_like_op nat :=
      rngl_opt_opp := None;
      rngl_opt_inv := None;
      rngl_opt_sous := Some Nat.sub;
-     rngl_opt_eucl_div := Some (Nat_eucl_div, id);
+     rngl_opt_divi := Some Nat.div;
      rngl_le := Nat.le |}.
 
 Existing Instance nat_ring_like_op.
@@ -64,39 +62,6 @@ intros.
 apply Nat.mul_sub_distr_l.
 Qed.
 
-Theorem Nat_eucl_div_prop : ∀ a b q r : nat,
-  b ≠ 0%nat
-  → rngl_eucl_div a b = (q, r)
-  → a = (b * q + r)%F ∧ id r < id b.
-Proof.
-intros * Hbz Hab.
-unfold rngl_eucl_div in Hab.
-cbn in Hab.
-unfold Nat_eucl_div in Hab.
-injection Hab; clear Hab; intros H1 H2; subst q r.
-split; [ now apply Nat.div_mod | ].
-now apply Nat.mod_upper_bound.
-Qed.
-
-Theorem Nat_rngl_gauge_prop : ∀ a b : nat,
-  a ≠ 0%F
-  → b ≠ 0%F
-  → rngl_gauge a ≤ rngl_gauge (a * b)%F ∧ rngl_gauge b ≤ rngl_gauge (a * b)%F.
-Proof.
-intros * Haz Hbz.
-cbn; unfold id.
-cbn in Haz, Hbz.
-split. {
-  remember (a * b) as x.
-  rewrite <- (Nat.mul_1_r a); subst x.
-  apply Nat.mul_le_mono_l; flia Hbz.
-} {
-  remember (a * b) as x.
-  rewrite <- (Nat.mul_1_l b); subst x.
-  apply Nat.mul_le_mono_r; flia Haz.
-}
-Qed.
-
 Theorem Nat_sub_sub_sub_add : ∀ a b c, a - b - c = a - (b + c).
 Proof.
 intros.
@@ -105,8 +70,9 @@ apply Nat.sub_add_distr.
 Qed.
 
 Theorem Nat_consistent :
-  rngl_has_inv = false ∨ rngl_has_eucl_div = false.
-Proof. now left. Qed.
+  (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
+  (rngl_has_inv = false ∨ rngl_has_divi = false).
+Proof. now split; left. Qed.
 
 Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
   {| rngl_is_comm := true;
@@ -133,8 +99,9 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := NA;
      rngl_opt_mul_inv_r := NA;
-     rngl_opt_eucl_div_prop := Nat_eucl_div_prop;
-     rngl_opt_gauge_prop := Nat_rngl_gauge_prop;
+     rngl_opt_mul_div_l := Nat_mul_div_l;
+     rngl_opt_mul_div_r := NA;
+     rngl_opt_div_div_div_mul := Nat.div_div;
      rngl_opt_eq_dec := Nat.eq_dec;
      rngl_opt_le_dec := le_dec;
      rngl_opt_integral := Nat_eq_mul_0;
@@ -254,7 +221,7 @@ Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
      rngl_opt_opp := Some (Zn_opp n);
      rngl_opt_inv := if is_prime n then Some (Zn_inv n) else None;
      rngl_opt_sous := None;
-     rngl_opt_eucl_div := None;
+     rngl_opt_divi := None;
      rngl_le := Zn_le n |}.
 
 Existing Instance Zn_ring_like_op.
@@ -456,7 +423,6 @@ induction i. {
   now rewrite Nat.mod_0_l.
 }
 cbn - [ "mod" ].
-(**)
 cbn - [ "mod" ] in IHi.
 rewrite IHi.
 rewrite Nat.add_mod_idemp_l; [ | easy ].
@@ -479,8 +445,9 @@ apply Nat.sub_diag.
 Qed.
 
 Theorem Zn_consistent :
-  rngl_has_inv = false ∨ rngl_has_eucl_div = false.
-Proof. now right. Qed.
+  (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
+  (rngl_has_inv = false ∨ rngl_has_divi = false).
+Proof. now split; right. Qed.
 
 Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
   {| rngl_is_comm := true;
@@ -507,8 +474,9 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := Zn_opt_mul_inv_l;
      rngl_opt_mul_inv_r := Zn_opt_mul_inv_r;
-     rngl_opt_eucl_div_prop := NA;
-     rngl_opt_gauge_prop := NA;
+     rngl_opt_mul_div_l := NA;
+     rngl_opt_mul_div_r := NA;
+     rngl_opt_div_div_div_mul := NA;
      rngl_opt_eq_dec := Zn_eq_dec;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;

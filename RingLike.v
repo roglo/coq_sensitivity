@@ -56,7 +56,7 @@ Class ring_like_op T :=
     rngl_opt_opp : option (T → T);
     rngl_opt_inv : option (T → T);
     rngl_opt_sous : option (T → T → T);
-    rngl_opt_eucl_div : option ((T → T → T * T) * (T → nat));
+    rngl_opt_divi : option (T → T → T);
     rngl_le : T → T → Prop }.
 
 Declare Scope ring_like_scope.
@@ -71,8 +71,8 @@ Definition rngl_has_inv {T} {R : ring_like_op T} :=
 Definition rngl_has_sous {T} {R : ring_like_op T} :=
   bool_of_option rngl_opt_sous.
 
-Definition rngl_has_eucl_div {T} {R : ring_like_op T} :=
-  bool_of_option rngl_opt_eucl_div.
+Definition rngl_has_divi {T} {R : ring_like_op T} :=
+  bool_of_option rngl_opt_divi.
 
 Definition rngl_opp {T} {R : ring_like_op T} a :=
   match rngl_opt_opp with
@@ -92,28 +92,10 @@ Definition rngl_sous {T} {R : ring_like_op T} a b :=
   | None => rngl_zero
   end.
 
-Definition rngl_quo {T} {R : ring_like_op T} a b :=
-  match rngl_opt_eucl_div with
-  | Some (rngl_eucl_div, rngl_gauge) => fst (rngl_eucl_div a b)
+Definition rngl_divi {T} {R : ring_like_op T} a b :=
+  match rngl_opt_divi with
+  | Some rngl_divi => rngl_divi a b
   | None => rngl_zero
-  end.
-
-Definition rngl_mod {T} {R : ring_like_op T} a b :=
-  match rngl_opt_eucl_div with
-  | Some (rngl_eucl_div, rngl_gauge) => snd (rngl_eucl_div a b)
-  | None => rngl_zero
-  end.
-
-Definition rngl_gauge {T} {R : ring_like_op T} (a : T) :=
-  match rngl_opt_eucl_div with
-  | Some (rngl_eucl_div, rngl_gauge) => rngl_gauge a
-  | None => 0
-  end.
-
-Definition rngl_eucl_div {T} {R : ring_like_op T} a b :=
-  match rngl_opt_eucl_div with
-  | Some (rngl_eucl_div, rngl_gauge) => rngl_eucl_div a b
-  | None => (rngl_zero, rngl_zero)
   end.
 
 Definition rngl_sub {T} {R : ring_like_op T} a b :=
@@ -122,7 +104,7 @@ Definition rngl_sub {T} {R : ring_like_op T} a b :=
   else rngl_zero.
 Definition rngl_div {T} {R : ring_like_op T} a b :=
   if rngl_has_inv then rngl_mul a (rngl_inv b)
-  else if rngl_has_eucl_div then rngl_quo a b
+  else if rngl_has_divi then rngl_divi a b
   else rngl_zero.
 
 Notation "0" := rngl_zero : ring_like_scope.
@@ -176,7 +158,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* when has opposite *)
     rngl_opt_add_opp_l :
       if rngl_has_opp then ∀ a : T, (- a + a = 0)%F else not_applicable;
-    (* when has sous *)
+    (* when has subtraction (sous) *)
     rngl_opt_add_sub :
       if rngl_has_sous then ∀ a b, (a + b - b)%F = a
       else not_applicable;
@@ -199,21 +181,18 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if (rngl_has_inv && negb rngl_is_comm)%bool then
         ∀ a : T, a ≠ 0%F → (a / a = 1)%F
       else not_applicable;
-    (* property of the euclidean division *)
-    rngl_opt_eucl_div_prop :
-      if rngl_has_eucl_div then
-        ∀ a b q r,
-        b ≠ 0%F
-        → rngl_eucl_div a b = (q, r)
-         → a = (b * q + r)%F ∧ rngl_gauge r < rngl_gauge b
+    (* when has divition (divi) *)
+    rngl_opt_mul_div_l :
+      if rngl_has_divi then ∀ a b, a ≠ 0%F → (a * b / a)%F = b
       else not_applicable;
-    rngl_opt_gauge_prop :
-      if rngl_has_eucl_div then
-        ∀ a b, a ≠ 0%F → b ≠ 0%F →
-        rngl_gauge a ≤ rngl_gauge (a * b)%F ∧
-        rngl_gauge b ≤ rngl_gauge (a * b)%F
-      else
-        not_applicable;
+    rngl_opt_mul_div_r :
+      if (rngl_has_divi && negb rngl_is_comm)%bool then
+        ∀ a b, b ≠ 0%F → (a * b / b)%F = a
+      else not_applicable;
+    rngl_opt_div_div_div_mul :
+      if rngl_has_divi then
+        ∀ a b c, b ≠ 0%F → c ≠ 0%F → ((a / b) / c = a / (b * c))%F
+      else not_applicable;
     (* when equality is decidable *)
     rngl_opt_eq_dec :
       if rngl_has_dec_eq then ∀ a b : T, {a = b} + {a ≠ b}
@@ -263,7 +242,8 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       else not_applicable;
     (* consistency *)
     rngl_consistent :
-      rngl_has_inv = false ∨ rngl_has_eucl_div = false }.
+      (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
+      (rngl_has_inv = false ∨ rngl_has_divi = false) }.
 
 Fixpoint rngl_power {T} {ro : ring_like_op T} a n :=
   match n with
@@ -571,7 +551,7 @@ intros a b c Hab.
 now rewrite Hab.
 Qed.
 
-Theorem rngl_add_reg_r :
+Theorem rngl_add_cancel_r :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   ∀ a b c, (a + c = b + c)%F → (a = b)%F.
 Proof.
@@ -585,7 +565,7 @@ Theorem rngl_mul_0_r :
   ∀ a, (a * 0 = 0)%F.
 Proof.
 intros Hom *.
-apply (rngl_add_reg_r Hom _ _ (a * 1)%F).
+apply (rngl_add_cancel_r Hom _ _ (a * 1)%F).
 rewrite <- rngl_mul_add_distr_l.
 now do 2 rewrite rngl_add_0_l.
 Qed.
@@ -690,8 +670,7 @@ now apply IHa in Hab.
 Qed.
 
 Theorem rngl_mul_inv_r :
-  rngl_has_inv = true ∨
-  (rngl_has_eucl_div = true ∧ rngl_has_opp = true ∧ rngl_has_dec_eq = true) →
+  rngl_has_inv = true ∨ rngl_has_divi = true →
   ∀ a : T, a ≠ 0%F → (a / a = 1)%F.
 Proof.
 intros Hii * Haz.
@@ -712,43 +691,10 @@ destruct iv. {
   }
 } {
   destruct Hii as [Hii| Hii]; [ easy | ].
-  specialize rngl_opt_eucl_div_prop as H1.
-  specialize rngl_opt_gauge_prop as H2.
-  unfold rngl_div, rngl_quo.
-  destruct Hii as (Hii & Hop & Heq).
-  rewrite Hii in H1, H2 |-*.
-  rewrite Hiv.
-  unfold rngl_has_eucl_div in Hii.
-  unfold rngl_gauge in H1, H2.
-  unfold rngl_eucl_div in H1.
-  remember rngl_opt_eucl_div as ed eqn:Hed; symmetry in Hed.
-  destruct ed as [(fdiv, fgauge)| ]; [ | easy ].
-  specialize (H1 a a) as H3.
-  remember (fdiv a a) as qr eqn:Hqr.
-  symmetry in Hqr.
-  destruct qr as (q, r); cbn.
-  specialize (H3 q r Haz eq_refl).
-  destruct H3 as (Haa, Hgg).
-  symmetry in Haa.
-  apply rngl_add_sub_eq_l in Haa; [ | now left ].
-  remember (a * q)%F as x.
-  replace a with (a * 1)%F in Haa by apply rngl_mul_1_r; subst x.
-  rewrite <- rngl_mul_sub_distr_l in Haa; [ | now left ].
-  specialize rngl_opt_eq_dec as H3.
-  rewrite Heq in H3.
-  specialize (H2 a (1 - q)%F Haz).
-  specialize (H3 (1 - q)%F 0%F).
-  destruct H3 as [H3| H3]. {
-    now apply rngl_sub_move_0_r in H3.
-  }
-  specialize (H2 H3).
-  rewrite Haa in H2.
-  destruct H2 as (H2, H4).
-  move H2 at bottom.
-  move Hgg at bottom.
-  exfalso.
-  revert Hgg.
-  now apply Nat_nlt_ge.
+  specialize rngl_opt_mul_div_l as H1.
+  rewrite Hii in H1.
+  specialize (H1 a 1%F Haz).
+  now rewrite rngl_mul_1_r in H1.
 }
 Qed.
 
@@ -762,9 +708,7 @@ now rewrite Hin.
 Qed.
 
 Theorem rngl_mul_div_l :
-  rngl_has_inv = true ∨
-  (rngl_has_eucl_div = true ∧ rngl_is_comm = true ∧
-   rngl_has_opp = true ∧ rngl_has_dec_eq = true) →
+  rngl_has_inv = true ∨ rngl_has_divi = true →
   ∀ a b : T, b ≠ 0%F → (a * b / b)%F = a.
 Proof.
 intros Hii a b Hbz.
@@ -778,49 +722,29 @@ destruct iv. {
   apply rngl_mul_1_r.
 } {
   destruct Hii as [Hii| Hii]; [ easy | ].
-  specialize rngl_opt_eucl_div_prop as H1.
-  specialize rngl_opt_gauge_prop as H2.
-  unfold rngl_div, rngl_quo.
-  destruct Hii as (Hii & Hco & Hop & Heq).
-  rewrite Hii in H1, H2 |-*.
-  rewrite Hiv.
-  unfold rngl_has_eucl_div in Hii.
-  unfold rngl_gauge in H1, H2.
-  unfold rngl_eucl_div in H1.
-  remember rngl_opt_eucl_div as ed eqn:Hed; symmetry in Hed.
-  destruct ed as [(fdiv, fgauge)| ]; [ | easy ].
-  specialize (H1 (a * b)%F b) as H3.
-  remember (fdiv (a * b)%F b) as qr eqn:Hqr.
-  symmetry in Hqr.
-  destruct qr as (q, r); cbn.
-  specialize (H3 q r Hbz eq_refl).
-  destruct H3 as (Haa, Hgg).
-  symmetry in Haa.
-  apply rngl_add_sub_eq_l in Haa; [ | now left ].
-  rewrite rngl_mul_comm in Haa; [ | easy ].
-  rewrite <- rngl_mul_sub_distr_l in Haa; [ | now left ].
-  specialize rngl_opt_eq_dec as H3.
-  rewrite Heq in H3.
-  specialize (H2 b (a - q)%F Hbz).
-  specialize (H3 (a - q)%F 0%F).
-  destruct H3 as [H3| H3]. {
-    now apply rngl_sub_move_0_r in H3.
+  remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
+  destruct ic. {
+    rewrite rngl_mul_comm; [ | easy ].
+    specialize rngl_opt_mul_div_l as H1.
+    rewrite Hii in H1.
+    now apply H1.
+  } {
+    specialize rngl_opt_mul_div_r as H1.
+    rewrite Hii, Hic in H1; cbn in H1.
+    now apply H1.
   }
-  specialize (H2 H3).
-  rewrite Haa in H2.
-  destruct H2 as (H2, H4).
-  move H2 at bottom.
-  move Hgg at bottom.
-  exfalso.
-  revert Hgg.
-  now apply Nat_nlt_ge.
 }
 Qed.
 
+Theorem rngl_div_cancel_l : ∀ a b c,
+  (a = b)%F → (a / c = b / c)%F.
+Proof.
+intros a b c Hab.
+now rewrite Hab.
+Qed.
+
 Theorem rngl_mul_cancel_l :
-  rngl_has_inv = true ∨
-    rngl_has_eucl_div = true ∧ rngl_is_comm = true ∧ rngl_has_opp = true ∧
-    rngl_has_dec_eq = true →
+  rngl_has_inv = true ∨ rngl_has_divi = true →
   ∀ a b c, a ≠ 0%F
   → (a * b = a * c)%F
   → b = c.
@@ -832,19 +756,25 @@ destruct Hii as [Hii| Hii]. {
   rewrite rngl_mul_inv_l in H2; [ | easy | easy ].
   now do 2 rewrite rngl_mul_1_l in H2.
 } {
-  assert (H : (a * b / a = a * c / a)%F) by now rewrite Hbc.
-  specialize (rngl_mul_div_l (or_intror Hii)) as H1.
-  rewrite rngl_mul_comm in H; [ | easy ].
-  rewrite H1 in H; [ | easy ].
-  rewrite rngl_mul_comm in H; [ | easy ].
-  now rewrite H1 in H.
+  remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
+  eapply rngl_div_cancel_l with (c := a) in Hbc.
+  destruct ic. {
+    specialize (rngl_mul_comm Hic) as H1.
+    rewrite H1 in Hbc.
+    rewrite rngl_mul_div_l in Hbc; [ | now right | easy ].
+    rewrite H1 in Hbc.
+    rewrite rngl_mul_div_l in Hbc; [ easy | now right | easy ].
+  } {
+    specialize rngl_opt_mul_div_l as H1.
+    rewrite Hii in H1.
+    rewrite H1 in Hbc; [ | easy ].
+    now rewrite H1 in Hbc.
+  }
 }
 Qed.
 
 Theorem rngl_mul_cancel_r :
-  rngl_has_inv = true ∨
-    rngl_has_eucl_div = true ∧ rngl_is_comm = true ∧ rngl_has_opp = true ∧
-    rngl_has_dec_eq = true →
+  rngl_has_inv = true ∨ rngl_has_divi = true →
   ∀ a b c, c ≠ 0%F
   → (a * c = b * c)%F
   → a = b.
@@ -962,7 +892,7 @@ Theorem rngl_mul_0_l :
   ∀ a, (0 * a = 0)%F.
 Proof.
 intros Hom a.
-apply (rngl_add_reg_r Hom _ _ (1 * a)%F).
+apply (rngl_add_cancel_r Hom _ _ (1 * a)%F).
 rewrite <- rngl_mul_add_distr_r.
 now do 2 rewrite rngl_add_0_l.
 Qed.
@@ -995,9 +925,7 @@ apply rngl_mul_1_l.
 Qed.
 
 Theorem rngl_div_1_r :
-  rngl_has_inv = true ∨
-    rngl_has_eucl_div = true ∧ rngl_is_comm = true ∧ rngl_has_opp = true ∧
-    rngl_has_dec_eq = true →
+  rngl_has_inv = true ∨ rngl_has_divi = true →
   rngl_has_1_neq_0 = true →
   ∀ a, (a / 1 = a)%F.
 Proof.
@@ -1297,7 +1225,7 @@ Qed.
 
 Theorem rngl_div_0_l :
   rngl_has_inv = true ∧ (rngl_has_opp = true ∨ rngl_has_sous = true) ∨
-    rngl_has_eucl_div = true ∧ rngl_is_comm = true ∧ rngl_has_opp = true ∧
+    rngl_has_divi = true ∧ rngl_is_comm = true ∧ rngl_has_opp = true ∧
     rngl_has_dec_eq = true →
   ∀ a, a ≠ 0%F → (0 / a)%F = 0%F.
 Proof.
@@ -1313,8 +1241,7 @@ destruct Hiv as [Hiv| Hiv]; [ now left | now right ].
 Qed.
 
 Theorem eq_rngl_div_1 :
-  rngl_has_inv = true ∨
-  rngl_has_eucl_div = true ∧ rngl_has_opp = true ∧ rngl_has_dec_eq = true →
+  rngl_has_inv = true ∨ rngl_has_divi = true →
    ∀ a b, b ≠ 0%F → a = b → (a / b = 1)%F.
 Proof.
 intros Hiv * Hbz Hab.
