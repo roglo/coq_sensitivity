@@ -1057,6 +1057,8 @@ f_equal. {
   remember (c * c - d * c' * c') as cc eqn:Hcc.
   remember (b * c + d * b' * c') as bc eqn:Hbc.
   remember (b * c' + b' * c) as bc' eqn:Hbc'.
+Compute (mk_qi (-1) 120 150 / mk_qi (-1) 21 0 / mk_qi (-1) 2 0)%QI.
+Compute (mk_qi (-1) 120 150 / (mk_qi (-1) 21 0 * mk_qi (-1) 2 0))%QI.
 ...
 
 Theorem quad_int_consistent :
