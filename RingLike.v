@@ -914,15 +914,13 @@ destruct op. {
 }
 remember rngl_has_sous as mo eqn:Hmo.
 symmetry in Hmo.
-destruct mo. {
-  specialize rngl_opt_sub_sub_sub_add as H1.
-  rewrite Hmo in H1.
-  rewrite <- H1.
-  rewrite rngl_add_comm.
-  rewrite rngl_add_sub; [ easy | ].
-  now right.
-}
-now destruct Hom.
+destruct mo; [ | now destruct Hom ].
+specialize rngl_opt_sub_sub_sub_add as H1.
+rewrite Hmo in H1.
+rewrite <- H1.
+rewrite rngl_add_comm.
+rewrite rngl_add_sub; [ easy | ].
+now right.
 Qed.
 
 Theorem rngl_inv_1 :
