@@ -920,7 +920,6 @@ destruct mo. {
   rewrite <- H1.
   rewrite rngl_add_comm.
   rewrite rngl_add_sub; [ easy | ].
-  destruct Hom as [Hom| Hom]; [ easy | ].
   now right.
 }
 now destruct Hom.
