@@ -56,7 +56,7 @@ Class ring_like_op T :=
     rngl_opt_opp : option (T → T);
     rngl_opt_inv : option (T → T);
     rngl_opt_sous : option (T → T → T);
-    rngl_opt_divi : option (T → T → T);
+    rngl_opt_quot : option (T → T → T);
     rngl_le : T → T → Prop }.
 
 Declare Scope ring_like_scope.
@@ -71,8 +71,8 @@ Definition rngl_has_inv {T} {R : ring_like_op T} :=
 Definition rngl_has_sous {T} {R : ring_like_op T} :=
   bool_of_option rngl_opt_sous.
 
-Definition rngl_has_divi {T} {R : ring_like_op T} :=
-  bool_of_option rngl_opt_divi.
+Definition rngl_has_quot {T} {R : ring_like_op T} :=
+  bool_of_option rngl_opt_quot.
 
 Definition rngl_opp {T} {R : ring_like_op T} a :=
   match rngl_opt_opp with
@@ -92,9 +92,9 @@ Definition rngl_sous {T} {R : ring_like_op T} a b :=
   | None => rngl_zero
   end.
 
-Definition rngl_divi {T} {R : ring_like_op T} a b :=
-  match rngl_opt_divi with
-  | Some rngl_divi => rngl_divi a b
+Definition rngl_quot {T} {R : ring_like_op T} a b :=
+  match rngl_opt_quot with
+  | Some rngl_quot => rngl_quot a b
   | None => rngl_zero
   end.
 
@@ -104,7 +104,7 @@ Definition rngl_sub {T} {R : ring_like_op T} a b :=
   else rngl_zero.
 Definition rngl_div {T} {R : ring_like_op T} a b :=
   if rngl_has_inv then rngl_mul a (rngl_inv b)
-  else if rngl_has_divi then rngl_divi a b
+  else if rngl_has_quot then rngl_quot a b
   else rngl_zero.
 
 Notation "0" := rngl_zero : ring_like_scope.
@@ -181,16 +181,16 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if (rngl_has_inv && negb rngl_is_comm)%bool then
         ∀ a : T, a ≠ 0%F → (a / a = 1)%F
       else not_applicable;
-    (* when has divition (divi) *)
-    rngl_opt_mul_div_l :
-      if rngl_has_divi then ∀ a b, a ≠ 0%F → (a * b / a)%F = b
+    (* when has division (quot) *)
+    rngl_opt_mul_quot_l :
+      if rngl_has_quot then ∀ a b, a ≠ 0%F → (a * b / a)%F = b
       else not_applicable;
-    rngl_opt_mul_div_r :
-      if (rngl_has_divi && negb rngl_is_comm)%bool then
+    rngl_opt_mul_quot_r :
+      if (rngl_has_quot && negb rngl_is_comm)%bool then
         ∀ a b, b ≠ 0%F → (a * b / b)%F = a
       else not_applicable;
-    rngl_opt_div_div_div_mul :
-      if rngl_has_divi then
+    rngl_opt_quot_quot_quot_mul :
+      if rngl_has_quot then
         ∀ a b c, b ≠ 0%F → c ≠ 0%F → ((a / b) / c = a / (b * c))%F
       else not_applicable;
     (* when equality is decidable *)
@@ -243,7 +243,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* consistency *)
     rngl_consistent :
       (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
-      (rngl_has_inv = false ∨ rngl_has_divi = false) }.
+      (rngl_has_inv = false ∨ rngl_has_quot = false) }.
 
 Fixpoint rngl_power {T} {ro : ring_like_op T} a n :=
   match n with
@@ -640,7 +640,7 @@ now rewrite Hin.
 Qed.
 
 Theorem rngl_mul_inv_r :
-  rngl_has_inv = true ∨ rngl_has_divi = true →
+  rngl_has_inv = true ∨ rngl_has_quot = true →
   ∀ a : T, a ≠ 0%F → (a / a = 1)%F.
 Proof.
 intros Hii * Haz.
@@ -661,7 +661,7 @@ destruct iv. {
   }
 } {
   destruct Hii as [Hii| Hii]; [ easy | ].
-  specialize rngl_opt_mul_div_l as H1.
+  specialize rngl_opt_mul_quot_l as H1.
   rewrite Hii in H1.
   specialize (H1 a 1%F Haz).
   now rewrite rngl_mul_1_r in H1.
@@ -669,7 +669,7 @@ destruct iv. {
 Qed.
 
 Theorem rngl_mul_div_l :
-  rngl_has_inv = true ∨ rngl_has_divi = true →
+  rngl_has_inv = true ∨ rngl_has_quot = true →
   ∀ a b : T, b ≠ 0%F → (a * b / b)%F = a.
 Proof.
 intros Hii a b Hbz.
@@ -686,11 +686,11 @@ destruct iv. {
   remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
   destruct ic. {
     rewrite rngl_mul_comm; [ | easy ].
-    specialize rngl_opt_mul_div_l as H1.
+    specialize rngl_opt_mul_quot_l as H1.
     rewrite Hii in H1.
     now apply H1.
   } {
-    specialize rngl_opt_mul_div_r as H1.
+    specialize rngl_opt_mul_quot_r as H1.
     rewrite Hii, Hic in H1; cbn in H1.
     now apply H1.
   }
@@ -699,7 +699,7 @@ Qed.
 
 Theorem rngl_div_0_l :
   (rngl_has_opp = true ∨ rngl_has_sous = true) ∧
-  (rngl_has_inv = true ∨ rngl_has_divi = true) →
+  (rngl_has_inv = true ∨ rngl_has_quot = true) →
   ∀ a, a ≠ 0%F → (0 / a)%F = 0%F.
 Proof.
 intros Hiv * Haz.
@@ -714,7 +714,7 @@ Qed.
 Theorem rngl_integral :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   (rngl_is_integral ||
-   ((rngl_has_inv || rngl_has_divi) && rngl_has_dec_eq))%bool = true →
+   ((rngl_has_inv || rngl_has_quot) && rngl_has_dec_eq))%bool = true →
   ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F.
 Proof.
 intros Hmo Hdo * Hab.
@@ -738,7 +738,7 @@ destruct iv. {
   cbn in Hdo.
   apply andb_prop in Hdo.
   destruct Hdo as (Hdi, Hde).
-  specialize (rngl_opt_mul_div_l) as H1.
+  specialize (rngl_opt_mul_quot_l) as H1.
   rewrite Hdi in H1.
   destruct (rngl_eq_dec Hde a 0%F) as [Haz| Haz]; [ now left | right ].
   specialize (H1 a b Haz) as H4.
@@ -783,7 +783,7 @@ now rewrite Hab.
 Qed.
 
 Theorem rngl_mul_cancel_l :
-  rngl_has_inv = true ∨ rngl_has_divi = true →
+  rngl_has_inv = true ∨ rngl_has_quot = true →
   ∀ a b c, a ≠ 0%F
   → (a * b = a * c)%F
   → b = c.
@@ -804,7 +804,7 @@ destruct Hii as [Hii| Hii]. {
     rewrite H1 in Hbc.
     rewrite rngl_mul_div_l in Hbc; [ easy | now right | easy ].
   } {
-    specialize rngl_opt_mul_div_l as H1.
+    specialize rngl_opt_mul_quot_l as H1.
     rewrite Hii in H1.
     rewrite H1 in Hbc; [ | easy ].
     now rewrite H1 in Hbc.
@@ -813,7 +813,7 @@ destruct Hii as [Hii| Hii]. {
 Qed.
 
 Theorem rngl_mul_cancel_r :
-  rngl_has_inv = true ∨ rngl_has_divi = true →
+  rngl_has_inv = true ∨ rngl_has_quot = true →
   ∀ a b c, c ≠ 0%F
   → (a * c = b * c)%F
   → a = b.
@@ -954,7 +954,7 @@ apply rngl_mul_1_l.
 Qed.
 
 Theorem rngl_div_1_r :
-  rngl_has_inv = true ∨ rngl_has_divi = true →
+  rngl_has_inv = true ∨ rngl_has_quot = true →
   rngl_has_1_neq_0 = true →
   ∀ a, (a / 1 = a)%F.
 Proof.
@@ -1253,7 +1253,7 @@ apply rngl_mul_1_r.
 Qed.
 
 Theorem eq_rngl_div_1 :
-  rngl_has_inv = true ∨ rngl_has_divi = true →
+  rngl_has_inv = true ∨ rngl_has_quot = true →
    ∀ a b, b ≠ 0%F → a = b → (a / b = 1)%F.
 Proof.
 intros Hiv * Hbz Hab.

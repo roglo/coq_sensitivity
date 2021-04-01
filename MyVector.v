@@ -121,7 +121,7 @@ apply rngl_mul_assoc.
 Qed.
 
 Theorem vect_mul_scal_reg_r :
-  rngl_has_inv = true ∨ rngl_has_divi = true →
+  rngl_has_inv = true ∨ rngl_has_quot = true →
   rngl_has_dec_eq = true →
   ∀ {n} (V : vector n T) a b,
   V ≠ vect_zero n

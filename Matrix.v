@@ -575,7 +575,7 @@ Canonical Structure mat_ring_like_op n :
      rngl_opt_opp := Some (@mat_opp T _ n n);
      rngl_opt_inv := None;
      rngl_opt_sous := None;
-     rngl_opt_divi := None;
+     rngl_opt_quot := None;
      rngl_le := @phony_mat_le n |}.
 
 (**)
@@ -717,7 +717,7 @@ Theorem mat_consistent : ∀ n,
   let TM := matrix n n T in
   let rom := mat_ring_like_op n in
   (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
-  (rngl_has_inv = false ∨ rngl_has_divi = false).
+  (rngl_has_inv = false ∨ rngl_has_quot = false).
 Proof. now intros; split; right. Qed.
 
 Definition mat_ring_like_prop (n : nat) :
@@ -746,9 +746,9 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := NA;
      rngl_opt_mul_inv_r := NA;
-     rngl_opt_mul_div_l := NA;
-     rngl_opt_mul_div_r := NA;
-     rngl_opt_div_div_div_mul := NA;
+     rngl_opt_mul_quot_l := NA;
+     rngl_opt_mul_quot_r := NA;
+     rngl_opt_quot_quot_quot_mul := NA;
      rngl_opt_eq_dec := mat_opt_eq_dec n;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;

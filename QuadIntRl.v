@@ -38,6 +38,11 @@ Definition qi_opp d (α : quad_int d) := mk_qi d (- qi_re α) (- qi_im α).
 Definition qi_sub d (α β : quad_int d) := qi_add α (qi_opp β).
 Definition qi_conj d (α : quad_int d) := mk_qi d (qi_re α) (- qi_im α).
 
+Definition qi_quot d (α β : quad_int d) :=
+  let ab := qi_mul α (qi_conj β) in
+  let bb := qi_mul β (qi_conj β) in
+  mk_qi d (qi_re ab ÷ qi_re bb) (qi_im ab ÷ qi_re bb).
+
 Declare Scope QI_scope.
 Delimit Scope QI_scope with QI.
 
@@ -50,6 +55,7 @@ Notation "- α" := (qi_opp α) : QI_scope.
 Notation "α + β" := (qi_add α β) : QI_scope.
 Notation "α * β" := (qi_mul α β) : QI_scope.
 Notation "α - β" := (qi_sub α β) : QI_scope.
+Notation "α / β" := (qi_quot α β) : QI_scope.
 Notation "'〈' a + b '√' d 〉" := (mk_qi d a b)
   (at level 1, a at level 35, b at level 35,
    format "〈  a  +  b  √ d  〉") : QI_scope.
@@ -75,25 +81,6 @@ Notation "〈 - '𝑖' 〉" := (mk_qi (-1) 0 (-1))
 Notation "〈 '𝑖' 〉" := (mk_qi (-1) 0 1)
   (at level 1) : QI_scope.
 
-Definition qi_gauge {d} (α : quad_int d) :=
-  Z.abs_nat (qi_re (α * qi_conj α)%QI).
-
-Definition delta_quot r b :=
-  if Z_le_dec 0 r then
-    if Z_le_dec (2 * r) b then 0 else 1
-  else
-    if Z_le_dec b (2 * r) then 42 else 18.
-
-Definition qi_eucl_div {d} (a b : quad_int d) :=
-  let bb := qi_re (b * qi_conj b)%QI in
-  let '(γ₁, r₁) := Z.div_eucl (qi_re (a * qi_conj b)) bb in
-  let '(γ'₁, r'₁) := Z.div_eucl (qi_im (a * qi_conj b)) bb in
-  let γ := γ₁ + delta_quot r₁ bb in
-  let γ' := γ'₁ + delta_quot r'₁ bb in
-  let q := mk_qi d γ γ' in
-  let r := (a - b * q)%QI in
-  (q, r).
-
 (*
  Par exemple :
 si a=−6+17i et si b=7+i on tape :
@@ -104,31 +91,29 @@ et on obtient : 4-3*i
 iquorem(-6+17*i,7+i)
 et on obtient : [-1+3*i,4-3*i]
 *)
-Compute let '(a, b) := (mk_qi (-1) (-6) 17, mk_qi (-1) 7 1) in (a, b, qi_eucl_div a b).
-(*
-     = (〈 -6 + 17 𝑖 〉%QI, 〈 7 + 1 𝑖 〉%QI, (〈 -1 + 2 𝑖 〉%QI, 〈 3 + 4 𝑖 〉%QI))
-*)
+Compute let '(a, b) := (mk_qi (-1) (-6) 17, mk_qi (-1) 7 1) in (a, b, qi_quot a b).
+Compute let '(a, b) := (mk_qi (-1) 7 1, mk_qi (-1) 4 (-3)) in (a, b, qi_quot a b).
 
-Compute let '(a, b) := (mk_qi (-1) 7 1, mk_qi (-1) 4 (-3)) in (a, b, qi_eucl_div a b).
+Print Z.quot.
 
-(* remainder always same sign as divisor *)
+(* remainder always same sign as dividend *)
 Compute let '(a, b) := (9, 4) in
-(a, b, Z.div_eucl a b, qi_eucl_div (mk_qi 2 a 15) (mk_qi 2 b 42)).
+(a, b, Z.quotrem a b, qi_quot (mk_qi 2 a 15) (mk_qi 2 b 42)).
 (**)
 Compute let '(a, b) := (11, 4) in
-(a, b, Z.div_eucl a b, qi_eucl_div (mk_qi 2 a 0) (mk_qi 2 b 0)).
+(a, b, Z.quotrem a b, qi_quot (mk_qi 2 a 0) (mk_qi 2 b 0)).
 Compute let '(a, b) := (9, -4) in
-(a, b, Z.div_eucl a b, qi_eucl_div (mk_qi 2 a 0) (mk_qi 2 b 0)).
+(a, b, Z.quotrem a b, qi_quot (mk_qi 2 a 0) (mk_qi 2 b 0)).
 Compute let '(a, b) := (11, -4) in
-(a, b, Z.div_eucl a b, qi_eucl_div (mk_qi 2 a 0) (mk_qi 2 b 0)).
+(a, b, Z.quotrem a b, qi_quot (mk_qi 2 a 0) (mk_qi 2 b 0)).
 Compute let '(a, b) := (-9, -4) in
-(a, b, Z.div_eucl a b, qi_eucl_div (mk_qi 2 a 0) (mk_qi 2 b 0)).
+(a, b, Z.quotrem a b, qi_quot (mk_qi 2 a 0) (mk_qi 2 b 0)).
 Compute let '(a, b) := (-11, -4) in
-(a, b, Z.div_eucl a b, qi_eucl_div (mk_qi 2 a 0) (mk_qi 2 b 0)).
+(a, b, Z.quotrem a b, qi_quot (mk_qi 2 a 0) (mk_qi 2 b 0)).
 Compute let '(a, b) := (-9, 4) in
-(a, b, Z.div_eucl a b, qi_eucl_div (mk_qi 2 a 0) (mk_qi 2 b 0)).
+(a, b, Z.quotrem a b, qi_quot (mk_qi 2 a 0) (mk_qi 2 b 0)).
 Compute let '(a, b) := (-11, 4) in
-(a, b, Z.div_eucl a b, qi_eucl_div (mk_qi 2 a 0) (mk_qi 2 b 0)).
+(a, b, Z.quotrem a b, qi_quot (mk_qi 2 a 0) (mk_qi 2 b 0)).
 (*
      = (9, 4, (2, 1), (〈 2 + 0 √2 〉%QI, 〈 1 + 0 √2 〉%QI))
      : Z * Z * (Z * Z) * (quad_int 2 * quad_int 2)
@@ -148,15 +133,11 @@ Compute let '(a, b) := (-11, 4) in
      : Z * Z * (Z * Z) * (quad_int 2 * quad_int 2)
 *)
 
-Definition qi_div d (α β : quad_int d) := fst (qi_eucl_div α β).
-
-Notation "α / β" := (qi_div α β) : QI_scope.
-
-Compute (qi_eucl_div (mk_qi (-1) (- 36) 242) (mk_qi (-1) 50 50)).
-Compute (qi_eucl_div (mk_qi (-1) 36 242) (mk_qi (-1) 50 50)).
+Compute (qi_quot (mk_qi (-1) (- 36) 242) (mk_qi (-1) 50 50)).
+Compute (qi_quot (mk_qi (-1) 36 242) (mk_qi (-1) 50 50)).
 Compute (mk_qi (-1) 0 1 * mk_qi (-1) 0 1)%QI.
-Check qi_eucl_div 1%QI (mk_qi (-1) 0 1).
-Compute (qi_eucl_div 1%QI (mk_qi (-1) 0 1)).
+Check qi_quot 1%QI (mk_qi (-1) 0 1).
+Compute (qi_quot 1%QI (mk_qi (-1) 0 1)).
 Compute (1 / mk_qi (-1) 0 1)%QI.
 Compute (1 / mk_qi (-1) 0 (- 1))%QI.
 Compute (@qi_zero 42 / @qi_zero 42)%QI.
@@ -178,7 +159,7 @@ Definition quad_int_ring_like_op {d} : ring_like_op (quad_int d) :=
      rngl_opt_opp := Some (@qi_opp d);
      rngl_opt_inv := None;
      rngl_opt_sous := None;
-     rngl_opt_divi := None;
+     rngl_opt_quot := Some (@qi_quot d);
      rngl_le := phony_qi_le |}.
 
 Compute (mk_qi (-1) (- 36) 242 / mk_qi (-1) 50 50)%QI.
@@ -794,12 +775,12 @@ unfold rngl_has_eucl_div, rngl_eucl_div, rngl_gauge.
 cbn - [ In_dec ].
 destruct (in_dec Z.eq_dec d having_eucl_div) as [Hhed| Hhed]; [ cbn | easy ].
 intros * Hbz Hab.
-unfold qi_eucl_div in Hab.
+unfold qi_quot in Hab.
 set (bb := qi_re (b * qi_conj b)) in Hab.
-remember (Z.div_eucl (qi_re (a * qi_conj b)) bb) as γr eqn:Hγr.
+remember (Z.quotrem (qi_re (a * qi_conj b)) bb) as γr eqn:Hγr.
 symmetry in Hγr.
 destruct γr as (γ₁, r₁).
-remember (Z.div_eucl (qi_im (a * qi_conj b)) bb) as γr' eqn:Hγr'.
+remember (Z.quotrem (qi_im (a * qi_conj b)) bb) as γr' eqn:Hγr'.
 symmetry in Hγr'.
 destruct γr' as (γ'₁, r'₁).
 move γ'₁ before γ₁.
@@ -990,7 +971,7 @@ destruct b as (b, b').
 unfold qi_mul, qi_zero in Hab.
 injection Hab; clear Hab; intros H1 H2.
 (* perhaps useless: try to implement rngl_divi first *)
-...
+Abort.
 
 Theorem quad_int_characteristic_prop : ∀ i : nat, rngl_of_nat (S i) ≠ 0%QI.
 Proof.
@@ -1025,7 +1006,7 @@ Qed.
 
 Theorem quad_int_consistent :
   (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
-  (rngl_has_inv = false ∨ rngl_has_divi = false).
+  (rngl_has_inv = false ∨ rngl_has_quot = true).
 Proof. now split; right. Qed.
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
@@ -1053,9 +1034,10 @@ Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := NA;
      rngl_opt_mul_inv_r := NA;
-     rngl_opt_mul_div_l := NA;
-     rngl_opt_mul_div_r := NA;
-     rngl_opt_div_div_div_mul := NA;
+     rngl_opt_mul_quot_l := NA;
+...
+     rngl_opt_mul_quot_r := NA;
+     rngl_opt_quot_quot_quot_mul := NA;
      rngl_opt_eq_dec := quad_int_eq_dec;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;

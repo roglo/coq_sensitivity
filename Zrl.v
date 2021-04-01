@@ -17,7 +17,7 @@ Canonical Structure Z_ring_like_op : ring_like_op Z :=
      rngl_opt_opp := Some Z.opp;
      rngl_opt_inv := None;
      rngl_opt_sous := None;
-     rngl_opt_divi := Some Z.quot;
+     rngl_opt_quot := Some Z.quot;
      rngl_le := Z.le |}.
 
 Existing Instance Z_ring_like_op.
@@ -80,7 +80,7 @@ Qed.
 
 Theorem Z_consistent :
   (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
-  (rngl_has_inv = false ∨ rngl_has_divi = false).
+  (rngl_has_inv = false ∨ rngl_has_quot = false).
 Proof. split; [ now right | now left ]. Qed.
 
 Definition Z_ring_like_prop : ring_like_prop Z :=
@@ -108,9 +108,9 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := NA;
      rngl_opt_mul_inv_r := NA;
-     rngl_opt_mul_div_l := Z_mul_div_l;
-     rngl_opt_mul_div_r := NA;
-     rngl_opt_div_div_div_mul := Z.quot_quot;
+     rngl_opt_mul_quot_l := Z_mul_div_l;
+     rngl_opt_mul_quot_r := NA;
+     rngl_opt_quot_quot_quot_mul := Z.quot_quot;
      rngl_opt_eq_dec := Z.eq_dec;
      rngl_opt_le_dec := Z_le_dec;
      rngl_opt_integral := Z_eq_mul_0;

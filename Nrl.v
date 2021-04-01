@@ -15,7 +15,7 @@ Canonical Structure nat_ring_like_op : ring_like_op nat :=
      rngl_opt_opp := None;
      rngl_opt_inv := None;
      rngl_opt_sous := Some Nat.sub;
-     rngl_opt_divi := Some Nat.div;
+     rngl_opt_quot := Some Nat.div;
      rngl_le := Nat.le |}.
 
 Existing Instance nat_ring_like_op.
@@ -71,7 +71,7 @@ Qed.
 
 Theorem Nat_consistent :
   (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
-  (rngl_has_inv = false ∨ rngl_has_divi = false).
+  (rngl_has_inv = false ∨ rngl_has_quot = false).
 Proof. now split; left. Qed.
 
 Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
@@ -99,9 +99,9 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := NA;
      rngl_opt_mul_inv_r := NA;
-     rngl_opt_mul_div_l := Nat_mul_div_l;
-     rngl_opt_mul_div_r := NA;
-     rngl_opt_div_div_div_mul := Nat.div_div;
+     rngl_opt_mul_quot_l := Nat_mul_div_l;
+     rngl_opt_mul_quot_r := NA;
+     rngl_opt_quot_quot_quot_mul := Nat.div_div;
      rngl_opt_eq_dec := Nat.eq_dec;
      rngl_opt_le_dec := le_dec;
      rngl_opt_integral := Nat_eq_mul_0;
@@ -221,7 +221,7 @@ Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
      rngl_opt_opp := Some (Zn_opp n);
      rngl_opt_inv := if is_prime n then Some (Zn_inv n) else None;
      rngl_opt_sous := None;
-     rngl_opt_divi := None;
+     rngl_opt_quot := None;
      rngl_le := Zn_le n |}.
 
 Existing Instance Zn_ring_like_op.
@@ -446,7 +446,7 @@ Qed.
 
 Theorem Zn_consistent :
   (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
-  (rngl_has_inv = false ∨ rngl_has_divi = false).
+  (rngl_has_inv = false ∨ rngl_has_quot = false).
 Proof. now split; right. Qed.
 
 Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
@@ -474,9 +474,9 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := Zn_opt_mul_inv_l;
      rngl_opt_mul_inv_r := Zn_opt_mul_inv_r;
-     rngl_opt_mul_div_l := NA;
-     rngl_opt_mul_div_r := NA;
-     rngl_opt_div_div_div_mul := NA;
+     rngl_opt_mul_quot_l := NA;
+     rngl_opt_mul_quot_r := NA;
+     rngl_opt_quot_quot_quot_mul := NA;
      rngl_opt_eq_dec := Zn_eq_dec;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;
