@@ -94,8 +94,6 @@ Definition qi_eucl_div {d} (a b : quad_int d) :=
   let r := (a - b * q)%QI in
   (q, r).
 
-...
-
 (*
  Par exemple :
 si a=−6+17i et si b=7+i on tape :
@@ -111,9 +109,7 @@ Compute let '(a, b) := (mk_qi (-1) (-6) 17, mk_qi (-1) 7 1) in (a, b, qi_eucl_di
      = (〈 -6 + 17 𝑖 〉%QI, 〈 7 + 1 𝑖 〉%QI, (〈 -1 + 2 𝑖 〉%QI, 〈 3 + 4 𝑖 〉%QI))
 *)
 
-...
 Compute let '(a, b) := (mk_qi (-1) 7 1, mk_qi (-1) 4 (-3)) in (a, b, qi_eucl_div a b).
-...
 
 (* remainder always same sign as divisor *)
 Compute let '(a, b) := (9, 4) in
@@ -182,9 +178,7 @@ Definition quad_int_ring_like_op {d} : ring_like_op (quad_int d) :=
      rngl_opt_opp := Some (@qi_opp d);
      rngl_opt_inv := None;
      rngl_opt_sous := None;
-     rngl_opt_eucl_div :=
-       if In_dec Z.eq_dec d having_eucl_div then Some (qi_eucl_div, qi_gauge)
-       else None;
+     rngl_opt_divi := None;
      rngl_le := phony_qi_le |}.
 
 Compute (mk_qi (-1) (- 36) 242 / mk_qi (-1) 50 50)%QI.
@@ -787,6 +781,7 @@ rewrite <- Hk in Hnz.
 now rewrite Zabs2Nat.inj_mul in Hnz.
 Qed.
 
+(*
 Theorem quad_int_eucl_div :
   if rngl_has_eucl_div then
     ∀ a b q r : quad_int d,
@@ -962,59 +957,79 @@ destruct (Z_le_dec 0 r'₁) as [H| H]; [ clear H | flia H Himr ].
 Search (Z.abs_nat _ < Z.abs_nat _).
       subst d'₁.
 ...
+*)
+
+Theorem quad_int_eq_dec : ∀ a b : quad_int d, {a = b} + {a ≠ b}.
+Proof.
+intros.
+destruct a as (a, a').
+destruct b as (b, b').
+destruct (Z.eq_dec a b) as [Hab| Hab]. {
+  subst b.
+  destruct (Z.eq_dec a' b') as [Hab'| Hab']. {
+    subst b'.
+    now left.
+  } {
+    right.
+    intros H.
+    now injection H.
+  }
+} {
+  right.
+  intros H.
+  now injection H.
+}
+Qed.
+
+Theorem quad_int_opt_integral : ∀ a b : quad_int d,
+  (a * b)%QI = 0%QI → a = 0%QI ∨ b = 0%QI.
+Proof.
+intros * Hab.
+destruct a as (a, a').
+destruct b as (b, b').
+unfold qi_mul, qi_zero in Hab.
+injection Hab; clear Hab; intros H1 H2.
+(* perhaps useless: try to implement rngl_divi first *)
+...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
   {| rngl_is_comm := true;
      rngl_has_dec_eq := true;
-     rngl_has_dec_le := true;
+     rngl_has_dec_le := false;
      rngl_has_1_neq_0 := true;
-     rngl_is_ordered := true;
+     rngl_is_ordered := false;
      rngl_is_integral := true;
      rngl_characteristic := 0;
-     rngl_add_comm := quad_int_add_comm;
-     rngl_add_assoc := quad_int_add_assoc;
-     rngl_add_0_l := quad_int_add_0_l;
-     rngl_mul_assoc := quad_int_mul_assoc;
-     rngl_mul_1_l := quad_int_mul_1_l;
-     rngl_mul_add_distr_l := quad_int_mul_add_distr_l;
-     rngl_opt_1_neq_0 := quad_int_neq_1_0;
-     rngl_opt_mul_comm := quad_int_mul_comm;
+     rngl_add_comm := @quad_int_add_comm d;
+     rngl_add_assoc := @quad_int_add_assoc d;
+     rngl_add_0_l := @quad_int_add_0_l d;
+     rngl_mul_assoc := @quad_int_mul_assoc d;
+     rngl_mul_1_l := @quad_int_mul_1_l d;
+     rngl_mul_add_distr_l := @quad_int_mul_add_distr_l d;
+     rngl_opt_1_neq_0 := @quad_int_neq_1_0 d;
+     rngl_opt_mul_comm := @quad_int_mul_comm d;
      rngl_opt_mul_1_r := NA;
      rngl_opt_mul_add_distr_r := NA;
-     rngl_opt_add_opp_l := quad_int_add_opp_l;
+     rngl_opt_add_opp_l := @quad_int_add_opp_l d;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_sub_sub_add := NA;
      rngl_opt_mul_sub_distr_l := NA;
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := NA;
      rngl_opt_mul_inv_r := NA;
-     rngl_opt_eucl_div_prop := quad_int_eucl_div |}.
-     rngl_opt_gauge_prop := ?rngl_opt_gauge_prop;
-     rngl_opt_eq_dec := ?rngl_opt_eq_dec;
-     rngl_opt_le_dec := ?rngl_opt_le_dec;
-     rngl_opt_integral := ?rngl_opt_integral;
-     rngl_characteristic_prop := ?rngl_characteristic_prop;
-     rngl_opt_le_refl := ?rngl_opt_le_refl;
-     rngl_opt_le_antisymm := ?rngl_opt_le_antisymm;
-     rngl_opt_le_trans := ?rngl_opt_le_trans;
-     rngl_opt_add_le_compat := ?rngl_opt_add_le_compat;
-     rngl_opt_mul_le_compat_nonneg := ?rngl_opt_mul_le_compat_nonneg;
-     rngl_opt_mul_le_compat_nonpos := ?rngl_opt_mul_le_compat_nonpos;
-     rngl_opt_mul_le_compat := ?rngl_opt_mul_le_compat;
-     rngl_opt_not_le := ?rngl_opt_not_le;
-     rngl_consistent := ?rngl_consistent |}.
-...
-     rngl_opt_gauge_prop := ?rngl_opt_gauge_prop;
-     rngl_opt_eq_dec := Nat.eq_dec;
-     rngl_opt_le_dec := le_dec;
-     rngl_opt_integral := Nat_eq_mul_0;
-     rngl_characteristic_prop := nat_characteristic_prop;
-     rngl_opt_le_refl := Nat.le_refl;
-     rngl_opt_le_antisymm := Nat.le_antisymm;
-     rngl_opt_le_trans := Nat.le_trans;
-     rngl_opt_add_le_compat := Nat.add_le_mono;
+     rngl_opt_mul_div_l := NA;
+     rngl_opt_mul_div_r := NA;
+     rngl_opt_div_div_div_mul := NA;
+     rngl_opt_eq_dec := quad_int_eq_dec;
+     rngl_opt_le_dec := NA;
+     rngl_opt_integral := quad_int_opt_integral;
+     rngl_characteristic_prop := NA;
+     rngl_opt_le_refl := NA;
+     rngl_opt_le_antisymm := NA;
+     rngl_opt_le_trans := NA;
+     rngl_opt_add_le_compat := NA;
      rngl_opt_mul_le_compat_nonneg := NA;
      rngl_opt_mul_le_compat_nonpos := NA;
-     rngl_opt_mul_le_compat := Nat_mul_le_compat;
-     rngl_opt_not_le := Nat_not_le;
-     rngl_consistent := Nat_consistent |}.
+     rngl_opt_mul_le_compat := NA;
+     rngl_opt_not_le := NA;
+     rngl_consistent := NA |}.
