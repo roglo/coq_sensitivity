@@ -1004,6 +1004,17 @@ destruct z as [| p| p]; [ now subst one | | ]. {
 }
 Qed.
 
+Theorem quad_int_mul_quot_l : ∀ a b : quad_int d,
+  a ≠ 0%QI
+  → (a * b / a)%QI = b.
+Proof.
+intros * Haz.
+unfold qi_mul, qi_quot; cbn.
+destruct a as (a, a').
+destruct b as (b, b'); cbn.
+f_equal. {
+...
+
 Theorem quad_int_consistent :
   (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
   (rngl_has_inv = false ∨ rngl_has_quot = true).
@@ -1034,8 +1045,8 @@ Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := NA;
      rngl_opt_mul_inv_r := NA;
+     rngl_opt_mul_quot_l := quad_int_mul_quot_l;
      rngl_opt_mul_quot_l := NA;
-...
      rngl_opt_mul_quot_r := NA;
      rngl_opt_quot_quot_quot_mul := NA;
      rngl_opt_eq_dec := quad_int_eq_dec;
