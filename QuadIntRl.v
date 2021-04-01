@@ -1021,6 +1021,16 @@ f_equal. {
   rewrite <- Z.mul_assoc.
   do 2 rewrite <- Z.pow_2_r.
   apply Z.quot_mul.
+  intros H; apply Haz; clear Haz.
+  apply -> Z.sub_move_0_r in H.
+  do 2 rewrite Z.pow_2_r in H.
+  rewrite Z.mul_assoc in H.
+  apply square_free_not_mul_square in H; [ | easy | ]. {
+    now destruct H; subst a a'.
+  } {
+    now apply square_free_not_square.
+  }
+} {
 ...
 
 Theorem quad_int_consistent :
