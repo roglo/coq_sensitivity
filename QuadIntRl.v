@@ -992,13 +992,49 @@ injection Hab; clear Hab; intros H1 H2.
 (* perhaps useless: try to implement rngl_divi first *)
 ...
 
+Theorem quad_int_characteristic_prop : ∀ i : nat, rngl_of_nat (S i) ≠ 0%QI.
+Proof.
+(* proof perhaps a little bit complicated; maybe simpler proof to find *)
+intros * Hi; cbn in Hi.
+unfold qi_add, qi_zero in Hi.
+remember 1%QI as one eqn:Hone.
+injection Hi; clear Hi; intros H1 H2.
+remember (qi_re (rngl_of_nat i)) as z eqn:Hz; symmetry in Hz.
+destruct z as [| p| p]; [ now subst one | | ]. {
+  rewrite Z.add_comm in H2.
+  subst one; cbn in H2.
+  specialize (Pos2Z.is_pos (p + 1)) as H3.
+  flia H2 H3.
+} {
+  subst one; cbn in Hz.
+  specialize (Pos2Z.neg_is_neg p) as H3.
+  rewrite <- Hz in H3.
+  apply Z.nle_gt in H3; apply H3; clear H3.
+  clear H1 Hz H2 p.
+  induction i; [ easy | cbn ].
+  remember (qi_re (rngl_of_nat i)) as z eqn:Hz; symmetry in Hz.
+  destruct z as [| p| p]; [ easy | | ]. {
+    apply Pos2Z.is_nonneg.
+  } {
+    apply Z.nlt_ge in IHi.
+    exfalso; apply IHi.
+    apply Pos2Z.neg_is_neg.
+  }
+}
+Qed.
+
+Theorem quad_int_consistent :
+  (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
+  (rngl_has_inv = false ∨ rngl_has_divi = false).
+Proof. now split; right. Qed.
+
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
   {| rngl_is_comm := true;
      rngl_has_dec_eq := true;
      rngl_has_dec_le := false;
      rngl_has_1_neq_0 := true;
      rngl_is_ordered := false;
-     rngl_is_integral := true;
+     rngl_is_integral := false;
      rngl_characteristic := 0;
      rngl_add_comm := @quad_int_add_comm d;
      rngl_add_assoc := @quad_int_add_assoc d;
@@ -1022,8 +1058,8 @@ Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
      rngl_opt_div_div_div_mul := NA;
      rngl_opt_eq_dec := quad_int_eq_dec;
      rngl_opt_le_dec := NA;
-     rngl_opt_integral := quad_int_opt_integral;
-     rngl_characteristic_prop := NA;
+     rngl_opt_integral := NA;
+     rngl_characteristic_prop := quad_int_characteristic_prop;
      rngl_opt_le_refl := NA;
      rngl_opt_le_antisymm := NA;
      rngl_opt_le_trans := NA;
@@ -1032,4 +1068,4 @@ Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
      rngl_opt_mul_le_compat_nonpos := NA;
      rngl_opt_mul_le_compat := NA;
      rngl_opt_not_le := NA;
-     rngl_consistent := NA |}.
+     rngl_consistent := quad_int_consistent |}.
