@@ -1013,6 +1013,14 @@ unfold qi_mul, qi_quot; cbn.
 destruct a as (a, a').
 destruct b as (b, b'); cbn.
 f_equal. {
+  remember (_ + _) as z eqn:Hz.
+  ring_simplify in Hz; subst z.
+  rewrite Z.mul_comm, <- Z.mul_assoc.
+  rewrite <- Z.mul_sub_distr_l.
+  rewrite Z.mul_opp_r, Z.add_opp_r.
+  rewrite <- Z.mul_assoc.
+  do 2 rewrite <- Z.pow_2_r.
+  apply Z.quot_mul.
 ...
 
 Theorem quad_int_consistent :
