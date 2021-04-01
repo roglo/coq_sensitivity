@@ -962,17 +962,6 @@ destruct (Z.eq_dec a b) as [Hab| Hab]. {
 }
 Qed.
 
-Theorem quad_int_opt_integral : ∀ a b : quad_int d,
-  (a * b)%QI = 0%QI → a = 0%QI ∨ b = 0%QI.
-Proof.
-intros * Hab.
-destruct a as (a, a').
-destruct b as (b, b').
-unfold qi_mul, qi_zero in Hab.
-injection Hab; clear Hab; intros H1 H2.
-(* perhaps useless: try to implement rngl_divi first *)
-Abort.
-
 Theorem quad_int_characteristic_prop : ∀ i : nat, rngl_of_nat (S i) ≠ 0%QI.
 Proof.
 (* proof perhaps a little bit complicated; maybe simpler proof to find *)
@@ -1031,12 +1020,49 @@ f_equal. {
     now apply square_free_not_square.
   }
 } {
+  remember (_ + _) as z eqn:Hz.
+  ring_simplify in Hz; subst z.
+  rewrite <- Z.mul_sub_distr_r.
+  rewrite Z.mul_opp_r, Z.add_opp_r.
+  rewrite <- (Z.mul_assoc _ _ a').
+  do 2 rewrite <- Z.pow_2_r.
+  rewrite Z.mul_comm.
+  apply Z.quot_mul.
+  intros H; apply Haz; clear Haz.
+  apply -> Z.sub_move_0_r in H.
+  do 2 rewrite Z.pow_2_r in H.
+  rewrite Z.mul_assoc in H.
+  apply square_free_not_mul_square in H; [ | easy | ]. {
+    now destruct H; subst a a'.
+  } {
+    now apply square_free_not_square.
+  }
+}
+Qed.
+
+Theorem quad_int_quot_quot_quot_mul : ∀ a b c : quad_int d,
+  b ≠ 0%QI
+  → c ≠ 0%QI
+  → (a / b / c)%QI = (a / (b * c))%QI.
+Proof.
+intros * Hbz Hcz.
+unfold qi_mul, qi_quot; cbn.
+destruct a as (a, a').
+destruct b as (b, b').
+destruct c as (c, c'); cbn.
+f_equal. {
+  do 7 rewrite Z.mul_opp_r.
+  do 6 rewrite Z.add_opp_r.
+  remember (b * b - d * b' * b') as bb eqn:Hbb.
+  remember (c * c - d * c' * c') as cc eqn:Hcc.
+  remember (b * c + d * b' * c') as bc eqn:Hbc.
+  remember (b * c' + b' * c) as bc' eqn:Hbc'.
 ...
 
 Theorem quad_int_consistent :
-  (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
-  (rngl_has_inv = false ∨ rngl_has_quot = true).
-Proof. now split; right. Qed.
+ (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
+ (rngl_has_inv = false ∨ rngl_has_quot = false).
+Proof. split; [ now right | now left ]. Qed.
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
   {| rngl_is_comm := true;
@@ -1064,9 +1090,8 @@ Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
      rngl_opt_mul_inv_l := NA;
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_quot_l := quad_int_mul_quot_l;
-     rngl_opt_mul_quot_l := NA;
      rngl_opt_mul_quot_r := NA;
-     rngl_opt_quot_quot_quot_mul := NA;
+     rngl_opt_quot_quot_quot_mul := quad_int_quot_quot_quot_mul;
      rngl_opt_eq_dec := quad_int_eq_dec;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;
