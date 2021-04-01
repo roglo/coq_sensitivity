@@ -1057,8 +1057,19 @@ f_equal. {
   remember (c * c - d * c' * c') as cc eqn:Hcc.
   remember (b * c + d * b' * c') as bc eqn:Hbc.
   remember (b * c' + b' * c) as bc' eqn:Hbc'.
-Compute (mk_qi (-1) 120 150 / mk_qi (-1) 21 0 / mk_qi (-1) 2 0)%QI.
-Compute (mk_qi (-1) 120 150 / (mk_qi (-1) 21 0 * mk_qi (-1) 2 0))%QI.
+Compute (mk_qi (-1) 120 150 / mk_qi (-1) 21 3 / mk_qi (-1) 2 (-5))%QI.
+Compute (mk_qi (-1) 120 150 / (mk_qi (-1) 21 3 * mk_qi (-1) 2 (-5)))%QI.
+Compute (mk_qi 7 120 150 / mk_qi 7 21 3 / mk_qi 7 2 (-5))%QI.
+Compute (mk_qi 7 120 150 / (mk_qi 7 21 3 * mk_qi 7 2 (-5)))%QI.
+  ((a * b - d * a' * b') ÷ bb * c - d * ((- (a * b') + a' * b) ÷ bb) * c')
+...
+ ÷ cc =
+  (a * bc - d * a' * bc') ÷ (bc * bc - d * bc' * bc')
+remember (bc * bc - d * bc' * bc') as z eqn:Hz.
+rewrite Hbc, Hbc' in Hz.
+ring_simplify in Hz.
+remember ((b * b - d * b' * b') * (c * c - d * c' * c')) as t eqn:Ht.
+ring_simplify in Hz.
 ...
 
 Theorem quad_int_consistent :
