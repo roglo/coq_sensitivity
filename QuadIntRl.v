@@ -1109,6 +1109,25 @@ f_equal. {
      d * a' ^ 2 * b' * c)
   with
     ((a ^ 2 - d * a' ^ 2) * (b' * c - b * c')) by flia.
+About Z.quot.
+About Z.quotrem.
+Locate "/".
+Locate "÷".
+Require Import Zeuclid.
+Print ZEuclid.div.
+Print ZEuclid.modulo.
+Compute let (a, b) := (7, 4) in (a, b, ZEuclid.div a b, ZEuclid.modulo a b).
+Compute let (a, b) := (7, -4) in (a, b, ZEuclid.div a b, ZEuclid.modulo a b).
+Compute let (a, b) := (-7, -4) in (a, b, ZEuclid.div a b, ZEuclid.modulo a b).
+Compute let (a, b) := (-7, 4) in (a, b, ZEuclid.div a b, ZEuclid.modulo a b).
+...
+Search ZEuclid.div.
+Theorem glop : ∀ a b, ZEuclid.div a b = 42.
+Require Import ZDivEucl.
+Print ZEuclid.
+...
+
+Compute (7/
 ...
 
 Theorem quad_int_quot_quot_quot_mul : ∀ a b c : quad_int d,
