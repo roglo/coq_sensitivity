@@ -1061,7 +1061,10 @@ Compute (mk_qi (-1) 120 150 / mk_qi (-1) 21 3 / mk_qi (-1) 2 (-5))%QI.
 Compute (mk_qi (-1) 120 150 / (mk_qi (-1) 21 3 * mk_qi (-1) 2 (-5)))%QI.
 Compute (mk_qi 7 120 150 / mk_qi 7 21 3 / mk_qi 7 2 (-5))%QI.
 Compute (mk_qi 7 120 150 / (mk_qi 7 21 3 * mk_qi 7 2 (-5)))%QI.
+Search (_ * (_ ÷ _)).
 Search ((_ ÷ _) * _).
+Search (_ ÷ _ ÷ _).
+Search (_ / _ / _).
 ...
   ((a * b - d * a' * b') ÷ bb * c - d * ((- (a * b') + a' * b) ÷ bb) * c')
 (* ça n'a pas l'air vrai, encore que, mais j'aimerais trouver un
