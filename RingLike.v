@@ -914,7 +914,7 @@ destruct op. {
 }
 remember rngl_has_sous as mo eqn:Hmo.
 symmetry in Hmo.
-destruct mo; [ | now destruct Hom ].
+destruct mo; [ clear Hom | now destruct Hom ].
 specialize rngl_opt_sub_sub_sub_add as H1.
 rewrite Hmo in H1.
 rewrite <- H1.
