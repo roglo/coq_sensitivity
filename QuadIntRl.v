@@ -1040,6 +1040,46 @@ f_equal. {
 }
 Qed.
 
+Theorem glop : ∀ a b c : quad_int d,
+  a ≠ 0%QI
+  → c ≠ 0%QI
+  → ((a * b) / (a * c) = b / c)%QI.
+Proof.
+intros * Haz Hcz.
+unfold qi_mul, qi_quot; cbn.
+destruct a as (a, a').
+destruct b as (b, b').
+destruct c as (c, c'); cbn.
+f_equal. {
+  do 4 rewrite Z.mul_opp_r, Z.add_opp_r.
+  remember
+    ((a * c + d * a' * c') * (a * c + d * a' * c') -
+     d * (a * c' + a' * c) * (a * c' + a' * c)) as z eqn:Hz.
+  ring_simplify in Hz.
+  subst z.
+  remember
+    ((a * b + d * a' * b') * (a * c + d * a' * c') -
+     d * (a * b' + a' * b) * (a * c' + a' * c)) as z eqn:Hz.
+  ring_simplify in Hz.
+  subst z.
+  do 3 rewrite <- Z.mul_assoc.
+  rewrite <- Z.mul_sub_distr_l.
+  replace (b * d * a' ^ 2 * c) with (d * a' ^ 2 * (b * c)) by flia.
+  replace (d ^ 2 * a' ^ 2 * b' * c') with
+    (d * a' ^ 2 * (d * (b' * c'))) by flia.
+  rewrite <- Z.sub_sub_distr.
+  rewrite <- Z.mul_sub_distr_l.
+  rewrite <- Z.mul_sub_distr_r.
+  replace
+    (a ^ 2 * c ^ 2 - a ^ 2 * d * c' ^ 2 - c ^ 2 * d * a' ^ 2 +
+     d ^ 2 * a' ^ 2 * c' ^ 2)
+  with
+    ((a ^ 2 - d * a' ^ 2) * (c ^ 2 - d * c' ^ 2)) by flia.
+  do 2 rewrite <- Z.mul_assoc.
+  do 2 rewrite <- Z.pow_2_r.
+  rewrite Z.quot_mul_cancel_l; [ easy | | ].
+...
+
 Theorem quad_int_quot_quot_quot_mul : ∀ a b c : quad_int d,
   b ≠ 0%QI
   → c ≠ 0%QI
