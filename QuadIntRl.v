@@ -993,6 +993,21 @@ destruct z as [| p| p]; [ now subst one | | ]. {
 }
 Qed.
 
+Theorem eq_quad_int_norm_zero : ∀ a a',
+  a ^ 2 - d * a' ^ 2 = 0
+  → 〈 a + a' √d 〉%QI = 0%QI.
+Proof.
+intros * H.
+apply -> Z.sub_move_0_r in H.
+do 2 rewrite Z.pow_2_r in H.
+rewrite Z.mul_assoc in H.
+apply square_free_not_mul_square in H; [ | easy | ]. {
+  now destruct H; subst a a'.
+} {
+  now apply square_free_not_square.
+}
+Qed.
+
 Theorem quad_int_mul_quot_l : ∀ a b : quad_int d,
   a ≠ 0%QI
   → (a * b / a)%QI = b.
@@ -1029,14 +1044,7 @@ f_equal. {
   rewrite Z.mul_comm.
   apply Z.quot_mul.
   intros H; apply Haz; clear Haz.
-  apply -> Z.sub_move_0_r in H.
-  do 2 rewrite Z.pow_2_r in H.
-  rewrite Z.mul_assoc in H.
-  apply square_free_not_mul_square in H; [ | easy | ]. {
-    now destruct H; subst a a'.
-  } {
-    now apply square_free_not_square.
-  }
+  now apply eq_quad_int_norm_zero in H.
 }
 Qed.
 
@@ -1077,7 +1085,30 @@ f_equal. {
     ((a ^ 2 - d * a' ^ 2) * (c ^ 2 - d * c' ^ 2)) by flia.
   do 2 rewrite <- Z.mul_assoc.
   do 2 rewrite <- Z.pow_2_r.
-  rewrite Z.quot_mul_cancel_l; [ easy | | ].
+  rewrite Z.quot_mul_cancel_l; [ easy | | ]. {
+    intros H; apply Hcz; clear Hcz.
+    now apply eq_quad_int_norm_zero in H.
+  } {
+    intros H; apply Haz; clear Haz.
+    now apply eq_quad_int_norm_zero in H.
+  }
+} {
+  do 4 rewrite Z.mul_opp_r.
+  do 2 rewrite Z.add_opp_r.
+  remember
+    ((a * c + d * a' * c') * (a * c + d * a' * c') -
+     d * (a * c' + a' * c) * (a * c' + a' * c)) as z eqn:Hz.
+  ring_simplify in Hz.
+  subst z.
+  remember
+    (- ((a * b + d * a' * b') * (a * c' + a' * c)) +
+     (a * b' + a' * b) * (a * c + d * a' * c')) as z eqn:Hz.
+  ring_simplify in Hz; subst z.
+  replace
+    (- a ^ 2 * b * c' + a ^ 2 * b' * c + b * d * a' ^ 2 * c' -
+     d * a' ^ 2 * b' * c)
+  with
+    ((a ^ 2 - d * a' ^ 2) * (b' * c - b * c')) by flia.
 ...
 
 Theorem quad_int_quot_quot_quot_mul : ∀ a b c : quad_int d,
