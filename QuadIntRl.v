@@ -704,6 +704,8 @@ destruct z as [| z| z]; [ easy | | ]. {
 }
 Qed.
 
+Require Import Zeuclid.
+
 Section a.
 
 Context [d : Z].
@@ -761,184 +763,6 @@ apply Nat.mod_same.
 rewrite <- Hk in Hnz.
 now rewrite Zabs2Nat.inj_mul in Hnz.
 Qed.
-
-(*
-Theorem quad_int_eucl_div :
-  if rngl_has_eucl_div then
-    ∀ a b q r : quad_int d,
-    b ≠ 0%F
-    → rngl_eucl_div a b = (q, r)
-    → a = (b * q + r)%F ∧ (rngl_gauge r < rngl_gauge b)%nat
-  else not_applicable.
-Proof.
-unfold rngl_has_eucl_div, rngl_eucl_div, rngl_gauge.
-cbn - [ In_dec ].
-destruct (in_dec Z.eq_dec d having_eucl_div) as [Hhed| Hhed]; [ cbn | easy ].
-intros * Hbz Hab.
-unfold qi_quot in Hab.
-set (bb := qi_re (b * qi_conj b)) in Hab.
-remember (Z.quotrem (qi_re (a * qi_conj b)) bb) as γr eqn:Hγr.
-symmetry in Hγr.
-destruct γr as (γ₁, r₁).
-remember (Z.quotrem (qi_im (a * qi_conj b)) bb) as γr' eqn:Hγr'.
-symmetry in Hγr'.
-destruct γr' as (γ'₁, r'₁).
-move γ'₁ before γ₁.
-move r'₁ before r₁.
-unfold delta_quot in Hab.
-remember (if Z_le_dec _ _ then _ else _) as d₁ eqn:Hd₁ in Hab.
-remember (if Z_le_dec _ _ then _ else _) as d'₁ eqn:Hd'₁ in Hab.
-move d'₁ before d₁.
-injection Hab; clear Hab; intros Hr Hq.
-symmetry in Hr, Hq.
-rewrite <- Hq in Hr.
-split. {
-  rewrite Hr.
-  rewrite quad_int_add_sub_assoc.
-  rewrite quad_int_add_comm.
-  symmetry.
-  apply quad_int_add_sub.
-}
-unfold qi_gauge.
-fold bb.
-assert (Hbbz : bb ≠ 0). {
-  intros H2; apply Hbz.
-  unfold bb in H2.
-  destruct b as (b₁, b'₁).
-  cbn in H2.
-  rewrite Z.mul_opp_r in H2.
-  apply Z.add_move_0_r in H2.
-  rewrite Z.opp_involutive in H2.
-  unfold qi_zero.
-  apply square_free_not_mul_square in H2; [ | easy | ]. 2: {
-    now apply square_free_not_square.
-  }
-  now destruct H2; subst b₁ b'₁.
-}
-specialize (Z_div_mod_full (qi_re (a * qi_conj b)) bb Hbbz) as H1.
-rewrite Hγr in H1.
-specialize (Z_div_mod_full (qi_im (a * qi_conj b)) bb Hbbz) as H2.
-rewrite Hγr' in H2.
-destruct H1 as (Hre, Hrer).
-destruct H2 as (Him, Himr).
-move Him before Hre.
-unfold Remainder in Hrer, Himr.
-set (rr := qi_re (r * qi_conj r)).
-move rr before bb.
-assert
-  (Hrb : (〈 r₁ + r'₁ √ d 〉 = r * qi_conj b + 〈 (bb * d₁) + (bb * d'₁) √ d 〉)%QI). {
-  rewrite Hr.
-  rewrite quad_int_mul_sub_distr_r.
-  rewrite <- (qi_re_im (a * qi_conj b)%QI).
-  rewrite Hre, Him.
-  rewrite <- quad_int_add_sub_swap.
-  rewrite quad_int_add_re_im.
-  rewrite quad_int_add_add_swap.
-  rewrite <- quad_int_add_re_im.
-  do 2 rewrite <- Z.mul_add_distr_l.
-  rewrite quad_int_mul_re_im.
-  rewrite <- Hq.
-  rewrite (quad_int_mul_comm b).
-  rewrite <- quad_int_mul_assoc.
-  rewrite quad_int_add_sub_swap.
-  rewrite (quad_int_mul_comm q).
-  rewrite <- quad_int_mul_sub_distr_r.
-  rewrite quad_int_add_comm.
-  apply quad_int_sub_move_r.
-  rewrite quad_int_sub_diag; symmetry.
-  rewrite <- (qi_re_im (b * qi_conj b)%QI).
-  fold bb.
-  rewrite qi_im_mul_conj.
-  rewrite quad_int_sub_diag.
-  apply quad_int_mul_0_l.
-}
-(* mmm... c'est compliqué... mais en tous cas, pour l'instant, il
-   n'y a pas de contraintes sur la valeur de d, à part de n'avoir
-   pas de facteur carré (square free) ; mais normalement, la
-   condition sur la jauge n'est censée marcher que sur
-   la liste having_eucl_div, bien que... bon, ma définition est
-   incorrecte sur les d=4n+1 (je fais des ℤ(√d) au lieu de ℚ(√d)) *)
-(* voyons avec d=-1, les entiers de Gauss *)
-destruct (Z.eq_dec d (-1)) as [Hdm1| Hdm1]. {
-  move Hdm1 at top; subst d.
-  clear Hd1 Hhed Hdsqu.
-  move q at top; move b at top; move a at top.
-  assert (Hbbp : 0 < bb). {
-    unfold bb.
-...
-}
-destruct Hrer as [Hrer| Hrer]; [ | flia Hrer Hbbp ].
-destruct Himr as [Himr| Himr]; [ | flia Himr Hbbp ].
-destruct (Z_le_dec 0 r₁) as [H| H]; [ clear H | flia H Hrer ].
-destruct (Z_le_dec 0 r'₁) as [H| H]; [ clear H | flia H Himr ].
-  destruct (Z_le_dec (2 * r₁) bb) as [Hrbb| Hrbb]. {
-    subst d₁.
-    destruct (Z_le_dec (2 * r'₁) bb) as [Hr'bb| Hr'bb]. {
-      subst d'₁.
-      do 2 rewrite Z.add_0_r in Hq.
-      rewrite Z.mul_0_r in Hrb.
-      rewrite quad_int_add_0_r in Hrb.
-      symmetry in Hrb.
-      set (rq := (r * qi_conj b)%QI) in Hrb.
-      assert (H1 : (rq * qi_conj rq = 〈 (r₁ ^ 2 + r'₁ ^ 2) 〉)%QI). {
-        rewrite <- (qi_re_im (rq * qi_conj rq)%QI).
-        rewrite qi_im_mul_conj.
-        rewrite qi_re_mul_conj.
-        f_equal.
-        unfold Z.sub.
-        rewrite <- Z.mul_opp_l.
-        rewrite Z.mul_1_l.
-        now rewrite Hrb.
-      }
-      apply (f_equal (qi_mul (mk_qi _ 4 0))) in H1.
-      unfold qi_mul in H1 at 3.
-      unfold qi_im in H1.
-      do 2 rewrite Z.mul_0_r in H1.
-      rewrite Z.mul_0_l in H1.
-      do 2 rewrite Z.add_0_r in H1.
-      cbn - [ qi_mul Z.pow Z.mul ] in H1.
-      rewrite Z.mul_add_distr_l in H1.
-      replace 4 with (2 ^ 2) in H1 by easy.
-      do 2 rewrite <- Z.pow_mul_l in H1.
-      unfold rq in H1.
-      rewrite qi_conj_mul in H1.
-      rewrite qi_conj_involutive in H1.
-      rewrite (quad_int_mul_mul_swap) in H1.
-      rewrite (quad_int_mul_assoc r) in H1.
-      rewrite <- (qi_re_im (r * qi_conj r)%QI) in H1.
-      fold rr in H1.
-      rewrite qi_im_mul_conj in H1.
-      rewrite <- quad_int_mul_assoc in H1.
-      rewrite <- (qi_re_im (b * qi_conj b)%QI) in H1.
-      fold bb in H1.
-      rewrite qi_im_mul_conj in H1.
-      do 2 rewrite quad_int_mul_re_re in H1.
-      rewrite Z.mul_assoc in H1.
-      remember (_ * _ * _) as x eqn:Hx in H1.
-      remember (_ + _) as y eqn:Hy in H1.
-      injection H1; clear H1; intros H1; subst x y.
-      assert (H2 : 2 ^ 2 * rr * bb <= bb ^ 2 + bb ^ 2). {
-        rewrite H1.
-        apply Z.add_le_mono. {
-          apply Z.pow_le_mono_l.
-          split; [ flia Hrer | easy ].
-        } {
-          apply Z.pow_le_mono_l.
-          split; [ flia Himr | easy ].
-        }
-      }
-      do 2 rewrite Z.pow_2_r in H2.
-      rewrite <- Z.mul_add_distr_r in H2.
-      apply Z.mul_le_mono_pos_r in H2; [ | flia Hrer ].
-      replace (bb + bb) with (2 * bb) in H2 by flia.
-      rewrite <- Z.mul_assoc in H2.
-      apply Z.mul_le_mono_pos_l in H2; [ | flia Hrer ].
-...
-    } {
-Search (Z.abs_nat _ < Z.abs_nat _).
-      subst d'₁.
-...
-*)
 
 Theorem quad_int_eq_dec : ∀ a b : quad_int d, {a = b} + {a ≠ b}.
 Proof.
@@ -1109,11 +933,66 @@ f_equal. {
      d * a' ^ 2 * b' * c)
   with
     ((a ^ 2 - d * a' ^ 2) * (b' * c - b * c')) by flia.
+  replace
+    (a ^ 2 * c ^ 2 - a ^ 2 * d * c' ^ 2 - c ^ 2 * d * a' ^ 2 +
+     d ^ 2 * a' ^ 2 * c' ^ 2)
+  with
+    ((a ^ 2 - d * a' ^ 2) * (c * c - d * c' * c')) by flia.
+  rewrite Z.add_opp_l.
+  rewrite <- Z.mul_assoc.
+  do 2 rewrite <- Z.pow_2_r.
+  rewrite Z.quot_mul_cancel_l; [ easy | | ]. {
+    intros H; apply Hcz; clear Hcz.
+    now apply eq_quad_int_norm_zero in H.
+  } {
+    intros H; apply Haz; clear Haz.
+    now apply eq_quad_int_norm_zero in H.
+  }
+}
+Qed.
+
+Definition qi_eucl_quot d (α β : quad_int d) :=
+  let ab := qi_mul α (qi_conj β) in
+  let bb := qi_mul β (qi_conj β) in
+  mk_qi d (ZEuclid.div (qi_re ab) (qi_re bb))
+    (ZEuclid.div (qi_im ab) (qi_re bb)).
+
+Theorem quad_int_quot_quot_quot_mul : ∀ a b c : quad_int d,
+  b ≠ 0%QI
+  → c ≠ 0%QI
+  → qi_eucl_quot (qi_eucl_quot a b) c = qi_eucl_quot a (b * c)%QI.
+Proof.
+intros * Hbz Hcz.
+unfold qi_mul, qi_eucl_quot; cbn.
+destruct a as (a, a').
+destruct b as (b, b').
+destruct c as (c, c'); cbn.
+f_equal. {
+  do 7 rewrite Z.mul_opp_r.
+  do 6 rewrite Z.add_opp_r.
+  remember (b * b - d * b' * b') as bb eqn:Hbb.
+  remember (c * c - d * c' * c') as cc eqn:Hcc.
+  remember (b * c + d * b' * c') as bc eqn:Hbc.
+  remember (b * c' + b' * c) as bc' eqn:Hbc'.
+  rewrite Z.add_opp_l.
+  unfold ZEuclid.div.
+  cbn.
+...
+Compute (mk_qi (-1) 120 150 / mk_qi (-1) 21 3 / mk_qi (-1) 2 (-5))%QI.
+Compute (mk_qi (-1) 120 150 / (mk_qi (-1) 21 3 * mk_qi (-1) 2 (-5)))%QI.
+Compute (mk_qi 7 120 150 / mk_qi 7 21 3 / mk_qi 7 2 (-5))%QI.
+Compute (mk_qi 7 120 150 / (mk_qi 7 21 3 * mk_qi 7 2 (-5)))%QI.
+Search (_ * (_ ÷ _)).
+Search ((_ ÷ _) * _).
+Search (_ ÷ _ ÷ _).
+Search (_ / _ / _).
+...
+
+...
 About Z.quot.
 About Z.quotrem.
 Locate "/".
 Locate "÷".
-Require Import Zeuclid.
 Print ZEuclid.div.
 Print ZEuclid.modulo.
 Compute let (a, b) := (7, 4) in (a, b, ZEuclid.div a b, ZEuclid.modulo a b).
