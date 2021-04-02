@@ -872,6 +872,11 @@ f_equal. {
 }
 Qed.
 
+...
+
+(* dois-je prendre ce théorème ci-dessous comme propriété
+   de base pour la "division" dans les espèces d'anneaux ? *)
+
 Theorem glop : ∀ a b c : quad_int d,
   a ≠ 0%QI
   → c ≠ 0%QI
@@ -950,105 +955,6 @@ f_equal. {
   }
 }
 Qed.
-
-Definition qi_eucl_quot d (α β : quad_int d) :=
-  let ab := qi_mul α (qi_conj β) in
-  let bb := qi_mul β (qi_conj β) in
-  mk_qi d (ZEuclid.div (qi_re ab) (qi_re bb))
-    (ZEuclid.div (qi_im ab) (qi_re bb)).
-
-Theorem quad_int_quot_quot_quot_mul : ∀ a b c : quad_int d,
-  b ≠ 0%QI
-  → c ≠ 0%QI
-  → qi_eucl_quot (qi_eucl_quot a b) c = qi_eucl_quot a (b * c)%QI.
-Proof.
-intros * Hbz Hcz.
-unfold qi_mul, qi_eucl_quot; cbn.
-destruct a as (a, a').
-destruct b as (b, b').
-destruct c as (c, c'); cbn.
-f_equal. {
-  do 7 rewrite Z.mul_opp_r.
-  do 6 rewrite Z.add_opp_r.
-  remember (b * b - d * b' * b') as bb eqn:Hbb.
-  remember (c * c - d * c' * c') as cc eqn:Hcc.
-  remember (b * c + d * b' * c') as bc eqn:Hbc.
-  remember (b * c' + b' * c) as bc' eqn:Hbc'.
-  rewrite Z.add_opp_l.
-  unfold ZEuclid.div.
-  cbn.
-  unfold Z.sgn, Z.abs; cbn.
-(* pfff... c'est trop compliqué... *)
-...
-Compute (mk_qi (-1) 120 150 / mk_qi (-1) 21 3 / mk_qi (-1) 2 (-5))%QI.
-Compute (mk_qi (-1) 120 150 / (mk_qi (-1) 21 3 * mk_qi (-1) 2 (-5)))%QI.
-Compute (mk_qi 7 120 150 / mk_qi 7 21 3 / mk_qi 7 2 (-5))%QI.
-Compute (mk_qi 7 120 150 / (mk_qi 7 21 3 * mk_qi 7 2 (-5)))%QI.
-Search (_ * (_ ÷ _)).
-Search ((_ ÷ _) * _).
-Search (_ ÷ _ ÷ _).
-Search (_ / _ / _).
-...
-
-...
-About Z.quot.
-About Z.quotrem.
-Locate "/".
-Locate "÷".
-Print ZEuclid.div.
-Print ZEuclid.modulo.
-Compute let (a, b) := (7, 4) in (a, b, ZEuclid.div a b, ZEuclid.modulo a b).
-Compute let (a, b) := (7, -4) in (a, b, ZEuclid.div a b, ZEuclid.modulo a b).
-Compute let (a, b) := (-7, -4) in (a, b, ZEuclid.div a b, ZEuclid.modulo a b).
-Compute let (a, b) := (-7, 4) in (a, b, ZEuclid.div a b, ZEuclid.modulo a b).
-...
-Search ZEuclid.div.
-Theorem glop : ∀ a b, ZEuclid.div a b = 42.
-Require Import ZDivEucl.
-Print ZEuclid.
-...
-
-Compute (7/
-...
-
-Theorem quad_int_quot_quot_quot_mul : ∀ a b c : quad_int d,
-  b ≠ 0%QI
-  → c ≠ 0%QI
-  → (a / b / c)%QI = (a / (b * c))%QI.
-Proof.
-intros * Hbz Hcz.
-unfold qi_mul, qi_quot; cbn.
-destruct a as (a, a').
-destruct b as (b, b').
-destruct c as (c, c'); cbn.
-f_equal. {
-  do 7 rewrite Z.mul_opp_r.
-  do 6 rewrite Z.add_opp_r.
-  remember (b * b - d * b' * b') as bb eqn:Hbb.
-  remember (c * c - d * c' * c') as cc eqn:Hcc.
-  remember (b * c + d * b' * c') as bc eqn:Hbc.
-  remember (b * c' + b' * c) as bc' eqn:Hbc'.
-Compute (mk_qi (-1) 120 150 / mk_qi (-1) 21 3 / mk_qi (-1) 2 (-5))%QI.
-Compute (mk_qi (-1) 120 150 / (mk_qi (-1) 21 3 * mk_qi (-1) 2 (-5)))%QI.
-Compute (mk_qi 7 120 150 / mk_qi 7 21 3 / mk_qi 7 2 (-5))%QI.
-Compute (mk_qi 7 120 150 / (mk_qi 7 21 3 * mk_qi 7 2 (-5)))%QI.
-Search (_ * (_ ÷ _)).
-Search ((_ ÷ _) * _).
-Search (_ ÷ _ ÷ _).
-Search (_ / _ / _).
-...
-  ((a * b - d * a' * b') ÷ bb * c - d * ((- (a * b') + a' * b) ÷ bb) * c')
-(* ça n'a pas l'air vrai, encore que, mais j'aimerais trouver un
-   contre-exemple pour m'en convaincre *)
-...
- ÷ cc =
-  (a * bc - d * a' * bc') ÷ (bc * bc - d * bc' * bc')
-remember (bc * bc - d * bc' * bc') as z eqn:Hz.
-rewrite Hbc, Hbc' in Hz.
-ring_simplify in Hz.
-remember ((b * b - d * b' * b') * (c * c - d * c' * c')) as t eqn:Ht.
-ring_simplify in Hz.
-...
 
 Theorem quad_int_consistent :
  (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
