@@ -977,6 +977,8 @@ f_equal. {
   rewrite Z.add_opp_l.
   unfold ZEuclid.div.
   cbn.
+  unfold Z.sgn, Z.abs; cbn.
+(* pfff... c'est trop compliqué... *)
 ...
 Compute (mk_qi (-1) 120 150 / mk_qi (-1) 21 3 / mk_qi (-1) 2 (-5))%QI.
 Compute (mk_qi (-1) 120 150 / (mk_qi (-1) 21 3 * mk_qi (-1) 2 (-5)))%QI.
