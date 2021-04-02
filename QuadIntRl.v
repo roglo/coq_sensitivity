@@ -43,6 +43,11 @@ Definition qi_quot d (α β : quad_int d) :=
   let bb := qi_mul β (qi_conj β) in
   mk_qi d (qi_re ab ÷ qi_re bb) (qi_im ab ÷ qi_re bb).
 
+Definition qi_div d (α β : quad_int d) :=
+  let ab := qi_mul α (qi_conj β) in
+  let bb := qi_mul β (qi_conj β) in
+  mk_qi d (qi_re ab / qi_re bb) (qi_im ab / qi_re bb).
+
 Declare Scope QI_scope.
 Delimit Scope QI_scope with QI.
 
@@ -55,7 +60,8 @@ Notation "- α" := (qi_opp α) : QI_scope.
 Notation "α + β" := (qi_add α β) : QI_scope.
 Notation "α * β" := (qi_mul α β) : QI_scope.
 Notation "α - β" := (qi_sub α β) : QI_scope.
-Notation "α / β" := (qi_quot α β) : QI_scope.
+Notation "α ÷ β" := (qi_quot α β) : QI_scope.
+Notation "α / β" := (qi_div α β) : QI_scope.
 Notation "'〈' a + b '√' d 〉" := (mk_qi d a b)
   (at level 1, a at level 35, b at level 35,
    format "〈  a  +  b  √ d  〉") : QI_scope.
@@ -138,9 +144,9 @@ Compute (qi_quot (mk_qi (-1) 36 242) (mk_qi (-1) 50 50)).
 Compute (mk_qi (-1) 0 1 * mk_qi (-1) 0 1)%QI.
 Check qi_quot 1%QI (mk_qi (-1) 0 1).
 Compute (qi_quot 1%QI (mk_qi (-1) 0 1)).
-Compute (1 / mk_qi (-1) 0 1)%QI.
-Compute (1 / mk_qi (-1) 0 (- 1))%QI.
-Compute (@qi_zero 42 / @qi_zero 42)%QI.
+Compute (1 ÷ mk_qi (-1) 0 1)%QI.
+Compute (1 ÷ mk_qi (-1) 0 (- 1))%QI.
+Compute (@qi_zero 42 ÷ @qi_zero 42)%QI.
 Check (mk_qi (-1) 0 3).
 Check (mk_qi (-1) 0 0).
 Check (mk_qi (-1) 2 (-3)).
@@ -162,17 +168,17 @@ Definition quad_int_ring_like_op {d} : ring_like_op (quad_int d) :=
      rngl_opt_quot := Some (@qi_quot d);
      rngl_le := phony_qi_le |}.
 
-Compute (mk_qi (-1) (- 36) 242 / mk_qi (-1) 50 50)%QI.
+Compute (mk_qi (-1) (- 36) 242 ÷ mk_qi (-1) 50 50)%QI.
 Compute (mk_qi (-1) 0 1 * mk_qi (-1) 0 1)%QI.
-Compute (1 / mk_qi (-1) 0 1)%QI.
-Compute (1 / mk_qi (-1) 0 (- 1))%QI.
-Compute (@qi_zero 42 / @qi_zero 42)%QI.
+Compute (1 ÷ mk_qi (-1) 0 1)%QI.
+Compute (1 ÷ mk_qi (-1) 0 (- 1))%QI.
+Compute (@qi_zero 42 ÷ @qi_zero 42)%QI.
 
-Compute (〈 -36 + 242 √-1 〉 / 〈 50 + 50 √-1 〉)%QI.
+Compute (〈 -36 + 242 √-1 〉 ÷ 〈 50 + 50 √-1 〉)%QI.
 Compute (〈 𝑖 〉 * 〈 𝑖 〉)%QI.
-Compute (1 / 〈 𝑖 〉)%QI.
-Compute (1 / 〈 - 𝑖 〉)%QI.
-Compute (〈 0 √42 〉 / 〈 0 √42 〉 )%QI.
+Compute (1 ÷ 〈 𝑖 〉)%QI.
+Compute (1 ÷ 〈 - 𝑖 〉)%QI.
+Compute (〈 0 √42 〉 ÷ 〈 0 √42 〉 )%QI.
 Check (mk_qi (-1) 3 2).
 Check (mk_qi (-1) 0 2).
 Compute (mk_qi (-1) 1 2 * mk_qi (-1) 1 (-2))%QI.
@@ -834,7 +840,7 @@ Qed.
 
 Theorem quad_int_mul_quot_l : ∀ a b : quad_int d,
   a ≠ 0%QI
-  → (a * b / a)%QI = b.
+  → (a * b ÷ a)%QI = b.
 Proof.
 intros * Haz.
 unfold qi_mul, qi_quot; cbn.
@@ -876,18 +882,18 @@ Search (_ / (_ * _)).
 Search (_ ÷ (_ * _)).
 Search (ZEuclid.div _ (_ * _)).
 Search (ZEuclid.div).
-...
+(*
 Z.div_div: ∀ a b c : Z, b ≠ 0 → 0 < c → a / b / c = a / (b * c)
 Z.quot_quot: ∀ a b c : Z, b ≠ 0 → c ≠ 0 → a ÷ b ÷ c = a ÷ (b * c)
-...
+*)
 
 (* dois-je prendre ce théorème ci-dessous comme propriété
-   de base pour la "division" dans les espèces d'anneaux ? *)
+   de base pour la "division" dans mes espèces d'anneaux ? *)
 
 Theorem glop : ∀ a b c : quad_int d,
   a ≠ 0%QI
   → c ≠ 0%QI
-  → ((a * b) / (a * c) = b / c)%QI.
+  → ((a * b) ÷ (a * c) = b ÷ c)%QI.
 Proof.
 intros * Haz Hcz.
 unfold qi_mul, qi_quot; cbn.
@@ -962,6 +968,93 @@ f_equal. {
   }
 }
 Qed.
+
+Theorem glip : ∀ a b c : quad_int d,
+  a ≠ 0%QI
+  → c ≠ 0%QI
+  → ((a * b) / (a * c) = b / c)%QI.
+Proof.
+intros * Haz Hcz.
+unfold qi_mul, qi_div; cbn.
+destruct a as (a, a').
+destruct b as (b, b').
+destruct c as (c, c'); cbn.
+f_equal. {
+  do 3 rewrite Z.mul_opp_r.
+  do 2 rewrite Z.add_opp_r.
+  remember
+    ((a * c + d * a' * c') * (a * c + d * a' * c') -
+     d * (a * c' + a' * c) * (a * c' + a' * c)) as z eqn:Hz.
+  ring_simplify in Hz.
+  subst z.
+  remember
+    ((a * b + d * a' * b') * (a * c + d * a' * c') -
+     d * (a * b' + a' * b) * (a * c' + a' * c)) as z eqn:Hz.
+  ring_simplify in Hz.
+  subst z.
+  do 3 rewrite <- Z.mul_assoc.
+  rewrite <- Z.mul_sub_distr_l.
+  replace (b * d * a' ^ 2 * c) with (d * a' ^ 2 * (b * c)) by flia.
+  replace (d ^ 2 * a' ^ 2 * b' * c') with
+    (d * a' ^ 2 * (d * (b' * c'))) by flia.
+  rewrite <- Z.sub_sub_distr.
+  rewrite <- Z.mul_sub_distr_l.
+  rewrite <- Z.mul_sub_distr_r.
+  replace
+    (a ^ 2 * c ^ 2 - a ^ 2 * d * c' ^ 2 - c ^ 2 * d * a' ^ 2 +
+     d ^ 2 * a' ^ 2 * c' ^ 2)
+  with
+    ((a ^ 2 - d * a' ^ 2) * (c ^ 2 - d * c' ^ 2)) by flia.
+  do 2 rewrite <- Z.mul_assoc.
+  do 2 rewrite Z.mul_opp_r.
+  do 2 rewrite Z.add_opp_r.
+  do 2 rewrite <- Z.pow_2_r.
+  rewrite Z.div_mul_cancel_l; [ easy | | ]. {
+    intros H; apply Hcz; clear Hcz.
+    now apply eq_quad_int_norm_zero in H.
+  } {
+    intros H; apply Haz; clear Haz.
+    now apply eq_quad_int_norm_zero in H.
+  }
+} {
+  do 4 rewrite Z.mul_opp_r.
+  do 2 rewrite Z.add_opp_r.
+  remember
+    ((a * c + d * a' * c') * (a * c + d * a' * c') -
+     d * (a * c' + a' * c) * (a * c' + a' * c)) as z eqn:Hz.
+  ring_simplify in Hz.
+  subst z.
+  remember
+    (- ((a * b + d * a' * b') * (a * c' + a' * c)) +
+     (a * b' + a' * b) * (a * c + d * a' * c')) as z eqn:Hz.
+  ring_simplify in Hz; subst z.
+  replace
+    (- a ^ 2 * b * c' + a ^ 2 * b' * c + b * d * a' ^ 2 * c' -
+     d * a' ^ 2 * b' * c)
+  with
+    ((a ^ 2 - d * a' ^ 2) * (b' * c - b * c')) by flia.
+  replace
+    (a ^ 2 * c ^ 2 - a ^ 2 * d * c' ^ 2 - c ^ 2 * d * a' ^ 2 +
+     d ^ 2 * a' ^ 2 * c' ^ 2)
+  with
+    ((a ^ 2 - d * a' ^ 2) * (c * c - d * c' * c')) by flia.
+  rewrite Z.add_opp_l.
+  rewrite <- Z.mul_assoc.
+  do 2 rewrite <- Z.pow_2_r.
+  rewrite Z.div_mul_cancel_l; [ easy | | ]. {
+    intros H; apply Hcz; clear Hcz.
+    now apply eq_quad_int_norm_zero in H.
+  } {
+    intros H; apply Haz; clear Haz.
+    now apply eq_quad_int_norm_zero in H.
+  }
+}
+Qed.
+
+Check glop.
+Check glip.
+
+...
 
 Theorem quad_int_consistent :
  (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
