@@ -879,7 +879,6 @@ Search (ZEuclid.div).
 ...
 Z.div_div: ∀ a b c : Z, b ≠ 0 → 0 < c → a / b / c = a / (b * c)
 Z.quot_quot: ∀ a b c : Z, b ≠ 0 → c ≠ 0 → a ÷ b ÷ c = a ÷ (b * c)
-
 ...
 
 (* dois-je prendre ce théorème ci-dessous comme propriété
