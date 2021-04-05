@@ -110,7 +110,6 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_quot_l := Z_mul_div_l;
      rngl_opt_mul_quot_r := NA;
-     rngl_opt_quot_quot_quot_mul := Z.quot_quot;
      rngl_opt_eq_dec := Z.eq_dec;
      rngl_opt_le_dec := Z_le_dec;
      rngl_opt_integral := Z_eq_mul_0;

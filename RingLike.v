@@ -189,10 +189,6 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if (rngl_has_quot && negb rngl_is_comm)%bool then
         ∀ a b, b ≠ 0%F → (a * b / b)%F = a
       else not_applicable;
-    rngl_opt_quot_quot_quot_mul :
-      if rngl_has_quot then
-        ∀ a b c, b ≠ 0%F → c ≠ 0%F → ((a / b) / c = a / (b * c))%F
-      else not_applicable;
     (* when equality is decidable *)
     rngl_opt_eq_dec :
       if rngl_has_dec_eq then ∀ a b : T, {a = b} + {a ≠ b}
