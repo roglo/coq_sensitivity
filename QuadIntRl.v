@@ -1054,8 +1054,6 @@ Qed.
 Check glop.
 Check glip.
 
-...
-
 Theorem quad_int_consistent :
  (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
  (rngl_has_inv = false ∨ rngl_has_quot = false).
@@ -1088,7 +1086,6 @@ Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_quot_l := quad_int_mul_quot_l;
      rngl_opt_mul_quot_r := NA;
-     rngl_opt_quot_quot_quot_mul := quad_int_quot_quot_quot_mul;
      rngl_opt_eq_dec := quad_int_eq_dec;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;
