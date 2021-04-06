@@ -97,12 +97,14 @@ et on obtient : 4-3*i
 iquorem(-6+17*i,7+i)
 et on obtient : [-1+3*i,4-3*i]
 *)
+(*
 Compute let '(a, b) := (mk_qi (-1) (-6) 17, mk_qi (-1) 7 1) in (a, b, qi_quot a b).
 Compute let '(a, b) := (mk_qi (-1) 7 1, mk_qi (-1) 4 (-3)) in (a, b, qi_quot a b).
 
 Print Z.quot.
+*)
 
-(* remainder always same sign as dividend *)
+(*
 Compute let '(a, b) := (9, 4) in
 (a, b, Z.quotrem a b, qi_quot (mk_qi 2 a 15) (mk_qi 2 b 42)).
 (**)
@@ -120,6 +122,7 @@ Compute let '(a, b) := (-9, 4) in
 (a, b, Z.quotrem a b, qi_quot (mk_qi 2 a 0) (mk_qi 2 b 0)).
 Compute let '(a, b) := (-11, 4) in
 (a, b, Z.quotrem a b, qi_quot (mk_qi 2 a 0) (mk_qi 2 b 0)).
+*)
 (*
      = (9, 4, (2, 1), (〈 2 + 0 √2 〉%QI, 〈 1 + 0 √2 〉%QI))
      : Z * Z * (Z * Z) * (quad_int 2 * quad_int 2)
@@ -139,6 +142,7 @@ Compute let '(a, b) := (-11, 4) in
      : Z * Z * (Z * Z) * (quad_int 2 * quad_int 2)
 *)
 
+(*
 Compute (qi_quot (mk_qi (-1) (- 36) 242) (mk_qi (-1) 50 50)).
 Compute (qi_quot (mk_qi (-1) 36 242) (mk_qi (-1) 50 50)).
 Compute (mk_qi (-1) 0 1 * mk_qi (-1) 0 1)%QI.
@@ -150,6 +154,7 @@ Compute (@qi_zero 42 ÷ @qi_zero 42)%QI.
 Check (mk_qi (-1) 0 3).
 Check (mk_qi (-1) 0 0).
 Check (mk_qi (-1) 2 (-3)).
+*)
 
 Definition phony_qi_le {d} (a b : quad_int d) := False.
 
@@ -168,6 +173,7 @@ Definition quad_int_ring_like_op {d} : ring_like_op (quad_int d) :=
      rngl_opt_quot := Some (@qi_quot d);
      rngl_le := phony_qi_le |}.
 
+(*
 Compute (mk_qi (-1) (- 36) 242 ÷ mk_qi (-1) 50 50)%QI.
 Compute (mk_qi (-1) 0 1 * mk_qi (-1) 0 1)%QI.
 Compute (1 ÷ mk_qi (-1) 0 1)%QI.
@@ -185,6 +191,7 @@ Compute (mk_qi (-1) 1 2 * mk_qi (-1) 1 (-2))%QI.
 Compute (mk_qi (-1) 2 3 * mk_qi (-1) 2 (-3))%QI.
 Compute (mk_qi (-1) 1 2 * mk_qi (-1) 2 3)%QI.
 Compute (mk_qi (-1) 1 2 * mk_qi (-1) 2 (-3))%QI.
+*)
 
 Section a.
 
@@ -447,10 +454,12 @@ Definition nat_square_free n :=
 Definition bsquare_free z := bnat_square_free (Z.abs_nat z).
 Definition square_free z := nat_square_free (Z.abs_nat z).
 
+(*
 Open Scope Z_scope.
 Compute filter bsquare_free (map (λ n, Z.of_nat n -  60) (seq 1 120)).
 Close Scope Z_scope.
 Compute filter bnat_square_free (seq 1 120).
+*)
 
 Theorem nat_square_free_bnat_square_free : ∀ n,
   nat_square_free n ↔ bnat_square_free n = true.
@@ -878,10 +887,12 @@ f_equal. {
 }
 Qed.
 
+(*
 Search (_ / (_ * _)).
 Search (_ ÷ (_ * _)).
 Search (ZEuclid.div _ (_ * _)).
 Search (ZEuclid.div).
+*)
 (*
 Z.div_div: ∀ a b c : Z, b ≠ 0 → 0 < c → a / b / c = a / (b * c)
 Z.quot_quot: ∀ a b c : Z, b ≠ 0 → c ≠ 0 → a ÷ b ÷ c = a ÷ (b * c)
@@ -1051,8 +1062,10 @@ f_equal. {
 }
 Qed.
 
+(*
 Check glop.
 Check glip.
+*)
 
 Theorem quad_int_consistent :
  (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
@@ -1099,3 +1112,5 @@ Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
      rngl_opt_mul_le_compat := NA;
      rngl_opt_not_le := NA;
      rngl_consistent := quad_int_consistent |}.
+
+End a.
