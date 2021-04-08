@@ -1757,6 +1757,41 @@ Theorem laplace_formula_on_rows :
   → determinant M = Σ (j = 0, n - 1), mat_el M i j * mat_el (comatrix M) i j.
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hlin.
+destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+  subst i.
+  unfold determinant.
+  destruct n; [ easy | clear Hnz; cbn ].
+  rewrite Nat.sub_0_r at 1.
+  symmetry.
+  apply rngl_summation_eq_compat.
+  intros j Hj.
+  rewrite Nat.sub_0_r at 2.
+  rewrite rngl_mul_comm; [ | easy ].
+  now rewrite rngl_mul_mul_swap.
+}
+specialize determinant_alternating as H1.
+specialize (H1 Hic Hop Hin Hit H10 Hde Hch).
+specialize (H1 n M i 0 Hiz Hlin).
+assert (H : 0 < n) by flia Hnz.
+specialize (H1 H); clear H.
+apply (f_equal rngl_opp) in H1.
+rewrite rngl_opp_involutive in H1; [ | easy ].
+rewrite <- H1.
+unfold determinant.
+destruct n; [ easy | clear Hnz ].
+cbn - [ mat_swap_rows ].
+rewrite Nat.sub_0_r at 1.
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite Nat.sub_0_r at 2.
+  rewrite rngl_mul_comm; [ | easy ].
+  rewrite rngl_mul_mul_swap; [ | easy ].
+  easy.
+}
+symmetry.
+...
+intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hlin.
 unfold determinant.
 destruct n; [ easy | clear Hnz; cbn ].
 rewrite Nat.sub_0_r at 1.
@@ -1769,6 +1804,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 symmetry.
+destruct (Nat.eq_dec i 0) as [Hiz| Hiz]; [ now subst i | ].
 ...
 intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hlin.
 destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
