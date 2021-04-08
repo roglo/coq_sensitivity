@@ -1769,8 +1769,6 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 symmetry.
-Print determinant.
-Print det_loop.
 ...
 intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hlin.
 destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
