@@ -20,6 +20,24 @@ Context (rp : ring_like_prop T).
 
 (* determinant *)
 
+(*
+   det_loop i recursively computes determinant
+
+      0     i-1
+      |     |
+      v     v
+     ---------    ---------   ---------   ---------
+0    |x      |    | x     |   |  x    |   |   x   |
+     | ......| -  |. .....| + |.. ....| - |... ...| + etc.
+     | ......|    |. .....|   |.. ....|   |... ...|
+i-1  | ......|    |. .....|   |.. ....|   |... ...|
+     ---------    ---------   ---------   ---------
+
+   each term is the term "x" multiplied by det_loop (i-1) of
+   the sub-matrix represented by the dots. The "x" goes through
+   the first row.
+*)
+
 Fixpoint det_loop {n} (M : matrix n n T) i :=
   match i with
   | 0 => 1%F
@@ -28,13 +46,13 @@ Fixpoint det_loop {n} (M : matrix n n T) i :=
       minus_one_pow j * mat_el M 0 j * det_loop (subm M 0 j) i'
   end.
 
+Definition determinant {n} (M : matrix n n T) := det_loop M n.
+
 Definition mat_permut_rows_fun n (σ : nat → nat) (M : matrix n n T) :=
   mk_mat n n (λ i j, mat_el M (σ i) j).
 
 Definition mat_permut_rows n (σ : vector n nat) (M : matrix n n T) :=
   mat_permut_rows_fun (vect_el σ) M.
-
-Definition determinant {n} (M : matrix n n T) := det_loop M n.
 
 (* the following versions of computing the determinant should
    (to be proven) be equivalent; perhaps could help for proving
@@ -1751,6 +1769,8 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 symmetry.
+Print determinant.
+Print det_loop.
 ...
 intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hlin.
 destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
