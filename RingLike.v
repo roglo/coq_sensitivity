@@ -18,7 +18,6 @@
    They can be commutative or not by setting rngl_is_comm to true or false.
    There are many other properties that are implemented here or could be
    implemented :
-     - algebraically closed or not
      - archimedian or not
      - with decidable equality or not
      - commutative or not
@@ -31,6 +30,7 @@
      - principal or not
      - factorial or not
      - euclidean or not
+     - algebraically closed or not
      - with associative addition or multiplication or not
      - with commutative addition or not
      - with 0 or without, right or left
