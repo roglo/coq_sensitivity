@@ -1770,6 +1770,24 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
 }
 move i before n.
 move Hiz after Hlin.
+destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
+  subst i; clear Hiz.
+  unfold determinant.
+  destruct n; [ easy | cbn ].
+  rewrite Nat.sub_0_r at 1.
+  symmetry.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j Hj.
+    rewrite Nat.sub_0_r at 2.
+    rewrite rngl_mul_comm; [ | easy ].
+    rewrite rngl_mul_mul_swap; [ | easy ].
+    rewrite <- subm_mat_swap_rows_0_1.
+    easy.
+  }
+  cbn.
+Inspect 1.
+...
+subm_mat_swap_rows_0_1 : ∀ (n : nat) (M : matrix n n T) (r : nat), subm (mat_swap_rows 0 1 M) 0 r = subm M 1 r
 ...
 intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hlin.
 destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
