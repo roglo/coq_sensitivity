@@ -842,9 +842,9 @@ Qed.
 
 Theorem rngl_div_compat_l :
   rngl_has_inv = true →
-  ∀ a b c, c ≠ 0%F → (a = b)%F → (a / c = b / c)%F.
+  ∀ a b c, (a = b)%F → (a / c = b / c)%F.
 Proof.
-intros Hin a b c Hcz Hab.
+intros Hin a b c Hab.
 now rewrite Hab.
 Qed.
 
@@ -954,9 +954,7 @@ transitivity (1 * ¹/ 1)%F. {
 apply H; [ now left | ].
 intros H1; unfold is_zero_divisor in H1.
 destruct H1 as (a & Ha & Ha').
-...
-apply rngl_1_neq_0.
-now apply rngl_1_neq_0.
+now rewrite rngl_mul_1_l in Ha'.
 Qed.
 
 Theorem rngl_div_1_l :
@@ -975,16 +973,24 @@ Theorem rngl_div_1_r :
   ∀ a, (a / 1 = a)%F.
 Proof.
 intros Hid H10 *.
-specialize (rngl_mul_div_l Hid a 1%F (rngl_1_neq_0 H10)) as H1.
+specialize (rngl_mul_div_l Hid a 1%F) as H1.
+assert (H : ¬ is_zero_divisor 1%F). {
+  intros H.
+  destruct H as (b & Hb & Hb').
+  now rewrite rngl_mul_1_l in Hb'.
+}
+specialize (H1 H); clear H.
 now rewrite rngl_mul_1_r in H1.
 Qed.
 
 Theorem rngl_mul_move_1_r :
-  rngl_has_inv = true → ∀ a b : T, b ≠ 0%F → (a * b)%F = 1%F ↔ a = (¹/ b)%F.
+  rngl_has_inv = true → ∀ a b : T,
+  ¬ is_zero_divisor b →
+  (a * b)%F = 1%F ↔ a = (¹/ b)%F.
 Proof.
 intros Hin * Hbz.
 split; intros H. {
-  apply rngl_div_compat_l with (c := b) in H; [ | easy | easy ].
+  apply rngl_div_compat_l with (c := b) in H; [ | easy ].
   unfold rngl_div in H.
   rewrite Hin in H.
   rewrite <- rngl_mul_assoc in H.
@@ -1014,7 +1020,7 @@ Theorem rngl_inv_neq_0 :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
-  ∀ a, a ≠ 0%F → (¹/ a ≠ 0)%F.
+  ∀ a, ¬ is_zero_divisor a → (¹/ a ≠ 0)%F.
 Proof.
 intros Hom Hin H10 * Haz H1.
 symmetry in H1.
@@ -1028,7 +1034,7 @@ Theorem rngl_inv_involutive :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
-  ∀ x, x ≠ 0%F → (¹/ ¹/ x)%F = x.
+  ∀ a, ¬ is_zero_divisor a → (¹/ ¹/ a)%F = a.
 Proof.
 intros Hom Hin H10 * Hxz.
 symmetry.
@@ -1040,6 +1046,8 @@ apply H1. 2: {
   rewrite fold_rngl_div; [ | easy ].
   apply rngl_mul_inv_r; [ now left | easy ].
 }
+Check rngl_inv_neq_0.
+...
 now apply rngl_inv_neq_0.
 Qed.
 
