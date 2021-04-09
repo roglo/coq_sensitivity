@@ -730,6 +730,9 @@ destruct iv. {
   }
   rewrite rngl_mul_0_r in H; [ | easy ].
 (**)
+...
+zero_dividor must be decidable
+...
   destruct (rngl_eq_dec Hde a 0%F) as [Haz| Haz]. {
     left; subst a.
     unfold zero_dividor.
