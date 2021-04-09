@@ -124,8 +124,10 @@ Notation "- 1" := (rngl_opp rngl_one) : ring_like_scope.
 
 Inductive not_applicable := NA.
 
-Definition is_zero_divisor {T} {ro : ring_like_op T} a :=
+Definition rngl_is_zero_divisor {T} {ro : ring_like_op T} a :=
   ∃ b, b ≠ 0%F ∧ (a * b = 0)%F.
+
+Arguments rngl_is_zero_divisor {T}%type {ro} a%F.
 
 Fixpoint rngl_of_nat {T} {ro : ring_like_op T} n :=
   match n with
@@ -179,19 +181,21 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       else not_applicable;
     (* when has inverse *)
     rngl_opt_mul_inv_l :
-      if rngl_has_inv then ∀ a : T, not (is_zero_divisor a) → (¹/ a * a = 1)%F
+      if rngl_has_inv then
+        ∀ a : T, not (rngl_is_zero_divisor a) → (¹/ a * a = 1)%F
       else not_applicable;
     rngl_opt_mul_inv_r :
       if (rngl_has_inv && negb rngl_is_comm)%bool then
-        ∀ a : T, ¬ is_zero_divisor a → (a / a = 1)%F
+        ∀ a : T, ¬ rngl_is_zero_divisor a → (a / a = 1)%F
       else not_applicable;
     (* when has division (quot) *)
     rngl_opt_mul_quot_l :
-      if rngl_has_quot then ∀ a b, ¬ is_zero_divisor a → (a * b / a)%F = b
+      if rngl_has_quot then
+        ∀ a b, ¬ rngl_is_zero_divisor a → (a * b / a)%F = b
       else not_applicable;
     rngl_opt_mul_quot_r :
       if (rngl_has_quot && negb rngl_is_comm)%bool then
-        ∀ a b, ¬ is_zero_divisor b → (a * b / b)%F = a
+        ∀ a b, ¬ rngl_is_zero_divisor b → (a * b / b)%F = a
       else not_applicable;
     (* when equality is decidable *)
     rngl_opt_eq_dec :
@@ -201,15 +205,15 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_opt_le_dec :
       if rngl_has_dec_le then ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%F
       else not_applicable;
-    (* when is_zero_divisor is decidable *)
+    (* when rngl_is_zero_divisor is decidable *)
     rngl_opt_zdiv_dec :
       if rngl_has_dec_zero_divisor then
-        ∀ a : T, {is_zero_divisor a} + {¬ is_zero_divisor a}
+        ∀ a : T, {rngl_is_zero_divisor a} + {¬ rngl_is_zero_divisor a}
       else not_applicable;
     (* when has_no_is_zero_divisors *)
     rngl_opt_integral :
       if rngl_is_integral then
-        ∀ a b, (a * b = 0)%F → is_zero_divisor a ∨ b = 0%F
+        ∀ a b, (a * b = 0)%F → rngl_is_zero_divisor a ∨ b = 0%F
       else not_applicable;
     (* characteristic *)
     rngl_characteristic_prop :
@@ -326,7 +330,7 @@ Qed.
 
 Theorem rngl_mul_inv_l :
   rngl_has_inv = true →
-  ∀ a : T, ¬ is_zero_divisor a → (¹/ a * a = 1)%F.
+  ∀ a : T, ¬ rngl_is_zero_divisor a → (¹/ a * a = 1)%F.
 Proof.
 intros H1 *.
 specialize rngl_opt_mul_inv_l as H.
@@ -354,7 +358,7 @@ Qed.
 
 Theorem rngl_zero_divisor_dec :
   rngl_has_dec_zero_divisor = true →
-  ∀ a : T, {is_zero_divisor a} + {¬ is_zero_divisor a}.
+  ∀ a : T, {rngl_is_zero_divisor a} + {¬ rngl_is_zero_divisor a}.
 Proof.
 intros Hde *.
 specialize rngl_opt_zdiv_dec as H.
@@ -656,7 +660,7 @@ Qed.
 
 Theorem rngl_mul_inv_r :
   rngl_has_inv = true ∨ rngl_has_quot = true →
-  ∀ a : T, ¬ is_zero_divisor a → (a / a = 1)%F.
+  ∀ a : T, ¬ rngl_is_zero_divisor a → (a / a = 1)%F.
 Proof.
 intros Hii * Haz.
 remember rngl_has_inv as iv eqn:Hiv; symmetry in Hiv.
@@ -685,7 +689,7 @@ Qed.
 
 Theorem rngl_mul_div_l :
   rngl_has_inv = true ∨ rngl_has_quot = true →
-  ∀ a b : T, ¬ is_zero_divisor b → (a * b / b)%F = a.
+  ∀ a b : T, ¬ rngl_is_zero_divisor b → (a * b / b)%F = a.
 Proof.
 intros Hii a b Hbz.
 remember rngl_has_inv as iv eqn:Hiv; symmetry in Hiv.
@@ -715,7 +719,7 @@ Qed.
 Theorem rngl_div_0_l :
   (rngl_has_opp = true ∨ rngl_has_sous = true) ∧
   (rngl_has_inv = true ∨ rngl_has_quot = true) →
-  ∀ a, ¬ is_zero_divisor a → (0 / a)%F = 0%F.
+  ∀ a, ¬ rngl_is_zero_divisor a → (0 / a)%F = 0%F.
 Proof.
 intros Hiv * Haz.
 remember (0 / a)%F as x eqn:Hx.
@@ -730,7 +734,7 @@ Theorem rngl_integral :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   (rngl_is_integral ||
    ((rngl_has_inv || rngl_has_quot) && rngl_has_dec_zero_divisor))%bool = true →
-  ∀ a b, (a * b = 0)%F → is_zero_divisor a ∨ b = 0%F.
+  ∀ a b, (a * b = 0)%F → rngl_is_zero_divisor a ∨ b = 0%F.
 Proof.
 intros Hmo Hdo * Hab.
 specialize rngl_opt_integral as rngl_integral.
@@ -799,7 +803,7 @@ Qed.
 
 Theorem rngl_mul_cancel_l :
   rngl_has_inv = true ∨ rngl_has_quot = true →
-  ∀ a b c, ¬ is_zero_divisor a
+  ∀ a b c, ¬ rngl_is_zero_divisor a
   → (a * b = a * c)%F
   → b = c.
 Proof.
@@ -829,7 +833,7 @@ Qed.
 
 Theorem rngl_mul_cancel_r :
   rngl_has_inv = true ∨ rngl_has_quot = true →
-  ∀ a b c, ¬ is_zero_divisor c
+  ∀ a b c, ¬ rngl_is_zero_divisor c
   → (a * c = b * c)%F
   → a = b.
 Proof.
@@ -952,7 +956,7 @@ transitivity (1 * ¹/ 1)%F. {
   apply rngl_mul_1_l.
 }
 apply H; [ now left | ].
-intros H1; unfold is_zero_divisor in H1.
+intros H1; unfold rngl_is_zero_divisor in H1.
 destruct H1 as (a & Ha & Ha').
 now rewrite rngl_mul_1_l in Ha'.
 Qed.
@@ -974,7 +978,7 @@ Theorem rngl_div_1_r :
 Proof.
 intros Hid H10 *.
 specialize (rngl_mul_div_l Hid a 1%F) as H1.
-assert (H : ¬ is_zero_divisor 1%F). {
+assert (H : ¬ rngl_is_zero_divisor 1%F). {
   intros H.
   destruct H as (b & Hb & Hb').
   now rewrite rngl_mul_1_l in Hb'.
@@ -985,7 +989,7 @@ Qed.
 
 Theorem rngl_mul_move_1_r :
   rngl_has_inv = true → ∀ a b : T,
-  ¬ is_zero_divisor b →
+  ¬ rngl_is_zero_divisor b →
   (a * b)%F = 1%F ↔ a = (¹/ b)%F.
 Proof.
 intros Hin * Hbz.
@@ -1020,8 +1024,21 @@ Theorem rngl_inv_neq_0 :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
-  ∀ a, ¬ is_zero_divisor a → (¹/ a ≠ 0)%F.
+  ∀ a, ¬ rngl_is_zero_divisor a → ¬ rngl_is_zero_divisor (¹/ a).
 Proof.
+intros Hom Hin H10 * Haz H1.
+apply Haz; clear Haz.
+destruct H1 as (b & Hb & Hb').
+exists (¹/b)%F.
+split. {
+  intros H; apply Hb; clear Hb.
+...
+Search (¹/ (_ * _))%F.
+...
+  apply (f_equal rngl_inv) in Hb'.
+Search (¹/ ¹/ _)%F.
+lll
+...
 intros Hom Hin H10 * Haz H1.
 symmetry in H1.
 apply rngl_mul_move_1_r in H1; [ | easy | easy ].
@@ -1034,7 +1051,7 @@ Theorem rngl_inv_involutive :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
-  ∀ a, ¬ is_zero_divisor a → (¹/ ¹/ a)%F = a.
+  ∀ a, ¬ rngl_is_zero_divisor a → (¹/ ¹/ a)%F = a.
 Proof.
 intros Hom Hin H10 * Hxz.
 symmetry.
@@ -1326,3 +1343,4 @@ Arguments rngl_mul_cancel_r {T}%type {ro rp} Hii (a b c)%F.
 Arguments rngl_mul_0_r {T}%type {ro rp} Hom a%F.
 Arguments rngl_opp_0 {T}%type {ro rp}.
 Arguments rngl_opp_add_distr {T}%type {ro rp} Hop a%F b%F.
+Arguments rngl_is_zero_divisor {T}%type {ro} a%F.
