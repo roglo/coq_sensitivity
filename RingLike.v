@@ -137,6 +137,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_is_comm : bool;
     rngl_has_dec_eq : bool;
     rngl_has_dec_le : bool;
+    rngl_has_dec_zero_divisor : bool;
     rngl_has_1_neq_0 : bool;
     rngl_is_ordered : bool;
     rngl_is_integral : bool;
@@ -199,6 +200,11 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* when le comparison is decidable *)
     rngl_opt_le_dec :
       if rngl_has_dec_le then ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%F
+      else not_applicable;
+    (* when is_zero_divisor is decidable *)
+    rngl_opt_zdiv_dec :
+      if rngl_has_dec_zero_divisor then
+        ∀ a : T, {is_zero_divisor a} + {¬ is_zero_divisor a}
       else not_applicable;
     (* when has_no_is_zero_divisors *)
     rngl_opt_integral :
@@ -343,6 +349,16 @@ Proof.
 intros H1 *.
 specialize rngl_opt_le_dec as H.
 rewrite H1 in H.
+apply H.
+Qed.
+
+Theorem rngl_zero_divisor_dec :
+  rngl_has_dec_zero_divisor = true →
+  ∀ a : T, {is_zero_divisor a} + {¬ is_zero_divisor a}.
+Proof.
+intros Hde *.
+specialize rngl_opt_zdiv_dec as H.
+rewrite Hde in H.
 apply H.
 Qed.
 
@@ -713,7 +729,7 @@ Qed.
 Theorem rngl_integral :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   (rngl_is_integral ||
-   ((rngl_has_inv || rngl_has_quot) && rngl_has_dec_eq))%bool = true →
+   ((rngl_has_inv || rngl_has_quot) && rngl_has_dec_zero_divisor))%bool = true →
   ∀ a b, (a * b = 0)%F → is_zero_divisor a ∨ b = 0%F.
 Proof.
 intros Hmo Hdo * Hab.
@@ -722,33 +738,14 @@ destruct rngl_is_integral; [ now apply rngl_integral | ].
 remember rngl_has_inv as iv eqn:Hiv; symmetry in Hiv.
 cbn in Hdo.
 destruct iv. {
-  remember rngl_has_dec_eq as de eqn:Hde; symmetry in Hde.
+  remember rngl_has_dec_zero_divisor as de eqn:Hde; symmetry in Hde.
   destruct de; [ | easy ].
   cbn; clear rngl_integral.
   assert (H : (¹/a * a * b = ¹/a * 0)%F). {
     now rewrite <- rngl_mul_assoc, Hab.
   }
   rewrite rngl_mul_0_r in H; [ | easy ].
-(**)
-...
-is_zero_divisor must be decidable
-...
-  destruct (rngl_eq_dec Hde a 0%F) as [Haz| Haz]. {
-    left; subst a.
-    unfold is_zero_divisor.
-    exists 1%F.
-    rewrite rngl_mul_0_l; [ | easy ].
-    split; [ | easy ].
-...
-    intros H1.
-    unfold not_is_zero_divisor in H1.
-    cbn in H1.
-    apply H1 with (b := 1%F); [ | now apply rngl_mul_0_l ].
-    apply rngl_1_neq_0.
-  }
-  rewrite rngl_mul_inv_l in H; [ | easy | ].
-...
-  destruct (rngl_eq_dec Hde a 0%F) as [Haz| Haz]; [ now left | ].
+  destruct (rngl_zero_divisor_dec Hde a) as [Haz| Haz]; [ now left | ].
   rewrite rngl_mul_inv_l in H; [ | easy | easy ].
   rewrite rngl_mul_1_l in H.
   now right.
@@ -758,7 +755,7 @@ is_zero_divisor must be decidable
   destruct Hdo as (Hdi, Hde).
   specialize (rngl_opt_mul_quot_l) as H1.
   rewrite Hdi in H1.
-  destruct (rngl_eq_dec Hde a 0%F) as [Haz| Haz]; [ now left | right ].
+  destruct (rngl_zero_divisor_dec Hde a) as [Haz| Haz]; [ now left | right ].
   specialize (H1 a b Haz) as H4.
   rewrite Hab in H4.
   rewrite <- H4.
@@ -802,7 +799,7 @@ Qed.
 
 Theorem rngl_mul_cancel_l :
   rngl_has_inv = true ∨ rngl_has_quot = true →
-  ∀ a b c, a ≠ 0%F
+  ∀ a b c, ¬ is_zero_divisor a
   → (a * b = a * c)%F
   → b = c.
 Proof.
@@ -832,7 +829,7 @@ Qed.
 
 Theorem rngl_mul_cancel_r :
   rngl_has_inv = true ∨ rngl_has_quot = true →
-  ∀ a b c, c ≠ 0%F
+  ∀ a b c, ¬ is_zero_divisor c
   → (a * c = b * c)%F
   → a = b.
 Proof.
@@ -955,6 +952,10 @@ transitivity (1 * ¹/ 1)%F. {
   apply rngl_mul_1_l.
 }
 apply H; [ now left | ].
+intros H1; unfold is_zero_divisor in H1.
+destruct H1 as (a & Ha & Ha').
+...
+apply rngl_1_neq_0.
 now apply rngl_1_neq_0.
 Qed.
 
