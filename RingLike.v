@@ -21,7 +21,6 @@
      - archimedian or not
      - with decidable equality or not
      - commutative or not
-     - complete or not
      - with some characteristic
      - finite or infinite
      - ordered or not
@@ -31,6 +30,7 @@
      - factorial or not
      - euclidean or not
      - algebraically closed or not
+     - complete or not
      - with associative addition or multiplication or not
      - with commutative addition or not
      - with 0 or without, right or left
