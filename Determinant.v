@@ -1752,10 +1752,25 @@ Theorem laplace_formula_on_rows :
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
   ∀ n (M : matrix n n T) i,
-  n ≠ 0
-  → i < n
+  i < n
   → determinant M = Σ (j = 0, n - 1), mat_el M i j * mat_el (comatrix M) i j.
 Proof.
+intros Hic Hop Hin Hit H10 Hde Hch * Hlin.
+destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+  subst i.
+  unfold determinant.
+  destruct n; [ easy | cbn ].
+  rewrite Nat.sub_0_r at 1.
+  symmetry.
+  apply rngl_summation_eq_compat.
+  intros j Hj.
+  rewrite Nat.sub_0_r at 2.
+  rewrite rngl_mul_comm; [ | easy ].
+  now rewrite rngl_mul_mul_swap.
+}
+move i before n.
+move Hiz after Hlin.
+...
 intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hlin.
 destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   subst i.
