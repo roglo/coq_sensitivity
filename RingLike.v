@@ -1030,16 +1030,20 @@ Proof.
 intros Hom Hin H10 Hzd * Haz H1.
 apply Haz; clear Haz.
 destruct H1 as (b & Hb & Hb').
+unfold rngl_is_zero_divisor.
+rename b into c.
+...
 exists (¹/b)%F.
 split. {
   intros H1; apply Hb; clear Hb.
-  apply (f_equal (rngl_mul b)) in H1.
-  rewrite rngl_mul_0_r in H1.
-  specialize rngl_mul_inv_r as H2.
-  specialize (H2 (or_introl Hin) b).
+  generalize H1; intros H2.
+  apply (f_equal (rngl_mul b)) in H2.
+  rewrite rngl_mul_0_r in H2.
+  specialize rngl_mul_inv_r as H3.
+  specialize (H3 (or_introl Hin) b).
   destruct (rngl_zero_divisor_dec Hzd b) as [Hbz| Hbz]. {
-    generalize Hbz; intros H3.
-    destruct H3 as (c & Hc & Hc').
+    generalize Hbz; intros H4.
+    destruct H4 as (c & Hc & Hc').
 ...
     specialize (rngl_integral Hom) as H3.
     assert
