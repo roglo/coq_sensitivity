@@ -1020,6 +1020,19 @@ rewrite Hro in H.
 now apply rngl_add_move_0_r.
 Qed.
 
+Theorem rngl_inv_zero_divisor :
+  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  rngl_has_dec_zero_divisor = true →
+  ∀ a, rngl_is_zero_divisor (¹/ a) → rngl_is_zero_divisor a.
+Proof.
+intros Hom Hin H10 Hzd * Hzdi.
+destruct Hzdi as (b & Hb & Hb').
+unfold rngl_is_zero_divisor.
+rename b into c.
+...
+
 Theorem rngl_inv_neq_0 :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_has_inv = true →
