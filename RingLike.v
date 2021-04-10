@@ -1030,7 +1030,6 @@ Proof.
 intros Hom Hin H10 Hzd * Haz H1.
 apply Haz; clear Haz.
 destruct H1 as (b & Hb & Hb').
-...
 exists (¹/b)%F.
 split. {
   intros H1; apply Hb; clear Hb.
@@ -1039,6 +1038,9 @@ split. {
   specialize rngl_mul_inv_r as H2.
   specialize (H2 (or_introl Hin) b).
   destruct (rngl_zero_divisor_dec Hzd b) as [Hbz| Hbz]. {
+    generalize Hbz; intros H3.
+    destruct H3 as (c & Hc & Hc').
+...
     specialize (rngl_integral Hom) as H3.
     assert
       (H : (rngl_is_integral
