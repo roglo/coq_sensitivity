@@ -1024,20 +1024,32 @@ Theorem rngl_inv_neq_0 :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
+  rngl_has_dec_zero_divisor = true →
   ∀ a, ¬ rngl_is_zero_divisor a → ¬ rngl_is_zero_divisor (¹/ a).
 Proof.
-intros Hom Hin H10 * Haz H1.
+intros Hom Hin H10 Hzd * Haz H1.
 apply Haz; clear Haz.
 destruct H1 as (b & Hb & Hb').
 exists (¹/b)%F.
 split. {
   intros H; apply Hb; clear Hb.
+  specialize (rngl_mul_inv_r (or_introl Hin) b) as H1.
+  destruct (rngl_zero_divisor_dec Hzd b) as [Hbz| Hbz]. {
+    generalize Hbz; intros H2.
+    destruct H2 as (c & Hc & Hc').
+    specialize (rngl_integral Hom) as H2.
+assert (H3 : (rngl_is_integral
+        || (rngl_has_inv || rngl_has_quot) && rngl_has_dec_zero_divisor)%bool =
+       true). {
+  rewrite Hin, Hzd; cbn.
+  now destruct rngl_is_integral.
+}
+specialize (H2 H3 b c Hc'); clear H3.
 ...
-Search (¹/ (_ * _))%F.
-...
-  apply (f_equal rngl_inv) in Hb'.
-Search (¹/ ¹/ _)%F.
-lll
+Search ((_ || _)%bool).
+Search (_ = true).
+About andb_true_intro.
+unfold orb.
 ...
 intros Hom Hin H10 * Haz H1.
 symmetry in H1.
@@ -1046,6 +1058,7 @@ rewrite rngl_mul_0_l in H1; [ | easy ].
 symmetry in H1; revert H1.
 now apply rngl_1_neq_0.
 Qed.
+*)
 
 Theorem rngl_inv_involutive :
   rngl_has_opp = true ∨ rngl_has_sous = true →
