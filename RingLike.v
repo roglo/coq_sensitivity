@@ -1028,7 +1028,11 @@ Theorem rngl_inv_no_zero_divisor :
   ∀ a, ¬ rngl_is_zero_divisor (¹/ a).
 Proof.
 intros Hom Hin H10 Hzd * Hzdi.
+generalize Hzdi; intros H1.
 destruct Hzdi as (b & Hb & Hb').
+Check rngl_mul_move_1_r.
+...
+apply rngl_mul_move_1_r in H1; [ | easy | easy ].
 ...
 
 Theorem rngl_inv_zero_divisor :
