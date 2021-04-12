@@ -213,7 +213,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* when has_no_is_zero_divisors *)
     rngl_opt_integral :
       if rngl_is_integral then
-        ∀ a b, (a * b = 0)%F → rngl_is_zero_divisor a ∨ b = 0%F
+        ∀ a b, (a * b = 0)%F → rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b
       else not_applicable;
     (* characteristic *)
     rngl_characteristic_prop :
@@ -734,7 +734,7 @@ Theorem rngl_integral :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   (rngl_is_integral ||
    ((rngl_has_inv || rngl_has_quot) && rngl_has_dec_zero_divisor))%bool = true →
-  ∀ a b, (a * b = 0)%F → rngl_is_zero_divisor a ∨ b = 0%F.
+  ∀ a b, (a * b = 0)%F → rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b.
 Proof.
 intros Hmo Hdo * Hab.
 specialize rngl_opt_integral as rngl_integral.
@@ -752,7 +752,11 @@ destruct iv. {
   destruct (rngl_zero_divisor_dec Hde a) as [Haz| Haz]; [ now left | ].
   rewrite rngl_mul_inv_l in H; [ | easy | easy ].
   rewrite rngl_mul_1_l in H.
-  now right.
+  right.
+  exists 1%F.
+  rewrite rngl_mul_1_r.
+  split; [ | easy ].
+...
 } {
   cbn in Hdo.
   apply andb_prop in Hdo.
@@ -1020,6 +1024,40 @@ rewrite Hro in H.
 now apply rngl_add_move_0_r.
 Qed.
 
+Theorem rngl_inv_mul_distr :
+  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_is_integral = true →
+  rngl_has_inv = true →
+  ∀ a b,
+  ¬ rngl_is_zero_divisor a
+  → ¬ rngl_is_zero_divisor b
+  → (¹/ (a * b) = ¹/ b * ¹/ a)%F.
+Proof.
+intros Hom Hdo Hin * Haz Hbz.
+specialize rngl_mul_cancel_l as H1.
+specialize rngl_mul_inv_r as H2.
+specialize (rngl_integral Hom) as H3.
+unfold rngl_div in H2.
+rewrite Hdo in H3; cbn in H3.
+specialize (H3 eq_refl).
+assert (Habz : (a * b)%F ≠ 0%F). {
+  intros H.
+  specialize (H3 a b H).
+...
+  destruct H3; [ easy | ].
+}
+rewrite Hin in H2.
+specialize (H2 (or_introl eq_refl)).
+apply H1 with (a := (a * b)%F); [ now left | easy | ].
+rewrite H2; [ | easy ].
+rewrite rngl_mul_assoc.
+rewrite <- (rngl_mul_assoc a).
+rewrite H2; [ | easy ].
+rewrite rngl_mul_1_r.
+now rewrite H2.
+Qed.
+
+(*
 Theorem rngl_inv_no_zero_divisor :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_has_inv = true →
@@ -1042,6 +1080,7 @@ specialize (H2 _ _ Hb').
 ...
 apply rngl_mul_move_1_r in H1; [ | easy | easy ].
 ...
+*)
 
 Theorem rngl_inv_zero_divisor :
   rngl_has_opp = true ∨ rngl_has_sous = true →
@@ -1051,9 +1090,12 @@ Theorem rngl_inv_zero_divisor :
   ∀ a, rngl_is_zero_divisor (¹/ a) → rngl_is_zero_divisor a.
 Proof.
 intros Hom Hin H10 Hzd * Hzdi.
-destruct Hzdi as (b & Hb & Hb').
+generalize Hzdi; intros H1.
+destruct H1 as (b & Hb & Hb').
 unfold rngl_is_zero_divisor.
 rename b into c.
+Search (1 / (_ * _))%F.
+Search (¹/ (_ * _))%F.
 ...
 
 Theorem rngl_inv_neq_0 :
