@@ -752,7 +752,12 @@ destruct iv. {
   destruct (rngl_zero_divisor_dec Hde a) as [Haz| Haz]; [ now left | ].
   rewrite rngl_mul_inv_l in H; [ | easy | easy ].
   rewrite rngl_mul_1_l in H.
+  subst b.
   right.
+  unfold rngl_is_zero_divisor.
+(* 0 must be a zero divisor ; but I need that 1≠0, i.e. that 0 is not
+   alone in the ring-like *)
+...
   exists 1%F.
   rewrite rngl_mul_1_r.
   split; [ | easy ].
