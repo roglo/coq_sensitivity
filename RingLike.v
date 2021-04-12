@@ -1030,7 +1030,15 @@ Proof.
 intros Hom Hin H10 Hzd * Hzdi.
 generalize Hzdi; intros H1.
 destruct Hzdi as (b & Hb & Hb').
-Check rngl_mul_move_1_r.
+...
+specialize rngl_integral as H2.
+specialize (H2 Hom).
+assert (H : (rngl_is_integral || (rngl_has_inv || rngl_has_quot) && rngl_has_dec_zero_divisor)%bool = true). {
+  rewrite Hin, Hzd; cbn.
+  now destruct rngl_is_integral.
+}
+specialize (H2 H); clear H.
+specialize (H2 _ _ Hb').
 ...
 apply rngl_mul_move_1_r in H1; [ | easy | easy ].
 ...
