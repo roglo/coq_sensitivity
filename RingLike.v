@@ -212,8 +212,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       else not_applicable;
     (* when has_no_is_zero_divisors *)
     rngl_opt_integral :
-      if rngl_is_integral then
-        ∀ a b, (a * b = 0)%F → rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b
+      if rngl_is_integral then ∀ a b, (a * b = 0)%F → (a = 0 ∨ b = 0)%F
       else not_applicable;
     (* characteristic *)
     rngl_characteristic_prop :
@@ -734,7 +733,7 @@ Theorem rngl_integral :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   (rngl_is_integral ||
    ((rngl_has_inv || rngl_has_quot) && rngl_has_dec_zero_divisor && rngl_has_1_neq_0))%bool = true →
-  ∀ a b, (a * b = 0)%F → rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b.
+  ∀ a b, (a * b = 0)%F → (a = 0 ∨ b = 0)%F.
 Proof.
 intros Hmo Hdo * Hab.
 specialize rngl_opt_integral as rngl_integral.
@@ -750,6 +749,7 @@ destruct iv. {
     now rewrite <- rngl_mul_assoc, Hab.
   }
   rewrite rngl_mul_0_r in H; [ | easy ].
+...
   destruct (rngl_zero_divisor_dec Hde a) as [Haz| Haz]; [ now left | ].
   rewrite rngl_mul_inv_l in H; [ | easy | easy ].
   rewrite rngl_mul_1_l in H.
