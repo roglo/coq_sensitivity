@@ -733,7 +733,7 @@ Qed.
 Theorem rngl_integral :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   (rngl_is_integral ||
-   ((rngl_has_inv || rngl_has_quot) && rngl_has_dec_zero_divisor))%bool = true →
+   ((rngl_has_inv || rngl_has_quot) && rngl_has_dec_zero_divisor && rngl_has_1_neq_0))%bool = true →
   ∀ a b, (a * b = 0)%F → rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b.
 Proof.
 intros Hmo Hdo * Hab.
@@ -745,6 +745,7 @@ destruct iv. {
   remember rngl_has_dec_zero_divisor as de eqn:Hde; symmetry in Hde.
   destruct de; [ | easy ].
   cbn; clear rngl_integral.
+  cbn in Hdo.
   assert (H : (¹/a * a * b = ¹/a * 0)%F). {
     now rewrite <- rngl_mul_assoc, Hab.
   }
@@ -752,26 +753,29 @@ destruct iv. {
   destruct (rngl_zero_divisor_dec Hde a) as [Haz| Haz]; [ now left | ].
   rewrite rngl_mul_inv_l in H; [ | easy | easy ].
   rewrite rngl_mul_1_l in H.
-  subst b.
   right.
-  unfold rngl_is_zero_divisor.
-(* 0 must be a zero divisor ; but I need that 1≠0, i.e. that 0 is not
-   alone in the ring-like *)
-...
   exists 1%F.
   rewrite rngl_mul_1_r.
   split; [ | easy ].
-...
+  now apply rngl_1_neq_0.
 } {
   cbn in Hdo.
   apply andb_prop in Hdo.
   destruct Hdo as (Hdi, Hde).
   specialize (rngl_opt_mul_quot_l) as H1.
-  rewrite Hdi in H1.
-  destruct (rngl_zero_divisor_dec Hde a) as [Haz| Haz]; [ now left | right ].
+  apply andb_prop in Hdi.
+  destruct Hdi as (Hqu, Hzd).
+  rewrite Hqu in H1.
+  destruct (rngl_zero_divisor_dec Hzd a) as [Haz| Haz]; [ now left | right ].
   specialize (H1 a b Haz) as H4.
   rewrite Hab in H4.
   rewrite <- H4.
+  unfold rngl_is_zero_divisor.
+  rename b into c.
+(* rngl_is_zero_divisor and rngl_is_comm ? *)
+...
+  rewrite H4.
+  exists a.
   apply rngl_div_0_l; [ | easy ].
   split; [ easy | now right ].
 }
