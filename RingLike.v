@@ -53,8 +53,8 @@ Class ring_like_op T :=
     rngl_one : T;
     rngl_add : T → T → T;
     rngl_mul : T → T → T;
-    rngl_opt_opp : option (T → T);
-    rngl_inv : T → option T;
+    rngl_opt_opp : T → option T;
+    rngl_opt_inv : T → option T;
     rngl_opt_sous : option (T → T → T);
     rngl_opt_quot : option (T → T → T);
     rngl_le : T → T → Prop }.
@@ -62,8 +62,13 @@ Class ring_like_op T :=
 Declare Scope ring_like_scope.
 Delimit Scope ring_like_scope with F.
 
-Definition rngl_has_opp {T} {R : ring_like_op T} :=
-  bool_of_option rngl_opt_opp.
+Definition rngl_is_ring {T} {R : ring_like_op T} :=
+  ({x : T & rngl_opt_opp x ≠ None} +
+   {x : T & rngl_opt_opp x = None})%type.
+
+Definition rngl_is_field {T} {R : ring_like_op T} :=
+  ({x : T & x = rngl_zero ∨ rngl_opt_inv x ≠ None} +
+   {x : T & x ≠ rngl_zero ∧ rngl_opt_inv x = None})%type.
 
 Definition rngl_has_sous {T} {R : ring_like_op T} :=
   bool_of_option rngl_opt_sous.
@@ -72,8 +77,14 @@ Definition rngl_has_quot {T} {R : ring_like_op T} :=
   bool_of_option rngl_opt_quot.
 
 Definition rngl_opp {T} {R : ring_like_op T} a :=
-  match rngl_opt_opp with
-  | Some rngl_opp => rngl_opp a
+  match rngl_opt_opp a with
+  | Some a => a
+  | None => rngl_zero
+  end.
+
+Definition rngl_inv {T} {R : ring_like_op T} a :=
+  match rngl_opt_inv a with
+  | Some a => a
   | None => rngl_zero
   end.
 
@@ -90,33 +101,16 @@ Definition rngl_quot {T} {R : ring_like_op T} a b :=
   end.
 
 Definition rngl_sub {T} {R : ring_like_op T} a b :=
-  if rngl_has_opp then rngl_add a (rngl_opp b)
-  else if rngl_has_sous then rngl_sous a b
-  else rngl_zero.
-
-(* la question, c'est : comment savoir si la fonction inverse, rngl_inv,
-   s'applique ou pas ? Par exemple,
-   - Pour ℕ, elle s'applique si x=1
-   - Pour ℤ, elle s'applique si x=1 ou x=-1
-   - Pour les matrices, elle s'applique si dét(x)≠0
-   - Pour un corps, elle s'applique pour x≠0
-   Il peut y avoir une division, sans que la fonction inverse soit définie.
-   Par exemple, on peut diviser 3*5 par 3 dans ℕ, même si 3 n'est pas
-   inversible. Il faut donc bien une fonction "division", rngl_quot, pour
-   les cas où x n'est pas inversible.
-     Mais dans ℕ, par exemple, pour calculer 7/1, faut-il faire "7*(inv 1)"
-   ou "quot 7 1" ? *)
-
-(* si x est inversible, alors ce n'est pas un diviseur de 0 : propriété à
-   ajouter, à imposer ? Note que la réciproque est fausse : dans ℕ, 2
-   n'est pas un diviseur de 0, mais n'est quand même pas inversible *)
+  match rngl_opt_opp b with
+  | Some b => rngl_add a b
+  | None => rngl_zero
+  end.
 
 Definition rngl_div {T} {R : ring_like_op T} a b :=
-  if rngl_has_inv then rngl_mul a (rngl_inv b)
-  else if rngl_has_quot then rngl_quot a b
-  else rngl_zero.
-
-...
+  match rngl_opt_inv b with
+  | Some b => rngl_mul a b
+  | None => rngl_zero
+  end.
 
 Notation "0" := rngl_zero : ring_like_scope.
 Notation "1" := rngl_one : ring_like_scope.
@@ -168,7 +162,11 @@ Class ring_like_prop T {ro : ring_like_op T} :=
        ∀ a b c, ((a + b) * c = a * c + b * c)%F;
     (* when has opposite *)
     rngl_opt_add_opp_l :
-      if rngl_has_opp then ∀ a : T, (- a + a = 0)%F else not_applicable;
+      ∀ a,
+      match rngl_opt_opp a with
+      | Some _ => (- a + a = 0)%F
+      | None => not_applicable
+      end;
     (* when has subtraction (sous) *)
     rngl_opt_add_sub :
       if rngl_has_sous then ∀ a b, (a + b - b)%F = a
@@ -186,6 +184,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       else not_applicable;
     (* when has inverse *)
     rngl_opt_mul_inv_l :
+...
       if rngl_has_inv then ∀ a : T, a ≠ 0%F → (¹/ a * a = 1)%F
       else not_applicable;
     rngl_opt_mul_inv_r :
