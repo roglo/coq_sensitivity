@@ -53,40 +53,30 @@ Class ring_like_op T :=
     rngl_one : T;
     rngl_add : T → T → T;
     rngl_mul : T → T → T;
-    rngl_opt_opp : T → option T;
-    rngl_opt_inv : T → option T;
+    rngl_opp : T → T;
+    rngl_inv : T → T;
     rngl_opt_sous : option (T → T → T);
     rngl_opt_quot : option (T → T → T);
+    rngl_opp_defined : T → bool;
+    rngl_inv_defined : T → bool;
     rngl_le : T → T → Prop }.
 
 Declare Scope ring_like_scope.
 Delimit Scope ring_like_scope with F.
 
 Definition rngl_is_ring {T} {R : ring_like_op T} :=
-  ({x : T & rngl_opt_opp x ≠ None} +
-   {x : T & rngl_opt_opp x = None})%type.
+  ({x : T & rngl_opp_defined x = true} +
+   {x : T & rngl_opp_defined x = false})%type.
 
 Definition rngl_is_field {T} {R : ring_like_op T} :=
-  ({x : T & x = rngl_zero ∨ rngl_opt_inv x ≠ None} +
-   {x : T & x ≠ rngl_zero ∧ rngl_opt_inv x = None})%type.
+  ({x : T & x = rngl_zero ∨ rngl_inv_defined x = true} +
+   {x : T & x ≠ rngl_zero ∧ rngl_inv_defined x = false})%type.
 
 Definition rngl_has_sous {T} {R : ring_like_op T} :=
   bool_of_option rngl_opt_sous.
 
 Definition rngl_has_quot {T} {R : ring_like_op T} :=
   bool_of_option rngl_opt_quot.
-
-Definition rngl_opp {T} {R : ring_like_op T} a :=
-  match rngl_opt_opp a with
-  | Some a => a
-  | None => rngl_zero
-  end.
-
-Definition rngl_inv {T} {R : ring_like_op T} a :=
-  match rngl_opt_inv a with
-  | Some a => a
-  | None => rngl_zero
-  end.
 
 Definition rngl_sous {T} {R : ring_like_op T} a b :=
   match rngl_opt_sous with
@@ -101,16 +91,10 @@ Definition rngl_quot {T} {R : ring_like_op T} a b :=
   end.
 
 Definition rngl_sub {T} {R : ring_like_op T} a b :=
-  match rngl_opt_opp b with
-  | Some b => rngl_add a b
-  | None => rngl_zero
-  end.
+  if rngl_opp_defined b then rngl_add a (rngl_opp b) else rngl_zero.
 
 Definition rngl_div {T} {R : ring_like_op T} a b :=
-  match rngl_opt_inv b with
-  | Some b => rngl_mul a b
-  | None => rngl_zero
-  end.
+  if rngl_inv_defined b then rngl_mul a (rngl_inv b) else rngl_zero.
 
 Notation "0" := rngl_zero : ring_like_scope.
 Notation "1" := rngl_one : ring_like_scope.
@@ -162,11 +146,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
        ∀ a b c, ((a + b) * c = a * c + b * c)%F;
     (* when has opposite *)
     rngl_opt_add_opp_l :
-      ∀ a,
-      match rngl_opt_opp a with
-      | Some _ => (- a + a = 0)%F
-      | None => not_applicable
-      end;
+      ∀ a, if rngl_opp_defined a then (- a + a = 0)%F else not_applicable;
     (* when has subtraction (sous) *)
     rngl_opt_add_sub :
       if rngl_has_sous then ∀ a b, (a + b - b)%F = a
@@ -184,10 +164,9 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       else not_applicable;
     (* when has inverse *)
     rngl_opt_mul_inv_l :
-...
-      if rngl_has_inv then ∀ a : T, a ≠ 0%F → (¹/ a * a = 1)%F
-      else not_applicable;
+      ∀ a, if rngl_inv_defined a then (¹/ a + a = 1)%F else not_applicable;
     rngl_opt_mul_inv_r :
+...
       if (rngl_has_inv && negb rngl_is_comm)%bool then
         ∀ a : T, a ≠ 0%F → (a / a = 1)%F
       else not_applicable;
