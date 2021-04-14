@@ -49,13 +49,12 @@ Definition bool_of_option {T} (x : option T) :=
   end.
 
 Class ring_like_op T :=
-  { rngl_has_inv_for_all_but_zero : bool;
-    rngl_zero : T;
+  { rngl_zero : T;
     rngl_one : T;
     rngl_add : T → T → T;
     rngl_mul : T → T → T;
     rngl_opt_opp : option (T → T);
-    rngl_inv : T → T;
+    rngl_inv : T → option T;
     rngl_opt_sous : option (T → T → T);
     rngl_opt_quot : option (T → T → T);
     rngl_le : T → T → Prop }.
@@ -112,12 +111,12 @@ Definition rngl_sub {T} {R : ring_like_op T} a b :=
    ajouter, à imposer ? Note que la réciproque est fausse : dans ℕ, 2
    n'est pas un diviseur de 0, mais n'est quand même pas inversible *)
 
-...
-
 Definition rngl_div {T} {R : ring_like_op T} a b :=
   if rngl_has_inv then rngl_mul a (rngl_inv b)
   else if rngl_has_quot then rngl_quot a b
   else rngl_zero.
+
+...
 
 Notation "0" := rngl_zero : ring_like_scope.
 Notation "1" := rngl_one : ring_like_scope.
