@@ -53,16 +53,30 @@ Class ring_like_op T :=
     rngl_one : T;
     rngl_add : T → T → T;
     rngl_mul : T → T → T;
-    rngl_opp : T → T;
-    rngl_inv : T → T;
+    rngl_opt_opp : T → option T;
+    rngl_opt_inv : T → option T;
     rngl_opt_sous : option (T → T → T);
     rngl_opt_quot : option (T → T → T);
-    rngl_opp_defined : T → bool;
-    rngl_inv_defined : T → bool;
     rngl_le : T → T → Prop }.
 
 Declare Scope ring_like_scope.
 Delimit Scope ring_like_scope with F.
+
+Definition map_option {T} d (x : option T) :=
+  match x with
+  | Some a => a
+  | None => d
+  end.
+
+Definition rngl_opp {T} {R : ring_like_op T} a :=
+  map_option rngl_zero (rngl_opt_opp a).
+Definition rngl_inv {T} {R : ring_like_op T} a :=
+  map_option rngl_zero (rngl_opt_inv a).
+
+Definition rngl_opp_defined {T} {R : ring_like_op T} a :=
+  bool_of_option (rngl_opt_opp a).
+Definition rngl_inv_defined {T} {R : ring_like_op T} a :=
+  bool_of_option (rngl_opt_inv a).
 
 Definition rngl_is_ring {T} {R : ring_like_op T} :=
   ({x : T & rngl_opp_defined x = true} +
