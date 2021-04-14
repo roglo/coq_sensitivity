@@ -104,7 +104,7 @@ Notation "a * b" := (rngl_mul a b) : ring_like_scope.
 Notation "a / b" := (rngl_div a b) : ring_like_scope.
 Notation "a ≤ b" := (rngl_le a b) : ring_like_scope.
 Notation "- a" := (rngl_opp a) : ring_like_scope.
-Notation "¹/ a" := (rngl_inv a) (at level 35, right associativity) :
+Notation "a '⁻¹'" := (rngl_inv a) (at level 35, right associativity) :
   ring_like_scope.
 Notation "a ≤ b ≤ c" := (a ≤ b ∧ b ≤ c)%F (at level 70, b at next level) :
   ring_like_scope.
@@ -164,7 +164,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       else not_applicable;
     (* when has inverse *)
     rngl_opt_mul_inv_l :
-      ∀ a, if rngl_inv_defined a then (¹/ a + a = 1)%F else not_applicable;
+      ∀ a, if rngl_inv_defined a then (a⁻¹ * a = 1)%F else not_applicable;
     rngl_opt_mul_inv_r :
 ...
       if (rngl_has_inv && negb rngl_is_comm)%bool then
