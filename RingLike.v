@@ -584,6 +584,15 @@ split; intros H. {
 }
 Qed.
 
+Theorem glop : ∀ a b,
+  rngl_opp_defined a = true →
+  rngl_opp_defined b = true →
+  rngl_opp_defined (a * b)%F = true.
+Proof.
+intros * Ha Hb.
+Search rngl_opp_defined.
+...
+
 Theorem rngl_mul_opp_r : ∀ a b,
   rngl_opp_defined a = true →
   rngl_opp_defined b = true →
