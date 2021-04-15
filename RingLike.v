@@ -437,14 +437,12 @@ unfold rngl_sub.
 now rewrite Hro.
 Qed.
 
-...
-
-Theorem rngl_sub_diag :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
-  ∀ a, (a - a = 0)%F.
+Theorem rngl_sub_diag : ∀ a,
+  rngl_opp_defined a = true ∨ rngl_has_sous = true →
+  (a - a = 0)%F.
 Proof.
-intros Hom *.
-remember rngl_has_opp as op eqn:Hop.
+intros * Hom.
+remember (rngl_opp_defined a) as op eqn:Hop.
 symmetry in Hop.
 destruct op. {
   unfold rngl_sub.
@@ -463,12 +461,12 @@ destruct mo. {
 now destruct Hom.
 Qed.
 
-Theorem rngl_add_sub :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
-  ∀ a b, (a + b - b = a)%F.
+Theorem rngl_add_sub : ∀ a b,
+  rngl_opp_defined b = true ∨ rngl_has_sous = true →
+  (a + b - b = a)%F.
 Proof.
-intros Hom *.
-remember rngl_has_opp as op eqn:Hop.
+intros * Hom.
+remember (rngl_opp_defined b) as op eqn:Hop.
 symmetry in Hop.
 destruct op. {
   unfold rngl_sub.
@@ -487,12 +485,12 @@ destruct mo. {
 now destruct Hom.
 Qed.
 
-Theorem rngl_add_cancel_l :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
-  ∀ a b c, (a + b = a + c)%F → (b = c)%F.
+Theorem rngl_add_cancel_l : ∀ a b c,
+  rngl_opp_defined a = true ∨ rngl_has_sous = true →
+  (a + b = a + c)%F → (b = c)%F.
 Proof.
-intros Hom * Habc.
-remember rngl_has_opp as op eqn:Hop.
+intros * Hom Habc.
+remember (rngl_opp_defined a) as op eqn:Hop.
 symmetry in Hop.
 destruct op. {
   apply (f_equal (λ x, rngl_sub x a)) in Habc.
@@ -516,6 +514,8 @@ destruct mo. {
 }
 now destruct Hom.
 Qed.
+
+...
 
 Theorem rngl_add_sub_eq_l :
   rngl_has_opp = true ∨ rngl_has_sous = true →
