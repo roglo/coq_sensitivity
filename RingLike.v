@@ -79,12 +79,10 @@ Definition rngl_inv_defined {T} {R : ring_like_op T} a :=
   bool_of_option (rngl_opt_inv a).
 
 Definition rngl_is_ring {T} {R : ring_like_op T} :=
-  ({x : T & rngl_opp_defined x = true} +
-   {x : T & rngl_opp_defined x = false})%type.
+  ∀ x, rngl_opp_defined x = true.
 
 Definition rngl_is_field {T} {R : ring_like_op T} :=
-  ({x : T & x = rngl_zero ∨ rngl_inv_defined x = true} +
-   {x : T & x ≠ rngl_zero ∧ rngl_inv_defined x = false})%type.
+  ∀ x, x = rngl_zero ∨ rngl_inv_defined x = true.
 
 Definition rngl_has_sous {T} {R : ring_like_op T} :=
   bool_of_option rngl_opt_sous.
@@ -180,9 +178,8 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_opt_mul_inv_l :
       ∀ a, if rngl_inv_defined a then (a⁻¹ * a = 1)%F else not_applicable;
     rngl_opt_mul_inv_r :
-...
-      if (rngl_has_inv && negb rngl_is_comm)%bool then
-        ∀ a : T, a ≠ 0%F → (a / a = 1)%F
+      ∀ a,
+      if (rngl_inv_defined a && negb rngl_is_comm)%bool then (a / a = 1)%F
       else not_applicable;
     (* when has division (quot) *)
     rngl_opt_mul_quot_l :
@@ -224,6 +221,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if rngl_is_ordered then ∀ a b c d, (a ≤ b → c ≤ d → a + c ≤ b + d)%F
       else not_applicable;
     rngl_opt_mul_le_compat_nonneg :
+...
       if (rngl_is_ordered && rngl_has_opp)%bool then
         ∀ a b c d, (0 ≤ a ≤ c)%F → (0 ≤ b ≤ d)%F → (a * b ≤ c * d)%F
       else not_applicable;
