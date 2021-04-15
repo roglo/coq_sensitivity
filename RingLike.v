@@ -221,16 +221,15 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if rngl_is_ordered then ∀ a b c d, (a ≤ b → c ≤ d → a + c ≤ b + d)%F
       else not_applicable;
     rngl_opt_mul_le_compat_nonneg :
-...
-      if (rngl_is_ordered && rngl_has_opp)%bool then
+      if rngl_is_ordered then
         ∀ a b c d, (0 ≤ a ≤ c)%F → (0 ≤ b ≤ d)%F → (a * b ≤ c * d)%F
       else not_applicable;
     rngl_opt_mul_le_compat_nonpos :
-      if (rngl_is_ordered && rngl_has_opp)%bool then
+      if rngl_is_ordered then
         ∀ a b c d, (c ≤ a ≤ 0)%F → (d ≤ b ≤ 0)%F → (a * b ≤ c * d)%F
       else not_applicable;
     rngl_opt_mul_le_compat :
-      if (rngl_is_ordered && negb rngl_has_opp)%bool then
+      if rngl_is_ordered then
         ∀ a b c d, (a ≤ c)%F → (b ≤ d)%F → (a * b ≤ c * d)%F
       else not_applicable;
     rngl_opt_not_le :
@@ -238,9 +237,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
         ∀ a b, (¬ a ≤ b → a = b ∨ b ≤ a)%F
       else not_applicable;
     (* consistency *)
-    rngl_consistent :
-      (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
-      (rngl_has_inv = false ∨ rngl_has_quot = false) }.
+    rngl_consistent : not_applicable }.
 
 Fixpoint rngl_power {T} {ro : ring_like_op T} a n :=
   match n with
@@ -306,24 +303,22 @@ destruct ic. {
 }
 Qed.
 
-Theorem rngl_add_opp_l :
-  rngl_has_opp = true →
-  ∀ x, (- x + x = 0)%F.
+Theorem rngl_add_opp_l : ∀ a,
+  rngl_opp_defined a = true →
+  (- a + a = 0)%F.
 Proof.
-intros H1 *.
-specialize rngl_opt_add_opp_l as H.
-rewrite H1 in H.
-apply H.
+intros * H1.
+specialize (rngl_opt_add_opp_l a) as H.
+now rewrite H1 in H.
 Qed.
 
-Theorem rngl_mul_inv_l :
-  rngl_has_inv = true →
-  ∀ a : T, a ≠ 0%F → (¹/ a * a = 1)%F.
+Theorem rngl_mul_inv_l : ∀ a,
+  rngl_inv_defined a = true →
+  (a⁻¹ * a = 1)%F.
 Proof.
-intros H1 *.
-specialize rngl_opt_mul_inv_l as H.
-rewrite H1 in H.
-apply H.
+intros * H1.
+specialize (rngl_opt_mul_inv_l a) as H.
+now rewrite H1 in H.
 Qed.
 
 Theorem rngl_eq_dec : rngl_has_dec_eq = true → ∀ a b : T, {a = b} + {a ≠ b}.
@@ -364,23 +359,21 @@ Qed.
 
 Theorem rngl_mul_le_compat_nonneg :
   rngl_is_ordered = true →
-  rngl_has_opp = true →
   ∀ a b c d, (0 ≤ a ≤ c)%F → (0 ≤ b ≤ d)%F → (a * b ≤ c * d)%F.
 Proof.
-intros Hor Hop *.
+intros Hor *.
 specialize rngl_opt_mul_le_compat_nonneg as H.
-rewrite Hor, Hop in H.
+rewrite Hor in H.
 apply H.
 Qed.
 
 Theorem rngl_mul_le_compat_nonpos :
   rngl_is_ordered = true →
-  rngl_has_opp = true →
   ∀ a b c d, (c ≤ a ≤ 0)%F → (d ≤ b ≤ 0)%F → (a * b ≤ c * d)%F.
 Proof.
-intros Hor Hop *.
+intros Hor *.
 specialize rngl_opt_mul_le_compat_nonpos as H.
-rewrite Hor, Hop in H.
+rewrite Hor in H.
 apply H.
 Qed.
 
@@ -435,14 +428,16 @@ intros a b c Hab.
 now rewrite Hab.
 Qed.
 
-Theorem fold_rngl_sub :
-  rngl_has_opp = true →
-  ∀ a b, (a + - b)%F = (a - b)%F.
+Theorem fold_rngl_sub : ∀ a b,
+  rngl_opp_defined b = true →
+  (a + - b)%F = (a - b)%F.
 Proof.
-intros Hro *.
+intros * Hro.
 unfold rngl_sub.
 now rewrite Hro.
 Qed.
+
+...
 
 Theorem rngl_sub_diag :
   rngl_has_opp = true ∨ rngl_has_sous = true →
