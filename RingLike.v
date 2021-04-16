@@ -584,24 +584,19 @@ split; intros H. {
 }
 Qed.
 
-Theorem glop : ∀ a b,
-  rngl_opp_defined a = true →
-  rngl_opp_defined b = true →
-  rngl_opp_defined (a * b)%F = true.
-Proof.
-intros * Ha Hb.
-Search rngl_opp_defined.
-...
-
 Theorem rngl_mul_opp_r : ∀ a b,
+(*
   rngl_opp_defined a = true →
+*)
   rngl_opp_defined b = true →
   (a * - b = - (a * b))%F.
 Proof.
-intros * Hroa Hrob.
+intros * (*Hroa*) Hrob.
 specialize (rngl_mul_add_distr_l a b (- b)%F) as H.
 rewrite fold_rngl_sub in H; [ | easy ].
 rewrite rngl_sub_diag in H; [ | now left ].
+Check rngl_mul_0_r.
+...
 rewrite rngl_mul_0_r in H; [ | now left ].
 symmetry in H.
 rewrite rngl_add_comm in H.
