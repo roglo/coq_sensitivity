@@ -599,35 +599,27 @@ apply rngl_add_move_0_r in H; [ easy | ].
 now apply rngl_add_move_0_r in H.
 Qed.
 
-...
-
 Theorem rngl_mul_sub_distr_l :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
-  ∀ a b c, (a * (b - c) = a * b - a * c)%F.
+  rngl_is_ring →
+  ∀ a b c , (a * (b - c) = a * b - a * c)%F.
 Proof.
-intros Hom *.
-remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
-destruct op. {
-  unfold rngl_sub; rewrite Hop.
-  rewrite rngl_mul_add_distr_l.
-  now rewrite rngl_mul_opp_r.
-}
-remember rngl_has_sous as mo eqn:Hmo; symmetry in Hmo.
-destruct mo. {
-  specialize rngl_opt_mul_sub_distr_l as H1.
-  now rewrite Hmo in H1.
-}
-now destruct Hom.
+intros Hrng *.
+unfold rngl_sub.
+do 2 rewrite Hrng.
+rewrite rngl_mul_add_distr_l.
+now rewrite rngl_mul_opp_r.
 Qed.
 
-Theorem fold_rngl_div :
-  rngl_has_inv = true →
-  ∀ a b, (a * ¹/ b)%F = (a / b)%F.
+Theorem fold_rngl_div : ∀ a b,
+  rngl_inv_defined b = true →
+  (a * b⁻¹)%F = (a / b)%F.
 Proof.
-intros Hin *.
+intros * Hin.
 unfold rngl_div.
 now rewrite Hin.
 Qed.
+
+...
 
 Theorem rngl_mul_inv_r :
   rngl_has_inv = true ∨ rngl_has_quot = true →
