@@ -552,11 +552,6 @@ Theorem rngl_mul_0_r : ∀ a,
   (a * 0 = 0)%F.
 Proof.
 intros * Hom.
-clear Hom.
-apply (rngl_add_cancel_r _ _ (a * 1)%F); [ | ].
-(* should be true without condition! *)
-...
-intros * Hom.
 apply (rngl_add_cancel_r _ _ (a * 1)%F); [ now rewrite rngl_mul_1_r | ].
 rewrite <- rngl_mul_add_distr_l.
 now do 2 rewrite rngl_add_0_l.
@@ -589,26 +584,22 @@ split; intros H. {
 }
 Qed.
 
-Theorem rngl_mul_opp_r : ∀ a b,
-(*
-  rngl_opp_defined a = true →
-*)
-  rngl_opp_defined b = true →
-  (a * - b = - (a * b))%F.
+Theorem rngl_mul_opp_r :
+  rngl_is_ring →
+  ∀ a b, (a * - b = - (a * b))%F.
 Proof.
-intros * (*Hroa*) Hrob.
+intros Hrng *.
 specialize (rngl_mul_add_distr_l a b (- b)%F) as H.
 rewrite fold_rngl_sub in H; [ | easy ].
 rewrite rngl_sub_diag in H; [ | now left ].
-Check rngl_mul_0_r.
-...
 rewrite rngl_mul_0_r in H; [ | now left ].
 symmetry in H.
 rewrite rngl_add_comm in H.
 apply rngl_add_move_0_r in H; [ easy | ].
-...
-ow apply rngl_add_move_0_r in H.
+now apply rngl_add_move_0_r in H.
 Qed.
+
+...
 
 Theorem rngl_mul_sub_distr_l :
   rngl_has_opp = true ∨ rngl_has_sous = true →
