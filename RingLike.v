@@ -679,14 +679,12 @@ destruct iv. {
 }
 Qed.
 
-...
-
-Theorem rngl_div_0_l :
-  (rngl_has_opp = true ∨ rngl_has_sous = true) ∧
-  (rngl_has_inv = true ∨ rngl_has_quot = true) →
-  ∀ a, a ≠ 0%F → (0 / a)%F = 0%F.
+Theorem rngl_div_0_l : ∀ a,
+  (rngl_opp_defined a = true ∨ rngl_has_sous = true) ∧
+  (rngl_inv_defined a = true ∨ rngl_has_quot = true) →
+  a ≠ 0%F → (0 / a)%F = 0%F.
 Proof.
-intros Hiv * Haz.
+intros * Hiv Haz.
 remember (0 / a)%F as x eqn:Hx.
 replace 0%F with (0 * a)%F in Hx. 2: {
   now apply rngl_mul_0_l.
@@ -695,27 +693,30 @@ subst x.
 now apply rngl_mul_div_l.
 Qed.
 
-Theorem rngl_integral :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+Theorem rngl_integral : ∀ a b,
+  rngl_opp_defined a = true ∧ rngl_opp_defined (a⁻¹)%F = true ∨
+  rngl_has_sous = true →
   (rngl_is_integral ||
-   ((rngl_has_inv || rngl_has_quot) && rngl_has_dec_eq))%bool = true →
-  ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F.
+   ((rngl_inv_defined a || rngl_has_quot) && rngl_has_dec_eq))%bool = true →
+  (a * b = 0)%F → a = 0%F ∨ b = 0%F.
 Proof.
-intros Hmo Hdo * Hab.
+intros * Hmo Hdo Hab.
 specialize rngl_opt_integral as rngl_integral.
 destruct rngl_is_integral; [ now apply rngl_integral | ].
-remember rngl_has_inv as iv eqn:Hiv; symmetry in Hiv.
+remember (rngl_inv_defined a) as iv eqn:Hiv; symmetry in Hiv.
 cbn in Hdo.
 destruct iv. {
   remember rngl_has_dec_eq as de eqn:Hde; symmetry in Hde.
   destruct de; [ | easy ].
   cbn; clear rngl_integral.
-  assert (H : (¹/a * a * b = ¹/a * 0)%F). {
+  assert (H : (a⁻¹ * a * b = a⁻¹ * 0)%F). {
     now rewrite <- rngl_mul_assoc, Hab.
   }
-  rewrite rngl_mul_0_r in H; [ | easy ].
+  rewrite rngl_mul_0_r in H. 2: {
+    destruct Hmo; [ now left | now right ].
+  }
   destruct (rngl_eq_dec Hde a 0%F) as [Haz| Haz]; [ now left | ].
-  rewrite rngl_mul_inv_l in H; [ | easy | easy ].
+  rewrite rngl_mul_inv_l in H; [ | easy ].
   rewrite rngl_mul_1_l in H.
   now right.
 } {
@@ -729,9 +730,12 @@ destruct iv. {
   rewrite Hab in H4.
   rewrite <- H4.
   apply rngl_div_0_l; [ | easy ].
-  split; [ easy | now right ].
+  split; [ | now right ].
+  destruct Hmo; [ now left | now right ].
 }
 Qed.
+
+...
 
 Theorem rngl_sub_move_0_r :
   rngl_has_opp = true →
