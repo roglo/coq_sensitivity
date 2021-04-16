@@ -552,6 +552,11 @@ Theorem rngl_mul_0_r : ∀ a,
   (a * 0 = 0)%F.
 Proof.
 intros * Hom.
+clear Hom.
+apply (rngl_add_cancel_r _ _ (a * 1)%F); [ | ].
+(* should be true without condition! *)
+...
+intros * Hom.
 apply (rngl_add_cancel_r _ _ (a * 1)%F); [ now rewrite rngl_mul_1_r | ].
 rewrite <- rngl_mul_add_distr_l.
 now do 2 rewrite rngl_add_0_l.
