@@ -181,11 +181,11 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* when has division (quot) *)
     rngl_opt_mul_quot_l :
       if rngl_has_quot then
-        ∀ a b, rngl_inv_defined a = true → (a * b / a)%F = b
+        ∀ a b, a ≠ 0%F → (a * b / a)%F = b
       else not_applicable;
     rngl_opt_mul_quot_r :
       if (rngl_has_quot && negb rngl_is_comm)%bool then
-        ∀ a b, rngl_inv_defined b = true → (a * b / b)%F = a
+        ∀ a b, b ≠ 0%F → (a * b / b)%F = a
       else not_applicable;
     (* when equality is decidable *)
     rngl_opt_eq_dec :
@@ -622,9 +622,10 @@ Qed.
 
 Theorem rngl_mul_inv_r : ∀ a,
   rngl_inv_defined a = true ∨ rngl_has_quot = true →
+  a ≠ 0%F →
   (a / a = 1)%F.
 Proof.
-intros * Hii.
+intros * Hii Haz.
 remember (rngl_inv_defined a) as iv eqn:Hiv; symmetry in Hiv.
 destruct iv. {
   specialize (rngl_opt_mul_inv_r a) as rngl_mul_inv_r.
@@ -644,18 +645,17 @@ destruct iv. {
   destruct Hii as [Hii| Hii]; [ easy | ].
   specialize rngl_opt_mul_quot_l as H1.
   rewrite Hii in H1.
-...
-  specialize (H1 a 1%F Hiv).
+  specialize (H1 a 1%F Haz).
   now rewrite rngl_mul_1_r in H1.
 }
 Qed.
 
-Theorem rngl_mul_div_l :
-  rngl_has_inv = true ∨ rngl_has_quot = true →
-  ∀ a b : T, b ≠ 0%F → (a * b / b)%F = a.
+Theorem rngl_mul_div_l : ∀ a b,
+  rngl_inv_defined b = true ∨ rngl_has_quot = true →
+  b ≠ 0%F → (a * b / b)%F = a.
 Proof.
-intros Hii a b Hbz.
-remember rngl_has_inv as iv eqn:Hiv; symmetry in Hiv.
+intros * Hii Hbz.
+remember (rngl_inv_defined b) as iv eqn:Hiv; symmetry in Hiv.
 destruct iv. {
   unfold rngl_div.
   rewrite Hiv.
@@ -678,6 +678,8 @@ destruct iv. {
   }
 }
 Qed.
+
+...
 
 Theorem rngl_div_0_l :
   (rngl_has_opp = true ∨ rngl_has_sous = true) ∧
