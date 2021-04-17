@@ -819,17 +819,15 @@ intros Hin a b c Hcz Hab.
 now rewrite Hab.
 Qed.
 
-...
-
 Theorem rngl_inv_if_then_else_distr : ∀ (c : bool) a b,
-  (¹/ (if c then a else b) = if c then ¹/ a else ¹/ b)%F.
+  ((if c then a else b)⁻¹ = if c then a⁻¹ else b⁻¹)%F.
 Proof. now destruct c. Qed.
 
 Theorem rngl_mul_if_then_else_distr : ∀ (x : bool) a b c d,
   ((if x then a else b) * (if x then c else d) = if x then a * c else b * d)%F.
 Proof. now destruct x. Qed.
 
-Theorem rngl_opp_0 : rngl_has_opp = true → (- 0 = 0)%F.
+Theorem rngl_opp_0 : rngl_opp_defined 0%F = true → (- 0 = 0)%F.
 Proof.
 intros Hro.
 transitivity (0 + - 0)%F. {
@@ -839,6 +837,8 @@ transitivity (0 + - 0)%F. {
 rewrite fold_rngl_sub; [ | easy ].
 now apply rngl_sub_diag; left.
 Qed.
+
+...
 
 Theorem rngl_sub_0_r :
   rngl_has_opp = true ∨ rngl_has_sous = true →
