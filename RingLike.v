@@ -735,13 +735,11 @@ destruct iv. {
 }
 Qed.
 
-...
-
-Theorem rngl_sub_move_0_r :
-  rngl_has_opp = true →
-  ∀ a b : T, (a - b)%F = 0%F → a = b.
+Theorem rngl_sub_move_0_r : ∀ a b,
+  rngl_opp_defined b = true →
+  (a - b)%F = 0%F → a = b.
 Proof.
-intros Hop * Hab.
+intros * Hop Hab.
 apply (rngl_add_compat_r _ _ b) in Hab.
 unfold rngl_sub in Hab.
 rewrite Hop in Hab.
@@ -770,17 +768,17 @@ intros a b c Hab.
 now rewrite Hab.
 Qed.
 
-Theorem rngl_mul_cancel_l :
-  rngl_has_inv = true ∨ rngl_has_quot = true →
-  ∀ a b c, a ≠ 0%F
+Theorem rngl_mul_cancel_l : ∀ a b c,
+  rngl_inv_defined a = true ∨ rngl_has_quot = true →
+  a ≠ 0%F
   → (a * b = a * c)%F
   → b = c.
 Proof.
-intros Hii * Haz Hbc.
+intros * Hii Haz Hbc.
 destruct Hii as [Hii| Hii]. {
-  assert (H2 : (¹/ a * (a * b) = ¹/ a * (a * c))%F) by now rewrite Hbc.
+  assert (H2 : (a⁻¹ * (a * b) = a⁻¹ * (a * c))%F) by now rewrite Hbc.
   do 2 rewrite rngl_mul_assoc in H2.
-  rewrite rngl_mul_inv_l in H2; [ | easy | easy ].
+  rewrite rngl_mul_inv_l in H2; [ | easy ].
   now do 2 rewrite rngl_mul_1_l in H2.
 } {
   remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
@@ -800,26 +798,28 @@ destruct Hii as [Hii| Hii]. {
 }
 Qed.
 
-Theorem rngl_mul_cancel_r :
-  rngl_has_inv = true ∨ rngl_has_quot = true →
-  ∀ a b c, c ≠ 0%F
+Theorem rngl_mul_cancel_r : ∀ a b c,
+  rngl_inv_defined c = true ∨ rngl_has_quot = true →
+  c ≠ 0%F
   → (a * c = b * c)%F
   → a = b.
 Proof.
-intros Hii * Hcz Hab.
+intros * Hii Hcz Hab.
 assert (H : (a * c / c = b * c / c)%F) by now rewrite Hab.
 rewrite rngl_mul_div_l in H; [ | easy | easy ].
 rewrite rngl_mul_div_l in H; [ | easy | easy ].
 easy.
 Qed.
 
-Theorem rngl_div_compat_l :
-  rngl_has_inv = true →
-  ∀ a b c, c ≠ 0%F → (a = b)%F → (a / c = b / c)%F.
+Theorem rngl_div_compat_l : ∀ a b c,
+  rngl_inv_defined c = true →
+  c ≠ 0%F → (a = b)%F → (a / c = b / c)%F.
 Proof.
 intros Hin a b c Hcz Hab.
 now rewrite Hab.
 Qed.
+
+...
 
 Theorem rngl_inv_if_then_else_distr : ∀ (c : bool) a b,
   (¹/ (if c then a else b) = if c then ¹/ a else ¹/ b)%F.
