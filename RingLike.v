@@ -957,18 +957,18 @@ split; intros H. {
 }
 Qed.
 
-...
-
-Theorem rngl_opp_involutive :
-  rngl_has_opp = true →
-  ∀ x, (- - x)%F = x.
+Theorem rngl_opp_involutive : ∀ a,
+  rngl_opp_defined a = true →
+  (- - a)%F = a.
 Proof.
-intros Hro *.
+intros * Hro.
 symmetry.
-specialize (rngl_sub_diag (or_introl Hro)) as H.
+specialize (rngl_sub_diag _ (or_introl Hro)) as H.
 unfold rngl_sub in H.
 rewrite Hro in H.
-now apply rngl_add_move_0_r.
+apply rngl_add_move_0_r; [ | easy ].
+Search rngl_opp_defined.
+...
 Qed.
 
 Theorem rngl_inv_neq_0 :
