@@ -862,24 +862,25 @@ destruct mo. {
 now destruct Hom.
 Qed.
 
-...
-
 Theorem rngl_opp_add_distr :
-  rngl_has_opp = true →
+  rngl_is_ring →
   ∀ a b, (- (a + b) = - b - a)%F.
 Proof.
 intros Hro *.
 apply rngl_add_cancel_l with (a := (a + b)%F); [ now left | ].
-rewrite (fold_rngl_sub Hro).
+rewrite fold_rngl_sub; [ | easy ].
 rewrite rngl_sub_diag; [ | now left ].
 unfold rngl_sub.
 rewrite Hro.
 rewrite rngl_add_assoc.
-do 2 rewrite (fold_rngl_sub Hro).
+rewrite fold_rngl_sub; [ | easy ].
+rewrite fold_rngl_sub; [ | easy ].
 rewrite rngl_add_sub; [ | now left ].
 symmetry.
 now apply rngl_sub_diag; left.
 Qed.
+
+...
 
 Theorem rngl_add_sub_simpl_l :
   rngl_has_opp = true ∨ rngl_has_sous = true →
