@@ -919,31 +919,30 @@ apply H.
 now apply rngl_1_neq_0.
 Qed.
 
-...
-Theorem rngl_div_1_l :
-  rngl_inv_defined 1 = true →
-  ∀ a, (1 / a = a⁻¹)%F.
+Theorem rngl_div_1_l : ∀ a,
+  rngl_inv_defined a = true →
+  (1 / a = a⁻¹)%F.
 Proof.
-intros Hin *.
+intros * Hin.
 unfold rngl_div.
 rewrite Hin.
 apply rngl_mul_1_l.
 Qed.
 
 Theorem rngl_div_1_r :
-  rngl_has_inv = true ∨ rngl_has_quot = true →
+  rngl_inv_defined 1 = true ∨ rngl_has_quot = true →
   rngl_has_1_neq_0 = true →
   ∀ a, (a / 1 = a)%F.
 Proof.
 intros Hid H10 *.
-specialize (rngl_mul_div_l Hid a 1%F (rngl_1_neq_0 H10)) as H1.
+specialize (rngl_mul_div_l a 1%F Hid (rngl_1_neq_0 H10)) as H1.
 now rewrite rngl_mul_1_r in H1.
 Qed.
 
-Theorem rngl_mul_move_1_r :
-  rngl_has_inv = true → ∀ a b : T, b ≠ 0%F → (a * b)%F = 1%F ↔ a = (¹/ b)%F.
+Theorem rngl_mul_move_1_r : ∀ a b,
+  rngl_inv_defined b = true → b ≠ 0%F → (a * b)%F = 1%F ↔ a = (b⁻¹)%F.
 Proof.
-intros Hin * Hbz.
+intros * Hin Hbz.
 split; intros H. {
   apply rngl_div_compat_l with (c := b) in H; [ | easy | easy ].
   unfold rngl_div in H.
@@ -954,10 +953,11 @@ split; intros H. {
   now rewrite rngl_mul_1_r, rngl_mul_1_l in H.
 } {
   rewrite H.
-  specialize (rngl_mul_inv_l Hin) as H1.
-  now apply H1.
+  now apply rngl_mul_inv_l.
 }
 Qed.
+
+...
 
 Theorem rngl_opp_involutive :
   rngl_has_opp = true →
