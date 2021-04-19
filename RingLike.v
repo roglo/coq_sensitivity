@@ -968,6 +968,8 @@ unfold rngl_sub in H.
 rewrite Hro in H.
 apply rngl_add_move_0_r; [ | easy ].
 Search rngl_opp_defined.
+(* do I have to specify in an axiom that "rngl_opp_defined a"
+   implies "rngl_opp_defined (- a)" ? *)
 ...
 Qed.
 
