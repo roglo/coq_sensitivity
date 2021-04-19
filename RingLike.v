@@ -75,6 +75,9 @@ Definition rngl_opp_defined {T} {R : ring_like_op T} a :=
 Definition rngl_inv_defined {T} {R : ring_like_op T} a :=
   bool_of_option (rngl_opt_inv a).
 
+Arguments rngl_opp_defined {T}%type {R} a%F.
+Arguments rngl_inv_defined {T}%type {R} a%F.
+
 Definition rngl_is_ring {T} {R : ring_like_op T} :=
   ∀ x, rngl_opp_defined x = true.
 
@@ -694,7 +697,7 @@ now apply rngl_mul_div_l.
 Qed.
 
 Theorem rngl_integral : ∀ a b,
-  rngl_opp_defined a = true ∧ rngl_opp_defined (a⁻¹)%F = true ∨
+  rngl_opp_defined a = true ∧ rngl_opp_defined (a⁻¹) = true ∨
   rngl_has_sous = true →
   (rngl_is_integral ||
    ((rngl_inv_defined a || rngl_has_quot) && rngl_has_dec_eq))%bool = true →
@@ -827,7 +830,7 @@ Theorem rngl_mul_if_then_else_distr : ∀ (x : bool) a b c d,
   ((if x then a else b) * (if x then c else d) = if x then a * c else b * d)%F.
 Proof. now destruct x. Qed.
 
-Theorem rngl_opp_0 : rngl_opp_defined 0%F = true → (- 0 = 0)%F.
+Theorem rngl_opp_0 : rngl_opp_defined 0 = true → (- 0 = 0)%F.
 Proof.
 intros Hro.
 transitivity (0 + - 0)%F. {
@@ -839,11 +842,11 @@ now apply rngl_sub_diag; left.
 Qed.
 
 Theorem rngl_sub_0_r :
-  rngl_opp_defined 0%F = true ∨ rngl_has_sous = true →
+  rngl_opp_defined 0 = true ∨ rngl_has_sous = true →
   ∀ a, (a - 0 = a)%F.
 Proof.
 intros Hom *.
-remember (rngl_opp_defined 0%F) as op eqn:Hop.
+remember (rngl_opp_defined 0) as op eqn:Hop.
 symmetry in Hop.
 destruct op. {
   unfold rngl_sub.
@@ -880,58 +883,46 @@ symmetry.
 now apply rngl_sub_diag; left.
 Qed.
 
-...
-
 Theorem rngl_add_sub_simpl_l :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
-  ∀ a b c : T, (a + b - (a + c) = b - c)%F.
+  rngl_is_ring →
+  ∀ a b c, (a + b - (a + c) = b - c)%F.
 Proof.
 intros Hom *.
-remember rngl_has_opp as op eqn:Hop.
-symmetry in Hop.
-destruct op. {
-  unfold rngl_sub; rewrite Hop.
-  rewrite rngl_opp_add_distr; [ | easy ].
-  unfold rngl_sub; rewrite Hop.
-  rewrite rngl_add_assoc.
-  rewrite rngl_add_add_swap.
-  rewrite (rngl_add_add_swap a).
-  rewrite fold_rngl_sub; [ | easy ].
-  rewrite fold_rngl_sub; [ | easy ].
-  rewrite fold_rngl_sub; [ | easy ].
-  rewrite rngl_sub_diag, rngl_add_0_l; [ easy | now left ].
-}
-remember rngl_has_sous as mo eqn:Hmo.
-symmetry in Hmo.
-destruct mo; [ clear Hom | now destruct Hom ].
-specialize rngl_opt_sub_sub_sub_add as H1.
-rewrite Hmo in H1.
-rewrite <- H1.
-rewrite rngl_add_comm.
-rewrite rngl_add_sub; [ easy | ].
-now right.
+unfold rngl_sub.
+do 2 rewrite Hom.
+rewrite rngl_opp_add_distr; [ | easy ].
+unfold rngl_sub; rewrite Hom.
+rewrite rngl_add_assoc.
+rewrite rngl_add_add_swap.
+rewrite (rngl_add_add_swap a).
+rewrite fold_rngl_sub; [ | easy ].
+rewrite fold_rngl_sub; [ | easy ].
+rewrite fold_rngl_sub; [ | easy ].
+rewrite rngl_sub_diag, rngl_add_0_l; [ easy | now left ].
 Qed.
 
 Theorem rngl_inv_1 :
-  rngl_has_inv = true →
+  rngl_inv_defined 1 = true →
   rngl_has_1_neq_0 = true →
-  (¹/ 1 = 1)%F.
+  (1⁻¹ = 1)%F.
 Proof.
 intros Hin H10.
 specialize rngl_mul_inv_r as H.
 unfold rngl_div in H.
-rewrite Hin in H.
-transitivity (1 * ¹/ 1)%F. {
+transitivity (1 * 1⁻¹)%F. {
   symmetry.
   apply rngl_mul_1_l.
 }
-apply H; [ now left | ].
+specialize (H 1%F (or_introl Hin)).
+rewrite Hin in H.
+apply H.
 now apply rngl_1_neq_0.
 Qed.
 
+...
 Theorem rngl_div_1_l :
-  rngl_has_inv = true →
-  ∀ a, (1 / a = ¹/ a)%F.
+  rngl_inv_defined 1 = true →
+  ∀ a, (1 / a = a⁻¹)%F.
 Proof.
 intros Hin *.
 unfold rngl_div.
