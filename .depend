@@ -4,6 +4,8 @@ FermatLittle.vio: FermatLittle.v Misc.vio
 FermatLittle.vo FermatLittle.glob FermatLittle.v.beautified FermatLittle.required_vo: FermatLittle.v Misc.vo
 GQ.vio: GQ.v Misc.vio PQ.vio Nat_ggcd.vio
 GQ.vo GQ.glob GQ.v.beautified GQ.required_vo: GQ.v Misc.vo PQ.vo Nat_ggcd.vo
+GaussIntRl.vio: GaussIntRl.v RingLike.vio
+GaussIntRl.vo GaussIntRl.glob GaussIntRl.v.beautified GaussIntRl.required_vo: GaussIntRl.v RingLike.vo
 Lemma_2_1.vio: Lemma_2_1.v Misc.vio MyVector.vio Matrix.vio Determinant.vio RingLike.vio RLsummation.vio
 Lemma_2_1.vo Lemma_2_1.glob Lemma_2_1.v.beautified Lemma_2_1.required_vo: Lemma_2_1.v Misc.vo MyVector.vo Matrix.vo Determinant.vo RingLike.vo RLsummation.vo
 Lemma_2_2.vio: Lemma_2_2.v Misc.vio RingLike.vio MyVector.vio Matrix.vio RLsummation.vio
@@ -26,6 +28,8 @@ Pigeonhole.vio: Pigeonhole.v Misc.vio
 Pigeonhole.vo Pigeonhole.glob Pigeonhole.v.beautified Pigeonhole.required_vo: Pigeonhole.v Misc.vo
 Qrl.vio: Qrl.v RingLike.vio Rational.vio
 Qrl.vo Qrl.glob Qrl.v.beautified Qrl.required_vo: Qrl.v RingLike.vo Rational.vo
+QuadIntRl.vio: QuadIntRl.v Misc.vio RingLike.vio
+QuadIntRl.vo QuadIntRl.glob QuadIntRl.v.beautified QuadIntRl.required_vo: QuadIntRl.v Misc.vo RingLike.vo
 RLproduct.vio: RLproduct.v Misc.vio RingLike.vio
 RLproduct.vo RLproduct.glob RLproduct.v.beautified RLproduct.required_vo: RLproduct.v Misc.vo RingLike.vo
 RLsummation.vio: RLsummation.v Misc.vio RingLike.vio
