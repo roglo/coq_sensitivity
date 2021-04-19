@@ -838,14 +838,12 @@ rewrite fold_rngl_sub; [ | easy ].
 now apply rngl_sub_diag; left.
 Qed.
 
-...
-
 Theorem rngl_sub_0_r :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_opp_defined 0%F = true ∨ rngl_has_sous = true →
   ∀ a, (a - 0 = a)%F.
 Proof.
 intros Hom *.
-remember rngl_has_opp as op eqn:Hop.
+remember (rngl_opp_defined 0%F) as op eqn:Hop.
 symmetry in Hop.
 destruct op. {
   unfold rngl_sub.
@@ -863,6 +861,8 @@ destruct mo. {
 }
 now destruct Hom.
 Qed.
+
+...
 
 Theorem rngl_opp_add_distr :
   rngl_has_opp = true →
