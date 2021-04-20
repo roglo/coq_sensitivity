@@ -1116,6 +1116,15 @@ Proof.
 intros * Hom Hdo Hia Hib Haz Hbz.
 specialize rngl_mul_cancel_l as H1.
 specialize rngl_mul_inv_r as H2.
+specialize rngl_integral as H3.
+unfold rngl_div in H2.
+rewrite Hdo in H3; cbn in H3.
+...
+specialize (H3 eq_refl).
+...
+intros * Hom Hdo Hia Hib Haz Hbz.
+specialize rngl_mul_cancel_l as H1.
+specialize rngl_mul_inv_r as H2.
 ...
 specialize (rngl_integral Hom) as H3.
 unfold rngl_div in H2.
