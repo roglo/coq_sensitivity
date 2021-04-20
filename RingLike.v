@@ -1075,39 +1075,48 @@ rewrite rngl_mul_opp_r; [ | easy ].
 now apply rngl_opp_involutive.
 Qed.
 
-...
-
-Theorem rngl_opp_inj :
-  rngl_has_opp = true →
-  ∀ a b, (- a = - b)%F → a = b.
+Theorem rngl_opp_inj : ∀ a b,
+  rngl_opp_defined a = true →
+  rngl_opp_defined b = true →
+  (- a = - b)%F → a = b.
 Proof.
-intros Hro * H.
-rewrite <- (rngl_opp_involutive Hro a).
-rewrite H.
+intros * Hra Hrb Hab.
+rewrite <- (rngl_opp_involutive a Hra).
+rewrite Hab.
 now apply rngl_opp_involutive.
 Qed.
 
-Theorem rngl_inv_inj :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
-  rngl_has_inv = true →
+Theorem rngl_inv_inj : ∀ a b,
+  (rngl_opp_defined a = true ∧ rngl_opp_defined b = true) ∨
+   rngl_has_sous = true →
+  rngl_inv_defined a = true →
+  rngl_inv_defined b = true →
   rngl_has_1_neq_0 = true →
-  ∀ a b, a ≠ 0%F → b ≠ 0%F →(¹/ a = ¹/ b)%F → a = b.
+  a ≠ 0%F → b ≠ 0%F →(a⁻¹ = b⁻¹)%F → a = b.
 Proof.
-intros Hom Hin H10 * Haz Hbz H.
-rewrite <- (rngl_inv_involutive Hom Hin H10 a); [ | easy ].
+intros * Hom Hia Hib H10 Haz Hbz H.
+rewrite <- (rngl_inv_involutive a); [ | | easy | easy | easy ]. 2: {
+  destruct Hom as [Hom| ]; [ | now right ].
+  destruct Hom; now left.
+}
 rewrite H.
-now apply rngl_inv_involutive.
+apply rngl_inv_involutive; [ | easy | easy | easy ].
+destruct Hom as [Hom| ]; [ | now right ].
+destruct Hom; now left.
 Qed.
 
-Theorem rngl_inv_mul_distr :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+Theorem rngl_inv_mul_distr : ∀ a b,
+  (rngl_opp_defined a = true ∧ rngl_opp_defined b = true) ∨
+   rngl_has_sous = true →
   rngl_is_integral = true →
-  rngl_has_inv = true →
-  ∀ a b, a ≠ 0%F → b ≠ 0%F →(¹/ (a * b) = ¹/ b * ¹/ a)%F.
+  rngl_inv_defined a = true →
+  rngl_inv_defined b = true →
+  a ≠ 0%F → b ≠ 0%F →((a * b)⁻¹ = b⁻¹ * a⁻¹)%F.
 Proof.
-intros Hom Hdo Hin * Haz Hbz.
+intros * Hom Hdo Hia Hib Haz Hbz.
 specialize rngl_mul_cancel_l as H1.
 specialize rngl_mul_inv_r as H2.
+...
 specialize (rngl_integral Hom) as H3.
 unfold rngl_div in H2.
 rewrite Hdo in H3; cbn in H3.
