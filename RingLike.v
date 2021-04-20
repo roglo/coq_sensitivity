@@ -1053,13 +1053,11 @@ apply H2; [ | easy ].
 now apply rngl_inv_neq_0.
 Qed.
 
-...
-
-Theorem rngl_mul_opp_l :
-  rngl_has_opp = true →
-  ∀ a b, (- a * b = - (a * b))%F.
+Theorem rngl_mul_opp_l : ∀ a b,
+  rngl_is_ring →
+  (- a * b = - (a * b))%F.
 Proof.
-intros Hro *.
+intros * Hr.
 specialize (rngl_mul_add_distr_r (- a)%F a b) as H.
 rewrite rngl_add_opp_l in H; [ | easy ].
 rewrite rngl_mul_0_l in H; [ | now left ].
@@ -1068,7 +1066,7 @@ now apply rngl_add_move_0_r in H.
 Qed.
 
 Theorem rngl_mul_opp_opp :
-  rngl_has_opp = true →
+  rngl_is_ring →
   ∀ a b, (- a * - b = a * b)%F.
 Proof.
 intros Hro *.
@@ -1076,6 +1074,8 @@ rewrite rngl_mul_opp_l; [ | easy ].
 rewrite rngl_mul_opp_r; [ | easy ].
 now apply rngl_opp_involutive.
 Qed.
+
+...
 
 Theorem rngl_opp_inj :
   rngl_has_opp = true →
