@@ -156,6 +156,11 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_opt_mul_add_distr_r :
       if rngl_is_comm then not_applicable else
        ∀ a b c, ((a + b) * c = a * c + b * c)%F;
+    (* properties of general opposite and general inverse *)
+    rngl_opt_opp_prop :
+      ∀ a b, rngl_opt_opp a = Some b → rngl_opt_opp b = Some a;
+    rngl_opt_inv_prop :
+      ∀ a b, rngl_opt_inv a = Some b → rngl_opt_inv b = Some a;
     (* when has opposite *)
     rngl_opt_add_opp_l :
       ∀ a, if rngl_opp_defined a then (- a + a = 0)%F else not_applicable;
@@ -967,11 +972,24 @@ specialize (rngl_sub_diag _ (or_introl Hro)) as H.
 unfold rngl_sub in H.
 rewrite Hro in H.
 apply rngl_add_move_0_r; [ | easy ].
-Search rngl_opp_defined.
-(* do I have to specify in an axiom that "rngl_opp_defined a"
-   implies "rngl_opp_defined (- a)" ? *)
-...
+unfold rngl_opp_defined in Hro |-*.
+unfold bool_of_option in Hro |-*.
+remember (rngl_opt_opp a) as oa eqn:Hoa.
+symmetry in Hoa.
+destruct oa as [a'| ]; [ | easy ].
+apply rngl_opt_opp_prop in Hoa.
+remember (rngl_opt_opp (- a)%F) as oa eqn:Hoa'.
+symmetry in Hoa'.
+destruct oa as [a''| ]; [ easy | ].
+apply rngl_opt_opp_prop in Hoa.
+unfold rngl_opp in Hoa'.
+rewrite Hoa in Hoa'.
+unfold map_option in Hoa'.
+apply rngl_opt_opp_prop in Hoa.
+now rewrite Hoa in Hoa'.
 Qed.
+
+...
 
 Theorem rngl_inv_neq_0 :
   rngl_has_opp = true ∨ rngl_has_sous = true →
