@@ -116,7 +116,7 @@ Notation "a * b" := (rngl_mul a b) : ring_like_scope.
 Notation "a / b" := (rngl_div a b) : ring_like_scope.
 Notation "a ≤ b" := (rngl_le a b) : ring_like_scope.
 Notation "- a" := (rngl_opp a) : ring_like_scope.
-Notation "a '⁻¹'" := (rngl_inv a) (at level 35, right associativity) :
+Notation "a '⁻¹'" := (rngl_inv a) (at level 35, right associativity, format "a ⁻¹") :
   ring_like_scope.
 Notation "a ≤ b ≤ c" := (a ≤ b ∧ b ≤ c)%F (at level 70, b at next level) :
   ring_like_scope.
@@ -962,16 +962,11 @@ split; intros H. {
 }
 Qed.
 
-Theorem rngl_opp_involutive : ∀ a,
-  rngl_opp_defined a = true →
-  (- - a)%F = a.
+Theorem rngl_opp_defined_opp : ∀ a,
+  rngl_opp_defined a = true
+  → rngl_opp_defined (- a) = true.
 Proof.
 intros * Hro.
-symmetry.
-specialize (rngl_sub_diag _ (or_introl Hro)) as H.
-unfold rngl_sub in H.
-rewrite Hro in H.
-apply rngl_add_move_0_r; [ | easy ].
 unfold rngl_opp_defined in Hro |-*.
 unfold bool_of_option in Hro |-*.
 remember (rngl_opt_opp a) as oa eqn:Hoa.
@@ -989,15 +984,48 @@ apply rngl_opt_opp_prop in Hoa.
 now rewrite Hoa in Hoa'.
 Qed.
 
-...
-
-Theorem rngl_inv_neq_0 :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
-  rngl_has_inv = true →
-  rngl_has_1_neq_0 = true →
-  ∀ a, a ≠ 0%F → (¹/ a ≠ 0)%F.
+Theorem rngl_inv_defined_inv : ∀ a,
+  rngl_inv_defined a = true
+  → rngl_inv_defined (a⁻¹) = true.
 Proof.
-intros Hom Hin H10 * Haz H1.
+intros * Hro.
+unfold rngl_inv_defined in Hro |-*.
+unfold bool_of_option in Hro |-*.
+remember (rngl_opt_inv a) as oa eqn:Hoa.
+symmetry in Hoa.
+destruct oa as [a'| ]; [ | easy ].
+apply rngl_opt_inv_prop in Hoa.
+remember (rngl_opt_inv (a⁻¹)%F) as oa eqn:Hoa'.
+symmetry in Hoa'.
+destruct oa as [a''| ]; [ easy | ].
+apply rngl_opt_inv_prop in Hoa.
+unfold rngl_inv in Hoa'.
+rewrite Hoa in Hoa'.
+unfold map_option in Hoa'.
+apply rngl_opt_inv_prop in Hoa.
+now rewrite Hoa in Hoa'.
+Qed.
+
+Theorem rngl_opp_involutive : ∀ a,
+  rngl_opp_defined a = true →
+  (- - a)%F = a.
+Proof.
+intros * Hro.
+symmetry.
+specialize (rngl_sub_diag _ (or_introl Hro)) as H.
+unfold rngl_sub in H.
+rewrite Hro in H.
+apply rngl_add_move_0_r; [ | easy ].
+now apply rngl_opp_defined_opp.
+Qed.
+
+Theorem rngl_inv_neq_0 : ∀ a,
+  rngl_opp_defined a = true ∨ rngl_has_sous = true →
+  rngl_inv_defined a = true →
+  rngl_has_1_neq_0 = true →
+  a ≠ 0%F → (a⁻¹ ≠ 0)%F.
+Proof.
+intros * Hom Hin H10 Haz H1.
 symmetry in H1.
 apply rngl_mul_move_1_r in H1; [ | easy | easy ].
 rewrite rngl_mul_0_l in H1; [ | easy ].
@@ -1005,24 +1033,27 @@ symmetry in H1; revert H1.
 now apply rngl_1_neq_0.
 Qed.
 
-Theorem rngl_inv_involutive :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
-  rngl_has_inv = true →
+Theorem rngl_inv_involutive : ∀ a,
+  rngl_opp_defined a = true ∨ rngl_has_sous = true →
+  rngl_inv_defined a = true →
   rngl_has_1_neq_0 = true →
-  ∀ x, x ≠ 0%F → (¹/ ¹/ x)%F = x.
+  a ≠ 0%F → (a⁻¹⁻¹)%F = a.
 Proof.
-intros Hom Hin H10 * Hxz.
+intros * Hom Hin H10 Hxz.
 symmetry.
-specialize (rngl_mul_inv_r (or_introl Hin)) as H.
-unfold rngl_div in H.
-rewrite Hin in H.
-specialize (rngl_mul_move_1_r Hin) as H1.
-apply H1. 2: {
-  rewrite fold_rngl_div; [ | easy ].
-  apply rngl_mul_inv_r; [ now left | easy ].
+specialize (rngl_mul_inv_r _ (or_introl Hin) Hxz) as H1.
+unfold rngl_div in H1.
+rewrite Hin in H1.
+specialize (rngl_mul_move_1_r a (a⁻¹)%F) as H2.
+assert (H : rngl_inv_defined (a⁻¹) = true). {
+  now apply rngl_inv_defined_inv.
 }
+specialize (H2 H); clear H.
+apply H2; [ | easy ].
 now apply rngl_inv_neq_0.
 Qed.
+
+...
 
 Theorem rngl_mul_opp_l :
   rngl_has_opp = true →
