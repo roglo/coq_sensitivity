@@ -854,6 +854,7 @@ Theorem rngl_opp_add_distr :
   ∀ a b, (- (a + b) = - b - a)%F.
 Proof.
 intros Hro *.
+...
 apply rngl_add_cancel_l with (a := (a + b)%F); [ now left | ].
 rewrite fold_rngl_sub; [ | easy ].
 rewrite rngl_sub_diag; [ | now left ].
@@ -1130,15 +1131,17 @@ split. {
 }
 Qed.
 
-...
-
-Theorem rngl_opp_sub_distr :
-  rngl_has_opp = true →
-  ∀ a b, (- (a - b) = b - a)%F.
+Theorem rngl_opp_sub_distr : ∀ a b,
+  rngl_opp_defined a = true →
+  rngl_opp_defined b = true →
+  (- (a - b) = b - a)%F.
 Proof.
-intros Hro *.
+intros * Hoa Hob.
 unfold rngl_sub at 1.
-rewrite Hro.
+rewrite Hob.
+rewrite rngl_opp_add_distr; [ | ].
+Check rngl_opp_add_distr.
+...
 rewrite rngl_opp_add_distr; [ | easy ].
 now rewrite rngl_opp_involutive.
 Qed.
