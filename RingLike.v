@@ -713,7 +713,6 @@ destruct rngl_is_integral; [ now apply rngl_integral | ].
 clear rngl_integral.
 destruct Hc as [Hc| Hc]; [ easy | ].
 destruct Hc as (Hid, Hod).
-clear Hod.
 assert (H : (a⁻¹ * a * b = a⁻¹ * 0)%F). {
   now rewrite <- rngl_mul_assoc, Hab.
 }
@@ -721,13 +720,11 @@ rewrite rngl_mul_inv_l in H; [ | easy ].
 rewrite rngl_mul_1_l in H.
 rewrite rngl_mul_0_r in H; [ | ].
 ...
-Check rngl_mul_0_l.
-Check rngl_mul_0_r.
-...
 rewrite rngl_mul_0_r in H; [ | easy ].
-rewrite rngl_mul_inv_l in H; [ | easy ].
-rewrite rngl_mul_1_l in H; now right.
+now right.
 Qed.
+
+...
 
 Theorem rngl_sub_move_0_r : ∀ a b,
   rngl_opp_defined b = true →
