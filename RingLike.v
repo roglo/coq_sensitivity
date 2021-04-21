@@ -702,49 +702,24 @@ now apply rngl_mul_div_l.
 Qed.
 
 Theorem rngl_integral : ∀ a b,
-  rngl_opp_defined a = true ∧ rngl_opp_defined (a⁻¹) = true ∨
-  rngl_has_sous = true →
-  (rngl_is_integral ||
-   ((rngl_inv_defined a || rngl_has_quot) && rngl_has_dec_eq))%bool = true →
+  rngl_is_integral = true ∨
+    rngl_inv_defined a = true ∧
+    (rngl_opp_defined (a⁻¹) = true ∨ rngl_has_sous = true) →
   (a * b = 0)%F → a = 0%F ∨ b = 0%F.
 Proof.
-intros * Hmo Hdo Hab.
-...
+intros * Hc Hab.
 specialize rngl_opt_integral as rngl_integral.
 destruct rngl_is_integral; [ now apply rngl_integral | ].
-remember (rngl_inv_defined a) as iv eqn:Hiv; symmetry in Hiv.
-cbn in Hdo.
-destruct iv. {
-  remember rngl_has_dec_eq as de eqn:Hde; symmetry in Hde.
-  destruct de; [ | easy ].
-  cbn; clear rngl_integral.
-  assert (H : (a⁻¹ * a * b = a⁻¹ * 0)%F). {
-    now rewrite <- rngl_mul_assoc, Hab.
-  }
-  rewrite rngl_mul_0_r in H. 2: {
-    destruct Hmo; [ now left | now right ].
-  }
-  destruct (rngl_eq_dec Hde a 0%F) as [Haz| Haz]; [ now left | ].
-  rewrite rngl_mul_inv_l in H; [ | easy ].
-  rewrite rngl_mul_1_l in H.
-  now right.
-} {
-  cbn in Hdo.
-  apply andb_prop in Hdo.
-  destruct Hdo as (Hdi, Hde).
-  specialize (rngl_opt_mul_quot_l) as H1.
-  rewrite Hdi in H1.
-  destruct (rngl_eq_dec Hde a 0%F) as [Haz| Haz]; [ now left | right ].
-  specialize (H1 a b Haz) as H4.
-  rewrite Hab in H4.
-  rewrite <- H4.
-  apply rngl_div_0_l; [ | easy ].
-  split; [ | now right ].
-  destruct Hmo; [ now left | now right ].
+clear rngl_integral.
+destruct Hc as [Hc| Hc]; [ easy | ].
+destruct Hc as (Hid, Hod).
+assert (H : (a⁻¹ * a * b = a⁻¹ * 0)%F). {
+  now rewrite <- rngl_mul_assoc, Hab.
 }
+rewrite rngl_mul_0_r in H; [ | easy ].
+rewrite rngl_mul_inv_l in H; [ | easy ].
+rewrite rngl_mul_1_l in H; now right.
 Qed.
-
-...
 
 Theorem rngl_sub_move_0_r : ∀ a b,
   rngl_opp_defined b = true →
@@ -1117,7 +1092,8 @@ Theorem rngl_inv_mul_distr : ∀ a b,
   rngl_inv_defined (a * b) = true →
   a ≠ 0%F → b ≠ 0%F →((a * b)⁻¹ = b⁻¹ * a⁻¹)%F.
 Proof.
-intros * Hom Hdo Hia Hib Haz Hbz Habz.
+intros * Hod Hin Hia Hib Haib Haz Hbz.
+clear Hin.
 apply rngl_mul_cancel_l with (a := b); [ now left | easy | ].
 rewrite rngl_mul_assoc.
 rewrite (fold_rngl_div b b); [ | easy ].
@@ -1129,44 +1105,15 @@ rewrite (fold_rngl_div a a); [ | easy ].
 rewrite rngl_mul_inv_r; [ | now left | easy ].
 rewrite fold_rngl_div; [ | easy ].
 apply rngl_mul_inv_r; [ now left | ].
-intros H; apply rngl_integral in H; cycle 1. {
-  destruct Hom as [Hom| ]; [ left | now right ].
-  split; [ easy | ].
-  destruct Hom as (Hoa, Hob).
 Check rngl_integral.
-Search rngl_is_integral.
+(* mouais, non, ça ne s'appliquerait pas aux matrices, qui ne sont
+   pas intègres *)
 ...
-specialize rngl_mul_cancel_l as H1.
-specialize rngl_mul_inv_r as H2.
-specialize rngl_integral as H3.
-unfold rngl_div in H2.
-rewrite Hdo in H3; cbn in H3.
-...
-specialize (H3 eq_refl).
-...
-intros * Hom Hdo Hia Hib Haz Hbz.
-specialize rngl_mul_cancel_l as H1.
-specialize rngl_mul_inv_r as H2.
-...
-specialize (rngl_integral Hom) as H3.
-unfold rngl_div in H2.
-rewrite Hdo in H3; cbn in H3.
-specialize (H3 eq_refl).
-assert (Habz : (a * b)%F ≠ 0%F). {
-  intros H.
-  specialize (H3 a b H).
-  now destruct H3.
-}
-rewrite Hin in H2.
-specialize (H2 (or_introl eq_refl)).
-apply H1 with (a := (a * b)%F); [ now left | easy | ].
-rewrite H2; [ | easy ].
-rewrite rngl_mul_assoc.
-rewrite <- (rngl_mul_assoc a).
-rewrite H2; [ | easy ].
-rewrite rngl_mul_1_r.
-now rewrite H2.
+intros H; apply rngl_integral in H; [ | now left ].
+now destruct H.
 Qed.
+
+...
 
 Theorem rngl_eq_add_0 :
   rngl_is_ordered = true →
