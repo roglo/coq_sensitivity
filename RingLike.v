@@ -717,7 +717,10 @@ clear Hod.
 assert (H : (a⁻¹ * a * b = a⁻¹ * 0)%F). {
   now rewrite <- rngl_mul_assoc, Hab.
 }
+rewrite rngl_mul_inv_l in H; [ | easy ].
+rewrite rngl_mul_1_l in H.
 rewrite rngl_mul_0_r in H; [ | ].
+...
 Check rngl_mul_0_l.
 Check rngl_mul_0_r.
 ...
