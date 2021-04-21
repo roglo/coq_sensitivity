@@ -718,13 +718,9 @@ assert (H : (a⁻¹ * a * b = a⁻¹ * 0)%F). {
 }
 rewrite rngl_mul_inv_l in H; [ | easy ].
 rewrite rngl_mul_1_l in H.
-rewrite rngl_mul_0_r in H; [ | ].
-...
 rewrite rngl_mul_0_r in H; [ | easy ].
 now right.
 Qed.
-
-...
 
 Theorem rngl_sub_move_0_r : ∀ a b,
   rngl_opp_defined b = true →
@@ -1108,6 +1104,7 @@ rewrite (fold_rngl_div a a); [ | easy ].
 rewrite rngl_mul_inv_r; [ | now left | easy ].
 rewrite fold_rngl_div; [ | easy ].
 apply rngl_mul_inv_r; [ now left | ].
+...
 intros H; apply rngl_integral in H; [ now destruct H | ].
 right.
 split; [ easy | left ].
