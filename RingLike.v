@@ -1111,9 +1111,27 @@ Theorem rngl_inv_mul_distr : ∀ a b,
   rngl_is_integral = true →
   rngl_inv_defined a = true →
   rngl_inv_defined b = true →
+  rngl_inv_defined (a * b) = true →
   a ≠ 0%F → b ≠ 0%F →((a * b)⁻¹ = b⁻¹ * a⁻¹)%F.
 Proof.
-intros * Hom Hdo Hia Hib Haz Hbz.
+intros * Hom Hdo Hia Hib Haz Hbz Habz.
+apply rngl_mul_cancel_l with (a := b); [ now left | easy | ].
+rewrite rngl_mul_assoc.
+rewrite (fold_rngl_div b b); [ | easy ].
+rewrite rngl_mul_inv_r; [ | now left | easy ].
+rewrite rngl_mul_1_l.
+apply rngl_mul_cancel_l with (a := a); [ now left | easy | ].
+rewrite rngl_mul_assoc.
+rewrite (fold_rngl_div a a); [ | easy ].
+rewrite rngl_mul_inv_r; [ | now left | easy ].
+rewrite fold_rngl_div; [ | easy ].
+apply rngl_mul_inv_r; [ now left | ].
+intros H; apply rngl_integral in H; cycle 1. {
+  destruct Hom as [Hom| ]; [ left | now right ].
+  split; [ easy | ].
+  destruct Hom as (Hoa, Hob).
+Check rngl_integral.
+...
 specialize rngl_mul_cancel_l as H1.
 specialize rngl_mul_inv_r as H2.
 specialize rngl_integral as H3.
