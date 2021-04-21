@@ -709,6 +709,7 @@ Theorem rngl_integral : ∀ a b,
   (a * b = 0)%F → a = 0%F ∨ b = 0%F.
 Proof.
 intros * Hmo Hdo Hab.
+...
 specialize rngl_opt_integral as rngl_integral.
 destruct rngl_is_integral; [ now apply rngl_integral | ].
 remember (rngl_inv_defined a) as iv eqn:Hiv; symmetry in Hiv.
@@ -742,6 +743,8 @@ destruct iv. {
   destruct Hmo; [ now left | now right ].
 }
 Qed.
+
+...
 
 Theorem rngl_sub_move_0_r : ∀ a b,
   rngl_opp_defined b = true →
@@ -1131,6 +1134,7 @@ intros H; apply rngl_integral in H; cycle 1. {
   split; [ easy | ].
   destruct Hom as (Hoa, Hob).
 Check rngl_integral.
+Search rngl_is_integral.
 ...
 specialize rngl_mul_cancel_l as H1.
 specialize rngl_mul_inv_r as H2.
