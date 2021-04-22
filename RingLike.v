@@ -635,6 +635,9 @@ Proof.
 intros * Ha Hb.
 apply rngl_opt_opp_prop in Ha.
 apply rngl_opt_opp_prop in Hb.
+assert (Hab : (a * b - a' * b' = 0)%F). {
+...
+  specialize (rngl_add_sub (a * b - a' * b')%F (a' * b)%F) as H1.
 ...
 
 Theorem rngl_mul_opp_r : ∀ a b,
