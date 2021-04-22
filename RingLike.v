@@ -159,11 +159,13 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* properties of general opposite and general inverse *)
     rngl_opt_opp_symm :
       ∀ a b, rngl_opt_opp a = Some b → rngl_opt_opp b = Some a;
+(*
     rngl_opp_defined_add :
       ∀ a b,
       rngl_opp_defined a = true
       → rngl_opp_defined b = true
       → rngl_opp_defined (a + b) = true;
+*)
     rngl_opt_inv_symm :
       ∀ a b, rngl_opt_inv a = Some b → rngl_opt_inv b = Some a;
     rngl_inv_defined_mul :
@@ -861,6 +863,35 @@ destruct mo. {
 }
 now destruct Hom.
 Qed.
+
+Arguments rngl_opt_opp {T}%type {ring_like_op} a%F.
+
+Theorem rngl_opp_defined_add : ∀ a b a' b',
+  rngl_opt_opp a = Some a'
+  → rngl_opt_opp b = Some b'
+  → rngl_opt_opp (a + b) = Some (b' + a')%F.
+Proof.
+intros * Ha Hb.
+assert (Haa : (a + a' = 0)%F). {
+  assert (a - (- a') = 0)%F. {
+    unfold rngl_sub.
+    apply rngl_opt_opp_symm in Ha.
+    unfold rngl_opp_defined.
+Search (rngl_opt_opp (- _)%F).
+Search (rngl_opp_defined (- _)%F).
+...
+    rewrite Ha; cbn.
+    rewrite rngl_add_comm.
+Check rngl_add_move_0_r.
+    apply rngl_add_move_0_r.
+...
+  apply rngl_add_move_0_r. {
+    apply rngl_opt_opp_symm in Ha.
+    unfold rngl_opp_defined.
+    now rewrite Ha.
+  } {
+Search (- _)%F.
+...
 
 Theorem rngl_opp_add_distr : ∀ a b,
   rngl_opp_defined a = true →
