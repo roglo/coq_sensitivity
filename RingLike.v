@@ -159,8 +159,18 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* properties of general opposite and general inverse *)
     rngl_opt_opp_symm :
       ∀ a b, rngl_opt_opp a = Some b → rngl_opt_opp b = Some a;
+    rngl_opp_defined_add :
+      ∀ a b,
+      rngl_opp_defined a = true
+      → rngl_opp_defined b = true
+      → rngl_opp_defined (a + b) = true;
     rngl_opt_inv_symm :
       ∀ a b, rngl_opt_inv a = Some b → rngl_opt_inv b = Some a;
+    rngl_inv_defined_mul :
+      ∀ a b,
+      rngl_inv_defined a = true
+      → rngl_inv_defined b = true
+      → rngl_inv_defined (a * b) = true;
     (* when has opposite *)
     rngl_opt_add_opp_l :
       ∀ a, if rngl_opp_defined a then (- a + a = 0)%F else not_applicable;
@@ -593,28 +603,31 @@ split; intros H. {
 }
 Qed.
 
-Theorem rngl_mul_opp_r :
-  rngl_is_ring →
-  ∀ a b, (a * - b = - (a * b))%F.
+Theorem rngl_mul_opp_r : ∀ a b,
+  rngl_opp_defined a = true →
+  rngl_opp_defined b = true →
+  rngl_opp_defined (a * b) = true →
+  (a * - b = - (a * b))%F.
 Proof.
-intros Hrng *.
+intros * Hoa Hob Hab.
 specialize (rngl_mul_add_distr_l a b (- b)%F) as H.
 rewrite fold_rngl_sub in H; [ | easy ].
 rewrite rngl_sub_diag in H; [ | now left ].
 rewrite rngl_mul_0_r in H; [ | now left ].
 symmetry in H.
 rewrite rngl_add_comm in H.
-apply rngl_add_move_0_r in H; [ easy | ].
 now apply rngl_add_move_0_r in H.
 Qed.
 
-Theorem rngl_mul_sub_distr_l :
-  rngl_is_ring →
-  ∀ a b c , (a * (b - c) = a * b - a * c)%F.
+Theorem rngl_mul_sub_distr_l : ∀ a b c,
+  rngl_opp_defined a = true →
+  rngl_opp_defined c = true →
+  rngl_opp_defined (a * c) = true →
+  (a * (b - c) = a * b - a * c)%F.
 Proof.
-intros Hrng *.
+intros * Hoa Hoc Hac.
 unfold rngl_sub.
-do 2 rewrite Hrng.
+rewrite Hoc, Hac.
 rewrite rngl_mul_add_distr_l.
 now rewrite rngl_mul_opp_r.
 Qed.
@@ -852,13 +865,15 @@ Qed.
 Theorem rngl_opp_add_distr : ∀ a b,
   rngl_opp_defined a = true →
   rngl_opp_defined b = true →
-  rngl_opp_defined (a + b) = true →
   (- (a + b) = - b - a)%F.
 Proof.
-intros * Hoa Hob Hab *.
-apply rngl_add_cancel_l with (a := (a + b)%F); [ now left | ].
-rewrite fold_rngl_sub; [ | easy ].
-rewrite rngl_sub_diag; [ | now left ].
+intros * Hoa Hob *.
+apply rngl_add_cancel_l with (a := (a + b)%F). {
+  left.
+  now apply rngl_opp_defined_add.
+}
+rewrite fold_rngl_sub; [ | now apply rngl_opp_defined_add ].
+rewrite rngl_sub_diag; [ | now left; apply rngl_opp_defined_add ].
 unfold rngl_sub.
 rewrite Hoa.
 rewrite rngl_add_assoc.
@@ -872,13 +887,13 @@ Qed.
 Theorem rngl_add_sub_simpl_l : ∀ a b c,
   rngl_opp_defined a = true →
   rngl_opp_defined c = true →
-  rngl_opp_defined (a + c) = true →
   (a + b - (a + c) = b - c)%F.
 Proof.
-intros * Hoa Hoc Hac.
+intros * Hoa Hoc.
 unfold rngl_sub.
-rewrite Hac, Hoc.
-rewrite rngl_opp_add_distr; [ | easy | easy | easy ].
+rewrite Hoc.
+rewrite rngl_opp_defined_add; [ | easy | easy ].
+rewrite rngl_opp_add_distr; [ | easy | easy ].
 unfold rngl_sub; rewrite Hoa.
 rewrite rngl_add_assoc.
 rewrite rngl_add_add_swap.
@@ -1036,6 +1051,8 @@ apply H2; [ | easy ].
 now apply rngl_inv_neq_0.
 Qed.
 
+...
+
 Theorem rngl_mul_opp_l : ∀ a b,
   rngl_is_ring →
   (- a * b = - (a * b))%F.
@@ -1137,24 +1154,20 @@ Qed.
 Theorem rngl_opp_sub_distr : ∀ a b,
   rngl_opp_defined a = true →
   rngl_opp_defined b = true →
-  rngl_opp_defined (a - b) = true →
   (- (a - b) = b - a)%F.
 Proof.
-intros * Hoa Hob Hab.
+intros * Hoa Hob.
 unfold rngl_sub at 1.
 rewrite Hob.
-rewrite rngl_opp_add_distr; [ | easy | | ]; cycle 1. {
+rewrite rngl_opp_add_distr; [ | easy | ]. 2: {
   now apply rngl_opp_defined_opp.
-} {
-  now rewrite fold_rngl_sub.
 }
 now rewrite rngl_opp_involutive.
 Qed.
 
 Theorem rngl_sub_add_distr : ∀ a b c,
   rngl_opp_defined b = true ∧
-  rngl_opp_defined c = true ∧
-  rngl_opp_defined (b + c) = true ∨
+  rngl_opp_defined c = true ∨
   rngl_has_sous = true →
   (a - (b + c) = a - b - c)%F.
 Proof.
@@ -1167,24 +1180,22 @@ destruct hs. {
   now rewrite H1.
 }
 destruct Hom as [Hom| ]; [ | easy ].
-destruct Hom as (Hob & Hoc & Hbc).
+destruct Hom as (Hob & Hoc).
 unfold rngl_sub.
-rewrite Hob, Hoc, Hbc.
-rewrite rngl_opp_add_distr; [ | easy | easy | easy ].
+rewrite Hob, Hoc.
+rewrite rngl_opp_defined_add; [ | easy | easy ].
+rewrite rngl_opp_add_distr; [ | easy | easy ].
 unfold rngl_sub; rewrite Hob.
 rewrite rngl_add_assoc.
 apply rngl_add_add_swap.
-Search (rngl_opp_defined (_ + _)).
-...
 Qed.
 
-...
-
-Theorem rngl_sub_sub_distr :
-  rngl_has_opp = true →
-  ∀ a b c, (a - (b - c) = a - b + c)%F.
+Theorem rngl_sub_sub_distr : ∀ a b c,
+  rngl_opp_defined c = true →
+  (a - (b - c) = a - b + c)%F.
 Proof.
-intros Hop *.
+intros * Hoc.
+...
 unfold rngl_sub.
 rewrite Hop.
 rewrite rngl_opp_add_distr; [ | easy ].
