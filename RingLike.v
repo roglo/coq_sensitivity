@@ -1151,28 +1151,32 @@ rewrite rngl_opp_add_distr; [ | easy | | ]; cycle 1. {
 now rewrite rngl_opp_involutive.
 Qed.
 
-...
-
-Theorem rngl_sub_add_distr :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
-  ∀ a b c, (a - (b + c) = a - b - c)%F.
+Theorem rngl_sub_add_distr : ∀ a b c,
+  rngl_opp_defined b = true ∧
+  rngl_opp_defined c = true ∧
+  rngl_opp_defined (b + c) = true ∨
+  rngl_has_sous = true →
+  (a - (b + c) = a - b - c)%F.
 Proof.
-intros Hom *.
-remember rngl_has_opp as op eqn:Hop.
-symmetry in Hop.
-destruct op. {
-  unfold rngl_sub.
-  rewrite rngl_opp_add_distr; [ | easy ].
-  unfold rngl_sub; rewrite Hop.
-  rewrite rngl_add_assoc.
-  apply rngl_add_add_swap.
+intros * Hom.
+remember rngl_has_sous as hs eqn:Hhs.
+symmetry in Hhs.
+destruct hs. {
+  specialize rngl_opt_sub_sub_sub_add as H1.
+  rewrite Hhs in H1.
+  now rewrite H1.
 }
-remember rngl_has_sous as mo eqn:Hmo.
-symmetry in Hmo.
-destruct mo; [ clear Hom | now destruct Hom ].
-specialize rngl_opt_sub_sub_sub_add as H1.
-now rewrite Hmo in H1.
+destruct Hom as [Hom| ]; [ | easy ].
+destruct Hom as (Hob & Hoc & Hbc).
+unfold rngl_sub.
+rewrite Hob, Hoc, Hbc.
+rewrite rngl_opp_add_distr; [ | easy | easy | easy ].
+unfold rngl_sub; rewrite Hob.
+rewrite rngl_add_assoc.
+apply rngl_add_add_swap.
 Qed.
+
+...
 
 Theorem rngl_sub_sub_distr :
   rngl_has_opp = true →
