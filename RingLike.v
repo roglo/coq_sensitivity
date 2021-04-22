@@ -50,7 +50,7 @@ Class ring_like_op T :=
     rngl_one : T;
     rngl_add : T → T → T;
     rngl_mul : T → T → T;
-    rngl_opt_opp : T → option T;
+    rngl_opt_opp' : T → option T;
     rngl_opt_inv : T → option T;
     rngl_opt_sous : option (T → T → T);
     rngl_opt_quot : option (T → T → T);
@@ -65,21 +65,23 @@ Definition map_option {T} d (x : option T) :=
   | None => d
   end.
 
-Definition rngl_opp {T} {R : ring_like_op T} a :=
-  map_option rngl_zero (rngl_opt_opp a).
+Arguments rngl_opt_opp' {T}%type {ring_like_op} a%F.
+
+Definition rngl_opp' {T} {R : ring_like_op T} a :=
+  map_option rngl_zero (rngl_opt_opp' a).
 Definition rngl_inv {T} {R : ring_like_op T} a :=
   map_option rngl_zero (rngl_opt_inv a).
 
-Definition rngl_opp_defined {T} {R : ring_like_op T} a :=
-  bool_of_option (rngl_opt_opp a).
+Definition rngl_opp_defined' {T} {R : ring_like_op T} a :=
+  bool_of_option (rngl_opt_opp' a).
 Definition rngl_inv_defined {T} {R : ring_like_op T} a :=
   bool_of_option (rngl_opt_inv a).
 
-Arguments rngl_opp_defined {T}%type {R} a%F.
+Arguments rngl_opp_defined' {T}%type {R} a%F.
 Arguments rngl_inv_defined {T}%type {R} a%F.
 
 Definition rngl_is_ring {T} {R : ring_like_op T} :=
-  ∀ x, rngl_opp_defined x = true.
+  ∀ x, rngl_opp_defined' x = true.
 
 Definition rngl_is_field {T} {R : ring_like_op T} :=
   ∀ x, x = rngl_zero ∨ rngl_inv_defined x = true.
@@ -102,8 +104,8 @@ Definition rngl_quot {T} {R : ring_like_op T} a b :=
   | None => rngl_zero
   end.
 
-Definition rngl_sub {T} {R : ring_like_op T} a b :=
-  if rngl_opp_defined b then rngl_add a (rngl_opp b) else rngl_zero.
+Definition rngl_sub' {T} {R : ring_like_op T} a b :=
+  if rngl_opp_defined' b then rngl_add a (rngl_opp' b) else rngl_zero.
 
 Definition rngl_div {T} {R : ring_like_op T} a b :=
   if rngl_inv_defined b then rngl_mul a (rngl_inv b) else rngl_zero.
@@ -111,17 +113,17 @@ Definition rngl_div {T} {R : ring_like_op T} a b :=
 Notation "0" := rngl_zero : ring_like_scope.
 Notation "1" := rngl_one : ring_like_scope.
 Notation "a + b" := (rngl_add a b) : ring_like_scope.
-Notation "a - b" := (rngl_sub a b) : ring_like_scope.
+Notation "a - b" := (rngl_sub' a b) : ring_like_scope.
 Notation "a * b" := (rngl_mul a b) : ring_like_scope.
 Notation "a / b" := (rngl_div a b) : ring_like_scope.
 Notation "a ≤ b" := (rngl_le a b) : ring_like_scope.
-Notation "- a" := (rngl_opp a) : ring_like_scope.
+Notation "- a" := (rngl_opp' a) : ring_like_scope.
 Notation "a '⁻¹'" := (rngl_inv a) (at level 35, right associativity, format "a ⁻¹") :
   ring_like_scope.
 Notation "a ≤ b ≤ c" := (a ≤ b ∧ b ≤ c)%F (at level 70, b at next level) :
   ring_like_scope.
 
-Notation "- 1" := (rngl_opp rngl_one) : ring_like_scope.
+Notation "- 1" := (rngl_opp' rngl_one) : ring_like_scope.
 
 Inductive not_applicable := NA.
 
@@ -157,8 +159,8 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if rngl_is_comm then not_applicable else
        ∀ a b c, ((a + b) * c = a * c + b * c)%F;
     (* properties of general opposite and general inverse *)
-    rngl_opt_opp_symm :
-      ∀ a b, rngl_opt_opp a = Some b → rngl_opt_opp b = Some a;
+    rngl_opt_opp_prop :
+      ∀ a b, rngl_opt_opp' a = Some b → (a + b = 0)%F;
 (*
     rngl_opp_defined_add :
       ∀ a b,
@@ -174,8 +176,10 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       → rngl_inv_defined b = true
       → rngl_inv_defined (a * b) = true;
     (* when has opposite *)
+(*
     rngl_opt_add_opp_l :
-      ∀ a, if rngl_opp_defined a then (- a + a = 0)%F else not_applicable;
+      ∀ a, if rngl_opp_defined' a then (- a + a = 0)%F else not_applicable;
+*)
     (* when has subtraction (sous) *)
     rngl_opt_add_sub :
       if rngl_has_sous then ∀ a b, (a + b - b)%F = a
@@ -183,6 +187,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_opt_sub_sub_sub_add :
       if rngl_has_sous then ∀ a b c, ((a - b) - c = a - (b + c))%F
       else not_applicable;
+(*
     rngl_opt_mul_sub_distr_l :
       if rngl_has_sous then ∀ a b c : T, (a * (b - c) = a * b - a * c)%F
       else not_applicable;
@@ -191,6 +196,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
         if rngl_is_comm then not_applicable
         else ∀ a b c : T, ((a - b) * c = a * c - b * c)%F
       else not_applicable;
+*)
     (* when has inverse *)
     rngl_opt_mul_inv_l :
       ∀ a, if rngl_inv_defined a then (a⁻¹ * a = 1)%F else not_applicable;
@@ -322,12 +328,28 @@ destruct ic. {
 Qed.
 
 Theorem rngl_add_opp_l : ∀ a,
-  rngl_opp_defined a = true →
+  rngl_opp_defined' a = true →
   (- a + a = 0)%F.
 Proof.
 intros * H1.
-specialize (rngl_opt_add_opp_l a) as H.
-now rewrite H1 in H.
+rewrite rngl_add_comm.
+apply rngl_opt_opp_prop.
+unfold rngl_opp_defined' in H1.
+remember (rngl_opt_opp' a) as b eqn:Hb.
+symmetry in Hb.
+destruct b as [b| ]; [ | easy ].
+clear H1.
+unfold rngl_opp'.
+now rewrite Hb.
+Qed.
+
+Theorem rngl_add_opp_r : ∀ a,
+  rngl_opp_defined' a = true →
+  (a + - a = 0)%F.
+Proof.
+intros * H1.
+rewrite rngl_add_comm.
+now apply rngl_add_opp_l.
 Qed.
 
 Theorem rngl_mul_inv_l : ∀ a,
@@ -447,23 +469,23 @@ now rewrite Hab.
 Qed.
 
 Theorem fold_rngl_sub : ∀ a b,
-  rngl_opp_defined b = true →
+  rngl_opp_defined' b = true →
   (a + - b)%F = (a - b)%F.
 Proof.
 intros * Hro.
-unfold rngl_sub.
+unfold rngl_sub'.
 now rewrite Hro.
 Qed.
 
 Theorem rngl_sub_diag : ∀ a,
-  rngl_opp_defined a = true ∨ rngl_has_sous = true →
+  rngl_opp_defined' a = true ∨ rngl_has_sous = true →
   (a - a = 0)%F.
 Proof.
 intros * Hom.
-remember (rngl_opp_defined a) as op eqn:Hop.
+remember (rngl_opp_defined' a) as op eqn:Hop.
 symmetry in Hop.
 destruct op. {
-  unfold rngl_sub.
+  unfold rngl_sub'.
   rewrite Hop.
   rewrite rngl_add_comm.
   now apply rngl_add_opp_l.
@@ -480,14 +502,14 @@ now destruct Hom.
 Qed.
 
 Theorem rngl_add_sub : ∀ a b,
-  rngl_opp_defined b = true ∨ rngl_has_sous = true →
+  rngl_opp_defined' b = true ∨ rngl_has_sous = true →
   (a + b - b = a)%F.
 Proof.
 intros * Hom.
-remember (rngl_opp_defined b) as op eqn:Hop.
+remember (rngl_opp_defined' b) as op eqn:Hop.
 symmetry in Hop.
 destruct op. {
-  unfold rngl_sub.
+  unfold rngl_sub'.
   rewrite Hop.
   rewrite <- rngl_add_assoc.
   rewrite (rngl_add_comm b).
@@ -504,16 +526,16 @@ now destruct Hom.
 Qed.
 
 Theorem rngl_add_cancel_l : ∀ a b c,
-  rngl_opp_defined a = true ∨ rngl_has_sous = true →
+  rngl_opp_defined' a = true ∨ rngl_has_sous = true →
   (a + b = a + c)%F → (b = c)%F.
 Proof.
 intros * Hom Habc.
-remember (rngl_opp_defined a) as op eqn:Hop.
+remember (rngl_opp_defined' a) as op eqn:Hop.
 symmetry in Hop.
 destruct op. {
-  apply (f_equal (λ x, rngl_sub x a)) in Habc.
+  apply (f_equal (λ x, rngl_sub' x a)) in Habc.
   do 2 rewrite (rngl_add_comm a) in Habc.
-  unfold rngl_sub in Habc.
+  unfold rngl_sub' in Habc.
   rewrite Hop in Habc.
   do 2 rewrite <- rngl_add_assoc in Habc.
   rewrite fold_rngl_sub in Habc; [ | easy ].
@@ -534,7 +556,7 @@ now destruct Hom.
 Qed.
 
 Theorem rngl_add_sub_eq_l : ∀ a b c,
-  rngl_opp_defined a = true ∨ rngl_has_sous = true →
+  rngl_opp_defined' a = true ∨ rngl_has_sous = true →
   (a + b = c → c - a = b)%F.
 Proof.
 intros * Hom Hab.
@@ -544,7 +566,7 @@ now apply rngl_add_sub.
 Qed.
 
 Theorem rngl_add_sub_eq_r : ∀ a b c,
-  rngl_opp_defined b = true ∨ rngl_has_sous = true →
+  rngl_opp_defined' b = true ∨ rngl_has_sous = true →
    (a + b = c → c - b = a)%F.
 Proof.
 intros * Hom Hab.
@@ -560,7 +582,7 @@ now rewrite Hab.
 Qed.
 
 Theorem rngl_add_cancel_r : ∀ a b c,
-  rngl_opp_defined c = true ∨ rngl_has_sous = true →
+  rngl_opp_defined' c = true ∨ rngl_has_sous = true →
   (a + c = b + c)%F → (a = b)%F.
 Proof.
 intros * Hom Habc.
@@ -569,7 +591,7 @@ now do 2 rewrite rngl_add_sub in Habc.
 Qed.
 
 Theorem rngl_mul_0_r : ∀ a,
-  rngl_opp_defined a = true ∨ rngl_has_sous = true →
+  rngl_opp_defined' a = true ∨ rngl_has_sous = true →
   (a * 0 = 0)%F.
 Proof.
 intros * Hom.
@@ -579,7 +601,7 @@ now do 2 rewrite rngl_add_0_l.
 Qed.
 
 Theorem rngl_mul_0_l : ∀ a,
-  rngl_opp_defined a = true ∨ rngl_has_sous = true →
+  rngl_opp_defined' a = true ∨ rngl_has_sous = true →
   (0 * a = 0)%F.
 Proof.
 intros * Hom.
@@ -589,14 +611,14 @@ now do 2 rewrite rngl_add_0_l.
 Qed.
 
 Theorem rngl_add_move_0_r : ∀ a b,
-  rngl_opp_defined b = true →
+  rngl_opp_defined' b = true →
   (a + b = 0)%F ↔ (a = - b)%F.
 Proof.
 intros * Hro.
 split; intros H. {
   apply rngl_sub_compat_l with (c := b) in H.
   rewrite rngl_add_sub in H; [ | now left ].
-  unfold rngl_sub in H.
+  unfold rngl_sub' in H.
   rewrite Hro in H.
   now rewrite rngl_add_0_l in H.
 } {
@@ -605,6 +627,16 @@ split; intros H. {
 }
 Qed.
 
+Theorem rngl_opp_mul_prop : ∀ a b a' b',
+  rngl_opt_opp' a = Some a' →
+  rngl_opt_opp' b = Some b' →
+  rngl_opt_opp' (a * b) = Some (- (a' * b'))%F.
+Proof.
+intros * Ha Hb.
+apply rngl_opt_opp_prop in Ha.
+apply rngl_opt_opp_prop in Hb.
+...
+
 Theorem rngl_mul_opp_r : ∀ a b,
   rngl_opp_defined a = true →
   rngl_opp_defined b = true →
@@ -612,6 +644,7 @@ Theorem rngl_mul_opp_r : ∀ a b,
   (a * - b = - (a * b))%F.
 Proof.
 intros * Hoa Hob Hab.
+...
 specialize (rngl_mul_add_distr_l a b (- b)%F) as H.
 rewrite fold_rngl_sub in H; [ | easy ].
 rewrite rngl_sub_diag in H; [ | now left ].
