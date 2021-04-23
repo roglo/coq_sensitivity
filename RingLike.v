@@ -753,6 +753,35 @@ Qed.
 Theorem rngl_opp_mul_prop : ∀ a b a' b',
   rngl_opt_opp a = Some a' →
   rngl_opt_opp b = Some b' →
+  (a * b = a' * b')%F.
+Proof.
+intros * Ha Hb.
+generalize Ha; intros Haa.
+generalize Hb; intros Hbb.
+apply rngl_opt_opp_iff in Ha.
+apply rngl_opt_opp_iff in Hb.
+apply rngl_add_move_0_r in Ha. 2: {
+  unfold rngl_opp_defined.
+  rewrite rngl_add_comm in Ha.
+  apply rngl_opt_opp_iff in Ha.
+  now rewrite Ha.
+}
+apply rngl_add_move_0_r in Hb. 2: {
+  unfold rngl_opp_defined.
+  rewrite rngl_add_comm in Hb.
+  apply rngl_opt_opp_iff in Hb.
+  now rewrite Hb.
+}
+rewrite Ha, Hb.
+Search (- _ * _)%F.
+Search (_ * - _)%F.
+...
+specialize (rngl_add_sub (a * b - a' * b')%F (a' * b)%F) as H1.
+...
+
+Theorem rngl_opp_mul_prop : ∀ a b a' b',
+  rngl_opt_opp a = Some a' →
+  rngl_opt_opp b = Some b' →
   rngl_opt_opp (a * b) = Some (a' * b')%F.
 Proof.
 intros * Ha Hb.
