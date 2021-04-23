@@ -339,6 +339,30 @@ rewrite rngl_add_comm.
 now apply rngl_add_opp_l.
 Qed.
 
+Theorem rngl_sub_diag : ∀ a,
+  rngl_opp_defined a = true ∨ rngl_has_sous = true →
+  (a - a = 0)%F.
+Proof.
+intros * Hom.
+remember (rngl_opp_defined a) as op eqn:Hop.
+symmetry in Hop.
+destruct op. {
+  unfold rngl_sub.
+  rewrite Hop.
+  rewrite rngl_add_comm.
+  now apply rngl_add_opp_l.
+}
+remember rngl_has_sous as mo eqn:Hmo.
+symmetry in Hmo.
+destruct mo. {
+  specialize rngl_opt_add_sub as H1.
+  rewrite Hmo in H1.
+  specialize (H1 0%F a).
+  now rewrite rngl_add_0_l in H1.
+}
+now destruct Hom.
+Qed.
+
 Theorem rngl_mul_inv_l : ∀ a,
   rngl_inv_defined a = true →
   (a⁻¹ * a = 1)%F.
@@ -347,6 +371,60 @@ intros * H1.
 specialize (rngl_opt_mul_inv_l a) as H.
 now rewrite H1 in H.
 Qed.
+
+Theorem rngl_mul_inv_r : ∀ a,
+  rngl_inv_defined a = true →
+  (a * a⁻¹ = 1)%F.
+Proof.
+intros * H1.
+remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
+destruct ic. {
+  specialize (rngl_opt_mul_inv_l a) as H.
+  rewrite H1 in H.
+  now rewrite rngl_mul_comm in H.
+} {
+  specialize (rngl_opt_mul_inv_r a) as H.
+  rewrite H1, Hic in H; cbn in H.
+  unfold rngl_div in H.
+  now rewrite H1 in H.
+}
+Qed.
+
+Theorem rngl_div_diag : ∀ a,
+  rngl_inv_defined a = true ∨ rngl_has_quot = true →
+  (a / a = 1)%F.
+Proof.
+intros * Hom.
+remember (rngl_inv_defined a) as op eqn:Hop.
+symmetry in Hop.
+destruct op. {
+  unfold rngl_div.
+  rewrite Hop.
+  now apply rngl_mul_inv_r.
+}
+remember rngl_has_quot as mo eqn:Hmo.
+symmetry in Hmo.
+destruct mo. {
+  specialize rngl_opt_add_sub as H1.
+Search (_ * _ / _)%F.
+...
+  specialize rngl_opt_mul_div as H1.
+  rewrite Hmo in H1.
+  specialize (H1 0%F a).
+  now rewrite rngl_add_0_l in H1.
+}
+now destruct Hom.
+Qed.
+...
+intros * H1.
+Check rngl_sub_diag.
+...
+unfold rngl_div.
+rewrite H1.
+apply rngl_mul_inv_r.
+Qed.
+
+...
 
 Theorem rngl_eq_dec : rngl_has_dec_eq = true → ∀ a b : T, {a = b} + {a ≠ b}.
 Proof.
@@ -464,18 +542,20 @@ unfold rngl_sub.
 now rewrite Hro.
 Qed.
 
-Theorem rngl_sub_diag : ∀ a,
-  rngl_opp_defined a = true ∨ rngl_has_sous = true →
-  (a - a = 0)%F.
+Theorem rngl_inv_diag : ∀ a,
+  rngl_inv_defined a = true ∨ rngl_has_quot = true →
+  (a / a = 1)%F.
 Proof.
 intros * Hom.
-remember (rngl_opp_defined a) as op eqn:Hop.
+remember (rngl_inv_defined a) as op eqn:Hop.
 symmetry in Hop.
 destruct op. {
-  unfold rngl_sub.
+  unfold rngl_div.
   rewrite Hop.
-  rewrite rngl_add_comm.
-  now apply rngl_add_opp_l.
+...
+  rewrite rngl_mul_comm.
+  now apply rngl_mul_inv_l.
+Check rngl_mul_inv_r.
 }
 remember rngl_has_sous as mo eqn:Hmo.
 symmetry in Hmo.
@@ -737,6 +817,23 @@ Theorem rngl_opp_involutive : ∀ a,
 Proof.
 intros * Hro.
 symmetry.
+specialize (rngl_sub_diag _ (or_introl Hro)) as H.
+unfold rngl_sub in H.
+rewrite Hro in H.
+apply rngl_add_move_0_r; [ | easy ].
+now apply rngl_opp_defined_opp.
+Qed.
+
+Theorem rngl_inv_involutive : ∀ a,
+  rngl_inv_defined a = true →
+  ((a⁻¹)⁻¹)%F = a.
+Proof.
+intros * Hro.
+symmetry.
+Check rngl_sub_diag.
+Search (_ / _ = 1)%F.
+Search (_ * _⁻¹ = 1)%F.
+...
 specialize (rngl_sub_diag _ (or_introl Hro)) as H.
 unfold rngl_sub in H.
 rewrite Hro in H.
