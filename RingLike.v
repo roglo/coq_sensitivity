@@ -731,6 +731,23 @@ rewrite Ha.
 now rewrite rngl_mul_1_r.
 Qed.
 
+Theorem rngl_mul_opp_l : ∀ a b,
+  rngl_opp_defined a = true →
+  rngl_opp_defined b = true →
+  ((- a) * b = - (a * b))%F.
+Proof.
+intros * Ha Hb.
+specialize (rngl_mul_add_distr_r (- a)%F a b) as H.
+rewrite rngl_add_opp_l in H; [ | easy ].
+rewrite rngl_mul_0_l in H; [ | now left ].
+symmetry in H.
+apply rngl_add_move_0_r in H; [ easy | ].
+unfold rngl_opp_defined.
+...
+Qed.
+...
+
+
 Theorem rngl_opp_mul_prop : ∀ a b a' b',
   rngl_opt_opp a = Some a' →
   rngl_opt_opp b = Some b' →
