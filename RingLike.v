@@ -627,6 +627,15 @@ split; intros H. {
 }
 Qed.
 
+Theorem rngl_opt_opp_symm : ∀ a b,
+  rngl_opt_opp' a = Some b
+  → rngl_opt_opp' b = Some a.
+Proof.
+intros * Hab.
+apply rngl_opt_opp_prop in Hab.
+rewrite rngl_add_comm in Hab.
+...
+
 Theorem rngl_opp_defined_opp : ∀ a,
   rngl_opp_defined' a = true
   → rngl_opp_defined' (- a) = true.
