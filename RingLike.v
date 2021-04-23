@@ -731,6 +731,19 @@ rewrite Ha.
 now rewrite rngl_mul_1_r.
 Qed.
 
+Theorem rngl_opp_involutive : ∀ a,
+  rngl_opp_defined a = true →
+  (- - a)%F = a.
+Proof.
+intros * Hro.
+symmetry.
+specialize (rngl_sub_diag _ (or_introl Hro)) as H.
+unfold rngl_sub in H.
+rewrite Hro in H.
+apply rngl_add_move_0_r; [ | easy ].
+now apply rngl_opp_defined_opp.
+Qed.
+
 Theorem rngl_mul_opp_l : ∀ a b,
   rngl_opp_defined a = true →
   rngl_opp_defined b = true →
@@ -746,7 +759,6 @@ unfold rngl_opp_defined.
 ...
 Qed.
 ...
-
 
 Theorem rngl_opp_mul_prop : ∀ a b a' b',
   rngl_opt_opp a = Some a' →
@@ -1239,19 +1251,6 @@ rewrite Hoa in Hoa'.
 unfold map_option in Hoa'.
 apply rngl_opt_inv_symm in Hoa.
 now rewrite Hoa in Hoa'.
-Qed.
-
-Theorem rngl_opp_involutive : ∀ a,
-  rngl_opp_defined a = true →
-  (- - a)%F = a.
-Proof.
-intros * Hro.
-symmetry.
-specialize (rngl_sub_diag _ (or_introl Hro)) as H.
-unfold rngl_sub in H.
-rewrite Hro in H.
-apply rngl_add_move_0_r; [ | easy ].
-now apply rngl_opp_defined_opp.
 Qed.
 
 Theorem rngl_inv_neq_0 : ∀ a,
