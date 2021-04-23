@@ -167,25 +167,6 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_opt_inv_r_iff :
       if rngl_is_comm then not_applicable
       else ∀ a b, rngl_opt_inv a = Some b ↔ (a * b = 1)%F;
-(*
-    rngl_opp_defined_add :
-      ∀ a b,
-      rngl_opp_defined a = true
-      → rngl_opp_defined b = true
-      → rngl_opp_defined (a + b) = true;
-    rngl_opt_inv_symm :
-      ∀ a b, rngl_opt_inv a = Some b → rngl_opt_inv b = Some a;
-    rngl_inv_defined_mul :
-      ∀ a b,
-      rngl_inv_defined a = true
-      → rngl_inv_defined b = true
-      → rngl_inv_defined (a * b) = true;
-*)
-    (* when has opposite *)
-(*
-    rngl_opt_add_opp_l :
-      ∀ a, if rngl_opp_defined' a then (- a + a = 0)%F else not_applicable;
-*)
     (* when has subtraction (sous) *)
     rngl_opt_add_sub :
       if rngl_has_sous then ∀ a b, (a + b - b)%F = a
