@@ -659,38 +659,29 @@ apply rngl_opt_opp_symm in Hoa.
 now rewrite Hoa in Hoa'.
 Qed.
 
-...
-
 Theorem rngl_opp_add_prop : ∀ a b a' b',
   rngl_opt_opp' a = Some a' →
   rngl_opt_opp' b = Some b' →
-  rngl_opt_opp' (a + b) = Some (- b' - a')%F.
+  rngl_opt_opp' (a + b) = Some (b' + a')%F.
 Proof.
 intros * Ha Hb.
-generalize Ha; intros Haa.
-generalize Hb; intros Hbb.
-apply rngl_opt_opp_prop in Ha.
-apply rngl_opt_opp_prop in Hb.
-assert (Hab : (a + b = - b' - a')%F). {
-  apply rngl_add_move_0_r in Ha. 2: {
-Search rngl_opp_defined'.
-...
-    unfold rngl_opp_defined'.
-    now rewrite Haa.
-  }
-
-  assert (H : (a + b + a' = - b' - a' + a')%F). {
-    rewrite rngl_add_add_swap, Ha, rngl_add_0_l.
-...
+apply rngl_opt_opp_iff in Ha.
+apply rngl_opt_opp_iff in Hb.
+apply rngl_opt_opp_iff.
+rewrite rngl_add_assoc.
+rewrite <- (rngl_add_assoc a).
+now rewrite Hb, rngl_add_0_r.
+Qed.
 
 Theorem rngl_opp_mul_prop : ∀ a b a' b',
   rngl_opt_opp' a = Some a' →
   rngl_opt_opp' b = Some b' →
-  rngl_opt_opp' (a * b) = Some (- (a' * b'))%F.
+  rngl_opt_opp' (a * b) = Some (a' * b')%F.
 Proof.
 intros * Ha Hb.
-apply rngl_opt_opp_prop in Ha.
-apply rngl_opt_opp_prop in Hb.
+apply rngl_opt_opp_iff in Ha.
+apply rngl_opt_opp_iff in Hb.
+...
 assert (Hab : (a * b = a' * b')%F). {
 Search (_ + _ = _ + _)%F.
 ...
