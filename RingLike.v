@@ -627,6 +627,30 @@ split; intros H. {
 }
 Qed.
 
+Theorem rngl_opp_defined_opp : ∀ a,
+  rngl_opp_defined' a = true
+  → rngl_opp_defined' (- a) = true.
+Proof.
+intros * Hro.
+unfold rngl_opp_defined' in Hro |-*.
+unfold bool_of_option in Hro |-*.
+remember (rngl_opt_opp' a) as oa eqn:Hoa.
+symmetry in Hoa.
+destruct oa as [a'| ]; [ | easy ].
+Check rngl_opt_opp_prop.
+...
+apply rngl_opt_opp_symm in Hoa.
+remember (rngl_opt_opp (- a)%F) as oa eqn:Hoa'.
+symmetry in Hoa'.
+destruct oa as [a''| ]; [ easy | ].
+apply rngl_opt_opp_symm in Hoa.
+unfold rngl_opp in Hoa'.
+rewrite Hoa in Hoa'.
+unfold map_option in Hoa'.
+apply rngl_opt_opp_symm in Hoa.
+now rewrite Hoa in Hoa'.
+Qed.
+
 Theorem rngl_opp_add_prop : ∀ a b a' b',
   rngl_opt_opp' a = Some a' →
   rngl_opt_opp' b = Some b' →
