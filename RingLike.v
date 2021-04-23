@@ -681,6 +681,25 @@ Proof.
 intros * Ha Hb.
 apply rngl_opt_opp_iff in Ha.
 apply rngl_opt_opp_iff in Hb.
+apply rngl_opt_opp_iff.
+...
+specialize (rngl_add_sub (a * b - a' * b')%F (a' * b)%F) as H1.
+Check rngl_add_sub.
+...
+apply rngl_add_move_0_r in Ha. 2: {
+  unfold rngl_opp_defined'.
+  rewrite rngl_add_comm in Ha.
+  apply rngl_opt_opp_iff in Ha.
+  now rewrite Ha.
+}
+apply rngl_add_move_0_r in Hb. 2: {
+  unfold rngl_opp_defined'.
+  rewrite rngl_add_comm in Hb.
+  apply rngl_opt_opp_iff in Hb.
+  now rewrite Hb.
+}
+rewrite Ha, Hb.
+Search (_ * - _)%F.
 ...
 assert (Hab : (a * b = a' * b')%F). {
 Search (_ + _ = _ + _)%F.
