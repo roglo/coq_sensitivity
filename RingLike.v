@@ -627,6 +627,19 @@ split; intros H. {
 }
 Qed.
 
+Theorem rngl_opp_add_prop : ∀ a b a' b',
+  rngl_opt_opp' a = Some a' →
+  rngl_opt_opp' b = Some b' →
+  rngl_opt_opp' (a + b) = Some (- b' - a')%F.
+Proof.
+intros * Ha Hb.
+apply rngl_opt_opp_prop in Ha.
+apply rngl_opt_opp_prop in Hb.
+assert (Hab : (a + b = - b' - a')%F). {
+  assert (H : (a + b + a' = - b' - a' + a')%F). {
+    rewrite rngl_add_add_swap, Ha, rngl_add_0_l.
+...
+
 Theorem rngl_opp_mul_prop : ∀ a b a' b',
   rngl_opt_opp' a = Some a' →
   rngl_opt_opp' b = Some b' →
