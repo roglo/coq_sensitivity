@@ -759,9 +759,7 @@ intros * Ha Hb.
 apply rngl_opt_opp_iff in Ha.
 apply rngl_opt_opp_iff in Hb.
 apply rngl_opt_opp_iff.
-...
 specialize (rngl_add_sub (a * b - a' * b')%F (a' * b)%F) as H1.
-Check rngl_add_sub.
 ...
 apply rngl_add_move_0_r in Ha. 2: {
   unfold rngl_opp_defined'.
