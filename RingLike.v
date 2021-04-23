@@ -633,9 +633,18 @@ Theorem rngl_opp_add_prop : ∀ a b a' b',
   rngl_opt_opp' (a + b) = Some (- b' - a')%F.
 Proof.
 intros * Ha Hb.
+generalize Ha; intros Haa.
+generalize Hb; intros Hbb.
 apply rngl_opt_opp_prop in Ha.
 apply rngl_opt_opp_prop in Hb.
 assert (Hab : (a + b = - b' - a')%F). {
+  apply rngl_add_move_0_r in Ha. 2: {
+Search rngl_opp_defined'.
+...
+    unfold rngl_opp_defined'.
+    now rewrite Haa.
+  }
+
   assert (H : (a + b + a' = - b' - a' + a')%F). {
     rewrite rngl_add_add_swap, Ha, rngl_add_0_l.
 ...
