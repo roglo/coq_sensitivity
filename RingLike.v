@@ -864,6 +864,10 @@ apply rngl_mul_move_1_r; [ | | easy ]. {
 }
 intros H1.
 rewrite H1 in H.
+apply rngl_opt_inv_l_iff in H.
+...
+intros H1.
+rewrite H1 in H.
 rewrite rngl_mul_0_r in H.
 ...
 Search (_⁻¹ = 0)%F.
