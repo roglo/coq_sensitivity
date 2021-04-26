@@ -867,6 +867,12 @@ rewrite H1 in H.
 apply rngl_opt_inv_l_iff in H.
 Search (0 ⁻¹)%F.
 (* est-ce que 0 peut avoir un inverse, dans une espèce d'anneau ? *)
+(* dans un demi-anneau, au sens strict, 0 est absorbant et donc ce
+   serait contradictoire puisqu'on aurait en même temps 0*0⁻¹=0 et
+   0*0⁻¹=1 ; mais dans mon sens de "demi-anneau", 0 absorbant n'est
+   pas un axiome, il se déduit de l'existence d'une soustraction
+   telle que la multiplication est distributive par rapport à elle ;
+   peut-on donc concevoir un demi-anneau *sans* soustraction ? *)
 ...
 intros H1.
 rewrite H1 in H.
