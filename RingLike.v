@@ -823,15 +823,51 @@ apply rngl_add_move_0_r; [ | easy ].
 now apply rngl_opp_defined_opp.
 Qed.
 
+Theorem rngl_div_compat_l : ∀ a b c,
+  rngl_inv_defined c = true →
+  c ≠ 0%F → (a = b)%F → (a / c = b / c)%F.
+Proof.
+intros Hin a b c Hcz Hab.
+now rewrite Hab.
+Qed.
+
+Theorem rngl_mul_move_1_r : ∀ a b,
+  rngl_inv_defined b = true → b ≠ 0%F → (a * b)%F = 1%F ↔ a = (b⁻¹)%F.
+Proof.
+intros * Hin Hbz.
+split; intros H. {
+  apply rngl_div_compat_l with (c := b) in H; [ | easy | easy ].
+  unfold rngl_div in H.
+  rewrite Hin in H.
+  rewrite <- rngl_mul_assoc in H.
+  rewrite fold_rngl_div in H; [ | easy ].
+  rewrite rngl_div_diag in H; [ | now left | easy ].
+  now rewrite rngl_mul_1_r, rngl_mul_1_l in H.
+} {
+  rewrite H.
+  now apply rngl_mul_inv_l.
+}
+Qed.
+
 Theorem rngl_inv_involutive : ∀ a,
   rngl_inv_defined a = true →
   a ≠ 0%F →
   ((a⁻¹)⁻¹)%F = a.
 Proof.
 intros * Hro Haz.
+symmetry.
 specialize (rngl_div_diag _ (or_introl Hro) Haz) as H.
 unfold rngl_div in H.
 rewrite Hro in H.
+apply rngl_mul_move_1_r; [ | | easy ]. 2: {
+  intros H1.
+...
+rewrite H1 in H.
+...
+Search (_ * _ = 1)%F.
+...
+rewrite rngl_mul_0_r in H.
+Search (_⁻¹ = 0)%F.
 ...
 symmetry.
 Check rngl_sub_diag.
@@ -1094,14 +1130,6 @@ rewrite rngl_mul_div_l in H; [ | easy | easy ].
 easy.
 Qed.
 
-Theorem rngl_div_compat_l : ∀ a b c,
-  rngl_inv_defined c = true →
-  c ≠ 0%F → (a = b)%F → (a / c = b / c)%F.
-Proof.
-intros Hin a b c Hcz Hab.
-now rewrite Hab.
-Qed.
-
 Theorem rngl_inv_if_then_else_distr : ∀ (c : bool) a b,
   ((if c then a else b)⁻¹ = if c then a⁻¹ else b⁻¹)%F.
 Proof. now destruct c. Qed.
@@ -1252,24 +1280,6 @@ Proof.
 intros Hid H10 *.
 specialize (rngl_mul_div_l a 1%F Hid (rngl_1_neq_0 H10)) as H1.
 now rewrite rngl_mul_1_r in H1.
-Qed.
-
-Theorem rngl_mul_move_1_r : ∀ a b,
-  rngl_inv_defined b = true → b ≠ 0%F → (a * b)%F = 1%F ↔ a = (b⁻¹)%F.
-Proof.
-intros * Hin Hbz.
-split; intros H. {
-  apply rngl_div_compat_l with (c := b) in H; [ | easy | easy ].
-  unfold rngl_div in H.
-  rewrite Hin in H.
-  rewrite <- rngl_mul_assoc in H.
-  rewrite fold_rngl_div in H; [ | easy ].
-  rewrite rngl_mul_inv_r in H; [ | now left | easy ].
-  now rewrite rngl_mul_1_r, rngl_mul_1_l in H.
-} {
-  rewrite H.
-  now apply rngl_mul_inv_l.
-}
 Qed.
 
 Theorem rngl_opp_defined_opp : ∀ a,
