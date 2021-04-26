@@ -865,6 +865,7 @@ apply rngl_mul_move_1_r; [ | | easy ]. {
 intros H1.
 rewrite H1 in H.
 apply rngl_opt_inv_l_iff in H.
+Search (0 ⁻¹)%F.
 ...
 intros H1.
 rewrite H1 in H.
