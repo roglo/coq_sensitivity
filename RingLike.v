@@ -866,6 +866,7 @@ intros H1.
 rewrite H1 in H.
 apply rngl_opt_inv_l_iff in H.
 Search (0 ⁻¹)%F.
+(* est-ce que 0 peut avoir un inverse, dans une espèce d'anneau ? *)
 ...
 intros H1.
 rewrite H1 in H.
