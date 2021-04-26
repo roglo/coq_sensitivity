@@ -859,12 +859,14 @@ symmetry.
 specialize (rngl_div_diag _ (or_introl Hro) Haz) as H.
 unfold rngl_div in H.
 rewrite Hro in H.
-apply rngl_mul_move_1_r; [ | | easy ]. 2: {
-  intros H1.
-Search (_⁻¹ = 0)%F.
-...
+apply rngl_mul_move_1_r; [ | | easy ]. {
+  now apply rngl_inv_defined_inv.
+}
+intros H1.
 rewrite H1 in H.
+rewrite rngl_mul_0_r in H.
 ...
+Search (_⁻¹ = 0)%F.
 Search (_ * _ = 1)%F.
 ...
 rewrite rngl_mul_0_r in H.
