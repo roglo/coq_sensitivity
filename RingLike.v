@@ -390,11 +390,51 @@ destruct ic. {
 }
 Qed.
 
+Theorem fold_rngl_div : ∀ a b,
+  rngl_inv_defined b = true →
+  (a * b⁻¹)%F = (a / b)%F.
+Proof.
+intros * Hin.
+unfold rngl_div.
+now rewrite Hin.
+Qed.
+
+Theorem rngl_mul_div_l : ∀ a b,
+  rngl_inv_defined b = true ∨ rngl_has_quot = true →
+  b ≠ 0%F → (a * b / b)%F = a.
+Proof.
+intros * Hii Hbz.
+remember (rngl_inv_defined b) as iv eqn:Hiv; symmetry in Hiv.
+destruct iv. {
+  unfold rngl_div.
+  rewrite Hiv.
+  rewrite <- rngl_mul_assoc.
+  rewrite fold_rngl_div; [ | easy ].
+  unfold rngl_div; rewrite Hiv.
+  rewrite rngl_mul_inv_r; [ | easy ].
+  apply rngl_mul_1_r.
+} {
+  destruct Hii as [Hii| Hii]; [ easy | ].
+  remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
+  destruct ic. {
+    rewrite rngl_mul_comm; [ | easy ].
+    specialize rngl_opt_mul_quot_l as H1.
+    rewrite Hii in H1.
+    now apply H1.
+  } {
+    specialize rngl_opt_mul_quot_r as H1.
+    rewrite Hii, Hic in H1; cbn in H1.
+    now apply H1.
+  }
+}
+Qed.
+
 Theorem rngl_div_diag : ∀ a,
   rngl_inv_defined a = true ∨ rngl_has_quot = true →
+  a ≠ 0%F →
   (a / a = 1)%F.
 Proof.
-intros * Hom.
+intros * Hom Haz.
 remember (rngl_inv_defined a) as op eqn:Hop.
 symmetry in Hop.
 destruct op. {
@@ -405,26 +445,11 @@ destruct op. {
 remember rngl_has_quot as mo eqn:Hmo.
 symmetry in Hmo.
 destruct mo. {
-  specialize rngl_opt_add_sub as H1.
-Search (_ * _ / _)%F.
-...
-  specialize rngl_opt_mul_div as H1.
-  rewrite Hmo in H1.
-  specialize (H1 0%F a).
-  now rewrite rngl_add_0_l in H1.
+  specialize (rngl_mul_div_l 1%F a (or_intror Hmo) Haz) as H1.
+  now rewrite rngl_mul_1_l in H1.
 }
 now destruct Hom.
 Qed.
-...
-intros * H1.
-Check rngl_sub_diag.
-...
-unfold rngl_div.
-rewrite H1.
-apply rngl_mul_inv_r.
-Qed.
-
-...
 
 Theorem rngl_eq_dec : rngl_has_dec_eq = true → ∀ a b : T, {a = b} + {a ≠ b}.
 Proof.
@@ -540,32 +565,6 @@ Proof.
 intros * Hro.
 unfold rngl_sub.
 now rewrite Hro.
-Qed.
-
-Theorem rngl_inv_diag : ∀ a,
-  rngl_inv_defined a = true ∨ rngl_has_quot = true →
-  (a / a = 1)%F.
-Proof.
-intros * Hom.
-remember (rngl_inv_defined a) as op eqn:Hop.
-symmetry in Hop.
-destruct op. {
-  unfold rngl_div.
-  rewrite Hop.
-...
-  rewrite rngl_mul_comm.
-  now apply rngl_mul_inv_l.
-Check rngl_mul_inv_r.
-}
-remember rngl_has_sous as mo eqn:Hmo.
-symmetry in Hmo.
-destruct mo. {
-  specialize rngl_opt_add_sub as H1.
-  rewrite Hmo in H1.
-  specialize (H1 0%F a).
-  now rewrite rngl_add_0_l in H1.
-}
-now destruct Hom.
 Qed.
 
 Theorem rngl_add_sub : ∀ a b,
@@ -829,6 +828,7 @@ Theorem rngl_inv_involutive : ∀ a,
   ((a⁻¹)⁻¹)%F = a.
 Proof.
 intros * Hro.
+...
 symmetry.
 Check rngl_sub_diag.
 Search (_ / _ = 1)%F.
@@ -949,15 +949,6 @@ rewrite rngl_mul_add_distr_l.
 now rewrite rngl_mul_opp_r.
 Qed.
 
-Theorem fold_rngl_div : ∀ a b,
-  rngl_inv_defined b = true →
-  (a * b⁻¹)%F = (a / b)%F.
-Proof.
-intros * Hin.
-unfold rngl_div.
-now rewrite Hin.
-Qed.
-
 Theorem rngl_mul_inv_r : ∀ a,
   rngl_inv_defined a = true ∨ rngl_has_quot = true →
   a ≠ 0%F →
@@ -985,35 +976,6 @@ destruct iv. {
   rewrite Hii in H1.
   specialize (H1 a 1%F Haz).
   now rewrite rngl_mul_1_r in H1.
-}
-Qed.
-
-Theorem rngl_mul_div_l : ∀ a b,
-  rngl_inv_defined b = true ∨ rngl_has_quot = true →
-  b ≠ 0%F → (a * b / b)%F = a.
-Proof.
-intros * Hii Hbz.
-remember (rngl_inv_defined b) as iv eqn:Hiv; symmetry in Hiv.
-destruct iv. {
-  unfold rngl_div.
-  rewrite Hiv.
-  rewrite <- rngl_mul_assoc.
-  rewrite fold_rngl_div; [ | easy ].
-  rewrite rngl_mul_inv_r; [ | now left | easy ].
-  apply rngl_mul_1_r.
-} {
-  destruct Hii as [Hii| Hii]; [ easy | ].
-  remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
-  destruct ic. {
-    rewrite rngl_mul_comm; [ | easy ].
-    specialize rngl_opt_mul_quot_l as H1.
-    rewrite Hii in H1.
-    now apply H1.
-  } {
-    specialize rngl_opt_mul_quot_r as H1.
-    rewrite Hii, Hic in H1; cbn in H1.
-    now apply H1.
-  }
 }
 Qed.
 
