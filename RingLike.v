@@ -825,9 +825,13 @@ Qed.
 
 Theorem rngl_inv_involutive : ∀ a,
   rngl_inv_defined a = true →
+  a ≠ 0%F →
   ((a⁻¹)⁻¹)%F = a.
 Proof.
-intros * Hro.
+intros * Hro Haz.
+specialize (rngl_div_diag _ (or_introl Hro) Haz) as H.
+unfold rngl_div in H.
+rewrite Hro in H.
 ...
 symmetry.
 Check rngl_sub_diag.
