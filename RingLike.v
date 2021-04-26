@@ -861,13 +861,13 @@ unfold rngl_div in H.
 rewrite Hro in H.
 apply rngl_mul_move_1_r; [ | | easy ]. 2: {
   intros H1.
+Search (_⁻¹ = 0)%F.
 ...
 rewrite H1 in H.
 ...
 Search (_ * _ = 1)%F.
 ...
 rewrite rngl_mul_0_r in H.
-Search (_⁻¹ = 0)%F.
 ...
 symmetry.
 Check rngl_sub_diag.
