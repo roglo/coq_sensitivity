@@ -879,6 +879,12 @@ assert (H6 : ∀ x, (x + x)%F = x). {
   now rewrite rngl_mul_1_r in H3.
 }
 move H6 before H3; clear H3; rename H6 into H3.
+assert (Ha1 : a ≠ 1%F). {
+  intros H; subst a.
+  rewrite rngl_mul_1_l in H1.
+  now symmetry in H1.
+}
+move Ha1 before Haz.
 ...
 specialize (rngl_sub_diag _ (or_introl Hro)) as H.
 unfold rngl_sub in H.
