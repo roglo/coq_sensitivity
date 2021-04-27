@@ -878,6 +878,7 @@ assert (H6 : ∀ x, (x + x)%F = x). {
   rewrite rngl_mul_add_distr_l in H3.
   now rewrite rngl_mul_1_r in H3.
 }
+move H6 before H3; clear H3; rename H6 into H3.
 ...
 specialize (rngl_sub_diag _ (or_introl Hro)) as H.
 unfold rngl_sub in H.
