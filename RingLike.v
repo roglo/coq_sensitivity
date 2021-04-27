@@ -868,12 +868,8 @@ generalize H1; intros H3.
 replace 0%F with (0 + 0)%F in H3 by apply rngl_add_0_l.
 rewrite rngl_mul_add_distr_l in H3.
 rewrite H1 in H3.
-assert (H4 : (0 = 1)%F). {
-...
-intros H2.
-rewrite H2 in H.
-apply rngl_opt_inv_l_iff in H.
-Search (0 ⁻¹)%F.
+generalize H1; intros H4.
+apply rngl_opt_inv_l_iff in H4.
 ...
 intros H1.
 rewrite H1 in H.
