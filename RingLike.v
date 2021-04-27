@@ -856,23 +856,24 @@ Theorem rngl_inv_involutive : ∀ a,
 Proof.
 intros * Hro Haz.
 symmetry.
-specialize (rngl_div_diag _ (or_introl Hro) Haz) as H.
-unfold rngl_div in H.
-rewrite Hro in H.
+specialize (rngl_div_diag _ (or_introl Hro) Haz) as H1.
+unfold rngl_div in H1.
+rewrite Hro in H1.
 apply rngl_mul_move_1_r; [ | | easy ]. {
   now apply rngl_inv_defined_inv.
 }
-intros H1.
-rewrite H1 in H.
+intros H2.
+rewrite H2 in H1.
+generalize H1; intros H3.
+replace 0%F with (0 + 0)%F in H3 by apply rngl_add_0_l.
+rewrite rngl_mul_add_distr_l in H3.
+rewrite H1 in H3.
+assert (H4 : (0 = 1)%F). {
+...
+intros H2.
+rewrite H2 in H.
 apply rngl_opt_inv_l_iff in H.
 Search (0 ⁻¹)%F.
-(* est-ce que 0 peut avoir un inverse, dans une espèce d'anneau ? *)
-(* dans un demi-anneau, au sens strict, 0 est absorbant et donc ce
-   serait contradictoire puisqu'on aurait en même temps 0*0⁻¹=0 et
-   0*0⁻¹=1 ; mais dans mon sens de "demi-anneau", 0 absorbant n'est
-   pas un axiome, il se déduit de l'existence d'une soustraction
-   telle que la multiplication est distributive par rapport à elle ;
-   peut-on donc concevoir un demi-anneau *sans* soustraction ? *)
 ...
 intros H1.
 rewrite H1 in H.
