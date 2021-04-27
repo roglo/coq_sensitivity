@@ -872,6 +872,12 @@ generalize H1; intros H4.
 apply rngl_opt_inv_l_iff in H4.
 specialize (rngl_opt_inv_symm _ _ H4) as H5.
 clear Hro.
+assert (H6 : ∀ x, (x + x)%F = x). {
+  intros x.
+  apply (f_equal (rngl_mul x)) in H3.
+  rewrite rngl_mul_add_distr_l in H3.
+  now rewrite rngl_mul_1_r in H3.
+}
 ...
 specialize (rngl_sub_diag _ (or_introl Hro)) as H.
 unfold rngl_sub in H.
