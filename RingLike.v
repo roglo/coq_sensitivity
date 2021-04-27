@@ -870,20 +870,8 @@ rewrite rngl_mul_add_distr_l in H3.
 rewrite H1 in H3.
 generalize H1; intros H4.
 apply rngl_opt_inv_l_iff in H4.
-...
-intros H1.
-rewrite H1 in H.
-rewrite rngl_mul_0_r in H.
-...
-Search (_⁻¹ = 0)%F.
-Search (_ * _ = 1)%F.
-...
-rewrite rngl_mul_0_r in H.
-...
-symmetry.
-Check rngl_sub_diag.
-Search (_ / _ = 1)%F.
-Search (_ * _⁻¹ = 1)%F.
+specialize (rngl_opt_inv_symm _ _ H4) as H5.
+clear Hro.
 ...
 specialize (rngl_sub_diag _ (or_introl Hro)) as H.
 unfold rngl_sub in H.
