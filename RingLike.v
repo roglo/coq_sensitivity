@@ -897,6 +897,19 @@ rewrite rngl_mul_add_distr_l in H4.
 rewrite H1 in H4.
 generalize H1; intros H5.
 apply rngl_opt_inv_l_iff in H5.
+assert (Ha1 : a ≠ 1%F). {
+  intros H; subst a.
+  rewrite rngl_mul_1_l in H1.
+  now symmetry in H1.
+}
+move Ha1 before Haz.
+assert (H10 : (1 ≠ 0)%F). {
+  intros H.
+  rewrite <- H in H5.
+  apply rngl_opt_inv_l_iff in H5.
+  now rewrite rngl_mul_1_r in H5.
+}
+move H10 before Ha1.
 specialize (rngl_opt_inv_symm _ _ H5) as H6.
 clear Hro.
 assert (H7 : ∀ x, (x + x)%F = x). {
@@ -906,12 +919,22 @@ assert (H7 : ∀ x, (x + x)%F = x). {
   now rewrite rngl_mul_1_r in H4.
 }
 move H7 before H4; clear H4; rename H7 into H4.
-assert (Ha1 : a ≠ 1%F). {
-  intros H; subst a.
-  rewrite rngl_mul_1_l in H1.
-  now symmetry in H1.
+assert (H7 : (a * a ≠ 0)%F). {
+  intros H7.
+  generalize H7; intros H.
+  remember a as z in H at 2.
+  replace a with (0 + a)%F in H by apply rngl_add_0_l.
+  subst z.
+  rewrite rngl_mul_add_distr_r in H.
+  rewrite H2 in H.
+  rewrite H7 in H.
+  now rewrite rngl_add_0_r in H.
 }
-move Ha1 before Haz.
+assert (H8 : (a * a ≠ 1)%F). {
+  intros H.
+  apply rngl_opt_inv_l_iff in H.
+  congruence.
+}
 ...
 specialize (rngl_sub_diag _ (or_introl Hro)) as H.
 unfold rngl_sub in H.
