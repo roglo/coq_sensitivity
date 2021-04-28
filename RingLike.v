@@ -870,6 +870,81 @@ split; intros H. {
 }
 Qed.
 
+(* experiment *)
+
+Inductive with_invertible_zero :=
+  IZ_zero | IZ_one | IZ_a.
+
+Definition IZ_add x y :=
+  match (x, y) with
+  | (IZ_a, _) => IZ_a
+  | (_, IZ_a) => IZ_a
+  | (IZ_one, _) => IZ_one
+  | (_, IZ_one) => IZ_one
+  | (IZ_zero, IZ_zero) => IZ_zero
+  end.
+
+Definition IZ_mul x y :=
+  match (x, y) with
+  | (IZ_one, _) => y
+  | (_, IZ_one) => x
+  | (IZ_zero, IZ_zero) => IZ_zero (* try IZ_a, to see if it also works *)
+  | (IZ_zero, IZ_a) => IZ_one
+  | (IZ_a, IZ_zero) => IZ_one
+  | (IZ_a, IZ_a) => IZ_a
+  end.
+
+Definition IZ_opt_opp x :=
+  match x with
+  | IZ_zero => Some IZ_zero
+  | _ => None
+  end.
+
+Definition IZ_opt_inv x :=
+  match x with
+  | IZ_zero => Some IZ_a
+  | IZ_one => Some IZ_one
+  | IZ_a => Some IZ_zero
+  end.
+
+Definition IZ_rngl_le (x y : with_invertible_zero) :=
+  False.
+
+Canonical Structure wiz_ring_like_op : ring_like_op with_invertible_zero :=
+  {| rngl_zero := IZ_zero;
+     rngl_one := IZ_one;
+     rngl_add := IZ_add;
+     rngl_mul := IZ_mul;
+     rngl_opt_opp := IZ_opt_opp;
+     rngl_opt_inv := IZ_opt_inv;
+     rngl_opt_sous := None;
+     rngl_opt_quot := None;
+     rngl_le := IZ_rngl_le |}.
+
+Existing Instance wiz_ring_like_op.
+
+Theorem wiz_add_comm : ∀ a b : with_invertible_zero,
+  (a + b)%F = (b + a)%F.
+Proof.
+intros.
+now destruct a, b.
+Qed.
+
+Definition wiz_ring_like_prop : ring_like_prop with_invertible_zero :=
+  {| rngl_is_comm := true;
+     rngl_has_dec_eq := true;
+     rngl_has_dec_le := false;
+     rngl_has_1_neq_0 := true;
+     rngl_is_ordered := false;
+     rngl_is_integral := true;
+     rngl_characteristic := 0;
+     rngl_add_comm := wiz_add_comm;
+     rngl_add_assoc := 42 |}.
+
+...
+
+(* end experiment *)
+
 Theorem rngl_inv_involutive : ∀ a,
   rngl_inv_defined a = true →
   a ≠ 0%F →
