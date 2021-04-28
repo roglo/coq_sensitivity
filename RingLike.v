@@ -935,6 +935,11 @@ assert (H8 : (a * a ≠ 1)%F). {
   apply rngl_opt_inv_l_iff in H.
   congruence.
 }
+assert (H9 : (0 * 0 ≠ 1)%F). {
+  intros H.
+  apply rngl_opt_inv_l_iff in H.
+  congruence.
+}
 ...
 specialize (rngl_sub_diag _ (or_introl Hro)) as H.
 unfold rngl_sub in H.
