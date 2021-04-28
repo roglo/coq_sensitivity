@@ -930,6 +930,13 @@ intros.
 now destruct a, b.
 Qed.
 
+Theorem wiz_add_assoc : ∀ a b c : with_invertible_zero,
+  (a + (b + c))%F = (a + b + c)%F.
+Proof.
+intros.
+now destruct a, b, c.
+Qed.
+
 Definition wiz_ring_like_prop : ring_like_prop with_invertible_zero :=
   {| rngl_is_comm := true;
      rngl_has_dec_eq := true;
@@ -939,7 +946,8 @@ Definition wiz_ring_like_prop : ring_like_prop with_invertible_zero :=
      rngl_is_integral := true;
      rngl_characteristic := 0;
      rngl_add_comm := wiz_add_comm;
-     rngl_add_assoc := 42 |}.
+     rngl_add_assoc := wiz_add_assoc;
+     rngl_add_0_l := 42 |}.
 
 ...
 
