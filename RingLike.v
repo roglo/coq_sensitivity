@@ -831,6 +831,27 @@ intros Hin a b c Hcz Hab.
 now rewrite Hab.
 Qed.
 
+Theorem rngl_mul_move_1_l : ∀ a b,
+  rngl_inv_defined a = true → a ≠ 0%F → (a * b)%F = 1%F ↔ b = (a⁻¹)%F.
+Proof.
+intros * Hin Hbz.
+split; intros H. {
+  apply rngl_opt_inv_l_iff in H.
+  apply rngl_opt_inv_symm in H.
+  apply rngl_opt_inv_l_iff in H.
+  apply rngl_div_compat_l with (c := a) in H; [ | easy | easy ].
+  unfold rngl_div in H.
+  rewrite Hin in H.
+  rewrite <- rngl_mul_assoc in H.
+  rewrite fold_rngl_div in H; [ | easy ].
+  rewrite rngl_div_diag in H; [ | now left | easy ].
+  now rewrite rngl_mul_1_r, rngl_mul_1_l in H.
+} {
+  rewrite H.
+  now apply rngl_mul_inv_r.
+}
+Qed.
+
 Theorem rngl_mul_move_1_r : ∀ a b,
   rngl_inv_defined b = true → b ≠ 0%F → (a * b)%F = 1%F ↔ a = (b⁻¹)%F.
 Proof.
@@ -862,23 +883,29 @@ rewrite Hro in H1.
 apply rngl_mul_move_1_r; [ | | easy ]. {
   now apply rngl_inv_defined_inv.
 }
-intros H2.
-rewrite H2 in H1.
-generalize H1; intros H3.
-replace 0%F with (0 + 0)%F in H3 by apply rngl_add_0_l.
-rewrite rngl_mul_add_distr_l in H3.
-rewrite H1 in H3.
-generalize H1; intros H4.
-apply rngl_opt_inv_l_iff in H4.
-specialize (rngl_opt_inv_symm _ _ H4) as H5.
-clear Hro.
-assert (H6 : ∀ x, (x + x)%F = x). {
-  intros x.
-  apply (f_equal (rngl_mul x)) in H3.
-  rewrite rngl_mul_add_distr_l in H3.
-  now rewrite rngl_mul_1_r in H3.
+intros H3.
+rewrite H3 in H1.
+assert (H2 : (0 * a = 1)%F). {
+  apply rngl_opt_inv_l_iff.
+  apply rngl_opt_inv_symm.
+  now apply rngl_opt_inv_l_iff.
 }
-move H6 before H3; clear H3; rename H6 into H3.
+move H2 before H1.
+generalize H1; intros H4.
+replace 0%F with (0 + 0)%F in H4 by apply rngl_add_0_l.
+rewrite rngl_mul_add_distr_l in H4.
+rewrite H1 in H4.
+generalize H1; intros H5.
+apply rngl_opt_inv_l_iff in H5.
+specialize (rngl_opt_inv_symm _ _ H5) as H6.
+clear Hro.
+assert (H7 : ∀ x, (x + x)%F = x). {
+  intros x.
+  apply (f_equal (rngl_mul x)) in H4.
+  rewrite rngl_mul_add_distr_l in H4.
+  now rewrite rngl_mul_1_r in H4.
+}
+move H7 before H4; clear H4; rename H7 into H4.
 assert (Ha1 : a ≠ 1%F). {
   intros H; subst a.
   rewrite rngl_mul_1_l in H1.
