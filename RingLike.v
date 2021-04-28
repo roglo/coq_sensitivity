@@ -937,6 +937,21 @@ intros.
 now destruct a, b, c.
 Qed.
 
+Theorem wiz_add_0_l : ∀ a : with_invertible_zero, (0 + a)%F = a.
+Proof.
+intros.
+now destruct a.
+Qed.
+
+Theorem wiz_mul_assoc : ∀ a b c : with_invertible_zero,
+  (a * (b * c))%F = (a * b * c)%F.
+Proof.
+intros.
+destruct a, b, c; try easy.
+(* verdict: it does not work, the multiplication is not associative *)
+(* even if 0*0=a (I also tested it) *)
+...
+
 Definition wiz_ring_like_prop : ring_like_prop with_invertible_zero :=
   {| rngl_is_comm := true;
      rngl_has_dec_eq := true;
@@ -947,7 +962,8 @@ Definition wiz_ring_like_prop : ring_like_prop with_invertible_zero :=
      rngl_characteristic := 0;
      rngl_add_comm := wiz_add_comm;
      rngl_add_assoc := wiz_add_assoc;
-     rngl_add_0_l := 42 |}.
+     rngl_add_0_l := wiz_add_0_l;
+     rngl_mul_assoc := 42 |}.
 
 ...
 
