@@ -870,110 +870,6 @@ split; intros H. {
 }
 Qed.
 
-(* experiment *)
-
-(*
-Inductive with_invertible_zero :=
-  | IZ_zero : with_invertible_zero
-  | IZ_a_pow : nat → with_invertible_zero.
-
-Definition IZ_add x y :=
-  match (x, y) with
-  | (IZ_zero, _) => y
-  | (_, IZ_zero) => x
-  | (IZ_a_pow m, IZ_a_pow n) => IZ_a_pow (max m n)
-  end.
-
-Definition IZ_mul x y :=
-  match (x, y) with
-  | (IZ_zero, IZ_zero) => IZ_zero (* other values are possible... *)
-  | (IZ_zero, IZ_a_pow 0) => IZ_zero
-  | (IZ_zero, IZ_a_pow (S n)) => IZ_a_pow n
-  | (IZ_a_pow 0, IZ_zero) => IZ_zero
-  | (IZ_a_pow (S m), IZ_zero) => IZ_a_pow m
-  | (IZ_a_pow m, IZ_a_pow n) => IZ_a_pow (m + n)
-  end.
-
-Definition IZ_opt_opp x :=
-  match x with
-  | IZ_zero => Some IZ_zero
-  | _ => None
-  end.
-
-Definition IZ_opt_inv x :=
-  match x with
-  | IZ_zero => Some (IZ_a_pow 1)
-  | IZ_a_pow 0 => Some (IZ_a_pow 0)
-  | IZ_a_pow (S n) => None
-  end.
-
-Definition IZ_rngl_le (x y : with_invertible_zero) :=
-  False.
-
-Canonical Structure wiz_ring_like_op : ring_like_op with_invertible_zero :=
-  {| rngl_zero := IZ_zero;
-     rngl_one := IZ_a_pow 0;
-     rngl_add := IZ_add;
-     rngl_mul := IZ_mul;
-     rngl_opt_opp := IZ_opt_opp;
-     rngl_opt_inv := IZ_opt_inv;
-     rngl_opt_sous := None;
-     rngl_opt_quot := None;
-     rngl_le := IZ_rngl_le |}.
-
-Existing Instance wiz_ring_like_op.
-
-Theorem wiz_add_comm : ∀ a b : with_invertible_zero,
-  (a + b)%F = (b + a)%F.
-Proof.
-intros.
-destruct a as [| m], b as [| n]; try easy; cbn.
-Require Import Arith.
-Search (Nat.max _ _ = Nat.max _ _).
-now rewrite Nat.max_comm.
-Qed.
-
-Theorem wiz_add_assoc : ∀ a b c : with_invertible_zero,
-  (a + (b + c))%F = (a + b + c)%F.
-Proof.
-intros.
-destruct a as [| a'], b as [| b'], c as [| c']; try easy; cbn.
-now rewrite Nat.max_assoc.
-Qed.
-
-Theorem wiz_add_0_l : ∀ a : with_invertible_zero, (0 + a)%F = a.
-Proof.
-intros.
-now destruct a.
-Qed.
-
-Theorem wiz_mul_assoc : ∀ a b c : with_invertible_zero,
-  (a * (b * c))%F = (a * b * c)%F.
-Proof.
-intros.
-destruct a as [| a'], b as [| b'], c as [| c']; try easy. {
-  destruct c'; [ easy | ].
-  destruct c'.
-...
-  cbn.
-...
-
-Definition wiz_ring_like_prop : ring_like_prop with_invertible_zero :=
-  {| rngl_is_comm := true;
-     rngl_has_dec_eq := true;
-     rngl_has_dec_le := false;
-     rngl_has_1_neq_0 := true;
-     rngl_is_ordered := false;
-     rngl_is_integral := true;
-     rngl_characteristic := 0;
-     rngl_add_comm := wiz_add_comm;
-     rngl_add_assoc := wiz_add_assoc;
-     rngl_add_0_l := wiz_add_0_l;
-     rngl_mul_assoc := 42 |}.
-*)
-
-(* end experiment *)
-
 Theorem rngl_inv_involutive : ∀ a,
   rngl_inv_defined a = true →
   a ≠ 0%F →
@@ -1058,13 +954,17 @@ assert (Hza : (0 * 0 ≠ a)%F). {
   now intros H; rewrite H in H11.
 }
 move Hza before Hz1.
-...
-specialize (rngl_sub_diag _ (or_introl Hro)) as H.
-unfold rngl_sub in H.
-rewrite Hro in H.
-apply rngl_add_move_0_r; [ | easy ].
-now apply rngl_opp_defined_opp.
+remember (0 * 0)%F as b eqn:Hb.
+generalize H11; intros H12.
+replace b with (b + 0)%F in H11 by apply rngl_add_0_r.
+rewrite rngl_mul_add_distr_r in H11.
+rewrite H12, rngl_add_0_l in H11.
+congruence.
 Qed.
+
+Inspect 1.
+
+...
 
 Theorem rngl_mul_opp_l : ∀ a b,
   rngl_opp_defined a = true →
