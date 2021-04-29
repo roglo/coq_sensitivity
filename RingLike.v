@@ -886,11 +886,6 @@ assert (H2 : (0 * a = 1)%F). {
   apply rngl_opt_inv_symm.
   now apply rngl_opt_inv_l_iff.
 }
-move H2 before H1.
-generalize H1; intros H4.
-replace 0%F with (0 + 0)%F in H4 by apply rngl_add_0_l.
-rewrite rngl_mul_add_distr_l in H4.
-rewrite H1 in H4.
 generalize H1; intros H5.
 apply rngl_opt_inv_l_iff in H5.
 assert (Ha1 : a ≠ 1%F). {
@@ -905,16 +900,6 @@ assert (H10 : (1 ≠ 0)%F). {
   apply rngl_opt_inv_l_iff in H5.
   now rewrite rngl_mul_1_r in H5.
 }
-move H10 before Ha1.
-specialize (rngl_opt_inv_symm _ _ H5) as H6.
-clear Hro.
-assert (H7 : ∀ x, (x + x)%F = x). {
-  intros x.
-  apply (f_equal (rngl_mul x)) in H4.
-  rewrite rngl_mul_add_distr_l in H4.
-  now rewrite rngl_mul_1_r in H4.
-}
-move H7 before H4; clear H4; rename H7 into H4.
 assert (H7 : (a * a ≠ 0)%F). {
   intros H7.
   generalize H7; intros H.
@@ -926,30 +911,13 @@ assert (H7 : (a * a ≠ 0)%F). {
   rewrite H7 in H.
   now rewrite rngl_add_0_r in H.
 }
-assert (H8 : (a * a ≠ 1)%F). {
-  intros H.
-  apply rngl_opt_inv_l_iff in H.
-  congruence.
-}
-assert (H9 : (0 * 0 ≠ 1)%F). {
-  intros H.
-  apply rngl_opt_inv_l_iff in H.
-  congruence.
-}
 assert (H11 : (0 * (0 * a) = 0)%F). {
   now rewrite H2, rngl_mul_1_r.
 }
 rewrite rngl_mul_assoc in H11.
-assert (H12 : (0 * 0 ≠ 0)%F). {
-  now intros H; rewrite H, H2 in H11.
-}
-rename H12 into Hzz.
-rename H9 into Hz1.
-move Hzz after Hz1.
 assert (Hza : (0 * 0 ≠ a)%F). {
   now intros H; rewrite H in H11.
 }
-move Hza before Hz1.
 remember (0 * 0)%F as b eqn:Hb.
 generalize H11; intros H12.
 replace b with (b + 0)%F in H11 by apply rngl_add_0_r.
