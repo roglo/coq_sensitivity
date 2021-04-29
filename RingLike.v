@@ -870,19 +870,15 @@ split; intros H. {
 }
 Qed.
 
-Theorem rngl_inv_involutive : ∀ a,
-  rngl_inv_defined a = true →
-  a ≠ 0%F →
-  ((a⁻¹)⁻¹)%F = a.
+Theorem neq_a_0_neq_inv_a_0 : ∀ a,
+  rngl_inv_defined a = true
+  → a ≠ 0%F
+  → (a⁻¹)%F ≠ 0%F.
 Proof.
 intros * Hro Haz.
-symmetry.
 specialize (rngl_div_diag _ (or_introl Hro) Haz) as H1.
 unfold rngl_div in H1.
 rewrite Hro in H1.
-apply rngl_mul_move_1_r; [ | | easy ]. {
-  now apply rngl_inv_defined_inv.
-}
 intros H3.
 rewrite H3 in H1.
 assert (H2 : (0 * a = 1)%F). {
@@ -962,7 +958,24 @@ rewrite H12, rngl_add_0_l in H11.
 congruence.
 Qed.
 
-Inspect 1.
+Theorem rngl_inv_involutive : ∀ a,
+  rngl_inv_defined a = true →
+  a ≠ 0%F →
+  ((a⁻¹)⁻¹)%F = a.
+Proof.
+intros * Hro Haz.
+symmetry.
+apply rngl_mul_move_1_r; cycle 2. {
+  specialize (rngl_div_diag _ (or_introl Hro) Haz) as H1.
+  unfold rngl_div in H1.
+  now rewrite Hro in H1.
+} {
+  now apply rngl_inv_defined_inv.
+}
+now apply neq_a_0_neq_inv_a_0.
+Qed.
+
+Inspect 2.
 
 ...
 
