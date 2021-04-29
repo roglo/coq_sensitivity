@@ -872,23 +872,25 @@ Qed.
 
 (* experiment *)
 
-(*
+Print nat.
+
 Inductive with_invertible_zero :=
-  IZ_zero | IZ_one | IZ_a.
+  | IZ_a_pow_pred : nat → with_invertible_zero.
 
 Definition IZ_add x y :=
   match (x, y) with
-  | (IZ_a, _) => IZ_a
-  | (_, IZ_a) => IZ_a
-  | (IZ_one, _) => IZ_one
-  | (_, IZ_one) => IZ_one
-  | (IZ_zero, IZ_zero) => IZ_zero
+  | (IZ_a_pow_pred m, IZ_a_pow_pred n) => IZ_a_pow_pred (max m n)
   end.
 
 Definition IZ_mul x y :=
   match (x, y) with
-  | (IZ_one, _) => y
-  | (_, IZ_one) => x
+  | (IZ_zero, IZ_zero) => IZ_zero (* try out other values... *)
+  | (IZ_zero, IZ_a_pow n) =>
+
+  | (IZ_a_pow 0, _) => y
+  | (_, IZ_a_pow 0) => x
+
+
   | (IZ_zero, IZ_zero) => IZ_zero
 (*
   | (IZ_zero, IZ_zero) => IZ_a
