@@ -926,21 +926,26 @@ rewrite H12, rngl_add_0_l in H11.
 congruence.
 Qed.
 
-Theorem glop : ∀ a b,
+Theorem rngl_eq_mul_1_neq_neq : ∀ a b,
   (a * b = 1)%F
   → a ≠ 0%F
   → b ≠ 0%F.
 Proof.
 intros * Hab Haz.
+generalize Hab; intros H1.
+apply rngl_opt_inv_l_iff in H1.
+apply rngl_opt_inv_symm in H1.
+specialize rngl_mul_move_1_l as H2.
 assert (Hro : rngl_inv_defined a = true). {
   apply rngl_opt_inv_l_iff in Hab.
   apply rngl_opt_inv_symm in Hab.
   unfold rngl_inv_defined.
   now rewrite Hab.
 }
-Check rngl_opt_inv_l_iff.
-Search rngl_opt_inv.
-...
+specialize (proj1 (H2 a b Hro Haz) Hab) as H3.
+subst b.
+now apply neq_a_0_neq_inv_a_0.
+Qed.
 
 Theorem rngl_inv_involutive : ∀ a,
   rngl_inv_defined a = true →
@@ -959,7 +964,7 @@ apply rngl_mul_move_1_r; cycle 2. {
 now apply neq_a_0_neq_inv_a_0.
 Qed.
 
-Inspect 2.
+Inspect 3.
 
 ...
 
