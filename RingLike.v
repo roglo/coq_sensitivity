@@ -872,6 +872,7 @@ Qed.
 
 (* experiment *)
 
+(*
 Inductive with_invertible_zero :=
   IZ_zero | IZ_one | IZ_a.
 
@@ -888,7 +889,10 @@ Definition IZ_mul x y :=
   match (x, y) with
   | (IZ_one, _) => y
   | (_, IZ_one) => x
-  | (IZ_zero, IZ_zero) => IZ_zero (* try IZ_a, to see if it also works *)
+  | (IZ_zero, IZ_zero) => IZ_zero
+(*
+  | (IZ_zero, IZ_zero) => IZ_a
+*)
   | (IZ_zero, IZ_a) => IZ_one
   | (IZ_a, IZ_zero) => IZ_one
   | (IZ_a, IZ_a) => IZ_a
@@ -947,9 +951,29 @@ Theorem wiz_mul_assoc : ∀ a b c : with_invertible_zero,
   (a * (b * c))%F = (a * b * c)%F.
 Proof.
 intros.
-destruct a, b, c; try easy.
+destruct a, b, c; try easy; cbn.
 (* verdict: it does not work, the multiplication is not associative *)
 (* even if 0*0=a (I also tested it) *)
+...
+ (IZ_zero * (IZ_zero * IZ_a))%F = (IZ_zero * IZ_zero * IZ_a)%F
+ (IZ_zero * (IZ_a * IZ_a))%F = (IZ_zero * IZ_a * IZ_a)%F
+ (IZ_a * (IZ_zero * IZ_zero))%F = (IZ_a * IZ_zero * IZ_zero)%F
+ (IZ_a * (IZ_a * IZ_zero))%F = (IZ_a * IZ_a * IZ_zero)%F
+...
+ IZ_zero = IZ_a
+ IZ_one = IZ_a
+ IZ_a = IZ_zero
+ IZ_a = IZ_one
+...
+ (IZ_zero * (IZ_zero * IZ_a))%F = (IZ_zero * IZ_zero * IZ_a)%F
+ (IZ_zero * (IZ_a * IZ_a))%F = (IZ_zero * IZ_a * IZ_a)%F
+ (IZ_a * (IZ_zero * IZ_zero))%F = (IZ_a * IZ_zero * IZ_zero)%F
+ (IZ_a * (IZ_a * IZ_zero))%F = (IZ_a * IZ_a * IZ_zero)%F
+...
+ IZ_zero = IZ_one
+ IZ_one = IZ_a
+ IZ_one = IZ_zero
+ IZ_a = IZ_one
 ...
 
 Definition wiz_ring_like_prop : ring_like_prop with_invertible_zero :=
@@ -964,8 +988,7 @@ Definition wiz_ring_like_prop : ring_like_prop with_invertible_zero :=
      rngl_add_assoc := wiz_add_assoc;
      rngl_add_0_l := wiz_add_0_l;
      rngl_mul_assoc := 42 |}.
-
-...
+*)
 
 (* end experiment *)
 
@@ -1039,6 +1062,17 @@ assert (H9 : (0 * 0 ≠ 1)%F). {
   apply rngl_opt_inv_l_iff in H.
   congruence.
 }
+(*
+ (IZ_zero * (IZ_a * IZ_a))%F = (IZ_zero * IZ_a * IZ_a)%F
+ IZ_one = IZ_a
+*)
+assert (H11 : (0 * (a * a) = 1)%F). {
+(* ah non : ça, c'est si "a * a" est égal à "a", c'est-à-dire que
+   l'espèce d'anneau ne contient que 0, 1 et a *)
+(* moralité : cet exemple, avec T = {0,1,a} n'est pas une espèce
+   d'anneau, car la multiplication n'est pas associative *)
+(* il faut chercher un type contenant au moins 4 valeurs *)
+(* voir aussi si on peut pas avoir 0, et non "a", comme inverse de 0. *)
 ...
 specialize (rngl_sub_diag _ (or_introl Hro)) as H.
 unfold rngl_sub in H.
