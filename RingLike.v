@@ -1062,6 +1062,13 @@ assert (H9 : (0 * 0 ≠ 1)%F). {
   apply rngl_opt_inv_l_iff in H.
   congruence.
 }
+(* on a :
+     a + 0 = a
+     a + 1 = a (démontrable)
+     a + a = a
+   mais s'il y a d'autres valeurs x que 0, 1 et a, il se
+   peut que a + x ne soit pas égal à "a" *)
+...
 (*
  (IZ_zero * (IZ_a * IZ_a))%F = (IZ_zero * IZ_a * IZ_a)%F
  IZ_one = IZ_a
