@@ -1048,7 +1048,8 @@ assert (H11 : (0 * (0 * a) = 0)%F). {
   now rewrite H2, rngl_mul_1_r.
 }
 rewrite rngl_mul_assoc in H11.
-(* if 0 * 0 = 0, then ok, because 0 * a = 1
+(* searching for a contradiction in H11
+   if 0 * 0 = 0, then ok, because 0 * a = 1
    if 0 * 0 = 1, ok by Haz
    if 0 * 0 = a, ok by H7
 but which other values are possible ?
