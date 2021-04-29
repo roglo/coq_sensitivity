@@ -875,29 +875,24 @@ Qed.
 Print nat.
 
 Inductive with_invertible_zero :=
-  | IZ_a_pow_pred : nat → with_invertible_zero.
+  | IZ_zero : with_invertible_zero
+  | IZ_a_pow : nat → with_invertible_zero.
 
 Definition IZ_add x y :=
   match (x, y) with
-  | (IZ_a_pow_pred m, IZ_a_pow_pred n) => IZ_a_pow_pred (max m n)
+  | (IZ_zero, _) => y
+  | (_, IZ_zero) => x
+  | (IZ_a_pow m, IZ_a_pow n) => IZ_a_pow (max m n)
   end.
 
 Definition IZ_mul x y :=
   match (x, y) with
-  | (IZ_zero, IZ_zero) => IZ_zero (* try out other values... *)
-  | (IZ_zero, IZ_a_pow n) =>
-
-  | (IZ_a_pow 0, _) => y
-  | (_, IZ_a_pow 0) => x
-
-
-  | (IZ_zero, IZ_zero) => IZ_zero
-(*
-  | (IZ_zero, IZ_zero) => IZ_a
-*)
-  | (IZ_zero, IZ_a) => IZ_one
-  | (IZ_a, IZ_zero) => IZ_one
-  | (IZ_a, IZ_a) => IZ_a
+  | (IZ_zero, IZ_zero) => IZ_zero (* other values are possible... *)
+  | (IZ_zero, IZ_a_pow 0) => IZ_zero
+  | (IZ_zero, IZ_a_pow (S n)) => IZ_a_pow n
+  | (IZ_a_pow 0, IZ_zero) => IZ_zero
+  | (IZ_a_pow (S m), IZ_zero) => IZ_a_pow m
+  | (IZ_a_pow m, IZ_a_pow n) => IZ_a_pow (m + n)
   end.
 
 Definition IZ_opt_opp x :=
@@ -908,9 +903,9 @@ Definition IZ_opt_opp x :=
 
 Definition IZ_opt_inv x :=
   match x with
-  | IZ_zero => Some IZ_a
-  | IZ_one => Some IZ_one
-  | IZ_a => Some IZ_zero
+  | IZ_zero => Some (IZ_a_pow 1)
+  | IZ_a_pow 0 => Some (IZ_a_pow 0)
+  | IZ_a_pow (S n) => None
   end.
 
 Definition IZ_rngl_le (x y : with_invertible_zero) :=
@@ -918,7 +913,7 @@ Definition IZ_rngl_le (x y : with_invertible_zero) :=
 
 Canonical Structure wiz_ring_like_op : ring_like_op with_invertible_zero :=
   {| rngl_zero := IZ_zero;
-     rngl_one := IZ_one;
+     rngl_one := IZ_a_pow 0;
      rngl_add := IZ_add;
      rngl_mul := IZ_mul;
      rngl_opt_opp := IZ_opt_opp;
@@ -933,14 +928,18 @@ Theorem wiz_add_comm : ∀ a b : with_invertible_zero,
   (a + b)%F = (b + a)%F.
 Proof.
 intros.
-now destruct a, b.
+destruct a as [| m], b as [| n]; try easy; cbn.
+Require Import Arith.
+Search (Nat.max _ _ = Nat.max _ _).
+now rewrite Nat.max_comm.
 Qed.
 
 Theorem wiz_add_assoc : ∀ a b c : with_invertible_zero,
   (a + (b + c))%F = (a + b + c)%F.
 Proof.
 intros.
-now destruct a, b, c.
+destruct a as [| a'], b as [| b'], c as [| c']; try easy; cbn.
+now rewrite Nat.max_assoc.
 Qed.
 
 Theorem wiz_add_0_l : ∀ a : with_invertible_zero, (0 + a)%F = a.
@@ -953,29 +952,10 @@ Theorem wiz_mul_assoc : ∀ a b c : with_invertible_zero,
   (a * (b * c))%F = (a * b * c)%F.
 Proof.
 intros.
-destruct a, b, c; try easy; cbn.
-(* verdict: it does not work, the multiplication is not associative *)
-(* even if 0*0=a (I also tested it) *)
-...
- (IZ_zero * (IZ_zero * IZ_a))%F = (IZ_zero * IZ_zero * IZ_a)%F
- (IZ_zero * (IZ_a * IZ_a))%F = (IZ_zero * IZ_a * IZ_a)%F
- (IZ_a * (IZ_zero * IZ_zero))%F = (IZ_a * IZ_zero * IZ_zero)%F
- (IZ_a * (IZ_a * IZ_zero))%F = (IZ_a * IZ_a * IZ_zero)%F
-...
- IZ_zero = IZ_a
- IZ_one = IZ_a
- IZ_a = IZ_zero
- IZ_a = IZ_one
-...
- (IZ_zero * (IZ_zero * IZ_a))%F = (IZ_zero * IZ_zero * IZ_a)%F
- (IZ_zero * (IZ_a * IZ_a))%F = (IZ_zero * IZ_a * IZ_a)%F
- (IZ_a * (IZ_zero * IZ_zero))%F = (IZ_a * IZ_zero * IZ_zero)%F
- (IZ_a * (IZ_a * IZ_zero))%F = (IZ_a * IZ_a * IZ_zero)%F
-...
- IZ_zero = IZ_one
- IZ_one = IZ_a
- IZ_one = IZ_zero
- IZ_a = IZ_one
+destruct a as [| a'], b as [| b'], c as [| c']; try easy. {
+  cbn.
+  destruct c'; [ easy | ].
+  destruct c'; cbn.
 ...
 
 Definition wiz_ring_like_prop : ring_like_prop with_invertible_zero :=
