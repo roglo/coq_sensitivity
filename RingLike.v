@@ -1048,34 +1048,16 @@ assert (H11 : (0 * (0 * a) = 0)%F). {
   now rewrite H2, rngl_mul_1_r.
 }
 rewrite rngl_mul_assoc in H11.
-(* searching for a contradiction in H11
-   if 0 * 0 = 0, then ok, because 0 * a = 1
-   if 0 * 0 = 1, ok by Haz
-   if 0 * 0 = a, ok by H7
-but which other values are possible ?
-there can be a², a³, a⁴, and so on.
-but it may exist other values than those ones.
-*)
-...
-...
-(* on a :
-     a + 0 = a
-     a + 1 = a (démontrable)
-     a + a = a
-   mais s'il y a d'autres valeurs x que 0, 1 et a, il se
-   peut que a + x ne soit pas égal à "a" *)
-...
-(*
- (IZ_zero * (IZ_a * IZ_a))%F = (IZ_zero * IZ_a * IZ_a)%F
- IZ_one = IZ_a
-*)
-assert (H11 : (0 * (a * a) = 1)%F). {
-(* ah non : ça, c'est si "a * a" est égal à "a", c'est-à-dire que
-   l'espèce d'anneau ne contient que 0, 1 et a *)
-(* moralité : cet exemple, avec T = {0,1,a} n'est pas une espèce
-   d'anneau, car la multiplication n'est pas associative *)
-(* il faut chercher un type contenant au moins 4 valeurs *)
-(* voir aussi si on peut pas avoir 0, et non "a", comme inverse de 0. *)
+assert (H12 : (0 * 0 ≠ 0)%F). {
+  now intros H; rewrite H, H2 in H11.
+}
+rename H12 into Hzz.
+rename H9 into Hz1.
+move Hzz after Hz1.
+assert (Hza : (0 * 0 ≠ a)%F). {
+  now intros H; rewrite H in H11.
+}
+move Hza before Hz1.
 ...
 specialize (rngl_sub_diag _ (or_introl Hro)) as H.
 unfold rngl_sub in H.
