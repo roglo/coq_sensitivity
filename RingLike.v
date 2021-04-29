@@ -926,6 +926,22 @@ rewrite H12, rngl_add_0_l in H11.
 congruence.
 Qed.
 
+Theorem glop : ∀ a b,
+  (a * b = 1)%F
+  → a ≠ 0%F
+  → b ≠ 0%F.
+Proof.
+intros * Hab Haz.
+assert (Hro : rngl_inv_defined a = true). {
+  apply rngl_opt_inv_l_iff in Hab.
+  apply rngl_opt_inv_symm in Hab.
+  unfold rngl_inv_defined.
+  now rewrite Hab.
+}
+Check rngl_opt_inv_l_iff.
+Search rngl_opt_inv.
+...
+
 Theorem rngl_inv_involutive : ∀ a,
   rngl_inv_defined a = true →
   a ≠ 0%F →
