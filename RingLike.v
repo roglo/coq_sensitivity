@@ -893,13 +893,13 @@ assert (Ha1 : a ≠ 1%F). {
   rewrite rngl_mul_1_l in H1.
   now symmetry in H1.
 }
-move Ha1 before Haz.
 assert (H10 : (1 ≠ 0)%F). {
   intros H.
   rewrite <- H in H5.
   apply rngl_opt_inv_l_iff in H5.
   now rewrite rngl_mul_1_r in H5.
 }
+move Ha1 before Haz.
 assert (H7 : (a * a ≠ 0)%F). {
   intros H7.
   generalize H7; intros H.
