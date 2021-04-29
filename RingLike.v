@@ -872,8 +872,7 @@ Qed.
 
 (* experiment *)
 
-Print nat.
-
+(*
 Inductive with_invertible_zero :=
   | IZ_zero : with_invertible_zero
   | IZ_a_pow : nat → with_invertible_zero.
@@ -953,9 +952,10 @@ Theorem wiz_mul_assoc : ∀ a b c : with_invertible_zero,
 Proof.
 intros.
 destruct a as [| a'], b as [| b'], c as [| c']; try easy. {
-  cbn.
   destruct c'; [ easy | ].
-  destruct c'; cbn.
+  destruct c'.
+...
+  cbn.
 ...
 
 Definition wiz_ring_like_prop : ring_like_prop with_invertible_zero :=
@@ -1044,6 +1044,19 @@ assert (H9 : (0 * 0 ≠ 1)%F). {
   apply rngl_opt_inv_l_iff in H.
   congruence.
 }
+assert (H11 : (0 * (0 * a) = 0)%F). {
+  now rewrite H2, rngl_mul_1_r.
+}
+assert (H12 : ((0 * 0) * a ≠ 0)%F). {
+(* if 0 * 0 = 0, then ok, because 0 * a = 1
+   if 0 * 0 = 1, ok by Haz
+   if 0 * 0 = a, ok by H7
+but which other values are possible ?
+there can be a², a³, a⁴, and so on.
+but it may exist other values than those ones.
+*)
+...
+...
 (* on a :
      a + 0 = a
      a + 1 = a (démontrable)
