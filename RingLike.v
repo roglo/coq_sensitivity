@@ -964,10 +964,6 @@ apply rngl_mul_move_1_r; cycle 2. {
 now apply neq_a_0_neq_inv_a_0.
 Qed.
 
-Inspect 3.
-
-...
-
 Theorem rngl_mul_opp_l : ∀ a b,
   rngl_opp_defined a = true →
   rngl_opp_defined b = true →
@@ -980,6 +976,10 @@ rewrite rngl_mul_0_l in H; [ | now left ].
 symmetry in H.
 apply rngl_add_move_0_r in H; [ easy | ].
 unfold rngl_opp_defined.
+remember (rngl_opt_opp (a * b)) as c eqn:Hc; symmetry in Hc.
+destruct c; [ easy | exfalso ].
+...
+Search rngl_opt_opp.
 ...
 Qed.
 ...
