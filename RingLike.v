@@ -1018,19 +1018,45 @@ apply rngl_add_move_0_r in Hb. 2: {
 }
 rewrite Ha, Hb.
 specialize (rngl_add_sub (a * b - a' * b')%F (a' * b)%F) as H1.
-specialize (rngl_opp_defined_mul a' b) as H2.
-assert (H : rngl_opp_defined a' = true). {
-  unfold rngl_opp_defined.
-  apply rngl_opt_opp_symm in Haa.
-  now rewrite Haa.
+assert (Ha'b : rngl_opp_defined (a' * b) = true). {
+  specialize (rngl_opp_defined_mul a' b) as H2.
+  assert (H : rngl_opp_defined a' = true). {
+    unfold rngl_opp_defined.
+    apply rngl_opt_opp_symm in Haa.
+    now rewrite Haa.
+  }
+  specialize (H2 H); clear H.
+  assert (H : rngl_opp_defined b = true). {
+    unfold rngl_opp_defined.
+    now rewrite Hbb.
+  }
+  now specialize (H2 H); clear H.
 }
-specialize (H2 H); clear H.
-assert (H : rngl_opp_defined b = true). {
-  unfold rngl_opp_defined.
-  now rewrite Hbb.
+assert (Ha'b' : rngl_opp_defined (a' * b') = true). {
+  specialize (rngl_opp_defined_mul a' b') as H2.
+  assert (H : rngl_opp_defined a' = true). {
+    unfold rngl_opp_defined.
+    apply rngl_opt_opp_symm in Haa.
+    now rewrite Haa.
+  }
+  specialize (H2 H); clear H.
+  assert (H : rngl_opp_defined b' = true). {
+    unfold rngl_opp_defined.
+    apply rngl_opt_opp_symm in Hbb.
+    now rewrite Hbb.
+  }
+  now specialize (H2 H); clear H.
 }
-specialize (H2 H); clear H.
-specialize (H1 (or_introl H2)).
+specialize (H1 (or_introl Ha'b)).
+unfold rngl_sub in H1 at 1.
+rewrite Ha'b in H1.
+rewrite rngl_add_add_swap in H1.
+unfold rngl_sub in H1 at 1.
+rewrite Ha'b' in H1.
+rewrite <- (rngl_add_assoc (a * b)%F) in H1.
+rewrite <- rngl_mul_opp_l in H1.
+...
+specialize (rngl_opp_defined_mul a' b') as H3.
 ...
 specialize (rngl_add_sub (a * b - a' * b')%F (a' * b)%F) as H1.
 ...
