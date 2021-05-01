@@ -967,6 +967,29 @@ Qed.
 Theorem rngl_mul_opp_l : ∀ a b,
   rngl_opp_defined a = true →
   rngl_opp_defined b = true →
+  rngl_opp_defined (a * b) = true.
+Proof.
+intros * Ha Hb.
+unfold rngl_opp_defined in Ha, Hb |-*.
+remember (rngl_opt_opp a) as a' eqn:Ha'; symmetry in Ha'.
+remember (rngl_opt_opp b) as b' eqn:Hb'; symmetry in Hb'.
+move b' before a'.
+destruct a' as [a'| ]; [ clear Ha | easy ].
+destruct b' as [b'| ]; [ clear Hb | easy ].
+remember (rngl_opt_opp (a * b)) as c eqn:Hc; symmetry in Hc.
+destruct c; [ easy | exfalso ].
+apply rngl_opt_opp_iff in Ha'.
+apply rngl_opt_opp_iff in Hb'.
+assert (a * b - a' * b' = 0)%F. {
+  specialize (rngl_mul_add_distr_r (- a)%F a b) as H.
+...
+congruence.
+Check rngl_opt_opp_iff.
+...
+
+Theorem rngl_mul_opp_l : ∀ a b,
+  rngl_opp_defined a = true →
+  rngl_opp_defined b = true →
   ((- a) * b = - (a * b))%F.
 Proof.
 intros * Ha Hb.
@@ -978,11 +1001,11 @@ apply rngl_add_move_0_r in H; [ easy | ].
 unfold rngl_opp_defined.
 remember (rngl_opt_opp (a * b)) as c eqn:Hc; symmetry in Hc.
 destruct c; [ easy | exfalso ].
-...
-Search rngl_opt_opp.
+rewrite rngl_add_comm in H.
+apply rngl_opt_opp_iff in H.
+congruence.
 ...
 Qed.
-...
 
 Theorem rngl_opp_mul_prop : ∀ a b a' b',
   rngl_opt_opp a = Some a' →
