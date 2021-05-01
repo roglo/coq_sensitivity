@@ -964,28 +964,21 @@ apply rngl_mul_move_1_r; cycle 2. {
 now apply neq_a_0_neq_inv_a_0.
 Qed.
 
-Theorem rngl_mul_opp_l : ∀ a b,
+Theorem rngl_opp_defined_mul : ∀ a b,
   rngl_opp_defined a = true →
   rngl_opp_defined b = true →
   rngl_opp_defined (a * b) = true.
 Proof.
 intros * Ha Hb.
-unfold rngl_opp_defined in Ha, Hb |-*.
-remember (rngl_opt_opp a) as a' eqn:Ha'; symmetry in Ha'.
-remember (rngl_opt_opp b) as b' eqn:Hb'; symmetry in Hb'.
-move b' before a'.
-destruct a' as [a'| ]; [ clear Ha | easy ].
-destruct b' as [b'| ]; [ clear Hb | easy ].
-remember (rngl_opt_opp (a * b)) as c eqn:Hc; symmetry in Hc.
-destruct c; [ easy | exfalso ].
-apply rngl_opt_opp_iff in Ha'.
-apply rngl_opt_opp_iff in Hb'.
-assert (a * b - a' * b' = 0)%F. {
-  specialize (rngl_mul_add_distr_r (- a)%F a b) as H.
-...
-congruence.
-Check rngl_opt_opp_iff.
-...
+specialize (rngl_mul_add_distr_r (- a)%F a b) as H.
+rewrite rngl_add_opp_l in H; [ | easy ].
+rewrite rngl_mul_0_l in H; [ | now left ].
+symmetry in H.
+rewrite rngl_add_comm in H.
+apply rngl_opt_opp_iff in H.
+unfold rngl_opp_defined.
+now rewrite H.
+Qed.
 
 Theorem rngl_mul_opp_l : ∀ a b,
   rngl_opp_defined a = true →
@@ -998,13 +991,7 @@ rewrite rngl_add_opp_l in H; [ | easy ].
 rewrite rngl_mul_0_l in H; [ | now left ].
 symmetry in H.
 apply rngl_add_move_0_r in H; [ easy | ].
-unfold rngl_opp_defined.
-remember (rngl_opt_opp (a * b)) as c eqn:Hc; symmetry in Hc.
-destruct c; [ easy | exfalso ].
-rewrite rngl_add_comm in H.
-apply rngl_opt_opp_iff in H.
-congruence.
-...
+now apply rngl_opp_defined_mul.
 Qed.
 
 Theorem rngl_opp_mul_prop : ∀ a b a' b',
@@ -1030,8 +1017,20 @@ apply rngl_add_move_0_r in Hb. 2: {
   now rewrite Hb.
 }
 rewrite Ha, Hb.
-Search (- _ * _)%F.
-Search (_ * - _)%F.
+specialize (rngl_add_sub (a * b - a' * b')%F (a' * b)%F) as H1.
+specialize (rngl_opp_defined_mul a' b) as H2.
+assert (H : rngl_opp_defined a' = true). {
+  unfold rngl_opp_defined.
+  apply rngl_opt_opp_symm in Haa.
+  now rewrite Haa.
+}
+specialize (H2 H); clear H.
+assert (H : rngl_opp_defined b = true). {
+  unfold rngl_opp_defined.
+  now rewrite Hbb.
+}
+specialize (H2 H); clear H.
+specialize (H1 (or_introl H2)).
 ...
 specialize (rngl_add_sub (a * b - a' * b')%F (a' * b)%F) as H1.
 ...
