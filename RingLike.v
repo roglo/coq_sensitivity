@@ -953,10 +953,10 @@ Theorem rngl_inv_involutive : ∀ a,
   ((a⁻¹)⁻¹)%F = a.
 Proof.
 intros * Hro Haz.
-symmetry.
 specialize (rngl_div_diag _ (or_introl Hro) Haz) as H1.
 unfold rngl_div in H1.
 rewrite Hro in H1.
+symmetry.
 apply rngl_mul_move_1_r; [ | | easy ]. {
   now apply rngl_inv_defined_inv.
 }
