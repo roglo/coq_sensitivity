@@ -1330,6 +1330,16 @@ Theorem rngl_inv_1 :
   (1⁻¹ = 1)%F.
 Proof.
 intros Hin H10.
+(*
+apply rngl_inv_defined_inv in Hin.
+*)
+unfold rngl_inv_defined in Hin.
+remember (rngl_opt_inv 1) as a eqn:Ha; symmetry in Ha.
+destruct a as [a| ]; [ clear Hin | easy ].
+apply rngl_opt_inv_iff in Ha.
+rewrite rngl_mul_1_l in Ha.
+...
+intros Hin H10.
 ...
 specialize rngl_mul_inv_r as H.
 unfold rngl_div in H.
