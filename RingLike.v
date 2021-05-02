@@ -1003,6 +1003,9 @@ generalize Ha; intros Haa.
 generalize Hb; intros Hbb.
 apply rngl_opt_opp_iff in Ha.
 apply rngl_opt_opp_iff in Hb.
+(*
+generalize Ha; intros Haaz.
+generalize Hb; intros Hbbz.
 apply rngl_add_move_0_r in Ha. 2: {
   unfold rngl_opp_defined.
   rewrite rngl_add_comm in Ha.
@@ -1016,6 +1019,7 @@ apply rngl_add_move_0_r in Hb. 2: {
   now rewrite Hb.
 }
 rewrite Ha, Hb.
+*)
 specialize (rngl_add_sub (a * b - a' * b')%F (a' * b)%F) as H1.
 assert (Ha'b : rngl_opp_defined (a' * b) = true). {
   specialize (rngl_opp_defined_mul a' b) as H2.
@@ -1054,10 +1058,15 @@ unfold rngl_sub in H1 at 1.
 rewrite Ha'b' in H1.
 rewrite <- (rngl_add_assoc (a * b)%F) in H1.
 rewrite <- rngl_mul_opp_l in H1.
-...
-specialize (rngl_opp_defined_mul a' b') as H3.
-...
-specialize (rngl_add_sub (a * b - a' * b')%F (a' * b)%F) as H1.
+rewrite <- rngl_mul_opp_l in H1.
+rewrite <- rngl_mul_add_distr_l in H1.
+rewrite (rngl_add_comm b'), Hb in H1.
+rewrite rngl_mul_0_r in H1.
+rewrite rngl_add_0_r in H1.
+rewrite <- rngl_mul_add_distr_r in H1.
+rewrite Ha in H1.
+rewrite rngl_mul_0_l in H1.
+symmetry in H1.
 ...
 
 Theorem rngl_opp_mul_prop : ∀ a b a' b',
