@@ -1003,23 +1003,6 @@ generalize Ha; intros Haa.
 generalize Hb; intros Hbb.
 apply rngl_opt_opp_iff in Ha.
 apply rngl_opt_opp_iff in Hb.
-(*
-generalize Ha; intros Haaz.
-generalize Hb; intros Hbbz.
-apply rngl_add_move_0_r in Ha. 2: {
-  unfold rngl_opp_defined.
-  rewrite rngl_add_comm in Ha.
-  apply rngl_opt_opp_iff in Ha.
-  now rewrite Ha.
-}
-apply rngl_add_move_0_r in Hb. 2: {
-  unfold rngl_opp_defined.
-  rewrite rngl_add_comm in Hb.
-  apply rngl_opt_opp_iff in Hb.
-  now rewrite Hb.
-}
-rewrite Ha, Hb.
-*)
 specialize (rngl_add_sub (a * b - a' * b')%F (a' * b)%F) as H1.
 assert (Ha'b : rngl_opp_defined (a' * b) = true). {
   specialize (rngl_opp_defined_mul a' b) as H2.
@@ -1100,59 +1083,23 @@ apply rngl_add_move_0_r in H1. 2: {
 now rewrite rngl_opp_involutive in H1.
 Qed.
 
-Inspect 1.
-
-...
-
-Theorem rngl_opp_mul_prop : ∀ a b a' b',
-  rngl_opt_opp a = Some a' →
-  rngl_opt_opp b = Some b' →
-  rngl_opt_opp (a * b) = Some (a' * b')%F.
-Proof.
-intros * Ha Hb.
-apply rngl_opt_opp_iff in Ha.
-apply rngl_opt_opp_iff in Hb.
-apply rngl_opt_opp_iff.
-specialize (rngl_add_sub (a * b - a' * b')%F (a' * b)%F) as H1.
-...
-apply rngl_add_move_0_r in Ha. 2: {
-  unfold rngl_opp_defined'.
-  rewrite rngl_add_comm in Ha.
-  apply rngl_opt_opp_iff in Ha.
-  now rewrite Ha.
-}
-apply rngl_add_move_0_r in Hb. 2: {
-  unfold rngl_opp_defined'.
-  rewrite rngl_add_comm in Hb.
-  apply rngl_opt_opp_iff in Hb.
-  now rewrite Hb.
-}
-rewrite Ha, Hb.
-Search (_ * - _)%F.
-...
-assert (Hab : (a * b = a' * b')%F). {
-Search (_ + _ = _ + _)%F.
-...
-assert (Hab : (a * b - a' * b' = 0)%F). {
-  specialize (rngl_add_sub (a * b - a' * b')%F (a' * b)%F) as H1.
-...
-
 Theorem rngl_mul_opp_r : ∀ a b,
   rngl_opp_defined a = true →
   rngl_opp_defined b = true →
-  rngl_opp_defined (a * b) = true →
   (a * - b = - (a * b))%F.
 Proof.
-intros * Hoa Hob Hab.
-...
-specialize (rngl_mul_add_distr_l a b (- b)%F) as H.
-rewrite fold_rngl_sub in H; [ | easy ].
-rewrite rngl_sub_diag in H; [ | now left ].
-rewrite rngl_mul_0_r in H; [ | now left ].
-symmetry in H.
-rewrite rngl_add_comm in H.
-now apply rngl_add_move_0_r in H.
+intros * Hoa Hob.
+rewrite (rngl_opp_mul_prop _ _ (-a)%F b); cycle 1. {
+  apply rngl_opt_opp_iff.
+  now apply rngl_add_opp_r.
+} {
+  apply rngl_opt_opp_iff.
+  now apply rngl_add_opp_l.
+}
+now apply rngl_mul_opp_l.
 Qed.
+
+...
 
 Theorem rngl_mul_sub_distr_l : ∀ a b c,
   rngl_opp_defined a = true →
