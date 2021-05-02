@@ -1057,16 +1057,51 @@ rewrite rngl_add_add_swap in H1.
 unfold rngl_sub in H1 at 1.
 rewrite Ha'b' in H1.
 rewrite <- (rngl_add_assoc (a * b)%F) in H1.
-rewrite <- rngl_mul_opp_l in H1.
-rewrite <- rngl_mul_opp_l in H1.
+rewrite <- rngl_mul_opp_l in H1; cycle 1. {
+  unfold rngl_opp_defined.
+  apply rngl_opt_opp_symm in Haa.
+  now rewrite Haa.
+} {
+  unfold rngl_opp_defined.
+  apply rngl_opt_opp_symm in Hbb.
+  now rewrite Hbb.
+}
+rewrite <- rngl_mul_opp_l in H1; cycle 1. {
+  unfold rngl_opp_defined.
+  apply rngl_opt_opp_symm in Haa.
+  now rewrite Haa.
+} {
+  unfold rngl_opp_defined.
+  now rewrite Hbb.
+}
 rewrite <- rngl_mul_add_distr_l in H1.
 rewrite (rngl_add_comm b'), Hb in H1.
-rewrite rngl_mul_0_r in H1.
+rewrite rngl_mul_0_r in H1. 2: {
+  left.
+  apply rngl_opp_defined_opp.
+  unfold rngl_opp_defined.
+  apply rngl_opt_opp_symm in Haa.
+  now rewrite Haa.
+}
 rewrite rngl_add_0_r in H1.
 rewrite <- rngl_mul_add_distr_r in H1.
 rewrite Ha in H1.
-rewrite rngl_mul_0_l in H1.
+rewrite rngl_mul_0_l in H1. 2: {
+  left.
+  unfold rngl_opp_defined.
+  now rewrite Hbb.
+}
 symmetry in H1.
+unfold rngl_sub in H1.
+rewrite Ha'b' in H1.
+apply rngl_add_move_0_r in H1. 2: {
+  now apply rngl_opp_defined_opp.
+}
+now rewrite rngl_opp_involutive in H1.
+Qed.
+
+Inspect 1.
+
 ...
 
 Theorem rngl_opp_mul_prop : ∀ a b a' b',
