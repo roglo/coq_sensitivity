@@ -1099,49 +1099,17 @@ rewrite (rngl_opp_mul_prop _ _ (-a)%F b); cycle 1. {
 now apply rngl_mul_opp_l.
 Qed.
 
-...
-
 Theorem rngl_mul_sub_distr_l : ∀ a b c,
   rngl_opp_defined a = true →
   rngl_opp_defined c = true →
-  rngl_opp_defined (a * c) = true →
   (a * (b - c) = a * b - a * c)%F.
 Proof.
-intros * Hoa Hoc Hac.
+intros * Hoa Hoc.
 unfold rngl_sub.
-rewrite Hoc, Hac.
+rewrite Hoc.
+rewrite rngl_opp_defined_mul; [ | easy | easy ].
 rewrite rngl_mul_add_distr_l.
 now rewrite rngl_mul_opp_r.
-Qed.
-
-Theorem rngl_mul_inv_r : ∀ a,
-  rngl_inv_defined a = true ∨ rngl_has_quot = true →
-  a ≠ 0%F →
-  (a / a = 1)%F.
-Proof.
-intros * Hii Haz.
-remember (rngl_inv_defined a) as iv eqn:Hiv; symmetry in Hiv.
-destruct iv. {
-  specialize (rngl_opt_mul_inv_r a) as rngl_mul_inv_r.
-  rewrite Hiv in rngl_mul_inv_r.
-  cbn in rngl_mul_inv_r.
-  remember rngl_is_comm as ic eqn:Hic.
-  symmetry in Hic.
-  destruct ic. {
-    unfold rngl_div.
-    rewrite Hiv.
-    rewrite rngl_mul_comm; [ | easy ].
-    now apply rngl_mul_inv_l.
-  } {
-    now apply rngl_mul_inv_r.
-  }
-} {
-  destruct Hii as [Hii| Hii]; [ easy | ].
-  specialize rngl_opt_mul_quot_l as H1.
-  rewrite Hii in H1.
-  specialize (H1 a 1%F Haz).
-  now rewrite rngl_mul_1_r in H1.
-}
 Qed.
 
 Theorem rngl_div_0_l : ∀ a,
@@ -1150,6 +1118,7 @@ Theorem rngl_div_0_l : ∀ a,
   a ≠ 0%F → (0 / a)%F = 0%F.
 Proof.
 intros * Hiv Haz.
+...
 remember (0 / a)%F as x eqn:Hx.
 replace 0%F with (0 * a)%F in Hx. 2: {
   now apply rngl_mul_0_l.
