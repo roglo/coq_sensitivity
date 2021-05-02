@@ -1118,7 +1118,6 @@ Theorem rngl_div_0_l : ∀ a,
   a ≠ 0%F → (0 / a)%F = 0%F.
 Proof.
 intros * Hiv Haz.
-...
 remember (0 / a)%F as x eqn:Hx.
 replace 0%F with (0 * a)%F in Hx. 2: {
   now apply rngl_mul_0_l.
@@ -1269,32 +1268,19 @@ Qed.
 
 Arguments rngl_opt_opp {T}%type {ring_like_op} a%F.
 
-Theorem rngl_opp_defined_add : ∀ a b a' b',
-  rngl_opt_opp a = Some a'
-  → rngl_opt_opp b = Some b'
-  → rngl_opt_opp (a + b) = Some (b' + a')%F.
+Theorem rngl_opp_defined_add : ∀ a b,
+  rngl_opp_defined a = true →
+  rngl_opp_defined b = true →
+  rngl_opp_defined (a + b) = true.
 Proof.
 intros * Ha Hb.
-assert (Haa : (a + a' = 0)%F). {
-  assert (a - (- a') = 0)%F. {
-    unfold rngl_sub.
-    apply rngl_opt_opp_symm in Ha.
-    unfold rngl_opp_defined.
-Search (rngl_opt_opp (- _)%F).
-Search (rngl_opp_defined (- _)%F).
-...
-    rewrite Ha; cbn.
-    rewrite rngl_add_comm.
-Check rngl_add_move_0_r.
-    apply rngl_add_move_0_r.
-...
-  apply rngl_add_move_0_r. {
-    apply rngl_opt_opp_symm in Ha.
-    unfold rngl_opp_defined.
-    now rewrite Ha.
-  } {
-Search (- _)%F.
-...
+unfold rngl_opp_defined in Ha, Hb |-*.
+remember (rngl_opt_opp a) as a' eqn:Ha'; symmetry in Ha'.
+remember (rngl_opt_opp b) as b' eqn:Hb'; symmetry in Hb'.
+destruct a' as [a'| ]; [ | easy ].
+destruct b' as [b'| ]; [ | easy ].
+now rewrite (rngl_opp_add_prop a b a' b').
+Qed.
 
 Theorem rngl_opp_add_distr : ∀ a b,
   rngl_opp_defined a = true →
@@ -1344,6 +1330,7 @@ Theorem rngl_inv_1 :
   (1⁻¹ = 1)%F.
 Proof.
 intros Hin H10.
+...
 specialize rngl_mul_inv_r as H.
 unfold rngl_div in H.
 transitivity (1 * 1⁻¹)%F. {
