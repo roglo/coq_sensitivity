@@ -994,7 +994,7 @@ apply rngl_mul_move_1_r; [ | | easy ]. {
 now apply rngl_inv_neq_0'.
 Qed.
 
-Theorem glop :
+Theorem rngl_inv_defined_not_0 :
   rngl_has_1_neq_0 = true →
   ∀ a,
   rngl_inv_defined a = true →
