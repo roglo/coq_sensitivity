@@ -18,7 +18,7 @@ ps:	common.tex
 
 
 open:
-	evince  ${SRC}.pdf
+	evince  ${SRC}.pdf >/dev/null 2>&1
 
 openpdf:
 	pdfopen --file  ${SRC}.pdf
