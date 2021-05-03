@@ -915,9 +915,6 @@ assert (H11 : (0 * (0 * a) = 0)%F). {
   now rewrite H2, rngl_mul_1_r.
 }
 rewrite rngl_mul_assoc in H11.
-assert (Hza : (0 * 0 ≠ a)%F). {
-  now intros H; rewrite H in H11.
-}
 remember (0 * 0)%F as b eqn:Hb.
 generalize H11; intros H12.
 replace b with (b + 0)%F in H11 by apply rngl_add_0_r.
