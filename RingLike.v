@@ -994,27 +994,18 @@ apply rngl_mul_move_1_r; [ | | easy ]. {
 now apply rngl_inv_neq_0'.
 Qed.
 
-Theorem rngl_inv_involutive'' :
-  rngl_has_dec_eq = true →
+Theorem glop :
+  rngl_has_1_neq_0 = true →
   ∀ a,
   rngl_inv_defined a = true →
-  ((a⁻¹)⁻¹)%F = a.
+  a ≠ 0%F.
 Proof.
-intros Hed * Hro.
-destruct (rngl_eq_dec Hed 1%F 0%F) as [H10| H10]. 2: {
-  specialize (rngl_mul_inv_r a Hro) as H1.
-  symmetry.
-  apply rngl_mul_move_1_r; [ | | easy ]. {
-    now apply rngl_inv_defined_inv.
-  }
-  apply rngl_inv_neq_0'; [ | easy ].
-  remember rngl_has_1_neq_0 as x eqn:Hx; symmetry in Hx.
-  destruct x; [ easy | exfalso ].
-...
-}
-
-Search rngl_has_1_neq_0.
-...
+intros H10 * Hia H.
+generalize Hia; intros Hia'.
+apply rngl_inv_defined_inv in Hia'.
+specialize (rngl_inv_neq_0' H10 (a⁻¹)%F Hia') as H1.
+specialize (rngl_mul_inv_r _ Hia') as H2.
+now rewrite rngl_inv_involutive' in H1.
 Qed.
 
 ...
