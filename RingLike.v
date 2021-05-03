@@ -909,7 +909,39 @@ rewrite H12, rngl_add_0_l in H11.
 congruence.
 Qed.
 
-...
+Theorem rngl_inv_neq_0' : ∀ a,
+  rngl_has_1_neq_0 = true →
+  rngl_inv_defined a = true →
+  (a⁻¹)%F ≠ 0%F.
+Proof.
+intros * H10 Hro.
+apply rngl_1_neq_0 in H10.
+specialize (rngl_mul_inv_r a Hro) as H1.
+intros H3.
+rewrite H3 in H1.
+assert (H2 : (0 * a = 1)%F). {
+  apply rngl_opt_inv_l_iff.
+  apply rngl_opt_inv_symm.
+  now apply rngl_opt_inv_l_iff.
+}
+generalize H1; intros H5.
+apply rngl_opt_inv_l_iff in H5.
+assert (Ha1 : a ≠ 1%F). {
+  intros H; subst a.
+  rewrite rngl_mul_1_l in H1.
+  now symmetry in H1.
+}
+assert (H11 : (0 * (0 * a) = 0)%F). {
+  now rewrite H2, rngl_mul_1_r.
+}
+clear - rp H2 H10 H11.
+rewrite rngl_mul_assoc in H11.
+generalize H11; intros H12.
+replace (0 * 0)%F with (0 * 0 + 0)%F in H11 by apply rngl_add_0_r.
+rewrite rngl_mul_add_distr_r in H11.
+rewrite H12, rngl_add_0_l in H11.
+congruence.
+Qed.
 
 Theorem rngl_eq_mul_1_neq_neq : ∀ a b,
   (a * b = 1)%F
@@ -938,15 +970,15 @@ Theorem rngl_inv_involutive : ∀ a,
   ((a⁻¹)⁻¹)%F = a.
 Proof.
 intros * Hro Haz.
-specialize (rngl_div_diag _ (or_introl Hro) Haz) as H1.
-unfold rngl_div in H1.
-rewrite Hro in H1.
+specialize (rngl_mul_inv_r a Hro) as H1.
 symmetry.
 apply rngl_mul_move_1_r; [ | | easy ]. {
   now apply rngl_inv_defined_inv.
 }
 now apply rngl_inv_neq_0.
 Qed.
+
+...
 
 Theorem rngl_opp_defined_mul : ∀ a b,
   rngl_opp_defined a = true →
