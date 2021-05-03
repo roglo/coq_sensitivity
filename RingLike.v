@@ -899,25 +899,13 @@ assert (H10 : (1 ≠ 0)%F). {
   apply rngl_opt_inv_l_iff in H5.
   now rewrite rngl_mul_1_r in H5.
 }
-move Ha1 before Haz.
-assert (H7 : (a * a ≠ 0)%F). {
-  intros H7.
-  generalize H7; intros H.
-  remember a as z in H at 2.
-  replace a with (0 + a)%F in H by apply rngl_add_0_l.
-  subst z.
-  rewrite rngl_mul_add_distr_r in H.
-  rewrite H2 in H.
-  rewrite H7 in H.
-  now rewrite rngl_add_0_r in H.
-}
 assert (H11 : (0 * (0 * a) = 0)%F). {
   now rewrite H2, rngl_mul_1_r.
 }
+clear - rp H2 H10 H11.
 rewrite rngl_mul_assoc in H11.
-remember (0 * 0)%F as b eqn:Hb.
 generalize H11; intros H12.
-replace b with (b + 0)%F in H11 by apply rngl_add_0_r.
+replace (0 * 0)%F with (0 * 0 + 0)%F in H11 by apply rngl_add_0_r.
 rewrite rngl_mul_add_distr_r in H11.
 rewrite H12, rngl_add_0_l in H11.
 congruence.
