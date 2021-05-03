@@ -876,9 +876,7 @@ Theorem rngl_inv_neq_0 : ∀ a,
   → (a⁻¹)%F ≠ 0%F.
 Proof.
 intros * Hro Haz.
-specialize (rngl_div_diag _ (or_introl Hro) Haz) as H1.
-unfold rngl_div in H1.
-rewrite Hro in H1.
+specialize (rngl_mul_inv_r a Hro) as H1.
 intros H3.
 rewrite H3 in H1.
 assert (H2 : (0 * a = 1)%F). {
@@ -910,6 +908,8 @@ rewrite rngl_mul_add_distr_r in H11.
 rewrite H12, rngl_add_0_l in H11.
 congruence.
 Qed.
+
+...
 
 Theorem rngl_eq_mul_1_neq_neq : ∀ a b,
   (a * b = 1)%F
