@@ -909,12 +909,13 @@ rewrite H12, rngl_add_0_l in H11.
 congruence.
 Qed.
 
-Theorem rngl_inv_neq_0' : ∀ a,
+Theorem rngl_inv_neq_0' :
   rngl_has_1_neq_0 = true →
+  ∀ a,
   rngl_inv_defined a = true →
   (a⁻¹)%F ≠ 0%F.
 Proof.
-intros * H10 Hro.
+intros H10 * Hro.
 apply rngl_1_neq_0 in H10.
 specialize (rngl_mul_inv_r a Hro) as H1.
 intros H3.
@@ -976,6 +977,21 @@ apply rngl_mul_move_1_r; [ | | easy ]. {
   now apply rngl_inv_defined_inv.
 }
 now apply rngl_inv_neq_0.
+Qed.
+
+Theorem rngl_inv_involutive' :
+  rngl_has_1_neq_0 = true →
+  ∀ a,
+  rngl_inv_defined a = true →
+  ((a⁻¹)⁻¹)%F = a.
+Proof.
+intros H10 * Hro.
+specialize (rngl_mul_inv_r a Hro) as H1.
+symmetry.
+apply rngl_mul_move_1_r; [ | | easy ]. {
+  now apply rngl_inv_defined_inv.
+}
+now apply rngl_inv_neq_0'.
 Qed.
 
 ...
