@@ -912,31 +912,19 @@ assert (H1 : ((a⁻¹)⁻¹ ≠ 0)%F). {
 specialize (rngl_mul_inv_r _ Hia') as H2.
 (**)
 specialize (rngl_mul_inv_r a Hia) as H3.
-assert (H4 : ((a⁻¹)⁻¹ = a)%F). {
-  symmetry.
-  apply rngl_mul_move_1_r; [ easy | | easy ].
+assert (H10' : (1 ≠ 0)%F). {
   intros H.
 ...
-  rewrite H in H1, H2, H3.
+  generalize H1; intros H5.
+Check rngl_opt_inv_l_iff.
 ...
-...
-  rngl_has_1_neq_0 = true →
-  ∀ a,
-  rngl_inv_defined a = true →
-  ((a⁻¹)⁻¹)%F = a.
-Proof.
-intros H10 * Hro.
-specialize (rngl_mul_inv_r a Hro) as H1.
-symmetry.
-apply rngl_mul_move_1_r; [ | | easy ]. {
-  now apply rngl_inv_defined_inv.
+  rewrite <- H in H5.
+  apply rngl_opt_inv_l_iff in H5.
+  now rewrite rngl_mul_1_r in H5.
 }
-now apply rngl_inv_neq_0'.
-Qed.
+assert (H4 : ((a⁻¹)⁻¹ = a)%F). {
 ...
-specialize (rngl_mul_inv_r a Hia) as H3.
 apply rngl_mul_move_1_r in H3.
-
 apply rngl_mul_move_1_r; [ | | easy ]. {
   now apply rngl_inv_defined_inv.
 }
