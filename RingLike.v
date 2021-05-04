@@ -874,6 +874,7 @@ split; intros H. {
 }
 Qed.
 
+(*
 Theorem glop :
   rngl_has_1_neq_0 = false →
   rngl_has_dec_eq = true →
@@ -889,8 +890,10 @@ destruct (rngl_eq_dec Hde 0 1) as [H1| H1]. {
 ...
   apply rngl_mul_0_l.
 ...
+*)
 
 (* trying to put all lemmas directly... *)
+(*
 Theorem rngl_inv_defined_not_0' :
   rngl_has_1_neq_0 = true →
   ∀ a,
@@ -952,8 +955,7 @@ now apply rngl_inv_neq_0'.
 ...
 now rewrite rngl_inv_involutive' in H1.
 Qed.
-
-...
+*)
 
 Theorem rngl_inv_neq_0 : ∀ a,
   rngl_inv_defined a = true
@@ -1092,6 +1094,19 @@ specialize (rngl_inv_neq_0' H10 (a⁻¹)%F Hia') as H1.
 specialize (rngl_mul_inv_r _ Hia') as H2.
 now rewrite rngl_inv_involutive' in H1.
 Qed.
+
+Theorem glop : (1 = 0)%F → ∀ a, a = 0%F.
+Proof.
+intros H10 *.
+(* bin non, pas forcément. *)
+
+...
+
+Theorem glop : ∀ a, a ≠ 0%F → (1 ≠ 0)%F.
+Proof.
+intros * H H10.
+apply H; clear H.
+(* bin non, pas forcément. *)
 
 ...
 
