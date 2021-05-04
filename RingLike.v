@@ -260,6 +260,8 @@ Definition rngl_squ {T} {ro : ring_like_op T} x := (x * x)%F.
 
 Notation "a ^ b" := (rngl_power a b) : ring_like_scope.
 
+Arguments rngl_opt_opp {T}%type {ring_like_op} a%F.
+
 Section a.
 
 Context {T : Type}.
@@ -458,6 +460,8 @@ specialize rngl_opt_eq_dec as H.
 rewrite Hde in H.
 apply H.
 Qed.
+
+Arguments rngl_eq_dec _ (a b)%F.
 
 Theorem rngl_le_dec :
   rngl_has_dec_le = true →
@@ -872,11 +876,18 @@ Qed.
 
 Theorem glop :
   rngl_has_1_neq_0 = false →
+  rngl_has_dec_eq = true →
   ∀ a, a = 0%F.
 Proof.
-intros H10 *.
+intros H10 Hde *.
+(*
 specialize rngl_1_neq_0 as H1.
-(* problem of decidability *)
+*)
+destruct (rngl_eq_dec Hde 0 1) as [H1| H1]. {
+  replace a with (1 * a)%F by apply rngl_mul_1_l.
+  rewrite <- H1.
+...
+  apply rngl_mul_0_l.
 ...
 
 (* trying to put all lemmas directly... *)
@@ -1386,8 +1397,6 @@ destruct mo. {
 }
 now destruct Hom.
 Qed.
-
-Arguments rngl_opt_opp {T}%type {ring_like_op} a%F.
 
 Theorem rngl_opp_defined_add : ∀ a b,
   rngl_opp_defined a = true →
