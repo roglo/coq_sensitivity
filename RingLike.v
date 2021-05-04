@@ -870,6 +870,14 @@ split; intros H. {
 }
 Qed.
 
+Theorem glop :
+  rngl_has_1_neq_0 = false →
+  ∀ a, a = 0%F.
+Proof.
+intros H10 *.
+specialize rngl_1_neq_0 as H1.
+...
+
 (* trying to put all lemmas directly... *)
 Theorem rngl_inv_defined_not_0' :
   rngl_has_1_neq_0 = true →
