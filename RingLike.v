@@ -876,6 +876,7 @@ Theorem glop :
 Proof.
 intros H10 *.
 specialize rngl_1_neq_0 as H1.
+(* problem of decidability *)
 ...
 
 (* trying to put all lemmas directly... *)
