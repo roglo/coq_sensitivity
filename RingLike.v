@@ -1521,25 +1521,19 @@ rewrite Hab.
 now apply rngl_opp_involutive.
 Qed.
 
-Theorem rngl_inv_inj : ∀ a b,
-  (rngl_opp_defined a = true ∧ rngl_opp_defined b = true) ∨
-   rngl_has_sous = true →
+Theorem rngl_inv_inj :
+  rngl_has_1_neq_0 = true → ∀ a b,
   rngl_inv_defined a = true →
   rngl_inv_defined b = true →
-  rngl_has_1_neq_0 = true →
-  a ≠ 0%F → b ≠ 0%F →(a⁻¹ = b⁻¹)%F → a = b.
+  (a⁻¹ = b⁻¹)%F → a = b.
 Proof.
-intros * Hom Hia Hib H10 Haz Hbz H.
-...
-rewrite <- (rngl_inv_involutive a); [ | | easy | easy | easy ]. 2: {
-  destruct Hom as [Hom| ]; [ | now right ].
-  destruct Hom; now left.
-}
-rewrite H.
-apply rngl_inv_involutive; [ | easy | easy | easy ].
-destruct Hom as [Hom| ]; [ | now right ].
-destruct Hom; now left.
+intros H10 * Hia Hib Hab.
+rewrite <- (rngl_inv_involutive' H10 a); [ | easy ].
+rewrite <- (rngl_inv_involutive' H10 b); [ | easy ].
+now rewrite Hab.
 Qed.
+
+...
 
 Theorem rngl_inv_mul_distr : ∀ a b,
   rngl_is_ring →
