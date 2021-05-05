@@ -1423,6 +1423,20 @@ destruct b' as [b'| ]; [ | easy ].
 now rewrite (rngl_opp_add_prop a b a' b').
 Qed.
 
+Theorem rngl_inv_defined_mul : ∀ a b,
+  rngl_inv_defined a = true →
+  rngl_inv_defined b = true →
+  rngl_inv_defined (a * b) = true.
+Proof.
+intros * Ha Hb.
+unfold rngl_inv_defined in Ha, Hb |-*.
+remember (rngl_opt_inv a) as a' eqn:Ha'; symmetry in Ha'.
+remember (rngl_opt_inv b) as b' eqn:Hb'; symmetry in Hb'.
+destruct a' as [a'| ]; [ | easy ].
+destruct b' as [b'| ]; [ | easy ].
+now rewrite (rngl_inv_mul_prop a b a' b').
+Qed.
+
 Theorem rngl_opp_add_distr : ∀ a b,
   rngl_opp_defined a = true →
   rngl_opp_defined b = true →
@@ -1542,9 +1556,22 @@ Theorem rngl_inv_mul_distr :
   ((a * b)⁻¹ = b⁻¹ * a⁻¹)%F.
 Proof.
 intros H10 * Hia Hib.
-apply rngl_mul_cancel_l with (a := b); [ now left | | ].
-Check rngl_mul_cancel_l.
-Search (_ * _ = _ * _)%F.
+apply rngl_mul_cancel_l with (a := b); [ now left | | ]. {
+  now apply rngl_inv_defined_not_0.
+}
+rewrite rngl_mul_assoc.
+rewrite rngl_mul_inv_r; [ | easy ].
+rewrite rngl_mul_1_l.
+apply rngl_mul_cancel_l with (a := a); [ now left | | ]. {
+  now apply rngl_inv_defined_not_0.
+}
+rewrite rngl_mul_assoc.
+rewrite rngl_mul_inv_r. 2: {
+  now apply rngl_inv_defined_mul.
+}
+symmetry.
+now apply rngl_mul_inv_r.
+Qed.
 
 ...
 
