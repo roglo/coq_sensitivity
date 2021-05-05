@@ -1095,6 +1095,19 @@ specialize (rngl_mul_inv_r _ Hia') as H2.
 now rewrite rngl_inv_involutive' in H1.
 Qed.
 
+Theorem rngl_inv_defined_1_neq_0 :
+  rngl_has_1_neq_0 = true → ∀ a,
+  rngl_inv_defined a = true →
+  a ≠ 0%F ∧ (a⁻¹)%F ≠ 0%F ∧ (a⁻¹⁻¹)%F = a.
+Proof.
+intros H1 * Hia.
+split; [ now apply rngl_inv_defined_not_0 | ].
+split; [ now apply rngl_inv_neq_0' | ].
+now apply rngl_inv_involutive'.
+Qed.
+
+...
+
 Theorem rngl_inv_defined_1_neq_0_or_neq_0 : ∀ a,
   rngl_inv_defined a = true →
   rngl_has_1_neq_0 = true ∨ a ≠ 0%F →
