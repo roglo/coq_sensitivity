@@ -1533,6 +1533,19 @@ rewrite <- (rngl_inv_involutive' H10 b); [ | easy ].
 now rewrite Hab.
 Qed.
 
+
+Theorem rngl_inv_mul_distr :
+  rngl_has_1_neq_0 = true →
+  ∀ a b,
+  rngl_inv_defined a = true →
+  rngl_inv_defined b = true →
+  ((a * b)⁻¹ = b⁻¹ * a⁻¹)%F.
+Proof.
+intros H10 * Hia Hib.
+apply rngl_mul_cancel_l with (a := b); [ now left | | ].
+Check rngl_mul_cancel_l.
+Search (_ * _ = _ * _)%F.
+
 ...
 
 Theorem rngl_inv_mul_distr : ∀ a b,
