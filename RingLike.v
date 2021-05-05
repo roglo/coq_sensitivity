@@ -874,89 +874,6 @@ split; intros H. {
 }
 Qed.
 
-(*
-Theorem glop :
-  rngl_has_1_neq_0 = false →
-  rngl_has_dec_eq = true →
-  ∀ a, a = 0%F.
-Proof.
-intros H10 Hde *.
-(*
-specialize rngl_1_neq_0 as H1.
-*)
-destruct (rngl_eq_dec Hde 0 1) as [H1| H1]. {
-  replace a with (1 * a)%F by apply rngl_mul_1_l.
-  rewrite <- H1.
-...
-  apply rngl_mul_0_l.
-...
-*)
-
-(* trying to put all lemmas directly... *)
-(*
-Theorem rngl_inv_defined_not_0' :
-  rngl_has_1_neq_0 = true →
-  ∀ a,
-  rngl_inv_defined a = true →
-  a ≠ 0%F.
-Proof.
-intros H10 * Hia H15.
-generalize Hia; intros Hia'.
-apply rngl_inv_defined_inv in Hia'.
-assert (H1 : ((a⁻¹)⁻¹ ≠ 0)%F). {
-  apply rngl_1_neq_0 in H10.
-  specialize (rngl_mul_inv_r _ Hia') as H1.
-  intros H3.
-  rewrite H3 in H1.
-  assert (H2 : (0 * a⁻¹ = 1)%F). {
-    apply rngl_opt_inv_l_iff.
-    apply rngl_opt_inv_symm.
-    now apply rngl_opt_inv_l_iff.
-  }
-  generalize H1; intros H5.
-  apply rngl_opt_inv_l_iff in H5.
-  assert (Ha1 : (a⁻¹ ≠ 1)%F). {
-    intros H.
-    rewrite H in H1, H3, H2, H5.
-    rewrite rngl_mul_1_l in H1.
-    now symmetry in H1.
-  }
-  assert (H11 : (0 * (0 * a⁻¹) = 0)%F). {
-    now rewrite H2, rngl_mul_1_r.
-  }
-  clear - rp H2 H10 H11.
-  rewrite rngl_mul_assoc in H11.
-  generalize H11; intros H12.
-  replace (0 * 0)%F with (0 * 0 + 0)%F in H11 by apply rngl_add_0_r.
-  rewrite rngl_mul_add_distr_r in H11.
-  rewrite H12, rngl_add_0_l in H11.
-  congruence.
-}
-specialize (rngl_mul_inv_r _ Hia') as H2.
-(**)
-specialize (rngl_mul_inv_r a Hia) as H3.
-assert (H10' : (1 ≠ 0)%F). {
-  intros H.
-...
-  generalize H1; intros H5.
-Check rngl_opt_inv_l_iff.
-...
-  rewrite <- H in H5.
-  apply rngl_opt_inv_l_iff in H5.
-  now rewrite rngl_mul_1_r in H5.
-}
-assert (H4 : ((a⁻¹)⁻¹ = a)%F). {
-...
-apply rngl_mul_move_1_r in H3.
-apply rngl_mul_move_1_r; [ | | easy ]. {
-  now apply rngl_inv_defined_inv.
-}
-now apply rngl_inv_neq_0'.
-...
-now rewrite rngl_inv_involutive' in H1.
-Qed.
-*)
-
 Theorem rngl_inv_neq_0 : ∀ a,
   rngl_inv_defined a = true
   → a ≠ 0%F
@@ -1634,16 +1551,21 @@ apply rngl_add_add_swap.
 Qed.
 
 Theorem rngl_sub_sub_distr : ∀ a b c,
+  rngl_opp_defined b = true →
   rngl_opp_defined c = true →
   (a - (b - c) = a - b + c)%F.
 Proof.
-intros * Hoc.
-...
+intros * Hob Hoc.
 unfold rngl_sub.
-rewrite Hop.
-rewrite rngl_opp_add_distr; [ | easy ].
+rewrite Hoc, Hob.
+rewrite rngl_opp_defined_add; [ | easy | ]. 2: {
+  now apply rngl_opp_defined_opp.
+}
+rewrite rngl_opp_add_distr; [ | easy | ]. 2: {
+  now apply rngl_opp_defined_opp.
+}
 rewrite rngl_opp_involutive; [ | easy ].
-unfold rngl_sub; rewrite Hop.
+unfold rngl_sub; rewrite Hob.
 rewrite rngl_add_assoc.
 apply rngl_add_add_swap.
 Qed.
@@ -1659,6 +1581,8 @@ specialize rngl_characteristic_prop as rngl_char_prop.
 rewrite Hch in rngl_char_prop.
 now specialize (rngl_char_prop i) as H.
 Qed.
+
+...
 
 Theorem rngl_of_nat_inj :
   rngl_has_opp = true ∨ rngl_has_sous = true →
