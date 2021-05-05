@@ -1106,42 +1106,6 @@ split; [ now apply rngl_inv_neq_0' | ].
 now apply rngl_inv_involutive'.
 Qed.
 
-...
-
-Theorem rngl_inv_defined_1_neq_0_or_neq_0 : ∀ a,
-  rngl_inv_defined a = true →
-  rngl_has_1_neq_0 = true ∨ a ≠ 0%F →
-  a ≠ 0%F ∧ (a⁻¹)%F ≠ 0%F ∧ (a⁻¹⁻¹)%F = a.
-Proof.
-intros * Hia H1.
-destruct H1 as [H1| H1]. {
-  split; [ now apply rngl_inv_defined_not_0 | ].
-  split; [ now apply rngl_inv_neq_0' | ].
-  now apply rngl_inv_involutive'.
-} {
-  split; [ easy | ].
-  split; [ now apply rngl_inv_neq_0 | ].
-  now apply rngl_inv_involutive.
-}
-Qed.
-
-...
-
-Theorem glop : (1 = 0)%F → ∀ a, a = 0%F.
-Proof.
-intros H10 *.
-(* bin non, pas forcément. *)
-
-...
-
-Theorem glop : ∀ a, a ≠ 0%F → (1 ≠ 0)%F.
-Proof.
-intros * H H10.
-apply H; clear H.
-(* bin non, pas forcément. *)
-
-...
-
 Theorem rngl_opp_defined_mul : ∀ a b,
   rngl_opp_defined a = true →
   rngl_opp_defined b = true →
@@ -1532,16 +1496,18 @@ specialize (rngl_mul_div_l a 1%F Hid (rngl_1_neq_0 H10)) as H1.
 now rewrite rngl_mul_1_r in H1.
 Qed.
 
-Theorem rngl_mul_opp_opp :
-  rngl_is_ring →
-  ∀ a b, (- a * - b = a * b)%F.
+Theorem rngl_mul_opp_opp : ∀ a b,
+  rngl_opp_defined a = true →
+  rngl_opp_defined b = true →
+  (- a * - b = a * b)%F.
 Proof.
-intros Hro *.
-Search (- _ * - _)%F.
-...
-rewrite rngl_mul_opp_l; [ | easy ].
-rewrite rngl_mul_opp_r; [ | easy ].
-now apply rngl_opp_involutive.
+intros * Hoa Hob.
+rewrite rngl_mul_opp_l; [ | easy | ]. 2: {
+  now apply rngl_opp_defined_opp.
+}
+rewrite rngl_mul_opp_r; [ | easy | easy ].
+apply rngl_opp_involutive.
+now apply rngl_opp_defined_mul.
 Qed.
 
 Theorem rngl_opp_inj : ∀ a b,
@@ -1564,6 +1530,7 @@ Theorem rngl_inv_inj : ∀ a b,
   a ≠ 0%F → b ≠ 0%F →(a⁻¹ = b⁻¹)%F → a = b.
 Proof.
 intros * Hom Hia Hib H10 Haz Hbz H.
+...
 rewrite <- (rngl_inv_involutive a); [ | | easy | easy | easy ]. 2: {
   destruct Hom as [Hom| ]; [ | now right ].
   destruct Hom; now left.
