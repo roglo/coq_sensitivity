@@ -1547,7 +1547,6 @@ rewrite <- (rngl_inv_involutive' H10 b); [ | easy ].
 now rewrite Hab.
 Qed.
 
-
 Theorem rngl_inv_mul_distr :
   rngl_has_1_neq_0 = true →
   ∀ a b,
@@ -1571,32 +1570,6 @@ rewrite rngl_mul_inv_r. 2: {
 }
 symmetry.
 now apply rngl_mul_inv_r.
-Qed.
-
-...
-
-Theorem rngl_inv_mul_distr : ∀ a b,
-  rngl_is_ring →
-  rngl_inv_defined a = true →
-  rngl_inv_defined b = true →
-  rngl_inv_defined (a * b) = true →
-  a ≠ 0%F → b ≠ 0%F →((a * b)⁻¹ = b⁻¹ * a⁻¹)%F.
-Proof.
-intros * Hrn Hia Hib Haib Haz Hbz.
-apply rngl_mul_cancel_l with (a := b); [ now left | easy | ].
-rewrite rngl_mul_assoc.
-rewrite (fold_rngl_div b b); [ | easy ].
-rewrite rngl_mul_inv_r; [ | now left | easy ].
-rewrite rngl_mul_1_l.
-apply rngl_mul_cancel_l with (a := a); [ now left | easy | ].
-rewrite rngl_mul_assoc.
-rewrite (fold_rngl_div a a); [ | easy ].
-rewrite rngl_mul_inv_r; [ | now left | easy ].
-rewrite fold_rngl_div; [ | easy ].
-apply rngl_mul_inv_r; [ now left | ].
-intros H; apply rngl_integral in H; [ now destruct H | ].
-right.
-split; [ easy | now left ].
 Qed.
 
 Theorem rngl_eq_add_0 :
