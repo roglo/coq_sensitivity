@@ -1619,13 +1619,15 @@ apply rngl_add_move_0_r in Hab; [ | easy ].
 now rewrite <- Hab.
 Qed.
 
-Theorem glip : ∀ a b c,
+Theorem glip :
+  rngl_has_1_neq_0 = true →
+  ∀ a b c,
   rngl_opp_defined c = true
   → (a + b = 0)%F
   → (a * c = 1)%F
   → (b = (- c)⁻¹)%F.
 Proof.
-intros * Hoc Hab Hac.
+intros H10 * Hoc Hab Hac.
 assert (Hbo : rngl_opp_defined b = true). {
   rewrite rngl_add_comm in Hab.
   apply rngl_opt_opp_iff in Hab.
@@ -1647,19 +1649,18 @@ apply rngl_mul_move_1_r; [ | | now apply (glop a) ]. {
   rewrite rngl_opp_involutive in H1; [ | easy ].
   rewrite rngl_opp_0 in H1.
   subst c.
-...
-  rewrite rngl_opp_0 in H1. 2: {
+  rewrite rngl_mul_0_r in Hac. 2: {
+    left.
     unfold rngl_opp_defined.
-    remember (rngl_opt_opp 0) as z eqn:Hz; symmetry in Hz.
-    destruct z; [ easy | exfalso ].
-    assert (H : (0 + 0 = 0)%F) by apply rngl_add_0_l.
-    apply rngl_opt_opp_iff in H.
-...
-rewrite rngl_mul_opp_r; [ | easy | easy ].
-rewrite <- rngl_mul_opp_l; [ | easy | easy ].
-apply rngl_add_move_0_r in Hab; [ | easy ].
-now rewrite <- Hab.
+    apply rngl_opt_opp_iff in Hab.
+    now rewrite Hab.
+  }
+  symmetry in Hac; revert Hac.
+  now apply rngl_1_neq_0.
+}
 Qed.
+
+...
 
 Theorem glip : ∀ a b c,
   rngl_inv_defined b = true
