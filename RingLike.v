@@ -1582,16 +1582,14 @@ rewrite Hch in rngl_char_prop.
 now specialize (rngl_char_prop i) as H.
 Qed.
 
-...
-
 Theorem rngl_of_nat_inj :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_opp_defined 1 = true ∨ rngl_has_sous = true →
   rngl_characteristic = 0 →
   ∀ i j,
   rngl_of_nat i = rngl_of_nat j
   → i = j.
 Proof.
-intros Hom Hch * Hij.
+intros Ho1 Hch * Hij.
 revert i Hij.
 induction j; intros. {
   cbn in Hij.
@@ -1608,12 +1606,71 @@ apply rngl_add_cancel_l in Hij; [ | easy ].
 now apply IHj.
 Qed.
 
-Theorem rngl_opp_inv :
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_has_1_neq_0 = true →
-  ∀ a, a ≠ 0%F → (- ¹/ a = ¹/ (- a))%F.
+Theorem rngl_inv_defined_opp : ∀ a a_ a1,
+  rngl_opt_opp a = Some a_
+  → rngl_opt_inv a = Some a1
+  → rngl_opt_opp (- a) = Some (- a1)%F.
 Proof.
+intros * Hoa Hia.
+apply rngl_opt_opp_iff.
+rewrite fold_rngl_sub. 2: {
+...
+  apply rngl_opt_inv_symm in Hia.
+  unfold rngl_opp_defined.
+...
+apply rngl_opt_opp_iff in Hoa.
+apply rngl_opt_inv_iff in Hia.
+...
+rewrite <- rngl_opp_add_distr.
+...
+
+Theorem rngl_inv_defined_opp : ∀ a,
+  rngl_opp_defined a = true
+  → rngl_inv_defined a = true
+  → rngl_inv_defined (- a) = true.
+Proof.
+intros * Hoa Hia.
+generalize Hia; intros H1.
+unfold rngl_inv_defined in H1 |-*.
+remember (rngl_opt_inv a) as b eqn:Hb; symmetry in Hb.
+destruct b as [b| ]; [ clear H1 | easy ].
+generalize Hb; intros Hc.
+apply rngl_opt_inv_iff in Hb.
+rewrite <- rngl_mul_opp_opp in Hb; [ | easy | ].
+remember (rngl_opt_inv (- a)) as d eqn:Hd; symmetry in Hd.
+destruct d as [d| ]; [ easy | exfalso ]. 2: {
+  unfold rngl_opp_defined in Hoa |-*.
+  remember (rngl_opt_opp a) as c eqn:H1; symmetry in H1.
+  destruct c as [c| ]; [ clear Hoa | easy ].
+  apply rngl_opt_opp_iff in H1.
+  remember (rngl_opt_opp b) as d eqn:H2; symmetry in H2.
+  destruct d as [d| ]; [ easy | exfalso ].
+  assert (H : rngl_opt_opp b = Some (- c)%F). {
+    apply rngl_opt_opp_iff.
+apply rngl_opt_inv_iff in Hb.
+...
+
+apply rngl_opt_inv_symm in Hc.
+apply rngl_opt_inv_iff in Hb.
+rewrite <- rngl_mul_opp_opp in Hb; [ | easy | ].
+remember (rngl_opt_inv (- a)) as d eqn:Hd; symmetry in Hd.
+destruct d as [d| ]; [ easy | exfalso ].
+...
+
+Theorem rngl_opp_inv :
+  rngl_has_1_neq_0 = true → ∀ a,
+  rngl_inv_defined a = true →
+  (- (a⁻¹) = (- a)⁻¹)%F.
+Proof.
+intros H10 * Hid.
+apply (rngl_mul_cancel_l (- a)%F). {
+  left.
+Search (rngl_inv_defined (- _)).
+...
+  apply rngl_inv_defined_opp.
+
+apply (rngl_mul_cancel_l (or_introl Hin) (- a)%F); [ easy | ].
+...
 intros Hop Hin H10 * Haz.
 assert (Hoaz : (- a)%F ≠ 0%F). {
   intros H.
