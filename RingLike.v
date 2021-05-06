@@ -1625,6 +1625,25 @@ apply rngl_add_move_0_r in Hab; [ | easy ].
 now rewrite <- Hab.
 Qed.
 
+Theorem glip : ∀ a b c,
+  rngl_inv_defined b = true
+  → (a + b = 0)%F
+  → (a * c = 1)%F
+  → (c + b⁻¹ = 0)%F.
+Proof.
+intros * Hib Hab Hac.
+assert (Hbo : rngl_inv_defined c = true). {
+  apply rngl_opt_inv_l_iff in Hac.
+  unfold rngl_inv_defined.
+  now rewrite Hac.
+}
+...
+rewrite rngl_mul_opp_r; [ | easy | easy ].
+rewrite <- rngl_mul_opp_l; [ | easy | easy ].
+apply rngl_add_move_0_r in Hab; [ | easy ].
+now rewrite <- Hab.
+Qed.
+
 ...
 
 Theorem rngl_inv_defined_opp : ∀ a a_ a1,
