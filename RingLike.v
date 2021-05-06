@@ -1634,6 +1634,9 @@ rewrite rngl_add_comm in Hb.
 apply rngl_add_move_0_r in Hb; [ | easy ].
 rewrite Hb.
 rewrite rngl_mul_opp_opp; [ easy | easy | ].
+assert (H : rngl_opt_opp c = Some (b⁻¹)%F). {
+  apply rngl_opt_opp_iff.
+Search ((- _)⁻¹)%F.
 ...
   unfold rngl_opp_defined.
   apply rngl_opt_opp_iff in Hab.
@@ -1703,19 +1706,20 @@ rewrite <- rngl_mul_opp_opp in Hb; [ | easy | ].
 remember (rngl_opt_inv (- a)) as d eqn:Hd; symmetry in Hd.
 destruct d as [d| ]; [ easy | exfalso ].
 ...
+*)
 
 Theorem rngl_opp_inv :
   rngl_has_1_neq_0 = true → ∀ a,
+  rngl_opp_defined a = true →
   rngl_inv_defined a = true →
   (- (a⁻¹) = (- a)⁻¹)%F.
 Proof.
-intros H10 * Hid.
+intros H10 * Hoa Hia.
 apply (rngl_mul_cancel_l (- a)%F). {
   left.
-Search (rngl_inv_defined (- _)).
 ...
   apply rngl_inv_defined_opp.
-
+...
 apply (rngl_mul_cancel_l (or_introl Hin) (- a)%F); [ easy | ].
 ...
 intros Hop Hin H10 * Haz.
