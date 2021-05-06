@@ -1614,6 +1614,8 @@ Proof.
 intros * Hoa Hia.
 apply rngl_opt_opp_iff.
 rewrite fold_rngl_sub. 2: {
+Search (- (_⁻¹))%F.
+Search ((- _)⁻¹)%F.
 ...
   apply rngl_opt_inv_symm in Hia.
   unfold rngl_opp_defined.
