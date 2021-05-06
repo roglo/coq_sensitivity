@@ -1626,6 +1626,37 @@ now rewrite <- Hab.
 Qed.
 
 Theorem glip : ∀ a b c,
+  rngl_opp_defined c = true
+  → (a + b = 0)%F
+  → (a * c = 1)%F
+  → (b = (- c)⁻¹)%F.
+Proof.
+intros * Hoc Hab Hac.
+assert (Hbo : rngl_opp_defined b = true). {
+  rewrite rngl_add_comm in Hab.
+  apply rngl_opt_opp_iff in Hab.
+  unfold rngl_opp_defined.
+  now rewrite Hab.
+}
+apply rngl_mul_move_1_r; [ | | now apply (glop a) ]. {
+  unfold rngl_inv_defined.
+  remember (rngl_opt_inv (- c)) as d eqn:Hd; symmetry in Hd.
+  destruct d; [ easy | exfalso ].
+  assert (rngl_opt_inv (- c) = Some b). {
+    apply rngl_opt_inv_l_iff.
+    now apply (glop a).
+  }
+  congruence.
+} {
+  intros H1.
+...
+rewrite rngl_mul_opp_r; [ | easy | easy ].
+rewrite <- rngl_mul_opp_l; [ | easy | easy ].
+apply rngl_add_move_0_r in Hab; [ | easy ].
+now rewrite <- Hab.
+Qed.
+
+Theorem glip : ∀ a b c,
   rngl_inv_defined b = true
   → (a + b = 0)%F
   → (a * c = 1)%F
