@@ -1606,6 +1606,51 @@ apply rngl_add_cancel_l in Hij; [ | easy ].
 now apply IHj.
 Qed.
 
+Theorem glop : ∀ a b c,
+  (a + b = 0)%F
+  → (a * c = 1)%F
+  → (b * - c = 1)%F.
+Proof.
+intros * Hab Hac.
+assert (Hao : rngl_opp_defined a = true). {
+  apply rngl_opt_opp_iff in Hab.
+  unfold rngl_opp_defined.
+  now rewrite Hab.
+}
+assert (Hbo : rngl_opp_defined b = true). {
+  rewrite rngl_add_comm in Hab.
+  apply rngl_opt_opp_iff in Hab.
+  unfold rngl_opp_defined.
+  now rewrite Hab.
+}
+assert (Hai : rngl_inv_defined a = true). {
+  apply rngl_opt_inv_l_iff in Hac.
+  apply rngl_opt_inv_symm in Hac.
+  unfold rngl_inv_defined.
+  now rewrite Hac.
+}
+generalize Hab; intros Hb.
+rewrite rngl_add_comm in Hb.
+apply rngl_add_move_0_r in Hb; [ | easy ].
+rewrite Hb.
+rewrite rngl_mul_opp_opp; [ easy | easy | ].
+...
+  unfold rngl_opp_defined.
+  apply rngl_opt_opp_iff in Hab.
+  now rewrite Hab.
+} {
+  apply rngl_add_move_0_r in Hab. 2: {
+    unfold rngl_opp_defined.
+    rewrite rngl_add_comm in Hab.
+    apply rngl_opt_opp_iff in Hab.
+    now rewrite Hab.
+  }
+  rewrite Hab in Hac.
+  rewrite rngl_mul_opp_l in Hac.
+  generalize Hac; intros Hc.
+...
+
+
 Theorem rngl_inv_defined_opp : ∀ a a_ a1,
   rngl_opt_opp a = Some a_
   → rngl_opt_inv a = Some a1
