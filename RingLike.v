@@ -1291,39 +1291,33 @@ Theorem rngl_mul_if_then_else_distr : ∀ (x : bool) a b c d,
   ((if x then a else b) * (if x then c else d) = if x then a * c else b * d)%F.
 Proof. now destruct x. Qed.
 
-Theorem rngl_opp_0 : rngl_opp_defined 0 = true → (- 0 = 0)%F.
+Theorem rngl_opp_defined_0 : rngl_opp_defined 0 = true.
 Proof.
-intros Hro.
+intros.
+unfold rngl_opp_defined.
+assert (H : (0 + 0 = 0)%F) by apply rngl_add_0_l.
+apply rngl_opt_opp_iff in H.
+now rewrite H.
+Qed.
+
+Theorem rngl_opp_0 : (- 0 = 0)%F.
+Proof.
 transitivity (0 + - 0)%F. {
   symmetry.
   apply rngl_add_0_l.
 }
-rewrite fold_rngl_sub; [ | easy ].
-now apply rngl_sub_diag; left.
+rewrite fold_rngl_sub; [ | apply rngl_opp_defined_0 ].
+apply rngl_sub_diag; left.
+apply rngl_opp_defined_0.
 Qed.
 
-Theorem rngl_sub_0_r :
-  rngl_opp_defined 0 = true ∨ rngl_has_sous = true →
-  ∀ a, (a - 0 = a)%F.
+Theorem rngl_sub_0_r : ∀ a, (a - 0 = a)%F.
 Proof.
-intros Hom *.
-remember (rngl_opp_defined 0) as op eqn:Hop.
-symmetry in Hop.
-destruct op. {
-  unfold rngl_sub.
-  rewrite Hop.
-  rewrite rngl_opp_0; [ | easy ].
-  apply rngl_add_0_r.
-}
-remember rngl_has_sous as mo eqn:Hmo.
-symmetry in Hmo.
-destruct mo. {
-  specialize rngl_opt_add_sub as H1.
-  rewrite Hmo in H1.
-  specialize (H1 a 0%F) as H2.
-  now rewrite rngl_add_0_r in H2.
-}
-now destruct Hom.
+intros.
+unfold rngl_sub.
+rewrite rngl_opp_defined_0.
+rewrite rngl_opp_0.
+apply rngl_add_0_r.
 Qed.
 
 Theorem rngl_opp_defined_add : ∀ a b,
@@ -1649,6 +1643,17 @@ apply rngl_mul_move_1_r; [ | | now apply (glop a) ]. {
   congruence.
 } {
   intros H1.
+  apply (f_equal rngl_opp) in H1.
+  rewrite rngl_opp_involutive in H1; [ | easy ].
+  rewrite rngl_opp_0 in H1.
+  subst c.
+...
+  rewrite rngl_opp_0 in H1. 2: {
+    unfold rngl_opp_defined.
+    remember (rngl_opt_opp 0) as z eqn:Hz; symmetry in Hz.
+    destruct z; [ easy | exfalso ].
+    assert (H : (0 + 0 = 0)%F) by apply rngl_add_0_l.
+    apply rngl_opt_opp_iff in H.
 ...
 rewrite rngl_mul_opp_r; [ | easy | easy ].
 rewrite <- rngl_mul_opp_l; [ | easy | easy ].
