@@ -1768,46 +1768,29 @@ now apply rngl_div_diag.
 Qed.
 
 Theorem rngl_mul_sub_distr_r : ∀ a b c,
-  rngl_opp_defined b = true ∨ rngl_has_sous = true →
+  rngl_opp_defined b = true →
+  rngl_opp_defined c = true →
   ((a - b) * c = a * c - b * c)%F.
 Proof.
-intros * Hom *.
-...
-remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
-destruct op. {
-  unfold rngl_sub; rewrite Hop.
-  rewrite rngl_mul_add_distr_r.
-  now rewrite rngl_mul_opp_l.
-}
-remember rngl_has_sous as mo eqn:Hmo; symmetry in Hmo.
-destruct mo. {
-  specialize rngl_opt_mul_sub_distr_r as H1.
-  remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
-  destruct ic. {
-    specialize rngl_opt_mul_comm as rngl_mul_comm.
-    rewrite Hic in rngl_mul_comm.
-    rewrite rngl_mul_comm, rngl_mul_sub_distr_l; [ | now right ].
-    now rewrite (rngl_mul_comm a), (rngl_mul_comm b).
-  } {
-    rewrite Hmo in H1.
-    apply H1.
-  }
-}
-now destruct Hom.
+intros * Hob Hoc *.
+unfold rngl_sub; rewrite Hob.
+rewrite rngl_opp_defined_mul; [ | easy | easy ].
+rewrite rngl_mul_add_distr_r.
+now rewrite rngl_mul_opp_l.
 Qed.
 
 End a.
 
-Arguments rngl_add_opp_l {T}%type {ro rp} Hro.
-Arguments rngl_sub_diag {T}%type {ro rp} Hom a%F.
-Arguments rngl_add_cancel_l {T}%type {ro rp} Hom (a b c)%F.
-Arguments rngl_add_sub {T}%type {ro rp} Hom (a b)%F.
-Arguments rngl_inv_mul_distr {T}%type {ro rp} Hom Hin Hdo a%F b%F.
+Arguments rngl_add_opp_l {T}%type {ro rp} a%F b%F.
+Arguments rngl_sub_diag {T}%type {ro rp} a%F.
+Arguments rngl_add_cancel_l {T}%type {ro rp} (a b c)%F.
+Arguments rngl_add_sub {T}%type {ro rp} (a b)%F.
+Arguments rngl_inv_mul_distr {T}%type {ro rp} H10 a%F b%F.
 Arguments rngl_integral {T}%type {ro rp}.
-Arguments rngl_mul_opp_opp {T}%type {ro rp} Hro.
-Arguments rngl_mul_0_l {T}%type {ro rp} Hom a%F.
-Arguments rngl_mul_opp_r {T}%type {ro rp} Hro.
-Arguments rngl_mul_cancel_r {T}%type {ro rp} Hii (a b c)%F.
-Arguments rngl_mul_0_r {T}%type {ro rp} Hom a%F.
+Arguments rngl_mul_opp_opp {T}%type {ro rp} a%F b%F.
+Arguments rngl_mul_0_l {T}%type {ro rp} a%F.
+Arguments rngl_mul_opp_r {T}%type {ro rp} a%F b%F.
+Arguments rngl_mul_cancel_r {T}%type {ro rp} (a b c)%F.
+Arguments rngl_mul_0_r {T}%type {ro rp} a%F.
 Arguments rngl_opp_0 {T}%type {ro rp}.
-Arguments rngl_opp_add_distr {T}%type {ro rp} Hop a%F b%F.
+Arguments rngl_opp_add_distr {T}%type {ro rp} (a b)%F.
