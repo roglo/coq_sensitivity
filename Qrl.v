@@ -76,7 +76,21 @@ Qed.
 Theorem Q_opt_mul_inv_l : ∀ a : Q,
   if rngl_inv_defined a then (a⁻¹ * a)%F = 1%F else not_applicable.
 Proof.
-Admitted.
+intros.
+remember (rngl_inv_defined a) as ia eqn:Hia; symmetry in Hia.
+destruct ia; [ cbn | easy ].
+rewrite <- (Q.mul_inv_l a); [ | now intros H; subst a ].
+f_equal.
+now destruct a.
+Qed.
+
+Theorem Q_opt_mul_inv_r : ∀ a : Q,
+  if (rngl_inv_defined a && negb true)%bool then (a / a)%F = 1%F
+  else not_applicable.
+Proof.
+intros.
+now rewrite Bool.andb_false_r.
+Qed.
 
 (*
 Theorem Q_consistent :
@@ -114,9 +128,8 @@ Definition Q_ring_like_prop :=
      rngl_opt_mul_sub_distr_l := NA;
      rngl_opt_mul_sub_distr_r := NA;
 *)
-...
      rngl_opt_mul_inv_l := Q_opt_mul_inv_l;
-     rngl_opt_mul_inv_r := NA;
+     rngl_opt_mul_inv_r := Q_opt_mul_inv_r;
      rngl_opt_mul_quot_l := NA;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_eq_dec := Q.eq_dec;
