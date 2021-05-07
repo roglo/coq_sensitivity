@@ -1660,6 +1660,50 @@ apply rngl_mul_move_1_r; [ | | now apply (glop a) ]. {
 }
 Qed.
 
+Theorem glup :
+  rngl_has_1_neq_0 = true →
+  ∀ a b c,
+  rngl_opp_defined c = true
+  → (a + b = 0)%F
+  → (a * c = 1)%F
+  → (b⁻¹ = - c)%F.
+Proof.
+intros H10 * Hoc Hab Hac.
+assert (Hbo : rngl_opp_defined b = true). {
+  rewrite rngl_add_comm in Hab.
+  apply rngl_opt_opp_iff in Hab.
+  unfold rngl_opp_defined.
+  now rewrite Hab.
+}
+symmetry.
+apply rngl_mul_move_1_l.
+...
+apply rngl_mul_move_1_r; [ | | now apply (glop a) ]. {
+  unfold rngl_inv_defined.
+  remember (rngl_opt_inv (- c)) as d eqn:Hd; symmetry in Hd.
+  destruct d; [ easy | exfalso ].
+  assert (rngl_opt_inv (- c) = Some b). {
+    apply rngl_opt_inv_l_iff.
+    now apply (glop a).
+  }
+  congruence.
+} {
+  intros H1.
+  apply (f_equal rngl_opp) in H1.
+  rewrite rngl_opp_involutive in H1; [ | easy ].
+  rewrite rngl_opp_0 in H1.
+  subst c.
+  rewrite rngl_mul_0_r in Hac. 2: {
+    left.
+    unfold rngl_opp_defined.
+    apply rngl_opt_opp_iff in Hab.
+    now rewrite Hab.
+  }
+  symmetry in Hac; revert Hac.
+  now apply rngl_1_neq_0.
+}
+Qed.
+
 ...
 
 Theorem glip : ∀ a b c,
