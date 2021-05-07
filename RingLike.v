@@ -1734,79 +1734,45 @@ destruct d as [d| ]; [ easy | exfalso ].
 Theorem rngl_opp_inv :
   rngl_has_1_neq_0 = true → ∀ a,
   rngl_opp_defined a = true →
+  rngl_opp_defined (a⁻¹) = true →
   rngl_inv_defined a = true →
   (- (a⁻¹) = (- a)⁻¹)%F.
 Proof.
-intros H10 * Hoa Hia.
+intros H10 * Hoa Hoa1 Hia.
 apply (rngl_mul_opp_inv_opp H10 (a⁻¹)%F); [ easy | | ]. 2: {
   now apply rngl_mul_inv_l.
 }
-apply rngl_add_opp_r.
-Search (rngl_opp_defined (_ ⁻¹)).
-Inspect 7.
-...
-intros H10 * Hoa Hia.
-apply (rngl_mul_cancel_l (- a)%F). {
-  left.
-...
-  apply rngl_inv_defined_opp.
-...
-apply (rngl_mul_cancel_l (or_introl Hin) (- a)%F); [ easy | ].
-...
-intros Hop Hin H10 * Haz.
-assert (Hoaz : (- a)%F ≠ 0%F). {
-  intros H.
-  apply (f_equal rngl_opp) in H.
-  rewrite rngl_opp_involutive in H; [ | easy ].
-  now rewrite rngl_opp_0 in H.
-}
-apply (rngl_mul_cancel_l (or_introl Hin) (- a)%F); [ easy | ].
-specialize (rngl_opt_mul_inv_r) as H2.
-remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
-rewrite Hin in H2; cbn in H2.
-rewrite rngl_mul_opp_opp; [ | easy ].
-destruct ic. {
-  symmetry.
-  rewrite rngl_mul_comm; [ | easy ].
-  rewrite rngl_mul_inv_l; [ | easy | easy ].
-  rewrite rngl_mul_comm; [ | easy ].
-  rewrite rngl_mul_inv_l; [ | easy | easy ].
-  easy.
-} {
-  cbn in H2.
-  rewrite fold_rngl_div; [ | easy ].
-  rewrite fold_rngl_div; [ | easy ].
-  rewrite H2; [ | easy ].
-  now rewrite H2.
-}
+now apply rngl_add_opp_r.
 Qed.
 
-Theorem rngl_div_mul_div :
-  rngl_has_inv = true →
-  ∀ x y z, y ≠ 0%F → ((x / y) * (y / z))%F = (x / z)%F.
+Theorem rngl_div_mul_div : ∀ a b c,
+  rngl_inv_defined b = true →
+  rngl_inv_defined c = true →
+  ((a / b) * (b / c))%F = (a / c)%F.
 Proof.
-intros Hin * Hs.
-unfold rngl_div; rewrite Hin.
+intros * Hib Hic.
+unfold rngl_div; rewrite Hib, Hic.
 rewrite rngl_mul_assoc; f_equal.
 rewrite <- rngl_mul_assoc.
-rewrite rngl_mul_inv_l; [ | easy| easy ].
+rewrite rngl_mul_inv_l; [ | easy ].
 apply rngl_mul_1_r.
 Qed.
 
-Theorem eq_rngl_div_1 :
-  rngl_has_inv = true ∨ rngl_has_quot = true →
-   ∀ a b, b ≠ 0%F → a = b → (a / b = 1)%F.
+Theorem eq_rngl_div_1 : ∀ a b,
+  rngl_inv_defined b = true ∨ rngl_has_quot = true →
+  b ≠ 0%F → a = b → (a / b = 1)%F.
 Proof.
-intros Hiv * Hbz Hab.
+intros * Hiv * Hbz Hab.
 subst a.
-now apply rngl_mul_inv_r.
+now apply rngl_div_diag.
 Qed.
 
-Theorem rngl_mul_sub_distr_r :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
-  ∀ a b c, ((a - b) * c = a * c - b * c)%F.
+Theorem rngl_mul_sub_distr_r : ∀ a b c,
+  rngl_opp_defined b = true ∨ rngl_has_sous = true →
+  ((a - b) * c = a * c - b * c)%F.
 Proof.
-intros Hom *.
+intros * Hom *.
+...
 remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
 destruct op. {
   unfold rngl_sub; rewrite Hop.
