@@ -1697,6 +1697,7 @@ rewrite <- Hac.
 now apply rngl_mul_opp_opp.
 Qed.
 
+(*
 Theorem rngl_inv_defined_opp : ∀ a,
   rngl_opp_defined a = true
   → rngl_inv_defined a = true
@@ -1722,7 +1723,6 @@ destruct d as [d| ]; [ easy | exfalso ]. 2: {
     apply rngl_opt_opp_iff.
     apply rngl_opt_inv_iff in Hb.
 ...
-
 apply rngl_opt_inv_symm in Hc.
 apply rngl_opt_inv_iff in Hb.
 rewrite <- rngl_mul_opp_opp in Hb; [ | easy | ].
@@ -1737,6 +1737,14 @@ Theorem rngl_opp_inv :
   rngl_inv_defined a = true →
   (- (a⁻¹) = (- a)⁻¹)%F.
 Proof.
+intros H10 * Hoa Hia.
+apply (rngl_mul_opp_inv_opp H10 (a⁻¹)%F); [ easy | | ]. 2: {
+  now apply rngl_mul_inv_l.
+}
+apply rngl_add_opp_r.
+Search (rngl_opp_defined (_ ⁻¹)).
+Inspect 7.
+...
 intros H10 * Hoa Hia.
 apply (rngl_mul_cancel_l (- a)%F). {
   left.
