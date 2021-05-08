@@ -115,8 +115,8 @@ Notation "a * b" := (rngl_mul a b) : ring_like_scope.
 Notation "a / b" := (rngl_div a b) : ring_like_scope.
 Notation "a ≤ b" := (rngl_le a b) : ring_like_scope.
 Notation "- a" := (rngl_opp a) : ring_like_scope.
-Notation "¹/ a" := (rngl_inv a) (at level 35, right associativity) :
-  ring_like_scope.
+Notation "a '⁻¹'" := (rngl_inv a)
+  (at level 35, right associativity, format "a ⁻¹") : ring_like_scope.
 Notation "a ≤ b ≤ c" := (a ≤ b ∧ b ≤ c)%F (at level 70, b at next level) :
   ring_like_scope.
 
@@ -175,7 +175,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       else not_applicable;
     (* when has inverse *)
     rngl_opt_mul_inv_l :
-      if rngl_has_inv then ∀ a : T, a ≠ 0%F → (¹/ a * a = 1)%F
+      if rngl_has_inv then ∀ a : T, a ≠ 0%F → (a⁻¹ * a = 1)%F
       else not_applicable;
     rngl_opt_mul_inv_r :
       if (rngl_has_inv && negb rngl_is_comm)%bool then
@@ -317,7 +317,7 @@ Qed.
 
 Theorem rngl_mul_inv_l :
   rngl_has_inv = true →
-  ∀ a : T, a ≠ 0%F → (¹/ a * a = 1)%F.
+  ∀ a : T, a ≠ 0%F → (a⁻¹ * a = 1)%F.
 Proof.
 intros H1 *.
 specialize rngl_opt_mul_inv_l as H.
@@ -628,7 +628,7 @@ Qed.
 
 Theorem fold_rngl_div :
   rngl_has_inv = true →
-  ∀ a b, (a * ¹/ b)%F = (a / b)%F.
+  ∀ a b, (a * b⁻¹)%F = (a / b)%F.
 Proof.
 intros Hin *.
 unfold rngl_div.
@@ -722,7 +722,7 @@ destruct iv. {
   remember rngl_has_dec_eq as de eqn:Hde; symmetry in Hde.
   destruct de; [ | easy ].
   cbn; clear rngl_integral.
-  assert (H : (¹/a * a * b = ¹/a * 0)%F). {
+  assert (H : (a⁻¹ * a * b = a⁻¹ * 0)%F). {
     now rewrite <- rngl_mul_assoc, Hab.
   }
   rewrite rngl_mul_0_r in H; [ | easy ].
@@ -786,7 +786,7 @@ Theorem rngl_mul_cancel_l :
 Proof.
 intros Hii * Haz Hbc.
 destruct Hii as [Hii| Hii]. {
-  assert (H2 : (¹/ a * (a * b) = ¹/ a * (a * c))%F) by now rewrite Hbc.
+  assert (H2 : (a⁻¹ * (a * b) = a⁻¹ * (a * c))%F) by now rewrite Hbc.
   do 2 rewrite rngl_mul_assoc in H2.
   rewrite rngl_mul_inv_l in H2; [ | easy | easy ].
   now do 2 rewrite rngl_mul_1_l in H2.
@@ -830,7 +830,7 @@ now rewrite Hab.
 Qed.
 
 Theorem rngl_inv_if_then_else_distr : ∀ (c : bool) a b,
-  (¹/ (if c then a else b) = if c then ¹/ a else ¹/ b)%F.
+  ((if c then a else b)⁻¹ = if c then a⁻¹ else b⁻¹)%F.
 Proof. now destruct c. Qed.
 
 Theorem rngl_mul_if_then_else_distr : ∀ (x : bool) a b c d,
@@ -922,13 +922,13 @@ Qed.
 Theorem rngl_inv_1 :
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
-  (¹/ 1 = 1)%F.
+  (1⁻¹ = 1)%F.
 Proof.
 intros Hin H10.
 specialize rngl_mul_inv_r as H.
 unfold rngl_div in H.
 rewrite Hin in H.
-transitivity (1 * ¹/ 1)%F. {
+transitivity (1 * 1⁻¹)%F. {
   symmetry.
   apply rngl_mul_1_l.
 }
@@ -938,7 +938,7 @@ Qed.
 
 Theorem rngl_div_1_l :
   rngl_has_inv = true →
-  ∀ a, (1 / a = ¹/ a)%F.
+  ∀ a, (1 / a = a⁻¹)%F.
 Proof.
 intros Hin *.
 unfold rngl_div.
@@ -957,7 +957,7 @@ now rewrite rngl_mul_1_r in H1.
 Qed.
 
 Theorem rngl_mul_move_1_r :
-  rngl_has_inv = true → ∀ a b : T, b ≠ 0%F → (a * b)%F = 1%F ↔ a = (¹/ b)%F.
+  rngl_has_inv = true → ∀ a b : T, b ≠ 0%F → (a * b)%F = 1%F ↔ a = (b⁻¹)%F.
 Proof.
 intros Hin * Hbz.
 split; intros H. {
@@ -991,7 +991,7 @@ Theorem rngl_inv_neq_0 :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
-  ∀ a, a ≠ 0%F → (¹/ a ≠ 0)%F.
+  ∀ a, a ≠ 0%F → (a⁻¹ ≠ 0)%F.
 Proof.
 intros Hom Hin H10 * Haz H1.
 symmetry in H1.
@@ -1005,7 +1005,7 @@ Theorem rngl_inv_involutive :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
-  ∀ x, x ≠ 0%F → (¹/ ¹/ x)%F = x.
+  ∀ x, x ≠ 0%F → (x⁻¹⁻¹)%F = x.
 Proof.
 intros Hom Hin H10 * Hxz.
 symmetry.
@@ -1056,7 +1056,7 @@ Theorem rngl_inv_inj :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
-  ∀ a b, a ≠ 0%F → b ≠ 0%F →(¹/ a = ¹/ b)%F → a = b.
+  ∀ a b, a ≠ 0%F → b ≠ 0%F →(a⁻¹ = b⁻¹)%F → a = b.
 Proof.
 intros Hom Hin H10 * Haz Hbz H.
 rewrite <- (rngl_inv_involutive Hom Hin H10 a); [ | easy ].
@@ -1068,7 +1068,7 @@ Theorem rngl_inv_mul_distr :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_is_integral = true →
   rngl_has_inv = true →
-  ∀ a b, a ≠ 0%F → b ≠ 0%F →(¹/ (a * b) = ¹/ b * ¹/ a)%F.
+  ∀ a b, a ≠ 0%F → b ≠ 0%F →((a * b)⁻¹ = b⁻¹ * a⁻¹)%F.
 Proof.
 intros Hom Hdo Hin * Haz Hbz.
 specialize rngl_mul_cancel_l as H1.
@@ -1201,7 +1201,7 @@ Theorem rngl_opp_inv :
   rngl_has_opp = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
-  ∀ a, a ≠ 0%F → (- ¹/ a = ¹/ (- a))%F.
+  ∀ a, a ≠ 0%F → (- a⁻¹ = (- a)⁻¹)%F.
 Proof.
 intros Hop Hin H10 * Haz.
 assert (Hoaz : (- a)%F ≠ 0%F). {

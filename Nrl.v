@@ -357,7 +357,7 @@ destruct (Nat.eq_dec a b) as [Hab| Hab]; [ left | right ]. {
 Qed.
 
 Theorem Zn_opt_mul_inv_l :
-  if rngl_has_inv then ∀ a : Zn n, a ≠ 0%F → (¹/ a * a)%F = 1%F
+  if rngl_has_inv then ∀ a : Zn n, a ≠ 0%F → (a⁻¹ * a)%F = 1%F
   else not_applicable.
 Proof.
 intros.

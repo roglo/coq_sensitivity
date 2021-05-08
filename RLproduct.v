@@ -244,7 +244,7 @@ Theorem rngl_inv_product_list :
   rngl_is_integral = true →
   ∀ A (l : list A) f,
   (∀ i, i ∈ l → f i ≠ 0%F)
-  → ((¹/ Π (i ∈ l), f i) = Π (i ∈ rev l), (¹/ f i))%F.
+  → ((Π (i ∈ l), f i)⁻¹ = Π (i ∈ rev l), ((f i)⁻¹))%F.
 Proof.
 intros Hom Hin H10 Hit * Hnz.
 unfold iter_list.
@@ -282,7 +282,7 @@ Theorem rngl_inv_product :
   rngl_is_integral = true →
   ∀ b e f,
   (∀ i, b ≤ i ≤ e → f i ≠ 0%F)
-  → ((¹/ Π (i = b, e), f i) = Π (i = b, e), (¹/ f (b + e - i)%nat))%F.
+  → ((Π (i = b, e), f i)⁻¹ = Π (i = b, e), ((f (b + e - i)%nat)⁻¹))%F.
 Proof.
 intros Hom Hin H10 Hit * Hnz.
 unfold iter_seq.
@@ -334,7 +334,7 @@ Theorem rngl_inv_product_list_comm :
   rngl_is_integral = true →
   ∀ A (l : list A) f,
   (∀ i, i ∈ l → f i ≠ 0%F)
-  → ((¹/ Π (i ∈ l), f i) = Π (i ∈ l), (¹/ f i))%F.
+  → ((Π (i ∈ l), f i)⁻¹ = Π (i ∈ l), (( f i)⁻¹))%F.
 Proof.
 intros Hom Hic Hin H10 Hit * Hnz.
 rewrite rngl_inv_product_list; [ | easy | easy | easy | easy | easy ].
@@ -351,7 +351,7 @@ Theorem rngl_inv_product_comm :
   rngl_is_integral = true →
   ∀ b e f,
   (∀ i, b ≤ i ≤ e → f i ≠ 0%F)
-  → ((¹/ Π (i = b, e), f i) = Π (i = b, e), (¹/ f i))%F.
+  → ((Π (i = b, e), f i)⁻¹ = Π (i = b, e), ((f i)⁻¹))%F.
 Proof.
 intros Hom Hic Hin H10 Hit * Hnz.
 apply rngl_inv_product_list_comm; try easy.

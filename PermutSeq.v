@@ -1054,7 +1054,7 @@ destruct (rngl_eq_dec Hde b 0%F) as [Hbz| Hbz]. {
   apply in_seq in Hjs.
   now apply Hg.
 }
-apply rngl_mul_cancel_r with (c := (¹/ b)%F); [ now left | | ]. {
+apply rngl_mul_cancel_r with (c := (b⁻¹)%F); [ now left | | ]. {
   intros Hbiz.
   apply (f_equal (rngl_mul b)) in Hbiz.
   rewrite fold_rngl_div in Hbiz; [ | easy ].
