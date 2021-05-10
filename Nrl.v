@@ -500,6 +500,7 @@ End a.
    2/ 0 is not absorbing
    3/ it is integral
    4/ its characteristic is 1
+   5/ the natural 0 (which is not the 0) is absorbing for + and x
  *)
 
 Definition lcm_ring_like_op : ring_like_op nat :=
