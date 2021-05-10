@@ -490,3 +490,95 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_consistent := Zn_consistent |}.
 
 End a.
+
+(* Semiring by Mohammed Abu Shamia in his PhD
+   "On Some Types Of Ideals In Semirings", Aug 2008,
+   https://iugspace.iugaza.edu.ps/bitstream/handle/20.500.12358/21352/file_1.pdf
+   Example 1.15
+   This "almost" semiring is special because:
+   1/ 1=0, but not trivial semiring
+   2/ 0 is not absorbing
+   3/ it is integral
+   4/ its characteristic is 1
+ *)
+
+Definition lcm_ring_like_op : ring_like_op nat :=
+  {| rngl_zero := 1;
+     rngl_one := 1;
+     rngl_add := Nat.lcm;
+     rngl_mul := Nat.mul;
+     rngl_opt_opp := None;
+     rngl_opt_inv := None;
+     rngl_opt_sous := None;
+     rngl_opt_quot := None;
+     rngl_le := Nat.le |}.
+
+Section a.
+
+Context (ro := lcm_ring_like_op).
+Existing Instance ro.
+
+Theorem lcm_mul_add_distr_l : ∀ a b c,
+  a * Nat.lcm b c = Nat.lcm (a * b) (a * c).
+Proof.
+intros.
+symmetry.
+apply Nat.lcm_mul_mono_l.
+Qed.
+
+Theorem lcm_opt_integral : ∀ a b, a * b = 1 → a = 1 ∨ b = 1.
+Proof.
+intros * Hab.
+apply Nat.eq_mul_1 in Hab.
+now left.
+Qed.
+
+Theorem lcm_consistent :
+  (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
+  (rngl_has_inv = false ∨ rngl_has_quot = false).
+Proof.
+now split; left.
+Qed.
+
+Definition lcm_ring_like_prop :=
+  {| rngl_is_comm := true;
+     rngl_has_dec_eq := true;
+     rngl_has_dec_le := false;
+     rngl_has_1_neq_0 := false;
+     rngl_is_ordered := false;
+     rngl_is_integral := true;
+     rngl_characteristic := 1;
+     rngl_add_comm := Nat.lcm_comm;
+     rngl_add_assoc := Nat.lcm_assoc;
+     rngl_add_0_l := Nat.lcm_1_l;
+     rngl_mul_assoc := Nat.mul_assoc;
+     rngl_mul_1_l := Nat.mul_1_l;
+     rngl_mul_add_distr_l := lcm_mul_add_distr_l;
+     rngl_opt_1_neq_0 := NA;
+     rngl_opt_mul_comm := Nat.mul_comm;
+     rngl_opt_mul_1_r := NA;
+     rngl_opt_mul_add_distr_r := NA;
+     rngl_opt_add_opp_l := NA;
+     rngl_opt_add_sub := NA;
+     rngl_opt_sub_sub_sub_add := NA;
+     rngl_opt_mul_sub_distr_l := NA;
+     rngl_opt_mul_sub_distr_r := NA;
+     rngl_opt_mul_inv_l := NA;
+     rngl_opt_mul_inv_r := NA;
+     rngl_opt_mul_quot_l := NA;
+     rngl_opt_mul_quot_r := NA;
+     rngl_opt_eq_dec := Nat.eq_dec;
+     rngl_opt_le_dec := NA;
+     rngl_opt_integral := lcm_opt_integral;
+     rngl_characteristic_prop := Nat.lcm_1_l 1;
+     rngl_opt_le_refl := NA;
+     rngl_opt_le_antisymm := NA;
+     rngl_opt_le_trans := NA;
+     rngl_opt_add_le_compat := NA;
+     rngl_opt_mul_le_compat_nonneg := NA;
+     rngl_opt_mul_le_compat_nonpos := NA;
+     rngl_opt_mul_le_compat := NA;
+     rngl_opt_not_le := NA;
+     rngl_consistent := lcm_consistent |}.
+
+End a.
