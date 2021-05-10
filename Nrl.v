@@ -496,7 +496,7 @@ End a.
    https://iugspace.iugaza.edu.ps/bitstream/handle/20.500.12358/21352/file_1.pdf
    Example 1.15
    This "almost" semiring is special because:
-   1/ 1=0, but not trivial set
+   1/ 1=0, but not a trivial set
    2/ 0 is not absorbing
    3/ it is integral
    4/ its characteristic is 1
