@@ -1754,9 +1754,14 @@ Theorem det_loop_subm_mat_swap_rows_0_i : ∀ n (M : matrix (S n) (S n) T) i j,
   (- minus_one_pow i * det_loop (subm M i j) n)%F.
 Proof.
 intros.
-Search det_loop.
-Check fold_determinant.
-...
+specialize (fold_determinant (subm M i j)) as H1.
+rewrite Nat_sub_succ_1 in H1 at 2.
+rewrite H1; clear H1.
+specialize (fold_determinant (subm (mat_swap_rows 0 i M) 0 j)) as H1.
+rewrite Nat_sub_succ_1 in H1 at 2.
+rewrite H1; clear H1.
+Search (determinant (subm _ _ _)).
+Abort.
 
 (* Laplace formulas *)
 
@@ -1820,12 +1825,10 @@ apply rngl_opp_inj; [ easy | ].
 rewrite <- determinant_alternating with (p := 0) (q := i); try easy; [ | flia Hiz | flia ].
 unfold determinant.
 cbn.
-Inspect 1.
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
-Inspect 1.
-Check det_loop_subm_mat_swap_rows_0_i.
+...
 specialize det_loop_subm_mat_swap_rows_0_i as H1.
 specialize (H1 n M i j).
 cbn in H1.
