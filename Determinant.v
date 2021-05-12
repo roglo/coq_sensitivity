@@ -1760,8 +1760,9 @@ rewrite H1; clear H1.
 specialize (fold_determinant (subm (mat_swap_rows 0 i M) 0 j)) as H1.
 rewrite Nat_sub_succ_1 in H1 at 2.
 rewrite H1; clear H1.
-Search (determinant (subm _ _ _)).
-Abort.
+Search determinant.
+Search (subm (mat_swap_rows _ _ _)).
+...
 
 (* Laplace formulas *)
 
