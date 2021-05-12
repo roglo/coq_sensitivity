@@ -48,6 +48,14 @@ Fixpoint det_loop {n} (M : matrix n n T) i :=
 
 Definition determinant {n} (M : matrix n n T) := det_loop M n.
 
+Theorem fold_det_loop : ∀ n (M : matrix n n T) i,
+  (Σ (j = 0, i), minus_one_pow j * mat_el M 0 j * det_loop (subm M 0 j) i)%F =
+  det_loop M (S i).
+Proof. easy. Qed.
+
+Theorem fold_determinant : ∀ n (M : matrix n n T), det_loop M n = determinant M.
+Proof. easy. Qed.
+
 Definition mat_permut_rows_fun n (σ : nat → nat) (M : matrix n n T) :=
   mk_mat n n (λ i j, mat_el M (σ i) j).
 
@@ -1784,13 +1792,24 @@ destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
     easy.
   }
   cbn.
-...
+  remember (mat_swap_rows 0 1 M) as M'.
   erewrite rngl_summation_eq_compat. 2: {
-    intros j Hj.
+    intros i Hi.
+    rewrite minus_one_pow_succ; [ | easy ].
     rewrite <- subm_mat_swap_rows_0_1.
+    replace (mat_el M 1 i) with (mat_el (mat_swap_rows 0 1 M) 0 i) by easy.
+    rewrite <- HeqM'.
+    rewrite rngl_mul_opp_l; [ | easy ].
+    rewrite rngl_mul_opp_l; [ | easy ].
     easy.
   }
-  cbn.
+  cbn; subst M'.
+  rewrite <- rngl_opp_summation; [ | easy | easy ].
+  do 2 rewrite fold_det_loop.
+  do 2 rewrite fold_determinant.
+  rewrite determinant_alternating; try easy; [ | flia ].
+  now apply rngl_opp_involutive.
+}
 ...
 intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hlin.
 destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
