@@ -1749,6 +1749,22 @@ destruct (Nat.eq_dec (i + 1) 1) as [H| H]. {
 now destruct i.
 Qed.
 
+Theorem subm_mat_swap_rows_0_i : ∀ n (M : matrix n n T) i r,
+  subm (mat_swap_rows 0 i M) 0 r = (- minus_one_pow i × subm M i r)%M.
+Proof.
+intros.
+rename i into k.
+apply matrix_eq.
+intros i j Hi Hj; cbn.
+destruct (Nat.eq_dec (i + 1) k) as [H| H]. {
+...
+; [ flia H | clear H ].
+destruct (Nat.eq_dec (i + 1) 1) as [H| H]. {
+  now replace i with 0 by flia H.
+}
+now destruct i.
+...
+
 (* Laplace formulas *)
 
 Theorem laplace_formula_on_rows :
@@ -1778,6 +1794,45 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
 }
 move i before n.
 move Hiz after Hlin.
+(**)
+  unfold determinant.
+  destruct n; [ easy | cbn ].
+  rewrite Nat.sub_0_r at 1.
+  symmetry.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j Hj.
+    rewrite Nat.sub_0_r at 2.
+    rewrite rngl_mul_comm; [ | easy ].
+    rewrite rngl_mul_mul_swap; [ | easy ].
+    easy.
+  }
+  cbn.
+  remember (mat_swap_rows 0 i M) as M'.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j Hj.
+    rewrite minus_one_pow_add_r; [ | easy | easy ].
+replace (mat_el M i j) with (mat_el (mat_swap_rows 0 i M) 0 j) by easy.
+Check subm_mat_swap_rows_0_1.
+Check determinant_alternating.
+...
+subm_mat_swap_rows_0_i
+     : ∀ (n : nat) (M : matrix n n T) (i r : nat), subm (mat_swap_rows 0 i M) 0 r = - minus_one_pow i * subm M i r
+
+...
+    rewrite <- subm_mat_swap_rows_0_1.
+    replace (mat_el M 1 i) with (mat_el (mat_swap_rows 0 1 M) 0 i) by easy.
+    rewrite <- HeqM'.
+    rewrite rngl_mul_opp_l; [ | easy ].
+    rewrite rngl_mul_opp_l; [ | easy ].
+    easy.
+  }
+  cbn; subst M'.
+  rewrite <- rngl_opp_summation; [ | easy | easy ].
+  do 2 rewrite fold_det_loop.
+  do 2 rewrite fold_determinant.
+  rewrite determinant_alternating; try easy; [ | flia ].
+  now apply rngl_opp_involutive.
+...
 destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
   subst i; clear Hiz.
   unfold determinant.
