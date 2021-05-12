@@ -1749,6 +1749,7 @@ destruct (Nat.eq_dec (i + 1) 1) as [H| H]. {
 now destruct i.
 Qed.
 
+(*
 Theorem subm_mat_swap_rows_0_i : ∀ n (M : matrix n n T) i r,
   subm (mat_swap_rows 0 i M) 0 r = (- minus_one_pow i × subm M i r)%M.
 Proof.
@@ -1764,6 +1765,7 @@ destruct (Nat.eq_dec (i + 1) 1) as [H| H]. {
 }
 now destruct i.
 ...
+*)
 
 (* Laplace formulas *)
 
@@ -1812,6 +1814,20 @@ move Hiz after Hlin.
     intros j Hj.
     rewrite minus_one_pow_add_r; [ | easy | easy ].
 replace (mat_el M i j) with (mat_el (mat_swap_rows 0 i M) 0 j) by easy.
+do 2 rewrite <- rngl_mul_assoc.
+rewrite (rngl_mul_assoc (minus_one_pow j)).
+rewrite <- HeqM'.
+easy.
+}
+cbn; subst M'.
+rewrite <- rngl_mul_summation_distr_l; [ | now left ].
+rewrite fold_det_loop.
+rewrite fold_determinant.
+Check determinant_alternating.
+Check fold_det_loop.
+...
+M' = mat_swap_rows 0 i
+...
 Check subm_mat_swap_rows_0_1.
 Check determinant_alternating.
 ...
