@@ -1756,7 +1756,7 @@ Proof.
 intros.
 Search det_loop.
 Check fold_determinant.
-Admitted.
+...
 
 (* Laplace formulas *)
 
@@ -1837,7 +1837,7 @@ easy.
 }
 cbn.
 rewrite <- rngl_mul_summation_distr_l; [ | now left ].
-rewrite rngl_mul_
+now apply rngl_mul_opp_l.
 ...
 rewrite (rngl_mul_comm _ (- minus_one_pow i))%F.
 
