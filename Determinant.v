@@ -1753,13 +1753,14 @@ Qed.
 
 Theorem det_loop_subm_mat_swap_rows_0_i : ∀ n (M : matrix (S n) (S n) T) i j,
   det_loop (subm (mat_swap_rows 0 i M) 0 j) n =
-  (- minus_one_pow i * det_loop (subm M i j) n)%F.
+  (minus_one_pow i * det_loop (subm M i j) n)%F.
 Proof.
 intros.
 destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   subst i.
   rewrite mat_swap_same_rows.
   cbn.
+Admitted. (*
 ...
 intros.
 specialize (fold_determinant (subm M i j)) as H1.
@@ -1789,6 +1790,7 @@ Theorem laplace_formula_on_rows :
   → determinant M = Σ (j = 0, n - 1), mat_el M i j * mat_el (comatrix M) i j.
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hlin.
+...
 destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   subst i.
   unfold determinant.
@@ -1839,7 +1841,6 @@ cbn.
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
-...
 specialize det_loop_subm_mat_swap_rows_0_i as H1.
 specialize (H1 n M i j).
 cbn in H1.
