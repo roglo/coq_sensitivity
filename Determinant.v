@@ -1740,17 +1740,6 @@ destruct (Nat.eq_dec (i + 1) 1) as [H| H]. {
 now destruct i.
 Qed.
 
-Theorem mat_swap_same_rows : ∀ n (M : matrix n n T) i,
-  mat_swap_rows i i M = M.
-Proof.
-intros.
-rename i into k.
-apply matrix_eq.
-intros i j Hi Hj.
-unfold mat_swap_rows; cbn.
-destruct (Nat.eq_dec i k); [ now subst i | easy ].
-Qed.
-
 Theorem det_loop_subm_mat_swap_rows_0_i :
   rngl_has_opp = true →
   ∀ n (M : matrix (S n) (S n) T) i j,
