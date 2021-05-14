@@ -1720,15 +1720,6 @@ f_equal. {
 }
 Qed.
 
-Theorem glop1 : ∀ n (A : matrix n n T) i j,
-  subm (subm A i j) 0 0 = subm (subm A 0 0) (i - 1) (j - 1).
-Proof.
-intros.
-rewrite subm_subm_swap.
-unfold δ_lt.
-now destruct i, j.
-Qed.
-
 Definition swap_in_permut n i j k := vect_swap_elem (canon_permut n k) i j.
 
 (* comatrix *)
@@ -1749,10 +1740,27 @@ destruct (Nat.eq_dec (i + 1) 1) as [H| H]. {
 now destruct i.
 Qed.
 
+Theorem mat_swap_same_rows : ∀ n (M : matrix n n T) i,
+  mat_swap_rows i i M = M.
+Proof.
+intros.
+rename i into k.
+apply matrix_eq.
+intros i j Hi Hj.
+unfold mat_swap_rows; cbn.
+destruct (Nat.eq_dec i k); [ now subst i | easy ].
+Qed.
+
 Theorem det_loop_subm_mat_swap_rows_0_i : ∀ n (M : matrix (S n) (S n) T) i j,
   det_loop (subm (mat_swap_rows 0 i M) 0 j) n =
   (- minus_one_pow i * det_loop (subm M i j) n)%F.
 Proof.
+intros.
+destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+  subst i.
+  rewrite mat_swap_same_rows.
+  cbn.
+...
 intros.
 specialize (fold_determinant (subm M i j)) as H1.
 rewrite Nat_sub_succ_1 in H1 at 2.
@@ -1761,8 +1769,10 @@ specialize (fold_determinant (subm (mat_swap_rows 0 i M) 0 j)) as H1.
 rewrite Nat_sub_succ_1 in H1 at 2.
 rewrite H1; clear H1.
 Search determinant.
+Search det_loop.
 Search (subm (mat_swap_rows _ _ _)).
 ...
+*)
 
 (* Laplace formulas *)
 
