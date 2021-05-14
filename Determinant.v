@@ -1751,30 +1751,29 @@ unfold mat_swap_rows; cbn.
 destruct (Nat.eq_dec i k); [ now subst i | easy ].
 Qed.
 
-Theorem det_loop_subm_mat_swap_rows_0_i : ∀ n (M : matrix (S n) (S n) T) i j,
-  det_loop (subm (mat_swap_rows 0 i M) 0 j) n =
-  (minus_one_pow i * det_loop (subm M i j) n)%F.
+Theorem det_loop_subm_mat_swap_rows_0_i :
+  rngl_has_opp = true →
+  ∀ n (M : matrix (S n) (S n) T) i j,
+  i ≠ 0
+  → det_loop (subm (mat_swap_rows 0 i M) 0 j) n =
+    (- minus_one_pow i * det_loop (subm M i j) n)%F.
 Proof.
-intros.
-destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
-  subst i.
-  rewrite mat_swap_same_rows.
-  cbn; symmetry.
-  apply rngl_mul_1_l.
-}
+intros Hop * Hiz.
 destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
   subst i.
   cbn.
-  specialize (fold_determinant (subm M 1 j)) as H1.
-  rewrite Nat_sub_succ_1 in H1 at 2.
-  cbn in H1.
-  rewrite H1; clear H1.
-  specialize (fold_determinant (subm (mat_swap_rows 0 1 M) 0 j)) as H1.
-  rewrite Nat_sub_succ_1 in H1 at 2.
-  cbn in H1.
-  rewrite H1; clear H1.
-  rewrite Nat.sub_0_r at 2 4.
-  rewrite subm_mat_swap_rows_0_1.
+  rewrite rngl_opp_involutive; [ | easy ].
+  rewrite rngl_mul_1_l.
+  now rewrite subm_mat_swap_rows_0_1.
+}
+destruct (Nat.eq_dec i 2) as [Hi2| Hi2]. {
+  subst i.
+  cbn.
+  rewrite rngl_mul_opp_l; [ | easy ].
+  rewrite rngl_mul_1_l.
+...
+  now rewrite subm_mat_swap_rows_0_1.
+}
 ...
 intros.
 specialize (fold_determinant (subm M i j)) as H1.
