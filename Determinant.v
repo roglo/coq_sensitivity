@@ -1727,11 +1727,12 @@ Definition swap_in_permut n i j k := vect_swap_elem (canon_permut n k) i j.
 Definition comatrix {n} (M : matrix n n T) : matrix n n T :=
   {| mat_el i j := (minus_one_pow (i + j) * determinant (subm M i j))%F |}.
 
-Theorem subm_mat_swap_rows_0_1 : ∀ n (M : matrix n n T) r,
-  subm (mat_swap_rows 0 1 M) 0 r = subm M 1 r.
+Theorem subm_mat_swap_rows_0_1 : ∀ n (M : matrix n n T) j,
+  subm (mat_swap_rows 0 1 M) 0 j = subm M 1 j.
 Proof.
 intros.
 apply matrix_eq.
+rename j into k.
 intros i j Hi Hj; cbn.
 destruct (Nat.eq_dec (i + 1) 0) as [H| H]; [ flia H | clear H ].
 destruct (Nat.eq_dec (i + 1) 1) as [H| H]. {
@@ -1739,6 +1740,17 @@ destruct (Nat.eq_dec (i + 1) 1) as [H| H]. {
 }
 now destruct i.
 Qed.
+
+Theorem subm_mat_swap_rows_lt : ∀ n (M : matrix n n T) p q r j,
+  p < r
+  → q < r
+  → subm (mat_swap_rows p q M) r j = subm (mat_swap_rows r j M) p q.
+Proof.
+intros * Hp Hq.
+apply matrix_eq.
+rename j into k.
+intros i j Hi Hj; cbn.
+...
 
 Theorem det_loop_subm_mat_swap_rows_0_i :
   rngl_has_opp = true →
@@ -1760,6 +1772,16 @@ destruct (Nat.eq_dec i 2) as [Hi2| Hi2]. {
   cbn.
   rewrite rngl_mul_opp_l; [ | easy ].
   rewrite rngl_mul_1_l.
+  specialize (fold_determinant (subm M 2 j)) as H1.
+  rewrite Nat_sub_succ_1 in H1 at 2.
+  cbn - [ determinant ] in H1.
+  rewrite H1; clear H1.
+  rewrite <- determinant_alternating with (p := 0) (q := 1).
+  unfold determinant.
+Search mat_swap_rows.
+Search subm.
+Check subm_mat_swap_rows_0_1.
+Search (subm (mat_swap_rows _ _ _)).
 ...
   now rewrite subm_mat_swap_rows_0_1.
 }
