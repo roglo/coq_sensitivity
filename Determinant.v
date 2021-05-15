@@ -1744,13 +1744,56 @@ Qed.
 Theorem subm_mat_swap_rows_lt : ∀ n (M : matrix n n T) p q r j,
   p < r
   → q < r
-  → subm (mat_swap_rows p q M) r j = subm (mat_swap_rows r j M) p q.
+  → subm (mat_swap_rows p q M) r j = mat_swap_rows p q (subm M r j).
 Proof.
 intros * Hp Hq.
 apply matrix_eq.
 rename j into k.
 intros i j Hi Hj; cbn.
-...
+destruct (Nat.eq_dec (i + Nat.b2n (r <=? i)) p) as [H1| H1]. {
+  remember (r <=? i) as b eqn:Hb1; symmetry in Hb1.
+  destruct b; cbn in H1. {
+    apply Nat.leb_le in Hb1.
+    flia Hp Hb1 H1.
+  }
+  apply Nat.leb_nle in Hb1.
+  rewrite Nat.add_0_r in H1; subst i; clear Hb1.
+  rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
+  remember (r <=? q) as b eqn:Hb1; symmetry in Hb1.
+  destruct b; cbn. {
+    apply Nat.leb_le in Hb1; flia Hq Hb1.
+  }
+  now rewrite Nat.add_0_r.
+}
+destruct (Nat.eq_dec (i + Nat.b2n (r <=? i)) q) as [H2| H2]. {
+  remember (r <=? i) as b eqn:Hb1; symmetry in Hb1.
+  destruct b; cbn in H2. {
+    apply Nat.leb_le in Hb1.
+    flia Hq Hb1 H2.
+  }
+  cbn in H1; rewrite Nat.add_0_r in H1, H2.
+  subst i; clear Hb1.
+  rewrite <- (if_eqb_eq_dec q q), Nat.eqb_refl.
+  destruct (Nat.eq_dec q p) as [H| H]; [ easy | clear H ].
+  remember (r <=? p) as b eqn:Hb1; symmetry in Hb1.
+  destruct b; [ | now rewrite Nat.add_0_r ].
+  apply Nat.leb_le in Hb1.
+  flia Hp Hb1.
+}
+destruct (Nat.eq_dec i p) as [H3| H3]. {
+  subst i.
+  apply Nat.nle_gt, Nat.leb_nle in Hp.
+  rewrite Hp in H1; cbn in H1.
+  now rewrite Nat.add_0_r in H1.
+}
+destruct (Nat.eq_dec i q) as [H4| H4]. {
+  subst i.
+  apply Nat.nle_gt, Nat.leb_nle in Hq.
+  rewrite Hq in H2; cbn in H2.
+  now rewrite Nat.add_0_r in H2.
+}
+easy.
+Qed.
 
 Theorem det_loop_subm_mat_swap_rows_0_i :
   rngl_has_opp = true →
@@ -1782,6 +1825,9 @@ Search mat_swap_rows.
 Search subm.
 Check subm_mat_swap_rows_0_1.
 Search (subm (mat_swap_rows _ _ _)).
+Inspect 1.
+...
+rewrite subm_mat_swap_rows_lt.
 ...
   now rewrite subm_mat_swap_rows_0_1.
 }
