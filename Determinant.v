@@ -1741,6 +1741,32 @@ destruct (Nat.eq_dec (i + 1) 1) as [H| H]. {
 now destruct i.
 Qed.
 
+Theorem subm_mat_swap_rows_012 : ∀ n (M : matrix n n T) j,
+  subm (mat_swap_rows 0 2 M) 0 j = subm (mat_swap_rows 0 1 M) 2 j.
+Proof.
+intros.
+apply matrix_eq.
+rename j into k.
+intros i j Hi Hj.
+cbn - [ "<=?" ].
+replace (0 <=? i) with true by easy.
+cbn - [ "<=?" ].
+destruct (Nat.eq_dec (i + 1) 0) as [H| H]; [ flia H | clear H ].
+destruct (Nat.eq_dec (i + 1) 2) as [H1| H1]. {
+  now replace i with 1 by flia H1.
+}
+destruct (Nat.eq_dec i 0) as [Hiz| Hiz]; [ now subst i | ].
+destruct (Nat.eq_dec (i + Nat.b2n (2 <=? i)) 0) as [H| H]; [ flia Hiz H | ].
+clear H.
+destruct (Nat.eq_dec (i + Nat.b2n (2 <=? i)) 1) as [H| H]. {
+  flia H1 Hiz H.
+}
+clear H.
+assert (H : 2 ≤ i) by flia H1 Hiz.
+apply Nat.leb_le in H.
+now rewrite H.
+Qed.
+
 Theorem subm_mat_swap_rows_lt : ∀ n (M : matrix n n T) p q r j,
   p < r
   → q < r
@@ -1837,22 +1863,9 @@ destruct (Nat.eq_dec i 2) as [Hi2| Hi2]. {
   specialize (H1 0 1 2 j Nat.lt_0_2 Nat.lt_1_2).
   cbn in H1.
   rewrite <- H1.
-...
-  now rewrite subm_mat_swap_rows_0_1.
+  now rewrite subm_mat_swap_rows_012.
 }
 ...
-intros.
-specialize (fold_determinant (subm M i j)) as H1.
-rewrite Nat_sub_succ_1 in H1 at 2.
-rewrite H1; clear H1.
-specialize (fold_determinant (subm (mat_swap_rows 0 i M) 0 j)) as H1.
-rewrite Nat_sub_succ_1 in H1 at 2.
-rewrite H1; clear H1.
-Search determinant.
-Search det_loop.
-Search (subm (mat_swap_rows _ _ _)).
-...
-*)
 
 (* Laplace formulas *)
 
