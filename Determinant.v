@@ -1796,13 +1796,20 @@ easy.
 Qed.
 
 Theorem det_loop_subm_mat_swap_rows_0_i :
-  rngl_has_opp = true →
+ rngl_is_comm = true →
+ rngl_has_opp = true →
+ rngl_has_inv = true →
+ rngl_is_integral = true →
+ rngl_has_1_neq_0 = true →
+ rngl_has_dec_eq = true →
+ rngl_characteristic = 0 →
   ∀ n (M : matrix (S n) (S n) T) i j,
-  i ≠ 0
+  2 ≤ n
+  → i ≠ 0
   → det_loop (subm (mat_swap_rows 0 i M) 0 j) n =
     (- minus_one_pow i * det_loop (subm M i j) n)%F.
 Proof.
-intros Hop * Hiz.
+intros Hic Hop Hin Hit H10 Hde Hch * H2n Hiz.
 destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
   subst i.
   cbn.
@@ -1819,7 +1826,11 @@ destruct (Nat.eq_dec i 2) as [Hi2| Hi2]. {
   rewrite Nat_sub_succ_1 in H1 at 2.
   cbn - [ determinant ] in H1.
   rewrite H1; clear H1.
-  rewrite <- determinant_alternating with (p := 0) (q := 1).
+  rewrite <- determinant_alternating with (p := 0) (q := 1); try easy. 2: {
+    flia H2n.
+  } 2: {
+    flia H2n.
+  }
   unfold determinant.
   rewrite Nat.sub_0_r at 4.
   specialize (subm_mat_swap_rows_lt M) as H1.
