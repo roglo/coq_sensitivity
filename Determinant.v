@@ -1821,13 +1821,11 @@ destruct (Nat.eq_dec i 2) as [Hi2| Hi2]. {
   rewrite H1; clear H1.
   rewrite <- determinant_alternating with (p := 0) (q := 1).
   unfold determinant.
-Search mat_swap_rows.
-Search subm.
-Check subm_mat_swap_rows_0_1.
-Search (subm (mat_swap_rows _ _ _)).
-Inspect 1.
-...
-rewrite subm_mat_swap_rows_lt.
+  rewrite Nat.sub_0_r at 4.
+  specialize (subm_mat_swap_rows_lt M) as H1.
+  specialize (H1 0 1 2 j Nat.lt_0_2 Nat.lt_1_2).
+  cbn in H1.
+  rewrite <- H1.
 ...
   now rewrite subm_mat_swap_rows_0_1.
 }
