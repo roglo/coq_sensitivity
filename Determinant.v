@@ -1830,14 +1830,12 @@ Theorem det_loop_subm_mat_swap_rows_0_i :
  rngl_has_dec_eq = true →
  rngl_characteristic = 0 →
   ∀ n (M : matrix (S n) (S n) T) i j,
-  2 ≤ n
-  → i ≠ 0
+  0 < i < n
   → det_loop (subm (mat_swap_rows 0 i M) 0 j) n =
     (- minus_one_pow i * det_loop (subm M i j) n)%F.
 Proof.
-intros Hic Hop Hin Hit H10 Hde Hch * H2n Hiz.
-(* perhaps I should rather replace the hyp H2n and Hiz by "i < n" *)
-...
+intros Hic Hop Hiv Hit H10 Hde Hch * (Hiz, Hin).
+apply Nat.neq_0_lt_0 in Hiz.
 destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
   subst i.
   cbn.
@@ -1855,9 +1853,9 @@ destruct (Nat.eq_dec i 2) as [Hi2| Hi2]. {
   cbn - [ determinant ] in H1.
   rewrite H1; clear H1.
   rewrite <- determinant_alternating with (p := 0) (q := 1); try easy. 2: {
-    flia H2n.
+    flia Hin.
   } 2: {
-    flia H2n.
+    flia Hin.
   }
   unfold determinant.
   rewrite Nat.sub_0_r at 4.
@@ -1878,12 +1876,14 @@ destruct (Nat.eq_dec i 3) as [Hi3| Hi3]. {
   rewrite H1; clear H1.
   rewrite <- rngl_opp_involutive; [ | easy ].
   rewrite <- determinant_alternating with (p := 0) (q := 1); try easy. 2: {
-    flia H2n.
+    flia Hin.
   } 2: {
-    flia H2n.
+    flia Hin.
   }
   rewrite <- determinant_alternating with (p := 1) (q := 2); try easy. 2: {
-    flia H2n.
+    flia Hin.
+  } 2: {
+    flia Hin.
   }
 ...
 
