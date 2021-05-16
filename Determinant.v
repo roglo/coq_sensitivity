@@ -1836,6 +1836,8 @@ Theorem det_loop_subm_mat_swap_rows_0_i :
     (- minus_one_pow i * det_loop (subm M i j) n)%F.
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * H2n Hiz.
+(* perhaps I should rather replace the hyp H2n and Hiz by "i < n" *)
+...
 destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
   subst i.
   cbn.
@@ -1865,6 +1867,24 @@ destruct (Nat.eq_dec i 2) as [Hi2| Hi2]. {
   rewrite <- H1.
   now rewrite subm_mat_swap_rows_012.
 }
+destruct (Nat.eq_dec i 3) as [Hi3| Hi3]. {
+  subst i.
+  cbn.
+  rewrite rngl_opp_involutive; [ | easy ].
+  rewrite rngl_mul_1_l.
+  specialize (fold_determinant (subm M 3 j)) as H1.
+  rewrite Nat_sub_succ_1 in H1 at 2.
+  cbn - [ determinant ] in H1.
+  rewrite H1; clear H1.
+  rewrite <- rngl_opp_involutive; [ | easy ].
+  rewrite <- determinant_alternating with (p := 0) (q := 1); try easy. 2: {
+    flia H2n.
+  } 2: {
+    flia H2n.
+  }
+  rewrite <- determinant_alternating with (p := 1) (q := 2); try easy. 2: {
+    flia H2n.
+  }
 ...
 
 (* Laplace formulas *)
