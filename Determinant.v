@@ -1859,11 +1859,12 @@ destruct (Nat.eq_dec i 2) as [Hi2| Hi2]. {
   }
   unfold determinant.
   rewrite Nat.sub_0_r at 4.
+  f_equal.
   specialize (subm_mat_swap_rows_lt M) as H1.
   specialize (H1 0 1 2 j Nat.lt_0_2 Nat.lt_1_2).
   cbn in H1.
   rewrite <- H1.
-  now rewrite subm_mat_swap_rows_012.
+  apply subm_mat_swap_rows_012.
 }
 destruct (Nat.eq_dec i 3) as [Hi3| Hi3]. {
   subst i.
@@ -1885,6 +1886,9 @@ destruct (Nat.eq_dec i 3) as [Hi3| Hi3]. {
   } 2: {
     flia Hin.
   }
+  unfold determinant.
+  rewrite Nat.sub_0_r at 5.
+  f_equal.
 ...
 
 (* Laplace formulas *)
