@@ -1910,7 +1910,8 @@ Theorem mat_el_circ_rot_rows_succ : ∀ n (M : matrix n n T) i j p,
          (seq 0 (p - 1)) M) (i + Nat.b2n (p <=? i)) j.
 Proof.
 intros * Hi1p.
-induction i. {
+revert p Hi1p.
+induction i; intros. {
   cbn.
   destruct (le_dec p 0) as [Hpz| Hpz]. {
     now apply Nat.le_0_r in Hpz; subst p; cbn.
@@ -1926,7 +1927,11 @@ induction i. {
   clear Hi1p.
   destruct p; [ easy | cbn ].
   clear Hpz.
-  induction p; [ easy | cbn ].
+  induction p; [ easy | ].
+  rewrite seq_S, fold_left_app; cbn.
+  apply IHp.
+}
+destruct p; [ easy | ].
 ...
 
 Theorem subm_mat_swap_rows_circ : ∀ n (M : matrix n n T) p q,
