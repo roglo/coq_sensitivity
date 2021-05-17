@@ -1727,6 +1727,17 @@ Definition swap_in_permut n i j k := vect_swap_elem (canon_permut n k) i j.
 Definition comatrix {n} (M : matrix n n T) : matrix n n T :=
   {| mat_el i j := (minus_one_pow (i + j) * determinant (subm M i j))%F |}.
 
+Theorem mat_swap_same_rows : ∀ n (M : matrix n n T) i,
+  mat_swap_rows i i M = M.
+Proof.
+intros.
+rename i into k.
+apply matrix_eq.
+intros i j Hi Hj.
+unfold mat_swap_rows; cbn.
+destruct (Nat.eq_dec i k); [ now subst i | easy ].
+Qed.
+
 Theorem subm_mat_swap_rows_0_1 : ∀ n (M : matrix n n T) j,
   subm (mat_swap_rows 0 1 M) 0 j = subm M 1 j.
 Proof.
@@ -1820,6 +1831,20 @@ Theorem subm_mat_swap_rows_0i : ∀ n (M : matrix n n T) i j,
   fold_left (λ t k, mat_swap_rows k (k + 1) t) (seq 0 (i - 1)) (subm M i j).
 Proof.
 intros.
+induction i. {
+  cbn; f_equal.
+  apply mat_swap_same_rows.
+}
+...
+Search (S _ - _).
+rewrite Nat.sub_succ_l.
+Search (seq _ (S _)).
+(* il semble que mon List_seq_succ_r s'appelle seq_S dans Coq *)
+rewrite seq_S.
+rewrite fold_left_app.
+cbn.
+cbn in IHi.
+rewrite <- IHi.
 ...
 subm_mat_swap_rows_0_1
      : ∀ (n : nat) (M : matrix n n T) (j : nat), subm (mat_swap_rows 0 1 M) 0 j = subm M 1 j
