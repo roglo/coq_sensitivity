@@ -1894,6 +1894,9 @@ destruct (Nat.eq_dec (i + 1) 0) as [H| H]; [ flia H | clear H ].
 destruct (Nat.eq_dec (i + 1) p) as [Hip| Hip]. {
   subst p.
   rewrite Nat.add_sub.
+  destruct (le_dec q j) as [Hqj| Hqj]. {
+    apply Nat.leb_le in Hqj; rewrite Hqj; cbn.
+    apply Nat.leb_le in Hqj.
 ...
 intros.
 revert j.
