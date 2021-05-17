@@ -1889,21 +1889,45 @@ now rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
 Qed.
 
 Theorem mat_el_circ_rot_rows : ∀ n (M : matrix n n T) i j,
-  i < n
-  → j < n
-  → mat_el M 0 j =
-     mat_el (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 i) M) i j.
+  mat_el M 0 j =
+    mat_el (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 i) M) i j.
 Proof.
-intros * Hi Hj.
-revert j Hj.
-induction i; intros; [ easy | ].
+intros.
+induction i; [ easy | ].
 rewrite seq_S.
 rewrite fold_left_app.
 cbn - [ mat_swap_rows ].
 rewrite Nat.add_1_r.
 rewrite mat_el_mat_swap_rows.
-apply IHi; [ flia Hi | easy ].
+apply IHi.
 Qed.
+
+Theorem mat_el_circ_rot_rows_succ : ∀ n (M : matrix n n T) i j p,
+  i + 1 ≠ p
+  → mat_el M (i + 1) j =
+    mat_el
+      (fold_left (λ (M' : matrix n n T) (k : nat), mat_swap_rows k (k + 1) M')
+         (seq 0 (p - 1)) M) (i + Nat.b2n (p <=? i)) j.
+Proof.
+intros * Hi1p.
+induction i. {
+  cbn.
+  destruct (le_dec p 0) as [Hpz| Hpz]. {
+    now apply Nat.le_0_r in Hpz; subst p; cbn.
+  }
+  apply Nat.leb_nle in Hpz; rewrite Hpz; cbn.
+  apply Nat.leb_nle in Hpz.
+  apply Nat.nle_gt in Hpz.
+  destruct p; [ easy | ].
+  rewrite Nat.sub_succ, Nat.sub_0_r.
+  clear Hpz.
+  cbn in Hi1p.
+  assert (Hpz : p ≠ 0) by flia Hi1p.
+  clear Hi1p.
+  destruct p; [ easy | cbn ].
+  clear Hpz.
+  induction p; [ easy | cbn ].
+...
 
 Theorem subm_mat_swap_rows_circ : ∀ n (M : matrix n n T) p q,
 (* i ≠ 0 → *)
@@ -1940,7 +1964,7 @@ destruct (Nat.eq_dec (i + 1) p) as [Hip| Hip]. {
   assert (H : ¬ (i + 1 ≤ i)) by flia.
   apply Nat.leb_nle in H; rewrite H; clear H; cbn.
   rewrite Nat.add_0_r.
-  apply mat_el_circ_rot_rows; [ flia Hi | easy ].
+  apply mat_el_circ_rot_rows.
 } {
 Check mat_el_circ_rot_rows.
 ...
