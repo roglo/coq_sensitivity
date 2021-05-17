@@ -1778,7 +1778,17 @@ intros i j Hi Hj.
 cbn - [ "<=?" ].
 remember (3 <=? i) as x.
 cbn; subst x.
-...
+destruct (Nat.eq_dec (i + 1) 0) as [H| H]; [ flia H | clear H ].
+destruct (Nat.eq_dec (i + 1) 3) as [Hi2| Hi2]. {
+  now replace i with 2 by flia Hi2.
+}
+destruct (Nat.eq_dec i 1) as [Hi1| Hi1]; [ now subst i | ].
+destruct (Nat.eq_dec i 2) as [H| H]; [ flia Hi2 H | clear H ].
+destruct (Nat.eq_dec i 0) as [Hiz| Hiz]; [ now subst i | ].
+assert (H : 3 <= i) by flia Hiz Hi1 Hi2.
+apply Nat.leb_le in H.
+now rewrite H.
+Qed.
 
 Theorem subm_mat_swap_rows_lt : ∀ n (M : matrix n n T) p q r j,
   p < r
@@ -1902,6 +1912,8 @@ destruct (Nat.eq_dec i 3) as [Hi3| Hi3]. {
   unfold determinant.
   rewrite Nat.sub_0_r at 5.
   f_equal.
+  apply subm_mat_swap_rows_013.
+}
 ...
 
 (* Laplace formulas *)
