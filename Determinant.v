@@ -1879,15 +1879,18 @@ destruct (Nat.eq_dec i q) as [H4| H4]. {
 easy.
 Qed.
 
-Theorem subm_mat_swap_rows_0i : ∀ n (M : matrix n n T) i j,
+Theorem subm_mat_swap_rows_0i : ∀ n (M : matrix n n T) p q,
 (* i ≠ 0 → *)
-  subm (mat_swap_rows 0 i M) 0 j =
-  fold_left (λ t k, mat_swap_rows k (k + 1) t) (seq 0 (i - 1)) (subm M i j).
+  subm (mat_swap_rows 0 p M) 0 q =
+(**)
+  fold_left (λ t k, mat_swap_rows k (k + 1) t) (seq 0 (p - 1)) (subm M p q).
+(*
+  subm (fold_left (λ t k, mat_swap_rows k (k + 1) t) (seq 0 (p - 1)) M) p q.
+*)
 Proof.
 intros.
+...
 apply matrix_eq.
-rename i into p.
-rename j into q.
 intros i j Hi Hj.
 cbn.
 destruct (Nat.eq_dec (i + 1) 0) as [H| H]; [ flia H | clear H ].
