@@ -1942,6 +1942,7 @@ destruct (Nat.eq_dec (i + 1) p) as [Hip| Hip]. {
   rewrite Nat.add_0_r.
   apply mat_el_circ_rot_rows; [ flia Hi | easy ].
 } {
+Check mat_el_circ_rot_rows.
 ...
 intros.
 apply matrix_eq.
