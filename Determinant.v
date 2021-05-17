@@ -1790,6 +1790,30 @@ apply Nat.leb_le in H.
 now rewrite H.
 Qed.
 
+Theorem subm_mat_swap_rows_014 : ∀ n (M : matrix n n T) j,
+  subm (mat_swap_rows 0 4 M) 0 j =
+  mat_swap_rows 2 3 (mat_swap_rows 1 2 (mat_swap_rows 0 1 (subm M 4 j))).
+Proof.
+intros.
+apply matrix_eq.
+rename j into k.
+intros i j Hi Hj.
+cbn - [ "<=?" ].
+remember (4 <=? i) as x.
+cbn; subst x.
+destruct (Nat.eq_dec (i + 1) 0) as [H| H]; [ flia H | clear H ].
+destruct (Nat.eq_dec (i + 1) 4) as [Hi3| Hi3]. {
+  now replace i with 3 by flia Hi3.
+}
+destruct (Nat.eq_dec i 3) as [H| H]; [ flia Hi3 H | clear H ].
+destruct (Nat.eq_dec i 2) as [Hi2| Hi2]; [ now subst i | ].
+destruct (Nat.eq_dec i 1) as [Hi1| Hi1]; [ now subst i | ].
+destruct (Nat.eq_dec i 0) as [Hiz| Hiz]; [ now subst i | ].
+assert (H : 4 <= i) by flia Hiz Hi1 Hi2 Hi3.
+apply Nat.leb_le in H.
+now rewrite H.
+Qed.
+
 Theorem subm_mat_swap_rows_lt : ∀ n (M : matrix n n T) p q r j,
   p < r
   → q < r
@@ -1913,6 +1937,36 @@ destruct (Nat.eq_dec i 3) as [Hi3| Hi3]. {
   rewrite Nat.sub_0_r at 5.
   f_equal.
   apply subm_mat_swap_rows_013.
+}
+destruct (Nat.eq_dec i 4) as [Hi4| Hi4]. {
+  subst i.
+  cbn.
+  rewrite rngl_mul_opp_l; [ | easy ].
+  rewrite rngl_mul_1_l.
+  specialize (fold_determinant (subm M 4 j)) as H1.
+  rewrite Nat_sub_succ_1 in H1 at 2.
+  cbn - [ determinant ] in H1.
+  rewrite H1; clear H1.
+  rewrite <- rngl_opp_involutive; [ | easy ].
+  rewrite <- determinant_alternating with (p := 0) (q := 1); try easy. 2: {
+    flia Hin.
+  } 2: {
+    flia Hin.
+  }
+  rewrite <- determinant_alternating with (p := 1) (q := 2); try easy. 2: {
+    flia Hin.
+  } 2: {
+    flia Hin.
+  }
+  rewrite <- determinant_alternating with (p := 2) (q := 3); try easy. 2: {
+    flia Hin.
+  } 2: {
+    flia Hin.
+  }
+  unfold determinant.
+  rewrite Nat.sub_0_r at 6.
+  f_equal.
+  apply subm_mat_swap_rows_014.
 }
 ...
 
