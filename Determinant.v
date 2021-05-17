@@ -1879,15 +1879,54 @@ destruct (Nat.eq_dec i q) as [H4| H4]. {
 easy.
 Qed.
 
+Theorem mat_el_circ_rot_rows : ∀ n (M : matrix n n T) i j,
+  i < n
+  → j < n
+  → mat_el M 0 j =
+     mat_el (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 i) M) i j.
+Proof.
+intros * Hi Hj.
+...
+
 Theorem subm_mat_swap_rows_circ : ∀ n (M : matrix n n T) p q,
 (* i ≠ 0 → *)
   subm (mat_swap_rows 0 p M) 0 q =
-(**)
-  fold_left (λ t k, mat_swap_rows k (k + 1) t) (seq 0 (p - 1)) (subm M p q).
 (*
-  subm (fold_left (λ t k, mat_swap_rows k (k + 1) t) (seq 0 (p - 1)) M) p q.
+  fold_left (λ t k, mat_swap_rows k (k + 1) t) (seq 0 (p - 1)) (subm M p q).
 *)
+  subm (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 (p - 1)) M) p q.
+(**)
 Proof.
+intros.
+apply matrix_eq.
+intros i j Hi Hj.
+cbn.
+destruct (Nat.eq_dec (i + 1) 0) as [H| H]; [ flia H | clear H ].
+destruct (Nat.eq_dec (i + 1) p) as [Hip| Hip]. {
+  subst p.
+  rewrite Nat.add_sub.
+  assert (H : ¬ (i + 1 ≤ i)) by flia.
+  apply Nat.leb_nle in H; rewrite H; clear H; cbn.
+  rewrite Nat.add_0_r.
+  remember (j + Nat.b2n (q <=? j)) as k eqn:Hk.
+  assert (H : k < n). {
+    destruct (le_dec q j) as [Hqj| Hqj]. {
+      apply Nat.leb_le in Hqj; rewrite Hqj in Hk.
+      cbn in Hk.
+      flia Hj Hk.
+    } {
+      apply Nat.leb_nle in Hqj; rewrite Hqj in Hk.
+      cbn in Hk.
+      flia Hj Hk.
+    }
+  }
+  clear q j Hj Hk.
+  rename k into j; move j before i.
+  rename H into Hj.
+...
+  apply mat_el_circ_rot_rows; [ flia Hi | easy ].
+}
+...
 intros.
 apply matrix_eq.
 intros i j Hi Hj.
