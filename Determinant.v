@@ -1879,6 +1879,15 @@ destruct (Nat.eq_dec i q) as [H4| H4]. {
 easy.
 Qed.
 
+Theorem mat_el_mat_swap_rows : ∀ n (M : matrix n n T) p q j,
+  mat_el (mat_swap_rows p q M) q j = mat_el M p j.
+Proof.
+intros.
+cbn.
+destruct (Nat.eq_dec q p) as [Hqp| Hqp]; [ now subst q | ].
+now rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
+Qed.
+
 Theorem mat_el_circ_rot_rows : ∀ n (M : matrix n n T) i j,
   i < n
   → j < n
@@ -1886,7 +1895,15 @@ Theorem mat_el_circ_rot_rows : ∀ n (M : matrix n n T) i j,
      mat_el (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 i) M) i j.
 Proof.
 intros * Hi Hj.
-...
+revert j Hj.
+induction i; intros; [ easy | ].
+rewrite seq_S.
+rewrite fold_left_app.
+cbn - [ mat_swap_rows ].
+rewrite Nat.add_1_r.
+rewrite mat_el_mat_swap_rows.
+apply IHi; [ flia Hi | easy ].
+Qed.
 
 Theorem subm_mat_swap_rows_circ : ∀ n (M : matrix n n T) p q,
 (* i ≠ 0 → *)
@@ -1902,30 +1919,29 @@ apply matrix_eq.
 intros i j Hi Hj.
 cbn.
 destruct (Nat.eq_dec (i + 1) 0) as [H| H]; [ flia H | clear H ].
+remember (j + Nat.b2n (q <=? j)) as k eqn:Hk.
+assert (H : k < n). {
+  destruct (le_dec q j) as [Hqj| Hqj]. {
+    apply Nat.leb_le in Hqj; rewrite Hqj in Hk.
+    cbn in Hk.
+    flia Hj Hk.
+  } {
+    apply Nat.leb_nle in Hqj; rewrite Hqj in Hk.
+    cbn in Hk.
+    flia Hj Hk.
+  }
+}
+clear q j Hj Hk.
+rename k into j; move j before i.
+rename H into Hj.
 destruct (Nat.eq_dec (i + 1) p) as [Hip| Hip]. {
   subst p.
   rewrite Nat.add_sub.
   assert (H : ¬ (i + 1 ≤ i)) by flia.
   apply Nat.leb_nle in H; rewrite H; clear H; cbn.
   rewrite Nat.add_0_r.
-  remember (j + Nat.b2n (q <=? j)) as k eqn:Hk.
-  assert (H : k < n). {
-    destruct (le_dec q j) as [Hqj| Hqj]. {
-      apply Nat.leb_le in Hqj; rewrite Hqj in Hk.
-      cbn in Hk.
-      flia Hj Hk.
-    } {
-      apply Nat.leb_nle in Hqj; rewrite Hqj in Hk.
-      cbn in Hk.
-      flia Hj Hk.
-    }
-  }
-  clear q j Hj Hk.
-  rename k into j; move j before i.
-  rename H into Hj.
-...
   apply mat_el_circ_rot_rows; [ flia Hi | easy ].
-}
+} {
 ...
 intros.
 apply matrix_eq.
