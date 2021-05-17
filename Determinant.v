@@ -1814,6 +1814,29 @@ apply Nat.leb_le in H.
 now rewrite H.
 Qed.
 
+Theorem subm_mat_swap_rows_0i : ∀ n (M : matrix n n T) i j,
+(* i ≠ 0 → *)
+  subm (mat_swap_rows 0 i M) 0 j =
+  fold_left (λ t k, mat_swap_rows k (k + 1) t) (seq 0 (i - 1)) (subm M i j).
+Proof.
+intros.
+...
+subm_mat_swap_rows_0_1
+     : ∀ (n : nat) (M : matrix n n T) (j : nat), subm (mat_swap_rows 0 1 M) 0 j = subm M 1 j
+subm_mat_swap_rows_012
+     : ∀ (n : nat) (M : matrix n n T) (j : nat), subm (mat_swap_rows 0 2 M) 0 j = subm (mat_swap_rows 0 1 M) 2 j
+subm_mat_swap_rows_013
+     : ∀ (n : nat) (M : matrix n n T) (j : nat),
+         subm (mat_swap_rows 0 3 M) 0 j = mat_swap_rows 1 2 (mat_swap_rows 0 1 (subm M 3 j))
+subm_mat_swap_rows_014
+     : ∀ (n : nat) (M : matrix n n T) (j : nat),
+         subm (mat_swap_rows 0 4 M) 0 j = mat_swap_rows 2 3 (mat_swap_rows 1 2 (mat_swap_rows 0 1 (subm M 4 j)))
+...
+  mat_swap_rows 2 3 (mat_swap_rows 1 2 (mat_swap_rows 0 1 (subm M i j))).
+...
+  det_loop (subm (mat_swap_rows 0 i M) 0 j) n = (- minus_one_pow i * det_loop (subm M i j) n)%F
+...
+
 Theorem subm_mat_swap_rows_lt : ∀ n (M : matrix n n T) p q r j,
   p < r
   → q < r
