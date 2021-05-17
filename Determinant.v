@@ -1879,7 +1879,7 @@ destruct (Nat.eq_dec i q) as [H4| H4]. {
 easy.
 Qed.
 
-Theorem subm_mat_swap_rows_0i : ∀ n (M : matrix n n T) p q,
+Theorem subm_mat_swap_rows_circ : ∀ n (M : matrix n n T) p q,
 (* i ≠ 0 → *)
   subm (mat_swap_rows 0 p M) 0 q =
 (**)
