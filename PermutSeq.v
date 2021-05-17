@@ -982,7 +982,7 @@ intros a n * Hp.
 symmetry.
 revert a Hp.
 induction n; intros; [ easy | ].
-rewrite List_seq_succ_r at 1.
+rewrite seq_S at 1.
 remember (permut_fun_inv a (S n) n) as i eqn:Hi.
 remember (seq 0 n) as s eqn:Hs.
 rewrite (List_seq_cut i); subst s. 2: {
@@ -1129,7 +1129,7 @@ destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
 }
 erewrite rngl_product_list_eq_compat. 2: {
   intros i Hi.
-  rewrite List_seq_succ_r.
+  rewrite seq_S.
   rewrite iter_list_app.
   unfold iter_list at 1; cbn.
   easy.
@@ -1137,7 +1137,7 @@ erewrite rngl_product_list_eq_compat. 2: {
 cbn - [ seq ].
 rewrite Nat.sub_0_r.
 rewrite rngl_product_list_mul_distr; [ | easy ].
-rewrite List_seq_succ_r.
+rewrite seq_S.
 rewrite iter_list_app.
 unfold iter_list at 1; cbn.
 rewrite IHn.
@@ -1166,7 +1166,7 @@ erewrite rngl_product_list_eq_compat. 2: {
   rewrite Nat.sub_succ.
   apply in_seq in Hi.
   replace (n - i) with (S (n - i - 1)) by flia Hnz Hn1 Hi.
-  rewrite List_seq_succ_r.
+  rewrite seq_S.
   replace (S i + (n - i - 1)) with n by flia Hnz Hn1 Hi.
   unfold iter_list.
   rewrite fold_left_app.

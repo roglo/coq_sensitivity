@@ -195,14 +195,6 @@ unfold iter_seq.
 now replace (S (b + len - 1) - b) with len by flia Hblen.
 Qed.
 
-Theorem List_seq_succ_r : ∀ sta len,
-  seq sta (S len) = seq sta len ++ [sta + len].
-Proof.
-intros.
-rewrite <- Nat.add_1_r.
-now rewrite seq_app.
-Qed.
-
 Theorem List_seq_cut : ∀ i sta len,
   i ∈ seq sta len
   → seq sta len = seq sta (i - sta) ++ [i] ++ seq (S i) (sta + len - S i).
@@ -274,8 +266,8 @@ remember (S k - b)%nat as len; clear Heqlen.
 clear k Hbk.
 revert b d.
 induction len; intros; [ easy | ].
-rewrite List_seq_succ_r; symmetry.
-rewrite List_seq_succ_r; symmetry.
+rewrite seq_S; symmetry.
+rewrite seq_S; symmetry.
 do 2 rewrite fold_left_app; cbn.
 now rewrite IHlen.
 Qed.
@@ -1737,7 +1729,7 @@ replace (S k - b) with (S len) by flia Hbk Hlen.
 replace k with (b + len) by flia Hbk Hlen.
 rewrite <- seq_shift.
 rewrite List_fold_left_map.
-rewrite List_seq_succ_r.
+rewrite seq_S.
 rewrite fold_left_app.
 cbn; f_equal.
 apply List_fold_left_ext_in.
@@ -1912,7 +1904,7 @@ remember (S e - b) as len.
 clear e Heqlen.
 revert b.
 induction len; intros; [ now apply inv_d | ].
-rewrite List_seq_succ_r; cbn.
+rewrite seq_S; cbn.
 rewrite fold_left_app; cbn.
 rewrite fold_left_app; cbn.
 rewrite <- IHlen.

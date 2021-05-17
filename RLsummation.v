@@ -170,7 +170,7 @@ replace k with (b + len - 1) by flia Hkb Hlen.
 clear Hlen Hkb.
 revert b.
 induction len; intros; [ easy | ].
-rewrite List_seq_succ_r at 1; cbn.
+rewrite seq_S at 1; cbn.
 rewrite fold_left_app; cbn.
 symmetry.
 rewrite fold_left_rngl_add_fun_from_0.
@@ -196,7 +196,7 @@ remember (S e - b) as n eqn:Hn.
 clear e Hn.
 revert b d.
 induction n; intros; [ easy | ].
-rewrite List_seq_succ_r.
+rewrite seq_S.
 do 2 rewrite fold_left_app; cbn.
 rewrite <- IHn.
 apply mul_add_distr_l.

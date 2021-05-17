@@ -1831,15 +1831,16 @@ Theorem subm_mat_swap_rows_0i : ∀ n (M : matrix n n T) i j,
   fold_left (λ t k, mat_swap_rows k (k + 1) t) (seq 0 (i - 1)) (subm M i j).
 Proof.
 intros.
-induction i. {
+revert j.
+induction i; intros j. {
   cbn; f_equal.
   apply mat_swap_same_rows.
 }
+Check seq_S.
 ...
 Search (S _ - _).
 rewrite Nat.sub_succ_l.
 Search (seq _ (S _)).
-(* il semble que mon List_seq_succ_r s'appelle seq_S dans Coq *)
 rewrite seq_S.
 rewrite fold_left_app.
 cbn.

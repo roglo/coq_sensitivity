@@ -303,7 +303,7 @@ induction len; intros. {
   now rewrite Nat.add_0_r, Nat.add_sub.
 }
 symmetry.
-rewrite List_seq_succ_r at 1.
+rewrite seq_S at 1.
 symmetry.
 remember (S len) as sl; cbn; subst sl.
 rewrite fold_left_app.
