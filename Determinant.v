@@ -1767,6 +1767,19 @@ apply Nat.leb_le in H.
 now rewrite H.
 Qed.
 
+Theorem subm_mat_swap_rows_013 : ∀ n (M : matrix n n T) j,
+  subm (mat_swap_rows 0 3 M) 0 j =
+  mat_swap_rows 1 2 (mat_swap_rows 0 1 (subm M 3 j)).
+Proof.
+intros.
+apply matrix_eq.
+rename j into k.
+intros i j Hi Hj.
+cbn - [ "<=?" ].
+remember (3 <=? i) as x.
+cbn; subst x.
+...
+
 Theorem subm_mat_swap_rows_lt : ∀ n (M : matrix n n T) p q r j,
   p < r
   → q < r
