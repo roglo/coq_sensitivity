@@ -1825,44 +1825,6 @@ apply Nat.leb_le in H.
 now rewrite H.
 Qed.
 
-Theorem subm_mat_swap_rows_0i : ∀ n (M : matrix n n T) i j,
-(* i ≠ 0 → *)
-  subm (mat_swap_rows 0 i M) 0 j =
-  fold_left (λ t k, mat_swap_rows k (k + 1) t) (seq 0 (i - 1)) (subm M i j).
-Proof.
-intros.
-revert j.
-induction i; intros j. {
-  cbn; f_equal.
-  apply mat_swap_same_rows.
-}
-Check seq_S.
-...
-Search (S _ - _).
-rewrite Nat.sub_succ_l.
-Search (seq _ (S _)).
-rewrite seq_S.
-rewrite fold_left_app.
-cbn.
-cbn in IHi.
-rewrite <- IHi.
-...
-subm_mat_swap_rows_0_1
-     : ∀ (n : nat) (M : matrix n n T) (j : nat), subm (mat_swap_rows 0 1 M) 0 j = subm M 1 j
-subm_mat_swap_rows_012
-     : ∀ (n : nat) (M : matrix n n T) (j : nat), subm (mat_swap_rows 0 2 M) 0 j = subm (mat_swap_rows 0 1 M) 2 j
-subm_mat_swap_rows_013
-     : ∀ (n : nat) (M : matrix n n T) (j : nat),
-         subm (mat_swap_rows 0 3 M) 0 j = mat_swap_rows 1 2 (mat_swap_rows 0 1 (subm M 3 j))
-subm_mat_swap_rows_014
-     : ∀ (n : nat) (M : matrix n n T) (j : nat),
-         subm (mat_swap_rows 0 4 M) 0 j = mat_swap_rows 2 3 (mat_swap_rows 1 2 (mat_swap_rows 0 1 (subm M 4 j)))
-...
-  mat_swap_rows 2 3 (mat_swap_rows 1 2 (mat_swap_rows 0 1 (subm M i j))).
-...
-  det_loop (subm (mat_swap_rows 0 i M) 0 j) n = (- minus_one_pow i * det_loop (subm M i j) n)%F
-...
-
 Theorem subm_mat_swap_rows_lt : ∀ n (M : matrix n n T) p q r j,
   p < r
   → q < r
@@ -1916,6 +1878,53 @@ destruct (Nat.eq_dec i q) as [H4| H4]. {
 }
 easy.
 Qed.
+
+Theorem subm_mat_swap_rows_0i : ∀ n (M : matrix n n T) i j,
+(* i ≠ 0 → *)
+  subm (mat_swap_rows 0 i M) 0 j =
+  fold_left (λ t k, mat_swap_rows k (k + 1) t) (seq 0 (i - 1)) (subm M i j).
+Proof.
+intros.
+apply matrix_eq.
+rename i into p.
+rename j into q.
+intros i j Hi Hj.
+cbn.
+destruct (Nat.eq_dec (i + 1) 0) as [H| H]; [ flia H | clear H ].
+destruct (Nat.eq_dec (i + 1) p) as [Hip| Hip]. {
+  subst p.
+  rewrite Nat.add_sub.
+...
+intros.
+revert j.
+induction i; intros j. {
+  cbn; f_equal.
+  apply mat_swap_same_rows.
+}
+...
+intros.
+destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+  subst i; cbn; f_equal.
+  apply mat_swap_same_rows.
+}
+destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
+  subst i; cbn.
+  apply subm_mat_swap_rows_0_1.
+}
+destruct (Nat.eq_dec i 2) as [Hi2| Hi2]. {
+  subst i; cbn.
+  rewrite subm_mat_swap_rows_012.
+  rewrite subm_mat_swap_rows_lt; [ easy | flia | flia ].
+}
+destruct (Nat.eq_dec i 3) as [Hi3| Hi3]. {
+  subst i; cbn.
+  now rewrite subm_mat_swap_rows_013.
+}
+destruct (Nat.eq_dec i 4) as [Hi4| Hi4]. {
+  subst i; cbn.
+  now rewrite subm_mat_swap_rows_014.
+}
+...
 
 Theorem det_loop_subm_mat_swap_rows_0_i :
  rngl_is_comm = true →
