@@ -1889,7 +1889,6 @@ Theorem subm_mat_swap_rows_circ : ∀ n (M : matrix n n T) p q,
 *)
 Proof.
 intros.
-...
 apply matrix_eq.
 intros i j Hi Hj.
 cbn.
