@@ -1909,14 +1909,28 @@ Theorem mat_el_circ_rot_rows_succ_1 : ∀ n (M : matrix n n T) i j p q,
       i j.
 Proof.
 intros * Hpi.
-revert i Hpi.
-induction q; intros; [ easy | ].
+induction q; [ easy | ].
 rewrite seq_S; cbn.
 rewrite fold_left_app; cbn.
 destruct (Nat.eq_dec i (p + q)) as [Hip| Hip]; [ flia Hpi Hip | ].
 destruct (Nat.eq_dec i (p + q + 1)) as [Hip1| Hip1]; [ flia Hpi Hip1 | ].
 apply IHq.
 flia Hpi Hip.
+Qed.
+
+Theorem mat_el_circ_rot_rows_outside : ∀ n (M : matrix n n T) i j p q,
+  i < p
+  → mat_el M i j =
+    mat_el (fold_left (λ M' k, mat_swap_rows k (k + 1) M')
+      (seq p q) M) i j.
+Proof.
+intros * Hip.
+induction q; [ easy | ].
+rewrite seq_S; cbn.
+rewrite fold_left_app; cbn.
+destruct (Nat.eq_dec i (p + q)) as [Hipq| Hipq]; [ flia Hip Hipq | ].
+destruct (Nat.eq_dec i (p + q + 1)) as [Hip1| Hip1]; [ flia Hip Hip1 | ].
+apply IHq.
 Qed.
 
 Theorem mat_swap_rows_comm : ∀ n (M : matrix n n T) p q,
@@ -1955,36 +1969,8 @@ rewrite <- cons_seq; cbn.
 rewrite <- mat_el_mat_swap_rows with (q := i).
 rewrite mat_swap_rows_comm.
 remember (mat_swap_rows i (i + 1) A) as B eqn:HB.
-Check mat_el_circ_rot_rows_succ_1.
-...
-rewrite <- mat_el_circ_rot_rows_succ_1.
-...
-assert (H : i + 1 < p) by flia Hi1p Hpi.
-...
-intros * Hi1p.
-revert p Hi1p.
-induction i; intros. {
-  cbn.
-  destruct (le_dec p 0) as [Hpz| Hpz]. {
-    now apply Nat.le_0_r in Hpz; subst p; cbn.
-  }
-  apply Nat.leb_nle in Hpz; rewrite Hpz; cbn.
-  apply Nat.leb_nle in Hpz.
-  apply Nat.nle_gt in Hpz.
-  destruct p; [ easy | ].
-  rewrite Nat.sub_succ, Nat.sub_0_r.
-  clear Hpz.
-  cbn in Hi1p.
-  assert (Hpz : p ≠ 0) by flia Hi1p.
-  clear Hi1p.
-  destruct p; [ easy | cbn ].
-  clear Hpz.
-  induction p; [ easy | ].
-  rewrite seq_S, fold_left_app; cbn.
-  apply IHp.
-}
-destruct p; [ easy | ].
-...
+apply mat_el_circ_rot_rows_outside; flia.
+Qed.
 
 Theorem subm_mat_swap_rows_circ : ∀ n (M : matrix n n T) p q,
 (* i ≠ 0 → *)
@@ -2023,49 +2009,12 @@ destruct (Nat.eq_dec (i + 1) p) as [Hip| Hip]. {
   rewrite Nat.add_0_r.
   apply mat_el_circ_rot_rows.
 } {
-Check mat_el_circ_rot_rows.
-...
-intros.
-apply matrix_eq.
-intros i j Hi Hj.
-cbn.
-destruct (Nat.eq_dec (i + 1) 0) as [H| H]; [ flia H | clear H ].
-destruct (Nat.eq_dec (i + 1) p) as [Hip| Hip]. {
-  subst p.
-  rewrite Nat.add_sub.
-  destruct (le_dec q j) as [Hqj| Hqj]. {
-    apply Nat.leb_le in Hqj; rewrite Hqj; cbn.
-    apply Nat.leb_le in Hqj.
-...
-intros.
-revert j.
-induction i; intros j. {
-  cbn; f_equal.
-  apply mat_swap_same_rows.
+  now apply mat_el_circ_rot_rows_succ.
 }
-...
-intros.
-destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
-  subst i; cbn; f_equal.
-  apply mat_swap_same_rows.
-}
-destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
-  subst i; cbn.
-  apply subm_mat_swap_rows_0_1.
-}
-destruct (Nat.eq_dec i 2) as [Hi2| Hi2]. {
-  subst i; cbn.
-  rewrite subm_mat_swap_rows_012.
-  rewrite subm_mat_swap_rows_lt; [ easy | flia | flia ].
-}
-destruct (Nat.eq_dec i 3) as [Hi3| Hi3]. {
-  subst i; cbn.
-  now rewrite subm_mat_swap_rows_013.
-}
-destruct (Nat.eq_dec i 4) as [Hi4| Hi4]. {
-  subst i; cbn.
-  now rewrite subm_mat_swap_rows_014.
-}
+Qed.
+
+Inspect 1.
+
 ...
 
 Theorem det_loop_subm_mat_swap_rows_0_i :
