@@ -1936,9 +1936,14 @@ apply Nat.leb_nle in Hpi; rewrite Hpi; cbn.
 rewrite Nat.add_0_r.
 apply Nat.leb_nle in Hpi.
 apply Nat.nle_gt in Hpi.
-...
+(*
+replace (p - 1) with ((p - i - 1) + i) by flia Hpi.
+rewrite seq_app, fold_left_app; cbn.
+*)
 replace (p - 1) with (i + (p - i - 1)) by flia Hpi.
 rewrite seq_app, fold_left_app; cbn.
+...
+rewrite <- mat_el_circ_rot_rows_succ_1.
 ...
 assert (H : i + 1 < p) by flia Hi1p Hpi.
 ...
