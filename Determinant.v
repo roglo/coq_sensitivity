@@ -1932,7 +1932,15 @@ destruct (le_dec p i) as [Hpi| Hpi]. {
   apply mat_el_circ_rot_rows_succ_1.
   apply Nat.leb_le in Hpi; cbn; flia Hpi.
 }
+apply Nat.leb_nle in Hpi; rewrite Hpi; cbn.
+rewrite Nat.add_0_r.
+apply Nat.leb_nle in Hpi.
 apply Nat.nle_gt in Hpi.
+...
+replace (p - 1) with (i + (p - i - 1)) by flia Hpi.
+rewrite seq_app, fold_left_app; cbn.
+...
+assert (H : i + 1 < p) by flia Hi1p Hpi.
 ...
 intros * Hi1p.
 revert p Hi1p.
