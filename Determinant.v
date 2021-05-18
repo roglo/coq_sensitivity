@@ -2028,8 +2028,58 @@ Theorem det_loop_subm_mat_swap_rows_0_i :
 Proof.
 intros Hic Hop Hiv Hit H10 Hde Hch * (Hiz, Hin).
 rewrite subm_mat_swap_rows_circ.
-Inspect 1.
-Search subm (mat_swap_rows _ _ _).
+destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
+  subst i.
+  cbn.
+  rewrite rngl_opp_involutive; [ | easy ].
+  now rewrite rngl_mul_1_l.
+}
+destruct (Nat.eq_dec i 2) as [Hi2| Hi2]. {
+  subst i.
+  cbn.
+  rewrite rngl_mul_opp_l; [ | easy ].
+  rewrite rngl_mul_1_l.
+  specialize (fold_determinant (subm M 2 j)) as H1.
+  rewrite Nat_sub_succ_1 in H1 at 2.
+  cbn - [ determinant ] in H1.
+  rewrite H1; clear H1.
+  rewrite <- determinant_alternating with (p := 0) (q := 1); try easy. 2: {
+    flia Hin.
+  } 2: {
+    flia Hin.
+  }
+  unfold determinant.
+  rewrite Nat.sub_0_r at 4.
+  f_equal.
+  apply subm_mat_swap_rows_lt; [ easy | flia ].
+}
+destruct (Nat.eq_dec i 3) as [Hi3| Hi3]. {
+  subst i.
+  cbn.
+  rewrite rngl_opp_involutive; [ | easy ].
+  rewrite rngl_mul_1_l.
+  specialize (fold_determinant (subm M 3 j)) as H1.
+  rewrite Nat_sub_succ_1 in H1 at 2.
+  cbn - [ determinant ] in H1.
+  rewrite H1; clear H1.
+  rewrite <- rngl_opp_involutive; [ | easy ].
+  rewrite <- determinant_alternating with (p := 0) (q := 1); try easy. 2: {
+    flia Hin.
+  } 2: {
+    flia Hin.
+  }
+  rewrite <- determinant_alternating with (p := 1) (q := 2); try easy. 2: {
+    flia Hin.
+  } 2: {
+    flia Hin.
+  }
+  unfold determinant.
+  rewrite Nat.sub_0_r at 5.
+  f_equal.
+Check subm_mat_swap_rows_013.
+...
+  apply subm_mat_swap_rows_013.
+}
 ...
 intros Hic Hop Hiv Hit H10 Hde Hch * (Hiz, Hin).
 apply Nat.neq_0_lt_0 in Hiz.
