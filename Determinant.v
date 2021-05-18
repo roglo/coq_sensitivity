@@ -1909,7 +1909,15 @@ Theorem mat_el_circ_rot_rows_succ_1 : ∀ n (M : matrix n n T) i j p,
       i j.
 Proof.
 intros * Hpi.
-...
+revert i Hpi.
+induction p; intros; [ easy | ].
+rewrite seq_S; cbn.
+rewrite fold_left_app; cbn.
+destruct (Nat.eq_dec i p) as [Hip| Hip]; [ flia Hpi Hip | ].
+destruct (Nat.eq_dec i (p + 1)) as [Hip1| Hip1]; [ flia Hpi Hip1 | ].
+apply IHp.
+flia Hpi Hip.
+Qed.
 
 Theorem mat_el_circ_rot_rows_succ : ∀ n (M : matrix n n T) i j p,
   i + 1 ≠ p
@@ -1922,9 +1930,9 @@ intros * Hi1p.
 destruct (le_dec p i) as [Hpi| Hpi]. {
   apply Nat.leb_le in Hpi; rewrite Hpi.
   apply mat_el_circ_rot_rows_succ_1.
-...
   apply Nat.leb_le in Hpi; cbn; flia Hpi.
 }
+apply Nat.nle_gt in Hpi.
 ...
 intros * Hi1p.
 revert p Hi1p.
