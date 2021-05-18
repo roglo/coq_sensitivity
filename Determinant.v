@@ -1905,7 +1905,7 @@ Qed.
 Theorem mat_el_circ_rot_rows_succ_1 : ∀ n (M : matrix n n T) i j p,
   p < i
   → mat_el M i j =
-    mat_el (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 (p - 1)) M)
+    mat_el (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 p) M)
       i j.
 Proof.
 intros * Hpi.
@@ -1921,8 +1921,8 @@ Proof.
 intros * Hi1p.
 destruct (le_dec p i) as [Hpi| Hpi]. {
   apply Nat.leb_le in Hpi; rewrite Hpi.
-...
   apply mat_el_circ_rot_rows_succ_1.
+...
   apply Nat.leb_le in Hpi; cbn; flia Hpi.
 }
 ...
