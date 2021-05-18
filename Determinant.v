@@ -1942,6 +1942,11 @@ rewrite seq_app, fold_left_app; cbn.
 *)
 replace (p - 1) with (i + (p - i - 1)) by flia Hpi.
 rewrite seq_app, fold_left_app; cbn.
+rewrite mat_el_circ_rot_rows_succ_1 with (p := 0) (q := i); [ | flia ].
+remember (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 i) M)
+  as A eqn:HA.
+replace (p - i - 1) with (S (p - i - 2)) by flia Hi1p Hpi.
+rewrite <- cons_seq; cbn.
 ...
 rewrite <- mat_el_circ_rot_rows_succ_1.
 ...
