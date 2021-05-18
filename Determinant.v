@@ -1902,20 +1902,20 @@ rewrite mat_el_mat_swap_rows.
 apply IHi.
 Qed.
 
-Theorem mat_el_circ_rot_rows_succ_1 : ∀ n (M : matrix n n T) i j p,
-  p < i
+Theorem mat_el_circ_rot_rows_succ_1 : ∀ n (M : matrix n n T) i j p q,
+  p + q < i
   → mat_el M i j =
-    mat_el (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 p) M)
+    mat_el (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq p q) M)
       i j.
 Proof.
 intros * Hpi.
 revert i Hpi.
-induction p; intros; [ easy | ].
+induction q; intros; [ easy | ].
 rewrite seq_S; cbn.
 rewrite fold_left_app; cbn.
-destruct (Nat.eq_dec i p) as [Hip| Hip]; [ flia Hpi Hip | ].
-destruct (Nat.eq_dec i (p + 1)) as [Hip1| Hip1]; [ flia Hpi Hip1 | ].
-apply IHp.
+destruct (Nat.eq_dec i (p + q)) as [Hip| Hip]; [ flia Hpi Hip | ].
+destruct (Nat.eq_dec i (p + q + 1)) as [Hip1| Hip1]; [ flia Hpi Hip1 | ].
+apply IHq.
 flia Hpi Hip.
 Qed.
 
