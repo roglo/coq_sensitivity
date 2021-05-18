@@ -2013,10 +2013,6 @@ destruct (Nat.eq_dec (i + 1) p) as [Hip| Hip]. {
 }
 Qed.
 
-Inspect 1.
-
-...
-
 Theorem det_loop_subm_mat_swap_rows_0_i :
  rngl_is_comm = true →
  rngl_has_opp = true →
@@ -2030,6 +2026,11 @@ Theorem det_loop_subm_mat_swap_rows_0_i :
   → det_loop (subm (mat_swap_rows 0 i M) 0 j) n =
     (- minus_one_pow i * det_loop (subm M i j) n)%F.
 Proof.
+intros Hic Hop Hiv Hit H10 Hde Hch * (Hiz, Hin).
+rewrite subm_mat_swap_rows_circ.
+Inspect 1.
+Search subm (mat_swap_rows _ _ _).
+...
 intros Hic Hop Hiv Hit H10 Hde Hch * (Hiz, Hin).
 apply Nat.neq_0_lt_0 in Hiz.
 destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
