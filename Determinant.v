@@ -1919,6 +1919,15 @@ apply IHq.
 flia Hpi Hip.
 Qed.
 
+Theorem mat_swap_rows_comm : ∀ n (M : matrix n n T) p q,
+  mat_swap_rows p q M = mat_swap_rows q p M.
+Proof.
+intros.
+apply matrix_eq.
+intros i j Hi Hj; cbn.
+now destruct (Nat.eq_dec i p), (Nat.eq_dec i q); subst.
+Qed.
+
 Theorem mat_el_circ_rot_rows_succ : ∀ n (M : matrix n n T) i j p,
   i + 1 ≠ p
   → mat_el M (i + 1) j =
@@ -1936,10 +1945,6 @@ apply Nat.leb_nle in Hpi; rewrite Hpi; cbn.
 rewrite Nat.add_0_r.
 apply Nat.leb_nle in Hpi.
 apply Nat.nle_gt in Hpi.
-(*
-replace (p - 1) with ((p - i - 1) + i) by flia Hpi.
-rewrite seq_app, fold_left_app; cbn.
-*)
 replace (p - 1) with (i + (p - i - 1)) by flia Hpi.
 rewrite seq_app, fold_left_app; cbn.
 rewrite mat_el_circ_rot_rows_succ_1 with (p := 0) (q := i); [ | flia ].
@@ -1947,6 +1952,10 @@ remember (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 i) M)
   as A eqn:HA.
 replace (p - i - 1) with (S (p - i - 2)) by flia Hi1p Hpi.
 rewrite <- cons_seq; cbn.
+rewrite <- mat_el_mat_swap_rows with (q := i).
+rewrite mat_swap_rows_comm.
+remember (mat_swap_rows i (i + 1) A) as B eqn:HB.
+Check mat_el_circ_rot_rows_succ_1.
 ...
 rewrite <- mat_el_circ_rot_rows_succ_1.
 ...
