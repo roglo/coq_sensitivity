@@ -1938,6 +1938,7 @@ Theorem det_loop_subm_mat_swap_rows_0_i :
   → det_loop (subm (mat_swap_rows 0 i M) 0 j) n =
     (- minus_one_pow i * det_loop (subm M i j) n)%F.
 Proof.
+(*
 intros Hic Hop Hiv Hit H10 Hde Hch * (Hiz, Hin).
 rewrite subm_mat_swap_rows_circ.
 apply Nat.neq_0_lt_0 in Hiz.
@@ -2008,6 +2009,7 @@ replace (S n - 1) with n at 4 by flia.
 rewrite <- subm_mat_swap_rows_lt; [ | flia | flia ].
 remember (mat_swap_rows i (S i) M) as M' eqn:HM'.
 ...
+*)
 intros Hic Hop Hiv Hit H10 Hde Hch * (Hiz, Hin).
 rewrite subm_mat_swap_rows_circ.
 destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
@@ -2016,80 +2018,52 @@ destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
   rewrite rngl_opp_involutive; [ | easy ].
   now rewrite rngl_mul_1_l.
 }
+specialize (fold_determinant (subm M i j)) as H1.
+rewrite Nat_sub_succ_1 in H1 at 2.
+rewrite H1; clear H1.
+rewrite rngl_mul_opp_l; [ | easy ].
+rewrite <- rngl_mul_opp_r; [ | easy ].
+rewrite <- determinant_alternating with (p := 0) (q := 1); try easy. 2: {
+  flia Hin.
+} 2: {
+  flia Hiz Hin.
+}
 destruct (Nat.eq_dec i 2) as [Hi2| Hi2]. {
-  subst i.
-  cbn.
-  rewrite rngl_mul_opp_l; [ | easy ].
+  subst i; cbn.
   rewrite rngl_mul_1_l.
-  specialize (fold_determinant (subm M 2 j)) as H1.
-  rewrite Nat_sub_succ_1 in H1 at 2.
-  cbn - [ determinant ] in H1.
-  rewrite H1; clear H1.
-  rewrite <- determinant_alternating with (p := 0) (q := 1); try easy. 2: {
-    flia Hin.
-  } 2: {
-    flia Hin.
-  }
-  unfold determinant.
   rewrite Nat.sub_0_r at 4.
   f_equal.
   apply subm_mat_swap_rows_lt; flia.
 }
+rewrite <- rngl_opp_involutive; [ | easy ].
+rewrite <- rngl_mul_opp_r; [ | easy ].
+rewrite <- determinant_alternating with (p := 1) (q := 2); try easy. 2: {
+  flia Hin Hiz.
+} 2: {
+  flia Hin Hiz Hi1.
+}
 destruct (Nat.eq_dec i 3) as [Hi3| Hi3]. {
-  subst i.
-  cbn.
+  subst i; cbn.
+  rewrite rngl_mul_opp_l; [ | easy ].
   rewrite rngl_opp_involutive; [ | easy ].
   rewrite rngl_mul_1_l.
-  specialize (fold_determinant (subm M 3 j)) as H1.
-  rewrite Nat_sub_succ_1 in H1 at 2.
-  cbn - [ determinant ] in H1.
-  rewrite H1; clear H1.
-  rewrite <- rngl_opp_involutive; [ | easy ].
-  rewrite <- determinant_alternating with (p := 0) (q := 1); try easy. 2: {
-    flia Hin.
-  } 2: {
-    flia Hin.
-  }
   rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
-  rewrite <- determinant_alternating with (p := 1) (q := 2); try easy. 2: {
-    flia Hin.
-  } 2: {
-    flia Hin.
-  }
   rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
-  unfold determinant.
   f_equal; symmetry.
   apply Nat.sub_0_r.
 }
+rewrite <- rngl_mul_opp_r; [ | easy ].
+rewrite <- determinant_alternating with (p := 2) (q := 3); try easy. 2: {
+  flia Hin Hiz Hi1.
+} 2: {
+  flia Hin Hiz Hi1 Hi2.
+}
 destruct (Nat.eq_dec i 4) as [Hi4| Hi4]. {
-  subst i.
-  cbn.
-  rewrite rngl_mul_opp_l; [ | easy ].
+  subst i; cbn.
   rewrite rngl_mul_1_l.
-  specialize (fold_determinant (subm M 4 j)) as H1.
-  rewrite Nat_sub_succ_1 in H1 at 2.
-  cbn - [ determinant ] in H1.
-  rewrite H1; clear H1.
-  rewrite <- rngl_opp_involutive; [ | easy ].
-  rewrite <- determinant_alternating with (p := 0) (q := 1); try easy. 2: {
-    flia Hin.
-  } 2: {
-    flia Hin.
-  }
   rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
-  rewrite <- determinant_alternating with (p := 1) (q := 2); try easy. 2: {
-    flia Hin.
-  } 2: {
-    flia Hin.
-  }
   rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
-  rewrite <- determinant_alternating with (p := 2) (q := 3); try easy. 2: {
-    flia Hin.
-  } 2: {
-    flia Hin.
-  }
   rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
-  unfold determinant.
   f_equal; symmetry.
   apply Nat.sub_0_r.
 }
