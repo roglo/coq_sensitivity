@@ -1885,6 +1885,60 @@ remember (mat_swap_rows i (i + 1) A) as B eqn:HB.
 apply mat_el_circ_rot_rows_outside; flia.
 Qed.
 
+Theorem subm_mat_swap_rows_succ_succ : ∀ n (M : matrix n n T) i j,
+  subm (mat_swap_rows (i + 1) (i + 2) (mat_swap_rows i (i + 1) M)) (S i) j =
+  subm (mat_swap_rows i (i + 1) M) (S (S i)) j.
+Proof.
+intros.
+apply matrix_eq.
+rename i into p; rename j into q.
+intros i j Hi Hj.
+cbn - [ "<=?" ].
+destruct (Nat.eq_dec (p + 2) p) as [H| H]; [ flia H | clear H ].
+destruct (Nat.eq_dec (p + 2) (p + 1)) as [H| H]; [ flia H | clear H ].
+destruct (Nat.eq_dec (p + 1) (p + 1)) as [H| H]; [ clear H | easy ].
+destruct (Nat.eq_dec (p + 1) p) as [H| H]; [ flia H | clear H ].
+destruct (le_dec (S p) i) as [Hspi| Hspi]. {
+  apply Nat.leb_le in Hspi; rewrite Hspi; cbn - [ "<=?" ].
+  apply Nat.leb_le in Hspi.
+  destruct (Nat.eq_dec (i + 1) (p + 1)) as [Hip| Hip]; [ flia Hspi Hip | ].
+  destruct (Nat.eq_dec (i + 1) (p + 2)) as [Hip2| Hip2]. {
+    destruct (le_dec (S (S p)) i) as [Hsspi| Hsspi]; [ flia Hsspi Hip2 | ].
+    apply Nat.leb_nle in Hsspi; rewrite Hsspi; cbn.
+    rewrite Nat.add_0_r.
+    destruct (Nat.eq_dec i p) as [H| H]; [ flia H Hip2 | clear H ].
+    destruct (Nat.eq_dec i (p + 1)) as [H| H]; [ clear H | flia Hip2 H ].
+    easy.
+  }
+  destruct (Nat.eq_dec (i + 1) p) as [H| H]; [ flia Hspi H | clear H ].
+  destruct (le_dec (S (S p)) i) as [Hsspi| Hsspi]. {
+    apply Nat.leb_le in Hsspi; rewrite Hsspi; cbn.
+    apply Nat.leb_le in Hsspi.
+    destruct (Nat.eq_dec (i + 1) p) as [H| H]; [ flia H Hsspi | clear H ].
+    destruct (Nat.eq_dec (i + 1) (p + 1)) as [H| H]; [ flia H Hspi | easy ].
+  }
+  flia Hspi Hip2 Hsspi.
+}
+apply Nat.leb_nle in Hspi; rewrite Hspi; cbn - [ "<=?" ].
+apply Nat.leb_nle in Hspi.
+rewrite Nat.add_0_r.
+destruct (Nat.eq_dec i (p + 1)) as [H| H]; [ flia H Hspi | clear H ].
+destruct (Nat.eq_dec i (p + 2)) as [H| H]; [ flia H Hspi | clear H ].
+destruct (Nat.eq_dec i p) as [Hip| Hip]. {
+  subst p.
+  destruct (le_dec (S (S i)) i) as [Hssi| Hssi]; [ flia Hssi | ].
+  apply Nat.leb_nle in Hssi; rewrite Hssi; cbn.
+  rewrite Nat.add_0_r.
+  now rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
+}
+destruct (le_dec (S (S p)) i) as [Hsspi| Hsspi]; [ flia Hspi Hsspi | ].
+apply Nat.leb_nle in Hsspi; rewrite Hsspi; cbn.
+apply Nat.leb_nle in Hsspi.
+rewrite Nat.add_0_r.
+destruct (Nat.eq_dec i p) as [H| H]; [ flia H Hip | clear H ].
+destruct (Nat.eq_dec i (p + 1)) as [H| H]; [ flia H Hspi | easy ].
+Qed.
+
 Theorem subm_mat_swap_rows_circ : ∀ n (M : matrix n n T) p q,
   subm (mat_swap_rows 0 p M) 0 q =
 (*
@@ -2033,31 +2087,7 @@ rewrite <- rngl_mul_opp_r; [ | easy ].
 rewrite <- determinant_alternating with (p := i) (q := i + 1); try easy;
   cycle 1; [ flia | flia Hin | flia Hin | ].
 rewrite <- subm_mat_swap_rows_lt; [ | flia | flia ].
-replace (subm (mat_swap_rows i (i + 1) M) (S (S i)) j) with
-  (subm (mat_swap_rows (i + 1) (i + 2) (mat_swap_rows i (i + 1) M))
-     (S i) j). 2: {
-  apply matrix_eq.
-  rename i into p; rename j into q.
-  intros i j Hi Hj.
-  cbn - [ "<=?" ].
-  destruct (Nat.eq_dec (p + 2) p) as [H| H]; [ flia H | clear H ].
-  destruct (Nat.eq_dec (p + 2) (p + 1)) as [H| H]; [ flia H | clear H ].
-  destruct (Nat.eq_dec (p + 1) (p + 1)) as [H| H]; [ clear H | easy ].
-  destruct (Nat.eq_dec (p + 1) p) as [H| H]; [ flia H | clear H ].
-  destruct (le_dec (S p) i) as [Hspi| Hspi]. {
-    apply Nat.leb_le in Hspi; rewrite Hspi; cbn - [ "<=?" ].
-    apply Nat.leb_le in Hspi.
-    destruct (Nat.eq_dec (i + 1) (p + 1)) as [Hip| Hip]; [ flia Hspi Hip | ].
-    destruct (Nat.eq_dec (i + 1) (p + 2)) as [Hip2| Hip2]. {
-      destruct (le_dec (S (S p)) i) as [Hsspi| Hsspi]; [ flia Hsspi Hip2 | ].
-      apply Nat.leb_nle in Hsspi; rewrite Hsspi; cbn.
-      rewrite Nat.add_0_r.
-      destruct (Nat.eq_dec i p) as [H| H]; [ flia H Hip2 | clear H ].
-      destruct (Nat.eq_dec i (p + 1)) as [H| H]; [ clear H | flia Hip2 H ].
-      easy.
-    }
-    destruct (Nat.eq_dec (i + 1) p) as [H| H]; [ flia Hspi H | clear H ].
-...
+rewrite <- subm_mat_swap_rows_succ_succ.
 rewrite <- IHi; [ | flia Hin ].
 rewrite seq_S, fold_left_app; cbn.
 f_equal.
