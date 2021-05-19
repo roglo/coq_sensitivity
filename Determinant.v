@@ -2020,7 +2020,8 @@ rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_opp_involutive; [ | easy ].
 rewrite (Nat.sub_succ i) at 1.
 rewrite Nat.sub_0_r.
-induction i. {
+revert M.
+induction i; intros. {
   cbn.
   rewrite rngl_mul_1_l.
   f_equal; symmetry.
@@ -2032,6 +2033,12 @@ rewrite <- rngl_mul_opp_r; [ | easy ].
 rewrite <- determinant_alternating with (p := i) (q := i + 1); try easy;
   cycle 1; [ flia | flia Hin | flia Hin | ].
 rewrite <- subm_mat_swap_rows_lt; [ | flia | flia ].
+...
+replace (subm (mat_swap_rows i (i + 1) M) (S (S i)) j) with
+  (subm (mat_swap_rows (i + 1) i (mat_swap_rows i (i + 1) M)) (S i) j).
+rewrite <- IHi.
+f_equal.
+cbn.
 ...
 replace (subm (mat_swap_rows i (i + 1) M) (S (S i)) j) with
   (subm M (S i) j). 2: {
