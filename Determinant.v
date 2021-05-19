@@ -1944,6 +1944,31 @@ apply Nat.neq_0_lt_0 in Hiz.
 destruct i; [ easy | clear Hiz ].
 remember (S i - 1) as k eqn:Hk.
 rewrite Nat.sub_succ, Nat.sub_0_r in Hk; subst k.
+rewrite minus_one_pow_succ; [ | easy ].
+rewrite rngl_opp_involutive; [ | easy ].
+specialize (fold_determinant (subm M (S i) j)) as H1.
+rewrite Nat_sub_succ_1 in H1 at 2.
+rewrite H1; clear H1.
+induction i. {
+  cbn.
+  rewrite Nat.sub_0_r at 3.
+  now rewrite rngl_mul_1_l.
+}
+rewrite minus_one_pow_succ; [ | easy ].
+rewrite rngl_mul_opp_l; [ | easy ].
+rewrite <- rngl_mul_opp_r; [ | easy ].
+rewrite <- determinant_alternating with (p := 0) (q := 1); try easy. 2: {
+  flia Hin.
+} 2: {
+  flia Hin.
+}
+...
+rewrite minus_one_pow
+rewrite <- determinant_alternating with (p := 0) (q := 1); try easy. 2: {
+  flia Hin.
+} 2: {
+  flia Hin.
+}
 ...
 intros Hic Hop Hiv Hit H10 Hde Hch * (Hiz, Hin).
 rewrite subm_mat_swap_rows_circ.
