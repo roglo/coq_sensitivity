@@ -1938,7 +1938,6 @@ Theorem det_loop_subm_mat_swap_rows_0_i :
   → det_loop (subm (mat_swap_rows 0 i M) 0 j) n =
     (- minus_one_pow i * det_loop (subm M i j) n)%F.
 Proof.
-(*
 intros Hic Hop Hiv Hit H10 Hde Hch * (Hiz, Hin).
 rewrite subm_mat_swap_rows_circ.
 apply Nat.neq_0_lt_0 in Hiz.
@@ -1950,6 +1949,8 @@ rewrite rngl_opp_involutive; [ | easy ].
 specialize (fold_determinant (subm M (S i) j)) as H1.
 rewrite Nat_sub_succ_1 in H1 at 2.
 rewrite H1; clear H1.
+(**)
+...
 revert n M Hin.
 induction i; intros. {
   cbn.
@@ -1965,6 +1966,14 @@ rewrite <- determinant_alternating with (p := 0) (q := 1); try easy. 2: {
   flia Hin.
 }
 rewrite <- subm_mat_swap_rows_lt; [ | flia | flia ].
+rewrite seq_S, fold_left_app.
+cbn.
+Search (subm (mat_swap_rows _ _ _)).
+replace
+(mat_swap_rows i (i + 1)
+          (fold_left (λ (M' : matrix (S n) (S n) T) (k : nat), mat_swap_rows k (k + 1) M') (seq 0 i) M))
+with
+(fold_left (λ (M' : matrix (S n) (S n) T) (k : nat), mat_swap_rows k (k + 1) M') (seq 0 i) (mat_swap_rows i (i + 1) M)).
 ...
 rewrite <- determinant_alternating with (p := i) (q := S i); try easy. 2: {
   flia Hin.
@@ -1977,7 +1986,6 @@ replace (S n - 1) with n at 4 by flia.
 rewrite <- subm_mat_swap_rows_lt; [ | flia | flia ].
 remember (mat_swap_rows i (S i) M) as M' eqn:HM'.
 ...
-*)
 intros Hic Hop Hiv Hit H10 Hde Hch * (Hiz, Hin).
 rewrite subm_mat_swap_rows_circ.
 destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
