@@ -2012,15 +2012,19 @@ remember (mat_swap_rows i (S i) M) as M' eqn:HM'.
 *)
 intros Hic Hop Hiv Hit H10 Hde Hch * (Hiz, Hin).
 rewrite subm_mat_swap_rows_circ.
-destruct i; [ flia Hiz | ].
-destruct i. {
-  cbn.
-  rewrite rngl_opp_involutive; [ | easy ].
-  now rewrite rngl_mul_1_l.
-}
-specialize (fold_determinant (subm M (S (S i)) j)) as H1.
+specialize (fold_determinant (subm M i j)) as H1.
 rewrite Nat_sub_succ_1 in H1 at 2.
 rewrite H1; clear H1.
+destruct i; [ flia Hiz | ].
+rewrite minus_one_pow_succ; [ | easy ].
+rewrite rngl_opp_involutive; [ | easy ].
+destruct i. {
+  cbn.
+  rewrite rngl_mul_1_l.
+  f_equal; symmetry.
+  apply Nat.sub_0_r.
+}
+rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_mul_opp_l; [ | easy ].
 rewrite <- rngl_mul_opp_r; [ | easy ].
 rewrite <- determinant_alternating with (p := 0) (q := 1); try easy. 2: {
@@ -2035,7 +2039,8 @@ destruct i. {
   f_equal; symmetry.
   apply Nat.sub_0_r.
 }
-rewrite <- rngl_opp_involutive; [ | easy ].
+rewrite minus_one_pow_succ; [ | easy ].
+rewrite rngl_mul_opp_l; [ | easy ].
 rewrite <- rngl_mul_opp_r; [ | easy ].
 rewrite <- determinant_alternating with (p := 1) (q := 2); try easy. 2: {
   flia Hin.
@@ -2044,14 +2049,14 @@ rewrite <- determinant_alternating with (p := 1) (q := 2); try easy. 2: {
 }
 destruct i. {
   cbn.
-  rewrite rngl_mul_opp_l; [ | easy ].
-  rewrite rngl_opp_involutive; [ | easy ].
   rewrite rngl_mul_1_l.
   rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
   rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
   f_equal; symmetry.
   apply Nat.sub_0_r.
 }
+rewrite minus_one_pow_succ; [ | easy ].
+rewrite rngl_mul_opp_l; [ | easy ].
 rewrite <- rngl_mul_opp_r; [ | easy ].
 rewrite <- determinant_alternating with (p := 2) (q := 3); try easy. 2: {
   flia Hin.
