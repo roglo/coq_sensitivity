@@ -1886,7 +1886,6 @@ apply mat_el_circ_rot_rows_outside; flia.
 Qed.
 
 Theorem subm_mat_swap_rows_circ : ∀ n (M : matrix n n T) p q,
-(* i ≠ 0 → *)
   subm (mat_swap_rows 0 p M) 0 q =
 (*
   fold_left (λ t k, mat_swap_rows k (k + 1) t) (seq 0 (p - 1)) (subm M p q).
