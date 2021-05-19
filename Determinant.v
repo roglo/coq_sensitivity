@@ -1940,6 +1940,13 @@ Theorem det_loop_subm_mat_swap_rows_0_i :
 Proof.
 intros Hic Hop Hiv Hit H10 Hde Hch * (Hiz, Hin).
 rewrite subm_mat_swap_rows_circ.
+apply Nat.neq_0_lt_0 in Hiz.
+destruct i; [ easy | clear Hiz ].
+remember (S i - 1) as k eqn:Hk.
+rewrite Nat.sub_succ, Nat.sub_0_r in Hk; subst k.
+...
+intros Hic Hop Hiv Hit H10 Hde Hch * (Hiz, Hin).
+rewrite subm_mat_swap_rows_circ.
 destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
   subst i.
   cbn.
@@ -1963,7 +1970,7 @@ destruct (Nat.eq_dec i 2) as [Hi2| Hi2]. {
   unfold determinant.
   rewrite Nat.sub_0_r at 4.
   f_equal.
-  apply subm_mat_swap_rows_lt; [ easy | flia ].
+  apply subm_mat_swap_rows_lt; flia.
 }
 destruct (Nat.eq_dec i 3) as [Hi3| Hi3]. {
   subst i.
