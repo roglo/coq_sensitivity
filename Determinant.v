@@ -1738,91 +1738,13 @@ unfold mat_swap_rows; cbn.
 destruct (Nat.eq_dec i k); [ now subst i | easy ].
 Qed.
 
-Theorem subm_mat_swap_rows_0_1 : ∀ n (M : matrix n n T) j,
-  subm (mat_swap_rows 0 1 M) 0 j = subm M 1 j.
+Theorem mat_swap_rows_comm : ∀ n (M : matrix n n T) p q,
+  mat_swap_rows p q M = mat_swap_rows q p M.
 Proof.
 intros.
 apply matrix_eq.
-rename j into k.
 intros i j Hi Hj; cbn.
-destruct (Nat.eq_dec (i + 1) 0) as [H| H]; [ flia H | clear H ].
-destruct (Nat.eq_dec (i + 1) 1) as [H| H]. {
-  now replace i with 0 by flia H.
-}
-now destruct i.
-Qed.
-
-Theorem subm_mat_swap_rows_012 : ∀ n (M : matrix n n T) j,
-  subm (mat_swap_rows 0 2 M) 0 j = subm (mat_swap_rows 0 1 M) 2 j.
-Proof.
-intros.
-apply matrix_eq.
-rename j into k.
-intros i j Hi Hj.
-cbn - [ "<=?" ].
-replace (0 <=? i) with true by easy.
-cbn - [ "<=?" ].
-destruct (Nat.eq_dec (i + 1) 0) as [H| H]; [ flia H | clear H ].
-destruct (Nat.eq_dec (i + 1) 2) as [H1| H1]. {
-  now replace i with 1 by flia H1.
-}
-destruct (Nat.eq_dec i 0) as [Hiz| Hiz]; [ now subst i | ].
-destruct (Nat.eq_dec (i + Nat.b2n (2 <=? i)) 0) as [H| H]; [ flia Hiz H | ].
-clear H.
-destruct (Nat.eq_dec (i + Nat.b2n (2 <=? i)) 1) as [H| H]. {
-  flia H1 Hiz H.
-}
-clear H.
-assert (H : 2 ≤ i) by flia H1 Hiz.
-apply Nat.leb_le in H.
-now rewrite H.
-Qed.
-
-Theorem subm_mat_swap_rows_013 : ∀ n (M : matrix n n T) j,
-  subm (mat_swap_rows 0 3 M) 0 j =
-  mat_swap_rows 1 2 (mat_swap_rows 0 1 (subm M 3 j)).
-Proof.
-intros.
-apply matrix_eq.
-rename j into k.
-intros i j Hi Hj.
-cbn - [ "<=?" ].
-remember (3 <=? i) as x.
-cbn; subst x.
-destruct (Nat.eq_dec (i + 1) 0) as [H| H]; [ flia H | clear H ].
-destruct (Nat.eq_dec (i + 1) 3) as [Hi2| Hi2]. {
-  now replace i with 2 by flia Hi2.
-}
-destruct (Nat.eq_dec i 1) as [Hi1| Hi1]; [ now subst i | ].
-destruct (Nat.eq_dec i 2) as [H| H]; [ flia Hi2 H | clear H ].
-destruct (Nat.eq_dec i 0) as [Hiz| Hiz]; [ now subst i | ].
-assert (H : 3 <= i) by flia Hiz Hi1 Hi2.
-apply Nat.leb_le in H.
-now rewrite H.
-Qed.
-
-Theorem subm_mat_swap_rows_014 : ∀ n (M : matrix n n T) j,
-  subm (mat_swap_rows 0 4 M) 0 j =
-  mat_swap_rows 2 3 (mat_swap_rows 1 2 (mat_swap_rows 0 1 (subm M 4 j))).
-Proof.
-intros.
-apply matrix_eq.
-rename j into k.
-intros i j Hi Hj.
-cbn - [ "<=?" ].
-remember (4 <=? i) as x.
-cbn; subst x.
-destruct (Nat.eq_dec (i + 1) 0) as [H| H]; [ flia H | clear H ].
-destruct (Nat.eq_dec (i + 1) 4) as [Hi3| Hi3]. {
-  now replace i with 3 by flia Hi3.
-}
-destruct (Nat.eq_dec i 3) as [H| H]; [ flia Hi3 H | clear H ].
-destruct (Nat.eq_dec i 2) as [Hi2| Hi2]; [ now subst i | ].
-destruct (Nat.eq_dec i 1) as [Hi1| Hi1]; [ now subst i | ].
-destruct (Nat.eq_dec i 0) as [Hiz| Hiz]; [ now subst i | ].
-assert (H : 4 <= i) by flia Hiz Hi1 Hi2 Hi3.
-apply Nat.leb_le in H.
-now rewrite H.
+now destruct (Nat.eq_dec i p), (Nat.eq_dec i q); subst.
 Qed.
 
 Theorem subm_mat_swap_rows_lt : ∀ n (M : matrix n n T) p q r j,
@@ -1888,20 +1810,6 @@ destruct (Nat.eq_dec q p) as [Hqp| Hqp]; [ now subst q | ].
 now rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
 Qed.
 
-Theorem mat_el_circ_rot_rows : ∀ n (M : matrix n n T) i j,
-  mat_el M 0 j =
-    mat_el (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 i) M) i j.
-Proof.
-intros.
-induction i; [ easy | ].
-rewrite seq_S.
-rewrite fold_left_app.
-cbn - [ mat_swap_rows ].
-rewrite Nat.add_1_r.
-rewrite mat_el_mat_swap_rows.
-apply IHi.
-Qed.
-
 Theorem mat_el_circ_rot_rows_succ_1 : ∀ n (M : matrix n n T) i j p q,
   p + q < i
   → mat_el M i j =
@@ -1918,6 +1826,20 @@ apply IHq.
 flia Hpi Hip.
 Qed.
 
+Theorem mat_el_circ_rot_rows : ∀ n (M : matrix n n T) i j,
+  mat_el M 0 j =
+    mat_el (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 i) M) i j.
+Proof.
+intros.
+induction i; [ easy | ].
+rewrite seq_S.
+rewrite fold_left_app.
+cbn - [ mat_swap_rows ].
+rewrite Nat.add_1_r.
+rewrite mat_el_mat_swap_rows.
+apply IHi.
+Qed.
+
 Theorem mat_el_circ_rot_rows_outside : ∀ n (M : matrix n n T) i j p q,
   i < p
   → mat_el M i j =
@@ -1931,15 +1853,6 @@ rewrite fold_left_app; cbn.
 destruct (Nat.eq_dec i (p + q)) as [Hipq| Hipq]; [ flia Hip Hipq | ].
 destruct (Nat.eq_dec i (p + q + 1)) as [Hip1| Hip1]; [ flia Hip Hip1 | ].
 apply IHq.
-Qed.
-
-Theorem mat_swap_rows_comm : ∀ n (M : matrix n n T) p q,
-  mat_swap_rows p q M = mat_swap_rows q p M.
-Proof.
-intros.
-apply matrix_eq.
-intros i j Hi Hj; cbn.
-now destruct (Nat.eq_dec i p), (Nat.eq_dec i q); subst.
 Qed.
 
 Theorem mat_el_circ_rot_rows_succ : ∀ n (M : matrix n n T) i j p,
@@ -2076,67 +1989,9 @@ destruct (Nat.eq_dec i 3) as [Hi3| Hi3]. {
   unfold determinant.
   rewrite Nat.sub_0_r at 5.
   f_equal.
-Check subm_mat_swap_rows_013.
-...
-  apply subm_mat_swap_rows_013.
-}
-...
-intros Hic Hop Hiv Hit H10 Hde Hch * (Hiz, Hin).
-apply Nat.neq_0_lt_0 in Hiz.
-destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
-  subst i.
-  cbn.
-  rewrite rngl_opp_involutive; [ | easy ].
-  rewrite rngl_mul_1_l.
-  now rewrite subm_mat_swap_rows_0_1.
-}
-destruct (Nat.eq_dec i 2) as [Hi2| Hi2]. {
-  subst i.
-  cbn.
-  rewrite rngl_mul_opp_l; [ | easy ].
-  rewrite rngl_mul_1_l.
-  specialize (fold_determinant (subm M 2 j)) as H1.
-  rewrite Nat_sub_succ_1 in H1 at 2.
-  cbn - [ determinant ] in H1.
-  rewrite H1; clear H1.
-  rewrite <- determinant_alternating with (p := 0) (q := 1); try easy. 2: {
-    flia Hin.
-  } 2: {
-    flia Hin.
-  }
-  unfold determinant.
-  rewrite Nat.sub_0_r at 4.
-  f_equal.
-  specialize (subm_mat_swap_rows_lt M) as H1.
-  specialize (H1 0 1 2 j Nat.lt_0_2 Nat.lt_1_2).
-  cbn in H1.
-  rewrite <- H1.
-  apply subm_mat_swap_rows_012.
-}
-destruct (Nat.eq_dec i 3) as [Hi3| Hi3]. {
-  subst i.
-  cbn.
-  rewrite rngl_opp_involutive; [ | easy ].
-  rewrite rngl_mul_1_l.
-  specialize (fold_determinant (subm M 3 j)) as H1.
-  rewrite Nat_sub_succ_1 in H1 at 2.
-  cbn - [ determinant ] in H1.
-  rewrite H1; clear H1.
-  rewrite <- rngl_opp_involutive; [ | easy ].
-  rewrite <- determinant_alternating with (p := 0) (q := 1); try easy. 2: {
-    flia Hin.
-  } 2: {
-    flia Hin.
-  }
-  rewrite <- determinant_alternating with (p := 1) (q := 2); try easy. 2: {
-    flia Hin.
-  } 2: {
-    flia Hin.
-  }
-  unfold determinant.
-  rewrite Nat.sub_0_r at 5.
-  f_equal.
-  apply subm_mat_swap_rows_013.
+  rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
+  rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
+  easy.
 }
 destruct (Nat.eq_dec i 4) as [Hi4| Hi4]. {
   subst i.
@@ -2166,7 +2021,12 @@ destruct (Nat.eq_dec i 4) as [Hi4| Hi4]. {
   unfold determinant.
   rewrite Nat.sub_0_r at 6.
   f_equal.
-  apply subm_mat_swap_rows_014.
+  rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
+  f_equal.
+  rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
+  f_equal.
+  rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
+  easy.
 }
 ...
 
