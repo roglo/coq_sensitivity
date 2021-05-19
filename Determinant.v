@@ -2015,6 +2015,55 @@ rewrite subm_mat_swap_rows_circ.
 specialize (fold_determinant (subm M i j)) as H1.
 rewrite Nat_sub_succ_1 in H1 at 2.
 rewrite H1; clear H1.
+destruct i; [ flia Hiz | clear Hiz ].
+rewrite minus_one_pow_succ; [ | easy ].
+rewrite rngl_opp_involutive; [ | easy ].
+rewrite (Nat.sub_succ i) at 1.
+rewrite Nat.sub_0_r.
+induction i. {
+  cbn.
+  rewrite rngl_mul_1_l.
+  f_equal; symmetry.
+  apply Nat.sub_0_r.
+}
+rewrite minus_one_pow_succ; [ | easy ].
+rewrite rngl_mul_opp_l; [ | easy ].
+rewrite <- rngl_mul_opp_r; [ | easy ].
+rewrite <- determinant_alternating with (p := i) (q := i + 1); try easy;
+  cycle 1; [ flia | flia Hin | flia Hin | ].
+rewrite <- subm_mat_swap_rows_lt; [ | flia | flia ].
+replace (subm (mat_swap_rows i (i + 1) M) (S (S i)) j) with
+  (subm M (S i) j). 2: {
+  apply matrix_eq.
+  rename i into p.
+  rename j into q.
+  intros i j Hi Hj.
+  cbn - [ "<=?" ].
+  destruct (le_dec (S (S p)) i) as [Hip| Hip]. {
+    apply Nat.leb_le in Hip; rewrite Hip; cbn - [ "<=?" ].
+    apply Nat.leb_le in Hip.
+    destruct (Nat.eq_dec (i + 1) p) as [Hi1p| Hi1p]. {
+      flia Hip Hi1p.
+    }
+    destruct (Nat.eq_dec (i + 1) (p + 1)) as [Hi1p1| Hi1p1]. {
+      flia Hip Hi1p1.
+    }
+    destruct (le_dec (S p) i) as [Hspi| Hspi]. {
+      now apply Nat.leb_le in Hspi; rewrite Hspi.
+    }
+    flia Hip Hspi.
+  } {
+    apply Nat.leb_nle in Hip; rewrite Hip; cbn - [ "<=?" ].
+    apply Nat.leb_nle in Hip.
+    rewrite Nat.add_0_r.
+    destruct (Nat.eq_dec i p) as [Hipz| Hipz]. {
+      subst i.
+...
+intros Hic Hop Hiv Hit H10 Hde Hch * (Hiz, Hin).
+rewrite subm_mat_swap_rows_circ.
+specialize (fold_determinant (subm M i j)) as H1.
+rewrite Nat_sub_succ_1 in H1 at 2.
+rewrite H1; clear H1.
 destruct i; [ flia Hiz | ].
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_opp_involutive; [ | easy ].
