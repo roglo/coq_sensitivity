@@ -1949,7 +1949,28 @@ rewrite rngl_opp_involutive; [ | easy ].
 specialize (fold_determinant (subm M (S i) j)) as H1.
 rewrite Nat_sub_succ_1 in H1 at 2.
 rewrite H1; clear H1.
-(**)
+remember (S i) as p eqn:Hp.
+assert (Hpi : i < p) by flia Hp.
+clear Hp.
+revert n M p Hin Hpi.
+induction i; intros. {
+  cbn.
+  rewrite Nat.sub_0_r at 3.
+  now rewrite rngl_mul_1_l.
+}
+rewrite minus_one_pow_succ; [ | easy ].
+rewrite rngl_mul_opp_l; [ | easy ].
+rewrite <- rngl_mul_opp_r; [ | easy ].
+rewrite <- determinant_alternating with (p := 0) (q := 1); try easy. 2: {
+  flia Hin.
+} 2: {
+  flia Hin Hpi.
+}
+rewrite <- subm_mat_swap_rows_lt; [ | flia Hpi | flia Hpi ].
+...
+rewrite seq_S, fold_left_app.
+cbn.
+Search (subm (mat_swap_rows _ _ _)).
 ...
 revert n M Hin.
 induction i; intros. {
@@ -1965,6 +1986,7 @@ rewrite <- determinant_alternating with (p := 0) (q := 1); try easy. 2: {
 } 2: {
   flia Hin.
 }
+...
 rewrite <- subm_mat_swap_rows_lt; [ | flia | flia ].
 rewrite seq_S, fold_left_app.
 cbn.
