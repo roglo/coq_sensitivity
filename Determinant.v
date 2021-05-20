@@ -1983,7 +1983,7 @@ Theorem determinant_subm_mat_swap_rows_0_i :
   → determinant (subm (mat_swap_rows 0 i M) 0 j) =
     (- minus_one_pow i * determinant (subm M i j))%F.
 Proof.
-(*
+(**)
 intros Hic Hop Hiv Hit H10 Hde Hch * (Hiz, Hin).
 rewrite subm_mat_swap_rows_circ.
 destruct i; [ flia Hiz | clear Hiz ].
@@ -2007,11 +2007,12 @@ rewrite <- IHi; [ | flia Hin ].
 rewrite seq_S, fold_left_app; cbn.
 f_equal.
 rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
+...
 apply matrix_eq.
 rename i into p; rename j into q.
 intros i j Hi Hj.
 cbn - [ "<=?" ].
-remember (λ (M' : matrix (S n) (S n) T) (k : nat), mat_swap_rows k (k + 1) M') as f eqn:Hf.
+remember (λ (M' : matrix n n T) (k : nat), mat_swap_rows k (k + 1) M') as f eqn:Hf.
 destruct (Nat.eq_dec i p) as [Hip| Hip]. {
   subst p.
 ...
