@@ -696,9 +696,6 @@ Theorem mat_1_neq_0 : ∀ n,
   else not_applicable.
 Proof.
 intros.
-(*
-specialize rngl_opt_1_neq_0 as rngl_1_neq_0.
-*)
 remember (rngl_has_1_neq_0 && negb (n =? 0)) as b eqn:Hb.
 symmetry in Hb.
 destruct b; [ | easy ].

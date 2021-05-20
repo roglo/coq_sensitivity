@@ -692,6 +692,24 @@ intros i Hi.
 now rewrite Nat.add_comm, Nat.add_sub.
 Qed.
 
+Theorem det_loop_alternating :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_integral = true →
+  rngl_has_1_neq_0 = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ n (M : matrix n n T) p q,
+  p ≠ q
+  → p < n
+  → q < n
+  → det_loop (mat_swap_rows p q M) n = (- det_loop M n)%F.
+Proof.
+intros Hic Hop Hin Hit H10 Hde Hch * Hpq Hp Hq.
+now apply determinant_alternating.
+Qed.
+
 (* transpositions list of permutation *)
 
 Fixpoint first_non_fixpoint it i σ :=
@@ -1992,6 +2010,7 @@ Theorem det_loop_subm_mat_swap_rows_0_i :
   → det_loop (subm (mat_swap_rows 0 i M) 0 j) n =
     (- minus_one_pow i * det_loop (subm M i j) n)%F.
 Proof.
+(*
 intros Hic Hop Hiv Hit H10 Hde Hch * (Hiz, Hin).
 rewrite subm_mat_swap_rows_circ.
 specialize (fold_determinant (subm M i j)) as H1.
@@ -2033,23 +2052,38 @@ destruct (Nat.eq_dec i (p + 1)) as [Hip1| Hip1]. {
 ...
 }
 ...
+*)
 intros Hic Hop Hiv Hit H10 Hde Hch * (Hiz, Hin).
 rewrite subm_mat_swap_rows_circ.
+(*
 specialize (fold_determinant (subm M i j)) as H1.
 rewrite Nat_sub_succ_1 in H1 at 2.
 rewrite H1; clear H1.
+*)
 destruct i; [ flia Hiz | ].
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_opp_involutive; [ | easy ].
 destruct i. {
   cbn.
-  rewrite rngl_mul_1_l.
-  f_equal; symmetry.
-  apply Nat.sub_0_r.
+  now rewrite rngl_mul_1_l.
 }
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_mul_opp_l; [ | easy ].
 rewrite <- rngl_mul_opp_r; [ | easy ].
+Check det_loop_alternating.
+remember (- det_loop (subm M (S (S i)) j) n)%F as x eqn:Hx.
+Set Printing All.
+replace (S n - S O) with n in Hx.
+...
+cbn in Hx.
+rewrite Nat.sub_0_r in Hx.
+rewrite <- det_loop_alternating in Hx.
+...
+rewrite <- det_loop_alternating with (p := 0) (q := 1); try easy. 2: {
+  flia Hin.
+} 2: {
+  flia Hiz Hin.
+}
 rewrite <- determinant_alternating with (p := 0) (q := 1); try easy. 2: {
   flia Hin.
 } 2: {
