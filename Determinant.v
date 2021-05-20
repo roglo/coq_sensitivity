@@ -2091,7 +2091,19 @@ rewrite <- subm_mat_swap_rows_succ_succ.
 rewrite <- IHi; [ | flia Hin ].
 rewrite seq_S, fold_left_app; cbn.
 f_equal.
-Search (subm (mat_swap_rows _ _ _)).
+rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
+apply matrix_eq.
+rename i into p; rename j into q.
+intros i j Hi Hj.
+cbn - [ "<=?" ].
+remember (λ (M' : matrix (S n) (S n) T) (k : nat), mat_swap_rows k (k + 1) M') as f eqn:Hf.
+destruct (Nat.eq_dec i p) as [Hip| Hip]. {
+  subst p.
+...
+}
+destruct (Nat.eq_dec i (p + 1)) as [Hip1| Hip1]. {
+...
+}
 ...
 intros Hic Hop Hiv Hit H10 Hde Hch * (Hiz, Hin).
 rewrite subm_mat_swap_rows_circ.
