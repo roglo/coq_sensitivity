@@ -2071,12 +2071,14 @@ rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_mul_opp_l; [ | easy ].
 rewrite <- rngl_mul_opp_r; [ | easy ].
 Check det_loop_alternating.
-remember (- det_loop (subm M (S (S i)) j) n)%F as x eqn:Hx.
+remember (det_loop (subm M (S (S i)) j) n)%F as x eqn:Hx.
 Theorem glop : ∀ m n (M : matrix m m T) (p : m = n) i,
   det_loop (eq_rect m (λ u, matrix u u T) M n p) i = det_loop M i.
 Proof. now intros; destruct p. Qed.
 assert (H : S n - 1 = n) by flia.
 rewrite <- glop with (n := n) (p := H) in Hx.
+Check @mat_el.
+Check @det_loop.
 ...
 rewrite Nat.sub_succ in Hx.
 
