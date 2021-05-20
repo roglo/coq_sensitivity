@@ -2074,6 +2074,9 @@ Check det_loop_alternating.
 remember (- det_loop (subm M (S (S i)) j) n)%F as x eqn:Hx.
 Set Printing All.
 replace (S n - S O) with n in Hx.
+Theorem glop : ∀ m n (M : matrix m m T) (p : m = n) i,
+  det_loop (eq_rect m (λ u, matrix u u T) M n p) i = det_loop M i.
+Proof. now intros; destruct p. Qed.
 ...
 cbn in Hx.
 rewrite Nat.sub_0_r in Hx.
