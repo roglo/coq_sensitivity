@@ -498,13 +498,13 @@ Definition mat_transp {m n} (M : matrix m n T) : matrix n m T :=
 
 (* matrix without row i and column j *)
 
-Definition subm {m n} (M : matrix (S m) (S n) T) i j :=
-  mk_mat m n
+Definition subm {m n} (M : matrix m n T) i j :=
+  mk_mat (m - 1) (n - 1)
     (λ k l, mat_el M (k + Nat.b2n (i <=? k)) (l + Nat.b2n (j <=? l))).
 
 (* combinations of submatrix and other *)
 
-Theorem submatrix_sub {m n} : ∀ (MA MB : matrix (S m) (S n) T) i j,
+Theorem submatrix_sub {m n} : ∀ (MA MB : matrix m n T) i j,
   subm (MA - MB)%M i j = (subm MA i j - subm MB i j)%M.
 Proof.
 intros.
@@ -513,7 +513,7 @@ intros k l Hk Hl; cbn.
 now destruct (lt_dec k i), (lt_dec l j).
 Qed.
 
-Theorem submatrix_mul_scal_l {m n} : ∀ (μ : T) (M : matrix (S m) (S n) T) i j,
+Theorem submatrix_mul_scal_l {m n} : ∀ (μ : T) (M : matrix m n T) i j,
   subm (μ × M)%M i j = (μ × subm M i j)%M.
 Proof.
 intros.
@@ -522,7 +522,7 @@ intros k l Hk Hl; cbn.
 now destruct (lt_dec k i), (lt_dec l j).
 Qed.
 
-Theorem submatrix_mI : ∀ i r, subm (mI (S r)) i i = mI r.
+Theorem submatrix_mI : ∀ i r, subm (mI r) i i = mI (r - 1).
 Proof.
 intros.
 apply matrix_eq.

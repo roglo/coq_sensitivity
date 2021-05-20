@@ -1459,8 +1459,6 @@ Qed.
 
 Definition δ_lt i k := Nat.b2n (i <? k).
 
-...
-
 Theorem subm_subm_swap : ∀ n (A : matrix (S n) (S n) T) i j k l,
   subm (subm A i j) k l =
   subm (subm A (k + δ_lt i k) (l + δ_lt j l)) (i - δ_lt k i) (j - δ_lt l j).
@@ -1972,7 +1970,7 @@ destruct (Nat.eq_dec (i + 1) p) as [Hip| Hip]. {
 }
 Qed.
 
-Theorem det_loop_subm_mat_swap_rows_0_i :
+Theorem determinant_subm_mat_swap_rows_0_i :
  rngl_is_comm = true →
  rngl_has_opp = true →
  rngl_has_inv = true →
@@ -1982,15 +1980,12 @@ Theorem det_loop_subm_mat_swap_rows_0_i :
  rngl_characteristic = 0 →
   ∀ n (M : matrix (S n) (S n) T) i j,
   0 < i < n
-  → det_loop (subm (mat_swap_rows 0 i M) 0 j) n =
-    (- minus_one_pow i * det_loop (subm M i j) n)%F.
+  → determinant (subm (mat_swap_rows 0 i M) 0 j) =
+    (- minus_one_pow i * determinant (subm M i j))%F.
 Proof.
 (*
 intros Hic Hop Hiv Hit H10 Hde Hch * (Hiz, Hin).
 rewrite subm_mat_swap_rows_circ.
-specialize (fold_determinant (subm M i j)) as H1.
-rewrite Nat_sub_succ_1 in H1 at 2.
-rewrite H1; clear H1.
 destruct i; [ flia Hiz | clear Hiz ].
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_opp_involutive; [ | easy ].
@@ -1999,9 +1994,7 @@ rewrite Nat.sub_0_r.
 revert M.
 induction i; intros. {
   cbn.
-  rewrite rngl_mul_1_l.
-  f_equal; symmetry.
-  apply Nat.sub_0_r.
+  now rewrite rngl_mul_1_l.
 }
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_mul_opp_l; [ | easy ].
@@ -2030,11 +2023,6 @@ destruct (Nat.eq_dec i (p + 1)) as [Hip1| Hip1]. {
 *)
 intros Hic Hop Hiv Hit H10 Hde Hch * (Hiz, Hin).
 rewrite subm_mat_swap_rows_circ.
-(*
-specialize (fold_determinant (subm M i j)) as H1.
-rewrite Nat_sub_succ_1 in H1 at 2.
-rewrite H1; clear H1.
-*)
 destruct i; [ flia Hiz | ].
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_opp_involutive; [ | easy ].
@@ -2045,52 +2033,6 @@ destruct i. {
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_mul_opp_l; [ | easy ].
 rewrite <- rngl_mul_opp_r; [ | easy ].
-Check det_loop_alternating.
-Print det_loop.
-,,,
-Print determinant.
-rewrite <- det_loop_alternating.
-
-Check det_loop_alternating.
-remember (det_loop (subm M (S (S i)) j) n)%F as x eqn:Hx.
-Set Printing All.
-...
-cbn in Hx.
-Theorem glop : ∀ m n (M : matrix m m T) (p : m = n) i,
-  det_loop (eq_rect m (λ u, matrix u u T) M n p) i = det_loop M i.
-Proof. now intros; destruct p. Qed.
-assert (H : n - 0 = n) by flia.
-rewrite <- glop with (n := n) (p := H) in Hx.
-rewrite H in Hx.
-Check @mat_el.
-Check @det_loop.
-...
-rewrite Nat.sub_succ in Hx.
-
-  Hx : @eq T x (@rngl_opp T ro (@det_loop (Init.Nat.sub (S n) (S O)) (@subm T (S n) (S n) M (S (S i)) j) n))
-
-  Hx : @eq T x
-         (@rngl_opp T ro
-            (@det_loop n
-               (@eq_rect nat (Init.Nat.sub (S n) (S O)) (fun u : nat => matrix u u T)
-                  (@subm T (S n) (S n) M (S (S i)) j) n H) n))
-..
-Check eq_rect.
-Set Printing All.
-replace (S n - S O) with n in Hx.
-
-Theorem glop : ∀ m n (M : matrix m m T) (p : m = n) i,
-  @det_loop m M n = @det_loop n N n.
-...
-cbn in Hx.
-rewrite Nat.sub_0_r in Hx.
-rewrite <- det_loop_alternating in Hx.
-...
-rewrite <- det_loop_alternating with (p := 0) (q := 1); try easy. 2: {
-  flia Hin.
-} 2: {
-  flia Hiz Hin.
-}
 rewrite <- determinant_alternating with (p := 0) (q := 1); try easy. 2: {
   flia Hin.
 } 2: {
@@ -2099,9 +2041,7 @@ rewrite <- determinant_alternating with (p := 0) (q := 1); try easy. 2: {
 destruct i. {
   cbn.
   rewrite rngl_mul_1_l.
-  rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
-  f_equal; symmetry.
-  apply Nat.sub_0_r.
+  rewrite subm_mat_swap_rows_lt; [ easy | flia | flia ].
 }
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_mul_opp_l; [ | easy ].
@@ -2115,9 +2055,7 @@ destruct i. {
   cbn.
   rewrite rngl_mul_1_l.
   rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
-  rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
-  f_equal; symmetry.
-  apply Nat.sub_0_r.
+  rewrite subm_mat_swap_rows_lt; [ easy | flia | flia ].
 }
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_mul_opp_l; [ | easy ].
@@ -2132,9 +2070,7 @@ destruct i. {
   rewrite rngl_mul_1_l.
   rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
   rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
-  rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
-  f_equal; symmetry.
-  apply Nat.sub_0_r.
+  rewrite subm_mat_swap_rows_lt; [ easy | flia | flia ].
 }
 ...
 
