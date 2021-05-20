@@ -2072,11 +2072,28 @@ rewrite rngl_mul_opp_l; [ | easy ].
 rewrite <- rngl_mul_opp_r; [ | easy ].
 Check det_loop_alternating.
 remember (- det_loop (subm M (S (S i)) j) n)%F as x eqn:Hx.
-Set Printing All.
-replace (S n - S O) with n in Hx.
 Theorem glop : ∀ m n (M : matrix m m T) (p : m = n) i,
   det_loop (eq_rect m (λ u, matrix u u T) M n p) i = det_loop M i.
 Proof. now intros; destruct p. Qed.
+assert (H : S n - 1 = n) by flia.
+rewrite <- glop with (n := n) (p := H) in Hx.
+...
+rewrite Nat.sub_succ in Hx.
+
+  Hx : @eq T x (@rngl_opp T ro (@det_loop (Init.Nat.sub (S n) (S O)) (@subm T (S n) (S n) M (S (S i)) j) n))
+
+  Hx : @eq T x
+         (@rngl_opp T ro
+            (@det_loop n
+               (@eq_rect nat (Init.Nat.sub (S n) (S O)) (fun u : nat => matrix u u T)
+                  (@subm T (S n) (S n) M (S (S i)) j) n H) n))
+..
+Check eq_rect.
+Set Printing All.
+replace (S n - S O) with n in Hx.
+
+Theorem glop : ∀ m n (M : matrix m m T) (p : m = n) i,
+  @det_loop m M n = @det_loop n N n.
 ...
 cbn in Hx.
 rewrite Nat.sub_0_r in Hx.
