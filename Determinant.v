@@ -21,40 +21,31 @@ Context (rp : ring_like_prop T).
 (* determinant *)
 
 (*
-   det_loop i recursively computes determinant
+   determinant n M recursively computes determinant
 
-      0     i-1
+      0     n-1
       |     |
       v     v
      ---------    ---------   ---------   ---------
 0    |x      |    | x     |   |  x    |   |   x   |
      | ......| -  |. .....| + |.. ....| - |... ...| + etc.
      | ......|    |. .....|   |.. ....|   |... ...|
-i-1  | ......|    |. .....|   |.. ....|   |... ...|
+n-1  | ......|    |. .....|   |.. ....|   |... ...|
      ---------    ---------   ---------   ---------
 
-   each term is the term "x" multiplied by det_loop (i-1) of
+   each term is the term "x" multiplied by det_loop (n-1) of
    the sub-matrix represented by the dots. The "x" goes through
    the first row.
 *)
 
-Fixpoint det_loop {n} (M : matrix n n T) i :=
-  match i with
-  | 0 => 1%F
-  | S i' =>
-      Σ (j = 0, i'),
-      minus_one_pow j * mat_el M 0 j * det_loop (subm M 0 j) i'
-  end.
-
-Definition determinant {n} (M : matrix n n T) := det_loop M n.
-
-Theorem fold_det_loop : ∀ n (M : matrix n n T) i,
-  (Σ (j = 0, i), minus_one_pow j * mat_el M 0 j * det_loop (subm M 0 j) i)%F =
-  det_loop M (S i).
-Proof. easy. Qed.
-
-Theorem fold_determinant : ∀ n (M : matrix n n T), det_loop M n = determinant M.
-Proof. easy. Qed.
+Fixpoint determinant n (M : matrix n n T) :=
+  (match n with
+   | 0 => λ _, 1%F
+   | S n' =>
+       λ M' : matrix (S n') (S n') T,
+       Σ (j = 0, n'),
+       minus_one_pow j * mat_el M' 0 j * determinant (subm M' 0 j)
+   end) M.
 
 Definition mat_permut_rows_fun n (σ : nat → nat) (M : matrix n n T) :=
   mk_mat n n (λ i j, mat_el M (σ i) j).
@@ -66,12 +57,12 @@ Definition mat_permut_rows n (σ : vector n nat) (M : matrix n n T) :=
    (to be proven) be equivalent; perhaps could help for proving
    Cramer's rule of resolving equations *)
 
-Definition det_from_row {n} (M : matrix n n T) i :=
+Definition det_from_row {n} (M : matrix (S n) (S n) T) i :=
   (minus_one_pow i *
-   Σ (j = 0, n - 1),
+   Σ (j = 0, n),
      minus_one_pow j * mat_el M i j * determinant (subm M i j))%F.
 
-Definition det_from_col {n} (M : matrix n n T) j :=
+Definition det_from_col {n} (M : matrix (S n) (S n) T) j :=
   (minus_one_pow j *
    Σ (i = 0, n - 1),
      minus_one_pow i * mat_el M i j * determinant (subm M i j))%F.
@@ -133,6 +124,7 @@ destruct n; intros. {
   rewrite rngl_div_1_r; [ | now left | easy ].
   symmetry; apply rngl_mul_1_l.
 }
+symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_product_succ_succ.
@@ -142,7 +134,6 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ fact det_loop canon_permut ε ].
 revert M.
 induction n; intros. {
   cbn.
@@ -153,11 +144,12 @@ induction n; intros. {
   rewrite rngl_mul_1_l.
   now rewrite rngl_mul_1_r.
 }
-remember (S n) as sn.
-cbn - [ fact "mod" "/" canon_permut ]; subst sn.
+cbn - [ fact "mod" "/" canon_permut ].
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
-  now rewrite IHn.
+...
+  rewrite IHn.
+...
 }
 cbn - [ fact "mod" "/" canon_permut ].
 erewrite rngl_summation_eq_compat. 2: {
@@ -2070,6 +2062,12 @@ destruct i. {
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_mul_opp_l; [ | easy ].
 rewrite <- rngl_mul_opp_r; [ | easy ].
+Check det_loop_alternating.
+Print det_loop.
+,,,
+Print determinant.
+rewrite <- det_loop_alternating.
+
 Check det_loop_alternating.
 remember (det_loop (subm M (S (S i)) j) n)%F as x eqn:Hx.
 Set Printing All.
