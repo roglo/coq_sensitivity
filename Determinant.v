@@ -116,7 +116,7 @@ Theorem det_is_det_by_canon_permut :
   ∀ n (M : matrix n n T), determinant M = determinant' M.
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch *.
-unfold determinant, determinant'.
+unfold determinant'.
 destruct n; intros. {
   unfold iter_seq, iter_list.
   cbn; rewrite rngl_add_0_l.
@@ -124,7 +124,6 @@ destruct n; intros. {
   rewrite rngl_div_1_r; [ | now left | easy ].
   symmetry; apply rngl_mul_1_l.
 }
-symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_product_succ_succ.
@@ -134,6 +133,7 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   easy.
 }
+cbn - [ fact determinant canon_permut ε ].
 revert M.
 induction n; intros. {
   cbn.
@@ -144,12 +144,11 @@ induction n; intros. {
   rewrite rngl_mul_1_l.
   now rewrite rngl_mul_1_r.
 }
-cbn - [ fact "mod" "/" canon_permut ].
+remember (S n) as sn.
+cbn - [ fact "mod" "/" canon_permut ]; subst sn.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
-...
-  rewrite IHn.
-...
+  now rewrite IHn.
 }
 cbn - [ fact "mod" "/" canon_permut ].
 erewrite rngl_summation_eq_compat. 2: {
@@ -682,24 +681,6 @@ rewrite rngl_product_shift; [ | flia Hp ].
 apply rngl_product_eq_compat.
 intros i Hi.
 now rewrite Nat.add_comm, Nat.add_sub.
-Qed.
-
-Theorem det_loop_alternating :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_is_integral = true →
-  rngl_has_1_neq_0 = true →
-  rngl_has_dec_eq = true →
-  rngl_characteristic = 0 →
-  ∀ n (M : matrix n n T) p q,
-  p ≠ q
-  → p < n
-  → q < n
-  → det_loop (mat_swap_rows p q M) n = (- det_loop M n)%F.
-Proof.
-intros Hic Hop Hin Hit H10 Hde Hch * Hpq Hp Hq.
-now apply determinant_alternating.
 Qed.
 
 (* transpositions list of permutation *)
@@ -1478,7 +1459,9 @@ Qed.
 
 Definition δ_lt i k := Nat.b2n (i <? k).
 
-Theorem subm_subm_swap : ∀ n (A : matrix n n T) i j k l,
+...
+
+Theorem subm_subm_swap : ∀ n (A : matrix (S n) (S n) T) i j k l,
   subm (subm A i j) k l =
   subm (subm A (k + δ_lt i k) (l + δ_lt j l)) (i - δ_lt k i) (j - δ_lt l j).
 Proof.
