@@ -1978,7 +1978,7 @@ Theorem determinant_subm_mat_swap_rows_0_i :
  rngl_has_1_neq_0 = true →
  rngl_has_dec_eq = true →
  rngl_characteristic = 0 →
-  ∀ n (M : matrix (S n) (S n) T) i j,
+  ∀ n (M : matrix n n T) i j,
   0 < i < n
   → determinant (subm (mat_swap_rows 0 i M) 0 j) =
     (- minus_one_pow i * determinant (subm M i j))%F.
