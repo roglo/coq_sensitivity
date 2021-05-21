@@ -1970,6 +1970,17 @@ destruct (Nat.eq_dec (i + 1) p) as [Hip| Hip]. {
 }
 Qed.
 
+Theorem mat_swap_rows_fold_left : ∀ n (M : matrix n n T) i,
+  mat_swap_rows i (S i)
+    (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 i) M) =
+   fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 (S i)) M.
+Proof.
+intros.
+rewrite seq_S; cbn.
+rewrite fold_left_app; cbn.
+now rewrite Nat.add_1_r.
+Qed.
+
 Theorem determinant_subm_mat_swap_rows_0_i :
  rngl_is_comm = true →
  rngl_has_opp = true →
@@ -1999,17 +2010,36 @@ induction i; intros. {
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_mul_opp_l; [ | easy ].
 rewrite <- rngl_mul_opp_r; [ | easy ].
+rewrite <- determinant_alternating with (p := i + 1) (q := i + 2); try easy;
+  cycle 1; [ flia | flia Hin | | ].
+...
 rewrite <- determinant_alternating with (p := i) (q := i + 1); try easy;
   cycle 1; [ flia | flia Hin | flia Hin | ].
 rewrite <- subm_mat_swap_rows_lt; [ | flia | flia ].
 rewrite <- subm_mat_swap_rows_succ_succ.
 rewrite <- IHi; [ | flia Hin ].
 rewrite seq_S, fold_left_app; cbn.
+replace (i + 1) with (S i) by flia.
+rewrite mat_swap_rows_fold_left.
+Search (determinant _ = determinant _).
+...
 f_equal.
 (**)
 rewrite <- subm_mat_swap_rows_succ_succ.
+replace (i + 1) with (S i) by flia.
+rewrite mat_swap_rows_fold_left.
+replace (i + 2) with (S (S i)) by flia.
+rewrite mat_swap_rows_fold_left.
+...
+Theorem glip : ∀ n (M : matrix n n T) i,
+  fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 i)
+    (mat_swap_rows (S i) (S (S i)) M) =
+  fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 (S i)) M.
+Admitted.
+rewrite glip.
+rewrite glip.
+...
 (* = mat_el M (S (S i)) j *)
-Search (mat_swap_rows _ _ (fold_left _ _ _)).
 Search (fold_left _ _ (mat_swap_rows _ _ _)).
 Search subm.
 Search (subm (fold_left _ _ _)).
