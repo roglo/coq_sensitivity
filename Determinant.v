@@ -1981,14 +1981,57 @@ rewrite fold_left_app; cbn.
 now rewrite Nat.add_1_r.
 Qed.
 
+Theorem truc :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_integral = true →
+  rngl_has_1_neq_0 = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ n (M : matrix n n T) i j m,
+  2 < n
+  → determinant
+      (subm
+         (fold_left (λ M' k, mat_swap_rows k (k + 1) M')
+            (seq 0 (S (m + i))) M)
+         (S (S (m + i))) j) =
+    (minus_one_pow (S i) *
+     determinant
+       (fold_left (λ M' k, mat_swap_rows k (k + 1) M')
+          (seq 0 m) (subm M (S (S (m + i))) j)))%F.
+Proof.
+intros Hic Hop Hiv Hit H10 Hed Hch * H2n.
+revert i j.
+induction m; intros; cbn. {
+  rewrite minus_one_pow_succ; [ | easy ].
+  rewrite rngl_mul_opp_l; [ | easy ].
+  rewrite <- rngl_mul_opp_r; [ | easy ].
+  rewrite <- determinant_alternating with (p := 0) (q := 1); try easy. 2: {
+    flia H2n.
+  } 2: {
+    flia H2n.
+  }
+  destruct i. {
+    cbn.
+    rewrite rngl_mul_1_l.
+    rewrite subm_mat_swap_rows_lt; [ easy | flia | flia ].
+  }
+  cbn.
+...
+  rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
+  rewrite subm_mat_swap_rows_lt; [ easy | flia | flia ].
+}
+...
+
 Theorem determinant_subm_mat_swap_rows_0_i :
- rngl_is_comm = true →
- rngl_has_opp = true →
- rngl_has_inv = true →
- rngl_is_integral = true →
- rngl_has_1_neq_0 = true →
- rngl_has_dec_eq = true →
- rngl_characteristic = 0 →
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_integral = true →
+  rngl_has_1_neq_0 = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
   ∀ n (M : matrix n n T) i j,
   0 < i < n
   → determinant (subm (mat_swap_rows 0 i M) 0 j) =
@@ -2083,15 +2126,7 @@ destruct i. {
   now rewrite rngl_mul_1_l.
 }
 rewrite Nat.sub_succ, Nat.sub_0_r.
-Theorem truc : ∀ n (M : matrix n n T) i j m,
-  determinant
-    (subm (fold_left (λ (M' : matrix n n T) (k : nat), mat_swap_rows k (k + 1) M') (seq 0 (S (m + i))) M)
-       (S (S (m + i))) j) =
-  (minus_one_pow (S i) *
-   determinant
-     (fold_left (λ (M' : matrix (n - 1) (n - 1) T) (k : nat), mat_swap_rows k (k + 1) M') 
-        (seq 0 m) (subm M (S (S (m + i))) j)))%F.
-Admitted.
+...
 specialize (truc M i j 0) as H1.
 rewrite Nat.add_0_l in H1.
 apply H1.
