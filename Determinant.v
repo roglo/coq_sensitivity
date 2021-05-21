@@ -1994,7 +1994,7 @@ Theorem determinant_subm_mat_swap_rows_0_i :
   → determinant (subm (mat_swap_rows 0 i M) 0 j) =
     (- minus_one_pow i * determinant (subm M i j))%F.
 Proof.
-(**)
+(*
 intros Hic Hop Hiv Hit H10 Hde Hch * (Hiz, Hin).
 rewrite subm_mat_swap_rows_circ.
 destruct i; [ flia Hiz | clear Hiz ].
@@ -2035,7 +2035,7 @@ Theorem glip : ∀ n (M : matrix n n T) i,
   fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 i)
     (mat_swap_rows (S i) (S (S i)) M) =
   fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 (S i)) M.
-Admitted.
+...
 rewrite glip.
 rewrite glip.
 ...
@@ -2046,7 +2046,7 @@ Search (subm (fold_left _ _ _)).
 Theorem glop : ∀ n (M : matrix n n T) p q,
   fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 p) (subm M (S p) q) =
   subm (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 p) M) (S p) q.
-Admitted.
+...
 rewrite <- glop.
 rewrite subm_mat_swap_rows_succ_succ.
 rewrite subm_mat_swap_rows_succ_succ.
@@ -2082,6 +2082,8 @@ destruct i. {
   cbn.
   now rewrite rngl_mul_1_l.
 }
+rewrite Nat.sub_succ, Nat.sub_0_r.
+(*1*)
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_mul_opp_l; [ | easy ].
 rewrite <- rngl_mul_opp_r; [ | easy ].
@@ -2095,6 +2097,7 @@ destruct i. {
   rewrite rngl_mul_1_l.
   rewrite subm_mat_swap_rows_lt; [ easy | flia | flia ].
 }
+(*2*)
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_mul_opp_l; [ | easy ].
 rewrite <- rngl_mul_opp_r; [ | easy ].
@@ -2109,6 +2112,7 @@ destruct i. {
   rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
   rewrite subm_mat_swap_rows_lt; [ easy | flia | flia ].
 }
+(*3*)
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_mul_opp_l; [ | easy ].
 rewrite <- rngl_mul_opp_r; [ | easy ].
@@ -2120,6 +2124,23 @@ rewrite <- determinant_alternating with (p := 2) (q := 3); try easy. 2: {
 destruct i. {
   cbn.
   rewrite rngl_mul_1_l.
+  rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
+  rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
+  rewrite subm_mat_swap_rows_lt; [ easy | flia | flia ].
+}
+(*4*)
+rewrite minus_one_pow_succ; [ | easy ].
+rewrite rngl_mul_opp_l; [ | easy ].
+rewrite <- rngl_mul_opp_r; [ | easy ].
+rewrite <- determinant_alternating with (p := 3) (q := 4); try easy. 2: {
+  flia Hin.
+} 2: {
+  flia Hin.
+}
+destruct i. {
+  cbn.
+  rewrite rngl_mul_1_l.
+  rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
   rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
   rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
   rewrite subm_mat_swap_rows_lt; [ easy | flia | flia ].
