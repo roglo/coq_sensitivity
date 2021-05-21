@@ -2083,6 +2083,19 @@ destruct i. {
   now rewrite rngl_mul_1_l.
 }
 rewrite Nat.sub_succ, Nat.sub_0_r.
+Theorem truc : ∀ n (M : matrix n n T) i j m,
+  determinant
+    (subm (fold_left (λ (M' : matrix n n T) (k : nat), mat_swap_rows k (k + 1) M') (seq 0 (S (m + i))) M)
+       (S (S (m + i))) j) =
+  (minus_one_pow (S i) *
+   determinant
+     (fold_left (λ (M' : matrix (n - 1) (n - 1) T) (k : nat), mat_swap_rows k (k + 1) M') 
+        (seq 0 m) (subm M (S (S (m + i))) j)))%F.
+Admitted.
+specialize (truc M i j 0) as H1.
+rewrite Nat.add_0_l in H1.
+apply H1.
+...
 (*1*)
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_mul_opp_l; [ | easy ].
@@ -2145,6 +2158,13 @@ destruct i. {
   rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
   rewrite subm_mat_swap_rows_lt; [ easy | flia | flia ].
 }
+...
+remember 4 as m; rewrite Heqm.
+replace (S (S (S (S i)))) with (m + i) by flia Heqm.
+replace (mat_swap_rows 3 4 (mat_swap_rows 2 3 (mat_swap_rows 1 2 (mat_swap_rows 0 1 (subm M (S (S (m + i))) j)))))
+with
+  (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 4) (subm M (S (S (m + i))) j)) by easy.
+rewrite <- Heqm.
 ...
 
 (* Laplace formulas *)
