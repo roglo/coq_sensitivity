@@ -2009,8 +2009,21 @@ f_equal.
 (**)
 rewrite <- subm_mat_swap_rows_succ_succ.
 (* = mat_el M (S (S i)) j *)
+Search (mat_swap_rows _ _ (fold_left _ _ _)).
+Search (fold_left _ _ (mat_swap_rows _ _ _)).
 Search subm.
 Search (subm (fold_left _ _ _)).
+Theorem glop : ∀ n (M : matrix n n T) p q,
+  fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 p) (subm M (S p) q) =
+  subm (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 p) M) (S p) q.
+Admitted.
+rewrite <- glop.
+rewrite subm_mat_swap_rows_succ_succ.
+rewrite subm_mat_swap_rows_succ_succ.
+Search subm (mat_swap_rows _ _ _).
+rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
+rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
+Search mat_swap_rows (subm _ _ _).
 ...
 rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
 Search mat_swap_rows (subm _ _ _).
