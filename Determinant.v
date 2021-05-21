@@ -2008,11 +2008,11 @@ rewrite seq_S, fold_left_app; cbn.
 f_equal.
 (**)
 rewrite <- subm_mat_swap_rows_succ_succ.
+(* = mat_el M (S (S i)) j *)
 Search subm.
 Search (subm (fold_left _ _ _)).
 ...
 rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
-(* = mat_el M (S (S i)) j *)
 Search mat_swap_rows (subm _ _ _).
 rewrite <- subm_mat_swap_rows_succ_succ.
 ...
