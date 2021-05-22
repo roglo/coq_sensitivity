@@ -2021,7 +2021,7 @@ induction i; intros. {
   f_equal; f_equal.
 Search (subm (fold_left _ _ _)).
 replace m with (S m - 1) at 1.
-rewrite <- subm_mat_swap_rows_circ.
+Check subm_mat_swap_rows_circ.
 ...
   rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
   rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
