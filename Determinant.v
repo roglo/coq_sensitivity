@@ -1990,7 +1990,7 @@ Theorem truc :
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
   ∀ n (M : matrix n n T) i j m,
-  2 < n
+  m + 2 < n
   → determinant
       (subm
          (fold_left (λ M' k, mat_swap_rows k (k + 1) M')
@@ -2001,17 +2001,17 @@ Theorem truc :
        (fold_left (λ M' k, mat_swap_rows k (k + 1) M')
           (seq 0 m) (subm M (S (S (m + i))) j)))%F.
 Proof.
-intros Hic Hop Hiv Hit H10 Hed Hch * H2n.
-revert j m.
+intros Hic Hop Hiv Hit H10 Hed Hch * Hmn.
+revert j m Hmn.
 induction i; intros. {
   rewrite Nat.add_0_r.
   rewrite minus_one_pow_succ; [ | easy ].
   rewrite rngl_mul_opp_l; [ | easy ].
   rewrite <- rngl_mul_opp_r; [ | easy ].
   rewrite <- determinant_alternating with (p := m) (q := S m); try easy. 2: {
-    admit.
+    flia Hmn.
   } 2: {
-    admit.
+    flia Hmn.
   }
   rewrite seq_S.
   rewrite fold_left_app; cbn.
@@ -2019,15 +2019,6 @@ induction i; intros. {
   rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
   rewrite Nat.add_1_r.
   f_equal; f_equal.
-Search (subm (fold_left _ _ _)).
-replace m with (S m - 1) at 1.
-Check subm_mat_swap_rows_circ.
-...
-  rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
-  rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
-  rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
-  rewrite subm_mat_swap_rows_lt; [ easy | flia | flia ].
-}
 ...
 intros Hic Hop Hiv Hit H10 Hed Hch * H2n.
 revert i j.
@@ -2051,6 +2042,7 @@ induction m; intros; cbn. {
   rewrite subm_mat_swap_rows_lt; [ easy | flia | flia ].
 }
 ...
+*)
 
 Theorem determinant_subm_mat_swap_rows_0_i :
   rngl_is_comm = true →
@@ -2155,7 +2147,10 @@ destruct i. {
 }
 rewrite Nat.sub_succ, Nat.sub_0_r.
 ...
-specialize (truc M i j 0) as H1.
+specialize (truc Hic Hop Hiv Hit H10 Hde Hch) as H1.
+specialize (H1 n M i j 0).
+assert (H : 2 < n) by flia Hin.
+specialize (H1 H); clear H.
 rewrite Nat.add_0_l in H1.
 apply H1.
 ...
