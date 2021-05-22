@@ -2008,13 +2008,20 @@ induction i; intros. {
   rewrite minus_one_pow_succ; [ | easy ].
   rewrite rngl_mul_opp_l; [ | easy ].
   rewrite <- rngl_mul_opp_r; [ | easy ].
-  rewrite <- determinant_alternating with (p := 0) (q := 1); try easy. 2: {
-    flia H2n.
+  rewrite <- determinant_alternating with (p := m) (q := S m); try easy. 2: {
+    admit.
   } 2: {
-    flia H2n.
+    admit.
   }
-  cbn.
+  rewrite seq_S.
+  rewrite fold_left_app; cbn.
   rewrite rngl_mul_1_l.
+  rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
+  rewrite Nat.add_1_r.
+  f_equal; f_equal.
+Search (subm (fold_left _ _ _)).
+replace m with (S m - 1) at 1.
+rewrite <- subm_mat_swap_rows_circ.
 ...
   rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
   rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
