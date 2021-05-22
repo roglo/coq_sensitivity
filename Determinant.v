@@ -2002,6 +2002,27 @@ Theorem truc :
           (seq 0 m) (subm M (S (S (m + i))) j)))%F.
 Proof.
 intros Hic Hop Hiv Hit H10 Hed Hch * H2n.
+revert j m.
+induction i; intros. {
+  rewrite Nat.add_0_r.
+  rewrite minus_one_pow_succ; [ | easy ].
+  rewrite rngl_mul_opp_l; [ | easy ].
+  rewrite <- rngl_mul_opp_r; [ | easy ].
+  rewrite <- determinant_alternating with (p := 0) (q := 1); try easy. 2: {
+    flia H2n.
+  } 2: {
+    flia H2n.
+  }
+  cbn.
+  rewrite rngl_mul_1_l.
+...
+  rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
+  rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
+  rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
+  rewrite subm_mat_swap_rows_lt; [ easy | flia | flia ].
+}
+...
+intros Hic Hop Hiv Hit H10 Hed Hch * H2n.
 revert i j.
 induction m; intros; cbn. {
   rewrite minus_one_pow_succ; [ | easy ].
