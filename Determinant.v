@@ -1981,6 +1981,24 @@ rewrite fold_left_app; cbn.
 now rewrite Nat.add_1_r.
 Qed.
 
+Theorem subm_fold_left_lt : ∀ n (M : matrix n n T) i j m,
+  m < i
+  → subm
+      (fold_left (λ M' k, mat_swap_rows k (k + 1) M')
+         (seq 0 m) M) i j =
+    fold_left
+      (λ M' k, mat_swap_rows k (k + 1) M')
+      (seq 0 m) (subm M i j).
+Proof.
+intros * Hmi.
+revert i Hmi.
+induction m; intros; [ easy | ].
+rewrite seq_S; cbn.
+do 2 rewrite fold_left_app; cbn.
+rewrite <- IHm; [ | flia Hmi ].
+apply subm_mat_swap_rows_lt; flia Hmi.
+Qed.
+
 Theorem truc :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -2019,6 +2037,13 @@ induction i; intros. {
   rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
   rewrite Nat.add_1_r.
   f_equal; f_equal.
+  apply subm_fold_left_lt; flia.
+}
+rewrite <- Nat.add_succ_comm.
+destruct (Nat.eq_dec (S m + 2) n) as [Hmn2| Hmn2]. {
+...
+}
+rewrite IHi; [ | flia Hmn Hmn2 ].
 ...
 intros Hic Hop Hiv Hit H10 Hed Hch * H2n.
 revert i j.
