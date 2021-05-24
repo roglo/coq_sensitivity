@@ -1999,6 +1999,7 @@ rewrite <- IHm; [ | flia Hmi ].
 apply subm_mat_swap_rows_lt; flia Hmi.
 Qed.
 
+(*
 Theorem truc :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -2043,33 +2044,12 @@ rewrite <- Nat.add_succ_comm.
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_opp_involutive.
+Check subm_mat_swap_rows_lt.
 ...
 destruct (Nat.eq_dec (S m + 2) n) as [Hmn2| Hmn2]. {
 ...
 }
 rewrite IHi; [ | flia Hmn Hmn2 ].
-...
-intros Hic Hop Hiv Hit H10 Hed Hch * H2n.
-revert i j.
-induction m; intros; cbn. {
-  rewrite minus_one_pow_succ; [ | easy ].
-  rewrite rngl_mul_opp_l; [ | easy ].
-  rewrite <- rngl_mul_opp_r; [ | easy ].
-  rewrite <- determinant_alternating with (p := 0) (q := 1); try easy. 2: {
-    flia H2n.
-  } 2: {
-    flia H2n.
-  }
-  destruct i. {
-    cbn.
-    rewrite rngl_mul_1_l.
-    rewrite subm_mat_swap_rows_lt; [ easy | flia | flia ].
-  }
-  cbn.
-...
-  rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
-  rewrite subm_mat_swap_rows_lt; [ easy | flia | flia ].
-}
 ...
 *)
 
@@ -2175,6 +2155,7 @@ destruct i. {
   now rewrite rngl_mul_1_l.
 }
 rewrite Nat.sub_succ, Nat.sub_0_r.
+(*
 ...
 specialize (truc Hic Hop Hiv Hit H10 Hde Hch) as H1.
 specialize (H1 n M i j 0).
@@ -2183,6 +2164,7 @@ specialize (H1 H); clear H.
 rewrite Nat.add_0_l in H1.
 apply H1.
 ...
+*)
 (*1*)
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_mul_opp_l; [ | easy ].
@@ -2245,6 +2227,13 @@ destruct i. {
   rewrite subm_mat_swap_rows_lt; [ | flia | flia ].
   rewrite subm_mat_swap_rows_lt; [ easy | flia | flia ].
 }
+(*
+specialize (truc Hic Hop Hiv Hit H10 Hde Hch) as H1.
+specialize (H1 n M i j 4).
+assert (H : 4 + 2 < n) by flia Hin.
+specialize (H1 H); clear H.
+apply H1.
+*)
 ...
 remember 4 as m; rewrite Heqm.
 replace (S (S (S (S i)))) with (m + i) by flia Heqm.
