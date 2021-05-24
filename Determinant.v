@@ -2043,6 +2043,7 @@ rewrite <- Nat.add_succ_comm.
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_opp_involutive.
+...
 destruct (Nat.eq_dec (S m + 2) n) as [Hmn2| Hmn2]. {
 ...
 }
