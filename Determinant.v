@@ -2078,17 +2078,50 @@ rewrite IHi; [ | flia Hmn Hmn2 ].
 ...
 *)
 
-Theorem machin : ∀ n (M : matrix n n T) i,
+Theorem machin :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_integral = true →
+  rngl_has_1_neq_0 = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ n (M : matrix n n T) i,
   i < n
   → determinant
       (fold_left (λ M' k, mat_swap_rows k (k + 1) M')
        (seq 0 i) M) =
     (minus_one_pow i * determinant M)%F.
 Proof.
-(*
 intros Hic Hop Hiv Hit H10 Hde Hch.
-*)
 intros * Hin.
+revert M.
+induction i; intros; [ now cbn; rewrite rngl_mul_1_l | ].
+assert (H : i < n) by flia Hin.
+specialize (IHi H); clear H.
+rewrite minus_one_pow_succ; [ | easy ].
+rewrite rngl_mul_opp_l; [ | easy ].
+rewrite <- rngl_mul_opp_r; [ | easy ].
+...
+rewrite <- determinant_alternating with (p := i) (q := i + 1); try easy;
+  [ | flia | flia Hin | flia Hin ].
+specialize (IHi (mat_swap_rows i (i + 1) M)).
+rewrite <- IHi.
+rewrite seq_S; cbn.
+rewrite fold_left_app; cbn.
+rewrite Nat.add_1_r.
+Search (determinant (mat_swap_rows _ _ _)).
+...
+rewrite mat_swap_rows_fold_left.
+rewrite seq_S; cbn.
+rewrite fold_left_app; cbn.
+rewrite Nat.add_1_r.
+rewrite mat_swap_rows_fold_left.
+rewrite seq_S; cbn.
+rewrite fold_left_app; cbn.
+rewrite Nat.add_1_r.
+rewrite mat_swap_rows_fold_left.
+rewrite seq_S; cbn.
 ...
 
 Theorem determinant_subm_mat_swap_rows_0_i :
