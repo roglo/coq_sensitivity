@@ -2150,11 +2150,11 @@ rewrite subm_mat_swap_rows_circ.
 destruct i; [ flia Hiz | ].
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_opp_involutive; [ | easy ].
+rewrite Nat.sub_succ, Nat.sub_0_r.
 destruct i. {
   cbn.
   now rewrite rngl_mul_1_l.
 }
-rewrite Nat.sub_succ, Nat.sub_0_r.
 (*
 ...
 specialize (truc Hic Hop Hiv Hit H10 Hde Hch) as H1.
