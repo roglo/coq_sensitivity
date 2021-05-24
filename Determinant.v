@@ -2078,6 +2078,19 @@ rewrite IHi; [ | flia Hmn Hmn2 ].
 ...
 *)
 
+Theorem machin : ∀ n (M : matrix n n T) i,
+  i < n
+  → determinant
+      (fold_left (λ M' k, mat_swap_rows k (k + 1) M')
+       (seq 0 i) M) =
+    (minus_one_pow i * determinant M)%F.
+Proof.
+(*
+intros Hic Hop Hiv Hit H10 Hde Hch.
+*)
+intros * Hin.
+...
+
 Theorem determinant_subm_mat_swap_rows_0_i :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -2176,6 +2189,12 @@ destruct i; [ flia Hiz | ].
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_opp_involutive; [ | easy ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
+(**)
+rewrite subm_fold_left_lt; [ | flia ].
+remember (subm M (S i) j) as A eqn:HA.
+...
+apply machin.
+flia Hin.
 ...
 (*
 specialize (truc Hic Hop Hiv Hit H10 Hde Hch) as H1.
