@@ -2009,6 +2009,31 @@ Theorem truc :
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
   ∀ n (M : matrix n n T) i j m,
+  m + 1 < n
+  → determinant
+      (subm
+         (fold_left (λ M' k, mat_swap_rows k (k + 1) M')
+            (seq 0 (m + i)) M)
+         (S (m + i)) j) =
+    (minus_one_pow i *
+     determinant
+       (fold_left (λ M' k, mat_swap_rows k (k + 1) M')
+          (seq 0 m) (subm M (S (m + i)) j)))%F.
+Proof.
+intros Hic Hop Hiv Hit H10 Hed Hch * Hmn.
+...
+*)
+
+(*
+Theorem truc :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_integral = true →
+  rngl_has_1_neq_0 = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ n (M : matrix n n T) i j m,
   m + 2 < n
   → determinant
       (subm
@@ -2151,6 +2176,16 @@ destruct i; [ flia Hiz | ].
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_opp_involutive; [ | easy ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
+...
+(*
+specialize (truc Hic Hop Hiv Hit H10 Hde Hch) as H1.
+specialize (H1 n M i j 0).
+assert (H : 1 < n) by flia Hin.
+specialize (H1 H); clear H.
+rewrite Nat.add_0_l in H1.
+apply H1.
+...
+*)
 destruct i. {
   cbn.
   now rewrite rngl_mul_1_l.
