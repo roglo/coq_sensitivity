@@ -1857,37 +1857,32 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
 }
 move i before n.
 move Hiz after Hlin.
-Inspect 1.
+destruct n; [ easy | cbn ].
+rewrite Nat.sub_0_r at 1.
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite rngl_mul_comm; [ | easy ].
+  rewrite rngl_mul_mul_swap; [ | easy ].
+  easy.
+}
+cbn.
+rename i into p.
 ...
-(**)
-(*
-  unfold determinant.
-*)
-  destruct n; [ easy | cbn ].
-  rewrite Nat.sub_0_r at 1.
-  symmetry.
-  erewrite rngl_summation_eq_compat. 2: {
-    intros j Hj.
-(*
-    rewrite Nat.sub_0_r at 2.
-*)
-    rewrite rngl_mul_comm; [ | easy ].
-    rewrite rngl_mul_mul_swap; [ | easy ].
-    easy.
-  }
-  cbn.
-  remember (mat_swap_rows 0 i M) as M'.
-  erewrite rngl_summation_eq_compat. 2: {
-    intros j Hj.
-    rewrite minus_one_pow_add_r; [ | easy | easy ].
-replace (mat_el M i j) with (mat_el (mat_swap_rows 0 i M) 0 j) by easy.
-do 2 rewrite <- rngl_mul_assoc.
-rewrite (rngl_mul_assoc (minus_one_pow j)).
-rewrite <- HeqM'.
-easy.
+remember (mat_swap_rows 0 p M) as M'.
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite minus_one_pow_add_r; [ | easy | easy ].
+  replace (mat_el M p j) with (mat_el (mat_swap_rows 0 p M) 0 j) by easy.
+  do 2 rewrite <- rngl_mul_assoc.
+  rewrite (rngl_mul_assoc (minus_one_pow j)).
+  rewrite <- HeqM'.
+  easy.
 }
 cbn; subst M'.
 rewrite <- rngl_mul_summation_distr_l; [ | now left ].
+Inspect 1.
+...
 (*
 rewrite fold_det_loop.
 rewrite fold_determinant.
