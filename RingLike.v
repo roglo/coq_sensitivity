@@ -1280,6 +1280,28 @@ destruct mo. {
 now destruct Hom.
 Qed.
 
+Theorem eq_rngl_add_same_0 :
+  rngl_has_opp = true ∨ rngl_has_sous = true →
+  (rngl_is_integral ||
+   (rngl_has_inv || rngl_has_quot) && rngl_has_dec_eq)%bool = true →
+  rngl_has_1_neq_0 = true →
+  rngl_characteristic = 0 →
+  ∀ a,
+  (a + a = 0)%F
+  → a = 0%F.
+Proof.
+intros H1 H2 H10 H3 * Haa.
+rewrite <- (rngl_mul_1_l a) in Haa.
+rewrite <- rngl_mul_add_distr_r in Haa.
+apply rngl_integral in Haa; [ | easy | easy ].
+destruct Haa as [Haa| Haa]; [ | easy ].
+specialize rngl_characteristic_prop as H4.
+rewrite H3 in H4.
+specialize (H4 1).
+cbn in H4.
+now rewrite rngl_add_0_r in H4.
+Qed.
+
 End a.
 
 Arguments rngl_add_opp_l {T}%type {ro rp} Hro.

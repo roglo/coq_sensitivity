@@ -715,12 +715,10 @@ assert (HM : determinant M = (- determinant M)%F). {
   easy.
 }
 apply rngl_add_move_0_r in HM; [ | easy ].
-Search (_ + _ = 0)%F.
-...
-rewrite H.
-Inspect 1.
-rewrite determinant_alternating; try easy.
-...
+apply eq_rngl_add_same_0 in HM; try easy; [ now left | ].
+apply orb_true_iff.
+now left.
+Qed.
 
 (* transpositions list of permutation *)
 
