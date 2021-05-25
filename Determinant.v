@@ -1941,7 +1941,33 @@ enough (H : x = 0%F). {
   rewrite H, rngl_mul_0_r; [ easy | now left ].
 }
 subst x.
-Inspect 2.
+Search determinant.
+...
+remember (mk_mat n n (λ p q, mat_el M (if Nat.eq_dec p j then i else p) q)) as A eqn:HA.
+assert (H1 : determinant A = 0%F). {
+...
+}
+rewrite <- H1 at 2.
+subst A.
+destruct n; [ flia Hi | ].
+rewrite <- fold_determinant at 1.
+rewrite Nat.sub_succ at 1.
+rewrite Nat.sub_0_r.
+cbn - [ Nat.eq_dec ].
+apply rngl_summation_eq_compat.
+intros k Hk.
+do 2 rewrite <- rngl_mul_assoc.
+f_equal.
+rewrite rngl_mul_comm; [ | easy ].
+destruct (Nat.eq_dec 0 j) as [Hjz| Hjz]. {
+  subst j.
+  f_equal; f_equal.
+  apply matrix_eq.
+  intros j m H2 Hm.
+  cbn.
+  destruct (Nat.eq_dec (j + 1) 0) as [H| H]; [ flia H | easy ].
+}
+
 ...
 comatrix =
 λ (n : nat) (M : matrix n n T), {| mat_el := λ i j : nat, (minus_one_pow (i + j) * determinant (subm M i j))%F |}
