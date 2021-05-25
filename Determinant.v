@@ -1982,32 +1982,37 @@ assert (H1 : determinant A = 0%F). {
   rewrite <- (if_eqb_eq_dec j), Nat.eqb_refl.
   now destruct (Nat.eq_dec i j).
 }
-rewrite <- H1 at 2.
-subst A.
+rewrite <- H1 at 2; clear H1.
+rewrite HA.
 destruct n; [ flia Hi | ].
-Check fold_determinant.
-Search determinant.
-...
-fold_determinant:
-  ∀ (n : nat) (M : matrix (S n) (S n) T),
-    determinant M = Σ (j = 0, n), minus_one_pow j * mat_el M 0 j * determinant (subm M 0 j)
-...
-rewrite fold_determinant at 1.
 rewrite Nat.sub_succ at 1.
 rewrite Nat.sub_0_r.
+Print fold_determinant.
+Theorem determinant_with_row : ∀ i n (M : matrix (S n) (S n) T),
+  determinant M =
+   Σ (j = 0, n),
+   minus_one_pow (i + j) * mat_el M i j * determinant (subm M i j).
+Proof.
+Admitted.
+rewrite (determinant_with_row i).
 cbn - [ Nat.eq_dec ].
 apply rngl_summation_eq_compat.
 intros k Hk.
 do 2 rewrite <- rngl_mul_assoc.
+rewrite (Nat.add_comm i k).
+rewrite minus_one_pow_add_r; [ | easy | easy ].
+rewrite <- rngl_mul_assoc.
 f_equal.
 rewrite rngl_mul_comm; [ | easy ].
-destruct (Nat.eq_dec 0 j) as [Hjz| Hjz]. {
-  subst j.
-  f_equal; f_equal.
-  apply matrix_eq.
-  intros j m H2 Hm; cbn.
-  destruct (Nat.eq_dec (j + 1) 0) as [H| H]; [ flia H | easy ].
-}
+destruct (Nat.eq_dec i j) as [H| H]; [ easy | clear H ].
+symmetry.
+rewrite rngl_mul_comm; [ symmetry | easy ].
+rewrite <- rngl_mul_assoc.
+f_equal.
+rewrite rngl_mul_comm; [ | easy ].
+rewrite <- HA.
+Search (determinant (subm _ _ _)).
+...
 ...
 destruct (Nat.eq_dec 0 j) as [Hjz| Hjz]. {
   subst j.
