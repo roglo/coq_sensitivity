@@ -688,6 +688,40 @@ intros i Hi.
 now rewrite Nat.add_comm, Nat.add_sub.
 Qed.
 
+Theorem determinant_same_rows :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_integral = true →
+  rngl_has_1_neq_0 = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ n (M : matrix n n T) p q,
+  p ≠ q
+  → p < n
+  → q < n
+  → (∀ j, mat_el M p j = mat_el M q j)
+  → determinant M = 0%F.
+Proof.
+intros Hic Hop Hin Hit H10 Hde Hch * Hpq Hpn Hqn Hjpq.
+assert (HM : determinant M = (- determinant M)%F). {
+  rewrite <- determinant_alternating with (p := p) (q := q); try easy.
+  f_equal.
+  apply matrix_eq.
+  intros i j Hi Hj.
+  cbn.
+  destruct (Nat.eq_dec i p) as [Hip| Hip]; [ subst i; apply Hjpq | ].
+  destruct (Nat.eq_dec i q) as [Hiq| Hiq]; [ symmetry; subst i; apply Hjpq | ].
+  easy.
+}
+apply rngl_add_move_0_r in HM; [ | easy ].
+Search (_ + _ = 0)%F.
+...
+rewrite H.
+Inspect 1.
+rewrite determinant_alternating; try easy.
+...
+
 (* transpositions list of permutation *)
 
 Fixpoint first_non_fixpoint it i σ :=
@@ -1941,12 +1975,23 @@ enough (H : x = 0%F). {
   rewrite H, rngl_mul_0_r; [ easy | now left ].
 }
 subst x.
-remember (mk_mat n n (λ p q, mat_el M (if Nat.eq_dec p j then i else p) q)) as A eqn:HA.
-assert (H1 : determinant A = 0%F). {
-  admit.
-}
 destruct (Nat.eq_dec 0 j) as [Hjz| Hjz]. {
   subst j.
+  remember (mk_mat n n (λ p q, mat_el M (if Nat.eq_dec p 0 then i else p) q)) as A eqn:HA.
+  assert (H1 : determinant A = 0%F). {
+    subst A.
+...
+Check determinant_same_rows.
+...
+    apply rngl_opp_inj; [ easy | ].
+    rewrite rngl_opp_0; [ | easy ].
+    rewrite <- determinant_alternating with (p := i) (q := 0); try easy.
+Search (determinant (mat_swap_rows _ _ _)).
+
+...
+Search (determinant _ = 0)%F.
+...
+  }
   rewrite <- H1 at 2.
   subst A.
   destruct n; [ flia Hi | ].
@@ -1966,6 +2011,7 @@ destruct (Nat.eq_dec 0 j) as [Hjz| Hjz]. {
   cbn.
   destruct (Nat.eq_dec (j + 1) 0) as [H| H]; [ flia H | easy ].
 }
+...
 apply (f_equal rngl_opp) in H1.
 rewrite rngl_opp_0 in H1; [ | easy ].
 rewrite <- determinant_alternating with (p := 0) (q := j) in H1; try easy; [ | flia Hi ].
@@ -1984,46 +2030,13 @@ rewrite <- (if_eqb_eq_dec j), Nat.eqb_refl.
 destruct (Nat.eq_dec 0 j) as [H| H]; [ flia H Hjz | clear H ].
 rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
 rewrite rngl_mul_comm; [ | easy ].
-f_equal.
-Search subm (mat_swap_rows _ _ _).
-...
-rewrite subm_mat_swap_rows_lt.
-...
-f_equal.
+f_equal; f_equal.
 apply matrix_eq.
 intros p q Hp Hq.
 cbn - [ Nat.eq_dec ].
 destruct (Nat.eq_dec (p + 1) 0) as [H| H]; [ flia H | clear H ].
+destruct (Nat.eq_dec 0 j) as [H| H]; [ flia H Hjz | clear H ].
 destruct (Nat.eq_dec (p + 1) j) as [Hpj| Hpj]. {
-
-...
-
-...
-...
-rewrite <- H1 at 2.
-subst A.
-destruct n; [ flia Hi | ].
-rewrite <- fold_determinant at 1.
-rewrite Nat.sub_succ at 1.
-rewrite Nat.sub_0_r.
-cbn - [ Nat.eq_dec ].
-apply rngl_summation_eq_compat.
-intros k Hk.
-do 2 rewrite <- rngl_mul_assoc.
-f_equal.
-rewrite rngl_mul_comm; [ | easy ].
-destruct (Nat.eq_dec 0 j) as [Hjz| Hjz]. {
-  subst j.
-  f_equal; f_equal.
-  apply matrix_eq.
-  intros j m H2 Hm.
-  cbn.
-  destruct (Nat.eq_dec (j + 1) 0) as [H| H]; [ flia H | easy ].
-}
-
-...
-comatrix =
-λ (n : nat) (M : matrix n n T), {| mat_el := λ i j : nat, (minus_one_pow (i + j) * determinant (subm M i j))%F |}
 ...
 
 End a.
