@@ -1942,10 +1942,64 @@ enough (H : x = 0%F). {
 }
 subst x.
 remember (mk_mat n n (λ p q, mat_el M (if Nat.eq_dec p j then i else p) q)) as A eqn:HA.
-...
 assert (H1 : determinant A = 0%F). {
   admit.
 }
+destruct (Nat.eq_dec 0 j) as [Hjz| Hjz]. {
+  subst j.
+  rewrite <- H1 at 2.
+  subst A.
+  destruct n; [ flia Hi | ].
+  rewrite <- fold_determinant at 1.
+  rewrite Nat.sub_succ at 1.
+  rewrite Nat.sub_0_r.
+  cbn - [ Nat.eq_dec ].
+  apply rngl_summation_eq_compat.
+  intros k Hk.
+  do 2 rewrite <- rngl_mul_assoc.
+  f_equal.
+  rewrite rngl_mul_comm; [ | easy ].
+  rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
+  f_equal; f_equal.
+  apply matrix_eq.
+  intros j m H2 Hm.
+  cbn.
+  destruct (Nat.eq_dec (j + 1) 0) as [H| H]; [ flia H | easy ].
+}
+apply (f_equal rngl_opp) in H1.
+rewrite rngl_opp_0 in H1; [ | easy ].
+rewrite <- determinant_alternating with (p := 0) (q := j) in H1; try easy; [ | flia Hi ].
+rewrite <- H1 at 2.
+subst A.
+destruct n; [ flia Hi | ].
+rewrite <- fold_determinant at 1.
+rewrite Nat.sub_succ at 1.
+rewrite Nat.sub_0_r.
+cbn - [ Nat.eq_dec ].
+apply rngl_summation_eq_compat.
+intros k Hk.
+do 2 rewrite <- rngl_mul_assoc.
+f_equal.
+rewrite <- (if_eqb_eq_dec j), Nat.eqb_refl.
+destruct (Nat.eq_dec 0 j) as [H| H]; [ flia H Hjz | clear H ].
+rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
+rewrite rngl_mul_comm; [ | easy ].
+f_equal.
+Search subm (mat_swap_rows _ _ _).
+...
+rewrite subm_mat_swap_rows_lt.
+...
+f_equal.
+apply matrix_eq.
+intros p q Hp Hq.
+cbn - [ Nat.eq_dec ].
+destruct (Nat.eq_dec (p + 1) 0) as [H| H]; [ flia H | clear H ].
+destruct (Nat.eq_dec (p + 1) j) as [Hpj| Hpj]. {
+
+...
+
+...
+...
 rewrite <- H1 at 2.
 subst A.
 destruct n; [ flia Hi | ].
