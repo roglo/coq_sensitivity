@@ -1941,9 +1941,8 @@ enough (H : x = 0%F). {
   rewrite H, rngl_mul_0_r; [ easy | now left ].
 }
 subst x.
-Print determinant.
-...
 remember (mk_mat n n (λ p q, mat_el M (if Nat.eq_dec p j then i else p) q)) as A eqn:HA.
+...
 assert (H1 : determinant A = 0%F). {
   admit.
 }
