@@ -1891,7 +1891,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
-Search determinant.
+Search (determinant _ = determinant _).
 ...
 Theorem subm_subm_mat_swap_rows : ∀ n (M : matrix n n T) i j k,
   subm M i j = subm (mat_swap_rows k i M) k j.
