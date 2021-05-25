@@ -1978,17 +1978,9 @@ destruct (Nat.eq_dec 0 j) as [Hjz| Hjz]. {
   remember (mk_mat n n (λ p q, mat_el M (if Nat.eq_dec p 0 then i else p) q)) as A eqn:HA.
   assert (H1 : determinant A = 0%F). {
     subst A.
-...
-Check determinant_same_rows.
-...
-    apply rngl_opp_inj; [ easy | ].
-    rewrite rngl_opp_0; [ | easy ].
-    rewrite <- determinant_alternating with (p := i) (q := 0); try easy.
-Search (determinant (mat_swap_rows _ _ _)).
-
-...
-Search (determinant _ = 0)%F.
-...
+    apply determinant_same_rows with (p := i) (q := 0); try easy.
+    intros; cbn.
+    now destruct (Nat.eq_dec i 0).
   }
   rewrite <- H1 at 2.
   subst A.
