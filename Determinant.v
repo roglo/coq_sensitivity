@@ -1927,7 +1927,24 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   now rewrite rngl_mul_1_r.
 }
 rewrite rngl_mul_0_r; [ | now left ].
-rename j into k.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  rewrite rngl_mul_comm; [ | easy ].
+  rewrite minus_one_pow_add_r; [ | easy | easy ].
+  rewrite <- (rngl_mul_assoc (minus_one_pow j)).
+  now rewrite <- rngl_mul_assoc.
+}
+cbn.
+rewrite <- rngl_mul_summation_distr_l; [ | now left ].
+remember (Σ (k = _, _), _)%F as x eqn:Hx.
+enough (H : x = 0%F). {
+  rewrite H, rngl_mul_0_r; [ easy | now left ].
+}
+subst x.
+Inspect 2.
+...
+comatrix =
+λ (n : nat) (M : matrix n n T), {| mat_el := λ i j : nat, (minus_one_pow (i + j) * determinant (subm M i j))%F |}
 ...
 
 End a.
