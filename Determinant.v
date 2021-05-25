@@ -1907,10 +1907,6 @@ f_equal.
 apply determinant_alternating; try easy; [ flia Hiz | flia ].
 Qed.
 
-Inspect 1.
-
-...
-
 Theorem mat_comat_mul :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -1923,9 +1919,7 @@ Theorem mat_comat_mul :
   (M * (comatrix M)⁺ = determinant M × mI n)%M.
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch *.
-Abort. (*
 ...
-*)
 
 End a.
 
