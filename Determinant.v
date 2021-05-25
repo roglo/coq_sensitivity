@@ -1868,8 +1868,40 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn.
 rename i into p.
-...
 remember (mat_swap_rows 0 p M) as M'.
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite rngl_mul_mul_swap; [ | easy ].
+  rewrite Nat.add_comm.
+  rewrite minus_one_pow_add_r; [ | easy | easy ].
+  do 2 rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; [ | easy ].
+  rewrite rngl_mul_assoc.
+  remember (minus_one_pow p * _)%F as x eqn:Hx.
+  rewrite <- rngl_opp_involutive in Hx; [ | easy ].
+  rewrite <- rngl_mul_opp_l in Hx; [ | easy ].
+  specialize determinant_subm_mat_swap_rows_0_i as H1.
+  specialize (H1 Hic Hop Hin Hit H10 Hde Hch).
+  specialize (H1 _ M p j).
+  cbn in H1.
+  rewrite <- H1 in Hx; [ | flia Hiz Hlin ].
+  subst x; clear H1.
+  rewrite rngl_mul_comm; [ | easy ].
+  rewrite rngl_mul_assoc, rngl_mul_mul_swap; [ | easy ].
+  easy.
+}
+cbn.
+Search determinant.
+...
+Theorem subm_subm_mat_swap_rows : ∀ n (M : matrix n n T) i j k,
+  subm M i j = subm (mat_swap_rows k i M) k j.
+...
+rewrite subm_subm_mat_swap_rows with (k := 0).
+easy.
+}
+cbn.
+Inspect 2.
+...
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   rewrite minus_one_pow_add_r; [ | easy | easy ].
@@ -1880,6 +1912,8 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn; subst M'.
+Inspect 1.
+...
 rewrite <- rngl_mul_summation_distr_l; [ | now left ].
 Inspect 1.
 ...
