@@ -68,8 +68,8 @@ Definition det_from_col {n} (M : matrix (S n) (S n) T) j :=
      minus_one_pow i * mat_el M i j * determinant (subm M i j))%F.
 
 Theorem fold_determinant : ∀ n (M : matrix (S n) (S n) T),
-  Σ (j = 0, n), minus_one_pow j * mat_el M 0 j * determinant (subm M 0 j) =
-  determinant M.
+  determinant M =
+  Σ (j = 0, n), minus_one_pow j * mat_el M 0 j * determinant (subm M 0 j).
 Proof. easy. Qed.
 
 (* Alternative version of the determinant: sum of product of the
@@ -1932,7 +1932,7 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn.
 rewrite <- rngl_opp_summation; [ | easy | easy ].
-do 2 rewrite fold_determinant.
+do 2 rewrite <- fold_determinant.
 subst M'.
 rewrite <- rngl_opp_involutive; [ | easy ].
 f_equal.
@@ -1973,9 +1973,44 @@ enough (H : x = 0%F). {
   rewrite H, rngl_mul_0_r; [ easy | now left ].
 }
 subst x.
+remember (mk_mat n n (λ p q, mat_el M (if Nat.eq_dec p j then i else p) q))
+  as A eqn:HA.
+assert (H1 : determinant A = 0%F). {
+  subst A.
+  apply determinant_same_rows with (p := i) (q := j); try easy.
+  intros; cbn.
+  rewrite <- (if_eqb_eq_dec j), Nat.eqb_refl.
+  now destruct (Nat.eq_dec i j).
+}
+rewrite <- H1 at 2.
+subst A.
+destruct n; [ flia Hi | ].
+Check fold_determinant.
+Search determinant.
+...
+fold_determinant:
+  ∀ (n : nat) (M : matrix (S n) (S n) T),
+    determinant M = Σ (j = 0, n), minus_one_pow j * mat_el M 0 j * determinant (subm M 0 j)
+...
+rewrite fold_determinant at 1.
+rewrite Nat.sub_succ at 1.
+rewrite Nat.sub_0_r.
+cbn - [ Nat.eq_dec ].
+apply rngl_summation_eq_compat.
+intros k Hk.
+do 2 rewrite <- rngl_mul_assoc.
+f_equal.
+rewrite rngl_mul_comm; [ | easy ].
 destruct (Nat.eq_dec 0 j) as [Hjz| Hjz]. {
   subst j.
-  remember (mk_mat n n (λ p q, mat_el M (if Nat.eq_dec p 0 then i else p) q)) as A eqn:HA.
+  f_equal; f_equal.
+  apply matrix_eq.
+  intros j m H2 Hm; cbn.
+  destruct (Nat.eq_dec (j + 1) 0) as [H| H]; [ flia H | easy ].
+}
+...
+destruct (Nat.eq_dec 0 j) as [Hjz| Hjz]. {
+  subst j.
   assert (H1 : determinant A = 0%F). {
     subst A.
     apply determinant_same_rows with (p := i) (q := 0); try easy.
