@@ -1921,13 +1921,13 @@ Proof.
 intros Hic Hop Hin Hit H10 Hde Hch *.
 apply matrix_eq.
 intros i j Hi Hj.
-rewrite laplace_formula_on_rows with (i := j); try easy.
-cbn.
+rewrite laplace_formula_on_rows with (i := i); try easy; cbn.
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   subst j.
   now rewrite rngl_mul_1_r.
 }
 rewrite rngl_mul_0_r; [ | now left ].
+rename j into k.
 ...
 
 End a.
