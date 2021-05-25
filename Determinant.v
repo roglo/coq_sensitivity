@@ -775,28 +775,6 @@ Fixpoint nb_good_loop it i σ :=
 
 Definition nb_good n σ := nb_good_loop n 0 σ.
 
-(*
-Theorem nb_good_loop_comp_transp : ∀ n it σ i j k,
-  is_permut_fun σ n
-  → n = i + it
-  → nb_good_loop it i (comp (transposition j k) σ) =
-    nb_good_loop it i σ.
-Proof.
-intros * Hp Hnit.
-revert i j k Hnit.
-induction it; intros; [ easy | cbn ].
-unfold comp at 1, transposition at 1, Nat.b2n.
-do 4 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec (σ i) j) as [Hsij| Hsij]. {
-destruct (Nat.eq_dec k i) as [Hki| Hki]. {
-  move Hki at top; subst k.
-  destruct (Nat.eq_dec (σ i) i) as [Hsii| Hsii]. {
-    f_equal.
-    apply IHit; flia Hnit.
-  }
-...
-*)
-
 Theorem nb_good_loop_comp_transp : ∀ n it σ i k,
   is_permut_fun σ n
   → k < i ≤ n
@@ -829,33 +807,6 @@ f_equal.
 apply IHit; [ | flia Hski | easy ].
 split; [ flia Hkin | flia Hnit ].
 Qed.
-
-(*
-Theorem glop : ∀ n σ i k,
-  is_permut_fun σ n
-  → i < n
-  → (∀ k, k < i → σ k = k)
-  → σ i ≠ i
-  → σ (σ i) ≠ i
-  → i + 1 ≤ k < n
-  → ∀ p, k ≤ p → comp (transposition i (σ i)) σ p = σ p.
-Proof.
-intros * Hp Hin Hsi Hsii Hssii Hsik p Hkp.
-unfold comp, transposition; cbn.
-rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec (σ p) i) as [Hspi| Hspi]. {
-  destruct (Nat.eq_dec (σ i) p) as [Hpsi| Hpsi]. {
-    now rewrite <- Hpsi in Hspi.
-  }
-...
-intros * Hp Hin Hsi Hsii Hssii Hsik p Hkp.
-revert i k Hin Hsi Hsii Hssii Hsik Hkp.
-induction p; intros; [ flia Hsik Hkp | cbn ].
-unfold comp, transposition; cbn.
-rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec (σ (S p)
-...
-*)
 
 Theorem comp_transp_permut_id : ∀ n σ i j k,
   is_permut_fun σ n
@@ -945,103 +896,6 @@ rewrite IHit; [ easy | easy | flia Hkn Hk1n | | flia Hnit ].
 intros j Hkj.
 apply Hj; flia Hkj.
 Qed.
-
-(*
-Theorem nb_good_loop_comp_transp3 : ∀ n it σ i k,
-  is_permut_fun σ n
-  → i < k < n
-  → σ k = i
-  → n = k + 1 + it
-  → nb_good_loop it (k + 1) (comp (transposition i (σ i)) σ) =
-    nb_good_loop it (k + 1) σ.
-Proof.
-intros * Hp Hikn Hski Hnit.
-revert i k Hikn Hski Hnit.
-induction it; intros; [ easy | cbn ].
-unfold comp at 1, transposition at 1, Nat.b2n.
-do 4 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec (σ (k + 1)) i) as [Hsk1i| Hsk1i]. {
-  rewrite <- Hski in Hsk1i.
-  apply Hp in Hsk1i; [ flia Hsk1i | flia Hnit | easy ].
-}
-destruct (Nat.eq_dec (σ (k + 1)) (σ i)) as [Hsk1si| Hsk1si]. {
-  apply Hp in Hsk1si; [ | flia Hnit | flia Hikn ].
-  flia Hikn Hsk1si.
-}
-f_equal.
-replace (k + 1 + S it) with (k + 1 + 1 + it) in Hnit by flia.
-apply IHit; try easy. {
-  split; [ flia Hikn | ].
-  flia Hnit.
-}
-...
-apply nb_good_loop_comp_transp_permit_id with (n := n); try easy.
-...
-*)
-
-(*
-Theorem nb_good_loop_comp_transp2 : ∀ n it σ i k,
-  is_permut_fun σ n
-  → i < n
-  → (∀ k, k < i → σ k = k)
-  → σ i ≠ i
-  → σ (σ i) ≠ i
-  → n = i + 1 + it
-  → i + 1 ≤ k < n
-  → nb_good_loop it k (comp (transposition i (σ i)) σ) =
-    nb_good_loop it k σ.
-Proof.
-intros * Hp Hin Hsi Hsii Hssii Hnit Hik.
-(*
-assert (Hssisi : σ (σ i) ≠ σ i). {
-  intros H.
-  apply Hp in H; [ easy | | easy ].
-  now apply Hp.
-}
-*)
-revert i k Hin Hsi Hsii Hssii Hnit Hik.
-induction it; intros; [ easy | cbn ].
-replace (i + 1 + S it) with (i + 1 + 1 + it) in Hnit by flia.
-unfold comp at 1, transposition at 1, Nat.b2n.
-do 4 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec (σ k) i) as [Hsi1i| Hsi1i]. {
-  destruct (Nat.eq_dec (σ i) k) as [Hsii1| Hsii1]. {
-    now rewrite Hsii1 in Hssii.
-  }
-  destruct (Nat.eq_dec (σ k) k) as [Hsi1i1| Hsi1i1]. {
-    flia Hik Hsi1i Hsi1i1.
-  }
-  cbn.
-...
-  apply nb_good_loop_comp_transp3 with (n := n); try easy.
-  flia Hik.
-...
-  apply IHit; try easy.
-...
-  apply nb_good_loop_comp_transp with (n := n); try easy. {
-    split; [ | flia Hik ].
-    flia Hik.
-  } {
-...
-  rewrite Hsik.
-  destruct (Nat.eq_dec k i) as [H| H]; [ flia Hkin H | clear H ].
-  rewrite Nat.add_0_l.
-  destruct (Nat.eq_dec (σ k) i) as [H| H]; [ flia Hski H | clear H ].
-  rewrite Nat.add_0_l.
-  apply IHit; try easy; [ | flia Hski ].
-  split; [ flia Hkin | ].
-  flia Hnit.
-}
-destruct (Nat.eq_dec (σ i) (σ k)) as [Hsisk| Hsisk]. {
-  apply Hp in Hsisk; [ flia Hkin Hsisk | | flia Hkin ].
-  flia Hnit.
-}
-f_equal.
-apply IHit; [ | flia Hski | easy ].
-split; [ flia Hkin | flia Hnit ].
-Qed.
-...
-*)
 
 Theorem nb_good_loop_comp_transp2 : ∀ n it σ i,
   is_permut_fun σ n
@@ -1279,76 +1133,6 @@ exfalso; apply Hii; symmetry.
 apply Hikj.
 split; [ flia | flia Hij H1 ].
 Qed.
-
-Theorem determinant_alternating_permut_fun :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_is_integral = true →
-  rngl_has_1_neq_0 = true →
-  rngl_has_dec_eq = true →
-  rngl_characteristic = 0 →
-  ∀ n (M : matrix n n T) σ,
-  n ≠ 0
-  → is_permut_fun σ n
-  → determinant (mat_permut_rows_fun σ M) = (ε_fun σ n * determinant M)%F.
-Proof.
-intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hp.
-remember (transp_list_of_permut_fun n σ) as trl eqn:Htrl.
-Abort. (*
-Print mat_permut_rows_fun.
-Search transp_list_of_permut_fun.
-Print transp_list_of_permut_fun.
-Print tlopf_loop.
-...
-(* prove that any permutation is a sequence of transpositions
-   then apply determinant alternating in sequence *)
-Check determinant_alternating.
-...
-Check det_is_det_by_any_permut.
-Print determinant'_list.
-...
-intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hp.
-destruct n; [ easy | clear Hnz; cbn ].
-revert σ M Hp.
-induction n; intros. {
-  cbn.
-  unfold iter_seq, iter_list; cbn.
-  do 2 rewrite rngl_add_0_l.
-  do 2 rewrite rngl_mul_1_l, rngl_mul_1_r.
-  destruct Hp as (Hp1, Hp2).
-  specialize (Hp1 0 Nat.lt_0_1).
-  apply Nat.lt_1_r in Hp1; rewrite Hp1.
-  symmetry; rewrite <- rngl_mul_1_l; f_equal.
-  unfold ε, ε_fun; cbn.
-  unfold iter_seq, iter_list; cbn.
-  apply rngl_mul_inv_r; [ now left | ].
-  do 2 rewrite rngl_mul_1_l.
-  now apply rngl_1_neq_0.
-}
-cbn.
-...
-*)
-
-Theorem determinant_alternating_permut :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_is_integral = true →
-  rngl_has_1_neq_0 = true →
-  rngl_has_dec_eq = true →
-  rngl_characteristic = 0 →
-  ∀ n (M : matrix n n T) σ,
-  n ≠ 0
-  → is_permut σ
-  → determinant (mat_permut_rows σ M) = (ε σ * determinant M)%F.
-Proof.
-intros Hic Hop Hin Hit H10 Hde Hch * Hnz Hp.
-Abort. (*
-...
-now apply determinant_alternating_permut_fun.
-...
-*)
 
 (* If we add a row (column) of A multiplied by a scalar k to another
    row (column) of A, then the determinant will not change. *)
