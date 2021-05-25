@@ -2046,10 +2046,6 @@ apply determinant_circular_shift_rows; try easy.
 flia Hin.
 Qed.
 
-Inspect 1.
-
-...
-
 (* Laplace formulas *)
 
 Theorem laplace_formula_on_rows :
@@ -2065,29 +2061,32 @@ Theorem laplace_formula_on_rows :
   → determinant M = Σ (j = 0, n - 1), mat_el M i j * mat_el (comatrix M) i j.
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hlin.
-...
 destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   subst i.
-  unfold determinant.
   destruct n; [ easy | cbn ].
   rewrite Nat.sub_0_r at 1.
   symmetry.
   apply rngl_summation_eq_compat.
   intros j Hj.
-  rewrite Nat.sub_0_r at 2.
   rewrite rngl_mul_comm; [ | easy ].
   now rewrite rngl_mul_mul_swap.
 }
 move i before n.
 move Hiz after Hlin.
+Inspect 1.
+...
 (**)
+(*
   unfold determinant.
+*)
   destruct n; [ easy | cbn ].
   rewrite Nat.sub_0_r at 1.
   symmetry.
   erewrite rngl_summation_eq_compat. 2: {
     intros j Hj.
+(*
     rewrite Nat.sub_0_r at 2.
+*)
     rewrite rngl_mul_comm; [ | easy ].
     rewrite rngl_mul_mul_swap; [ | easy ].
     easy.
@@ -2105,10 +2104,14 @@ easy.
 }
 cbn; subst M'.
 rewrite <- rngl_mul_summation_distr_l; [ | now left ].
+(*
 rewrite fold_det_loop.
 rewrite fold_determinant.
+*)
 Check determinant_alternating.
+(*
 Check fold_det_loop.
+*)
 apply rngl_opp_inj; [ easy | ].
 rewrite <- determinant_alternating with (p := 0) (q := i); try easy; [ | flia Hiz | flia ].
 unfold determinant.
