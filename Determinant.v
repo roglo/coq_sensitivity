@@ -2093,8 +2093,7 @@ Theorem machin :
        (seq 0 i) M) =
     (minus_one_pow i * determinant M)%F.
 Proof.
-intros Hic Hop Hiv Hit H10 Hde Hch.
-intros * Hin.
+intros Hic Hop Hiv Hit H10 Hde Hch * Hin.
 revert M.
 induction i; intros; [ now cbn; rewrite rngl_mul_1_l | ].
 assert (H : i < n) by flia Hin.
