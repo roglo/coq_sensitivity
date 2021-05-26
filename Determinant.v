@@ -2025,6 +2025,13 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   now rewrite rngl_mul_1_r.
 }
 rewrite rngl_mul_0_r; [ | now left ].
+destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+  subst i.
+  destruct n; [ easy | ].
+  rewrite Nat.sub_succ at 1.
+  rewrite Nat.sub_0_r.
+  Check determinant_succ.
+...
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   rewrite rngl_mul_comm; [ | easy ].
@@ -2053,6 +2060,7 @@ rewrite HA.
 destruct n; [ flia Hi | ].
 rewrite Nat.sub_succ at 1.
 rewrite Nat.sub_0_r.
+...
 rewrite determinant_with_row with (i := i); try easy.
 ...
 cbn - [ Nat.eq_dec ].
