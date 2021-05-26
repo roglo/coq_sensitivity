@@ -2123,8 +2123,56 @@ apply Nat.neq_sym in Hij.
 now apply determinant_with_bad_row.
 Qed.
 
-Inspect 1.
+Definition mat_inv n (M : matrix n n T) :=
+  ((determinant M)⁻¹ × (comatrix M)⁺)%M.
 
+Theorem matrix_right_inv :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_integral = true →
+  rngl_has_1_neq_0 = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ n (M : matrix n n T),
+  determinant M ≠ 0%F → (M * mat_inv M = mI n)%M.
+Proof.
+intros Hic Hop Hiv Hit H10 Hde Hch *.
+intros Hdz.
+unfold mat_inv.
+rewrite mat_mul_mul_scal_l; [ | easy | easy ].
+rewrite matrix_comatrix_mul; try easy.
+rewrite mat_mul_scal_l_mul_assoc; [ | easy ].
+rewrite rngl_mul_inv_l; [ | easy | easy ].
+now apply mat_mul_scal_1_l.
+Qed.
+
+Theorem matrix_left_inv :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_integral = true →
+  rngl_has_1_neq_0 = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ n (M : matrix n n T),
+  determinant M ≠ 0%F → (mat_inv M * M = mI n)%M.
+Proof.
+intros Hic Hop Hiv Hit H10 Hde Hch *.
+intros Hdz.
+unfold mat_inv.
+Search ((_ × _) * _)%M.
+...
+  eq
+    (mat_mul
+       (mat_mul_scal_l (rngl_inv (determinant M)) (mat_transp (comatrix M))) M)
+    (mI n)
+...
+rewrite <- mat_mul_mul_scal_l; [ | easy | easy ].
+rewrite matrix_comatrix_mul; try easy.
+rewrite mat_mul_scal_l_mul_assoc; [ | easy ].
+rewrite rngl_mul_inv_l; [ | easy | easy ].
+now apply mat_mul_scal_1_l.
 ...
 
 End a.
