@@ -2017,33 +2017,28 @@ Theorem determinant_with_bad_row :
   i ≤ n
   → k ≤ n
   → i ≠ k
-  → Σ (j = 0, n), minus_one_pow (i + j) * mat_el M k j * determinant (subm M i j) = 0%F.
+  → Σ (j = 0, n),
+    minus_one_pow (i + j) * mat_el M k j * determinant (subm M i j) = 0%F.
 Proof.
 intros Hic Hop Hiv Hit H10 Hde Hch.
 intros * Hi Hk Hik.
-rename i into j.
-rename k into i.
-rename Hi into Hj.
-rename Hk into Hi.
-move Hi after Hj.
-apply Nat.lt_succ_r in Hi.
-apply Nat.lt_succ_r in Hj.
-apply Nat.neq_sym in Hik.
 remember
-  (mk_mat (S n) (S n) (λ p q, mat_el M (if Nat.eq_dec p j then i else p) q))
+  (mk_mat (S n) (S n) (λ p q, mat_el M (if Nat.eq_dec p i then k else p) q))
   as A eqn:HA.
 assert (H1 : determinant A = 0%F). {
   subst A.
-  apply determinant_same_rows with (p := i) (q := j); try easy.
-  intros k.
+  apply Nat.lt_succ_r in Hi.
+  apply Nat.lt_succ_r in Hk.
+  apply determinant_same_rows with (p := i) (q := k); try easy.
+  intros j.
   cbn.
-  rewrite <- (if_eqb_eq_dec j), Nat.eqb_refl.
-  now destruct (Nat.eq_dec i j).
+  rewrite <- (if_eqb_eq_dec i), Nat.eqb_refl.
+  now destruct (Nat.eq_dec k i).
 }
-rewrite determinant_with_row with (i := j) in H1; try easy; [ | flia Hj ].
+rewrite determinant_with_row with (i := i) in H1; try easy.
 rewrite <- H1 at 2.
 apply rngl_summation_eq_compat.
-intros k Hk.
+intros j Hj.
 do 2 rewrite <- rngl_mul_assoc.
 f_equal; f_equal. {
   rewrite HA; cbn.
@@ -2053,23 +2048,23 @@ f_equal.
 rewrite HA.
 apply matrix_eq.
 intros p q Hp Hq; cbn.
-destruct (Nat.eq_dec (p + Nat.b2n (j <=? p)) j) as [Hpj| Hpj]; [ | easy ].
-destruct (le_dec j p) as [Hjp| Hjp]. {
-  apply Nat.leb_le in Hjp.
-  rewrite Hjp in Hpj.
-  cbn in Hpj.
-  apply Nat.leb_le in Hjp.
-  flia Hpj Hjp.
+destruct (Nat.eq_dec (p + Nat.b2n (i <=? p)) i) as [Hpi| Hpi]; [ | easy ].
+destruct (le_dec i p) as [Hip| Hip]. {
+  apply Nat.leb_le in Hip.
+  rewrite Hip in Hpi.
+  cbn in Hpi.
+  apply Nat.leb_le in Hip.
+  flia Hpi Hip.
 } {
-  apply Nat.leb_nle in Hjp.
-  rewrite Hjp in Hpj.
-  cbn in Hpj.
-  apply Nat.leb_nle in Hjp.
-  flia Hpj Hjp.
+  apply Nat.leb_nle in Hip.
+  rewrite Hip in Hpi.
+  cbn in Hpi.
+  apply Nat.leb_nle in Hip.
+  flia Hpi Hip.
 }
 Qed.
 
-Theorem mat_comat_mul :
+Theorem matrix_comatrix_mul :
   rngl_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
