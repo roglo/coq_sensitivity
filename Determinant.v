@@ -1939,6 +1939,35 @@ f_equal.
 apply determinant_alternating; try easy; [ flia Hiz | flia ].
 Qed.
 
+Theorem determinant_with_row :
+  rngl_has_opp = true →
+  ∀ i n (M : matrix (S n) (S n) T),
+  determinant M =
+   Σ (j = 0, n),
+   minus_one_pow (i + j) * mat_el M i j * determinant (subm M i j).
+Proof.
+intros Hop *.
+remember (mat_swap_rows i 0 M) as A eqn:HA.
+replace M with (mat_swap_rows i 0 A).
+(*
+rewrite determinant_alternating; try easy.
+*)
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite mat_swap_rows_comm.
+  rewrite mat_el_mat_swap_rows.
+  rewrite minus_one_pow_add_r; [ | easy | easy ].
+  do 2 rewrite <- (rngl_mul_assoc (minus_one_pow i)).
+  easy.
+}
+cbn - [ Nat.eq_dec determinant ].
+rewrite <- rngl_mul_summation_distr_l.
+Check fold_determinant.
+Check determinant_circular_shift_rows.
+Search (determinant (mat_swap_rows _ _ _)).
+(* faut que je réfléchisse *)
+...
+
 Theorem mat_comat_mul :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -1988,12 +2017,7 @@ destruct n; [ flia Hi | ].
 rewrite Nat.sub_succ at 1.
 rewrite Nat.sub_0_r.
 Print fold_determinant.
-Theorem determinant_with_row : ∀ i n (M : matrix (S n) (S n) T),
-  determinant M =
-   Σ (j = 0, n),
-   minus_one_pow (i + j) * mat_el M i j * determinant (subm M i j).
-Proof.
-Admitted.
+...
 rewrite (determinant_with_row i).
 cbn - [ Nat.eq_dec ].
 apply rngl_summation_eq_compat.
