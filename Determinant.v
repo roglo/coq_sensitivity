@@ -1974,51 +1974,36 @@ Theorem determinant_with_row :
      minus_one_pow (i + j) * mat_el M i j * determinant (subm M i j).
 Proof.
 intros Hic Hop Hiv Hit H10 Hde Hch * Hin.
-remember (mat_swap_rows i 0 M) as A eqn:HA.
-replace M with (mat_swap_rows i 0 A). 2: {
-  rewrite HA.
-  apply mat_swap_rows_involutive.
-}
 destruct (Nat.eq_dec i 0) as [Hiz| Hiz]; [ now subst i | ].
+apply rngl_opp_inj; [ easy | ].
+rewrite <- determinant_alternating with (p := 0) (q := i); try easy;
+  [ | flia Hiz | flia | flia Hin ].
+rewrite determinant_succ at 1.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   rewrite mat_swap_rows_comm.
   rewrite mat_el_mat_swap_rows.
-  specialize determinant_circular_shift_rows as H1.
-  specialize (H1 Hic Hop Hiv Hit H10 Hde Hch).
-  specialize (H1 _ A i).
-  assert (H : i < S n) by flia Hin.
-  specialize (H1 H); clear H.
-Search (subm (mat_swap_rows _ _ _)).
-Check determinant_succ.
-...
-  subm (mat_swap_rows 0 i M) i j =
-  fold_left (λ M' j, mat_swap_rows k (k + 1) M') (seq 0 i) (subm M i j).
-
-...
-  rewrite minus_one_pow_add_r; [ | easy | easy ].
-  do 2 rewrite <- (rngl_mul_assoc (minus_one_pow i)).
   easy.
 }
-...
-(*
-rewrite determinant_alternating; try easy.
-*)
-erewrite rngl_summation_eq_compat. 2: {
-  intros j Hj.
-  rewrite mat_swap_rows_comm.
-  rewrite mat_el_mat_swap_rows.
-  rewrite minus_one_pow_add_r; [ | easy | easy ].
-  do 2 rewrite <- (rngl_mul_assoc (minus_one_pow i)).
-  easy.
-}
-cbn - [ Nat.eq_dec determinant ].
-rewrite <- rngl_mul_summation_distr_l.
-Check fold_determinant.
-Check determinant_circular_shift_rows.
-Search (determinant (mat_swap_rows _ _ _)).
-(* faut que je réfléchisse *)
-...
+rewrite rngl_opp_summation; [ | easy | easy ].
+apply rngl_summation_eq_compat.
+intros j Hj.
+rewrite <- rngl_mul_assoc; symmetry.
+rewrite <- rngl_mul_opp_r; [ | easy ].
+rewrite (Nat.add_comm i j).
+rewrite minus_one_pow_add_r; [ | easy | easy ].
+do 2 rewrite <- rngl_mul_assoc.
+f_equal.
+rewrite rngl_mul_comm; [ | easy ].
+rewrite <- rngl_mul_assoc.
+f_equal.
+rewrite rngl_mul_opp_l, <- rngl_mul_opp_r; [ | easy | easy ].
+rewrite rngl_mul_comm; [ | easy ].
+symmetry.
+rewrite mat_swap_rows_comm.
+apply determinant_subm_mat_swap_rows_0_i; try easy.
+flia Hiz Hin.
+Qed.
 
 Theorem mat_comat_mul :
   rngl_is_comm = true →
@@ -2068,9 +2053,8 @@ rewrite HA.
 destruct n; [ flia Hi | ].
 rewrite Nat.sub_succ at 1.
 rewrite Nat.sub_0_r.
-Print fold_determinant.
+rewrite determinant_with_row with (i := i); try easy.
 ...
-rewrite (determinant_with_row i).
 cbn - [ Nat.eq_dec ].
 apply rngl_summation_eq_compat.
 intros k Hk.
