@@ -1939,16 +1939,64 @@ f_equal.
 apply determinant_alternating; try easy; [ flia Hiz | flia ].
 Qed.
 
-Theorem determinant_with_row :
-  rngl_has_opp = true →
-  ∀ i n (M : matrix (S n) (S n) T),
-  determinant M =
-   Σ (j = 0, n),
-   minus_one_pow (i + j) * mat_el M i j * determinant (subm M i j).
+Theorem mat_swap_rows_involutive : ∀ n (M : matrix n n T) i j,
+  mat_swap_rows i j (mat_swap_rows i j M) = M.
 Proof.
-intros Hop *.
+intros.
+apply matrix_eq.
+intros p q Hp Hq; cbn.
+destruct (Nat.eq_dec p i) as [Hpi| Hpi]. {
+  subst p.
+  destruct (Nat.eq_dec j i) as [Hji| Hji]; [ now subst j | ].
+  now rewrite <- (if_eqb_eq_dec j), Nat.eqb_refl.
+}
+destruct (Nat.eq_dec p j) as [Hpj| Hpj]; [ | easy ].
+subst p.
+now rewrite <- (if_eqb_eq_dec i), Nat.eqb_refl.
+Qed.
+
+Theorem determinant_with_row :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_integral = true →
+  rngl_has_1_neq_0 = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ i n (M : matrix (S n) (S n) T),
+  i < n
+  → determinant M =
+     Σ (j = 0, n),
+     minus_one_pow (i + j) * mat_el M i j * determinant (subm M i j).
+Proof.
+intros Hic Hop Hiv Hit H10 Hde Hch * Hin.
 remember (mat_swap_rows i 0 M) as A eqn:HA.
-replace M with (mat_swap_rows i 0 A).
+replace M with (mat_swap_rows i 0 A). 2: {
+  rewrite HA.
+  apply mat_swap_rows_involutive.
+}
+destruct (Nat.eq_dec i 0) as [Hiz| Hiz]; [ now subst i | ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite mat_swap_rows_comm.
+  rewrite mat_el_mat_swap_rows.
+  specialize determinant_circular_shift_rows as H1.
+  specialize (H1 Hic Hop Hiv Hit H10 Hde Hch).
+  specialize (H1 _ A i).
+  assert (H : i < S n) by flia Hin.
+  specialize (H1 H); clear H.
+Search (subm (mat_swap_rows _ _ _)).
+Check fold_determinant.
+...
+  subm (mat_swap_rows 0 i M) i j =
+  fold_left (λ M' j, mat_swap_rows k (k + 1) M') (seq 0 i) (subm M i j).
+
+...
+  rewrite minus_one_pow_add_r; [ | easy | easy ].
+  do 2 rewrite <- (rngl_mul_assoc (minus_one_pow i)).
+  easy.
+}
+...
 (*
 rewrite determinant_alternating; try easy.
 *)
