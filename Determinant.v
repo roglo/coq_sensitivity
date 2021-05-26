@@ -1959,6 +1959,28 @@ subst p.
 now rewrite <- (if_eqb_eq_dec i), Nat.eqb_refl.
 Qed.
 
+(*
+The following two theorems, "determinant_with_row" and determinant_with_bad_row
+have some similitudes.
+  The theorem "determinant_with_row" says that we can compute the determinant
+by going through any row (not necessarily the 0th one). Here, row "i".
+  The theorem "determinant_with_bad_row" says that if we go through another
+row "k" different from "i", the same formula (where "M i j" is replaced
+with "M k j") returns 0. It is what I call a "bad determinant formula".
+
+determinant_with_row
+  ∀ (i n : nat) (M : matrix (S n) (S n) T),
+  i ≤ n
+  → Σ (j = 0, n), minus_one_pow (i + j) * M i j * det (subm M i j) = det M
+
+determinant_with_bad_row
+  ∀ (i k n : nat) (M : matrix (S n) (S n) T),
+  i ≤ n → k ≤ n → i ≠ k
+  → Σ (j = 0, n), minus_one_pow (i + j) * M k j * det (subm M i j) = 0%F
+
+Isn't it strange? (or beautiful?)
+*)
+
 Theorem determinant_with_row :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -1969,11 +1991,12 @@ Theorem determinant_with_row :
   rngl_characteristic = 0 →
   ∀ i n (M : matrix (S n) (S n) T),
   i ≤ n
-  → determinant M =
-     Σ (j = 0, n),
-     minus_one_pow (i + j) * mat_el M i j * determinant (subm M i j).
+  → Σ (j = 0, n),
+    minus_one_pow (i + j) * mat_el M i j * determinant (subm M i j) =
+    determinant M.
 Proof.
 intros Hic Hop Hiv Hit H10 Hde Hch * Hin.
+symmetry.
 destruct (Nat.eq_dec i 0) as [Hiz| Hiz]; [ now subst i | ].
 apply rngl_opp_inj; [ easy | ].
 rewrite <- determinant_alternating with (p := 0) (q := i); try easy;
@@ -2035,7 +2058,7 @@ assert (H1 : determinant A = 0%F). {
   rewrite <- (if_eqb_eq_dec i), Nat.eqb_refl.
   now destruct (Nat.eq_dec k i).
 }
-rewrite determinant_with_row with (i := i) in H1; try easy.
+rewrite <- determinant_with_row with (i := i) in H1; try easy.
 rewrite <- H1 at 2.
 apply rngl_summation_eq_compat.
 intros j Hj.
