@@ -386,6 +386,20 @@ intros * Hi Hj; cbn.
 apply rngl_mul_assoc.
 Qed.
 
+Theorem mat_mul_scal_l_mul :
+  ∀ {m n p} a (MA : matrix m n T) (MB : matrix n p T),
+  (a × MA * MB = a × (MA * MB))%M.
+Proof.
+intros *.
+apply matrix_eq.
+intros * Hi Hj.
+cbn.
+rewrite rngl_mul_summation_distr_l; [ | now left ].
+apply rngl_summation_eq_compat.
+intros k Hk.
+now rewrite <- rngl_mul_assoc.
+Qed.
+
 Theorem mat_mul_mul_scal_l :
   rngl_is_comm = true →
   ∀ {m n p} a (MA : matrix m n T) (MB : matrix n p T),
@@ -781,7 +795,8 @@ Delimit Scope M_scope with M.
 
 Arguments mat_el [m n]%nat [T]%type M%M (i j)%nat : rename.
 Arguments mat_add_opp_r {T}%type {ro rp} Hro {m n}%nat M%M.
-Arguments mat_mul_mul_scal_l {T}%type {ro rp} Hro Hic {m n p}%nat a%F MA%M.
+Arguments mat_mul_scal_l_mul {T}%type {ro rp} Hro {m n p}%nat a%F (MA MB)%M.
+Arguments mat_mul_mul_scal_l {T}%type {ro rp} Hro Hic {m n p}%nat a%F (MA MB)%M.
 Arguments mat_mul_scal_l {T ro} {m n}%nat s%F M%M.
 Arguments mat_mul_vect_r {T ro} {m n}%nat M%M V%V.
 Arguments mat_mul_scal_vect_comm {T}%type {ro rp} Hro Hic {m n}%nat a%F MA%M V%V.

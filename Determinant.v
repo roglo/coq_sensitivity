@@ -2161,14 +2161,8 @@ Proof.
 intros Hic Hop Hiv Hit H10 Hde Hch *.
 intros Hdz.
 unfold mat_inv.
-Search ((_ × _) * _)%M.
+rewrite mat_mul_scal_l_mul; [ | easy ].
 ...
-  eq
-    (mat_mul
-       (mat_mul_scal_l (rngl_inv (determinant M)) (mat_transp (comatrix M))) M)
-    (mI n)
-...
-rewrite <- mat_mul_mul_scal_l; [ | easy | easy ].
 rewrite matrix_comatrix_mul; try easy.
 rewrite mat_mul_scal_l_mul_assoc; [ | easy ].
 rewrite rngl_mul_inv_l; [ | easy | easy ].
