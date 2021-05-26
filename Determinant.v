@@ -47,6 +47,15 @@ Fixpoint determinant n (M : matrix n n T) :=
        minus_one_pow j * mat_el M' 0 j * determinant (subm M' 0 j)
    end) M.
 
+Theorem determinant_zero : ∀ (M : matrix 0 0 T),
+  determinant M = 1%F.
+Proof. easy. Qed.
+
+Theorem determinant_succ : ∀ n (M : matrix (S n) (S n) T),
+  determinant M =
+     Σ (j = 0, n), minus_one_pow j * mat_el M 0 j * determinant (subm M 0 j).
+Proof. easy. Qed.
+
 Definition mat_permut_rows_fun n (σ : nat → nat) (M : matrix n n T) :=
   mk_mat n n (λ i j, mat_el M (σ i) j).
 
@@ -66,11 +75,6 @@ Definition det_from_col {n} (M : matrix (S n) (S n) T) j :=
   (minus_one_pow j *
    Σ (i = 0, n - 1),
      minus_one_pow i * mat_el M i j * determinant (subm M i j))%F.
-
-Theorem fold_determinant : ∀ n (M : matrix (S n) (S n) T),
-  determinant M =
-  Σ (j = 0, n), minus_one_pow j * mat_el M 0 j * determinant (subm M 0 j).
-Proof. easy. Qed.
 
 (* Alternative version of the determinant: sum of product of the
    factors a_{i,σ(i)} where σ goes through all permutations of
@@ -1932,7 +1936,7 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn.
 rewrite <- rngl_opp_summation; [ | easy | easy ].
-do 2 rewrite <- fold_determinant.
+do 2 rewrite <- determinant_succ.
 subst M'.
 rewrite <- rngl_opp_involutive; [ | easy ].
 f_equal.
@@ -1986,7 +1990,7 @@ erewrite rngl_summation_eq_compat. 2: {
   assert (H : i < S n) by flia Hin.
   specialize (H1 H); clear H.
 Search (subm (mat_swap_rows _ _ _)).
-Check fold_determinant.
+Check determinant_succ.
 ...
   subm (mat_swap_rows 0 i M) i j =
   fold_left (λ M' j, mat_swap_rows k (k + 1) M') (seq 0 i) (subm M i j).
