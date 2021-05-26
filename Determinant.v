@@ -2028,11 +2028,28 @@ rewrite rngl_mul_0_r; [ | now left ].
 destruct n; [ easy | ].
 rewrite Nat.sub_succ at 1.
 rewrite Nat.sub_0_r.
+remember
+  (mk_mat (S n) (S n) (λ p q, mat_el M (if Nat.eq_dec p j then i else p) q))
+  as A eqn:HA.
+assert (H1 : determinant A = 0%F). {
+  subst A.
+  apply determinant_same_rows with (p := i) (q := j); try easy.
+  intros k.
+  cbn.
+  rewrite <- (if_eqb_eq_dec j), Nat.eqb_refl.
+  now destruct (Nat.eq_dec i j).
+}
+apply all_0_rngl_summation_0; [ easy | ].
+intros k Hk.
+replace (determinant (subm M j k)) with (determinant A). 2: {
+  rewrite HA.
+  cbn - [ determinant ].
+  f_equal.
 ...
-erewrite rngl_summation_eq_compat. 2: {
-  intros k Hk.
+  apply matrix_eq.
   rewrite rngl_mul_comm; [ | easy ].
   rewrite rngl_mul_mul_swap; [ | easy ].
+
   easy.
 }
 cbn.
