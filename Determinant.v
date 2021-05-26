@@ -2005,6 +2005,70 @@ apply determinant_subm_mat_swap_rows_0_i; try easy.
 flia Hiz Hin.
 Qed.
 
+Theorem determinant_with_bad_row :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_integral = true →
+  rngl_has_1_neq_0 = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ i k n (M : matrix (S n) (S n) T),
+  i ≤ n
+  → k ≤ n
+  → i ≠ k
+  → Σ (j = 0, n), minus_one_pow (i + j) * mat_el M k j * determinant (subm M i j) = 0%F.
+Proof.
+intros Hic Hop Hiv Hit H10 Hde Hch.
+intros * Hi Hk Hik.
+rename i into j.
+rename k into i.
+rename Hi into Hj.
+rename Hk into Hi.
+move Hi after Hj.
+apply Nat.lt_succ_r in Hi.
+apply Nat.lt_succ_r in Hj.
+apply Nat.neq_sym in Hik.
+remember
+  (mk_mat (S n) (S n) (λ p q, mat_el M (if Nat.eq_dec p j then i else p) q))
+  as A eqn:HA.
+assert (H1 : determinant A = 0%F). {
+  subst A.
+  apply determinant_same_rows with (p := i) (q := j); try easy.
+  intros k.
+  cbn.
+  rewrite <- (if_eqb_eq_dec j), Nat.eqb_refl.
+  now destruct (Nat.eq_dec i j).
+}
+rewrite determinant_with_row with (i := j) in H1; try easy; [ | flia Hj ].
+rewrite <- H1 at 2.
+apply rngl_summation_eq_compat.
+intros k Hk.
+do 2 rewrite <- rngl_mul_assoc.
+f_equal; f_equal. {
+  rewrite HA; cbn.
+  now rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
+}
+f_equal.
+rewrite HA.
+apply matrix_eq.
+intros p q Hp Hq; cbn.
+destruct (Nat.eq_dec (p + Nat.b2n (j <=? p)) j) as [Hpj| Hpj]; [ | easy ].
+destruct (le_dec j p) as [Hjp| Hjp]. {
+  apply Nat.leb_le in Hjp.
+  rewrite Hjp in Hpj.
+  cbn in Hpj.
+  apply Nat.leb_le in Hjp.
+  flia Hpj Hjp.
+} {
+  apply Nat.leb_nle in Hjp.
+  rewrite Hjp in Hpj.
+  cbn in Hpj.
+  apply Nat.leb_nle in Hjp.
+  flia Hpj Hjp.
+}
+Qed.
+
 Theorem mat_comat_mul :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -2028,47 +2092,20 @@ rewrite rngl_mul_0_r; [ | now left ].
 destruct n; [ easy | ].
 rewrite Nat.sub_succ at 1.
 rewrite Nat.sub_0_r.
-remember
-  (mk_mat (S n) (S n) (λ p q, mat_el M (if Nat.eq_dec p j then i else p) q))
-  as A eqn:HA.
-assert (H1 : determinant A = 0%F). {
-  subst A.
-  apply determinant_same_rows with (p := i) (q := j); try easy.
-  intros k.
-  cbn.
-  rewrite <- (if_eqb_eq_dec j), Nat.eqb_refl.
-  now destruct (Nat.eq_dec i j).
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  rewrite rngl_mul_comm; [ | easy ].
+  rewrite rngl_mul_mul_swap; [ | easy ].
+  easy.
 }
-rewrite determinant_with_row with (i := j) in H1; try easy; [ | flia Hj ].
-rewrite <- H1 at 2.
-apply rngl_summation_eq_compat.
-intros k Hk.
-rewrite rngl_mul_assoc.
-f_equal. 2: {
-  f_equal.
-  rewrite HA.
-  apply matrix_eq.
-  intros p q Hp Hq; cbn.
-  destruct (Nat.eq_dec (p + Nat.b2n (j <=? p)) j) as [Hpj| Hpj]; [ | easy ].
-  destruct (le_dec j p) as [Hjp| Hjp]. {
-    apply Nat.leb_le in Hjp.
-    rewrite Hjp in Hpj.
-    cbn in Hpj.
-    apply Nat.leb_le in Hjp.
-    flia Hpj Hjp.
-  } {
-    apply Nat.leb_nle in Hjp.
-    rewrite Hjp in Hpj.
-    cbn in Hpj.
-    apply Nat.leb_nle in Hjp.
-    flia Hpj Hjp.
-  }
-}
-rewrite rngl_mul_comm; [ | easy ].
-f_equal.
-rewrite HA; cbn.
-now rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
+cbn.
+apply -> Nat.lt_succ_r in Hi.
+apply -> Nat.lt_succ_r in Hj.
+apply Nat.neq_sym in Hij.
+now apply determinant_with_bad_row.
 Qed.
+
+Inspect 1.
 
 ...
 
