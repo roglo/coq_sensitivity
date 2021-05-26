@@ -1968,7 +1968,7 @@ Theorem determinant_with_row :
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
   ∀ i n (M : matrix (S n) (S n) T),
-  i < n
+  i ≤ n
   → determinant M =
      Σ (j = 0, n),
      minus_one_pow (i + j) * mat_el M i j * determinant (subm M i j).
@@ -2016,6 +2016,33 @@ Theorem mat_comat_mul :
   ∀ n (M : matrix n n T),
   (M * (comatrix M)⁺ = determinant M × mI n)%M.
 Proof.
+intros Hic Hop Hiv Hit H10 Hde Hch *.
+apply matrix_eq.
+intros i j Hi Hj.
+rewrite laplace_formula_on_rows with (i := i); try easy; cbn.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  subst j.
+  now rewrite rngl_mul_1_r.
+}
+rewrite rngl_mul_0_r; [ | now left ].
+destruct n; [ easy | ].
+rewrite Nat.sub_succ at 1.
+rewrite Nat.sub_0_r.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  rewrite rngl_mul_comm; [ | easy ].
+  rewrite rngl_mul_mul_swap; [ | easy ].
+  easy.
+}
+cbn.
+specialize determinant_with_row as H1.
+specialize (H1 Hic Hop Hiv Hit H10 Hde Hch).
+assert (H : i ≤ n) by flia Hi.
+specialize (H1 i n M H); clear H.
+cbn - [ determinant ] in H1 |-*.
+...
+rewrite <- H1.
+...
 intros Hic Hop Hin Hit H10 Hde Hch *.
 apply matrix_eq.
 intros i j Hi Hj.
