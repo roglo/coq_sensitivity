@@ -2028,6 +2028,7 @@ rewrite rngl_mul_0_r; [ | now left ].
 destruct n; [ easy | ].
 rewrite Nat.sub_succ at 1.
 rewrite Nat.sub_0_r.
+...
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   rewrite rngl_mul_comm; [ | easy ].
