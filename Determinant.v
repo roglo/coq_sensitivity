@@ -1963,6 +1963,7 @@ intros Hic Hop Hiv Hit H10 Hde Hch *.
 rewrite det_is_det_by_canon_permut; try easy.
 rewrite determinant'_by_list; try easy.
 symmetry.
+...
 apply det_is_det_by_any_permut; try easy.
 unfold determinant'_list.
 Search determinant'_list.
