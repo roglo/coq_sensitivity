@@ -1960,15 +1960,30 @@ Theorem determinant_transp :
   ∀ n (M : matrix n n T), determinant M⁺ = determinant M.
 Proof.
 intros Hic Hop Hiv Hit H10 Hde Hch *.
-...
-intros Hic Hop Hiv Hit H10 Hde Hch *.
 rewrite det_is_det_by_canon_permut; try easy.
 rewrite determinant'_by_list; try easy.
 symmetry.
 apply det_is_det_by_any_permut; try easy.
 unfold determinant'_list.
+etransitivity. {
+Search (Permutation (map _ _)).
+About permut_fun_Permutation.
+...
+Search Permutation.
+apply nat_bijection_Permutation.
+Check Permutation_map.
+Check Permutation_trans.
+...
+permut_fun_Permutation: ∀ (f : nat → nat) (n : nat), is_permut_fun f n → Permutation (map f (seq 0 n)) (seq 0 n)
+
 cbn.
-induction n; [ easy | ].
+transitivity (seq 0 n!).
+Check Permutation_trans.
+
+Search (Permutation (map _ _)).
+apply Permutation_trans with (l' := seq 0 n!).
+eapply Permutation_trans. {
+apply permut_fun_Permutation.
 ...
 intros Hic Hop Hiv Hit H10 Hde Hch *.
 rewrite det_is_det_by_canon_permut; try easy.
