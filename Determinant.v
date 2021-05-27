@@ -1965,8 +1965,10 @@ rewrite determinant'_by_list; try easy.
 symmetry.
 apply det_is_det_by_any_permut; try easy.
 unfold determinant'_list.
-etransitivity. {
+Search determinant'_list.
 Search (Permutation (map _ _)).
+About nat_bijection_Permutation.
+etransitivity. {
 About permut_fun_Permutation.
 ...
 Search Permutation.
