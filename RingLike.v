@@ -115,8 +115,8 @@ Notation "a * b" := (rngl_mul a b) : ring_like_scope.
 Notation "a / b" := (rngl_div a b) : ring_like_scope.
 Notation "a ≤ b" := (rngl_le a b) : ring_like_scope.
 Notation "- a" := (rngl_opp a) : ring_like_scope.
-Notation "a '⁻¹'" := (rngl_inv a)
-  (at level 35, right associativity, format "a ⁻¹") : ring_like_scope.
+Notation "a '⁻¹'" := (rngl_inv a) (at level 1, format "a ⁻¹") :
+  ring_like_scope.
 Notation "a ≤ b ≤ c" := (a ≤ b ∧ b ≤ c)%F (at level 70, b at next level) :
   ring_like_scope.
 
