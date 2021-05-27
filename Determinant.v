@@ -358,6 +358,8 @@ Definition determinant'_list {n} (M : matrix n n T) :=
      Π (i = 1, n), mat_el M (i - 1) (vect_el (canon_permut n k) (i - 1)%nat))%F)
     (seq 0 (fact n)).
 
+Arguments determinant'_list {n}%nat M%M.
+
 Theorem determinant'_by_list :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -1958,14 +1960,24 @@ Theorem determinant_transp :
   ∀ n (M : matrix n n T), determinant M⁺ = determinant M.
 Proof.
 intros Hic Hop Hiv Hit H10 Hde Hch *.
-(* chais pas très bien, faut que je réfléchisse *)
 ...
+intros Hic Hop Hiv Hit H10 Hde Hch *.
+rewrite det_is_det_by_canon_permut; try easy.
+rewrite determinant'_by_list; try easy.
+symmetry.
+apply det_is_det_by_any_permut; try easy.
+unfold determinant'_list.
+cbn.
+induction n; [ easy | ].
+...
+intros Hic Hop Hiv Hit H10 Hde Hch *.
 rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
 symmetry.
-Check det_is_det_by_any_permut.
-rewrite det_is_det_by_any_permut; try easy.
+rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
+cbn.
+Search determinant'.
 ...
 intros Hic Hop Hin Hit H10 Hde Hch * Hlin.
 intros.
