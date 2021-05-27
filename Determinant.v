@@ -33,7 +33,7 @@ Context (rp : ring_like_prop T).
 n-1  | ......|    |. .....|   |.. ....|   |... ...|
      ---------    ---------   ---------   ---------
 
-   each term is the term "x" multiplied by det_loop (n-1) of
+   each term is the term "x" multiplied by det (n-1) of
    the sub-matrix represented by the dots. The "x" goes through
    the first row.
 *)
@@ -46,6 +46,8 @@ Fixpoint determinant n (M : matrix n n T) :=
        Σ (j = 0, n'),
        minus_one_pow j * mat_el M' 0 j * determinant (subm M' 0 j)
    end) M.
+
+Arguments determinant [n]%nat M%M.
 
 Theorem determinant_zero : ∀ (M : matrix 0 0 T),
   determinant M = 1%F.
@@ -111,6 +113,8 @@ Definition determinant' n (M : matrix n n T) :=
   Σ (k = 0, fact n - 1),
     ε (canon_permut n k) *
     Π (i = 1, n), mat_el M (i - 1) (vect_el (canon_permut n k) (i - 1)).
+
+Arguments determinant' [n]%nat M%M.
 
 (* Proof that both definitions of determinants are equal *)
 
@@ -1943,6 +1947,47 @@ f_equal.
 apply determinant_alternating; try easy; [ flia Hiz | flia ].
 Qed.
 
+Theorem determinant_transp :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_integral = true →
+  rngl_has_1_neq_0 = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ n (M : matrix n n T), determinant M⁺ = determinant M.
+Proof.
+intros Hic Hop Hiv Hit H10 Hde Hch *.
+(* chais pas très bien, faut que je réfléchisse *)
+...
+rewrite det_is_det_by_canon_permut; try easy.
+unfold determinant'.
+symmetry.
+Check det_is_det_by_any_permut.
+rewrite det_is_det_by_any_permut; try easy.
+unfold determinant'.
+...
+intros Hic Hop Hin Hit H10 Hde Hch * Hlin.
+intros.
+...
+
+Theorem laplace_formula_on_cols :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_integral = true →
+  rngl_has_1_neq_0 = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ n (M : matrix n n T) j,
+  j < n
+  → determinant M = Σ (i = 0, n - 1), mat_el M i j * mat_el (comatrix M) i j.
+Proof.
+intros Hic Hop Hin Hit H10 Hde Hch * Hlin.
+...
+Check determinant_transp.
+...
+
 Theorem mat_swap_rows_involutive : ∀ n (M : matrix n n T) i j,
   mat_swap_rows i j (mat_swap_rows i j M) = M.
 Proof.
@@ -2123,6 +2168,49 @@ apply Nat.neq_sym in Hij.
 now apply determinant_with_bad_row.
 Qed.
 
+Theorem comatrix_matrix_mul :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_integral = true →
+  rngl_has_1_neq_0 = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ n (M : matrix n n T),
+  ((comatrix M)⁺ * M = determinant M × mI n)%M.
+Proof.
+intros Hic Hop Hiv Hit H10 Hde Hch *.
+apply matrix_eq.
+intros i j Hi Hj.
+rewrite laplace_formula_on_cols with (j := j); try easy; cbn.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  subst i.
+  rewrite rngl_mul_1_r.
+  apply rngl_summation_eq_compat.
+  intros k Hk.
+  rewrite rngl_mul_mul_swap; [ | easy ].
+  rewrite rngl_mul_assoc.
+  f_equal.
+  now apply rngl_mul_comm.
+}
+rewrite rngl_mul_0_r; [ | now left ].
+...
+destruct n; [ easy | ].
+rewrite Nat.sub_succ at 1.
+rewrite Nat.sub_0_r.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  rewrite rngl_mul_comm; [ | easy ].
+  rewrite rngl_mul_mul_swap; [ | easy ].
+  easy.
+}
+cbn.
+apply -> Nat.lt_succ_r in Hi.
+apply -> Nat.lt_succ_r in Hj.
+apply Nat.neq_sym in Hij.
+now apply determinant_with_bad_row.
+Qed.
+
 Definition mat_inv n (M : matrix n n T) :=
   ((determinant M)⁻¹ × (comatrix M)⁺)%M.
 
@@ -2171,12 +2259,8 @@ now apply mat_mul_scal_1_l.
 
 End a.
 
-Arguments det_loop {T ro} {n}%nat M%M i%nat.
-Arguments determinant {T ro n} M%M.
-Arguments subm {T m n} M%M i%nat j%nat.
-
 Arguments determinant {T ro} {n%nat} M%M.
-Arguments det_loop {T ro} {n%nat} M%M i%nat.
 Arguments det_from_row {T}%type {ro} {n}%nat M%M i%nat.
 Arguments det_from_col {T}%type {ro} {n}%nat M%M j%nat.
 Arguments comatrix {T}%type {ro} {n}%nat M%M.
+Arguments subm {T m n} M%M i%nat j%nat.
