@@ -1974,6 +1974,24 @@ apply rngl_summation_permut; cycle 1. {
 }
 unfold determinant'_list.
 cbn.
+remember (canon_permut n) as f eqn:Hf.
+...
+destruct n; [ easy | ].
+destruct n. {
+  now subst f; unfold iter_seq, iter_list; cbn.
+}
+destruct n. {
+  subst f; unfold iter_seq, iter_list; cbn.
+  repeat rewrite rngl_mul_1_l.
+  rewrite rngl_mul_1_r.
+  rewrite (rngl_mul_comm Hic (mat_el M 0 1)).
+  easy.
+}
+...
+cbn in Hf.
+subst f.
+remember (S n) as sn; cbn; subst sn.
+Print canon_permut_fun.
 ...
 apply det_is_det_by_any_permut; try easy.
 unfold determinant'_list.
