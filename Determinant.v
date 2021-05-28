@@ -1975,6 +1975,7 @@ apply rngl_summation_permut; cycle 1. {
 unfold determinant'_list.
 cbn.
 remember (canon_permut n) as f eqn:Hf.
+Check determinant_multilinear.
 ...
 destruct n; [ easy | ].
 destruct n. {
