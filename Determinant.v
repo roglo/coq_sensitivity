@@ -1987,6 +1987,10 @@ erewrite map_ext_in. 2: {
 }
 symmetry.
 remember (canon_permut n) as f eqn:Hf.
+...
+look at
+https://proofwiki.org/wiki/Permutation_of_Determinant_Indices
+...
 Search canon_permut.
 Print FinFun.Injective.
 Print FinFun.Surjective.
