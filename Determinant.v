@@ -1987,6 +1987,20 @@ erewrite map_ext_in. 2: {
 }
 symmetry.
 remember (canon_permut n) as f eqn:Hf.
+Search canon_permut.
+Print FinFun.Injective.
+Print FinFun.Surjective.
+Print Module FinFun.
+Definition is_symmetric_group n (f : nat → vector n nat) :=
+  (∀ i j, i < n! → j < n! → f i = f j → i = j) ∧
+  (∀ v, ∃ i, i < n! ∧ f i = v).
+...
+Theorem glop : ∀ n (M : matrix n n T) (f g : nat → vector n nat),
+  is_symmetric_group f
+  → is_symmetric_group f
+  → determinant M =
+      (Σ (i = 1, n!), ε (f i) * ε (g i) *
+       Π (j = 1, n), mat_el M (vect_el (f i) j) (vect_el (g i) j))%F.
 ...
 Check determinant_multilinear.
 About nat_bijection_Permutation.
