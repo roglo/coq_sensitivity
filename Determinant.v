@@ -1991,6 +1991,11 @@ Search canon_permut.
 Print FinFun.Injective.
 Print FinFun.Surjective.
 Print Module FinFun.
+Print FinFun.Finite.
+Print FinFun.Full.
+Definition is_symmetric_group n (f : nat → vector n nat) :=
+  FinFun.Injective nat {
+...
 Definition is_symmetric_group n (f : nat → vector n nat) :=
   (∀ i j, i < n! → j < n! → f i = f j → i = j) ∧
   (∀ v, ∃ i, i < n! ∧ f i = v).
