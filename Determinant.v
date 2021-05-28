@@ -1976,6 +1976,27 @@ unfold determinant'_list.
 cbn.
 remember (canon_permut n) as f eqn:Hf.
 Check determinant_multilinear.
+About nat_bijection_Permutation.
+Search (Permutation (map _ _)).
+Search determinant'_list.
+Search canon_permut.
+...
+Print FinFun.Injective.
+Print FinFun.Surjective.
+Search FinFun.Surjective.
+Theorem glop : ∀ A B (f g : A → B) l,
+  FinFun.Injective f
+  → FinFun.Injective g
+  → FinFun.Surjective f
+  → FinFun.Surjective g
+  → Permutation (map f l) (map g l).
+Proof.
+intros * Hif Hig Hsf Hsg.
+unfold FinFun.Injective in Hif, Hig.
+unfold FinFun.Surjective in Hsf, Hsg.
+induction l as [| x]; [ easy | ].
+cbn.
+Search Permutation (_ :: _).
 ...
 destruct n; [ easy | ].
 destruct n. {
