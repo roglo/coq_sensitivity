@@ -1949,34 +1949,22 @@ f_equal.
 apply determinant_alternating; try easy; [ flia Hiz | flia ].
 Qed.
 
-(*
-Compute vect_of_list 3 [1;2;3].
-Compute mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]].
-
-vect_of_list
-     : ∀ T : Type, T → ∀ l : list T, vector (length l) T
-mat_of_list_list
-     : ∀ T : Type, T → ∀ ll : list (list T), matrix (list_list_nrows ll) (list_list_ncols ll) T
-
-Compute vect_of_list 0 [1;2;3].
-
-Check (@vect_of_list nat).
-
-Definition sym_gr (n : nat) :=
-map (@vect_of_list nat 0) [[1;2;3];[1;3;2];[2;1;3];[2;3;1];[3;1;2];[3;2;1]].
-Check sym_gr.
-
-...
-
-Compute (sym_gr 5).
-
-Check vect_of_list.
-
-...
-*)
-
 Theorem permut_comp_assoc : ∀ n (f g h : vector n nat),
   (f ° (g ° h) = (f ° g) ° h)%F.
+Proof. easy. Qed.
+
+Theorem comp_permut_inv_r : ∀ n f,
+  is_permut f
+  → (f ° permut_inv f = mk_vect n id).
+Proof.
+intros * Hf.
+apply vector_eq; cbn.
+intros i Hi.
+unfold comp.
+now apply fun_permut_fun_inv.
+Qed.
+
+Theorem comp_id_l : ∀ A B (f : A → B), comp id f = f.
 Proof. easy. Qed.
 
 Definition sym_gr (n : nat) :=
@@ -2013,14 +2001,21 @@ erewrite rngl_summation_list_eq_compat. 2: {
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
     rewrite <- Hσν at 1.
+    rewrite permut_comp_assoc.
+    rewrite comp_permut_inv_r; [ | easy ].
+    unfold permut_comp; cbn.
+    unfold id.
     easy.
   }
   cbn.
   rewrite permut_comp_assoc.
+  rewrite comp_permut_inv_r; [ | easy ].
+  unfold ε at 1; cbn.
+  rewrite comp_id_l.
+  replace (ε_fun (vect_el μ) n) with (ε μ) by easy.
   easy.
 }
 cbn.
-unfold comp.
 ...
 
 Theorem determinant_transp :
