@@ -1978,7 +1978,7 @@ Check vect_of_list.
 Definition sym_gr (n : nat) :=
   map (λ v, canon_permut n v) (seq 0 n!).
 
-Theorem glop : ∀ n (M : matrix n n T) (σ : vector n nat),
+Theorem det_any_permut : ∀ n (M : matrix n n T) (σ : vector n nat),
   is_permut σ
   → determinant M =
     (Σ (μ ∈ sym_gr n), ε μ * ε σ *
@@ -1987,6 +1987,12 @@ Proof.
 intros * Hσ.
 unfold is_permut in Hσ.
 destruct Hσ as (Hσ_lt, Hσ_inj).
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros μ Hμ.
+  remember (permut_inv σ ° μ) as ν eqn:Hν.
+  assert (Hσν : σ ° ν = μ). {
+    rewrite Hν.
+Search "°".
 ...
 
 Theorem determinant_transp :
