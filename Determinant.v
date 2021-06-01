@@ -1975,16 +1975,12 @@ Check vect_of_list.
 ...
 *)
 
-...
+Definition sym_gr (n : nat) :=
+  map (λ v, canon_permut n v) (seq 0 n!).
 
-Definition sym_gr (n : nat) : list (vector n nat) :=
-  [vect_of_list 0 [1;2;3]; vect_of_list 0 [1;3;2]].
-
-Check sym_gr.
-
-Theorem glop : ∀ n (M : matrix n n T) σ,
+Theorem glop : ∀ n (M : matrix n n T) (σ : vector n nat),
   determinant M =
-  (Σ (μ ∈ sym_gr n), ε μ * ε σ * Π (k = 0, n - 1), mat_el M (σ k) (μ k))%F.
+  (Σ (μ ∈ sym_gr n), ε μ * ε σ * Π (k = 0, n - 1), mat_el M (vect_el σ k) (vect_el μ k))%F.
 ...
 
 Theorem determinant_transp :
