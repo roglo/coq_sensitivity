@@ -1975,6 +1975,10 @@ Check vect_of_list.
 ...
 *)
 
+Theorem permut_comp_assoc : ∀ n (f g h : vector n nat),
+  (f ° (g ° h) = (f ° g) ° h)%F.
+Proof. easy. Qed.
+
 Definition sym_gr (n : nat) :=
   map (λ v, canon_permut n v) (seq 0 n!).
 
@@ -1992,7 +1996,27 @@ erewrite rngl_summation_list_eq_compat. 2: {
   remember (permut_inv σ ° μ) as ν eqn:Hν.
   assert (Hσν : σ ° ν = μ). {
     rewrite Hν.
-Search "°".
+    rewrite permut_comp_assoc.
+    apply vector_eq.
+    intros i Hi; cbn.
+    unfold comp.
+    rewrite fun_permut_fun_inv; [ easy | easy | ].
+    unfold sym_gr in Hμ.
+    apply in_map_iff in Hμ.
+    destruct Hμ as (j & Hj & Hjs).
+    rewrite <- Hj.
+    apply vect_el_canon_permut_ub; [ | easy ].
+    now apply in_seq in Hjs.
+  }
+  rewrite <- Hσν at 1.
+...
+  erewrite rngl_product_eq_compat. 2: {
+    intros i Hi.
+    rewrite <- Hσν at 1.
+    easy.
+  }
+  cbn.
+
 ...
 
 Theorem determinant_transp :
