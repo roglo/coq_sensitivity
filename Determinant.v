@@ -1957,7 +1957,6 @@ vect_of_list
      : ∀ T : Type, T → ∀ l : list T, vector (length l) T
 mat_of_list_list
      : ∀ T : Type, T → ∀ ll : list (list T), matrix (list_list_nrows ll) (list_list_ncols ll) T
-*)
 
 Compute vect_of_list 0 [1;2;3].
 
@@ -1974,8 +1973,16 @@ Compute (sym_gr 5).
 Check vect_of_list.
 
 ...
+*)
 
-Theorem glop : ∀ n (M : matrix n n T),
+...
+
+Definition sym_gr (n : nat) : list (vector n nat) :=
+  [vect_of_list 0 [1;2;3]; vect_of_list 0 [1;3;2]].
+
+Check sym_gr.
+
+Theorem glop : ∀ n (M : matrix n n T) σ,
   determinant M =
   (Σ (μ ∈ sym_gr n), ε μ * ε σ * Π (k = 0, n - 1), mat_el M (σ k) (μ k))%F.
 ...
