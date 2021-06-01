@@ -3,11 +3,11 @@
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
-Require Import Utf8 Arith (*Bool*).
+Require Import Utf8 Arith.
 Import List List.ListNotations.
 
 Require Import Misc.
-Require Import RingLike RLsummation (*RLproduct*).
+Require Import RingLike RLsummation.
 
 Record vector (n : nat) T := mk_vect
   { vect_el : nat → T }.
@@ -17,7 +17,7 @@ Axiom vector_eq : ∀ n T (VA VB : vector n T),
   (∀ i, i < n → vect_el VA i = vect_el VB i)
   → VA = VB.
 
-Definition vect_of_list {T} d (l : list T) :=
+Definition vect_of_list T d (l : list T) : vector (length l) T :=
   mk_vect (length l) (λ i, nth i l d).
 Definition list_of_vect {n T} (v : vector n T) :=
   map (vect_el v) (seq 0 n).

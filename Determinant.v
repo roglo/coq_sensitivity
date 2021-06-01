@@ -1949,7 +1949,14 @@ f_equal.
 apply determinant_alternating; try easy; [ flia Hiz | flia ].
 Qed.
 
-Definition sym_gr n := ...
+Compute vect_of_list 3 [1;2;3].
+
+Definition sym_gr (n : nat) :=
+@map (list nat) (vector n nat) (λ (l : list nat), vect_of_list n l) [[1;2;3];[1;3;2];[2;1;3];[2;3;1];[3;1;2];[3;2;1]].
+Check sym_gr.
+Check vect_of_list.
+
+...
 
 Theorem glop : ∀ n (M : matrix n n T),
   determinant M =
