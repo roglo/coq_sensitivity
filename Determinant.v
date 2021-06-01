@@ -1949,6 +1949,13 @@ f_equal.
 apply determinant_alternating; try easy; [ flia Hiz | flia ].
 Qed.
 
+Definition sym_gr n := ...
+
+Theorem glop : ∀ n (M : matrix n n T),
+  determinant M =
+  (Σ (μ ∈ sym_gr n), ε μ * ε σ * Π (k = 0, n - 1), mat_el M (σ k) (μ k))%F.
+...
+
 Theorem determinant_transp :
   rngl_is_comm = true →
   rngl_has_opp = true →
