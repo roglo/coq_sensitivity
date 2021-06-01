@@ -2008,15 +2008,19 @@ erewrite rngl_summation_list_eq_compat. 2: {
     apply vect_el_canon_permut_ub; [ | easy ].
     now apply in_seq in Hjs.
   }
+  subst ν.
   rewrite <- Hσν at 1.
-...
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
     rewrite <- Hσν at 1.
     easy.
   }
   cbn.
-
+  rewrite permut_comp_assoc.
+  easy.
+}
+cbn.
+unfold comp.
 ...
 
 Theorem determinant_transp :
