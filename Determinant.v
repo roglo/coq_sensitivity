@@ -1949,9 +1949,10 @@ f_equal.
 apply determinant_alternating; try easy; [ flia Hiz | flia ].
 Qed.
 
+(*
 Compute vect_of_list 3 [1;2;3].
 Compute mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]].
-(*
+
 vect_of_list
      : ∀ T : Type, T → ∀ l : list T, vector (length l) T
 mat_of_list_list
@@ -1960,11 +1961,13 @@ mat_of_list_list
 
 Compute vect_of_list 0 [1;2;3].
 
-...
+Check (@vect_of_list nat).
 
 Definition sym_gr (n : nat) :=
-map (vect_of_list 3) [[1;2;3];[1;3;2];[2;1;3];[2;3;1];[3;1;2];[3;2;1]].
+map (@vect_of_list nat 0) [[1;2;3];[1;3;2];[2;1;3];[2;3;1];[3;1;2];[3;2;1]].
 Check sym_gr.
+
+...
 
 Compute (sym_gr 5).
 
