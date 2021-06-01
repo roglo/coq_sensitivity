@@ -1958,6 +1958,8 @@ mat_of_list_list
      : ∀ T : Type, T → ∀ ll : list (list T), matrix (list_list_nrows ll) (list_list_ncols ll) T
 *)
 
+Compute vect_of_list 0 [1;2;3].
+
 ...
 
 Definition sym_gr (n : nat) :=
