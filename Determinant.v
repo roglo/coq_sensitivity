@@ -1979,8 +1979,14 @@ Definition sym_gr (n : nat) :=
   map (λ v, canon_permut n v) (seq 0 n!).
 
 Theorem glop : ∀ n (M : matrix n n T) (σ : vector n nat),
-  determinant M =
-  (Σ (μ ∈ sym_gr n), ε μ * ε σ * Π (k = 0, n - 1), mat_el M (vect_el σ k) (vect_el μ k))%F.
+  is_permut σ
+  → determinant M =
+    (Σ (μ ∈ sym_gr n), ε μ * ε σ *
+     Π (k = 0, n - 1), mat_el M (vect_el σ k) (vect_el μ k))%F.
+Proof.
+intros * Hσ.
+unfold is_permut in Hσ.
+destruct Hσ as (Hσ_lt, Hσ_inj).
 ...
 
 Theorem determinant_transp :
