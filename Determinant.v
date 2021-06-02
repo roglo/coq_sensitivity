@@ -1992,10 +1992,31 @@ erewrite rngl_summation_list_eq_compat. 2: {
   }
   subst ν.
   rewrite <- Hσν at 1.
+  assert (Hpμ : is_permut μ). {
+    unfold sym_gr in Hμ.
+    apply in_map_iff in Hμ.
+    destruct Hμ as (i & Hi & His).
+    rewrite <- Hi.
+    apply in_seq in His.
+    now apply canon_permut_is_permut.
+  }
   rewrite signature_comp;
     [ | easy | easy | easy | easy | easy | easy | easy | easy | ]. 2: {
- Search (is_permut (_ ° _)).
-Theorem is_permut_comp : ∀ n (u v : vector n nat), is_permut u → is_permut v → is_permut (u ° v).
+    apply is_permut_comp; [ now apply permut_inv_is_permut | easy ].
+  }
+  rewrite rngl_mul_comm; [ | easy ].
+  do 2 rewrite rngl_mul_assoc.
+  rewrite rngl_mul_mul_swap; [ | easy ].
+  rewrite rngl_mul_comm; [ | easy ].
+  rewrite <- rngl_mul_assoc.
+  rewrite <- signature_comp;
+    [ | easy | easy | easy | easy | easy | easy | easy | easy | easy ].
+  unfold ε at 2.
+  unfold ε_fun.
+  cbn.
+...
+rewrite <- signature_comp_fun.
+Search (ε _ * ε _)%F.
 ...
    apply is_permut_permut_inv.
 ...

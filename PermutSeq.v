@@ -3063,6 +3063,21 @@ apply comp_is_permut_fun. 2: {
 now apply Hl; left.
 Qed.
 
+Theorem is_permut_comp : ∀ n (u v : vector n nat),
+  is_permut u → is_permut v → is_permut (u ° v).
+Proof.
+intros * Hu Hv.
+split. {
+  intros i Hi.
+  cbn; unfold comp.
+  now apply Hu, Hv.
+} {
+  intros i j Hi Hj Huv.
+  apply Hu in Huv; [ | now apply Hv | now apply Hv ].
+  now apply Hv in Huv.
+}
+Qed.
+
 End a.
 
 Arguments ε {T}%type {ro} [n]%nat p.
