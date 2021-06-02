@@ -2009,6 +2009,9 @@ erewrite rngl_summation_list_eq_compat. 2: {
   rewrite rngl_mul_mul_swap; [ | easy ].
   rewrite rngl_mul_comm; [ | easy ].
   rewrite <- rngl_mul_assoc.
+Theorem ε_square : ∀ n (σ : vector n nat), (ε σ * ε σ = 1)%F.
+Proof.
+...
   rewrite <- signature_comp;
     [ | easy | easy | easy | easy | easy | easy | easy | easy | easy ].
   unfold ε at 2.
