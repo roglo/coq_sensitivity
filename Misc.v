@@ -1834,6 +1834,22 @@ rewrite <- seq_shift.
 now rewrite List_fold_left_map.
 Qed.
 
+Theorem iter_seq_succ_succ' : ∀ {T} (d : T) b k f,
+  iter_seq (S b) (S k) (λ c i, f c (i - 1)) d =
+  iter_seq b k (λ c i, f c i) d.
+Proof.
+intros.
+unfold iter_seq, iter_list.
+rewrite Nat.sub_succ.
+rewrite <- seq_shift.
+rewrite List_fold_left_map.
+apply List_fold_left_ext_in.
+intros j i Hj.
+f_equal.
+rewrite Nat.sub_succ.
+apply Nat.sub_0_r.
+Qed.
+
 Theorem iter_seq_empty : ∀ T d (op : T → T → T) b k g,
   k < b
   → iter_seq b k (λ (c : T) (i : nat), op c (g i)) d = d.

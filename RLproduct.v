@@ -131,6 +131,14 @@ intros b k g.
 apply iter_seq_succ_succ.
 Qed.
 
+Theorem rngl_product_succ_succ' : ∀ b k g,
+  (Π (i = S b, S k), g (i - 1)%nat = Π (i = b, k), g i)%F.
+Proof.
+intros.
+symmetry.
+now rewrite <- iter_seq_succ_succ'.
+Qed.
+
 Theorem rngl_product_empty : ∀ g b k,
   k < b → (Π (i = b, k), g i = 1)%F.
 Proof.

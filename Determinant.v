@@ -1959,12 +1959,13 @@ Theorem det_any_permut :
   rngl_is_comm = true →
   rngl_has_opp = true ∨ rngl_has_sous = true →
   ∀ n (M : matrix n n T) (σ : vector n nat),
-  is_permut σ
+  n ≠ 0
+  → is_permut σ
   → determinant M =
     (Σ (μ ∈ sym_gr n), ε μ * ε σ *
      Π (k = 0, n - 1), mat_el M (vect_el σ k) (vect_el μ k))%F.
 Proof.
-intros Hic Hos * Hσ.
+intros Hic Hos * Hnz Hσ.
 unfold is_permut in Hσ.
 destruct Hσ as (Hσ_lt, Hσ_inj).
 erewrite rngl_summation_list_eq_compat. 2: {
@@ -1986,15 +1987,11 @@ erewrite rngl_summation_list_eq_compat. 2: {
   }
   subst ν.
   rewrite <- Hσν at 1.
+  rewrite <- rngl_product_succ_succ'.
+  replace (S (n - 1)) with n by flia Hnz.
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
     rewrite <- Hσν at 1.
-(*
-    rewrite permut_comp_assoc.
-    rewrite comp_permut_inv_r; [ | easy ].
-    unfold permut_comp; cbn.
-    unfold id.
-*)
     easy.
   }
   cbn.
@@ -2008,7 +2005,6 @@ erewrite rngl_summation_list_eq_compat. 2: {
 }
 cbn.
 rewrite <- rngl_mul_summation_list_distr_l; [ | easy ].
-unfold comp.
 unfold sym_gr.
 rewrite rngl_summation_map_seq.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
