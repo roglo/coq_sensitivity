@@ -1992,8 +1992,12 @@ erewrite rngl_summation_list_eq_compat. 2: {
   }
   subst ν.
   rewrite <- Hσν at 1.
+  rewrite signature_comp;
+    [ | easy | easy | easy | easy | easy | easy | easy | easy | ]. 2: {
+ Search (is_permut (_ ° _)).
+Theorem is_permut_comp : ∀ n (u v : vector n nat), is_permut u → is_permut v → is_permut (u ° v).
 ...
-  rewrite signature_comp; [ easy | easy | easy | ].
+   apply is_permut_permut_inv.
 ...
   rewrite <- rngl_product_succ_succ'.
   replace (S (n - 1)) with n by flia Hnz.
