@@ -91,21 +91,6 @@ Definition det_from_col {n} (M : matrix (S n) (S n) T) j :=
    of both determinants is easy.
    See PermutSeq.v *)
 
-Theorem rngl_summation_change_var : ∀ A b e f g (h : _ → A),
-  (∀ i, b ≤ i ≤ e → g (h i) = i)
-  → Σ (i = b, e), f i = Σ (i ∈ map h (seq b (S e - b))), f (g i).
-Proof.
-intros * Hgh.
-unfold iter_seq, iter_list.
-rewrite List_fold_left_map.
-apply List_fold_left_ext_in.
-intros i c Hi.
-f_equal; f_equal; symmetry.
-apply Hgh.
-apply in_seq in Hi.
-flia Hi.
-Qed.
-
 (* definition of determinant by sum of products involving all
    permutations *)
 
@@ -633,7 +618,7 @@ f_equal.
 rewrite rngl_mul_1_l.
 symmetry.
 set (g := λ k, nat_of_canon_permut (f k)).
-rewrite rngl_summation_change_var with (g := g) (h := g). 2: {
+rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
   intros k (_, Hk).
   assert (Hkn : k < n!). {
     specialize (fact_neq_0 n) as Hn.
@@ -2024,6 +2009,22 @@ erewrite rngl_summation_list_eq_compat. 2: {
 cbn.
 rewrite <- rngl_mul_summation_list_distr_l; [ | easy ].
 unfold comp.
+unfold sym_gr.
+rewrite rngl_summation_map_seq.
+rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
+cbn.
+Print determinant'.
+...
+
+replace (n!) with (S (n! - 1) - 0).
+remember (λ v : nat, canon_permut n v) as h eqn:Hh.
+remember 0 as b eqn:Hb.
+rewrite Hb at 2.
+remember (n! - 1) as e eqn:He.
+Check rngl_summation_change_var.
+...
+Search (Σ (_ ∈ map _ _), _)%F.
+rewrite <- rngl_summation_change_var.
 Print determinant'.
 ...
 

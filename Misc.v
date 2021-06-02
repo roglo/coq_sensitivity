@@ -1796,7 +1796,7 @@ Qed.
 Theorem iter_list_eq_compat : ∀ A B d (op : A → A → A) (l : list B) g h,
   (∀ i, i ∈ l → g i = h i)
   → iter_list l (λ c i, op c (g i)) d =
-     iter_list l (λ c i, op c (h i)) d.
+    iter_list l (λ c i, op c (h i)) d.
 Proof.
 intros * Hgh.
 unfold iter_list.

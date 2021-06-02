@@ -481,9 +481,42 @@ f_equal; f_equal.
 flia Hlen.
 Qed.
 
+Theorem rngl_summation_map_seq : ∀ A start len (f : A → T) g,
+  (Σ (i ∈ map g (seq start len)), f i =
+   Σ (i ∈ seq start len), f (g i))%F.
+Proof.
+intros.
+revert start.
+induction len; intros; [ easy | cbn ].
+rewrite rngl_summation_list_cons.
+rewrite rngl_summation_list_cons.
+f_equal.
+apply IHlen.
+Qed.
+
+Theorem rngl_summation_change_var : ∀ A b e f g (h : _ → A),
+  (∀ i, b ≤ i ≤ e → g (h i) = i)
+  → Σ (i = b, e), f i = Σ (i ∈ map h (seq b (S e - b))), f (g i).
+Proof.
+intros * Hgh.
+rewrite rngl_summation_map_seq.
+unfold iter_seq.
+apply rngl_summation_list_eq_compat.
+intros i Hi.
+apply in_seq in Hi.
+rewrite Hgh; [ easy | ].
+flia Hi.
+Qed.
+
 End a.
 
 Arguments rngl_mul_summation_list_distr_l {T ro rp} Hom A%type a
   la%list f%function.
 Arguments rngl_mul_summation_distr_l {T ro rp} Hom a b e f.
 Arguments rngl_mul_summation_distr_r {T ro rp} Hom a b e f.
+Arguments rngl_summation_list_cons {T ro rp} A%type_scope a la%list
+  f%function.
+Arguments rngl_summation_change_var {T ro rp} A%type (b e)%nat
+  (f g h)%function.
+Arguments rngl_summation_map_seq {T ro rp} A%type (start len)%nat
+  (f g)%function.
