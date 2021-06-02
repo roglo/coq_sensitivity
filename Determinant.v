@@ -1956,8 +1956,13 @@ Definition sym_gr (n : nat) :=
   map (λ v, canon_permut n v) (seq 0 n!).
 
 Theorem det_any_permut :
+  rngl_has_opp = true →
+  rngl_has_inv = true →
   rngl_is_comm = true →
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_dec_eq = true →
+  rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
+  rngl_characteristic = 0 →
   ∀ n (M : matrix n n T) (σ : vector n nat),
   n ≠ 0
   → is_permut σ
@@ -1965,7 +1970,7 @@ Theorem det_any_permut :
     (Σ (μ ∈ sym_gr n), ε μ * ε σ *
      Π (k = 0, n - 1), mat_el M (vect_el σ k) (vect_el μ k))%F.
 Proof.
-intros Hic Hos * Hnz Hσ.
+intros Hop Hiv Hic Hde H10 Hit Hch * Hnz Hσ.
 unfold is_permut in Hσ.
 destruct Hσ as (Hσ_lt, Hσ_inj).
 erewrite rngl_summation_list_eq_compat. 2: {
@@ -1987,11 +1992,17 @@ erewrite rngl_summation_list_eq_compat. 2: {
   }
   subst ν.
   rewrite <- Hσν at 1.
+...
+  rewrite signature_comp; [ easy | easy | easy | ].
+...
   rewrite <- rngl_product_succ_succ'.
   replace (S (n - 1)) with n by flia Hnz.
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
     rewrite <- Hσν at 1.
+    rewrite permut_comp_assoc.
+    rewrite comp_permut_inv_r; [ cbn | easy ].
+    unfold id.
     easy.
   }
   cbn.
@@ -2010,6 +2021,13 @@ rewrite rngl_summation_map_seq.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 cbn.
 Print determinant'.
+...
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+Print determinant'.
+...
+  erewrite rngl_product_eq_compat. 2: {
+    intros i Hi.
 ...
 
 replace (n!) with (S (n! - 1) - 0).
