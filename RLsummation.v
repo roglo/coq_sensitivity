@@ -185,29 +185,45 @@ apply in_seq in Hj.
 f_equal; f_equal; flia.
 Qed.
 
+Theorem mul_iter_list_distr_l : ∀ A B a (la : list B) f
+    (add mul : A → A → A) d
+    (mul_add_distr_l : ∀ y z, mul a (add y z) = add (mul a y) (mul a z)),
+  mul a (iter_list la (λ c i, add c (f i)) d) =
+  iter_list la (λ c i, add c (mul a (f i))) (mul a d).
+Proof.
+intros.
+clear Hom.
+unfold iter_list.
+revert d.
+induction la as [| a1]; intros; [ easy | cbn ].
+rewrite IHla.
+f_equal.
+apply mul_add_distr_l.
+Qed.
+
 Theorem mul_iter_seq_distr_l : ∀ A a b e f (add mul : A → A → A) d
     (mul_add_distr_l : ∀ y z, mul a (add y z) = add (mul a y) (mul a z)),
   mul a (iter_seq b e (λ c i, add c (f i)) d) =
   iter_seq b e (λ c i, add c (mul a (f i))) (mul a d).
 Proof.
 intros.
-unfold iter_seq, iter_list.
-remember (S e - b) as n eqn:Hn.
-clear e Hn.
-revert b d.
-induction n; intros; [ easy | ].
-rewrite seq_S.
-do 2 rewrite fold_left_app; cbn.
-rewrite <- IHn.
-apply mul_add_distr_l.
+clear Hom.
+now apply mul_iter_list_distr_l.
+Qed.
+
+Theorem rngl_mul_summation_list_distr_l : ∀ A a (la : list A) f,
+  (a * (Σ (i ∈ la), f i) = Σ (i ∈ la), a * f i)%F.
+Proof.
+intros.
+rewrite mul_iter_list_distr_l; [ | apply rngl_mul_add_distr_l ].
+now rewrite rngl_mul_0_r.
 Qed.
 
 Theorem rngl_mul_summation_distr_l : ∀ a b e f,
   (a * (Σ (i = b, e), f i) = Σ (i = b, e), a * f i)%F.
 Proof.
 intros.
-rewrite mul_iter_seq_distr_l; [ | apply rngl_mul_add_distr_l ].
-now rewrite rngl_mul_0_r.
+apply rngl_mul_summation_list_distr_l.
 Qed.
 
 Theorem rngl_mul_summation_distr_r : ∀ a b e f,
@@ -467,5 +483,7 @@ Qed.
 
 End a.
 
+Arguments rngl_mul_summation_list_distr_l {T ro rp} Hom A%type a
+  la%list f%function.
 Arguments rngl_mul_summation_distr_l {T ro rp} Hom a b e f.
 Arguments rngl_mul_summation_distr_r {T ro rp} Hom a b e f.

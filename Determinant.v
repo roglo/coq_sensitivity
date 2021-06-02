@@ -1970,13 +1970,16 @@ Proof. easy. Qed.
 Definition sym_gr (n : nat) :=
   map (λ v, canon_permut n v) (seq 0 n!).
 
-Theorem det_any_permut : ∀ n (M : matrix n n T) (σ : vector n nat),
+Theorem det_any_permut :
+  rngl_is_comm = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
+  ∀ n (M : matrix n n T) (σ : vector n nat),
   is_permut σ
   → determinant M =
     (Σ (μ ∈ sym_gr n), ε μ * ε σ *
      Π (k = 0, n - 1), mat_el M (vect_el σ k) (vect_el μ k))%F.
 Proof.
-intros * Hσ.
+intros Hic Hos * Hσ.
 unfold is_permut in Hσ.
 destruct Hσ as (Hσ_lt, Hσ_inj).
 erewrite rngl_summation_list_eq_compat. 2: {
@@ -2001,10 +2004,12 @@ erewrite rngl_summation_list_eq_compat. 2: {
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
     rewrite <- Hσν at 1.
+(*
     rewrite permut_comp_assoc.
     rewrite comp_permut_inv_r; [ | easy ].
     unfold permut_comp; cbn.
     unfold id.
+*)
     easy.
   }
   cbn.
@@ -2013,9 +2018,13 @@ erewrite rngl_summation_list_eq_compat. 2: {
   unfold ε at 1; cbn.
   rewrite comp_id_l.
   replace (ε_fun (vect_el μ) n) with (ε μ) by easy.
+  rewrite rngl_mul_mul_swap, rngl_mul_comm; [ | easy | easy ].
   easy.
 }
 cbn.
+rewrite <- rngl_mul_summation_list_distr_l; [ | easy ].
+unfold comp.
+Print determinant'.
 ...
 
 Theorem determinant_transp :
