@@ -2009,8 +2009,27 @@ erewrite rngl_summation_list_eq_compat. 2: {
   rewrite rngl_mul_mul_swap; [ | easy ].
   rewrite rngl_mul_comm; [ | easy ].
   rewrite <- rngl_mul_assoc.
+Theorem ε_1_opp_1 : ∀ n (σ : vector n nat), ε σ = 1%F ∨ ε σ = (-1)%F.
+Proof.
+intros.
+rewrite ε_ws_ε.
+unfold ε_ws.
+unfold ε_fun_ws.
+...
 Theorem ε_square : ∀ n (σ : vector n nat), (ε σ * ε σ = 1)%F.
 Proof.
+intros.
+rewrite ε_ws_ε.
+unfold ε_ws.
+unfold ε_fun_ws.
+unfold sign_diff.
+
+...
+unfold ε, ε_fun.
+unfold δ.
+Search ε.
+Print ε_ws.
+Print ε_fun_ws.
 ...
   rewrite <- signature_comp;
     [ | easy | easy | easy | easy | easy | easy | easy | easy | easy ].

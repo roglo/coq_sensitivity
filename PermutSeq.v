@@ -3082,6 +3082,10 @@ End a.
 
 Arguments ε {T}%type {ro} [n]%nat p.
 Arguments ε_fun {T}%type {ro} f%function n%nat.
+Arguments ε_ws {T}%type {ro} {n}%nat.
+Arguments ε_fun_ws {T}%type {ro} f%function n%nat.
+Arguments sign_diff {T}%type {ro} (u v)%nat.
+
 Arguments ε_canon_permut {T}%type {ro} (n k)%nat.
 Arguments ε_of_canon_permut_succ {T}%type {ro rp} _ _ _ _ _ _ _ n%nat [k]%nat.
 Arguments ε_of_canon_permut_ε {T}%type {ro rp} _ _ _ _ _ _ _ n%nat [k]%nat.
