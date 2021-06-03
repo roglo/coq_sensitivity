@@ -2011,6 +2011,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   rewrite <- rngl_mul_assoc.
   now rewrite ε_square, rngl_mul_1_r.
 }
+cbn.
 ...
 Search (_ * _ = 1)%F.
 rngl_mul_move_1_r:
