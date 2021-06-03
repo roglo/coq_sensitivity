@@ -397,6 +397,56 @@ f_equal; f_equal.
 flia Hlen.
 Qed.
 
+Theorem rngl_product_1_opp_1 :
+  rngl_has_opp = true →
+  ∀ b e f,
+  (∀ i, b ≤ i ≤ e → f i = 1%F ∨ f i = (-1)%F)
+  → (Π (i = b, e), f i = 1)%F ∨ (Π (i = b, e), f i = -1)%F.
+Proof.
+intros Hop * Hf.
+unfold iter_seq.
+remember (S e - b) as len eqn:Hlen.
+destruct len; [ now left | ].
+assert (H : ∀ i, b ≤ i ≤ b + len → f i = 1%F ∨ f i = (-1)%F). {
+  intros i Hi.
+  apply Hf.
+  flia Hlen Hi.
+}
+move H before Hf; clear Hf; rename H into Hf.
+replace e with (b + len) by flia Hlen.
+clear e Hlen.
+revert b Hf.
+induction len; intros. {
+  cbn.
+  unfold iter_list; cbn.
+  rewrite rngl_mul_1_l.
+  apply Hf; flia.
+}
+remember (S len) as x; cbn; subst x.
+rewrite rngl_product_list_cons.
+specialize (Hf b) as H1.
+assert (H : b ≤ b ≤ b + S len) by flia.
+specialize (H1 H); clear H.
+specialize (IHlen (S b)) as H2.
+assert (H : ∀ i, S b ≤ i ≤ S b + len → f i = 1%F ∨ f i = (-1)%F). {
+  intros i Hi.
+  apply Hf.
+  flia Hi.
+}
+specialize (H2 H); clear H.
+destruct H1 as [H1| H1]; rewrite H1. {
+  now rewrite rngl_mul_1_l.
+} {
+  destruct H2 as [H2| H2]; rewrite H2; [ right | left ]. {
+    rewrite rngl_mul_opp_l; [ | easy ].
+    now rewrite rngl_mul_1_l.
+  } {
+    rewrite rngl_mul_opp_opp; [ | easy ].
+    apply rngl_mul_1_l.
+  }
+}
+Qed.
+
 End a.
 
 Arguments rngl_product_div_distr {T}%type {ro rp} _ _ _ _ _ (b e)%nat
@@ -415,3 +465,4 @@ Arguments rngl_product_succ_succ {T}%type {ro} (b k)%nat g%function.
 Arguments rngl_product_integral {T}%type {ro rp} _ _ _ (b e)%nat f%function.
 Arguments rngl_product_list_integral {T}%type {ro rp} _ _ _ A%type l%list f%function.
 Arguments rngl_product_split_first {T}%type {ro rp} (b k)%nat g%function.
+Arguments rngl_product_1_opp_1 {T}%type {ro rp} _ (b e)%nat (f g)%function.
