@@ -2009,29 +2009,15 @@ erewrite rngl_summation_list_eq_compat. 2: {
   rewrite rngl_mul_mul_swap; [ | easy ].
   rewrite rngl_mul_comm; [ | easy ].
   rewrite <- rngl_mul_assoc.
-Theorem ε_1_opp_1 :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_has_1_neq_0 = true →
-  rngl_is_integral = true →
-  rngl_has_dec_eq = true →
-  rngl_characteristic = 0 →
-  ∀ n (σ : vector n nat), is_permut σ → ε σ = 1%F ∨ ε σ = (-1)%F.
-Proof.
-intros Hic Hop Ihv H10 Hit Hed Hch * Hσ.
-rewrite ε_ws_ε; try easy.
-unfold ε_ws.
-unfold ε_fun_ws.
-apply rngl_product_1_opp_1; [ easy | ].
-intros i Hi.
-apply rngl_product_1_opp_1; [ easy | ].
-intros j Hj.
-unfold sign_diff.
+  now rewrite ε_square, rngl_mul_1_r.
+}
 ...
-Theorem ε_square : ∀ n (σ : vector n nat), (ε σ * ε σ = 1)%F.
-Proof.
-intros.
+Search (_ * _ = 1)%F.
+rngl_mul_move_1_r:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T → rngl_has_inv = true → ∀ a b : T, b ≠ 0%F → (a * b)%F = 1%F ↔ a = b⁻¹%F
+...
+
 rewrite ε_ws_ε.
 unfold ε_ws.
 unfold ε_fun_ws.

@@ -3078,6 +3078,55 @@ split. {
 }
 Qed.
 
+Theorem ε_1_opp_1 :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ n (σ : vector n nat), is_permut σ → ε σ = 1%F ∨ ε σ = (-1)%F.
+Proof.
+intros Hic Hop Hiv H10 Hit Hed Hch * Hσ.
+rewrite ε_ws_ε; try easy.
+unfold ε_ws.
+unfold ε_fun_ws.
+apply rngl_product_1_opp_1; [ easy | ].
+intros i Hi.
+apply rngl_product_1_opp_1; [ easy | ].
+intros j Hj.
+unfold sign_diff.
+rewrite if_ltb_lt_dec.
+rewrite if_ltb_lt_dec.
+destruct (lt_dec i j) as [Hij| Hij]. {
+  now destruct (lt_dec _ _) as [Hvv| Hvv]; [ left | right ].
+}
+now left.
+Qed.
+
+Theorem ε_square :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ n (σ : vector n nat), is_permut σ → (ε σ * ε σ = 1)%F.
+Proof.
+intros Hic Hop Hiv H10 Hit Hed Hch * Hσ.
+specialize (ε_1_opp_1) as H1.
+specialize (H1 Hic Hop Hiv H10 Hit Hed Hch).
+specialize (H1 n σ Hσ).
+destruct H1 as [H1| H1]; rewrite H1. {
+  apply rngl_mul_1_l.
+} {
+  rewrite rngl_mul_opp_opp; [ | easy ].
+  apply rngl_mul_1_l.
+}
+Qed.
+
 End a.
 
 Arguments ε {T}%type {ro} [n]%nat p.
@@ -3094,3 +3143,5 @@ Arguments rngl_product_change_list {T}%type {ro rp} _ [A]%type [la lb]%list
   f%function.
 Arguments signature_comp {T}%type {ro rp} _ _ _ _ _ _ _ [n]%nat [σ₁ σ₂].
 Arguments transposition_signature {T}%type {ro rp} _ _ _ _ _ _ _ [n p q]%nat.
+Arguments ε_1_opp_1 {T}%type {ro rp} _ _ _ _ _ _ _ [n]%nat [σ].
+Arguments ε_square {T}%type {ro rp} _ _ _ _ _ _ _ [n]%nat [σ].
