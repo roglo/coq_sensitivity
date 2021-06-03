@@ -2015,6 +2015,7 @@ intros.
 rewrite ε_ws_ε.
 unfold ε_ws.
 unfold ε_fun_ws.
+Print sign_diff.
 ...
 Theorem ε_square : ∀ n (σ : vector n nat), (ε σ * ε σ = 1)%F.
 Proof.
