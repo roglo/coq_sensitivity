@@ -2028,6 +2028,7 @@ rewrite rngl_summation_map_seq.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
 remember (canon_permut n) as μ eqn:Hμ.
+...
 apply rngl_summation_eq_compat.
 intros i Hi.
 symmetry.
