@@ -2018,13 +2018,37 @@ erewrite rngl_summation_list_eq_compat. 2: {
   now rewrite rngl_mul_1_r.
 }
 cbn.
+(*
 rewrite <- rngl_mul_summation_list_distr_l; [ | now left ].
+*)
 rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
 unfold sym_gr.
 rewrite rngl_summation_map_seq.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
+remember (canon_permut n) as μ eqn:Hμ.
+apply rngl_summation_eq_compat.
+intros i Hi.
+symmetry.
+rewrite rngl_mul_comm; [ | easy ].
+rewrite <- rngl_mul_assoc.
+f_equal.
+rewrite <- rngl_product_succ_succ'.
+replace (S (n - 1)) with n by flia Hnz.
+rewrite rngl_product_shift; [ | now apply Nat.neq_0_lt_0 ].
+symmetry.
+rewrite rngl_product_shift; [ | now apply Nat.neq_0_lt_0 ].
+erewrite rngl_product_eq_compat. 2: {
+  intros j Hj.
+  now rewrite Nat.add_comm, Nat.add_sub.
+}
+symmetry.
+erewrite rngl_product_eq_compat. 2: {
+  intros j Hj.
+  now rewrite Nat.add_comm, Nat.add_sub.
+}
+symmetry.
 ...
 Search (_ * _ = 1)%F.
 rngl_mul_move_1_r:
