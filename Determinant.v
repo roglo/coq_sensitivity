@@ -2012,6 +2012,12 @@ erewrite rngl_summation_list_eq_compat. 2: {
   now rewrite ε_square, rngl_mul_1_r.
 }
 cbn.
+rewrite det_is_det_by_canon_permut; try easy.
+unfold determinant'.
+unfold sym_gr.
+rewrite rngl_summation_map_seq.
+rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
+rewrite Nat.add_0_l.
 ...
 Search (_ * _ = 1)%F.
 rngl_mul_move_1_r:
