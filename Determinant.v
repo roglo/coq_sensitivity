@@ -2004,23 +2004,35 @@ erewrite rngl_summation_list_eq_compat. 2: {
     [ | easy | easy | easy | easy | easy | easy | easy | easy | ]. 2: {
     apply is_permut_comp; [ now apply permut_inv_is_permut | easy ].
   }
+(*
   rewrite signature_comp;
     [ | easy | easy | easy | easy | easy | easy | easy | | easy ]. 2: {
     now apply permut_inv_is_permut.
   }
+*)
   rewrite rngl_mul_comm; [ | easy ].
   do 2 rewrite rngl_mul_assoc.
   rewrite rngl_mul_mul_swap; [ | easy ].
   rewrite rngl_mul_comm; [ | easy ].
-  do 2 rewrite <- rngl_mul_assoc.
+  rewrite <- rngl_mul_assoc.
   rewrite ε_square;
     [ | easy | easy | easy | easy | easy | easy | easy | easy ].
-  now rewrite rngl_mul_1_r.
+  rewrite rngl_mul_1_r.
+  erewrite rngl_product_eq_compat. 2: {
+    intros i Hi.
+    rewrite <- Hσν at 1.
+    easy.
+  }
+  easy.
 }
+(**)
+cbn - [ "°" ].
+unfold sym_gr.
+Check rngl_summation_change_var.
+...
+rewrite rngl_summation_list_change_var with (g0 := σ) (h := α). 2: {
+...
 cbn.
-(*
-rewrite <- rngl_mul_summation_list_distr_l; [ | now left ].
-*)
 rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
 unfold sym_gr.
