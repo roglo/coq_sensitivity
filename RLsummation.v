@@ -508,22 +508,6 @@ rewrite Hgh; [ easy | ].
 flia Hi.
 Qed.
 
-...
-
-Theorem rngl_summation_list_change_var : ∀ A (f : _ → A) g (h : _ → A) l,
-  (∀ i, i ∈ l → g (h i) = i)
-  → (Σ (i ∈ l), f i = Σ (i ∈ map h l), f (g i))%F.
-Proof.
-intros * Hgh.
-rewrite rngl_summation_map_seq.
-unfold iter_seq.
-apply rngl_summation_list_eq_compat.
-intros i Hi.
-apply in_seq in Hi.
-rewrite Hgh; [ easy | ].
-flia Hi.
-Qed.
-
 End a.
 
 Arguments rngl_mul_summation_list_distr_l {T ro rp} Hom A%type a
