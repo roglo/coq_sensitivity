@@ -2033,14 +2033,6 @@ enough (determinant M =
 ...
 unfold sym_gr.
 Check rngl_summation_change_var.
-  Σ (i ∈ sym_gr n),
-  let j := permut_inv σ ° i in
-  ε j * Π (i0 = 0, n - 1), mat_el M (vect_el σ i0) (vect_el (σ ° j) i0)
-
-i = σ ° j
-
-  Σ (σ ° j ∈ sym_gr n),
-
 ...
 rewrite rngl_summation_list_change_var with (g0 := σ) (h := α). 2: {
 ...
