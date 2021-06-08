@@ -2031,10 +2031,7 @@ rewrite rngl_summation_list_change_var with
   (f := λ i, permut_inv σ ° i)
   (g :=
      λ k,
-     (ε k * Π (j = 0, n - 1), mat_el M (vect_el σ j) (vect_el (σ ° k) j))%F).
-...
-unfold sym_gr.
-Check rngl_summation_change_var.
+     (ε k * Π (i = 0, n - 1), mat_el M (vect_el σ i) (vect_el (σ ° k) i))%F).
 ...
 rewrite rngl_summation_list_change_var with (g0 := σ) (h := α). 2: {
 ...
