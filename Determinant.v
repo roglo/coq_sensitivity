@@ -2027,9 +2027,11 @@ erewrite rngl_summation_list_eq_compat. 2: {
 }
 (**)
 cbn - [ "°" ].
-enough (determinant M =
-  Σ (ν ∈ map (λ k, permut_inv σ ° k) (sym_gr n)),
-  ε ν * Π (k = 0, n - 1), mat_el M (vect_el σ k) (vect_el σ (vect_el ν k))).
+rewrite rngl_summation_list_change_var with
+  (f := λ i, permut_inv σ ° i)
+  (g :=
+     λ k,
+     (ε k * Π (j = 0, n - 1), mat_el M (vect_el σ j) (vect_el (σ ° k) j))%F).
 ...
 unfold sym_gr.
 Check rngl_summation_change_var.

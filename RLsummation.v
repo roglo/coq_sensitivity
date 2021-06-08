@@ -494,6 +494,16 @@ f_equal.
 apply IHlen.
 Qed.
 
+Theorem rngl_summation_list_change_var :
+  ∀ A B (f : A → B) (g : B → _) l,
+  Σ (i ∈ l), g (f i) = Σ (j ∈ map f l), g j.
+Proof.
+intros.
+unfold iter_list.
+rewrite List_fold_left_map.
+now apply rngl_summation_list_eq_compat.
+Qed.
+
 Theorem rngl_summation_change_var : ∀ A b e f g (h : _ → A),
   (∀ i, b ≤ i ≤ e → g (h i) = i)
   → Σ (i = b, e), f i = Σ (i ∈ map h (seq b (S e - b))), f (g i).
