@@ -2032,6 +2032,14 @@ rewrite rngl_summation_list_change_var with
   (g :=
      λ k,
      (ε k * Π (i = 0, n - 1), mat_el M (vect_el σ i) (vect_el (σ ° k) i))%F).
+unfold sym_gr.
+rewrite map_map.
+rewrite det_is_det_by_canon_permut; try easy.
+unfold determinant'.
+rewrite rngl_summation_map_seq.
+rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
+rewrite Nat.add_0_l.
+Search determinant.
 ...
 rewrite rngl_summation_list_change_var with (g0 := σ) (h := α). 2: {
 ...
