@@ -2039,9 +2039,6 @@ unfold determinant'.
 rewrite rngl_summation_map_seq.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
-Search determinant.
-...
-rewrite rngl_summation_list_change_var with (g0 := σ) (h := α). 2: {
 ...
 cbn.
 rewrite det_is_det_by_canon_permut; try easy.
@@ -2059,6 +2056,15 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 symmetry.
+...
+  Hμ : μ = canon_permut n
+  ============================
+  Σ (k = 0, n! - 1), ε (μ k) * Π (i = 1, n), mat_el M (i - 1) (vect_el (μ k) (i - 1)) =
+  Σ (i = 0, n! - 1),
+  ε (permut_inv σ ° μ i) *
+  Π (i0 = 1, n),
+  mat_el M (vect_el σ (i0 - 1))
+    (comp (vect_el σ) (comp (permut_fun_inv (vect_el σ) n) (vect_el (μ i))) (i0 - 1)%nat)
 ...
 apply rngl_summation_eq_compat.
 intros i Hi.
