@@ -2027,6 +2027,21 @@ erewrite rngl_summation_list_eq_compat. 2: {
 }
 (**)
 cbn - [ "°" ].
+(*2*)
+unfold sym_gr.
+rewrite <- rngl_summation_list_change_var.
+rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
+rewrite Nat.add_0_l.
+(*3*)
+Check det_is_det_by_any_permut.
+...
+apply det_is_det_by_any_permut.
+...3
+rewrite det_is_det_by_canon_permut; try easy.
+unfold determinant'.
+Search determinant'.
+
+...2
 rewrite rngl_summation_list_change_var with
   (f := λ i, permut_inv σ ° i)
   (g :=
@@ -2036,6 +2051,9 @@ unfold sym_gr.
 rewrite map_map.
 rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
+(*1*)
+Search (Σ (_ ∈ map _ _), _).
+...1
 rewrite rngl_summation_map_seq.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
