@@ -2033,7 +2033,39 @@ rewrite <- rngl_summation_list_change_var.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
 (*3*)
+remember (map (λ i, (ε (permut_inv σ ° canon_permut n i) *
+  Π (i0 = 0, n - 1), mat_el M (vect_el σ i0) (vect_el (σ ° (permut_inv σ ° canon_permut n i)) i0))%F) (seq 0 n!)) as d eqn:Hd.
 Check det_is_det_by_any_permut.
+enough (H : determinant M = Σ (i = 0, n! - 1), nth i d 0). {
+  rewrite Hd in H.
+  erewrite rngl_summation_eq_compat in H. 2: {
+    intros i Hi.
+    rewrite List_map_nth_in with (a := 0).
+    easy.
+    rewrite seq_length.
+    specialize (fact_neq_0 n) as H1.
+    flia Hi H1.
+  }
+  cbn in H.
+  rewrite H.
+  apply rngl_summation_eq_compat.
+  intros i Hi.
+  f_equal. {
+    f_equal; f_equal.
+    rewrite seq_nth; [ easy | ].
+    specialize (fact_neq_0 n) as H1.
+    flia Hi H1.
+  }
+  apply rngl_product_eq_compat.
+  intros j Hj.
+  f_equal.
+  cbn.
+  rewrite seq_nth; [ easy | ].
+  specialize (fact_neq_0 n) as H1.
+  flia Hi H1.
+}
+apply det_is_det_by_any_permut; try easy.
+unfold determinant'_list.
 ...
 apply det_is_det_by_any_permut.
 ...3
