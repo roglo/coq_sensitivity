@@ -2066,6 +2066,14 @@ enough (H : determinant M = Σ (i = 0, n! - 1), nth i d 0). {
 }
 apply det_is_det_by_any_permut; try easy.
 unfold determinant'_list.
+subst d.
+etransitivity. {
+Search (Permutation (map _ _)).
+  apply Permutation_map with (l' := map (vect_el (permut_inv σ)) (seq 0 n!)).
+  admit.
+}
+(* truc genre, quoi *)
+...
 Search (map _ _ = map _ _).
 ...
 map_map: ∀ (A B C : Type) (f : A → B) (g : B → C) (l : list A), map g (map f l) = map (λ x : A, g (f x)) l
