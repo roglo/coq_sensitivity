@@ -2072,9 +2072,9 @@ Search (Permutation (map _ _)).
 Print canon_permut_inv.
 Search canon_permut_inv.
 Check (map (canon_permut_inv n) (seq 0 n!)).
-...
-  apply Permutation_map with (l' := map (canon_permut_inv n) (seq 0 n!)).
+  apply Permutation_map with (l' := map (canon_permut_inv n ° permut_inv σ ° canon_permut n) (seq 0 n!)).
   apply Permutation_map with (l' := map (λ i, vect_el (permut_inv σ) i) (seq 0 n!)).
+f = canon_permut_inv n ° permut_inv σ ° canon_permut n
 ...
 }
 rewrite map_map.
@@ -2082,6 +2082,21 @@ rewrite map_map.
 Search (map _ _ = map _ _).
 ...
 map_map: ∀ (A B C : Type) (f : A → B) (g : B → C) (l : list A), map g (map f l) = map (λ x : A, g (f x)) l
+...
+permut_inv σ ° canon_permut n i = canon_permut n (f i)
+...
+f = canon_permut_inv n ° permut_inv σ ° canon_permut n
+
+...
+  ============================
+  Permutation
+    (map
+       (λ i : nat,
+          (ε (permut_inv σ ° canon_permut n i) *
+           Π (i0 = 0, n - 1), mat_el M (vect_el σ i0) (vect_el (σ ° (permut_inv σ ° canon_permut n i)) i0))%F)
+       (seq 0 n!))
+    (map (λ k : nat, (ε_canon_permut n k * Π (i = 1, n), mat_el M (i - 1) (vect_el (canon_permut n k) (i - 1)))%F)
+       (seq 0 n!))
 ...
 apply det_is_det_by_any_permut.
 ...3
