@@ -2066,7 +2066,7 @@ enough (H : determinant M = Σ (i = 0, n! - 1), nth i d 0). {
 }
 apply det_is_det_by_any_permut; try easy.
 unfold determinant'_list.
-subst d.
+Search (map _ _ = map _ _).
 ...
 apply det_is_det_by_any_permut.
 ...3
