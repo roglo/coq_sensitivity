@@ -2068,6 +2068,8 @@ apply det_is_det_by_any_permut; try easy.
 unfold determinant'_list.
 Search (map _ _ = map _ _).
 ...
+map_map: ∀ (A B C : Type) (f : A → B) (g : B → C) (l : list A), map g (map f l) = map (λ x : A, g (f x)) l
+...
 apply det_is_det_by_any_permut.
 ...3
 rewrite det_is_det_by_canon_permut; try easy.
