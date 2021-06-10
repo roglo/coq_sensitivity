@@ -2066,12 +2066,21 @@ enough (H : determinant M = Σ (i = 0, n! - 1), nth i d 0). {
 }
 apply det_is_det_by_any_permut; try easy.
 unfold determinant'_list.
+set (f := λ i, permut_inv σ ° canon_permut n i).
+erewrite map_ext_in in Hd. 2: {
+  intros i Hi.
+  replace (permut_inv σ ° canon_permut n i) with (f i) by easy.
+  easy.
+}
 subst d.
 etransitivity. {
+...
+  apply Permutation_map with (l' := map f (seq 0 n!)).
 Search (Permutation (map _ _)).
 Print canon_permut_inv.
 Search canon_permut_inv.
 Check (map (canon_permut_inv n) (seq 0 n!)).
+Check ε.
   apply Permutation_map with (l' := map (canon_permut_inv n ° permut_inv σ ° canon_permut n) (seq 0 n!)).
   apply Permutation_map with (l' := map (λ i, vect_el (permut_inv σ) i) (seq 0 n!)).
 f = canon_permut_inv n ° permut_inv σ ° canon_permut n
