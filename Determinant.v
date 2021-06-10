@@ -2069,10 +2069,15 @@ unfold determinant'_list.
 subst d.
 etransitivity. {
 Search (Permutation (map _ _)).
-  apply Permutation_map with (l' := map (vect_el (permut_inv σ)) (seq 0 n!)).
-  admit.
+Print canon_permut_inv.
+Search canon_permut_inv.
+Check (map (canon_permut_inv n) (seq 0 n!)).
+...
+  apply Permutation_map with (l' := map (canon_permut_inv n) (seq 0 n!)).
+  apply Permutation_map with (l' := map (λ i, vect_el (permut_inv σ) i) (seq 0 n!)).
+...
 }
-(* truc genre, quoi *)
+rewrite map_map.
 ...
 Search (map _ _ = map _ _).
 ...
