@@ -447,6 +447,15 @@ destruct H1 as [H1| H1]; rewrite H1. {
 }
 Qed.
 
+Theorem rngl_product_only_one : ∀ g n, (Π (i = n, n), g i = g n)%F.
+Proof.
+intros g n.
+unfold iter_seq.
+rewrite Nat.sub_succ_l; [ idtac | reflexivity ].
+rewrite Nat.sub_diag; simpl.
+apply rngl_mul_1_l.
+Qed.
+
 End a.
 
 Arguments rngl_product_div_distr {T}%type {ro rp} _ _ _ _ _ (b e)%nat
