@@ -2095,19 +2095,25 @@ erewrite map_ext_in. 2: {
 Theorem glop : ∀ n (σ : vector n nat) f g,
   n ≠ 0
   → is_permut σ
+  → (∀ i, i < n → g i < n)
   → Π (i = 0, n - 1), f (vect_el σ i) (vect_el σ (g i)) =
     Π (i = 0, n - 1), f i (g i).
 Proof.
-intros * Hnz Hσ.
+intros * Hnz Hσ Hg.
 destruct n; [ easy | clear Hnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
+unfold is_permut in Hσ.
+remember (vect_el σ) as s eqn:Hs; clear σ Hs.
+destruct Hσ as (H1, H2).
 induction n; cbn. {
-  destruct Hσ as (H1, H2).
   rewrite rngl_product_only_one; [ | easy ].
   rewrite rngl_product_only_one; [ | easy ].
   specialize (H1 0 Nat.lt_0_1) as H3.
+  specialize (Hg 0 Nat.lt_0_1) as H4.
   apply Nat.lt_1_r in H3.
-  rewrite H3.
+  apply Nat.lt_1_r in H4.
+  now rewrite H3, H4, H3.
+}
 ...
 Search (Π (_ = _, _), _ = Π (_ = _, _), _).
 ...
