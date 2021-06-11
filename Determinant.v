@@ -2115,6 +2115,21 @@ induction n; cbn. {
   now rewrite H3, H4, H3.
 }
 ...
+assert (H : ∀ i : nat, i < S n → s i < S n). {
+  intros i Hi.
+  specialize (H1 i) as H3.
+...
+destruct (Nat.eq_dec (s (S n)) (S n)) as [Hsn| Hsn]. 2: {
+    intros i Hi.
+    specialize (H1 i) as H3.
+...
+rewrite rngl_product_split_last; [ | flia ].
+rewrite rngl_product_succ_succ.
+symmetry.
+rewrite rngl_product_split_last; [ | flia ].
+rewrite rngl_product_succ_succ.
+symmetry.
+...
 Search (Π (_ = _, _), _ = Π (_ = _, _), _).
 ...
 erewrite map_ext_in. 2: {
