@@ -2072,7 +2072,20 @@ erewrite map_ext_in in Hd. 2: {
   replace (permut_inv σ ° canon_permut n i) with (f i) by easy.
   easy.
 }
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  replace n with (S (n - 1)) at 2 by flia Hnz.
+  rewrite rngl_product_succ_succ.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    now rewrite Nat.sub_succ, Nat.sub_0_r.
+  }
+  rewrite <- ε_of_canon_permut_ε; try easy.
+  apply in_seq in Hi; flia Hi.
+}
+remember (canon_permut n) as g eqn:Hg.
 subst d.
+...
 etransitivity. {
 ...
   apply Permutation_map with (l' := map f (seq 0 n!)).
