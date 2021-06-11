@@ -2085,6 +2085,23 @@ erewrite map_ext_in. 2: {
 }
 remember (canon_permut n) as g eqn:Hg.
 subst d.
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  unfold "°".
+  cbn - [ f ].
+  unfold comp.
+  easy.
+}
+Theorem glop : ∀ n (M : matrix n n T) (σ : vector n nat) μ,
+  Π (i = 0, n - 1), mat_el M (vect_el σ i) (vect_el σ (μ i)) =
+  Π (i = 0, n - 1), mat_el M i (μ i).
+Proof.
+...
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  rewrite glop.
+  easy.
+}
 ...
 etransitivity. {
 ...
