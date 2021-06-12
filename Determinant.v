@@ -2115,8 +2115,8 @@ induction n; cbn. {
   now rewrite H3, H4, H3.
 }
 destruct (Nat.eq_dec (s (S n)) (S n)) as [Hsn| Hsn]. {
-    assert (H : ∀ i : nat, i < S n → s i < S n). {
-      intros i Hi.
+  assert (H : ∀ i : nat, i < S n → s i < S n). {
+    intros i Hi.
 ...
       specialize (H1 i) as H3.
       assert (H : i < S (S n)) by flia Hi.
