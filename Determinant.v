@@ -2103,7 +2103,7 @@ intros * Hnz Hσ Hg.
 destruct n; [ easy | clear Hnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
 unfold is_permut in Hσ.
-remember (vect_el σ) as s eqn:Hs; clear σ Hs.
+remember (vect_el σ) as u eqn:Hu; clear σ Hu.
 destruct Hσ as (H1, H2).
 ...
 induction n; cbn. {
