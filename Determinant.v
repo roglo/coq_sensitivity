@@ -2138,6 +2138,8 @@ destruct (Nat.eq_dec (s (S n)) (S n)) as [Hsn| Hsn]. {
   assert (H : ∀ i : nat, i < S n → g i < S n). {
     intros i Hi.
 ...
+(*
+...
 rewrite rngl_product_split_last; [ | flia ].
 rewrite rngl_product_succ_succ.
 symmetry.
@@ -2147,6 +2149,7 @@ symmetry.
 ...
 Search (Π (_ = _, _), _ = Π (_ = _, _), _).
 ...
+*)
 erewrite map_ext_in. 2: {
   intros i Hi.
   rewrite glop.
