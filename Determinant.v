@@ -2126,6 +2126,16 @@ destruct (Nat.eq_dec (s (S n)) (S n)) as [Hsn| Hsn]. {
       specialize (H4 H' Hisn).
       subst i; flia Hi.
     }
+    flia Hsn H3 Hsin.
+  }
+  specialize (IHn H); clear H.
+  assert (H : ∀ i j : nat, i < S n → j < S n → s i = s j → i = j). {
+    intros i j Hi Hj Hij.
+    apply H2; [ flia Hi | flia Hj | easy ].
+  }
+  specialize (IHn H); clear H.
+  assert (H : ∀ i : nat, i < S n → g i < S n). {
+    intros i Hi.
 ...
 rewrite rngl_product_split_last; [ | flia ].
 rewrite rngl_product_succ_succ.
