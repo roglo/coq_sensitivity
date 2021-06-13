@@ -2117,16 +2117,15 @@ induction n; cbn. {
 destruct (Nat.eq_dec (s (S n)) (S n)) as [Hsn| Hsn]. {
   assert (H : ∀ i : nat, i < S n → s i < S n). {
     intros i Hi.
-...
-      specialize (H1 i) as H3.
-      assert (H : i < S (S n)) by flia Hi.
-      specialize (H3 H).
-      specialize (H2 _ (S n) H) as H4.
-      destruct (Nat.eq_dec (s i) (s (S n))) as [Hisn| Hsin]. {
-        assert (H' : S n < S (S n)) by flia.
-        specialize (H4 H' Hisn).
-        subst i; flia Hi.
-      }
+    specialize (H1 i) as H3.
+    assert (H : i < S (S n)) by flia Hi.
+    specialize (H3 H).
+    specialize (H2 _ (S n) H) as H4; clear H.
+    destruct (Nat.eq_dec (s i) (s (S n))) as [Hisn| Hsin]. {
+      assert (H' : S n < S (S n)) by flia.
+      specialize (H4 H' Hisn).
+      subst i; flia Hi.
+    }
 ...
 rewrite rngl_product_split_last; [ | flia ].
 rewrite rngl_product_succ_succ.
