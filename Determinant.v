@@ -2105,6 +2105,7 @@ rewrite Nat.sub_succ, Nat.sub_0_r.
 unfold is_permut in Hσ.
 remember (vect_el σ) as s eqn:Hs; clear σ Hs.
 destruct Hσ as (H1, H2).
+...
 induction n; cbn. {
   rewrite rngl_product_only_one; [ | easy ].
   rewrite rngl_product_only_one; [ | easy ].
