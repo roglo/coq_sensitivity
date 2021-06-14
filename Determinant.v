@@ -2045,6 +2045,7 @@ erewrite map_ext_in. 2: {
   unfold comp.
   easy.
 }
+...
 Theorem glop : ∀ n (σ : vector n nat) f g,
   n ≠ 0
   → is_permut σ
