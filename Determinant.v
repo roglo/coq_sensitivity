@@ -1989,7 +1989,6 @@ rewrite Nat.add_0_l.
 (*3*)
 remember (map (λ i, (ε (permut_inv σ ° canon_permut n i) *
   Π (i0 = 0, n - 1), mat_el M (vect_el σ i0) (vect_el (σ ° (permut_inv σ ° canon_permut n i)) i0))%F) (seq 0 n!)) as d eqn:Hd.
-Check det_is_det_by_any_permut.
 enough (H : determinant M = Σ (i = 0, n! - 1), nth i d 0). {
   rewrite Hd in H.
   erewrite rngl_summation_eq_compat in H. 2: {
@@ -2054,12 +2053,15 @@ Theorem glop : ∀ n (σ : vector n nat) f g,
     Π (i = 0, n - 1), f i (g i).
 Proof.
 intros * Hnz Hσ Hg.
+unfold iter_seq.
 Theorem glop : ∀ d len f g,
   Π (i = 0, len - 1), nth i (list_of_fun len f) d =
   Π (i = 0, len - 1), nth i (list_of_fun len g) d
   → Π (i = 0, len - 1), f i = Π (i = 0, len - 1), g i.
 Admitted.
 apply (glop 0%F).
+apply rngl_product_permut.
+...
 Search (Π (_ = _, _), _ = Π (_ = _, _), _)%F.
 ...
   Π (i = 0, n - 1),
