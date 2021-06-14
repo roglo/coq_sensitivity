@@ -1934,6 +1934,17 @@ assert (H : ∀ i : nat, i < S n → vect_el σ' i < S n). {
     specialize (H1 (S n) (Nat.lt_succ_diag_r (S n))).
     flia H1 Hσn.
   }
+  destruct (lt_dec i (permut_fun_inv (vect_el σ) n (S n))) as [H3| H3]. {
+Search permut_fun_inv.
+...
+    specialize (H1 i).
+    assert (H : i < S (S n)) by flia Hi.
+    specialize (H1 H); clear H.
+    flia H1
+...
+      rewrite <- Hσs in Hσ.
+      apply H2 in Hσ; [ flia Hin Hσ | flia Hi | flia ].
+
 ...
 
 Theorem permut_comp_assoc : ∀ n (f g h : vector n nat),
