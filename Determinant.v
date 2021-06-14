@@ -1929,20 +1929,14 @@ unfold is_permut in Hσ.
 destruct Hσ as (Hσ_lt, Hσ_inj).
 erewrite rngl_summation_list_eq_compat. 2: {
   intros μ Hμ.
-  remember (permut_inv σ ° μ) as ν eqn:Hν.
-  assert (Hσν : σ ° ν = μ). {
+  remember (μ ° permut_inv σ) as ν eqn:Hν.
+  assert (Hσν : ν ° σ = μ). {
     rewrite Hν.
-    rewrite permut_comp_assoc.
+    rewrite <- permut_comp_assoc.
     apply vector_eq.
     intros i Hi; cbn.
     unfold comp.
-    rewrite fun_permut_fun_inv; [ easy | easy | ].
-    unfold sym_gr in Hμ.
-    apply in_map_iff in Hμ.
-    destruct Hμ as (j & Hj & Hjs).
-    rewrite <- Hj.
-    apply vect_el_canon_permut_ub; [ | easy ].
-    now apply in_seq in Hjs.
+    now rewrite permut_fun_inv_fun.
   }
   subst ν.
   rewrite <- Hσν at 1.
@@ -1955,18 +1949,9 @@ erewrite rngl_summation_list_eq_compat. 2: {
     now apply canon_permut_is_permut.
   }
   rewrite signature_comp;
-    [ | easy | easy | easy | easy | easy | easy | easy | easy | ]. 2: {
-    apply is_permut_comp; [ now apply permut_inv_is_permut | easy ].
-  }
-(*
-  rewrite signature_comp;
     [ | easy | easy | easy | easy | easy | easy | easy | | easy ]. 2: {
-    now apply permut_inv_is_permut.
+    apply is_permut_comp; [ easy | now apply permut_inv_is_permut ].
   }
-*)
-  rewrite rngl_mul_comm; [ | easy ].
-  do 2 rewrite rngl_mul_assoc.
-  rewrite rngl_mul_mul_swap; [ | easy ].
   rewrite rngl_mul_comm; [ | easy ].
   rewrite <- rngl_mul_assoc.
   rewrite ε_square;
@@ -1987,6 +1972,7 @@ rewrite <- rngl_summation_list_change_var.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
 (*3*)
+...
 remember (map (λ i, (ε (permut_inv σ ° canon_permut n i) *
   Π (i0 = 0, n - 1), mat_el M (vect_el σ i0) (vect_el (σ ° (permut_inv σ ° canon_permut n i)) i0))%F) (seq 0 n!)) as d eqn:Hd.
 enough (H : determinant M = Σ (i = 0, n! - 1), nth i d 0). {

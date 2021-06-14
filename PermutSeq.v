@@ -554,6 +554,17 @@ intros j k Hj Hk Hjk.
 apply Hp2; [ flia Hj | flia Hk | easy ].
 Qed.
 
+Theorem permut_fun_inv_fun : ∀ f n,
+  is_permut_fun f n
+  → ∀ i, i < n
+  → permut_fun_inv f n (f i) = i.
+Proof.
+intros * (Hp1, Hp2) * Hin.
+apply fun_find_prop; [ | easy ].
+intros j k Hj Hk Hjk.
+now apply Hp2.
+Qed.
+
 Definition permut_fun_inv' f n i :=
   let '(x, x') :=
     pigeonhole_fun (S n) (λ j, if Nat.eq_dec j n then i else f j)
