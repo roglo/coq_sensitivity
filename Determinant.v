@@ -2033,16 +2033,15 @@ erewrite map_ext_in. 2: {
   unfold comp.
   easy.
 }
-Theorem glop : ∀ n (σ : vector n nat) (f : nat → nat → T) g,
+Theorem glop : ∀ n (σ : vector n nat) (f : nat → T),
   n ≠ 0
   → is_permut σ
-  → Π (i = 0, n - 1), f (vect_el σ i) (g (vect_el σ i)) =
-    Π (i = 0, n - 1), f i (g i).
+  → Π (i = 0, n - 1), f (vect_el σ i) = Π (i = 0, n - 1), f i.
 Proof.
 ...
 erewrite map_ext_in. 2: {
   intros i Hi.
-  now rewrite glop.
+  now rewrite glop with (f := λ j, mat_el M j (vect_el (f i) j)).
 }
 ...
 (*
