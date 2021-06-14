@@ -370,52 +370,6 @@ f_equal.
 now apply ε_of_canon_permut_ε.
 Qed.
 
-Theorem rngl_summation_permut : ∀ n l1 l2,
-  Permutation l1 l2
-  → length l1 = n
-  → length l2 = n
-  → Σ (i = 0, n - 1), nth i l1 0 = Σ (i = 0, n - 1), nth i l2 0.
-Proof.
-intros * Hl H1 H2.
-destruct n. {
-  apply length_zero_iff_nil in H1.
-  apply length_zero_iff_nil in H2.
-  now subst l1 l2.
-}
-rewrite Nat.sub_succ, Nat.sub_0_r.
-revert n H1 H2.
-induction Hl; intros; [ easy | | | ]. {
-  cbn in H1, H2.
-  apply Nat.succ_inj in H1.
-  apply Nat.succ_inj in H2.
-  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
-  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
-  destruct n; [ easy | ].
-  do 2 rewrite rngl_summation_succ_succ.
-  now rewrite IHHl.
-} {
-  destruct n; [ easy | ].
-  cbn in H1, H2.
-  do 2 apply Nat.succ_inj in H1.
-  do 2 apply Nat.succ_inj in H2.
-  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
-  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
-  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
-  rewrite rngl_summation_split_first; [ symmetry | easy | flia ].
-  do 2 rewrite rngl_add_assoc.
-  do 2 rewrite rngl_summation_succ_succ.
-  f_equal; [ apply rngl_add_comm | ].
-  apply rngl_summation_eq_compat.
-  intros i Hi; cbn.
-  destruct i; [ flia Hi | easy ].
-} {
-  specialize (Permutation_length Hl2) as H3.
-  rewrite H2 in H3.
-  rewrite IHHl1; [ | easy | easy ].
-  now rewrite IHHl2.
-}
-Qed.
-
 Theorem det_is_det_by_any_permut :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -2100,11 +2054,26 @@ Theorem glop : ∀ n (σ : vector n nat) f g,
     Π (i = 0, n - 1), f i (g i).
 Proof.
 intros * Hnz Hσ Hg.
+Theorem glop : ∀ d len f g,
+  Π (i = 0, len - 1), nth i (list_of_fun len f) d =
+  Π (i = 0, len - 1), nth i (list_of_fun len g) d
+  → Π (i = 0, len - 1), f i = Π (i = 0, len - 1), g i.
+Admitted.
+apply (glop 0%F).
+Search (Π (_ = _, _), _ = Π (_ = _, _), _)%F.
+...
+  Π (i = 0, n - 1),
+  nth i (list_of_fun n (λ i0 : nat, f (vect_el σ i0) (vect_el σ (g i0)))) 0 =
+  Π (i = 0, n - 1), nth i (list_of_fun n (λ i0 : nat, f i0 (g i0))) 0
+...
+intros * Hnz Hσ Hg.
 destruct n; [ easy | clear Hnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
 unfold is_permut in Hσ.
 remember (vect_el σ) as u eqn:Hu; clear σ Hu.
 destruct Hσ as (H1, H2).
+Search ((nat → _) → list _).
+About list_of_fun.
 ...
 induction n; cbn. {
   rewrite rngl_product_only_one; [ | easy ].

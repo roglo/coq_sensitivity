@@ -518,6 +518,52 @@ rewrite Hgh; [ easy | ].
 flia Hi.
 Qed.
 
+Theorem rngl_summation_permut : ∀ n l1 l2,
+  Permutation l1 l2
+  → length l1 = n
+  → length l2 = n
+  → Σ (i = 0, n - 1), nth i l1 0 = Σ (i = 0, n - 1), nth i l2 0.
+Proof.
+intros * Hl H1 H2.
+destruct n. {
+  apply length_zero_iff_nil in H1.
+  apply length_zero_iff_nil in H2.
+  now subst l1 l2.
+}
+rewrite Nat.sub_succ, Nat.sub_0_r.
+revert n H1 H2.
+induction Hl; intros; [ easy | | | ]. {
+  cbn in H1, H2.
+  apply Nat.succ_inj in H1.
+  apply Nat.succ_inj in H2.
+  rewrite rngl_summation_split_first; [ symmetry | flia ].
+  rewrite rngl_summation_split_first; [ symmetry | flia ].
+  destruct n; [ easy | ].
+  do 2 rewrite rngl_summation_succ_succ.
+  now rewrite IHHl.
+} {
+  destruct n; [ easy | ].
+  cbn in H1, H2.
+  do 2 apply Nat.succ_inj in H1.
+  do 2 apply Nat.succ_inj in H2.
+  rewrite rngl_summation_split_first; [ symmetry | flia ].
+  rewrite rngl_summation_split_first; [ symmetry | flia ].
+  rewrite rngl_summation_split_first; [ symmetry | flia ].
+  rewrite rngl_summation_split_first; [ symmetry | flia ].
+  do 2 rewrite rngl_add_assoc.
+  do 2 rewrite rngl_summation_succ_succ.
+  f_equal; [ apply rngl_add_comm | ].
+  apply rngl_summation_eq_compat.
+  intros i Hi; cbn.
+  destruct i; [ flia Hi | easy ].
+} {
+  specialize (Permutation_length Hl2) as H3.
+  rewrite H2 in H3.
+  rewrite IHHl1; [ | easy | easy ].
+  now rewrite IHHl2.
+}
+Qed.
+
 End a.
 
 Arguments rngl_mul_summation_list_distr_l {T ro rp} Hom A%type a
@@ -530,3 +576,4 @@ Arguments rngl_summation_change_var {T ro rp} A%type (b e)%nat
   (f g h)%function.
 Arguments rngl_summation_map_seq {T ro rp} A%type (start len)%nat
   (f g)%function.
+Arguments rngl_summation_permut {T}%type {ro rp} n%nat (l1 l2)%list.
