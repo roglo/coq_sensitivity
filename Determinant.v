@@ -1964,17 +1964,18 @@ erewrite rngl_summation_list_eq_compat. 2: {
   }
   easy.
 }
-(**)
 cbn - [ "°" ].
-(*2*)
 unfold sym_gr.
 rewrite <- rngl_summation_list_change_var.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
-(*3*)
-...
-remember (map (λ i, (ε (permut_inv σ ° canon_permut n i) *
-  Π (i0 = 0, n - 1), mat_el M (vect_el σ i0) (vect_el (σ ° (permut_inv σ ° canon_permut n i)) i0))%F) (seq 0 n!)) as d eqn:Hd.
+remember
+  (map
+     (λ i, ε (canon_permut n i ° permut_inv σ) *
+      Π (i0 = 0, n - 1),
+      mat_el M (vect_el σ i0)
+       (vect_el ((canon_permut n i ° permut_inv σ) ° σ) i0))%F
+  (seq 0 n!)) as d eqn:Hd.
 enough (H : determinant M = Σ (i = 0, n! - 1), nth i d 0). {
   rewrite Hd in H.
   erewrite rngl_summation_eq_compat in H. 2: {
@@ -1989,7 +1990,8 @@ enough (H : determinant M = Σ (i = 0, n! - 1), nth i d 0). {
   rewrite H.
   apply rngl_summation_eq_compat.
   intros i Hi.
-  f_equal. {
+  rewrite rngl_mul_comm; [ | easy ].
+  f_equal. 2: {
     f_equal; f_equal.
     rewrite seq_nth; [ easy | ].
     specialize (fact_neq_0 n) as H1.
@@ -2005,10 +2007,10 @@ enough (H : determinant M = Σ (i = 0, n! - 1), nth i d 0). {
 }
 apply det_is_det_by_any_permut; try easy.
 unfold determinant'_list.
-set (f := λ i, permut_inv σ ° canon_permut n i).
+set (f := λ i, canon_permut n i ° permut_inv σ).
 erewrite map_ext_in in Hd. 2: {
   intros i Hi.
-  replace (permut_inv σ ° canon_permut n i) with (f i) by easy.
+  replace (canon_permut n i ° permut_inv σ) with (f i) by easy.
   easy.
 }
 erewrite map_ext_in. 2: {
@@ -2031,14 +2033,18 @@ erewrite map_ext_in. 2: {
   unfold comp.
   easy.
 }
-...
-Theorem glop : ∀ n (σ : vector n nat) f g,
+Theorem glop : ∀ n (σ : vector n nat) (f : nat → nat → T) g,
   n ≠ 0
   → is_permut σ
-  → (∀ i, i < n → g i < n)
-  → Π (i = 0, n - 1), f (vect_el σ i) (vect_el σ (g i)) =
+  → Π (i = 0, n - 1), f (vect_el σ i) (g (vect_el σ i)) =
     Π (i = 0, n - 1), f i (g i).
 Proof.
+...
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  now rewrite glop.
+}
+...
 (*
 intros * Hnz Hσ Hg.
 unfold iter_seq.
