@@ -1888,6 +1888,54 @@ f_equal.
 apply determinant_alternating; try easy; [ flia Hiz | flia ].
 Qed.
 
+Theorem rngl_product_fun_permut : ∀ n (σ : vector n nat) (f : nat → T),
+  n ≠ 0
+  → is_permut σ
+  → Π (i = 0, n - 1), f (vect_el σ i) = Π (i = 0, n - 1), f i.
+Proof.
+intros * Hnz Hσ.
+destruct n; [ easy | clear Hnz ].
+rewrite Nat.sub_succ, Nat.sub_0_r.
+destruct Hσ as (H1, H2).
+induction n; cbn. {
+  rewrite rngl_product_only_one; [ | easy ].
+  rewrite rngl_product_only_one; [ | easy ].
+  specialize (H1 0 Nat.lt_0_1) as H3.
+  apply Nat.lt_1_r in H3.
+  now rewrite H3.
+}
+set (g := λ i, if lt_dec i (vect_el (permut_inv σ) (S n)) then i else i + 1).
+set (σ' := mk_vect (S n) (λ i, vect_el σ (g i))).
+specialize (IHn σ').
+assert (H : ∀ i : nat, i < S n → vect_el σ' i < S n). {
+  intros i Hi.
+  unfold σ'; cbn.
+  unfold g; cbn.
+  destruct (Nat.eq_dec (vect_el σ (S n)) (S n)) as [Hσn| Hσn]. {
+    destruct (lt_dec i (S n)) as [H| H]; [ clear H | flia Hi H ].
+    specialize (H1 i).
+    assert (H : i < S (S n)) by flia Hi.
+    specialize (H1 H); clear H.
+    destruct (Nat.eq_dec (vect_el σ i) (S n)) as [Hσ| Hσ]; [ | flia H1 Hσ ].
+    rewrite <- Hσn in Hσ.
+    apply H2 in Hσ; [ flia Hi Hσ | flia Hi | flia ].
+  }
+  destruct (Nat.eq_dec (vect_el σ n) (S n)) as [Hσs| Hσs]. {
+    destruct (lt_dec i n) as [Hin| Hin]. {
+      specialize (H1 i).
+      assert (H : i < S (S n)) by flia Hi.
+      specialize (H1 H); clear H.
+      destruct (Nat.eq_dec (vect_el σ i) (S n)) as [Hσ| Hσ]; [ | flia H1 Hσ ].
+      rewrite <- Hσs in Hσ.
+      apply H2 in Hσ; [ flia Hin Hσ | flia Hi | flia ].
+    }
+    replace i with n by flia Hi Hin.
+    rewrite Nat.add_1_r.
+    specialize (H1 (S n) (Nat.lt_succ_diag_r (S n))).
+    flia H1 Hσn.
+  }
+...
+
 Theorem permut_comp_assoc : ∀ n (f g h : vector n nat),
   (f ° (g ° h) = (f ° g) ° h)%F.
 Proof. easy. Qed.
@@ -2033,26 +2081,11 @@ erewrite map_ext_in. 2: {
   unfold comp.
   easy.
 }
-Theorem glop : ∀ n (σ : vector n nat) (f : nat → T),
-  n ≠ 0
-  → is_permut σ
-  → Π (i = 0, n - 1), f (vect_el σ i) = Π (i = 0, n - 1), f i.
-Proof.
-intros * Hnz Hσ.
-destruct n; [ easy | clear Hnz ].
-rewrite Nat.sub_succ, Nat.sub_0_r.
-destruct Hσ as (H1, H2).
-induction n; cbn. {
-  rewrite rngl_product_only_one; [ | easy ].
-  rewrite rngl_product_only_one; [ | easy ].
-  specialize (H1 0 Nat.lt_0_1) as H3.
-  apply Nat.lt_1_r in H3.
-  now rewrite H3.
-}
 ...
 erewrite map_ext_in. 2: {
   intros i Hi.
-  now rewrite glop with (f := λ j, mat_el M j (vect_el (f i) j)).
+  now rewrite rngl_product_fun_permut with
+    (f := λ j, mat_el M j (vect_el (f i) j)).
 }
 ...
 (*
