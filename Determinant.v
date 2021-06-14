@@ -1935,15 +1935,22 @@ assert (H : ∀ i : nat, i < S n → vect_el σ' i < S n). {
     flia H1 Hσn.
   }
   destruct (lt_dec i (permut_fun_inv (vect_el σ) n (S n))) as [H3| H3]. {
-Search permut_fun_inv.
+    destruct (Nat.eq_dec (vect_el σ i) (S n)) as [H4| H4]. {
+      exfalso.
 ...
-    specialize (H1 i).
-    assert (H : i < S (S n)) by flia Hi.
-    specialize (H1 H); clear H.
-    flia H1
+      rewrite <- H4 in H3 at 2.
+Check permut_fun_inv_fun.
 ...
-      rewrite <- Hσs in Hσ.
-      apply H2 in Hσ; [ flia Hin Hσ | flia Hi | flia ].
+      rewrite permut_fun_inv_fun in H3; [ flia H3 | | ]. 2: {
+        destruct (Nat.eq_dec i n) as [H5| H5]; [ now subst i | ].
+        flia Hi H5.
+      }
+      split. {
+        intros j Hj.
+        specialize (H1 j).
+        assert (H : j < S (S n)) by flia Hj.
+        specialize (H1 H); clear H.
+        destruct (Nat.eq_dec (vect_el σ j) (S n)) as [H5| H5]. {
 
 ...
 
