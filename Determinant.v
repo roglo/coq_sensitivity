@@ -2038,6 +2038,17 @@ Theorem glop : ∀ n (σ : vector n nat) (f : nat → T),
   → is_permut σ
   → Π (i = 0, n - 1), f (vect_el σ i) = Π (i = 0, n - 1), f i.
 Proof.
+intros * Hnz Hσ.
+destruct n; [ easy | clear Hnz ].
+rewrite Nat.sub_succ, Nat.sub_0_r.
+destruct Hσ as (H1, H2).
+induction n; cbn. {
+  rewrite rngl_product_only_one; [ | easy ].
+  rewrite rngl_product_only_one; [ | easy ].
+  specialize (H1 0 Nat.lt_0_1) as H3.
+  apply Nat.lt_1_r in H3.
+  now rewrite H3.
+}
 ...
 erewrite map_ext_in. 2: {
   intros i Hi.
