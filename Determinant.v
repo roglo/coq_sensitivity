@@ -2034,12 +2034,12 @@ destruct (Nat.eq_dec k (S n)) as [Hksn| Hksn]. {
   cbn - [ permut_fun_inv ].
   rewrite fun_permut_fun_inv; [ easy | easy | flia ].
 }
+specialize permut_inv_is_permut as H3.
+specialize (H3 _ σ).
+assert (H : is_permut σ) by easy.
+specialize (H3 H); clear H.
 rewrite rngl_product_split with (j := k) in IHn. 2: {
   split; [ flia | ].
-  specialize permut_inv_is_permut as H3.
-  specialize (H3 _ σ).
-  assert (H : is_permut σ) by easy.
-  specialize (H3 H); clear H.
   destruct H3 as (H3, H4).
   apply -> Nat.succ_le_mono.
   specialize (H3 (S n)) as H5.
@@ -2081,9 +2081,59 @@ erewrite rngl_product_eq_compat in IHn. 2: {
   easy.
 }
 cbn in IHn.
-destruct k; [ easy | destruct Hkz ].
-exfalso.
+destruct k; [ easy | clear Hkz ].
 rewrite rngl_product_succ_succ' with (g0 := λ i, f (vect_el σ i)) in IHn.
+unfold g in IHn.
+destruct (lt_dec (S k) (S k)) as [H| H]; [ flia H | clear H ].
+erewrite rngl_product_eq_compat with (b := S k + 1) in IHn. 2: {
+  intros i Hi.
+  destruct (lt_dec i (S k)) as [H| H]; [ flia Hi H | easy ].
+}
+cbn in IHn.
+rewrite rngl_mul_mul_swap in IHn; [ | easy ].
+symmetry.
+rewrite rngl_product_split_last; [ | flia ].
+rewrite rngl_product_succ_succ'.
+rewrite <- IHn.
+symmetry.
+rewrite rngl_product_split with (j := k). 2: {
+  split; [ flia | ].
+  destruct H3 as (H3, H4).
+  rewrite Hk.
+  apply Nat.lt_le_incl.
+  apply H3; flia.
+}
+do 2 rewrite <- rngl_mul_assoc.
+f_equal.
+rewrite rngl_product_split_last. 2: {
+  rewrite Nat.add_1_r.
+  rewrite Hk.
+  destruct H3 as (H3, H4).
+  apply Nat.lt_succ_r.
+  apply H3; flia.
+}
+rewrite rngl_product_succ_succ' with (g0 := λ i, f (vect_el σ i)).
+rewrite rngl_product_split_first. 2: {
+  rewrite Nat.add_1_r.
+  rewrite Hk.
+  destruct H3 as (H3, H4).
+  specialize (H3 (S n) (Nat.lt_succ_diag_r _)).
+  destruct (Nat.eq_dec (vect_el (permut_inv σ) (S n)) (S n)) as [H5| H5]. {
+    flia Hk Hksn H5.
+  }
+  flia H3 H5.
+}
+replace (vect_el σ (k + 1)) with (S n). 2: {
+  rewrite Nat.add_1_r.
+  rewrite Hk.
+  unfold permut_inv.
+  cbn - [ permut_fun_inv ].
+  rewrite fun_permut_fun_inv; [ easy | easy | flia ].
+}
+rewrite <- rngl_mul_assoc.
+rewrite rngl_mul_comm; [ | easy ].
+rewrite rngl_mul_assoc.
+f_equal.
 ...
 rewrite rngl_product_split_last in IHn; [ | flia Hkz ].
 rewrite rngl_product_split with (b := 1) (j := k) in IHn; [ | flia Hkz ].
