@@ -2258,6 +2258,12 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ ν ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  now rewrite rngl_product_fun_permut with
+    (f := λ j, mat_el M j (vect_el (ν i) j)).
+}
+cbn - [ ν ].
 ...1
 remember
   (map
