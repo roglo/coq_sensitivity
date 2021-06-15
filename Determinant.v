@@ -1888,12 +1888,14 @@ f_equal.
 apply determinant_alternating; try easy; [ flia Hiz | flia ].
 Qed.
 
-Theorem rngl_product_fun_permut : ∀ n (σ : vector n nat) (f : nat → T),
+Theorem rngl_product_fun_permut :
+  rngl_is_comm = true →
+  ∀ n (σ : vector n nat) (f : nat → T),
   n ≠ 0
   → is_permut σ
   → Π (i = 0, n - 1), f (vect_el σ i) = Π (i = 0, n - 1), f i.
 Proof.
-intros * Hnz Hσ.
+intros Hic * Hnz Hσ.
 destruct n; [ easy | clear Hnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
 destruct Hσ as (H1, H2).
@@ -2025,16 +2027,55 @@ destruct (Nat.eq_dec k (S n)) as [Hksn| Hksn]. {
   rewrite rngl_product_split_last; [ | flia ].
   rewrite rngl_product_succ_succ'.
   symmetry.
-  rewrite IHn; f_equal.
-...
+  rewrite IHn; f_equal; f_equal.
+  rewrite <- Hksn at 2.
+  rewrite Hk.
+  unfold permut_inv.
+  cbn - [ permut_fun_inv ].
+  rewrite fun_permut_fun_inv; [ easy | easy | flia ].
+}
 rewrite rngl_product_split with (j := k) in IHn. 2: {
   split; [ flia | ].
+  specialize permut_inv_is_permut as H3.
+  specialize (H3 _ σ).
+  assert (H : is_permut σ) by easy.
+  specialize (H3 H); clear H.
+  destruct H3 as (H3, H4).
   apply -> Nat.succ_le_mono.
+  specialize (H3 (S n)) as H5.
+  assert (H : S n < S (S n)) by flia.
+  specialize (H5 H); clear H.
+  rewrite <- Hk in H5.
+  flia Hksn H5.
+}
+rewrite rngl_product_split_last in IHn; [ | flia ].
+destruct (Nat.eq_dec k 0) as [Hkz| Hkz]. {
+  move Hkz at top; subst k.
+  rewrite rngl_product_empty in IHn; [ | flia ].
+  rewrite rngl_mul_1_l, Nat.add_0_l in IHn.
+  unfold σ' in IHn at 1.
+  cbn in IHn.
+  symmetry.
+  rewrite rngl_product_split_last; [ | flia ].
+  rewrite rngl_product_succ_succ'.
+  rewrite <- IHn.
+  symmetry.
+  rewrite rngl_product_split_first; [ | flia ].
+  rewrite Hk at 1.
+  unfold permut_inv.
+  cbn - [ permut_fun_inv ].
+  rewrite fun_permut_fun_inv; [ | easy | flia ].
+  rewrite rngl_mul_comm; [ | easy ].
+  f_equal.
+  rewrite rngl_product_succ_succ.
+  rewrite rngl_product_split_first; [ | flia ].
+  f_equal.
+  apply rngl_product_eq_compat.
+  now intros; rewrite Nat.add_1_r.
+}
 ...
-symmetry.
-rewrite rngl_product_split_last; [ | flia ].
-rewrite rngl_product_succ_succ'.
-rewrite <- IHn.
+rewrite rngl_product_split_last in IHn; [ | flia Hkz ].
+rewrite rngl_product_split with (b := 1) (j := k) in IHn; [ | flia Hkz ].
 ...
 
 Theorem permut_comp_assoc : ∀ n (f g h : vector n nat),
