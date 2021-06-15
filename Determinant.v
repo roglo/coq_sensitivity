@@ -2166,6 +2166,20 @@ intros i Hi.
 rewrite Nat.sub_add; [ easy | flia Hi ].
 Qed.
 
+Check canon_permut.
+
+...
+
+Theorem det_by_any_permut : ∀ n (M : matrix n n T) (σ : nat → vector n nat),
+(* bijection between σ and canon_permut... *)
+  (∀ k, k < n! → is_permut (σ k))
+  → determinant M =
+    Σ (k = 0, n! - 1),
+    ε (σ k) * Π (i = 0, n - 1), mat_el M i (vect_el (σ k) i).
+Proof.
+intros * Hσ.
+...
+
 Theorem permut_comp_assoc : ∀ n (f g h : vector n nat),
   (f ° (g ° h) = (f ° g) ° h)%F.
 Proof. easy. Qed.
@@ -2264,6 +2278,8 @@ erewrite rngl_summation_eq_compat. 2: {
     (f := λ j, mat_el M j (vect_el (ν i) j)).
 }
 cbn - [ ν ].
+...
+apply det_by_any_permut.
 ...1
 remember
   (map
