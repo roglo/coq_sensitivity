@@ -2073,6 +2073,17 @@ destruct (Nat.eq_dec k 0) as [Hkz| Hkz]. {
   apply rngl_product_eq_compat.
   now intros; rewrite Nat.add_1_r.
 }
+erewrite rngl_product_eq_compat in IHn. 2: {
+  intros i Hi.
+  unfold σ'; cbn.
+  unfold g.
+  destruct (lt_dec (i - 1) k) as [H| H]; [ | flia Hi H ].
+  easy.
+}
+cbn in IHn.
+destruct k; [ easy | destruct Hkz ].
+exfalso.
+rewrite rngl_product_succ_succ' with (g0 := λ i, f (vect_el σ i)) in IHn.
 ...
 rewrite rngl_product_split_last in IHn; [ | flia Hkz ].
 rewrite rngl_product_split with (b := 1) (j := k) in IHn; [ | flia Hkz ].
