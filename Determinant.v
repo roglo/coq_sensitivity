@@ -2012,6 +2012,20 @@ assert (H : ∀ i j, i < S n → j < S n → vect_el σ' i = vect_el σ' j → i
 }
 specialize (IHn H); clear H.
 remember (vect_el (permut_inv σ) (S n)) as k eqn:Hk.
+destruct (Nat.eq_dec k (S n)) as [Hksn| Hksn]. {
+  erewrite rngl_product_eq_compat in IHn. 2: {
+    intros i Hi.
+    unfold σ', g; cbn.
+    destruct (lt_dec i k) as [H| H]; [ easy | flia Hksn Hi H ].
+  }
+  cbn in IHn.
+  rewrite rngl_product_split_last; [ | flia ].
+  rewrite rngl_product_succ_succ' with (g0 := λ i, f (vect_el σ i)).
+  symmetry.
+  rewrite rngl_product_split_last; [ | flia ].
+  rewrite rngl_product_succ_succ'.
+  symmetry.
+  rewrite IHn; f_equal.
 ...
 rewrite rngl_product_split with (j := k) in IHn. 2: {
   split; [ flia | ].
