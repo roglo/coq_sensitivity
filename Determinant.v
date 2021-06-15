@@ -1939,8 +1939,6 @@ assert (H : ∀ i : nat, i < S n → vect_el σ' i < S n). {
       exfalso.
 ...
       rewrite <- H4 in H3 at 2.
-Check permut_fun_inv_fun.
-...
       rewrite permut_fun_inv_fun in H3; [ flia H3 | | ]. 2: {
         destruct (Nat.eq_dec i n) as [H5| H5]; [ now subst i | ].
         flia Hi H5.
@@ -1951,7 +1949,6 @@ Check permut_fun_inv_fun.
         assert (H : j < S (S n)) by flia Hj.
         specialize (H1 H); clear H.
         destruct (Nat.eq_dec (vect_el σ j) (S n)) as [H5| H5]. {
-
 ...
 
 Theorem permut_comp_assoc : ∀ n (f g h : vector n nat),
