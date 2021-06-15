@@ -2248,17 +2248,16 @@ rewrite <- rngl_summation_list_change_var.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
 (*1*)
-set (f := λ i, canon_permut n i ° permut_inv σ).
+set (ν := λ i, canon_permut n i ° permut_inv σ).
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_mul_comm; [ | easy ].
-  replace (canon_permut n i ° permut_inv σ) with (f i) by easy.
+  replace (canon_permut n i ° permut_inv σ) with (ν i) by easy.
   unfold "°".
   unfold comp.
-  cbn - [ f ].
   easy.
 }
-cbn - [ f ].
+cbn - [ ν ].
 ...1
 remember
   (map
