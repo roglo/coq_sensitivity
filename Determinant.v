@@ -2166,18 +2166,20 @@ intros i Hi.
 rewrite Nat.sub_add; [ easy | flia Hi ].
 Qed.
 
-Check canon_permut.
-
-...
-
 Theorem det_by_any_permut : ∀ n (M : matrix n n T) (σ : nat → vector n nat),
-(* bijection between σ and canon_permut... *)
-  (∀ k, k < n! → is_permut (σ k))
+  (∀ i, i < n! → ∃ j, j < n! ∧ σ i = canon_permut n j)
+  → (∀ i, i < n! → ∃ j, j < n! ∧ σ j = canon_permut n i)
   → determinant M =
     Σ (k = 0, n! - 1),
     ε (σ k) * Π (i = 0, n - 1), mat_el M i (vect_el (σ k) i).
 Proof.
-intros * Hσ.
+intros * Hcσ Hσc.
+assert (σ_is_permut : ∀ k : nat, k < n! → is_permut (σ k)). {
+  intros * Hk.
+  specialize (Hcσ k Hk) as (a & Han & Ha).
+  rewrite Ha.
+  now apply canon_permut_is_permut.
+}
 ...
 
 Theorem permut_comp_assoc : ∀ n (f g h : vector n nat),
