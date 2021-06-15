@@ -2134,9 +2134,40 @@ rewrite <- rngl_mul_assoc.
 rewrite rngl_mul_comm; [ | easy ].
 rewrite rngl_mul_assoc.
 f_equal.
-...
-rewrite rngl_product_split_last in IHn; [ | flia Hkz ].
-rewrite rngl_product_split with (b := 1) (j := k) in IHn; [ | flia Hkz ].
+destruct (Nat.eq_dec (vect_el (permut_inv σ) (S n)) n) as [H7| H7]. {
+  rewrite H7 in Hk.
+  rewrite Nat.add_1_r.
+  rewrite Hk.
+  rewrite rngl_product_empty; [ | flia ].
+  rewrite rngl_product_empty; [ | flia ].
+  easy.
+}
+assert (Hkn : S (k + 1) ≤ n). {
+  rewrite Nat.add_1_r.
+  rewrite Hk.
+  destruct H3 as (H3, H4).
+  apply Nat.le_succ_l.
+  specialize (H3 (S n) (Nat.lt_succ_diag_r _)) as H5.
+  destruct (Nat.eq_dec (vect_el (permut_inv σ) (S n)) (S n)) as [H6| H6]. {
+    flia Hk Hksn H6.
+  }
+  flia H5 H6 H7.
+}
+rewrite rngl_product_split_first; [ | easy ].
+rewrite <- rngl_mul_assoc.
+rewrite rngl_mul_comm; [ | easy ].
+f_equal.
+symmetry.
+rewrite rngl_product_split_last; [ | easy ].
+do 2 rewrite Nat.add_1_r.
+f_equal.
+apply rngl_product_eq_compat.
+intros i Hi.
+rewrite Nat.sub_add; [ easy | flia Hi ].
+Qed.
+
+Inspect 1.
+
 ...
 
 Theorem permut_comp_assoc : ∀ n (f g h : vector n nat),
