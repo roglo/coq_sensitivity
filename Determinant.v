@@ -1950,6 +1950,29 @@ assert (H : ∀ i : nat, i < S n → vect_el σ' i < S n). {
     specialize (H1 H); clear H.
     flia H1 H4.
   }
+  rewrite Nat.add_1_r.
+  specialize (H1 (S i)).
+  assert (H : S i < S (S n)) by flia Hi.
+  specialize (H1 H); clear H.
+  destruct (Nat.eq_dec (vect_el σ (S i)) (S n)) as [H4| H4]. {
+    exfalso.
+    rewrite <- H4 in H3 at 2.
+    rewrite permut_fun_inv_fun' in H3; [ flia H3 | | ]. 2: {
+      destruct (Nat.eq_dec i n) as [H5| H5]; [ now subst i | ].
+      destruct (Nat.eq_dec (S i) n) as [H6| H6]. {
+        now rewrite H6 in H4.
+      }
+      flia Hi H5 H6.
+    }
+    intros j k Hj Hk Hjk.
+    apply H2; [ flia Hj | flia Hk | easy ].
+  }
+  flia H1 H4.
+}
+specialize (IHn H); clear H.
+assert (H : ∀ i j, i < S n → j < S n → vect_el σ' i = vect_el σ' j → i = j). {
+  intros i j Hi Hj Hij; cbn in Hij.
+  unfold g in Hij; cbn in Hij.
 ...
 
 Theorem permut_comp_assoc : ∀ n (f g h : vector n nat),
