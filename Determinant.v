@@ -2166,10 +2166,6 @@ intros i Hi.
 rewrite Nat.sub_add; [ easy | flia Hi ].
 Qed.
 
-Inspect 1.
-
-...
-
 Theorem permut_comp_assoc : ∀ n (f g h : vector n nat),
   (f ° (g ° h) = (f ° g) ° h)%F.
 Proof. easy. Qed.
@@ -2315,12 +2311,12 @@ erewrite map_ext_in. 2: {
   unfold comp.
   easy.
 }
-...
 erewrite map_ext_in. 2: {
   intros i Hi.
   now rewrite rngl_product_fun_permut with
     (f := λ j, mat_el M j (vect_el (f i) j)).
 }
+Search (Permutation (map _ _)).
 ...
 (*
 intros * Hnz Hσ Hg.
