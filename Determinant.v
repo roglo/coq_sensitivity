@@ -2011,6 +2011,16 @@ assert (H : ∀ i j, i < S n → j < S n → vect_el σ' i = vect_el σ' j → i
   flia Hij.
 }
 specialize (IHn H); clear H.
+remember (vect_el (permut_inv σ) (S n)) as k eqn:Hk.
+...
+rewrite rngl_product_split with (j := k) in IHn. 2: {
+  split; [ flia | ].
+  apply -> Nat.succ_le_mono.
+...
+symmetry.
+rewrite rngl_product_split_last; [ | flia ].
+rewrite rngl_product_succ_succ'.
+rewrite <- IHn.
 ...
 
 Theorem permut_comp_assoc : ∀ n (f g h : vector n nat),
