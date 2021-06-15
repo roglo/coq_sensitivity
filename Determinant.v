@@ -2316,6 +2316,7 @@ erewrite map_ext_in. 2: {
   now rewrite rngl_product_fun_permut with
     (f := λ j, mat_el M j (vect_el (f i) j)).
 }
+...
 Search (Permutation (map _ _)).
 Print determinant'.
 Search determinant.
