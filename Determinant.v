@@ -1973,6 +1973,44 @@ specialize (IHn H); clear H.
 assert (H : ∀ i j, i < S n → j < S n → vect_el σ' i = vect_el σ' j → i = j). {
   intros i j Hi Hj Hij; cbn in Hij.
   unfold g in Hij; cbn in Hij.
+  destruct (Nat.eq_dec (vect_el σ (S n)) (S n)) as [H3| H3]. {
+    destruct (lt_dec i (S n)) as [H| H]; [ clear H | flia Hi H ].
+    destruct (lt_dec j (S n)) as [H| H]; [ clear H | flia Hj H ].
+    apply H2; [ flia Hi | flia Hj | easy ].
+  }
+  destruct (Nat.eq_dec (vect_el σ n) (S n)) as [H4| H4]. {
+    destruct (lt_dec i n) as [Hin| Hin]. {
+      destruct (lt_dec j n) as [Hjn| Hjn]. {
+        apply H2; [ flia Hi | flia Hj | easy ].
+      }
+      replace j with n in Hij by flia Hj Hjn.
+      rewrite Nat.add_1_r in Hij.
+      rewrite <- Hij in H3.
+      apply H2 in Hij; [ flia Hin Hij | flia Hi | flia ].
+    }
+    replace i with n in Hij |-* by flia Hi Hin.
+    rewrite Nat.add_1_r in Hij.
+    destruct (lt_dec j n) as [Hjn| Hjn]. {
+      apply H2 in Hij; [ flia Hjn Hij | flia | flia Hjn ].
+    }
+    now replace j with n by flia Hj Hjn.
+  }
+  remember (permut_fun_inv (vect_el σ) n (S n)) as k eqn:Hk.
+  destruct (lt_dec i k) as [H5| H5]. {
+    destruct (lt_dec j k) as [H6| H6]. {
+      apply H2; [ flia Hi | flia Hj | easy ].
+    }
+    apply H2 in Hij; [ | flia Hi | flia Hj ].
+    flia H5 H6 Hij.
+  }
+  destruct (lt_dec j k) as [H6| H6]. {
+    apply H2 in Hij; [ | flia Hi | flia Hj ].
+    flia H5 H6 Hij.
+  }
+  apply H2 in Hij; [ | flia Hi | flia Hj ].
+  flia Hij.
+}
+specialize (IHn H); clear H.
 ...
 
 Theorem permut_comp_assoc : ∀ n (f g h : vector n nat),
