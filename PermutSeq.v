@@ -158,7 +158,7 @@ Fixpoint canon_permut_inv n k (j : nat) :=
 
 (**)
 
-Definition canon_permut_fun' n (σ_n : vector n! (vector n nat)) k j :=
+Definition sym_gr_fun n (σ_n : vector n! (vector n nat)) k j :=
   match j with
   | 0 => k / n!
   | S j' =>
@@ -166,18 +166,17 @@ Definition canon_permut_fun' n (σ_n : vector n! (vector n nat)) k j :=
       Nat.b2n (k / n! <=? vect_el (vect_el σ_n (k mod n!)) j')
   end.
 
-Fixpoint canon_permut' n : vector n! (vector n nat) :=
+Fixpoint sym_gr n : vector n! (vector n nat) :=
   match n with
   | 0 => mk_vect 0! (λ _, mk_vect 0 (λ _, 0))
   | S n' =>
-      mk_vect (S n')!
-        (λ k, mk_vect (S n') (canon_permut_fun' (canon_permut' n') k))
+      mk_vect (S n')! (λ k, mk_vect (S n') (sym_gr_fun (sym_gr n') k))
   end.
 
-Compute map list_of_vect (list_of_vect (canon_permut' 4)).
+Compute map list_of_vect (list_of_vect (sym_gr 4)).
 
-Check canon_permut'.
-Check canon_permut_fun'.
+Check sym_gr.
+Check sym_gr_fun.
 
 ...
 
