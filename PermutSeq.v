@@ -150,20 +150,16 @@ Fixpoint sym_gr n : vector n! (vector n nat) :=
 Compute map list_of_vect (list_of_vect (sym_gr 4)).
 *)
 
-(*
--Fixpoint canon_permut_inv n k (j : nat) :=
--  match n with
--  | 0 => 0
--  | S n' =>
--      if lt_dec j (k / fact n') then
--        S (canon_permut_inv n' (k mod fact n') j)
--      else if lt_dec (k / fact n') j then
--        S (canon_permut_inv n' (k mod fact n') (j - 1))
--      else 0
--  end.
-*)
-
-...
+Fixpoint sym_gr_inv n k (j : nat) :=
+  match n with
+  | 0 => 0
+  | S n' =>
+      if lt_dec j (k / n'!) then
+        S (sym_gr_inv n' (k mod n'!) j)
+      else if lt_dec (k / n'!) j then
+        S (sym_gr_inv n' (k mod n'!) (j - 1))
+      else 0
+  end.
 
 Definition sub_permut n (v : vector n nat) n' :=
   let d := vect_el v 0 in
@@ -2483,13 +2479,12 @@ apply Nat.div_lt_upper_bound; [ | easy ].
 apply fact_neq_0.
 Qed.
 
-Theorem canon_permut_inv_permut : ∀ n k i,
+Theorem sym_gr_inv_sym_gr : ∀ n k i,
   i < n
   → k < fact n
-  → canon_permut_inv n k (vect_el (canon_permut n k) i) = i.
+  → sym_gr_inv n k (vect_el (vect_el (sym_gr n) k) i) = i.
 Proof.
 intros * Hi Hkn.
-...
 revert k i Hi Hkn.
 induction n; intros; [ flia Hi | ].
 destruct i. {
@@ -2500,7 +2495,7 @@ destruct i. {
 apply Nat.succ_lt_mono in Hi.
 cbn.
 remember (k / fact n) as p eqn:Hp.
-remember (vect_el (canon_permut n (k mod fact n)) i) as q eqn:Hq.
+remember (vect_el (vect_el (sym_gr n) (k mod fact n)) i) as q eqn:Hq.
 move q before p.
 remember (p <=? q) as b eqn:Hb; symmetry in Hb.
 destruct b. {
@@ -2525,34 +2520,36 @@ destruct b. {
 }
 Qed.
 
-Theorem canon_permut_vect_injective : ∀ n k i j,
+Theorem permut_elem_injective : ∀ n k i j,
   k < fact n
   → i < n
   → j < n
-  → vect_el (canon_permut n k) i = vect_el (canon_permut n k) j
+  → vect_el (vect_el (sym_gr n) k) i = vect_el (vect_el (sym_gr n) k) j
   → i = j.
 Proof.
 intros * Hk Hi Hj Hij.
 assert (Hnz : n ≠ 0) by flia Hi.
-rewrite <- canon_permut_inv_permut with (n := n) (k := k); [ | easy | easy ].
+rewrite <- sym_gr_inv_sym_gr with (n := n) (k := k); [ | easy | easy ].
 symmetry.
-rewrite <- canon_permut_inv_permut with (n := n) (k := k); [ | easy | easy ].
+rewrite <- sym_gr_inv_sym_gr with (n := n) (k := k); [ | easy | easy ].
 now f_equal.
 Qed.
 
-Theorem canon_permut_is_permut : ∀ n k,
+Theorem sym_gr_elem_is_permut : ∀ n k,
   k < fact n
-  → is_permut (canon_permut n k).
+  → is_permut (vect_el (sym_gr n) k).
 Proof.
 intros * Hkn.
 split. {
   intros i Hi.
-  now apply vect_el_canon_permut_ub.
+  now apply permut_elem_ub.
 } {
   intros * Hi Hj Hij.
-  now apply canon_permut_vect_injective in Hij.
+  now apply permut_elem_injective in Hij.
 }
 Qed.
+
+...
 
 Theorem canon_permut_succ_values : ∀ n k σ σ',
   σ = vect_el (canon_permut (S n) k)
