@@ -175,25 +175,42 @@ Fixpoint sym_gr n : vector n! (vector n nat) :=
       mk_vect (S n')! (λ k, mk_vect (S n') (sym_gr_fun (sym_gr n') k))
   end.
 
+(*
 Compute map list_of_vect (list_of_vect (sym_gr 4)).
+*)
 
-Definition nat_of_canon_permut_sub_vect n (v : vector n nat) n' :=
+Definition rank_of_permut_in_sub_sym_gr n (v : vector n nat) n' :=
   let d := vect_el v 0 in
   mk_vect n' (λ i, vect_el v (S i) - Nat.b2n (d <? vect_el v (S i))).
 
-Fixpoint nat_of_canon_permut n (v : vector n nat) : nat :=
+Fixpoint rank_of_permut_in_sym_gr n (v : vector n nat) : nat :=
   match n with
   | 0 => 0
   | S n' =>
       let d := vect_el v 0 in
-      d * fact n' +
-      nat_of_canon_permut (nat_of_canon_permut_sub_vect v n')
+      d * n'! + rank_of_permut_in_sym_gr (rank_of_permut_in_sub_sym_gr v n')
   end.
+
+...
+
+Compute list_of_vect (vect_el (sym_gr 4) 5).
+Compute list_of_vect (rank_of_permut_in_sub_sym_gr (vect_el (sym_gr 4) 0) 3).
+Compute list_of_vect (rank_of_permut_in_sub_sym_gr (vect_el (sym_gr 4) 1) 3).
+Compute list_of_vect (rank_of_permut_in_sub_sym_gr (vect_el (sym_gr 4) 2) 3).
+Compute list_of_vect (rank_of_permut_in_sub_sym_gr (vect_el (sym_gr 4) 3) 3).
+Compute list_of_vect (rank_of_permut_in_sub_sym_gr (vect_el (sym_gr 4) 4) 3).
+Compute list_of_vect (rank_of_permut_in_sub_sym_gr (vect_el (sym_gr 4) 20) 3).
+Compute list_of_vect (rank_of_permut_in_sub_sym_gr (vect_el (sym_gr 4) 21) 3).
+
+(*
+Compute (rank_of_permut_in_sym_gr (vect_el (sym_gr 4) 12)).
+*)
+Compute list_of_vect (vect_el (sym_gr 4) 26).
 
 Theorem vect_el_nat_of_canon_permut_ub : ∀ n (v : vector (S n) nat) i,
   is_permut v
   → i < n
-  → vect_el (nat_of_canon_permut_sub_vect v n) i < n.
+  → vect_el (rank_of_permut_in_sub_sym_gr v n) i < n.
 Proof.
 intros * (Hvn, Hn) Hin.
 destruct n; [ easy | ].
