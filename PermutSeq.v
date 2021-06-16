@@ -145,9 +145,20 @@ Fixpoint canon_permut n k : vector n nat :=
   | S n' => mk_vect (S n') (canon_permut_fun (canon_permut n') k)
   end.
 
+Fixpoint canon_permut_inv n k (j : nat) :=
+  match n with
+  | 0 => 0
+  | S n' =>
+      if lt_dec j (k / fact n') then
+        S (canon_permut_inv n' (k mod fact n') j)
+      else if lt_dec (k / fact n') j then
+        S (canon_permut_inv n' (k mod fact n') (j - 1))
+      else 0
+  end.
+
 (**)
 
-Definition canon_permut_fun' {n} (σ_n : vector n! (vector n nat)) k j :=
+Definition canon_permut_fun' n (σ_n : vector n! (vector n nat)) k j :=
   match j with
   | 0 => k / n!
   | S j' =>
@@ -165,18 +176,10 @@ Fixpoint canon_permut' n : vector n! (vector n nat) :=
 
 Compute map list_of_vect (list_of_vect (canon_permut' 4)).
 
-...
+Check canon_permut'.
+Check canon_permut_fun'.
 
-Fixpoint canon_permut_inv n k (j : nat) :=
-  match n with
-  | 0 => 0
-  | S n' =>
-      if lt_dec j (k / fact n') then
-        S (canon_permut_inv n' (k mod fact n') j)
-      else if lt_dec (k / fact n') j then
-        S (canon_permut_inv n' (k mod fact n') (j - 1))
-      else 0
-  end.
+...
 
 Definition nat_of_canon_permut_sub_vect n (v : vector n nat) n' :=
   let d := vect_el v 0 in
