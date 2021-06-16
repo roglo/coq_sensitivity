@@ -113,7 +113,7 @@ Qed.
 (*
    Canonical Permutations.
 
-   The permutations are built this way. The k-th permutation is a
+   The symmetric group is built this way. The k-th permutation is a
    vector of size n where
    - the first value is k/fact(n-1)
    - the rest is the (k mod fact(n-1))-th permutation of n-1 values
@@ -130,35 +130,6 @@ Qed.
      0 and 1 are not shifted (both < 2), 2 is shifted, resulting 0;3;1
      final result: 2;0;3;1
   *)
-
-(*
-Definition canon_permut_fun {n} (σ_n : nat → vector n nat) k j :=
-  match j with
-  | 0 => k / fact n
-  | S j' =>
-      vect_el (σ_n (k mod fact n)) j' +
-      Nat.b2n (k / fact n <=? vect_el (σ_n (k mod fact n)) j')
-  end.
-
-Fixpoint canon_permut n k : vector n nat :=
-  match n with
-  | 0 => mk_vect 0 (λ _, 0)
-  | S n' => mk_vect (S n') (canon_permut_fun (canon_permut n') k)
-  end.
-
-Fixpoint canon_permut_inv n k (j : nat) :=
-  match n with
-  | 0 => 0
-  | S n' =>
-      if lt_dec j (k / fact n') then
-        S (canon_permut_inv n' (k mod fact n') j)
-      else if lt_dec (k / fact n') j then
-        S (canon_permut_inv n' (k mod fact n') (j - 1))
-      else 0
-  end.
-*)
-
-(**)
 
 Definition sym_gr_fun n (σ_n : vector n! (vector n nat)) k j :=
   match j with
@@ -179,7 +150,7 @@ Fixpoint sym_gr n : vector n! (vector n nat) :=
 Compute map list_of_vect (list_of_vect (sym_gr 4)).
 *)
 
-Definition rank_of_permut_in_sub_sym_gr n (v : vector n nat) n' :=
+Definition sub_permut n (v : vector n nat) n' :=
   let d := vect_el v 0 in
   mk_vect n' (λ i, vect_el v (S i) - Nat.b2n (d <? vect_el v (S i))).
 
@@ -188,29 +159,17 @@ Fixpoint rank_of_permut_in_sym_gr n (v : vector n nat) : nat :=
   | 0 => 0
   | S n' =>
       let d := vect_el v 0 in
-      d * n'! + rank_of_permut_in_sym_gr (rank_of_permut_in_sub_sym_gr v n')
+      d * n'! + rank_of_permut_in_sym_gr (sub_permut v n')
   end.
-
-...
-
-Compute list_of_vect (vect_el (sym_gr 4) 5).
-Compute list_of_vect (rank_of_permut_in_sub_sym_gr (vect_el (sym_gr 4) 0) 3).
-Compute list_of_vect (rank_of_permut_in_sub_sym_gr (vect_el (sym_gr 4) 1) 3).
-Compute list_of_vect (rank_of_permut_in_sub_sym_gr (vect_el (sym_gr 4) 2) 3).
-Compute list_of_vect (rank_of_permut_in_sub_sym_gr (vect_el (sym_gr 4) 3) 3).
-Compute list_of_vect (rank_of_permut_in_sub_sym_gr (vect_el (sym_gr 4) 4) 3).
-Compute list_of_vect (rank_of_permut_in_sub_sym_gr (vect_el (sym_gr 4) 20) 3).
-Compute list_of_vect (rank_of_permut_in_sub_sym_gr (vect_el (sym_gr 4) 21) 3).
 
 (*
 Compute (rank_of_permut_in_sym_gr (vect_el (sym_gr 4) 12)).
 *)
-Compute list_of_vect (vect_el (sym_gr 4) 26).
 
-Theorem vect_el_nat_of_canon_permut_ub : ∀ n (v : vector (S n) nat) i,
+Theorem sub_permut_elem_ub : ∀ n (v : vector (S n) nat) i,
   is_permut v
   → i < n
-  → vect_el (rank_of_permut_in_sub_sym_gr v n) i < n.
+  → vect_el (sub_permut v n) i < n.
 Proof.
 intros * (Hvn, Hn) Hin.
 destruct n; [ easy | ].
@@ -229,12 +188,11 @@ specialize (Hvn 0 (Nat.lt_0_succ _)) as H3.
 flia Hb H1 H2 H3 Hvi.
 Qed.
 
-Theorem vect_el_nat_of_canon_permut_injective : ∀ n (v : vector (S n) nat) i j,
+Theorem sub_permut_elem_injective : ∀ n (v : vector (S n) nat) i j,
   is_permut v
   → i < n
   → j < n
-  → vect_el (nat_of_canon_permut_sub_vect v n) i =
-    vect_el (nat_of_canon_permut_sub_vect v n) j
+  → vect_el (sub_permut v n) i = vect_el (sub_permut v n) j
   → i = j.
 Proof.
 intros * (Hvn, Hn) Hin Hjn Hij.
@@ -283,9 +241,9 @@ destruct bi; cbn. {
 }
 Qed.
 
-Theorem nat_of_canon_permut_upper_bound : ∀ n (v : vector n nat),
+Theorem rank_of_permut_upper_bound : ∀ n (v : vector n nat),
   is_permut v
-  → nat_of_canon_permut v < fact n.
+  → rank_of_permut_in_sym_gr v < n!.
 Proof.
 intros * (Hvn, Hn).
 revert v Hvn Hn.
@@ -295,10 +253,10 @@ rewrite Nat.add_comm.
 apply Nat.add_lt_le_mono. {
   apply IHn. {
     intros i Hi.
-    now apply vect_el_nat_of_canon_permut_ub.
+    now apply sub_permut_elem_ub.
   } {
     intros i j Hi Hj.
-    now apply vect_el_nat_of_canon_permut_injective.
+    now apply sub_permut_elem_injective.
   }
 }
 apply Nat.mul_le_mono_r.
@@ -306,9 +264,9 @@ specialize (Hvn 0 (Nat.lt_0_succ _)).
 flia Hvn.
 Qed.
 
-Theorem permut_nat_of_canon_permut : ∀ n v,
+Theorem permut_in_sym_gr_of_its_rank : ∀ n v,
   is_permut v
-  → vect_el (sym_gr n) (nat_of_canon_permut v) = v.
+  → vect_el (sym_gr n) (rank_of_permut_in_sym_gr v) = v.
 Proof.
 intros * (Hvn, Hn).
 revert v Hvn Hn.
@@ -320,16 +278,17 @@ destruct j. {
   rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
   rewrite <- Nat.add_0_r; f_equal.
   apply Nat.div_small.
-  apply nat_of_canon_permut_upper_bound.
+  apply rank_of_permut_upper_bound.
   split. {
     intros i Hi.
-    now apply vect_el_nat_of_canon_permut_ub.
+    now apply sub_permut_elem_ub.
   } {
     intros i j Hi Hj.
-    now apply vect_el_nat_of_canon_permut_injective.
+    now apply sub_permut_elem_injective.
   }
 }
 cbn.
+...
 remember (nat_of_canon_permut (nat_of_canon_permut_sub_vect v n)) as k eqn:Hk.
 symmetry in Hk.
 rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
