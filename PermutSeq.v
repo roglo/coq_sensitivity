@@ -2852,12 +2852,10 @@ intros * Hperm.
 now apply permut_fun_inv_is_permut.
 Qed.
 
-...
-
-Theorem canon_permut_inv_upper_bound : ∀ n k j,
+Theorem sym_gr_inv_upper_bound : ∀ n k j,
   k < fact n
   → j < n
-  → canon_permut_inv n k j < n.
+  → sym_gr_inv n k j < n.
 Proof.
 intros * Hkn Hjn.
 revert k j Hkn Hjn.
@@ -2894,6 +2892,8 @@ destruct (lt_dec j (k / fact n)) as [Hjkn| Hjkn]. {
   apply Nat.mod_upper_bound, fact_neq_0.
 }
 Qed.
+
+...
 
 (* should use permut_fun_blah_blah... *)
 Theorem canon_permut_permut_inv : ∀ n k j,
