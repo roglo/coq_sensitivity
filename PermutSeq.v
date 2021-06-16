@@ -396,12 +396,12 @@ Definition ε_fun f n :=
 
 Definition ε {n} (p : vector n nat) := ε_fun (vect_el p) n.
 
-(* signature of the k-th permutation of "canon_permut" above *)
+(* signature of the k-th permutation of the symmetric group *)
 
-Fixpoint ε_canon_permut n k :=
+Fixpoint ε_permut n k :=
   match n with
   | 0 => 1%F
-  | S n' => (minus_one_pow (k / fact n') * ε_canon_permut n' (k mod fact n'))%F
+  | S n' => (minus_one_pow (k / fact n') * ε_permut n' (k mod fact n'))%F
   end.
 
 (* alternative version of signature of a permutation
@@ -2442,10 +2442,10 @@ Definition sym_gr_elem_swap_last (p q : nat) n k :=
 
 (* *)
 
-Theorem ε_canon_permut_succ : ∀ n k,
+Theorem ε_permut_succ : ∀ n k,
   k < fact (S n)
-  → ε_canon_permut (S n) k =
-     (minus_one_pow (k / fact n) * ε_canon_permut n (k mod fact n))%F.
+  → ε_permut (S n) k =
+     (minus_one_pow (k / fact n) * ε_permut n (k mod fact n))%F.
 Proof. easy. Qed.
 
 Theorem permut_elem_ub : ∀ n k i,
@@ -2549,11 +2549,9 @@ split. {
 }
 Qed.
 
-...
-
-Theorem canon_permut_succ_values : ∀ n k σ σ',
-  σ = vect_el (canon_permut (S n) k)
-  → σ' = vect_el (canon_permut n (k mod fact n))
+Theorem sym_gr_succ_values : ∀ n k σ σ',
+  σ = vect_el (vect_el (sym_gr (S n)) k)
+  → σ' = vect_el (vect_el (sym_gr n) (k mod n!))
   → ∀ i,
     σ i =
     match i with
@@ -2574,9 +2572,9 @@ destruct (lt_dec _ _) as [H1| H1]; [ | easy ].
 apply Nat.add_0_r.
 Qed.
 
-(* equality of ε (canon_permut) and ε_canon_permut *)
+(* equality of ε of sym_gr elem and ε_permut *)
 
-Theorem ε_of_canon_permut_succ :
+Theorem ε_of_sym_gr_permut_succ :
   rngl_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -2585,12 +2583,12 @@ Theorem ε_of_canon_permut_succ :
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
   ∀ n k,
-  k < fact (S n)
-  → ε (canon_permut (S n) k) =
-    (minus_one_pow (k / fact n) * ε (canon_permut n (k mod fact n)))%F.
+  k < (S n)!
+  → ε (vect_el (sym_gr (S n)) k) =
+    (minus_one_pow (k / n!) * ε (vect_el (sym_gr n) (k mod n!)))%F.
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hkn.
-rewrite ε_ws_ε; try easy; [ | now apply canon_permut_is_permut ].
+rewrite ε_ws_ε; try easy; [ | now apply sym_gr_elem_is_permut ].
 unfold ε_ws, ε_fun_ws.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   unfold ε, ε_fun.
@@ -2614,7 +2612,7 @@ f_equal. {
     rewrite Nat.add_comm, Nat.add_sub.
     easy.
   }
-  cbn - [ "<?" canon_permut ].
+  cbn - [ "<?" sym_gr ].
   rewrite rngl_product_split_first; [ | flia ].
   replace (0 <? 0) with false by easy.
   rewrite rngl_mul_1_l.
@@ -2624,10 +2622,10 @@ f_equal. {
     destruct (lt_dec 0 i) as [H| H]; [ clear H | flia Hi H ].
     easy.
   }
-  cbn - [ canon_permut ].
-  remember (vect_el (canon_permut (S n) k)) as σ eqn:Hσ.
-  remember (vect_el (canon_permut n (k mod fact n))) as σ' eqn:Hσ'.
-  specialize (canon_permut_succ_values Hσ Hσ') as H1.
+  cbn - [ sym_gr ].
+  remember (vect_el (@vect_el (n! + n * n!) _ (sym_gr (S n)) k)) as σ eqn:Hσ.
+  remember (vect_el (vect_el (sym_gr n) (k mod fact n))) as σ' eqn:Hσ'.
+  specialize (sym_gr_succ_values Hσ Hσ') as H1.
   unfold sign_diff.
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
@@ -2668,6 +2666,7 @@ f_equal. {
   cbn - [ "<?" ].
   assert (Hp' : is_permut_fun σ' n). {
     rewrite Hσ'.
+...
     apply canon_permut_is_permut.
     apply Nat.mod_upper_bound.
     apply fact_neq_0.
