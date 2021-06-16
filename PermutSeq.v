@@ -2666,14 +2666,13 @@ f_equal. {
   cbn - [ "<?" ].
   assert (Hp' : is_permut_fun σ' n). {
     rewrite Hσ'.
-...
-    apply canon_permut_is_permut.
+    apply sym_gr_elem_is_permut.
     apply Nat.mod_upper_bound.
     apply fact_neq_0.
   }
   assert (Hp : is_permut_fun σ (S n)). {
     rewrite Hσ.
-    now apply canon_permut_is_permut.
+    now apply sym_gr_elem_is_permut.
   }
   rewrite rngl_product_change_var with (g := permut_fun_inv σ' n) (h := σ').
   2: {
@@ -2748,7 +2747,7 @@ f_equal. {
   now rewrite rngl_mul_1_l.
 }
 rewrite ε_ws_ε; try easy. 2: {
-  apply canon_permut_is_permut.
+  apply sym_gr_elem_is_permut.
   apply Nat.mod_upper_bound.
   apply fact_neq_0.
 }
@@ -2767,7 +2766,7 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ canon_permut "<?" ].
+cbn - [ sym_gr "<?" ].
 apply rngl_product_eq_compat.
 intros i Hi.
 apply rngl_product_eq_compat.
@@ -2775,10 +2774,10 @@ intros j Hj.
 move j before i.
 do 2 rewrite if_ltb_lt_dec.
 destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
-remember (vect_el (canon_permut (S n) k)) as σ eqn:Hσ.
-remember (vect_el (canon_permut n (k mod fact n))) as σ' eqn:Hσ'.
+remember (vect_el (@vect_el (n! + n * n!) _ (sym_gr (S n)) k)) as σ eqn:Hσ.
+remember (vect_el (vect_el (sym_gr n) (k mod fact n))) as σ' eqn:Hσ'.
 move σ' before σ.
-do 2 rewrite (canon_permut_succ_values Hσ Hσ').
+do 2 rewrite (sym_gr_succ_values Hσ Hσ').
 destruct j; [ flia Hj | ].
 destruct i; [ flia Hi | ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
@@ -2815,7 +2814,7 @@ destruct (lt_dec (σ' i) (σ' j)) as [Hsij| Hsij]; [ | easy ].
 flia Hsi1j Hsij.
 Qed.
 
-Theorem ε_of_canon_permut_ε :
+Theorem ε_of_permut_ε :
   rngl_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -2825,7 +2824,7 @@ Theorem ε_of_canon_permut_ε :
   rngl_characteristic = 0 →
   ∀ n k,
   k < fact n
-  → ε (canon_permut n k) = ε_canon_permut n k.
+  → ε (vect_el (sym_gr n) k) = ε_permut n k.
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hkn.
 revert k Hkn.
@@ -2834,8 +2833,8 @@ induction n; intros. {
   unfold iter_seq, iter_list; cbn.
   apply rngl_div_1_r; [ now left | easy ].
 }
-rewrite ε_canon_permut_succ; [ | easy ].
-rewrite ε_of_canon_permut_succ; try easy.
+rewrite ε_of_sym_gr_permut_succ; try easy.
+cbn.
 f_equal.
 apply IHn.
 apply Nat.mod_upper_bound.
@@ -2852,6 +2851,8 @@ Proof.
 intros * Hperm.
 now apply permut_fun_inv_is_permut.
 Qed.
+
+...
 
 Theorem canon_permut_inv_upper_bound : ∀ n k j,
   k < fact n
