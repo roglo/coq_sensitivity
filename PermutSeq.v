@@ -150,6 +150,21 @@ Fixpoint sym_gr n : vector n! (vector n nat) :=
 Compute map list_of_vect (list_of_vect (sym_gr 4)).
 *)
 
+(*
+-Fixpoint canon_permut_inv n k (j : nat) :=
+-  match n with
+-  | 0 => 0
+-  | S n' =>
+-      if lt_dec j (k / fact n') then
+-        S (canon_permut_inv n' (k mod fact n') j)
+-      else if lt_dec (k / fact n') j then
+-        S (canon_permut_inv n' (k mod fact n') (j - 1))
+-      else 0
+-  end.
+*)
+
+...
+
 Definition sub_permut n (v : vector n nat) n' :=
   let d := vect_el v 0 in
   mk_vect n' (λ i, vect_el v (S i) - Nat.b2n (d <? vect_el v (S i))).
@@ -288,20 +303,19 @@ destruct j. {
   }
 }
 cbn.
-...
-remember (nat_of_canon_permut (nat_of_canon_permut_sub_vect v n)) as k eqn:Hk.
+remember (rank_of_permut_in_sym_gr (sub_permut v n)) as k eqn:Hk.
 symmetry in Hk.
 rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
 rewrite Nat_mod_add_l_mul_r; [ | apply fact_neq_0 ].
 assert (Hkn : k < fact n). {
   rewrite <- Hk.
-  apply nat_of_canon_permut_upper_bound.
+  apply rank_of_permut_upper_bound.
   split. {
     intros i Hi.
-    now apply vect_el_nat_of_canon_permut_ub.
+    now apply sub_permut_elem_ub.
   } {
     intros i m Hi Hm.
-    now apply vect_el_nat_of_canon_permut_injective.
+    now apply sub_permut_elem_injective.
   }
 }
 rewrite Nat.div_small; [ | easy ].
@@ -309,19 +323,19 @@ rewrite Nat.mod_small; [ | easy ].
 rewrite Nat.add_0_r.
 remember (vect_el v 0 <=? vect_el (vect_el (sym_gr n) k) j) as b eqn:Hb.
 symmetry in Hb.
-assert (H1 : ∀ i, i < n → vect_el (nat_of_canon_permut_sub_vect v n) i < n). {
+assert (H1 : ∀ i, i < n → vect_el (sub_permut v n) i < n). {
   intros i Hi.
-  now apply vect_el_nat_of_canon_permut_ub.
+  now apply sub_permut_elem_ub.
 }
 assert
 (H2 : ∀ i j : nat,
     i < n
     → j < n
-    → vect_el (nat_of_canon_permut_sub_vect v n) i =
-      vect_el (nat_of_canon_permut_sub_vect v n) j
+    → vect_el (sub_permut v n) i =
+      vect_el (sub_permut v n) j
     → i = j). {
   intros i m Hi Hm Him.
-  now apply vect_el_nat_of_canon_permut_injective in Him.
+  now apply sub_permut_elem_injective in Him.
 }
 destruct b. {
   apply Nat.leb_le in Hb; cbn.
@@ -362,115 +376,16 @@ destruct b. {
 }
 Qed.
 
-...
-
-Theorem permut_nat_of_canon_permut : ∀ n v,
-  is_permut v
-  → canon_permut n (nat_of_canon_permut v) = v.
-Proof.
-intros * (Hvn, Hn).
-revert v Hvn Hn.
-induction n; intros; [ now apply vector_eq | ].
-apply vector_eq.
-intros j Hj; cbn.
-destruct j. {
-  cbn; clear Hj.
-  rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
-  rewrite <- Nat.add_0_r; f_equal.
-  apply Nat.div_small.
-  apply nat_of_canon_permut_upper_bound.
-  split. {
-    intros i Hi.
-    now apply vect_el_nat_of_canon_permut_ub.
-  } {
-    intros i j Hi Hj.
-    now apply vect_el_nat_of_canon_permut_injective.
-  }
-}
-cbn.
-remember (nat_of_canon_permut (nat_of_canon_permut_sub_vect v n)) as k eqn:Hk.
-symmetry in Hk.
-rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
-rewrite Nat_mod_add_l_mul_r; [ | apply fact_neq_0 ].
-assert (Hkn : k < fact n). {
-  rewrite <- Hk.
-  apply nat_of_canon_permut_upper_bound.
-  split. {
-    intros i Hi.
-    now apply vect_el_nat_of_canon_permut_ub.
-  } {
-    intros i m Hi Hm.
-    now apply vect_el_nat_of_canon_permut_injective.
-  }
-}
-rewrite Nat.div_small; [ | easy ].
-rewrite Nat.mod_small; [ | easy ].
-rewrite Nat.add_0_r.
-remember (vect_el v 0 <=? vect_el (canon_permut n k) j) as b eqn:Hb.
-symmetry in Hb.
-assert (H1 : ∀ i, i < n → vect_el (nat_of_canon_permut_sub_vect v n) i < n). {
-  intros i Hi.
-  now apply vect_el_nat_of_canon_permut_ub.
-}
-assert
-(H2 : ∀ i j : nat,
-    i < n
-    → j < n
-    → vect_el (nat_of_canon_permut_sub_vect v n) i =
-      vect_el (nat_of_canon_permut_sub_vect v n) j
-    → i = j). {
-  intros i m Hi Hm Him.
-  now apply vect_el_nat_of_canon_permut_injective in Him.
-}
-destruct b. {
-  apply Nat.leb_le in Hb; cbn.
-  rewrite <- Hk in Hb |-*.
-  rewrite IHn in Hb |-*; [ | easy | easy | easy | easy ].
-  cbn - [ "<?" ] in Hb |-*.
-  remember (vect_el v 0 <? vect_el v (S j)) as b1 eqn:Hb1.
-  symmetry in Hb1.
-  destruct b1. {
-    apply Nat.ltb_lt in Hb1; cbn.
-    apply Nat.sub_add; flia Hb1.
-  } {
-    apply Nat.ltb_ge in Hb1; exfalso.
-    cbn in Hb.
-    rewrite Nat.sub_0_r in Hb.
-    apply Nat.le_antisymm in Hb; [ | easy ].
-    symmetry in Hb.
-    now specialize (Hn 0 (S j) (Nat.lt_0_succ _) Hj Hb).
-  }
-} {
-  apply Nat.leb_gt in Hb; cbn.
-  rewrite Nat.add_0_r.
-  rewrite <- Hk in Hb |-*.
-  remember (vect_el v 0 <? vect_el v (S j)) as b1 eqn:Hb1.
-  symmetry in Hb1.
-  destruct b1. {
-    rewrite IHn in Hb; [ | easy | easy ].
-    cbn - [ "<?" ] in Hb.
-    rewrite Hb1 in Hb; cbn in Hb.
-    apply Nat.ltb_lt in Hb1.
-    flia Hb1 Hb.
-  } {
-    rewrite IHn; [ | easy | easy ].
-    cbn - [ "<?" ].
-    rewrite Hb1; cbn.
-    apply Nat.sub_0_r.
-  }
-}
-Qed.
-
-Theorem nat_of_canon_permut_injective : ∀ n (σ₁ σ₂ : vector n nat),
+Theorem rank_of_permut_injective : ∀ n (σ₁ σ₂ : vector n nat),
   is_permut σ₁
   → is_permut σ₂
-  → nat_of_canon_permut σ₁ = nat_of_canon_permut σ₂
+  → rank_of_permut_in_sym_gr σ₁ = rank_of_permut_in_sym_gr σ₂
   → σ₁ = σ₂.
 Proof.
 intros * Hσ₁ Hσ₂ Hσσ.
-apply (f_equal (canon_permut n)) in Hσσ.
-rewrite permut_nat_of_canon_permut in Hσσ; [ | easy ].
-rewrite permut_nat_of_canon_permut in Hσσ; [ | easy ].
+apply (f_equal (vect_el (sym_gr n))) in Hσσ.
+rewrite permut_in_sym_gr_of_its_rank in Hσσ; [ | easy ].
+rewrite permut_in_sym_gr_of_its_rank in Hσσ; [ | easy ].
 easy.
 Qed.
 
@@ -2414,9 +2329,9 @@ intros Hop Hin Hic Hde H10 Hit Hch * Hp1 Hp2.
 now apply signature_comp_fun.
 Qed.
 
-Theorem nat_of_canon_permut_permut : ∀ n k,
+Theorem rank_of_permut_of_rank : ∀ n k,
   k < fact n
-  → nat_of_canon_permut (canon_permut n k) = k.
+  → rank_of_permut_in_sym_gr (vect_el (sym_gr n) k) = k.
 Proof.
 intros * Hkn.
 revert k Hkn.
@@ -2446,7 +2361,7 @@ destruct b. 2: {
   destruct (k / fact n <=? _); flia Hb.
 }
 cbn.
-remember (vect_el (canon_permut n _) i) as x eqn:Hx.
+remember (vect_el (vect_el (sym_gr n) _) i) as x eqn:Hx.
 symmetry in Hx.
 destruct x; [ easy | ].
 unfold Nat.b2n in Hb |-*.
@@ -2461,48 +2376,18 @@ apply Nat.leb_le in Hb.
 flia Hb Hc.
 Qed.
 
-Theorem canon_permut_injective : ∀ n i j,
+Theorem sym_gr_elem_injective : ∀ n i j,
   i < fact n
   → j < fact n
-  → canon_permut n i = canon_permut n j
+  → vect_el (sym_gr n) i = vect_el (sym_gr n) j
   → i = j.
 Proof.
 intros * Hi Hj Hij.
-apply (f_equal (@nat_of_canon_permut n)) in Hij.
-rewrite nat_of_canon_permut_permut in Hij; [ | easy ].
-rewrite nat_of_canon_permut_permut in Hij; [ | easy ].
+apply (f_equal (@rank_of_permut_in_sym_gr n)) in Hij.
+rewrite rank_of_permut_of_rank in Hij; [ | easy ].
+rewrite rank_of_permut_of_rank in Hij; [ | easy ].
 easy.
 Qed.
-
-(*
-Theorem permut_inv_permut : ∀ n (σ : vector n nat),
-  is_permut σ
-  → ∀ i, i < n
-  → vect_el (permut_inv σ) (vect_el σ i) = i.
-Proof.
-intros * (_, Hp2) * Hin; cbn.
-now apply fun_find_prop.
-Qed.
-
-Theorem permut_permut_inv : ∀ n (σ : vector n nat),
-  is_permut σ
-  → ∀ i, i < n
-  → vect_el σ (vect_el (permut_inv σ) i) = i.
-Proof.
-intros * Hp * Hin; cbn.
-now apply fun_permut_fun_inv.
-Qed.
-
-Theorem permut_Permutation : ∀ n (σ : vector n nat),
-  is_permut σ
-  → Permutation (map (vect_el σ) (seq 0 n)) (seq 0 n).
-Proof.
-intros * Hp.
-unfold is_permut in Hp.
-remember (vect_el σ) as f.
-now apply permut_fun_Permutation.
-Qed.
-*)
 
 Theorem transposition_involutive : ∀ p q i,
   transposition p q (transposition p q i) = i.
@@ -2549,48 +2434,15 @@ apply (f_equal (λ u, vect_swap_elem u p q)) in Huv.
 now do 2 rewrite vect_swap_elem_involutive in Huv.
 Qed.
 
-(*
-Theorem permut_swap_involutive : ∀ n p q (σ : vector n nat),
-  permut_swap p q (permut_swap p q σ) = σ.
-Proof.
-intros.
-unfold permut_swap.
-unfold vect_swap_elem; cbn.
-apply vector_eq.
-intros i Hi; cbn.
-unfold permut_fun_swap.
-now rewrite transposition_involutive.
-Qed.
-
-Theorem permut_swap_injective : ∀ n p q (σ σ' : vector n nat),
-  permut_swap p q σ = permut_swap p q σ'
-  → σ = σ'.
-Proof.
-intros.
-apply (f_equal (permut_swap p q)) in H.
-now do 2 rewrite permut_swap_involutive in H.
-Qed.
-
-Theorem permut_swap_is_permut : ∀ n p q (σ : vector n nat),
-  p < n
-  → q < n
-  → is_permut σ
-  → is_permut (permut_swap p q σ).
-Proof.
-intros * Hp Hq Hσ.
-now apply permut_swap_fun_is_permut.
-Qed.
-*)
-
 (* i such that vect_el (permut n k) i = j *)
 
-Definition canon_permut_swap_with_0 p n k :=
-  vect_swap_elem (canon_permut n k) 0 p.
+Definition sym_gr_elem_swap_with_0 p n k :=
+  vect_swap_elem (vect_el (sym_gr n) k) 0 p.
 
 (* k' such that permut_swap_with_0 p n k = permut n k' *)
 
-Definition canon_permut_swap_last (p q : nat) n k :=
-  vect_swap_elem (vect_swap_elem (canon_permut n k) p (n - 2)) q (n - 1).
+Definition sym_gr_elem_swap_last (p q : nat) n k :=
+  vect_swap_elem (vect_swap_elem (vect_el (sym_gr n) k) p (n - 2)) q (n - 1).
 
 (* *)
 
@@ -2600,22 +2452,22 @@ Theorem ε_canon_permut_succ : ∀ n k,
      (minus_one_pow (k / fact n) * ε_canon_permut n (k mod fact n))%F.
 Proof. easy. Qed.
 
-Theorem vect_el_canon_permut_ub : ∀ n k i,
+Theorem permut_elem_ub : ∀ n k i,
   k < fact n
   → i < n
-  → vect_el (canon_permut n k) i < n.
+  → vect_el (vect_el (sym_gr n) k) i < n.
 Proof.
 intros * Hkn Hin.
 revert k i Hkn Hin.
 induction n; intros; [ easy | cbn ].
-unfold canon_permut_fun.
+unfold sym_gr_fun.
 destruct i. {
   rewrite Nat_fact_succ, Nat.mul_comm in Hkn.
   apply Nat.div_lt_upper_bound; [ | easy ].
   apply fact_neq_0.
 }
 apply Nat.succ_lt_mono in Hin.
-remember (k / fact n <=? vect_el (canon_permut n (k mod fact n)) i) as b eqn:Hb.
+remember (k / fact n <=? vect_el (vect_el (sym_gr n) (k mod n!)) i) as b eqn:Hb.
 symmetry in Hb.
 destruct b. {
   cbn; rewrite Nat.add_1_r.
@@ -2631,14 +2483,13 @@ apply Nat.div_lt_upper_bound; [ | easy ].
 apply fact_neq_0.
 Qed.
 
-(* perhaps, I could prove it by proving that canon_inv_permut
-   is indeed the invert (permut_inv) of canon_permut *)
 Theorem canon_permut_inv_permut : ∀ n k i,
   i < n
   → k < fact n
   → canon_permut_inv n k (vect_el (canon_permut n k) i) = i.
 Proof.
 intros * Hi Hkn.
+...
 revert k i Hi Hkn.
 induction n; intros; [ flia Hi | ].
 destruct i. {
