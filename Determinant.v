@@ -178,8 +178,7 @@ f_equal. 2: {
 rewrite rngl_mul_mul_swap; [ | easy ].
 symmetry.
 f_equal.
-...
-apply ε_of_canon_permut_succ; try easy.
+apply ε_of_sym_gr_permut_succ; try easy.
 specialize (fact_neq_0 (S (S n))) as Hnz.
 flia Hk Hnz.
 Qed.
@@ -239,17 +238,18 @@ assert (Hkn : k < fact n). {
   specialize (fact_neq_0 n) as Hnz.
   flia Hk Hnz.
 }
-specialize (canon_permut_vect_surjective Hkn Hi) as Hp.
+specialize (sym_gr_surjective Hkn Hi) as Hp.
 destruct Hp as (p & Hp & Hpp).
 rewrite (rngl_product_split (p + 1)); [ | flia Hp ].
 rewrite rngl_product_split_last; [ | flia ].
 erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   replace (j - 1 - 1) with (j - 2) by flia.
-  destruct (Nat.eq_dec (vect_el (canon_permut n k) (j - 2)) i) as [Hpj| Hpj]. {
+  destruct
+    (Nat.eq_dec (vect_el (vect_el (sym_gr n) k) (j - 2)) i) as [Hpj| Hpj]. {
     exfalso.
     rewrite <- Hpp in Hpj.
-    apply canon_permut_vect_injective in Hpj; [ | easy | flia Hp Hj | easy ].
+    apply permut_elem_injective in Hpj; [ | easy | flia Hp Hj | easy ].
     flia Hj Hpj.
   }
   easy.
@@ -261,6 +261,7 @@ rewrite rngl_product_split_last; [ | flia ].
 erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   replace (j - 1 - 1) with (j - 2) by flia.
+...
   destruct (Nat.eq_dec (vect_el (canon_permut n k) (j - 2)) i) as [Hpj| Hpj]. {
     exfalso.
     rewrite <- Hpp in Hpj.
