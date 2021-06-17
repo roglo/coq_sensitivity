@@ -139,12 +139,109 @@ Definition sym_gr_fun n (σ_n : vector n! (vector n nat)) k j :=
       Nat.b2n (k / n! <=? vect_el (vect_el σ_n (k mod n!)) j')
   end.
 
-Fixpoint sym_gr n : vector n! (vector n nat) :=
+Fixpoint mk_sym_gr n : vector n! (vector n nat) :=
   match n with
   | 0 => mk_vect 0! (λ _, mk_vect 0 (λ _, 0))
   | S n' =>
-      mk_vect (S n')! (λ k, mk_vect (S n') (sym_gr_fun (sym_gr n') k))
+      mk_vect (S n')! (λ k, mk_vect (S n') (sym_gr_fun (mk_sym_gr n') k))
   end.
+
+Record sym_gr n :=
+  { sg_vect : vector n! (vector n nat);
+    sg_prop :
+      (∀ i j,
+       i < n! → j < n! → vect_el sg_vect i = vect_el sg_vect j → i = j) ∧
+      (∀ i, i < n! → is_permut (vect_el sg_vect i)) }.
+
+Definition sub_permut n (v : vector n nat) n' :=
+  let d := vect_el v 0 in
+  mk_vect n' (λ i, vect_el v (S i) - Nat.b2n (d <? vect_el v (S i))).
+
+Fixpoint rank_of_permut_in_sym_gr n (v : vector n nat) : nat :=
+  match n with
+  | 0 => 0
+  | S n' =>
+      let d := vect_el v 0 in
+      d * n'! + rank_of_permut_in_sym_gr (sub_permut v n')
+  end.
+
+Theorem rank_of_permut_of_rank : ∀ n k,
+  k < fact n
+  → rank_of_permut_in_sym_gr (vect_el (mk_sym_gr n) k) = k.
+Proof.
+intros * Hkn.
+revert k Hkn.
+induction n; intros; [ now apply Nat.lt_1_r in Hkn | cbn ].
+specialize (Nat.div_mod k (fact n) (fact_neq_0 _)) as H1.
+rewrite Nat.mul_comm in H1.
+replace (k / fact n * fact n) with (k - k mod fact n) by flia H1.
+rewrite <- Nat.add_sub_swap; [ | apply Nat.mod_le, fact_neq_0 ].
+apply Nat.add_sub_eq_r; f_equal.
+clear H1.
+rewrite <- (IHn (k mod fact n)) at 1. 2: {
+  apply Nat.mod_upper_bound, fact_neq_0.
+}
+f_equal.
+apply vector_eq.
+intros i Hi; cbn.
+symmetry.
+apply Nat.add_sub_eq_r.
+f_equal.
+remember (Nat.b2n (_ <=? _)) as b eqn:Hb.
+rewrite Nat.add_comm.
+symmetry in Hb.
+destruct b. 2: {
+  cbn.
+  destruct b; [ easy | exfalso ].
+  unfold Nat.b2n in Hb.
+  destruct (k / fact n <=? _); flia Hb.
+}
+cbn.
+remember (vect_el (vect_el (mk_sym_gr n) _) i) as x eqn:Hx.
+symmetry in Hx.
+destruct x; [ easy | ].
+unfold Nat.b2n in Hb |-*.
+remember (k / fact n) as y eqn:Hy; symmetry in Hy.
+remember (y <=? S x) as c eqn:Hc; symmetry in Hc.
+destruct c; [ easy | clear Hb ].
+apply Nat.leb_gt in Hc.
+remember (y <=? x) as b eqn:Hb.
+symmetry in Hb.
+destruct b; [ | easy ].
+apply Nat.leb_le in Hb.
+flia Hb Hc.
+Qed.
+
+Theorem sym_gr_elem_injective : ∀ n i j,
+  i < fact n
+  → j < fact n
+  → vect_el (mk_sym_gr n) i = vect_el (mk_sym_gr n) j
+  → i = j.
+Proof.
+intros * Hi Hj Hij.
+apply (f_equal (@rank_of_permut_in_sym_gr n)) in Hij.
+rewrite rank_of_permut_of_rank in Hij; [ | easy ].
+rewrite rank_of_permut_of_rank in Hij; [ | easy ].
+easy.
+Qed.
+
+Theorem canon_sym_gr_prop : ∀ n,
+  (∀ i j,
+   i < n! → j < n! → vect_el (mk_sym_gr n) i = vect_el (mk_sym_gr n) j → i = j) ∧
+  (∀ i, i < n! → is_permut (vect_el (mk_sym_gr n) i)).
+Proof.
+intros.
+split. {
+  intros i j Hi Hj Hij.
+  now apply sym_gr_elem_injective in Hij.
+} {
+...
+
+Definition canon_sym_gr n :=
+  {| sg_vect := mk_sym_gr n;
+     sg_prop := canon_sym_gr_prop n |}.
+
+...
 
 (*
 Compute map list_of_vect (list_of_vect (sym_gr 4)).
@@ -159,18 +256,6 @@ Fixpoint sym_gr_inv n k (j : nat) :=
       else if lt_dec (k / n'!) j then
         S (sym_gr_inv n' (k mod n'!) (j - 1))
       else 0
-  end.
-
-Definition sub_permut n (v : vector n nat) n' :=
-  let d := vect_el v 0 in
-  mk_vect n' (λ i, vect_el v (S i) - Nat.b2n (d <? vect_el v (S i))).
-
-Fixpoint rank_of_permut_in_sym_gr n (v : vector n nat) : nat :=
-  match n with
-  | 0 => 0
-  | S n' =>
-      let d := vect_el v 0 in
-      d * n'! + rank_of_permut_in_sym_gr (sub_permut v n')
   end.
 
 (*
@@ -2323,66 +2408,6 @@ Theorem signature_comp :
 Proof.
 intros Hop Hin Hic Hde H10 Hit Hch * Hp1 Hp2.
 now apply signature_comp_fun.
-Qed.
-
-Theorem rank_of_permut_of_rank : ∀ n k,
-  k < fact n
-  → rank_of_permut_in_sym_gr (vect_el (sym_gr n) k) = k.
-Proof.
-intros * Hkn.
-revert k Hkn.
-induction n; intros; [ now apply Nat.lt_1_r in Hkn | cbn ].
-specialize (Nat.div_mod k (fact n) (fact_neq_0 _)) as H1.
-rewrite Nat.mul_comm in H1.
-replace (k / fact n * fact n) with (k - k mod fact n) by flia H1.
-rewrite <- Nat.add_sub_swap; [ | apply Nat.mod_le, fact_neq_0 ].
-apply Nat.add_sub_eq_r; f_equal.
-clear H1.
-rewrite <- (IHn (k mod fact n)) at 1. 2: {
-  apply Nat.mod_upper_bound, fact_neq_0.
-}
-f_equal.
-apply vector_eq.
-intros i Hi; cbn.
-symmetry.
-apply Nat.add_sub_eq_r.
-f_equal.
-remember (Nat.b2n (_ <=? _)) as b eqn:Hb.
-rewrite Nat.add_comm.
-symmetry in Hb.
-destruct b. 2: {
-  cbn.
-  destruct b; [ easy | exfalso ].
-  unfold Nat.b2n in Hb.
-  destruct (k / fact n <=? _); flia Hb.
-}
-cbn.
-remember (vect_el (vect_el (sym_gr n) _) i) as x eqn:Hx.
-symmetry in Hx.
-destruct x; [ easy | ].
-unfold Nat.b2n in Hb |-*.
-remember (k / fact n) as y eqn:Hy; symmetry in Hy.
-remember (y <=? S x) as c eqn:Hc; symmetry in Hc.
-destruct c; [ easy | clear Hb ].
-apply Nat.leb_gt in Hc.
-remember (y <=? x) as b eqn:Hb.
-symmetry in Hb.
-destruct b; [ | easy ].
-apply Nat.leb_le in Hb.
-flia Hb Hc.
-Qed.
-
-Theorem sym_gr_elem_injective : ∀ n i j,
-  i < fact n
-  → j < fact n
-  → vect_el (sym_gr n) i = vect_el (sym_gr n) j
-  → i = j.
-Proof.
-intros * Hi Hj Hij.
-apply (f_equal (@rank_of_permut_in_sym_gr n)) in Hij.
-rewrite rank_of_permut_of_rank in Hij; [ | easy ].
-rewrite rank_of_permut_of_rank in Hij; [ | easy ].
-easy.
 Qed.
 
 Theorem transposition_involutive : ∀ p q i,
