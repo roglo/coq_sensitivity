@@ -94,6 +94,8 @@ Definition det_from_col {n} (M : matrix (S n) (S n) T) j :=
 (* definition of determinant by sum of products involving all
    permutations *)
 
+...
+
 Definition determinant' n (M : matrix n n T) :=
   Σ (k = 0, fact n - 1),
     ε (vect_el (sym_gr n) k) *

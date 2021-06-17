@@ -506,8 +506,8 @@ assert (Hkn : k < fact n). {
 rewrite Nat.div_small; [ | easy ].
 rewrite Nat.mod_small; [ | easy ].
 rewrite Nat.add_0_r.
-...
-remember (vect_el v 0 <=? vect_el (vect_el (sym_gr n) k) j) as b eqn:Hb.
+remember (vect_el v 0 <=? vect_el (vect_el (mk_canon_sym_gr n) k) j)
+  as b eqn:Hb.
 symmetry in Hb.
 assert (H1 : ∀ i, i < n → vect_el (sub_permut v n) i < n). {
   intros i Hi.
@@ -569,7 +569,7 @@ Theorem rank_of_permut_injective : ∀ n (σ₁ σ₂ : vector n nat),
   → σ₁ = σ₂.
 Proof.
 intros * Hσ₁ Hσ₂ Hσσ.
-apply (f_equal (vect_el (sym_gr n))) in Hσσ.
+apply (f_equal (vect_el (mk_canon_sym_gr n))) in Hσσ.
 rewrite permut_in_sym_gr_of_its_rank in Hσσ; [ | easy ].
 rewrite permut_in_sym_gr_of_its_rank in Hσσ; [ | easy ].
 easy.
@@ -2563,12 +2563,13 @@ Qed.
 (* i such that vect_el (permut n k) i = j *)
 
 Definition sym_gr_elem_swap_with_0 p n k :=
-  vect_swap_elem (vect_el (sym_gr n) k) 0 p.
+  vect_swap_elem (vect_el (mk_canon_sym_gr n) k) 0 p.
 
 (* k' such that permut_swap_with_0 p n k = permut n k' *)
 
 Definition sym_gr_elem_swap_last (p q : nat) n k :=
-  vect_swap_elem (vect_swap_elem (vect_el (sym_gr n) k) p (n - 2)) q (n - 1).
+  vect_swap_elem (vect_swap_elem (vect_el (mk_canon_sym_gr n) k) p (n - 2))
+    q (n - 1).
 
 (* *)
 
@@ -2579,8 +2580,8 @@ Theorem ε_permut_succ : ∀ n k,
 Proof. easy. Qed.
 
 Theorem sym_gr_succ_values : ∀ n k σ σ',
-  σ = vect_el (vect_el (sym_gr (S n)) k)
-  → σ' = vect_el (vect_el (sym_gr n) (k mod n!))
+  σ = vect_el (vect_el (mk_canon_sym_gr (S n)) k)
+  → σ' = vect_el (vect_el (mk_canon_sym_gr n) (k mod n!))
   → ∀ i,
     σ i =
     match i with
@@ -2613,8 +2614,8 @@ Theorem ε_of_sym_gr_permut_succ :
   rngl_characteristic = 0 →
   ∀ n k,
   k < (S n)!
-  → ε (vect_el (sym_gr (S n)) k) =
-    (minus_one_pow (k / n!) * ε (vect_el (sym_gr n) (k mod n!)))%F.
+  → ε (vect_el (mk_canon_sym_gr (S n)) k) =
+    (minus_one_pow (k / n!) * ε (vect_el (mk_canon_sym_gr n) (k mod n!)))%F.
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hkn.
 rewrite ε_ws_ε; try easy; [ | now apply sym_gr_elem_is_permut ].
@@ -2641,7 +2642,7 @@ f_equal. {
     rewrite Nat.add_comm, Nat.add_sub.
     easy.
   }
-  cbn - [ "<?" sym_gr ].
+  cbn - [ "<?" mk_canon_sym_gr ].
   rewrite rngl_product_split_first; [ | flia ].
   replace (0 <? 0) with false by easy.
   rewrite rngl_mul_1_l.
@@ -2651,9 +2652,10 @@ f_equal. {
     destruct (lt_dec 0 i) as [H| H]; [ clear H | flia Hi H ].
     easy.
   }
-  cbn - [ sym_gr ].
-  remember (vect_el (@vect_el (n! + n * n!) _ (sym_gr (S n)) k)) as σ eqn:Hσ.
-  remember (vect_el (vect_el (sym_gr n) (k mod fact n))) as σ' eqn:Hσ'.
+  cbn - [ mk_canon_sym_gr ].
+  remember
+    (vect_el (@vect_el (n! + n * n!) _ (mk_canon_sym_gr (S n)) k)) as σ eqn:Hσ.
+  remember (vect_el (vect_el (mk_canon_sym_gr n) (k mod fact n))) as σ' eqn:Hσ'.
   specialize (sym_gr_succ_values Hσ Hσ') as H1.
   unfold sign_diff.
   erewrite rngl_product_eq_compat. 2: {
@@ -2795,7 +2797,7 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ sym_gr "<?" ].
+cbn - [ mk_canon_sym_gr "<?" ].
 apply rngl_product_eq_compat.
 intros i Hi.
 apply rngl_product_eq_compat.
@@ -2803,8 +2805,8 @@ intros j Hj.
 move j before i.
 do 2 rewrite if_ltb_lt_dec.
 destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
-remember (vect_el (@vect_el (n! + n * n!) _ (sym_gr (S n)) k)) as σ eqn:Hσ.
-remember (vect_el (vect_el (sym_gr n) (k mod fact n))) as σ' eqn:Hσ'.
+remember (vect_el (@vect_el (n! + n * n!) _ (mk_canon_sym_gr (S n)) k)) as σ eqn:Hσ.
+remember (vect_el (vect_el (mk_canon_sym_gr n) (k mod fact n))) as σ' eqn:Hσ'.
 move σ' before σ.
 do 2 rewrite (sym_gr_succ_values Hσ Hσ').
 destruct j; [ flia Hj | ].
@@ -2853,7 +2855,7 @@ Theorem ε_of_permut_ε :
   rngl_characteristic = 0 →
   ∀ n k,
   k < fact n
-  → ε (vect_el (sym_gr n) k) = ε_permut n k.
+  → ε (vect_el (mk_canon_sym_gr n) k) = ε_permut n k.
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hkn.
 revert k Hkn.
@@ -2925,7 +2927,7 @@ Qed.
 Theorem sym_gr_sym_gr_inv : ∀ n k j,
   j < n
   → k < fact n
-  → vect_el (vect_el (sym_gr n) k) (sym_gr_inv n k j) = j.
+  → vect_el (vect_el (mk_canon_sym_gr n) k) (sym_gr_inv n k j) = j.
 Proof.
 intros * Hjn Hkn.
 revert j k Hjn Hkn.
@@ -2985,7 +2987,7 @@ Qed.
 Theorem sym_gr_surjective : ∀ n k j,
   k < fact n
   → j < n
-  → ∃ i : nat, i < n ∧ vect_el (vect_el (sym_gr n) k) i = j.
+  → ∃ i : nat, i < n ∧ vect_el (vect_el (mk_canon_sym_gr n) k) i = j.
 Proof.
 intros * Hkn Hjn.
 exists (sym_gr_inv n k j).
