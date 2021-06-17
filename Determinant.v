@@ -96,8 +96,8 @@ Definition det_from_col {n} (M : matrix (S n) (S n) T) j :=
 
 Definition determinant' n (M : matrix n n T) :=
   Σ (k = 0, fact n - 1),
-    ε (canon_permut n k) *
-    Π (i = 1, n), mat_el M (i - 1) (vect_el (canon_permut n k) (i - 1)).
+    ε (vect_el (sym_gr n) k) *
+    Π (i = 1, n), mat_el M (i - 1) (vect_el (vect_el (sym_gr n) k) (i - 1)).
 
 Arguments determinant' [n]%nat M%M.
 
@@ -131,7 +131,7 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ fact determinant canon_permut ε ].
+cbn - [ fact determinant sym_gr ε ].
 revert M.
 induction n; intros. {
   cbn.
@@ -143,17 +143,17 @@ induction n; intros. {
   now rewrite rngl_mul_1_r.
 }
 remember (S n) as sn.
-cbn - [ fact "mod" "/" canon_permut ]; subst sn.
+cbn - [ fact "mod" "/" sym_gr ]; subst sn.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   now rewrite IHn.
 }
-cbn - [ fact "mod" "/" canon_permut ].
+cbn - [ fact "mod" "/" sym_gr ].
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_mul_summation_distr_l; [ easy | now left ].
 }
-cbn - [ fact "mod" "/" canon_permut ].
+cbn - [ fact "mod" "/" sym_gr ].
 rewrite rngl_summation_summation_distr; [ | easy ].
 rewrite <- Nat.sub_succ_l; [ | apply lt_O_fact ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
@@ -165,7 +165,7 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite rngl_product_succ_succ.
   easy.
 }
-cbn - [ fact "mod" "/" canon_permut ].
+cbn - [ fact "mod" "/" sym_gr ].
 symmetry.
 apply rngl_summation_eq_compat.
 intros k Hk.
@@ -178,6 +178,7 @@ f_equal. 2: {
 rewrite rngl_mul_mul_swap; [ | easy ].
 symmetry.
 f_equal.
+...
 apply ε_of_canon_permut_succ; try easy.
 specialize (fact_neq_0 (S (S n))) as Hnz.
 flia Hk Hnz.
@@ -2199,6 +2200,8 @@ Qed.
 
 Theorem comp_id_l : ∀ A B (f : A → B), comp id f = f.
 Proof. easy. Qed.
+
+...
 
 Definition sym_gr (n : nat) :=
   map (λ v, canon_permut n v) (seq 0 n!).
