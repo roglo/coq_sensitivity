@@ -2174,6 +2174,7 @@ intros i Hi.
 rewrite Nat.sub_add; [ easy | flia Hi ].
 Qed.
 
+(*
 Theorem det_by_any_sym_gr_order :
   ∀ n (M : matrix n n T) (sym_gr' : vector n! (vector n nat)),
   (∀ i j, vect_el sym_gr' i = vect_el sym_gr' j → i = j)
@@ -2201,6 +2202,7 @@ assert (σ_is_permut : ∀ k : nat, k < n! → is_permut (σ k)). {
   now apply sym_gr_elem_is_permut.
 }
 ...
+*)
 
 Theorem permut_comp_assoc : ∀ n (f g h : vector n nat),
   (f ° (g ° h) = (f ° g) ° h)%F.
@@ -2220,10 +2222,14 @@ Qed.
 Theorem comp_id_l : ∀ A B (f : A → B), comp id f = f.
 Proof. easy. Qed.
 
-...
-
+(*
 Definition sym_gr (n : nat) :=
   map (λ v, canon_permut n v) (seq 0 n!).
+*)
+
+Print determinant'.
+
+...
 
 Theorem det_any_permut :
   rngl_has_opp = true →
