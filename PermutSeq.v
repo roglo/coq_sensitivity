@@ -358,14 +358,12 @@ Definition canon_sym_gr n :=
   {| sg_vect := mk_canon_sym_gr n;
      sg_prop := canon_sym_gr_prop n |}.
 
-...
-
 (*
-Compute map list_of_vect (list_of_vect (sym_gr 4)).
+Compute map list_of_vect (list_of_vect (mk_canon_sym_gr 4)).
 *)
 
 (*
-Compute (rank_of_permut_in_sym_gr (vect_el (sym_gr 4) 12)).
+Compute (rank_of_permut_in_sym_gr (vect_el (mk_canon_sym_gr 4) 12)).
 *)
 
 Theorem sub_permut_elem_ub : ∀ n (v : vector (S n) nat) i,
@@ -465,6 +463,8 @@ apply Nat.mul_le_mono_r.
 specialize (Hvn 0 (Nat.lt_0_succ _)).
 flia Hvn.
 Qed.
+
+...
 
 Theorem permut_in_sym_gr_of_its_rank : ∀ n v,
   is_permut v
