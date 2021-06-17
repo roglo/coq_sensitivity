@@ -2174,11 +2174,22 @@ intros i Hi.
 rewrite Nat.sub_add; [ easy | flia Hi ].
 Qed.
 
+Theorem det_by_any_sym_gr_order :
+  ∀ n (M : matrix n n T) (sym_gr' : vector n! (vector n nat)),
+  (∀ i j,
+...
+  (∀ i, i < n! → ∃ j, j < n! ∧ vect_el sym_gr' i = vect_el (sym_gr n) j)
+  → (∀ i, i < n! → ∃ j, j < n! ∧ vect_el sym_gr' j = vect_el (sym_gr n) i)
+  → determinant M =
+    Σ (k = 0, n! - 1),
+    ε (vect_el sym_gr' k) * Π (i = 0, n - 1), mat_el M i (vect_el (vect_el sym_gr' k) i).
+Proof.
+intros * Hcσ Hσc.
 ...
 
 Theorem det_by_any_permut : ∀ n (M : matrix n n T) (σ : nat → vector n nat),
-  (∀ i, i < n! → ∃ j, j < n! ∧ σ i = canon_permut n j)
-  → (∀ i, i < n! → ∃ j, j < n! ∧ σ j = canon_permut n i)
+  (∀ i, i < n! → ∃ j, j < n! ∧ σ i = vect_el (sym_gr n) j)
+  → (∀ i, i < n! → ∃ j, j < n! ∧ σ j = vect_el (sym_gr n) i)
   → determinant M =
     Σ (k = 0, n! - 1),
     ε (σ k) * Π (i = 0, n - 1), mat_el M i (vect_el (σ k) i).
