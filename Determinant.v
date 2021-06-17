@@ -343,13 +343,12 @@ Qed.
 (* list of terms in determinant' (determinant by sum of products of
    permutations *)
 
-...
-
 Definition determinant'_list {n} (M : matrix n n T) :=
   map (λ k,
-    (ε_canon_permut n k *
-     Π (i = 1, n), mat_el M (i - 1) (vect_el (canon_permut n k) (i - 1)%nat))%F)
-    (seq 0 (fact n)).
+    (ε_permut n k *
+     Π (i = 1, n),
+     mat_el M (i - 1) (vect_el (vect_el (sym_gr n) k) (i - 1)%nat))%F)
+    (seq 0 n!).
 
 Arguments determinant'_list {n}%nat M%M.
 
@@ -375,7 +374,7 @@ rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
 rewrite Nat.add_0_l.
 f_equal.
-now apply ε_of_canon_permut_ε.
+now apply ε_of_permut_ε.
 Qed.
 
 Theorem det_is_det_by_any_permut :
@@ -407,15 +406,15 @@ Qed.
 
 Definition determinant'' p q n (M : matrix n n T) :=
   Σ (k = 0, fact n - 1),
-    ε_canon_permut n k *
+    ε_permut n k *
     Π (i = 1, n),
-    mat_el M (i - 1) (vect_el (canon_permut_swap_last p q n k) (i - 1)).
+    mat_el M (i - 1) (vect_el (sym_gr_elem_swap_last p q n k) (i - 1)).
 
 Definition determinant''_list p q {n} (M : matrix n n T) :=
   map (λ k,
-    (ε_canon_permut n k *
+    (ε_permut n k *
      Π (i = 1, n),
-     mat_el M (i - 1) (vect_el (canon_permut_swap_last p q n k) (i - 1)))%F)
+     mat_el M (i - 1) (vect_el (sym_gr_elem_swap_last p q n k) (i - 1)))%F)
     (seq 0 (fact n)).
 
 Theorem determinant''_by_list : ∀ n p q (M : matrix n n T),
@@ -495,7 +494,7 @@ erewrite rngl_summation_eq_compat. 2: {
   erewrite rngl_product_list_eq_compat. 2: {
     intros i Hi.
     replace (mat_el _ _ _) with
-      (mat_el M i (vect_el (canon_permut n k) (transposition p q i))). 2: {
+      (mat_el M i (vect_el (vect_el (sym_gr n) k) (transposition p q i))). 2: {
       cbn.
       unfold transposition.
       do 2 rewrite if_eqb_eq_dec.
@@ -519,7 +518,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ mat_swap_rows ].
-set (f := λ k, vect_swap_elem (canon_permut n k) p q).
+set (f := λ k, vect_swap_elem (vect_el (sym_gr n) k) p q).
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   assert (Hkn : k < n!). {
@@ -533,7 +532,7 @@ erewrite rngl_summation_eq_compat. 2: {
     now replace (vect_el _ _) with (vect_el (f k) i).
   }
   cbn - [ f ].
-  replace (canon_permut n k) with
+  replace (vect_el (sym_gr n) k) with
     (mk_vect n (λ i, vect_el (f k) (transposition p q i))). 2: {
     apply vector_eq.
     intros i Hi; cbn.
@@ -545,11 +544,11 @@ erewrite rngl_summation_eq_compat. 2: {
     subst f; cbn.
     split; cbn. {
       intros i Hi.
-      apply vect_el_permut_ub; [ now apply canon_permut_is_permut | ].
+      apply vect_el_permut_ub; [ now apply sym_gr_elem_is_permut | ].
       now apply transposition_lt.
     } {
       intros * Hi Hj Hij.
-      apply canon_permut_vect_injective in Hij; [ | easy | | ]; cycle 1. {
+      apply permut_elem_injective in Hij; [ | easy | | ]; cycle 1. {
         now apply transposition_lt.
       } {
         now apply transposition_lt.
@@ -579,7 +578,7 @@ rewrite rngl_mul_opp_l; [ | easy ].
 f_equal.
 rewrite rngl_mul_1_l.
 symmetry.
-set (g := λ k, nat_of_canon_permut (f k)).
+set (g := λ k, rank_of_permut_in_sym_gr (f k)).
 rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
   intros k (_, Hk).
   assert (Hkn : k < n!). {
@@ -587,12 +586,12 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
     flia Hk Hn.
   }
   unfold g, f.
-  rewrite permut_nat_of_canon_permut. 2: {
+  rewrite permut_in_sym_gr_of_its_rank. 2: {
     apply vect_swap_elem_is_permut; [ easy | easy | ].
-    now apply canon_permut_is_permut.
+    now apply sym_gr_elem_is_permut.
   }
   rewrite vect_swap_elem_involutive.
-  now apply nat_of_canon_permut_permut.
+  now apply rank_of_permut_of_rank.
 }
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
@@ -602,20 +601,20 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
   unfold g, f.
   split. {
     intros i Hi.
-    apply nat_of_canon_permut_upper_bound.
+    apply rank_of_permut_upper_bound.
     apply vect_swap_elem_is_permut; [ easy | easy | ].
-    now apply canon_permut_is_permut.
+    now apply sym_gr_elem_is_permut.
   } {
     intros * Hi Hj Hij.
-    apply nat_of_canon_permut_injective in Hij; cycle 1. {
+    apply rank_of_permut_injective in Hij; cycle 1. {
       apply vect_swap_elem_is_permut; [ easy | easy | ].
-      now apply canon_permut_is_permut.
+      now apply sym_gr_elem_is_permut.
     } {
       apply vect_swap_elem_is_permut; [ easy | easy | ].
-      now apply canon_permut_is_permut.
+      now apply sym_gr_elem_is_permut.
     }
     apply vect_swap_elem_injective in Hij.
-    now apply canon_permut_injective in Hij.
+    now apply sym_gr_elem_injective in Hij.
   }
 }
 erewrite rngl_summation_list_eq_compat. 2: {
@@ -626,9 +625,9 @@ erewrite rngl_summation_list_eq_compat. 2: {
     flia Hk Hn.
   }
   unfold g, f.
-  rewrite permut_nat_of_canon_permut. 2: {
+  rewrite permut_in_sym_gr_of_its_rank. 2: {
     apply vect_swap_elem_is_permut; [ easy | easy | ].
-    now apply canon_permut_is_permut.
+    now apply sym_gr_elem_is_permut.
   }
   rewrite vect_swap_elem_involutive.
   easy.
@@ -1489,7 +1488,8 @@ f_equal. {
 }
 Qed.
 
-Definition swap_in_permut n i j k := vect_swap_elem (canon_permut n k) i j.
+Definition swap_in_permut n i j k :=
+  vect_swap_elem (vect_el (sym_gr n) k) i j.
 
 (* comatrix *)
 
@@ -2174,6 +2174,8 @@ intros i Hi.
 rewrite Nat.sub_add; [ easy | flia Hi ].
 Qed.
 
+...
+
 Theorem det_by_any_permut : ∀ n (M : matrix n n T) (σ : nat → vector n nat),
   (∀ i, i < n! → ∃ j, j < n! ∧ σ i = canon_permut n j)
   → (∀ i, i < n! → ∃ j, j < n! ∧ σ j = canon_permut n i)
@@ -2186,7 +2188,7 @@ assert (σ_is_permut : ∀ k : nat, k < n! → is_permut (σ k)). {
   intros * Hk.
   specialize (Hcσ k Hk) as (a & Han & Ha).
   rewrite Ha.
-  now apply canon_permut_is_permut.
+  now apply sym_gr_elem_is_permut.
 }
 ...
 
@@ -2250,7 +2252,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
     destruct Hμ as (i & Hi & His).
     rewrite <- Hi.
     apply in_seq in His.
-    now apply canon_permut_is_permut.
+    now apply sym_gr_elem_is_permut.
   }
   rewrite signature_comp;
     [ | easy | easy | easy | easy | easy | easy | easy | | easy ]. 2: {
