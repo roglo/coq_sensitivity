@@ -139,11 +139,11 @@ Definition sym_gr_fun n (σ_n : vector n! (vector n nat)) k j :=
       Nat.b2n (k / n! <=? vect_el (vect_el σ_n (k mod n!)) j')
   end.
 
-Fixpoint mk_sym_gr n : vector n! (vector n nat) :=
+Fixpoint mk_canon_sym_gr n : vector n! (vector n nat) :=
   match n with
   | 0 => mk_vect 0! (λ _, mk_vect 0 (λ _, 0))
   | S n' =>
-      mk_vect (S n')! (λ k, mk_vect (S n') (sym_gr_fun (mk_sym_gr n') k))
+      mk_vect (S n')! (λ k, mk_vect (S n') (sym_gr_fun (mk_canon_sym_gr n') k))
   end.
 
 Record sym_gr n :=
@@ -167,7 +167,7 @@ Fixpoint rank_of_permut_in_sym_gr n (v : vector n nat) : nat :=
 
 Theorem rank_of_permut_of_rank : ∀ n k,
   k < fact n
-  → rank_of_permut_in_sym_gr (vect_el (mk_sym_gr n) k) = k.
+  → rank_of_permut_in_sym_gr (vect_el (mk_canon_sym_gr n) k) = k.
 Proof.
 intros * Hkn.
 revert k Hkn.
@@ -197,7 +197,7 @@ destruct b. 2: {
   destruct (k / fact n <=? _); flia Hb.
 }
 cbn.
-remember (vect_el (vect_el (mk_sym_gr n) _) i) as x eqn:Hx.
+remember (vect_el (vect_el (mk_canon_sym_gr n) _) i) as x eqn:Hx.
 symmetry in Hx.
 destruct x; [ easy | ].
 unfold Nat.b2n in Hb |-*.
@@ -215,7 +215,7 @@ Qed.
 Theorem sym_gr_elem_injective : ∀ n i j,
   i < fact n
   → j < fact n
-  → vect_el (mk_sym_gr n) i = vect_el (mk_sym_gr n) j
+  → vect_el (mk_canon_sym_gr n) i = vect_el (mk_canon_sym_gr n) j
   → i = j.
 Proof.
 intros * Hi Hj Hij.
@@ -225,27 +225,37 @@ rewrite rank_of_permut_of_rank in Hij; [ | easy ].
 easy.
 Qed.
 
-Theorem canon_sym_gr_prop : ∀ n,
-  (∀ i j,
-   i < n! → j < n! → vect_el (mk_sym_gr n) i = vect_el (mk_sym_gr n) j → i = j) ∧
-  (∀ i, i < n! → is_permut (vect_el (mk_sym_gr n) i)).
+Theorem permut_elem_ub : ∀ n k i,
+  k < fact n
+  → i < n
+  → vect_el (vect_el (mk_canon_sym_gr n) k) i < n.
 Proof.
-intros.
-split. {
-  intros i j Hi Hj Hij.
-  now apply sym_gr_elem_injective in Hij.
-} {
-...
-
-Definition canon_sym_gr n :=
-  {| sg_vect := mk_sym_gr n;
-     sg_prop := canon_sym_gr_prop n |}.
-
-...
-
-(*
-Compute map list_of_vect (list_of_vect (sym_gr 4)).
-*)
+intros * Hkn Hin.
+revert k i Hkn Hin.
+induction n; intros; [ easy | cbn ].
+unfold sym_gr_fun.
+destruct i. {
+  rewrite Nat_fact_succ, Nat.mul_comm in Hkn.
+  apply Nat.div_lt_upper_bound; [ | easy ].
+  apply fact_neq_0.
+}
+apply Nat.succ_lt_mono in Hin.
+remember (k / fact n <=? vect_el (vect_el (mk_canon_sym_gr n) (k mod n!)) i)
+  as b eqn:Hb.
+symmetry in Hb.
+destruct b. {
+  cbn; rewrite Nat.add_1_r.
+  apply -> Nat.succ_lt_mono.
+  apply IHn; [ | easy ].
+  apply Nat.mod_upper_bound, fact_neq_0.
+}
+cbn; rewrite Nat.add_0_r.
+apply Nat.leb_gt in Hb.
+etransitivity; [ apply Hb | ].
+rewrite Nat_fact_succ, Nat.mul_comm in Hkn.
+apply Nat.div_lt_upper_bound; [ | easy ].
+apply fact_neq_0.
+Qed.
 
 Fixpoint sym_gr_inv n k (j : nat) :=
   match n with
@@ -257,6 +267,102 @@ Fixpoint sym_gr_inv n k (j : nat) :=
         S (sym_gr_inv n' (k mod n'!) (j - 1))
       else 0
   end.
+
+Theorem sym_gr_inv_sym_gr : ∀ n k i,
+  i < n
+  → k < fact n
+  → sym_gr_inv n k (vect_el (vect_el (mk_canon_sym_gr n) k) i) = i.
+Proof.
+intros * Hi Hkn.
+revert k i Hi Hkn.
+induction n; intros; [ flia Hi | ].
+destruct i. {
+  clear Hi; cbn.
+  remember (k / fact n) as p eqn:Hp.
+  destruct (lt_dec p p) as [H| H]; [ flia H | easy ].
+}
+apply Nat.succ_lt_mono in Hi.
+cbn.
+remember (k / fact n) as p eqn:Hp.
+remember (vect_el (vect_el (mk_canon_sym_gr n) (k mod fact n)) i) as q eqn:Hq.
+move q before p.
+remember (p <=? q) as b eqn:Hb; symmetry in Hb.
+destruct b. {
+  apply Nat.leb_le in Hb; cbn.
+  destruct (lt_dec (q + 1) p) as [Hpq| Hqp]; [ flia Hb Hpq | ].
+  apply Nat.nlt_ge in Hqp.
+  destruct (lt_dec p (q + 1)) as [Hpq| Hpq]; [ | flia Hb Hpq ].
+  clear Hpq Hqp.
+  f_equal.
+  rewrite Nat.add_sub.
+  rewrite Hq.
+  apply IHn; [ easy | ].
+  apply Nat.mod_upper_bound, fact_neq_0.
+} {
+  apply Nat.leb_gt in Hb; cbn.
+  rewrite Nat.add_0_r.
+  destruct (lt_dec q p) as [H| H]; [ clear H | flia Hb H ].
+  f_equal.
+  rewrite Hq.
+  apply IHn; [ easy | ].
+  apply Nat.mod_upper_bound, fact_neq_0.
+}
+Qed.
+
+Theorem permut_elem_injective : ∀ n k i j,
+  k < fact n
+  → i < n
+  → j < n
+  → vect_el (vect_el (mk_canon_sym_gr n) k) i =
+     vect_el (vect_el (mk_canon_sym_gr n) k) j
+  → i = j.
+Proof.
+intros * Hk Hi Hj Hij.
+assert (Hnz : n ≠ 0) by flia Hi.
+rewrite <- sym_gr_inv_sym_gr with (n := n) (k := k); [ | easy | easy ].
+symmetry.
+rewrite <- sym_gr_inv_sym_gr with (n := n) (k := k); [ | easy | easy ].
+now f_equal.
+Qed.
+
+Theorem sym_gr_elem_is_permut : ∀ n k,
+  k < fact n
+  → is_permut (vect_el (mk_canon_sym_gr n) k).
+Proof.
+intros * Hkn.
+split. {
+  intros i Hi.
+  now apply permut_elem_ub.
+} {
+  intros * Hi Hj Hij.
+  now apply permut_elem_injective in Hij.
+}
+Qed.
+
+Theorem canon_sym_gr_prop : ∀ n,
+  (∀ i j,
+   i < n! → j < n! → vect_el (mk_canon_sym_gr n) i = vect_el (mk_canon_sym_gr n) j → i = j) ∧
+  (∀ i, i < n! → is_permut (vect_el (mk_canon_sym_gr n) i)).
+Proof.
+intros.
+split. {
+  intros i j Hi Hj Hij.
+  now apply sym_gr_elem_injective in Hij.
+} {
+  intros i Hi.
+  now apply sym_gr_elem_is_permut.
+}
+Qed.
+
+Definition canon_sym_gr n :=
+  {| sg_vect := mk_canon_sym_gr n;
+     sg_prop := canon_sym_gr_prop n |}.
+
+...
+
+(*
+Compute map list_of_vect (list_of_vect (sym_gr 4)).
+*)
 
 (*
 Compute (rank_of_permut_in_sym_gr (vect_el (sym_gr 4) 12)).
@@ -2472,107 +2578,6 @@ Theorem ε_permut_succ : ∀ n k,
   → ε_permut (S n) k =
      (minus_one_pow (k / fact n) * ε_permut n (k mod fact n))%F.
 Proof. easy. Qed.
-
-Theorem permut_elem_ub : ∀ n k i,
-  k < fact n
-  → i < n
-  → vect_el (vect_el (sym_gr n) k) i < n.
-Proof.
-intros * Hkn Hin.
-revert k i Hkn Hin.
-induction n; intros; [ easy | cbn ].
-unfold sym_gr_fun.
-destruct i. {
-  rewrite Nat_fact_succ, Nat.mul_comm in Hkn.
-  apply Nat.div_lt_upper_bound; [ | easy ].
-  apply fact_neq_0.
-}
-apply Nat.succ_lt_mono in Hin.
-remember (k / fact n <=? vect_el (vect_el (sym_gr n) (k mod n!)) i) as b eqn:Hb.
-symmetry in Hb.
-destruct b. {
-  cbn; rewrite Nat.add_1_r.
-  apply -> Nat.succ_lt_mono.
-  apply IHn; [ | easy ].
-  apply Nat.mod_upper_bound, fact_neq_0.
-}
-cbn; rewrite Nat.add_0_r.
-apply Nat.leb_gt in Hb.
-etransitivity; [ apply Hb | ].
-rewrite Nat_fact_succ, Nat.mul_comm in Hkn.
-apply Nat.div_lt_upper_bound; [ | easy ].
-apply fact_neq_0.
-Qed.
-
-Theorem sym_gr_inv_sym_gr : ∀ n k i,
-  i < n
-  → k < fact n
-  → sym_gr_inv n k (vect_el (vect_el (sym_gr n) k) i) = i.
-Proof.
-intros * Hi Hkn.
-revert k i Hi Hkn.
-induction n; intros; [ flia Hi | ].
-destruct i. {
-  clear Hi; cbn.
-  remember (k / fact n) as p eqn:Hp.
-  destruct (lt_dec p p) as [H| H]; [ flia H | easy ].
-}
-apply Nat.succ_lt_mono in Hi.
-cbn.
-remember (k / fact n) as p eqn:Hp.
-remember (vect_el (vect_el (sym_gr n) (k mod fact n)) i) as q eqn:Hq.
-move q before p.
-remember (p <=? q) as b eqn:Hb; symmetry in Hb.
-destruct b. {
-  apply Nat.leb_le in Hb; cbn.
-  destruct (lt_dec (q + 1) p) as [Hpq| Hqp]; [ flia Hb Hpq | ].
-  apply Nat.nlt_ge in Hqp.
-  destruct (lt_dec p (q + 1)) as [Hpq| Hpq]; [ | flia Hb Hpq ].
-  clear Hpq Hqp.
-  f_equal.
-  rewrite Nat.add_sub.
-  rewrite Hq.
-  apply IHn; [ easy | ].
-  apply Nat.mod_upper_bound, fact_neq_0.
-} {
-  apply Nat.leb_gt in Hb; cbn.
-  rewrite Nat.add_0_r.
-  destruct (lt_dec q p) as [H| H]; [ clear H | flia Hb H ].
-  f_equal.
-  rewrite Hq.
-  apply IHn; [ easy | ].
-  apply Nat.mod_upper_bound, fact_neq_0.
-}
-Qed.
-
-Theorem permut_elem_injective : ∀ n k i j,
-  k < fact n
-  → i < n
-  → j < n
-  → vect_el (vect_el (sym_gr n) k) i = vect_el (vect_el (sym_gr n) k) j
-  → i = j.
-Proof.
-intros * Hk Hi Hj Hij.
-assert (Hnz : n ≠ 0) by flia Hi.
-rewrite <- sym_gr_inv_sym_gr with (n := n) (k := k); [ | easy | easy ].
-symmetry.
-rewrite <- sym_gr_inv_sym_gr with (n := n) (k := k); [ | easy | easy ].
-now f_equal.
-Qed.
-
-Theorem sym_gr_elem_is_permut : ∀ n k,
-  k < fact n
-  → is_permut (vect_el (sym_gr n) k).
-Proof.
-intros * Hkn.
-split. {
-  intros i Hi.
-  now apply permut_elem_ub.
-} {
-  intros * Hi Hj Hij.
-  now apply permut_elem_injective in Hij.
-}
-Qed.
 
 Theorem sym_gr_succ_values : ∀ n k σ σ',
   σ = vect_el (vect_el (sym_gr (S n)) k)
