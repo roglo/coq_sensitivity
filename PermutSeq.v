@@ -464,11 +464,9 @@ specialize (Hvn 0 (Nat.lt_0_succ _)).
 flia Hvn.
 Qed.
 
-...
-
 Theorem permut_in_sym_gr_of_its_rank : ∀ n v,
   is_permut v
-  → vect_el (sym_gr n) (rank_of_permut_in_sym_gr v) = v.
+  → vect_el (mk_canon_sym_gr n) (rank_of_permut_in_sym_gr v) = v.
 Proof.
 intros * (Hvn, Hn).
 revert v Hvn Hn.
@@ -508,6 +506,7 @@ assert (Hkn : k < fact n). {
 rewrite Nat.div_small; [ | easy ].
 rewrite Nat.mod_small; [ | easy ].
 rewrite Nat.add_0_r.
+...
 remember (vect_el v 0 <=? vect_el (vect_el (sym_gr n) k) j) as b eqn:Hb.
 symmetry in Hb.
 assert (H1 : ∀ i, i < n → vect_el (sub_permut v n) i < n). {
