@@ -2893,13 +2893,10 @@ destruct (lt_dec j (k / fact n)) as [Hjkn| Hjkn]. {
 }
 Qed.
 
-...
-
-(* should use permut_fun_blah_blah... *)
-Theorem canon_permut_permut_inv : ∀ n k j,
+Theorem sym_gr_sym_gr_inv : ∀ n k j,
   j < n
   → k < fact n
-  → vect_el (canon_permut n k) (canon_permut_inv n k j) = j.
+  → vect_el (vect_el (sym_gr n) k) (sym_gr_inv n k j) = j.
 Proof.
 intros * Hjn Hkn.
 revert j k Hjn Hkn.
@@ -2956,13 +2953,13 @@ destruct (lt_dec j (k / fact n)) as [Hjkn| Hjkn]. {
 }
 Qed.
 
-Theorem canon_permut_vect_surjective : ∀ n k j,
+Theorem sym_gr_surjective : ∀ n k j,
   k < fact n
   → j < n
-  → ∃ i : nat, i < n ∧ vect_el (canon_permut n k) i = j.
+  → ∃ i : nat, i < n ∧ vect_el (vect_el (sym_gr n) k) i = j.
 Proof.
 intros * Hkn Hjn.
-exists (canon_permut_inv n k j).
+exists (sym_gr_inv n k j).
 destruct n; [ easy | ].
 split. {
   cbn.
@@ -2981,7 +2978,7 @@ split. {
       apply Nat.div_lt_upper_bound; [ | easy ].
       apply fact_neq_0.
     }
-    apply canon_permut_inv_upper_bound; [ | flia Hjn Hjsn ].
+    apply sym_gr_inv_upper_bound; [ | flia Hjn Hjsn ].
     apply Nat.mod_upper_bound, fact_neq_0.
   } {
     apply Nat.nlt_ge in Hjk.
@@ -2991,11 +2988,11 @@ split. {
       apply Nat.lt_1_r in Hkn; subst k.
       flia Hjn Hkj.
     }
-    apply canon_permut_inv_upper_bound; [ | flia Hjn Hkj ].
+    apply sym_gr_inv_upper_bound; [ | flia Hjn Hkj ].
     apply Nat.mod_upper_bound, fact_neq_0.
   }
 }
-now apply canon_permut_permut_inv.
+now apply sym_gr_sym_gr_inv.
 Qed.
 
 Theorem comp_is_permut_fun : ∀ n (σ₁ σ₂ : nat → nat),
@@ -3101,9 +3098,9 @@ Arguments ε_ws {T}%type {ro} {n}%nat.
 Arguments ε_fun_ws {T}%type {ro} f%function n%nat.
 Arguments sign_diff {T}%type {ro} (u v)%nat.
 
-Arguments ε_canon_permut {T}%type {ro} (n k)%nat.
-Arguments ε_of_canon_permut_succ {T}%type {ro rp} _ _ _ _ _ _ _ n%nat [k]%nat.
-Arguments ε_of_canon_permut_ε {T}%type {ro rp} _ _ _ _ _ _ _ n%nat [k]%nat.
+Arguments ε_permut {T}%type {ro} (n k)%nat.
+Arguments ε_of_sym_gr_permut_succ {T}%type {ro rp} _ _ _ _ _ _ _ n%nat [k]%nat.
+Arguments ε_of_permut_ε {T}%type {ro rp} _ _ _ _ _ _ _ n%nat [k]%nat.
 Arguments ε_ws_ε {T}%type {ro rp} _ _ _ _ _ _ _ {n}%nat [p].
 Arguments rngl_product_change_list {T}%type {ro rp} _ [A]%type [la lb]%list
   f%function.
