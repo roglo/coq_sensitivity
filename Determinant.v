@@ -94,12 +94,11 @@ Definition det_from_col {n} (M : matrix (S n) (S n) T) j :=
 (* definition of determinant by sum of products involving all
    permutations *)
 
-...
-
 Definition determinant' n (M : matrix n n T) :=
   Σ (k = 0, fact n - 1),
-    ε (vect_el (sym_gr n) k) *
-    Π (i = 1, n), mat_el M (i - 1) (vect_el (vect_el (sym_gr n) k) (i - 1)).
+    ε (vect_el (mk_canon_sym_gr n) k) *
+    Π (i = 1, n),
+    mat_el M (i - 1) (vect_el (vect_el (mk_canon_sym_gr n) k) (i - 1)).
 
 Arguments determinant' [n]%nat M%M.
 
@@ -133,7 +132,7 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ fact determinant sym_gr ε ].
+cbn - [ fact determinant mk_canon_sym_gr ε ].
 revert M.
 induction n; intros. {
   cbn.
@@ -145,17 +144,17 @@ induction n; intros. {
   now rewrite rngl_mul_1_r.
 }
 remember (S n) as sn.
-cbn - [ fact "mod" "/" sym_gr ]; subst sn.
+cbn - [ fact "mod" "/" mk_canon_sym_gr ]; subst sn.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   now rewrite IHn.
 }
-cbn - [ fact "mod" "/" sym_gr ].
+cbn - [ fact "mod" "/" mk_canon_sym_gr ].
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_mul_summation_distr_l; [ easy | now left ].
 }
-cbn - [ fact "mod" "/" sym_gr ].
+cbn - [ fact "mod" "/" mk_canon_sym_gr ].
 rewrite rngl_summation_summation_distr; [ | easy ].
 rewrite <- Nat.sub_succ_l; [ | apply lt_O_fact ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
@@ -167,7 +166,7 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite rngl_product_succ_succ.
   easy.
 }
-cbn - [ fact "mod" "/" sym_gr ].
+cbn - [ fact "mod" "/" mk_canon_sym_gr ].
 symmetry.
 apply rngl_summation_eq_compat.
 intros k Hk.
@@ -248,7 +247,8 @@ erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   replace (j - 1 - 1) with (j - 2) by flia.
   destruct
-    (Nat.eq_dec (vect_el (vect_el (sym_gr n) k) (j - 2)) i) as [Hpj| Hpj]. {
+    (Nat.eq_dec (vect_el (vect_el (mk_canon_sym_gr n) k) (j - 2)) i)
+      as [Hpj| Hpj]. {
     exfalso.
     rewrite <- Hpp in Hpj.
     apply permut_elem_injective in Hpj; [ | easy | flia Hp Hj | easy ].
@@ -263,7 +263,7 @@ rewrite rngl_product_split_last; [ | flia ].
 erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   replace (j - 1 - 1) with (j - 2) by flia.
-  destruct (Nat.eq_dec (vect_el (vect_el (sym_gr n) k) (j - 2)) i)
+  destruct (Nat.eq_dec (vect_el (vect_el (mk_canon_sym_gr n) k) (j - 2)) i)
     as [Hpj| Hpj]. {
     exfalso.
     rewrite <- Hpp in Hpj.
@@ -280,7 +280,7 @@ rewrite rngl_product_split_last; [ | flia ].
 erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   replace (j - 1 - 1) with (j - 2) by flia.
-  destruct (Nat.eq_dec (vect_el (vect_el (sym_gr n) k) (j - 2)) i)
+  destruct (Nat.eq_dec (vect_el (vect_el (mk_canon_sym_gr n) k) (j - 2)) i)
     as [Hpj| Hpj]. {
     exfalso.
     rewrite <- Hpp in Hpj.
@@ -296,7 +296,7 @@ destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
 do 4 rewrite rngl_mul_assoc.
 remember
   (Π (i0 = 2, p + 1),
-   mat_el M (i0 - 2) (vect_el (vect_el (sym_gr n) k) (i0 - 2)%nat))%F
+   mat_el M (i0 - 2) (vect_el (vect_el (mk_canon_sym_gr n) k) (i0 - 2)%nat))%F
   as q eqn:Hq.
 rewrite (rngl_mul_mul_swap Hic _ _ q).
 do 3 rewrite (rngl_mul_comm Hic _ q).
@@ -306,7 +306,7 @@ f_equal.
 clear q Hq.
 erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
-  destruct (Nat.eq_dec (vect_el (vect_el (sym_gr n) k) (j - 1)) i)
+  destruct (Nat.eq_dec (vect_el (vect_el (mk_canon_sym_gr n) k) (j - 1)) i)
     as [Hpj| Hpj]. {
     rewrite <- Hpp in Hpj.
     apply permut_elem_injective in Hpj; [ | easy | flia Hp Hj | easy ].
@@ -317,7 +317,7 @@ erewrite rngl_product_eq_compat. 2: {
 symmetry.
 erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
-  destruct (Nat.eq_dec (vect_el (vect_el (sym_gr n) k) (j - 1)) i)
+  destruct (Nat.eq_dec (vect_el (vect_el (mk_canon_sym_gr n) k) (j - 1)) i)
     as [Hpj| Hpj]. {
     rewrite <- Hpp in Hpj.
     apply permut_elem_injective in Hpj; [ | easy | flia Hp Hj | easy ].
@@ -328,7 +328,7 @@ erewrite rngl_product_eq_compat. 2: {
 rewrite rngl_add_comm.
 erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
-  destruct (Nat.eq_dec (vect_el (vect_el (sym_gr n) k) (j - 1)) i)
+  destruct (Nat.eq_dec (vect_el (vect_el (mk_canon_sym_gr n) k) (j - 1)) i)
     as [Hpj| Hpj]. {
     rewrite <- Hpp in Hpj.
     apply permut_elem_injective in Hpj; [ | easy | flia Hp Hj | easy ].
@@ -349,7 +349,7 @@ Definition determinant'_list {n} (M : matrix n n T) :=
   map (λ k,
     (ε_permut n k *
      Π (i = 1, n),
-     mat_el M (i - 1) (vect_el (vect_el (sym_gr n) k) (i - 1)%nat))%F)
+     mat_el M (i - 1) (vect_el (vect_el (mk_canon_sym_gr n) k) (i - 1)%nat))%F)
     (seq 0 n!).
 
 Arguments determinant'_list {n}%nat M%M.
@@ -496,7 +496,7 @@ erewrite rngl_summation_eq_compat. 2: {
   erewrite rngl_product_list_eq_compat. 2: {
     intros i Hi.
     replace (mat_el _ _ _) with
-      (mat_el M i (vect_el (vect_el (sym_gr n) k) (transposition p q i))). 2: {
+      (mat_el M i (vect_el (vect_el (mk_canon_sym_gr n) k) (transposition p q i))). 2: {
       cbn.
       unfold transposition.
       do 2 rewrite if_eqb_eq_dec.
@@ -520,7 +520,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ mat_swap_rows ].
-set (f := λ k, vect_swap_elem (vect_el (sym_gr n) k) p q).
+set (f := λ k, vect_swap_elem (vect_el (mk_canon_sym_gr n) k) p q).
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   assert (Hkn : k < n!). {
@@ -534,7 +534,7 @@ erewrite rngl_summation_eq_compat. 2: {
     now replace (vect_el _ _) with (vect_el (f k) i).
   }
   cbn - [ f ].
-  replace (vect_el (sym_gr n) k) with
+  replace (vect_el (mk_canon_sym_gr n) k) with
     (mk_vect n (λ i, vect_el (f k) (transposition p q i))). 2: {
     apply vector_eq.
     intros i Hi; cbn.
@@ -1491,7 +1491,7 @@ f_equal. {
 Qed.
 
 Definition swap_in_permut n i j k :=
-  vect_swap_elem (vect_el (sym_gr n) k) i j.
+  vect_swap_elem (vect_el (mk_canon_sym_gr n) k) i j.
 
 (* comatrix *)
 
@@ -2245,7 +2245,7 @@ Theorem det_any_permut :
   n ≠ 0
   → is_permut σ
   → determinant M =
-    (Σ (μ ∈ sym_gr n), ε μ * ε σ *
+    (Σ (μ ∈ mk_canon_sym_gr n), ε μ * ε σ *
      Π (k = 0, n - 1), mat_el M (vect_el σ k) (vect_el μ k))%F.
 Proof.
 intros Hop Hiv Hic Hde H10 Hit Hch * Hnz Hσ.
@@ -2265,7 +2265,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   subst ν.
   rewrite <- Hσν at 1.
   assert (Hpμ : is_permut μ). {
-    unfold sym_gr in Hμ.
+    unfold mk_canon_sym_gr in Hμ.
     apply in_map_iff in Hμ.
     destruct Hμ as (i & Hi & His).
     rewrite <- Hi.
@@ -2289,7 +2289,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn - [ "°" ].
-unfold sym_gr.
+unfold mk_canon_sym_gr.
 rewrite <- rngl_summation_list_change_var.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
@@ -2502,7 +2502,7 @@ rewrite rngl_summation_list_change_var with
   (g :=
      λ k,
      (ε k * Π (i = 0, n - 1), mat_el M (vect_el σ i) (vect_el (σ ° k) i))%F).
-unfold sym_gr.
+unfold mk_canon_sym_gr.
 rewrite map_map.
 rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
@@ -2516,7 +2516,7 @@ rewrite Nat.add_0_l.
 cbn.
 rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
-unfold sym_gr.
+unfold mk_canon_sym_gr.
 rewrite rngl_summation_map_seq.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
@@ -2611,7 +2611,7 @@ Search (ε _ * ε _)%F.
 }
 cbn.
 rewrite <- rngl_mul_summation_list_distr_l; [ | easy ].
-unfold sym_gr.
+unfold mk_canon_sym_gr.
 rewrite rngl_summation_map_seq.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 cbn.
