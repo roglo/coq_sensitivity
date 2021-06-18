@@ -2229,10 +2229,6 @@ Definition sym_gr (n : nat) :=
   map (λ v, canon_permut n v) (seq 0 n!).
 *)
 
-Print determinant'.
-
-...
-
 Theorem det_any_permut :
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -2245,7 +2241,7 @@ Theorem det_any_permut :
   n ≠ 0
   → is_permut σ
   → determinant M =
-    (Σ (μ ∈ mk_canon_sym_gr n), ε μ * ε σ *
+    (Σ (μ ∈ list_of_vect (mk_canon_sym_gr n)), ε μ * ε σ *
      Π (k = 0, n - 1), mat_el M (vect_el σ k) (vect_el μ k))%F.
 Proof.
 intros Hop Hiv Hic Hde H10 Hit Hch * Hnz Hσ.
@@ -2289,16 +2285,16 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn - [ "°" ].
-unfold mk_canon_sym_gr.
+unfold list_of_vect.
 rewrite <- rngl_summation_list_change_var.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
 (*1*)
-set (ν := λ i, canon_permut n i ° permut_inv σ).
+set (ν := λ i, vect_el (mk_canon_sym_gr n) i ° permut_inv σ).
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_mul_comm; [ | easy ].
-  replace (canon_permut n i ° permut_inv σ) with (ν i) by easy.
+  replace (vect_el (mk_canon_sym_gr n) i ° permut_inv σ) with (ν i) by easy.
   unfold "°".
   unfold comp.
   easy.
