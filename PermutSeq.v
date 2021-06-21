@@ -146,12 +146,13 @@ Fixpoint mk_canon_sym_gr n : vector n! (vector n nat) :=
       mk_vect (S n')! (λ k, mk_vect (S n') (sym_gr_fun (mk_canon_sym_gr n') k))
   end.
 
+Definition is_sym_gr n (σ : vector n! (vector n nat)) :=
+  (∀ i j, i < n! → j < n! → vect_el σ i = vect_el σ j → i = j) ∧
+  (∀ i, i < n! → is_permut (vect_el σ i)).
+
 Record sym_gr n :=
   { sg_vect : vector n! (vector n nat);
-    sg_prop :
-      (∀ i j,
-       i < n! → j < n! → vect_el sg_vect i = vect_el sg_vect j → i = j) ∧
-      (∀ i, i < n! → is_permut (vect_el sg_vect i)) }.
+    sg_prop : is_sym_gr sg_vect }.
 
 Definition sub_permut n (v : vector n nat) n' :=
   let d := vect_el v 0 in
@@ -339,10 +340,7 @@ split. {
 }
 Qed.
 
-Theorem canon_sym_gr_prop : ∀ n,
-  (∀ i j,
-   i < n! → j < n! → vect_el (mk_canon_sym_gr n) i = vect_el (mk_canon_sym_gr n) j → i = j) ∧
-  (∀ i, i < n! → is_permut (vect_el (mk_canon_sym_gr n) i)).
+Theorem canon_sym_gr_prop : ∀ n, is_sym_gr (mk_canon_sym_gr n).
 Proof.
 intros.
 split. {

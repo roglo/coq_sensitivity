@@ -2306,6 +2306,8 @@ erewrite rngl_summation_eq_compat. 2: {
     (f := λ j, mat_el M j (vect_el (ν i) j)).
 }
 cbn - [ ν ].
+assert (is_sym_gr (mk_vect n! ν)).
+Check (mk_vect n! ν).
 ...
 apply det_by_any_permut.
 ...1
