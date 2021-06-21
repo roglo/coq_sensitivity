@@ -2229,9 +2229,12 @@ Theorem det_by_any_sym_gr :
   is_sym_gr σ
   → determinant M =
     Σ (k = 0, n! - 1),
-    ε (vect_el σ k) * Π (i = 0, n - 1), mat_el M i (vect_el (vect_el σ k) i).
+    ε (vect_el σ k) *
+    Π (i = 1, n), mat_el M (i - 1) (vect_el (vect_el σ k) (i - 1)).
 Proof.
 intros * Hσ.
+rewrite det_is_det_by_canon_permut.
+unfold determinant'.
 ...
 
 Theorem det_any_permut :
