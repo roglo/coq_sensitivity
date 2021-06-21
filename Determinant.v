@@ -2225,6 +2225,13 @@ Theorem comp_id_l : ∀ A B (f : A → B), comp id f = f.
 Proof. easy. Qed.
 
 Theorem det_by_any_sym_gr :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_integral = true →
+  rngl_has_1_neq_0 = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
   ∀ n (M : matrix n n T) (σ : vector n! (vector n nat)),
   is_sym_gr σ
   → determinant M =
@@ -2232,8 +2239,8 @@ Theorem det_by_any_sym_gr :
     ε (vect_el σ k) *
     Π (i = 1, n), mat_el M (i - 1) (vect_el (vect_el σ k) (i - 1)).
 Proof.
-intros * Hσ.
-rewrite det_is_det_by_canon_permut.
+intros Hic Hop Hiv Hit H10 Hed Hch * Hσ.
+rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
 ...
 
