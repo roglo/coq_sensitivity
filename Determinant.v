@@ -2242,7 +2242,6 @@ Proof.
 intros Hic Hop Hiv Hit H10 Hed Hch * Hσ.
 rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
-Search (Σ (_ = _, _), _ = Σ (_ = _, _), _)%F.
 Theorem glop : ∀ n (σ σ' : vector n! _),
   is_sym_gr σ
   → is_sym_gr σ'
