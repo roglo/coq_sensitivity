@@ -2224,10 +2224,15 @@ Qed.
 Theorem comp_id_l : ∀ A B (f : A → B), comp id f = f.
 Proof. easy. Qed.
 
-(*
-Definition sym_gr (n : nat) :=
-  map (λ v, canon_permut n v) (seq 0 n!).
-*)
+Theorem det_by_any_sym_gr :
+  ∀ n (M : matrix n n T) (σ : vector n! (vector n nat)),
+  is_sym_gr σ
+  → determinant M =
+    Σ (k = 0, n! - 1),
+    ε (vect_el σ k) * Π (i = 0, n - 1), mat_el M i (vect_el (vect_el σ k) i).
+Proof.
+intros * Hσ.
+...
 
 Theorem det_any_permut :
   rngl_has_opp = true →
@@ -2306,10 +2311,10 @@ erewrite rngl_summation_eq_compat. 2: {
     (f := λ j, mat_el M j (vect_el (ν i) j)).
 }
 cbn - [ ν ].
-assert (is_sym_gr (mk_vect n! ν)).
-Check (mk_vect n! ν).
+assert (Hν : is_sym_gr (mk_vect n! ν)). {
 ...
-apply det_by_any_permut.
+}
+apply (det_by_any_sym_gr M Hν).
 ...1
 remember
   (map
