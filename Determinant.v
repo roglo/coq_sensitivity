@@ -2242,6 +2242,14 @@ Proof.
 intros Hic Hop Hiv Hit H10 Hed Hch * Hσ.
 rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
+Search (Σ (_ = _, _), _ = Σ (_ = _, _), _)%F.
+...
+rngl_summation_permut:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T
+    → ∀ (n : nat) (l1 l2 : list T),
+        Permutation l1 l2
+        → length l1 = n → length l2 = n → Σ (i = 0, n - 1), nth i l1 0 = Σ (i = 0, n - 1), nth i l2 0
 ...
 
 Theorem det_any_permut :
