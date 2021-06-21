@@ -2243,6 +2243,24 @@ intros Hic Hop Hiv Hit H10 Hed Hch * Hσ.
 rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
 Search (Σ (_ = _, _), _ = Σ (_ = _, _), _)%F.
+Theorem glop : ∀ n (σ σ' : vector n! _),
+  is_sym_gr σ
+  → is_sym_gr σ'
+  → (∀ i, i < n! → ∃ j, j < n! ∧ vect_el σ i = vect_el σ' j) ∧
+    (∀ i, i < n! → ∃ j, j < n! ∧ vect_el σ j = vect_el σ' i).
+Admitted.
+specialize (glop (canon_sym_gr_prop n) Hσ) as H1.
+destruct H1 as (H1, H2).
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  specialize (H1 k).
+  assert (H : k < n!). {
+    specialize (fact_neq_0 n) as H.
+    flia Hk H.
+  }
+  specialize (H1 H); clear H.
+  destruct H1 as (j & Hjn & Hj).
+  rewrite Hj.
 ...
 rngl_summation_permut:
   ∀ (T : Type) (ro : ring_like_op T),
