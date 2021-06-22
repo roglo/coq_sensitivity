@@ -2213,12 +2213,24 @@ intros Hic Hop Hiv Hit H10 Hed Hch * Hσ.
 rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
 remember (mk_canon_sym_gr n) as σ' eqn:Hσ'.
+Search (Σ (_ ∈ _), _ = Σ (_ ∈ _), _).
+...
+rngl_summation_list_permut:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T
+    → ∀ (A : Type) (l1 l2 : list A) (f : A → T), Permutation l1 l2 → Σ (i ∈ l1), f i = Σ (i ∈ l2), f i
+rngl_summation_permut:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T
+    → ∀ (n : nat) (l1 l2 : list T),
+        Permutation l1 l2
+        → length l1 = n → length l2 = n → Σ (i = 0, n - 1), nth i l1 0 = Σ (i = 0, n - 1), nth i l2 0
 ...
 Theorem glop : ∀ n (σ σ' : vector n! _),
   is_sym_gr σ
   → is_sym_gr σ'
   → ∃ f, ∀ i, i < n! → vect_el σ i = vect_el σ' (f i).
-Admitted.
+...
 specialize (glop (canon_sym_gr_prop n) Hσ) as H1.
 destruct H1 as (f, Hf).
 erewrite rngl_summation_eq_compat. 2: {
