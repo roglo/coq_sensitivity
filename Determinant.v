@@ -2231,21 +2231,8 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
-induction n. {
-  cbn.
-  rewrite rngl_summation_only_one; [ | easy ].
-  rewrite rngl_summation_only_one; [ | easy ].
-  rewrite rngl_product_empty; [ | flia ].
-  rewrite rngl_product_empty; [ | flia ].
-  do 2 rewrite rngl_mul_1_r.
-  specialize (Hf 0 Nat.lt_0_1) as H1.
-  cbn; cbn in H1.
-  rewrite <- H1; cbn.
+induction n; [ easy | ].
 ...
-  specialize (H1 0 Nat.lt_0_1) as H3.
-  apply Nat.lt_1_r in H3.
-  now rewrite H3.
-}
 set (g := λ i, if lt_dec i (vect_el (permut_inv σ) (S n)) then i else i + 1).
 set (σ' := mk_vect (S n) (λ i, vect_el σ (g i))).
 specialize (IHn σ').
