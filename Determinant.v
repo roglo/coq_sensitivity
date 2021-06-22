@@ -2249,7 +2249,27 @@ destruct n. {
   cbn in H2; cbn.
   now rewrite H2.
 }
-...
+destruct n. {
+  cbn.
+  unfold iter_seq, iter_list.
+  cbn.
+  do 2 rewrite rngl_add_0_l.
+  do 4 rewrite rngl_mul_1_l.
+  specialize (Hf 0 Nat.lt_0_2) as H1.
+  specialize (Hf 1 Nat.lt_1_2) as H2.
+  cbn in H1, H2; cbn.
+  rewrite <- H1, <- H2; cbn.
+  rewrite ε_ws_ε; try easy.
+  rewrite ε_ws_ε; try easy.
+  rewrite ε_ws_ε; try easy.
+  rewrite ε_ws_ε; try easy.
+  unfold ε_ws; cbn.
+  unfold ε_fun_ws; cbn.
+  unfold iter_seq, iter_list; cbn.
+  repeat rewrite rngl_mul_1_l.
+  repeat rewrite rngl_mul_1_r.
+  unfold sign_diff.
+....
 rngl_summation_permut:
   ∀ (T : Type) (ro : ring_like_op T),
     ring_like_prop T
