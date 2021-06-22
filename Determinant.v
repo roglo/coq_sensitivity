@@ -1910,8 +1910,8 @@ destruct n; [ easy | clear Hnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
 destruct Hσ as (H1, H2).
 induction n; cbn. {
-  rewrite rngl_product_only_one; [ | easy ].
-  rewrite rngl_product_only_one; [ | easy ].
+  rewrite rngl_product_only_one.
+  rewrite rngl_product_only_one.
   specialize (H1 0 Nat.lt_0_1) as H3.
   apply Nat.lt_1_r in H3.
   now rewrite H3.
@@ -2232,10 +2232,23 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn.
 induction n; [ easy | ].
-...
-set (g := λ i, if lt_dec i (vect_el (permut_inv σ) (S n)) then i else i + 1).
-set (σ' := mk_vect (S n) (λ i, vect_el σ (g i))).
-specialize (IHn σ').
+destruct n. {
+  cbn.
+  do 2 rewrite rngl_summation_only_one.
+  do 2 rewrite rngl_product_only_one.
+  cbn.
+  specialize (Hf 0 Nat.lt_0_1).
+  cbn in Hf.
+  rewrite <- Hf; cbn.
+  destruct Hσ as (H1, H2).
+  specialize (H2 0 Nat.lt_0_1).
+  unfold is_permut in H2.
+  destruct H2 as (H2, H3).
+  specialize (H2 0 Nat.lt_0_1).
+  apply Nat.lt_1_r in H2.
+  cbn in H2; cbn.
+  now rewrite H2.
+}
 ...
 rngl_summation_permut:
   ∀ (T : Type) (ro : ring_like_op T),

@@ -577,3 +577,4 @@ Arguments rngl_summation_change_var {T ro rp} A%type (b e)%nat
 Arguments rngl_summation_map_seq {T ro rp} A%type (start len)%nat
   (f g)%function.
 Arguments rngl_summation_permut {T}%type {ro rp} n%nat (l1 l2)%list.
+Arguments rngl_summation_only_one {T}%type {ro rp} g%function n%nat.

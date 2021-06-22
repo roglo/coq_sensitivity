@@ -524,3 +524,4 @@ Arguments rngl_product_list_integral {T}%type {ro rp} _ _ _ A%type l%list f%func
 Arguments rngl_product_split_first {T}%type {ro rp} (b k)%nat g%function.
 Arguments rngl_product_1_opp_1 {T}%type {ro rp} _ (b e)%nat (f g)%function.
 Arguments rngl_product_permut {T}%type {ro rp} Hic n%nat (l1 l2)%list.
+Arguments rngl_product_only_one {T}%type {ro rp} g%function n%nat.
