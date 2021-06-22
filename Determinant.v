@@ -2213,7 +2213,7 @@ intros Hic Hop Hiv Hit H10 Hed Hch * Hσ.
 rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
 remember (mk_canon_sym_gr n) as σ' eqn:Hσ'.
-specialize (rngl_summation_change_var) as H1.
+specialize rngl_summation_change_var as H1.
 specialize (H1 nat 0 (n! - 1)).
 set
   (f := λ k,
@@ -2231,7 +2231,17 @@ specialize (H2 n (mk_canon_sym_gr n) σ).
 specialize (H2 (canon_sym_gr_prop n) Hσ).
 rewrite <- Hσ' in H2.
 destruct H2 as (g, Hg).
-erewrite H1 with (g := g).
+assert (Hh : ∃ h, ∀ i, i < n! → g (h i) = i).
+admit.
+destruct Hh as (h, Hh).
+rewrite H1 with (g := g) (h := h).
+assert (H : ∀ i, i < n! → h i < n!). {
+  intros i Hi.
+...
+rngl_summation_list_permut:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T
+    → ∀ (A : Type) (l1 l2 : list A) (f : A → T), Permutation l1 l2 → Σ (i ∈ l1), f i = Σ (i ∈ l2), f i
 ...
 rngl_summation_list_change_var:
   ∀ (T : Type) (ro : ring_like_op T) (A B : Type) (f : A → B) (g : B → T) (l : list A),
@@ -2248,11 +2258,6 @@ rngl_summation_permut:
     → ∀ (n : nat) (l1 l2 : list T),
         Permutation l1 l2
         → length l1 = n → length l2 = n → Σ (i = 0, n - 1), nth i l1 0 = Σ (i = 0, n - 1), nth i l2 0
-...
-Theorem glop : ∀ n (σ σ' : vector n! _),
-  is_sym_gr σ
-  → is_sym_gr σ'
-  → ∃ f, ∀ i, i < n! → vect_el σ i = vect_el σ' (f i).
 ...
 specialize (glop (canon_sym_gr_prop n) Hσ) as H1.
 destruct H1 as (f, Hf).
