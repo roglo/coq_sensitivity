@@ -2202,6 +2202,12 @@ Theorem fun_betw_sym_gr : ∀ n (σ σ' : vector n! _),
 Proof.
 intros * Hnz Hσ Hσ'.
 destruct n; [ easy | clear Hnz ].
+...
+destruct Hσ as (H1, H2).
+destruct Hσ' as (H3, H4).
+...
+intros * Hnz Hσ Hσ'.
+destruct n; [ easy | clear Hnz ].
 induction n. {
   cbn.
   exists (λ i, i).
@@ -2224,8 +2230,8 @@ induction n. {
   cbn in H2, H4.
   congruence.
 }
-Check mk_vect.
-assert (∀ i, i < S (S n)! →
+Check (mk_vect (S n)! (λ i, vect_el σ (i / (S n)!))).
+assert (∀ i, i < S (S n)! → IHn (
 ...
 specialize (IHn (mk_vect (S n)! (λ i, let j := i / (S n)! in
 ...
