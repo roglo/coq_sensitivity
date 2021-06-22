@@ -2221,7 +2221,17 @@ set
     Π (i = 1, n), mat_el M (i - 1) (vect_el (vect_el σ' k) (i - 1)))%F).
 specialize (H1 f).
 unfold f in H1.
-erewrite H1.
+Theorem glop : ∀ n (σ σ' : vector n! _),
+  is_sym_gr σ
+  → is_sym_gr σ'
+  → ∃ f, ∀ i, i < n! → vect_el σ (f i) = vect_el σ' i.
+Admitted.
+specialize glop as H2.
+specialize (H2 n (mk_canon_sym_gr n) σ).
+specialize (H2 (canon_sym_gr_prop n) Hσ).
+rewrite <- Hσ' in H2.
+destruct H2 as (g, Hg).
+erewrite H1 with (g := g).
 ...
 find g such that
 vect_el σ' (g i) = vect_el σ i
