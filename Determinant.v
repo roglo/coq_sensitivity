@@ -2233,9 +2233,6 @@ rewrite <- Hσ' in H2.
 destruct H2 as (g, Hg).
 erewrite H1 with (g := g).
 ...
-find g such that
-vect_el σ' (g i) = vect_el σ i
-...
 rngl_summation_list_change_var:
   ∀ (T : Type) (ro : ring_like_op T) (A B : Type) (f : A → B) (g : B → T) (l : list A),
     Σ (i ∈ l), g (f i) = Σ (j ∈ map f l), g j
