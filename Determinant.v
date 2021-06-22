@@ -2235,6 +2235,10 @@ assert (Hh : ∃ h, ∀ i, i < n! → g (h i) = i).
 admit.
 destruct Hh as (h, Hh).
 rewrite H1 with (g := g) (h := h).
+assert (H : ∀ i, i < n! → h (g i) = i). {
+  intros i Hi.
+  destruct Hσ as (H2, H3).
+...
 assert (H : ∀ i, i < n! → h i < n!). {
   intros i Hi.
 ...
