@@ -2194,6 +2194,46 @@ Qed.
 Theorem comp_id_l : ∀ A B (f : A → B), comp id f = f.
 Proof. easy. Qed.
 
+Theorem fun_betw_sym_gr : ∀ n (σ σ' : vector n! _),
+  n ≠ 0
+  → is_sym_gr σ
+  → is_sym_gr σ'
+  → { f | ∀ i, i < n! → vect_el σ (f i) = vect_el σ' i }.
+Proof.
+intros * Hnz Hσ Hσ'.
+destruct n; [ easy | clear Hnz ].
+induction n. {
+  cbn.
+  exists (λ i, i).
+  intros i Hi.
+  apply vector_eq.
+  intros j Hj.
+  apply Nat.lt_1_r in Hi.
+  apply Nat.lt_1_r in Hj.
+  subst i j.
+  destruct Hσ as (H1, H2).
+  destruct Hσ' as (H3, H4).
+  specialize (H2 0 Nat.lt_0_1).
+  destruct H2 as (H2, H2').
+  specialize (H2 0 Nat.lt_0_1).
+  apply Nat.lt_1_r in H2.
+  specialize (H4 0 Nat.lt_0_1).
+  destruct H4 as (H4, H4').
+  specialize (H4 0 Nat.lt_0_1).
+  apply Nat.lt_1_r in H4.
+  cbn in H2, H4.
+  congruence.
+}
+Check mk_vect.
+assert (∀ i, i < S (S n)! →
+...
+specialize (IHn (mk_vect (S n)! (λ i, let j := i / (S n)! in
+...
+intros * Hσ Hσ'.
+destruct Hσ as (H1, H2).
+destruct Hσ' as (H3, H4).
+...
+
 Theorem det_by_any_sym_gr :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -2221,12 +2261,8 @@ set
     Π (i = 1, n), mat_el M (i - 1) (vect_el (vect_el σ' k) (i - 1)))%F).
 specialize (H1 f).
 unfold f in H1.
-Theorem glop : ∀ n (σ σ' : vector n! _),
-  is_sym_gr σ
-  → is_sym_gr σ'
-  → ∃ f, ∀ i, i < n! → vect_el σ (f i) = vect_el σ' i.
-Admitted.
-specialize glop as H2.
+...
+specialize fun_betw_sym_gr as H2.
 specialize (H2 n (mk_canon_sym_gr n) σ).
 specialize (H2 (canon_sym_gr_prop n) Hσ).
 rewrite <- Hσ' in H2.
