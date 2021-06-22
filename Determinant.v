@@ -2176,36 +2176,6 @@ intros i Hi.
 rewrite Nat.sub_add; [ easy | flia Hi ].
 Qed.
 
-(*
-Theorem det_by_any_sym_gr_order :
-  ∀ n (M : matrix n n T) (sym_gr' : vector n! (vector n nat)),
-  (∀ i j, vect_el sym_gr' i = vect_el sym_gr' j → i = j)
-  → (∀ v, ∃ i, vect_el sym_gr' i = v)
-  → determinant M =
-    Σ (k = 0, n! - 1),
-    ε (vect_el sym_gr' k) * Π (i = 0, n - 1), mat_el M i (vect_el (vect_el sym_gr' k) i).
-Proof.
-intros * Hinj Hsurj.
-(* oui mais non *)
-...
-
-Theorem det_by_any_permut : ∀ n (M : matrix n n T) (σ : nat → vector n nat),
-  (∀ i, i < n! → ∃ j, j < n! ∧ σ i = vect_el (sym_gr n) j)
-  → (∀ i, i < n! → ∃ j, j < n! ∧ σ j = vect_el (sym_gr n) i)
-  → determinant M =
-    Σ (k = 0, n! - 1),
-    ε (σ k) * Π (i = 0, n - 1), mat_el M i (vect_el (σ k) i).
-Proof.
-intros * Hcσ Hσc.
-assert (σ_is_permut : ∀ k : nat, k < n! → is_permut (σ k)). {
-  intros * Hk.
-  specialize (Hcσ k Hk) as (a & Han & Ha).
-  rewrite Ha.
-  now apply sym_gr_elem_is_permut.
-}
-...
-*)
-
 Theorem permut_comp_assoc : ∀ n (f g h : vector n nat),
   (f ° (g ° h) = (f ° g) ° h)%F.
 Proof. easy. Qed.
@@ -2245,21 +2215,40 @@ unfold determinant'.
 Theorem glop : ∀ n (σ σ' : vector n! _),
   is_sym_gr σ
   → is_sym_gr σ'
-  → (∀ i, i < n! → ∃ j, j < n! ∧ vect_el σ i = vect_el σ' j) ∧
-    (∀ i, i < n! → ∃ j, j < n! ∧ vect_el σ j = vect_el σ' i).
+  → ∃ f, ∀ i, i < n! → vect_el σ i = vect_el σ' (f i).
 Admitted.
 specialize (glop (canon_sym_gr_prop n) Hσ) as H1.
-destruct H1 as (H1, H2).
+destruct H1 as (f, Hf).
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
-  specialize (H1 k).
+  specialize (Hf k).
   assert (H : k < n!). {
     specialize (fact_neq_0 n) as H.
     flia Hk H.
   }
-  specialize (H1 H); clear H.
-  destruct H1 as (j & Hjn & Hj).
-  rewrite Hj.
+  specialize (Hf H); clear H.
+  rewrite Hf.
+  easy.
+}
+cbn.
+induction n. {
+  cbn.
+  rewrite rngl_summation_only_one; [ | easy ].
+  rewrite rngl_summation_only_one; [ | easy ].
+  rewrite rngl_product_empty; [ | flia ].
+  rewrite rngl_product_empty; [ | flia ].
+  do 2 rewrite rngl_mul_1_r.
+  specialize (Hf 0 Nat.lt_0_1) as H1.
+  cbn; cbn in H1.
+  rewrite <- H1; cbn.
+...
+  specialize (H1 0 Nat.lt_0_1) as H3.
+  apply Nat.lt_1_r in H3.
+  now rewrite H3.
+}
+set (g := λ i, if lt_dec i (vect_el (permut_inv σ) (S n)) then i else i + 1).
+set (σ' := mk_vect (S n) (λ i, vect_el σ (g i))).
+specialize (IHn σ').
 ...
 rngl_summation_permut:
   ∀ (T : Type) (ro : ring_like_op T),
