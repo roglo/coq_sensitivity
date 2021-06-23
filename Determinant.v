@@ -2202,6 +2202,7 @@ Theorem fun_betw_sym_gr : ∀ n (σ σ' : vector n! _),
 Proof.
 intros * Hnz Hσ Hσ'.
 destruct n; [ easy | clear Hnz ].
+Abort. (*
 ...
 destruct Hσ as (H1, H2).
 destruct Hσ' as (H3, H4).
@@ -2239,6 +2240,7 @@ intros * Hσ Hσ'.
 destruct Hσ as (H1, H2).
 destruct Hσ' as (H3, H4).
 ...
+*)
 
 Theorem det_by_any_sym_gr :
   rngl_is_comm = true →
