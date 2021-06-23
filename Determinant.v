@@ -2251,13 +2251,14 @@ Theorem det_by_any_sym_gr :
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
   ∀ n (M : matrix n n T) (σ : vector n! (vector n nat)),
-  is_sym_gr σ
+  n ≠ 0
+  → is_sym_gr σ
   → determinant M =
     Σ (k = 0, n! - 1),
     ε (vect_el σ k) *
     Π (i = 1, n), mat_el M (i - 1) (vect_el (vect_el σ k) (i - 1)).
 Proof.
-intros Hic Hop Hiv Hit H10 Hed Hch * Hσ.
+intros Hic Hop Hiv Hit H10 Hed Hch * Hnz Hσ.
 rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
 remember (mk_canon_sym_gr n) as σ' eqn:Hσ'.
@@ -2271,7 +2272,6 @@ specialize (H1 f).
 unfold f in H1.
 specialize fun_betw_sym_gr as H2.
 specialize (H2 n (mk_canon_sym_gr n) σ).
-enough (Hnz : n ≠ 0).
 specialize (H2 Hnz (canon_sym_gr_prop n) Hσ).
 rewrite <- Hσ' in H2.
 destruct H2 as (g, Hg).
