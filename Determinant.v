@@ -2202,7 +2202,7 @@ Theorem fun_betw_sym_gr : ∀ n (σ σ' : vector n! _),
 Proof.
 intros * Hnz Hσ Hσ'.
 destruct n; [ easy | clear Hnz ].
-Abort. (*
+Admitted. (*
 ...
 destruct Hσ as (H1, H2).
 destruct Hσ' as (H3, H4).
@@ -2269,16 +2269,17 @@ set
     Π (i = 1, n), mat_el M (i - 1) (vect_el (vect_el σ' k) (i - 1)))%F).
 specialize (H1 f).
 unfold f in H1.
-...
 specialize fun_betw_sym_gr as H2.
 specialize (H2 n (mk_canon_sym_gr n) σ).
-specialize (H2 (canon_sym_gr_prop n) Hσ).
+enough (Hnz : n ≠ 0).
+specialize (H2 Hnz (canon_sym_gr_prop n) Hσ).
 rewrite <- Hσ' in H2.
 destruct H2 as (g, Hg).
 assert (Hh : ∃ h, ∀ i, i < n! → g (h i) = i).
 admit.
 destruct Hh as (h, Hh).
 rewrite H1 with (g := g) (h := h).
+...
 assert (H : ∀ i, i < n! → h (g i) = i). {
   intros i Hi.
   destruct Hσ as (H2, H3).
