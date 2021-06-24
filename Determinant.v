@@ -2207,10 +2207,12 @@ Print is_sym_gr.
 Print Module Pigeonhole.
 Print permut_fun_inv.
 Print permut_fun_inv'.
-Search permut_fun_inv.
-Print permut_fun_inv'.
+Check (λ i, vect_el (vect_el σ i)).
 Print is_permut_fun.
-Check (vect_el σ).
+Search permut_fun_inv.
+...
+unfold is_permut in H2.
+Print permut_fun_inv'.
 permut_fun = vect_el σ
 exists (permut_fun_inv n
 ...
