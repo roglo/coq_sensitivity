@@ -2204,6 +2204,8 @@ intros * Hnz Hσ Hσ'.
 destruct n; [ easy | clear Hnz ].
 destruct Hσ as (H1, H2).
 destruct Hσ' as (H3, H4).
+assert (Hσp : ∀ p, is_permut p → { i | vect_el σ i = p }). {
+  intros p Hp.
 ...
 intros * Hnz Hσ Hσ'.
 destruct n; [ easy | clear Hnz ].
