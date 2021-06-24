@@ -2194,13 +2194,26 @@ Qed.
 Theorem comp_id_l : ∀ A B (f : A → B), comp id f = f.
 Proof. easy. Qed.
 
-Theorem fun_betw_sym_gr : ∀ n (σ σ' : vector n! _),
+Theorem glop : ∀ n (σ : vector n! _) p,
+  n ≠ 0
+  → is_sym_gr σ
+  → is_permut p
+  → { i | i < n! ∧ vect_el σ i = p }.
+Proof.
+intros * Hnz Hσ Hp.
+destruct Hσ as (H1, H2).
+...
+
+Theorem glop : ∀ n (σ σ' : vector n! _),
   n ≠ 0
   → is_sym_gr σ
   → is_sym_gr σ'
-  → { σ'' : vector n! _ | ∀ i, vect_el σ i ° vect_el σ'' i = vect_el σ' i }.
+  → { σ'' : vector n! _ |
+      is_sym_gr σ'' ∧ ∀ i, vect_el σ i ° vect_el σ'' i = vect_el σ' i }.
 Proof.
 intros * Hnz Hσ Hσ'.
+destruct Hσ as (H1, H2).
+destruct Hσ' as (H3, H4).
 ...
 
 Theorem fun_betw_sym_gr : ∀ n (σ σ' : vector n! _),
