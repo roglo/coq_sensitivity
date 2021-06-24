@@ -2202,8 +2202,7 @@ Theorem sym_gr_surj : ∀ n (σ : vector n! _) p,
 Proof.
 intros * Hnz Hσ Hp.
 destruct Hσ as (H1, H2).
-Print is_permut.
-Print is_permut_fun.
+destruct Hp as (H3, H4).
 ...
 
 Theorem glop : ∀ n (σ σ' : vector n! _),
