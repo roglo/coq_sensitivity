@@ -2203,6 +2203,7 @@ Proof.
 intros * Hnz Hσ Hp.
 destruct Hσ as (H1, H2).
 destruct Hp as (H3, H4).
+Print is_sym_gr.
 ...
 
 Theorem glop : ∀ n (σ σ' : vector n! _),
