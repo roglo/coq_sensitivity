@@ -2198,6 +2198,15 @@ Theorem fun_betw_sym_gr : ∀ n (σ σ' : vector n! _),
   n ≠ 0
   → is_sym_gr σ
   → is_sym_gr σ'
+  → { σ'' : vector n! _ | ∀ i, vect_el σ i ° vect_el σ'' i = vect_el σ' i }.
+Proof.
+intros * Hnz Hσ Hσ'.
+...
+
+Theorem fun_betw_sym_gr : ∀ n (σ σ' : vector n! _),
+  n ≠ 0
+  → is_sym_gr σ
+  → is_sym_gr σ'
   → { f | ∀ i, i < n! → vect_el σ (f i) = vect_el σ' i }.
 Proof.
 intros * Hnz Hσ Hσ'.
@@ -2270,6 +2279,7 @@ set
     Π (i = 1, n), mat_el M (i - 1) (vect_el (vect_el σ' k) (i - 1)))%F).
 specialize (H1 f).
 unfold f in H1.
+...
 specialize fun_betw_sym_gr as H2.
 specialize (H2 n (mk_canon_sym_gr n) σ).
 specialize (H2 Hnz (canon_sym_gr_prop n) Hσ).
@@ -2369,6 +2379,7 @@ rngl_summation_permut:
         Permutation l1 l2
         → length l1 = n → length l2 = n → Σ (i = 0, n - 1), nth i l1 0 = Σ (i = 0, n - 1), nth i l2 0
 ...
+*)
 
 Theorem det_any_permut :
   rngl_has_opp = true →
