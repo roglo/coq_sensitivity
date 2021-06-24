@@ -2194,7 +2194,7 @@ Qed.
 Theorem comp_id_l : ∀ A B (f : A → B), comp id f = f.
 Proof. easy. Qed.
 
-Theorem glop : ∀ n (σ : vector n! _) p,
+Theorem sym_gr_surj : ∀ n (σ : vector n! _) p,
   n ≠ 0
   → is_sym_gr σ
   → is_permut p
