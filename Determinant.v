@@ -2202,8 +2202,6 @@ Theorem fun_betw_sym_gr : ∀ n (σ σ' : vector n! _),
 Proof.
 intros * Hnz Hσ Hσ'.
 destruct n; [ easy | clear Hnz ].
-Admitted. (*
-...
 destruct Hσ as (H1, H2).
 destruct Hσ' as (H3, H4).
 ...
@@ -2275,6 +2273,7 @@ specialize (H2 n (mk_canon_sym_gr n) σ).
 specialize (H2 Hnz (canon_sym_gr_prop n) Hσ).
 rewrite <- Hσ' in H2.
 destruct H2 as (g, Hg).
+...
 assert (Hh : ∃ h, ∀ i, i < n! → g (h i) = i).
 admit.
 destruct Hh as (h, Hh).
