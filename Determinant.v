@@ -2204,6 +2204,15 @@ intros * Hnz Hσ Hp.
 destruct Hσ as (H1, H2).
 destruct Hp as (H3, H4).
 Print is_sym_gr.
+Print Module Pigeonhole.
+Print permut_fun_inv.
+Print permut_fun_inv'.
+Search permut_fun_inv.
+Print permut_fun_inv'.
+Print is_permut_fun.
+Check (vect_el σ).
+permut_fun = vect_el σ
+exists (permut_fun_inv n
 ...
 
 Theorem glop : ∀ n (σ σ' : vector n! _),
