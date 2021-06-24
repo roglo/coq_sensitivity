@@ -2207,7 +2207,7 @@ Print is_sym_gr.
 Print Module Pigeonhole.
 Print permut_fun_inv.
 Print permut_fun_inv'.
-Check (λ i, vect_el (vect_el σ i)).
+Check (λ k, vect_el (vect_el σ k)).
 Print is_permut_fun.
 Search permut_fun_inv.
 ...
