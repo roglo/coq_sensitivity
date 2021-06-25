@@ -14,9 +14,39 @@ Require Import Pigeonhole.
 (* attempt to define the symmetric group as all automorphisms on a
    finite set *)
 
+Print FinFun.Bijective.
+
+Definition fin_bijective n (f : nat → nat) :=
+  ∃ g, (∀ a, a < n → g (f a) = a) ∧ (∀ a, a < n → f (g a) = a).
+
 Record sym_gr n := mk_sym_gr
-  { sg_perm : Fin.t n → Fin.t n;
-    sg_bij : FinFun.Bijective sg_perm }.
+  { sg_perm : nat → nat;
+    sg_bij : fin_bijective n sg_perm }.
+
+Definition sym_gr_fun n (σ_n : nat → nat → nat) k j : nat :=
+  match j with
+  | 0 => k / n!
+  | S j' => σ_n (k mod n!) j' + Nat.b2n (k / n! <=? σ_n (k mod n!) j')
+  end.
+
+Fixpoint mk_canon_sym_gr n : nat → nat → nat :=
+  match n with
+  | 0 => λ _ _, 0
+  | S n' => sym_gr_fun n (mk_canon_sym_gr n')
+  end.
+
+Check (mk_canon_sym_gr 3).
+
+Fixpoint list_of_truc n (f : nat → nat) :=
+  match n with
+  | 0 => []
+  | S n' => list_of_truc n' f ++ [f n']
+  end.
+
+Compute (list_of_truc 3 (mk_canon_sym_gr 3 0)).
+Compute (list_of_truc 3 (mk_canon_sym_gr 3 1)).
+
+...
 
 (*
 Definition sym_gr_fun n (σ_n : vector n! (vector n nat)) k j : nat :=
