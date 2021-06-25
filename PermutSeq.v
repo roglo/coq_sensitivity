@@ -156,20 +156,11 @@ Record sym_gr n :=
 
 (* *)
 
-Print Module FinFun.
-Print FinFun.Finite.
-Print FinFun.Full.
-
-Print Fin.t.
-
-Compute (@Fin.FS 1 Fin.F1).
-Compute (@Fin.F1 0).
+Record permut n :=
+  { p_perm : Fin.t n → Fin.t n;
+    p_bij : FinFun.Bijective p_perm }.
 
 ...
-
-Record sym_gr' :=
-  { sg_fin : FinFun.Finite nat;
-    sg_bij :}.
 
 (* attempt to have another definition of symmetric group, bu we don't
    know its size in advance: the fact that it is n! is then a theorem.
