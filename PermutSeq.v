@@ -11,17 +11,7 @@ Require Import Misc RingLike MyVector.
 Require Import RLproduct.
 Require Import Pigeonhole.
 
-(* attempt to define the symmetric group as all automorphisms on a
-   finite set *)
-
-Print FinFun.Bijective.
-
-Definition fin_bijective n (f : nat → nat) :=
-  ∃ g, (∀ a, a < n → g (f a) = a) ∧ (∀ a, a < n → f (g a) = a).
-
-Record sym_gr n := mk_sym_gr
-  { sg_perm : nat → nat;
-    sg_bij : fin_bijective n sg_perm }.
+(* attempt to define the symmetric group with functions *)
 
 Definition sym_gr_fun n (σ_n : nat → nat → nat) k j : nat :=
   match j with
@@ -42,13 +32,6 @@ Fixpoint list_of_truc n (f : nat → nat) :=
   | 0 => []
   | S n' => list_of_truc n' f ++ [f n']
   end.
-
-Compute (list_of_truc 3 (mk_canon_sym_gr 3 0)).
-Compute (list_of_truc 3 (mk_canon_sym_gr 3 1)).
-Compute (list_of_truc 3 (mk_canon_sym_gr 3 2)).
-Compute (list_of_truc 3 (mk_canon_sym_gr 3 3)).
-Compute (list_of_truc 3 (mk_canon_sym_gr 3 4)).
-Compute (list_of_truc 3 (mk_canon_sym_gr 3 5)).
 
 Fixpoint list_of_machin n (f : nat → nat → nat) k :=
   match k with
