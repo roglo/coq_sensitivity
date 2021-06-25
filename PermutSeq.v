@@ -25,8 +25,6 @@ Fixpoint mk_canon_sym_gr n : nat → nat → nat :=
   | S n' => sym_gr_fun n' (mk_canon_sym_gr n')
   end.
 
-Check (mk_canon_sym_gr 3).
-
 Fixpoint list_of_truc n (f : nat → nat) :=
   match n with
   | 0 => []
@@ -47,43 +45,12 @@ Compute (list_of_bidule 4 mk_canon_sym_gr).
 
 ...
 
-(*
-Definition sym_gr_fun n (σ_n : vector n! (vector n nat)) k j : nat :=
-  match j with
-  | 0 => k / n!
-  | S j' =>
-      vect_el (vect_el σ_n (k mod n!)) j' +
-      Nat.b2n (k / n! <=? vect_el (vect_el σ_n (k mod n!)) j')
-  end.
+Definition fin_bijective n (f : nat → nat) :=
+  ∃ g, (∀ a, a < n → g (f a) = a) ∧ (∀ a, a < n → f (g a) = a).
 
-Fixpoint mk_canon_sym_gr n : vector n! (vector n nat) :=
-  match n with
-  | 0 => mk_vect 0! (λ _, mk_vect 0 (λ _, 0))
-  | S n' =>
-      mk_vect (S n')! (λ k, mk_vect (S n') (sym_gr_fun (mk_canon_sym_gr n') k))
-  end.
-*)
-
-Theorem id_bij : ∀ A, FinFun.Bijective (id : A → A).
-Proof. now intros; exists id. Qed.
-
-Print Module Fin.
-
-Definition sym_gr_fun n (f : Fin.t n! → Fin.t n → Fin.t n) (k j : nat) : nat :=
-  match j with
-  | 0 => k / n!
-  | S j' =>
-      f (k mod n!) j' +
-      Nat.b2n (k / n! <=? f (k mod n!) j')
-  end.
-...
-
-Fixpoint mk_canon_sym_gr n : Fin.t n! → Fin.t n → Fin.t n :=
-  match n with
-  | 0 => λ _, id
-  | S n' => sym_gr_fun (@mk_canon_sym_gr n')
-  end.
-...
+Record sym_gr n := mk_sym_gr
+  { sg_perm : nat → nat;
+    sg_bij : fin_bijective n sg_perm }.
 
 Theorem sym_gr_has_fact_elem : ∀ n,
   ∃ f : sym_gr n → Fin.t n!, FinFun.Bijective f.
