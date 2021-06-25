@@ -19,7 +19,7 @@ Record sym_gr n := mk_sym_gr
     sg_bij : FinFun.Bijective sg_perm }.
 
 (*
-Definition sym_gr_fun n (σ_n : vector n! (vector n nat)) k j :=
+Definition sym_gr_fun n (σ_n : vector n! (vector n nat)) k j : nat :=
   match j with
   | 0 => k / n!
   | S j' =>
@@ -38,10 +38,21 @@ Fixpoint mk_canon_sym_gr n : vector n! (vector n nat) :=
 Theorem id_bij : ∀ A, FinFun.Bijective (id : A → A).
 Proof. now intros; exists id. Qed.
 
-Fixpoint mk_canon_sym_gr n : Fin.t n! → sym_gr n :=
+Print Module Fin.
+
+Definition sym_gr_fun n (f : Fin.t n! → Fin.t n → Fin.t n) (k j : nat) : nat :=
+  match j with
+  | 0 => k / n!
+  | S j' =>
+      f (k mod n!) j' +
+      Nat.b2n (k / n! <=? f (k mod n!) j')
+  end.
+...
+
+Fixpoint mk_canon_sym_gr n : Fin.t n! → Fin.t n → Fin.t n :=
   match n with
-  | 0 => ...
-  | S n' => id
+  | 0 => λ _, id
+  | S n' => sym_gr_fun (@mk_canon_sym_gr n')
   end.
 ...
 
