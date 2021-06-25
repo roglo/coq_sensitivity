@@ -154,6 +154,24 @@ Record sym_gr n :=
   { sg_vect : vector n! (vector n nat);
     sg_prop : is_sym_gr sg_vect }.
 
+(* attempt to have another definition of symmetric group, saying that
+   we don't know, in advance, its size: the fact that it is n! is
+   then a theorem *)
+
+Definition nat_vect_0 n := mk_vect n (λ _, 0).
+
+Definition is_sym_gr' n (σ : list (vector n nat)) :=
+  (∀ i j, i < length σ → j < length σ →
+   nth i σ (nat_vect_0 n) = nth j σ (nat_vect_0 n) → i = j) ∧
+  (∀ i, i < length σ → is_permut (nth i σ (nat_vect_0 n))) ∧
+  (∀ p, is_permut p → p ∈ σ).
+
+Theorem glop : ∀ n (σ : list (vector n nat)), length σ = n!.
+Proof.
+intros.
+
+...
+
 Definition sub_permut n (v : vector n nat) n' :=
   let d := vect_el v 0 in
   mk_vect n' (λ i, vect_el v (S i) - Nat.b2n (d <? vect_el v (S i))).
