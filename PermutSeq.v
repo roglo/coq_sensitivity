@@ -154,9 +154,9 @@ Record sym_gr n :=
   { sg_vect : vector n! (vector n nat);
     sg_prop : is_sym_gr sg_vect }.
 
-(* attempt to have another definition of symmetric group, saying that
-   we don't know, in advance, its size: the fact that it is n! is
-   then a theorem *)
+(* attempt to have another definition of symmetric group, bu we don't
+   know its size in advance: the fact that it is n! is then a theorem.
+   Is it better, like that, or not? *)
 
 Definition nat_vect_0 n := mk_vect n (λ _, 0).
 
