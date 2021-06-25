@@ -14,9 +14,36 @@ Require Import Pigeonhole.
 (* attempt to define the symmetric group as all automorphisms on a
    finite set *)
 
-Record sym_gr n :=
+Record sym_gr n := mk_sym_gr
   { sg_perm : Fin.t n → Fin.t n;
     sg_bij : FinFun.Bijective sg_perm }.
+
+(*
+Definition sym_gr_fun n (σ_n : vector n! (vector n nat)) k j :=
+  match j with
+  | 0 => k / n!
+  | S j' =>
+      vect_el (vect_el σ_n (k mod n!)) j' +
+      Nat.b2n (k / n! <=? vect_el (vect_el σ_n (k mod n!)) j')
+  end.
+
+Fixpoint mk_canon_sym_gr n : vector n! (vector n nat) :=
+  match n with
+  | 0 => mk_vect 0! (λ _, mk_vect 0 (λ _, 0))
+  | S n' =>
+      mk_vect (S n')! (λ k, mk_vect (S n') (sym_gr_fun (mk_canon_sym_gr n') k))
+  end.
+*)
+
+Theorem id_bij : ∀ A, FinFun.Bijective (id : A → A).
+Proof. now intros; exists id. Qed.
+
+Fixpoint mk_canon_sym_gr n : Fin.t n! → sym_gr n :=
+  match n with
+  | 0 => ...
+  | S n' => id
+  end.
+...
 
 Theorem sym_gr_has_fact_elem : ∀ n,
   ∃ f : sym_gr n → Fin.t n!, FinFun.Bijective f.
