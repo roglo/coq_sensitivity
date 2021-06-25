@@ -11,11 +11,17 @@ Require Import Misc RingLike MyVector.
 Require Import RLproduct.
 Require Import Pigeonhole.
 
-(* attempt to define permutation as an automorphism on a finite set *)
+(* attempt to define the symmetric group as all automorphisms on a
+   finite set *)
 
-Record permut n :=
-  { p_perm : Fin.t n → Fin.t n;
-    p_bij : FinFun.Bijective p_perm }.
+Record sym_gr n :=
+  { sg_perm : Fin.t n → Fin.t n;
+    sg_bij : FinFun.Bijective sg_perm }.
+
+Theorem sym_gr_has_fact_elem : ∀ n,
+  ∃ f : sym_gr n → Fin.t n!, FinFun.Bijective f.
+Proof.
+intros.
 
 ...
 
