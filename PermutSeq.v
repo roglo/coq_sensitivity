@@ -154,6 +154,20 @@ Record sym_gr n :=
   { sg_vect : vector n! (vector n nat);
     sg_prop : is_sym_gr sg_vect }.
 
+(* *)
+
+Print Module FinFun.
+Print FinFun.Finite.
+Print FinFun.Full.
+
+Print Fin.t.
+
+...
+
+Record sym_gr' :=
+  { sg_fin : FinFun.Finite nat;
+    sg_bij :}.
+
 (* attempt to have another definition of symmetric group, bu we don't
    know its size in advance: the fact that it is n! is then a theorem.
    Is it better, like that, or not? *)
