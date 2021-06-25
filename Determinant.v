@@ -2194,6 +2194,27 @@ Qed.
 Theorem comp_id_l : ∀ A B (f : A → B), comp id f = f.
 Proof. easy. Qed.
 
+Fixpoint vect_eqb_loop A n (eqb : A → A → bool) (u v : vector n A) i :=
+  match i with
+  | 0 => true
+  | S i' =>
+      if eqb (vect_el u i') (vect_el v i') then vect_eqb_loop eqb u v i'
+      else false
+  end.
+
+Definition vect_eqb A n (eqb : A → A → bool) (u v : vector n A) : bool :=
+  vect_eqb_loop eqb u v n.
+
+Fixpoint vect_find_loop A n (f : A → bool) (u : vector n A) i :=
+  match i with
+  | 0 => 0
+  | S i' => if f (vect_el u i') then i else vect_find_loop f u i'
+  end.
+
+(* 0 => not found ; S n => found at position n *)
+Definition vect_find A n (f : A → bool) (u : vector n A) : nat :=
+  vect_find_loop f u n.
+
 Theorem sym_gr_surj : ∀ n (σ : vector n! _) p,
   n ≠ 0
   → is_sym_gr σ
@@ -2203,11 +2224,21 @@ Proof.
 intros * Hnz Hσ Hp.
 destruct Hσ as (H1, H2).
 destruct Hp as (H3, H4).
+exists (vect_find (vect_eqb Nat.eqb p) σ - 1).
+split. {
+...
 Print is_sym_gr.
 Print Module Pigeonhole.
+Check find.
+Print vector_eq.
+Search (vector _ _ → vector _ _ → bool).
+Search (vector _ _ → vector _ _ → _).
+...
+Check (permut_fun_inv (λ k, vect_el (vect_el σ k) n)).
+Print permut_fun_inv.
+Check (λ k, vect_el (vect_el σ k)).
 Print permut_fun_inv.
 Print permut_fun_inv'.
-Check (λ k, vect_el (vect_el σ k)).
 Print is_permut_fun.
 Search permut_fun_inv.
 ...
