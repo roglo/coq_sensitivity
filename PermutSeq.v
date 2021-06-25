@@ -11,39 +11,7 @@ Require Import Misc RingLike MyVector.
 Require Import RLproduct.
 Require Import Pigeonhole.
 
-(* attempt to define the symmetric group with functions *)
-
-Definition sym_gr_fun n (σ_n : nat → nat → nat) k j : nat :=
-  match j with
-  | 0 => k / n!
-  | S j' => σ_n (k mod n!) j' + Nat.b2n (k / n! <=? σ_n (k mod n!) j')
-  end.
-
-Fixpoint mk_canon_sym_gr n : nat → nat → nat :=
-  match n with
-  | 0 => λ _ _, 0
-  | S n' => sym_gr_fun n' (mk_canon_sym_gr n')
-  end.
-
-Fixpoint list_of_truc n (f : nat → nat) :=
-  match n with
-  | 0 => []
-  | S n' => list_of_truc n' f ++ [f n']
-  end.
-
-Fixpoint list_of_machin n (f : nat → nat → nat) k :=
-  match k with
-  | 0 => []
-  | S k' => list_of_machin n f k' ++ [list_of_truc n (f k')]
-  end.
-
-Definition list_of_bidule n (f : nat → nat → nat → nat) :=
-  list_of_machin n (f n) n!.
-
-Compute (list_of_bidule 3 mk_canon_sym_gr).
-Compute (list_of_bidule 4 mk_canon_sym_gr).
-
-...
+(* attempt to define the symmetric group with functions
 
 Definition fin_bijective n (f : nat → nat) :=
   ∃ g, (∀ a, a < n → g (f a) = a) ∧ (∀ a, a < n → f (g a) = a).
@@ -56,8 +24,10 @@ Theorem sym_gr_has_fact_elem : ∀ n,
   ∃ f : sym_gr n → Fin.t n!, FinFun.Bijective f.
 Proof.
 intros.
-
 ...
+*)
+
+(* *)
 
 Definition comp {A B C} (f : B → C) (g : A → B) x := f (g x).
 
@@ -75,8 +45,6 @@ Section a.
 Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
-
-...
 
 Definition is_permut_fun f n :=
   (∀ i, i < n → f i < n) ∧
@@ -181,6 +149,39 @@ Qed.
      final result: 2;0;3;1
   *)
 
+Definition sym_gr_fun n (σ_n : nat → nat → nat) k j : nat :=
+  match j with
+  | 0 => k / n!
+  | S j' => σ_n (k mod n!) j' + Nat.b2n (k / n! <=? σ_n (k mod n!) j')
+  end.
+
+Fixpoint mk_canon_sym_gr n : nat → nat → nat :=
+  match n with
+  | 0 => λ _ _, 0
+  | S n' => sym_gr_fun n' (mk_canon_sym_gr n')
+  end.
+
+(*
+Fixpoint list_of_truc n (f : nat → nat) :=
+  match n with
+  | 0 => []
+  | S n' => list_of_truc n' f ++ [f n']
+  end.
+
+Fixpoint list_of_machin n (f : nat → nat → nat) k :=
+  match k with
+  | 0 => []
+  | S k' => list_of_machin n f k' ++ [list_of_truc n (f k')]
+  end.
+
+Definition list_of_bidule n (f : nat → nat → nat → nat) :=
+  list_of_machin n (f n) n!.
+
+Compute (list_of_bidule 3 mk_canon_sym_gr).
+Compute (list_of_bidule 4 mk_canon_sym_gr).
+*)
+
+(*
 Definition sym_gr_fun n (σ_n : vector n! (vector n nat)) k j :=
   match j with
   | 0 => k / n!
@@ -195,6 +196,10 @@ Fixpoint mk_canon_sym_gr n : vector n! (vector n nat) :=
   | S n' =>
       mk_vect (S n')! (λ k, mk_vect (S n') (sym_gr_fun (mk_canon_sym_gr n') k))
   end.
+*)
+
+Definition mk_canon_sym_gr_vect n : vector n! (vector n nat) :=
+  mk_vect n! (λ k, mk_vect n (mk_canon_sym_gr n k)).
 
 Definition is_sym_gr n (σ : vector n! (vector n nat)) :=
   (∀ i j, i < n! → j < n! → vect_el σ i = vect_el σ j → i = j) ∧
@@ -205,24 +210,6 @@ Record sym_gr n :=
     sg_prop : is_sym_gr sg_vect }.
 
 (* *)
-
-(* attempt to have another definition of symmetric group, bu we don't
-   know its size in advance: the fact that it is n! is then a theorem.
-   Is it better, like that, or not? *)
-
-Definition nat_vect_0 n := mk_vect n (λ _, 0).
-
-Definition is_sym_gr' n (σ : list (vector n nat)) :=
-  (∀ i j, i < length σ → j < length σ →
-   nth i σ (nat_vect_0 n) = nth j σ (nat_vect_0 n) → i = j) ∧
-  (∀ i, i < length σ → is_permut (nth i σ (nat_vect_0 n))) ∧
-  (∀ p, is_permut p → p ∈ σ).
-
-Theorem glop : ∀ n (σ : list (vector n nat)), length σ = n!.
-Proof.
-intros.
-
-...
 
 Definition sub_permut n (v : vector n nat) n' :=
   let d := vect_el v 0 in
@@ -238,7 +225,7 @@ Fixpoint rank_of_permut_in_sym_gr n (v : vector n nat) : nat :=
 
 Theorem rank_of_permut_of_rank : ∀ n k,
   k < fact n
-  → rank_of_permut_in_sym_gr (vect_el (mk_canon_sym_gr n) k) = k.
+  → rank_of_permut_in_sym_gr (vect_el (mk_canon_sym_gr_vect n) k) = k.
 Proof.
 intros * Hkn.
 revert k Hkn.
@@ -268,7 +255,7 @@ destruct b. 2: {
   destruct (k / fact n <=? _); flia Hb.
 }
 cbn.
-remember (vect_el (vect_el (mk_canon_sym_gr n) _) i) as x eqn:Hx.
+remember (mk_canon_sym_gr n _ i) as x eqn:Hx.
 symmetry in Hx.
 destruct x; [ easy | ].
 unfold Nat.b2n in Hb |-*.
@@ -286,7 +273,7 @@ Qed.
 Theorem sym_gr_elem_injective : ∀ n i j,
   i < fact n
   → j < fact n
-  → vect_el (mk_canon_sym_gr n) i = vect_el (mk_canon_sym_gr n) j
+  → vect_el (mk_canon_sym_gr_vect n) i = vect_el (mk_canon_sym_gr_vect n) j
   → i = j.
 Proof.
 intros * Hi Hj Hij.
@@ -299,7 +286,7 @@ Qed.
 Theorem permut_elem_ub : ∀ n k i,
   k < fact n
   → i < n
-  → vect_el (vect_el (mk_canon_sym_gr n) k) i < n.
+  → vect_el (vect_el (mk_canon_sym_gr_vect n) k) i < n.
 Proof.
 intros * Hkn Hin.
 revert k i Hkn Hin.
@@ -311,8 +298,7 @@ destruct i. {
   apply fact_neq_0.
 }
 apply Nat.succ_lt_mono in Hin.
-remember (k / fact n <=? vect_el (vect_el (mk_canon_sym_gr n) (k mod n!)) i)
-  as b eqn:Hb.
+remember (k / fact n <=? mk_canon_sym_gr n (k mod n!) i) as b eqn:Hb.
 symmetry in Hb.
 destruct b. {
   cbn; rewrite Nat.add_1_r.
@@ -342,7 +328,7 @@ Fixpoint sym_gr_inv n k (j : nat) :=
 Theorem sym_gr_inv_sym_gr : ∀ n k i,
   i < n
   → k < fact n
-  → sym_gr_inv n k (vect_el (vect_el (mk_canon_sym_gr n) k) i) = i.
+  → sym_gr_inv n k (vect_el (vect_el (mk_canon_sym_gr_vect n) k) i) = i.
 Proof.
 intros * Hi Hkn.
 revert k i Hi Hkn.
@@ -355,7 +341,7 @@ destruct i. {
 apply Nat.succ_lt_mono in Hi.
 cbn.
 remember (k / fact n) as p eqn:Hp.
-remember (vect_el (vect_el (mk_canon_sym_gr n) (k mod fact n)) i) as q eqn:Hq.
+remember (mk_canon_sym_gr n (k mod fact n) i) as q eqn:Hq.
 move q before p.
 remember (p <=? q) as b eqn:Hb; symmetry in Hb.
 destruct b. {
@@ -384,8 +370,8 @@ Theorem permut_elem_injective : ∀ n k i j,
   k < fact n
   → i < n
   → j < n
-  → vect_el (vect_el (mk_canon_sym_gr n) k) i =
-     vect_el (vect_el (mk_canon_sym_gr n) k) j
+  → vect_el (vect_el (mk_canon_sym_gr_vect n) k) i =
+     vect_el (vect_el (mk_canon_sym_gr_vect n) k) j
   → i = j.
 Proof.
 intros * Hk Hi Hj Hij.
@@ -398,7 +384,7 @@ Qed.
 
 Theorem sym_gr_elem_is_permut : ∀ n k,
   k < fact n
-  → is_permut (vect_el (mk_canon_sym_gr n) k).
+  → is_permut (vect_el (mk_canon_sym_gr_vect n) k).
 Proof.
 intros * Hkn.
 split. {
@@ -410,7 +396,7 @@ split. {
 }
 Qed.
 
-Theorem canon_sym_gr_prop : ∀ n, is_sym_gr (mk_canon_sym_gr n).
+Theorem canon_sym_gr_prop : ∀ n, is_sym_gr (mk_canon_sym_gr_vect n).
 Proof.
 intros.
 split. {
@@ -423,7 +409,7 @@ split. {
 Qed.
 
 Definition canon_sym_gr n :=
-  {| sg_vect := mk_canon_sym_gr n;
+  {| sg_vect := mk_canon_sym_gr_vect n;
      sg_prop := canon_sym_gr_prop n |}.
 
 (*
@@ -534,7 +520,7 @@ Qed.
 
 Theorem permut_in_sym_gr_of_its_rank : ∀ n v,
   is_permut v
-  → vect_el (mk_canon_sym_gr n) (rank_of_permut_in_sym_gr v) = v.
+  → vect_el (mk_canon_sym_gr_vect n) (rank_of_permut_in_sym_gr v) = v.
 Proof.
 intros * (Hvn, Hn).
 revert v Hvn Hn.
@@ -574,7 +560,7 @@ assert (Hkn : k < fact n). {
 rewrite Nat.div_small; [ | easy ].
 rewrite Nat.mod_small; [ | easy ].
 rewrite Nat.add_0_r.
-remember (vect_el v 0 <=? vect_el (vect_el (mk_canon_sym_gr n) k) j)
+remember (vect_el v 0 <=? vect_el (vect_el (mk_canon_sym_gr_vect n) k) j)
   as b eqn:Hb.
 symmetry in Hb.
 assert (H1 : ∀ i, i < n → vect_el (sub_permut v n) i < n). {
@@ -594,6 +580,9 @@ assert
 destruct b. {
   apply Nat.leb_le in Hb; cbn.
   rewrite <- Hk in Hb |-*.
+  unfold mk_canon_sym_gr_vect in IHn, Hb.
+  cbn in IHn, Hb.
+...
   rewrite IHn in Hb |-*; [ | easy | easy | easy | easy ].
   cbn - [ "<?" ] in Hb |-*.
   remember (vect_el v 0 <? vect_el v (S j)) as b1 eqn:Hb1.
