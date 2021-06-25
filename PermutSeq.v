@@ -560,10 +560,6 @@ assert (Hkn : k < fact n). {
 rewrite Nat.div_small; [ | easy ].
 rewrite Nat.mod_small; [ | easy ].
 rewrite Nat.add_0_r.
-(*
-remember (vect_el v 0 <=? vect_el (vect_el (mk_canon_sym_gr_vect n) k) j)
-  as b eqn:Hb.
-*)
 remember (vect_el v 0 <=? mk_canon_sym_gr n k j) as b eqn:Hb.
 symmetry in Hb.
 assert (H1 : ∀ i, i < n → vect_el (sub_permut v n) i < n). {
@@ -583,12 +579,6 @@ assert
 destruct b. {
   apply Nat.leb_le in Hb; cbn.
   rewrite <- Hk in Hb |-*.
-(*
-...
-  unfold mk_canon_sym_gr_vect in IHn, Hb.
-  cbn in IHn, Hb.
-...
-*)
   apply Nat.succ_lt_mono in Hj.
   rewrite IHn in Hb |-*; [ | easy | easy | easy | easy | easy | easy ].
   cbn - [ "<?" ] in Hb |-*.
@@ -2628,15 +2618,14 @@ Qed.
 
 (* i such that vect_el (permut n k) i = j *)
 
-...
-
 Definition sym_gr_elem_swap_with_0 p n k :=
-  vect_swap_elem (vect_el (mk_canon_sym_gr n) k) 0 p.
+  vect_swap_elem (vect_el (mk_canon_sym_gr_vect n) k) 0 p.
 
 (* k' such that permut_swap_with_0 p n k = permut n k' *)
 
 Definition sym_gr_elem_swap_last (p q : nat) n k :=
-  vect_swap_elem (vect_swap_elem (vect_el (mk_canon_sym_gr n) k) p (n - 2))
+  vect_swap_elem
+    (vect_swap_elem (vect_el (mk_canon_sym_gr_vect n) k) p (n - 2))
     q (n - 1).
 
 (* *)
@@ -2648,8 +2637,8 @@ Theorem ε_permut_succ : ∀ n k,
 Proof. easy. Qed.
 
 Theorem sym_gr_succ_values : ∀ n k σ σ',
-  σ = vect_el (vect_el (mk_canon_sym_gr (S n)) k)
-  → σ' = vect_el (vect_el (mk_canon_sym_gr n) (k mod n!))
+  σ = vect_el (vect_el (mk_canon_sym_gr_vect (S n)) k)
+  → σ' = vect_el (vect_el (mk_canon_sym_gr_vect n) (k mod n!))
   → ∀ i,
     σ i =
     match i with
@@ -2682,8 +2671,9 @@ Theorem ε_of_sym_gr_permut_succ :
   rngl_characteristic = 0 →
   ∀ n k,
   k < (S n)!
-  → ε (vect_el (mk_canon_sym_gr (S n)) k) =
-    (minus_one_pow (k / n!) * ε (vect_el (mk_canon_sym_gr n) (k mod n!)))%F.
+  → ε (vect_el (mk_canon_sym_gr_vect (S n)) k) =
+    (minus_one_pow (k / n!) *
+     ε (vect_el (mk_canon_sym_gr_vect n) (k mod n!)))%F.
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hkn.
 rewrite ε_ws_ε; try easy; [ | now apply sym_gr_elem_is_permut ].
@@ -2721,8 +2711,12 @@ f_equal. {
     easy.
   }
   cbn - [ mk_canon_sym_gr ].
+  remember (mk_canon_sym_gr (S n) k) as σ eqn:Hσ.
+(*
   remember
     (vect_el (@vect_el (n! + n * n!) _ (mk_canon_sym_gr (S n)) k)) as σ eqn:Hσ.
+*)
+...
   remember (vect_el (vect_el (mk_canon_sym_gr n) (k mod fact n))) as σ' eqn:Hσ'.
   specialize (sym_gr_succ_values Hσ Hσ') as H1.
   unfold sign_diff.
