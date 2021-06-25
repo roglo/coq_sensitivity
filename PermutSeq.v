@@ -11,6 +11,14 @@ Require Import Misc RingLike MyVector.
 Require Import RLproduct.
 Require Import Pigeonhole.
 
+(* attempt to define permutation as an automorphism on a finite set *)
+
+Record permut n :=
+  { p_perm : Fin.t n → Fin.t n;
+    p_bij : FinFun.Bijective p_perm }.
+
+...
+
 Definition comp {A B C} (f : B → C) (g : A → B) x := f (g x).
 
 Definition permut_comp {n} (σ₁ σ₂ : vector n nat) :=
@@ -27,6 +35,8 @@ Section a.
 Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
+
+...
 
 Definition is_permut_fun f n :=
   (∀ i, i < n → f i < n) ∧
@@ -155,12 +165,6 @@ Record sym_gr n :=
     sg_prop : is_sym_gr sg_vect }.
 
 (* *)
-
-Record permut n :=
-  { p_perm : Fin.t n → Fin.t n;
-    p_bij : FinFun.Bijective p_perm }.
-
-...
 
 (* attempt to have another definition of symmetric group, bu we don't
    know its size in advance: the fact that it is n! is then a theorem.
