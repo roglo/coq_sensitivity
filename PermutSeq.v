@@ -32,7 +32,7 @@ Definition sym_gr_fun n (σ_n : nat → nat → nat) k j : nat :=
 Fixpoint mk_canon_sym_gr n : nat → nat → nat :=
   match n with
   | 0 => λ _ _, 0
-  | S n' => sym_gr_fun n (mk_canon_sym_gr n')
+  | S n' => sym_gr_fun n' (mk_canon_sym_gr n')
   end.
 
 Check (mk_canon_sym_gr 3).
@@ -45,6 +45,22 @@ Fixpoint list_of_truc n (f : nat → nat) :=
 
 Compute (list_of_truc 3 (mk_canon_sym_gr 3 0)).
 Compute (list_of_truc 3 (mk_canon_sym_gr 3 1)).
+Compute (list_of_truc 3 (mk_canon_sym_gr 3 2)).
+Compute (list_of_truc 3 (mk_canon_sym_gr 3 3)).
+Compute (list_of_truc 3 (mk_canon_sym_gr 3 4)).
+Compute (list_of_truc 3 (mk_canon_sym_gr 3 5)).
+
+Fixpoint list_of_machin n (f : nat → nat → nat) k :=
+  match k with
+  | 0 => []
+  | S k' => list_of_machin n f k' ++ [list_of_truc n (f k')]
+  end.
+
+Definition list_of_bidule n (f : nat → nat → nat → nat) :=
+  list_of_machin n (f n) n!.
+
+Compute (list_of_bidule 3 mk_canon_sym_gr).
+Compute (list_of_bidule 4 mk_canon_sym_gr).
 
 ...
 
