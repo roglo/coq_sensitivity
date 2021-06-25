@@ -162,6 +162,9 @@ Print FinFun.Full.
 
 Print Fin.t.
 
+Compute (@Fin.FS 1 Fin.F1).
+Compute (@Fin.F1 0).
+
 ...
 
 Record sym_gr' :=
