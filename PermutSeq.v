@@ -2716,8 +2716,10 @@ f_equal. {
   remember
     (vect_el (@vect_el (n! + n * n!) _ (mk_canon_sym_gr (S n)) k)) as σ eqn:Hσ.
 *)
-...
+  remember (mk_canon_sym_gr n (k mod fact n)) as σ' eqn:Hσ'.
+(*
   remember (vect_el (vect_el (mk_canon_sym_gr n) (k mod fact n))) as σ' eqn:Hσ'.
+*)
   specialize (sym_gr_succ_values Hσ Hσ') as H1.
   unfold sign_diff.
   erewrite rngl_product_eq_compat. 2: {
@@ -2765,6 +2767,8 @@ f_equal. {
   }
   assert (Hp : is_permut_fun σ (S n)). {
     rewrite Hσ.
+Check sym_gr_elem_is_permut.
+...
     now apply sym_gr_elem_is_permut.
   }
   rewrite rngl_product_change_var with (g := permut_fun_inv σ' n) (h := σ').
