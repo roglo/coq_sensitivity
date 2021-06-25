@@ -2226,6 +2226,7 @@ destruct Hσ as (H1, H2).
 destruct Hp as (H3, H4).
 exists (vect_find (vect_eqb Nat.eqb p) σ - 1).
 split. {
+  unfold vect_find.
 ...
 Print is_sym_gr.
 Print Module Pigeonhole.
