@@ -200,9 +200,17 @@ Record sym_gr n :=
 
 (* *)
 
+Definition sub_permut (f : nat → nat) i :=
+  f (S i) - Nat.b2n (f 0 <? f (S i)).
+
+Definition sub_permut_vect n (v : vector n nat) n' :=
+  mk_vect n' (sub_permut (vect_el v)).
+
+(*
 Definition sub_permut_vect n (v : vector n nat) n' :=
   let d := vect_el v 0 in
   mk_vect n' (λ i, vect_el v (S i) - Nat.b2n (d <? vect_el v (S i))).
+*)
 
 Fixpoint rank_of_permut_in_sym_gr n (v : vector n nat) : nat :=
   match n with
@@ -417,6 +425,7 @@ Proof.
 intros * (Hvn, Hn) Hin.
 destruct n; [ easy | ].
 cbn - [ "<?" ].
+unfold sub_permut.
 remember (vect_el v 0 <? vect_el v (S i)) as b eqn:Hb.
 symmetry in Hb.
 specialize (Hvn (S i)) as H1.
@@ -426,9 +435,8 @@ specialize (H1 H); specialize (H2 H); clear H.
 destruct b; cbn; [ flia H1 | ].
 rewrite Nat.sub_0_r.
 apply Nat.ltb_ge in Hb.
-destruct (Nat.eq_dec (vect_el v (S i)) (S n)) as [Hvi| Hvi]; [ | flia H1 Hvi ].
 specialize (Hvn 0 (Nat.lt_0_succ _)) as H3.
-flia Hb H1 H2 H3 Hvi.
+flia Hb H1 H2 H3.
 Qed.
 
 Theorem sub_permut_elem_injective : ∀ n (v : vector (S n) nat) i j,
@@ -443,6 +451,7 @@ destruct (Nat.eq_dec i j) as [H| H]; [ easy | exfalso ].
 revert Hij; rename H into Hij.
 destruct n; [ easy | ].
 cbn - [ "<?" ].
+unfold sub_permut.
 remember (vect_el v 0 <? vect_el v (S i)) as bi eqn:Hbi.
 remember (vect_el v 0 <? vect_el v (S j)) as bj eqn:Hbj.
 symmetry in Hbi, Hbj.
@@ -568,9 +577,12 @@ assert
 destruct b. {
   apply Nat.leb_le in Hb; cbn.
   rewrite <- Hk in Hb |-*.
+  unfold sub_permut_vect in Hb.
   apply Nat.succ_lt_mono in Hj.
   rewrite IHn in Hb |-*; [ | easy | easy | easy | easy | easy | easy ].
   cbn - [ "<?" ] in Hb |-*.
+  unfold sub_permut.
+  unfold sub_permut in Hb.
   remember (vect_el v 0 <? vect_el v (S j)) as b1 eqn:Hb1.
   symmetry in Hb1.
   destruct b1. {
@@ -589,6 +601,8 @@ destruct b. {
   apply Nat.leb_gt in Hb; cbn.
   rewrite Nat.add_0_r.
   rewrite <- Hk in Hb |-*.
+  unfold sub_permut_vect in Hb.
+  unfold sub_permut in Hb.
   remember (vect_el v 0 <? vect_el v (S j)) as b1 eqn:Hb1.
   symmetry in Hb1.
   apply Nat.succ_lt_mono in Hj.
@@ -601,6 +615,7 @@ destruct b. {
   } {
     rewrite IHn; [ | easy | easy | easy ].
     cbn - [ "<?" ].
+    unfold sub_permut.
     rewrite Hb1; cbn.
     apply Nat.sub_0_r.
   }
