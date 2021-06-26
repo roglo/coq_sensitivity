@@ -96,9 +96,9 @@ Definition det_from_col {n} (M : matrix (S n) (S n) T) j :=
 
 Definition determinant' n (M : matrix n n T) :=
   Σ (k = 0, fact n - 1),
-    ε (vect_el (mk_canon_sym_gr n) k) *
+    ε (vect_el (mk_canon_sym_gr_vect n) k) *
     Π (i = 1, n),
-    mat_el M (i - 1) (vect_el (vect_el (mk_canon_sym_gr n) k) (i - 1)).
+    mat_el M (i - 1) (vect_el (vect_el (mk_canon_sym_gr_vect n) k) (i - 1)).
 
 Arguments determinant' [n]%nat M%M.
 
@@ -247,7 +247,7 @@ erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   replace (j - 1 - 1) with (j - 2) by flia.
   destruct
-    (Nat.eq_dec (vect_el (vect_el (mk_canon_sym_gr n) k) (j - 2)) i)
+    (Nat.eq_dec (vect_el (vect_el (mk_canon_sym_gr_vect n) k) (j - 2)) i)
       as [Hpj| Hpj]. {
     exfalso.
     rewrite <- Hpp in Hpj.
@@ -263,7 +263,7 @@ rewrite rngl_product_split_last; [ | flia ].
 erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   replace (j - 1 - 1) with (j - 2) by flia.
-  destruct (Nat.eq_dec (vect_el (vect_el (mk_canon_sym_gr n) k) (j - 2)) i)
+  destruct (Nat.eq_dec (vect_el (vect_el (mk_canon_sym_gr_vect n) k) (j - 2)) i)
     as [Hpj| Hpj]. {
     exfalso.
     rewrite <- Hpp in Hpj.
@@ -280,7 +280,7 @@ rewrite rngl_product_split_last; [ | flia ].
 erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   replace (j - 1 - 1) with (j - 2) by flia.
-  destruct (Nat.eq_dec (vect_el (vect_el (mk_canon_sym_gr n) k) (j - 2)) i)
+  destruct (Nat.eq_dec (vect_el (vect_el (mk_canon_sym_gr_vect n) k) (j - 2)) i)
     as [Hpj| Hpj]. {
     exfalso.
     rewrite <- Hpp in Hpj.
@@ -291,12 +291,13 @@ erewrite rngl_product_eq_compat. 2: {
 }
 rewrite (rngl_mul_comm Hic (iter_seq _ _ _ _)).
 rewrite Nat.add_sub.
+cbn in Hpp.
 rewrite Hpp.
 destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
 do 4 rewrite rngl_mul_assoc.
 remember
   (Π (i0 = 2, p + 1),
-   mat_el M (i0 - 2) (vect_el (vect_el (mk_canon_sym_gr n) k) (i0 - 2)%nat))%F
+   mat_el M (i0 - 2) (vect_el (vect_el (mk_canon_sym_gr_vect n) k) (i0 - 2)%nat))%F
   as q eqn:Hq.
 rewrite (rngl_mul_mul_swap Hic _ _ q).
 do 3 rewrite (rngl_mul_comm Hic _ q).
