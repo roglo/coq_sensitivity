@@ -383,8 +383,8 @@ now f_equal.
 Qed.
 
 Theorem sym_gr_elem_is_permut : ∀ n k,
-  k < fact n
-  → is_permut (vect_el (mk_canon_sym_gr_vect n) k).
+  k < n!
+  → is_permut_fun (mk_canon_sym_gr n k) n.
 Proof.
 intros * Hkn.
 split. {
@@ -2767,8 +2767,6 @@ f_equal. {
   }
   assert (Hp : is_permut_fun σ (S n)). {
     rewrite Hσ.
-Check sym_gr_elem_is_permut.
-...
     now apply sym_gr_elem_is_permut.
   }
   rewrite rngl_product_change_var with (g := permut_fun_inv σ' n) (h := σ').
@@ -2871,8 +2869,8 @@ intros j Hj.
 move j before i.
 do 2 rewrite if_ltb_lt_dec.
 destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
-remember (vect_el (@vect_el (n! + n * n!) _ (mk_canon_sym_gr (S n)) k)) as σ eqn:Hσ.
-remember (vect_el (vect_el (mk_canon_sym_gr n) (k mod fact n))) as σ' eqn:Hσ'.
+remember (mk_canon_sym_gr (S n) k) as σ eqn:Hσ.
+remember (mk_canon_sym_gr n (k mod n!)) as σ' eqn:Hσ'.
 move σ' before σ.
 do 2 rewrite (sym_gr_succ_values Hσ Hσ').
 destruct j; [ flia Hj | ].
@@ -2921,7 +2919,7 @@ Theorem ε_of_permut_ε :
   rngl_characteristic = 0 →
   ∀ n k,
   k < fact n
-  → ε (vect_el (mk_canon_sym_gr n) k) = ε_permut n k.
+  → ε (vect_el (mk_canon_sym_gr_vect n) k) = ε_permut n k.
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hkn.
 revert k Hkn.
@@ -2993,12 +2991,12 @@ Qed.
 Theorem sym_gr_sym_gr_inv : ∀ n k j,
   j < n
   → k < fact n
-  → vect_el (vect_el (mk_canon_sym_gr n) k) (sym_gr_inv n k j) = j.
+  → vect_el (vect_el (mk_canon_sym_gr_vect n) k) (sym_gr_inv n k j) = j.
 Proof.
 intros * Hjn Hkn.
-revert j k Hjn Hkn.
-induction n; intros; [ easy | ].
 cbn.
+revert j k Hjn Hkn.
+induction n; intros; [ easy | cbn ].
 destruct (lt_dec j (k / fact n)) as [Hjkn| Hjkn]. {
   cbn.
   destruct n. {
@@ -3053,7 +3051,7 @@ Qed.
 Theorem sym_gr_surjective : ∀ n k j,
   k < fact n
   → j < n
-  → ∃ i : nat, i < n ∧ vect_el (vect_el (mk_canon_sym_gr n) k) i = j.
+  → ∃ i : nat, i < n ∧ vect_el (vect_el (mk_canon_sym_gr_vect n) k) i = j.
 Proof.
 intros * Hkn Hjn.
 exists (sym_gr_inv n k j).
