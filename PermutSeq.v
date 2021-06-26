@@ -203,6 +203,9 @@ Record sym_gr n :=
 Definition sub_permut (f : nat → nat) i :=
   f (S i) - Nat.b2n (f 0 <? f (S i)).
 
+...
+
+(* faire une version fonction, pas vecteur *)
 Fixpoint rank_of_permut_in_sym_gr n (v : vector n nat) : nat :=
   match n with
   | 0 => 0
