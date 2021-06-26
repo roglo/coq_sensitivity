@@ -412,7 +412,7 @@ Compute (rank_of_permut_in_sym_gr (vect_el (mk_canon_sym_gr 4) 12)).
 Theorem sub_permut_elem_ub : ∀ n (v : vector (S n) nat) i,
   is_permut v
   → i < n
-  → vect_el (mk_vect n (sub_permut (vect_el v))) i < n.
+  → sub_permut (vect_el v) i < n.
 Proof.
 intros * (Hvn, Hn) Hin.
 destruct n; [ easy | ].
@@ -435,8 +435,7 @@ Theorem sub_permut_elem_injective : ∀ n (v : vector (S n) nat) i j,
   is_permut v
   → i < n
   → j < n
-  → vect_el (mk_vect n (sub_permut (vect_el v))) i =
-    vect_el (mk_vect n (sub_permut (vect_el v))) j
+  → sub_permut (vect_el v) i = sub_permut (vect_el v) j
   → i = j.
 Proof.
 intros * (Hvn, Hn) Hin Hjn Hij.
@@ -553,7 +552,7 @@ rewrite Nat.mod_small; [ | easy ].
 rewrite Nat.add_0_r.
 remember (vect_el v 0 <=? mk_canon_sym_gr n k j) as b eqn:Hb.
 symmetry in Hb.
-assert (H1 : ∀ i, i < n → vect_el (mk_vect n (sub_permut (vect_el v))) i < n). {
+assert (H1 : ∀ i, i < n → sub_permut (vect_el v) i < n). {
   intros i Hi.
   now apply sub_permut_elem_ub.
 }
@@ -561,8 +560,7 @@ assert
 (H2 : ∀ i j : nat,
     i < n
     → j < n
-    → vect_el (mk_vect n (sub_permut (vect_el v))) i =
-      vect_el (mk_vect n (sub_permut (vect_el v))) j
+    → sub_permut (vect_el v) i = sub_permut (vect_el v) j
     → i = j). {
   intros i m Hi Hm Him.
   now apply sub_permut_elem_injective in Him.
