@@ -528,10 +528,6 @@ erewrite rngl_summation_eq_compat. 2: {
   cbn - [ f ].
   replace ({| vect_el := mk_canon_sym_gr n k |}) with
     (mk_vect n (λ i, vect_el (f k) (transposition p q i))). 2: {
-(*
-  replace (vect_el (mk_canon_sym_gr n) k) with
-    (mk_vect n (λ i, vect_el (f k) (transposition p q i))). 2: {
-*)
     apply vector_eq.
     intros i Hi; cbn.
     now rewrite transposition_involutive.
@@ -542,8 +538,7 @@ erewrite rngl_summation_eq_compat. 2: {
     subst f; cbn.
     split; cbn. {
       intros i Hi.
-...
-      apply vect_el_permut_ub; [ now apply sym_gr_elem_is_permut | ].
+      apply permut_fun_ub; [ now apply sym_gr_elem_is_permut | ].
       now apply transposition_lt.
     } {
       intros * Hi Hj Hij.
@@ -1488,7 +1483,7 @@ f_equal. {
 Qed.
 
 Definition swap_in_permut n i j k :=
-  vect_swap_elem (vect_el (mk_canon_sym_gr n) k) i j.
+  vect_swap_elem (vect_el (mk_canon_sym_gr_vect n) k) i j.
 
 (* comatrix *)
 

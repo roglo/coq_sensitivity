@@ -64,12 +64,18 @@ Definition transposition i j k :=
 Definition vect_swap_elem n (v : vector n nat) i j :=
   mk_vect n (λ k, vect_el v (transposition i j k)).
 
+Theorem permut_fun_ub : ∀ n f i,
+  is_permut_fun f n → i < n → f i < n.
+Proof.
+intros * Hp Hin.
+now apply Hp.
+Qed.
+
 Theorem vect_el_permut_ub : ∀ n (σ : vector n nat) i,
   is_permut σ → i < n → vect_el σ i < n.
 Proof.
 intros * Hp Hin.
-destruct Hp as (Hp1, Hp2).
-now apply Hp1.
+now apply permut_fun_ub.
 Qed.
 
 Theorem transposition_lt : ∀ i j k n,
@@ -982,12 +988,6 @@ Proof.
 intros * (Hp1, Hp2) * Hin.
 rewrite fun_find_permut_fun_inv'; [ | easy | easy ].
 apply (proj2 (pigeonhole' f Hp1 Hp2 Hin eq_refl)).
-Qed.
-
-Theorem permut_fun_ub : ∀ n f i, is_permut_fun f n → i < n → f i < n.
-Proof.
-intros * Hp Hin.
-now apply Hp.
 Qed.
 
 Theorem permut_fun_inv_is_permut : ∀ n f,
