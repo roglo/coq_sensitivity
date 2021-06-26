@@ -341,7 +341,7 @@ Definition determinant'_list {n} (M : matrix n n T) :=
   map (λ k,
     (ε_permut n k *
      Π (i = 1, n),
-     mat_el M (i - 1) (vect_el (vect_el (mk_canon_sym_gr n) k) (i - 1)%nat))%F)
+     mat_el M (i - 1) (vect_el (vect_el (mk_canon_sym_gr_vect n) k) (i - 1)%nat))%F)
     (seq 0 n!).
 
 Arguments determinant'_list {n}%nat M%M.
@@ -488,7 +488,7 @@ erewrite rngl_summation_eq_compat. 2: {
   erewrite rngl_product_list_eq_compat. 2: {
     intros i Hi.
     replace (mat_el _ _ _) with
-      (mat_el M i (vect_el (vect_el (mk_canon_sym_gr n) k) (transposition p q i))). 2: {
+      (mat_el M i (vect_el (vect_el (mk_canon_sym_gr_vect n) k) (transposition p q i))). 2: {
       cbn.
       unfold transposition.
       do 2 rewrite if_eqb_eq_dec.
@@ -512,7 +512,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ mat_swap_rows ].
-set (f := λ k, vect_swap_elem (vect_el (mk_canon_sym_gr n) k) p q).
+set (f := λ k, vect_swap_elem (vect_el (mk_canon_sym_gr_vect n) k) p q).
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   assert (Hkn : k < n!). {
@@ -523,11 +523,15 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite Nat.add_0_l.
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
-    now replace (vect_el _ _) with (vect_el (f k) i).
+    now replace (mk_canon_sym_gr _ _ _) with (vect_el (f k) i).
   }
   cbn - [ f ].
+  replace ({| vect_el := mk_canon_sym_gr n k |}) with
+    (mk_vect n (λ i, vect_el (f k) (transposition p q i))). 2: {
+(*
   replace (vect_el (mk_canon_sym_gr n) k) with
     (mk_vect n (λ i, vect_el (f k) (transposition p q i))). 2: {
+*)
     apply vector_eq.
     intros i Hi; cbn.
     now rewrite transposition_involutive.
@@ -538,6 +542,7 @@ erewrite rngl_summation_eq_compat. 2: {
     subst f; cbn.
     split; cbn. {
       intros i Hi.
+...
       apply vect_el_permut_ub; [ now apply sym_gr_elem_is_permut | ].
       now apply transposition_lt.
     } {
