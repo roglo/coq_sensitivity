@@ -204,6 +204,8 @@ Definition sub_permut n (v : vector n nat) n' :=
   let d := vect_el v 0 in
   mk_vect n' (λ i, vect_el v (S i) - Nat.b2n (d <? vect_el v (S i))).
 
+...
+
 Fixpoint rank_of_permut_in_sym_gr n (v : vector n nat) : nat :=
   match n with
   | 0 => 0
