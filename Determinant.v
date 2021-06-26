@@ -247,11 +247,6 @@ erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   replace (j - 1 - 1) with (j - 2) by flia.
   destruct (Nat.eq_dec (mk_canon_sym_gr n k (j - 2)) i) as [Hpj| Hpj]. {
-(*
-  destruct
-    (Nat.eq_dec (vect_el (vect_el (mk_canon_sym_gr_vect n) k) (j - 2)) i)
-      as [Hpj| Hpj]. {
-*)
     exfalso.
     rewrite <- Hpp in Hpj.
     apply permut_elem_injective in Hpj; [ | easy | flia Hp Hj | easy ].
@@ -267,10 +262,6 @@ erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   replace (j - 1 - 1) with (j - 2) by flia.
   destruct (Nat.eq_dec (mk_canon_sym_gr n k (j - 2)) i) as [Hpj| Hpj]. {
-(*
-  destruct (Nat.eq_dec (vect_el (vect_el (mk_canon_sym_gr_vect n) k) (j - 2)) i)
-    as [Hpj| Hpj]. {
-*)
     exfalso.
     rewrite <- Hpp in Hpj.
     apply permut_elem_injective in Hpj; [ | easy | flia Hp Hj | easy ].
@@ -287,10 +278,6 @@ erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   replace (j - 1 - 1) with (j - 2) by flia.
   destruct (Nat.eq_dec (mk_canon_sym_gr n k (j - 2)) i) as [Hpj| Hpj]. {
-(*
-  destruct (Nat.eq_dec (vect_el (vect_el (mk_canon_sym_gr_vect n) k) (j - 2)) i)
-    as [Hpj| Hpj]. {
-*)
     exfalso.
     rewrite <- Hpp in Hpj.
     apply permut_elem_injective in Hpj; [ | easy | flia Hp Hj | easy ].
@@ -307,12 +294,6 @@ do 4 rewrite rngl_mul_assoc.
 remember
   (Π (i0 = 2, p + 1), mat_el M (i0 - 2) (mk_canon_sym_gr n k (i0 - 2)))
   as q eqn:Hq.
-(*
-remember
-  (Π (i0 = 2, p + 1),
-   mat_el M (i0 - 2) (vect_el (vect_el (mk_canon_sym_gr_vect n) k) (i0 - 2)%nat))%F
-  as q eqn:Hq.
-*)
 do 3 rewrite (rngl_mul_comm Hic _ q).
 do 5 rewrite <- rngl_mul_assoc.
 rewrite <- rngl_mul_add_distr_l.
@@ -321,10 +302,6 @@ clear q Hq.
 erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   destruct (Nat.eq_dec (mk_canon_sym_gr n k (j - 1)) i) as [Hpj| Hpj]. {
-(*
-  destruct (Nat.eq_dec (vect_el (vect_el (mk_canon_sym_gr n) k) (j - 1)) i)
-    as [Hpj| Hpj]. {
-*)
     rewrite <- Hpp in Hpj.
     apply permut_elem_injective in Hpj; [ | easy | flia Hp Hj | easy ].
     flia Hj Hpj.
@@ -335,10 +312,6 @@ symmetry.
 erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   destruct (Nat.eq_dec (mk_canon_sym_gr n k (j - 1)) i) as [Hpj| Hpj]. {
-(*
-  destruct (Nat.eq_dec (vect_el (vect_el (mk_canon_sym_gr n) k) (j - 1)) i)
-    as [Hpj| Hpj]. {
-*)
     rewrite <- Hpp in Hpj.
     apply permut_elem_injective in Hpj; [ | easy | flia Hp Hj | easy ].
     flia Hj Hpj.
@@ -349,10 +322,6 @@ rewrite rngl_add_comm.
 erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   destruct (Nat.eq_dec (mk_canon_sym_gr n k (j - 1)) i) as [Hpj| Hpj]. {
-(*
-  destruct (Nat.eq_dec (vect_el (vect_el (mk_canon_sym_gr n) k) (j - 1)) i)
-    as [Hpj| Hpj]. {
-*)
     rewrite <- Hpp in Hpj.
     apply permut_elem_injective in Hpj; [ | easy | flia Hp Hj | easy ].
     flia Hj Hpj.
