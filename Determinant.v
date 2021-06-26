@@ -209,11 +209,11 @@ erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
-    now cbn.
+    now cbn - [ Nat.eq_dec ].
   }
   easy.
 }
-cbn.
+cbn - [ Nat.eq_dec ].
 rewrite rngl_mul_summation_distr_l; [ | now left ].
 rewrite rngl_mul_summation_distr_l; [ | now left ].
 symmetry.
@@ -246,6 +246,7 @@ rewrite rngl_product_split_last; [ | flia ].
 erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   replace (j - 1 - 1) with (j - 2) by flia.
+...
   destruct
     (Nat.eq_dec (vect_el (vect_el (mk_canon_sym_gr_vect n) k) (j - 2)) i)
       as [Hpj| Hpj]. {
@@ -291,15 +292,29 @@ erewrite rngl_product_eq_compat. 2: {
 }
 rewrite (rngl_mul_comm Hic (iter_seq _ _ _ _)).
 rewrite Nat.add_sub.
-cbn in Hpp.
 rewrite Hpp.
 destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
 do 4 rewrite rngl_mul_assoc.
+(*1*)
+remember
+  (Π (i0 = 2, p + 1),
+   mat_el (mat_repl_vect i M (a × U + b × V)%V) (i0 - 2)
+     (vect_el (vect_el (mk_canon_sym_gr_vect n) k) (i0 - 2))) as q1 eqn:Hq1.
+remember
+  (Π (i0 = 2, p + 1),
+   mat_el (mat_repl_vect i M U) (i0 - 2)
+     (vect_el (vect_el (mk_canon_sym_gr_vect n) k) (i0 - 2))) as q2 eqn:Hq2.
+remember
+  (Π (i0 = 2, p + 1),
+   mat_el (mat_repl_vect i M V) (i0 - 2)
+     (vect_el (vect_el (mk_canon_sym_gr_vect n) k) (i0 - 2))) as q3 eqn:Hq3.
+...1
+(*
 remember
   (Π (i0 = 2, p + 1),
    mat_el M (i0 - 2) (vect_el (vect_el (mk_canon_sym_gr_vect n) k) (i0 - 2)%nat))%F
   as q eqn:Hq.
-rewrite (rngl_mul_mul_swap Hic _ _ q).
+*)
 do 3 rewrite (rngl_mul_comm Hic _ q).
 do 5 rewrite <- rngl_mul_assoc.
 rewrite <- rngl_mul_add_distr_l.
