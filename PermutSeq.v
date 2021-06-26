@@ -222,17 +222,6 @@ Theorem fold_rank_of_permut_in_sym_gr_vect' : ∀ n f,
   rank_of_permut_in_sym_gr_vect (mk_vect n f).
 Proof. easy. Qed.
 
-(*
-Fixpoint rank_of_permut_in_sym_gr n (v : vector n nat) : nat :=
-  match n with
-  | 0 => 0
-  | S n' =>
-      let d := vect_el v 0 in
-      d * n'! +
-      rank_of_permut_in_sym_gr (mk_vect n' (sub_permut (vect_el v)))
-  end.
-*)
-
 Theorem rank_of_permut_of_rank : ∀ n k,
   k < fact n
   → rank_of_permut_in_sym_gr_vect (vect_el (mk_canon_sym_gr_vect n) k) = k.
