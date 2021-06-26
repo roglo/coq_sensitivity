@@ -200,18 +200,16 @@ Record sym_gr n :=
 
 (* *)
 
-Definition sub_permut n (v : vector n nat) n' :=
+Definition sub_permut_vect n (v : vector n nat) n' :=
   let d := vect_el v 0 in
   mk_vect n' (λ i, vect_el v (S i) - Nat.b2n (d <? vect_el v (S i))).
-
-...
 
 Fixpoint rank_of_permut_in_sym_gr n (v : vector n nat) : nat :=
   match n with
   | 0 => 0
   | S n' =>
       let d := vect_el v 0 in
-      d * n'! + rank_of_permut_in_sym_gr (sub_permut v n')
+      d * n'! + rank_of_permut_in_sym_gr (sub_permut_vect v n')
   end.
 
 Theorem rank_of_permut_of_rank : ∀ n k,
@@ -414,7 +412,7 @@ Compute (rank_of_permut_in_sym_gr (vect_el (mk_canon_sym_gr 4) 12)).
 Theorem sub_permut_elem_ub : ∀ n (v : vector (S n) nat) i,
   is_permut v
   → i < n
-  → vect_el (sub_permut v n) i < n.
+  → vect_el (sub_permut_vect v n) i < n.
 Proof.
 intros * (Hvn, Hn) Hin.
 destruct n; [ easy | ].
@@ -437,7 +435,7 @@ Theorem sub_permut_elem_injective : ∀ n (v : vector (S n) nat) i j,
   is_permut v
   → i < n
   → j < n
-  → vect_el (sub_permut v n) i = vect_el (sub_permut v n) j
+  → vect_el (sub_permut_vect v n) i = vect_el (sub_permut_vect v n) j
   → i = j.
 Proof.
 intros * (Hvn, Hn) Hin Hjn Hij.
@@ -533,7 +531,7 @@ destruct j. {
   }
 }
 cbn.
-remember (rank_of_permut_in_sym_gr (sub_permut v n)) as k eqn:Hk.
+remember (rank_of_permut_in_sym_gr (sub_permut_vect v n)) as k eqn:Hk.
 symmetry in Hk.
 rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
 rewrite Nat_mod_add_l_mul_r; [ | apply fact_neq_0 ].
@@ -553,7 +551,7 @@ rewrite Nat.mod_small; [ | easy ].
 rewrite Nat.add_0_r.
 remember (vect_el v 0 <=? mk_canon_sym_gr n k j) as b eqn:Hb.
 symmetry in Hb.
-assert (H1 : ∀ i, i < n → vect_el (sub_permut v n) i < n). {
+assert (H1 : ∀ i, i < n → vect_el (sub_permut_vect v n) i < n). {
   intros i Hi.
   now apply sub_permut_elem_ub.
 }
@@ -561,8 +559,8 @@ assert
 (H2 : ∀ i j : nat,
     i < n
     → j < n
-    → vect_el (sub_permut v n) i =
-      vect_el (sub_permut v n) j
+    → vect_el (sub_permut_vect v n) i =
+      vect_el (sub_permut_vect v n) j
     → i = j). {
   intros i m Hi Hm Him.
   now apply sub_permut_elem_injective in Him.
