@@ -572,7 +572,7 @@ rewrite rngl_mul_opp_l; [ | easy ].
 f_equal.
 rewrite rngl_mul_1_l.
 symmetry.
-set (g := λ k, rank_of_permut_in_sym_gr (f k)).
+set (g := λ k, rank_of_permut_in_sym_gr_vect (f k)).
 rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
   intros k (_, Hk).
   assert (Hkn : k < n!). {

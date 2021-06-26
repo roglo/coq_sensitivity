@@ -203,6 +203,26 @@ Record sym_gr n :=
 Definition sub_permut (f : nat → nat) i :=
   f (S i) - Nat.b2n (f 0 <? f (S i)).
 
+Fixpoint rank_of_permut_in_sym_gr n (f : nat → nat) : nat :=
+  match n with
+  | 0 => 0
+  | S n' => f 0 * n'! + rank_of_permut_in_sym_gr n' (sub_permut f)
+  end.
+
+Definition rank_of_permut_in_sym_gr_vect n (v : vector n nat) : nat :=
+  rank_of_permut_in_sym_gr n (vect_el v).
+
+Theorem fold_rank_of_permut_in_sym_gr_vect : ∀ n (v : vector n nat),
+  rank_of_permut_in_sym_gr n (vect_el v) =
+  rank_of_permut_in_sym_gr_vect v.
+Proof. easy. Qed.
+
+Theorem fold_rank_of_permut_in_sym_gr_vect' : ∀ n f,
+  rank_of_permut_in_sym_gr n f =
+  rank_of_permut_in_sym_gr_vect (mk_vect n f).
+Proof. easy. Qed.
+
+(*
 Fixpoint rank_of_permut_in_sym_gr n (v : vector n nat) : nat :=
   match n with
   | 0 => 0
@@ -211,10 +231,11 @@ Fixpoint rank_of_permut_in_sym_gr n (v : vector n nat) : nat :=
       d * n'! +
       rank_of_permut_in_sym_gr (mk_vect n' (sub_permut (vect_el v)))
   end.
+*)
 
 Theorem rank_of_permut_of_rank : ∀ n k,
   k < fact n
-  → rank_of_permut_in_sym_gr (vect_el (mk_canon_sym_gr_vect n) k) = k.
+  → rank_of_permut_in_sym_gr_vect (vect_el (mk_canon_sym_gr_vect n) k) = k.
 Proof.
 intros * Hkn.
 revert k Hkn.
@@ -228,6 +249,7 @@ clear H1.
 rewrite <- (IHn (k mod fact n)) at 1. 2: {
   apply Nat.mod_upper_bound, fact_neq_0.
 }
+rewrite fold_rank_of_permut_in_sym_gr_vect'.
 f_equal.
 apply vector_eq.
 intros i Hi; cbn.
@@ -266,7 +288,7 @@ Theorem sym_gr_elem_injective : ∀ n i j,
   → i = j.
 Proof.
 intros * Hi Hj Hij.
-apply (f_equal (@rank_of_permut_in_sym_gr n)) in Hij.
+apply (f_equal (@rank_of_permut_in_sym_gr_vect n)) in Hij.
 rewrite rank_of_permut_of_rank in Hij; [ | easy ].
 rewrite rank_of_permut_of_rank in Hij; [ | easy ].
 easy.
@@ -487,7 +509,7 @@ Qed.
 
 Theorem rank_of_permut_upper_bound : ∀ n (v : vector n nat),
   is_permut v
-  → rank_of_permut_in_sym_gr v < n!.
+  → rank_of_permut_in_sym_gr_vect v < n!.
 Proof.
 intros * (Hvn, Hn).
 revert v Hvn Hn.
@@ -495,6 +517,7 @@ induction n; intros; [ cbn; flia | ].
 cbn.
 rewrite Nat.add_comm.
 apply Nat.add_lt_le_mono. {
+  rewrite fold_rank_of_permut_in_sym_gr_vect'.
   apply IHn. {
     intros i Hi.
     now apply sub_permut_elem_ub.
@@ -510,7 +533,7 @@ Qed.
 
 Theorem permut_in_sym_gr_of_its_rank : ∀ n v,
   is_permut v
-  → vect_el (mk_canon_sym_gr_vect n) (rank_of_permut_in_sym_gr v) = v.
+  → vect_el (mk_canon_sym_gr_vect n) (rank_of_permut_in_sym_gr_vect v) = v.
 Proof.
 intros * (Hvn, Hn).
 apply vector_eq; cbn.
@@ -522,6 +545,7 @@ destruct j. {
   rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
   rewrite <- Nat.add_0_r; f_equal.
   apply Nat.div_small.
+  rewrite fold_rank_of_permut_in_sym_gr_vect'.
   apply rank_of_permut_upper_bound.
   split. {
     intros i Hi.
@@ -532,7 +556,8 @@ destruct j. {
   }
 }
 cbn.
-remember (rank_of_permut_in_sym_gr (mk_vect n (sub_permut (vect_el v)))) as k eqn:Hk.
+rewrite fold_rank_of_permut_in_sym_gr_vect'.
+remember (rank_of_permut_in_sym_gr_vect (mk_vect n (sub_permut (vect_el v)))) as k eqn:Hk.
 symmetry in Hk.
 rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
 rewrite Nat_mod_add_l_mul_r; [ | apply fact_neq_0 ].
@@ -615,7 +640,7 @@ Qed.
 Theorem rank_of_permut_injective : ∀ n (σ₁ σ₂ : vector n nat),
   is_permut σ₁
   → is_permut σ₂
-  → rank_of_permut_in_sym_gr σ₁ = rank_of_permut_in_sym_gr σ₂
+  → rank_of_permut_in_sym_gr_vect σ₁ = rank_of_permut_in_sym_gr_vect σ₂
   → σ₁ = σ₂.
 Proof.
 intros * Hσ₁ Hσ₂ Hσσ.
