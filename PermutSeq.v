@@ -187,23 +187,6 @@ Compute (list_of_bidule 3 mk_canon_sym_gr).
 Compute (list_of_bidule 4 mk_canon_sym_gr).
 *)
 
-(*
-Definition sym_gr_fun n (σ_n : vector n! (vector n nat)) k j :=
-  match j with
-  | 0 => k / n!
-  | S j' =>
-      vect_el (vect_el σ_n (k mod n!)) j' +
-      Nat.b2n (k / n! <=? vect_el (vect_el σ_n (k mod n!)) j')
-  end.
-
-Fixpoint mk_canon_sym_gr n : vector n! (vector n nat) :=
-  match n with
-  | 0 => mk_vect 0! (λ _, mk_vect 0 (λ _, 0))
-  | S n' =>
-      mk_vect (S n')! (λ k, mk_vect (S n') (sym_gr_fun (mk_canon_sym_gr n') k))
-  end.
-*)
-
 Definition mk_canon_sym_gr_vect n : vector n! (vector n nat) :=
   mk_vect n! (λ k, mk_vect n (mk_canon_sym_gr n k)).
 
