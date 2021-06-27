@@ -222,13 +222,19 @@ Theorem fold_rank_of_permut_in_sym_gr_vect' : ∀ n f,
   rank_of_permut_in_sym_gr_vect (mk_vect n f).
 Proof. easy. Qed.
 
-...
 
+Theorem rank_of_permut_of_rank : ∀ n k,
+  k < n!
+  → rank_of_permut_in_sym_gr n (mk_canon_sym_gr n k) = k.
+Proof.
+intros * Hkn.
+(*
 Theorem rank_of_permut_of_rank : ∀ n k,
   k < fact n
   → rank_of_permut_in_sym_gr_vect (vect_el (mk_canon_sym_gr_vect n) k) = k.
 Proof.
 intros * Hkn.
+*)
 revert k Hkn.
 induction n; intros; [ now apply Nat.lt_1_r in Hkn | cbn ].
 specialize (Nat.div_mod k (fact n) (fact_neq_0 _)) as H1.
@@ -240,6 +246,8 @@ clear H1.
 rewrite <- (IHn (k mod fact n)) at 1. 2: {
   apply Nat.mod_upper_bound, fact_neq_0.
 }
+(**)
+...
 rewrite fold_rank_of_permut_in_sym_gr_vect'.
 f_equal.
 apply vector_eq.
