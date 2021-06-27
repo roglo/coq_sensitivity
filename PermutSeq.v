@@ -200,6 +200,20 @@ Record sym_gr n :=
 
 (* *)
 
+(* my axiom "vector_eq" implies function extensionality on
+   finite types; here, the proof. But I don't like the idea
+   of using it. This axiom was not provided for that. It uses
+   vectors in a context where there are initially no vectors. *)
+Theorem fun_ext_by_vect : ∀ A n (f g : nat → A),
+  (∀ i, i < n → f i = g i)
+  → f = g.
+Proof.
+intros * Hfg.
+change (vect_el (mk_vect n f) = vect_el (mk_vect n g)).
+f_equal.
+now apply vector_eq.
+...
+
 Definition sub_permut (f : nat → nat) i :=
   f (S i) - Nat.b2n (f 0 <? f (S i)).
 
@@ -221,7 +235,6 @@ Theorem fold_rank_of_permut_in_sym_gr_vect' : ∀ n f,
   rank_of_permut_in_sym_gr n f =
   rank_of_permut_in_sym_gr_vect (mk_vect n f).
 Proof. easy. Qed.
-
 
 Theorem rank_of_permut_of_rank : ∀ n k,
   k < n!
@@ -248,6 +261,8 @@ rewrite <- (IHn (k mod fact n)) at 1. 2: {
 }
 (**)
 Print rank_of_permut_in_sym_gr_vect.
+Print rank_of_permut_in_sym_gr.
+...
 rewrite fold_rank_of_permut_in_sym_gr_vect'.
 rewrite fold_rank_of_permut_in_sym_gr_vect'.
 f_equal.
