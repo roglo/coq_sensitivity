@@ -212,6 +212,12 @@ intros * Hfg.
 change (vect_el (mk_vect n f) = vect_el (mk_vect n g)).
 f_equal.
 now apply vector_eq.
+(* questions:
+   - is this theorem "equivalent" to "vector_eq"?
+   - is it also equivalent to Matrix.matrix_eq? in that case, it
+     could be the only axiom required *)
+Require Import Matrix.
+Check matrix_eq.
 ...
 
 Definition sub_permut (f : nat → nat) i :=
