@@ -247,6 +247,19 @@ rewrite <- (IHn (k mod fact n)) at 1. 2: {
   apply Nat.mod_upper_bound, fact_neq_0.
 }
 (**)
+Print rank_of_permut_in_sym_gr_vect.
+rewrite fold_rank_of_permut_in_sym_gr_vect'.
+rewrite fold_rank_of_permut_in_sym_gr_vect'.
+f_equal.
+apply vector_eq.
+cbn - [ sub_permut ].
+(* ok, mais c'est de la triche *)
+...
+f (vect_el u) = f (vect_el v)
+f_equal.
+vect_el u = vect_el v
+apply vector_eq
+u = v
 ...
 rewrite fold_rank_of_permut_in_sym_gr_vect'.
 f_equal.
