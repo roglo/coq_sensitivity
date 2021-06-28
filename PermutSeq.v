@@ -212,11 +212,6 @@ Fixpoint rank_of_permut_in_sym_gr n (f : nat → nat) : nat :=
 Definition rank_of_permut_in_sym_gr_vect n (v : vector n nat) : nat :=
   rank_of_permut_in_sym_gr n (vect_el v).
 
-Theorem fold_rank_of_permut_in_sym_gr_vect : ∀ n (v : vector n nat),
-  rank_of_permut_in_sym_gr n (vect_el v) =
-  rank_of_permut_in_sym_gr_vect v.
-Proof. easy. Qed.
-
 Theorem fold_rank_of_permut_in_sym_gr_vect' : ∀ n f,
   rank_of_permut_in_sym_gr n f =
   rank_of_permut_in_sym_gr_vect (mk_vect n f).
