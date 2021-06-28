@@ -200,11 +200,9 @@ Record sym_gr n :=
 
 (* *)
 
-(* my axiom "vector_eq" implies function extensionality on
-   finite types; here, the proof. But I don't like the idea
-   of using it. This axiom was not provided for that. It uses
-   vectors in a context where there are initially no vectors. *)
-Theorem fun_ext_by_vect : ∀ A n (f g : nat → A),
+(* TODO: change this theorem into an axiom and prove the
+   "axioms" vector_eq and matrix_eq using it *)
+Theorem fin_fun_ext : ∀ A n (f g : nat → A),
   (∀ i, i < n → f i = g i)
   → f = g.
 Proof.
@@ -212,12 +210,34 @@ intros * Hfg.
 change (vect_el (mk_vect n f) = vect_el (mk_vect n g)).
 f_equal.
 now apply vector_eq.
-(* questions:
-   - is this theorem "equivalent" to "vector_eq"?
-   - is it also equivalent to Matrix.matrix_eq? in that case, it
-     could be the only axiom required *)
+Qed.
+
+Theorem vector_eq' :
+  ∀ (n : nat) (T : Type) (VA VB : vector n T),
+  (∀ i : nat, i < n → vect_el VA i = vect_el VB i) → VA = VB.
+Proof.
+intros * Hab.
+destruct VA as (f), VB as (g).
+f_equal.
+apply (fin_fun_ext (n := n)).
+Qed.
+
 Require Import Matrix.
 Check matrix_eq.
+
+Theorem matrix_eq' : ∀ m n T (MA MB : matrix m n T),
+  (∀ i j, i < m → j < n → mat_el MA i j = mat_el MB i j)
+  → MA = MB.
+Proof.
+intros * Hab.
+destruct MA as (f), MB as (g).
+f_equal; cbn in Hab.
+apply fin_fun_ext with (n := m).
+intros i Hi.
+apply fin_fun_ext with (n := n).
+intros j Hj.
+now apply Hab.
+Qed.
 ...
 
 Definition sub_permut (f : nat → nat) i :=
