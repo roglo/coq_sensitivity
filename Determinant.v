@@ -478,7 +478,7 @@ erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   rewrite rngl_product_list_permut with (l2 := seq 0 n); [ | easy | ]. 2: {
     apply permut_fun_Permutation.
-    now apply transposition_is_permut_fun.
+    now apply transposition_is_permut.
   }
   easy.
 }
@@ -765,7 +765,7 @@ Fixpoint nb_good_loop it i σ :=
 Definition nb_good n σ := nb_good_loop n 0 σ.
 
 Theorem nb_good_loop_comp_transp : ∀ n it σ i k,
-  is_permut_fun σ n
+  is_permut σ n
   → k < i ≤ n
   → σ k < i
   → n = i + it
@@ -798,7 +798,7 @@ split; [ flia Hkin | flia Hnit ].
 Qed.
 
 Theorem comp_transp_permut_id : ∀ n σ i j k,
-  is_permut_fun σ n
+  is_permut σ n
   → i < k
   → k < j < n
   → σ k = i
@@ -818,7 +818,7 @@ flia Hikn Hkp Hspi.
 Qed.
 
 Theorem nb_good_loop_comp_transp_permit_id : ∀ n it σ i k,
-  is_permut_fun σ n
+  is_permut σ n
   → i < n
   → k < n
   → n = k + it
@@ -887,7 +887,7 @@ apply Hj; flia Hkj.
 Qed.
 
 Theorem nb_good_loop_comp_transp2 : ∀ n it σ i,
-  is_permut_fun σ n
+  is_permut σ n
   → (∀ k, k < i → σ k = k)
   → σ i ≠ i
   → σ (σ i) ≠ i
@@ -964,7 +964,7 @@ apply IHit with (k := k); try easy; flia Hip.
 Qed.
 
 Theorem nb_good_loop_comp_transp' : ∀ n it σ i d,
-  is_permut_fun σ n
+  is_permut σ n
   → i < n
   → d ≠ 0
   → (∀ k, k < i → σ k = k)
@@ -1034,7 +1034,7 @@ flia Hk Hkd.
 Qed.
 
 Theorem nb_good_loop_comp_transp_eq : ∀ it n σ i k,
-  is_permut_fun σ n
+  is_permut σ n
   → first_non_fixpoint n 0 σ = Some i
   → k ≤ i
   → n = k + it
