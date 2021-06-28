@@ -190,13 +190,13 @@ Compute (list_of_bidule 4 mk_canon_sym_gr).
 Definition mk_canon_sym_gr_vect n : vector n! (vector n nat) :=
   mk_vect n! (λ k, mk_vect n (mk_canon_sym_gr n k)).
 
-Definition is_sym_gr n (σ : vector n! (vector n nat)) :=
+Definition is_sym_gr_vect n (σ : vector n! (vector n nat)) :=
   (∀ i j, i < n! → j < n! → vect_el σ i = vect_el σ j → i = j) ∧
   (∀ i, i < n! → is_permut (vect_el σ i)).
 
-Record sym_gr n :=
+Record sym_gr_vect n :=
   { sg_vect : vector n! (vector n nat);
-    sg_prop : is_sym_gr sg_vect }.
+    sg_prop : is_sym_gr_vect sg_vect }.
 
 (* *)
 
@@ -272,13 +272,11 @@ Qed.
 Theorem sym_gr_elem_injective : ∀ n i j,
   i < fact n
   → j < fact n
-  → vect_el (mk_canon_sym_gr_vect n) i = vect_el (mk_canon_sym_gr_vect n) j
+  → mk_canon_sym_gr n i = mk_canon_sym_gr n j
   → i = j.
 Proof.
 intros * Hi Hj Hij.
-apply (f_equal (@rank_of_permut_in_sym_gr_vect n)) in Hij.
-unfold rank_of_permut_in_sym_gr_vect in Hij.
-cbn in Hij.
+apply (f_equal (@rank_of_permut_in_sym_gr n)) in Hij.
 rewrite rank_of_permut_of_rank in Hij; [ | easy ].
 rewrite rank_of_permut_of_rank in Hij; [ | easy ].
 easy.
@@ -397,12 +395,14 @@ split. {
 }
 Qed.
 
-Theorem canon_sym_gr_prop : ∀ n, is_sym_gr (mk_canon_sym_gr_vect n).
+Theorem canon_sym_gr_prop : ∀ n, is_sym_gr_vect (mk_canon_sym_gr_vect n).
 Proof.
 intros.
 split. {
   intros i j Hi Hj Hij.
-  now apply sym_gr_elem_injective in Hij.
+  cbn in Hij.
+  injection Hij; intros H.
+  now apply sym_gr_elem_injective in H.
 } {
   intros i Hi.
   now apply sym_gr_elem_is_permut.

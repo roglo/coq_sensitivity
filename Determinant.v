@@ -608,6 +608,8 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
       now apply sym_gr_elem_is_permut.
     }
     apply vect_swap_elem_injective in Hij.
+    cbn in Hij.
+    injection Hij; clear Hij; intros Hij.
     now apply sym_gr_elem_injective in Hij.
   }
 }
@@ -2209,7 +2211,7 @@ Definition vect_find A n (f : A → bool) (u : vector n A) : nat :=
 
 Theorem sym_gr_surj : ∀ n (σ : vector n! _) p,
   n ≠ 0
-  → is_sym_gr σ
+  → is_sym_gr_vect σ
   → is_permut p
   → { i | i < n! ∧ vect_el σ i = p }.
 Proof.
