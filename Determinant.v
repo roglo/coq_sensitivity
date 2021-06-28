@@ -96,9 +96,9 @@ Definition det_from_col {n} (M : matrix (S n) (S n) T) j :=
 
 Definition determinant' n (M : matrix n n T) :=
   Σ (k = 0, fact n - 1),
-    ε (vect_el (mk_canon_sym_gr_vect n) k) *
+    ε (vect_el (mk_canon_sym_gr_vect' n) k) *
     Π (i = 1, n),
-    mat_el M (i - 1) (vect_el (vect_el (mk_canon_sym_gr_vect n) k) (i - 1)).
+    mat_el M (i - 1) (vect_el (vect_el (mk_canon_sym_gr_vect' n) k) (i - 1)).
 
 Arguments determinant' [n]%nat M%M.
 
@@ -341,7 +341,7 @@ Definition determinant'_list {n} (M : matrix n n T) :=
   map (λ k,
     (ε_permut n k *
      Π (i = 1, n),
-     mat_el M (i - 1) (vect_el (vect_el (mk_canon_sym_gr_vect n) k) (i - 1)%nat))%F)
+     mat_el M (i - 1) (vect_el (vect_el (mk_canon_sym_gr_vect' n) k) (i - 1)%nat))%F)
     (seq 0 n!).
 
 Arguments determinant'_list {n}%nat M%M.
@@ -488,7 +488,7 @@ erewrite rngl_summation_eq_compat. 2: {
   erewrite rngl_product_list_eq_compat. 2: {
     intros i Hi.
     replace (mat_el _ _ _) with
-      (mat_el M i (vect_el (vect_el (mk_canon_sym_gr_vect n) k) (transposition p q i))). 2: {
+      (mat_el M i (vect_el (vect_el (mk_canon_sym_gr_vect' n) k) (transposition p q i))). 2: {
       cbn.
       unfold transposition.
       do 2 rewrite if_eqb_eq_dec.
@@ -512,7 +512,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ mat_swap_rows ].
-set (f := λ k, vect_swap_elem (vect_el (mk_canon_sym_gr_vect n) k) p q).
+set (f := λ k, vect_swap_elem (vect_el (mk_canon_sym_gr_vect' n) k) p q).
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   assert (Hkn : k < n!). {
@@ -1485,7 +1485,7 @@ f_equal. {
 Qed.
 
 Definition swap_in_permut n i j k :=
-  vect_swap_elem (vect_el (mk_canon_sym_gr_vect n) k) i j.
+  vect_swap_elem (vect_el (mk_canon_sym_gr_vect' n) k) i j.
 
 (* comatrix *)
 
