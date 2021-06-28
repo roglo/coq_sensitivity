@@ -278,9 +278,9 @@ easy.
 Qed.
 
 Theorem permut_elem_ub : ∀ n k i,
-  k < fact n
+  k < n!
   → i < n
-  → vect_el (vect_el (mk_canon_sym_gr_vect n) k) i < n.
+  → mk_canon_sym_gr n k i < n.
 Proof.
 intros * Hkn Hin.
 revert k i Hkn Hin.
