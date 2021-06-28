@@ -66,9 +66,6 @@ Definition swap_elem (f : nat → nat) i j k :=
 
 Definition vect_swap_elem n (v : vector n nat) i j :=
   mk_vect n (swap_elem (vect_el v) i j).
-(*
-  mk_vect n (λ k, vect_el v (transposition i j k)).
-*)
 
 Theorem permut_ub : ∀ n f i,
   is_permut f n → i < n → f i < n.
@@ -97,25 +94,17 @@ destruct (Nat.eq_dec k i); [ easy | ].
 now destruct (Nat.eq_dec k j).
 Qed.
 
-Theorem vect_swap_elem_is_permut : ∀ n (σ : vector n nat) p q,
+Theorem vect_swap_elem_is_permut : ∀ n σ p q,
   p < n
   → q < n
-  → is_permut_vect σ
-  → is_permut_vect (vect_swap_elem σ p q).
+  → is_permut σ n
+  → is_permut (swap_elem σ p q) n.
 Proof.
 intros * Hp Hq Hσ.
-(*
-unfold is_permut_vect, vect_swap_elem in Hσ |-*.
-cbn in Hσ |-*.
-Print is_permut.
-remember (vect_el σ) as f eqn:Hf.
-clear σ Hf.
-cbn.
-...
-*)
 split; cbn. {
   intros i Hi.
-  apply vect_el_permut_ub; [ easy | ].
+  unfold swap_elem.
+  apply permut_ub; [ easy | ].
   now apply transposition_lt.
 } {
   intros * Hi Hj Hij.
