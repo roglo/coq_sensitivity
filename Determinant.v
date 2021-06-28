@@ -1896,7 +1896,7 @@ Theorem rngl_product_fun_permut :
   rngl_is_comm = true →
   ∀ n (σ : vector n nat) (f : nat → T),
   n ≠ 0
-  → is_permut σ
+  → is_permut_vect σ
   → Π (i = 0, n - 1), f (vect_el σ i) = Π (i = 0, n - 1), f i.
 Proof.
 intros Hic * Hnz Hσ.
@@ -2040,7 +2040,7 @@ destruct (Nat.eq_dec k (S n)) as [Hksn| Hksn]. {
 }
 specialize permut_inv_is_permut as H3.
 specialize (H3 _ σ).
-assert (H : is_permut σ) by easy.
+assert (H : is_permut_vect σ) by easy.
 specialize (H3 H); clear H.
 rewrite rngl_product_split with (j := k) in IHn. 2: {
   split; [ flia | ].
@@ -2175,7 +2175,7 @@ Theorem permut_comp_assoc : ∀ n (f g h : vector n nat),
 Proof. easy. Qed.
 
 Theorem comp_permut_inv_r : ∀ n f,
-  is_permut f
+  is_permut_vect f
   → (f ° permut_inv f = mk_vect n id).
 Proof.
 intros * Hf.
@@ -2212,7 +2212,7 @@ Definition vect_find A n (f : A → bool) (u : vector n A) : nat :=
 Theorem sym_gr_surj : ∀ n (σ : vector n! _) p,
   n ≠ 0
   → is_sym_gr_vect σ
-  → is_permut p
+  → is_permut_vect p
   → { i | i < n! ∧ vect_el σ i = p }.
 Proof.
 intros * Hnz Hσ Hp.

@@ -50,7 +50,7 @@ Definition is_permut_fun f n :=
   (∀ i, i < n → f i < n) ∧
   (∀ i j, i < n → j < n → f i = f j → i = j).
 
-Definition is_permut {n} (σ : vector n nat) := is_permut_fun (vect_el σ) n.
+Definition is_permut_vect {n} (σ : vector n nat) := is_permut_fun (vect_el σ) n.
 
 Fixpoint permut_fun_inv f i j :=
   match i with
@@ -72,7 +72,7 @@ now apply Hp.
 Qed.
 
 Theorem vect_el_permut_ub : ∀ n (σ : vector n nat) i,
-  is_permut σ → i < n → vect_el σ i < n.
+  is_permut_vect σ → i < n → vect_el σ i < n.
 Proof.
 intros * Hp Hin.
 now apply permut_fun_ub.
@@ -94,8 +94,8 @@ Qed.
 Theorem vect_swap_elem_is_permut : ∀ n (σ : vector n nat) p q,
   p < n
   → q < n
-  → is_permut σ
-  → is_permut (vect_swap_elem σ p q).
+  → is_permut_vect σ
+  → is_permut_vect (vect_swap_elem σ p q).
 Proof.
 intros * Hp Hq Hσ.
 split; cbn. {
@@ -192,7 +192,7 @@ Definition mk_canon_sym_gr_vect' n : vector n! (vector n nat) :=
 
 Definition is_sym_gr_vect n (σ : vector n! (vector n nat)) :=
   (∀ i j, i < n! → j < n! → vect_el σ i = vect_el σ j → i = j) ∧
-  (∀ i, i < n! → is_permut (vect_el σ i)).
+  (∀ i, i < n! → is_permut_vect (vect_el σ i)).
 
 Record sym_gr_vect n :=
   { sg_vect : vector n! (vector n nat);
@@ -417,7 +417,7 @@ Compute (rank_of_permut_in_sym_gr (vect_el (mk_canon_sym_gr 4) 12)).
 *)
 
 Theorem sub_permut_elem_ub : ∀ n (v : vector (S n) nat) i,
-  is_permut v
+  is_permut_vect v
   → i < n
   → sub_permut (vect_el v) i < n.
 Proof.
@@ -439,7 +439,7 @@ flia Hb H1 H2 H3.
 Qed.
 
 Theorem sub_permut_elem_injective : ∀ n (v : vector (S n) nat) i j,
-  is_permut v
+  is_permut_vect v
   → i < n
   → j < n
   → sub_permut (vect_el v) i = sub_permut (vect_el v) j
@@ -493,7 +493,7 @@ destruct bi; cbn. {
 Qed.
 
 Theorem rank_of_permut_upper_bound : ∀ n (v : vector n nat),
-  is_permut v
+  is_permut_vect v
   → rank_of_permut_in_sym_gr_vect v < n!.
 Proof.
 intros * (Hvn, Hn).
@@ -517,7 +517,7 @@ flia Hvn.
 Qed.
 
 Theorem permut_in_sym_gr_of_its_rank : ∀ n v,
-  is_permut v
+  is_permut_vect v
   → vect_el (mk_canon_sym_gr_vect' n) (rank_of_permut_in_sym_gr_vect v) = v.
 Proof.
 intros * (Hvn, Hn).
@@ -623,8 +623,8 @@ destruct b. {
 Qed.
 
 Theorem rank_of_permut_injective : ∀ n (σ₁ σ₂ : vector n nat),
-  is_permut σ₁
-  → is_permut σ₂
+  is_permut_vect σ₁
+  → is_permut_vect σ₂
   → rank_of_permut_in_sym_gr_vect σ₁ = rank_of_permut_in_sym_gr_vect σ₂
   → σ₁ = σ₂.
 Proof.
@@ -1898,7 +1898,7 @@ Theorem ε_ws_ε :
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
   ∀ n (p : vector n nat),
-  is_permut p
+  is_permut_vect p
   → ε p = ε_ws p.
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch *.
@@ -1988,7 +1988,7 @@ Qed.
 Theorem transposition_is_permut : ∀ n p q,
   p < n
   → q < n
-  → is_permut (mk_vect n (transposition p q)).
+  → is_permut_vect (mk_vect n (transposition p q)).
 Proof.
 intros.
 now apply transposition_is_permut_fun.
@@ -2561,8 +2561,8 @@ Theorem signature_comp :
   rngl_is_integral = true →
   rngl_characteristic = 0 →
   ∀ n (σ₁ σ₂ : vector n nat),
-  is_permut σ₁
-  → is_permut σ₂
+  is_permut_vect σ₁
+  → is_permut_vect σ₂
   → ε (σ₁ ° σ₂) = (ε σ₁ * ε σ₂)%F.
 Proof.
 intros Hop Hin Hic Hde H10 Hit Hch * Hp1 Hp2.
@@ -2931,8 +2931,8 @@ Definition permut_inv n (σ : vector n nat) :=
   mk_vect n (permut_fun_inv (vect_el σ) n).
 
 Theorem permut_inv_is_permut : ∀ n (σ : vector n nat),
-  is_permut σ
-  → is_permut (permut_inv σ).
+  is_permut_vect σ
+  → is_permut_vect (permut_inv σ).
 Proof.
 intros * Hperm.
 now apply permut_fun_inv_is_permut.
@@ -3112,7 +3112,7 @@ now apply Hl; left.
 Qed.
 
 Theorem is_permut_comp : ∀ n (u v : vector n nat),
-  is_permut u → is_permut v → is_permut (u ° v).
+  is_permut_vect u → is_permut_vect v → is_permut_vect (u ° v).
 Proof.
 intros * Hu Hv.
 split. {
@@ -3134,7 +3134,7 @@ Theorem ε_1_opp_1 :
   rngl_is_integral = true →
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
-  ∀ n (σ : vector n nat), is_permut σ → ε σ = 1%F ∨ ε σ = (-1)%F.
+  ∀ n (σ : vector n nat), is_permut_vect σ → ε σ = 1%F ∨ ε σ = (-1)%F.
 Proof.
 intros Hic Hop Hiv H10 Hit Hed Hch * Hσ.
 rewrite ε_ws_ε; try easy.
@@ -3161,7 +3161,7 @@ Theorem ε_square :
   rngl_is_integral = true →
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
-  ∀ n (σ : vector n nat), is_permut σ → (ε σ * ε σ = 1)%F.
+  ∀ n (σ : vector n nat), is_permut_vect σ → (ε σ * ε σ = 1)%F.
 Proof.
 intros Hic Hop Hiv H10 Hit Hed Hch * Hσ.
 specialize (ε_1_opp_1) as H1.
