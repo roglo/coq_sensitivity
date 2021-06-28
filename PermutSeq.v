@@ -187,7 +187,7 @@ Compute (list_of_bidule 3 mk_canon_sym_gr).
 Compute (list_of_bidule 4 mk_canon_sym_gr).
 *)
 
-Definition mk_canon_sym_gr_vect n : vector n! (vector n nat) :=
+Definition mk_canon_sym_gr_vect' n : vector n! (vector n nat) :=
   mk_vect n! (λ k, mk_vect n (mk_canon_sym_gr n k)).
 
 Definition is_sym_gr_vect n (σ : vector n! (vector n nat)) :=
@@ -322,7 +322,7 @@ Fixpoint sym_gr_inv n k (j : nat) :=
 Theorem sym_gr_inv_sym_gr : ∀ n k i,
   i < n
   → k < fact n
-  → sym_gr_inv n k (vect_el (vect_el (mk_canon_sym_gr_vect n) k) i) = i.
+  → sym_gr_inv n k (mk_canon_sym_gr n k i) = i.
 Proof.
 intros * Hi Hkn.
 revert k i Hi Hkn.
@@ -364,11 +364,11 @@ Theorem permut_elem_injective : ∀ n k i j,
   k < fact n
   → i < n
   → j < n
-  → vect_el (vect_el (mk_canon_sym_gr_vect n) k) i =
-     vect_el (vect_el (mk_canon_sym_gr_vect n) k) j
+  → mk_canon_sym_gr n k i = mk_canon_sym_gr n k j
   → i = j.
 Proof.
 intros * Hk Hi Hj Hij.
+cbn in Hij.
 assert (Hnz : n ≠ 0) by flia Hi.
 rewrite <- sym_gr_inv_sym_gr with (n := n) (k := k); [ | easy | easy ].
 symmetry.
@@ -390,7 +390,7 @@ split. {
 }
 Qed.
 
-Theorem canon_sym_gr_prop : ∀ n, is_sym_gr_vect (mk_canon_sym_gr_vect n).
+Theorem canon_sym_gr_prop : ∀ n, is_sym_gr_vect (mk_canon_sym_gr_vect' n).
 Proof.
 intros.
 split. {
@@ -403,6 +403,8 @@ split. {
   now apply sym_gr_elem_is_permut.
 }
 Qed.
+
+...
 
 Definition canon_sym_gr n :=
   {| sg_vect := mk_canon_sym_gr_vect n;
