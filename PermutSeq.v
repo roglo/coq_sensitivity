@@ -74,13 +74,6 @@ intros * Hp Hin.
 now apply Hp.
 Qed.
 
-Theorem vect_el_permut_ub : ∀ n (σ : vector n nat) i,
-  is_permut_vect σ → i < n → vect_el σ i < n.
-Proof.
-intros * Hp Hin.
-now apply permut_ub.
-Qed.
-
 Theorem transposition_lt : ∀ i j k n,
   i < n
   → j < n
