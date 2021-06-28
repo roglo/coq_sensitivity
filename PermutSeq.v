@@ -61,8 +61,14 @@ Fixpoint permut_fun_inv f i j :=
 Definition transposition i j k :=
   if k =? i then j else if k =? j then i else k.
 
+Definition swap_elem (f : nat → nat) i j k :=
+  f (transposition i j k).
+
 Definition vect_swap_elem n (v : vector n nat) i j :=
+  mk_vect n (swap_elem (vect_el v) i j).
+(*
   mk_vect n (λ k, vect_el v (transposition i j k)).
+*)
 
 Theorem permut_ub : ∀ n f i,
   is_permut f n → i < n → f i < n.
@@ -98,12 +104,22 @@ Theorem vect_swap_elem_is_permut : ∀ n (σ : vector n nat) p q,
   → is_permut_vect (vect_swap_elem σ p q).
 Proof.
 intros * Hp Hq Hσ.
+(*
+unfold is_permut_vect, vect_swap_elem in Hσ |-*.
+cbn in Hσ |-*.
+Print is_permut.
+remember (vect_el σ) as f eqn:Hf.
+clear σ Hf.
+cbn.
+...
+*)
 split; cbn. {
   intros i Hi.
   apply vect_el_permut_ub; [ easy | ].
   now apply transposition_lt.
 } {
   intros * Hi Hj Hij.
+  unfold swap_elem in Hij.
   unfold transposition in Hij.
   do 4 rewrite if_eqb_eq_dec in Hij.
   destruct (Nat.eq_dec i p) as [Hip| Hip]. {
@@ -2602,6 +2618,7 @@ Proof.
 intros.
 apply vector_eq.
 intros i Hi; cbn.
+unfold swap_elem.
 now rewrite transposition_involutive.
 Qed.
 
