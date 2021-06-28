@@ -64,7 +64,7 @@ Definition transposition i j k :=
 Definition vect_swap_elem n (v : vector n nat) i j :=
   mk_vect n (λ k, vect_el v (transposition i j k)).
 
-Theorem permut_fun_ub : ∀ n f i,
+Theorem permut_ub : ∀ n f i,
   is_permut f n → i < n → f i < n.
 Proof.
 intros * Hp Hin.
@@ -75,7 +75,7 @@ Theorem vect_el_permut_ub : ∀ n (σ : vector n nat) i,
   is_permut_vect σ → i < n → vect_el σ i < n.
 Proof.
 intros * Hp Hin.
-now apply permut_fun_ub.
+now apply permut_ub.
 Qed.
 
 Theorem transposition_lt : ∀ i j k n,
@@ -1171,7 +1171,7 @@ split. 2: {
     split; [ flia | cbn ].
     enough (H : i < S (S n)) by flia Hsni H.
     rewrite Hi.
-    apply permut_fun_ub; [ | flia ].
+    apply permut_ub; [ | flia ].
     now apply permut_fun_inv_is_permut.
   }
   symmetry; cbn - [ "-" ].
@@ -1179,7 +1179,7 @@ split. 2: {
   rewrite Nat.sub_succ_l. 2: {
     assert (H : i < S (S n)). {
       rewrite Hi.
-      apply permut_fun_ub; [ | flia ].
+      apply permut_ub; [ | flia ].
       now apply permut_fun_inv_is_permut.
     }
     flia Hsni H.
@@ -1214,7 +1214,7 @@ split. {
       rewrite <- Hajn in Hin.
       apply Hp in Hin; [ flia Hji Hin | | flia Hj ].
       rewrite Hi.
-      apply permut_fun_ub; [ | flia ].
+      apply permut_ub; [ | flia ].
       now apply permut_fun_inv_is_permut.
     }
     enough (H : a j < S n) by flia Hajn H.
@@ -1262,7 +1262,7 @@ rewrite (List_seq_cut i); subst s. 2: {
   subst i.
   apply in_seq.
   split; [ flia | ].
-  apply permut_fun_ub; [ | flia ].
+  apply permut_ub; [ | flia ].
   now apply permut_fun_inv_is_permut.
 }
 rewrite Nat.sub_0_r; cbn.

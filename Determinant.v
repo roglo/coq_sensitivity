@@ -538,7 +538,7 @@ erewrite rngl_summation_eq_compat. 2: {
     subst f; cbn.
     split; cbn. {
       intros i Hi.
-      apply permut_fun_ub; [ now apply sym_gr_elem_is_permut | ].
+      apply permut_ub; [ now apply sym_gr_elem_is_permut | ].
       now apply transposition_lt.
     } {
       intros * Hi Hj Hij.
@@ -924,7 +924,7 @@ assert (Hij : i < j). {
 }
 assert (Hkn : k < n). {
   rewrite Hk.
-  apply permut_fun_ub; [ | flia Hnit ].
+  apply permut_ub; [ | flia Hnit ].
   now apply permut_fun_inv_is_permut.
 }
 clear Hk.
