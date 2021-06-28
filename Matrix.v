@@ -16,10 +16,21 @@ Require Import MyVector.
 Record matrix (m n : nat) T := mk_mat
   { mat_el : nat → nat → T }.
 
-(* function extensionality required for matrices *)
-Axiom matrix_eq : ∀ m n T (MA MB : matrix m n T),
+(* function extensionality for matrices *)
+
+Theorem matrix_eq : ∀ m n T (MA MB : matrix m n T),
   (∀ i j, i < m → j < n → mat_el MA i j = mat_el MB i j)
   → MA = MB.
+Proof.
+intros * Hab.
+destruct MA as (f), MB as (g).
+f_equal; cbn in Hab.
+apply fin_fun_ext with (n := m).
+intros i Hi.
+apply fin_fun_ext with (n := n).
+intros j Hj.
+now apply Hab.
+Qed.
 
 Theorem matrix_neq : ∀ m n T (MA MB : matrix m n T),
   ¬ (∀ i j, i < m → j < n → mat_el MA i j = mat_el MB i j)
