@@ -416,16 +416,16 @@ Compute map list_of_vect (list_of_vect (mk_canon_sym_gr 4)).
 Compute (rank_of_permut_in_sym_gr (vect_el (mk_canon_sym_gr 4) 12)).
 *)
 
-Theorem sub_permut_elem_ub : ∀ n (v : vector (S n) nat) i,
-  is_permut_vect v
+Theorem sub_permut_elem_ub : ∀ n f i,
+  is_permut f (S n)
   → i < n
-  → sub_permut (vect_el v) i < n.
+  → sub_permut f i < n.
 Proof.
 intros * (Hvn, Hn) Hin.
 destruct n; [ easy | ].
 cbn - [ "<?" ].
 unfold sub_permut.
-remember (vect_el v 0 <? vect_el v (S i)) as b eqn:Hb.
+remember (f 0 <? f (S i)) as b eqn:Hb.
 symmetry in Hb.
 specialize (Hvn (S i)) as H1.
 specialize (Hn 0 (S i) (Nat.lt_0_succ _)) as H2.
@@ -445,6 +445,7 @@ Theorem sub_permut_elem_injective : ∀ n (v : vector (S n) nat) i j,
   → sub_permut (vect_el v) i = sub_permut (vect_el v) j
   → i = j.
 Proof.
+...
 intros * (Hvn, Hn) Hin Hjn Hij.
 destruct (Nat.eq_dec i j) as [H| H]; [ easy | exfalso ].
 revert Hij; rename H into Hij.
@@ -492,14 +493,19 @@ destruct bi; cbn. {
 }
 Qed.
 
+(*
+Theorem rank_of_permut_upper_bound : ∀ n f,
+  is_permut f n
+  → rank_of_permut_in_sym_gr n f < n!.
+*)
 Theorem rank_of_permut_upper_bound : ∀ n (v : vector n nat),
   is_permut_vect v
   → rank_of_permut_in_sym_gr_vect v < n!.
+(**)
 Proof.
 intros * (Hvn, Hn).
 revert v Hvn Hn.
-induction n; intros; [ cbn; flia | ].
-cbn.
+induction n; intros; cbn; [ flia | ].
 rewrite Nat.add_comm.
 apply Nat.add_lt_le_mono. {
   rewrite fold_rank_of_permut_in_sym_gr_vect'.
@@ -508,6 +514,7 @@ apply Nat.add_lt_le_mono. {
     now apply sub_permut_elem_ub.
   } {
     intros i j Hi Hj.
+...
     now apply sub_permut_elem_injective.
   }
 }
@@ -515,6 +522,8 @@ apply Nat.mul_le_mono_r.
 specialize (Hvn 0 (Nat.lt_0_succ _)).
 flia Hvn.
 Qed.
+
+...
 
 Theorem permut_in_sym_gr_of_its_rank : ∀ n v,
   is_permut_vect v
