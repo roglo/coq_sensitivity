@@ -391,7 +391,7 @@ split. {
 }
 Qed.
 
-Theorem canon_sym_gr_prop : ∀ n, is_sym_gr_vect (mk_canon_sym_gr_vect' n).
+Theorem canon_sym_gr_prop : ∀ n, is_sym_gr n (mk_canon_sym_gr n).
 Proof.
 intros.
 split. {
