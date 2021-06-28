@@ -438,22 +438,21 @@ specialize (Hvn 0 (Nat.lt_0_succ _)) as H3.
 flia Hb H1 H2 H3.
 Qed.
 
-Theorem sub_permut_elem_injective : ∀ n (v : vector (S n) nat) i j,
-  is_permut_vect v
+Theorem sub_permut_elem_injective : ∀ n f i j,
+  is_permut f (S n)
   → i < n
   → j < n
-  → sub_permut (vect_el v) i = sub_permut (vect_el v) j
+  → sub_permut f i = sub_permut f j
   → i = j.
 Proof.
-...
 intros * (Hvn, Hn) Hin Hjn Hij.
 destruct (Nat.eq_dec i j) as [H| H]; [ easy | exfalso ].
 revert Hij; rename H into Hij.
 destruct n; [ easy | ].
 cbn - [ "<?" ].
 unfold sub_permut.
-remember (vect_el v 0 <? vect_el v (S i)) as bi eqn:Hbi.
-remember (vect_el v 0 <? vect_el v (S j)) as bj eqn:Hbj.
+remember (f 0 <? f (S i)) as bi eqn:Hbi.
+remember (f 0 <? f (S j)) as bj eqn:Hbj.
 symmetry in Hbi, Hbj.
 move bj before bi.
 destruct bi; cbn. {
@@ -493,15 +492,9 @@ destruct bi; cbn. {
 }
 Qed.
 
-(*
-Theorem rank_of_permut_upper_bound : ∀ n f,
-  is_permut f n
-  → rank_of_permut_in_sym_gr n f < n!.
-*)
 Theorem rank_of_permut_upper_bound : ∀ n (v : vector n nat),
   is_permut_vect v
   → rank_of_permut_in_sym_gr_vect v < n!.
-(**)
 Proof.
 intros * (Hvn, Hn).
 revert v Hvn Hn.
@@ -514,16 +507,13 @@ apply Nat.add_lt_le_mono. {
     now apply sub_permut_elem_ub.
   } {
     intros i j Hi Hj.
-...
-    now apply sub_permut_elem_injective.
+    now apply sub_permut_elem_injective with (n := n).
   }
 }
 apply Nat.mul_le_mono_r.
 specialize (Hvn 0 (Nat.lt_0_succ _)).
 flia Hvn.
 Qed.
-
-...
 
 Theorem permut_in_sym_gr_of_its_rank : ∀ n v,
   is_permut_vect v
@@ -546,7 +536,7 @@ destruct j. {
     now apply sub_permut_elem_ub.
   } {
     intros i j Hi Hj.
-    now apply sub_permut_elem_injective.
+    now apply sub_permut_elem_injective with (n := n).
   }
 }
 cbn.
@@ -563,7 +553,7 @@ assert (Hkn : k < fact n). {
     now apply sub_permut_elem_ub.
   } {
     intros i m Hi Hm.
-    now apply sub_permut_elem_injective.
+    now apply sub_permut_elem_injective with (n := n).
   }
 }
 rewrite Nat.div_small; [ | easy ].
@@ -582,7 +572,7 @@ assert
     → sub_permut (vect_el v) i = sub_permut (vect_el v) j
     → i = j). {
   intros i m Hi Hm Him.
-  now apply sub_permut_elem_injective in Him.
+  now apply sub_permut_elem_injective with (n := n) in Him.
 }
 destruct b. {
   apply Nat.leb_le in Hb; cbn.
