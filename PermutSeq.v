@@ -200,10 +200,6 @@ Record sym_gr n :=
 
 (* *)
 
-Check fin_fun_ext.
-
-...
-
 Definition sub_permut (f : nat → nat) i :=
   f (S i) - Nat.b2n (f 0 <? f (S i)).
 
@@ -250,8 +246,9 @@ rewrite <- (IHn (k mod fact n)) at 1. 2: {
   apply Nat.mod_upper_bound, fact_neq_0.
 }
 (**)
-Print rank_of_permut_in_sym_gr_vect.
-Print rank_of_permut_in_sym_gr.
+f_equal.
+apply (fin_fun_ext (n := n)).
+intros i Hi.
 ...
 rewrite fold_rank_of_permut_in_sym_gr_vect'.
 rewrite fold_rank_of_permut_in_sym_gr_vect'.
