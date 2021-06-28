@@ -188,9 +188,12 @@ Compute (list_of_bidule 4 mk_canon_sym_gr).
 Definition mk_canon_sym_gr_vect' n : vector n! (vector n nat) :=
   mk_vect n! (λ k, mk_vect n (mk_canon_sym_gr n k)).
 
+Definition is_sym_gr n (f : nat → nat → nat) :=
+  (∀ i j, i < n! → j < n! → f i = f j → i = j) ∧
+  (∀ i, i < n! → is_permut (f i) n).
+
 Definition is_sym_gr_vect n (σ : vector n! (vector n nat)) :=
-  (∀ i j, i < n! → j < n! → vect_el σ i = vect_el σ j → i = j) ∧
-  (∀ i, i < n! → is_permut_vect (vect_el σ i)).
+  is_sym_gr n (λ i, vect_el (vect_el σ i)).
 
 Record sym_gr_vect n :=
   { sg_vect : vector n! (vector n nat);
@@ -394,8 +397,7 @@ intros.
 split. {
   intros i j Hi Hj Hij.
   cbn in Hij.
-  injection Hij; intros H.
-  now apply sym_gr_elem_injective in H.
+  now apply sym_gr_elem_injective in Hij.
 } {
   intros i Hi.
   now apply sym_gr_elem_is_permut.
