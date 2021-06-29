@@ -49,7 +49,10 @@ Definition list_list_ncols T (ll : list (list T)) :=
   length (hd [] ll).
 
 Fixpoint fin_seq start len : list (fin (start + len)) :=
-...
+  match len with
+  | 0 => []
+  | S len' => fin_seq (S start) len'
+  end.
 
 ...
 
