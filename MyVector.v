@@ -17,6 +17,22 @@ Axiom vector_eq : ∀ n T (VA VB : vector n T),
   (∀ i, i < n → vect_el VA i = vect_el VB i)
   → VA = VB.
 
+Theorem oops : False.
+Proof.
+assert (H1 : ∀ f g : nat → nat, f = g). {
+  intros.
+  enough (mk_vect 0 f = mk_vect 0 g) by now injection H.
+  now apply vector_eq.
+}
+assert (H2 : ∀ (f g : nat → nat), f = g → ∀ x, f x = g x). {
+  intros * Hfg x.
+  now subst f.
+}
+now specialize (H2 (λ _, 0) (λ _, 1) (H1 _ _) 0).
+Qed.
+
+...
+
 Definition vect_of_list {T} d (l : list T) : vector (length l) T :=
   mk_vect (length l) (λ i, nth i l d).
 Definition list_of_vect {n T} (v : vector n T) :=
