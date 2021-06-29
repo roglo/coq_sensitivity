@@ -48,7 +48,28 @@ Definition list_list_nrows T (ll : list (list T)) :=
 Definition list_list_ncols T (ll : list (list T)) :=
   length (hd [] ll).
 
+...
+
 Definition fin_seq start len : list (fin (start + len)).
+Proof.
+intros.
+revert start.
+induction len; intros. {
+  rewrite Nat.add_0_r.
+  apply [].
+}
+rewrite <- Nat.add_succ_comm.
+apply IHlen.
+Qed.
+
+Compute (fin_seq 3 4).
+Compute (hd {| f_nat := 0; f_prop := Nat.lt_0_succ (2 + 4) |} (fin_seq 3 4)).
+Compute (map f_nat (fin_seq 3 4)).
+
+Fixpoint fin_seq' start len : list (fin (start + len)) :=
+  match len with
+  | 0 => []
+  | S len' => {| f_
 
 ...
 
