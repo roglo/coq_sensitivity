@@ -2368,9 +2368,10 @@ Definition sumbool_and {A B C D : Prop} (P : sumbool A B) (Q : sumbool C D) :=
 Notation "a ∨∨ b" := (sumbool_or a b) (at level 85).
 Notation "a ∧∧ b" := (sumbool_and a b) (at level 80).
 
-(* extensionality of functions *)
+(* extensionality of finite functions *)
 
-Axiom fun_ext : ∀ A B (f g : A → B),
+Record fin n := { f_nat : nat; f_prop : f_nat < n }.
+Axiom fun_ext : ∀ n A (f g : fin n → A),
   (∀ i, f i = g i)
   → f = g.
 

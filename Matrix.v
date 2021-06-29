@@ -14,32 +14,26 @@ Require Import MyVector.
 (* matrices *)
 
 Record matrix (m n : nat) T := mk_mat
-  { mat_el : nat → nat → T }.
+  { mat_el : fin m → fin n → T }.
 
 (* function extensionality for matrices *)
 
 Theorem matrix_eq : ∀ m n T (MA MB : matrix m n T),
-  (∀ i j, i < m → j < n → mat_el MA i j = mat_el MB i j)
+  (∀ i j, mat_el MA i j = mat_el MB i j)
   → MA = MB.
 Proof.
 intros * Hab.
 destruct MA as (f), MB as (g).
 f_equal; cbn in Hab.
 apply fun_ext.
-intros i.
+intros (i, Hi).
 apply fun_ext.
-intros j.
+intros (j, Hj).
 apply Hab.
-...
-apply fin_fun_ext with (n := m).
-intros i Hi.
-apply fin_fun_ext with (n := n).
-intros j Hj.
-now apply Hab.
 Qed.
 
 Theorem matrix_neq : ∀ m n T (MA MB : matrix m n T),
-  ¬ (∀ i j, i < m → j < n → mat_el MA i j = mat_el MB i j)
+  ¬ (∀ i j, mat_el MA i j = mat_el MB i j)
   → MA ≠ MB.
 Proof.
 intros * Hab.
@@ -54,8 +48,26 @@ Definition list_list_nrows T (ll : list (list T)) :=
 Definition list_list_ncols T (ll : list (list T)) :=
   length (hd [] ll).
 
+Definition fin_seq start len : list (fin (start + len)).
+
+...
+
+Theorem pouet : ∀ start len glen (p : start + len < glen), start < glen.
+Proof.
+Admitted.
+
+Theorem glop : ∀ start len len' glen (p : len = S len') (q : start + S len' < glen), S start + len' < glen.
+Proof.
+Admitted.
+
+Fixpoint fin_seq start len glen (p : start + len < glen) :=
+  match len with
+  | 0 => []
+  | S len' => {| f_nat := start; f_prop := pouet start len p |} :: fin_seq (S start) len' (glop start eq_refl p)
+  end.
+
 Definition list_list_of_mat m n T (M : matrix m n T) : list (list T) :=
-  map (λ i, map (mat_el M i) (seq 0 m)) (seq 0 n).
+  map (λ i, map (mat_el M i) (fin_seq 0 m)) (seq 0 n).
 
 Definition list_list_el T d (ll : list (list T)) i j : T :=
   nth j (nth i ll []) d.
