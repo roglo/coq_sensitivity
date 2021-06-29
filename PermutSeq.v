@@ -492,16 +492,15 @@ destruct bi; cbn. {
 }
 Qed.
 
-Theorem rank_of_permut_upper_bound : ∀ n (v : vector n nat),
-  is_permut_vect v
-  → rank_of_permut_in_sym_gr_vect v < n!.
+Theorem rank_of_permut_upper_bound : ∀ n f,
+  is_permut f n
+  → rank_of_permut_in_sym_gr n f < n!.
 Proof.
 intros * (Hvn, Hn).
-revert v Hvn Hn.
+revert f Hvn Hn.
 induction n; intros; cbn; [ flia | ].
 rewrite Nat.add_comm.
 apply Nat.add_lt_le_mono. {
-  rewrite fold_rank_of_permut_in_sym_gr_vect'.
   apply IHn. {
     intros i Hi.
     now apply sub_permut_elem_ub.
