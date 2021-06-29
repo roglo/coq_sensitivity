@@ -135,6 +135,20 @@ Qed.
      final result: 2;0;3;1
   *)
 
+(*
+Definition fin_of_nat_mod_fact a n :=
+  @Fin.of_nat_lt (a mod n!) n!
+     (Nat.mod_upper_bound a n! (fact_neq_0 n)).
+
+Definition sym_gr_fun n (σ_n : Fin.t n! → nat → nat) k j : nat :=
+  match j with
+  | 0 => k / n!
+  | S j' =>
+      σ_n (fin_of_nat_mod_fact k n) j' +
+      Nat.b2n (k / n! <=? σ_n (fin_of_nat_mod_fact k n) j')
+  end.
+*)
+
 Definition sym_gr_fun n (σ_n : nat → nat → nat) k j : nat :=
   match j with
   | 0 => k / n!
