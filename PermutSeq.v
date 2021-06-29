@@ -235,6 +235,7 @@ rewrite <- (IHn (k mod fact n)) at 1. 2: {
   apply Nat.mod_upper_bound, fact_neq_0.
 }
 f_equal.
+...
 apply (fin_fun_ext (n := n)).
 intros i Hi; cbn.
 symmetry.
