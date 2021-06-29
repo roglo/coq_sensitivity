@@ -514,14 +514,14 @@ specialize (Hvn 0 (Nat.lt_0_succ _)).
 flia Hvn.
 Qed.
 
-Theorem permut_in_sym_gr_of_its_rank : ∀ n v,
-  is_permut_vect v
-  → vect_el (mk_canon_sym_gr_vect' n) (rank_of_permut_in_sym_gr_vect v) = v.
+Theorem permut_in_sym_gr_of_its_rank : ∀ n f,
+  is_permut f n
+  → mk_canon_sym_gr n (rank_of_permut_in_sym_gr n f) = f.
 Proof.
 intros * (Hvn, Hn).
-apply vector_eq; cbn.
+apply fin_fun_ext with (n := n); cbn.
 intros j Hj.
-revert j v Hj Hvn Hn.
+revert j f Hj Hvn Hn.
 induction n; intros; [ easy | cbn ].
 destruct j. {
   cbn; clear Hj.
@@ -539,8 +539,7 @@ destruct j. {
   }
 }
 cbn.
-rewrite fold_rank_of_permut_in_sym_gr_vect'.
-remember (rank_of_permut_in_sym_gr_vect (mk_vect n (sub_permut (vect_el v)))) as k eqn:Hk.
+remember (rank_of_permut_in_sym_gr n (sub_permut f)) as k eqn:Hk.
 symmetry in Hk.
 rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
 rewrite Nat_mod_add_l_mul_r; [ | apply fact_neq_0 ].
@@ -558,9 +557,9 @@ assert (Hkn : k < fact n). {
 rewrite Nat.div_small; [ | easy ].
 rewrite Nat.mod_small; [ | easy ].
 rewrite Nat.add_0_r.
-remember (vect_el v 0 <=? mk_canon_sym_gr n k j) as b eqn:Hb.
+remember (f 0 <=? mk_canon_sym_gr n k j) as b eqn:Hb.
 symmetry in Hb.
-assert (H1 : ∀ i, i < n → sub_permut (vect_el v) i < n). {
+assert (H1 : ∀ i, i < n → sub_permut f i < n). {
   intros i Hi.
   now apply sub_permut_elem_ub.
 }
@@ -568,7 +567,7 @@ assert
 (H2 : ∀ i j : nat,
     i < n
     → j < n
-    → sub_permut (vect_el v) i = sub_permut (vect_el v) j
+    → sub_permut f i = sub_permut f j
     → i = j). {
   intros i m Hi Hm Him.
   now apply sub_permut_elem_injective with (n := n) in Him.
@@ -582,7 +581,7 @@ destruct b. {
   cbn - [ "<?" ] in Hb |-*.
   unfold sub_permut.
   unfold sub_permut in Hb.
-  remember (vect_el v 0 <? vect_el v (S j)) as b1 eqn:Hb1.
+  remember (f 0 <? f (S j)) as b1 eqn:Hb1.
   symmetry in Hb1.
   destruct b1. {
     apply Nat.ltb_lt in Hb1; cbn.
@@ -601,7 +600,7 @@ destruct b. {
   rewrite Nat.add_0_r.
   rewrite <- Hk in Hb |-*.
   unfold sub_permut in Hb.
-  remember (vect_el v 0 <? vect_el v (S j)) as b1 eqn:Hb1.
+  remember (f 0 <? f (S j)) as b1 eqn:Hb1.
   symmetry in Hb1.
   apply Nat.succ_lt_mono in Hj.
   destruct b1. {
@@ -620,14 +619,14 @@ destruct b. {
 }
 Qed.
 
-Theorem rank_of_permut_injective : ∀ n (σ₁ σ₂ : vector n nat),
-  is_permut_vect σ₁
-  → is_permut_vect σ₂
-  → rank_of_permut_in_sym_gr_vect σ₁ = rank_of_permut_in_sym_gr_vect σ₂
-  → σ₁ = σ₂.
+Theorem rank_of_permut_injective : ∀ n f g,
+  is_permut f n
+  → is_permut g n
+  → rank_of_permut_in_sym_gr n f = rank_of_permut_in_sym_gr n g
+  → f = g.
 Proof.
 intros * Hσ₁ Hσ₂ Hσσ.
-apply (f_equal (vect_el (mk_canon_sym_gr_vect' n))) in Hσσ.
+apply (f_equal (mk_canon_sym_gr n)) in Hσσ.
 rewrite permut_in_sym_gr_of_its_rank in Hσσ; [ | easy ].
 rewrite permut_in_sym_gr_of_its_rank in Hσσ; [ | easy ].
 easy.
