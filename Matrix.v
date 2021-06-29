@@ -25,6 +25,12 @@ Proof.
 intros * Hab.
 destruct MA as (f), MB as (g).
 f_equal; cbn in Hab.
+apply fun_ext.
+intros i.
+apply fun_ext.
+intros j.
+apply Hab.
+...
 apply fin_fun_ext with (n := m).
 intros i Hi.
 apply fin_fun_ext with (n := n).

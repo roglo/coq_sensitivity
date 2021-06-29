@@ -2368,11 +2368,10 @@ Definition sumbool_and {A B C D : Prop} (P : sumbool A B) (Q : sumbool C D) :=
 Notation "a ∨∨ b" := (sumbool_or a b) (at level 85).
 Notation "a ∧∧ b" := (sumbool_and a b) (at level 80).
 
-(* extensionality of functions of type {1,2...n} → A
-   useful for vectors and matrices *)
+(* extensionality of functions *)
 
-Axiom fin_fun_ext : ∀ A n (f g : nat → A),
-  (∀ i, i < n → f i = g i)
+Axiom fun_ext : ∀ A B (f g : A → B),
+  (∀ i, f i = g i)
   → f = g.
 
 Arguments iter_list {A B}%type l%list f%function : simpl never.

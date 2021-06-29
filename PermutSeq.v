@@ -2593,10 +2593,23 @@ apply (f_equal (transposition p q)) in Hpq.
 now do 2 rewrite transposition_involutive in Hpq.
 Qed.
 
-Theorem vect_swap_elem_involutive : ∀ n (v : vector n nat) p q,
-  vect_swap_elem (vect_swap_elem v p q) p q = v.
+Theorem swap_elem_involutive : ∀ f p q,
+  swap_elem (swap_elem f p q) p q = f.
 Proof.
 intros.
+Print fin_fun_ext.
+Theorem my_false : ∀ A (f g : nat → A), f = g.
+Proof.
+intros.
+apply fin_fun_ext with (n := 0).
+easy.
+Print fin_fun_ext.
+...
+apply fin_fun_ext with (n := n).
+intros i Hi.
+unfold swap_elem.
+rewrite transposition_involutive.
+...
 apply vector_eq.
 intros i Hi; cbn.
 unfold swap_elem.

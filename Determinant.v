@@ -580,11 +580,15 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
     flia Hk Hn.
   }
   unfold g, f.
-...
+  unfold vect_swap_elem; cbn.
+  unfold rank_of_permut_in_sym_gr_vect; cbn.
   rewrite permut_in_sym_gr_of_its_rank. 2: {
     apply vect_swap_elem_is_permut; [ easy | easy | ].
     now apply sym_gr_elem_is_permut.
   }
+...
+  rewrite transposition_involutive.
+...
   rewrite vect_swap_elem_involutive.
   now apply rank_of_permut_of_rank.
 }
