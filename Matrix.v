@@ -48,6 +48,9 @@ Definition list_list_nrows T (ll : list (list T)) :=
 Definition list_list_ncols T (ll : list (list T)) :=
   length (hd [] ll).
 
+Fixpoint fin_seq start len : list (fin (start + len)) :=
+...
+
 ...
 
 Definition fin_seq start len : list (fin (start + len)).
