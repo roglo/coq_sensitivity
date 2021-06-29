@@ -11,24 +11,6 @@ Require Import Misc RingLike MyVector.
 Require Import RLproduct.
 Require Import Pigeonhole.
 
-(* attempt to define the symmetric group with functions
-
-Definition fin_bijective n (f : nat → nat) :=
-  ∃ g, (∀ a, a < n → g (f a) = a) ∧ (∀ a, a < n → f (g a) = a).
-
-Record sym_gr n := mk_sym_gr
-  { sg_perm : nat → nat;
-    sg_bij : fin_bijective n sg_perm }.
-
-Theorem sym_gr_has_fact_elem : ∀ n,
-  ∃ f : sym_gr n → Fin.t n!, FinFun.Bijective f.
-Proof.
-intros.
-...
-*)
-
-(* *)
-
 Definition comp {A B C} (f : B → C) (g : A → B) x := f (g x).
 
 Definition permut_comp {n} (σ₁ σ₂ : vector n nat) :=
