@@ -48,6 +48,53 @@ Definition list_list_nrows T (ll : list (list T)) :=
 Definition list_list_ncols T (ll : list (list T)) :=
   length (hd [] ll).
 
+(* *)
+
+Theorem glop : ∀ start len d, d + start < start + (d + 1 + len).
+Proof. flia. Qed.
+
+Fixpoint fin_seq start len : list (fin (start + len)) :=
+  match len with
+  | 0 => []
+  | 1 => [@mk_fin (start + 1) start (glop start 0 0)]
+  | 2 =>
+      [@mk_fin (start + 2) start (glop start 1 0);
+       @mk_fin (start + 2) (S start) (glop start 0 1)]
+  | 3 =>
+      [@mk_fin (start + 3) start (glop start 2 0);
+       @mk_fin (start + 3) (S start) (glop start 1 1);
+       @mk_fin (start + 3) (S (S start)) (glop start 0 2)]
+  | S len' => []
+  end.
+
+Compute (fin_seq 7 3).
+Compute (fin_seq 7 3 : list (fin 10)).
+Compute (map (@f_nat _) (fin_seq 7 3)).
+
+(* mais non mais ça ne va pas, mon bin'z, là. La fonction "fin_seq" ne
+   devrait s'appliquer que sur des suites commençant à 0 *)
+
+Theorem toto : ∀ len d, d < (d + 1 + len).
+Proof. flia. Qed.
+
+Fixpoint fin_seq' len : list (fin len) :=
+  match len with
+  | 0 => []
+  | 1 => [@mk_fin 1 0 (toto 0 0)]
+  | 2 =>
+      [@mk_fin 2 0 (toto 1 0);
+       @mk_fin 2 1 (toto 0 1)]
+  | 3 =>
+      [@mk_fin 3 0 (toto 2 0);
+       @mk_fin 3 1 (toto 1 1);
+       @mk_fin 3 2 (toto 0 2)]
+  | _ => []
+  end.
+
+Compute (fin_seq' 3).
+
+...
+
 Fixpoint fin_seq start len : list (fin (start + len)) :=
   match len with
   | 0 => []
