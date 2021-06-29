@@ -2370,10 +2370,12 @@ Notation "a ∧∧ b" := (sumbool_and a b) (at level 80).
 
 (* extensionality of finite functions *)
 
+(*
 Record fin n := mk_fin { f_nat : nat; f_prop : f_nat < n }.
 
 Axiom fun_ext : ∀ n A (f g : fin n → A),
   (∀ i, f i = g i)
   → f = g.
+*)
 
 Arguments iter_list {A B}%type l%list f%function : simpl never.

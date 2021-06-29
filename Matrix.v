@@ -14,23 +14,13 @@ Require Import MyVector.
 (* matrices *)
 
 Record matrix (m n : nat) T := mk_mat
-  { mat_el : fin m → fin n → T }.
+  { mat_el : nat → nat → T }.
 
 (* function extensionality for matrices *)
 
-Theorem matrix_eq : ∀ m n T (MA MB : matrix m n T),
-  (∀ i j, mat_el MA i j = mat_el MB i j)
-  → MA = MB.
-Proof.
-intros * Hab.
-destruct MA as (f), MB as (g).
-f_equal; cbn in Hab.
-apply fun_ext.
-intros (i, Hi).
-apply fun_ext.
-intros (j, Hj).
-apply Hab.
-Qed.
+Axiom matrix_eq : ∀ m n T (MA MB : matrix m n T),
+   (∀ i j, i < m → j < n → mat_el MA i j = mat_el MB i j)
+   → MA = MB.
 
 Theorem matrix_neq : ∀ m n T (MA MB : matrix m n T),
   ¬ (∀ i j, mat_el MA i j = mat_el MB i j)
@@ -48,100 +38,8 @@ Definition list_list_nrows T (ll : list (list T)) :=
 Definition list_list_ncols T (ll : list (list T)) :=
   length (hd [] ll).
 
-(* *)
-
-Theorem glop : ∀ start len d, d + start < start + (d + 1 + len).
-Proof. flia. Qed.
-
-Fixpoint fin_seq start len : list (fin (start + len)) :=
-  match len with
-  | 0 => []
-  | 1 => [@mk_fin (start + 1) start (glop start 0 0)]
-  | 2 =>
-      [@mk_fin (start + 2) start (glop start 1 0);
-       @mk_fin (start + 2) (S start) (glop start 0 1)]
-  | 3 =>
-      [@mk_fin (start + 3) start (glop start 2 0);
-       @mk_fin (start + 3) (S start) (glop start 1 1);
-       @mk_fin (start + 3) (S (S start)) (glop start 0 2)]
-  | S len' => []
-  end.
-
-Compute (fin_seq 7 3).
-Compute (fin_seq 7 3 : list (fin 10)).
-Compute (map (@f_nat _) (fin_seq 7 3)).
-
-(* mais non mais ça ne va pas, mon bin'z, là. La fonction "fin_seq" ne
-   devrait s'appliquer que sur des suites commençant à 0 *)
-
-Theorem toto : ∀ len d, d < (d + 1 + len).
-Proof. flia. Qed.
-
-Fixpoint fin_seq' len : list (fin len) :=
-  match len with
-  | 0 => []
-  | 1 => [@mk_fin 1 0 (toto 0 0)]
-  | 2 =>
-      [@mk_fin 2 0 (toto 1 0);
-       @mk_fin 2 1 (toto 0 1)]
-  | 3 =>
-      [@mk_fin 3 0 (toto 2 0);
-       @mk_fin 3 1 (toto 1 1);
-       @mk_fin 3 2 (toto 0 2)]
-  | _ => []
-  end.
-
-Compute (fin_seq' 3).
-
-...
-
-Fixpoint fin_seq start len : list (fin (start + len)) :=
-  match len with
-  | 0 => []
-  | S len' => fin_seq (S start) len'
-  end.
-
-...
-
-Definition fin_seq start len : list (fin (start + len)).
-Proof.
-intros.
-revert start.
-induction len; intros. {
-  rewrite Nat.add_0_r.
-  apply [].
-}
-rewrite <- Nat.add_succ_comm.
-apply IHlen.
-Qed.
-
-Compute (fin_seq 3 4).
-Compute (hd {| f_nat := 0; f_prop := Nat.lt_0_succ (2 + 4) |} (fin_seq 3 4)).
-Compute (map f_nat (fin_seq 3 4)).
-
-Fixpoint fin_seq' start len : list (fin (start + len)) :=
-  match len with
-  | 0 => []
-  | S len' => {| f_
-
-...
-
-Theorem pouet : ∀ start len glen (p : start + len < glen), start < glen.
-Proof.
-Admitted.
-
-Theorem glop : ∀ start len len' glen (p : len = S len') (q : start + S len' < glen), S start + len' < glen.
-Proof.
-Admitted.
-
-Fixpoint fin_seq start len glen (p : start + len < glen) :=
-  match len with
-  | 0 => []
-  | S len' => {| f_nat := start; f_prop := pouet start len p |} :: fin_seq (S start) len' (glop start eq_refl p)
-  end.
-
 Definition list_list_of_mat m n T (M : matrix m n T) : list (list T) :=
-  map (λ i, map (mat_el M i) (fin_seq 0 m)) (seq 0 n).
+  map (λ i, map (mat_el M i) (seq 0 m)) (seq 0 n).
 
 Definition list_list_el T d (ll : list (list T)) i j : T :=
   nth j (nth i ll []) d.
@@ -746,7 +644,11 @@ destruct c. {
   apply matrix_neq; cbn.
   intros H.
   destruct n; [ easy | ].
+(*
   specialize (H 0 0 (Nat.lt_0_succ _) (Nat.lt_0_succ _)).
+*)
+  specialize (H 0 0).
+(**)
   cbn in H.
   replace
     (@mat_el (S n) (S n) T
@@ -823,7 +725,7 @@ apply Nat.eqb_neq in Hb.
 apply matrix_neq.
 intros H; cbn in H.
 destruct n; [ easy | ].
-specialize (H 0 0 (Nat.lt_0_succ _) (Nat.lt_0_succ _)).
+specialize (H 0 0); cbn in H.
 now apply rngl_1_neq_0 in H.
 Qed.
 
