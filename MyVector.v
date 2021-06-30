@@ -12,10 +12,17 @@ Require Import RingLike RLsummation.
 Record vector (n : nat) T := mk_vect
   { vect_el : Fin.t n → T }.
 
-(* function extensionality required for vectors *)
-Axiom vector_eq : ∀ n T (VA VB : vector n T),
+(* function extensionality for vectors *)
+Theorem vector_eq : ∀ n T (VA VB : vector n T),
   (∀ i, vect_el VA i = vect_el VB i)
   → VA = VB.
+Proof.
+intros * Hab.
+destruct VA as (f).
+destruct VB as (g).
+cbn in Hab; f_equal.
+now apply fin_fun_ext.
+Qed.
 
 (*
 (* function extensionality required for vectors *)
@@ -65,10 +72,12 @@ Fixpoint fin_seq start len : list (Fin.t (start + len)) :=
       map (fin_t_add_succ_l (b := len')) (fin_seq (S start) len')
   end.
 
+(*
 Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 2 1)).
 Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 2 2)).
 Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 7 4)).
 Compute fin_seq 7 4.
+*)
 
 Definition vect_of_list {T} d (l : list T) : vector (length l) T :=
   mk_vect (λ i, nth (proj1_sig (Fin.to_nat i)) l d).
@@ -76,16 +85,9 @@ Definition vect_of_list {T} d (l : list T) : vector (length l) T :=
 Definition list_of_vect {n T} (v : vector n T) :=
   map (vect_el v) (fin_seq 0 n).
 
+(*
 Compute (list_of_vect (vect_of_list 42 [3;7;2])).
 Compute (vect_of_list 42 [3;7;2]).
-
-...
-
-(*
-Definition vect_of_list {T} d (l : list T) : vector (length l) T :=
-  mk_vect (length l) (λ i, nth i l d).
-Definition list_of_vect {n T} (v : vector n T) :=
-  map (vect_el v) (seq 0 n).
 *)
 
 (* (-1) ^ n *)
@@ -96,23 +98,25 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context {rp : ring_like_prop T}.
 
-Definition vect_zero n := mk_vect n (λ _, 0%F).
+Definition vect_zero n : vector n T := mk_vect (λ _, 0%F).
 
 (* addition, subtraction of vector *)
 
 Definition vect_add {n} (U V : vector n T) :=
-  mk_vect n (λ i, (vect_el U i + vect_el V i)%F).
+  mk_vect (λ i, (vect_el U i + vect_el V i)%F).
 Definition vect_opp {n} (V : vector n T) :=
-  mk_vect n (λ i, (- vect_el V i)%F).
+  mk_vect (λ i, (- vect_el V i)%F).
 
 Definition vect_sub {n} (U V : vector n T) := vect_add U (vect_opp V).
 
 (* multiplication of a vector by a scalar *)
 
 Definition vect_mul_scal_l s {n} (V : vector n T) :=
-  mk_vect n (λ i, s * vect_el V i)%F.
+  mk_vect (λ i, s * vect_el V i)%F.
 
 (* dot product *)
+
+...
 
 Definition vect_dot_product {n} (U V : vector n T) :=
   (Σ (i = 0, n - 1), vect_el U i * vect_el V i)%F.
