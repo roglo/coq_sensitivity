@@ -39,6 +39,23 @@ now specialize (H2 (λ _, 0) (λ _, 1) (H1 _ _) 0).
 Qed.
 *)
 
+(*
+Check Fin.of_nat.
+Definition fin_of_nat_mod_fact a n :=
+  @Fin.of_nat_lt (a mod n!) n!
+     (Nat.mod_upper_bound a n! (fact_neq_0 n)).
+*)
+
+Check Fin.to_nat.
+
+Definition vect_of_list {T} d (l : list T) : vector (length l) T :=
+  mk_vect (λ i, nth (proj1_sig (Fin.to_nat i)) l d).
+
+Check @vect_of_list.
+Compute (vect_el (vect_of_list 0 [3;5;8]) (Fin.of_nat 0)).
+
+...
+
 Definition vect_of_list {T} d (l : list T) : vector (length l) T :=
   mk_vect (length l) (λ i, nth i l d).
 Definition list_of_vect {n T} (v : vector n T) :=
