@@ -54,17 +54,15 @@ rewrite Nat.sub_diag.
 apply Nat.lt_0_succ.
 Qed.
 
-Definition fin_t_add_succ_l start len' (i : Fin.t (S start + len')) :
-  Fin.t (start + S len') :=
-  eq_rect (S start + len') (λ n : nat, Fin.t n) i (start + S len')
-    (add_succ_comm start len').
+Definition fin_t_add_succ_l a b : Fin.t (S a + b) → Fin.t (a + S b) :=
+  λ i, match add_succ_comm a b with eq_refl => i end.
 
 Fixpoint fin_seq start len : list (Fin.t (start + len)) :=
   match len with
   | 0 => []
   | S len' =>
       Fin.of_nat_lt (add_lt_succ start len') ::
-      map (fin_t_add_succ_l (len' := len')) (fin_seq (S start) len')
+      map (fin_t_add_succ_l (b := len')) (fin_seq (S start) len')
   end.
 
 Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 2 1)).
