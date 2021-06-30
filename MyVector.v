@@ -10,7 +10,7 @@ Require Import Misc.
 Require Import RingLike RLsummation.
 
 Record vector (n : nat) T := mk_vect
-  { vect_el : nat → T }.
+  { vect_el : Fin.t n → T }.
 
 (* function extensionality required for vectors *)
 Axiom vector_eq : ∀ n T (VA VB : vector n T),
@@ -47,7 +47,39 @@ Definition fin_of_nat_mod_fact a n :=
 *)
 
 Definition vect_of_list {T} d (l : list T) : vector (length l) T :=
+  mk_vect (λ i, nth (proj1_sig (Fin.to_nat i)) l d).
+
+Theorem glop1 : ∀ a, a < a + 1. Proof. flia. Qed.
+Theorem glop2 : ∀ a, a < a + 2. Proof. flia. Qed.
+Theorem glop3 : ∀ a, a + 1 < a + 2. Proof. flia. Qed.
+Theorem glop : ∀ a b c, a + b < a + S (b + c). Proof. flia. Qed.
+
+Fixpoint fin_seq start len : list (Fin.t (start + len)) :=
+  match len with
+  | 0 => []
+  | 1 => [Fin.of_nat_lt (glop start 0 0)]
+  | 2 => [Fin.of_nat_lt (glop start 0 1); Fin.of_nat_lt (glop start 1 0)]
+  | 3 => [Fin.of_nat_lt (glop start 0 2); Fin.of_nat_lt (glop start 1 1); Fin.of_nat_lt (glop start 2 0)]
+  | _ => []
+  end.
+
+Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 0 1)).
+Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 1 1)).
+Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 2 1)).
+Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 7 2)).
+Check (fin_seq 7 2).
+Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 7 3)).
+Check (fin_seq 7 3).
+
+...
+
+Definition list_of_vect {n T} (v : vector n T) :=
+  map (vect_el v) (seq 0 n).
+
+(*
+Definition vect_of_list {T} d (l : list T) : vector (length l) T :=
   mk_vect (length l) (λ i, nth i l d).
+*)
 Definition list_of_vect {n T} (v : vector n T) :=
   map (vect_el v) (seq 0 n).
 
