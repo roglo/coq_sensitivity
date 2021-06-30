@@ -14,6 +14,12 @@ Record vector (n : nat) T := mk_vect
 
 (* function extensionality required for vectors *)
 Axiom vector_eq : ∀ n T (VA VB : vector n T),
+  (∀ i, vect_el VA i = vect_el VB i)
+  → VA = VB.
+
+(*
+(* function extensionality required for vectors *)
+Axiom vector_eq : ∀ n T (VA VB : vector n T),
   (∀ i, i < n → vect_el VA i = vect_el VB i)
   → VA = VB.
 
@@ -31,8 +37,7 @@ assert (H2 : ∀ (f g : nat → nat), f = g → ∀ x, f x = g x). {
 }
 now specialize (H2 (λ _, 0) (λ _, 1) (H1 _ _) 0).
 Qed.
-
-...
+*)
 
 Definition vect_of_list {T} d (l : list T) : vector (length l) T :=
   mk_vect (length l) (λ i, nth i l d).
@@ -133,7 +138,7 @@ Theorem vect_mul_scal_l_mul_assoc {n} : ∀ (a b : T) (V : vector n T),
 Proof.
 intros.
 apply vector_eq.
-intros * Hi; cbn.
+intros; cbn.
 apply rngl_mul_assoc.
 Qed.
 
@@ -152,21 +157,24 @@ assert (Hiv : ∀ i, vect_el (a × V)%V i = vect_el (b × V)%V i). {
 }
 unfold vect_mul_scal_l in Hiv.
 cbn in Hiv.
-assert (Hn : ¬ ∀ i, i < n → vect_el V i = 0%F). {
+assert (Hn : ¬ ∀ i, vect_el V i = 0%F). {
   intros H; apply Hvz.
   apply vector_eq.
-  cbn; intros * Hi.
+  cbn; intros.
   now apply H.
 }
 assert (∃ i, vect_el V i ≠ 0%F). {
+About not_forall_in_interv_imp_exist.
+...
   apply (not_forall_in_interv_imp_exist (a:=0) (b:=n-1));
     cycle 1. {
     flia.
   } {
     intros Hnv.
     apply Hn.
-    intros i Hi.
+    intros i.
     specialize (Hnv i).
+...
     assert (H : 0 ≤ i ≤ n - 1) by flia Hi.
     specialize (Hnv H).
     now destruct (rngl_eq_dec Hde (vect_el V i) 0%F).
