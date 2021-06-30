@@ -23,7 +23,7 @@ Axiom vector_eq : ∀ n T (VA VB : vector n T),
   (∀ i, i < n → vect_el VA i = vect_el VB i)
   → VA = VB.
 
-(* ... but that axiom is bad: it proves False! *)
+(* ... but this version of that axiom is bad: it proves False! *)
 Theorem oops : False.
 Proof.
 assert (H1 : ∀ f g : nat → nat, f = g). {
