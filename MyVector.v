@@ -163,36 +163,13 @@ assert (Hn : ¬ ∀ i, vect_el V i = 0%F). {
   cbn; intros.
   now apply H.
 }
-...
-assert (∃ i, vect_el V i ≠ 0%F). {
-About not_forall_in_interv_imp_exist.
-...
-  apply (not_forall_in_interv_imp_exist (a:=0) (b:=n-1));
-    cycle 1. {
-    flia.
-  } {
-    intros Hnv.
-    apply Hn.
-    intros i.
-    specialize (Hnv i).
-...
-    assert (H : 0 ≤ i ≤ n - 1) by flia Hi.
-    specialize (Hnv H).
-    now destruct (rngl_eq_dec Hde (vect_el V i) 0%F).
-  }
-  intros k.
-  unfold Decidable.decidable.
-  specialize (rngl_eq_dec Hde (vect_el V k) 0%F) as [Hvnz| Hvnz]. {
-    now right.
-  } {
-    now left.
-  }
-}
-move Hiv at bottom.
-destruct H as (i, Hi).
+destruct (rngl_eq_dec Hde a b) as [Haeb| Haeb]; [ easy | ].
+exfalso; apply Hvz; clear Hvz.
+apply vector_eq.
+intros i; cbn.
 specialize (Hiv i).
-apply rngl_mul_cancel_r in Hiv; [ easy | | easy ].
-destruct Hii as [Hii| Hii]; [ now left | now right ].
+destruct (rngl_eq_dec Hde (vect_el V i) 0%F) as [Hvi| Hvi]; [ easy | ].
+now apply rngl_mul_cancel_r in Hiv.
 Qed.
 
 Theorem vect_dot_mul_scal_mul_comm :
@@ -235,6 +212,7 @@ assert (H : ∀ i, {fu i = fv i} + {fu i ≠ fv i}). {
   intros.
   apply (rngl_eq_dec Hde).
 }
+...
 induction n; intros; [ now left; apply vector_eq | ].
 destruct IHn as [IHn| IHn]. {
   injection IHn; clear IHn; intros IHn.
