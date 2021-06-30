@@ -73,8 +73,7 @@ Proof.
 intros.
 cbn.
 induction a; [ easy | ].
-cbn.
-now f_equal.
+now cbn; rewrite IHa.
 Defined.
 
 Print pouet.
@@ -94,6 +93,11 @@ Fixpoint fin_seq' start len : list (Fin.t (start + len)) :=
 
 Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq' 2 1)).
 Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq' 2 2)).
+
+Check plus_n_Sm.
+
+Print pouet.
+
 ...
 
 Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 0 1)).
