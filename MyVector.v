@@ -39,94 +39,56 @@ now specialize (H2 (λ _, 0) (λ _, 1) (H1 _ _) 0).
 Qed.
 *)
 
-(*
-Check Fin.of_nat.
-Definition fin_of_nat_mod_fact a n :=
-  @Fin.of_nat_lt (a mod n!) n!
-     (Nat.mod_upper_bound a n! (fact_neq_0 n)).
-*)
+Theorem add_succ_comm : ∀ a b, S a + b = a + S b.
+Proof.
+intros; cbn.
+induction a; [ reflexivity | ].
+now cbn; rewrite IHa.
+Defined.
 
-Definition vect_of_list {T} d (l : list T) : vector (length l) T :=
-  mk_vect (λ i, nth (proj1_sig (Fin.to_nat i)) l d).
+Theorem add_lt_succ : ∀ a b, a < a + S b.
+Proof.
+intros.
+apply Nat.lt_sub_lt_add_l.
+rewrite Nat.sub_diag.
+apply Nat.lt_0_succ.
+Qed.
 
-Theorem glop1 : ∀ a, a < a + 1. Proof. flia. Qed.
-Theorem glop2 : ∀ a, a < a + 2. Proof. flia. Qed.
-Theorem glop3 : ∀ a, a + 1 < a + 2. Proof. flia. Qed.
-Theorem glop : ∀ a b c, a + b < a + S (b + c). Proof. flia. Qed.
+Definition fin_t_add_succ_l start len' (i : Fin.t (S start + len')) :
+  Fin.t (start + S len') :=
+  eq_rect (S start + len') (λ n : nat, Fin.t n) i (start + S len')
+    (add_succ_comm start len').
 
 Fixpoint fin_seq start len : list (Fin.t (start + len)) :=
   match len with
   | 0 => []
-  | 1 => [Fin.of_nat_lt (glop start 0 0)]
-  | 2 => [Fin.of_nat_lt (glop start 0 1); Fin.of_nat_lt (glop start 1 0)]
-  | 3 => [Fin.of_nat_lt (glop start 0 2); Fin.of_nat_lt (glop start 1 1); Fin.of_nat_lt (glop start 2 0)]
-  | _ => []
-  end.
-
-(*
-Check let start := 4 in
-[Fin.of_nat_lt (glop start 0 1); Fin.of_nat_lt (glop start 1 0)].
-*)
-
-Theorem pouet : ∀ a b, S a + b = a + S b.
-Proof.
-intros.
-cbn.
-induction a; [ easy | ].
-now cbn; rewrite IHa.
-Defined.
-
-Print pouet.
-
-Definition agaga start len' (i : Fin.t (S start + len'))
-  : Fin.t (start + S len') :=
-   eq_rect (S start + len') (λ n : nat, Fin.t n) i (start + S len')
-     (pouet start len').
-
-Fixpoint fin_seq' start len : list (Fin.t (start + len)) :=
-  match len with
-  | 0 => []
   | S len' =>
-      Fin.of_nat_lt (glop start 0 len') ::
-      map (@agaga start len') (fin_seq' (S start) len')
+      Fin.of_nat_lt (add_lt_succ start len') ::
+      map (fin_t_add_succ_l (len' := len')) (fin_seq (S start) len')
   end.
 
-Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq' 2 1)).
-Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq' 2 2)).
-
-Check plus_n_Sm.
-
-Print pouet.
-
-...
-
-Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 0 1)).
-Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 1 1)).
 Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 2 1)).
-Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 7 2)).
-Check (fin_seq 7 2).
-Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 7 3)).
-Check (fin_seq 7 3).
+Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 2 2)).
+Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 7 4)).
+Compute fin_seq 7 4.
 
-Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq' 0 1)).
-Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq' 1 1)).
-Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq' 2 1)).
-Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq' 7 2)).
-Check (fin_seq' 7 2).
-Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq' 7 3)).
-Check (fin_seq' 7 3).
-
-...
+Definition vect_of_list {T} d (l : list T) : vector (length l) T :=
+  mk_vect (λ i, nth (proj1_sig (Fin.to_nat i)) l d).
 
 Definition list_of_vect {n T} (v : vector n T) :=
-  map (vect_el v) (seq 0 n).
+  map (vect_el v) (fin_seq 0 n).
+
+Compute (list_of_vect (vect_of_list 42 [3;7;2])).
+Compute (vect_of_list 42 [3;7;2]).
+
+...
 
 (*
 Definition vect_of_list {T} d (l : list T) : vector (length l) T :=
   mk_vect (length l) (λ i, nth i l d).
-*)
 Definition list_of_vect {n T} (v : vector n T) :=
   map (vect_el v) (seq 0 n).
+*)
 
 (* (-1) ^ n *)
 
