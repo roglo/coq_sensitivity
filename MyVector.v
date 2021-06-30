@@ -63,6 +63,39 @@ Fixpoint fin_seq start len : list (Fin.t (start + len)) :=
   | _ => []
   end.
 
+(*
+Check let start := 4 in
+[Fin.of_nat_lt (glop start 0 1); Fin.of_nat_lt (glop start 1 0)].
+*)
+
+Theorem pouet : ∀ a b, S a + b = a + S b.
+Proof.
+intros.
+cbn.
+induction a; [ easy | ].
+cbn.
+now f_equal.
+Defined.
+
+Print pouet.
+
+Definition agaga start len' (i : Fin.t (S start + len'))
+  : Fin.t (start + S len') :=
+   eq_rect (S start + len') (λ n : nat, Fin.t n) i (start + S len')
+     (pouet start len').
+
+Fixpoint fin_seq' start len : list (Fin.t (start + len)) :=
+  match len with
+  | 0 => []
+  | S len' =>
+      Fin.of_nat_lt (glop start 0 len') ::
+      map (@agaga start len') (fin_seq' (S start) len')
+  end.
+
+Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq' 2 1)).
+Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq' 2 2)).
+...
+
 Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 0 1)).
 Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 1 1)).
 Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 2 1)).
@@ -70,6 +103,14 @@ Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 7 2)).
 Check (fin_seq 7 2).
 Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 7 3)).
 Check (fin_seq 7 3).
+
+Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq' 0 1)).
+Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq' 1 1)).
+Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq' 2 1)).
+Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq' 7 2)).
+Check (fin_seq' 7 2).
+Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq' 7 3)).
+Check (fin_seq' 7 3).
 
 ...
 
