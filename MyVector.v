@@ -163,6 +163,7 @@ assert (Hn : ¬ ∀ i, vect_el V i = 0%F). {
   cbn; intros.
   now apply H.
 }
+...
 assert (∃ i, vect_el V i ≠ 0%F). {
 About not_forall_in_interv_imp_exist.
 ...
