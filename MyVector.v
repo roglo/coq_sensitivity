@@ -135,11 +135,8 @@ Definition vect_mul_scal_l s {n} (V : vector n T) :=
 Definition vect_dot_product {n} (U V : vector n T) :=
   Σ (i ∈ fin_seq 0 n), vect_el U i * vect_el V i.
 
-(*
 Definition iter_fin_seq T b e (f : T → Fin.t (b + (S e - b)) → T) d :=
   iter_list (fin_seq b (S e - b)) f d.
-
-Print iter_list.
 
 Theorem pouet : ∀ b e, b + (e - b) = max b e.
 Proof. intros. flia. Qed.
@@ -155,8 +152,18 @@ Notation "'Σf' ( i = b , e ) , g" :=
   (iter_fin_seq' b e (λ c i, (c + g)%F) 0%F)
   (at level 45, i at level 0, b at level 60, e at level 60).
 
+(*
+Theorem pouet : ∀ n, 0 + (S (n - 1) - 0) = n.
+Proof. intros. flia. Qed.
+*)
+
 Definition vect_dot_product' {n} (U V : vector n T) :=
   Σf (i = 0, n - 1), vect_el U i * vect_el V i.
+
+...
+
+(*
+Print iter_list.
 
 Print vect_dot_product.
 Locate "Σ".
