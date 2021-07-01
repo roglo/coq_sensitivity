@@ -135,6 +135,7 @@ Definition vect_mul_scal_l s {n} (V : vector n T) :=
 Definition vect_dot_product {n} (U V : vector n T) :=
   Σ (i ∈ fin_seq 0 n), vect_el U i * vect_el V i.
 
+(*
 Definition iter_fin_seq T b e (f : T → Fin.t (b + (S e - b)) → T) d :=
   iter_list (fin_seq b (S e - b)) f d.
 
@@ -162,9 +163,6 @@ cbn.
 Definition vect_dot_product' {n} (U V : vector n T) :=
   Σf (i = 0, n - 1), vect_el U i * vect_el V i.
 
-...
-
-(*
 Print iter_list.
 
 Print vect_dot_product.
@@ -294,9 +292,8 @@ Theorem vect_scal_mul_dot_mul_comm :
 Proof.
 intros Hom *.
 unfold vect_dot_product.
-...
-rewrite rngl_mul_summation_distr_l; [ | easy ].
-apply rngl_summation_eq_compat.
+rewrite rngl_mul_summation_list_distr_l; [ | easy ].
+apply rngl_summation_list_eq_compat.
 intros j Hj; cbn.
 symmetry; apply rngl_mul_assoc.
 Qed.
@@ -312,8 +309,8 @@ assert (H : ∀ i, {fu i = fv i} + {fu i ≠ fv i}). {
   intros.
   apply (rngl_eq_dec Hde).
 }
-...
 induction n; intros; [ now left; apply vector_eq | ].
+...
 destruct IHn as [IHn| IHn]. {
   injection IHn; clear IHn; intros IHn.
   now left; subst fv.
