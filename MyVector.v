@@ -323,7 +323,7 @@ destruct IHn as [IHn| IHn]. {
     intros i; cbn.
     injection IHn; clear IHn; intros H2.
     destruct (Fin.eq_dec i nn) as [H3| H3]; [ now subst i | ].
-    assert (H : proj1_sig (Fin.to_nat i) < n). {
+    assert (H4 : proj1_sig (Fin.to_nat i) < n). {
       specialize (proj2_sig (Fin.to_nat i)) as H4.
       cbn in H4.
       destruct (Nat.eq_dec (proj1_sig (Fin.to_nat i)) n) as [H5| H5]. {
@@ -335,8 +335,25 @@ destruct IHn as [IHn| IHn]. {
       }
       flia H4 H5.
     }
-Search (proj1_sig (Fin.to_nat _)).
+...
+    set (m := Fin.of_nat_lt H4).
+    assert (H5 : gu m =  gv m) by now rewrite H2.
+    unfold m, gu, gv in H5.
+    cbn in H5.
+    enough (Fin.FS (Fin.of_nat_lt H4) = i) by congruence.
+...
+    rewrite <- H2 in Hb.
+    unfold gu, m in Ha, Hb.
+Search Fin.L.
+    unfold gu, m in Ha; cbn in Ha.
+    unfold gv, m in Hb; cbn in Hb.
+Print Fin.
+ Definition of_nat_lt : ∀ p n : nat, p < n → t n.
 Search (Fin.t _ → Fin.t _).
+Print Term Fin.t.
+...
+Search Fin.to_nat.
+Search (proj1_sig (Fin.to_nat _)).
 Check (proj1_sig (Fin.to_nat i)).
 Check (proj2_sig (Fin.to_nat i)).
 ...
