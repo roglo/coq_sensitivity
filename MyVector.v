@@ -135,18 +135,33 @@ Definition vect_mul_scal_l s {n} (V : vector n T) :=
 Definition vect_dot_product {n} (U V : vector n T) :=
   Σ (i ∈ fin_seq 0 n), vect_el U i * vect_el V i.
 
+(*
+Definition iter_fin_seq T b e (f : T → Fin.t (b + (S e - b)) → T) d :=
+  iter_list (fin_seq b (S e - b)) f d.
+
+Print iter_list.
+
+Theorem pouet : ∀ b e, b + (e - b) = max b e.
+Proof. intros. flia. Qed.
+
+Definition glop b e : Fin.t (b + (e - b)) → Fin.t (max b e) :=
+  λ i, match pouet b e with eq_refl => i end.
+
+Definition iter_fin_seq' T b e (f : T → Fin.t (max b (S e)) → T) d :=
+  iter_list (fin_seq b (S e - b))
+    (λ a i, f a (glop b (S e) i)) d.
+
+Notation "'Σf' ( i = b , e ) , g" :=
+  (iter_fin_seq' b e (λ c i, (c + g)%F) 0%F)
+  (at level 45, i at level 0, b at level 60, e at level 60).
+
+Definition vect_dot_product' {n} (U V : vector n T) :=
+  Σf (i = 0, n - 1), vect_el U i * vect_el V i.
+
 Print vect_dot_product.
 Locate "Σ".
 Search (Fin.t _ → Fin.t _).
-
-Definition iter_fin_seq :=
-  λ (T : Type) (b e : nat) (f : T → Fin.t (b + (S e - b)) → T) (d : T),
-    iter_list (fin_seq b (S e - b)) f d.
-
-...
-
-Definition vect_dot_product {n} (U V : vector n T) :=
-  (Σ (i = 0, n - 1), vect_el U i * vect_el V i)%F.
+*)
 
 Definition vect_squ_norm n (V : vector n T) := vect_dot_product V V.
 
@@ -255,6 +270,7 @@ Theorem vect_dot_mul_scal_mul_comm :
 Proof.
 intros Hom Hic *.
 unfold vect_dot_product.
+...
 rewrite rngl_mul_summation_distr_l; [ | easy ].
 apply rngl_summation_eq_compat.
 intros j Hj; cbn.
