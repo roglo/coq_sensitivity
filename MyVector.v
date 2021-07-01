@@ -310,6 +310,7 @@ assert (H : ∀ i, {fu i = fv i} + {fu i ≠ fv i}). {
   apply (rngl_eq_dec Hde).
 }
 induction n; intros; [ now left; apply vector_eq | ].
+Definition toto n (f : Fin.t (S n) → T) : Fin.t n → T.
 ...
 destruct IHn as [IHn| IHn]. {
   injection IHn; clear IHn; intros IHn.
