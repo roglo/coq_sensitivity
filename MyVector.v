@@ -323,17 +323,22 @@ destruct IHn as [IHn| IHn]. {
     intros i; cbn.
     injection IHn; clear IHn; intros H2.
     destruct (Fin.eq_dec i nn) as [H3| H3]; [ now subst i | ].
+    assert (H : proj1_sig (Fin.to_nat i) < n). {
+      specialize (proj2_sig (Fin.to_nat i)) as H4.
+      cbn in H4.
+      destruct (Nat.eq_dec (proj1_sig (Fin.to_nat i)) n) as [H5| H5]. {
+        exfalso; apply H3; clear H3.
+        unfold nn.
+        apply Fin.to_nat_inj.
+        rewrite H5.
+        now rewrite Fin.to_nat_of_nat.
+      }
+      flia H4 H5.
+    }
+Search (proj1_sig (Fin.to_nat _)).
 Search (Fin.t _ → Fin.t _).
 Check (proj1_sig (Fin.to_nat i)).
 Check (proj2_sig (Fin.to_nat i)).
-assert (H : proj1_sig (Fin.to_nat i) < n). {
-  specialize (proj2_sig (Fin.to_nat i)) as H4.
-  cbn in H4.
-  destruct (Nat.eq_dec (proj1_sig (Fin.to_nat i)) n) as [H5| H5]. {
-    exfalso; apply H3; clear H3.
-    unfold nn.
-...
-Check (@Fin.of_nat_lt (proj1_sig (Fin.to_nat i)) n).
 ...
 
 Check @Fin.eq_dec.
