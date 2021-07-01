@@ -335,6 +335,7 @@ destruct IHn as [IHn| IHn]. {
       }
       flia H4 H5.
     }
+...
 Search (Fin.t _ → Fin.t _).
 ...
     set (m := Fin.of_nat_lt H4).
