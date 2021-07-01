@@ -61,6 +61,7 @@ rewrite Nat.sub_diag.
 apply Nat.lt_0_succ.
 Qed.
 
+(*
 Definition fin_t_glop a b (p : a = b) : Fin.t a → Fin.t b :=
   λ i, match p with eq_refl => i end.
 
@@ -70,7 +71,11 @@ Print Fin.eqb.
 Check f_equal.
 Print f_equal.
 
-...
+Print eq_rect.
+
+Definition fin_t_add_succ_l a b : Fin.t (S a + b) → Fin.t (a + S b) :=
+  λ i, eq_rect _ _ i _ (add_succ_comm a b).
+*)
 
 Definition fin_t_add_succ_l a b : Fin.t (S a + b) → Fin.t (a + S b) :=
   λ i, match add_succ_comm a b with eq_refl => i end.
