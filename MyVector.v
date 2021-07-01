@@ -61,6 +61,17 @@ rewrite Nat.sub_diag.
 apply Nat.lt_0_succ.
 Qed.
 
+Definition fin_t_glop a b (p : a = b) : Fin.t a → Fin.t b :=
+  λ i, match p with eq_refl => i end.
+
+Print fin_t_glop.
+Print eq_rect.
+Print Fin.eqb.
+Check f_equal.
+Print f_equal.
+
+...
+
 Definition fin_t_add_succ_l a b : Fin.t (S a + b) → Fin.t (a + S b) :=
   λ i, match add_succ_comm a b with eq_refl => i end.
 
@@ -121,6 +132,7 @@ Definition vect_dot_product {n} (U V : vector n T) :=
 
 Print vect_dot_product.
 Locate "Σ".
+Search (Fin.t _ → Fin.t _).
 
 Definition iter_fin_seq :=
   λ (T : Type) (b e : nat) (f : T → Fin.t (b + (S e - b)) → T) (d : T),
