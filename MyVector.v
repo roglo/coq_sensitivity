@@ -305,12 +305,46 @@ Proof.
 intros Hde *.
 destruct U as (fu).
 destruct V as (fv).
+(*
 assert (H : ∀ i, {fu i = fv i} + {fu i ≠ fv i}). {
   intros.
   apply (rngl_eq_dec Hde).
 }
+*)
 induction n; intros; [ now left; apply vector_eq | ].
-Definition toto n (f : Fin.t (S n) → T) : Fin.t n → T.
+set (gu := λ i, fu (Fin.R 1 i)).
+set (gv := λ i, fv (Fin.R 1 i)).
+specialize (IHn gu gv).
+destruct IHn as [IHn| IHn]. {
+  set (nn := Fin.of_nat_lt (Nat.lt_succ_diag_r n)).
+  destruct (rngl_eq_dec Hde (fu nn) (fv nn)) as [H1| H1]. {
+    left.
+    apply vector_eq.
+    intros i; cbn.
+    injection IHn; clear IHn; intros H.
+    destruct (Fin.eq_dec i nn) as [H2| H2]; [ now subst i | ].
+...
+
+Check @Fin.eq_dec.
+Check (Fin.of_nat_lt (Nat.lt_succ_diag_r n)).
+destruct (Fin.eq_dec i (Fin.of_nat_lt (Nat.lt_succ_diag_r _))) as [H1| H1]. {
+  subst i.
+
+...
+
+assert (H : ∀ i, {gu i = gv i} + {gu i ≠ gv i}). {
+  intros i.
+  destruct IH
+...
+
+Check @Fin.eq_dec.
+
+Check (λ n, @Fin.of_nat_lt n (S n) (Nat.lt_succ_diag_r _)).
+
+Print Term Fin.L.
+
+Definition toto n (f : Fin.t (S n) → T) : Fin.t n → T :=
+  λ i : Fin.t n, f (Fin.R 1 i).
 ...
 destruct IHn as [IHn| IHn]. {
   injection IHn; clear IHn; intros IHn.
