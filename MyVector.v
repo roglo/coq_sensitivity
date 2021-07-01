@@ -270,9 +270,8 @@ Theorem vect_dot_mul_scal_mul_comm :
 Proof.
 intros Hom Hic *.
 unfold vect_dot_product.
-...
-rewrite rngl_mul_summation_distr_l; [ | easy ].
-apply rngl_summation_eq_compat.
+rewrite rngl_mul_summation_list_distr_l; [ | easy ].
+apply rngl_summation_list_eq_compat.
 intros j Hj; cbn.
 do 2 rewrite rngl_mul_assoc.
 f_equal.
@@ -286,6 +285,7 @@ Theorem vect_scal_mul_dot_mul_comm :
 Proof.
 intros Hom *.
 unfold vect_dot_product.
+...
 rewrite rngl_mul_summation_distr_l; [ | easy ].
 apply rngl_summation_eq_compat.
 intros j Hj; cbn.
