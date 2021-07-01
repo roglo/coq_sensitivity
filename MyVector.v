@@ -116,6 +116,16 @@ Definition vect_mul_scal_l s {n} (V : vector n T) :=
 
 (* dot product *)
 
+Definition vect_dot_product {n} (U V : vector n T) :=
+  Σ (i ∈ fin_seq 0 n), vect_el U i * vect_el V i.
+
+Print vect_dot_product.
+Locate "Σ".
+
+Definition iter_fin_seq :=
+  λ (T : Type) (b e : nat) (f : T → Fin.t (b + (S e - b)) → T) (d : T),
+    iter_list (fin_seq b (S e - b)) f d.
+
 ...
 
 Definition vect_dot_product {n} (U V : vector n T) :=
