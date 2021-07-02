@@ -301,9 +301,7 @@ Qed.
 Theorem Fin_1_F1 : ∀ i : Fin.t 1, i = Fin.F1.
 Proof.
 intros.
-refine (match i with Fin.F1 => _ | Fin.FS _ => _ end).
-now destruct n.
-now destruct n.
+now refine (match i with Fin.F1 => _ | Fin.FS _ => _ end); destruct n.
 Qed.
 
 Theorem vect_eq_dec :
