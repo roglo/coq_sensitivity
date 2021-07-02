@@ -334,6 +334,7 @@ destruct n. {
     now subst fv.
   }
 }
+destruct n. {
 ...
 Qed.
 
