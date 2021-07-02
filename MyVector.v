@@ -298,6 +298,14 @@ intros j Hj; cbn.
 symmetry; apply rngl_mul_assoc.
 Qed.
 
+Theorem Fin_1_F1 : ∀ i : Fin.t 1, i = Fin.F1.
+Proof.
+intros.
+refine (match i with Fin.F1 => _ | Fin.FS _ => _ end).
+now destruct n.
+now destruct n.
+Qed.
+
 Theorem vect_eq_dec :
   rngl_has_dec_eq = true →
   ∀ n (U V : vector n T), {U = V} + {U ≠ V}.
@@ -318,35 +326,9 @@ destruct n. {
     left.
     apply vector_eq.
     intros i; cbn.
-Theorem glop : ∀ i : Fin.t 1, i = Fin.F1.
-Proof.
-intros.
-inversion i; [ | easy ].
-
-..
-Print Fin.t.
-Print Fin.
-remember (Fin.to_nat i) as j eqn:Hj.
-destruct j as (j, Hi).
-Search (exist _ _ _ = _).
-destruct Hj.
-Print Fin.t.
-replace j with 0 in Hj by flia Hi.
-...
-
-clear Hj.
-apply Nat.lt_1_r in Hi.
-...
-  set (nn := Fin.of_nat_lt (Nat.lt_succ_diag_r 0)).
-  destruct (rngl_eq_dec Hde (fu nn) (fv nn)) as [H1| H1]. {
-    left.
-    apply vector_eq.
-    intros i; cbn.
-cbn in nn.
-Theorem glop : ∀ i : Fin.t 1, i = Fin
-Proof.
-intros.
-cbn.
+    specialize (Fin_1_F1 i) as H2.
+    now subst i.
+  }
 ...1
 set (gu := λ i, fu (Fin.R 1 i)).
 set (gv := λ i, fv (Fin.R 1 i)).
