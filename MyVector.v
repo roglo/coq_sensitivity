@@ -342,9 +342,8 @@ destruct IHn as [IHn| IHn]. {
     enough (Fin.FS (Fin.of_nat_lt H4) = i) by congruence.
     clear - H4.
     induction n; [ easy | ].
-Definition glop n (i : Fin.t (S n)) (p : proj1_sig (Fin.to_nat i) < n) : Fin.t n.
-clear - p.
-Admitted.
+Definition glop n (i : Fin.t (S n)) (p : proj1_sig (Fin.to_nat i) < n) :=
+  Fin.of_nat_lt p.
 specialize (@glop (S n) i H4) as j.
 ,,,
 Search Fin.of_nat_lt.
