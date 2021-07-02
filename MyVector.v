@@ -338,7 +338,17 @@ destruct IHn as [IHn| IHn]. {
     set (m := Fin.of_nat_lt H4).
     assert (H5 : gu m =  gv m) by now rewrite H2.
     unfold m, gu, gv in H5.
+    cbn in H5.
+    enough (Fin.FS (Fin.of_nat_lt H4) = i) by congruence.
+    clear - H4.
+    induction n; [ easy | ].
+Definition glop n (i : Fin.t (S n)) (p : proj1_sig (Fin.to_nat i) < n) : Fin.t n.
+clear - p.
+Admitted.
+specialize (@glop (S n) i H4) as j.
+,,,
 Search Fin.of_nat_lt.
+assert (Fin.R 1 (Fin.of_nat_lt H4
 ...
     cbn in H5.
 ...
