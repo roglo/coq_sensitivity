@@ -318,6 +318,36 @@ assert (H : ∀ i, {fu i = fv i} + {fu i ≠ fv i}). {
 }
 *)
 induction n; intros; [ now left; apply vector_eq | ].
+(*1*)
+set (gu := λ i, fu (Fin.R 1 i)).
+set (gv := λ i, fv (Fin.R 1 i)).
+specialize (IHn gu gv).
+destruct IHn as [IHn| IHn]. {
+  set (nn := Fin.of_nat_lt (Nat.lt_succ_diag_r n)).
+  destruct (rngl_eq_dec Hde (fu nn) (fv nn)) as [H1| H1]. {
+    left.
+    apply vector_eq.
+    intros i; cbn.
+    injection IHn; clear IHn; intros H2.
+    destruct (Fin.eq_dec i nn) as [H3| H3]; [ now subst i | ].
+    assert (H4 : proj1_sig (Fin.to_nat i) < n). {
+      specialize (proj2_sig (Fin.to_nat i)) as H4.
+      cbn in H4.
+      destruct (Nat.eq_dec (proj1_sig (Fin.to_nat i)) n) as [H5| H5]. {
+        exfalso; apply H3; clear H3.
+        unfold nn.
+        apply Fin.to_nat_inj.
+        rewrite H5.
+        now rewrite Fin.to_nat_of_nat.
+      }
+      flia H4 H5.
+    }
+    set (m := Fin.of_nat_lt H4).
+    assert (H5 : gu m =  gv m) by now rewrite H2.
+    unfold m, gu, gv in H5.
+    cbn in H5.
+    enough (Fin.FS (Fin.of_nat_lt H4) = i) by congruence.
+...1
 destruct n. {
   destruct (rngl_eq_dec Hde (fu Fin.F1) (fv Fin.F1)) as [H1| H1]. {
     left.
