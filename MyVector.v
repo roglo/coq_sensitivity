@@ -321,12 +321,16 @@ destruct n. {
 Theorem glop : ∀ i : Fin.t 1, i = Fin.F1.
 Proof.
 intros.
+inversion i; [ | easy ].
+
+..
 Print Fin.t.
 Print Fin.
 remember (Fin.to_nat i) as j eqn:Hj.
 destruct j as (j, Hi).
 Search (exist _ _ _ = _).
 destruct Hj.
+Print Fin.t.
 replace j with 0 in Hj by flia Hi.
 ...
 
