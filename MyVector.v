@@ -335,6 +335,16 @@ destruct IHn as [IHn| IHn]. {
       }
       flia H4 H5.
     }
+    set (m := Fin.of_nat_lt H4).
+    assert (H5 : gu m =  gv m) by now rewrite H2.
+    unfold m, gu, gv in H5.
+Search Fin.of_nat_lt.
+...
+    cbn in H5.
+...
+    enough (Fin.FS (Fin.of_nat_lt H4) = i) by congruence.
+Fin.of_nat_lt: ∀ p n : nat, p < n → Fin.t n
+assert (∀ i, fu i = gu (
 ...
 Search (Fin.t _ → Fin.t _).
 ...
