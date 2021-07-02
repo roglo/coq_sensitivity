@@ -312,6 +312,38 @@ assert (H : ∀ i, {fu i = fv i} + {fu i ≠ fv i}). {
 }
 *)
 induction n; intros; [ now left; apply vector_eq | ].
+(*1*)
+destruct n. {
+  destruct (rngl_eq_dec Hde (fu Fin.F1) (fv Fin.F1)) as [H1| H1]. {
+    left.
+    apply vector_eq.
+    intros i; cbn.
+Theorem glop : ∀ i : Fin.t 1, i = Fin.F1.
+Proof.
+intros.
+Print Fin.t.
+Print Fin.
+remember (Fin.to_nat i) as j eqn:Hj.
+destruct j as (j, Hi).
+Search (exist _ _ _ = _).
+destruct Hj.
+replace j with 0 in Hj by flia Hi.
+...
+
+clear Hj.
+apply Nat.lt_1_r in Hi.
+...
+  set (nn := Fin.of_nat_lt (Nat.lt_succ_diag_r 0)).
+  destruct (rngl_eq_dec Hde (fu nn) (fv nn)) as [H1| H1]. {
+    left.
+    apply vector_eq.
+    intros i; cbn.
+cbn in nn.
+Theorem glop : ∀ i : Fin.t 1, i = Fin
+Proof.
+intros.
+cbn.
+...1
 set (gu := λ i, fu (Fin.R 1 i)).
 set (gv := λ i, fv (Fin.R 1 i)).
 specialize (IHn gu gv).
