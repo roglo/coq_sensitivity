@@ -347,10 +347,9 @@ destruct IHn as [IHn| IHn]. {
     unfold m, gu, gv in H5.
     cbn in H5.
     enough (Fin.FS (Fin.of_nat_lt H4) = i) by congruence.
-destruct n; [ easy | ].
-destruct n. {
-...
 clear.
+...
+induction n; [ easy | ].
 Search Fin.of_nat_lt.
 specialize (@Fin.of_nat_to_nat_inv (S n) i) as H1.
 specialize (@Fin.to_nat_of_nat) as H2.
