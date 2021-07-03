@@ -346,8 +346,8 @@ destruct IHn as [IHn| IHn]. {
     assert (H5 : gu m =  gv m) by now rewrite H2.
     unfold m, gu, gv in H5.
     cbn in H5.
+...
     enough (Fin.FS (Fin.of_nat_lt H4) = i) by congruence.
-clear.
 ...
 induction n; [ easy | ].
 Search Fin.of_nat_lt.
