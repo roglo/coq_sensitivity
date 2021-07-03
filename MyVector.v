@@ -347,6 +347,15 @@ destruct IHn as [IHn| IHn]. {
     unfold m, gu, gv in H5.
     cbn in H5.
     enough (Fin.FS (Fin.of_nat_lt H4) = i) by congruence.
+clear.
+Search Fin.of_nat_lt.
+specialize (@Fin.of_nat_to_nat_inv (S n) i) as H1.
+specialize (@Fin.to_nat_of_nat) as H2.
+specialize (H2 (proj1_sig (Fin.to_nat i)) n H4).
+...
+Check (Fin.FS (Fin.of_nat_lt H4), i).
+fold m.
+refine (match m with Fin.F1 => _ | Fin.FS _ => _ end).
 ...1
 destruct n. {
   destruct (rngl_eq_dec Hde (fu Fin.F1) (fv Fin.F1)) as [H1| H1]. {
