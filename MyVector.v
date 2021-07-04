@@ -330,6 +330,8 @@ destruct IHn as [IHn| IHn]. {
     intros i; cbn.
     injection IHn; clear IHn; intros H2.
     destruct (Fin.eq_dec i nn) as [H3| H3]; [ now subst i | ].
+Check @Fin.of_nat_lt.
+...
     assert (H4 : proj1_sig (Fin.to_nat i) < n). {
       specialize (proj2_sig (Fin.to_nat i)) as H4.
       cbn in H4.
@@ -346,6 +348,7 @@ destruct IHn as [IHn| IHn]. {
     assert (H5 : gu m =  gv m) by now rewrite H2.
     unfold m, gu, gv in H5.
     cbn in H5.
+Check (Fin.R 1 (Fin.of_nat_lt H4)).
 ...
     enough (Fin.FS (Fin.of_nat_lt H4) = i) by congruence.
 ...
