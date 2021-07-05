@@ -142,11 +142,11 @@ flia Hijp Haa.
 Qed.
 
 Theorem fold_left_mul_map_mod : ∀ a b l,
-  fold_left Nat.mul (map (λ i, i mod a) l) b mod a =
-  fold_left Nat.mul l b mod a.
+  a ≠ 0
+  → fold_left Nat.mul (map (λ i, i mod a) l) b mod a =
+    fold_left Nat.mul l b mod a.
 Proof.
-intros.
-destruct (Nat.eq_dec a 0) as [Haz| Haz]; [ now subst a | ].
+intros * Haz.
 induction l as [| c l]; [ easy | cbn ].
 rewrite <- List_fold_left_mul_assoc.
 rewrite Nat.mul_mod_idemp_r; [ | easy ].
@@ -256,12 +256,12 @@ assert (Hx1 : x mod p = fact (p - 1) mod p). {
 assert (Hx2 : x mod p = (fact (p - 1) * a ^ (p - 1)) mod p). {
   subst x; rewrite Hf.
   rewrite <- (map_map (λ i, i * a) (λ j, j mod p)).
-  rewrite fold_left_mul_map_mod.
+  rewrite fold_left_mul_map_mod; [ | easy ].
   rewrite fold_left_mul_map_mul.
   rewrite seq_length.
   f_equal; f_equal.
   symmetry.
-  apply fact_eq_fold_left.
+  now apply fact_eq_fold_left.
 }
 rewrite Hx2 in Hx1.
 rewrite <- (Nat.mul_1_r (fact _)) in Hx1 at 2.

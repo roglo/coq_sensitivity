@@ -18,7 +18,7 @@ Canonical Structure Q_ring_like_op : ring_like_op Q :=
      rngl_opt_quot := None;
      rngl_le := Q.le |}.
 
-Existing Instance Q_ring_like_op.
+Global Existing Instance Q_ring_like_op.
 
 Theorem Q_1_neq_0 : (1 ≠ 0)%Q.
 Proof. easy. Qed.

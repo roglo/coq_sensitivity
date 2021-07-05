@@ -18,7 +18,7 @@ Canonical Structure nat_ring_like_op : ring_like_op nat :=
      rngl_opt_quot := Some Nat.div;
      rngl_le := Nat.le |}.
 
-Existing Instance nat_ring_like_op.
+Global Existing Instance nat_ring_like_op.
 
 Theorem Nat_eq_mul_0 : ∀ n m, n * m = 0 → n = 0 ∨ m = 0.
 Proof. now intros; apply Nat.eq_mul_0. Qed.
@@ -223,7 +223,7 @@ Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
      rngl_opt_quot := None;
      rngl_le := Zn_le n |}.
 
-Existing Instance Zn_ring_like_op.
+Global Existing Instance Zn_ring_like_op.
 
 Theorem Zn_eq : ∀ n (a b : Zn n), proj1_sig a = proj1_sig b → a = b.
 Proof.
