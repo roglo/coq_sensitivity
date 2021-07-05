@@ -118,19 +118,19 @@ Numeral Notation PQ PQ_of_decimal_int PQ_to_decimal_uint : PQ_scope.
 
 (* since 8.12 *)
 
-Definition PQ_of_numeral_int (n : Numeral.int) : option PQ :=
+Definition PQ_of_numeral_int (n : Number.int) : option PQ :=
   match n with
-  | Numeral.IntDec n => PQ_of_decimal_int n
-  | Numeral.IntHex _ => None
+  | Number.IntDecimal n => PQ_of_decimal_int n
+  | Number.IntHexadecimal _ => None
   end.
 
-Definition PQ_to_numeral_uint (pq : PQ) : option Numeral.uint :=
+Definition PQ_to_numeral_uint (pq : PQ) : option Number.uint :=
   match nn (PQden1 pq) with
-  | 0 => Some (Numeral.UIntDec (Nat.to_uint (nn (PQnum1 pq) + 1)))
+  | 0 => Some (Number.UIntDecimal (Nat.to_uint (nn (PQnum1 pq) + 1)))
   | _ => None
   end.
 
-Numeral Notation PQ PQ_of_numeral_int PQ_to_numeral_uint : PQ_scope.
+Number Notation PQ PQ_of_numeral_int PQ_to_numeral_uint : PQ_scope.
 
 (* end 8.12 *)
 
@@ -149,16 +149,16 @@ Definition nnn_of_decimal_int (n : Decimal.int) : option nnn :=
 
 (* *)
 
-Definition nnn_of_numeral_int (n : Numeral.int) : option nnn :=
+Definition nnn_of_numeral_int (n : Number.int) : option nnn :=
   match n with
-  | Numeral.IntDec n => nnn_of_decimal_int n
-  | Numeral.IntHex _ => None
+  | Number.IntDecimal n => nnn_of_decimal_int n
+  | Number.IntHexadecimal _ => None
   end.
 
-Definition nnn_to_numeral_uint (nn1 : nnn) : option Numeral.uint :=
-  Some (Numeral.UIntDec (Nat.to_uint (nn nn1 + 1))).
+Definition nnn_to_numeral_uint (nn1 : nnn) : option Number.uint :=
+  Some (Number.UIntDecimal (Nat.to_uint (nn nn1 + 1))).
 
-Numeral Notation nnn nnn_of_numeral_int nnn_to_numeral_uint : nnn_scope.
+Number Notation nnn nnn_of_numeral_int nnn_to_numeral_uint : nnn_scope.
 
 (*
 Check (12 - 7)%PQ.
@@ -229,7 +229,7 @@ Proof. easy. Qed.
       ====================
       ... if_PQeq_dec y z then P else Q ...
  *)
-Instance PQif_PQeq_morph {P Q : Prop} :
+Local Instance PQif_PQeq_morph {P Q : Prop} :
   Proper (PQeq ==> PQeq ==> iff) (λ x y, if PQeq_dec x y then P else Q).
 Proof.
 intros x1 x2 Hx y1 y2 Hy.
@@ -321,7 +321,7 @@ Ltac split_var x :=
       (x < z)%PQ
    rewrite H.
  *)
-Instance PQlt_morph : Proper (PQeq ==> PQeq ==> iff) PQlt.
+Local Instance PQlt_morph : Proper (PQeq ==> PQeq ==> iff) PQlt.
 Proof.
 assert (H : ∀ x1 x2 y1 y2,
   (x1 == x2)%PQ → (y1 == y2)%PQ → (x1 < y1)%PQ → (x2 < y2)%PQ). {
@@ -350,7 +350,7 @@ split; intros Hxy.
  now apply (H x2 x1 y2 y1).
 Qed.
 
-Instance PQgt_morph : Proper (PQeq ==> PQeq ==> iff) PQgt.
+Local Instance PQgt_morph : Proper (PQeq ==> PQeq ==> iff) PQgt.
 Proof.
 intros x1 x2 Hx y1 y2 Hy.
 now apply PQlt_morph.
@@ -363,7 +363,7 @@ Qed.
       (x ≤ z)%PQ
    rewrite H.
  *)
-Instance PQle_morph : Proper (PQeq ==> PQeq ==> iff) PQle.
+Local Instance PQle_morph : Proper (PQeq ==> PQeq ==> iff) PQle.
 Proof.
 assert (H : ∀ x1 x2 y1 y2,
   (x1 == x2)%PQ → (y1 == y2)%PQ → (x1 ≤ y1)%PQ → (x2 ≤ y2)%PQ). {
@@ -392,7 +392,7 @@ split; intros Hxy.
  now apply (H x2 x1 y2 y1).
 Qed.
 
-Instance PQge_morph : Proper (PQeq ==> PQeq ==> iff) PQge.
+Local Instance PQge_morph : Proper (PQeq ==> PQeq ==> iff) PQge.
 Proof.
 intros x1 x2 Hx y1 y2 Hy.
 now apply PQle_morph.
@@ -405,7 +405,7 @@ Qed.
       ..... (x + z)%PQ ....
    rewrite H.
  *)
-Instance PQadd_morph : Proper (PQeq ==> PQeq ==> PQeq) PQadd.
+Local Instance PQadd_morph : Proper (PQeq ==> PQeq ==> PQeq) PQadd.
 Proof.
 intros x1q x2q Hx y1q y2q Hy.
 move Hx before Hy.
@@ -474,7 +474,7 @@ Arguments PQsub_morph x1%PQ x2%PQ y1%PQ y2%PQ.
       ..... (x * z)%PQ ....
    rewrite H.
  *)
-Instance PQmul_morph : Proper (PQeq ==> PQeq ==> PQeq) PQmul.
+Local Instance PQmul_morph : Proper (PQeq ==> PQeq ==> PQeq) PQmul.
 Proof.
 unfold "*"%PQ.
 unfold "==", nd; simpl.
@@ -644,7 +644,7 @@ apply
  apply Nat.mul_le_mono_pos_r; [ flia | easy ].
 Qed.
 
-Instance PQcompare_morph : Proper (PQeq ==> PQeq ==> eq) PQcompare.
+Local Instance PQcompare_morph : Proper (PQeq ==> PQeq ==> eq) PQcompare.
 Proof.
 intros x1 x2 Hx y1 y2 Hy.
 move Hx before Hy.
@@ -1322,7 +1322,7 @@ Definition PQred x :=
   PQmake (mknn (aa - 1)) (mknn (bb - 1)).
 Arguments PQred x%PQ.
 
-Instance PQred_morph : Proper (PQeq ==> PQeq) PQred.
+Local Instance PQred_morph : Proper (PQeq ==> PQeq) PQred.
 Proof.
 intros (xn, xd) (yn, yd) Hxy.
 unfold "=="%PQ, nd in Hxy |-*; simpl in *.

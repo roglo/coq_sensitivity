@@ -97,19 +97,19 @@ Numeral Notation GQ GQ_of_decimal_int GQ_to_decimal_int : GQ_scope.
 
 (* since 8.12 *)
 
-Definition GQ_of_numeral_int (n : Numeral.int) : option GQ :=
+Definition GQ_of_numeral_int (n : Number.int) : option GQ :=
   match n with
-  | Numeral.IntDec n => GQ_of_decimal_int n
-  | Numeral.IntHex _ => None
+  | Number.IntDecimal n => GQ_of_decimal_int n
+  | Number.IntHexadecimal _ => None
   end.
 
-Definition GQ_to_numeral_uint (gq : GQ) : option Numeral.uint :=
+Definition GQ_to_numeral_uint (gq : GQ) : option Number.uint :=
   match GQ_to_decimal_uint gq with
-  | Some d => Some (Numeral.UIntDec d)
+  | Some d => Some (Number.UIntDecimal d)
   | None => None
   end.
 
-Numeral Notation GQ GQ_of_numeral_int GQ_to_numeral_uint : GQ_scope.
+Number Notation GQ GQ_of_numeral_int GQ_to_numeral_uint : GQ_scope.
 
 End GQ_Notations.
 
@@ -1316,6 +1316,14 @@ unfold GQnum, GQden in Hnd.
 unfold GQ_of_PQ in Hnd; cbn in Hnd.
 unfold PQred in Hnd.
 remember ggcd as f; cbn in Hnd; subst f.
+destruct b. {
+  cbn.
+  cbn in Hnd.
+  destruct (Nat.eq_dec a 0) as [Haz| Haz]; [ easy | exfalso ].
+  rewrite Nat.sub_add in Hnd; [ | flia Haz ].
+  rewrite ggcd_1_r in Hnd.
+  cbn in Hnd.
+...
 destruct b; [ easy | ].
 destruct a; [ now rewrite Nat.mod_0_l | ].
 rewrite Nat.sub_add in Hnd; [ | flia ].
