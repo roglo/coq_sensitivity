@@ -298,10 +298,19 @@ intros j Hj; cbn.
 symmetry; apply rngl_mul_assoc.
 Qed.
 
+Theorem Fin_F1_or_FS : ∀ n (i : Fin.t (S n)), i = Fin.F1 ∨ ∃ j, i = Fin.FS j.
+Proof.
+intros.
+refine (match i with Fin.F1 => _ | Fin.FS _ => _ end).
+now left.
+right.
+now exists t.
+Qed.
+
 Theorem Fin_1_F1 : ∀ i : Fin.t 1, i = Fin.F1.
 Proof.
 intros.
-now refine (match i with Fin.F1 => _ | Fin.FS _ => _ end); destruct n.
+now destruct (Fin_F1_or_FS i) as [| (j, Hj)].
 Qed.
 
 Theorem vect_eq_dec :
@@ -328,91 +337,13 @@ destruct IHn as [IHn| IHn]. {
     left.
     apply vector_eq; cbn.
     intros i.
-    destruct (Fin.eq_dec i Fin.F1) as [H3| H3]; [ congruence | ].
-    assert (H4 : ∀ i, gu i = gv i) by now intros; rewrite H1.
-    unfold gu, gv in H4.
-    cbn in H4.
-Theorem glop : ∀ n (i : Fin.t (S n)), i ≠ Fin.F1 → ∃ j, i = Fin.FS j.
-Proof.
-intros * Hi.
-destruct n; [ now specialize (Fin_1_F1 i) | ].
-destruct n. {
-Theorem Fin_2_F1_FS_F1 : ∀ i : Fin.t 2, i = Fin.F1 ∨ i = Fin.FS Fin.F1.
-Proof.
-intros.
-refine (match i with Fin.F1 => _ | Fin.FS _ => _ end). {
-  destruct n; [ easy | ].
-  destruct n; [ now left | easy ].
-} {
-  destruct n; [ easy | ].
-  destruct n; [ | easy ].
-  right; f_equal.
-  apply Fin_1_F1.
-}
-Qed.
-...
-apply glop in H3.
-destruct H3 as (j, Hj).
-rewrite Hj.
-apply H4.
-...
-  set (nn := Fin.of_nat_lt (Nat.lt_succ_diag_r n)).
-  destruct (rngl_eq_dec Hde (fu nn) (fv nn)) as [H1| H1]. {
-    left.
-    apply vector_eq.
-    intros i; cbn.
-    injection IHn; clear IHn; intros H2.
-    destruct (Fin.eq_dec i nn) as [H3| H3]; [ now subst i | ].
-Check @Fin.of_nat_lt.
-destruct (Nat.eq_dec n 4). {
-  subst n.
-  cbn in gu, gv.
-...
-    assert (H4 : proj1_sig (Fin.to_nat i) < n). {
-      specialize (proj2_sig (Fin.to_nat i)) as H4.
-      cbn in H4.
-      destruct (Nat.eq_dec (proj1_sig (Fin.to_nat i)) n) as [H5| H5]. {
-        exfalso; apply H3; clear H3.
-        unfold nn.
-        apply Fin.to_nat_inj.
-        rewrite H5.
-        now rewrite Fin.to_nat_of_nat.
-      }
-      flia H4 H5.
-    }
-    set (m := Fin.of_nat_lt H4).
-    assert (H5 : gu m =  gv m) by now rewrite H2.
-    unfold m, gu, gv in H5.
-    cbn in H5.
-Check (Fin.R 1 (Fin.of_nat_lt H4)).
-...
-    enough (Fin.FS (Fin.of_nat_lt H4) = i) by congruence.
-...
-induction n; [ easy | ].
-Search Fin.of_nat_lt.
-specialize (@Fin.of_nat_to_nat_inv (S n) i) as H1.
-specialize (@Fin.to_nat_of_nat) as H2.
-specialize (H2 (proj1_sig (Fin.to_nat i)) n H4).
-...
-Check (Fin.FS (Fin.of_nat_lt H4), i).
-fold m.
-refine (match m with Fin.F1 => _ | Fin.FS _ => _ end).
-...1
-destruct n. {
-  destruct (rngl_eq_dec Hde (fu Fin.F1) (fv Fin.F1)) as [H1| H1]. {
-    left.
-    apply vector_eq.
-    intros i; cbn.
-    specialize (Fin_1_F1 i) as H2.
-    now subst i.
-  } {
-    right.
-    intros H2; apply H1; clear H1.
-    injection H2; intros H1.
-    now subst fv.
+    specialize (Fin_F1_or_FS i) as H3.
+    destruct H3 as [| (j, Hj)]; [ congruence | ].
+    subst i.
+    cbn in gu, gv.
+    now assert (gu j = gv j) by now rewrite H1.
   }
-}
-destruct n. {
+  right.
 ...
 Qed.
 
