@@ -1323,6 +1323,7 @@ destruct b. {
   rewrite Nat.sub_add in Hnd; [ | flia Haz ].
   rewrite ggcd_1_r in Hnd.
   cbn in Hnd.
+Compute (4 mod 0).
 ...
 destruct b; [ easy | ].
 destruct a; [ now rewrite Nat.mod_0_l | ].

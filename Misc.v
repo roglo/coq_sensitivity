@@ -392,9 +392,7 @@ Proof.
 intros * Hab.
 destruct (Nat.eq_dec c 0) as [Hcz| Hcz]. {
   subst c; cbn.
-  cbn in Hab.
-  subst a.
-  apply Nat.sub_diag.
+  flia.
 }
 specialize (Nat.div_mod a c Hcz) as H1.
 specialize (Nat.div_mod b c Hcz) as H2.
