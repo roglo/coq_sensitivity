@@ -303,8 +303,7 @@ Proof.
 intros.
 refine (match i with Fin.F1 => _ | Fin.FS _ => _ end).
 now left.
-right.
-now exists t.
+now right; exists t.
 Qed.
 
 Theorem Fin_1_F1 : ∀ i : Fin.t 1, i = Fin.F1.
@@ -347,7 +346,7 @@ injection H1; clear H1; intros H1.
 unfold gu, gv; cbn.
 congruence.
 Qed.
-
+Search Fin.t.
 ...
 
 Definition vect_size {T n} (v : vector n T) := n.
