@@ -323,6 +323,13 @@ set (gu := λ i, fu (Fin.R 1 i)).
 set (gv := λ i, fv (Fin.R 1 i)).
 specialize (IHn gu gv).
 destruct IHn as [IHn| IHn]. {
+  injection IHn; clear IHn; intros H1.
+  destruct (rngl_eq_dec Hde (fu Fin.F1) (fv Fin.F1)) as [H2| H2]. {
+    left.
+    apply vector_eq; cbn.
+    intros i.
+    destruct (Fin.eq_dec i Fin.F1) as [H3| H3]; [ congruence | ].
+...
   set (nn := Fin.of_nat_lt (Nat.lt_succ_diag_r n)).
   destruct (rngl_eq_dec Hde (fu nn) (fv nn)) as [H1| H1]. {
     left.
@@ -331,6 +338,9 @@ destruct IHn as [IHn| IHn]. {
     injection IHn; clear IHn; intros H2.
     destruct (Fin.eq_dec i nn) as [H3| H3]; [ now subst i | ].
 Check @Fin.of_nat_lt.
+destruct (Nat.eq_dec n 4). {
+  subst n.
+  cbn in gu, gv.
 ...
     assert (H4 : proj1_sig (Fin.to_nat i) < n). {
       specialize (proj2_sig (Fin.to_nat i)) as H4.
