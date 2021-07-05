@@ -2378,6 +2378,46 @@ Definition sumbool_and {A B C D : Prop} (P : sumbool A B) (Q : sumbool C D) :=
 Notation "a ∨∨ b" := (sumbool_or a b) (at level 85).
 Notation "a ∧∧ b" := (sumbool_and a b) (at level 80).
 
+Theorem add_succ_comm : ∀ a b, S a + b = a + S b.
+Proof.
+intros; cbn.
+induction a; [ reflexivity | ].
+now cbn; rewrite IHa.
+Defined.
+
+Definition fin_t_add_succ_l a b : Fin.t (S a + b) → Fin.t (a + S b) :=
+  λ i, match add_succ_comm a b with eq_refl => i end.
+
+Theorem add_lt_succ : ∀ a b, a < a + S b.
+Proof.
+intros.
+apply Nat.lt_sub_lt_add_l.
+rewrite Nat.sub_diag.
+apply Nat.lt_0_succ.
+Qed.
+
+Fixpoint fin_seq start len : list (Fin.t (start + len)) :=
+  match len with
+  | 0 => []
+  | S len' =>
+      Fin.of_nat_lt (add_lt_succ start len') ::
+      map (fin_t_add_succ_l (b := len')) (fin_seq (S start) len')
+  end.
+
+Theorem Fin_inv : ∀ n (i : Fin.t (S n)), i = Fin.F1 ∨ ∃ j, i = Fin.FS j.
+Proof.
+intros.
+refine (match i with Fin.F1 => _ | Fin.FS _ => _ end).
+now left.
+now right; exists t.
+Qed.
+
+Theorem Fin_1_F1 : ∀ i : Fin.t 1, i = Fin.F1.
+Proof.
+intros.
+now destruct (Fin_inv i) as [| (j, Hj)].
+Qed.
+
 (* extensionality of finite functions *)
 
 Axiom fin_fun_ext : ∀ n A (f g : Fin.t n → A),

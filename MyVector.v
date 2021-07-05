@@ -46,48 +46,6 @@ now specialize (H2 (λ _, 0) (λ _, 1) (H1 _ _) 0).
 Qed.
 *)
 
-Theorem add_succ_comm : ∀ a b, S a + b = a + S b.
-Proof.
-intros; cbn.
-induction a; [ reflexivity | ].
-now cbn; rewrite IHa.
-Defined.
-
-Theorem add_lt_succ : ∀ a b, a < a + S b.
-Proof.
-intros.
-apply Nat.lt_sub_lt_add_l.
-rewrite Nat.sub_diag.
-apply Nat.lt_0_succ.
-Qed.
-
-(*
-Definition fin_t_glop a b (p : a = b) : Fin.t a → Fin.t b :=
-  λ i, match p with eq_refl => i end.
-
-Print fin_t_glop.
-Print eq_rect.
-Print Fin.eqb.
-Check f_equal.
-Print f_equal.
-
-Print eq_rect.
-
-Definition fin_t_add_succ_l a b : Fin.t (S a + b) → Fin.t (a + S b) :=
-  λ i, eq_rect _ _ i _ (add_succ_comm a b).
-*)
-
-Definition fin_t_add_succ_l a b : Fin.t (S a + b) → Fin.t (a + S b) :=
-  λ i, match add_succ_comm a b with eq_refl => i end.
-
-Fixpoint fin_seq start len : list (Fin.t (start + len)) :=
-  match len with
-  | 0 => []
-  | S len' =>
-      Fin.of_nat_lt (add_lt_succ start len') ::
-      map (fin_t_add_succ_l (b := len')) (fin_seq (S start) len')
-  end.
-
 (*
 Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 2 1)).
 Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 2 2)).
@@ -134,41 +92,6 @@ Definition vect_mul_scal_l s {n} (V : vector n T) :=
 
 Definition vect_dot_product {n} (U V : vector n T) :=
   Σ (i ∈ fin_seq 0 n), vect_el U i * vect_el V i.
-
-(*
-Definition iter_fin_seq T b e (f : T → Fin.t (b + (S e - b)) → T) d :=
-  iter_list (fin_seq b (S e - b)) f d.
-
-Theorem pouet : ∀ b e, b + (e - b) = max b e.
-Proof. intros. flia. Qed.
-
-Definition glop b e : Fin.t (b + (e - b)) → Fin.t (max b e) :=
-  λ i, match pouet b e with eq_refl => i end.
-
-Definition iter_fin_seq' T b e (f : T → Fin.t (max b (S e)) → T) d :=
-  iter_list (fin_seq b (S e - b))
-    (λ a i, f a (glop b (S e) i)) d.
-
-Notation "'Σf' ( i = b , e ) , g" :=
-  (iter_fin_seq' b e (λ c i, (c + g)%F) 0%F)
-  (at level 45, i at level 0, b at level 60, e at level 60).
-
-Theorem agaga : ∀ n, 0 + (S (n - 1) - 0) = n.
-Proof.
-intros.
-destruct n; [ | flia ].
-cbn.
-...
-
-Definition vect_dot_product' {n} (U V : vector n T) :=
-  Σf (i = 0, n - 1), vect_el U i * vect_el V i.
-
-Print iter_list.
-
-Print vect_dot_product.
-Locate "Σ".
-Search (Fin.t _ → Fin.t _).
-*)
 
 Definition vect_squ_norm n (V : vector n T) := vect_dot_product V V.
 
@@ -296,20 +219,6 @@ rewrite rngl_mul_summation_list_distr_l; [ | easy ].
 apply rngl_summation_list_eq_compat.
 intros j Hj; cbn.
 symmetry; apply rngl_mul_assoc.
-Qed.
-
-Theorem Fin_inv : ∀ n (i : Fin.t (S n)), i = Fin.F1 ∨ ∃ j, i = Fin.FS j.
-Proof.
-intros.
-refine (match i with Fin.F1 => _ | Fin.FS _ => _ end).
-now left.
-now right; exists t.
-Qed.
-
-Theorem Fin_1_F1 : ∀ i : Fin.t 1, i = Fin.F1.
-Proof.
-intros.
-now destruct (Fin_inv i) as [| (j, Hj)].
 Qed.
 
 Theorem vect_eq_dec :
