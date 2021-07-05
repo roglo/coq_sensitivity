@@ -391,8 +391,8 @@ Theorem Nat_eq_mod_sub_0 : ∀ a b c,
 Proof.
 intros * Hab.
 destruct (Nat.eq_dec c 0) as [Hcz| Hcz]. {
-  subst c; cbn.
-  flia.
+  subst c; cbn in Hab |-*.
+  subst; flia.
 }
 specialize (Nat.div_mod a c Hcz) as H1.
 specialize (Nat.div_mod b c Hcz) as H2.
