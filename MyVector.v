@@ -320,14 +320,7 @@ Proof.
 intros Hde *.
 destruct U as (fu).
 destruct V as (fv).
-(*
-assert (H : ∀ i, {fu i = fv i} + {fu i ≠ fv i}). {
-  intros.
-  apply (rngl_eq_dec Hde).
-}
-*)
 induction n; intros; [ now left; apply vector_eq | ].
-(*1*)
 set (gu := λ i, fu (Fin.R 1 i)).
 set (gv := λ i, fv (Fin.R 1 i)).
 specialize (IHn gu gv).
@@ -344,8 +337,18 @@ destruct IHn as [IHn| IHn]. {
     now assert (gu j = gv j) by now rewrite H1.
   }
   right.
-...
+  congruence.
+}
+right.
+intros H1; apply IHn; clear IHn.
+apply vector_eq; cbn.
+intros i.
+injection H1; clear H1; intros H1.
+unfold gu, gv; cbn.
+congruence.
 Qed.
+
+...
 
 Definition vect_size {T n} (v : vector n T) := n.
 
