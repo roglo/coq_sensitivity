@@ -337,6 +337,19 @@ Proof.
 intros * Hi.
 destruct n; [ now specialize (Fin_1_F1 i) | ].
 destruct n. {
+Theorem Fin_2_F1_FS_F1 : ∀ i : Fin.t 2, i = Fin.F1 ∨ i = Fin.FS Fin.F1.
+Proof.
+intros.
+refine (match i with Fin.F1 => _ | Fin.FS _ => _ end). {
+  destruct n; [ easy | ].
+  destruct n; [ now left | easy ].
+} {
+  destruct n; [ easy | ].
+  destruct n; [ | easy ].
+  right; f_equal.
+  apply Fin_1_F1.
+}
+Qed.
 ...
 apply glop in H3.
 destruct H3 as (j, Hj).
