@@ -256,19 +256,19 @@ Numeral Notation Q of_decimal_int to_decimal_int : Q_scope
 
 (* since 8.12 *)
 
-Definition of_numeral_int (n : Numeral.int) : option Q :=
+Definition of_numeral_int (n : Number.int) : option Q :=
   match n with
-  | Numeral.IntDec n => Some (of_decimal_int n)
-  | Numeral.IntHex _ => None
+  | Number.IntDecimal n => Some (of_decimal_int n)
+  | Number.IntHexadecimal _ => None
   end.
 
-Definition to_numeral_int (q : Q) : option Numeral.int :=
+Definition to_numeral_int (q : Q) : option Number.int :=
   match to_decimal_int q with
-  | Some d => Some (Numeral.IntDec d)
+  | Some d => Some (Number.IntDecimal d)
   | None => None
   end.
 
-Numeral Notation Q of_numeral_int to_numeral_int : Q_scope.
+Number Notation Q of_numeral_int to_numeral_int : Q_scope.
 
 (* end 8.12 *)
 
@@ -687,7 +687,7 @@ intros.
 destruct x as [| px| px]; [ easy | apply GQle_refl | apply GQle_refl ].
 Qed.
 
-Hint Resolve le_refl : core.
+Global Hint Resolve le_refl : core.
 
 Theorem le_antisymm : ∀ x y, (x ≤ y)%Q → (y ≤ x)%Q → x = y.
 Proof.
@@ -2134,7 +2134,7 @@ destruct x; [ easy | | ].
  now rewrite Nat.add_1_r.
 Qed.
 
-Hint Resolve den_neq_0 : core.
+Global Hint Resolve den_neq_0 : core.
 
 Theorem num_pair_1_r : ∀ a, num (a // 1) = a.
 Proof.
@@ -2341,36 +2341,34 @@ Definition intg x := num x / den x.
 Arguments frac x%Q.
 Arguments intg x%Q.
 
-Theorem frac_pair : ∀ a b, frac (a // b) = ((a mod b) // b)%Q.
+Theorem frac_pair : ∀ a b, b ≠ 0 → frac (a // b) = ((a mod b) // b)%Q.
 Proof.
-intros.
+intros * Hbz.
 destruct (zerop a) as [Ha| Ha].
 -subst a; destruct b; [ easy | cbn; now rewrite Nat.sub_diag ].
 -destruct a; [ easy | clear Ha ].
  unfold frac; cbn.
- destruct b.
- +rewrite GQnum_pair_0_r; [ | easy ].
-  now rewrite GQden_pair_0_r.
- +rewrite GQnum_pair.
-  rewrite GQden_pair.
-  remember Nat.gcd as f; remember Nat.modulo as g; cbn; subst f g.
-  remember (Nat_ggcd.ggcd (S a) (S b)) as g eqn:Hg.
-  destruct g as (g, (aa, bb)).
-  rewrite <- Nat_ggcd.ggcd_gcd, <- Hg.
-  remember S as f; cbn; subst f.
-  specialize (Nat_ggcd.ggcd_correct_divisors (S a) (S b)) as H.
-  rewrite <- Hg in H.
-  destruct H as (Ha, Hb).
-  rewrite Ha, Hb.
-  setoid_rewrite Nat.mul_comm.
-  assert (Hgz : g ≠ 0) by now intros H; subst g.
-  rewrite Nat.div_mul; [ | easy ].
-  rewrite Nat.div_mul; [ | easy ].
-  assert (Hbb : bb ≠ 0) by now intros H; subst bb; rewrite Nat.mul_0_r in Hb.
-  rewrite Nat.mul_mod_distr_r; [ | easy | easy ].
-  rewrite <- mul_pair; [ | easy | easy ].
-  rewrite pair_diag; [ | easy ].
-  now rewrite mul_1_r.
+ destruct b; [ easy | clear Hbz ].
+ rewrite GQnum_pair.
+ rewrite GQden_pair.
+ remember Nat.gcd as f; remember Nat.modulo as g; cbn; subst f g.
+ remember (Nat_ggcd.ggcd (S a) (S b)) as g eqn:Hg.
+ destruct g as (g, (aa, bb)).
+ rewrite <- Nat_ggcd.ggcd_gcd, <- Hg.
+ remember S as f; cbn; subst f.
+ specialize (Nat_ggcd.ggcd_correct_divisors (S a) (S b)) as H.
+ rewrite <- Hg in H.
+ destruct H as (Ha, Hb).
+ rewrite Ha, Hb.
+ setoid_rewrite Nat.mul_comm.
+ assert (Hgz : g ≠ 0) by now intros H; subst g.
+ rewrite Nat.div_mul; [ | easy ].
+ rewrite Nat.div_mul; [ | easy ].
+ assert (Hbb : bb ≠ 0) by now intros H; subst bb; rewrite Nat.mul_0_r in Hb.
+ rewrite Nat.mul_mod_distr_r; [ | easy | easy ].
+ rewrite <- mul_pair; [ | easy | easy ].
+ rewrite pair_diag; [ | easy ].
+ now rewrite mul_1_r.
 Qed.
 
 Theorem intg_frac : ∀ x, (0 ≤ x)%Q → x = (intg x // 1 + frac x)%Q.
@@ -2509,7 +2507,7 @@ apply (le_pair 0 1); [ easy | easy | ].
 rewrite Nat.mul_1_l; cbn; flia.
 Qed.
 
-Hint Resolve frac_ge_0 : core.
+Global Hint Resolve frac_ge_0 : core.
 
 Theorem frac_lt_1 : ∀ x, (frac x < 1)%Q.
 Proof.

@@ -1277,7 +1277,7 @@ unfold GQden.
 now rewrite Nat.add_1_r.
 Qed.
 
-Hint Resolve GQnum_neq_0 GQden_neq_0 : core.
+Global Hint Resolve GQnum_neq_0 GQden_neq_0 : core.
 
 Theorem GQnum_den : ∀ x, x = (GQnum x // GQden x)%GQ.
 Proof.
@@ -1308,24 +1308,16 @@ now do 2 rewrite Nat.add_sub.
 Qed.
 
 Theorem GQnum_mult_GQden : ∀ a b n,
-  GQnum (a // b)%GQ = GQden (a // b)%GQ * n
+  b ≠ 0
+  → GQnum (a // b)%GQ = GQden (a // b)%GQ * n
   → a mod b = 0.
 Proof.
-intros * Hnd.
+intros * Hbz Hnd.
 unfold GQnum, GQden in Hnd.
 unfold GQ_of_PQ in Hnd; cbn in Hnd.
 unfold PQred in Hnd.
 remember ggcd as f; cbn in Hnd; subst f.
-destruct b. {
-  cbn.
-  cbn in Hnd.
-  destruct (Nat.eq_dec a 0) as [Haz| Haz]; [ easy | exfalso ].
-  rewrite Nat.sub_add in Hnd; [ | flia Haz ].
-  rewrite ggcd_1_r in Hnd.
-  cbn in Hnd.
-Compute (4 mod 0).
-...
-destruct b; [ easy | ].
+destruct b; [ easy | clear Hbz ].
 destruct a; [ now rewrite Nat.mod_0_l | ].
 rewrite Nat.sub_add in Hnd; [ | flia ].
 rewrite Nat.sub_add in Hnd; [ | flia ].
