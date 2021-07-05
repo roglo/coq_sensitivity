@@ -64,11 +64,7 @@ Definition mat_of_list_list T d (ll : list (list T)) :
   matrix (list_list_nrows ll) (list_list_ncols ll) T :=
   mk_mat (list_list_el d ll).
 
-(**)
-Compute (let (i, j) := (2, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j).
-...
-Compute (let (i, j) := (7, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j).
-Compute (let (i, j) := (1, 3) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j).
+(*
 Compute (list_list_of_mat (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
 *)
 
@@ -101,7 +97,7 @@ Definition mat_add {ro : ring_like_op T} {m n} (MA MB : matrix m n T) :
 
 Definition mat_mul {ro : ring_like_op T} {m n p}
     (MA : matrix m n T) (MB : matrix n p T) : matrix m p T :=
-  {| mat_el i k := Σ (j = 0, n - 1), mat_el MA i j * mat_el MB j k |}.
+  {| mat_el i k := Σ (j ∈ fin_seq 0 n), mat_el MA i j * mat_el MB j k |}.
 
 (* opposite *)
 
@@ -118,9 +114,9 @@ Definition mat_sub {m n} (MA MB : matrix m n T) :=
 Definition vect_of_mat_col {m n} (M : matrix m n T) j :=
   mk_vect (λ i, mat_el M i j).
 
-...
-
 (* concatenation of a matrix and a vector *)
+
+...
 
 Definition mat_vect_concat {m n} (M : matrix m n T) (V : vector m T) :
   matrix m (n + 1) T :=
