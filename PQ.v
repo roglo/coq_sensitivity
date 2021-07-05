@@ -229,7 +229,7 @@ Proof. easy. Qed.
       ====================
       ... if_PQeq_dec y z then P else Q ...
  *)
-Local Instance PQif_PQeq_morph {P Q : Prop} :
+Global Instance PQif_PQeq_morph {P Q : Prop} :
   Proper (PQeq ==> PQeq ==> iff) (λ x y, if PQeq_dec x y then P else Q).
 Proof.
 intros x1 x2 Hx y1 y2 Hy.
@@ -321,7 +321,7 @@ Ltac split_var x :=
       (x < z)%PQ
    rewrite H.
  *)
-Local Instance PQlt_morph : Proper (PQeq ==> PQeq ==> iff) PQlt.
+Global Instance PQlt_morph : Proper (PQeq ==> PQeq ==> iff) PQlt.
 Proof.
 assert (H : ∀ x1 x2 y1 y2,
   (x1 == x2)%PQ → (y1 == y2)%PQ → (x1 < y1)%PQ → (x2 < y2)%PQ). {
@@ -350,7 +350,7 @@ split; intros Hxy.
  now apply (H x2 x1 y2 y1).
 Qed.
 
-Local Instance PQgt_morph : Proper (PQeq ==> PQeq ==> iff) PQgt.
+Global Instance PQgt_morph : Proper (PQeq ==> PQeq ==> iff) PQgt.
 Proof.
 intros x1 x2 Hx y1 y2 Hy.
 now apply PQlt_morph.
@@ -363,7 +363,7 @@ Qed.
       (x ≤ z)%PQ
    rewrite H.
  *)
-Local Instance PQle_morph : Proper (PQeq ==> PQeq ==> iff) PQle.
+Global Instance PQle_morph : Proper (PQeq ==> PQeq ==> iff) PQle.
 Proof.
 assert (H : ∀ x1 x2 y1 y2,
   (x1 == x2)%PQ → (y1 == y2)%PQ → (x1 ≤ y1)%PQ → (x2 ≤ y2)%PQ). {
@@ -392,7 +392,7 @@ split; intros Hxy.
  now apply (H x2 x1 y2 y1).
 Qed.
 
-Local Instance PQge_morph : Proper (PQeq ==> PQeq ==> iff) PQge.
+Global Instance PQge_morph : Proper (PQeq ==> PQeq ==> iff) PQge.
 Proof.
 intros x1 x2 Hx y1 y2 Hy.
 now apply PQle_morph.
@@ -405,7 +405,7 @@ Qed.
       ..... (x + z)%PQ ....
    rewrite H.
  *)
-Local Instance PQadd_morph : Proper (PQeq ==> PQeq ==> PQeq) PQadd.
+Global Instance PQadd_morph : Proper (PQeq ==> PQeq ==> PQeq) PQadd.
 Proof.
 intros x1q x2q Hx y1q y2q Hy.
 move Hx before Hy.
@@ -474,7 +474,7 @@ Arguments PQsub_morph x1%PQ x2%PQ y1%PQ y2%PQ.
       ..... (x * z)%PQ ....
    rewrite H.
  *)
-Local Instance PQmul_morph : Proper (PQeq ==> PQeq ==> PQeq) PQmul.
+Global Instance PQmul_morph : Proper (PQeq ==> PQeq ==> PQeq) PQmul.
 Proof.
 unfold "*"%PQ.
 unfold "==", nd; simpl.
@@ -644,7 +644,7 @@ apply
  apply Nat.mul_le_mono_pos_r; [ flia | easy ].
 Qed.
 
-Local Instance PQcompare_morph : Proper (PQeq ==> PQeq ==> eq) PQcompare.
+Global Instance PQcompare_morph : Proper (PQeq ==> PQeq ==> eq) PQcompare.
 Proof.
 intros x1 x2 Hx y1 y2 Hy.
 move Hx before Hy.
@@ -1322,7 +1322,7 @@ Definition PQred x :=
   PQmake (mknn (aa - 1)) (mknn (bb - 1)).
 Arguments PQred x%PQ.
 
-Local Instance PQred_morph : Proper (PQeq ==> PQeq) PQred.
+Global Instance PQred_morph : Proper (PQeq ==> PQeq) PQred.
 Proof.
 intros (xn, xd) (yn, yd) Hxy.
 unfold "=="%PQ, nd in Hxy |-*; simpl in *.

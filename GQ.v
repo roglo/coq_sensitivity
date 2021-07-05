@@ -156,7 +156,7 @@ simpl in H; subst x; f_equal.
 apply UIP_nat.
 Qed.
 
-Instance GQ_of_PQ_morph : Proper (PQeq ==> eq) GQ_of_PQ.
+Global Instance GQ_of_PQ_morph : Proper (PQeq ==> eq) GQ_of_PQ.
 Proof.
 intros (xn, xd) (yn, yd) Hxy.
 unfold "=="%PQ, nd in Hxy.
