@@ -298,7 +298,7 @@ intros j Hj; cbn.
 symmetry; apply rngl_mul_assoc.
 Qed.
 
-Theorem Fin_F1_or_FS : ∀ n (i : Fin.t (S n)), i = Fin.F1 ∨ ∃ j, i = Fin.FS j.
+Theorem Fin_inv : ∀ n (i : Fin.t (S n)), i = Fin.F1 ∨ ∃ j, i = Fin.FS j.
 Proof.
 intros.
 refine (match i with Fin.F1 => _ | Fin.FS _ => _ end).
@@ -309,7 +309,7 @@ Qed.
 Theorem Fin_1_F1 : ∀ i : Fin.t 1, i = Fin.F1.
 Proof.
 intros.
-now destruct (Fin_F1_or_FS i) as [| (j, Hj)].
+now destruct (Fin_inv i) as [| (j, Hj)].
 Qed.
 
 Theorem vect_eq_dec :
@@ -329,7 +329,7 @@ destruct IHn as [IHn| IHn]. {
     left.
     apply vector_eq; cbn.
     intros i.
-    specialize (Fin_F1_or_FS i) as H3.
+    specialize (Fin_inv i) as H3.
     destruct H3 as [| (j, Hj)]; [ congruence | ].
     subst i.
     cbn in gu, gv.
