@@ -329,6 +329,19 @@ destruct IHn as [IHn| IHn]. {
     apply vector_eq; cbn.
     intros i.
     destruct (Fin.eq_dec i Fin.F1) as [H3| H3]; [ congruence | ].
+    assert (H4 : ∀ i, gu i = gv i) by now intros; rewrite H1.
+    unfold gu, gv in H4.
+    cbn in H4.
+Theorem glop : ∀ n (i : Fin.t (S n)), i ≠ Fin.F1 → ∃ j, i = Fin.FS j.
+Proof.
+intros * Hi.
+destruct n; [ now specialize (Fin_1_F1 i) | ].
+destruct n. {
+...
+apply glop in H3.
+destruct H3 as (j, Hj).
+rewrite Hj.
+apply H4.
 ...
   set (nn := Fin.of_nat_lt (Nat.lt_succ_diag_r n)).
   destruct (rngl_eq_dec Hde (fu nn) (fv nn)) as [H1| H1]. {
