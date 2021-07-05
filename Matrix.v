@@ -14,13 +14,28 @@ Require Import MyVector.
 (* matrices *)
 
 Record matrix (m n : nat) T := mk_mat
-  { mat_el : nat → nat → T }.
+  { mat_el : Fin.t m → Fin.t n → T }.
 
-(* function extensionality for matrices *)
-
+(* function extensionality for matrices
 Axiom matrix_eq : ∀ m n T (MA MB : matrix m n T),
    (∀ i j, i < m → j < n → mat_el MA i j = mat_el MB i j)
    → MA = MB.
+
+(* ... but this version of that axiom is bad: it proves False! *)
+Theorem oops : False.
+Proof.
+assert (H1 : ∀ f g : nat → nat → nat, f = g). {
+  intros.
+  enough (mk_mat 0 0 f = mk_mat 0 0 g) by now injection H.
+  now apply matrix_eq.
+}
+assert (H2 : ∀ (f g : nat → nat → nat), f = g → ∀ x y, f x y = g x y). {
+  intros * Hfg x y.
+  now subst f.
+}
+now specialize (H2 (λ _ _, 0) (λ _ _, 1) (H1 _ _) 0 0).
+Qed.
+*)
 
 Theorem matrix_neq : ∀ m n T (MA MB : matrix m n T),
   ¬ (∀ i j, mat_el MA i j = mat_el MB i j)
@@ -37,6 +52,8 @@ Definition list_list_nrows T (ll : list (list T)) :=
 
 Definition list_list_ncols T (ll : list (list T)) :=
   length (hd [] ll).
+
+...
 
 Definition list_list_of_mat m n T (M : matrix m n T) : list (list T) :=
   map (λ i, map (mat_el M i) (seq 0 m)) (seq 0 n).
@@ -99,7 +116,9 @@ Definition mat_sub {m n} (MA MB : matrix m n T) :=
 (* vector from a matrix column *)
 
 Definition vect_of_mat_col {m n} (M : matrix m n T) j :=
-  mk_vect m (λ i, mat_el M i j).
+  mk_vect (λ i, mat_el M i j).
+
+...
 
 (* concatenation of a matrix and a vector *)
 
