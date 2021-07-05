@@ -53,20 +53,20 @@ Definition list_list_nrows T (ll : list (list T)) :=
 Definition list_list_ncols T (ll : list (list T)) :=
   length (hd [] ll).
 
-...
-
 Definition list_list_of_mat m n T (M : matrix m n T) : list (list T) :=
-  map (λ i, map (mat_el M i) (seq 0 m)) (seq 0 n).
+  map (λ i, map (mat_el M i) (fin_seq 0 n)) (fin_seq 0 m).
 
-Definition list_list_el T d (ll : list (list T)) i j : T :=
-  nth j (nth i ll []) d.
+Definition list_list_el m n T d (ll : list (list T))
+    (i : Fin.t m) (j : Fin.t n) : T :=
+  nth (proj1_sig (Fin.to_nat j)) (nth (proj1_sig (Fin.to_nat i)) ll []) d.
 
 Definition mat_of_list_list T d (ll : list (list T)) :
   matrix (list_list_nrows ll) (list_list_ncols ll) T :=
-  mk_mat (list_list_nrows ll) (list_list_ncols ll) (list_list_el d ll).
+  mk_mat (list_list_el d ll).
 
-(*
+(**)
 Compute (let (i, j) := (2, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j).
+...
 Compute (let (i, j) := (7, 0) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j).
 Compute (let (i, j) := (1, 3) in list_list_el 42 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] i j).
 Compute (list_list_of_mat (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
