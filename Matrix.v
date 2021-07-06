@@ -118,6 +118,28 @@ Definition vect_of_mat_col {m n} (M : matrix m n T) j :=
 
 Definition Fin_nat n (i : Fin.t n) : nat := proj1_sig (Fin.to_nat i).
 
+Definition toto A n : (Fin.t n → A) → A → (Fin.t (S n) → A).
+Proof.
+intros f a i.
+destruct (Nat.eq_dec (Fin_nat i) n) as [H1| H1]. {
+  apply a.
+}
+apply f.
+assert (H2 : Fin_nat i < n). {
+  unfold Fin_nat in H1 |-*.
+...
+  specialize (@Fin.to_nat (S n) i) as H2.
+  destruct H2 as (j, Hj).
+...
+specialize (@Fin.of_nat_lt) as j.
+specialize (j (Fin_nat i)).
+...
+
+specialize @Fin.of_nat_lt as H1.
+specialize (H1 n (S n) (Nat.lt_succ_diag_r _)).
+apply H1.
+...
+
 Definition toto n (i : Fin.t (S n)) (p : Fin_nat i < n) : Fin.t n.
 destruct n. {
   now apply Nat.nlt_0_r in p.
