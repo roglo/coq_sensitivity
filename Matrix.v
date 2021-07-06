@@ -151,7 +151,7 @@ destruct (Nat.eq_dec (proj1_sig (Fin.to_nat j)) n) as [H1| H1]. {
 Definition mat_vect_concat {m n} (M : matrix m n T) (V : vector m T) :
   matrix m (n + 1) T :=
   mk_mat
-    (λ i (j : Fin.t (n + 1)),
+    (λ (i : Fin.t m) (j : Fin.t (n + 1)),
      match j with
      | Fin.F1 =>
          match n return matrix m n T → T with
