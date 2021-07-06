@@ -116,6 +116,23 @@ Definition vect_of_mat_col {m n} (M : matrix m n T) j :=
 
 (* concatenation of a matrix and a vector *)
 
+Definition Fin_nat n (i : Fin.t n) : nat := proj1_sig (Fin.to_nat i).
+
+Definition toto n (i : Fin.t (S n)) (p : Fin_nat i < n) : Fin.t n.
+destruct n. {
+  now apply Nat.nlt_0_r in p.
+}
+refine (match i with Fin.F1 => _ | Fin.FS _ => _ end). {
+  destruct n0; [ apply idProp | ].
+...
+specialize (Fin_inv i) as H1.
+destruct H1 as [H1| H1]. {
+  apply Fin.F1.
+}
+destruct H1 as (j, Hj).
+
+...
+
 Definition glop A n : (Fin.t n → A) → A → (Fin.t (n + 1) → A).
 Proof.
 intros * f a i.
