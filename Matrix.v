@@ -119,6 +119,7 @@ Definition vect_of_mat_col {m n} (M : matrix m n T) j :=
 Definition mat_vect_concat {m n} (M : matrix m n T) (V : vector m T) :
   matrix m (n + 1) T.
 Proof.
+(*
 refine (mk_mat _).
 intros i j.
 specialize (Fin_inv) as H1.
@@ -132,10 +133,11 @@ destruct n. {
   exfalso.
   now destruct H1 as (k, Hk).
 }
-Abort. (*
+Abort.
 ...
 destruct H1 as (k, Hk).
 ...
+*)
 refine (mk_mat _).
 intros i j.
 destruct j as [| k]. {
@@ -145,19 +147,73 @@ destruct j as [| k]. {
 destruct (Nat.eq_dec (proj1_sig (Fin.to_nat j)) n) as [H1| H1]. {
   apply (vect_el V i).
 }
-...
+Abort.
+
+(*
+Definition mat_mat_concat {m n p} (M : matrix m n T) (M' : matrix m p T) :
+  matrix m (n + p) T :=
+  mk_mat
+    (λ (i : Fin.t m) (j : Fin.t (n + p)),
+     match n return Fin.t (n + p) → T with
+     | 0 => λ j', mat_el M' i j'
+     | S n => λ j',
+     end j).
 *)
 
 Definition mat_vect_concat {m n} (M : matrix m n T) (V : vector m T) :
   matrix m (n + 1) T :=
   mk_mat
     (λ (i : Fin.t m) (j : Fin.t (n + 1)),
-     match j with
-     | Fin.F1 =>
+     match n return matrix m n T → Fin.t (n + 1) → T with
+     | 0 => λ _ _, vect_el V i
+     | S n' =>
+         (λ M' j',
+          match Nat.lt_trichotomy (proj1_sig (Fin.to_nat j')) (S n' + 1) with
+          | or_introl _ => vect_el V i
+          | or_intror (or_introl _) => vect_el V i
+          | or_intror (or_intror _) => vect_el V i
+          end)
+     end M j).
+
+
+          if Nat.eq_dec (proj1_sig (Fin.to_nat j')) (S n' + 1) then vect_el V i
+          else mat_el M' i j')
+
+j with
+     | @Fin.F1 p =>
+         match n with
+         | 0 => vect_el V i
+         | S n' => mat_el M i Fin.F1
+         end
+(*
          match n return matrix m n T → T with
          | 0 => λ _, vect_el V i
          | S n' => λ M', mat_el M' i Fin.F1
          end M
+*)
+     | @Fin.FS p k =>
+         match Nat.eq_dec (proj1_sig (Fin.to_nat k)) n with
+         | left H => λ _, vect_el V i
+         | right H => λ M', mat_el M' i j
+         end M
+    end).
+
+Definition mat_vect_concat {m n} (M : matrix m n T) (V : vector m T) :
+  matrix m (n + 1) T :=
+  mk_mat
+    (λ (i : Fin.t m) (j : Fin.t (n + 1)),
+     match j with
+     | @Fin.F1 p =>
+         match n with
+         | 0 => vect_el V i
+         | S n' => mat_el M i Fin.F1
+         end
+(*
+         match n return matrix m n T → T with
+         | 0 => λ _, vect_el V i
+         | S n' => λ M', mat_el M' i Fin.F1
+         end M
+*)
      | @Fin.FS p k =>
          match Nat.eq_dec (proj1_sig (Fin.to_nat k)) n with
          | left H => λ _, vect_el V i
