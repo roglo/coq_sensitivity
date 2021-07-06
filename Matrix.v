@@ -158,9 +158,11 @@ Definition mat_vect_concat {m n} (M : matrix m n T) (V : vector m T) :
          | 0 => λ _, vect_el V i
          | S n' => λ M', mat_el M' i Fin.F1
          end M
-     | Fin.FS k =>
-         if Nat.eq_dec (proj1_sig (Fin.to_nat k)) n then vect_el V i
-         else mat_el M i (Fin.FS k)
+     | @Fin.FS p k =>
+         match Nat.eq_dec (proj1_sig (Fin.to_nat k)) n with
+         | left H => λ _, vect_el V i
+         | right H => λ M', mat_el M' i j
+         end M
     end).
 
 Definition mat_vect_concat {m n} (M : matrix m n T) (V : vector m T) :
