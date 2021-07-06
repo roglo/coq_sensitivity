@@ -160,6 +160,11 @@ Definition mat_mat_concat {m n p} (M : matrix m n T) (M' : matrix m p T) :
      end j).
 *)
 
+Require Import ZArith.
+Search ({_ < _} + {_ = _} + {_ > _})%Z.
+
+Print Ztrichotomy_inf.
+
 Definition mat_vect_concat {m n} (M : matrix m n T) (V : vector m T) :
   matrix m (n + 1) T :=
   mk_mat
@@ -168,13 +173,12 @@ Definition mat_vect_concat {m n} (M : matrix m n T) (V : vector m T) :
      | 0 => λ _ _, vect_el V i
      | S n' =>
          (λ M' j',
-          match Nat.lt_trichotomy (proj1_sig (Fin.to_nat j')) (S n' + 1) with
-          | or_introl _ => vect_el V i
-          | or_intror (or_introl _) => vect_el V i
-          | or_intror (or_intror _) => vect_el V i
-          end)
+          match compare (proj1_sig (Fin.to_nat j')) (S n' + 1) with
+          | Eq => λ _, vect_el V i
+          | Lt => λ _, vect_el V i
+          | Gt => λ _, vect_el V i
+          end) (compare _ _)
      end M j).
-
 
           if Nat.eq_dec (proj1_sig (Fin.to_nat j')) (S n' + 1) then vect_el V i
           else mat_el M' i j')
