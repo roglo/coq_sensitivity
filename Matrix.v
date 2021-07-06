@@ -118,64 +118,38 @@ Definition vect_of_mat_col {m n} (M : matrix m n T) j :=
 
 Definition Fin_nat n (i : Fin.t n) : nat := proj1_sig (Fin.to_nat i).
 
-Definition toto A n : (Fin.t n → A) → A → (Fin.t (S n) → A).
+Theorem Fin_ub : ∀ n (i : Fin.t n), proj1_sig (Fin.to_nat i) < n.
+Proof.
+intros.
+destruct n; [ easy | ].
+specialize (@Fin_inv n i) as H2.
+destruct H2 as [H2| H2]. {
+  subst i.
+  apply Nat.lt_0_succ.
+}
+destruct H2 as (j, Hj).
+subst i; cbn.
+destruct (Fin.to_nat j) as (k, Hk); cbn.
+now apply Nat.succ_lt_mono in Hk.
+Qed.
+
+Definition Fin_extend_fun A n : (Fin.t n → A) → A → (Fin.t (S n) → A).
 Proof.
 intros f a i.
-destruct (Nat.eq_dec (Fin_nat i) n) as [H1| H1]. {
-  apply a.
-}
+destruct (Nat.eq_dec (Fin_nat i) n) as [H1| H1]; [ apply a | ].
 apply f.
 assert (H2 : Fin_nat i < n). {
   unfold Fin_nat in H1 |-*.
-...
-  specialize (@Fin.to_nat (S n) i) as H2.
-  destruct H2 as (j, Hj).
-...
-specialize (@Fin.of_nat_lt) as j.
-specialize (j (Fin_nat i)).
-...
-
-specialize @Fin.of_nat_lt as H1.
-specialize (H1 n (S n) (Nat.lt_succ_diag_r _)).
-apply H1.
-...
-
-Definition toto n (i : Fin.t (S n)) (p : Fin_nat i < n) : Fin.t n.
-destruct n. {
-  now apply Nat.nlt_0_r in p.
+  specialize (Fin_ub i) as H2.
+  apply Nat.succ_le_mono in H2.
+  now apply Nat_le_neq_lt.
 }
-refine (match i with Fin.F1 => _ | Fin.FS _ => _ end). {
-  destruct n0; [ apply idProp | ].
-...
-specialize (Fin_inv i) as H1.
-destruct H1 as [H1| H1]. {
-  apply Fin.F1.
-}
-destruct H1 as (j, Hj).
+apply (Fin.of_nat_lt H2).
+Defined.
 
-...
-
-Definition glop A n : (Fin.t n → A) → A → (Fin.t (n + 1) → A).
-Proof.
-intros * f a i.
-destruct (Nat.eq_dec (proj1_sig (Fin.to_nat i)) (n + 1)) as [H1| H1]. {
-  apply a.
-}
-destruct n; [ apply a | ].
-apply f.
-specialize (@Fin_inv (n + 1)) as H2.
-specialize (H2 i).
-destruct H2 as [H2| H2]. {
-  subst i; cbn in H1.
-  apply Fin.F1.
-}
-destruct H2 as (j, Hj).
-...
-  apply Fin_inv in i.
-Search (Fin.t _ → Fin.t _).
-set (m := Fin.to_nat i).
-specialize (@Fin.of_nat_lt) as H2.
-specialize (H2 n (n + 1)).
+Check (@Fin_nat 12).
+Check (Fin_extend_fun (@Fin_nat 12)) 17.
+Compute map ((Fin_extend_fun (@Fin_nat 12)) 17) (fin_seq 0 13).
 
 ...
 
