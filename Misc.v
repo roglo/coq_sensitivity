@@ -2413,6 +2413,11 @@ now left.
 now right; exists t.
 Qed.
 
+Check @Fin.of_nat_lt.
+...
+
+j = Fin.of_nat (Fin.to_nat i - 1).
+
 (*
 Theorem Fin_inv : ∀ n (i : Fin.t (S n)), i = Fin.F1 ∨ ∃ j, i = Fin.FS j.
 Proof.
