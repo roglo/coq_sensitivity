@@ -132,9 +132,9 @@ destruct n. {
   exfalso.
   now destruct H1 as (k, Hk).
 }
+Abort. (*
 ...
 destruct H1 as (k, Hk).
-
 ...
 refine (mk_mat _).
 intros i j.
@@ -146,6 +146,7 @@ destruct (Nat.eq_dec (proj1_sig (Fin.to_nat j)) n) as [H1| H1]. {
   apply (vect_el V i).
 }
 ...
+*)
 
 Definition mat_vect_concat {m n} (M : matrix m n T) (V : vector m T) :
   matrix m (n + 1) T :=
@@ -153,14 +154,28 @@ Definition mat_vect_concat {m n} (M : matrix m n T) (V : vector m T) :
     (λ i (j : Fin.t (n + 1)),
      match j with
      | Fin.F1 =>
-         (λ _,
-          match n as n3 return matrix m n3 T → T with
-          | 0 => λ _, vect_el V i
-          | S n' => (λ n4 M0, mat_el M0 i Fin.F1) n'
-          end M) _
+         match n return matrix m n T → T with
+         | 0 => λ _, vect_el V i
+         | S n' => λ M', mat_el M' i Fin.F1
+         end M
      | Fin.FS k =>
          if Nat.eq_dec (proj1_sig (Fin.to_nat k)) n then vect_el V i
-         else mat_el M i j
+         else mat_el M i (Fin.FS k)
+    end).
+
+Definition mat_vect_concat {m n} (M : matrix m n T) (V : vector m T) :
+  matrix m (n + 1) T :=
+  mk_mat
+    (λ i (j : Fin.t (n + 1)),
+     match j with
+     | Fin.F1 =>
+         match n return matrix m n T → T with
+         | 0 => λ _, vect_el V i
+         | S n' => λ M', mat_el M' i Fin.F1
+         end M
+     | Fin.FS k =>
+         if Nat.eq_dec (proj1_sig (Fin.to_nat k)) n then vect_el V i
+         else vect_el V i (*mat_el M i j*)
     end).
 
 Definition mat_vect_concat {m n} (M : matrix m n T) (V : vector m T) :
