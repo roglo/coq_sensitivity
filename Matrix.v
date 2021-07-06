@@ -147,23 +147,19 @@ destruct j as [| k]. {
 destruct (Nat.eq_dec (proj1_sig (Fin.to_nat j)) n) as [H1| H1]. {
   apply (vect_el V i).
 }
+apply (mat_el M i j).
+...
 Abort.
+...
 
-(*
-Definition mat_mat_concat {m n p} (M : matrix m n T) (M' : matrix m p T) :
-  matrix m (n + p) T :=
+Definition mat_vect_concat {m n p} (M : matrix m n T) (V : vector n T) :
+  matrix m (n + 1) T :=
   mk_mat
-    (λ (i : Fin.t m) (j : Fin.t (n + p)),
-     match n return Fin.t (n + p) → T with
-     | 0 => λ j', mat_el M' i j'
-     | S n => λ j',
+    (λ (i : Fin.t m) (j : Fin.t (n + 1)),
+     match n return Fin.t (n + 1) → T with
+     | 0 => λ j', vect_el V j'
+     | S n => λ j', vect_el V i
      end j).
-*)
-
-Require Import ZArith.
-Search ({_ < _} + {_ = _} + {_ > _})%Z.
-
-Print Ztrichotomy_inf.
 
 Definition mat_vect_concat {m n} (M : matrix m n T) (V : vector m T) :
   matrix m (n + 1) T :=
