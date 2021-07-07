@@ -133,6 +133,7 @@ destruct (Fin.to_nat j) as (k, Hk); cbn.
 now apply Nat.succ_lt_mono in Hk.
 Qed.
 
+(*
 Definition Fin_fun_app A n : (Fin.t n → A) → A → (Fin.t (S n) → A).
 Proof.
 intros f a i.
@@ -146,8 +147,9 @@ assert (H2 : Fin_nat i < n). {
 }
 apply (Fin.of_nat_lt H2).
 Defined.
+*)
 
-Definition Fin_fun_app' A n : (Fin.t n → A) → A → (Fin.t (S n) → A) :=
+Definition Fin_fun_app A n : (Fin.t n → A) → A → (Fin.t (S n) → A) :=
   λ f a i,
   match Nat.eq_dec (Fin_nat i) n with
   | left _ => a
@@ -160,43 +162,46 @@ Definition Fin_fun_app' A n : (Fin.t n → A) → A → (Fin.t (S n) → A) :=
          Fin.of_nat_lt (Nat_le_neq_lt Hin Hne))
   end.
 
-Check Fin_fun_app'.
-
+(*
 Check (@Fin_nat 12).
 Check (Fin_fun_app (@Fin_nat 12)) 17.
 Compute map ((Fin_fun_app (@Fin_nat 12)) 17) (Fin_seq 0 13).
-Compute map ((Fin_fun_app' (@Fin_nat 12)) 17) (Fin_seq 0 13).
+*)
 
-Definition glop a l : list (Fin.t (fold_left (λ c i : nat, max c i) l a + 1)).
+Definition lfln a l : list (Fin.t (fold_left (λ c i : nat, max c i) l a + 1)).
 Proof.
 revert a.
 induction l as [| b]; intros; [ apply [] | ].
+apply cons. {
+  cbn.
+  apply (@Fin.of_nat_lt b).
+  clear.
+  revert a.
+  induction l as [| c]; intros; cbn. {
+    rewrite Nat.add_1_r.
+    apply -> Nat.succ_le_mono.
+    apply Nat.le_max_r.
+  }
+  rewrite <- Nat.max_assoc.
+  rewrite (Nat.max_comm b).
+  rewrite Nat.max_assoc.
+  apply IHl.
+}
 cbn.
-...
 apply IHl.
 Defined.
 
-Definition pouet (l : list nat) : list (Fin.t (Max (i ∈ l), i + 1)).
-Proof.
-apply glop.
-Defined.
+Definition list_Fin_of_list_nat (l : list nat) : list (Fin.t _) := lfln 0 l.
 
-Compute (pouet [3;7;1;8;0;9] : list (Fin.t 10)).
-
-
-Definition pouet (l : list nat) : list (Fin.t (Max (i ∈ l), i + 1)).
-Proof.
-unfold iter_list.
-induction l as [| a]; [ apply [] | ].
-cbn.
-...
-remember (Max (i ∈ l), i + 1) as n eqn:Hn.
-
-...
+(*
+Compute (list_Fin_of_list_nat [3;7;1;8;0;9] : list (Fin.t 10)).
+Compute map (@Fin_nat 10) (list_Fin_of_list_nat [3;7;1;8;0;9]).
+*)
 
 Definition mat_vect_concat {m n} (M : matrix m n T) (V : vector m T) :
   matrix m (n + 1) T.
 Proof.
+...
 (*
 refine (mk_mat _).
 intros i j.
