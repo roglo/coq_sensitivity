@@ -201,7 +201,6 @@ Compute map (@Fin_nat 10) (list_Fin_of_list_nat [3;7;1;8;0;9]).
 Definition mat_vect_concat {m n} (M : matrix m n T) (V : vector m T) :
   matrix m (n + 1) T.
 Proof.
-...
 (*
 refine (mk_mat _).
 intros i j.
@@ -230,6 +229,9 @@ destruct j as [| k]. {
 destruct (Nat.eq_dec (proj1_sig (Fin.to_nat j)) n) as [H1| H1]. {
   apply (vect_el V i).
 }
+...
+apply Fin_fun_app with (n := m).
+...
 apply (mat_el M i j).
 ...
 Abort.
