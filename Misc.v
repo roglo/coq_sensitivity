@@ -2396,12 +2396,12 @@ rewrite Nat.sub_diag.
 apply Nat.lt_0_succ.
 Qed.
 
-Fixpoint fin_seq start len : list (Fin.t (start + len)) :=
+Fixpoint Fin_seq start len : list (Fin.t (start + len)) :=
   match len with
   | 0 => []
   | S len' =>
       Fin.of_nat_lt (add_lt_succ start len') ::
-      map (fin_t_add_succ_l (b := len')) (fin_seq (S start) len')
+      map (fin_t_add_succ_l (b := len')) (Fin_seq (S start) len')
   end.
 
 Theorem Fin_inv : ∀ n (i : Fin.t (S n)),
@@ -2412,16 +2412,6 @@ refine (match i with Fin.F1 => _ | Fin.FS _ => _ end).
 now left.
 now right; exists t.
 Qed.
-
-(*
-Theorem Fin_inv : ∀ n (i : Fin.t (S n)), i = Fin.F1 ∨ ∃ j, i = Fin.FS j.
-Proof.
-intros.
-refine (match i with Fin.F1 => _ | Fin.FS _ => _ end).
-now left.
-now right; exists t.
-Qed.
-*)
 
 Theorem Fin_1_F1 : ∀ i : Fin.t 1, i = Fin.F1.
 Proof.

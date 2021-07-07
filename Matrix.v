@@ -54,7 +54,7 @@ Definition list_list_ncols T (ll : list (list T)) :=
   length (hd [] ll).
 
 Definition list_list_of_mat m n T (M : matrix m n T) : list (list T) :=
-  map (λ i, map (mat_el M i) (fin_seq 0 n)) (fin_seq 0 m).
+  map (λ i, map (mat_el M i) (Fin_seq 0 n)) (Fin_seq 0 m).
 
 Definition list_list_el m n T d (ll : list (list T))
     (i : Fin.t m) (j : Fin.t n) : T :=
@@ -97,7 +97,7 @@ Definition mat_add {ro : ring_like_op T} {m n} (MA MB : matrix m n T) :
 
 Definition mat_mul {ro : ring_like_op T} {m n p}
     (MA : matrix m n T) (MB : matrix n p T) : matrix m p T :=
-  {| mat_el i k := Σ (j ∈ fin_seq 0 n), mat_el MA i j * mat_el MB j k |}.
+  {| mat_el i k := Σ (j ∈ Fin_seq 0 n), mat_el MA i j * mat_el MB j k |}.
 
 (* opposite *)
 
@@ -152,23 +152,20 @@ Definition Fin_fun_app' A n : (Fin.t n → A) → A → (Fin.t (S n) → A) :=
   match Nat.eq_dec (Fin_nat i) n with
   | left _ => a
   | right Hne =>
-      f (let Hlt : Fin_nat i < n :=
-           let H3 : proj1_sig (Fin.to_nat i) ≤ n :=
-             match Nat.succ_le_mono (proj1_sig (Fin.to_nat i)) n with
-             | conj _ H => H (Fin_ub i)
-             end
-           in
-           Nat_le_neq_lt H3 Hne
-        in
-        Fin.of_nat_lt Hlt)
+      f (let Hin :=
+           match Nat.succ_le_mono (proj1_sig (Fin.to_nat i)) n with
+           | conj _ H => H (Fin_ub i)
+           end
+         in
+         Fin.of_nat_lt (Nat_le_neq_lt Hin Hne))
   end.
 
 Check Fin_fun_app'.
 
 Check (@Fin_nat 12).
 Check (Fin_fun_app (@Fin_nat 12)) 17.
-Compute map ((Fin_fun_app (@Fin_nat 12)) 17) (fin_seq 0 13).
-Compute map ((Fin_fun_app' (@Fin_nat 12)) 17) (fin_seq 0 13).
+Compute map ((Fin_fun_app (@Fin_nat 12)) 17) (Fin_seq 0 13).
+Compute map ((Fin_fun_app' (@Fin_nat 12)) 17) (Fin_seq 0 13).
 
 ...
 

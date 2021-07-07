@@ -57,7 +57,7 @@ Definition vect_of_list {T} d (l : list T) : vector (length l) T :=
   mk_vect (λ i, nth (proj1_sig (Fin.to_nat i)) l d).
 
 Definition list_of_vect {n T} (v : vector n T) :=
-  map (vect_el v) (fin_seq 0 n).
+  map (vect_el v) (Fin_seq 0 n).
 
 (*
 Compute (list_of_vect (vect_of_list 42 [3;7;2])).
@@ -91,7 +91,7 @@ Definition vect_mul_scal_l s {n} (V : vector n T) :=
 (* dot product *)
 
 Definition vect_dot_product {n} (U V : vector n T) :=
-  Σ (i ∈ fin_seq 0 n), vect_el U i * vect_el V i.
+  Σ (i ∈ Fin_seq 0 n), vect_el U i * vect_el V i.
 
 Definition vect_squ_norm n (V : vector n T) := vect_dot_product V V.
 
