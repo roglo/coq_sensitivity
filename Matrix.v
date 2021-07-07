@@ -211,15 +211,11 @@ specialize (Fin_fun_app (mat_el M i)) as H3.
 apply H3; [ apply d | apply j ].
 Defined.
 
-Print mat_vect_concat.
-
-Compute (list_list_of_mat (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] : matrix 3 4 _)).
-Compute (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] : matrix 3 4 _).
-Compute (vect_of_list 0 [42; 12; 29] : vector 3 _).
-Compute (mat_vect_concat 37 (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (vect_of_list 0 [42; 12; 29])).
+(*
 Compute (list_list_of_mat (mat_vect_concat 37 (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (vect_of_list 0 [43; 12; 29]))).
+*)
 
-Compute (Nat.add_comm 4 1).
+Print mat_vect_concat.
 
 ...
 
