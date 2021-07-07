@@ -198,43 +198,29 @@ Compute (list_Fin_of_list_nat [3;7;1;8;0;9] : list (Fin.t 10)).
 Compute map (@Fin_nat 10) (list_Fin_of_list_nat [3;7;1;8;0;9]).
 *)
 
-Definition mat_vect_concat {m n} (M : matrix m n T) (V : vector m T) :
-  matrix m (n + 1) T.
+Definition mat_vect_concat {A m n} (d : A) (M : matrix m n A) (V : vector m A) :
+  matrix m (S n) A.
 Proof.
-(*
 refine (mk_mat _).
 intros i j.
-specialize (Fin_inv) as H1.
-rewrite Nat.add_comm in j.
-specialize (H1 n j).
-destruct H1 as [H1| H1]. {
-  destruct n; [ apply (vect_el V i) | ].
-  apply (mat_el M i Fin.F1).
-}
-destruct n. {
-  exfalso.
-  now destruct H1 as (k, Hk).
-}
-Abort.
-...
-destruct H1 as (k, Hk).
-...
-*)
-refine (mk_mat _).
-intros i j.
-destruct j as [| k]. {
-  destruct n; [ apply (vect_el V i) | ].
-  apply (mat_el M i Fin.F1).
-}
 destruct (Nat.eq_dec (proj1_sig (Fin.to_nat j)) n) as [H1| H1]. {
   apply (vect_el V i).
 }
-...
-apply Fin_fun_app with (n := m).
-...
-apply (mat_el M i j).
-...
-Abort.
+specialize (Fin_ub j) as H2.
+specialize (Fin_fun_app (mat_el M i)) as H3.
+apply H3; [ apply d | apply j ].
+Defined.
+
+Print mat_vect_concat.
+
+Compute (list_list_of_mat (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] : matrix 3 4 _)).
+Compute (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]] : matrix 3 4 _).
+Compute (vect_of_list 0 [42; 12; 29] : vector 3 _).
+Compute (mat_vect_concat 37 (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (vect_of_list 0 [42; 12; 29])).
+Compute (list_list_of_mat (mat_vect_concat 37 (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (vect_of_list 0 [43; 12; 29]))).
+
+Compute (Nat.add_comm 4 1).
+
 ...
 
 Definition mat_vect_concat {m n p} (M : matrix m n T) (V : vector n T) :
