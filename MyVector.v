@@ -25,28 +25,6 @@ now apply fin_fun_ext.
 Qed.
 
 (*
-(* function extensionality required for vectors *)
-Axiom vector_eq : ∀ n T (VA VB : vector n T),
-  (∀ i, i < n → vect_el VA i = vect_el VB i)
-  → VA = VB.
-
-(* ... but this version of that axiom is bad: it proves False! *)
-Theorem oops : False.
-Proof.
-assert (H1 : ∀ f g : nat → nat, f = g). {
-  intros.
-  enough (mk_vect 0 f = mk_vect 0 g) by now injection H.
-  now apply vector_eq.
-}
-assert (H2 : ∀ (f g : nat → nat), f = g → ∀ x, f x = g x). {
-  intros * Hfg x.
-  now subst f.
-}
-now specialize (H2 (λ _, 0) (λ _, 1) (H1 _ _) 0).
-Qed.
-*)
-
-(*
 Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 2 1)).
 Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 2 2)).
 Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 7 4)).

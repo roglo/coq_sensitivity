@@ -16,26 +16,19 @@ Require Import MyVector.
 Record matrix (m n : nat) T := mk_mat
   { mat_el : Fin.t m → Fin.t n → T }.
 
-(* function extensionality for matrices
-Axiom matrix_eq : ∀ m n T (MA MB : matrix m n T),
-   (∀ i j, i < m → j < n → mat_el MA i j = mat_el MB i j)
-   → MA = MB.
-
-(* ... but this version of that axiom is bad: it proves False! *)
-Theorem oops : False.
+(* function extensionality for matrices *)
+Theorem matrix_eq : ∀ m n T (MA MB : matrix m n T),
+  (∀ i j, mat_el MA i j = mat_el MB i j)
+  → MA = MB.
 Proof.
-assert (H1 : ∀ f g : nat → nat → nat, f = g). {
-  intros.
-  enough (mk_mat 0 0 f = mk_mat 0 0 g) by now injection H.
-  now apply matrix_eq.
-}
-assert (H2 : ∀ (f g : nat → nat → nat), f = g → ∀ x y, f x y = g x y). {
-  intros * Hfg x y.
-  now subst f.
-}
-now specialize (H2 (λ _ _, 0) (λ _ _, 1) (H1 _ _) 0 0).
+intros * Hab.
+destruct MA as (f).
+destruct MB as (g).
+cbn in Hab; f_equal.
+apply fin_fun_ext.
+intros i.
+now apply fin_fun_ext.
 Qed.
-*)
 
 Theorem matrix_neq : ∀ m n T (MA MB : matrix m n T),
   ¬ (∀ i j, mat_el MA i j = mat_el MB i j)
@@ -207,32 +200,30 @@ Definition mat_vect_concat {A m n} d (M : matrix m n A) V :=
 
 Compute (list_list_of_mat (mat_vect_concat 37 (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (vect_of_list 0 [43; 12; 29]))).
 
-...
-
 (* multiplication of a matrix by a vector *)
 
 Definition mat_mul_vect_r {m n} (M : matrix m n T) (V : vector n T) :=
-  mk_vect m (λ i, Σ (j = 0, n - 1), mat_el M i j * vect_el V j).
+  mk_vect (λ i, Σ (j ∈ Fin_seq 0 n), mat_el M i j * vect_el V j).
 
 (* multiplication of a matrix by a scalar *)
 
 Definition mat_mul_scal_l {m n} s (M : matrix m n T) :=
-  mk_mat m n (λ i j, s * mat_el M i j)%F.
+  mk_mat (λ i j, s * mat_el M i j)%F.
 
 (* matrix whose k-th column is replaced by a vector *)
 
 Definition mat_repl_vect {m n} k (M : matrix m n T) (V : vector m T) :=
-  mk_mat m n (λ i j, if Nat.eq_dec j k then vect_el V i else mat_el M i j).
+  mk_mat (λ i j, if Fin.eq_dec j k then vect_el V i else mat_el M i j).
 
 (* null matrix of dimension m × n *)
 
 Definition mZ m n : matrix m n T :=
-  mk_mat m n (λ i j, 0%F).
+  mk_mat (λ i j, 0%F).
 
 (* identity square matrix of dimension n *)
 
 Definition mI n : matrix n n T :=
-  mk_mat n n (λ i j, if Nat.eq_dec i j then 1%F else 0%F).
+  mk_mat (λ i j, if Fin.eq_dec i j then 1%F else 0%F).
 
 End a.
 
@@ -275,7 +266,7 @@ Theorem mat_add_comm : ∀ {m n} (MA MB : matrix m n T), (MA + MB = MB + MA)%M.
 Proof.
 intros.
 apply matrix_eq.
-intros * Hi Hj.
+intros.
 apply rngl_add_comm.
 Qed.
 
@@ -286,7 +277,7 @@ Theorem mat_add_add_swap : ∀ {m n} (MA MB MC : matrix m n T),
 Proof.
 intros.
 apply matrix_eq.
-intros i j Hi Hj.
+intros.
 apply rngl_add_add_swap.
 Qed.
 
@@ -295,7 +286,7 @@ Theorem mat_add_assoc : ∀ {m n} (MA MB MC : matrix m n T),
 Proof.
 intros.
 apply matrix_eq.
-intros i j Hi Hj.
+intros.
 apply rngl_add_assoc.
 Qed.
 
@@ -305,7 +296,7 @@ Theorem mat_add_0_l : ∀ {m n} (M : matrix m n T), (mZ m n + M)%M = M.
 Proof.
 intros.
 apply matrix_eq.
-intros * Hi Hj.
+intros.
 apply rngl_add_0_l.
 Qed.
 
@@ -316,7 +307,7 @@ Theorem mat_add_opp_l {m n} :
 Proof.
 intros.
 apply matrix_eq; cbn.
-intros * Hi Hj.
+intros.
 now apply rngl_add_opp_l.
 Qed.
 
@@ -325,7 +316,7 @@ Theorem mat_add_opp_r {m n} :
 Proof.
 intros.
 apply matrix_eq; cbn.
-intros * Hi Hj.
+intros.
 rewrite fold_rngl_sub; [ | easy ].
 now apply rngl_sub_diag; left.
 Qed.
@@ -337,7 +328,8 @@ Proof.
 intros.
 apply matrix_eq.
 cbn.
-intros * Hi Hj.
+intros.
+...
 rewrite (rngl_summation_split _ i); [ | flia Hi ].
 rewrite rngl_summation_split_last; [ | flia ].
 destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
