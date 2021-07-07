@@ -191,122 +191,23 @@ cbn.
 apply IHl.
 Defined.
 
-Definition list_Fin_of_list_nat (l : list nat) : list (Fin.t _) := lfln 0 l.
+Definition list_Fin_of_list_nat l : list (Fin.t (Max (i ∈ l), i + 1)) :=
+  lfln 0 l.
 
 (*
 Compute (list_Fin_of_list_nat [3;7;1;8;0;9] : list (Fin.t 10)).
 Compute map (@Fin_nat 10) (list_Fin_of_list_nat [3;7;1;8;0;9]).
 *)
 
-Definition mat_vect_concat {A m n} (d : A) (M : matrix m n A) (V : vector m A) :
-  matrix m (S n) A.
-Proof.
-refine (mk_mat _).
-intros i j.
-destruct (Nat.eq_dec (proj1_sig (Fin.to_nat j)) n) as [H1| H1]. {
-  apply (vect_el V i).
-}
-specialize (Fin_ub j) as H2.
-specialize (Fin_fun_app (mat_el M i)) as H3.
-apply H3; [ apply d | apply j ].
-Defined.
+Definition mat_vect_concat {A m n} d (M : matrix m n A) V :=
+  mk_mat
+    (λ i j,
+     if Nat.eq_dec (proj1_sig (Fin.to_nat j)) n then vect_el V i
+     else Fin_fun_app (mat_el M i) d j).
 
-(*
 Compute (list_list_of_mat (mat_vect_concat 37 (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (vect_of_list 0 [43; 12; 29]))).
-*)
-
-Print mat_vect_concat.
 
 ...
-
-Definition mat_vect_concat {m n p} (M : matrix m n T) (V : vector n T) :
-  matrix m (n + 1) T :=
-  mk_mat
-    (λ (i : Fin.t m) (j : Fin.t (n + 1)),
-     match n return Fin.t (n + 1) → T with
-     | 0 => λ j', vect_el V j'
-     | S n => λ j', vect_el V i
-     end j).
-
-Definition mat_vect_concat {m n} (M : matrix m n T) (V : vector m T) :
-  matrix m (n + 1) T :=
-  mk_mat
-    (λ (i : Fin.t m) (j : Fin.t (n + 1)),
-     match n return matrix m n T → Fin.t (n + 1) → T with
-     | 0 => λ _ _, vect_el V i
-     | S n' =>
-         (λ M' j',
-          match compare (proj1_sig (Fin.to_nat j')) (S n' + 1) with
-          | Eq => λ _, vect_el V i
-          | Lt => λ _, vect_el V i
-          | Gt => λ _, vect_el V i
-          end) (compare _ _)
-     end M j).
-
-          if Nat.eq_dec (proj1_sig (Fin.to_nat j')) (S n' + 1) then vect_el V i
-          else mat_el M' i j')
-
-j with
-     | @Fin.F1 p =>
-         match n with
-         | 0 => vect_el V i
-         | S n' => mat_el M i Fin.F1
-         end
-(*
-         match n return matrix m n T → T with
-         | 0 => λ _, vect_el V i
-         | S n' => λ M', mat_el M' i Fin.F1
-         end M
-*)
-     | @Fin.FS p k =>
-         match Nat.eq_dec (proj1_sig (Fin.to_nat k)) n with
-         | left H => λ _, vect_el V i
-         | right H => λ M', mat_el M' i j
-         end M
-    end).
-
-Definition mat_vect_concat {m n} (M : matrix m n T) (V : vector m T) :
-  matrix m (n + 1) T :=
-  mk_mat
-    (λ (i : Fin.t m) (j : Fin.t (n + 1)),
-     match j with
-     | @Fin.F1 p =>
-         match n with
-         | 0 => vect_el V i
-         | S n' => mat_el M i Fin.F1
-         end
-(*
-         match n return matrix m n T → T with
-         | 0 => λ _, vect_el V i
-         | S n' => λ M', mat_el M' i Fin.F1
-         end M
-*)
-     | @Fin.FS p k =>
-         match Nat.eq_dec (proj1_sig (Fin.to_nat k)) n with
-         | left H => λ _, vect_el V i
-         | right H => λ M', mat_el M' i j
-         end M
-    end).
-
-Definition mat_vect_concat {m n} (M : matrix m n T) (V : vector m T) :
-  matrix m (n + 1) T :=
-  mk_mat
-    (λ i (j : Fin.t (n + 1)),
-     match j with
-     | Fin.F1 =>
-         match n return matrix m n T → T with
-         | 0 => λ _, vect_el V i
-         | S n' => λ M', mat_el M' i Fin.F1
-         end M
-     | Fin.FS k =>
-         if Nat.eq_dec (proj1_sig (Fin.to_nat k)) n then vect_el V i
-         else vect_el V i (*mat_el M i j*)
-    end).
-
-Definition mat_vect_concat {m n} (M : matrix m n T) (V : vector m T) :
-  matrix m (n + 1) T :=
-  mk_mat m (n + 1)
-    (λ i j, if Nat.eq_dec j n then vect_el V i else mat_el M i j).
 
 (* multiplication of a matrix by a vector *)
 
