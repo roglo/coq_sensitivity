@@ -167,6 +167,14 @@ Check (Fin_fun_app (@Fin_nat 12)) 17.
 Compute map ((Fin_fun_app (@Fin_nat 12)) 17) (Fin_seq 0 13).
 Compute map ((Fin_fun_app' (@Fin_nat 12)) 17) (Fin_seq 0 13).
 
+Definition pouet (l : list nat) : list (Fin.t (Max (i ∈ l), i + 1)).
+Proof.
+unfold iter_list.
+induction l as [| a]; [ apply [] | ].
+cbn.
+...
+remember (Max (i ∈ l), i + 1) as n eqn:Hn.
+
 ...
 
 Definition mat_vect_concat {m n} (M : matrix m n T) (V : vector m T) :

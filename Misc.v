@@ -80,6 +80,10 @@ Notation "'Max' ( i = b , e ) , g" :=
   (iter_seq b e (λ c i, max c (g)) 0)
   (at level 45, i at level 0, b at level 60, e at level 60) : nat_scope.
 
+Notation "'Max' ( i ∈ l ) , g" :=
+  (iter_list l (λ c i, max c (g)) 0)
+  (at level 45, i at level 0, l at level 60) : nat_scope.
+
 Theorem fold_left_max_fun_from_0 : ∀ a l (f : nat → _),
   fold_left (λ c i, max c (f i)) l a =
   max a (fold_left (λ c i, max c (f i)) l 0).
