@@ -167,6 +167,23 @@ Check (Fin_fun_app (@Fin_nat 12)) 17.
 Compute map ((Fin_fun_app (@Fin_nat 12)) 17) (Fin_seq 0 13).
 Compute map ((Fin_fun_app' (@Fin_nat 12)) 17) (Fin_seq 0 13).
 
+Definition glop a l : list (Fin.t (fold_left (λ c i : nat, max c i) l a + 1)).
+Proof.
+revert a.
+induction l as [| b]; intros; [ apply [] | ].
+cbn.
+...
+apply IHl.
+Defined.
+
+Definition pouet (l : list nat) : list (Fin.t (Max (i ∈ l), i + 1)).
+Proof.
+apply glop.
+Defined.
+
+Compute (pouet [3;7;1;8;0;9] : list (Fin.t 10)).
+
+
 Definition pouet (l : list nat) : list (Fin.t (Max (i ∈ l), i + 1)).
 Proof.
 unfold iter_list.
