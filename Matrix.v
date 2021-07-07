@@ -133,7 +133,7 @@ destruct (Fin.to_nat j) as (k, Hk); cbn.
 now apply Nat.succ_lt_mono in Hk.
 Qed.
 
-Definition Fin_extend_fun A n : (Fin.t n → A) → A → (Fin.t (S n) → A).
+Definition Fin_fun_app A n : (Fin.t n → A) → A → (Fin.t (S n) → A).
 Proof.
 intros f a i.
 destruct (Nat.eq_dec (Fin_nat i) n) as [H1| H1]; [ apply a | ].
@@ -147,9 +147,28 @@ assert (H2 : Fin_nat i < n). {
 apply (Fin.of_nat_lt H2).
 Defined.
 
+Definition Fin_fun_app' A n : (Fin.t n → A) → A → (Fin.t (S n) → A) :=
+  λ f a i,
+  match Nat.eq_dec (Fin_nat i) n with
+  | left _ => a
+  | right Hne =>
+      f (let Hlt : Fin_nat i < n :=
+           let H3 : proj1_sig (Fin.to_nat i) ≤ n :=
+             match Nat.succ_le_mono (proj1_sig (Fin.to_nat i)) n with
+             | conj _ H => H (Fin_ub i)
+             end
+           in
+           Nat_le_neq_lt H3 Hne
+        in
+        Fin.of_nat_lt Hlt)
+  end.
+
+Check Fin_fun_app'.
+
 Check (@Fin_nat 12).
-Check (Fin_extend_fun (@Fin_nat 12)) 17.
-Compute map ((Fin_extend_fun (@Fin_nat 12)) 17) (fin_seq 0 13).
+Check (Fin_fun_app (@Fin_nat 12)) 17.
+Compute map ((Fin_fun_app (@Fin_nat 12)) 17) (fin_seq 0 13).
+Compute map ((Fin_fun_app' (@Fin_nat 12)) 17) (fin_seq 0 13).
 
 ...
 
