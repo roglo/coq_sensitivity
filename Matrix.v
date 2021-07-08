@@ -343,6 +343,22 @@ destruct (Nat.eq_dec (Fin_nat i) 0) as [Hiz| Hiz]. {
       destruct (Fin.eq_dec i k) as [Hik| Hik]. {
         subst i k; exfalso.
         clear - Hk.
+Theorem glop : ∀ n, Fin.F1 ∉ map (fin_t_add_succ_l (b:=n)) (Fin_seq 1 n).
+Proof.
+intros * Hk.
+apply in_map_iff in Hk.
+destruct Hk as (k & Hk & Hkn).
+specialize (@Fin_inv) as H1.
+specialize (H1 n k).
+destruct H1 as [H1| H1]. 2: {
+  destruct H1 as (j, Hj).
+  now subst k.
+}
+subst k.
+clear Hk.
+destruct n; [ easy | ].
+cbn in Hkn.
+destruct Hkn as [Hkn| Hkn]; [ easy | ]
 ...
         destruct n; [ easy | ].
         cbn in Hk.
