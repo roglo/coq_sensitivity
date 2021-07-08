@@ -65,8 +65,6 @@ Definition vect_mul_scal_l s (V : vector T) :=
 Definition vect_dot_product (U V : vector T) :=
   Σ (t ∈ map2 rngl_mul (vect_list U) (vect_list V)), t.
 
-...
-
 Definition vect_squ_norm (V : vector T) := vect_dot_product V V.
 
 Definition minus_one_pow n :=
@@ -131,8 +129,12 @@ Theorem vect_mul_scal_l_mul_assoc : ∀ (a b : T) (V : vector T),
   (a × (b × V))%V = ((a * b)%F × V)%V.
 Proof.
 intros.
-apply vector_eq; [ easy | ].
-intros; apply rngl_mul_assoc.
+unfold vect_mul_scal_l.
+f_equal; cbn.
+rewrite map_map.
+apply map_ext_in.
+intros x Hx.
+apply rngl_mul_assoc.
 Qed.
 
 Theorem vect_mul_scal_reg_r :
@@ -144,6 +146,7 @@ Theorem vect_mul_scal_reg_r :
   → a = b.
 Proof.
 intros Hii Hde * Hvz Hab.
+...
 assert (Hiv : ∀ i, vect_el (a × V)%V i = vect_el (b × V)%V i). {
   intros i.
   now rewrite Hab.
