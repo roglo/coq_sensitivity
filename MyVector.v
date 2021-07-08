@@ -35,24 +35,34 @@ Check repeat.
 
 Definition vect_zero n : vector T := mk_vect (repeat 0%F n).
 
+Fixpoint list_op {A B C} (op : A → B → C) la lb :=
+  match la with
+  | [] => []
+  | a :: la' =>
+      match lb with
+      | [] => []
+      | b :: lb' => op a b :: list_op op la' lb'
+      end
+  end.
+
 (* addition, subtraction of vector *)
 
 Definition vect_add (U V : vector T) :=
-  mk_vect (map (λ ab, (fst ab + snd ab)%F) (combine (vect_el U) (vect_el V))).
-
-...
+  mk_vect (list_op rngl_add (vect_el U) (vect_el V)).
 
 Definition vect_opp (V : vector T) :=
-  mk_vect (vect_size V) (λ i, (- vect_el V i)%F).
+  mk_vect (map rngl_opp (vect_el V)).
 
 Definition vect_sub (U V : vector T) := vect_add U (vect_opp V).
 
 (* multiplication of a vector by a scalar *)
 
 Definition vect_mul_scal_l s (V : vector T) :=
-  mk_vect (vect_size V) (λ i, s * vect_el V i)%F.
+  mk_vect (map (λ x, (s * x)%F) (vect_el V)).
 
 (* dot product *)
+
+...
 
 Definition vect_dot_product (U V : vector T) :=
   Σ (i = 0, vect_size U - 1), vect_el U i * vect_el V i.
