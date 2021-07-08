@@ -144,14 +144,11 @@ unfold vect_mul_scal_l in Hiv.
 cbn in Hiv.
 assert (Hn : ¬ ∀ i, vect_el V i = 0%F). {
   intros H; apply Hvz.
-  apply vector_eq.
-  cbn; intros.
-...
-  now apply H.
+  now apply vector_eq.
 }
 destruct (rngl_eq_dec Hde a b) as [Haeb| Haeb]; [ easy | ].
 exfalso; apply Hvz; clear Hvz.
-apply vector_eq.
+apply vector_eq; [ easy | ].
 intros i; cbn.
 specialize (Hiv i).
 destruct (rngl_eq_dec Hde (vect_el V i) 0%F) as [Hvi| Hvi]; [ easy | ].
@@ -161,13 +158,13 @@ Qed.
 Theorem vect_dot_mul_scal_mul_comm :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_is_comm = true →
-  ∀ {n} (a : T) (U V : vector n T),
+  ∀ (a : T) (U V : vector T),
   ≺ U, a × V ≻ = (a * ≺ U, V ≻)%F.
 Proof.
 intros Hom Hic *.
 unfold vect_dot_product.
-rewrite rngl_mul_summation_list_distr_l; [ | easy ].
-apply rngl_summation_list_eq_compat.
+rewrite rngl_mul_summation_distr_l; [ | easy ].
+apply rngl_summation_eq_compat.
 intros j Hj; cbn.
 do 2 rewrite rngl_mul_assoc.
 f_equal.
@@ -176,24 +173,33 @@ Qed.
 
 Theorem vect_scal_mul_dot_mul_comm :
   rngl_has_opp = true ∨ rngl_has_sous = true →
-  ∀ {n} (a : T) (U V : vector n T),
+  ∀ (a : T) (U V : vector T),
   ≺ a × U, V ≻ = (a * ≺ U, V ≻)%F.
 Proof.
 intros Hom *.
 unfold vect_dot_product.
-rewrite rngl_mul_summation_list_distr_l; [ | easy ].
-apply rngl_summation_list_eq_compat.
+rewrite rngl_mul_summation_distr_l; [ | easy ].
+apply rngl_summation_eq_compat.
 intros j Hj; cbn.
 symmetry; apply rngl_mul_assoc.
 Qed.
 
 Theorem vect_eq_dec :
   rngl_has_dec_eq = true →
-  ∀ n (U V : vector n T), {U = V} + {U ≠ V}.
+  ∀ (U V : vector T), {U = V} + {U ≠ V}.
 Proof.
 intros Hde *.
-destruct U as (fu).
-destruct V as (fv).
+destruct (Nat.eq_dec (vect_size U) (vect_size V)) as [Hss| Hss]. {
+  destruct U as (su, fu).
+  destruct V as (sv, fv).
+  cbn in Hss; subst sv.
+  rename su into n.
+  induction n. {
+...
+
+intros Hde *.
+destruct U as (fu, su).
+destruct V as (fv, sv).
 induction n; intros; [ now left; apply vector_eq | ].
 set (gu := λ i, fu (Fin.R 1 i)).
 set (gv := λ i, fv (Fin.R 1 i)).
