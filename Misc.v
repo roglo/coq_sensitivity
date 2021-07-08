@@ -1737,11 +1737,12 @@ Theorem iter_list_split_last : ∀ T A d (op : T → T → T) l (g : A → T) z,
 Proof.
 intros * Hlz.
 unfold iter_list.
-Search removelast.
-...
-destruct l as [| a]; [ easy | clear Hlz ].
-revert a.
-induction l as [| b]; intros; [ easy | ].
+destruct l as [| a] using rev_ind; [ easy | clear IHl Hlz ].
+rewrite removelast_last.
+rewrite last_last.
+now rewrite fold_left_app.
+Qed.
+
 ...
 
 Theorem iter_seq_split_last : ∀ T d (op : T → T → T) b k g,
