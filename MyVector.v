@@ -9,33 +9,21 @@ Import List List.ListNotations.
 Require Import Misc.
 Require Import RingLike RLsummation.
 
-Record vector (n : nat) T := mk_vect
-  { vect_el : Fin.t n → T }.
+Record vector T := mk_vect
+  { vect_size : nat;
+    vect_el : nat → T }.
 
 (* function extensionality for vectors *)
-Theorem vector_eq : ∀ n T (VA VB : vector n T),
-  (∀ i, vect_el VA i = vect_el VB i)
+Axiom vector_eq : ∀ T (VA VB : vector T),
+  vect_size VA = vect_size VB
+  → (∀ i, vect_el VA i = vect_el VB i)
   → VA = VB.
-Proof.
-intros * Hab.
-destruct VA as (f).
-destruct VB as (g).
-cbn in Hab; f_equal.
-now apply fin_fun_ext.
-Qed.
 
-(*
-Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 2 1)).
-Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 2 2)).
-Compute (map (λ i, proj1_sig (Fin.to_nat i)) (fin_seq 7 4)).
-Compute fin_seq 7 4.
-*)
+Definition vect_of_list {T} d (l : list T) : vector T :=
+  mk_vect (length l) (λ i, nth i l d).
 
-Definition vect_of_list {T} d (l : list T) : vector (length l) T :=
-  mk_vect (λ i, nth (proj1_sig (Fin.to_nat i)) l d).
-
-Definition list_of_vect {n T} (v : vector n T) :=
-  map (vect_el v) (Fin_seq 0 n).
+Definition list_of_vect {T} (v : vector T) :=
+  map (vect_el v) (seq 0 (vect_size v)).
 
 (*
 Compute (list_of_vect (vect_of_list 42 [3;7;2])).
@@ -50,28 +38,28 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context {rp : ring_like_prop T}.
 
-Definition vect_zero n : vector n T := mk_vect (λ _, 0%F).
+Definition vect_zero n : vector T := mk_vect n (λ _, 0%F).
 
 (* addition, subtraction of vector *)
 
-Definition vect_add {n} (U V : vector n T) :=
-  mk_vect (λ i, (vect_el U i + vect_el V i)%F).
-Definition vect_opp {n} (V : vector n T) :=
-  mk_vect (λ i, (- vect_el V i)%F).
+Definition vect_add (U V : vector T) :=
+  mk_vect (vect_size U) (λ i, (vect_el U i + vect_el V i)%F).
+Definition vect_opp (V : vector T) :=
+  mk_vect (vect_size V) (λ i, (- vect_el V i)%F).
 
-Definition vect_sub {n} (U V : vector n T) := vect_add U (vect_opp V).
+Definition vect_sub (U V : vector T) := vect_add U (vect_opp V).
 
 (* multiplication of a vector by a scalar *)
 
-Definition vect_mul_scal_l s {n} (V : vector n T) :=
-  mk_vect (λ i, s * vect_el V i)%F.
+Definition vect_mul_scal_l s (V : vector T) :=
+  mk_vect (vect_size V) (λ i, s * vect_el V i)%F.
 
 (* dot product *)
 
-Definition vect_dot_product {n} (U V : vector n T) :=
-  Σ (i ∈ Fin_seq 0 n), vect_el U i * vect_el V i.
+Definition vect_dot_product (U V : vector T) :=
+  Σ (i = 0, vect_size U - 1), vect_el U i * vect_el V i.
 
-Definition vect_squ_norm n (V : vector n T) := vect_dot_product V V.
+Definition vect_squ_norm (V : vector T) := vect_dot_product V V.
 
 Definition minus_one_pow n :=
   match n mod 2 with
@@ -125,26 +113,25 @@ Qed.
 Declare Scope V_scope.
 Delimit Scope V_scope with V.
 
-Arguments vect_dot_product {n}%nat (U V)%V.
+Arguments vect_dot_product (U V)%V.
 
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
 Notation "≺ U , V ≻" := (vect_dot_product U V) (at level 35).
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
 
-Theorem vect_mul_scal_l_mul_assoc {n} : ∀ (a b : T) (V : vector n T),
+Theorem vect_mul_scal_l_mul_assoc : ∀ (a b : T) (V : vector T),
   (a × (b × V))%V = ((a * b)%F × V)%V.
 Proof.
 intros.
-apply vector_eq.
-intros; cbn.
-apply rngl_mul_assoc.
+apply vector_eq; [ easy | ].
+intros; apply rngl_mul_assoc.
 Qed.
 
 Theorem vect_mul_scal_reg_r :
   rngl_has_inv = true ∨ rngl_has_quot = true →
   rngl_has_dec_eq = true →
-  ∀ {n} (V : vector n T) a b,
-  V ≠ vect_zero n
+  ∀ (V : vector T) a b,
+  V ≠ vect_zero (vect_size V)
   → (a × V = b × V)%V
   → a = b.
 Proof.
@@ -159,6 +146,7 @@ assert (Hn : ¬ ∀ i, vect_el V i = 0%F). {
   intros H; apply Hvz.
   apply vector_eq.
   cbn; intros.
+...
   now apply H.
 }
 destruct (rngl_eq_dec Hde a b) as [Haeb| Haeb]; [ easy | ].
