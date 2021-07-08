@@ -330,8 +330,16 @@ apply matrix_eq.
 cbn.
 intros.
 rewrite rngl_summation_list_split with (n0 := Fin_nat i).
+rewrite rngl_summation_list_split_last with (d := i). 2: {
+  destruct n; [ easy | ].
 ...
-rewrite rngl_summation_split_last; [ | flia ].
+specialize @rngl_summation_list_split_last as H1.
+
+
+Check @rngl_summation_list_split_last.
+...
+rewrite rngl_summation_list_split_last with (d := Fin.F1).
+...
 destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
 rewrite rngl_mul_1_l.
 rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {

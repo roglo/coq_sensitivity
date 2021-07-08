@@ -1179,14 +1179,10 @@ apply Nat.succ_lt_mono in Hnl.
 now apply IHl.
 Qed.
 
-Theorem List_seq_eq_nil : ∀ b e, seq b e = [] → e ≤ b.
+Theorem List_seq_eq_nil : ∀ b len, seq b len = [] → len = 0.
 Proof.
-intros.
-revert b H.
-induction e; intros; [ cbn; flia | ].
-destruct b; [ easy | ].
-apply -> Nat.succ_le_mono.
-now apply IHe.
+intros * Hb.
+now induction len.
 Qed.
 
 Theorem List_firstn_seq : ∀ n start len,
@@ -1737,24 +1733,28 @@ Theorem iter_list_split_last : ∀ T A d (op : T → T → T) l (g : A → T) z,
 Proof.
 intros * Hlz.
 unfold iter_list.
-destruct l as [| a] using rev_ind; [ easy | clear IHl Hlz ].
+induction l as [| a] using rev_ind; [ easy | clear IHl Hlz ].
 rewrite removelast_last.
 rewrite last_last.
 now rewrite fold_left_app.
 Qed.
 
-...
+Theorem List_removelast_seq : ∀ b len,
+  len ≠ 0
+  → removelast (seq b len) = seq b (len - 1).
+Proof.
+intros * Hlen.
+destruct len; [ easy | clear Hlen ].
+rewrite seq_S.
+rewrite removelast_last; cbn.
+now rewrite Nat.sub_0_r.
+Qed.
 
 Theorem iter_seq_split_last : ∀ T d (op : T → T → T) b k g,
   b ≤ k
   → iter_seq b k (λ (c : T) (i : nat), op c (g i)) d =
     op (iter_seq (S b) k (λ (c : T) (i : nat), op c (g (i - 1)%nat)) d) (g k).
 Proof.
-intros * Hbk.
-unfold iter_seq.
-rewrite iter_list_split_last with (z := 0).
-(* ? *)
-...
 intros * Hbk.
 unfold iter_seq, iter_list.
 remember (S k - S b) as len eqn:Hlen.

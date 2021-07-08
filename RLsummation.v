@@ -54,10 +54,8 @@ Theorem rngl_summation_list_split_last : ∀ A (l : list A) d f,
   → Σ (i ∈ l), f i = (Σ (i ∈ removelast l), f i + f (last l d))%F.
 Proof.
 intros * Hlz.
-...
 now apply iter_list_split_last.
-
-...
+Qed.
 
 Theorem rngl_summation_list_split : ∀ A (l : list A) f n,
   Σ (i ∈ l), f i = (Σ (i ∈ firstn n l), f i + Σ (i ∈ skipn n l), f i)%F.
