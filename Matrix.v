@@ -330,6 +330,30 @@ apply matrix_eq.
 cbn.
 intros.
 rewrite rngl_summation_list_split with (n0 := Fin_nat i).
+destruct n; [ easy | ].
+destruct (Nat.eq_dec (Fin_nat i) 0) as [Hiz| Hiz]. {
+  rewrite Hiz; cbn.
+  unfold iter_list at 1; cbn.
+  rewrite rngl_add_0_l.
+  rewrite rngl_summation_list_cons.
+  destruct (Fin.eq_dec i Fin.F1) as [H1| H1]. {
+    rewrite rngl_mul_1_l.
+    rewrite all_0_rngl_summation_list_0. 2: {
+      intros k Hk.
+      destruct (Fin.eq_dec i k) as [Hik| Hik]. {
+        subst i k; exfalso.
+        clear - Hk.
+        assert (H : ∀ a, Fin.F1 ∈ map (fin_t_add_succ_l (b:=n)) (Fin_seq a n)). {
+...
+        induction n; [ easy | ].
+        cbn in Hk.
+        destruct Hk as [Hk| Hk]; [ easy | ].
+
+
+rewrite rngl_summation_list_split_last with (d := i). 2: {
+
+
+...
 destruct (Nat.eq_dec (Fin_nat i) 0) as [Hiz| Hiz]. {
   rewrite Hiz; cbn.
   unfold iter_list at 1; cbn.
