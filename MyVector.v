@@ -10,25 +10,18 @@ Require Import Misc.
 Require Import RingLike RLsummation.
 
 Record vector T := mk_vect
-  { vect_size : nat;
-    vect_el : nat → T }.
+  { vect_el : list T }.
 
-(* function extensionality for vectors *)
-Axiom vector_eq : ∀ T (VA VB : vector T),
-  vect_size VA = vect_size VB
-  → (∀ i, vect_el VA i = vect_el VB i)
-  → VA = VB.
-
-Definition vect_of_list {T} d (l : list T) : vector T :=
-  mk_vect (length l) (λ i, nth i l d).
+Definition vect_of_list {T} (l : list T) : vector T :=
+  mk_vect l.
 
 Definition list_of_vect {T} (v : vector T) :=
-  map (vect_el v) (seq 0 (vect_size v)).
+  vect_el v.
 
-(*
-Compute (list_of_vect (vect_of_list 42 [3;7;2])).
-Compute (vect_of_list 42 [3;7;2]).
-*)
+Definition vect_size {T} (v : vector T) := length (vect_el v).
+
+Compute (list_of_vect (vect_of_list [3;7;2])).
+Compute (vect_of_list [3;7;2]).
 
 (* (-1) ^ n *)
 
@@ -38,12 +31,17 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context {rp : ring_like_prop T}.
 
-Definition vect_zero n : vector T := mk_vect n (λ _, 0%F).
+Check repeat.
+
+Definition vect_zero n : vector T := mk_vect (repeat 0%F n).
 
 (* addition, subtraction of vector *)
 
 Definition vect_add (U V : vector T) :=
-  mk_vect (vect_size U) (λ i, (vect_el U i + vect_el V i)%F).
+  mk_vect (map (λ ab, (fst ab + snd ab)%F) (combine (vect_el U) (vect_el V))).
+
+...
+
 Definition vect_opp (V : vector T) :=
   mk_vect (vect_size V) (λ i, (- vect_el V i)%F).
 
