@@ -1730,11 +1730,30 @@ apply fold_left_op_fun_from_d. {
 }
 Qed.
 
+Theorem iter_list_split_last : ∀ T A d (op : T → T → T) l (g : A → T) z,
+  l ≠ []
+  → iter_list l (λ c i, op c (g i)) d =
+    op (iter_list (removelast l) (λ c i, op c (g i)) d) (g (last l z)).
+Proof.
+intros * Hlz.
+unfold iter_list.
+Search removelast.
+...
+destruct l as [| a]; [ easy | clear Hlz ].
+revert a.
+induction l as [| b]; intros; [ easy | ].
+...
+
 Theorem iter_seq_split_last : ∀ T d (op : T → T → T) b k g,
   b ≤ k
   → iter_seq b k (λ (c : T) (i : nat), op c (g i)) d =
     op (iter_seq (S b) k (λ (c : T) (i : nat), op c (g (i - 1)%nat)) d) (g k).
 Proof.
+intros * Hbk.
+unfold iter_seq.
+rewrite iter_list_split_last with (z := 0).
+(* ? *)
+...
 intros * Hbk.
 unfold iter_seq, iter_list.
 remember (S k - S b) as len eqn:Hlen.

@@ -49,6 +49,26 @@ apply iter_seq_all_d; [ | | | easy ]. {
 }
 Qed.
 
+Theorem rngl_summation_list_split_last : ∀ A (l : list A) d f,
+  l ≠ []
+  → Σ (i ∈ l), f i = (Σ (i ∈ removelast l), f i + f (last l d))%F.
+Proof.
+intros * Hlz.
+...
+now apply iter_list_split_last.
+
+...
+
+Theorem rngl_summation_list_split : ∀ A (l : list A) f n,
+  Σ (i ∈ l), f i = (Σ (i ∈ firstn n l), f i + Σ (i ∈ skipn n l), f i)%F.
+Proof.
+intros.
+rewrite <- firstn_skipn with (n := n) (l := l) at 1.
+unfold iter_list.
+rewrite fold_left_app.
+now rewrite fold_left_rngl_add_fun_from_0.
+Qed.
+
 Theorem rngl_summation_split_first : ∀ b k g,
   b ≤ k
   → Σ (i = b, k), g i = (g b + Σ (i = S b, k), g i)%F.
@@ -69,16 +89,6 @@ Theorem rngl_summation_split_last : ∀ b k g,
 Proof.
 intros * Hbk.
 now apply iter_seq_split_last.
-Qed.
-
-Theorem rngl_summation_list_split : ∀ A (l : list A) f n,
-  Σ (i ∈ l), f i = (Σ (i ∈ firstn n l), f i + Σ (i ∈ skipn n l), f i)%F.
-Proof.
-intros.
-rewrite <- firstn_skipn with (n := n) (l := l) at 1.
-unfold iter_list.
-rewrite fold_left_app.
-now rewrite fold_left_rngl_add_fun_from_0.
 Qed.
 
 Theorem rngl_summation_split : ∀ j g b k,
