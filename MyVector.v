@@ -10,15 +10,15 @@ Require Import Misc.
 Require Import RingLike RLsummation.
 
 Record vector T := mk_vect
-  { vect_el : list T }.
+  { vect_list : list T }.
 
 Definition vect_of_list {T} (l : list T) : vector T :=
   mk_vect l.
 
 Definition list_of_vect {T} (v : vector T) :=
-  vect_el v.
+  vect_list v.
 
-Definition vect_size {T} (v : vector T) := length (vect_el v).
+Definition vect_size {T} (v : vector T) := length (vect_list v).
 
 Compute (list_of_vect (vect_of_list [3;7;2])).
 Compute (vect_of_list [3;7;2]).
@@ -35,37 +35,37 @@ Check repeat.
 
 Definition vect_zero n : vector T := mk_vect (repeat 0%F n).
 
-Fixpoint list_op {A B C} (op : A → B → C) la lb :=
+Fixpoint map2 {A B C} (op : A → B → C) la lb :=
   match la with
   | [] => []
   | a :: la' =>
       match lb with
       | [] => []
-      | b :: lb' => op a b :: list_op op la' lb'
+      | b :: lb' => op a b :: map2 op la' lb'
       end
   end.
 
 (* addition, subtraction of vector *)
 
 Definition vect_add (U V : vector T) :=
-  mk_vect (list_op rngl_add (vect_el U) (vect_el V)).
+  mk_vect (map2 rngl_add (vect_list U) (vect_list V)).
 
 Definition vect_opp (V : vector T) :=
-  mk_vect (map rngl_opp (vect_el V)).
+  mk_vect (map rngl_opp (vect_list V)).
 
 Definition vect_sub (U V : vector T) := vect_add U (vect_opp V).
 
 (* multiplication of a vector by a scalar *)
 
 Definition vect_mul_scal_l s (V : vector T) :=
-  mk_vect (map (λ x, (s * x)%F) (vect_el V)).
+  mk_vect (map (λ x, (s * x)%F) (vect_list V)).
 
 (* dot product *)
 
-...
-
 Definition vect_dot_product (U V : vector T) :=
-  Σ (i = 0, vect_size U - 1), vect_el U i * vect_el V i.
+  Σ (t ∈ map2 rngl_mul (vect_list U) (vect_list V)), t.
+
+...
 
 Definition vect_squ_norm (V : vector T) := vect_dot_product V V.
 
