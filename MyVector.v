@@ -146,7 +146,14 @@ Theorem vect_mul_scal_reg_r :
   → a = b.
 Proof.
 intros Hii Hde * Hvz Hab.
+unfold vect_mul_scal_l in Hab.
+injection Hab; clear Hab; intros Hab.
+specialize (ext_in_map Hab) as H1.
+cbn in H1.
+destruct (rngl_eq_dec Hde a b) as [Haeb| Haeb]; [ easy | ].
+exfalso; apply Hvz; clear Hvz.
 ...
+intros Hii Hde * Hvz Hab.
 assert (Hiv : ∀ i, vect_el (a × V)%V i = vect_el (b × V)%V i). {
   intros i.
   now rewrite Hab.
