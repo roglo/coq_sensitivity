@@ -343,12 +343,32 @@ destruct (Nat.eq_dec (Fin_nat i) 0) as [Hiz| Hiz]. {
       destruct (Fin.eq_dec i k) as [Hik| Hik]. {
         subst i k; exfalso.
         clear - Hk.
-        assert (H : ∀ a, Fin.F1 ∈ map (fin_t_add_succ_l (b:=n)) (Fin_seq a n)). {
 ...
+        destruct n; [ easy | ].
+        cbn in Hk.
+        destruct Hk as [| Hk]; [ easy | ].
+...
+        remember (Fin_seq 1 n) as l eqn:Hl; clear Hl.
+        induction n. {
+          cbn in l, Hk.
         induction n; [ easy | ].
         cbn in Hk.
-        destruct Hk as [Hk| Hk]; [ easy | ].
+        destruct Hk as [| Hk]; [ easy | ].
 
+        destruct n; [ easy | ].
+        destruct n; [ now destruct Hk | ].
+        destruct n. {
+          cbn in Hk.
+          destruct Hk as [| Hk]; [ easy | now destruct Hk ].
+        }
+        destruct n. {
+          cbn in Hk.
+          destruct Hk as [| Hk]; [ easy | ].
+          destruct Hk as [| Hk]; [ easy | ].
+          destruct Hk as [| Hk]; [ easy | ].
+          easy.
+        }
+...
 
 rewrite rngl_summation_list_split_last with (d := i). 2: {
 
