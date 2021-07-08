@@ -35,6 +35,20 @@ apply fold_left_op_fun_from_d. {
 }
 Qed.
 
+Theorem all_0_rngl_summation_list_0 : ∀ A l (f : A → T),
+  (∀ i, i ∈ l → f i = 0%F)
+  → Σ (i ∈ l), f i = 0%F.
+Proof.
+intros * Hz.
+apply iter_list_all_d; [ | | | easy ]. {
+  apply rngl_add_0_l.
+} {
+  apply rngl_add_0_r.
+} {
+  apply rngl_add_assoc.
+}
+Qed.
+
 Theorem all_0_rngl_summation_0 : ∀ b e f,
   (∀ i, b ≤ i ≤ e → f i = 0%F)
   → Σ (i = b, e), f i = 0%F.
@@ -584,6 +598,7 @@ Qed.
 
 End a.
 
+Arguments all_0_rngl_summation_list_0 {T}%type {ro rp} A%type l%list.
 Arguments rngl_mul_summation_list_distr_l {T ro rp} Hom A%type a
   la%list f%function.
 Arguments rngl_mul_summation_distr_l {T ro rp} Hom a b e f.

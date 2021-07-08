@@ -330,8 +330,18 @@ apply matrix_eq.
 cbn.
 intros.
 rewrite rngl_summation_list_split with (n0 := Fin_nat i).
+destruct (Nat.eq_dec (Fin_nat i) 0) as [Hiz| Hiz]. {
+  rewrite Hiz; cbn.
+  unfold iter_list at 1; cbn.
+  rewrite rngl_add_0_l.
+...
+  rewrite all_0_rngl_summation_list_0.
+...
+...
 rewrite rngl_summation_list_split_last with (d := i). 2: {
   destruct n; [ easy | ].
+...
+}
 ...
 specialize @rngl_summation_list_split_last as H1.
 
@@ -340,6 +350,26 @@ Check @rngl_summation_list_split_last.
 ...
 rewrite rngl_summation_list_split_last with (d := Fin.F1).
 ...
+destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
+rewrite rngl_mul_1_l.
+rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
+  intros k Hk.
+  destruct (Nat.eq_dec i (k - 1)) as [H| H]; [ flia H Hk | ].
+  now apply rngl_mul_0_l; left.
+}
+rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
+  intros k Hk.
+  destruct (Nat.eq_dec i k) as [H| H]; [ flia H Hk | ].
+  now apply rngl_mul_0_l; left.
+}
+now rewrite rngl_add_0_l, rngl_add_0_r.
+...
+intros.
+apply matrix_eq.
+cbn.
+intros * Hi Hj.
+rewrite (rngl_summation_split _ i); [ | flia Hi ].
+rewrite rngl_summation_split_last; [ | flia ].
 destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
 rewrite rngl_mul_1_l.
 rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
