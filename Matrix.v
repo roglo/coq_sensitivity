@@ -329,8 +329,8 @@ intros.
 apply matrix_eq.
 cbn.
 intros.
+rewrite rngl_summation_list_split with (n0 := Fin_nat i).
 ...
-rewrite (rngl_summation_split _ i); [ | flia Hi ].
 rewrite rngl_summation_split_last; [ | flia ].
 destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
 rewrite rngl_mul_1_l.

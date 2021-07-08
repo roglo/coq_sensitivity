@@ -21,7 +21,7 @@ Context (ro : ring_like_op T).
 Context {rp : ring_like_prop T}.
 Context {Hom : rngl_has_opp = true ∨ rngl_has_sous = true}.
 
-Theorem fold_left_rngl_add_fun_from_0 : ∀ a l (f : nat → _),
+Theorem fold_left_rngl_add_fun_from_0 : ∀ A a l (f : A → _),
   (fold_left (λ c i, c + f i) l a =
    a + fold_left (λ c i, c + f i) l 0)%F.
 Proof.
@@ -69,6 +69,16 @@ Theorem rngl_summation_split_last : ∀ b k g,
 Proof.
 intros * Hbk.
 now apply iter_seq_split_last.
+Qed.
+
+Theorem rngl_summation_list_split : ∀ A (l : list A) f n,
+  Σ (i ∈ l), f i = (Σ (i ∈ firstn n l), f i + Σ (i ∈ skipn n l), f i)%F.
+Proof.
+intros.
+rewrite <- firstn_skipn with (n := n) (l := l) at 1.
+unfold iter_list.
+rewrite fold_left_app.
+now rewrite fold_left_rngl_add_fun_from_0.
 Qed.
 
 Theorem rngl_summation_split : ∀ j g b k,
@@ -574,6 +584,8 @@ Arguments rngl_summation_list_cons {T ro rp} A%type_scope a la%list
   f%function.
 Arguments rngl_summation_change_var {T ro rp} A%type (b e)%nat
   (f g h)%function.
+Arguments rngl_summation_list_split {T}%type {ro rp} A%type
+  l%list f%function n%nat.
 Arguments rngl_summation_map_seq {T ro rp} A%type (start len)%nat
   (f g)%function.
 Arguments rngl_summation_permut {T}%type {ro rp} n%nat (l1 l2)%list.
