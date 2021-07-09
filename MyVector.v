@@ -20,8 +20,10 @@ Definition list_of_vect {T} (v : vector T) :=
 
 Definition vect_size {T} (v : vector T) := length (vect_list v).
 
+(*
 Compute (list_of_vect (vect_of_list [3;7;2])).
 Compute (vect_of_list [3;7;2]).
+*)
 
 Theorem vector_eq {T} (U V : vector T) :
   (∀ i, nth_error (vect_list U) i = nth_error (vect_list V) i)
@@ -296,21 +298,18 @@ End a.
 Declare Scope V_scope.
 Delimit Scope V_scope with V.
 
-...
-
-Arguments vect_add {T}%type {ro} {n}%nat (U V)%V.
-Arguments vect_sub {T ro} {n}%nat U%V V%V.
-Arguments vect_opp {T ro} {n}%nat V%V.
-Arguments vect_mul_scal_l {T ro} s%F {n}%nat V%V.
-Arguments vect_mul_scal_reg_r {T}%type {ro rp} Hde Hii {n}%nat V%V (a b)%F.
+Arguments vect_add {T}%type {ro} (U V)%V.
+Arguments vect_sub {T ro} U%V V%V.
+Arguments vect_opp {T ro} V%V.
+Arguments vect_mul_scal_l {T ro} s%F V%V.
+Arguments vect_mul_scal_reg_r {T}%type {ro rp} Hde Hii V%V (a b)%F.
 Arguments vect_zero {T ro} n%nat.
-Arguments vect_dot_product {T}%type {ro} {n}%nat (U V)%V.
-Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hom Hic
-  {n}%nat a%F (U V)%V.
-Arguments vect_scal_mul_dot_mul_comm {T}%type {ro rp} Hom {n}%nat a%F (U V)%V.
-Arguments vect_eq_dec {T}%type {ro rp} _ n%nat U%V V%V.
-Arguments vect_el {n}%nat {T}%type v%V UUU%nat.
-Arguments vect_squ_norm {T}%type {ro} {n}%nat V%V.
+Arguments vect_dot_product {T}%type {ro} (U V)%V.
+Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hom Hic a%F (U V)%V.
+Arguments vect_scal_mul_dot_mul_comm {T}%type {ro rp} Hom a%F (U V)%V.
+Arguments vect_eq_dec {T}%type {ro rp} Hde U%V V%V.
+Arguments vect_el {T}%type {ro} V%V i%nat.
+Arguments vect_squ_norm {T}%type {ro} V%V.
 
 Arguments minus_one_pow {T}%type {ro} n%nat.
 Arguments minus_one_pow_succ {T}%type {ro rp} _ i%nat.
