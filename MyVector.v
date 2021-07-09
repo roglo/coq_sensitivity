@@ -76,6 +76,17 @@ Fixpoint map2 {A B C} (f : A → B → C) la lb :=
       end
   end.
 
+Theorem map2_map_l : ∀ A B C D (f : C → B → D) g (la : list A) (lb : list B),
+  map2 f (map g la) lb = map2 (λ a b, f (g a) b) la lb.
+Proof.
+intros.
+revert lb.
+induction la as [| a]; intros; [ easy | cbn ].
+destruct lb as [| b]; [ easy | cbn ].
+f_equal.
+apply IHla.
+Qed.
+
 Theorem map2_map_r : ∀ A B C D (f : A → C → D) g (la : list A) (lb : list B),
   map2 f la (map g lb) = map2 (λ a b, f a (g b)) la lb.
 Proof.
@@ -256,18 +267,21 @@ unfold vect_dot_product.
 rewrite rngl_mul_summation_list_distr_l; [ | easy ].
 unfold "×"; cbn.
 unfold iter_list.
-...
 rewrite map2_map_l.
-...
-apply rngl_summation_eq_compat.
-intros j Hj; cbn.
-symmetry; apply rngl_mul_assoc.
+rewrite List_fold_left_map2.
+rewrite List_fold_left_map2.
+apply List_fold_left_ext_in.
+intros * Hb.
+f_equal; symmetry.
+apply rngl_mul_assoc.
 Qed.
 
 Theorem vect_eq_dec :
   rngl_has_dec_eq = true →
   ∀ (U V : vector T), {U = V} + {U ≠ V}.
 Proof.
+intros Hde *.
+...
 intros Hde *.
 destruct (Nat.eq_dec (vect_size U) (vect_size V)) as [Hss| Hss]. {
   destruct U as (su, fu).
