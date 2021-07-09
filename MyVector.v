@@ -23,6 +23,37 @@ Definition vect_size {T} (v : vector T) := length (vect_list v).
 Compute (list_of_vect (vect_of_list [3;7;2])).
 Compute (vect_of_list [3;7;2]).
 
+Theorem vector_eq {T} (U V : vector T) :
+  (∀ i, nth_error (vect_list U) i = nth_error (vect_list V) i)
+  → U = V.
+Proof.
+intros * Huv.
+destruct U as (lu).
+destruct V as (lv).
+cbn in Huv; f_equal.
+remember (length lu) as len eqn:Hlen.
+symmetry in Hlen.
+revert lu lv Huv Hlen.
+induction len; intros. {
+  apply length_zero_iff_nil in Hlen.
+  subst lu; cbn in Huv.
+  destruct lv as [| a]; [ easy | exfalso ].
+  now specialize (Huv 0).
+}
+destruct lu as [| a]; [ easy | ].
+cbn in Hlen.
+apply Nat.succ_inj in Hlen.
+destruct lv as [| b]. {
+  exfalso.
+  now specialize (Huv 0).
+}
+specialize (Huv 0) as H1; cbn in H1.
+injection H1; clear H1; intros; subst b; f_equal.
+apply IHlen; [ | easy ].
+intros i.
+now specialize (Huv (S i)).
+Qed.
+
 (* (-1) ^ n *)
 
 Section a.
@@ -152,6 +183,16 @@ specialize (ext_in_map Hab) as H1.
 cbn in H1.
 destruct (rngl_eq_dec Hde a b) as [Haeb| Haeb]; [ easy | ].
 exfalso; apply Hvz; clear Hvz.
+apply vector_eq.
+intros i; cbn.
+destruct (lt_dec i (vect_size V)) as [Hiv| Hiv]. {
+  rewrite nth_error_repeat; [ | easy ].
+  rewrite nth_error_nth' with (d := 0%F); [ | easy ].
+  f_equal.
+  specialize (H1 (nth i (vect_list V) 0%F)) as H2.
+  assert (H : nth i (vect_list V) 0%F ∈ vect_list V) by now apply nth_In.
+  specialize (H2 H); clear H.
+  apply rngl_mul_cancel_r in H2; [ easy | easy | ].
 ...
 intros Hii Hde * Hvz Hab.
 assert (Hiv : ∀ i, vect_el (a × V)%V i = vect_el (b × V)%V i). {
