@@ -281,53 +281,22 @@ Theorem vect_eq_dec :
   ∀ (U V : vector T), {U = V} + {U ≠ V}.
 Proof.
 intros Hde *.
-...
-intros Hde *.
-destruct (Nat.eq_dec (vect_size U) (vect_size V)) as [Hss| Hss]. {
-  destruct U as (su, fu).
-  destruct V as (sv, fv).
-  cbn in Hss; subst sv.
-  rename su into n.
-  induction n. {
-...
-
-intros Hde *.
-destruct U as (fu, su).
-destruct V as (fv, sv).
-induction n; intros; [ now left; apply vector_eq | ].
-set (gu := λ i, fu (Fin.R 1 i)).
-set (gv := λ i, fv (Fin.R 1 i)).
-specialize (IHn gu gv).
-destruct IHn as [IHn| IHn]. {
-  injection IHn; clear IHn; intros H1.
-  destruct (rngl_eq_dec Hde (fu Fin.F1) (fv Fin.F1)) as [H2| H2]. {
-    left.
-    apply vector_eq; cbn.
-    intros i.
-    specialize (Fin_inv i) as H3.
-    destruct H3 as [| (j, Hj)]; [ congruence | ].
-    subst i.
-    cbn in gu, gv.
-    now assert (gu j = gv j) by now rewrite H1.
-  }
-  right.
-  congruence.
+destruct U as (lu).
+destruct V as (lv).
+destruct (list_eq_dec (rngl_eq_dec Hde) lu lv) as [Huv| Huv]. {
+  now left; subst.
+} {
+  right; intros H; apply Huv; clear Huv.
+  now injection H.
 }
-right.
-intros H1; apply IHn; clear IHn.
-apply vector_eq; cbn.
-intros i.
-injection H1; clear H1; intros H1.
-unfold gu, gv; cbn.
-congruence.
 Qed.
-
-Definition vect_size {T n} (v : vector n T) := n.
 
 End a.
 
 Declare Scope V_scope.
 Delimit Scope V_scope with V.
+
+...
 
 Arguments vect_add {T}%type {ro} {n}%nat (U V)%V.
 Arguments vect_sub {T ro} {n}%nat U%V V%V.
