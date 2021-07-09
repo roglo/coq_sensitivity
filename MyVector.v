@@ -62,7 +62,7 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context {rp : ring_like_prop T}.
 
-Check repeat.
+Definition vect_el V i := nth i (vect_list V) 0%F.
 
 Definition vect_zero n : vector T := mk_vect (repeat 0%F n).
 
@@ -192,26 +192,13 @@ destruct (lt_dec i (vect_size V)) as [Hiv| Hiv]. {
   specialize (H1 (nth i (vect_list V) 0%F)) as H2.
   assert (H : nth i (vect_list V) 0%F ∈ vect_list V) by now apply nth_In.
   specialize (H2 H); clear H.
-  apply rngl_mul_cancel_r in H2; [ easy | easy | ].
-...
-intros Hii Hde * Hvz Hab.
-assert (Hiv : ∀ i, vect_el (a × V)%V i = vect_el (b × V)%V i). {
-  intros i.
-  now rewrite Hab.
+  destruct (rngl_eq_dec Hde (vect_el V i) 0%F) as [Hvi| Hvi]; [ easy | ].
+  now apply rngl_mul_cancel_r in H2.
 }
-unfold vect_mul_scal_l in Hiv.
-cbn in Hiv.
-assert (Hn : ¬ ∀ i, vect_el V i = 0%F). {
-  intros H; apply Hvz.
-  now apply vector_eq.
-}
-destruct (rngl_eq_dec Hde a b) as [Haeb| Haeb]; [ easy | ].
-exfalso; apply Hvz; clear Hvz.
-apply vector_eq; [ easy | ].
-intros i; cbn.
-specialize (Hiv i).
-destruct (rngl_eq_dec Hde (vect_el V i) 0%F) as [Hvi| Hvi]; [ easy | ].
-now apply rngl_mul_cancel_r in Hiv.
+apply Nat.nlt_ge in Hiv.
+rewrite (proj2 (nth_error_None _ _)); [ | easy ].
+rewrite (proj2 (nth_error_None _ _)); [ easy | ].
+now rewrite repeat_length.
 Qed.
 
 Theorem vect_dot_mul_scal_mul_comm :
@@ -222,6 +209,7 @@ Theorem vect_dot_mul_scal_mul_comm :
 Proof.
 intros Hom Hic *.
 unfold vect_dot_product.
+...
 rewrite rngl_mul_summation_distr_l; [ | easy ].
 apply rngl_summation_eq_compat.
 intros j Hj; cbn.
