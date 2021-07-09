@@ -13,8 +13,33 @@ Require Import MyVector.
 
 (* matrices *)
 
-Record matrix (m n : nat) T := mk_mat
-  { mat_el : Fin.t m → Fin.t n → T }.
+Record matrix T := mk_mat
+  { mat_list : list (list T) }.
+
+Definition mat_of_list {T} (l : list (list T)) : matrix T :=
+  mk_mat l.
+
+Definition list_of_mat {T} (M : matrix T) :=
+  mat_list M.
+
+Definition mat_nrows {T} (M : matrix T) := length (mat_list M).
+Definition mat_ncols {T} (M : matrix T) := length (hd (mat_list M) []).
+
+Definition mat_el {T} {ro : ring_like_op T} (M : matrix T) i j :=
+  nth j (nth i (mat_list M) []) 0%F.
+
+Theorem matrix_eq : ∀ T (MA MB : matrix T),
+  (∀ i j, mat_el MA i j = mat_el MB i j)
+  → MA = MB.
+
+...
+
+Theorem vector_eq {T} (U V : vector T) :
+  (∀ i, nth_error (vect_list U) i = nth_error (vect_list V) i)
+  → U = V.
+Proof.
+
+...
 
 (* function extensionality for matrices *)
 Theorem matrix_eq : ∀ m n T (MA MB : matrix m n T),
