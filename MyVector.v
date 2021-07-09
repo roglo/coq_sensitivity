@@ -155,12 +155,6 @@ assert (Hiv : ∀ i, vect_el (a × V)%V i = vect_el (b × V)%V i). {
 }
 unfold vect_mul_scal_l in Hiv.
 cbn in Hiv.
-assert (Hn : ¬ ∀ i, vect_el V i = 0%F). {
-  intros H; apply Hvz.
-  apply vector_eq.
-  cbn; intros.
-  now apply H.
-}
 destruct (rngl_eq_dec Hde a b) as [Haeb| Haeb]; [ easy | ].
 exfalso; apply Hvz; clear Hvz.
 apply vector_eq.
