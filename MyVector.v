@@ -66,15 +66,26 @@ Definition vect_el V i := nth i (vect_list V) 0%F.
 
 Definition vect_zero n : vector T := mk_vect (repeat 0%F n).
 
-Fixpoint map2 {A B C} (op : A → B → C) la lb :=
+Fixpoint map2 {A B C} (f : A → B → C) la lb :=
   match la with
   | [] => []
   | a :: la' =>
       match lb with
       | [] => []
-      | b :: lb' => op a b :: map2 op la' lb'
+      | b :: lb' => f a b :: map2 f la' lb'
       end
   end.
+
+Theorem map2_map : ∀ A B C D (f : A → C → D) g (la : list A) (lb : list B),
+  map2 f la (map g lb) = map2 (λ a b, f a (g b)) la lb.
+Proof.
+intros.
+revert lb.
+induction la as [| a]; intros; [ easy | cbn ].
+destruct lb as [| b]; [ easy | cbn ].
+f_equal.
+apply IHla.
+Qed.
 
 (* addition, subtraction of vector *)
 
@@ -212,14 +223,13 @@ unfold vect_dot_product.
 rewrite rngl_mul_summation_list_distr_l; [ | easy ].
 unfold "×"; cbn.
 unfold iter_list.
-...
+rewrite map2_map.
 Theorem List_fold_left_map2 :
   ∀ (A B C D : Type) (f : A → B → A) (g : C → D → B) (la : list C) (lb : list D) (a : A),
   fold_left f (map2 g la lb) a = fold_left (λ (c : A) (b : C * D), f c (g (fst b) (snd b))) (combine la lb) a.
-Admitted.
+...
 rewrite List_fold_left_map2.
-Search (fold_left _ (combine _ _)).
-Search (combine _ (map _ _)).
+rewrite List_fold_left_map2.
 ...
 intros Hom Hic *.
 rewrite rngl_mul_summation_distr_l; [ | easy ].
