@@ -87,6 +87,18 @@ f_equal.
 apply IHla.
 Qed.
 
+Theorem List_fold_left_map2 :
+  ∀ A B C D (f : A → B → A) (g : C → D → B) lc ld (a : A),
+  fold_left f (map2 g lc ld) a =
+  fold_left (λ b c, f b (g (fst c) (snd c))) (combine lc ld) a.
+Proof.
+intros.
+revert ld a.
+induction lc as [| c]; intros; [ easy | cbn ].
+destruct ld as [| d]; [ easy | cbn ].
+apply IHlc.
+Qed.
+
 (* addition, subtraction of vector *)
 
 Definition vect_add (U V : vector T) :=
@@ -224,17 +236,11 @@ rewrite rngl_mul_summation_list_distr_l; [ | easy ].
 unfold "×"; cbn.
 unfold iter_list.
 rewrite map2_map.
-Theorem List_fold_left_map2 :
-  ∀ (A B C D : Type) (f : A → B → A) (g : C → D → B) (la : list C) (lb : list D) (a : A),
-  fold_left f (map2 g la lb) a = fold_left (λ (c : A) (b : C * D), f c (g (fst b) (snd b))) (combine la lb) a.
-...
 rewrite List_fold_left_map2.
 rewrite List_fold_left_map2.
-...
-intros Hom Hic *.
-rewrite rngl_mul_summation_distr_l; [ | easy ].
-apply rngl_summation_eq_compat.
-intros j Hj; cbn.
+apply List_fold_left_ext_in.
+intros * Hb.
+f_equal.
 do 2 rewrite rngl_mul_assoc.
 f_equal.
 now apply rngl_mul_comm.
@@ -247,6 +253,7 @@ Theorem vect_scal_mul_dot_mul_comm :
 Proof.
 intros Hom *.
 unfold vect_dot_product.
+...
 rewrite rngl_mul_summation_distr_l; [ | easy ].
 apply rngl_summation_eq_compat.
 intros j Hj; cbn.
