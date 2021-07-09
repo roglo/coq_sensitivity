@@ -211,6 +211,15 @@ intros Hom Hic *.
 unfold vect_dot_product.
 rewrite rngl_mul_summation_list_distr_l; [ | easy ].
 unfold "×"; cbn.
+unfold iter_list.
+...
+Theorem List_fold_left_map2 :
+  ∀ (A B C D : Type) (f : A → B → A) (g : C → D → B) (la : list C) (lb : list D) (a : A),
+  fold_left f (map2 g la lb) a = fold_left (λ (c : A) (b : C * D), f c (g (fst b) (snd b))) (combine la lb) a.
+Admitted.
+rewrite List_fold_left_map2.
+Search (fold_left _ (combine _ _)).
+Search (combine _ (map _ _)).
 ...
 intros Hom Hic *.
 rewrite rngl_mul_summation_distr_l; [ | easy ].
