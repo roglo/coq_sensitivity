@@ -210,9 +210,7 @@ Proof.
 intros Hom Hic *.
 unfold vect_dot_product.
 rewrite rngl_mul_summation_list_distr_l; [ | easy ].
-...
-unfold "×".
-cbn.
+unfold "×"; cbn.
 ...
 intros Hom Hic *.
 rewrite rngl_mul_summation_distr_l; [ | easy ].
