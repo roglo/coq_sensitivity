@@ -76,7 +76,7 @@ Fixpoint map2 {A B C} (f : A → B → C) la lb :=
       end
   end.
 
-Theorem map2_map : ∀ A B C D (f : A → C → D) g (la : list A) (lb : list B),
+Theorem map2_map_r : ∀ A B C D (f : A → C → D) g (la : list A) (lb : list B),
   map2 f la (map g lb) = map2 (λ a b, f a (g b)) la lb.
 Proof.
 intros.
@@ -235,7 +235,7 @@ unfold vect_dot_product.
 rewrite rngl_mul_summation_list_distr_l; [ | easy ].
 unfold "×"; cbn.
 unfold iter_list.
-rewrite map2_map.
+rewrite map2_map_r.
 rewrite List_fold_left_map2.
 rewrite List_fold_left_map2.
 apply List_fold_left_ext_in.
@@ -253,8 +253,12 @@ Theorem vect_scal_mul_dot_mul_comm :
 Proof.
 intros Hom *.
 unfold vect_dot_product.
+rewrite rngl_mul_summation_list_distr_l; [ | easy ].
+unfold "×"; cbn.
+unfold iter_list.
 ...
-rewrite rngl_mul_summation_distr_l; [ | easy ].
+rewrite map2_map_l.
+...
 apply rngl_summation_eq_compat.
 intros j Hj; cbn.
 symmetry; apply rngl_mul_assoc.
