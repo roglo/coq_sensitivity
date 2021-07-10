@@ -109,8 +109,12 @@ Compute (mat_add nat_ring_like_op (mat_of_list_list [[2;3;5]; [3;8;17]]) (mat_of
 
 (* multiplication *)
 
-Definition mat_mul {ro : ring_like_op T} {m n p}
+Definition mat_mul {ro : ring_like_op T}
     (MA : matrix T) (MB : matrix T) : matrix T :=
+  if Nat.eq_dec (mat_ncols MA) (mat_nrows MB) then
+...
+  else mk_mat [].
+
 ...
   {| mat_el i k := Σ (j ∈ Fin_seq 0 n), mat_el MA i j * mat_el MB j k |}.
 
