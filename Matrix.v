@@ -109,10 +109,9 @@ Compute (mat_add nat_ring_like_op (mat_of_list_list [[2;3;5]; [3;8;17]]) (mat_of
 
 (* multiplication *)
 
-...
-
 Definition mat_mul {ro : ring_like_op T} {m n p}
-    (MA : matrix m n T) (MB : matrix n p T) : matrix m p T :=
+    (MA : matrix T) (MB : matrix T) : matrix T :=
+...
   {| mat_el i k := Σ (j ∈ Fin_seq 0 n), mat_el MA i j * mat_el MB j k |}.
 
 ...
