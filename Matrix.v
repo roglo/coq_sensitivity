@@ -16,10 +16,10 @@ Require Import MyVector.
 Record matrix T := mk_mat
   { mat_list : list (list T) }.
 
-Definition mat_of_list {T} (l : list (list T)) : matrix T :=
+Definition mat_of_list_list {T} (l : list (list T)) : matrix T :=
   mk_mat l.
 
-Definition list_of_mat {T} (M : matrix T) :=
+Definition list_list_of_mat {T} (M : matrix T) :=
   mat_list M.
 
 Definition mat_nrows {T} (M : matrix T) := length (mat_list M).
@@ -95,15 +95,14 @@ Context {rp : ring_like_prop T}.
 
 (* addition *)
 
-...
-
-Definition mat_add {ro : ring_like_op T} (MA MB : matrix T) : matrix T :=
-  {| mat_list := i j := (mat_el MA i j + mat_el MB i j)%F |}.
+Definition mat_add (MA MB : matrix T) : matrix T :=
+  {| mat_list := map2 (map2 rngl_add) (mat_list MA) (mat_list MB) |}.
 
 ...
 
-Definition mat_add {ro : ring_like_op T} (MA MB : matrix T) : matrix T :=
-  {| mat_list := i j := (mat_el MA i j + mat_el MB i j)%F |}.
+End a.
+
+Compute (mat_add (mat_of_list_list [[2;3;5]; [3;8;17]]) (mat_of_list_list [[17;22;3]; [12;0;13]])).
 
 (* multiplication *)
 
