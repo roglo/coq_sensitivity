@@ -98,13 +98,24 @@ Context {rp : ring_like_prop T}.
 Definition mat_add (MA MB : matrix T) : matrix T :=
   {| mat_list := map2 (map2 rngl_add) (mat_list MA) (mat_list MB) |}.
 
-...
-
+(*
 End a.
 
-Compute (mat_add (mat_of_list_list [[2;3;5]; [3;8;17]]) (mat_of_list_list [[17;22;3]; [12;0;13]])).
+Require Import Nrl.
+Print Nrl.
+Check nat_ring_like_op.
+Compute (mat_add nat_ring_like_op (mat_of_list_list [[2;3;5]; [3;8;17]]) (mat_of_list_list [[17;22;3]; [12;0;13]])).
+*)
 
 (* multiplication *)
+
+...
+
+Definition mat_mul {ro : ring_like_op T} {m n p}
+    (MA : matrix m n T) (MB : matrix n p T) : matrix m p T :=
+  {| mat_el i k := Σ (j ∈ Fin_seq 0 n), mat_el MA i j * mat_el MB j k |}.
+
+...
 
 Definition mat_mul {ro : ring_like_op T} {m n p}
     (MA : matrix m n T) (MB : matrix n p T) : matrix m p T :=
