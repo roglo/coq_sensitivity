@@ -23,7 +23,7 @@ Definition list_list_of_mat {T} (M : matrix T) :=
   mat_list M.
 
 Definition mat_nrows {T} (M : matrix T) := length (mat_list M).
-Definition mat_ncols {T} (M : matrix T) := length (hd (mat_list M) []).
+Definition mat_ncols {T} (M : matrix T) := length (hd [] (mat_list M)).
 
 Definition mat_el {T} {ro : ring_like_op T} (M : matrix T) i j :=
   nth j (nth i (mat_list M) []) 0%F.
@@ -109,23 +109,22 @@ Compute (mat_add nat_ring_like_op (mat_of_list_list [[2;3;5]; [3;8;17]]) (mat_of
 
 (* multiplication *)
 
-...
-
-Fixpoint glop MA MB n i k c :=
-  match c with
+Fixpoint glop (ncols : nat) cnt j (row : list T) :=
+  match cnt with
   | 0 => []
-  | S c' =>
-      Σ (j = 0, n - 1), mat_el MA i j * mat_el MB j k :: glop MA MB n i k c'
+  | S cnt' => 0%F :: glop ncols cnt' (S j) row
   end.
 
 Definition mat_mul {ro : ring_like_op T}
     (MA : matrix T) (MB : matrix T) : matrix T :=
-  if Nat.eq_dec (mat_ncols MA) (mat_nrows MB) then
-...
-  else mk_mat [].
+  mk_mat (map (glop (mat_ncols MA) (mat_ncols MA) 0) (mat_list MA)).
+End a.
 
-...
-  {| mat_el i k := Σ (j ∈ Fin_seq 0 n), mat_el MA i j * mat_el MB j k |}.
+Require Import Nrl.
+Print Nrl.
+Check nat_ring_like_op.
+Compute (mat_mul nat_ring_like_op (mat_of_list_list [[2;3;5]; [3;8;17]]) (mat_of_list_list [[17;22;3;5]; [12;0;13;0]; [7;15;3;2]])).
+*)
 
 ...
 
