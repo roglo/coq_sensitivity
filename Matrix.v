@@ -223,11 +223,10 @@ Context {Hro : @rngl_has_opp T ro = true}.
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
 
-...
-
-Arguments mat_mul_scal_l {T ro m n} s%F M%M.
-Arguments mat_opp {T}%type {ro} {m n}%nat.
-Arguments mat_sub {T ro m n} MA%M MB%M.
+Arguments mat_add {T ro} MA%M MB%M.
+Arguments mat_mul_scal_l {T ro} s%F M%M.
+Arguments mat_opp {T}%type {ro}.
+Arguments mat_sub {T ro} MA%M MB%M.
 Arguments mI {T ro} n%nat.
 Arguments mZ {T ro} (m n)%nat.
 Arguments minus_one_pow {T ro}.
@@ -239,31 +238,41 @@ Notation "A * B" := (mat_mul A B) : M_scope.
 Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
 Notation "- A" := (mat_opp A) : M_scope.
 
-Arguments mat_mul_vect_r {T ro m n} M%M V%V.
+Arguments mat_mul_vect_r {T ro} M%M V%V.
 
 Notation "A • V" := (mat_mul_vect_r A V) (at level 40) : M_scope.
 Notation "A • V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
 Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
 
-Theorem fold_mat_sub : ∀ m n (MA MB : matrix m n T), (MA + - MB = MA - MB)%M.
+Theorem fold_mat_sub : ∀ (MA MB : matrix T), (MA + - MB = MA - MB)%M.
 Proof. easy. Qed.
 
 (* commutativity of addition *)
 
-Theorem mat_add_comm : ∀ {m n} (MA MB : matrix m n T), (MA + MB = MB + MA)%M.
+Theorem mat_add_comm : ∀ (MA MB : matrix T), (MA + MB = MB + MA)%M.
 Proof.
 intros.
-apply matrix_eq.
-intros.
-apply rngl_add_comm.
+unfold mat_add; f_equal.
+remember (mat_list_list MA) as lla eqn:Hlla.
+remember (mat_list_list MB) as llb eqn:Hllb.
+clear MA MB Hlla Hllb.
+revert llb.
+induction lla as [| la]; intros; [ now destruct llb | cbn ].
+destruct llb as [| lb]; [ easy | cbn ].
+rewrite IHlla; f_equal.
+revert lb.
+induction la as [| a]; intros; [ now destruct lb | cbn ].
+destruct lb as [| b]; [ easy | cbn ].
+now rewrite rngl_add_comm, IHla.
 Qed.
 
 (* associativity of addition *)
 
-Theorem mat_add_add_swap : ∀ {m n} (MA MB MC : matrix m n T),
+Theorem mat_add_add_swap : ∀ (MA MB MC : matrix T),
   (MA + MB + MC = MA + MC + MB)%M.
 Proof.
 intros.
+...
 apply matrix_eq.
 intros.
 apply rngl_add_add_swap.
