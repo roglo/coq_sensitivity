@@ -159,16 +159,18 @@ Compute (list_list_of_mat (mat_vect_concat (mat_of_list_list [[1; 2; 3; 4]; [5; 
 Definition mat_mul_vect_r (M : matrix T) (V : vector T) :=
   mk_vect (map (λ row, vect_dot_mul (mk_vect row) V) (mat_list_list M)).
 
-(* faire des tests *)
-
+(*
 End a.
 Require Import Nrl.
 Compute (list_of_vect (mat_mul_vect_r nat_ring_like_op (mat_of_list_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (vect_of_list [43; 12; 29]))).
-(* exemple ci-dessus à vérifier *)
-
-...
+Compute (1*43+2*12+3*29).
+Compute (5*43+6*12+7*29).
+Compute (9*43+10*12+11*29).
+*)
 
 (* multiplication of a matrix by a scalar *)
+
+...
 
 Definition mat_mul_scal_l {m n} s (M : matrix m n T) :=
   mk_mat (λ i j, s * mat_el M i j)%F.
