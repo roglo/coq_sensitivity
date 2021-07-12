@@ -170,12 +170,12 @@ Compute (9*43+10*12+11*29).
 
 (* multiplication of a matrix by a scalar *)
 
-...
-
-Definition mat_mul_scal_l {m n} s (M : matrix m n T) :=
-  mk_mat (λ i j, s * mat_el M i j)%F.
+Definition mat_mul_scal_l s (M : matrix T) :=
+  mk_mat (map (map (rngl_mul s)) (mat_list_list M)).
 
 (* matrix whose k-th column is replaced by a vector *)
+
+...
 
 Definition mat_repl_vect {m n} k (M : matrix m n T) (V : vector m T) :=
   mk_mat (λ i j, if Fin.eq_dec j k then vect_el V i else mat_el M i j).
