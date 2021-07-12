@@ -325,7 +325,8 @@ induction ll as [| l]; [ easy | cbn ].
 (* ouais, en fait c'est faux; il faut que M soit une matrice "bien structurée",
    c'est-à-dire dont toutes les lignes aient la même longueur *)
 (* ou alors définir un mZ qui ait la même structure que M; je crois que j'avais
-   fait ça, avant. Mais chais pas *)
+   fait ça, avant. Mais chais pas si c'est bien, de faire ça, parce que ça
+   multiplie les types de matrices nulles. *)
 ...
 intros.
 apply matrix_eq.
