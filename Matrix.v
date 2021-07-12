@@ -313,17 +313,17 @@ f_equal.
 apply mat_add_comm.
 Qed.
 
-Definition is_good_matrix (M : matrix T) :=
+Definition is_correct_matrix (M : matrix T) :=
   ∀ l, l ∈ mat_list_list M → length l = mat_ncols M.
 
 (* addition to zero *)
 
 Theorem mat_add_0_l : ∀ (M : matrix T),
-  is_good_matrix M
+  is_correct_matrix M
   → (mZ (mat_nrows M) (mat_ncols M) + M)%M = M.
 Proof.
 intros * HM.
-unfold is_good_matrix in HM.
+unfold is_correct_matrix in HM.
 unfold mZ, "+"%M, mat_nrows, mat_ncols.
 unfold mat_ncols in HM.
 destruct M as (ll); cbn in HM |-*; f_equal.
@@ -350,11 +350,11 @@ Qed.
 (* addition left and right with opposite *)
 
 Theorem mat_add_opp_l : ∀ (M : matrix T),
-  is_good_matrix M
+  is_correct_matrix M
   → (- M + M = mZ (mat_nrows M) (mat_ncols M))%M.
 Proof.
 intros * HM.
-unfold is_good_matrix in HM.
+unfold is_correct_matrix in HM.
 unfold "+"%M, mZ, mat_nrows, mat_ncols; cbn; f_equal.
 unfold mat_ncols in HM.
 destruct M as (ll); cbn in HM |-*.
