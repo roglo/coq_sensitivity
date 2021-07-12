@@ -126,7 +126,6 @@ Definition mat_mul {ro : ring_like_op T}
 End a.
 
 Require Import Nrl.
-Check nat_ring_like_op.
 Compute (mat_mul nat_ring_like_op (mat_of_list_list [[2;3;5]; [3;8;17]]) (mat_of_list_list [[17;22;3;5]; [12;0;13;0]; [7;15;3;2]])).
 *)
 
@@ -147,24 +146,17 @@ Definition vect_of_mat_col (M : matrix T) j :=
 
 (* concatenation of a matrix and a column vector *)
 
-Definition mat_vect_concat d (M : matrix T) V :=
-...
-  mk_mat
-    (λ i j,
-     if Nat.eq_dec (proj1_sig (Fin.to_nat j)) n then vect_el V i
-     else Fin_fun_app (mat_el M i) d j).
+Definition mat_vect_concat (M : matrix T) V :=
+  mk_mat (map2 (λ row e, row ++ [e]) (mat_list_list M) (vect_list V)).
 
-...
-
-Definition mat_vect_concat {A m n} d (M : matrix m n A) V :=
-  mk_mat
-    (λ i j,
-     if Nat.eq_dec (proj1_sig (Fin.to_nat j)) n then vect_el V i
-     else Fin_fun_app (mat_el M i) d j).
-
-Compute (list_list_of_mat (mat_vect_concat 37 (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (vect_of_list 0 [43; 12; 29]))).
+(*
+End a.
+Compute (list_list_of_mat (mat_vect_concat (mat_of_list_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (vect_of_list [43; 12; 29]))).
+*)
 
 (* multiplication of a matrix by a vector *)
+
+...
 
 Definition mat_mul_vect_r {m n} (M : matrix m n T) (V : vector n T) :=
   mk_vect (λ i, Σ (j ∈ Fin_seq 0 n), mat_el M i j * vect_el V j).
