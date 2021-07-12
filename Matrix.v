@@ -109,22 +109,24 @@ Compute (mat_add nat_ring_like_op (mat_of_list_list [[2;3;5]; [3;8;17]]) (mat_of
 
 (* multiplication *)
 
-Fixpoint glop (ncols : nat) cnt j (row : list T) :=
+Fixpoint mul_row_mat (ncols : nat) cnt k MB (MA_row : list T) :=
   match cnt with
   | 0 => []
-  | S cnt' => 0%F :: glop ncols cnt' (S j) row
+  | S cnt' =>
+      Σ (j = 0, ncols - 1), nth j MA_row 0 * mat_el MB j k ::
+      mul_row_mat ncols cnt' (S k) MB MA_row
   end.
 
 Definition mat_mul {ro : ring_like_op T}
     (MA : matrix T) (MB : matrix T) : matrix T :=
-  mk_mat (map (glop (mat_ncols MA) (mat_ncols MA) 0) (mat_list MA)).
+  mk_mat (map (mul_row_mat (mat_ncols MA) (mat_ncols MB) 0 MB) (mat_list MA)).
 End a.
 
 Require Import Nrl.
-Print Nrl.
 Check nat_ring_like_op.
 Compute (mat_mul nat_ring_like_op (mat_of_list_list [[2;3;5]; [3;8;17]]) (mat_of_list_list [[17;22;3;5]; [12;0;13;0]; [7;15;3;2]])).
-*)
+Compute (2*17+3*12+5*7).
+Compute (2*22+3*0+5*15).
 
 ...
 
