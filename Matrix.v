@@ -336,20 +336,21 @@ rewrite IHll. 2: {
   now apply HM; right.
 }
 f_equal.
+(*1*)
+specialize (HM la (or_introl eq_refl)).
+clear - rp HM.
 revert ncols HM.
 induction la as [| a]; intros; [ now destruct ncols | cbn ].
-destruct ncols; cbn. {
-  now specialize (HM (a :: la) (or_introl eq_refl)).
-}
+destruct ncols; [ easy | cbn ].
 rewrite rngl_add_0_l; f_equal.
-...
-intros.
-apply matrix_eq.
-intros.
-apply rngl_add_0_l.
+apply IHla.
+cbn in HM.
+now apply Nat.succ_inj in HM.
 Qed.
 
 (* addition left and right with opposite *)
+
+...
 
 Theorem mat_add_opp_l {m n} :
   ∀ (M : matrix m n T), (- M + M = mZ m n)%M.
