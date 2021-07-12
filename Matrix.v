@@ -359,6 +359,49 @@ unfold "+"%M, mZ, mat_nrows, mat_ncols; cbn; f_equal.
 unfold mat_ncols in HM.
 destruct M as (ll); cbn in HM |-*.
 remember (length (hd [] ll)) as ncols eqn:H; clear H.
+induction ll as [| la]; [ easy | cbn ].
+rewrite IHll. 2: {
+  intros * Hl.
+  now apply HM; right.
+}
+f_equal.
+(*1*)
+clear IHll.
+revert ncols HM.
+induction la as [| a]; intros; cbn. {
+  specialize (HM [] (or_introl eq_refl)).
+  now rewrite <- HM.
+}
+rewrite rngl_add_opp_l; [ | easy ].
+destruct ncols. {
+  now specialize (HM (a :: la) (or_introl eq_refl)).
+}
+cbn; f_equal.
+specialize (HM (a :: la) (or_introl eq_refl)).
+cbn in HM.
+apply Nat.succ_inj in HM.
+apply IHla.
+intros l Hl.
+...
+apply IHla.
+intros l Hl.
+specialize (HM (a :: la) (or_introl eq_refl)).
+cbn in HM.
+apply Nat.succ_inj in HM.
+destruct Hl as [Hl| Hl]; [ congruence | ].
+...1
+destruct ncols; cbn. {
+  specialize (HM la (or_introl eq_refl)).
+  now apply length_zero_iff_nil in HM; subst la.
+}
+clear IHll.
+revert ncols HM.
+induction la as [| a]; intros; cbn. {
+  now specialize (HM [] (or_introl eq_refl)).
+}
+rewrite rngl_add_opp_l; [ | easy ].
+f_equal.
+rewrite IHla with (ncols := ncols).
 ...
 intros.
 apply matrix_eq; cbn.
