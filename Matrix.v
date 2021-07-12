@@ -313,20 +313,29 @@ f_equal.
 apply mat_add_comm.
 Qed.
 
+Definition is_good_matrix (M : matrix T) :=
+  ∀ l, l ∈ mat_list_list M → length l = mat_ncols M.
+
 (* addition to zero *)
 
 Theorem mat_add_0_l : ∀ (M : matrix T),
-  (mZ (mat_nrows M) (mat_ncols M) + M)%M = M.
+  is_good_matrix M
+  → (mZ (mat_nrows M) (mat_ncols M) + M)%M = M.
 Proof.
-intros.
+intros * HM.
+unfold is_good_matrix in HM.
 unfold mZ, "+"%M, mat_nrows, mat_ncols.
-destruct M as (ll); cbn; f_equal.
-induction ll as [| l]; [ easy | cbn ].
-(* ouais, en fait c'est faux; il faut que M soit une matrice "bien structurée",
-   c'est-à-dire dont toutes les lignes aient la même longueur *)
-(* ou alors définir un mZ qui ait la même structure que M; je crois que j'avais
-   fait ça, avant. Mais chais pas si c'est bien, de faire ça, parce que ça
-   multiplie les types de matrices nulles. *)
+unfold mat_ncols in HM.
+destruct M as (ll); cbn in HM |-*; f_equal.
+remember (length (hd [] ll)) as ncols eqn:H.
+clear H.
+revert ncols HM.
+induction ll as [| la]; intros; [ easy | cbn ].
+rewrite IHll. 2: {
+  intros l Hl.
+  now apply HM; right.
+}
+f_equal.
 ...
 intros.
 apply matrix_eq.
