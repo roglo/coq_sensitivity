@@ -161,10 +161,12 @@ Definition mat_mul_vect_r (M : matrix T) (V : vector T) :=
 
 (* faire des tests *)
 
-...
+End a.
+Require Import Nrl.
+Compute (list_of_vect (mat_mul_vect_r nat_ring_like_op (mat_of_list_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (vect_of_list [43; 12; 29]))).
+(* exemple ci-dessus à vérifier *)
 
-Definition mat_mul_vect_r {m n} (M : matrix m n T) (V : vector n T) :=
-  mk_vect (λ i, Σ (j ∈ Fin_seq 0 n), mat_el M i j * vect_el V j).
+...
 
 (* multiplication of a matrix by a scalar *)
 
