@@ -14,19 +14,19 @@ Require Import MyVector.
 (* matrices *)
 
 Record matrix T := mk_mat
-  { mat_list : list (list T) }.
+  { mat_list_list : list (list T) }.
 
 Definition mat_of_list_list {T} (l : list (list T)) : matrix T :=
   mk_mat l.
 
 Definition list_list_of_mat {T} (M : matrix T) :=
-  mat_list M.
+  mat_list_list M.
 
-Definition mat_nrows {T} (M : matrix T) := length (mat_list M).
-Definition mat_ncols {T} (M : matrix T) := length (hd [] (mat_list M)).
+Definition mat_nrows {T} (M : matrix T) := length (mat_list_list M).
+Definition mat_ncols {T} (M : matrix T) := length (hd [] (mat_list_list M)).
 
 Definition mat_el {T} {ro : ring_like_op T} (M : matrix T) i j :=
-  nth j (nth i (mat_list M) []) 0%F.
+  nth j (nth i (mat_list_list M) []) 0%F.
 
 (*
 Theorem matrix_eq : ∀ T (MA MB : matrix T),
@@ -96,7 +96,7 @@ Context {rp : ring_like_prop T}.
 (* addition *)
 
 Definition mat_add (MA MB : matrix T) : matrix T :=
-  {| mat_list := map2 (map2 rngl_add) (mat_list MA) (mat_list MB) |}.
+  mk_mat (map2 (map2 rngl_add) (mat_list_list MA) (mat_list_list MB)).
 
 (*
 End a.
@@ -119,32 +119,30 @@ Fixpoint mul_row_mat (ncols : nat) cnt k MB (MA_row : list T) :=
 
 Definition mat_mul {ro : ring_like_op T}
     (MA : matrix T) (MB : matrix T) : matrix T :=
-  mk_mat (map (mul_row_mat (mat_ncols MA) (mat_ncols MB) 0 MB) (mat_list MA)).
+  mk_mat (map (mul_row_mat (mat_ncols MA) (mat_ncols MB) 0 MB)
+    (mat_list_list MA)).
+
+(*
 End a.
 
 Require Import Nrl.
 Check nat_ring_like_op.
 Compute (mat_mul nat_ring_like_op (mat_of_list_list [[2;3;5]; [3;8;17]]) (mat_of_list_list [[17;22;3;5]; [12;0;13;0]; [7;15;3;2]])).
-Compute (2*17+3*12+5*7).
-Compute (2*22+3*0+5*15).
-
-...
-
-Definition mat_mul {ro : ring_like_op T} {m n p}
-    (MA : matrix m n T) (MB : matrix n p T) : matrix m p T :=
-  {| mat_el i k := Σ (j ∈ Fin_seq 0 n), mat_el MA i j * mat_el MB j k |}.
+*)
 
 (* opposite *)
 
-Definition mat_opp {m n} (M : matrix m n T) : matrix m n T :=
-  {| mat_el i j := (- mat_el M i j)%F |}.
+Definition mat_opp (M : matrix T) : matrix T :=
+  mk_mat (map (map rngl_opp) (mat_list_list M)).
 
 (* subtraction *)
 
-Definition mat_sub {m n} (MA MB : matrix m n T) :=
+Definition mat_sub (MA MB : matrix T) :=
   mat_add MA (mat_opp MB).
 
 (* vector from a matrix column *)
+
+...
 
 Definition vect_of_mat_col {m n} (M : matrix m n T) j :=
   mk_vect (λ i, mat_el M i j).
