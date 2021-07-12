@@ -20,8 +20,15 @@ Theorem matrix_eq : ∀ T (MA MB : matrix T),
   (Forall2 (Forall2 eq) (mat_list_list MA) (mat_list_list MB))
   → MA = MB.
 Proof.
-Search Forall2.
-...
+intros * Hab.
+destruct MA as (lla).
+destruct MB as (llb).
+cbn in Hab; f_equal.
+induction Hab; [ easy | ].
+subst l'; f_equal.
+induction H; [ easy | ].
+now subst x l0.
+Qed.
 
 Definition mat_of_list_list {T} (l : list (list T)) : matrix T :=
   mk_mat l.
@@ -259,10 +266,6 @@ Proof. easy. Qed.
 Theorem mat_add_comm : ∀ (MA MB : matrix T), (MA + MB = MB + MA)%M.
 Proof.
 intros.
-...
-Check matrix_eq.
-...
-intros.
 unfold mat_add; f_equal.
 remember (mat_list_list MA) as lla eqn:Hlla.
 remember (mat_list_list MB) as llb eqn:Hllb.
@@ -288,23 +291,31 @@ remember (mat_list_list MA) as lla eqn:Hlla.
 remember (mat_list_list MB) as llb eqn:Hllb.
 remember (mat_list_list MC) as llc eqn:Hllc.
 clear MA MB MC Hlla Hllb Hllc.
-...
-intros.
-apply matrix_eq.
-intros.
-apply rngl_add_add_swap.
+revert llb llc.
+induction lla as [| la]; intros; [ easy | cbn ].
+destruct llb as [| lb]; [ now destruct llc | cbn ].
+destruct llc as [| lc]; [ easy | cbn ].
+rewrite IHlla; f_equal.
+revert lb lc.
+induction la as [| a]; intros; [ easy | cbn ].
+destruct lb as [| b]; [ now destruct lc | cbn ].
+destruct lc as [| c]; [ easy | cbn ].
+now rewrite rngl_add_add_swap, IHla.
 Qed.
 
-Theorem mat_add_assoc : ∀ {m n} (MA MB MC : matrix m n T),
+Theorem mat_add_assoc : ∀ (MA MB MC : matrix T),
   (MA + (MB + MC) = (MA + MB) + MC)%M.
 Proof.
 intros.
-apply matrix_eq.
-intros.
-apply rngl_add_assoc.
+rewrite mat_add_comm.
+rewrite mat_add_add_swap.
+f_equal.
+apply mat_add_comm.
 Qed.
 
 (* addition to zero *)
+
+...
 
 Theorem mat_add_0_l : ∀ {m n} (M : matrix m n T), (mZ m n + M)%M = M.
 Proof.
