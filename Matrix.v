@@ -16,6 +16,13 @@ Require Import MyVector.
 Record matrix T := mk_mat
   { mat_list_list : list (list T) }.
 
+Theorem matrix_eq : ∀ T (MA MB : matrix T),
+  (Forall2 (Forall2 eq) (mat_list_list MA) (mat_list_list MB))
+  → MA = MB.
+Proof.
+Search Forall2.
+...
+
 Definition mat_of_list_list {T} (l : list (list T)) : matrix T :=
   mk_mat l.
 
@@ -252,6 +259,10 @@ Proof. easy. Qed.
 Theorem mat_add_comm : ∀ (MA MB : matrix T), (MA + MB = MB + MA)%M.
 Proof.
 intros.
+...
+Check matrix_eq.
+...
+intros.
 unfold mat_add; f_equal.
 remember (mat_list_list MA) as lla eqn:Hlla.
 remember (mat_list_list MB) as llb eqn:Hllb.
@@ -272,7 +283,13 @@ Theorem mat_add_add_swap : ∀ (MA MB MC : matrix T),
   (MA + MB + MC = MA + MC + MB)%M.
 Proof.
 intros.
+unfold mat_add; f_equal; cbn.
+remember (mat_list_list MA) as lla eqn:Hlla.
+remember (mat_list_list MB) as llb eqn:Hllb.
+remember (mat_list_list MC) as llc eqn:Hllc.
+clear MA MB MC Hlla Hllb Hllc.
 ...
+intros.
 apply matrix_eq.
 intros.
 apply rngl_add_add_swap.
