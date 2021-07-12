@@ -156,10 +156,10 @@ Compute (list_list_of_mat (mat_vect_concat (mat_of_list_list [[1; 2; 3; 4]; [5; 
 
 (* multiplication of a matrix by a vector *)
 
-...
-
 Definition mat_mul_vect_r (M : matrix T) (V : vector T) :=
-  mk_vect (λ i, Σ (j ∈ Fin_seq 0 n), mat_el M i j * vect_el V j).
+  mk_vect (map (λ row, vect_dot_mul (mk_vect row) V) (mat_list_list M)).
+
+(* faire des tests *)
 
 ...
 

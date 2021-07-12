@@ -129,10 +129,10 @@ Definition vect_mul_scal_l s (V : vector T) :=
 
 (* dot product *)
 
-Definition vect_dot_product (U V : vector T) :=
+Definition vect_dot_mul (U V : vector T) :=
   Σ (t ∈ map2 rngl_mul (vect_list U) (vect_list V)), t.
 
-Definition vect_squ_norm (V : vector T) := vect_dot_product V V.
+Definition vect_squ_norm (V : vector T) := vect_dot_mul V V.
 
 Definition minus_one_pow n :=
   match n mod 2 with
@@ -186,10 +186,10 @@ Qed.
 Declare Scope V_scope.
 Delimit Scope V_scope with V.
 
-Arguments vect_dot_product (U V)%V.
+Arguments vect_dot_mul (U V)%V.
 
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
-Notation "≺ U , V ≻" := (vect_dot_product U V) (at level 35).
+Notation "≺ U , V ≻" := (vect_dot_mul U V) (at level 35).
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
 
 Theorem vect_mul_scal_l_mul_assoc : ∀ (a b : T) (V : vector T),
@@ -244,7 +244,7 @@ Theorem vect_dot_mul_scal_mul_comm :
   ≺ U, a × V ≻ = (a * ≺ U, V ≻)%F.
 Proof.
 intros Hom Hic *.
-unfold vect_dot_product.
+unfold vect_dot_mul.
 rewrite rngl_mul_summation_list_distr_l; [ | easy ].
 unfold "×"; cbn.
 unfold iter_list.
@@ -265,7 +265,7 @@ Theorem vect_scal_mul_dot_mul_comm :
   ≺ a × U, V ≻ = (a * ≺ U, V ≻)%F.
 Proof.
 intros Hom *.
-unfold vect_dot_product.
+unfold vect_dot_mul.
 rewrite rngl_mul_summation_list_distr_l; [ | easy ].
 unfold "×"; cbn.
 unfold iter_list.
@@ -304,7 +304,7 @@ Arguments vect_opp {T ro} V%V.
 Arguments vect_mul_scal_l {T ro} s%F V%V.
 Arguments vect_mul_scal_reg_r {T}%type {ro rp} Hde Hii V%V (a b)%F.
 Arguments vect_zero {T ro} n%nat.
-Arguments vect_dot_product {T}%type {ro} (U V)%V.
+Arguments vect_dot_mul {T}%type {ro} (U V)%V.
 Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hom Hic a%F (U V)%V.
 Arguments vect_scal_mul_dot_mul_comm {T}%type {ro rp} Hom a%F (U V)%V.
 Arguments vect_eq_dec {T}%type {ro rp} Hde U%V V%V.
@@ -317,5 +317,5 @@ Arguments minus_one_pow_succ {T}%type {ro rp} _ i%nat.
 Notation "U + V" := (vect_add U V) : V_scope.
 Notation "U - V" := (vect_sub U V) : V_scope.
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
-Notation "≺ U , V ≻" := (vect_dot_product U V) (at level 35).
+Notation "≺ U , V ≻" := (vect_dot_mul U V) (at level 35).
 Notation "- V" := (vect_opp V) : V_scope.
