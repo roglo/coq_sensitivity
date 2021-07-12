@@ -336,6 +336,12 @@ rewrite IHll. 2: {
   now apply HM; right.
 }
 f_equal.
+revert ncols HM.
+induction la as [| a]; intros; [ now destruct ncols | cbn ].
+destruct ncols; cbn. {
+  now specialize (HM (a :: la) (or_introl eq_refl)).
+}
+rewrite rngl_add_0_l; f_equal.
 ...
 intros.
 apply matrix_eq.
