@@ -315,10 +315,13 @@ Qed.
 
 (* addition to zero *)
 
-...
-
-Theorem mat_add_0_l : ∀ {m n} (M : matrix m n T), (mZ m n + M)%M = M.
+Theorem mat_add_0_l : ∀ (M : matrix T),
+  (mZ (mat_nrows M) (mat_ncols M) + M)%M = M.
 Proof.
+intros.
+unfold mZ, "+"%M, mat_nrows, mat_ncols.
+destruct M as (ll); cbn; f_equal.
+...
 intros.
 apply matrix_eq.
 intros.
