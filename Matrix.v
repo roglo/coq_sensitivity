@@ -201,10 +201,15 @@ Compute (mZ nat_ring_like_op 7 2).
 
 (* identity square matrix of dimension n *)
 
-...
+Definition mI n : matrix T :=
+  mk_mat (map (λ i, map (λ j, if Nat.eqb i j then 1%F else 0%F) (seq 0 n)) (seq 0 n)).
 
-Definition mI n : matrix n n T :=
-  mk_mat (λ i j, if Fin.eq_dec i j then 1%F else 0%F).
+(*
+End a.
+Require Import Nrl.
+Compute (mI nat_ring_like_op 2).
+Compute (mI nat_ring_like_op 7).
+*)
 
 End a.
 
@@ -217,6 +222,8 @@ Context {Hro : @rngl_has_opp T ro = true}.
 
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
+
+...
 
 Arguments mat_mul_scal_l {T ro m n} s%F M%M.
 Arguments mat_opp {T}%type {ro} {m n}%nat.
