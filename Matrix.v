@@ -142,95 +142,19 @@ Definition mat_sub (MA MB : matrix T) :=
 
 (* vector from a matrix column *)
 
+Definition vect_of_mat_col (M : matrix T) j :=
+  mk_vect (map (λ row, nth j row 0%F) (mat_list_list M)).
+
+(* concatenation of a matrix and a column vector *)
+
+Definition mat_vect_concat d (M : matrix T) V :=
 ...
+  mk_mat
+    (λ i j,
+     if Nat.eq_dec (proj1_sig (Fin.to_nat j)) n then vect_el V i
+     else Fin_fun_app (mat_el M i) d j).
 
-Definition vect_of_mat_col {m n} (M : matrix m n T) j :=
-  mk_vect (λ i, mat_el M i j).
-
-(* concatenation of a matrix and a vector *)
-
-Definition Fin_nat n (i : Fin.t n) : nat := proj1_sig (Fin.to_nat i).
-
-Theorem Fin_ub : ∀ n (i : Fin.t n), proj1_sig (Fin.to_nat i) < n.
-Proof.
-intros.
-destruct n; [ easy | ].
-specialize (@Fin_inv n i) as H2.
-destruct H2 as [H2| H2]. {
-  subst i.
-  apply Nat.lt_0_succ.
-}
-destruct H2 as (j, Hj).
-subst i; cbn.
-destruct (Fin.to_nat j) as (k, Hk); cbn.
-now apply Nat.succ_lt_mono in Hk.
-Qed.
-
-(*
-Definition Fin_fun_app A n : (Fin.t n → A) → A → (Fin.t (S n) → A).
-Proof.
-intros f a i.
-destruct (Nat.eq_dec (Fin_nat i) n) as [H1| H1]; [ apply a | ].
-apply f.
-assert (H2 : Fin_nat i < n). {
-  unfold Fin_nat in H1 |-*.
-  specialize (Fin_ub i) as H2.
-  apply Nat.succ_le_mono in H2.
-  now apply Nat_le_neq_lt.
-}
-apply (Fin.of_nat_lt H2).
-Defined.
-*)
-
-Definition Fin_fun_app A n : (Fin.t n → A) → A → (Fin.t (S n) → A) :=
-  λ f a i,
-  match Nat.eq_dec (Fin_nat i) n with
-  | left _ => a
-  | right Hne =>
-      f (let Hin :=
-           match Nat.succ_le_mono (proj1_sig (Fin.to_nat i)) n with
-           | conj _ H => H (Fin_ub i)
-           end
-         in
-         Fin.of_nat_lt (Nat_le_neq_lt Hin Hne))
-  end.
-
-(*
-Check (@Fin_nat 12).
-Check (Fin_fun_app (@Fin_nat 12)) 17.
-Compute map ((Fin_fun_app (@Fin_nat 12)) 17) (Fin_seq 0 13).
-*)
-
-Definition lfln a l : list (Fin.t (fold_left (λ c i : nat, max c i) l a + 1)).
-Proof.
-revert a.
-induction l as [| b]; intros; [ apply [] | ].
-apply cons. {
-  cbn.
-  apply (@Fin.of_nat_lt b).
-  clear.
-  revert a.
-  induction l as [| c]; intros; cbn. {
-    rewrite Nat.add_1_r.
-    apply -> Nat.succ_le_mono.
-    apply Nat.le_max_r.
-  }
-  rewrite <- Nat.max_assoc.
-  rewrite (Nat.max_comm b).
-  rewrite Nat.max_assoc.
-  apply IHl.
-}
-cbn.
-apply IHl.
-Defined.
-
-Definition list_Fin_of_list_nat l : list (Fin.t (Max (i ∈ l), i + 1)) :=
-  lfln 0 l.
-
-(*
-Compute (list_Fin_of_list_nat [3;7;1;8;0;9] : list (Fin.t 10)).
-Compute map (@Fin_nat 10) (list_Fin_of_list_nat [3;7;1;8;0;9]).
-*)
+...
 
 Definition mat_vect_concat {A m n} d (M : matrix m n A) V :=
   mk_mat
