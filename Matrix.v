@@ -158,6 +158,11 @@ Compute (list_list_of_mat (mat_vect_concat (mat_of_list_list [[1; 2; 3; 4]; [5; 
 
 ...
 
+Definition mat_mul_vect_r (M : matrix T) (V : vector T) :=
+  mk_vect (λ i, Σ (j ∈ Fin_seq 0 n), mat_el M i j * vect_el V j).
+
+...
+
 Definition mat_mul_vect_r {m n} (M : matrix m n T) (V : vector n T) :=
   mk_vect (λ i, Σ (j ∈ Fin_seq 0 n), mat_el M i j * vect_el V j).
 
