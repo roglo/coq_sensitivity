@@ -175,17 +175,33 @@ Definition mat_mul_scal_l s (M : matrix T) :=
 
 (* matrix whose k-th column is replaced by a vector *)
 
-...
+Definition mat_repl_vect k (M : matrix T) (V : vector T) :=
+  mk_mat
+    (map2 (λ row e, firstn k row ++ e :: skipn (S k) row) (mat_list_list M)
+       (vect_list V)).
 
-Definition mat_repl_vect {m n} k (M : matrix m n T) (V : vector m T) :=
-  mk_mat (λ i j, if Fin.eq_dec j k then vect_el V i else mat_el M i j).
+(*
+End a.
+Compute (list_list_of_mat (mat_repl_vect 2 (mat_of_list_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (vect_of_list [43; 12; 29]))).
+Compute (list_list_of_mat (mat_repl_vect 0 (mat_of_list_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (vect_of_list [43; 12; 29]))).
+Compute (list_list_of_mat (mat_repl_vect 15 (mat_of_list_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (vect_of_list [43; 12; 29]))).
+*)
 
 (* null matrix of dimension m × n *)
 
-Definition mZ m n : matrix m n T :=
-  mk_mat (λ i j, 0%F).
+Definition mZ m n : matrix T :=
+  mk_mat (repeat (repeat 0%F n) m).
+
+(*
+End a.
+Require Import Nrl.
+Compute (mZ nat_ring_like_op 2 7).
+Compute (mZ nat_ring_like_op 7 2).
+*)
 
 (* identity square matrix of dimension n *)
+
+...
 
 Definition mI n : matrix n n T :=
   mk_mat (λ i j, if Fin.eq_dec i j then 1%F else 0%F).
