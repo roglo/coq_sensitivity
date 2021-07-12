@@ -336,7 +336,6 @@ rewrite IHll. 2: {
   now apply HM; right.
 }
 f_equal.
-(*1*)
 specialize (HM la (or_introl eq_refl)).
 clear - rp HM.
 revert ncols HM.
@@ -350,11 +349,17 @@ Qed.
 
 (* addition left and right with opposite *)
 
-...
-
-Theorem mat_add_opp_l {m n} :
-  ∀ (M : matrix m n T), (- M + M = mZ m n)%M.
+Theorem mat_add_opp_l : ∀ (M : matrix T),
+  is_good_matrix M
+  → (- M + M = mZ (mat_nrows M) (mat_ncols M))%M.
 Proof.
+intros * HM.
+unfold is_good_matrix in HM.
+unfold "+"%M, mZ, mat_nrows, mat_ncols; cbn; f_equal.
+unfold mat_ncols in HM.
+destruct M as (ll); cbn in HM |-*.
+remember (length (hd [] ll)) as ncols eqn:H; clear H.
+...
 intros.
 apply matrix_eq; cbn.
 intros.
