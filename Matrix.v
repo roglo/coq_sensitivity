@@ -241,6 +241,7 @@ Arguments mat_mul {T ro} MA%M MB%M.
 Arguments mat_mul_scal_l {T ro} s%F M%M.
 Arguments mat_opp {T}%type {ro}.
 Arguments mat_sub {T ro} MA%M MB%M.
+Arguments mul_row_mat {T}%type {ro} (ncols cnt k)%nat MB%M MA_row%list.
 Arguments mI {T ro} n%nat.
 Arguments mZ {T ro} (m n)%nat.
 Arguments minus_one_pow {T ro}.
@@ -387,6 +388,13 @@ rewrite mat_add_comm.
 now apply mat_add_opp_l.
 Qed.
 
+Theorem mI_ncols : ∀ n, mat_ncols (mI n) = n.
+Proof.
+intros.
+destruct n; cbn - [ "=?" ]; [ easy | ].
+now rewrite map_length, seq_length.
+Qed.
+
 (* multiplication left and right with identity *)
 
 Theorem mat_mul_1_l : ∀ (M : matrix T),
@@ -394,15 +402,11 @@ Theorem mat_mul_1_l : ∀ (M : matrix T),
   → (mI (mat_nrows M) * M)%M = M.
 Proof.
 intros * HM.
-Print mat_mul.
-...
-unfold "*"%M, mI, mat_nrows, mat_ncols; cbn.
+unfold is_correct_matrix, mat_ncols in HM.
+unfold "*"%M; cbn.
+rewrite mI_ncols.
 destruct M as (ll); cbn in HM |-*.
-f_equal.
-...
-unfold "+"%M, mZ, mat_nrows, mat_ncols; cbn; f_equal.
-unfold mat_ncols in HM.
-destruct M as (ll); cbn in HM |-*.
+unfold mat_ncols; cbn.
 remember (length (hd [] ll)) as ncols eqn:H; clear H.
 ...
 intros.
