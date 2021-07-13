@@ -389,9 +389,21 @@ Qed.
 
 (* multiplication left and right with identity *)
 
-Theorem mat_mul_1_l : ∀ (M : matrix T), (mI (mat_nrows M) * M)%M = M.
+Theorem mat_mul_1_l : ∀ (M : matrix T),
+  is_correct_matrix M
+  → (mI (mat_nrows M) * M)%M = M.
 Proof.
-intros.
+intros * HM.
+Print mat_mul.
+...
+unfold "*"%M, mI, mat_nrows, mat_ncols; cbn.
+destruct M as (ll); cbn in HM |-*.
+f_equal.
+...
+unfold "+"%M, mZ, mat_nrows, mat_ncols; cbn; f_equal.
+unfold mat_ncols in HM.
+destruct M as (ll); cbn in HM |-*.
+remember (length (hd [] ll)) as ncols eqn:H; clear H.
 ...
 intros.
 apply matrix_eq.
