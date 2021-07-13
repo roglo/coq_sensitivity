@@ -598,6 +598,7 @@ Qed.
 
 End a.
 
+Arguments all_0_rngl_summation_0 {T}%type {ro rp} (b e)%nat (f g)%function.
 Arguments all_0_rngl_summation_list_0 {T}%type {ro rp} A%type l%list.
 Arguments rngl_mul_summation_list_distr_l {T ro rp} Hom A%type a
   la%list f%function.
@@ -611,5 +612,6 @@ Arguments rngl_summation_list_split {T}%type {ro rp} A%type
   l%list f%function n%nat.
 Arguments rngl_summation_map_seq {T ro rp} A%type (start len)%nat
   (f g)%function.
-Arguments rngl_summation_permut {T}%type {ro rp} n%nat (l1 l2)%list.
 Arguments rngl_summation_only_one {T}%type {ro rp} g%function n%nat.
+Arguments rngl_summation_permut {T}%type {ro rp} n%nat (l1 l2)%list.
+Arguments rngl_summation_split_first {T}%type {ro rp} (b k)%nat g%function.

@@ -428,9 +428,33 @@ destruct M as (ll); cbn in HM |-*.
 f_equal.
 unfold mat_ncols; cbn.
 remember (length (hd [] ll)) as ncols eqn:H; clear H.
-...
 revert ncols HM.
 induction ll as [| la]; intros; [ easy | ].
+cbn; f_equal. {
+  clear IHll.
+  specialize (HM la (or_introl eq_refl)).
+  subst ncols.
+  induction la as [| a]; [ easy | ].
+  cbn.
+  f_equal. {
+    unfold mat_mul_el.
+    rewrite mI_ncols.
+    rewrite Nat.sub_succ, Nat.sub_0_r.
+    rewrite rngl_summation_split_first; [ | flia ].
+    rewrite all_0_rngl_summation_0. 2: {
+      intros i Hi.
+      destruct i; [ easy | ].
+Theorem mI_ndiag : ∀ n i j, i ≠ j → mat_el (mI n) i j = 0%F.
+Proof.
+intros * Hij.
+cbn.
+...
+intros * Hij.
+revert i j Hij.
+induction n; intros; [ now destruct i, j | ].
+...
+rewrite mI_ndiag; [ | easy ].
+...
 cbn - [ seq ].
 rewrite seq_S; cbn.
 rewrite map_app.
