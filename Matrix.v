@@ -131,8 +131,7 @@ Fixpoint mul_row_mat (ncols : nat) cnt k MB (MA_row : list T) :=
       mul_row_mat ncols cnt' (S k) MB MA_row
   end.
 
-Definition mat_mul {ro : ring_like_op T}
-    (MA : matrix T) (MB : matrix T) : matrix T :=
+Definition mat_mul (MA : matrix T) (MB : matrix T) : matrix T :=
   mk_mat (map (mul_row_mat (mat_ncols MA) (mat_ncols MB) 0 MB)
     (mat_list_list MA)).
 
@@ -238,6 +237,7 @@ Declare Scope M_scope.
 Delimit Scope M_scope with M.
 
 Arguments mat_add {T ro} MA%M MB%M.
+Arguments mat_mul {T ro} MA%M MB%M.
 Arguments mat_mul_scal_l {T ro} s%F M%M.
 Arguments mat_opp {T}%type {ro}.
 Arguments mat_sub {T ro} MA%M MB%M.
@@ -389,10 +389,10 @@ Qed.
 
 (* multiplication left and right with identity *)
 
-...
-
-Theorem mat_mul_1_l : ∀ {n} (M : matrix n n T), (mI n * M)%M = M.
+Theorem mat_mul_1_l : ∀ (M : matrix T), (mI (mat_nrows M) * M)%M = M.
 Proof.
+intros.
+...
 intros.
 apply matrix_eq.
 cbn.
