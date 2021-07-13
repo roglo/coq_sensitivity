@@ -405,6 +405,7 @@ intros * HM.
 unfold is_correct_matrix, mat_ncols in HM.
 unfold "*"%M.
 rewrite mI_ncols.
+...
 unfold mI; cbn.
 destruct M as (ll); cbn in HM |-*.
 unfold mat_ncols; cbn.
