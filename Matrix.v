@@ -377,19 +377,19 @@ apply Nat.succ_inj in HM.
 now apply IHla.
 Qed.
 
-...
-
-Theorem mat_add_opp_r {m n} :
-  ∀ (M : matrix m n T), (M - M = mZ m n)%M.
+Theorem mat_add_opp_r : ∀ (M : matrix T),
+  is_correct_matrix M
+  → (M - M = mZ (mat_nrows M) (mat_ncols M))%M.
 Proof.
-intros.
-apply matrix_eq; cbn.
-intros.
-rewrite fold_rngl_sub; [ | easy ].
-now apply rngl_sub_diag; left.
+intros * HM.
+unfold mat_sub.
+rewrite mat_add_comm.
+now apply mat_add_opp_l.
 Qed.
 
 (* multiplication left and right with identity *)
+
+...
 
 Theorem mat_mul_1_l : ∀ {n} (M : matrix n n T), (mI n * M)%M = M.
 Proof.
