@@ -123,13 +123,14 @@ Compute (mat_add nat_ring_like_op (mat_of_list_list [[2;3;5]; [3;8;17]]) (mat_of
 
 (* multiplication *)
 
+Definition mat_mul_el MA MB i k :=
+   Σ (j = 0, mat_ncols MA - 1), mat_el MA i j * mat_el MB j k.
+
 Definition mat_mul (MA MB : matrix T) : matrix T :=
   mk_mat
-    (map
-       (λ i,
-        map (λ k, Σ (j = 0, mat_ncols MA - 1), mat_el MA i j * mat_el MB j k)
-          (seq 0 (mat_ncols MB)))
+    (map (λ i, map (mat_mul_el MA MB i) (seq 0 (mat_ncols MB)))
        (seq 0 (mat_nrows MA))).
+
 (*
 End a.
 
@@ -248,6 +249,8 @@ Delimit Scope M_scope with M.
 
 Arguments mat_add {T ro} MA%M MB%M.
 Arguments mat_mul {T ro} MA%M MB%M.
+About mat_mul_el.
+Arguments mat_mul_el {T}%type {ro} (MA MB)%M (i k)%nat.
 Arguments mat_mul_scal_l {T ro} s%F M%M.
 Arguments mat_opp {T}%type {ro}.
 Arguments mat_sub {T ro} MA%M MB%M.
@@ -421,10 +424,16 @@ intros * HM.
 unfold is_correct_matrix, mat_ncols in HM.
 unfold "*"%M.
 rewrite mI_nrows.
-rewrite mI_ncols.
 destruct M as (ll); cbn in HM |-*.
-unfold mat_ncols; cbn.
 f_equal.
+unfold mat_ncols; cbn.
+remember (length (hd [] ll)) as ncols eqn:H; clear H.
+...
+revert ncols HM.
+induction ll as [| la]; intros; [ easy | ].
+cbn - [ seq ].
+rewrite seq_S; cbn.
+rewrite map_app.
 ...
 unfold mI; cbn.
 destruct M as (ll); cbn in HM |-*.
