@@ -123,33 +123,22 @@ Compute (mat_add nat_ring_like_op (mat_of_list_list [[2;3;5]; [3;8;17]]) (mat_of
 
 (* multiplication *)
 
-...
-
 Definition mat_mul (MA MB : matrix T) : matrix T :=
   mk_mat
     (map
        (λ i,
-        map (λ j, Σ (j = 0, mat_ncols MA - 1), mat_el MA i j * mat_el MB j k) (seq 0 (mat_ncols MA)))
+        map (λ k, Σ (j = 0, mat_ncols MA - 1), mat_el MA i j * mat_el MB j k)
+          (seq 0 (mat_ncols MB)))
        (seq 0 (mat_nrows MA))).
+(*
+End a.
 
-Fixpoint mul_vect_mat cnt k V M :=
-  match cnt with
-  | 0 => []
-  | S cnt' =>
-      Σ (j = 0, vect_size V - 1), vect_el V j * mat_el M j k ::
-      mul_vect_mat cnt' (S k) V M
-  end.
+Require Import Nrl.
+Compute (mat_mul nat_ring_like_op (mat_of_list_list [[2;3;5]; [3;8;17]]) (mat_of_list_list [[17;22;3;5]; [12;0;13;0]; [7;15;3;2]])).
+     = {| mat_list_list := [[105; 119; 60; 20]; [266; 321; 164; 49]] |}
+*)
 
-
-...
-
-Fixpoint mul_row_mat (ncols : nat) cnt k MB (MA_row : list T) :=
-  match cnt with
-  | 0 => []
-  | S cnt' =>
-      Σ (j = 0, ncols - 1), nth j MA_row 0 * nth k (nth j MB []) 0%F ::
-      mul_row_mat ncols cnt' (S k) MB MA_row
-  end.
+(*
 Fixpoint mul_row_mat (ncols : nat) cnt k MB (MA_row : list T) :=
   match cnt with
   | 0 => []
@@ -161,12 +150,6 @@ Fixpoint mul_row_mat (ncols : nat) cnt k MB (MA_row : list T) :=
 Definition mat_mul (MA : matrix T) (MB : matrix T) : matrix T :=
   mk_mat (map (mul_row_mat (mat_ncols MA) (mat_ncols MB) 0 MB)
     (mat_list_list MA)).
-
-(*
-End a.
-
-Require Import Nrl.
-Compute (mat_mul nat_ring_like_op (mat_of_list_list [[2;3;5]; [3;8;17]]) (mat_of_list_list [[17;22;3;5]; [12;0;13;0]; [7;15;3;2]])).
 *)
 
 (* opposite *)
@@ -268,7 +251,6 @@ Arguments mat_mul {T ro} MA%M MB%M.
 Arguments mat_mul_scal_l {T ro} s%F M%M.
 Arguments mat_opp {T}%type {ro}.
 Arguments mat_sub {T ro} MA%M MB%M.
-Arguments mul_row_mat {T}%type {ro} (ncols cnt k)%nat MB%M MA_row%list.
 Arguments mI {T ro} n%nat.
 Arguments mZ {T ro} (m n)%nat.
 Arguments minus_one_pow {T ro}.
@@ -415,6 +397,13 @@ rewrite mat_add_comm.
 now apply mat_add_opp_l.
 Qed.
 
+Theorem mI_nrows : ∀ n, mat_nrows (mI n) = n.
+Proof.
+intros.
+destruct n; cbn - [ "=?" ]; [ easy | ].
+now rewrite map_length, seq_length.
+Qed.
+
 Theorem mI_ncols : ∀ n, mat_ncols (mI n) = n.
 Proof.
 intros.
@@ -431,7 +420,11 @@ Proof.
 intros * HM.
 unfold is_correct_matrix, mat_ncols in HM.
 unfold "*"%M.
+rewrite mI_nrows.
 rewrite mI_ncols.
+destruct M as (ll); cbn in HM |-*.
+unfold mat_ncols; cbn.
+f_equal.
 ...
 unfold mI; cbn.
 destruct M as (ll); cbn in HM |-*.
