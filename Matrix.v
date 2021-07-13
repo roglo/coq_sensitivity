@@ -403,11 +403,29 @@ Theorem mat_mul_1_l : ∀ (M : matrix T),
 Proof.
 intros * HM.
 unfold is_correct_matrix, mat_ncols in HM.
-unfold "*"%M; cbn.
+unfold "*"%M.
 rewrite mI_ncols.
+unfold mI; cbn.
 destruct M as (ll); cbn in HM |-*.
 unfold mat_ncols; cbn.
 remember (length (hd [] ll)) as ncols eqn:H; clear H.
+f_equal.
+destruct ll as [| la]; [ easy | ].
+rewrite map_map.
+Theorem glop : ∀ A (la : list A) d,
+  la ≠ []
+  → la = map (λ i, nth i la d) (seq 0 (length la)).
+Admitted.
+rewrite glop with (la := la :: ll) (d := []); [ | easy ].
+Search (map _ _ = map _ _).
+apply map_ext_in.
+...
+revert ncols HM.
+induction ll as [| la]; intros; [ easy | ].
+cbn - [ "=?" ].
+f_equal. {
+  destruct la as [| a]; cbn - [ "=?" ]. {
+    rewrite Nat.eqb_refl.
 ...
 intros.
 apply matrix_eq.
