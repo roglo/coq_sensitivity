@@ -123,7 +123,7 @@ Compute (mat_add nat_ring_like_op (mat_of_list_list [[2;3;5]; [3;8;17]]) (mat_of
 
 (* multiplication *)
 
-Fixpoint mul_vect_mat (ncols : nat) cnt k V M :=
+Fixpoint mul_vect_mat ncols cnt k V M :=
   match cnt with
   | 0 => []
   | S cnt' =>
