@@ -415,10 +415,18 @@ rewrite map_map.
 Theorem glop : ∀ A (la : list A) d,
   la ≠ []
   → la = map (λ i, nth i la d) (seq 0 (length la)).
-Admitted.
+Proof.
+intros * Hla.
+induction la as [| a]; [ easy | ].
+cbn - [ nth ].
+f_equal.
+...
 rewrite glop with (la := la :: ll) (d := []); [ | easy ].
 Search (map _ _ = map _ _).
+rewrite map_length.
+rewrite seq_length.
 apply map_ext_in.
+intros i Hi.
 ...
 revert ncols HM.
 induction ll as [| la]; intros; [ easy | ].
