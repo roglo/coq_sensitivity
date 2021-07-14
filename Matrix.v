@@ -466,7 +466,61 @@ destruct M as (ll); cbn in HM |-*.
 f_equal.
 unfold mat_ncols; cbn.
 remember (length (hd [] ll)) as ncols eqn:H; clear H.
-remember (length ll) as nrows eqn:H.
+revert ncols HM.
+induction ll as [| la]; intros; [ easy | ].
+cbn; f_equal. {
+  specialize (HM la (or_introl eq_refl)).
+  clear IHll.
+  revert ncols HM ll.
+  induction la as [| a]; intros; [ now rewrite <- HM | ].
+  destruct ncols; [ easy | cbn ].
+  f_equal. {
+    unfold mat_mul_el.
+    rewrite rngl_summation_split_first; [ | flia ].
+    rewrite mat_el_mI_diag; [ | flia ].
+    rewrite rngl_mul_1_l.
+    rewrite all_0_rngl_summation_0. 2: {
+      intros i Hi.
+      destruct i; [ easy | ].
+      rewrite mat_el_mI_ndiag; [ | easy ].
+      apply rngl_mul_0_l.
+      now left.
+    }
+    apply rngl_add_0_r.
+  }
+  rewrite <- seq_shift.
+  unfold mat_mul_el.
+  rewrite map_map.
+  cbn in HM.
+  apply Nat.succ_inj in HM.
+...
+  specialize (IHla ncols HM).
+  unfold mat_mul_el in IHla.
+  rewrite <- IHla at 1.
+  apply map_ext_in.
+  intros b Hb.
+  apply rngl_summation_eq_compat.
+  intros i Hi; f_equal.
+  destruct i; [ easy | cbn ].
+...
+(*
+replace ll with (map (λ i, nth i ll []) (seq 0 (length ll))). 2: {
+  clear.
+  induction ll as [| la]; [ easy | ].
+  cbn; f_equal.
+  rewrite <- seq_shift.
+  now rewrite map_map.
+}
+...
+remember (length ll) as nrows eqn:Hlen.
+symmetry in Hlen.
+revert ncols ll HM Hlen.
+induction nrows; intros; cbn. {
+  now apply length_zero_iff_nil in Hlen.
+}
+destruct ll as [| la]; [ easy |].
+f_equal. {
+...
 rewrite H at 1.
 assert (Hr : nrows ≤ length ll) by flia H; clear H.
 revert nrows ncols HM Hr.
