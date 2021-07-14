@@ -532,11 +532,18 @@ rewrite (HM la). 2: {
 apply map_ext_in.
 intros j Hj.
 unfold mat_mul_el.
-rewrite rngl_summation_split with (j0 := i). 2: {
+...
+rewrite rngl_summation_split with (j0 := j). 2: {
   split; [ flia | ].
   apply -> Nat.succ_le_mono.
-  apply in_seq in Hi.
+  apply in_seq in Hj.
   unfold mat_ncols; cbn.
+  destruct ll as [| lb]. {
+    cbn.
+    clear la Hla.
+...
+  specialize (HM (hd [] ll)).
+Search (hd _ _ ∈ _).
 ...
   rewrite mI_ncols.
   rewrite mI_ncols; flia Hi.
