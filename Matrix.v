@@ -442,6 +442,16 @@ rewrite nth_overflow; [ cbn; flia | ].
 now rewrite map_length, seq_length.
 Qed.
 
+Theorem mat_el_mI_diag : ∀ n i, i < n → mat_el (mI n) i i = 1%F.
+Proof.
+intros * Hin.
+unfold mat_el, mI; cbn.
+rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
+rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+now rewrite Nat.eqb_refl.
+Qed.
+
 (* multiplication left and right with identity *)
 
 Theorem mat_mul_1_l : ∀ (M : matrix T),
@@ -477,6 +487,9 @@ cbn; f_equal. {
       now left.
     }
     rewrite rngl_add_0_r.
+    rewrite mat_el_mI_diag; [ | flia ].
+    apply rngl_mul_1_l.
+  } {
 ...
 cbn - [ seq ].
 rewrite seq_S; cbn.
