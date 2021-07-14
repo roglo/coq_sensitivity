@@ -431,6 +431,34 @@ rewrite nth_overflow; [ easy | ].
 now rewrite map_length, seq_length.
 Qed.
 
+Theorem mat_el_mI_ndiag : ∀ n i j, i ≠ j → mat_el (mI n) i j = 0%F.
+Proof.
+intros * Hij.
+unfold mat_el, mI; cbn.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n; cbn.
+  now destruct i, j.
+}
+apply Nat.neq_0_lt_0 in Hnz.
+destruct (lt_dec i n) as [Hin| Hin]. {
+  rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
+  destruct (lt_dec j n) as [Hjn| Hjn]. {
+    rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ | easy ].
+    rewrite seq_nth; [ cbn | easy ].
+    rewrite if_eqb_eq_dec.
+    now destruct (Nat.eq_dec i j).
+  }
+  apply Nat.nlt_ge in Hjn.
+  apply nth_overflow.
+  now rewrite map_length, seq_length.
+}
+apply Nat.nlt_ge in Hin.
+apply nth_overflow.
+rewrite nth_overflow; [ cbn; flia | ].
+now rewrite map_length, seq_length.
+Qed.
+
 (* multiplication left and right with identity *)
 
 Theorem mat_mul_1_l : ∀ (M : matrix T),
@@ -461,15 +489,6 @@ cbn; f_equal. {
     rewrite all_0_rngl_summation_0. 2: {
       intros i Hi.
       destruct i; [ easy | ].
-Theorem mat_el_mI_ndiag : ∀ n i j, i ≠ j → mat_el (mI n) i j = 0%F.
-Proof.
-intros * Hij.
-revert i j Hij.
-induction n; intros; [ now destruct i, j | ].
-destruct i. {
-  destruct j; [ easy | ].
-  apply mat_el_nI_0_succ.
-}
 ...
 rewrite mat_el_mI_ndiag; [ | easy ].
 ...
