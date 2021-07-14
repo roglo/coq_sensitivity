@@ -473,6 +473,10 @@ cbn; f_equal. {
       intros i Hi.
       destruct i; [ easy | ].
       rewrite mat_el_mI_ndiag; [ | easy ].
+      apply rngl_mul_0_l.
+      now left.
+    }
+    rewrite rngl_add_0_r.
 ...
 cbn - [ seq ].
 rewrite seq_S; cbn.
