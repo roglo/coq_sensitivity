@@ -466,248 +466,58 @@ destruct M as (ll); cbn in HM |-*.
 f_equal.
 unfold mat_ncols; cbn.
 remember (length (hd [] ll)) as ncols eqn:H; clear H.
-revert ncols HM.
-induction ll as [| la]; intros; [ easy | ].
-cbn; f_equal. {
-  specialize (HM la (or_introl eq_refl)).
-  clear IHll.
-  revert ncols HM ll.
-  induction la as [| a]; intros; [ now rewrite <- HM | ].
-  destruct ncols; [ easy | cbn ].
-  f_equal. {
-    unfold mat_mul_el.
-    rewrite rngl_summation_split_first; [ | flia ].
-    rewrite mat_el_mI_diag; [ | flia ].
-    rewrite rngl_mul_1_l.
-    rewrite all_0_rngl_summation_0. 2: {
-      intros i Hi.
-      destruct i; [ easy | ].
-      rewrite mat_el_mI_ndiag; [ | easy ].
-      apply rngl_mul_0_l.
-      now left.
-    }
-    apply rngl_add_0_r.
-  }
-  rewrite <- seq_shift.
-  unfold mat_mul_el.
-  rewrite map_map.
-  cbn in HM.
-  apply Nat.succ_inj in HM.
-...
-  specialize (IHla ncols HM).
-  unfold mat_mul_el in IHla.
-  rewrite <- IHla at 1.
-  apply map_ext_in.
-  intros b Hb.
-  apply rngl_summation_eq_compat.
-  intros i Hi; f_equal.
-  destruct i; [ easy | cbn ].
-...
-(*
-replace ll with (map (λ i, nth i ll []) (seq 0 (length ll))). 2: {
+replace ll with (map (λ i, nth i ll []) (seq 0 (length ll))) at 2. 2: {
   clear.
   induction ll as [| la]; [ easy | ].
   cbn; f_equal.
   rewrite <- seq_shift.
   now rewrite map_map.
 }
-...
-remember (length ll) as nrows eqn:Hlen.
-symmetry in Hlen.
-revert ncols ll HM Hlen.
-induction nrows; intros; cbn. {
-  now apply length_zero_iff_nil in Hlen.
-}
-destruct ll as [| la]; [ easy |].
-f_equal. {
-...
-rewrite H at 1.
-assert (Hr : nrows ≤ length ll) by flia H; clear H.
-revert nrows ncols HM Hr.
-induction ll as [| la]; intros; [ easy | ].
-cbn - [ seq ].
-rewrite seq_S; cbn.
-rewrite map_app.
-cbn.
-(* ah pute vierge ! *)
-rewrite IHll.
-...
-cbn; f_equal. {
-  clear IHll.
-  specialize (HM la (or_introl eq_refl)).
-  subst ncols.
-  induction la as [| a]; [ easy | ].
-  cbn.
-  f_equal. {
-    unfold mat_mul_el.
-    rewrite mI_ncols.
-    rewrite Nat.sub_succ, Nat.sub_0_r.
-    rewrite rngl_summation_split_first; [ | flia ].
-    rewrite all_0_rngl_summation_0. 2: {
-      intros i Hi.
-      destruct i; [ easy | ].
-      rewrite mat_el_mI_ndiag; [ | easy ].
-      apply rngl_mul_0_l.
-      now left.
-    }
-    rewrite rngl_add_0_r.
-    rewrite mat_el_mI_diag; [ | flia ].
-    apply rngl_mul_1_l.
-  } {
-...
-cbn - [ seq ].
-rewrite seq_S; cbn.
-rewrite map_app.
-...
-unfold mI; cbn.
-destruct M as (ll); cbn in HM |-*.
-unfold mat_ncols; cbn.
-remember (length (hd [] ll)) as ncols eqn:H; clear H.
-f_equal.
-destruct ll as [| la]; [ easy | ].
-rewrite map_map.
-Theorem glop : ∀ A (la : list A) d,
-  la ≠ []
-  → la = map (λ i, nth i la d) (seq 0 (length la)).
-Proof.
-intros * Hla.
-induction la as [| a]; [ easy | ].
-cbn - [ nth ].
-f_equal.
-...
-rewrite glop with (la := la :: ll) (d := []); [ | easy ].
-Search (map _ _ = map _ _).
-rewrite map_length.
-rewrite seq_length.
 apply map_ext_in.
 intros i Hi.
-...
-revert ncols HM.
-induction ll as [| la]; intros; [ easy | ].
-cbn - [ "=?" ].
-f_equal. {
-  destruct la as [| a]; cbn - [ "=?" ]. {
-    rewrite Nat.eqb_refl.
-...
-intros.
-apply matrix_eq.
-cbn.
-intros.
-rewrite rngl_summation_list_split with (n0 := Fin_nat i).
-destruct n; [ easy | ].
-destruct (Nat.eq_dec (Fin_nat i) 0) as [Hiz| Hiz]. {
-  rewrite Hiz; cbn.
-  unfold iter_list at 1; cbn.
-  rewrite rngl_add_0_l.
-  rewrite rngl_summation_list_cons.
-  destruct (Fin.eq_dec i Fin.F1) as [H1| H1]. {
-    rewrite rngl_mul_1_l.
-    rewrite all_0_rngl_summation_list_0. 2: {
-      intros k Hk.
-      destruct (Fin.eq_dec i k) as [Hik| Hik]. {
-        subst i k; exfalso.
-        clear - Hk.
-Theorem glop : ∀ n, Fin.F1 ∉ map (fin_t_add_succ_l (b:=n)) (Fin_seq 1 n).
-Proof.
-intros * Hk.
-apply in_map_iff in Hk.
-destruct Hk as (k & Hk & Hkn).
-specialize (@Fin_inv) as H1.
-specialize (H1 n k).
-destruct H1 as [H1| H1]. 2: {
-  destruct H1 as (j, Hj).
-  now subst k.
+remember (nth i ll []) as la eqn:Hla.
+replace la with (map (λ i, nth i la 0%F) (seq 0 (length la))). 2: {
+  clear.
+  induction la as [| a]; [ easy | ].
+  cbn; f_equal.
+  rewrite <- seq_shift.
+  now rewrite map_map.
 }
-subst k.
-clear Hk.
-destruct n; [ easy | ].
-cbn in Hkn.
-destruct Hkn as [Hkn| Hkn]; [ easy | ]
-...
-        destruct n; [ easy | ].
-        cbn in Hk.
-        destruct Hk as [| Hk]; [ easy | ].
-...
-        remember (Fin_seq 1 n) as l eqn:Hl; clear Hl.
-        induction n. {
-          cbn in l, Hk.
-        induction n; [ easy | ].
-        cbn in Hk.
-        destruct Hk as [| Hk]; [ easy | ].
-
-        destruct n; [ easy | ].
-        destruct n; [ now destruct Hk | ].
-        destruct n. {
-          cbn in Hk.
-          destruct Hk as [| Hk]; [ easy | now destruct Hk ].
-        }
-        destruct n. {
-          cbn in Hk.
-          destruct Hk as [| Hk]; [ easy | ].
-          destruct Hk as [| Hk]; [ easy | ].
-          destruct Hk as [| Hk]; [ easy | ].
-          easy.
-        }
-...
-
-rewrite rngl_summation_list_split_last with (d := i). 2: {
-
-
-...
-destruct (Nat.eq_dec (Fin_nat i) 0) as [Hiz| Hiz]. {
-  rewrite Hiz; cbn.
-  unfold iter_list at 1; cbn.
-  rewrite rngl_add_0_l.
-...
-  rewrite all_0_rngl_summation_list_0.
-...
-...
-rewrite rngl_summation_list_split_last with (d := i). 2: {
-  destruct n; [ easy | ].
-...
+rewrite (HM la). 2: {
+  rewrite Hla.
+  apply nth_In.
+  now apply in_seq in Hi.
 }
-...
-specialize @rngl_summation_list_split_last as H1.
-
-
-Check @rngl_summation_list_split_last.
-...
-rewrite rngl_summation_list_split_last with (d := Fin.F1).
-...
-destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
-rewrite rngl_mul_1_l.
-rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
-  intros k Hk.
-  destruct (Nat.eq_dec i (k - 1)) as [H| H]; [ flia H Hk | ].
-  now apply rngl_mul_0_l; left.
+apply map_ext_in.
+intros j Hj.
+unfold mat_mul_el.
+rewrite rngl_summation_split with (j0 := i). 2: {
+  split; [ flia | ].
+  apply -> Nat.succ_le_mono.
+  apply in_seq in Hi.
+  rewrite mI_ncols; flia Hi.
 }
-rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
-  intros k Hk.
-  destruct (Nat.eq_dec i k) as [H| H]; [ flia H Hk | ].
-  now apply rngl_mul_0_l; left.
-}
-now rewrite rngl_add_0_l, rngl_add_0_r.
-...
-intros.
-apply matrix_eq.
-cbn.
-intros * Hi Hj.
-rewrite (rngl_summation_split _ i); [ | flia Hi ].
 rewrite rngl_summation_split_last; [ | flia ].
-destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
+rewrite all_0_rngl_summation_0. 2: {
+  intros k Hk.
+  rewrite mat_el_mI_ndiag; [ | flia Hk ].
+  now apply rngl_mul_0_l; left.
+}
+rewrite rngl_add_0_l.
+apply in_seq in Hi.
+rewrite mat_el_mI_diag; [ | easy ].
 rewrite rngl_mul_1_l.
-rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
+remember (Σ (k = _, _), _) as x; cbn; subst x.
+rewrite <- Hla.
+rewrite all_0_rngl_summation_0. 2: {
   intros k Hk.
-  destruct (Nat.eq_dec i (k - 1)) as [H| H]; [ flia H Hk | ].
+  rewrite mat_el_mI_ndiag; [ | flia Hk ].
   now apply rngl_mul_0_l; left.
 }
-rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
-  intros k Hk.
-  destruct (Nat.eq_dec i k) as [H| H]; [ flia H Hk | ].
-  now apply rngl_mul_0_l; left.
-}
-now rewrite rngl_add_0_l, rngl_add_0_r.
+apply rngl_add_0_r.
 Qed.
+
+...
 
 Theorem mat_mul_1_r : ∀ {n} (M : matrix n n T), (M * mI n)%M = M.
 Proof.

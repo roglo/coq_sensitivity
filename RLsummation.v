@@ -614,4 +614,5 @@ Arguments rngl_summation_map_seq {T ro rp} A%type (start len)%nat
   (f g)%function.
 Arguments rngl_summation_only_one {T}%type {ro rp} g%function n%nat.
 Arguments rngl_summation_permut {T}%type {ro rp} n%nat (l1 l2)%list.
+Arguments rngl_summation_split {T}%type {ro rp} j%nat g%function (b k)%nat.
 Arguments rngl_summation_split_first {T}%type {ro rp} (b k)%nat g%function.
