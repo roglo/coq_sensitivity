@@ -506,10 +506,61 @@ rewrite all_0_rngl_summation_0. 2: {
 apply rngl_add_0_r.
 Qed.
 
-...
-
-Theorem mat_mul_1_r : ∀ {n} (M : matrix n n T), (M * mI n)%M = M.
+Theorem mat_mul_1_r : ∀ (M : matrix T),
+  is_correct_matrix M
+  → (M * mI (mat_ncols M))%M = M.
 Proof.
+intros * HM.
+unfold is_correct_matrix, mat_ncols in HM.
+unfold "*"%M.
+rewrite mI_ncols.
+destruct M as (ll); cbn in HM |-*.
+f_equal.
+unfold mat_ncols; cbn.
+remember (length (hd [] ll)) as ncols eqn:H; clear H.
+remember (map _ _) as x.
+rewrite List_eq_map_seq with (d := []); subst x.
+apply map_ext_in.
+intros i Hi.
+remember (nth i ll []) as la eqn:Hla.
+rewrite List_eq_map_seq with (d := 0%F).
+rewrite (HM la). 2: {
+  rewrite Hla.
+  apply nth_In.
+  now apply in_seq in Hi.
+}
+apply map_ext_in.
+intros j Hj.
+unfold mat_mul_el.
+rewrite rngl_summation_split with (j0 := i). 2: {
+  split; [ flia | ].
+  apply -> Nat.succ_le_mono.
+  apply in_seq in Hi.
+  unfold mat_ncols; cbn.
+...
+  rewrite mI_ncols.
+  rewrite mI_ncols; flia Hi.
+}
+rewrite rngl_summation_split_last; [ | flia ].
+rewrite all_0_rngl_summation_0. 2: {
+  intros k Hk.
+  rewrite mat_el_mI_ndiag; [ | flia Hk ].
+  now apply rngl_mul_0_l; left.
+}
+rewrite rngl_add_0_l.
+apply in_seq in Hi.
+rewrite mat_el_mI_diag; [ | easy ].
+rewrite rngl_mul_1_l.
+remember (Σ (k = _, _), _) as x; cbn; subst x.
+rewrite <- Hla.
+rewrite all_0_rngl_summation_0. 2: {
+  intros k Hk.
+  rewrite mat_el_mI_ndiag; [ | flia Hk ].
+  now apply rngl_mul_0_l; left.
+}
+apply rngl_add_0_r.
+Qed.
+...
 intros.
 apply matrix_eq.
 cbn.
