@@ -532,62 +532,45 @@ rewrite (HM la). 2: {
 apply map_ext_in.
 intros j Hj.
 unfold mat_mul_el.
-...
+unfold mat_ncols at 1.
+cbn - [ mat_el ].
+destruct ll as [| lb]. {
+  subst la.
+  cbn - [ mat_el nth ].
+  rewrite rngl_summation_only_one.
+  replace (mat_el _ _ _) with 0%F by now destruct i.
+  rewrite rngl_mul_0_l; [ | now left ].
+  now destruct i.
+}
+cbn - [ mat_el ].
+rewrite (HM lb (or_introl eq_refl)).
 rewrite rngl_summation_split with (j0 := j). 2: {
   split; [ flia | ].
   apply -> Nat.succ_le_mono.
   apply in_seq in Hj.
-  unfold mat_ncols; cbn.
-  destruct ll as [| lb]. {
-    cbn.
-    clear la Hla.
-...
-  specialize (HM (hd [] ll)).
-Search (hd _ _ ∈ _).
-...
-  rewrite mI_ncols.
-  rewrite mI_ncols; flia Hi.
+  flia Hj.
 }
 rewrite rngl_summation_split_last; [ | flia ].
 rewrite all_0_rngl_summation_0. 2: {
   intros k Hk.
   rewrite mat_el_mI_ndiag; [ | flia Hk ].
-  now apply rngl_mul_0_l; left.
+  now apply rngl_mul_0_r; left.
 }
 rewrite rngl_add_0_l.
-apply in_seq in Hi.
+apply in_seq in Hj.
 rewrite mat_el_mI_diag; [ | easy ].
-rewrite rngl_mul_1_l.
-remember (Σ (k = _, _), _) as x; cbn; subst x.
-rewrite <- Hla.
+rewrite rngl_mul_1_r.
 rewrite all_0_rngl_summation_0. 2: {
   intros k Hk.
   rewrite mat_el_mI_ndiag; [ | flia Hk ].
-  now apply rngl_mul_0_l; left.
+  now apply rngl_mul_0_r; left.
 }
-apply rngl_add_0_r.
+rewrite rngl_add_0_r.
+subst la; cbn.
+now destruct i, j.
 Qed.
+
 ...
-intros.
-apply matrix_eq.
-cbn.
-intros * Hi Hj.
-rewrite (rngl_summation_split _ j); [ | flia Hj ].
-rewrite rngl_summation_split_last; [ | flia ].
-destruct (Nat.eq_dec j j) as [H| H]; [ clear H | easy ].
-rewrite rngl_mul_1_r.
-rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
-  intros k Hk.
-  destruct (Nat.eq_dec (k - 1) j) as [H| H]; [ flia H Hk | ].
-  now apply rngl_mul_0_r; left.
-}
-rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
-  intros k Hk.
-  destruct (Nat.eq_dec k j) as [H| H]; [ flia H Hk | ].
-  now apply rngl_mul_0_r; left.
-}
-now rewrite rngl_add_0_l, rngl_add_0_r.
-Qed.
 
 Theorem vect_mul_1_l : ∀ {n} (V : vector n T), (mI n • V)%M = V.
 Proof.
