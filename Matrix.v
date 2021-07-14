@@ -414,23 +414,6 @@ destruct n; cbn - [ "=?" ]; [ easy | ].
 now rewrite map_length, seq_length.
 Qed.
 
-Theorem mat_el_nI_0_succ : ∀ n i, mat_el (mI n) 0 (S i) = 0%F.
-Proof.
-intros.
-unfold mat_el, mI; cbn.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
-apply Nat.neq_0_lt_0 in Hnz.
-rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
-destruct (lt_dec (S i) n) as [Hsin| Hsin]. {
-  rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
-  rewrite seq_nth; [ | easy ].
-  now rewrite seq_nth.
-}
-apply Nat.nlt_ge in Hsin.
-rewrite nth_overflow; [ easy | ].
-now rewrite map_length, seq_length.
-Qed.
-
 Theorem mat_el_mI_ndiag : ∀ n i j, i ≠ j → mat_el (mI n) i j = 0%F.
 Proof.
 intros * Hij.
@@ -489,8 +472,7 @@ cbn; f_equal. {
     rewrite all_0_rngl_summation_0. 2: {
       intros i Hi.
       destruct i; [ easy | ].
-...
-rewrite mat_el_mI_ndiag; [ | easy ].
+      rewrite mat_el_mI_ndiag; [ | easy ].
 ...
 cbn - [ seq ].
 rewrite seq_S; cbn.
