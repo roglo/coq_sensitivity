@@ -444,16 +444,25 @@ cbn; f_equal. {
     rewrite all_0_rngl_summation_0. 2: {
       intros i Hi.
       destruct i; [ easy | ].
-Theorem mI_ndiag : ∀ n i j, i ≠ j → mat_el (mI n) i j = 0%F.
+Theorem mat_el_mI_ndiag : ∀ n i j, i ≠ j → mat_el (mI n) i j = 0%F.
 Proof.
 intros * Hij.
-cbn.
+revert i j Hij.
+induction n; intros; [ now destruct i, j | ].
+destruct i. {
+  destruct j; [ easy | ].
+Theorem mat_el_nI_0_succ : ∀ n i, mat_el (mI n) 0 (S i) = 0%F.
+Proof.
+intros.
+revert i.
+induction n; intros; [ easy | ].
+unfold mI.
 ...
 intros * Hij.
 revert i j Hij.
 induction n; intros; [ now destruct i, j | ].
 ...
-rewrite mI_ndiag; [ | easy ].
+rewrite mat_el_mI_ndiag; [ | easy ].
 ...
 cbn - [ seq ].
 rewrite seq_S; cbn.
