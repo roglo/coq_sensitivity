@@ -414,6 +414,23 @@ destruct n; cbn - [ "=?" ]; [ easy | ].
 now rewrite map_length, seq_length.
 Qed.
 
+Theorem mat_el_nI_0_succ : ∀ n i, mat_el (mI n) 0 (S i) = 0%F.
+Proof.
+intros.
+unfold mat_el, mI; cbn.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+apply Nat.neq_0_lt_0 in Hnz.
+rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
+destruct (lt_dec (S i) n) as [Hsin| Hsin]. {
+  rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
+  now rewrite seq_nth.
+}
+apply Nat.nlt_ge in Hsin.
+rewrite nth_overflow; [ easy | ].
+now rewrite map_length, seq_length.
+Qed.
+
 (* multiplication left and right with identity *)
 
 Theorem mat_mul_1_l : ∀ (M : matrix T),
@@ -451,16 +468,8 @@ revert i j Hij.
 induction n; intros; [ now destruct i, j | ].
 destruct i. {
   destruct j; [ easy | ].
-Theorem mat_el_nI_0_succ : ∀ n i, mat_el (mI n) 0 (S i) = 0%F.
-Proof.
-intros.
-revert i.
-induction n; intros; [ easy | ].
-unfold mI.
-...
-intros * Hij.
-revert i j Hij.
-induction n; intros; [ now destruct i, j | ].
+  apply mat_el_nI_0_succ.
+}
 ...
 rewrite mat_el_mI_ndiag; [ | easy ].
 ...
