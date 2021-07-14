@@ -466,8 +466,18 @@ destruct M as (ll); cbn in HM |-*.
 f_equal.
 unfold mat_ncols; cbn.
 remember (length (hd [] ll)) as ncols eqn:H; clear H.
-revert ncols HM.
+remember (length ll) as nrows eqn:H.
+rewrite H at 1.
+assert (Hr : nrows ≤ length ll) by flia H; clear H.
+revert nrows ncols HM Hr.
 induction ll as [| la]; intros; [ easy | ].
+cbn - [ seq ].
+rewrite seq_S; cbn.
+rewrite map_app.
+cbn.
+(* ah pute vierge ! *)
+rewrite IHll.
+...
 cbn; f_equal. {
   clear IHll.
   specialize (HM la (or_introl eq_refl)).
