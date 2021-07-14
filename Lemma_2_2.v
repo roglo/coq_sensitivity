@@ -830,7 +830,7 @@ rewrite Ha.
 (* (rngl_of_nat n × mI (2 ^ n)) . V = rngl_of_nat n × V *)
 rewrite <- mat_mul_scal_vect_assoc; [ | easy ].
 (* rngl_of_nat n × (mI (2 ^ n) . V) = rngl_of_nat n × V *)
-rewrite vect_mul_1_l; easy.
+rewrite mat_vect_mul_1_l; easy.
 Qed.
 
 Definition is_eigenvector_of_An n μ (V : vector (2 ^ n) T) :=

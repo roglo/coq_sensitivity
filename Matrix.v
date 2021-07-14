@@ -570,10 +570,12 @@ subst la; cbn.
 now destruct i, j.
 Qed.
 
-...
-
-Theorem vect_mul_1_l : ∀ {n} (V : vector n T), (mI n • V)%M = V.
+Theorem mat_vect_mul_1_l : ∀ (V : vector T), (mI (vect_size V) • V)%M = V.
 Proof.
+intros.
+apply vector_eq; cbn.
+intros.
+...
 intros.
 apply vector_eq; cbn.
 intros * Hi.
@@ -1110,7 +1112,7 @@ Arguments mI {T ro} n%nat.
 Arguments mZ {T ro} (m n)%nat.
 Arguments minus_one_pow {T ro}.
 Arguments subm {T} {m n}%nat M%M i%nat j%nat.
-Arguments vect_mul_1_l {T}%type {ro rp} Hro {n}%nat V%V.
+Arguments mat_vect_mul_1_l {T}%type {ro rp} Hro {n}%nat V%V.
 
 Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.
