@@ -466,23 +466,12 @@ destruct M as (ll); cbn in HM |-*.
 f_equal.
 unfold mat_ncols; cbn.
 remember (length (hd [] ll)) as ncols eqn:H; clear H.
-replace ll with (map (λ i, nth i ll []) (seq 0 (length ll))) at 2. 2: {
-  clear.
-  induction ll as [| la]; [ easy | ].
-  cbn; f_equal.
-  rewrite <- seq_shift.
-  now rewrite map_map.
-}
+remember (map _ _) as x.
+rewrite List_eq_map_seq with (d := []); subst x.
 apply map_ext_in.
 intros i Hi.
 remember (nth i ll []) as la eqn:Hla.
-replace la with (map (λ i, nth i la 0%F) (seq 0 (length la))). 2: {
-  clear.
-  induction la as [| a]; [ easy | ].
-  cbn; f_equal.
-  rewrite <- seq_shift.
-  now rewrite map_map.
-}
+rewrite List_eq_map_seq with (d := 0%F).
 rewrite (HM la). 2: {
   rewrite Hla.
   apply nth_In.

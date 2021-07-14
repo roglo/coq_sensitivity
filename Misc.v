@@ -1649,6 +1649,16 @@ intros.
 now specialize (Hll d (S i)).
 Qed.
 
+Theorem List_eq_map_seq : ∀ A (la : list A) d,
+  la = map (λ i, nth i la d) (seq 0 (length la)).
+Proof.
+intros.
+induction la as [| a]; [ easy | ].
+cbn; f_equal.
+rewrite <- seq_shift.
+now rewrite map_map.
+Qed.
+
 (* common for summations and products *)
 
 Theorem fold_left_op_fun_from_d : ∀ T A d op a l (f : A → _)
