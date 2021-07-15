@@ -662,9 +662,11 @@ Qed.
 Theorem mat_mul_assoc :
   ∀ (MA : matrix T) (MB : matrix T) (MC : matrix T),
   mat_nrows MB ≠ 0
+  → mat_ncols MB ≠ 0
+  → mat_ncols MA = mat_nrows MB
   → (MA * (MB * MC))%M = ((MA * MB) * MC)%M.
 Proof.
-intros * Hrbz.
+intros * Hrbz Hcbz Hcarb.
 unfold "*"%M.
 f_equal.
 unfold mat_nrows at 5; cbn.
@@ -691,6 +693,45 @@ rewrite List_map_nth_in with (a := 0). 2: {
   flia Hraz.
 }
 rewrite map_length, seq_length.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  rewrite List_map_nth_in with (a := 0). 2: {
+    rewrite seq_length.
+    rewrite Hcarb in Hk.
+    flia Hrbz Hk.
+  }
+  rewrite List_map_nth_in with (a := 0). 2: {
+    rewrite seq_length.
+    now apply in_seq in Hj.
+  }
+  erewrite rngl_summation_eq_compat. 2: {
+    intros m Hm.
+    rewrite seq_nth; [ | rewrite Hcarb in Hk; flia Hrbz Hk ].
+    rewrite seq_nth; [ | now apply in_seq in Hj ].
+    easy.
+  }
+  easy.
+}
+cbn.
+erewrite rngl_summation_eq_compat with (k := mat_ncols MB - 1). 2: {
+  intros k Hk.
+  rewrite List_map_nth_in with (a := 0). 2: {
+    rewrite seq_length.
+    now apply in_seq in Hi.
+  }
+  rewrite List_map_nth_in with (a := 0). 2: {
+    rewrite seq_length.
+    flia Hcbz Hk.
+  }
+  erewrite rngl_summation_eq_compat. 2: {
+    intros m Hm.
+    rewrite seq_nth; [ | now apply in_seq in Hi ].
+    rewrite seq_nth; [ | flia Hcbz Hk ].
+    easy.
+  }
+  easy.
+}
+cbn.
 ...
 intros.
 apply matrix_eq.
