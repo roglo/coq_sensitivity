@@ -603,8 +603,9 @@ destruct x as [x| ]. {
       unfold iter_list at 1.
       cbn - [ "=?" ].
       rewrite rngl_add_0_l.
-...
-      rewrite rngl_summation_list_split_first with (d := 0%F).
+      rewrite rngl_summation_list_split_first with (d := 0%F). 2: {
+        now destruct la.
+      }
 ...
 cbn.
     rewrite rngl_summation_list_split_last with (d := 0%F). 2: {
