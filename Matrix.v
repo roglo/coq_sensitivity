@@ -249,7 +249,6 @@ Delimit Scope M_scope with M.
 
 Arguments mat_add {T ro} MA%M MB%M.
 Arguments mat_mul {T ro} MA%M MB%M.
-About mat_mul_el.
 Arguments mat_mul_el {T}%type {ro} (MA MB)%M (i k)%nat.
 Arguments mat_mul_scal_l {T ro} s%F M%M.
 Arguments mat_opp {T}%type {ro}.
@@ -573,8 +572,39 @@ Qed.
 Theorem mat_vect_mul_1_l : ∀ (V : vector T), (mI (vect_size V) • V)%M = V.
 Proof.
 intros.
+apply vector_eq.
+intros i.
+remember (nth_error _ _) as x eqn:Hx in |-*; symmetry in Hx.
+remember (nth_error _ _) as y eqn:Hy in |-*; symmetry in Hy.
+move y before x.
+destruct x as [x| ]. {
+Search (nth_error _ _ = Some _).
+...
+  apply List_nth_error_Some_iff with (d := 0%F) in Hx.
+  apply nth_error_nth with (d := 0%F) in Hx.
+  destruct y as [y| ]. {
+    apply nth_error_nth with (d := 0%F) in Hy.
+    f_equal.
+    subst x y; cbn.
+    rewrite List_map_nth_in with (a := []). 2: {
+      rewrite map_length, seq_length.
+...
+    cbn in Hx.
+    apply in_map_iff in Hx.
+    destruct Hx as (la & Hvla & Hla).
+    apply in_map_iff in Hla.
+    destruct Hla as (k & Hvk & Hk).
+    destruct V as (lb).
+    cbn in Hvk, Hk, Hy.
+    unfold vect_dot_mul in Hvla.
+    cbn in Hvla.
+    move lb after la.
+Search (map _ (seq _ _)).
+Search nth_error.
+...
 apply vector_eq; cbn.
 intros.
+Print nth_error.
 ...
 intros.
 apply vector_eq; cbn.

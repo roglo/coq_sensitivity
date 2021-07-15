@@ -1551,6 +1551,22 @@ apply nth_overflow.
 now rewrite repeat_length.
 Qed.
 
+Theorem List_nth_error_Some_iff : ∀ A (l : list A) n x d,
+  nth_error l n = Some x ↔ nth n l d = x ∧ n < length l.
+Proof.
+intros.
+split. {
+  intros Hx.
+  split; [ now apply nth_error_nth | ].
+  apply nth_error_Some.
+  congruence.
+} {
+  intros (Hn, Hx).
+  subst x.
+  now apply nth_error_nth'.
+}
+Qed.
+
 Theorem List_app_cons : ∀ A (l1 l2 : list A) a,
   l1 ++ a :: l2 = l1 ++ [a] ++ l2.
 Proof. easy. Qed.
