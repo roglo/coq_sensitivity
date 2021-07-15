@@ -1422,6 +1422,12 @@ destruct lb as [| b]; [ easy | cbn ].
 now rewrite IHla.
 Qed.
 
+Theorem map2_nil_r : ∀ A B C (f : A → B → C) la, map2 f la [] = [].
+Proof.
+intros.
+now destruct la.
+Qed.
+
 Theorem firstn_map2 : ∀ A B C (f : A → B → C) n la lb,
   firstn n (map2 f la lb) = map2 f (firstn n la) (firstn n lb).
 Proof.
@@ -1433,6 +1439,22 @@ induction la as [| a]; cbn; intros. {
 destruct lb as [| b]. {
   do 2 rewrite firstn_nil.
   now destruct n.
+}
+destruct n; [ easy | cbn ].
+now rewrite IHla.
+Qed.
+
+Theorem skipn_map2 : ∀ A B C (f : A → B → C) n la lb,
+  skipn n (map2 f la lb) = map2 f (skipn n la) (skipn n lb).
+Proof.
+intros.
+revert n lb.
+induction la as [| a]; cbn; intros. {
+  now do 2 rewrite skipn_nil.
+}
+destruct lb as [| b]. {
+  do 2 rewrite skipn_nil.
+  now rewrite map2_nil_r.
 }
 destruct n; [ easy | cbn ].
 now rewrite IHla.
@@ -1708,15 +1730,6 @@ Qed.
 Theorem List_last_cons_cons : ∀ A l (x y d : A),
   last (x :: y :: l) d = last (y :: l) d.
 Proof. easy. Qed.
-
-Theorem List_skipn_map : ∀ A B (f : A → B) l n,
-  skipn n (map f l) = map f (skipn n l).
-Proof.
-intros.
-revert n.
-induction l as [| a]; intros; [ now do 2 rewrite skipn_nil | cbn ].
-destruct n; [ easy | cbn; apply IHl ].
-Qed.
 
 Theorem List_skipn_seq : ∀ n start len,
   n ≤ len → skipn n (seq start len) = seq (start + n) (len - n).

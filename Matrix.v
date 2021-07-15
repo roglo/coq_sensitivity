@@ -599,6 +599,26 @@ destruct x as [x| ]. {
     rewrite map2_map_l.
     rewrite seq_nth; [ cbn | easy ].
     rewrite rngl_summation_list_split with (n := i).
+(*1*)
+    rewrite all_0_rngl_summation_list_0. 2: {
+      intros j Hj.
+      rewrite firstn_map2 in Hj.
+      rewrite List_firstn_seq in Hj.
+      rewrite Nat.min_l in Hj; [ | flia Hiv ].
+      apply in_map2_iff in Hj.
+      destruct Hj as (k & Hkm & a & b & Hk).
+      subst j.
+      rewrite seq_length, firstn_length in Hkm.
+      rewrite Nat.min_assoc in Hkm.
+      rewrite Nat.min_id in Hkm.
+      apply Nat.min_glb_lt_iff in Hkm.
+      rewrite seq_nth; [ | easy ].
+      rewrite if_eqb_eq_dec, Nat.add_0_l.
+      destruct (Nat.eq_dec i k) as [H| H]; [ flia Hkm H | clear H ].
+      now apply rngl_mul_0_l; left.
+    }
+    rewrite rngl_add_0_l.
+...1
     destruct i. {
       unfold iter_list at 1.
       cbn - [ "=?" ].
@@ -630,6 +650,7 @@ destruct x as [x| ]. {
       }
       apply rngl_add_0_r.
     }
+...
     rewrite rngl_summation_list_split_last with (d := 0%F). 2: {
       revert i Hiv.
       now induction la.
@@ -652,13 +673,22 @@ destruct x as [x| ]. {
       now apply rngl_mul_0_l; left.
     }
     rewrite rngl_add_0_l.
+...
     rewrite all_0_rngl_summation_list_0. 2: {
       intros j Hj.
-...
-      rewrite List_skipn_cons_nth_skipn_succ with (d := 0%F) in Hj. 2: {
-        rewrite map2_length.
-        now rewrite seq_length, Nat.min_id.
-      }
+      rewrite skipn_map2 in Hj.
+      rewrite List_skipn_seq in Hj; [ | flia Hiv ].
+      rewrite Nat.add_0_l in Hj.
+      apply in_map2_iff in Hj.
+      destruct Hj as (k & Hkm & a & b & Hk).
+      subst j.
+      rewrite seq_length, skipn_length, Nat.min_id in Hkm.
+      rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec (S i) (nth k (seq (S i) (length la - S i)) a))
+        as [Hik| Hik]. {
+        rewrite rngl_mul_1_l.
+        rewrite seq_nth in Hik; [ | easy ].
+        replace k with 0 by flia Hik.
 ...
 intros.
 apply vector_eq; cbn.
