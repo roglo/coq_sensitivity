@@ -640,6 +640,8 @@ destruct x as [x| ]. {
         rewrite map2_length, seq_length.
         rewrite Nat.min_id; flia Hiv.
       }
+      rewrite firstn_map2 in Hj.
+      rewrite List_firstn_seq in Hj.
 ...
 intros.
 apply vector_eq; cbn.

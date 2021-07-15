@@ -1422,6 +1422,22 @@ destruct lb as [| b]; [ easy | cbn ].
 now rewrite IHla.
 Qed.
 
+Theorem firstn_map2 : ∀ A B C (f : A → B → C) n la lb,
+  firstn n (map2 f la lb) = map2 f (firstn n la) (firstn n lb).
+Proof.
+intros.
+revert n lb.
+induction la as [| a]; cbn; intros. {
+  now do 2 rewrite firstn_nil.
+}
+destruct lb as [| b]. {
+  do 2 rewrite firstn_nil.
+  now destruct n.
+}
+destruct n; [ easy | cbn ].
+now rewrite IHla.
+Qed.
+
 (* end map2 *)
 
 Theorem not_equiv_imp_False : ∀ P : Prop, (P → False) ↔ ¬ P.
@@ -1544,16 +1560,6 @@ rewrite IHl. 2: {
   now apply Hg; right.
 }
 now apply Hg; left.
-Qed.
-
-Theorem List_firstn_map {A B} : ∀ n l (f : A → B),
-  firstn n (map f l) = map f (firstn n l).
-Proof.
-intros.
-revert n.
-induction l as [| a l]; intros; [ now cbn; do 2 rewrite firstn_nil | ].
-destruct n; [ easy | cbn ].
-now rewrite IHl.
 Qed.
 
 Theorem List_list_prod_nil_r {A B} : ∀ l : list A,
