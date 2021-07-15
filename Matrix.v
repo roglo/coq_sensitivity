@@ -618,6 +618,59 @@ destruct x as [x| ]. {
       now apply rngl_mul_0_l; left.
     }
     rewrite rngl_add_0_l.
+    rewrite skipn_map2.
+    rewrite List_skipn_seq; [ cbn | flia Hiv ].
+    revert i Hiv.
+    induction la as [| a]; intros; [ easy | ].
+    destruct i. {
+      cbn.
+      rewrite rngl_mul_1_l.
+      rewrite rngl_summation_list_cons.
+      rewrite all_0_rngl_summation_list_0. 2: {
+        intros i Hi.
+        rewrite <- seq_shift in Hi.
+        rewrite map2_map_l in Hi.
+        apply in_map2_iff in Hi.
+        destruct Hi as (k & Hkm & a' & b & Hk).
+        rewrite rngl_mul_0_l in Hk; [ easy | now left ].
+      }
+      apply rngl_add_0_r.
+    }
+    cbn - [ "=?" ].
+    rewrite <- seq_shift.
+    rewrite map2_map_l.
+    cbn in Hiv.
+    apply Nat.succ_lt_mono in Hiv.
+    specialize (IHla _ Hiv) as H1.
+Search (map2 _ _ _ = map2 _ _ _).
+Search (map _ _ = map _ _).
+Print map2.
+...
+erewrite map2_ext_in. 2: {
+  intros j k Hj Hk.
+  now cbn.
+}
+apply H1.
+}
+  Search (S _ =? S _).
+map_ext_in:
+  ∀ (A B : Type) (f g : A → B) (l : list A),
+    (∀ a : A, a ∈ l → f a = g a) → map f l = map g l
+...
+        destruct la as [| a']; [ easy | ].
+        cbn - [ "=?" ] in Hi.
+        rewrite <- seq_shift in Hi.
+        rewrite map2_map_l in Hi.
+        cbn in Hi.
+        clear a Hiv.
+        induction la as [| a]; [ easy | ].
+        destruct Hi as [Hi| Hi]. {
+          rewrite rngl_mul_0_l in Hi; [ easy | now left ].
+        }
+        rewrite <- seq_shift in Hi.
+        rewrite map2_map_l in Hi.
+        now apply IHla.
+      }
 ...1
     destruct i. {
       unfold iter_list at 1.

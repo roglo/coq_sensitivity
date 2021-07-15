@@ -1493,6 +1493,11 @@ split. {
 }
 Qed.
 
+Theorem map2_ext_in : ∀ A B C (f g : A → B → C) la lb,
+  (∀ a b, a ∈ la → b ∈ lb → f a b = g a b) → map2 f la lb = map2 g la lb.
+Proof.
+...
+
 (* end map2 *)
 
 Theorem not_equiv_imp_False : ∀ P : Prop, (P → False) ↔ ¬ P.
