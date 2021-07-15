@@ -637,9 +637,9 @@ destruct x as [x| ]. {
     rewrite all_0_rngl_summation_list_0. 2: {
       intros j Hj.
       rewrite removelast_firstn in Hj. 2: {
-Search (length (map2 _ _ _)).
-...
-        rewrite map2_length.
+        rewrite map2_length, seq_length.
+        rewrite Nat.min_id; flia Hiv.
+      }
 ...
 intros.
 apply vector_eq; cbn.

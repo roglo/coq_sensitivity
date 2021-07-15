@@ -1350,6 +1350,8 @@ destruct b, c; cbn - [ "-" ]. {
 }
 Qed.
 
+(* map2: map with two lists *)
+
 Fixpoint map2 {A B C} (f : A → B → C) la lb :=
   match la with
   | [] => []
@@ -1409,6 +1411,18 @@ induction lc as [| c]; intros; [ easy | cbn ].
 destruct ld as [| d]; [ easy | cbn ].
 apply IHlc.
 Qed.
+
+Theorem map2_length : ∀ A B C (f : A → B → C) la lb,
+  length (map2 f la lb) = min (length la) (length lb).
+Proof.
+intros.
+revert lb.
+induction la as [| a]; intros; [ easy | cbn ].
+destruct lb as [| b]; [ easy | cbn ].
+now rewrite IHla.
+Qed.
+
+(* end map2 *)
 
 Theorem not_equiv_imp_False : ∀ P : Prop, (P → False) ↔ ¬ P.
 Proof. easy. Qed.
