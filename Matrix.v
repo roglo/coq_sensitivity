@@ -642,84 +642,23 @@ destruct x as [x| ]. {
       }
       rewrite firstn_map2 in Hj.
       rewrite List_firstn_seq in Hj.
-Search (map2 _ (seq _ _)).
-Search (_ ∈ map2 _ _ _).
-Search (_ ∈ map _ _).
-Print map2.
-Theorem in_map2_iff : ∀ A B C (f : A → B → C) la lb c,
-  c ∈ map2 f la lb ↔ ∃ i a b, i < min (length la) (length lb) ∧ f (nth i la a) (nth i lb b) = c.
-Proof.
-intros.
-split. {
-  intros Hc.
-  revert lb Hc.
-  induction la as [| a]; intros; [ easy | ].
-  destruct lb as [| b]; [ easy | ].
-  cbn in Hc.
-  destruct Hc as [Hc| Hc]. {
-    exists 0, a, b.
-    split; [ cbn; flia | easy ].
-  }
-  specialize (IHla _ Hc) as H1.
-  destruct H1 as (i & a' & b' & Him & Hi).
-  destruct la as [| a'']; [ easy | ].
-  destruct lb as [| b'']; [ easy | ].
-  cbn in Hc.
-  destruct Hc as [Hc| Hc]. {
-    exists (S i), a'', b''.
-    split. {
-      cbn in Him |-*.
-      now apply Nat.succ_lt_mono in Him.
+      apply in_map2_iff in Hj.
+      destruct Hj as (k & Hkm & a & b & Hk).
+      subst j.
+      rewrite seq_length, firstn_length, Nat.min_id in Hkm.
+      rewrite seq_nth; [ | easy ].
+      rewrite if_eqb_eq_dec, Nat.add_0_l.
+      destruct (Nat.eq_dec (S i) k) as [Hsik| Hsik]; [ flia Hkm Hsik | ].
+      now apply rngl_mul_0_l; left.
     }
-    cbn.
-    destruct i; [ easy | ].
+    rewrite rngl_add_0_l.
+    rewrite all_0_rngl_summation_list_0. 2: {
+      intros j Hj.
 ...
-Search (nth _ (_ :: _)).
-Check nth_S_cons.
-  exists i.
-  destruct i; cbn. {
-    cbn in Hc.
-    destruct Hc as [Hc| Hc]. {
-      cbn in Hi.
-, a', b'.
-  split; [ cbn; flia Him | ].
-  destruct i; cbn. {
-    destruct la as [| a'']; [ easy | ].
-    destruct lb as [| b'']; [ easy | ].
-    cbn in Hc.
-    destruct Hc as [Hc| Hc]. {
-      cbn in Hi.
-
-easy.
-  now do 2 rewrite firstn_nil.
-}
-destruct lb as [| b]. {
-  do 2 rewrite firstn_nil.
-  now destruct n.
-}
-destruct n; [ easy | cbn ].
-now rewrite IHla.
-Qed.
-...
-apply in_map2_iff in Hj.
-destruct Hj as (k & Hk).
-specialize (Hk 0 0%F).
-destruct (lt_dec k (min i (length la))) as [Hkm| Hkm]. {
-  rewrite <- Hk.
-  rewrite seq_nth; [ | easy ].
-  apply Nat.min_glb_lt_iff in Hkm.
-  destruct Hkm as (Hki, Hka).
-  rewrite if_eqb_eq_dec; cbn - [ Nat.eq_dec ].
-  destruct (Nat.eq_dec (S i) k) as [Hik| Hik]; [ flia Hki Hik | ].
-  now apply rngl_mul_0_l; left.
-}
-apply Nat.nlt_ge in Hkm.
-rewrite nth_overflow in Hk; [ | now rewrite seq_length ].
-cbn in Hk.
-rewrite rngl_mul_0_l in Hk; [ easy | now left ].
-}
-...
-in_map_iff: ∀ (A B : Type) (f : A → B) (l : list A) (y : B), y ∈ map f l ↔ (∃ x : A, f x = y ∧ x ∈ l)
+      rewrite List_skipn_cons_nth_skipn_succ with (d := 0%F) in Hj. 2: {
+        rewrite map2_length.
+        now rewrite seq_length, Nat.min_id.
+      }
 ...
 intros.
 apply vector_eq; cbn.

@@ -1438,6 +1438,39 @@ destruct n; [ easy | cbn ].
 now rewrite IHla.
 Qed.
 
+Theorem in_map2_iff : ∀ A B C (f : A → B → C) la lb c,
+  c ∈ map2 f la lb ↔
+  ∃ i,
+  i < min (length la) (length lb) ∧ ∃ a b, f (nth i la a) (nth i lb b) = c.
+Proof.
+intros.
+split. {
+  intros Hc.
+  revert lb Hc.
+  induction la as [| a]; intros; [ easy | ].
+  destruct lb as [| b]; [ easy | ].
+  cbn in Hc.
+  destruct Hc as [Hc| Hc]. {
+    exists 0.
+    split; [ cbn; flia | now exists a, b ].
+  }
+  specialize (IHla _ Hc) as H1.
+  destruct H1 as (i & Him & a' & b' & Hi).
+  exists (S i).
+  split; [ cbn; flia Him | ].
+  now exists a', b'.
+} {
+  intros (i & Him & a' & b' & Hi).
+  revert lb i Him Hi.
+  induction la as [| a]; intros; [ easy | ].
+  destruct lb as [| b]; [ easy | ].
+  cbn in Him, Hi |-*.
+  destruct i; [ now left | right ].
+  apply Nat.succ_lt_mono in Him.
+  now apply IHla in Hi.
+}
+Qed.
+
 (* end map2 *)
 
 Theorem not_equiv_imp_False : ∀ P : Prop, (P → False) ↔ ¬ P.
