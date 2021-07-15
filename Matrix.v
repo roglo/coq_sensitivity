@@ -659,12 +659,39 @@ Qed.
 
 (* associativity of multiplication *)
 
-...
-
-Theorem mat_mul_assoc {m n p q} :
-  ∀ (MA : matrix m n T) (MB : matrix n p T) (MC : matrix p q T),
-  (MA * (MB * MC))%M = ((MA * MB) * MC)%M.
+Theorem mat_mul_assoc :
+  ∀ (MA : matrix T) (MB : matrix T) (MC : matrix T),
+  mat_nrows MB ≠ 0
+  → (MA * (MB * MC))%M = ((MA * MB) * MC)%M.
 Proof.
+intros * Hrbz.
+unfold "*"%M.
+f_equal.
+unfold mat_nrows at 5; cbn.
+rewrite map_length, seq_length.
+apply map_ext_in.
+intros i Hi.
+unfold mat_ncols at 2; cbn.
+rewrite List_hd_nth_0.
+rewrite List_map_nth_in with (a := 0). 2: {
+  rewrite seq_length; flia Hrbz.
+}
+rewrite map_length, seq_length.
+apply map_ext_in.
+intros j Hj.
+move j before i.
+unfold mat_mul_el.
+unfold mat_ncols at 4.
+rewrite List_hd_nth_0; cbn.
+rewrite List_map_nth_in with (a := 0). 2: {
+  rewrite seq_length.
+  destruct (Nat.eq_dec (mat_nrows MA) 0) as [Hraz| Hraz]. {
+    now rewrite Hraz in Hi.
+  }
+  flia Hraz.
+}
+rewrite map_length, seq_length.
+...
 intros.
 apply matrix_eq.
 intros i j Hi Hj.
