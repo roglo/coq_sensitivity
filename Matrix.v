@@ -599,7 +599,6 @@ destruct x as [x| ]. {
     rewrite map2_map_l.
     rewrite seq_nth; [ cbn | easy ].
     rewrite rngl_summation_list_split with (n := i).
-(*1*)
     rewrite all_0_rngl_summation_list_0. 2: {
       intros j Hj.
       rewrite firstn_map2 in Hj.
@@ -641,129 +640,26 @@ destruct x as [x| ]. {
     rewrite map2_map_l.
     cbn in Hiv.
     apply Nat.succ_lt_mono in Hiv.
-    specialize (IHla _ Hiv) as H1.
-Search (map2 _ _ _ = map2 _ _ _).
-Search (map _ _ = map _ _).
-Print map2.
-...
-erewrite map2_ext_in. 2: {
-  intros j k Hj Hk.
-  now cbn.
+    erewrite map2_ext_in; [ | now intros j k Hj Hk; cbn ].
+    now apply IHla.
+  } {
+    exfalso.
+    apply nth_error_None in Hy.
+    now apply Nat.nlt_ge in Hy.
+  }
 }
-apply H1.
-}
-  Search (S _ =? S _).
-map_ext_in:
-  ∀ (A B : Type) (f g : A → B) (l : list A),
-    (∀ a : A, a ∈ l → f a = g a) → map f l = map g l
-...
-        destruct la as [| a']; [ easy | ].
-        cbn - [ "=?" ] in Hi.
-        rewrite <- seq_shift in Hi.
-        rewrite map2_map_l in Hi.
-        cbn in Hi.
-        clear a Hiv.
-        induction la as [| a]; [ easy | ].
-        destruct Hi as [Hi| Hi]. {
-          rewrite rngl_mul_0_l in Hi; [ easy | now left ].
-        }
-        rewrite <- seq_shift in Hi.
-        rewrite map2_map_l in Hi.
-        now apply IHla.
-      }
-...1
-    destruct i. {
-      unfold iter_list at 1.
-      cbn - [ "=?" ].
-      rewrite rngl_add_0_l.
-      rewrite rngl_summation_list_split_first with (d := 0%F). 2: {
-        now destruct la.
-      }
-      rewrite List_hd_nth_0.
-      rewrite map2_nth with (a := 0) (b := 0%F); [ | | easy ]. 2: {
-        now rewrite seq_length.
-      }
-      rewrite seq_nth; [ | easy ].
-      rewrite Nat.eqb_refl, rngl_mul_1_l.
-      rewrite all_0_rngl_summation_list_0. 2: {
-        intros i Hi.
-        destruct la as [| a]; [ easy | ].
-        cbn - [ "=?" ] in Hi.
-        rewrite <- seq_shift in Hi.
-        rewrite map2_map_l in Hi.
-        cbn in Hi.
-        clear a Hiv.
-        induction la as [| a]; [ easy | ].
-        destruct Hi as [Hi| Hi]. {
-          rewrite rngl_mul_0_l in Hi; [ easy | now left ].
-        }
-        rewrite <- seq_shift in Hi.
-        rewrite map2_map_l in Hi.
-        now apply IHla.
-      }
-      apply rngl_add_0_r.
-    }
-...
-    rewrite rngl_summation_list_split_last with (d := 0%F). 2: {
-      revert i Hiv.
-      now induction la.
-    }
-    rewrite all_0_rngl_summation_list_0. 2: {
-      intros j Hj.
-      rewrite removelast_firstn in Hj. 2: {
-        rewrite map2_length, seq_length.
-        rewrite Nat.min_id; flia Hiv.
-      }
-      rewrite firstn_map2 in Hj.
-      rewrite List_firstn_seq in Hj.
-      apply in_map2_iff in Hj.
-      destruct Hj as (k & Hkm & a & b & Hk).
-      subst j.
-      rewrite seq_length, firstn_length, Nat.min_id in Hkm.
-      rewrite seq_nth; [ | easy ].
-      rewrite if_eqb_eq_dec, Nat.add_0_l.
-      destruct (Nat.eq_dec (S i) k) as [Hsik| Hsik]; [ flia Hkm Hsik | ].
-      now apply rngl_mul_0_l; left.
-    }
-    rewrite rngl_add_0_l.
-...
-    rewrite all_0_rngl_summation_list_0. 2: {
-      intros j Hj.
-      rewrite skipn_map2 in Hj.
-      rewrite List_skipn_seq in Hj; [ | flia Hiv ].
-      rewrite Nat.add_0_l in Hj.
-      apply in_map2_iff in Hj.
-      destruct Hj as (k & Hkm & a & b & Hk).
-      subst j.
-      rewrite seq_length, skipn_length, Nat.min_id in Hkm.
-      rewrite if_eqb_eq_dec.
-      destruct (Nat.eq_dec (S i) (nth k (seq (S i) (length la - S i)) a))
-        as [Hik| Hik]. {
-        rewrite rngl_mul_1_l.
-        rewrite seq_nth in Hik; [ | easy ].
-        replace k with 0 by flia Hik.
-...
-intros.
-apply vector_eq; cbn.
-intros * Hi.
-rewrite (rngl_summation_split _ i); [ | flia Hi ].
-rewrite rngl_summation_split_last; [ | flia ].
-destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
-rewrite rngl_mul_1_l.
-rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
-  intros k Hk.
-  destruct (Nat.eq_dec i (k - 1)) as [H| H]; [ flia H Hk | ].
-  now apply rngl_mul_0_l; left.
-}
-rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
-  intros k Hk.
-  destruct (Nat.eq_dec i k) as [H| H]; [ flia H Hk | ].
-  now apply rngl_mul_0_l; left.
-}
-now rewrite rngl_add_0_l, rngl_add_0_r.
+destruct y as [y| ]; [ | easy ].
+exfalso.
+apply nth_error_None in Hx.
+cbn in Hx.
+rewrite map_length, map_length, seq_length in Hx.
+apply List_nth_error_Some_iff with (d := 0%F) in Hy.
+now apply Nat.nlt_ge in Hx.
 Qed.
 
 (* associativity of multiplication *)
+
+...
 
 Theorem mat_mul_assoc {m n p q} :
   ∀ (MA : matrix m n T) (MB : matrix n p T) (MC : matrix p q T),

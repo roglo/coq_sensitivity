@@ -1496,7 +1496,15 @@ Qed.
 Theorem map2_ext_in : ∀ A B C (f g : A → B → C) la lb,
   (∀ a b, a ∈ la → b ∈ lb → f a b = g a b) → map2 f la lb = map2 g la lb.
 Proof.
-...
+intros * Hab.
+revert lb Hab.
+induction la as [| a]; intros; [ easy | cbn ].
+destruct lb as [| b]; [ easy | ].
+f_equal; [ now apply Hab; left | ].
+apply IHla.
+intros a' b' Ha' Hb'.
+now apply Hab; right.
+Qed.
 
 (* end map2 *)
 
