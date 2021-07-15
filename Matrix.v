@@ -710,6 +710,11 @@ erewrite rngl_summation_eq_compat. 2: {
     rewrite seq_nth; [ | now apply in_seq in Hj ].
     easy.
   }
+  rewrite rngl_mul_summation_distr_l; [ | now left ].
+  erewrite rngl_summation_eq_compat. 2: {
+    intros m Hm.
+    now rewrite rngl_mul_assoc.
+  }
   easy.
 }
 cbn.
@@ -729,31 +734,14 @@ erewrite rngl_summation_eq_compat with (k := mat_ncols MB - 1). 2: {
     rewrite seq_nth; [ | flia Hcbz Hk ].
     easy.
   }
+  rewrite rngl_mul_summation_distr_r; [ | now left ].
   easy.
 }
 cbn.
-...
-intros.
-apply matrix_eq.
-intros i j Hi Hj.
-cbn.
-cbn in Hi, Hj.
-erewrite rngl_summation_eq_compat. 2: {
-  intros k Hk.
-  now apply rngl_mul_summation_distr_l; left.
-}
-cbn.
-rewrite rngl_summation_summation_exch'; [ | easy ].
-apply rngl_summation_eq_compat.
-intros k Hk.
-erewrite rngl_summation_eq_compat. 2: {
-  intros l Hl.
-  now rewrite rngl_mul_assoc.
-}
-cbn.
-symmetry.
-now apply rngl_mul_summation_distr_r; left.
+apply rngl_summation_summation_exch'.
 Qed.
+
+...
 
 (* left distributivity of multiplication over addition *)
 
