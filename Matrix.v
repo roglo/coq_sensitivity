@@ -578,33 +578,23 @@ remember (nth_error _ _) as x eqn:Hx in |-*; symmetry in Hx.
 remember (nth_error _ _) as y eqn:Hy in |-*; symmetry in Hy.
 move y before x.
 destruct x as [x| ]. {
-Search (nth_error _ _ = Some _).
-...
   apply List_nth_error_Some_iff with (d := 0%F) in Hx.
-  apply nth_error_nth with (d := 0%F) in Hx.
+  destruct Hx as (Hx, Hii).
+  cbn in Hii.
+  rewrite map_length, map_length, seq_length in Hii.
   destruct y as [y| ]. {
-    apply nth_error_nth with (d := 0%F) in Hy.
+    apply List_nth_error_Some_iff with (d := 0%F) in Hy.
+    destruct Hy as (Hy, Hiv).
     f_equal.
     subst x y; cbn.
     rewrite List_map_nth_in with (a := []). 2: {
-      rewrite map_length, seq_length.
-...
-    cbn in Hx.
-    apply in_map_iff in Hx.
-    destruct Hx as (la & Hvla & Hla).
-    apply in_map_iff in Hla.
-    destruct Hla as (k & Hvk & Hk).
-    destruct V as (lb).
-    cbn in Hvk, Hk, Hy.
-    unfold vect_dot_mul in Hvla.
-    cbn in Hvla.
-    move lb after la.
-Search (map _ (seq _ _)).
-Search nth_error.
-...
-apply vector_eq; cbn.
-intros.
-Print nth_error.
+      now rewrite map_length, seq_length.
+    }
+    unfold vect_size in Hii.
+    clear Hii.
+    destruct V as (la).
+    cbn in Hiv; cbn.
+    unfold vect_dot_mul; cbn.
 ...
 intros.
 apply vector_eq; cbn.
