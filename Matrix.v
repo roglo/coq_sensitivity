@@ -595,6 +595,22 @@ destruct x as [x| ]. {
     destruct V as (la).
     cbn in Hiv; cbn.
     unfold vect_dot_mul; cbn.
+    rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
+    rewrite map2_map_l.
+    rewrite seq_nth; [ cbn | easy ].
+    rewrite rngl_summation_list_split with (n := i).
+    destruct i. {
+      unfold iter_list at 1.
+      cbn - [ "=?" ].
+      rewrite rngl_add_0_l.
+...
+      rewrite rngl_summation_list_split_first with (d := 0%F).
+...
+cbn.
+    rewrite rngl_summation_list_split_last with (d := 0%F). 2: {
+      revert i Hiv.
+      induction la as [| a]; intros; [ easy | cbn ].
+      destruct i; cbn.
 ...
 intros.
 apply vector_eq; cbn.

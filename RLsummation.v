@@ -63,6 +63,20 @@ apply iter_seq_all_d; [ | | | easy ]. {
 }
 Qed.
 
+Theorem rngl_summation_list_split_first : ∀ A (l : list A) d f,
+  l ≠ []
+  → Σ (i ∈ l), f i = (f (hd d l) + Σ (i ∈ tl l), f i)%F.
+Proof.
+intros * Hlz.
+apply iter_list_split_first; [ | | | easy ]. {
+  apply rngl_add_0_l.
+} {
+  apply rngl_add_0_r.
+} {
+  apply rngl_add_assoc.
+}
+Qed.
+
 Theorem rngl_summation_list_split_last : ∀ A (l : list A) d f,
   l ≠ []
   → Σ (i ∈ l), f i = (Σ (i ∈ removelast l), f i + f (last l d))%F.
@@ -600,6 +614,7 @@ End a.
 
 Arguments all_0_rngl_summation_0 {T}%type {ro rp} (b e)%nat (f g)%function.
 Arguments all_0_rngl_summation_list_0 {T}%type {ro rp} A%type l%list.
+Arguments rngl_summation_list_split_first {T}%type {ro rp} A%type l%list.
 Arguments rngl_mul_summation_list_distr_l {T ro rp} Hom A%type a
   la%list f%function.
 Arguments rngl_mul_summation_distr_l {T ro rp} Hom a b e f.

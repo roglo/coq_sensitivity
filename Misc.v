@@ -1726,6 +1726,21 @@ apply in_seq in Hi.
 apply Hz; flia Hi.
 Qed.
 
+Theorem iter_list_split_first : ∀ T A d op l z f
+  (op_d_l : ∀ x, op d x = x)
+  (op_d_r : ∀ x, op x d = x)
+  (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
+  l ≠ []
+  → iter_list l (λ (c : T) (i : A), op c (f i)) d =
+    op (f (hd z l)) (iter_list (tl l) (λ (c : T) (i : A), op c (f i)) d).
+Proof.
+intros * op_d_l op_d_r op_assoc Hl.
+unfold iter_list.
+destruct l as [| a]; [ easy | cbn ].
+rewrite op_d_l.
+now rewrite fold_left_op_fun_from_d with (d := d).
+Qed.
+
 Theorem iter_seq_split_first : ∀ T d op b k g
   (op_d_l : ∀ x, op d x = x)
   (op_d_r : ∀ x, op x d = x)
