@@ -606,12 +606,40 @@ destruct x as [x| ]. {
       rewrite rngl_summation_list_split_first with (d := 0%F). 2: {
         now destruct la.
       }
-...
-cbn.
+      rewrite List_hd_nth_0.
+      rewrite map2_nth with (a := 0) (b := 0%F); [ | | easy ]. 2: {
+        now rewrite seq_length.
+      }
+      rewrite seq_nth; [ | easy ].
+      rewrite Nat.eqb_refl, rngl_mul_1_l.
+      rewrite all_0_rngl_summation_list_0. 2: {
+        intros i Hi.
+        destruct la as [| a]; [ easy | ].
+        cbn - [ "=?" ] in Hi.
+        rewrite <- seq_shift in Hi.
+        rewrite map2_map_l in Hi.
+        cbn in Hi.
+        clear a Hiv.
+        induction la as [| a]; [ easy | ].
+        destruct Hi as [Hi| Hi]. {
+          rewrite rngl_mul_0_l in Hi; [ easy | now left ].
+        }
+        rewrite <- seq_shift in Hi.
+        rewrite map2_map_l in Hi.
+        now apply IHla.
+      }
+      apply rngl_add_0_r.
+    }
     rewrite rngl_summation_list_split_last with (d := 0%F). 2: {
       revert i Hiv.
-      induction la as [| a]; intros; [ easy | cbn ].
-      destruct i; cbn.
+      now induction la.
+    }
+    rewrite all_0_rngl_summation_list_0. 2: {
+      intros j Hj.
+      rewrite removelast_firstn in Hj. 2: {
+Search (length (map2 _ _ _)).
+...
+        rewrite map2_length.
 ...
 intros.
 apply vector_eq; cbn.

@@ -1350,6 +1350,66 @@ destruct b, c; cbn - [ "-" ]. {
 }
 Qed.
 
+Fixpoint map2 {A B C} (f : A → B → C) la lb :=
+  match la with
+  | [] => []
+  | a :: la' =>
+      match lb with
+      | [] => []
+      | b :: lb' => f a b :: map2 f la' lb'
+      end
+  end.
+Theorem map2_nth : ∀ A B C (f : A → B → C) la lb a b c n,
+  n < length la
+  → n < length lb
+  → nth n (map2 f la lb) c = f (nth n la a) (nth n lb b).
+Proof.
+intros * Hla Hlb.
+revert n lb Hla Hlb.
+induction la as [| a']; intros; [ easy | cbn ].
+destruct lb as [| b']; [ easy | cbn ].
+destruct n; [ easy | cbn ].
+cbn in Hla, Hlb.
+apply Nat.succ_lt_mono in Hla.
+apply Nat.succ_lt_mono in Hlb.
+destruct n; [ now apply IHla | ].
+now apply IHla.
+Qed.
+
+Theorem map2_map_l : ∀ A B C D (f : C → B → D) g (la : list A) (lb : list B),
+  map2 f (map g la) lb = map2 (λ a b, f (g a) b) la lb.
+Proof.
+intros.
+revert lb.
+induction la as [| a]; intros; [ easy | cbn ].
+destruct lb as [| b]; [ easy | cbn ].
+f_equal.
+apply IHla.
+Qed.
+
+Theorem map2_map_r : ∀ A B C D (f : A → C → D) g (la : list A) (lb : list B),
+  map2 f la (map g lb) = map2 (λ a b, f a (g b)) la lb.
+Proof.
+intros.
+revert lb.
+induction la as [| a]; intros; [ easy | cbn ].
+destruct lb as [| b]; [ easy | cbn ].
+f_equal.
+apply IHla.
+Qed.
+
+Theorem List_fold_left_map2 :
+  ∀ A B C D (f : A → B → A) (g : C → D → B) lc ld (a : A),
+  fold_left f (map2 g lc ld) a =
+  fold_left (λ b c, f b (g (fst c) (snd c))) (combine lc ld) a.
+Proof.
+intros.
+revert ld a.
+induction lc as [| c]; intros; [ easy | cbn ].
+destruct ld as [| d]; [ easy | cbn ].
+apply IHlc.
+Qed.
+
 Theorem not_equiv_imp_False : ∀ P : Prop, (P → False) ↔ ¬ P.
 Proof. easy. Qed.
 

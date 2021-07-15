@@ -68,50 +68,6 @@ Definition vect_el V i := nth i (vect_list V) 0%F.
 
 Definition vect_zero n : vector T := mk_vect (repeat 0%F n).
 
-Fixpoint map2 {A B C} (f : A → B → C) la lb :=
-  match la with
-  | [] => []
-  | a :: la' =>
-      match lb with
-      | [] => []
-      | b :: lb' => f a b :: map2 f la' lb'
-      end
-  end.
-
-Theorem map2_map_l : ∀ A B C D (f : C → B → D) g (la : list A) (lb : list B),
-  map2 f (map g la) lb = map2 (λ a b, f (g a) b) la lb.
-Proof.
-intros.
-revert lb.
-induction la as [| a]; intros; [ easy | cbn ].
-destruct lb as [| b]; [ easy | cbn ].
-f_equal.
-apply IHla.
-Qed.
-
-Theorem map2_map_r : ∀ A B C D (f : A → C → D) g (la : list A) (lb : list B),
-  map2 f la (map g lb) = map2 (λ a b, f a (g b)) la lb.
-Proof.
-intros.
-revert lb.
-induction la as [| a]; intros; [ easy | cbn ].
-destruct lb as [| b]; [ easy | cbn ].
-f_equal.
-apply IHla.
-Qed.
-
-Theorem List_fold_left_map2 :
-  ∀ A B C D (f : A → B → A) (g : C → D → B) lc ld (a : A),
-  fold_left f (map2 g lc ld) a =
-  fold_left (λ b c, f b (g (fst c) (snd c))) (combine lc ld) a.
-Proof.
-intros.
-revert ld a.
-induction lc as [| c]; intros; [ easy | cbn ].
-destruct ld as [| d]; [ easy | cbn ].
-apply IHlc.
-Qed.
-
 (* addition, subtraction of vector *)
 
 Definition vect_add (U V : vector T) :=
