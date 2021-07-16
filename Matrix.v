@@ -753,13 +753,26 @@ Qed.
 
 Theorem mat_mul_add_distr_l :
   ∀ (MA : matrix T) (MB : matrix T) (MC : matrix T),
-  mat_nrows MB ≠ 0
+  is_correct_matrix MB
+  → is_correct_matrix MC
+  → (MA * (MB + MC) = MA * MB + MA * MC)%M.
+Proof.
+intros * Hb Hc.
+...
+
+Theorem mat_mul_add_distr_l :
+  ∀ (MA : matrix T) (MB : matrix T) (MC : matrix T),
+  is_correct_matrix MB
+  → is_correct_matrix MC
+  → mat_nrows MB ≠ 0
   → mat_ncols MA = mat_nrows MB
   → mat_nrows MB = mat_nrows MC
   → mat_ncols MB = mat_ncols MC
   → (MA * (MB + MC) = MA * MB + MA * MC)%M.
 Proof.
-intros * Hrbz Hcarb Hcrbc Hcbc.
+intros * Hb Hc Hrbz Hcarb Hcrbc Hcbc.
+...
+intros * Hb Hc Hrbz Hcarb Hcrbc Hcbc.
 unfold "*"%M, "+"%M.
 f_equal; cbn.
 rewrite map2_map_l, map2_map_r, map2_diag.
