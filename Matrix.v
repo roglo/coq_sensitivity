@@ -774,6 +774,14 @@ do 2 rewrite fold_mat_ncols.
 rewrite <- Hcbc, Nat.min_id.
 apply map_ext_in.
 intros j Hj.
+unfold mat_mul_el; cbn.
+rewrite <- rngl_summation_add_distr.
+apply rngl_summation_eq_compat.
+intros k Hk.
+rewrite <- rngl_mul_add_distr_l.
+f_equal.
+...
+Search (Σ (_ = _, _), _ = Σ (_ = _, _), _).
 ...
   do 2 rewrite <- List_hd_nth_0.
   do 2 rewrite fold_mat_ncols.

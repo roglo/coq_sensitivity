@@ -618,8 +618,9 @@ Arguments rngl_summation_list_split_first {T}%type {ro rp} A%type l%list.
 Arguments rngl_mul_summation_list_distr_l {T ro rp} Hom A%type a la%list.
 Arguments rngl_mul_summation_distr_l {T ro rp} Hom a b e f.
 Arguments rngl_mul_summation_distr_r {T ro rp} Hom a b e f.
-Arguments rngl_summation_list_cons {T ro rp} A%type_scope a la%list.
+Arguments rngl_summation_add_distr {T}%type {ro rp} _ _ (b k)%nat.
 Arguments rngl_summation_change_var {T ro rp} A%type (b e)%nat.
+Arguments rngl_summation_list_cons {T ro rp} A%type_scope a la%list.
 Arguments rngl_summation_list_split {T}%type {ro rp} A%type l%list _ n%nat.
 Arguments rngl_summation_map_seq {T ro rp} A%type (start len)%nat.
 Arguments rngl_summation_only_one {T}%type {ro rp} g%function n%nat.
