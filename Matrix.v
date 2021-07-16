@@ -819,14 +819,115 @@ rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
 now do 2 rewrite fold_mat_el.
 Qed.
 
-...
-
 (* right distributivity of multiplication over addition *)
 
-Theorem mat_mul_add_distr_r {m n p} :
-  ∀ (MA : matrix m n T) (MB : matrix m n T) (MC : matrix n p T),
-  ((MA + MB) * MC = MA * MC + MB * MC)%M.
+Theorem mat_mul_add_distr_r :
+  ∀ (MA : matrix T) (MB : matrix T) (MC : matrix T),
+  mat_nrows MA = mat_nrows MB
+  → mat_ncols MA = mat_ncols MB
+  → ((MA + MB) * MC = MA * MC + MB * MC)%M.
 Proof.
+intros * Hrarb Hcacb.
+(*
+intros * Hb Hc Hrbz Hcarb Hcrbc Hcbc.
+*)
+unfold "*"%M, "+"%M.
+f_equal; cbn.
+rewrite map2_length.
+do 2 rewrite fold_mat_nrows.
+rewrite map2_map_l, map2_map_r, <- Hrarb, map2_diag.
+rewrite Nat.min_id.
+apply map_ext_in.
+intros i Hi.
+rewrite map2_map_l, map2_map_r, map2_diag.
+apply map_ext_in.
+intros j Hj.
+unfold mat_mul_el; cbn.
+rewrite <- Hcacb.
+rewrite <- rngl_summation_add_distr.
+unfold mat_ncols at 1; cbn.
+Check fold_mat_ncols.
+...
+apply rngl_summation_eq_compat.
+intros k Hk.
+rewrite <- rngl_mul_add_distr_l.
+f_equal.
+rewrite map2_nth with (a := []) (b := []); cycle 1. {
+  rewrite fold_mat_nrows.
+  rewrite Hcarb in Hk; flia Hrbz Hk.
+} {
+  rewrite fold_mat_nrows.
+  rewrite Hcarb, Hcrbc in Hk.
+  flia Hrbz Hcrbc Hk.
+}
+rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
+  unfold is_correct_matrix in Hb.
+  apply in_seq in Hj.
+  rewrite Hb; [ easy | ].
+  apply nth_In.
+  rewrite fold_mat_nrows.
+  rewrite Hcarb in Hk.
+  flia Hrbz Hk.
+} {
+  unfold is_correct_matrix in Hc.
+  apply in_seq in Hj.
+  rewrite Hc; [ now rewrite <- Hcbc | ].
+  apply nth_In.
+  rewrite fold_mat_nrows, <- Hcrbc.
+  rewrite Hcarb in Hk.
+  flia Hrbz Hk.
+}
+now do 2 rewrite fold_mat_el.
+Qed.
+...
+rewrite map2_map_l, map2_map_r, <- Hcbc, map2_diag.
+unfold mat_ncols at 1; cbn.
+rewrite List_hd_nth_0.
+rewrite map2_nth with (a := []) (b := []); cycle 1. {
+  rewrite fold_mat_nrows; flia Hrbz.
+} {
+  rewrite fold_mat_nrows; flia Hrbz Hcrbc.
+}
+rewrite map2_length; cbn.
+do 2 rewrite <- List_hd_nth_0.
+do 2 rewrite fold_mat_ncols.
+rewrite <- Hcbc, Nat.min_id.
+apply map_ext_in.
+intros j Hj.
+unfold mat_mul_el; cbn.
+rewrite <- rngl_summation_add_distr.
+apply rngl_summation_eq_compat.
+intros k Hk.
+rewrite <- rngl_mul_add_distr_l.
+f_equal.
+rewrite map2_nth with (a := []) (b := []); cycle 1. {
+  rewrite fold_mat_nrows.
+  rewrite Hcarb in Hk; flia Hrbz Hk.
+} {
+  rewrite fold_mat_nrows.
+  rewrite Hcarb, Hcrbc in Hk.
+  flia Hrbz Hcrbc Hk.
+}
+rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
+  unfold is_correct_matrix in Hb.
+  apply in_seq in Hj.
+  rewrite Hb; [ easy | ].
+  apply nth_In.
+  rewrite fold_mat_nrows.
+  rewrite Hcarb in Hk.
+  flia Hrbz Hk.
+} {
+  unfold is_correct_matrix in Hc.
+  apply in_seq in Hj.
+  rewrite Hc; [ now rewrite <- Hcbc | ].
+  apply nth_In.
+  rewrite fold_mat_nrows, <- Hcrbc.
+  rewrite Hcarb in Hk.
+  flia Hrbz Hk.
+}
+now do 2 rewrite fold_mat_el.
+Qed.
+...
 intros.
 apply matrix_eq.
 intros i j Hi Hj.
