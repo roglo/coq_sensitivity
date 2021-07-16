@@ -88,6 +88,10 @@ Definition mat_of_list_list T d (ll : list (list T)) :
 Compute (list_list_of_mat (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
 *)
 
+Theorem fold_mat_nrows {T} : ∀ (M : matrix T),
+  length (mat_list_list M) = mat_nrows M.
+Proof. easy. Qed.
+
 Theorem fold_mat_ncols {T} : ∀ (M : matrix T),
   length (hd [] (mat_list_list M)) = mat_ncols M.
 Proof. easy. Qed.
@@ -750,11 +754,12 @@ Qed.
 Theorem mat_mul_add_distr_l :
   ∀ (MA : matrix T) (MB : matrix T) (MC : matrix T),
   mat_nrows MB ≠ 0
-  → mat_nrows MC ≠ 0
+  → mat_ncols MA = mat_nrows MB
+  → mat_nrows MB = mat_nrows MC
   → mat_ncols MB = mat_ncols MC
   → (MA * (MB + MC) = MA * MB + MA * MC)%M.
 Proof.
-intros * Hrbz Hrcz Hcbc.
+intros * Hrbz Hcarb Hcrbc Hcbc.
 unfold "*"%M, "+"%M.
 f_equal; cbn.
 rewrite map2_map_l, map2_map_r, map2_diag.
@@ -764,9 +769,9 @@ rewrite map2_map_l, map2_map_r, <- Hcbc, map2_diag.
 unfold mat_ncols at 1; cbn.
 rewrite List_hd_nth_0.
 rewrite map2_nth with (a := []) (b := []); cycle 1. {
-  unfold mat_nrows in Hrbz; flia Hrbz.
+  rewrite fold_mat_nrows; flia Hrbz.
 } {
-  unfold mat_nrows in Hrcz; flia Hrcz.
+  rewrite fold_mat_nrows; flia Hrbz Hcrbc.
 }
 rewrite map2_length; cbn.
 do 2 rewrite <- List_hd_nth_0.
@@ -780,6 +785,29 @@ apply rngl_summation_eq_compat.
 intros k Hk.
 rewrite <- rngl_mul_add_distr_l.
 f_equal.
+rewrite map2_nth with (a := []) (b := []); cycle 1. {
+  rewrite fold_mat_nrows.
+  rewrite Hcarb in Hk; flia Hrbz Hk.
+} {
+  rewrite fold_mat_nrows.
+  rewrite Hcarb, Hcrbc in Hk.
+  flia Hrbz Hcrbc Hk.
+}
+rewrite map2_nth with (a := 0%F) (b := 0%F).
+...
+rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
+...
+  rewrite Hcarb in Hk; flia Hrbz Hk.
+
+...
+  rewrite Hcarb in Hk.
+  unfold mat_nrows in Hrbz, Hk.
+  flia Hrbz Hk.
+} {
+  rewrite Hcarb in Hk.
+  unfold mat_nrows in Hrbz, Hk.
+...
+  flia Hrbz Hk.
 ...
 Search (Σ (_ = _, _), _ = Σ (_ = _, _), _).
 ...
