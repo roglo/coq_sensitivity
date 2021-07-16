@@ -755,23 +755,12 @@ Theorem mat_mul_add_distr_l :
   ∀ (MA : matrix T) (MB : matrix T) (MC : matrix T),
   is_correct_matrix MB
   → is_correct_matrix MC
-  → (MA * (MB + MC) = MA * MB + MA * MC)%M.
-Proof.
-intros * Hb Hc.
-...
-
-Theorem mat_mul_add_distr_l :
-  ∀ (MA : matrix T) (MB : matrix T) (MC : matrix T),
-  is_correct_matrix MB
-  → is_correct_matrix MC
   → mat_nrows MB ≠ 0
   → mat_ncols MA = mat_nrows MB
   → mat_nrows MB = mat_nrows MC
   → mat_ncols MB = mat_ncols MC
   → (MA * (MB + MC) = MA * MB + MA * MC)%M.
 Proof.
-intros * Hb Hc Hrbz Hcarb Hcrbc Hcbc.
-...
 intros * Hb Hc Hrbz Hcarb Hcrbc Hcbc.
 unfold "*"%M, "+"%M.
 f_equal; cbn.
@@ -806,9 +795,23 @@ rewrite map2_nth with (a := []) (b := []); cycle 1. {
   rewrite Hcarb, Hcrbc in Hk.
   flia Hrbz Hcrbc Hk.
 }
-rewrite map2_nth with (a := 0%F) (b := 0%F).
-...
 rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
+  unfold is_correct_matrix in Hb.
+  apply in_seq in Hj.
+  rewrite Hb; [ easy | ].
+  apply nth_In.
+  rewrite fold_mat_nrows.
+  rewrite Hcarb in Hk.
+  flia Hrbz Hk.
+} {
+  unfold is_correct_matrix in Hc.
+  apply in_seq in Hj.
+  rewrite Hc; [ now rewrite <- Hcbc | ].
+  apply nth_In.
+  rewrite fold_mat_nrows, <- Hcrbc.
+  rewrite Hcarb in Hk.
+  flia Hrbz Hk.
+}
 ...
   rewrite Hcarb in Hk; flia Hrbz Hk.
 
