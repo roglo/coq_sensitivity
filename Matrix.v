@@ -970,37 +970,28 @@ rewrite List_map_nth_in with (a := []). 2: {
 rewrite List_map_nth_in with (a := 0%F). 2: {
   destruct Ha as (Harc, Ha).
   rewrite Ha. 2: {
-...
-; [ flia Hraz Hk | ].
-...
-rewrite <- List_map_nth_in with (b := 0). 2: {
-  rewrite fold_mat_nrows; flia Hraz.
+    apply nth_In.
+    rewrite fold_mat_nrows.
+    now apply in_seq in Hi.
+  }
+  assert (Hcaz : mat_ncols MA ≠ 0). {
+    intros H; apply Hraz.
+    now apply Harc.
+  }
+  flia Hk Hcaz.
 }
-rewrite <- List_hd_nth_0.
-...
-rewrite fold_mat_ncols.
-...
-intros la Hla.
-rewrite map_map.
-apply map_ext_in.
-intros i Hi.
+rewrite fold_mat_el.
+symmetry.
 apply rngl_mul_assoc.
-...
-intros *.
-apply matrix_eq.
-intros * Hi Hj.
-cbn.
-rewrite rngl_mul_summation_distr_l; [ | now left ].
-apply rngl_summation_eq_compat.
-intros k Hk.
-now rewrite <- rngl_mul_assoc.
 Qed.
 
 Theorem mat_mul_mul_scal_l :
   rngl_is_comm = true →
-  ∀ {m n p} a (MA : matrix m n T) (MB : matrix n p T),
+  ∀ a (MA : matrix T) (MB : matrix T),
   (MA * (a × MB) = a × (MA * MB))%M.
 Proof.
+intros Hic *.
+...
 intros Hic *.
 apply matrix_eq.
 intros * Hi Hj.
