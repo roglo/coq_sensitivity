@@ -823,11 +823,12 @@ Qed.
 
 Theorem mat_mul_add_distr_r :
   ∀ (MA : matrix T) (MB : matrix T) (MC : matrix T),
-  mat_nrows MA = mat_nrows MB
+  mat_nrows MA ≠ 0
+  → mat_nrows MA = mat_nrows MB
   → mat_ncols MA = mat_ncols MB
   → ((MA + MB) * MC = MA * MC + MB * MC)%M.
 Proof.
-intros * Hrarb Hcacb.
+intros * Hraz Hrarb Hcacb.
 (*
 intros * Hb Hc Hrbz Hcarb Hcrbc Hcbc.
 *)
@@ -846,7 +847,46 @@ unfold mat_mul_el; cbn.
 rewrite <- Hcacb.
 rewrite <- rngl_summation_add_distr.
 unfold mat_ncols at 1; cbn.
+rewrite List_hd_nth_0.
+rewrite map2_nth with (a := []) (b := []); cycle 1. {
+  rewrite fold_mat_nrows; flia Hraz.
+} {
+  rewrite fold_mat_nrows, <- Hrarb; flia Hraz.
+}
+rewrite map2_length.
+do 2 rewrite <- List_hd_nth_0.
+do 2 rewrite fold_mat_ncols.
+rewrite <- Hcacb, Nat.min_id.
+apply rngl_summation_eq_compat.
+intros k Hk.
+...
+unfold mat_ncols at 1; cbn.
+rewrite List_hd_nth_0.
+...
+rewrite map2_nth with (a := []) (b := []); cycle 1. {
+  unfold is_correct_matrix in Hb.
+  apply in_seq in Hj.
+  rewrite Hb; [ easy | ].
+  apply nth_In.
+  rewrite fold_mat_nrows.
+  rewrite Hcarb in Hk.
+  flia Hrbz Hk.
+} {
+  unfold is_correct_matrix in Hc.
+  apply in_seq in Hj.
+  rewrite Hc; [ now rewrite <- Hcbc | ].
+  apply nth_In.
+  rewrite fold_mat_nrows, <- Hcrbc.
+  rewrite Hcarb in Hk.
+  flia Hrbz Hk.
+}
+...
+replace (length (hd [] (map2 (map2 rngl_add) _ _))) with (mat_ncols MA). 2: {
+  rewrite List_hd_nth_0.
+  unfold mat_ncols.
+...
 Check fold_mat_ncols.
+unfold mat_ncols at 1.
 ...
 apply rngl_summation_eq_compat.
 intros k Hk.
