@@ -883,24 +883,32 @@ do 2 rewrite fold_mat_el.
 apply rngl_mul_add_distr_r.
 Qed.
 
-...
-
 (* left distributivity of multiplication by scalar over addition *)
 
-Theorem mat_mul_scal_l_add_distr_r {m n} : ∀ a b (M : matrix m n T),
+Theorem mat_mul_scal_l_add_distr_r : ∀ a b (M : matrix T),
   ((a + b)%F × M)%M = (a × M + b × M)%M.
 Proof.
 intros.
-apply matrix_eq.
-intros * Hi Hj; cbn.
+unfold "+"%M, "×"%M.
+cbn; f_equal.
+rewrite map2_map_l, map2_map_r.
+rewrite map2_diag.
+apply map_ext_in.
+intros la Hla.
+rewrite map2_map_l, map2_map_r.
+rewrite map2_diag.
+apply map_ext_in.
+intros c Hc.
 apply rngl_mul_add_distr_r.
 Qed.
 
 (* associativity of multiplication by scalar *)
 
-Theorem mat_mul_scal_l_mul_assoc {m n} : ∀ a b (M : matrix m n T),
+Theorem mat_mul_scal_l_mul_assoc : ∀ a b (M : matrix T),
   (a × (b × M))%M = ((a * b)%F × M)%M.
 Proof.
+intros.
+...
 intros.
 apply matrix_eq.
 intros * Hi Hj; cbn.
