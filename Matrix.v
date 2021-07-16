@@ -908,17 +908,71 @@ Theorem mat_mul_scal_l_mul_assoc : ∀ a b (M : matrix T),
   (a × (b × M))%M = ((a * b)%F × M)%M.
 Proof.
 intros.
-...
-intros.
-apply matrix_eq.
-intros * Hi Hj; cbn.
+unfold "*"%M, "×"%M.
+cbn; f_equal.
+rewrite map_map.
+apply map_ext_in.
+intros la Hla.
+rewrite map_map.
+apply map_ext_in.
+intros i Hi.
 apply rngl_mul_assoc.
 Qed.
 
 Theorem mat_mul_scal_l_mul :
-  ∀ {m n p} a (MA : matrix m n T) (MB : matrix n p T),
-  (a × MA * MB = a × (MA * MB))%M.
+  ∀ a (MA : matrix T) (MB : matrix T),
+  is_correct_matrix MA
+  → (a × MA * MB = a × (MA * MB))%M.
 Proof.
+intros * Ha.
+unfold "*"%M, "×"%M.
+cbn; f_equal.
+rewrite map_length; cbn.
+rewrite fold_mat_nrows.
+rewrite map_map.
+apply map_ext_in.
+intros i Hi.
+destruct (Nat.eq_dec (mat_nrows MA) 0) as [Hraz| Hraz]. {
+  now rewrite Hraz in Hi.
+}
+rewrite map_map.
+apply map_ext_in.
+intros j Hj.
+unfold mat_mul_el; cbn.
+unfold mat_ncols at 1; cbn.
+rewrite List_hd_nth_0.
+rewrite List_map_nth_in with (a := []). 2: {
+  rewrite fold_mat_nrows; flia Hraz.
+}
+rewrite map_length.
+rewrite <- List_hd_nth_0.
+rewrite fold_mat_ncols.
+rewrite rngl_mul_summation_distr_l; [ | now left ].
+apply rngl_summation_eq_compat.
+intros k Hk.
+rewrite List_map_nth_in with (a := []). 2: {
+  rewrite fold_mat_nrows.
+  now apply in_seq in Hi.
+}
+rewrite List_map_nth_in with (a := 0%F). 2: {
+  rewrite Ha.
+...
+; [ flia Hraz Hk | ].
+
+...
+rewrite <- List_map_nth_in with (b := 0). 2: {
+  rewrite fold_mat_nrows; flia Hraz.
+}
+rewrite <- List_hd_nth_0.
+...
+rewrite fold_mat_ncols.
+...
+intros la Hla.
+rewrite map_map.
+apply map_ext_in.
+intros i Hi.
+apply rngl_mul_assoc.
+...
 intros *.
 apply matrix_eq.
 intros * Hi Hj.
