@@ -96,6 +96,10 @@ Theorem fold_mat_ncols {T} : ∀ (M : matrix T),
   length (hd [] (mat_list_list M)) = mat_ncols M.
 Proof. easy. Qed.
 
+Theorem fold_mat_el {T} {ro : ring_like_op T} : ∀ (M : matrix T) i j,
+  nth j (nth i (mat_list_list M) []) 0%F = mat_el M i j.
+Proof. easy. Qed.
+
 Fixpoint concat_list_in_list {T} (ll1 ll2 : list (list T)) :=
   match ll1 with
   | [] => ll2
@@ -812,127 +816,10 @@ rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
   rewrite Hcarb in Hk.
   flia Hrbz Hk.
 }
-...
-  rewrite Hcarb in Hk; flia Hrbz Hk.
-
-...
-  rewrite Hcarb in Hk.
-  unfold mat_nrows in Hrbz, Hk.
-  flia Hrbz Hk.
-} {
-  rewrite Hcarb in Hk.
-  unfold mat_nrows in Hrbz, Hk.
-...
-  flia Hrbz Hk.
-...
-Search (Σ (_ = _, _), _ = Σ (_ = _, _), _).
-...
-  do 2 rewrite <- List_hd_nth_0.
-  do 2 rewrite fold_mat_ncols.
-  now rewrite <- Hcbc, Nat.min_id.
-}
-...
-unfold mat_ncols at 1; cbn.
-rewrite List_hd_nth_0.
-rewrite map2_nth with (a := []) (b := []); cycle 1. {
-  unfold mat_nrows in Hrbz; flia Hrbz.
-} {
-  unfold mat_nrows in Hrcz; flia Hrcz.
-}
-rewrite map2_length; cbn.
-erewrite map_ext_in. 2: {
-  intros i Hi.
-  do 2 rewrite <- List_hd_nth_0.
-  do 2 rewrite fold_mat_ncols.
-  now rewrite <- Hcbc, Nat.min_id.
-}
-...
-
-rewrite map_length, seq_length.
-
-unfold mat_nrows at 5; cbn.
-rewrite map_length, seq_length.
-apply map_ext_in.
-intros i Hi.
-unfold mat_ncols at 2; cbn.
-rewrite List_hd_nth_0.
-rewrite List_map_nth_in with (a := 0). 2: {
-  rewrite seq_length; flia Hrbz.
-}
-rewrite map_length, seq_length.
-apply map_ext_in.
-intros j Hj.
-move j before i.
-unfold mat_mul_el.
-unfold mat_ncols at 4.
-rewrite List_hd_nth_0; cbn.
-rewrite List_map_nth_in with (a := 0). 2: {
-  rewrite seq_length.
-  destruct (Nat.eq_dec (mat_nrows MA) 0) as [Hraz| Hraz]. {
-    now rewrite Hraz in Hi.
-  }
-  flia Hraz.
-}
-rewrite map_length, seq_length.
-erewrite rngl_summation_eq_compat. 2: {
-  intros k Hk.
-  rewrite List_map_nth_in with (a := 0). 2: {
-    rewrite seq_length.
-    rewrite Hcarb in Hk.
-    flia Hrbz Hk.
-  }
-  rewrite List_map_nth_in with (a := 0). 2: {
-    rewrite seq_length.
-    now apply in_seq in Hj.
-  }
-  erewrite rngl_summation_eq_compat. 2: {
-    intros m Hm.
-    rewrite seq_nth; [ | rewrite Hcarb in Hk; flia Hrbz Hk ].
-    rewrite seq_nth; [ | now apply in_seq in Hj ].
-    easy.
-  }
-  rewrite rngl_mul_summation_distr_l; [ | now left ].
-  erewrite rngl_summation_eq_compat. 2: {
-    intros m Hm.
-    now rewrite rngl_mul_assoc.
-  }
-  easy.
-}
-cbn.
-erewrite rngl_summation_eq_compat with (k := mat_ncols MB - 1). 2: {
-  intros k Hk.
-  rewrite List_map_nth_in with (a := 0). 2: {
-    rewrite seq_length.
-    now apply in_seq in Hi.
-  }
-  rewrite List_map_nth_in with (a := 0). 2: {
-    rewrite seq_length.
-    flia Hcbz Hk.
-  }
-  erewrite rngl_summation_eq_compat. 2: {
-    intros m Hm.
-    rewrite seq_nth; [ | now apply in_seq in Hi ].
-    rewrite seq_nth; [ | flia Hcbz Hk ].
-    easy.
-  }
-  rewrite rngl_mul_summation_distr_r; [ | now left ].
-  easy.
-}
-cbn.
-apply rngl_summation_summation_exch'.
-...
-intros.
-apply matrix_eq.
-intros i j Hi Hj.
-cbn.
-cbn in Hi, Hj.
-erewrite rngl_summation_eq_compat. 2: {
-  intros k Hk.
-  apply rngl_mul_add_distr_l.
-}
-cbn.
-now apply rngl_summation_add_distr.
+now do 2 rewrite fold_mat_el.
 Qed.
+
+...
 
 (* right distributivity of multiplication over addition *)
 
