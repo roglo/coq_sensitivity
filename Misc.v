@@ -1506,6 +1506,14 @@ intros a' b' Ha' Hb'.
 now apply Hab; right.
 Qed.
 
+Theorem map2_diag : ∀ A B (f : A → A → B) la,
+  map2 f la la = map (λ i, f i i) la.
+Proof.
+intros.
+induction la as [| a]; [ easy | cbn ].
+now rewrite IHla.
+Qed.
+
 (* end map2 *)
 
 Theorem not_equiv_imp_False : ∀ P : Prop, (P → False) ↔ ¬ P.
