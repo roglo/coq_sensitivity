@@ -823,12 +823,14 @@ Qed.
 
 Theorem mat_mul_add_distr_r :
   ∀ (MA : matrix T) (MB : matrix T) (MC : matrix T),
-  mat_nrows MA ≠ 0
+  is_correct_matrix MA
+  → mat_nrows MA ≠ 0
+  → mat_ncols MA ≠ 0
   → mat_nrows MA = mat_nrows MB
   → mat_ncols MA = mat_ncols MB
   → ((MA + MB) * MC = MA * MC + MB * MC)%M.
 Proof.
-intros * Hraz Hrarb Hcacb.
+intros * Ha Hraz Hcaz Hrarb Hcacb.
 (*
 intros * Hb Hc Hrbz Hcarb Hcrbc Hcbc.
 *)
@@ -859,6 +861,46 @@ do 2 rewrite fold_mat_ncols.
 rewrite <- Hcacb, Nat.min_id.
 apply rngl_summation_eq_compat.
 intros k Hk.
+rewrite map2_nth with (a := []) (b := []); cycle 1. {
+  rewrite fold_mat_nrows.
+  now apply in_seq in Hi.
+} {
+  rewrite fold_mat_nrows, <- Hrarb.
+  now apply in_seq in Hi.
+}
+rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
+  unfold is_correct_matrix in Ha.
+  rewrite Ha; [ flia Hcaz Hk | ].
+  apply nth_In.
+  rewrite fold_mat_nrows.
+  now apply in_seq in Hi.
+} {
+...
+  unfold is_correct_matrix in Hc.
+  apply in_seq in Hj.
+  rewrite Hc; [ now rewrite <- Hcbc | ].
+  apply nth_In.
+  rewrite fold_mat_nrows, <- Hcrbc.
+  rewrite Hcarb in Hk.
+  flia Hrbz Hk.
+...
+
+  unfold is_correct_matrix in Hb.
+  apply in_seq in Hj.
+  rewrite Hb; [ easy | ].
+  apply nth_In.
+  rewrite fold_mat_nrows.
+  rewrite Hcarb in Hk.
+  flia Hrbz Hk.
+} {
+  unfold is_correct_matrix in Hc.
+  apply in_seq in Hj.
+  rewrite Hc; [ now rewrite <- Hcbc | ].
+  apply nth_In.
+  rewrite fold_mat_nrows, <- Hcrbc.
+  rewrite Hcarb in Hk.
+  flia Hrbz Hk.
+}
 ...
 unfold mat_ncols at 1; cbn.
 rewrite List_hd_nth_0.
@@ -901,21 +943,6 @@ rewrite map2_nth with (a := []) (b := []); cycle 1. {
   flia Hrbz Hcrbc Hk.
 }
 rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
-  unfold is_correct_matrix in Hb.
-  apply in_seq in Hj.
-  rewrite Hb; [ easy | ].
-  apply nth_In.
-  rewrite fold_mat_nrows.
-  rewrite Hcarb in Hk.
-  flia Hrbz Hk.
-} {
-  unfold is_correct_matrix in Hc.
-  apply in_seq in Hj.
-  rewrite Hc; [ now rewrite <- Hcbc | ].
-  apply nth_In.
-  rewrite fold_mat_nrows, <- Hcrbc.
-  rewrite Hcarb in Hk.
-  flia Hrbz Hk.
 }
 now do 2 rewrite fold_mat_el.
 Qed.
