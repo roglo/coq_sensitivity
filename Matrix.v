@@ -338,6 +338,7 @@ apply mat_add_comm.
 Qed.
 
 Definition is_correct_matrix (M : matrix T) :=
+  (mat_nrows M = 0 ↔ mat_ncols M = 0) ∧
   ∀ l, l ∈ mat_list_list M → length l = mat_ncols M.
 
 (* addition to zero *)
@@ -348,6 +349,7 @@ Theorem mat_add_0_l : ∀ (M : matrix T),
 Proof.
 intros * HM.
 unfold is_correct_matrix in HM.
+destruct HM as (_, HM).
 unfold mZ, "+"%M, mat_nrows, mat_ncols.
 unfold mat_ncols in HM.
 destruct M as (ll); cbn in HM |-*; f_equal.
@@ -379,6 +381,7 @@ Theorem mat_add_opp_l : ∀ (M : matrix T),
 Proof.
 intros * HM.
 unfold is_correct_matrix in HM.
+destruct HM as (_, HM).
 unfold "+"%M, mZ, mat_nrows, mat_ncols; cbn; f_equal.
 unfold mat_ncols in HM.
 destruct M as (ll); cbn in HM |-*.
@@ -471,6 +474,7 @@ Theorem mat_mul_1_l : ∀ (M : matrix T),
 Proof.
 intros * HM.
 unfold is_correct_matrix, mat_ncols in HM.
+destruct HM as (_, HM).
 unfold "*"%M.
 rewrite mI_nrows.
 destruct M as (ll); cbn in HM |-*.
@@ -523,6 +527,7 @@ Theorem mat_mul_1_r : ∀ (M : matrix T),
 Proof.
 intros * HM.
 unfold is_correct_matrix, mat_ncols in HM.
+destruct HM as (_, HM).
 unfold "*"%M.
 rewrite mI_ncols.
 destruct M as (ll); cbn in HM |-*.
@@ -801,6 +806,7 @@ rewrite map2_nth with (a := []) (b := []); cycle 1. {
 }
 rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
   unfold is_correct_matrix in Hb.
+  destruct Hb as (_, Hb).
   apply in_seq in Hj.
   rewrite Hb; [ easy | ].
   apply nth_In.
@@ -809,6 +815,7 @@ rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
   flia Hrbz Hk.
 } {
   unfold is_correct_matrix in Hc.
+  destruct Hc as (_, Hc).
   apply in_seq in Hj.
   rewrite Hc; [ now rewrite <- Hcbc | ].
   apply nth_In.
@@ -826,12 +833,16 @@ Theorem mat_mul_add_distr_r :
   is_correct_matrix MA
   → is_correct_matrix MB
   → mat_nrows MA ≠ 0
-  → mat_ncols MA ≠ 0
   → mat_nrows MA = mat_nrows MB
   → mat_ncols MA = mat_ncols MB
   → ((MA + MB) * MC = MA * MC + MB * MC)%M.
 Proof.
-intros * Ha Hb Hraz Hcaz Hrarb Hcacb.
+intros * Ha Hb Hraz Hrarb Hcacb.
+assert (Hcaz : mat_ncols MA ≠ 0). {
+  destruct Ha as (Ha, _).
+  intros H; apply Hraz.
+  now apply Ha.
+}
 unfold "*"%M, "+"%M.
 f_equal; cbn.
 rewrite map2_length.
@@ -868,12 +879,14 @@ rewrite map2_nth with (a := []) (b := []); cycle 1. {
 }
 rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
   unfold is_correct_matrix in Ha.
+  destruct Ha as (_, Ha).
   rewrite Ha; [ flia Hcaz Hk | ].
   apply nth_In.
   rewrite fold_mat_nrows.
   now apply in_seq in Hi.
 } {
   unfold is_correct_matrix in Hb.
+  destruct Hb as (_, Hb).
   rewrite Hb; [ rewrite <- Hcacb; flia Hcaz Hk | ].
   apply in_seq in Hi.
   apply nth_In.
@@ -955,10 +968,10 @@ rewrite List_map_nth_in with (a := []). 2: {
   now apply in_seq in Hi.
 }
 rewrite List_map_nth_in with (a := 0%F). 2: {
-  rewrite Ha.
+  destruct Ha as (Harc, Ha).
+  rewrite Ha. 2: {
 ...
 ; [ flia Hraz Hk | ].
-
 ...
 rewrite <- List_map_nth_in with (b := 0). 2: {
   rewrite fold_mat_nrows; flia Hraz.
