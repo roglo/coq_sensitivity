@@ -1173,12 +1173,20 @@ apply in_seq in Hi.
 now apply mat_vect_mul_assoc_as_sums.
 Qed.
 
-...
-
-Theorem mat_mul_scal_vect_assoc {m n} :
-  ∀ a (MA : matrix m n T) (V : vector n T),
+Theorem mat_mul_scal_vect_assoc :
+  ∀ a (MA : matrix T) (V : vector T),
   (a × (MA • V))%V = ((a × MA) • V)%M.
 Proof.
+intros.
+unfold "×"%V, "×"%M, "•"%V; cbn.
+f_equal.
+do 2 rewrite map_map.
+apply map_ext_in.
+intros la Hla.
+unfold vect_dot_mul; cbn.
+rewrite map2_map_l.
+rewrite rngl_mul_summation_list_distr_l; [ | now left ].
+...
 intros.
 apply vector_eq.
 intros i Hi.
