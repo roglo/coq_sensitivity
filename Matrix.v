@@ -1296,14 +1296,27 @@ Qed.
 
 (* matrix transpose *)
 
-...
-
 Definition mat_transp (M : matrix T) : matrix T :=
-  {| mat_el i j := mat_el M j i |}.
+  mk_mat
+    (map (λ j, map (λ i, mat_el M i j) (seq 0 (mat_nrows M)))
+       (seq 0 (mat_ncols M))).
+
+(*
+End a.
+Require Import Nrl.
+Compute (mat_transp nat_ring_like_op (mk_mat [[3;2];[5;1];[8;9]])).
+Compute (mat_transp nat_ring_like_op (mk_mat [[3;5;8];[2;1;9];[10;11;12]])).
+*)
 
 (* matrix without row i and column j *)
 
-Definition subm {m n} (M : matrix m n T) i j :=
+Definition subm {m n} (M : matrix T) i j :=
+  mk_mat
+    (λ k l, mat_el M (k + Nat.b2n (i <=? k)) (l + Nat.b2n (j <=? l))).
+
+...
+
+Definition subm {m n} (M : matrix T) i j :=
   mk_mat (m - 1) (n - 1)
     (λ k l, mat_el M (k + Nat.b2n (i <=? k)) (l + Nat.b2n (j <=? l))).
 
