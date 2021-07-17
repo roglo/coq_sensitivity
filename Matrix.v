@@ -1039,51 +1039,19 @@ Proof.
 intros.
 unfold "+"%M, "×"%M; cbn.
 f_equal.
-rewrite map2_map_l, map2_map_r.
-Search (map _ (map2 _ _ _)).
-...
-rewrite map_map.
-apply map_ext_in.
-intros i Hi.
-unfold mat_ncols at 1; cbn.
-rewrite List_hd_nth_0.
-rewrite List_map_nth_in with (a := []). 2: {
-  now rewrite fold_mat_nrows, <- Hcarb.
-}
-rewrite map_length.
-rewrite <- List_hd_nth_0.
-rewrite fold_mat_ncols.
-rewrite map_map.
-apply map_ext_in.
-intros j Hj.
-unfold mat_mul_el; cbn.
-rewrite rngl_mul_summation_distr_l; [ | now left ].
-apply rngl_summation_eq_compat.
-intros k Hk.
-rewrite List_map_nth_in with (a := []). 2: {
-  rewrite fold_mat_nrows, <- Hcarb.
-  flia Hcaz Hk.
-}
-rewrite List_map_nth_in with (a := 0%F). 2: {
-  destruct Hb as (Hbzz, Hb).
-  rewrite Hb; [ now apply in_seq in Hj | ].
-  apply nth_In.
-  rewrite fold_mat_nrows, <- Hcarb.
-  flia Hcaz Hk.
-}
-rewrite fold_mat_el.
-rewrite rngl_mul_comm; [ | easy ].
-rewrite <- rngl_mul_assoc.
-f_equal.
-now apply rngl_mul_comm.
-...
-intros.
-apply matrix_eq.
-intros * Hi Hj.
+rewrite map2_map_l, map2_map_r, map_map2.
+apply map2_ext_in.
+rename a into c.
+intros la lb Hla Hlb.
+rewrite map2_map_l, map2_map_r, map_map2.
+apply map2_ext_in.
+intros a b Ha Hb.
 apply rngl_mul_add_distr_l.
 Qed.
 
 (* associativity with multiplication with vector *)
+
+...
 
 Theorem mat_vect_mul_assoc_as_sums :
   ∀ {m n p} (A : matrix m n T) (B : matrix n p T) (V : vector p T) i,

@@ -1400,6 +1400,16 @@ f_equal.
 apply IHla.
 Qed.
 
+Theorem map_map2 : ∀ A B C D (f : A → B) (g : C → D → A) la lb,
+  map f (map2 g la lb) = map2 (λ a b, f (g a b)) la lb.
+Proof.
+intros.
+revert lb.
+induction la as [| a]; intros; [ easy | cbn ].
+destruct lb as [| b]; [ easy | cbn ].
+now rewrite IHla.
+Qed.
+
 Theorem List_fold_left_map2 :
   ∀ A B C D (f : A → B → A) (g : C → D → B) lc ld (a : A),
   fold_left f (map2 g lc ld) a =
