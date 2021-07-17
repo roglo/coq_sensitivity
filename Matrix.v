@@ -1181,11 +1181,22 @@ intros.
 unfold "×"%V, "×"%M, "•"%V; cbn.
 f_equal.
 do 2 rewrite map_map.
+rewrite List_map_map_seq with (d := []).
+rewrite fold_mat_nrows.
+rewrite List_map_map_seq with (d := []).
+rewrite fold_mat_nrows.
 apply map_ext_in.
-intros la Hla.
+intros i Hi.
 unfold vect_dot_mul; cbn.
 rewrite map2_map_l.
 rewrite rngl_mul_summation_list_distr_l; [ | now left ].
+...
+mat_ncols M = vect_size V
+...
+rngl_summation_list_change_var:
+  ∀ (T : Type) (ro : ring_like_op T) (A B : Type) (f : A → B) (g : B → T) (l : list A),
+    Σ (i ∈ l), g (f i) = Σ (j ∈ map f l), g j
+Search (Σ (_ ∈ _), _ = Σ (_ ∈ _), _).
 ...
 intros.
 apply vector_eq.
