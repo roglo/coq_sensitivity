@@ -70,6 +70,10 @@ Context {rp : ring_like_prop T}.
 
 Definition vect_el V i := nth i (vect_list V) 0%F.
 
+Theorem fold_vect_el : ∀ (V : vector T) i,
+  nth i (vect_list V) 0%F = vect_el V i.
+Proof. easy. Qed.
+
 Definition vect_zero n : vector T := mk_vect (repeat 0%F n).
 
 (* addition, subtraction of vector *)

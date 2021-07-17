@@ -1175,9 +1175,11 @@ Qed.
 
 Theorem mat_mul_scal_vect_assoc :
   ∀ a (MA : matrix T) (V : vector T),
-  (a × (MA • V))%V = ((a × MA) • V)%M.
+  is_correct_matrix MA
+  → mat_ncols MA = vect_size V
+  → (a × (MA • V))%V = ((a × MA) • V)%M.
 Proof.
-intros.
+intros * Ha Hcav.
 unfold "×"%V, "×"%M, "•"%V; cbn.
 f_equal.
 do 2 rewrite map_map.
@@ -1190,24 +1192,55 @@ intros i Hi.
 unfold vect_dot_mul; cbn.
 rewrite map2_map_l.
 rewrite rngl_mul_summation_list_distr_l; [ | now left ].
-...
-mat_ncols M = vect_size V
-...
-rngl_summation_list_change_var:
-  ∀ (T : Type) (ro : ring_like_op T) (A B : Type) (f : A → B) (g : B → T) (l : list A),
-    Σ (i ∈ l), g (f i) = Σ (j ∈ map f l), g j
-Search (Σ (_ ∈ _), _ = Σ (_ ∈ _), _).
-...
-intros.
-apply vector_eq.
-intros i Hi.
-cbn in Hi.
-cbn.
-rewrite rngl_mul_summation_distr_l; [ | now left ].
+rewrite map2_map2_seq_l with (d := 0%F).
+destruct Ha as (Harc, Ha).
+rewrite Ha. 2: {
+  apply nth_In.
+  rewrite fold_mat_nrows.
+  now apply in_seq in Hi.
+}
+rewrite map2_map2_seq_r with (d := 0%F).
+rewrite fold_vect_size, Hcav.
+rewrite map2_diag.
+rewrite rngl_summation_map_seq.
+rewrite rngl_summation_seq_summation. 2: {
+  rewrite <- Hcav; intros H.
+  apply Harc in H.
+  now rewrite H in Hi.
+}
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite fold_mat_el.
+  now rewrite fold_vect_el.
+}
+rewrite map2_map2_seq_l with (d := 0%F).
+rewrite Ha. 2: {
+  apply nth_In.
+  rewrite fold_mat_nrows.
+  now apply in_seq in Hi.
+}
+rewrite map2_map2_seq_r with (d := 0%F).
+rewrite fold_vect_size, Hcav.
+rewrite map2_diag.
+rewrite rngl_summation_map_seq.
+rewrite rngl_summation_seq_summation. 2: {
+  rewrite <- Hcav; intros H.
+  apply Harc in H.
+  now rewrite H in Hi.
+}
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite fold_mat_el.
+  now rewrite fold_vect_el.
+}
+symmetry.
 apply rngl_summation_eq_compat.
 intros j Hj.
 apply rngl_mul_assoc.
 Qed.
+
+...
 
 Theorem mat_mul_scal_vect_comm :
   rngl_is_comm = true →
