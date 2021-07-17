@@ -1062,7 +1062,6 @@ Theorem mat_vect_mul_assoc_as_sums :
         vect_el V j.
 Proof.
 intros * Hi.
-...
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   rewrite rngl_mul_summation_distr_l; [ easy | now left ].
@@ -1074,7 +1073,7 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 symmetry.
 cbn.
-rewrite rngl_summation_summation_exch'; [ | easy ].
+rewrite rngl_summation_summation_exch'.
 apply rngl_summation_eq_compat.
 intros j Hj.
 apply rngl_summation_eq_compat.
@@ -1082,10 +1081,12 @@ intros k Hk.
 apply rngl_mul_assoc.
 Qed.
 
-Theorem mat_vect_mul_assoc {m n p} :
-  ∀ (A : matrix m n T) (B : matrix n p T) (V : vector p T),
+Theorem mat_vect_mul_assoc :
+  ∀ (A : matrix T) (B : matrix T) (V : vector T),
   (A • (B • V) = (A * B) • V)%M.
 Proof.
+intros.
+...
 intros.
 apply vector_eq.
 intros i Hi.
