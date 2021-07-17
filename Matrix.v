@@ -1143,7 +1143,21 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite fold_vect_size.
   rewrite Hcbv.
   rewrite map2_diag.
-Inspect 1.
+  rewrite rngl_summation_map_seq.
+  rewrite rngl_summation_seq_summation. 2: {
+    intros H; rewrite <- Hcbv in H.
+    apply Hbrc in H.
+    rewrite <- Hcarb in H.
+    apply Harc in H.
+    now rewrite H in Hi.
+  }
+  erewrite rngl_summation_eq_compat. 2: {
+    intros k Hk.
+    now rewrite fold_mat_el.
+  }
+  easy.
+}
+cbn.
 ...
 intros.
 apply vector_eq.
