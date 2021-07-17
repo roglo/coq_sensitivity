@@ -1822,6 +1822,16 @@ intros.
 now specialize (Hll d (S i)).
 Qed.
 
+Theorem List_map_map_seq : ∀ A B (f : A → B) d la,
+  map f la = map (λ i, f (nth i la d)) (seq 0 (length la)).
+Proof.
+intros.
+induction la as [| a]; [ easy | cbn ].
+f_equal.
+rewrite <- seq_shift.
+now rewrite map_map.
+Qed.
+
 Theorem List_eq_map_seq : ∀ A (la : list A) d,
   la = map (λ i, nth i la d) (seq 0 (length la)).
 Proof.

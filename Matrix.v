@@ -1086,6 +1086,14 @@ Theorem mat_vect_mul_assoc :
   (A • (B • V) = (A * B) • V)%M.
 Proof.
 intros.
+unfold "•"%M, "*"%M; cbn.
+unfold vect_dot_mul; cbn.
+f_equal.
+rewrite map_map.
+rewrite List_map_map_seq with (d := []).
+apply map_ext_in.
+intros i Hi.
+rewrite map2_map_r.
 ...
 intros.
 apply vector_eq.
