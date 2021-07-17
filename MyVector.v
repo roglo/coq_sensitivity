@@ -20,6 +20,10 @@ Definition list_of_vect {T} (v : vector T) :=
 
 Definition vect_size {T} (v : vector T) := length (vect_list v).
 
+Theorem fold_vect_size {T} : ∀ (V : vector T),
+  length (vect_list V) = vect_size V.
+Proof. easy. Qed.
+
 (*
 Compute (list_of_vect (vect_of_list [3;7;2])).
 Compute (vect_of_list [3;7;2]).

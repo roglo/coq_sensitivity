@@ -1083,9 +1083,11 @@ Qed.
 
 Theorem mat_vect_mul_assoc :
   ∀ (A : matrix T) (B : matrix T) (V : vector T),
-  (A • (B • V) = (A * B) • V)%M.
+  is_correct_matrix A
+  → mat_ncols A = mat_nrows B
+  → (A • (B • V) = (A * B) • V)%M.
 Proof.
-intros.
+intros * Ha Hcarb.
 unfold "•"%M, "*"%M; cbn.
 unfold vect_dot_mul; cbn.
 f_equal.
@@ -1094,6 +1096,27 @@ rewrite List_map_map_seq with (d := []).
 apply map_ext_in.
 intros i Hi.
 rewrite map2_map_r.
+rewrite map2_map2_seq_l with (d := 0%F).
+rewrite map2_map2_seq_r with (d := []).
+destruct Ha as (Harc, Ha).
+rewrite Ha. 2: {
+  apply nth_In.
+  rewrite fold_mat_nrows.
+  now apply in_seq in Hi.
+}
+rewrite fold_mat_nrows.
+symmetry.
+rewrite map2_map2_seq_r with (d := 0%F).
+rewrite fold_vect_size.
+symmetry.
+rewrite <- Hcarb.
+rewrite map2_diag.
+rewrite rngl_summation_map_seq.
+rewrite rngl_summation_seq_summation. 2: {
+  intros H; apply Harc in H.
+  now rewrite H in Hi.
+}
+cbn.
 ...
 intros.
 apply vector_eq.
