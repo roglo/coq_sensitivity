@@ -1084,10 +1084,12 @@ Qed.
 Theorem mat_vect_mul_assoc :
   ∀ (A : matrix T) (B : matrix T) (V : vector T),
   is_correct_matrix A
+  → is_correct_matrix B
   → mat_ncols A = mat_nrows B
+  → mat_ncols B = vect_size V
   → (A • (B • V) = (A * B) • V)%M.
 Proof.
-intros * Ha Hcarb.
+intros * Ha Hb Hcarb Hcbv.
 unfold "•"%M, "*"%M; cbn.
 unfold vect_dot_mul; cbn.
 f_equal.
@@ -1117,6 +1119,31 @@ rewrite rngl_summation_seq_summation. 2: {
   now rewrite H in Hi.
 }
 cbn.
+destruct Hb as (Hbrc, Hb).
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite fold_mat_el.
+  rewrite map2_map2_seq_l with (d := 0%F).
+  rewrite Hb with (l := nth j (mat_list_list B) []). 2: {
+    apply nth_In.
+    rewrite fold_mat_nrows.
+    rewrite <- Hcarb.
+    destruct Hj as (_, Hj).
+    apply Nat.lt_succ_r in Hj.
+    rewrite <- Nat.sub_succ_l in Hj. 2: {
+      apply Nat.le_succ_l.
+      apply Nat.neq_0_lt_0.
+      intros H.
+      apply Harc in H.
+      now rewrite H in Hi.
+    }
+    now rewrite Nat.sub_succ, Nat.sub_0_r in Hj.
+  }
+  rewrite map2_map2_seq_r with (d := 0%F).
+  rewrite fold_vect_size.
+  rewrite Hcbv.
+  rewrite map2_diag.
+Inspect 1.
 ...
 intros.
 apply vector_eq.
