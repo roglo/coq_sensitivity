@@ -1051,19 +1051,18 @@ Qed.
 
 (* associativity with multiplication with vector *)
 
-...
-
 Theorem mat_vect_mul_assoc_as_sums :
-  ∀ {m n p} (A : matrix m n T) (B : matrix n p T) (V : vector p T) i,
-  i < m
-  → Σ (j = 0, n - 1),
+  ∀ (A : matrix T) (B : matrix T) (V : vector T) i,
+  i < mat_nrows A
+  → Σ (j = 0, mat_ncols A - 1),
        mat_el A i j *
-       (Σ (k = 0, p - 1), mat_el B j k * vect_el V k) =
-     Σ (j = 0, p - 1),
-       (Σ (k = 0, n - 1), mat_el A i k * mat_el B k j) *
+       (Σ (k = 0, vect_size V - 1), mat_el B j k * vect_el V k) =
+     Σ (j = 0, vect_size V - 1),
+       (Σ (k = 0, mat_ncols A - 1), mat_el A i k * mat_el B k j) *
         vect_el V j.
 Proof.
 intros * Hi.
+...
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   rewrite rngl_mul_summation_distr_l; [ easy | now left ].
