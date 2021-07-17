@@ -1158,16 +1158,22 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
-...
-intros.
-apply vector_eq.
-intros i Hi.
-cbn in Hi.
-unfold mat_mul_vect_r.
-unfold mat_mul.
-cbn.
+rewrite Hcbv.
+rewrite map2_map_l.
+rewrite map2_diag.
+rewrite rngl_summation_map_seq.
+rewrite rngl_summation_seq_summation. 2: {
+  intros H; rewrite <- Hcbv in H.
+  apply Hbrc in H.
+  rewrite <- Hcarb in H.
+  apply Harc in H.
+  now rewrite H in Hi.
+}
+apply in_seq in Hi.
 now apply mat_vect_mul_assoc_as_sums.
 Qed.
+
+...
 
 Theorem mat_mul_scal_vect_assoc {m n} :
   ∀ a (MA : matrix m n T) (V : vector n T),
