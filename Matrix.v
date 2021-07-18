@@ -259,6 +259,8 @@ Context {Hro : @rngl_has_opp T ro = true}.
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
 
+Arguments δ {T ro} (i j)%nat.
+
 Arguments mat_add {T ro} MA%M MB%M.
 Arguments mat_mul {T ro} MA%M MB%M.
 Arguments mat_mul_el {T}%type {ro} (MA MB)%M (i k)%nat.
@@ -1367,7 +1369,6 @@ Qed.
 Theorem submatrix_mI : ∀ i n, i < n → subm (mI n) i i = mI (n - 1).
 Proof.
 intros * Hnr.
-...
 unfold subm, mI; cbn.
 f_equal.
 destruct n; [ easy | ].
@@ -1378,24 +1379,13 @@ erewrite map_ext_in. 2: {
   intros j Hj.
   now rewrite <- map_butn.
 }
-remember (λ j j0 : nat, if j =? j0 then 1%F else 0%F) as f eqn:Hf.
 ...
-(fun j : nat =>
-        @map nat T
-          (fun j0 : nat =>
-           match Nat.eqb j j0 return T with
-           | true => @rngl_one T ro
-           | false => @rngl_zero T ro
-           end))
-
-
-remember (λ j : nat, map (λ j0 : nat, if j =? j0 then 1%F else 0%F)) as f in |-*.
-rewrite <- Heqf.
-...
+(*
 End a.
 Require Import Nrl.
 Compute (subm (mI nat_ring_like_op 3) 0 0).
 Compute (mI nat_ring_like_op 2).
+*)
 ...
 intros.
 unfold subm, mI; cbn.
