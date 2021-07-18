@@ -1363,6 +1363,39 @@ Qed.
 Theorem submatrix_mI : ∀ i r, subm (mI r) i i = mI (r - 1).
 Proof.
 intros.
+unfold subm, mI; cbn.
+f_equal.
+rewrite map_butn.
+rewrite map_map.
+rewrite <- map_butn.
+destruct r; cbn; [ now do 2 rewrite butn_nil | ].
+rewrite Nat.sub_0_r.
+rewrite <- seq_shift.
+destruct i. {
+  cbn.
+  rewrite map_map.
+  apply map_ext_in.
+  intros i Hi.
+  apply map_map.
+}
+rewrite butn_cons.
+cbn - [ butn "=?" ].
+rewrite Nat.eqb_refl.
+rewrite butn_cons.
+rewrite map_butn.
+do 2 rewrite map_map.
+erewrite map_ext_in; [ | now intros j Hj; cbn ].
+remember (butn _ _) as x eqn:Hx.
+erewrite map_ext_in. 2: {
+  intros j Hj.
+  rewrite butn_cons.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (S j) 0) as [H| H]; [ | clear H ].
+  inversion H.
+  easy.
+}
+...
+  destruct H.
 ...
 intros.
 apply matrix_eq.
