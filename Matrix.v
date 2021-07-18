@@ -1367,6 +1367,8 @@ unfold subm, mI; cbn.
 f_equal.
 destruct r; [ now rewrite butn_nil | ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
+rewrite <- map_butn.
+rewrite map_map.
 ...
 rewrite map_butn.
 unfold butn at 2.
