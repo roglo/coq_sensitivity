@@ -1360,8 +1360,15 @@ symmetry.
 apply map_butn.
 Qed.
 
-Theorem submatrix_mI : ∀ n r, subm (mI r) n n = mI (r - 1).
+Theorem submatrix_mI : ∀ n r, n < r → subm (mI r) n n = mI (r - 1).
 Proof.
+intros * Hnr.
+...
+End a.
+Require Import Nrl.
+Compute (subm (mI nat_ring_like_op 3) 0 0).
+Compute (mI nat_ring_like_op 2).
+...
 intros.
 unfold subm, mI; cbn.
 f_equal.
@@ -1439,7 +1446,7 @@ rewrite <- map_butn.
 destruct r; cbn; [ now do 2 rewrite butn_nil | ].
 rewrite Nat.sub_0_r.
 rewrite <- seq_shift.
-destruct i. {
+destruct n. {
   cbn.
   rewrite map_map.
   apply map_ext_in.
