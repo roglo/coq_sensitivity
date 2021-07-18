@@ -1326,13 +1326,13 @@ Compute subm (mk_mat [[3;5;8];[2;1;9];[10;11;12]]) 1 1.
 Compute subm (mk_mat [[3;5;8];[2;1;9];[10;11;12]]) 1 2.
 *)
 
-...
+(* combinations of submatrix and other operations *)
 
-(* combinations of submatrix and other *)
-
-Theorem submatrix_sub {m n} : ∀ (MA MB : matrix m n T) i j,
+Theorem submatrix_sub : ∀ (MA MB : matrix T) i j,
   subm (MA - MB)%M i j = (subm MA i j - subm MB i j)%M.
 Proof.
+intros.
+...
 intros.
 apply matrix_eq.
 intros k l Hk Hl; cbn.
