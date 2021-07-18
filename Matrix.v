@@ -1380,16 +1380,21 @@ rewrite map2_map_l.
 do 3 rewrite map2_map_r.
 rewrite map_butn, map2_butn.
 f_equal; clear i.
-...
-intros.
-apply matrix_eq.
-intros k l Hk Hl; cbn.
-now destruct (lt_dec k i), (lt_dec l j).
+rewrite map_map2.
+apply map2_ext_in.
+intros la lb Hla Hlb.
+rewrite map2_map_r.
+rewrite map_butn.
+rewrite map2_butn.
+f_equal.
+now rewrite map2_map_r.
 Qed.
 
-Theorem submatrix_mul_scal_l {m n} : ∀ (μ : T) (M : matrix m n T) i j,
+Theorem submatrix_mul_scal_l : ∀ (μ : T) (M : matrix T) i j,
   subm (μ × M)%M i j = (μ × subm M i j)%M.
 Proof.
+intros.
+...
 intros.
 apply matrix_eq.
 intros k l Hk Hl; cbn.
