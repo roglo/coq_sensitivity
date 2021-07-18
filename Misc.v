@@ -1552,6 +1552,55 @@ Qed.
 
 (* end map2 *)
 
+(* butn: list without its nth element *)
+
+Definition butn {A} n (l : list A) :=
+  firstn n l ++ skipn (S n) l.
+
+Theorem butn_nil : ∀ A n, butn n ([] : list A) = [].
+Proof.
+intros.
+unfold butn.
+now rewrite firstn_nil, skipn_nil.
+Qed.
+
+Theorem butn_cons : ∀ A (a : A) la n, butn (S n) (a :: la) = a :: butn n la.
+Proof.
+intros.
+unfold butn.
+now rewrite firstn_cons, skipn_cons.
+Qed.
+
+Theorem map_butn : ∀ A B (f : A → B) la n,
+  map f (butn n la) = butn n (map f la).
+Proof.
+intros.
+revert n.
+induction la as [| a]; intros; cbn; [ now do 2 rewrite butn_nil | ].
+destruct n; [ easy | ].
+do 2 rewrite butn_cons.
+cbn; f_equal.
+apply IHla.
+Qed.
+
+Theorem map2_butn : ∀ A B C (f : A → B → C) (la : list A) (lb : list B) n,
+  map2 f (butn n la) (butn n lb) = butn n (map2 f la lb).
+Proof.
+intros.
+revert n lb.
+induction la as [| a]; intros; cbn; [ now do 2 rewrite butn_nil | ].
+destruct lb as [| b]; cbn. {
+  do 2 rewrite butn_nil.
+  now rewrite map2_nil_r.
+}
+destruct n; [ easy | ].
+do 3 rewrite butn_cons.
+cbn; f_equal.
+apply IHla.
+Qed.
+
+(* end butn *)
+
 Theorem not_equiv_imp_False : ∀ P : Prop, (P → False) ↔ ¬ P.
 Proof. easy. Qed.
 
