@@ -1310,8 +1310,8 @@ Compute (mat_transp nat_ring_like_op (mk_mat [[3;5;8];[2;1;9];[10;11;12]])).
 
 (* matrix without row i and column j *)
 
-Definition butn {A} i (l : list A) :=
-  firstn i l ++ skipn (i + 1) l.
+Definition butn {A} n (l : list A) :=
+  firstn n l ++ skipn (S n) l.
 
 Definition subm (M : matrix T) i j :=
   mk_mat (map (butn j) (butn i (mat_list_list M))).
@@ -1326,12 +1326,60 @@ Compute subm (mk_mat [[3;5;8];[2;1;9];[10;11;12]]) 1 1.
 Compute subm (mk_mat [[3;5;8];[2;1;9];[10;11;12]]) 1 2.
 *)
 
+Theorem butn_nil : ∀ A n, butn n ([] : list A) = [].
+Proof.
+intros.
+unfold butn.
+now rewrite firstn_nil, skipn_nil.
+Qed.
+
+Theorem butn_cons : ∀ A (a : A) la n, butn (S n) (a :: la) = a :: butn n la.
+Proof.
+intros.
+unfold butn.
+now rewrite firstn_cons, skipn_cons.
+Qed.
+
+Theorem map_butn : ∀ A B (f : A → B) la n,
+  map f (butn n la) = butn n (map f la).
+Proof.
+intros.
+revert n.
+induction la as [| a]; intros; cbn; [ now do 2 rewrite butn_nil | ].
+destruct n; [ easy | ].
+do 2 rewrite butn_cons.
+cbn; f_equal.
+apply IHla.
+Qed.
+
+Theorem map2_butn : ∀ A B C (f : A → B → C) (la : list A) (lb : list B) n,
+  map2 f (butn n la) (butn n lb) = butn n (map2 f la lb).
+Proof.
+intros.
+revert n lb.
+induction la as [| a]; intros; cbn; [ now do 2 rewrite butn_nil | ].
+destruct lb as [| b]; cbn. {
+  do 2 rewrite butn_nil.
+  now rewrite map2_nil_r.
+}
+destruct n; [ easy | ].
+do 3 rewrite butn_cons.
+cbn; f_equal.
+apply IHla.
+Qed.
+
 (* combinations of submatrix and other operations *)
 
 Theorem submatrix_sub : ∀ (MA MB : matrix T) i j,
   subm (MA - MB)%M i j = (subm MA i j - subm MB i j)%M.
 Proof.
 intros.
+unfold subm, mat_sub, "+"%M, mat_opp; cbn.
+f_equal.
+rewrite map2_map_l.
+do 3 rewrite map2_map_r.
+rewrite map_butn, map2_butn.
+f_equal; clear i.
 ...
 intros.
 apply matrix_eq.
