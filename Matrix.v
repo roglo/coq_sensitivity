@@ -237,8 +237,10 @@ Compute (mZ nat_ring_like_op 7 2).
 
 (* identity square matrix of dimension n *)
 
+...
+
 Definition mI n : matrix T :=
-  mk_mat (map (λ i, map (λ j, if Nat.eqb i j then 1%F else 0%F) (seq 0 n)) (seq 0 n)).
+  mk_mat (map (λ i, map (λ j, if i =? j then 1%F else 0%F) (seq 0 n)) (seq 0 n)).
 
 (*
 End a.
@@ -1363,13 +1365,30 @@ Qed.
 Theorem submatrix_mI : ∀ i n, i < n → subm (mI n) i i = mI (n - 1).
 Proof.
 intros * Hnr.
+...
 unfold subm, mI; cbn.
 f_equal.
 destruct n; [ easy | ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
-...
 rewrite <- map_butn.
 rewrite map_map.
+erewrite map_ext_in. 2: {
+  intros j Hj.
+  now rewrite <- map_butn.
+}
+remember (λ j j0 : nat, if j =? j0 then 1%F else 0%F) as f eqn:Hf.
+...
+(fun j : nat =>
+        @map nat T
+          (fun j0 : nat =>
+           match Nat.eqb j j0 return T with
+           | true => @rngl_one T ro
+           | false => @rngl_zero T ro
+           end))
+
+
+remember (λ j : nat, map (λ j0 : nat, if j =? j0 then 1%F else 0%F)) as f in |-*.
+rewrite <- Heqf.
 ...
 End a.
 Require Import Nrl.
