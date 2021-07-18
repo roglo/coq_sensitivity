@@ -1367,6 +1367,20 @@ unfold subm, mI; cbn.
 f_equal.
 destruct r; [ now rewrite butn_nil | ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
+...
+rewrite map_butn.
+unfold butn at 2.
+rewrite map_app.
+rewrite <- firstn_map.
+rewrite <- skipn_map.
+...
+============================
+  firstn n (map (butn n) (map (λ i : nat, map (λ j : nat, if i =? j then 1%F else 0%F) (seq 0 r)) (seq 0 r))) ++
+  skipn (S n) (map (butn n) (map (λ i : nat, map (λ j : nat, if i =? j then 1%F else 0%F) (seq 0 r)) (seq 0 r))) =
+  map (λ i : nat, map (λ j : nat, if i =? j then 1%F else 0%F) (seq 0 (r - 1))) (seq 0 (r - 1))
+...
+destruct r; [ now rewrite butn_nil | ].
+rewrite Nat.sub_succ, Nat.sub_0_r.
 rewrite <- map_butn.
 remember (map (λ i, map _ _) _) as x eqn:Hx.
 erewrite map_ext_in in Hx. 2: {
