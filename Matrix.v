@@ -237,11 +237,8 @@ Compute (mZ nat_ring_like_op 7 2).
 
 (* identity square matrix of dimension n *)
 
-...
-
-Definition glop i j := if i =? j then 1%F else 0%F.
-
-Definition mI n : matrix T := mk_mat (map (λ i, map (glop i) (seq 0 n)) (seq 0 n)).
+Definition δ i j := if i =? j then 1%F else 0%F.
+Definition mI n : matrix T := mk_mat (map (λ i, map (δ i) (seq 0 n)) (seq 0 n)).
 
 (*
 End a.
@@ -446,7 +443,7 @@ destruct (lt_dec i n) as [Hin| Hin]. {
     rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
     rewrite seq_nth; [ | easy ].
     rewrite seq_nth; [ cbn | easy ].
-    unfold glop.
+    unfold δ.
     rewrite if_eqb_eq_dec.
     now destruct (Nat.eq_dec i j).
   }
@@ -467,7 +464,7 @@ unfold mat_el, mI; cbn.
 rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
 rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
-unfold glop.
+unfold δ.
 now rewrite Nat.eqb_refl.
 Qed.
 
@@ -634,7 +631,7 @@ destruct x as [x| ]. {
       rewrite Nat.min_id in Hkm.
       apply Nat.min_glb_lt_iff in Hkm.
       rewrite seq_nth; [ | easy ].
-      unfold glop.
+      unfold δ.
       rewrite if_eqb_eq_dec, Nat.add_0_l.
       destruct (Nat.eq_dec i k) as [H| H]; [ flia Hkm H | clear H ].
       now apply rngl_mul_0_l; left.
@@ -654,7 +651,7 @@ destruct x as [x| ]. {
         rewrite map2_map_l in Hi.
         apply in_map2_iff in Hi.
         destruct Hi as (k & Hkm & a' & b & Hk).
-        unfold glop in Hk; cbn in Hk.
+        unfold δ in Hk; cbn in Hk.
         rewrite rngl_mul_0_l in Hk; [ easy | now left ].
       }
       apply rngl_add_0_r.
