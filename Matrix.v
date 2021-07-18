@@ -1360,13 +1360,43 @@ symmetry.
 apply map_butn.
 Qed.
 
-Theorem submatrix_mI : ∀ i r, subm (mI r) i i = mI (r - 1).
+Theorem submatrix_mI : ∀ n r, subm (mI r) n n = mI (r - 1).
 Proof.
 intros.
 unfold subm, mI; cbn.
 f_equal.
 destruct r; [ now rewrite butn_nil | ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
+rewrite <- map_butn.
+remember (map (λ i, map _ _) _) as x eqn:Hx.
+erewrite map_ext_in in Hx. 2: {
+  intros i Hi.
+  replace (S r) with (i + (S r - i)). 2: {
+    unfold butn in Hi.
+    apply in_app_iff in Hi.
+    destruct Hi as [Hi| Hi]. {
+      rewrite List_firstn_seq in Hi.
+      apply in_seq in Hi.
+      flia Hi.
+    } {
+      cbn in Hi.
+      rewrite <- seq_shift in Hi.
+      rewrite skipn_map in Hi.
+      apply in_map_iff in Hi.
+      destruct Hi as (j & Hji & Hj).
+      subst i.
+      cbn; f_equal.
+...
+Search (_ ∈ skipn _ _).
+rewrite List_skipn_seq in Hj.
+...
+      destruct (le_dec n r) as [Hnr| Hnr]. {
+        rewrite List_skipn_seq in Hi; [ | flia Hnr ].
+Search (seq _ (_ - _)).
+Search (butn _ (seq _ _)).
+...
+Search (seq _ _ ++ seq _ _).
+Search (_ ∈ butn _ _).
 ...
 intros.
 unfold subm, mI; cbn.
