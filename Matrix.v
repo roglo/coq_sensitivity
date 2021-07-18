@@ -1310,15 +1310,21 @@ Compute (mat_transp nat_ring_like_op (mk_mat [[3;5;8];[2;1;9];[10;11;12]])).
 
 (* matrix without row i and column j *)
 
-Definition subm {m n} (M : matrix T) i j :=
+Definition subm (M : matrix T) i j :=
   mk_mat
-    (λ k l, mat_el M (k + Nat.b2n (i <=? k)) (l + Nat.b2n (j <=? l))).
+    (map (λ row, firstn j row ++ skipn (j + 1) row)
+       (firstn i (mat_list_list M) ++ skipn (i + 1) (mat_list_list M))).
+
+(*
+End a.
+Compute subm (mk_mat [[3;5;8];[2;1;9];[10;11;12]]) 0 0.
+Compute subm (mk_mat [[3;5;8];[2;1;9];[10;11;12]]) 0 1.
+Compute subm (mk_mat [[3;5;8];[2;1;9];[10;11;12]]) 0 2.
+Compute subm (mk_mat [[3;5;8];[2;1;9];[10;11;12]]) 1 0.
+Compute subm (mk_mat [[3;5;8];[2;1;9];[10;11;12]]) 1 1.
+*)
 
 ...
-
-Definition subm {m n} (M : matrix T) i j :=
-  mk_mat (m - 1) (n - 1)
-    (λ k l, mat_el M (k + Nat.b2n (i <=? k)) (l + Nat.b2n (j <=? l))).
 
 (* combinations of submatrix and other *)
 
