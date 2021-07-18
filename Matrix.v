@@ -1379,6 +1379,43 @@ erewrite map_ext_in. 2: {
   intros j Hj.
   now rewrite <- map_butn.
 }
+unfold butn at 2.
+rewrite List_firstn_seq.
+rewrite Nat.min_l; [ | flia Hnr ].
+rewrite List_skipn_seq; [ | easy ].
+cbn - [ seq ].
+replace n with (i + (n - i)) at 2 by flia Hnr.
+rewrite seq_app.
+cbn - [ seq ].
+do 2 rewrite map_app.
+f_equal. {
+  apply map_ext_in.
+  intros j Hj.
+  unfold butn.
+  rewrite List_firstn_seq.
+  rewrite Nat.min_l; [ | flia Hnr ].
+  rewrite List_skipn_seq; [ | easy ].
+  cbn.
+  replace n with (i + (n - i)) at 2 by flia Hnr.
+  rewrite seq_app.
+  do 2 rewrite map_app.
+  f_equal.
+  cbn.
+  rewrite <- seq_shift.
+  rewrite map_map.
+  apply map_ext_in.
+  intros k Hk.
+  apply in_seq in Hj.
+  apply in_seq in Hk.
+  unfold δ.
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec j (S k)) as [H| H]; [ flia Hj Hk H | clear H ].
+  destruct (Nat.eq_dec j k) as [H| H]; [ flia Hj Hk H | easy ].
+} {
+  rewrite <- seq_shift.
+  rewrite map_map.
+  apply map_ext_in.
+  intros j Hj.
 ...
 (*
 End a.
