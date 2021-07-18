@@ -1350,6 +1350,18 @@ destruct b, c; cbn - [ "-" ]. {
 }
 Qed.
 
+Theorem List_in_skipn : ∀ A (a : A) n l, a ∈ skipn n l → a ∈ l.
+Proof.
+intros * Ha.
+revert n Ha.
+induction l as [| b]; intros; [ now rewrite skipn_nil in Ha | ].
+cbn in Ha.
+destruct n; [ easy | ].
+rewrite skipn_cons in Ha.
+cbn; right.
+now apply (IHl n).
+Qed.
+
 (* map2: map with two lists *)
 
 Fixpoint map2 {A B C} (f : A → B → C) la lb :=

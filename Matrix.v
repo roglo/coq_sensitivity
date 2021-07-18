@@ -1371,6 +1371,11 @@ rewrite <- map_butn.
 remember (map (λ i, map _ _) _) as x eqn:Hx.
 erewrite map_ext_in in Hx. 2: {
   intros i Hi.
+  replace (map _ _) with (repeat 0%F i ++ 1%F :: repeat 0%F (r - i)). 2: {
+...
+  easy.
+Search (map _ (repeat _ _)).
+...
   replace (S r) with (i + (S r - i)). 2: {
     unfold butn in Hi.
     apply in_app_iff in Hi.
@@ -1386,8 +1391,19 @@ erewrite map_ext_in in Hx. 2: {
       destruct Hi as (j & Hji & Hj).
       subst i.
       cbn; f_equal.
+      apply List_in_skipn in Hj.
+      apply in_seq in Hj.
+      flia Hj.
+    }
+  }
+  rewrite seq_app, Nat.add_0_l.
+  rewrite map_app.
 ...
-Search (_ ∈ skipn _ _).
+repeat 0%F i ++ 1%F :: repeat 0%F (r - i)
+...
+  easy.
+}
+...
 rewrite List_skipn_seq in Hj.
 ...
       destruct (le_dec n r) as [Hnr| Hnr]. {
