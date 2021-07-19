@@ -146,7 +146,9 @@ Qed.
 
 Theorem is_sm_mat_iff {T} n : ∀ (M : matrix T),
   is_square_matrix n M = true ↔
-  mat_nrows M = n ∧ ∀ l, l ∈ mat_list_list M → length l = n.
+  mat_nrows M = n ∧
+  (mat_ncols M = 0 → mat_nrows M = 0) ∧
+  ∀ l, l ∈ mat_list_list M → length l = n.
 Proof.
 intros.
 unfold is_square_matrix.
@@ -158,6 +160,15 @@ split; intros Hm. {
   apply Bool.orb_true_iff in Hrc.
   apply Nat.eqb_eq in Hr.
   split; [ easy | ].
+  split. {
+    intros Hcz.
+    destruct Hrc as [Hrc| Hrc]. {
+      apply negb_true_iff in Hrc.
+      now apply Nat.eqb_neq in Hrc.
+    } {
+      now apply Nat.eqb_eq in Hrc.
+    }
+  }
   intros l Hl.
   remember (mat_list_list M) as ll eqn:Hll.
   clear Hll.
@@ -173,14 +184,24 @@ split; intros Hm. {
   destruct Hl as [Hl| Hl]; [ now subst l | ].
   now apply IHll.
 } {
-  destruct Hm as (Hr, Hc).
-  apply Nat.eqb_eq in Hr.
+  destruct Hm as (Hr & Hrc & Hc).
   apply Bool.andb_true_iff.
   split. {
     apply Bool.andb_true_iff.
-    split; [ easy | ].
-...
-  split; [ easy | ].
+    split; [ now apply Nat.eqb_eq in Hr | ].
+    apply Bool.orb_true_iff.
+    destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+      move Hnz at top; subst n.
+      right.
+      now apply Nat.eqb_eq.
+    }
+    left.
+    rewrite <- Hr in Hnz.
+    apply negb_true_iff.
+    apply Nat.eqb_neq.
+    intros H.
+    now apply Hnz, Hrc.
+  }
   remember (mat_list_list M) as ll eqn:Hll.
   clear Hll.
   induction ll as [| la]; [ easy | ].
@@ -512,6 +533,20 @@ intros * HM.
 unfold mat_sub.
 rewrite mat_add_comm.
 now apply mat_add_opp_l.
+Qed.
+
+Theorem mZ_nrows : ∀ m n, mat_nrows (mZ m n) = m.
+Proof.
+intros; cbn.
+apply repeat_length.
+Qed.
+
+Theorem mZ_ncols : ∀ m n, m ≠ 0 → mat_ncols (mZ m n) = n.
+Proof.
+intros * Hmz.
+unfold mZ, mat_ncols; cbn.
+destruct m; [ easy | cbn ].
+apply repeat_length.
 Qed.
 
 Theorem mI_nrows : ∀ n, mat_nrows (mI n) = n.
@@ -1570,7 +1605,11 @@ Theorem mZ_is_square_matrix : ∀ n, is_square_matrix n (mZ n n) = true.
 Proof.
 intros.
 apply is_sm_mat_iff.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  now subst n; cbn.
+}
 split; [ now cbn; rewrite repeat_length | ].
+split; [ now rewrite mZ_nrows, mZ_ncols | ].
 intros la Hla.
 cbn in Hla.
 apply repeat_spec in Hla; subst la.
@@ -1586,6 +1625,8 @@ Proof.
 intros.
 apply is_sm_mat_iff.
 split; [ now cbn; rewrite map_length, seq_length | ].
+rewrite mI_nrows, mI_ncols.
+split; [ easy | ].
 intros la Hla.
 cbn in Hla.
 apply in_map_iff in Hla.
@@ -1603,12 +1644,21 @@ Theorem square_matrix_add_is_square : ∀ n (MA MB : square_matrix n T),
 Proof.
 intros.
 apply is_sm_mat_iff.
-split; cbn. {
+cbn.
+split. {
   rewrite map2_length.
   do 2 rewrite fold_mat_nrows.
   do 2 rewrite squ_mat_nrows.
   apply Nat.min_id.
-} {
+}
+split. {
+  intros Hc.
+  destruct MA as (MA & Hrca).
+  destruct MB as (MB & Hrcb).
+  cbn in Hc |-*.
+  rewrite map2_length.
+  do 2 rewrite fold_mat_nrows.
+...
   intros l Hl.
   apply in_map2_iff in Hl.
   destruct Hl as (i & Him & a & b & Hl).
