@@ -1994,31 +1994,19 @@ apply mat_add_0_l; cycle 1. {
 } {
   symmetry; apply squ_mat_ncols.
 }
-...
-destruct M as (M, Hm).
-split; intros H. {
-  cbn in H |-*.
-  apply is_sm_mat_iff in Hm.
-  destruct Hm as (Hr, Hc).
-Search (mat_ncols _ = 0).
-...
-  unfold mat_nrows.
-
-  unfold mat_ncols in H.
-...
-  apply is_sm_mat_iff in M.
-...
-Check mat_add_0_l.
-specialize (squ_mat_nrows M) as Hr.
-specialize (squ_mat_ncols M) as Hc.
-...
-replace (mZ n n) with (mZ (mat_nrows (sm_mat M)) (mat_ncols (sm_mat M))).
-rewrite <- Hr at 1.
-rewrite <- Hc.
-destruct M as (M, Hm).
-cbn.
-
-...
+destruct M as (M, Hm); cbn.
+apply is_sm_mat_iff in Hm.
+destruct Hm as (Hr & Hcr & Hc).
+split; [ now intros H; apply Hcr in H | ].
+intros l Hl.
+unfold mat_ncols.
+rewrite Hc with (l := hd _ _). 2: {
+  rewrite List_hd_nth_0.
+  apply nth_In.
+  destruct (mat_list_list M); [ easy | cbn; flia ].
+}
+now apply Hc.
+Qed.
 
 Definition mat_ring_like_prop (n : nat) :
   ring_like_prop (square_matrix n T) :=
@@ -2032,7 +2020,7 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_add_comm := squ_mat_add_comm;
      rngl_add_assoc := squ_mat_add_assoc;
      rngl_add_0_l := squ_mat_add_0_l;
-     rngl_mul_assoc := mat_mul_assoc;
+     rngl_mul_assoc := 42; (*mat_mul_assoc;*)
      rngl_mul_1_l := mat_mul_1_l;
      rngl_mul_add_distr_l := mat_mul_add_distr_l;
 (**)
