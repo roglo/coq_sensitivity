@@ -102,6 +102,9 @@ Proof. easy. Qed.
 
 (* correct_matrix: matrix whose list list is made of non
    empty lists (rows) of same length *)
+(* this definition should (if it could) be defined like
+   is_square_matrix below, to allow property to be
+   unique *)
 
 Definition is_correct_matrix {T} (M : matrix T) :=
   (mat_ncols M = 0 → mat_nrows M = 0) ∧
@@ -113,13 +116,29 @@ Record correct_matrix T := mk_cm
 
 (* square_matrix *)
 
-Definition is_square_matrix {T} n (M : matrix T) :=
-  mat_nrows M = n ∧
-  ∀ l, l ∈ mat_list_list M → length l = n.
+Notation "'AND' ( i ∈ l ) , g" :=
+  (iter_list l (λ c i, (c && g)) true)
+  (at level 45, i at level 0, l at level 60).
 
-Record square_matrix n T := mk_sm
+Definition is_square_matrix {T} n (M : matrix T) :=
+  (mat_nrows M =? n) && AND (l ∈ mat_list_list M), (length l =? n).
+
+Record square_matrix n T :=
   { sm_mat : matrix T;
-    sm_prop : is_square_matrix n sm_mat }.
+    sm_prop : is_square_matrix n sm_mat = true }.
+
+Theorem square_matrix_eq {n T} : ∀ (MA MB : square_matrix n T),
+  sm_mat MA = sm_mat MB
+  → MA = MB.
+Proof.
+intros * Hab.
+destruct MA as (MA, Ha).
+destruct MB as (MB, Hb).
+cbn in Hab.
+destruct Hab.
+f_equal.
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+Qed.
 
 (* *)
 
@@ -1608,8 +1627,6 @@ Canonical Structure mat_ring_like_op n : ring_like_op (square_matrix n T) :=
      rngl_opt_quot := None;
      rngl_le := phony_mat_le |}.
 
-...
-
 Existing Instance mat_ring_like_op.
 
 (*
@@ -1755,8 +1772,17 @@ Theorem mat_consistent : ∀ n,
 Proof. now intros; split; right. Qed.
 *)
 
+Theorem squ_mat_add_comm {n} : ∀ (MA MB : square_matrix n T),
+   (MA + MB)%F = (MB + MA)%F.
+Proof.
+intros.
+...
+apply square_matrix_eq.
+apply mat_add_comm.
+Qed.
+
 Definition mat_ring_like_prop (n : nat) :
-  ring_like_prop (matrix T) :=
+  ring_like_prop (square_matrix n T) :=
   {| rngl_is_comm := false;
      rngl_has_dec_eq := @rngl_has_dec_eq T ro rp;
      rngl_has_dec_le := false;
@@ -1764,7 +1790,7 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_is_ordered := false;
      rngl_is_integral := false;
      rngl_characteristic := if Nat.eq_dec n 0 then 1 else rngl_characteristic;
-     rngl_add_comm := mat_add_comm;
+     rngl_add_comm := squ_mat_add_comm;
      rngl_add_assoc := mat_add_assoc;
      rngl_add_0_l := mat_add_0_l;
      rngl_mul_assoc := mat_mul_assoc;
