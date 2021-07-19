@@ -1388,7 +1388,6 @@ replace n with (i + (n - i)) at 2 by flia Hnr.
 rewrite seq_app.
 cbn - [ seq ].
 do 2 rewrite map_app.
-(**)
 unfold butn.
 rewrite List_firstn_seq.
 rewrite Nat.min_l; [ | flia Hnr ].
@@ -1428,150 +1427,11 @@ f_equal. {
   destruct (Nat.eq_dec j k) as [H| H]; [ flia Hj Hk H | easy ].
 }
 Qed.
-(* nettoyage required *)
-...
-(*
-End a.
-Require Import Nrl.
-Compute (subm (mI nat_ring_like_op 3) 0 0).
-Compute (mI nat_ring_like_op 2).
-*)
-...
-intros.
-unfold subm, mI; cbn.
-f_equal.
-destruct r; [ now rewrite butn_nil | ].
-rewrite Nat.sub_succ, Nat.sub_0_r.
-rewrite <- map_butn.
-rewrite map_map.
-...
-rewrite map_butn.
-unfold butn at 2.
-rewrite map_app.
-rewrite <- firstn_map.
-rewrite <- skipn_map.
-...
-============================
-  firstn n (map (butn n) (map (λ i : nat, map (λ j : nat, if i =? j then 1%F else 0%F) (seq 0 r)) (seq 0 r))) ++
-  skipn (S n) (map (butn n) (map (λ i : nat, map (λ j : nat, if i =? j then 1%F else 0%F) (seq 0 r)) (seq 0 r))) =
-  map (λ i : nat, map (λ j : nat, if i =? j then 1%F else 0%F) (seq 0 (r - 1))) (seq 0 (r - 1))
-...
-destruct r; [ now rewrite butn_nil | ].
-rewrite Nat.sub_succ, Nat.sub_0_r.
-rewrite <- map_butn.
-remember (map (λ i, map _ _) _) as x eqn:Hx.
-erewrite map_ext_in in Hx. 2: {
-  intros i Hi.
-  replace (map _ _) with (repeat 0%F i ++ 1%F :: repeat 0%F (r - i)). 2: {
-...
-  easy.
-Search (map _ (repeat _ _)).
-...
-  replace (S r) with (i + (S r - i)). 2: {
-    unfold butn in Hi.
-    apply in_app_iff in Hi.
-    destruct Hi as [Hi| Hi]. {
-      rewrite List_firstn_seq in Hi.
-      apply in_seq in Hi.
-      flia Hi.
-    } {
-      cbn in Hi.
-      rewrite <- seq_shift in Hi.
-      rewrite skipn_map in Hi.
-      apply in_map_iff in Hi.
-      destruct Hi as (j & Hji & Hj).
-      subst i.
-      cbn; f_equal.
-      apply List_in_skipn in Hj.
-      apply in_seq in Hj.
-      flia Hj.
-    }
-  }
-  rewrite seq_app, Nat.add_0_l.
-  rewrite map_app.
-...
-repeat 0%F i ++ 1%F :: repeat 0%F (r - i)
-...
-  easy.
-}
-...
-rewrite List_skipn_seq in Hj.
-...
-      destruct (le_dec n r) as [Hnr| Hnr]. {
-        rewrite List_skipn_seq in Hi; [ | flia Hnr ].
-Search (seq _ (_ - _)).
-Search (butn _ (seq _ _)).
-...
-Search (seq _ _ ++ seq _ _).
-Search (_ ∈ butn _ _).
-...
-intros.
-unfold subm, mI; cbn.
-f_equal.
-rewrite map_butn.
-rewrite map_map.
-rewrite <- map_butn.
-destruct r; cbn; [ now do 2 rewrite butn_nil | ].
-rewrite Nat.sub_0_r.
-rewrite <- seq_shift.
-destruct n. {
-  cbn.
-  rewrite map_map.
-  apply map_ext_in.
-  intros i Hi.
-  apply map_map.
-}
-rewrite butn_cons.
-cbn - [ butn "=?" ].
-rewrite Nat.eqb_refl.
-rewrite butn_cons.
-rewrite map_butn.
-do 2 rewrite map_map.
-erewrite map_ext_in; [ | now intros j Hj; cbn ].
-remember (butn _ _) as x eqn:Hx.
-erewrite map_ext_in. 2: {
-  intros j Hj.
-  rewrite butn_cons.
-  rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec (S j) 0) as [H| H]; [ | clear H ].
-  inversion H.
-  easy.
-}
-...
-  destruct H.
-...
-intros.
-apply matrix_eq.
-intros k l Hk Hl; cbn.
-remember (i <=? k) as ki eqn:Hki; symmetry in Hki.
-remember (i <=? l) as li eqn:Hli; symmetry in Hli.
-destruct ki; cbn. {
-  destruct li; cbn. {
-    destruct (Nat.eq_dec (k + 1) (l + 1)) as [Hkl1| Hkl1]. {
-      destruct (Nat.eq_dec k l) as [Hkl| Hkl]; [ easy | flia Hkl1 Hkl ].
-    } {
-      destruct (Nat.eq_dec k l) as [Hkl| Hkl]; [ flia Hkl1 Hkl | easy ].
-    }
-  } {
-    rewrite Nat.add_0_r.
-    apply Nat.leb_le in Hki; apply Nat.leb_nle in Hli.
-    destruct (Nat.eq_dec (k + 1) l) as [Hkl1| Hkl1]; [ flia Hki Hli Hkl1 | ].
-    destruct (Nat.eq_dec k l) as [Hkl| Hkl]; [ flia Hki Hli Hkl | easy ].
-  }
-} {
-  rewrite Nat.add_0_r.
-  destruct li; cbn. {
-    apply Nat.leb_nle in Hki; apply Nat.leb_le in Hli.
-    destruct (Nat.eq_dec k (l + 1)) as [Hkl1| Hkl1]; [ flia Hki Hli Hkl1 | ].
-    destruct (Nat.eq_dec k l) as [Hkl| Hkl]; [ flia Hki Hli Hkl | easy ].
-  } {
-    now rewrite Nat.add_0_r.
-  }
-}
-Qed.
 
-Theorem mat_mul_scal_1_l {m n} : ∀ (M : matrix m n T), (1 × M = M)%M.
+Theorem mat_mul_scal_1_l : ∀ (M : matrix T), (1 × M = M)%M.
 Proof.
+intros.
+...
 intros.
 apply matrix_eq; cbn.
 intros * Hi Hj.
@@ -1594,9 +1454,7 @@ Canonical Structure mat_ring_like_op n :
      rngl_opt_quot := None;
      rngl_le := @phony_mat_le n |}.
 
-(**)
 Existing Instance mat_ring_like_op.
-(**)
 
 Theorem mat_opt_add_opp_l : ∀ n,
   if @rngl_has_opp (matrix n n T) _ then
