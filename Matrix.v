@@ -431,11 +431,14 @@ Qed.
 
 (* addition to zero *)
 
-Theorem mat_add_0_l : ∀ (M : matrix T),
+Theorem mat_add_0_l {m n} : ∀ (M : matrix T),
   is_correct_matrix M
-  → (mZ (mat_nrows M) (mat_ncols M) + M)%M = M.
+  → m = mat_nrows M
+  → n = mat_ncols M
+  → (mZ m n + M)%M = M.
 Proof.
-intros * HM.
+intros * HM Hr Hc.
+subst m n.
 unfold is_correct_matrix in HM.
 destruct HM as (_, HM).
 unfold mZ, "+"%M, mat_nrows, mat_ncols.
@@ -1847,6 +1850,31 @@ apply square_matrix_eq.
 apply mat_add_assoc.
 Qed.
 
+Theorem squ_mat_add_0_l {n} : ∀ M : square_matrix n T, (0 + M)%F = M.
+Proof.
+intros.
+apply square_matrix_eq.
+apply mat_add_0_l; cycle 1. {
+  symmetry; apply squ_mat_nrows.
+} {
+  symmetry; apply squ_mat_ncols.
+}
+split; intros H. {
+...
+  apply is_sm_mat_iff in M.
+...
+Check mat_add_0_l.
+specialize (squ_mat_nrows M) as Hr.
+specialize (squ_mat_ncols M) as Hc.
+...
+replace (mZ n n) with (mZ (mat_nrows (sm_mat M)) (mat_ncols (sm_mat M))).
+rewrite <- Hr at 1.
+rewrite <- Hc.
+destruct M as (M, Hm).
+cbn.
+
+...
+
 Definition mat_ring_like_prop (n : nat) :
   ring_like_prop (square_matrix n T) :=
   {| rngl_is_comm := false;
@@ -1858,7 +1886,7 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_characteristic := if Nat.eq_dec n 0 then 1 else rngl_characteristic;
      rngl_add_comm := squ_mat_add_comm;
      rngl_add_assoc := squ_mat_add_assoc;
-     rngl_add_0_l := 42; (*mat_add_0_l;*)
+     rngl_add_0_l := squ_mat_add_0_l;
      rngl_mul_assoc := mat_mul_assoc;
      rngl_mul_1_l := mat_mul_1_l;
      rngl_mul_add_distr_l := mat_mul_add_distr_l;
