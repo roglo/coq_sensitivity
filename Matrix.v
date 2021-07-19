@@ -1393,6 +1393,8 @@ unfold butn.
 rewrite List_firstn_seq.
 rewrite Nat.min_l; [ | flia Hnr ].
 rewrite List_skipn_seq; [ cbn | easy ].
+rewrite <- seq_shift.
+rewrite map_map.
 f_equal. {
   apply map_ext_in.
   intros j Hj.
@@ -1400,7 +1402,6 @@ f_equal. {
   rewrite seq_app.
   do 2 rewrite map_app.
   f_equal; cbn.
-  rewrite <- seq_shift.
   rewrite map_map.
   apply map_ext_in.
   intros k Hk.
@@ -1411,25 +1412,20 @@ f_equal. {
   destruct (Nat.eq_dec j (S k)) as [H| H]; [ flia Hj Hk H | clear H ].
   destruct (Nat.eq_dec j k) as [H| H]; [ flia Hj Hk H | easy ].
 } {
-  rewrite <- seq_shift.
-  rewrite map_map.
   apply map_ext_in.
   intros j Hj.
   replace n with (i + (n - i)) at 2 by flia Hnr.
   rewrite seq_app.
   do 2 rewrite map_app; cbn.
-  f_equal. {
-    apply map_ext_in.
-    intros k Hk.
-    apply in_seq in Hj.
-    apply in_seq in Hk.
-    unfold δ.
-    do 2 rewrite if_eqb_eq_dec.
-    destruct (Nat.eq_dec (S j) k) as [H| H]; [ flia Hj Hk H | clear H ].
-    destruct (Nat.eq_dec j k) as [H| H]; [ flia Hj Hk H | easy ].
-  } {
-    now rewrite map_map.
-  }
+  f_equal; [ | now rewrite map_map ].
+  apply map_ext_in.
+  intros k Hk.
+  apply in_seq in Hj.
+  apply in_seq in Hk.
+  unfold δ.
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (S j) k) as [H| H]; [ flia Hj Hk H | clear H ].
+  destruct (Nat.eq_dec j k) as [H| H]; [ flia Hj Hk H | easy ].
 }
 Qed.
 (* nettoyage required *)
