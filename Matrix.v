@@ -1658,6 +1658,11 @@ split. {
   cbn in Hc |-*.
   rewrite map2_length.
   do 2 rewrite fold_mat_nrows.
+  unfold mat_ncols in Hc; cbn in Hc.
+  apply length_zero_iff_nil in Hc.
+...
+  unfold "+"%M in Hc.
+  cbn in Hc.
 ...
   intros l Hl.
   apply in_map2_iff in Hl.
