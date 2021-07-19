@@ -1660,10 +1660,27 @@ split. {
   do 2 rewrite fold_mat_nrows.
   unfold mat_ncols in Hc; cbn in Hc.
   apply length_zero_iff_nil in Hc.
-...
-  unfold "+"%M in Hc.
+  destruct MA as (lla).
+  destruct MB as (llb).
+  cbn in Hrca, Hrcb, Hc |-*.
+  apply is_sm_mat_iff in Hrca.
+  apply is_sm_mat_iff in Hrcb.
+  cbn in Hrca, Hrcb.
+  rewrite List_hd_nth_0 in Hc.
+  destruct lla as [| la]; [ easy | ].
+  destruct llb as [| lb]; [ easy | exfalso ].
   cbn in Hc.
-...
+  cbn in Hrca, Hrcb.
+  destruct la as [| a]. {
+    destruct Hrca as (_ & H & _).
+    now specialize (H eq_refl).
+  }
+  destruct lb as [| b]. {
+    destruct Hrcb as (_ & H & _).
+    now specialize (H eq_refl).
+  }
+  easy.
+} {
   intros l Hl.
   apply in_map2_iff in Hl.
   destruct Hl as (i & Him & a & b & Hl).
@@ -1674,8 +1691,8 @@ split. {
   cbn in Him |-*.
   apply is_sm_mat_iff in Hrca.
   apply is_sm_mat_iff in Hrcb.
-  destruct Hrca as (Hra, Hca).
-  destruct Hrcb as (Hrb, Hcb).
+  destruct Hrca as (Hra & Hrca & Hca).
+  destruct Hrcb as (Hrb & Hrcb & Hcb).
   do 2 rewrite fold_mat_nrows in Him.
   rewrite Hra, Hrb in Him.
   rewrite Nat.min_id in Him.
@@ -1698,7 +1715,11 @@ apply is_sm_mat_iff.
 split; cbn. {
   rewrite map_length, seq_length.
   apply squ_mat_nrows.
-} {
+}
+split. {
+  intros Hab.
+  rewrite map_length, seq_length.
+...
   intros l Hl.
   apply in_map_iff in Hl.
   destruct Hl as (i & Him & Hl).
