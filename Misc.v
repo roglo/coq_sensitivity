@@ -1571,6 +1571,13 @@ rewrite map2_map_r.
 apply IHla.
 Qed.
 
+Theorem map2_eq_nil: ∀ A B C (f : A → B → C) la lb,
+  map2 f la lb = [] → la = [] ∨ lb = [].
+Proof.
+intros * Hab.
+destruct la; intros; [ now left | now right; destruct lb ].
+Qed.
+
 (* end map2 *)
 
 (* butn: list without its nth element *)

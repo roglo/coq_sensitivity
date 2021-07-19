@@ -385,6 +385,8 @@ Arguments mat_add {T ro} MA%M MB%M.
 Arguments mat_mul {T ro} MA%M MB%M.
 Arguments mat_mul_el {T}%type {ro} (MA MB)%M (i k)%nat.
 Arguments mat_mul_scal_l {T ro} s%F M%M.
+Arguments mat_nrows {T}%type M%M.
+Arguments mat_ncols {T}%type M%M.
 Arguments mat_opp {T}%type {ro}.
 Arguments mat_sub {T ro} MA%M MB%M.
 Arguments mI {T ro} n%nat.
@@ -1653,33 +1655,40 @@ split. {
 }
 split. {
   intros Hc.
-  destruct MA as (MA & Hrca).
-  destruct MB as (MB & Hrcb).
-  cbn in Hc |-*.
   rewrite map2_length.
   do 2 rewrite fold_mat_nrows.
+  destruct MA as (MA & Ha).
+  destruct MB as (MB & Hb).
+  move MB before MA; cbn in Hc |-*.
+  apply is_sm_mat_iff in Ha.
+  apply is_sm_mat_iff in Hb.
+  destruct Ha as (Hra & Hcra & Hca).
+  destruct Hb as (Hrb & Hcrb & Hcb).
+  move Hrb before Hra.
+  move Hcrb before Hcra.
+  rewrite Hra, Hrb, Nat.min_id.
   unfold mat_ncols in Hc; cbn in Hc.
   apply length_zero_iff_nil in Hc.
-  destruct MA as (lla).
-  destruct MB as (llb).
-  cbn in Hrca, Hrcb, Hc |-*.
-  apply is_sm_mat_iff in Hrca.
-  apply is_sm_mat_iff in Hrcb.
-  cbn in Hrca, Hrcb.
   rewrite List_hd_nth_0 in Hc.
-  destruct lla as [| la]; [ easy | ].
-  destruct llb as [| lb]; [ easy | exfalso ].
-  cbn in Hc.
-  cbn in Hrca, Hrcb.
-  destruct la as [| a]. {
-    destruct Hrca as (_ & H & _).
-    now specialize (H eq_refl).
+  destruct n; [ easy | exfalso ].
+  rewrite map2_nth with (a := []) (b := []) in Hc; cycle 1. {
+    rewrite fold_mat_nrows, Hra; flia.
+  } {
+    rewrite fold_mat_nrows, Hrb; flia.
   }
-  destruct lb as [| b]. {
-    destruct Hrcb as (_ & H & _).
-    now specialize (H eq_refl).
+  apply map2_eq_nil in Hc.
+  do 2 rewrite <- List_hd_nth_0 in Hc.
+  destruct Hc as [Hc| Hc]. {
+    apply (f_equal length) in Hc; cbn in Hc.
+    rewrite fold_mat_ncols in Hc.
+    apply Hcra in Hc.
+    flia Hra Hc.
+  } {
+    apply (f_equal length) in Hc; cbn in Hc.
+    rewrite fold_mat_ncols in Hc.
+    apply Hcrb in Hc.
+    flia Hrb Hc.
   }
-  easy.
 } {
   intros l Hl.
   apply in_map2_iff in Hl.
@@ -1717,9 +1726,29 @@ split; cbn. {
   apply squ_mat_nrows.
 }
 split. {
-  intros Hab.
+  intros Hc.
   rewrite map_length, seq_length.
-...
+  destruct MA as (MA & Ha).
+  destruct MB as (MB & Hb).
+  move MB before MA; cbn in Hc |-*.
+  apply is_sm_mat_iff in Ha.
+  apply is_sm_mat_iff in Hb.
+  destruct Ha as (Hra & Hcra & Hca).
+  destruct Hb as (Hrb & Hcrb & Hcb).
+  move Hrb before Hra.
+  move Hcrb before Hcra.
+  unfold mat_ncols in Hc; cbn in Hc.
+  apply length_zero_iff_nil in Hc.
+  rewrite List_hd_nth_0 in Hc.
+  destruct n; [ easy | exfalso ].
+  rewrite List_map_nth' with (a := 0) in Hc. 2: {
+    rewrite seq_length, Hra; flia.
+  }
+  apply map_eq_nil in Hc.
+  apply List_seq_eq_nil in Hc.
+  apply Hcrb in Hc.
+  flia Hrb Hc.
+} {
   intros l Hl.
   apply in_map_iff in Hl.
   destruct Hl as (i & Him & Hl).
@@ -1743,6 +1772,27 @@ split; cbn. {
   rewrite map_length.
   rewrite fold_mat_nrows.
   apply squ_mat_nrows.
+}
+split. {
+  intros Hco.
+  rewrite map_length.
+  rewrite fold_mat_nrows.
+  destruct M as (M & Ha); cbn in Hco |-*.
+  apply is_sm_mat_iff in Ha.
+  destruct Ha as (Hr & Hcr & Hc).
+  unfold mat_ncols in Hco; cbn in Hco.
+  apply length_zero_iff_nil in Hco.
+  rewrite List_hd_nth_0 in Hco.
+  destruct n; [ easy | exfalso ].
+  rewrite List_map_nth' with (a := []) in Hco. 2: {
+    rewrite fold_mat_nrows, Hr; flia.
+  }
+  apply map_eq_nil in Hco.
+  apply (f_equal length) in Hco; cbn in Hco.
+  rewrite <- List_hd_nth_0 in Hco.
+  rewrite fold_mat_ncols in Hco.
+  apply Hcr in Hco.
+  flia Hr Hco.
 } {
   intros l Hl.
   destruct M as (M & Hrc).
@@ -1944,6 +1994,7 @@ apply mat_add_0_l; cycle 1. {
 } {
   symmetry; apply squ_mat_ncols.
 }
+...
 destruct M as (M, Hm).
 split; intros H. {
   cbn in H |-*.
