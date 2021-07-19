@@ -140,14 +140,11 @@ f_equal.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
-(* is_square_matrix_prop (a Prop) easier to use than
-  is_square_matrix (a bool) *)
-
-Definition is_square_matrix_prop {T} n (M : matrix T) :=
-  mat_nrows M = n ∧ ∀ l, l ∈ mat_list_list M → length l = n.
+(* is_square_matrix (a bool) easier to use with Prop *)
 
 Theorem is_sm_mat_iff {T} n : ∀ (M : matrix T),
-  is_square_matrix n M = true ↔ is_square_matrix_prop n M.
+  is_square_matrix n M = true ↔
+  mat_nrows M = n ∧ ∀ l, l ∈ mat_list_list M → length l = n.
 Proof.
 intros.
 unfold is_square_matrix.
@@ -1531,41 +1528,36 @@ Theorem squ_mat_nrows : ∀ n (M : square_matrix n T),
 Proof.
 intros.
 destruct M as (M & Hmp); cbn.
-apply is_sm_mat_iff in Hmp.
-...
-unfold is_square_matrix in Hmp.
-apply Bool.andb_true_iff in Hmp.
-destruct Hmp as (Hr & Hc).
-now apply Nat.eqb_eq in Hr.
-...
-now destruct Hmp as (H1, H2).
+now apply is_sm_mat_iff in Hmp.
 Qed.
 
 Theorem squ_mat_ncols : ∀ n (M : square_matrix n T),
   mat_ncols (sm_mat M) = n.
 Proof.
 intros.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  subst n; cbn.
-  destruct M as (M & H1 & H2).
-  unfold mat_ncols; cbn.
-  unfold mat_nrows in H1.
-  apply length_zero_iff_nil in H1.
-  now rewrite H1.
-}
 destruct M as (M, Hmp); cbn.
-destruct Hmp as (H1, H2).
+apply is_sm_mat_iff in Hmp.
+destruct Hmp as (Hr, Hc).
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  move Hnz at top; subst n.
+  unfold mat_ncols.
+  unfold mat_nrows in Hr.
+  apply length_zero_iff_nil in Hr.
+  now rewrite Hr.
+}
 unfold mat_ncols.
-apply H2.
+apply Hc.
 rewrite List_hd_nth_0.
 apply nth_In.
-rewrite fold_mat_nrows, H1.
+unfold mat_nrows in Hr.
+rewrite Hr.
 now apply Nat.neq_0_lt_0.
 Qed.
 
-Theorem mZ_is_square_matrix : ∀ n, is_square_matrix n (mZ n n).
+Theorem mZ_is_square_matrix : ∀ n, is_square_matrix n (mZ n n) = true.
 Proof.
 intros.
+apply is_sm_mat_iff.
 split; [ now cbn; rewrite repeat_length | ].
 intros la Hla.
 cbn in Hla.
@@ -1577,9 +1569,10 @@ Definition smZ n : square_matrix n T :=
   {| sm_mat := mZ n n;
      sm_prop := mZ_is_square_matrix n |}.
 
-Theorem mI_is_square_matrix : ∀ n, is_square_matrix n (mI n).
+Theorem mI_is_square_matrix : ∀ n, is_square_matrix n (mI n) = true.
 Proof.
 intros.
+apply is_sm_mat_iff.
 split; [ now cbn; rewrite map_length, seq_length | ].
 intros la Hla.
 cbn in Hla.
@@ -1594,9 +1587,10 @@ Definition smI n : square_matrix n T :=
      sm_prop := mI_is_square_matrix n |}.
 
 Theorem square_matrix_add_is_square : ∀ n (MA MB : square_matrix n T),
-  is_square_matrix n (sm_mat MA + sm_mat MB)%M.
+  is_square_matrix n (sm_mat MA + sm_mat MB)%M = true.
 Proof.
 intros.
+apply is_sm_mat_iff.
 split; cbn. {
   rewrite map2_length.
   do 2 rewrite fold_mat_nrows.
@@ -1608,6 +1602,7 @@ split; cbn. {
   destruct Hl as (i & Him & a & b & Hl).
   subst l.
   rewrite map2_length.
+...
   destruct MA as (MA & Hra & Hca).
   destruct MB as (MB & Hrb & Hcb).
   cbn in Him |-*.
@@ -1625,6 +1620,7 @@ Definition square_matrix_add {n} (MA MB : square_matrix n T) :
   {| sm_mat := (sm_mat MA + sm_mat MB)%M;
      sm_prop := square_matrix_add_is_square MA MB |}.
 
+(*
 Theorem square_matrix_mul_is_square : ∀ n (MA MB : square_matrix n T),
   is_square_matrix n (sm_mat MA * sm_mat MB)%M.
 Proof.
@@ -1673,6 +1669,7 @@ Definition square_matrix_opp {n} (M : square_matrix n T) :
      sm_prop := square_matrix_opp_is_square M |}.
 
 Definition phony_mat_le {n} (MA MB : square_matrix n T) := True.
+*)
 
 Canonical Structure mat_ring_like_op n : ring_like_op (square_matrix n T) :=
   {| rngl_zero := smZ n;
