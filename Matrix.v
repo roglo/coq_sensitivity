@@ -1602,10 +1602,13 @@ split; cbn. {
   destruct Hl as (i & Him & a & b & Hl).
   subst l.
   rewrite map2_length.
-...
-  destruct MA as (MA & Hra & Hca).
-  destruct MB as (MB & Hrb & Hcb).
+  destruct MA as (MA & Hrca).
+  destruct MB as (MB & Hrcb).
   cbn in Him |-*.
+  apply is_sm_mat_iff in Hrca.
+  apply is_sm_mat_iff in Hrcb.
+  destruct Hrca as (Hra, Hca).
+  destruct Hrcb as (Hrb, Hcb).
   do 2 rewrite fold_mat_nrows in Him.
   rewrite Hra, Hrb in Him.
   rewrite Nat.min_id in Him.
@@ -1620,11 +1623,11 @@ Definition square_matrix_add {n} (MA MB : square_matrix n T) :
   {| sm_mat := (sm_mat MA + sm_mat MB)%M;
      sm_prop := square_matrix_add_is_square MA MB |}.
 
-(*
 Theorem square_matrix_mul_is_square : ∀ n (MA MB : square_matrix n T),
-  is_square_matrix n (sm_mat MA * sm_mat MB)%M.
+  is_square_matrix n (sm_mat MA * sm_mat MB)%M = true.
 Proof.
 intros.
+apply is_sm_mat_iff.
 split; cbn. {
   rewrite map_length, seq_length.
   apply squ_mat_nrows.
@@ -1644,16 +1647,20 @@ Definition square_matrix_mul {n} (MA MB : square_matrix n T) :
      sm_prop := square_matrix_mul_is_square MA MB |}.
 
 Theorem square_matrix_opp_is_square : ∀ n (M : square_matrix n T),
-  is_square_matrix n (- sm_mat M)%M.
+  is_square_matrix n (- sm_mat M)%M = true.
 Proof.
 intros.
+apply is_sm_mat_iff.
 split; cbn. {
   rewrite map_length.
   rewrite fold_mat_nrows.
   apply squ_mat_nrows.
 } {
   intros l Hl.
-  destruct M as (M & Hr & Hc).
+  destruct M as (M & Hrc).
+  cbn in Hl.
+  apply is_sm_mat_iff in Hrc.
+  destruct Hrc as (Hr, Hc).
   apply in_map_iff in Hl.
   destruct Hl as (la & Hlm & Hla).
   subst l.
@@ -1669,7 +1676,6 @@ Definition square_matrix_opp {n} (M : square_matrix n T) :
      sm_prop := square_matrix_opp_is_square M |}.
 
 Definition phony_mat_le {n} (MA MB : square_matrix n T) := True.
-*)
 
 Canonical Structure mat_ring_like_op n : ring_like_op (square_matrix n T) :=
   {| rngl_zero := smZ n;
@@ -1771,9 +1777,7 @@ induction c; [ easy | cbn ].
 destruct (Nat.eq_dec i j) as [H| H]; [ easy | clear H ].
 now rewrite rngl_add_0_l.
 Qed.
-*)
 
-(*
 Theorem mat_opt_eq_dec : ∀ n,
   if rngl_has_dec_eq then ∀ a b : matrix n n T, {a = b} + {a ≠ b}
   else not_applicable.
@@ -1828,12 +1832,19 @@ Proof. now intros; split; right. Qed.
 *)
 
 Theorem squ_mat_add_comm {n} : ∀ (MA MB : square_matrix n T),
-   (MA + MB)%F = (MB + MA)%F.
+  (MA + MB)%F = (MB + MA)%F.
 Proof.
 intros.
-...
 apply square_matrix_eq.
 apply mat_add_comm.
+Qed.
+
+Theorem squ_mat_add_assoc {n} : ∀ (MA MB MC : square_matrix n T),
+  (MA + (MB + MC) = (MA + MB) + MC)%F.
+Proof.
+intros.
+apply square_matrix_eq.
+apply mat_add_assoc.
 Qed.
 
 Definition mat_ring_like_prop (n : nat) :
@@ -1846,8 +1857,8 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_is_integral := false;
      rngl_characteristic := if Nat.eq_dec n 0 then 1 else rngl_characteristic;
      rngl_add_comm := squ_mat_add_comm;
-     rngl_add_assoc := mat_add_assoc;
-     rngl_add_0_l := mat_add_0_l;
+     rngl_add_assoc := squ_mat_add_assoc;
+     rngl_add_0_l := 42; (*mat_add_0_l;*)
      rngl_mul_assoc := mat_mul_assoc;
      rngl_mul_1_l := mat_mul_1_l;
      rngl_mul_add_distr_l := mat_mul_add_distr_l;
