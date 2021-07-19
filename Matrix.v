@@ -100,6 +100,29 @@ Theorem fold_mat_el {T} {ro : ring_like_op T} : ∀ (M : matrix T) i j,
   nth j (nth i (mat_list_list M) []) 0%F = mat_el M i j.
 Proof. easy. Qed.
 
+(* correct_matrix: matrix whose list list is made of non
+   empty lists (rows) of same length *)
+
+Definition is_correct_matrix {T} (M : matrix T) :=
+  (mat_ncols M = 0 → mat_nrows M = 0) ∧
+  ∀ l, l ∈ mat_list_list M → length l = mat_ncols M.
+
+Record correct_matrix T := mk_cm
+  { cm_mat : matrix T;
+    cm_prop : is_correct_matrix cm_mat }.
+
+(* square_matrix *)
+
+Definition is_square_matrix {T} n (M : matrix T) :=
+  mat_nrows M = n ∧
+  ∀ l, l ∈ mat_list_list M → length l = n.
+
+Record square_matrix n T := mk_sm
+  { sm_mat : matrix T;
+    sm_prop : is_square_matrix n sm_mat }.
+
+(* *)
+
 Fixpoint concat_list_in_list {T} (ll1 ll2 : list (list T)) :=
   match ll1 with
   | [] => ll2
@@ -338,10 +361,6 @@ rewrite mat_add_add_swap.
 f_equal.
 apply mat_add_comm.
 Qed.
-
-Definition is_correct_matrix (M : matrix T) :=
-  (mat_nrows M = 0 ↔ mat_ncols M = 0) ∧
-  ∀ l, l ∈ mat_list_list M → length l = mat_ncols M.
 
 (* addition to zero *)
 
@@ -1440,51 +1459,30 @@ induction la as [| a]; [ easy | cbn ].
 now rewrite rngl_mul_1_l, IHla.
 Qed.
 
+(* ring of square matrices *)
+
 Definition phony_mat_le (MA MB : matrix T) := True.
 
 Definition at_least_1 n := S (n - 1).
 
-Record correct_matrix := mk_cm
-  { cm_mat : matrix T;
-    cm_prop : is_correct_matrix cm_mat }.
-
-Theorem mZ_is_correct_matrix : ∀ n, is_correct_matrix (mZ n n).
+Theorem mZ_is_square_matrix : ∀ n, is_square_matrix n (mZ n n).
 Proof.
 intros.
-split. {
-  unfold mat_ncols; cbn.
-  rewrite repeat_length.
-  rewrite List_hd_nth_0.
-  rewrite List_nth_repeat.
-  destruct (lt_dec 0 n) as [Hmz| Hmz]. {
-    now rewrite repeat_length.
-  } {
-    cbn; apply Nat.nlt_ge in Hmz.
-    now apply Nat.le_0_r in Hmz.
-  }
-} {
-  intros la Hla.
-  cbn in Hla.
-  unfold mat_ncols; cbn.
-  rewrite List_hd_nth_0.
-  rewrite List_nth_repeat.
-  destruct (lt_dec 0 n) as [Hnz| Hnz]. {
-    rewrite repeat_length.
-    apply repeat_spec in Hla.
-    now rewrite Hla, repeat_length.
-  } {
-    apply Nat.nlt_ge in Hnz.
-    now apply Nat.le_0_r in Hnz; subst n.
-  }
-}
+split; [ now cbn; rewrite repeat_length | ].
+intros la Hla.
+cbn in Hla.
+apply repeat_spec in Hla; subst la.
+apply repeat_length.
 Qed.
 
-Definition cmZ n : correct_matrix :=
-  {| cm_mat := mZ n n;
-     cm_prop := mZ_is_correct_matrix n |}.
+Definition smZ n : square_matrix n T :=
+  {| sm_mat := mZ n n;
+     sm_prop := mZ_is_square_matrix n |}.
 
-Theorem mI_is_correct_matrix : ∀ n, is_correct_matrix (mI n).
+Theorem mI_is_square_matrix : ∀ n, is_square_matrix n (mI n).
 Proof.
+intros.
+...
 intros.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n; split | ].
 apply Nat.neq_0_lt_0 in Hnz.
@@ -1503,16 +1501,32 @@ split. {
 }
 Qed.
 
-Definition cmI n : correct_matrix :=
+Definition cmI n : correct_matrix T :=
   {| cm_mat := mI n;
      cm_prop := mI_is_correct_matrix n |}.
 
+Theorem correct_matrix_add_is_correct : ∀ MA MB,
+  is_correct_matrix (cm_mat MA + cm_mat MB)%M.
+Proof.
+intros.
+split. {
+  unfold mat_nrows, mat_ncols; cbn.
+  intros Hr.
+  rewrite List_hd_nth_0 in Hr.
+  rewrite map2_length.
+...
+  rewrite map2_nth with (a := []) (b := []) in Hr
+...
+
+Definition correct_matrix_add (MA MB : correct_matrix T) : correct_matrix T :=
+  {| cm_mat := mat_add (cm_mat MA) (cm_mat MB);
+     cm_prop := correct_matrix_add_is_correct MA MB |}.
+
 Canonical Structure mat_ring_like_op n :
-  ring_like_op correct_matrix :=
+  ring_like_op (correct_matrix T) :=
   {| rngl_zero := cmZ n;
      rngl_one := cmI n;
-...
-     rngl_add := mat_add;
+     rngl_add := 42; (*mat_add;*)
      rngl_mul := mat_mul;
      rngl_opt_opp := Some (mat_opp);
      rngl_opt_inv := None;
