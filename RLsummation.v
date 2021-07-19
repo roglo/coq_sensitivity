@@ -6,11 +6,11 @@ Require Import Utf8 Arith Permutation.
 Require Import Misc RingLike.
 Import List List.ListNotations.
 
-Notation "'Σ' ( i = b , e ) , g" :=
+Notation "'∑' ( i = b , e ) , g" :=
   (iter_seq b e (λ c i, (c + g)%F) 0%F)
   (at level 45, i at level 0, b at level 60, e at level 60).
 
-Notation "'Σ' ( i ∈ l ) , g" :=
+Notation "'∑' ( i ∈ l ) , g" :=
   (iter_list l (λ c i, (c + g)%F) 0%F)
   (at level 45, i at level 0, l at level 60).
 
@@ -37,7 +37,7 @@ Qed.
 
 Theorem all_0_rngl_summation_list_0 : ∀ A l (f : A → T),
   (∀ i, i ∈ l → f i = 0%F)
-  → Σ (i ∈ l), f i = 0%F.
+  → ∑ (i ∈ l), f i = 0%F.
 Proof.
 intros * Hz.
 apply iter_list_all_d; [ | | | easy ]. {
@@ -51,7 +51,7 @@ Qed.
 
 Theorem all_0_rngl_summation_0 : ∀ b e f,
   (∀ i, b ≤ i ≤ e → f i = 0%F)
-  → Σ (i = b, e), f i = 0%F.
+  → ∑ (i = b, e), f i = 0%F.
 Proof.
 intros * Hz.
 apply iter_seq_all_d; [ | | | easy ]. {
@@ -65,7 +65,7 @@ Qed.
 
 Theorem rngl_summation_list_split_first : ∀ A (l : list A) d f,
   l ≠ []
-  → Σ (i ∈ l), f i = (f (hd d l) + Σ (i ∈ tl l), f i)%F.
+  → ∑ (i ∈ l), f i = (f (hd d l) + ∑ (i ∈ tl l), f i)%F.
 Proof.
 intros * Hlz.
 apply iter_list_split_first; [ | | | easy ]. {
@@ -79,14 +79,14 @@ Qed.
 
 Theorem rngl_summation_list_split_last : ∀ A (l : list A) d f,
   l ≠ []
-  → Σ (i ∈ l), f i = (Σ (i ∈ removelast l), f i + f (last l d))%F.
+  → ∑ (i ∈ l), f i = (∑ (i ∈ removelast l), f i + f (last l d))%F.
 Proof.
 intros * Hlz.
 now apply iter_list_split_last.
 Qed.
 
 Theorem rngl_summation_list_split : ∀ A (l : list A) f n,
-  Σ (i ∈ l), f i = (Σ (i ∈ firstn n l), f i + Σ (i ∈ skipn n l), f i)%F.
+  ∑ (i ∈ l), f i = (∑ (i ∈ firstn n l), f i + ∑ (i ∈ skipn n l), f i)%F.
 Proof.
 intros.
 rewrite <- firstn_skipn with (n := n) (l := l) at 1.
@@ -97,7 +97,7 @@ Qed.
 
 Theorem rngl_summation_split_first : ∀ b k g,
   b ≤ k
-  → Σ (i = b, k), g i = (g b + Σ (i = S b, k), g i)%F.
+  → ∑ (i = b, k), g i = (g b + ∑ (i = S b, k), g i)%F.
 Proof.
 intros * Hbk.
 apply iter_seq_split_first; [ | | | easy ]. {
@@ -111,7 +111,7 @@ Qed.
 
 Theorem rngl_summation_split_last : ∀ b k g,
   b ≤ k
-  → (Σ (i = b, k), g i = Σ (i = S b, k), g (i - 1)%nat + g k)%F.
+  → (∑ (i = b, k), g i = ∑ (i = S b, k), g (i - 1)%nat + g k)%F.
 Proof.
 intros * Hbk.
 now apply iter_seq_split_last.
@@ -119,7 +119,7 @@ Qed.
 
 Theorem rngl_summation_split : ∀ j g b k,
   b ≤ S j ≤ S k
-  → (Σ (i = b, k), g i = Σ (i = b, j), g i + Σ (i = j+1, k), g i)%F.
+  → (∑ (i = b, k), g i = ∑ (i = b, j), g i + ∑ (i = j+1, k), g i)%F.
 Proof.
 intros * Hbjk.
 apply iter_seq_split; [ | | | easy ]. {
@@ -133,7 +133,7 @@ Qed.
 
 Theorem rngl_summation_eq_compat : ∀ g h b k,
   (∀ i, b ≤ i ≤ k → (g i = h i)%F)
-  → (Σ (i = b, k), g i = Σ (i = b, k), h i)%F.
+  → (∑ (i = b, k), g i = ∑ (i = b, k), h i)%F.
 Proof.
 intros * Hgh.
 now apply iter_seq_eq_compat.
@@ -141,29 +141,29 @@ Qed.
 
 Theorem rngl_summation_list_eq_compat : ∀ A g h (l : list A),
   (∀ i, i ∈ l → (g i = h i)%F)
-  → (Σ (i ∈ l), g i = Σ (i ∈ l), h i)%F.
+  → (∑ (i ∈ l), g i = ∑ (i ∈ l), h i)%F.
 Proof.
 intros * Hgh.
 now apply iter_list_eq_compat.
 Qed.
 
 Theorem rngl_summation_succ_succ : ∀ b k g,
-  (Σ (i = S b, S k), g i = Σ (i = b, k), g (S i))%F.
+  (∑ (i = S b, S k), g i = ∑ (i = b, k), g (S i))%F.
 Proof.
 intros b k g.
 apply iter_seq_succ_succ.
 Qed.
 
 Theorem rngl_summation_empty : ∀ g b k,
-  k < b → (Σ (i = b, k), g i = 0)%F.
+  k < b → (∑ (i = b, k), g i = 0)%F.
 Proof.
 intros * Hkb.
 now apply iter_seq_empty.
 Qed.
 
 Theorem rngl_summation_add_distr : ∀ g h b k,
-  (Σ (i = b, k), (g i + h i) =
-   Σ (i = b, k), g i + Σ (i = b, k), h i)%F.
+  (∑ (i = b, k), (g i + h i) =
+   ∑ (i = b, k), g i + ∑ (i = b, k), h i)%F.
 Proof.
 intros g h b k.
 apply iter_seq_distr. {
@@ -177,8 +177,8 @@ Qed.
 
 Theorem rngl_summation_shift : ∀ b g k,
   b ≤ k
-  → (Σ (i = b, k), g i =
-     Σ (i = 0, k - b), g (b + i)%nat)%F.
+  → (∑ (i = b, k), g i =
+     ∑ (i = 0, k - b), g (b + i)%nat)%F.
 Proof.
 intros b g k Hbk.
 now apply iter_shift.
@@ -186,7 +186,7 @@ Qed.
 
 Theorem rngl_opp_summation :
   rngl_has_opp = true →
-  ∀ b e f, ((- Σ (i = b, e), f i) = Σ (i = b, e), (- f i))%F.
+  ∀ b e f, ((- ∑ (i = b, e), f i) = ∑ (i = b, e), (- f i))%F.
 Proof.
 intros Hro *.
 apply iter_seq_inv. {
@@ -200,7 +200,7 @@ apply iter_seq_inv. {
 Qed.
 
 Theorem rngl_summation_rtl : ∀ g b k,
-  (Σ (i = b, k), g i = Σ (i = b, k), g (k + b - i)%nat)%F.
+  (∑ (i = b, k), g i = ∑ (i = b, k), g (k + b - i)%nat)%F.
 Proof.
 intros g b k.
 destruct (le_dec (S k) b) as [Hkb| Hkb]. {
@@ -258,7 +258,7 @@ now apply mul_iter_list_distr_l.
 Qed.
 
 Theorem rngl_mul_summation_list_distr_l : ∀ A a (la : list A) f,
-  (a * (Σ (i ∈ la), f i) = Σ (i ∈ la), a * f i)%F.
+  (a * (∑ (i ∈ la), f i) = ∑ (i ∈ la), a * f i)%F.
 Proof.
 intros.
 rewrite mul_iter_list_distr_l; [ | apply rngl_mul_add_distr_l ].
@@ -266,14 +266,14 @@ now rewrite rngl_mul_0_r.
 Qed.
 
 Theorem rngl_mul_summation_distr_l : ∀ a b e f,
-  (a * (Σ (i = b, e), f i) = Σ (i = b, e), a * f i)%F.
+  (a * (∑ (i = b, e), f i) = ∑ (i = b, e), a * f i)%F.
 Proof.
 intros.
 apply rngl_mul_summation_list_distr_l.
 Qed.
 
 Theorem rngl_mul_summation_distr_r : ∀ a b e f,
-  ((Σ (i = b, e), f i) * a = Σ (i = b, e), f i * a)%F.
+  ((∑ (i = b, e), f i) * a = ∑ (i = b, e), f i * a)%F.
 Proof.
 intros.
 unfold iter_seq, iter_list.
@@ -287,7 +287,7 @@ rewrite rngl_mul_add_distr_r.
 rewrite (IHn e); [ easy | flia Hn ].
 Qed.
 
-Theorem rngl_summation_only_one : ∀ g n, (Σ (i = n, n), g i = g n)%F.
+Theorem rngl_summation_only_one : ∀ g n, (∑ (i = n, n), g i = g n)%F.
 Proof.
 intros g n.
 unfold iter_seq.
@@ -297,8 +297,8 @@ apply rngl_add_0_l.
 Qed.
 
 Theorem rngl_summation_summation_exch : ∀ g k,
-  (Σ (j = 0, k), (Σ (i = 0, j), g i j) =
-   Σ (i = 0, k), Σ (j = i, k), g i j)%F.
+  (∑ (j = 0, k), (∑ (i = 0, j), g i j) =
+   ∑ (i = 0, k), ∑ (j = i, k), g i j)%F.
 Proof.
 intros g k.
 induction k; [ easy | ].
@@ -343,8 +343,8 @@ now rewrite Nat.sub_succ, Nat.sub_0_r.
 Qed.
 
 Theorem rngl_summation_summation_exch' : ∀ g k l,
-  (Σ (j = 0, k), (Σ (i = 0, l), g i j) =
-   Σ (i = 0, l), Σ (j = 0, k), g i j)%F.
+  (∑ (j = 0, k), (∑ (i = 0, l), g i j) =
+   ∑ (i = 0, l), ∑ (j = 0, k), g i j)%F.
 Proof.
 intros.
 revert l.
@@ -399,8 +399,8 @@ now rewrite <- IHlen.
 Qed.
 
 Theorem rngl_summation_summation_shift : ∀ g k,
-  (Σ (i = 0, k), (Σ (j = i, k), g i j) =
-   Σ (i = 0, k), Σ (j = 0, k - i), g i (i + j)%nat)%F.
+  (∑ (i = 0, k), (∑ (j = i, k), g i j) =
+   ∑ (i = 0, k), ∑ (j = 0, k - i), g i (i + j)%nat)%F.
 Proof.
 intros g k.
 apply rngl_summation_eq_compat; intros i Hi.
@@ -411,7 +411,7 @@ now rewrite <- fold_left_add_seq_add, Nat.add_0_l.
 Qed.
 
 Theorem rngl_summation_ub_add_distr : ∀ a b f,
-  (Σ (i = 0, a + b), f i)%F = (Σ (i = 0, a), f i + Σ (i = S a, a + b), f i)%F.
+  (∑ (i = 0, a + b), f i)%F = (∑ (i = 0, a), f i + ∑ (i = S a, a + b), f i)%F.
 Proof.
 intros.
 rewrite (rngl_summation_split a); [ | flia ].
@@ -419,8 +419,8 @@ now rewrite Nat.add_1_r.
 Qed.
 
 Theorem rngl_summation_summation_distr : ∀ a b f,
-  (Σ (i = 0, a), Σ (j = 0, b), f i j)%F =
-  (Σ (i = 0, (S a * S b - 1)%nat), f (i / S b)%nat (i mod S b))%F.
+  (∑ (i = 0, a), ∑ (j = 0, b), f i j)%F =
+  (∑ (i = 0, (S a * S b - 1)%nat), f (i / S b)%nat (i mod S b))%F.
 Proof.
 intros.
 revert b.
@@ -489,7 +489,7 @@ f_equal. {
 Qed.
 
 Theorem rngl_summation_list_cons : ∀ A (a : A) la f,
-  (Σ (i ∈ a :: la), f i = f a + Σ (i ∈ la), f i)%F.
+  (∑ (i ∈ a :: la), f i = f a + ∑ (i ∈ la), f i)%F.
 Proof.
 intros.
 apply iter_list_cons. {
@@ -503,7 +503,7 @@ Qed.
 
 Theorem rngl_summation_list_permut : ∀ A (l1 l2 : list A) f,
   Permutation l1 l2
-  → (Σ (i ∈ l1), f i = Σ (i ∈ l2), f i)%F.
+  → (∑ (i ∈ l1), f i = ∑ (i ∈ l2), f i)%F.
 Proof.
 intros * Hl.
 apply iter_list_permut; [ | | | | easy ]. {
@@ -519,7 +519,7 @@ Qed.
 
 Theorem rngl_summation_seq_summation : ∀ b len f,
   len ≠ 0
-  → (Σ (i ∈ seq b len), f i = Σ (i = b, b + len - 1), f i)%F.
+  → (∑ (i ∈ seq b len), f i = ∑ (i = b, b + len - 1), f i)%F.
 Proof.
 intros * Hlen.
 unfold iter_seq.
@@ -528,8 +528,8 @@ flia Hlen.
 Qed.
 
 Theorem rngl_summation_map_seq : ∀ A start len (f : A → T) g,
-  (Σ (i ∈ map g (seq start len)), f i =
-   Σ (i ∈ seq start len), f (g i))%F.
+  (∑ (i ∈ map g (seq start len)), f i =
+   ∑ (i ∈ seq start len), f (g i))%F.
 Proof.
 intros.
 revert start.
@@ -542,7 +542,7 @@ Qed.
 
 Theorem rngl_summation_list_change_var :
   ∀ A B (f : A → B) (g : B → _) l,
-  Σ (i ∈ l), g (f i) = Σ (j ∈ map f l), g j.
+  ∑ (i ∈ l), g (f i) = ∑ (j ∈ map f l), g j.
 Proof.
 intros.
 unfold iter_list.
@@ -552,7 +552,7 @@ Qed.
 
 Theorem rngl_summation_change_var : ∀ A b e f g (h : _ → A),
   (∀ i, b ≤ i ≤ e → g (h i) = i)
-  → Σ (i = b, e), f i = Σ (i ∈ map h (seq b (S e - b))), f (g i).
+  → ∑ (i = b, e), f i = ∑ (i ∈ map h (seq b (S e - b))), f (g i).
 Proof.
 intros * Hgh.
 rewrite rngl_summation_map_seq.
@@ -568,7 +568,7 @@ Theorem rngl_summation_permut : ∀ n l1 l2,
   Permutation l1 l2
   → length l1 = n
   → length l2 = n
-  → Σ (i = 0, n - 1), nth i l1 0 = Σ (i = 0, n - 1), nth i l2 0.
+  → ∑ (i = 0, n - 1), nth i l1 0 = ∑ (i = 0, n - 1), nth i l2 0.
 Proof.
 intros * Hl H1 H2.
 destruct n. {

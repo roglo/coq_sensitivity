@@ -94,7 +94,7 @@ Definition vect_mul_scal_l s (V : vector T) :=
 (* dot product *)
 
 Definition vect_dot_mul (U V : vector T) :=
-  Σ (t ∈ map2 rngl_mul (vect_list U) (vect_list V)), t.
+  ∑ (t ∈ map2 rngl_mul (vect_list U) (vect_list V)), t.
 
 Definition vect_squ_norm (V : vector T) := vect_dot_mul V V.
 

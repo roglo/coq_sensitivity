@@ -11,6 +11,10 @@ Require Import Misc.
 Require Import RingLike RLsummation RLproduct.
 Require Import MyVector.
 
+Notation "'⋀' ( i ∈ l ) , g" :=
+  (iter_list l (λ c i, (c && g)) true)
+  (at level 45, i at level 0, l at level 60).
+
 (* matrices *)
 
 Record matrix T := mk_mat
@@ -116,12 +120,8 @@ Record correct_matrix T := mk_cm
 
 (* square_matrix *)
 
-Notation "'AND' ( i ∈ l ) , g" :=
-  (iter_list l (λ c i, (c && g)) true)
-  (at level 45, i at level 0, l at level 60).
-
 Definition is_square_matrix {T} n (M : matrix T) :=
-  (mat_nrows M =? n) && AND (l ∈ mat_list_list M), (length l =? n).
+  (mat_nrows M =? n) && ⋀ (l ∈ mat_list_list M), (length l =? n).
 
 Record square_matrix n T :=
   { sm_mat : matrix T;
@@ -138,6 +138,57 @@ cbn in Hab.
 destruct Hab.
 f_equal.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+Qed.
+
+(* is_square_matrix_prop (a Prop) easier to use than
+  is_square_matrix (a bool) *)
+
+Definition is_square_matrix_prop {T} n (M : matrix T) :=
+  mat_nrows M = n ∧ ∀ l, l ∈ mat_list_list M → length l = n.
+
+Theorem is_sm_mat_iff {T} n : ∀ (M : matrix T),
+  is_square_matrix n M = true ↔ is_square_matrix_prop n M.
+Proof.
+intros.
+unfold is_square_matrix.
+split; intros Hm. {
+  apply Bool.andb_true_iff in Hm.
+  destruct Hm as (Hr, Hc).
+  apply Nat.eqb_eq in Hr.
+  split; [ easy | ].
+  intros l Hl.
+  remember (mat_list_list M) as ll eqn:Hll.
+  clear Hll.
+  induction ll as [| la]; [ easy | cbn ].
+  rewrite iter_list_cons in Hc; cycle 1; try easy. {
+    intros b; apply andb_true_r.
+  } {
+    intros; apply andb_assoc.
+  }
+  apply Bool.andb_true_iff in Hc.
+  destruct Hc as (Hla, Hc).
+  apply Nat.eqb_eq in Hla.
+  destruct Hl as [Hl| Hl]; [ now subst l | ].
+  now apply IHll.
+} {
+  destruct Hm as (Hr, Hc).
+  apply Nat.eqb_eq in Hr.
+  apply Bool.andb_true_iff.
+  split; [ easy | ].
+  remember (mat_list_list M) as ll eqn:Hll.
+  clear Hll.
+  induction ll as [| la]; [ easy | ].
+  rewrite iter_list_cons; cycle 1; try easy. {
+    intros b; apply andb_true_r.
+  } {
+    intros; apply andb_assoc.
+  }
+  apply Bool.andb_true_iff.
+  split; [ now apply Nat.eqb_eq, Hc; left | ].
+  apply IHll.
+  intros l Hl.
+  now apply Hc; right.
+}
 Qed.
 
 (* *)
@@ -178,7 +229,7 @@ Compute (mat_add nat_ring_like_op (mat_of_list_list [[2;3;5]; [3;8;17]]) (mat_of
 (* multiplication *)
 
 Definition mat_mul_el MA MB i k :=
-   Σ (j = 0, mat_ncols MA - 1), mat_el MA i j * mat_el MB j k.
+   ∑ (j = 0, mat_ncols MA - 1), mat_el MA i j * mat_el MB j k.
 
 Definition mat_mul (MA MB : matrix T) : matrix T :=
   mk_mat
@@ -198,7 +249,7 @@ Fixpoint mul_row_mat (ncols : nat) cnt k MB (MA_row : list T) :=
   match cnt with
   | 0 => []
   | S cnt' =>
-      Σ (j = 0, ncols - 1), nth j MA_row 0 * mat_el MB j k ::
+      ∑ (j = 0, ncols - 1), nth j MA_row 0 * mat_el MB j k ::
       mul_row_mat ncols cnt' (S k) MB MA_row
   end.
 
@@ -553,7 +604,7 @@ rewrite rngl_add_0_l.
 apply in_seq in Hi.
 rewrite mat_el_mI_diag; [ | easy ].
 rewrite rngl_mul_1_l.
-remember (Σ (k = _, _), _) as x; cbn; subst x.
+remember (∑ (k = _, _), _) as x; cbn; subst x.
 rewrite <- Hla.
 rewrite all_0_rngl_summation_0. 2: {
   intros k Hk.
@@ -1093,11 +1144,11 @@ Qed.
 Theorem mat_vect_mul_assoc_as_sums :
   ∀ (A : matrix T) (B : matrix T) (V : vector T) i,
   i < mat_nrows A
-  → Σ (j = 0, mat_ncols A - 1),
+  → ∑ (j = 0, mat_ncols A - 1),
        mat_el A i j *
-       (Σ (k = 0, vect_size V - 1), mat_el B j k * vect_el V k) =
-     Σ (j = 0, vect_size V - 1),
-       (Σ (k = 0, mat_ncols A - 1), mat_el A i k * mat_el B k j) *
+       (∑ (k = 0, vect_size V - 1), mat_el B j k * vect_el V k) =
+     ∑ (j = 0, vect_size V - 1),
+       (∑ (k = 0, mat_ncols A - 1), mat_el A i k * mat_el B k j) *
         vect_el V j.
 Proof.
 intros * Hi.
@@ -1479,7 +1530,14 @@ Theorem squ_mat_nrows : ∀ n (M : square_matrix n T),
   mat_nrows (sm_mat M) = n.
 Proof.
 intros.
-destruct M as (M, Hmp); cbn.
+destruct M as (M & Hmp); cbn.
+apply is_sm_mat_iff in Hmp.
+...
+unfold is_square_matrix in Hmp.
+apply Bool.andb_true_iff in Hmp.
+destruct Hmp as (Hr & Hc).
+now apply Nat.eqb_eq in Hr.
+...
 now destruct Hmp as (H1, H2).
 Qed.
 
