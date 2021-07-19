@@ -1431,31 +1431,78 @@ Qed.
 Theorem mat_mul_scal_1_l : ∀ (M : matrix T), (1 × M = M)%M.
 Proof.
 intros.
-...
-intros.
-apply matrix_eq; cbn.
-intros * Hi Hj.
-apply rngl_mul_1_l.
+unfold "×"%M.
+destruct M as (ll).
+f_equal; cbn.
+induction ll as [| la]; [ easy | cbn ].
+rewrite IHll; f_equal.
+induction la as [| a]; [ easy | cbn ].
+now rewrite rngl_mul_1_l, IHla.
 Qed.
 
-Definition phony_mat_le n (MA MB : matrix n n T) := True.
+Definition phony_mat_le (MA MB : matrix T) := True.
 
 Definition at_least_1 n := S (n - 1).
 
+Record correct_matrix := mk_cm
+  { cm_mat : matrix T;
+    cm_prop : is_correct_matrix cm_mat }.
+
+Theorem mZ_is_correct_matrix : ∀ n, is_correct_matrix (mZ n n).
+Proof.
+intros.
+split. {
+  unfold mat_ncols; cbn.
+  rewrite repeat_length.
+  rewrite List_hd_nth_0.
+  rewrite List_nth_repeat.
+  destruct (lt_dec 0 n) as [Hmz| Hmz]. {
+    now rewrite repeat_length.
+  } {
+    cbn; apply Nat.nlt_ge in Hmz.
+    now apply Nat.le_0_r in Hmz.
+  }
+} {
+  intros la Hla.
+  cbn in Hla.
+  unfold mat_ncols; cbn.
+  rewrite List_hd_nth_0.
+  rewrite List_nth_repeat.
+  destruct (lt_dec 0 n) as [Hnz| Hnz]. {
+    rewrite repeat_length.
+    apply repeat_spec in Hla.
+    now rewrite Hla, repeat_length.
+  } {
+    apply Nat.nlt_ge in Hnz.
+    now apply Nat.le_0_r in Hnz; subst n.
+  }
+}
+Qed.
+
+Definition cmZ n : correct_matrix :=
+  {| cm_mat := mZ n n;
+     cm_prop := mZ_is_correct_matrix n |}.
+
 Canonical Structure mat_ring_like_op n :
-  ring_like_op (matrix n n T) :=
+  ring_like_op correct_matrix :=
+  {| rngl_zero := cmZ n;
+(*
   {| rngl_zero := mZ n n;
+*)
      rngl_one := mI n;
-     rngl_add := @mat_add T _ n n;
-     rngl_mul := @mat_mul T _ n n n;
-     rngl_opt_opp := Some (@mat_opp T _ n n);
+     rngl_add := mat_add;
+     rngl_mul := mat_mul;
+     rngl_opt_opp := Some (mat_opp);
      rngl_opt_inv := None;
      rngl_opt_sous := None;
      rngl_opt_quot := None;
-     rngl_le := @phony_mat_le n |}.
+     rngl_le := @phony_mat_le |}.
+
+...
 
 Existing Instance mat_ring_like_op.
 
+(*
 Theorem mat_opt_add_opp_l : ∀ n,
   if @rngl_has_opp (matrix n n T) _ then
     ∀ a : matrix n n T, (- a + a)%F = 0%F
@@ -1542,7 +1589,9 @@ induction c; [ easy | cbn ].
 destruct (Nat.eq_dec i j) as [H| H]; [ easy | clear H ].
 now rewrite rngl_add_0_l.
 Qed.
+*)
 
+(*
 Theorem mat_opt_eq_dec : ∀ n,
   if rngl_has_dec_eq then ∀ a b : matrix n n T, {a = b} + {a ≠ b}
   else not_applicable.
@@ -1594,9 +1643,10 @@ Theorem mat_consistent : ∀ n,
   (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
   (rngl_has_inv = false ∨ rngl_has_quot = false).
 Proof. now intros; split; right. Qed.
+*)
 
 Definition mat_ring_like_prop (n : nat) :
-  ring_like_prop (matrix n n T) :=
+  ring_like_prop (matrix T) :=
   {| rngl_is_comm := false;
      rngl_has_dec_eq := @rngl_has_dec_eq T ro rp;
      rngl_has_dec_le := false;
@@ -1610,11 +1660,19 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_mul_assoc := mat_mul_assoc;
      rngl_mul_1_l := mat_mul_1_l;
      rngl_mul_add_distr_l := mat_mul_add_distr_l;
+(**)
+     rngl_opt_1_neq_0 := 42;
+(*
      rngl_opt_1_neq_0 := @mat_1_neq_0 n;
+*)
      rngl_opt_mul_comm := NA;
      rngl_opt_mul_1_r := mat_mul_1_r;
      rngl_opt_mul_add_distr_r := mat_mul_add_distr_r;
+(**)
+     rngl_opt_add_opp_l := 42;
+(*
      rngl_opt_add_opp_l := @mat_opt_add_opp_l n;
+*)
      rngl_opt_add_sub := NA;
      rngl_opt_sub_sub_sub_add := NA;
      rngl_opt_mul_sub_distr_l := NA;
@@ -1623,10 +1681,18 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_quot_l := NA;
      rngl_opt_mul_quot_r := NA;
+(**)
+     rngl_opt_eq_dec := 42;
+(*
      rngl_opt_eq_dec := mat_opt_eq_dec n;
+*)
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;
+(**)
+     rngl_characteristic_prop := 42;
+(*
      rngl_characteristic_prop := @mat_characteristic_prop n;
+*)
      rngl_opt_le_refl := NA;
      rngl_opt_le_antisymm := NA;
      rngl_opt_le_trans := NA;
@@ -1635,7 +1701,11 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_opt_mul_le_compat_nonpos := NA;
      rngl_opt_mul_le_compat := NA;
      rngl_opt_not_le := NA;
+(**)
+     rngl_consistent := 42 |}.
+(*
      rngl_consistent := mat_consistent n |}.
+*)
 
 Theorem mat_vect_mul_0_r : ∀ m n (M : matrix m n T),
   (M • vect_zero _ = vect_zero _)%V.
