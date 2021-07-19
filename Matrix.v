@@ -1483,13 +1483,35 @@ Definition cmZ n : correct_matrix :=
   {| cm_mat := mZ n n;
      cm_prop := mZ_is_correct_matrix n |}.
 
+Theorem mI_is_correct_matrix : ∀ n, is_correct_matrix (mI n).
+Proof.
+intros.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n; split | ].
+apply Nat.neq_0_lt_0 in Hnz.
+split. {
+  unfold mat_ncols; cbn.
+  rewrite List_hd_nth_0.
+  rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
+  now do 2 rewrite map_length, seq_length.
+} {
+  intros la Hla.
+  rewrite mI_ncols.
+  cbn in Hla.
+  apply in_map_iff in Hla.
+  destruct Hla as (i & Him & Hi).
+  now subst la; rewrite map_length, seq_length.
+}
+Qed.
+
+Definition cmI n : correct_matrix :=
+  {| cm_mat := mI n;
+     cm_prop := mI_is_correct_matrix n |}.
+
 Canonical Structure mat_ring_like_op n :
   ring_like_op correct_matrix :=
   {| rngl_zero := cmZ n;
-(*
-  {| rngl_zero := mZ n n;
-*)
-     rngl_one := mI n;
+     rngl_one := cmI n;
+...
      rngl_add := mat_add;
      rngl_mul := mat_mul;
      rngl_opt_opp := Some (mat_opp);
