@@ -1476,8 +1476,6 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   apply length_zero_iff_nil in H1.
   now rewrite H1.
 }
-...
-rewrite squ_mat_ncols.
 destruct M as (M, Hmp); cbn.
 destruct Hmp as (H1, H2).
 unfold mat_ncols.
@@ -1485,14 +1483,8 @@ apply H2.
 rewrite List_hd_nth_0.
 apply nth_In.
 rewrite fold_mat_nrows, H1.
-...
-apply nth_In.
-
+now apply Nat.neq_0_lt_0.
 Qed.
-
-Definition phony_mat_le (MA MB : matrix T) := True.
-
-Definition at_least_1 n := S (n - 1).
 
 Theorem mZ_is_square_matrix : ∀ n, is_square_matrix n (mZ n n).
 Proof.
@@ -1551,6 +1543,11 @@ split; cbn. {
 }
 Qed.
 
+Definition square_matrix_add n (MA MB : square_matrix n T) :
+  square_matrix n T :=
+  {| sm_mat := (sm_mat MA + sm_mat MB)%M;
+     sm_prop := square_matrix_add_is_square MA MB |}.
+
 Theorem square_matrix_mul_is_square : ∀ n (MA MB : square_matrix n T),
   is_square_matrix n (sm_mat MA * sm_mat MB)%M.
 Proof.
@@ -1564,41 +1561,52 @@ split; cbn. {
   destruct Hl as (i & Him & Hl).
   subst l.
   rewrite map_length, seq_length.
-...
   apply squ_mat_ncols.
-  destruct MA as (MA & Hra & Hca).
-  destruct MB as (MB & Hrb & Hcb).
-  cbn in Him |-*.
-  do 2 rewrite fold_mat_nrows in Him.
-  rewrite Hra, Hrb in Him.
-  rewrite Nat.min_id in Him.
-  rewrite Hca; [ | now apply nth_In; rewrite fold_mat_nrows, Hra ].
-  rewrite Hcb; [ | now apply nth_In; rewrite fold_mat_nrows, Hrb ].
-  apply Nat.min_id.
 }
 Qed.
-*)
-
-Definition square_matrix_add n (MA MB : square_matrix n T) :
-  square_matrix n T :=
-  {| sm_mat := (sm_mat MA + sm_mat MB)%M;
-     sm_prop := square_matrix_add_is_square MA MB |}.
 
 Definition square_matrix_mul n (MA MB : square_matrix n T) :
   square_matrix n T :=
   {| sm_mat := (sm_mat MA * sm_mat MB)%M;
      sm_prop := square_matrix_mul_is_square MA MB |}.
 
+Theorem square_matrix_opp_is_square : ∀ n (M : square_matrix n T),
+  is_square_matrix n (- sm_mat M)%M.
+Proof.
+intros.
+split; cbn. {
+  rewrite map_length.
+  rewrite fold_mat_nrows.
+  apply squ_mat_nrows.
+} {
+  intros l Hl.
+  destruct M as (M & Hr & Hc).
+  apply in_map_iff in Hl.
+  destruct Hl as (la & Hlm & Hla).
+  subst l.
+  cbn in Hla.
+  rewrite map_length.
+  now apply Hc.
+}
+Qed.
+
+Definition square_matrix_opp {n} (M : square_matrix n T) :
+  square_matrix n T :=
+  {| sm_mat := (- sm_mat M)%M;
+     sm_prop := square_matrix_opp_is_square M |}.
+
+Definition phony_mat_le (MA MB : matrix T) := True.
+
 Canonical Structure mat_ring_like_op n : ring_like_op (square_matrix n T) :=
   {| rngl_zero := smZ n;
      rngl_one := smI n;
      rngl_add MA MB := square_matrix_add MA MB;
      rngl_mul MA MB := square_matrix_mul MA MB;
-     rngl_opt_opp := Some (mat_opp);
+     rngl_opt_opp := Some square_matrix_opp;
      rngl_opt_inv := None;
      rngl_opt_sous := None;
      rngl_opt_quot := None;
-     rngl_le := @phony_mat_le |}.
+     rngl_le := 42 |}.
 
 ...
 
