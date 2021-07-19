@@ -1543,7 +1543,7 @@ split; cbn. {
 }
 Qed.
 
-Definition square_matrix_add n (MA MB : square_matrix n T) :
+Definition square_matrix_add {n} (MA MB : square_matrix n T) :
   square_matrix n T :=
   {| sm_mat := (sm_mat MA + sm_mat MB)%M;
      sm_prop := square_matrix_add_is_square MA MB |}.
@@ -1565,7 +1565,7 @@ split; cbn. {
 }
 Qed.
 
-Definition square_matrix_mul n (MA MB : square_matrix n T) :
+Definition square_matrix_mul {n} (MA MB : square_matrix n T) :
   square_matrix n T :=
   {| sm_mat := (sm_mat MA * sm_mat MB)%M;
      sm_prop := square_matrix_mul_is_square MA MB |}.
@@ -1595,18 +1595,18 @@ Definition square_matrix_opp {n} (M : square_matrix n T) :
   {| sm_mat := (- sm_mat M)%M;
      sm_prop := square_matrix_opp_is_square M |}.
 
-Definition phony_mat_le (MA MB : matrix T) := True.
+Definition phony_mat_le {n} (MA MB : square_matrix n T) := True.
 
 Canonical Structure mat_ring_like_op n : ring_like_op (square_matrix n T) :=
   {| rngl_zero := smZ n;
      rngl_one := smI n;
-     rngl_add MA MB := square_matrix_add MA MB;
-     rngl_mul MA MB := square_matrix_mul MA MB;
+     rngl_add := square_matrix_add;
+     rngl_mul := square_matrix_mul;
      rngl_opt_opp := Some square_matrix_opp;
      rngl_opt_inv := None;
      rngl_opt_sous := None;
      rngl_opt_quot := None;
-     rngl_le := 42 |}.
+     rngl_le := phony_mat_le |}.
 
 ...
 
