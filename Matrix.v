@@ -459,9 +459,9 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 }
 apply Nat.neq_0_lt_0 in Hnz.
 destruct (lt_dec i n) as [Hin| Hin]. {
-  rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
+  rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
   destruct (lt_dec j n) as [Hjn| Hjn]. {
-    rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
+    rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
     rewrite seq_nth; [ | easy ].
     rewrite seq_nth; [ cbn | easy ].
     unfold δ.
@@ -482,8 +482,8 @@ Theorem mat_el_mI_diag : ∀ n i, i < n → mat_el (mI n) i i = 1%F.
 Proof.
 intros * Hin.
 unfold mat_el, mI; cbn.
-rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
-rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
+rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
+rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
 unfold δ.
 now rewrite Nat.eqb_refl.
@@ -627,7 +627,7 @@ destruct x as [x| ]. {
     destruct Hy as (Hy, Hiv).
     f_equal.
     subst x y; cbn.
-    rewrite List_map_nth_in with (a := []). 2: {
+    rewrite List_map_nth' with (a := []). 2: {
       now rewrite map_length, seq_length.
     }
     unfold vect_size in Hii.
@@ -635,7 +635,7 @@ destruct x as [x| ]. {
     destruct V as (la).
     cbn in Hiv; cbn.
     unfold vect_dot_mul; cbn.
-    rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
+    rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
     rewrite map2_map_l.
     rewrite seq_nth; [ cbn | easy ].
     rewrite rngl_summation_list_split with (n := i).
@@ -716,9 +716,8 @@ rewrite map_length, seq_length.
 apply map_ext_in.
 intros i Hi.
 unfold mat_ncols at 2; cbn.
-rewrite List_hd_nth_0.
-rewrite List_map_nth_in with (a := 0). 2: {
-  rewrite seq_length; flia Hrbz.
+rewrite List_map_hd with (a := 0). 2: {
+  now intros H; apply List_seq_eq_nil in H.
 }
 rewrite map_length, seq_length.
 apply map_ext_in.
@@ -726,23 +725,20 @@ intros j Hj.
 move j before i.
 unfold mat_mul_el.
 unfold mat_ncols at 4.
-rewrite List_hd_nth_0; cbn.
-rewrite List_map_nth_in with (a := 0). 2: {
-  rewrite seq_length.
-  destruct (Nat.eq_dec (mat_nrows MA) 0) as [Hraz| Hraz]. {
-    now rewrite Hraz in Hi.
-  }
-  flia Hraz.
+cbn.
+rewrite List_map_hd with (a := 0). 2: {
+  intros H; apply List_seq_eq_nil in H.
+  now rewrite H in Hi.
 }
 rewrite map_length, seq_length.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
-  rewrite List_map_nth_in with (a := 0). 2: {
+  rewrite List_map_nth' with (a := 0). 2: {
     rewrite seq_length.
     rewrite Hcarb in Hk.
     flia Hrbz Hk.
   }
-  rewrite List_map_nth_in with (a := 0). 2: {
+  rewrite List_map_nth' with (a := 0). 2: {
     rewrite seq_length.
     now apply in_seq in Hj.
   }
@@ -762,11 +758,11 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn.
 erewrite rngl_summation_eq_compat with (k := mat_ncols MB - 1). 2: {
   intros k Hk.
-  rewrite List_map_nth_in with (a := 0). 2: {
+  rewrite List_map_nth' with (a := 0). 2: {
     rewrite seq_length.
     now apply in_seq in Hi.
   }
-  rewrite List_map_nth_in with (a := 0). 2: {
+  rewrite List_map_nth' with (a := 0). 2: {
     rewrite seq_length.
     flia Hcbz Hk.
   }
@@ -978,21 +974,20 @@ apply map_ext_in.
 intros j Hj.
 unfold mat_mul_el; cbn.
 unfold mat_ncols at 1; cbn.
-rewrite List_hd_nth_0.
-rewrite List_map_nth_in with (a := []). 2: {
-  rewrite fold_mat_nrows; flia Hraz.
+rewrite List_map_hd with (a := []). 2: {
+  intros H; apply Hraz; unfold mat_nrows.
+  now rewrite H.
 }
 rewrite map_length.
-rewrite <- List_hd_nth_0.
 rewrite fold_mat_ncols.
 rewrite rngl_mul_summation_distr_l; [ | now left ].
 apply rngl_summation_eq_compat.
 intros k Hk.
-rewrite List_map_nth_in with (a := []). 2: {
+rewrite List_map_nth' with (a := []). 2: {
   rewrite fold_mat_nrows.
   now apply in_seq in Hi.
 }
-rewrite List_map_nth_in with (a := 0%F). 2: {
+rewrite List_map_nth' with (a := 0%F). 2: {
   destruct Ha as (Harc, Ha).
   rewrite Ha. 2: {
     apply nth_In.
@@ -1026,12 +1021,12 @@ rewrite map_map.
 apply map_ext_in.
 intros i Hi.
 unfold mat_ncols at 1; cbn.
-rewrite List_hd_nth_0.
-rewrite List_map_nth_in with (a := []). 2: {
-  now rewrite fold_mat_nrows, <- Hcarb.
+rewrite List_map_hd with (a := []). 2: {
+  intros H; unfold mat_nrows in Hcarb.
+  rewrite H in Hcarb.
+  now rewrite Hcarb in Hcaz.
 }
 rewrite map_length.
-rewrite <- List_hd_nth_0.
 rewrite fold_mat_ncols.
 rewrite map_map.
 apply map_ext_in.
@@ -1040,11 +1035,11 @@ unfold mat_mul_el; cbn.
 rewrite rngl_mul_summation_distr_l; [ | now left ].
 apply rngl_summation_eq_compat.
 intros k Hk.
-rewrite List_map_nth_in with (a := []). 2: {
+rewrite List_map_nth' with (a := []). 2: {
   rewrite fold_mat_nrows, <- Hcarb.
   flia Hcaz Hk.
 }
-rewrite List_map_nth_in with (a := 0%F). 2: {
+rewrite List_map_nth' with (a := 0%F). 2: {
   destruct Hb as (Hbzz, Hb).
   rewrite Hb; [ now apply in_seq in Hj | ].
   apply nth_In.
@@ -1461,6 +1456,40 @@ Qed.
 
 (* ring of square matrices *)
 
+Theorem squ_mat_nrows : ∀ n (M : square_matrix n T),
+  mat_nrows (sm_mat M) = n.
+Proof.
+intros.
+destruct M as (M, Hmp); cbn.
+now destruct Hmp as (H1, H2).
+Qed.
+
+Theorem squ_mat_ncols : ∀ n (M : square_matrix n T),
+  mat_ncols (sm_mat M) = n.
+Proof.
+intros.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n; cbn.
+  destruct M as (M & H1 & H2).
+  unfold mat_ncols; cbn.
+  unfold mat_nrows in H1.
+  apply length_zero_iff_nil in H1.
+  now rewrite H1.
+}
+...
+rewrite squ_mat_ncols.
+destruct M as (M, Hmp); cbn.
+destruct Hmp as (H1, H2).
+unfold mat_ncols.
+apply H2.
+rewrite List_hd_nth_0.
+apply nth_In.
+rewrite fold_mat_nrows, H1.
+...
+apply nth_In.
+
+Qed.
+
 Definition phony_mat_le (MA MB : matrix T) := True.
 
 Definition at_least_1 n := S (n - 1).
@@ -1482,52 +1511,89 @@ Definition smZ n : square_matrix n T :=
 Theorem mI_is_square_matrix : ∀ n, is_square_matrix n (mI n).
 Proof.
 intros.
-...
+split; [ now cbn; rewrite map_length, seq_length | ].
+intros la Hla.
+cbn in Hla.
+apply in_map_iff in Hla.
+destruct Hla as (i & Hin & Hi).
+subst la.
+now rewrite map_length, seq_length.
+Qed.
+
+Definition smI n : square_matrix n T :=
+  {| sm_mat := mI n;
+     sm_prop := mI_is_square_matrix n |}.
+
+Theorem square_matrix_add_is_square : ∀ n (MA MB : square_matrix n T),
+  is_square_matrix n (sm_mat MA + sm_mat MB)%M.
+Proof.
 intros.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n; split | ].
-apply Nat.neq_0_lt_0 in Hnz.
-split. {
-  unfold mat_ncols; cbn.
-  rewrite List_hd_nth_0.
-  rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
-  now do 2 rewrite map_length, seq_length.
+split; cbn. {
+  rewrite map2_length.
+  do 2 rewrite fold_mat_nrows.
+  do 2 rewrite squ_mat_nrows.
+  apply Nat.min_id.
 } {
-  intros la Hla.
-  rewrite mI_ncols.
-  cbn in Hla.
-  apply in_map_iff in Hla.
-  destruct Hla as (i & Him & Hi).
-  now subst la; rewrite map_length, seq_length.
+  intros l Hl.
+  apply in_map2_iff in Hl.
+  destruct Hl as (i & Him & a & b & Hl).
+  subst l.
+  rewrite map2_length.
+  destruct MA as (MA & Hra & Hca).
+  destruct MB as (MB & Hrb & Hcb).
+  cbn in Him |-*.
+  do 2 rewrite fold_mat_nrows in Him.
+  rewrite Hra, Hrb in Him.
+  rewrite Nat.min_id in Him.
+  rewrite Hca; [ | now apply nth_In; rewrite fold_mat_nrows, Hra ].
+  rewrite Hcb; [ | now apply nth_In; rewrite fold_mat_nrows, Hrb ].
+  apply Nat.min_id.
 }
 Qed.
 
-Definition cmI n : correct_matrix T :=
-  {| cm_mat := mI n;
-     cm_prop := mI_is_correct_matrix n |}.
-
-Theorem correct_matrix_add_is_correct : ∀ MA MB,
-  is_correct_matrix (cm_mat MA + cm_mat MB)%M.
+Theorem square_matrix_mul_is_square : ∀ n (MA MB : square_matrix n T),
+  is_square_matrix n (sm_mat MA * sm_mat MB)%M.
 Proof.
 intros.
-split. {
-  unfold mat_nrows, mat_ncols; cbn.
-  intros Hr.
-  rewrite List_hd_nth_0 in Hr.
-  rewrite map2_length.
+split; cbn. {
+  rewrite map_length, seq_length.
+  apply squ_mat_nrows.
+} {
+  intros l Hl.
+  apply in_map_iff in Hl.
+  destruct Hl as (i & Him & Hl).
+  subst l.
+  rewrite map_length, seq_length.
 ...
-  rewrite map2_nth with (a := []) (b := []) in Hr
-...
+  apply squ_mat_ncols.
+  destruct MA as (MA & Hra & Hca).
+  destruct MB as (MB & Hrb & Hcb).
+  cbn in Him |-*.
+  do 2 rewrite fold_mat_nrows in Him.
+  rewrite Hra, Hrb in Him.
+  rewrite Nat.min_id in Him.
+  rewrite Hca; [ | now apply nth_In; rewrite fold_mat_nrows, Hra ].
+  rewrite Hcb; [ | now apply nth_In; rewrite fold_mat_nrows, Hrb ].
+  apply Nat.min_id.
+}
+Qed.
+*)
 
-Definition correct_matrix_add (MA MB : correct_matrix T) : correct_matrix T :=
-  {| cm_mat := mat_add (cm_mat MA) (cm_mat MB);
-     cm_prop := correct_matrix_add_is_correct MA MB |}.
+Definition square_matrix_add n (MA MB : square_matrix n T) :
+  square_matrix n T :=
+  {| sm_mat := (sm_mat MA + sm_mat MB)%M;
+     sm_prop := square_matrix_add_is_square MA MB |}.
 
-Canonical Structure mat_ring_like_op n :
-  ring_like_op (correct_matrix T) :=
-  {| rngl_zero := cmZ n;
-     rngl_one := cmI n;
-     rngl_add := 42; (*mat_add;*)
-     rngl_mul := mat_mul;
+Definition square_matrix_mul n (MA MB : square_matrix n T) :
+  square_matrix n T :=
+  {| sm_mat := (sm_mat MA * sm_mat MB)%M;
+     sm_prop := square_matrix_mul_is_square MA MB |}.
+
+Canonical Structure mat_ring_like_op n : ring_like_op (square_matrix n T) :=
+  {| rngl_zero := smZ n;
+     rngl_one := smI n;
+     rngl_add MA MB := square_matrix_add MA MB;
+     rngl_mul MA MB := square_matrix_mul MA MB;
      rngl_opt_opp := Some (mat_opp);
      rngl_opt_inv := None;
      rngl_opt_sous := None;

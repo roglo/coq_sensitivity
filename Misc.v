@@ -1167,7 +1167,7 @@ intros i.
 now specialize (Hf (S i)).
 Qed.
 
-Theorem List_map_nth_in : ∀ A B (f : A → B) a b l n,
+Theorem List_map_nth' : ∀ A B (f : A → B) a b l n,
   n < length l → nth n (map f l) b = f (nth n l a).
 Proof.
 intros * Hnl.
@@ -1177,6 +1177,15 @@ cbn in Hnl; cbn.
 destruct n; [ easy | ].
 apply Nat.succ_lt_mono in Hnl.
 now apply IHl.
+Qed.
+
+Theorem List_map_hd : ∀ A B (f : A → B) a b l,
+  l ≠ [] → hd b (map f l) = f (hd a l).
+Proof.
+intros * Hnl.
+do 2 rewrite List_hd_nth_0.
+apply List_map_nth'.
+destruct l; [ easy | apply Nat.lt_0_succ ].
 Qed.
 
 Theorem List_seq_eq_nil : ∀ b len, seq b len = [] → len = 0.
