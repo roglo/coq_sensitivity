@@ -121,7 +121,9 @@ Record correct_matrix T := mk_cm
 (* square_matrix *)
 
 Definition is_square_matrix {T} n (M : matrix T) :=
-  (mat_nrows M =? n) && ⋀ (l ∈ mat_list_list M), (length l =? n).
+  (mat_nrows M =? n) &&
+  ((negb (mat_ncols M =? 0)) || (mat_nrows M =? 0)) &&
+  ⋀ (l ∈ mat_list_list M), (length l =? n).
 
 Record square_matrix n T :=
   { sm_mat : matrix T;
@@ -150,7 +152,10 @@ intros.
 unfold is_square_matrix.
 split; intros Hm. {
   apply Bool.andb_true_iff in Hm.
-  destruct Hm as (Hr, Hc).
+  destruct Hm as (Hm, Hc).
+  apply Bool.andb_true_iff in Hm.
+  destruct Hm as (Hr, Hrc).
+  apply Bool.orb_true_iff in Hrc.
   apply Nat.eqb_eq in Hr.
   split; [ easy | ].
   intros l Hl.
@@ -171,6 +176,10 @@ split; intros Hm. {
   destruct Hm as (Hr, Hc).
   apply Nat.eqb_eq in Hr.
   apply Bool.andb_true_iff.
+  split. {
+    apply Bool.andb_true_iff.
+    split; [ easy | ].
+...
   split; [ easy | ].
   remember (mat_list_list M) as ll eqn:Hll.
   clear Hll.
@@ -1859,7 +1868,16 @@ apply mat_add_0_l; cycle 1. {
 } {
   symmetry; apply squ_mat_ncols.
 }
+destruct M as (M, Hm).
 split; intros H. {
+  cbn in H |-*.
+  apply is_sm_mat_iff in Hm.
+  destruct Hm as (Hr, Hc).
+Search (mat_ncols _ = 0).
+...
+  unfold mat_nrows.
+
+  unfold mat_ncols in H.
 ...
   apply is_sm_mat_iff in M.
 ...
