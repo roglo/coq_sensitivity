@@ -2300,6 +2300,9 @@ assert
   intros.
   now apply rngl_eq_dec.
 }
+clear Hcra Hcrb.
+revert MA MB Ha Hb Hra Hrb Hca Hcb Hab.
+induction n; intros; [ easy | ].
 ...
 induction n; intros. {
   cbn.
