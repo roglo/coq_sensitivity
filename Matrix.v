@@ -1989,16 +1989,10 @@ apply square_matrix_eq.
 apply mat_add_assoc.
 Qed.
 
-Theorem squ_mat_add_0_l {n} : ∀ M : square_matrix n T, (0 + M)%F = M.
+Theorem square_matrix_is_correct : ∀ n (M : square_matrix n T),
+  is_correct_matrix (sm_mat M).
 Proof.
 intros.
-apply square_matrix_eq.
-cbn.
-apply mat_add_0_l; cycle 1. {
-  symmetry; apply squ_mat_nrows.
-} {
-  symmetry; apply squ_mat_ncols.
-}
 destruct M as (M, Hm); cbn.
 apply is_sm_mat_iff in Hm.
 destruct Hm as (Hr & Hcr & Hc).
@@ -2011,6 +2005,19 @@ rewrite Hc with (l := hd _ _). 2: {
   destruct (mat_list_list M); [ easy | cbn; flia ].
 }
 now apply Hc.
+Qed.
+
+Theorem squ_mat_add_0_l {n} : ∀ M : square_matrix n T, (0 + M)%F = M.
+Proof.
+intros.
+apply square_matrix_eq.
+cbn.
+apply mat_add_0_l; cycle 1. {
+  symmetry; apply squ_mat_nrows.
+} {
+  symmetry; apply squ_mat_ncols.
+}
+apply square_matrix_is_correct.
 Qed.
 
 Theorem squ_mat_mul_assoc {n} : ∀ (MA MB MC : square_matrix n T),
@@ -2049,24 +2056,6 @@ apply mat_mul_assoc. {
   apply nth_In, Nat.neq_0_lt_0.
   now rewrite fold_mat_nrows, Hra.
 }
-Qed.
-
-Theorem square_matrix_is_correct : ∀ n (M : square_matrix n T),
-  is_correct_matrix (sm_mat M).
-Proof.
-intros.
-destruct M as (M, Hm); cbn.
-apply is_sm_mat_iff in Hm.
-destruct Hm as (Hr & Hcr & Hc).
-split; [ now intros H; apply Hcr in H | ].
-intros l Hl.
-unfold mat_ncols.
-rewrite Hc with (l := hd _ _). 2: {
-  rewrite List_hd_nth_0.
-  apply nth_In.
-  destruct (mat_list_list M); [ easy | cbn; flia ].
-}
-now apply Hc.
 Qed.
 
 Theorem squ_mat_mul_1_l {n} : ∀ M : square_matrix n T, (1 * M)%F = M.
