@@ -2070,6 +2070,70 @@ rewrite Hc with (l := hd _ _). 2: {
 now apply Hc.
 Qed.
 
+Theorem squ_mat_mul_add_distr_l {n} : ∀ (MA MB MC : square_matrix n T),
+  (MA * (MB + MC) = MA * MB + MA * MC)%F.
+Proof.
+intros.
+apply square_matrix_eq.
+destruct MA as (MA & Ha).
+destruct MB as (MB & Hb).
+destruct MC as (MC & Hc); cbn.
+move MB before MA; move MC before MB.
+apply is_sm_mat_iff in Ha.
+apply is_sm_mat_iff in Hb.
+apply is_sm_mat_iff in Hc.
+destruct Ha as (Hra & Hcra & Hca).
+destruct Hb as (Hrb & Hcrb & Hcb).
+destruct Hc as (Hrc & Hcrc & Hcc).
+move Hrb before Hra; move Hrc before Hrb.
+move Hcrb before Hcra; move Hcrc before Hcrb.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  move Hnz at top; subst n; cbn.
+  unfold "*"%M, "+"%M; cbn.
+  now rewrite Hra.
+}
+apply mat_mul_add_distr_l. {
+  split; [ easy | ].
+  intros l Hl.
+  rewrite Hcb; [ | easy ].
+  symmetry; apply Hcb.
+  rewrite List_hd_nth_0.
+  apply nth_In, Nat.neq_0_lt_0.
+  now rewrite fold_mat_nrows, Hrb.
+} {
+  split; [ easy | ].
+  intros l Hl.
+  rewrite Hcc; [ | easy ].
+  symmetry; apply Hcc.
+  rewrite List_hd_nth_0.
+  apply nth_In, Nat.neq_0_lt_0.
+  now rewrite fold_mat_nrows, Hrc.
+} {
+  now rewrite Hrb.
+} {
+  rewrite Hrb; unfold mat_ncols.
+  apply Hca.
+  rewrite List_hd_nth_0.
+  apply nth_In, Nat.neq_0_lt_0.
+  now rewrite fold_mat_nrows, Hra.
+} {
+  congruence.
+} {
+  unfold mat_ncols.
+  rewrite Hcb. 2: {
+    rewrite List_hd_nth_0.
+    apply nth_In, Nat.neq_0_lt_0.
+    now rewrite fold_mat_nrows, Hrb.
+  }
+  rewrite Hcc. 2: {
+    rewrite List_hd_nth_0.
+    apply nth_In, Nat.neq_0_lt_0.
+    now rewrite fold_mat_nrows, Hrc.
+  }
+  easy.
+}
+Qed.
+
 Definition mat_ring_like_prop (n : nat) :
   ring_like_prop (square_matrix n T) :=
   {| rngl_is_comm := false;
@@ -2084,7 +2148,7 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_add_0_l := squ_mat_add_0_l;
      rngl_mul_assoc := squ_mat_mul_assoc;
      rngl_mul_1_l := squ_mat_mul_1_l;
-     rngl_mul_add_distr_l := 42; (* mat_mul_add_distr_l; *)
+     rngl_mul_add_distr_l := squ_mat_mul_add_distr_l;
 (**)
      rngl_opt_1_neq_0 := 42;
 (*
