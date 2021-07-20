@@ -2051,13 +2051,10 @@ apply mat_mul_assoc. {
 }
 Qed.
 
-Theorem squ_mat_mul_1_l {n} : ∀ M : square_matrix n T, (1 * M)%F = M.
+Theorem square_matrix_is_correct : ∀ n (M : square_matrix n T),
+  is_correct_matrix (sm_mat M).
 Proof.
 intros.
-apply square_matrix_eq; cbn.
-apply mat_mul_1_l; cycle 1. {
-  symmetry; apply squ_mat_nrows.
-}
 destruct M as (M, Hm); cbn.
 apply is_sm_mat_iff in Hm.
 destruct Hm as (Hr & Hcr & Hc).
@@ -2070,6 +2067,22 @@ rewrite Hc with (l := hd _ _). 2: {
   destruct (mat_list_list M); [ easy | cbn; flia ].
 }
 now apply Hc.
+Qed.
+
+Theorem squ_mat_mul_1_l {n} : ∀ M : square_matrix n T, (1 * M)%F = M.
+Proof.
+intros.
+apply square_matrix_eq; cbn.
+apply mat_mul_1_l; [ | symmetry; apply squ_mat_nrows ].
+apply square_matrix_is_correct.
+Qed.
+
+Theorem squ_mat_mul_1_r {n} : ∀ M : square_matrix n T, (M * 1)%F = M.
+Proof.
+intros.
+apply square_matrix_eq; cbn.
+apply mat_mul_1_r; [ | symmetry; apply squ_mat_ncols ].
+apply square_matrix_is_correct.
 Qed.
 
 Theorem squ_mat_mul_add_distr_l {n} : ∀ (MA MB MC : square_matrix n T),
@@ -2178,7 +2191,7 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_mul_add_distr_l := squ_mat_mul_add_distr_l;
      rngl_opt_1_neq_0 := squ_mat_opt_1_neq_0;
      rngl_opt_mul_comm := NA;
-     rngl_opt_mul_1_r := 42; (* mat_mul_1_r; *)
+     rngl_opt_mul_1_r := squ_mat_mul_1_r;
      rngl_opt_mul_add_distr_r := mat_mul_add_distr_r;
 (**)
      rngl_opt_add_opp_l := 42;
