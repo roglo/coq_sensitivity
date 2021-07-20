@@ -2273,6 +2273,47 @@ Proof.
 remember rngl_has_dec_eq as b eqn:Hed; symmetry in Hed.
 destruct b; [ | easy ].
 intros.
+destruct MA as (MA & Ha).
+destruct MB as (MB & Hb).
+move MB before MA.
+Theorem glop :
+  if rngl_has_dec_eq then ∀ MA MB : matrix T, {MA = MB} + {MA ≠ MB}
+  else not_applicable.
+Proof.
+remember rngl_has_dec_eq as de eqn:Hde; symmetry in Hde.
+destruct de; [ | easy ].
+intros MA MB.
+assert
+  (Hab : ∀ i j,
+   {mat_el MA i j = mat_el MB i j} + {mat_el MA i j ≠ mat_el MB i j}). {
+  intros.
+  now apply rngl_eq_dec.
+}
+destruct MA as (lla).
+destruct MB as (llb).
+cbn in Hab.
+revert llb Hab.
+induction lla as [| la]; intros; cbn. {
+  destruct llb as [| lb]; [ now left | right ].
+  now intros H; injection H.
+}
+destruct llb as [| lb]; [ now right; intros H; injection H | ].
+...
+induction n; intros; [ now left; apply matrix_eq | ].
+destruct IHn as [IHn| IHn]. {
+  injection IHn; clear IHn; intros IHn.
+  now left; subst fb.
+} {
+  right.
+  intros H1; apply IHn; clear IHn.
+  injection H1; clear H1; intros H1.
+  now subst fb.
+}
+Qed.
+...
+remember rngl_has_dec_eq as b eqn:Hed; symmetry in Hed.
+destruct b; [ | easy ].
+intros.
 assert
   (Hab : ∀ i j,
    {mat_el (sm_mat MA) i j = mat_el (sm_mat MB) i j} +
