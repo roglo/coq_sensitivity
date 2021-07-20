@@ -500,11 +500,14 @@ Qed.
 
 (* addition left and right with opposite *)
 
-Theorem mat_add_opp_l : ∀ (M : matrix T),
+Theorem mat_add_opp_l {m n} : ∀ (M : matrix T),
   is_correct_matrix M
-  → (- M + M = mZ (mat_nrows M) (mat_ncols M))%M.
+  → m = mat_nrows M
+  → n = mat_ncols M
+  → (- M + M = mZ m n)%M.
 Proof.
-intros * HM.
+intros * HM Hr Hc.
+subst m n.
 unfold is_correct_matrix in HM.
 destruct HM as (_, HM).
 unfold "+"%M, mZ, mat_nrows, mat_ncols; cbn; f_equal.
@@ -2223,6 +2226,46 @@ injection H; intros H1 H2.
 now apply rngl_1_neq_0.
 Qed.
 
+Theorem squ_mat_opt_add_opp_l {n} :
+  if @rngl_has_opp (square_matrix n T) (mat_ring_like_op n) then
+    ∀ M : square_matrix n T, (- M + M)%F = 0%F
+  else not_applicable.
+(*
+  if rngl_has_opp then ∀ M : square_matrix n T, (- M + M)%F = 0%F
+  else not_applicable.
+*)
+Proof.
+remember (@rngl_has_opp (square_matrix n T) (mat_ring_like_op n)) as b eqn:Hb.
+symmetry in Hb.
+destruct b; [ | easy ].
+intros M; cbn.
+apply square_matrix_eq; cbn.
+destruct M as (M & Hs); cbn.
+apply is_sm_mat_iff in Hs.
+destruct Hs as (Hr & Hcr & Hc).
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  move Hnz at top; subst n; cbn.
+  unfold mat_opp, "+"%M, mZ; cbn.
+  apply length_zero_iff_nil in Hr.
+  now rewrite Hr.
+}
+apply mat_add_opp_l; [ | easy | ]. 2: {
+  unfold mat_ncols.
+  symmetry; apply Hc.
+  rewrite List_hd_nth_0.
+  apply nth_In, Nat.neq_0_lt_0.
+  now rewrite fold_mat_nrows, Hr.
+}
+split; [ easy | ].
+intros l Hl.
+unfold mat_ncols.
+rewrite Hc; [ | easy ].
+symmetry; apply Hc.
+rewrite List_hd_nth_0.
+apply nth_In, Nat.neq_0_lt_0.
+now rewrite fold_mat_nrows, Hr.
+Qed.
+
 Definition mat_ring_like_prop (n : nat) :
   ring_like_prop (square_matrix n T) :=
   {| rngl_is_comm := false;
@@ -2242,7 +2285,7 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_opt_mul_comm := NA;
      rngl_opt_mul_1_r := squ_mat_mul_1_r;
      rngl_opt_mul_add_distr_r := squ_mat_mul_add_distr_r;
-     rngl_opt_add_opp_l := 42; (*@mat_opt_add_opp_l n;*)
+     rngl_opt_add_opp_l := squ_mat_opt_add_opp_l;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_sub_sub_add := NA;
      rngl_opt_mul_sub_distr_l := NA;
@@ -2251,11 +2294,7 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_quot_l := NA;
      rngl_opt_mul_quot_r := NA;
-(**)
-     rngl_opt_eq_dec := 42;
-(*
-     rngl_opt_eq_dec := mat_opt_eq_dec n;
-*)
+     rngl_opt_eq_dec := 42; (*mat_opt_eq_dec n;*)
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;
 (**)
