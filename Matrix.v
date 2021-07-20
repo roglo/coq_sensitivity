@@ -20,6 +20,7 @@ Notation "'⋀' ( i ∈ l ) , g" :=
 Record matrix T := mk_mat
   { mat_list_list : list (list T) }.
 
+(*
 Theorem matrix_eq : ∀ T (MA MB : matrix T),
   (Forall2 (Forall2 eq) (mat_list_list MA) (mat_list_list MB))
   → MA = MB.
@@ -33,6 +34,7 @@ subst l'; f_equal.
 induction H; [ easy | ].
 now subst x l0.
 Qed.
+*)
 
 Definition mat_of_list_list {T} (l : list (list T)) : matrix T :=
   mk_mat l.
@@ -2134,6 +2136,31 @@ apply mat_mul_add_distr_l. {
 }
 Qed.
 
+Theorem squ_mat_opt_1_neq_0 {n} :
+  if rngl_has_1_neq_0 && negb (n =? 0) then
+    @rngl_one (square_matrix n T) (mat_ring_like_op n) ≠
+    @rngl_zero (square_matrix n T) (mat_ring_like_op n)
+  else not_applicable.
+(*
+  if rngl_has_1_neq_0 && negb (n =? 0) then 1%F ≠ 0%F else not_applicable.
+*)
+Proof.
+remember (rngl_has_1_neq_0 && negb (n =? 0)) as b eqn:Hb.
+symmetry in Hb.
+destruct b; [ | easy ].
+apply Bool.andb_true_iff in Hb.
+destruct Hb as (H10, Hb).
+apply Bool.negb_true_iff in Hb.
+apply Nat.eqb_neq in Hb.
+intros H; cbn in H.
+unfold smI, smZ in H.
+injection H; clear H; intros H.
+destruct n; [ easy | ].
+cbn in H.
+injection H; intros H1 H2.
+now apply rngl_1_neq_0.
+Qed.
+
 Definition mat_ring_like_prop (n : nat) :
   ring_like_prop (square_matrix n T) :=
   {| rngl_is_comm := false;
@@ -2149,13 +2176,9 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_mul_assoc := squ_mat_mul_assoc;
      rngl_mul_1_l := squ_mat_mul_1_l;
      rngl_mul_add_distr_l := squ_mat_mul_add_distr_l;
-(**)
-     rngl_opt_1_neq_0 := 42;
-(*
-     rngl_opt_1_neq_0 := @mat_1_neq_0 n;
-*)
+     rngl_opt_1_neq_0 := squ_mat_opt_1_neq_0;
      rngl_opt_mul_comm := NA;
-     rngl_opt_mul_1_r := mat_mul_1_r;
+     rngl_opt_mul_1_r := 42; (* mat_mul_1_r; *)
      rngl_opt_mul_add_distr_r := mat_mul_add_distr_r;
 (**)
      rngl_opt_add_opp_l := 42;
