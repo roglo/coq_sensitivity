@@ -2311,6 +2311,33 @@ destruct (mat_eq_dec Hed MA MB) as [Hab| Hab]. {
 }
 Qed.
 
+Theorem squ_mat_characteristic_prop {n} :
+  match (if Nat.eq_dec n 0 then 1 else rngl_characteristic) with
+  | O =>
+      ∀ i,
+      @rngl_of_nat (square_matrix n T) (mat_ring_like_op n) (S i) ≠ 0%F
+  | S _ =>
+      @rngl_of_nat (square_matrix n T) (mat_ring_like_op n)
+        (if Nat.eq_dec n 0 then 1 else rngl_characteristic) = 0%F
+  end.
+Proof.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n; cbn.
+  now apply square_matrix_eq.
+}
+remember rngl_characteristic as ch eqn:Hch; symmetry in Hch.
+destruct ch. {
+  intros i H.
+  cbn in H.
+  injection H; clear H; intros H.
+  rewrite map2_map_l in H.
+  specialize @rngl_characteristic_prop as H1.
+  specialize (H1 T ro rp).
+  rewrite Hch in H1.
+...
+Check square_matrix_eq.
+...
+
 Definition mat_ring_like_prop (n : nat) :
   ring_like_prop (square_matrix n T) :=
   {| rngl_is_comm := false;
@@ -2342,7 +2369,7 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_opt_eq_dec := squ_mat_opt_eq_dec;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;
-     rngl_characteristic_prop := 42; (* mat_characteristic_prop n*)
+     rngl_characteristic_prop := squ_mat_characteristic_prop;
      rngl_opt_le_refl := NA;
      rngl_opt_le_antisymm := NA;
      rngl_opt_le_trans := NA;
