@@ -2273,6 +2273,38 @@ Proof.
 remember rngl_has_dec_eq as b eqn:Hed; symmetry in Hed.
 destruct b; [ | easy ].
 intros.
+assert
+  (Hab : ∀ i j,
+   {mat_el (sm_mat MA) i j = mat_el (sm_mat MB) i j} +
+   {mat_el (sm_mat MA) i j ≠ mat_el (sm_mat MB) i j}). {
+  intros.
+  now apply rngl_eq_dec.
+}
+revert MA MB Hab.
+induction n; intros. {
+  left.
+  destruct MA as (MA & Ha).
+  destruct MB as (MB & Hb).
+  move MB before MA.
+  cbn in Hab.
+  apply square_matrix_eq; cbn.
+  apply is_sm_mat_iff in Ha.
+  apply is_sm_mat_iff in Hb.
+  destruct Ha as (Hra & Hcra & Hca).
+  destruct Hb as (Hrb & Hcrb & Hcb).
+  move Hrb before Hra; move Hcrb before Hcra.
+  unfold mat_nrows in Hra, Hrb.
+  apply length_zero_iff_nil in Hra, Hrb.
+  destruct MA as (lla).
+  destruct MB as (llb).
+  cbn in Hra, Hrb.
+  f_equal.
+  congruence.
+}
+...
+remember rngl_has_dec_eq as b eqn:Hed; symmetry in Hed.
+destruct b; [ | easy ].
+intros.
 destruct MA as (MA & Ha).
 destruct MB as (MB & Hb); cbn.
 move MB before MA.
