@@ -1989,6 +1989,7 @@ Theorem squ_mat_add_0_l {n} : ∀ M : square_matrix n T, (0 + M)%F = M.
 Proof.
 intros.
 apply square_matrix_eq.
+cbn.
 apply mat_add_0_l; cycle 1. {
   symmetry; apply squ_mat_nrows.
 } {
@@ -2008,6 +2009,44 @@ rewrite Hc with (l := hd _ _). 2: {
 now apply Hc.
 Qed.
 
+Theorem squ_mat_mul_assoc {n} : ∀ (MA MB MC : square_matrix n T),
+  (MA * (MB * MC) = (MA * MB) * MC)%F.
+Proof.
+intros.
+apply square_matrix_eq.
+destruct MA as (MA & Ha).
+destruct MB as (MB & Hb).
+destruct MC as (MC & Hc); cbn.
+move MB before MA; move MC before MB.
+apply is_sm_mat_iff in Ha.
+apply is_sm_mat_iff in Hb.
+apply is_sm_mat_iff in Hc.
+destruct Ha as (Hra & Hcra & Hca).
+destruct Hb as (Hrb & Hcrb & Hcb).
+destruct Hc as (Hrc & Hcrc & Hcc).
+move Hrb before Hra; move Hrc before Hrb.
+move Hcrb before Hcra; move Hcrc before Hcrb.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  move Hnz at top; subst n; cbn.
+  unfold "*"%M; cbn.
+  now rewrite Hra, Hrb.
+}
+apply mat_mul_assoc. {
+  now rewrite Hrb.
+} {
+  intros H; apply Hnz.
+  apply Hcrb in H.
+  rewrite <- Hrb; apply H.
+} {
+  rewrite Hrb.
+  unfold mat_ncols.
+  apply Hca.
+  rewrite List_hd_nth_0.
+  apply nth_In, Nat.neq_0_lt_0.
+  now rewrite fold_mat_nrows, Hra.
+}
+Qed.
+
 Definition mat_ring_like_prop (n : nat) :
   ring_like_prop (square_matrix n T) :=
   {| rngl_is_comm := false;
@@ -2020,8 +2059,8 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_add_comm := squ_mat_add_comm;
      rngl_add_assoc := squ_mat_add_assoc;
      rngl_add_0_l := squ_mat_add_0_l;
-     rngl_mul_assoc := 42; (*mat_mul_assoc;*)
-     rngl_mul_1_l := mat_mul_1_l;
+     rngl_mul_assoc := squ_mat_mul_assoc;
+     rngl_mul_1_l := 42; (* mat_mul_1_l; *)
      rngl_mul_add_distr_l := mat_mul_add_distr_l;
 (**)
      rngl_opt_1_neq_0 := 42;
