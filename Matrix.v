@@ -2266,6 +2266,32 @@ apply nth_In, Nat.neq_0_lt_0.
 now rewrite fold_mat_nrows, Hr.
 Qed.
 
+Theorem mat_opt_eq_dec :
+  if rngl_has_dec_eq then ∀ MA MB : matrix T, {MA = MB} + {MA ≠ MB}
+  else not_applicable.
+Proof.
+remember rngl_has_dec_eq as de eqn:Hde; symmetry in Hde.
+destruct de; [ | easy ].
+intros MA MB.
+destruct MA as (lla).
+destruct MB as (llb).
+specialize (list_eq_dec (list_eq_dec (rngl_eq_dec Hde)) lla llb) as H1.
+destruct H1 as [H1| H1]; [ now subst lla; left | ].
+right.
+intros H; apply H1; clear H1.
+now injection H.
+Qed.
+
+Theorem mat_eq_dec :
+  rngl_has_dec_eq = true
+  → ∀ MA MB : matrix T, {MA = MB} + {MA ≠ MB}.
+Proof.
+intros * Hde *.
+specialize mat_opt_eq_dec as H1.
+rewrite Hde in H1.
+apply H1.
+Qed.
+
 Theorem squ_mat_opt_eq_dec {n} :
   if rngl_has_dec_eq then ∀ MA MB : square_matrix n T, {MA = MB} + {MA ≠ MB}
   else not_applicable.
@@ -2276,143 +2302,14 @@ intros.
 destruct MA as (MA & Ha).
 destruct MB as (MB & Hb).
 move MB before MA.
-Theorem glop :
-  if rngl_has_dec_eq then ∀ MA MB : matrix T, {MA = MB} + {MA ≠ MB}
-  else not_applicable.
-Proof.
-remember rngl_has_dec_eq as de eqn:Hde; symmetry in Hde.
-destruct de; [ | easy ].
-intros MA MB.
-assert
-  (Hab : ∀ i j,
-   {mat_el MA i j = mat_el MB i j} + {mat_el MA i j ≠ mat_el MB i j}). {
-  intros.
-  now apply rngl_eq_dec.
-}
-destruct MA as (lla).
-destruct MB as (llb).
-cbn in Hab.
-revert llb Hab.
-induction lla as [| la]; intros; cbn. {
-  destruct llb as [| lb]; [ now left | right ].
-  now intros H; injection H.
-}
-destruct llb as [| lb]; [ now right; intros H; injection H | ].
-...
-induction n; intros; [ now left; apply matrix_eq | ].
-destruct IHn as [IHn| IHn]. {
-  injection IHn; clear IHn; intros IHn.
-  now left; subst fb.
+destruct (mat_eq_dec Hed MA MB) as [Hab| Hab]. {
+  left; subst MB.
+  now apply square_matrix_eq.
 } {
-  right.
-  intros H1; apply IHn; clear IHn.
-  injection H1; clear H1; intros H1.
-  now subst fb.
+  right; intros H; apply Hab; clear Hab.
+  now injection H.
 }
 Qed.
-...
-remember rngl_has_dec_eq as b eqn:Hed; symmetry in Hed.
-destruct b; [ | easy ].
-intros.
-assert
-  (Hab : ∀ i j,
-   {mat_el (sm_mat MA) i j = mat_el (sm_mat MB) i j} +
-   {mat_el (sm_mat MA) i j ≠ mat_el (sm_mat MB) i j}). {
-  intros.
-  now apply rngl_eq_dec.
-}
-revert MA MB Hab.
-induction n; intros. {
-  left.
-  destruct MA as (MA & Ha).
-  destruct MB as (MB & Hb).
-  move MB before MA.
-  cbn in Hab.
-  apply square_matrix_eq; cbn.
-  apply is_sm_mat_iff in Ha.
-  apply is_sm_mat_iff in Hb.
-  destruct Ha as (Hra & Hcra & Hca).
-  destruct Hb as (Hrb & Hcrb & Hcb).
-  move Hrb before Hra; move Hcrb before Hcra.
-  unfold mat_nrows in Hra, Hrb.
-  apply length_zero_iff_nil in Hra, Hrb.
-  destruct MA as (lla).
-  destruct MB as (llb).
-  cbn in Hra, Hrb.
-  f_equal.
-  congruence.
-}
-...
-remember rngl_has_dec_eq as b eqn:Hed; symmetry in Hed.
-destruct b; [ | easy ].
-intros.
-destruct MA as (MA & Ha).
-destruct MB as (MB & Hb); cbn.
-move MB before MA.
-specialize (proj1 (@is_sm_mat_iff T n MA) Ha) as Ha1.
-specialize (proj1 (@is_sm_mat_iff T n MB) Hb) as Hb1.
-destruct Ha1 as (Hra & Hcra & Hca).
-destruct Hb1 as (Hrb & Hcrb & Hcb).
-move Hrb before Hra; move Hcrb before Hcra.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  move Hnz at top; subst n; cbn.
-  left.
-  apply square_matrix_eq; cbn.
-  clear Ha Hb.
-  destruct MA as (lla).
-  destruct MB as (llb).
-  cbn in Hra, Hrb, Hcra, Hcrb, Hca, Hcb.
-  f_equal.
-  apply length_zero_iff_nil in Hra.
-  apply length_zero_iff_nil in Hrb.
-  now subst lla llb.
-}
-assert
-  (Hab : ∀ i j,
-   {mat_el MA i j = mat_el MB i j} + {mat_el MA i j ≠ mat_el MB i j}). {
-  intros.
-  now apply rngl_eq_dec.
-}
-clear Hcra Hcrb.
-revert MA MB Ha Hb Hra Hrb Hca Hcb Hab.
-induction n; intros; [ easy | ].
-...
-induction n; intros. {
-  cbn.
-  left.
-  apply square_matrix_eq; cbn.
-  clear Ha Hb.
-  destruct MA as (lla).
-  destruct MB as (llb).
-(*
-  cbn in Hra, Hrb, Hcra, Hcrb, Hca, Hcb.
-*)
-  f_equal.
-  cbn in Hab.
-  revert llb Hab.
-  induction lla as [| la]; intros; cbn. {
-    destruct llb as [| lb]; [ easy | exfalso ].
-...
-  apply length_zero_iff_nil in Hra.
-  apply length_zero_iff_nil in Hrb.
-  now subst lla llb.
-...
-destruct IHn as [IHn| IHn]. {
-  injection IHn; clear IHn; intros IHn.
-  now left; subst fb.
-} {
-  right.
-  intros H1; apply IHn; clear IHn.
-  injection H1; clear H1; intros H1.
-  now subst fb.
-}
-Qed.
-...
-
-destruct MA as (lla).
-destruct MB as (llb).
-cbn in Hra, Hrb, Hcra, Hcrb, Hca, Hcb |-*.
-...
 
 Definition mat_ring_like_prop (n : nat) :
   ring_like_prop (square_matrix n T) :=
@@ -2445,11 +2342,7 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_opt_eq_dec := squ_mat_opt_eq_dec;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;
-(**)
-     rngl_characteristic_prop := 42;
-(*
-     rngl_characteristic_prop := @mat_characteristic_prop n;
-*)
+     rngl_characteristic_prop := 42; (* mat_characteristic_prop n*)
      rngl_opt_le_refl := NA;
      rngl_opt_le_antisymm := NA;
      rngl_opt_le_trans := NA;
