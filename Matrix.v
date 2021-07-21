@@ -2331,6 +2331,20 @@ specialize (H1 T ro rp).
 rewrite Hch in H1.
 destruct ch. {
   intros i Hi.
+  apply (f_equal (λ M, mat_el (sm_mat M) 0 0)) in Hi.
+  cbn in Hi.
+  rewrite List_nth_repeat in Hi.
+  destruct (lt_dec 0 n) as [H| H]; [ clear H | flia Hnz H ].
+  rewrite List_nth_repeat in Hi.
+  destruct (lt_dec 0 n) as [H| H]; [ clear H | flia Hnz H ].
+  rewrite map2_map_l in Hi.
+  rewrite map2_nth with (a := 0) (b := []) in Hi.
+  erewrite map2_nth in Hi.
+  rewrite map_nth, seq_nth, seq_nth in Hi.
+  cbn in Hi.
+...
+  rewrite map2_nth with (a := 0) (b := []) in Hi.
+...
   injection Hi; clear Hi; intros Hi.
   apply (f_equal (λ M, nth 0 (nth 0 M []) 0%F)) in Hi.
 rewrite map2_map_l in Hi.
