@@ -2331,11 +2331,16 @@ specialize (H1 T ro rp).
 rewrite Hch in H1.
 destruct ch. {
   intros i Hi.
-...
   injection Hi; clear Hi; intros Hi.
+  apply (f_equal (λ M, nth 0 (nth 0 M []) 0%F)) in Hi.
+rewrite map2_map_l in Hi.
+rewrite map2_nth with (a := 0) (b := []) in Hi.
+...
   revert n Hnz Hi.
-  induction i; intros; cbn in Hi.
-  destruct n; [ easy | clear Hnz ].
+  induction i; intros; cbn in Hi. {
+    destruct n; [ easy | clear Hnz ].
+    apply (f_equal (λ M, nth 0 (nth 0 M []) 0%F)) in Hi.
+    cbn in Hi.
 ...
   destruct n; [ easy | clear Hnz ].
   revert i Hi.
