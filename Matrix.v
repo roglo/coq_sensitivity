@@ -2311,6 +2311,29 @@ destruct (mat_eq_dec Hed MA MB) as [Hab| Hab]. {
 }
 Qed.
 
+Theorem mat_add_ncols : ∀ MA MB : matrix T,
+  mat_ncols (MA + MB) = min (mat_ncols MA) (mat_ncols MB).
+Proof.
+intros.
+unfold mZ, "+"%M, mat_ncols.
+destruct MA as (lla).
+destruct MB as (llb); cbn.
+destruct lla as [| la]; [ easy | cbn ].
+destruct llb as [| lb]; cbn; [ symmetry; apply Nat.min_r; flia | ].
+apply map2_length.
+Qed.
+
+Theorem mat_ncols_of_nat {n} : ∀ i, mat_ncols (@sm_mat n T (rngl_of_nat i)) = n.
+Proof.
+intros.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n; destruct i | ].
+induction i; [ now apply mZ_ncols | cbn ].
+rewrite mat_add_ncols.
+rewrite mI_ncols, IHi.
+apply Nat.min_id.
+Qed.
+
+
 Theorem squ_mat_characteristic_prop {n} :
   match (if Nat.eq_dec n 0 then 1 else rngl_characteristic) with
   | O =>
@@ -2353,54 +2376,10 @@ destruct ch. {
     now rewrite map_length, seq_length.
   } {
     rewrite <- List_hd_nth_0, fold_mat_ncols.
-    clear Hi.
-...
-    induction i; cbn. {
-      rewrite mZ_ncols; [ easy | flia Hnz ].
-    }
-    unfold "+"%M, mat_ncols; cbn.
-    rewrite map2_map_l.
-    unfold mat_ncols in IHi.
-...
-    rewrite fold_mat_ncols.
-...
-  rewrite map_nth, seq_nth, seq_nth in Hi.
+    now rewrite mat_ncols_of_nat.
+  }
+  rewrite map_nth, seq_nth, seq_nth in Hi; [ | easy | easy ].
   cbn in Hi.
-...
-  rewrite map2_nth with (a := 0) (b := []) in Hi.
-...
-  injection Hi; clear Hi; intros Hi.
-  apply (f_equal (λ M, nth 0 (nth 0 M []) 0%F)) in Hi.
-rewrite map2_map_l in Hi.
-rewrite map2_nth with (a := 0) (b := []) in Hi.
-...
-  revert n Hnz Hi.
-  induction i; intros; cbn in Hi. {
-    destruct n; [ easy | clear Hnz ].
-    apply (f_equal (λ M, nth 0 (nth 0 M []) 0%F)) in Hi.
-    cbn in Hi.
-...
-  destruct n; [ easy | clear Hnz ].
-  revert i Hi.
-  induction n; intros; cbn in Hi.
-...
-  cbn in H.
-  injection H; clear H; intros H.
-  rewrite map2_map_l in H.
-  specialize @rngl_characteristic_prop as H1.
-  specialize (H1 T ro rp).
-  rewrite Hch in H1.
-  destruct n; [ easy | clear Hnz ].
-  induction n. {
-    cbn in H.
-    destruct i. {
-      cbn in H.
-      injection H; clear H; intros H.
-      now specialize (H1 0).
-    }
-    cbn in H.
-...
-Check square_matrix_eq.
 ...
 
 Definition mat_ring_like_prop (n : nat) :
