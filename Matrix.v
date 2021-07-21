@@ -2437,10 +2437,34 @@ Proof.
 intros.
 split. {
   intros Hc.
+  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+    now subst n; destruct i.
+  }
+  destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+    subst i; cbn in Hc |-*.
+    now rewrite mZ_ncols in Hc.
+  }
   unfold mat_ncols in Hc.
   unfold mat_nrows.
   apply length_zero_iff_nil in Hc.
   apply length_zero_iff_nil.
+  remember (mat_list_list _) as lla eqn:Hlla.
+  symmetry in Hlla.
+  destruct lla as [| la]; [ easy | exfalso ].
+  cbn in Hc; subst la.
+  apply (f_equal (λ ll, nth 0 (nth 0 ll []) 0%F)) in Hlla.
+  cbn in Hlla.
+  destruct n; [ easy | clear Hnz ].
+  destruct i; [ easy | clear Hiz ].
+...
+  revert n Hlla.
+  induction i; intros.
+2: {
+remember (S i) as x; cbn in Hlla; subst x.
+...
+  revert i Hlla.
+  induction n; intros; cbn in Hlla. {
+    induction i; cbn in Hlla.
 ...
   induction (mat_list_list _) as [| la]; [ easy | ].
   cbn in Hc.
