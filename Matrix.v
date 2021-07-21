@@ -387,6 +387,7 @@ Arguments mat_add {T ro} MA%M MB%M.
 Arguments mat_mul {T ro} MA%M MB%M.
 Arguments mat_mul_el {T}%type {ro} (MA MB)%M (i k)%nat.
 Arguments mat_mul_scal_l {T ro} s%F M%M.
+Arguments mat_list_list [T]%type m%M.
 Arguments mat_nrows {T}%type M%M.
 Arguments mat_ncols {T}%type M%M.
 Arguments mat_el {T}%type {ro} M%M (i j)%nat.
@@ -2321,6 +2322,16 @@ destruct (mat_eq_dec Hed MA MB) as [Hab| Hab]. {
 }
 Qed.
 
+Theorem mat_add_nrows : ∀ MA MB : matrix T,
+  mat_nrows (MA + MB) = min (mat_nrows MA) (mat_nrows MB).
+Proof.
+intros.
+unfold mZ, "+"%M, mat_nrows.
+destruct MA as (lla).
+destruct MB as (llb); cbn.
+apply map2_length.
+Qed.
+
 Theorem mat_add_ncols : ∀ MA MB : matrix T,
   mat_ncols (MA + MB) = min (mat_ncols MA) (mat_ncols MB).
 Proof.
@@ -2371,6 +2382,77 @@ rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
   now rewrite fold_mat_nrows.
 }
 easy.
+Qed.
+
+Theorem mat_add_is_correct : ∀ MA MB : matrix T,
+  is_correct_matrix MA
+  → is_correct_matrix MB
+  → is_correct_matrix (MA + MB).
+Proof.
+intros * Ha Hb.
+destruct Ha as (Hcra, Hca).
+destruct Hb as (Hcrb, Hcb).
+move Hcrb before Hcra.
+destruct (Nat.eq_dec (mat_nrows MA) 0) as [Hraz| Hraz]. {
+  unfold mat_nrows in Hraz.
+  apply length_zero_iff_nil in Hraz.
+  now destruct MA as (lla); cbn in Hraz |-*; subst lla.
+}
+destruct (Nat.eq_dec (mat_nrows MB) 0) as [Hrbz| Hrbz]. {
+  unfold mat_nrows in Hrbz.
+  apply length_zero_iff_nil in Hrbz.
+  destruct MB as (llb); cbn in Hrbz |-*; subst llb.
+  now rewrite mat_add_comm.
+}
+apply Nat.neq_0_lt_0 in Hraz, Hrbz.
+split. {
+  unfold mat_ncols, mat_nrows; cbn.
+  intros Hab.
+  apply length_zero_iff_nil in Hab.
+  apply length_zero_iff_nil.
+  remember (map2 _ _ _) as ll eqn:Hll.
+  symmetry in Hll.
+  destruct ll as [| l]; [ easy | exfalso ].
+  cbn in Hab; subst l.
+  apply (f_equal (hd [])) in Hll.
+  cbn in Hll.
+  rewrite List_hd_nth_0 in Hll.
+  rewrite map2_nth with (a := []) (b := []) in Hll; [ | easy | easy ].
+  apply map2_eq_nil in Hll.
+  destruct Hll as [Hll| Hll]. {
+    apply (f_equal length) in Hll; cbn in Hll.
+    rewrite <- List_hd_nth_0 in Hll.
+    rewrite fold_mat_ncols in Hll.
+    apply Hcra in Hll.
+    now rewrite Hll in Hraz.
+  } {
+    apply (f_equal length) in Hll; cbn in Hll.
+    rewrite <- List_hd_nth_0 in Hll.
+    rewrite fold_mat_ncols in Hll.
+    apply Hcrb in Hll.
+    now rewrite Hll in Hrbz.
+  }
+} {
+  intros l Hl.
+  rewrite mat_add_ncols.
+  cbn in Hl.
+  apply in_map2_iff in Hl.
+  destruct Hl as (i & Him & la & lb & Hab).
+  do 2 rewrite fold_mat_nrows in Him.
+  subst l.
+  rewrite map2_length.
+  rewrite Hca. 2: {
+    apply nth_In.
+    rewrite fold_mat_nrows.
+    now apply Nat.min_glb_lt_iff in Him.
+  }
+  rewrite Hcb. 2: {
+    apply nth_In.
+    rewrite fold_mat_nrows.
+    now apply Nat.min_glb_lt_iff in Him.
+  }
+  easy.
+}
 Qed.
 
 Theorem squ_mat_characteristic_prop {n} :
@@ -2459,6 +2541,10 @@ split. {
   exfalso; clear lla Hc.
   destruct n; [ easy | clear Hnz ].
   destruct i; [ easy | clear Hiz ].
+(**)
+  cbn - [ mat_el ] in Hlla.
+  rewrite mat_el_add in Hlla.
+...
   revert i Hlla.
   induction n; intros. {
     induction i; [ now cbn in Hlla; rewrite rngl_add_0_r in Hlla | ].
@@ -2466,86 +2552,18 @@ split. {
     rewrite mat_el_add in Hlla; cycle 1. {
       apply mI_is_correct_matrix.
     } {
-Theorem mat_add_is_correct : ∀ MA MB : matrix T,
-  is_correct_matrix MA
-  → is_correct_matrix MB
-  → is_correct_matrix (MA + MB).
-Proof.
-intros * Ha Hb.
-destruct Ha as (Hcra, Hca).
-destruct Hb as (Hcrb, Hcb).
-move Hcrb before Hcra.
-destruct (Nat.eq_dec (mat_nrows MA) 0) as [Hraz| Hraz]. {
-  unfold mat_nrows in Hraz.
-  apply length_zero_iff_nil in Hraz.
-  now destruct MA as (lla); cbn in Hraz |-*; subst lla.
-}
-destruct (Nat.eq_dec (mat_nrows MB) 0) as [Hrbz| Hrbz]. {
-  unfold mat_nrows in Hrbz.
-  apply length_zero_iff_nil in Hrbz.
-  destruct MB as (llb); cbn in Hrbz |-*; subst llb.
-  now rewrite mat_add_comm.
-}
-apply Nat.neq_0_lt_0 in Hraz, Hrbz.
-split. {
-  unfold mat_ncols, mat_nrows; cbn.
-  intros Hab.
-  apply length_zero_iff_nil in Hab.
-  apply length_zero_iff_nil.
-  remember (map2 _ _ _) as ll eqn:Hll.
-  symmetry in Hll.
-  destruct ll as [| l]; [ easy | exfalso ].
-  cbn in Hab; subst l.
-  apply (f_equal (hd [])) in Hll.
-  cbn in Hll.
-  rewrite List_hd_nth_0 in Hll.
-  rewrite map2_nth with (a := []) (b := []) in Hll; [ | easy | easy ].
-  apply map2_eq_nil in Hll.
-  destruct Hll as [Hll| Hll]. {
-    apply (f_equal length) in Hll; cbn in Hll.
-    rewrite <- List_hd_nth_0 in Hll.
-    rewrite fold_mat_ncols in Hll.
-    apply Hcra in Hll.
-    now rewrite Hll in Hraz.
-  } {
-    apply (f_equal length) in Hll; cbn in Hll.
-    rewrite <- List_hd_nth_0 in Hll.
-    rewrite fold_mat_ncols in Hll.
-    apply Hcrb in Hll.
-    now rewrite Hll in Hrbz.
-  }
-} {
-  intros l Hl.
-...
-apply mat_add_is_correct.
-Search (is_correct_matrix).
-Search (is_correct_matrix (_ + _)).
-...
-    remember (S i) as x; cbn in Hlla; subst x.
-
-...
-  destruct lla as [| la]; [ easy | exfalso ].
-  clear la Hc.
-  cbn in Hc; subst la.
-  apply (f_equal (λ ll, nth 0 (nth 0 ll []) 0%F)) in Hlla.
-  rewrite fold_mat_el in Hlla.
-  cbn in Hlla.
-  destruct n; [ easy | clear Hnz ].
-  destruct i; [ easy | clear Hiz ].
-...
-  revert n Hlla.
-  induction i; intros.
-2: {
-remember (S i) as x; cbn in Hlla; subst x.
-...
-  revert i Hlla.
-  induction n; intros; cbn in Hlla. {
-    induction i; cbn in Hlla.
-...
-  induction (mat_list_list _) as [| la]; [ easy | ].
-  cbn in Hc.
-...
-      apply rngl_of_nat_is_correct_matrix.
+      apply mat_add_is_correct; [ apply mI_is_correct_matrix | ].
+      apply square_matrix_is_correct.
+    } {
+      cbn; flia.
+    } {
+      rewrite mat_add_nrows, mI_nrows, squ_mat_nrows; flia.
+    } {
+      rewrite mI_ncols; flia.
+    } {
+      rewrite mat_add_ncols, mI_ncols, squ_mat_ncols; flia.
+    }
+    rewrite mat_el_add in Hlla.
 ...
 
 Definition mat_ring_like_prop (n : nat) :
