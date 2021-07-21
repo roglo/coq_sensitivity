@@ -2326,14 +2326,28 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   now apply square_matrix_eq.
 }
 remember rngl_characteristic as ch eqn:Hch; symmetry in Hch.
+specialize @rngl_characteristic_prop as H1.
+specialize (H1 T ro rp).
+rewrite Hch in H1.
 destruct ch. {
-  intros i H.
+  intros i Hi.
+  injection Hi; clear Hi; intros Hi.
+...
   cbn in H.
   injection H; clear H; intros H.
   rewrite map2_map_l in H.
   specialize @rngl_characteristic_prop as H1.
   specialize (H1 T ro rp).
   rewrite Hch in H1.
+  destruct n; [ easy | clear Hnz ].
+  induction n. {
+    cbn in H.
+    destruct i. {
+      cbn in H.
+      injection H; clear H; intros H.
+      now specialize (H1 0).
+    }
+    cbn in H.
 ...
 Check square_matrix_eq.
 ...
