@@ -2325,6 +2325,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n; cbn.
   now apply square_matrix_eq.
 }
+apply Nat.neq_0_lt_0 in Hnz.
 remember rngl_characteristic as ch eqn:Hch; symmetry in Hch.
 specialize @rngl_characteristic_prop as H1.
 specialize (H1 T ro rp).
@@ -2338,8 +2339,31 @@ destruct ch. {
   rewrite List_nth_repeat in Hi.
   destruct (lt_dec 0 n) as [H| H]; [ clear H | flia Hnz H ].
   rewrite map2_map_l in Hi.
-  rewrite map2_nth with (a := 0) (b := []) in Hi.
-  erewrite map2_nth in Hi.
+  rewrite map2_nth with (a := 0) (b := []) in Hi; cycle 1. {
+    now rewrite seq_length.
+  } {
+    rewrite fold_mat_nrows.
+    clear Hi.
+    induction i; cbn; [ now rewrite repeat_length | ].
+    rewrite map2_length, map_length, seq_length.
+    rewrite fold_mat_nrows.
+    flia Hnz IHi.
+  }
+  erewrite map2_nth in Hi; cycle 1. {
+    now rewrite map_length, seq_length.
+  } {
+    rewrite <- List_hd_nth_0, fold_mat_ncols.
+    clear Hi.
+...
+    induction i; cbn. {
+      rewrite mZ_ncols; [ easy | flia Hnz ].
+    }
+    unfold "+"%M, mat_ncols; cbn.
+    rewrite map2_map_l.
+    unfold mat_ncols in IHi.
+...
+    rewrite fold_mat_ncols.
+...
   rewrite map_nth, seq_nth, seq_nth in Hi.
   cbn in Hi.
 ...
