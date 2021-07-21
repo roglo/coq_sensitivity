@@ -2344,7 +2344,20 @@ destruct llb as [| lb]; cbn; [ symmetry; apply Nat.min_r; flia | ].
 apply map2_length.
 Qed.
 
-Theorem mat_ncols_of_nat {n} : ∀ i, mat_ncols (@sm_mat n T (rngl_of_nat i)) = n.
+Theorem mat_nrows_of_nat {n} : ∀ i,
+  mat_nrows (@sm_mat n T (rngl_of_nat i)) = n.
+Proof.
+intros.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n; destruct i | ].
+induction i; [ now apply mZ_nrows | cbn ].
+rewrite map2_length.
+rewrite map_length, seq_length.
+rewrite fold_mat_nrows, IHi.
+apply Nat.min_id.
+Qed.
+
+Theorem mat_ncols_of_nat {n} : ∀ i,
+  mat_ncols (@sm_mat n T (rngl_of_nat i)) = n.
 Proof.
 intros.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n; destruct i | ].
@@ -2455,6 +2468,86 @@ split. {
 }
 Qed.
 
+Theorem mat_el_of_nat_diag {n} : ∀ m i,
+  i < n
+  → mat_el
+      (sm_mat
+         (@rngl_of_nat (square_matrix n T) (mat_ring_like_op n) m)) i i =
+    rngl_of_nat m.
+Proof.
+intros * Hin.
+unfold mat_el; cbn.
+induction m. {
+  cbn.
+  rewrite List_nth_repeat.
+  destruct (lt_dec i n) as [H| H]; [ apply nth_repeat | easy ].
+}
+cbn.
+rewrite map2_nth with (a := []) (b := []); cycle 1. {
+  now rewrite map_length, seq_length.
+} {
+  now rewrite fold_mat_nrows, mat_nrows_of_nat.
+} {
+  rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
+  rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
+    now rewrite map_length, seq_length.
+  } {
+Search (length (nth _ _ _)).
+...
+rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
+rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+unfold δ.
+now rewrite Nat.eqb_refl.
+Qed.
+...
+
+Theorem rngl_of_nat_is_correct_matrix {n} :
+  @rngl_one T ro ≠ 0%F
+  → ∀ i, is_correct_matrix (@sm_mat n T (rngl_of_nat i)).
+Proof.
+intros H10 *.
+split. {
+  intros Hc.
+  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+    now subst n; destruct i.
+  }
+  destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+    subst i; cbn in Hc |-*.
+    now rewrite mZ_ncols in Hc.
+  }
+  unfold mat_ncols in Hc.
+  unfold mat_nrows.
+  apply length_zero_iff_nil in Hc.
+  apply length_zero_iff_nil.
+  remember (mat_list_list _) as lla eqn:Hlla.
+  symmetry in Hlla.
+  apply (f_equal (λ ll, nth 0 (nth 0 ll []) 0%F)) in Hlla.
+  rewrite fold_mat_el in Hlla.
+  rewrite List_hd_nth_0 in Hc.
+  rewrite Hc in Hlla; cbn in Hlla.
+  exfalso; clear lla Hc.
+  destruct i; [ easy | clear Hiz ].
+  cbn - [ mat_el ] in Hlla.
+  apply Nat.neq_0_lt_0 in Hnz.
+  rewrite mat_el_add in Hlla; cycle 1. {
+    apply mI_is_correct_matrix.
+  } {
+    apply square_matrix_is_correct.
+  } {
+    now rewrite mI_nrows.
+  } {
+    now rewrite squ_mat_nrows.
+  } {
+    now rewrite mI_ncols.
+  } {
+    now rewrite squ_mat_ncols.
+  }
+  rewrite mat_el_mI_diag in Hlla; [ | easy ].
+...
+  rewrite mat_el_of_nat_diag in Hlla.
+...
+
 Theorem squ_mat_characteristic_prop {n} :
   if (if n =? 0 then 1 else rngl_characteristic) =? 0
   then ∀ i, @rngl_of_nat (square_matrix n T) (mat_ring_like_op n) (S i) ≠ 0%F
@@ -2514,69 +2607,8 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
     rewrite mat_el_add; cycle 1. {
       apply mI_is_correct_matrix.
     } {
-Theorem rngl_of_nat_is_correct_matrix {n} :
-  @rngl_one T ro ≠ 0%F
-  → ∀ i, is_correct_matrix (@sm_mat n T (rngl_of_nat i)).
-Proof.
-intros H10 *.
-split. {
-  intros Hc.
-  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-    now subst n; destruct i.
-  }
-  destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
-    subst i; cbn in Hc |-*.
-    now rewrite mZ_ncols in Hc.
-  }
-  unfold mat_ncols in Hc.
-  unfold mat_nrows.
-  apply length_zero_iff_nil in Hc.
-  apply length_zero_iff_nil.
-  remember (mat_list_list _) as lla eqn:Hlla.
-  symmetry in Hlla.
-  apply (f_equal (λ ll, nth 0 (nth 0 ll []) 0%F)) in Hlla.
-  rewrite fold_mat_el in Hlla.
-  rewrite List_hd_nth_0 in Hc.
-  rewrite Hc in Hlla; cbn in Hlla.
-  exfalso; clear lla Hc.
-  destruct n; [ easy | clear Hnz ].
-  destruct i; [ easy | clear Hiz ].
-(**)
-  cbn - [ mat_el ] in Hlla.
-  rewrite mat_el_add in Hlla; cycle 1. {
-    apply mI_is_correct_matrix.
-  } {
-    apply square_matrix_is_correct.
-  } {
-    rewrite mI_nrows; flia.
-  } {
-    rewrite squ_mat_nrows; flia.
-  } {
-    rewrite mI_ncols; flia.
-  } {
-    rewrite squ_mat_ncols; flia.
-  }
-  rewrite mat_el_mI_diag in Hlla; [ | flia ].
 ...
-  revert i Hlla.
-  induction n; intros. {
-    induction i; [ now cbn in Hlla; rewrite rngl_add_0_r in Hlla | ].
-    cbn - [ mat_el ] in Hlla.
-    rewrite mat_el_add in Hlla; cycle 1. {
-      apply mI_is_correct_matrix.
-    } {
-      apply mat_add_is_correct; [ apply mI_is_correct_matrix | ].
-      apply square_matrix_is_correct.
-    } {
-      cbn; flia.
-    } {
-      rewrite mat_add_nrows, mI_nrows, squ_mat_nrows; flia.
-    } {
-      rewrite mI_ncols; flia.
-    } {
-      rewrite mat_add_ncols, mI_ncols, squ_mat_ncols; flia.
-    }
-    rewrite mat_el_add in Hlla.
+      apply rngl_of_nat_is_correct_matrix.
 ...
 
 Definition mat_ring_like_prop (n : nat) :
