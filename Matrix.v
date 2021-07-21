@@ -2334,6 +2334,36 @@ rewrite mI_ncols, IHi.
 apply Nat.min_id.
 Qed.
 
+Theorem mat_el_add : ∀ (MA MB : matrix T) i j,
+  is_correct_matrix MA
+  → is_correct_matrix MB
+  → i < mat_nrows MA
+  → i < mat_nrows MB
+  → j < mat_ncols MA
+  → j < mat_ncols MB
+  → mat_el (MA + MB) i j = (mat_el MA i j + mat_el MB i j)%F.
+Proof.
+intros * Ha Hb Hia Hib Hja Hjb.
+unfold "+"%M; cbn.
+rewrite map2_nth with (a := []) (b := []); cycle 1. {
+  now rewrite fold_mat_nrows.
+} {
+  now rewrite fold_mat_nrows.
+}
+rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
+  destruct Ha as (Hcra & Hca).
+  rewrite Hca; [ easy | ].
+  apply nth_In.
+  now rewrite fold_mat_nrows.
+} {
+  destruct Hb as (Hcrb & Hcb).
+  rewrite Hcb; [ easy | ].
+  apply nth_In.
+  now rewrite fold_mat_nrows.
+}
+easy.
+Qed.
+
 Theorem squ_mat_characteristic_prop {n} :
   if (if n =? 0 then 1 else rngl_characteristic) =? 0
   then ∀ i, @rngl_of_nat (square_matrix n T) (mat_ring_like_op n) (S i) ≠ 0%F
@@ -2390,49 +2420,12 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
       now destruct (lt_dec 0 n).
     }
     cbn - [ mat_el ].
-Search (mat_el (_ + _)).
-Theorem mat_el_add : ∀ (MA MB : matrix T) i j,
-  i < mat_nrows MA
-  → i < mat_nrows MB
-  → mat_el (MA + MB) i j = (mat_el MA i j + mat_el MB i j)%F.
-Proof.
-intros * Hia Hib.
-unfold "+"%M; cbn.
-rewrite map2_nth with (a := []) (b := []); cycle 1. {
-  now rewrite fold_mat_nrows.
-} {
-  now rewrite fold_mat_nrows.
-}
-rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
+    rewrite mat_el_add; cycle 1. {
+      specialize square_matrix_is_correct as H2.
 ...
-intros.
-destruct MA as (lla).
-destruct MB as (llb); cbn.
-revert llb.
-induction lla as [| la]; intros. {
-  destruct llb as [| lb]. {
-    destruct i, j; symmetry; cbn; apply rngl_add_0_l.
-  }
-  destruct i, j; symmetry; cbn; rewrite rngl_add_0_l.
+Search (is_correct_matrix (mI _)).
 ...
-intros * Ha Hb.
-unfold "+"%M; cbn.
-rewrite map2_nth with (a := []) (b := []); cycle 1. {
-  now rewrite fold_mat_nrows.
-} {
-  now rewrite fold_mat_nrows.
-}
-rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
-Check mat_add_comm.
-...
-  rewrite fold_mat_cols.
-} {
-  now rewrite fold_mat_nrows.
-}
-...
-erewrite map2_nth.
-...
-rewrite mat_el_add.
+      apply mI_is_correct_matrix.
 ...
 
 Definition mat_ring_like_prop (n : nat) :
