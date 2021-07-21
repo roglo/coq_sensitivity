@@ -2543,7 +2543,20 @@ split. {
   destruct i; [ easy | clear Hiz ].
 (**)
   cbn - [ mat_el ] in Hlla.
-  rewrite mat_el_add in Hlla.
+  rewrite mat_el_add in Hlla; cycle 1. {
+    apply mI_is_correct_matrix.
+  } {
+    apply square_matrix_is_correct.
+  } {
+    rewrite mI_nrows; flia.
+  } {
+    rewrite squ_mat_nrows; flia.
+  } {
+    rewrite mI_ncols; flia.
+  } {
+    rewrite squ_mat_ncols; flia.
+  }
+  rewrite mat_el_mI_diag in Hlla; [ | flia ].
 ...
   revert i Hlla.
   induction n; intros. {
