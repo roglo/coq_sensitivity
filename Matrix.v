@@ -1645,6 +1645,14 @@ subst la.
 now rewrite map_length, seq_length.
 Qed.
 
+Theorem mI_is_correct_matrix : ∀ n, is_correct_matrix (mI n).
+Proof.
+intros.
+apply is_sm_mat_iff.
+rewrite mI_ncols.
+apply mI_is_square_matrix.
+Qed.
+
 Definition smI n : square_matrix n T :=
   {| sm_mat := mI n;
      sm_prop := mI_is_square_matrix n |}.
@@ -2421,11 +2429,23 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
     }
     cbn - [ mat_el ].
     rewrite mat_el_add; cycle 1. {
-      specialize square_matrix_is_correct as H2.
-...
-Search (is_correct_matrix (mI _)).
-...
       apply mI_is_correct_matrix.
+    } {
+Theorem rngl_of_nat_is_correct_matrix {n} : ∀ i,
+  is_correct_matrix (@sm_mat n T (rngl_of_nat i)).
+Proof.
+intros.
+split. {
+  intros Hc.
+  unfold mat_ncols in Hc.
+  unfold mat_nrows.
+  apply length_zero_iff_nil in Hc.
+  apply length_zero_iff_nil.
+...
+  induction (mat_list_list _) as [| la]; [ easy | ].
+  cbn in Hc.
+...
+      apply rngl_of_nat_is_correct_matrix.
 ...
 
 Definition mat_ring_like_prop (n : nat) :
