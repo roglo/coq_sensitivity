@@ -2475,6 +2475,18 @@ intros * Ha Hb.
 destruct Ha as (Hcra, Hca).
 destruct Hb as (Hcrb, Hcb).
 move Hcrb before Hcra.
+destruct (Nat.eq_dec (mat_nrows MA) 0) as [Hraz| Hraz]. {
+  unfold mat_nrows in Hraz.
+  apply length_zero_iff_nil in Hraz.
+  now destruct MA as (lla); cbn in Hraz |-*; subst lla.
+}
+destruct (Nat.eq_dec (mat_nrows MB) 0) as [Hrbz| Hrbz]. {
+  unfold mat_nrows in Hrbz.
+  apply length_zero_iff_nil in Hrbz.
+  destruct MB as (llb); cbn in Hrbz |-*; subst llb.
+  now rewrite mat_add_comm.
+}
+apply Nat.neq_0_lt_0 in Hraz, Hrbz.
 split. {
   unfold mat_ncols, mat_nrows; cbn.
   intros Hab.
@@ -2486,6 +2498,24 @@ split. {
   cbn in Hab; subst l.
   apply (f_equal (hd [])) in Hll.
   cbn in Hll.
+  rewrite List_hd_nth_0 in Hll.
+  rewrite map2_nth with (a := []) (b := []) in Hll; [ | easy | easy ].
+  apply map2_eq_nil in Hll.
+  destruct Hll as [Hll| Hll]. {
+    apply (f_equal length) in Hll; cbn in Hll.
+    rewrite <- List_hd_nth_0 in Hll.
+    rewrite fold_mat_ncols in Hll.
+    apply Hcra in Hll.
+    now rewrite Hll in Hraz.
+  } {
+    apply (f_equal length) in Hll; cbn in Hll.
+    rewrite <- List_hd_nth_0 in Hll.
+    rewrite fold_mat_ncols in Hll.
+    apply Hcrb in Hll.
+    now rewrite Hll in Hrbz.
+  }
+} {
+  intros l Hl.
 ...
 apply mat_add_is_correct.
 Search (is_correct_matrix).
