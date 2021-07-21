@@ -2331,6 +2331,7 @@ specialize (H1 T ro rp).
 rewrite Hch in H1.
 destruct ch. {
   intros i Hi.
+...
   injection Hi; clear Hi; intros Hi.
   revert n Hnz Hi.
   induction i; intros; cbn in Hi.
