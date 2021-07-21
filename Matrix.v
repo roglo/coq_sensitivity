@@ -2333,27 +2333,21 @@ rewrite mI_ncols, IHi.
 apply Nat.min_id.
 Qed.
 
-
 Theorem squ_mat_characteristic_prop {n} :
-  match (if Nat.eq_dec n 0 then 1 else rngl_characteristic) with
-  | O =>
-      ∀ i,
-      @rngl_of_nat (square_matrix n T) (mat_ring_like_op n) (S i) ≠ 0%F
-  | S _ =>
-      @rngl_of_nat (square_matrix n T) (mat_ring_like_op n)
-        (if Nat.eq_dec n 0 then 1 else rngl_characteristic) = 0%F
-  end.
+  if (if n =? 0 then 1 else rngl_characteristic) =? 0
+  then ∀ i, @rngl_of_nat (square_matrix n T) (mat_ring_like_op n) (S i) ≠ 0%F
+  else
+    @rngl_of_nat (square_matrix n T) (mat_ring_like_op n)
+      (if n =? 0 then 1 else rngl_characteristic) = 0%F.
 Proof.
+rewrite (if_eqb_eq_dec n).
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n; cbn.
   now apply square_matrix_eq.
 }
 apply Nat.neq_0_lt_0 in Hnz.
-remember rngl_characteristic as ch eqn:Hch; symmetry in Hch.
-specialize @rngl_characteristic_prop as H1.
-specialize (H1 T ro rp).
-rewrite Hch in H1.
-destruct ch. {
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
   intros i Hi.
   apply (f_equal (λ M, mat_el (sm_mat M) 0 0)) in Hi.
   cbn in Hi.
@@ -2372,14 +2366,14 @@ destruct ch. {
     rewrite fold_mat_nrows.
     flia Hnz IHi.
   }
-  erewrite map2_nth in Hi; cycle 1. {
+  rewrite map2_nth with (a := 0%F) (b := 0%F) in Hi; cycle 1. {
     now rewrite map_length, seq_length.
   } {
     rewrite <- List_hd_nth_0, fold_mat_ncols.
     now rewrite mat_ncols_of_nat.
   }
-  rewrite map_nth, seq_nth, seq_nth in Hi; [ | easy | easy ].
-  cbn in Hi.
+  rewrite List_map_nth' with (a := 0) in Hi; [ | now rewrite seq_length ].
+  rewrite seq_nth in Hi; [ cbn in Hi | easy ].
 ...
 
 Definition mat_ring_like_prop (n : nat) :
@@ -2390,7 +2384,7 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_has_1_neq_0 := (rngl_has_1_neq_0 && negb (Nat.eqb n 0))%bool;
      rngl_is_ordered := false;
      rngl_is_integral := false;
-     rngl_characteristic := if Nat.eq_dec n 0 then 1 else rngl_characteristic;
+     rngl_characteristic := if n =? 0 then 1 else rngl_characteristic;
      rngl_add_comm := squ_mat_add_comm;
      rngl_add_assoc := squ_mat_add_assoc;
      rngl_add_0_l := squ_mat_add_0_l;
