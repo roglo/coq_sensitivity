@@ -2450,9 +2450,17 @@ split. {
   apply length_zero_iff_nil.
   remember (mat_list_list _) as lla eqn:Hlla.
   symmetry in Hlla.
+  apply (f_equal (λ ll, nth 0 (nth 0 ll []) 0%F)) in Hlla.
+  rewrite fold_mat_el in Hlla.
+  rewrite List_hd_nth_0 in Hc.
+  rewrite Hc in Hlla; cbn in Hlla.
+  exfalso; clear lla Hc.
+...
   destruct lla as [| la]; [ easy | exfalso ].
+  clear la Hc.
   cbn in Hc; subst la.
   apply (f_equal (λ ll, nth 0 (nth 0 ll []) 0%F)) in Hlla.
+  rewrite fold_mat_el in Hlla.
   cbn in Hlla.
   destruct n; [ easy | clear Hnz ].
   destruct i; [ easy | clear Hiz ].
