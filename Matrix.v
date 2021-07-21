@@ -389,6 +389,7 @@ Arguments mat_mul_el {T}%type {ro} (MA MB)%M (i k)%nat.
 Arguments mat_mul_scal_l {T ro} s%F M%M.
 Arguments mat_nrows {T}%type M%M.
 Arguments mat_ncols {T}%type M%M.
+Arguments mat_el {T}%type {ro} M%M (i j)%nat.
 Arguments mat_opp {T}%type {ro}.
 Arguments mat_sub {T ro} MA%M MB%M.
 Arguments mI {T ro} n%nat.
@@ -2377,6 +2378,61 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
   rewrite List_map_nth' with (a := 0) in Hi; [ | now rewrite seq_length ].
   rewrite seq_nth in Hi; [ cbn in Hi | easy ].
   rewrite fold_mat_el in Hi.
+  replace (mat_el (sm_mat (rngl_of_nat i)) 0 0) with
+    (@rngl_of_nat T ro i) in Hi. 2: {
+    symmetry.
+    clear Hi.
+    induction i. {
+      cbn.
+      rewrite List_nth_repeat.
+      destruct (lt_dec 0 n) as [H| H]; [ clear H | flia Hnz H ].
+      rewrite List_nth_repeat.
+      now destruct (lt_dec 0 n).
+    }
+    cbn - [ mat_el ].
+Search (mat_el (_ + _)).
+Theorem mat_el_add : ∀ (MA MB : matrix T) i j,
+  i < mat_nrows MA
+  → i < mat_nrows MB
+  → mat_el (MA + MB) i j = (mat_el MA i j + mat_el MB i j)%F.
+Proof.
+intros * Hia Hib.
+unfold "+"%M; cbn.
+rewrite map2_nth with (a := []) (b := []); cycle 1. {
+  now rewrite fold_mat_nrows.
+} {
+  now rewrite fold_mat_nrows.
+}
+rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
+...
+intros.
+destruct MA as (lla).
+destruct MB as (llb); cbn.
+revert llb.
+induction lla as [| la]; intros. {
+  destruct llb as [| lb]. {
+    destruct i, j; symmetry; cbn; apply rngl_add_0_l.
+  }
+  destruct i, j; symmetry; cbn; rewrite rngl_add_0_l.
+...
+intros * Ha Hb.
+unfold "+"%M; cbn.
+rewrite map2_nth with (a := []) (b := []); cycle 1. {
+  now rewrite fold_mat_nrows.
+} {
+  now rewrite fold_mat_nrows.
+}
+rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
+Check mat_add_comm.
+...
+  rewrite fold_mat_cols.
+} {
+  now rewrite fold_mat_nrows.
+}
+...
+erewrite map2_nth.
+...
+rewrite mat_el_add.
 ...
 
 Definition mat_ring_like_prop (n : nat) :
