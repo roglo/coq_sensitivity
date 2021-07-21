@@ -2332,6 +2332,13 @@ rewrite Hch in H1.
 destruct ch. {
   intros i Hi.
   injection Hi; clear Hi; intros Hi.
+  revert n Hnz Hi.
+  induction i; intros; cbn in Hi.
+  destruct n; [ easy | clear Hnz ].
+...
+  destruct n; [ easy | clear Hnz ].
+  revert i Hi.
+  induction n; intros; cbn in Hi.
 ...
   cbn in H.
   injection H; clear H; intros H.
