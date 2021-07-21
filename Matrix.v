@@ -396,6 +396,7 @@ Arguments mI {T ro} n%nat.
 Arguments mZ {T ro} (m n)%nat.
 Arguments minus_one_pow {T ro}.
 Arguments vect_zero {T ro} n%nat.
+Arguments is_correct_matrix {T}%type M%M.
 
 Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.
@@ -2431,10 +2432,11 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
     rewrite mat_el_add; cycle 1. {
       apply mI_is_correct_matrix.
     } {
-Theorem rngl_of_nat_is_correct_matrix {n} : ∀ i,
-  is_correct_matrix (@sm_mat n T (rngl_of_nat i)).
+Theorem rngl_of_nat_is_correct_matrix {n} :
+  @rngl_one T ro ≠ 0%F
+  → ∀ i, is_correct_matrix (@sm_mat n T (rngl_of_nat i)).
 Proof.
-intros.
+intros H10 *.
 split. {
   intros Hc.
   destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
@@ -2455,6 +2457,40 @@ split. {
   rewrite List_hd_nth_0 in Hc.
   rewrite Hc in Hlla; cbn in Hlla.
   exfalso; clear lla Hc.
+  destruct n; [ easy | clear Hnz ].
+  destruct i; [ easy | clear Hiz ].
+  revert i Hlla.
+  induction n; intros. {
+    induction i; [ now cbn in Hlla; rewrite rngl_add_0_r in Hlla | ].
+    cbn - [ mat_el ] in Hlla.
+    rewrite mat_el_add in Hlla; cycle 1. {
+      apply mI_is_correct_matrix.
+    } {
+Theorem mat_add_is_correct : ∀ MA MB : matrix T,
+  is_correct_matrix MA
+  → is_correct_matrix MB
+  → is_correct_matrix (MA + MB).
+Proof.
+intros * Ha Hb.
+destruct Ha as (Hcra, Hca).
+destruct Hb as (Hcrb, Hcb).
+move Hcrb before Hcra.
+split. {
+  unfold mat_ncols, mat_nrows; cbn.
+  intros Hab.
+  apply length_zero_iff_nil in Hab.
+  apply length_zero_iff_nil.
+  remember (map2 _ _ _) as ll eqn:Hll.
+  symmetry in Hll.
+  destruct ll as [| l]; [ easy | exfalso ].
+  cbn in Hab; subst l.
+...
+apply mat_add_is_correct.
+Search (is_correct_matrix).
+Search (is_correct_matrix (_ + _)).
+...
+    remember (S i) as x; cbn in Hlla; subst x.
+
 ...
   destruct lla as [| la]; [ easy | exfalso ].
   clear la Hc.
