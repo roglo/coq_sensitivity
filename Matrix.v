@@ -2484,6 +2484,8 @@ split. {
   symmetry in Hll.
   destruct ll as [| l]; [ easy | exfalso ].
   cbn in Hab; subst l.
+  apply (f_equal (hd [])) in Hll.
+  cbn in Hll.
 ...
 apply mat_add_is_correct.
 Search (is_correct_matrix).
