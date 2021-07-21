@@ -2346,7 +2346,9 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   now apply square_matrix_eq.
 }
 apply Nat.neq_0_lt_0 in Hnz.
-rewrite if_eqb_eq_dec.
+specialize @rngl_characteristic_prop as H1.
+specialize (H1 T ro rp).
+rewrite if_eqb_eq_dec in H1 |-*.
 destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
   intros i Hi.
   apply (f_equal (λ M, mat_el (sm_mat M) 0 0)) in Hi.
@@ -2374,6 +2376,7 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
   }
   rewrite List_map_nth' with (a := 0) in Hi; [ | now rewrite seq_length ].
   rewrite seq_nth in Hi; [ cbn in Hi | easy ].
+  rewrite fold_mat_el in Hi.
 ...
 
 Definition mat_ring_like_prop (n : nat) :
