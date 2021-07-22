@@ -2650,6 +2650,19 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
     } {
       now rewrite mI_nrows.
     } {
+      now rewrite squ_mat_nrows.
+    } {
+      now rewrite mI_ncols.
+    } {
+      now rewrite squ_mat_ncols.
+    }
+    rewrite mat_el_mI_diag; [ | easy ].
+    now rewrite IHi.
+  }
+  now specialize (H1 i); cbn in H1.
+}
+cbn.
+Set Printing Implicit.
 ...
 
 Definition mat_ring_like_prop (n : nat) :
