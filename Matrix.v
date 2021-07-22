@@ -2577,68 +2577,8 @@ split. {
   now apply (H1 i).
 } {
   intros l Hl.
+  rewrite mat_ncols_of_nat.
 ...
-
-(*
-Theorem rngl_of_nat_is_correct_matrix {n} :
-  @rngl_one T ro ≠ 0%F
-  → ∀ i, is_correct_matrix (@sm_mat n T (rngl_of_nat i)).
-Proof.
-intros H10 *.
-split. {
-  intros Hc.
-  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-    now subst n; destruct i.
-  }
-  destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
-    subst i; cbn in Hc |-*.
-    now rewrite mZ_ncols in Hc.
-  }
-  unfold mat_ncols in Hc.
-  unfold mat_nrows.
-  apply length_zero_iff_nil in Hc.
-  apply length_zero_iff_nil.
-  remember (mat_list_list _) as lla eqn:Hlla.
-  symmetry in Hlla.
-  apply (f_equal (λ ll, nth 0 (nth 0 ll []) 0%F)) in Hlla.
-  rewrite fold_mat_el in Hlla.
-  rewrite List_hd_nth_0 in Hc.
-  rewrite Hc in Hlla; cbn in Hlla.
-  exfalso; clear lla Hc.
-  destruct i; [ easy | clear Hiz ].
-  cbn - [ mat_el ] in Hlla.
-  apply Nat.neq_0_lt_0 in Hnz.
-  rewrite mat_el_add in Hlla; cycle 1. {
-    apply mI_is_correct_matrix.
-  } {
-    apply square_matrix_is_correct.
-  } {
-    now rewrite mI_nrows.
-  } {
-    now rewrite squ_mat_nrows.
-  } {
-    now rewrite mI_ncols.
-  } {
-    now rewrite squ_mat_ncols.
-  }
-  rewrite mat_el_mI_diag in Hlla; [ | easy ].
-  rewrite mat_el_of_nat_diag in Hlla; [ | easy ].
-(*
-  induction i. {
-    cbn in Hlla.
-    now rewrite rngl_add_0_r in Hlla.
-  }
-  cbn in Hlla.
-*)
-  remember rngl_characteristic as ch eqn:Hch.
-  symmetry in Hch.
-  destruct ch. {
-    specialize rngl_characteristic_prop as H1.
-    rewrite Hch in H1; cbn in H1.
-    now apply (H1 i).
-  }
-...
-*)
 
 Theorem squ_mat_characteristic_prop {n} :
   if (if n =? 0 then 1 else rngl_characteristic) =? 0
