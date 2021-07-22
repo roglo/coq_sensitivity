@@ -2578,7 +2578,14 @@ split. {
 } {
   intros l Hl.
   rewrite mat_ncols_of_nat.
-...
+  remember (rngl_of_nat i) as M eqn:HM.
+  destruct M as (M, Hm); cbn in Hl.
+  clear HM.
+  apply is_sm_mat_iff in Hm.
+  destruct Hm as (Hr & Hcr & Hc).
+  now apply Hc.
+}
+Qed.
 
 Theorem squ_mat_characteristic_prop {n} :
   if (if n =? 0 then 1 else rngl_characteristic) =? 0
@@ -2639,8 +2646,10 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
     rewrite mat_el_add; cycle 1. {
       apply mI_is_correct_matrix.
     } {
-...
       now apply rngl_of_nat_is_correct_matrix.
+    } {
+      now rewrite mI_nrows.
+    } {
 ...
 
 Definition mat_ring_like_prop (n : nat) :
