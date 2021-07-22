@@ -2476,13 +2476,27 @@ Theorem mat_el_of_nat_diag {n} : ∀ m i,
     rngl_of_nat m.
 Proof.
 intros * Hin.
+remember (rngl_of_nat m) as M eqn:HM.
+destruct M as (M, Hm); cbn.
+assert (M = sm_mat (@rngl_of_nat (square_matrix n T) (mat_ring_like_op n) m)). {
+  now rewrite <- HM.
+}
+clear HM; rename H into HM.
+apply is_sm_mat_iff in Hm.
+destruct Hm as (Hr & Hcr & Hc).
+unfold mat_el.
+...
+intros * Hin.
+...
 unfold mat_el; cbn.
 induction m. {
   cbn.
   rewrite List_nth_repeat.
   destruct (lt_dec i n) as [H| H]; [ apply nth_repeat | easy ].
 }
+...
 cbn.
+...
 rewrite map2_nth with (a := []) (b := []); cycle 1. {
   now rewrite map_length, seq_length.
 } {
@@ -2494,6 +2508,7 @@ rewrite map2_nth with (a := []) (b := []); cycle 1. {
   } {
     remember (nth i (mat_list_list (sm_mat (rngl_of_nat m))) []) as la
       eqn:Hla.
+...
     assert (length la = n). {
       rewrite Hla.
 remember (sm_mat (rngl_of_nat m)) as M eqn:HM.
