@@ -2494,6 +2494,16 @@ rewrite map2_nth with (a := []) (b := []); cycle 1. {
   } {
     remember (nth i (mat_list_list (sm_mat (rngl_of_nat m))) []) as la
       eqn:Hla.
+    assert (length la = n). {
+      rewrite Hla.
+remember (sm_mat (rngl_of_nat m)) as M eqn:HM.
+assert (
+ ∀ l : list T,
+   l ∈ mat_list_list M
+   → length l = mat_ncols M). {
+  subst M.
+  intros l Hl.
+Search (mat_ncols (sm_mat (rngl_of_nat m))).
 ...
 rewrite fold_mat_ncols.
 ...
@@ -2504,6 +2514,7 @@ unfold δ.
 now rewrite Nat.eqb_refl.
 Qed.
 ...
+*)
 
 Theorem rngl_of_nat_is_correct_matrix {n} :
   @rngl_one T ro ≠ 0%F
