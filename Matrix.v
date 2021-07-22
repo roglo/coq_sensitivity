@@ -2517,95 +2517,17 @@ Theorem mat_el_of_nat_diag {n} : ∀ m i,
 Proof.
 intros * Hin.
 rewrite sm_mat_of_nat; [ | now left ].
-...
-intros * Hin.
-remember (rngl_of_nat m) as M eqn:HM.
-destruct M as (M, Hm); cbn.
-assert
-  (H :
-   M = sm_mat (@rngl_of_nat (square_matrix n T) (mat_ring_like_op n) m)). {
-  now rewrite <- HM.
-}
-clear HM; rename H into HM.
-apply is_sm_mat_iff in Hm.
-destruct Hm as (_ & _ & Hc).
-subst M.
-unfold mat_el.
-induction m; intros. {
-  cbn.
-  rewrite List_nth_repeat.
-  destruct (lt_dec i n) as [H| H]; [ apply nth_repeat | easy ].
-}
 cbn.
-rewrite map2_nth with (a := []) (b := []); cycle 1. {
-  now rewrite map_length, seq_length.
-} {
-  now rewrite fold_mat_nrows, squ_mat_nrows.
-}
-rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
-  rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
-  now rewrite map_length, seq_length.
-} {
-  rewrite Hc; [ easy | ].
-  cbn - [ "+"%M ].
-Search (mat_list_list (_ + _)).
-(* j'ai peur que ça soit faux, ça *)
-...
-(*
-remember (mat_list_list (sm_mat (rngl_of_nat m))) as lla eqn:Hlla.
-revert lla Hlla Hc.
-induction m; intros. {
-  rewrite Hlla; cbn.
-  rewrite List_nth_repeat.
-  destruct (lt_dec i n) as [H| H]; [ apply nth_repeat | easy ].
-}
-cbn in Hlla.
-*)
-...
-intros * Hin.
-...
-unfold mat_el; cbn.
-induction m. {
-  cbn.
-  rewrite List_nth_repeat.
-  destruct (lt_dec i n) as [H| H]; [ apply nth_repeat | easy ].
-}
-...
-cbn.
-...
-rewrite map2_nth with (a := []) (b := []); cycle 1. {
-  now rewrite map_length, seq_length.
-} {
-  now rewrite fold_mat_nrows, mat_nrows_of_nat.
-} {
-  rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
-  rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
-    now rewrite map_length, seq_length.
-  } {
-    remember (nth i (mat_list_list (sm_mat (rngl_of_nat m))) []) as la
-      eqn:Hla.
-...
-    assert (length la = n). {
-      rewrite Hla.
-remember (sm_mat (rngl_of_nat m)) as M eqn:HM.
-assert (
- ∀ l : list T,
-   l ∈ mat_list_list M
-   → length l = mat_ncols M). {
-  subst M.
-  intros l Hl.
-Search (mat_ncols (sm_mat (rngl_of_nat m))).
-...
-rewrite fold_mat_ncols.
-...
+rewrite map_map.
 rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
+rewrite List_map_nth' with (a := 0%F). 2: {
+  now rewrite map_length, seq_length.
+}
 rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
-rewrite seq_nth; [ | easy ].
+rewrite seq_nth; [ cbn | easy ].
 unfold δ.
-now rewrite Nat.eqb_refl.
+now rewrite Nat.eqb_refl, rngl_mul_1_r.
 Qed.
-...
-*)
 
 Theorem rngl_of_nat_is_correct_matrix {n} :
   @rngl_one T ro ≠ 0%F
@@ -2649,8 +2571,12 @@ split. {
     now rewrite squ_mat_ncols.
   }
   rewrite mat_el_mI_diag in Hlla; [ | easy ].
-...
-  rewrite mat_el_of_nat_diag in Hlla.
+  rewrite mat_el_of_nat_diag in Hlla; [ | easy ].
+  induction i. {
+    cbn in Hlla.
+    now rewrite rngl_add_0_r in Hlla.
+  }
+  cbn in Hlla.
 ...
 
 Theorem squ_mat_characteristic_prop {n} :
