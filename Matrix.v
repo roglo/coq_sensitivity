@@ -2468,13 +2468,56 @@ split. {
 }
 Qed.
 
+Theorem List_repeat_as_map : ∀ A (a : A) n,
+  repeat a n = map (λ _, a) (seq 0 n).
+Proof.
+intros.
+induction n; [ easy | cbn ].
+f_equal.
+now rewrite <- seq_shift, map_map.
+Qed.
+
+Theorem sm_mat_of_nat :
+  @rngl_has_opp T ro = true ∨ @rngl_has_sous T ro = true
+  → ∀ n m,
+     sm_mat (rngl_of_nat m : square_matrix n T) = (rngl_of_nat m × mI n)%M.
+(*
+  rngl_has_opp = true ∨ rngl_has_sous = true
+  → ∀ n m : nat, sm_mat (rngl_of_nat m) = (rngl_of_nat m × mI n)%M
+*)
+Proof.
+cbn.
+intros Hop; cbn.
+induction m; cbn. {
+  unfold "×"%M, mZ, mI.
+  f_equal; cbn.
+  rewrite map_map.
+  rewrite List_repeat_as_map.
+  apply map_ext_in.
+  intros i Hi.
+  rewrite List_repeat_as_map.
+  rewrite map_map.
+  apply map_ext_in.
+  intros j Hj.
+  now symmetry; apply rngl_mul_0_l.
+}
+rewrite mat_mul_scal_l_add_distr_r.
+now rewrite mat_mul_scal_1_l, IHm.
+Qed.
+
 Theorem mat_el_of_nat_diag {n} : ∀ m i,
   i < n
   → mat_el
       (sm_mat
          (@rngl_of_nat (square_matrix n T) (mat_ring_like_op n) m)) i i =
     rngl_of_nat m.
+(*
+  ∀ m i : nat, i < n → mat_el (sm_mat (rngl_of_nat m)) i i = rngl_of_nat m
+*)
 Proof.
+intros * Hin.
+rewrite sm_mat_of_nat; [ | now left ].
+...
 intros * Hin.
 remember (rngl_of_nat m) as M eqn:HM.
 destruct M as (M, Hm); cbn.
