@@ -2662,7 +2662,20 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
   now specialize (H1 i); cbn in H1.
 }
 cbn.
-Set Printing Implicit.
+apply square_matrix_eq; cbn.
+remember (sm_mat _) as MA eqn:Ha.
+remember (mZ _ _) as MB eqn:Hb.
+destruct MA as (lla).
+destruct MB as (llb).
+f_equal.
+move llb before lla.
+symmetry in Ha, Hb.
+revert llb Hb.
+induction lla as [| la]; intros; cbn. {
+...
+  injection Ha.
+...
+  destruct llb as [| lb]; [ easy | exfalso ].
 ...
 
 Definition mat_ring_like_prop (n : nat) :
