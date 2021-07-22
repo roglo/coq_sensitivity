@@ -2492,7 +2492,10 @@ rewrite map2_nth with (a := []) (b := []); cycle 1. {
   rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
     now rewrite map_length, seq_length.
   } {
-Search (length (nth _ _ _)).
+    remember (nth i (mat_list_list (sm_mat (rngl_of_nat m))) []) as la
+      eqn:Hla.
+...
+rewrite fold_mat_ncols.
 ...
 rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
 rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
