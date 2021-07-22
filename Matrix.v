@@ -2478,13 +2478,46 @@ Proof.
 intros * Hin.
 remember (rngl_of_nat m) as M eqn:HM.
 destruct M as (M, Hm); cbn.
-assert (M = sm_mat (@rngl_of_nat (square_matrix n T) (mat_ring_like_op n) m)). {
+assert
+  (H :
+   M = sm_mat (@rngl_of_nat (square_matrix n T) (mat_ring_like_op n) m)). {
   now rewrite <- HM.
 }
 clear HM; rename H into HM.
 apply is_sm_mat_iff in Hm.
-destruct Hm as (Hr & Hcr & Hc).
+destruct Hm as (_ & _ & Hc).
+subst M.
 unfold mat_el.
+induction m; intros. {
+  cbn.
+  rewrite List_nth_repeat.
+  destruct (lt_dec i n) as [H| H]; [ apply nth_repeat | easy ].
+}
+cbn.
+rewrite map2_nth with (a := []) (b := []); cycle 1. {
+  now rewrite map_length, seq_length.
+} {
+  now rewrite fold_mat_nrows, squ_mat_nrows.
+}
+rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
+  rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
+  now rewrite map_length, seq_length.
+} {
+  rewrite Hc; [ easy | ].
+  cbn - [ "+"%M ].
+Search (mat_list_list (_ + _)).
+(* j'ai peur que ça soit faux, ça *)
+...
+(*
+remember (mat_list_list (sm_mat (rngl_of_nat m))) as lla eqn:Hlla.
+revert lla Hlla Hc.
+induction m; intros. {
+  rewrite Hlla; cbn.
+  rewrite List_nth_repeat.
+  destruct (lt_dec i n) as [H| H]; [ apply nth_repeat | easy ].
+}
+cbn in Hlla.
+*)
 ...
 intros * Hin.
 ...
