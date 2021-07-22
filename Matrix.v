@@ -2663,6 +2663,7 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
 }
 cbn.
 apply square_matrix_eq; cbn.
+...
 remember (sm_mat _) as MA eqn:Ha.
 remember (mZ _ _) as MB eqn:Hb.
 destruct MA as (lla).
