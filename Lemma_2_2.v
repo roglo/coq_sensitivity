@@ -62,12 +62,16 @@ Compute list_list_of_mat (@mA Z Z_ring_like_op 3).
 *)
 
 Theorem flatten_list_list_length : ∀ A (llll : list (list (list (list A)))),
-  length (flatten_list_list llll) = length llll.
+  length (flatten_list_list llll) =
+  length llll * length (hd [] llll) * length (hd [] (hd [] llll)).
 Proof.
 intros.
 unfold flatten_list_list.
-induction llll as [| lll]; [ easy | ].
-cbn.
+rewrite List_flat_map_length.
+rewrite map_map.
+induction llll as [| lll]; [ easy | cbn ].
+rewrite IHllll.
+(* pas sûr qu'il soit bon, ce lemme *)
 ...
 
 Theorem mA_nrows : ∀ n, mat_nrows (mA n) = 2 ^ n.
