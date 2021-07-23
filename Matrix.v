@@ -2784,7 +2784,7 @@ Module matrix_Notations.
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
 
-Arguments mat_el [T]%type M%M (i j)%nat : rename.
+Arguments mat_el {T}%type {ro} M%M (i j)%nat.
 Arguments mat_add_opp_r {T}%type {ro rp} Hro M%M.
 Arguments mat_mul_scal_l_mul {T}%type {ro rp} Hro a%F (MA MB)%M.
 Arguments mat_mul_mul_scal_l {T}%type {ro rp} Hro Hic a%F (MA MB)%M.

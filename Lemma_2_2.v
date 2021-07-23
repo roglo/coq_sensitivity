@@ -36,12 +36,10 @@ Context {rp : ring_like_prop T}.
 (* conversion matrix of matrices (actually list of list of matrices)
    into simple matrix *)
 
-(*
 Definition mat_list_list_el {m n} mll i j :=
   mat_el (nth (j / n) (nth (i / m) mll []) (mZ m n)) (i mod m) (j mod n).
-*)
 
-Check concat.
+...
 
 Definition mat_of_mat_list_list {m n} (mll : list (list (matrix T))) :
     matrix T :=
