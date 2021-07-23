@@ -2747,6 +2747,17 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_opt_not_le := NA;
      rngl_consistent := squ_mat_consistent |}.
 
+Theorem mat_vect_mul_0_r : ∀ m n (M : matrix T),
+  m = mat_nrows M
+  → n = mat_ncols M
+  → (M • vect_zero n = vect_zero m)%V.
+Proof.
+intros * Hr Hc.
+subst m n.
+unfold "•"%V, vect_zero; cbn; f_equal.
+unfold vect_dot_mul; cbn.
+rewrite (List_repeat_as_map _ (mat_nrows _)).
+Search (map _ (mat_list_list _)).
 ...
 
 Theorem mat_vect_mul_0_r : ∀ m n (M : matrix m n T),
