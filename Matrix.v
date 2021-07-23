@@ -2775,19 +2775,6 @@ destruct (lt_dec k (length (hd [] lla))) as [H| H]; [ | flia Hkm H ].
 now apply rngl_mul_0_r; left.
 Qed.
 
-...
-
-Theorem mat_vect_mul_0_r : ∀ m n (M : matrix m n T),
-  (M • vect_zero _ = vect_zero _)%V.
-Proof.
-intros.
-apply vector_eq.
-intros i Hi.
-cbn.
-rewrite <- rngl_mul_summation_distr_r; [ | now left ].
-now apply rngl_mul_0_r; left.
-Qed.
-
 (* *)
 
 End a.
@@ -2797,24 +2784,24 @@ Module matrix_Notations.
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
 
-Arguments mat_el [m n]%nat [T]%type M%M (i j)%nat : rename.
-Arguments mat_add_opp_r {T}%type {ro rp} Hro {m n}%nat M%M.
-Arguments mat_mul_scal_l_mul {T}%type {ro rp} Hro {m n p}%nat a%F (MA MB)%M.
-Arguments mat_mul_mul_scal_l {T}%type {ro rp} Hro Hic {m n p}%nat a%F (MA MB)%M.
-Arguments mat_mul_scal_l {T ro} {m n}%nat s%F M%M.
-Arguments mat_mul_vect_r {T ro} {m n}%nat M%M V%V.
-Arguments mat_mul_scal_vect_comm {T}%type {ro rp} Hro Hic {m n}%nat a%F MA%M V%V.
-Arguments mat_mul_scal_vect_assoc {T}%type {ro rp} Hro {m n}%nat a%F MA%M V%V.
-Arguments mat_vect_mul_assoc {T}%type {ro rp} Hro {m n p}%nat (A B)%M V%V.
+Arguments mat_el [T]%type M%M (i j)%nat : rename.
+Arguments mat_add_opp_r {T}%type {ro rp} Hro M%M.
+Arguments mat_mul_scal_l_mul {T}%type {ro rp} Hro a%F (MA MB)%M.
+Arguments mat_mul_mul_scal_l {T}%type {ro rp} Hro Hic a%F (MA MB)%M.
+Arguments mat_mul_scal_l {T ro} s%F M%M.
+Arguments mat_mul_vect_r {T ro} M%M V%V.
+Arguments mat_mul_scal_vect_comm {T}%type {ro rp} Hro Hic a%F MA%M V%V.
+Arguments mat_mul_scal_vect_assoc {T}%type {ro rp} Hro a%F MA%M V%V.
+Arguments mat_vect_mul_assoc {T}%type {ro rp} Hro (A B)%M V%V.
 Arguments mat_mul_1_l {T}%type {ro rp} Hro {n}%nat M%M.
 Arguments mat_mul_1_r {T}%type {ro rp} Hro {n}%nat M%M.
-Arguments mat_opp {T ro} {m n}%nat M%M.
-Arguments mat_sub {T ro} {m n}%nat MA%M MB%M.
+Arguments mat_opp {T ro} M%M.
+Arguments mat_sub {T ro} MA%M MB%M.
 Arguments mI {T ro} n%nat.
 Arguments mZ {T ro} (m n)%nat.
 Arguments minus_one_pow {T ro}.
-Arguments subm {T} {m n}%nat M%M i%nat j%nat.
-Arguments mat_vect_mul_1_l {T}%type {ro rp} Hro {n}%nat V%V.
+Arguments subm {T} M%M i%nat j%nat.
+Arguments mat_vect_mul_1_l {T}%type {ro rp} Hro V%V.
 
 Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.
