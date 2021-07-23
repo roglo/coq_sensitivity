@@ -45,8 +45,6 @@ Check concat.
 
 Definition mat_of_mat_list_list {m n} (mll : list (list (matrix T))) :
     matrix T :=
-  mk_mat (map (λ ll, map (λ row, ...
-
   mk_mat (m * length mll) (n * length (hd [] mll)) (mat_list_list_el mll).
 
 ...
