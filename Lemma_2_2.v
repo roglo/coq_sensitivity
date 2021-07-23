@@ -36,14 +36,22 @@ Context {rp : ring_like_prop T}.
 (* conversion matrix of matrices (actually list of list of matrices)
    into simple matrix *)
 
-...
-
+(*
 Definition mat_list_list_el {m n} mll i j :=
   mat_el (nth (j / n) (nth (i / m) mll []) (mZ m n)) (i mod m) (j mod n).
+*)
+
+Definition mat_of_mat_list_list {m n} (mll : list (list (matrix T))) :
+    matrix T :=
+  mk_mat (m * length mll) (n * length (hd [] mll)) (mat_list_list_el mll).
+
+...
 
 Definition mat_of_mat_list_list {m n} (mll : list (list (matrix m n T))) :
     matrix _ _ T :=
   mk_mat (m * length mll) (n * length (hd [] mll)) (mat_list_list_el mll).
+
+...
 
 (*
 Theorem mat_el_eq_rect : ∀ m n m' n' (M : matrix m n T) (p : (m, n) = (m', n')),
@@ -54,14 +62,17 @@ Theorem mat_el_eq_rect : ∀ m n (M : matrix m m T) (p : m = n),
   mat_el (eq_rect m (λ u, matrix u u T) M n p) = mat_el M.
 Proof. now intros; destruct p. Qed.
 (**)
+*)
 
 (* sequence "An" *)
 
+(*
 Theorem two_pow_n_mul_two : ∀ n, 2 ^ n * 2 = 2 ^ S n.
 Proof.
 intros.
 now rewrite Nat.mul_comm.
 Qed.
+*)
 
 (* the magic incancation
     eq_rect _ (λ m, matrix m m T)
@@ -79,6 +90,16 @@ Qed.
      matrix (2 ^ S n') (2 ^ S n') T
  *)
 
+Fixpoint mA (n : nat) : matrix T :=
+  match n with
+  | 0 => mZ 1 1
+  | S n' =>
+      mat_of_mat_list_list
+        [[mA n'; mI (2 ^ n')];
+         [mI (2 ^ n'); (- mA n')%M]]
+  end.
+
+(*
 Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
   match n with
   | 0 => mZ 1 1
@@ -89,6 +110,9 @@ Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
             [mI (2 ^ n'); (- mA n')%M]])
         _ (two_pow_n_mul_two n')
   end.
+*)
+
+...
 
 (* "We prove by induction that A_n^2 = nI" *)
 
