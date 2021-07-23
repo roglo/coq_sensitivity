@@ -33,68 +33,14 @@ Context {rp : ring_like_prop T}.
 
 (* *)
 
-(* conversion matrix of matrices (actually list of list of matrices)
-   into simple matrix *)
+(* conversion list of list of matrices into simple matrix *)
 
-Definition mat_list_list_el {m n} mll i j :=
-  mat_el (nth (j / n) (nth (i / m) mll []) (mZ m n)) (i mod m) (j mod n).
-
-Check iter_list.
-
-...
-
-Check (λ mll : list (list (matrix T)), map (λ row : list (matrix T), iter_list row (λ M1 M2 : matrix T, M) []) mll).
-
-...
-
-Definition mat_of_mat_list_list {m n} (mll : list (list (matrix T))) :
-    matrix T :=
-  mk_mat (m * length mll) (n * length (hd [] mll)) (mat_list_list_el mll).
-
-...
-
-Definition mat_of_mat_list_list {m n} (mll : list (list (matrix m n T))) :
-    matrix _ _ T :=
-  mk_mat (m * length mll) (n * length (hd [] mll)) (mat_list_list_el mll).
-
-...
-
-(*
-Theorem mat_el_eq_rect : ∀ m n m' n' (M : matrix m n T) (p : (m, n) = (m', n')),
-  mat_el (eq_rect (m, n) (λ u, matrix (fst u) (snd u) T) M (m', n') p) = mat_el M.
-Proof. now intros; destruct p. Qed.
-*)
-Theorem mat_el_eq_rect : ∀ m n (M : matrix m m T) (p : m = n),
-  mat_el (eq_rect m (λ u, matrix u u T) M n p) = mat_el M.
-Proof. now intros; destruct p. Qed.
-(**)
-*)
+Definition mat_of_mat_list_list (mll : list (list (matrix T))) : matrix T :=
+  mk_mat
+    (flat_map (λ row, iter_list (tl row) (map2 (@app T)) (hd [] row))
+       (map (λ row : list (matrix T), map (@mat_list_list T) row) mll)).
 
 (* sequence "An" *)
-
-(*
-Theorem two_pow_n_mul_two : ∀ n, 2 ^ n * 2 = 2 ^ S n.
-Proof.
-intros.
-now rewrite Nat.mul_comm.
-Qed.
-*)
-
-(* the magic incancation
-    eq_rect _ (λ m, matrix m m T)
-      (mat_of_mat_list_list
-         [[mA n'; mI (2 ^ n')];
-          [mI (2 ^ n'); (- mA n')%M]])
-      _ (two_pow_n_mul_two n')
-   in mA definition below, transforms the type of the expression
-     mat_of_mat_list_list
-       [[mA n'; mI (2 ^ n')];
-        [mI (2 ^ n'); (- mA n')%M]]
-   following it, from
-     matrix (2 ^ n' * 2) (2 ^ n' * 2) T
-   into the equivalent
-     matrix (2 ^ S n') (2 ^ S n') T
- *)
 
 Fixpoint mA (n : nat) : matrix T :=
   match n with
@@ -104,6 +50,17 @@ Fixpoint mA (n : nat) : matrix T :=
         [[mA n'; mI (2 ^ n')];
          [mI (2 ^ n'); (- mA n')%M]]
   end.
+
+...
+
+(*
+End a.
+Check @mA.
+Require Import ZArith Zrl.
+Open Scope Z_scope.
+Compute list_list_of_mat (@mA Z Z_ring_like_op 2).
+Compute list_list_of_mat (@mA Z Z_ring_like_op 3).
+*)
 
 (*
 Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
