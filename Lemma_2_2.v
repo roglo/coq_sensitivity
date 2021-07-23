@@ -31,47 +31,15 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 
-(* *)
-
-Print map2.
-Fixpoint map2' A (f : A → A → A) (la lb : list A) :=
-  match la with
-  | [] => lb
-  | a :: la' =>
-      match lb with
-      | [] => a :: la'
-      | b :: lb' => f a b :: map2' f la' lb'
-      end
-  end.
-
 (* conversion list of list of matrices into simple matrix *)
 
+Definition flatten_list_list {A} llll :=
+  flat_map (λ row, iter_list (tl row) (map2 (@app A)) (hd [] row)) llll.
+
 Definition mat_of_mat_list_list (mll : list (list (matrix T))) : matrix T :=
   mk_mat
-    (flat_map
-       (λ row,
-        iter_list (map (@mat_list_list T) row) (map2' (@app T)) []) mll).
-
-Notation "'MAP' ( i ∈ l ) , g" :=
-  (iter_list l (λ c i, map2' g c i) [])
-  (at level 45, i at level 0, l at level 60).
-
-Print mat_of_mat_list_list.
-Print flat_map.
-
-...
-
-(*
-Definition mat_of_mat_list_list (mll : list (list (matrix T))) : matrix T :=
-  mk_mat
-    (flat_map (λ row, iter_list row (map2' (@app T)) [])
+    (flatten_list_list
        (map (λ row : list (matrix T), map (@mat_list_list T) row) mll)).
-
-Definition old_mat_of_mat_list_list (mll : list (list (matrix T))) : matrix T :=
-  mk_mat
-    (flat_map (λ row, iter_list (tl row) (map2 (@app T)) (hd [] row))
-       (map (λ row : list (matrix T), map (@mat_list_list T) row) mll)).
-*)
 
 (* sequence "An" *)
 
@@ -93,11 +61,21 @@ Compute list_list_of_mat (@mA Z Z_ring_like_op 2).
 Compute list_list_of_mat (@mA Z Z_ring_like_op 3).
 *)
 
+Theorem flatten_list_list_length : ∀ A (llll : list (list (list (list A)))),
+  length (flatten_list_list llll) = length llll.
+Proof.
+intros.
+unfold flatten_list_list.
+induction llll as [| lll]; [ easy | ].
+cbn.
+...
+
 Theorem mA_nrows : ∀ n, mat_nrows (mA n) = 2 ^ n.
 Proof.
 intros.
 induction n; [ easy | ].
-cbn - [ "^" ].
+cbn - [ "^" flatten_list_list ].
+...
 rewrite app_nil_r, app_length.
 unfold mat_nrows in IHn.
 Search (length (iter_list _ _ _)).
