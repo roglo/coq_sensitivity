@@ -51,8 +51,6 @@ Fixpoint mA (n : nat) : matrix T :=
          [mI (2 ^ n'); (- mA n')%M]]
   end.
 
-...
-
 (*
 End a.
 Check @mA.
@@ -62,27 +60,14 @@ Compute list_list_of_mat (@mA Z Z_ring_like_op 2).
 Compute list_list_of_mat (@mA Z Z_ring_like_op 3).
 *)
 
-(*
-Fixpoint mA (n : nat) : matrix (2 ^ n) (2 ^ n) T :=
-  match n with
-  | 0 => mZ 1 1
-  | S n' =>
-      eq_rect _ (λ m, matrix m m T)
-        (mat_of_mat_list_list
-           [[mA n'; mI (2 ^ n')];
-            [mI (2 ^ n'); (- mA n')%M]])
-        _ (two_pow_n_mul_two n')
-  end.
-*)
-
-...
-
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I :
   rngl_has_opp = true →
   ∀ n, (mA n * mA n)%M = (rngl_of_nat n × mI (2 ^ n))%M.
 Proof.
+intros Hro *.
+...
 intros Hro *.
 apply matrix_eq; cbn.
 intros i k Hi Hk.
