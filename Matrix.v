@@ -2692,6 +2692,19 @@ intros j Hj.
 now apply rngl_mul_0_l; left.
 Qed.
 
+Theorem squ_mat_consistent {n} :
+  (@rngl_has_opp (square_matrix n T) (mat_ring_like_op n) = false
+   ∨ @rngl_has_sous (square_matrix n T) (mat_ring_like_op n) = false)
+  ∧ (@rngl_has_inv (square_matrix n T) (mat_ring_like_op n) = false
+     ∨ @rngl_has_quot (square_matrix n T) (mat_ring_like_op n) = false).
+(*
+  (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
+  (rngl_has_inv = false ∨ rngl_has_quot = false)
+*)
+Proof.
+now split; right.
+Qed.
+
 Definition mat_ring_like_prop (n : nat) :
   ring_like_prop (square_matrix n T) :=
   {| rngl_is_comm := false;
@@ -2732,11 +2745,9 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_opt_mul_le_compat_nonpos := NA;
      rngl_opt_mul_le_compat := NA;
      rngl_opt_not_le := NA;
-(**)
-     rngl_consistent := 42 |}.
-(*
-     rngl_consistent := mat_consistent n |}.
-*)
+     rngl_consistent := squ_mat_consistent |}.
+
+...
 
 Theorem mat_vect_mul_0_r : ∀ m n (M : matrix m n T),
   (M • vect_zero _ = vect_zero _)%V.
