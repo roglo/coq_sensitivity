@@ -41,8 +41,12 @@ Definition mat_list_list_el {m n} mll i j :=
   mat_el (nth (j / n) (nth (i / m) mll []) (mZ m n)) (i mod m) (j mod n).
 *)
 
+Check concat.
+
 Definition mat_of_mat_list_list {m n} (mll : list (list (matrix T))) :
     matrix T :=
+  mk_mat (map (λ ll, map (λ row, ...
+
   mk_mat (m * length mll) (n * length (hd [] mll)) (mat_list_list_el mll).
 
 ...
