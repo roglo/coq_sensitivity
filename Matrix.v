@@ -2757,7 +2757,24 @@ subst m n.
 unfold "•"%V, vect_zero; cbn; f_equal.
 unfold vect_dot_mul; cbn.
 rewrite (List_repeat_as_map _ (mat_nrows _)).
-Search (map _ (mat_list_list _)).
+destruct M as (lla); cbn.
+rewrite (List_eq_map_seq lla) with (d := []) at 1.
+rewrite map_map.
+apply map_ext_in.
+intros i Hi.
+apply all_0_rngl_summation_list_0.
+intros j Hj.
+unfold mat_ncols in Hj; cbn in Hj.
+apply in_map2_iff in Hj.
+destruct Hj as (k & Hkm & a & b & Hk).
+subst j.
+rewrite List_nth_repeat; cbn.
+rewrite repeat_length in Hkm.
+apply Nat.min_glb_lt_iff in Hkm.
+destruct (lt_dec k (length (hd [] lla))) as [H| H]; [ | flia Hkm H ].
+now apply rngl_mul_0_r; left.
+Qed.
+
 ...
 
 Theorem mat_vect_mul_0_r : ∀ m n (M : matrix m n T),
