@@ -60,6 +60,15 @@ Compute list_list_of_mat (@mA Z Z_ring_like_op 2).
 Compute list_list_of_mat (@mA Z Z_ring_like_op 3).
 *)
 
+Theorem mA_nrows : ∀ n, mat_nrows (mA n) = 2 ^ n.
+Proof.
+intros.
+induction n; [ easy | ].
+cbn - [ "^" ].
+rewrite app_nil_r, app_length.
+unfold mat_nrows in IHn.
+...
+
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I :
@@ -67,6 +76,10 @@ Theorem lemma_2_A_n_2_eq_n_I :
   ∀ n, (mA n * mA n)%M = (rngl_of_nat n × mI (2 ^ n))%M.
 Proof.
 intros Hro *.
+unfold "*"%M, "×"%M.
+cbn; f_equal.
+...
+rewrite mA_nrows.
 ...
 intros Hro *.
 apply matrix_eq; cbn.
