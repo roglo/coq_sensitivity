@@ -2663,21 +2663,34 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
 }
 cbn.
 apply square_matrix_eq; cbn.
-...
-remember (sm_mat _) as MA eqn:Ha.
-remember (mZ _ _) as MB eqn:Hb.
-destruct MA as (lla).
-destruct MB as (llb).
+rewrite sm_mat_of_nat; [ | now left ].
+unfold "×"%M, mZ.
+f_equal; rewrite H1.
+destruct n; [ flia Hnz | clear Hnz ].
+cbn.
+f_equal. {
+  f_equal; [ now apply rngl_mul_0_l; left | ].
+  rewrite <- seq_shift.
+  rewrite map_map, map_map.
+  rewrite List_repeat_as_map.
+  apply map_ext_in.
+  intros i Hi.
+  now apply rngl_mul_0_l; left.
+}
+rewrite <- seq_shift.
+rewrite map_map, map_map.
+rewrite List_repeat_as_map.
+apply map_ext_in.
+intros i Hi.
+rewrite map_map; cbn.
+rewrite rngl_mul_0_l; [ | now left ].
 f_equal.
-move llb before lla.
-symmetry in Ha, Hb.
-revert llb Hb.
-induction lla as [| la]; intros; cbn. {
-...
-  injection Ha.
-...
-  destruct llb as [| lb]; [ easy | exfalso ].
-...
+rewrite List_repeat_as_map.
+rewrite map_map.
+apply map_ext_in.
+intros j Hj.
+now apply rngl_mul_0_l; left.
+Qed.
 
 Definition mat_ring_like_prop (n : nat) :
   ring_like_prop (square_matrix n T) :=
