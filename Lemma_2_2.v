@@ -33,6 +33,8 @@ Context {rp : ring_like_prop T}.
 
 (* *)
 
+...
+
 Definition mat_of_scalar (c : T) := mk_mat 1 1 (λ i j, c).
 
 (* conversion matrix of matrices (actually list of list of matrices)
