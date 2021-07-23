@@ -39,6 +39,12 @@ Context {rp : ring_like_prop T}.
 Definition mat_list_list_el {m n} mll i j :=
   mat_el (nth (j / n) (nth (i / m) mll []) (mZ m n)) (i mod m) (j mod n).
 
+Check iter_list.
+
+...
+
+Check (λ mll : list (list (matrix T)), map (λ row : list (matrix T), iter_list row (λ M1 M2 : matrix T, M) []) mll).
+
 ...
 
 Definition mat_of_mat_list_list {m n} (mll : list (list (matrix T))) :
