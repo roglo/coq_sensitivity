@@ -2787,6 +2787,7 @@ Delimit Scope M_scope with M.
 Arguments mat_el {T}%type {ro} M%M (i j)%nat.
 Arguments mat_add_opp_r {T}%type {ro rp} Hro M%M.
 Arguments mat_mul {T}%type {ro} (MA MB)%M.
+Arguments mat_mul_el {T}%type {ro} (MA MB)%M (i k)%nat.
 Arguments mat_mul_scal_l_mul {T}%type {ro rp} Hro a%F (MA MB)%M.
 Arguments mat_mul_mul_scal_l {T}%type {ro rp} Hro Hic a%F (MA MB)%M.
 Arguments mat_mul_scal_l {T ro} s%F M%M.
@@ -2803,6 +2804,7 @@ Arguments mZ {T ro} (m n)%nat.
 Arguments minus_one_pow {T ro}.
 Arguments subm {T} M%M i%nat j%nat.
 Arguments mat_vect_mul_1_l {T}%type {ro rp} Hro V%V.
+Arguments δ {T}%type {ro} (i j)%nat.
 
 Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.

@@ -143,6 +143,15 @@ destruct lb as [| b]; [ easy | cbn ].
 now rewrite IHla.
 Qed.
 
+Theorem length_hd_app_in_list: ∀ la lb : list (list T),
+  length (hd [] (app_in_list la lb)) = length (hd [] la) + length (hd [] lb).
+Proof.
+intros.
+destruct la as [| a]; [ easy | cbn ].
+destruct lb as [| b]; [ easy | cbn ].
+apply app_length.
+Qed.
+
 Theorem mA_nrows : ∀ n, mat_nrows (mA n) = 2 ^ n.
 Proof.
 intros.
@@ -176,15 +185,14 @@ rewrite app_nth1. 2: {
 }
 unfold mat_ncols in IHn.
 rewrite <- List_hd_nth_0.
-...
-rewrite app_nil_r.
-rewrite app_length.
-do 2 rewrite length_app_in_list.
-do 2 rewrite map_length.
-rewrite seq_length.
-do 2 rewrite Nat.max_comm.
-rewrite fold_mat_nrows, IHn.
-rewrite Nat.max_id; cbn.
+rewrite length_hd_app_in_list, IHn.
+rewrite List_map_hd with (a := 0). 2: {
+  intros H.
+  apply List_seq_eq_nil in H.
+  revert H.
+  now apply Nat.pow_nonzero.
+}
+rewrite map_length, seq_length; cbn.
 now rewrite Nat.add_0_r.
 Qed.
 
@@ -201,7 +209,12 @@ rewrite mA_nrows.
 rewrite map_map.
 apply map_ext_in.
 intros i Hi.
-...
+rewrite mA_ncols.
+rewrite map_map.
+apply map_ext_in.
+intros j Hj.
+move j before i.
+unfold mat_mul_el.
 rewrite mA_ncols.
 ...
 intros Hro *.
