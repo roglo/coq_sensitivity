@@ -159,6 +159,33 @@ rewrite Nat.max_id; cbn.
 now rewrite Nat.add_0_r.
 Qed.
 
+Theorem mA_ncols : ∀ n, mat_ncols (mA n) = 2 ^ n.
+Proof.
+intros.
+induction n; [ easy | ].
+cbn - [ "^" ].
+unfold mat_ncols; cbn - [ "^" ].
+rewrite List_hd_nth_0.
+rewrite app_nth1. 2: {
+  rewrite length_app_in_list.
+  rewrite map_length, seq_length.
+  rewrite fold_mat_nrows.
+  rewrite mA_nrows, Nat.max_id.
+  apply Nat.neq_0_lt_0.
+  now apply Nat.pow_nonzero.
+}
+...
+rewrite app_nil_r.
+rewrite app_length.
+do 2 rewrite length_app_in_list.
+do 2 rewrite map_length.
+rewrite seq_length.
+do 2 rewrite Nat.max_comm.
+rewrite fold_mat_nrows, IHn.
+rewrite Nat.max_id; cbn.
+now rewrite Nat.add_0_r.
+Qed.
+
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I :
@@ -169,6 +196,11 @@ intros Hro *.
 unfold "*"%M, "×"%M.
 cbn; f_equal.
 rewrite mA_nrows.
+rewrite map_map.
+apply map_ext_in.
+intros i Hi.
+...
+rewrite mA_ncols.
 ...
 intros Hro *.
 apply matrix_eq; cbn.
