@@ -82,6 +82,7 @@ Compute list_list_of_mat (@mA Z Z_ring_like_op 3).
 ...
 *)
 
+(*
 Theorem flatten_list_list_length : ∀ A f (llll : list (list (list (list A)))),
   length (flatten_list_list f llll) =
   length llll * length (hd [] llll) * length (hd [] (hd [] llll)).
@@ -93,13 +94,21 @@ rewrite map_map.
 induction llll as [| lll]; [ easy | cbn ].
 rewrite IHllll.
 (* pas sûr qu'il soit bon, ce lemme *)
+
+Check flatten_list_list (@app nat) [[[[1;2];[3;4];[5;6]];[[7;8;9;10]]]].
+Compute length (flatten_list_list (@app nat) [[[[1;2];[3;4];[5;6]];[[7;8;9;10]]];[[[11;12]]]]).
+Compute length [[[[1;2];[3;4];[5;6]];[[7;8;9;10]]];[[[11;12]]]].
 ...
+*)
 
 Theorem mA_nrows : ∀ n, mat_nrows (mA n) = 2 ^ n.
 Proof.
 intros.
 induction n; [ easy | ].
-cbn - [ "^" flatten_list_list ].
+cbn - [ "^" ].
+rewrite app_length.
+Search (length (iter_list _ _ _)).
+Search (length (fold_left _ _ _)).
 ...
 rewrite app_nil_r, app_length.
 unfold mat_nrows in IHn.
