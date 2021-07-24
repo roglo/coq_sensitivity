@@ -154,7 +154,10 @@ do 2 rewrite length_app_in_list.
 do 2 rewrite map_length.
 rewrite seq_length.
 do 2 rewrite Nat.max_comm.
-...
+rewrite fold_mat_nrows, IHn.
+rewrite Nat.max_id; cbn.
+now rewrite Nat.add_0_r.
+Qed.
 
 (* "We prove by induction that A_n^2 = nI" *)
 
@@ -165,7 +168,6 @@ Proof.
 intros Hro *.
 unfold "*"%M, "×"%M.
 cbn; f_equal.
-...
 rewrite mA_nrows.
 ...
 intros Hro *.
