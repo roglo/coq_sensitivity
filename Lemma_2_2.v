@@ -175,6 +175,7 @@ rewrite app_nth1. 2: {
   now apply Nat.pow_nonzero.
 }
 unfold mat_ncols in IHn.
+rewrite <- List_hd_nth_0.
 ...
 rewrite app_nil_r.
 rewrite app_length.
