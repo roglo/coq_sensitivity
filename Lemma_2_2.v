@@ -212,17 +212,17 @@ intros i Hi.
 rewrite mA_ncols.
 rewrite map_map.
 apply map_ext_in.
-intros j Hj.
-move j before i.
+intros k Hk.
+move k before i.
 unfold mat_mul_el.
 rewrite mA_ncols.
-apply in_seq in Hi, Hj.
+apply in_seq in Hi, Hk.
 destruct Hi as (_, Hi).
-destruct Hj as (_, Hj).
-rewrite Nat.add_0_l in Hi, Hj.
-revert i j Hi Hj.
+destruct Hk as (_, Hk).
+rewrite Nat.add_0_l in Hi, Hk.
+revert i k Hi Hk.
 induction n; intros. {
-  apply Nat.lt_1_r in Hi, Hj; subst i j; cbn.
+  apply Nat.lt_1_r in Hi, Hk; subst i k; cbn.
   rewrite rngl_summation_only_one.
   rewrite rngl_mul_0_l; [ | now left ].
   rewrite rngl_mul_0_l; [ easy | now left ].
@@ -233,6 +233,13 @@ rewrite (rngl_summation_split (2 ^ n - 1)). 2: {
   apply Nat.sub_le_mono_r.
   apply Nat.pow_le_mono_r; [ easy | flia ].
 }
+rewrite Nat.sub_add. 2: {
+  now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+}
+cbn - [ Nat.pow ].
+rewrite rngl_add_comm.
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
 ...
 intros Hro *.
 apply matrix_eq; cbn.
