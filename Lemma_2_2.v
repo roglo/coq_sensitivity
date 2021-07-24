@@ -174,6 +174,7 @@ rewrite app_nth1. 2: {
   apply Nat.neq_0_lt_0.
   now apply Nat.pow_nonzero.
 }
+unfold mat_ncols in IHn.
 ...
 rewrite app_nil_r.
 rewrite app_length.
