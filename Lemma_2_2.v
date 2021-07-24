@@ -240,6 +240,11 @@ cbn - [ Nat.pow ].
 rewrite rngl_add_comm.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
+  rewrite app_nth1. 2: {
+    rewrite length_app_in_list.
+    rewrite map_length, seq_length.
+    rewrite fold_mat_nrows, mA_nrows, Nat.max_id.
+(* donc il y a deux cas : i < 2 ^ n et i ≥ 2 ^ n *)
 ...
 intros Hro *.
 apply matrix_eq; cbn.
