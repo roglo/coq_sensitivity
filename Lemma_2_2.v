@@ -216,6 +216,23 @@ intros j Hj.
 move j before i.
 unfold mat_mul_el.
 rewrite mA_ncols.
+apply in_seq in Hi, Hj.
+destruct Hi as (_, Hi).
+destruct Hj as (_, Hj).
+rewrite Nat.add_0_l in Hi, Hj.
+revert i j Hi Hj.
+induction n; intros. {
+  apply Nat.lt_1_r in Hi, Hj; subst i j; cbn.
+  rewrite rngl_summation_only_one.
+  rewrite rngl_mul_0_l; [ | now left ].
+  rewrite rngl_mul_0_l; [ easy | now left ].
+}
+rewrite (rngl_summation_split (2 ^ n - 1)). 2: {
+  split; [ flia | ].
+  apply -> Nat.succ_le_mono.
+  apply Nat.sub_le_mono_r.
+  apply Nat.pow_le_mono_r; [ easy | flia ].
+}
 ...
 intros Hro *.
 apply matrix_eq; cbn.
