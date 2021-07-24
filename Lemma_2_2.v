@@ -31,10 +31,27 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 
+Fixpoint map3 A (f : A → A → A) (la lb : list A) : list A :=
+  match la with
+  | [] => lb
+  | a :: la' =>
+      match lb with
+      | [] => la
+      | b :: lb' => f a b :: map3 f la' lb'
+      end
+  end.
+
 (* conversion list of list of matrices into simple matrix *)
 
 Definition flatten_list_list {A} (f : A → A → A) llll :=
+  flat_map (λ row, iter_list row (map3 f) []) llll.
+
+(*
+Definition flatten_list_list {A} (f : A → A → A) llll :=
   flat_map (λ row, iter_list (tl row) (map2 f) (hd [] row)) llll.
+*)
+
+Print flatten_list_list.
 
 (*
 Definition flatten_list_list {A} llll :=
@@ -62,6 +79,7 @@ Require Import ZArith Zrl.
 Open Scope Z_scope.
 Compute list_list_of_mat (@mA Z Z_ring_like_op 2).
 Compute list_list_of_mat (@mA Z Z_ring_like_op 3).
+...
 *)
 
 Theorem flatten_list_list_length : ∀ A f (llll : list (list (list (list A)))),
