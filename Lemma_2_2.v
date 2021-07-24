@@ -37,9 +37,7 @@ Definition flatten_list_list {A} llll :=
   flat_map (λ row, iter_list (tl row) (map2 (@app A)) (hd [] row)) llll.
 
 Definition mat_of_mat_list_list (mll : list (list (matrix T))) : matrix T :=
-  mk_mat
-    (flatten_list_list
-       (map (λ row : list (matrix T), map (@mat_list_list T) row) mll)).
+  mk_mat (flatten_list_list (map (map (@mat_list_list T)) mll)).
 
 (* sequence "An" *)
 
