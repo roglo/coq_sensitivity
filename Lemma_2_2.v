@@ -33,11 +33,16 @@ Context {rp : ring_like_prop T}.
 
 (* conversion list of list of matrices into simple matrix *)
 
+Definition flatten_list_list {A} (f : A → A → A) llll :=
+  flat_map (λ row, iter_list (tl row) (map2 f) (hd [] row)) llll.
+
+(*
 Definition flatten_list_list {A} llll :=
   flat_map (λ row, iter_list (tl row) (map2 (@app A)) (hd [] row)) llll.
+*)
 
 Definition mat_of_mat_list_list (mll : list (list (matrix T))) : matrix T :=
-  mk_mat (flatten_list_list (map (map (@mat_list_list T)) mll)).
+  mk_mat (flatten_list_list (@app T) (map (map (@mat_list_list T)) mll)).
 
 (* sequence "An" *)
 
@@ -59,8 +64,8 @@ Compute list_list_of_mat (@mA Z Z_ring_like_op 2).
 Compute list_list_of_mat (@mA Z Z_ring_like_op 3).
 *)
 
-Theorem flatten_list_list_length : ∀ A (llll : list (list (list (list A)))),
-  length (flatten_list_list llll) =
+Theorem flatten_list_list_length : ∀ A f (llll : list (list (list (list A)))),
+  length (flatten_list_list f llll) =
   length llll * length (hd [] llll) * length (hd [] (hd [] llll)).
 Proof.
 intros.
