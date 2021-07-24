@@ -31,21 +31,30 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 
-Fixpoint glop (la lb : list (list T)) : list (list T) :=
+Fixpoint app_in_list (la lb : list (list T)) : list (list T) :=
   match la with
   | [] => lb
   | a :: la' =>
       match lb with
       | [] => la
-      | b :: lb' => (a ++ b) :: glop la' lb'
+      | b :: lb' => (a ++ b) :: app_in_list la' lb'
       end
   end.
 
-Definition flatten_list_list llll :=
-  flat_map (λ row, iter_list row glop []) llll.
+Fixpoint fold_app_in_list a (l : list (list (list T))) :=
+  match l with
+  | [] => a
+  | b :: t => fold_app_in_list (app_in_list a b) t
+  end.
 
-Print iter_list.
+Definition flatten_list_list llll := flat_map (fold_app_in_list []) llll.
 
+Definition mat_of_mat_list_list (mll : list (list (matrix T))) : matrix T :=
+  mk_mat (flatten_list_list (map (map (@mat_list_list T)) mll)).
+
+
+(*
+Print fold_left.
 ...
 
 
@@ -58,11 +67,14 @@ Fixpoint map3 A (f : A → A → A) (la lb : list A) : list A :=
       | b :: lb' => f a b :: map3 f la' lb'
       end
   end.
+*)
 
 (* conversion list of list of matrices into simple matrix *)
 
+(*
 Definition flatten_list_list {A} (f : A → A → A) llll :=
   flat_map (λ row, iter_list row (map3 f) []) llll.
+*)
 
 (*
 Definition flatten_list_list {A} (f : A → A → A) llll :=
@@ -76,8 +88,10 @@ Definition flatten_list_list {A} llll :=
   flat_map (λ row, iter_list (tl row) (map2 (@app A)) (hd [] row)) llll.
 *)
 
+(*
 Definition mat_of_mat_list_list (mll : list (list (matrix T))) : matrix T :=
   mk_mat (flatten_list_list (@app T) (map (map (@mat_list_list T)) mll)).
+*)
 
 (* sequence "An" *)
 
@@ -119,19 +133,27 @@ Compute length [[[[1;2];[3;4];[5;6]];[[7;8;9;10]]];[[[11;12]]]].
 ...
 *)
 
+Theorem length_app_in_list : ∀ la lb,
+  length (app_in_list la lb) = max (length la) (length lb).
+Proof.
+intros.
+revert lb.
+induction la as [| a]; intros; [ easy | cbn ].
+destruct lb as [| b]; [ easy | cbn ].
+now rewrite IHla.
+Qed.
+
 Theorem mA_nrows : ∀ n, mat_nrows (mA n) = 2 ^ n.
 Proof.
 intros.
 induction n; [ easy | ].
 cbn - [ "^" ].
+rewrite app_nil_r.
 rewrite app_length.
-Search (length (iter_list _ _ _)).
-Search (length (fold_left _ _ _)).
-...
-rewrite app_nil_r, app_length.
-unfold mat_nrows in IHn.
-Search (length (iter_list _ _ _)).
-Search (iter_list (map _ _)).
+do 2 rewrite length_app_in_list.
+do 2 rewrite map_length.
+rewrite seq_length.
+do 2 rewrite Nat.max_comm.
 ...
 
 (* "We prove by induction that A_n^2 = nI" *)
