@@ -310,6 +310,7 @@ rewrite mA_nrows, mA_ncols.
 split; [ easy | ].
 split; [ easy | ].
 intros la Hla.
+...
 revert la Hla.
 induction n; intros. {
   cbn; cbn in Hla.
@@ -319,6 +320,12 @@ cbn in Hla.
 rewrite app_nil_r in Hla.
 apply in_app_or in Hla.
 destruct Hla as [Hla| Hla]. {
+Search (app_in_list _ (map _ _)).
+Search (_ ∈ app_in_list _ _).
+...
+Theorem glop : ∀ la lla llb,
+  la ∈ app_in_list lla llb
+  → ∃ i, la = nth i lla [] ++ nth i llb [].
 ...
 Search (is_correct_matrix (mI _)).
 ...
