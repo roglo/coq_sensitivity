@@ -255,6 +255,7 @@ erewrite rngl_summation_eq_compat. 2: {
     rewrite length_app_in_list.
     rewrite map_length, seq_length.
     rewrite fold_mat_nrows, mA_nrows.
+    rewrite Nat.max_id.
     easy.
   } {
     cbn.
@@ -269,6 +270,12 @@ erewrite rngl_summation_eq_compat. 2: {
     rewrite fold_mat_nrows, mA_nrows.
     rewrite Nat.max_id.
     f_equal.
+...
+  }
+}
+cbn - [ "^" ].
+Search app_in_list.
+Search (nth _ (app_in_list _ _)).
 ...
 intros Hro *.
 apply matrix_eq; cbn.
