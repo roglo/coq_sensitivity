@@ -297,14 +297,24 @@ destruct Hla as [Hla| Hla]. {
   destruct Hla as (i & Him & Hla).
   rewrite map_length, seq_length in Him.
   rewrite map_length in Him.
-Search (length (mat_list_list (mA _))).
-...
+  rewrite fold_mat_nrows, mA_nrows, Nat.max_id in Him.
   subst la; cbn.
   rewrite app_length.
-  apply Nat.max_lt_iff in Him.
-  rewrite List_map_nth' with (a := 0). 2: {
-    rewrite seq_length.
-...
+  rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
+  rewrite map_length, seq_length.
+  f_equal; rewrite Nat.add_0_r.
+  rewrite List_map_nth' with (a := []). 2: {
+    now rewrite fold_mat_nrows, mA_nrows.
+  }
+  rewrite map_length.
+  rewrite fold_corr_mat_ncols; cycle 2. {
+    now rewrite mA_nrows.
+  } {
+    apply mA_ncols.
+  }
+  easy.
+}
+Qed.
 
 (* "We prove by induction that A_n^2 = nI" *)
 
@@ -394,8 +404,8 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       } {
         now rewrite mA_ncols.
       }
-...
-Search (is_correct_matrix (mI _)).
+      apply mA_is_correct.
+    }
 ...
 split. {
   intros Hc.
