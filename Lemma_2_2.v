@@ -420,16 +420,6 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     easy.
   }
   cbn - [ "^" ].
-...
-split. {
-  intros Hc.
-  unfold mat_ncols in Hc; unfold mat_nrows.
-...
-Search (is_correct_matrix (mA _)).
-...
-    easy.
-  }
-  cbn - [ "^" ].
   rewrite rngl_add_comm.
   erewrite rngl_summation_eq_compat. 2: {
     intros j Hj.
@@ -446,16 +436,66 @@ Search (is_correct_matrix (mA _)).
       rewrite length_app_in_list.
       rewrite map_length, seq_length.
       now rewrite fold_mat_nrows, mA_nrows, Nat.max_id.
-
     }
     rewrite nth_app_in_list; cycle 1. {
       now rewrite fold_mat_nrows, mA_nrows.
     } {
       now rewrite map_length, seq_length.
     }
+    assert (H : j < 2 ^ n). {
+      apply (le_lt_trans _ (2 ^ n - 1)); [ easy | ].
+      apply Nat.sub_lt; [ | flia ].
+      apply Nat.neq_0_lt_0.
+      now apply Nat.pow_nonzero.
+    }
+    rewrite nth_app_in_list; cycle 1. {
+      now rewrite fold_mat_nrows, mA_nrows.
+    } {
+      now rewrite map_length, seq_length.
+    }
+    rewrite app_nth1. 2: {
+      rewrite fold_corr_mat_ncols; cycle 2. {
+        now rewrite mA_nrows.
+      } {
+        now rewrite mA_ncols.
+      }
+      apply mA_is_correct.
+    }
+    rewrite fold_mat_el.
     easy.
   }
   rewrite rngl_add_comm.
+  destruct (lt_dec k (2 ^ n)) as [Hkn| Hkn]. {
+    erewrite rngl_summation_eq_compat. 2: {
+      intros j Hj.
+      rewrite app_nth1. 2: {
+        now rewrite map_length, seq_length.
+      }
+      rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
+      rewrite seq_nth; [ cbn | easy ].
+      easy.
+    }
+    rewrite rngl_add_comm.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros j Hj.
+      assert (H : j < 2 ^ n). {
+        apply (le_lt_trans _ (2 ^ n - 1)); [ easy | ].
+        apply Nat.sub_lt; [ | flia ].
+        apply Nat.neq_0_lt_0.
+        now apply Nat.pow_nonzero.
+      }
+      rewrite app_nth1. 2: {
+        rewrite fold_corr_mat_ncols; cycle 2. {
+          now rewrite mA_nrows.
+        } {
+          now rewrite mA_ncols.
+        }
+        apply mA_is_correct.
+      }
+      rewrite fold_mat_el.
+      easy.
+    }
+    rewrite rngl_add_comm.
 ...
 {
     cbn.
