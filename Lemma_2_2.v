@@ -305,6 +305,20 @@ Proof.
 intros.
 apply is_sm_mat_iff.
 rewrite mA_ncols.
+apply is_sm_mat_iff.
+rewrite mA_nrows, mA_ncols.
+split; [ easy | ].
+split; [ easy | ].
+intros la Hla.
+revert la Hla.
+induction n; intros. {
+  cbn; cbn in Hla.
+  destruct Hla as [Hl| Hl]; [ now subst la | easy ].
+}
+cbn in Hla.
+rewrite app_nil_r in Hla.
+apply in_app_or in Hla.
+destruct Hla as [Hla| Hla]. {
 ...
 Search (is_correct_matrix (mI _)).
 ...
