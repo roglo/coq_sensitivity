@@ -300,6 +300,17 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       } {
         now rewrite mA_ncols.
       }
+Theorem mA_is_correct : ∀ n, is_correct_matrix (mA n).
+Proof.
+intros.
+apply is_sm_mat_iff.
+rewrite mA_ncols.
+...
+Search (is_correct_matrix (mI _)).
+...
+split. {
+  intros Hc.
+  unfold mat_ncols in Hc; unfold mat_nrows.
 ...
 Search (is_correct_matrix (mA _)).
 ...
