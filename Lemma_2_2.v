@@ -212,19 +212,6 @@ apply Nat.succ_lt_mono in Hb.
 now apply IHlla.
 Qed.
 
-(* to be moved into Matrix.v *)
-Theorem fold_corr_mat_ncols : ∀ (M : matrix T),
-  is_correct_matrix M
-  → ∀ i, i < mat_nrows M
-  → length (nth i (mat_list_list M) []) = mat_ncols M.
-Proof.
-intros * Hm * Him.
-destruct Hm as (Hcr, Hc).
-apply Hc.
-apply nth_In.
-now rewrite fold_mat_nrows.
-Qed.
-
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I :

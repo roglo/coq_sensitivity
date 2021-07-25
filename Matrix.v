@@ -120,6 +120,18 @@ Record correct_matrix T := mk_cm
   { cm_mat : matrix T;
     cm_prop : is_correct_matrix cm_mat }.
 
+Theorem fold_corr_mat_ncols {T} : ∀ (M : matrix T),
+  is_correct_matrix M
+  → ∀ i, i < mat_nrows M
+  → length (nth i (mat_list_list M) []) = mat_ncols M.
+Proof.
+intros * Hm * Him.
+destruct Hm as (Hcr, Hc).
+apply Hc.
+apply nth_In.
+now rewrite fold_mat_nrows.
+Qed.
+
 (* square_matrix *)
 
 Definition is_square_matrix {T} n (M : matrix T) :=
@@ -961,12 +973,9 @@ rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
   rewrite Hcarb in Hk.
   flia Hrbz Hk.
 } {
-  unfold is_correct_matrix in Hc.
-  destruct Hc as (_, Hc).
   apply in_seq in Hj.
-  rewrite Hc; [ now rewrite <- Hcbc | ].
-  apply nth_In.
-  rewrite fold_mat_nrows, <- Hcrbc.
+  rewrite fold_corr_mat_ncols; [ now rewrite <- Hcbc | easy | ].
+  rewrite <- Hcrbc.
   rewrite Hcarb in Hk.
   flia Hrbz Hk.
 }
@@ -1025,19 +1034,13 @@ rewrite map2_nth with (a := []) (b := []); cycle 1. {
   now apply in_seq in Hi.
 }
 rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
-  unfold is_correct_matrix in Ha.
-  destruct Ha as (_, Ha).
-  rewrite Ha; [ flia Hcaz Hk | ].
-  apply nth_In.
-  rewrite fold_mat_nrows.
-  now apply in_seq in Hi.
-} {
-  unfold is_correct_matrix in Hb.
-  destruct Hb as (_, Hb).
-  rewrite Hb; [ rewrite <- Hcacb; flia Hcaz Hk | ].
   apply in_seq in Hi.
-  apply nth_In.
-  now rewrite fold_mat_nrows, <- Hrarb.
+  rewrite fold_corr_mat_ncols; [ flia Hcaz Hk | easy | easy ].
+} {
+  apply in_seq in Hi.
+  rewrite Hrarb in Hi.
+  rewrite fold_corr_mat_ncols; [ | easy | easy ].
+  rewrite <- Hcacb; flia Hcaz Hk.
 }
 do 2 rewrite fold_mat_el.
 apply rngl_mul_add_distr_r.
