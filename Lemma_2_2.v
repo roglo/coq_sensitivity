@@ -406,6 +406,20 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       }
       apply mA_is_correct.
     }
+    rewrite fold_corr_mat_ncols; cycle 1. {
+      apply mA_is_correct.
+    } {
+      now rewrite mA_nrows.
+    }
+    rewrite mA_ncols.
+    rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ cbn | easy ].
+    rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
+    rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ cbn | easy ].
+    easy.
+  }
+  cbn - [ "^" ].
 ...
 split. {
   intros Hc.
