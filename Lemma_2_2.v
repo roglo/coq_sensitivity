@@ -496,6 +496,79 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       easy.
     }
     rewrite rngl_add_comm.
+    rewrite IHn; [ | easy | easy ].
+    rewrite rngl_mul_add_distr_r, rngl_mul_1_l.
+    f_equal.
+    rewrite rngl_summation_shift. 2: {
+      cbn; rewrite Nat.add_0_r.
+      rewrite <- Nat.add_sub_assoc; [ flia | ].
+      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+    }
+    cbn; rewrite Nat.add_0_r.
+    rewrite Nat_sub_sub_swap.
+    rewrite Nat.add_sub.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros j Hj.
+      now rewrite Nat.add_comm, Nat.add_sub.
+    }
+    cbn.
+    destruct (lt_eq_lt_dec i k) as [[Hik| Hik]| Hik]. {
+      rewrite δ_ndiag; [ | flia Hik ].
+      apply all_0_rngl_summation_0.
+      intros j Hj.
+      unfold δ.
+      do 2 rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+        destruct (Nat.eq_dec j k) as [Hjk| Hjk]. {
+          rewrite Hij, Hjk in Hik; flia Hik.
+        }
+        now apply rngl_mul_0_r; left.
+      } {
+        destruct (Nat.eq_dec j k) as [Hjk| Hjk]. {
+          now apply rngl_mul_0_l; left.
+        }
+        now apply rngl_mul_0_l; left.
+      }
+    } {
+      subst k.
+      rewrite δ_diag.
+      rewrite rngl_summation_split with (j := i). 2: {
+        split; [ flia | flia Hin ].
+      }
+      rewrite rngl_summation_split_last; [ | flia ].
+      rewrite all_0_rngl_summation_0. 2: {
+        intros j Hj.
+        rewrite δ_ndiag; [ | flia Hj ].
+        now apply rngl_mul_0_l; left.
+      }
+      rewrite rngl_add_0_l.
+      rewrite δ_diag, rngl_mul_1_l.
+      rewrite all_0_rngl_summation_0. 2: {
+        intros j Hj.
+        rewrite δ_ndiag; [ | flia Hj ].
+        now apply rngl_mul_0_l; left.
+      }
+      apply rngl_add_0_r.
+    } {
+      rewrite δ_ndiag; [ | flia Hik ].
+      apply all_0_rngl_summation_0.
+      intros j Hj.
+      unfold δ.
+      do 2 rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+        destruct (Nat.eq_dec j k) as [Hjk| Hjk]. {
+          rewrite Hij, Hjk in Hik; flia Hik.
+        }
+        now apply rngl_mul_0_r; left.
+      } {
+        destruct (Nat.eq_dec j k) as [Hjk| Hjk]. {
+          now apply rngl_mul_0_l; left.
+        }
+        now apply rngl_mul_0_l; left.
+      }
+    }
+  } {
+    apply Nat.nlt_ge in Hkn.
 ...
 {
     cbn.

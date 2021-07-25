@@ -374,6 +374,28 @@ Compute (mZ nat_ring_like_op 7 2).
 Definition δ i j := if i =? j then 1%F else 0%F.
 Definition mI n : matrix T := mk_mat (map (λ i, map (δ i) (seq 0 n)) (seq 0 n)).
 
+Theorem δ_comm : ∀ i j, δ i j = δ j i.
+Proof.
+intros.
+unfold δ.
+now rewrite Nat.eqb_sym.
+Qed.
+
+Theorem δ_diag : ∀ i, δ i i = 1%F.
+Proof.
+intros.
+unfold δ.
+now rewrite Nat.eqb_refl.
+Qed.
+
+Theorem δ_ndiag : ∀ i j, i ≠ j → δ i j = 0%F.
+Proof.
+intros * Hij.
+unfold δ.
+rewrite if_eqb_eq_dec.
+now destruct (Nat.eq_dec i j).
+Qed.
+
 (*
 End a.
 Require Import Nrl.
