@@ -259,6 +259,26 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     easy.
   }
   cbn - [ "^" ].
+  rewrite rngl_add_comm.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j Hj.
+    rewrite app_nth1 with (n := j). 2: {
+      rewrite length_app_in_list.
+      rewrite map_length, seq_length.
+      rewrite fold_mat_nrows, mA_nrows, Nat.max_id.
+      apply (le_lt_trans _ (2 ^ n - 1)); [ easy | ].
+      apply Nat.sub_lt; [ | flia ].
+      apply Nat.neq_0_lt_0.
+      now apply Nat.pow_nonzero.
+    }
+    rewrite app_nth1. 2: {
+      rewrite length_app_in_list.
+      rewrite map_length, seq_length.
+      now rewrite fold_mat_nrows, mA_nrows, Nat.max_id.
+    }
+    easy.
+  }
+  rewrite rngl_add_comm.
 ...
 {
     cbn.
