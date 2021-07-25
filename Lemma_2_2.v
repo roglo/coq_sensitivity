@@ -259,8 +259,8 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     easy.
   }
   cbn - [ "^" ].
-
-... {
+...
+{
     cbn.
     apply Nat.nlt_ge in Hin.
     rewrite app_nth2. 2: {
