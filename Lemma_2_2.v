@@ -306,7 +306,6 @@ intros.
 split; [ now rewrite mA_nrows, mA_ncols | ].
 intros la Hla.
 rewrite mA_ncols.
-...
 revert la Hla.
 induction n; intros. {
   cbn; cbn in Hla.
@@ -316,12 +315,46 @@ cbn in Hla.
 rewrite app_nil_r in Hla.
 apply in_app_or in Hla.
 destruct Hla as [Hla| Hla]. {
+Search (app_in_list (map _ _)).
 Search (app_in_list _ (map _ _)).
 Search (_ ∈ app_in_list _ _).
-...
 Theorem glop : ∀ la lla llb,
   la ∈ app_in_list lla llb
-  → ∃ i, la = nth i lla [] ++ nth i llb [].
+  → ∃ i,
+    i < max (length lla) (length llb) ∧ la = nth i lla [] ++ nth i llb [].
+Proof.
+intros * Hla.
+rename la into lc.
+revert llb Hla.
+induction lla as [| la]; intros; cbn. {
+  cbn in Hla.
+  induction llb as [| lb]; [ easy | ].
+  destruct Hla as [Hla| Hla]. {
+    subst lc.
+    exists 0.
+    split; [ cbn; flia | easy ].
+  } {
+    specialize (IHllb Hla).
+    destruct IHllb as (i & Hi & Hc).
+    exists (S i).
+    split. {
+      cbn.
+      now apply -> Nat.succ_lt_mono.
+    }
+    subst lc; cbn.
+    now destruct i.
+  }
+}
+destruct llb as [| lb]. {
+  destruct Hla as [Hla| Hla]. {
+    subst lc; cbn.
+    exists 0.
+    split; [ cbn; flia | symmetry; apply app_nil_r ].
+  } {
+    cbn.
+...
+apply glop in Hla.
+
 ...
 Search (is_correct_matrix (mI _)).
 ...
