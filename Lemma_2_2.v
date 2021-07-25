@@ -214,7 +214,8 @@ Qed.
 
 Theorem in_app_in_list : ∀ la lla llb,
   la ∈ app_in_list lla llb
-  → ∃ i, la = nth i lla [] ++ nth i llb [].
+  → ∃ i,
+    i < max (length lla) (length llb) ∧ la = nth i lla [] ++ nth i llb [].
 Proof.
 intros * Hla.
 rename la into lc.
@@ -224,12 +225,15 @@ induction lla as [| la]; intros; cbn. {
   induction llb as [| lb]; [ easy | ].
   destruct Hla as [Hla| Hla]. {
     subst lc.
-    now exists 0.
+    exists 0.
+    split; [ | easy ].
+    cbn; flia.
   } {
     specialize (IHllb Hla).
-    destruct IHllb as (i & Hc).
+    destruct IHllb as (i & Hil & Hc).
     exists (S i).
     subst lc; cbn.
+    split; [ now apply -> Nat.succ_lt_mono | ].
     now destruct i.
   }
 }
@@ -238,6 +242,7 @@ destruct llb as [| lb]. {
   destruct Hla as [Hla| Hla]. {
     subst lc; cbn.
     exists 0.
+    split; [ flia | ].
     symmetry; apply app_nil_r.
   } {
     cbn.
@@ -245,18 +250,61 @@ destruct llb as [| lb]. {
     destruct Hla as (n & Hnl & Hn).
     subst lc.
     exists (S n).
+    split; [ now apply -> Nat.succ_lt_mono | ].
     symmetry; apply app_nil_r.
   }
 }
 cbn in Hla.
 destruct Hla as [Hla| Hla]. {
   exists 0.
-  now subst lc.
+  subst lc; cbn.
+  split; [ flia | easy ].
 }
 specialize (IHlla _ Hla).
-destruct IHlla as (n & Hn).
-now exists (S n).
+destruct IHlla as (n & Hn & Hc).
+exists (S n); cbn.
+split; [ now apply -> Nat.succ_lt_mono | easy ].
 Qed.
+
+Theorem mA_is_correct : ∀ n, is_correct_matrix (mA n).
+Proof.
+intros.
+induction n. {
+  cbn.
+  now apply mZ_is_correct_matrix.
+}
+split; [ now rewrite mA_nrows, mA_ncols | ].
+intros la Hla.
+rewrite mA_ncols.
+cbn in Hla.
+rewrite app_nil_r in Hla.
+apply in_app_or in Hla.
+destruct Hla as [Hla| Hla]. {
+  apply in_app_in_list in Hla.
+  destruct Hla as (i & Him & Hla).
+  rewrite fold_mat_nrows, mA_nrows in Him.
+  rewrite map_length, seq_length in Him.
+  rewrite Nat.max_id in Him.
+  subst la.
+  rewrite app_length.
+  rewrite fold_corr_mat_ncols; [ | easy | now rewrite mA_nrows ].
+  rewrite mA_ncols.
+  rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
+  rewrite map_length, seq_length.
+  now cbn; rewrite Nat.add_0_r.
+} {
+  apply in_app_in_list in Hla.
+  destruct Hla as (i & Him & Hla).
+  rewrite map_length, seq_length in Him.
+  rewrite map_length in Him.
+Search (length (mat_list_list (mA _))).
+...
+  subst la; cbn.
+  rewrite app_length.
+  apply Nat.max_lt_iff in Him.
+  rewrite List_map_nth' with (a := 0). 2: {
+    rewrite seq_length.
+...
 
 (* "We prove by induction that A_n^2 = nI" *)
 
@@ -346,22 +394,6 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       } {
         now rewrite mA_ncols.
       }
-Theorem mA_is_correct : ∀ n, is_correct_matrix (mA n).
-Proof.
-intros.
-split; [ now rewrite mA_nrows, mA_ncols | ].
-intros la Hla.
-rewrite mA_ncols.
-revert la Hla.
-induction n; intros. {
-  cbn; cbn in Hla.
-  destruct Hla as [Hl| Hl]; [ now subst la | easy ].
-}
-cbn in Hla.
-rewrite app_nil_r in Hla.
-apply in_app_or in Hla.
-destruct Hla as [Hla| Hla]. {
-apply in_app_in_list in Hla.
 ...
 Search (is_correct_matrix (mI _)).
 ...

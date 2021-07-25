@@ -1658,6 +1658,24 @@ rewrite mI_ncols.
 apply mI_is_square_matrix.
 Qed.
 
+Theorem mZ_is_correct_matrix : ∀ m n,
+  n ≠ 0
+  → is_correct_matrix (mZ m n).
+Proof.
+intros * Hnz.
+destruct (Nat.eq_dec m 0) as [Hmz| Hmz]; [ now subst m | ].
+split. {
+  intros Hc.
+  now rewrite mZ_ncols in Hc.
+}
+intros l Hl.
+rewrite mZ_ncols; [ | easy ].
+cbn in Hl.
+apply repeat_spec in Hl.
+subst l.
+apply repeat_length.
+Qed.
+
 Definition smI n : square_matrix n T :=
   {| sm_mat := mI n;
      sm_prop := mI_is_square_matrix n |}.
