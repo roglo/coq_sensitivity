@@ -303,13 +303,9 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
 Theorem mA_is_correct : ∀ n, is_correct_matrix (mA n).
 Proof.
 intros.
-apply is_sm_mat_iff.
-rewrite mA_ncols.
-apply is_sm_mat_iff.
-rewrite mA_nrows, mA_ncols.
-split; [ easy | ].
-split; [ easy | ].
+split; [ now rewrite mA_nrows, mA_ncols | ].
 intros la Hla.
+rewrite mA_ncols.
 ...
 revert la Hla.
 induction n; intros. {
