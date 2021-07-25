@@ -196,6 +196,22 @@ rewrite map_length, seq_length; cbn.
 now rewrite Nat.add_0_r.
 Qed.
 
+Theorem nth_app_in_list : ∀ i lla llb d,
+  i < length lla
+  → i < length llb
+  → nth i (app_in_list lla llb) d = nth i lla d ++ nth i llb d.
+Proof.
+intros * Ha Hb.
+revert i llb Ha Hb.
+induction lla as [| la]; intros; [ easy | cbn ].
+destruct llb as [| lb]; [ easy | cbn ].
+destruct i; [ easy | ].
+cbn in Ha, Hb.
+apply Nat.succ_lt_mono in Ha.
+apply Nat.succ_lt_mono in Hb.
+now apply IHlla.
+Qed.
+
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I :
@@ -256,6 +272,29 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     rewrite map_length, seq_length.
     rewrite fold_mat_nrows, mA_nrows.
     rewrite Nat.max_id.
+    rewrite nth_app_in_list; cycle 1. {
+      now rewrite fold_mat_nrows, mA_nrows.
+    } {
+      now rewrite map_length, seq_length.
+    }
+    assert (Hjn : j - 2 ^ n < 2 ^ n). {
+      apply Nat.add_lt_mono_r with (p := 2 ^ n).
+      rewrite Nat.sub_add; [ | easy ].
+      cbn in Hj; rewrite Nat.add_0_r in Hj.
+      apply (le_lt_trans _ (2 ^ n + 2 ^ n - 1)); [ easy | ].
+      apply Nat.sub_lt; [ | flia ].
+      apply Nat.neq_0_lt_0.
+      intros H.
+      apply Nat.eq_add_0 in H.
+      destruct H as (H, _); revert H.
+      now apply Nat.pow_nonzero.
+    }
+    rewrite nth_app_in_list; cycle 1. {
+      now rewrite map_length, seq_length.
+    } {
+      now rewrite map_length, fold_mat_nrows, mA_nrows.
+    }
+...
     easy.
   }
   cbn - [ "^" ].
@@ -275,6 +314,12 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       rewrite length_app_in_list.
       rewrite map_length, seq_length.
       now rewrite fold_mat_nrows, mA_nrows, Nat.max_id.
+
+    }
+    rewrite nth_app_in_list; cycle 1. {
+      now rewrite fold_mat_nrows, mA_nrows.
+    } {
+      now rewrite map_length, seq_length.
     }
     easy.
   }
