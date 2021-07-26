@@ -131,6 +131,16 @@ apply iter_seq_split; [ | | | easy ]. {
 }
 Qed.
 
+Theorem rngl_summation_split3 : ∀ j g b k,
+  b ≤ j ≤ k
+  → ∑ (i = b, k), g i =
+       (∑ (i = S b, j), g (i - 1)%nat + g j + ∑ (i = j + 1, k), g i)%F.
+Proof.
+intros * Hj.
+rewrite rngl_summation_split with (j := j); [ | flia Hj ].
+now rewrite rngl_summation_split_last.
+Qed.
+
 Theorem rngl_summation_eq_compat : ∀ g h b k,
   (∀ i, b ≤ i ≤ k → (g i = h i)%F)
   → (∑ (i = b, k), g i = ∑ (i = b, k), h i)%F.
@@ -629,4 +639,5 @@ Arguments rngl_summation_permut {T}%type {ro rp} n%nat (l1 l2)%list.
 Arguments rngl_summation_rtl {T}%type {ro rp} _ (b k)%nat.
 Arguments rngl_summation_split {T}%type {ro rp} j%nat g%function (b k)%nat.
 Arguments rngl_summation_split_first {T}%type {ro rp} (b k)%nat.
+Arguments rngl_summation_split3 {T}%type {ro rp} j%nat_scope _ (b k)%nat_scope.
 Arguments rngl_summation_summation_exch' {T}%type {ro rp} _ (k l)%nat.
