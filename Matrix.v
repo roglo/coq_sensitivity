@@ -232,6 +232,27 @@ split; intros Hm. {
 }
 Qed.
 
+Theorem square_matrix_ncols {n T} : ∀ (M : matrix T),
+  is_square_matrix n M = true
+  → mat_ncols M = n.
+Proof.
+intros * Hm.
+apply is_sm_mat_iff in Hm.
+destruct Hm as (Hr & Hcr & Hc).
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  move Hnz at top; subst n.
+  unfold mat_nrows in Hr.
+  apply length_zero_iff_nil in Hr.
+  unfold mat_ncols.
+  now rewrite Hr.
+}
+apply Nat.neq_0_lt_0 in Hnz.
+apply Hc.
+rewrite List_hd_nth_0.
+apply nth_In.
+now rewrite fold_mat_nrows, Hr.
+Qed.
+
 (* *)
 
 Fixpoint concat_list_in_list {T} (ll1 ll2 : list (list T)) :=
