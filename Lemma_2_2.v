@@ -1024,18 +1024,19 @@ Qed.
    works *)
 
 Theorem m_o_mll_2x2_2x1 : ∀ n (M1 M2 M3 M4 M5 M6 : matrix T),
-  mat_nrows M1 = n
+  is_square_matrix n M5 = true
+  → mat_nrows M1 = n
   → mat_nrows M2 = n
   → mat_nrows M3 = n
   → mat_nrows M4 = n
-  → mat_nrows M5 = n
-  → mat_ncols M5 = n
   → mat_ncols M6 = n
   → (mat_of_mat_list_list [[M1; M2]; [M3; M4]] *
      mat_of_mat_list_list [[M5]; [M6]])%M =
      mat_of_mat_list_list [[M1 * M5 + M2 * M6]; [M3 * M5 + M4 * M6]]%M.
 Proof.
-intros * Hr1 Hr2 Hr3 Hr4 Hr5 Hc5 Hc6.
+intros * Hs5 Hr1 Hr2 Hr3 Hr4 Hc6.
+apply is_sm_mat_iff in Hs5.
+destruct Hs5 as (Hr5 & Hcr5 & Hc5).
 unfold mat_mul, mat_add; cbn.
 unfold mat_of_mat_list_list; cbn.
 f_equal.
@@ -1058,6 +1059,16 @@ erewrite map_ext_in. 2: {
     rewrite List_hd_nth_0 in Hj.
     rewrite app_nth1 in Hj; [ | now rewrite fold_mat_nrows, Hr5 ].
     rewrite <- List_hd_nth_0 in Hj.
+    rewrite fold_mat_ncols in Hj.
+Search is_square_matrix.
+Theorem square_matrix_ncols : ∀ n (M : matrix T),
+  is_square_matrix n M = true
+  → mat_ncols M = n.
+Proof.
+intros * Hm.
+apply is_sm_mat_iff in Hm.
+destruct Hm as (Hr & Hcr & Hc).
+...
     rewrite fold_mat_ncols, Hc5 in Hj.
     unfold mat_mul_el; cbn.
     unfold mat_ncols; cbn.
