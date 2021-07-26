@@ -1023,12 +1023,46 @@ Qed.
    This way, we have to prove that this pair eigen(value,vector)
    works *)
 
-Theorem m_o_mll_2x2_2x1 : ∀ (M1 M2 M3 M4 M5 M6 : matrix T),
-  (mat_of_mat_list_list [[M1; M2]; [M3; M4]] *
-   mat_of_mat_list_list [[M5]; [M6]])%M =
-   mat_of_mat_list_list [[M1 * M5 + M2 * M6]; [M3 * M5 + M4 * M6]]%M.
+Theorem m_o_mll_2x2_2x1 : ∀ n (M1 M2 M3 M4 M5 M6 : matrix T),
+  mat_nrows M1 = n
+  → mat_nrows M2 = n
+  → mat_nrows M3 = n
+  → mat_nrows M4 = n
+  → mat_ncols M5 = n
+  → mat_ncols M6 = n
+  → (mat_of_mat_list_list [[M1; M2]; [M3; M4]] *
+     mat_of_mat_list_list [[M5]; [M6]])%M =
+     mat_of_mat_list_list [[M1 * M5 + M2 * M6]; [M3 * M5 + M4 * M6]]%M.
 Proof.
-intros.
+intros * Hr1 Hr2 Hr3 Hr4 Hc5 Hc6.
+unfold mat_mul, mat_add; cbn.
+unfold mat_of_mat_list_list; cbn.
+f_equal.
+do 3 rewrite app_nil_r.
+rewrite app_length.
+do 2 rewrite length_app_in_list.
+do 4 rewrite fold_mat_nrows.
+do 2 rewrite map2_map_l, map2_map_r.
+rewrite Hr1, Hr2, Hr3, Hr4, Nat.max_id.
+do 2 rewrite map2_diag.
+(**)
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  erewrite map_ext_in. 2: {
+    intros j Hj.
+    unfold mat_ncols in Hj; cbn in Hj.
+    rewrite List_hd_nth_0 in Hj.
+    unfold mat_mul_el; cbn.
+...
+erewrite (map_ext_in _ _ (seq 0 n)). 2: {
+  intros i Hi.
+  rewrite map2_map_l, map2_map_r, Hc5, Hc6.
+  now rewrite map2_diag.
+}
+unfold mat_mul_el.
+...
+erewrite (map_ext_in _ _ (seq 0 n)). 2: {
+  intros i Hi.
 ...
 
 Theorem m_o_mll_2x2_2x1 : ∀ n (M1 M2 M3 M4 M5 M6 : matrix n n T),
