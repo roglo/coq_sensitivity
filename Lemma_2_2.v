@@ -1028,13 +1028,14 @@ Theorem m_o_mll_2x2_2x1 : ∀ n (M1 M2 M3 M4 M5 M6 : matrix T),
   → mat_nrows M2 = n
   → mat_nrows M3 = n
   → mat_nrows M4 = n
+  → mat_nrows M5 = n
   → mat_ncols M5 = n
   → mat_ncols M6 = n
   → (mat_of_mat_list_list [[M1; M2]; [M3; M4]] *
      mat_of_mat_list_list [[M5]; [M6]])%M =
      mat_of_mat_list_list [[M1 * M5 + M2 * M6]; [M3 * M5 + M4 * M6]]%M.
 Proof.
-intros * Hr1 Hr2 Hr3 Hr4 Hc5 Hc6.
+intros * Hr1 Hr2 Hr3 Hr4 Hr5 Hc5 Hc6.
 unfold mat_mul, mat_add; cbn.
 unfold mat_of_mat_list_list; cbn.
 f_equal.
@@ -1042,17 +1043,66 @@ do 3 rewrite app_nil_r.
 rewrite app_length.
 do 2 rewrite length_app_in_list.
 do 4 rewrite fold_mat_nrows.
-do 2 rewrite map2_map_l, map2_map_r.
 rewrite Hr1, Hr2, Hr3, Hr4, Nat.max_id.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  now move Hnz at top; subst n.
+}
+do 2 rewrite map2_map_l, map2_map_r.
 do 2 rewrite map2_diag.
-(**)
+apply Nat.neq_0_lt_0 in Hnz.
 erewrite map_ext_in. 2: {
   intros i Hi.
   erewrite map_ext_in. 2: {
     intros j Hj.
     unfold mat_ncols in Hj; cbn in Hj.
     rewrite List_hd_nth_0 in Hj.
+    rewrite app_nth1 in Hj; [ | now rewrite fold_mat_nrows, Hr5 ].
+    rewrite <- List_hd_nth_0 in Hj.
+    rewrite fold_mat_ncols, Hc5 in Hj.
     unfold mat_mul_el; cbn.
+    unfold mat_ncols; cbn.
+    rewrite List_hd_nth_0.
+    rewrite app_nth1. 2: {
+      rewrite length_app_in_list.
+      do 2 rewrite fold_mat_nrows.
+      now rewrite Hr1, Hr2, Nat.max_id.
+    }
+    rewrite nth_app_in_list; cycle 1. {
+      now rewrite fold_mat_nrows, Hr1.
+    } {
+      now rewrite fold_mat_nrows, Hr2.
+    }
+    easy.
+  }
+  easy.
+}
+rewrite seq_app; cbn.
+rewrite map_app.
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  apply in_seq in Hi.
+  unfold mat_ncols; cbn.
+  rewrite app_nth1. 2: {
+    rewrite length_app_in_list.
+    do 2 rewrite fold_mat_nrows.
+    now rewrite Hr1, Hr2, Nat.max_id.
+  }
+  rewrite List_hd_nth_0.
+  rewrite app_nth1; [ | now rewrite fold_mat_nrows, Hr5 ].
+  rewrite fold_corr_mat_ncols; cycle 1. {
+...
+  apply in_seq in Hi.
+  destruct Hi as (_, Hi); cbn in Hi.
+  destruct (lt_dec i n) as [Hin| Hin]. {
+    rewrite app_nth1. 2: {
+      rewrite length_app_in_list.
+      do 2 rewrite fold_mat_nrows.
+      now rewrite Hr1, Hr2, Nat.max_id.
+    }
+    easy.
+  }
+cbn.
+
 ...
 erewrite (map_ext_in _ _ (seq 0 n)). 2: {
   intros i Hi.
