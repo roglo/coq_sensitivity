@@ -893,6 +893,98 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       now rewrite fold_mat_el.
     }
     cbn - [ "^" ].
+    rewrite rngl_summation_shift; [ | cbn; flia ].
+    rewrite Nat_sub_sub_swap.
+    cbn; rewrite Nat.add_0_r, Nat.add_sub.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros j Hj.
+      now rewrite Nat.add_comm, Nat.add_sub.
+    }
+    cbn - [ "^" ].
+    rewrite IHn; cycle 1. {
+      apply Hj'; split; [ easy | flia Hi ].
+    } {
+      apply Hj'; split; [ easy | flia Hk ].
+    }
+    rewrite rngl_mul_add_distr_r, rngl_mul_1_l, rngl_add_comm.
+    f_equal. 2: {
+      f_equal; unfold δ; symmetry.
+      rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec i k) as [Hik| Hik]. {
+        now subst k; rewrite Nat.eqb_refl.
+      }
+      rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec _ _) as [H| H]; [ | easy ].
+      flia Hik H Hin Hkn.
+    }
+    erewrite rngl_summation_eq_compat. 2: {
+      intros j Hj.
+      rewrite app_nth2. 2: {
+        rewrite length_app_in_list, fold_mat_nrows, mA_nrows.
+        now rewrite map_length, seq_length, Nat.max_id.
+      }
+      rewrite length_app_in_list, fold_mat_nrows, mA_nrows.
+      rewrite map_length, seq_length, Nat.max_id.
+      rewrite nth_app_in_list; cycle 1. {
+        rewrite map_length, seq_length.
+        apply Hj'; split; [ easy | flia Hi ].
+      } {
+        rewrite map_length, fold_mat_nrows, mA_nrows.
+        apply Hj'; split; [ easy | flia Hi ].
+      }
+      rewrite (List_map_nth' 0). 2: {
+        rewrite seq_length.
+        apply Hj'; split; [ easy | flia Hi ].
+      }
+      rewrite seq_nth. 2: {
+        apply Hj'; split; [ easy | flia Hi ].
+      }
+      cbn.
+      rewrite (List_map_nth' []). 2: {
+        rewrite fold_mat_nrows, mA_nrows.
+        apply Hj'; split; [ easy | flia Hi ].
+      }
+      rewrite app_nth1. 2: {
+        rewrite map_length, seq_length.
+        now apply Hj''.
+      }
+      rewrite (List_map_nth' 0); [ | now rewrite seq_length; apply Hj'' ].
+      rewrite seq_nth; [ cbn | now apply Hj'' ].
+      rewrite app_nth1. 2: {
+        rewrite length_app_in_list, fold_mat_nrows, mA_nrows.
+        rewrite map_length, seq_length, Nat.max_id.
+        now apply Hj''.
+      }
+      rewrite nth_app_in_list; cycle 1. {
+        now rewrite fold_mat_nrows, mA_nrows; apply Hj''.
+      } {
+        now rewrite map_length, seq_length; apply Hj''.
+      }
+      rewrite app_nth2. 2: {
+        rewrite fold_corr_mat_ncols; cycle 1. {
+          apply mA_is_correct.
+        } {
+          now rewrite mA_nrows; apply Hj''.
+        }
+        now rewrite mA_ncols.
+      }
+      rewrite fold_corr_mat_ncols; cycle 1. {
+        apply mA_is_correct.
+      } {
+        now rewrite mA_nrows; apply Hj''.
+      }
+      rewrite mA_ncols.
+      rewrite (List_map_nth' 0); [ | now rewrite seq_length; apply Hj'' ].
+      rewrite (List_map_nth' 0). 2: {
+        rewrite seq_length; apply Hj'; split; [ easy | flia Hk ].
+      }
+      rewrite seq_nth; [ cbn | now apply Hj'' ].
+      rewrite seq_nth. 2: {
+        apply Hj'; split; [ easy | flia Hk ].
+      }
+      now cbn.
+    }
+    cbn.
 ...
       rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
       rewrite seq_nth; [ cbn | easy ].
