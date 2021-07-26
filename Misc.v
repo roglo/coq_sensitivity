@@ -1167,7 +1167,7 @@ intros i.
 now specialize (Hf (S i)).
 Qed.
 
-Theorem List_map_nth' : ∀ A B (f : A → B) a b l n,
+Theorem List_map_nth' : ∀ A B a b (f : A → B) l n,
   n < length l → nth n (map f l) b = f (nth n l a).
 Proof.
 intros * Hnl.
