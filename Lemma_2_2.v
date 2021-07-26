@@ -507,6 +507,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     cbn; rewrite Nat.add_0_r.
     rewrite Nat_sub_sub_swap.
     rewrite Nat.add_sub.
+(**)
     erewrite rngl_summation_eq_compat. 2: {
       intros j Hj.
       now rewrite Nat.add_comm, Nat.add_sub.
@@ -568,7 +569,122 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       }
     }
   } {
+(**)
     apply Nat.nlt_ge in Hkn.
+    rewrite δ_ndiag; [ | flia Hin Hkn ].
+    rewrite rngl_mul_0_r; [ | now left ].
+    erewrite rngl_summation_eq_compat. 2: {
+      intros j Hj.
+      rewrite app_nth2. 2: {
+        now rewrite map_length, seq_length.
+      }
+      rewrite map_length, seq_length.
+      assert (Hj' : j - 2 ^ n < 2 ^ n). {
+        apply Nat.add_lt_mono_r with (p := 2 ^ n).
+        rewrite Nat.sub_add; [ | easy ].
+        destruct Hj as (_, Hj).
+        cbn in Hj; rewrite Nat.add_0_r in Hj.
+        apply (le_lt_trans _ (2 ^ n + 2 ^ n - 1)); [ easy | ].
+        apply Nat.sub_lt; [ | flia ].
+        apply Nat.neq_0_lt_0.
+        intros H.
+        apply Nat.eq_add_0 in H.
+        destruct H as (H, _); revert H.
+        now apply Nat.pow_nonzero.
+      }
+      rewrite List_map_nth' with (a := []). 2: {
+        now rewrite fold_mat_nrows, mA_nrows.
+      }
+      rewrite List_map_nth' with (a := 0%F). 2: {
+        rewrite fold_corr_mat_ncols; cycle 1. {
+          apply mA_is_correct.
+        } {
+          now rewrite mA_nrows.
+        }
+        rewrite mA_ncols.
+        apply Nat.add_lt_mono_r with (p := 2 ^ n).
+        rewrite Nat.sub_add; [ | easy ].
+        now cbn in Hk; rewrite Nat.add_0_r in Hk.
+      }
+      rewrite fold_mat_el.
+      now rewrite rngl_mul_opp_r.
+    }
+    rewrite rngl_summation_shift. 2: {
+      cbn; rewrite Nat.add_0_r.
+      rewrite <- Nat.add_sub_assoc; [ flia | ].
+      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+    }
+    rewrite <- rngl_opp_summation; [ | easy ].
+    cbn; rewrite Nat.add_0_r.
+    rewrite Nat_sub_sub_swap, Nat.add_sub.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros j Hj.
+      now rewrite Nat.add_comm, Nat.add_sub.
+    }
+    rewrite rngl_add_comm.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros j Hj.
+      assert (H : j < 2 ^ n). {
+        apply (le_lt_trans _ (2 ^ n - 1)); [ easy | ].
+        apply Nat.sub_lt; [ | flia ].
+        apply Nat.neq_0_lt_0.
+        now apply Nat.pow_nonzero.
+      }
+      rewrite app_nth2. 2: {
+        rewrite fold_corr_mat_ncols; cycle 2. {
+          now rewrite mA_nrows.
+        } {
+          now rewrite mA_ncols.
+        }
+        apply mA_is_correct.
+      }
+      rewrite fold_corr_mat_ncols; cycle 1. {
+        apply mA_is_correct.
+      } {
+        now rewrite mA_nrows.
+      }
+      rewrite mA_ncols.
+      rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
+      assert (Hk' : k - 2 ^ n < 2 ^ n). {
+        apply Nat.add_lt_mono_r with (p := 2 ^ n).
+        rewrite Nat.sub_add; [ | easy ].
+        now cbn in Hk; rewrite Nat.add_0_r in Hk.
+      }
+      rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
+      rewrite seq_nth; [ | easy ].
+      rewrite seq_nth; [ | easy ].
+      now cbn.
+    }
+    cbn.
+    rewrite fold_rngl_sub; [ | easy ].
+(* split 1st summation at (k - 2 ^ n) *)
+(* make a lemma to split a summation into 3 parts la ++ [x] ++ lb *)
+...
+    rewrite rngl_summation_rtl.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros j Hj.
+      now rewrite Nat.add_0_r.
+    }
+    cbn.
+...
+    apply rngl_sub_diag.
+...
+    rewrite rngl_add_comm.
+    rewrite
+    rewrite fold_rngl_sub; [ | easy ].
+    rewrite
+...
+    rewrite IHn; [ | easy | easy ].
+    rewrite rngl_mul_add_distr_r, rngl_mul_1_l.
+    f_equal.
+    rewrite rngl_summation_shift. 2: {
+      cbn; rewrite Nat.add_0_r.
+      rewrite <- Nat.add_sub_assoc; [ flia | ].
+      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+    }
+    cbn; rewrite Nat.add_0_r.
+    rewrite Nat_sub_sub_swap.
+    rewrite Nat.add_sub.
 ...
 {
     cbn.
