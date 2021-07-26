@@ -2828,6 +2828,7 @@ Declare Scope M_scope.
 Delimit Scope M_scope with M.
 
 Arguments mat_el {T}%type {ro} M%M (i j)%nat.
+Arguments mat_add {T}%type {ro} (MA MB)%M.
 Arguments mat_add_opp_r {T}%type {ro rp} Hro M%M.
 Arguments mat_mul {T}%type {ro} (MA MB)%M.
 Arguments mat_mul_el {T}%type {ro} (MA MB)%M (i k)%nat.

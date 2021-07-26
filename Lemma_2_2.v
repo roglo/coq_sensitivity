@@ -1013,8 +1013,6 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
 }
 Qed.
 
-...
-
 (* seems, on paper, that √(n+1) is an eignenvalue for A_{n+1}
    and a corresponding eigenvector is
       ( A_n + √(n+1) I )
@@ -1024,6 +1022,14 @@ Qed.
      There is going to be a special case for n = 0.
    This way, we have to prove that this pair eigen(value,vector)
    works *)
+
+Theorem m_o_mll_2x2_2x1 : ∀ (M1 M2 M3 M4 M5 M6 : matrix T),
+  (mat_of_mat_list_list [[M1; M2]; [M3; M4]] *
+   mat_of_mat_list_list [[M5]; [M6]])%M =
+   mat_of_mat_list_list [[M1 * M5 + M2 * M6]; [M3 * M5 + M4 * M6]]%M.
+Proof.
+intros.
+...
 
 Theorem m_o_mll_2x2_2x1 : ∀ n (M1 M2 M3 M4 M5 M6 : matrix n n T),
   (mat_of_mat_list_list [[M1; M2]; [M3; M4]] *
