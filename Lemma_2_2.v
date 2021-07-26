@@ -415,36 +415,11 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       rewrite map_length, seq_length.
       now rewrite fold_mat_nrows, mA_nrows, Nat.max_id.
     }
-(*
-    rewrite length_app_in_list.
-    rewrite map_length, seq_length.
-    rewrite fold_mat_nrows, mA_nrows.
-    rewrite Nat.max_id.
-*)
     rewrite nth_app_in_list; cycle 1. {
       now rewrite fold_mat_nrows, mA_nrows.
     } {
       now rewrite map_length, seq_length.
     }
-(*
-    assert (Hjn : j - 2 ^ n < 2 ^ n). {
-      apply Nat.add_lt_mono_r with (p := 2 ^ n).
-      rewrite Nat.sub_add; [ | easy ].
-      cbn in Hj; rewrite Nat.add_0_r in Hj.
-      apply (le_lt_trans _ (2 ^ n + 2 ^ n - 1)); [ easy | ].
-      apply Nat.sub_lt; [ | flia ].
-      apply Nat.neq_0_lt_0.
-      intros H.
-      apply Nat.eq_add_0 in H.
-      destruct H as (H, _); revert H.
-      now apply Nat.pow_nonzero.
-    }
-    rewrite nth_app_in_list; cycle 1. {
-      now rewrite map_length, seq_length.
-    } {
-      now rewrite map_length, fold_mat_nrows, mA_nrows.
-    }
-*)
     rewrite app_nth2. 2: {
       rewrite fold_corr_mat_ncols; cycle 2. {
         now rewrite mA_nrows.
@@ -520,16 +495,10 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     rewrite rngl_add_comm.
     erewrite rngl_summation_eq_compat. 2: {
       intros j Hj.
-...
-      assert (Hj'' : j ≤ 2 ^ n - 1 → j < 2 ^ n). {
-        apply (le_lt_trans _ (2 ^ n - 1)); [ easy | ].
-        apply Nat.sub_lt; [ | flia ].
-        apply Nat.neq_0_lt_0.
-        now apply Nat.pow_nonzero.
-      }
       rewrite app_nth1. 2: {
         rewrite fold_corr_mat_ncols; cycle 2. {
-          now rewrite mA_nrows.
+          rewrite mA_nrows.
+          now apply Hj''.
         } {
           now rewrite mA_ncols.
         }
@@ -617,27 +586,12 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
         now rewrite map_length, seq_length.
       }
       rewrite map_length, seq_length.
-      assert (Hj' : j - 2 ^ n < 2 ^ n). {
-        apply Nat.add_lt_mono_r with (p := 2 ^ n).
-        rewrite Nat.sub_add; [ | easy ].
-        destruct Hj as (_, Hj).
-        cbn in Hj; rewrite Nat.add_0_r in Hj.
-        apply (le_lt_trans _ (2 ^ n + 2 ^ n - 1)); [ easy | ].
-        apply Nat.sub_lt; [ | flia ].
-        apply Nat.neq_0_lt_0.
-        intros H.
-        apply Nat.eq_add_0 in H.
-        destruct H as (H, _); revert H.
-        now apply Nat.pow_nonzero.
-      }
-      rewrite List_map_nth' with (a := []). 2: {
-        now rewrite fold_mat_nrows, mA_nrows.
-      }
       rewrite List_map_nth' with (a := 0%F). 2: {
         rewrite fold_corr_mat_ncols; cycle 1. {
           apply mA_is_correct.
         } {
-          now rewrite mA_nrows.
+          rewrite mA_nrows.
+          now apply Hj'.
         }
         rewrite mA_ncols.
         apply Nat.add_lt_mono_r with (p := 2 ^ n).
@@ -662,15 +616,10 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     rewrite rngl_add_comm.
     erewrite rngl_summation_eq_compat. 2: {
       intros j Hj.
-      assert (H : j < 2 ^ n). {
-        apply (le_lt_trans _ (2 ^ n - 1)); [ easy | ].
-        apply Nat.sub_lt; [ | flia ].
-        apply Nat.neq_0_lt_0.
-        now apply Nat.pow_nonzero.
-      }
       rewrite app_nth2. 2: {
         rewrite fold_corr_mat_ncols; cycle 2. {
-          now rewrite mA_nrows.
+          rewrite mA_nrows.
+          now apply Hj''.
         } {
           now rewrite mA_ncols.
         }
@@ -679,18 +628,23 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       rewrite fold_corr_mat_ncols; cycle 1. {
         apply mA_is_correct.
       } {
-        now rewrite mA_nrows.
+        rewrite mA_nrows.
+        now apply Hj''.
       }
       rewrite mA_ncols.
-      rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
-      assert (Hk' : k - 2 ^ n < 2 ^ n). {
-        apply Nat.add_lt_mono_r with (p := 2 ^ n).
-        rewrite Nat.sub_add; [ | easy ].
-        now cbn in Hk; rewrite Nat.add_0_r in Hk.
+      rewrite List_map_nth' with (a := 0). 2: {
+        now rewrite seq_length; apply Hj''.
       }
-      rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
-      rewrite seq_nth; [ | easy ].
-      rewrite seq_nth; [ | easy ].
+      rewrite List_map_nth' with (a := 0). 2: {
+        rewrite seq_length.
+        apply Hj'.
+        split; [ easy | flia Hk ].
+      }
+      rewrite seq_nth; [ | now apply Hj'' ].
+      rewrite seq_nth. 2: {
+        apply Hj'.
+        split; [ easy | flia Hk ].
+      }
       now cbn.
     }
     cbn.
@@ -734,6 +688,8 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     now apply rngl_sub_diag; left.
   }
 } {
+(**)
+...
   apply Nat.nlt_ge in Hin.
   erewrite rngl_summation_eq_compat. 2: {
     intros j Hj.
