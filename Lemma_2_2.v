@@ -872,6 +872,34 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     now apply rngl_add_opp_l.
   } {
     apply Nat.nlt_ge in Hkn.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros j Hj.
+      rewrite app_nth2. 2: {
+        now rewrite map_length, seq_length.
+      }
+      rewrite map_length, seq_length.
+      rewrite (List_map_nth' 0%F). 2: {
+        rewrite fold_corr_mat_ncols; cycle 1. {
+          apply mA_is_correct.
+        } {
+          now rewrite mA_nrows; apply Hj'.
+        }
+        rewrite mA_ncols.
+        apply Hj'; split; [ easy | flia Hk ].
+      }
+      rewrite rngl_mul_opp_l; [ | easy ].
+      rewrite rngl_mul_opp_r; [ | easy ].
+      rewrite rngl_opp_involutive; [ | easy ].
+      now rewrite fold_mat_el.
+    }
+    cbn - [ "^" ].
+...
+      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+      rewrite seq_nth; [ cbn | easy ].
+      rewrite rngl_mul_opp_l; [ | easy ].
+      easy.
+    }
+    cbn - [ "^" ].
 ...
     erewrite rngl_summation_eq_compat. 2: {
       intros j Hj.
