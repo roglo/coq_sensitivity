@@ -314,6 +314,37 @@ destruct Hla as [Hla| Hla]. {
 }
 Qed.
 
+Theorem le_pow_succ_sub_1_lt : ∀ n j, j ≤ 2 ^ S n - 1 → j - 2 ^ n < 2 ^ n.
+Proof.
+intros * Hj.
+apply (Nat.add_lt_mono_r _ _ (2 ^ n)).
+destruct (le_dec (2 ^ n) j) as [H1| H1]. {
+  rewrite Nat.sub_add; [ | easy ].
+  cbn in Hj; rewrite Nat.add_0_r in Hj.
+  apply (le_lt_trans _ (2 ^ n + 2 ^ n - 1)); [ easy | ].
+  apply Nat.sub_lt; [ | flia ].
+  apply Nat.neq_0_lt_0.
+  intros H.
+  apply Nat.eq_add_0 in H.
+  destruct H as (H, _); revert H.
+  now apply Nat.pow_nonzero.
+} {
+  apply Nat.nle_gt in H1.
+  rewrite (proj2 (Nat.sub_0_le j (2 ^ n))); [ | flia H1 ].
+  apply Nat.lt_add_pos_r.
+  now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+}
+Qed.
+
+Theorem le_pow_sub_1_lt : ∀ n j, j ≤ 2 ^ n - 1 → j < 2 ^ n.
+Proof.
+intros n j Hj.
+apply (le_lt_trans _ (2 ^ n - 1)); [ easy | ].
+apply Nat.sub_lt; [ | flia ].
+apply Nat.neq_0_lt_0.
+now apply Nat.pow_nonzero.
+Qed.
+
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I :
@@ -357,26 +388,6 @@ rewrite Nat.sub_add. 2: {
 cbn - [ Nat.pow ].
 rewrite rngl_add_comm.
 rewrite app_nil_r.
-assert (Hj' : ∀ j, 2 ^ n ≤ j ≤ 2 ^ S n - 1 → j - 2 ^ n < 2 ^ n). {
-  intros * Hj.
-  apply (Nat.add_lt_mono_r _ _ (2 ^ n)).
-  rewrite Nat.sub_add; [ | easy ].
-  cbn in Hj; rewrite Nat.add_0_r in Hj.
-  apply (le_lt_trans _ (2 ^ n + 2 ^ n - 1)); [ easy | ].
-  apply Nat.sub_lt; [ | flia ].
-  apply Nat.neq_0_lt_0.
-  intros H.
-  apply Nat.eq_add_0 in H.
-  destruct H as (H, _); revert H.
-  now apply Nat.pow_nonzero.
-}
-assert (Hj'' : ∀ j, j ≤ 2 ^ n - 1 → j < 2 ^ n). {
-  intros j Hj.
-  apply (le_lt_trans _ (2 ^ n - 1)); [ easy | ].
-  apply Nat.sub_lt; [ | flia ].
-  apply Nat.neq_0_lt_0.
-  now apply Nat.pow_nonzero.
-}
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   rewrite app_nth2 with (n := j). 2: {
@@ -388,20 +399,20 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite fold_mat_nrows, mA_nrows.
   rewrite map_length, seq_length, Nat.max_id.
   rewrite nth_app_in_list; cycle 1. {
-    now rewrite map_length, seq_length; apply Hj'.
+    now rewrite map_length, seq_length; apply le_pow_succ_sub_1_lt.
   } {
     rewrite map_length, fold_mat_nrows, mA_nrows.
-    now apply Hj'.
+    now apply le_pow_succ_sub_1_lt.
   }
   rewrite (List_map_nth' 0). 2: {
     rewrite seq_length.
-    now apply Hj'.
+    now apply le_pow_succ_sub_1_lt.
   }
   rewrite (List_map_nth' []). 2: {
     rewrite fold_mat_nrows, mA_nrows.
-    now apply Hj'.
+    now apply le_pow_succ_sub_1_lt.
   }
-  rewrite seq_nth; [ cbn | now apply Hj' ].
+  rewrite seq_nth; [ cbn | now apply le_pow_succ_sub_1_lt ].
   easy.
 }
 cbn - [ "^" ].
@@ -435,9 +446,9 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
     rewrite seq_nth; [ cbn | easy ].
     rewrite (List_map_nth' 0). 2: {
-      now rewrite seq_length; apply Hj'.
+      now rewrite seq_length; apply le_pow_succ_sub_1_lt.
     }
-    rewrite seq_nth; [ cbn | now apply Hj' ].
+    rewrite seq_nth; [ cbn | now apply le_pow_succ_sub_1_lt ].
     easy.
   }
   cbn - [ "^" ].
@@ -448,7 +459,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       rewrite length_app_in_list.
       rewrite map_length, seq_length.
       rewrite fold_mat_nrows, mA_nrows, Nat.max_id.
-      now apply Hj''.
+      now apply le_pow_sub_1_lt.
     }
     rewrite app_nth1. 2: {
       rewrite length_app_in_list.
@@ -462,17 +473,17 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     }
     rewrite nth_app_in_list; cycle 1. {
       rewrite fold_mat_nrows, mA_nrows.
-      now apply Hj''.
+      now apply le_pow_sub_1_lt.
     } {
       rewrite map_length, seq_length.
-      now apply Hj''.
+      now apply le_pow_sub_1_lt.
     }
     rewrite app_nth1. 2: {
       rewrite fold_corr_mat_ncols; cycle 2. {
         now rewrite mA_nrows.
       } {
         rewrite mA_ncols.
-        now apply Hj''.
+        now apply le_pow_sub_1_lt.
       }
       apply mA_is_correct.
     }
@@ -496,7 +507,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       rewrite app_nth1. 2: {
         rewrite fold_corr_mat_ncols; cycle 2. {
           rewrite mA_nrows.
-          now apply Hj''.
+          now apply le_pow_sub_1_lt.
         } {
           now rewrite mA_ncols.
         }
@@ -589,7 +600,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
           apply mA_is_correct.
         } {
           rewrite mA_nrows.
-          now apply Hj'.
+          now apply le_pow_succ_sub_1_lt.
         }
         rewrite mA_ncols.
         apply Nat.add_lt_mono_r with (p := 2 ^ n).
@@ -617,7 +628,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       rewrite app_nth2. 2: {
         rewrite fold_corr_mat_ncols; cycle 2. {
           rewrite mA_nrows.
-          now apply Hj''.
+          now apply le_pow_sub_1_lt.
         } {
           now rewrite mA_ncols.
         }
@@ -627,22 +638,18 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
         apply mA_is_correct.
       } {
         rewrite mA_nrows.
-        now apply Hj''.
+        now apply le_pow_sub_1_lt.
       }
       rewrite mA_ncols.
       rewrite (List_map_nth' 0). 2: {
-        now rewrite seq_length; apply Hj''.
+        now rewrite seq_length; apply le_pow_sub_1_lt.
       }
       rewrite (List_map_nth' 0). 2: {
         rewrite seq_length.
-        apply Hj'.
-        split; [ easy | flia Hk ].
+        apply le_pow_succ_sub_1_lt; flia Hk.
       }
-      rewrite seq_nth; [ | now apply Hj'' ].
-      rewrite seq_nth. 2: {
-        apply Hj'.
-        split; [ easy | flia Hk ].
-      }
+      rewrite seq_nth; [ | now apply le_pow_sub_1_lt ].
+      rewrite seq_nth; [ | apply le_pow_succ_sub_1_lt; flia Hk ].
       now cbn.
     }
     cbn.
@@ -700,41 +707,35 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     rewrite Nat.max_id.
     rewrite nth_app_in_list; cycle 1. {
       rewrite map_length, seq_length.
-      apply Hj'.
-      split; [ easy | flia Hi ].
+      apply le_pow_succ_sub_1_lt; flia Hi.
     } {
       rewrite map_length, fold_mat_nrows, mA_nrows.
-      apply Hj'.
-      split; [ easy | flia Hi ].
+      apply le_pow_succ_sub_1_lt; flia Hi.
     }
     rewrite app_nth2. 2: {
       rewrite (List_map_nth' 0). 2: {
         rewrite seq_length.
-        apply Hj'.
-        split; [ easy | flia Hi ].
+        apply le_pow_succ_sub_1_lt; flia Hi.
       }
       now rewrite map_length, seq_length.
     }
     rewrite (List_map_nth' 0). 2: {
       rewrite seq_length.
-      apply Hj'.
-      split; [ easy | flia Hi ].
+      apply le_pow_succ_sub_1_lt; flia Hi.
     }
     rewrite map_length, seq_length.
     rewrite (List_map_nth' []). 2: {
       rewrite fold_mat_nrows, mA_nrows.
-      apply Hj'.
-      split; [ easy | flia Hi ].
+      apply le_pow_succ_sub_1_lt; flia Hi.
     }
     rewrite (List_map_nth' 0%F). 2: {
       rewrite fold_corr_mat_ncols; cycle 1. {
         apply mA_is_correct.
       } {
         rewrite mA_nrows.
-        apply Hj'.
-        split; [ easy | flia Hi ].
+        apply le_pow_succ_sub_1_lt; flia Hi.
       }
-      now rewrite mA_ncols; apply Hj'.
+      now rewrite mA_ncols; apply le_pow_succ_sub_1_lt.
     }
     now rewrite fold_mat_el.
   }
@@ -780,22 +781,20 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       rewrite map_length, seq_length, Nat.max_id.
       rewrite nth_app_in_list; cycle 1. {
         rewrite map_length, seq_length.
-        apply Hj'; split; [ easy | flia Hi ].
+        apply le_pow_succ_sub_1_lt; flia Hi.
       } {
         rewrite map_length, fold_mat_nrows, mA_nrows.
-        apply Hj'; split; [ easy | flia Hi ].
+        apply le_pow_succ_sub_1_lt; flia Hi.
       }
       rewrite (List_map_nth' 0). 2: {
         rewrite seq_length.
-        apply Hj'; split; [ easy | flia Hi ].
+        apply le_pow_succ_sub_1_lt; flia Hi.
       }
       rewrite (List_map_nth' []). 2: {
         rewrite fold_mat_nrows, mA_nrows.
-        apply Hj'; split; [ easy | flia Hi ].
+        apply le_pow_succ_sub_1_lt; flia Hi.
       }
-      rewrite seq_nth. 2: {
-        apply Hj'; split; [ easy | flia Hi ].
-      }
+      rewrite seq_nth; [ | apply le_pow_succ_sub_1_lt; flia Hi ].
       now cbn.
     }
     cbn.
@@ -805,14 +804,14 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     }
     rewrite app_nth1. 2: {
       rewrite map_length, seq_length.
-      apply Hj'; split; [ easy | flia Hi ].
+      apply le_pow_succ_sub_1_lt; flia Hi.
     }
     rewrite (List_map_nth' 0). 2: {
       rewrite seq_length.
-      apply Hj'; split; [ easy | flia Hi ].
+      apply le_pow_succ_sub_1_lt; flia Hi.
     }
     rewrite seq_nth. 2: {
-      apply Hj'; split; [ easy | flia Hi ].
+      apply le_pow_succ_sub_1_lt; flia Hi.
     }
     rewrite δ_diag, rngl_mul_1_l.
     rewrite all_0_rngl_summation_0. 2: {
@@ -833,21 +832,21 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     rewrite app_nth1. 2: {
       rewrite length_app_in_list, fold_mat_nrows, mA_nrows.
       rewrite map_length, seq_length, Nat.max_id.
-      apply Hj'; split; [ easy | flia Hi ].
+      apply le_pow_succ_sub_1_lt; flia Hi.
     }
     rewrite nth_app_in_list; cycle 1. {
       rewrite fold_mat_nrows, mA_nrows.
-      apply Hj'; split; [ easy | flia Hi ].
+      apply le_pow_succ_sub_1_lt; flia Hi.
     } {
       rewrite map_length, seq_length.
-      apply Hj'; split; [ easy | flia Hi ].
+      apply le_pow_succ_sub_1_lt; flia Hi.
     }
     rewrite app_nth1. 2: {
       rewrite fold_corr_mat_ncols; cycle 1. {
         apply mA_is_correct.
       } {
         rewrite mA_nrows.
-        apply Hj'; split; [ easy | flia Hi ].
+        apply le_pow_succ_sub_1_lt; flia Hi.
       }
       now rewrite mA_ncols.
     }
@@ -856,13 +855,13 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       intros j Hj.
       rewrite app_nth1. 2: {
         rewrite map_length, seq_length.
-        now apply Hj''.
+        now apply le_pow_sub_1_lt.
       }
       rewrite (List_map_nth' 0). 2: {
         rewrite seq_length.
-        now apply Hj''.
+        now apply le_pow_sub_1_lt.
       }
-      rewrite seq_nth; [ | now apply Hj'' ].
+      rewrite seq_nth; [ | now apply le_pow_sub_1_lt ].
       rewrite δ_ndiag; [ | flia Hj ].
       now apply rngl_mul_0_l; left.
     }
@@ -880,10 +879,10 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
         rewrite fold_corr_mat_ncols; cycle 1. {
           apply mA_is_correct.
         } {
-          now rewrite mA_nrows; apply Hj'.
+          now rewrite mA_nrows; apply le_pow_succ_sub_1_lt.
         }
         rewrite mA_ncols.
-        apply Hj'; split; [ easy | flia Hk ].
+        apply le_pow_succ_sub_1_lt; flia Hk.
       }
       rewrite rngl_mul_opp_l; [ | easy ].
       rewrite rngl_mul_opp_r; [ | easy ].
@@ -900,9 +899,9 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     }
     cbn - [ "^" ].
     rewrite IHn; cycle 1. {
-      apply Hj'; split; [ easy | flia Hi ].
+      apply le_pow_succ_sub_1_lt; flia Hi.
     } {
-      apply Hj'; split; [ easy | flia Hk ].
+      apply le_pow_succ_sub_1_lt; flia Hk.
     }
     rewrite rngl_mul_add_distr_r, rngl_mul_1_l, rngl_add_comm.
     f_equal. 2: {
@@ -925,61 +924,61 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       rewrite map_length, seq_length, Nat.max_id.
       rewrite nth_app_in_list; cycle 1. {
         rewrite map_length, seq_length.
-        apply Hj'; split; [ easy | flia Hi ].
+        apply le_pow_succ_sub_1_lt; flia Hi.
       } {
         rewrite map_length, fold_mat_nrows, mA_nrows.
-        apply Hj'; split; [ easy | flia Hi ].
+        apply le_pow_succ_sub_1_lt; flia Hi.
       }
       rewrite (List_map_nth' 0). 2: {
         rewrite seq_length.
-        apply Hj'; split; [ easy | flia Hi ].
+        apply le_pow_succ_sub_1_lt; flia Hi.
       }
       rewrite seq_nth. 2: {
-        apply Hj'; split; [ easy | flia Hi ].
+        apply le_pow_succ_sub_1_lt; flia Hi.
       }
       cbn.
       rewrite (List_map_nth' []). 2: {
         rewrite fold_mat_nrows, mA_nrows.
-        apply Hj'; split; [ easy | flia Hi ].
+        apply le_pow_succ_sub_1_lt; flia Hi.
       }
       rewrite app_nth1. 2: {
         rewrite map_length, seq_length.
-        now apply Hj''.
+        now apply le_pow_sub_1_lt.
       }
-      rewrite (List_map_nth' 0); [ | now rewrite seq_length; apply Hj'' ].
-      rewrite seq_nth; [ cbn | now apply Hj'' ].
+      rewrite (List_map_nth' 0); [ | now rewrite seq_length; apply le_pow_sub_1_lt ].
+      rewrite seq_nth; [ cbn | now apply le_pow_sub_1_lt ].
       rewrite app_nth1. 2: {
         rewrite length_app_in_list, fold_mat_nrows, mA_nrows.
         rewrite map_length, seq_length, Nat.max_id.
-        now apply Hj''.
+        now apply le_pow_sub_1_lt.
       }
       rewrite nth_app_in_list; cycle 1. {
-        now rewrite fold_mat_nrows, mA_nrows; apply Hj''.
+        now rewrite fold_mat_nrows, mA_nrows; apply le_pow_sub_1_lt.
       } {
-        now rewrite map_length, seq_length; apply Hj''.
+        now rewrite map_length, seq_length; apply le_pow_sub_1_lt.
       }
       rewrite app_nth2. 2: {
         rewrite fold_corr_mat_ncols; cycle 1. {
           apply mA_is_correct.
         } {
-          now rewrite mA_nrows; apply Hj''.
+          now rewrite mA_nrows; apply le_pow_sub_1_lt.
         }
         now rewrite mA_ncols.
       }
       rewrite fold_corr_mat_ncols; cycle 1. {
         apply mA_is_correct.
       } {
-        now rewrite mA_nrows; apply Hj''.
+        now rewrite mA_nrows; apply le_pow_sub_1_lt.
       }
       rewrite mA_ncols.
-      rewrite (List_map_nth' 0); [ | now rewrite seq_length; apply Hj'' ].
       rewrite (List_map_nth' 0). 2: {
-        rewrite seq_length; apply Hj'; split; [ easy | flia Hk ].
+        now rewrite seq_length; apply le_pow_sub_1_lt.
       }
-      rewrite seq_nth; [ cbn | now apply Hj'' ].
-      rewrite seq_nth. 2: {
-        apply Hj'; split; [ easy | flia Hk ].
+      rewrite (List_map_nth' 0). 2: {
+        rewrite seq_length; apply le_pow_succ_sub_1_lt; flia Hk.
       }
+      rewrite seq_nth; [ cbn | now apply le_pow_sub_1_lt ].
+      rewrite seq_nth; [ | apply le_pow_succ_sub_1_lt; flia Hk ].
       now cbn.
     }
     cbn.
@@ -1288,23 +1287,71 @@ revert i Hi2n.
 induction n; intros. {
   destruct i; [ easy | now destruct i ].
 }
-...
-etransitivity; [ now rewrite mat_el_eq_rect | cbn ].
-unfold mat_list_list_el.
+cbn.
+rewrite app_nil_r.
 destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
-  rewrite (Nat.div_small i); [ | easy ].
-  rewrite (Nat.mod_small i); [ | easy ].
+  rewrite app_nth1. 2: {
+    rewrite length_app_in_list, fold_mat_nrows, mA_nrows.
+    now rewrite map_length, seq_length, Nat.max_id.
+  }
+  rewrite nth_app_in_list; cycle 1. {
+    now rewrite fold_mat_nrows, mA_nrows.
+  } {
+    now rewrite map_length, seq_length.
+  }
+  rewrite app_nth1. 2: {
+    rewrite fold_corr_mat_ncols; cycle 1. {
+      apply mA_is_correct.
+    } {
+      now rewrite mA_nrows.
+    }
+    now rewrite mA_ncols.
+  }
   now apply IHn.
 } {
   apply Nat.nlt_ge in Hin.
-  rewrite (Nat_div_less_small 1); [ | now rewrite Nat.mul_1_l ].
-  rewrite (Nat_mod_less_small 1); [ | now rewrite Nat.mul_1_l ].
-  cbn; rewrite Nat.add_0_r.
-  rewrite <- rngl_opp_involutive; [ | easy ].
-  rewrite rngl_opp_0; [ f_equal | easy ].
-  apply IHn.
-  cbn in Hi2n.
-  flia Hi2n Hin.
+  rewrite app_nth2. 2: {
+    rewrite length_app_in_list, fold_mat_nrows, mA_nrows.
+    now rewrite map_length, seq_length, Nat.max_id.
+  }
+  rewrite length_app_in_list, fold_mat_nrows, mA_nrows.
+  rewrite map_length, seq_length, Nat.max_id.
+  rewrite nth_app_in_list; cycle 1. {
+    rewrite map_length, seq_length.
+    apply le_pow_succ_sub_1_lt; flia Hi2n.
+  } {
+    rewrite map_length, fold_mat_nrows, mA_nrows.
+    apply le_pow_succ_sub_1_lt; flia Hi2n.
+  }
+  rewrite app_nth2. 2: {
+    rewrite (List_map_nth' 0). 2: {
+      rewrite seq_length.
+      apply le_pow_succ_sub_1_lt; flia Hi2n.
+    }
+    now rewrite map_length, seq_length.
+  }
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    apply le_pow_succ_sub_1_lt; flia Hi2n.
+  }
+  rewrite map_length, seq_length.
+  rewrite (List_map_nth' []). 2: {
+    rewrite fold_mat_nrows, mA_nrows.
+    apply le_pow_succ_sub_1_lt; flia Hi2n.
+  }
+  rewrite (List_map_nth' 0%F). 2: {
+    rewrite fold_corr_mat_ncols; cycle 1. {
+      apply mA_is_correct.
+    } {
+      rewrite mA_nrows.
+      apply le_pow_succ_sub_1_lt; flia Hi2n.
+    }
+    rewrite mA_ncols.
+    apply le_pow_succ_sub_1_lt; flia Hi2n.
+  }
+  rewrite fold_mat_el.
+  rewrite IHn; [ | apply le_pow_succ_sub_1_lt; flia Hi2n ].
+  now apply rngl_opp_0.
 }
 Qed.
 
@@ -1333,6 +1380,7 @@ destruct n. {
   intros V.
   cbn in Hμ, V |-*.
   apply vector_eq.
+...
   intros i Hi; cbn in Hi |-*.
   apply Nat.lt_1_r in Hi; subst i.
   unfold iter_seq, iter_list; cbn.
