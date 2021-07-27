@@ -1368,7 +1368,7 @@ Theorem An_eigen_equation_for_sqrt_n :
   rngl_has_dec_eq = true →
   ∀ n μ, (μ * μ)%F = rngl_of_nat n →
   match n with
-  | 0 => ∀ V, (mA 0 • V = μ × V)%V
+  | 0 => ∀ V, vect_size V = 1 → (mA 0 • V = μ × V)%V
   | S n' =>
       ∀ U V,
       V = A_Sn_eigenvector_of_sqrt_Sn n' μ U
@@ -1377,19 +1377,16 @@ Theorem An_eigen_equation_for_sqrt_n :
 Proof.
 intros Hic Hro Hin Hde * Hμ.
 destruct n. {
-  intros V.
+  intros V Hv.
   cbn in Hμ, V |-*.
   apply vector_eq.
-(**)
   intros i; cbn.
   rewrite nth_error_map.
   unfold option_map.
-  unfold vect_dot_mul.
-  cbn.
+  unfold vect_dot_mul; cbn.
   destruct V as (la); cbn.
-  destruct la as [| a]; cbn. {
-    rewrite rngl_summation_list_empty; [ | easy ].
-    destruct i; cbn. {
+  destruct la as [| a]; [ easy | ].
+  destruct la; [ | easy ].
 ...
 Search nth_error.
 Search (nth_error _ _ = nth_error _ _).
