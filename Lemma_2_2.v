@@ -1371,7 +1371,8 @@ Theorem An_eigen_equation_for_sqrt_n :
   | 0 => ∀ V, vect_size V = 1 → (mA 0 • V = μ × V)%V
   | S n' =>
       ∀ U V,
-      V = A_Sn_eigenvector_of_sqrt_Sn n' μ U
+      vect_size U = 2 ^ n'
+      → V = A_Sn_eigenvector_of_sqrt_Sn n' μ U
       → (mA (S n') • V = μ × V)%V
   end.
 Proof.
@@ -1403,7 +1404,7 @@ destruct n. {
   }
   now destruct i.
 }
-intros * HV.
+intros * HU HV.
 subst V.
 unfold A_Sn_eigenvector_of_sqrt_Sn.
 rewrite mat_vect_mul_assoc; cycle 1. {
@@ -1509,6 +1510,46 @@ rewrite mat_vect_mul_assoc; cycle 1. {
     }
   }
 } {
+  rewrite mA_ncols.
+  unfold mat_of_list_list_1_row_2_col.
+  cbn - [ "^" ].
+  rewrite app_nil_r, app_length.
+  rewrite map2_length.
+  rewrite fold_mat_nrows, mA_nrows.
+  rewrite map_length, map_length, seq_length, Nat.min_id.
+  now cbn; rewrite Nat.add_0_r.
+} {
+  unfold mat_of_list_list_1_row_2_col.
+  unfold mat_ncols; cbn.
+  rewrite app_nil_r.
+  rewrite List_hd_nth_0.
+  rewrite app_nth1. 2: {
+    rewrite map2_length.
+    rewrite fold_mat_nrows, mA_nrows.
+    rewrite map_length, map_length, seq_length, Nat.min_id.
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  }
+  rewrite map2_nth with (a := []) (b := []); cycle 1. {
+    rewrite fold_mat_nrows, mA_nrows.
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  } {
+    rewrite map_length, map_length, seq_length.
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  }
+  rewrite map2_length.
+  rewrite <- List_hd_nth_0.
+  rewrite fold_mat_ncols, mA_ncols.
+  rewrite (List_map_nth' []). 2: {
+    rewrite map_length, seq_length.
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  }
+  rewrite map_length.
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  }
+  now rewrite map_length, seq_length, Nat.min_id.
+}
 ...
 rewrite mat_vect_mul_assoc; [ | easy ].
 rewrite mat_mul_scal_vect_assoc; [ | easy ].
