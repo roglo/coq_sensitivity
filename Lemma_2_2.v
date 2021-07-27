@@ -1550,6 +1550,7 @@ rewrite mat_vect_mul_assoc; cycle 1. {
   }
   now rewrite map_length, seq_length, Nat.min_id.
 }
+unfold mat_of_list_list_1_row_2_col.
 ...
 rewrite mat_vect_mul_assoc; [ | easy ].
 rewrite mat_mul_scal_vect_assoc; [ | easy ].
