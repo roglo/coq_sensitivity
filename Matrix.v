@@ -120,10 +120,10 @@ Record correct_matrix T := mk_cm
   { cm_mat : matrix T;
     cm_prop : is_correct_matrix cm_mat }.
 
-Theorem fold_corr_mat_ncols {T} : ∀ (M : matrix T),
+Theorem fold_corr_mat_ncols {T} : ∀ (M : matrix T) d,
   is_correct_matrix M
   → ∀ i, i < mat_nrows M
-  → length (nth i (mat_list_list M) []) = mat_ncols M.
+  → length (nth i (mat_list_list M) d) = mat_ncols M.
 Proof.
 intros * Hm * Him.
 destruct Hm as (Hcr, Hc).

@@ -1550,6 +1550,68 @@ rewrite mat_vect_mul_assoc; cycle 1. {
   }
   now rewrite map_length, seq_length, Nat.min_id.
 }
+rewrite mat_mul_scal_vect_assoc; cycle 1. {
+  easy.
+} {
+  unfold mat_of_list_list_1_row_2_col.
+  unfold is_correct_matrix.
+  unfold mat_ncols, mat_of_mat_list_list; cbn.
+  rewrite List_hd_nth_0.
+  rewrite app_nth1. 2: {
+    rewrite map2_length, fold_mat_nrows, mA_nrows.
+    rewrite map_length, map_length, seq_length, Nat.min_id.
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  }
+  rewrite map2_nth with (a := []) (b := []); cycle 1. {
+    rewrite fold_mat_nrows, mA_nrows.
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  } {
+    rewrite map_length, map_length, seq_length.
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  }
+  rewrite map2_length.
+  rewrite <- List_hd_nth_0.
+  rewrite fold_mat_ncols, mA_ncols.
+  rewrite (List_map_nth' []). 2: {
+    rewrite map_length, seq_length.
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  }
+  rewrite map_length.
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  }
+  rewrite map_length, seq_length, Nat.min_id.
+  split; [ now intros Hc; apply Nat.pow_nonzero in Hc | ].
+  intros l Hl.
+  apply in_app_or in Hl.
+  destruct Hl as [Hl| Hl]. {
+    apply in_map2_iff in Hl.
+    destruct Hl as (i & Hi & la & lb & Hl).
+    rewrite fold_mat_nrows, mA_nrows in Hi.
+    rewrite map_length, map_length, seq_length, Nat.min_id in Hi.
+    subst l.
+    rewrite map2_length.
+    rewrite fold_corr_mat_ncols; cycle 1. {
+      apply mA_is_correct.
+    } {
+      now rewrite mA_nrows.
+    }
+    rewrite mA_ncols.
+    rewrite (List_map_nth' []); [ | now rewrite map_length, seq_length ].
+    rewrite map_length.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    now rewrite map_length, seq_length, Nat.min_id.
+  } {
+    rewrite app_nil_r in Hl.
+    apply in_map_iff in Hl.
+    destruct Hl as (i & Hl & Hi); subst l.
+    now rewrite map_length, seq_length.
+  }
+} {
+...
+f_equal.
+
 unfold mat_of_list_list_1_row_2_col.
 ...
 rewrite mat_vect_mul_assoc; [ | easy ].
