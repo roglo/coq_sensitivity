@@ -1270,98 +1270,7 @@ f_equal. {
 }
 Qed.
 
-Inspect 1.
-
-...
-
-Theorem m_o_mll_2x2_2x1 : ∀ n (M1 M2 M3 M4 M5 M6 : matrix n n T),
-  (mat_of_mat_list_list [[M1; M2]; [M3; M4]] *
-   mat_of_mat_list_list [[M5]; [M6]])%M =
-   mat_of_mat_list_list [[M1 * M5 + M2 * M6]; [M3 * M5 + M4 * M6]]%M.
-Proof.
-intros.
-apply matrix_eq; cbn.
-intros * Hi Hj.
-rewrite Nat.mul_1_r in Hj.
-unfold mat_mul, mat_add; cbn.
-unfold mat_list_list_el; cbn.
-rewrite (Nat.div_small j); [ | flia Hj ].
-rewrite (Nat.mod_small j); [ | flia Hj ].
-...
-rewrite (rngl_summation_split _ n); [ | flia Hi ].
-rewrite rngl_summation_split_last; [ | flia ].
-assert (H : n ≠ 0) by flia Hj.
-rewrite Nat.div_same; [ | easy ].
-rewrite Nat.mod_same; [ clear H | easy ].
-erewrite rngl_summation_eq_compat. 2: {
-  intros k Hk.
-  rewrite (Nat.div_small (k - 1)); [ | flia Hk ].
-  rewrite (Nat.mod_small (k - 1)); [ | flia Hk ].
-  easy.
-}
-cbn.
-erewrite (rngl_summation_eq_compat _ _ _ (n + 1)). 2: {
-  intros k Hk.
-  rewrite (Nat_div_less_small 1); [ | flia Hk ].
-  rewrite (@Nat_mod_less_small 1 k); [ | flia Hk ].
-  rewrite Nat.mul_1_l.
-  easy.
-}
-cbn.
-destruct (lt_dec i n) as [Hir1| Hir1]. {
-  rewrite Nat.div_small; [ | easy ].
-  rewrite Nat.mod_small; [ | easy ].
-  cbn.
-  rewrite <- rngl_add_assoc.
-  f_equal. {
-    rewrite rngl_summation_shift; [ | flia Hj ].
-    apply rngl_summation_eq_compat.
-    intros k Hk.
-    now rewrite Nat.add_comm, Nat.add_sub.
-  }
-  destruct (Nat.eq_dec n 1) as [Hc11| Hc11]. {
-    subst n; cbn.
-    unfold iter_seq, iter_list; cbn.
-    now rewrite rngl_add_0_r, rngl_add_0_l.
-  }
-  rewrite rngl_summation_shift; [ | flia Hc11 Hj ].
-  replace (n * 2 - 1 - (n + 1)) with (n - 2) by flia.
-  rewrite (rngl_summation_split_first _ _ (n - 1)); [ | flia Hc11 ].
-  rewrite (rngl_summation_shift _ 1); [ | flia Hc11 Hir1 ].
-  f_equal.
-  replace (n - 1 - 1) with (n - 2) by flia.
-  apply rngl_summation_eq_compat.
-  intros k Hk.
-  now rewrite <- Nat.add_assoc, Nat.add_comm, Nat.add_sub.
-} {
-  apply Nat.nlt_ge in Hir1.
-  rewrite (Nat_div_less_small 1); [ | flia Hir1 Hi ].
-  rewrite (Nat_mod_less_small 1); [ | flia Hir1 Hi ].
-  cbn.
-  rewrite Nat.add_0_r, <- rngl_add_assoc.
-  f_equal. {
-    rewrite rngl_summation_shift; [ | flia Hi ].
-    apply rngl_summation_eq_compat.
-    intros k Hk.
-    now rewrite Nat.add_comm, Nat.add_sub.
-  }
-  destruct (Nat.eq_dec n 1) as [Hc11| Hc11]. {
-    subst n; cbn.
-    unfold iter_seq, iter_list; cbn.
-    now rewrite rngl_add_0_r, rngl_add_0_l.
-  }
-  rewrite rngl_summation_shift; [ | flia Hi Hc11 ].
-  replace (n * 2 - 1 - (n + 1)) with (n - 2) by flia.
-  rewrite (rngl_summation_split_first _ _ (n - 1)); [ | flia Hc11 ].
-  rewrite (rngl_summation_shift _ 1); [ | flia Hi Hc11 ].
-  f_equal.
-  replace (n - 1 - 1) with (n - 2) by flia.
-  apply rngl_summation_eq_compat.
-  intros k Hk.
-  now rewrite <- Nat.add_assoc, Nat.add_comm, Nat.add_sub.
-}
-Qed.
-
+(*
 Definition mat_of_list_list_1_row_2_col {n} (A B : matrix (2 ^ n) (2 ^ n) T) :
     matrix (2 ^ S n) (2 ^ n) T :=
   eq_rect _ (λ m, matrix (2 ^ S n) m T)
@@ -1369,6 +1278,9 @@ Definition mat_of_list_list_1_row_2_col {n} (A B : matrix (2 ^ n) (2 ^ n) T) :
        (mat_of_mat_list_list [[A]; [B]]) _
        (two_pow_n_mul_two n)) _
     (Nat.mul_1_r (2 ^ n)).
+*)
+
+...
 
 Definition base_vector_1 dim :=
   mk_vect dim (λ i, match i with 0 => 1%F | _ => 0%F end).
