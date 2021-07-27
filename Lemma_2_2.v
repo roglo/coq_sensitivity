@@ -1023,21 +1023,26 @@ Qed.
 
 Theorem m_o_mll_2x2_2x1 : ∀ n (M1 M2 M3 M4 M5 M6 : matrix T),
   is_square_matrix n M1 = true
+  → is_square_matrix n M3 = true
   → is_square_matrix n M5 = true
   → mat_nrows M2 = n
-  → mat_nrows M3 = n
   → mat_nrows M4 = n
   → mat_ncols M2 = n
+  → mat_ncols M4 = n
   → mat_ncols M6 = n
   → (mat_of_mat_list_list [[M1; M2]; [M3; M4]] *
      mat_of_mat_list_list [[M5]; [M6]])%M =
      mat_of_mat_list_list [[M1 * M5 + M2 * M6]; [M3 * M5 + M4 * M6]]%M.
 Proof.
-intros * Hs1 Hs5 Hr2 Hr3 Hr4 Hc2 Hc6.
+intros * Hs1 Hs3 Hs5 Hr2 Hr4 Hc2 Hc4 Hc6.
 specialize (square_matrix_ncols _ Hs1) as Hc1.
 apply is_sm_mat_iff in Hs1.
 destruct Hs1 as (Hr1 & Hcr1 & Hc1').
 move Hr1 before Hc1.
+specialize (square_matrix_ncols _ Hs3) as Hc3.
+apply is_sm_mat_iff in Hs3.
+destruct Hs3 as (Hr3 & Hcr3 & Hc3').
+move Hr3 before Hc3.
 specialize (square_matrix_ncols _ Hs5) as Hc5.
 apply is_sm_mat_iff in Hs5.
 destruct Hs5 as (Hr5 & Hcr5 & Hc5').
@@ -1211,62 +1216,62 @@ f_equal. {
     }
     easy.
   }
-...
+  cbn.
+  rewrite (rngl_summation_split (n - 1)); [ | flia ].
+  f_equal. {
+    unfold mat_mul_el.
+    rewrite Hc3.
+    apply rngl_summation_eq_compat.
+    intros j Hj.
+    rewrite seq_nth; [ | easy ].
+    rewrite app_nth1. 2: {
+      rewrite fold_corr_mat_ncols; cycle 1. {
+        split; [ easy | now rewrite Hc3 ].
+      } {
+        now rewrite Hr3.
+      }
+      rewrite Hc3; flia Hj Hnz.
+    }
+    rewrite fold_mat_el.
+    f_equal.
+    rewrite app_nth1. 2: {
+      rewrite fold_mat_nrows, Hr5.
+      flia Hj Hnz.
+    }
+    apply fold_mat_el.
+  } {
+    rewrite Nat.sub_add; [ | easy ].
+    rewrite rngl_summation_shift; [ | flia ].
+    rewrite Nat_sub_sub_swap, Nat.add_sub.
+    unfold mat_mul_el; rewrite Hc4.
+    apply rngl_summation_eq_compat.
+    intros j Hj.
     rewrite app_nth2. 2: {
       rewrite fold_corr_mat_ncols; cycle 1. {
         split; [ easy | now rewrite Hc3 ].
       } {
         now rewrite Hr3.
       }
-      rewrite Hc3.
-...
-      }
-...
-
-    rewrite fold_corr_mat_ncols; cycle 1. {
-        split; [ easy | now rewrite Hc1 ].
-      } {
-        now rewrite Hr1.
-      }
-      now rewrite Hc1.
+      rewrite Hc3; flia.
     }
     rewrite fold_corr_mat_ncols; cycle 1. {
-      split; [ easy | now rewrite Hc1 ].
+      split; [ easy | now rewrite Hc3 ].
     } {
-      now rewrite Hr1.
+      now rewrite Hr3.
     }
-    rewrite Hc1, fold_mat_el.
-...
+    rewrite Hc3, Nat.add_comm, Nat.add_sub.
+    rewrite fold_mat_el.
     rewrite app_nth2. 2: {
-      rewrite fold_corr_mat_ncols; cycle 1. {
-        split;[ easy | now rewrite Hc1 ].
-      } {
-        now rewrite Hr1.
-      }
-      rewrite Hc1.
-...
-  apply in_seq in Hi.
-  destruct Hi as (_, Hi); cbn in Hi.
-  destruct (lt_dec i n) as [Hin| Hin]. {
-    rewrite app_nth1. 2: {
-      rewrite length_app_in_list.
-      do 2 rewrite fold_mat_nrows.
-      now rewrite Hr1, Hr2, Nat.max_id.
+      rewrite fold_mat_nrows, Hr5; flia.
     }
-    easy.
+    rewrite fold_mat_nrows, Hr5.
+    now rewrite Nat.add_sub, fold_mat_el, seq_nth.
   }
-cbn.
-
-...
-erewrite (map_ext_in _ _ (seq 0 n)). 2: {
-  intros i Hi.
-  rewrite map2_map_l, map2_map_r, Hc5, Hc6.
-  now rewrite map2_diag.
 }
-unfold mat_mul_el.
-...
-erewrite (map_ext_in _ _ (seq 0 n)). 2: {
-  intros i Hi.
+Qed.
+
+Inspect 1.
+
 ...
 
 Theorem m_o_mll_2x2_2x1 : ∀ n (M1 M2 M3 M4 M5 M6 : matrix n n T),
