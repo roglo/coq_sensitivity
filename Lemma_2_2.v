@@ -1118,6 +1118,79 @@ erewrite map_ext_in. 2: {
   now cbn.
 }
 cbn.
+rewrite Hc5, Hc6.
+f_equal. {
+  apply map_ext_in.
+  intros i Hi.
+  rewrite map2_map_l, map2_map_r, map2_diag.
+  apply map_ext_in.
+  intros k Hk; move k before i.
+  unfold mat_mul_el.
+  rewrite Hc1, Hc2.
+  rewrite (rngl_summation_split (n - 1)); [ | flia ].
+  rewrite Nat.sub_add; [ | flia Hnz ].
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j Hj.
+    rewrite app_nth1. 2: {
+      rewrite fold_corr_mat_ncols; cycle 1. {
+        split; [ easy | now rewrite Hc1 ].
+      } {
+        now apply in_seq in Hi; rewrite Hr1.
+      }
+      rewrite Hc1; flia Hnz Hj.
+    }
+    rewrite app_nth1. 2: {
+      rewrite fold_mat_nrows, Hr5.
+      flia Hj Hnz.
+    }
+    now do 2 rewrite fold_mat_el.
+  }
+  f_equal.
+  apply in_seq in Hi.
+  rewrite rngl_summation_shift; [ | flia ].
+  rewrite Nat_sub_sub_swap, Nat.add_sub.
+  apply rngl_summation_eq_compat.
+  intros j Hj.
+  rewrite app_nth2. 2: {
+    rewrite fold_corr_mat_ncols; cycle 1. {
+      split; [ easy | now rewrite Hc1 ].
+    } {
+      now rewrite Hr1.
+    }
+    rewrite Hc1; flia.
+  }
+  rewrite fold_corr_mat_ncols; cycle 1. {
+    split; [ easy | now rewrite Hc1 ].
+  } {
+    now rewrite Hr1.
+  }
+  rewrite Hc1, fold_mat_el.
+  rewrite Nat.add_comm, Nat.add_sub.
+  f_equal.
+  rewrite app_nth2. 2: {
+    rewrite fold_mat_nrows, Hr5; flia.
+  }
+  rewrite fold_mat_nrows, Hr5, Nat.add_sub.
+  apply fold_mat_el.
+} {
+Search (map _ _ = map _ _).
+Search (seq _ _ = seq _ _).
+Search (map _ (seq _ _)).
+...
+
+    rewrite fold_corr_mat_ncols; cycle 1. {
+        split; [ easy | now rewrite Hc1 ].
+      } {
+        now rewrite Hr1.
+      }
+      now rewrite Hc1.
+    }
+    rewrite fold_corr_mat_ncols; cycle 1. {
+      split; [ easy | now rewrite Hc1 ].
+    } {
+      now rewrite Hr1.
+    }
+    rewrite Hc1, fold_mat_el.
 ...
     rewrite app_nth2. 2: {
       rewrite fold_corr_mat_ncols; cycle 1. {
