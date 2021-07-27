@@ -1270,28 +1270,14 @@ f_equal. {
 }
 Qed.
 
-(*
-Definition mat_of_list_list_1_row_2_col {n} (A B : matrix (2 ^ n) (2 ^ n) T) :
-    matrix (2 ^ S n) (2 ^ n) T :=
-  eq_rect _ (λ m, matrix (2 ^ S n) m T)
-    (eq_rect _ (λ m, matrix m (2 ^ n * 1) T)
-       (mat_of_mat_list_list [[A]; [B]]) _
-       (two_pow_n_mul_two n)) _
-    (Nat.mul_1_r (2 ^ n)).
-*)
-
-...
+Definition mat_of_list_list_1_row_2_col (A B : matrix T) : matrix T :=
+  mat_of_mat_list_list [[A]; [B]].
 
 Definition base_vector_1 dim :=
-  mk_vect dim (λ i, match i with 0 => 1%F | _ => 0%F end).
+  mk_vect (1%F :: repeat 0%F (dim - 1)).
 
-Definition A_Sn_eigenvector_of_sqrt_Sn n μ (V : vector (2 ^ n) T) :
-    vector (2 ^ S n) T :=
+Definition A_Sn_eigenvector_of_sqrt_Sn n μ (V : vector T) : vector T :=
   (mat_of_list_list_1_row_2_col (mA n + μ × mI (2 ^ n))%M (mI (2 ^ n)) • V)%M.
-
-(*
-...
-*)
 
 Theorem mA_diag_zero :
   rngl_has_opp = true →
@@ -1299,7 +1285,10 @@ Theorem mA_diag_zero :
 Proof.
 intros Hop * Hi2n.
 revert i Hi2n.
-induction n; intros; [ easy | cbn ].
+induction n; intros. {
+  destruct i; [ easy | now destruct i ].
+}
+...
 etransitivity; [ now rewrite mat_el_eq_rect | cbn ].
 unfold mat_list_list_el.
 destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
