@@ -1379,6 +1379,15 @@ intros Hic Hro Hin Hde * Hμ.
 destruct n. {
   intros V Hv.
   cbn in Hμ, V |-*.
+  assert (H : μ = 0%F). {
+    destruct (rngl_eq_dec Hde μ 0%F) as [Hμz| Hμz]; [ easy | ].
+    apply (f_equal (rngl_mul (μ⁻¹)%F)) in Hμ.
+    rewrite rngl_mul_0_r in Hμ; [ | now left ].
+    rewrite rngl_mul_assoc in Hμ.
+    rewrite rngl_mul_inv_l in Hμ; [ | easy | easy ].
+    now rewrite rngl_mul_1_l in Hμ.
+  }
+  subst μ.
   apply vector_eq.
   intros i; cbn.
   rewrite nth_error_map.
@@ -1387,24 +1396,17 @@ destruct n. {
   destruct V as (la); cbn.
   destruct la as [| a]; [ easy | ].
   destruct la; [ | easy ].
-...
-Search nth_error.
-Search (nth_error _ _ = nth_error _ _).
-...
-  intros i Hi; cbn in Hi |-*.
-  apply Nat.lt_1_r in Hi; subst i.
-  unfold iter_seq, iter_list; cbn.
-  rewrite rngl_mul_0_l, rngl_add_0_l; [ | now left ].
-  specialize rngl_integral as H.
-  rewrite Hro, Hin, Hde in H; cbn in H.
-  rewrite Bool.orb_true_r in H.
-  apply (H (or_introl eq_refl) eq_refl) in Hμ.
-  symmetry.
-  now destruct Hμ; subst μ; apply rngl_mul_0_l; left.
+  unfold iter_list; cbn.
+  rewrite rngl_add_0_l, rngl_mul_0_l; [ | now left ].
+  destruct i; cbn. {
+    rewrite rngl_mul_0_l; [ easy | now left ].
+  }
+  now destruct i.
 }
 intros * HV.
 subst V.
 unfold A_Sn_eigenvector_of_sqrt_Sn.
+...
 rewrite mat_vect_mul_assoc; [ | easy ].
 rewrite mat_mul_scal_vect_assoc; [ | easy ].
 cbn - [ Nat.pow ].
