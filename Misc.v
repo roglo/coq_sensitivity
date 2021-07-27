@@ -2196,6 +2196,13 @@ rewrite Nat.sub_succ.
 apply Nat.sub_0_r.
 Qed.
 
+Theorem iter_list_empty : ∀ T A d (op : T → T → T) (l : list A) g,
+  l = []
+  → iter_list l (λ c i, op c (g i)) d = d.
+Proof.
+now intros * Hl; subst l.
+Qed.
+
 Theorem iter_seq_empty : ∀ T d (op : T → T → T) b k g,
   k < b
   → iter_seq b k (λ (c : T) (i : nat), op c (g i)) d = d.

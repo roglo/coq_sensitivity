@@ -164,6 +164,13 @@ intros b k g.
 apply iter_seq_succ_succ.
 Qed.
 
+Theorem rngl_summation_list_empty : ∀ A g (l : list A),
+  l = [] → ∑ (i ∈ l), g i = 0%F.
+Proof.
+intros * Hl.
+now apply iter_list_empty.
+Qed.
+
 Theorem rngl_summation_empty : ∀ g b k,
   k < b → (∑ (i = b, k), g i = 0)%F.
 Proof.

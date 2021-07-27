@@ -1380,6 +1380,19 @@ destruct n. {
   intros V.
   cbn in Hμ, V |-*.
   apply vector_eq.
+(**)
+  intros i; cbn.
+  rewrite nth_error_map.
+  unfold option_map.
+  unfold vect_dot_mul.
+  cbn.
+  destruct V as (la); cbn.
+  destruct la as [| a]; cbn. {
+    rewrite rngl_summation_list_empty; [ | easy ].
+    destruct i; cbn. {
+...
+Search nth_error.
+Search (nth_error _ _ = nth_error _ _).
 ...
   intros i Hi; cbn in Hi |-*.
   apply Nat.lt_1_r in Hi; subst i.
