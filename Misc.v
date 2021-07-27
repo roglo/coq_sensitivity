@@ -1150,21 +1150,22 @@ induction l; [ easy | cbn ].
 apply List_last_app.
 Qed.
 
-Theorem List_map_fun : ∀ A B d l l' (f : A → B),
+Theorem List_map_fun : ∀ A B d l l' (f g : A → B),
   length l = length l'
-  → (∀ i, f (nth i l d) = f (nth i l' d))
-  → map f l = map f l'.
+  → (∀ i, i < length l → f (nth i l d) = g (nth i l' d))
+  → map f l = map g l'.
 Proof.
 intros * Hlen Hf.
 revert l' Hlen Hf.
 induction l as [| a l]; intros; [ now destruct l' | ].
 destruct l' as [| a' l']; [ easy | cbn ].
-specialize (Hf 0) as H1; cbn in H1.
+specialize (Hf 0 (Nat.lt_0_succ _)) as H1; cbn in H1.
 rewrite H1; f_equal.
 cbn in Hlen; apply Nat.succ_inj in Hlen.
 apply IHl; [ easy | ].
-intros i.
-now specialize (Hf (S i)).
+intros i Hi.
+apply Hf with (i := S i); cbn.
+now apply -> Nat.succ_lt_mono.
 Qed.
 
 Theorem List_map_nth' : ∀ A B a b (f : A → B) l n,

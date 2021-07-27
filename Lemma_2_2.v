@@ -1173,9 +1173,54 @@ f_equal. {
   rewrite fold_mat_nrows, Hr5, Nat.add_sub.
   apply fold_mat_el.
 } {
-Search (map _ _ = map _ _).
-Search (seq _ _ = seq _ _).
-Search (map _ (seq _ _)).
+  erewrite List_map_fun with (l' := seq 0 n) (d := 0); [ easy | | ]. {
+    now do 2 rewrite seq_length.
+  }
+  cbn.
+  intros i Hi.
+  rewrite seq_length in Hi.
+  rewrite map2_map_l, map2_map_r.
+  unfold mat_ncols; cbn.
+  rewrite app_nth2. 2: {
+    rewrite seq_nth; [ | easy ].
+    rewrite length_app_in_list.
+    do 2 rewrite fold_mat_nrows.
+    rewrite Hr1, Hr2, Nat.max_id; flia.
+  }
+  rewrite List_hd_nth_0.
+  rewrite app_nth1; [ | now rewrite fold_mat_nrows, Hr5 ].
+  do 3 rewrite <- List_hd_nth_0.
+  rewrite fold_mat_ncols, Hc5.
+  rewrite map2_diag.
+  apply map_ext_in.
+  intros k Hk; move k before i.
+  rewrite app_length.
+  do 2 rewrite fold_mat_ncols.
+  rewrite Hc1, Hc2.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j Hj.
+    rewrite seq_nth; [ | easy ].
+    rewrite length_app_in_list.
+    do 2 rewrite fold_mat_nrows.
+    rewrite Hr1, Hr2, Nat.max_id.
+    rewrite Nat.add_comm, Nat.add_sub.
+    rewrite nth_app_in_list; cycle 1. {
+      now rewrite fold_mat_nrows, Hr3.
+    } {
+      now rewrite fold_mat_nrows, Hr4.
+    }
+    easy.
+  }
+...
+    rewrite app_nth2. 2: {
+      rewrite fold_corr_mat_ncols; cycle 1. {
+        split; [ easy | now rewrite Hc3 ].
+      } {
+        now rewrite Hr3.
+      }
+      rewrite Hc3.
+...
+      }
 ...
 
     rewrite fold_corr_mat_ncols; cycle 1. {
