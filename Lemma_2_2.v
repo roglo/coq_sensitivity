@@ -1733,6 +1733,8 @@ do 2 rewrite app_nil_r.
 do 2 rewrite map_length.
 rewrite seq_length.
 rewrite map_app.
+Inspect 8.
+...
 f_equal. {
   rewrite map2_map_l, map2_map_r.
   rewrite mA_nrows.
@@ -1741,9 +1743,10 @@ f_equal. {
   rewrite map2_map_r.
   rewrite map_map2.
   rewrite map_map.
-...
-Search (map _ _ = map _ _).
-  apply map_ext_in.
+  rewrite mat_add_ncols.
+  rewrite mA_ncols.
+  unfold mat_ncols; cbn.
+  rewrite <- map_map2.
 ...
 rewrite mat_vect_mul_assoc; [ | easy ].
 rewrite mat_mul_scal_vect_assoc; [ | easy ].
