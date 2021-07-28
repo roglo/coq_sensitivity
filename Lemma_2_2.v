@@ -1726,6 +1726,24 @@ rewrite m_o_mll_2x2_2x1 with (n := 2 ^ n); cycle 1. {
 } {
   apply mI_ncols.
 }
+unfold "×"%M.
+unfold mat_of_mat_list_list.
+cbn; f_equal.
+do 2 rewrite app_nil_r.
+do 2 rewrite map_length.
+rewrite seq_length.
+rewrite map_app.
+f_equal. {
+  rewrite map2_map_l, map2_map_r.
+  rewrite mA_nrows.
+  rewrite map2_diag.
+  rewrite map2_map_r.
+  rewrite map2_map_r.
+  rewrite map_map2.
+  rewrite map_map.
+...
+Search (map _ _ = map _ _).
+  apply map_ext_in.
 ...
 rewrite mat_vect_mul_assoc; [ | easy ].
 rewrite mat_mul_scal_vect_assoc; [ | easy ].
