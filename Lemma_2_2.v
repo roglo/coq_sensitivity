@@ -1642,8 +1642,17 @@ rewrite mat_mul_scal_vect_assoc; cycle 1. {
   now rewrite map_length, seq_length, Nat.min_id.
 }
 f_equal.
-unfold mat_of_list_list_1_row_2_col.
-cbn.
+unfold mat_of_list_list_1_row_2_col; cbn.
+rewrite m_o_mll_2x2_2x1 with (n := 2 ^ n); cycle 1. {
+Search is_square_matrix.
+Theorem mA_is_square_matrix : ∀ n, is_square_matrix (2 ^ n) (mA n) = true.
+Proof.
+intros.
+apply is_sm_mat_iff.
+rewrite mA_nrows, mA_ncols.
+split; [ easy | ].
+split; [ easy | ].
+intros l Hl.
 ...
 rewrite mat_vect_mul_assoc; [ | easy ].
 rewrite mat_mul_scal_vect_assoc; [ | easy ].
