@@ -1294,9 +1294,22 @@ revert i Hi2n.
 induction n; intros. {
   destruct i; [ easy | now destruct i ].
 }
-cbn.
-rewrite app_nil_r.
+unfold mat_el.
 destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
+...
+  cbn - [ mat_list_list ].
+...
+Theorem glop : ∀ (mll : list (list (matrix T))) i j,
+  nth j (nth i (mat_list_list (mat_of_mat_list_list mll)) []) 0%F =
+  nth j (nth i mll []) 0%F.
+...
+rewrite glop.
+  unfold mat_of_mat_list_list.
+  cbn - [ flatten_list_list map ].
+unfold mat_el in IHn.
+Search flatten_list_list.
+Print flatten_list_list.
+cbn.
   rewrite app_nth1. 2: {
     rewrite length_app_in_list, fold_mat_nrows, mA_nrows.
     now rewrite map_length, seq_length, Nat.max_id.
@@ -1317,6 +1330,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
   now apply IHn.
 } {
   apply Nat.nlt_ge in Hin.
+cbn; rewrite app_nil_r.
   rewrite app_nth2. 2: {
     rewrite length_app_in_list, fold_mat_nrows, mA_nrows.
     now rewrite map_length, seq_length, Nat.max_id.
@@ -1361,6 +1375,8 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
   now apply rngl_opp_0.
 }
 Qed.
+
+...
 
 Theorem rngl_mul_eq_if : ∀ a b c d, a = c → b = d → (a * b = c * d)%F.
 Proof.

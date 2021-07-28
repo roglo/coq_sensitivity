@@ -49,10 +49,6 @@ Definition mat_el {T} {ro : ring_like_op T} (M : matrix T) i j :=
   nth j (nth i (mat_list_list M) []) 0%F.
 
 (*
-Theorem matrix_eq : ∀ T (MA MB : matrix T),
-  (∀ i j, mat_el MA i j = mat_el MB i j)
-  → MA = MB.
-
 Theorem vector_eq {T} (U V : vector T) :
   (∀ i, nth_error (vect_list U) i = nth_error (vect_list V) i)
   → U = V.
@@ -130,6 +126,51 @@ destruct Hm as (Hcr, Hc).
 apply Hc.
 apply nth_In.
 now rewrite fold_mat_nrows.
+Qed.
+
+Theorem matrix_eq : ∀ T (ro : ring_like_op T) m n (MA MB : matrix T),
+  is_correct_matrix MA
+  → is_correct_matrix MB
+  → m = mat_nrows MA
+  → m = mat_nrows MB
+  → n = mat_ncols MA
+  → n = mat_ncols MB
+  → (∀ i j, i < m → j < n → mat_el MA i j = mat_el MB i j)
+  → MA = MB.
+Proof.
+intros * Ha Hb Hma Hmb Hna Hnb Hab.
+destruct Ha as (Hcra & Hca).
+destruct Hb as (Hcrb & Hcb).
+destruct MA as (lla).
+destruct MB as (llb).
+unfold mat_nrows, mat_ncols in Hcra, Hcrb, Hca, Hcb, Hma, Hmb, Hna, Hnb.
+cbn in Hcra, Hcrb, Hca, Hcb, Hab, Hma, Hmb, Hna, Hnb; f_equal.
+revert m n llb Hma Hmb Hna Hnb Hab Hcra Hca Hcrb Hcb.
+induction lla as [| la]; intros. {
+  destruct llb as [| lb]; [ easy | exfalso ].
+  cbn in Hma, Hmb.
+  now rewrite Hma in Hmb.
+}
+destruct llb as [| lb]. {
+  cbn in Hma, Hmb.
+  now rewrite Hma in Hmb.
+}
+f_equal. {
+...
+  specialize (Hab 0 0).
+  assert (H : 0 < m) by (cbn in Hma; flia Hma).
+  specialize (Hab H); clear H.
+  cbn in Hab.
+
+  assert (H : 0 < n). {
+    rewrite Hna; cbn.
+
+  specialize (Hab H); clear H.
+...
+
+apply fin_fun_ext.
+intros i.
+now apply fin_fun_ext.
 Qed.
 
 (* square_matrix *)
@@ -566,6 +607,8 @@ Theorem mat_add_opp_l {m n} : ∀ (M : matrix T),
   → (- M + M = mZ m n)%M.
 Proof.
 intros * HM Hr Hc.
+Check matrix_eq.
+...
 subst m n.
 unfold is_correct_matrix in HM.
 destruct HM as (_, HM).
