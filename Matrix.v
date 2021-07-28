@@ -15,11 +15,96 @@ Notation "'⋀' ( i ∈ l ) , g" :=
   (iter_list l (λ c i, (c && g)) true)
   (at level 45, i at level 0, l at level 60).
 
+Definition nth_nth_error A (ll : list (list A)) (i j : nat) := 
+  match nth_error ll i with
+  | None => None
+  | Some l => nth_error l j
+  end.
+
 (* matrices *)
 
 Record matrix T := mk_mat
   { mat_list_list : list (list T) }.
 
+Theorem matrix_eq : ∀ T (ro : ring_like_op T) (MA MB : matrix T),
+  (∀ i j,
+   nth_nth_error (mat_list_list MA) i j =
+   nth_nth_error (mat_list_list MB) i j)
+  → MA = MB.
+Proof.
+intros * ro * Hab.
+destruct MA as (lla).
+destruct MB as (llb).
+cbn in Hab; f_equal.
+remember (length lla) as len eqn:Hlen.
+symmetry in Hlen.
+revert lla llb Hab Hlen.
+induction len; intros. {
+  apply length_zero_iff_nil in Hlen.
+  subst lla; cbn in Hab.
+  remember (length llb) as len eqn:Hlen.
+  symmetry in Hlen.
+  revert llb Hab Hlen.
+  induction len; intros. {
+    now apply length_zero_iff_nil in Hlen.
+  }
+  destruct llb as [| lb]; [ easy | exfalso ].
+  cbn in Hlen.
+  apply Nat.succ_inj in Hlen.
+...
+  destruct lb as [| b]. {
+...
+    cbn in Hab.
+  specialize (Hab 0 0).
+  cbn in Hab.
+}
+destruct lu as [| a]; [ easy | ].
+cbn in Hlen.
+apply Nat.succ_inj in Hlen.
+destruct lv as [| b]. {
+  exfalso.
+  now specialize (Huv 0).
+}
+specialize (Huv 0) as H1; cbn in H1.
+injection H1; clear H1; intros; subst b; f_equal.
+apply IHlen; [ | easy ].
+intros i.
+now specialize (Huv (S i)).
+...
+unfold mat_el in Hab.
+destruct Ha as (Hcra & Hca).
+destruct Hb as (Hcrb & Hcb).
+destruct MA as (lla).
+destruct MB as (llb).
+unfold mat_nrows, mat_ncols in Hcra, Hcrb, Hca, Hcb, Hma, Hmb, Hna, Hnb.
+cbn in Hcra, Hcrb, Hca, Hcb, Hab, Hma, Hmb, Hna, Hnb; f_equal.
+revert m n llb Hma Hmb Hna Hnb Hab Hcra Hca Hcrb Hcb.
+induction lla as [| la]; intros. {
+  destruct llb as [| lb]; [ easy | exfalso ].
+  cbn in Hma, Hmb.
+  now rewrite Hma in Hmb.
+}
+destruct llb as [| lb]. {
+  cbn in Hma, Hmb.
+  now rewrite Hma in Hmb.
+}
+f_equal. {
+...
+  specialize (Hab 0 0).
+  assert (H : 0 < m) by (cbn in Hma; flia Hma).
+  specialize (Hab H); clear H.
+  cbn in Hab.
+
+  assert (H : 0 < n). {
+    rewrite Hna; cbn.
+
+  specialize (Hab H); clear H.
+...
+
+apply fin_fun_ext.
+intros i.
+now apply fin_fun_ext.
+Qed.
 (*
 Theorem matrix_eq : ∀ T (MA MB : matrix T),
   (Forall2 (Forall2 eq) (mat_list_list MA) (mat_list_list MB))
@@ -126,51 +211,6 @@ destruct Hm as (Hcr, Hc).
 apply Hc.
 apply nth_In.
 now rewrite fold_mat_nrows.
-Qed.
-
-Theorem matrix_eq : ∀ T (ro : ring_like_op T) m n (MA MB : matrix T),
-  is_correct_matrix MA
-  → is_correct_matrix MB
-  → m = mat_nrows MA
-  → m = mat_nrows MB
-  → n = mat_ncols MA
-  → n = mat_ncols MB
-  → (∀ i j, i < m → j < n → mat_el MA i j = mat_el MB i j)
-  → MA = MB.
-Proof.
-intros * Ha Hb Hma Hmb Hna Hnb Hab.
-destruct Ha as (Hcra & Hca).
-destruct Hb as (Hcrb & Hcb).
-destruct MA as (lla).
-destruct MB as (llb).
-unfold mat_nrows, mat_ncols in Hcra, Hcrb, Hca, Hcb, Hma, Hmb, Hna, Hnb.
-cbn in Hcra, Hcrb, Hca, Hcb, Hab, Hma, Hmb, Hna, Hnb; f_equal.
-revert m n llb Hma Hmb Hna Hnb Hab Hcra Hca Hcrb Hcb.
-induction lla as [| la]; intros. {
-  destruct llb as [| lb]; [ easy | exfalso ].
-  cbn in Hma, Hmb.
-  now rewrite Hma in Hmb.
-}
-destruct llb as [| lb]. {
-  cbn in Hma, Hmb.
-  now rewrite Hma in Hmb.
-}
-f_equal. {
-...
-  specialize (Hab 0 0).
-  assert (H : 0 < m) by (cbn in Hma; flia Hma).
-  specialize (Hab H); clear H.
-  cbn in Hab.
-
-  assert (H : 0 < n). {
-    rewrite Hna; cbn.
-
-  specialize (Hab H); clear H.
-...
-
-apply fin_fun_ext.
-intros i.
-now apply fin_fun_ext.
 Qed.
 
 (* square_matrix *)
