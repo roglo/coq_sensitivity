@@ -1150,25 +1150,24 @@ induction l; [ easy | cbn ].
 apply List_last_app.
 Qed.
 
-Theorem List_map_fun : ∀ A B d l l' (f g : A → B),
+Theorem List_map_fun : ∀ A B d l l' (f : A → B),
   length l = length l'
-  → (∀ i, i < length l → f (nth i l d) = g (nth i l' d))
-  → map f l = map g l'.
+  → (∀ i, f (nth i l d) = f (nth i l' d))
+  → map f l = map f l'.
 Proof.
 intros * Hlen Hf.
 revert l' Hlen Hf.
 induction l as [| a l]; intros; [ now destruct l' | ].
 destruct l' as [| a' l']; [ easy | cbn ].
-specialize (Hf 0 (Nat.lt_0_succ _)) as H1; cbn in H1.
+specialize (Hf 0) as H1; cbn in H1.
 rewrite H1; f_equal.
 cbn in Hlen; apply Nat.succ_inj in Hlen.
 apply IHl; [ easy | ].
-intros i Hi.
-apply Hf with (i := S i); cbn.
-now apply -> Nat.succ_lt_mono.
+intros i.
+now specialize (Hf (S i)).
 Qed.
 
-Theorem List_map_nth' : ∀ A B a b (f : A → B) l n,
+Theorem List_map_nth_in : ∀ A B (f : A → B) a b l n,
   n < length l → nth n (map f l) b = f (nth n l a).
 Proof.
 intros * Hnl.
@@ -1178,15 +1177,6 @@ cbn in Hnl; cbn.
 destruct n; [ easy | ].
 apply Nat.succ_lt_mono in Hnl.
 now apply IHl.
-Qed.
-
-Theorem List_map_hd : ∀ A B (f : A → B) a b l,
-  l ≠ [] → hd b (map f l) = f (hd a l).
-Proof.
-intros * Hnl.
-do 2 rewrite List_hd_nth_0.
-apply List_map_nth'.
-destruct l; [ easy | apply Nat.lt_0_succ ].
 Qed.
 
 Theorem List_seq_eq_nil : ∀ b len, seq b len = [] → len = 0.
@@ -1360,276 +1350,6 @@ destruct b, c; cbn - [ "-" ]. {
 }
 Qed.
 
-Theorem List_in_skipn : ∀ A (a : A) n l, a ∈ skipn n l → a ∈ l.
-Proof.
-intros * Ha.
-revert n Ha.
-induction l as [| b]; intros; [ now rewrite skipn_nil in Ha | ].
-cbn in Ha.
-destruct n; [ easy | ].
-rewrite skipn_cons in Ha.
-cbn; right.
-now apply (IHl n).
-Qed.
-
-(* map2: map with two lists *)
-
-Fixpoint map2 {A B C} (f : A → B → C) la lb :=
-  match la with
-  | [] => []
-  | a :: la' =>
-      match lb with
-      | [] => []
-      | b :: lb' => f a b :: map2 f la' lb'
-      end
-  end.
-Theorem map2_nth : ∀ A B C (f : A → B → C) la lb a b c n,
-  n < length la
-  → n < length lb
-  → nth n (map2 f la lb) c = f (nth n la a) (nth n lb b).
-Proof.
-intros * Hla Hlb.
-revert n lb Hla Hlb.
-induction la as [| a']; intros; [ easy | cbn ].
-destruct lb as [| b']; [ easy | cbn ].
-destruct n; [ easy | cbn ].
-cbn in Hla, Hlb.
-apply Nat.succ_lt_mono in Hla.
-apply Nat.succ_lt_mono in Hlb.
-destruct n; [ now apply IHla | ].
-now apply IHla.
-Qed.
-
-Theorem map2_map_l : ∀ A B C D (f : C → B → D) g (la : list A) (lb : list B),
-  map2 f (map g la) lb = map2 (λ a b, f (g a) b) la lb.
-Proof.
-intros.
-revert lb.
-induction la as [| a]; intros; [ easy | cbn ].
-destruct lb as [| b]; [ easy | cbn ].
-f_equal.
-apply IHla.
-Qed.
-
-Theorem map2_map_r : ∀ A B C D (f : A → C → D) g (la : list A) (lb : list B),
-  map2 f la (map g lb) = map2 (λ a b, f a (g b)) la lb.
-Proof.
-intros.
-revert lb.
-induction la as [| a]; intros; [ easy | cbn ].
-destruct lb as [| b]; [ easy | cbn ].
-f_equal.
-apply IHla.
-Qed.
-
-Theorem map_map2 : ∀ A B C D (f : A → B) (g : C → D → A) la lb,
-  map f (map2 g la lb) = map2 (λ a b, f (g a b)) la lb.
-Proof.
-intros.
-revert lb.
-induction la as [| a]; intros; [ easy | cbn ].
-destruct lb as [| b]; [ easy | cbn ].
-now rewrite IHla.
-Qed.
-
-Theorem List_fold_left_map2 :
-  ∀ A B C D (f : A → B → A) (g : C → D → B) lc ld (a : A),
-  fold_left f (map2 g lc ld) a =
-  fold_left (λ b c, f b (g (fst c) (snd c))) (combine lc ld) a.
-Proof.
-intros.
-revert ld a.
-induction lc as [| c]; intros; [ easy | cbn ].
-destruct ld as [| d]; [ easy | cbn ].
-apply IHlc.
-Qed.
-
-Theorem map2_length : ∀ A B C (f : A → B → C) la lb,
-  length (map2 f la lb) = min (length la) (length lb).
-Proof.
-intros.
-revert lb.
-induction la as [| a]; intros; [ easy | cbn ].
-destruct lb as [| b]; [ easy | cbn ].
-now rewrite IHla.
-Qed.
-
-Theorem map2_nil_r : ∀ A B C (f : A → B → C) la, map2 f la [] = [].
-Proof.
-intros.
-now destruct la.
-Qed.
-
-Theorem firstn_map2 : ∀ A B C (f : A → B → C) n la lb,
-  firstn n (map2 f la lb) = map2 f (firstn n la) (firstn n lb).
-Proof.
-intros.
-revert n lb.
-induction la as [| a]; cbn; intros. {
-  now do 2 rewrite firstn_nil.
-}
-destruct lb as [| b]. {
-  do 2 rewrite firstn_nil.
-  now destruct n.
-}
-destruct n; [ easy | cbn ].
-now rewrite IHla.
-Qed.
-
-Theorem skipn_map2 : ∀ A B C (f : A → B → C) n la lb,
-  skipn n (map2 f la lb) = map2 f (skipn n la) (skipn n lb).
-Proof.
-intros.
-revert n lb.
-induction la as [| a]; cbn; intros. {
-  now do 2 rewrite skipn_nil.
-}
-destruct lb as [| b]. {
-  do 2 rewrite skipn_nil.
-  now rewrite map2_nil_r.
-}
-destruct n; [ easy | cbn ].
-now rewrite IHla.
-Qed.
-
-Theorem in_map2_iff : ∀ A B C (f : A → B → C) la lb c,
-  c ∈ map2 f la lb ↔
-  ∃ i,
-  i < min (length la) (length lb) ∧ ∃ a b, f (nth i la a) (nth i lb b) = c.
-Proof.
-intros.
-split. {
-  intros Hc.
-  revert lb Hc.
-  induction la as [| a]; intros; [ easy | ].
-  destruct lb as [| b]; [ easy | ].
-  cbn in Hc.
-  destruct Hc as [Hc| Hc]. {
-    exists 0.
-    split; [ cbn; flia | now exists a, b ].
-  }
-  specialize (IHla _ Hc) as H1.
-  destruct H1 as (i & Him & a' & b' & Hi).
-  exists (S i).
-  split; [ cbn; flia Him | ].
-  now exists a', b'.
-} {
-  intros (i & Him & a' & b' & Hi).
-  revert lb i Him Hi.
-  induction la as [| a]; intros; [ easy | ].
-  destruct lb as [| b]; [ easy | ].
-  cbn in Him, Hi |-*.
-  destruct i; [ now left | right ].
-  apply Nat.succ_lt_mono in Him.
-  now apply IHla in Hi.
-}
-Qed.
-
-Theorem map2_ext_in : ∀ A B C (f g : A → B → C) la lb,
-  (∀ a b, a ∈ la → b ∈ lb → f a b = g a b) → map2 f la lb = map2 g la lb.
-Proof.
-intros * Hab.
-revert lb Hab.
-induction la as [| a]; intros; [ easy | cbn ].
-destruct lb as [| b]; [ easy | ].
-f_equal; [ now apply Hab; left | ].
-apply IHla.
-intros a' b' Ha' Hb'.
-now apply Hab; right.
-Qed.
-
-Theorem map2_diag : ∀ A B (f : A → A → B) la,
-  map2 f la la = map (λ i, f i i) la.
-Proof.
-intros.
-induction la as [| a]; [ easy | cbn ].
-now rewrite IHla.
-Qed.
-
-Theorem map2_map2_seq_l : ∀ A B C (f : A → B → C) d la lb,
-  map2 f la lb = map2 (λ i b, f (nth i la d) b) (seq 0 (length la)) lb.
-Proof.
-intros.
-revert lb.
-induction la as [| a]; intros; [ easy | cbn ].
-destruct lb as [| b]; [ easy | ].
-f_equal.
-rewrite <- seq_shift.
-rewrite map2_map_l.
-apply IHla.
-Qed.
-
-Theorem map2_map2_seq_r : ∀ A B C (f : A → B → C) d la lb,
-  map2 f la lb = map2 (λ a i, f a (nth i lb d)) la (seq 0 (length lb)).
-Proof.
-intros.
-revert lb.
-induction la as [| a]; intros; [ easy | cbn ].
-destruct lb as [| b]; [ easy | cbn ].
-f_equal.
-rewrite <- seq_shift.
-rewrite map2_map_r.
-apply IHla.
-Qed.
-
-Theorem map2_eq_nil: ∀ A B C (f : A → B → C) la lb,
-  map2 f la lb = [] → la = [] ∨ lb = [].
-Proof.
-intros * Hab.
-destruct la; intros; [ now left | now right; destruct lb ].
-Qed.
-
-(* end map2 *)
-
-(* butn: list without its nth element *)
-
-Definition butn {A} n (l : list A) :=
-  firstn n l ++ skipn (S n) l.
-
-Theorem butn_nil : ∀ A n, butn n ([] : list A) = [].
-Proof.
-intros.
-unfold butn.
-now rewrite firstn_nil, skipn_nil.
-Qed.
-
-Theorem butn_cons : ∀ A (a : A) la n, butn (S n) (a :: la) = a :: butn n la.
-Proof.
-intros.
-unfold butn.
-now rewrite firstn_cons, skipn_cons.
-Qed.
-
-Theorem map_butn : ∀ A B (f : A → B) la n,
-  map f (butn n la) = butn n (map f la).
-Proof.
-intros.
-revert n.
-induction la as [| a]; intros; cbn; [ now do 2 rewrite butn_nil | ].
-destruct n; [ easy | ].
-do 2 rewrite butn_cons.
-cbn; f_equal.
-apply IHla.
-Qed.
-
-Theorem map2_butn : ∀ A B C (f : A → B → C) (la : list A) (lb : list B) n,
-  map2 f (butn n la) (butn n lb) = butn n (map2 f la lb).
-Proof.
-intros.
-revert n lb.
-induction la as [| a]; intros; cbn; [ now do 2 rewrite butn_nil | ].
-destruct lb as [| b]; cbn. {
-  do 2 rewrite butn_nil.
-  now rewrite map2_nil_r.
-}
-destruct n; [ easy | ].
-do 3 rewrite butn_cons.
-cbn; f_equal.
-apply IHla.
-Qed.
-
-(* end butn *)
-
 Theorem not_equiv_imp_False : ∀ P : Prop, (P → False) ↔ ¬ P.
 Proof. easy. Qed.
 
@@ -1752,6 +1472,16 @@ rewrite IHl. 2: {
 now apply Hg; left.
 Qed.
 
+Theorem List_firstn_map {A B} : ∀ n l (f : A → B),
+  firstn n (map f l) = map f (firstn n l).
+Proof.
+intros.
+revert n.
+induction l as [| a l]; intros; [ now cbn; do 2 rewrite firstn_nil | ].
+destruct n; [ easy | cbn ].
+now rewrite IHl.
+Qed.
+
 Theorem List_list_prod_nil_r {A B} : ∀ l : list A,
   list_prod l ([] : list B) = [].
 Proof.
@@ -1821,22 +1551,6 @@ apply nth_overflow.
 now rewrite repeat_length.
 Qed.
 
-Theorem List_nth_error_Some_iff : ∀ A (l : list A) n x d,
-  nth_error l n = Some x ↔ nth n l d = x ∧ n < length l.
-Proof.
-intros.
-split. {
-  intros Hx.
-  split; [ now apply nth_error_nth | ].
-  apply nth_error_Some.
-  congruence.
-} {
-  intros (Hn, Hx).
-  subst x.
-  now apply nth_error_nth'.
-}
-Qed.
-
 Theorem List_app_cons : ∀ A (l1 l2 : list A) a,
   l1 ++ a :: l2 = l1 ++ [a] ++ l2.
 Proof. easy. Qed.
@@ -1865,6 +1579,15 @@ Qed.
 Theorem List_last_cons_cons : ∀ A l (x y d : A),
   last (x :: y :: l) d = last (y :: l) d.
 Proof. easy. Qed.
+
+Theorem List_skipn_map : ∀ A B (f : A → B) l n,
+  skipn n (map f l) = map f (skipn n l).
+Proof.
+intros.
+revert n.
+induction l as [| a]; intros; [ now do 2 rewrite skipn_nil | cbn ].
+destruct n; [ easy | cbn; apply IHl ].
+Qed.
 
 Theorem List_skipn_seq : ∀ n start len,
   n ≤ len → skipn n (seq start len) = seq (start + n) (len - n).
@@ -1926,26 +1649,6 @@ intros.
 now specialize (Hll d (S i)).
 Qed.
 
-Theorem List_map_map_seq : ∀ A B (f : A → B) d la,
-  map f la = map (λ i, f (nth i la d)) (seq 0 (length la)).
-Proof.
-intros.
-induction la as [| a]; [ easy | cbn ].
-f_equal.
-rewrite <- seq_shift.
-now rewrite map_map.
-Qed.
-
-Theorem List_eq_map_seq : ∀ A (la : list A) d,
-  la = map (λ i, nth i la d) (seq 0 (length la)).
-Proof.
-intros.
-induction la as [| a]; [ easy | ].
-cbn; f_equal.
-rewrite <- seq_shift.
-now rewrite map_map.
-Qed.
-
 (* common for summations and products *)
 
 Theorem fold_left_op_fun_from_d : ∀ T A d op a l (f : A → _)
@@ -1995,21 +1698,6 @@ apply iter_list_all_d; [ easy | easy | easy | ].
 intros i Hi.
 apply in_seq in Hi.
 apply Hz; flia Hi.
-Qed.
-
-Theorem iter_list_split_first : ∀ T A d op l z f
-  (op_d_l : ∀ x, op d x = x)
-  (op_d_r : ∀ x, op x d = x)
-  (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
-  l ≠ []
-  → iter_list l (λ (c : T) (i : A), op c (f i)) d =
-    op (f (hd z l)) (iter_list (tl l) (λ (c : T) (i : A), op c (f i)) d).
-Proof.
-intros * op_d_l op_d_r op_assoc Hl.
-unfold iter_list.
-destruct l as [| a]; [ easy | cbn ].
-rewrite op_d_l.
-now rewrite fold_left_op_fun_from_d with (d := d).
 Qed.
 
 Theorem iter_seq_split_first : ∀ T d op b k g
@@ -2194,13 +1882,6 @@ intros j i Hj.
 f_equal.
 rewrite Nat.sub_succ.
 apply Nat.sub_0_r.
-Qed.
-
-Theorem iter_list_empty : ∀ T A d (op : T → T → T) (l : list A) g,
-  l = []
-  → iter_list l (λ c i, op c (g i)) d = d.
-Proof.
-now intros * Hl; subst l.
 Qed.
 
 Theorem iter_seq_empty : ∀ T d (op : T → T → T) b k g,
@@ -2720,5 +2401,52 @@ Definition sumbool_and {A B C D : Prop} (P : sumbool A B) (Q : sumbool C D) :=
 
 Notation "a ∨∨ b" := (sumbool_or a b) (at level 85).
 Notation "a ∧∧ b" := (sumbool_and a b) (at level 80).
+
+Theorem add_succ_comm : ∀ a b, S a + b = a + S b.
+Proof.
+intros; cbn.
+induction a; [ reflexivity | ].
+now cbn; rewrite IHa.
+Defined.
+
+Definition fin_t_add_succ_l a b : Fin.t (S a + b) → Fin.t (a + S b) :=
+  λ i, match add_succ_comm a b with eq_refl => i end.
+
+Theorem add_lt_succ : ∀ a b, a < a + S b.
+Proof.
+intros.
+apply Nat.lt_sub_lt_add_l.
+rewrite Nat.sub_diag.
+apply Nat.lt_0_succ.
+Qed.
+
+Fixpoint Fin_seq start len : list (Fin.t (start + len)) :=
+  match len with
+  | 0 => []
+  | S len' =>
+      Fin.of_nat_lt (add_lt_succ start len') ::
+      map (fin_t_add_succ_l (b := len')) (Fin_seq (S start) len')
+  end.
+
+Theorem Fin_inv : ∀ n (i : Fin.t (S n)),
+  { i = Fin.F1 } + { ∃ j, i = Fin.FS j }.
+Proof.
+intros.
+refine (match i with Fin.F1 => _ | Fin.FS _ => _ end).
+now left.
+now right; exists t.
+Qed.
+
+Theorem Fin_1_F1 : ∀ i : Fin.t 1, i = Fin.F1.
+Proof.
+intros.
+now destruct (Fin_inv i) as [| (j, Hj)].
+Qed.
+
+(* extensionality of finite functions *)
+
+Axiom fin_fun_ext : ∀ n A (f g : Fin.t n → A),
+  (∀ i, f i = g i)
+  → f = g.
 
 Arguments iter_list {A B}%type l%list f%function : simpl never.
