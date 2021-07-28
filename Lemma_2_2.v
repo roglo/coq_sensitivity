@@ -1368,6 +1368,13 @@ intros * Hac Hbd.
 now subst a b.
 Qed.
 
+Theorem mat_of_mat_list_list_mul_scal_l : ∀ μ mll,
+  (μ × mat_of_mat_list_list mll =
+   mat_of_mat_list_list (map (map (mat_mul_scal_l μ)) mll))%M.
+Proof.
+intros.
+...
+
 Theorem An_eigen_equation_for_sqrt_n :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -1676,6 +1683,9 @@ rewrite m_o_mll_2x2_2x1 with (n := 2 ^ n); cycle 1. {
 } {
   apply mI_ncols.
 }
+Search mat_of_mat_list_list.
+...
+rewrite mat_of_mat_list_list_mul_scal_l.
 ...
 unfold "×"%M.
 Search "×"%M.
