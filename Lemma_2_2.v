@@ -17,9 +17,6 @@ Set Implicit Arguments.
 
 Require Import Utf8 Arith.
 Import List List.ListNotations.
-(*
-Import EqNotations.
-*)
 
 Require Import Misc RingLike MyVector Matrix.
 Require Import RLsummation.
@@ -51,45 +48,6 @@ Definition flatten_list_list llll := flat_map (fold_app_in_list []) llll.
 
 Definition mat_of_mat_list_list (mll : list (list (matrix T))) : matrix T :=
   mk_mat (flatten_list_list (map (map (@mat_list_list T)) mll)).
-
-
-(*
-Print fold_left.
-...
-
-
-Fixpoint map3 A (f : A → A → A) (la lb : list A) : list A :=
-  match la with
-  | [] => lb
-  | a :: la' =>
-      match lb with
-      | [] => la
-      | b :: lb' => f a b :: map3 f la' lb'
-      end
-  end.
-*)
-
-(* conversion list of list of matrices into simple matrix *)
-
-(*
-Definition flatten_list_list {A} (f : A → A → A) llll :=
-  flat_map (λ row, iter_list row (map3 f) []) llll.
-*)
-
-(*
-Definition flatten_list_list {A} (f : A → A → A) llll :=
-  flat_map (λ row, iter_list (tl row) (map2 f) (hd [] row)) llll.
-*)
-
-(*
-Definition flatten_list_list {A} llll :=
-  flat_map (λ row, iter_list (tl row) (map2 (@app A)) (hd [] row)) llll.
-*)
-
-(*
-Definition mat_of_mat_list_list (mll : list (list (matrix T))) : matrix T :=
-  mk_mat (flatten_list_list (@app T) (map (map (@mat_list_list T)) mll)).
-*)
 
 (* sequence "An" *)
 
@@ -1321,21 +1279,11 @@ f_equal. {
 }
 Qed.
 
-(*
-Definition mat_of_list_list_1_row_2_col (A B : matrix T) : matrix T :=
-  mat_of_mat_list_list [[A]; [B]].
-*)
-
 Definition base_vector_1 dim :=
   mk_vect (1%F :: repeat 0%F (dim - 1)).
 
 Definition A_Sn_eigenvector_of_sqrt_Sn n μ (V : vector T) : vector T :=
   (mat_of_mat_list_list [[(mA n + μ × mI (2 ^ n))]; [mI (2 ^ n)]] • V)%M.
-
-(*
-Definition A_Sn_eigenvector_of_sqrt_Sn n μ (V : vector T) : vector T :=
-  (mat_of_list_list_1_row_2_col (mA n + μ × mI (2 ^ n))%M (mI (2 ^ n)) • V)%M.
-*)
 
 Theorem mA_diag_zero :
   rngl_has_opp = true →
@@ -1471,9 +1419,6 @@ rewrite mat_vect_mul_assoc; cycle 1. {
 } {
   apply mA_is_correct.
 } {
-(*
-  unfold mat_of_list_list_1_row_2_col.
-*)
   split. {
     cbn; intros Hc.
     unfold mat_ncols in Hc.
@@ -1572,9 +1517,6 @@ rewrite mat_vect_mul_assoc; cycle 1. {
   }
 } {
   rewrite mA_ncols.
-(*
-  unfold mat_of_list_list_1_row_2_col.
-*)
   cbn - [ "^" ].
   rewrite app_nil_r, app_length.
   rewrite map2_length.
@@ -1582,9 +1524,6 @@ rewrite mat_vect_mul_assoc; cycle 1. {
   rewrite map_length, map_length, seq_length, Nat.min_id.
   now cbn; rewrite Nat.add_0_r.
 } {
-(*
-  unfold mat_of_list_list_1_row_2_col.
-*)
   unfold mat_ncols; cbn.
   rewrite app_nil_r.
   rewrite List_hd_nth_0.
@@ -1618,9 +1557,6 @@ rewrite mat_vect_mul_assoc; cycle 1. {
 rewrite mat_mul_scal_vect_assoc; cycle 1. {
   easy.
 } {
-(*
-  unfold mat_of_list_list_1_row_2_col.
-*)
   unfold is_correct_matrix.
   unfold mat_ncols, mat_of_mat_list_list; cbn.
   rewrite List_hd_nth_0.
@@ -1676,7 +1612,7 @@ rewrite mat_mul_scal_vect_assoc; cycle 1. {
     now rewrite map_length, seq_length.
   }
 } {
-  unfold mat_ncols(*, mat_of_list_list_1_row_2_col*); cbn.
+  unfold mat_ncols; cbn.
   rewrite app_nil_r, List_hd_nth_0.
   rewrite app_nth1. 2: {
     rewrite map2_length, fold_mat_nrows, mA_nrows.
@@ -1708,11 +1644,7 @@ rewrite mat_mul_scal_vect_assoc; cycle 1. {
   }
   now rewrite map_length, seq_length, Nat.min_id.
 }
-f_equal.
-(*
-unfold mat_of_list_list_1_row_2_col; cbn.
-*)
-cbn.
+f_equal; cbn.
 rewrite m_o_mll_2x2_2x1 with (n := 2 ^ n); cycle 1. {
   apply mA_is_square_matrix.
 } {
