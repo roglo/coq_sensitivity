@@ -1609,10 +1609,41 @@ rewrite mat_mul_scal_vect_assoc; cycle 1. {
     now rewrite map_length, seq_length.
   }
 } {
-...
+  unfold mat_ncols, mat_of_list_list_1_row_2_col; cbn.
+  rewrite app_nil_r, List_hd_nth_0.
+  rewrite app_nth1. 2: {
+    rewrite map2_length, fold_mat_nrows, mA_nrows.
+    rewrite map_length, map_length, seq_length, Nat.min_id.
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  }
+  rewrite map2_nth with (a := []) (b := []); cycle 1. {
+    rewrite fold_mat_nrows, mA_nrows.
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  } {
+    rewrite map_length, map_length, seq_length.
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  }
+  rewrite map2_length, fold_corr_mat_ncols; cycle 1. {
+    apply mA_is_correct.
+  } {
+    rewrite mA_nrows.
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  }
+  rewrite mA_ncols.
+  rewrite (List_map_nth' []). 2: {
+    rewrite map_length, seq_length.
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  }
+  rewrite map_length.
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  }
+  now rewrite map_length, seq_length, Nat.min_id.
+}
 f_equal.
-
 unfold mat_of_list_list_1_row_2_col.
+cbn.
 ...
 rewrite mat_vect_mul_assoc; [ | easy ].
 rewrite mat_mul_scal_vect_assoc; [ | easy ].
