@@ -1726,6 +1726,16 @@ rewrite m_o_mll_2x2_2x1 with (n := 2 ^ n); cycle 1. {
 } {
   apply mI_ncols.
 }
+...
+unfold "×"%M.
+Search "×"%M.
+unfold
+unfold mat_of_mat_list_list.
+cbn.
+unfold
+Search (_ × mk_mat _)%M.
+Search (_ × mat_of_mat_list_list _)%M.
+...
 unfold "×"%M.
 unfold mat_of_mat_list_list.
 cbn; f_equal.
