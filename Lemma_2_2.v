@@ -1700,7 +1700,32 @@ rewrite m_o_mll_2x2_2x1 with (n := 2 ^ n); cycle 1. {
 } {
   apply mI_is_square_matrix.
 } {
-Search is_square_matrix.
+  apply squ_mat_add_is_squ. {
+    apply mA_is_square_matrix.
+  } {
+    apply squ_mat_mul_scal_l_is_squ.
+    apply mI_is_square_matrix.
+  }
+} {
+  apply mI_nrows.
+} {
+  cbn; rewrite map_length.
+  apply mA_nrows.
+} {
+  apply mI_ncols.
+} {
+  unfold mat_ncols; cbn.
+  rewrite List_hd_nth_0.
+  rewrite (List_map_nth' []). 2: {
+    rewrite fold_mat_nrows, mA_nrows.
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  }
+  rewrite map_length.
+  rewrite <- List_hd_nth_0, fold_mat_ncols.
+  apply mA_ncols.
+} {
+  apply mI_ncols.
+}
 ...
 rewrite mat_vect_mul_assoc; [ | easy ].
 rewrite mat_mul_scal_vect_assoc; [ | easy ].

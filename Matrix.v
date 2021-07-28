@@ -453,6 +453,7 @@ Arguments mZ {T ro} (m n)%nat.
 Arguments minus_one_pow {T ro}.
 Arguments vect_zero {T ro} n%nat.
 Arguments is_correct_matrix {T}%type M%M.
+Arguments is_square_matrix {T}%type n%nat M%M.
 
 Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.
@@ -1723,31 +1724,27 @@ Definition smI n : square_matrix n T :=
   {| sm_mat := mI n;
      sm_prop := mI_is_square_matrix n |}.
 
-Theorem square_matrix_add_is_square : ∀ n (MA MB : square_matrix n T),
-  is_square_matrix n (sm_mat MA + sm_mat MB)%M = true.
+Theorem squ_mat_add_is_squ : ∀ n (MA MB : matrix T),
+  is_square_matrix n MA = true
+  → is_square_matrix n MB = true
+  → is_square_matrix n (MA + MB) = true.
 Proof.
-intros.
-apply is_sm_mat_iff.
-cbn.
+intros * Ha Hb.
+apply is_sm_mat_iff; cbn.
+apply is_sm_mat_iff in Ha.
+apply is_sm_mat_iff in Hb.
+destruct Ha as (Hra & Hcra & Hca).
+destruct Hb as (Hrb & Hcrb & Hcb).
 split. {
   rewrite map2_length.
   do 2 rewrite fold_mat_nrows.
-  do 2 rewrite squ_mat_nrows.
+  rewrite Hra, Hrb.
   apply Nat.min_id.
 }
 split. {
   intros Hc.
   rewrite map2_length.
   do 2 rewrite fold_mat_nrows.
-  destruct MA as (MA & Ha).
-  destruct MB as (MB & Hb).
-  move MB before MA; cbn in Hc |-*.
-  apply is_sm_mat_iff in Ha.
-  apply is_sm_mat_iff in Hb.
-  destruct Ha as (Hra & Hcra & Hca).
-  destruct Hb as (Hrb & Hcrb & Hcb).
-  move Hrb before Hra.
-  move Hcrb before Hcra.
   rewrite Hra, Hrb, Nat.min_id.
   unfold mat_ncols in Hc; cbn in Hc.
   apply length_zero_iff_nil in Hc.
@@ -1777,13 +1774,7 @@ split. {
   destruct Hl as (i & Him & a & b & Hl).
   subst l.
   rewrite map2_length.
-  destruct MA as (MA & Hrca).
-  destruct MB as (MB & Hrcb).
   cbn in Him |-*.
-  apply is_sm_mat_iff in Hrca.
-  apply is_sm_mat_iff in Hrcb.
-  destruct Hrca as (Hra & Hrca & Hca).
-  destruct Hrcb as (Hrb & Hrcb & Hcb).
   do 2 rewrite fold_mat_nrows in Him.
   rewrite Hra, Hrb in Him.
   rewrite Nat.min_id in Him.
@@ -1791,6 +1782,42 @@ split. {
   rewrite Hcb; [ | now apply nth_In; rewrite fold_mat_nrows, Hrb ].
   apply Nat.min_id.
 }
+Qed.
+
+Theorem square_matrix_add_is_square : ∀ n (MA MB : square_matrix n T),
+  is_square_matrix n (sm_mat MA + sm_mat MB)%M = true.
+Proof.
+intros.
+destruct MA as (MA & Ha).
+destruct MB as (MB & Hb).
+now apply squ_mat_add_is_squ.
+Qed.
+
+Theorem squ_mat_mul_scal_l_is_squ : ∀ n (M : matrix T) μ,
+  is_square_matrix n M = true
+  → is_square_matrix n (μ × M) = true.
+Proof.
+intros * Hm.
+apply is_sm_mat_iff in Hm.
+apply is_sm_mat_iff.
+destruct Hm as (Hr & Hcr & Hc).
+cbn; rewrite map_length, fold_mat_nrows.
+split; [ easy | ].
+split. {
+  intros H1.
+  destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]; [ easy | ].
+  apply Nat.neq_0_lt_0 in Hrz.
+  apply Hcr.
+  unfold mat_ncols in H1 |-*; cbn in H1 |-*.
+  rewrite List_hd_nth_0 in H1 |-*.
+  rewrite (List_map_nth' []) in H1; [ | easy ].
+  now rewrite map_length in H1.
+}
+intros la Hla.
+apply in_map_iff in Hla.
+destruct Hla as (lb & Hla & Hi); subst la.
+rewrite map_length.
+now apply Hc.
 Qed.
 
 Definition square_matrix_add {n} (MA MB : square_matrix n T) :
@@ -2859,6 +2886,8 @@ Arguments mat_mul_scal_l {T ro} s%F M%M.
 Arguments mat_mul_vect_r {T ro} M%M V%V.
 Arguments mat_mul_scal_vect_comm {T}%type {ro rp} Hro Hic a%F MA%M V%V.
 Arguments mat_mul_scal_vect_assoc {T}%type {ro rp} Hro a%F MA%M V%V.
+Arguments mat_nrows {T}%type M%M.
+Arguments mat_ncols {T}%type M%M.
 Arguments mat_vect_mul_assoc {T}%type {ro rp} Hro (A B)%M V%V.
 Arguments mat_mul_1_l {T}%type {ro rp} Hro {n}%nat M%M.
 Arguments mat_mul_1_r {T}%type {ro rp} Hro {n}%nat M%M.
@@ -2870,6 +2899,7 @@ Arguments minus_one_pow {T ro}.
 Arguments subm {T} M%M i%nat j%nat.
 Arguments mat_vect_mul_1_l {T}%type {ro rp} Hro V%V.
 Arguments δ {T}%type {ro} (i j)%nat.
+Arguments is_square_matrix {T}%type n%nat M%M.
 
 Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.
