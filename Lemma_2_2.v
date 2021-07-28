@@ -314,6 +314,58 @@ destruct Hla as [Hla| Hla]. {
 }
 Qed.
 
+Theorem mA_is_square_matrix : ∀ n, is_square_matrix (2 ^ n) (mA n) = true.
+Proof.
+intros.
+apply is_sm_mat_iff.
+rewrite mA_nrows, mA_ncols.
+split; [ easy | ].
+split; [ easy | ].
+intros la Hla.
+revert la Hla.
+induction n; intros. {
+  cbn in Hla |-*.
+  destruct Hla as [H| H]; [ now subst la | easy ].
+}
+cbn in Hla.
+rewrite app_nil_r in Hla.
+apply in_app_iff in Hla.
+destruct Hla as [Hla| Hla]. {
+  apply in_app_in_list in Hla.
+  destruct Hla as (i & Him & Hla); subst la.
+  rewrite fold_mat_nrows, mA_nrows in Him.
+  rewrite map_length, seq_length, Nat.max_id in Him.
+  rewrite app_length.
+  rewrite fold_corr_mat_ncols; cycle 1. {
+    apply mA_is_correct.
+  } {
+    now rewrite mA_nrows.
+  }
+  rewrite mA_ncols.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite map_length, seq_length; cbn.
+  now rewrite Nat.add_0_r.
+} {
+  apply in_app_in_list in Hla.
+  destruct Hla as (i & Him & Hla); subst la.
+  rewrite map_length, seq_length in Him.
+  rewrite map_length in Him.
+  rewrite fold_mat_nrows, mA_nrows, Nat.max_id in Him.
+  rewrite app_length.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite (List_map_nth' []); [ | now rewrite fold_mat_nrows, mA_nrows ].
+  do 2 rewrite map_length.
+  rewrite seq_length.
+  rewrite fold_corr_mat_ncols; cycle 1. {
+    apply mA_is_correct.
+  } {
+    now rewrite mA_nrows.
+  }
+  rewrite mA_ncols; cbn.
+  now rewrite Nat.add_0_r.
+}
+Qed.
+
 Theorem le_pow_succ_sub_1_lt : ∀ n j, j ≤ 2 ^ S n - 1 → j - 2 ^ n < 2 ^ n.
 Proof.
 intros * Hj.
@@ -1644,15 +1696,11 @@ rewrite mat_mul_scal_vect_assoc; cycle 1. {
 f_equal.
 unfold mat_of_list_list_1_row_2_col; cbn.
 rewrite m_o_mll_2x2_2x1 with (n := 2 ^ n); cycle 1. {
+  apply mA_is_square_matrix.
+} {
+  apply mI_is_square_matrix.
+} {
 Search is_square_matrix.
-Theorem mA_is_square_matrix : ∀ n, is_square_matrix (2 ^ n) (mA n) = true.
-Proof.
-intros.
-apply is_sm_mat_iff.
-rewrite mA_nrows, mA_ncols.
-split; [ easy | ].
-split; [ easy | ].
-intros l Hl.
 ...
 rewrite mat_vect_mul_assoc; [ | easy ].
 rewrite mat_mul_scal_vect_assoc; [ | easy ].
