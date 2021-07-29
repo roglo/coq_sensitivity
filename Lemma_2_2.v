@@ -1437,8 +1437,6 @@ assert (H : ∀ lb,
 apply H.
 Qed.
 
-...
-
 Theorem An_eigen_equation_for_sqrt_n :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -1497,6 +1495,8 @@ rewrite mat_vect_mul_assoc; cycle 1. {
     rewrite List_hd_nth_0 in Hc.
     rewrite app_nth1 in Hc. 2: {
       rewrite map2_map_r.
+      unfold fold_app_in_list.
+...
       rewrite map2_length, fold_mat_nrows, mA_nrows.
       rewrite map_length, seq_length, Nat.min_id.
       now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
@@ -2009,6 +2009,8 @@ destruct (lt_dec i (2 ^ n)) as [Hi2n| Hi2n]. {
   now rewrite rngl_add_0_r.
 }
 Qed.
+
+...
 
 Theorem A_n_eigenvalue_squared_is_n :
   rngl_is_comm = true →
