@@ -1400,7 +1400,6 @@ f_equal.
 rewrite map_map.
 unfold flatten_list_list.
 do 2 rewrite flat_map_concat_map.
-Search (concat (map _ _)).
 rewrite concat_map.
 do 3 rewrite map_map.
 unfold fold_app_in_list, iter_list; cbn.
@@ -1495,7 +1494,42 @@ rewrite mat_vect_mul_assoc; cycle 1. {
     rewrite List_hd_nth_0 in Hc.
     rewrite app_nth1 in Hc. 2: {
       rewrite map2_map_r.
-      unfold fold_app_in_list, iter_list.
+      unfold fold_app_in_list, iter_list; cbn.
+      rewrite map2_length, fold_mat_nrows, mA_nrows.
+      rewrite map_length, seq_length, Nat.min_id.
+      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+    }
+    unfold fold_app_in_list, iter_list in Hc; cbn in Hc.
+    rewrite map2_nth with (a := []) (b := []) in Hc; cycle 1. {
+      rewrite fold_mat_nrows, mA_nrows.
+      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+    } {
+      do 2 rewrite map_length.
+      rewrite seq_length.
+      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+    }
+    rewrite map2_length in Hc.
+    rewrite <- List_hd_nth_0 in Hc.
+    rewrite fold_mat_ncols, mA_ncols in Hc.
+    rewrite (List_map_nth' []) in Hc. 2: {
+      rewrite map_length, seq_length.
+      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+    }
+    rewrite map_length in Hc.
+    rewrite (List_map_nth' 0) in Hc. 2: {
+      rewrite seq_length.
+      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+    }
+    rewrite map_length, seq_length, Nat.min_id in Hc.
+    now apply Nat.pow_nonzero in Hc.
+  } {
+    intros la Hla.
+...
+Search (_ ∈ mat_list_list _).
+Search (mat_list_list (mat_of_mat_list_list _)).
+...
+    rewrite <- List_hd_nth_0 in Hc.
+    rewrite fold_mat_ncols, mA_ncols in Hc.
 ...
       rewrite map2_length, fold_mat_nrows, mA_nrows.
       rewrite map_length, seq_length, Nat.min_id.
