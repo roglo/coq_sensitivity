@@ -1495,7 +1495,7 @@ rewrite mat_vect_mul_assoc; cycle 1. {
     rewrite List_hd_nth_0 in Hc.
     rewrite app_nth1 in Hc. 2: {
       rewrite map2_map_r.
-      unfold fold_app_in_list.
+      unfold fold_app_in_list, iter_list.
 ...
       rewrite map2_length, fold_mat_nrows, mA_nrows.
       rewrite map_length, seq_length, Nat.min_id.
