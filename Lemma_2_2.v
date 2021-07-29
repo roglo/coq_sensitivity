@@ -38,11 +38,16 @@ Fixpoint app_in_list (la lb : list (list T)) : list (list T) :=
       end
   end.
 
+(*
 Fixpoint fold_app_in_list lla (lll : list (list (list T))) :=
   match lll with
   | [] => lla
   | llb :: lll' => fold_app_in_list (app_in_list lla llb) lll'
   end.
+*)
+
+Definition fold_app_in_list lla (lll : list (list (list T))) :=
+  iter_list lll app_in_list lla.
 
 Definition flatten_list_list llll := flat_map (fold_app_in_list []) llll.
 
@@ -115,6 +120,7 @@ induction n; [ easy | ].
 cbn - [ "^" ].
 rewrite app_nil_r.
 rewrite app_length.
+unfold fold_app_in_list, iter_list; cbn.
 do 2 rewrite length_app_in_list.
 do 2 rewrite map_length.
 rewrite seq_length.
@@ -132,6 +138,7 @@ cbn - [ "^" ].
 unfold mat_ncols; cbn - [ "^" ].
 rewrite List_hd_nth_0.
 rewrite app_nth1. 2: {
+  unfold fold_app_in_list, iter_list; cbn.
   rewrite length_app_in_list.
   rewrite map_length, seq_length.
   rewrite fold_mat_nrows.
@@ -141,6 +148,7 @@ rewrite app_nth1. 2: {
 }
 unfold mat_ncols in IHn.
 rewrite <- List_hd_nth_0.
+unfold fold_app_in_list, iter_list; cbn.
 rewrite length_hd_app_in_list, IHn.
 rewrite List_map_hd with (a := 0). 2: {
   intros H.
@@ -238,11 +246,13 @@ apply in_app_or in Hla.
 destruct Hla as [Hla| Hla]. {
   apply in_app_in_list in Hla.
   destruct Hla as (i & Him & Hla).
+  unfold app_in_list in Him.
   rewrite fold_mat_nrows, mA_nrows in Him.
   rewrite map_length, seq_length in Him.
   rewrite Nat.max_id in Him.
   subst la.
   rewrite app_length.
+  unfold app_in_list.
   rewrite fold_corr_mat_ncols; [ | easy | now rewrite mA_nrows ].
   rewrite mA_ncols.
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
@@ -251,6 +261,7 @@ destruct Hla as [Hla| Hla]. {
 } {
   apply in_app_in_list in Hla.
   destruct Hla as (i & Him & Hla).
+  unfold app_in_list in Him.
   rewrite map_length, seq_length in Him.
   rewrite map_length in Him.
   rewrite fold_mat_nrows, mA_nrows, Nat.max_id in Him.
@@ -291,9 +302,10 @@ apply in_app_iff in Hla.
 destruct Hla as [Hla| Hla]. {
   apply in_app_in_list in Hla.
   destruct Hla as (i & Him & Hla); subst la.
+  unfold app_in_list in Him.
   rewrite fold_mat_nrows, mA_nrows in Him.
   rewrite map_length, seq_length, Nat.max_id in Him.
-  rewrite app_length.
+  rewrite app_length; cbn.
   rewrite fold_corr_mat_ncols; cycle 1. {
     apply mA_is_correct.
   } {
@@ -306,10 +318,11 @@ destruct Hla as [Hla| Hla]. {
 } {
   apply in_app_in_list in Hla.
   destruct Hla as (i & Him & Hla); subst la.
+  unfold app_in_list in Him.
   rewrite map_length, seq_length in Him.
   rewrite map_length in Him.
   rewrite fold_mat_nrows, mA_nrows, Nat.max_id in Him.
-  rewrite app_length.
+  rewrite app_length; cbn.
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
   rewrite (List_map_nth' []); [ | now rewrite fold_mat_nrows, mA_nrows ].
   do 2 rewrite map_length.
@@ -400,6 +413,7 @@ rewrite rngl_add_comm.
 rewrite app_nil_r.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
+  unfold fold_app_in_list, iter_list; cbn.
   rewrite app_nth2 with (n := j). 2: {
     rewrite length_app_in_list.
     rewrite map_length, seq_length.
@@ -465,6 +479,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
   rewrite rngl_add_comm.
   erewrite rngl_summation_eq_compat. 2: {
     intros j Hj.
+    unfold fold_app_in_list, iter_list; cbn.
     rewrite app_nth1 with (n := j). 2: {
       rewrite length_app_in_list.
       rewrite map_length, seq_length.
@@ -783,6 +798,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     rewrite rngl_add_0_r.
     erewrite rngl_summation_eq_compat. 2: {
       intros j Hj.
+      unfold fold_app_in_list, iter_list; cbn.
       rewrite app_nth2. 2: {
         rewrite length_app_in_list, fold_mat_nrows, mA_nrows.
         now rewrite map_length, seq_length, Nat.max_id.
@@ -926,6 +942,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     }
     erewrite rngl_summation_eq_compat. 2: {
       intros j Hj.
+      unfold fold_app_in_list, iter_list; cbn.
       rewrite app_nth2. 2: {
         rewrite length_app_in_list, fold_mat_nrows, mA_nrows.
         now rewrite map_length, seq_length, Nat.max_id.
@@ -1061,6 +1078,7 @@ unfold mat_of_mat_list_list; cbn.
 f_equal.
 do 3 rewrite app_nil_r.
 rewrite app_length.
+unfold fold_app_in_list, iter_list; cbn.
 do 2 rewrite length_app_in_list.
 do 4 rewrite fold_mat_nrows.
 rewrite Hr1, Hr2, Hr3, Hr4, Nat.max_id.
@@ -1297,6 +1315,7 @@ induction n; intros. {
 unfold mat_el.
 destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
   cbn.
+  unfold fold_app_in_list, iter_list; cbn.
   rewrite app_nth1. 2: {
     rewrite length_app_in_list, fold_mat_nrows, mA_nrows.
     now rewrite map_length, seq_length, Nat.max_id.
@@ -1318,6 +1337,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
 } {
   apply Nat.nlt_ge in Hin.
   cbn; rewrite app_nil_r.
+  unfold fold_app_in_list, iter_list; cbn.
   rewrite app_nth2. 2: {
     rewrite length_app_in_list, fold_mat_nrows, mA_nrows.
     now rewrite map_length, seq_length, Nat.max_id.
@@ -1382,6 +1402,7 @@ do 2 rewrite flat_map_concat_map.
 Search (concat (map _ _)).
 rewrite concat_map.
 do 3 rewrite map_map.
+unfold fold_app_in_list, iter_list; cbn.
 ...
 induction mll as [| la]; [ easy | cbn ].
 ...
