@@ -1584,11 +1584,53 @@ rewrite mat_vect_mul_assoc; cycle 1. {
     }
   }
 } {
+  rewrite mA_ncols.
+  cbn - [ "^" ].
+  rewrite app_nil_r.
+  rewrite app_length.
+  unfold fold_app_in_list, iter_list.
+  cbn - [ "^" ].
+  rewrite map2_length, fold_mat_nrows, mA_nrows.
+  do 2 rewrite map_length.
+  rewrite seq_length, Nat.min_id.
+  now cbn; rewrite Nat.add_0_r.
+} {
+  unfold mat_ncols; cbn.
+  rewrite app_nil_r.
+  rewrite List_hd_nth_0.
+  unfold fold_app_in_list, iter_list; cbn.
+  rewrite app_nth1. 2: {
+    rewrite map2_length, fold_mat_nrows, mA_nrows.
+    do 2 rewrite map_length.
+    rewrite seq_length, Nat.min_id.
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  }
+  rewrite map2_nth with (a := []) (b := []); cycle 1. {
+    rewrite fold_mat_nrows, mA_nrows.
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  } {
+    do 2 rewrite map_length.
+    rewrite seq_length.
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  }
+  rewrite map2_length.
+  rewrite <- List_hd_nth_0.
+  rewrite fold_mat_ncols, mA_ncols.
+  rewrite (List_map_nth' []). 2: {
+    rewrite map_length, seq_length.
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  }
+  rewrite map_length.
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  }
+  now rewrite map_length, seq_length, Nat.min_id.
+}
 ...
     rewrite map2_length, fold_mat_nrows, mA_nrows.
       rewrite map_length, seq_length, Nat.min_id.
       now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-
 ...
 Search (_ ∈ mat_list_list _).
 Search (mat_list_list (mat_of_mat_list_list _)).
