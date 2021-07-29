@@ -38,6 +38,14 @@ Fixpoint map3 {A} f (la lb : list A) : list A :=
       end
   end.
 
+Theorem map3_nil_r : ∀ A f (la : list A), map3 f la [] = la.
+Proof.
+intros.
+now induction la.
+Qed.
+
+(* *)
+
 Definition fold_app_in_list (lll : list (list (list T))) :=
   iter_list lll (map3 (app (A:=T))) [].
 
@@ -1396,8 +1404,39 @@ Search (concat (map _ _)).
 rewrite concat_map.
 do 3 rewrite map_map.
 unfold fold_app_in_list, iter_list; cbn.
-...
-induction mll as [| la]; [ easy | cbn ].
+f_equal.
+apply map_ext_in.
+intros la Hla.
+symmetry.
+rewrite List_fold_left_map.
+rewrite List_fold_left_map.
+symmetry.
+cbn.
+clear Hla.
+assert (H : ∀ lb,
+  map (map (rngl_mul μ))
+    (fold_left (map3 (app (A:=T))) (map (mat_list_list (T:=T)) la) lb) =
+  fold_left
+    (λ (c : list (list T)) (b : matrix T),
+       map3 (app (A:=T)) c (map (map (rngl_mul μ)) (mat_list_list b))) la
+         (map (map (rngl_mul μ)) lb)). {
+  induction la as [| a]; intros; [ easy | cbn ].
+  rewrite IHla.
+  f_equal.
+  remember (mat_list_list a) as ll.
+  clear Heqll.
+  revert lb.
+  induction ll as [| lc]; intros. {
+    now do 2 rewrite map3_nil_r.
+  }
+  cbn.
+  destruct lb as [| b]; [ easy | cbn ].
+  rewrite IHll; f_equal.
+  apply map_app.
+}
+apply H.
+Qed.
+
 ...
 
 Theorem An_eigen_equation_for_sqrt_n :
