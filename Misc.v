@@ -1383,6 +1383,7 @@ Fixpoint map2 {A B C} (f : A → B → C) la lb :=
       | b :: lb' => f a b :: map2 f la' lb'
       end
   end.
+
 Theorem map2_nth : ∀ A B C (f : A → B → C) la lb a b c n,
   n < length la
   → n < length lb

@@ -28,26 +28,18 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 
-Fixpoint app_in_list (la lb : list (list T)) : list (list T) :=
+Fixpoint map3 {A} f (la lb : list A) : list A :=
   match la with
   | [] => lb
   | a :: la' =>
       match lb with
       | [] => la
-      | b :: lb' => (a ++ b) :: app_in_list la' lb'
+      | b :: lb' => f a b :: map3 f la' lb'
       end
   end.
 
-(*
-Fixpoint fold_app_in_list lla (lll : list (list (list T))) :=
-  match lll with
-  | [] => lla
-  | llb :: lll' => fold_app_in_list (app_in_list lla llb) lll'
-  end.
-*)
-
 Definition fold_app_in_list (lll : list (list (list T))) :=
-  iter_list lll app_in_list [].
+  iter_list lll (map3 (app (A:=T))) [].
 
 Definition flatten_list_list llll := flat_map fold_app_in_list llll.
 
@@ -95,7 +87,7 @@ Compute length [[[[1;2];[3;4];[5;6]];[[7;8;9;10]]];[[[11;12]]]].
 *)
 
 Theorem length_app_in_list : ∀ la lb,
-  length (app_in_list la lb) = max (length la) (length lb).
+  length (map3 (app (A := T)) la lb) = max (length la) (length lb).
 Proof.
 intros.
 revert lb.
@@ -105,7 +97,8 @@ now rewrite IHla.
 Qed.
 
 Theorem length_hd_app_in_list: ∀ la lb : list (list T),
-  length (hd [] (app_in_list la lb)) = length (hd [] la) + length (hd [] lb).
+  length (hd [] (map3 (app (A := T)) la lb)) =
+  length (hd [] la) + length (hd [] lb).
 Proof.
 intros.
 destruct la as [| a]; [ easy | cbn ].
@@ -163,7 +156,7 @@ Qed.
 Theorem nth_app_in_list : ∀ i lla llb d,
   i < length lla
   → i < length llb
-  → nth i (app_in_list lla llb) d = nth i lla d ++ nth i llb d.
+  → nth i (map3 (app (A:=T)) lla llb) d = nth i lla d ++ nth i llb d.
 Proof.
 intros * Ha Hb.
 revert i llb Ha Hb.
@@ -177,7 +170,7 @@ now apply IHlla.
 Qed.
 
 Theorem in_app_in_list : ∀ la lla llb,
-  la ∈ app_in_list lla llb
+  la ∈ map3 (app (A:=T)) lla llb
   → ∃ i,
     i < max (length lla) (length llb) ∧ la = nth i lla [] ++ nth i llb [].
 Proof.
@@ -246,13 +239,13 @@ apply in_app_or in Hla.
 destruct Hla as [Hla| Hla]. {
   apply in_app_in_list in Hla.
   destruct Hla as (i & Him & Hla).
-  unfold app_in_list in Him.
+  unfold map3 in Him.
   rewrite fold_mat_nrows, mA_nrows in Him.
   rewrite map_length, seq_length in Him.
   rewrite Nat.max_id in Him.
   subst la.
   rewrite app_length.
-  unfold app_in_list.
+  unfold map3.
   rewrite fold_corr_mat_ncols; [ | easy | now rewrite mA_nrows ].
   rewrite mA_ncols.
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
@@ -261,7 +254,7 @@ destruct Hla as [Hla| Hla]. {
 } {
   apply in_app_in_list in Hla.
   destruct Hla as (i & Him & Hla).
-  unfold app_in_list in Him.
+  unfold map3 in Him.
   rewrite map_length, seq_length in Him.
   rewrite map_length in Him.
   rewrite fold_mat_nrows, mA_nrows, Nat.max_id in Him.
@@ -302,7 +295,7 @@ apply in_app_iff in Hla.
 destruct Hla as [Hla| Hla]. {
   apply in_app_in_list in Hla.
   destruct Hla as (i & Him & Hla); subst la.
-  unfold app_in_list in Him.
+  unfold map3 in Him.
   rewrite fold_mat_nrows, mA_nrows in Him.
   rewrite map_length, seq_length, Nat.max_id in Him.
   rewrite app_length; cbn.
@@ -318,7 +311,7 @@ destruct Hla as [Hla| Hla]. {
 } {
   apply in_app_in_list in Hla.
   destruct Hla as (i & Him & Hla); subst la.
-  unfold app_in_list in Him.
+  unfold map3 in Him.
   rewrite map_length, seq_length in Him.
   rewrite map_length in Him.
   rewrite fold_mat_nrows, mA_nrows, Nat.max_id in Him.
