@@ -46,10 +46,10 @@ Fixpoint fold_app_in_list lla (lll : list (list (list T))) :=
   end.
 *)
 
-Definition fold_app_in_list lla (lll : list (list (list T))) :=
-  iter_list lll app_in_list lla.
+Definition fold_app_in_list (lll : list (list (list T))) :=
+  iter_list lll app_in_list [].
 
-Definition flatten_list_list llll := flat_map (fold_app_in_list []) llll.
+Definition flatten_list_list llll := flat_map fold_app_in_list llll.
 
 Definition mat_of_mat_list_list (mll : list (list (matrix T))) : matrix T :=
   mk_mat (flatten_list_list (map (map (@mat_list_list T)) mll)).
