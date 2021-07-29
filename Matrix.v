@@ -279,6 +279,14 @@ split; intros Hm. {
 }
 Qed.
 
+Theorem square_matrix_nrows {n T} : ∀ (M : matrix T),
+  is_square_matrix n M = true
+  → mat_nrows M = n.
+Proof.
+intros * Hm.
+now apply is_sm_mat_iff in Hm.
+Qed.
+
 Theorem square_matrix_ncols {n T} : ∀ (M : matrix T),
   is_square_matrix n M = true
   → mat_ncols M = n.

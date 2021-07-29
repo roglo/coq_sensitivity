@@ -1436,10 +1436,100 @@ assert (H : ∀ lb,
 apply H.
 Qed.
 
+Theorem is_corr_mat_of_list_list_squ_1_2 : ∀ n MA MB,
+  is_square_matrix n MA = true
+  → is_square_matrix n MB = true
+  → is_correct_matrix (mat_of_mat_list_list [[MA]; [MB]]).
+Proof.
+intros * Ha Hb.
+specialize (square_matrix_nrows MA Ha) as Hran.
+specialize (square_matrix_ncols MA Ha) as Hcan.
+specialize (square_matrix_nrows MB Hb) as Hrbn.
+specialize (square_matrix_ncols MB Hb) as Hcbn.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  move Hnz at top; subst n.
+  apply is_sm_mat_iff in Ha, Hb.
+  destruct Ha as (Hra & Hcra & Hca).
+  destruct Hb as (Hrb & Hcrb & Hcb).
+  split. {
+    cbn; intros Hc.
+    unfold mat_of_mat_list_list; cbn.
+    rewrite app_nil_r.
+    unfold fold_app_in_list, iter_list; cbn.
+    unfold mat_ncols; cbn.
+    rewrite app_length.
+    do 2 rewrite fold_mat_nrows.
+    now rewrite Hra, Hrb.
+  } {
+    unfold mat_ncols; cbn.
+    rewrite app_nil_r.
+    unfold fold_app_in_list, iter_list; cbn.
+    rewrite List_hd_nth_0.
+    rewrite app_nth2. 2: {
+      now rewrite fold_mat_nrows, Hra; unfold "≥".
+    }
+    cbn.
+    rewrite <- List_hd_nth_0.
+    rewrite fold_mat_ncols, Hcbn.
+    intros l Hl.
+    apply in_app_or in Hl.
+    destruct Hl as [Hl| Hl]; [ now apply Hca | now apply Hcb ].
+  }
+}
+apply Nat.neq_0_lt_0 in Hnz.
+split. {
+  cbn; intros Hc.
+  unfold mat_ncols in Hc.
+  unfold mat_of_mat_list_list in Hc; cbn in Hc.
+  rewrite List_hd_nth_0 in Hc.
+  rewrite app_nth1 in Hc. 2: {
+    unfold fold_app_in_list, iter_list; cbn.
+    now rewrite fold_mat_nrows, Hran.
+  }
+  unfold fold_app_in_list, iter_list in Hc; cbn in Hc.
+  rewrite <- List_hd_nth_0 in Hc.
+  rewrite fold_mat_ncols in Hc.
+  now rewrite <- Hcan, Hc in Hnz.
+} {
+  intros la Hla.
+  unfold mat_ncols; cbn.
+  rewrite app_nil_r.
+  rewrite List_hd_nth_0.
+  rewrite app_nth1. 2: {
+    unfold fold_app_in_list, iter_list; cbn.
+    now rewrite fold_mat_nrows, Hran.
+  }
+  unfold fold_app_in_list, iter_list; cbn.
+  rewrite <- List_hd_nth_0, fold_mat_ncols.
+  cbn in Hla.
+  unfold fold_app_in_list, iter_list in Hla; cbn in Hla.
+  rewrite app_nil_r in Hla.
+  apply in_app_or in Hla.
+  rewrite Hcan.
+  destruct Hla as [Hla| Hla]. {
+    apply is_sm_mat_iff in Ha.
+    destruct Ha as (Hra & Hcra & Hca).
+    now apply Hca.
+  } {
+    apply is_sm_mat_iff in Hb.
+    destruct Hb as (Hrb & Hcrb & Hcb).
+    now apply Hcb.
+  }
+}
+Qed.
+
 Theorem is_corr_mat_of_list_list_1 : ∀ n μ,
   is_correct_matrix
     (mat_of_mat_list_list [[(mA n + μ × mI (2 ^ n))%M]; [mI (2 ^ n)]]).
 Proof.
+intros.
+apply (is_corr_mat_of_list_list_squ_1_2 (2 ^ n)). {
+...
+apply
+  (is_corr_mat_of_list_list 42
+    ((mA n + μ × mI (2 ^ n))%M)
+    (mI (2 ^ n))).
+...
 intros.
 split. {
   cbn; intros Hc.
@@ -1640,6 +1730,13 @@ rewrite mat_mul_scal_vect_assoc; cycle 1. {
 } {
   apply is_corr_mat_of_list_list_1.
 } {
+  rewrite HU.
+...
+  mat_ncols (mat_of_mat_list_list [[(mA n + μ × mI (2 ^ n))%M]; [mI (2 ^ n)]]) =
+  2 ^ n
+...
+  mat_nrows (mat_of_mat_list_list [[(mA n + μ × mI (2 ^ n))%M]; [mI (2 ^ n)]]) =
+  2 ^ S n
 ...
     rewrite map2_length, fold_mat_nrows, mA_nrows.
       rewrite map_length, seq_length, Nat.min_id.
