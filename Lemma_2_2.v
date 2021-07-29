@@ -1631,6 +1631,12 @@ rewrite mat_mul_scal_vect_assoc; cycle 1. {
   easy.
 } {
 ...
+  is_correct_matrix
+    (mat_of_mat_list_list [[(mA n + μ × mI (2 ^ n))%M]; [mI (2 ^ n)]])
+  is_correct_matrix
+    (mat_of_mat_list_list [[(mA n + μ × mI (2 ^ n))%M]; [mI (2 ^ n)]])
+  split. {
+...
     rewrite map2_length, fold_mat_nrows, mA_nrows.
       rewrite map_length, seq_length, Nat.min_id.
       now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
