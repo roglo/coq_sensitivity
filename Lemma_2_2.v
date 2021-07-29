@@ -1627,6 +1627,9 @@ rewrite mat_vect_mul_assoc; cycle 1. {
   }
   now rewrite map_length, seq_length, Nat.min_id.
 }
+rewrite mat_mul_scal_vect_assoc; cycle 1. {
+  easy.
+} {
 ...
     rewrite map2_length, fold_mat_nrows, mA_nrows.
       rewrite map_length, seq_length, Nat.min_id.
