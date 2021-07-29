@@ -38,10 +38,10 @@ Fixpoint app_in_list (la lb : list (list T)) : list (list T) :=
       end
   end.
 
-Fixpoint fold_app_in_list a (l : list (list (list T))) :=
-  match l with
-  | [] => a
-  | b :: t => fold_app_in_list (app_in_list a b) t
+Fixpoint fold_app_in_list lla (lll : list (list (list T))) :=
+  match lll with
+  | [] => lla
+  | llb :: lll' => fold_app_in_list (app_in_list lla llb) lll'
   end.
 
 Definition flatten_list_list llll := flat_map (fold_app_in_list []) llll.
@@ -1296,20 +1296,7 @@ induction n; intros. {
 }
 unfold mat_el.
 destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
-...
-  cbn - [ mat_list_list ].
-...
-Theorem glop : ∀ (mll : list (list (matrix T))) i j,
-  nth j (nth i (mat_list_list (mat_of_mat_list_list mll)) []) 0%F =
-  nth j (nth i mll []) 0%F.
-...
-rewrite glop.
-  unfold mat_of_mat_list_list.
-  cbn - [ flatten_list_list map ].
-unfold mat_el in IHn.
-Search flatten_list_list.
-Print flatten_list_list.
-cbn.
+  cbn.
   rewrite app_nth1. 2: {
     rewrite length_app_in_list, fold_mat_nrows, mA_nrows.
     now rewrite map_length, seq_length, Nat.max_id.
@@ -1330,7 +1317,7 @@ cbn.
   now apply IHn.
 } {
   apply Nat.nlt_ge in Hin.
-cbn; rewrite app_nil_r.
+  cbn; rewrite app_nil_r.
   rewrite app_nth2. 2: {
     rewrite length_app_in_list, fold_mat_nrows, mA_nrows.
     now rewrite map_length, seq_length, Nat.max_id.
@@ -1376,8 +1363,6 @@ cbn; rewrite app_nil_r.
 }
 Qed.
 
-...
-
 Theorem rngl_mul_eq_if : ∀ a b c d, a = c → b = d → (a * b = c * d)%F.
 Proof.
 intros * Hac Hbd.
@@ -1389,6 +1374,16 @@ Theorem mat_of_mat_list_list_mul_scal_l : ∀ μ mll,
    mat_of_mat_list_list (map (map (mat_mul_scal_l μ)) mll))%M.
 Proof.
 intros.
+unfold mat_of_mat_list_list, "×"%M; cbn.
+f_equal.
+rewrite map_map.
+unfold flatten_list_list.
+do 2 rewrite flat_map_concat_map.
+Search (concat (map _ _)).
+rewrite concat_map.
+do 3 rewrite map_map.
+...
+induction mll as [| la]; [ easy | cbn ].
 ...
 
 Theorem An_eigen_equation_for_sqrt_n :
@@ -1699,7 +1694,6 @@ rewrite m_o_mll_2x2_2x1 with (n := 2 ^ n); cycle 1. {
 } {
   apply mI_ncols.
 }
-Search mat_of_mat_list_list.
 ...
 rewrite mat_of_mat_list_list_mul_scal_l.
 ...

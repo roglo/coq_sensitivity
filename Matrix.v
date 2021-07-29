@@ -614,12 +614,6 @@ Theorem mat_add_opp_l {m n} : ∀ (M : matrix T),
   → (- M + M = mZ m n)%M.
 Proof.
 intros * HM Hr Hc.
-apply matrix_eq; cbn.
-intros.
-rewrite map2_map_l.
-rewrite map2_diag.
-unfold nth_nth_error.
-...
 subst m n.
 unfold is_correct_matrix in HM.
 destruct HM as (_, HM).
