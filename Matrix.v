@@ -18,7 +18,7 @@ Notation "'⋀' ( i ∈ l ) , g" :=
 Definition nth_nth_error A (ll : list (list A)) (i j : nat) := 
   match nth_error ll i with
   | None => None
-  | Some l => nth_error l j
+  | Some l => Some (nth_error l j)
   end.
 
 (* matrices *)
@@ -41,70 +41,36 @@ symmetry in Hlen.
 revert lla llb Hab Hlen.
 induction len; intros. {
   apply length_zero_iff_nil in Hlen.
-  subst lla; cbn in Hab.
-  remember (length llb) as len eqn:Hlen.
-  symmetry in Hlen.
-  revert llb Hab Hlen.
-  induction len; intros. {
-    now apply length_zero_iff_nil in Hlen.
-  }
+  subst lla.
   destruct llb as [| lb]; [ easy | exfalso ].
-  cbn in Hlen.
-  apply Nat.succ_inj in Hlen.
-...
-  destruct lb as [| b]. {
-...
-    cbn in Hab.
-  specialize (Hab 0 0).
-  cbn in Hab.
+  now specialize (Hab 0 0).
 }
-destruct lu as [| a]; [ easy | ].
+destruct lla as [| la]; [ easy | ].
 cbn in Hlen.
 apply Nat.succ_inj in Hlen.
-destruct lv as [| b]. {
-  exfalso.
-  now specialize (Huv 0).
-}
-specialize (Huv 0) as H1; cbn in H1.
-injection H1; clear H1; intros; subst b; f_equal.
-apply IHlen; [ | easy ].
-intros i.
-now specialize (Huv (S i)).
-...
-unfold mat_el in Hab.
-destruct Ha as (Hcra & Hca).
-destruct Hb as (Hcrb & Hcb).
-destruct MA as (lla).
-destruct MB as (llb).
-unfold mat_nrows, mat_ncols in Hcra, Hcrb, Hca, Hcb, Hma, Hmb, Hna, Hnb.
-cbn in Hcra, Hcrb, Hca, Hcb, Hab, Hma, Hmb, Hna, Hnb; f_equal.
-revert m n llb Hma Hmb Hna Hnb Hab Hcra Hca Hcrb Hcb.
-induction lla as [| la]; intros. {
-  destruct llb as [| lb]; [ easy | exfalso ].
-  cbn in Hma, Hmb.
-  now rewrite Hma in Hmb.
-}
-destruct llb as [| lb]. {
-  cbn in Hma, Hmb.
-  now rewrite Hma in Hmb.
-}
+destruct llb as [| lb]; [ now specialize (Hab 0 0) | ].
 f_equal. {
-...
-  specialize (Hab 0 0).
-  assert (H : 0 < m) by (cbn in Hma; flia Hma).
-  specialize (Hab H); clear H.
-  cbn in Hab.
-
-  assert (H : 0 < n). {
-    rewrite Hna; cbn.
-
-  specialize (Hab H); clear H.
-...
-
-apply fin_fun_ext.
-intros i.
-now apply fin_fun_ext.
+  specialize (Hab 0); cbn in Hab.
+  revert lb Hab.
+  induction la as [| a]; intros. {
+    destruct lb as [| b]; [ easy | ].
+    now specialize (Hab 0).
+  }
+  destruct lb as [| b]; [ now specialize (Hab 0) | ].
+  f_equal. {
+    specialize (Hab 0); cbn in Hab.
+    now injection Hab.
+  }
+  apply IHla.
+  intros j.
+  now specialize (Hab (S j)).
+} {
+  apply IHlen; [ | easy ].
+  intros i j.
+  now specialize (Hab (S i) j).
+}
 Qed.
+
 (*
 Theorem matrix_eq : ∀ T (MA MB : matrix T),
   (Forall2 (Forall2 eq) (mat_list_list MA) (mat_list_list MB))
@@ -519,6 +485,7 @@ Delimit Scope M_scope with M.
 
 Arguments δ {T ro} (i j)%nat.
 
+Arguments matrix_eq {T}%type {ro} (MA MB)%M.
 Arguments mat_add {T ro} MA%M MB%M.
 Arguments mat_mul {T ro} MA%M MB%M.
 Arguments mat_mul_el {T}%type {ro} (MA MB)%M (i k)%nat.
@@ -647,7 +614,11 @@ Theorem mat_add_opp_l {m n} : ∀ (M : matrix T),
   → (- M + M = mZ m n)%M.
 Proof.
 intros * HM Hr Hc.
-Check matrix_eq.
+apply matrix_eq; cbn.
+intros.
+rewrite map2_map_l.
+rewrite map2_diag.
+unfold nth_nth_error.
 ...
 subst m n.
 unfold is_correct_matrix in HM.
