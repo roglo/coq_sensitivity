@@ -1725,7 +1725,23 @@ rewrite mat_of_mat_list_list_mul_scal_l; cbn.
 rewrite mat_mul_add_distr_l; cycle 1. {
   apply mA_is_correct.
 } {
-Search (is_correct_matrix (_ × _)%M).
+  apply is_correct_matrix_mul_scal_l.
+  apply mI_is_correct_matrix.
+} {
+  rewrite mA_nrows.
+  now apply Nat.pow_nonzero.
+} {
+  now rewrite mA_nrows, mA_ncols.
+} {
+  rewrite mA_nrows.
+  rewrite mat_mul_scal_l_nrows.
+  symmetry; apply mI_nrows.
+} {
+  rewrite mA_ncols.
+  rewrite mat_mul_scal_l_ncols.
+  symmetry; apply mI_ncols.
+}
+rewrite lemma_2_A_n_2_eq_n_I; [ | easy ].
 ...
 unfold "×"%M in Hla.
 cbn in Hla.

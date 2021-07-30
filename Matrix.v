@@ -1148,6 +1148,9 @@ Qed.
 
 (* *)
 
+Theorem mat_mul_scal_l_nrows : ∀ M μ, mat_nrows (μ × M) = mat_nrows M.
+Proof. now intros; cbn; rewrite map_length. Qed.
+
 Theorem mat_mul_scal_l_ncols : ∀ M μ, mat_ncols (μ × M) = mat_ncols M.
 Proof.
 intros.
