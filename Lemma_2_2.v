@@ -1721,8 +1721,14 @@ rewrite m_o_mll_2x2_2x1 with (n := 2 ^ n); cycle 1. {
 } {
   apply mI_ncols.
 }
-rewrite mat_of_mat_list_list_mul_scal_l.
-cbn.
+rewrite mat_of_mat_list_list_mul_scal_l; cbn.
+rewrite mat_mul_add_distr_l; cycle 1. {
+  apply mA_is_correct.
+} {
+Search (is_correct_matrix (_ × _)%M).
+...
+Search (mA _ * mA _)%M.
+...
 Inspect 8.
 Check m_o_mll_2x2_2x1.
 Search mat_of_mat_list_list.
