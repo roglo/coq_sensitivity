@@ -2956,6 +2956,7 @@ Arguments minus_one_pow {T ro}.
 Arguments subm {T} M%M i%nat j%nat.
 Arguments mat_vect_mul_1_l {T}%type {ro rp} Hro V%V.
 Arguments δ {T}%type {ro} (i j)%nat.
+Arguments is_correct_matrix {T}%type M%M.
 Arguments is_square_matrix {T}%type n%nat M%M.
 
 Notation "A + B" := (mat_add A B) : M_scope.
