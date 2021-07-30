@@ -1575,6 +1575,45 @@ apply (is_corr_mat_of_list_list_squ_1_2 (2 ^ n)). {
 }
 Qed.
 
+Theorem mat_ncols_mat_list_list_1_2 : ∀ n μ,
+  mat_ncols
+    (mat_of_mat_list_list [[(mA n + μ × mI (2 ^ n))%M]; [mI (2 ^ n)]]) =
+  2 ^ n.
+Proof.
+intros.
+unfold mat_ncols; cbn.
+rewrite app_nil_r.
+rewrite List_hd_nth_0.
+unfold fold_app_in_list, iter_list; cbn.
+rewrite app_nth1. 2: {
+  rewrite map2_length, fold_mat_nrows, mA_nrows.
+  do 2 rewrite map_length.
+  rewrite seq_length, Nat.min_id.
+  now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+}
+rewrite map2_nth with (a := []) (b := []); cycle 1. {
+  rewrite fold_mat_nrows, mA_nrows.
+  now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+} {
+  do 2 rewrite map_length.
+  rewrite seq_length.
+  now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+}
+rewrite map2_length.
+rewrite <- List_hd_nth_0.
+rewrite fold_mat_ncols, mA_ncols.
+rewrite (List_map_nth' []). 2: {
+  rewrite map_length, seq_length.
+  now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+}
+rewrite map_length.
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+}
+now rewrite map_length, seq_length, Nat.min_id.
+Qed.
+
 Theorem An_eigen_equation_for_sqrt_n :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -1639,37 +1678,8 @@ rewrite mat_vect_mul_assoc; cycle 1. {
   rewrite seq_length, Nat.min_id.
   now cbn; rewrite Nat.add_0_r.
 } {
-  unfold mat_ncols; cbn.
-  rewrite app_nil_r.
-  rewrite List_hd_nth_0.
-  unfold fold_app_in_list, iter_list; cbn.
-  rewrite app_nth1. 2: {
-    rewrite map2_length, fold_mat_nrows, mA_nrows.
-    do 2 rewrite map_length.
-    rewrite seq_length, Nat.min_id.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  }
-  rewrite map2_nth with (a := []) (b := []); cycle 1. {
-    rewrite fold_mat_nrows, mA_nrows.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  } {
-    do 2 rewrite map_length.
-    rewrite seq_length.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  }
-  rewrite map2_length.
-  rewrite <- List_hd_nth_0.
-  rewrite fold_mat_ncols, mA_ncols.
-  rewrite (List_map_nth' []). 2: {
-    rewrite map_length, seq_length.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  }
-  rewrite map_length.
-  rewrite (List_map_nth' 0). 2: {
-    rewrite seq_length.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  }
-  now rewrite map_length, seq_length, Nat.min_id.
+  rewrite HU.
+  apply mat_ncols_mat_list_list_1_2.
 }
 rewrite mat_mul_scal_vect_assoc; cycle 1. {
   easy.
@@ -1677,241 +1687,7 @@ rewrite mat_mul_scal_vect_assoc; cycle 1. {
   apply is_corr_mat_of_list_list_1.
 } {
   rewrite HU.
-Inspect 5.
-...
-  mat_ncols (mat_of_mat_list_list [[(mA n + μ × mI (2 ^ n))%M]; [mI (2 ^ n)]]) =
-  2 ^ n
-...
-  mat_nrows (mat_of_mat_list_list [[(mA n + μ × mI (2 ^ n))%M]; [mI (2 ^ n)]]) =
-  2 ^ S n
-...
-    rewrite map2_length, fold_mat_nrows, mA_nrows.
-      rewrite map_length, seq_length, Nat.min_id.
-      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-...
-Search (_ ∈ mat_list_list _).
-Search (mat_list_list (mat_of_mat_list_list _)).
-...
-    rewrite <- List_hd_nth_0 in Hc.
-    rewrite fold_mat_ncols, mA_ncols in Hc.
-...
-      rewrite map2_length, fold_mat_nrows, mA_nrows.
-      rewrite map_length, seq_length, Nat.min_id.
-      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-    }
-    rewrite map2_map_r in Hc.
-    rewrite map2_map_r in Hc.
-    rewrite map2_nth with(a := []) (b := 0) in Hc; cycle 1. {
-      rewrite fold_mat_nrows, mA_nrows.
-      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-    } {
-      rewrite seq_length.
-      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-    }
-    rewrite map2_map_r in Hc.
-    rewrite map2_map_r in Hc.
-    rewrite map2_length, seq_length in Hc.
-    rewrite <- List_hd_nth_0 in Hc.
-    rewrite fold_mat_ncols, mA_ncols, Nat.min_id in Hc.
-    now apply Nat.pow_nonzero in Hc.
-  } {
-    intros l Hl.
-    unfold mat_of_list_list in Hl; cbn in Hl.
-    rewrite app_nil_r in Hl.
-    rewrite map2_map_r in Hl.
-    rewrite map2_map_r in Hl.
-    apply in_app_or in Hl.
-    destruct Hl as [Hl| Hl]. {
-      apply in_map2_iff in Hl.
-      rewrite fold_mat_nrows, mA_nrows in Hl.
-      rewrite seq_length, Nat.min_id in Hl.
-      destruct Hl as (i & Hi & la & j & Hl); subst l.
-      rewrite map2_length.
-      rewrite map_length, map_length, seq_length.
-      unfold mat_of_mat_list_list, mat_ncols; cbn.
-      rewrite List_hd_nth_0.
-      rewrite app_nth1. 2: {
-        rewrite map2_map_r, map2_map_r.
-        rewrite map2_length, seq_length.
-        rewrite fold_mat_nrows, mA_nrows, Nat.min_id.
-        now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-      }
-      rewrite map2_map_r, map2_map_r.
-      rewrite map2_nth with (a := []) (b := 0); cycle 1. {
-        rewrite fold_mat_nrows, mA_nrows.
-        now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-      } {
-        rewrite seq_length.
-        now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-      }
-      rewrite map2_map_r.
-      rewrite map2_map_r.
-      rewrite map2_length, seq_length.
-      rewrite <- List_hd_nth_0.
-      rewrite fold_mat_ncols, mA_ncols, Nat.min_id.
-      specialize (mA_is_correct n) as H1.
-      destruct H1 as (Hcr & Hc).
-      rewrite Hc. 2: {
-        apply nth_In.
-        now rewrite fold_mat_nrows, mA_nrows.
-      }
-      rewrite mA_ncols.
-      apply Nat.min_id.
-    } {
-      apply in_map_iff in Hl.
-      destruct Hl as (i & Hl & Hi); subst l.
-      rewrite map_length, seq_length.
-      unfold mat_of_mat_list_list, mat_ncols; cbn.
-      rewrite List_hd_nth_0.
-      rewrite app_nth1. 2: {
-        rewrite map2_map_r, map2_map_r.
-        rewrite map2_length, seq_length.
-        rewrite fold_mat_nrows, mA_nrows, Nat.min_id.
-        now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-      }
-      rewrite map2_map_r, map2_map_r.
-      rewrite map2_nth with (a := []) (b := 0); cycle 1. {
-        rewrite fold_mat_nrows, mA_nrows.
-        now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-      } {
-        rewrite seq_length.
-        now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-      }
-      rewrite map2_map_r.
-      rewrite map2_map_r.
-      rewrite map2_length, seq_length.
-      rewrite <- List_hd_nth_0.
-      now rewrite fold_mat_ncols, mA_ncols, Nat.min_id.
-    }
-  }
-} {
-  rewrite mA_ncols.
-  cbn - [ "^" ].
-  rewrite app_nil_r, app_length.
-  rewrite map2_length.
-  rewrite fold_mat_nrows, mA_nrows.
-  rewrite map_length, map_length, seq_length, Nat.min_id.
-  now cbn; rewrite Nat.add_0_r.
-} {
-  unfold mat_ncols; cbn.
-  rewrite app_nil_r.
-  rewrite List_hd_nth_0.
-  rewrite app_nth1. 2: {
-    rewrite map2_length.
-    rewrite fold_mat_nrows, mA_nrows.
-    rewrite map_length, map_length, seq_length, Nat.min_id.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  }
-  rewrite map2_nth with (a := []) (b := []); cycle 1. {
-    rewrite fold_mat_nrows, mA_nrows.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  } {
-    rewrite map_length, map_length, seq_length.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  }
-  rewrite map2_length.
-  rewrite <- List_hd_nth_0.
-  rewrite fold_mat_ncols, mA_ncols.
-  rewrite (List_map_nth' []). 2: {
-    rewrite map_length, seq_length.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  }
-  rewrite map_length.
-  rewrite (List_map_nth' 0). 2: {
-    rewrite seq_length.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  }
-  now rewrite map_length, seq_length, Nat.min_id.
-}
-rewrite mat_mul_scal_vect_assoc; cycle 1. {
-  easy.
-} {
-  unfold is_correct_matrix.
-  unfold mat_ncols, mat_of_mat_list_list; cbn.
-  rewrite List_hd_nth_0.
-  rewrite app_nth1. 2: {
-    rewrite map2_length, fold_mat_nrows, mA_nrows.
-    rewrite map_length, map_length, seq_length, Nat.min_id.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  }
-  rewrite map2_nth with (a := []) (b := []); cycle 1. {
-    rewrite fold_mat_nrows, mA_nrows.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  } {
-    rewrite map_length, map_length, seq_length.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  }
-  rewrite map2_length.
-  rewrite <- List_hd_nth_0.
-  rewrite fold_mat_ncols, mA_ncols.
-  rewrite (List_map_nth' []). 2: {
-    rewrite map_length, seq_length.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  }
-  rewrite map_length.
-  rewrite (List_map_nth' 0). 2: {
-    rewrite seq_length.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  }
-  rewrite map_length, seq_length, Nat.min_id.
-  split; [ now intros Hc; apply Nat.pow_nonzero in Hc | ].
-  intros l Hl.
-  apply in_app_or in Hl.
-  destruct Hl as [Hl| Hl]. {
-    apply in_map2_iff in Hl.
-    destruct Hl as (i & Hi & la & lb & Hl).
-    rewrite fold_mat_nrows, mA_nrows in Hi.
-    rewrite map_length, map_length, seq_length, Nat.min_id in Hi.
-    subst l.
-    rewrite map2_length.
-    rewrite fold_corr_mat_ncols; cycle 1. {
-      apply mA_is_correct.
-    } {
-      now rewrite mA_nrows.
-    }
-    rewrite mA_ncols.
-    rewrite (List_map_nth' []); [ | now rewrite map_length, seq_length ].
-    rewrite map_length.
-    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-    now rewrite map_length, seq_length, Nat.min_id.
-  } {
-    rewrite app_nil_r in Hl.
-    apply in_map_iff in Hl.
-    destruct Hl as (i & Hl & Hi); subst l.
-    now rewrite map_length, seq_length.
-  }
-} {
-  unfold mat_ncols; cbn.
-  rewrite app_nil_r, List_hd_nth_0.
-  rewrite app_nth1. 2: {
-    rewrite map2_length, fold_mat_nrows, mA_nrows.
-    rewrite map_length, map_length, seq_length, Nat.min_id.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  }
-  rewrite map2_nth with (a := []) (b := []); cycle 1. {
-    rewrite fold_mat_nrows, mA_nrows.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  } {
-    rewrite map_length, map_length, seq_length.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  }
-  rewrite map2_length, fold_corr_mat_ncols; cycle 1. {
-    apply mA_is_correct.
-  } {
-    rewrite mA_nrows.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  }
-  rewrite mA_ncols.
-  rewrite (List_map_nth' []). 2: {
-    rewrite map_length, seq_length.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  }
-  rewrite map_length.
-  rewrite (List_map_nth' 0). 2: {
-    rewrite seq_length.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  }
-  now rewrite map_length, seq_length, Nat.min_id.
+  apply mat_ncols_mat_list_list_1_2.
 }
 f_equal; cbn.
 rewrite m_o_mll_2x2_2x1 with (n := 2 ^ n); cycle 1. {
@@ -1945,8 +1721,15 @@ rewrite m_o_mll_2x2_2x1 with (n := 2 ^ n); cycle 1. {
 } {
   apply mI_ncols.
 }
-...
 rewrite mat_of_mat_list_list_mul_scal_l.
+cbn.
+Inspect 8.
+Check m_o_mll_2x2_2x1.
+Search mat_of_mat_list_list.
+...
+Search (mat_of_mat_list_list [_; _]).
+...
+rewrite m_o_mll_2x2_2x1.
 ...
 unfold "×"%M.
 Search "×"%M.
