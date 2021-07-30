@@ -1738,6 +1738,19 @@ split. {
   rewrite List_hd_nth_0.
   intros Hc'.
   destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]; [ easy | ].
+  rewrite (List_map_nth' []) in Hc'. 2: {
+    rewrite fold_mat_nrows.
+    now apply Nat.neq_0_lt_0 in Hrz.
+  }
+  rewrite map_length in Hc'.
+  rewrite <- List_hd_nth_0 in Hc'.
+  rewrite fold_mat_ncols in Hc'.
+  now apply Hcr.
+} {
+  intros la Hla.
+...
+  rewrite mat_mul_scal_l_ncols.
+  apply Hc.
 ...
   intros Hc'; apply Hcr.
   rewrite (List_map_nth' []) in Hc'. 2: {

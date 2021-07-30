@@ -1146,6 +1146,24 @@ do 2 rewrite fold_mat_el.
 apply rngl_mul_add_distr_r.
 Qed.
 
+(* *)
+
+Theorem mat_mul_scal_l_ncols : ∀ M μ, mat_ncols (μ × M) = mat_ncols M.
+Proof.
+intros.
+unfold mat_ncols; cbn.
+destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
+  unfold mat_nrows in Hrz.
+  apply length_zero_iff_nil in Hrz.
+  now rewrite Hrz.
+}
+apply Nat.neq_0_lt_0 in Hrz.
+rewrite List_hd_nth_0.
+rewrite (List_map_nth' []); [ | now rewrite fold_mat_nrows ].
+rewrite map_length.
+now rewrite List_hd_nth_0.
+Qed.
+
 (* left distributivity of multiplication by scalar over addition *)
 
 Theorem mat_mul_scal_l_add_distr_r : ∀ a b (M : matrix T),
