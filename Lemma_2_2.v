@@ -1726,30 +1726,10 @@ rewrite mat_mul_add_distr_l; cycle 1. {
   apply mA_is_correct.
 } {
 Search (is_correct_matrix (_ × _)%M).
-Theorem is_correct_matrix_mul_scal_l : ∀ M μ,
-  is_correct_matrix M
-  → is_correct_matrix (μ × M).
-Proof.
-intros * Hm.
-destruct Hm as (Hcr, Hc).
-split. {
-  unfold mat_ncols; cbn.
-  rewrite map_length, fold_mat_nrows.
-  rewrite List_hd_nth_0.
-  intros Hc'.
-  destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]; [ easy | ].
-  rewrite (List_map_nth' []) in Hc'. 2: {
-    rewrite fold_mat_nrows.
-    now apply Nat.neq_0_lt_0 in Hrz.
-  }
-  rewrite map_length in Hc'.
-  rewrite <- List_hd_nth_0 in Hc'.
-  rewrite fold_mat_ncols in Hc'.
-  now apply Hcr.
-} {
-  intros la Hla.
 ...
-  rewrite mat_mul_scal_l_ncols.
+unfold "×"%M in Hla.
+cbn in Hla.
+...
   apply Hc.
 ...
   intros Hc'; apply Hcr.

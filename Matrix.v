@@ -1164,6 +1164,38 @@ rewrite map_length.
 now rewrite List_hd_nth_0.
 Qed.
 
+Theorem is_correct_matrix_mul_scal_l : ∀ M μ,
+  is_correct_matrix M
+  → is_correct_matrix (μ × M).
+Proof.
+intros * Hm.
+destruct Hm as (Hcr, Hc).
+split. {
+  unfold mat_ncols; cbn.
+  rewrite map_length, fold_mat_nrows.
+  rewrite List_hd_nth_0.
+  intros Hc'.
+  destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]; [ easy | ].
+  rewrite (List_map_nth' []) in Hc'. 2: {
+    rewrite fold_mat_nrows.
+    now apply Nat.neq_0_lt_0 in Hrz.
+  }
+  rewrite map_length in Hc'.
+  rewrite <- List_hd_nth_0 in Hc'.
+  rewrite fold_mat_ncols in Hc'.
+  now apply Hcr.
+} {
+  intros la Hla.
+  cbn in Hla.
+  apply in_map_iff in Hla.
+  destruct Hla as (lb & Hla & Hlb).
+  subst la.
+  rewrite map_length.
+  rewrite mat_mul_scal_l_ncols.
+  now apply Hc.
+}
+Qed.
+
 (* left distributivity of multiplication by scalar over addition *)
 
 Theorem mat_mul_scal_l_add_distr_r : ∀ a b (M : matrix T),
