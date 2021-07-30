@@ -625,6 +625,41 @@ Qed.
 (* addition left and right with opposite *)
 
 Theorem mat_add_opp_l {m n} : ∀ (M : matrix T),
+  m = mat_nrows M
+  → n = mat_ncols M
+  → (- M + M = mZ m n)%M.
+Proof.
+intros * Hr Hc.
+subst m n.
+unfold "+"%M, mZ, mat_nrows, mat_ncols; cbn; f_equal.
+destruct M as (ll); cbn.
+induction ll as [| la]; [ easy | cbn ].
+f_equal. {
+  induction la as [| a]; [ easy | cbn ].
+  rewrite IHla.
+  now rewrite rngl_add_opp_l.
+} {
+...
+  induction ll as [| lb]; cbn.
+...
+f_equal. {
+  induction la as [| a]. {
+    cbn.
+clear IHll.
+specialize (HM la (or_introl eq_refl)).
+revert ncols HM.
+induction la as [| a]; intros; cbn; [ now rewrite <- HM | ].
+rewrite rngl_add_opp_l; [ | easy ].
+destruct ncols; [ easy | ].
+cbn; f_equal.
+cbn in HM.
+apply Nat.succ_inj in HM.
+now apply IHla.
+Qed.
+
+...
+
+Theorem mat_add_opp_l {m n} : ∀ (M : matrix T),
   is_correct_matrix M
   → m = mat_nrows M
   → n = mat_ncols M
@@ -3023,6 +3058,7 @@ Delimit Scope M_scope with M.
 
 Arguments mat_el {T}%type {ro} M%M (i j)%nat.
 Arguments mat_add {T}%type {ro} (MA MB)%M.
+Arguments mat_add_assoc {T}%type {ro rp} (MA MB MC)%M.
 Arguments mat_add_opp_r {T}%type {ro rp} Hro M%M.
 Arguments mat_mul {T}%type {ro} (MA MB)%M.
 Arguments mat_mul_add_distr_l {T}%type {ro rp} (MA MB MC)%M.

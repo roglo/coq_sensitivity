@@ -1787,9 +1787,19 @@ rewrite mat_mul_1_r; [ | easy | | ]; cycle 1. {
 }
 rewrite fold_mat_sub.
 rewrite (mat_add_comm (mA n)).
-Search (_ + _ - _)%M.
+Theorem mat_add_sub :
+  rngl_has_opp = true →
+  ∀ MA MB : matrix T, (MA + MB - MB)%M = MA.
+Proof.
+intros Hop *.
+unfold mat_sub.
+rewrite <- mat_add_assoc.
+rewrite fold_mat_sub.
+rewrite mat_add_opp_r; [ | easy | ].
 ...
 rewrite mat_add_sub.
+Search (_ + _ - _)%M.
+...
 ...
 apply Hc.
 split. {
