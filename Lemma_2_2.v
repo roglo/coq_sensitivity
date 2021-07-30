@@ -1771,6 +1771,32 @@ rewrite mat_mul_add_distr_l; [ | easy | easy | | | | ]; cycle 1. {
 }
 rewrite mat_mul_1_l; [ | easy | easy | symmetry; apply mA_nrows ].
 rewrite mat_mul_1_l; [ | easy | easy | easy ].
+rewrite mat_mul_1_r; [ | easy | | ]; cycle 1. {
+Search (is_correct_matrix (- _)).
+Theorem mat_opp_is_correct : ∀ M,
+  is_correct_matrix M
+  → is_correct_matrix (- M).
+Proof.
+intros * Hm.
+destruct Hm as (Hcr, Hc).
+destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
+  split. {
+    unfold mat_ncols, mat_nrows; cbn.
+    rewrite List_hd_nth_0.
+Search (mat_nrows _ = 0).
+...
+destruct Hm as (Hcr, Hc).
+split. {
+  unfold mat_ncols, mat_nrows; cbn.
+  rewrite List_hd_nth_0.
+  rewrite (List_map_nth' []). 2: {
+    rewrite fold_mat_nrows.
+
+Search (mat_nrows (- _)).
+...
+Search (- _ * _)%M.
+rewrite mat_opp_mul_l.
+rewrite fold_mat_sub.
 ...
 unfold "×"%M in Hla.
 cbn in Hla.
