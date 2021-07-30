@@ -622,42 +622,18 @@ cbn in HM.
 now apply Nat.succ_inj in HM.
 Qed.
 
-(* addition left and right with opposite *)
-
-Theorem mat_add_opp_l {m n} : ∀ (M : matrix T),
-  m = mat_nrows M
+Theorem mat_add_0_r {m n} : ∀ (M : matrix T),
+  is_correct_matrix M
+  → m = mat_nrows M
   → n = mat_ncols M
-  → (- M + M = mZ m n)%M.
+  → (M + mZ m n)%M = M.
 Proof.
-intros * Hr Hc.
-subst m n.
-unfold "+"%M, mZ, mat_nrows, mat_ncols; cbn; f_equal.
-destruct M as (ll); cbn.
-induction ll as [| la]; [ easy | cbn ].
-f_equal. {
-  induction la as [| a]; [ easy | cbn ].
-  rewrite IHla.
-  now rewrite rngl_add_opp_l.
-} {
-...
-  induction ll as [| lb]; cbn.
-...
-f_equal. {
-  induction la as [| a]. {
-    cbn.
-clear IHll.
-specialize (HM la (or_introl eq_refl)).
-revert ncols HM.
-induction la as [| a]; intros; cbn; [ now rewrite <- HM | ].
-rewrite rngl_add_opp_l; [ | easy ].
-destruct ncols; [ easy | ].
-cbn; f_equal.
-cbn in HM.
-apply Nat.succ_inj in HM.
-now apply IHla.
+intros * HM Hr Hc.
+rewrite mat_add_comm.
+now apply mat_add_0_l.
 Qed.
 
-...
+(* addition left and right with opposite *)
 
 Theorem mat_add_opp_l {m n} : ∀ (M : matrix T),
   is_correct_matrix M
@@ -699,6 +675,22 @@ intros * HM.
 unfold mat_sub.
 rewrite mat_add_comm.
 now apply mat_add_opp_l.
+Qed.
+
+Theorem mat_add_sub :
+  ∀ MA MB : matrix T,
+  is_correct_matrix MA
+  → is_correct_matrix MB
+  → mat_nrows MA = mat_nrows MB
+  → mat_ncols MA = mat_ncols MB
+  → (MA + MB - MB)%M = MA.
+Proof.
+intros * Ha Hb Hrab Hcab.
+unfold mat_sub.
+rewrite <- mat_add_assoc.
+rewrite fold_mat_sub.
+rewrite mat_add_opp_r; [ | easy ].
+now rewrite mat_add_0_r.
 Qed.
 
 Theorem mZ_nrows : ∀ m n, mat_nrows (mZ m n) = m.
@@ -1379,7 +1371,7 @@ f_equal.
 now apply rngl_mul_comm.
 Qed.
 
-Theorem mat_mul_scal_add_distr_l : ∀ a (MA MB : matrix T),
+Theorem mat_mul_scal_l_add_distr_l : ∀ a (MA MB : matrix T),
   (a × (MA + MB) = (a × MA + a × MB))%M.
 Proof.
 intros.
@@ -3058,12 +3050,20 @@ Delimit Scope M_scope with M.
 
 Arguments mat_el {T}%type {ro} M%M (i j)%nat.
 Arguments mat_add {T}%type {ro} (MA MB)%M.
+Arguments mat_add_0_r {T}%type {ro rp} {m n}%nat M%M.
+Arguments mat_add_add_swap {T}%type {ro rp} (MA MB MC)%M.
 Arguments mat_add_assoc {T}%type {ro rp} (MA MB MC)%M.
+Arguments mat_add_comm {T}%type {ro rp} (MA MB)%M.
 Arguments mat_add_opp_r {T}%type {ro rp} Hro M%M.
+Arguments mat_add_sub {T}%type {ro rp} Hro (MA MB)%M.
 Arguments mat_mul {T}%type {ro} (MA MB)%M.
 Arguments mat_mul_add_distr_l {T}%type {ro rp} (MA MB MC)%M.
 Arguments mat_mul_el {T}%type {ro} (MA MB)%M (i k)%nat.
+Arguments mat_mul_scal_l_add_distr_l {T}%type {ro rp} a%F (MA MB)%M.
+Arguments mat_mul_scal_l_add_distr_r {T}%type {ro rp} (a b)%F M%M.
+Arguments mat_mul_scal_1_l {T}%type {ro rp} M%M.
 Arguments mat_mul_scal_l_mul {T}%type {ro rp} Hro a%F (MA MB)%M.
+Arguments mat_mul_scal_l_mul_assoc {T}%type {ro rp} (a b)%F M%M.
 Arguments mat_mul_mul_scal_l {T}%type {ro rp} Hro Hic a%F (MA MB)%M.
 Arguments mat_mul_scal_l {T ro} s%F M%M.
 Arguments mat_mul_vect_r {T ro} M%M V%V.
