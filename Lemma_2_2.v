@@ -1722,26 +1722,55 @@ rewrite m_o_mll_2x2_2x1 with (n := 2 ^ n); cycle 1. {
   apply mI_ncols.
 }
 rewrite mat_of_mat_list_list_mul_scal_l; cbn.
-rewrite mat_mul_add_distr_l; cycle 1. {
-  apply mA_is_correct.
-} {
+assert (Hcma : is_correct_matrix (mA n)) by apply mA_is_correct.
+assert (Hcmμi : is_correct_matrix (μ × mI (2 ^ n))). {
   apply is_correct_matrix_mul_scal_l.
   apply mI_is_correct_matrix.
-} {
+}
+assert (Hμir : mat_nrows (μ × mI (2 ^ n)) = 2 ^ n). {
+  rewrite mat_mul_scal_l_nrows.
+  apply mI_nrows.
+}
+rewrite mat_mul_add_distr_l; [ | easy | easy | | | | ]; cycle 1. {
   rewrite mA_nrows.
   now apply Nat.pow_nonzero.
 } {
   now rewrite mA_nrows, mA_ncols.
 } {
-  rewrite mA_nrows.
-  rewrite mat_mul_scal_l_nrows.
-  symmetry; apply mI_nrows.
+  now rewrite mA_nrows.
 } {
   rewrite mA_ncols.
   rewrite mat_mul_scal_l_ncols.
   symmetry; apply mI_ncols.
 }
 rewrite lemma_2_A_n_2_eq_n_I; [ | easy ].
+rewrite mat_mul_mul_scal_l; [ | easy | easy | | | ]; cycle 1. {
+  apply mI_is_correct_matrix.
+} {
+  rewrite mA_ncols.
+  now apply Nat.pow_nonzero.
+} {
+  now rewrite mA_ncols, mI_nrows.
+}
+rewrite mat_mul_1_r; [ | easy | easy | symmetry; apply mA_ncols ].
+rewrite mat_mul_1_r; [ | easy | | ]; cycle 1. {
+  apply mI_is_correct_matrix.
+} {
+  symmetry; apply mI_ncols.
+}
+rewrite mat_mul_add_distr_l; [ | easy | easy | | | | ]; cycle 1. {
+  rewrite mA_nrows.
+  now apply Nat.pow_nonzero.
+} {
+  now rewrite mI_ncols, mA_nrows.
+} {
+  now rewrite mA_nrows.
+} {
+  rewrite mA_ncols.
+  now rewrite mat_mul_scal_l_ncols, mI_ncols.
+}
+rewrite mat_mul_1_l; [ | easy | easy | symmetry; apply mA_nrows ].
+rewrite mat_mul_1_l; [ | easy | easy | easy ].
 ...
 unfold "×"%M in Hla.
 cbn in Hla.
