@@ -1772,26 +1772,36 @@ rewrite mat_mul_add_distr_l; [ | easy | easy | | | | ]; cycle 1. {
 rewrite mat_mul_1_l; [ | easy | easy | symmetry; apply mA_nrows ].
 rewrite mat_mul_1_l; [ | easy | easy | easy ].
 rewrite mat_mul_1_r; [ | easy | | ]; cycle 1. {
-Search (is_correct_matrix (- _)).
-Theorem mat_opp_is_correct : ∀ M,
-  is_correct_matrix M
-  → is_correct_matrix (- M).
-Proof.
-intros * Hm.
-destruct Hm as (Hcr, Hc).
-destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
-  split. {
-    unfold mat_ncols, mat_nrows; cbn.
-    rewrite List_hd_nth_0.
-Search (mat_nrows _ = 0).
+  now apply mat_opp_is_correct.
+} {
+  unfold mat_ncols; cbn.
+  rewrite List_hd_nth_0.
+  rewrite (List_map_nth' []). 2: {
+    rewrite fold_mat_nrows, mA_nrows.
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  }
+  rewrite map_length; cbn.
+  rewrite <- List_hd_nth_0.
+  rewrite fold_mat_ncols.
+  symmetry; apply mA_ncols.
+}
+rewrite fold_mat_sub.
+rewrite (mat_add_comm (mA n)).
+Search (_ + _ - _)%M.
 ...
-destruct Hm as (Hcr, Hc).
+rewrite mat_add_sub.
+...
+apply Hc.
 split. {
   unfold mat_ncols, mat_nrows; cbn.
   rewrite List_hd_nth_0.
-  rewrite (List_map_nth' []). 2: {
-    rewrite fold_mat_nrows.
-
+  rewrite (List_map_nth' []); [ | easy ].
+  do 2 rewrite map_length.
+  rewrite <- List_hd_nth_0.
+  now rewrite fold_mat_nrows, fold_mat_ncols.
+} {
+  unfold mat_ncols; cbn.
+  rewrite List_hd_nth_0.
 Search (mat_nrows (- _)).
 ...
 Search (- _ * _)%M.

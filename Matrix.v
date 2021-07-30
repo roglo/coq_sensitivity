@@ -153,6 +153,15 @@ Theorem fold_mat_el {T} {ro : ring_like_op T} : ∀ (M : matrix T) i j,
   nth j (nth i (mat_list_list M) []) 0%F = mat_el M i j.
 Proof. easy. Qed.
 
+Theorem eq_mat_nrows_0 {T} : ∀ M : matrix T,
+  mat_nrows M = 0
+  → mat_list_list M = [].
+Proof.
+intros * Hr.
+unfold mat_nrows in Hr.
+now apply length_zero_iff_nil in Hr.
+Qed.
+
 (* correct_matrix: matrix whose list list is made of non
    empty lists (rows) of same length *)
 (* this definition should (if it could) be defined like
@@ -1827,6 +1836,34 @@ cbn in Hl.
 apply repeat_spec in Hl.
 subst l.
 apply repeat_length.
+Qed.
+
+Theorem mat_opp_is_correct : ∀ M,
+  is_correct_matrix M
+  → is_correct_matrix (- M).
+Proof.
+intros * Hm.
+destruct Hm as (Hcr, Hc).
+destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
+  apply eq_mat_nrows_0 in Hrz.
+  unfold is_correct_matrix.
+  unfold mat_ncols, mat_nrows; cbn.
+  now rewrite Hrz; cbn.
+}
+apply Nat.neq_0_lt_0 in Hrz.
+unfold is_correct_matrix.
+unfold mat_ncols, mat_nrows; cbn.
+rewrite List_hd_nth_0.
+rewrite (List_map_nth' []); [ | easy ].
+do 2 rewrite map_length.
+rewrite <- List_hd_nth_0.
+rewrite fold_mat_nrows, fold_mat_ncols.
+split; [ easy | ].
+intros la Hla.
+apply in_map_iff in Hla.
+destruct Hla as (lb & Hla & Hlb); subst la.
+rewrite map_length.
+now apply Hc.
 Qed.
 
 Definition smI n : square_matrix n T :=
