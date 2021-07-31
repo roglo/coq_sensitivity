@@ -1805,41 +1805,49 @@ rewrite mat_add_comm, mat_mul_scal_l_add_distr_r.
 now rewrite mat_mul_scal_1_l.
 Qed.
 
-Inspect 1.
-
-...
-
 Theorem A_n_eigenvalue_squared_is_n :
   rngl_is_comm = true →
   rngl_has_opp = true →
   rngl_has_dec_eq = true →
   rngl_has_inv = true →
-  ∀ n μ (V : vector (2 ^ n) T),
-  V ≠ vect_zero (2 ^ n)
+  ∀ n μ (V : vector T),
+  vect_size V = 2 ^ n
+  → V ≠ vect_zero (2 ^ n)
   → (mA n • V = μ × V)%V
   → (μ * μ)%F = rngl_of_nat n.
 Proof.
-intros Hic Hro Hed Hin * Hvr Hav.
+intros Hic Hro Hed Hin * Hvs Hvr Hav.
 specialize (lemma_2_A_n_2_eq_n_I Hro n) as Ha.
+specialize (mA_is_correct n) as Hac.
+specialize (mI_is_correct_matrix (2 ^ n)) as Hicm.
+assert (Hcs : mat_ncols (mA n) = vect_size V) by now rewrite mA_ncols.
 (* μ * μ = rngl_of_nat n *)
-apply vect_mul_scal_reg_r with (V0 := V); [ now left | easy | easy | ].
+apply vect_mul_scal_reg_r with (V0 := V); [ now left | easy | congruence | ].
 (* (μ * μ) × V = rngl_of_nat n × V *)
 rewrite <- vect_mul_scal_l_mul_assoc; [ | easy ].
 (* μ × (μ × V) = rngl_of_nat n × V *)
 rewrite <- Hav.
 (* μ × (mA n . V) = rngl_of_nat n × V *)
-rewrite mat_mul_scal_vect_comm; [ | easy | easy ].
+rewrite mat_mul_scal_vect_comm; [ | easy | easy | easy | easy ].
 (* mA n . (μ × V) = rngl_of_nat n × V *)
 rewrite <- Hav.
 (* mA n . (mA n . V) = rngl_of_nat n × V *)
-rewrite mat_vect_mul_assoc; [ | easy ].
+rewrite mat_vect_mul_assoc; [ | easy | easy | easy | | easy ]. 2: {
+  now rewrite mA_nrows, mA_ncols.
+}
 (* (mA n * mA n) . V = rngl_of_nat n × V *)
 rewrite Ha.
 (* (rngl_of_nat n × mI (2 ^ n)) . V = rngl_of_nat n × V *)
-rewrite <- mat_mul_scal_vect_assoc; [ | easy ].
+rewrite <- mat_mul_scal_vect_assoc; [ | easy | easy | ]. 2: {
+  now rewrite mI_ncols.
+}
 (* rngl_of_nat n × (mI (2 ^ n) . V) = rngl_of_nat n × V *)
 rewrite mat_vect_mul_1_l; easy.
 Qed.
+
+Inspect 1.
+
+...
 
 Definition is_eigenvector_of_An n μ (V : vector (2 ^ n) T) :=
   V ≠ vect_zero (2 ^ n) ∧ (mA n • V = μ × V)%V.
