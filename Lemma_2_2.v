@@ -1911,6 +1911,8 @@ split. {
   (* V ≠ vect_zero (2 ^ n) *)
   subst V.
   unfold A_Sn_eigenvector_of_sqrt_Sn.
+Print base_vector_1.
+...
 (*1*)
   unfold mat_of_mat_list_list.
   cbn - [ "^" ].
