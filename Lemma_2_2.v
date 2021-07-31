@@ -1845,12 +1845,8 @@ rewrite <- mat_mul_scal_vect_assoc; [ | easy | easy | ]. 2: {
 rewrite mat_vect_mul_1_l; easy.
 Qed.
 
-Inspect 1.
-
-...
-
-Definition is_eigenvector_of_An n μ (V : vector (2 ^ n) T) :=
-  V ≠ vect_zero (2 ^ n) ∧ (mA n • V = μ × V)%V.
+Definition is_eigenvector_of_An n μ (V : vector T) :=
+  vect_size V = 2 ^ n ∧ V ≠ vect_zero (2 ^ n) ∧ (mA n • V = μ × V)%V.
 
 Theorem μ_is_ev_of_An_iff_μ2_eq_n :
   rngl_is_comm = true →
@@ -1873,15 +1869,11 @@ split. {
     cbn in Hμ |-*.
     unfold is_eigenvector_of_An; cbn.
     exists (base_vector_1 1).
+    split; [ easy | ].
     split. {
       intros H.
       injection H; clear H; intros H.
-      set (f := λ i, match i with 0 => 1%F | S _ => 0%F end) in H.
-      set (g := λ _, 0%F) in H.
-      assert (H1 : ∀ i, f i = g i) by now rewrite H.
-      specialize (H1 0).
-      unfold f, g in H1; cbn in H1.
-      now apply rngl_1_neq_0 in H1.
+      now revert H; apply rngl_1_neq_0.
     }
     specialize An_eigen_equation_for_sqrt_n as H1.
     specialize (H1 Hic Hro Hin Heq).
@@ -1890,20 +1882,43 @@ split. {
   remember (A_Sn_eigenvector_of_sqrt_Sn n μ (base_vector_1 (2 ^ n))) as V
     eqn:Hv.
   exists V.
+  split. {
+    subst V.
+    cbn - [ "^" ].
+    rewrite app_nil_r.
+    rewrite map_length, app_length.
+    unfold fold_app_in_list, iter_list.
+    cbn - [ "^" ].
+    rewrite map2_length, fold_mat_nrows, mA_nrows.
+    do 2 rewrite map_length.
+    rewrite seq_length, Nat.min_id.
+    now cbn; rewrite Nat.add_0_r.
+  }
   split. 2: {
     specialize An_eigen_equation_for_sqrt_n as H1.
     specialize (H1 Hic Hro Hin Heq).
     specialize (H1 (S n) μ Hμ).
     cbn - [ mA ] in H1.
-    specialize (H1 (base_vector_1 (2 ^ n))).
-    now specialize (H1 V Hv).
+    specialize (H1 (base_vector_1 (2 ^ n)) V).
+    cbn in H1.
+    rewrite repeat_length in H1.
+    rewrite <- Nat.sub_succ_l in H1. 2: {
+      now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+    }
+    cbn in H1; rewrite Nat.sub_0_r in H1.
+    now specialize (H1 eq_refl Hv).
   }
   (* V ≠ vect_zero (2 ^ n) *)
   subst V.
   unfold A_Sn_eigenvector_of_sqrt_Sn.
+(*
   unfold mat_of_list_list_1_row_2_col.
+*)
   cbn - [ Nat.pow ].
+(*
   destruct (two_pow_n_mul_two n).
+*)
+...
   destruct (Nat.mul_1_r (2 ^ n)).
   cbn - [ Nat.pow ].
   intros H.
@@ -1951,5 +1966,7 @@ split. {
   now apply H in Hμ.
 }
 Qed.
+
+...
 
 End a.
