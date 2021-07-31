@@ -1911,14 +1911,53 @@ split. {
   (* V ≠ vect_zero (2 ^ n) *)
   subst V.
   unfold A_Sn_eigenvector_of_sqrt_Sn.
-(*
-  unfold mat_of_list_list_1_row_2_col.
-*)
-  cbn - [ Nat.pow ].
-(*
-  destruct (two_pow_n_mul_two n).
-*)
+(*1*)
+  unfold mat_of_mat_list_list.
+  cbn - [ "^" ].
+  rewrite app_nil_r.
+  unfold fold_app_in_list, iter_list.
+  cbn - [ "^" ].
+  intros H.
+  injection H; clear H; intros H1.
+  rewrite map_app in H1.
+  rewrite repeat_app in H1.
+  rewrite Nat.add_0_r in H1.
+  do 2 rewrite map_map in H1.
+  erewrite map_ext_in in H1. 2: {
+    intros la Hla.
+    unfold vect_dot_mul.
+    rewrite all_0_rngl_summation_list_0. 2: {
+      intros i Hi.
+      apply in_map2_iff in Hi; cbn in Hi.
+      destruct Hi as (j & Hj & a & b & Hi); subst i.
+      apply in_map2_iff in Hla.
+      rewrite map_length, seq_length in Hla.
+      rewrite fold_mat_nrows, mA_nrows, Nat.min_id in Hla.
+      destruct Hla as (k & Hk & lb & lc & Hla).
 ...
+  cbn in H1.
+...
+  apply app_eq_app in H1.
+  destruct H1 as (la & Hla).
+  destruct Hla as [Hla| Hla]. {
+...
+    destruct Hla as (Hla & Hrla).
+    rewrite map_map in Hrla.
+...
+  do 2 rewrite map2_map_r in H1.
+  rewrite map_app in H1.
+  rewrite map_map2 in H1.
+  rewrite map_map in H1.
+  unfold vect_dot_mul in H1.
+  cbn in H1.
+  rewrite Nat.add_0_r in H1.
+  rewrite repeat_app in H1.
+  apply app_eq_app in H1.
+  cbn in H1.
+...1
+  unfold mat_of_list_list_1_row_2_col.
+  cbn - [ Nat.pow ].
+  destruct (two_pow_n_mul_two n).
   destruct (Nat.mul_1_r (2 ^ n)).
   cbn - [ Nat.pow ].
   intros H.
