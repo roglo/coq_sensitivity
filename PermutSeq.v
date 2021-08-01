@@ -40,11 +40,8 @@ Definition is_permut f n :=
   (∀ i, i < n → f i < n) ∧
   (∀ i j, i < n → j < n → f i = f j → i = j).
 
-Print vect_el.
-
-...
-
-Definition is_permut_vect {n} (σ : vector nat) := is_permut (vect_el σ) n.
+Definition is_permut_vect {n} (σ : vector nat) :=
+  is_permut (λ i, nth i (vect_list σ) 0) n.
 
 Fixpoint permut_fun_inv f i j :=
   match i with
@@ -58,7 +55,9 @@ Definition transposition i j k :=
 Definition swap_elem (f : nat → nat) i j k :=
   f (transposition i j k).
 
-Definition vect_swap_elem n (v : vector n nat) i j :=
+...
+
+Definition vect_swap_elem n (v : vector nat) i j :=
   mk_vect n (swap_elem (vect_el v) i j).
 
 Theorem permut_ub : ∀ n f i,
