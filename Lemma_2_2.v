@@ -1854,11 +1854,10 @@ Theorem μ_is_ev_of_An_iff_μ2_eq_n :
   rngl_has_dec_eq = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
-  rngl_characteristic = 0 →
   ∀ n μ,
   (∃ V, is_eigenvector_of_An n μ V) ↔ (μ * μ = rngl_of_nat n)%F.
 Proof.
-intros Hic Hro Heq Hin H10 Hch *.
+intros Hic Hro Heq Hin H10 *.
 split. {
   intros HV.
   destruct HV as (V & Hvz & Hv).
@@ -1911,7 +1910,6 @@ split. {
   (* V ≠ vect_zero (2 ^ n) *)
   subst V.
   unfold A_Sn_eigenvector_of_sqrt_Sn.
-(*1*)
   unfold mat_of_mat_list_list.
   cbn; rewrite Nat.add_0_r.
   rewrite app_nil_r.
@@ -1928,7 +1926,6 @@ split. {
     now rewrite map_length, seq_length, Nat.min_id.
   }
   destruct H1 as (H1, H2).
-(*2*)
   rewrite List_repeat_as_map in H2.
   apply ext_in_map with (a := 0) in H2. 2: {
     apply in_seq.
@@ -1962,124 +1959,5 @@ split. {
   now specialize (rngl_1_neq_0 H10) as H3.
 }
 Qed.
-
-...
-Search (seq _ (_ + _)).
-  rewrite <- seq_shift in H2.
-Search (map2 _ _ (_ :: _)).
-Search (map2 _ (_ :: _)).
-...2
-  rewrite List_map_map_seq with (d := []) in H1.
-  rewrite map2_length in H1.
-  rewrite fold_mat_nrows, mA_nrows in H1.
-  rewrite map_length, seq_length, Nat.min_id in H1.
-  rewrite List_repeat_as_map in H1.
-  apply ext_in_map with (a := 0) in H1. 2: {
-    apply in_seq.
-    split; [ easy | ].
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  }
-  unfold vect_dot_mul in H1.
-  cbn in H1.
-  rewrite map2_nth with (a := []) (b := []) in H1; cycle 1. {
-    rewrite fold_mat_nrows, mA_nrows.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  } {
-    rewrite map_length, seq_length.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  }
-  rewrite (List_map_nth' 0) in H1. 2: {
-    rewrite seq_length.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  }
-  do 2 rewrite map2_map_r in H1.
-...
-revert x2 y1 y2 Hxy Haa.
-induction x1 as [| a1]; intros; cbn.
-...
-  erewrite map_ext_in in H1. 2: {
-    intros la Hla.
-    unfold vect_dot_mul.
-    rewrite all_0_rngl_summation_list_0. 2: {
-      intros i Hi.
-      apply in_map2_iff in Hi; cbn in Hi.
-      destruct Hi as (j & Hj & a & b & Hi); subst i.
-      apply in_map2_iff in Hla.
-      rewrite map_length, seq_length in Hla.
-      rewrite fold_mat_nrows, mA_nrows, Nat.min_id in Hla.
-      destruct Hla as (k & Hk & lb & lc & Hla).
-...
-  cbn in H1.
-...
-  apply app_eq_app in H1.
-  destruct H1 as (la & Hla).
-  destruct Hla as [Hla| Hla]. {
-...
-    destruct Hla as (Hla & Hrla).
-    rewrite map_map in Hrla.
-...
-  do 2 rewrite map2_map_r in H1.
-  rewrite map_app in H1.
-  rewrite map_map2 in H1.
-  rewrite map_map in H1.
-  unfold vect_dot_mul in H1.
-  cbn in H1.
-  rewrite Nat.add_0_r in H1.
-  rewrite repeat_app in H1.
-  apply app_eq_app in H1.
-  cbn in H1.
-...1
-  unfold mat_of_list_list_1_row_2_col.
-  cbn - [ Nat.pow ].
-  destruct (two_pow_n_mul_two n).
-  destruct (Nat.mul_1_r (2 ^ n)).
-  cbn - [ Nat.pow ].
-  intros H.
-  remember base_vector_1 as ffff.
-  injection H; clear H; intros H1.
-  subst ffff.
-  rewrite Nat.mul_1_r in H1.
-  set
-    (f :=
-       λ i,
-       (Σ (j = 0, 2 ^ n - 1),
-        mat_list_list_el [[(mA n + μ × mI (2 ^ n))%M]; [mI (2 ^ n)]] i j *
-        vect_el (base_vector_1 (2 ^ n)) j)%F) in H1.
-  set (g := λ _, 0%F) in H1.
-  assert (H3 : ∀ i, f i = g i) by now rewrite H1.
-  specialize (H3 0) as H4.
-  unfold f, g in H4.
-  rewrite rngl_summation_split_first in H4; [ | easy | flia ].
-  unfold base_vector_1 in H4 at 1.
-  cbn - [ base_vector_1 ] in H4.
-  rewrite rngl_mul_1_r in H4.
-  unfold mat_list_list_el in H4 at 1.
-  cbn - [ base_vector_1 ] in H4.
-  rewrite Nat.div_small in H4; [ | now apply Nat.neq_0_lt_0, Nat.pow_nonzero ].
-  rewrite Nat.mod_small in H4; [ | now apply Nat.neq_0_lt_0, Nat.pow_nonzero ].
-  cbn - [ base_vector_1 ] in H4.
-  rewrite rngl_mul_1_r in H4.
-  rewrite mA_diag_zero in H4; [ | easy | ]. 2: {
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  }
-  rewrite rngl_add_0_l in H4.
-  rewrite all_0_rngl_summation_0 in H4; [ | easy | ]. 2: {
-    intros i Hi; cbn.
-    destruct i; [ easy | ].
-    unfold mat_list_list_el; cbn.
-    now apply rngl_mul_0_r; left.
-  }
-  rewrite rngl_add_0_r in H4.
-  rewrite H4 in Hμ.
-  rewrite rngl_mul_0_l in Hμ; [ | now left ].
-  symmetry in Hμ.
-  move Hμ at bottom.
-  specialize rngl_characteristic_prop as H.
-  rewrite Hch in H.
-  now apply H in Hμ.
-}
-Qed.
-
-...
 
 End a.
