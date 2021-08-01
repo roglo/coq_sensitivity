@@ -55,6 +55,9 @@ Definition transposition i j k :=
 Definition swap_elem (f : nat → nat) i j k :=
   f (transposition i j k).
 
+Definition vect_swap_elem n (v : vector nat) i j :=
+  mk_vect (swap_elem (vect_el v) i j).
+
 ...
 
 Definition vect_swap_elem n (v : vector nat) i j :=
