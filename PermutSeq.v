@@ -55,13 +55,11 @@ Definition transposition i j k :=
 Definition swap_elem (f : nat → nat) i j k :=
   f (transposition i j k).
 
-Definition vect_swap_elem n (v : vector nat) i j :=
-  mk_vect (swap_elem (vect_el v) i j).
-
-...
-
-Definition vect_swap_elem n (v : vector nat) i j :=
-  mk_vect n (swap_elem (vect_el v) i j).
+Definition vect_swap_elem (v : vector nat) i j :=
+  mk_vect
+    (map
+       (λ k, nth (transposition i j k) (vect_list v) 0)
+       (seq 0 (length (vect_list v)))).
 
 Theorem permut_ub : ∀ n f i,
   is_permut f n → i < n → f i < n.
@@ -194,6 +192,8 @@ Definition list_of_bidule n (f : nat → nat → nat → nat) :=
 Compute (list_of_bidule 3 mk_canon_sym_gr).
 Compute (list_of_bidule 4 mk_canon_sym_gr).
 *)
+
+...
 
 Definition mk_canon_sym_gr_vect' n : vector n! (vector n nat) :=
   mk_vect n! (λ k, mk_vect n (mk_canon_sym_gr n k)).
