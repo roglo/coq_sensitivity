@@ -195,6 +195,11 @@ Compute (list_of_bidule 4 mk_canon_sym_gr).
 
 ...
 
+Definition mk_canon_sym_gr_vect' n : vector (vector nat) :=
+  mk_vect (λ k, mk_vect n (mk_canon_sym_gr n k)).
+
+...
+
 Definition mk_canon_sym_gr_vect' n : vector n! (vector n nat) :=
   mk_vect n! (λ k, mk_vect n (mk_canon_sym_gr n k)).
 
