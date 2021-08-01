@@ -1842,6 +1842,27 @@ Theorem List_app_cons : ∀ A (l1 l2 : list A) a,
   l1 ++ a :: l2 = l1 ++ [a] ++ l2.
 Proof. easy. Qed.
 
+Theorem List_app_eq_app' :
+  ∀ (X : Type) (x1 x2 y1 y2 : list X),
+    length x1 = length y1
+    → x1 ++ x2 = y1 ++ y2
+    → x1 = y1 ∧ x2 = y2.
+Proof.
+intros * Hxy Haa.
+revert x2 y1 y2 Hxy Haa.
+induction x1 as [| a1]; intros; cbn. {
+  cbn in Hxy, Haa.
+  symmetry in Hxy; apply length_zero_iff_nil in Hxy.
+  now subst x2 y1.
+}
+destruct y1 as [| b1]; [ easy | ].
+injection Haa; clear Haa; intros H1 H2; subst b1.
+cbn in Hxy.
+apply Nat.succ_inj in Hxy.
+specialize (IHx1 x2 y1 y2 Hxy H1).
+now destruct IHx1; subst y1 y2.
+Qed.
+
 Theorem List_last_nth : ∀ A l (d : A), last l d = nth (length l - 1) l d.
 Proof.
 intros.
