@@ -13,6 +13,11 @@ Require Import Pigeonhole.
 
 Definition comp {A B C} (f : B → C) (g : A → B) x := f (g x).
 
+Definition permut_comp (σ₁ σ₂ : vector nat) :=
+  mk_vect (map (λ i, nth i (vect_list σ₁) 0) (vect_list σ₂)).
+
+Compute (permut_comp (vect_of_list (seq 0 3)) (vect_of_list (rev (seq 0 3)))).
+
 ...
 
 Definition permut_comp {n} (σ₁ σ₂ : vector n nat) :=
