@@ -40,9 +40,11 @@ Definition is_permut f n :=
   (∀ i, i < n → f i < n) ∧
   (∀ i j, i < n → j < n → f i = f j → i = j).
 
+Print vect_el.
+
 ...
 
-Definition is_permut_vect {n} (σ : vector n nat) := is_permut (vect_el σ) n.
+Definition is_permut_vect {n} (σ : vector nat) := is_permut (vect_el σ) n.
 
 Fixpoint permut_fun_inv f i j :=
   match i with
