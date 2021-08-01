@@ -1929,6 +1929,45 @@ split. {
   }
   destruct H1 as (H1, H2).
 (*2*)
+  rewrite List_repeat_as_map in H2.
+  apply ext_in_map with (a := 0) in H2. 2: {
+    apply in_seq.
+    split; [ easy | ].
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  }
+  unfold vect_dot_mul in H2.
+  cbn in H2.
+  replace (2 ^ n) with (1 + (2 ^ n - 1)) in H2 at 1. 2: {
+    rewrite Nat.add_comm.
+    apply Nat.sub_add.
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  }
+  rewrite seq_app in H2.
+  cbn in H2.
+  rewrite rngl_mul_1_l in H2.
+  rewrite rngl_summation_list_cons in H2.
+  rewrite all_0_rngl_summation_list_0 in H2. 2: {
+    intros i Hi.
+    rewrite <- seq_shift in Hi.
+    rewrite map_map in Hi.
+    rewrite map2_map_l in Hi.
+    rewrite List_repeat_as_map in Hi.
+    rewrite map2_map_r in Hi.
+    rewrite map2_diag in Hi.
+    apply in_map_iff in Hi.
+    destruct Hi as (j & Hi & Hj); subst i.
+    now apply rngl_mul_0_r; left.
+  }
+  rewrite rngl_add_0_r in H2.
+  now specialize (rngl_1_neq_0 H10) as H3.
+}
+Qed.
+
+...
+Search (seq _ (_ + _)).
+  rewrite <- seq_shift in H2.
+Search (map2 _ _ (_ :: _)).
+Search (map2 _ (_ :: _)).
 ...2
   rewrite List_map_map_seq with (d := []) in H1.
   rewrite map2_length in H1.
