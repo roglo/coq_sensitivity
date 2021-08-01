@@ -13,15 +13,16 @@ Require Import Pigeonhole.
 
 Definition comp {A B C} (f : B → C) (g : A → B) x := f (g x).
 
+Definition comp_list (la lb : list nat) :=
+  map (λ i, nth i la 0) lb.
+
 Definition permut_comp (σ₁ σ₂ : vector nat) :=
-  mk_vect (map (λ i, nth i (vect_list σ₁) 0) (vect_list σ₂)).
+  comp_list (vect_list σ₁) (vect_list σ₂).
 
-Compute (permut_comp (vect_of_list (seq 0 3)) (vect_of_list (rev (seq 0 3)))).
-
-...
-
-Definition permut_comp {n} (σ₁ σ₂ : vector n nat) :=
-  mk_vect n (comp (vect_el σ₁) (vect_el σ₂)).
+(*
+Compute (comp_list [0;2;1] [2;1;0]).
+Compute (map (comp (λ i, nth i [0;2;1] 0) (λ i, nth i [2;1;0] 0)) [0;1;2]).
+*)
 
 Notation "σ₁ ° σ₂" := (permut_comp σ₁ σ₂) (at level 40).
 
@@ -38,6 +39,8 @@ Context (rp : ring_like_prop T).
 Definition is_permut f n :=
   (∀ i, i < n → f i < n) ∧
   (∀ i j, i < n → j < n → f i = f j → i = j).
+
+...
 
 Definition is_permut_vect {n} (σ : vector n nat) := is_permut (vect_el σ) n.
 
