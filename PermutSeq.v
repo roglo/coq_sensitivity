@@ -251,7 +251,6 @@ clear H1.
 rewrite <- (IHn (k mod fact n)) at 1. 2: {
   apply Nat.mod_upper_bound, fact_neq_0.
 }
-f_equal.
 ...
 apply (fin_fun_ext (n := n)).
 intros i Hi; cbn.
@@ -291,6 +290,7 @@ Theorem sym_gr_elem_injective : ∀ n i j,
 Proof.
 intros * Hi Hj Hij.
 apply (f_equal (@rank_of_permut_in_sym_gr n)) in Hij.
+...
 rewrite rank_of_permut_of_rank in Hij; [ | easy ].
 rewrite rank_of_permut_of_rank in Hij; [ | easy ].
 easy.
