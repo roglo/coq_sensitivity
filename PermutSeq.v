@@ -235,6 +235,7 @@ Theorem fold_rank_of_permut_in_sym_gr_vect' : ∀ n f,
 Proof. easy. Qed.
 *)
 
+(*
 Theorem rank_of_permut_of_rank : ∀ n k,
   k < n!
   → rank_of_permut_in_sym_gr n (mk_canon_sym_gr n k) = k.
@@ -281,7 +282,9 @@ destruct b; [ | easy ].
 apply Nat.leb_le in Hb.
 flia Hb Hc.
 Qed.
+*)
 
+(*
 Theorem sym_gr_elem_injective : ∀ n i j,
   i < fact n
   → j < fact n
@@ -290,11 +293,11 @@ Theorem sym_gr_elem_injective : ∀ n i j,
 Proof.
 intros * Hi Hj Hij.
 apply (f_equal (@rank_of_permut_in_sym_gr n)) in Hij.
-...
 rewrite rank_of_permut_of_rank in Hij; [ | easy ].
 rewrite rank_of_permut_of_rank in Hij; [ | easy ].
 easy.
 Qed.
+*)
 
 Theorem permut_elem_ub : ∀ n k i,
   k < n!
@@ -409,6 +412,7 @@ split. {
 }
 Qed.
 
+(*
 Theorem canon_sym_gr_prop : ∀ n, is_sym_gr n (mk_canon_sym_gr n).
 Proof.
 intros.
@@ -421,10 +425,13 @@ split. {
   now apply sym_gr_elem_is_permut.
 }
 Qed.
+*)
 
+(*
 Definition canon_sym_gr n :=
   {| sg_vect := mk_canon_sym_gr_vect' n;
      sg_prop := canon_sym_gr_prop n |}.
+*)
 
 (*
 Compute map list_of_vect (list_of_vect (mk_canon_sym_gr 4)).
@@ -532,6 +539,7 @@ specialize (Hvn 0 (Nat.lt_0_succ _)).
 flia Hvn.
 Qed.
 
+(*
 Theorem permut_in_sym_gr_of_its_rank : ∀ n f,
   is_permut f n
   → mk_canon_sym_gr n (rank_of_permut_in_sym_gr n f) = f.
@@ -636,7 +644,9 @@ destruct b. {
   }
 }
 Qed.
+*)
 
+(*
 Theorem rank_of_permut_injective : ∀ n f g,
   is_permut f n
   → is_permut g n
@@ -649,6 +659,7 @@ rewrite permut_in_sym_gr_of_its_rank in Hσσ; [ | easy ].
 rewrite permut_in_sym_gr_of_its_rank in Hσσ; [ | easy ].
 easy.
 Qed.
+*)
 
 (* signatures *)
 
@@ -656,10 +667,12 @@ Definition δ i j u v :=
   if i <? j then (rngl_of_nat v - rngl_of_nat u)%F else 1%F.
 
 Definition ε_fun f n :=
-  ((Π (i = 1, n), Π (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
-   (Π (i = 1, n), Π (j = 1, n), δ i j i j))%F.
+  ((∏ (i = 1, n), ∏ (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
+   (∏ (i = 1, n), ∏ (j = 1, n), δ i j i j))%F.
 
-Definition ε {n} (p : vector n nat) := ε_fun (vect_el p) n.
+(*
+Definition ε {n} (p : vector nat) := ε_fun (vect_el p) n.
+*)
 
 (* signature of the k-th permutation of the symmetric group *)
 
@@ -676,16 +689,18 @@ Definition sign_diff u v := if v <? u then 1%F else (-1)%F.
 Definition abs_diff u v := if v <? u then u - v else v - u.
 
 Definition ε_fun_ws f n :=
-  (Π (i = 1, n), Π (j = 1, n),
+  (∏ (i = 1, n), ∏ (j = 1, n),
    if i <? j then sign_diff (f (j - 1)%nat) (f (i - 1)%nat) else 1)%F.
 
-Definition ε_ws {n} (p : vector n nat) := ε_fun_ws (vect_el p) n.
+(*
+Definition ε_ws {n} (p : vector nat) := ε_fun_ws (vect_el p) n.
+*)
 
 (* equality of both definitions of ε: ε and ε_ws *)
 
 Theorem rngl_product_product_if : ∀ b e f,
-  (Π (i = b, e), Π (j = b, e), if i <? j then f i j else 1)%F =
-  (Π (i = b, e), Π (j = i + 1, e), f i j)%F.
+  (∏ (i = b, e), ∏ (j = b, e), if i <? j then f i j else 1)%F =
+  (∏ (i = b, e), ∏ (j = i + 1, e), f i j)%F.
 Proof.
 intros.
 apply rngl_product_eq_compat.
@@ -743,7 +758,7 @@ Qed.
 
 Theorem rngl_product_rngl_of_nat :
   rngl_has_opp = true ∨ rngl_has_sous = true →
-  ∀ n, (Π (i = 1, n), rngl_of_nat i)%F = rngl_of_nat (fact n).
+  ∀ n, (∏ (i = 1, n), rngl_of_nat i)%F = rngl_of_nat (fact n).
 Proof.
 intros Hom *.
 induction n. {
@@ -791,7 +806,7 @@ Qed.
 
 Theorem rngl_product_change_var : ∀ A b e f g (h : _ → A),
   (∀ i, b ≤ i ≤ e → g (h i) = i)
-  → (Π (i = b, e), f i = Π (i ∈ map h (seq b (S e - b))), f (g i))%F.
+  → (∏ (i = b, e), f i = ∏ (i ∈ map h (seq b (S e - b))), f (g i))%F.
 Proof.
 intros * Hgh.
 unfold iter_seq, iter_list.
@@ -1296,7 +1311,7 @@ Theorem rngl_product_change_list :
   rngl_is_comm = true →
   ∀ A (la lb : list A) f,
   Permutation la lb
-  → (Π (i ∈ la), f i = Π (i ∈ lb), f i)%F.
+  → (∏ (i ∈ la), f i = ∏ (i ∈ lb), f i)%F.
 Proof.
 intros Hic * P.
 induction P; [ easy | | | ]. {
@@ -1322,14 +1337,14 @@ Theorem rngl_product_product_div_eq_1 :
   rngl_has_dec_eq = true →
   ∀ n f g,
   (∀ i j, i < n → j < n → g i j ≠ 0%F)
-  → (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), (f i j / g i j)))%F = 1%F
-  → (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), f i j))%F =
-    (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), g i j))%F.
+  → (∏ (i ∈ seq 0 n), (∏ (j ∈ seq 0 n), (f i j / g i j)))%F = 1%F
+  → (∏ (i ∈ seq 0 n), (∏ (j ∈ seq 0 n), f i j))%F =
+    (∏ (i ∈ seq 0 n), (∏ (j ∈ seq 0 n), g i j))%F.
 Proof.
 intros Hom Hic Hid Hin H10 Hde * Hg Hs.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
-remember (Π (i ∈ _), _)%F as a eqn:Ha in |-*.
-remember (Π (i ∈ _), _)%F as b eqn:Hb in |-*.
+remember (∏ (i ∈ _), _)%F as a eqn:Ha in |-*.
+remember (∏ (i ∈ _), _)%F as b eqn:Hb in |-*.
 destruct (rngl_eq_dec Hde b 0%F) as [Hbz| Hbz]. {
   rewrite Hbz in Hb |-*; clear Hbz; subst a; symmetry in Hb.
   apply rngl_product_list_integral in Hb; [ | easy | easy | easy ].
@@ -1394,9 +1409,9 @@ Qed.
 Theorem rngl_product_product_by_swap :
   rngl_is_comm = true →
   ∀ n f,
-  (Π (i ∈ seq 0 n), Π (j ∈ seq 0 n), f i j)%F =
-  ((Π (i ∈ seq 0 n), f i i) *
-   (Π (i ∈ seq 0 (n - 1)), Π (j = i + 1, n - 1), (f i j * f j i)))%F.
+  (∏ (i ∈ seq 0 n), ∏ (j ∈ seq 0 n), f i j)%F =
+  ((∏ (i ∈ seq 0 n), f i i) *
+   (∏ (i ∈ seq 0 (n - 1)), ∏ (j = i + 1, n - 1), (f i j * f j i)))%F.
 Proof.
 intros Hic *.
 induction n. {
@@ -1602,7 +1617,7 @@ Theorem product_product_if_permut_div :
   is_permut σ n
   → (∀ i j, f i j = f j i)
   → (∀ i j, i < n → j < n → i ≠ j → f i j ≠ 0%F)
-  → (Π (i ∈ seq 0 n), Π (j ∈ seq 0 n),
+  → (∏ (i ∈ seq 0 n), ∏ (j ∈ seq 0 n),
       ((if σ i <? σ j then f i j else 1) / (if i <? j then f i j else 1)))%F =
      1%F.
 Proof.
@@ -1636,8 +1651,8 @@ Theorem product_product_if_permut :
   is_permut σ n
   → (∀ i j, f i j = f j i)
   → (∀ i j, i < n → j < n → i ≠ j → f i j ≠ 0%F)
-  → (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), if σ i <? σ j then f i j else 1))%F =
-    (Π (i ∈ seq 0 n), (Π (j ∈ seq 0 n), if i <? j then f i j else 1))%F.
+  → (∏ (i ∈ seq 0 n), (∏ (j ∈ seq 0 n), if σ i <? σ j then f i j else 1))%F =
+    (∏ (i ∈ seq 0 n), (∏ (j ∈ seq 0 n), if i <? j then f i j else 1))%F.
 Proof.
 intros Hom Hic Hid Hin H10 Hed * Hp Hfij Hfijnz.
 apply rngl_product_product_div_eq_1; try easy. {
@@ -1904,6 +1919,7 @@ do 3 rewrite if_ltb_lt_dec.
 now destruct (lt_dec i j).
 Qed.
 
+(*
 Theorem ε_ws_ε :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -1919,12 +1935,15 @@ Proof.
 intros Hic Hop Hin H10 Hit Hde Hch *.
 now apply ε_ws_ε_fun.
 Qed.
+*)
 
 Definition permut_fun_swap (p q : nat) (σ : nat → nat) :=
   λ i, σ (transposition p q i).
 
-Definition permut_swap {n} (p q : nat) (σ : vector n nat) :=
+(*
+Definition permut_swap {n} (p q : nat) (σ : vector nat) :=
   mk_vect n (permut_fun_swap p q (vect_el σ)).
+*)
 
 Theorem permut_swap_fun_is_permut : ∀ p q σ n,
   p < n
@@ -2000,15 +2019,18 @@ split. {
 }
 Qed.
 
+(*
 Theorem transposition_is_permut_vect : ∀ n p q,
   p < n
   → q < n
-  → is_permut_vect (mk_vect n (transposition p q)).
+  → is_permut_vect (mk_vect (transposition p q)).
 Proof.
 intros.
 now apply transposition_is_permut.
 Qed.
+*)
 
+(*
 Theorem transposition_signature_lt :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -2095,7 +2117,7 @@ erewrite rngl_product_eq_compat. 2: {
   now rewrite if_ltb_lt_dec.
 }
 cbn - [ "<?" ].
-remember (Π (i = _, _), _)%F as x eqn:Hx.
+remember (∏ (i = _, _), _)%F as x eqn:Hx.
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
   do 2 rewrite if_eqb_eq_dec.
@@ -2181,7 +2203,9 @@ rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec j q) as [H| H]; [ flia Hi Hj H | clear H ].
 destruct (lt_dec i j) as [H| H]; [ easy | flia Hj H ].
 Qed.
+*)
 
+(*
 Theorem transposition_signature :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -2214,6 +2238,7 @@ destruct (Nat.eq_dec i p) as [Hip| Hip]. {
   destruct (Nat.eq_dec i q) as [Hiq| Hiq]; [ congruence | easy ].
 }
 Qed.
+*)
 
 (* ε (σ₁ ° σ₂) = ε σ₁ * ε σ₂ *)
 
@@ -2225,11 +2250,11 @@ Theorem signature_comp_fun_expand_1 :
   rngl_characteristic = 0 →
   ∀ n f g,
   is_permut g n
-  → (Π (i = 1, n),
-        (Π (j = 1, n), δ i j (f (g (i - 1)%nat)) (f (g (j - 1)%nat))) /
-      Π (i = 1, n), (Π (j = 1, n), δ i j (g (i - 1)%nat) (g (j - 1)%nat)))%F =
-    (Π (i = 1, n), (Π (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
-      Π (i = 1, n), (Π (j = 1, n), δ i j i j))%F
+  → (∏ (i = 1, n),
+        (∏ (j = 1, n), δ i j (f (g (i - 1)%nat)) (f (g (j - 1)%nat))) /
+      ∏ (i = 1, n), (∏ (j = 1, n), δ i j (g (i - 1)%nat) (g (j - 1)%nat)))%F =
+    (∏ (i = 1, n), (∏ (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
+      ∏ (i = 1, n), (∏ (j = 1, n), δ i j i j))%F
   → ε_fun (comp f g) n = (ε_fun f n * ε_fun g n)%F.
 Proof.
 intros Hop Hin H10 Hit Hch * Hp2 Hs.
@@ -2259,11 +2284,11 @@ Theorem signature_comp_fun_expand_2_1 :
   rngl_characteristic = 0 →
   ∀ n f g,
   is_permut g n
-  → (Π (i = 1, n),
-      (Π (j = 1, n), δ i j (f (g (i - 1)%nat)) (f (g (j - 1)%nat))) /
-     Π (i = 1, n), (Π (j = 1, n), δ i j (g (i - 1)%nat) (g (j - 1)%nat)))%F =
-    (Π (i = 1, n),
-      (Π (j = 1, n),
+  → (∏ (i = 1, n),
+      (∏ (j = 1, n), δ i j (f (g (i - 1)%nat)) (f (g (j - 1)%nat))) /
+     ∏ (i = 1, n), (∏ (j = 1, n), δ i j (g (i - 1)%nat) (g (j - 1)%nat)))%F =
+    (∏ (i = 1, n),
+      (∏ (j = 1, n),
        (if i <? j then
          (rngl_of_nat (f (g (j - 1)%nat)) - rngl_of_nat (f (g (i - 1)%nat))) /
          (rngl_of_nat (g (j - 1)%nat) - rngl_of_nat (g (i - 1)%nat))
@@ -2326,10 +2351,10 @@ Theorem signature_comp_fun_expand_2_2 :
   rngl_is_integral = true →
   rngl_characteristic = 0 →
   ∀ n f,
-  (Π (i = 1, n), (Π (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
-   Π (i = 1, n), (Π (j = 1, n), δ i j i j))%F =
-  (Π (i = 1, n),
-   (Π (j = 1, n),
+  (∏ (i = 1, n), (∏ (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
+   ∏ (i = 1, n), (∏ (j = 1, n), δ i j i j))%F =
+  (∏ (i = 1, n),
+   (∏ (j = 1, n),
     (if i <? j then
       (rngl_of_nat (f (j - 1)%nat) - rngl_of_nat (f (i - 1)%nat)) /
       rngl_of_nat (j - i)
@@ -2400,14 +2425,14 @@ Theorem signature_comp_fun_changement_of_variable :
   ∀ n f g,
   is_permut f n
   → is_permut g n
-  → (Π (i = 1, n),
-     (Π (j = 1, n),
+  → (∏ (i = 1, n),
+     (∏ (j = 1, n),
       (if i <? j then
          (rngl_of_nat (f (g (j - 1)%nat)) - rngl_of_nat (f (g (i - 1)%nat))) /
          (rngl_of_nat (g (j - 1)%nat) - rngl_of_nat (g (i - 1)%nat))
        else 1)))%F =
-    (Π (i = 1, n),
-     (Π (j = 1, n),
+    (∏ (i = 1, n),
+     (∏ (j = 1, n),
       (if i <? j then
          (rngl_of_nat (f (j - 1)%nat) - rngl_of_nat (f (i - 1)%nat)) /
          rngl_of_nat (j - i)
@@ -2567,6 +2592,7 @@ rewrite signature_comp_fun_expand_2_2; try easy.
 now apply signature_comp_fun_changement_of_variable.
 Qed.
 
+(*
 Theorem signature_comp :
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -2583,6 +2609,7 @@ Proof.
 intros Hop Hin Hic Hde H10 Hit Hch * Hp1 Hp2.
 now apply signature_comp_fun.
 Qed.
+*)
 
 Theorem transposition_involutive : ∀ p q i,
   transposition p q (transposition p q i) = i.
@@ -2611,6 +2638,7 @@ apply (f_equal (transposition p q)) in Hpq.
 now do 2 rewrite transposition_involutive in Hpq.
 Qed.
 
+(*
 Theorem swap_elem_involutive : ∀ f p q,
   swap_elem (swap_elem f p q) p q = f.
 Proof.
@@ -2633,8 +2661,10 @@ intros i Hi; cbn.
 unfold swap_elem.
 now rewrite transposition_involutive.
 Qed.
+*)
 
-Theorem vect_swap_elem_injective : ∀ n (u v : vector n nat) p q,
+(*
+Theorem vect_swap_elem_injective : ∀ (u v : vector nat) p q,
   vect_swap_elem u p q = vect_swap_elem v p q
   → u = v.
 Proof.
@@ -2642,18 +2672,23 @@ intros * Huv.
 apply (f_equal (λ u, vect_swap_elem u p q)) in Huv.
 now do 2 rewrite vect_swap_elem_involutive in Huv.
 Qed.
+*)
 
 (* i such that vect_el (permut n k) i = j *)
 
+(*
 Definition sym_gr_elem_swap_with_0 p n k :=
   vect_swap_elem (vect_el (mk_canon_sym_gr_vect' n) k) 0 p.
+*)
 
 (* k' such that permut_swap_with_0 p n k = permut n k' *)
 
+(*
 Definition sym_gr_elem_swap_last (p q : nat) n k :=
   vect_swap_elem
     (vect_swap_elem (vect_el (mk_canon_sym_gr_vect' n) k) p (n - 2))
     q (n - 1).
+*)
 
 (* *)
 
@@ -2688,6 +2723,7 @@ Qed.
 
 (* equality of ε of sym_gr elem and ε_permut *)
 
+(*
 Theorem ε_of_sym_gr_permut_succ :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -2826,7 +2862,7 @@ f_equal. {
     replace x with (σ 0) by now rewrite H1.
     apply Hp; flia.
   }
-  remember (Π (i = _, _), _)%F as y eqn:Hy.
+  remember (∏ (i = _, _), _)%F as y eqn:Hy.
   rewrite all_1_rngl_product_1; [ | easy | ]. 2: {
     intros i Hi.
     rewrite if_ltb_lt_dec.
@@ -2928,7 +2964,9 @@ destruct (lt_dec (σ' i + 1) (σ' j + 1)) as [Hsi1j| Hsi1j]. {
 destruct (lt_dec (σ' i) (σ' j)) as [Hsij| Hsij]; [ | easy ].
 flia Hsi1j Hsij.
 Qed.
+*)
 
+(*
 Theorem ε_of_permut_ε :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -2955,10 +2993,14 @@ apply IHn.
 apply Nat.mod_upper_bound.
 apply fact_neq_0.
 Qed.
+*)
 
-Definition permut_inv n (σ : vector n nat) :=
+(*
+Definition permut_inv n (σ : vector nat) :=
   mk_vect n (permut_fun_inv (vect_el σ) n).
+*)
 
+(*
 Theorem permut_inv_is_permut : ∀ n (σ : vector n nat),
   is_permut_vect σ
   → is_permut_vect (permut_inv σ).
@@ -2966,6 +3008,7 @@ Proof.
 intros * Hperm.
 now apply permut_fun_inv_is_permut.
 Qed.
+*)
 
 Theorem sym_gr_inv_upper_bound : ∀ n k j,
   k < fact n
@@ -3140,7 +3183,8 @@ apply comp_is_permut. 2: {
 now apply Hl; left.
 Qed.
 
-Theorem is_permut_comp : ∀ n (u v : vector n nat),
+(*
+Theorem is_permut_comp : ∀ n (u v : vector nat),
   is_permut_vect u → is_permut_vect v → is_permut_vect (u ° v).
 Proof.
 intros * Hu Hv.
@@ -3154,7 +3198,9 @@ split. {
   now apply Hv in Huv.
 }
 Qed.
+*)
 
+(*
 Theorem ε_1_opp_1 :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -3181,7 +3227,9 @@ destruct (lt_dec i j) as [Hij| Hij]. {
 }
 now left.
 Qed.
+*)
 
+(*
 Theorem ε_square :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -3203,22 +3251,31 @@ destruct H1 as [H1| H1]; rewrite H1. {
   apply rngl_mul_1_l.
 }
 Qed.
+*)
 
 End a.
 
+(*
 Arguments ε {T}%type {ro} [n]%nat p.
+*)
 Arguments ε_fun {T}%type {ro} f%function n%nat.
+(*
 Arguments ε_ws {T}%type {ro} {n}%nat.
+*)
 Arguments ε_fun_ws {T}%type {ro} f%function n%nat.
 Arguments sign_diff {T}%type {ro} (u v)%nat.
 
 Arguments ε_permut {T}%type {ro} (n k)%nat.
+(*
 Arguments ε_of_sym_gr_permut_succ {T}%type {ro rp} _ _ _ _ _ _ _ n%nat [k]%nat.
 Arguments ε_of_permut_ε {T}%type {ro rp} _ _ _ _ _ _ _ n%nat [k]%nat.
 Arguments ε_ws_ε {T}%type {ro rp} _ _ _ _ _ _ _ {n}%nat [p].
+*)
 Arguments rngl_product_change_list {T}%type {ro rp} _ [A]%type [la lb]%list
   f%function.
+(*
 Arguments signature_comp {T}%type {ro rp} _ _ _ _ _ _ _ [n]%nat [σ₁ σ₂].
 Arguments transposition_signature {T}%type {ro rp} _ _ _ _ _ _ _ [n p q]%nat.
 Arguments ε_1_opp_1 {T}%type {ro rp} _ _ _ _ _ _ _ [n]%nat [σ].
 Arguments ε_square {T}%type {ro rp} _ _ _ _ _ _ _ [n]%nat [σ].
+*)

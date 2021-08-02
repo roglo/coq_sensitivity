@@ -38,27 +38,29 @@ n-1  | ......|    |. .....|   |.. ....|   |... ...|
    the first row.
 *)
 
-Fixpoint determinant n (M : matrix n n T) :=
+Fixpoint determinant n (M : matrix T) :=
   (match n with
    | 0 => λ _, 1%F
    | S n' =>
-       λ M' : matrix (S n') (S n') T,
-       Σ (j = 0, n'),
-       minus_one_pow j * mat_el M' 0 j * determinant (subm M' 0 j)
+       λ M' : matrix T,
+       ∑ (j = 0, n'),
+       minus_one_pow j * mat_el M' 0 j * determinant n' (subm M' 0 j)
    end) M.
 
-Arguments determinant [n]%nat M%M.
+Arguments determinant n%nat M%M.
 
-Theorem determinant_zero : ∀ (M : matrix 0 0 T),
-  determinant M = 1%F.
+Theorem determinant_zero : ∀ (M : matrix T),
+  determinant 0 M = 1%F.
 Proof. easy. Qed.
 
-Theorem determinant_succ : ∀ n (M : matrix (S n) (S n) T),
-  determinant M =
-     Σ (j = 0, n), minus_one_pow j * mat_el M 0 j * determinant (subm M 0 j).
+Theorem determinant_succ : ∀ n (M : matrix T),
+  determinant (S n) M =
+     ∑ (j = 0, n), minus_one_pow j * mat_el M 0 j * determinant n (subm M 0 j).
 Proof. easy. Qed.
 
-Definition mat_permut_rows_fun n (σ : nat → nat) (M : matrix n n T) :=
+...
+
+Definition mat_permut_rows_fun n (σ : nat → nat) (M : matrix T) :=
   mk_mat n n (λ i j, mat_el M (σ i) j).
 
 Definition mat_permut_rows n (σ : vector n nat) (M : matrix n n T) :=
@@ -70,12 +72,12 @@ Definition mat_permut_rows n (σ : vector n nat) (M : matrix n n T) :=
 
 Definition det_from_row {n} (M : matrix (S n) (S n) T) i :=
   (minus_one_pow i *
-   Σ (j = 0, n),
+   ∑ (j = 0, n),
      minus_one_pow j * mat_el M i j * determinant (subm M i j))%F.
 
 Definition det_from_col {n} (M : matrix (S n) (S n) T) j :=
   (minus_one_pow j *
-   Σ (i = 0, n - 1),
+   ∑ (i = 0, n - 1),
      minus_one_pow i * mat_el M i j * determinant (subm M i j))%F.
 
 (* Alternative version of the determinant: sum of product of the
@@ -95,7 +97,7 @@ Definition det_from_col {n} (M : matrix (S n) (S n) T) j :=
    permutations *)
 
 Definition determinant' n (M : matrix n n T) :=
-  Σ (k = 0, fact n - 1),
+  ∑ (k = 0, fact n - 1),
     ε (vect_el (mk_canon_sym_gr_vect' n) k) *
     Π (i = 1, n),
     mat_el M (i - 1) (vect_el (vect_el (mk_canon_sym_gr_vect' n) k) (i - 1)).
@@ -355,7 +357,7 @@ Theorem determinant'_by_list :
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
   ∀ n (M : matrix n n T),
-  determinant' M = Σ (k = 0, fact n - 1), nth k (determinant'_list M) 0.
+  determinant' M = ∑ (k = 0, fact n - 1), nth k (determinant'_list M) 0.
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch *.
 unfold determinant', determinant'_list.
@@ -381,7 +383,7 @@ Theorem det_is_det_by_any_permut :
   rngl_characteristic = 0 →
   ∀ n (M : matrix n n T) l,
   Permutation l (determinant'_list M)
-  → determinant M = Σ (k = 0, fact n - 1), nth k l 0.
+  → determinant M = ∑ (k = 0, fact n - 1), nth k l 0.
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hl.
 rewrite det_is_det_by_canon_permut; try easy.
@@ -399,7 +401,7 @@ Qed.
 (* yet another definition of determinant *)
 
 Definition determinant'' p q n (M : matrix n n T) :=
-  Σ (k = 0, fact n - 1),
+  ∑ (k = 0, fact n - 1),
     ε_permut n k *
     Π (i = 1, n),
     mat_el M (i - 1) (vect_el (sym_gr_elem_swap_last p q n k) (i - 1)).
@@ -413,7 +415,7 @@ Definition determinant''_list p q {n} (M : matrix n n T) :=
 
 Theorem determinant''_by_list : ∀ n p q (M : matrix n n T),
   determinant'' p q M =
-    Σ (k = 0, fact n - 1), nth k (determinant''_list p q M) 0.
+    ∑ (k = 0, fact n - 1), nth k (determinant''_list p q M) 0.
 Proof.
 intros.
 unfold determinant'', determinant''_list.
@@ -1837,7 +1839,7 @@ Theorem laplace_formula_on_rows :
   rngl_characteristic = 0 →
   ∀ n (M : matrix n n T) i,
   i < n
-  → determinant M = Σ (j = 0, n - 1), mat_el M i j * mat_el (comatrix M) i j.
+  → determinant M = ∑ (j = 0, n - 1), mat_el M i j * mat_el (comatrix M) i j.
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hlin.
 destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
@@ -2320,7 +2322,7 @@ Theorem det_by_any_sym_gr :
   n ≠ 0
   → is_sym_gr σ
   → determinant M =
-    Σ (k = 0, n! - 1),
+    ∑ (k = 0, n! - 1),
     ε (vect_el σ k) *
     Π (i = 1, n), mat_el M (i - 1) (vect_el (vect_el σ k) (i - 1)).
 Proof.
@@ -2358,23 +2360,23 @@ assert (H : ∀ i, i < n! → h i < n!). {
 rngl_summation_list_permut:
   ∀ (T : Type) (ro : ring_like_op T),
     ring_like_prop T
-    → ∀ (A : Type) (l1 l2 : list A) (f : A → T), Permutation l1 l2 → Σ (i ∈ l1), f i = Σ (i ∈ l2), f i
+    → ∀ (A : Type) (l1 l2 : list A) (f : A → T), Permutation l1 l2 → ∑ (i ∈ l1), f i = ∑ (i ∈ l2), f i
 ...
 rngl_summation_list_change_var:
   ∀ (T : Type) (ro : ring_like_op T) (A B : Type) (f : A → B) (g : B → T) (l : list A),
-    Σ (i ∈ l), g (f i) = Σ (j ∈ map f l), g j
-Search (Σ (_ ∈ _), _ = Σ (_ ∈ _), _).
+    ∑ (i ∈ l), g (f i) = ∑ (j ∈ map f l), g j
+Search (∑ (_ ∈ _), _ = ∑ (_ ∈ _), _).
 ...
 rngl_summation_list_permut:
   ∀ (T : Type) (ro : ring_like_op T),
     ring_like_prop T
-    → ∀ (A : Type) (l1 l2 : list A) (f : A → T), Permutation l1 l2 → Σ (i ∈ l1), f i = Σ (i ∈ l2), f i
+    → ∀ (A : Type) (l1 l2 : list A) (f : A → T), Permutation l1 l2 → ∑ (i ∈ l1), f i = ∑ (i ∈ l2), f i
 rngl_summation_permut:
   ∀ (T : Type) (ro : ring_like_op T),
     ring_like_prop T
     → ∀ (n : nat) (l1 l2 : list T),
         Permutation l1 l2
-        → length l1 = n → length l2 = n → Σ (i = 0, n - 1), nth i l1 0 = Σ (i = 0, n - 1), nth i l2 0
+        → length l1 = n → length l2 = n → ∑ (i = 0, n - 1), nth i l1 0 = ∑ (i = 0, n - 1), nth i l2 0
 ...
 specialize (glop (canon_sym_gr_prop n) Hσ) as H1.
 destruct H1 as (f, Hf).
@@ -2434,7 +2436,7 @@ rngl_summation_permut:
     ring_like_prop T
     → ∀ (n : nat) (l1 l2 : list T),
         Permutation l1 l2
-        → length l1 = n → length l2 = n → Σ (i = 0, n - 1), nth i l1 0 = Σ (i = 0, n - 1), nth i l2 0
+        → length l1 = n → length l2 = n → ∑ (i = 0, n - 1), nth i l1 0 = ∑ (i = 0, n - 1), nth i l2 0
 ...
 *)
 
@@ -2450,7 +2452,7 @@ Theorem det_any_permut :
   n ≠ 0
   → is_permut σ
   → determinant M =
-    (Σ (μ ∈ list_of_vect (mk_canon_sym_gr n)), ε μ * ε σ *
+    (∑ (μ ∈ list_of_vect (mk_canon_sym_gr n)), ε μ * ε σ *
      Π (k = 0, n - 1), mat_el M (vect_el σ k) (vect_el μ k))%F.
 Proof.
 intros Hop Hiv Hic Hde H10 Hit Hch * Hnz Hσ.
@@ -2527,7 +2529,7 @@ remember
       mat_el M (vect_el σ i0)
        (vect_el ((canon_permut n i ° permut_inv σ) ° σ) i0))%F
   (seq 0 n!)) as d eqn:Hd.
-enough (H : determinant M = Σ (i = 0, n! - 1), nth i d 0). {
+enough (H : determinant M = ∑ (i = 0, n! - 1), nth i d 0). {
   rewrite Hd in H.
   erewrite rngl_summation_eq_compat in H. 2: {
     intros i Hi.
@@ -2714,7 +2716,7 @@ rewrite map_map.
 rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
 (*1*)
-Search (Σ (_ ∈ map _ _), _).
+Search (∑ (_ ∈ map _ _), _).
 ...1
 rewrite rngl_summation_map_seq.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
@@ -2739,8 +2741,8 @@ symmetry.
 ...
   Hμ : μ = canon_permut n
   ============================
-  Σ (k = 0, n! - 1), ε (μ k) * Π (i = 1, n), mat_el M (i - 1) (vect_el (μ k) (i - 1)) =
-  Σ (i = 0, n! - 1),
+  ∑ (k = 0, n! - 1), ε (μ k) * Π (i = 1, n), mat_el M (i - 1) (vect_el (μ k) (i - 1)) =
+  ∑ (i = 0, n! - 1),
   ε (permut_inv σ ° μ i) *
   Π (i0 = 1, n),
   mat_el M (vect_el σ (i0 - 1))
@@ -2839,7 +2841,7 @@ rewrite Hb at 2.
 remember (n! - 1) as e eqn:He.
 Check rngl_summation_change_var.
 ...
-Search (Σ (_ ∈ map _ _), _)%F.
+Search (∑ (_ ∈ map _ _), _)%F.
 rewrite <- rngl_summation_change_var.
 Print determinant'.
 ...
@@ -2903,7 +2905,7 @@ Theorem glop : ∀ n (M : matrix n n T) (f g : nat → vector n nat),
   is_symmetric_group f
   → is_symmetric_group f
   → determinant M =
-      (Σ (i = 1, n!), ε (f i) * ε (g i) *
+      (∑ (i = 1, n!), ε (f i) * ε (g i) *
        Π (j = 1, n), mat_el M (vect_el (f i) j) (vect_el (g i) j))%F.
 ...
 Check determinant_multilinear.
@@ -2993,7 +2995,7 @@ Theorem laplace_formula_on_cols :
   rngl_characteristic = 0 →
   ∀ n (M : matrix n n T) j,
   j < n
-  → determinant M = Σ (i = 0, n - 1), mat_el M i j * mat_el (comatrix M) i j.
+  → determinant M = ∑ (i = 0, n - 1), mat_el M i j * mat_el (comatrix M) i j.
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hlin.
 ...
@@ -3028,12 +3030,12 @@ with "M k j") returns 0. It is what I call a "bad determinant formula".
 determinant_with_row
   ∀ (i n : nat) (M : matrix (S n) (S n) T),
   i ≤ n
-  → Σ (j = 0, n), minus_one_pow (i + j) * M i j * det (subm M i j) = det M
+  → ∑ (j = 0, n), minus_one_pow (i + j) * M i j * det (subm M i j) = det M
 
 determinant_with_bad_row
   ∀ (i k n : nat) (M : matrix (S n) (S n) T),
   i ≤ n → k ≤ n → i ≠ k
-  → Σ (j = 0, n), minus_one_pow (i + j) * M k j * det (subm M i j) = 0%F
+  → ∑ (j = 0, n), minus_one_pow (i + j) * M k j * det (subm M i j) = 0%F
 
 Isn't it strange? (or beautiful?)
 *)
@@ -3048,7 +3050,7 @@ Theorem determinant_with_row :
   rngl_characteristic = 0 →
   ∀ i n (M : matrix (S n) (S n) T),
   i ≤ n
-  → Σ (j = 0, n),
+  → ∑ (j = 0, n),
     minus_one_pow (i + j) * mat_el M i j * determinant (subm M i j) =
     determinant M.
 Proof.
@@ -3097,7 +3099,7 @@ Theorem determinant_with_bad_row :
   i ≤ n
   → k ≤ n
   → i ≠ k
-  → Σ (j = 0, n),
+  → ∑ (j = 0, n),
     minus_one_pow (i + j) * mat_el M k j * determinant (subm M i j) = 0%F.
 Proof.
 intros Hic Hop Hiv Hit H10 Hde Hch.
