@@ -207,16 +207,11 @@ Definition is_sym_gr n (f : nat → nat → nat) :=
   (∀ i, i < n! → is_permut (f i) n).
 
 Definition is_sym_gr_vect n (σ : vector (vector nat)) :=
-  is_sym_gr n (λ i, vect_el (vect_el σ i)).
-
-...
-
-Definition is_sym_gr_vect n (σ : vector n! (vector n nat)) :=
-  is_sym_gr n (λ i, vect_el (vect_el σ i)).
+  is_sym_gr n (λ i, vect_nat_el (nth i (vect_list σ) (mk_vect []))).
 
 Record sym_gr_vect n :=
-  { sg_vect : vector n! (vector n nat);
-    sg_prop : is_sym_gr_vect sg_vect }.
+  { sg_vect : vector (vector nat);
+    sg_prop : is_sym_gr_vect n sg_vect }.
 
 (* *)
 
@@ -228,6 +223,8 @@ Fixpoint rank_of_permut_in_sym_gr n (f : nat → nat) : nat :=
   | 0 => 0
   | S n' => f 0 * n'! + rank_of_permut_in_sym_gr n' (sub_permut f)
   end.
+
+...
 
 Definition rank_of_permut_in_sym_gr_vect n (v : vector n nat) : nat :=
   rank_of_permut_in_sym_gr n (vect_el v).
