@@ -40,8 +40,10 @@ Definition is_permut f n :=
   (∀ i, i < n → f i < n) ∧
   (∀ i j, i < n → j < n → f i = f j → i = j).
 
+Definition vect_nat_el (V : vector nat) i := nth i (vect_list V) 0.
+
 Definition is_permut_vect {n} (σ : vector nat) :=
-  is_permut (λ i, nth i (vect_list σ) 0) n.
+  is_permut (vect_nat_el σ) n.
 
 Fixpoint permut_fun_inv f i j :=
   match i with
@@ -57,8 +59,7 @@ Definition swap_elem (f : nat → nat) i j k :=
 
 Definition vect_swap_elem (v : vector nat) i j :=
   mk_vect
-    (map
-       (λ k, nth (transposition i j k) (vect_list v) 0)
+    (map (λ k, vect_nat_el v (transposition i j k))
        (seq 0 (length (vect_list v)))).
 
 Theorem permut_ub : ∀ n f i,
@@ -193,19 +194,22 @@ Compute (list_of_bidule 3 mk_canon_sym_gr).
 Compute (list_of_bidule 4 mk_canon_sym_gr).
 *)
 
-...
-
 Definition mk_canon_sym_gr_vect' n : vector (vector nat) :=
-  mk_vect (λ k, mk_vect n (mk_canon_sym_gr n k)).
+  mk_vect
+    (map (λ k, mk_vect (map (mk_canon_sym_gr n k) (seq 0 n))) (seq 0 n!)).
 
-...
-
-Definition mk_canon_sym_gr_vect' n : vector n! (vector n nat) :=
-  mk_vect n! (λ k, mk_vect n (mk_canon_sym_gr n k)).
+(*
+Compute map (vect_list (T := nat)) (vect_list (mk_canon_sym_gr_vect' 4)).
+*)
 
 Definition is_sym_gr n (f : nat → nat → nat) :=
   (∀ i j, i < n! → j < n! → f i = f j → i = j) ∧
   (∀ i, i < n! → is_permut (f i) n).
+
+Definition is_sym_gr_vect n (σ : vector (vector nat)) :=
+  is_sym_gr n (λ i, vect_el (vect_el σ i)).
+
+...
 
 Definition is_sym_gr_vect n (σ : vector n! (vector n nat)) :=
   is_sym_gr n (λ i, vect_el (vect_el σ i)).
