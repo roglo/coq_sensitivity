@@ -155,13 +155,33 @@ erewrite rngl_summation_eq_compat. 2: {
     Search (is_correct_matrix (subm _ _ _)).
 Theorem subm_is_correct_matrix : ∀ (M : matrix T) i j,
   i < mat_nrows M
+  → j < mat_ncols M
   → is_correct_matrix M
   → is_correct_matrix (subm M i j).
 Proof.
-intros * Hr Hm.
+intros * Hir Hjc Hm.
 destruct Hm as (Hcr, Hc).
 split. {
   rewrite mat_nrows_subm; [ | easy ].
+  intros Hcs.
+...
+  unfold mat_ncols in Hcs.
+  apply length_zero_iff_nil in Hcs.
+  destruct M as (ll); cbn in *.
+  destruct ll as [| l]; [ easy | cbn ].
+  rewrite Nat.sub_0_r.
+  unfold mat_nrows, mat_ncols in *; cbn in *.
+...
+  rewrite List_map_hd with (a := []) in Hcs. 2: {
+    destruct i. {
+      cbn in Hcs |-*.
+      intros H; subst ll.
+      cbn in *.
+...
+  cbn in Hcs.
+  cbn in Hc.
+
+Search (hd _ _ = []).
 About mat_nrows_subm.
 ...
   rewrite mat_ncols_subm; [ | easy ].
