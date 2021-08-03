@@ -96,19 +96,12 @@ Definition det_from_col {n} (M : matrix T) j :=
 
 Definition determinant' n (M : matrix T) :=
   ∑ (k = 0, fact n - 1),
-    ε (vect_el (mk_canon_sym_gr_vect' n) k) *
+    ε n (vect_vect_nat_el (mk_canon_sym_gr_vect' n) k) *
     ∏ (i = 1, n),
-    mat_el M (i - 1) (vect_el (vect_el (mk_canon_sym_gr_vect' n) k) (i - 1)).
+    mat_el M (i - 1)
+      (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect' n) k) (i - 1)).
 
-...
-
-Definition determinant' n (M : matrix T) :=
-  ∑ (k = 0, fact n - 1),
-    ε (vect_el (mk_canon_sym_gr_vect' n) k) *
-    ∏ (i = 1, n),
-    mat_el M (i - 1) (vect_el (vect_el (mk_canon_sym_gr_vect' n) k) (i - 1)).
-
-Arguments determinant' [n]%nat M%M.
+Arguments determinant' n%nat M%M.
 
 (* Proof that both definitions of determinants are equal *)
 
@@ -120,7 +113,7 @@ Theorem det_is_det_by_canon_permut :
   rngl_has_1_neq_0 = true →
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
-  ∀ n (M : matrix n n T), determinant M = determinant' M.
+  ∀ n (M : matrix T), determinant n M = determinant' n M.
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch *.
 unfold determinant'.
@@ -191,6 +184,8 @@ apply ε_of_sym_gr_permut_succ; try easy.
 specialize (fact_neq_0 (S (S n))) as Hnz.
 flia Hk Hnz.
 Qed.
+
+...
 
 (* multilinearity *)
 

@@ -41,6 +41,8 @@ Definition is_permut f n :=
   (∀ i j, i < n → j < n → f i = f j → i = j).
 
 Definition vect_nat_el (V : vector nat) i := nth i (vect_list V) 0.
+Definition vect_vect_nat_el (V : vector (vector nat)) i : vector nat :=
+  nth i (vect_list V) (mk_vect []).
 
 Definition is_permut_vect n (σ : vector nat) :=
   is_permut (vect_nat_el σ) n.
