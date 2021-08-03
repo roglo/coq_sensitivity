@@ -58,6 +58,9 @@ Theorem determinant_succ : ∀ n (M : matrix T),
      ∑ (j = 0, n), minus_one_pow j * mat_el M 0 j * determinant n (subm M 0 j).
 Proof. easy. Qed.
 
+Definition mat_permut_rows_fun n (σ : nat → nat) (M : matrix T) :=
+  mk_mat n n (λ i j, mat_el M (σ i) j).
+
 ...
 
 Definition mat_permut_rows_fun n (σ : nat → nat) (M : matrix T) :=
