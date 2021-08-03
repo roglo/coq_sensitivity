@@ -133,7 +133,7 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ fact determinant mk_canon_sym_gr ε ].
+cbn - [ fact determinant mk_canon_sym_gr mk_canon_sym_gr_vect' ε ].
 revert M.
 induction n; intros. {
   cbn.
@@ -145,17 +145,17 @@ induction n; intros. {
   now rewrite rngl_mul_1_r.
 }
 remember (S n) as sn.
-cbn - [ fact "mod" "/" mk_canon_sym_gr ]; subst sn.
+cbn - [ fact "mod" "/" mk_canon_sym_gr_vect' ]; subst sn.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   now rewrite IHn.
 }
-cbn - [ fact "mod" "/" mk_canon_sym_gr ].
+cbn - [ fact "mod" "/" mk_canon_sym_gr_vect' subm ].
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_mul_summation_distr_l; [ easy | now left ].
 }
-cbn - [ fact "mod" "/" mk_canon_sym_gr ].
+cbn - [ fact "mod" "/" mk_canon_sym_gr_vect' subm ].
 rewrite rngl_summation_summation_distr; [ | easy ].
 rewrite <- Nat.sub_succ_l; [ | apply lt_O_fact ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
@@ -167,7 +167,7 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite rngl_product_succ_succ.
   easy.
 }
-cbn - [ fact "mod" "/" mk_canon_sym_gr ].
+cbn - [ fact "mod" "/" mk_canon_sym_gr_vect' subm ].
 symmetry.
 apply rngl_summation_eq_compat.
 intros k Hk.
@@ -175,6 +175,8 @@ do 2 rewrite rngl_mul_assoc.
 f_equal. 2: {
   apply rngl_product_eq_compat.
   intros i Hi.
+unfold mat_el.
+...
   now rewrite Nat.add_1_r.
 }
 rewrite rngl_mul_mul_swap; [ | easy ].
