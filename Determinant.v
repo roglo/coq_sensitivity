@@ -164,6 +164,11 @@ destruct Hm as (Hcr, Hc).
 split. {
   rewrite mat_nrows_subm; [ | easy ].
   intros Hcs.
+  unfold mat_ncols, subm in Hcs.
+  cbn in Hcs.
+  apply length_zero_iff_nil in Hcs.
+  rewrite map_butn in Hcs.
+Search (nth _ (butn _ _)).
 ...
   unfold mat_ncols in Hcs.
   apply length_zero_iff_nil in Hcs.
