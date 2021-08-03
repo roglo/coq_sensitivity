@@ -58,30 +58,25 @@ Theorem determinant_succ : ∀ n (M : matrix T),
      ∑ (j = 0, n), minus_one_pow j * mat_el M 0 j * determinant n (subm M 0 j).
 Proof. easy. Qed.
 
-Definition mat_permut_rows_fun n (σ : nat → nat) (M : matrix T) :=
-  mk_mat n n (λ i j, mat_el M (σ i) j).
+Definition mat_permut_rows_fun (σ : nat → nat) (M : matrix T) :=
+  mk_mat (map (λ i, nth (σ i) (mat_list_list M) []) (seq 0 (mat_nrows M))).
 
-...
-
-Definition mat_permut_rows_fun n (σ : nat → nat) (M : matrix T) :=
-  mk_mat n n (λ i j, mat_el M (σ i) j).
-
-Definition mat_permut_rows n (σ : vector n nat) (M : matrix n n T) :=
-  mat_permut_rows_fun (vect_el σ) M.
+Definition mat_permut_rows (σ : vector nat) (M : matrix T) :=
+  mat_permut_rows_fun (vect_nat_el σ) M.
 
 (* the following versions of computing the determinant should
    (to be proven) be equivalent; perhaps could help for proving
    Cramer's rule of resolving equations *)
 
-Definition det_from_row {n} (M : matrix (S n) (S n) T) i :=
+Definition det_from_row {n} (M : matrix T) i :=
   (minus_one_pow i *
    ∑ (j = 0, n),
-     minus_one_pow j * mat_el M i j * determinant (subm M i j))%F.
+     minus_one_pow j * mat_el M i j * determinant n (subm M i j))%F.
 
-Definition det_from_col {n} (M : matrix (S n) (S n) T) j :=
+Definition det_from_col {n} (M : matrix T) j :=
   (minus_one_pow j *
    ∑ (i = 0, n - 1),
-     minus_one_pow i * mat_el M i j * determinant (subm M i j))%F.
+     minus_one_pow i * mat_el M i j * determinant n (subm M i j))%F.
 
 (* Alternative version of the determinant: sum of product of the
    factors a_{i,σ(i)} where σ goes through all permutations of
@@ -99,10 +94,18 @@ Definition det_from_col {n} (M : matrix (S n) (S n) T) j :=
 (* definition of determinant by sum of products involving all
    permutations *)
 
-Definition determinant' n (M : matrix n n T) :=
+Definition determinant' n (M : matrix T) :=
   ∑ (k = 0, fact n - 1),
     ε (vect_el (mk_canon_sym_gr_vect' n) k) *
-    Π (i = 1, n),
+    ∏ (i = 1, n),
+    mat_el M (i - 1) (vect_el (vect_el (mk_canon_sym_gr_vect' n) k) (i - 1)).
+
+...
+
+Definition determinant' n (M : matrix T) :=
+  ∑ (k = 0, fact n - 1),
+    ε (vect_el (mk_canon_sym_gr_vect' n) k) *
+    ∏ (i = 1, n),
     mat_el M (i - 1) (vect_el (vect_el (mk_canon_sym_gr_vect' n) k) (i - 1)).
 
 Arguments determinant' [n]%nat M%M.
@@ -297,7 +300,7 @@ rewrite Hpp.
 destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
 do 4 rewrite rngl_mul_assoc.
 remember
-  (Π (i0 = 2, p + 1), mat_el M (i0 - 2) (mk_canon_sym_gr n k (i0 - 2)))
+  (∏ (i0 = 2, p + 1), mat_el M (i0 - 2) (mk_canon_sym_gr n k (i0 - 2)))
   as q eqn:Hq.
 do 3 rewrite (rngl_mul_comm Hic _ q).
 do 5 rewrite <- rngl_mul_assoc.
@@ -345,7 +348,7 @@ Qed.
 Definition determinant'_list {n} (M : matrix n n T) :=
   map (λ k,
     (ε_permut n k *
-     Π (i = 1, n),
+     ∏ (i = 1, n),
      mat_el M (i - 1) (vect_el (vect_el (mk_canon_sym_gr_vect' n) k) (i - 1)%nat))%F)
     (seq 0 n!).
 
@@ -406,13 +409,13 @@ Qed.
 Definition determinant'' p q n (M : matrix n n T) :=
   ∑ (k = 0, fact n - 1),
     ε_permut n k *
-    Π (i = 1, n),
+    ∏ (i = 1, n),
     mat_el M (i - 1) (vect_el (sym_gr_elem_swap_last p q n k) (i - 1)).
 
 Definition determinant''_list p q {n} (M : matrix n n T) :=
   map (λ k,
     (ε_permut n k *
-     Π (i = 1, n),
+     ∏ (i = 1, n),
      mat_el M (i - 1) (vect_el (sym_gr_elem_swap_last p q n k) (i - 1)))%F)
     (seq 0 (fact n)).
 
@@ -1907,7 +1910,7 @@ Theorem rngl_product_fun_permut :
   ∀ n (σ : vector n nat) (f : nat → T),
   n ≠ 0
   → is_permut_vect σ
-  → Π (i = 0, n - 1), f (vect_el σ i) = Π (i = 0, n - 1), f i.
+  → ∏ (i = 0, n - 1), f (vect_el σ i) = ∏ (i = 0, n - 1), f i.
 Proof.
 intros Hic * Hnz Hσ.
 destruct n; [ easy | clear Hnz ].
@@ -2327,7 +2330,7 @@ Theorem det_by_any_sym_gr :
   → determinant M =
     ∑ (k = 0, n! - 1),
     ε (vect_el σ k) *
-    Π (i = 1, n), mat_el M (i - 1) (vect_el (vect_el σ k) (i - 1)).
+    ∏ (i = 1, n), mat_el M (i - 1) (vect_el (vect_el σ k) (i - 1)).
 Proof.
 intros Hic Hop Hiv Hit H10 Hed Hch * Hnz Hσ.
 rewrite det_is_det_by_canon_permut; try easy.
@@ -2338,7 +2341,7 @@ specialize (H1 nat 0 (n! - 1)).
 set
   (f := λ k,
    (ε (vect_el σ' k) *
-    Π (i = 1, n), mat_el M (i - 1) (vect_el (vect_el σ' k) (i - 1)))%F).
+    ∏ (i = 1, n), mat_el M (i - 1) (vect_el (vect_el σ' k) (i - 1)))%F).
 specialize (H1 f).
 unfold f in H1.
 ...
@@ -2456,7 +2459,7 @@ Theorem det_any_permut :
   → is_permut σ
   → determinant M =
     (∑ (μ ∈ list_of_vect (mk_canon_sym_gr n)), ε μ * ε σ *
-     Π (k = 0, n - 1), mat_el M (vect_el σ k) (vect_el μ k))%F.
+     ∏ (k = 0, n - 1), mat_el M (vect_el σ k) (vect_el μ k))%F.
 Proof.
 intros Hop Hiv Hic Hde H10 Hit Hch * Hnz Hσ.
 unfold is_permut in Hσ.
@@ -2528,7 +2531,7 @@ apply (det_by_any_sym_gr M Hν).
 remember
   (map
      (λ i, ε (canon_permut n i ° permut_inv σ) *
-      Π (i0 = 0, n - 1),
+      ∏ (i0 = 0, n - 1),
       mat_el M (vect_el σ i0)
        (vect_el ((canon_permut n i ° permut_inv σ) ° σ) i0))%F
   (seq 0 n!)) as d eqn:Hd.
@@ -2603,9 +2606,9 @@ Search determinant.
 intros * Hnz Hσ Hg.
 unfold iter_seq.
 Theorem glop : ∀ d len f g,
-  Π (i = 0, len - 1), nth i (list_of_fun len f) d =
-  Π (i = 0, len - 1), nth i (list_of_fun len g) d
-  → Π (i = 0, len - 1), f i = Π (i = 0, len - 1), g i.
+  ∏ (i = 0, len - 1), nth i (list_of_fun len f) d =
+  ∏ (i = 0, len - 1), nth i (list_of_fun len g) d
+  → ∏ (i = 0, len - 1), f i = ∏ (i = 0, len - 1), g i.
 ...
 apply (glop 0%F).
 apply rngl_product_permut.
@@ -2659,7 +2662,7 @@ rewrite rngl_product_split_last; [ | flia ].
 rewrite rngl_product_succ_succ.
 symmetry.
 ...
-Search (Π (_ = _, _), _ = Π (_ = _, _), _).
+Search (∏ (_ = _, _), _ = ∏ (_ = _, _), _).
 ...
 *)
 erewrite map_ext_in. 2: {
@@ -2697,9 +2700,9 @@ f = canon_permut_inv n ° permut_inv σ ° canon_permut n
     (map
        (λ i : nat,
           (ε (permut_inv σ ° canon_permut n i) *
-           Π (i0 = 0, n - 1), mat_el M (vect_el σ i0) (vect_el (σ ° (permut_inv σ ° canon_permut n i)) i0))%F)
+           ∏ (i0 = 0, n - 1), mat_el M (vect_el σ i0) (vect_el (σ ° (permut_inv σ ° canon_permut n i)) i0))%F)
        (seq 0 n!))
-    (map (λ k : nat, (ε_canon_permut n k * Π (i = 1, n), mat_el M (i - 1) (vect_el (canon_permut n k) (i - 1)))%F)
+    (map (λ k : nat, (ε_canon_permut n k * ∏ (i = 1, n), mat_el M (i - 1) (vect_el (canon_permut n k) (i - 1)))%F)
        (seq 0 n!))
 ...
 apply det_is_det_by_any_permut.
@@ -2713,7 +2716,7 @@ rewrite rngl_summation_list_change_var with
   (f := λ i, permut_inv σ ° i)
   (g :=
      λ k,
-     (ε k * Π (i = 0, n - 1), mat_el M (vect_el σ i) (vect_el (σ ° k) i))%F).
+     (ε k * ∏ (i = 0, n - 1), mat_el M (vect_el σ i) (vect_el (σ ° k) i))%F).
 unfold mk_canon_sym_gr.
 rewrite map_map.
 rewrite det_is_det_by_canon_permut; try easy.
@@ -2744,10 +2747,10 @@ symmetry.
 ...
   Hμ : μ = canon_permut n
   ============================
-  ∑ (k = 0, n! - 1), ε (μ k) * Π (i = 1, n), mat_el M (i - 1) (vect_el (μ k) (i - 1)) =
+  ∑ (k = 0, n! - 1), ε (μ k) * ∏ (i = 1, n), mat_el M (i - 1) (vect_el (μ k) (i - 1)) =
   ∑ (i = 0, n! - 1),
   ε (permut_inv σ ° μ i) *
-  Π (i0 = 1, n),
+  ∏ (i0 = 1, n),
   mat_el M (vect_el σ (i0 - 1))
     (comp (vect_el σ) (comp (permut_fun_inv (vect_el σ) n) (vect_el (μ i))) (i0 - 1)%nat)
 ...
@@ -2909,7 +2912,7 @@ Theorem glop : ∀ n (M : matrix n n T) (f g : nat → vector n nat),
   → is_symmetric_group f
   → determinant M =
       (∑ (i = 1, n!), ε (f i) * ε (g i) *
-       Π (j = 1, n), mat_el M (vect_el (f i) j) (vect_el (g i) j))%F.
+       ∏ (j = 1, n), mat_el M (vect_el (f i) j) (vect_el (g i) j))%F.
 ...
 Check determinant_multilinear.
 About nat_bijection_Permutation.
