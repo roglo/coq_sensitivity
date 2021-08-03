@@ -1676,6 +1676,24 @@ cbn in Hir.
 now apply butn_length.
 Qed.
 
+Theorem mat_ncols_subm : ∀ (M : matrix T) i j,
+  j < mat_ncols M
+  → mat_ncols (subm M i j) = mat_ncols M - 1.
+Proof.
+intros * Hic.
+unfold mat_ncols in Hic |-*.
+destruct M as (ll); cbn in Hic |-*.
+rewrite (List_map_hd _ []). 2: {
+  destruct ll as [| l]; [ easy | ].
+  destruct i; cbn.
+cbn in Hic.
+...
+Print hd.
+rewrite map_length.
+cbn in Hir.
+now apply butn_length.
+Qed.
+
 Theorem submatrix_sub : ∀ (MA MB : matrix T) i j,
   subm (MA - MB)%M i j = (subm MA i j - subm MB i j)%M.
 Proof.

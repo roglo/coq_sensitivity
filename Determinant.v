@@ -113,9 +113,12 @@ Theorem det_is_det_by_canon_permut :
   rngl_has_1_neq_0 = true →
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
-  ∀ n (M : matrix T), mat_nrows M = n → determinant n M = determinant' n M.
+  ∀ n (M : matrix T),
+  is_correct_matrix M
+  → mat_nrows M = n
+  → determinant n M = determinant' n M.
 Proof.
-intros Hic Hop Hin Hit H10 Hde Hch * Hr.
+intros Hic Hop Hin Hit H10 Hde Hch * Hm Hr.
 unfold determinant'.
 destruct n; intros. {
   unfold iter_seq, iter_list.
@@ -134,7 +137,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ fact determinant mk_canon_sym_gr mk_canon_sym_gr_vect' ε ].
-revert M Hr.
+revert M Hm Hr.
 induction n; intros. {
   cbn.
   unfold ε, ε_fun, iter_seq, iter_list; cbn.
@@ -148,6 +151,23 @@ remember (S n) as sn.
 cbn - [ fact "mod" "/" mk_canon_sym_gr_vect' ]; subst sn.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
+  rewrite IHn; [ easy | | ]. {
+    Search (is_correct_matrix (subm _ _ _)).
+Theorem subm_is_correct_matrix : ∀ (M : matrix T) i j,
+  i < mat_nrows M
+  → is_correct_matrix M
+  → is_correct_matrix (subm M i j).
+Proof.
+intros * Hr Hm.
+destruct Hm as (Hcr, Hc).
+split. {
+  rewrite mat_nrows_subm; [ | easy ].
+About mat_nrows_subm.
+...
+  rewrite mat_ncols_subm; [ | easy ].
+Search (mat_ncols (subm _ _ _)).
+  rewrite subm_ncols.
+...
   rewrite IHn; [ easy | ].
   rewrite mat_nrows_subm; [ | rewrite Hr; flia ].
   now rewrite Hr, Nat.sub_succ, Nat.sub_0_r.
@@ -225,6 +245,14 @@ f_equal. 2: {
   rewrite Nat.add_0_l.
   rewrite seq_nth; [ | now do 2 apply -> Nat.succ_le_mono ].
   rewrite Nat.add_0_l.
+  cbn - [ fact skipn ].
+  rewrite app_nth1. 2: {
+    rewrite firstn_length.
+    rewrite List_skipn_1.
+    rewrite List_nth_tl.
+    rewrite fold_corr_mat_ncols.
+3: {
+rewrite Hr.
 ...
 Search (length (tl _)).
 rewrite app_nth2.

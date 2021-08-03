@@ -1855,6 +1855,12 @@ split. {
 }
 Qed.
 
+Theorem List_nth_tl : ∀ A (l : list A) i d, nth i (tl l) d = nth (S i) l d.
+Proof.
+intros.
+destruct l as [| a]; [ now destruct i | easy ].
+Qed.
+
 Theorem List_app_cons : ∀ A (l1 l2 : list A) a,
   l1 ++ a :: l2 = l1 ++ [a] ++ l2.
 Proof. easy. Qed.
