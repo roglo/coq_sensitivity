@@ -187,6 +187,44 @@ f_equal. 2: {
     rewrite fold_mat_nrows, Hr.
     flia Hi.
   }
+  unfold mk_canon_sym_gr_vect'.
+  cbn - [ fact map skipn seq ].
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    apply Nat.mod_upper_bound.
+    apply fact_neq_0.
+  }
+  cbn - [ fact map skipn seq ].
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    now apply -> Nat.succ_le_mono.
+  }
+  rewrite seq_nth. 2: {
+    apply Nat.mod_upper_bound.
+    apply fact_neq_0.
+  }
+  rewrite Nat.add_0_l.
+  rewrite seq_nth; [ | now apply -> Nat.succ_le_mono ].
+  rewrite Nat.add_0_l.
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    eapply le_lt_trans; [ apply Hk | ].
+    apply Nat.sub_lt; [ | flia ].
+    apply Nat.neq_0_lt_0, fact_neq_0.
+  }
+  cbn - [ fact map skipn seq ].
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    now do 2 apply -> Nat.succ_le_mono.
+  }
+  rewrite seq_nth. 2: {
+    eapply le_lt_trans; [ apply Hk | ].
+    apply Nat.sub_lt; [ | flia ].
+    apply Nat.neq_0_lt_0, fact_neq_0.
+  }
+  rewrite Nat.add_0_l.
+  rewrite seq_nth; [ | now do 2 apply -> Nat.succ_le_mono ].
+  rewrite Nat.add_0_l.
 ...
 Search (length (tl _)).
 rewrite app_nth2.
