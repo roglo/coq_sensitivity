@@ -42,7 +42,7 @@ Definition is_permut f n :=
 
 Definition vect_nat_el (V : vector nat) i := nth i (vect_list V) 0.
 
-Definition is_permut_vect {n} (σ : vector nat) :=
+Definition is_permut_vect n (σ : vector nat) :=
   is_permut (vect_nat_el σ) n.
 
 Fixpoint permut_fun_inv f i j :=
@@ -670,9 +670,7 @@ Definition ε_fun f n :=
   ((∏ (i = 1, n), ∏ (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
    (∏ (i = 1, n), ∏ (j = 1, n), δ i j i j))%F.
 
-(*
-Definition ε {n} (p : vector nat) := ε_fun (vect_el p) n.
-*)
+Definition ε n (p : vector nat) := ε_fun (vect_nat_el p) n.
 
 (* signature of the k-th permutation of the symmetric group *)
 
@@ -692,9 +690,7 @@ Definition ε_fun_ws f n :=
   (∏ (i = 1, n), ∏ (j = 1, n),
    if i <? j then sign_diff (f (j - 1)%nat) (f (i - 1)%nat) else 1)%F.
 
-(*
-Definition ε_ws {n} (p : vector nat) := ε_fun_ws (vect_el p) n.
-*)
+Definition ε_ws n (p : vector nat) := ε_fun_ws (vect_nat_el p) n.
 
 (* equality of both definitions of ε: ε and ε_ws *)
 
@@ -1919,7 +1915,6 @@ do 3 rewrite if_ltb_lt_dec.
 now destruct (lt_dec i j).
 Qed.
 
-(*
 Theorem ε_ws_ε :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -1928,14 +1923,13 @@ Theorem ε_ws_ε :
   rngl_is_integral = true →
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
-  ∀ n (p : vector n nat),
-  is_permut_vect p
-  → ε p = ε_ws p.
+  ∀ n (p : vector nat),
+  is_permut_vect n p
+  → ε n p = ε_ws n p.
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch *.
 now apply ε_ws_ε_fun.
 Qed.
-*)
 
 Definition permut_fun_swap (p q : nat) (σ : nat → nat) :=
   λ i, σ (transposition p q i).
@@ -3255,13 +3249,9 @@ Qed.
 
 End a.
 
-(*
-Arguments ε {T}%type {ro} [n]%nat p.
-*)
+Arguments ε {T}%type {ro} n%nat p%V.
 Arguments ε_fun {T}%type {ro} f%function n%nat.
-(*
-Arguments ε_ws {T}%type {ro} {n}%nat.
-*)
+Arguments ε_ws {T}%type {ro} n.
 Arguments ε_fun_ws {T}%type {ro} f%function n%nat.
 Arguments sign_diff {T}%type {ro} (u v)%nat.
 
@@ -3269,8 +3259,8 @@ Arguments ε_permut {T}%type {ro} (n k)%nat.
 (*
 Arguments ε_of_sym_gr_permut_succ {T}%type {ro rp} _ _ _ _ _ _ _ n%nat [k]%nat.
 Arguments ε_of_permut_ε {T}%type {ro rp} _ _ _ _ _ _ _ n%nat [k]%nat.
-Arguments ε_ws_ε {T}%type {ro rp} _ _ _ _ _ _ _ {n}%nat [p].
 *)
+Arguments ε_ws_ε {T}%type {ro rp} _ _ _ _ _ _ _ n%nat p%V.
 Arguments rngl_product_change_list {T}%type {ro rp} _ [A]%type [la lb]%list
   f%function.
 (*
