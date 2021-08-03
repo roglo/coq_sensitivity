@@ -1629,6 +1629,23 @@ cbn; f_equal.
 apply IHla.
 Qed.
 
+Theorem butn_length : ∀ A n (l : list A),
+  n < length l
+  → length (butn n l) = length l - 1.
+Proof.
+intros * Hnl.
+revert n Hnl.
+induction l as [| a]; intros; [ easy | ].
+cbn; rewrite Nat.sub_0_r.
+destruct n; [ easy | ].
+rewrite butn_cons; cbn.
+cbn in Hnl.
+apply Nat.succ_lt_mono in Hnl.
+rewrite IHl; [ | easy ].
+destruct (length l); [ easy | ].
+now cbn; rewrite Nat.sub_0_r.
+Qed.
+
 (* end butn *)
 
 Theorem not_equiv_imp_False : ∀ P : Prop, (P → False) ↔ ¬ P.

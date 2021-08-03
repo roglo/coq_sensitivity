@@ -113,9 +113,9 @@ Theorem det_is_det_by_canon_permut :
   rngl_has_1_neq_0 = true →
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
-  ∀ n (M : matrix T), determinant n M = determinant' n M.
+  ∀ n (M : matrix T), mat_nrows M = n → determinant n M = determinant' n M.
 Proof.
-intros Hic Hop Hin Hit H10 Hde Hch *.
+intros Hic Hop Hin Hit H10 Hde Hch * Hr.
 unfold determinant'.
 destruct n; intros. {
   unfold iter_seq, iter_list.
@@ -134,7 +134,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ fact determinant mk_canon_sym_gr mk_canon_sym_gr_vect' ε ].
-revert M.
+revert M Hr.
 induction n; intros. {
   cbn.
   unfold ε, ε_fun, iter_seq, iter_list; cbn.
@@ -148,7 +148,9 @@ remember (S n) as sn.
 cbn - [ fact "mod" "/" mk_canon_sym_gr_vect' ]; subst sn.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
-  now rewrite IHn.
+  rewrite IHn; [ easy | ].
+  rewrite mat_nrows_subm; [ | rewrite Hr; flia ].
+  now rewrite Hr, Nat.sub_succ, Nat.sub_0_r.
 }
 cbn - [ fact "mod" "/" mk_canon_sym_gr_vect' subm ].
 erewrite rngl_summation_eq_compat. 2: {
@@ -175,7 +177,19 @@ do 2 rewrite rngl_mul_assoc.
 f_equal. 2: {
   apply rngl_product_eq_compat.
   intros i Hi.
-unfold mat_el.
+  unfold mat_el.
+  unfold subm.
+  cbn - [ butn fact mk_canon_sym_gr_vect' ].
+  unfold butn.
+  rewrite firstn_O, app_nil_l.
+  rewrite (List_map_nth' []). 2: {
+    rewrite skipn_length.
+    rewrite fold_mat_nrows, Hr.
+    flia Hi.
+  }
+...
+Search (length (tl _)).
+rewrite app_nth2.
 ...
   now rewrite Nat.add_1_r.
 }

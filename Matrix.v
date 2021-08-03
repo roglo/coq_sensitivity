@@ -1665,6 +1665,17 @@ Compute subm (mk_mat [[3;5;8];[2;1;9];[10;11;12]]) 1 2.
 
 (* combinations of submatrix and other operations *)
 
+Theorem mat_nrows_subm : ∀ (M : matrix T) i j,
+  i < mat_nrows M
+  → mat_nrows (subm M i j) = mat_nrows M - 1.
+Proof.
+intros * Hir.
+destruct M as (ll); cbn.
+rewrite map_length.
+cbn in Hir.
+now apply butn_length.
+Qed.
+
 Theorem submatrix_sub : ∀ (MA MB : matrix T) i j,
   subm (MA - MB)%M i j = (subm MA i j - subm MB i j)%M.
 Proof.
