@@ -114,11 +114,10 @@ Theorem det_is_det_by_canon_permut :
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
   ∀ n (M : matrix T),
-  is_correct_matrix M
-  → mat_nrows M = n
+  is_square_matrix n M = true
   → determinant n M = determinant' n M.
 Proof.
-intros Hic Hop Hin Hit H10 Hde Hch * Hm Hr.
+intros Hic Hop Hin Hit H10 Hde Hch * Hm.
 unfold determinant'.
 destruct n; intros. {
   unfold iter_seq, iter_list.
@@ -137,7 +136,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ fact determinant mk_canon_sym_gr mk_canon_sym_gr_vect' ε ].
-revert M Hm Hr.
+revert M Hm.
 induction n; intros. {
   cbn.
   unfold ε, ε_fun, iter_seq, iter_list; cbn.
@@ -151,7 +150,36 @@ remember (S n) as sn.
 cbn - [ fact "mod" "/" mk_canon_sym_gr_vect' ]; subst sn.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
-  rewrite IHn; [ easy | | ]. {
+  specialize (square_matrix_ncols _ Hm) as Hcm.
+  rewrite IHn. 2: {
+    apply is_sm_mat_iff.
+    split. {
+      apply is_sm_mat_iff in Hm.
+      destruct Hm as (Hr & Hcr & Hc).
+      rewrite mat_nrows_subm; [ | flia Hr ].
+      now rewrite Hr, Nat.sub_succ, Nat.sub_0_r.
+    }
+    split. {
+      intros Hcs.
+      rewrite mat_ncols_subm in Hcs; cycle 1. {
+        now apply (@squ_mat_is_corr (S (S n))).
+      } {
+        apply is_sm_mat_iff in Hm.
+        destruct Hm as (Hr & Hcr & Hc).
+        rewrite Hr; flia.
+      } {
+        rewrite Hcm; flia.
+      } {
+        rewrite Hcm; flia Hi.
+      }
+      now rewrite Hcm in Hcs.
+    } {
+      intros l Hl.
+...
+        destruct Hm as (Hr & Hcr & Hc).
+        split.
+Search (mat_nrows (subm _ _ _)).
+Search (mat_ncols (subm _ _ _)).
 ...
     Search (is_correct_matrix (subm _ _ _)).
 Theorem subm_is_correct_matrix : ∀ (M : matrix T) i j,
