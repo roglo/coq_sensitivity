@@ -136,6 +136,13 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ fact determinant mk_canon_sym_gr mk_canon_sym_gr_vect' ε ].
+(*1*)
+unfold vect_vect_nat_el, vect_nat_el.
+unfold mk_canon_sym_gr_vect'.
+cbn - [ determinant fact mk_canon_sym_gr seq ].
+...
+map (λ k, mk_vect (map (f k) l) l' = ?
+...1
 revert M Hm.
 induction n; intros. {
   cbn.
@@ -148,6 +155,10 @@ induction n; intros. {
 }
 remember (S n) as sn.
 cbn - [ fact "mod" "/" mk_canon_sym_gr_vect' ]; subst sn.
+...
+unfold vect_vect_nat_el, vect_nat_el.
+unfold mk_canon_sym_gr_vect'.
+cbn - [ determinant fact mk_canon_sym_gr seq ].
 ...
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
