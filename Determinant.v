@@ -226,13 +226,19 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ fact "mod" "/" mk_canon_sym_gr_vect' subm seq ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_mul_summation_distr_l; [ | now left ].
+  easy.
+}
+cbn - [ fact "mod" "/" mk_canon_sym_gr_vect' subm seq ].
+rewrite rngl_summation_summation_exch'.
 ...
       cbn in Hj.
       unfold mat_ncols in Hcm; cbn in Hcm.
       destruct ll as [| l']; [ easy | ].
       cbn in Hcm.
       rewrite butn_length.
-
 ...
         destruct Hm as (Hr & Hcr & Hc).
         split.
