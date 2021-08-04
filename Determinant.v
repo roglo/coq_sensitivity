@@ -168,7 +168,36 @@ split. {
   cbn in Hcs.
   apply length_zero_iff_nil in Hcs.
   rewrite map_butn in Hcs.
-Search (nth _ (butn _ _)).
+  rewrite List_hd_nth_0 in Hcs.
+Theorem nth_0_butn_0 : ∀ A (l : list A) d,  nth 0 (butn 0 l) d = nth 1 l d.
+Proof. now intros; destruct l. Qed.
+destruct i. {
+  rewrite nth_0_butn_0 in Hcs.
+  destruct M as (ll); cbn in *.
+  destruct ll as [| l]; [ easy | ].
+  clear Hir Hcr.
+  destruct ll as [| l']; [ easy | exfalso ].
+  cbn in Hcs, Hjc.
+  cbn in Hc.
+  destruct j. {
+    specialize (Hc l' (or_intror (or_introl eq_refl))) as H1.
+    destruct l'; [ cbn in H1; flia Hjc H1 | ].
+    cbn in Hcs; subst l'; cbn in H1.
+(* ah bin c'est faut, ça, y a un blème *)
+...
+Theorem nth_butn : ∀ A (l : list A) d i j,
+  i < j
+  → nth i (butn j l) d = nth i l d.
+Admitted.
+
+Search (butn _ _ = []).
+  rewrite (List_map_nth' []) in Hcs. 2: {
+    cbn in Hcs |-*.
+    apply -> Nat.succ_lt_mono.
+    clear Hir Hcr; cbn in Hjc.
+  cbn in Hcs.
+}
+rewrite nth_butn in Hcs.
 ...
   unfold mat_ncols in Hcs.
   apply length_zero_iff_nil in Hcs.
