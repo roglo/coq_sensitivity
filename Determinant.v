@@ -232,7 +232,15 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ fact "mod" "/" mk_canon_sym_gr_vect' subm seq ].
+rewrite rngl_summation_summation_distr.
+rewrite <- Nat.sub_succ_l.
+rewrite Nat.sub_succ, Nat.sub_0_r.
+rewrite <- Nat_fact_succ.
+apply rngl_summation_eq_compat.
+intros k Hk.
+...
 rewrite rngl_summation_summation_exch'.
+Search (∑ (_ = _, _), ∑ (_ = _, _), _).
 ...
       cbn in Hj.
       unfold mat_ncols in Hcm; cbn in Hcm.
