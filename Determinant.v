@@ -181,9 +181,24 @@ erewrite rngl_summation_eq_compat. 2: {
       cbn - [ butn ] in Hl.
       apply in_map_iff in Hl.
       destruct Hl as (j & Hl & Hj); subst l.
-...
       cbn in Hj.
       destruct M as (ll).
+      cbn in Hr, Hj.
+      destruct ll as [| l']; [ easy | ].
+      cbn in Hr; apply Nat.succ_inj in Hr.
+      cbn in Hcm.
+      rewrite butn_length. {
+        cbn in Hc.
+        rewrite Hc; [ flia | now right ].
+      }
+      rewrite Hc; [ flia Hi | now right ].
+    }
+  }
+  easy.
+}
+cbn - [ fact "mod" "/" mk_canon_sym_gr_vect' subm ].
+(* pfff... c'est la catastrophe *)
+...
       cbn in Hj.
       unfold mat_ncols in Hcm; cbn in Hcm.
       destruct ll as [| l']; [ easy | ].
