@@ -136,7 +136,6 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ fact determinant mk_canon_sym_gr mk_canon_sym_gr_vect' ε ].
-(*1*)
 unfold vect_vect_nat_el, vect_nat_el.
 unfold mk_canon_sym_gr_vect'.
 cbn - [ determinant fact mk_canon_sym_gr seq ].
@@ -154,31 +153,35 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ fact mk_canon_sym_gr seq ].
-Search ε_fun.
-Print ε_fun_ws.
-...1
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite seq_nth. 2: {
+    eapply le_lt_trans; [ apply Hi | ].
+    apply Nat.sub_lt; [ | flia ].
+    apply Nat.neq_0_lt_0, fact_neq_0.
+  }
+  rewrite Nat.add_0_l.
+  easy.
+}
+symmetry.
 revert M Hm.
 induction n; intros. {
   cbn.
-  unfold ε, ε_fun, iter_seq, iter_list; cbn.
+  unfold ε_fun, iter_seq, iter_list; cbn.
   do 2 rewrite rngl_add_0_l.
   do 3 rewrite rngl_mul_1_l.
   rewrite rngl_div_1_r; [ | now left | easy ].
   rewrite rngl_mul_1_l.
   now rewrite rngl_mul_1_r.
 }
-remember (S n) as sn.
-cbn - [ fact "mod" "/" mk_canon_sym_gr_vect' ]; subst sn.
-...
-unfold vect_vect_nat_el, vect_nat_el.
-unfold mk_canon_sym_gr_vect'.
-cbn - [ determinant fact mk_canon_sym_gr seq ].
-...
+(*1*)
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
-  specialize (square_matrix_ncols _ Hm) as Hcm.
+  cbn - [ subm ].
   rewrite IHn. 2: {
     apply is_sm_mat_iff.
+    specialize (square_matrix_ncols _ Hm) as Hcm.
     split. {
       apply is_sm_mat_iff in Hm.
       destruct Hm as (Hr & Hcr & Hc).
@@ -222,8 +225,7 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ fact "mod" "/" mk_canon_sym_gr_vect' subm ].
-(* pfff... c'est la catastrophe *)
+cbn - [ fact "mod" "/" mk_canon_sym_gr_vect' subm seq ].
 ...
       cbn in Hj.
       unfold mat_ncols in Hcm; cbn in Hcm.
