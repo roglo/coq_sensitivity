@@ -152,6 +152,7 @@ cbn - [ fact "mod" "/" mk_canon_sym_gr_vect' ]; subst sn.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   rewrite IHn; [ easy | | ]. {
+...
     Search (is_correct_matrix (subm _ _ _)).
 Theorem subm_is_correct_matrix : ∀ (M : matrix T) i j,
   i < mat_nrows M
@@ -160,6 +161,9 @@ Theorem subm_is_correct_matrix : ∀ (M : matrix T) i j,
   → is_correct_matrix (subm M i j).
 Proof.
 intros * Hir Hjc Hm.
+(* faut pas que M n'ait qu'une seule colonne, et donc avec j=0
+   parce que subm M i j est alors formée de lignes vides *)
+...
 destruct Hm as (Hcr, Hc).
 split. {
   rewrite mat_nrows_subm; [ | easy ].
@@ -175,7 +179,7 @@ destruct i. {
   rewrite nth_0_butn_0 in Hcs.
   destruct M as (ll); cbn in *.
   destruct ll as [| l]; [ easy | ].
-  clear Hir Hcr.
+cbn in Hir, Hcr.
   destruct ll as [| l']; [ easy | exfalso ].
   cbn in Hcs, Hjc.
   cbn in Hc.
@@ -183,7 +187,9 @@ destruct i. {
     specialize (Hc l' (or_intror (or_introl eq_refl))) as H1.
     destruct l'; [ cbn in H1; flia Hjc H1 | ].
     cbn in Hcs; subst l'; cbn in H1.
-(* ah bin c'est faux, ça, y a un blème *)
+cbn in Hir, Hcr.
+clear Hir.
+destruct ll as [| l'']. {
 ...
 Theorem nth_butn : ∀ A (l : list A) d i j,
   i < j
