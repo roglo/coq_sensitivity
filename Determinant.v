@@ -183,7 +183,7 @@ destruct i. {
     specialize (Hc l' (or_intror (or_introl eq_refl))) as H1.
     destruct l'; [ cbn in H1; flia Hjc H1 | ].
     cbn in Hcs; subst l'; cbn in H1.
-(* ah bin c'est faut, ça, y a un blème *)
+(* ah bin c'est faux, ça, y a un blème *)
 ...
 Theorem nth_butn : ∀ A (l : list A) d i j,
   i < j
