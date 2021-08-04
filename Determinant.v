@@ -175,6 +175,21 @@ erewrite rngl_summation_eq_compat. 2: {
       now rewrite Hcm in Hcs.
     } {
       intros l Hl.
+      apply is_sm_mat_iff in Hm.
+      destruct Hm as (Hr & Hcr & Hc).
+      unfold subm in Hl.
+      cbn - [ butn ] in Hl.
+      apply in_map_iff in Hl.
+      destruct Hl as (j & Hl & Hj); subst l.
+...
+      cbn in Hj.
+      destruct M as (ll).
+      cbn in Hj.
+      unfold mat_ncols in Hcm; cbn in Hcm.
+      destruct ll as [| l']; [ easy | ].
+      cbn in Hcm.
+      rewrite butn_length.
+
 ...
         destruct Hm as (Hr & Hcr & Hc).
         split.
