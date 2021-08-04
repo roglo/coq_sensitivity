@@ -154,6 +154,8 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ fact mk_canon_sym_gr seq ].
+Search ε_fun.
+Print ε_fun_ws.
 ...1
 revert M Hm.
 induction n; intros. {
