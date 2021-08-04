@@ -140,8 +140,20 @@ cbn - [ fact determinant mk_canon_sym_gr mk_canon_sym_gr_vect' ε ].
 unfold vect_vect_nat_el, vect_nat_el.
 unfold mk_canon_sym_gr_vect'.
 cbn - [ determinant fact mk_canon_sym_gr seq ].
-...
-map (λ k, mk_vect (map (f k) l) l' = ?
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    eapply le_lt_trans; [ apply Hi | ].
+    apply Nat.sub_lt; [ | flia ].
+    apply Nat.neq_0_lt_0, fact_neq_0.
+  }
+  cbn - [ fact mk_canon_sym_gr seq ].
+  unfold ε, vect_nat_el.
+  cbn - [ fact mk_canon_sym_gr seq ].
+  easy.
+}
+cbn - [ fact mk_canon_sym_gr seq ].
 ...1
 revert M Hm.
 induction n; intros. {
