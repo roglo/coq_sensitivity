@@ -148,6 +148,7 @@ induction n; intros. {
 }
 remember (S n) as sn.
 cbn - [ fact "mod" "/" mk_canon_sym_gr_vect' ]; subst sn.
+...
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   specialize (square_matrix_ncols _ Hm) as Hcm.
