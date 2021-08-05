@@ -329,6 +329,23 @@ f_equal. {
   (* end proof equality of the two "∏" *)
 }
 (* equality of the two "ε_fun" *)
+symmetry.
+Print mk_canon_sym_gr_vect'.
+...
+apply ε_of_sym_gr_permut_succ; try easy.
+Theorem ε_of_sym_gr_permut_succ :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ n k,
+  k < (S n)!
+  → ε (vect_el (mk_canon_sym_gr_vect' (S n)) k) =
+    (minus_one_pow (k / n!) *
+     ε (vect_el (mk_canon_sym_gr_vect' n) (k mod n!)))%F.
 ...
 (*
 Print determinant.
