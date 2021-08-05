@@ -289,9 +289,20 @@ f_equal. {
     rewrite List_nth_tl.
     unfold Nat.b2n.
     rewrite if_leb_le_dec.
-Search (butn _ (nth _ _ _)).
+    destruct (le_dec (k / (S n)!) (p / n!)) as [Hkp| Hkp]. 2: {
+      apply Nat.nle_gt in Hkp.
+      rewrite Nat.add_0_r.
 ...
-    destruct (le_dec (k / (S n)!) (p / n!)) as [Hkp| Hkp]. {
+      unfold butn.
+      rewrite skipn_all2. 2: {
+      rewrite fold_corr_mat_ncols.
+      rewrite Hp in Hkp.
+...
+Search (skipn _ _ = []).
+Search (butn _ (nth _ _ _)).
+Search (nth _ (nth _ _ _)).
+rewrite fold_mat_el.
+...
 Search subm.
 Search sym_gr_fun.
 unfold sym_gr_fun.
