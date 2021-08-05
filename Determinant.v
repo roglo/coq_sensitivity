@@ -294,8 +294,8 @@ f_equal. {
       rewrite Nat.add_0_r.
       now rewrite nth_butn_after.
     }
-...
-      unfold butn.
+    now rewrite nth_butn_before.
+  }
 ...
 (*
 Print determinant.

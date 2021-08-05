@@ -1646,6 +1646,23 @@ destruct (length l); [ easy | ].
 now cbn; rewrite Nat.sub_0_r.
 Qed.
 
+Theorem nth_butn_before : ∀ A (l : list A) i j d,
+  j ≤ i
+  → nth i (butn j l) d = nth (i + 1) l d.
+Proof.
+intros * Hji.
+revert i j Hji.
+induction l as [| a]; intros; cbn. {
+  rewrite butn_nil.
+  now destruct i.
+}
+destruct j; [ now rewrite Nat.add_1_r | ].
+destruct i; [ easy | ].
+apply Nat.succ_le_mono in Hji.
+rewrite butn_cons; cbn.
+now apply IHl.
+Qed.
+
 Theorem nth_butn_after : ∀ A (l : list A) i j d,
   i < j
   → nth i (butn j l) d = nth i l d.
