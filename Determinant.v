@@ -347,8 +347,12 @@ specialize (@ε_of_sym_gr_permut_succ (S n) k) as H1.
 unfold vect_nat_el in H1.
 unfold vect_vect_nat_el in H1.
 cbn - [ vect_list fact ] in H1.
+Print sym_gr_fun.
+Print mk_canon_sym_gr.
+Print mk_canon_sym_gr_vect'.
 unfold mk_canon_sym_gr_vect' in H1.
 cbn - [ fact ] in H1.
+Search (map _ (seq _ _)).
 ...
 Theorem ε_of_sym_gr_permut_succ :
   ∀ n k,
