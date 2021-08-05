@@ -293,6 +293,17 @@ f_equal. {
       apply Nat.nle_gt in Hkp.
       rewrite Nat.add_0_r.
 ...
+(*
+Print determinant.
+Abort.
+End a.
+Require Import Zrl.
+Require Import ZArith.
+Open Scope Z_scope.
+Compute (determinant Z_ring_like_op 3 (mat_of_list_list [[1;2;7];[4;3;6];[7;8;9]])).
+Compute (determinant' Z_ring_like_op 3 (mat_of_list_list [[1;2;7];[4;3;6];[7;8;9]])).
+*)
+...
       unfold butn.
       rewrite skipn_all2. 2: {
       rewrite fold_corr_mat_ncols.
