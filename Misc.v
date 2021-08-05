@@ -1646,6 +1646,23 @@ destruct (length l); [ easy | ].
 now cbn; rewrite Nat.sub_0_r.
 Qed.
 
+Theorem nth_butn_after : ∀ A (l : list A) i j d,
+  i < j
+  → nth i (butn j l) d = nth i l d.
+Proof.
+intros * Hij.
+revert i j Hij.
+induction l as [| a]; intros; cbn. {
+  rewrite butn_nil.
+  now destruct i.
+}
+destruct j; [ easy | ].
+destruct i; [ easy | ].
+apply Nat.succ_lt_mono in Hij.
+rewrite butn_cons; cbn.
+now apply IHl.
+Qed.
+
 (* end butn *)
 
 Theorem not_equiv_imp_False : ∀ P : Prop, (P → False) ↔ ¬ P.

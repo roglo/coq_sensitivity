@@ -292,6 +292,10 @@ f_equal. {
     destruct (le_dec (k / (S n)!) (p / n!)) as [Hkp| Hkp]. 2: {
       apply Nat.nle_gt in Hkp.
       rewrite Nat.add_0_r.
+      now rewrite nth_butn_after.
+    }
+...
+      unfold butn.
 ...
 (*
 Print determinant.
