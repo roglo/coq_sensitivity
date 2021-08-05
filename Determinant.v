@@ -333,6 +333,7 @@ symmetry.
 Print mk_canon_sym_gr_vect'.
 Print vect_el.
 Print vect_vect_nat_el.
+...
 Theorem ε_of_sym_gr_permut_succ :
   ∀ n k,
   k < (S n)!

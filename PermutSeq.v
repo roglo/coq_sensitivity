@@ -2719,6 +2719,7 @@ Qed.
 
 (* equality of ε of sym_gr elem and ε_permut *)
 
+(*
 Print ε.
 Print vect_nat_el.
 Search (vector nat → nat → _).
@@ -2734,6 +2735,7 @@ Theorem ε_of_sym_gr_permut_succ :
 Proof.
 intros.
 ...
+*)
 
 (*
 Theorem ε_of_sym_gr_permut_succ :
