@@ -254,16 +254,48 @@ rewrite rngl_mul_comm; [ | easy ].
 do 3 rewrite <- rngl_mul_assoc.
 f_equal.
 (* elimination done *)
-(* separation factors "ε_fun" and "∏" *)
-(* are they equal two by two? *)
-symmetry.
+(* separation factors "∏" and "ε_fun" *)
 rewrite rngl_mul_comm; [ | easy ].
+rewrite <- rngl_mul_assoc.
 f_equal. {
-(*1*)
-  unfold ε_fun.
-  f_equal. 2: {
-    unfold δ.
-(* pas sûr, tout ça... *)
+  (* equality of the two "∏" *)
+  rewrite (rngl_product_shift _ 1); [ | flia ].
+  rewrite Nat.sub_succ, Nat.sub_0_r.
+  apply rngl_product_eq_compat.
+  intros i Hi.
+  unfold mat_el.
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
+  rewrite seq_nth; [ | flia Hi ].
+  rewrite seq_nth; [ | flia Hi ].
+  do 2 rewrite Nat.add_0_l.
+  cbn - [ fact subm ].
+  remember (k mod (S n)!) as p eqn:Hp.
+  remember (sym_gr_fun n (mk_canon_sym_gr n) p) as σ eqn:Hσ.
+  remember (mk_canon_sym_gr n (p mod n!)) as σ' eqn:Hσ'.
+  move σ' before σ.
+  rewrite (sym_gr_succ_values Hσ Hσ').
+  destruct i. {
+    unfold subm.
+    cbn - [ fact butn ].
+    rewrite (List_map_nth' []). 2: {
+      apply is_sm_mat_iff in Hm.
+      destruct Hm as (Hr & Hcr & Hc).
+      rewrite butn_length; rewrite fold_mat_nrows; flia Hr.
+    }
+    unfold butn at 2.
+    rewrite firstn_O, app_nil_l.
+    rewrite List_skipn_1.
+    rewrite List_nth_tl.
+    unfold Nat.b2n.
+    rewrite if_leb_le_dec.
+Search (butn _ (nth _ _ _)).
+...
+    destruct (le_dec (k / (S n)!) (p / n!)) as [Hkp| Hkp]. {
+Search subm.
+Search sym_gr_fun.
+unfold sym_gr_fun.
+cbn.
 ...1
   rewrite ε_ws_ε_fun; try easy. 2: {
     split. {
