@@ -269,20 +269,20 @@ f_equal. {
   rewrite seq_nth; [ | flia Hi ].
   rewrite seq_nth; [ | flia Hi ].
   do 2 rewrite Nat.add_0_l.
-  cbn - [ fact subm ].
+  unfold subm.
+  cbn - [ fact butn ].
+  rewrite (List_map_nth' []). 2: {
+    apply is_sm_mat_iff in Hm.
+    destruct Hm as (Hr & Hcr & Hc).
+    rewrite butn_length; rewrite fold_mat_nrows; flia Hr Hi.
+  }
+  cbn - [ fact subm butn ].
   remember (k mod (S n)!) as p eqn:Hp.
   remember (sym_gr_fun n (mk_canon_sym_gr n) p) as σ eqn:Hσ.
   remember (mk_canon_sym_gr n (p mod n!)) as σ' eqn:Hσ'.
   move σ' before σ.
   rewrite (sym_gr_succ_values Hσ Hσ').
   destruct i. {
-    unfold subm.
-    cbn - [ fact butn ].
-    rewrite (List_map_nth' []). 2: {
-      apply is_sm_mat_iff in Hm.
-      destruct Hm as (Hr & Hcr & Hc).
-      rewrite butn_length; rewrite fold_mat_nrows; flia Hr.
-    }
     unfold butn at 2.
     rewrite firstn_O, app_nil_l.
     rewrite List_skipn_1.
@@ -296,6 +296,39 @@ f_equal. {
     }
     now rewrite nth_butn_before.
   }
+  rewrite if_ltb_lt_dec.
+  destruct (lt_dec (σ' i) (p / n!)) as [Hσp| Hσp]. {
+    unfold Nat.b2n.
+    rewrite if_leb_le_dec.
+    destruct (le_dec (k / (S n)!) (σ' i)) as [Hkn| Hkn]. {
+      rewrite nth_butn_before; [ | easy ].
+      rewrite nth_butn_before; [ | flia ].
+      now rewrite (Nat.add_1_r (S i)).
+    } {
+      rewrite Nat.add_0_r.
+      apply Nat.nle_gt in Hkn.
+      rewrite nth_butn_after; [ | easy ].
+      rewrite nth_butn_before; [ | flia ].
+      now rewrite (Nat.add_1_r (S i)).
+    }
+  } {
+    unfold Nat.b2n.
+    rewrite if_leb_le_dec.
+    destruct (le_dec (k / (S n)!) (σ' i + 1)) as [Hkn| Hkn]. {
+      rewrite nth_butn_before; [ | easy ].
+      rewrite nth_butn_before; [ | flia ].
+      now rewrite (Nat.add_1_r (S i)).
+    } {
+      rewrite Nat.add_0_r.
+      apply Nat.nle_gt in Hkn.
+      rewrite nth_butn_after; [ | easy ].
+      rewrite nth_butn_before; [ | flia ].
+      now rewrite (Nat.add_1_r (S i)).
+    }
+  }
+  (* end proof equality of the two "∏" *)
+}
+(* equality of the two "ε_fun" *)
 ...
 (*
 Print determinant.
