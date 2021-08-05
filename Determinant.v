@@ -225,19 +225,73 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   easy.
 }
+clear IHn.
 cbn - [ fact "mod" "/" mk_canon_sym_gr_vect' subm seq ].
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_mul_summation_distr_l; [ | now left ].
   easy.
 }
-cbn - [ fact "mod" "/" mk_canon_sym_gr_vect' subm seq ].
+cbn - [ fact mk_canon_sym_gr_vect' subm seq ].
 rewrite rngl_summation_summation_distr.
-rewrite <- Nat.sub_succ_l.
+rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
 rewrite <- Nat_fact_succ.
 apply rngl_summation_eq_compat.
 intros k Hk.
+(* elimination of "mat_el M 0 (k / (S n)!)" *)
+symmetry.
+rewrite rngl_product_split_first; [ | flia ].
+rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
+rewrite seq_nth; [ | flia ].
+rewrite Nat.add_0_l.
+remember (sym_gr_fun (S n) _ _ _) as x eqn:Hx.
+cbn - [ fact ] in Hx; subst x.
+rewrite rngl_mul_comm; [ | easy ].
+symmetry.
+rewrite <- rngl_mul_assoc.
+rewrite rngl_mul_comm; [ | easy ].
+do 3 rewrite <- rngl_mul_assoc.
+f_equal.
+(* elimination done *)
+(* separation factors "ε_fun" and "∏" *)
+(* are they equal two by two? *)
+symmetry.
+rewrite rngl_mul_comm; [ | easy ].
+f_equal. {
+(*1*)
+  unfold ε_fun.
+  f_equal. 2: {
+    unfold δ.
+(* pas sûr, tout ça... *)
+...1
+  rewrite ε_ws_ε_fun; try easy. 2: {
+    split. {
+      intros i Hi.
+      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+      rewrite seq_nth; [ cbn | easy ].
+      unfold sym_gr_fun at 1.
+      destruct i. {
+        admit. (* devrait le faire, mais casse-couilles *)
+      }
+      remember (k mod (S n)!) as p eqn:Hp.
+      remember (sym_gr_fun n (mk_canon_sym_gr n) p) as σ eqn:Hσ.
+      remember (mk_canon_sym_gr n (p mod n!)) as σ' eqn:Hσ'.
+      move σ' before σ.
+      rewrite (sym_gr_succ_values Hσ Hσ').
+      destruct i. {
+        admit.
+      }
+      admit.
+    } {
+      admit.
+    }
+  }
+  unfold ε_fun_ws.
+...
+Print ε_fun_ws.
+...
+cbn - [ fact mk_canon_sym_gr_vect' subm seq ].
 ...
 rewrite rngl_summation_summation_exch'.
 Search (∑ (_ = _, _), ∑ (_ = _, _), _).

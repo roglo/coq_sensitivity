@@ -3251,6 +3251,7 @@ Qed.
 
 End a.
 
+Arguments δ {T}%type {ro} (i j u v)%nat.
 Arguments ε {T}%type {ro} n%nat p%V.
 Arguments ε_fun {T}%type {ro} f%function n%nat.
 Arguments ε_ws {T}%type {ro} n.
@@ -3263,6 +3264,7 @@ Arguments ε_of_sym_gr_permut_succ {T}%type {ro rp} _ _ _ _ _ _ _ n%nat [k]%nat.
 Arguments ε_of_permut_ε {T}%type {ro rp} _ _ _ _ _ _ _ n%nat [k]%nat.
 *)
 Arguments ε_ws_ε {T}%type {ro rp} _ _ _ _ _ _ _ n%nat p%V.
+Arguments ε_ws_ε_fun {T}%type {ro rp} _ _ _ _ _ _ _ [σ]%function [n]%nat.
 Arguments rngl_product_change_list {T}%type {ro rp} _ [A]%type [la lb]%list
   f%function.
 (*
