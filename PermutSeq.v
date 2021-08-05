@@ -2719,6 +2719,22 @@ Qed.
 
 (* equality of ε of sym_gr elem and ε_permut *)
 
+Print ε.
+Print vect_nat_el.
+Search (vector nat → nat → _).
+Search (vector _ (vector _ _)).
+
+Theorem ε_of_sym_gr_permut_succ :
+  ∀ n k,
+  k < (S n)!
+  → ε_fun (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect' (S n)) k)) n =
+    (minus_one_pow (k / n!) *
+     ε_fun
+       (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect' n) (k mod n!))) n)%F.
+Proof.
+intros.
+...
+
 (*
 Theorem ε_of_sym_gr_permut_succ :
   rngl_is_comm = true →

@@ -331,6 +331,32 @@ f_equal. {
 (* equality of the two "ε_fun" *)
 symmetry.
 Print mk_canon_sym_gr_vect'.
+Print vect_el.
+Print vect_vect_nat_el.
+Theorem ε_of_sym_gr_permut_succ :
+  ∀ n k,
+  k < (S n)!
+  → ε_fun (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect' (S n)) k)) n =
+    (minus_one_pow (k / n!) *
+     ε_fun
+       (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect' n) (k mod n!))) n)%F.
+Proof.
+intros.
+Admitted.
+specialize (@ε_of_sym_gr_permut_succ (S n) k) as H1.
+unfold vect_nat_el in H1.
+unfold vect_vect_nat_el in H1.
+cbn - [ vect_list fact ] in H1.
+unfold mk_canon_sym_gr_vect' in H1.
+cbn - [ fact ] in H1.
+...
+Theorem ε_of_sym_gr_permut_succ :
+  ∀ n k,
+  k < (S n)!
+  → ε n (vect_vect_nat_el (mk_canon_sym_gr_vect' (S n)) k) =
+    (minus_one_pow (k / n!) *
+     ε n (vect_vect_nat_el (mk_canon_sym_gr_vect' n) (k mod n!)))%F.
+Proof.
 ...
 apply ε_of_sym_gr_permut_succ; try easy.
 Theorem ε_of_sym_gr_permut_succ :
