@@ -119,6 +119,18 @@ Theorem det_is_det_by_canon_permut :
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hm.
 unfold determinant'.
+revert M Hm.
+induction n; intros. {
+  cbn.
+  unfold ε, ε_fun, iter_seq, iter_list; cbn.
+  rewrite rngl_add_0_l.
+  rewrite rngl_mul_1_r.
+  rewrite rngl_div_1_r; [ easy | now left | easy ].
+}
+rewrite determinant_succ.
+...
+intros Hic Hop Hin Hit H10 Hde Hch * Hm.
+unfold determinant'.
 destruct n; intros. {
   unfold iter_seq, iter_list.
   cbn; rewrite rngl_add_0_l.
