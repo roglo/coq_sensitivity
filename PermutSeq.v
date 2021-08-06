@@ -2736,8 +2736,27 @@ Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hkn.
 rewrite ε_ws_ε; try easy. 2: {
   specialize (sym_gr_elem_is_permut _ Hkn) as H1.
+  unfold mk_canon_sym_gr_vect; cbn - [ fact map seq ].
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
+  rewrite Nat.add_0_l.
+...
+  unfold is_permut_vect, vect_nat_el.
+  cbn - [ seq fact nth ].
+  rewrite seq_nth; [ | easy ].
+  cbn.
+...
+  specialize (sym_gr_elem_is_permut _ Hkn) as H1.
   cbn in H1.
-  unfold mk_canon_sym_gr_vect.
+  unfold mk_canon_sym_gr_vect; cbn - [ fact ].
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  unfold is_permut_vect.
+  rewrite seq_nth; [ | easy ].
+  rewrite Nat.add_0_l.
+  unfold is_permut; cbn.
+  unfold is_permut in H1; cbn in H1.
+...
+  unfold is_permut_vect, vect_nat_el.
 ...
   unfold is_permut_vect; cbn - [ fact ].
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
