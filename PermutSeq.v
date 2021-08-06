@@ -196,12 +196,12 @@ Compute (list_of_bidule 3 mk_canon_sym_gr).
 Compute (list_of_bidule 4 mk_canon_sym_gr).
 *)
 
-Definition mk_canon_sym_gr_vect' n : vector (vector nat) :=
+Definition mk_canon_sym_gr_vect n : vector (vector nat) :=
   mk_vect
     (map (λ k, mk_vect (map (mk_canon_sym_gr n k) (seq 0 n))) (seq 0 n!)).
 
 (*
-Compute map (vect_list (T := nat)) (vect_list (mk_canon_sym_gr_vect' 4)).
+Compute map (vect_list (T := nat)) (vect_list (mk_canon_sym_gr_vect 4)).
 *)
 
 Definition is_sym_gr n (f : nat → nat → nat) :=
@@ -431,7 +431,7 @@ Qed.
 
 (*
 Definition canon_sym_gr n :=
-  {| sg_vect := mk_canon_sym_gr_vect' n;
+  {| sg_vect := mk_canon_sym_gr_vect n;
      sg_prop := canon_sym_gr_prop n |}.
 *)
 
@@ -2674,7 +2674,7 @@ Qed.
 
 (*
 Definition sym_gr_elem_swap_with_0 p n k :=
-  vect_swap_elem (vect_el (mk_canon_sym_gr_vect' n) k) 0 p.
+  vect_swap_elem (vect_el (mk_canon_sym_gr_vect n) k) 0 p.
 *)
 
 (* k' such that permut_swap_with_0 p n k = permut n k' *)
@@ -2682,7 +2682,7 @@ Definition sym_gr_elem_swap_with_0 p n k :=
 (*
 Definition sym_gr_elem_swap_last (p q : nat) n k :=
   vect_swap_elem
-    (vect_swap_elem (vect_el (mk_canon_sym_gr_vect' n) k) p (n - 2))
+    (vect_swap_elem (vect_el (mk_canon_sym_gr_vect n) k) p (n - 2))
     q (n - 1).
 *)
 
@@ -2720,24 +2720,6 @@ Qed.
 (* equality of ε of sym_gr elem and ε_permut *)
 
 (*
-Print ε.
-Print vect_nat_el.
-Search (vector nat → nat → _).
-Search (vector _ (vector _ _)).
-
-Theorem ε_of_sym_gr_permut_succ :
-  ∀ n k,
-  k < (S n)!
-  → ε_fun (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect' (S n)) k)) n =
-    (minus_one_pow (k / n!) *
-     ε_fun
-       (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect' n) (k mod n!))) n)%F.
-Proof.
-intros.
-...
-*)
-
-(*
 Theorem ε_of_sym_gr_permut_succ :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -2748,9 +2730,9 @@ Theorem ε_of_sym_gr_permut_succ :
   rngl_characteristic = 0 →
   ∀ n k,
   k < (S n)!
-  → ε (vect_el (mk_canon_sym_gr_vect' (S n)) k) =
+  → ε (vect_el (mk_canon_sym_gr_vect (S n)) k) =
     (minus_one_pow (k / n!) *
-     ε (vect_el (mk_canon_sym_gr_vect' n) (k mod n!)))%F.
+     ε (vect_el (mk_canon_sym_gr_vect n) (k mod n!)))%F.
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hkn.
 rewrite ε_ws_ε; try easy; [ | now apply sym_gr_elem_is_permut ].
@@ -2991,7 +2973,7 @@ Theorem ε_of_permut_ε :
   rngl_characteristic = 0 →
   ∀ n k,
   k < fact n
-  → ε (vect_el (mk_canon_sym_gr_vect' n) k) = ε_permut n k.
+  → ε (vect_el (mk_canon_sym_gr_vect n) k) = ε_permut n k.
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hkn.
 revert k Hkn.

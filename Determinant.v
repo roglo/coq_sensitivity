@@ -96,10 +96,10 @@ Definition det_from_col {n} (M : matrix T) j :=
 
 Definition determinant' n (M : matrix T) :=
   ∑ (k = 0, fact n - 1),
-    ε n (vect_vect_nat_el (mk_canon_sym_gr_vect' n) k) *
+    ε n (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) *
     ∏ (i = 1, n),
     mat_el M (i - 1)
-      (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect' n) k) (i - 1)).
+      (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) (i - 1)).
 
 Arguments determinant' n%nat M%M.
 
@@ -182,7 +182,7 @@ rewrite rngl_mul_comm; [ | easy ].
 do 3 rewrite <- rngl_mul_assoc.
 f_equal.
 (* elimination done *)
-(* separation factors "∏" and "ε_fun" *)
+(* separation factors "∏" and "ε" *)
 rewrite rngl_mul_comm; [ | easy ].
 rewrite <- rngl_mul_assoc.
 f_equal. {
@@ -212,7 +212,6 @@ f_equal. {
     destruct Hm as (Hr & Hcr & Hc).
     rewrite butn_length; rewrite fold_mat_nrows; flia Hr Hi Hnz.
   }
-(**)
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi Hnz ].
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi Hnz ].
   rewrite seq_nth; [ | flia Hi Hnz ].
@@ -222,64 +221,40 @@ f_equal. {
   remember (mk_canon_sym_gr n (k mod n!)) as σ' eqn:Hσ'.
   move σ' before σ.
   rewrite (sym_gr_succ_values Hσ Hσ').
-...
-  remember (k mod n!) as p eqn:Hp.
-  unfold mk_canon_sy
-  remember (sym_gr_fun n (mk_canon_sym_gr n) p) as σ eqn:Hσ.
-  remember (mk_canon_sym_gr n (p mod n!)) as σ' eqn:Hσ'.
-  move σ' before σ.
-  rewrite (sym_gr_succ_values Hσ Hσ').
-  destruct i. {
-    unfold butn at 2.
-    rewrite firstn_O, app_nil_l.
-    rewrite List_skipn_1.
-    rewrite List_nth_tl.
-    unfold Nat.b2n.
-    rewrite if_leb_le_dec.
-    destruct (le_dec (k / (S n)!) (p / n!)) as [Hkp| Hkp]. 2: {
-      apply Nat.nle_gt in Hkp.
-      rewrite Nat.add_0_r.
-      now rewrite nth_butn_after.
-    }
-    now rewrite nth_butn_before.
-  }
   rewrite if_ltb_lt_dec.
-  destruct (lt_dec (σ' i) (p / n!)) as [Hσp| Hσp]. {
-    unfold Nat.b2n.
-    rewrite if_leb_le_dec.
-    destruct (le_dec (k / (S n)!) (σ' i)) as [Hkn| Hkn]. {
-      rewrite nth_butn_before; [ | easy ].
-      rewrite nth_butn_before; [ | flia ].
-      now rewrite (Nat.add_1_r (S i)).
-    } {
-      rewrite Nat.add_0_r.
-      apply Nat.nle_gt in Hkn.
-      rewrite nth_butn_after; [ | easy ].
-      rewrite nth_butn_before; [ | flia ].
-      now rewrite (Nat.add_1_r (S i)).
-    }
+  destruct (lt_dec (σ' i) (k / n!)) as [Hσk| Hσk]. {
+    rewrite nth_butn_after; [ | easy ].
+    rewrite nth_butn_before; [ | flia ].
+    now rewrite Nat.add_1_r.
   } {
-    unfold Nat.b2n.
-    rewrite if_leb_le_dec.
-    destruct (le_dec (k / (S n)!) (σ' i + 1)) as [Hkn| Hkn]. {
-      rewrite nth_butn_before; [ | easy ].
-      rewrite nth_butn_before; [ | flia ].
-      now rewrite (Nat.add_1_r (S i)).
-    } {
-      rewrite Nat.add_0_r.
-      apply Nat.nle_gt in Hkn.
-      rewrite nth_butn_after; [ | easy ].
-      rewrite nth_butn_before; [ | flia ].
-      now rewrite (Nat.add_1_r (S i)).
-    }
+    apply Nat.nlt_ge in Hσk.
+    rewrite nth_butn_before; [ | easy ].
+    rewrite nth_butn_before; [ | easy ].
+    now rewrite (Nat.add_1_r i).
   }
   (* end proof equality of the two "∏" *)
 }
-(* equality of the two "ε_fun" *)
+(* equality of the two "ε" *)
 symmetry.
-Print mk_canon_sym_gr_vect'.
+Print mk_canon_sym_gr_vect.
 Print vect_el.
 Print vect_vect_nat_el.
+...
+Check ε_of_sym_gr_permut_succ.
+...
+Theorem ε_of_sym_gr_permut_succ :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ n k,
+  k < (S n)!
+  → ε (vect_el (mk_canon_sym_gr_vect (S n)) k) =
+    (minus_one_pow (k / n!) *
+     ε (vect_el (mk_canon_sym_gr_vect n) (k mod n!)))%F.
 ...
 ...
 intros Hic Hop Hin Hit H10 Hde Hch * Hm.
@@ -300,9 +275,9 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ fact determinant mk_canon_sym_gr mk_canon_sym_gr_vect' ε ].
+cbn - [ fact determinant mk_canon_sym_gr mk_canon_sym_gr_vect ε ].
 unfold vect_vect_nat_el, vect_nat_el.
-unfold mk_canon_sym_gr_vect'.
+unfold mk_canon_sym_gr_vect.
 cbn - [ determinant fact mk_canon_sym_gr seq ].
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
@@ -391,13 +366,13 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 clear IHn.
-cbn - [ fact "mod" "/" mk_canon_sym_gr_vect' subm seq ].
+cbn - [ fact "mod" "/" mk_canon_sym_gr_vect subm seq ].
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_mul_summation_distr_l; [ | now left ].
   easy.
 }
-cbn - [ fact mk_canon_sym_gr_vect' subm seq ].
+cbn - [ fact mk_canon_sym_gr_vect subm seq ].
 rewrite rngl_summation_summation_distr.
 rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
@@ -495,17 +470,17 @@ f_equal. {
 }
 (* equality of the two "ε_fun" *)
 symmetry.
-Print mk_canon_sym_gr_vect'.
+Print mk_canon_sym_gr_vect.
 Print vect_el.
 Print vect_vect_nat_el.
 ...
 Theorem ε_of_sym_gr_permut_succ :
   ∀ n k,
   k < (S n)!
-  → ε_fun (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect' (S n)) k)) n =
+  → ε_fun (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect (S n)) k)) n =
     (minus_one_pow (k / n!) *
      ε_fun
-       (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect' n) (k mod n!))) n)%F.
+       (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect n) (k mod n!))) n)%F.
 Proof.
 intros.
 Admitted.
@@ -515,17 +490,17 @@ unfold vect_vect_nat_el in H1.
 cbn - [ vect_list fact ] in H1.
 Print sym_gr_fun.
 Print mk_canon_sym_gr.
-Print mk_canon_sym_gr_vect'.
-unfold mk_canon_sym_gr_vect' in H1.
+Print mk_canon_sym_gr_vect.
+unfold mk_canon_sym_gr_vect in H1.
 cbn - [ fact ] in H1.
 Search (map _ (seq _ _)).
 ...
 Theorem ε_of_sym_gr_permut_succ :
   ∀ n k,
   k < (S n)!
-  → ε n (vect_vect_nat_el (mk_canon_sym_gr_vect' (S n)) k) =
+  → ε n (vect_vect_nat_el (mk_canon_sym_gr_vect (S n)) k) =
     (minus_one_pow (k / n!) *
-     ε n (vect_vect_nat_el (mk_canon_sym_gr_vect' n) (k mod n!)))%F.
+     ε n (vect_vect_nat_el (mk_canon_sym_gr_vect n) (k mod n!)))%F.
 Proof.
 ...
 apply ε_of_sym_gr_permut_succ; try easy.
@@ -539,9 +514,9 @@ Theorem ε_of_sym_gr_permut_succ :
   rngl_characteristic = 0 →
   ∀ n k,
   k < (S n)!
-  → ε (vect_el (mk_canon_sym_gr_vect' (S n)) k) =
+  → ε (vect_el (mk_canon_sym_gr_vect (S n)) k) =
     (minus_one_pow (k / n!) *
-     ε (vect_el (mk_canon_sym_gr_vect' n) (k mod n!)))%F.
+     ε (vect_el (mk_canon_sym_gr_vect n) (k mod n!)))%F.
 ...
 (*
 Print determinant.
@@ -595,7 +570,7 @@ cbn.
 ...
 Print ε_fun_ws.
 ...
-cbn - [ fact mk_canon_sym_gr_vect' subm seq ].
+cbn - [ fact mk_canon_sym_gr_vect subm seq ].
 ...
 rewrite rngl_summation_summation_exch'.
 Search (∑ (_ = _, _), ∑ (_ = _, _), _).
@@ -690,12 +665,12 @@ Search (mat_ncols (subm _ _ _)).
   rewrite mat_nrows_subm; [ | rewrite Hr; flia ].
   now rewrite Hr, Nat.sub_succ, Nat.sub_0_r.
 }
-cbn - [ fact "mod" "/" mk_canon_sym_gr_vect' subm ].
+cbn - [ fact "mod" "/" mk_canon_sym_gr_vect subm ].
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_mul_summation_distr_l; [ easy | now left ].
 }
-cbn - [ fact "mod" "/" mk_canon_sym_gr_vect' subm ].
+cbn - [ fact "mod" "/" mk_canon_sym_gr_vect subm ].
 rewrite rngl_summation_summation_distr; [ | easy ].
 rewrite <- Nat.sub_succ_l; [ | apply lt_O_fact ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
@@ -707,7 +682,7 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite rngl_product_succ_succ.
   easy.
 }
-cbn - [ fact "mod" "/" mk_canon_sym_gr_vect' subm ].
+cbn - [ fact "mod" "/" mk_canon_sym_gr_vect subm ].
 symmetry.
 apply rngl_summation_eq_compat.
 intros k Hk.
@@ -717,7 +692,7 @@ f_equal. 2: {
   intros i Hi.
   unfold mat_el.
   unfold subm.
-  cbn - [ butn fact mk_canon_sym_gr_vect' ].
+  cbn - [ butn fact mk_canon_sym_gr_vect ].
   unfold butn.
   rewrite firstn_O, app_nil_l.
   rewrite (List_map_nth' []). 2: {
@@ -725,7 +700,7 @@ f_equal. 2: {
     rewrite fold_mat_nrows, Hr.
     flia Hi.
   }
-  unfold mk_canon_sym_gr_vect'.
+  unfold mk_canon_sym_gr_vect.
   cbn - [ fact map skipn seq ].
   rewrite (List_map_nth' 0). 2: {
     rewrite seq_length.
@@ -944,7 +919,7 @@ Definition determinant'_list {n} (M : matrix n n T) :=
   map (λ k,
     (ε_permut n k *
      ∏ (i = 1, n),
-     mat_el M (i - 1) (vect_el (vect_el (mk_canon_sym_gr_vect' n) k) (i - 1)%nat))%F)
+     mat_el M (i - 1) (vect_el (vect_el (mk_canon_sym_gr_vect n) k) (i - 1)%nat))%F)
     (seq 0 n!).
 
 Arguments determinant'_list {n}%nat M%M.
@@ -1091,7 +1066,7 @@ erewrite rngl_summation_eq_compat. 2: {
   erewrite rngl_product_list_eq_compat. 2: {
     intros i Hi.
     replace (mat_el _ _ _) with
-      (mat_el M i (vect_el (vect_el (mk_canon_sym_gr_vect' n) k) (transposition p q i))). 2: {
+      (mat_el M i (vect_el (vect_el (mk_canon_sym_gr_vect n) k) (transposition p q i))). 2: {
       cbn.
       unfold transposition.
       do 2 rewrite if_eqb_eq_dec.
@@ -1115,7 +1090,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ mat_swap_rows ].
-set (f := λ k, vect_swap_elem (vect_el (mk_canon_sym_gr_vect' n) k) p q).
+set (f := λ k, vect_swap_elem (vect_el (mk_canon_sym_gr_vect n) k) p q).
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   assert (Hkn : k < n!). {
@@ -2093,7 +2068,7 @@ f_equal. {
 Qed.
 
 Definition swap_in_permut n i j k :=
-  vect_swap_elem (vect_el (mk_canon_sym_gr_vect' n) k) i j.
+  vect_swap_elem (vect_el (mk_canon_sym_gr_vect n) k) i j.
 
 (* comatrix *)
 
