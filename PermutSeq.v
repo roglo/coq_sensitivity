@@ -2745,15 +2745,69 @@ apply Nat.add_0_r.
 Qed.
 
 Theorem sym_gr_vect_succ_values : ∀ (n k : nat) (σ σ' : nat → nat),
-  σ = vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect n) k)
-  → σ' = vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect n) (k mod n!))
-  → ∀ i : nat,
+  k < (S n)!
+  → σ = vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect (S n)) k)
+  → σ' =
+    vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect (S n)) (k mod (S n)!))
+  → ∀ i : nat, i < S n →
     σ i =
       match i with
       | 0 => k / n!
       | S i' => if σ' i' <? k / n! then σ' i' else σ' i' + 1
       end.
 Proof.
+intros * Hkn Hσ Hσ' i Hin.
+destruct i. {
+  subst σ; cbn - [ fact ].
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  now rewrite seq_nth.
+}
+apply Nat.succ_lt_mono in Hin.
+subst σ; cbn - [ "<?" fact ].
+(*
+subst σ'; cbn - [ "<?" fact ].
+*)
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+cbn - [ "<?" fact ].
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+cbn - [ "<?" fact sym_gr_fun ].
+rewrite if_ltb_lt_dec.
+destruct (lt_dec _ _) as [H1| H1]. {
+  rewrite Hσ'; cbn - [ fact ].
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    apply Nat.mod_upper_bound, fact_neq_0.
+  }
+  rewrite seq_nth. 2: {
+    apply Nat.mod_upper_bound, fact_neq_0.
+  }
+  unfold vect_nat_el.
+  cbn - [ fact nth ].
+...
+  destruct n; [ easy | ].
+  cbn - [ fact ].
+  destruct i. {
+    cbn - [ fact ].
+    rewrite seq_nth. 2: {
+      apply Nat.mod_upper_bound, fact_neq_0.
+    }
+...
+
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  apply Nat.mod_upper_bound, fact_neq_0.
+}
+cbn - [ "<?" fact ].
+...
+rewrite Nat.leb_antisym.
+unfold Nat.b2n.
+rewrite if_ltb_lt_dec.
+rewrite negb_if.
+rewrite if_ltb_lt_dec.
+destruct (lt_dec _ _) as [H1| H1]; [ | easy ].
+apply Nat.add_0_r.
 ...
 
 (* equality of ε of sym_gr elem and ε_permut *)
