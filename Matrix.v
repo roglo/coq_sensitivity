@@ -1764,6 +1764,8 @@ split. {
 }
 Qed.
 
+...
+
 Theorem submatrix_sub : ∀ (MA MB : matrix T) i j,
   subm (MA - MB)%M i j = (subm MA i j - subm MB i j)%M.
 Proof.
