@@ -182,31 +182,49 @@ rewrite rngl_mul_comm; [ | easy ].
 do 3 rewrite <- rngl_mul_assoc.
 f_equal.
 (* elimination done *)
-...
 (* separation factors "∏" and "ε_fun" *)
 rewrite rngl_mul_comm; [ | easy ].
 rewrite <- rngl_mul_assoc.
 f_equal. {
   (* equality of the two "∏" *)
-  rewrite (rngl_product_shift _ 1); [ | flia ].
-  rewrite Nat.sub_succ, Nat.sub_0_r.
+  rewrite rngl_product_shift; [ | flia Hnz ].
+  rewrite (rngl_product_shift _ 2); [ | flia Hnz ].
+  rewrite Nat.sub_succ.
   apply rngl_product_eq_compat.
   intros i Hi.
+  rewrite Nat.add_comm, Nat.add_sub.
+  replace (2 + i - 1) with (S i) by flia.
   unfold mat_el.
-  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
-  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
-  rewrite seq_nth; [ | flia Hi ].
-  rewrite seq_nth; [ | flia Hi ].
+  unfold vect_nat_el, vect_vect_nat_el.
+  cbn - [ subm fact ].
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    apply Nat.mod_upper_bound, fact_neq_0.
+  }
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | apply Nat.mod_upper_bound, fact_neq_0 ].
+  rewrite seq_nth; [ | easy ].
   do 2 rewrite Nat.add_0_l.
   unfold subm.
   cbn - [ fact butn ].
   rewrite (List_map_nth' []). 2: {
     apply is_sm_mat_iff in Hm.
     destruct Hm as (Hr & Hcr & Hc).
-    rewrite butn_length; rewrite fold_mat_nrows; flia Hr Hi.
+    rewrite butn_length; rewrite fold_mat_nrows; flia Hr Hi Hnz.
   }
-  cbn - [ fact subm butn ].
-  remember (k mod (S n)!) as p eqn:Hp.
+(**)
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi Hnz ].
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi Hnz ].
+  rewrite seq_nth; [ | flia Hi Hnz ].
+  rewrite seq_nth; [ | flia Hi Hnz ].
+  rewrite Nat.add_0_l, Nat.add_1_l.
+  remember (sym_gr_fun n (mk_canon_sym_gr n) k) as σ eqn:Hσ.
+  remember (mk_canon_sym_gr n (k mod n!)) as σ' eqn:Hσ'.
+  move σ' before σ.
+  rewrite (sym_gr_succ_values Hσ Hσ').
+...
+  remember (k mod n!) as p eqn:Hp.
+  unfold mk_canon_sy
   remember (sym_gr_fun n (mk_canon_sym_gr n) p) as σ eqn:Hσ.
   remember (mk_canon_sym_gr n (p mod n!)) as σ' eqn:Hσ'.
   move σ' before σ.
