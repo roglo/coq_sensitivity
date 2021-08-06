@@ -2740,49 +2740,23 @@ rewrite ε_ws_ε; try easy. 2: {
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
   rewrite seq_nth; [ | easy ].
   rewrite Nat.add_0_l.
-...
   unfold is_permut_vect, vect_nat_el.
   cbn - [ seq fact nth ].
-  rewrite seq_nth; [ | easy ].
-  cbn.
-...
-  specialize (sym_gr_elem_is_permut _ Hkn) as H1.
-  cbn in H1.
-  unfold mk_canon_sym_gr_vect; cbn - [ fact ].
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  unfold is_permut_vect.
-  rewrite seq_nth; [ | easy ].
-  rewrite Nat.add_0_l.
-  unfold is_permut; cbn.
-  unfold is_permut in H1; cbn in H1.
-...
-  unfold is_permut_vect, vect_nat_el.
-...
-  unfold is_permut_vect; cbn - [ fact ].
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  rewrite seq_nth; [ | easy ].
-  unfold vect_nat_el; cbn - [ nth fact ].
-...
-  rewrite <- seq_shift.
-  rewrite map_map.
-...
-
-; cbn - [ fact ].
-unfold mk_canon_sym_gr_vect.
-unfold vect_vect_nat_el.
-cbn.
-cbn.
-
-...
-unfold is_permut_vect.
-Search is_permut.
-...
-Search (is_permut (vect_nat_el _ _)).
-Print mk_canon_sym_gr.
-unfold mk_canon_sym_gr_vect.
-cbn - [ fact ].
-unfold vect_nat_el.
-cbn - [ fact ].
+  destruct H1 as (H1, H2).
+  split. {
+    intros i Hi.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ cbn | easy ].
+    now apply H1.
+  } {
+    intros * Hi Hj Hij.
+    rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+    rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+    rewrite seq_nth in Hij; [ | easy ].
+    rewrite seq_nth in Hij; [ | easy ].
+    now apply H2.
+  }
+}
 ...
 rewrite ε_ws_ε; try easy; [ | now apply sym_gr_elem_is_permut ].
 ...
