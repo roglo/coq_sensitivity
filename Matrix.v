@@ -1749,10 +1749,10 @@ split. {
   unfold subm in Hl.
   cbn - [ butn ] in Hl.
   apply in_map_iff in Hl.
-  destruct Hl as (j & Hl & Hj); subst l.
-  cbn in Hj.
+  destruct Hl as (la & Hl & Hla); subst l.
+  cbn in Hla.
   destruct M as (ll).
-  cbn in Hr, Hj.
+  cbn in Hr, Hla.
   destruct ll as [| l']; [ easy | ].
   cbn in Hr; apply Nat.succ_inj in Hr.
   cbn in Hcm.
