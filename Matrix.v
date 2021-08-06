@@ -1713,19 +1713,20 @@ destruct i. {
 now cbn; rewrite butn_length.
 Qed.
 
-Theorem is_squ_mat_subm_0 : ∀ n (M : matrix T) j,
+Theorem is_squ_mat_subm : ∀ n (M : matrix T) i j,
   n ≠ 0
+  → i ≤ n
   → j ≤ n
   → is_square_matrix (S n) M = true
-  → is_square_matrix n (subm M 0 j) = true.
+  → is_square_matrix n (subm M i j) = true.
 Proof.
-intros * Hnz Hj Hm.
+intros * Hnz Hi Hj Hm.
 apply is_sm_mat_iff.
 specialize (square_matrix_ncols _ Hm) as Hcm.
 split. {
   apply is_sm_mat_iff in Hm.
   destruct Hm as (Hr & Hcr & Hc).
-  rewrite mat_nrows_subm; [ | flia Hr ].
+  rewrite mat_nrows_subm; [ | flia Hr Hi ].
   now rewrite Hr, Nat.sub_succ, Nat.sub_0_r.
 }
 split. {
@@ -1750,88 +1751,32 @@ split. {
   destruct M as (ll).
   cbn in Hc.
   cbn - [ butn ] in Hl.
-(**)
-Theorem toto : ∀ A ll i j n (l : list A),
-  i ≤ n
-  → j ≤ n
-  → (∀ l, l ∈ ll → length l = S n)
-  → l ∈ map (butn j) (butn i ll)
-  → length l = n.
-Proof.
-intros * Hi Hj Hc Hl.
-revert ll Hc Hl.
-induction i; intros. {
-  apply in_map_iff in Hl.
-  destruct Hl as (la & Hl & Hla); subst l.
-  cbn in Hla, Hc.
-  destruct ll as [| l']; [ easy | ].
-  rewrite butn_length. {
-    rewrite Hc; [ flia | now right ].
+  revert ll Hc Hl.
+  induction i; intros. {
+    apply in_map_iff in Hl.
+    destruct Hl as (la & Hl & Hla); subst l.
+    cbn in Hla, Hc.
+    destruct ll as [| l']; [ easy | ].
+    rewrite butn_length. {
+      rewrite Hc; [ flia | now right ].
+    }
+    rewrite Hc; [ flia Hj | now right ].
   }
-  rewrite Hc; [ flia Hj | now right ].
-}
-destruct ll as [| l']; [ easy | ].
-rewrite butn_cons in Hl.
-cbn in Hl.
-destruct Hl as [Hl| Hl]. {
-  subst l.
-  rewrite butn_length. {
-    rewrite Hc; [ flia | now left ].
-  }
-  rewrite Hc; [ flia Hj | now left ].
-}
-apply IHi with (ll := ll); [ flia Hi | | easy ].
-intros l'' Hl''.
-now apply Hc; right.
-Qed.
-apply (@toto _ ll 0 j); [ flia | easy | easy | easy ].
-...
-intros * Hi Hj Hc Hl.
-destruct i. {
-  apply in_map_iff in Hl.
-  destruct Hl as (la & Hl & Hla); subst l.
-  cbn in Hla, Hc.
   destruct ll as [| l']; [ easy | ].
-  rewrite butn_length. {
-    rewrite Hc; [ flia | now right ].
-  }
-  rewrite Hc; [ flia Hj | now right ].
-}
-destruct i. {
-  apply in_map_iff in Hl.
-  destruct Hl as (la & Hl & Hla); subst l.
-  cbn in Hla, Hc.
-  destruct ll as [| l']; [ easy | ].
-  apply in_app_iff in Hla.
-  destruct Hla as [Hla| Hla]. {
-    destruct Hla as [Hla| Hla]; [ subst l' | easy ].
+  rewrite butn_cons in Hl.
+  cbn in Hl.
+  destruct Hl as [Hl| Hl]. {
+    subst l.
     rewrite butn_length. {
       rewrite Hc; [ flia | now left ].
     }
     rewrite Hc; [ flia Hj | now left ].
   }
-  destruct ll as [| l'']; [ easy | ].
-  rewrite butn_length. {
-    rewrite Hc; [ flia | now right; right ].
-  }
-  rewrite Hc; [ flia Hj | now right; right ].
-}
-...
-apply (@toto _ ll 0 j); try easy.
-...
-  apply in_map_iff in Hl.
-  destruct Hl as (la & Hl & Hla); subst l.
-  cbn in Hla, Hc.
-  destruct ll as [| l']; [ easy | ].
-  rewrite butn_length. {
-    cbn in Hc.
-    rewrite Hc; [ flia | now right ].
-  }
-  rewrite Hc; [ flia Hj | now right ].
+  apply IHi with (ll := ll); [ flia Hi | | easy ].
+  intros l'' Hl''.
+  now apply Hc; right.
 }
 Qed.
-
-...
 
 Theorem submatrix_sub : ∀ (MA MB : matrix T) i j,
   subm (MA - MB)%M i j = (subm MA i j - subm MB i j)%M.

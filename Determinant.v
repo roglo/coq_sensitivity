@@ -141,8 +141,12 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   rewrite IHn. 2: {
-    now apply is_squ_mat_subm_0.
+    apply is_squ_mat_subm; [ easy | flia | easy | easy ].
   }
+  easy.
+}
+cbn - [ vect_vect_nat_el mat_el fact ].
+clear IHn.
 ...
 intros Hic Hop Hin Hit H10 Hde Hch * Hm.
 unfold determinant'.
