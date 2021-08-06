@@ -1713,13 +1713,13 @@ destruct i. {
 now cbn; rewrite butn_length.
 Qed.
 
-Theorem is_squ_mat_subm_0 : ∀ n (M : matrix T) i,
+Theorem is_squ_mat_subm_0 : ∀ n (M : matrix T) j,
   n ≠ 0
-  → i ≤ n
+  → j ≤ n
   → is_square_matrix (S n) M = true
-  → is_square_matrix n (subm M 0 i) = true.
+  → is_square_matrix n (subm M 0 j) = true.
 Proof.
-intros * Hnz Hi Hm.
+intros * Hnz Hj Hm.
 apply is_sm_mat_iff.
 specialize (square_matrix_ncols _ Hm) as Hcm.
 split. {
@@ -1739,7 +1739,7 @@ split. {
   } {
     rewrite Hcm; flia Hnz.
   } {
-    rewrite Hcm; flia Hi.
+    rewrite Hcm; flia Hj.
   }
   rewrite Hcm in Hcs; flia Hnz Hcs.
 } {
@@ -1762,7 +1762,7 @@ split. {
     cbn in Hc.
     rewrite Hc; [ flia | now right ].
   }
-  rewrite Hc; [ flia Hi | now right ].
+  rewrite Hc; [ flia Hj | now right ].
 }
 Qed.
 
