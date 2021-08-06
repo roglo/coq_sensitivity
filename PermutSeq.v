@@ -414,6 +414,33 @@ split. {
 }
 Qed.
 
+Theorem mk_canon_is_permut_vect : ∀ n k,
+  k < n!
+  → is_permut_vect n (vect_vect_nat_el (mk_canon_sym_gr_vect n) k).
+Proof.
+intros * Hkn.
+unfold mk_canon_sym_gr_vect; cbn - [ fact map seq ].
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+rewrite Nat.add_0_l.
+unfold is_permut_vect, vect_nat_el.
+cbn - [ seq fact nth ].
+(**)
+split. {
+  intros i Hi.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ cbn | easy ].
+  now apply permut_elem_ub.
+} {
+  intros * Hi Hj Hij.
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite seq_nth in Hij; [ | easy ].
+  rewrite seq_nth in Hij; [ | easy ].
+  now apply permut_elem_injective in Hij.
+}
+Qed.
+
 (*
 Theorem canon_sym_gr_prop : ∀ n, is_sym_gr n (mk_canon_sym_gr n).
 Proof.
@@ -2734,31 +2761,9 @@ Theorem ε_of_sym_gr_permut_succ :
      ε n (vect_vect_nat_el (mk_canon_sym_gr_vect n) (k mod n!)))%F.
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hkn.
-rewrite ε_ws_ε; try easy. 2: {
-  specialize (sym_gr_elem_is_permut _ Hkn) as H1.
-  unfold mk_canon_sym_gr_vect; cbn - [ fact map seq ].
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  rewrite seq_nth; [ | easy ].
-  rewrite Nat.add_0_l.
-  unfold is_permut_vect, vect_nat_el.
-  cbn - [ seq fact nth ].
-  destruct H1 as (H1, H2).
-  split. {
-    intros i Hi.
-    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-    rewrite seq_nth; [ cbn | easy ].
-    now apply H1.
-  } {
-    intros * Hi Hj Hij.
-    rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-    rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-    rewrite seq_nth in Hij; [ | easy ].
-    rewrite seq_nth in Hij; [ | easy ].
-    now apply H2.
-  }
-}
-...
-rewrite ε_ws_ε; try easy; [ | now apply sym_gr_elem_is_permut ].
+rewrite ε_ws_ε; try easy; [ | now apply mk_canon_is_permut_vect ].
+unfold ε_ws, ε_fun_ws.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 ...
 
 (*
