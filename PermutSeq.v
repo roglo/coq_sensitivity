@@ -2719,6 +2719,33 @@ Qed.
 
 (* equality of ε of sym_gr elem and ε_permut *)
 
+Theorem ε_of_sym_gr_permut_succ :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ n k,
+  k < (S n)!
+  → ε (S n) (vect_vect_nat_el (mk_canon_sym_gr_vect (S n)) k) =
+    (minus_one_pow (k / n!) *
+     ε n (vect_vect_nat_el (mk_canon_sym_gr_vect n) (k mod n!)))%F.
+Proof.
+intros Hic Hop Hin H10 Hit Hde Hch * Hkn.
+rewrite ε_ws_ε; try easy. 2: {
+unfold is_permut_vect.
+Check sym_gr_elem_is_permut.
+Print mk_canon_sym_gr.
+unfold mk_canon_sym_gr_vect.
+cbn - [ fact ].
+unfold vect_nat_el.
+cbn - [ fact ].
+...
+rewrite ε_ws_ε; try easy; [ | now apply sym_gr_elem_is_permut ].
+...
+
 (*
 Theorem ε_of_sym_gr_permut_succ :
   rngl_is_comm = true →
