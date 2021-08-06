@@ -2735,11 +2735,30 @@ Theorem ε_of_sym_gr_permut_succ :
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hkn.
 rewrite ε_ws_ε; try easy. 2: {
+  specialize (sym_gr_elem_is_permut _ Hkn) as H1.
+  cbn in H1.
+  unfold mk_canon_sym_gr_vect.
+...
+  unfold is_permut_vect; cbn - [ fact ].
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
+  unfold vect_nat_el; cbn - [ nth fact ].
+...
+  rewrite <- seq_shift.
+  rewrite map_map.
+...
+
+; cbn - [ fact ].
+unfold mk_canon_sym_gr_vect.
+unfold vect_vect_nat_el.
+cbn.
+cbn.
+
+...
 unfold is_permut_vect.
 Search is_permut.
 ...
 Search (is_permut (vect_nat_el _ _)).
-Check sym_gr_elem_is_permut.
 Print mk_canon_sym_gr.
 unfold mk_canon_sym_gr_vect.
 cbn - [ fact ].
