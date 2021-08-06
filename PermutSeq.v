@@ -2744,6 +2744,18 @@ destruct (lt_dec _ _) as [H1| H1]; [ | easy ].
 apply Nat.add_0_r.
 Qed.
 
+Theorem sym_gr_vect_succ_values : ∀ (n k : nat) (σ σ' : nat → nat),
+  σ = vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect n) k)
+  → σ' = vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect n) (k mod n!))
+  → ∀ i : nat,
+    σ i =
+      match i with
+      | 0 => k / n!
+      | S i' => if σ' i' <? k / n! then σ' i' else σ' i' + 1
+      end.
+Proof.
+...
+
 (* equality of ε of sym_gr elem and ε_permut *)
 
 Theorem ε_of_sym_gr_permut_succ :
@@ -2796,10 +2808,15 @@ f_equal. {
     easy.
   }
   cbn - [ mk_canon_sym_gr_vect ].
+remember (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect (S n)) k)) as σ eqn:Hσ.
+remember (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect (S n)) (k mod (S n)!))) as σ' eqn:Hσ'.
+Check sym_gr_succ_values.
+...
+rewrite (sym_gr_vect_succ_values _ _ Hσ Hσ').
+...
   unfold mk_canon_sym_gr_vect.
   cbn - [ map fact ].
 Search mk_canon_sym_gr_vect.
-Check sym_gr_succ_values.
 ...
   remember (mk_canon_sym_gr (S n) k) as σ eqn:Hσ.
   remember (mk_canon_sym_gr n (k mod fact n)) as σ' eqn:Hσ'.
