@@ -141,49 +141,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   rewrite IHn. 2: {
-(*lemme?*)
-    apply is_sm_mat_iff.
-    specialize (square_matrix_ncols _ Hm) as Hcm.
-    split. {
-      apply is_sm_mat_iff in Hm.
-      destruct Hm as (Hr & Hcr & Hc).
-      rewrite mat_nrows_subm; [ | flia Hr ].
-      now rewrite Hr, Nat.sub_succ, Nat.sub_0_r.
-    }
-    split. {
-      intros Hcs.
-      rewrite mat_ncols_subm in Hcs; cycle 1. {
-        now apply (@squ_mat_is_corr (S n)).
-      } {
-        apply is_sm_mat_iff in Hm.
-        destruct Hm as (Hr & Hcr & Hc).
-        rewrite Hr; flia Hnz.
-      } {
-        rewrite Hcm; flia Hnz.
-      } {
-        rewrite Hcm; flia Hi.
-      }
-      rewrite Hcm in Hcs; flia Hnz Hcs.
-    } {
-      intros l Hl.
-      apply is_sm_mat_iff in Hm.
-      destruct Hm as (Hr & Hcr & Hc).
-      unfold subm in Hl.
-      cbn - [ butn ] in Hl.
-      apply in_map_iff in Hl.
-      destruct Hl as (j & Hl & Hj); subst l.
-      cbn in Hj.
-      destruct M as (ll).
-      cbn in Hr, Hj.
-      destruct ll as [| l']; [ easy | ].
-      cbn in Hr; apply Nat.succ_inj in Hr.
-      cbn in Hcm.
-      rewrite butn_length. {
-        cbn in Hc.
-        rewrite Hc; [ flia | now right ].
-      }
-      rewrite Hc; [ flia Hi | now right ].
-    }
+    now apply is_squ_mat_subm_0.
   }
 ...
 intros Hic Hop Hin Hit H10 Hde Hch * Hm.
