@@ -1751,6 +1751,74 @@ split. {
   cbn in Hc.
   cbn - [ butn ] in Hl.
 (**)
+Theorem toto : ∀ A ll i j n (l : list A),
+  i ≤ n
+  → j ≤ n
+  → (∀ l, l ∈ ll → length l = S n)
+  → l ∈ map (butn j) (butn i ll)
+  → length l = n.
+Proof.
+intros * Hi Hj Hc Hl.
+revert ll Hc Hl.
+induction i; intros. {
+  apply in_map_iff in Hl.
+  destruct Hl as (la & Hl & Hla); subst l.
+  cbn in Hla, Hc.
+  destruct ll as [| l']; [ easy | ].
+  rewrite butn_length. {
+    rewrite Hc; [ flia | now right ].
+  }
+  rewrite Hc; [ flia Hj | now right ].
+}
+destruct ll as [| l']; [ easy | ].
+rewrite butn_cons in Hl.
+cbn in Hl.
+destruct Hl as [Hl| Hl]. {
+  subst l.
+  rewrite butn_length. {
+    rewrite Hc; [ flia | now left ].
+  }
+  rewrite Hc; [ flia Hj | now left ].
+}
+apply IHi with (ll := ll); [ flia Hi | | easy ].
+intros l'' Hl''.
+now apply Hc; right.
+Qed.
+apply (@toto _ ll 0 j); [ flia | easy | easy | easy ].
+...
+intros * Hi Hj Hc Hl.
+destruct i. {
+  apply in_map_iff in Hl.
+  destruct Hl as (la & Hl & Hla); subst l.
+  cbn in Hla, Hc.
+  destruct ll as [| l']; [ easy | ].
+  rewrite butn_length. {
+    rewrite Hc; [ flia | now right ].
+  }
+  rewrite Hc; [ flia Hj | now right ].
+}
+destruct i. {
+  apply in_map_iff in Hl.
+  destruct Hl as (la & Hl & Hla); subst l.
+  cbn in Hla, Hc.
+  destruct ll as [| l']; [ easy | ].
+  apply in_app_iff in Hla.
+  destruct Hla as [Hla| Hla]. {
+    destruct Hla as [Hla| Hla]; [ subst l' | easy ].
+    rewrite butn_length. {
+      rewrite Hc; [ flia | now left ].
+    }
+    rewrite Hc; [ flia Hj | now left ].
+  }
+  destruct ll as [| l'']; [ easy | ].
+  rewrite butn_length. {
+    rewrite Hc; [ flia | now right; right ].
+  }
+  rewrite Hc; [ flia Hj | now right; right ].
+}
+...
+apply (@toto _ ll 0 j); try easy.
+...
   apply in_map_iff in Hl.
   destruct Hl as (la & Hl & Hla); subst l.
   cbn in Hla, Hc.
