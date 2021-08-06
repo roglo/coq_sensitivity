@@ -147,6 +147,122 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn - [ vect_vect_nat_el mat_el fact ].
 clear IHn.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_mul_summation_distr_l; [ | now left ].
+  easy.
+}
+cbn - [ vect_vect_nat_el mat_el fact ].
+rewrite rngl_summation_summation_distr.
+rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
+rewrite Nat.sub_succ, Nat.sub_0_r.
+rewrite <- Nat_fact_succ.
+apply rngl_summation_eq_compat.
+intros k Hk.
+(* elimination of "mat_el M 0 (k / (n!)" *)
+symmetry.
+rewrite rngl_product_split_first; [ | flia ].
+cbn - [ vect_vect_nat_el mat_el fact ].
+remember (mat_el M 0 _) as x eqn:Hx.
+cbn - [ fact ] in Hx.
+assert (Hksn : k < (S n)!). {
+  eapply le_lt_trans; [ apply Hk | ].
+  apply Nat.sub_lt; [ | flia ].
+  apply Nat.neq_0_lt_0, fact_neq_0.
+}
+rewrite (List_map_nth' 0) in Hx; [ | now rewrite seq_length ].
+cbn - [ fact ] in Hx.
+rewrite seq_nth in Hx; [ | easy ].
+rewrite Nat.add_0_l in Hx.
+subst x.
+rewrite rngl_mul_comm; [ | easy ].
+symmetry.
+rewrite <- rngl_mul_assoc.
+rewrite rngl_mul_comm; [ | easy ].
+do 3 rewrite <- rngl_mul_assoc.
+f_equal.
+(* elimination done *)
+...
+(* separation factors "∏" and "ε_fun" *)
+rewrite rngl_mul_comm; [ | easy ].
+rewrite <- rngl_mul_assoc.
+f_equal. {
+  (* equality of the two "∏" *)
+  rewrite (rngl_product_shift _ 1); [ | flia ].
+  rewrite Nat.sub_succ, Nat.sub_0_r.
+  apply rngl_product_eq_compat.
+  intros i Hi.
+  unfold mat_el.
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
+  rewrite seq_nth; [ | flia Hi ].
+  rewrite seq_nth; [ | flia Hi ].
+  do 2 rewrite Nat.add_0_l.
+  unfold subm.
+  cbn - [ fact butn ].
+  rewrite (List_map_nth' []). 2: {
+    apply is_sm_mat_iff in Hm.
+    destruct Hm as (Hr & Hcr & Hc).
+    rewrite butn_length; rewrite fold_mat_nrows; flia Hr Hi.
+  }
+  cbn - [ fact subm butn ].
+  remember (k mod (S n)!) as p eqn:Hp.
+  remember (sym_gr_fun n (mk_canon_sym_gr n) p) as σ eqn:Hσ.
+  remember (mk_canon_sym_gr n (p mod n!)) as σ' eqn:Hσ'.
+  move σ' before σ.
+  rewrite (sym_gr_succ_values Hσ Hσ').
+  destruct i. {
+    unfold butn at 2.
+    rewrite firstn_O, app_nil_l.
+    rewrite List_skipn_1.
+    rewrite List_nth_tl.
+    unfold Nat.b2n.
+    rewrite if_leb_le_dec.
+    destruct (le_dec (k / (S n)!) (p / n!)) as [Hkp| Hkp]. 2: {
+      apply Nat.nle_gt in Hkp.
+      rewrite Nat.add_0_r.
+      now rewrite nth_butn_after.
+    }
+    now rewrite nth_butn_before.
+  }
+  rewrite if_ltb_lt_dec.
+  destruct (lt_dec (σ' i) (p / n!)) as [Hσp| Hσp]. {
+    unfold Nat.b2n.
+    rewrite if_leb_le_dec.
+    destruct (le_dec (k / (S n)!) (σ' i)) as [Hkn| Hkn]. {
+      rewrite nth_butn_before; [ | easy ].
+      rewrite nth_butn_before; [ | flia ].
+      now rewrite (Nat.add_1_r (S i)).
+    } {
+      rewrite Nat.add_0_r.
+      apply Nat.nle_gt in Hkn.
+      rewrite nth_butn_after; [ | easy ].
+      rewrite nth_butn_before; [ | flia ].
+      now rewrite (Nat.add_1_r (S i)).
+    }
+  } {
+    unfold Nat.b2n.
+    rewrite if_leb_le_dec.
+    destruct (le_dec (k / (S n)!) (σ' i + 1)) as [Hkn| Hkn]. {
+      rewrite nth_butn_before; [ | easy ].
+      rewrite nth_butn_before; [ | flia ].
+      now rewrite (Nat.add_1_r (S i)).
+    } {
+      rewrite Nat.add_0_r.
+      apply Nat.nle_gt in Hkn.
+      rewrite nth_butn_after; [ | easy ].
+      rewrite nth_butn_before; [ | flia ].
+      now rewrite (Nat.add_1_r (S i)).
+    }
+  }
+  (* end proof equality of the two "∏" *)
+}
+(* equality of the two "ε_fun" *)
+symmetry.
+Print mk_canon_sym_gr_vect'.
+Print vect_el.
+Print vect_vect_nat_el.
+...
 ...
 intros Hic Hop Hin Hit H10 Hde Hch * Hm.
 unfold determinant'.
