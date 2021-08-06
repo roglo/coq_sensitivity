@@ -2736,6 +2736,9 @@ Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hkn.
 rewrite ε_ws_ε; try easy. 2: {
 unfold is_permut_vect.
+Search is_permut.
+...
+Search (is_permut (vect_nat_el _ _)).
 Check sym_gr_elem_is_permut.
 Print mk_canon_sym_gr.
 unfold mk_canon_sym_gr_vect.
