@@ -128,6 +128,63 @@ induction n; intros. {
   rewrite rngl_div_1_r; [ easy | now left | easy ].
 }
 rewrite determinant_succ.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n; cbn.
+  rewrite rngl_summation_only_one; cbn.
+  rewrite rngl_summation_only_one; cbn.
+  rewrite rngl_product_only_one; cbn.
+  unfold ε, ε_fun; cbn.
+  do 4 rewrite rngl_product_only_one; cbn.
+  rewrite rngl_mul_1_r.
+  rewrite rngl_div_1_r; [ easy | now left | easy ].
+}
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite IHn. 2: {
+(*lemme?*)
+    apply is_sm_mat_iff.
+    specialize (square_matrix_ncols _ Hm) as Hcm.
+    split. {
+      apply is_sm_mat_iff in Hm.
+      destruct Hm as (Hr & Hcr & Hc).
+      rewrite mat_nrows_subm; [ | flia Hr ].
+      now rewrite Hr, Nat.sub_succ, Nat.sub_0_r.
+    }
+    split. {
+      intros Hcs.
+      rewrite mat_ncols_subm in Hcs; cycle 1. {
+        now apply (@squ_mat_is_corr (S n)).
+      } {
+        apply is_sm_mat_iff in Hm.
+        destruct Hm as (Hr & Hcr & Hc).
+        rewrite Hr; flia Hnz.
+      } {
+        rewrite Hcm; flia Hnz.
+      } {
+        rewrite Hcm; flia Hi.
+      }
+      rewrite Hcm in Hcs; flia Hnz Hcs.
+    } {
+      intros l Hl.
+      apply is_sm_mat_iff in Hm.
+      destruct Hm as (Hr & Hcr & Hc).
+      unfold subm in Hl.
+      cbn - [ butn ] in Hl.
+      apply in_map_iff in Hl.
+      destruct Hl as (j & Hl & Hj); subst l.
+      cbn in Hj.
+      destruct M as (ll).
+      cbn in Hr, Hj.
+      destruct ll as [| l']; [ easy | ].
+      cbn in Hr; apply Nat.succ_inj in Hr.
+      cbn in Hcm.
+      rewrite butn_length. {
+        cbn in Hc.
+        rewrite Hc; [ flia | now right ].
+      }
+      rewrite Hc; [ flia Hi | now right ].
+    }
+  }
 ...
 intros Hic Hop Hin Hit H10 Hde Hch * Hm.
 unfold determinant'.
