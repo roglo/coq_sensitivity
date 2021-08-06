@@ -1746,18 +1746,15 @@ split. {
   intros l Hl.
   apply is_sm_mat_iff in Hm.
   destruct Hm as (Hr & Hcr & Hc).
-  clear Hcr Hr.
+  clear Hcr Hr Hcm Hnz.
   destruct M as (ll).
   cbn in Hc.
   cbn - [ butn ] in Hl.
-  unfold mat_ncols in Hcm; cbn in Hcm.
 (**)
   apply in_map_iff in Hl.
   destruct Hl as (la & Hl & Hla); subst l.
-  cbn in Hla.
   cbn in Hla, Hc.
   destruct ll as [| l']; [ easy | ].
-  cbn in Hcm.
   rewrite butn_length. {
     cbn in Hc.
     rewrite Hc; [ flia | now right ].
