@@ -2767,28 +2767,25 @@ cbn - [ "<?" nth seq ].
 rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
 rewrite Nat.add_0_l.
-erewrite sym_gr_succ_values; [ | easy | easy ].
-rewrite Hσ'.
-unfold vect_vect_nat_el.
-unfold vect_nat_el.
-unfold mk_canon_sym_gr_vect.
-cbn - [ fact map seq "<?" ].
+destruct i; [ easy | ].
+subst σ; cbn - [ "<?" ].
+subst σ'; cbn - [ "<?" ].
+rewrite Nat.leb_antisym.
+unfold Nat.b2n.
+rewrite if_ltb_lt_dec.
+rewrite negb_if.
+rewrite if_ltb_lt_dec.
 rewrite (List_map_nth' 0). 2: {
   rewrite seq_length.
   apply Nat.mod_upper_bound, fact_neq_0.
 }
 cbn - [ fact map seq "<?" ].
-destruct i; [ easy | ].
-rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length; flia Hin.
-}
+rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hin ].
 rewrite seq_nth; [ | apply Nat.mod_upper_bound, fact_neq_0 ].
 rewrite seq_nth; [ | flia Hin ].
 do 2 rewrite Nat.add_0_l.
-easy.
+destruct (lt_dec _ _); [ apply Nat.add_0_r | easy ].
 Qed.
-
-...
 
 (* equality of ε of sym_gr elem and ε_permut *)
 
@@ -2842,207 +2839,19 @@ f_equal. {
     easy.
   }
   cbn - [ mk_canon_sym_gr_vect ].
-remember (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect (S n)) k)) as σ eqn:Hσ.
-remember (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect (S n)) (k mod (S n)!))) as σ' eqn:Hσ'.
-Check sym_gr_succ_values.
-...
-rewrite (sym_gr_vect_succ_values _ _ Hσ Hσ').
-...
-  unfold mk_canon_sym_gr_vect.
-  cbn - [ map fact ].
-Search mk_canon_sym_gr_vect.
-...
-  remember (mk_canon_sym_gr (S n) k) as σ eqn:Hσ.
-  remember (mk_canon_sym_gr n (k mod fact n)) as σ' eqn:Hσ'.
-  specialize (sym_gr_succ_values Hσ Hσ') as H1.
+  remember (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect (S n)) k))
+    as σ eqn:Hσ.
+  remember
+    (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect n) (k mod n!)))
+    as σ' eqn:Hσ'.
+  specialize (sym_gr_vect_succ_values Hkn Hσ Hσ') as H1.
   unfold sign_diff.
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
-    rewrite H1.
+    rewrite H1; [ | flia ].
     replace i with (S (i - 1)) at 1 by flia Hi.
     easy.
   }
-  cbn - [ "<?" ].
-  remember (k / fact n) as x eqn:Hx.
-  erewrite rngl_product_eq_compat. 2: {
-    intros i Hi.
-    rewrite <- Nat.sub_succ_l; [ | easy ].
-    rewrite Nat.sub_succ, Nat.sub_0_r.
-    rewrite H1.
-    replace i with (S (i - 1)) at 1 by flia Hi.
-    easy.
-  }
-  cbn - [ "<?" ].
-  rewrite rngl_product_shift; [ | flia Hnz ].
-  erewrite rngl_product_eq_compat. 2: {
-    intros i (_, Hi).
-    rewrite Nat.add_comm, Nat.add_sub.
-    easy.
-  }
-  cbn - [ "<?" ].
-  erewrite rngl_product_eq_compat. 2: {
-    intros i (_, Hi).
-    replace (if x <? _ then _ else _) with
-      (if x <? σ' i + 1 then 1%F else (-1)%F). 2: {
-      do 3 rewrite if_ltb_lt_dec.
-      destruct (lt_dec (σ' i) x) as [H2| H2]; [ | easy ].
-      destruct (lt_dec x (σ' i)) as [H| H]; [ flia H H2 | clear H ].
-      destruct (lt_dec x (σ' i + 1)) as [H3| H3]; [ | easy ].
-      flia H2 H3.
-    }
-    easy.
-  }
-  cbn - [ "<?" ].
-  assert (Hp' : is_permut σ' n). {
-    rewrite Hσ'.
-    apply sym_gr_elem_is_permut.
-    apply Nat.mod_upper_bound.
-    apply fact_neq_0.
-  }
-  assert (Hp : is_permut σ (S n)). {
-    rewrite Hσ.
-    now apply sym_gr_elem_is_permut.
-  }
-  rewrite rngl_product_change_var with (g := permut_fun_inv σ' n) (h := σ').
-  2: {
-    intros i (_, Hi).
-    apply fun_find_prop; [ | flia Hnz Hi ].
-    apply Hp'.
-  }
-  rewrite Nat.sub_0_r.
-  rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
-  rewrite Nat.sub_succ, Nat.sub_0_r.
-  erewrite rngl_product_list_eq_compat. 2: {
-    intros i Hi.
-    apply in_map_iff in Hi.
-    destruct Hi as (j & Hji & Hj).
-    apply in_seq in Hj.
-    rewrite fun_permut_fun_inv; [ easy | easy | ].
-    now rewrite <- Hji; apply Hp'.
-  }
-  cbn - [ "<?" seq ].
-  rewrite rngl_product_change_list with (lb := seq 0 n); [ | easy | ]. 2: {
-    now apply permut_fun_Permutation.
-  }
-  rewrite rngl_product_seq_product; [ | easy ].
-  rewrite Nat.add_0_l.
-  destruct (Nat.eq_dec x 0) as [Hxz| Hxz]. {
-    move Hxz at top; subst x.
-    cbn - [ "<?" ].
-    apply all_1_rngl_product_1; [ easy | ].
-    intros i (_, Hi).
-    now rewrite Nat.add_comm.
-  }
-  rewrite (rngl_product_split (x - 1)). 2: {
-    split; [ flia | ].
-    apply -> Nat.succ_le_mono.
-    enough (H : x < S n) by flia H Hnz.
-    replace x with (σ 0) by now rewrite H1.
-    apply Hp; flia.
-  }
-  remember (∏ (i = _, _), _)%F as y eqn:Hy.
-  rewrite all_1_rngl_product_1; [ | easy | ]. 2: {
-    intros i Hi.
-    rewrite if_ltb_lt_dec.
-    destruct (lt_dec x (i + 1)) as [H2| H2]; [ easy | ].
-    flia Hi H2.
-  }
-  subst y; rewrite rngl_mul_1_r.
-  erewrite rngl_product_eq_compat. 2: {
-    intros i (_, Hi).
-    replace (if x <? i + 1 then 1%F else _) with (-1)%F. 2: {
-      rewrite if_ltb_lt_dec.
-      destruct (lt_dec x (i + 1)) as [H| H]; [ | easy ].
-      flia Hi H Hxz.
-    }
-    easy.
-  }
-  cbn.
-  destruct x; [ easy | clear Hxz ].
-  rewrite Nat.sub_succ, Nat.sub_0_r.
-  clear Hx H1.
-  induction x; cbn. {
-    unfold iter_seq, iter_list; cbn.
-    apply rngl_mul_1_l.
-  }
-  rewrite rngl_product_split_last; [ | flia ].
-  rewrite rngl_product_shift; [ | flia ].
-  rewrite Nat.sub_succ, Nat.sub_0_r.
-  rewrite IHx.
-  symmetry.
-  rewrite minus_one_pow_succ; [ | easy ].
-  rewrite rngl_mul_comm; [ | easy ].
-  rewrite rngl_mul_opp_l; [ | easy ].
-  now rewrite rngl_mul_1_l.
-}
-rewrite ε_ws_ε; try easy. 2: {
-  apply sym_gr_elem_is_permut.
-  apply Nat.mod_upper_bound.
-  apply fact_neq_0.
-}
-unfold ε_ws, ε_fun_ws.
-erewrite rngl_product_eq_compat. 2: {
-  intros i Hi.
-  rewrite rngl_product_succ_succ.
-  rewrite rngl_product_split_first; [ | flia ].
-  rewrite if_ltb_lt_dec.
-  destruct (lt_dec (S i) 1) as [H| H]; [ flia H | clear H ].
-  rewrite rngl_mul_1_l.
-  erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    replace (S i <? S j) with (i <? j) by easy.
-    now do 2 rewrite Nat.sub_succ, Nat.sub_0_r.
-  }
-  easy.
-}
-cbn - [ mk_canon_sym_gr "<?" ].
-apply rngl_product_eq_compat.
-intros i Hi.
-apply rngl_product_eq_compat.
-intros j Hj.
-move j before i.
-do 2 rewrite if_ltb_lt_dec.
-destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
-remember (mk_canon_sym_gr (S n) k) as σ eqn:Hσ.
-remember (mk_canon_sym_gr n (k mod n!)) as σ' eqn:Hσ'.
-move σ' before σ.
-do 2 rewrite (sym_gr_succ_values Hσ Hσ').
-destruct j; [ flia Hj | ].
-destruct i; [ flia Hi | ].
-rewrite Nat.sub_succ, Nat.sub_0_r.
-rewrite Nat.sub_succ, Nat.sub_0_r.
-do 2 rewrite if_ltb_lt_dec.
-destruct (lt_dec (σ' j) (k / fact n)) as [Hsfj| Hsfj]. {
-  destruct (lt_dec (σ' i) (k / fact n)) as [Hsfi| Hsfi]; [ easy | ].
-  unfold sign_diff.
-  do 2 rewrite if_ltb_lt_dec.
-  destruct (lt_dec (σ' i + 1) (σ' j)) as [Hsi1j| Hsi1j]. {
-    destruct (lt_dec (σ' i) (σ' j)) as [Hsij| Hsij]; [ easy | ].
-    flia Hsi1j Hsij.
-  }
-  destruct (lt_dec (σ' i) (σ' j)) as [Hsij| Hsij]; [ | easy ].
-  flia Hsij Hsfj Hsfi.
-}
-destruct (lt_dec (σ' i) (k / fact n)) as [Hsfi| Hsfi]. {
-  unfold sign_diff.
-  do 2 rewrite if_ltb_lt_dec.
-  destruct (lt_dec (σ' i) (σ' j + 1)) as [Hsi1j| Hsi1j]. {
-    destruct (lt_dec (σ' i) (σ' j)) as [Hsij| Hsij]; [ easy | ].
-    flia Hsij Hsfj Hsfi.
-  }
-  destruct (lt_dec (σ' i) (σ' j)) as [Hsij| Hsij]; [ | easy ].
-  flia Hsi1j Hsij.
-}
-unfold sign_diff.
-do 2 rewrite if_ltb_lt_dec.
-destruct (lt_dec (σ' i + 1) (σ' j + 1)) as [Hsi1j| Hsi1j]. {
-  destruct (lt_dec (σ' i) (σ' j)) as [Hsij| Hsij]; [ easy | ].
-  flia Hsi1j Hsij.
-}
-destruct (lt_dec (σ' i) (σ' j)) as [Hsij| Hsij]; [ | easy ].
-flia Hsi1j Hsij.
-Qed.
-*)
 ...
 
 (*
