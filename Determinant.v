@@ -310,7 +310,6 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ mat_el vect_vect_nat_el ].
-...
 rewrite rngl_mul_summation_distr_l; [ | now left ].
 rewrite rngl_mul_summation_distr_l; [ | now left ].
 symmetry.
@@ -326,7 +325,7 @@ erewrite rngl_summation_eq_compat. 2: {
   now rewrite (rngl_mul_comm Hic b).
 }
 rewrite rngl_add_comm.
-rewrite <- rngl_summation_add_distr; [ | easy ].
+rewrite <- rngl_summation_add_distr.
 apply rngl_summation_eq_compat.
 intros k Hk.
 do 2 rewrite <- rngl_mul_assoc.
@@ -388,6 +387,7 @@ cbn in Hpp.
 rewrite Hpp.
 destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
 do 4 rewrite rngl_mul_assoc.
+...
 remember
   (∏ (i0 = 2, p + 1), mat_el M (i0 - 2) (mk_canon_sym_gr n k (i0 - 2)))
   as q eqn:Hq.
