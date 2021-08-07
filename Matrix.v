@@ -513,6 +513,7 @@ Theorem mat_repl_vect_is_square : ∀ n k (M : matrix T) V,
   → is_square_matrix n (mat_repl_vect k M V) = true.
 Proof.
 intros * Hv Hm.
+specialize (square_matrix_ncols _ Hm) as Hcn.
 apply is_sm_mat_iff in Hm.
 apply is_sm_mat_iff.
 destruct Hm as (Hr & Hcr & Hc).
@@ -520,7 +521,9 @@ rewrite mat_repl_vect_nrows; [ | congruence ].
 split; [ easy | ].
 split. {
   destruct (lt_dec k (mat_ncols M)) as [Hkm| Hkm]. {
-    rewrite mat_repl_vect_ncols; [ easy | easy | ].
+    rewrite mat_repl_vect_ncols; [ easy | easy | congruence ].
+  }
+  apply Nat.nlt_ge in Hkm.
 ...
   intros Hcv.
   unfold mat_ncols in Hcv; cbn in Hcv.
