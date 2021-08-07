@@ -2790,6 +2790,8 @@ rewrite (List_map_nth' 0). 2: {
 rewrite seq_nth; [ | apply Nat.mod_upper_bound, fact_neq_0 ].
 rewrite seq_nth; [ | flia Hin ].
 do 2 rewrite Nat.add_0_l.
+destruct i. {
+  cbn - [ fact ].
 ...
 unfold vect_nat_el in Hσ.
 cbn - [ map fact seq ] in Hσ.
