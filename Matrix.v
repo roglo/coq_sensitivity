@@ -466,13 +466,46 @@ apply Nat.min_id.
 Qed.
 
 Theorem mat_repl_vect_ncols : ∀ k (M : matrix T) V,
-  vect_size V = mat_ncols M
+  k < mat_ncols M
+  → vect_size V = mat_ncols M
   → mat_ncols (mat_repl_vect k M V) = mat_ncols M.
 Proof.
-intros * Hv.
-unfold mat_repl_vect.
+intros * Hkc Hv.
+destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
+  unfold mat_nrows in Hrz.
+  apply length_zero_iff_nil in Hrz.
+  unfold mat_ncols; cbn.
+  now rewrite Hrz.
+}
+destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]. {
+  rewrite Hcz in Hv.
+  unfold vect_size in Hv.
+  apply length_zero_iff_nil in Hv.
+  unfold mat_ncols in Hcz.
+  apply length_zero_iff_nil in Hcz.
+  unfold mat_ncols; cbn.
+  rewrite Hv.
+  now rewrite map2_nil_r, Hcz.
+}
+apply Nat.neq_0_lt_0 in Hrz.
+apply Nat.neq_0_lt_0 in Hcz.
 unfold mat_ncols.
-...
+cbn - [ skipn ].
+rewrite List_hd_nth_0.
+rewrite map2_nth with (a := []) (b := 0%F); cycle 1. {
+  now rewrite fold_mat_nrows.
+} {
+  now rewrite fold_vect_size, Hv.
+}
+rewrite app_length.
+rewrite firstn_length.
+rewrite <- List_hd_nth_0.
+rewrite fold_mat_ncols.
+rewrite List_length_cons.
+rewrite skipn_length.
+rewrite fold_mat_ncols.
+flia Hkc.
+Qed.
 
 Theorem mat_repl_vect_is_square : ∀ n k (M : matrix T) V,
   vect_size V = n
@@ -483,10 +516,17 @@ intros * Hv Hm.
 apply is_sm_mat_iff in Hm.
 apply is_sm_mat_iff.
 destruct Hm as (Hr & Hcr & Hc).
+rewrite mat_repl_vect_nrows; [ | congruence ].
+split; [ easy | ].
 split. {
-  rewrite mat_repl_vect_nrows; [ easy | congruence ].
-}
-split. {
+...
+  intros Hcv.
+  unfold mat_ncols in Hcv; cbn in Hcv.
+  apply length_zero_iff_nil in Hcv.
+...
+  destruct (lt_dec k (mat_ncols M)) as [Hkm| Hkm]. {
+    rewrite mat_repl_vect_ncols in Hcv; [ | easy | ]. 2: {
+      rewrite Hv.
 ...
 Theorem mat_repl_vect_ncols : ∀ k (M : matrix T) V,
   mat_ncols (mat_repl_vect k M v) = mat_ncols M.
