@@ -239,8 +239,6 @@ symmetry.
 now apply ε_of_sym_gr_permut_succ.
 Qed.
 
-...
-
 (* multilinearity *)
 
 Theorem determinant_multilinear :
@@ -251,14 +249,15 @@ Theorem determinant_multilinear :
   rngl_has_1_neq_0 = true →
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
-  ∀ n (M : matrix n n T) i a b U V,
+  ∀ n (M : matrix T) i a b U V,
     i < n
-    → determinant (mat_repl_vect i M (a × U + b × V)%V) =
-         (a * determinant (mat_repl_vect i M U) +
-          b * determinant (mat_repl_vect i M V))%F.
+    → determinant n (mat_repl_vect i M (a × U + b × V)%V) =
+         (a * determinant n (mat_repl_vect i M U) +
+          b * determinant n (mat_repl_vect i M V))%F.
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hi.
-rewrite det_is_det_by_canon_permut; try easy.
+rewrite det_is_det_by_canon_permut; try easy. 2: {
+...
 rewrite det_is_det_by_canon_permut; try easy.
 rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
