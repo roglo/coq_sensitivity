@@ -2986,8 +2986,6 @@ remember (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect n) (k mod n!)))
   as σ' eqn:Hσ'.
 rewrite (sym_gr_vect_succ_values Hkn Hσ Hσ'); [ | flia Hj ].
 rewrite (sym_gr_vect_succ_values Hkn Hσ Hσ'); [ | flia Hi ].
-...
-do 2 rewrite (sym_gr_succ_values Hσ Hσ').
 destruct j; [ flia Hj | ].
 destruct i; [ flia Hi | ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
@@ -3023,7 +3021,6 @@ destruct (lt_dec (σ' i + 1) (σ' j + 1)) as [Hsi1j| Hsi1j]. {
 destruct (lt_dec (σ' i) (σ' j)) as [Hsij| Hsij]; [ | easy ].
 flia Hsi1j Hsij.
 Qed.
-...
 
 (*
 Theorem ε_of_sym_gr_permut_succ :
@@ -3565,8 +3562,8 @@ Arguments ε_fun_ws {T}%type {ro} f%function n%nat.
 Arguments sign_diff {T}%type {ro} (u v)%nat.
 
 Arguments ε_permut {T}%type {ro} (n k)%nat.
+Arguments ε_of_sym_gr_permut_succ {T}%type {ro rp} _ _ _ _ _ _ _ (n k)%nat.
 (*
-Arguments ε_of_sym_gr_permut_succ {T}%type {ro rp} _ _ _ _ _ _ _ n%nat [k]%nat.
 Arguments ε_of_permut_ε {T}%type {ro rp} _ _ _ _ _ _ _ n%nat [k]%nat.
 *)
 Arguments ε_ws_ε {T}%type {ro rp} _ _ _ _ _ _ _ n%nat p%V.
