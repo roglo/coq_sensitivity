@@ -2899,6 +2899,65 @@ f_equal. {
   rewrite rngl_product_change_list with (lb := seq 0 n); [ | easy | ]. 2: {
     now apply permut_fun_Permutation.
   }
+  rewrite rngl_product_seq_product; [ | easy ].
+  rewrite Nat.add_0_l.
+  destruct (Nat.eq_dec x 0) as [Hxz| Hxz]. {
+    move Hxz at top; subst x.
+    cbn - [ "<?" ].
+    apply all_1_rngl_product_1; [ easy | ].
+    intros i (_, Hi).
+    now rewrite Nat.add_comm.
+  }
+  rewrite (rngl_product_split (x - 1)). 2: {
+    split; [ flia | ].
+    apply -> Nat.succ_le_mono.
+    enough (H : x < S n) by flia H Hnz.
+    replace x with (σ 0). 2: {
+      rewrite H1; [ easy | flia ].
+    }
+    apply Hp; flia.
+  }
+  remember (∏ (i = _, _), _)%F as y eqn:Hy.
+  rewrite all_1_rngl_product_1; [ | easy | ]. 2: {
+    intros i Hi.
+    rewrite if_ltb_lt_dec.
+    destruct (lt_dec x (i + 1)) as [H2| H2]; [ easy | ].
+    flia Hi H2.
+  }
+  subst y; rewrite rngl_mul_1_r.
+  erewrite rngl_product_eq_compat. 2: {
+    intros i (_, Hi).
+    replace (if x <? i + 1 then 1%F else _) with (-1)%F. 2: {
+      rewrite if_ltb_lt_dec.
+      destruct (lt_dec x (i + 1)) as [H| H]; [ | easy ].
+      flia Hi H Hxz.
+    }
+    easy.
+  }
+  cbn.
+  destruct x; [ easy | clear Hxz ].
+  rewrite Nat.sub_succ, Nat.sub_0_r.
+  clear Hx H1.
+  induction x; cbn. {
+    unfold iter_seq, iter_list; cbn.
+    apply rngl_mul_1_l.
+  }
+  rewrite rngl_product_split_last; [ | flia ].
+  rewrite rngl_product_shift; [ | flia ].
+  rewrite Nat.sub_succ, Nat.sub_0_r.
+  rewrite IHx.
+  symmetry.
+  rewrite minus_one_pow_succ; [ | easy ].
+  rewrite rngl_mul_comm; [ | easy ].
+  rewrite rngl_mul_opp_l; [ | easy ].
+  now rewrite rngl_mul_1_l.
+}
+rewrite ε_ws_ε; try easy. 2: {
+...
+  apply sym_gr_elem_is_permut.
+  apply Nat.mod_upper_bound.
+  apply fact_neq_0.
+}
 ...
 
 (*
