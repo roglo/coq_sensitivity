@@ -519,6 +519,8 @@ destruct Hm as (Hr & Hcr & Hc).
 rewrite mat_repl_vect_nrows; [ | congruence ].
 split; [ easy | ].
 split. {
+  destruct (lt_dec k (mat_ncols M)) as [Hkm| Hkm]. {
+    rewrite mat_repl_vect_ncols; [ easy | easy | ].
 ...
   intros Hcv.
   unfold mat_ncols in Hcv; cbn in Hcv.
