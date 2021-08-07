@@ -471,8 +471,6 @@ Theorem mat_repl_vect_ncols : ∀ k (M : matrix T) V,
   → mat_ncols (mat_repl_vect k M V) = mat_ncols M.
 Proof.
 intros * Hkc Hv.
-(**)
-clear Hkc.
 (* works with nrows=0 *)
 destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
   unfold mat_nrows in Hrz.
@@ -493,31 +491,6 @@ destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]. {
   now rewrite map2_nil_r, Hcz.
 }
 apply Nat.neq_0_lt_0 in Hcz.
-destruct (le_dec (mat_ncols M) k) as [Hkc| Hkc]. {
-  unfold mat_repl_vect, mat_ncols.
-  cbn - [ skipn ].
-...
-  rewrite List_hd_nth_0.
-  rewrite map2_nth with (a := []) (b := 0%F); cycle 1. {
-    now rewrite fold_mat_nrows.
-  } {
-    now rewrite fold_vect_size, Hv.
-  }
-...
-  rewrite app_length.
-  rewrite firstn_length.
-  rewrite <- List_hd_nth_0.
-  rewrite fold_mat_ncols.
-  rewrite Nat.min_r; [ | easy ].
-  cbn - [ skipn ].
-(* wrong! *)
-rewrite skipn_length.
-rewrite fold_mat_ncols.
-...
-  erewrite map2_ext_in. 2: {
-    intros la a Hla Ha.
-    rewrite firstn_all2.
-...
 unfold mat_ncols.
 cbn - [ skipn ].
 rewrite List_hd_nth_0.
@@ -537,11 +510,12 @@ flia Hkc.
 Qed.
 
 Theorem mat_repl_vect_is_square : ∀ n k (M : matrix T) V,
-  vect_size V = n
+  k < mat_ncols M
+  → vect_size V = n
   → is_square_matrix n M = true
   → is_square_matrix n (mat_repl_vect k M V) = true.
 Proof.
-intros * Hv Hm.
+intros * Hkc Hv Hm.
 specialize (square_matrix_ncols _ Hm) as Hcn.
 apply is_sm_mat_iff in Hm.
 apply is_sm_mat_iff.
@@ -553,24 +527,9 @@ split. {
     rewrite mat_repl_vect_ncols; [ easy | easy | congruence ].
   }
   apply Nat.nlt_ge in Hkm.
-Print mat_repl_vect.
-...
-  intros Hcv.
-  unfold mat_ncols in Hcv; cbn in Hcv.
-  apply length_zero_iff_nil in Hcv.
-...
-  destruct (lt_dec k (mat_ncols M)) as [Hkm| Hkm]. {
-    rewrite mat_repl_vect_ncols in Hcv; [ | easy | ]. 2: {
-      rewrite Hv.
-...
-Theorem mat_repl_vect_ncols : ∀ k (M : matrix T) V,
-  mat_ncols (mat_repl_vect k M v) = mat_ncols M.
-...
-  cbn.
-  rewrite map2_length.
-  rewrite fold_mat_nrows, Hr.
-  rewrite fold_vect_size, Hv.
-  unfold mat_ncols.
+  rewrite mat_repl_vect_ncols; [ easy | easy | congruence ].
+} {
+  intros la Hla.
 ...
 
 (* null matrix of dimension m × n *)
