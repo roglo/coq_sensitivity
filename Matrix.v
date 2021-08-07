@@ -3284,6 +3284,7 @@ Arguments mat_vect_mul_assoc {T}%type {ro rp} Hro (A B)%M V%V.
 Arguments mat_mul_1_l {T}%type {ro rp} Hro {n}%nat M%M.
 Arguments mat_mul_1_r {T}%type {ro rp} Hro {n}%nat M%M.
 Arguments mat_opp {T ro} M%M.
+Arguments mat_repl_vect_is_square {T}%type {ro} [n k]%nat.
 Arguments mat_sub {T ro} MA%M MB%M.
 Arguments mI {T ro} n%nat.
 Arguments mZ {T ro} (m n)%nat.
