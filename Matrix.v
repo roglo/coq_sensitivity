@@ -471,6 +471,9 @@ Theorem mat_repl_vect_ncols : ∀ k (M : matrix T) V,
   → mat_ncols (mat_repl_vect k M V) = mat_ncols M.
 Proof.
 intros * Hkc Hv.
+(**)
+clear Hkc.
+...
 destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
   unfold mat_nrows in Hrz.
   apply length_zero_iff_nil in Hrz.
@@ -524,6 +527,7 @@ split. {
     rewrite mat_repl_vect_ncols; [ easy | easy | congruence ].
   }
   apply Nat.nlt_ge in Hkm.
+Print mat_repl_vect.
 ...
   intros Hcv.
   unfold mat_ncols in Hcv; cbn in Hcv.
