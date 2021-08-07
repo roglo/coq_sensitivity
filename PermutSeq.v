@@ -2972,7 +2972,7 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ mk_canon_sym_gr "<?" ].
+cbn - [ mk_canon_sym_gr "<?" fact map vect_vect_nat_el ].
 apply rngl_product_eq_compat.
 intros i Hi.
 apply rngl_product_eq_compat.
@@ -2980,9 +2980,12 @@ intros j Hj.
 move j before i.
 do 2 rewrite if_ltb_lt_dec.
 destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
-remember (mk_canon_sym_gr (S n) k) as σ eqn:Hσ.
-remember (mk_canon_sym_gr n (k mod n!)) as σ' eqn:Hσ'.
-move σ' before σ.
+remember (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect (S n)) k))
+  as σ eqn:Hσ.
+remember (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect n) (k mod n!)))
+  as σ' eqn:Hσ'.
+rewrite (sym_gr_vect_succ_values Hkn Hσ Hσ'); [ | flia Hj ].
+rewrite (sym_gr_vect_succ_values Hkn Hσ Hσ'); [ | flia Hi ].
 ...
 do 2 rewrite (sym_gr_succ_values Hσ Hσ').
 destruct j; [ flia Hj | ].
