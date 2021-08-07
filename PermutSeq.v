@@ -2849,8 +2849,42 @@ f_equal. {
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
     rewrite H1; [ | flia ].
-    replace i with (S (i - 1)) at 1 by flia Hi.
     easy.
+  }
+  cbn - [ "<?" ].
+  rewrite rngl_product_shift; [ | flia Hnz ].
+  remember (k / fact n) as x eqn:Hx.
+  assert (Hp' : is_permut σ' n). {
+    rewrite Hσ'.
+    apply mk_canon_is_permut_vect.
+    apply Nat.mod_upper_bound, fact_neq_0.
+  }
+  assert (Hp : is_permut σ (S n)). {
+    rewrite Hσ.
+    now apply mk_canon_is_permut_vect.
+  }
+  rewrite rngl_product_change_var with (g := permut_fun_inv σ' n) (h := σ').
+  2: {
+    intros i (_, Hi).
+    apply fun_find_prop; [ | flia Hnz Hi ].
+    apply Hp'.
+  }
+  rewrite Nat.sub_0_r.
+  rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
+  rewrite Nat.sub_succ, Nat.sub_0_r.
+  erewrite rngl_product_list_eq_compat. 2: {
+    intros i Hi.
+    apply in_map_iff in Hi.
+    destruct Hi as (j & Hji & Hj).
+    apply in_seq in Hj.
+Check fun_permut_fun_inv.
+...
+    rewrite fun_permut_fun_inv; [ easy | easy | ].
+    now rewrite <- Hji; apply Hp'.
+  }
+  cbn - [ "<?" seq ].
+  rewrite rngl_product_change_list with (lb := seq 0 n); [ | easy | ]. 2: {
+    now apply permut_fun_Permutation.
   }
 ...
 
