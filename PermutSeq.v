@@ -2854,6 +2854,21 @@ f_equal. {
   cbn - [ "<?" ].
   rewrite rngl_product_shift; [ | flia Hnz ].
   remember (k / fact n) as x eqn:Hx.
+  erewrite rngl_product_eq_compat. 2: {
+    intros i (_, Hi).
+    replace (if x <? _ then _ else _) with
+      (if x <? σ' i + 1 then 1%F else (-1)%F). 2: {
+      rewrite (Nat.add_1_l i).
+      rewrite H1; [ | flia Hi Hnz ].
+      do 3 rewrite if_ltb_lt_dec.
+      destruct (lt_dec (σ' i) x) as [H2| H2]; [ | easy ].
+      destruct (lt_dec x (σ' i)) as [H| H]; [ flia H H2 | clear H ].
+      destruct (lt_dec x (σ' i + 1)) as [H3| H3]; [ | easy ].
+      flia H2 H3.
+    }
+    easy.
+  }
+  cbn - [ "<?" ].
   assert (Hp' : is_permut σ' n). {
     rewrite Hσ'.
     apply mk_canon_is_permut_vect.
@@ -2877,8 +2892,6 @@ f_equal. {
     apply in_map_iff in Hi.
     destruct Hi as (j & Hji & Hj).
     apply in_seq in Hj.
-Check fun_permut_fun_inv.
-...
     rewrite fun_permut_fun_inv; [ easy | easy | ].
     now rewrite <- Hji; apply Hp'.
   }
