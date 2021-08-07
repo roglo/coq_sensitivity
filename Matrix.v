@@ -530,7 +530,24 @@ split. {
   rewrite mat_repl_vect_ncols; [ easy | easy | congruence ].
 } {
   intros la Hla.
-...
+  cbn - [ skipn ] in Hla.
+  apply in_map2_iff in Hla.
+  destruct Hla as (i & Hi & lb & a & Hla).
+  rewrite fold_mat_nrows, fold_vect_size, Hr, Hv in Hi.
+  rewrite Nat.min_id in Hi.
+  subst la.
+  rewrite app_length.
+  rewrite firstn_length.
+  cbn - [ skipn ].
+  rewrite skipn_length.
+  rewrite fold_corr_mat_ncols; [ | | now rewrite Hr ]. 2: {
+    split; [ easy | now rewrite Hcn ].
+  }
+  rewrite Nat.min_l; [ | flia Hkc ].
+  rewrite Hcn in Hkc |-*.
+  flia Hkc.
+}
+Qed.
 
 (* null matrix of dimension m × n *)
 
