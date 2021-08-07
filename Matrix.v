@@ -443,10 +443,11 @@ Definition mat_mul_scal_l s (M : matrix T) :=
 
 (* matrix whose k-th column is replaced by a vector *)
 
+Definition replace_at {A} k (la : list A) e :=
+  firstn k la ++ e :: skipn (S k) la.
+
 Definition mat_repl_vect k (M : matrix T) (V : vector T) :=
-  mk_mat
-    (map2 (λ row e, firstn k row ++ e :: skipn (S k) row) (mat_list_list M)
-       (vect_list V)).
+  mk_mat (map2 (replace_at k) (mat_list_list M) (vect_list V)).
 
 (*
 End a.
@@ -499,6 +500,7 @@ rewrite map2_nth with (a := []) (b := 0%F); cycle 1. {
 } {
   now rewrite fold_vect_size, Hv.
 }
+unfold replace_at.
 rewrite app_length.
 rewrite firstn_length.
 rewrite <- List_hd_nth_0.
@@ -536,6 +538,7 @@ split. {
   rewrite fold_mat_nrows, fold_vect_size, Hr, Hv in Hi.
   rewrite Nat.min_id in Hi.
   subst la.
+  unfold replace_at.
   rewrite app_length.
   rewrite firstn_length.
   cbn - [ skipn ].

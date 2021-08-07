@@ -251,28 +251,66 @@ Theorem determinant_multilinear :
   rngl_characteristic = 0 →
   ∀ n (M : matrix T) i a b U V,
   is_square_matrix n M = true
+  → vect_size U = n
+  → vect_size V = n
   → i < n
   → determinant n (mat_repl_vect i M (a × U + b × V)%V) =
        (a * determinant n (mat_repl_vect i M U) +
         b * determinant n (mat_repl_vect i M V))%F.
 Proof.
-intros Hic Hop Hin Hit H10 Hde Hch * Hsm Hi.
+intros Hic Hop Hin Hit H10 Hde Hch * Hsm Hu Hv Hi.
 specialize (square_matrix_ncols _ Hsm) as Hcn.
 rewrite det_is_det_by_canon_permut; try easy. 2: {
-  apply mat_repl_vect_is_square; [ congruence | | easy ].
-...
-rewrite det_is_det_by_canon_permut; try easy.
-rewrite det_is_det_by_canon_permut; try easy.
+  apply mat_repl_vect_is_square; [ congruence | cbn | easy ].
+  rewrite map2_length.
+  do 2 rewrite map_length, fold_vect_size.
+  rewrite Hu, Hv.
+  apply Nat.min_id.
+}
+rewrite det_is_det_by_canon_permut; try easy. 2: {
+  apply mat_repl_vect_is_square; [ congruence | easy | easy ].
+}
+rewrite det_is_det_by_canon_permut; try easy. 2: {
+  apply mat_repl_vect_is_square; [ congruence | easy | easy ].
+}
 unfold determinant'.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
+  assert (Hkn : k < n!). {
+    eapply le_lt_trans; [ apply Hk | ].
+    apply Nat.sub_lt; [ | flia ].
+    apply Nat.neq_0_lt_0, fact_neq_0.
+  }
   erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    now cbn - [ Nat.eq_dec ].
+    intros j Hj; cbn.
+    assert (Hjn : j - 1 < n) by flia Hj.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ cbn | easy ].
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ rewrite Nat.add_0_l | easy ].
+    rewrite map2_nth with (a := []) (b := 0%F); cycle 1. {
+      rewrite fold_mat_nrows.
+      apply is_sm_mat_iff in Hsm.
+      now destruct Hsm as (Hr, _); rewrite Hr.
+    } {
+      rewrite map2_length.
+      do 2 rewrite map_length, fold_vect_size.
+      now rewrite Hu, Hv, Nat.min_id.
+    }
+    rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
+      now rewrite map_length, fold_vect_size, Hu.
+    } {
+      now rewrite map_length, fold_vect_size, Hv.
+    }
+    rewrite (List_map_nth' 0%F); [ | now rewrite fold_vect_size, Hu ].
+    rewrite (List_map_nth' 0%F); [ | now rewrite fold_vect_size, Hv ].
+    do 2 rewrite fold_vect_el.
+    easy.
   }
   easy.
 }
-cbn - [ Nat.eq_dec ].
+cbn - [ mat_el vect_vect_nat_el ].
+...
 rewrite rngl_mul_summation_distr_l; [ | now left ].
 rewrite rngl_mul_summation_distr_l; [ | now left ].
 symmetry.
