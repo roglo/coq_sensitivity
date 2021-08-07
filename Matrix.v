@@ -473,13 +473,15 @@ Proof.
 intros * Hkc Hv.
 (**)
 clear Hkc.
-...
+(* works with nrows=0 *)
 destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
   unfold mat_nrows in Hrz.
   apply length_zero_iff_nil in Hrz.
   unfold mat_ncols; cbn.
   now rewrite Hrz.
 }
+apply Nat.neq_0_lt_0 in Hrz.
+(* works with ncols=0 *)
 destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]. {
   rewrite Hcz in Hv.
   unfold vect_size in Hv.
@@ -490,8 +492,30 @@ destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]. {
   rewrite Hv.
   now rewrite map2_nil_r, Hcz.
 }
-apply Nat.neq_0_lt_0 in Hrz.
 apply Nat.neq_0_lt_0 in Hcz.
+destruct (le_dec (mat_ncols M) k) as [Hkc| Hkc]. {
+  unfold mat_repl_vect, mat_ncols.
+  cbn - [ skipn ].
+  rewrite List_hd_nth_0.
+  rewrite map2_nth with (a := []) (b := 0%F); cycle 1. {
+    now rewrite fold_mat_nrows.
+  } {
+    now rewrite fold_vect_size, Hv.
+  }
+  rewrite app_length.
+  rewrite firstn_length.
+  rewrite <- List_hd_nth_0.
+  rewrite fold_mat_ncols.
+  rewrite Nat.min_r; [ | easy ].
+  cbn - [ skipn ].
+(* wrong! *)
+rewrite skipn_length.
+rewrite fold_mat_ncols.
+...
+  erewrite map2_ext_in. 2: {
+    intros la a Hla Ha.
+    rewrite firstn_all2.
+...
 unfold mat_ncols.
 cbn - [ skipn ].
 rewrite List_hd_nth_0.
