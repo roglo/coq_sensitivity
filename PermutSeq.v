@@ -2953,11 +2953,73 @@ f_equal. {
   now rewrite rngl_mul_1_l.
 }
 rewrite ε_ws_ε; try easy. 2: {
-...
-  apply sym_gr_elem_is_permut.
+  apply mk_canon_is_permut_vect.
   apply Nat.mod_upper_bound.
   apply fact_neq_0.
 }
+unfold ε_ws, ε_fun_ws.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_product_succ_succ.
+  rewrite rngl_product_split_first; [ | flia ].
+  rewrite if_ltb_lt_dec.
+  destruct (lt_dec (S i) 1) as [H| H]; [ flia H | clear H ].
+  rewrite rngl_mul_1_l.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    replace (S i <? S j) with (i <? j) by easy.
+    now do 2 rewrite Nat.sub_succ, Nat.sub_0_r.
+  }
+  easy.
+}
+cbn - [ mk_canon_sym_gr "<?" ].
+apply rngl_product_eq_compat.
+intros i Hi.
+apply rngl_product_eq_compat.
+intros j Hj.
+move j before i.
+do 2 rewrite if_ltb_lt_dec.
+destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
+remember (mk_canon_sym_gr (S n) k) as σ eqn:Hσ.
+remember (mk_canon_sym_gr n (k mod n!)) as σ' eqn:Hσ'.
+move σ' before σ.
+...
+do 2 rewrite (sym_gr_succ_values Hσ Hσ').
+destruct j; [ flia Hj | ].
+destruct i; [ flia Hi | ].
+rewrite Nat.sub_succ, Nat.sub_0_r.
+rewrite Nat.sub_succ, Nat.sub_0_r.
+do 2 rewrite if_ltb_lt_dec.
+destruct (lt_dec (σ' j) (k / fact n)) as [Hsfj| Hsfj]. {
+  destruct (lt_dec (σ' i) (k / fact n)) as [Hsfi| Hsfi]; [ easy | ].
+  unfold sign_diff.
+  do 2 rewrite if_ltb_lt_dec.
+  destruct (lt_dec (σ' i + 1) (σ' j)) as [Hsi1j| Hsi1j]. {
+    destruct (lt_dec (σ' i) (σ' j)) as [Hsij| Hsij]; [ easy | ].
+    flia Hsi1j Hsij.
+  }
+  destruct (lt_dec (σ' i) (σ' j)) as [Hsij| Hsij]; [ | easy ].
+  flia Hsij Hsfj Hsfi.
+}
+destruct (lt_dec (σ' i) (k / fact n)) as [Hsfi| Hsfi]. {
+  unfold sign_diff.
+  do 2 rewrite if_ltb_lt_dec.
+  destruct (lt_dec (σ' i) (σ' j + 1)) as [Hsi1j| Hsi1j]. {
+    destruct (lt_dec (σ' i) (σ' j)) as [Hsij| Hsij]; [ easy | ].
+    flia Hsij Hsfj Hsfi.
+  }
+  destruct (lt_dec (σ' i) (σ' j)) as [Hsij| Hsij]; [ | easy ].
+  flia Hsi1j Hsij.
+}
+unfold sign_diff.
+do 2 rewrite if_ltb_lt_dec.
+destruct (lt_dec (σ' i + 1) (σ' j + 1)) as [Hsi1j| Hsi1j]. {
+  destruct (lt_dec (σ' i) (σ' j)) as [Hsij| Hsij]; [ easy | ].
+  flia Hsi1j Hsij.
+}
+destruct (lt_dec (σ' i) (σ' j)) as [Hsij| Hsij]; [ | easy ].
+flia Hsi1j Hsij.
+Qed.
 ...
 
 (*
