@@ -455,6 +455,40 @@ Compute (list_list_of_mat (mat_repl_vect 0 (mat_of_list_list [[1; 2; 3; 4]; [5; 
 Compute (list_list_of_mat (mat_repl_vect 15 (mat_of_list_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (vect_of_list [43; 12; 29]))).
 *)
 
+Theorem mat_repl_vect_nrows : ∀ k (M : matrix T) V,
+  vect_size V = mat_nrows M
+  → mat_nrows (mat_repl_vect k M V) = mat_nrows M.
+Proof.
+intros * Hv; cbn.
+rewrite map2_length.
+rewrite fold_mat_nrows, fold_vect_size, Hv.
+apply Nat.min_id.
+Qed.
+
+Theorem mat_repl_vect_is_square : ∀ n k (M : matrix T) V,
+  vect_size V = n
+  → is_square_matrix n M = true
+  → is_square_matrix n (mat_repl_vect k M V) = true.
+Proof.
+intros * Hv Hm.
+apply is_sm_mat_iff in Hm.
+apply is_sm_mat_iff.
+destruct Hm as (Hr & Hcr & Hc).
+split. {
+  rewrite mat_repl_vect_nrows; [ easy | congruence ].
+}
+split. {
+...
+Theorem mat_repl_vect_ncols : ∀ k (M : matrix T) V,
+  mat_ncols (mat_repl_vect k M v) = mat_ncols M.
+...
+  cbn.
+  rewrite map2_length.
+  rewrite fold_mat_nrows, Hr.
+  rewrite fold_vect_size, Hv.
+  unfold mat_ncols.
+...
+
 (* null matrix of dimension m × n *)
 
 Definition mZ m n : matrix T :=

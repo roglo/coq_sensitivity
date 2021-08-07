@@ -258,6 +258,8 @@ Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hi.
 rewrite det_is_det_by_canon_permut; try easy. 2: {
 ...
+  apply mat_repl_vect_is_square.
+...
 rewrite det_is_det_by_canon_permut; try easy.
 rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
