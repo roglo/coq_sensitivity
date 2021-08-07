@@ -496,12 +496,14 @@ apply Nat.neq_0_lt_0 in Hcz.
 destruct (le_dec (mat_ncols M) k) as [Hkc| Hkc]. {
   unfold mat_repl_vect, mat_ncols.
   cbn - [ skipn ].
+...
   rewrite List_hd_nth_0.
   rewrite map2_nth with (a := []) (b := 0%F); cycle 1. {
     now rewrite fold_mat_nrows.
   } {
     now rewrite fold_vect_size, Hv.
   }
+...
   rewrite app_length.
   rewrite firstn_length.
   rewrite <- List_hd_nth_0.
