@@ -2757,12 +2757,79 @@ Theorem sym_gr_vect_succ_values : ∀ (n k : nat) (σ σ' : nat → nat),
       end.
 Proof.
 intros * Hkn Hσ Hσ' i Hin.
+unfold mk_canon_sym_gr_vect in Hσ.
+cbn - [ map fact seq ] in Hσ.
+rewrite (List_map_nth' 0) in Hσ; [ | now rewrite seq_length ].
+rewrite seq_nth in Hσ; [ | easy ].
+rewrite Nat.add_0_l in Hσ.
+(*
+remember (sym_gr_fun n (mk_canon_sym_gr n) k) as σ₁ eqn:Hσ₁.
+*)
+rewrite Hσ.
+unfold vect_nat_el.
+cbn - [ "<?" nth seq ].
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+rewrite Nat.add_0_l.
+Inspect 1.
+erewrite sym_gr_succ_values; [ | easy | easy ].
+rewrite Hσ'.
+unfold vect_vect_nat_el.
+unfold vect_nat_el.
+unfold mk_canon_sym_gr_vect.
+cbn - [ fact map seq "<?" ].
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  apply Nat.mod_upper_bound, fact_neq_0.
+}
+cbn - [ fact map seq "<?" ].
+destruct i; [ easy | ].
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length; flia Hin.
+}
+rewrite seq_nth; [ | apply Nat.mod_upper_bound, fact_neq_0 ].
+rewrite seq_nth; [ | flia Hin ].
+do 2 rewrite Nat.add_0_l.
+...
+unfold vect_nat_el in Hσ.
+cbn - [ map fact seq ] in Hσ.
+...
+intros * Hkn Hσ Hσ' i Hin.
 destruct i. {
   subst σ; cbn - [ fact ].
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
   now rewrite seq_nth.
 }
 apply Nat.succ_lt_mono in Hin.
+rewrite if_ltb_lt_dec.
+destruct (lt_dec _ _) as [H1| H1]. {
+  subst; cbn - [ fact ].
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    apply Nat.mod_upper_bound, fact_neq_0.
+  }
+  rewrite seq_nth; [ | easy ].
+  rewrite seq_nth; [ | apply Nat.mod_upper_bound, fact_neq_0 ].
+  cbn - [ fact ].
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
+  destruct i. {
+    cbn - [ fact ].
+    cbn - [ fact ] in H1.
+    rewrite (List_map_nth' 0) in H1. 2: {
+      rewrite seq_length.
+      apply Nat.mod_upper_bound, fact_neq_0.
+    }
+    rewrite seq_nth in H1; [ | apply Nat.mod_upper_bound, fact_neq_0 ].
+    cbn - [ fact ] in H1.
+    unfold Nat.b2n.
+    rewrite if_leb_le_dec.
+    destruct (le_dec (k / n!) _) as [H2| H2]. {
+Search mk_canon_sym_gr.
+...
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+...
 subst σ; cbn - [ "<?" fact ].
 (*
 subst σ'; cbn - [ "<?" fact ].
