@@ -465,6 +465,15 @@ rewrite fold_mat_nrows, fold_vect_size, Hv.
 apply Nat.min_id.
 Qed.
 
+Theorem mat_repl_vect_ncols : ∀ k (M : matrix T) V,
+  vect_size V = mat_ncols M
+  → mat_ncols (mat_repl_vect k M V) = mat_ncols M.
+Proof.
+intros * Hv.
+unfold mat_repl_vect.
+unfold mat_ncols.
+...
+
 Theorem mat_repl_vect_is_square : ∀ n k (M : matrix T) V,
   vect_size V = n
   → is_square_matrix n M = true
