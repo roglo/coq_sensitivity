@@ -399,12 +399,37 @@ rewrite nth_replace_id. 2: {
 destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
 *)
 do 4 rewrite rngl_mul_assoc.
+remember
+  (∏ (i0 = 2, p + 1),
+   mat_el (mat_repl_vect i M U) (i0 - 2)
+     (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) (i0 - 2)))
+  as QQQQQQ eqn:Hq.
+remember
+  (∏ (i0 = 2, p + 1),
+   mat_el (mat_repl_vect i M V) (i0 - 2)
+     (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) (i0 - 2)))
+  as RRRRRR eqn:Hr.
+...
 (*
 remember
   (∏ (i0 = 2, p + 1), mat_el M (i0 - 2) (mk_canon_sym_gr n k (i0 - 2)))
   as q eqn:Hq.
 do 3 rewrite (rngl_mul_comm Hic _ q).
 *)
+remember
+  (∏ (i0 = p + 1 + 1, n),
+   mat_el (mat_repl_vect i M V) (i0 - 1)
+     (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) (i0 - 1)))
+  as x eqn:Hx.
+remember
+  (∏ (i0 = p + 1 + 1, n),
+   mat_el (mat_repl_vect i M U) (i0 - 1)
+     (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) (i0 - 1)))
+  as y eqn:Hy.
+remember
+  (∏ (i0 = 2, p + 1),
+   nth (mk_canon_sym_gr n k (i0 - 2))
+     (replace_at i (nth (i0 - 2) (mat_list_list M) []))) as z eqn:Hz.
 do 5 rewrite <- rngl_mul_assoc.
 ...
 rewrite <- rngl_mul_add_distr_l.
