@@ -395,6 +395,7 @@ rewrite nth_replace_id. 2: {
   }
   rewrite Hcn; flia Hi.
 }
+...
 (*
 destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
 *)
