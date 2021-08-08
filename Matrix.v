@@ -443,9 +443,6 @@ Definition mat_mul_scal_l s (M : matrix T) :=
 
 (* matrix whose k-th column is replaced by a vector *)
 
-Definition replace_at {A} k (la : list A) e :=
-  firstn k la ++ e :: skipn (S k) la.
-
 Definition mat_repl_vect k (M : matrix T) (V : vector T) :=
   mk_mat (map2 (replace_at k) (mat_list_list M) (vect_list V)).
 

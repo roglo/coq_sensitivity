@@ -1682,6 +1682,29 @@ Qed.
 
 (* end butn *)
 
+(* replace in a list *)
+
+Definition replace_at {A} k (la : list A) e :=
+  firstn k la ++ e :: skipn (S k) la.
+
+Theorem nth_replace_id : ∀ A i (la : list A) a d,
+  i ≤ length la
+  → nth i (replace_at i la a) d = a.
+Proof.
+intros * Hi.
+unfold replace_at.
+rewrite app_nth2. 2: {
+  unfold "≥".
+  rewrite firstn_length.
+  now rewrite Nat.min_l.
+}
+rewrite firstn_length.
+rewrite Nat.min_l; [ | easy ].
+now rewrite Nat.sub_diag.
+Qed.
+
+(* end replace_at *)
+
 Theorem not_equiv_imp_False : ∀ P : Prop, (P → False) ↔ ¬ P.
 Proof. easy. Qed.
 
