@@ -1932,6 +1932,20 @@ apply IHla.
 now apply Nat.succ_lt_mono.
 Qed.
 
+Theorem List_nth_skipn : ∀ A (l : list A) i j d,
+  nth i (skipn j l) d = nth (i + j) l d.
+Proof.
+intros.
+revert i j.
+induction l as [| a la]; intros. {
+  rewrite skipn_nil; cbn.
+  now destruct i, j.
+}
+destruct j; [ now rewrite Nat.add_0_r | ].
+rewrite Nat.add_succ_r; cbn.
+apply IHla.
+Qed.
+
 Theorem List_app_cons : ∀ A (l1 l2 : list A) a,
   l1 ++ a :: l2 = l1 ++ [a] ++ l2.
 Proof. easy. Qed.

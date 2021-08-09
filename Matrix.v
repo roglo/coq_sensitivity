@@ -453,6 +453,62 @@ Compute (list_list_of_mat (mat_repl_vect 0 (mat_of_list_list [[1; 2; 3; 4]; [5; 
 Compute (list_list_of_mat (mat_repl_vect 15 (mat_of_list_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (vect_of_list [43; 12; 29]))).
 *)
 
+Theorem mat_el_repl_vect : ∀ (M : matrix T) V i j k,
+  is_correct_matrix M
+  → i < vect_size V
+  → i < mat_nrows M
+  → j < mat_ncols M
+  → k < mat_ncols M
+  → mat_el (mat_repl_vect k M V) i j =
+    if Nat.eq_dec j k then vect_el V i else mat_el M i j.
+Proof.
+intros * Hm His Hir Hjc Hkc; cbn.
+rewrite map2_nth with (a := []) (b := 0%F); cycle 1. {
+  now rewrite fold_mat_nrows.
+} {
+  now rewrite fold_vect_size.
+}
+unfold replace_at.
+destruct (Nat.eq_dec j k) as [Hjk| Hjk]. {
+  subst k.
+  rewrite app_nth2. 2: {
+    rewrite firstn_length.
+    rewrite fold_corr_mat_ncols; [ | easy | easy ].
+    rewrite Nat.min_l; [ | flia Hjc ].
+    now unfold "≥".
+  }
+  rewrite firstn_length.
+  rewrite fold_corr_mat_ncols; [ | easy | easy ].
+  rewrite Nat.min_l; [ | flia Hjc ].
+  now rewrite Nat.sub_diag.
+}
+destruct (lt_dec j k) as [Hljk| Hljk]. {
+  rewrite app_nth1. 2: {
+    rewrite firstn_length.
+    rewrite fold_corr_mat_ncols; [ | easy | easy ].
+    rewrite Nat.min_l; [ easy | flia Hkc ].
+  }
+  rewrite List_nth_firstn; [ | easy ].
+  now rewrite fold_mat_el.
+} {
+  apply Nat.nlt_ge in Hljk.
+  rewrite app_nth2. 2: {
+    rewrite firstn_length.
+    rewrite fold_corr_mat_ncols; [ | easy | easy ].
+    rewrite Nat.min_l; [ easy | flia Hkc ].
+  }
+  rewrite firstn_length.
+  rewrite fold_corr_mat_ncols; [ | easy | easy ].
+  rewrite Nat.min_l; [ | flia Hkc ].
+  replace (j - k) with (S (j - k - 1)) by flia Hjk Hljk.
+  cbn - [ skipn ].
+  rewrite List_nth_skipn.
+  rewrite <- (Nat.add_1_l k), Nat.add_assoc.
+  rewrite Nat.sub_add; [ | flia Hjk Hljk ].
+  now rewrite Nat.sub_add.
+}
+Qed.
+
 Theorem mat_repl_vect_nrows : ∀ k (M : matrix T) V,
   vect_size V = mat_nrows M
   → mat_nrows (mat_repl_vect k M V) = mat_nrows M.

@@ -285,118 +285,38 @@ erewrite rngl_summation_eq_compat. 2: {
     apply Nat.neq_0_lt_0, fact_neq_0.
   }
   erewrite rngl_product_eq_compat. 2: {
-intros j Hj.
-Theorem mat_el_repl_vect : ∀ (M : matrix T) V i j k,
-  is_correct_matrix M
-  → i < vect_size V
-  → i < mat_nrows M
-  → j < mat_ncols M
-  → k < mat_ncols M
-  → mat_el (mat_repl_vect k M V) i j =
-    if Nat.eq_dec j k then vect_el V i else mat_el M i j.
-Proof.
-intros * Hm His Hir Hjc Hkc; cbn.
-rewrite map2_nth with (a := []) (b := 0%F); cycle 1. {
-  now rewrite fold_mat_nrows.
-} {
-  now rewrite fold_vect_size.
-}
-unfold replace_at.
-destruct (Nat.eq_dec j k) as [Hjk| Hjk]. {
-  subst k.
-  rewrite app_nth2. 2: {
-    rewrite firstn_length.
-    rewrite fold_corr_mat_ncols; [ | easy | easy ].
-    rewrite Nat.min_l; [ | flia Hjc ].
-    now unfold "≥".
-  }
-  rewrite firstn_length.
-  rewrite fold_corr_mat_ncols; [ | easy | easy ].
-  rewrite Nat.min_l; [ | flia Hjc ].
-  now rewrite Nat.sub_diag.
-}
-destruct (lt_dec j k) as [Hljk| Hljk]. {
-  rewrite app_nth1. 2: {
-    rewrite firstn_length.
-    rewrite fold_corr_mat_ncols; [ | easy | easy ].
-    rewrite Nat.min_l; [ easy | flia Hkc ].
-  }
-  rewrite List_nth_firstn; [ | easy ].
-  now rewrite fold_mat_el.
-} {
-  apply Nat.nlt_ge in Hljk.
-  rewrite app_nth2. 2: {
-    rewrite firstn_length.
-    rewrite fold_corr_mat_ncols; [ | easy | easy ].
-    rewrite Nat.min_l; [ easy | flia Hkc ].
-  }
-  rewrite firstn_length.
-  rewrite fold_corr_mat_ncols; [ | easy | easy ].
-  rewrite Nat.min_l; [ | flia Hkc ].
-  replace (j - k) with (S (j - k - 1)) by flia Hjk Hljk.
-  cbn - [ skipn ].
-Search (nth _ (skipn _ _)).
-Theorem List_nth_skipn : ∀ A (l : list A) i j d,
-...
-  → nth i (skipn j l) d = nth i l d.
-...
-  rewrite skipn_nth.
-...
-  rewrite List_nth_firstn; [ | easy ].
-  now rewrite fold_mat_el.
-...
-...
-rewrite List_nth_firstn.
-Search firstn.
-  Search (firstn _ (nth _ _ _)).
-  Search (nth _ (firstn _ _)).
-  rewrite List_nth_firstn.
-...
-
-destruct (le_dec k (mat_ncols M)) as [Hkc| Hkc]. {
-  rewrite app_nth1. 2: {
-    rewrite firstn_length.
-    rewrite fold_corr_mat_ncols; [ | easy | easy ].
-    rewrite Nat.min_l; [ | easy ].
-
-
-    rewrite Nat.min_l; [ | flia Hjc ].
-    now unfold "≥".
-  }
-  rewrite firstn_length.
-  rewrite fold_corr_mat_ncols; [ | easy | easy ].
-  rewrite Nat.min_l; [ | flia Hjc ].
-  now rewrite Nat.sub_diag.
-...
-rewrite mat_el_repl_vect.
-...
-    intros j Hj; cbn.
-    assert (Hjn : j - 1 < n) by flia Hj.
-    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-    rewrite seq_nth; [ cbn | easy ].
-    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-    rewrite seq_nth; [ rewrite Nat.add_0_l | easy ].
-    rewrite map2_nth with (a := []) (b := 0%F); cycle 1. {
-      rewrite fold_mat_nrows.
-      apply is_sm_mat_iff in Hsm.
-      now destruct Hsm as (Hr, _); rewrite Hr.
+    intros j Hj.
+    rewrite mat_el_repl_vect; cycle 1. {
+      now apply (@squ_mat_is_corr n).
     } {
-      rewrite HUV; cbn.
+      subst UV; cbn.
       rewrite map2_length.
-      do 2 rewrite map_length, fold_vect_size.
-      now rewrite Hu, Hv, Nat.min_id.
-    }
-(*
-    rewrite HUV at 1; cbn.
-    rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
-      now rewrite map_length, fold_vect_size, Hu.
+      rewrite map_length.
+      rewrite map_length.
+      do 2 rewrite fold_vect_size.
+      rewrite Hu, Hv, Nat.min_id.
+      flia Hj.
     } {
-      now rewrite map_length, fold_vect_size, Hv.
+      apply is_sm_mat_iff in Hsm.
+      destruct Hsm as (Hr, _).
+      rewrite Hr; flia Hj.
+    } {
+      cbn.
+      rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
+      rewrite seq_nth; [ | easy ].
+      rewrite (List_map_nth' 0); [ cbn | rewrite seq_length; flia Hj ].
+      rewrite seq_nth; [ cbn | flia Hj ].
+      rewrite Hcn.
+      apply permut_elem_ub; [ easy | flia Hj ].
+    } {
+      now rewrite Hcn.
     }
-    rewrite (List_map_nth' 0%F); [ | now rewrite fold_vect_size, Hu ].
-    rewrite (List_map_nth' 0%F); [ | now rewrite fold_vect_size, Hv ].
-    do 2 rewrite fold_vect_el.
-*)
+    unfold vect_nat_el, vect_vect_nat_el; cbn.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    cbn - [ nth ].
+    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
+    rewrite seq_nth; [ cbn | easy ].
+    rewrite seq_nth; [ cbn | flia Hj ].
     easy.
   }
   easy.
@@ -408,14 +328,82 @@ rewrite rngl_mul_summation_distr_l; [ | now left ].
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
+  assert (Hkn : k < fact n). {
+    specialize (fact_neq_0 n) as Hnz.
+    flia Hk Hnz.
+  }
   rewrite rngl_mul_assoc.
-  now rewrite (rngl_mul_comm Hic a).
+  rewrite (rngl_mul_comm Hic a).
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite mat_el_repl_vect; cycle 1. {
+      now apply (@squ_mat_is_corr n).
+    } {
+      rewrite Hu; flia Hj.
+    } {
+      apply is_sm_mat_iff in Hsm.
+      destruct Hsm as (Hr, _).
+      rewrite Hr; flia Hj.
+    } {
+      cbn.
+      rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
+      rewrite seq_nth; [ | easy ].
+      rewrite (List_map_nth' 0); [ cbn | rewrite seq_length; flia Hj ].
+      rewrite seq_nth; [ cbn | flia Hj ].
+      rewrite Hcn.
+      apply permut_elem_ub; [ easy | flia Hj ].
+    } {
+      now rewrite Hcn.
+    }
+    unfold vect_nat_el, vect_vect_nat_el; cbn.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    cbn - [ nth ].
+    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
+    rewrite seq_nth; [ cbn | easy ].
+    rewrite seq_nth; [ cbn | flia Hj ].
+    easy.
+  }
+  easy.
 }
 rewrite rngl_add_comm.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
+  assert (Hkn : k < fact n). {
+    specialize (fact_neq_0 n) as Hnz.
+    flia Hk Hnz.
+  }
   rewrite rngl_mul_assoc.
-  now rewrite (rngl_mul_comm Hic b).
+  rewrite (rngl_mul_comm Hic b).
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite mat_el_repl_vect; cycle 1. {
+      now apply (@squ_mat_is_corr n).
+    } {
+      rewrite Hv; flia Hj.
+    } {
+      apply is_sm_mat_iff in Hsm.
+      destruct Hsm as (Hr, _).
+      rewrite Hr; flia Hj.
+    } {
+      cbn.
+      rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
+      rewrite seq_nth; [ | easy ].
+      rewrite (List_map_nth' 0); [ cbn | rewrite seq_length; flia Hj ].
+      rewrite seq_nth; [ cbn | flia Hj ].
+      rewrite Hcn.
+      apply permut_elem_ub; [ easy | flia Hj ].
+    } {
+      now rewrite Hcn.
+    }
+    unfold vect_nat_el, vect_vect_nat_el; cbn.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    cbn - [ nth ].
+    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
+    rewrite seq_nth; [ cbn | easy ].
+    rewrite seq_nth; [ cbn | flia Hj ].
+    easy.
+  }
+  easy.
 }
 rewrite rngl_add_comm.
 (* make one summation *)
@@ -481,62 +469,25 @@ rewrite (rngl_mul_comm Hic (iter_seq _ _ _ _)).
 rewrite Nat.add_sub.
 cbn in Hpp.
 rewrite Hpp.
-rewrite nth_replace_id. 2: {
-  rewrite fold_corr_mat_ncols; cycle 1. {
-    now apply (@squ_mat_is_corr n).
-  } {
-    apply is_sm_mat_iff in Hsm.
-    destruct Hsm as (Hr, _).
-    now rewrite Hr.
-  }
-  rewrite Hcn; flia Hi.
-}
-remember
-  (∏ (i0 = 2, p + 1),
-   nth (mk_canon_sym_gr n k (i0 - 2))
-     (replace_at i (nth (i0 - 2) (mat_list_list M) []) (nth (i0 - 2) (vect_list UV) 0)) 0) as QQQQQQQQ eqn:Hq.
-...
-remember
-  (∏ (i0 = 2, p + 1), mat_el M (i0 - 2) (mk_canon_sym_gr n k (i0 - 2)))
-  as q eqn:Hq.
-unfold mat_el in Hq.
-...
-erewrite rngl_product_eq_compat. 2: {
-  intros q Hq.
-...
-erewrite rngl_product_eq_compat. 2: {
-  intros q Hq.
-  move q before p.
-  remember (mk_canon_sym_gr n k (q - 2)) as j eqn:Hqq.
-  symmetry in Hqq; move Hpp before Hqq.
-...
-(*
 destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
-*)
 do 4 rewrite rngl_mul_assoc.
-...
-(*
+subst UV.
+cbn - [ mat_el vect_vect_nat_el ].
+rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
+  now rewrite map_length, fold_vect_size, Hu.
+} {
+  now rewrite map_length, fold_vect_size, Hv.
+}
+rewrite (List_map_nth' 0%F); [ | now rewrite fold_vect_size, Hu ].
+rewrite (List_map_nth' 0%F); [ | now rewrite fold_vect_size, Hv ].
+do 2 rewrite fold_vect_el.
+(* elimination of the following term (q) *)
 remember
   (∏ (i0 = 2, p + 1), mat_el M (i0 - 2) (mk_canon_sym_gr n k (i0 - 2)))
   as q eqn:Hq.
+rewrite (rngl_mul_mul_swap Hic _ _ q).
 do 3 rewrite (rngl_mul_comm Hic _ q).
-*)
-remember
-  (∏ (i0 = p + 1 + 1, n),
-   mat_el (mat_repl_vect i M V) (i0 - 1)
-     (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) (i0 - 1)))
-  as x eqn:Hx.
-remember
-  (∏ (i0 = p + 1 + 1, n),
-   mat_el (mat_repl_vect i M U) (i0 - 1)
-     (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) (i0 - 1)))
-  as y eqn:Hy.
-remember
-  (∏ (i0 = 2, p + 1),
-   nth (mk_canon_sym_gr n k (i0 - 2))
-     (replace_at i (nth (i0 - 2) (mat_list_list M) []))) as z eqn:Hz.
 do 5 rewrite <- rngl_mul_assoc.
-...
 rewrite <- rngl_mul_add_distr_l.
 f_equal.
 clear q Hq.
@@ -574,6 +525,10 @@ rewrite rngl_add_comm.
 do 2 rewrite rngl_mul_assoc.
 now rewrite <- rngl_mul_add_distr_r.
 Qed.
+
+Inspect 1.
+
+...
 
 (* list of terms in determinant' (determinant by sum of products of
    permutations *)
