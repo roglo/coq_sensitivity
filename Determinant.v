@@ -780,9 +780,12 @@ erewrite rngl_summation_eq_compat. 2: {
         now apply in_seq in Hi.
       }
       rewrite (List_map_nth' 0); [ | easy ].
-...
-      rewrite (List_map_nth' 0); [ | now rewrite Hr ].
+      unfold list_list_swap_rows.
+      rewrite fold_mat_nrows.
+      apply is_sm_mat_iff in Hsm.
+      destruct Hsm as (Hr, _).
       rewrite Hr.
+      rewrite (List_map_nth' 0); [ | easy ].
       unfold transposition.
       do 2 rewrite if_eqb_eq_dec.
       destruct (Nat.eq_dec i p) as [Hip| Hip]. {
@@ -791,13 +794,21 @@ erewrite rngl_summation_eq_compat. 2: {
         rewrite Nat.add_0_l.
         destruct (Nat.eq_dec q q) as [H| H]; [ clear H | easy ].
         apply Nat.neq_sym in Hpq.
-        now destruct (Nat.eq_dec q p).
+        destruct (Nat.eq_dec q p) as [H| H]; [ easy | clear H ].
+        unfold mat_el.
+        symmetry.
+        rewrite (@nth_indep _ _ p) with (d' := []); [ easy | ].
+        now rewrite fold_mat_nrows, Hr.
       }
       destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
         subst i.
         rewrite seq_nth; [ | easy ].
         rewrite Nat.add_0_l.
-        now destruct (Nat.eq_dec p p).
+        destruct (Nat.eq_dec p p) as [H| H]; [ clear H | easy ].
+        unfold mat_el.
+        symmetry.
+        rewrite (@nth_indep _ _ q) with (d' := []); [ easy | ].
+        now rewrite fold_mat_nrows, Hr.
       }
       apply in_seq in Hi.
       rewrite seq_nth; [ | easy ].
@@ -809,6 +820,8 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   easy.
 }
+cbn.
+...
 cbn - [ mat_swap_rows ].
 set (f := λ k, vect_swap_elem (vect_el (mk_canon_sym_gr_vect n) k) p q).
 erewrite rngl_summation_eq_compat. 2: {
