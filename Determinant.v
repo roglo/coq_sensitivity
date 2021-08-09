@@ -621,24 +621,30 @@ rewrite seq_nth; [ | easy ].
 now rewrite Nat.add_0_l.
 Qed.
 
+Definition list_list_swap_rows i1 i2 (ll : list (list T)) :=
+  map
+    (λ i,
+     if Nat.eq_dec i i1 then nth i2 ll (nth i ll [])
+     else if Nat.eq_dec i i2 then nth i1 ll (nth i ll [])
+     else nth i ll [])
+    (seq 0 (length ll)).
+
 Definition mat_swap_rows i1 i2 (M : matrix T) :=
-  mk_mat
-    (map
-       (λ i,
-        if Nat.eq_dec i i1 then nth i2 (mat_list_list M) []
-        else if Nat.eq_dec i i2 then nth i1 (mat_list_list M) []
-        else nth i (mat_list_list M) [])
-       (seq 0 (mat_nrows M))).
+  mk_mat (list_list_swap_rows i1 i2 (mat_list_list M)).
 
 Theorem mat_swap_rows_is_square : ∀ n (M : matrix T) p q,
   is_square_matrix n M = true
   → is_square_matrix n (mat_swap_rows p q M) = true.
 Proof.
 intros * Hsm.
+specialize (square_matrix_ncols _ Hsm) as Hcn.
+specialize (squ_mat_is_corr M Hsm) as Hco.
 apply is_sm_mat_iff in Hsm.
 apply is_sm_mat_iff.
 destruct Hsm as (Hr & Hcr & Hc).
-cbn; rewrite map_length, seq_length.
+cbn; unfold list_list_swap_rows.
+rewrite map_length, seq_length.
+unfold mat_swap_rows, list_list_swap_rows; cbn.
 split; [ easy | ].
 split. {
   destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]; [ easy | ].
@@ -650,16 +656,53 @@ split. {
   rewrite Nat.add_0_l.
   destruct (Nat.eq_dec 0 p) as [Hpz| Hpz]. {
     rewrite Hc; [ now intros Hn; subst n | ].
-...
+    destruct (lt_dec q (length (mat_list_list M))) as [Hqll| Hqll]. {
+      now apply nth_In.
+    }
+    apply Nat.nlt_ge in Hqll.
+    rewrite nth_overflow; [ | easy ].
+    now apply nth_In.
   }
-    rewrite fold_corr_mat_ncols.
-...
-  rewrite nth_length.
-  unfold mat_swap_rows; cbn.
-
-  cbn.
-  rewrite map_length, seq_length.
-...
+  destruct (Nat.eq_dec 0 q) as [Hqz| Hqz]. {
+    rewrite Hc; [ now intros Hn; subst n | ].
+    destruct (lt_dec p (length (mat_list_list M))) as [Hqll| Hqll]. {
+      now apply nth_In.
+    }
+    apply Nat.nlt_ge in Hqll.
+    rewrite nth_overflow; [ | easy ].
+    now apply nth_In.
+  }
+  now rewrite <- List_hd_nth_0.
+} {
+  intros la Hla.
+  apply in_map_iff in Hla.
+  rewrite fold_mat_nrows, Hr in Hla.
+  destruct Hla as (a & Ha & Hla).
+  apply in_seq in Hla.
+  subst la.
+  destruct (Nat.eq_dec a p) as [Hap| Hap]. {
+    subst a.
+    destruct (lt_dec q (length (mat_list_list M))) as [Hqll| Hqll]. {
+      rewrite fold_mat_nrows in Hqll.
+      now rewrite fold_corr_mat_ncols.
+    }
+    apply Nat.nlt_ge in Hqll.
+    rewrite nth_overflow; [ | easy ].
+    rewrite fold_corr_mat_ncols; [ easy | easy | now rewrite Hr ].
+  }
+  destruct (Nat.eq_dec a q) as [Haq| Haq]. {
+    subst a.
+    destruct (lt_dec p (length (mat_list_list M))) as [Hpll| Hpll]. {
+      rewrite fold_mat_nrows in Hpll.
+      now rewrite fold_corr_mat_ncols.
+    }
+    apply Nat.nlt_ge in Hpll.
+    rewrite nth_overflow; [ | easy ].
+    rewrite fold_corr_mat_ncols; [ easy | easy | now rewrite Hr ].
+  }
+  rewrite fold_corr_mat_ncols; [ easy | easy | now rewrite Hr ].
+}
+Qed.
 
 Theorem determinant_alternating :
   rngl_is_comm = true →
@@ -678,9 +721,8 @@ Theorem determinant_alternating :
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hpq Hp Hq Hsm.
 rewrite det_is_det_by_canon_permut; try easy. 2: {
-Search (is_square_matrix _ (mat_swap_rows _ _ _)).
-...
-apply mat_swap_rows_is_square.
+  now apply mat_swap_rows_is_square.
+}
 ...
 unfold determinant'.
 erewrite rngl_summation_eq_compat. 2: {
