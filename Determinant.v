@@ -723,7 +723,6 @@ intros Hic Hop Hin Hit H10 Hde Hch * Hpq Hp Hq Hsm.
 rewrite det_is_det_by_canon_permut; try easy. 2: {
   now apply mat_swap_rows_is_square.
 }
-...
 unfold determinant'.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
@@ -781,6 +780,7 @@ erewrite rngl_summation_eq_compat. 2: {
         now apply in_seq in Hi.
       }
       rewrite (List_map_nth' 0); [ | easy ].
+...
       rewrite (List_map_nth' 0); [ | now rewrite Hr ].
       rewrite Hr.
       unfold transposition.
@@ -942,6 +942,8 @@ apply rngl_product_eq_compat.
 intros i Hi.
 now rewrite Nat.add_comm, Nat.add_sub.
 Qed.
+
+...
 
 Theorem determinant_same_rows :
   rngl_is_comm = true →
