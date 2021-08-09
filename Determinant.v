@@ -400,16 +400,6 @@ rewrite nth_replace_id. 2: {
 destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
 *)
 do 4 rewrite rngl_mul_assoc.
-remember
-  (∏ (i0 = 2, p + 1),
-   mat_el (mat_repl_vect i M U) (i0 - 2)
-     (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) (i0 - 2)))
-  as QQQQQQ eqn:Hq.
-remember
-  (∏ (i0 = 2, p + 1),
-   mat_el (mat_repl_vect i M V) (i0 - 2)
-     (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) (i0 - 2)))
-  as RRRRRR eqn:Hr.
 ...
 (*
 remember
