@@ -821,9 +821,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
-...
-cbn - [ mat_swap_rows ].
-set (f := λ k, vect_swap_elem (vect_el (mk_canon_sym_gr_vect n) k) p q).
+set (f := λ k, vect_swap_elem (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) p q).
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   assert (Hkn : k < n!). {
@@ -834,6 +832,26 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite Nat.add_0_l.
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ | easy ].
+    rewrite Nat.add_0_l; cbn.
+    rewrite (List_map_nth' 0). 2: {
+      rewrite seq_length.
+      unfold transposition.
+      do 2 rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec i p) as [Hip| Hip]; [ easy | ].
+      destruct (Nat.eq_dec i q) as [Hiq| Hiq]; [ easy | ].
+      flia Hi Hp.
+    }
+    replace (mk_canon_sym_gr _ _ _) with (vect_nat_el (f k) i). 2: {
+      unfold f.
+...
+      cbn.
+      unfold transposition.
+      unfold vect_swap_elem.
+
+Print mk_canon_sym_gr.
+...
     now replace (mk_canon_sym_gr _ _ _) with (vect_el (f k) i).
   }
   cbn - [ f ].
