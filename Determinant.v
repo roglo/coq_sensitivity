@@ -844,17 +844,34 @@ erewrite rngl_summation_eq_compat. 2: {
       flia Hi Hp.
     }
     replace (mk_canon_sym_gr _ _ _) with (vect_nat_el (f k) i). 2: {
-      unfold f.
-...
-      cbn.
-      unfold transposition.
-      unfold vect_swap_elem.
-
-Print mk_canon_sym_gr.
-...
-    now replace (mk_canon_sym_gr _ _ _) with (vect_el (f k) i).
+      unfold f; cbn.
+      rewrite (List_map_nth' 0). 2: {
+        rewrite seq_length.
+        rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
+        rewrite map_length, seq_length; flia Hi Hp.
+      }
+      rewrite (List_map_nth' 0); cbn; [ | now rewrite seq_length ].
+      rewrite map_length, seq_length.
+      rewrite (List_map_nth' 0). 2: {
+        rewrite seq_length.
+        rewrite seq_nth; [ | flia Hi Hp ].
+        apply transposition_lt; [ easy | easy | flia Hi Hp ].
+      }
+      rewrite seq_nth; [ | easy ].
+      rewrite seq_nth. 2: {
+        rewrite seq_nth; [ | flia Hi Hp ].
+        apply transposition_lt; [ easy | easy | flia Hi Hp ].
+      }
+      rewrite seq_nth; [ | flia Hi Hp ].
+      rewrite seq_nth. 2: {
+        apply transposition_lt; [ easy | easy | flia Hi Hp ].
+      }
+      easy.
+    }
+    easy.
   }
   cbn - [ f ].
+...
   replace ({| vect_el := mk_canon_sym_gr n k |}) with
     (mk_vect n (λ i, vect_el (f k) (transposition p q i))). 2: {
     apply vector_eq.
