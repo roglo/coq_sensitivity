@@ -630,6 +630,37 @@ Definition mat_swap_rows i1 i2 (M : matrix T) :=
         else nth i (mat_list_list M) [])
        (seq 0 (mat_nrows M))).
 
+Theorem mat_swap_rows_is_square : ∀ n (M : matrix T) p q,
+  is_square_matrix n M = true
+  → is_square_matrix n (mat_swap_rows p q M) = true.
+Proof.
+intros * Hsm.
+apply is_sm_mat_iff in Hsm.
+apply is_sm_mat_iff.
+destruct Hsm as (Hr & Hcr & Hc).
+cbn; rewrite map_length, seq_length.
+split; [ easy | ].
+split. {
+  destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]; [ easy | ].
+  apply Nat.neq_0_lt_0 in Hrz.
+  unfold mat_ncols; cbn.
+  rewrite List_hd_nth_0.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
+  rewrite Nat.add_0_l.
+  destruct (Nat.eq_dec 0 p) as [Hpz| Hpz]. {
+    rewrite Hc; [ now intros Hn; subst n | ].
+...
+  }
+    rewrite fold_corr_mat_ncols.
+...
+  rewrite nth_length.
+  unfold mat_swap_rows; cbn.
+
+  cbn.
+  rewrite map_length, seq_length.
+...
+
 Theorem determinant_alternating :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -648,6 +679,8 @@ Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hpq Hp Hq Hsm.
 rewrite det_is_det_by_canon_permut; try easy. 2: {
 Search (is_square_matrix _ (mat_swap_rows _ _ _)).
+...
+apply mat_swap_rows_is_square.
 ...
 unfold determinant'.
 erewrite rngl_summation_eq_compat. 2: {
