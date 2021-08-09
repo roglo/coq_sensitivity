@@ -592,26 +592,22 @@ Qed.
 
 (* yet another definition of determinant *)
 
-...
-
-Check sym_gr_elem_swap_last.
-
 Definition determinant'' p q n (M : matrix T) :=
   ∑ (k = 0, fact n - 1),
     ε_permut n k *
     ∏ (i = 1, n),
-    mat_el M (i - 1) (vect_vect_nat_el (sym_gr_elem_swap_last p q n k) (i - 1)).
+    mat_el M (i - 1) (vect_nat_el (sym_gr_elem_swap_last p q n k) (i - 1)).
 
-Definition determinant''_list p q {n} (M : matrix n n T) :=
+Definition determinant''_list p q n (M : matrix T) :=
   map (λ k,
     (ε_permut n k *
      ∏ (i = 1, n),
-     mat_el M (i - 1) (vect_el (sym_gr_elem_swap_last p q n k) (i - 1)))%F)
+     mat_el M (i - 1) (vect_nat_el (sym_gr_elem_swap_last p q n k) (i - 1)))%F)
     (seq 0 (fact n)).
 
-Theorem determinant''_by_list : ∀ n p q (M : matrix n n T),
-  determinant'' p q M =
-    ∑ (k = 0, fact n - 1), nth k (determinant''_list p q M) 0.
+Theorem determinant''_by_list : ∀ n p q (M : matrix T),
+  determinant'' p q n M =
+    ∑ (k = 0, fact n - 1), nth k (determinant''_list p q n M) 0.
 Proof.
 intros.
 unfold determinant'', determinant''_list.
@@ -620,12 +616,21 @@ assert (Hkn : k < fact n). {
   specialize (fact_neq_0 n) as Hn.
   flia Hk Hn.
 }
-rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
 now rewrite Nat.add_0_l.
 Qed.
 
-Definition mat_swap_rows n i1 i2 (M : matrix n n T) :=
+...
+
+Definition mat_swap_rows n i1 i2 (M : matrix T) :=
+  mk_mat n n
+    (λ i j,
+     if Nat.eq_dec i i1 then mat_el M i2 j
+     else if Nat.eq_dec i i2 then mat_el M i1 j
+     else mat_el M i j).
+
+Definition mat_swap_rows n i1 i2 (M : matrix T) :=
   mk_mat n n
     (λ i j,
      if Nat.eq_dec i i1 then mat_el M i2 j

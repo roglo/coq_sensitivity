@@ -2706,12 +2706,10 @@ Definition sym_gr_elem_swap_with_0 p n k :=
 
 (* k' such that permut_swap_with_0 p n k = permut n k' *)
 
-(*
 Definition sym_gr_elem_swap_last (p q : nat) n k :=
   vect_swap_elem
-    (vect_swap_elem (vect_el (mk_canon_sym_gr_vect n) k) p (n - 2))
+    (vect_swap_elem (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) p (n - 2))
     q (n - 1).
-*)
 
 (* *)
 
