@@ -276,6 +276,7 @@ rewrite det_is_det_by_canon_permut; try easy. 2: {
 }
 unfold determinant'.
 (* simplification of the lhs *)
+remember (a × U + b × V)%V as UV eqn:HUV.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   assert (Hkn : k < n!). {
@@ -295,10 +296,13 @@ erewrite rngl_summation_eq_compat. 2: {
       apply is_sm_mat_iff in Hsm.
       now destruct Hsm as (Hr, _); rewrite Hr.
     } {
+      rewrite HUV; cbn.
       rewrite map2_length.
       do 2 rewrite map_length, fold_vect_size.
       now rewrite Hu, Hv, Nat.min_id.
     }
+(*
+    rewrite HUV at 1; cbn.
     rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
       now rewrite map_length, fold_vect_size, Hu.
     } {
@@ -307,6 +311,7 @@ erewrite rngl_summation_eq_compat. 2: {
     rewrite (List_map_nth' 0%F); [ | now rewrite fold_vect_size, Hu ].
     rewrite (List_map_nth' 0%F); [ | now rewrite fold_vect_size, Hv ].
     do 2 rewrite fold_vect_el.
+*)
     easy.
   }
   easy.
@@ -401,6 +406,12 @@ rewrite nth_replace_id. 2: {
   }
   rewrite Hcn; flia Hi.
 }
+...
+remember
+  (∏ (i0 = 2, p + 1), mat_el M (i0 - 2) (mk_canon_sym_gr n k (i0 - 2)))
+  as q eqn:Hq.
+unfold mat_el in Hq.
+...
 erewrite rngl_product_eq_compat. 2: {
   intros q Hq.
 ...
