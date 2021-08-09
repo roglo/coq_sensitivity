@@ -621,21 +621,14 @@ rewrite seq_nth; [ | easy ].
 now rewrite Nat.add_0_l.
 Qed.
 
-...
-
-Definition mat_swap_rows n i1 i2 (M : matrix T) :=
-  mk_mat n n
-    (λ i j,
-     if Nat.eq_dec i i1 then mat_el M i2 j
-     else if Nat.eq_dec i i2 then mat_el M i1 j
-     else mat_el M i j).
-
-Definition mat_swap_rows n i1 i2 (M : matrix T) :=
-  mk_mat n n
-    (λ i j,
-     if Nat.eq_dec i i1 then mat_el M i2 j
-     else if Nat.eq_dec i i2 then mat_el M i1 j
-     else mat_el M i j).
+Definition mat_swap_rows i1 i2 (M : matrix T) :=
+  mk_mat
+    (map
+       (λ i,
+        if Nat.eq_dec i i1 then nth i2 (mat_list_list M) []
+        else if Nat.eq_dec i i2 then nth i1 (mat_list_list M) []
+        else nth i (mat_list_list M) [])
+       (seq 0 (mat_nrows M))).
 
 Theorem determinant_alternating :
   rngl_is_comm = true →
@@ -645,14 +638,17 @@ Theorem determinant_alternating :
   rngl_has_1_neq_0 = true →
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
-  ∀ n (M : matrix n n T) p q,
+  ∀ n (M : matrix T) p q,
   p ≠ q
   → p < n
   → q < n
-  → determinant (mat_swap_rows p q M) = (- determinant M)%F.
+  → is_square_matrix n M = true
+  → determinant n (mat_swap_rows p q M) = (- determinant n M)%F.
 Proof.
-intros Hic Hop Hin Hit H10 Hde Hch * Hpq Hp Hq.
-rewrite det_is_det_by_canon_permut; try easy.
+intros Hic Hop Hin Hit H10 Hde Hch * Hpq Hp Hq Hsm.
+rewrite det_is_det_by_canon_permut; try easy. 2: {
+Search (is_square_matrix _ (mat_swap_rows _ _ _)).
+...
 unfold determinant'.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
@@ -688,27 +684,51 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn - [ mat_swap_rows ].
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
+  assert (Hkn : k < fact n). {
+    specialize (fact_neq_0 n) as Hn.
+    flia Hk Hn.
+  }
   erewrite rngl_product_list_eq_compat. 2: {
     intros i Hi.
     replace (mat_el _ _ _) with
-      (mat_el M i (vect_el (vect_el (mk_canon_sym_gr_vect n) k) (transposition p q i))). 2: {
+      (mat_el M i
+         (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect n) k)
+            (transposition p q i))). 2: {
       cbn.
+      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+      rewrite seq_nth; [ cbn | easy ].
+      assert (Ht : transposition p q i < length (seq 0 n)). {
+        rewrite seq_length.
+        unfold transposition.
+        do 2 rewrite if_eqb_eq_dec.
+        destruct (Nat.eq_dec i p) as [Hip| Hip]; [ now subst p | ].
+        destruct (Nat.eq_dec i q) as [Hiq| Hiq]; [ now subst q | ].
+        now apply in_seq in Hi.
+      }
+      rewrite (List_map_nth' 0); [ | easy ].
+      rewrite (List_map_nth' 0); [ | now rewrite Hr ].
+      rewrite Hr.
       unfold transposition.
       do 2 rewrite if_eqb_eq_dec.
       destruct (Nat.eq_dec i p) as [Hip| Hip]. {
         subst i.
+        rewrite seq_nth; [ | easy ].
+        rewrite Nat.add_0_l.
+        destruct (Nat.eq_dec q q) as [H| H]; [ clear H | easy ].
         apply Nat.neq_sym in Hpq.
-        destruct (Nat.eq_dec q p) as [Hqp| Hqp]; [ easy | ].
-        now destruct (Nat.eq_dec q q).
+        now destruct (Nat.eq_dec q p).
       }
       destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
         subst i.
-        apply Nat.neq_sym in Hpq.
+        rewrite seq_nth; [ | easy ].
+        rewrite Nat.add_0_l.
         now destruct (Nat.eq_dec p p).
       }
+      apply in_seq in Hi.
+      rewrite seq_nth; [ | easy ].
+      rewrite Nat.add_0_l.
       destruct (Nat.eq_dec i p) as [H| H]; [ easy | clear H ].
-      destruct (Nat.eq_dec i q) as [H| H]; [ easy | clear H ].
-      easy.
+      now destruct (Nat.eq_dec i q).
     }
     easy.
   }
