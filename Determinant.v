@@ -260,6 +260,7 @@ Theorem determinant_multilinear :
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hsm Hu Hv Hi.
 specialize (square_matrix_ncols _ Hsm) as Hcn.
+(* using the snd version of determinants: determinant' *)
 rewrite det_is_det_by_canon_permut; try easy. 2: {
   apply mat_repl_vect_is_square; [ congruence | cbn | easy ].
   rewrite map2_length.
@@ -274,6 +275,7 @@ rewrite det_is_det_by_canon_permut; try easy. 2: {
   apply mat_repl_vect_is_square; [ congruence | easy | easy ].
 }
 unfold determinant'.
+(* simplification of the lhs *)
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   assert (Hkn : k < n!). {
@@ -310,6 +312,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ mat_el vect_vect_nat_el ].
+(* put a and b inside the sigma in the rhs *)
 rewrite rngl_mul_summation_distr_l; [ | now left ].
 rewrite rngl_mul_summation_distr_l; [ | now left ].
 symmetry.
@@ -325,12 +328,15 @@ erewrite rngl_summation_eq_compat. 2: {
   now rewrite (rngl_mul_comm Hic b).
 }
 rewrite rngl_add_comm.
+(* make one summation *)
 rewrite <- rngl_summation_add_distr.
 apply rngl_summation_eq_compat.
 intros k Hk.
 do 2 rewrite <- rngl_mul_assoc.
 rewrite <- rngl_mul_add_distr_l.
+(* elimination of the ε-s *)
 f_equal.
+(* *)
 assert (Hkn : k < fact n). {
   specialize (fact_neq_0 n) as Hnz.
   flia Hk Hnz.
@@ -395,6 +401,14 @@ rewrite nth_replace_id. 2: {
   }
   rewrite Hcn; flia Hi.
 }
+erewrite rngl_product_eq_compat. 2: {
+  intros q Hq.
+...
+erewrite rngl_product_eq_compat. 2: {
+  intros q Hq.
+  move q before p.
+  remember (mk_canon_sym_gr n k (q - 2)) as j eqn:Hqq.
+  symmetry in Hqq; move Hpp before Hqq.
 ...
 (*
 destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
