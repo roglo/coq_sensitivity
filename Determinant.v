@@ -526,21 +526,18 @@ do 2 rewrite rngl_mul_assoc.
 now rewrite <- rngl_mul_add_distr_r.
 Qed.
 
-Inspect 1.
-
-...
-
 (* list of terms in determinant' (determinant by sum of products of
    permutations *)
 
-Definition determinant'_list {n} (M : matrix n n T) :=
+Definition determinant'_list n (M : matrix T) :=
   map (λ k,
     (ε_permut n k *
      ∏ (i = 1, n),
-     mat_el M (i - 1) (vect_el (vect_el (mk_canon_sym_gr_vect n) k) (i - 1)%nat))%F)
+     mat_el M (i - 1)
+       (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) (i - 1)%nat))%F)
     (seq 0 n!).
 
-Arguments determinant'_list {n}%nat M%M.
+Arguments determinant'_list n%nat M%M.
 
 Theorem determinant'_by_list :
   rngl_is_comm = true →
@@ -550,8 +547,8 @@ Theorem determinant'_by_list :
   rngl_is_integral = true →
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
-  ∀ n (M : matrix n n T),
-  determinant' M = ∑ (k = 0, fact n - 1), nth k (determinant'_list M) 0.
+  ∀ n (M : matrix T),
+  determinant' n M = ∑ (k = 0, fact n - 1), nth k (determinant'_list n M) 0.
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch *.
 unfold determinant', determinant'_list.
@@ -560,7 +557,7 @@ assert (Hkn : k < fact n). {
   specialize (fact_neq_0 n) as Hn.
   flia Hk Hn.
 }
-rewrite List_map_nth_in with (a := 0); [ | now rewrite seq_length ].
+rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
 rewrite Nat.add_0_l.
 f_equal.
@@ -575,11 +572,12 @@ Theorem det_is_det_by_any_permut :
   rngl_has_1_neq_0 = true →
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
-  ∀ n (M : matrix n n T) l,
-  Permutation l (determinant'_list M)
-  → determinant M = ∑ (k = 0, fact n - 1), nth k l 0.
+  ∀ n (M : matrix T) l,
+  is_square_matrix n M = true
+  → Permutation l (determinant'_list n M)
+  → determinant n M = ∑ (k = 0, fact n - 1), nth k l 0.
 Proof.
-intros Hic Hop Hin Hit H10 Hde Hch * Hl.
+intros Hic Hop Hin Hit H10 Hde Hch * Hsm Hl.
 rewrite det_is_det_by_canon_permut; try easy.
 rewrite determinant'_by_list; try easy.
 apply rngl_summation_permut; [ now symmetry | | ]. {
@@ -594,11 +592,15 @@ Qed.
 
 (* yet another definition of determinant *)
 
-Definition determinant'' p q n (M : matrix n n T) :=
+...
+
+Check sym_gr_elem_swap_last.
+
+Definition determinant'' p q n (M : matrix T) :=
   ∑ (k = 0, fact n - 1),
     ε_permut n k *
     ∏ (i = 1, n),
-    mat_el M (i - 1) (vect_el (sym_gr_elem_swap_last p q n k) (i - 1)).
+    mat_el M (i - 1) (vect_vect_nat_el (sym_gr_elem_swap_last p q n k) (i - 1)).
 
 Definition determinant''_list p q {n} (M : matrix n n T) :=
   map (λ k,

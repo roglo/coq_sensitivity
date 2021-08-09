@@ -3265,7 +3265,6 @@ flia Hsi1j Hsij.
 Qed.
 *)
 
-(*
 Theorem ε_of_permut_ε :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -3276,7 +3275,7 @@ Theorem ε_of_permut_ε :
   rngl_characteristic = 0 →
   ∀ n k,
   k < fact n
-  → ε (vect_el (mk_canon_sym_gr_vect n) k) = ε_permut n k.
+  → ε n (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) = ε_permut n k.
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hkn.
 revert k Hkn.
@@ -3292,7 +3291,6 @@ apply IHn.
 apply Nat.mod_upper_bound.
 apply fact_neq_0.
 Qed.
-*)
 
 (*
 Definition permut_inv n (σ : vector nat) :=
@@ -3563,9 +3561,7 @@ Arguments sign_diff {T}%type {ro} (u v)%nat.
 
 Arguments ε_permut {T}%type {ro} (n k)%nat.
 Arguments ε_of_sym_gr_permut_succ {T}%type {ro rp} _ _ _ _ _ _ _ (n k)%nat.
-(*
 Arguments ε_of_permut_ε {T}%type {ro rp} _ _ _ _ _ _ _ n%nat [k]%nat.
-*)
 Arguments ε_ws_ε {T}%type {ro rp} _ _ _ _ _ _ _ n%nat p%V.
 Arguments ε_ws_ε_fun {T}%type {ro rp} _ _ _ _ _ _ _ [σ]%function [n]%nat.
 Arguments rngl_product_change_list {T}%type {ro rp} _ [A]%type [la lb]%list
