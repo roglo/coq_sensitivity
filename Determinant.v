@@ -818,10 +818,14 @@ erewrite rngl_summation_eq_compat. 2: {
     }
     easy.
   }
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
+  rewrite Nat.add_0_l.
   easy.
 }
-cbn.
-set (f := λ k, vect_swap_elem (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) p q).
+set
+  (f :=
+   λ k, vect_swap_elem (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) p q).
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   assert (Hkn : k < n!). {
@@ -832,6 +836,7 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite Nat.add_0_l.
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
+...
     rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
     rewrite seq_nth; [ | easy ].
     rewrite Nat.add_0_l; cbn.
