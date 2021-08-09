@@ -835,19 +835,18 @@ erewrite rngl_summation_eq_compat. 2: {
   erewrite rngl_product_seq_product; [ | flia Hp ].
   rewrite Nat.add_0_l.
   erewrite rngl_product_eq_compat. 2: {
-    intros i Hi.
-...
-    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-    rewrite seq_nth; [ | easy ].
-    rewrite Nat.add_0_l; cbn.
+    intros i Hi; cbn.
+    rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
     rewrite (List_map_nth' 0). 2: {
       rewrite seq_length.
-      unfold transposition.
-      do 2 rewrite if_eqb_eq_dec.
-      destruct (Nat.eq_dec i p) as [Hip| Hip]; [ easy | ].
-      destruct (Nat.eq_dec i q) as [Hiq| Hiq]; [ easy | ].
-      flia Hi Hp.
+      apply transposition_lt; [ easy | easy | flia Hi Hp ].
     }
+    rewrite seq_nth; [ | easy ].
+    rewrite Nat.add_0_l.
+    rewrite seq_nth. 2: {
+      apply transposition_lt; [ easy | easy | flia Hi Hp ].
+    }
+    rewrite Nat.add_0_l.
     replace (mk_canon_sym_gr _ _ _) with (vect_nat_el (f k) i). 2: {
       unfold f; cbn.
       rewrite (List_map_nth' 0). 2: {
@@ -867,17 +866,13 @@ erewrite rngl_summation_eq_compat. 2: {
         rewrite seq_nth; [ | flia Hi Hp ].
         apply transposition_lt; [ easy | easy | flia Hi Hp ].
       }
-      rewrite seq_nth; [ | flia Hi Hp ].
-      rewrite seq_nth. 2: {
-        apply transposition_lt; [ easy | easy | flia Hi Hp ].
-      }
-      easy.
+      rewrite seq_nth; [ easy | flia Hi Hp ].
     }
     easy.
   }
   cbn - [ f ].
 ...
-  replace ({| vect_el := mk_canon_sym_gr n k |}) with
+  replace ({| vect_list := map (mk_canon_sym_gr n k) (seq 0 n) |}) with
     (mk_vect n (λ i, vect_el (f k) (transposition p q i))). 2: {
     apply vector_eq.
     intros i Hi; cbn.
