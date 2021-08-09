@@ -285,6 +285,91 @@ erewrite rngl_summation_eq_compat. 2: {
     apply Nat.neq_0_lt_0, fact_neq_0.
   }
   erewrite rngl_product_eq_compat. 2: {
+intros j Hj.
+Theorem mat_el_repl_vect : ∀ (M : matrix T) V i j k,
+  is_correct_matrix M
+  → i < vect_size V
+  → i < mat_nrows M
+  → j < mat_ncols M
+  → k < mat_ncols M
+  → mat_el (mat_repl_vect k M V) i j =
+    if Nat.eq_dec j k then vect_el V i else mat_el M i j.
+Proof.
+intros * Hm His Hir Hjc Hkc; cbn.
+rewrite map2_nth with (a := []) (b := 0%F); cycle 1. {
+  now rewrite fold_mat_nrows.
+} {
+  now rewrite fold_vect_size.
+}
+unfold replace_at.
+destruct (Nat.eq_dec j k) as [Hjk| Hjk]. {
+  subst k.
+  rewrite app_nth2. 2: {
+    rewrite firstn_length.
+    rewrite fold_corr_mat_ncols; [ | easy | easy ].
+    rewrite Nat.min_l; [ | flia Hjc ].
+    now unfold "≥".
+  }
+  rewrite firstn_length.
+  rewrite fold_corr_mat_ncols; [ | easy | easy ].
+  rewrite Nat.min_l; [ | flia Hjc ].
+  now rewrite Nat.sub_diag.
+}
+destruct (lt_dec j k) as [Hljk| Hljk]. {
+  rewrite app_nth1. 2: {
+    rewrite firstn_length.
+    rewrite fold_corr_mat_ncols; [ | easy | easy ].
+    rewrite Nat.min_l; [ easy | flia Hkc ].
+  }
+  rewrite List_nth_firstn; [ | easy ].
+  now rewrite fold_mat_el.
+} {
+  apply Nat.nlt_ge in Hljk.
+  rewrite app_nth2. 2: {
+    rewrite firstn_length.
+    rewrite fold_corr_mat_ncols; [ | easy | easy ].
+    rewrite Nat.min_l; [ easy | flia Hkc ].
+  }
+  rewrite firstn_length.
+  rewrite fold_corr_mat_ncols; [ | easy | easy ].
+  rewrite Nat.min_l; [ | flia Hkc ].
+  replace (j - k) with (S (j - k - 1)) by flia Hjk Hljk.
+  cbn - [ skipn ].
+Search (nth _ (skipn _ _)).
+Theorem List_nth_skipn : ∀ A (l : list A) i j d,
+...
+  → nth i (skipn j l) d = nth i l d.
+...
+  rewrite skipn_nth.
+...
+  rewrite List_nth_firstn; [ | easy ].
+  now rewrite fold_mat_el.
+...
+...
+rewrite List_nth_firstn.
+Search firstn.
+  Search (firstn _ (nth _ _ _)).
+  Search (nth _ (firstn _ _)).
+  rewrite List_nth_firstn.
+...
+
+destruct (le_dec k (mat_ncols M)) as [Hkc| Hkc]. {
+  rewrite app_nth1. 2: {
+    rewrite firstn_length.
+    rewrite fold_corr_mat_ncols; [ | easy | easy ].
+    rewrite Nat.min_l; [ | easy ].
+
+
+    rewrite Nat.min_l; [ | flia Hjc ].
+    now unfold "≥".
+  }
+  rewrite firstn_length.
+  rewrite fold_corr_mat_ncols; [ | easy | easy ].
+  rewrite Nat.min_l; [ | flia Hjc ].
+  now rewrite Nat.sub_diag.
+...
+rewrite mat_el_repl_vect.
+...
     intros j Hj; cbn.
     assert (Hjn : j - 1 < n) by flia Hj.
     rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
@@ -406,6 +491,10 @@ rewrite nth_replace_id. 2: {
   }
   rewrite Hcn; flia Hi.
 }
+remember
+  (∏ (i0 = 2, p + 1),
+   nth (mk_canon_sym_gr n k (i0 - 2))
+     (replace_at i (nth (i0 - 2) (mat_list_list M) []) (nth (i0 - 2) (vect_list UV) 0)) 0) as QQQQQQQQ eqn:Hq.
 ...
 remember
   (∏ (i0 = 2, p + 1), mat_el M (i0 - 2) (mk_canon_sym_gr n k (i0 - 2)))

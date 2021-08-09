@@ -1918,6 +1918,20 @@ intros.
 destruct l as [| a]; [ now destruct i | easy ].
 Qed.
 
+Theorem List_nth_firstn : ∀ A (l : list A) i j d,
+  i < j
+  → nth i (firstn j l) d = nth i l d.
+Proof.
+intros * Hij.
+revert i j Hij.
+induction l as [| a la]; intros; [ now rewrite firstn_nil | ].
+destruct j; [ easy | ].
+rewrite firstn_cons.
+destruct i; [ easy | cbn ].
+apply IHla.
+now apply Nat.succ_lt_mono.
+Qed.
+
 Theorem List_app_cons : ∀ A (l1 l2 : list A) a,
   l1 ++ a :: l2 = l1 ++ [a] ++ l2.
 Proof. easy. Qed.
