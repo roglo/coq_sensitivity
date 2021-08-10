@@ -870,18 +870,25 @@ destruct m; [ easy | cbn ].
 apply repeat_length.
 Qed.
 
+Theorem map_seq_length : ∀ A (f : _ → A) a len,
+  length (map f (seq a len)) = len.
+Proof.
+intros.
+now rewrite map_length, seq_length.
+Qed.
+
 Theorem mI_nrows : ∀ n, mat_nrows (mI n) = n.
 Proof.
 intros.
 destruct n; cbn - [ "=?" ]; [ easy | ].
-now rewrite map_length, seq_length.
+now rewrite map_seq_length.
 Qed.
 
 Theorem mI_ncols : ∀ n, mat_ncols (mI n) = n.
 Proof.
 intros.
 destruct n; cbn - [ "=?" ]; [ easy | ].
-now rewrite map_length, seq_length.
+now rewrite map_seq_length.
 Qed.
 
 Theorem mat_el_mI_ndiag : ∀ n i j, i ≠ j → mat_el (mI n) i j = 0%F.
@@ -905,12 +912,12 @@ destruct (lt_dec i n) as [Hin| Hin]. {
   }
   apply Nat.nlt_ge in Hjn.
   apply nth_overflow.
-  now rewrite map_length, seq_length.
+  now rewrite map_seq_length.
 }
 apply Nat.nlt_ge in Hin.
 apply nth_overflow.
 rewrite nth_overflow; [ cbn; flia | ].
-now rewrite map_length, seq_length.
+now rewrite map_seq_length.
 Qed.
 
 Theorem mat_el_mI_diag : ∀ n i, i < n → mat_el (mI n) i i = 1%F.
@@ -1060,14 +1067,14 @@ destruct x as [x| ]. {
   apply List_nth_error_Some_iff with (d := 0%F) in Hx.
   destruct Hx as (Hx, Hii).
   cbn in Hii.
-  rewrite map_length, map_length, seq_length in Hii.
+  rewrite map_length, map_seq_length in Hii.
   destruct y as [y| ]. {
     apply List_nth_error_Some_iff with (d := 0%F) in Hy.
     destruct Hy as (Hy, Hiv).
     f_equal.
     subst x y; cbn.
     rewrite List_map_nth' with (a := []). 2: {
-      now rewrite map_length, seq_length.
+      now rewrite map_seq_length.
     }
     unfold vect_size in Hii.
     clear Hii.
@@ -1133,7 +1140,7 @@ destruct y as [y| ]; [ | easy ].
 exfalso.
 apply nth_error_None in Hx.
 cbn in Hx.
-rewrite map_length, map_length, seq_length in Hx.
+rewrite map_length, map_seq_length in Hx.
 apply List_nth_error_Some_iff with (d := 0%F) in Hy.
 now apply Nat.nlt_ge in Hx.
 Qed.
@@ -1151,14 +1158,14 @@ intros * Hrbz Hcbz Hcarb.
 unfold "*"%M.
 f_equal.
 unfold mat_nrows at 5; cbn.
-rewrite map_length, seq_length.
+rewrite map_seq_length.
 apply map_ext_in.
 intros i Hi.
 unfold mat_ncols at 2; cbn.
 rewrite List_map_hd with (a := 0). 2: {
   now intros H; apply List_seq_eq_nil in H.
 }
-rewrite map_length, seq_length.
+rewrite map_seq_length.
 apply map_ext_in.
 intros j Hj.
 move j before i.
@@ -1169,7 +1176,7 @@ rewrite List_map_hd with (a := 0). 2: {
   intros H; apply List_seq_eq_nil in H.
   now rewrite H in Hi.
 }
-rewrite map_length, seq_length.
+rewrite map_seq_length.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   rewrite List_map_nth' with (a := 0). 2: {
@@ -2093,7 +2100,7 @@ Theorem mI_is_square_matrix : ∀ n, is_square_matrix n (mI n) = true.
 Proof.
 intros.
 apply is_sm_mat_iff.
-split; [ now cbn; rewrite map_length, seq_length | ].
+split; [ now cbn; rewrite map_seq_length | ].
 rewrite mI_nrows, mI_ncols.
 split; [ easy | ].
 intros la Hla.
@@ -2101,7 +2108,7 @@ cbn in Hla.
 apply in_map_iff in Hla.
 destruct Hla as (i & Hin & Hi).
 subst la.
-now rewrite map_length, seq_length.
+now rewrite map_seq_length.
 Qed.
 
 Theorem mI_is_correct_matrix : ∀ n, is_correct_matrix (mI n).
@@ -2269,12 +2276,12 @@ Proof.
 intros.
 apply is_sm_mat_iff.
 split; cbn. {
-  rewrite map_length, seq_length.
+  rewrite map_seq_length.
   apply squ_mat_nrows.
 }
 split. {
   intros Hc.
-  rewrite map_length, seq_length.
+  rewrite map_seq_length.
   destruct MA as (MA & Ha).
   destruct MB as (MB & Hb).
   move MB before MA; cbn in Hc |-*.
@@ -2300,7 +2307,7 @@ split. {
   apply in_map_iff in Hl.
   destruct Hl as (i & Him & Hl).
   subst l.
-  rewrite map_length, seq_length.
+  rewrite map_seq_length.
   apply squ_mat_ncols.
 }
 Qed.
@@ -2880,7 +2887,7 @@ intros.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n; destruct i | ].
 induction i; [ now apply mZ_nrows | cbn ].
 rewrite map2_length.
-rewrite map_length, seq_length.
+rewrite map_seq_length.
 rewrite fold_mat_nrows, IHi.
 apply Nat.min_id.
 Qed.
@@ -3050,7 +3057,7 @@ cbn.
 rewrite map_map.
 rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
 rewrite List_map_nth' with (a := 0%F). 2: {
-  now rewrite map_length, seq_length.
+  now rewrite map_seq_length.
 }
 rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ cbn | easy ].
@@ -3147,12 +3154,12 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
     rewrite fold_mat_nrows.
     clear Hi.
     induction i; cbn; [ now rewrite repeat_length | ].
-    rewrite map2_length, map_length, seq_length.
+    rewrite map2_length, map_seq_length.
     rewrite fold_mat_nrows.
     flia Hnz IHi.
   }
   rewrite map2_nth with (a := 0%F) (b := 0%F) in Hi; cycle 1. {
-    now rewrite map_length, seq_length.
+    now rewrite map_seq_length.
   } {
     rewrite <- List_hd_nth_0, fold_mat_ncols.
     now rewrite mat_ncols_of_nat.
