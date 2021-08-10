@@ -2134,7 +2134,32 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
-cbn.
+assert (Hp : p < n) by now transitivity q.
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+rewrite Nat.add_0_l.
+rewrite Nat.eqb_refl.
+erewrite (rngl_product_eq_compat _ _ _ 0). 2: {
+  intros i Hi.
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi Hq ].
+  rewrite seq_nth; [ | flia Hi Hq ].
+  rewrite Nat.add_0_l.
+  easy.
+}
+erewrite (rngl_product_eq_compat _ _ _ (p + 1)). 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi Hq ].
+    rewrite seq_nth; [ | flia Hi Hq ].
+    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj Hq ].
+    rewrite seq_nth; [ | flia Hj Hq ].
+    do 2 rewrite Nat.add_0_l.
+    easy.
+  }
+  easy.
+}
+cbn - [ "<?" ].
 ...
     destruct (Nat.eq_dec j p) as [Hjp| Hjp].
     destruct (lt_dec (i - 1) j) as [Hij| Hij]; [ | easy ].
