@@ -2053,7 +2053,6 @@ now apply transposition_is_permut.
 Qed.
 *)
 
-(*
 Theorem transposition_signature_lt :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -2065,10 +2064,15 @@ Theorem transposition_signature_lt :
   ∀ n p q,
   p < q
   → q < n
-  → ε (mk_vect n (transposition p q)) = (-1)%F.
+  → ε n (mk_vect (map (transposition p q) (seq 0 n))) = (-1)%F.
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hpq Hq.
 rewrite ε_ws_ε; try easy. 2: {
+Check transposition_is_permut.
+unfold is_permut_vect; cbn.
+unfold vect_nat_el; cbn.
+Check transposition_is_permut.
+...
   apply transposition_is_permut; [ flia Hpq Hq | easy ].
 }
 unfold ε_ws; cbn.
@@ -2243,6 +2247,7 @@ Theorem transposition_signature :
   → ε n (mk_vect (map (transposition p q) (seq 0 n))) = (-1)%F.
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hpq Hp Hq.
+Check transposition_signature_lt.
 ...
 destruct (lt_dec p q) as [Hpq'| Hpq']. {
   now apply transposition_signature_lt.
