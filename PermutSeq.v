@@ -2053,6 +2053,27 @@ now apply transposition_is_permut.
 Qed.
 *)
 
+Theorem is_permut_map : ∀ f n,
+  is_permut f n
+  → is_permut (λ i, nth i (map f (seq 0 n)) 0) n.
+Proof.
+intros * Hf.
+destruct Hf as (Hf, Hff).
+split. {
+  intros i Hi.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
+  now apply Hf.
+} {
+  intros i j Hi Hj Hij.
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite seq_nth in Hij; [ | easy ].
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite seq_nth in Hij; [ | easy ].
+  now apply Hff.
+}
+Qed.
+
 Theorem transposition_signature_lt :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -2068,12 +2089,11 @@ Theorem transposition_signature_lt :
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hpq Hq.
 rewrite ε_ws_ε; try easy. 2: {
-Check transposition_is_permut.
-unfold is_permut_vect; cbn.
-unfold vect_nat_el; cbn.
-Check transposition_is_permut.
-...
-  apply transposition_is_permut; [ flia Hpq Hq | easy ].
+  unfold is_permut_vect; cbn.
+  unfold vect_nat_el; cbn.
+  apply is_permut_map.
+  apply transposition_is_permut; [ | easy ].
+  now transitivity q.
 }
 unfold ε_ws; cbn.
 unfold ε_fun_ws.
@@ -2097,16 +2117,44 @@ rewrite (rngl_product_split p); [ | flia Hpq Hq ].
 rewrite rngl_product_split_last; [ | flia ].
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi Hpq Hq ].
+  rewrite seq_nth; [ | flia Hi Hpq Hq ].
+  rewrite Nat.add_0_l.
   do 2 rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec (i - 1) p) as [Hip| Hip]; [ flia Hi Hip | ].
   destruct (Nat.eq_dec (i - 1) q) as [Hiq| Hiq]; [ flia Hi Hiq Hpq Hq | ].
   erewrite rngl_product_eq_compat. 2: {
     intros j (_, Hj).
     do 2 rewrite if_ltb_lt_dec.
-    do 2 rewrite if_eqb_eq_dec.
+    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj Hq ].
+    rewrite seq_nth; [ | flia Hj Hq ].
+    rewrite Nat.add_0_l.
+    rewrite if_eqb_eq_dec.
+    easy.
+  }
+  easy.
+}
+cbn.
+...
+    destruct (Nat.eq_dec j p) as [Hjp| Hjp].
+    destruct (lt_dec (i - 1) j) as [Hij| Hij]; [ | easy ].
+    cbn.
+...
+    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi Hpq Hq ].
+    rewrite seq_nth; [ | flia Hi Hpq Hq ].
+    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj Hq ].
+    rewrite seq_nth; [ | flia Hj Hq ].
+    do 2 rewrite Nat.add_0_l.
+    do 3 rewrite if_eqb_eq_dec.
     destruct (Nat.eq_dec j p) as [Hjp| Hjp]. {
-      destruct (lt_dec (i - 1) j) as [Hij| Hij]; [ | flia Hi Hjp Hij ].
-      destruct (lt_dec (i - 1) q) as [Hiq'| Hiq']; [ | flia Hpq Hjp Hij Hiq' ].
+      subst j.
+      destruct (lt_dec (i - 1) p) as [Hij| Hij]; [ | flia Hi Hij ].
+      destruct (Nat.eq_dec (i - 1) p) as [Hip'| Hip']. {
+        destruct (lt_dec q q) as [H| H]; [ flia H | clear H ].
+        easy.
+      }
+      destruct (Nat.eq_dec (i - 1) q) as [Hiq''| Hiq'']. {
+      destruct (lt_dec (i - 1) p) as [Hip'| Hip']; [ | flia Hpq Hjp Hij Hiq' ].
       easy.
     }
     cbn.
@@ -2230,7 +2278,8 @@ rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec j q) as [H| H]; [ flia Hi Hj H | clear H ].
 destruct (lt_dec i j) as [H| H]; [ easy | flia Hj H ].
 Qed.
-*)
+
+...
 
 Theorem transposition_signature :
   rngl_is_comm = true →
