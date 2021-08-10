@@ -901,11 +901,14 @@ erewrite rngl_summation_eq_compat. 2: {
     f_equal; cbn.
     now rewrite map_map.
   }
-...
   rewrite signature_comp; try easy. {
+    cbn; rewrite map_length; apply seq_length.
+  } {
     subst f; cbn.
     split; cbn. {
       intros i Hi.
+      apply permut_ub. {
+...
       apply permut_ub; [ now apply sym_gr_elem_is_permut | ].
       now apply transposition_lt.
     } {

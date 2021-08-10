@@ -2615,7 +2615,6 @@ rewrite signature_comp_fun_expand_2_2; try easy.
 now apply signature_comp_fun_changement_of_variable.
 Qed.
 
-(*
 Theorem signature_comp :
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -2624,15 +2623,26 @@ Theorem signature_comp :
   rngl_has_1_neq_0 = true →
   rngl_is_integral = true →
   rngl_characteristic = 0 →
-  ∀ n (σ₁ σ₂ : vector n nat),
-  is_permut_vect σ₁
-  → is_permut_vect σ₂
-  → ε (σ₁ ° σ₂) = (ε σ₁ * ε σ₂)%F.
+  ∀ n (σ₁ σ₂ : vector nat),
+  vect_size σ₂ = n
+  → is_permut_vect n σ₁
+  → is_permut_vect n σ₂
+  → ε n (mk_vect (σ₁ ° σ₂)) = (ε n σ₁ * ε n σ₂)%F.
 Proof.
-intros Hop Hin Hic Hde H10 Hit Hch * Hp1 Hp2.
-now apply signature_comp_fun.
+intros Hop Hin Hic Hde H10 Hit Hch * Hv2 Hp1 Hp2.
+unfold ε.
+rewrite <- signature_comp_fun; try easy.
+unfold comp, "°".
+unfold ε_fun; f_equal.
+apply rngl_product_eq_compat.
+intros i Hi.
+apply rngl_product_eq_compat.
+intros j Hj.
+cbn; unfold comp_list.
+rewrite (List_map_nth' 0); [ | rewrite fold_vect_size; flia Hv2 Hi ].
+rewrite (List_map_nth' 0); [ | rewrite fold_vect_size; flia Hv2 Hj ].
+easy.
 Qed.
-*)
 
 Theorem transposition_involutive : ∀ p q i,
   transposition p q (transposition p q i) = i.
@@ -3564,8 +3574,8 @@ Arguments ε_ws_ε {T}%type {ro rp} _ _ _ _ _ _ _ n%nat p%V.
 Arguments ε_ws_ε_fun {T}%type {ro rp} _ _ _ _ _ _ _ [σ]%function [n]%nat.
 Arguments rngl_product_change_list {T}%type {ro rp} _ [A]%type [la lb]%list
   f%function.
-(*
 Arguments signature_comp {T}%type {ro rp} _ _ _ _ _ _ _ [n]%nat [σ₁ σ₂].
+(*
 Arguments transposition_signature {T}%type {ro rp} _ _ _ _ _ _ _ [n p q]%nat.
 Arguments ε_1_opp_1 {T}%type {ro rp} _ _ _ _ _ _ _ [n]%nat [σ].
 Arguments ε_square {T}%type {ro rp} _ _ _ _ _ _ _ [n]%nat [σ].
