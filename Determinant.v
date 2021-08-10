@@ -871,15 +871,37 @@ erewrite rngl_summation_eq_compat. 2: {
     easy.
   }
   cbn - [ f ].
-...
   replace ({| vect_list := map (mk_canon_sym_gr n k) (seq 0 n) |}) with
-    (mk_vect n (λ i, vect_el (f k) (transposition p q i))). 2: {
-    apply vector_eq.
+    (mk_vect
+       (map (λ i, vect_nat_el (f k) (transposition p q i)) (seq 0 n))). 2: {
+    f_equal.
+    apply map_ext_in.
     intros i Hi; cbn.
-    now rewrite transposition_involutive.
+    apply in_seq in Hi.
+    rewrite (List_map_nth' 0). 2: {
+      rewrite seq_length.
+      rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
+      rewrite map_length, seq_length.
+      now apply transposition_lt.
+    }
+    rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
+    rewrite map_length, seq_length.
+    rewrite seq_nth; [ | now apply transposition_lt ].
+    rewrite Nat.add_0_l.
+    rewrite transposition_involutive.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ | easy ].
+    rewrite seq_nth; [ | easy ].
+    easy.
   }
-  replace (mk_vect n (λ i, vect_el (f k) (transposition p q i))) with
-    (f k ° mk_vect n (transposition p q)) by easy.
+  replace
+    (mk_vect (map (λ i, vect_nat_el (f k) (transposition p q i)) (seq 0 n)))
+  with
+    (mk_vect (f k ° mk_vect (map (λ i, transposition p q i) (seq 0 n)))). 2: {
+    f_equal; cbn.
+    now rewrite map_map.
+  }
+...
   rewrite signature_comp; try easy. {
     subst f; cbn.
     split; cbn. {
