@@ -2228,7 +2228,6 @@ destruct (lt_dec i j) as [H| H]; [ easy | flia Hj H ].
 Qed.
 *)
 
-(*
 Theorem transposition_signature :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -2241,9 +2240,10 @@ Theorem transposition_signature :
   p ≠ q
   → p < n
   → q < n
-  → ε (mk_vect n (transposition p q)) = (-1)%F.
+  → ε n (mk_vect (map (transposition p q) (seq 0 n))) = (-1)%F.
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hpq Hp Hq.
+...
 destruct (lt_dec p q) as [Hpq'| Hpq']. {
   now apply transposition_signature_lt.
 }

@@ -959,32 +959,24 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   cbn.
   split. {
-    intros i Hi.
-...
-    } {
-      intros * Hi Hj Hij.
-      apply permut_elem_injective in Hij; [ | easy | | ]; cycle 1. {
-        now apply transposition_lt.
-      } {
-        now apply transposition_lt.
-      }
-      now apply transposition_injective in Hij.
-    }
-  } {
-    split; cbn. {
-      intros i Hi.
-      now apply transposition_lt.
-    } {
-      intros * Hi Hj Hij.
-      now apply transposition_injective in Hij.
-    }
+    intros i Hi; cbn.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ | easy ].
+    now apply transposition_lt.
   }
+  intros i j Hi Hj Hij; cbn in Hij.
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite seq_nth in Hij; [ | easy ].
+  rewrite seq_nth in Hij; [ | easy ].
+  now apply transposition_injective in Hij.
 }
 cbn - [ f ].
 erewrite rngl_summation_eq_compat. 2: {
   intros k (_, Hk).
-  rewrite (rngl_mul_comm Hic (ε (f k))).
+  rewrite (rngl_mul_comm Hic (ε n (f k))).
   rewrite <- rngl_mul_assoc.
+...
   now rewrite transposition_signature.
 }
 cbn - [ f ].
