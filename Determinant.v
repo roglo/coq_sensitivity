@@ -908,6 +908,29 @@ erewrite rngl_summation_eq_compat. 2: {
     split; cbn. {
       intros i Hi.
       apply permut_ub. {
+        rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
+        rewrite map_length, seq_length.
+        erewrite map_ext_in. 2: {
+          intros j Hj.
+          apply in_seq in Hj.
+          rewrite (List_map_nth' 0). 2: {
+            rewrite seq_length.
+            now apply transposition_lt.
+          }
+          rewrite seq_nth; [ | easy ].
+          rewrite seq_nth; [ | now apply transposition_lt ].
+          now do 2 rewrite Nat.add_0_l.
+        }
+        unfold is_permut.
+        split. {
+          intros j Hj.
+          rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+...
+Print is_permut.
+...
+        rewrite (List_map_nth' []); [ cbn | now rewrite seq_length ].
+cbn.
+        rewrite
 ...
       apply permut_ub; [ now apply sym_gr_elem_is_permut | ].
       now apply transposition_lt.
