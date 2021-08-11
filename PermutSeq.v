@@ -264,6 +264,21 @@ Fixpoint rank_of_permut_in_sym_gr n (f : nat → nat) : nat :=
   end.
 
 
+Theorem rank_of_permut_in_sym_gr_eq_compat : ∀ n f g,
+  (∀ i, i < n → f i = g i)
+  → rank_of_permut_in_sym_gr n f = rank_of_permut_in_sym_gr n g.
+Proof.
+intros * Hfg.
+revert f g Hfg.
+induction n; intros; [ easy | cbn ].
+rewrite Hfg; [ f_equal | flia ].
+apply IHn.
+intros i Hi.
+unfold sub_permut.
+rewrite Hfg; [ f_equal | flia Hi ].
+rewrite Hfg; [ f_equal | flia Hi ].
+Qed.
+
 Definition rank_of_permut_in_sym_gr_vect n (v : vector nat) : nat :=
   rank_of_permut_in_sym_gr n (vect_nat_el v).
 
