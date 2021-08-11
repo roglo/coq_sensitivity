@@ -2119,6 +2119,7 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 cbn - [ "<?" ].
+...
 rewrite (rngl_product_split3 p); [ | flia Hpq Hq ].
 cbn - [ "<?" ].
 assert (Hp : p < n) by now transitivity q.
