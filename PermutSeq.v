@@ -2119,7 +2119,6 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 cbn - [ "<?" ].
-...
 rewrite (rngl_product_split3 p); [ | flia Hpq Hq ].
 cbn - [ "<?" ].
 assert (Hp : p < n) by now transitivity q.
@@ -2140,7 +2139,9 @@ rewrite all_1_rngl_product_1. 2: {
   destruct (Nat.eq_dec j q) as [Hjq| Hjq]; [ flia Hpq Hi | easy ].
 }
 rewrite rngl_mul_1_l.
-destruct (Nat.eq_dec p p) as [H| H]; [ clear H | easy ].
+unfold transposition at 1.
+rewrite Nat.eqb_refl.
+...
 rewrite (rngl_product_split p); [ | flia Hpq Hq ].
 rewrite rngl_product_split_last; [ | flia ].
 erewrite rngl_product_eq_compat. 2: {
