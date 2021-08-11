@@ -2265,7 +2265,29 @@ unfold transposition at 4.
 rewrite Nat.eqb_refl.
 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec q p) as [H| H]; [ flia Hpq H | clear H ].
-Check rngl_product_mul_distr.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  unfold transposition at 1.
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (i - 1) p) as [H| H]; [ flia Hi H | clear H ].
+  destruct (Nat.eq_dec (i - 1) q) as [H| H]; [ flia Hi H | clear H ].
+  rewrite if_ltb_lt_dec.
+  destruct (lt_dec q (i - 1)) as [H| H]; [ flia Hi H | clear H ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    unfold transposition at 1.
+    do 2 rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec (i - 1) p) as [H| H]; [ flia Hi H | clear H ].
+    destruct (Nat.eq_dec (i - 1) q) as [H| H]; [ flia Hi H | clear H ].
+    unfold transposition.
+    do 2 rewrite if_ltb_lt_dec.
+    easy.
+  }
+  cbn.
+  easy.
+}
+cbn - [ "<?" ].
+rewrite rngl_product_mul_distr; [ | easy ].
 ...
 destruct (Nat.eq_dec q q) as [H| H]; [ clear H | easy ].
 rewrite if_eqb_eq_dec.
