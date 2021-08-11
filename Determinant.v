@@ -1053,6 +1053,37 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
         now do 3 rewrite Nat.add_0_l.
       }
       split. {
+        intros j Hj.
+        apply permut_elem_ub; [ easy | ].
+        now apply transposition_lt.
+      } {
+        intros u v Hu Hv Huv.
+        assert (Htu : transposition p q u < n) by now apply transposition_lt.
+        assert (Htv : transposition p q v < n) by now apply transposition_lt.
+        apply permut_elem_injective in Huv; [ | easy | easy | easy ].
+        now apply transposition_injective in Huv.
+      }
+    }
+    rewrite Nat.add_0_l.
+    erewrite rank_of_permut_in_sym_gr_eq_compat. 2: {
+      intros j Hj.
+      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+      rewrite seq_nth; [ | easy ].
+      rewrite (List_map_nth' 0). 2: {
+        rewrite seq_length.
+        now apply transposition_lt.
+      }
+      rewrite seq_nth; [ | easy ].
+      rewrite seq_nth; [ | now apply transposition_lt ].
+      now do 3 rewrite Nat.add_0_l.
+    }
+    rewrite seq_nth. 2: {
+      rewrite seq_nth; [ | easy ].
+      now apply transposition_lt.
+    }
+    rewrite seq_nth; [ | easy ].
+    now do 2 rewrite Nat.add_0_l.
+  }
 ...
     apply rank_of_permut_upper_bound.
 ...
