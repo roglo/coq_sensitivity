@@ -976,7 +976,6 @@ erewrite rngl_summation_eq_compat. 2: {
   intros k (_, Hk).
   rewrite (rngl_mul_comm Hic (ε n (f k))).
   rewrite <- rngl_mul_assoc.
-...
   now rewrite transposition_signature.
 }
 cbn - [ f ].
@@ -985,7 +984,7 @@ rewrite rngl_mul_opp_l; [ | easy ].
 f_equal.
 rewrite rngl_mul_1_l.
 symmetry.
-set (g := λ k, rank_of_permut_in_sym_gr_vect (f k)).
+set (g := λ k, rank_of_permut_in_sym_gr_vect n (f k)).
 rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
   intros k (_, Hk).
   assert (Hkn : k < n!). {
@@ -993,8 +992,60 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
     flia Hk Hn.
   }
   unfold g, f.
+  unfold rank_of_permut_in_sym_gr_vect; cbn.
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    apply rank_of_permut_upper_bound.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ | easy ].
+    rewrite Nat.add_0_l.
+    unfold vect_swap_elem; cbn.
+    unfold vect_nat_el; cbn.
+    rewrite map_seq_length.
+    split. {
+      intros i Hi.
+      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+      rewrite seq_nth; [ | easy ].
+      rewrite Nat.add_0_l.
+      rewrite (List_map_nth' 0). 2: {
+        unfold vect_nat_el.
+        rewrite seq_length.
+        now apply transposition_lt.
+      }
+      rewrite seq_nth; [ | now apply transposition_lt ].
+      rewrite Nat.add_0_l.
+      apply permut_elem_ub; [ easy | now apply transposition_lt ].
+    } {
+      intros i j Hi Hj Hij.
+      assert (Hti : transposition p q i < n) by now apply transposition_lt.
+      assert (Htj : transposition p q j < n) by now apply transposition_lt.
+        rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+      rewrite (List_map_nth' 0) in Hij. 2: {
+        now rewrite seq_length, seq_nth.
+      }
+      rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+      rewrite seq_nth in Hij; [ | now rewrite seq_nth ].
+      rewrite seq_nth in Hij; [ | easy ].
+      rewrite seq_nth in Hij; [ | easy ].
+      cbn in Hij.
+      rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+      rewrite seq_nth in Hij; [ | easy ].
+      cbn in Hij.
+      apply permut_elem_injective in Hij; [ | easy | easy | easy ].
+      now apply transposition_injective in Hij.
+    }
+  }
+...
+    apply rank_of_permut_upper_bound.
+...
   unfold vect_swap_elem; cbn.
   unfold rank_of_permut_in_sym_gr_vect; cbn.
+unfold vect_nat_el; cbn.
+...
+Theorem permut_in_sym_gr_of_its_rank : ∀ n f,
+  is_permut f n
+  → mk_canon_sym_gr n (rank_of_permut_in_sym_gr n f) = f.
+...
   rewrite permut_in_sym_gr_of_its_rank. 2: {
     apply vect_swap_elem_is_permut; [ easy | easy | ].
     now apply sym_gr_elem_is_permut.
