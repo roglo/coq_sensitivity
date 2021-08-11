@@ -2221,6 +2221,13 @@ rewrite all_1_rngl_product_1. 2: {
 rewrite rngl_mul_1_l.
 rewrite all_1_rngl_product_1; [ apply rngl_mul_1_l | ].
 intros i Hi.
+unfold transposition at 1 2.
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (i - 1) p) as [H| H]; [ flia Hi H | clear H ].
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (i - 1) q) as [H| H]; [ flia Hi H | clear H ].
+rewrite if_ltb_lt_dec.
+destruct (lt_dec q (i - 1)) as [H| H]; [ flia Hi H | clear H ].
 ...
 rewrite (all_1_rngl_product_1 (q + 1)). 2: {
   intros i Hi.
