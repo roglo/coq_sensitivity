@@ -731,7 +731,7 @@ intros.
 apply rngl_product_eq_compat.
 intros i Hi.
 rewrite (rngl_product_split i); [ | flia Hi ].
-rewrite all_1_rngl_product_1; [ | easy | ]. 2: {
+rewrite all_1_rngl_product_1. 2: {
   intros j Hj.
   rewrite if_ltb_lt_dec.
   destruct (lt_dec i j) as [H| H]; [ flia Hj H | easy ].
@@ -2160,7 +2160,24 @@ erewrite (rngl_product_eq_compat _ _ _ (p + 1)). 2: {
   easy.
 }
 cbn - [ "<?" ].
-rewrite all_1_rngl_product_1; [ | ].
+rewrite all_1_rngl_product_1. 2: {
+  intros i Hi.
+  apply all_1_rngl_product_1.
+  intros j Hj.
+  destruct (lt_dec (i - 1) j) as [Hij| Hij]; [ | easy ].
+  destruct (Nat.eq_dec j p) as [Hjp| Hjp]. {
+    subst j.
+    destruct (lt_dec (i - 1) q) as [Hiq| Hiq]; [ easy | ].
+    flia Hpq Hij Hiq.
+  }
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
+    subst j.
+    destruct (lt_dec (i - 1) p) as [Hip| Hip]; [ easy | ].
+    flia Hi Hip.
+  }
+  destruct (lt_dec (i - 1) j) as [H| H]; [ easy | flia Hij H ].
+}
 ...
 rewrite all_1_rngl_product_1; [ | easy | easy ].
 rewrite rngl_mul_1_l.
