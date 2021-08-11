@@ -2097,8 +2097,11 @@ rewrite ε_ws_ε; try easy. 2: {
 }
 unfold ε_ws; cbn.
 unfold ε_fun_ws.
+cbn - [ "<?" ].
 unfold sign_diff.
+(*
 unfold transposition.
+*)
 rewrite rngl_product_shift; [ | flia Hq ].
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
@@ -2108,11 +2111,19 @@ erewrite rngl_product_eq_compat. 2: {
     rewrite (Nat.add_comm 1 j), Nat.add_sub.
     rewrite (Nat.add_comm 1 i), Nat.add_sub.
     rewrite Nat_ltb_mono_r.
+    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi Hq ].
+    rewrite seq_nth; [ | flia Hi Hq ].
+    rewrite Nat.add_0_l.
+    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj Hq ].
+    rewrite seq_nth; [ | flia Hj Hq ].
+    rewrite Nat.add_0_l.
     easy.
   }
   easy.
 }
 cbn - [ "<?" ].
+Check rngl_product_split3.
+...
 rewrite (rngl_product_split p); [ | flia Hpq Hq ].
 rewrite rngl_product_split_last; [ | flia ].
 erewrite rngl_product_eq_compat. 2: {

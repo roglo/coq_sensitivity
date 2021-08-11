@@ -99,6 +99,16 @@ apply iter_seq_split; [ | | | easy ]. {
 }
 Qed.
 
+Theorem rngl_product_split3 : ∀ j g b k,
+  b ≤ j ≤ k
+  → ∏ (i = b, k), g i =
+       (∏ (i = S b, j), g (i - 1)%nat * g j * ∏ (i = j + 1, k), g i)%F.
+Proof.
+intros * Hj.
+rewrite rngl_product_split with (j := j); [ | flia Hj ].
+now rewrite rngl_product_split_last.
+Qed.
+
 Theorem rngl_product_eq_compat : ∀ g h b k,
   (∀ i, b ≤ i ≤ k → (g i = h i)%F)
   → (∏ (i = b, k), g i = ∏ (i = b, k), h i)%F.
@@ -519,6 +529,7 @@ Arguments rngl_product_succ_succ {T}%type {ro} (b k)%nat g%function.
 Arguments rngl_product_integral {T}%type {ro rp} _ _ _ (b e)%nat f%function.
 Arguments rngl_product_list_integral {T}%type {ro rp} _ _ _ A%type l%list.
 Arguments rngl_product_split_first {T}%type {ro rp} (b k)%nat g%function.
+Arguments rngl_product_split3 {T}%type {ro rp} j%nat _ (b k)%nat.
 Arguments rngl_product_1_opp_1 {T}%type {ro rp} _ (b e)%nat (f g)%function.
 Arguments rngl_product_permut {T}%type {ro rp} Hic n%nat (l1 l2)%list.
 Arguments rngl_product_only_one {T}%type {ro rp} g%function n%nat.
