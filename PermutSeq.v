@@ -2158,13 +2158,70 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 cbn - [ "<?" ].
+rewrite <- rngl_product_mul_distr; [ | easy ].
 rewrite (rngl_product_split3 q); [ | flia Hpq Hq ].
-unfold transposition at 2.
+unfold transposition at 4.
 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec q p) as [H| H]; [ flia Hpq H | clear H ].
 rewrite Nat.eqb_refl.
 rewrite if_ltb_lt_dec.
 destruct (lt_dec q p) as [H| H]; [ flia Hpq H | clear H ].
+rewrite <- rngl_mul_assoc.
+rewrite rngl_mul_comm; [ | easy ].
+unfold transposition at 1.
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec q p) as [H| H]; [ flia Hpq H | clear H ].
+rewrite Nat.eqb_refl.
+rewrite (rngl_product_split3 q); [ | flia Hpq Hq ].
+rewrite if_ltb_lt_dec.
+destruct (lt_dec q q) as [H| H]; [ flia H | clear H ].
+rewrite rngl_mul_1_r.
+rewrite all_1_rngl_product_1. 2: {
+  intros i Hi.
+  rewrite if_ltb_lt_dec.
+  destruct (lt_dec q (i - 1)) as [H| H]; [ flia Hi H | easy ].
+}
+rewrite rngl_mul_1_l.
+do 2 rewrite <- rngl_mul_assoc.
+rewrite rngl_mul_comm; [ | easy ].
+rewrite rngl_mul_assoc.
+rewrite <- rngl_product_mul_distr; [ | easy ].
+rewrite all_1_rngl_product_1. 2: {
+  intros i Hi.
+  rewrite if_ltb_lt_dec.
+  destruct (lt_dec q i) as [H| H]; [ clear H | flia Hi H ].
+  rewrite rngl_mul_assoc.
+  unfold transposition at 1 2.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i p) as [H| H]; [ flia Hpq Hi H | clear H ].
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i q) as [H| H]; [ flia Hi H | clear H ].
+  do 2 rewrite if_ltb_lt_dec.
+  destruct (lt_dec p i) as [H| H]; [ clear H | flia Hpq Hi H ].
+  rewrite rngl_mul_1_l.
+  destruct (lt_dec q i) as [H| H]; [ clear H | flia Hi H ].
+  rewrite rngl_mul_1_l.
+  unfold transposition at 1.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i p) as [H| H]; [ flia Hpq Hi H | clear H ].
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i q) as [H| H]; [ flia Hi H | clear H ].
+  apply all_1_rngl_product_1.
+  intros j Hj.
+  rewrite if_ltb_lt_dec.
+  destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
+  unfold transposition.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec j p) as [H| H]; [ flia Hpq Hi Hij H | clear H ].
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec j q) as [H| H]; [ flia Hpq Hi Hij H | clear H ].
+  rewrite if_ltb_lt_dec.
+  now destruct (lt_dec i j).
+}
+rewrite rngl_mul_1_l.
+rewrite all_1_rngl_product_1; [ apply rngl_mul_1_l | ].
+intros i Hi.
+...
 rewrite (all_1_rngl_product_1 (q + 1)). 2: {
   intros i Hi.
   unfold transposition.
@@ -2256,7 +2313,6 @@ rewrite (all_1_rngl_product_1 (q + 1)). 2: {
 }
 rewrite rngl_mul_1_r.
 ...
-
 unfold transposition at 4.
 rewrite Nat.eqb_refl.
 rewrite if_eqb_eq_dec.
