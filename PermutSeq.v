@@ -2160,39 +2160,8 @@ erewrite (rngl_product_eq_compat _ _ _ (p + 1)). 2: {
   easy.
 }
 cbn - [ "<?" ].
+rewrite all_1_rngl_product_1; [ | ].
 ...
-    destruct (Nat.eq_dec j p) as [Hjp| Hjp].
-    destruct (lt_dec (i - 1) j) as [Hij| Hij]; [ | easy ].
-    cbn.
-...
-    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi Hpq Hq ].
-    rewrite seq_nth; [ | flia Hi Hpq Hq ].
-    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj Hq ].
-    rewrite seq_nth; [ | flia Hj Hq ].
-    do 2 rewrite Nat.add_0_l.
-    do 3 rewrite if_eqb_eq_dec.
-    destruct (Nat.eq_dec j p) as [Hjp| Hjp]. {
-      subst j.
-      destruct (lt_dec (i - 1) p) as [Hij| Hij]; [ | flia Hi Hij ].
-      destruct (Nat.eq_dec (i - 1) p) as [Hip'| Hip']. {
-        destruct (lt_dec q q) as [H| H]; [ flia H | clear H ].
-        easy.
-      }
-      destruct (Nat.eq_dec (i - 1) q) as [Hiq''| Hiq'']. {
-      destruct (lt_dec (i - 1) p) as [Hip'| Hip']; [ | flia Hpq Hjp Hij Hiq' ].
-      easy.
-    }
-    cbn.
-    destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
-      destruct (lt_dec (i - 1) p) as [Hip'| Hip']; [ | flia Hi Hip' ].
-      now destruct (lt_dec (i - 1) j).
-    }
-    now destruct (lt_dec (i - 1) j).
-  }
-  cbn.
-  now rewrite all_1_rngl_product_1.
-}
-cbn - [ "<?" ].
 rewrite all_1_rngl_product_1; [ | easy | easy ].
 rewrite rngl_mul_1_l.
 destruct (Nat.eq_dec p p) as [H| H]; [ clear H | easy ].

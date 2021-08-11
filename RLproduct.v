@@ -506,21 +506,18 @@ Qed.
 
 End a.
 
-Arguments rngl_product_div_distr {T}%type {ro rp} _ _ _ _ _ (b e)%nat
-  (f g)%function.
+Arguments all_1_rngl_product_1 {T}%type {ro rp} (b e)%nat.
+Arguments rngl_product_div_distr {T}%type {ro rp} _ _ _ _ _ (b e)%nat.
 Arguments rngl_inv_product {T}%type {ro rp} _ _ _ _ (b e)%nat f.
 Arguments rngl_inv_product_comm {T}%type {ro rp} _ _ _ _ _ (b e)%nat f.
-Arguments rngl_inv_product_list {T}%type {ro rp} _ _ _ _ {A}%type l%list
-  (f _)%function.
-Arguments rngl_product_list_mul_distr {T}%type {ro rp} _ A%type
-  (g h)%function l%list.
-Arguments rngl_product_list_permut {T}%type {ro rp} _ A%type (l1 l2)%list
-  _%function.
+Arguments rngl_inv_product_list {T}%type {ro rp} _ _ _ _ {A}%type l%list.
+Arguments rngl_product_list_mul_distr {T}%type {ro rp} _ A%type.
+Arguments rngl_product_list_permut {T}%type {ro rp} _ A%type (l1 l2)%list.
 Arguments rngl_product_mul_distr {T}%type {ro rp} _ (g h)%function (b k)%nat.
 Arguments rngl_product_split {T}%type {ro rp} j%nat g%function (b k)%nat.
 Arguments rngl_product_succ_succ {T}%type {ro} (b k)%nat g%function.
 Arguments rngl_product_integral {T}%type {ro rp} _ _ _ (b e)%nat f%function.
-Arguments rngl_product_list_integral {T}%type {ro rp} _ _ _ A%type l%list f%function.
+Arguments rngl_product_list_integral {T}%type {ro rp} _ _ _ A%type l%list.
 Arguments rngl_product_split_first {T}%type {ro rp} (b k)%nat g%function.
 Arguments rngl_product_1_opp_1 {T}%type {ro rp} _ (b e)%nat (f g)%function.
 Arguments rngl_product_permut {T}%type {ro rp} Hic n%nat (l1 l2)%list.
