@@ -1002,8 +1002,8 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
     unfold vect_swap_elem; cbn.
     unfold vect_nat_el; cbn.
     rewrite map_seq_length.
-    split. {
-      intros i Hi.
+    eapply is_permut_eq_compat. {
+      intros i Hi; symmetry.
       rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
       rewrite seq_nth; [ | easy ].
       rewrite Nat.add_0_l.
@@ -1013,24 +1013,15 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
         now apply transposition_lt.
       }
       rewrite seq_nth; [ | now apply transposition_lt ].
-      rewrite Nat.add_0_l.
+      now rewrite Nat.add_0_l.
+    }
+    split. {
+      intros i Hi.
       apply permut_elem_ub; [ easy | now apply transposition_lt ].
     } {
       intros i j Hi Hj Hij.
       assert (Hti : transposition p q i < n) by now apply transposition_lt.
       assert (Htj : transposition p q j < n) by now apply transposition_lt.
-        rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-      rewrite (List_map_nth' 0) in Hij. 2: {
-        now rewrite seq_length, seq_nth.
-      }
-      rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-      rewrite seq_nth in Hij; [ | now rewrite seq_nth ].
-      rewrite seq_nth in Hij; [ | easy ].
-      rewrite seq_nth in Hij; [ | easy ].
-      cbn in Hij.
-      rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-      rewrite seq_nth in Hij; [ | easy ].
-      cbn in Hij.
       apply permut_elem_injective in Hij; [ | easy | easy | easy ].
       now apply transposition_injective in Hij.
     }
@@ -1049,37 +1040,19 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
     }
     rewrite seq_nth. 2: {
       apply rank_of_permut_upper_bound.
-...
-Print is_permut.
-Theorem is_permut_eq_compat : ∀ n f g,
-  (∀ i, i < n → f i = g i)
-  → is_permut f n
-  → is_permut g n.
-Proof.
-intros * Hfg (H1, H2).
-split. {
-  intros i Hi.
-  rewrite <- Hfg; [ now apply H1 | easy ].
-} {
-  intros i j Hi Hj Hgij.
-  apply H2; [ easy | easy | ].
-  rewrite Hfg; [ | easy ].
-  now rewrite Hfg.
-}
-Qed.
-...
-eapply is_permut_eq_compat. {
-  intros j Hj; symmetry.
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  rewrite seq_nth; [ | easy ].
-  rewrite (List_map_nth' 0). 2: {
-    rewrite seq_length.
-    now apply transposition_lt.
-  }
-  rewrite seq_nth; [ | easy ].
-  rewrite seq_nth; [ | now apply transposition_lt ].
-  now do 2 rewrite Nat.add_0_l.
-}
+      eapply is_permut_eq_compat. {
+        intros j Hj; symmetry.
+        rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+        rewrite seq_nth; [ | easy ].
+        rewrite (List_map_nth' 0). 2: {
+          rewrite seq_length.
+          now apply transposition_lt.
+        }
+        rewrite seq_nth; [ | easy ].
+        rewrite seq_nth; [ | now apply transposition_lt ].
+        now do 3 rewrite Nat.add_0_l.
+      }
+      split. {
 ...
     apply rank_of_permut_upper_bound.
 ...

@@ -64,6 +64,23 @@ Definition vect_swap_elem (v : vector nat) i j :=
     (map (λ k, vect_nat_el v (transposition i j k))
        (seq 0 (length (vect_list v)))).
 
+Theorem is_permut_eq_compat : ∀ n f g,
+  (∀ i, i < n → f i = g i)
+  → is_permut f n
+  → is_permut g n.
+Proof.
+intros * Hfg (H1, H2).
+split. {
+  intros i Hi.
+  rewrite <- Hfg; [ now apply H1 | easy ].
+} {
+  intros i j Hi Hj Hgij.
+  apply H2; [ easy | easy | ].
+  rewrite Hfg; [ | easy ].
+  now rewrite Hfg.
+}
+Qed.
+
 Theorem permut_ub : ∀ n f i,
   is_permut f n → i < n → f i < n.
 Proof.
