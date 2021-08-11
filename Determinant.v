@@ -1035,6 +1035,40 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
       now apply transposition_injective in Hij.
     }
   }
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  unfold vect_swap_elem; cbn.
+  do 2 rewrite map_seq_length.
+  unfold vect_nat_el; cbn.
+Search rank_of_permut_in_sym_gr.
+Print rank_of_permut_in_sym_gr.
+Print sub_permut.
+Theorem rank_of_permut_in_sym_gr_eq_compat : ∀ n f g,
+  (∀ i, i < n → f i = g i)
+  → rank_of_permut_in_sym_gr n f = rank_of_permut_in_sym_gr n g.
+Proof.
+intros * Hfg.
+revert f g Hfg.
+induction n; intros; [ easy | cbn ].
+rewrite Hfg; [ f_equal | flia ].
+apply IHn.
+intros i Hi.
+unfold sub_permut.
+rewrite Hfg; [ f_equal | flia Hi ].
+rewrite Hfg; [ f_equal | flia Hi ].
+Qed.
+erewrite rank_of_permut_in_sym_gr_eq_compat. 2: {
+  intros i Hi.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    rewrite seq_nth; [ | easy ].
+    now apply transposition_lt.
+  }
+  rewrite seq_nth.
+2: {
+    apply rank_of_permut_upper_bound.
+Print is_permut.
+Theorem is_permut_eq_compat.
 ...
     apply rank_of_permut_upper_bound.
 ...
