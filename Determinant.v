@@ -1170,6 +1170,9 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
       easy.
     }
     symmetry in Hij.
+Search (rank_of_permut_in_sym_gr _ _ = rank_of_permut_in_sym_gr _ _).
+...
+Search (mk_canon_sym_gr _ _ _ = mk_canon_sym_gr _ _ _).
 ...
     specialize (is_permut_mk_canon_transp Hi Hp Hq) as Hf.
     specialize (is_permut_mk_canon_transp Hj Hp Hq) as Hg.
