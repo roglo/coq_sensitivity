@@ -280,7 +280,6 @@ Fixpoint rank_of_permut_in_sym_gr n (f : nat → nat) : nat :=
   | S n' => f 0 * n'! + rank_of_permut_in_sym_gr n' (sub_permut f)
   end.
 
-
 Theorem rank_of_permut_in_sym_gr_eq_compat : ∀ n f g,
   (∀ i, i < n → f i = g i)
   → rank_of_permut_in_sym_gr n f = rank_of_permut_in_sym_gr n g.
