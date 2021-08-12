@@ -71,22 +71,6 @@ f_equal. {
 }
 Qed.
 
-(*
-Theorem matrix_eq : ∀ T (MA MB : matrix T),
-  (Forall2 (Forall2 eq) (mat_list_list MA) (mat_list_list MB))
-  → MA = MB.
-Proof.
-intros * Hab.
-destruct MA as (lla).
-destruct MB as (llb).
-cbn in Hab; f_equal.
-induction Hab; [ easy | ].
-subst l'; f_equal.
-induction H; [ easy | ].
-now subst x l0.
-Qed.
-*)
-
 Definition mat_of_list_list {T} (l : list (list T)) : matrix T :=
   mk_mat l.
 
@@ -98,48 +82,6 @@ Definition mat_ncols {T} (M : matrix T) := length (hd [] (mat_list_list M)).
 
 Definition mat_el {T} {ro : ring_like_op T} (M : matrix T) i j :=
   nth j (nth i (mat_list_list M) []) 0%F.
-
-(*
-Theorem vector_eq {T} (U V : vector T) :
-  (∀ i, nth_error (vect_list U) i = nth_error (vect_list V) i)
-  → U = V.
-Proof.
-*)
-
-(*
-Theorem matrix_neq : ∀ m n T (MA MB : matrix m n T),
-  ¬ (∀ i j, mat_el MA i j = mat_el MB i j)
-  → MA ≠ MB.
-Proof.
-intros * Hab.
-intros H.
-subst MB.
-now apply Hab.
-Qed.
-*)
-
-(*
-Definition list_list_nrows T (ll : list (list T)) :=
-  length ll.
-
-Definition list_list_ncols T (ll : list (list T)) :=
-  length (hd [] ll).
-
-Definition list_list_of_mat m n T (M : matrix m n T) : list (list T) :=
-  map (λ i, map (mat_el M i) (Fin_seq 0 n)) (Fin_seq 0 m).
-
-Definition list_list_el m n T d (ll : list (list T))
-    (i : Fin.t m) (j : Fin.t n) : T :=
-  nth (proj1_sig (Fin.to_nat j)) (nth (proj1_sig (Fin.to_nat i)) ll []) d.
-
-Definition mat_of_list_list T d (ll : list (list T)) :
-  matrix (list_list_nrows ll) (list_list_ncols ll) T :=
-  mk_mat (list_list_el d ll).
-*)
-
-(*
-Compute (list_list_of_mat (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
-*)
 
 Theorem fold_mat_nrows {T} : ∀ (M : matrix T),
   length (mat_list_list M) = mat_nrows M.
