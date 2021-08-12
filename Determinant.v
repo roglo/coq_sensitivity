@@ -1105,30 +1105,6 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
     intros i Hi.
     now rewrite transposition_involutive.
   }
-Search rank_of_permut_in_sym_gr.
-...
-      eapply is_permut_eq_compat. {
-        intros j Hj.
-Search (mk_canon_sym_gr _ _ (transposition _ _ _)).
-...
-    apply rank_of_permut_upper_bound.
-...
-  unfold vect_swap_elem; cbn.
-  unfold rank_of_permut_in_sym_gr_vect; cbn.
-unfold vect_nat_el; cbn.
-...
-Theorem permut_in_sym_gr_of_its_rank : ∀ n f,
-  is_permut f n
-  → mk_canon_sym_gr n (rank_of_permut_in_sym_gr n f) = f.
-...
-  rewrite permut_in_sym_gr_of_its_rank. 2: {
-    apply vect_swap_elem_is_permut; [ easy | easy | ].
-    now apply sym_gr_elem_is_permut.
-  }
-...
-  rewrite transposition_involutive.
-...
-  rewrite vect_swap_elem_involutive.
   now apply rank_of_permut_of_rank.
 }
 rewrite Nat.sub_0_r.
@@ -1140,6 +1116,9 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
   split. {
     intros i Hi.
     apply rank_of_permut_upper_bound.
+Check vect_swap_elem_is_permut.
+Print swap_elem.
+...
     apply vect_swap_elem_is_permut; [ easy | easy | ].
     now apply sym_gr_elem_is_permut.
   } {
