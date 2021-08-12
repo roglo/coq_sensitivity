@@ -325,20 +325,6 @@ Compute (mat_mul nat_ring_like_op (mat_of_list_list [[2;3;5]; [3;8;17]]) (mat_of
      = {| mat_list_list := [[105; 119; 60; 20]; [266; 321; 164; 49]] |}
 *)
 
-(*
-Fixpoint mul_row_mat (ncols : nat) cnt k MB (MA_row : list T) :=
-  match cnt with
-  | 0 => []
-  | S cnt' =>
-      ∑ (j = 0, ncols - 1), nth j MA_row 0 * mat_el MB j k ::
-      mul_row_mat ncols cnt' (S k) MB MA_row
-  end.
-
-Definition mat_mul (MA : matrix T) (MB : matrix T) : matrix T :=
-  mk_mat (map (mul_row_mat (mat_ncols MA) (mat_ncols MB) 0 MB)
-    (mat_list_list MA)).
-*)
-
 (* opposite *)
 
 Definition mat_opp (M : matrix T) : matrix T :=
