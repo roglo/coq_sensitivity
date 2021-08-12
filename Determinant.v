@@ -704,6 +704,26 @@ split. {
 }
 Qed.
 
+Theorem is_permut_mk_canon_transp : ∀ n k p q,
+  k < n!
+  → p < n
+  → q < n
+  → is_permut (λ j : nat, mk_canon_sym_gr n k (transposition p q j)) n.
+Proof.
+intros * Hkn Hpn Hqn.
+split. {
+  intros j Hj.
+  apply permut_elem_ub; [ easy | ].
+  now apply transposition_lt.
+} {
+  intros u v Hu Hv Huv.
+  assert (Htu : transposition p q u < n) by now apply transposition_lt.
+  assert (Htv : transposition p q v < n) by now apply transposition_lt.
+  apply permut_elem_injective in Huv; [ | easy | easy | easy ].
+  now apply transposition_injective in Huv.
+}
+Qed.
+
 Theorem determinant_alternating :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -1052,17 +1072,7 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
         rewrite seq_nth; [ | now apply transposition_lt ].
         now do 3 rewrite Nat.add_0_l.
       }
-      split. {
-        intros j Hj.
-        apply permut_elem_ub; [ easy | ].
-        now apply transposition_lt.
-      } {
-        intros u v Hu Hv Huv.
-        assert (Htu : transposition p q u < n) by now apply transposition_lt.
-        assert (Htv : transposition p q v < n) by now apply transposition_lt.
-        apply permut_elem_injective in Huv; [ | easy | easy | easy ].
-        now apply transposition_injective in Huv.
-      }
+      now apply is_permut_mk_canon_transp.
     }
     rewrite Nat.add_0_l.
     erewrite rank_of_permut_in_sym_gr_eq_compat. 2: {
@@ -1084,6 +1094,22 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
     rewrite seq_nth; [ | easy ].
     now do 2 rewrite Nat.add_0_l.
   }
+  erewrite rank_of_permut_in_sym_gr_eq_compat. 2: {
+    intros i Hi.
+    rewrite permut_in_sym_gr_of_its_rank; [ easy | | ]. 2: {
+      now apply transposition_lt.
+    }
+    now apply is_permut_mk_canon_transp.
+  }
+  erewrite rank_of_permut_in_sym_gr_eq_compat. 2: {
+    intros i Hi.
+    now rewrite transposition_involutive.
+  }
+Search rank_of_permut_in_sym_gr.
+...
+      eapply is_permut_eq_compat. {
+        intros j Hj.
+Search (mk_canon_sym_gr _ _ (transposition _ _ _)).
 ...
     apply rank_of_permut_upper_bound.
 ...
