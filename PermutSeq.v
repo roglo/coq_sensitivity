@@ -718,20 +718,19 @@ destruct (le_dec (k / n!) x) as [H| H]; [ | easy ].
 flia Hkc H.
 Qed.
 
-(*
 Theorem rank_of_permut_injective : ∀ n f g,
   is_permut f n
   → is_permut g n
   → rank_of_permut_in_sym_gr n f = rank_of_permut_in_sym_gr n g
-  → f = g.
+  → ∀ i, i < n → f i = g i.
 Proof.
-intros * Hσ₁ Hσ₂ Hσσ.
+intros * Hσ₁ Hσ₂ Hσσ i Hi.
 apply (f_equal (mk_canon_sym_gr n)) in Hσσ.
-rewrite permut_in_sym_gr_of_its_rank in Hσσ; [ | easy ].
-rewrite permut_in_sym_gr_of_its_rank in Hσσ; [ | easy ].
+apply (f_equal (λ f, f i)) in Hσσ.
+rewrite permut_in_sym_gr_of_its_rank in Hσσ; [ | easy | easy ].
+rewrite permut_in_sym_gr_of_its_rank in Hσσ; [ | easy | easy ].
 easy.
 Qed.
-*)
 
 (* signatures *)
 

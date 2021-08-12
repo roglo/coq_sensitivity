@@ -1139,6 +1139,62 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
     now apply is_permut_mk_canon_transp.
   } {
     intros i j Hi Hj Hij.
+    unfold rank_of_permut_in_sym_gr_vect in Hij.
+    unfold vect_nat_el in Hij.
+    cbn in Hij.
+    erewrite rank_of_permut_in_sym_gr_eq_compat in Hij. 2: {
+      intros u Hu.
+      rewrite (List_map_nth' 0); [ | now rewrite map_seq_length, seq_length ].
+      rewrite map_seq_length.
+      rewrite seq_nth; [ cbn | easy ].
+      rewrite (List_map_nth' 0). 2: {
+        rewrite seq_length.
+        now apply transposition_lt.
+      }
+      rewrite seq_nth; [ cbn | now apply transposition_lt ].
+      easy.
+    }
+    symmetry in Hij.
+    erewrite rank_of_permut_in_sym_gr_eq_compat in Hij. 2: {
+      intros u Hu.
+      rewrite (List_map_nth' 0); [ | now rewrite map_seq_length, seq_length ].
+      rewrite map_seq_length.
+      rewrite seq_nth; [ cbn | easy ].
+      rewrite (List_map_nth' 0). 2: {
+        rewrite seq_length.
+        now apply transposition_lt.
+      }
+      rewrite seq_nth; [ cbn | now apply transposition_lt ].
+      easy.
+    }
+    symmetry in Hij.
+    specialize (is_permut_mk_canon_transp Hi Hp Hq) as Hf.
+    specialize (is_permut_mk_canon_transp Hj Hp Hq) as Hg.
+    specialize (rank_of_permut_injective Hf Hg Hij) as H1.
+    cbn in H1.
+    erewrite rank_of_permut_in_sym_gr_eq_compat in Hij. 2: {
+      intros u Hu.
+      rewrite H1; [ | easy ].
+      easy.
+    }
+...
+Search (rank_of_permut_in_sym_gr _ _ = rank_of_permut_in_sym_gr _ _).
+    specialize (H1 u) as Hu1.
+eapply permut_elem_injective with (n := n) (k := p).
+...
+    specialize (H1 p Hp) as Hp1.
+    specialize (H1 q Hq) as Hq1.
+    rewrite transposition_1 in Hp1.
+    rewrite transposition_2 in Hq1.
+eapply permut_elem_injective with (n := n) (k := p).
+Search (rank_of_permut_in_sym_gr _ _ = rank_of_permut_in_sym_gr _ _).
+Search (mk_canon_sym_gr _ _ _ = mk_canon_sym_gr _ _ _).
+...
+Search (is_permut (λ _, mk_canon_sym_gr _ _ _)).
+specialize (H1 _ _ (is_permut_mk_canon_transp
+...
+    apply rank_of_permut_injective with (i := p) in Hij.
+    cbn in Hij.
 ...
 Check vect_swap_elem_is_permut.
 Print swap_elem.
