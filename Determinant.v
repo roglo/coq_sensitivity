@@ -1170,10 +1170,13 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
       easy.
     }
     symmetry in Hij.
+...
     specialize (is_permut_mk_canon_transp Hi Hp Hq) as Hf.
     specialize (is_permut_mk_canon_transp Hj Hp Hq) as Hg.
     specialize (rank_of_permut_injective Hf Hg Hij) as H1.
     cbn in H1.
+Search (mk_canon_sym_gr _ _ _ = mk_canon_sym_gr _ _ _).
+...
     specialize permut_elem_injective as H2.
     specialize (H2 n i).
 specialize (H2 (transposition p q i)).
@@ -1261,6 +1264,10 @@ apply rngl_product_eq_compat.
 intros i Hi.
 now rewrite Nat.add_comm, Nat.add_sub.
 Qed.
+
+...
+
+Search (mk_canon_sym_gr _ _ _ = mk_canon_sym_gr _ _ _).
 
 ...
 
