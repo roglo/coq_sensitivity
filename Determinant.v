@@ -1113,11 +1113,38 @@ rewrite Nat.sub_succ, Nat.sub_0_r.
 rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
   apply permut_fun_Permutation.
   unfold g, f.
+  eapply is_permut_eq_compat. {
+    intros j Hj; symmetry; cbn.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ cbn | easy ].
+    easy.
+  }
   split. {
     intros i Hi.
     apply rank_of_permut_upper_bound.
+    eapply is_permut_eq_compat. {
+      intros j Hj; symmetry; cbn.
+      rewrite (List_map_nth' 0). 2: {
+        rewrite seq_length.
+        now cbn; rewrite map_seq_length.
+      }
+      rewrite seq_nth; [ | now rewrite map_seq_length ].
+      rewrite (List_map_nth' 0). 2: {
+        rewrite seq_length.
+        now apply transposition_lt.
+      }
+      rewrite seq_nth; [ cbn | now apply transposition_lt ].
+      easy.
+    }
+    now apply is_permut_mk_canon_transp.
+  } {
+    intros i j Hi Hj Hij.
+...
 Check vect_swap_elem_is_permut.
 Print swap_elem.
+Search (_ → is_permut _ _).
+unfold vect_nat_el.
+cbn.
 ...
     apply vect_swap_elem_is_permut; [ easy | easy | ].
     now apply sym_gr_elem_is_permut.
