@@ -1121,14 +1121,13 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
   }
   split. {
     intros i Hi.
-    apply rank_of_permut_upper_bound.
-    eapply is_permut_eq_compat. {
-      intros j Hj; symmetry; cbn.
-      rewrite (List_map_nth' 0). 2: {
-        rewrite seq_length.
-        now cbn; rewrite map_seq_length.
-      }
-      rewrite seq_nth; [ | now rewrite map_seq_length ].
+    unfold rank_of_permut_in_sym_gr_vect.
+    unfold vect_nat_el; cbn.
+    erewrite rank_of_permut_in_sym_gr_eq_compat. 2: {
+      intros u Hu.
+      rewrite (List_map_nth' 0); [ | now rewrite map_seq_length, seq_length ].
+      rewrite map_seq_length.
+      rewrite seq_nth; [ cbn | easy ].
       rewrite (List_map_nth' 0). 2: {
         rewrite seq_length.
         now apply transposition_lt.
@@ -1136,9 +1135,12 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
       rewrite seq_nth; [ cbn | now apply transposition_lt ].
       easy.
     }
+    apply rank_of_permut_upper_bound.
     now apply is_permut_mk_canon_transp.
   } {
     intros i j Hi Hj Hij.
+    unfold vect_swap_elem in Hij.
+    cbn in Hij.
     unfold rank_of_permut_in_sym_gr_vect in Hij.
     unfold vect_nat_el in Hij.
     cbn in Hij.
@@ -1172,6 +1174,20 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
     specialize (is_permut_mk_canon_transp Hj Hp Hq) as Hg.
     specialize (rank_of_permut_injective Hf Hg Hij) as H1.
     cbn in H1.
+    specialize permut_elem_injective as H2.
+    specialize (H2 n i).
+specialize (H2 (transposition p q i)).
+specialize (H1 p Hp) as Hp1.
+specialize (H1 q Hq) as Hq1.
+    rewrite transposition_1 in Hp1.
+    rewrite transposition_2 in Hq1.
+Search (mk_canon_sym_gr _ _ _ = mk_canon_sym_gr _ _ _).
+...
+apply permut_elem_injective in Hp1.
+...
+eapply permut_elem_injective with (n := n!).
+Search (rank_of_permut_in_sym_gr _ _ = rank_of_permut_in_sym_gr _ _).
+...
     erewrite rank_of_permut_in_sym_gr_eq_compat in Hij. 2: {
       intros u Hu.
       rewrite H1; [ | easy ].
