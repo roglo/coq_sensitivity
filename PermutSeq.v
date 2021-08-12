@@ -392,14 +392,11 @@ rewrite if_leb_le_dec.
 destruct (le_dec (k / n!) x) as [H| H]; [ | easy ].
 assert (H1 : k / n! = x) by flia Hkc H; clear Hkc H.
 subst x.
-destruct n; [ easy | ].
-cbn - [ fact ] in Hx.
-Print sym_gr_fun.
-...
 specialize permut_elem_ub as H1.
 specialize (H1 n (k mod n!) i).
 assert (H : k mod n! < n!) by apply Nat.mod_upper_bound, fact_neq_0.
 specialize (H1 H Hi); clear H.
+...
 rewrite Hx in H1.
 exfalso; apply Nat.nle_gt in H1; apply H1; clear H1.
 ...
