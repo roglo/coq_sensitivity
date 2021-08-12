@@ -306,7 +306,6 @@ Theorem fold_rank_of_permut_in_sym_gr_vect' : ∀ n f,
 Proof. easy. Qed.
 *)
 
-(*
 Theorem rank_of_permut_of_rank : ∀ n k,
   k < n!
   → rank_of_permut_in_sym_gr n (mk_canon_sym_gr n k) = k.
