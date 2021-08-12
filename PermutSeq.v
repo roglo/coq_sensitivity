@@ -336,115 +336,6 @@ apply Nat.div_lt_upper_bound; [ | easy ].
 apply fact_neq_0.
 Qed.
 
-Theorem rank_of_permut_of_rank : ∀ n k,
-  k < n!
-  → rank_of_permut_in_sym_gr n (mk_canon_sym_gr n k) = k.
-Proof.
-intros * Hkn.
-revert k Hkn.
-induction n; intros; [ now apply Nat.lt_1_r in Hkn | cbn ].
-specialize (Nat.div_mod k (fact n) (fact_neq_0 _)) as H1.
-rewrite Nat.mul_comm in H1.
-replace (k / fact n * fact n) with (k - k mod fact n) by flia H1.
-rewrite <- Nat.add_sub_swap; [ | apply Nat.mod_le, fact_neq_0 ].
-apply Nat.add_sub_eq_r; f_equal.
-clear H1.
-rewrite <- (IHn (k mod fact n)) at 1. 2: {
-  apply Nat.mod_upper_bound, fact_neq_0.
-}
-apply rank_of_permut_in_sym_gr_eq_compat.
-intros i Hi; cbn.
-symmetry.
-apply Nat.add_sub_eq_r.
-f_equal.
-rewrite Nat.add_comm.
-unfold Nat.b2n.
-rewrite if_leb_le_dec.
-destruct (le_dec (k / n!) (mk_canon_sym_gr n (k mod n!) i)) as [Hkc| Hkc]. {
-  cbn.
-  rewrite if_leb_le_dec.
-  now destruct (le_dec (k / n!) (mk_canon_sym_gr n (k mod n!) i)).
-}
-cbn.
-(*
-...
-apply (fin_fun_ext (n := n)).
-intros i Hi; cbn.
-symmetry.
-apply Nat.add_sub_eq_r.
-f_equal.
-remember (Nat.b2n (_ <=? _)) as b eqn:Hb.
-rewrite Nat.add_comm.
-symmetry in Hb.
-destruct b. 2: {
-  cbn.
-  destruct b; [ easy | exfalso ].
-  unfold Nat.b2n in Hb.
-  destruct (k / fact n <=? _); flia Hb.
-}
-cbn.
-*)
-remember (mk_canon_sym_gr n _ i) as x eqn:Hx.
-symmetry in Hx.
-destruct x; [ easy | ].
-rewrite if_leb_le_dec.
-destruct (le_dec (k / n!) x) as [H| H]; [ | easy ].
-apply Nat.nle_gt in Hkc.
-assert (H1 : k / n! = x) by flia Hkc H; clear Hkc H.
-subst x.
-destruct n; [ easy | ].
-cbn - [ fact ] in Hx.
-destruct n. {
-  rewrite Nat.div_1_r in Hx.
-  cbn in Hx.
-  now apply Nat.lt_1_r in Hi; subst i.
-}
-cbn - [ fact ] in Hx.
-destruct n. {
-  cbn - [ "/" "mod" ] in Hx.
-  destruct i. {
-    cbn - [ "/" "mod" ] in Hx.
-    rewrite Nat.div_1_r in Hx.
-    destruct k; [ easy | ].
-    destruct k; cbn in Hx.
-...
-specialize permut_elem_ub as H1.
-specialize (H1 n (k mod n!) i).
-assert (H : k mod n! < n!) by apply Nat.mod_upper_bound, fact_neq_0.
-specialize (H1 H Hi); clear H.
-...
-rewrite Hx in H1.
-exfalso; apply Nat.nle_gt in H1; apply H1; clear H1.
-...
-destruct n; [ easy | ].
-specialize permut_elem_ub as H1.
-specialize (H1 (S n) k).
-...
-destruct n; [ easy | ].
-cbn - [ fact ] in Hx.
-destruct i. {
-  cbn - [ fact ] in Hx.
-  specialize (Nat.div_mod k (S n)!) as H2.
-  specialize (H2 (fact_neq_0 _)).
-  rewrite H1 in H2.
-(*
-unfold Nat.b2n in Hb |-*.
-*)
-...
-remember (k / fact n) as y eqn:Hy; symmetry in Hy.
-remember (y <=? S x) as c eqn:Hc; symmetry in Hc.
-apply Nat.leb_nle in Hkc.
-rewrite Hkc in Hc.
-destruct c; [ easy | clear Hb ].
-apply Nat.leb_gt in Hc.
-apply Nat.leb_gt in Hc.
-remember (y <=? x) as b eqn:Hb.
-symmetry in Hb.
-destruct b; [ | easy ].
-apply Nat.leb_le in Hb.
-flia Hb Hc.
-Qed.
-
 (*
 Theorem sym_gr_elem_injective : ∀ n i j,
   i < fact n
@@ -786,6 +677,144 @@ destruct (le_dec (f 0) (mk_canon_sym_gr n k i)) as [Hb| Hb]. {
   destruct (lt_dec (f 0) (f (S i))) as [Hzi| Hzi]; [ | apply Nat.sub_0_r ].
   flia Hzi Hb.
 }
+Qed.
+
+Theorem rank_of_permut_of_rank : ∀ n k,
+  k < n!
+  → rank_of_permut_in_sym_gr n (mk_canon_sym_gr n k) = k.
+Proof.
+intros * Hkn.
+revert k Hkn.
+induction n; intros; [ now apply Nat.lt_1_r in Hkn | cbn ].
+specialize (Nat.div_mod k (fact n) (fact_neq_0 _)) as H1.
+rewrite Nat.mul_comm in H1.
+replace (k / fact n * fact n) with (k - k mod fact n) by flia H1.
+rewrite <- Nat.add_sub_swap; [ | apply Nat.mod_le, fact_neq_0 ].
+apply Nat.add_sub_eq_r; f_equal.
+clear H1.
+(*
+specialize (IHn (k mod fact n)) as H1.
+assert (H : k mod n! < n!) by apply Nat.mod_upper_bound, fact_neq_0.
+specialize (H1 H); clear H.
+*)
+rewrite <- (IHn (k mod fact n)) at 1. 2: {
+  apply Nat.mod_upper_bound, fact_neq_0.
+}
+(*
+Compute let n := 5 in
+map (λ k,
+  rank_of_permut_in_sym_gr n (mk_canon_sym_gr n (k mod n!)) =
+  rank_of_permut_in_sym_gr n (sub_permut (sym_gr_fun n (mk_canon_sym_gr n) k)))
+  (seq 0 n!).
+...
+*)
+apply rank_of_permut_in_sym_gr_eq_compat.
+(*
+intros i Hi.
+Compute let n := 5 in
+map (λ k,
+map (λ i,
+Nat.eqb
+  (mk_canon_sym_gr n (k mod n!) i) (sub_permut (sym_gr_fun n (mk_canon_sym_gr n) k) i))
+(seq 0 n))
+  (seq 0 n!).
+...
+*)
+intros i Hi; cbn.
+symmetry.
+apply Nat.add_sub_eq_r.
+f_equal.
+rewrite Nat.add_comm.
+unfold Nat.b2n.
+rewrite if_leb_le_dec.
+destruct (le_dec (k / n!) (mk_canon_sym_gr n (k mod n!) i)) as [Hkc| Hkc]. {
+  cbn.
+  rewrite if_leb_le_dec.
+  now destruct (le_dec (k / n!) (mk_canon_sym_gr n (k mod n!) i)).
+}
+cbn.
+(*
+...
+apply (fin_fun_ext (n := n)).
+intros i Hi; cbn.
+symmetry.
+apply Nat.add_sub_eq_r.
+f_equal.
+remember (Nat.b2n (_ <=? _)) as b eqn:Hb.
+rewrite Nat.add_comm.
+symmetry in Hb.
+destruct b. 2: {
+  cbn.
+  destruct b; [ easy | exfalso ].
+  unfold Nat.b2n in Hb.
+  destruct (k / fact n <=? _); flia Hb.
+}
+cbn.
+*)
+(**)
+...
+remember (mk_canon_sym_gr n _ i) as x eqn:Hx.
+symmetry in Hx.
+destruct x; [ easy | ].
+rewrite if_leb_le_dec.
+destruct (le_dec (k / n!) x) as [H| H]; [ | easy ].
+apply Nat.nle_gt in Hkc.
+assert (H1 : k / n! = x) by flia Hkc H; clear Hkc H.
+subst x.
+destruct n; [ easy | ].
+cbn - [ fact ] in Hx.
+destruct n. {
+  rewrite Nat.div_1_r in Hx.
+  cbn in Hx.
+  now apply Nat.lt_1_r in Hi; subst i.
+}
+cbn - [ fact ] in Hx.
+destruct n. {
+  cbn - [ "/" "mod" ] in Hx.
+  destruct i. {
+    cbn - [ "/" "mod" ] in Hx.
+    rewrite Nat.div_1_r in Hx.
+    destruct k; [ easy | ].
+    destruct k. {
+      cbn in Hx.
+Compute rank_of_permut_in_sym_gr 3 (mk_canon_sym_gr 3 5).
+Search rank_of_permut_in_sym_gr.
+...
+specialize permut_elem_ub as H1.
+specialize (H1 n (k mod n!) i).
+assert (H : k mod n! < n!) by apply Nat.mod_upper_bound, fact_neq_0.
+specialize (H1 H Hi); clear H.
+...
+rewrite Hx in H1.
+exfalso; apply Nat.nle_gt in H1; apply H1; clear H1.
+...
+destruct n; [ easy | ].
+specialize permut_elem_ub as H1.
+specialize (H1 (S n) k).
+...
+destruct n; [ easy | ].
+cbn - [ fact ] in Hx.
+destruct i. {
+  cbn - [ fact ] in Hx.
+  specialize (Nat.div_mod k (S n)!) as H2.
+  specialize (H2 (fact_neq_0 _)).
+  rewrite H1 in H2.
+(*
+unfold Nat.b2n in Hb |-*.
+*)
+...
+remember (k / fact n) as y eqn:Hy; symmetry in Hy.
+remember (y <=? S x) as c eqn:Hc; symmetry in Hc.
+apply Nat.leb_nle in Hkc.
+rewrite Hkc in Hc.
+destruct c; [ easy | clear Hb ].
+apply Nat.leb_gt in Hc.
+apply Nat.leb_gt in Hc.
+remember (y <=? x) as b eqn:Hb.
+symmetry in Hb.
+destruct b; [ | easy ].
+apply Nat.leb_le in Hb.
+flia Hb Hc.
 Qed.
 
 (*
