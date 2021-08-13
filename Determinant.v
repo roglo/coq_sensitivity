@@ -704,6 +704,16 @@ split. {
 }
 Qed.
 
+Theorem mat_swap_rows_nrows : ∀ (M : matrix T) p q,
+  mat_nrows (mat_swap_rows p q M) = mat_nrows M.
+Proof.
+intros.
+unfold mat_swap_rows; cbn.
+unfold list_list_swap_rows.
+rewrite map_length.
+now rewrite seq_length.
+Qed.
+
 Theorem corr_mat_swap_rows_ncols : ∀ (M : matrix T) p q,
   is_correct_matrix M
   → mat_ncols (mat_swap_rows p q M) = mat_ncols M.
@@ -1494,58 +1504,62 @@ assert (HM : determinant n M = (- determinant n M)%F). {
         apply Nat.nlt_ge in Hyy; apply Hyy; clear Hyy.
         subst lb.
         rewrite fold_corr_mat_ncols. {
-          rewrite corr_mat_swap_rows_ncols.
-...
-Search (nth _ _ _ = nth _ _ _).
-...
-      subst x y.
-      unfold mat_swap_rows; cbn.
-      unfold list_list_swap_rows.
-      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-      rewrite seq_nth; [ | easy ].
-      rewrite Nat.add_0_l.
-      destruct (Nat.eq_dec i p) as [Hip| Hip]. {
-        subst i.
-specialize (Hjpq j) as H1.
-unfold mat_el in H1.
-...
-f_equal.
-subst x y.
-...
-Search (nth _ _ _ = nth _ _ _).
-      subst x y; cbn.
-      unfold list_list_swap_rows.
-      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-      rewrite seq_nth; [ | easy ].
-      rewrite Nat.add_0_l.
-      destruct (Nat.eq_dec i p) as [Hip| Hip]. {
-        subst i.
-Search nth_error.
-Search (nth_error _ _ = nth_error _ _).
-Search nth_error.
-Print mat_el.
-...
-      rewrite fold_mat_el.
-cbn.
-...
-Search (nth_error _ (nth _ _ _)).
-
-Search (mat_nrows (mat_swap_rows _ _ _)).
-      rewrite map_swap_rows_nrows.
-...
-  unfold nth_error.
-
-  intros i j Hi Hj.
-  cbn.
-  destruct (Nat.eq_dec i p) as [Hip| Hip]; [ subst i; apply Hjpq | ].
-  destruct (Nat.eq_dec i q) as [Hiq| Hiq]; [ symmetry; subst i; apply Hjpq | ].
-  easy.
+          rewrite corr_mat_swap_rows_ncols. 2: {
+            now apply squ_mat_is_corr in Hsm.
+          }
+          rewrite fold_mat_nrows in Hi.
+          subst la.
+          rewrite fold_corr_mat_ncols in Hj; [ easy | | easy ].
+          now apply squ_mat_is_corr in Hsm.
+        } {
+          apply (@squ_mat_is_corr n).
+          now apply mat_swap_rows_is_square.
+        }
+        now rewrite mat_swap_rows_nrows.
+      }
+      apply nth_error_None in Hxx.
+      destruct yy as [yy| ]; [ exfalso | easy ].
+      apply List_nth_error_Some_iff with (d := 0%F) in Hyy.
+      destruct Hyy as (Hyy & Hj').
+      apply Nat.nlt_ge in Hxx; apply Hxx; clear Hxx.
+      subst la lb.
+      rewrite fold_corr_mat_ncols in Hj'. {
+        rewrite corr_mat_swap_rows_ncols in Hj'. 2: {
+          now apply squ_mat_is_corr in Hsm.
+        }
+        rewrite fold_corr_mat_ncols; [ easy | | easy ].
+        now apply squ_mat_is_corr in Hsm.
+      } {
+        apply (@squ_mat_is_corr n).
+        now apply mat_swap_rows_is_square.
+      }
+      now rewrite mat_swap_rows_nrows.
+    }
+    exfalso.
+    apply nth_error_None in Hy.
+    apply Nat.nlt_ge in Hy; apply Hy; clear Hy.
+    rewrite fold_mat_nrows in Hi.
+    rewrite fold_mat_nrows.
+    now rewrite mat_swap_rows_nrows.
+  }
+  apply nth_error_None in Hx.
+  destruct y as [lb|]; [ exfalso | easy ].
+  apply List_nth_error_Some_iff with (d := []) in Hy.
+  destruct Hy as (Hlb & Hi').
+  apply Nat.nlt_ge in Hx; apply Hx; clear Hx.
+  rewrite fold_mat_nrows in Hi'.
+  rewrite fold_mat_nrows.
+  now rewrite mat_swap_rows_nrows in Hi'.
 }
 apply rngl_add_move_0_r in HM; [ | easy ].
 apply eq_rngl_add_same_0 in HM; try easy; [ now left | ].
 apply orb_true_iff.
 now left.
 Qed.
+
+Inspect 1.
+
+...
 
 (* transpositions list of permutation *)
 
