@@ -425,6 +425,18 @@ Theorem mk_canon_sym_gr_inj2 : ∀ n i j,
   → (∀ k, k < n → mk_canon_sym_gr n i k = mk_canon_sym_gr n j k)
   → i = j.
 Proof.
+intros * Hin Hjn Hij.
+...
+intros * Hin Hjn Hij.
+revert i j Hin Hjn Hij.
+induction n; intros. {
+  apply Nat.lt_1_r in Hin.
+  apply Nat.lt_1_r in Hjn.
+  congruence.
+}
+cbn in Hij.
+Search sym_gr_fun.
+Print sym_gr_fun.
 ...
 
 Theorem sym_gr_elem_is_permut : ∀ n k,
