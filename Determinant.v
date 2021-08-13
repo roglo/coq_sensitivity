@@ -1194,27 +1194,60 @@ erewrite rngl_summation_list_eq_compat. 2: {
     flia Hk Hn.
   }
   unfold g, f.
-unfold mk_canon_sym_gr_vect at 1.
-unfold vect_vect_nat_el at 1.
-cbn - [ vect_vect_nat_el vect_nat_el ].
-assert
+  unfold mk_canon_sym_gr_vect at 1.
+  unfold vect_vect_nat_el at 1.
+  cbn - [ vect_vect_nat_el vect_nat_el ].
+  assert (Hps :
+    is_permut
+      (vect_nat_el
+         (vect_swap_elem (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) p q))
+      n). {
+    eapply is_permut_eq_compat. {
+      intros i Hi; symmetry.
+      unfold vect_nat_el; cbn.
+      rewrite (List_map_nth' 0). 2: {
+        rewrite seq_length.
+        rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
+        now rewrite map_seq_length.
+      }
+      rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
+      rewrite seq_nth; [ | now rewrite map_seq_length ].
+      rewrite seq_nth; [ cbn | easy ].
+      rewrite (List_map_nth' 0). 2: {
+        rewrite seq_length.
+        now apply transposition_lt.
+      }
+      rewrite seq_nth; [ cbn | now apply transposition_lt ].
+      easy.
+    }
+    now apply is_permut_mk_canon_transp.
+  }
+  assert
   (Hrpq :
-   rank_of_permut_in_sym_gr_vect n
-     (vect_swap_elem (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) p q) <
-   n!). {
+     rank_of_permut_in_sym_gr_vect n
+                                   (vect_swap_elem (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) p q) <
+     n!). {
+    unfold rank_of_permut_in_sym_gr_vect.
+    now apply rank_of_permut_upper_bound.
+  }
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
+  rewrite Nat.add_0_l.
   unfold rank_of_permut_in_sym_gr_vect.
-  apply rank_of_permut_upper_bound.
-  eapply is_permut_eq_compat. {
-    intros i Hi; symmetry.
-    unfold vect_nat_el; cbn.
+  erewrite map_ext_in. 2: {
+    intros i Hi.
+    apply in_seq in Hi.
+    unfold rank_of_permut_in_sym_gr_vect in Hrpq.
+    rewrite permut_in_sym_gr_of_its_rank; [ cbn | easy | easy ].
     rewrite (List_map_nth' 0). 2: {
       rewrite seq_length.
       rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
       now rewrite map_seq_length.
     }
     rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-    rewrite seq_nth; [ | now rewrite map_seq_length ].
-    rewrite seq_nth; [ cbn | easy ].
+    rewrite map_seq_length.
+    rewrite seq_nth; [ | easy ].
+    rewrite seq_nth; [ | easy ].
     rewrite (List_map_nth' 0). 2: {
       rewrite seq_length.
       now apply transposition_lt.
@@ -1222,21 +1255,6 @@ assert
     rewrite seq_nth; [ cbn | now apply transposition_lt ].
     easy.
   }
-  now apply is_permut_mk_canon_transp.
-}
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite seq_nth; [ | easy ].
-rewrite Nat.add_0_l.
-unfold rank_of_permut_in_sym_gr_vect.
-...
-rewrite permut_in_sym_gr_of_its_rank. 2: {
-Check permut_in_sym_gr_of_its_rank.
-...
-rewrite permut_in_sym_gr_of_its_rank. 2: {
-    apply vect_swap_elem_is_permut; [ easy | easy | ].
-    now apply sym_gr_elem_is_permut.
-  }
-  rewrite vect_swap_elem_involutive.
   easy.
 }
 rewrite det_is_det_by_canon_permut; try easy.
@@ -1244,11 +1262,34 @@ unfold determinant'.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
 apply rngl_summation_eq_compat.
-intros k Hk; f_equal.
+intros k Hk.
+assert (Hkn : k < n!). {
+  specialize (fact_neq_0 n) as Hn.
+  flia Hk Hn.
+}
+f_equal. {
+  cbn.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ cbn | easy ].
+  unfold vect_swap_elem; cbn.
+  rewrite map_seq_length.
+  f_equal; f_equal.
+  apply map_ext_in.
+  intros i Hi.
+  apply in_seq in Hi.
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    now apply transposition_lt.
+  }
+  rewrite seq_nth; [ | now apply transposition_lt ].
+  rewrite Nat.add_0_l.
+  now rewrite transposition_involutive.
+}
 rewrite rngl_product_shift; [ | flia Hp ].
 apply rngl_product_eq_compat.
 intros i Hi.
-now rewrite Nat.add_comm, Nat.add_sub.
+rewrite Nat.add_comm, Nat.add_sub.
+...
 Qed.
 
 ...
