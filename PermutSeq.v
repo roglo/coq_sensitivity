@@ -426,6 +426,54 @@ Theorem mk_canon_sym_gr_inj2 : ∀ n i j,
   → i = j.
 Proof.
 intros * Hin Hjn Hij.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  apply Nat.lt_1_r in Hin, Hjn; congruence.
+}
+destruct (Nat.eq_dec (i / n) (j / n)) as [Hijd| Hijd]. {
+  destruct (Nat.eq_dec (i mod n) (j mod n)) as [Hijm| Hijm]. {
+    specialize (Nat.div_mod i n Hnz) as Hi.
+    specialize (Nat.div_mod j n Hnz) as Hj.
+    congruence.
+  }
+  destruct n; [ easy | clear Hnz ].
+  specialize (Hij 0 (Nat.lt_0_succ _)) as H1.
+  cbn in H1.
+  specialize (Nat.div_mod i (S n) (Nat.neq_succ_0 _)) as Hi.
+  specialize (Nat.div_mod j (S n) (Nat.neq_succ_0 _)) as Hj.
+  rewrite Hijd in Hi.
+...
+  destruct n; [ now do 2 rewrite Nat.div_1_r in Hijd | ].
+  specialize (Hij 1) as H1.
+  assert (H : 1 < S (S n)) by flia.
+  specialize (H1 H); clear H.
+  cbn - [ fact ] in H1.
+...
+intros * Hin Hjn Hij.
+revert i j Hin Hjn Hij.
+induction n; intros. {
+  apply Nat.lt_1_r in Hin.
+  apply Nat.lt_1_r in Hjn.
+  congruence.
+}
+cbn in Hij.
+destruct n. {
+  apply Nat.lt_1_r in Hin.
+  apply Nat.lt_1_r in Hjn.
+  congruence.
+}
+destruct (Nat.eq_dec (i / S n) (j / S n)) as [Hijd| Hijd]. {
+  destruct (Nat.eq_dec (i mod S n) (j mod S n)) as [Hijm| Hijm]. {
+    specialize (Nat.div_mod i (S n) (Nat.neq_succ_0 _)) as Hi.
+    specialize (Nat.div_mod j (S n) (Nat.neq_succ_0 _)) as Hj.
+    congruence.
+  }
+  specialize (Hij 1) as H1.
+  assert (H : 1 < S (S n)) by flia.
+  specialize (H1 H); clear H.
+  cbn - [ fact ] in H1.
+...
+intros * Hin Hjn Hij.
 revert i j Hin Hjn Hij.
 induction n; intros. {
   apply Nat.lt_1_r in Hin.
