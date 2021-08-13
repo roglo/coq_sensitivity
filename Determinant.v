@@ -1393,6 +1393,7 @@ Theorem determinant_same_rows :
   → determinant n M = 0%F.
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hsm Hpq Hpn Hqn Hjpq.
+specialize (square_matrix_ncols M Hsm) as Hc.
 assert (HM : determinant n M = (- determinant n M)%F). {
   rewrite <- determinant_alternating with (p := p) (q := q); try easy.
   f_equal.
@@ -1402,15 +1403,89 @@ assert (HM : determinant n M = (- determinant n M)%F). {
   remember (nth_error (mat_list_list M) i) as x eqn:Hx; symmetry in Hx.
   remember (nth_error (mat_list_list (mat_swap_rows p q M)) i)
     as y eqn:Hy; symmetry in Hy.
-  destruct x as [x| ]. {
+  destruct x as [la| ]. {
     apply List_nth_error_Some_iff with (d := []) in Hx.
-    destruct Hx as (Hx & Hi).
-    rewrite fold_mat_nrows in Hi.
-    destruct y as [y|]. {
+    destruct Hx as (Hla & Hi).
+    destruct y as [lb|]. {
       f_equal.
       apply List_nth_error_Some_iff with (d := []) in Hy.
-      destruct Hy as (Hy & Hj).
-      rewrite fold_mat_nrows in Hj.
+      destruct Hy as (Hlb & Hi').
+      remember (nth_error la j) as xx eqn:Hxx; symmetry in Hxx.
+      remember (nth_error lb j) as yy eqn:Hyy; symmetry in Hyy.
+      destruct xx as [xx| ]. {
+        apply List_nth_error_Some_iff with (d := 0%F) in Hxx.
+        destruct Hxx as (Hxx & Hj).
+        destruct yy as [yy| ]. {
+          apply List_nth_error_Some_iff with (d := 0%F) in Hyy.
+          destruct Hyy as (Hyy & Hj').
+          f_equal; subst xx yy.
+          subst la lb.
+          unfold mat_swap_rows; cbn.
+          unfold list_list_swap_rows.
+          rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+          rewrite seq_nth; [ | easy ].
+          rewrite Nat.add_0_l.
+          destruct (Nat.eq_dec i p) as [Hip| Hip]. {
+            subst i.
+            rewrite fold_mat_el, Hjpq.
+            unfold mat_el.
+            f_equal.
+            apply nth_indep.
+            rewrite fold_mat_nrows.
+            apply is_sm_mat_iff in Hsm.
+            destruct Hsm as (Hr, _).
+            congruence.
+          }
+          destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
+            subst i.
+            rewrite fold_mat_el, <- Hjpq.
+            unfold mat_el.
+            f_equal.
+            apply nth_indep.
+            rewrite fold_mat_nrows.
+            apply is_sm_mat_iff in Hsm.
+            destruct Hsm as (Hr, _).
+            congruence.
+          }
+          easy.
+        }
+        exfalso.
+        apply nth_error_None in Hyy.
+        apply Nat.nlt_ge in Hyy; apply Hyy; clear Hyy.
+        subst lb.
+        rewrite fold_corr_mat_ncols. {
+          Search (mat_ncols (mat_swap_rows _ _ _)).
+Theorem corr_mat_swap_rows_ncols : ∀ (M : matrix T) p q,
+  is_correct_matrix M
+  → mat_ncols (mat_swap_rows p q M) = mat_ncols M.
+Proof.
+intros * Hcm.
+destruct Hcm as (H1, H2).
+unfold mat_swap_rows; cbn.
+unfold list_list_swap_rows.
+unfold mat_ncols; cbn.
+rewrite List_hd_nth_0.
+rewrite (List_map_nth' 0); [ | rewrite seq_length ].
+...
+rewrite corr_mat_swap_rows_ncols.
+...
+Search (nth _ _ _ = nth _ _ _).
+...
+      subst x y.
+      unfold mat_swap_rows; cbn.
+      unfold list_list_swap_rows.
+      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+      rewrite seq_nth; [ | easy ].
+      rewrite Nat.add_0_l.
+      destruct (Nat.eq_dec i p) as [Hip| Hip]. {
+        subst i.
+specialize (Hjpq j) as H1.
+unfold mat_el in H1.
+...
+f_equal.
+subst x y.
+...
+Search (nth _ _ _ = nth _ _ _).
       subst x y; cbn.
       unfold list_list_swap_rows.
       rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
@@ -1418,6 +1493,7 @@ assert (HM : determinant n M = (- determinant n M)%F). {
       rewrite Nat.add_0_l.
       destruct (Nat.eq_dec i p) as [Hip| Hip]. {
         subst i.
+Search nth_error.
 Search (nth_error _ _ = nth_error _ _).
 Search nth_error.
 Print mat_el.
