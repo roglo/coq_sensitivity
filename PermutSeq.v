@@ -430,6 +430,16 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n.
   apply Nat.lt_1_r in Hin, Hjn; congruence.
 }
+destruct n; [ easy | clear Hnz ].
+destruct (Nat.eq_dec (i / n!) (j / n!)) as [Hijd| Hijd]. 2: {
+  now specialize (Hij 0 (Nat.lt_0_succ _)).
+}
+destruct (Nat.eq_dec (i mod n!) (j mod n!)) as [Hijm| Hijm]. {
+  specialize (Nat.div_mod i n! (fact_neq_0 _)) as Hi.
+  specialize (Nat.div_mod j n! (fact_neq_0 _)) as Hj.
+  congruence.
+}
+...
 destruct (Nat.eq_dec (i / n) (j / n)) as [Hijd| Hijd]. {
   destruct (Nat.eq_dec (i mod n) (j mod n)) as [Hijm| Hijm]. {
     specialize (Nat.div_mod i n Hnz) as Hi.
