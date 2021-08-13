@@ -1174,25 +1174,18 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
     specialize (is_permut_mk_canon_transp Hj Hp Hq) as Hg.
     specialize (rank_of_permut_injective Hf Hg Hij) as H1.
     cbn in H1.
-(*
-    specialize mk_canon_sym_gr_inj1 as H2.
-    specialize (H2 n i).
-    specialize (H2 (transposition p q i)).
-*)
     specialize (H1 p Hp) as Hp1.
     specialize (H1 q Hq) as Hq1.
     rewrite transposition_1 in Hp1.
     rewrite transposition_2 in Hq1.
-Search (mk_canon_sym_gr _ _ _ = mk_canon_sym_gr _ _ _).
-...
-specialize (@mk_canon_sym_gr_inj2 T ro rp) as H2.
-specialize (H2 n i j Hi Hj).
-apply H2.
-intros k Hk.
-specialize (H1 k Hk).
-destruct (Nat.eq_dec k p) as [Hkp| Hkp]; [ now subst k | ].
-destruct (Nat.eq_dec k q) as [Hkq| Hkq]; [ now subst k | ].
-now rewrite transposition_out in H1.
+    apply (mk_canon_sym_gr_inj2 Hi Hj).
+    intros k Hk.
+    specialize (H1 k Hk).
+    destruct (Nat.eq_dec k p) as [Hkp| Hkp]; [ now subst k | ].
+    destruct (Nat.eq_dec k q) as [Hkq| Hkq]; [ now subst k | ].
+    now rewrite transposition_out in H1.
+  }
+}
 ...
 now apply mk_canon_sym_gr_inj2 in Hp1.
 ...
