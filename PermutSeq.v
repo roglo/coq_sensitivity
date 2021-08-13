@@ -430,7 +430,8 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n.
   apply Nat.lt_1_r in Hin, Hjn; congruence.
 }
-destruct n; [ easy | clear Hnz ].
+revert i j Hin Hjn Hij.
+induction n; intros; [ easy | clear Hnz ].
 destruct (Nat.eq_dec (i / n!) (j / n!)) as [Hijd| Hijd]. 2: {
   now specialize (Hij 0 (Nat.lt_0_succ _)).
 }
@@ -439,6 +440,20 @@ destruct (Nat.eq_dec (i mod n!) (j mod n!)) as [Hijm| Hijm]. {
   specialize (Nat.div_mod j n! (fact_neq_0 _)) as Hj.
   congruence.
 }
+destruct n; [ now do 2 rewrite Nat.div_1_r in Hijd | ].
+specialize (Hij 1) as H1.
+assert (H : 1 < S (S n)) by flia.
+specialize (H1 H); clear H.
+cbn - [ fact ] in H1.
+specialize (IHn (Nat.neq_succ_0 _)).
+exfalso; apply Hijm; clear Hijm.
+apply IHn. {
+  apply Nat.mod_upper_bound, fact_neq_0.
+} {
+  apply Nat.mod_upper_bound, fact_neq_0.
+}
+intros k Hk.
+cbn - [ fact ].
 ...
 destruct (Nat.eq_dec (i / n) (j / n)) as [Hijd| Hijd]. {
   destruct (Nat.eq_dec (i mod n) (j mod n)) as [Hijm| Hijm]. {
