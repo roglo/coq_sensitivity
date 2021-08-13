@@ -2024,6 +2024,8 @@ Definition mat_add_row_mul_scal_row n (M : matrix T) i1 v i2 :=
          (seq 0 n))
      (seq 0 n)).
 
+Print mat_repl_vect.
+
 ...
 
 Definition mat_add_row_mul_scal_row n (M : matrix n n T) i1 v i2 :=
