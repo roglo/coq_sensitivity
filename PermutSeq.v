@@ -442,7 +442,6 @@ destruct (Nat.eq_dec (i mod n!) (j mod n!)) as [Hijm| Hijm]. {
 }
 destruct n; [ now do 2 rewrite Nat.div_1_r in Hijd | ].
 specialize (IHn (Nat.neq_succ_0 _)).
-...
 exfalso; apply Hijm; clear Hijm.
 apply IHn. {
   apply Nat.mod_upper_bound, fact_neq_0.
@@ -450,91 +449,30 @@ apply IHn. {
   apply Nat.mod_upper_bound, fact_neq_0.
 }
 intros k Hk.
-remember (S n) as sn; cbn in Hij; subst sn.
-cbn - [ fact ].
-...
-specialize (Hij 1) as H1.
-assert (H : 1 < S (S n)) by flia.
+cbn - [ fact ] in Hij |-*.
+specialize (Hij (S k)) as H1.
+assert (H : S k < S (S n)) by flia Hk.
 specialize (H1 H); clear H.
 cbn - [ fact ] in H1.
-exfalso; apply Hijm; clear Hijm.
-apply IHn. {
-  apply Nat.mod_upper_bound, fact_neq_0.
-} {
-  apply Nat.mod_upper_bound, fact_neq_0.
-}
-intros k Hk.
-cbn - [ fact ].
 rewrite Hijd in H1.
 unfold Nat.b2n in H1.
 do 2 rewrite if_leb_le_dec in H1.
-destruct (le_dec (j / (S n)!) (i mod (S n)! / n!)) as [H2| H2]. {
-  destruct (le_dec (j / (S n)!) (j mod (S n)! / n!)) as [H3| H3]. {
-    apply Nat.add_cancel_r in H1.
-...
-destruct (Nat.eq_dec (i / n) (j / n)) as [Hijd| Hijd]. {
-  destruct (Nat.eq_dec (i mod n) (j mod n)) as [Hijm| Hijm]. {
-    specialize (Nat.div_mod i n Hnz) as Hi.
-    specialize (Nat.div_mod j n Hnz) as Hj.
-    congruence.
+remember (sym_gr_fun n (mk_canon_sym_gr n) (i mod (S n)!) k) as x eqn:Hx.
+remember (sym_gr_fun n (mk_canon_sym_gr n) (j mod (S n)!) k) as y eqn:Hy.
+destruct (le_dec (j / (S n)!) x) as [Hjx| Hjx]. {
+  destruct (le_dec (j / (S n)!) y) as [Hjy| Hjy]. {
+    now apply Nat.add_cancel_r in H1.
   }
-  destruct n; [ easy | clear Hnz ].
-  specialize (Hij 0 (Nat.lt_0_succ _)) as H1.
-  cbn in H1.
-  specialize (Nat.div_mod i (S n) (Nat.neq_succ_0 _)) as Hi.
-  specialize (Nat.div_mod j (S n) (Nat.neq_succ_0 _)) as Hj.
-  rewrite Hijd in Hi.
-...
-  destruct n; [ now do 2 rewrite Nat.div_1_r in Hijd | ].
-  specialize (Hij 1) as H1.
-  assert (H : 1 < S (S n)) by flia.
-  specialize (H1 H); clear H.
-  cbn - [ fact ] in H1.
-...
-intros * Hin Hjn Hij.
-revert i j Hin Hjn Hij.
-induction n; intros. {
-  apply Nat.lt_1_r in Hin.
-  apply Nat.lt_1_r in Hjn.
-  congruence.
-}
-cbn in Hij.
-destruct n. {
-  apply Nat.lt_1_r in Hin.
-  apply Nat.lt_1_r in Hjn.
-  congruence.
-}
-destruct (Nat.eq_dec (i / S n) (j / S n)) as [Hijd| Hijd]. {
-  destruct (Nat.eq_dec (i mod S n) (j mod S n)) as [Hijm| Hijm]. {
-    specialize (Nat.div_mod i (S n) (Nat.neq_succ_0 _)) as Hi.
-    specialize (Nat.div_mod j (S n) (Nat.neq_succ_0 _)) as Hj.
-    congruence.
+  apply Nat.nle_gt in Hjy.
+  flia Hjx Hjy H1.
+} {
+  destruct (le_dec (j / (S n)!) y) as [Hjy| Hjy]. {
+    apply Nat.nle_gt in Hjx.
+    flia Hjx Hjy H1.
   }
-  specialize (Hij 1) as H1.
-  assert (H : 1 < S (S n)) by flia.
-  specialize (H1 H); clear H.
-  cbn - [ fact ] in H1.
-...
-intros * Hin Hjn Hij.
-revert i j Hin Hjn Hij.
-induction n; intros. {
-  apply Nat.lt_1_r in Hin.
-  apply Nat.lt_1_r in Hjn.
-  congruence.
+  now apply Nat.add_cancel_r in H1.
 }
-cbn in Hij.
-cbn in Hin, Hjn.
-destruct (lt_dec i (n * n!)) as [Hinn| Hinn]. {
-  destruct (lt_dec j (n * n!)) as [Hjnn| Hjnn]. {
-    specialize (IHn (i / n) (j / n)) as H1.
-(* ouais, faut réfléchir... *)
-(* et pis peut-être généraliser à d'autres sym_gr que mk_canon_sym_gr *)
-...
-specialize (IHn (i - n * n!) (j - n * n!)) as H1.
-...
-Search sym_gr_fun.
-Print sym_gr_fun.
-...
+Qed.
 
 Theorem sym_gr_elem_is_permut : ∀ n k,
   k < n!
