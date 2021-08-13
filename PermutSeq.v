@@ -442,7 +442,7 @@ destruct (Nat.eq_dec (i mod n!) (j mod n!)) as [Hijm| Hijm]. {
 }
 destruct n; [ now do 2 rewrite Nat.div_1_r in Hijd | ].
 specialize (IHn (Nat.neq_succ_0 _)).
-(**)
+...
 exfalso; apply Hijm; clear Hijm.
 apply IHn. {
   apply Nat.mod_upper_bound, fact_neq_0.
@@ -451,6 +451,7 @@ apply IHn. {
 }
 intros k Hk.
 remember (S n) as sn; cbn in Hij; subst sn.
+cbn - [ fact ].
 ...
 specialize (Hij 1) as H1.
 assert (H : 1 < S (S n)) by flia.
