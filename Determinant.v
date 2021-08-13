@@ -1557,10 +1557,6 @@ apply orb_true_iff.
 now left.
 Qed.
 
-Inspect 1.
-
-...
-
 (* transpositions list of permutation *)
 
 Fixpoint first_non_fixpoint it i σ :=
@@ -1583,8 +1579,8 @@ Fixpoint tlopf_loop it n (σ : nat → nat) :=
 
 Definition transp_list_of_permut_fun n (σ : nat → nat) := tlopf_loop n n σ.
 
-Definition transp_list_of_permut {n} (σ : vector n nat) :=
-  transp_list_of_permut_fun n (vect_el σ).
+Definition transp_list_of_permut {n} (σ : vector nat) :=
+  transp_list_of_permut_fun n (vect_nat_el σ).
 
 Theorem first_non_fixpoint_Some_iff : ∀ σ it i j,
   first_non_fixpoint it i σ = Some j
@@ -2016,6 +2012,19 @@ Qed.
    row (column) of A, then the determinant will not change. *)
 (* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html *)
 (* doing it only when the first row is 0; can be generalized later *)
+
+Definition mat_add_row_mul_scal_row n (M : matrix T) i1 v i2 :=
+  mk_mat
+    (map
+      (λ i,
+       map
+         (λ j,
+          if Nat.eq_dec i i1 then (mat_el M i1 j + v * mat_el M i2 j)%F
+          else mat_el M i j)
+         (seq 0 n))
+     (seq 0 n)).
+
+...
 
 Definition mat_add_row_mul_scal_row n (M : matrix n n T) i1 v i2 :=
   mk_mat n n
