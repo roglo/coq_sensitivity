@@ -704,6 +704,46 @@ split. {
 }
 Qed.
 
+Theorem corr_mat_swap_rows_ncols : ∀ (M : matrix T) p q,
+  is_correct_matrix M
+  → mat_ncols (mat_swap_rows p q M) = mat_ncols M.
+Proof.
+intros * Hcm.
+destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
+  unfold mat_nrows in Hrz.
+  apply length_zero_iff_nil in Hrz.
+  unfold mat_ncols; cbn.
+  now rewrite Hrz.
+}
+apply Nat.neq_0_lt_0 in Hrz.
+unfold mat_swap_rows; cbn.
+unfold list_list_swap_rows.
+unfold mat_ncols; cbn.
+rewrite List_hd_nth_0.
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+rewrite Nat.add_0_l.
+destruct (Nat.eq_dec 0 p) as [Hzp| Hzp]. {
+  subst p; cbn.
+  destruct (lt_dec q (mat_nrows M)) as [Hqr| Hqr]. {
+    now rewrite fold_corr_mat_ncols.
+  }
+  apply Nat.nlt_ge in Hqr.
+  rewrite nth_overflow; [ | easy ].
+  now rewrite List_hd_nth_0.
+}
+destruct (Nat.eq_dec 0 q) as [Hzq| Hzq]. {
+  subst q; cbn.
+  destruct (lt_dec p (mat_nrows M)) as [Hpq| Hpr]. {
+    now rewrite fold_corr_mat_ncols.
+  }
+  apply Nat.nlt_ge in Hpr.
+  rewrite nth_overflow; [ | easy ].
+  now rewrite List_hd_nth_0.
+}
+now rewrite List_hd_nth_0.
+Qed.
+
 Theorem is_permut_mk_canon_transp : ∀ n k p q,
   k < n!
   → p < n
@@ -1454,20 +1494,7 @@ assert (HM : determinant n M = (- determinant n M)%F). {
         apply Nat.nlt_ge in Hyy; apply Hyy; clear Hyy.
         subst lb.
         rewrite fold_corr_mat_ncols. {
-          Search (mat_ncols (mat_swap_rows _ _ _)).
-Theorem corr_mat_swap_rows_ncols : ∀ (M : matrix T) p q,
-  is_correct_matrix M
-  → mat_ncols (mat_swap_rows p q M) = mat_ncols M.
-Proof.
-intros * Hcm.
-destruct Hcm as (H1, H2).
-unfold mat_swap_rows; cbn.
-unfold list_list_swap_rows.
-unfold mat_ncols; cbn.
-rewrite List_hd_nth_0.
-rewrite (List_map_nth' 0); [ | rewrite seq_length ].
-...
-rewrite corr_mat_swap_rows_ncols.
+          rewrite corr_mat_swap_rows_ncols.
 ...
 Search (nth _ _ _ = nth _ _ _).
 ...
