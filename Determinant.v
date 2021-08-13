@@ -429,7 +429,7 @@ erewrite rngl_product_eq_compat. 2: {
   destruct (Nat.eq_dec (mk_canon_sym_gr n k (j - 2)) i) as [Hpj| Hpj]. {
     exfalso.
     rewrite <- Hpp in Hpj.
-    apply permut_elem_injective in Hpj; [ | easy | flia Hp Hj | easy ].
+    apply mk_canon_sym_gr_inj1 in Hpj; [ | easy | flia Hp Hj | easy ].
     flia Hj Hpj.
   }
   easy.
@@ -444,7 +444,7 @@ erewrite rngl_product_eq_compat. 2: {
   destruct (Nat.eq_dec (mk_canon_sym_gr n k (j - 2)) i) as [Hpj| Hpj]. {
     exfalso.
     rewrite <- Hpp in Hpj.
-    apply permut_elem_injective in Hpj; [ | easy | flia Hp Hj | easy ].
+    apply mk_canon_sym_gr_inj1 in Hpj; [ | easy | flia Hp Hj | easy ].
     flia Hj Hpj.
   }
   easy.
@@ -460,7 +460,7 @@ erewrite rngl_product_eq_compat. 2: {
   destruct (Nat.eq_dec (mk_canon_sym_gr n k (j - 2)) i) as [Hpj| Hpj]. {
     exfalso.
     rewrite <- Hpp in Hpj.
-    apply permut_elem_injective in Hpj; [ | easy | flia Hp Hj | easy ].
+    apply mk_canon_sym_gr_inj1 in Hpj; [ | easy | flia Hp Hj | easy ].
     flia Hj Hpj.
   }
   easy.
@@ -495,7 +495,7 @@ erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   destruct (Nat.eq_dec (mk_canon_sym_gr n k (j - 1)) i) as [Hpj| Hpj]. {
     rewrite <- Hpp in Hpj.
-    apply permut_elem_injective in Hpj; [ | easy | flia Hp Hj | easy ].
+    apply mk_canon_sym_gr_inj1 in Hpj; [ | easy | flia Hp Hj | easy ].
     flia Hj Hpj.
   }
   easy.
@@ -505,7 +505,7 @@ erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   destruct (Nat.eq_dec (mk_canon_sym_gr n k (j - 1)) i) as [Hpj| Hpj]. {
     rewrite <- Hpp in Hpj.
-    apply permut_elem_injective in Hpj; [ | easy | flia Hp Hj | easy ].
+    apply mk_canon_sym_gr_inj1 in Hpj; [ | easy | flia Hp Hj | easy ].
     flia Hj Hpj.
   }
   easy.
@@ -515,7 +515,7 @@ erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   destruct (Nat.eq_dec (mk_canon_sym_gr n k (j - 1)) i) as [Hpj| Hpj]. {
     rewrite <- Hpp in Hpj.
-    apply permut_elem_injective in Hpj; [ | easy | flia Hp Hj | easy ].
+    apply mk_canon_sym_gr_inj1 in Hpj; [ | easy | flia Hp Hj | easy ].
     flia Hj Hpj.
   }
   easy.
@@ -719,7 +719,7 @@ split. {
   intros u v Hu Hv Huv.
   assert (Htu : transposition p q u < n) by now apply transposition_lt.
   assert (Htv : transposition p q v < n) by now apply transposition_lt.
-  apply permut_elem_injective in Huv; [ | easy | easy | easy ].
+  apply mk_canon_sym_gr_inj1 in Huv; [ | easy | easy | easy ].
   now apply transposition_injective in Huv.
 }
 Qed.
@@ -970,7 +970,7 @@ erewrite rngl_summation_eq_compat. 2: {
     }
     rewrite seq_nth in Hij; [ | easy ].
     cbn in Hij.
-    apply permut_elem_injective in Hij; [ | easy | | ]; cycle 1. {
+    apply mk_canon_sym_gr_inj1 in Hij; [ | easy | | ]; cycle 1. {
       now apply transposition_lt.
     } {
       now apply transposition_lt.
@@ -1042,7 +1042,7 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
       intros i j Hi Hj Hij.
       assert (Hti : transposition p q i < n) by now apply transposition_lt.
       assert (Htj : transposition p q j < n) by now apply transposition_lt.
-      apply permut_elem_injective in Hij; [ | easy | easy | easy ].
+      apply mk_canon_sym_gr_inj1 in Hij; [ | easy | easy | easy ].
       now apply transposition_injective in Hij.
     }
   }
@@ -1170,28 +1170,35 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
       easy.
     }
     symmetry in Hij.
-Search (rank_of_permut_in_sym_gr _ _ = rank_of_permut_in_sym_gr _ _).
-...
-Search (mk_canon_sym_gr _ _ _ = mk_canon_sym_gr _ _ _).
-...
     specialize (is_permut_mk_canon_transp Hi Hp Hq) as Hf.
     specialize (is_permut_mk_canon_transp Hj Hp Hq) as Hg.
     specialize (rank_of_permut_injective Hf Hg Hij) as H1.
     cbn in H1.
-Search (mk_canon_sym_gr _ _ _ = mk_canon_sym_gr _ _ _).
-...
-    specialize permut_elem_injective as H2.
+(*
+    specialize mk_canon_sym_gr_inj1 as H2.
     specialize (H2 n i).
-specialize (H2 (transposition p q i)).
-specialize (H1 p Hp) as Hp1.
-specialize (H1 q Hq) as Hq1.
+    specialize (H2 (transposition p q i)).
+*)
+    specialize (H1 p Hp) as Hp1.
+    specialize (H1 q Hq) as Hq1.
     rewrite transposition_1 in Hp1.
     rewrite transposition_2 in Hq1.
 Search (mk_canon_sym_gr _ _ _ = mk_canon_sym_gr _ _ _).
 ...
-apply permut_elem_injective in Hp1.
+specialize (@mk_canon_sym_gr_inj2 T ro rp) as H2.
+specialize (H2 n i j Hi Hj).
+apply H2.
+intros k Hk.
+specialize (H1 k Hk).
+destruct (Nat.eq_dec k p) as [Hkp| Hkp]; [ now subst k | ].
+destruct (Nat.eq_dec k q) as [Hkq| Hkq]; [ now subst k | ].
+now rewrite transposition_out in H1.
 ...
-eapply permut_elem_injective with (n := n!).
+now apply mk_canon_sym_gr_inj2 in Hp1.
+...
+apply mk_canon_sym_gr_inj1 in Hp1.
+...
+eapply mk_canon_sym_gr_inj1 with (n := n!).
 Search (rank_of_permut_in_sym_gr _ _ = rank_of_permut_in_sym_gr _ _).
 ...
     erewrite rank_of_permut_in_sym_gr_eq_compat in Hij. 2: {
@@ -1202,13 +1209,13 @@ Search (rank_of_permut_in_sym_gr _ _ = rank_of_permut_in_sym_gr _ _).
 ...
 Search (rank_of_permut_in_sym_gr _ _ = rank_of_permut_in_sym_gr _ _).
     specialize (H1 u) as Hu1.
-eapply permut_elem_injective with (n := n) (k := p).
+eapply mk_canon_sym_gr_inj1 with (n := n) (k := p).
 ...
     specialize (H1 p Hp) as Hp1.
     specialize (H1 q Hq) as Hq1.
     rewrite transposition_1 in Hp1.
     rewrite transposition_2 in Hq1.
-eapply permut_elem_injective with (n := n) (k := p).
+eapply mk_canon_sym_gr_inj1 with (n := n) (k := p).
 Search (rank_of_permut_in_sym_gr _ _ = rank_of_permut_in_sym_gr _ _).
 Search (mk_canon_sym_gr _ _ _ = mk_canon_sym_gr _ _ _).
 ...

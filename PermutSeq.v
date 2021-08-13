@@ -403,7 +403,7 @@ destruct b. {
 }
 Qed.
 
-Theorem permut_elem_injective : ∀ n k i j,
+Theorem mk_canon_sym_gr_inj1 : ∀ n k i j,
   k < fact n
   → i < n
   → j < n
@@ -419,6 +419,14 @@ rewrite <- sym_gr_inv_sym_gr with (n := n) (k := k); [ | easy | easy ].
 now f_equal.
 Qed.
 
+Theorem mk_canon_sym_gr_inj2 : ∀ n i j,
+  i < n!
+  → j < n!
+  → (∀ k, k < n → mk_canon_sym_gr n i k = mk_canon_sym_gr n j k)
+  → i = j.
+Proof.
+...
+
 Theorem sym_gr_elem_is_permut : ∀ n k,
   k < n!
   → is_permut (mk_canon_sym_gr n k) n.
@@ -429,7 +437,7 @@ split. {
   now apply permut_elem_ub.
 } {
   intros * Hi Hj Hij.
-  now apply permut_elem_injective in Hij.
+  now apply mk_canon_sym_gr_inj1 in Hij.
 }
 Qed.
 
@@ -456,7 +464,7 @@ split. {
   rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
   rewrite seq_nth in Hij; [ | easy ].
   rewrite seq_nth in Hij; [ | easy ].
-  now apply permut_elem_injective in Hij.
+  now apply mk_canon_sym_gr_inj1 in Hij.
 }
 Qed.
 
@@ -511,7 +519,7 @@ specialize (Hvn 0 (Nat.lt_0_succ _)) as H3.
 flia Hb H1 H2 H3.
 Qed.
 
-Theorem sub_permut_elem_injective : ∀ n f i j,
+Theorem sub_mk_canon_sym_gr_inj1 : ∀ n f i j,
   is_permut f (S n)
   → i < n
   → j < n
@@ -579,7 +587,7 @@ apply Nat.add_lt_le_mono. {
     now apply sub_permut_elem_ub.
   } {
     intros i j Hi Hj.
-    now apply sub_permut_elem_injective with (n := n).
+    now apply sub_mk_canon_sym_gr_inj1 with (n := n).
   }
 }
 apply Nat.mul_le_mono_r.
@@ -606,7 +614,7 @@ destruct i. {
     now apply sub_permut_elem_ub.
   } {
     intros i j Hi Hj.
-    now apply sub_permut_elem_injective with (n := n).
+    now apply sub_mk_canon_sym_gr_inj1 with (n := n).
   }
 }
 cbn.
@@ -622,7 +630,7 @@ assert (Hkn : k < fact n). {
     now apply sub_permut_elem_ub.
   } {
     intros j m Hj Hm.
-    now apply sub_permut_elem_injective with (n := n).
+    now apply sub_mk_canon_sym_gr_inj1 with (n := n).
   }
 }
 rewrite Nat.div_small; [ | easy ].
@@ -641,7 +649,7 @@ assert
     → sub_permut f i = sub_permut f j
     → i = j). {
   intros j m Hi Hm Him.
-  now apply sub_permut_elem_injective with (n := n) in Him.
+  now apply sub_mk_canon_sym_gr_inj1 with (n := n) in Him.
 }
 destruct (le_dec (f 0) (mk_canon_sym_gr n k i)) as [Hb| Hb]. {
   rewrite <- Hk in Hb |-*.
