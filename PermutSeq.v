@@ -426,8 +426,6 @@ Theorem mk_canon_sym_gr_inj2 : ∀ n i j,
   → i = j.
 Proof.
 intros * Hin Hjn Hij.
-...
-intros * Hin Hjn Hij.
 revert i j Hin Hjn Hij.
 induction n; intros. {
   apply Nat.lt_1_r in Hin.
@@ -435,6 +433,15 @@ induction n; intros. {
   congruence.
 }
 cbn in Hij.
+cbn in Hin, Hjn.
+destruct (lt_dec i (n * n!)) as [Hinn| Hinn]. {
+  destruct (lt_dec j (n * n!)) as [Hjnn| Hjnn]. {
+    specialize (IHn (i / n) (j / n)) as H1.
+(* ouais, faut réfléchir... *)
+(* et pis peut-être généraliser à d'autres sym_gr que mk_canon_sym_gr *)
+...
+specialize (IHn (i - n * n!) (j - n * n!)) as H1.
+...
 Search sym_gr_fun.
 Print sym_gr_fun.
 ...
