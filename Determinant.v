@@ -1376,10 +1376,6 @@ rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 now rewrite seq_nth.
 Qed.
 
-Inspect 1.
-
-...
-
 Theorem determinant_same_rows :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -1388,18 +1384,54 @@ Theorem determinant_same_rows :
   rngl_has_1_neq_0 = true →
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
-  ∀ n (M : matrix n n T) p q,
-  p ≠ q
+  ∀ n (M : matrix T) p q,
+  is_square_matrix n M = true
+  → p ≠ q
   → p < n
   → q < n
   → (∀ j, mat_el M p j = mat_el M q j)
-  → determinant M = 0%F.
+  → determinant n M = 0%F.
 Proof.
-intros Hic Hop Hin Hit H10 Hde Hch * Hpq Hpn Hqn Hjpq.
-assert (HM : determinant M = (- determinant M)%F). {
+intros Hic Hop Hin Hit H10 Hde Hch * Hsm Hpq Hpn Hqn Hjpq.
+assert (HM : determinant n M = (- determinant n M)%F). {
   rewrite <- determinant_alternating with (p := p) (q := q); try easy.
   f_equal.
   apply matrix_eq.
+  intros i j.
+  unfold nth_nth_error.
+  remember (nth_error (mat_list_list M) i) as x eqn:Hx; symmetry in Hx.
+  remember (nth_error (mat_list_list (mat_swap_rows p q M)) i)
+    as y eqn:Hy; symmetry in Hy.
+  destruct x as [x| ]. {
+    apply List_nth_error_Some_iff with (d := []) in Hx.
+    destruct Hx as (Hx & Hi).
+    rewrite fold_mat_nrows in Hi.
+    destruct y as [y|]. {
+      f_equal.
+      apply List_nth_error_Some_iff with (d := []) in Hy.
+      destruct Hy as (Hy & Hj).
+      rewrite fold_mat_nrows in Hj.
+      subst x y; cbn.
+      unfold list_list_swap_rows.
+      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+      rewrite seq_nth; [ | easy ].
+      rewrite Nat.add_0_l.
+      destruct (Nat.eq_dec i p) as [Hip| Hip]. {
+        subst i.
+Search (nth_error _ _ = nth_error _ _).
+Search nth_error.
+Print mat_el.
+...
+      rewrite fold_mat_el.
+cbn.
+...
+Search (nth_error _ (nth _ _ _)).
+
+Search (mat_nrows (mat_swap_rows _ _ _)).
+      rewrite map_swap_rows_nrows.
+...
+  unfold nth_error.
+
   intros i j Hi Hj.
   cbn.
   destruct (Nat.eq_dec i p) as [Hip| Hip]; [ subst i; apply Hjpq | ].
