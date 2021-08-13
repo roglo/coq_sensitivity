@@ -1186,61 +1186,6 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
     now rewrite transposition_out in H1.
   }
 }
-...
-now apply mk_canon_sym_gr_inj2 in Hp1.
-...
-apply mk_canon_sym_gr_inj1 in Hp1.
-...
-eapply mk_canon_sym_gr_inj1 with (n := n!).
-Search (rank_of_permut_in_sym_gr _ _ = rank_of_permut_in_sym_gr _ _).
-...
-    erewrite rank_of_permut_in_sym_gr_eq_compat in Hij. 2: {
-      intros u Hu.
-      rewrite H1; [ | easy ].
-      easy.
-    }
-...
-Search (rank_of_permut_in_sym_gr _ _ = rank_of_permut_in_sym_gr _ _).
-    specialize (H1 u) as Hu1.
-eapply mk_canon_sym_gr_inj1 with (n := n) (k := p).
-...
-    specialize (H1 p Hp) as Hp1.
-    specialize (H1 q Hq) as Hq1.
-    rewrite transposition_1 in Hp1.
-    rewrite transposition_2 in Hq1.
-eapply mk_canon_sym_gr_inj1 with (n := n) (k := p).
-Search (rank_of_permut_in_sym_gr _ _ = rank_of_permut_in_sym_gr _ _).
-Search (mk_canon_sym_gr _ _ _ = mk_canon_sym_gr _ _ _).
-...
-Search (is_permut (λ _, mk_canon_sym_gr _ _ _)).
-specialize (H1 _ _ (is_permut_mk_canon_transp
-...
-    apply rank_of_permut_injective with (i := p) in Hij.
-    cbn in Hij.
-...
-Check vect_swap_elem_is_permut.
-Print swap_elem.
-Search (_ → is_permut _ _).
-unfold vect_nat_el.
-cbn.
-...
-    apply vect_swap_elem_is_permut; [ easy | easy | ].
-    now apply sym_gr_elem_is_permut.
-  } {
-    intros * Hi Hj Hij.
-    apply rank_of_permut_injective in Hij; cycle 1. {
-      apply vect_swap_elem_is_permut; [ easy | easy | ].
-      now apply sym_gr_elem_is_permut.
-    } {
-      apply vect_swap_elem_is_permut; [ easy | easy | ].
-      now apply sym_gr_elem_is_permut.
-    }
-    apply vect_swap_elem_injective in Hij.
-    cbn in Hij.
-    injection Hij; clear Hij; intros Hij.
-    now apply sym_gr_elem_injective in Hij.
-  }
-}
 erewrite rngl_summation_list_eq_compat. 2: {
   intros k Hk.
   assert (Hkn : k < n!). {
@@ -1249,7 +1194,45 @@ erewrite rngl_summation_list_eq_compat. 2: {
     flia Hk Hn.
   }
   unfold g, f.
-  rewrite permut_in_sym_gr_of_its_rank. 2: {
+unfold mk_canon_sym_gr_vect at 1.
+unfold vect_vect_nat_el at 1.
+cbn - [ vect_vect_nat_el vect_nat_el ].
+assert
+  (Hrpq :
+   rank_of_permut_in_sym_gr_vect n
+     (vect_swap_elem (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) p q) <
+   n!). {
+  unfold rank_of_permut_in_sym_gr_vect.
+  apply rank_of_permut_upper_bound.
+  eapply is_permut_eq_compat. {
+    intros i Hi; symmetry.
+    unfold vect_nat_el; cbn.
+    rewrite (List_map_nth' 0). 2: {
+      rewrite seq_length.
+      rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
+      now rewrite map_seq_length.
+    }
+    rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
+    rewrite seq_nth; [ | now rewrite map_seq_length ].
+    rewrite seq_nth; [ cbn | easy ].
+    rewrite (List_map_nth' 0). 2: {
+      rewrite seq_length.
+      now apply transposition_lt.
+    }
+    rewrite seq_nth; [ cbn | now apply transposition_lt ].
+    easy.
+  }
+  now apply is_permut_mk_canon_transp.
+}
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+rewrite Nat.add_0_l.
+unfold rank_of_permut_in_sym_gr_vect.
+...
+rewrite permut_in_sym_gr_of_its_rank. 2: {
+Check permut_in_sym_gr_of_its_rank.
+...
+rewrite permut_in_sym_gr_of_its_rank. 2: {
     apply vect_swap_elem_is_permut; [ easy | easy | ].
     now apply sym_gr_elem_is_permut.
   }
