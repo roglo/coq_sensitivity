@@ -2068,37 +2068,49 @@ destruct j. {
   rewrite <- rngl_mul_assoc; f_equal.
   rewrite rngl_mul_comm; [ f_equal | easy ].
   f_equal.
-unfold mat_mul_row_by_scal.
-cbn - [ seq ].
-unfold subm.
-f_equal.
-cbn - [ butn seq ].
-Search (butn _ (map _ _)).
-rewrite map_butn.
-rewrite map_map.
-rewrite map_butn.
-unfold butn at 1 3.
-rewrite firstn_O, app_nil_l.
-rewrite firstn_O, app_nil_l.
-do 2 rewrite List_skipn_1.
-do 2 rewrite List_map_tl.
-remember (tl (seq _ _)) as x eqn:Hx.
-cbn in Hx; subst x.
-Search (_ = map _ (seq _ _)).
-rewrite List_eq_map_seq with (d := []).
-rewrite map_length.
-Search (length (tl _)).
-destruct A as (ll).
-cbn - [ butn seq ].
-destruct n; cbn.
-apply is_sm_mat_iff in Hsm.
-cbn in Hsm.
-destruct Hsm as (Hr & Hcr & Hc).
-Search (length _ = 1).
-destruct ll as [| a]; [ easy | ].
-cbn in Hr |-*.
-apply Nat.succ_inj in Hr.
-now rewrite Hr.
+  unfold mat_mul_row_by_scal.
+  cbn - [ seq ].
+  unfold subm.
+  f_equal.
+  cbn - [ butn seq ].
+  rewrite map_butn, map_map, map_butn.
+  unfold butn at 1 3.
+  rewrite firstn_O, app_nil_l.
+  rewrite firstn_O, app_nil_l.
+  do 2 rewrite List_skipn_1.
+  do 2 rewrite List_map_tl.
+  remember (tl (seq _ _)) as x eqn:Hx.
+  cbn in Hx; subst x.
+  rewrite List_eq_map_seq with (d := []).
+  rewrite map_length.
+  destruct n. {
+    cbn.
+    apply is_sm_mat_iff in Hsm.
+    cbn in Hsm.
+    destruct Hsm as (Hr & Hcr & Hc).
+    unfold mat_nrows in Hr.
+    destruct (mat_list_list A); [ easy | ].
+    cbn in Hr |-*.
+    apply Nat.succ_inj in Hr.
+    now rewrite Hr.
+  }
+  replace (length (tl (mat_list_list A))) with (S n). 2: {
+    apply is_sm_mat_iff in Hsm.
+    destruct Hsm as (Hr & Hcr & Hc).
+    unfold mat_nrows in Hr.
+    destruct (mat_list_list A) as [| la ll]; [ easy | ].
+    destruct ll; cbn in Hr |-*; [ easy | ].
+    do 2 apply Nat.succ_inj in Hr.
+    now rewrite Hr.
+  }
+  rewrite <- seq_shift, map_map.
+  apply map_ext_in.
+  intros i Hi.
+  cbn.
+...
+  cbn - [ seq ].
+destruct ll as [| la ll].
+  replace (length (tl (mat_list_list A))) with (S n). 2: {
 ...
 destruct ll as [| la ll].
 cbn.
