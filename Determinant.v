@@ -2049,9 +2049,10 @@ Theorem det_mul_row_0_by_scal :
   rngl_is_comm = true →
   ∀ n (A : matrix T) v,
   n ≠ 0
+  → is_square_matrix n A = true
   → determinant n (mat_mul_row_by_scal n 0 A v) = (v * determinant n A)%F.
 Proof.
-intros Hom Hic * Hnz.
+intros Hom Hic * Hnz Hsm.
 destruct n; [ easy | clear Hnz; cbn ].
 rewrite rngl_mul_summation_distr_l; [ | easy ].
 apply rngl_summation_eq_compat.
@@ -2080,14 +2081,27 @@ unfold butn at 1 3.
 rewrite firstn_O, app_nil_l.
 rewrite firstn_O, app_nil_l.
 do 2 rewrite List_skipn_1.
-Search (tl (map _ _ )).
-Search (hd _ (map _ _)).
-...
-rewrite List_map_tl.
-rewrite List_map_tl.
-Search (tl (seq _ _)).
+do 2 rewrite List_map_tl.
 remember (tl (seq _ _)) as x eqn:Hx.
 cbn in Hx; subst x.
+Search (_ = map _ (seq _ _)).
+rewrite List_eq_map_seq with (d := []).
+rewrite map_length.
+Search (length (tl _)).
+destruct A as (ll).
+cbn - [ butn seq ].
+destruct n; cbn.
+apply is_sm_mat_iff in Hsm.
+cbn in Hsm.
+destruct Hsm as (Hr & Hcr & Hc).
+Search (length _ = 1).
+destruct ll as [| a]; [ easy | ].
+cbn in Hr |-*.
+apply Nat.succ_inj in Hr.
+now rewrite Hr.
+...
+destruct ll as [| la ll].
+cbn.
 ...
 erewrite map_ext_in. 2: {
   intros i Hi.
