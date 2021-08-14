@@ -1078,6 +1078,9 @@ Definition Nat_le_neq_lt : ∀ x y : nat, x ≤ y → x ≠ y → (x < y)%nat :=
 Theorem List_hd_nth_0 {A} : ∀ l (d : A), hd d l = nth 0 l d.
 Proof. intros; now destruct l. Qed.
 
+Theorem List_map_tl : ∀ A B (f : A → B) l, tl (map f l) = map f (tl l).
+Proof. now intros; destruct l. Qed.
+
 Theorem List_map_map_map {A B C D} : ∀ (f : A → B → C) (g : A → D → B) h l,
   map (λ d, map (f d) (map (g d) (h d))) l =
   map (λ d, map (λ x, (f d (g d x))) (h d)) l.

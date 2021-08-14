@@ -2067,8 +2067,36 @@ destruct j. {
   rewrite <- rngl_mul_assoc; f_equal.
   rewrite rngl_mul_comm; [ f_equal | easy ].
   f_equal.
+unfold mat_mul_row_by_scal.
+cbn - [ seq ].
+unfold subm.
+f_equal.
+cbn - [ butn seq ].
+Search (butn _ (map _ _)).
+rewrite map_butn.
+rewrite map_map.
+rewrite map_butn.
+unfold butn at 1 3.
+rewrite firstn_O, app_nil_l.
+rewrite firstn_O, app_nil_l.
+do 2 rewrite List_skipn_1.
+Search (tl (map _ _ )).
+Search (hd _ (map _ _)).
+...
+rewrite List_map_tl.
+rewrite List_map_tl.
+Search (tl (seq _ _)).
+remember (tl (seq _ _)) as x eqn:Hx.
+cbn in Hx; subst x.
+...
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  erewrite map_ext_in. 2: {
+    intros j Hj.
+...
   apply matrix_eq.
   intros.
+  unfold nth_nth_error.
 ...
   cbn - [ mat_mul_row_by_scal ].
 ...
