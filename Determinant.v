@@ -2053,6 +2053,18 @@ Theorem det_mul_row_0_by_scal :
   → determinant n (mat_mul_row_by_scal n 0 A v) = (v * determinant n A)%F.
 Proof.
 intros Hom Hic * Hnz Hsm.
+destruct n; [ easy | clear Hnz ].
+cbn - [ mat_mul_row_by_scal ].
+rewrite rngl_mul_summation_distr_l; [ | easy ].
+apply rngl_summation_eq_compat.
+intros j Hj.
+symmetry.
+rewrite (rngl_mul_comm Hic).
+symmetry.
+do 3 rewrite <- rngl_mul_assoc.
+f_equal.
+...
+intros Hom Hic * Hnz Hsm.
 destruct n; [ easy | clear Hnz; cbn ].
 rewrite rngl_mul_summation_distr_l; [ | easy ].
 apply rngl_summation_eq_compat.
