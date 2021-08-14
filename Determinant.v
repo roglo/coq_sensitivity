@@ -2108,6 +2108,8 @@ destruct j. {
   intros i Hi.
   cbn.
 ...
+}
+...
   cbn - [ seq ].
 destruct ll as [| la ll].
   replace (length (tl (mat_list_list A))) with (S n). 2: {
