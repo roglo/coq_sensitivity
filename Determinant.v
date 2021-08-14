@@ -2024,22 +2024,16 @@ Definition mat_add_row_mul_scal_row n (M : matrix T) i1 v i2 :=
          (seq 0 n))
      (seq 0 n)).
 
-Print mat_repl_vect.
-
-...
-
-Definition mat_add_row_mul_scal_row n (M : matrix n n T) i1 v i2 :=
-  mk_mat n n
-    (λ i j,
-     if Nat.eq_dec i i1 then (mat_el M i1 j + v * mat_el M i2 j)%F
-     else mat_el M i j).
-
 (* *)
 
-Definition mat_mul_row_by_scal n k (M : matrix n n T) s :=
-  mk_mat n n
-    (λ i j,
-     if Nat.eq_dec i k then (s * mat_el M i j)%F else mat_el M i j).
+Definition mat_mul_row_by_scal n k (M : matrix T) s :=
+  mk_mat
+    (map
+       (λ i,
+        map
+          (λ j, if Nat.eq_dec i k then (s * mat_el M i j)%F else mat_el M i j)
+          (seq 0 n))
+       (seq 0 n)).
 
 (* If we multiply a row (column) of A by a number, the determinant of
    A will be multiplied by the same number. *)
@@ -2053,10 +2047,38 @@ Definition mat_mul_row_by_scal n k (M : matrix n n T) s :=
 Theorem det_mul_row_0_by_scal :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_is_comm = true →
-  ∀ n (A : matrix n n T) v,
+  ∀ n (A : matrix T) v,
   n ≠ 0
-  → determinant (mat_mul_row_by_scal 0 A v) = (v * determinant A)%F.
+  → determinant n (mat_mul_row_by_scal n 0 A v) = (v * determinant n A)%F.
 Proof.
+intros Hom Hic * Hnz.
+destruct n; [ easy | clear Hnz; cbn ].
+rewrite rngl_mul_summation_distr_l; [ | easy ].
+apply rngl_summation_eq_compat.
+intros j Hj.
+symmetry.
+rewrite (rngl_mul_comm Hic).
+symmetry.
+do 3 rewrite <- rngl_mul_assoc.
+f_equal.
+destruct j. {
+  clear Hj.
+  rewrite (rngl_mul_comm Hic v).
+  rewrite <- rngl_mul_assoc; f_equal.
+  rewrite rngl_mul_comm; [ f_equal | easy ].
+  f_equal.
+  apply matrix_eq.
+  intros.
+...
+  cbn - [ mat_mul_row_by_scal ].
+...
+rewrite rngl_mul_comm; [ f_equal | easy ].
+f_equal.
+apply matrix_eq; cbn.
+rename j into k; rename Hj into Hk.
+intros i j Hi Hj.
+destruct (Nat.eq_dec (i + 1) 0) as [H| H]; [ flia H | easy ].
+...
 intros Hom Hic * Hnz.
 unfold determinant; cbn.
 destruct n; [ easy | clear Hnz ].
