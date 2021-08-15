@@ -2057,7 +2057,7 @@ destruct n; [ easy | clear Hnz ].
 cbn - [ mat_mul_row_by_scal ].
 rewrite rngl_mul_summation_distr_l; [ | easy ].
 apply rngl_summation_eq_compat.
-intros j Hj.
+intros i (_, Hi).
 symmetry.
 rewrite (rngl_mul_comm Hic).
 symmetry.
@@ -2066,10 +2066,43 @@ f_equal.
 rewrite rngl_mul_assoc, (rngl_mul_mul_swap Hic).
 rewrite (rngl_mul_comm Hic _ v).
 f_equal. {
-  destruct j; [ easy | cbn ].
-  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
-  rewrite seq_nth; [ easy | flia Hj ].
+  destruct i; [ easy | cbn ].
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  now rewrite seq_nth.
 }
+f_equal.
+unfold subm.
+f_equal.
+f_equal.
+unfold butn.
+do 2 rewrite firstn_O.
+f_equal.
+do 2 rewrite List_skipn_1.
+destruct A as (ll).
+cbn.
+destruct ll as [| la ll]; [ easy | ].
+rewrite <- seq_shift.
+rewrite map_map.
+erewrite map_ext_in. 2: {
+  intros j Hj.
+  apply in_seq in Hj.
+  destruct (Nat.eq_dec (S j) 0) as [H| H]; [ now exfalso | clear H ].
+  cbn.
+  easy.
+}
+cbn.
+rewrite List_eq_map_seq with (d := []).
+apply is_sm_mat_iff in Hsm.
+cbn in Hsm.
+destruct Hsm as (Hr & Hcr & Hc).
+apply Nat.succ_inj in Hr.
+rewrite Hr.
+apply map_ext_in.
+intros j Hj.
+apply in_seq in Hj.
+rewrite map_map.
+destruct j; cbn. {
+  destruct n; [ easy | cbn ].
 ...
 rewrite rngl_mul_comm; [ f_equal | easy ].
 f_equal.
