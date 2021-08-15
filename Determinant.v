@@ -2063,82 +2063,13 @@ rewrite (rngl_mul_comm Hic).
 symmetry.
 do 3 rewrite <- rngl_mul_assoc.
 f_equal.
-...
-intros Hom Hic * Hnz Hsm.
-destruct n; [ easy | clear Hnz; cbn ].
-rewrite rngl_mul_summation_distr_l; [ | easy ].
-apply rngl_summation_eq_compat.
-intros j Hj.
-symmetry.
-rewrite (rngl_mul_comm Hic).
-symmetry.
-do 3 rewrite <- rngl_mul_assoc.
-f_equal.
-destruct j. {
-  clear Hj.
-  rewrite (rngl_mul_comm Hic v).
-  rewrite <- rngl_mul_assoc; f_equal.
-  rewrite rngl_mul_comm; [ f_equal | easy ].
-  f_equal.
-  unfold mat_mul_row_by_scal.
-  cbn - [ seq ].
-  unfold subm.
-  f_equal.
-  cbn - [ butn seq ].
-  rewrite map_butn, map_map, map_butn.
-  unfold butn at 1 3.
-  rewrite firstn_O, app_nil_l.
-  rewrite firstn_O, app_nil_l.
-  do 2 rewrite List_skipn_1.
-  do 2 rewrite List_map_tl.
-  remember (tl (seq _ _)) as x eqn:Hx.
-  cbn in Hx; subst x.
-  rewrite List_eq_map_seq with (d := []).
-  rewrite map_length.
-  destruct n. {
-    cbn.
-    apply is_sm_mat_iff in Hsm.
-    cbn in Hsm.
-    destruct Hsm as (Hr & Hcr & Hc).
-    unfold mat_nrows in Hr.
-    destruct (mat_list_list A); [ easy | ].
-    cbn in Hr |-*.
-    apply Nat.succ_inj in Hr.
-    now rewrite Hr.
-  }
-  replace (length (tl (mat_list_list A))) with (S n). 2: {
-    apply is_sm_mat_iff in Hsm.
-    destruct Hsm as (Hr & Hcr & Hc).
-    unfold mat_nrows in Hr.
-    destruct (mat_list_list A) as [| la ll]; [ easy | ].
-    destruct ll; cbn in Hr |-*; [ easy | ].
-    do 2 apply Nat.succ_inj in Hr.
-    now rewrite Hr.
-  }
-  rewrite <- seq_shift, map_map.
-  apply map_ext_in.
-  intros i Hi.
-  cbn.
-...
+rewrite rngl_mul_assoc, (rngl_mul_mul_swap Hic).
+rewrite (rngl_mul_comm Hic _ v).
+f_equal. {
+  destruct j; [ easy | cbn ].
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
+  rewrite seq_nth; [ easy | flia Hj ].
 }
-...
-  cbn - [ seq ].
-destruct ll as [| la ll].
-  replace (length (tl (mat_list_list A))) with (S n). 2: {
-...
-destruct ll as [| la ll].
-cbn.
-...
-erewrite map_ext_in. 2: {
-  intros i Hi.
-  erewrite map_ext_in. 2: {
-    intros j Hj.
-...
-  apply matrix_eq.
-  intros.
-  unfold nth_nth_error.
-...
-  cbn - [ mat_mul_row_by_scal ].
 ...
 rewrite rngl_mul_comm; [ f_equal | easy ].
 f_equal.
