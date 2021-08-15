@@ -2070,6 +2070,7 @@ f_equal. {
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
   now rewrite seq_nth.
 }
+...
 f_equal.
 unfold subm.
 f_equal.
@@ -2103,6 +2104,18 @@ apply in_seq in Hj.
 rewrite map_map.
 destruct j; cbn. {
   destruct n; [ easy | cbn ].
+  remember (nth 0 ll []) as lb eqn:Hlb.
+  rewrite List_eq_map_seq with (d := 0%F).
+  rewrite Hc.
+  cbn.
+  f_equal; f_equal.
+  rewrite <- (seq_shift _ 1).
+  now rewrite map_map.
+  destruct ll as [| lc].
+  now right.
+  cbn in Hlb.
+  now right; left.
+}
 ...
 rewrite rngl_mul_comm; [ f_equal | easy ].
 f_equal.
