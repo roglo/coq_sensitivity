@@ -2035,6 +2035,54 @@ Definition mat_mul_row_by_scal n k (M : matrix T) s :=
           (seq 0 n))
        (seq 0 n)).
 
+Theorem subm_mat_mul_row_by_scal : ∀ (A : matrix T) n i v,
+  is_square_matrix n A = true
+  → subm (mat_mul_row_by_scal n 0 A v) 0 i = subm A 0 i.
+Proof.
+intros * Hsm.
+unfold subm.
+f_equal.
+f_equal.
+unfold butn.
+do 2 rewrite firstn_O.
+f_equal.
+do 2 rewrite List_skipn_1.
+destruct A as (ll).
+destruct ll as [| la ll]. {
+  cbn.
+  apply is_sm_mat_iff in Hsm.
+  cbn in Hsm.
+  now destruct Hsm as (Hr, _); subst n.
+}
+apply is_sm_mat_iff in Hsm.
+cbn in Hsm.
+destruct Hsm as (Hr & Hcr & Hc).
+destruct n; [ easy | ].
+apply Nat.succ_inj in Hr.
+cbn - [ mat_mul_row_by_scal ].
+rewrite List_eq_map_seq with (d := []).
+rewrite Hr.
+cbn - [ seq mat_el ].
+rewrite List_map_tl.
+remember (tl (seq 0 (S n))) as x eqn:Hx.
+cbn in Hx; subst x.
+rewrite <- seq_shift.
+rewrite map_map.
+apply map_ext_in.
+intros j Hj.
+apply in_seq in Hj.
+destruct Hj as (_, Hj).
+rewrite List_eq_map_seq with (d := 0%F).
+rewrite Hc. 2: {
+  right.
+  apply nth_In.
+  now rewrite Hr.
+}
+apply map_ext_in.
+intros k Hk.
+now destruct (Nat.eq_dec (S j) 0).
+Qed.
+
 (* If we multiply a row (column) of A by a number, the determinant of
    A will be multiplied by the same number. *)
 (* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html
@@ -2071,82 +2119,10 @@ f_equal. {
   now rewrite seq_nth.
 }
 f_equal.
-unfold subm.
-f_equal.
-f_equal.
-unfold butn.
-do 2 rewrite firstn_O.
-f_equal.
-do 2 rewrite List_skipn_1.
-...
-destruct A as (ll).
-cbn.
-clear Hsm.
-cbn.
-induction ll as [| la ll]. {
-induction ll as [| la ll]; [ easy | ].
-rewrite <- seq_shift.
-rewrite map_map.
-erewrite map_ext_in. 2: {
-  intros j Hj.
-  apply in_seq in Hj.
-  destruct (Nat.eq_dec (S j) 0) as [H| H]; [ now exfalso | clear H ].
-  cbn.
-  easy.
-}
-cbn.
-rewrite List_eq_map_seq with (d := []).
-apply is_sm_mat_iff in Hsm.
-cbn in Hsm.
-destruct Hsm as (Hr & Hcr & Hc).
-apply Nat.succ_inj in Hr.
-rewrite Hr.
-apply map_ext_in.
-intros j Hj.
-apply in_seq in Hj.
-rewrite map_map.
-destruct j; cbn. {
-  destruct n; [ easy | cbn ].
-  remember (nth 0 ll []) as lb eqn:Hlb.
-  rewrite List_eq_map_seq with (d := 0%F).
-  rewrite Hc.
-  cbn.
-  f_equal; f_equal.
-  rewrite <- (seq_shift _ 1).
-  now rewrite map_map.
-  destruct ll as [| lc].
-  now right.
-  cbn in Hlb.
-  now right; left.
-}
-...
-rewrite rngl_mul_comm; [ f_equal | easy ].
-f_equal.
-apply matrix_eq; cbn.
-rename j into k; rename Hj into Hk.
-intros i j Hi Hj.
-destruct (Nat.eq_dec (i + 1) 0) as [H| H]; [ flia H | easy ].
-...
-intros Hom Hic * Hnz.
-unfold determinant; cbn.
-destruct n; [ easy | clear Hnz ].
-cbn.
-rewrite rngl_mul_summation_distr_l; [ | easy ].
-apply rngl_summation_eq_compat.
-intros j Hj.
-rewrite (rngl_mul_comm Hic (minus_one_pow j)).
-do 2 rewrite <- rngl_mul_assoc.
-f_equal.
-rewrite (rngl_mul_comm Hic (mat_el A 0 j)).
-do 2 rewrite <- rngl_mul_assoc.
-f_equal.
-rewrite rngl_mul_comm; [ f_equal | easy ].
-f_equal.
-apply matrix_eq; cbn.
-rename j into k; rename Hj into Hk.
-intros i j Hi Hj.
-destruct (Nat.eq_dec (i + 1) 0) as [H| H]; [ flia H | easy ].
+now apply subm_mat_mul_row_by_scal.
 Qed.
+
+...
 
 (* If the i-th row (column) in A is a sum of the i-th row (column) of
    a matrix B and the i-th row (column) of a matrix C and all other
