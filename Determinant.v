@@ -2122,8 +2122,6 @@ f_equal.
 now apply subm_mat_mul_row_by_scal.
 Qed.
 
-...
-
 (* If the i-th row (column) in A is a sum of the i-th row (column) of
    a matrix B and the i-th row (column) of a matrix C and all other
    rows in B and C are equal to the corresponding rows in A (that is B
@@ -2135,13 +2133,60 @@ Qed.
    row 0, we can prove that only when i=0; this will able us to
    prove the next theorem, swapping rows by going via row 0 *)
 
-Theorem det_sum_row_row : ∀ n (A B C : matrix n n T),
+Theorem det_sum_row_row : ∀ n (A B C : matrix T),
   n ≠ 0
   → (∀ j, mat_el A 0 j = (mat_el B 0 j + mat_el C 0 j)%F)
   → (∀ i j, i ≠ 0 → mat_el B i j = mat_el A i j)
   → (∀ i j, i ≠ 0 → mat_el C i j = mat_el A i j)
-  → determinant A = (determinant B + determinant C)%F.
+  → determinant n A = (determinant n B + determinant n C)%F.
 Proof.
+intros * Hnz Hbc Hb Hc.
+destruct n; [ easy | clear Hnz ].
+cbn.
+assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
+  intros.
+  apply matrix_eq.
+  intros i j'.
+  unfold nth_nth_error.
+  remember (nth_error _ _) as x eqn:Hx.
+  remember (nth_error _ _) as y eqn:Hy in |-*.
+  symmetry in Hx, Hy.
+  destruct x as [la| ]. {
+    apply nth_error_In in Hx.
+    destruct y as [lb| ]. {
+      apply nth_error_In in Hy.
+      f_equal.
+Search (nth_error _ _ = nth_error _ _).
+...
+  unfold subm.
+  f_equal; f_equal.
+  unfold butn.
+  do 2 rewrite firstn_O; f_equal.
+  do 2 rewrite List_skipn_1.
+...
+  apply matrix_eq; cbn.
+  intros i j' Hi Hj'.
+  destruct (lt_dec j' j); symmetry; apply Hb; flia.
+}
+assert (Hac : ∀ j, subm A 0 j = subm C 0 j). {
+  intros.
+  apply matrix_eq; cbn.
+  intros i j' Hi Hj'.
+  destruct (lt_dec j' j); symmetry; apply Hc; flia.
+}
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite Hbc.
+  rewrite rngl_mul_add_distr_l.
+  rewrite rngl_mul_add_distr_r.
+  rewrite Hab at 1.
+  rewrite Hac at 1.
+  easy.
+}
+cbn.
+now apply rngl_summation_add_distr.
+Qed.
+...
 intros * Hnz Hbc Hb Hc.
 unfold determinant.
 destruct n; [ easy | clear Hnz ].
