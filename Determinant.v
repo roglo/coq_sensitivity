@@ -2071,6 +2071,35 @@ f_equal. {
   now rewrite seq_nth.
 }
 ...
+revert i A Hsm Hi.
+induction n; intros; [ easy | ].
+cbn - [ subm ].
+apply rngl_summation_eq_compat.
+intros j Hj.
+do 2 rewrite <- rngl_mul_assoc.
+f_equal.
+f_equal. {
+  unfold subm at 1.
+  cbn - [ subm ].
+  unfold butn.
+  unfold mat_mul_row_by_scal.
+  cbn.
+symmetry.
+rewrite <- IHn; [ | | easy ].
+...
+rewrite (rngl_mul_comm Hic (minus_one_pow j)).
+do 2 rewrite <- rngl_mul_assoc.
+f_equal.
+rewrite (rngl_mul_comm Hic (mat_el A 0 j)).
+do 2 rewrite <- rngl_mul_assoc.
+f_equal.
+rewrite rngl_mul_comm; [ f_equal | easy ].
+f_equal.
+apply matrix_eq; cbn.
+rename j into k; rename Hj into Hk.
+intros i j Hi Hj.
+destruct (Nat.eq_dec (i + 1) 0) as [H| H]; [ flia H | easy ].
+...
 f_equal.
 unfold subm.
 f_equal.
@@ -2081,7 +2110,10 @@ f_equal.
 do 2 rewrite List_skipn_1.
 destruct A as (ll).
 cbn.
-destruct ll as [| la ll]; [ easy | ].
+clear Hsm.
+cbn.
+induction ll as [| la ll]. {
+induction ll as [| la ll]; [ easy | ].
 rewrite <- seq_shift.
 rewrite map_map.
 erewrite map_ext_in. 2: {
