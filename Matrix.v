@@ -1763,6 +1763,87 @@ Compute subm (mk_mat [[3;5;8];[2;1;9];[10;11;12]]) 1 2.
 
 (* combinations of submatrix and other operations *)
 
+Theorem mat_el_subm : ∀ (M : matrix T) i j u v,
+  is_correct_matrix M
+  → u ≤ mat_nrows M
+  → v ≤ mat_ncols M
+  → i < mat_nrows M - 1
+  → j < mat_ncols M - 1
+  → mat_el (subm M u v) i j =
+      mat_el M (i + Nat.b2n (u <=? i)) (j + Nat.b2n (v <=? j)).
+Proof.
+intros * Hcm Hu Hv Hi Hj.
+unfold Nat.b2n.
+do 2 rewrite if_leb_le_dec.
+unfold mat_el, subm; cbn.
+unfold butn.
+rewrite map_app.
+destruct (le_dec u i) as [Hui| Hui]. {
+  rewrite app_nth2. 2: {
+    rewrite map_length, firstn_length, fold_mat_nrows.
+    unfold ge.
+    rewrite Nat.min_l; [ easy | flia Hi Hui ].
+  }
+  rewrite map_length, firstn_length.
+  rewrite fold_mat_nrows.
+  rewrite Nat.min_l; [ | flia Hi Hui ].
+  rewrite <- skipn_map.
+  rewrite List_nth_skipn.
+  replace (i - u + S u) with (i + 1) by flia Hui.
+  rewrite (List_map_nth' []). 2: {
+    rewrite fold_mat_nrows.
+    flia Hi.
+  }
+  destruct (le_dec v j) as [Hvj| Hvj]. {
+    rewrite app_nth2; [ | rewrite firstn_length; flia Hvj ].
+    rewrite firstn_length.
+    rewrite Nat.min_l. 2: {
+      rewrite fold_corr_mat_ncols; [ easy | easy | flia Hi ].
+    }
+    rewrite List_nth_skipn.
+    now replace (j - v + S v) with (j + 1) by flia Hvj.
+  } {
+    rewrite Nat.add_0_r.
+    apply Nat.nle_gt in Hvj.
+    rewrite app_nth1. 2: {
+      rewrite firstn_length.
+      rewrite fold_corr_mat_ncols; [ | easy | flia Hi ].
+      now rewrite Nat.min_l.
+    }
+    now rewrite List_nth_firstn.
+  }
+} {
+  rewrite Nat.add_0_r.
+  apply Nat.nle_gt in Hui.
+  rewrite app_nth1. 2: {
+    rewrite map_length, firstn_length, fold_mat_nrows.
+    now rewrite Nat.min_l.
+  }
+  rewrite (List_map_nth' []). 2: {
+    rewrite firstn_length, fold_mat_nrows.
+    now rewrite Nat.min_l.
+  }
+  rewrite List_nth_firstn; [ | easy ].
+  destruct (le_dec v j) as [Hvj| Hvj]. {
+    rewrite app_nth2; [ | rewrite firstn_length; flia Hvj ].
+    rewrite firstn_length.
+    rewrite fold_corr_mat_ncols; [ | easy | flia Hi ].
+    rewrite Nat.min_l; [ | easy ].
+    rewrite List_nth_skipn.
+    now replace (j - v + S v) with (j + 1) by flia Hvj.
+  } {
+    rewrite Nat.add_0_r.
+    apply Nat.nle_gt in Hvj.
+    rewrite app_nth1. 2: {
+      rewrite firstn_length.
+      rewrite fold_corr_mat_ncols; [ | easy | flia Hi ].
+      now rewrite Nat.min_l.
+    }
+    now rewrite List_nth_firstn.
+  }
+}
+Qed.
+
 Theorem mat_nrows_subm : ∀ (M : matrix T) i j,
   i < mat_nrows M
   → mat_nrows (subm M i j) = mat_nrows M - 1.

@@ -2225,58 +2225,26 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
               flia Hib.
             } {
               specialize (square_matrix_ncols _ Hsmb) as H1.
-              flia Hnz H1.
+              rewrite H1; flia Hnz.
             } {
               specialize (square_matrix_ncols _ Hsmb) as H1.
-              flia Hjn H1.
+              rewrite H1; flia Hjn.
             }
-Theorem mat_el_subm : ∀ (M : matrix T) i j u v,
-  u ≤ mat_nrows M
-  → v ≤ mat_nrows M
-  → i < mat_nrows M - 1
-  → j < mat_ncols M - 1
-  → mat_el (subm M u v) i j =
-      mat_el M (i + Nat.b2n (u <=? i)) (j + Nat.b2n (v <=? j)).
-Proof.
-intros * Hu Hv Hi Hj.
-unfold Nat.b2n.
-do 2 rewrite if_leb_le_dec.
-destruct (le_dec u i) as [Hui| Hui]. {
-  destruct (le_dec v j) as [Hvj| Hvj]. {
-    unfold mat_el, subm; cbn.
-    unfold butn.
-    rewrite map_app.
-    rewrite app_nth2. 2: {
-      rewrite map_length, firstn_length, fold_mat_nrows.
-      unfold ge.
-      rewrite Nat.min_l; [ easy | flia Hi Hui ].
-    }
-    rewrite map_length, firstn_length.
-    rewrite fold_mat_nrows.
-    rewrite Nat.min_l; [ | flia Hi Hui ].
-    rewrite <- skipn_map.
-    rewrite List_nth_skipn.
-    replace (i - u + S u) with (i + 1) by flia Hui.
-    rewrite (List_map_nth' []). 2: {
-      rewrite fold_mat_nrows.
-      flia Hi.
-    }
-    rewrite app_nth2; [ | rewrite firstn_length; flia Hvj ].
-    rewrite firstn_length.
-    rewrite Nat.min_l.
-...
-    rewrite List_nth_skipn.
-...
-rewrite mat_el_subm; [ | flia | | easy | easy ]. 2: {
-  apply is_sm_mat_iff in Hsma.
-  destruct Hsma as (Hr, _).
-  flia Hr Hjn.
-}
-...
-    rewrite (List_map_nth' []). 2: {
-      rewrite app_length, firstn_length, skipn_length.
-      rewrite fold_mat_nrows.
-
+            rewrite mat_el_subm; [ | | flia | | easy | easy ]; cycle 1. {
+              now apply (@squ_mat_is_corr (S n)).
+            } {
+              specialize (square_matrix_ncols _ Hsma) as H1.
+              rewrite H1; flia Hjn.
+            }
+            rewrite mat_el_subm; [ | | flia | | easy | easy ]; cycle 1. {
+              now apply (@squ_mat_is_corr (S n)).
+            } {
+              specialize (square_matrix_ncols _ Hsmb) as H1.
+              rewrite H1; flia Hjn.
+            }
+            symmetry; apply Hb.
+            now rewrite Nat.add_1_r.
+          }
 ...
   unfold subm.
   f_equal; f_equal.
