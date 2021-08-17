@@ -2185,14 +2185,60 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
           f_equal.
           subst z t la lb.
           do 2 rewrite fold_mat_el.
-...
-Search (mat_el (subm _ _ _)).
+          destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+            subst n.
+            apply is_sm_mat_iff in Hsma.
+            destruct Hsma as (Hr, _); rewrite Hr in Hia.
+            flia Hia.
+          }
+          destruct (le_dec j n) as [Hjn| Hjn]. {
+            rewrite fold_corr_mat_ncols in Hjla; cycle 1. {
+              apply (@squ_mat_is_corr n).
+              apply is_squ_mat_subm; [ easy | flia | easy | easy ].
+            } {
+              rewrite mat_nrows_subm; [ easy | ].
+              apply Nat.neq_0_lt_0.
+              intros H; rewrite H in Hia; flia Hia.
+            }
+            rewrite mat_ncols_subm in Hjla; cycle 1. {
+              now apply (@squ_mat_is_corr (S n)).
+            } {
+              flia Hia.
+            } {
+              specialize (square_matrix_ncols _ Hsma) as H1.
+              flia Hnz H1.
+            } {
+              specialize (square_matrix_ncols _ Hsma) as H1.
+              flia Hjn H1.
+            }
+            rewrite fold_corr_mat_ncols in Hjlb; cycle 1. {
+              apply (@squ_mat_is_corr n).
+              apply is_squ_mat_subm; [ easy | flia | easy | easy ].
+            } {
+              rewrite mat_nrows_subm; [ easy | ].
+              apply Nat.neq_0_lt_0.
+              intros H; rewrite H in Hib; flia Hib.
+            }
+            rewrite mat_ncols_subm in Hjlb; cycle 1. {
+              now apply (@squ_mat_is_corr (S n)).
+            } {
+              flia Hib.
+            } {
+              specialize (square_matrix_ncols _ Hsmb) as H1.
+              flia Hnz H1.
+            } {
+              specialize (square_matrix_ncols _ Hsmb) as H1.
+              flia Hjn H1.
+            }
 Theorem mat_el_subm : ∀ (M : matrix T) i j u v,
-  i ≤ mat_nrows M
+  u ≤ mat_nrows M
+  → v ≤ mat_nrows M
+  → i < mat_nrows M - 1
+  → j < mat_ncols M - 1
   → mat_el (subm M u v) i j =
       mat_el M (i + Nat.b2n (u <=? i)) (j + Nat.b2n (v <=? j)).
 Proof.
-intros * Hi.
+intros * Hu Hv Hi Hj.
 unfold Nat.b2n.
 do 2 rewrite if_leb_le_dec.
 destruct (le_dec u i) as [Hui| Hui]. {
@@ -2214,6 +2260,18 @@ destruct (le_dec u i) as [Hui| Hui]. {
     rewrite (List_map_nth' []). 2: {
       rewrite fold_mat_nrows.
       flia Hi.
+    }
+    rewrite app_nth2; [ | rewrite firstn_length; flia Hvj ].
+    rewrite firstn_length.
+    rewrite Nat.min_l.
+...
+    rewrite List_nth_skipn.
+...
+rewrite mat_el_subm; [ | flia | | easy | easy ]. 2: {
+  apply is_sm_mat_iff in Hsma.
+  destruct Hsma as (Hr, _).
+  flia Hr Hjn.
+}
 ...
     rewrite (List_map_nth' []). 2: {
       rewrite app_length, firstn_length, skipn_length.
