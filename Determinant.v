@@ -2152,11 +2152,60 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
   remember (nth_error _ _) as y eqn:Hy in |-*.
   symmetry in Hx, Hy.
   destruct x as [la| ]. {
-    apply nth_error_In in Hx.
+    apply List_nth_error_Some_iff with (d := []) in Hx.
+    destruct Hx as (Hla & Hia).
     destruct y as [lb| ]. {
-      apply nth_error_In in Hy.
+      apply List_nth_error_Some_iff with (d := []) in Hy.
+      destruct Hy as (Hlb & Hib).
       f_equal.
-Search (nth_error _ _ = nth_error _ _).
+      remember (nth_error la j') as z eqn:Hz.
+      remember (nth_error lb j') as t eqn:Ht.
+      symmetry in Hz, Ht.
+      destruct z as [z| ]. {
+        apply List_nth_error_Some_iff with (d := 0%F) in Hz.
+        destruct Hz as (Hz & Hjla).
+        destruct t as [t| ]. {
+          apply List_nth_error_Some_iff with (d := 0%F) in Ht.
+          destruct Ht as (Ht & Hjlb).
+          f_equal.
+          subst z t la lb.
+          do 2 rewrite fold_mat_el.
+          rewrite fold_mat_nrows in Hia, Hib.
+          rewrite mat_nrows_subm in Hia.
+...
+Search (mat_el (subm _ _ _)).
+Theorem mat_el_subm : ∀ (M : matrix T) i j u v,
+  i ≤ mat_nrows M
+  → mat_el (subm M u v) i j =
+      mat_el M (i + Nat.b2n (u <=? i)) (j + Nat.b2n (v <=? j)).
+Proof.
+intros * Hi.
+unfold Nat.b2n.
+do 2 rewrite if_leb_le_dec.
+destruct (le_dec u i) as [Hui| Hui]. {
+  destruct (le_dec v j) as [Hvj| Hvj]. {
+    unfold mat_el, subm; cbn.
+    unfold butn.
+    rewrite map_app.
+    rewrite app_nth2. 2: {
+      rewrite map_length, firstn_length, fold_mat_nrows.
+      unfold ge.
+      rewrite Nat.min_l; [ easy | flia Hi Hui ].
+    }
+    rewrite map_length, firstn_length.
+    rewrite fold_mat_nrows.
+    rewrite Nat.min_l; [ | flia Hi Hui ].
+    rewrite <- skipn_map.
+    rewrite List_nth_skipn.
+    replace (i - u + S u) with (i + 1) by flia Hui.
+    rewrite (List_map_nth' []). 2: {
+      rewrite fold_mat_nrows.
+      flia Hi.
+...
+    rewrite (List_map_nth' []). 2: {
+      rewrite app_length, firstn_length, skipn_length.
+      rewrite fold_mat_nrows.
+
 ...
   unfold subm.
   f_equal; f_equal.
