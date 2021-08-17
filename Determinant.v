@@ -2191,6 +2191,18 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
             destruct Hsma as (Hr, _); rewrite Hr in Hia.
             flia Hia.
           }
+          destruct (lt_dec n j) as [Hjn| Hjn]. {
+            unfold mat_el, subm.
+            cbn - [ butn ].
+            rewrite (List_map_nth' []). 2: {
+              rewrite butn_length; [ | rewrite fold_mat_nrows; flia Hia ].
+              now rewrite fold_mat_nrows.
+            }
+            rewrite (List_map_nth' []). 2: {
+              rewrite butn_length; [ | rewrite fold_mat_nrows; flia Hib ].
+              now rewrite fold_mat_nrows.
+            }
+...
           destruct (le_dec j n) as [Hjn| Hjn]. {
             rewrite fold_corr_mat_ncols in Hjla; cycle 1. {
               apply (@squ_mat_is_corr n).
