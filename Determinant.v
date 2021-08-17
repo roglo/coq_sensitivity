@@ -2238,19 +2238,46 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
             rewrite butn_length; rewrite fold_mat_nrows, Hra; [ | flia ].
             now rewrite Nat.sub_succ, Nat.sub_0_r.
           }
+          unfold subm.
+          cbn - [ butn ].
+          rewrite (List_map_nth' []). 2: {
+            rewrite butn_length; [ | rewrite fold_mat_nrows, Hra; flia ].
+            now rewrite fold_mat_nrows, Hra, Nat.sub_succ, Nat.sub_0_r.
+          }
+          rewrite (List_map_nth' []). 2: {
+            rewrite butn_length; [ | rewrite fold_mat_nrows, Hrb; flia ].
+            now rewrite fold_mat_nrows, Hrb, Nat.sub_succ, Nat.sub_0_r.
+          }
+          unfold butn at 1 3.
+          rewrite app_nth1. 2: {
+            rewrite firstn_length.
+            rewrite Nat.min_r. 2: {
+              unfold butn.
+              rewrite app_nth2. 2: {
+                rewrite firstn_length.
+                rewrite Nat.min_0_l; flia.
+              }
+              rewrite firstn_length.
+              rewrite Nat.min_0_l, Nat.sub_0_r.
+              rewrite List_nth_skipn.
+              rewrite fold_corr_mat_ncols; cycle 1. {
+                now apply (@squ_mat_is_corr (S n)).
+              } {
+                rewrite Hra, Nat.add_1_r.
+                now apply -> Nat.succ_lt_mono.
+              }
+              now rewrite Hca.
+            }
+...
+            rewrite Nat.min_r; [ | flia Hjn ].
+            unfold ge.
+...
+rewrite nth_butn_after with (j := j).
 ...
 2: rewrite fold_mat_ncols.
 ...
             unfold mat_el, subm.
-            cbn - [ butn ].
-            rewrite (List_map_nth' []). 2: {
-              rewrite butn_length; [ | rewrite fold_mat_nrows, Hra; flia ].
-              now rewrite fold_mat_nrows, Hra, Nat.sub_succ, Nat.sub_0_r.
-            }
-            rewrite (List_map_nth' []). 2: {
-              rewrite butn_length; [ | rewrite fold_mat_nrows, Hrb; flia ].
-              now rewrite fold_mat_nrows, Hrb, Nat.sub_succ, Nat.sub_0_r.
-            }
+
 ...
             rewrite nth_butn_after. 2: {
 
