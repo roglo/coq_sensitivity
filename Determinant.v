@@ -2135,12 +2135,14 @@ Qed.
 
 Theorem det_sum_row_row : ∀ n (A B C : matrix T),
   n ≠ 0
+  → is_square_matrix n A = true
+  → is_square_matrix n B = true
   → (∀ j, mat_el A 0 j = (mat_el B 0 j + mat_el C 0 j)%F)
   → (∀ i j, i ≠ 0 → mat_el B i j = mat_el A i j)
   → (∀ i j, i ≠ 0 → mat_el C i j = mat_el A i j)
   → determinant n A = (determinant n B + determinant n C)%F.
 Proof.
-intros * Hnz Hbc Hb Hc.
+intros * Hnz Hsma Hsmb Hbc Hb Hc.
 destruct n; [ easy | clear Hnz ].
 cbn.
 assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
@@ -2151,16 +2153,29 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
   remember (nth_error _ _) as x eqn:Hx.
   remember (nth_error _ _) as y eqn:Hy in |-*.
   symmetry in Hx, Hy.
+  move Hx before Hy.
   destruct x as [la| ]. {
     apply List_nth_error_Some_iff with (d := []) in Hx.
     destruct Hx as (Hla & Hia).
+    rewrite fold_mat_nrows in Hia.
+    rewrite mat_nrows_subm in Hia. 2: {
+      apply is_sm_mat_iff in Hsma.
+      destruct Hsma as (Hr, _); rewrite Hr; flia.
+    }
     destruct y as [lb| ]. {
       apply List_nth_error_Some_iff with (d := []) in Hy.
       destruct Hy as (Hlb & Hib).
+      rewrite fold_mat_nrows in Hib.
+      rewrite mat_nrows_subm in Hib. 2: {
+        apply is_sm_mat_iff in Hsmb.
+        destruct Hsmb as (Hr, _); rewrite Hr; flia.
+      }
+      move Hia before Hib.
       f_equal.
       remember (nth_error la j') as z eqn:Hz.
       remember (nth_error lb j') as t eqn:Ht.
       symmetry in Hz, Ht.
+      move Hz before Ht.
       destruct z as [z| ]. {
         apply List_nth_error_Some_iff with (d := 0%F) in Hz.
         destruct Hz as (Hz & Hjla).
@@ -2170,8 +2185,6 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
           f_equal.
           subst z t la lb.
           do 2 rewrite fold_mat_el.
-          rewrite fold_mat_nrows in Hia, Hib.
-          rewrite mat_nrows_subm in Hia.
 ...
 Search (mat_el (subm _ _ _)).
 Theorem mat_el_subm : ∀ (M : matrix T) i j u v,
