@@ -2143,8 +2143,11 @@ Theorem det_sum_row_row : ∀ n (A B C : matrix T),
   → determinant n A = (determinant n B + determinant n C)%F.
 Proof.
 intros * Hnz Hsma Hsmb Hbc Hb Hc.
-destruct n; [ easy | clear Hnz ].
-cbn.
+assert (Hra : mat_nrows A = n) by now apply is_sm_mat_iff in Hsma.
+assert (Hrb : mat_nrows B = n) by now apply is_sm_mat_iff in Hsmb.
+specialize (square_matrix_ncols _ Hsma) as Hca.
+specialize (square_matrix_ncols _ Hsmb) as Hcb.
+destruct n; [ easy | clear Hnz; cbn ].
 assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
   intros.
   apply matrix_eq.
@@ -2158,19 +2161,13 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
     apply List_nth_error_Some_iff with (d := []) in Hx.
     destruct Hx as (Hla & Hia).
     rewrite fold_mat_nrows in Hia.
-    rewrite mat_nrows_subm in Hia. 2: {
-      apply is_sm_mat_iff in Hsma.
-      destruct Hsma as (Hr, _); rewrite Hr; flia.
-    }
+    rewrite mat_nrows_subm in Hia; [ | flia Hra ].
+    rewrite Hra, Nat.sub_succ, Nat.sub_0_r in Hia.
+    assert (Hnz : n ≠ 0) by flia Hia.
     destruct y as [lb| ]. {
       apply List_nth_error_Some_iff with (d := []) in Hy.
-      destruct Hy as (Hlb & Hib).
-      rewrite fold_mat_nrows in Hib.
-      rewrite mat_nrows_subm in Hib. 2: {
-        apply is_sm_mat_iff in Hsmb.
-        destruct Hsmb as (Hr, _); rewrite Hr; flia.
-      }
-      move Hia before Hib.
+      destruct Hy as (Hlb, _).
+      move Hla before Hlb.
       f_equal.
       remember (nth_error la j') as z eqn:Hz.
       remember (nth_error lb j') as t eqn:Ht.
@@ -2179,84 +2176,90 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
       destruct z as [z| ]. {
         apply List_nth_error_Some_iff with (d := 0%F) in Hz.
         destruct Hz as (Hz & Hjla).
+        rewrite <- Hla in Hjla.
         destruct t as [t| ]. {
           apply List_nth_error_Some_iff with (d := 0%F) in Ht.
           destruct Ht as (Ht & Hjlb).
           f_equal.
           subst z t la lb.
           do 2 rewrite fold_mat_el.
-          destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-            subst n.
-            apply is_sm_mat_iff in Hsma.
-            destruct Hsma as (Hr, _); rewrite Hr in Hia.
-            flia Hia.
-          }
-          destruct (lt_dec n j) as [Hjn| Hjn]. {
-            unfold mat_el, subm.
-            cbn - [ butn ].
-            rewrite (List_map_nth' []). 2: {
-              rewrite butn_length; [ | rewrite fold_mat_nrows; flia Hia ].
-              now rewrite fold_mat_nrows.
-            }
-            rewrite (List_map_nth' []). 2: {
-              rewrite butn_length; [ | rewrite fold_mat_nrows; flia Hib ].
-              now rewrite fold_mat_nrows.
-            }
-...
           destruct (le_dec j n) as [Hjn| Hjn]. {
             rewrite fold_corr_mat_ncols in Hjla; cycle 1. {
               apply (@squ_mat_is_corr n).
               apply is_squ_mat_subm; [ easy | flia | easy | easy ].
             } {
-              rewrite mat_nrows_subm; [ easy | ].
-              apply Nat.neq_0_lt_0.
-              intros H; rewrite H in Hia; flia Hia.
+              rewrite mat_nrows_subm; rewrite Hra; [ flia Hia | flia ].
             }
             rewrite mat_ncols_subm in Hjla; cycle 1. {
               now apply (@squ_mat_is_corr (S n)).
             } {
-              flia Hia.
+              flia Hra Hia.
             } {
-              specialize (square_matrix_ncols _ Hsma) as H1.
-              flia Hnz H1.
+              rewrite Hca; flia Hnz.
             } {
-              specialize (square_matrix_ncols _ Hsma) as H1.
-              flia Hjn H1.
+              rewrite Hca; flia Hjn.
             }
             rewrite fold_corr_mat_ncols in Hjlb; cycle 1. {
               apply (@squ_mat_is_corr n).
               apply is_squ_mat_subm; [ easy | flia | easy | easy ].
             } {
-              rewrite mat_nrows_subm; [ easy | ].
-              apply Nat.neq_0_lt_0.
-              intros H; rewrite H in Hib; flia Hib.
+              rewrite mat_nrows_subm; rewrite Hrb; [ flia Hia | flia ].
             }
             rewrite mat_ncols_subm in Hjlb; cycle 1. {
               now apply (@squ_mat_is_corr (S n)).
             } {
-              flia Hib.
+              rewrite Hrb; flia Hnz.
             } {
-              specialize (square_matrix_ncols _ Hsmb) as H1.
-              rewrite H1; flia Hnz.
+              rewrite Hcb; flia Hnz.
             } {
-              specialize (square_matrix_ncols _ Hsmb) as H1.
-              rewrite H1; flia Hjn.
+              rewrite Hcb; flia Hjn.
             }
-            rewrite mat_el_subm; [ | | flia | | easy | easy ]; cycle 1. {
+            rewrite mat_el_subm; [ | | flia | | | easy ]; cycle 1. {
               now apply (@squ_mat_is_corr (S n)).
             } {
-              specialize (square_matrix_ncols _ Hsma) as H1.
-              rewrite H1; flia Hjn.
+              rewrite Hca; flia Hjn.
+            } {
+              now rewrite Hra, Nat.sub_succ, Nat.sub_0_r.
             }
-            rewrite mat_el_subm; [ | | flia | | easy | easy ]; cycle 1. {
+            rewrite mat_el_subm; [ | | flia | | | easy ]; cycle 1. {
               now apply (@squ_mat_is_corr (S n)).
             } {
-              specialize (square_matrix_ncols _ Hsmb) as H1.
-              rewrite H1; flia Hjn.
+              rewrite Hcb; flia Hjn.
+            } {
+              now rewrite Hrb, Nat.sub_succ, Nat.sub_0_r.
             }
             symmetry; apply Hb.
             now rewrite Nat.add_1_r.
           }
+          apply Nat.nle_gt in Hjn.
+          unfold subm in Hjla.
+          cbn - [ butn ] in Hjla.
+          rewrite (List_map_nth' []) in Hjla. 2: {
+            rewrite butn_length; rewrite fold_mat_nrows, Hra; [ | flia ].
+            now rewrite Nat.sub_succ, Nat.sub_0_r.
+          }
+...
+2: rewrite fold_mat_ncols.
+...
+            unfold mat_el, subm.
+            cbn - [ butn ].
+            rewrite (List_map_nth' []). 2: {
+              rewrite butn_length; [ | rewrite fold_mat_nrows, Hra; flia ].
+              now rewrite fold_mat_nrows, Hra, Nat.sub_succ, Nat.sub_0_r.
+            }
+            rewrite (List_map_nth' []). 2: {
+              rewrite butn_length; [ | rewrite fold_mat_nrows, Hrb; flia ].
+              now rewrite fold_mat_nrows, Hrb, Nat.sub_succ, Nat.sub_0_r.
+            }
+...
+            rewrite nth_butn_after. 2: {
+
+              transitivity n; [ | easy ].
+              rewrite fold_corr_mat_ncols in Hjla; cycle 1. {
+                apply (@squ_mat_is_corr n).
+                apply is_squ_mat_subm; [ flia Hia | flia | | easy ].
+...
+...
 ...
   unfold subm.
   f_equal; f_equal.
