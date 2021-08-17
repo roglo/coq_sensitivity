@@ -2232,12 +2232,40 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
             now rewrite Nat.add_1_r.
           }
           apply Nat.nle_gt in Hjn.
+...
           unfold subm in Hjla.
           cbn - [ butn ] in Hjla.
           rewrite (List_map_nth' []) in Hjla. 2: {
             rewrite butn_length; rewrite fold_mat_nrows, Hra; [ | flia ].
             now rewrite Nat.sub_succ, Nat.sub_0_r.
           }
+          unfold butn in Hjla at 1.
+          rewrite app_length in Hjla.
+          rewrite firstn_length, skipn_length in Hjla.
+          rewrite Nat.min_r in Hjla. 2: {
+            unfold butn.
+            rewrite firstn_O, app_nil_l.
+            rewrite List_skipn_1.
+            rewrite List_nth_tl.
+            rewrite fold_corr_mat_ncols; cycle 1. {
+              now apply (@squ_mat_is_corr (S n)).
+            } {
+              rewrite Hra.
+              now apply -> Nat.succ_lt_mono.
+            }
+            now rewrite Hca.
+          }
+          unfold butn in Hjla.
+          rewrite app_nth2 in Hjla. 2: {
+            rewrite firstn_length.
+            rewrite Nat.min_0_l; flia.
+          }
+          rewrite firstn_length in Hjla.
+          rewrite Nat.min_0_l, Nat.sub_0_r in Hjla.
+          rewrite List_nth_skipn in Hjla.
+...
+          rewrite fold_corr_mat_ncols in Hjla.
+...
           unfold subm.
           cbn - [ butn ].
           rewrite (List_map_nth' []). 2: {
