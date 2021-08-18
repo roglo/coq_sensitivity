@@ -2232,6 +2232,53 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
             now rewrite Nat.add_1_r.
           }
           apply Nat.nle_gt in Hjn.
+          rewrite fold_corr_mat_ncols in Hjla; cycle 1. {
+            split. {
+              intros Hcj.
+              unfold subm, mat_nrows.
+              unfold subm, mat_ncols in Hcj.
+              cbn - [ butn ] in Hcj |-*.
+              apply length_zero_iff_nil in Hcj.
+              rewrite List_map_hd with (a := []) in Hcj. 2: {
+                unfold butn.
+                rewrite firstn_O, List_skipn_1; cbn.
+                destruct n; [ easy | ].
+                unfold mat_nrows in Hra.
+                destruct A as (ll).
+                cbn in Hra |-*.
+                destruct ll; [ easy | ].
+                now destruct ll.
+              }
+              unfold butn in Hcj.
+              rewrite List_hd_nth_0 in Hcj.
+              rewrite app_nth2 in Hcj; [ | unfold ge; easy ].
+              cbn - [ nth length firstn skipn ] in Hcj.
+              rewrite List_skipn_1 in Hcj.
+              destruct A as (ll).
+              cbn in Hra.
+              destruct n; [ easy | ].
+              destruct ll as [| l1 ll]; [ easy | ].
+              destruct ll as [| l2 ll]; [ easy | ].
+              cbn in Hcj.
+              cbn in Hra.
+              do 2 apply Nat.succ_inj in Hra.
+              cbn in Hca.
+              apply is_sm_mat_iff in Hsma.
+              cbn in Hsma.
+              destruct Hsma as (_ & Hl1 & Hl12).
+              specialize (Hl12 l2).
+              specialize (Hl12 (or_intror (or_introl eq_refl))).
+              destruct l2 as [| a1 l2]; [ easy | ].
+              destruct l2 as [| a2 l2]; [ easy | ].
+              cbn in Hl12.
+              do 2 apply Nat.succ_inj in Hl12.
+              now destruct j.
+            } {
+              intros la Hla.
+...
+              destruct
+              rewrite <- List_nth_firstn with (j := 1) in Hcj; [ | flia ].
+
 ...
           unfold subm in Hjla.
           cbn - [ butn ] in Hjla.
