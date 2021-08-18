@@ -2232,69 +2232,52 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
             now rewrite Nat.add_1_r.
           }
           apply Nat.nle_gt in Hjn.
-unfold subm.
-cbn - [ butn ].
-replace (map (butn j) _) with (butn 0 (mat_list_list A)). 2: {
-...
-          rewrite fold_corr_mat_ncols in Hjla; cycle 1. {
-            split. {
-              intros Hcj.
-              unfold subm, mat_nrows.
-              unfold subm, mat_ncols in Hcj.
-              cbn - [ butn ] in Hcj |-*.
-              apply length_zero_iff_nil in Hcj.
-              rewrite List_map_hd with (a := []) in Hcj. 2: {
-                unfold butn.
-                rewrite firstn_O, List_skipn_1; cbn.
-                destruct n; [ easy | ].
-                unfold mat_nrows in Hra.
-                destruct A as (ll).
-                cbn in Hra |-*.
-                destruct ll; [ easy | ].
-                now destruct ll.
-              }
-              unfold butn in Hcj.
-              rewrite List_hd_nth_0 in Hcj.
-              rewrite app_nth2 in Hcj; [ | unfold ge; easy ].
-              cbn - [ nth length firstn skipn ] in Hcj.
-              rewrite List_skipn_1 in Hcj.
-              destruct A as (ll).
-              cbn in Hra.
-              destruct n; [ easy | ].
-              destruct ll as [| l1 ll]; [ easy | ].
-              destruct ll as [| l2 ll]; [ easy | ].
-              cbn in Hcj.
-              cbn in Hra.
-              do 2 apply Nat.succ_inj in Hra.
-              cbn in Hca.
+          unfold subm.
+          cbn - [ butn ].
+          replace (map (butn j) _) with (butn 0 (mat_list_list A)). 2: {
+            rewrite <- (map_id (butn _ _)) at 1.
+            apply map_ext_in_iff.
+            intros la Hla.
+            unfold butn in Hla.
+            rewrite firstn_O, app_nil_l in Hla.
+            rewrite List_skipn_1 in Hla.
+            unfold butn.
+            rewrite firstn_all2. 2: {
               apply is_sm_mat_iff in Hsma.
-              cbn in Hsma.
-              destruct Hsma as (_ & Hl1 & Hl12).
-              specialize (Hl12 l2).
-              specialize (Hl12 (or_intror (or_introl eq_refl))).
-              destruct l2 as [| a1 l2]; [ easy | ].
-              destruct l2 as [| a2 l2]; [ easy | ].
-              cbn in Hl12.
-              do 2 apply Nat.succ_inj in Hl12.
-              now destruct j.
-            } {
-              intros la Hla.
-...
-              unfold subm in Hla |-*.
-              unfold mat_ncols.
-              cbn - [ butn ] in Hla |-*.
-              destruct A as (ll).
-              cbn in Hla |-*.
-              destruct ll as [| lb ll]; [ easy | ].
-              destruct ll as [| lc ll]; [ easy | ].
-              cbn in Hla |-*.
-              destruct Hla as [Hla| Hla]; [ now subst la | ].
-              cbn in Hca.
-              apply is_sm_mat_iff in Hsma; cbn in Hsma.
-              destruct Hsma as (_ & Hlb & Hlbc).
-              specialize (Hlbc lc (or_intror (or_introl eq_refl))).
-...
-              rewrite <- List_nth_firstn with (j := 1) in Hcj; [ | flia ].
+              destruct Hsma as (_ & Hcra & Hca').
+              rewrite Hca'; [ easy | ].
+              destruct (mat_list_list A); [ easy | now right ].
+            }
+            rewrite skipn_all2. 2: {
+              apply is_sm_mat_iff in Hsma.
+              destruct Hsma as (_ & Hcra & Hca').
+              rewrite Hca'; [ flia Hjn | ].
+              destruct (mat_list_list A); [ easy | now right ].
+            }
+            symmetry; apply app_nil_r.
+          }
+          replace (map (butn j) _) with (butn 0 (mat_list_list B)). 2: {
+            rewrite <- (map_id (butn _ _)) at 1.
+            apply map_ext_in_iff.
+            intros la Hla.
+            unfold butn in Hla.
+            rewrite firstn_O, app_nil_l in Hla.
+            rewrite List_skipn_1 in Hla.
+            unfold butn.
+            rewrite firstn_all2. 2: {
+              apply is_sm_mat_iff in Hsmb.
+              destruct Hsmb as (_ & Hcra & Hca').
+              rewrite Hca'; [ easy | ].
+              destruct (mat_list_list B); [ easy | now right ].
+            }
+            rewrite skipn_all2. 2: {
+              apply is_sm_mat_iff in Hsmb.
+              destruct Hsmb as (_ & Hcra & Hca').
+              rewrite Hca'; [ flia Hjn | ].
+              destruct (mat_list_list B); [ easy | now right ].
+            }
+            symmetry; apply app_nil_r.
+          }
 ...
           unfold subm in Hjla.
           cbn - [ butn ] in Hjla.
