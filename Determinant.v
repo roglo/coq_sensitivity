@@ -2196,6 +2196,7 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
       destruct Hy as (Hlb, _).
       move Hla before Hlb.
       f_equal.
+...
       remember (nth_error la j') as z eqn:Hz.
       remember (nth_error lb j') as t eqn:Ht.
       symmetry in Hz, Ht.
