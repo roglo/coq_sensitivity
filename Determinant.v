@@ -2232,6 +2232,10 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
             now rewrite Nat.add_1_r.
           }
           apply Nat.nle_gt in Hjn.
+unfold subm.
+cbn - [ butn ].
+replace (map (butn j) _) with (butn 0 (mat_list_list A)). 2: {
+...
           rewrite fold_corr_mat_ncols in Hjla; cycle 1. {
             split. {
               intros Hcj.
