@@ -2209,8 +2209,32 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
           destruct Ht as (Ht & Hjlb).
           f_equal.
           subst z t la lb.
-specialize (Hb (S i) j' (Nat.neq_succ_0 _)) as H1.
-unfold mat_el in H1.
+unfold subm.
+cbn - [ butn ].
+destruct (lt_dec j' j) as [Hjj| Hjj]. {
+  specialize (Hb (S i) j' (Nat.neq_succ_0 _)) as H1.
+  unfold mat_el in H1.
+  destruct A as (lla).
+  destruct B as (llb).
+  cbn - [ butn ] in H1 |-*.
+  destruct n; [ easy | clear Hnz ].
+  destruct lla as [| la1]; [ easy | ].
+  destruct llb as [| lb1]; [ easy | ].
+  cbn in H1.
+  destruct lla as [| la2]; [ easy | ].
+  destruct llb as [| lb2]; [ easy | ].
+  unfold butn at 2 4.
+  cbn - [ butn nth ].
+  destruct i. {
+    cbn in H1 |-*.
+    rewrite nth_butn_after; [ | easy ].
+    rewrite nth_butn_after; [ | easy ].
+    easy.
+  }
+  cbn in H1 |-*.
+cbn in *.
+...
+  rewrite nth_butn_before.
 ...
 f_equal.
 f_equal.
