@@ -104,6 +104,55 @@ unfold mat_nrows in Hr.
 now apply length_zero_iff_nil in Hr.
 Qed.
 
+Theorem matrix_eq' : ∀ T (ro : ring_like_op T) m n (MA MB : matrix T),
+  mat_nrows MA = m
+  → mat_nrows MB = m
+  → mat_ncols MA = n
+  → mat_ncols MB = n
+  → (∀ i j, i < m → j < n → mat_el MA i j = mat_el MB i j)
+  → MA = MB.
+Proof.
+intros * Hra Hrb Hca Hcb Hab.
+destruct MA as (lla).
+destruct MB as (llb).
+unfold mat_ncols in Hca, Hcb.
+cbn in Hra, Hrb, Hca, Hcb, Hab.
+f_equal.
+revert m n llb Hra Hrb Hca Hcb Hab.
+induction lla as [| la]; intros; cbn. {
+  subst m.
+  now apply length_zero_iff_nil in Hrb.
+}
+destruct llb as [| lb]; [ now subst m | ].
+cbn in Hra, Hrb, Hca, Hcb.
+f_equal. {
+  revert n lb Hca Hcb Hab.
+  induction la as [| a]; intros; cbn. {
+    subst n.
+    now apply length_zero_iff_nil in Hcb.
+  }
+  destruct lb as [| b]; [ now subst n | ].
+  cbn in Hca, Hcb.
+  f_equal. {
+    apply (Hab 0 0); [ flia Hra | flia Hca ].
+  }
+  destruct n; [ easy | ].
+  apply Nat.succ_inj in Hca, Hcb.
+  apply (IHla n); [ easy | easy | ].
+  intros i j Hi Hm.
+  destruct m; [ easy | ].
+  destruct i; cbn. {
+    apply Nat.succ_lt_mono in Hm.
+    apply (Hab 0 (S j) Hi Hm).
+  }
+  cbn.
+  apply (Hab (S i) j Hi); flia Hm.
+} {
+  destruct m; [ easy | ].
+  apply Nat.succ_inj in Hra, Hrb.
+  apply (IHlla m n); [ easy | easy | | | ].
+...
+
 (* correct_matrix: matrix whose list list is made of non
    empty lists (rows) of same length *)
 (* this definition should (if it could) be defined like
