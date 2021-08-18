@@ -2232,9 +2232,20 @@ destruct (lt_dec j' j) as [Hjj| Hjj]. {
     easy.
   }
   cbn in H1 |-*.
-cbn in *.
-...
-  rewrite nth_butn_before.
+  cbn in Hra, Hrb.
+  do 2 apply Nat.succ_inj in Hra, Hrb.
+  apply Nat.succ_lt_mono in Hia.
+  rewrite (List_map_nth' []); [ | now rewrite Hra ].
+  rewrite (List_map_nth' []); [ | now rewrite Hrb ].
+  rewrite nth_butn_after; [ | easy ].
+  rewrite nth_butn_after; [ | easy ].
+  easy.
+} {
+  apply Nat.nlt_ge in Hjj.
+  destruct i. {
+    rewrite <- List_hd_nth_0 in Hjla.
+    rewrite <- List_hd_nth_0 in Hjlb.
+    rewrite fold_mat_ncols in Hjla, Hjlb.
 ...
 f_equal.
 f_equal.
