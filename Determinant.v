@@ -2276,9 +2276,21 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
             } {
               intros la Hla.
 ...
-              destruct
+              unfold subm in Hla |-*.
+              unfold mat_ncols.
+              cbn - [ butn ] in Hla |-*.
+              destruct A as (ll).
+              cbn in Hla |-*.
+              destruct ll as [| lb ll]; [ easy | ].
+              destruct ll as [| lc ll]; [ easy | ].
+              cbn in Hla |-*.
+              destruct Hla as [Hla| Hla]; [ now subst la | ].
+              cbn in Hca.
+              apply is_sm_mat_iff in Hsma; cbn in Hsma.
+              destruct Hsma as (_ & Hlb & Hlbc).
+              specialize (Hlbc lc (or_intror (or_introl eq_refl))).
+...
               rewrite <- List_nth_firstn with (j := 1) in Hcj; [ | flia ].
-
 ...
           unfold subm in Hjla.
           cbn - [ butn ] in Hjla.
