@@ -2293,11 +2293,33 @@ split. {
       flia H1r Hir.
     }
     apply Nat.nlt_ge in Hjc.
-replace (mat_ncols (subm A i j)) with (mat_ncols A). 2: {
-  unfold mat_ncols, subm; cbn.
-  destruct A as (ll); cbn in Hir, Hjc |-*.
-  destruct ll as [| la]; [ easy | ].
-cbn in Hc1, Hir, Hjc |-*.
+    unfold mat_ncols, subm; cbn.
+    rewrite map_butn_out. 2: {
+      intros la Hla.
+      destruct Ha as (Hcr, Hc).
+      rewrite Hc; [ easy | ].
+      now apply in_butn in Hla.
+    }
+    rewrite List_hd_nth_0.
+    destruct A as (ll).
+    destruct ll as [| la]; [ easy | ].
+    destruct Ha as (Hcr, Hc).
+    cbn in *.
+    destruct i. {
+      destruct ll as [| lb]; [ easy | cbn ].
+      intros H; exfalso.
+      rewrite Hc in H; [ | now right; left ].
+      now specialize (Hcr H).
+    }
+    rewrite Hc; [ now intros H; specialize (Hcr H) | ].
+    now left.
+  }
+  apply Nat.nlt_ge in Hir.
+...
+  rewrite mat_ncols_subm; [ | easy | | ].
+...
+    rewrite butn_length.
+Search (_ ∈ butn _ _).
 ...
         destruct (lt_dec 1 (mat_ncols A)) as [H1c| H1c]. {
           intros H; flia H1c H.

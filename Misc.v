@@ -1598,11 +1598,7 @@ Definition butn {A} n (l : list A) :=
   firstn n l ++ skipn (S n) l.
 
 Theorem butn_nil : ∀ A n, butn n ([] : list A) = [].
-Proof.
-intros.
-unfold butn.
-now rewrite firstn_nil, skipn_nil.
-Qed.
+Proof. now intros; destruct n. Qed.
 
 Theorem butn_cons : ∀ A (a : A) la n, butn (S n) (a :: la) = a :: butn n la.
 Proof.
@@ -1688,6 +1684,38 @@ destruct i; [ easy | ].
 apply Nat.succ_lt_mono in Hij.
 rewrite butn_cons; cbn.
 now apply IHl.
+Qed.
+
+Theorem map_butn_out : ∀ A (ll : list (list A)) i,
+  (∀ l, l ∈ ll → length l ≤ i)
+  → map (butn i) ll = ll.
+Proof.
+intros * Hi.
+revert i Hi.
+induction ll as [| la]; intros; [ easy | cbn ].
+rewrite IHll. 2: {
+  intros l Hl.
+  now apply Hi; right.
+}
+f_equal.
+specialize (Hi la (or_introl eq_refl)).
+unfold butn.
+rewrite firstn_all2; [ | easy ].
+rewrite skipn_all2; [ | flia Hi ].
+apply app_nil_r.
+Qed.
+
+Theorem in_butn : ∀ A (l : list A) i a, a ∈ butn i l → a ∈ l.
+Proof.
+intros * Ha.
+revert i Ha.
+induction l as [| b]; intros. {
+  now rewrite butn_nil in Ha.
+}
+destruct i; [ now right | ].
+rewrite butn_cons in Ha.
+destruct Ha as [Ha| Ha]; [ now left | right ].
+now apply IHl in Ha.
 Qed.
 
 (* end butn *)
