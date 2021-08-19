@@ -2242,6 +2242,7 @@ destruct (lt_dec j' j) as [Hjj| Hjj]. {
   easy.
 } {
   apply Nat.nlt_ge in Hjj.
+...
   destruct i. {
     rewrite <- List_hd_nth_0 in Hjla.
     rewrite <- List_hd_nth_0 in Hjlb.
