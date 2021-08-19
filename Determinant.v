@@ -2315,6 +2315,32 @@ split. {
     now left.
   }
   apply Nat.nlt_ge in Hir.
+  unfold mat_nrows; cbn.
+  rewrite map_length.
+  rewrite butn_out; [ | easy ].
+  rewrite fold_mat_nrows.
+  unfold mat_ncols; cbn.
+  rewrite butn_out; [ | easy ].
+  destruct Ha as (Hcr, Hc).
+  intros H1.
+  destruct (lt_dec j (mat_ncols A)) as [Hjc| Hjc]. 2: {
+    apply Nat.nlt_ge in Hjc.
+    rewrite map_butn_out in H1. 2: {
+      intros l Hl.
+      now rewrite Hc.
+    }
+    now apply Hcr.
+  }
+  apply length_zero_iff_nil in H1.
+  destruct A as (ll); cbn in *.
+  destruct ll as [| la]; [ easy | exfalso ].
+  cbn in *.
+  destruct la as [| a]; [ easy | ].
+  destruct la as [| b]; [ easy | ].
+  clear Hc1; cbn in *.
+  now destruct j.
+} {
+  intros l Hl.
 ...
     rewrite butn_length.
 Search (_ ∈ butn _ _).

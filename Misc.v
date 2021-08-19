@@ -1718,6 +1718,17 @@ destruct Ha as [Ha| Ha]; [ now left | right ].
 now apply IHl in Ha.
 Qed.
 
+Theorem butn_out : ∀ A (l : list A) i, length l ≤ i → butn i l = l.
+Proof.
+intros * Hi.
+revert i Hi.
+induction l as [| a]; intros; [ apply butn_nil | ].
+destruct i; [ easy | ].
+cbn in Hi; apply Nat.succ_le_mono in Hi.
+rewrite butn_cons.
+now rewrite IHl.
+Qed.
+
 (* end butn *)
 
 (* replace in a list *)
