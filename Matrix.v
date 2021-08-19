@@ -1870,7 +1870,22 @@ destruct (le_dec (mat_nrows M) 1) as [H1r| H1r]. {
     apply length_zero_iff_nil in H1r.
     unfold mat_ncols; cbn; rewrite H1r; cbn.
     now rewrite butn_nil.
-  } {
+  }
+...
+  destruct i. {
+    unfold mat_ncols, subm; cbn.
+    destruct M as (ll); cbn in *.
+    destruct ll as [| la]; [ easy | ].
+    destruct ll; [ cbn | easy ].
+    clear H1r.
+    cbn in Hic.
+    destruct la as [| a]; [ easy | cbn ].
+    destruct la as [| b]; [ easy | ].
+    cbn in Hic.
+    destruct Hcm as (Hcr, Hc).
+    cbn in Hcr, Hc.
+    specialize (Hc (a :: b :: la) (or_introl eq_refl)).
+    cbn in Hc.
 ...
 destruct (le_dec (mat_ncols M) 1) as [H1c| H1c]. {
   destruct (Nat.eq_dec (mat_ncols M) 0) as [H| H]; [ flia Hic H | ].
