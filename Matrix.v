@@ -1862,7 +1862,26 @@ Theorem mat_ncols_subm : ∀ (M : matrix T) i j,
   → j < mat_ncols M
   → mat_ncols (subm M i j) = mat_ncols M - 1.
 Proof.
-intros * Hcm Hr1 Hc1 Hic.
+intros * Hcm H1r H1c Hic.
+clear H1c.
+destruct (le_dec (mat_ncols M) 1) as [H1c| H1c]. {
+  destruct (Nat.eq_dec (mat_ncols M) 0) as [H| H]; [ flia Hic H | ].
+  assert (Hc1 : mat_ncols M = 1) by flia H1c H; clear H1c H.
+  rewrite Hc1 in Hic |-*.
+  apply Nat.lt_1_r in Hic; subst j.
+  unfold mat_ncols, subm; cbn.
+  unfold mat_ncols in Hc1.
+  destruct M as (ll).
+  cbn in Hc1 |-*.
+  destruct ll as [| la1]; [ easy | ].
+  cbn in H1r, Hc1 |-*.
+  apply Nat.succ_lt_mono in H1r.
+  destruct ll as [| la2]; [ easy | ].
+Search (map _ (butn _)).
+...
+  unfold mat_ncols in H1c, Hic |-*.
+
+...
 unfold mat_ncols in Hc1, Hic |-*.
 destruct M as (ll); cbn in *.
 destruct ll as [| l]; [ easy | ].

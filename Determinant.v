@@ -2209,39 +2209,91 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
           destruct Ht as (Ht & Hjlb).
           f_equal.
           subst z t la lb.
-unfold subm.
-cbn - [ butn ].
-destruct (lt_dec j' j) as [Hjj| Hjj]. {
-  specialize (Hb (S i) j' (Nat.neq_succ_0 _)) as H1.
-  unfold mat_el in H1.
-  destruct A as (lla).
-  destruct B as (llb).
-  cbn - [ butn ] in H1 |-*.
-  destruct n; [ easy | clear Hnz ].
-  destruct lla as [| la1]; [ easy | ].
-  destruct llb as [| lb1]; [ easy | ].
-  cbn in H1.
-  destruct lla as [| la2]; [ easy | ].
-  destruct llb as [| lb2]; [ easy | ].
-  unfold butn at 2 4.
-  cbn - [ butn nth ].
-  destruct i. {
-    cbn in H1 |-*.
-    rewrite nth_butn_after; [ | easy ].
-    rewrite nth_butn_after; [ | easy ].
-    easy.
-  }
-  cbn in H1 |-*.
-  cbn in Hra, Hrb.
-  do 2 apply Nat.succ_inj in Hra, Hrb.
-  apply Nat.succ_lt_mono in Hia.
-  rewrite (List_map_nth' []); [ | now rewrite Hra ].
-  rewrite (List_map_nth' []); [ | now rewrite Hrb ].
-  rewrite nth_butn_after; [ | easy ].
-  rewrite nth_butn_after; [ | easy ].
-  easy.
-} {
-  apply Nat.nlt_ge in Hjj.
+          unfold subm.
+          cbn - [ butn ].
+          destruct (lt_dec j' j) as [Hjj| Hjj]. {
+            specialize (Hb (S i) j' (Nat.neq_succ_0 _)) as H1.
+            unfold mat_el in H1.
+            destruct A as (lla).
+            destruct B as (llb).
+            cbn - [ butn ] in H1 |-*.
+            destruct n; [ easy | clear Hnz ].
+            destruct lla as [| la1]; [ easy | ].
+            destruct llb as [| lb1]; [ easy | ].
+            cbn in H1.
+            destruct lla as [| la2]; [ easy | ].
+            destruct llb as [| lb2]; [ easy | ].
+            unfold butn at 2 4.
+            cbn - [ butn nth ].
+            destruct i. {
+              cbn in H1 |-*.
+              rewrite nth_butn_after; [ | easy ].
+              rewrite nth_butn_after; [ | easy ].
+              easy.
+            }
+            cbn in H1 |-*.
+            cbn in Hra, Hrb.
+            do 2 apply Nat.succ_inj in Hra, Hrb.
+            apply Nat.succ_lt_mono in Hia.
+            rewrite (List_map_nth' []); [ | now rewrite Hra ].
+            rewrite (List_map_nth' []); [ | now rewrite Hrb ].
+            rewrite nth_butn_after; [ | easy ].
+            rewrite nth_butn_after; [ | easy ].
+            easy.
+          } {
+            apply Nat.nlt_ge in Hjj.
+            rewrite (List_map_nth' []). 2: {
+              unfold butn.
+              rewrite firstn_O, List_skipn_1; cbn.
+              rewrite List_tl_length, fold_mat_nrows, Hra.
+              now rewrite Nat.sub_succ, Nat.sub_0_r.
+            }
+            rewrite (List_map_nth' []). 2: {
+              unfold butn.
+              rewrite firstn_O, List_skipn_1; cbn.
+              rewrite List_tl_length, fold_mat_nrows, Hrb.
+              now rewrite Nat.sub_succ, Nat.sub_0_r.
+            }
+            rewrite nth_butn_before; [ | easy ].
+            rewrite (@nth_butn_before _ _ i); [ | flia ].
+            rewrite nth_butn_before; [ | easy ].
+            rewrite (@nth_butn_before _ _ i); [ | flia ].
+            do 2 rewrite fold_mat_el.
+            symmetry; apply Hb.
+            now rewrite Nat.add_1_r.
+          }
+        } {
+          exfalso.
+          apply nth_error_None in Ht.
+          clear z Hz.
+          clear la Hla.
+          subst lb.
+          rewrite fold_corr_mat_ncols in Ht; cycle 1. {
+Search (is_correct_matrix (subm _ _ _)).
+Theorem subm_is_corr_mat : ∀ (A : matrix T) i j,
+  is_correct_matrix A → is_correct_matrix (subm A i j).
+Proof.
+intros * Ha.
+split. {
+  destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. {
+    rewrite mat_nrows_subm; [ | easy ].
+    destruct (lt_dec j (mat_ncols A)) as [Hjc| Hjc]. {
+      destruct (lt_dec 1 (mat_nrows A)) as [H1r| H1r]. {
+        destruct (lt_dec 1 (mat_ncols A)) as [H1c| H1c]. {
+          rewrite mat_ncols_subm; [ | easy | easy | easy | easy ].
+          intros H; flia H1c H.
+        }
+        apply Nat.nlt_ge in H1c.
+        assert (Hc : mat_ncols A = 1) by flia Hjc H1c.
+        rewrite Hc in Hjc; clear H1c.
+        apply Nat.lt_1_r in Hjc; subst j.
+Check @mat_ncols_subm.
+...
+        rewrite mat_ncols_subm; [ | easy | easy | | flia Hc ].
+          intros H; flia H1c H.
+...
+            apply (@squ_mat_is_corr n).
+Search (is_square_matrix _ (subm _ _ _)).
 ...
   destruct i. {
     rewrite <- List_hd_nth_0 in Hjla.

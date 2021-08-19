@@ -1081,6 +1081,13 @@ Proof. intros; now destruct l. Qed.
 Theorem List_map_tl : ∀ A B (f : A → B) l, tl (map f l) = map f (tl l).
 Proof. now intros; destruct l. Qed.
 
+Theorem List_tl_length : ∀ A (l : list A), length (tl l) = length l - 1.
+Proof.
+intros.
+destruct l as [| a]; [ easy | cbn ].
+symmetry; apply Nat.sub_0_r.
+Qed.
+
 Theorem List_map_map_map {A B C D} : ∀ (f : A → B → C) (g : A → D → B) h l,
   map (λ d, map (f d) (map (g d) (h d))) l =
   map (λ d, map (λ x, (f d (g d x))) (h d)) l.
