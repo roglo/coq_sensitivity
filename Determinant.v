@@ -2315,6 +2315,9 @@ split. {
     now left.
   }
   apply Nat.nlt_ge in Hir.
+Check @mat_ncols_subm.
+...
+  rewrite mat_ncols_subm.
 ...
   rewrite mat_ncols_subm; [ | easy | | ].
 ...
