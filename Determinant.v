@@ -2341,6 +2341,30 @@ split. {
   now destruct j.
 } {
   intros l Hl.
+  destruct (le_dec (mat_nrows A) 1) as [H1r| H1r]. {
+    apply Nat.le_1_r in H1r.
+    destruct H1r as [H1r| H1r]. {
+      unfold mat_nrows in H1r.
+      apply length_zero_iff_nil in H1r.
+      unfold subm in Hl; cbn in Hl.
+      rewrite H1r in Hl.
+      now rewrite butn_nil in Hl.
+    }
+    unfold mat_nrows in H1r.
+    destruct A as (ll); cbn in *.
+    destruct ll as [| la]; [ easy | ].
+    destruct ll; [ clear H1r | easy ].
+    cbn in Hc1.
+    unfold subm, mat_ncols; cbn.
+    destruct i; [ easy | cbn ].
+    rewrite butn_cons in Hl.
+    cbn in Hl.
+    destruct Hl as [Hl| Hl]; [ now subst l | ].
+    now rewrite butn_nil in Hl.
+  }
+  apply Nat.nle_gt in H1r.
+  destruct (lt_dec j (mat_ncols A)) as [Hjc| Hjc]. {
+    rewrite mat_ncols_subm; [ | easy | easy | easy ].
 ...
     rewrite butn_length.
 Search (_ ∈ butn _ _).
