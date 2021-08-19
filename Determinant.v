@@ -2293,6 +2293,11 @@ split. {
       flia H1r Hir.
     }
     apply Nat.nlt_ge in Hjc.
+replace (mat_ncols (subm A i j)) with (mat_ncols A). 2: {
+  unfold mat_ncols, subm; cbn.
+  destruct A as (ll); cbn in Hir, Hjc |-*.
+  destruct ll as [| la]; [ easy | ].
+cbn in Hc1, Hir, Hjc |-*.
 ...
         destruct (lt_dec 1 (mat_ncols A)) as [H1c| H1c]. {
           intros H; flia H1c H.
