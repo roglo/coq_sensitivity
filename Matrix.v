@@ -1858,12 +1858,10 @@ Qed.
 Theorem mat_ncols_subm : ∀ (M : matrix T) i j,
   is_correct_matrix M
   → 1 < mat_nrows M
-  → 1 < mat_ncols M
   → j < mat_ncols M
   → mat_ncols (subm M i j) = mat_ncols M - 1.
 Proof.
-intros * Hcm H1r H1c Hic.
-clear H1c.
+intros * Hcm H1r Hic.
 destruct (le_dec (mat_ncols M) 1) as [H1c| H1c]. {
   destruct (Nat.eq_dec (mat_ncols M) 0) as [H| H]; [ flia Hic H | ].
   assert (Hc1 : mat_ncols M = 1) by flia H1c H; clear H1c H.
@@ -1877,17 +1875,26 @@ destruct (le_dec (mat_ncols M) 1) as [H1c| H1c]. {
   cbn in H1r, Hc1 |-*.
   apply Nat.succ_lt_mono in H1r.
   destruct ll as [| la2]; [ easy | ].
-Search (map _ (butn _)).
-...
-  unfold mat_ncols in H1c, Hic |-*.
-
-...
-unfold mat_ncols in Hc1, Hic |-*.
+  destruct i. {
+    cbn.
+    destruct la2 as [| a2]; [ easy | ].
+    destruct Hcm as (Hcr, Hc).
+    cbn in Hc.
+    specialize (Hc (a2 :: la2) (or_intror (or_introl eq_refl))).
+    rewrite Hc1 in Hc; cbn in Hc.
+    now apply Nat.succ_inj in Hc.
+  }
+  cbn.
+  destruct la1 as [| a1]; [ easy | cbn in Hc1 ].
+  now apply Nat.succ_inj in Hc1.
+}
+apply Nat.nle_gt in H1c.
+unfold mat_ncols in H1c, Hic |-*.
 destruct M as (ll); cbn in *.
 destruct ll as [| l]; [ easy | ].
-destruct ll as [| l']; [ cbn in Hr1; flia Hr1 | ].
-clear Hr1.
-cbn in Hc1, Hic.
+destruct ll as [| l']; [ cbn in H1r; flia H1r | ].
+clear H1r.
+cbn in H1c, Hic.
 destruct Hcm as (Hcr, Hcm).
 cbn in Hcr |-*.
 unfold mat_ncols in Hcm; cbn in Hcm.
@@ -1922,8 +1929,6 @@ split. {
     apply is_sm_mat_iff in Hm.
     destruct Hm as (Hr & Hcr & Hc).
     rewrite Hr; flia Hnz.
-  } {
-    rewrite Hcm; flia Hnz.
   } {
     rewrite Hcm; flia Hj.
   }

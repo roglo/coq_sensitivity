@@ -2269,23 +2269,40 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
           clear la Hla.
           subst lb.
           rewrite fold_corr_mat_ncols in Ht; cycle 1. {
+            destruct n; [ easy | ].
 Search (is_correct_matrix (subm _ _ _)).
 Theorem subm_is_corr_mat : ∀ (A : matrix T) i j,
-  is_correct_matrix A → is_correct_matrix (subm A i j).
+  mat_ncols A ≠ 1
+  → is_correct_matrix A
+  → is_correct_matrix (subm A i j).
 Proof.
-intros * Ha.
+intros * Hc1 Ha.
 split. {
   destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. {
     rewrite mat_nrows_subm; [ | easy ].
     destruct (lt_dec j (mat_ncols A)) as [Hjc| Hjc]. {
       destruct (lt_dec 1 (mat_nrows A)) as [H1r| H1r]. {
+        rewrite mat_ncols_subm; [ | easy | easy | easy ].
+        destruct Ha as (Hcr, Hc).
+        destruct (Nat.eq_dec (mat_ncols A) 0) as [Hcz| Hcz]. {
+          flia Hjc Hcz.
+        }
+        intros H; flia Hc1 Hcz H.
+      }
+      apply Nat.nlt_ge in H1r.
+      flia H1r Hir.
+    }
+    apply Nat.nlt_ge in Hjc.
+...
         destruct (lt_dec 1 (mat_ncols A)) as [H1c| H1c]. {
-          rewrite mat_ncols_subm; [ | easy | easy | easy | easy ].
           intros H; flia H1c H.
         }
         apply Nat.nlt_ge in H1c.
         assert (Hc : mat_ncols A = 1) by flia Hjc H1c.
         rewrite Hc in Hjc; clear H1c.
+        clear j Hjc.
+        intros _.
+...
         apply Nat.lt_1_r in Hjc; subst j.
 Check @mat_ncols_subm.
 ...
