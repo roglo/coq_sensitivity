@@ -2366,21 +2366,39 @@ split. {
 ...
   destruct (lt_dec j (mat_ncols A)) as [Hjc| Hjc]. {
     rewrite mat_ncols_subm; [ | easy | easy | easy ].
-    unfold mat_ncols in Hc1, Hjc |-*.
     destruct A as (ll); cbn in *.
+    destruct Ha as (_, Hc).
+    unfold mat_ncols in Hc, Hc1, Hjc |-*.
+    cbn in Hc1, Hc, Hjc |-*.
     destruct ll as [| la]; [ easy | cbn in Hc1, H1r, Hjc |-* ].
     destruct ll as [| lb]; [ cbn in H1r; flia H1r | clear H1r ].
-    destruct Ha as (Hcr, Hc).
-    cbn in Hcr, Hc.
-    destruct i. {
-      cbn in Hl.
-      destruct Hl as [Hl| Hl]. {
+    induction ll as [| lc]. {
+      destruct i. {
+        cbn in Hl.
+        destruct Hl as [Hl| Hl]; [ | easy ].
         subst l.
         rewrite butn_length. 2: {
           rewrite Hc; [ easy | now right; left ].
         }
         rewrite Hc; [ easy | now right; left ].
       }
+      rewrite butn_cons in Hl.
+      cbn in Hl.
+      destruct Hl as [Hl| Hl]. {
+        subst l.
+        now rewrite butn_length.
+      }
+      destruct i; [ easy | cbn in Hl ].
+      rewrite app_nil_r in Hl.
+      rewrite firstn_nil in Hl; cbn in Hl.
+      destruct Hl as [Hl| Hl]; [ | easy ].
+      subst l.
+      rewrite butn_length. 2: {
+        rewrite Hc; [ easy | now right; left ].
+      }
+      rewrite Hc; [ easy | now right; left ].
+    }
+    apply IHll.
 ...
     rewrite butn_length.
 Search (_ ∈ butn _ _).
