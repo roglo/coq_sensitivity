@@ -2383,6 +2383,19 @@ split. {
   rewrite Nat.min_r; [ | easy ].
   rewrite (proj2 (Nat.sub_0_le (mat_ncols A) (S j))); [ | flia Hjc ].
   rewrite Nat.add_0_r.
+  unfold mat_ncols; cbn.
+  symmetry.
+  rewrite Hc; [ easy | ].
+  rewrite map_butn_out. 2: {
+    intros lb Hlb.
+    rewrite Hc; [ easy | ].
+    now apply in_butn in Hlb.
+  }
+Check in_butn.
+Search (hd _ _ ∈ _).
+Search (nth _ _ _ ∈ _).
+...
+  apply in_butn in Hla.
   unfold mat_ncols, subm; cbn.
   rewrite map_butn.
 Search (length (nth _ _ _)).
