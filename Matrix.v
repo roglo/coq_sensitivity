@@ -1968,6 +1968,137 @@ split. {
 }
 Qed.
 
+Theorem subm_is_corr_mat : ∀ (A : matrix T) i j,
+  mat_ncols A ≠ 1
+  → is_correct_matrix A
+  → is_correct_matrix (subm A i j).
+Proof.
+intros * Hc1 Ha.
+split. {
+  destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. {
+    rewrite mat_nrows_subm; [ | easy ].
+    destruct (lt_dec j (mat_ncols A)) as [Hjc| Hjc]. {
+      destruct (lt_dec 1 (mat_nrows A)) as [H1r| H1r]. {
+        rewrite mat_ncols_subm; [ | easy | easy | easy ].
+        destruct Ha as (Hcr, Hc).
+        destruct (Nat.eq_dec (mat_ncols A) 0) as [Hcz| Hcz]. {
+          flia Hjc Hcz.
+        }
+        intros H; flia Hc1 Hcz H.
+      }
+      apply Nat.nlt_ge in H1r.
+      flia H1r Hir.
+    }
+    apply Nat.nlt_ge in Hjc.
+    unfold mat_ncols, subm; cbn.
+    rewrite map_butn_out. 2: {
+      intros la Hla.
+      destruct Ha as (Hcr, Hc).
+      rewrite Hc; [ easy | ].
+      now apply in_butn in Hla.
+    }
+    rewrite List_hd_nth_0.
+    destruct A as (ll).
+    destruct ll as [| la]; [ easy | ].
+    destruct Ha as (Hcr, Hc).
+    cbn in *.
+    destruct i. {
+      destruct ll as [| lb]; [ easy | cbn ].
+      intros H; exfalso.
+      rewrite Hc in H; [ | now right; left ].
+      now specialize (Hcr H).
+    }
+    rewrite Hc; [ now intros H; specialize (Hcr H) | ].
+    now left.
+  }
+  apply Nat.nlt_ge in Hir.
+  unfold mat_nrows; cbn.
+  rewrite map_length.
+  rewrite butn_out; [ | easy ].
+  rewrite fold_mat_nrows.
+  unfold mat_ncols; cbn.
+  rewrite butn_out; [ | easy ].
+  destruct Ha as (Hcr, Hc).
+  intros H1.
+  destruct (lt_dec j (mat_ncols A)) as [Hjc| Hjc]. 2: {
+    apply Nat.nlt_ge in Hjc.
+    rewrite map_butn_out in H1. 2: {
+      intros l Hl.
+      now rewrite Hc.
+    }
+    now apply Hcr.
+  }
+  apply length_zero_iff_nil in H1.
+  destruct A as (ll); cbn in *.
+  destruct ll as [| la]; [ easy | exfalso ].
+  cbn in *.
+  destruct la as [| a]; [ easy | ].
+  destruct la as [| b]; [ easy | ].
+  clear Hc1; cbn in *.
+  now destruct j.
+} {
+  intros l Hl.
+  destruct (le_dec (mat_nrows A) 1) as [H1r| H1r]. {
+    apply Nat.le_1_r in H1r.
+    destruct H1r as [H1r| H1r]. {
+      unfold mat_nrows in H1r.
+      apply length_zero_iff_nil in H1r.
+      unfold subm in Hl; cbn in Hl.
+      rewrite H1r in Hl.
+      now rewrite butn_nil in Hl.
+    }
+    unfold mat_nrows in H1r.
+    destruct A as (ll); cbn in *.
+    destruct ll as [| la]; [ easy | ].
+    destruct ll; [ clear H1r | easy ].
+    cbn in Hc1.
+    unfold subm, mat_ncols; cbn.
+    destruct i; [ easy | cbn ].
+    rewrite butn_cons in Hl.
+    cbn in Hl.
+    destruct Hl as [Hl| Hl]; [ now subst l | ].
+    now rewrite butn_nil in Hl.
+  }
+  apply Nat.nle_gt in H1r.
+  unfold subm in Hl; cbn in Hl.
+  apply in_map_iff in Hl.
+  destruct Hl as (la & Hl & Hla).
+  subst l.
+  destruct Ha as (Hcr, Hc).
+  specialize (in_butn _ _ _ Hla) as H.
+  specialize (Hc _ H) as H1; clear H.
+  destruct (lt_dec j (mat_ncols A)) as [Hjc| Hjc]. {
+    rewrite mat_ncols_subm; [ | easy | easy | easy ].
+    rewrite butn_length; [ | congruence ].
+    now rewrite H1.
+  }
+  apply Nat.nlt_ge in Hjc.
+  unfold butn.
+  rewrite app_length.
+  rewrite firstn_length, skipn_length.
+  rewrite H1.
+  rewrite Nat.min_r; [ | easy ].
+  rewrite (proj2 (Nat.sub_0_le (mat_ncols A) (S j))); [ | flia Hjc ].
+  rewrite Nat.add_0_r.
+  unfold mat_ncols; cbn.
+  symmetry.
+  rewrite Hc; [ easy | ].
+  rewrite map_butn_out. 2: {
+    intros lb Hlb.
+    rewrite Hc; [ easy | ].
+    now apply in_butn in Hlb.
+  }
+  rewrite List_hd_nth_0.
+  destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+    rewrite nth_butn_before; [ cbn | flia Hiz ].
+    now apply nth_In.
+  } {
+    rewrite nth_butn_after; [ cbn | flia Hiz ].
+    apply nth_In; rewrite fold_mat_nrows; flia H1r.
+  }
+}
+Qed.
+
 Theorem submatrix_sub : ∀ (MA MB : matrix T) i j,
   subm (MA - MB)%M i j = (subm MA i j - subm MB i j)%M.
 Proof.
