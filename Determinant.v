@@ -2151,6 +2151,34 @@ destruct n; [ easy | clear Hnz; cbn ].
 (**)
 assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
   intros.
+  clear Hbc Hc Hca Hcb.
+  destruct A as (lla).
+  destruct B as (llb).
+  cbn in *.
+  unfold subm; f_equal.
+  cbn - [ butn ].
+  destruct lla as [| la]; [ easy | ].
+  destruct llb as [| lb]; [ easy | ].
+  cbn in Hra, Hrb |-*.
+  apply Nat.succ_inj in Hra, Hrb.
+  apply is_sm_mat_iff in Hsma, Hsmb.
+  destruct Hsma as (_ & _ & Hca).
+  destruct Hsmb as (_ & _ & Hcb).
+  cbn - [ In ] in Hca, Hcb.
+  assert
+    (Hba : ∀ i j, nth j (nth i llb []) 0%F = nth j (nth i lla []) 0%F). {
+    intros i k.
+    apply (Hb (S i) k (Nat.neq_succ_0 _)).
+  }
+  clear Hb.
+  assert (H : ∀ l, l ∈ lla → length l = S n). {
+    now intros l Hl; apply Hca; right.
+  }
+  move H before Hca; clear Hca; rename H into Hca.
+  assert (H : ∀ l, l ∈ llb → length l = S n). {
+    now intros l Hl; apply Hcb; right.
+  }
+  move H before Hcb; clear Hcb; rename H into Hcb.
 ...
 assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
   intros.
