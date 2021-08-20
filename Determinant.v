@@ -2288,8 +2288,25 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
             rewrite mat_nrows_subm; [ | rewrite Hra; flia ].
             now rewrite Hra, Nat.sub_succ, Nat.sub_0_r.
           }
+          apply Nat.nlt_ge in Ht.
+assert (H : subm A 0 j = subm B 0 j). {
+  unfold subm.
+  f_equal.
 ...
-          rewrite mat_ncols_subm in Ht.
+          destruct n; [ easy | ].
+          destruct (lt_dec j n) as [Hjn| Hjn]. {
+            rewrite mat_ncols_subm in Ht; [ | | flia Hrb | flia Hcb Hjn ].
+            2: {
+              now apply (@squ_mat_is_corr (S (S n))).
+            }
+            rewrite mat_ncols_subm in Hjla; [ | | flia Hra | flia Hca Hjn ].
+            2: {
+              now apply (@squ_mat_is_corr (S (S n))).
+            }
+            rewrite Hca in Hjla.
+            now rewrite Hcb in Ht.
+          } {
+Search (mat_ncols (subm _ _ _)).
 ...
   apply in_butn in Hla.
   unfold mat_ncols, subm; cbn.
