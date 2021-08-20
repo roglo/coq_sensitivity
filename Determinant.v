@@ -2363,9 +2363,10 @@ split. {
     now rewrite butn_nil in Hl.
   }
   apply Nat.nle_gt in H1r.
-...
   destruct (lt_dec j (mat_ncols A)) as [Hjc| Hjc]. {
     rewrite mat_ncols_subm; [ | easy | easy | easy ].
+    destruct Ha as (_, Hc).
+...
     destruct A as (ll); cbn in *.
     destruct Ha as (_, Hc).
     unfold mat_ncols in Hc, Hc1, Hjc |-*.
