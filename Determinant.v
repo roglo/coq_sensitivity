@@ -2290,8 +2290,10 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
           }
           apply Nat.nlt_ge in Ht.
 assert (H : subm A 0 j = subm B 0 j). {
-  unfold subm.
   f_equal.
+  apply matrix_eq.
+  intros u v.
+  unfold nth_nth_error.
 ...
           destruct n; [ easy | ].
           destruct (lt_dec j n) as [Hjn| Hjn]. {
