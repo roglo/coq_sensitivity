@@ -2381,6 +2381,11 @@ split. {
   rewrite firstn_length, skipn_length.
   rewrite H1.
   rewrite Nat.min_r; [ | easy ].
+  rewrite (proj2 (Nat.sub_0_le (mat_ncols A) (S j))); [ | flia Hjc ].
+  rewrite Nat.add_0_r.
+  unfold mat_ncols, subm; cbn.
+  rewrite map_butn.
+Search (length (nth _ _ _)).
 ...
 (*
 remember (nth i (mat_list_list A) []) as row eqn:Hrow.
