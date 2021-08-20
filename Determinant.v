@@ -2363,9 +2363,24 @@ split. {
     now rewrite butn_nil in Hl.
   }
   apply Nat.nle_gt in H1r.
+  unfold subm in Hl; cbn in Hl.
+  apply in_map_iff in Hl.
+  destruct Hl as (la & Hl & Hla).
+  subst l.
+  destruct Ha as (Hcr, Hc).
+  specialize (in_butn _ _ _ Hla) as H.
+  specialize (Hc _ H) as H1; clear H.
   destruct (lt_dec j (mat_ncols A)) as [Hjc| Hjc]. {
     rewrite mat_ncols_subm; [ | easy | easy | easy ].
-    destruct Ha as (_, Hc).
+    rewrite butn_length; [ | congruence ].
+    now rewrite H1.
+  }
+  apply Nat.nlt_ge in Hjc.
+  unfold butn.
+  rewrite app_length.
+  rewrite firstn_length, skipn_length.
+  rewrite H1.
+  rewrite Nat.min_r; [ | easy ].
 ...
 (*
 remember (nth i (mat_list_list A) []) as row eqn:Hrow.
