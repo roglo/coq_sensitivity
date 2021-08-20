@@ -2367,6 +2367,23 @@ split. {
     rewrite mat_ncols_subm; [ | easy | easy | easy ].
     destruct Ha as (_, Hc).
 ...
+(*
+remember (nth i (mat_list_list A) []) as row eqn:Hrow.
+assert (l = firstn j row ++ skipn (j + 1) row). {
+  subst row.
+  Search (firstn _ (nth _ _ _)).
+*)
+  unfold subm in Hl; cbn in Hl.
+  unfold butn in Hl at 2.
+  rewrite map_app in Hl.
+  apply in_app_iff in Hl.
+  destruct Hl as [Hl| Hl].
+Search (map _ (firstn _ _)).
+rewrite <- firstn_map in Hl.
+...
+    rewrite <- firstn_skipn with (n := j) (l := l).
+specialize (Hc (firstn j l ++ mat_el A i j :: skipn j l)).
+...
     destruct A as (ll); cbn in *.
     destruct Ha as (_, Hc).
     unfold mat_ncols in Hc, Hc1, Hjc |-*.
