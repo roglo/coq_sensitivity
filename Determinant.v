@@ -2151,32 +2151,6 @@ destruct n; [ easy | clear Hnz; cbn ].
 assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
   intros.
   unfold nth_nth_error.
-(*
-  remember (nth_error (mat_list_list A) u) as la eqn:Hla.
-  remember (nth_error (mat_list_list B) u) as lb eqn:Hlb.
-  symmetry in Hla, Hlb.
-  move lb before la.
-  destruct la as [la| ]. {
-    apply List_nth_error_Some_iff with (d := []) in Hla.
-    destruct Hla as (Hla & Hua).
-    rewrite fold_mat_nrows in Hua.
-    rewrite Hra in Hua.
-    destruct lb as [lb| ]. {
-      apply List_nth_error_Some_iff with (d := []) in Hlb.
-      destruct Hlb as (Hlb & _).
-      f_equal.
-      remember (nth_error la v) as d eqn:Hd.
-      remember (nth_error lb v) as e eqn:He.
-      symmetry in Hd, He.
-      move e before d.
-      destruct d as [d| ]. {
-        apply List_nth_error_Some_iff with (d := 0%F) in Hd.
-        destruct Hd as (Hd, Hva).
-        destruct e as [e| ]. {
-          apply List_nth_error_Some_iff with (d := 0%F) in He.
-          destruct He as (He, Hvb).
-          f_equal; subst d e.
-*)
   apply matrix_eq.
   intros i j'.
   unfold nth_nth_error.
@@ -2289,11 +2263,6 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
             now rewrite Hra, Nat.sub_succ, Nat.sub_0_r.
           }
           apply Nat.nlt_ge in Ht.
-assert (H : subm A 0 j = subm B 0 j). {
-  f_equal.
-  apply matrix_eq.
-  intros u v.
-  unfold nth_nth_error.
 ...
           destruct n; [ easy | ].
           destruct (lt_dec j n) as [Hjn| Hjn]. {
