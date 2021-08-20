@@ -2148,6 +2148,10 @@ assert (Hrb : mat_nrows B = n) by now apply is_sm_mat_iff in Hsmb.
 specialize (square_matrix_ncols _ Hsma) as Hca.
 specialize (square_matrix_ncols _ Hsmb) as Hcb.
 destruct n; [ easy | clear Hnz; cbn ].
+(**)
+assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
+  intros.
+...
 assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
   intros.
   unfold nth_nth_error.
