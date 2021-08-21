@@ -1797,33 +1797,26 @@ Search (map _ (butn _ _)).
 Theorem map_butn_seq : ∀ A (f : _ → A) n sta len,
   sta ≤ n < sta + len
   → map f (butn n (seq sta len)) =
-    map (λ i, if lt_dec i n then f (i - 1) else f i) (seq (sta + 1) len).
+    map (λ i, if lt_dec i n then f i else f (i + 1)) (seq sta (len - 1)).
 Proof.
 intros * Hn.
 revert n sta Hn.
 induction len; intros; [ now rewrite butn_nil | ].
+rewrite Nat.sub_succ, Nat.sub_0_r.
+cbn.
 destruct n. {
   cbn.
-  destruct Hn as (Hs, _).
-  apply Nat.le_0_r in Hs; subst sta.
-  cbn.
-  destruct len.
-  cbn.
-...
-  symmetry.
+  destruct Hn as (Hsta, Hlen).
+  apply Nat.le_0_r in Hsta; subst sta.
+  cbn; clear Hlen.
   rewrite <- seq_shift.
   rewrite map_map.
-  rewrite Nat.add_1_r.
-Search (seq (S _)).
-rewrite cons_seq.
-
-  rewrite <- cons_seq.
-Search (butn _ (_ :: _)).
-  cbn.
-Search (seq (S _)).
+  apply map_ext_in.
+  intros i Hi.
+  now rewrite Nat.add_1_r.
+}
+rewrite butn_cons; cbn.
 ...
-rewrite seq_S.
-
 rewrite Nat.add_1_r.
 rewrite <- seq_shift, map_map.
 revert sta.
