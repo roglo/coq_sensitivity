@@ -1795,27 +1795,80 @@ erewrite map_ext_in. 2: {
 }
 Search (map _ (butn _ _)).
 Theorem map_butn_seq : ∀ A (f : _ → A) n sta len,
-  sta ≤ n < sta + len
+  n < len
   → map f (butn n (seq sta len)) =
-    map (λ i, if lt_dec i n then f i else f (i + 1)) (seq sta (len - 1)).
+    map (λ i, if lt_dec i (sta + n) then f i else f (i + 1))
+      (seq sta (len - 1)).
 Proof.
 intros * Hn.
-revert n sta Hn.
+clear Hn.
+revert n sta.
 induction len; intros; [ now rewrite butn_nil | ].
-rewrite Nat.sub_succ, Nat.sub_0_r.
-cbn.
 destruct n. {
-  cbn.
-  destruct Hn as (Hsta, Hlen).
-  apply Nat.le_0_r in Hsta; subst sta.
-  cbn; clear Hlen.
+  rewrite Nat.sub_succ, Nat.sub_0_r.
+  rewrite Nat.add_0_r; cbn.
   rewrite <- seq_shift.
   rewrite map_map.
   apply map_ext_in.
   intros i Hi.
-  now rewrite Nat.add_1_r.
+  apply in_seq in Hi.
+  rewrite Nat.add_1_r.
+  destruct (lt_dec i sta) as [H| H]; [ | easy ].
+  flia Hi H.
 }
+cbn - [ butn ].
 rewrite butn_cons; cbn.
+rewrite IHlen.
+destruct len; cbn.
+2: {
+  rewrite Nat.sub_0_r.
+  destruct (lt_dec sta (sta + S n)) as [H| H]; [ clear H | flia H ].
+  f_equal.
+  apply map_ext_in.
+  intros i Hi.
+  now rewrite (Nat.add_succ_r sta).
+}
+...
+intros * Hn.
+revert n sta Hn.
+induction len; intros; [ now rewrite butn_nil | ].
+rewrite Nat.sub_succ, Nat.sub_0_r.
+destruct n. {
+  rewrite Nat.add_0_r; cbn.
+  rewrite <- seq_shift.
+  rewrite map_map.
+  apply map_ext_in.
+  intros i Hi.
+  apply in_seq in Hi.
+  rewrite Nat.add_1_r.
+  destruct (lt_dec i sta) as [H| H]; [ | easy ].
+  flia Hi H.
+}
+apply Nat.succ_lt_mono in Hn.
+cbn - [ butn ].
+rewrite butn_cons; cbn.
+rewrite IHlen; [ | easy ].
+destruct len; [ easy | cbn ].
+rewrite Nat.sub_0_r.
+destruct (lt_dec sta (sta + S n)) as [H| H]; [ clear H | flia H ].
+f_equal.
+apply map_ext_in.
+intros i Hi.
+now rewrite (Nat.add_succ_r sta).
+Qed.
+...
+rewrite map_butn_seq.
+cbn.
+...
+Search (seq _ (S _)).
+rewrite seq_S.
+Search (butn _ (_ ++ _)).
+rewrite butn_app.
+
+rewrite butn_cons; cbn.
+destruct len. {
+  cbn.
+Print butn.
 ...
 rewrite Nat.add_1_r.
 rewrite <- seq_shift, map_map.
