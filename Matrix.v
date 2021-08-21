@@ -1761,6 +1761,23 @@ Compute subm (mk_mat [[3;5;8];[2;1;9];[10;11;12]]) 1 1.
 Compute subm (mk_mat [[3;5;8];[2;1;9];[10;11;12]]) 1 2.
 *)
 
+(* alternative definition *)
+Definition subm' (M : matrix T) u v :=
+  mk_mat
+    (map
+       (λ i,
+          map
+            (λ j, mat_el M (i + Nat.b2n (u <=? i)) (j + Nat.b2n (v <=? j)))
+            (seq 0 (mat_ncols M - 1)))
+       (seq 0 (mat_nrows M - 1))).
+
+(* equivalence between subm and subm' *)
+
+Theorem subm_subm' : ∀ (M : matrix T) i j, subm M i j = subm' M i j.
+Proof.
+intros.
+...
+
 (* combinations of submatrix and other operations *)
 
 Theorem mat_el_subm : ∀ (M : matrix T) i j u v,
