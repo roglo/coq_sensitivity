@@ -1786,11 +1786,11 @@ rewrite <- map_butn.
 erewrite map_ext_in. 2: {
   intros u Hu.
   rewrite (List_eq_map_seq (nth u (mat_list_list M) []) 0%F).
+  rewrite <- map_butn.
   erewrite map_ext_in. 2: {
     intros v Hv.
     now rewrite fold_mat_el.
   }
-...
   easy.
 }
 ...
