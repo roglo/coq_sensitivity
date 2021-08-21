@@ -1778,7 +1778,59 @@ Proof.
 intros.
 unfold subm, subm'.
 f_equal.
-destruct M as (ll); cbn.
+rewrite (List_eq_map_seq (mat_list_list M) []) at 1.
+rewrite fold_mat_nrows.
+rewrite map_butn.
+rewrite map_map.
+rewrite <- map_butn.
+erewrite map_ext_in. 2: {
+  intros u Hu.
+  rewrite (List_eq_map_seq (nth u (mat_list_list M) []) 0%F).
+  erewrite map_ext_in. 2: {
+    intros v Hv.
+    now rewrite fold_mat_el.
+  }
+...
+  easy.
+}
+...
+unfold mat_ncols; cbn.
+(*
+*)
+rewrite <- map_butn.
+(*
+rewrite map_seq_length.
+*)
+symmetry.
+erewrite map_ext_in. 2: {
+  intros u Hu.
+  apply in_seq in Hu.
+  rewrite List_hd_nth_0.
+...
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    unfold Nat.b2n.
+    rewrite if_leb_le_dec.
+    destruct (le_dec i u); flia Hu.
+  }
+  rewrite seq_nth. 2: {
+    unfold Nat.b2n.
+    rewrite if_leb_le_dec.
+    destruct (le_dec i u); flia Hu.
+  }
+  rewrite Nat.add_0_l.
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    flia Hu.
+  }
+  rewrite seq_nth; [ | flia Hu ].
+  cbn.
+  rewrite <- List_hd_nth_0.
+  easy.
+}
+symmetry.
+Print subm'.
+...
 unfold mat_ncols; cbn.
 induction ll as [| la]; [ now rewrite butn_nil | ].
 destruct i. {
