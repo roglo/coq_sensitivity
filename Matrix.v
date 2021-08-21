@@ -1793,41 +1793,19 @@ erewrite map_ext_in. 2: {
   }
   easy.
 }
-Search (map _ (butn _ _)).
-Theorem map_butn_seq : ∀ A (f : _ → A) n sta len,
-  n < len
-  → map f (butn n (seq sta len)) =
-    map (λ i, if lt_dec i (sta + n) then f i else f (i + 1))
-      (seq sta (len - 1)).
-Proof.
-intros * Hn.
-revert n sta Hn.
-induction len; intros; [ now rewrite butn_nil | ].
-destruct n. {
-  rewrite Nat.sub_succ, Nat.sub_0_r.
-  rewrite Nat.add_0_r; cbn.
-  rewrite <- seq_shift.
-  rewrite map_map.
-  apply map_ext_in.
-  intros i Hi.
-  apply in_seq in Hi.
-  rewrite Nat.add_1_r.
-  destruct (lt_dec i sta) as [H| H]; [ | easy ].
-  flia Hi H.
-}
-cbn - [ butn ].
-rewrite butn_cons; cbn.
-apply Nat.succ_lt_mono in Hn.
-rewrite IHlen; [ | easy ].
-destruct len; [ easy | ].
-cbn; rewrite Nat.sub_0_r.
-destruct (lt_dec sta (sta + S n)) as [H| H]; [ clear H | flia H ].
-f_equal.
-apply map_ext_in.
-intros i Hi.
-now rewrite (Nat.add_succ_r sta).
-Qed.
 rewrite map_butn_seq.
+rewrite Nat.add_0_l.
+unfold Nat.b2n at 1.
+rewrite if_ltb_lt_dec.
+destruct (lt_dec i (mat_nrows M)) as [Hi| Hi]. {
+  apply map_ext_in.
+  intros k Hk.
+  apply in_seq in Hk.
+  destruct (lt_dec k i) as [Hki| Hki]. {
+    rewrite map_butn_seq.
+    unfold Nat.b2n at 1.
+    rewrite if_ltb_lt_dec.
+    destruct (lt_dec j (length (nth k (mat_list_list M) []))) as [Hj| Hj]. {
 ...
 unfold mat_ncols; cbn.
 (*

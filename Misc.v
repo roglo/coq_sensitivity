@@ -1592,6 +1592,82 @@ Qed.
 
 (* end map2 *)
 
+(* conversions if ...? into if ..._dec *)
+
+Theorem if_eqb_eq_dec : ∀ A i j (a b : A),
+  (if i =? j then a else b) = (if Nat.eq_dec i j then a else b).
+Proof.
+intros.
+remember (i =? j) as ij eqn:Hij.
+symmetry in Hij.
+destruct ij. {
+  apply Nat.eqb_eq in Hij.
+  now destruct (Nat.eq_dec i j).
+} {
+  apply Nat.eqb_neq in Hij.
+  now destruct (Nat.eq_dec i j).
+}
+Qed.
+
+Theorem if_ltb_lt_dec : ∀ A i j (a b : A),
+  (if i <? j then a else b) = (if lt_dec i j then a else b).
+Proof.
+intros.
+remember (i <? j) as ij eqn:Hij.
+symmetry in Hij.
+destruct ij. {
+  apply Nat.ltb_lt in Hij.
+  now destruct (lt_dec i j).
+} {
+  apply Nat.ltb_nlt in Hij.
+  now destruct (lt_dec i j).
+}
+Qed.
+
+Theorem if_leb_le_dec : ∀ A i j (a b : A),
+  (if i <=? j then a else b) = (if le_dec i j then a else b).
+Proof.
+intros.
+remember (i <=? j) as ij eqn:Hij.
+symmetry in Hij.
+destruct ij. {
+  apply Nat.leb_le in Hij.
+  now destruct (le_dec i j).
+} {
+  apply Nat.leb_nle in Hij.
+  now destruct (le_dec i j).
+}
+Qed.
+
+Theorem Nat_ltb_mono_l : ∀ a b c, (a + b <? a + c) = (b <? c).
+Proof.
+intros.
+remember (_ <? _) as x eqn:Hx in |-*; symmetry in Hx.
+remember (_ <? _) as y eqn:Hy in |-*; symmetry in Hy.
+destruct x, y; [ easy | | | easy ]. {
+  apply Nat.ltb_lt in Hx.
+  apply Nat.ltb_nlt in Hy.
+  flia Hx Hy.
+} {
+  apply Nat.ltb_nlt in Hx.
+  apply Nat.ltb_lt in Hy.
+  flia Hx Hy.
+}
+Qed.
+
+Theorem Nat_ltb_mono_r : ∀ a b c, (a + c <? b + c) = (a <? b).
+Proof.
+intros.
+rewrite (Nat.add_comm a).
+rewrite (Nat.add_comm b).
+apply Nat_ltb_mono_l.
+Qed.
+
+Theorem Nat_b2n_upper_bound : ∀ b, Nat.b2n b ≤ 1.
+Proof.
+intros; destruct b; cbn; flia.
+Qed.
+
 (* butn: list without its nth element *)
 
 Definition butn {A} n (l : list A) :=
@@ -1727,6 +1803,53 @@ destruct i; [ easy | ].
 cbn in Hi; apply Nat.succ_le_mono in Hi.
 rewrite butn_cons.
 now rewrite IHl.
+Qed.
+
+Theorem map_butn_seq : ∀ A (f : _ → A) n sta len,
+  map f (butn n (seq sta len)) =
+  map (λ i, if lt_dec i (sta + n) then f i else f (i + 1))
+    (seq sta (len - Nat.b2n (n <? len))).
+Proof.
+intros.
+revert n sta.
+induction len; intros; [ now rewrite butn_nil | ].
+destruct n. {
+  cbn; rewrite Nat.sub_0_r, Nat.add_0_r.
+  rewrite <- seq_shift.
+  rewrite map_map.
+  apply map_ext_in.
+  intros i Hi.
+  apply in_seq in Hi.
+  rewrite Nat.add_1_r.
+  destruct (lt_dec i sta) as [H| H]; [ | easy ].
+  flia Hi H.
+}
+unfold Nat.b2n.
+rewrite if_ltb_lt_dec.
+destruct (lt_dec (S n) (S len)) as [Hn| Hn]. {
+  cbn - [ butn ].
+  rewrite Nat.sub_0_r, butn_cons; cbn.
+  apply Nat.succ_lt_mono in Hn.
+  rewrite IHlen.
+  destruct len; [ easy | ].
+  unfold Nat.b2n.
+  rewrite if_ltb_lt_dec.
+  destruct (lt_dec n (S len)) as [H| H]; [ clear H | easy ].
+  cbn; rewrite Nat.sub_0_r.
+  destruct (lt_dec sta (sta + S n)) as [H| H]; [ clear H | flia H ].
+  f_equal.
+  apply map_ext_in.
+  intros i Hi.
+  now rewrite (Nat.add_succ_r sta).
+} {
+  apply Nat.nlt_ge in Hn.
+  rewrite Nat.sub_0_r.
+  rewrite butn_out; [ | now rewrite seq_length ].
+  apply map_ext_in.
+  intros i Hi.
+  apply in_seq in Hi.
+  destruct (lt_dec i (sta + S n)) as [H| H]; [ easy | flia Hn Hi H ].
+}
 Qed.
 
 (* end butn *)
@@ -2810,80 +2933,6 @@ Fixpoint iter_merge {A} (le : A → A → bool) stack l :=
 Definition bsort {A} (le : A → A → bool) := iter_merge le [].
 
 (* *)
-
-Theorem if_eqb_eq_dec : ∀ A i j (a b : A),
-  (if i =? j then a else b) = (if Nat.eq_dec i j then a else b).
-Proof.
-intros.
-remember (i =? j) as ij eqn:Hij.
-symmetry in Hij.
-destruct ij. {
-  apply Nat.eqb_eq in Hij.
-  now destruct (Nat.eq_dec i j).
-} {
-  apply Nat.eqb_neq in Hij.
-  now destruct (Nat.eq_dec i j).
-}
-Qed.
-
-Theorem if_ltb_lt_dec : ∀ A i j (a b : A),
-  (if i <? j then a else b) = (if lt_dec i j then a else b).
-Proof.
-intros.
-remember (i <? j) as ij eqn:Hij.
-symmetry in Hij.
-destruct ij. {
-  apply Nat.ltb_lt in Hij.
-  now destruct (lt_dec i j).
-} {
-  apply Nat.ltb_nlt in Hij.
-  now destruct (lt_dec i j).
-}
-Qed.
-
-Theorem if_leb_le_dec : ∀ A i j (a b : A),
-  (if i <=? j then a else b) = (if le_dec i j then a else b).
-Proof.
-intros.
-remember (i <=? j) as ij eqn:Hij.
-symmetry in Hij.
-destruct ij. {
-  apply Nat.leb_le in Hij.
-  now destruct (le_dec i j).
-} {
-  apply Nat.leb_nle in Hij.
-  now destruct (le_dec i j).
-}
-Qed.
-
-Theorem Nat_ltb_mono_l : ∀ a b c, (a + b <? a + c) = (b <? c).
-Proof.
-intros.
-remember (_ <? _) as x eqn:Hx in |-*; symmetry in Hx.
-remember (_ <? _) as y eqn:Hy in |-*; symmetry in Hy.
-destruct x, y; [ easy | | | easy ]. {
-  apply Nat.ltb_lt in Hx.
-  apply Nat.ltb_nlt in Hy.
-  flia Hx Hy.
-} {
-  apply Nat.ltb_nlt in Hx.
-  apply Nat.ltb_lt in Hy.
-  flia Hx Hy.
-}
-Qed.
-
-Theorem Nat_ltb_mono_r : ∀ a b c, (a + c <? b + c) = (a <? b).
-Proof.
-intros.
-rewrite (Nat.add_comm a).
-rewrite (Nat.add_comm b).
-apply Nat_ltb_mono_l.
-Qed.
-
-Theorem Nat_b2n_upper_bound : ∀ b, Nat.b2n b ≤ 1.
-Proof.
-intros; destruct b; cbn; flia.
-Qed.
 
 Definition bool_of_sumbool {A B : Prop} (P : sumbool A B) :=
   match P with
