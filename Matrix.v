@@ -1776,6 +1776,13 @@ Definition subm' (M : matrix T) u v :=
 Theorem subm_subm' : ∀ (M : matrix T) i j, subm M i j = subm' M i j.
 Proof.
 intros.
+unfold subm, subm'.
+f_equal.
+destruct M as (ll); cbn.
+unfold mat_ncols; cbn.
+induction ll as [| la]; [ now rewrite butn_nil | ].
+destruct i. {
+  cbn.
 ...
 
 (* combinations of submatrix and other operations *)
