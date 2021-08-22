@@ -79,6 +79,8 @@ Definition list_list_of_mat {T} (M : matrix T) :=
 
 Definition mat_nrows {T} (M : matrix T) := length (mat_list_list M).
 Definition mat_ncols {T} (M : matrix T) := length (hd [] (mat_list_list M)).
+Definition mat_nth_ncols {T} n (M : matrix T) :=
+  length (nth n (mat_list_list M) []).
 
 Definition mat_el {T} {ro : ring_like_op T} (M : matrix T) i j :=
   nth j (nth i (mat_list_list M) []) 0%F.
@@ -89,6 +91,10 @@ Proof. easy. Qed.
 
 Theorem fold_mat_ncols {T} : ∀ (M : matrix T),
   length (hd [] (mat_list_list M)) = mat_ncols M.
+Proof. easy. Qed.
+
+Theorem fold_mat_nth_ncols {T} : ∀ i (M : matrix T),
+  length (nth i (mat_list_list M) []) = mat_nth_ncols i M.
 Proof. easy. Qed.
 
 Theorem fold_mat_el {T} {ro : ring_like_op T} : ∀ (M : matrix T) i j,
@@ -1768,7 +1774,7 @@ Definition subm' (M : matrix T) u v :=
        (λ i,
           map
             (λ j, mat_el M (i + Nat.b2n (u <=? i)) (j + Nat.b2n (v <=? j)))
-            (seq 0 (mat_ncols M - 1)))
+            (seq 0 (mat_nth_ncols i M - 1)))
        (seq 0 (mat_nrows M - 1))).
 
 (* equivalence between subm and subm' *)
@@ -1799,13 +1805,43 @@ unfold Nat.b2n at 1.
 rewrite if_ltb_lt_dec.
 destruct (lt_dec i (mat_nrows M)) as [Hi| Hi]. {
   apply map_ext_in.
-  intros k Hk.
-  apply in_seq in Hk.
-  destruct (lt_dec k i) as [Hki| Hki]. {
+  intros u Hu.
+  apply in_seq in Hu.
+  destruct (lt_dec u i) as [Hui| Hui]. {
+    unfold Nat.b2n at 1.
+    rewrite if_leb_le_dec.
+    destruct (le_dec i u) as [H| H]; [ flia Hui H | clear H ].
+    rewrite Nat.add_0_r.
     rewrite map_butn_seq.
     unfold Nat.b2n at 1.
     rewrite if_ltb_lt_dec.
-    destruct (lt_dec j (length (nth k (mat_list_list M) []))) as [Hj| Hj]. {
+    rewrite fold_mat_nth_ncols.
+    destruct (lt_dec j (mat_nth_ncols u M)) as [Hj| Hj]. {
+      apply map_ext_in.
+      intros v Hv; cbn.
+      unfold Nat.b2n.
+      rewrite if_leb_le_dec.
+      destruct (lt_dec v j) as [Hvj| Hvj]. {
+        destruct (le_dec j v) as [H| H]; [ flia Hvj H | clear H ].
+        now rewrite Nat.add_0_r.
+      } {
+        destruct (le_dec j v) as [H| H]; [ easy | flia Hvj H ].
+      }
+    } {
+      apply Nat.nlt_ge in Hj.
+      rewrite Nat.sub_0_r; cbn.
+(* shit *)
+...
+      apply map_ext_in.
+      intros v Hv; cbn.
+      unfold Nat.b2n.
+      rewrite if_leb_le_dec.
+      destruct (lt_dec v j) as [Hvj| Hvj]. {
+        destruct (le_dec j v) as [H| H]; [ flia Hvj H | clear H ].
+        now rewrite Nat.add_0_r.
+      } {
+        destruct (le_dec j v) as [H| H]; [ easy | flia Hvj H ].
+      }
 ...
 unfold mat_ncols; cbn.
 (*
