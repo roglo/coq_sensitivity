@@ -1822,62 +1822,25 @@ destruct (lt_dec u i) as [Hui| Hui]. {
   unfold Nat.b2n.
   rewrite if_leb_le_dec.
   destruct (le_dec i u) as [H| H]; [ clear H | flia Hui H ].
-...
-intros * Hm Hj.
-unfold subm, subm'.
-f_equal.
-rewrite (List_eq_map_seq (mat_list_list M) []) at 1.
-rewrite fold_mat_nrows.
-rewrite map_butn.
-rewrite map_map.
-rewrite <- map_butn.
-erewrite map_ext_in. 2: {
-  intros u Hu.
-  rewrite (List_eq_map_seq (nth u (mat_list_list M) []) 0%F).
-  rewrite <- map_butn.
-  erewrite map_ext_in. 2: {
-    intros v Hv.
-    now rewrite fold_mat_el.
+  rewrite (List_eq_map_seq _ 0%F).
+  rewrite butn_length. 2: {
+    rewrite fold_corr_mat_ncols; [ easy | easy | flia Hu ].
   }
-  easy.
-}
-rewrite map_butn_seq.
-rewrite Nat.add_0_l.
-unfold Nat.b2n at 1.
-rewrite if_ltb_lt_dec.
-destruct (lt_dec i (mat_nrows M)) as [Hi| Hi]. {
+  rewrite fold_corr_mat_ncols; [ | easy | flia Hu ].
   apply map_ext_in.
-  intros u Hu.
-  apply in_seq in Hu.
-  destruct (lt_dec u i) as [Hui| Hui]. {
-    unfold Nat.b2n at 1.
-    rewrite if_leb_le_dec.
-    destruct (le_dec i u) as [H| H]; [ flia Hui H | clear H ].
+  intros v Hv.
+  apply in_seq in Hv.
+  unfold Nat.b2n.
+  rewrite if_leb_le_dec.
+  destruct (le_dec j v) as [Hjv| Hjv]. {
+    now rewrite nth_butn_before.
+  } {
+    apply Nat.nle_gt in Hjv.
     rewrite Nat.add_0_r.
-    rewrite map_butn_seq.
-    unfold Nat.b2n at 1.
-    rewrite if_ltb_lt_dec.
-    rewrite fold_mat_nth_ncols.
-    destruct (lt_dec j (mat_nth_ncols u M)) as [Hju| Hju]. {
-      unfold mat_nth_ncols.
-      rewrite fold_corr_mat_ncols; [ | easy | flia Hu ].
-      apply map_ext_in.
-      intros v Hv; cbn.
-      unfold Nat.b2n.
-      rewrite if_leb_le_dec.
-      destruct (lt_dec v j) as [Hvj| Hvj]. {
-        destruct (le_dec j v) as [H| H]; [ flia Hvj H | clear H ].
-        now rewrite Nat.add_0_r.
-      } {
-        destruct (le_dec j v) as [H| H]; [ easy | flia Hvj H ].
-      }
-    } {
-      apply Nat.nlt_ge in Hju.
-      rewrite Nat.sub_0_r; cbn.
-      unfold mat_nth_ncols.
-      rewrite fold_corr_mat_ncols; [ | easy | flia Hu ].
-...
-*)
+    now rewrite nth_butn_after.
+  }
+}
+Qed.
 
 (* combinations of submatrix and other operations *)
 
