@@ -2150,68 +2150,9 @@ specialize (square_matrix_ncols _ Hsmb) as Hcb.
 destruct n; [ easy | clear Hnz; cbn ].
 assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
   intros.
-  destruct (lt_dec j (mat_ncols A)) as [Hjc| Hjc]. {
-    rewrite Hca in Hjc.
-    rewrite subm_subm'; [ | | rewrite Hra; flia | now rewrite Hca ]. 2: {
-      now apply (@squ_mat_is_corr (S n)).
-    }
-    rewrite subm_subm'; [ | | rewrite Hrb; flia| now rewrite Hcb ]. 2: {
-      now apply (@squ_mat_is_corr (S n)).
-    }
-    unfold subm'; f_equal.
-    rewrite Hra, Hrb, Hca, Hcb.
-    rewrite Nat.sub_succ, Nat.sub_0_r.
-    apply map_ext_in.
-    intros u Hu.
-    apply in_seq in Hu.
-    apply map_ext_in.
-    intros v Hv.
-    apply in_seq in Hv.
-    symmetry; apply Hb.
-    now cbn; rewrite Nat.add_1_r.
-  } {
-    apply Nat.nlt_ge in Hjc.
-    unfold subm; f_equal.
-    rewrite Hca in Hjc.
-    rewrite map_butn_out. 2: {
-      intros la Hla.
-      apply in_butn in Hla.
-      apply is_sm_mat_iff in Hsma.
-      destruct Hsma as (_ & Hcra & Hca').
-      now rewrite Hca'.
-    }
-    rewrite map_butn_out. 2: {
-      intros la Hla.
-      apply in_butn in Hla.
-      apply is_sm_mat_iff in Hsmb.
-      destruct Hsmb as (_ & Hcrb & Hcb').
-      now rewrite Hcb'.
-    }
-    rewrite (List_eq_map_seq _ []); symmetry.
-    rewrite (List_eq_map_seq _ []); symmetry.
-    rewrite butn_length; [ | rewrite fold_mat_nrows, Hra; flia ].
-    rewrite butn_length; [ | rewrite fold_mat_nrows, Hrb; flia ].
-    do 2 rewrite fold_mat_nrows.
-    rewrite Hra, Hrb, Nat.sub_succ, Nat.sub_0_r.
-    apply map_ext_in.
-    intros u Hu.
-    rewrite nth_butn_before; [ | flia ].
-    rewrite nth_butn_before; [ | flia ].
-    rewrite (List_eq_map_seq _ 0%F); symmetry.
-    rewrite (List_eq_map_seq _ 0%F); symmetry.
-    rewrite fold_corr_mat_ncols.
-...
-    rewrite butn_length; [ | rewrite fold_mat_nrows, Hra; flia ].
-    rewrite butn_length; [ | rewrite fold_mat_nrows, Hrb; flia ].
-    do 2 rewrite fold_mat_nrows.
-    rewrite Hra, Hrb, Nat.sub_succ, Nat.sub_0_r.
-    apply map_ext_in.
-    intros u Hu.
-    rewrite nth_butn_before; [ | flia ].
-    rewrite nth_butn_before; [ | flia ].
-...
-  intros.
+(*
   clear Hbc Hc Hca Hcb.
+*)
   destruct A as (lla).
   destruct B as (llb).
   cbn in *.
@@ -2222,9 +2163,10 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
   cbn in Hra, Hrb |-*.
   apply Nat.succ_inj in Hra, Hrb.
   apply is_sm_mat_iff in Hsma, Hsmb.
-  destruct Hsma as (_ & _ & Hca).
-  destruct Hsmb as (_ & _ & Hcb).
-  cbn - [ In ] in Hca, Hcb.
+  cbn in Hca, Hcb.
+  destruct Hsma as (_ & _ & Hca').
+  destruct Hsmb as (_ & _ & Hcb').
+  cbn - [ In ] in Hca', Hcb'.
   assert
     (Hba : ∀ i j, nth j (nth i llb []) 0%F = nth j (nth i lla []) 0%F). {
     intros i k.
@@ -2232,13 +2174,13 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
   }
   clear Hb.
   assert (H : ∀ l, l ∈ lla → length l = S n). {
-    now intros l Hl; apply Hca; right.
+    now intros l Hl; apply Hca'; right.
   }
-  move H before Hca; clear Hca; rename H into Hca.
+  move H before Hca'; clear Hca'; rename H into Hca'.
   assert (H : ∀ l, l ∈ llb → length l = S n). {
-    now intros l Hl; apply Hcb; right.
+    now intros l Hl; apply Hcb'; right.
   }
-  move H before Hcb; clear Hcb; rename H into Hcb.
+  move H before Hcb'; clear Hcb'; rename H into Hcb'.
   rewrite (List_eq_map_seq lla []).
   rewrite (List_eq_map_seq llb []).
   do 2 rewrite map_map.
@@ -2249,8 +2191,8 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
   f_equal.
   rewrite List_eq_map_seq with (d := 0%F); symmetry.
   rewrite List_eq_map_seq with (d := 0%F); symmetry.
-  rewrite Hca; [ | now apply nth_In; rewrite Hra ].
-  rewrite Hcb; [ | now apply nth_In; rewrite Hrb ].
+  rewrite Hca'; [ | now apply nth_In; rewrite Hra ].
+  rewrite Hcb'; [ | now apply nth_In; rewrite Hrb ].
   apply map_ext_in.
   intros k Hk.
   apply in_seq in Hk.
