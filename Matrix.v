@@ -1774,7 +1774,7 @@ Definition subm' (M : matrix T) u v :=
        (λ i,
           map
             (λ j, mat_el M (i + Nat.b2n (u <=? i)) (j + Nat.b2n (v <=? j)))
-            (seq 0 (mat_ncols M - 1)))
+            (seq 0 (mat_nth_ncols i M - 1)))
        (seq 0 (mat_nrows M - 1))).
 
 (* equivalence between subm and subm' *)
@@ -1836,7 +1836,6 @@ destruct (lt_dec i (mat_nrows M)) as [Hi| Hi]. {
       rewrite Nat.sub_0_r; cbn.
       unfold mat_nth_ncols.
       rewrite fold_corr_mat_ncols; [ | easy | flia Hu ].
-(* shit *)
 ...
       apply map_ext_in.
       intros v Hv; cbn.
