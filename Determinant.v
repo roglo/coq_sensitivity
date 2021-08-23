@@ -2150,9 +2150,41 @@ specialize (square_matrix_ncols _ Hsmb) as Hcb.
 destruct n; [ easy | clear Hnz; cbn ].
 assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
   intros.
-(*
-  clear Hbc Hc Hca Hcb.
-*)
+  destruct A as (lla).
+  destruct B as (llb).
+  cbn in *.
+  unfold subm; f_equal.
+  cbn - [ butn ].
+  rewrite (List_eq_map_seq lla []).
+  rewrite (List_eq_map_seq llb []).
+  rewrite Hra, Hrb.
+  do 2 rewrite <- map_butn.
+  do 2 rewrite map_map.
+  apply map_ext_in.
+  intros u Hu.
+  rewrite (List_eq_map_seq (nth u lla []) 0%F).
+  rewrite (List_eq_map_seq (nth u llb []) 0%F).
+  apply is_sm_mat_iff in Hsma.
+  destruct Hsma as (_ & _ & Hca').
+  apply in_butn, in_seq in Hu.
+  rewrite Hca'. 2: {
+    cbn; apply nth_In.
+    now rewrite Hra.
+  }
+  apply is_sm_mat_iff in Hsmb.
+  destruct Hsmb as (_ & _ & Hcb').
+  rewrite Hcb'. 2: {
+    cbn; apply nth_In.
+    now rewrite Hrb.
+  }
+  f_equal.
+  apply map_ext_in.
+  intros v Hv.
+  apply in_seq in Hv.
+  symmetry; apply Hb.
+...
+assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
+  intros.
   destruct A as (lla).
   destruct B as (llb).
   cbn in *.
