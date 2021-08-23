@@ -1781,9 +1781,10 @@ Definition subm' (M : matrix T) u v :=
 
 Theorem subm_subm' : ∀ (M : matrix T) i j,
   is_correct_matrix M
+  → j < mat_ncols M
   → subm M i j = subm' M i j.
 Proof.
-intros * Hm.
+intros * Hm Hj.
 unfold subm, subm'.
 f_equal.
 rewrite (List_eq_map_seq (mat_list_list M) []) at 1.
@@ -1818,7 +1819,7 @@ destruct (lt_dec i (mat_nrows M)) as [Hi| Hi]. {
     unfold Nat.b2n at 1.
     rewrite if_ltb_lt_dec.
     rewrite fold_mat_nth_ncols.
-    destruct (lt_dec j (mat_nth_ncols u M)) as [Hj| Hj]. {
+    destruct (lt_dec j (mat_nth_ncols u M)) as [Hju| Hju]. {
       unfold mat_nth_ncols.
       rewrite fold_corr_mat_ncols; [ | easy | flia Hu ].
       apply map_ext_in.
@@ -1832,7 +1833,7 @@ destruct (lt_dec i (mat_nrows M)) as [Hi| Hi]. {
         destruct (le_dec j v) as [H| H]; [ easy | flia Hvj H ].
       }
     } {
-      apply Nat.nlt_ge in Hj.
+      apply Nat.nlt_ge in Hju.
       rewrite Nat.sub_0_r; cbn.
       unfold mat_nth_ncols.
       rewrite fold_corr_mat_ncols; [ | easy | flia Hu ].
