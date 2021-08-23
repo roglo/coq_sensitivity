@@ -1767,7 +1767,6 @@ Compute subm (mk_mat [[3;5;8];[2;1;9];[10;11;12]]) 1 1.
 Compute subm (mk_mat [[3;5;8];[2;1;9];[10;11;12]]) 1 2.
 *)
 
-(*
 (* alternative definition *)
 Definition subm' (M : matrix T) u v :=
   mk_mat
@@ -1785,6 +1784,14 @@ Theorem subm_subm' : ∀ (M : matrix T) i j,
   → j < mat_ncols M
   → subm M i j = subm' M i j.
 Proof.
+intros * Hm Hj.
+unfold subm, subm'.
+f_equal.
+rewrite (List_eq_map_seq (mat_list_list M) []) at 1.
+rewrite fold_mat_nrows.
+rewrite <- map_butn, map_map.
+rewrite map_butn_seq.
+...
 intros * Hm Hj.
 unfold subm, subm'.
 f_equal.
