@@ -1774,14 +1774,16 @@ Definition subm' (M : matrix T) u v :=
        (λ i,
           map
             (λ j, mat_el M (i + Nat.b2n (u <=? i)) (j + Nat.b2n (v <=? j)))
-            (seq 0 (mat_nth_ncols i M - 1)))
+            (seq 0 (mat_ncols M - 1)))
        (seq 0 (mat_nrows M - 1))).
 
 (* equivalence between subm and subm' *)
 
-Theorem subm_subm' : ∀ (M : matrix T) i j, subm M i j = subm' M i j.
+Theorem subm_subm' : ∀ (M : matrix T) i j,
+  is_correct_matrix M
+  → subm M i j = subm' M i j.
 Proof.
-intros.
+intros * Hm.
 unfold subm, subm'.
 f_equal.
 rewrite (List_eq_map_seq (mat_list_list M) []) at 1.
@@ -1817,6 +1819,8 @@ destruct (lt_dec i (mat_nrows M)) as [Hi| Hi]. {
     rewrite if_ltb_lt_dec.
     rewrite fold_mat_nth_ncols.
     destruct (lt_dec j (mat_nth_ncols u M)) as [Hj| Hj]. {
+      unfold mat_nth_ncols.
+      rewrite fold_corr_mat_ncols; [ | easy | flia Hu ].
       apply map_ext_in.
       intros v Hv; cbn.
       unfold Nat.b2n.
@@ -1830,6 +1834,8 @@ destruct (lt_dec i (mat_nrows M)) as [Hi| Hi]. {
     } {
       apply Nat.nlt_ge in Hj.
       rewrite Nat.sub_0_r; cbn.
+      unfold mat_nth_ncols.
+      rewrite fold_corr_mat_ncols; [ | easy | flia Hu ].
 (* shit *)
 ...
       apply map_ext_in.
