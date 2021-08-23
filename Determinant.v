@@ -2187,6 +2187,28 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
       destruct Hsmb as (_ & Hcrb & Hcb').
       now rewrite Hcb'.
     }
+    rewrite (List_eq_map_seq _ []); symmetry.
+    rewrite (List_eq_map_seq _ []); symmetry.
+    rewrite butn_length; [ | rewrite fold_mat_nrows, Hra; flia ].
+    rewrite butn_length; [ | rewrite fold_mat_nrows, Hrb; flia ].
+    do 2 rewrite fold_mat_nrows.
+    rewrite Hra, Hrb, Nat.sub_succ, Nat.sub_0_r.
+    apply map_ext_in.
+    intros u Hu.
+    rewrite nth_butn_before; [ | flia ].
+    rewrite nth_butn_before; [ | flia ].
+    rewrite (List_eq_map_seq _ 0%F); symmetry.
+    rewrite (List_eq_map_seq _ 0%F); symmetry.
+    rewrite fold_corr_mat_ncols.
+...
+    rewrite butn_length; [ | rewrite fold_mat_nrows, Hra; flia ].
+    rewrite butn_length; [ | rewrite fold_mat_nrows, Hrb; flia ].
+    do 2 rewrite fold_mat_nrows.
+    rewrite Hra, Hrb, Nat.sub_succ, Nat.sub_0_r.
+    apply map_ext_in.
+    intros u Hu.
+    rewrite nth_butn_before; [ | flia ].
+    rewrite nth_butn_before; [ | flia ].
 ...
   intros.
   clear Hbc Hc Hca Hcb.
