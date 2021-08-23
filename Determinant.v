@@ -2162,6 +2162,10 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
   do 2 rewrite map_map.
   apply map_ext_in.
   intros u Hu.
+  destruct (Nat.eq_dec u 0) as [Huz| Huz]. {
+    subst u; cbn in Hu.
+    now apply in_seq in Hu.
+  }
   rewrite (List_eq_map_seq (nth u lla []) 0%F).
   rewrite (List_eq_map_seq (nth u llb []) 0%F).
   apply is_sm_mat_iff in Hsma.
@@ -2181,54 +2185,7 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
   apply map_ext_in.
   intros v Hv.
   apply in_seq in Hv.
-  symmetry; apply Hb.
-...
-assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
-  intros.
-  destruct A as (lla).
-  destruct B as (llb).
-  cbn in *.
-  unfold subm; f_equal.
-  cbn - [ butn ].
-  destruct lla as [| la]; [ easy | ].
-  destruct llb as [| lb]; [ easy | ].
-  cbn in Hra, Hrb |-*.
-  apply Nat.succ_inj in Hra, Hrb.
-  apply is_sm_mat_iff in Hsma, Hsmb.
-  cbn in Hca, Hcb.
-  destruct Hsma as (_ & _ & Hca').
-  destruct Hsmb as (_ & _ & Hcb').
-  cbn - [ In ] in Hca', Hcb'.
-  assert
-    (Hba : ∀ i j, nth j (nth i llb []) 0%F = nth j (nth i lla []) 0%F). {
-    intros i k.
-    apply (Hb (S i) k (Nat.neq_succ_0 _)).
-  }
-  clear Hb.
-  assert (H : ∀ l, l ∈ lla → length l = S n). {
-    now intros l Hl; apply Hca'; right.
-  }
-  move H before Hca'; clear Hca'; rename H into Hca'.
-  assert (H : ∀ l, l ∈ llb → length l = S n). {
-    now intros l Hl; apply Hcb'; right.
-  }
-  move H before Hcb'; clear Hcb'; rename H into Hcb'.
-  rewrite (List_eq_map_seq lla []).
-  rewrite (List_eq_map_seq llb []).
-  do 2 rewrite map_map.
-  rewrite Hra, Hrb.
-  apply map_ext_in.
-  intros i Hi.
-  apply in_seq in Hi.
-  f_equal.
-  rewrite List_eq_map_seq with (d := 0%F); symmetry.
-  rewrite List_eq_map_seq with (d := 0%F); symmetry.
-  rewrite Hca'; [ | now apply nth_In; rewrite Hra ].
-  rewrite Hcb'; [ | now apply nth_In; rewrite Hrb ].
-  apply map_ext_in.
-  intros k Hk.
-  apply in_seq in Hk.
-  symmetry; apply Hba.
+  now symmetry; apply Hb.
 }
 assert (Hac : ∀ j, subm A 0 j = subm C 0 j). {
   intros.
