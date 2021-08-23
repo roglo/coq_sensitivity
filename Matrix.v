@@ -1774,23 +1774,45 @@ Definition subm' (M : matrix T) u v :=
        (λ i,
           map
             (λ j, mat_el M (i + Nat.b2n (u <=? i)) (j + Nat.b2n (v <=? j)))
-            (seq 0 (mat_nth_ncols i M - 1)))
+            (seq 0 (mat_ncols M - 1)))
        (seq 0 (mat_nrows M - 1))).
 
 (* equivalence between subm and subm' *)
 
 Theorem subm_subm' : ∀ (M : matrix T) i j,
   is_correct_matrix M
+  → i < mat_nrows M
   → j < mat_ncols M
   → subm M i j = subm' M i j.
 Proof.
-intros * Hm Hj.
+intros * Hm Hi Hj.
 unfold subm, subm'.
 f_equal.
 rewrite (List_eq_map_seq (mat_list_list M) []) at 1.
 rewrite fold_mat_nrows.
 rewrite <- map_butn, map_map.
 rewrite map_butn_seq.
+unfold Nat.b2n at 1.
+rewrite if_ltb_lt_dec.
+destruct (lt_dec i (mat_nrows M)) as [H| H]; [ clear H | flia Hi H ].
+apply map_ext_in.
+intros u Hu.
+apply in_seq in Hu; cbn.
+destruct (lt_dec u i) as [Hui| Hui]. {
+  rewrite (List_eq_map_seq _ 0%F).
+  rewrite butn_length. 2: {
+    rewrite fold_corr_mat_ncols; [ easy | easy | flia Hu ].
+  }
+  rewrite fold_corr_mat_ncols; [ | easy | flia Hu ].
+  apply map_ext_in.
+  intros v Hv.
+  unfold Nat.b2n.
+  do 2 rewrite if_leb_le_dec.
+  destruct (le_dec i u) as [H| H]; [ flia Hui H | clear H ].
+  rewrite Nat.add_0_r.
+  destruct (le_dec j v) as [Hvj| Hjv]. {
+Search (butn _ (nth _ _ _)).
+    rewrite butn_nth_after.
 ...
 intros * Hm Hj.
 unfold subm, subm'.
