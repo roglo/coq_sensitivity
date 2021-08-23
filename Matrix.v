@@ -1811,8 +1811,17 @@ destruct (lt_dec u i) as [Hui| Hui]. {
   destruct (le_dec i u) as [H| H]; [ flia Hui H | clear H ].
   rewrite Nat.add_0_r.
   destruct (le_dec j v) as [Hvj| Hjv]. {
-Search (butn _ (nth _ _ _)).
-    rewrite butn_nth_after.
+    now rewrite nth_butn_before.
+  } {
+    apply Nat.nle_gt in Hjv.
+    rewrite nth_butn_after; [ | easy ].
+    now rewrite Nat.add_0_r.
+  }
+} {
+  apply Nat.nlt_ge in Hui.
+  unfold Nat.b2n.
+  rewrite if_leb_le_dec.
+  destruct (le_dec i u) as [H| H]; [ clear H | flia Hui H ].
 ...
 intros * Hm Hj.
 unfold subm, subm'.
