@@ -2137,14 +2137,16 @@ Theorem det_sum_row_row : ∀ n (A B C : matrix T),
   n ≠ 0
   → is_square_matrix n A = true
   → is_square_matrix n B = true
+  → is_square_matrix n C = true
   → (∀ j, mat_el A 0 j = (mat_el B 0 j + mat_el C 0 j)%F)
   → (∀ i j, i ≠ 0 → mat_el B i j = mat_el A i j)
   → (∀ i j, i ≠ 0 → mat_el C i j = mat_el A i j)
   → determinant n A = (determinant n B + determinant n C)%F.
 Proof.
-intros * Hnz Hsma Hsmb Hbc Hb Hc.
+intros * Hnz Hsma Hsmb Hsmc Hbc Hb Hc.
 assert (Hra : mat_nrows A = n) by now apply is_sm_mat_iff in Hsma.
 assert (Hrb : mat_nrows B = n) by now apply is_sm_mat_iff in Hsmb.
+assert (Hrc : mat_nrows C = n) by now apply is_sm_mat_iff in Hsmc.
 specialize (square_matrix_ncols _ Hsma) as Hca.
 specialize (square_matrix_ncols _ Hsmb) as Hcb.
 destruct n; [ easy | clear Hnz; cbn ].
@@ -2189,11 +2191,45 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
 }
 assert (Hac : ∀ j, subm A 0 j = subm C 0 j). {
   intros.
-...
-  apply matrix_eq; cbn.
-  intros i j' Hi Hj'.
-  destruct (lt_dec j' j); symmetry; apply Hc; flia.
+  intros.
+  destruct A as (lla).
+  destruct C as (llc).
+  cbn in *.
+  unfold subm; f_equal.
+  cbn - [ butn ].
+  rewrite (List_eq_map_seq lla []).
+  rewrite (List_eq_map_seq llc []).
+  rewrite Hra, Hrc.
+  do 2 rewrite <- map_butn.
+  do 2 rewrite map_map.
+  apply map_ext_in.
+  intros u Hu.
+  destruct (Nat.eq_dec u 0) as [Huz| Huz]. {
+    subst u; cbn in Hu.
+    now apply in_seq in Hu.
+  }
+  rewrite (List_eq_map_seq (nth u lla []) 0%F).
+  rewrite (List_eq_map_seq (nth u llc []) 0%F).
+  apply is_sm_mat_iff in Hsma.
+  destruct Hsma as (_ & _ & Hca').
+  apply in_butn, in_seq in Hu.
+  rewrite Hca'. 2: {
+    cbn; apply nth_In.
+    now rewrite Hra.
+  }
+  apply is_sm_mat_iff in Hsmc.
+  destruct Hsmc as (_ & _ & Hcc').
+  rewrite Hcc'. 2: {
+    cbn; apply nth_In.
+    now rewrite Hrc.
+  }
+  f_equal.
+  apply map_ext_in.
+  intros v Hv.
+  apply in_seq in Hv.
+  now symmetry; apply Hc.
 }
+...
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   rewrite Hbc.
