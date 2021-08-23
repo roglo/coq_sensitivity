@@ -2150,6 +2150,45 @@ specialize (square_matrix_ncols _ Hsmb) as Hcb.
 destruct n; [ easy | clear Hnz; cbn ].
 assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
   intros.
+  destruct (lt_dec j (mat_ncols A)) as [Hjc| Hjc]. {
+    rewrite Hca in Hjc.
+    rewrite subm_subm'; [ | | rewrite Hra; flia | now rewrite Hca ]. 2: {
+      now apply (@squ_mat_is_corr (S n)).
+    }
+    rewrite subm_subm'; [ | | rewrite Hrb; flia| now rewrite Hcb ]. 2: {
+      now apply (@squ_mat_is_corr (S n)).
+    }
+    unfold subm'; f_equal.
+    rewrite Hra, Hrb, Hca, Hcb.
+    rewrite Nat.sub_succ, Nat.sub_0_r.
+    apply map_ext_in.
+    intros u Hu.
+    apply in_seq in Hu.
+    apply map_ext_in.
+    intros v Hv.
+    apply in_seq in Hv.
+    symmetry; apply Hb.
+    now cbn; rewrite Nat.add_1_r.
+  } {
+    apply Nat.nlt_ge in Hjc.
+    unfold subm; f_equal.
+    rewrite Hca in Hjc.
+    rewrite map_butn_out. 2: {
+      intros la Hla.
+      apply in_butn in Hla.
+      apply is_sm_mat_iff in Hsma.
+      destruct Hsma as (_ & Hcra & Hca').
+      now rewrite Hca'.
+    }
+    rewrite map_butn_out. 2: {
+      intros la Hla.
+      apply in_butn in Hla.
+      apply is_sm_mat_iff in Hsmb.
+      destruct Hsmb as (_ & Hcrb & Hcb').
+      now rewrite Hcb'.
+    }
+...
+  intros.
   clear Hbc Hc Hca Hcb.
   destruct A as (lla).
   destruct B as (llb).
