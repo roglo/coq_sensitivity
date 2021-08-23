@@ -1767,6 +1767,7 @@ Compute subm (mk_mat [[3;5;8];[2;1;9];[10;11;12]]) 1 1.
 Compute subm (mk_mat [[3;5;8];[2;1;9];[10;11;12]]) 1 2.
 *)
 
+(*
 (* alternative definition *)
 Definition subm' (M : matrix T) u v :=
   mk_mat
@@ -1838,59 +1839,7 @@ destruct (lt_dec i (mat_nrows M)) as [Hi| Hi]. {
       unfold mat_nth_ncols.
       rewrite fold_corr_mat_ncols; [ | easy | flia Hu ].
 ...
-      apply map_ext_in.
-      intros v Hv; cbn.
-      unfold Nat.b2n.
-      rewrite if_leb_le_dec.
-      destruct (lt_dec v j) as [Hvj| Hvj]. {
-        destruct (le_dec j v) as [H| H]; [ flia Hvj H | clear H ].
-        now rewrite Nat.add_0_r.
-      } {
-        destruct (le_dec j v) as [H| H]; [ easy | flia Hvj H ].
-      }
-...
-unfold mat_ncols; cbn.
-(*
 *)
-rewrite <- map_butn.
-(*
-rewrite map_seq_length.
-*)
-symmetry.
-erewrite map_ext_in. 2: {
-  intros u Hu.
-  apply in_seq in Hu.
-  rewrite List_hd_nth_0.
-...
-  rewrite (List_map_nth' 0). 2: {
-    rewrite seq_length.
-    unfold Nat.b2n.
-    rewrite if_leb_le_dec.
-    destruct (le_dec i u); flia Hu.
-  }
-  rewrite seq_nth. 2: {
-    unfold Nat.b2n.
-    rewrite if_leb_le_dec.
-    destruct (le_dec i u); flia Hu.
-  }
-  rewrite Nat.add_0_l.
-  rewrite (List_map_nth' 0). 2: {
-    rewrite seq_length.
-    flia Hu.
-  }
-  rewrite seq_nth; [ | flia Hu ].
-  cbn.
-  rewrite <- List_hd_nth_0.
-  easy.
-}
-symmetry.
-Print subm'.
-...
-unfold mat_ncols; cbn.
-induction ll as [| la]; [ now rewrite butn_nil | ].
-destruct i. {
-  cbn.
-...
 
 (* combinations of submatrix and other operations *)
 
