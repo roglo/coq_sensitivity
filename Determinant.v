@@ -2299,6 +2299,7 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
         rewrite Nat.sub_0_r.
         now rewrite lt_subm_subm.
       }
+Check @lt_subm_subm.
 ...
 ... suite ok
 }
