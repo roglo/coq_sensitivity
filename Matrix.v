@@ -1934,7 +1934,7 @@ destruct (le_dec u i) as [Hui| Hui]. {
 }
 Qed.
 
-Theorem lt_subm_subm : ∀ i j k (M : matrix T),
+Theorem lt_subm_subm_rr : ∀ i j k (M : matrix T),
   i < k
   → subm (subm M i j) k j = subm (subm M (k + 1) j) i j.
 Proof.

@@ -2297,7 +2297,7 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
         replace l with j by flia Hjl Hlj.
         clear l Hjl Hlj.
         rewrite Nat.sub_0_r.
-        now rewrite lt_subm_subm.
+        now rewrite lt_subm_subm_rr.
       }
       rewrite (@subm_out_l _ (k + 1) i A); [ | flia Hir Hik | easy ].
       rewrite (@subm_out_l _ k i); cycle 1. {
@@ -2305,6 +2305,8 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
       } {
         rewrite mat_nrows_subm; flia Hir.
       }
+Check @lt_subm_subm_rr.
+rewrite lt_subm_subm_rr.
 ...
 rewrite lt_subm_subm.
 ...
