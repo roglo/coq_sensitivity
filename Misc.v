@@ -1711,11 +1711,26 @@ cbn; f_equal.
 apply IHla.
 Qed.
 
-Theorem butn_length : ∀ A n (l : list A),
-  n < length l
-  → length (butn n l) = length l - 1.
+Theorem butn_out : ∀ A (l : list A) i, length l ≤ i → butn i l = l.
 Proof.
-intros * Hnl.
+intros * Hi.
+revert i Hi.
+induction l as [| a]; intros; [ apply butn_nil | ].
+destruct i; [ easy | ].
+cbn in Hi; apply Nat.succ_le_mono in Hi.
+rewrite butn_cons.
+now rewrite IHl.
+Qed.
+
+Theorem butn_length : ∀ A n (l : list A),
+  length (butn n l) = length l - Nat.b2n (n <? length l).
+Proof.
+intros.
+unfold Nat.b2n; rewrite if_ltb_lt_dec.
+destruct (lt_dec n (length l)) as [Hnl| Hnl]. 2: {
+  apply Nat.nlt_ge in Hnl; rewrite Nat.sub_0_r.
+  now rewrite butn_out.
+}
 revert n Hnl.
 induction l as [| a]; intros; [ easy | ].
 cbn; rewrite Nat.sub_0_r.
@@ -1792,17 +1807,6 @@ destruct i; [ now right | ].
 rewrite butn_cons in Ha.
 destruct Ha as [Ha| Ha]; [ now left | right ].
 now apply IHl in Ha.
-Qed.
-
-Theorem butn_out : ∀ A (l : list A) i, length l ≤ i → butn i l = l.
-Proof.
-intros * Hi.
-revert i Hi.
-induction l as [| a]; intros; [ apply butn_nil | ].
-destruct i; [ easy | ].
-cbn in Hi; apply Nat.succ_le_mono in Hi.
-rewrite butn_cons.
-now rewrite IHl.
 Qed.
 
 Theorem map_butn_seq : ∀ A (f : _ → A) n sta len,

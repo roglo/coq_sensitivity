@@ -1809,10 +1809,10 @@ intros u Hu.
 apply in_seq in Hu; cbn.
 destruct (lt_dec u i) as [Hui| Hui]. {
   rewrite (List_eq_map_seq _ 0%F).
-  rewrite butn_length. 2: {
-    rewrite fold_corr_mat_ncols; [ easy | easy | flia Hu ].
-  }
+  rewrite butn_length.
+  unfold Nat.b2n at 1; rewrite if_ltb_lt_dec.
   rewrite fold_corr_mat_ncols; [ | easy | flia Hu ].
+  destruct (lt_dec j (mat_ncols M)) as [H| H]; [ clear H | flia Hj H ].
   apply map_ext_in.
   intros v Hv.
   unfold Nat.b2n.
@@ -1832,10 +1832,10 @@ destruct (lt_dec u i) as [Hui| Hui]. {
   rewrite if_leb_le_dec.
   destruct (le_dec i u) as [H| H]; [ clear H | flia Hui H ].
   rewrite (List_eq_map_seq _ 0%F).
-  rewrite butn_length. 2: {
-    rewrite fold_corr_mat_ncols; [ easy | easy | flia Hu ].
-  }
+  rewrite butn_length.
+  unfold Nat.b2n; rewrite if_ltb_lt_dec.
   rewrite fold_corr_mat_ncols; [ | easy | flia Hu ].
+  destruct (lt_dec j (mat_ncols M)) as [H| H]; [ clear H | flia Hj H ].
   apply map_ext_in.
   intros v Hv.
   apply in_seq in Hv.
@@ -1935,10 +1935,18 @@ destruct (le_dec u i) as [Hui| Hui]. {
 Qed.
 
 Theorem mat_nrows_subm : ∀ (M : matrix T) i j,
-  i < mat_nrows M
-  → mat_nrows (subm M i j) = mat_nrows M - 1.
+  mat_nrows (subm M i j) = mat_nrows M - Nat.b2n (i <? mat_nrows M).
 Proof.
-intros * Hir.
+intros.
+unfold Nat.b2n.
+rewrite if_ltb_lt_dec.
+destruct (lt_dec i (mat_nrows M)) as [Hir| Hir]. 2: {
+  apply Nat.nlt_ge in Hir.
+  rewrite Nat.sub_0_r.
+  destruct M as (ll); cbn in Hir |-*.
+  rewrite map_length.
+Search (length (butn _ _)).
+...
 destruct M as (ll); cbn.
 rewrite map_length.
 cbn in Hir.

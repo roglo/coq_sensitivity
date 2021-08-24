@@ -2258,7 +2258,9 @@ rewrite mat_eq_map_seq; symmetry.
 rewrite mat_eq_map_seq; symmetry.
 f_equal.
 destruct (le_dec (mat_nrows A) i) as [Hir| Hir]. {
+Search (mat_nrows (subm _ _ _)).
 Search (subm (subm _ _ _)).
+
 ...
 ... suite ok
 }
