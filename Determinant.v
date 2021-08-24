@@ -2305,8 +2305,7 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
       } {
         rewrite mat_nrows_subm; flia Hir.
       }
-Check @lt_subm_subm_rr.
-rewrite lt_subm_subm_rr.
+      rewrite lt_subm_subm_ll.
 ...
 rewrite lt_subm_subm.
 ...
