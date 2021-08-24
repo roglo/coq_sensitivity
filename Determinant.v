@@ -2269,6 +2269,15 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
     rewrite Nat.sub_0_r.
     destruct (lt_dec k (mat_nrows A)) as [H| H]; [ flia Hir Hik H | clear H ].
     rewrite Nat.sub_0_r.
+    destruct (lt_dec (k + 1) (mat_nrows A)) as [H| H]; [ flia Hir Hik H | clear H ].
+    rewrite Nat.sub_0_r.
+    destruct (lt_dec i (mat_nrows A)) as [H| H]; [ flia Hir H | clear H ].
+    rewrite Nat.sub_0_r.
+    apply map_ext_in.
+    intros u Hu; apply in_seq in Hu.
+    destruct (lt_dec j l) as [Hjl| Hjl]. {
+      destruct (lt_dec l j) as [H| H]; [ flia Hjl H | clear H ].
+      rewrite Nat.sub_0_r.
 ...
 destruct (le_dec (mat_nrows A) i) as [Hir| Hir]. {
 Search (mat_nrows (subm _ _ _)).
