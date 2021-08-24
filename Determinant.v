@@ -2229,7 +2229,6 @@ assert (Hac : ∀ j, subm A 0 j = subm C 0 j). {
   apply in_seq in Hv.
   now symmetry; apply Hc.
 }
-...
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   rewrite Hbc.
@@ -2242,35 +2241,10 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn.
 now apply rngl_summation_add_distr.
 Qed.
+
+Inspect 1.
+
 ...
-intros * Hnz Hbc Hb Hc.
-unfold determinant.
-destruct n; [ easy | clear Hnz ].
-cbn.
-assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
-  intros.
-  apply matrix_eq; cbn.
-  intros i j' Hi Hj'.
-  destruct (lt_dec j' j); symmetry; apply Hb; flia.
-}
-assert (Hac : ∀ j, subm A 0 j = subm C 0 j). {
-  intros.
-  apply matrix_eq; cbn.
-  intros i j' Hi Hj'.
-  destruct (lt_dec j' j); symmetry; apply Hc; flia.
-}
-erewrite rngl_summation_eq_compat. 2: {
-  intros j Hj.
-  rewrite Hbc.
-  rewrite rngl_mul_add_distr_l.
-  rewrite rngl_mul_add_distr_r.
-  rewrite Hab at 1.
-  rewrite Hac at 1.
-  easy.
-}
-cbn.
-now apply rngl_summation_add_distr.
-Qed.
 
 (* If two rows (columns) in A are equal then det(A)=0. *)
 (* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html
