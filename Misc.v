@@ -1668,6 +1668,21 @@ Proof.
 intros; destruct b; cbn; flia.
 Qed.
 
+Theorem List_skipn_skipn : ∀ A i j (la : list A),
+  skipn i (skipn j la) = skipn (i + j) la.
+Proof.
+intros.
+revert j.
+induction la as [| a]; intros; cbn. {
+  now do 3 rewrite skipn_nil.
+}
+destruct j; [ now rewrite Nat.add_0_r | ].
+rewrite skipn_cons.
+rewrite <- Nat.add_succ_comm, Nat.add_succ_l.
+rewrite skipn_cons.
+apply IHla.
+Qed.
+
 (* butn: list without its nth element *)
 
 Definition butn {A} n (l : list A) :=
@@ -1854,6 +1869,74 @@ destruct (lt_dec (S n) (S len)) as [Hn| Hn]. {
   apply in_seq in Hi.
   destruct (lt_dec i (sta + S n)) as [H| H]; [ easy | flia Hn Hi H ].
 }
+Qed.
+
+Theorem lt_butn_butn : ∀ A i j (la : list A),
+  j < i → butn i (butn j la) = butn j (butn (i + 1) la).
+Proof.
+intros * Hji.
+unfold butn.
+do 2 rewrite firstn_app.
+do 2 rewrite <- app_assoc.
+do 2 rewrite firstn_firstn.
+rewrite Nat.min_r; [ | flia Hji ].
+rewrite Nat.min_l; [ | flia Hji ].
+f_equal.
+do 2 rewrite skipn_app.
+do 2 rewrite firstn_length.
+destruct (le_dec (i + 1) (length la)) as [Hi1la| Hi1la]. 2: {
+  apply Nat.nle_gt in Hi1la.
+  rewrite (Nat.min_r (i + 1)); [ | flia Hi1la ].
+  destruct (lt_dec j (length la)) as [Hjla| Hjla]. 2: {
+    apply Nat.nlt_ge in Hjla.
+    rewrite Nat.min_r; [ | easy ].
+    rewrite skipn_all2; [ | flia Hjla ].
+    rewrite firstn_nil, app_nil_l.
+    rewrite firstn_all2; [ | easy ].
+    rewrite firstn_all2. 2: {
+      rewrite skipn_length.
+      rewrite (proj2 (Nat.sub_0_le _ _)); [ flia | flia Hi1la ].
+    }
+    rewrite skipn_all2; [ | flia Hi1la ].
+    rewrite app_nil_l.
+    rewrite skipn_nil.
+    rewrite skipn_all2; [ | flia Hi1la ].
+    rewrite skipn_nil.
+    rewrite app_nil_l, app_nil_r.
+    rewrite skipn_all2; [ easy | ].
+    rewrite firstn_length.
+    rewrite Nat.min_r; [ | flia Hi1la ].
+    flia Hjla.
+  }
+  rewrite Nat.min_l; [ | flia Hjla ].
+  replace (j - length la) with 0 by flia Hjla.
+  rewrite firstn_O, app_nil_l.
+  rewrite skipn_firstn_comm.
+  replace (j - S i) with 0 by flia Hi1la Hjla.
+  rewrite firstn_O, app_nil_l.
+  replace (S j - length la) with 0 by flia Hjla.
+  rewrite skipn_O.
+  rewrite firstn_skipn_comm.
+  replace (S j + (i - j)) with (i + 1) by flia Hi1la Hjla.
+  f_equal.
+  rewrite List_skipn_skipn.
+  f_equal.
+  flia Hi1la Hjla.
+}
+rewrite Nat.min_l; [ | flia Hji Hi1la ].
+rewrite Nat.min_l; [ | flia Hi1la ].
+rewrite firstn_skipn_comm.
+replace (S j + (i - j)) with (i + 1) by flia Hji.
+replace (j - (i + 1)) with 0 by flia Hji.
+rewrite firstn_O, app_nil_l.
+f_equal.
+rewrite skipn_firstn_comm.
+replace (j - S i) with 0 by flia Hji.
+rewrite firstn_O, app_nil_l.
+replace (S j - (i + 1)) with 0 by flia Hji.
+rewrite skipn_O.
+rewrite List_skipn_skipn.
+f_equal; flia Hji.
 Qed.
 
 (* end butn *)

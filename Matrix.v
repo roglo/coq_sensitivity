@@ -1934,6 +1934,16 @@ destruct (le_dec u i) as [Hui| Hui]. {
 }
 Qed.
 
+Theorem lt_subm_subm : ∀ i j k (M : matrix T),
+  i < k
+  → subm (subm M i j) k j = subm (subm M (k + 1) j) i j.
+Proof.
+intros * Hik.
+unfold subm; f_equal; cbn.
+do 6 rewrite map_butn.
+now rewrite lt_butn_butn.
+Qed.
+
 Theorem mat_nrows_subm : ∀ (M : matrix T) i j,
   mat_nrows (subm M i j) = mat_nrows M - Nat.b2n (i <? mat_nrows M).
 Proof.

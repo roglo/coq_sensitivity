@@ -2278,10 +2278,27 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
     destruct (lt_dec j l) as [Hjl| Hjl]. {
       destruct (lt_dec l j) as [H| H]; [ flia Hjl H | clear H ].
       rewrite Nat.sub_0_r.
-...
-destruct (le_dec (mat_nrows A) i) as [Hir| Hir]. {
-Search (mat_nrows (subm _ _ _)).
-Search (subm (subm _ _ _)).
+      unfold subm; cbn.
+      do 6 rewrite map_butn.
+      rewrite nth_butn_after; [ | flia Hik Hir Hu ].
+      rewrite nth_butn_after; [ | flia Hir Hu ].
+      rewrite nth_butn_after; [ | flia Hir Hu ].
+      rewrite nth_butn_after; [ | flia Hik Hir Hu ].
+      do 2 rewrite map_map.
+      f_equal.
+      apply map_ext_in.
+      intros la Hla.
+      now apply lt_butn_butn.
+    } {
+      apply Nat.nlt_ge in Hjl.
+      rewrite Nat.add_0_r.
+      destruct (lt_dec l j) as [Hlj| Hlj]. 2: {
+        apply Nat.nlt_ge in Hlj.
+        replace l with j by flia Hjl Hlj.
+        clear l Hjl Hlj.
+        rewrite Nat.sub_0_r.
+        now rewrite lt_subm_subm.
+      }
 ...
 ... suite ok
 }
