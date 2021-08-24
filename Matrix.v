@@ -1945,7 +1945,7 @@ now rewrite lt_butn_butn.
 Qed.
 
 Theorem lt_subm_subm_ll : ∀ i j k (M : matrix T),
-  k < j - 1 → subm (subm M i j) i k = subm (subm M i k) i (j - 1).
+  k < j →  subm (subm M i k) i j = subm (subm M i (j + 1)) i k.
 Proof.
 intros * Hkj.
 unfold subm; f_equal; cbn.
@@ -1954,9 +1954,7 @@ f_equal; f_equal.
 do 2 rewrite map_map.
 apply map_ext_in.
 intros la Hla.
-symmetry.
-rewrite lt_butn_butn; [ | easy ].
-rewrite Nat.sub_add; [ easy | flia Hkj ].
+now rewrite lt_butn_butn.
 Qed.
 
 Theorem subm_out_l : ∀ i j (M : matrix T),
