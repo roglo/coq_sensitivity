@@ -1938,19 +1938,9 @@ Theorem mat_nrows_subm : ∀ (M : matrix T) i j,
   mat_nrows (subm M i j) = mat_nrows M - Nat.b2n (i <? mat_nrows M).
 Proof.
 intros.
-unfold Nat.b2n.
-rewrite if_ltb_lt_dec.
-destruct (lt_dec i (mat_nrows M)) as [Hir| Hir]. 2: {
-  apply Nat.nlt_ge in Hir.
-  rewrite Nat.sub_0_r.
-  destruct M as (ll); cbn in Hir |-*.
-  rewrite map_length.
-Search (length (butn _ _)).
-...
-destruct M as (ll); cbn.
+destruct M as (ll); cbn - [ "<?" ].
 rewrite map_length.
-cbn in Hir.
-now apply butn_length.
+now rewrite butn_length.
 Qed.
 
 Theorem mat_ncols_subm : ∀ (M : matrix T) i j,
@@ -1998,9 +1988,13 @@ cbn in Hcr |-*.
 unfold mat_ncols in Hcm; cbn in Hcm.
 destruct i. {
   specialize (Hcm l' (or_intror (or_introl eq_refl))) as H1.
-  now cbn; rewrite butn_length; rewrite H1.
+  cbn; rewrite butn_length; rewrite H1.
+  unfold Nat.b2n; rewrite if_ltb_lt_dec.
+  now destruct (lt_dec j (length l)).
 }
-now cbn; rewrite butn_length.
+cbn; rewrite butn_length.
+unfold Nat.b2n; rewrite if_ltb_lt_dec.
+now destruct (lt_dec j (length l)).
 Qed.
 
 Theorem is_squ_mat_subm : ∀ n (M : matrix T) i j,
@@ -2016,6 +2010,7 @@ specialize (square_matrix_ncols _ Hm) as Hcm.
 split. {
   apply is_sm_mat_iff in Hm.
   destruct Hm as (Hr & Hcr & Hc).
+...
   rewrite mat_nrows_subm; [ | flia Hr Hi ].
   now rewrite Hr, Nat.sub_succ, Nat.sub_0_r.
 }
