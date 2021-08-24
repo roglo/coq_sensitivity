@@ -2010,9 +2010,10 @@ specialize (square_matrix_ncols _ Hm) as Hcm.
 split. {
   apply is_sm_mat_iff in Hm.
   destruct Hm as (Hr & Hcr & Hc).
-...
-  rewrite mat_nrows_subm; [ | flia Hr Hi ].
-  now rewrite Hr, Nat.sub_succ, Nat.sub_0_r.
+  rewrite mat_nrows_subm.
+  unfold Nat.b2n; rewrite if_ltb_lt_dec, Hr.
+  destruct (lt_dec i (S n)) as [H| H]; [ clear H | flia Hi H ].
+  apply Nat_sub_succ_1.
 }
 split. {
   intros Hcs.
@@ -2040,6 +2041,7 @@ split. {
     destruct Hl as (la & Hl & Hla); subst l.
     cbn in Hla, Hc.
     destruct ll as [| l']; [ easy | ].
+...
     rewrite butn_length. {
       rewrite Hc; [ flia | now right ].
     }
