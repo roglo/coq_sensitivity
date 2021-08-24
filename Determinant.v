@@ -2242,10 +2242,6 @@ cbn.
 now apply rngl_summation_add_distr.
 Qed.
 
-Inspect 1.
-
-...
-
 (* If two rows (columns) in A are equal then det(A)=0. *)
 (* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html
    point 3 *)
@@ -2253,10 +2249,28 @@ Inspect 1.
 
 Definition δ_lt i k := Nat.b2n (i <? k).
 
-Theorem subm_subm_swap : ∀ n (A : matrix (S n) (S n) T) i j k l,
+Theorem subm_subm_swap : ∀ (A : matrix T) i j k l,
   subm (subm A i j) k l =
   subm (subm A (k + δ_lt i k) (l + δ_lt j l)) (i - δ_lt k i) (j - δ_lt l j).
 Proof.
+intros.
+rewrite mat_eq_map_seq; symmetry.
+rewrite mat_eq_map_seq; symmetry.
+f_equal.
+destruct (le_dec (mat_nrows A) i) as [Hir| Hir]. {
+Search (subm (subm _ _ _)).
+...
+... suite ok
+}
+apply Nat.nle_gt in Hir.
+destruct (le_dec (mat_nrows (subm A i j)) k) as [Hkr| Hkr]. {
+  rewrite mat_nrows_subm in Hkr; [ | easy ].
+...
+... suite ok
+}
+apply Nat.nle_gt in Hkr.
+rewrite mat_nrows_subm; [ | easy ].
+...
 intros.
 apply matrix_eq; cbn.
 intros i' j' Hi' Hj'.
