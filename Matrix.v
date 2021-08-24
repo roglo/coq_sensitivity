@@ -1944,6 +1944,19 @@ do 6 rewrite map_butn.
 now rewrite lt_butn_butn.
 Qed.
 
+Theorem subm_out_l : ∀ i j (M : matrix T),
+  mat_nrows M ≤ i
+  → mat_nrows M ≤ j
+  → ∀ k, subm M i k = subm M j k.
+Proof.
+intros * Hi Hj *.
+unfold subm; f_equal.
+do 2 rewrite map_butn.
+rewrite butn_out; [ | now rewrite map_length, fold_mat_nrows ].
+rewrite butn_out; [ | now rewrite map_length, fold_mat_nrows ].
+easy.
+Qed.
+
 Theorem mat_nrows_subm : ∀ (M : matrix T) i j,
   mat_nrows (subm M i j) = mat_nrows M - Nat.b2n (i <? mat_nrows M).
 Proof.

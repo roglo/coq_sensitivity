@@ -2300,11 +2300,6 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
         now rewrite lt_subm_subm.
       }
 Check @lt_subm_subm.
-Theorem subm_out_l : ∀ i j (M : matrix T),
-  mat_nrows M ≤ i
-  → mat_nrows M ≤ j
-  → ∀ k, subm M i k = subm M j k.
-Proof.
 ...
 rewrite (@subm_out_l _ (k + 1) A).
 ...
