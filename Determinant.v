@@ -2299,7 +2299,14 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
         rewrite Nat.sub_0_r.
         now rewrite lt_subm_subm.
       }
-      rewrite (@subm_out_l _ _ (k + 1) A); [ | easy | flia Hir Hik ].
+      rewrite (@subm_out_l _ (k + 1) i A); [ | flia Hir Hik | easy ].
+      rewrite (@subm_out_l _ k i); cycle 1. {
+        rewrite mat_nrows_subm; flia Hir Hik.
+      } {
+        rewrite mat_nrows_subm; flia Hir.
+      }
+...
+rewrite lt_subm_subm.
 ...
 ... suite ok
 }
