@@ -2264,11 +2264,15 @@ unfold Nat.b2n; do 8 rewrite if_ltb_lt_dec.
 destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
   apply Nat.nlt_ge in Hir.
   rewrite Nat.sub_0_r.
+  destruct (lt_dec i k) as [Hik| Hik]. {
+    destruct (lt_dec k i) as [H| H]; [ flia Hik H | clear H ].
+    rewrite Nat.sub_0_r.
+    destruct (lt_dec k (mat_nrows A)) as [H| H]; [ flia Hir Hik H | clear H ].
+    rewrite Nat.sub_0_r.
 ...
 destruct (le_dec (mat_nrows A) i) as [Hir| Hir]. {
 Search (mat_nrows (subm _ _ _)).
 Search (subm (subm _ _ _)).
-
 ...
 ... suite ok
 }
