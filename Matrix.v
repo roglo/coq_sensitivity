@@ -2041,21 +2041,21 @@ split. {
     destruct Hl as (la & Hl & Hla); subst l.
     cbn in Hla, Hc.
     destruct ll as [| l']; [ easy | ].
-...
-    rewrite butn_length. {
-      rewrite Hc; [ flia | now right ].
-    }
-    rewrite Hc; [ flia Hj | now right ].
+    rewrite butn_length.
+    unfold Nat.b2n; rewrite if_ltb_lt_dec.
+    rewrite Hc; [ | now right ].
+    destruct (lt_dec j (S n)) as [H| H]; [ clear H | flia Hj H ].
+    apply Nat_sub_succ_1.
   }
   destruct ll as [| l']; [ easy | ].
   rewrite butn_cons in Hl.
   cbn in Hl.
   destruct Hl as [Hl| Hl]. {
     subst l.
-    rewrite butn_length. {
-      rewrite Hc; [ flia | now left ].
-    }
-    rewrite Hc; [ flia Hj | now left ].
+    rewrite butn_length, Hc; [ | now left ].
+    unfold Nat.b2n; rewrite if_ltb_lt_dec.
+    destruct (lt_dec j (S n)) as [H| H]; [ clear H | flia Hj H ].
+    apply Nat_sub_succ_1.
   }
   apply IHi with (ll := ll); [ flia Hi | | easy ].
   intros l'' Hl''.
@@ -2070,8 +2070,9 @@ Theorem subm_is_corr_mat : ∀ (A : matrix T) i j,
 Proof.
 intros * Hc1 Ha.
 split. {
+  rewrite mat_nrows_subm.
+  unfold Nat.b2n; rewrite if_ltb_lt_dec.
   destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. {
-    rewrite mat_nrows_subm; [ | easy ].
     destruct (lt_dec j (mat_ncols A)) as [Hjc| Hjc]. {
       destruct (lt_dec 1 (mat_nrows A)) as [H1r| H1r]. {
         rewrite mat_ncols_subm; [ | easy | easy | easy ].
@@ -2107,10 +2108,7 @@ split. {
     now left.
   }
   apply Nat.nlt_ge in Hir.
-  unfold mat_nrows; cbn.
-  rewrite map_length.
-  rewrite butn_out; [ | easy ].
-  rewrite fold_mat_nrows.
+  rewrite Nat.sub_0_r.
   unfold mat_ncols; cbn.
   rewrite butn_out; [ | easy ].
   destruct Ha as (Hcr, Hc).
@@ -2164,8 +2162,9 @@ split. {
   specialize (Hc _ H) as H1; clear H.
   destruct (lt_dec j (mat_ncols A)) as [Hjc| Hjc]. {
     rewrite mat_ncols_subm; [ | easy | easy | easy ].
-    rewrite butn_length; [ | congruence ].
-    now rewrite H1.
+    rewrite butn_length.
+    unfold Nat.b2n; rewrite if_ltb_lt_dec, H1.
+    destruct (lt_dec j (mat_ncols A)) as [H| H]; [ easy | flia Hjc H ].
   }
   apply Nat.nlt_ge in Hjc.
   unfold butn.
