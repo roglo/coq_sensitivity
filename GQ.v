@@ -1195,7 +1195,7 @@ rewrite PQmul_1_l.
 destruct a as (a, Ha); simpl.
 rewrite (ggcd_split _ _ 1); [ | easy ].
 do 2 rewrite Nat.div_1_r, Nat.add_1_r.
-do 2 rewrite Nat.sub_succ, Nat.sub_0_r.
+do 2 rewrite Nat_sub_succ_1.
 now destruct a, PQnum1, PQden1.
 Qed.
 
@@ -1330,8 +1330,8 @@ rewrite Hg in H1.
 destruct H1 as (Ha, Hb).
 destruct aa; [ now rewrite Nat.mul_comm in Ha | ].
 destruct bb; [ now rewrite Nat.mul_comm in Hb | ].
-rewrite Nat.sub_succ, Nat.sub_0_r, Nat.add_1_r in Hnd.
-rewrite Nat.sub_succ, Nat.sub_0_r, Nat.add_1_r in Hnd.
+rewrite Nat_sub_succ_1, Nat.add_1_r in Hnd.
+rewrite Nat_sub_succ_1, Nat.add_1_r in Hnd.
 rewrite Ha, Hb, Hnd.
 replace (g * S bb) with (g * S bb * 1) by flia.
 rewrite Nat.mul_assoc.
@@ -1395,7 +1395,7 @@ destruct a.
  destruct b.
  +remember ggcd as f; cbn; subst f.
   rewrite ggcd_1_r.
-  now rewrite Nat.sub_succ, Nat.sub_0_r, Nat.add_1_r.
+  now rewrite Nat_sub_succ_1, Nat.add_1_r.
  +rewrite Nat.sub_add; [ | flia ].
   remember (ggcd (S a) (S b)) as g eqn:Hg.
   destruct g as (g, (aa, bb)).
@@ -1539,7 +1539,7 @@ rewrite Nat.mul_1_r in Habc.
 destruct a; [ easy | ].
 destruct b; [ easy | ].
 destruct c; [ easy | ].
-do 3 rewrite Nat.sub_succ, Nat.sub_0_r in Habc.
+do 3 rewrite Nat_sub_succ_1 in Habc.
 now do 3 rewrite Nat.add_1_r in Habc.
 Qed.
 
@@ -1554,7 +1554,7 @@ rewrite Nat.mul_1_r, Nat.mul_comm in Habc.
 destruct a; [ easy | ].
 destruct b; [ easy | ].
 destruct c; [ easy | ].
-do 3 rewrite Nat.sub_succ, Nat.sub_0_r in Habc.
+do 3 rewrite Nat_sub_succ_1 in Habc.
 now do 3 rewrite Nat.add_1_r in Habc.
 Qed.
 
@@ -1577,7 +1577,7 @@ rewrite Nat.mul_1_r in Habc.
 destruct a; [ easy | ].
 destruct b; [ easy | ].
 destruct c; [ easy | ].
-do 3 rewrite Nat.sub_succ, Nat.sub_0_r in Habc.
+do 3 rewrite Nat_sub_succ_1 in Habc.
 now do 3 rewrite Nat.add_1_r in Habc.
 Qed.
 
@@ -1592,7 +1592,7 @@ rewrite Nat.mul_1_r, Nat.mul_comm in Habc.
 destruct a; [ easy | ].
 destruct b; [ easy | ].
 destruct c; [ easy | ].
-do 3 rewrite Nat.sub_succ, Nat.sub_0_r in Habc.
+do 3 rewrite Nat_sub_succ_1 in Habc.
 now do 3 rewrite Nat.add_1_r in Habc.
 Qed.
 

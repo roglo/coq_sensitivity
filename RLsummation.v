@@ -323,7 +323,7 @@ rewrite rngl_summation_split_last; [ | apply Nat.le_0_l ].
 rewrite rngl_summation_succ_succ.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
-  now rewrite Nat.sub_succ, Nat.sub_0_r.
+  now rewrite Nat_sub_succ_1.
 }
 cbn.
 rewrite IHk.
@@ -332,7 +332,7 @@ rewrite rngl_summation_split_last; [ | flia ].
 rewrite rngl_summation_succ_succ.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
-  now rewrite Nat.sub_succ, Nat.sub_0_r.
+  now rewrite Nat_sub_succ_1.
 }
 cbn.
 erewrite rngl_summation_eq_compat. 2: {
@@ -341,7 +341,7 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite rngl_summation_succ_succ.
   erewrite rngl_summation_eq_compat. 2: {
     intros j Hj.
-    now rewrite Nat.sub_succ, Nat.sub_0_r.
+    now rewrite Nat_sub_succ_1.
   }
   easy.
 }
@@ -356,7 +356,7 @@ rewrite rngl_summation_only_one.
 f_equal.
 apply rngl_summation_eq_compat.
 intros i Hi.
-now rewrite Nat.sub_succ, Nat.sub_0_r.
+now rewrite Nat_sub_succ_1.
 Qed.
 
 Theorem rngl_summation_summation_exch' : ∀ g k l,
@@ -378,7 +378,7 @@ erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   erewrite rngl_summation_eq_compat. 2: {
     intros j Hj.
-    now rewrite Nat.sub_succ, Nat.sub_0_r.
+    now rewrite Nat_sub_succ_1.
   }
   easy.
 }
@@ -390,7 +390,7 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite rngl_summation_succ_succ.
   erewrite rngl_summation_eq_compat. 2: {
     intros j Hj.
-    now rewrite Nat.sub_succ, Nat.sub_0_r.
+    now rewrite Nat_sub_succ_1.
   }
   easy.
 }
@@ -456,7 +456,7 @@ erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   erewrite rngl_summation_eq_compat. 2: {
     intros j Hj.
-    now rewrite Nat.sub_succ, Nat.sub_0_r.
+    now rewrite Nat_sub_succ_1.
   }
   easy.
 }
@@ -593,7 +593,7 @@ destruct n. {
   apply length_zero_iff_nil in H2.
   now subst l1 l2.
 }
-rewrite Nat.sub_succ, Nat.sub_0_r.
+rewrite Nat_sub_succ_1.
 revert n H1 H2.
 induction Hl; intros; [ easy | | | ]. {
   cbn in H1, H2.

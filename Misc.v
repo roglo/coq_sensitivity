@@ -633,7 +633,7 @@ do 2 rewrite Nat.mul_assoc.
 replace (a * fact (a - 1)) with (fact a). 2: {
   destruct a; [ flia Han | ].
   rewrite Nat_fact_succ.
-  now rewrite Nat.sub_succ, Nat.sub_0_r.
+  now rewrite Nat_sub_succ_1.
 }
 replace (fact a * (fact (b - 1) / fact a)) with (fact (b - 1)). 2: {
   specialize (Nat_divide_fact_fact (b - 1) (b - 1 - a)) as H1.
@@ -646,7 +646,7 @@ rewrite Nat.mul_comm, Nat.mul_assoc.
 replace (b * fact (b - 1)) with (fact b). 2: {
   destruct b; [ flia Hbn | ].
   rewrite Nat_fact_succ.
-  now rewrite Nat.sub_succ, Nat.sub_0_r.
+  now rewrite Nat_sub_succ_1.
 }
 replace (fact b * (fact n / fact b)) with (fact n). 2: {
   specialize (Nat_divide_fact_fact n (n - b)) as H1.

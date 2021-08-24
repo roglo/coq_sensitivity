@@ -891,7 +891,7 @@ rewrite rngl_product_split_last; [ | flia ].
 rewrite rngl_product_succ_succ.
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
-  now rewrite Nat.sub_succ, Nat.sub_0_r.
+  now rewrite Nat_sub_succ_1.
 }
 rewrite IHn.
 rewrite Nat_fact_succ.
@@ -1583,7 +1583,7 @@ rewrite Nat.sub_add; [ | flia Hnz ].
 unfold iter_seq.
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | flia Hnz Hn1 ].
-rewrite Nat.sub_succ, Nat.sub_0_r.
+rewrite Nat_sub_succ_1.
 erewrite rngl_product_list_eq_compat. 2: {
   intros i Hi.
   rewrite (Nat.add_comm 1), Nat.add_sub.
@@ -1622,7 +1622,7 @@ rewrite rngl_product_shift; [ | flia Hnz Hn1 ].
 unfold iter_seq.
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | flia Hnz Hn1 ].
-rewrite Nat.sub_succ, Nat.sub_0_r.
+rewrite Nat_sub_succ_1.
 erewrite rngl_product_list_eq_compat. 2: {
   intros i Hi.
   rewrite (Nat.add_comm 1), Nat.add_sub.
@@ -1645,7 +1645,7 @@ rewrite rngl_product_shift; [ | flia Hnz Hn1 ].
 unfold iter_seq.
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | flia Hnz Hn1 ].
-rewrite Nat.sub_succ, Nat.sub_0_r.
+rewrite Nat_sub_succ_1.
 erewrite rngl_product_list_eq_compat. 2: {
   intros i Hi.
   rewrite (Nat.add_comm 1), Nat.add_sub.
@@ -1904,7 +1904,7 @@ erewrite rngl_product_eq_compat. 2: {
   rewrite rngl_product_succ_succ.
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
-    now rewrite Nat.sub_succ, Nat.sub_0_r.
+    now rewrite Nat_sub_succ_1.
   }
   cbn - [ "-" ].
   easy.
@@ -1954,7 +1954,7 @@ rewrite rngl_product_change_var with (g := permut_fun_inv σ n) (h := σ). 2: {
 }
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
-rewrite Nat.sub_succ, Nat.sub_0_r.
+rewrite Nat_sub_succ_1.
 erewrite rngl_product_list_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_product_change_var with (g := permut_fun_inv σ n) (h := σ). 2: {
@@ -1963,7 +1963,7 @@ erewrite rngl_product_list_eq_compat. 2: {
     rewrite fun_find_prop; [ easy | easy | flia Hj Hnz ].
   }
   rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
-  rewrite Nat.sub_succ, Nat.sub_0_r.
+  rewrite Nat_sub_succ_1.
   erewrite rngl_product_list_eq_compat. 2: {
     intros j Hj.
     apply in_map_iff in Hj.
@@ -2579,7 +2579,7 @@ rewrite rngl_product_change_var with (g := permut_fun_inv g n) (h := g). 2: {
   rewrite fun_find_prop; [ easy | apply Hp2 | flia Hi Hnz ].
 }
 rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
-rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
+rewrite Nat_sub_succ_1, Nat.sub_0_r.
 erewrite rngl_product_list_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_product_shift; [ | flia Hnz ].
@@ -2589,7 +2589,7 @@ erewrite rngl_product_list_eq_compat. 2: {
     rewrite fun_find_prop; [ easy | apply Hp2 | flia Hj Hnz ].
   }
   rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
-  rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
+  rewrite Nat_sub_succ_1, Nat.sub_0_r.
   erewrite rngl_product_list_eq_compat. 2: {
     intros j Hj.
     rewrite (Nat.add_comm _ 1).
@@ -2643,7 +2643,7 @@ erewrite rngl_product_eq_compat. 2: {
 }
 unfold iter_seq.
 rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
-rewrite Nat.sub_succ, Nat.sub_0_r, Nat.sub_0_r.
+rewrite Nat_sub_succ_1, Nat.sub_0_r.
 symmetry.
 rewrite product_product_if_permut; try easy. {
   apply rngl_product_list_eq_compat.
@@ -2930,7 +2930,7 @@ rewrite rngl_product_split_first; [ | flia ].
 rewrite Nat.sub_diag.
 f_equal. {
   rewrite rngl_product_shift; [ | flia ].
-  rewrite Nat.sub_succ, Nat.sub_0_r.
+  rewrite Nat_sub_succ_1.
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
     replace (1 <? 1 + i) with (0 <? i) by easy.
@@ -2995,7 +2995,7 @@ f_equal. {
   }
   rewrite Nat.sub_0_r.
   rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
-  rewrite Nat.sub_succ, Nat.sub_0_r.
+  rewrite Nat_sub_succ_1.
   erewrite rngl_product_list_eq_compat. 2: {
     intros i Hi.
     apply in_map_iff in Hi.
@@ -3045,7 +3045,7 @@ f_equal. {
   }
   cbn.
   destruct x; [ easy | clear Hxz ].
-  rewrite Nat.sub_succ, Nat.sub_0_r.
+  rewrite Nat_sub_succ_1.
   clear Hx H1.
   induction x; cbn. {
     unfold iter_seq, iter_list; cbn.
@@ -3053,7 +3053,7 @@ f_equal. {
   }
   rewrite rngl_product_split_last; [ | flia ].
   rewrite rngl_product_shift; [ | flia ].
-  rewrite Nat.sub_succ, Nat.sub_0_r.
+  rewrite Nat_sub_succ_1.
   rewrite IHx.
   symmetry.
   rewrite minus_one_pow_succ; [ | easy ].
@@ -3077,7 +3077,7 @@ erewrite rngl_product_eq_compat. 2: {
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
     replace (S i <? S j) with (i <? j) by easy.
-    now do 2 rewrite Nat.sub_succ, Nat.sub_0_r.
+    now do 2 rewrite Nat_sub_succ_1.
   }
   easy.
 }
@@ -3097,8 +3097,8 @@ rewrite (sym_gr_vect_succ_values Hkn Hσ Hσ'); [ | flia Hj ].
 rewrite (sym_gr_vect_succ_values Hkn Hσ Hσ'); [ | flia Hi ].
 destruct j; [ flia Hj | ].
 destruct i; [ flia Hi | ].
-rewrite Nat.sub_succ, Nat.sub_0_r.
-rewrite Nat.sub_succ, Nat.sub_0_r.
+rewrite Nat_sub_succ_1.
+rewrite Nat_sub_succ_1.
 do 2 rewrite if_ltb_lt_dec.
 destruct (lt_dec (σ' j) (k / fact n)) as [Hsfj| Hsfj]. {
   destruct (lt_dec (σ' i) (k / fact n)) as [Hsfi| Hsfi]; [ easy | ].
@@ -3164,7 +3164,7 @@ rewrite rngl_product_split_first; [ | flia ].
 rewrite Nat.sub_diag.
 f_equal. {
   rewrite rngl_product_shift; [ | flia ].
-  rewrite Nat.sub_succ, Nat.sub_0_r.
+  rewrite Nat_sub_succ_1.
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
     replace (1 <? 1 + i) with (0 <? i) by easy.
@@ -3197,7 +3197,7 @@ f_equal. {
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
     rewrite <- Nat.sub_succ_l; [ | easy ].
-    rewrite Nat.sub_succ, Nat.sub_0_r.
+    rewrite Nat_sub_succ_1.
     rewrite H1.
     replace i with (S (i - 1)) at 1 by flia Hi.
     easy.
@@ -3241,7 +3241,7 @@ f_equal. {
   }
   rewrite Nat.sub_0_r.
   rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
-  rewrite Nat.sub_succ, Nat.sub_0_r.
+  rewrite Nat_sub_succ_1.
   erewrite rngl_product_list_eq_compat. 2: {
     intros i Hi.
     apply in_map_iff in Hi.
@@ -3289,7 +3289,7 @@ f_equal. {
   }
   cbn.
   destruct x; [ easy | clear Hxz ].
-  rewrite Nat.sub_succ, Nat.sub_0_r.
+  rewrite Nat_sub_succ_1.
   clear Hx H1.
   induction x; cbn. {
     unfold iter_seq, iter_list; cbn.
@@ -3297,7 +3297,7 @@ f_equal. {
   }
   rewrite rngl_product_split_last; [ | flia ].
   rewrite rngl_product_shift; [ | flia ].
-  rewrite Nat.sub_succ, Nat.sub_0_r.
+  rewrite Nat_sub_succ_1.
   rewrite IHx.
   symmetry.
   rewrite minus_one_pow_succ; [ | easy ].
@@ -3321,7 +3321,7 @@ erewrite rngl_product_eq_compat. 2: {
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
     replace (S i <? S j) with (i <? j) by easy.
-    now do 2 rewrite Nat.sub_succ, Nat.sub_0_r.
+    now do 2 rewrite Nat_sub_succ_1.
   }
   easy.
 }
@@ -3339,8 +3339,8 @@ move σ' before σ.
 do 2 rewrite (sym_gr_succ_values Hσ Hσ').
 destruct j; [ flia Hj | ].
 destruct i; [ flia Hi | ].
-rewrite Nat.sub_succ, Nat.sub_0_r.
-rewrite Nat.sub_succ, Nat.sub_0_r.
+rewrite Nat_sub_succ_1.
+rewrite Nat_sub_succ_1.
 do 2 rewrite if_ltb_lt_dec.
 destruct (lt_dec (σ' j) (k / fact n)) as [Hsfj| Hsfj]. {
   destruct (lt_dec (σ' i) (k / fact n)) as [Hsfi| Hsfi]; [ easy | ].
@@ -3501,8 +3501,7 @@ destruct (lt_dec j (k / fact n)) as [Hjkn| Hjkn]. {
   }
   clear Hjkn.
   destruct j; [ easy | ].
-  rewrite Nat.sub_succ, Nat.sub_0_r.
-  cbn.
+  rewrite Nat_sub_succ_1; cbn.
   destruct n; [ flia Hjn | ].
   apply Nat.succ_lt_mono in Hjn.
   rewrite IHn; [ | easy | ]. 2: {

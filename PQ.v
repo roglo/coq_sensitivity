@@ -442,13 +442,13 @@ unfold PQsub_num1, PQadd_den1, nd; simpl.
 do 4 rewrite Nat.add_1_r in H1, H2, Hx, Hy.
 do 12 rewrite Nat.add_1_r.
 do 2 (rewrite <- Nat.sub_succ_l; [ | flia H1 ]).
-rewrite Nat_sub_sub_swap, Nat.sub_succ, Nat.sub_0_r.
+rewrite Nat_sub_sub_swap, Nat_sub_succ_1.
 rewrite <- Nat.sub_succ_l; [ | simpl; flia ].
-rewrite Nat.sub_succ, Nat.sub_0_r.
+rewrite Nat_sub_succ_1.
 do 2 (rewrite <- Nat.sub_succ_l; [ | flia H2 ]).
-rewrite Nat_sub_sub_swap, Nat.sub_succ, Nat.sub_0_r.
+rewrite Nat_sub_sub_swap, Nat_sub_succ_1.
 rewrite <- Nat.sub_succ_l; [ | simpl; flia ].
-rewrite Nat.sub_succ, Nat.sub_0_r.
+rewrite Nat_sub_succ_1.
 do 2 rewrite Nat.mul_sub_distr_r.
 remember (S (nn (PQnum1 x1))) as x1n eqn:Hx1n.
 remember (S (nn (PQden1 x1))) as x1d eqn:Hx1d.
@@ -484,7 +484,7 @@ move Hx before Hy.
 do 4 rewrite Nat.add_1_r in Hx, Hy.
 do 12 rewrite Nat.add_1_r.
 do 4 (rewrite <- Nat.sub_succ_l; [ | simpl; flia ]).
-do 4 rewrite Nat.sub_succ, Nat.sub_0_r.
+do 4 rewrite Nat_sub_succ_1.
 setoid_rewrite Nat.mul_shuffle0.
 do 2 rewrite Nat.mul_assoc; rewrite Hx.
 setoid_rewrite <- Nat.mul_assoc; f_equal.
@@ -507,7 +507,7 @@ Ltac PQtac1 :=
 
 Ltac PQtac2 :=
   rewrite <- Nat.sub_succ_l;
-  try (rewrite Nat.sub_succ, Nat.sub_0_r);
+  try (rewrite Nat_sub_succ_1);
   match goal with
   | [ |- 1 ≤ S _ * _ ] => try (simpl; flia)
   | [ |- 1 ≤ S _ * _ * _ ] => try (simpl; flia)
@@ -687,7 +687,7 @@ unfold "<"%PQ, "+"%PQ, PQadd_num1, PQadd_den1, nd; simpl.
 intros *.
 do 10 rewrite Nat.add_1_r.
 do 4 (rewrite <- Nat.sub_succ_l; [ | simpl; flia ]).
-do 4 rewrite Nat.sub_succ, Nat.sub_0_r.
+do 4 rewrite Nat_sub_succ_1.
 do 2 rewrite Nat.mul_add_distr_r.
 remember (S (nn (PQnum1 x))) as xn eqn:Hxn.
 remember (S (nn (PQden1 x))) as xd eqn:Hxd.
@@ -720,7 +720,7 @@ unfold "≤"%PQ, "+"%PQ, PQadd_num1, PQadd_den1, nd; simpl.
 intros *.
 do 10 rewrite Nat.add_1_r.
 do 4 (rewrite <- Nat.sub_succ_l; [ | simpl; flia ]).
-do 4 rewrite Nat.sub_succ, Nat.sub_0_r.
+do 4 rewrite Nat_sub_succ_1.
 do 2 rewrite Nat.mul_add_distr_r.
 remember (S (nn (PQnum1 x))) as xn eqn:Hxn.
 remember (S (nn (PQden1 x))) as xd eqn:Hxd.
@@ -789,13 +789,13 @@ split.
  do 10 rewrite Nat.add_1_r.
  intros.
  rewrite <- Nat.sub_succ_l; [ | flia Hzx ].
- rewrite Nat.sub_succ, Nat.sub_0_r.
+ rewrite Nat_sub_succ_1.
  rewrite <- Nat.sub_succ_l; [ | simpl; flia ].
- rewrite Nat.sub_succ, Nat.sub_0_r.
+ rewrite Nat_sub_succ_1.
  rewrite <- Nat.sub_succ_l; [ | flia Hzy ].
- rewrite Nat.sub_succ, Nat.sub_0_r.
+ rewrite Nat_sub_succ_1.
  rewrite <- Nat.sub_succ_l; [ | simpl; flia ].
- rewrite Nat.sub_succ, Nat.sub_0_r.
+ rewrite Nat_sub_succ_1.
  remember (S (nn (PQnum1 x))) as xn eqn:Hxn.
  remember (S (nn (PQden1 x))) as xd eqn:Hxd.
  remember (S (nn (PQnum1 y))) as yn eqn:Hyn.
@@ -825,13 +825,13 @@ split.
  do 10 rewrite Nat.add_1_r.
  intros.
  rewrite <- Nat.sub_succ_l; [ | flia Hzx ].
- rewrite Nat.sub_succ, Nat.sub_0_r.
+ rewrite Nat_sub_succ_1.
  rewrite <- Nat.sub_succ_l; [ | simpl; flia ].
- rewrite Nat.sub_succ, Nat.sub_0_r.
+ rewrite Nat_sub_succ_1.
  rewrite <- Nat.sub_succ_l; [ | flia Hzy ].
- rewrite Nat.sub_succ, Nat.sub_0_r.
+ rewrite Nat_sub_succ_1.
  rewrite <- Nat.sub_succ_l; [ | simpl; flia ].
- rewrite Nat.sub_succ, Nat.sub_0_r.
+ rewrite Nat_sub_succ_1.
  remember (S (nn (PQnum1 x))) as xn eqn:Hxn.
  remember (S (nn (PQden1 x))) as xd eqn:Hxd.
  remember (S (nn (PQnum1 y))) as yn eqn:Hyn.
@@ -871,7 +871,7 @@ unfold "+"%PQ, "=="%PQ, nd in Hxy; simpl in Hxy.
 unfold PQadd_num1, PQadd_den1, nd in Hxy.
 do 6 rewrite Nat.add_1_r in Hxy.
 do 2 (rewrite <- Nat.sub_succ_l in Hxy; [ | simpl; flia ]).
-do 2 rewrite Nat.sub_succ, Nat.sub_0_r in Hxy.
+do 2 rewrite Nat_sub_succ_1 in Hxy.
 rewrite Nat.mul_add_distr_r in Hxy.
 rewrite Nat.mul_assoc in Hxy.
 apply Nat.add_sub_eq_r in Hxy.
@@ -884,7 +884,7 @@ intros *; PQtac1; intros Hyz.
 PQtac2; [ | flia Hyz ].
 PQtac3.
 rewrite <- Nat.sub_succ_l; [ | simpl; flia ].
-rewrite Nat.sub_succ, Nat.sub_0_r, Nat.mul_assoc.
+rewrite Nat_sub_succ_1, Nat.mul_assoc.
 intros H.
 apply Nat.add_sub_eq_nz in H; [ | simpl; flia ].
 rewrite Nat.add_comm, Nat.mul_shuffle0 in H.
@@ -922,7 +922,7 @@ unfold "<"%PQ, "+"%PQ; simpl.
 unfold PQadd_num1, PQadd_den1, nd; simpl.
 do 6 rewrite Nat.add_1_r.
 do 2 (rewrite <- Nat.sub_succ_l; [ | simpl; flia ]).
-do 2 (rewrite Nat.sub_succ, Nat.sub_0_r).
+do 2 (rewrite Nat_sub_succ_1).
 rewrite Nat.mul_add_distr_r.
 rewrite Nat.mul_assoc, Nat.mul_shuffle0.
 rewrite <- Nat.add_0_r at 1.
@@ -943,7 +943,7 @@ unfold "≤"%PQ, "+"%PQ; simpl.
 unfold PQadd_num1, PQadd_den1, nd; simpl.
 do 6 rewrite Nat.add_1_r.
 do 2 (rewrite <- Nat.sub_succ_l; [ | simpl; flia ]).
-do 2 (rewrite Nat.sub_succ, Nat.sub_0_r).
+do 2 (rewrite Nat_sub_succ_1).
 rewrite Nat.mul_add_distr_r.
 rewrite Nat.mul_assoc, Nat.mul_shuffle0.
 rewrite <- Nat.add_0_r at 1.
@@ -993,7 +993,7 @@ revert Hzy Hyzx; PQtac1; intros.
 rewrite Nat_sub_sub_swap in Hyzx.
 do 2 (rewrite <- Nat.sub_succ_l in Hyzx; [ | flia Hzy ]).
 rewrite <- Nat.sub_succ_l in Hyzx; [ | simpl; flia ].
-do 2 rewrite Nat.sub_succ, Nat.sub_0_r in Hyzx.
+do 2 rewrite Nat_sub_succ_1 in Hyzx.
 rewrite Nat.mul_sub_distr_r, Nat.mul_assoc in Hyzx.
 repeat PQtac2; PQtac3; [ | simpl; flia | ].
 -f_equal; [ f_equal | now rewrite Nat.mul_shuffle0 ].
@@ -1039,7 +1039,7 @@ Proof.
 intros * H.
 revert H; PQtac1; intros.
 do 4 (rewrite <- Nat.sub_succ_l in H; [ | simpl; flia ]).
-do 4 rewrite Nat.sub_succ, Nat.sub_0_r in H.
+do 4 rewrite Nat_sub_succ_1 in H.
 setoid_rewrite Nat.mul_comm in H.
 do 2 rewrite <- Nat.mul_assoc in H.
 apply Nat.mul_cancel_l in H; [ | easy ].
@@ -1153,7 +1153,7 @@ unfold "≤"%PQ, nd; cbn.
 unfold PQmul_num1, PQmul_den1.
 do 12 rewrite Nat.add_1_r.
 do 4 (rewrite <- Nat.sub_succ_l; [ | cbn; flia ]).
-do 4 rewrite Nat.sub_succ, Nat.sub_0_r.
+do 4 rewrite Nat_sub_succ_1.
 intros Hxy Hzt.
 setoid_rewrite Nat.mul_shuffle0.
 do 2 rewrite Nat.mul_assoc.
@@ -1169,7 +1169,7 @@ unfold "≤"%PQ, nd; simpl.
 unfold PQmul_num1, PQmul_den1.
 do 10 rewrite Nat.add_1_r.
 do 4 (rewrite <- Nat.sub_succ_l; [ | simpl; flia ]).
-do 4 rewrite Nat.sub_succ, Nat.sub_0_r.
+do 4 rewrite Nat_sub_succ_1.
 do 2 rewrite Nat.mul_assoc.
 setoid_rewrite Nat.mul_shuffle0.
 split; intros Hxy.

@@ -155,7 +155,7 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn - [ vect_vect_nat_el mat_el fact ].
 rewrite rngl_summation_summation_distr.
 rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
-rewrite Nat.sub_succ, Nat.sub_0_r.
+rewrite Nat_sub_succ_1.
 rewrite <- Nat_fact_succ.
 apply rngl_summation_eq_compat.
 intros k Hk.
@@ -813,7 +813,7 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   rewrite Nat.sub_0_r.
   rewrite <- Nat.sub_succ_l; [ | flia Hp ].
-  rewrite Nat.sub_succ, Nat.sub_0_r.
+  rewrite Nat_sub_succ_1.
   easy.
 }
 cbn - [ mat_swap_rows ].
@@ -1159,7 +1159,7 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
 }
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
-rewrite Nat.sub_succ, Nat.sub_0_r.
+rewrite Nat_sub_succ_1.
 rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
   apply permut_fun_Permutation.
   unfold g, f.
@@ -2850,7 +2850,7 @@ rewrite subm_mat_swap_rows_circ.
 destruct i; [ flia Hiz | ].
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_opp_involutive; [ | easy ].
-rewrite Nat.sub_succ, Nat.sub_0_r.
+rewrite Nat_sub_succ_1.
 rewrite subm_fold_left_lt; [ | flia ].
 remember (subm M (S i) j) as A eqn:HA.
 apply determinant_circular_shift_rows; try easy.
@@ -2938,7 +2938,7 @@ Theorem rngl_product_fun_permut :
 Proof.
 intros Hic * Hnz Hσ.
 destruct n; [ easy | clear Hnz ].
-rewrite Nat.sub_succ, Nat.sub_0_r.
+rewrite Nat_sub_succ_1.
 destruct Hσ as (H1, H2).
 induction n; cbn. {
   rewrite rngl_product_only_one.
@@ -3602,7 +3602,7 @@ erewrite map_ext_in. 2: {
   rewrite rngl_product_succ_succ.
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
-    now rewrite Nat.sub_succ, Nat.sub_0_r.
+    now rewrite Nat_sub_succ_1.
   }
   rewrite <- ε_of_canon_permut_ε; try easy.
   apply in_seq in Hi; flia Hi.
@@ -3640,7 +3640,7 @@ apply rngl_product_permut.
 *)
 intros * Hnz Hσ Hg.
 destruct n; [ easy | clear Hnz ].
-rewrite Nat.sub_succ, Nat.sub_0_r.
+rewrite Nat_sub_succ_1.
 unfold is_permut in Hσ.
 remember (vect_el σ) as u eqn:Hu; clear σ Hu.
 destruct Hσ as (H1, H2).

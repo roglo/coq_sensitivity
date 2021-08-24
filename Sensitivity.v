@@ -1252,7 +1252,7 @@ destruct b. {
 specialize (IHll (d + 1) l Hlll Hil).
 rewrite Nat.sub_add_distr in IHll.
 rewrite Hb1 in IHll.
-now rewrite Nat.sub_succ, Nat.sub_0_r in IHll.
+now rewrite Nat_sub_succ_1 in IHll.
 Qed.
 
 Theorem in_nth_nth_find : ∀ ll j,

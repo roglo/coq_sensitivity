@@ -1590,7 +1590,7 @@ erewrite rngl_summation_eq_compat. 2: {
       apply Harc in H.
       now rewrite H in Hi.
     }
-    now rewrite Nat.sub_succ, Nat.sub_0_r in Hj.
+    now rewrite Nat_sub_succ_1 in Hj.
   }
   rewrite map2_map2_seq_r with (d := 0%F).
   rewrite fold_vect_size.
@@ -2235,7 +2235,7 @@ intros * Hnr.
 unfold subm, mI; cbn.
 f_equal.
 destruct n; [ easy | ].
-rewrite Nat.sub_succ, Nat.sub_0_r.
+rewrite Nat_sub_succ_1.
 rewrite <- map_butn.
 rewrite map_map.
 erewrite map_ext_in. 2: {

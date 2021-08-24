@@ -129,7 +129,7 @@ intros i Hi.
 cbn.
 revert v i Hi H.
 induction n; intros; [ easy | ].
-rewrite Nat.sub_succ, Nat.sub_0_r in H.
+rewrite Nat_sub_succ_1 in H.
 rewrite rngl_summation_split_last in H; [ | flia ].
 destruct n. {
   unfold iter_seq, iter_list in H.
@@ -140,7 +140,7 @@ destruct n. {
   now destruct H.
 }
 rewrite rngl_summation_shift in H; [ | flia ].
-rewrite Nat.sub_succ, Nat.sub_0_r in H.
+rewrite Nat_sub_succ_1 in H.
 erewrite rngl_summation_eq_compat in H. 2: {
   intros j Hj.
   now rewrite Nat.add_comm, Nat.add_sub.
@@ -155,7 +155,7 @@ apply rngl_eq_add_0 in H; [ | easy | | ]; cycle 1. {
   }
   rewrite rngl_summation_split_last; [ | flia ].
   rewrite rngl_summation_shift; [ | flia ].
-  rewrite Nat.sub_succ, Nat.sub_0_r.
+  rewrite Nat_sub_succ_1.
   erewrite rngl_summation_eq_compat. 2: {
     intros j Hj.
     now rewrite Nat.add_comm, Nat.add_sub.
@@ -465,7 +465,7 @@ Abort. (*
 (*
   unfold determinant.
   induction n; [ easy | ].
-  rewrite Nat.sub_succ, Nat.sub_0_r at 1.
+  rewrite Nat_sub_succ_1 at 1.
   cbn - [ iter_seq ].
   erewrite rngl_summation_eq_compat. 2: {
     intros j Hj.
