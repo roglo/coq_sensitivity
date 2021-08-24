@@ -210,7 +210,8 @@ f_equal. {
   rewrite (List_map_nth' []). 2: {
     apply is_sm_mat_iff in Hm.
     destruct Hm as (Hr & Hcr & Hc).
-    rewrite butn_length; rewrite fold_mat_nrows; flia Hr Hi Hnz.
+    rewrite butn_length, fold_mat_nrows, Hr.
+    cbn; flia Hi Hnz.
   }
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi Hnz ].
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi Hnz ].
@@ -2257,6 +2258,13 @@ intros.
 rewrite mat_eq_map_seq; symmetry.
 rewrite mat_eq_map_seq; symmetry.
 f_equal.
+unfold δ_lt.
+do 4 rewrite mat_nrows_subm.
+unfold Nat.b2n; do 8 rewrite if_ltb_lt_dec.
+destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
+  apply Nat.nlt_ge in Hir.
+  rewrite Nat.sub_0_r.
+...
 destruct (le_dec (mat_nrows A) i) as [Hir| Hir]. {
 Search (mat_nrows (subm _ _ _)).
 Search (subm (subm _ _ _)).
