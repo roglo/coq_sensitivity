@@ -1957,6 +1957,19 @@ intros la Hla.
 now rewrite lt_butn_butn.
 Qed.
 
+Theorem subm_subm_id : ∀ i j (M : matrix T),
+  subm (subm M i j) i j = subm (subm M i (j + 1)) i j.
+Proof.
+intros.
+unfold subm; f_equal; cbn.
+do 6 rewrite map_butn.
+f_equal; f_equal.
+do 2 rewrite map_map.
+apply map_ext_in.
+intros la Hla.
+apply butn_butn_id.
+Qed.
+
 Theorem subm_out_l : ∀ i j (M : matrix T),
   mat_nrows M ≤ i
   → mat_nrows M ≤ j

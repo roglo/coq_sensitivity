@@ -1939,6 +1939,57 @@ rewrite List_skipn_skipn.
 f_equal; flia Hji.
 Qed.
 
+Theorem butn_butn_id : ∀ A (la : list A) i,
+  butn i (butn i la) = butn i (butn (i + 1) la).
+Proof.
+intros.
+unfold butn.
+do 2 rewrite firstn_app.
+do 2 rewrite skipn_app.
+do 2 rewrite firstn_firstn.
+do 2 rewrite List_skipn_skipn.
+do 2 rewrite firstn_length.
+rewrite Nat.min_id.
+rewrite (Nat.min_l i (i + 1)); [ | flia ].
+do 2 rewrite <- app_assoc.
+f_equal.
+destruct (lt_dec i (length la)) as [Hil| Hil]. 2: {
+  apply Nat.nlt_ge in Hil.
+  rewrite skipn_all2; [ | flia Hil ].
+  rewrite skipn_all2. 2: {
+    rewrite firstn_length.
+    transitivity i; [ | apply Nat.le_succ_diag_r ].
+    apply Nat.le_min_l.
+  }
+  rewrite skipn_all2; [ | flia Hil ].
+  rewrite skipn_all2; [ | flia Hil ].
+  rewrite skipn_all2. 2: {
+    rewrite firstn_length.
+    rewrite Nat.add_1_r.
+    apply Nat.le_min_l.
+  }
+  do 2 rewrite firstn_nil.
+  rewrite skipn_all2; [ easy | flia Hil ].
+}
+rewrite Nat.min_l; [ | flia Hil ].
+rewrite Nat.min_l; [ | flia Hil ].
+rewrite Nat.add_1_r, Nat.sub_diag, Nat.sub_diag.
+rewrite Nat.add_0_l.
+replace (i - S i) with 0 by flia.
+replace (S i - i + S i) with (S (S i)) by flia.
+f_equal; f_equal.
+rewrite skipn_all2. 2: {
+  rewrite firstn_length.
+  transitivity i; [ | apply Nat.le_succ_diag_r ].
+  apply Nat.le_min_l.
+}
+rewrite skipn_all2. 2: {
+  rewrite firstn_length.
+  apply Nat.le_min_l.
+}
+easy.
+Qed.
+
 (* end butn *)
 
 (* replace in a list *)

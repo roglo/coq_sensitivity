@@ -2308,7 +2308,11 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
       symmetry.
       destruct (lt_dec l (j - 1)) as [Hlj1| Hlj1]. 2: {
         apply Nat.nlt_ge in Hlj1.
-        replace (j - 1) with l by flia Hlj Hlj1.
+        replace j with (l + 1) by flia Hlj Hlj1.
+        rewrite Nat.add_sub.
+...
+f_equal; f_equal.
+apply subm_subm_id.
 ...
 rewrite lt_subm_subm.
 ...
