@@ -2310,11 +2310,9 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
         apply Nat.nlt_ge in Hlj1.
         replace j with (l + 1) by flia Hlj Hlj1.
         rewrite Nat.add_sub.
-...
-f_equal; f_equal.
-apply subm_subm_id.
-...
-rewrite lt_subm_subm.
+        f_equal; f_equal.
+        apply subm_subm_id.
+      }
 ...
 ... suite ok
 }
