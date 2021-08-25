@@ -1871,7 +1871,7 @@ destruct (lt_dec (S n) (S len)) as [Hn| Hn]. {
 }
 Qed.
 
-Theorem lt_butn_butn : ∀ A i j (la : list A),
+Theorem butn_butn : ∀ A i j (la : list A),
   j < i → butn i (butn j la) = butn j (butn (i + 1) la).
 Proof.
 intros * Hji.

@@ -1934,18 +1934,17 @@ destruct (le_dec u i) as [Hui| Hui]. {
 }
 Qed.
 
-Theorem lt_subm_subm_rr : ∀ i j k (M : matrix T),
-  i < k
-  → subm (subm M i j) k j = subm (subm M (k + 1) j) i j.
+Theorem subm_subm_rr : ∀ i j k (M : matrix T),
+  i < k → subm (subm M i j) k j = subm (subm M (k + 1) j) i j.
 Proof.
 intros * Hik.
 unfold subm; f_equal; cbn.
 do 6 rewrite map_butn.
-now rewrite lt_butn_butn.
+now rewrite butn_butn.
 Qed.
 
-Theorem lt_subm_subm_ll : ∀ i j k (M : matrix T),
-  k < j →  subm (subm M i k) i j = subm (subm M i (j + 1)) i k.
+Theorem subm_subm_ll : ∀ i j k (M : matrix T),
+  j < k → subm (subm M i j) i k = subm (subm M i (k + 1)) i j.
 Proof.
 intros * Hkj.
 unfold subm; f_equal; cbn.
@@ -1954,7 +1953,7 @@ f_equal; f_equal.
 do 2 rewrite map_map.
 apply map_ext_in.
 intros la Hla.
-now rewrite lt_butn_butn.
+now rewrite butn_butn.
 Qed.
 
 Theorem subm_subm_id : ∀ i j (M : matrix T),

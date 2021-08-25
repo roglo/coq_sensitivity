@@ -2278,6 +2278,10 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
     destruct (lt_dec j l) as [Hjl| Hjl]. {
       destruct (lt_dec l j) as [H| H]; [ flia Hjl H | clear H ].
       rewrite Nat.sub_0_r.
+(*
+Theorem subm_subm_agaga :
+  subm (subm A i j) k l = subm (subm A (k + 1) (l + 1)) i j.
+*)
       unfold subm; cbn.
       do 6 rewrite map_butn.
       rewrite nth_butn_after; [ | flia Hik Hir Hu ].
@@ -2288,7 +2292,7 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
       f_equal.
       apply map_ext_in.
       intros la Hla.
-      now apply lt_butn_butn.
+      now apply butn_butn.
     } {
       apply Nat.nlt_ge in Hjl.
       rewrite Nat.add_0_r.
@@ -2297,7 +2301,7 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
         replace l with j by flia Hjl Hlj.
         clear l Hjl Hlj.
         rewrite Nat.sub_0_r.
-        now rewrite lt_subm_subm_rr.
+        now rewrite subm_subm_rr.
       }
       rewrite (@subm_out_l _ (k + 1) i A); [ | flia Hir Hik | easy ].
       rewrite (@subm_out_l _ k i); cycle 1. {
@@ -2314,7 +2318,7 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
         apply subm_subm_id.
       }
       f_equal; f_equal.
-      rewrite lt_subm_subm_ll; [ | easy ].
+      rewrite subm_subm_ll; [ | easy ].
       rewrite Nat.sub_add; [ easy | flia Hlj ].
     }
   } {
@@ -2323,20 +2327,34 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
     destruct (lt_dec k i) as [Hki| Hki]. 2: {
       replace k with i by flia Hik Hki.
       clear k Hik Hki.
-      destruct (lt_dec i (mat_nrows A)) as [Hri| Hri]. 2: {
-        do 2 rewrite Nat.sub_0_r.
-        destruct (lt_dec i (mat_nrows A)) as [H| H]; [ flia Hri H | clear H ].
-        rewrite Nat.sub_0_r.
-        destruct (lt_dec j l) as [Hjl| Hjl]. {
+      destruct (lt_dec i (mat_nrows A)) as [H| H]; [ flia Hir H | clear H ].
+      do 2 rewrite Nat.sub_0_r.
+      destruct (lt_dec i (mat_nrows A)) as [H| H]; [ flia Hir H | clear H ].
+      rewrite Nat.sub_0_r.
+      destruct (lt_dec j l) as [Hjl| Hjl]. {
+        rewrite subm_subm_ll; [ | easy ].
+        destruct (lt_dec l j) as [H| H]; [ flia Hjl H | clear H ].
+        now rewrite Nat.sub_0_r.
+      } {
+        destruct (lt_dec l j) as [Hlj| Hlj]. 2: {
+          replace l with j by flia Hjl Hlj.
+          now rewrite Nat.add_0_r, Nat.sub_0_r.
+        }
+        rewrite Nat.add_0_r.
+        symmetry.
+        destruct (lt_dec l (j - 1)) as [Hlj1| Hlj1]. 2: {
+          replace j with (l + 1) by flia Hlj Hlj1.
+          rewrite Nat.add_sub.
+          clear j Hjl Hlj Hlj1.
+          rename l into j.
+          now rewrite subm_subm_id.
+        }
+        clear Hjl Hlj.
+        rewrite subm_subm_ll.
+...
+... suite ok
           rewrite lt_subm_subm_ll; [ | easy ].
-          destruct (lt_dec l j) as [H| H]; [ flia Hjl H | clear H ].
-          now rewrite Nat.sub_0_r.
-        } {
-          destruct (lt_dec l j) as [Hlj| Hlj]. 2: {
-            replace l with j by flia Hjl Hlj.
-            now rewrite Nat.add_0_r, Nat.sub_0_r.
-          }
-          rewrite Nat.add_0_r.
+          rewrite Nat.sub_add; [ easy | flia Hlj ].
 ...
     destruct (lt_dec k (mat_nrows A)) as [Hkr| Hkr]. 2: {
       apply Nat.nlt_ge in Hkr.
