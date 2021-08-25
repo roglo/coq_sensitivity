@@ -2313,6 +2313,11 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
         f_equal; f_equal.
         apply subm_subm_id.
       }
+      f_equal; f_equal.
+      rewrite lt_subm_subm_ll; [ | easy ].
+      rewrite Nat.sub_add; [ easy | flia Hlj ].
+    }
+  }
 ...
 ... suite ok
 }
