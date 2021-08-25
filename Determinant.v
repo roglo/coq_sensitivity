@@ -2390,6 +2390,7 @@ rewrite (@butn_out _ _ (k + 1)). 2: {
   rewrite fold_mat_nrows.
   flia Hir Hkr Hki Hki1.
 }
+...
 f_equal; f_equal.
 ...
 f_equal; f_equal.
