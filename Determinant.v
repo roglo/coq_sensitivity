@@ -2374,7 +2374,10 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
         clear l Hjl Hlj.
         apply map_ext_in.
         intros l Hl.
+        apply in_seq in Hl.
+(*
         f_equal; f_equal; clear l Hl.
+*)
         destruct (lt_dec k (i - 1)) as [Hki1| Hki1]. {
           symmetry.
           rewrite subm_subm_r_r; [ | easy ].
@@ -2383,13 +2386,39 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
         replace i with (k + 1) by flia Hki Hki1.
         rewrite Nat.add_sub.
         rewrite subm_subm_id.
-Search (subm (subm _ _ _)).
-unfold subm.
-f_equal; cbn.
+        unfold subm; cbn.
+        rewrite (List_map_nth' []). 2: {
+          rewrite butn_length, map_length.
+          rewrite butn_length, fold_mat_nrows.
+          unfold Nat.b2n.
+          do 2 rewrite if_ltb_lt_dec.
+          destruct (lt_dec (k + 1) (mat_nrows A)) as [H| H];
+            [ flia Hkr Hir Hki1 H | clear H ].
+          rewrite Nat.sub_0_r.
+          destruct (lt_dec k (mat_nrows A)) as [H| H]; [ easy | clear H ].
+          rewrite Nat.sub_0_r; flia Hl.
+        }
+...
+
 rewrite (@butn_out _ _ (k + 1)). 2: {
   rewrite fold_mat_nrows.
   flia Hir Hkr Hki Hki1.
 }
+do 4 rewrite map_butn.
+do 2 rewrite map_map.
+f_equal.
+erewrite map_ext_in. 2: {
+  intros la Hla.
+  now rewrite butn_butn_id.
+}
+apply Nat.nlt_ge in Hki1.
+unfold butn at 3.
+rewrite skipn_all2. 2: {
+  rewrite map_length.
+  rewrite fold_mat_nrows.
+  flia Hki1 Hir.
+}
+rewrite app_nil_r.
 ...
 f_equal; f_equal.
 ...
