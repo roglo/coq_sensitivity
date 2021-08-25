@@ -2317,7 +2317,30 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
       rewrite lt_subm_subm_ll; [ | easy ].
       rewrite Nat.sub_add; [ easy | flia Hlj ].
     }
-  }
+  } {
+    apply Nat.nlt_ge in Hik.
+    rewrite Nat.add_0_r.
+    destruct (lt_dec k i) as [Hki| Hki]. 2: {
+      replace k with i by flia Hik Hki.
+      clear k Hik Hki.
+      destruct (lt_dec i (mat_nrows A)) as [Hri| Hri]. 2: {
+        do 2 rewrite Nat.sub_0_r.
+        destruct (lt_dec i (mat_nrows A)) as [H| H]; [ flia Hri H | clear H ].
+        rewrite Nat.sub_0_r.
+        destruct (lt_dec j l) as [Hjl| Hjl]. {
+          rewrite lt_subm_subm_ll; [ | easy ].
+          destruct (lt_dec l j) as [H| H]; [ flia Hjl H | clear H ].
+          now rewrite Nat.sub_0_r.
+        } {
+          destruct (lt_dec l j) as [Hlj| Hlj]. 2: {
+            replace l with j by flia Hjl Hlj.
+            now rewrite Nat.add_0_r, Nat.sub_0_r.
+          }
+          rewrite Nat.add_0_r.
+...
+    destruct (lt_dec k (mat_nrows A)) as [Hkr| Hkr]. 2: {
+      apply Nat.nlt_ge in Hkr.
+      rewrite Nat.sub_0_r.
 ...
 ... suite ok
 }
