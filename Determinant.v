@@ -2386,12 +2386,21 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
 Search (subm (subm _ _ _)).
 unfold subm.
 f_equal; cbn.
+rewrite (@butn_out _ _ (k + 1)). 2: {
+  rewrite fold_mat_nrows.
+  flia Hir Hkr Hki Hki1.
+}
+f_equal; f_equal.
+...
 f_equal; f_equal.
 do 2 rewrite map_butn.
 rewrite butn_out. 2: {
   rewrite map_length, fold_mat_nrows.
   flia Hir Hkr Hki Hki1.
 }
+...
+rewrite butn_out. 2: {
+  rewrite map_length, fold_mat_nrows.
 Search (butn _ (map _ _)).
 ...
 symmetry.
