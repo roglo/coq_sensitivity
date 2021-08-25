@@ -2410,6 +2410,19 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
           destruct (lt_dec (k + 1) i); flia Hl Hi.
         }
         rewrite nth_butn_after; [ | flia Hl Hk ].
+        do 3 rewrite map_butn.
+        rewrite nth_butn_after; [ | flia Hl Hk ].
+        rewrite nth_butn_after; [ | flia Hl Hk ].
+        rewrite (List_map_nth' []). 2: {
+          rewrite map_length, fold_mat_nrows, <- Hi; flia Hl.
+        }
+        rewrite (List_map_nth' []). 2: {
+          rewrite fold_mat_nrows, <- Hi; flia Hl.
+        }
+        now rewrite butn_butn_id.
+      }
+      apply Nat.nlt_ge in Hkr.
+      rewrite Nat.sub_0_r.
 ...
 
 rewrite (@butn_out _ _ (k + 1)). 2: {
