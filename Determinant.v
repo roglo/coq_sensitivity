@@ -2382,6 +2382,21 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
         }
         replace i with (k + 1) by flia Hki Hki1.
         rewrite Nat.add_sub.
+        rewrite subm_subm_id.
+Search (subm (subm _ _ _)).
+unfold subm.
+f_equal; cbn.
+f_equal; f_equal.
+do 2 rewrite map_butn.
+rewrite butn_out. 2: {
+  rewrite map_length, fold_mat_nrows.
+  flia Hir Hkr Hki Hki1.
+}
+Search (butn _ (map _ _)).
+...
+symmetry.
+rewrite subm_subm_exch.
+apply Nat.nlt_ge in Hki1.
 ...
         apply Nat.nlt_ge in Hjl.
 ...
