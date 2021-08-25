@@ -2398,6 +2398,12 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
           destruct (lt_dec k (mat_nrows A)) as [H| H]; [ easy | clear H ].
           rewrite Nat.sub_0_r; flia Hl.
         }
+        rewrite nth_butn_after; [ | flia Hir Hkr Hki1 Hl ].
+        rewrite (List_map_nth' []). 2: {
+          rewrite butn_length, fold_mat_nrows.
+          unfold Nat.b2n; rewrite if_ltb_lt_dec.
+          destruct (lt_dec (k + 1) (mat_nrows A)); flia Hl.
+        }
 ...
 
 rewrite (@butn_out _ _ (k + 1)). 2: {
