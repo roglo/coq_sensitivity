@@ -2383,7 +2383,12 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
           rewrite subm_subm_r_r; [ | easy ].
           rewrite Nat.sub_add; [ easy | flia Hki ].
         }
-        replace i with (k + 1) by flia Hki Hki1.
+        assert (Hk : k = mat_nrows A - 1) by flia Hir Hki Hkr Hki1.
+        assert (Hi : i = mat_nrows A) by flia Hir Hki Hkr Hki1.
+        assert (Hr : mat_nrows A ≠ 0) by flia Hkr.
+        clear Hir Hik Hki Hkr Hki1.
+        rewrite <- Hi in Hl, Hk, Hr.
+        replace i with (k + 1) by flia Hk Hi Hr.
         rewrite Nat.add_sub.
         rewrite subm_subm_id.
         unfold subm; cbn.
@@ -2392,18 +2397,19 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
           rewrite butn_length, fold_mat_nrows.
           unfold Nat.b2n.
           do 2 rewrite if_ltb_lt_dec.
-          destruct (lt_dec (k + 1) (mat_nrows A)) as [H| H];
-            [ flia Hkr Hir Hki1 H | clear H ].
+          rewrite <- Hi.
+          destruct (lt_dec (k + 1) i) as [H| H]; [ flia Hk H | clear H ].
           rewrite Nat.sub_0_r.
-          destruct (lt_dec k (mat_nrows A)) as [H| H]; [ easy | clear H ].
-          rewrite Nat.sub_0_r; flia Hl.
+          destruct (lt_dec k i) as [H| H]; [ flia Hl H | clear H ].
+          rewrite Nat.sub_0_r; flia Hl Hi.
         }
-        rewrite nth_butn_after; [ | flia Hir Hkr Hki1 Hl ].
+        rewrite nth_butn_after; [ | flia Hl Hk ].
         rewrite (List_map_nth' []). 2: {
-          rewrite butn_length, fold_mat_nrows.
+          rewrite butn_length, fold_mat_nrows, <- Hi.
           unfold Nat.b2n; rewrite if_ltb_lt_dec.
-          destruct (lt_dec (k + 1) (mat_nrows A)); flia Hl.
+          destruct (lt_dec (k + 1) i); flia Hl Hi.
         }
+        rewrite nth_butn_after; [ | flia Hl Hk ].
 ...
 
 rewrite (@butn_out _ _ (k + 1)). 2: {
