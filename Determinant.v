@@ -2278,35 +2278,16 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
     destruct (lt_dec j l) as [Hjl| Hjl]. {
       destruct (lt_dec l j) as [H| H]; [ flia Hjl H | clear H ].
       rewrite Nat.sub_0_r.
-Theorem subm_subm_exch : ∀ i j k l (M : matrix T),
-  subm (subm M i j) k l = subm (subm M (k + 1) (l + 1)) i j.
-Proof.
-intros.
       unfold subm; cbn.
-f_equal.
       do 6 rewrite map_butn.
-(*
       rewrite nth_butn_after; [ | flia Hik Hir Hu ].
       rewrite nth_butn_after; [ | flia Hir Hu ].
       rewrite nth_butn_after; [ | flia Hir Hu ].
       rewrite nth_butn_after; [ | flia Hik Hir Hu ].
-*)
       do 2 rewrite map_map.
-destruct (lt_dec i k) as [Hik| Hik]. {
-rewrite butn_butn; [ | easy ].
-f_equal.
       f_equal.
       apply map_ext_in.
       intros la Hla.
-destruct (lt_dec j l) as [Hjl| Hjl]. {
-now apply butn_butn.
-}
-apply Nat.nlt_ge in Hjl.
-destruct (lt_dec (l + 1) j) as [Hl1j| Hl1j]. {
-symmetry.
-Search (butn _ (butn _ _)).
-rewrite butn_butn; [ | easy ].
-...
       now apply butn_butn.
     } {
       apply Nat.nlt_ge in Hjl.
@@ -2373,15 +2354,14 @@ rewrite butn_butn; [ | easy ].
         destruct (lt_dec (i - 1) (mat_nrows A - 1)) as [H| H];
           [ flia Hir H | clear H ].
         rewrite Nat.sub_0_r.
-(*
-      destruct (lt_dec k (mat_nrows A)) as [H| H]; [ flia Hki H | clear H ].
-      rewrite Nat.sub_0_r.
-      destruct (lt_dec i (mat_nrows A)) as [H| H]; [ flia Hir H | clear H ].
-      rewrite Nat.sub_0_r.
-*)
         destruct (lt_dec j l) as [Hjl| Hjl]. {
           destruct (lt_dec l j) as [H| H]; [ flia Hjl H | clear H ].
           rewrite Nat.sub_0_r.
+          apply map_ext_in.
+          intros m Hm.
+          f_equal; f_equal; clear m Hm.
+          now rewrite subm_subm_exch.
+        }
 ...
           rewrite subm_subm_ll; [ | easy ].
         destruct (lt_dec l j) as [H| H]; [ flia Hjl H | clear H ].

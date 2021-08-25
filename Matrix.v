@@ -1969,6 +1969,34 @@ intros la Hla.
 apply butn_butn_id.
 Qed.
 
+Theorem subm_subm_exch : ∀ i j k l (M : matrix T),
+  k < i → j < l → subm (subm M i j) k l = subm (subm M k (l + 1)) (i - 1) j.
+Proof.
+intros * Hki Hjl.
+unfold subm; f_equal; cbn.
+do 6 rewrite map_butn.
+do 2 rewrite map_map.
+destruct (lt_dec k (i - 1)) as [Hki1| Hki1]. {
+  symmetry.
+  rewrite butn_butn; [ | easy ].
+  rewrite Nat.sub_add; [ | flia Hki ].
+  f_equal; f_equal.
+  apply map_ext_in.
+  intros la Hla.
+  symmetry.
+  now rewrite butn_butn.
+}
+replace i with (k + 1) by flia Hki Hki1.
+clear i Hki Hki1.
+rename k into i.
+rewrite Nat.add_sub.
+rewrite butn_butn_id.
+f_equal; f_equal.
+apply map_ext_in.
+intros la Hla.
+now rewrite butn_butn.
+Qed.
+
 Theorem subm_out_l : ∀ i j (M : matrix T),
   mat_nrows M ≤ i
   → mat_nrows M ≤ j
