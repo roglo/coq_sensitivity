@@ -2445,8 +2445,11 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
               replace i with (k + 1) by flia Hki Hki1.
               rewrite Nat.add_sub.
               rewrite subm_subm_id.
+              rewrite (@subm_out_l _ (k + 1) k); [ | flia Hkr | easy ].
+              now rewrite subm_subm_id.
+            }
+          }
 ...
-
 rewrite (@butn_out _ _ (k + 1)). 2: {
   rewrite fold_mat_nrows.
   flia Hir Hkr Hki Hki1.
