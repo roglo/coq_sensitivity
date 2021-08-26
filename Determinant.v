@@ -2568,6 +2568,7 @@ destruct (lt_dec i k) as [Hik| Hik]. {
   }
 } {
   apply Nat.nlt_ge in Hik.
+  rewrite Nat.add_0_r.
 ...
 intros.
 apply matrix_eq; cbn.
