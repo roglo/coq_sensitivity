@@ -2550,6 +2550,24 @@ destruct (lt_dec i k) as [Hik| Hik]. {
     destruct (lt_dec l j) as [Hlj| Hlj]. {
       rewrite Nat.add_0_r.
       f_equal; f_equal.
+      destruct (lt_dec l (j - 1)) as [Hlj1| Hlj1]. {
+        symmetry.
+        rewrite subm_subm_exch; [ | flia Hik | easy ].
+        rewrite Nat.sub_add; [ | flia Hlj ].
+        now rewrite Nat.add_sub.
+      }
+      replace j with (l + 1) by flia Hlj Hlj1.
+      rewrite Nat.add_sub.
+      symmetry.
+      now rewrite subm_subm_exch''.
+    }
+    rewrite Nat.add_0_r, Nat.sub_0_r.
+    f_equal; f_equal.
+    replace j with l by flia Hjl Hlj.
+    now apply subm_subm_r_r.
+  }
+} {
+  apply Nat.nlt_ge in Hik.
 ...
 intros.
 apply matrix_eq; cbn.
