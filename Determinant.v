@@ -2492,7 +2492,16 @@ destruct (lt_dec k (mat_nrows A - 1)) as [Hkr1| Hkr1]. 2: {
         }
         replace l with (j - 1) by flia Hlj Hlj1.
         destruct (Nat.eq_dec k (mat_nrows A - 1)) as [ Hkr| Hkr]. 2: {
-          rewrite (@subm_out_l _ (k + 1) k); [ | flia Hkr1 | flia Hkr1 Hkr ].
+          rewrite <- subm_subm_exch''; [ | easy ].
+          rewrite Nat.sub_add; [ easy | flia Hlj ].
+        }
+...
+destruct (lt_dec k (i - 1)) as [Hki1| Hki1]. {
+  symmetry.
+  rewrite butn_butn; [ | easy ].
+  rewrite Nat.sub_add; [ | flia Hki ].
+...
+rewrite subm_subm_agaga.
 ...
         rewrite subm_subm_r_r.
 ...

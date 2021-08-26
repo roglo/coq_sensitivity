@@ -2037,6 +2037,21 @@ rewrite Nat.add_sub.
 now rewrite butn_butn_id.
 Qed.
 
+Theorem subm_subm_exch'' : ∀ i j k (M : matrix T),
+  i < j → subm (subm M i (k + 1)) j k = subm (subm M (j + 1) k) i k.
+Proof.
+intros * Hij.
+unfold subm; f_equal; cbn.
+do 6 rewrite map_butn.
+do 2 rewrite map_map.
+rewrite butn_butn; [ | easy ].
+f_equal.
+f_equal.
+apply map_ext_in.
+intros l Hl.
+symmetry; apply butn_butn_id.
+Qed.
+
 Theorem subm_out_l : ∀ i j (M : matrix T),
   mat_nrows M ≤ i
   → mat_nrows M ≤ j
