@@ -2530,6 +2530,26 @@ destruct (lt_dec k (mat_nrows A - 1)) as [Hkr1| Hkr1]. 2: {
     }
   }
 }
+destruct (lt_dec i k) as [Hik| Hik]. {
+  destruct (lt_dec (k + 1) (mat_nrows A)) as [H| H]; [ | flia Hkr1 H ].
+  clear H.
+  destruct (lt_dec k i) as [H| H]; [ flia Hik H | clear H ].
+  rewrite Nat.sub_0_r.
+  destruct (lt_dec i (mat_nrows A - 1)) as [Hir1| Hir1]. 2: {
+    flia Hir Hir1 Hkr1 Hik.
+  }
+  apply map_ext_in.
+  intros m Hm; apply in_seq in Hm.
+  destruct (lt_dec j l) as [Hjl| Hjl]. {
+    destruct (lt_dec l j) as [H| H]; [ flia Hjl H | clear H ].
+    rewrite Nat.sub_0_r.
+    symmetry.
+    rewrite subm_subm_exch'; [ | flia Hik | flia Hjl ].
+    now do 2 rewrite Nat.add_sub.
+  } {
+    destruct (lt_dec l j) as [Hlj| Hlj]. {
+      rewrite Nat.add_0_r.
+      f_equal; f_equal.
 ...
 intros.
 apply matrix_eq; cbn.
