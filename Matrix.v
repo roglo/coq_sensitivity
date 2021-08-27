@@ -1956,72 +1956,6 @@ intros la Hla.
 now rewrite butn_butn.
 Qed.
 
-Theorem subm_subm_id : ∀ i j (M : matrix T),
-  subm (subm M i j) i j = subm (subm M i (j + 1)) i j.
-Proof.
-intros.
-unfold subm; f_equal; cbn.
-do 6 rewrite map_butn.
-f_equal; f_equal.
-do 2 rewrite map_map.
-apply map_ext_in.
-intros la Hla.
-now apply butn_butn.
-Qed.
-
-(*
-Theorem subm_subm_exch : ∀ i j k l (M : matrix T),
-  k ≤ i → j ≤ l → subm (subm M i j) k l = subm (subm M k (l + 1)) (i - 1) j.
-Proof.
-intros * Hki Hjl.
-unfold subm; f_equal; cbn.
-do 6 rewrite map_butn.
-do 2 rewrite map_map.
-destruct (le_dec k (i - 1)) as [Hki1| Hki1]. {
-  symmetry.
-  rewrite butn_butn; [ | flia Hki1 ].
-  destruct i. {
-    apply Nat.le_0_r in Hki; subst k.
-    rewrite Nat.sub_0_l, Nat.add_0_l.
-    symmetry.
-    rewrite butn_butn; [ | easy ].
-    f_equal; f_equal.
-    apply map_ext_in.
-    intros la Hla.
-    now rewrite butn_butn.
-  }
-  rewrite Nat.sub_add; [ | flia ].
-  f_equal; f_equal.
-  apply map_ext_in.
-  intros la Hla.
-  symmetry.
-  now rewrite butn_butn.
-}
-apply Nat.nle_gt in Hki1.
-replace i with k by flia Hki Hki1.
-clear i Hki Hki1.
-rename k into i.
-destruct i. {
-  rewrite Nat.sub_0_l.
-  f_equal; f_equal.
-  apply map_ext_in.
-  intros la Hla.
-  now rewrite butn_butn.
-}
-rewrite Nat_sub_succ_1.
-symmetry.
-rewrite <- Nat.add_1_r at 1.
-rewrite <- butn_butn; [ | easy ].
-...
-rewrite butn_butn_id.
-...
-f_equal; f_equal.
-apply map_ext_in.
-intros la Hla.
-now rewrite butn_butn.
-Qed.
-*)
-
 Theorem subm_subm_exch : ∀ i j k l (M : matrix T),
   k < i → j ≤ l → subm (subm M i j) k l = subm (subm M k (l + 1)) (i - 1) j.
 Proof.
@@ -2031,6 +1965,7 @@ do 6 rewrite map_butn.
 do 2 rewrite map_map.
 destruct (lt_dec k (i - 1)) as [Hki1| Hki1]. {
   symmetry.
+...
   rewrite butn_butn; [ | flia Hki1 ].
   rewrite Nat.sub_add; [ | flia Hki Hki1 ].
   f_equal; f_equal.
