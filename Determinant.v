@@ -2569,6 +2569,12 @@ destruct (lt_dec i k) as [Hik| Hik]. {
 } {
   apply Nat.nlt_ge in Hik.
   rewrite Nat.add_0_r.
+  destruct (lt_dec k i) as [Hki| Hki]. {
+    destruct (lt_dec k (mat_nrows A)) as [H| H]; [ clear H | flia Hkr1 H ].
+    destruct (lt_dec (i - 1) (mat_nrows A - 1)) as [H| H];
+      [ clear H | flia Hir Hki H ].
+    apply map_ext_in.
+    intros m Hm; apply in_seq in Hm.
 ...
 intros.
 apply matrix_eq; cbn.
