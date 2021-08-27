@@ -1963,28 +1963,30 @@ intros * Hki Hjl.
 unfold subm; f_equal; cbn.
 do 6 rewrite map_butn.
 do 2 rewrite map_map.
-destruct (lt_dec k (i - 1)) as [Hki1| Hki1]. {
+destruct (le_dec k (i - 1)) as [Hki1| Hki1]. {
   symmetry.
-...
-  rewrite butn_butn; [ | flia Hki1 ].
-  rewrite Nat.sub_add; [ | flia Hki Hki1 ].
+  rewrite butn_butn; [ | easy ].
+  rewrite Nat.sub_add; [ | flia Hki ].
   f_equal; f_equal.
   apply map_ext_in.
   intros la Hla.
   symmetry.
   now rewrite butn_butn.
 }
-apply Nat.nlt_ge in Hki1.
 replace i with (k + 1) by flia Hki Hki1.
 clear i Hki Hki1.
 rename k into i.
 rewrite Nat.add_sub.
-rewrite (butn_butn _ (le_refl _)).
+symmetry.
+rewrite butn_butn; [ | easy ].
 f_equal; f_equal.
 apply map_ext_in.
 intros la Hla.
-now rewrite butn_butn.
+symmetry.
+now apply butn_butn.
 Qed.
+
+...
 
 Theorem subm_subm_exch' : ∀ i j k l (M : matrix T),
   k < i → l < j → subm (subm M i j) k l = subm (subm M k l) (i - 1) (j - 1).
