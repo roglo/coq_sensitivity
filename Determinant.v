@@ -2596,6 +2596,12 @@ destruct (lt_dec i k) as [Hik| Hik]. {
       rewrite subm_subm_exch; [ | flia | easy ].
       now rewrite Nat.add_sub.
     }
+    f_equal; f_equal.
+    now apply subm_subm_exch'.
+  }
+  replace i with k by flia Hik Hki.
+  clear i Hir Hik Hki.
+  rename k into i.
 ...
 intros.
 apply matrix_eq; cbn.
