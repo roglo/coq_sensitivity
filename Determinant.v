@@ -2639,14 +2639,11 @@ Definition comatrix {n} (M : matrix T) : matrix T :=
          (seq 0 (mat_ncols M)))
       (seq 0 (mat_nrows M))).
 
-...
-
-Definition comatrix {n} (M : matrix n n T) : matrix n n T :=
-  {| mat_el i j := (minus_one_pow (i + j) * determinant (subm M i j))%F |}.
-
-Theorem mat_swap_same_rows : ∀ n (M : matrix n n T) i,
+Theorem mat_swap_same_rows : ∀ (M : matrix T) i,
   mat_swap_rows i i M = M.
 Proof.
+intros.
+...
 intros.
 rename i into k.
 apply matrix_eq.
