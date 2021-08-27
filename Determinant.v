@@ -2625,12 +2625,21 @@ destruct (lt_dec i k) as [Hik| Hik]. {
 }
 Qed.
 
-...
-
 Definition swap_in_permut n i j k :=
-  vect_swap_elem (vect_el (mk_canon_sym_gr_vect n) k) i j.
+  vect_swap_elem (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) i j.
 
 (* comatrix *)
+
+Definition comatrix {n} (M : matrix T) : matrix T :=
+  mk_mat
+    (map
+      (λ i,
+       map
+         (λ j, (minus_one_pow (i + j) * determinant n (subm M i j))%F)
+         (seq 0 (mat_ncols M)))
+      (seq 0 (mat_nrows M))).
+
+...
 
 Definition comatrix {n} (M : matrix n n T) : matrix n n T :=
   {| mat_el i j := (minus_one_pow (i + j) * determinant (subm M i j))%F |}.
