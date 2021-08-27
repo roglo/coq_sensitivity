@@ -2575,6 +2575,26 @@ destruct (lt_dec i k) as [Hik| Hik]. {
       [ clear H | flia Hir Hki H ].
     apply map_ext_in.
     intros m Hm; apply in_seq in Hm.
+    destruct (lt_dec j l) as [Hjl| Hjl]. {
+      destruct (lt_dec l j) as [H| H]; [ flia Hjl H | clear H ].
+      rewrite Nat.sub_0_r.
+      f_equal; f_equal.
+      now rewrite subm_subm_exch.
+    }
+    apply Nat.nlt_ge in Hjl.
+    rewrite Nat.add_0_r.
+    destruct (lt_dec l j) as [Hlj| Hlj]. 2: {
+      rewrite Nat.sub_0_r.
+      replace l with j by flia Hjl Hlj.
+      f_equal; f_equal.
+      destruct (lt_dec k (i - 1)) as [Hki1| Hki1]. {
+        symmetry.
+        rewrite subm_subm_r_r; [ | easy ].
+        rewrite Nat.sub_add; [ easy | flia Hki ].
+      }
+      replace i with (k + 1) by flia Hki Hki1.
+      rewrite Nat.add_sub.
+      rewrite subm_subm_id.
 ...
 intros.
 apply matrix_eq; cbn.
