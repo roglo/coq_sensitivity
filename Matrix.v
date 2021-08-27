@@ -1935,7 +1935,7 @@ destruct (le_dec u i) as [Hui| Hui]. {
 Qed.
 
 Theorem subm_subm_r_r : ∀ i j k (M : matrix T),
-  i < k → subm (subm M i j) k j = subm (subm M (k + 1) j) i j.
+  i ≤ k → subm (subm M i j) k j = subm (subm M (k + 1) j) i j.
 Proof.
 intros * Hik.
 unfold subm; f_equal; cbn.
@@ -1944,7 +1944,7 @@ now rewrite butn_butn.
 Qed.
 
 Theorem subm_subm_l_l : ∀ i j k (M : matrix T),
-  j < k → subm (subm M i j) i k = subm (subm M i (k + 1)) i j.
+  j ≤ k → subm (subm M i j) i k = subm (subm M i (k + 1)) i j.
 Proof.
 intros * Hkj.
 unfold subm; f_equal; cbn.
@@ -1966,11 +1966,64 @@ f_equal; f_equal.
 do 2 rewrite map_map.
 apply map_ext_in.
 intros la Hla.
-apply butn_butn_id.
+now apply butn_butn.
 Qed.
 
+(*
 Theorem subm_subm_exch : ∀ i j k l (M : matrix T),
-  k < i → j < l → subm (subm M i j) k l = subm (subm M k (l + 1)) (i - 1) j.
+  k ≤ i → j ≤ l → subm (subm M i j) k l = subm (subm M k (l + 1)) (i - 1) j.
+Proof.
+intros * Hki Hjl.
+unfold subm; f_equal; cbn.
+do 6 rewrite map_butn.
+do 2 rewrite map_map.
+destruct (le_dec k (i - 1)) as [Hki1| Hki1]. {
+  symmetry.
+  rewrite butn_butn; [ | flia Hki1 ].
+  destruct i. {
+    apply Nat.le_0_r in Hki; subst k.
+    rewrite Nat.sub_0_l, Nat.add_0_l.
+    symmetry.
+    rewrite butn_butn; [ | easy ].
+    f_equal; f_equal.
+    apply map_ext_in.
+    intros la Hla.
+    now rewrite butn_butn.
+  }
+  rewrite Nat.sub_add; [ | flia ].
+  f_equal; f_equal.
+  apply map_ext_in.
+  intros la Hla.
+  symmetry.
+  now rewrite butn_butn.
+}
+apply Nat.nle_gt in Hki1.
+replace i with k by flia Hki Hki1.
+clear i Hki Hki1.
+rename k into i.
+destruct i. {
+  rewrite Nat.sub_0_l.
+  f_equal; f_equal.
+  apply map_ext_in.
+  intros la Hla.
+  now rewrite butn_butn.
+}
+rewrite Nat_sub_succ_1.
+symmetry.
+rewrite <- Nat.add_1_r at 1.
+rewrite <- butn_butn; [ | easy ].
+...
+rewrite butn_butn_id.
+...
+f_equal; f_equal.
+apply map_ext_in.
+intros la Hla.
+now rewrite butn_butn.
+Qed.
+*)
+
+Theorem subm_subm_exch : ∀ i j k l (M : matrix T),
+  k < i → j ≤ l → subm (subm M i j) k l = subm (subm M k (l + 1)) (i - 1) j.
 Proof.
 intros * Hki Hjl.
 unfold subm; f_equal; cbn.
@@ -1978,19 +2031,20 @@ do 6 rewrite map_butn.
 do 2 rewrite map_map.
 destruct (lt_dec k (i - 1)) as [Hki1| Hki1]. {
   symmetry.
-  rewrite butn_butn; [ | easy ].
-  rewrite Nat.sub_add; [ | flia Hki ].
+  rewrite butn_butn; [ | flia Hki1 ].
+  rewrite Nat.sub_add; [ | flia Hki Hki1 ].
   f_equal; f_equal.
   apply map_ext_in.
   intros la Hla.
   symmetry.
   now rewrite butn_butn.
 }
+apply Nat.nlt_ge in Hki1.
 replace i with (k + 1) by flia Hki Hki1.
 clear i Hki Hki1.
 rename k into i.
 rewrite Nat.add_sub.
-rewrite butn_butn_id.
+rewrite (butn_butn _ (le_refl _)).
 f_equal; f_equal.
 apply map_ext_in.
 intros la Hla.
@@ -2006,50 +2060,49 @@ do 6 rewrite map_butn.
 do 2 rewrite map_map.
 destruct (lt_dec k (i - 1)) as [Hki1| Hki1]. {
   symmetry.
-  rewrite butn_butn; [ | easy ].
+  rewrite butn_butn; [ | flia Hki1 ].
   rewrite Nat.sub_add; [ | flia Hki ].
   f_equal; f_equal.
   apply map_ext_in.
   intros la Hla.
   destruct (lt_dec l (j - 1)) as [Hlj1| Hlj1]. {
-    rewrite butn_butn; [ | easy ].
+    rewrite butn_butn; [ | flia Hlj1 ].
     rewrite Nat.sub_add; [ easy | flia Hlj ].
   }
   replace j with (l + 1) by flia Hlj Hlj1.
   rewrite Nat.add_sub.
-  apply butn_butn_id.
+  now apply butn_butn.
 }
 replace i with (k + 1) by flia Hki Hki1.
 clear i Hki Hki1.
 rename k into i.
 rewrite Nat.add_sub.
-rewrite butn_butn_id.
+symmetry.
+rewrite butn_butn; [ | easy ].
 f_equal; f_equal.
 apply map_ext_in.
 intros la Hla.
 destruct (lt_dec l (j - 1)) as [Hlj1| Hlj1]. {
-  symmetry.
-  rewrite butn_butn; [ | easy ].
+  rewrite butn_butn; [ | flia Hlj1 ].
   rewrite Nat.sub_add; [ easy | flia Hlj ].
 }
 replace j with (l + 1) by flia Hlj Hlj1.
 rewrite Nat.add_sub.
-now rewrite butn_butn_id.
+now rewrite butn_butn.
 Qed.
 
 Theorem subm_subm_exch'' : ∀ i j k (M : matrix T),
-  i < j → subm (subm M i (k + 1)) j k = subm (subm M (j + 1) k) i k.
+  i ≤ j → subm (subm M i (k + 1)) j k = subm (subm M (j + 1) k) i k.
 Proof.
 intros * Hij.
 unfold subm; f_equal; cbn.
 do 6 rewrite map_butn.
 do 2 rewrite map_map.
 rewrite butn_butn; [ | easy ].
-f_equal.
-f_equal.
+f_equal; f_equal.
 apply map_ext_in.
 intros l Hl.
-symmetry; apply butn_butn_id.
+now symmetry; apply butn_butn.
 Qed.
 
 Theorem subm_out_l : ∀ i j (M : matrix T),
