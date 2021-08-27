@@ -2254,6 +2254,26 @@ Theorem subm_subm_swap : ∀ (A : matrix T) i j k l,
   subm (subm A i j) k l =
   subm (subm A (k + δ_lt i k) (l + δ_lt j l)) (i - δ_lt k i) (j - δ_lt l j).
 Proof.
+(*
+intros.
+rewrite mat_eq_map_seq; symmetry.
+rewrite mat_eq_map_seq; symmetry.
+f_equal.
+unfold δ_lt.
+do 4 rewrite mat_nrows_subm.
+remember (mat_nrows A) as n eqn:Hn.
+remember (i <? n) as a eqn:Ha.
+remember (k <? n - Nat.b2n a) as b eqn:Hb.
+remember (i <? k) as c eqn:Hc.
+remember (k <? i) as d eqn:Hd.
+remember (j <? l) as e eqn:He.
+remember (l <? j) as f eqn:Hf.
+remember (k + Nat.b2n c <? n) as g eqn:Hg.
+remember (i - Nat.b2n d <? n - Nat.b2n g) as h eqn:Hh.
+symmetry in Ha, Hb, Hc, Hd, He, Hf, Hg, Hh.
+destruct a, b, d, e, f, g, h; try easy; cbn.
+...
+*)
 intros.
 rewrite mat_eq_map_seq; symmetry.
 rewrite mat_eq_map_seq; symmetry.
