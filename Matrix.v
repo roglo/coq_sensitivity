@@ -2035,8 +2035,6 @@ intros l Hl.
 now symmetry; apply butn_butn.
 Qed.
 
-...
-
 Theorem subm_out_l : ∀ i j (M : matrix T),
   mat_nrows M ≤ i
   → mat_nrows M ≤ j
