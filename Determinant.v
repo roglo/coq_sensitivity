@@ -2602,6 +2602,8 @@ destruct (lt_dec i k) as [Hik| Hik]. {
   replace i with k by flia Hik Hki.
   clear i Hir Hik Hki.
   rename k into i.
+  rewrite Nat.sub_0_r.
+  destruct (lt_dec i (mat_nrows A)) as [Hir| Hir].
 ...
 intros.
 apply matrix_eq; cbn.
