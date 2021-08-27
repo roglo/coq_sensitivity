@@ -2594,7 +2594,12 @@ destruct (lt_dec i k) as [Hik| Hik]. {
       }
       replace i with (k + 1) by flia Hki Hki1.
       rewrite Nat.add_sub.
+apply Nat.nlt_ge in Hki1.
+...
       rewrite subm_subm_id.
+Search (subm (subm _ _ _)).
+symmetry.
+rewrite subm_subm_exch'.
 ...
 intros.
 apply matrix_eq; cbn.
