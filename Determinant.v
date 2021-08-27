@@ -2311,7 +2311,7 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
         replace j with (l + 1) by flia Hlj Hlj1.
         rewrite Nat.add_sub.
         f_equal; f_equal.
-        apply subm_subm_id.
+        now apply subm_subm_l_l.
       }
       f_equal; f_equal.
       rewrite subm_subm_l_l; [ | flia Hlj1 ].
@@ -2343,7 +2343,7 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
           rewrite Nat.add_sub.
           clear j Hjl Hlj Hlj1.
           rename l into j.
-          now rewrite subm_subm_id.
+          now rewrite subm_subm_l_l.
         }
         clear Hjl Hlj.
         rewrite subm_subm_l_l; [ | flia Hlj1 ].
@@ -2387,7 +2387,7 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
         rewrite <- Hi in Hl, Hk, Hr.
         replace i with (k + 1) by flia Hk Hi Hr.
         rewrite Nat.add_sub.
-        rewrite subm_subm_id.
+        rewrite subm_subm_l_l; [ | easy ].
         unfold subm; cbn.
         rewrite (List_map_nth' []). 2: {
           rewrite butn_length, map_length.
@@ -2442,9 +2442,9 @@ destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. 2: {
             } {
               replace i with (k + 1) by flia Hki Hki1.
               rewrite Nat.add_sub.
-              rewrite subm_subm_id.
+              rewrite subm_subm_l_l; [ | easy ].
               rewrite (@subm_out_l _ (k + 1) k); [ | flia Hkr | easy ].
-              apply subm_subm_id.
+              now apply subm_subm_l_l.
             }
           } {
             now rewrite subm_subm_exch'.
@@ -2522,7 +2522,8 @@ destruct (lt_dec k (mat_nrows A - 1)) as [Hkr1| Hkr1]. 2: {
         rewrite Nat.sub_add; [ easy | flia Hlj ].
       }
       replace l with (j - 1) by flia Hlj Hlj1.
-      rewrite subm_subm_id.
+      symmetry.
+      rewrite subm_subm_l_l; [ | easy ].
       rewrite Nat.sub_add; [ easy | flia Hlj ].
     }
   }
@@ -2591,7 +2592,7 @@ destruct (lt_dec i k) as [Hik| Hik]. {
       }
       replace i with (k + 1) by flia Hki Hki1.
       rewrite Nat.add_sub.
-      rewrite subm_subm_id.
+      rewrite subm_subm_l_l; [ | easy ].
       rewrite subm_subm_exch; [ | flia | easy ].
       now rewrite Nat.add_sub.
     }
