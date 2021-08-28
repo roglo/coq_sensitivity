@@ -1460,7 +1460,6 @@ assert (HM : determinant n M = (- determinant n M)%F). {
         }
         now rewrite mat_swap_rows_nrows.
       }
-...
       apply nth_error_None in Hxx.
       destruct yy as [yy| ]; [ exfalso | easy ].
       apply List_nth_error_Some_iff with (d := 0%F) in Hyy.
@@ -1468,7 +1467,13 @@ assert (HM : determinant n M = (- determinant n M)%F). {
       apply Nat.nlt_ge in Hxx; apply Hxx; clear Hxx.
       subst la lb.
       rewrite fold_corr_mat_ncols in Hj'. {
-        rewrite corr_mat_swap_rows_ncols in Hj'. 2: {
+        rewrite corr_mat_swap_rows_ncols in Hj'; cycle 1. {
+          apply is_sm_mat_iff in Hsm.
+          now destruct Hsm as (Hr, _); rewrite Hr.
+        } {
+          apply is_sm_mat_iff in Hsm.
+          now destruct Hsm as (Hr, _); rewrite Hr.
+        } {
           now apply squ_mat_is_corr in Hsm.
         }
         rewrite fold_corr_mat_ncols; [ easy | | easy ].
@@ -2593,7 +2598,10 @@ rewrite (List_eq_map_seq ll (nth i ll [])) at 2.
 unfold list_list_swap_rows.
 apply map_ext_in.
 intros j Hj; apply in_seq in Hj.
-destruct (Nat.eq_dec j i) as [Hji| Hji]; [ now subst j | ].
+destruct (Nat.eq_dec j i) as [Hji| Hji]. {
+  subst j.
+  now apply nth_indep.
+}
 now apply nth_indep.
 Qed.
 
@@ -2638,13 +2646,12 @@ destruct (lt_dec i r) as [Hir| Hir]. {
     apply Nat.nlt_ge in Hqrl.
     symmetry.
     rewrite nth_overflow; [ | now rewrite map_length ].
-    rewrite (List_map_nth' []); [ | now rewrite butn_length ].
-    rewrite nth_butn_after; [ | flia Hpq Hq ].
+    rewrite butn_length in Hqrl.
     destruct (le_dec (length ll) q) as [Hlq| Hlq]. {
-      now rewrite nth_overflow with (n := q).
+      rewrite nth_overflow with (n := q); [ | easy ].
+      now rewrite butn_nil.
     }
     apply Nat.nle_gt in Hlq.
-    rewrite butn_length in Hqrl.
     unfold Nat.b2n in Hi, Hqrl.
     rewrite if_ltb_lt_dec in Hi, Hqrl.
     destruct (lt_dec r (length ll)) as [Hrl| Hrl]; [ | flia Hqrl Hlq ].
