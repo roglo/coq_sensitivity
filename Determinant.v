@@ -2643,6 +2643,18 @@ Theorem mat_swap_same_rows : ∀ (M : matrix T) i,
   mat_swap_rows i i M = M.
 Proof.
 intros.
+destruct M as (ll); cbn.
+unfold mat_swap_rows; f_equal.
+cbn - [ list_list_swap_rows ].
+...
+rewrite (List_eq_map_seq ll []).
+unfold list_list_swap_rows.
+rewrite map_seq_length.
+apply map_ext_in.
+intros j Hj; apply in_seq in Hj.
+destruct (Nat.eq_dec j i) as [Hji| Hji]. {
+  subst j.
+  rewrite
 ...
 intros.
 rename i into k.
