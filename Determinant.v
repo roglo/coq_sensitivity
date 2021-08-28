@@ -2724,10 +2724,15 @@ Proof.
 intros * Hpi.
 induction q; [ easy | ].
 rewrite seq_S; cbn.
-rewrite fold_left_app; cbn.
+rewrite fold_left_app; cbn - [ mat_el ].
+...
 destruct (Nat.eq_dec i (p + q)) as [Hip| Hip]; [ flia Hpi Hip | ].
 destruct (Nat.eq_dec i (p + q + 1)) as [Hip1| Hip1]; [ flia Hpi Hip1 | ].
 rewrite IHq; [ | flia Hpi Hip ].
+unfold list_list_swap_rows.
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  rewrite fold_mat_nrows.
 ...
 
 Theorem mat_el_circ_rot_rows_succ_1 : ∀ n (M : matrix n n T) i j p q,
