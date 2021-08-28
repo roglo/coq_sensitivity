@@ -2715,16 +2715,20 @@ destruct (Nat.eq_dec q p) as [Hqp| Hqp]; [ now subst q | ].
 now rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
 Qed.
 
-...
-
-Theorem mat_el_mat_swap_rows : ∀ n (M : matrix n n T) p q j,
-  mat_el (mat_swap_rows p q M) q j = mat_el M p j.
+Theorem mat_el_circ_rot_rows_succ_1 : ∀ (M : matrix T) i j p q,
+  p + q < i
+  → mat_el M i j =
+    mat_el (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq p q) M)
+      i j.
 Proof.
-intros.
-cbn.
-destruct (Nat.eq_dec q p) as [Hqp| Hqp]; [ now subst q | ].
-now rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
-Qed.
+intros * Hpi.
+induction q; [ easy | ].
+rewrite seq_S; cbn.
+rewrite fold_left_app; cbn.
+destruct (Nat.eq_dec i (p + q)) as [Hip| Hip]; [ flia Hpi Hip | ].
+destruct (Nat.eq_dec i (p + q + 1)) as [Hip1| Hip1]; [ flia Hpi Hip1 | ].
+rewrite IHq; [ | flia Hpi Hip ].
+...
 
 Theorem mat_el_circ_rot_rows_succ_1 : ∀ n (M : matrix n n T) i j p q,
   p + q < i
