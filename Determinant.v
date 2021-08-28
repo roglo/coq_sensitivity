@@ -1442,11 +1442,15 @@ assert (HM : determinant n M = (- determinant n M)%F). {
         apply Nat.nlt_ge in Hyy; apply Hyy; clear Hyy.
         subst lb.
         rewrite fold_corr_mat_ncols. {
-...
-          rewrite corr_mat_swap_rows_ncols. 2: {
+          rewrite corr_mat_swap_rows_ncols; cycle 1. {
+            apply is_sm_mat_iff in Hsm.
+            now destruct Hsm as (Hr, _); rewrite Hr.
+          } {
+            apply is_sm_mat_iff in Hsm.
+            now destruct Hsm as (Hr, _); rewrite Hr.
+          } {
             now apply squ_mat_is_corr in Hsm.
           }
-          rewrite fold_mat_nrows in Hi.
           subst la.
           rewrite fold_corr_mat_ncols in Hj; [ easy | | easy ].
           now apply squ_mat_is_corr in Hsm.
@@ -1456,6 +1460,7 @@ assert (HM : determinant n M = (- determinant n M)%F). {
         }
         now rewrite mat_swap_rows_nrows.
       }
+...
       apply nth_error_None in Hxx.
       destruct yy as [yy| ]; [ exfalso | easy ].
       apply List_nth_error_Some_iff with (d := 0%F) in Hyy.
