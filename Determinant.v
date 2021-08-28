@@ -625,20 +625,20 @@ Qed.
 Definition list_list_swap_rows i1 i2 (ll : list (list T)) :=
   map
     (λ i,
-     let d := nth i ll [] in
-     if Nat.eq_dec i i1 then nth i2 ll d
-     else if Nat.eq_dec i i2 then nth i1 ll d
-     else d)
+     nth (if Nat.eq_dec i i1 then i2 else if Nat.eq_dec i i2 then i1 else i)
+       ll [])
     (seq 0 (length ll)).
 
 Definition mat_swap_rows i1 i2 (M : matrix T) :=
   mk_mat (list_list_swap_rows i1 i2 (mat_list_list M)).
 
 Theorem mat_swap_rows_is_square : ∀ n (M : matrix T) p q,
-  is_square_matrix n M = true
+  p < n
+  → q < n
+  → is_square_matrix n M = true
   → is_square_matrix n (mat_swap_rows p q M) = true.
 Proof.
-intros * Hsm.
+intros * Hp Hq Hsm.
 specialize (square_matrix_ncols _ Hsm) as Hcn.
 specialize (squ_mat_is_corr M Hsm) as Hco.
 apply is_sm_mat_iff in Hsm.
@@ -656,53 +656,21 @@ split. {
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
   rewrite seq_nth; [ | easy ].
   rewrite Nat.add_0_l.
-  destruct (Nat.eq_dec 0 p) as [Hpz| Hpz]. {
-    rewrite Hc; [ now intros Hn; subst n | ].
-    destruct (lt_dec q (length (mat_list_list M))) as [Hqll| Hqll]. {
-      now apply nth_In.
-    }
-    apply Nat.nlt_ge in Hqll.
-    rewrite nth_overflow; [ | easy ].
-    now apply nth_In.
-  }
-  destruct (Nat.eq_dec 0 q) as [Hqz| Hqz]. {
-    rewrite Hc; [ now intros Hn; subst n | ].
-    destruct (lt_dec p (length (mat_list_list M))) as [Hqll| Hqll]. {
-      now apply nth_In.
-    }
-    apply Nat.nlt_ge in Hqll.
-    rewrite nth_overflow; [ | easy ].
-    now apply nth_In.
-  }
-  now rewrite <- List_hd_nth_0.
+  rewrite Hc; [ now intros Hn; subst n | ].
+  apply nth_In; rewrite fold_mat_nrows; rewrite Hr.
+  destruct (Nat.eq_dec 0 p); [ easy | ].
+  destruct (Nat.eq_dec 0 q); [ easy | ].
+  flia Hp.
 } {
   intros la Hla.
   apply in_map_iff in Hla.
   rewrite fold_mat_nrows, Hr in Hla.
   destruct Hla as (a & Ha & Hla).
-  apply in_seq in Hla.
-  subst la.
-  destruct (Nat.eq_dec a p) as [Hap| Hap]. {
-    subst a.
-    destruct (lt_dec q (length (mat_list_list M))) as [Hqll| Hqll]. {
-      rewrite fold_mat_nrows in Hqll.
-      now rewrite fold_corr_mat_ncols.
-    }
-    apply Nat.nlt_ge in Hqll.
-    rewrite nth_overflow; [ | easy ].
-    rewrite fold_corr_mat_ncols; [ easy | easy | now rewrite Hr ].
-  }
-  destruct (Nat.eq_dec a q) as [Haq| Haq]. {
-    subst a.
-    destruct (lt_dec p (length (mat_list_list M))) as [Hpll| Hpll]. {
-      rewrite fold_mat_nrows in Hpll.
-      now rewrite fold_corr_mat_ncols.
-    }
-    apply Nat.nlt_ge in Hpll.
-    rewrite nth_overflow; [ | easy ].
-    rewrite fold_corr_mat_ncols; [ easy | easy | now rewrite Hr ].
-  }
-  rewrite fold_corr_mat_ncols; [ easy | easy | now rewrite Hr ].
+  apply in_seq in Hla; subst la.
+  rewrite fold_corr_mat_ncols; [ easy | easy | rewrite Hr ].
+  destruct (Nat.eq_dec a p); [ easy | ].
+  destruct (Nat.eq_dec a q); [ easy | ].
+  easy.
 }
 Qed.
 
@@ -717,10 +685,12 @@ now rewrite seq_length.
 Qed.
 
 Theorem corr_mat_swap_rows_ncols : ∀ (M : matrix T) p q,
-  is_correct_matrix M
+  p < mat_nrows M
+  → q < mat_nrows M
+  → is_correct_matrix M
   → mat_ncols (mat_swap_rows p q M) = mat_ncols M.
 Proof.
-intros * Hcm.
+intros * Hp Hq Hcm.
 destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
   unfold mat_nrows in Hrz.
   apply length_zero_iff_nil in Hrz.
@@ -736,22 +706,10 @@ rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
 rewrite Nat.add_0_l.
 destruct (Nat.eq_dec 0 p) as [Hzp| Hzp]. {
-  subst p; cbn.
-  destruct (lt_dec q (mat_nrows M)) as [Hqr| Hqr]. {
-    now rewrite fold_corr_mat_ncols.
-  }
-  apply Nat.nlt_ge in Hqr.
-  rewrite nth_overflow; [ | easy ].
-  now rewrite List_hd_nth_0.
+  now rewrite fold_corr_mat_ncols.
 }
 destruct (Nat.eq_dec 0 q) as [Hzq| Hzq]. {
-  subst q; cbn.
-  destruct (lt_dec p (mat_nrows M)) as [Hpq| Hpr]. {
-    now rewrite fold_corr_mat_ncols.
-  }
-  apply Nat.nlt_ge in Hpr.
-  rewrite nth_overflow; [ | easy ].
-  now rewrite List_hd_nth_0.
+  now rewrite fold_corr_mat_ncols.
 }
 now rewrite List_hd_nth_0.
 Qed.
@@ -869,6 +827,7 @@ erewrite rngl_summation_eq_compat. 2: {
         destruct (Nat.eq_dec q p) as [H| H]; [ easy | clear H ].
         unfold mat_el.
         symmetry.
+...
         rewrite (@nth_indep _ _ p) with (d' := []); [ easy | ].
         now rewrite fold_mat_nrows, Hr.
       }
