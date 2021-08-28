@@ -824,22 +824,13 @@ erewrite rngl_summation_eq_compat. 2: {
         rewrite Nat.add_0_l.
         destruct (Nat.eq_dec q q) as [H| H]; [ clear H | easy ].
         apply Nat.neq_sym in Hpq.
-        destruct (Nat.eq_dec q p) as [H| H]; [ easy | clear H ].
-        unfold mat_el.
-        symmetry.
-...
-        rewrite (@nth_indep _ _ p) with (d' := []); [ easy | ].
-        now rewrite fold_mat_nrows, Hr.
+        now destruct (Nat.eq_dec q p).
       }
       destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
         subst i.
         rewrite seq_nth; [ | easy ].
         rewrite Nat.add_0_l.
-        destruct (Nat.eq_dec p p) as [H| H]; [ clear H | easy ].
-        unfold mat_el.
-        symmetry.
-        rewrite (@nth_indep _ _ q) with (d' := []); [ easy | ].
-        now rewrite fold_mat_nrows, Hr.
+        now destruct (Nat.eq_dec p p).
       }
       apply in_seq in Hi.
       rewrite seq_nth; [ | easy ].
@@ -1438,25 +1429,11 @@ assert (HM : determinant n M = (- determinant n M)%F). {
           rewrite Nat.add_0_l.
           destruct (Nat.eq_dec i p) as [Hip| Hip]. {
             subst i.
-            rewrite fold_mat_el, Hjpq.
-            unfold mat_el.
-            f_equal.
-            apply nth_indep.
-            rewrite fold_mat_nrows.
-            apply is_sm_mat_iff in Hsm.
-            destruct Hsm as (Hr, _).
-            congruence.
+            now rewrite fold_mat_el, Hjpq.
           }
           destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
             subst i.
-            rewrite fold_mat_el, <- Hjpq.
-            unfold mat_el.
-            f_equal.
-            apply nth_indep.
-            rewrite fold_mat_nrows.
-            apply is_sm_mat_iff in Hsm.
-            destruct Hsm as (Hr, _).
-            congruence.
+            now rewrite fold_mat_el, <- Hjpq.
           }
           easy.
         }
@@ -1465,6 +1442,7 @@ assert (HM : determinant n M = (- determinant n M)%F). {
         apply Nat.nlt_ge in Hyy; apply Hyy; clear Hyy.
         subst lb.
         rewrite fold_corr_mat_ncols. {
+...
           rewrite corr_mat_swap_rows_ncols. 2: {
             now apply squ_mat_is_corr in Hsm.
           }
