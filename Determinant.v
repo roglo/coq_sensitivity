@@ -625,9 +625,10 @@ Qed.
 Definition list_list_swap_rows i1 i2 (ll : list (list T)) :=
   map
     (λ i,
-     if Nat.eq_dec i i1 then nth i2 ll (nth i ll [])
-     else if Nat.eq_dec i i2 then nth i1 ll (nth i ll [])
-     else nth i ll [])
+     let d := nth i ll [] in
+     if Nat.eq_dec i i1 then nth i2 ll d
+     else if Nat.eq_dec i i2 then nth i1 ll d
+     else d)
     (seq 0 (length ll)).
 
 Definition mat_swap_rows i1 i2 (M : matrix T) :=
