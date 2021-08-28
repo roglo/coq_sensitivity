@@ -2725,9 +2725,9 @@ intros * Hpi.
 induction q; [ easy | ].
 rewrite seq_S; cbn.
 rewrite fold_left_app; cbn - [ mat_el ].
-...
 destruct (Nat.eq_dec i (p + q)) as [Hip| Hip]; [ flia Hpi Hip | ].
 destruct (Nat.eq_dec i (p + q + 1)) as [Hip1| Hip1]; [ flia Hpi Hip1 | ].
+...
 rewrite IHq; [ | flia Hpi Hip ].
 unfold list_list_swap_rows.
 rewrite (List_map_nth' 0). 2: {
