@@ -2703,18 +2703,14 @@ now do 2 rewrite mat_swap_same_rows.
 Qed.
 
 Theorem mat_el_mat_swap_rows : ∀ (M : matrix T) p q j,
-  mat_el (mat_swap_rows p q M) q j = mat_el M p j.
+  q < mat_nrows M
+  → mat_el (mat_swap_rows p q M) q j = mat_el M p j.
 Proof.
-intros; cbn.
-destruct M as (ll); cbn.
-destruct (lt_dec q (length ll)) as [Hql| Hql]. 2: {
-  apply Nat.nlt_ge in Hql.
-  rewrite nth_overflow with (n := q); [ | now rewrite map_seq_length ].
-Print mat_swap_rows.
-Print list_list_swap_rows.
-...
-rewrite (List_map_nth' 0); [ | rewrite seq_length ].
-...
+intros * Hql; cbn.
+destruct M as (ll); cbn in Hql |-*.
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+rewrite Nat.add_0_l.
 destruct (Nat.eq_dec q p) as [Hqp| Hqp]; [ now subst q | ].
 now rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
 Qed.
