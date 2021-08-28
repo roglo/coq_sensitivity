@@ -2710,6 +2710,8 @@ destruct M as (ll); cbn.
 destruct (lt_dec q (length ll)) as [Hql| Hql]. 2: {
   apply Nat.nlt_ge in Hql.
   rewrite nth_overflow with (n := q); [ | now rewrite map_seq_length ].
+Print mat_swap_rows.
+Print list_list_swap_rows.
 ...
 rewrite (List_map_nth' 0); [ | rewrite seq_length ].
 ...
