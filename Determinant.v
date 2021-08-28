@@ -2646,86 +2646,113 @@ intros.
 destruct M as (ll); cbn.
 unfold mat_swap_rows; f_equal.
 cbn - [ list_list_swap_rows ].
-...
-rewrite (List_eq_map_seq ll []).
+rewrite (List_eq_map_seq ll (nth i ll [])) at 2.
 unfold list_list_swap_rows.
-rewrite map_seq_length.
 apply map_ext_in.
 intros j Hj; apply in_seq in Hj.
-destruct (Nat.eq_dec j i) as [Hji| Hji]. {
-  subst j.
-  rewrite
-...
-intros.
-rename i into k.
-apply matrix_eq.
-intros i j Hi Hj.
-unfold mat_swap_rows; cbn.
-destruct (Nat.eq_dec i k); [ now subst i | easy ].
+destruct (Nat.eq_dec j i) as [Hji| Hji]; [ now subst j | ].
+now apply nth_indep.
 Qed.
 
-Theorem mat_swap_rows_comm : ∀ n (M : matrix n n T) p q,
+Theorem mat_swap_rows_comm : ∀ (M : matrix T) p q,
   mat_swap_rows p q M = mat_swap_rows q p M.
 Proof.
 intros.
-apply matrix_eq.
-intros i j Hi Hj; cbn.
+destruct M as (ll); cbn.
+unfold mat_swap_rows; f_equal; cbn.
+apply map_ext_in.
+intros i Hi; apply in_seq in Hi.
 now destruct (Nat.eq_dec i p), (Nat.eq_dec i q); subst.
 Qed.
 
-Theorem subm_mat_swap_rows_lt : ∀ n (M : matrix n n T) p q r j,
+Theorem subm_mat_swap_rows_lt_lt : ∀ (M : matrix T) p q r j,
+  p < q
+  → q < r
+  → subm (mat_swap_rows p q M) r j = mat_swap_rows p q (subm M r j).
+Proof.
+intros * Hpq Hq.
+destruct M as (ll); cbn.
+unfold subm, mat_swap_rows; cbn; f_equal.
+rewrite map_length.
+rewrite butn_length.
+rewrite <- map_butn, map_map.
+rewrite map_butn_seq.
+apply map_ext_in.
+intros i Hi; apply in_seq in Hi.
+destruct Hi as (_, Hi).
+rewrite Nat.add_0_l in Hi |-*.
+destruct (lt_dec i r) as [Hir| Hir]. {
+  destruct (Nat.eq_dec i p) as [Hip| Hip]. {
+    subst i; clear Hir.
+    destruct (lt_dec q (length (butn r ll))) as [Hqrl| Hqrl]. {
+      rewrite (List_map_nth' []); [ | easy ].
+      rewrite butn_length in Hqrl.
+      f_equal.
+      rewrite nth_butn_after; [ | easy ].
+      apply nth_indep.
+      flia Hqrl.
+    }
+    apply Nat.nlt_ge in Hqrl.
+    symmetry.
+    rewrite nth_overflow; [ | now rewrite map_length ].
+    rewrite (List_map_nth' []); [ | now rewrite butn_length ].
+    rewrite nth_butn_after; [ | flia Hpq Hq ].
+    destruct (le_dec (length ll) q) as [Hlq| Hlq]. {
+      now rewrite nth_overflow with (n := q).
+    }
+    apply Nat.nle_gt in Hlq.
+    rewrite butn_length in Hqrl.
+    unfold Nat.b2n in Hi, Hqrl.
+    rewrite if_ltb_lt_dec in Hi, Hqrl.
+    destruct (lt_dec r (length ll)) as [Hrl| Hrl]; [ | flia Hqrl Hlq ].
+    flia Hq Hrl Hqrl Hlq.
+  }
+  destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
+    subst i; clear Hir.
+    destruct (lt_dec p (length (butn r ll))) as [Hprl| Hprl]. 2: {
+      apply Nat.nlt_ge in Hprl.
+      rewrite butn_length in Hprl.
+      flia Hpq Hi Hprl.
+    }
+    rewrite (List_map_nth' []); [ | easy ].
+    rewrite butn_length in Hprl.
+    f_equal.
+    rewrite nth_butn_after; [ | flia Hpq Hq ].
+    apply nth_indep.
+    flia Hprl.
+  }
+  rewrite map_butn.
+  rewrite nth_butn_after; [ | easy ].
+  rewrite (List_map_nth' []); [ easy | flia Hi ].
+}
+apply Nat.nlt_ge in Hir.
+destruct (Nat.eq_dec i p) as [H| H]; [ flia Hpq Hq Hir H | clear H ].
+destruct (Nat.eq_dec i q) as [H| H]; [ flia Hq Hir H | clear H ].
+destruct (Nat.eq_dec (i + 1) p) as [H| H]; [ flia Hpq Hq Hir H | clear H ].
+destruct (Nat.eq_dec (i + 1) q) as [H| H]; [ flia Hq Hir H | clear H ].
+rewrite map_butn.
+rewrite nth_butn_before; [ | easy ].
+rewrite (List_map_nth' []); [ easy | ].
+unfold Nat.b2n in Hi.
+rewrite if_ltb_lt_dec in Hi.
+destruct (lt_dec r (length ll)) as [Hrl| Hrl]; [ flia Hi Hir | ].
+flia Hrl Hi Hir.
+Qed.
+
+Theorem subm_mat_swap_rows_lt : ∀ (M : matrix T) p q r j,
   p < r
   → q < r
   → subm (mat_swap_rows p q M) r j = mat_swap_rows p q (subm M r j).
 Proof.
 intros * Hp Hq.
-apply matrix_eq.
-rename j into k.
-intros i j Hi Hj; cbn.
-destruct (Nat.eq_dec (i + Nat.b2n (r <=? i)) p) as [H1| H1]. {
-  remember (r <=? i) as b eqn:Hb1; symmetry in Hb1.
-  destruct b; cbn in H1. {
-    apply Nat.leb_le in Hb1.
-    flia Hp Hb1 H1.
-  }
-  apply Nat.leb_nle in Hb1.
-  rewrite Nat.add_0_r in H1; subst i; clear Hb1.
-  rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
-  remember (r <=? q) as b eqn:Hb1; symmetry in Hb1.
-  destruct b; cbn. {
-    apply Nat.leb_le in Hb1; flia Hq Hb1.
-  }
-  now rewrite Nat.add_0_r.
-}
-destruct (Nat.eq_dec (i + Nat.b2n (r <=? i)) q) as [H2| H2]. {
-  remember (r <=? i) as b eqn:Hb1; symmetry in Hb1.
-  destruct b; cbn in H2. {
-    apply Nat.leb_le in Hb1.
-    flia Hq Hb1 H2.
-  }
-  cbn in H1; rewrite Nat.add_0_r in H1, H2.
-  subst i; clear Hb1.
-  rewrite <- (if_eqb_eq_dec q q), Nat.eqb_refl.
-  destruct (Nat.eq_dec q p) as [H| H]; [ easy | clear H ].
-  remember (r <=? p) as b eqn:Hb1; symmetry in Hb1.
-  destruct b; [ | now rewrite Nat.add_0_r ].
-  apply Nat.leb_le in Hb1.
-  flia Hp Hb1.
-}
-destruct (Nat.eq_dec i p) as [H3| H3]. {
-  subst i.
-  apply Nat.nle_gt, Nat.leb_nle in Hp.
-  rewrite Hp in H1; cbn in H1.
-  now rewrite Nat.add_0_r in H1.
-}
-destruct (Nat.eq_dec i q) as [H4| H4]. {
-  subst i.
-  apply Nat.nle_gt, Nat.leb_nle in Hq.
-  rewrite Hq in H2; cbn in H2.
-  now rewrite Nat.add_0_r in H2.
-}
-easy.
+destruct (lt_dec p q) as [Hpq| Hpq]; [ now apply subm_mat_swap_rows_lt_lt | ].
+do 2 rewrite mat_swap_rows_comm with (p := p).
+destruct (lt_dec q p) as [Hqp| Hqp]; [ now apply subm_mat_swap_rows_lt_lt | ].
+replace q with p by flia Hpq Hqp.
+now do 2 rewrite mat_swap_same_rows.
 Qed.
+
+...
 
 Theorem mat_el_mat_swap_rows : ∀ n (M : matrix n n T) p q j,
   mat_el (mat_swap_rows p q M) q j = mat_el M p j.
