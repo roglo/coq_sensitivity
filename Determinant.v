@@ -2753,6 +2753,21 @@ replace q with p by flia Hpq Hqp.
 now do 2 rewrite mat_swap_same_rows.
 Qed.
 
+Theorem mat_el_mat_swap_rows : ∀ (M : matrix T) p q j,
+  mat_el (mat_swap_rows p q M) q j = mat_el M p j.
+Proof.
+intros; cbn.
+destruct M as (ll); cbn.
+destruct (lt_dec q (length ll)) as [Hql| Hql]. 2: {
+  apply Nat.nlt_ge in Hql.
+  rewrite nth_overflow with (n := q); [ | now rewrite map_seq_length ].
+...
+rewrite (List_map_nth' 0); [ | rewrite seq_length ].
+...
+destruct (Nat.eq_dec q p) as [Hqp| Hqp]; [ now subst q | ].
+now rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
+Qed.
+
 ...
 
 Theorem mat_el_mat_swap_rows : ∀ n (M : matrix n n T) p q j,
