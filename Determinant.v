@@ -1431,9 +1431,10 @@ assert (HM : determinant n M = (- determinant n M)%F). {
           rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
           rewrite seq_nth; [ | easy ].
           rewrite Nat.add_0_l.
+          unfold transposition.
+          do 2 rewrite if_eqb_eq_dec.
           destruct (Nat.eq_dec i p) as [Hip| Hip]. {
             subst i.
-...
             now rewrite fold_mat_el, Hjpq.
           }
           destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
@@ -2605,6 +2606,7 @@ apply map_ext_in.
 intros j Hj; apply in_seq in Hj.
 destruct (Nat.eq_dec j i) as [Hji| Hji]. {
   subst j.
+...
   now apply nth_indep.
 }
 now apply nth_indep.
