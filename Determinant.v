@@ -623,11 +623,7 @@ now rewrite Nat.add_0_l.
 Qed.
 
 Definition list_list_swap_rows i1 i2 (ll : list (list T)) :=
-  map
-    (λ i,
-     nth (if Nat.eq_dec i i1 then i2 else if Nat.eq_dec i i2 then i1 else i)
-       ll [])
-    (seq 0 (length ll)).
+  map (λ i, nth (transposition i1 i2 i) ll []) (seq 0 (length ll)).
 
 Definition mat_swap_rows i1 i2 (M : matrix T) :=
   mk_mat (list_list_swap_rows i1 i2 (mat_list_list M)).
@@ -658,6 +654,8 @@ split. {
   rewrite Nat.add_0_l.
   rewrite Hc; [ now intros Hn; subst n | ].
   apply nth_In; rewrite fold_mat_nrows; rewrite Hr.
+  unfold transposition.
+  do 2 rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec 0 p); [ easy | ].
   destruct (Nat.eq_dec 0 q); [ easy | ].
   flia Hp.
@@ -668,6 +666,8 @@ split. {
   destruct Hla as (a & Ha & Hla).
   apply in_seq in Hla; subst la.
   rewrite fold_corr_mat_ncols; [ easy | easy | rewrite Hr ].
+  unfold transposition.
+  do 2 rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec a p); [ easy | ].
   destruct (Nat.eq_dec a q); [ easy | ].
   easy.
@@ -705,6 +705,8 @@ rewrite List_hd_nth_0.
 rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
 rewrite Nat.add_0_l.
+unfold transposition.
+do 2 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec 0 p) as [Hzp| Hzp]. {
   now rewrite fold_corr_mat_ncols.
 }
@@ -822,7 +824,8 @@ erewrite rngl_summation_eq_compat. 2: {
         subst i.
         rewrite seq_nth; [ | easy ].
         rewrite Nat.add_0_l.
-        destruct (Nat.eq_dec q q) as [H| H]; [ clear H | easy ].
+        rewrite Nat.eqb_refl.
+        rewrite if_eqb_eq_dec.
         apply Nat.neq_sym in Hpq.
         now destruct (Nat.eq_dec q p).
       }
@@ -830,11 +833,12 @@ erewrite rngl_summation_eq_compat. 2: {
         subst i.
         rewrite seq_nth; [ | easy ].
         rewrite Nat.add_0_l.
-        now destruct (Nat.eq_dec p p).
+        now rewrite Nat.eqb_refl.
       }
       apply in_seq in Hi.
       rewrite seq_nth; [ | easy ].
       rewrite Nat.add_0_l.
+      do 2 rewrite if_eqb_eq_dec.
       destruct (Nat.eq_dec i p) as [H| H]; [ easy | clear H ].
       now destruct (Nat.eq_dec i q).
     }
@@ -1429,6 +1433,7 @@ assert (HM : determinant n M = (- determinant n M)%F). {
           rewrite Nat.add_0_l.
           destruct (Nat.eq_dec i p) as [Hip| Hip]. {
             subst i.
+...
             now rewrite fold_mat_el, Hjpq.
           }
           destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
@@ -2727,6 +2732,8 @@ rewrite seq_S; cbn.
 rewrite fold_left_app; cbn - [ mat_el ].
 destruct (Nat.eq_dec i (p + q)) as [Hip| Hip]; [ flia Hpi Hip | ].
 destruct (Nat.eq_dec i (p + q + 1)) as [Hip1| Hip1]; [ flia Hpi Hip1 | ].
+unfold mat_swap_rows.
+unfold list_list_swap_rows.
 ...
 rewrite IHq; [ | flia Hpi Hip ].
 unfold list_list_swap_rows.
