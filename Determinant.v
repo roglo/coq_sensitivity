@@ -2643,14 +2643,10 @@ rewrite Nat.add_0_l in Hi |-*.
 destruct (lt_dec i r) as [Hir| Hir]. {
   destruct (Nat.eq_dec i p) as [Hip| Hip]. {
     subst i; clear Hir.
+    rewrite transposition_1.
     destruct (lt_dec q (length (butn r ll))) as [Hqrl| Hqrl]. {
-...
       rewrite (List_map_nth' []); [ | easy ].
-      rewrite butn_length in Hqrl.
-      f_equal.
-      rewrite nth_butn_after; [ | easy ].
-      apply nth_indep.
-      flia Hqrl.
+      now rewrite nth_butn_after.
     }
     apply Nat.nlt_ge in Hqrl.
     symmetry.
@@ -2668,23 +2664,26 @@ destruct (lt_dec i r) as [Hir| Hir]. {
   }
   destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
     subst i; clear Hir.
-    destruct (lt_dec p (length (butn r ll))) as [Hprl| Hprl]. 2: {
-      apply Nat.nlt_ge in Hprl.
-      rewrite butn_length in Hprl.
-      flia Hpq Hi Hprl.
+    rewrite transposition_2.
+    destruct (lt_dec p (length (butn r ll))) as [Hprl| Hprl]. {
+      rewrite (List_map_nth' []); [ | easy ].
+      rewrite nth_butn_after; [ easy | flia Hpq Hq ].
     }
-    rewrite (List_map_nth' []); [ | easy ].
+    apply Nat.nlt_ge in Hprl.
     rewrite butn_length in Hprl.
-    f_equal.
-    rewrite nth_butn_after; [ | flia Hpq Hq ].
-    apply nth_indep.
-    flia Hprl.
+    flia Hpq Hi Hprl.
   }
+  unfold transposition.
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i p) as [H| H]; [ easy | clear H ].
+  destruct (Nat.eq_dec i q) as [H| H]; [ easy | clear H ].
   rewrite map_butn.
   rewrite nth_butn_after; [ | easy ].
   rewrite (List_map_nth' []); [ easy | flia Hi ].
 }
 apply Nat.nlt_ge in Hir.
+unfold transposition.
+do 4 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec i p) as [H| H]; [ flia Hpq Hq Hir H | clear H ].
 destruct (Nat.eq_dec i q) as [H| H]; [ flia Hq Hir H | clear H ].
 destruct (Nat.eq_dec (i + 1) p) as [H| H]; [ flia Hpq Hq Hir H | clear H ].
@@ -2720,8 +2719,7 @@ destruct M as (ll); cbn in Hql |-*.
 rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
 rewrite Nat.add_0_l.
-destruct (Nat.eq_dec q p) as [Hqp| Hqp]; [ now subst q | ].
-now rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
+now rewrite transposition_2.
 Qed.
 
 Theorem mat_el_circ_rot_rows_succ_1 : ∀ (M : matrix T) i j p q,
