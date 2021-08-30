@@ -2604,9 +2604,10 @@ rewrite (List_eq_map_seq ll (nth i ll [])) at 2.
 unfold list_list_swap_rows.
 apply map_ext_in.
 intros j Hj; apply in_seq in Hj.
+unfold transposition.
+do 2 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec j i) as [Hji| Hji]. {
   subst j.
-...
   now apply nth_indep.
 }
 now apply nth_indep.
@@ -2616,11 +2617,11 @@ Theorem mat_swap_rows_comm : ∀ (M : matrix T) p q,
   mat_swap_rows p q M = mat_swap_rows q p M.
 Proof.
 intros.
-destruct M as (ll); cbn.
 unfold mat_swap_rows; f_equal; cbn.
+unfold list_list_swap_rows.
 apply map_ext_in.
 intros i Hi; apply in_seq in Hi.
-now destruct (Nat.eq_dec i p), (Nat.eq_dec i q); subst.
+now rewrite transposition_comm.
 Qed.
 
 Theorem subm_mat_swap_rows_lt_lt : ∀ (M : matrix T) p q r j,
@@ -2643,6 +2644,7 @@ destruct (lt_dec i r) as [Hir| Hir]. {
   destruct (Nat.eq_dec i p) as [Hip| Hip]. {
     subst i; clear Hir.
     destruct (lt_dec q (length (butn r ll))) as [Hqrl| Hqrl]. {
+...
       rewrite (List_map_nth' []); [ | easy ].
       rewrite butn_length in Hqrl.
       f_equal.
