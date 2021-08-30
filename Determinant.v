@@ -2735,8 +2735,7 @@ rewrite fold_left_app; cbn - [ mat_el ].
 destruct (Nat.eq_dec i (p + q)) as [Hip| Hip]; [ flia Hpi Hip | ].
 destruct (Nat.eq_dec i (p + q + 1)) as [Hip1| Hip1]; [ flia Hpi Hip1 | ].
 unfold mat_swap_rows.
-unfold list_list_swap_rows.
-Search (nth (transposition _ _ _)).
+unfold list_list_swap_rows; cbn.
 ...
 rewrite IHq; [ | flia Hpi Hip ].
 unfold list_list_swap_rows.
