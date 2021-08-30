@@ -2734,6 +2734,20 @@ rewrite seq_S; cbn.
 rewrite fold_left_app; cbn - [ mat_el ].
 destruct (Nat.eq_dec i (p + q)) as [Hip| Hip]; [ flia Hpi Hip | ].
 destruct (Nat.eq_dec i (p + q + 1)) as [Hip1| Hip1]; [ flia Hpi Hip1 | ].
+Search mat_swap_rows.
+Theorem mat_swap_rows_fold_left : ∀ A p q (M : matrix T) l (f : _ → A → _),
+  mat_swap_rows p q M = M
+  → mat_swap_rows p q (fold_left f l M) =
+    fold_left (λ M' k, f (mat_swap_rows p q M') k) l M.
+Proof.
+intros * Hm.
+revert M Hm.
+induction l as [| a]; intros; [ easy | cbn ].
+rewrite <- IHl; [ now rewrite Hm | ].
+rewrite Hm.
+...
+rewrite mat_swap_rows_fold_left.
+...
 unfold mat_swap_rows.
 unfold list_list_swap_rows; cbn.
 ...
