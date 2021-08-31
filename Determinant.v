@@ -2723,12 +2723,13 @@ now rewrite transposition_2.
 Qed.
 
 Theorem mat_el_circ_rot_rows_succ_1 : ∀ (M : matrix T) i j p q,
-  p + q < i
+  i < mat_nrows M
+  → p + q < i
   → mat_el M i j =
     mat_el (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq p q) M)
       i j.
 Proof.
-intros * Hpi.
+intros * Hi Hpi.
 induction q; [ easy | ].
 rewrite seq_S; cbn.
 rewrite fold_left_app; cbn - [ mat_el ].
@@ -2740,16 +2741,14 @@ induction q; cbn. {
   rewrite Nat.add_0_r in Hip, Hip1 |-*.
   unfold list_list_swap_rows.
   rewrite fold_mat_nrows.
-  rewrite (List_map_nth' 0); [ | rewrite seq_length ].
-  rewrite seq_nth.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
   rewrite Nat.add_0_l.
   unfold transposition.
   do 2 rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec i p) as [H| H]; [ easy | clear H ].
   destruct (Nat.eq_dec i (p + 1)) as [H| H]; [ easy | clear H ].
   easy.
-  admit.
-  admit.
 }
 ...
 Theorem mat_swap_rows_fold_left : ∀ A p q (M : matrix T) l (f : _ → A → _),
