@@ -2735,9 +2735,28 @@ rewrite seq_S; cbn.
 rewrite fold_left_app; cbn - [ mat_el ].
 destruct (Nat.eq_dec i (p + q)) as [Hip| Hip]; [ flia Hpi Hip | ].
 destruct (Nat.eq_dec i (p + q + 1)) as [Hip1| Hip1]; [ flia Hpi Hip1 | ].
-Check List_apply_fold_left.
-Search mat_swap_rows.
+(**)
+cbn.
+unfold list_list_swap_rows.
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  rewrite fold_mat_nrows.
 ...
+Theorem length_mat_fold_left : ∀ A (M : matrix T) n l (f : _ → A → _),
+  (∀ a, a ∈ l → mat_nrows (f M a) = n)
+  → length (mat_list_list (fold_left f l M)) = length (mat_list_list M).
+Proof.
+intros * Hm.
+rewrite fold_mat_nrows.
+revert M Hm.
+induction l as [| a]; intros; [ easy | cbn ].
+rewrite IHl. 2: {
+  intros M' Hm'.
+...
+  rewrite length_mat_fold_left.
+  now rewrite seq_length.
+...
+cbn - [ mat_swap_rows ].
 rewrite List_apply_fold_left. 2: {
   intros M' k Hk; apply in_seq in Hk.
   clear i Hi Hpi IHq Hip Hip1.
@@ -2746,6 +2765,22 @@ rewrite List_apply_fold_left. 2: {
   rewrite map_seq_length.
   apply map_ext_in.
   intros i Hi; apply in_seq in Hi.
+  destruct (lt_dec (p + q + 1) (length ll)) as [Hpq1l| Hpq1l]. 2: {
+    apply Nat.nlt_ge in Hpq1l.
+    destruct (lt_dec (p + q) (length ll)) as [Hpql| Hpql]. 2: {
+      apply Nat.nlt_ge in Hpql.
+      unfold transposition.
+      do 2 rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec i (p + q)) as [H| H]; [ flia Hi Hpql H | clear H ].
+      destruct (Nat.eq_dec i (p + q + 1)) as [H| H]; [ flia Hi Hpql H | ].
+      clear H.
+      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+      rewrite seq_nth; [ | easy ].
+      rewrite Nat.add_0_l.
+      do 2 rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec i k) as [H| H]. {
+        subst i.
+...
   rewrite (List_map_nth' 0). 2: {
     rewrite seq_length.
     apply transposition_lt.
