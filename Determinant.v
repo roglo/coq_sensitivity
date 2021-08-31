@@ -2735,6 +2735,10 @@ rewrite seq_S; cbn.
 rewrite fold_left_app; cbn - [ mat_el ].
 destruct (Nat.eq_dec i (p + q)) as [Hip| Hip]; [ flia Hpi Hip | ].
 destruct (Nat.eq_dec i (p + q + 1)) as [Hip1| Hip1]; [ flia Hpi Hip1 | ].
+rewrite List_apply_fold_left. 2: {
+  intros M' k Hk; apply in_seq in Hk.
+Search (mat_swap_rows _ _ (mat_swap_rows _ _ _)).
+...
 (*
 ...
 rewrite IHq; [ | flia Hpi Hip ].
