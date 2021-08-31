@@ -2735,6 +2735,8 @@ rewrite seq_S; cbn.
 rewrite fold_left_app; cbn - [ mat_el ].
 destruct (Nat.eq_dec i (p + q)) as [Hip| Hip]; [ flia Hpi Hip | ].
 destruct (Nat.eq_dec i (p + q + 1)) as [Hip1| Hip1]; [ flia Hpi Hip1 | ].
+(*
+...
 rewrite IHq; [ | flia Hpi Hip ].
 clear IHq.
 induction q; cbn. {
@@ -2751,9 +2753,11 @@ induction q; cbn. {
   easy.
 }
 ...
+*)
 Theorem mat_swap_rows_fold_left : ∀ A p q (M : matrix T) l (f : _ → A → _),
   mat_swap_rows p q M = M
-  → (∀ a, a ∈ l → mat_swap_rows p q (f M a) = f M a)
+  → (∀ a M, a ∈ l → mat_swap_rows p q M = M →
+     mat_swap_rows p q (f M a) = f M a)
   → mat_swap_rows p q (fold_left f l M) =
     fold_left (λ M' k, f (mat_swap_rows p q M') k) l M.
 Proof.
@@ -2761,10 +2765,24 @@ intros * Hm Hml.
 revert M Hm Hml.
 induction l as [| a]; intros; [ easy | cbn ].
 rewrite <- IHl; [ now rewrite Hm | | ]. 2: {
-intros b Hb.
-rewrite Hm.
-...
+  intros b M' Hb Hm'.
+  apply Hml; [ now right | easy ].
 }
+apply Hml; [ now left | ].
+now do 2 rewrite Hm.
+Qed.
+...
+rewrite mat_swap_rows_fold_left; cycle 1. {
+  unfold mat_swap_rows.
+  destruct M as (ll); cbn; f_equal.
+  rewrite List_eq_map_seq with (d := []).
+  apply map_ext_in.
+  intros k Hk; apply in_seq in Hk.
+...
+  unfold transposition.
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec k (p + q)) as [Hkpq| Hkpq]. {
+...
 rewrite Hm.
 apply Hml; left.
 ...
