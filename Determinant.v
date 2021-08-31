@@ -2771,7 +2771,6 @@ rewrite <- IHl; [ now rewrite Hm | | ]. 2: {
 apply Hml; [ now left | ].
 now do 2 rewrite Hm.
 Qed.
-...
 rewrite mat_swap_rows_fold_left; cycle 1. {
   unfold mat_swap_rows.
   destruct M as (ll); cbn; f_equal.
