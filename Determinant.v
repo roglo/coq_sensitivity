@@ -2798,22 +2798,32 @@ apply IHi.
 flia Hi.
 Qed.
 
-...
-
-Theorem mat_el_circ_rot_rows_outside : ∀ n (M : matrix n n T) i j p q,
-  i < p
+Theorem mat_el_circ_rot_rows_outside : ∀ (M : matrix T) i j p q,
+  i < mat_nrows M
+  → i < p
   → mat_el M i j =
-    mat_el (fold_left (λ M' k, mat_swap_rows k (k + 1) M')
-      (seq p q) M) i j.
+    mat_el (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq p q) M) i j.
 Proof.
-intros * Hip.
+intros * Hi Hip.
 induction q; [ easy | ].
 rewrite seq_S; cbn.
 rewrite fold_left_app; cbn.
+unfold list_list_swap_rows.
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length, fold_mat_nrows.
+  now rewrite mat_nrows_fold_left_swap.
+}
+rewrite fold_mat_nrows.
+rewrite seq_nth; [ | now rewrite mat_nrows_fold_left_swap ].
+rewrite Nat.add_0_l.
+unfold transposition.
+do 2 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec i (p + q)) as [Hipq| Hipq]; [ flia Hip Hipq | ].
 destruct (Nat.eq_dec i (p + q + 1)) as [Hip1| Hip1]; [ flia Hip Hip1 | ].
 apply IHq.
 Qed.
+
+...
 
 Theorem mat_el_circ_rot_rows_succ : ∀ n (M : matrix n n T) i j p,
   i + 1 ≠ p
