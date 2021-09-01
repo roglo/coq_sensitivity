@@ -2780,56 +2780,25 @@ flia Hpi Hip.
 Qed.
 
 Theorem mat_el_circ_rot_rows : ∀ (M : matrix T) i j,
-  mat_el M 0 j =
-    mat_el (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 i) M) i j.
+  i < mat_nrows M
+  → mat_el M 0 j =
+      mat_el (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 i) M) i j.
 Proof.
-intros.
-induction i; [ easy | ].
+intros * Hi.
+revert M Hi.
+induction i; intros; [ easy | ].
 rewrite seq_S.
 rewrite fold_left_app.
 cbn - [ mat_swap_rows ].
 rewrite Nat.add_1_r.
-destruct (lt_dec (S i) (mat_nrows M)) as [Hsir| Hsir]. {
-  rewrite mat_el_mat_swap_rows. 2: {
-    now rewrite mat_nrows_fold_left_swap.
-  }
-  apply IHi.
-}
-apply Nat.nlt_ge in Hsir; cbn.
-unfold list_list_swap_rows.
-rewrite (@nth_overflow _ _ (S i)). 2: {
-  rewrite map_seq_length.
-  rewrite fold_mat_nrows.
+rewrite mat_el_mat_swap_rows. 2: {
   now rewrite mat_nrows_fold_left_swap.
 }
-unfold mat_el.
-...
-Search (mat_nrows _ ≤ mat_nrows _).
-...
-rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length, fold_mat_nrows.
-...
-unfold list_list_swap_rows.
-...
-Search (mat_nrows (fold_left _ _ _)).
-...
 apply IHi.
+flia Hi.
 Qed.
-...
 
-Theorem mat_el_circ_rot_rows : ∀ n (M : matrix n n T) i j,
-  mat_el M 0 j =
-    mat_el (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 i) M) i j.
-Proof.
-intros.
-induction i; [ easy | ].
-rewrite seq_S.
-rewrite fold_left_app.
-cbn - [ mat_swap_rows ].
-rewrite Nat.add_1_r.
-rewrite mat_el_mat_swap_rows.
-apply IHi.
-Qed.
+...
 
 Theorem mat_el_circ_rot_rows_outside : ∀ n (M : matrix n n T) i j p q,
   i < p
