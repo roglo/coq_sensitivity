@@ -2758,6 +2758,21 @@ apply IHq.
 flia Hpi Hip.
 Qed.
 
+Theorem mat_el_circ_rot_rows : ∀ (M : matrix T) i j,
+  mat_el M 0 j =
+    mat_el (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 i) M) i j.
+Proof.
+intros.
+induction i; [ easy | ].
+rewrite seq_S.
+rewrite fold_left_app.
+cbn - [ mat_swap_rows ].
+rewrite Nat.add_1_r.
+...
+rewrite mat_el_mat_swap_rows. 2: {
+...
+apply IHi.
+Qed.
 ...
 
 Theorem mat_el_circ_rot_rows : ∀ n (M : matrix n n T) i j,
