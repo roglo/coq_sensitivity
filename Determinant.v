@@ -2860,6 +2860,14 @@ rewrite HA.
 rewrite mat_nrows_fold_left_swap; flia Hi.
 Qed.
 
+Theorem subm_mat_swap_rows_succ_succ : ∀ (M : matrix T) i j,
+  subm (mat_swap_rows (i + 1) (i + 2) (mat_swap_rows i (i + 1) M)) (S i) j =
+  subm (mat_swap_rows i (i + 1) M) (S (S i)) j.
+Proof.
+intros.
+destruct M as (ll); cbn.
+unfold mat_swap_rows; cbn - [ list_list_swap_rows ].
+unfold subm; f_equal; cbn - [ list_list_swap_rows butn ].
 ...
 
 Theorem subm_mat_swap_rows_succ_succ : ∀ n (M : matrix n n T) i j,
