@@ -2782,6 +2782,8 @@ destruct (lt_dec (S i) (mat_nrows M)) as [Hsir| Hsir]. {
   apply IHi.
 }
 apply Nat.nlt_ge in Hsir; cbn.
+Inspect 2.
+...
 unfold list_list_swap_rows.
 ...
 Search (mat_nrows (fold_left _ _ _)).
