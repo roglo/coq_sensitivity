@@ -2866,7 +2866,6 @@ Theorem subm_mat_swap_rows_succ_succ : ∀ (M : matrix T) i j,
 Proof.
 intros.
 destruct M as (ll); cbn.
-unfold mat_swap_rows; cbn - [ list_list_swap_rows ].
 unfold subm; f_equal; cbn - [ list_list_swap_rows butn ].
 ...
 
