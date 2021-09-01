@@ -2722,6 +2722,22 @@ rewrite Nat.add_0_l.
 now rewrite transposition_2.
 Qed.
 
+Theorem lt_mat_nrows_fold_left : ∀ (M : matrix T) i p q,
+  i < mat_nrows M
+  → i <
+    mat_nrows
+      (fold_left (λ (M' : matrix T) (k : nat), mat_swap_rows k (k + 1) M')
+         (seq p q) M).
+Proof.
+induction q; [ easy | ].
+rewrite seq_S.
+rewrite fold_left_app; cbn.
+unfold list_list_swap_rows.
+rewrite map_seq_length.
+rewrite fold_mat_nrows.
+apply IHq.
+Qed.
+
 Theorem mat_el_circ_rot_rows_succ_1 : ∀ (M : matrix T) i j p q,
   i < mat_nrows M
   → p + q < i
@@ -2731,23 +2747,14 @@ Theorem mat_el_circ_rot_rows_succ_1 : ∀ (M : matrix T) i j p q,
 Proof.
 intros * Hi Hpi.
 induction q; [ easy | ].
-assert (Hir :
-  i <
-  mat_nrows (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq p q) M)). {
-  clear Hpi IHq.
-  induction q; [ easy | ].
-  rewrite seq_S.
-  rewrite fold_left_app; cbn.
-  unfold list_list_swap_rows.
-  rewrite map_seq_length.
-  rewrite fold_mat_nrows.
-  apply IHq.
-}
 rewrite seq_S; cbn.
 rewrite fold_left_app; cbn.
 unfold list_list_swap_rows.
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite seq_nth; [ | easy ].
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  now apply lt_mat_nrows_fold_left.
+}
+rewrite seq_nth; [ | now apply lt_mat_nrows_fold_left ].
 rewrite Nat.add_0_l.
 rewrite fold_mat_el.
 unfold transposition.
@@ -2768,8 +2775,16 @@ rewrite seq_S.
 rewrite fold_left_app.
 cbn - [ mat_swap_rows ].
 rewrite Nat.add_1_r.
+destruct (lt_dec (S i) (mat_nrows M)) as [Hsir| Hsir]. {
+  rewrite mat_el_mat_swap_rows. 2: {
+    now apply lt_mat_nrows_fold_left.
+  }
+  apply IHi.
+}
+apply Nat.nlt_ge in Hsir; cbn.
+unfold list_list_swap_rows.
 ...
-rewrite mat_el_mat_swap_rows. 2: {
+Search (mat_nrows (fold_left _ _ _)).
 ...
 apply IHi.
 Qed.
