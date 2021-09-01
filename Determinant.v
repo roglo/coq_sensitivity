@@ -2722,10 +2722,23 @@ rewrite Nat.add_0_l.
 now rewrite transposition_2.
 Qed.
 
+Theorem mat_nrows_fold_left_swap : ∀ (M : matrix T) p q f g,
+  mat_nrows (fold_left (λ M' k, mat_swap_rows (f k) (g k) M') (seq p q) M) =
+  mat_nrows M.
+Proof.
+intros.
+induction q; [ easy | ].
+rewrite seq_S.
+rewrite fold_left_app; cbn.
+unfold list_list_swap_rows.
+rewrite map_seq_length.
+rewrite fold_mat_nrows.
+apply IHq.
+Qed.
+
+(*
 Theorem mat_nrows_fold_left_swap : ∀ (M : matrix T) p q,
-  mat_nrows
-    (fold_left (λ (M' : matrix T) (k : nat), mat_swap_rows k (k + 1) M')
-       (seq p q) M) =
+  mat_nrows (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq p q) M) =
   mat_nrows M.
 Proof.
 induction q; [ easy | ].
@@ -2736,6 +2749,7 @@ rewrite map_seq_length.
 rewrite fold_mat_nrows.
 apply IHq.
 Qed.
+*)
 
 Theorem mat_el_circ_rot_rows_succ_1 : ∀ (M : matrix T) i j p q,
   i < mat_nrows M
