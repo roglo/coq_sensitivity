@@ -2912,11 +2912,7 @@ Theorem subm_mat_swap_rows_circ : ∀ (M : matrix T) p q,
 Proof.
 intros.
 unfold subm; f_equal.
-destruct M as (ll).
-cbn - [ butn ].
-rewrite map_butn, map_map.
-rewrite map_butn.
-...
+do 2 rewrite map_butn.
 rewrite butn_0.
 rewrite List_map_tl.
 ...
