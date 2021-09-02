@@ -2881,11 +2881,16 @@ do 2 rewrite Nat.add_0_l.
 apply map_ext_in.
 intros k Hk; apply in_seq in Hk.
 destruct (lt_dec k (S i)) as [Hksi| Hksi]. {
+  rewrite (@transposition_out (i + 1)); [ | flia Hksi | flia Hksi ].
   destruct (lt_dec k (S (S i))) as [Hkssi| Hkssi]. {
-    rewrite (List_map_nth' 0). 2: {
-      rewrite seq_length.
-      apply transposition_lt; [ flia Hi2 | easy | flia Hk ].
-    }
+    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hk ].
+    rewrite seq_nth; [ easy | flia Hk ].
+  }
+  flia Hi2 Hk Hksi Hkssi.
+} {
+  apply Nat.nlt_ge in Hksi.
+...
+  rewrite (@transposition_out (i + 1)); [ | flia Hksi | ].
 ...
 
 Theorem subm_mat_swap_rows_succ_succ : ∀ n (M : matrix n n T) i j,
