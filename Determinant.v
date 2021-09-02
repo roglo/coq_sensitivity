@@ -2911,10 +2911,26 @@ Theorem subm_mat_swap_rows_circ : ∀ (M : matrix T) p q,
   subm (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 (p - 1)) M) p q.
 Proof.
 intros.
-unfold subm; f_equal.
-do 2 rewrite map_butn.
+unfold subm; f_equal; f_equal.
 rewrite butn_0.
-rewrite List_map_tl.
+rewrite mat_list_list_fold_left.
+destruct M as (ll); cbn.
+Search (butn _ (fold_left _ _ _)).
+Definition butn_fold_left : ∀ A B (f : list A → B → list A) l ll i,
+  butn i (fold_left f l ll) =
+  fold_left (λ la a, f la a) l (butn i ll).
+Proof.
+intros.
+revert ll.
+induction l as [| a]; intros; [ easy | cbn ].
+rewrite IHl.
+(* oui, non, c'est pas ça... *)
+...
+rewrite butn_fold_left.
+...
+Search (map _ (fold_left _ _ _)).
+cbn.
+rewrite <- map_butn.
 ...
 
 Theorem subm_mat_swap_rows_circ : ∀ n (M : matrix n n T) p q,
