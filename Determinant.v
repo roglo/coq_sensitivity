@@ -2914,8 +2914,37 @@ intros.
 unfold subm; f_equal; f_equal.
 rewrite butn_0.
 rewrite mat_list_list_fold_left.
+unfold mat_swap_rows; cbn.
+...
+Theorem butn_fold_left : ∀ A B (f : list A → B → list A) l ll i,
+  butn i (fold_left f l ll) =
+  fold_left (λ la a, f la a) l (butn i ll).
+Proof.
+intros.
+...
 destruct M as (ll); cbn.
+induction ll as [| la]; cbn. {
+...
+  destruct p; [ easy | ].
+  rewrite Nat_sub_succ_1.
+  destruct p; [ easy | ].
+...
+Definition butn_fold_left : ∀ A B (f : list A → B → list A) l ll i,
+  butn i (fold_left f l ll) =
+  fold_left (λ la a, f la a) l (butn i ll).
+Proof.
+...
+rewrite butn_fold_left.
+...
+destruct M as (ll); cbn.
+...
 Search (butn _ (fold_left _ _ _)).
+Definition butn_fold_left : ∀ A B (f : list A → B → list A) l ll i,
+  butn i (fold_left f l ll) = fold_left f l (butn i ll).
+Proof.
+intros.
+induction l as [| a]; [ easy | cbn ].
+...
 Definition butn_fold_left : ∀ A B (f : list A → B → list A) l ll i,
   butn i (fold_left f l ll) =
   fold_left (λ la a, f la a) l (butn i ll).
