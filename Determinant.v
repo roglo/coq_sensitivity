@@ -2867,6 +2867,50 @@ Proof.
 intros.
 destruct M as (ll); cbn.
 unfold subm; f_equal; cbn - [ list_list_swap_rows butn ].
+Search (map (butn _)).
+Search (map _ (butn _ _)).
+unfold list_list_swap_rows.
+rewrite map_seq_length.
+do 2 rewrite <- map_butn.
+do 2 rewrite map_map.
+do 2 rewrite map_butn_seq.
+unfold Nat.b2n.
+do 2 rewrite if_ltb_lt_dec.
+destruct (lt_dec (S i) (length ll)) as [Hsil| Hsil]. 2: {
+  apply Nat.nlt_ge in Hsil.
+  destruct (lt_dec (S (S i)) (length ll)) as [H| H]; [ flia Hsil H | clear H ].
+  do 2 rewrite Nat.add_0_l.
+  rewrite Nat.sub_0_r.
+  apply map_ext_in.
+  intros k Hk; apply in_seq in Hk.
+  destruct (lt_dec k (S i)) as [Hksi| Hksi]; [ | flia Hsil Hk Hksi ].
+  destruct (lt_dec k (S (S i))) as [H| H]; [ clear H | flia Hksi H ].
+  unfold transposition.
+  do 4 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec k (i + 1)) as [H| H]; [ flia Hksi H | clear H ].
+  destruct (Nat.eq_dec k (i + 2)) as [H| H]; [ flia Hksi H | clear H ].
+  destruct (Nat.eq_dec k i) as [Hki| Hki]. {
+    subst k.
+    replace i with (length ll - 1) by flia Hsil Hk.
+    rewrite Nat.sub_add; [ | flia Hk ].
+    symmetry.
+    rewrite nth_overflow; [ symmetry | easy ].
+    rewrite butn_nil.
+    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hk ].
+    rewrite seq_nth; [ | flia Hk ].
+    rewrite Nat.add_0_l.
+    rewrite Nat.eqb_refl.
+    rewrite nth_overflow; [ | easy ].
+    apply butn_nil.
+  } {
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ | easy ].
+    rewrite Nat.add_0_l.
+    do 2 rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec k i) as [H| H]; [ easy | clear H ].
+    destruct (Nat.eq_dec k (i + 1)) as [H| H]; [ flia Hksi H | easy ].
+  }
+}
 ...
 
 Theorem subm_mat_swap_rows_succ_succ : ∀ n (M : matrix n n T) i j,
