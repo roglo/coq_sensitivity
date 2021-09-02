@@ -1939,6 +1939,9 @@ rewrite List_skipn_skipn.
 f_equal; flia Hji.
 Qed.
 
+Theorem butn_0 : ∀ A (l : list A), butn 0 l = tl l.
+Proof. now intros; destruct l. Qed.
+
 (* end butn *)
 
 (* replace in a list *)

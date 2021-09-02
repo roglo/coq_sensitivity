@@ -2906,6 +2906,19 @@ destruct (lt_dec k (S i)) as [Hksi| Hksi]. {
 }
 Qed.
 
+Theorem subm_mat_swap_rows_circ : ∀ (M : matrix T) p q,
+  subm (mat_swap_rows 0 p M) 0 q =
+  subm (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 (p - 1)) M) p q.
+Proof.
+intros.
+unfold subm; f_equal.
+destruct M as (ll).
+cbn - [ butn ].
+rewrite map_butn, map_map.
+rewrite map_butn.
+...
+rewrite butn_0.
+rewrite List_map_tl.
 ...
 
 Theorem subm_mat_swap_rows_circ : ∀ n (M : matrix n n T) p q,
