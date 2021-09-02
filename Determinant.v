@@ -2861,11 +2861,12 @@ rewrite mat_nrows_fold_left_swap; flia Hi.
 Qed.
 
 Theorem subm_mat_swap_rows_succ_succ : ∀ (M : matrix T) i j,
-  subm (mat_swap_rows (i + 1) (i + 2) (mat_swap_rows i (i + 1) M)) (S i) j =
-  subm (mat_swap_rows i (i + 1) M) (S (S i)) j.
+  i + 2 < mat_nrows M
+  → subm (mat_swap_rows (i + 1) (i + 2) (mat_swap_rows i (i + 1) M)) (S i) j =
+    subm (mat_swap_rows i (i + 1) M) (S (S i)) j.
 Proof.
-intros.
-destruct M as (ll); cbn.
+intros * Hi2.
+destruct M as (ll); cbn in Hi2 |-*.
 unfold subm; f_equal; cbn - [ list_list_swap_rows butn ].
 Search (map (butn _)).
 Search (map _ (butn _ _)).
@@ -2877,6 +2878,8 @@ do 2 rewrite map_butn_seq.
 unfold Nat.b2n.
 do 2 rewrite if_ltb_lt_dec.
 destruct (lt_dec (S i) (length ll)) as [Hsil| Hsil]. 2: {
+flia Hi2 Hsil.
+...
   apply Nat.nlt_ge in Hsil.
   destruct (lt_dec (S (S i)) (length ll)) as [H| H]; [ flia Hsil H | clear H ].
   do 2 rewrite Nat.add_0_l.
@@ -2911,6 +2914,14 @@ destruct (lt_dec (S i) (length ll)) as [Hsil| Hsil]. 2: {
     destruct (Nat.eq_dec k (i + 1)) as [H| H]; [ flia Hksi H | easy ].
   }
 }
+rewrite Nat.add_0_l.
+destruct (lt_dec (S (S i)) (length ll)) as [Hssil| Hssil]. 2: {
+  replace i with (length ll - 2) by flia Hsil Hssil.
+  rewrite Nat.add_0_l, Nat.sub_0_r.
+  rewrite Nat.sub_add; [ | flia Hsil ].
+  rewrite <- Nat.sub_succ_l; [ | flia Hsil ].
+  rewrite Nat.sub_succ.
+apply Nat.nlt_ge in Hssil.
 ...
 
 Theorem subm_mat_swap_rows_succ_succ : ∀ n (M : matrix n n T) i j,
