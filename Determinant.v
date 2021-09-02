@@ -2916,7 +2916,7 @@ rewrite butn_0.
 rewrite mat_list_list_fold_left.
 unfold mat_swap_rows; cbn.
 Theorem glop : ∀ A B C la lb (f : list A → B → C → A) g,
-  fold_left (λ la' b, map (f la' b) (g la')) lb la = [].
+  fold_left (λ la' b', map (f la' b') (g la' b')) lb la = [].
 Proof.
 intros.
 ...
