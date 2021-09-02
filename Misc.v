@@ -2116,6 +2116,33 @@ subst la.
 apply rev_involutive.
 Qed.
 
+Theorem List_map_seq_length : ∀ A (f : _ → A) a len,
+  length (map f (seq a len)) = len.
+Proof.
+intros.
+now rewrite map_length, seq_length.
+Qed.
+
+Theorem List_map_map_seq : ∀ A B (f : A → B) d la,
+  map f la = map (λ i, f (nth i la d)) (seq 0 (length la)).
+Proof.
+intros.
+induction la as [| a]; [ easy | cbn ].
+f_equal.
+rewrite <- seq_shift.
+now rewrite map_map.
+Qed.
+
+Theorem List_eq_map_seq : ∀ A (la : list A) d,
+  la = map (λ i, nth i la d) (seq 0 (length la)).
+Proof.
+intros.
+induction la as [| a]; [ easy | ].
+cbn; f_equal.
+rewrite <- seq_shift.
+now rewrite map_map.
+Qed.
+
 Theorem List_rev_inj : ∀ A (la lb : list A), rev la = rev lb → la = lb.
 Proof.
 intros A * Hll.
@@ -2203,6 +2230,23 @@ induction l as [| a la]; intros. {
 destruct j; [ now rewrite Nat.add_0_r | ].
 rewrite Nat.add_succ_r; cbn.
 apply IHla.
+Qed.
+
+Theorem List_nth_map_seq : ∀ A i sta len d (f : _ → A),
+  i < len
+  → nth i (map f (seq sta len)) d = f (sta + i).
+Proof.
+intros * Hi.
+revert i Hi.
+induction len; intros; [ easy | ].
+rewrite seq_S, map_app; cbn.
+destruct (Nat.eq_dec i len) as [Hil| Hil]. {
+  subst i.
+  rewrite app_nth2; [ | rewrite List_map_seq_length; flia Hi ].
+  now rewrite List_map_seq_length, Nat.sub_diag.
+}
+rewrite app_nth1; [ | rewrite List_map_seq_length; flia Hi Hil ].
+apply IHlen; flia Hi Hil.
 Qed.
 
 Theorem List_app_cons : ∀ A (l1 l2 : list A) a,
@@ -2313,26 +2357,6 @@ f_equal; [ apply (Hll a1 0) | ].
 apply IHl1; [ easy | ].
 intros.
 now specialize (Hll d (S i)).
-Qed.
-
-Theorem List_map_map_seq : ∀ A B (f : A → B) d la,
-  map f la = map (λ i, f (nth i la d)) (seq 0 (length la)).
-Proof.
-intros.
-induction la as [| a]; [ easy | cbn ].
-f_equal.
-rewrite <- seq_shift.
-now rewrite map_map.
-Qed.
-
-Theorem List_eq_map_seq : ∀ A (la : list A) d,
-  la = map (λ i, nth i la d) (seq 0 (length la)).
-Proof.
-intros.
-induction la as [| a]; [ easy | ].
-cbn; f_equal.
-rewrite <- seq_shift.
-now rewrite map_map.
 Qed.
 
 (* common for summations and products *)

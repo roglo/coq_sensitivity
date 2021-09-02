@@ -583,11 +583,11 @@ rewrite det_is_det_by_canon_permut; try easy.
 rewrite determinant'_by_list; try easy.
 apply rngl_summation_permut; [ now symmetry | | ]. {
   unfold determinant'_list.
-  now rewrite map_seq_length.
+  now rewrite List_map_seq_length.
 } {
   apply Permutation_length in Hl.
   unfold determinant'_list in Hl.
-  now rewrite map_seq_length in Hl.
+  now rewrite List_map_seq_length in Hl.
 }
 Qed.
 
@@ -641,7 +641,7 @@ apply is_sm_mat_iff in Hsm.
 apply is_sm_mat_iff.
 destruct Hsm as (Hr & Hcr & Hc).
 cbn; unfold list_list_swap_rows.
-rewrite map_seq_length.
+rewrite List_map_seq_length.
 unfold mat_swap_rows, list_list_swap_rows; cbn.
 split; [ easy | ].
 split. {
@@ -878,10 +878,10 @@ erewrite rngl_summation_eq_compat. 2: {
       rewrite (List_map_nth' 0). 2: {
         rewrite seq_length.
         rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-        rewrite map_seq_length; flia Hi Hp.
+        rewrite List_map_seq_length; flia Hi Hp.
       }
       rewrite (List_map_nth' 0); cbn; [ | now rewrite seq_length ].
-      rewrite map_seq_length.
+      rewrite List_map_seq_length.
       rewrite (List_map_nth' 0). 2: {
         rewrite seq_length.
         rewrite seq_nth; [ | flia Hi Hp ].
@@ -907,11 +907,11 @@ erewrite rngl_summation_eq_compat. 2: {
     rewrite (List_map_nth' 0). 2: {
       rewrite seq_length.
       rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-      rewrite map_seq_length.
+      rewrite List_map_seq_length.
       now apply transposition_lt.
     }
     rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-    rewrite map_seq_length.
+    rewrite List_map_seq_length.
     rewrite seq_nth; [ | now apply transposition_lt ].
     rewrite Nat.add_0_l.
     rewrite transposition_involutive.
@@ -936,10 +936,10 @@ erewrite rngl_summation_eq_compat. 2: {
       rewrite (List_map_nth' 0). 2: {
         rewrite seq_length.
         rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-        now rewrite map_seq_length.
+        now rewrite List_map_seq_length.
       }
       rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-      rewrite map_seq_length.
+      rewrite List_map_seq_length.
       rewrite seq_nth; [ | easy ].
       rewrite seq_nth; [ cbn | easy ].
       rewrite (List_map_nth' 0). 2: {
@@ -953,10 +953,10 @@ erewrite rngl_summation_eq_compat. 2: {
     rewrite (List_map_nth' 0) in Hij. 2: {
       rewrite seq_length.
       rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-      now rewrite map_seq_length.
+      now rewrite List_map_seq_length.
     }
     rewrite (List_map_nth' 0) in Hij; [ cbn in Hij | now rewrite seq_length ].
-    rewrite map_seq_length in Hij.
+    rewrite List_map_seq_length in Hij.
     rewrite seq_nth in Hij; [ | easy ].
     rewrite seq_nth in Hij; [ | easy ].
     rewrite (List_map_nth' 0) in Hij. 2: {
@@ -1027,7 +1027,7 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
     rewrite Nat.add_0_l.
     unfold vect_swap_elem; cbn.
     unfold vect_nat_el; cbn.
-    rewrite map_seq_length.
+    rewrite List_map_seq_length.
     eapply is_permut_eq_compat. {
       intros i Hi; symmetry.
       rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
@@ -1054,7 +1054,7 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
   }
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
   unfold vect_swap_elem; cbn.
-  do 2 rewrite map_seq_length.
+  do 2 rewrite List_map_seq_length.
   unfold vect_nat_el; cbn.
   erewrite rank_of_permut_in_sym_gr_eq_compat. 2: {
     intros i Hi.
@@ -1131,8 +1131,8 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
     unfold vect_nat_el; cbn.
     erewrite rank_of_permut_in_sym_gr_eq_compat. 2: {
       intros u Hu.
-      rewrite (List_map_nth' 0); [ | now rewrite map_seq_length, seq_length ].
-      rewrite map_seq_length.
+      rewrite (List_map_nth' 0); [ | now rewrite List_map_seq_length, seq_length ].
+      rewrite List_map_seq_length.
       rewrite seq_nth; [ cbn | easy ].
       rewrite (List_map_nth' 0). 2: {
         rewrite seq_length.
@@ -1152,8 +1152,8 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
     cbn in Hij.
     erewrite rank_of_permut_in_sym_gr_eq_compat in Hij. 2: {
       intros u Hu.
-      rewrite (List_map_nth' 0); [ | now rewrite map_seq_length, seq_length ].
-      rewrite map_seq_length.
+      rewrite (List_map_nth' 0); [ | now rewrite List_map_seq_length, seq_length ].
+      rewrite List_map_seq_length.
       rewrite seq_nth; [ cbn | easy ].
       rewrite (List_map_nth' 0). 2: {
         rewrite seq_length.
@@ -1165,8 +1165,8 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
     symmetry in Hij.
     erewrite rank_of_permut_in_sym_gr_eq_compat in Hij. 2: {
       intros u Hu.
-      rewrite (List_map_nth' 0); [ | now rewrite map_seq_length, seq_length ].
-      rewrite map_seq_length.
+      rewrite (List_map_nth' 0); [ | now rewrite List_map_seq_length, seq_length ].
+      rewrite List_map_seq_length.
       rewrite seq_nth; [ cbn | easy ].
       rewrite (List_map_nth' 0). 2: {
         rewrite seq_length.
@@ -1214,10 +1214,10 @@ erewrite rngl_summation_list_eq_compat. 2: {
       rewrite (List_map_nth' 0). 2: {
         rewrite seq_length.
         rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-        now rewrite map_seq_length.
+        now rewrite List_map_seq_length.
       }
       rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-      rewrite seq_nth; [ | now rewrite map_seq_length ].
+      rewrite seq_nth; [ | now rewrite List_map_seq_length ].
       rewrite seq_nth; [ cbn | easy ].
       rewrite (List_map_nth' 0). 2: {
         rewrite seq_length.
@@ -1248,10 +1248,10 @@ erewrite rngl_summation_list_eq_compat. 2: {
     rewrite (List_map_nth' 0). 2: {
       rewrite seq_length.
       rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-      now rewrite map_seq_length.
+      now rewrite List_map_seq_length.
     }
     rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-    rewrite map_seq_length.
+    rewrite List_map_seq_length.
     rewrite seq_nth; [ | easy ].
     rewrite seq_nth; [ | easy ].
     rewrite (List_map_nth' 0). 2: {
@@ -1278,7 +1278,7 @@ f_equal. {
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
   rewrite seq_nth; [ cbn | easy ].
   unfold vect_swap_elem; cbn.
-  rewrite map_seq_length.
+  rewrite List_map_seq_length.
   f_equal; f_equal.
   apply map_ext_in.
   intros i Hi.
@@ -1305,7 +1305,7 @@ assert
            p q)) < n!). {
   unfold vect_nat_el.
   apply rank_of_permut_upper_bound; cbn.
-  rewrite map_seq_length.
+  rewrite List_map_seq_length.
   eapply is_permut_eq_compat. {
     intros j Hj; symmetry.
     rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
@@ -1329,7 +1329,7 @@ rewrite (List_map_nth' 0). 2: {
     apply Hrg.
   }
   cbn.
-  now rewrite map_seq_length.
+  now rewrite List_map_seq_length.
 }
 rewrite seq_nth. 2: {
   cbn.
@@ -1339,7 +1339,7 @@ rewrite seq_nth. 2: {
     now rewrite seq_nth.
   }
   cbn.
-  now rewrite map_seq_length.
+  now rewrite List_map_seq_length.
 }
 cbn.
 rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
@@ -1357,8 +1357,8 @@ rewrite permut_in_sym_gr_of_its_rank; cycle 1. {
   unfold vect_nat_el.
   eapply is_permut_eq_compat. {
     intros j Hj; symmetry; cbn.
-    rewrite (List_map_nth' 0); [ | now rewrite map_seq_length, seq_length ].
-    rewrite seq_nth; [ | now rewrite map_seq_length ].
+    rewrite (List_map_nth' 0); [ | now rewrite List_map_seq_length, seq_length ].
+    rewrite seq_nth; [ | now rewrite List_map_seq_length ].
     rewrite (List_map_nth' 0). 2: {
       rewrite seq_length.
       now apply transposition_lt.
@@ -1371,7 +1371,7 @@ rewrite permut_in_sym_gr_of_its_rank; cycle 1. {
   now apply transposition_lt.
 }
 cbn.
-rewrite map_seq_length.
+rewrite List_map_seq_length.
 rewrite (List_map_nth' 0). 2: {
   rewrite seq_length.
   now apply transposition_lt.
@@ -2731,7 +2731,7 @@ induction q; [ easy | ].
 rewrite seq_S.
 rewrite fold_left_app; cbn.
 unfold list_list_swap_rows.
-rewrite map_seq_length.
+rewrite List_map_seq_length.
 rewrite fold_mat_nrows.
 apply IHq.
 Qed.
@@ -2745,7 +2745,7 @@ induction q; [ easy | ].
 rewrite seq_S.
 rewrite fold_left_app; cbn.
 unfold list_list_swap_rows.
-rewrite map_seq_length.
+rewrite List_map_seq_length.
 rewrite fold_mat_nrows.
 apply IHq.
 Qed.
@@ -2869,7 +2869,7 @@ intros * Hi2.
 destruct M as (ll); cbn in Hi2 |-*.
 unfold subm; f_equal; cbn - [ list_list_swap_rows butn ].
 unfold list_list_swap_rows.
-rewrite map_seq_length.
+rewrite List_map_seq_length.
 do 2 rewrite <- map_butn.
 do 2 rewrite map_map.
 do 2 rewrite map_butn_seq.
@@ -2889,8 +2889,11 @@ destruct (lt_dec k (S i)) as [Hksi| Hksi]. {
   flia Hi2 Hk Hksi Hkssi.
 } {
   apply Nat.nlt_ge in Hksi.
+  rewrite (@transposition_out i (i + 1) (k + 1)); [ | flia Hksi | flia Hksi ].
 ...
-  rewrite (@transposition_out (i + 1)); [ | flia Hksi | ].
+  rewrite List_nth_map_seq. 2: {
+    apply transposition_lt; [ flia Hi2 | easy | flia Hk ].
+  }
 ...
 
 Theorem subm_mat_swap_rows_succ_succ : ∀ n (M : matrix n n T) i j,
@@ -4100,10 +4103,10 @@ rewrite det_is_det_by_canon_permut; try easy.
 rewrite determinant'_by_list; try easy.
 apply rngl_summation_permut; cycle 1. {
   unfold determinant'_list.
-  now rewrite map_seq_length.
+  now rewrite List_map_seq_length.
 } {
   unfold determinant'_list.
-  now rewrite map_seq_length.
+  now rewrite List_map_seq_length.
 }
 unfold determinant'_list.
 cbn.
