@@ -2949,6 +2949,39 @@ erewrite map_ext_in. 2: {
 }
 rewrite List_map_nth_seq_skipn_firstn; [ | flia Hp ].
 rewrite List_skipn_1.
+symmetry.
+destruct (Nat.eq_dec p 0) as [Hpz| Hpz]. {
+  subst p.
+  cbn.
+  destruct ll as [| a]; [ easy | ].
+  cbn.
+  f_equal.
+  rewrite Nat.sub_0_r.
+  destruct ll as [| b]; [ cbn in Hp; flia Hp | clear Hp ].
+  cbn.
+  rewrite Nat.sub_0_r.
+  do 2 rewrite <- seq_shift.
+  do 2 rewrite map_map.
+  erewrite map_ext_in. 2: {
+    intros i Hi; apply in_seq in Hi.
+    now rewrite transposition_out.
+  }
+  apply List_map_nth_seq.
+}
+rewrite List_seq_cut with (i := p - 1). 2: {
+  apply in_seq; flia Hpz.
+}
+rewrite Nat.sub_0_r.
+rewrite Nat.add_0_l.
+replace (p - (S (p - 1))) with 0 by flia Hpz.
+cbn - [ butn ].
+rewrite fold_left_app.
+cbn - [ butn ].
+rewrite Nat.sub_add; [ | flia Hpz ].
+...
+List_map_nth_seq: ∀ (A : Type) (la : list A) (d : A), la = map (λ i : nat, nth i la d) (seq 0 (length la))
+List_nth_map_seq:
+  ∀ (A : Type) (i sta len : nat) (d : A) (f : nat → A), i < len → nth i (map f (seq sta len)) d = f (sta + i)
 ...
 rewrite seq_S.
 rewrite map_app.
