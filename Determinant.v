@@ -3023,13 +3023,6 @@ cbn.
 ...
 rewrite List_map_nth_seq_firstn.
 ...
-Theorem List_map_nth_seq_firstn : ∀ (A : Type) (la : list A) (d : A) len,
-  map (λ i : nat, nth i la d) (seq 0 len) = firstn len la.
-Admitted.
-(* ah, chiasse de pute, c'est pas encore assez général *)
-...
-rewrite List_map_nth_seq_firstn.
-...
 rewrite <- seq_shift.
 rewrite map_map.
 rewrite List_seq_cut with (i := p); [ | apply in_seq; flia Hp ].
