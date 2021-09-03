@@ -2907,10 +2907,12 @@ destruct (lt_dec k (S i)) as [Hksi| Hksi]. {
 Qed.
 
 Theorem subm_mat_swap_rows_circ : ∀ (M : matrix T) p q,
-  subm (mat_swap_rows 0 p M) 0 q =
-  subm (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 (p - 1)) M) p q.
+  p < mat_nrows M
+  → subm (mat_swap_rows 0 p M) 0 q =
+    subm (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 (p - 1)) M)
+      p q.
 Proof.
-intros.
+intros * Hp.
 unfold subm; f_equal; f_equal.
 rewrite butn_0.
 rewrite mat_list_list_fold_left.
@@ -2927,99 +2929,23 @@ destruct p. {
   apply List_map_nth_seq.
 }
 rewrite Nat_sub_succ_1.
-Search (butn (S _)).
-...
-  erewrite map_ext_in. 2: {
-    intros i Hi.
-    cbn.
-
-  revert la.
-  induction ll as [| lb]; intros; [ easy | ].
-  cbn - [ nth ].
-  f_equal.
-...
-induction ll as [| la]. {
-  symmetry; cbn.
-  destruct p; [ easy | ].
-  rewrite Nat_sub_succ_1.
-  apply butn_cons_nil.
-  clear q.
-  induction p; [ easy | ].
-  rewrite seq_S; cbn.
-  admit.
-}
-cbn - [ seq nth ].
-...
-  induction p; [ easy | cbn ].
+cbn in Hp.
+revert ll Hp.
+induction p; intros. {
+  cbn.
+  destruct ll as [| la]; [ easy | cbn ].
   rewrite <- seq_shift.
-...
-Search (fold_left _ _ (map _ _)).
-Theorem fold_left_map_r : ∀ A B C (f : list C → A → list C) (g : B → C) la lb,
-  fold_left f la (map g lb) = [].
-intros.
-  fold_left f la (map g lb) = fold_left (λ lb' a, f (map g lb') a) la lb.
-intros.
-...
-  induction p; [ easy | ].
-  rewrite Nat_sub_succ_1.
-...
-Theorem glop : ∀ A B C la lb (f : list A → B → C → A) g,
-  fold_left (λ la' b', map (f la' b') (g la' b')) lb la = [].
-Proof.
-intros.
-Theorem glop : ∀ A B C la lb (f : list A → B → C → A) g,
-  fold_left (λ la' b', map (f la' b') (g la' b')) lb la =
-  fold_left (λ la' b', (f la' b', g a' b')) lb la
-Proof.
-intros.
-...
-Admitted.
-rewrite glop.
-...
-Theorem butn_fold_left : ∀ A B (f : list A → B → list A) l ll i,
-  butn i (fold_left f l ll) =
-  fold_left (λ la a, f la a) l (butn i ll).
-Proof.
-intros.
-...
-destruct M as (ll); cbn.
-induction ll as [| la]; cbn. {
-...
-  destruct p; [ easy | ].
-  rewrite Nat_sub_succ_1.
-  destruct p; [ easy | ].
-...
-Definition butn_fold_left : ∀ A B (f : list A → B → list A) l ll i,
-  butn i (fold_left f l ll) =
-  fold_left (λ la a, f la a) l (butn i ll).
-Proof.
-...
-rewrite butn_fold_left.
-...
-destruct M as (ll); cbn.
-...
-Search (butn _ (fold_left _ _ _)).
-Definition butn_fold_left : ∀ A B (f : list A → B → list A) l ll i,
-  butn i (fold_left f l ll) = fold_left f l (butn i ll).
-Proof.
-intros.
-induction l as [| a]; [ easy | cbn ].
-...
-Definition butn_fold_left : ∀ A B (f : list A → B → list A) l ll i,
-  butn i (fold_left f l ll) =
-  fold_left (λ la a, f la a) l (butn i ll).
-Proof.
-intros.
-revert ll.
-induction l as [| a]; intros; [ easy | cbn ].
-rewrite IHl.
-(* oui, non, c'est pas ça... *)
-...
-rewrite butn_fold_left.
-...
-Search (map _ (fold_left _ _ _)).
-cbn.
-rewrite <- map_butn.
+  rewrite map_map; cbn.
+  destruct ll as [| lb]; [ cbn in Hp; flia Hp | clear Hp; cbn ].
+  f_equal.
+  rewrite <- seq_shift.
+  rewrite map_map; cbn.
+  symmetry.
+  apply List_map_nth_seq.
+}
+destruct ll as [| la]; cbn in Hp; [ flia Hp | ].
+apply Nat.succ_lt_mono in Hp.
+cbn - [ seq nth butn ].
 ...
 
 Theorem subm_mat_swap_rows_circ : ∀ n (M : matrix n n T) p q,
