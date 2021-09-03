@@ -1942,6 +1942,13 @@ Qed.
 Theorem butn_0 : ∀ A (l : list A), butn 0 l = tl l.
 Proof. now intros; destruct l. Qed.
 
+Theorem butn_cons_nil : ∀ A n (l : list A), l = [] → butn (S n) l = [].
+Proof.
+intros * Hl.
+destruct l as [| a]; [ easy | cbn ].
+now destruct l.
+Qed.
+
 (* end butn *)
 
 (* replace in a list *)
@@ -2136,7 +2143,7 @@ rewrite <- seq_shift.
 now rewrite map_map.
 Qed.
 
-Theorem List_eq_map_seq : ∀ A (la : list A) d,
+Theorem List_map_nth_seq : ∀ A (la : list A) d,
   la = map (λ i, nth i la d) (seq 0 (length la)).
 Proof.
 intros.

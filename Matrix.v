@@ -106,7 +106,7 @@ Theorem mat_eq_map_seq : ∀ T (M : matrix T),
   mk_mat (map (λ i, nth i (mat_list_list M) []) (seq 0 (mat_nrows M))).
 Proof.
 intros.
-rewrite <- List_eq_map_seq.
+rewrite <- List_map_nth_seq.
 now destruct M.
 Qed.
 
@@ -893,11 +893,11 @@ f_equal.
 unfold mat_ncols; cbn.
 remember (length (hd [] ll)) as ncols eqn:H; clear H.
 remember (map _ _) as x.
-rewrite List_eq_map_seq with (d := []); subst x.
+rewrite List_map_nth_seq with (d := []); subst x.
 apply map_ext_in.
 intros i Hi.
 remember (nth i ll []) as la eqn:Hla.
-rewrite List_eq_map_seq with (d := 0%F).
+rewrite List_map_nth_seq with (d := 0%F).
 rewrite (HM la). 2: {
   rewrite Hla.
   apply nth_In.
@@ -946,11 +946,11 @@ f_equal.
 unfold mat_ncols; cbn.
 remember (length (hd [] ll)) as ncols eqn:H; clear H.
 remember (map _ _) as x.
-rewrite List_eq_map_seq with (d := []); subst x.
+rewrite List_map_nth_seq with (d := []); subst x.
 apply map_ext_in.
 intros i Hi.
 remember (nth i ll []) as la eqn:Hla.
-rewrite List_eq_map_seq with (d := 0%F).
+rewrite List_map_nth_seq with (d := 0%F).
 rewrite (HM la). 2: {
   rewrite Hla.
   apply nth_In.
@@ -1799,7 +1799,7 @@ Proof.
 intros * Hm Hi Hj.
 unfold subm, subm'.
 f_equal.
-rewrite (List_eq_map_seq (mat_list_list M) []) at 1.
+rewrite (List_map_nth_seq (mat_list_list M) []) at 1.
 rewrite fold_mat_nrows.
 rewrite <- map_butn, map_map.
 rewrite map_butn_seq.
@@ -1810,7 +1810,7 @@ apply map_ext_in.
 intros u Hu.
 apply in_seq in Hu; cbn.
 destruct (lt_dec u i) as [Hui| Hui]. {
-  rewrite (List_eq_map_seq _ 0%F).
+  rewrite (List_map_nth_seq _ 0%F).
   rewrite butn_length.
   unfold Nat.b2n at 1; rewrite if_ltb_lt_dec.
   rewrite fold_corr_mat_ncols; [ | easy | flia Hu ].
@@ -1833,7 +1833,7 @@ destruct (lt_dec u i) as [Hui| Hui]. {
   unfold Nat.b2n.
   rewrite if_leb_le_dec.
   destruct (le_dec i u) as [H| H]; [ clear H | flia Hui H ].
-  rewrite (List_eq_map_seq _ 0%F).
+  rewrite (List_map_nth_seq _ 0%F).
   rewrite butn_length.
   unfold Nat.b2n; rewrite if_ltb_lt_dec.
   rewrite fold_corr_mat_ncols; [ | easy | flia Hu ].
@@ -3668,7 +3668,7 @@ unfold "•"%V, vect_zero; cbn; f_equal.
 unfold vect_dot_mul; cbn.
 rewrite (List_repeat_as_map _ (mat_nrows _)).
 destruct M as (lla); cbn.
-rewrite (List_eq_map_seq lla) with (d := []) at 1.
+rewrite (List_map_nth_seq lla) with (d := []) at 1.
 rewrite map_map.
 apply map_ext_in.
 intros i Hi.
