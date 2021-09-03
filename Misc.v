@@ -1213,6 +1213,38 @@ apply List_map_nth'.
 destruct l; [ easy | apply Nat.lt_0_succ ].
 Qed.
 
+Theorem List_map_nth_seq_skipn_firstn : ∀ (A : Type) (la : list A) d sta len,
+  sta + len ≤ length la
+  → map (λ i, nth i la d) (seq sta len) = firstn len (skipn sta la).
+Proof.
+intros * Hls.
+revert sta Hls.
+induction la as [| a]; intros. {
+  apply Nat.le_0_r in Hls.
+  apply Nat.eq_add_0 in Hls.
+  now destruct Hls; subst sta len.
+}
+destruct sta. {
+  rewrite skipn_O.
+  remember (a :: la) as lb.
+  clear a la IHla Heqlb.
+  cbn in Hls.
+  revert lb Hls.
+  induction len; intros; [ easy | cbn ].
+  destruct lb as [| b]; [ cbn in Hls; flia Hls | ].
+  cbn - [ nth ]; f_equal.
+  rewrite <- seq_shift.
+  rewrite map_map; cbn.
+  apply Nat.succ_le_mono in Hls.
+  now apply IHlen.
+}
+rewrite <- seq_shift.
+rewrite map_map; cbn.
+cbn in Hls.
+apply Nat.succ_le_mono in Hls.
+now apply IHla.
+Qed.
+
 Theorem List_seq_eq_nil : ∀ b len, seq b len = [] → len = 0.
 Proof.
 intros * Hb.

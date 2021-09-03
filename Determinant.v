@@ -2947,20 +2947,8 @@ erewrite map_ext_in. 2: {
   destruct (Nat.eq_dec i (S p)) as [H| H]; [ flia Hi H | clear H ].
   easy.
 }
-Theorem List_map_nth_seq_skipn_firstn : ∀ (A : Type) (la : list A) d sta len,
-  sta + len ≤ length la
-  → map (λ i, nth i la d) (seq sta len) = firstn len (skipn sta la).
-Proof.
-intros * Hls.
-revert sta la Hls.
-induction len; intros. {
-  rewrite Nat.add_0_r in Hls.
-  now rewrite firstn_O.
-}
-rewrite <- Nat.add_succ_comm in Hls.
-destruct la as [| a]; [ easy | ].
-cbn in Hls.
-apply Nat.succ_le_mono in Hls.
+rewrite List_map_nth_seq_skipn_firstn; [ | flia Hp ].
+rewrite List_skipn_1.
 ...
 rewrite seq_S.
 rewrite map_app.
