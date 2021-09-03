@@ -2948,22 +2948,29 @@ erewrite map_ext_in. 2: {
   easy.
 }
 Theorem List_map_nth_seq_skipn_firstn : ∀ (A : Type) (la : list A) d sta len,
-  sta + len < length la
-  → map (λ i, nth i la d) (seq sta len) = skipn sta (firstn len la).
+  sta + len ≤ length la
+  → map (λ i, nth i la d) (seq sta len) = firstn len (skipn sta la).
 Proof.
 intros * Hls.
 revert sta la Hls.
 induction len; intros. {
   rewrite Nat.add_0_r in Hls.
-  symmetry; apply skipn_all2.
-  rewrite firstn_length; flia.
+  now rewrite firstn_O.
 }
 rewrite <- Nat.add_succ_comm in Hls.
+destruct la as [| a]; [ easy | ].
+cbn in Hls.
+apply Nat.succ_le_mono in Hls.
+...
 rewrite seq_S.
 rewrite map_app.
+rewrite IHlen; [ | ].
+rewrite IHlen; [ | ].
+rewrite IHlen; [ | flia Hls ].
 rewrite IHlen; [ | flia Hls ].
 cbn - [ firstn ].
-(* ah, merde, bordel *)
+Search (firstn (_ + _)).
+Search (skipn _ (firstn _ _)).
 ...
 rewrite IHlen; [ | easy ].
 destruct la as [| a]; [ easy | cbn ].
