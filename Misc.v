@@ -199,6 +199,20 @@ unfold iter_seq.
 now replace (S (b + len - 1) - b) with len by flia Hblen.
 Qed.
 
+(*
+Theorem seq_split3 : ∀ n sta len,
+  n < len
+  → seq sta len = seq sta n ++ [sta + n] ++ seq (sta + S n) (len - S n).
+Proof.
+intros * Hn.
+replace len with (n + (1 + (len - S n))) by flia Hn.
+rewrite seq_app; f_equal.
+rewrite seq_app; cbn; f_equal.
+rewrite <- Nat.add_assoc, Nat.add_1_r; f_equal.
+flia Hn.
+Qed.
+*)
+
 Theorem List_seq_cut : ∀ i sta len,
   i ∈ seq sta len
   → seq sta len = seq sta (i - sta) ++ [i] ++ seq (S i) (sta + len - S i).
@@ -2262,6 +2276,10 @@ Qed.
 Theorem List_app_cons : ∀ A (l1 l2 : list A) a,
   l1 ++ a :: l2 = l1 ++ [a] ++ l2.
 Proof. easy. Qed.
+
+Theorem List_app_tl : ∀ A (la lb : list A),
+  la ≠ [] → tl (la ++ lb) = tl la ++ lb.
+Proof. now intros * Hla; destruct la. Qed.
 
 Theorem List_app_eq_app' :
   ∀ (X : Type) (x1 x2 y1 y2 : list X),

@@ -2930,6 +2930,52 @@ destruct p. {
 }
 rewrite Nat_sub_succ_1.
 cbn in Hp.
+replace (length ll) with (1 + (length ll - 1)) by flia Hp.
+rewrite seq_app.
+cbn - [ nth butn ].
+(**)
+rewrite List_seq_cut with (i := S p); [ | apply in_seq; flia Hp ].
+rewrite Nat_sub_succ_1.
+do 2 rewrite map_app.
+cbn - [ nth butn ].
+rewrite Nat.eqb_refl.
+erewrite map_ext_in. 2: {
+  intros i Hi; apply in_seq in Hi.
+  unfold transposition.
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i 0) as [H| H]; [ flia Hi H | clear H ].
+  destruct (Nat.eq_dec i (S p)) as [H| H]; [ flia Hi H | clear H ].
+  easy.
+}
+Theorem List_map_nth_seq_firstn : ∀ (A : Type) (la : list A) (d : A) len,
+  map (λ i : nat, nth i la d) (seq 0 len) = firstn len la.
+Admitted.
+(* ah, chiasse de pute, c'est pas encore assez général *)
+...
+rewrite List_map_nth_seq_firstn.
+...
+rewrite <- seq_shift.
+rewrite map_map.
+rewrite List_seq_cut with (i := p); [ | apply in_seq; flia Hp ].
+do 2 rewrite map_app.
+cbn - [ nth butn ].
+rewrite Nat.eqb_refl.
+rewrite Nat.sub_0_r.
+erewrite map_ext_in. 2: {
+  intros i Hi; apply in_seq in Hi.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i p) as [H| H]; [ flia H Hi | easy ].
+}
+Search (map (λ _, nth _ _ _) (seq _ _)).
+
+rewrite List_map_nth_seq_firstn.
+...
+rewrite (@seq_split3 (S p)).
+...
+replace (length ll - 1) with (S p + (length ll - S (S p))) by flia Hp.
+rewrite seq_app.
+cbn - [ nth butn seq ].
+...
 revert ll Hp.
 induction p; intros. {
   cbn.
@@ -2946,6 +2992,16 @@ induction p; intros. {
 destruct ll as [| la]; cbn in Hp; [ flia Hp | ].
 apply Nat.succ_lt_mono in Hp.
 cbn - [ seq nth butn ].
+rewrite seq_S.
+rewrite map_app.
+cbn - [ seq nth butn ].
+rewrite List_app_tl. 2: {
+  intros H.
+  apply map_eq_nil in H.
+  apply List_seq_eq_nil in H.
+  now rewrite H in Hp.
+}
+rewrite IHp.
 ...
 
 Theorem subm_mat_swap_rows_circ : ∀ n (M : matrix n n T) p q,
