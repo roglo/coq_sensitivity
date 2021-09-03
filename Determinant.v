@@ -2968,6 +2968,13 @@ destruct (Nat.eq_dec p 0) as [Hpz| Hpz]. {
   }
   apply List_map_nth_seq.
 }
+...
+(**)
+rewrite List_seq_cut with (i := 0). 2: {
+  apply in_seq; flia Hpz.
+}
+cbn - [ butn ].
+...
 rewrite List_seq_cut with (i := p - 1). 2: {
   apply in_seq; flia Hpz.
 }
