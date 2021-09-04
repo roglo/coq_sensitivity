@@ -2968,6 +2968,40 @@ destruct (Nat.eq_dec p 0) as [Hpz| Hpz]. {
   }
   apply List_map_nth_seq.
 }
+destruct p; [ easy | clear Hpz ].
+destruct p. {
+  destruct ll; [ easy | ].
+  destruct ll; [ cbn in Hp; flia Hp | ].
+  destruct ll; [ cbn in Hp; flia Hp | cbn ].
+  rewrite Nat.sub_0_r.
+  f_equal; f_equal.
+  apply map_ext_in.
+  intros i Hi; apply in_seq in Hi.
+  rewrite transposition_out; [ | flia Hi | flia Hi ].
+  rewrite transposition_out; [ | flia Hi | flia Hi ].
+  easy.
+}
+destruct p. {
+  destruct ll; [ easy | ].
+  destruct ll; [ cbn in Hp; flia Hp | ].
+  destruct ll; [ cbn in Hp; flia Hp | ].
+  destruct ll; [ cbn in Hp; flia Hp | cbn ].
+  rewrite Nat.sub_0_r.
+  f_equal; f_equal; f_equal.
+  rewrite map_length, seq_length.
+  apply map_ext_in.
+  intros i Hi; apply in_seq in Hi.
+  rewrite transposition_out; [ | flia Hi | flia Hi ].
+  rewrite transposition_out; [ | flia Hi | flia Hi ].
+  cbn in Hp.
+  destruct i; [ easy | ].
+  destruct i; [ flia Hi | ].
+  destruct i; [ flia Hi | ].
+  destruct i; [ flia Hi | ].
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
+  rewrite seq_nth; [ | flia Hi ].
+  now rewrite transposition_out.
+}
 ...
 (**)
 rewrite List_seq_cut with (i := 0). 2: {
