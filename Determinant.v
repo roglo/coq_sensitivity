@@ -2913,6 +2913,28 @@ Theorem subm_mat_swap_rows_circ : ∀ (M : matrix T) p q,
       p q.
 Proof.
 intros * Hp.
+destruct M as (ll).
+cbn in Hp.
+unfold subm; f_equal.
+revert ll Hp.
+induction p; intros. {
+  destruct ll as [| a]; [ easy | cbn ].
+  destruct ll as [| b]; [ easy | ].
+  f_equal; clear q; cbn.
+  f_equal; cbn.
+...
+  rewrite Nat.sub_0_r.
+  do 2 rewrite <- seq_shift.
+  do 2 rewrite map_map.
+  erewrite map_ext_in. 2: {
+    intros i Hi; apply in_seq in Hi.
+    now rewrite transposition_out.
+  }
+  apply List_map_nth_seq.
+}
+...
+(*
+intros * Hp.
 unfold subm; f_equal; f_equal.
 rewrite butn_0.
 rewrite mat_list_list_fold_left.
@@ -2950,13 +2972,13 @@ erewrite map_ext_in. 2: {
 rewrite List_map_nth_seq_skipn_firstn; [ | flia Hp ].
 rewrite List_skipn_1.
 symmetry.
+replace (length ll - 1 - S p) with (length ll - S (S p)) by flia.
 destruct (Nat.eq_dec p 0) as [Hpz| Hpz]. {
   subst p.
   cbn.
   destruct ll as [| a]; [ easy | ].
   cbn.
   f_equal.
-  rewrite Nat.sub_0_r.
   destruct ll as [| b]; [ cbn in Hp; flia Hp | clear Hp ].
   cbn.
   rewrite Nat.sub_0_r.
@@ -2969,6 +2991,7 @@ destruct (Nat.eq_dec p 0) as [Hpz| Hpz]. {
   apply List_map_nth_seq.
 }
 destruct p; [ easy | clear Hpz ].
+...
 destruct p. {
   destruct ll; [ easy | ].
   destruct ll; [ cbn in Hp; flia Hp | ].
