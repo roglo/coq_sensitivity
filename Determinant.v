@@ -2919,6 +2919,15 @@ unfold subm; f_equal; f_equal; clear q.
 rewrite butn_0.
 unfold mat_swap_rows at 1; cbn.
 rewrite List_map_tl.
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  unfold transposition.
+  replace (length ll) with (S (length ll - 1)) in Hi by flia Hp.
+  cbn in Hi; apply in_seq in Hi.
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i 0) as [H| H]; [ flia Hi H | clear H ].
+  easy.
+}
 revert ll Hp.
 induction p; intros. {
   destruct ll as [| la]; [ easy | cbn ].
@@ -2928,7 +2937,8 @@ induction p; intros. {
   do 2 rewrite map_map.
   erewrite map_ext_in. 2: {
     intros i Hi; apply in_seq in Hi.
-    now rewrite transposition_out.
+    destruct (Nat.eq_dec (S (S i)) 0) as [H| H]; [ flia H | clear H ].
+    easy.
   }
   symmetry.
   apply List_map_nth_seq.
@@ -2942,8 +2952,7 @@ cbn - [ map  nth ].
 rewrite <- seq_shift, map_map.
 apply Nat.succ_lt_mono in Hp.
 specialize (IHp _ Hp) as H1.
-apply Nat.succ_lt_mono in Hp.
-cbn - [ nth ].
+cbn - [ nth Nat.eq_dec ].
 subst lbl.
 (* bordel de pute *)
 ...
