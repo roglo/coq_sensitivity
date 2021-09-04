@@ -2914,14 +2914,16 @@ Theorem subm_mat_swap_rows_circ : ∀ (M : matrix T) p q,
 Proof.
 intros * Hp.
 destruct M as (ll).
-cbn in Hp.
-unfold subm; f_equal.
+cbn in Hp |-*.
+unfold subm; f_equal; f_equal; clear q.
+rewrite butn_0.
+unfold mat_swap_rows at 1; cbn.
+rewrite List_map_tl.
 revert ll Hp.
 induction p; intros. {
-  destruct ll as [| a]; [ easy | cbn ].
-  destruct ll as [| b]; [ easy | ].
-  f_equal; clear q; cbn.
-  f_equal; cbn.
+  destruct ll as [| la]; [ easy | cbn ].
+  destruct ll as [| lb]; [ easy | ].
+  cbn; f_equal.
   do 2 rewrite <- seq_shift.
   do 2 rewrite map_map.
   erewrite map_ext_in. 2: {
@@ -2931,6 +2933,35 @@ induction p; intros. {
   symmetry.
   apply List_map_nth_seq.
 }
+cbn - [ butn ].
+rewrite Nat.sub_0_r.
+destruct ll as [| la]; [ easy | ].
+destruct ll as [| lb]; [ cbn in Hp; flia Hp | ].
+remember (lb :: ll) as lbl; cbn in Hp.
+cbn - [ map  nth ].
+rewrite <- seq_shift, map_map.
+apply Nat.succ_lt_mono in Hp.
+specialize (IHp _ Hp) as H1.
+apply Nat.succ_lt_mono in Hp.
+cbn - [ nth ].
+subst lbl.
+(* bordel de pute *)
+...
+rewrite <- seq_shift.
+rewrite map_map.
+cbn - [ nth transposition ].
+
+...
+specialize (IHp ll Hp) as H1.
+assert
+  (H :
+   map (λ x : nat, nth (transposition 0 (S p) (S x)) (la :: ll) [])
+    (seq 0 (length ll)) =
+...
+erewrite map_ext_in. 2: {
+  intros i Hi; apply in_seq in Hi.
+...
+Search (nth _ (_ :: _)).
 ...
 (*
 intros * Hp.
