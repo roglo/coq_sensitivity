@@ -2922,14 +2922,13 @@ induction p; intros. {
   destruct ll as [| b]; [ easy | ].
   f_equal; clear q; cbn.
   f_equal; cbn.
-...
-  rewrite Nat.sub_0_r.
   do 2 rewrite <- seq_shift.
   do 2 rewrite map_map.
   erewrite map_ext_in. 2: {
     intros i Hi; apply in_seq in Hi.
     now rewrite transposition_out.
   }
+  symmetry.
   apply List_map_nth_seq.
 }
 ...
