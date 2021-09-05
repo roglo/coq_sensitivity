@@ -2919,6 +2919,36 @@ unfold subm; f_equal; f_equal; clear q.
 rewrite butn_0.
 unfold mat_swap_rows at 1; cbn.
 rewrite List_map_tl.
+(**)
+destruct ll as [| la]; [ easy | ].
+cbn in Hp.
+cbn - [ nth ].
+rewrite <- seq_shift, map_map.
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  unfold transposition.
+  cbn in Hi; apply in_seq in Hi.
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (S i) 0) as [H| H]; [ now exfalso | clear H ].
+  easy.
+}
+revert ll la Hp.
+induction p; intros. {
+  destruct ll as [| lb]; [ easy | ].
+  cbn; f_equal.
+  rewrite <- seq_shift, map_map.
+  symmetry.
+  apply List_map_nth_seq.
+}
+apply Nat.succ_lt_mono in Hp.
+...
+destruct ll as [| lb]; [ easy | ].
+cbn - [ Nat.eq_dec nth butn seq ].
+rewrite seq_S.
+rewrite map_app.
+erewrite map_ext_in. 2: {
+  intros i Hi; apply in_seq in Hi.
+...
 erewrite map_ext_in. 2: {
   intros i Hi.
   unfold transposition.
@@ -2946,6 +2976,7 @@ induction p; intros. {
 cbn - [ butn ].
 rewrite Nat.sub_0_r.
 destruct ll as [| la]; [ easy | ].
+cbn - [ butn nth ].
 destruct ll as [| lb]; [ cbn in Hp; flia Hp | ].
 remember (lb :: ll) as lbl; cbn in Hp.
 cbn - [ map  nth ].
