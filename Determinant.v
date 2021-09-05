@@ -2941,13 +2941,39 @@ induction p; intros. {
   apply List_map_nth_seq.
 }
 apply Nat.succ_lt_mono in Hp.
-...
 destruct ll as [| lb]; [ easy | ].
-cbn - [ Nat.eq_dec nth butn seq ].
-rewrite seq_S.
-rewrite map_app.
+rewrite Nat_sub_succ_1.
+cbn - [ Nat.eq_dec nth butn ].
+rewrite <- seq_shift, map_map.
 erewrite map_ext_in. 2: {
   intros i Hi; apply in_seq in Hi.
+  rewrite <- if_eqb_eq_dec.
+  replace (S (S i) =? S p) with (S i =? p) by easy.
+  rewrite if_eqb_eq_dec.
+  replace (nth _ _ _) with
+    (nth (if Nat.eq_dec (S i) p then 0 else S i) (la :: ll) []). 2: {
+    now destruct (Nat.eq_dec (S i) p).
+  }
+  easy.
+}
+rewrite IHp; [ clear IHp | easy ].
+Search (butn (S _)).
+symmetry.
+replace p with (S (p - 1)) at 2.
+cbn - [ butn nth Nat.eq_dec ].
+unfold mat_swap_rows at 2.
+cbn - [ butn nth Nat.eq_dec list_list_swap_rows ].
+Search (list_list_swap_rows _ _ (_ :: _)).
+...
+rewrite fold_left_op_fun_from_d with (d := M).
+...
+fold_left_op_fun_from_d:
+  ∀ (T A : Type) (d : T) (op : T → T → T) (a : T) (l : list A) (f : A → T),
+    (∀ x : T, op d x = x)
+    → (∀ x : T, op x d = x)
+      → (∀ a0 b c : T, op a0 (op b c) = op (op a0 b) c)
+        → fold_left (λ (c : T) (i : A), op c (f i)) l a =
+          op a (fold_left (λ (c : T) (i : A), op c (f i)) l d)
 ...
 erewrite map_ext_in. 2: {
   intros i Hi.
