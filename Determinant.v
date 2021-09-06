@@ -2929,10 +2929,7 @@ Theorem butn_list_swap_scal_0_l : ∀ A d (l : list A) p,
       (fold_left (λ l' k, list_swap_scal d k (k + 1) l') (seq 0 (p - 1)) l).
 Proof.
 intros * Hp.
-...
-intros * Hp.
-revert p Hp.
-induction l as [| a]; intros; [ easy | cbn in Hp ].
+destruct l as [| a]; intros; [ easy | cbn in Hp ].
 destruct p. {
   unfold list_swap_scal.
   cbn - [ nth ].
@@ -2947,7 +2944,38 @@ destruct p. {
 apply Nat.succ_lt_mono in Hp.
 rewrite list_swap_scal_0_succ_cons.
 rewrite butn_0.
+rewrite Nat_sub_succ_1.
 cbn - [ butn ].
+revert p Hp.
+induction l as [| b]; intros; [ easy | ].
+destruct p. {
+  cbn - [ nth ]; f_equal.
+  rewrite <- seq_shift, map_map; cbn.
+  symmetry.
+  apply List_map_nth_seq.
+}
+cbn in Hp.
+apply Nat.succ_lt_mono in Hp.
+cbn - [ map nth butn fold_left ].
+rewrite map_cons.
+cbn - [ map nth butn fold_left ].
+remember (nth 0 _ _) as x; cbn in Heqx; subst x.
+rewrite <- seq_shift, map_map.
+erewrite map_ext_in; [ | now intros i Hi; cbn ].
+rewrite IHl; [ clear IHl | easy ].
+replace (0 :: seq 1 p) with (seq 0 (S p)) by easy.
+rewrite seq_S, Nat.add_0_l.
+rewrite fold_left_app.
+remember (S p) as sp.
+cbn - [ butn list_swap_scal ].
+...
+Search (butn (S _)).
+rewrite butn_cons.
+cbn - [ butn list_swap_scal ].
+cbn - [ fold_left].
+...
+rewrite map_cons.
+cbn - [ nth ].
 ...
 
 Theorem subm_mat_swap_rows_circ : ∀ (M : matrix T) p q,
