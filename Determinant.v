@@ -2914,6 +2914,18 @@ Theorem subm_mat_swap_rows_circ : ∀ (M : matrix T) p q,
 Proof.
 intros * Hp.
 unfold subm; f_equal; f_equal; clear q.
+Print mat_swap_rows.
+Print list_list_swap_rows.
+Print transposition.
+...
+Theorem glop : ∀ A p (la : list A) d,
+  butn 0 (map (λ i, nth (transposition 0 p i) la d) (seq 0 (length la))) =
+  butn p (fold_left (λ lb k, transposition k (k + 1) lb) (seq 0 (p - 1)) la).
+(* truc comme ça, quoi... *)
+...
+Theorem glop :
+  butn 0 (mat_list_list (mat_swap_rows 0 p M)) =
+  butn p (mat_list_list (fold_left (λ (M' : matrix T) (k : nat), mat_swap_rows k (k + 1) M') (seq 0 (p - 1)) M))
 ...
 intros * Hp.
 destruct M as (ll).
