@@ -119,13 +119,16 @@ unfold mat_nrows in Hr.
 now apply length_zero_iff_nil in Hr.
 Qed.
 
-Theorem mat_list_list_fold_left : ∀ T A (l : list A) (M : matrix T) f,
-  mat_list_list (fold_left f l M) =
-  fold_left (λ ll k, mat_list_list (f (mk_mat ll) k)) l (mat_list_list M).
+Theorem fold_left_mat_fold_left_list_list : ∀ T A (M : matrix T) (l : list A) f,
+  fold_left f l M =
+  mk_mat
+    (fold_left (λ ll k, mat_list_list (f (mk_mat ll) k)) l (mat_list_list M)).
 Proof.
 intros.
 revert M.
-induction l as [| a]; intros; [ easy | now cbn; destruct M ].
+induction l as [| a]; intros; [ now destruct M | cbn ].
+rewrite IHl; cbn.
+now destruct M.
 Qed.
 
 (* correct_matrix: matrix whose list list is made of non
