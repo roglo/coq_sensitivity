@@ -2913,6 +2913,7 @@ Theorem subm_mat_swap_rows_circ : ∀ (M : matrix T) p q,
       p q.
 Proof.
 intros * Hp.
+...
 destruct M as (ll).
 cbn in Hp |-*.
 unfold subm; f_equal; f_equal; clear q.
@@ -2957,6 +2958,8 @@ erewrite map_ext_in. 2: {
   easy.
 }
 rewrite IHp; [ clear IHp | easy ].
+...
+cbn.
 Search (butn (S _)).
 symmetry.
 replace p with (S (p - 1)) at 2.
