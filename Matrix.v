@@ -57,6 +57,25 @@ Definition mat_of_list_list T d (ll : list (list T)) :
   matrix (list_list_nrows ll) (list_list_ncols ll) T :=
   mk_mat (list_list_el d ll).
 
+(* 2nd definition for matrices, without size *)
+
+Record matrix' T := mk_mat'
+  { mat_list_list : list (list T) }.
+
+Definition matrix'_of_matrix {T m n} (M : matrix m n T) :=
+  mk_mat' (list_list_of_mat M).
+
+Definition matrix_of_matrix' {T} (M' : matrix' T) d :
+  matrix
+    (list_list_nrows (mat_list_list M'))
+    (list_list_ncols (mat_list_list M')) T :=
+  mat_of_list_list d (mat_list_list M').
+
+(* but is it possible to easyly convert from one definition to the other?
+   this "matrix_of_matrix'" build matrices with complicated dimensions. *)
+
+...
+
 (*
 Compute (list_list_of_mat (mat_of_list_list 0 [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]])).
 *)
