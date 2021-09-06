@@ -622,11 +622,27 @@ rewrite seq_nth; [ | easy ].
 now rewrite Nat.add_0_l.
 Qed.
 
-Definition list_list_swap_rows i1 i2 (ll : list (list T)) :=
-  map (λ i, nth (transposition i1 i2 i) ll []) (seq 0 (length ll)).
+Definition list_swap_scal {A} d i1 i2 (l : list A) :=
+  map (λ i, nth (transposition i1 i2 i) l d) (seq 0 (length l)).
 
 Definition mat_swap_rows i1 i2 (M : matrix T) :=
-  mk_mat (list_list_swap_rows i1 i2 (mat_list_list M)).
+  mk_mat (list_swap_scal [] i1 i2 (mat_list_list M)).
+
+Theorem list_swap_scal_0_succ_cons : ∀ A (d : A) j a l,
+  list_swap_scal d 0 (S j) (a :: l) =
+  nth j l d :: map (λ i, if i =? j then a else nth i l d) (seq 0 (length l)).
+Proof.
+intros.
+cbn - [ nth ].
+f_equal.
+rewrite <- seq_shift, map_map.
+apply map_ext_in.
+intros i Hi; apply in_seq in Hi.
+unfold transposition.
+cbn - [ nth ].
+do 2 rewrite if_eqb_eq_dec.
+now destruct (Nat.eq_dec i j).
+Qed.
 
 Theorem mat_swap_rows_is_square : ∀ n (M : matrix T) p q,
   p < n
@@ -640,9 +656,9 @@ specialize (squ_mat_is_corr M Hsm) as Hco.
 apply is_sm_mat_iff in Hsm.
 apply is_sm_mat_iff.
 destruct Hsm as (Hr & Hcr & Hc).
-cbn; unfold list_list_swap_rows.
+cbn; unfold list_swap_scal.
 rewrite List_map_seq_length.
-unfold mat_swap_rows, list_list_swap_rows; cbn.
+unfold mat_swap_rows, list_swap_scal; cbn.
 split; [ easy | ].
 split. {
   destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]; [ easy | ].
@@ -679,7 +695,7 @@ Theorem mat_swap_rows_nrows : ∀ (M : matrix T) p q,
 Proof.
 intros.
 unfold mat_swap_rows; cbn.
-unfold list_list_swap_rows.
+unfold list_swap_scal.
 rewrite map_length.
 now rewrite seq_length.
 Qed.
@@ -699,7 +715,7 @@ destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
 }
 apply Nat.neq_0_lt_0 in Hrz.
 unfold mat_swap_rows; cbn.
-unfold list_list_swap_rows.
+unfold list_swap_scal.
 unfold mat_ncols; cbn.
 rewrite List_hd_nth_0.
 rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
@@ -812,7 +828,7 @@ erewrite rngl_summation_eq_compat. 2: {
         now apply in_seq in Hi.
       }
       rewrite (List_map_nth' 0); [ | easy ].
-      unfold list_list_swap_rows.
+      unfold list_swap_scal.
       rewrite fold_mat_nrows.
       apply is_sm_mat_iff in Hsm.
       destruct Hsm as (Hr, _).
@@ -1427,7 +1443,7 @@ assert (HM : determinant n M = (- determinant n M)%F). {
           f_equal; subst xx yy.
           subst la lb.
           unfold mat_swap_rows; cbn.
-          unfold list_list_swap_rows.
+          unfold list_swap_scal.
           rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
           rewrite seq_nth; [ | easy ].
           rewrite Nat.add_0_l.
@@ -2599,9 +2615,9 @@ Proof.
 intros.
 destruct M as (ll); cbn.
 unfold mat_swap_rows; f_equal.
-cbn - [ list_list_swap_rows ].
+cbn - [ list_swap_scal ].
 rewrite (List_map_nth_seq ll (nth i ll [])) at 2.
-unfold list_list_swap_rows.
+unfold list_swap_scal.
 apply map_ext_in.
 intros j Hj; apply in_seq in Hj.
 unfold transposition.
@@ -2618,7 +2634,7 @@ Theorem mat_swap_rows_comm : ∀ (M : matrix T) p q,
 Proof.
 intros.
 unfold mat_swap_rows; f_equal; cbn.
-unfold list_list_swap_rows.
+unfold list_swap_scal.
 apply map_ext_in.
 intros i Hi; apply in_seq in Hi.
 now rewrite transposition_comm.
@@ -2730,7 +2746,7 @@ intros.
 induction q; [ easy | ].
 rewrite seq_S.
 rewrite fold_left_app; cbn.
-unfold list_list_swap_rows.
+unfold list_swap_scal.
 rewrite List_map_seq_length.
 rewrite fold_mat_nrows.
 apply IHq.
@@ -2744,7 +2760,7 @@ Proof.
 induction q; [ easy | ].
 rewrite seq_S.
 rewrite fold_left_app; cbn.
-unfold list_list_swap_rows.
+unfold list_swap_scal.
 rewrite List_map_seq_length.
 rewrite fold_mat_nrows.
 apply IHq.
@@ -2762,7 +2778,7 @@ intros * Hi Hpi.
 induction q; [ easy | ].
 rewrite seq_S; cbn.
 rewrite fold_left_app; cbn.
-unfold list_list_swap_rows.
+unfold list_swap_scal.
 rewrite (List_map_nth' 0). 2: {
   rewrite seq_length, fold_mat_nrows.
   now rewrite mat_nrows_fold_left_swap.
@@ -2808,7 +2824,7 @@ intros * Hi Hip.
 induction q; [ easy | ].
 rewrite seq_S; cbn.
 rewrite fold_left_app; cbn.
-unfold list_list_swap_rows.
+unfold list_swap_scal.
 rewrite (List_map_nth' 0). 2: {
   rewrite seq_length, fold_mat_nrows.
   now rewrite mat_nrows_fold_left_swap.
@@ -2867,8 +2883,8 @@ Theorem subm_mat_swap_rows_succ_succ : ∀ (M : matrix T) i j,
 Proof.
 intros * Hi2.
 destruct M as (ll); cbn in Hi2 |-*.
-unfold subm; f_equal; cbn - [ list_list_swap_rows butn ].
-unfold list_list_swap_rows.
+unfold subm; f_equal; cbn - [ list_swap_scal butn ].
+unfold list_swap_scal.
 rewrite List_map_seq_length.
 do 2 rewrite <- map_butn.
 do 2 rewrite map_map.
@@ -2906,6 +2922,34 @@ destruct (lt_dec k (S i)) as [Hksi| Hksi]. {
 }
 Qed.
 
+Theorem butn_list_swap_scal_0_l : ∀ A d (l : list A) p,
+  p < length l
+  → butn 0 (list_swap_scal d 0 p l) =
+    butn p
+      (fold_left (λ l' k, list_swap_scal d k (k + 1) l') (seq 0 (p - 1)) l).
+Proof.
+intros * Hp.
+...
+intros * Hp.
+revert p Hp.
+induction l as [| a]; intros; [ easy | cbn in Hp ].
+destruct p. {
+  unfold list_swap_scal.
+  cbn - [ nth ].
+  rewrite <- seq_shift, map_map.
+  erewrite map_ext_in. 2: {
+    intros i Hi; apply in_seq in Hi.
+    now cbn.
+  }
+  symmetry.
+  apply List_map_nth_seq.
+}
+apply Nat.succ_lt_mono in Hp.
+rewrite list_swap_scal_0_succ_cons.
+rewrite butn_0.
+cbn - [ butn ].
+...
+
 Theorem subm_mat_swap_rows_circ : ∀ (M : matrix T) p q,
   p < mat_nrows M
   → subm (mat_swap_rows 0 p M) 0 q =
@@ -2916,11 +2960,11 @@ intros * Hp.
 unfold subm; f_equal; f_equal; clear q.
 unfold mat_swap_rows; cbn - [ butn ].
 rewrite fold_left_mat_fold_left_list_list.
-destruct M as (ll); cbn - [ butn list_list_swap_rows ].
+destruct M as (ll); cbn - [ butn list_swap_scal ].
 cbn in Hp.
-Print list_list_swap_rows.
-(* ouais, mais list_list_swap_rows devrait pouvoir être vu comme un
-   "list_swap" tout court, à définir *)
+Print list_swap_scal.
+...
+apply butn_list_swap_scal_0_l.
 ...
 intros * Hp.
 destruct M as (ll).
@@ -2974,8 +3018,8 @@ symmetry.
 replace p with (S (p - 1)) at 2.
 cbn - [ butn nth Nat.eq_dec ].
 unfold mat_swap_rows at 2.
-cbn - [ butn nth Nat.eq_dec list_list_swap_rows ].
-Search (list_list_swap_rows _ _ (_ :: _)).
+cbn - [ butn nth Nat.eq_dec list_swap_scal ].
+Search (list_swap_scal _ _ (_ :: _)).
 ...
 rewrite fold_left_op_fun_from_d with (d := M).
 ...

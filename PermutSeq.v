@@ -110,6 +110,14 @@ destruct (Nat.eq_dec k i) as [H| H]; [ easy | clear H ].
 now destruct (Nat.eq_dec k j).
 Qed.
 
+Theorem transposition_id : ∀ i k, transposition i i k = k.
+Proof.
+intros.
+unfold transposition.
+do 2 rewrite if_eqb_eq_dec.
+now destruct (Nat.eq_dec k i).
+Qed.
+
 Theorem transposition_1 : ∀ i j, transposition i j i = j.
 Proof.
 intros.
