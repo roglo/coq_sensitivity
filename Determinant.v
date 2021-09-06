@@ -2913,7 +2913,9 @@ Theorem subm_mat_swap_rows_circ : ∀ (M : matrix T) p q,
       p q.
 Proof.
 intros * Hp.
+unfold subm; f_equal; f_equal; clear q.
 ...
+intros * Hp.
 destruct M as (ll).
 cbn in Hp |-*.
 unfold subm; f_equal; f_equal; clear q.
