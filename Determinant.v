@@ -2989,7 +2989,13 @@ unfold list_swap_scal.
 rewrite length_fold_left_map_transp.
 rewrite <- map_butn.
 rewrite map_butn_seq.
-About map_butn_seq.
+rewrite Nat.add_0_l.
+cbn - [ "<=?" "-" ].
+unfold Nat.b2n at 2.
+rewrite if_ltb_lt_dec.
+destruct (lt_dec (S sp) (S (S (length l)))) as [H| H]; [ | flia Hp Heqsp H ].
+clear H.
+rewrite Nat_sub_succ_1.
 ...
 Search (length (fold_left _ _ _)).
 Search mat_swap_rows.
