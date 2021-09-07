@@ -3002,17 +3002,24 @@ cbn; f_equal. {
   destruct (Nat.eq_dec 0 (p + 1)) as [H| H]; [ flia H | clear H ].
   destruct (Nat.eq_dec 0 p) as [Hpz| Hpz]; [ now subst p | ].
   destruct p; [ easy | ].
-Theorem mat_list_list_fold_left : ∀ A (M : matrix T) f (l : list A),
-  mat_list_list (fold_left f l M) = mat_list_list M.
+Theorem mat_list_list_fold_left : ∀ A (M : matrix T) f g (l : list A),
+  mat_list_list (fold_left f l M) = g M.
 Proof.
 intros.
-destruct M as (ll).
-cbn.
+destruct l as [| a]; intros; cbn.
+(*
+  mat_list_list M = g M
+*)
+admit.
 ...
+intros.
 revert M.
-induction l as [| a]; intros; [ easy | cbn ].
+induction l as [| a]; intros; [ admit | cbn ].
+cbn.
 rewrite IHl.
-
+...
+g M = mat_list_list M
+g (f M a) = g M
 Search (mat_list_list (fold_left _ _ _)).
 ...
 Search (nth 0).
