@@ -2996,6 +2996,8 @@ rewrite if_ltb_lt_dec.
 destruct (lt_dec (S sp) (S (S (length l)))) as [H| H]; [ | flia Hp Heqsp H ].
 clear H.
 rewrite Nat_sub_succ_1.
+cbn; f_equal. {
+Search (nth (transposition _ _ _)).
 ...
 Search (length (fold_left _ _ _)).
 Search mat_swap_rows.
