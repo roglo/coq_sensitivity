@@ -2738,34 +2738,31 @@ rewrite Nat.add_0_l.
 now rewrite transposition_2.
 Qed.
 
+Theorem length_fold_left_map_transp : ∀ A (ll : list A) sta len f g d,
+  length
+    (fold_left
+       (λ ll' k,
+        map (λ i, nth (transposition (f k) (g k) i) ll' d)
+          (seq 0 (length ll')))
+       (seq sta len) ll) = length ll.
+Proof.
+intros.
+induction len; [ easy | ].
+rewrite seq_S.
+rewrite fold_left_app; cbn.
+rewrite List_map_seq_length.
+apply IHlen.
+Qed.
+
 Theorem mat_nrows_fold_left_swap : ∀ (M : matrix T) p q f g,
   mat_nrows (fold_left (λ M' k, mat_swap_rows (f k) (g k) M') (seq p q) M) =
   mat_nrows M.
 Proof.
 intros.
-induction q; [ easy | ].
-rewrite seq_S.
-rewrite fold_left_app; cbn.
-unfold list_swap_scal.
-rewrite List_map_seq_length.
-rewrite fold_mat_nrows.
-apply IHq.
+unfold mat_nrows.
+rewrite fold_left_mat_fold_left_list_list.
+apply length_fold_left_map_transp.
 Qed.
-
-(*
-Theorem mat_nrows_fold_left_swap : ∀ (M : matrix T) p q,
-  mat_nrows (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq p q) M) =
-  mat_nrows M.
-Proof.
-induction q; [ easy | ].
-rewrite seq_S.
-rewrite fold_left_app; cbn.
-unfold list_swap_scal.
-rewrite List_map_seq_length.
-rewrite fold_mat_nrows.
-apply IHq.
-Qed.
-*)
 
 Theorem mat_el_circ_rot_rows_succ_1 : ∀ (M : matrix T) i j p q,
   i < mat_nrows M
@@ -2800,6 +2797,17 @@ Theorem mat_el_circ_rot_rows : ∀ (M : matrix T) i j,
   → mat_el M 0 j =
       mat_el (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 i) M) i j.
 Proof.
+(*
+intros * Hi.
+unfold mat_el.
+f_equal.
+rewrite fold_left_mat_fold_left_list_list.
+cbn - [ mat_swap_rows ].
+destruct M as (ll).
+cbn - [ mat_swap_rows ].
+Search mat_list_list.
+...
+*)
 intros * Hi.
 revert M Hi.
 induction i; intros; [ easy | ].
@@ -2922,7 +2930,7 @@ destruct (lt_dec k (S i)) as [Hksi| Hksi]. {
 }
 Qed.
 
-Theorem butn_list_swap_scal_0_l : ∀ A d (l : list A) p,
+Theorem butn_list_swap_scal_0_l : ∀ d (l : list T) p,
   p < length l
   → butn 0 (list_swap_scal d 0 p l) =
     butn p
@@ -2968,6 +2976,22 @@ rewrite seq_S, Nat.add_0_l.
 rewrite fold_left_app.
 remember (S p) as sp.
 cbn - [ butn list_swap_scal ].
+unfold list_swap_scal at 2.
+unfold list_swap_scal.
+rewrite length_fold_left_map_transp.
+rewrite <- map_butn.
+rewrite map_butn_seq.
+About map_butn_seq.
+...
+Search (length (fold_left _ _ _)).
+Search mat_swap_rows.
+About mat_el_circ_rot_rows.
+...
+unfold list_swap_scal at 2.
+Search (length (fold_left _ _ _)).
+...
+unfold butn at 2.
+Search (firstn (S _)).
 ...
 Search (butn (S _)).
 rewrite butn_cons.
