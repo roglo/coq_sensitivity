@@ -1813,19 +1813,13 @@ apply map_ext_in.
 intros u Hu.
 apply in_seq in Hu; cbn.
 unfold Nat.b2n at 1; rewrite if_leb_le_dec.
-...
-Search (if le_dec _ _ then _ else _).
-destruct (lt_dec u i) as [Hui| Hui]. {
+destruct (le_dec i u) as [Hui| Hui]. 2: {
+  apply Nat.nle_gt in Hui.
   rewrite (List_map_nth_seq _ 0%F).
   rewrite butn_length.
-  unfold Nat.b2n at 2; rewrite if_leb_le_dec.
-...
-  unfold Nat.b2n at 1; rewrite if_ltb_lt_dec.
-*)
-  rewrite fold_corr_mat_ncols; [ | easy | ]. 2: {
-
-...
   rewrite fold_corr_mat_ncols; [ | easy | flia Hu ].
+  unfold Nat.b2n.
+  rewrite if_ltb_lt_dec.
   destruct (lt_dec j (mat_ncols M)) as [H| H]; [ clear H | flia Hj H ].
   apply map_ext_in.
   intros v Hv.
@@ -1841,7 +1835,6 @@ destruct (lt_dec u i) as [Hui| Hui]. {
     now rewrite Nat.add_0_r.
   }
 } {
-  apply Nat.nlt_ge in Hui.
   unfold Nat.b2n.
   rewrite if_leb_le_dec.
   destruct (le_dec i u) as [H| H]; [ clear H | flia Hui H ].
