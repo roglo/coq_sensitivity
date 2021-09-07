@@ -2652,11 +2652,15 @@ rewrite map_length.
 rewrite butn_length.
 rewrite <- map_butn, map_map.
 rewrite map_butn_seq.
+rewrite Nat.add_0_l.
 apply map_ext_in.
 intros i Hi; apply in_seq in Hi.
+unfold Nat.b2n.
+rewrite if_leb_le_dec.
 destruct Hi as (_, Hi).
-rewrite Nat.add_0_l in Hi |-*.
-destruct (lt_dec i r) as [Hir| Hir]. {
+destruct (le_dec r i) as [Hir| Hir]. 2: {
+  apply Nat.nle_gt in Hir.
+  rewrite Nat.add_0_r.
   destruct (Nat.eq_dec i p) as [Hip| Hip]. {
     subst i; clear Hir.
     rewrite transposition_1.
@@ -2697,7 +2701,6 @@ destruct (lt_dec i r) as [Hir| Hir]. {
   rewrite nth_butn_after; [ | easy ].
   rewrite (List_map_nth' []); [ easy | flia Hi ].
 }
-apply Nat.nlt_ge in Hir.
 unfold transposition.
 do 4 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec i p) as [H| H]; [ flia Hpq Hq Hir H | clear H ].
@@ -2904,29 +2907,34 @@ destruct (lt_dec (S (S i)) (length ll)) as [H| H]; [ clear H | flia Hi2 H ].
 do 2 rewrite Nat.add_0_l.
 apply map_ext_in.
 intros k Hk; apply in_seq in Hk.
-destruct (lt_dec k (S i)) as [Hksi| Hksi]. {
+unfold Nat.b2n.
+do 2 rewrite if_leb_le_dec.
+destruct (le_dec (S i) k) as [Hksi| Hksi]. 2: {
+  apply Nat.nle_gt in Hksi.
   rewrite (@transposition_out (i + 1)); [ | flia Hksi | flia Hksi ].
-  destruct (lt_dec k (S (S i))) as [Hkssi| Hkssi]. {
+  destruct (le_dec (S (S i)) k) as [Hkssi| Hkssi]. 2: {
+    apply Nat.nle_gt in Hkssi.
     rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hk ].
     rewrite seq_nth; [ easy | flia Hk ].
   }
   flia Hi2 Hk Hksi Hkssi.
 } {
-  apply Nat.nlt_ge in Hksi.
+  destruct (le_dec (S (S i)) k) as [Hkssi| Hkssi]. 2: {
+    apply Nat.nle_gt in Hkssi.
+    replace k with (i + 1) by flia Hksi Hkssi.
+    rewrite Nat.add_0_r.
+    rewrite <- Nat.add_assoc.
+    do 2 rewrite transposition_2.
+    rewrite List_nth_map_seq; [ | flia Hk Hksi ].
+    now rewrite transposition_2.
+  }
   rewrite (@transposition_out i (i + 1) (k + 1)); [ | flia Hksi | flia Hksi ].
   rewrite List_nth_map_seq. 2: {
     apply transposition_lt; [ flia Hi2 | easy | flia Hk ].
   }
   rewrite Nat.add_0_l.
-  destruct (lt_dec k (S (S i))) as [Hkssi| Hkssi]. {
-    replace k with (i + 1) by flia Hksi Hkssi.
-    rewrite <- Nat.add_assoc.
-    now rewrite transposition_2.
-  } {
-    apply Nat.nlt_ge in Hkssi.
-    rewrite (@transposition_out (i + 1)); [ | flia Hkssi | flia Hkssi ].
-    rewrite transposition_out; [ easy | flia Hkssi | flia Hkssi ].
-  }
+  rewrite (@transposition_out (i + 1)); [ | flia Hkssi | flia Hkssi ].
+  rewrite transposition_out; [ easy | flia Hkssi | flia Hkssi ].
 }
 Qed.
 
