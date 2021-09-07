@@ -2997,6 +2997,27 @@ destruct (lt_dec (S sp) (S (S (length l)))) as [H| H]; [ | flia Hp Heqsp H ].
 clear H.
 rewrite Nat_sub_succ_1.
 cbn; f_equal. {
+  unfold transposition at 1.
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec 0 (p + 1)) as [H| H]; [ flia H | clear H ].
+  destruct (Nat.eq_dec 0 p) as [Hpz| Hpz]; [ now subst p | ].
+  destruct p; [ easy | ].
+Theorem mat_list_list_fold_left : ∀ A (M : matrix T) f (l : list A),
+  mat_list_list (fold_left f l M) = mat_list_list M.
+Proof.
+intros.
+destruct M as (ll).
+cbn.
+...
+revert M.
+induction l as [| a]; intros; [ easy | cbn ].
+rewrite IHl.
+
+Search (mat_list_list (fold_left _ _ _)).
+...
+Search (nth 0).
+Search (nth _ (fold_left _ _ _)).
+
 Search (nth (transposition _ _ _)).
 ...
 Search (length (fold_left _ _ _)).
