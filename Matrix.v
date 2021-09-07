@@ -1806,16 +1806,25 @@ rewrite (List_map_nth_seq (mat_list_list M) []) at 1.
 rewrite fold_mat_nrows.
 rewrite <- map_butn, map_map.
 rewrite map_butn_seq.
-unfold Nat.b2n at 1.
+unfold Nat.b2n at 2.
 rewrite if_ltb_lt_dec.
 destruct (lt_dec i (mat_nrows M)) as [H| H]; [ clear H | flia Hi H ].
 apply map_ext_in.
 intros u Hu.
 apply in_seq in Hu; cbn.
+unfold Nat.b2n at 1; rewrite if_leb_le_dec.
+...
+Search (if le_dec _ _ then _ else _).
 destruct (lt_dec u i) as [Hui| Hui]. {
   rewrite (List_map_nth_seq _ 0%F).
   rewrite butn_length.
+  unfold Nat.b2n at 2; rewrite if_leb_le_dec.
+...
   unfold Nat.b2n at 1; rewrite if_ltb_lt_dec.
+*)
+  rewrite fold_corr_mat_ncols; [ | easy | ]. 2: {
+
+...
   rewrite fold_corr_mat_ncols; [ | easy | flia Hu ].
   destruct (lt_dec j (mat_ncols M)) as [H| H]; [ clear H | flia Hj H ].
   apply map_ext_in.
