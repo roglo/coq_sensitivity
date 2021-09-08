@@ -2768,6 +2768,37 @@ rewrite fold_left_mat_fold_left_list_list.
 apply length_fold_left_map_transp.
 Qed.
 
+Theorem nth_fold_left_map_transp_1 : ∀ A (la : list A) i sta len d,
+  i < length la
+  → i < sta ∨ sta + len < i
+  → nth i
+      (fold_left
+         (λ la' k,
+            map (λ j, nth (transposition k (k + 1) j) la' d)
+              (seq 0 (length la')))
+         (seq sta len) la) d =
+    nth i la d.
+Proof.
+intros * Hi Hip.
+induction len; [ easy | ].
+rewrite seq_S; cbn.
+rewrite fold_left_app; cbn.
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  now rewrite length_fold_left_map_transp.
+}
+rewrite seq_nth. 2: {
+  now rewrite length_fold_left_map_transp.
+}
+rewrite Nat.add_0_l.
+unfold transposition.
+do 2 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec i (sta + len)) as [His| His]; [ flia His Hip | ].
+destruct (Nat.eq_dec i (sta + len + 1)) as [Hip1| Hip1]; [ flia Hip Hip1 | ].
+apply IHlen.
+flia Hip His.
+Qed.
+
 Theorem nth_fold_left_map_transp : ∀ A (la : list A) i sta len d,
   i < length la
   → nth i
@@ -2776,56 +2807,72 @@ Theorem nth_fold_left_map_transp : ∀ A (la : list A) i sta len d,
             map (λ j, nth (transposition k (k + 1) j) la' d)
               (seq 0 (length la')))
          (seq sta len) la) d =
-    nth (i + Nat.b2n ((sta <=? i) && (i <=? sta + len))) la d.
+    nth
+      (i + Nat.b2n ((negb (len =? 0)) && (sta <=? i) && (i <=? sta + len)))
+      la d.
 Proof.
 intros * Hi.
-unfold Nat.b2n, "&&".
+unfold Nat.b2n, "&&", negb.
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec len 0) as [Hlz| Hlz]. {
+  subst len; cbn.
+  now rewrite Nat.add_0_r.
+}
 rewrite if_leb_le_dec.
 destruct (le_dec sta i) as [Hip| Hip]. 2: {
   apply Nat.nle_gt in Hip.
   rewrite Nat.add_0_r.
-  induction len; [ easy | ].
-  rewrite seq_S; cbn.
-  rewrite fold_left_app; cbn.
-  rewrite (List_map_nth' 0). 2: {
-    rewrite seq_length.
-    now rewrite length_fold_left_map_transp.
-  }
-  rewrite seq_nth. 2: {
-    now rewrite length_fold_left_map_transp.
-  }
-  rewrite Nat.add_0_l.
-  unfold transposition.
-  do 2 rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec i (sta + len)) as [His| His]; [ flia His Hip | ].
-  destruct (Nat.eq_dec i (sta + len + 1)) as [Hip1| Hip1]; [ flia Hip Hip1 | ].
-  apply IHlen.
+  apply nth_fold_left_map_transp_1; [ easy | now left ].
 }
 rewrite if_leb_le_dec.
 destruct (le_dec i (sta + len)) as [Hip'| Hip']. 2: {
   apply Nat.nle_gt in Hip'.
   rewrite Nat.add_0_r.
-  induction len; [ easy | ].
-  rewrite seq_S; cbn.
-  rewrite fold_left_app; cbn.
-  rewrite (List_map_nth' 0). 2: {
-    rewrite seq_length.
-    now rewrite length_fold_left_map_transp.
-  }
-  rewrite seq_nth. 2: {
-    now rewrite length_fold_left_map_transp.
-  }
-  rewrite Nat.add_0_l.
-  unfold transposition.
-  do 2 rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec i (sta + len)) as [His| His]; [ flia His Hip' | ].
-  destruct (Nat.eq_dec i (sta + len + 1)) as [Hip1| Hip1]; [ flia Hip' Hip1 | ].
-  apply IHlen.
-  flia Hip'.
+  apply nth_fold_left_map_transp_1; [ easy | now right ].
 }
-induction len; cbn.
 ...
 symmetry.
+rewrite <- (@nth_fold_left_map_transp_1 _ _ _ 0 i); [ | | ].
+...
+rewrite <- (@nth_fold_left_map_transp_1 _ _ _ 0 i); [ | easy | flia ].
+...
+destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+  subst i.
+  apply Nat.le_0_r in Hip; subst sta.
+  cbn.
+  destruct len; [ easy | cbn ].
+...
+rewrite <- (@nth_fold_left_map_transp_1 _ _ _ 0 (i + 1)); [ | | ].
+rewrite <- (@nth_fold_left_map_transp_1 _ _ _ 0 (i + 1)); [ | | flia ].
+rewrite <- (@nth_fold_left_map_transp_1 _ _ _ 0 i); [ | easy | flia ].
+remember (fold_left _ _ _) as B eqn:HB.
+replace len with (i + (len - i)) by flia Hpi.
+rewrite seq_app, fold_left_app; cbn.
+replace (len - i) with (S (len - i - 1)) by flia Hpi.
+rewrite <- cons_seq; cbn.
+rewrite length_fold_left_map_transp.
+rewrite nth_fold_left_map_transp; [ | | left; flia ]. 2: {
+  rewrite map_length, seq_length; flia Hi.
+}
+rewrite List_nth_map_seq; [ | flia Hi ].
+rewrite Nat.add_0_l.
+rewrite transposition_1.
+now rewrite HB.
+Qed.
+...
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ cbn | easy ].
+  unfold transposition.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i sta) as [His| His]; [ now subst i | ].
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i (sta + 1)) as [His1| His1]. {
+    subst i.
+...
+
+  rewrite List_map_nth_seq with (la := la) (d := d) at 2.
+Search (nth _ (map _ _)).
+
 rewrite <- (@nth_fold_left_map_transp _ _ _ 0 i); [ | easy | flia ].
 remember (fold_left _ _ _) as B eqn:HB.
 replace len with (i + (len - i)) by flia Hpi.
