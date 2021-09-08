@@ -2807,10 +2807,18 @@ Theorem nth_fold_left_map_transp : ∀ A (la : list A) i sta len d,
             map (λ j, nth (transposition k (k + 1) j) la' d)
               (seq 0 (length la')))
          (seq sta len) la) d =
-    nth
-      (i + Nat.b2n ((negb (len =? 0)) && (sta <=? i) && (i <=? sta + len)))
-      la d.
+    if Nat.eq_dec i (sta + len) then nth sta la d
+    else
+      nth (i + Nat.b2n ((sta <=? i) && (i <=? sta + len))) la d.
 Proof.
+intros * Hi.
+destruct (Nat.eq_dec i (sta + len)) as [Hisl| Hisl]. {
+  subst i.
+  revert sta Hi.
+  induction len; intros. {
+    rewrite Nat.add_0_r in Hi |-*.
+Search (nth _ (fold_left _ _ _)).
+...
 intros * Hi.
 unfold Nat.b2n, "&&", negb.
 rewrite if_eqb_eq_dec.
