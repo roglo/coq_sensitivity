@@ -2866,6 +2866,8 @@ Theorem nth_fold_left_map_transp' : ∀ A (la : list A) i len d,
     nth (i + 1) la d.
 Proof.
 intros * Hi Hpi.
+Check nth_fold_left_map_transp.
+...
 symmetry.
 rewrite <- (@nth_fold_left_map_transp _ _ _ 0 i); [ | easy | flia ].
 remember (fold_left _ _ _) as B eqn:HB.
