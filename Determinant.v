@@ -2875,8 +2875,11 @@ Theorem mat_el_circ_rot_rows_succ : ∀ (M : matrix T) i j p,
          (seq 0 (p - 1)) M) (i + Nat.b2n (p <=? i)) j.
 Proof.
 intros * Hi Hi1p.
-Check mat_el_circ_rot_rows_succ_1.
-Check nth_fold_left_map_transp.
+destruct M as (ll); cbn in Hi |-*.
+unfold mat_el; f_equal; clear j.
+rewrite fold_left_mat_fold_left_list_list; cbn.
+destruct (le_dec p i) as [Hpi| Hpi]. {
+  rewrite nth_fold_left_map_transp.
 ...
 intros * Hi Hi1p.
 destruct (le_dec p i) as [Hpi| Hpi]. {
