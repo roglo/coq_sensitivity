@@ -2945,6 +2945,18 @@ Theorem butn_list_swap_scal_0_l : ∀ d (l : list T) p,
       (fold_left (λ l' k, list_swap_scal d k (k + 1) l') (seq 0 (p - 1)) l).
 Proof.
 intros * Hp.
+revert l Hp.
+induction p; intros. {
+  unfold list_swap_scal.
+  cbn - [ nth ].
+  erewrite map_ext_in. 2: {
+    intros i Hi; apply in_seq in Hi.
+    now rewrite transposition_id.
+  }
+  now rewrite <- (List_map_nth_seq l d).
+}
+...
+intros * Hp.
 destruct l as [| a]; intros; [ easy | cbn in Hp ].
 destruct p. {
   unfold list_swap_scal.
@@ -3002,6 +3014,7 @@ cbn; f_equal. {
   destruct (Nat.eq_dec 0 (p + 1)) as [H| H]; [ flia H | clear H ].
   destruct (Nat.eq_dec 0 p) as [Hpz| Hpz]; [ now subst p | ].
   destruct p; [ easy | ].
+...
 Theorem mat_list_list_fold_left : ∀ A (M : matrix T) f g (l : list A),
   mat_list_list (fold_left f l M) = g M.
 Proof.
