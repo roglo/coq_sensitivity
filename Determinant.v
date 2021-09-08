@@ -2878,21 +2878,22 @@ intros * Hi Hi1p.
 destruct M as (ll); cbn in Hi |-*.
 unfold mat_el; f_equal; clear j.
 rewrite fold_left_mat_fold_left_list_list; cbn.
+unfold Nat.b2n.
+rewrite if_leb_le_dec.
 destruct (le_dec p i) as [Hpi| Hpi]. {
-  rewrite nth_fold_left_map_transp.
-...
-intros * Hi Hi1p.
-destruct (le_dec p i) as [Hpi| Hpi]. {
-  apply Nat.leb_le in Hpi; rewrite Hpi.
-  apply mat_el_circ_rot_rows_succ_1; [ easy | ].
-  apply Nat.leb_le in Hpi; cbn; flia Hpi.
+  destruct (le_dec p i) as [H| H]; [ clear H | flia Hpi H ].
+  rewrite nth_fold_left_map_transp; [ easy | easy | flia Hpi Hi1p ].
 }
-apply Nat.leb_nle in Hpi; rewrite Hpi; cbn.
-rewrite Nat.add_0_r.
-apply Nat.leb_nle in Hpi.
 apply Nat.nle_gt in Hpi.
+rewrite Nat.add_0_r.
+...
 replace (p - 1) with (i + (p - i - 1)) by flia Hpi.
 rewrite seq_app, fold_left_app; cbn.
+...
+rewrite nth_fold_left_map_transp; cycle 1. {
+  rewrite length_fold_left_map_transp; flia Hi.
+} {
+...
 rewrite mat_el_circ_rot_rows_succ_1 with (p := 0) (q := i); [ | easy | flia ].
 remember (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 i) M)
   as A eqn:HA.
