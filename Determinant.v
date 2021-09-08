@@ -2770,6 +2770,84 @@ Qed.
 
 Theorem nth_fold_left_map_transp : ∀ A (la : list A) i sta len d,
   i < length la
+  → nth i
+      (fold_left
+         (λ la' k,
+            map (λ j, nth (transposition k (k + 1) j) la' d)
+              (seq 0 (length la')))
+         (seq sta len) la) d =
+    nth (i + Nat.b2n ((sta <=? i) && (i <=? sta + len))) la d.
+Proof.
+intros * Hi.
+unfold Nat.b2n, "&&".
+rewrite if_leb_le_dec.
+destruct (le_dec sta i) as [Hip| Hip]. 2: {
+  apply Nat.nle_gt in Hip.
+  rewrite Nat.add_0_r.
+  induction len; [ easy | ].
+  rewrite seq_S; cbn.
+  rewrite fold_left_app; cbn.
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    now rewrite length_fold_left_map_transp.
+  }
+  rewrite seq_nth. 2: {
+    now rewrite length_fold_left_map_transp.
+  }
+  rewrite Nat.add_0_l.
+  unfold transposition.
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i (sta + len)) as [His| His]; [ flia His Hip | ].
+  destruct (Nat.eq_dec i (sta + len + 1)) as [Hip1| Hip1]; [ flia Hip Hip1 | ].
+  apply IHlen.
+}
+rewrite if_leb_le_dec.
+destruct (le_dec i (sta + len)) as [Hip'| Hip']. 2: {
+  apply Nat.nle_gt in Hip'.
+  rewrite Nat.add_0_r.
+  induction len; [ easy | ].
+  rewrite seq_S; cbn.
+  rewrite fold_left_app; cbn.
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    now rewrite length_fold_left_map_transp.
+  }
+  rewrite seq_nth. 2: {
+    now rewrite length_fold_left_map_transp.
+  }
+  rewrite Nat.add_0_l.
+  unfold transposition.
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i (sta + len)) as [His| His]; [ flia His Hip' | ].
+  destruct (Nat.eq_dec i (sta + len + 1)) as [Hip1| Hip1]; [ flia Hip' Hip1 | ].
+  apply IHlen.
+  flia Hip'.
+}
+induction len; cbn.
+...
+symmetry.
+rewrite <- (@nth_fold_left_map_transp _ _ _ 0 i); [ | easy | flia ].
+remember (fold_left _ _ _) as B eqn:HB.
+replace len with (i + (len - i)) by flia Hpi.
+rewrite seq_app, fold_left_app; cbn.
+replace (len - i) with (S (len - i - 1)) by flia Hpi.
+rewrite <- cons_seq; cbn.
+rewrite length_fold_left_map_transp.
+rewrite nth_fold_left_map_transp; [ | | left; flia ]. 2: {
+  rewrite map_length, seq_length; flia Hi.
+}
+rewrite List_nth_map_seq; [ | flia Hi ].
+rewrite Nat.add_0_l.
+rewrite transposition_1.
+now rewrite HB.
+Qed.
+...
+Qed.
+
+...
+
+Theorem nth_fold_left_map_transp : ∀ A (la : list A) i sta len d,
+  i < length la
   → i < sta ∨ sta + len < i
   → nth i
       (fold_left
@@ -2780,6 +2858,7 @@ Theorem nth_fold_left_map_transp : ∀ A (la : list A) i sta len d,
     nth i la d.
 Proof.
 intros * Hi Hip.
+...
 induction len; [ easy | ].
 rewrite seq_S; cbn.
 rewrite fold_left_app; cbn.
