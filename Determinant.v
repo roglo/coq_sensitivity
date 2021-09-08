@@ -2735,6 +2735,7 @@ Theorem mat_el_mat_swap_rows : ∀ (M : matrix T) p q j,
 Proof.
 intros * Hql; cbn.
 destruct M as (ll); cbn in Hql |-*.
+f_equal; clear j.
 rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
 rewrite Nat.add_0_l.
@@ -2767,18 +2768,18 @@ rewrite fold_left_mat_fold_left_list_list.
 apply length_fold_left_map_transp.
 Qed.
 
-Theorem nth_fold_left_map_transp : ∀ A (la : list A) sta len i d,
+Theorem nth_fold_left_map_transp : ∀ A (la : list A) i sta len d,
   i < length la
-  → sta + len < i
+  → i < sta ∨ sta + len < i
   → nth i
       (fold_left
          (λ la' k,
             map (λ j, nth (transposition k (k + 1) j) la' d)
-             (seq 0 (length la')))
+              (seq 0 (length la')))
          (seq sta len) la) d =
     nth i la d.
 Proof.
-intros * Hi Hpi.
+intros * Hi Hip.
 induction len; [ easy | ].
 rewrite seq_S; cbn.
 rewrite fold_left_app; cbn.
@@ -2792,15 +2793,15 @@ rewrite seq_nth. 2: {
 rewrite Nat.add_0_l.
 unfold transposition.
 do 2 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec i (sta + len)) as [Hip| Hip]; [ flia Hpi Hip | ].
-destruct (Nat.eq_dec i (sta + len + 1)) as [Hip1| Hip1]; [ flia Hpi Hip1 | ].
+destruct (Nat.eq_dec i (sta + len)) as [His| His]; [ flia His Hip | ].
+destruct (Nat.eq_dec i (sta + len + 1)) as [Hip1| Hip1]; [ flia Hip Hip1 | ].
 apply IHlen.
-flia Hpi Hip.
+flia Hip His.
 Qed.
 
 Theorem mat_el_circ_rot_rows_succ_1 : ∀ (M : matrix T) i j p q,
   i < mat_nrows M
-  → p + q < i
+  → i < p ∨ p + q < i
   → mat_el M i j =
     mat_el (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq p q) M)
       i j.
@@ -2832,31 +2833,6 @@ apply IHi.
 flia Hi.
 Qed.
 
-Theorem mat_el_circ_rot_rows_outside : ∀ (M : matrix T) i j p q,
-  i < mat_nrows M
-  → i < p
-  → mat_el M i j =
-    mat_el (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq p q) M) i j.
-Proof.
-intros * Hi Hip.
-induction q; [ easy | ].
-rewrite seq_S; cbn.
-rewrite fold_left_app; cbn.
-unfold list_swap_scal.
-rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length, fold_mat_nrows.
-  now rewrite mat_nrows_fold_left_swap.
-}
-rewrite fold_mat_nrows.
-rewrite seq_nth; [ | now rewrite mat_nrows_fold_left_swap ].
-rewrite Nat.add_0_l.
-unfold transposition.
-do 2 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec i (p + q)) as [Hipq| Hipq]; [ flia Hip Hipq | ].
-destruct (Nat.eq_dec i (p + q + 1)) as [Hip1| Hip1]; [ flia Hip Hip1 | ].
-apply IHq.
-Qed.
-
 (*
   butn 0 (map (λ i : nat, nth (transposition 0 p i) ll []) (seq 0 (length ll))) =
   butn p
@@ -2878,6 +2854,7 @@ intros * Hi Hi1p.
 destruct M as (ll); cbn in Hi |-*.
 unfold mat_el; f_equal; clear j.
 rewrite fold_left_mat_fold_left_list_list; cbn.
+... lemme à faire pour plus loin
 unfold Nat.b2n.
 rewrite if_leb_le_dec.
 destruct (le_dec p i) as [Hpi| Hpi]. {
@@ -2886,29 +2863,20 @@ destruct (le_dec p i) as [Hpi| Hpi]. {
 }
 apply Nat.nle_gt in Hpi.
 rewrite Nat.add_0_r.
-...
+rewrite <- (@nth_fold_left_map_transp _ _ _ 0 i); [ | easy | flia ].
+remember (fold_left _ _ _) as A eqn:HA.
 replace (p - 1) with (i + (p - i - 1)) by flia Hpi.
 rewrite seq_app, fold_left_app; cbn.
-...
-rewrite nth_fold_left_map_transp; cycle 1. {
-  rewrite length_fold_left_map_transp; flia Hi.
-} {
-...
-rewrite mat_el_circ_rot_rows_succ_1 with (p := 0) (q := i); [ | easy | flia ].
-remember (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 i) M)
-  as A eqn:HA.
 replace (p - i - 1) with (S (p - i - 2)) by flia Hi1p Hpi.
 rewrite <- cons_seq; cbn.
-rewrite <- mat_el_mat_swap_rows with (q := i). 2: {
-  rewrite HA.
-  rewrite mat_nrows_fold_left_swap; flia Hi.
+rewrite length_fold_left_map_transp.
+rewrite nth_fold_left_map_transp; [ | | left; flia ]. 2: {
+  rewrite map_length, seq_length; flia Hi.
 }
-rewrite mat_swap_rows_comm.
-remember (mat_swap_rows i (i + 1) A) as B eqn:HB.
-apply mat_el_circ_rot_rows_outside; [ | flia ].
-rewrite HB, mat_swap_rows_nrows.
-rewrite HA.
-rewrite mat_nrows_fold_left_swap; flia Hi.
+rewrite List_nth_map_seq; [ | flia Hi ].
+rewrite Nat.add_0_l.
+rewrite transposition_1.
+now rewrite HA.
 Qed.
 
 Theorem subm_mat_swap_rows_succ_succ : ∀ (M : matrix T) i j,
