@@ -2856,8 +2856,7 @@ Qed.
 
 Theorem nth_fold_left_map_transp' : ∀ A (la : list A) i len d,
   i + 1 < length la
-  → i ≠ len
-  → i < len + 1
+  → i < len
   → nth i
       (fold_left
          (λ la' k,
@@ -2866,15 +2865,13 @@ Theorem nth_fold_left_map_transp' : ∀ A (la : list A) i len d,
          (seq 0 len) la) d =
     nth (i + 1) la d.
 Proof.
-intros * Hi Hi1p Hpi.
-Check nth_fold_left_map_transp.
-...
+intros * Hi Hpi.
 symmetry.
 rewrite <- (@nth_fold_left_map_transp _ _ _ 0 i); [ | easy | flia ].
 remember (fold_left _ _ _) as B eqn:HB.
 replace len with (i + (len - i)) by flia Hpi.
 rewrite seq_app, fold_left_app; cbn.
-replace (len - i) with (S (len - i - 1)) by flia Hpi Hi1p.
+replace (len - i) with (S (len - i - 1)) by flia Hpi.
 rewrite <- cons_seq; cbn.
 rewrite length_fold_left_map_transp.
 rewrite nth_fold_left_map_transp; [ | | left; flia ]. 2: {
@@ -2933,7 +2930,7 @@ destruct (le_dec p i) as [Hpi| Hpi]. {
 apply Nat.nle_gt in Hpi.
 rewrite Nat.add_0_r.
 symmetry.
-apply nth_fold_left_map_transp'; [ easy | flia Hi1p Hpi | flia Hpi ].
+apply nth_fold_left_map_transp'; [ easy | flia Hi1p Hpi ].
 Qed.
 
 Theorem subm_mat_swap_rows_succ_succ : ∀ (M : matrix T) i j,
@@ -3147,7 +3144,6 @@ destruct (le_dec p i) as [Hpi| Hpi]. 2: {
   rewrite nth_butn_after; [ | easy ].
   rewrite nth_fold_left_map_transp'; cycle 1.
 flia Hi.
-2: flia Hpi.
 ...
   rewrite glop; [ | flia Hi | | easy ].
 ...
