@@ -2814,18 +2814,21 @@ Proof.
 intros * Hi.
 destruct (Nat.eq_dec i (sta + len)) as [Hisl| Hisl]. {
   subst i.
-  revert sta Hi.
+  revert la sta d Hi.
   induction len; intros. {
     rewrite Nat.add_0_r in Hi |-*.
-Search (nth _ (fold_left _ _ _)).
-...
-intros * Hi.
-unfold Nat.b2n, "&&", negb.
-rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec len 0) as [Hlz| Hlz]. {
-  subst len; cbn.
-  now rewrite Nat.add_0_r.
+    now destruct la.
+  }
+  cbn.
+  rewrite <- Nat.add_succ_comm in Hi.
+  rewrite <- Nat.add_succ_comm.
+  rewrite IHlen; [ | now rewrite map_length, seq_length ].
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
+  rewrite seq_nth; [ | flia Hi ].
+  rewrite Nat.add_0_l, Nat.add_1_r.
+  now rewrite transposition_2.
 }
+unfold Nat.b2n, "&&", negb.
 rewrite if_leb_le_dec.
 destruct (le_dec sta i) as [Hip| Hip]. 2: {
   apply Nat.nle_gt in Hip.
@@ -2838,21 +2841,12 @@ destruct (le_dec i (sta + len)) as [Hip'| Hip']. 2: {
   rewrite Nat.add_0_r.
   apply nth_fold_left_map_transp_1; [ easy | now right ].
 }
+rewrite <- (@nth_fold_left_map_transp_1 _ _ _ (sta + len) i); cycle 1. {
+  now rewrite length_fold_left_map_transp.
+} {
+  left; flia Hisl Hip'.
+}
 ...
-symmetry.
-rewrite <- (@nth_fold_left_map_transp_1 _ _ _ 0 i); [ | | ].
-...
-rewrite <- (@nth_fold_left_map_transp_1 _ _ _ 0 i); [ | easy | flia ].
-...
-destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
-  subst i.
-  apply Nat.le_0_r in Hip; subst sta.
-  cbn.
-  destruct len; [ easy | cbn ].
-...
-rewrite <- (@nth_fold_left_map_transp_1 _ _ _ 0 (i + 1)); [ | | ].
-rewrite <- (@nth_fold_left_map_transp_1 _ _ _ 0 (i + 1)); [ | | flia ].
-rewrite <- (@nth_fold_left_map_transp_1 _ _ _ 0 i); [ | easy | flia ].
 remember (fold_left _ _ _) as B eqn:HB.
 replace len with (i + (len - i)) by flia Hpi.
 rewrite seq_app, fold_left_app; cbn.
