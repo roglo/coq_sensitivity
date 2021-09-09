@@ -2853,9 +2853,37 @@ rewrite Nat.add_0_l.
 unfold transposition at 1.
 do 2 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec i (sta + len)) as [Hisl'| Hisl']. {
-(*2*)
   subst i.
   clear IHlen Hisl Hip.
+Search (map _ (seq _ _)).
+Theorem seq_shift' : ∀ len sta d,
+  d ≤ sta
+  → map (Nat.add (sta - d)) (seq d len) = seq sta len.
+Proof.
+intros * Hd.
+revert sta d Hd.
+induction len; intros; [ easy | cbn ].
+rewrite Nat.sub_add; [ f_equal | easy ].
+...
+rewrite <- IHlen with (d := S d); [ | easy ].
+rewrite Nat.sub_diag.
+rewrite map_map.
+cbn.
+erewrite map_ext_in. 2: {
+  intros i Hi; apply in_seq in Hi.
+...
+rewrite seq_S; cbn.
+rewrite map_app; cbn.
+rewrite IHlen.
+
+cbn; rewrite Nat.add_0_r; f_equal.
+rewrite <- IHlen.
+cbn.
+...
+
+seq_shift: ∀ len start : nat, map S (seq start len) = seq (S start) len
+...
+(*2*)
   remember (sta + len) as n eqn:Hn.
   replace sta with (n - len) by flia Hn.
   clear sta Hn.
@@ -2885,8 +2913,6 @@ destruct (Nat.eq_dec i (sta + len)) as [Hisl'| Hisl']. {
     }
 ...2
 (*1*)
-  subst i.
-  clear IHlen Hisl Hip.
   revert la sta Hi.
   induction len; intros; [ easy | ].
   destruct la as [| a]; [ easy | ].
