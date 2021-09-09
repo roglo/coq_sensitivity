@@ -2853,6 +2853,19 @@ rewrite Nat.add_0_l.
 unfold transposition at 1.
 do 2 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec i (sta + len)) as [Hisl'| Hisl']. {
+(*1*)
+  subst i.
+  clear IHlen Hisl Hip.
+  revert la sta Hi.
+  induction len; intros; [ easy | ].
+  destruct la as [| a]; [ easy | ].
+  rewrite <- Nat.add_succ_comm in Hi; cbn in Hi.
+  apply Nat.succ_lt_mono in Hi.
+  rewrite <- (Nat.add_succ_comm sta).
+  cbn - [ nth ].
+  remember (nth (S _) (a :: la) d) as x.
+  cbn in Heqx; subst x.
+...1
   rewrite <- Hisl'.
   destruct len; [ easy | ].
   rewrite seq_S, fold_left_app; cbn.
@@ -2866,6 +2879,9 @@ destruct (Nat.eq_dec i (sta + len)) as [Hisl'| Hisl']. {
     clear H.
     destruct (Nat.eq_dec (i + 1) (sta + len + 1)) as [H| H]; [ flia Hisl' H | ].
     clear H.
+    clear IHlen Hisl.
+    subst i.
+    clear Hip Hi.
 ...
     symmetry.
     rewrite <- (@nth_fold_left_map_transp_1 _ _ _ sta (i - sta)).
