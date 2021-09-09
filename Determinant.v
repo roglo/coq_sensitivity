@@ -2843,6 +2843,7 @@ destruct (le_dec i (sta + len)) as [Hip'| Hip']. 2: {
 }
 assert (H : i < sta + len) by flia Hisl Hip'.
 clear Hisl Hip'; rename H into Hisl.
+...
 revert i la d sta Hi Hip Hisl.
 induction len; intros; [ flia Hip Hisl | ].
 rewrite seq_S, fold_left_app.
