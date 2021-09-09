@@ -2853,6 +2853,37 @@ rewrite Nat.add_0_l.
 unfold transposition at 1.
 do 2 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec i (sta + len)) as [Hisl'| Hisl']. {
+(*2*)
+  subst i.
+  clear IHlen Hisl Hip.
+  remember (sta + len) as n eqn:Hn.
+  replace sta with (n - len) by flia Hn.
+  clear sta Hn.
+  revert len la Hi.
+  induction n; intros. {
+    cbn.
+    induction len; [ easy | cbn ].
+    cbn.
+...
+    destruct la as [| a]; [ easy | cbn; clear Hi ].
+...
+  destruct la as [| a]; [ easy | ].
+  rewrite <- Nat.add_succ_comm in Hi; cbn in Hi.
+  apply Nat.succ_lt_mono in Hi.
+  rewrite <- (Nat.add_succ_comm sta).
+  rewrite seq_S.
+  cbn - [ nth ].
+  remember (nth (S _) (a :: la) d) as x.
+  cbn in Heqx; subst x.
+  rewrite fold_left_app.
+  cbn - [ nth ].
+  rewrite length_fold_left_map_transp.
+  destruct (lt_dec (sta + len + 1) (length la)) as [H1| H1]. {
+    rewrite (List_map_nth' 0). 2: {
+      rewrite seq_length; cbn.
+      now apply -> Nat.succ_lt_mono.
+    }
+...2
 (*1*)
   subst i.
   clear IHlen Hisl Hip.
@@ -2862,9 +2893,18 @@ destruct (Nat.eq_dec i (sta + len)) as [Hisl'| Hisl']. {
   rewrite <- Nat.add_succ_comm in Hi; cbn in Hi.
   apply Nat.succ_lt_mono in Hi.
   rewrite <- (Nat.add_succ_comm sta).
+  rewrite seq_S.
   cbn - [ nth ].
   remember (nth (S _) (a :: la) d) as x.
   cbn in Heqx; subst x.
+  rewrite fold_left_app.
+  cbn - [ nth ].
+  rewrite length_fold_left_map_transp.
+  destruct (lt_dec (sta + len + 1) (length la)) as [H1| H1]. {
+    rewrite (List_map_nth' 0). 2: {
+      rewrite seq_length; cbn.
+      now apply -> Nat.succ_lt_mono.
+    }
 ...1
   rewrite <- Hisl'.
   destruct len; [ easy | ].
