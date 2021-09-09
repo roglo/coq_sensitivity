@@ -2854,6 +2854,24 @@ unfold transposition at 1.
 do 2 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec i (sta + len)) as [Hisl'| Hisl']. {
   rewrite <- Hisl'.
+  destruct len; [ easy | ].
+  rewrite seq_S, fold_left_app; cbn.
+  rewrite length_fold_left_map_transp.
+  destruct (lt_dec (i + 1) (length la)) as [Hi1l| Hi1l]. {
+    rewrite List_nth_map_seq; [ | easy ].
+    rewrite Nat.add_0_l.
+    unfold transposition at 1.
+    do 2 rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec (i + 1) (sta + len)) as [H| H]; [ flia Hisl' H | ].
+    clear H.
+    destruct (Nat.eq_dec (i + 1) (sta + len + 1)) as [H| H]; [ flia Hisl' H | ].
+    clear H.
+...
+    symmetry.
+    rewrite <- (@nth_fold_left_map_transp_1 _ _ _ sta (i - sta)).
+...
+
+  replace len with (i - sta + (len - (i - sta))) by flia Hisl.
 Search (nth _ (fold_left _ _ _)).
 ...
   rewrite nth_overflow. 2: {
