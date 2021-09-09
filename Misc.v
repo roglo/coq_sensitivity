@@ -199,19 +199,26 @@ unfold iter_seq.
 now replace (S (b + len - 1) - b) with len by flia Hblen.
 Qed.
 
-(*
-Theorem seq_split3 : ∀ n sta len,
-  n < len
-  → seq sta len = seq sta n ++ [sta + n] ++ seq (sta + S n) (len - S n).
+Theorem List_seq_shift' : ∀ len sta,
+  map (Nat.add sta) (seq 0 len) = seq sta len.
 Proof.
-intros * Hn.
-replace len with (n + (1 + (len - S n))) by flia Hn.
-rewrite seq_app; f_equal.
-rewrite seq_app; cbn; f_equal.
-rewrite <- Nat.add_assoc, Nat.add_1_r; f_equal.
-flia Hn.
+assert (List_seq_shift_1 : ∀ len sta d,
+  d ≤ sta
+  → map (Nat.add (sta - d)) (seq d len) = seq sta len). {
+  intros * Hd.
+  revert sta d Hd.
+  induction len; intros; [ easy | cbn ].
+  rewrite Nat.sub_add; [ f_equal | easy ].
+  rewrite <- seq_shift, map_map.
+  symmetry.
+  rewrite <- IHlen with (d := S d); [ | flia Hd ].
+  cbn.
+  now rewrite <- seq_shift, map_map.
+}
+intros.
+specialize (List_seq_shift_1 len sta 0 (Nat.le_0_l sta)) as H1.
+now rewrite Nat.sub_0_r in H1.
 Qed.
-*)
 
 Theorem List_seq_cut : ∀ i sta len,
   i ∈ seq sta len
