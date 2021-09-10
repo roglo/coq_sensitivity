@@ -2843,6 +2843,20 @@ destruct (le_dec i (sta + len)) as [Hip'| Hip']. 2: {
 }
 assert (H : i < sta + len) by flia Hisl Hip'.
 clear Hisl Hip'; rename H into Hisl.
+rewrite List_fold_left_map_nth_len.
+Search (map _ _ = fold_left _ _ _).
+Search (fold_left (λ _ _, fold_left _ _ _)).
+Search (fold_left (λ _ _, map _ _)).
+...
+Search (fold_left _ _ _ = map _ _).
+...
+nth_fold_left_map_transp_1:
+
+erewrite List_fold_left_ext_in. 2: {
+  intros j lb Hj; apply in_seq in Hj.
+  unfold transposition.
+Search (map _ (seq _ _)).
+Search (map _ (λ _, nth _ _ _)).
 ...
 rewrite Nat.add_1_r.
 revert i sta len Hi Hip Hisl.

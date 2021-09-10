@@ -2161,6 +2161,21 @@ apply Hfg.
 now right.
 Qed.
 
+Theorem List_fold_left_map_nth_len : ∀ A (la : list A) sta len f d,
+  fold_left (λ lb k, map (λ i, nth (f k i) lb d) (seq 0 (length lb)))
+    (seq sta len) la =
+  fold_left (λ lb k, map (λ i, nth (f k i) lb d) (seq 0 (length la)))
+    (seq sta len) la.
+Proof.
+intros.
+revert sta la.
+induction len; intros; [ easy | cbn ].
+rewrite IHlen.
+apply List_fold_left_ext_in.
+intros i lb Hi; apply in_seq in Hi.
+now rewrite map_length, seq_length.
+Qed.
+
 Theorem List_fold_left_mul_assoc : ∀ a b l,
   fold_left Nat.mul l a * b = fold_left Nat.mul l (a * b).
 Proof.
