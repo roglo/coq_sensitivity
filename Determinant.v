@@ -2843,10 +2843,17 @@ destruct (le_dec i (sta + len)) as [Hip'| Hip']. 2: {
 }
 assert (H : i < sta + len) by flia Hisl Hip'.
 clear Hisl Hip'; rename H into Hisl.
+Theorem glop : ∀ (A : Type) (la : list A) (d : A),
+  map (λ i : nat, nth (f i) la d) (seq 0 (length la)) =
+  map (λ a, ...) la.
+(* ah, fait chier *)
+...
 rewrite List_fold_left_map_nth_len.
 Search (map _ _ = fold_left _ _ _).
 Search (fold_left (λ _ _, fold_left _ _ _)).
 Search (fold_left (λ _ _, map _ _)).
+Search (map _ (seq _ _)).
+List_map_nth_seq: ∀ (A : Type) (la : list A) (d : A), la = map (λ i : nat, nth i la d) (seq 0 (length la))
 ...
 Search (fold_left _ _ _ = map _ _).
 ...
