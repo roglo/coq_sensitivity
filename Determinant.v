@@ -2843,12 +2843,53 @@ destruct (le_dec i (sta + len)) as [Hip'| Hip']. 2: {
 }
 assert (H : i < sta + len) by flia Hisl Hip'.
 clear Hisl Hip'; rename H into Hisl.
+...
 rewrite Nat.add_1_r.
 revert i sta len Hi Hip Hisl.
 induction la as [| a]; intros; [ easy | cbn ].
 destruct i. {
   apply Nat.le_0_r in Hip; subst sta; cbn.
   clear IHla Hi; cbn in Hisl.
+  induction len; [ easy | clear Hisl ].
+  rewrite seq_S, fold_left_app; cbn.
+  rewrite length_fold_left_map_transp; cbn.
+  unfold transposition at 1.
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec 0 len) as [Hlz| Hlz]; [ now subst len | ].
+  destruct (Nat.eq_dec 0 (len + 1)) as [H| H]; [ flia H | clear H ].
+  apply Nat.neq_sym in Hlz.
+  apply IHlen.
+  now apply Nat.neq_0_lt_0.
+}
+destruct sta. {
+  clear IHla Hi Hip; cbn in Hisl.
+...
+  rewrite nth_fold_left_map_transp_1.
+...
+  revert i Hisl.
+  induction len; intros; [ easy | clear Hisl ].
+  rewrite seq_S, fold_left_app; cbn.
+  rewrite length_fold_left_map_transp; cbn.
+  destruct (lt_dec i (length la)) as [Hil| Hil]. {
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ | easy ].
+    unfold transposition at 1.
+    rewrite Nat.add_1_l.
+    do 2 rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec (S i) len) as [Hsil| Hsil]. {
+...
+  unfold transposition at 1.
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec 0 len) as [Hlz| Hlz]; [ now subst len | ].
+  destruct (Nat.eq_dec 0 (len + 1)) as [H| H]; [ flia H | clear H ].
+  apply Nat.neq_sym in Hlz.
+  apply IHlen.
+  now apply Nat.neq_0_lt_0.
+  ============================
+  nth (S i)
+    (fold_left
+       (λ (la' : list A) (k : nat), map (λ j : nat, nth (transposition k (k + 1) j) la' d) (seq 0 (length la')))
+       (seq 0 len) (a :: la)) d = nth (S i) la d
 ...
   induction len; [ easy | ].
   rewrite seq_S; cbn.
