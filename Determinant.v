@@ -2844,6 +2844,18 @@ destruct (le_dec i (sta + len)) as [Hip'| Hip']. 2: {
 assert (H : i < sta + len) by flia Hisl Hip'.
 clear Hisl Hip'; rename H into Hisl.
 ...
+erewrite List_fold_left_ext_in. 2: {
+  intros j lb Hj; apply in_seq in Hj.
+  erewrite map_ext_in. 2: {
+    intros k Hk; apply in_seq in Hk.
+    unfold transposition.
+    easy.
+  }
+  easy.
+}
+...
+Search (fold_left _ _ _ = fold_left _ _ _).
+...
 revert i la d sta Hi Hip Hisl.
 induction len; intros; [ flia Hip Hisl | ].
 rewrite seq_S, fold_left_app.
