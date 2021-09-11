@@ -2843,6 +2843,11 @@ destruct (le_dec i (sta + len)) as [Hip'| Hip']. 2: {
 }
 assert (H : i < sta + len) by flia Hisl Hip'.
 clear Hisl Hip'; rename H into Hisl.
+remember (λ la' k, map _ _) as f eqn:Hf.
+replace len with (i - sta + (len - (i - sta))) by flia Hip Hisl.
+rewrite seq_app.
+rewrite fold_left_app.
+replace (sta + (i - sta)) with i by flia Hip.
 ...
 Theorem glop : ∀ A B d la lb (f : list A → B → list A) i,
   nth i (fold_left f lb la) d = d.
