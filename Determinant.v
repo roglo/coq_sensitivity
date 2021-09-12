@@ -2846,6 +2846,10 @@ clear Hisl Hip'; rename H into Hisl.
 rewrite List_fold_left_map_nth_len.
 set (f := λ la' k, map _ _).
 ...
+(∀ j, sta ≤ j < i → nth j la' d = nth (j + 1) la d)
+→ nth i la' d = nth sta la d
+→ (∀ j, i < j, nth j la' d = nth j la d)
+...
 replace len with (i - sta + (len - (i - sta))) by flia Hip Hisl.
 rewrite seq_app.
 rewrite fold_left_app.
