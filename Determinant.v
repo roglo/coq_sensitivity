@@ -2845,7 +2845,10 @@ assert (H : i < sta + len) by flia Hisl Hip'.
 clear Hisl Hip'; rename H into Hisl.
 rewrite List_fold_left_map_nth_len.
 set (f := λ la' k, map _ _).
-(**)
+(*1*)
+revert i sta Hi Hip Hisl.
+induction len; intros; [ flia Hip Hisl | ].
+...1
 destruct len; [ flia Hip Hisl | ].
 destruct len. {
   cbn.
