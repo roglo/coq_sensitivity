@@ -2846,6 +2846,38 @@ clear Hisl Hip'; rename H into Hisl.
 rewrite List_fold_left_map_nth_len.
 set (f := λ la' k, map _ _).
 (*1*)
+remember (i - sta) as j eqn:Hj.
+replace i with (sta + j) in * by flia Hj Hip.
+clear Hip Hj.
+assert (H : j < len) by flia Hisl.
+move H before Hisl; clear Hisl; rename H into Hisl.
+revert j sta Hi Hisl.
+induction len; intros; [ flia Hisl | ].
+...
+revert sta Hi.
+induction j; intros. {
+  rewrite Nat.add_0_r in Hi |-*.
+  rewrite seq_S.
+  rewrite fold_left_app.
+  cbn.
+  unfold f at 1; cbn.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ cbn | easy ].
+  destruct (Nat.eq_dec len 0) as [Hlz| Hlz]. {
+    subst len.
+    rewrite Nat.add_0_r.
+    now rewrite transposition_1.
+  }
+  rewrite transposition_out; [ | flia Hlz | flia ].
+  specialize (IHlen 0 sta).
+  rewrite Nat.add_0_r in IHlen.
+  rewrite IHlen; [ easy | easy | flia Hlz ].
+}
+assert (H : j < S len) by flia Hisl.
+specialize (IHj H); clear H.
+rewrite <- Nat.add_succ_comm in Hi |-*.
+specialize (IHj (S sta) Hi).
+...1
 revert i sta Hi Hip Hisl.
 induction len; intros; [ flia Hip Hisl | ].
 destruct (Nat.eq_dec i sta) as [His| His]. {
@@ -2867,6 +2899,7 @@ destruct (Nat.eq_dec i sta) as [His| His]. {
 assert (H : S sta ≤ i) by flia Hip His.
 move H before Hip; clear Hip; rename H into Hip.
 rewrite <- Nat.add_succ_comm in Hisl.
+cbn.
 ...
 rewrite <- (IHlen i (S sta) Hi Hip Hisl).
 cbn.
