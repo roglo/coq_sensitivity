@@ -2873,6 +2873,86 @@ destruct len. {
   rewrite seq_nth; [ cbn | easy ].
   rewrite Nat.add_1_r.
   rewrite transposition_1.
+  clear Hisl Hip His.
+  destruct (lt_dec (sta + 2) (length la)) as [Hs2l| Hs2l]. {
+    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hs2l ].
+    rewrite seq_nth; [ cbn | flia Hs2l ].
+    rewrite transposition_out; [ | flia | flia ].
+    now rewrite Nat.add_1_r.
+  }
+  replace sta with (length la - 2) by flia Hi Hs2l.
+  cbn.
+  replace (length la - 2 + 1) with (length la - 1) by flia Hi.
+  rewrite <- Nat.sub_succ_l; [ | flia Hi Hs2l ].
+  rewrite <- Nat.sub_succ_l; [ | flia Hi Hs2l ].
+  rewrite <- Nat.sub_succ_l; [ | flia Hi Hs2l ].
+  do 3 rewrite Nat.sub_succ.
+  rewrite Nat.sub_0_r.
+  rewrite nth_overflow; [ | now rewrite map_length, seq_length ].
+  now symmetry; apply nth_overflow.
+}
+destruct len. {
+  unfold f; cbn.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ cbn | easy ].
+  destruct (Nat.eq_dec i sta) as [His| His]. {
+    subst i.
+    rewrite transposition_out; [ | flia | flia ].
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ cbn | easy ].
+    rewrite transposition_out; [ | easy | flia ].
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ cbn | easy ].
+    now rewrite transposition_1.
+  }
+  destruct (Nat.eq_dec i (sta + 1)) as [His1| His1]. {
+    subst i.
+    rewrite transposition_out; [ | flia | flia ].
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ cbn | easy ].
+    rewrite Nat.add_1_r.
+    rewrite transposition_1.
+    destruct (lt_dec (sta + 2) (length la)) as [Hs2l| Hs2l]. {
+      rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hs2l ].
+      rewrite seq_nth; [ cbn | flia Hs2l ].
+      rewrite transposition_out; [ | flia | flia ].
+      now rewrite Nat.add_1_r.
+    }
+    replace sta with (length la - 2) by flia Hi Hs2l.
+    cbn.
+    replace (length la - 2 + 1) with (length la - 1) by flia Hi.
+    rewrite <- Nat.sub_succ_l; [ | flia Hi Hs2l ].
+    rewrite <- Nat.sub_succ_l; [ | flia Hi Hs2l ].
+    rewrite <- Nat.sub_succ_l; [ | flia Hi Hs2l ].
+    do 3 rewrite Nat.sub_succ.
+    rewrite Nat.sub_0_r.
+    rewrite nth_overflow; [ | now rewrite map_length, seq_length ].
+    now symmetry; apply nth_overflow.
+  }
+  assert (H : i = S (S sta)) by flia Hip Hisl His His1.
+  subst i.
+  rewrite transposition_1.
+  destruct (lt_dec (sta + 3) (length la)) as [Hs3l| Hs3l]. {
+    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hs3l ].
+    rewrite seq_nth; [ cbn | flia Hs3l ].
+    rewrite transposition_out; [ | flia | flia ].
+    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hs3l ].
+    rewrite seq_nth; [ cbn | flia Hs3l ].
+    rewrite transposition_out; [ easy | flia | flia ].
+  }
+  replace sta with (length la - 3) by flia Hi Hs3l.
+  replace (length la - 3 + 1) with (length la - 2) by flia Hi.
+  rewrite <- Nat.sub_succ_l; [ | flia Hi Hs3l ].
+  rewrite <- Nat.sub_succ_l; [ | flia Hi Hs3l ].
+  rewrite <- Nat.sub_succ_l; [ | flia Hi Hs3l ].
+  rewrite <- Nat.sub_succ_l; [ | flia Hi Hs3l ].
+  do 6 rewrite Nat.sub_succ.
+  rewrite Nat.sub_0_r.
+  rewrite Nat.sub_add; [ | flia Hi ].
+  rewrite nth_overflow; [ | now rewrite map_length, seq_length ].
+  now symmetry; apply nth_overflow.
+}
+destruct len. {
 ...
 replace len with (i - sta + (len - (i - sta))) by flia Hip Hisl.
 rewrite seq_app.
