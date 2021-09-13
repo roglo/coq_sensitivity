@@ -2845,65 +2845,33 @@ assert (H : i < sta + len) by flia Hisl Hip'.
 clear Hisl Hip'; rename H into Hisl.
 rewrite List_fold_left_map_nth_len.
 set (f := λ la' k, map _ _).
-Theorem glop : ∀ A sta len d f (la : list A) i j,
-  (∀ k, sta ≤ k < j → nth k (fold_left f (seq sta (j - sta)) la) d = nth (k + 1) la d)
-  → nth j (fold_left f (seq sta (j - sta)) la) d = nth sta la d
-  → (∀ k, j < k < sta + len → nth k (fold_left f (seq sta (j - sta)) la) d = nth k la d)
-  → i < length la
-  → sta ≤ i < sta + len
-  → nth i (fold_left f (seq sta len) la) d = nth (i + 1) la d.
-Admitted.
-apply glop with (j := sta + len).
-(* n'importe quoi... *)
-...
-  (∀ j, sta ≤ j < len → nth j (f la i) d = nth (j + 1) la d)
-  → nth j (f la i)
-  → (∀ j, i < j → nth j (f la i) d = nth j la d)
-  → i < length la
-  → sta ≤ i < sta + len
-  → nth i (fold_left f (seq sta len) la) d = nth (i + 1) la d.
-Admitted.
-...
-(*1*)
-revert i Hi sta Hip Hisl.
-induction len; intros; [ flia Hip Hisl | ].
-...1
-set (f := λ la' k, map _ _).
-...
-Theorem glop : ∀ A sta len d f (la : list A) i,
-  (∀ j, sta ≤ j < i → nth j (f la i) d = nth (j + 1) la d)
-  → (∀ j, i < j → nth j (f la i) d = nth j la d)
-  → i < length la
-  → sta ≤ i < sta + len
-  → nth i (fold_left f (seq sta len) la) d = nth (i + 1) la d.
-Admitted.
-apply glop. {
-  intros j Hj.
+(**)
+destruct len; [ flia Hip Hisl | ].
+destruct len. {
+  cbn.
+  assert (H : i = sta) by flia Hip Hisl; subst i.
   unfold f; cbn.
-  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi Hj ].
-  rewrite seq_nth; [ cbn | flia Hi Hj ].
-  unfold transposition.
-  do 2 rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec j i) as [H| H]; [ now subst j | clear H ].
-  destruct (Nat.eq_dec j (i + 1)) as [H| H]; [ flia Hj H | clear H ].
-(* non c'est pas bon *)
-...
-} {
-  intros j Hj.
-  unfold f; cbn.
-  destruct (lt_dec j (length la)) as [Hjl| Hjl]. 2: {
-    apply Nat.nlt_ge in Hjl.
-    rewrite nth_overflow; [ | now rewrite map_length, seq_length ].
-    now symmetry; apply nth_overflow.
-  }
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
   rewrite seq_nth; [ cbn | easy ].
-  unfold transposition.
-  do 2 rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec j i) as [H| H]; [ flia Hj H | clear H ].
-  destruct (Nat.eq_dec j (i + 1)) as [Hji| Hji]; [ | easy ].
-  subst j.
-...
+  now rewrite transposition_1.
+}
+destruct len. {
+  cbn.
+  destruct (Nat.eq_dec i sta) as [His| His]. {
+    subst i.
+    unfold f; cbn.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ cbn | easy ].
+    rewrite transposition_out; [ | easy | flia ].
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ cbn | easy ].
+    now rewrite transposition_1.
+  }
+  assert (H : i = sta + 1) by flia Hip Hisl His; subst i.
+  unfold f; cbn.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ cbn | easy ].
+  rewrite Nat.add_1_r.
   rewrite transposition_1.
 ...
 replace len with (i - sta + (len - (i - sta))) by flia Hip Hisl.
