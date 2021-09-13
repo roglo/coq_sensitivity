@@ -2844,7 +2844,12 @@ destruct (le_dec i (sta + len)) as [Hip'| Hip']. 2: {
 assert (H : i < sta + len) by flia Hisl Hip'.
 clear Hisl Hip'; rename H into Hisl.
 rewrite List_fold_left_map_nth_len.
+(*1*)
+revert i Hi sta Hip Hisl.
+induction len; intros; [ flia Hip Hisl | ].
+...1
 set (f := λ la' k, map _ _).
+...
 Theorem glop : ∀ A sta len d f (la : list A) i,
   (∀ j, sta ≤ j < i → nth j (f la i) d = nth (j + 1) la d)
   → (∀ j, i < j → nth j (f la i) d = nth j la d)
