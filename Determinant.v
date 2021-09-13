@@ -2848,6 +2848,33 @@ set (f := λ la' k, map _ _).
 (*1*)
 revert i sta Hi Hip Hisl.
 induction len; intros; [ flia Hip Hisl | ].
+destruct (Nat.eq_dec i sta) as [His| His]. {
+  subst i.
+  rewrite seq_S.
+  rewrite fold_left_app.
+  cbn.
+  unfold f at 1; cbn.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ cbn | easy ].
+  destruct (Nat.eq_dec len 0) as [Hlz| Hlz]. {
+    subst len.
+    rewrite Nat.add_0_r.
+    now rewrite transposition_1.
+  }
+  rewrite transposition_out; [ | flia Hlz | flia ].
+  apply IHlen; [ easy | easy | flia Hlz ].
+}
+assert (H : S sta ≤ i) by flia Hip His.
+move H before Hip; clear Hip; rename H into Hip.
+rewrite <- Nat.add_succ_comm in Hisl.
+...
+rewrite <- (IHlen i (S sta) Hi Hip Hisl).
+cbn.
+...
+rewrite <- seq_shift in H1.
+rewrite List_fold_left_map in H1.
+cbn.
+unfold f at 2.
 ...1
 destruct len; [ flia Hip Hisl | ].
 destruct len. {
