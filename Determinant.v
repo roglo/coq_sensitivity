@@ -2812,6 +2812,7 @@ Theorem nth_fold_left_map_transp : ∀ A (la : list A) i sta len d,
       nth (i + Nat.b2n ((sta <=? i) && (i <=? sta + len))) la d.
 Proof.
 intros * Hi.
+rewrite List_fold_left_map_nth_len.
 set (f := λ la k i, nth (transposition k (k + 1) i) la d).
 erewrite List_fold_left_ext_in. 2: {
   intros j la' Hj.
