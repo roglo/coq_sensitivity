@@ -2872,6 +2872,7 @@ destruct (le_dec i (sta + len)) as [Hip'| Hip']. 2: {
 }
 assert (H : i < sta + len) by flia Hisl Hip'.
 clear Hisl Hip'; rename H into Hisl.
+(*
 specialize List_fold_left_map_nth_len as H1.
 specialize (H1 A la sta len).
 specialize (H1 (λ k, transposition k (k + 1)) d).
@@ -2882,20 +2883,23 @@ set
        (seq 0 (length lb))) in H1 |-*.
 rewrite H1.
 ...
+*)
+(*
 rewrite List_fold_left_map_nth_len.
-...
-(**)
+*)
 specialize (firstn_skipn) as H1.
 specialize (H1 A sta la).
 rewrite <- H1.
 erewrite List_fold_left_ext_in. 2: {
   intros j lb Hj.
+  rewrite <- (firstn_skipn sta lb) at 1.
   rewrite app_length.
   rewrite firstn_length.
   rewrite skipn_length.
   rewrite seq_app.
   rewrite map_app.
-  rewrite Nat.min_l; [ | ].
+  rewrite Nat.min_l.
+...
   rewrite Nat.min_l; [ | flia Hip Hi ].
   erewrite map_ext_in. 2: {
     intros k Hk.
