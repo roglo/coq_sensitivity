@@ -2853,7 +2853,6 @@ assert (H : j < len) by flia Hisl.
 move H before Hisl; clear Hisl; rename H into Hisl.
 revert j sta Hi Hisl.
 induction len; intros; [ flia Hisl | ].
-...
 revert sta Hi.
 induction j; intros. {
   rewrite Nat.add_0_r in Hi |-*.
@@ -2873,6 +2872,7 @@ induction j; intros. {
   rewrite Nat.add_0_r in IHlen.
   rewrite IHlen; [ easy | easy | flia Hlz ].
 }
+apply Nat.succ_lt_mono in Hisl.
 assert (H : j < S len) by flia Hisl.
 specialize (IHj H); clear H.
 rewrite <- Nat.add_succ_comm in Hi |-*.
