@@ -2799,6 +2799,20 @@ apply IHlen.
 flia Hip His.
 Qed.
 
+Theorem glop : ∀ A (la : list A) i d,
+  i < length la
+  → nth i
+      (fold_left
+         (λ la' k,
+            map (λ j, nth (transposition k (k + 1) j) la' d)
+              (seq 0 (length la')))
+         (seq 0 (length la)) la) d =
+     nth (i + 1) la d.
+Proof.
+intros * Hi.
+rewrite List_fold_left_map_nth_len.
+Admitted.
+
 Theorem nth_fold_left_map_transp : ∀ A (la : list A) i sta len d,
   i < length la
   → nth i
@@ -2811,6 +2825,7 @@ Theorem nth_fold_left_map_transp : ∀ A (la : list A) i sta len d,
     else
       nth (i + Nat.b2n ((sta <=? i) && (i <=? sta + len))) la d.
 Proof.
+(*
 intros * Hi.
 rewrite List_fold_left_map_nth_len.
 set (f := λ la k i, nth (transposition k (k + 1) i) la d).
@@ -2824,6 +2839,7 @@ erewrite List_fold_left_ext_in. 2: {
   easy.
 }
 ...
+*)
 intros * Hi.
 destruct (Nat.eq_dec i (sta + len)) as [Hisl| Hisl]. {
   subst i.
@@ -2857,6 +2873,39 @@ destruct (le_dec i (sta + len)) as [Hip'| Hip']. 2: {
 assert (H : i < sta + len) by flia Hisl Hip'.
 clear Hisl Hip'; rename H into Hisl.
 rewrite List_fold_left_map_nth_len.
+(**)
+specialize (firstn_skipn) as H1.
+specialize (H1 A sta la).
+rewrite <- H1.
+erewrite List_fold_left_ext_in. 2: {
+  intros j lb Hj.
+  rewrite app_length.
+  rewrite firstn_length.
+  rewrite skipn_length.
+  rewrite seq_app.
+  rewrite map_app.
+  rewrite Nat.min_l; [ | flia Hip Hi ].
+  erewrite map_ext_in. 2: {
+    intros k Hk.
+    apply in_seq in Hj, Hk.
+    rewrite transposition_out; [ | flia Hj Hk | flia Hj Hk ].
+    easy.
+  }
+  rewrite List_map_nth_seq_skipn_firstn.
+...
+  cbn.
+    apply in_seq in Hk.
+...
+  erewrite map_ext_in. 2: {
+    intros k Hk.
+    rewrite app_length in Hk.
+    rewrite firstn_length in Hk.
+    rewrite skipn_length in Hk.
+    apply in_seq in Hk.
+    cbn in Hk.
+    rewrite seq_app in Hk.
+
+...
 set (f := λ la' k, map _ _).
 (*1*)
 remember (i - sta) as j eqn:Hj.
