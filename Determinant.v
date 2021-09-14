@@ -2898,7 +2898,28 @@ erewrite List_fold_left_ext_in. 2: {
   rewrite skipn_length.
   rewrite seq_app.
   rewrite map_app.
-  rewrite Nat.min_l.
+  erewrite map_ext_in. 2: {
+    intros k Hk.
+    apply in_seq in Hj, Hk.
+    rewrite transposition_out; [ | flia Hj Hk | flia Hj Hk ].
+    easy.
+  }
+  rewrite Nat.add_0_l.
+  easy.
+}
+rewrite app_nth2. 2: {
+  rewrite firstn_length.
+  rewrite min_l; [ | flia Hi Hip ].
+  flia Hip.
+}
+rewrite firstn_length.
+rewrite min_l; [ | flia Hi Hip ].
+...
+rewrite List_nth_skipn.
+rewrite Nat.sub_add; [ | flia Hip ].
+(*
+rewrite List_fold_left_map_nth_len.
+*)
 ...
   rewrite Nat.min_l; [ | flia Hip Hi ].
   erewrite map_ext_in. 2: {
