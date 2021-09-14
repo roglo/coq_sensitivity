@@ -2851,6 +2851,52 @@ replace i with (sta + j) in * by flia Hj Hip.
 clear i Hip Hj.
 assert (H : j < len) by flia Hisl.
 move H before Hisl; clear Hisl; rename H into Hisl.
+(*3*)
+revert j sta Hi Hisl.
+induction len; intros; [ flia Hisl | ].
+revert sta Hi.
+induction j; intros. {
+  rewrite Nat.add_0_r in Hi |-*.
+  rewrite seq_S.
+  rewrite fold_left_app.
+  cbn.
+  unfold f at 1; cbn.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ cbn | easy ].
+  destruct (Nat.eq_dec len 0) as [Hlz| Hlz]. {
+    subst len.
+    rewrite Nat.add_0_r.
+    now rewrite transposition_1.
+  }
+  rewrite transposition_out; [ | flia Hlz | flia ].
+  specialize (IHlen 0 sta).
+  rewrite Nat.add_0_r in IHlen.
+  rewrite IHlen; [ easy | easy | flia Hlz ].
+}
+apply Nat.succ_lt_mono in Hisl.
+assert (H : j < S len) by flia Hisl.
+specialize (IHj H); clear H.
+rewrite <- Nat.add_succ_comm in Hi |-*.
+specialize (IHj (S sta) Hi) as H1.
+specialize (IHlen j (S sta) Hi Hisl) as H2.
+cbn in H1, H2 |-*.
+specialize (IHlen j sta) as H3.
+assert (H : sta + j < length la) by flia Hi.
+specialize (H3 H Hisl); clear H.
+specialize (IHlen (S j) sta) as H4.
+rewrite Nat.add_succ_comm in Hi.
+specialize (H4 Hi).
+...
+destruct (Nat.eq_dec (S j) len) as [Hsjl| Hsjl]. {
+  subst len.
+  clear H4.
+  cbn.
+ 2: {
+  assert (H : S j < len) by flia Hisl Hsjl.
+  specialize (H4 H); clear H.
+  rewrite <- Nat.add_succ_comm in H4.
+  cbn in H4.
+...3
 (*2*)
 destruct len; [ easy | ].
 destruct len. {
