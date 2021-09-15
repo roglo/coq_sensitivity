@@ -2822,11 +2822,15 @@ induction n; intros. {
 destruct u as [| u0]; [ easy | ].
 cbn in Hn; apply Nat.succ_inj in Hn.
 rewrite Nat.add_1_r, List_nth_succ_cons.
+...
 revert u Hn.
 induction i; intros. {
+  clear Hi.
   destruct u as [| u1]; [ easy | ].
   cbn in Hn; apply Nat.succ_inj in Hn.
   cbn - [ seq ].
+  destruct u as [| u2]; [ easy | ].
+  cbn in Hn; apply Nat.succ_inj in Hn.
 ...
 intros * Hi.
 remember (length u) as n eqn:Hn; symmetry in Hn.
