@@ -2811,6 +2811,12 @@ Theorem glop : ∀ A (la : list A) i d,
 Proof.
 intros * Hi.
 rewrite List_fold_left_map_nth_len.
+remember (length la) as len eqn:Hlen.
+revert i d la Hlen Hi.
+induction len; intros; [ easy | ].
+...
+intros * Hi.
+rewrite List_fold_left_map_nth_len.
 revert i d Hi.
 induction la as [| a]; intros; [ easy | ].
 cbn - [ nth seq ].
