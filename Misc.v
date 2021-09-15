@@ -2330,6 +2330,9 @@ split. {
 }
 Qed.
 
+Theorem List_nth_S_cons' : ∀ A (a : A) la i, nth (S i) (a :: la) = nth i la.
+Proof. easy. Qed.
+
 Theorem List_nth_tl : ∀ A (l : list A) i d, nth i (tl l) d = nth (S i) l d.
 Proof.
 intros.

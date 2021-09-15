@@ -2811,7 +2811,35 @@ Theorem glop : ∀ A (la : list A) i d,
 Proof.
 intros * Hi.
 rewrite List_fold_left_map_nth_len.
-Admitted.
+revert i d Hi.
+induction la as [| a]; intros; [ easy | ].
+cbn - [ nth seq ].
+rewrite Nat.add_1_r.
+rewrite List_nth_S_cons'.
+...
+(**)
+rewrite seq_S.
+cbn - [ nth seq ].
+rewrite fold_left_app.
+cbn - [ nth seq ].
+rewrite map_app.
+cbn - [ nth seq ].
+rewrite transposition_1.
+cbn - [ nth seq ].
+destruct i. {
+...
+rewrite Nat.add_1_r.
+do 2 rewrite List_nth_S_cons'.
+rewrite <- seq_shift.
+rewrite map_map.
+rewrite List_fold_left_map.
+erewrite List_fold_left_ext_in. 2: {
+  intros j lb Hj; apply in_seq in Hj.
+  rewrite transposition_out; [ | easy | easy ].
+  rewrite map_map.
+  easy.
+}
+...
 
 Theorem nth_fold_left_map_transp : ∀ A (la : list A) i sta len d,
   i < length la
