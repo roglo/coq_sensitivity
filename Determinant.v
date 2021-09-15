@@ -2809,27 +2809,6 @@ Theorem glop : ∀ A (u : list A) i d,
          (seq 0 (length u - 1)) u) d =
      nth (i + 1) u d.
 Proof.
-intros * Hi.
-remember (length u) as n eqn:Hn; symmetry in Hn.
-revert u i Hn Hi.
-induction n; intros; [ easy | ].
-rewrite Nat_sub_succ_1 in Hi |-*.
-destruct n; [ easy | ].
-rewrite Nat_sub_succ_1 in IHn.
-revert u n IHn Hn Hi.
-induction i; intros; cbn. {
-  destruct u as [| u0]; [ easy | ].
-  cbn in Hn; apply Nat.succ_inj in Hn.
-  destruct u as [| u1]; [ easy | ].
-  cbn in Hn; apply Nat.succ_inj in Hn.
-  destruct u as [| u2]; [ now subst n | cbn ].
-  destruct n; [ easy | cbn ].
-  cbn in Hn; apply Nat.succ_inj in Hn.
-  rewrite <- seq_shift, map_length, seq_length.
-  rewrite <- seq_shift, map_map.
-  rewrite <- seq_shift, map_map, map_map; cbn.
-  rewrite <- seq_shift, map_map, map_map; cbn.
-  rewrite <- seq_shift, map_map, map_map; cbn.
 ...
 intros * Hi.
 remember (length u) as n eqn:Hn; symmetry in Hn.
