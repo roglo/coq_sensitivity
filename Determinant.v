@@ -2833,21 +2833,9 @@ erewrite List_fold_left_ext_in. 2: {
     rewrite transposition_out; [ | flia Hk | flia Hk ].
     easy.
   }
-Theorem map_nth_seq_firstn : ∀ A l (d : A) len,
-  len < length l
-  → map (λ i, nth i l d) (seq 0 len) = firstn len l.
-Proof.
-intros * Hl.
-revert len Hl.
-induction l as [| a]; intros; [ easy | ].
-destruct len; [ easy | ].
-cbn - [ nth ]; f_equal.
-rewrite <- seq_shift, map_map.
-erewrite map_ext_in. 2: {
-  intros i Hi; apply in_seq in Hi.
-  rewrite List_nth_succ_cons.
+  cbn - [ "-" ].
 ...
-rewrite map_nth_seq_firstn.
+  rewrite List_map_nth_seq_firstn.
 ...
 revert i d Hi.
 induction la as [| a]; intros; [ easy | ].

@@ -1199,6 +1199,9 @@ apply Hf with (i := S i); cbn.
 now apply -> Nat.succ_lt_mono.
 Qed.
 
+Theorem List_nth_succ_cons : ∀ A (a : A) la i, nth (S i) (a :: la) = nth i la.
+Proof. easy. Qed.
+
 Theorem List_map_nth' : ∀ A B a b (f : A → B) l n,
   n < length l → nth n (map f l) b = f (nth n l a).
 Proof.
@@ -1208,6 +1211,25 @@ induction l as [| c l]; intros; [ easy | ].
 cbn in Hnl; cbn.
 destruct n; [ easy | ].
 apply Nat.succ_lt_mono in Hnl.
+now apply IHl.
+Qed.
+
+Theorem List_map_nth_seq_firstn : ∀ A l (d : A) n,
+  n < length l
+  → map (λ i, nth i l d) (seq 0 n) = firstn n l.
+Proof.
+intros * Hl.
+revert n Hl.
+induction l as [| a]; intros; [ easy | ].
+destruct n; [ easy | ].
+cbn - [ nth ]; f_equal.
+rewrite <- seq_shift, map_map.
+erewrite map_ext_in. 2: {
+  intros i Hi; apply in_seq in Hi.
+  rewrite List_nth_succ_cons.
+  easy.
+}
+cbn in Hl; apply Nat.succ_lt_mono in Hl.
 now apply IHl.
 Qed.
 
@@ -2329,9 +2351,6 @@ split. {
   now apply nth_error_nth'.
 }
 Qed.
-
-Theorem List_nth_succ_cons : ∀ A (a : A) la i, nth (S i) (a :: la) = nth i la.
-Proof. easy. Qed.
 
 Theorem List_nth_tl : ∀ A (l : list A) i d, nth i (tl l) d = nth (S i) l d.
 Proof.
