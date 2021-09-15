@@ -2799,15 +2799,15 @@ apply IHlen.
 flia Hip His.
 Qed.
 
-Theorem glop : ∀ A (la : list A) i d,
-  i < length la - 1
+Theorem glop : ∀ A (u : list A) i d,
+  i < length u - 1
   → nth i
       (fold_left
          (λ la' k,
             map (λ j, nth (transposition k (k + 1) j) la' d)
               (seq 0 (length la')))
-         (seq 0 (length la - 1)) la) d =
-     nth (i + 1) la d.
+         (seq 0 (length u - 1)) u) d =
+     nth (i + 1) u d.
 Proof.
 (*
 intros * Hi.
@@ -2819,7 +2819,7 @@ induction len; intros; [ easy | ].
 *)
 intros * Hi.
 rewrite List_fold_left_map_nth_len.
-destruct la as [| a]; [ easy | ].
+destruct u as [| a]; [ easy | ].
 cbn in Hi; rewrite Nat.sub_0_r in Hi.
 cbn - [ nth seq ]; rewrite Nat.sub_0_r.
 rewrite Nat.add_1_r; rewrite List_nth_S_cons'.
