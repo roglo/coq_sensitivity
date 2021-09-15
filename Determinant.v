@@ -2822,7 +2822,32 @@ rewrite List_fold_left_map_nth_len.
 destruct u as [| a]; [ easy | ].
 cbn in Hi; rewrite Nat.sub_0_r in Hi.
 cbn - [ nth seq ]; rewrite Nat.sub_0_r.
-rewrite Nat.add_1_r; rewrite List_nth_S_cons'.
+rewrite Nat.add_1_r; rewrite List_nth_succ_cons.
+erewrite List_fold_left_ext_in. 2: {
+  intros j v Hj; apply in_seq in Hj.
+  replace (S (length u)) with (j + (S (length u) - j)) by flia Hj.
+  rewrite seq_app.
+  rewrite map_app.
+  erewrite map_ext_in. 2: {
+    intros k Hk; apply in_seq in Hk.
+    rewrite transposition_out; [ | flia Hk | flia Hk ].
+    easy.
+  }
+Theorem map_nth_seq_firstn : ∀ A l (d : A) len,
+  len < length l
+  → map (λ i, nth i l d) (seq 0 len) = firstn len l.
+Proof.
+intros * Hl.
+revert len Hl.
+induction l as [| a]; intros; [ easy | ].
+destruct len; [ easy | ].
+cbn - [ nth ]; f_equal.
+rewrite <- seq_shift, map_map.
+erewrite map_ext_in. 2: {
+  intros i Hi; apply in_seq in Hi.
+  rewrite List_nth_succ_cons.
+...
+rewrite map_nth_seq_firstn.
 ...
 revert i d Hi.
 induction la as [| a]; intros; [ easy | ].
