@@ -2849,6 +2849,46 @@ destruct i. {
   }
   apply nth_0_fold_left_cons_cons.
 }
+remember (nth (S i) u d) as x eqn:Hx.
+remember (u0 :: u) as v eqn:Hv.
+remember (S n) as sn; cbn - [ transposition ]; subst sn v.
+rewrite List_length_cons.
+remember (u0 :: u) as v eqn:Hv.
+remember (S n) as sn; cbn - [ transposition ]; subst sn v.
+rewrite transposition_1.
+rewrite List_nth_succ_cons.
+rewrite List_fold_left_map_nth_len.
+rewrite <- (seq_shift (S n)).
+rewrite List_fold_left_map.
+rewrite <- seq_shift.
+erewrite List_fold_left_ext_in. 2: {
+  intros j v Hj; apply in_seq in Hj.
+  cbn.
+  rewrite map_length.
+  rewrite map_length, seq_length.
+  rewrite <- seq_shift.
+  rewrite map_map.
+  easy.
+}
+rewrite map_map.
+...
+Theorem nth_succ_fold_left_cons_cons :
+  ∀ A B (b : A) (la : list B) lb d e f i,
+  nth (S i) (fold_left (λ v i, nth 0 v d :: f v i) la (b :: lb)) e =
+  nth i lb e.
+Proof.
+intros.
+revert lb.
+induction la as [| a]; intros; [ easy | cbn ].
+rewrite IHla.
+...
+rewrite nth_succ_fold_left_cons_cons.
+rewrite <- Hn in Hi.
+rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
+rewrite seq_nth; [ | flia Hi ].
+cbn; subst x.
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. 2: {
 ...
 destruct u as [| u1]; [ easy | ].
 cbn in Hn; apply Nat.succ_inj in Hn.
