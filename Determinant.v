@@ -2830,6 +2830,8 @@ destruct i. {
   remember (S n) as sn; cbn - [ nth ]; subst sn.
   rewrite List_nth_succ_cons.
   remember (nth 0 (u1 :: u) d) as x; cbn in Heqx; subst x.
+  rewrite <- seq_shift.
+  rewrite List_fold_left_map.
   erewrite List_fold_left_ext_in. 2: {
     intros i v Hi; apply in_seq in Hi.
 ...
