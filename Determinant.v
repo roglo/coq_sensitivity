@@ -2849,6 +2849,37 @@ destruct i. {
   }
   apply nth_0_fold_left_cons_cons.
 }
+(**)
+rewrite List_fold_left_map_nth_len.
+erewrite List_fold_left_ext_in. 2: {
+  intros j v Hj; apply in_seq in Hj; cbn.
+  rewrite <- seq_shift, map_map.
+  easy.
+}
+Inspect 1.
+Theorem nth_succ_fold_left_cons_cons :
+∀ (A B : Type) (b : A) (la : list B) (lb : list A) (d : A) (e : B) i f g,
+
+  nth (S i) (fold_left (λ (v : list A) (i : B), f v i :: g v i) la (b :: lb))
+    d = nth i (g lb (nth i la e)) d.
+Proof.
+intros.
+revert lb.
+induction la as [| a]; intros. {
+  cbn.
+...
+induction la as [| a]; intros; [ easy | cbn ].
+now rewrite IHla.
+...
+rewrite nth_succ_fold_left_cons_cons with (e := 0).
+rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hn Hi ].
+rewrite seq_nth; [ | flia Hi ].
+rewrite seq_nth; [ | flia Hn Hi ].
+rewrite Nat.add_1_r.
+rewrite transposition_2.
+...
+rewrite nth_succ_fold_left_cons_cons.
+...
 remember (nth (S i) u d) as x eqn:Hx.
 remember (u0 :: u) as v eqn:Hv.
 remember (S n) as sn; cbn - [ transposition ]; subst sn v.
