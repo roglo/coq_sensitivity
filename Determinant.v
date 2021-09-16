@@ -2856,7 +2856,7 @@ erewrite List_fold_left_ext_in. 2: {
   rewrite <- seq_shift, map_map.
   easy.
 }
-Inspect 1.
+...
 Theorem nth_succ_fold_left_cons_cons :
 ∀ (A B : Type) (b : A) (la : list B) (lb : list A) (d : A) (e : B) i f g,
 
