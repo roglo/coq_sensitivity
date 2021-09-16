@@ -2799,6 +2799,15 @@ apply IHlen.
 flia Hip His.
 Qed.
 
+Theorem nth_0_fold_left_cons_cons : ∀ A B (b : A) (la : list B) lb lc d f,
+  nth 0 (fold_left (λ v i, nth 0 v d :: f v i) la (b :: lb)) lc = b.
+Proof.
+intros.
+revert lb.
+induction la as [| a]; intros; [ easy | cbn ].
+now rewrite IHla.
+Qed.
+
 Theorem glop : ∀ A (u : list A) i d,
   i < length u - 1
   → nth i
@@ -2830,10 +2839,16 @@ destruct i. {
   remember (S n) as sn; cbn - [ nth ]; subst sn.
   rewrite List_nth_succ_cons.
   remember (nth 0 (u1 :: u) d) as x; cbn in Heqx; subst x.
+  remember (nth 0 (u0 :: _) d) as x; cbn in Heqx; subst x.
   rewrite <- seq_shift.
   rewrite List_fold_left_map.
+  rewrite List_fold_left_map_nth_len.
   erewrite List_fold_left_ext_in. 2: {
-    intros i v Hi; apply in_seq in Hi.
+    intros i v Hi; apply in_seq in Hi; cbn.
+    now rewrite map_length, seq_length.
+  }
+  apply nth_0_fold_left_cons_cons.
+}
 ...
 destruct u as [| u1]; [ easy | ].
 cbn in Hn; apply Nat.succ_inj in Hn.
