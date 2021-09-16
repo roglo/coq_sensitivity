@@ -2822,13 +2822,29 @@ induction n; intros. {
 destruct u as [| u0]; [ easy | ].
 cbn in Hn; apply Nat.succ_inj in Hn.
 rewrite Nat.add_1_r, List_nth_succ_cons.
-...
-revert u Hn.
-induction i; intros. {
+destruct i. {
   clear Hi.
   destruct u as [| u1]; [ easy | ].
   cbn in Hn; apply Nat.succ_inj in Hn.
   cbn - [ seq ].
+  remember (S n) as sn; cbn - [ nth ]; subst sn.
+  rewrite List_nth_succ_cons.
+  remember (nth 0 (u1 :: u) d) as x; cbn in Heqx; subst x.
+  erewrite List_fold_left_ext_in. 2: {
+    intros i v Hi; apply in_seq in Hi.
+...
+destruct u as [| u1]; [ easy | ].
+cbn in Hn; apply Nat.succ_inj in Hn.
+cbn - [ seq ].
+apply Nat.succ_lt_mono in Hi.
+assert (H : i < S (S n)) by flia Hi.
+specialize (IHi H); clear H.
+...
+specialize (IHi (u1 :: u) u0) as H1.
+assert (H : length (u1 :: u) = S (S n)) by (cbn; flia Hn).
+specialize (H1 H); clear H.
+cbn - [ seq ].
+...
   destruct u as [| u2]; [ easy | ].
   cbn in Hn; apply Nat.succ_inj in Hn.
 ...
