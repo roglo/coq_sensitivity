@@ -2878,6 +2878,22 @@ destruct (Nat.eq_dec i (S n)) as [Hin| Hin]. {
   now rewrite map_length, seq_length.
 }
 assert (H : i < S n) by flia Hi Hin.
+clear Hi Hin; rename H into Hi.
+destruct i. {
+  rewrite List_fold_left_map_nth_len.
+  cbn; rewrite Hn; cbn.
+  Check nth_0_fold_left_cons_cons.
+Inspect 2.
+...
+clear IHn.
+revert u0 u i Hn Hi.
+induction n; intros. {
+  now apply Nat.lt_1_r in Hi; subst i.
+}
+destruct u as [| u1]; [ easy | ].
+cbn in Hn; apply Nat.succ_inj in Hn.
+specialize (IHn u0 u (S i) Hn) as H1.
+...
 (*
 specialize (IHn i u Hn Hi) as H1.
 *)
