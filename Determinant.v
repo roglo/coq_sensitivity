@@ -2879,6 +2879,20 @@ destruct (Nat.eq_dec i (S n)) as [Hin| Hin]. {
 }
 assert (H : i < S n) by flia Hi Hin.
 clear Hi Hin; rename H into Hi.
+rewrite seq_S.
+rewrite fold_left_app.
+cbn - [ seq ].
+rewrite length_fold_left_map_transp.
+cbn - [ seq ].
+rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hn Hi ].
+rewrite seq_nth; [ | flia Hn Hi ].
+rewrite transposition_out; [ | flia Hi | flia Hi ].
+rewrite Nat.add_0_l.
+...
+rewrite IHn; [ | cbn | easy ].
+rewrite Nat.add_1_r.
+rewrite List_nth_succ_cons; easy.
+(* pute vierge *)
 ...
 destruct i. {
   clear Hi.
