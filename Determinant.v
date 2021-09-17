@@ -2901,6 +2901,8 @@ destruct (Nat.eq_dec i n) as [Hin| Hin]. {
   intros v i; cbn.
   now rewrite map_length, seq_length.
 }
+assert (H : i < n) by flia Hi Hin.
+clear Hi Hin; rename H into Hi.
 ...
 Theorem nth_succ_fold_left_cons_cons :
 ∀ (A B : Type) (b : A) (la : list B) (lb : list A) (d : A) (e : B) i f g,
