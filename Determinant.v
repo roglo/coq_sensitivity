@@ -2850,6 +2850,36 @@ induction n; intros. {
 destruct u as [| u0]; [ easy | ].
 cbn in Hn; apply Nat.succ_inj in Hn.
 rewrite Nat.add_1_r, List_nth_succ_cons.
+(**)
+destruct (Nat.eq_dec i (S n)) as [Hin| Hin]. {
+  subst i; clear Hi.
+  rewrite List_fold_left_map_nth_len.
+  rewrite seq_S.
+  cbn - [ seq ].
+  rewrite Hn.
+  remember (S n) as sn; remember (S sn) as ssn; cbn; subst sn ssn.
+  rewrite fold_left_app.
+  remember (S n) as sn; remember (S sn) as ssn; cbn; subst sn ssn.
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
+  rewrite seq_nth; [ | flia ].
+  rewrite transposition_1.
+  rewrite Nat.add_1_r.
+  erewrite List_fold_left_ext_in. 2: {
+    intros i v Hi; apply in_seq in Hi.
+    rewrite seq_S.
+    remember (S n) as sn; cbn; subst sn.
+    rewrite map_app.
+    remember (S n) as sn; cbn; subst sn.
+    rewrite (@transposition_out _ _ (S (S n))); [ | flia Hi | flia Hi ].
+    easy.
+  }
+  rewrite nth_succ_fold_left_app_cons; [ easy | easy | ].
+  intros v i; cbn.
+  now rewrite map_length, seq_length.
+}
+assert (H : i < S n) by flia Hi Hin.
+clear Hi Hin; rename H into Hi.
+...
 destruct i. {
   clear Hi.
   destruct u as [| u1]; [ easy | ].
