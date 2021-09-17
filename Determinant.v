@@ -2808,6 +2808,25 @@ induction la as [| a]; intros; [ easy | cbn ].
 now rewrite IHla.
 Qed.
 
+Theorem nth_succ_fold_left_app_cons : ∀ A B n (b : A) (la : list B) lb d f g,
+  length lb = S n
+  → (∀ v i, length (g v i) = n)
+  → nth (S n)
+       (fold_left (λ v i, f v i :: g v i ++ [nth (S n) v d]) la (b :: lb)) d =
+    nth n lb d.
+Proof.
+intros * Hlb Hf.
+revert b lb Hlb Hf.
+induction la as [| a]; intros; [ easy | cbn ].
+rewrite IHla; [ | | apply Hf ]. 2: {
+  rewrite app_length; cbn.
+  rewrite Nat.add_1_r; f_equal.
+  apply Hf.
+}
+rewrite app_nth2; [ | now unfold "≥"; rewrite Hf ].
+now rewrite Hf, Nat.sub_diag.
+Qed.
+
 Theorem glop : ∀ A (u : list A) i d,
   i < length u - 1
   → nth i
@@ -2855,6 +2874,32 @@ erewrite List_fold_left_ext_in. 2: {
   intros j v Hj; apply in_seq in Hj; cbn.
   rewrite <- seq_shift, map_map.
   easy.
+}
+apply Nat.succ_lt_mono in Hi.
+destruct (Nat.eq_dec i n) as [Hin| Hin]. {
+  subst i; clear Hi.
+  rewrite Hn.
+  rewrite seq_S at 1.
+  remember (S n) as sn; remember (S sn) as ssn; cbn; subst sn ssn.
+  rewrite fold_left_app.
+  remember (S n) as sn; remember (S sn) as ssn; cbn; subst sn ssn.
+  erewrite List_fold_left_ext_in. 2: {
+    intros i v Hi; apply in_seq in Hi.
+    rewrite seq_S.
+    remember (S n) as sn; cbn; subst sn.
+    rewrite map_app.
+    remember (S n) as sn; cbn; subst sn.
+    rewrite (@transposition_out _ _ (S (S n))); [ | flia Hi | flia Hi ].
+    easy.
+  }
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
+  rewrite seq_nth; [ | flia ].
+  rewrite Nat.add_0_l.
+  rewrite transposition_1.
+  rewrite Nat.add_1_r.
+  rewrite nth_succ_fold_left_app_cons; [ easy | easy | ].
+  intros v i; cbn.
+  now rewrite map_length, seq_length.
 }
 ...
 Theorem nth_succ_fold_left_cons_cons :
