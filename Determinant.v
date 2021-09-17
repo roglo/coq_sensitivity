@@ -2878,7 +2878,29 @@ destruct (Nat.eq_dec i (S n)) as [Hin| Hin]. {
   now rewrite map_length, seq_length.
 }
 assert (H : i < S n) by flia Hi Hin.
-clear Hi Hin; rename H into Hi.
+(*
+specialize (IHn i u Hn Hi) as H1.
+*)
+remember (S n) as sn; cbn - [ nth map ]; subst sn.
+rewrite <- seq_shift, List_fold_left_map.
+remember (S n) as sn; cbn - [ nth ]; subst sn.
+rewrite List_nth_succ_cons.
+remember (nth 0 u d :: _) as u' eqn:Hu'.
+rewrite List_fold_left_map_nth_len.
+erewrite List_fold_left_ext_in. 2: {
+  intros j v Hj; apply in_seq in Hj.
+  rewrite Hu' at 1.
+  rewrite List_length_cons.
+  rewrite map_length.
+  rewrite seq_length.
+  cbn.
+  rewrite <- seq_shift, map_map.
+  easy.
+}
+Search (fold_left (λ _ _, _ :: _)).
+...
+specialize (IHn i u') as H2.
+...
 rewrite seq_S.
 rewrite fold_left_app.
 cbn - [ seq ].
@@ -2888,6 +2910,15 @@ rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hn Hi ].
 rewrite seq_nth; [ | flia Hn Hi ].
 rewrite transposition_out; [ | flia Hi | flia Hi ].
 rewrite Nat.add_0_l.
+(**)
+...
+rewrite List_fold_left_map_nth_len.
+erewrite List_fold_left_ext_in. 2: {
+  intros j v Hj; apply in_seq in Hj.
+  now cbn.
+}
+...
+Inspect 2.
 ...
 rewrite IHn; [ | cbn | easy ].
 rewrite Nat.add_1_r.
