@@ -2879,6 +2879,53 @@ destruct (Nat.eq_dec i (S n)) as [Hin| Hin]. {
 }
 assert (H : i < S n) by flia Hi Hin.
 clear Hi Hin; rename H into Hi.
+replace (S (S n)) with (i + (S (S n) - i)) by flia Hn Hi.
+rewrite seq_app.
+cbn - [ "-" ].
+rewrite fold_left_app.
+Theorem glop : ∀ A (d : A) u i f n,
+  nth i (fold_left f (seq 0 i) u) d = nth (i + 1) u d
+  → (∀ n j la, nth i (fold_left (λ c b, f c (j + b)) (seq i n) la) d = nth i la d)
+  → nth i (fold_left f (seq i n) (fold_left f (seq 0 i) u)) d =
+    nth (i + 1) u d.
+Proof.
+intros * Hiu Hjla.
+revert i u Hiu Hjla.
+induction n; intros; [ easy | cbn ].
+rewrite <- seq_shift.
+rewrite List_fold_left_map.
+erewrite List_fold_left_ext_in. 2: {
+  intros j v Hj.
+  rewrite <- Nat.add_1_l.
+  easy.
+}
+rewrite Hjla.
+...
+rewrite glop.
+...
+u0..u
+u = u1 u2 u3 u4 ... u(n+1)
+la' = u0 u1 u2 u3 u4 ... u(n+1)
+k=0, 1, 2, 3, 4, ... n+1
+i≤n
+
+la' = u0 u1 u2 u3 u4 ... u(n+1)
+k=0
+map (λ j, nth (transp 0 1 j) [u0 u1 u2 ... u(n+1)]) [0 1 2 ... n+1]
+[u1 u0 u2 ... u(n+1)]
+k=1
+map (λ j, nth (transp 1 2 j) [u1 u0 u2 ... u(n+1)]) [0 1 2 ... n+1]
+[u1 u2 u0 ... u(n+1)]
+...
+k=i
+map (λ j, nth (transp i (i+1) j) [u1 u2 ... u(i) u(0) u(i+1) u(i+2) ... u(n+1)])
+  [0 1 2 ... n+1]
+ 0  1      i-1  i      i+1
+[u1 u2 ... u(i) u(i+1) u(0) u(i+2) ... u(n+1)])
+                ^^^^^^
+...
+
+...
 destruct i. {
   rewrite List_fold_left_map_nth_len.
   cbn; rewrite Hn; cbn.
