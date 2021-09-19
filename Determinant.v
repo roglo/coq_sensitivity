@@ -2883,6 +2883,25 @@ replace (S (S n)) with (i + (S (S n) - i)) by flia Hn Hi.
 rewrite seq_app.
 cbn - [ "-" ].
 rewrite fold_left_app.
+(**)
+remember (fold_left _ _ (_ :: _)) as v eqn:Hv.
+...
+Theorem glop : ∀ A (d : A) la i l,
+  nth i
+    (fold_left
+       (λ (la' : list A) (k : nat),
+          map (λ j : nat, nth (transposition k (k + 1) j) la' d)
+            (seq 0 (length la'))) l la) d =
+  nth i
+    (fold_left
+       (λ (la' : list A) (k : nat),
+          map (λ j : nat, nth (transposition k (k + 1) j) la' d)
+            (seq 0 (S i))) l la) d.
+Proof.
+intros.
+...
+rewrite glop.
+...
 Theorem glop : ∀ A (d : A) u i f n,
   nth i (fold_left f (seq 0 i) u) d = nth (i + 1) u d
   → (∀ n j la, nth i (fold_left (λ c b, f c (j + b)) (seq i n) la) d = nth i la d)
