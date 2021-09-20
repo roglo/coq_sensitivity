@@ -2879,6 +2879,7 @@ destruct (Nat.eq_dec i (S n)) as [Hin| Hin]. {
 }
 assert (H : i < S n) by flia Hi Hin.
 clear Hi Hin; rename H into Hi.
+...
 replace (S (S n)) with (i + (S (S n) - i)) by flia Hn Hi.
 rewrite seq_app.
 cbn - [ "-" ].
