@@ -2841,17 +2841,6 @@ intros * Hi.
 remember (length u) as n eqn:Hn; symmetry in Hn.
 destruct n; [ easy | ].
 rewrite Nat_sub_succ_1 in Hi |-*.
-(*1*)
-revert i u Hn Hi.
-induction n; intros; [ easy | ].
-destruct u as [| u0]; [ easy | ].
-rewrite Nat.add_1_r, List_nth_succ_cons.
-destruct n; [ now apply Nat.lt_1_r in Hi; subst i | ].
-cbn.
-rewrite map_length, seq_length.
-destruct i. {
-  cbn.
-...1
 destruct u as [| u0]; [ easy | ].
 rewrite Nat.add_1_r, List_nth_succ_cons.
 destruct n; [ easy | ].
