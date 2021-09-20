@@ -2842,6 +2842,69 @@ remember (length u) as n eqn:Hn; symmetry in Hn.
 destruct n; [ easy | ].
 rewrite Nat_sub_succ_1 in Hi |-*.
 destruct n; [ easy | ].
+destruct n. {
+  apply Nat.lt_1_r in Hi; subst i.
+  now destruct u.
+}
+destruct n. {
+  destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+    subst i.
+    now destruct u.
+  }
+  replace i with 1 by flia Hi Hiz.
+  destruct u as [| u0]; [ easy | cbn ].
+  destruct u as [| u1]; [ easy | cbn ].
+  destruct u as [| u2]; [ easy | cbn ].
+  now destruct u.
+}
+destruct n. {
+  destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+    subst i.
+    now destruct u.
+  }
+  destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
+    subst i.
+    destruct u as [|u0]; [ easy | cbn ].
+    destruct u as [|u1]; [ easy | cbn ].
+    now destruct u.
+  }
+  replace i with 2 by flia Hi Hiz Hi1.
+  destruct u as [| u0]; [ easy | cbn ].
+  destruct u as [| u1]; [ easy | cbn ].
+  destruct u as [| u2]; [ easy | cbn ].
+  now destruct u.
+}
+destruct n. {
+  destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+    subst i.
+    now destruct u.
+  }
+  destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
+    subst i.
+    destruct u as [|u0]; [ easy | cbn ].
+    destruct u as [|u1]; [ easy | cbn ].
+    now destruct u.
+  }
+  destruct (Nat.eq_dec i 2) as [Hi2| Hi2]. {
+    subst i.
+    destruct u as [|u0]; [ easy | cbn ].
+    destruct u as [|u1]; [ easy | cbn ].
+    destruct u as [|u2]; [ easy | cbn ].
+    now destruct u.
+  }
+  replace i with 3 by flia Hi Hiz Hi1 Hi2.
+  destruct u as [| u0]; [ easy | cbn ].
+  destruct u as [| u1]; [ easy | cbn ].
+  destruct u as [| u2]; [ easy | cbn ].
+  destruct u as [| u3]; [ easy | cbn ].
+  now destruct u.
+}
+......
+intros * Hi.
+remember (length u) as n eqn:Hn; symmetry in Hn.
+destruct n; [ easy | ].
+rewrite Nat_sub_succ_1 in Hi |-*.
+destruct n; [ easy | ].
 revert i u Hn Hi.
 induction n; intros. {
   apply Nat.lt_1_r in Hi; subst i.
