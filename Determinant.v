@@ -2827,6 +2827,55 @@ rewrite app_nth2; [ | now unfold "≥"; rewrite Hf ].
 now rewrite Hf, Nat.sub_diag.
 Qed.
 
+Theorem glop : ∀ A (u : list A) i (f : list A → nat → A),
+  i < length u - 1
+  → f (fold_left
+         (λ la' k,
+            map (λ j, f la' (transposition k (k + 1) j))
+              (seq 0 (length la')))
+         (seq 0 (length u - 1)) u) i =
+     f u (i + 1).
+Proof.
+intros * Hi.
+remember (length u) as n eqn:Hn; symmetry in Hn.
+destruct n; [ easy | ].
+rewrite Nat_sub_succ_1 in Hi |-*.
+destruct n; [ easy | ].
+destruct n. {
+  apply Nat.lt_1_r in Hi; subst i.
+  destruct u; [ easy | cbn ].
+  now destruct u.
+}
+destruct n. {
+  destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+    subst i.
+    now destruct u.
+  }
+  replace i with 1 by flia Hi Hiz.
+  destruct u as [| u0]; [ easy | cbn ].
+  destruct u as [| u1]; [ easy | cbn ].
+  destruct u as [| u2]; [ easy | cbn ].
+  now destruct u.
+}
+destruct n. {
+  destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+    subst i.
+    now destruct u.
+  }
+  destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
+    subst i.
+    destruct u as [|u0]; [ easy | cbn ].
+    destruct u as [|u1]; [ easy | cbn ].
+    now destruct u.
+  }
+  replace i with 2 by flia Hi Hiz Hi1.
+  destruct u as [| u0]; [ easy | cbn ].
+  destruct u as [| u1]; [ easy | cbn ].
+  destruct u as [| u2]; [ easy | cbn ].
+  now destruct u.
+}
+...
+
 Theorem glop : ∀ A (u : list A) i d,
   i < length u - 1
   → nth i
