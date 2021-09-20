@@ -2842,6 +2842,7 @@ remember (length u) as n eqn:Hn; symmetry in Hn.
 destruct n; [ easy | ].
 rewrite Nat_sub_succ_1 in Hi |-*.
 destruct u as [| u0]; [ easy | ].
+rewrite Nat.add_1_r, List_nth_succ_cons.
 destruct n; [ easy | ].
 destruct u as [| u1]; [ easy | ].
 destruct n. {
