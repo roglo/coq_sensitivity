@@ -2841,37 +2841,37 @@ intros * Hi.
 remember (length u) as n eqn:Hn; symmetry in Hn.
 destruct n; [ easy | ].
 rewrite Nat_sub_succ_1 in Hi |-*.
+destruct u as [| u0]; [ easy | ].
 destruct n; [ easy | ].
+destruct u as [| u1]; [ easy | ].
 destruct n. {
-  destruct u as [| u0]; [ easy | ].
-  destruct u as [| u1]; [ easy | ].
   destruct i; [ easy | ].
   flia Hi.
 }
+destruct u as [| u2]; [ easy | ].
 destruct n. {
-  destruct u as [| u0]; [ easy | ].
-  destruct u as [| u1]; [ easy | ].
-  destruct u as [| u2]; [ easy | ].
   destruct i; [ easy | ].
   destruct i; [ easy | ].
   flia Hi.
 }
+destruct u as [| u3]; [ easy | ].
 destruct n. {
-  destruct u as [| u0]; [ easy | ].
-  destruct u as [| u1]; [ easy | ].
-  destruct u as [| u2]; [ easy | ].
-  destruct u as [| u3]; [ easy | ].
   destruct i; [ easy | ].
   destruct i; [ easy | ].
   destruct i; [ easy | ].
   flia Hi.
 }
+destruct u as [| u4]; [ easy | ].
 destruct n. {
-  destruct u as [| u0]; [ easy | ].
-  destruct u as [| u1]; [ easy | ].
-  destruct u as [| u2]; [ easy | ].
-  destruct u as [| u3]; [ easy | ].
-  destruct u as [| u4]; [ easy | ].
+  destruct i; [ easy | ].
+  destruct i; [ easy | ].
+  destruct i; [ easy | ].
+  destruct i; [ easy | ].
+  flia Hi.
+}
+destruct u as [| u5]; [ easy | ].
+destruct n. {
+  destruct i; [ easy | ].
   destruct i; [ easy | ].
   destruct i; [ easy | ].
   destruct i; [ easy | ].
