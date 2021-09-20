@@ -2844,6 +2844,22 @@ rewrite Nat_sub_succ_1 in Hi |-*.
 destruct u as [| u0]; [ easy | ].
 rewrite Nat.add_1_r, List_nth_succ_cons.
 destruct n; [ easy | ].
+(*
+rewrite seq_S; cbn.
+rewrite fold_left_app; cbn.
+rewrite length_fold_left_map_transp.
+cbn - [ seq ].
+rewrite seq_S; cbn.
+rewrite map_app; cbn.
+cbn in Hn.
+apply Nat.succ_inj in Hn.
+rewrite Hn, <- (Nat.add_1_r n).
+rewrite transposition_2.
+rewrite <- Nat.add_1_r in Hi.
+rewrite app_nth1; [ | now rewrite map_length, seq_length ].
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ cbn | easy ].
+*)
 destruct u as [| u1]; [ easy | ].
 destruct n. {
   destruct i; [ easy | ].
