@@ -2875,6 +2875,16 @@ destruct n. {
   now destruct u.
 }
 destruct n. {
+(*2*)
+  destruct u as [| u0]; [ easy | ].
+  destruct u as [| u1]; [ easy | ].
+  destruct u as [| u2]; [ easy | ].
+  destruct u as [| u3]; [ easy | ].
+  destruct u as [| u4]; [ easy | ].
+  cbn in Hn.
+  do 5 apply Nat.succ_inj in Hn.
+  apply length_zero_iff_nil in Hn; subst u; cbn.
+...2
   destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
     subst i.
     now destruct u.
