@@ -2841,24 +2841,6 @@ intros * Hi.
 remember (length u) as n eqn:Hn; symmetry in Hn.
 destruct n; [ easy | ].
 rewrite Nat_sub_succ_1 in Hi |-*.
-assert
-  (H : ∀ u z n i,
-   length u = z + S n
-   → i < z + n
-   → nth i
-       (fold_left
-         (λ la' k,
-          map (λ j, nth (transposition k (k + 1) j) la' d)
-            (seq 0 (length la')))
-         (seq 0 (z + n)) u) d = nth (i + 1) u d). {
-  clear u n i Hn Hi.
-  intros * Hn Hi.
-  revert z Hn Hi.
-  induction n; intros; cbn. {
-}
-...
-apply (H u 0 n i Hn Hi).
-...
 destruct n; [ easy | ].
 destruct n. {
   apply Nat.lt_1_r in Hi; subst i.
@@ -2917,13 +2899,6 @@ destruct n. {
   destruct u as [| u3]; [ easy | cbn ].
   now destruct u.
 }
-  Hn : length u = n + z + 1
-  Hi : i < n + z
-  ============================
-  nth i
-    (fold_left
-       (λ (la' : list A) (k : nat), map (λ j : nat, nth (transposition k (k + 1) j) la' d) (seq 0 (length la')))
-       (seq 0 (n + z)) u) d = nth (i + 1) u d
 ...
   Hn : length u = S (S (S (S (S n))))
   Hi : i < S (S (S (S n)))
