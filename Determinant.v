@@ -2879,6 +2879,7 @@ destruct (Nat.eq_dec i (S n)) as [Hin| Hin]. {
 }
 assert (H : i < S n) by flia Hi Hin.
 clear Hi Hin; rename H into Hi.
+...
 destruct i. {
   rewrite List_fold_left_map_nth_len.
   remember (S n) as sn; cbn; subst sn.
@@ -2894,7 +2895,8 @@ rewrite <- Nat.add_1_r.
 rewrite <- IHn; [ | | flia Hi ]. 2: {
   Search (length (fold_left _ _ _)).
   rewrite length_fold_left_map_transp.
-(* perdu ! *)
+(* perdu !
+ *)
 ...
   cbn; rewrite Hn; cbn.
 ...
