@@ -2843,88 +2843,41 @@ destruct n; [ easy | ].
 rewrite Nat_sub_succ_1 in Hi |-*.
 destruct n; [ easy | ].
 destruct n. {
-  apply Nat.lt_1_r in Hi; subst i.
-  now destruct u.
+  destruct u as [| u0]; [ easy | ].
+  destruct u as [| u1]; [ easy | ].
+  destruct i; [ easy | ].
+  flia Hi.
 }
 destruct n. {
-  destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
-    subst i.
-    now destruct u.
-  }
-  replace i with 1 by flia Hi Hiz.
-  destruct u as [| u0]; [ easy | cbn ].
-  destruct u as [| u1]; [ easy | cbn ].
-  destruct u as [| u2]; [ easy | cbn ].
-  now destruct u.
+  destruct u as [| u0]; [ easy | ].
+  destruct u as [| u1]; [ easy | ].
+  destruct u as [| u2]; [ easy | ].
+  destruct i; [ easy | ].
+  destruct i; [ easy | ].
+  flia Hi.
 }
 destruct n. {
-  destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
-    subst i.
-    now destruct u.
-  }
-  destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
-    subst i.
-    destruct u as [|u0]; [ easy | cbn ].
-    destruct u as [|u1]; [ easy | cbn ].
-    now destruct u.
-  }
-  replace i with 2 by flia Hi Hiz Hi1.
-  destruct u as [| u0]; [ easy | cbn ].
-  destruct u as [| u1]; [ easy | cbn ].
-  destruct u as [| u2]; [ easy | cbn ].
-  now destruct u.
+  destruct u as [| u0]; [ easy | ].
+  destruct u as [| u1]; [ easy | ].
+  destruct u as [| u2]; [ easy | ].
+  destruct u as [| u3]; [ easy | ].
+  destruct i; [ easy | ].
+  destruct i; [ easy | ].
+  destruct i; [ easy | ].
+  flia Hi.
 }
 destruct n. {
-(*2*)
   destruct u as [| u0]; [ easy | ].
   destruct u as [| u1]; [ easy | ].
   destruct u as [| u2]; [ easy | ].
   destruct u as [| u3]; [ easy | ].
   destruct u as [| u4]; [ easy | ].
-  cbn in Hn.
-  do 5 apply Nat.succ_inj in Hn.
-  apply length_zero_iff_nil in Hn; subst u; cbn.
-...2
-  destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
-    subst i.
-    now destruct u.
-  }
-  destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
-    subst i.
-    destruct u as [|u0]; [ easy | cbn ].
-    destruct u as [|u1]; [ easy | cbn ].
-    now destruct u.
-  }
-  destruct (Nat.eq_dec i 2) as [Hi2| Hi2]. {
-    subst i.
-    destruct u as [|u0]; [ easy | cbn ].
-    destruct u as [|u1]; [ easy | cbn ].
-    destruct u as [|u2]; [ easy | cbn ].
-    now destruct u.
-  }
-  replace i with 3 by flia Hi Hiz Hi1 Hi2.
-  destruct u as [| u0]; [ easy | cbn ].
-  destruct u as [| u1]; [ easy | cbn ].
-  destruct u as [| u2]; [ easy | cbn ].
-  destruct u as [| u3]; [ easy | cbn ].
-  now destruct u.
+  destruct i; [ easy | ].
+  destruct i; [ easy | ].
+  destruct i; [ easy | ].
+  destruct i; [ easy | ].
+  flia Hi.
 }
-...
-  Hn : length u = S (S (S (S (S n))))
-  Hi : i < S (S (S (S n)))
-  ============================
-  nth i
-    (fold_left
-       (λ (la' : list A) (k : nat), map (λ j : nat, nth (transposition k (k + 1) j) la' d) (seq 0 (length la')))
-       (seq 0 (S (S (S (S n))))) u) d = nth (i + 1) u d
-...
-  Hn : length u = S (S (S (S (S (S n)))))
-  Hi : i < S (S (S (S (S n))))
-  ============================
-  nth i
-    (fold_left
-       (λ (la' : list A) (k : nat), map (λ j : nat, nth (transposition k (k + 1) j) la' d) (seq 0 (length la')))
-       (seq 0 (S (S (S (S (S n)))))) u) d = nth (i + 1) u d
 ......
 intros * Hi.
 remember (length u) as n eqn:Hn; symmetry in Hn.
