@@ -2946,7 +2946,6 @@ destruct (le_dec i (sta + len)) as [Hip'| Hip']. 2: {
 }
 assert (H : i < sta + len) by flia Hisl Hip'.
 clear Hisl Hip'; rename H into Hisl.
-...
 destruct sta. {
   destruct (le_dec len (length la)) as [Hll| Hll]. {
     destruct (Nat.eq_dec i (len - 1)) as [Hil| Hil]. 2: {
@@ -2973,6 +2972,38 @@ destruct sta. {
     flia Hll Hsll.
   }
   apply Nat.nle_gt in Hll.
+  replace len with (length la + (len - length la)) by flia Hll.
+  rewrite seq_app; cbn.
+  rewrite fold_left_app.
+  rewrite List_fold_left_map_nth_len.
+  erewrite List_fold_left_ext_in. 2: {
+    intros j v Hj; apply in_seq in Hj.
+    rewrite length_fold_left_map_transp.
+    erewrite map_ext_in. 2: {
+      intros k Hk; apply in_seq in Hk.
+      rewrite transposition_out; [ easy | flia Hj Hk | flia Hj Hk ].
+    }
+    easy.
+  }
+Check fold_left.
+...
+Theorem glop : ∀ A B (a : A) (l : list B) f,
+  l ≠ []
+  → fold_left (λ a _, f a) l a = f a.
+Proof.
+intros * Hl.
+destruct l as [| b]; [ easy | clear Hl; cbn ].
+destruct l as [| c]; intros; [ easy | cbn ].
+destruct l as [| d]; cbn.
+...
+induction l as [| c]; intros; [ easy | cbn ].
+rewrite IHl.
+...
+rewrite glop. 2: {
+  intros H.
+  apply List_seq_eq_nil in H.
+  flia Hll H.
+}
 ...
 (*
 specialize List_fold_left_map_nth_len as H1.
