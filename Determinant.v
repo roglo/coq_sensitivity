@@ -2840,26 +2840,27 @@ rewrite app_nth2; [ | now unfold "≥"; rewrite Hf ].
 now rewrite Hf, Nat.sub_diag.
 Qed.
 
-Theorem nth_fold_left_seq_gen : ∀ A (u : list A) i d n,
-  n ≤ length u
-  → i < n - 1
+Theorem nth_fold_left_seq_gen : ∀ A (u : list A) i d n sta,
+  sta + n ≤ length u
+  → sta ≤ i < sta + n - 1
   → nth i
       (fold_left
          (λ la' k,
             map (λ j, nth (transposition k (k + 1) j) la' d)
               (seq 0 (length la')))
-         (seq 0 n) u) d =
+         (seq sta n) u) d =
      nth (i + 1) u d.
 Proof.
 intros * Hn Hi.
 revert i Hi.
-induction n; intros; [ easy | ].
-assert (H : n ≤ length u) by flia Hn.
+induction n; intros; [ flia Hi  | ].
+assert (H : sta + n ≤ length u) by flia Hn.
 specialize (IHn H); clear H.
+rewrite <- Nat.add_sub_assoc in Hi; [ | flia ].
 rewrite Nat_sub_succ_1 in Hi.
 rewrite seq_S.
-rewrite fold_left_app, Nat.add_0_l.
-destruct (Nat.eq_dec i (n - 1)) as [Hin| Hin]. {
+rewrite fold_left_app.
+destruct (Nat.eq_dec i (sta + n - 1)) as [Hin| Hin]. {
   subst i.
   rewrite Nat.sub_add; [ | flia Hi ].
   cbn.
@@ -2867,7 +2868,8 @@ destruct (Nat.eq_dec i (n - 1)) as [Hin| Hin]. {
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hn ].
   rewrite seq_nth; [ | flia Hn ].
   rewrite transposition_out; [ cbn | flia Hi | flia ].
-  destruct n; [ easy | ].
+  destruct n; [ flia Hi | ].
+  rewrite <- Nat.add_sub_assoc; [ | flia ].
   rewrite Nat_sub_succ_1.
   rewrite seq_S; cbn.
   rewrite fold_left_app; cbn.
@@ -2876,7 +2878,8 @@ destruct (Nat.eq_dec i (n - 1)) as [Hin| Hin]. {
   rewrite seq_nth; [ | flia Hn ].
   rewrite transposition_1.
   rewrite Nat.add_1_r.
-  rewrite nth_fold_left_map_transp_1; [ easy | flia Hn | right; flia ].
+  rewrite nth_fold_left_map_transp_1; [ | flia Hn | right; flia ].
+  now rewrite <- Nat.add_succ_comm.
 }
 cbn.
 rewrite length_fold_left_map_transp.
@@ -2936,9 +2939,17 @@ clear Hisl Hip'; rename H into Hisl.
 destruct (Nat.eq_dec i (length la - 1)) as [Hila| Hila]. {
   flia Hsl Hisl Hila.
 }
+(**)
+destruct (Nat.eq_dec i (sta + len - 1)) as [Hisl1| Hisl1]. 2: {
+  rewrite nth_fold_left_seq_gen; [ easy | flia Hsl | flia Hip Hisl Hisl1 ].
+}
+rewrite Hisl1.
+rewrite Nat.sub_add; [ | flia Hisl ].
+...
+(*
 assert (H : i < length la - 1) by flia Hi Hila.
 clear Hi Hila; rename H into Hi.
-clear Hi.
+*)
 revert len Hisl Hsl.
 induction sta; intros. {
   destruct (le_dec len (length la)) as [Hll| Hll]. {
