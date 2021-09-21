@@ -2975,14 +2975,29 @@ destruct sta. {
   replace len with (length la + (len - length la)) by flia Hll.
   rewrite seq_app; cbn.
   rewrite fold_left_app.
+(* putain, faudrait prouver qu'on peut changer "length la" en "length la'"
+   et réciproquement, même dans fold_left_ext_in *)
+Check List_fold_left_ext_in.
+Search (fold_left (λ _ _, map _ _)).
+...
+(*
   rewrite List_fold_left_map_nth_len.
+*)
   erewrite List_fold_left_ext_in. 2: {
     intros j v Hj; apply in_seq in Hj.
+(*
     rewrite length_fold_left_map_transp.
+*)
     erewrite map_ext_in. 2: {
       intros k Hk; apply in_seq in Hk.
-      rewrite transposition_out; [ easy | flia Hj Hk | flia Hj Hk ].
+      rewrite transposition_out; [ | | ].
+...
+      rewrite transposition_out; [ | flia Hj Hk | flia Hj Hk ].
+      easy.
     }
+Search (map (λ _, nth _ _ _)).
+...
+    rewrite List_map_nth_seq_skipn_firstn.
     easy.
   }
 Check fold_left.
