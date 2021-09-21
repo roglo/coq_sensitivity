@@ -2808,6 +2808,19 @@ induction la as [| a]; intros; [ easy | cbn ].
 now rewrite IHla.
 Qed.
 
+Theorem nth_0_fold_left_nth_transp: ∀ A (b : A) lb d f n,
+  nth 0
+    (fold_left
+       (λ v i, nth (transposition i (i + 1) 0) v d :: f v i) (seq 0 (S n))
+       (b :: lb))
+    d = nth 0 lb d.
+Proof.
+intros; cbn.
+rewrite <- seq_shift.
+rewrite List_fold_left_map; cbn.
+now rewrite nth_0_fold_left_cons_cons.
+Qed.
+
 Theorem nth_succ_fold_left_app_cons : ∀ A B n (b : A) (la : list B) lb d f g,
   length lb = S n
   → (∀ v i, length (g v i) = n)
@@ -2845,6 +2858,29 @@ destruct u as [| u0]; [ easy | ].
 rewrite Nat.add_1_r, List_nth_succ_cons.
 destruct n; [ easy | ].
 destruct u as [| u1]; [ easy | ].
+(*1*)
+cbn in Hn.
+do 2 apply Nat.succ_inj in Hn.
+revert u0 u1 u n Hn Hi.
+induction i; intros. {
+  rewrite List_fold_left_map_nth_len.
+  erewrite List_fold_left_ext_in. 2: {
+    intros j v Hj; apply in_seq in Hj.
+    cbn - [ seq ].
+    rewrite <- cons_seq.
+    cbn - [ seq ].
+    rewrite <- seq_shift, map_map.
+    easy.
+  }
+  now rewrite nth_0_fold_left_nth_transp.
+}
+rewrite List_nth_succ_cons.
+apply Nat.succ_lt_mono in Hi.
+destruct n; [ easy | ].
+destruct u as [| u2]; [ easy | ].
+cbn in Hn.
+apply Nat.succ_inj in Hn.
+...1
 destruct n. {
   destruct i; [ easy | ].
   flia Hi.
