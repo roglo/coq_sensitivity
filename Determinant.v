@@ -2945,6 +2945,8 @@ destruct (Nat.eq_dec i (sta + len - 1)) as [Hisl1| Hisl1]. 2: {
 }
 rewrite Hisl1.
 rewrite Nat.sub_add; [ | flia Hisl ].
+Check nth_fold_left_seq_gen.
+rewrite nth_fold_left_seq_gen; [ | flia Hsl | ].
 ...
 (*
 assert (H : i < length la - 1) by flia Hi Hila.
