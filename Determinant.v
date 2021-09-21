@@ -2840,20 +2840,115 @@ rewrite app_nth2; [ | now unfold "≥"; rewrite Hf ].
 now rewrite Hf, Nat.sub_diag.
 Qed.
 
-Theorem glop : ∀ A (u : list A) i d,
-  i < length u - 1
+Theorem glop : ∀ A (u : list A) i d n,
+  n ≤ length u
+  → i < n - 1
   → nth i
       (fold_left
          (λ la' k,
             map (λ j, nth (transposition k (k + 1) j) la' d)
               (seq 0 (length la')))
-         (seq 0 (length u - 1)) u) d =
+         (seq 0 n) u) d =
      nth (i + 1) u d.
 Proof.
-intros * Hi.
-remember (length u) as n eqn:Hn; symmetry in Hn.
-destruct n; [ easy | ].
-rewrite Nat_sub_succ_1 in Hi |-*.
+intros * Hn Hi.
+revert i Hi.
+induction n; intros; [ easy | ].
+assert (H : n ≤ length u) by flia Hn.
+specialize (IHn H); clear H.
+rewrite Nat_sub_succ_1 in Hi.
+rewrite seq_S.
+rewrite fold_left_app, Nat.add_0_l.
+destruct (Nat.eq_dec i (n - 1)) as [Hin| Hin]. {
+  subst i.
+  rewrite Nat.sub_add; [ | flia Hi ].
+  cbn.
+  rewrite length_fold_left_map_transp.
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hn ].
+  rewrite seq_nth; [ | flia Hn ].
+  rewrite transposition_out; [ cbn | flia Hi | flia ].
+  destruct n; [ easy | ].
+  rewrite Nat_sub_succ_1.
+  rewrite seq_S; cbn.
+  rewrite fold_left_app; cbn.
+  rewrite length_fold_left_map_transp.
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hn ].
+  rewrite seq_nth; [ | flia Hn ].
+  rewrite transposition_1.
+  rewrite Nat.add_1_r.
+  rewrite nth_fold_left_map_transp_1; [ easy | flia Hn | right; flia ].
+}
+cbn.
+rewrite length_fold_left_map_transp.
+rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hn Hi ].
+rewrite seq_nth; [ | flia Hn Hi ].
+rewrite transposition_out; [ cbn | flia Hi | flia Hi Hin ].
+apply IHn.
+flia Hi Hin.
+Qed.
+...
+Search (nth _ (fold_left _ _ _)).
+...
+  rewrite List_fold_left_map_nth_len.
+  rewrite nth_0_fold_left_nth_transp.
+Search (
+
+...
+
+cbn.
+
+...
+destruct u as [| u0]; [ easy | ].
+cbn in Hn.
+apply Nat.succ_le_mono in Hn.
+induction i; intros. {
+  rewrite List_fold_left_map_nth_len.
+  erewrite List_fold_left_ext_in. 2: {
+    intros j v Hj; apply in_seq in Hj.
+    cbn - [ seq ].
+    rewrite <- cons_seq.
+    cbn - [ seq ].
+    rewrite <- seq_shift, map_map.
+    easy.
+  }
+  now rewrite nth_0_fold_left_nth_transp.
+}
+assert (H : i < n) by flia Hi.
+specialize (IHi H); clear H.
+cbn.
+rewrite <- seq_shift.
+rewrite List_fold_left_map.
+Search (nth _ (fold_left _ _ _)).
+
+...
+erewrite List_fold_left_ext_in. 2: {
+  intros j v Hj; apply in_seq in Hj.
+
+apply Nat.succ_lt_mono in Hi.
+assert (H : i < S n) by flia Hi.
+specialize (IHi H); clear H.
+rewrite seq_S.
+cbn.
+rewrite fold_left_app.
+cbn.
+rewrite length_fold_left_map_transp.
+cbn.
+rewrite <- seq_shift.
+rewrite map_map.
+cbn in Hn; rewrite Nat.sub_0_r in Hn.
+rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi Hn ].
+rewrite seq_nth; [ | flia Hi Hn ].
+destruct (Nat.eq_dec i (n - 1)) as [Hin| Hin]. {
+  subst i; cbn.
+  rewrite <- Nat.sub_succ_l; [ | flia Hi ].
+  rewrite Nat_sub_succ_1, transposition_1.
+  rewrite Nat.sub_add; [ | flia Hi ].
+
+
+
+rewrite IHn. 2: {
+    subst i; cbn.
+...
 destruct u as [| u0]; [ easy | ].
 rewrite Nat.add_1_r, List_nth_succ_cons.
 destruct n; [ easy | ].
