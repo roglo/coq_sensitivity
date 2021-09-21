@@ -2888,7 +2888,8 @@ flia Hi Hin.
 Qed.
 
 Theorem nth_fold_left_map_transp : ∀ A (la : list A) i sta len d,
-  i < length la
+  sta + len < length la
+  → i < length la
   → nth i
       (fold_left
          (λ la' k,
@@ -2899,24 +2900,10 @@ Theorem nth_fold_left_map_transp : ∀ A (la : list A) i sta len d,
     else
       nth (i + Nat.b2n ((sta <=? i) && (i <=? sta + len))) la d.
 Proof.
-(*
-intros * Hi.
-rewrite List_fold_left_map_nth_len.
-set (f := λ la k i, nth (transposition k (k + 1) i) la d).
-erewrite List_fold_left_ext_in. 2: {
-  intros j la' Hj.
-  erewrite map_ext_in. 2: {
-    intros k Hk.
-    fold (f la' j k).
-    easy.
-  }
-  easy.
-}
-...
-*)
-intros * Hi.
+intros * Hsl Hi.
 destruct (Nat.eq_dec i (sta + len)) as [Hisl| Hisl]. {
   subst i.
+  clear Hsl.
   revert la sta d Hi.
   induction len; intros. {
     rewrite Nat.add_0_r in Hi |-*.
@@ -2946,6 +2933,9 @@ destruct (le_dec i (sta + len)) as [Hip'| Hip']. 2: {
 }
 assert (H : i < sta + len) by flia Hisl Hip'.
 clear Hisl Hip'; rename H into Hisl.
+destruct (Nat.eq_dec i (length la - 1)) as [Hila| Hila]. {
+  flia Hsl Hisl Hila.
+}
 destruct sta. {
   destruct (le_dec len (length la)) as [Hll| Hll]. {
     destruct (Nat.eq_dec i (len - 1)) as [Hil| Hil]. 2: {
@@ -2975,49 +2965,36 @@ destruct sta. {
   replace len with (length la + (len - length la)) by flia Hll.
   rewrite seq_app; cbn.
   rewrite fold_left_app.
-(* putain, faudrait prouver qu'on peut changer "length la" en "length la'"
-   et réciproquement, même dans fold_left_ext_in *)
-Check List_fold_left_ext_in.
-Search (fold_left (λ _ _, map _ _)).
-...
-(*
   rewrite List_fold_left_map_nth_len.
-*)
   erewrite List_fold_left_ext_in. 2: {
     intros j v Hj; apply in_seq in Hj.
-(*
     rewrite length_fold_left_map_transp.
-*)
     erewrite map_ext_in. 2: {
       intros k Hk; apply in_seq in Hk.
-      rewrite transposition_out; [ | | ].
-...
       rewrite transposition_out; [ | flia Hj Hk | flia Hj Hk ].
       easy.
     }
-Search (map (λ _, nth _ _ _)).
-...
-    rewrite List_map_nth_seq_skipn_firstn.
     easy.
   }
-Check fold_left.
-...
-Theorem glop : ∀ A B (a : A) (l : list B) f,
-  l ≠ []
-  → fold_left (λ a _, f a) l a = f a.
-Proof.
-intros * Hl.
-destruct l as [| b]; [ easy | clear Hl; cbn ].
-destruct l as [| c]; intros; [ easy | cbn ].
-destruct l as [| d]; cbn.
-...
-induction l as [| c]; intros; [ easy | cbn ].
-rewrite IHl.
-...
-rewrite glop. 2: {
-  intros H.
-  apply List_seq_eq_nil in H.
-  flia Hll H.
+  specialize List_fold_left_map_nth_len as H1.
+  remember (fold_left _ (seq 0 _) _) as x.
+  specialize (H1 A x (length x) (len - length la)).
+  specialize (H1 (λ x y, y) d).
+  cbn in H1.
+  replace (length x) with (length la) in H1. 2: {
+    rewrite Heqx.
+    now rewrite length_fold_left_map_transp.
+  }
+  rewrite <- H1.
+  clear H1.
+  erewrite List_fold_left_ext_in. 2: {
+    intros j v Hj; apply in_seq in Hj.
+    rewrite <- List_map_nth_seq.
+    easy.
+  }
+  rewrite List_fold_left_id.
+  subst x.
+  rewrite nth_fold_left_seq_gen; [ easy | easy | flia Hi Hila ].
 }
 ...
 (*
