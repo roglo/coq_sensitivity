@@ -2936,7 +2936,11 @@ clear Hisl Hip'; rename H into Hisl.
 destruct (Nat.eq_dec i (length la - 1)) as [Hila| Hila]. {
   flia Hsl Hisl Hila.
 }
-destruct sta. {
+assert (H : i < length la - 1) by flia Hi Hila.
+clear Hi Hila; rename H into Hi.
+clear Hi.
+revert len Hisl Hsl.
+induction sta; intros. {
   destruct (le_dec len (length la)) as [Hll| Hll]. {
     destruct (Nat.eq_dec i (len - 1)) as [Hil| Hil]. 2: {
       apply nth_fold_left_seq_gen; [ easy | flia Hisl Hil ].
@@ -2994,8 +2998,15 @@ destruct sta. {
   }
   rewrite List_fold_left_id.
   subst x.
-  rewrite nth_fold_left_seq_gen; [ easy | easy | flia Hi Hila ].
+  rewrite nth_fold_left_seq_gen; [ easy | easy | flia Hisl Hsl ].
 }
+rewrite <- seq_shift, List_fold_left_map.
+...
+assert (H : sta ≤ i) by flia Hip.
+specialize (IHsta H); clear H.
+rewrite Nat.add_succ_comm in Hisl, Hsl.
+specialize (IHsta _ Hisl Hsl) as H1.
+rewrite <- seq_shift, List_fold_left_map.
 ...
 (*
 specialize List_fold_left_map_nth_len as H1.
