@@ -2946,7 +2946,33 @@ destruct (le_dec i (sta + len)) as [Hip'| Hip']. 2: {
 }
 assert (H : i < sta + len) by flia Hisl Hip'.
 clear Hisl Hip'; rename H into Hisl.
-Inspect 1.
+...
+destruct sta. {
+  destruct (le_dec len (length la)) as [Hll| Hll]. {
+    destruct (Nat.eq_dec i (len - 1)) as [Hil| Hil]. 2: {
+      apply nth_fold_left_seq_gen; [ easy | flia Hisl Hil ].
+    }
+    subst i.
+    rewrite Nat.sub_add; [ | flia Hisl ].
+    destruct len; [ easy | ].
+    rewrite Nat_sub_succ_1.
+    rewrite seq_S; cbn.
+    rewrite fold_left_app; cbn.
+    rewrite length_fold_left_map_transp.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ | easy ].
+    rewrite transposition_1, Nat.add_1_r.
+    destruct (Nat.eq_dec (S len) (length la)) as [Hsll| Hsll]. {
+      rewrite Hsll.
+      rewrite nth_overflow. 2: {
+        now rewrite length_fold_left_map_transp.
+      }
+      now symmetry; apply nth_overflow.
+    }
+    apply nth_fold_left_map_transp_1; [ | flia ].
+    flia Hll Hsll.
+  }
+  apply Nat.nle_gt in Hll.
 ...
 (*
 specialize List_fold_left_map_nth_len as H1.
@@ -2988,8 +3014,6 @@ rewrite app_nth2. 2: {
   rewrite min_l; [ | flia Hi Hip ].
   flia Hip.
 }
-Inspect 1.
-...
 rewrite firstn_length.
 rewrite min_l; [ | flia Hi Hip ].
 rewrite List_nth_skipn.
