@@ -2969,6 +2969,8 @@ destruct M as (ll); cbn in Hi; cbn.
 unfold mat_el.
 rewrite fold_left_mat_fold_left_list_list; cbn.
 f_equal; clear j; symmetry.
+Inspect 1.
+...
 destruct (lt_dec (p + q) (length ll)) as [Hpql| Hpql]. {
   rewrite nth_fold_left_map_transp; [ | easy | easy ].
   destruct (Nat.eq_dec i (p + q)) as [H| H]; [ | clear H ]. {
@@ -3010,6 +3012,7 @@ destruct (le_dec (length ll) p) as [Hlp| Hlp]. {
   now apply IHq.
 }
 apply Nat.nle_gt in Hlp.
+...
 replace q with (length ll - p + (p + q - length ll)) by flia Hlp Hpql.
 rewrite seq_app.
 rewrite fold_left_app.
