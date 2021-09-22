@@ -3010,7 +3010,6 @@ destruct (le_dec (length ll) p) as [Hlp| Hlp]. {
   now apply IHq.
 }
 apply Nat.nle_gt in Hlp.
-...
 replace q with (length ll - p + (p + q - length ll)) by flia Hlp Hpql.
 rewrite seq_app.
 rewrite fold_left_app.
