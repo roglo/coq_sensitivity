@@ -2985,6 +2985,28 @@ destruct (lt_dec (p + q) (length ll)) as [Hpql| Hpql]. {
 }
 apply Nat.nlt_ge in Hpql.
 destruct Hpi as [Hpi| H]; [ | flia Hi H Hpql ].
+destruct (le_dec (length ll) p) as [Hlp| Hlp]. {
+  rewrite List_fold_left_map_nth_len.
+  erewrite List_fold_left_ext_in. 2: {
+    intros j v Hj; apply in_seq in Hj.
+    erewrite map_ext_in. 2: {
+      intros k Hk; apply in_seq in Hk.
+      rewrite transposition_out; [ easy | flia Hk Hj Hlp | flia Hk Hj Hlp ].
+    }
+    easy.
+  }
+  clear Hi Hpi Hpql.
+  induction ll as [| la]. {
+    cbn; clear Hlp.
+    revert p.
+    induction q; intros; [ easy | cbn ].
+    apply IHq.
+  }
+  cbn in Hlp.
+...
+Search (fold_left (λ _ _, _ :: _)).
+...
+replace q with (length ll - p + (p + q - length ll)) by flia Hlp Hpql.
 ...
 now apply nth_fold_left_map_transp.
 Qed.
