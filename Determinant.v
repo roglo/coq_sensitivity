@@ -2969,7 +2969,22 @@ destruct M as (ll); cbn in Hi; cbn.
 unfold mat_el.
 rewrite fold_left_mat_fold_left_list_list; cbn.
 f_equal; clear j; symmetry.
-rewrite nth_fold_left_map_transp; [ | | easy ].
+destruct (lt_dec (p + q) (length ll)) as [Hpql| Hpql]. {
+  rewrite nth_fold_left_map_transp; [ | easy | easy ].
+  destruct (Nat.eq_dec i (p + q)) as [H| H]; [ | clear H ]. {
+    destruct Hpi as [Hpi| Hpi]; flia H Hpi.
+  }
+  unfold Nat.b2n.
+  rewrite andb_if.
+  do 2 rewrite if_leb_le_dec.
+  destruct (le_dec p i) as [Hpi'| Hpi']; [ | now rewrite Nat.add_0_r ].
+  destruct (le_dec i (p + q)) as [H| H]; [ | clear H ]. {
+    destruct Hpi as [Hpi| Hpi]; flia H Hpi Hpi'.
+  }
+  now rewrite Nat.add_0_r.
+}
+apply Nat.nlt_ge in Hpql.
+destruct Hpi as [Hpi| H]; [ | flia Hi H Hpql ].
 ...
 now apply nth_fold_left_map_transp.
 Qed.
