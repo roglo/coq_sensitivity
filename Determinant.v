@@ -2997,23 +2997,34 @@ destruct (le_dec (length ll) p) as [Hlp| Hlp]. {
     easy.
   }
   clear Hpi Hpql.
-  revert i Hi p Hlp.
-  induction ll as [| la]; intros. {
-    cbn; clear Hlp.
-    revert p.
-    induction q; intros; [ easy | cbn ].
-    apply IHq.
+  rewrite <- List_fold_left_map_nth_len.
+  erewrite List_fold_left_ext_in. 2: {
+    intros j v Hj; apply in_seq in Hj.
+    now rewrite <- List_map_nth_seq.
   }
-  cbn in Hlp.
-  destruct i; [ apply nth_0_fold_left_cons_cons | ].
-  cbn.
-Search (nth (S _) (fold_left _ _ _)).
-...
-rewrite nth_succ_fold_left_app_cons.
-...
-Search (fold_left (λ _ _, _ :: _)).
-...
+  f_equal; clear i Hi.
+  revert p ll Hlp.
+  induction q; intros; [ easy | cbn ].
+  rewrite <- seq_shift.
+  rewrite List_fold_left_map.
+  now apply IHq.
+}
+apply Nat.nle_gt in Hlp.
 replace q with (length ll - p + (p + q - length ll)) by flia Hlp Hpql.
+rewrite seq_app.
+rewrite fold_left_app.
+rewrite Nat.add_sub_assoc; [ | flia Hlp ].
+rewrite Nat.add_comm, Nat.add_sub.
+rewrite List_fold_left_map_nth_len.
+erewrite List_fold_left_ext_in. 2: {
+  intros j ll' Hj; apply in_seq in Hj.
+  rewrite length_fold_left_map_transp.
+  erewrite map_ext_in. 2: {
+    intros k Hk; apply in_seq in Hk.
+    rewrite transposition_out; [ easy | flia Hk Hj | flia Hk Hj ].
+  }
+  easy.
+}
 ...
 now apply nth_fold_left_map_transp.
 Qed.
