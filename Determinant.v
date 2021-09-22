@@ -3025,6 +3025,7 @@ erewrite List_fold_left_ext_in. 2: {
   }
   easy.
 }
+rewrite List_fold_left_map_nth_len.
 ...
 now apply nth_fold_left_map_transp.
 Qed.
