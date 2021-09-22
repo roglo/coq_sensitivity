@@ -3026,6 +3026,7 @@ erewrite List_fold_left_ext_in. 2: {
   easy.
 }
 rewrite List_fold_left_map_nth_len.
+remember (fold_left _ (seq p _) _) as x eqn:Hx.
 ...
 now apply nth_fold_left_map_transp.
 Qed.
