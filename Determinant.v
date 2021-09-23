@@ -3428,13 +3428,55 @@ rewrite seq_S; cbn.
 rewrite fold_left_app; cbn.
 rewrite determinant_alternating; try easy; [ | flia | flia Hin | flia Hin | ].
   2: {
-...
+  specialize (square_matrix_ncols _ Hsm) as Hc1.
   apply is_sm_mat_iff.
+  apply is_sm_mat_iff in Hsm.
+  destruct Hsm as (Hr & Hcr & Hc).
   rewrite mat_nrows_fold_left_swap.
   split; [ easy | ].
   split. {
-    intros Hc.
+    intros Hc'.
+Search mat_swap_rows.
+...
+    apply Hcr.
+    unfold mat_ncols in Hc'.
+    rewrite fold_left_mat_fold_left_list_list in Hc'.
+    cbn in Hc'.
+    apply length_zero_iff_nil in Hc'.
+    rewrite List_hd_nth_0 in Hc'.
+destruct i. {
+  cbn in Hc'.
+  destruct M as (ll).
+  unfold mat_ncols; cbn.
+  cbn in Hc' |-*.
+  unfold mat_ncols in Hc1.
+  cbn in Hc1.
+...
+rewrite List_fold_left_map_nth_len in Hc'.
+Search (nth _ (fold_left _ _ _)).
+rewrite nth_0_fold_left_nth_transp in Hc'.
+rewrite nth_fold_left_seq_gen in Hc'.
+...
+    cbn in Hc'.
+    apply length_zero_iff_nil in Hc'.
+    destruct M as (ll).
+    cbn in Hr, Hcr, Hc, Hc1, Hc' |-*.
+    unfold mat_ncols in Hcr, Hc1, Hc' |-*.
+    cbn in Hcr, Hc1, Hc' |-*.
+...
+    Search mat_list_list.
+Search (
+    unfold mat_ncols in Hc'.
+Search (mat_list_list (fold_left _ _ _)).
+    unfold mat_ncols.
+    rewrite Hc.
+...
+    rewrite List_hd_nth_0 in Hc'.
+Search (nth _ _ _ = []).
+Search (mat_ncols _ = 0).
+Search mat_ncols.
     unfold mat_ncols in Hc.
+    apply is_sm_mat_iff.
 Search (mat_ncols _ = 0).
 ...
   split. {
