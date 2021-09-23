@@ -2904,10 +2904,9 @@ Theorem nth_fold_left_map_transp : ∀ A (la : list A) i sta len d,
     nth i
       (fold_left
          (λ la' k,
-            map (λ j, nth (transposition k (k + 1) j) la' d)
-              (seq 0 (length la')))
-         (seq sta (length la - sta) ++
-          seq (length la) (sta + len - length la)) la) d
+          map (λ j, nth (transposition k (k + 1) j) la' d)
+            (seq 0 (length la)))
+         (seq sta (length la - sta)) la) d
   else
     nth (i + Nat.b2n ((sta <=? i) && (i <=? sta + len))) la d.
 Proof.
@@ -2961,7 +2960,27 @@ destruct (le_dec (length la) (sta + len)) as [Hsl| Hsl]. {
   replace len with (length la - sta + (sta + len - length la)) at 1
     by flia Hsla Hsl.
   rewrite seq_app.
-  rewrite Nat.add_comm, Nat.sub_add; [ easy | flia Hsla ].
+  rewrite fold_left_app.
+  rewrite Nat.add_comm, Nat.sub_add; [ | flia Hsla ].
+  rewrite List_fold_left_map_nth_len.
+  erewrite List_fold_left_ext_in. 2: {
+    intros j v Hj; apply in_seq in Hj.
+    erewrite map_ext_in. 2: {
+      intros k Hk; apply in_seq in Hk.
+      rewrite length_fold_left_map_transp in Hk.
+      rewrite transposition_out; [ | flia Hsla Hj Hk | flia Hsla Hj Hk ].
+      easy.
+    }
+    easy.
+  }
+  rewrite <- List_fold_left_map_nth_len.
+  rewrite List_fold_left_nop_r.
+  rewrite seq_length.
+  rewrite repeat_apply_id. 2: {
+    intros u.
+    symmetry; apply List_map_nth_seq.
+  }
+  now rewrite <- List_fold_left_map_nth_len.
 }
 apply Nat.nle_gt in Hsl.
 rewrite if_leb_le_dec.
