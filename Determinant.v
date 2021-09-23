@@ -3100,34 +3100,6 @@ rewrite <- List_fold_left_map_nth_len.
 rewrite nth_fold_left_seq_gen; [ easy | easy | flia Hi ].
 Qed.
 
-...
-
-Check nth_fold_left_map_transp.
-Check nth_fold_left_map_transp'.
-(*
-...
-nth_fold_left_map_transp
-     : ∀ (A : Type) (la : list A) (i sta len : nat) (d : A),
-         i < length la
-         → i < sta ∨ sta + len < i
-           → nth i
-               (fold_left
-                  (λ (la' : list A) (k : nat),
-                     map (λ j : nat, nth (transposition k (k + 1) j) la' d) (seq 0 (length la'))) 
-                  (seq sta len) la) d = nth i la d
-nth_fold_left_map_transp'
-     : ∀ (A : Type) (la : list A) (i len : nat) (d : A),
-         i + 1 < length la
-         → i + 1 ≠ len
-           → i < len
-             → nth i
-                 (fold_left
-                    (λ (ll0 : list A) (k : nat),
-                       map (λ i0 : nat, nth (transposition k (k + 1) i0) ll0 d) (seq 0 (length ll0)))
-                    (seq 0 (len - 1)) la) d = nth (i + 1) la d
-...
-*)
-
 Theorem mat_el_circ_rot_rows_succ : ∀ (M : matrix T) i j p,
   i + 1 < mat_nrows M
   → i + 1 ≠ p
@@ -3144,7 +3116,15 @@ unfold Nat.b2n.
 rewrite if_leb_le_dec.
 destruct (le_dec p i) as [Hpi| Hpi]. {
   destruct (le_dec p i) as [H| H]; [ clear H | flia Hpi H ].
-  rewrite nth_fold_left_map_transp; [ easy | easy | flia Hpi Hi1p ].
+  rewrite nth_fold_left_map_transp; cbn.
+  destruct (le_dec (length ll) (i + 1)) as [H| H]; [ flia Hi H | clear H ].
+  destruct (Nat.eq_dec (i + 1) (p - 1)) as [H| H]; [ flia Hpi H | clear H ].
+  destruct (le_dec (length ll) 0) as [H| H]; [ flia Hi H | clear H ].
+  destruct (le_dec (length ll) (p - 1)) as [H| H]; [ flia Hi Hpi H | clear H ].
+  unfold Nat.b2n.
+  rewrite if_leb_le_dec.
+  destruct (le_dec (i + 1) (p - 1)) as [H| H]; [ flia Hpi H | clear H ].
+  now rewrite Nat.add_0_r.
 }
 apply Nat.nle_gt in Hpi.
 rewrite Nat.add_0_r.
@@ -3339,10 +3319,6 @@ cbn - [ butn ].
 f_equal; clear q.
 rewrite fold_left_mat_fold_left_list_list.
 cbn - [ butn ].
-(*
-Search (butn _ (fold_left _ _ _)).
-Check mat_el_circ_rot_rows_succ.
-*)
 rewrite List_map_nth_seq with (d := []); symmetry.
 rewrite List_map_nth_seq with (d := []); symmetry.
 rewrite butn_length, map_length, seq_length.
@@ -3354,400 +3330,52 @@ destruct (lt_dec 0 (length ll)) as [H| H]; [ clear H | flia H Hp ].
 destruct (lt_dec p (length ll)) as [H| H]; [ clear H | flia H Hp ].
 apply map_ext_in.
 intros i Hi; apply in_seq in Hi.
+cbn in Hi.
 rewrite <- map_butn.
-rewrite (List_map_nth' 0).
-Search (nth _ (butn _ _)).
+rewrite (List_map_nth' 0). 2: {
+  rewrite butn_length, seq_length.
+  unfold Nat.b2n.
+  rewrite if_ltb_lt_dec.
+  destruct (lt_dec 0 (length ll)) as [H| H]; [ easy | flia Hp H ].
+}
 rewrite nth_butn_before; [ | flia ].
+rewrite seq_nth; [ cbn | flia Hi ].
 destruct (le_dec p i) as [Hpi| Hpi]. 2: {
   apply Nat.nle_gt in Hpi.
   rewrite nth_butn_after; [ | easy ].
-  rewrite nth_fold_left_map_transp'; cycle 1.
-flia Hi.
-...
-  rewrite glop; [ | flia Hi | | easy ].
-...
-  Hi : i + 1 < length ll
-  Hi1p : i + 1 ≠ p
-  Hpi : i < p
-  ============================
-  nth (i + 1) ll [] =
-  nth i
-    (fold_left
-       (λ (ll0 : list (list T)) (k : nat),
-          map (λ i0 : nat, nth (transposition k (k + 1) i0) ll0 []) (seq 0 (length ll0))) 
-       (seq 0 (p - 1)) ll) []
-...
-  Hi : i + 1 < length ll
-  Hi1p : i + 1 ≠ p
-  ============================
-  nth (i + 1) ll [] =
-  nth (i + Nat.b2n (p <=? i))
-    (fold_left
-       (λ (ll0 : list (list T)) (k : nat),
-          map (λ i0 : nat, nth (transposition k (k + 1) i0) ll0 []) (seq 0 (length ll0))) 
-       (seq 0 (p - 1)) ll) []
-...
-  butn 0 (map (λ i : nat, nth (transposition 0 p i) ll []) (seq 0 (length ll))) =
-  butn p
-    (fold_left
-       (λ (ll0 : list (list T)) (k : nat),
-          map (λ i : nat, nth (transposition k (k + 1) i) ll0 []) (seq 0 (length ll0)))
-       (seq 0 (p - 1)) ll)
-...
-apply matrix_eq.
-intros i j Hi Hj.
-cbn.
-destruct (Nat.eq_dec (i + 1) 0) as [H| H]; [ flia H | clear H ].
-remember (j + Nat.b2n (q <=? j)) as k eqn:Hk.
-assert (H : k < n). {
-  destruct (le_dec q j) as [Hqj| Hqj]. {
-    apply Nat.leb_le in Hqj; rewrite Hqj in Hk.
-    cbn in Hk.
-    flia Hj Hk.
-  } {
-    apply Nat.leb_nle in Hqj; rewrite Hqj in Hk.
-    cbn in Hk.
-    flia Hj Hk.
+  rewrite nth_fold_left_map_transp; cbn.
+  rewrite Nat.sub_0_r.
+  destruct (le_dec (length ll) i) as [H| H]; [ flia Hi H | clear H ].
+  destruct (Nat.eq_dec i (p - 1)) as [Hip1| Hip1]. {
+    rewrite Hip1, Nat.sub_add; [ | flia Hpi ].
+    now rewrite transposition_2.
   }
+  destruct (le_dec (length ll) 0) as [H| H]; [ flia Hp H | clear H ].
+  destruct (le_dec (length ll) (p - 1)) as [H| H]; [ flia Hp H | clear H ].
+  unfold transposition.
+  unfold Nat.b2n.
+  do 2 rewrite if_eqb_eq_dec.
+  rewrite if_leb_le_dec.
+  rewrite Nat.add_1_r.
+  destruct (Nat.eq_dec (S i) 0) as [H| H]; [ easy | clear H ].
+  destruct (Nat.eq_dec (S i) p) as [H| H]; [ flia Hip1 H | clear H ].
+  destruct (le_dec i (p - 1)) as [H| H]; [ | flia Hpi H ].
+  now rewrite Nat.add_1_r.
 }
-clear q j Hj Hk.
-rename k into j; move j before i.
-rename H into Hj.
-destruct (Nat.eq_dec (i + 1) p) as [Hip| Hip]. {
-  subst p.
-  rewrite Nat.add_sub.
-  assert (H : ¬ (i + 1 ≤ i)) by flia.
-  apply Nat.leb_nle in H; rewrite H; clear H; cbn.
-  rewrite Nat.add_0_r.
-  apply mat_el_circ_rot_rows.
-} {
-  now apply mat_el_circ_rot_rows_succ.
-}
+rewrite transposition_out; [ | flia | flia Hpi ].
+rewrite nth_butn_before; [ | easy ].
+symmetry.
+rewrite nth_fold_left_map_transp; cbn; rewrite Nat.sub_0_r.
+destruct (le_dec (length ll) (i + 1)) as [H| H]; [ flia Hi H | clear H ].
+destruct (Nat.eq_dec (i + 1) (p - 1)) as [H| H]; [ flia Hpi H | clear H ].
+destruct (le_dec (length ll) 0) as [H| H]; [ flia Hp H | clear H ].
+destruct (le_dec (length ll) (p - 1)) as [H| H]; [ flia Hp H | clear H ].
+unfold Nat.b2n.
+rewrite if_leb_le_dec.
+destruct (le_dec (i + 1) (p - 1)) as [H| H]; [ flia Hpi H | clear H ].
+now rewrite Nat.add_0_r.
 Qed.
-...
-intros * Hp.
-unfold subm; f_equal; f_equal; clear q.
-unfold mat_swap_rows; cbn - [ butn ].
-rewrite fold_left_mat_fold_left_list_list.
-destruct M as (ll); cbn - [ butn list_swap_scal ].
-cbn in Hp.
-Print list_swap_scal.
-...
-apply butn_list_swap_scal_0_l.
-...
-intros * Hp.
-destruct M as (ll).
-cbn in Hp |-*.
-unfold subm; f_equal; f_equal; clear q.
-rewrite butn_0.
-unfold mat_swap_rows at 1; cbn.
-rewrite List_map_tl.
-(**)
-destruct ll as [| la]; [ easy | ].
-cbn in Hp.
-cbn - [ nth ].
-rewrite <- seq_shift, map_map.
-erewrite map_ext_in. 2: {
-  intros i Hi.
-  unfold transposition.
-  cbn in Hi; apply in_seq in Hi.
-  do 2 rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec (S i) 0) as [H| H]; [ now exfalso | clear H ].
-  easy.
-}
-revert ll la Hp.
-induction p; intros. {
-  destruct ll as [| lb]; [ easy | ].
-  cbn; f_equal.
-  rewrite <- seq_shift, map_map.
-  symmetry.
-  apply List_map_nth_seq.
-}
-apply Nat.succ_lt_mono in Hp.
-destruct ll as [| lb]; [ easy | ].
-rewrite Nat_sub_succ_1.
-cbn - [ Nat.eq_dec nth butn ].
-rewrite <- seq_shift, map_map.
-erewrite map_ext_in. 2: {
-  intros i Hi; apply in_seq in Hi.
-  rewrite <- if_eqb_eq_dec.
-  replace (S (S i) =? S p) with (S i =? p) by easy.
-  rewrite if_eqb_eq_dec.
-  replace (nth _ _ _) with
-    (nth (if Nat.eq_dec (S i) p then 0 else S i) (la :: ll) []). 2: {
-    now destruct (Nat.eq_dec (S i) p).
-  }
-  easy.
-}
-rewrite IHp; [ clear IHp | easy ].
-...
-cbn.
-Search (butn (S _)).
-symmetry.
-replace p with (S (p - 1)) at 2.
-cbn - [ butn nth Nat.eq_dec ].
-unfold mat_swap_rows at 2.
-cbn - [ butn nth Nat.eq_dec list_swap_scal ].
-Search (list_swap_scal _ _ (_ :: _)).
-...
-rewrite fold_left_op_fun_from_d with (d := M).
-...
-fold_left_op_fun_from_d:
-  ∀ (T A : Type) (d : T) (op : T → T → T) (a : T) (l : list A) (f : A → T),
-    (∀ x : T, op d x = x)
-    → (∀ x : T, op x d = x)
-      → (∀ a0 b c : T, op a0 (op b c) = op (op a0 b) c)
-        → fold_left (λ (c : T) (i : A), op c (f i)) l a =
-          op a (fold_left (λ (c : T) (i : A), op c (f i)) l d)
-...
-erewrite map_ext_in. 2: {
-  intros i Hi.
-  unfold transposition.
-  replace (length ll) with (S (length ll - 1)) in Hi by flia Hp.
-  cbn in Hi; apply in_seq in Hi.
-  do 2 rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec i 0) as [H| H]; [ flia Hi H | clear H ].
-  easy.
-}
-revert ll Hp.
-induction p; intros. {
-  destruct ll as [| la]; [ easy | cbn ].
-  destruct ll as [| lb]; [ easy | ].
-  cbn; f_equal.
-  do 2 rewrite <- seq_shift.
-  do 2 rewrite map_map.
-  erewrite map_ext_in. 2: {
-    intros i Hi; apply in_seq in Hi.
-    destruct (Nat.eq_dec (S (S i)) 0) as [H| H]; [ flia H | clear H ].
-    easy.
-  }
-  symmetry.
-  apply List_map_nth_seq.
-}
-cbn - [ butn ].
-rewrite Nat.sub_0_r.
-destruct ll as [| la]; [ easy | ].
-cbn - [ butn nth ].
-destruct ll as [| lb]; [ cbn in Hp; flia Hp | ].
-remember (lb :: ll) as lbl; cbn in Hp.
-cbn - [ map  nth ].
-rewrite <- seq_shift, map_map.
-apply Nat.succ_lt_mono in Hp.
-specialize (IHp _ Hp) as H1.
-cbn - [ nth Nat.eq_dec ].
-subst lbl.
-(* bordel de pute *)
-...
-rewrite <- seq_shift.
-rewrite map_map.
-cbn - [ nth transposition ].
 
-...
-specialize (IHp ll Hp) as H1.
-assert
-  (H :
-   map (λ x : nat, nth (transposition 0 (S p) (S x)) (la :: ll) [])
-    (seq 0 (length ll)) =
-...
-erewrite map_ext_in. 2: {
-  intros i Hi; apply in_seq in Hi.
-...
-Search (nth _ (_ :: _)).
-...
-intros * Hp.
-unfold subm; f_equal; f_equal.
-rewrite butn_0.
-rewrite mat_list_list_fold_left.
-unfold mat_swap_rows; cbn.
-destruct M as (ll); cbn.
-destruct p. {
-  cbn.
-  destruct ll as [| la]; [ easy | ].
-  rewrite List_map_tl.
-  cbn - [ nth ].
-  rewrite <- seq_shift.
-  rewrite map_map; cbn.
-  symmetry.
-  apply List_map_nth_seq.
-}
-rewrite Nat_sub_succ_1.
-cbn in Hp.
-replace (length ll) with (1 + (length ll - 1)) by flia Hp.
-rewrite seq_app.
-cbn - [ nth butn ].
-(**)
-rewrite List_seq_cut with (i := S p); [ | apply in_seq; flia Hp ].
-rewrite Nat_sub_succ_1.
-do 2 rewrite map_app.
-cbn - [ nth butn ].
-rewrite Nat.eqb_refl.
-erewrite map_ext_in. 2: {
-  intros i Hi; apply in_seq in Hi.
-  unfold transposition.
-  do 2 rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec i 0) as [H| H]; [ flia Hi H | clear H ].
-  destruct (Nat.eq_dec i (S p)) as [H| H]; [ flia Hi H | clear H ].
-  easy.
-}
-rewrite List_map_nth_seq_skipn_firstn; [ | flia Hp ].
-rewrite List_skipn_1.
-symmetry.
-replace (length ll - 1 - S p) with (length ll - S (S p)) by flia.
-destruct (Nat.eq_dec p 0) as [Hpz| Hpz]. {
-  subst p.
-  cbn.
-  destruct ll as [| a]; [ easy | ].
-  cbn.
-  f_equal.
-  destruct ll as [| b]; [ cbn in Hp; flia Hp | clear Hp ].
-  cbn.
-  rewrite Nat.sub_0_r.
-  do 2 rewrite <- seq_shift.
-  do 2 rewrite map_map.
-  erewrite map_ext_in. 2: {
-    intros i Hi; apply in_seq in Hi.
-    now rewrite transposition_out.
-  }
-  apply List_map_nth_seq.
-}
-destruct p; [ easy | clear Hpz ].
-...
-destruct p. {
-  destruct ll; [ easy | ].
-  destruct ll; [ cbn in Hp; flia Hp | ].
-  destruct ll; [ cbn in Hp; flia Hp | cbn ].
-  rewrite Nat.sub_0_r.
-  f_equal; f_equal.
-  apply map_ext_in.
-  intros i Hi; apply in_seq in Hi.
-  rewrite transposition_out; [ | flia Hi | flia Hi ].
-  rewrite transposition_out; [ | flia Hi | flia Hi ].
-  easy.
-}
-destruct p. {
-  destruct ll; [ easy | ].
-  destruct ll; [ cbn in Hp; flia Hp | ].
-  destruct ll; [ cbn in Hp; flia Hp | ].
-  destruct ll; [ cbn in Hp; flia Hp | cbn ].
-  rewrite Nat.sub_0_r.
-  f_equal; f_equal; f_equal.
-  rewrite map_length, seq_length.
-  apply map_ext_in.
-  intros i Hi; apply in_seq in Hi.
-  rewrite transposition_out; [ | flia Hi | flia Hi ].
-  rewrite transposition_out; [ | flia Hi | flia Hi ].
-  cbn in Hp.
-  destruct i; [ easy | ].
-  destruct i; [ flia Hi | ].
-  destruct i; [ flia Hi | ].
-  destruct i; [ flia Hi | ].
-  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
-  rewrite seq_nth; [ | flia Hi ].
-  now rewrite transposition_out.
-}
-...
-(**)
-rewrite List_seq_cut with (i := 0). 2: {
-  apply in_seq; flia Hpz.
-}
-cbn - [ butn ].
-...
-rewrite List_seq_cut with (i := p - 1). 2: {
-  apply in_seq; flia Hpz.
-}
-rewrite Nat.sub_0_r.
-rewrite Nat.add_0_l.
-replace (p - (S (p - 1))) with 0 by flia Hpz.
-cbn - [ butn ].
-rewrite fold_left_app.
-cbn - [ butn ].
-rewrite Nat.sub_add; [ | flia Hpz ].
-...
-List_map_nth_seq: ∀ (A : Type) (la : list A) (d : A), la = map (λ i : nat, nth i la d) (seq 0 (length la))
-List_nth_map_seq:
-  ∀ (A : Type) (i sta len : nat) (d : A) (f : nat → A), i < len → nth i (map f (seq sta len)) d = f (sta + i)
-...
-rewrite seq_S.
-rewrite map_app.
-rewrite IHlen; [ | ].
-rewrite IHlen; [ | ].
-rewrite IHlen; [ | flia Hls ].
-rewrite IHlen; [ | flia Hls ].
-cbn - [ firstn ].
-Search (firstn (_ + _)).
-Search (skipn _ (firstn _ _)).
-...
-rewrite IHlen; [ | easy ].
-destruct la as [| a]; [ easy | cbn ].
-destruct sta; cbn. {
-  f_equal.
-  destruct len; [ easy | cbn ].
-  destruct la as [| b]; [ apply firstn_nil | ].
-  destruct len.
-  cbn.
-...
-rewrite IHlen; [ | now rewrite Nat.add_succ_comm ].
-...
-rewrite seq_S.
-rewrite map_app; cbn.
-rewrite IHlen.
-...
-...
-destruct len; [ easy | cbn ].
-destruct la as [| a]; cbn.
-destruct sta.
-cbn.
-...
-rewrite List_map_nth_seq_firstn.
-...
-rewrite <- seq_shift.
-rewrite map_map.
-rewrite List_seq_cut with (i := p); [ | apply in_seq; flia Hp ].
-do 2 rewrite map_app.
-cbn - [ nth butn ].
-rewrite Nat.eqb_refl.
-rewrite Nat.sub_0_r.
-erewrite map_ext_in. 2: {
-  intros i Hi; apply in_seq in Hi.
-  rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec i p) as [H| H]; [ flia H Hi | easy ].
-}
-Search (map (λ _, nth _ _ _) (seq _ _)).
-
-rewrite List_map_nth_seq_firstn.
-...
-rewrite (@seq_split3 (S p)).
-...
-replace (length ll - 1) with (S p + (length ll - S (S p))) by flia Hp.
-rewrite seq_app.
-cbn - [ nth butn seq ].
-...
-revert ll Hp.
-induction p; intros. {
-  cbn.
-  destruct ll as [| la]; [ easy | cbn ].
-  rewrite <- seq_shift.
-  rewrite map_map; cbn.
-  destruct ll as [| lb]; [ cbn in Hp; flia Hp | clear Hp; cbn ].
-  f_equal.
-  rewrite <- seq_shift.
-  rewrite map_map; cbn.
-  symmetry.
-  apply List_map_nth_seq.
-}
-destruct ll as [| la]; cbn in Hp; [ flia Hp | ].
-apply Nat.succ_lt_mono in Hp.
-cbn - [ seq nth butn ].
-rewrite seq_S.
-rewrite map_app.
-cbn - [ seq nth butn ].
-rewrite List_app_tl. 2: {
-  intros H.
-  apply map_eq_nil in H.
-  apply List_seq_eq_nil in H.
-  now rewrite H in Hp.
-}
-rewrite IHp.
 ...
 
 Theorem subm_mat_swap_rows_circ : ∀ n (M : matrix n n T) p q,
