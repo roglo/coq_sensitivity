@@ -3018,8 +3018,6 @@ rewrite <- Nat.add_assoc, Nat.add_1_r.
 apply nth_fold_left_map_transp_1; [ easy | right; flia ].
 Qed.
 
-...
-
 Theorem mat_el_circ_rot_rows_succ_1 : ∀ (M : matrix T) i j p q,
   i < mat_nrows M
   → i < p ∨ p + q < i
@@ -3032,48 +3030,28 @@ destruct M as (ll); cbn in Hi; cbn.
 unfold mat_el.
 rewrite fold_left_mat_fold_left_list_list; cbn.
 f_equal; clear j; symmetry.
-destruct (lt_dec (p + q) (length ll)) as [Hpql| Hpql]. {
-  rewrite nth_fold_left_map_transp; [ | easy ].
-  destruct (Nat.eq_dec i (p + q)) as [H| H]; [ | clear H ]. {
-    destruct Hpi as [Hpi| Hpi]; flia H Hpi.
-  }
+rewrite nth_fold_left_map_transp.
+destruct (le_dec (length ll) i) as [H| H]; [ flia Hi H | clear H ].
+destruct (Nat.eq_dec i (p + q)) as [H| H]; [ | clear H ]. {
+  destruct Hpi as [Hpi| Hpi]; flia H Hpi.
+}
+destruct (le_dec (length ll) p) as [Hlp| Hlp]; [ easy | ].
+apply Nat.nle_gt in Hlp.
+destruct (le_dec (length ll) (p + q)) as [Hpql| Hpql]. 2: {
+  apply Nat.nle_gt in Hpql.
   unfold Nat.b2n.
   rewrite andb_if.
   do 2 rewrite if_leb_le_dec.
-  destruct (le_dec (length ll) i) as [Hli| Hli]; [ flia Hi Hli | ].
   destruct (le_dec p i) as [Hpi'| Hpi']; [ | now rewrite Nat.add_0_r ].
   destruct (le_dec i (p + q)) as [H| H]; [ | clear H ]. {
     destruct Hpi as [Hpi| Hpi]; flia H Hpi Hpi'.
   }
   now rewrite Nat.add_0_r.
 }
-apply Nat.nlt_ge in Hpql.
-destruct Hpi as [Hpi| H]; [ | flia Hi H Hpql ].
-destruct (le_dec (length ll) p) as [Hlp| Hlp]. {
-  rewrite List_fold_left_map_nth_len.
-  erewrite List_fold_left_ext_in. 2: {
-    intros j v Hj; apply in_seq in Hj.
-    erewrite map_ext_in. 2: {
-      intros k Hk; apply in_seq in Hk.
-      rewrite transposition_out; [ | flia Hk Hj Hlp | flia Hk Hj Hlp ].
-      easy.
-    }
-    easy.
-  }
-  clear Hpi Hpql.
-  rewrite <- List_fold_left_map_nth_len.
-  erewrite List_fold_left_ext_in. 2: {
-    intros j v Hj; apply in_seq in Hj.
-    now rewrite <- List_map_nth_seq.
-  }
-  f_equal; clear i Hi.
-  revert p ll Hlp.
-  induction q; intros; [ easy | cbn ].
-  rewrite <- seq_shift.
-  rewrite List_fold_left_map.
-  now apply IHq.
-}
-apply Nat.nle_gt in Hlp.
+destruct Hpi as [Hpi| Hpi]; [ | flia Hi Hpi Hpql ].
+...
+Search (nth _ (fold_left _ _ _)).
+...
 replace q with (length ll - p + (p + q - length ll)) by flia Hlp Hpql.
 rewrite seq_app.
 rewrite fold_left_app.
