@@ -3436,14 +3436,44 @@ rewrite determinant_alternating; try easy; [ | flia | flia Hin | flia Hin | ].
   split; [ easy | ].
   split. {
     intros Hc'.
-Search mat_swap_rows.
-...
-    apply Hcr.
     unfold mat_ncols in Hc'.
     rewrite fold_left_mat_fold_left_list_list in Hc'.
     cbn in Hc'.
     apply length_zero_iff_nil in Hc'.
     rewrite List_hd_nth_0 in Hc'.
+    rewrite nth_fold_left_map_transp in Hc'.
+    rewrite fold_mat_nrows in Hc'.
+    do 2 rewrite Nat.add_0_l in Hc'.
+    destruct (le_dec (mat_nrows M) 0) as [Hlz| Hlz]. {
+      now apply Nat.le_0_r in Hlz.
+    }
+    apply Nat.nle_gt in Hlz.
+    destruct (Nat.eq_dec 0 i) as [Hiz| Hiz]. {
+      subst i.
+      apply Hcr.
+      unfold mat_ncols.
+      rewrite List_hd_nth_0.
+      now rewrite Hc'.
+    }
+    rewrite Nat.sub_0_r in Hc'.
+    destruct (le_dec (mat_nrows M) i) as [Hri| Hri]. {
+Search (nth 0 (fold_left _ _ _)).
+...
+  Hc' : nth 0
+          (fold_left
+             (λ (ll : list (list T)) (k : nat),
+                map (λ i : nat, nth (transposition k (k + 1) i) ll []) (seq 0 (length ll)))
+             (seq 0 i) (mat_list_list M)) [] = []
+  Hc' : nth 0
+          (fold_left
+             (λ (la' : list (list T)) (k : nat),
+                map (λ j : nat, nth (transposition k (k + 1) j) la' []) (seq 0 (mat_nrows M)))
+             (seq 0 (mat_nrows M)) (mat_list_list M)) [] = []
+...
+Search (nth _ (fold_left _ _ _)).
+rewrite nth_0_fold_left_nth_transp in Hc'.
+...
+    apply Hcr.
 destruct i. {
   cbn in Hc'.
   destruct M as (ll).
