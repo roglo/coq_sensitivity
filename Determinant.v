@@ -2892,18 +2892,23 @@ Qed.
 
 Theorem nth_fold_left_map_transp : ∀ A (la : list A) i sta len d,
   sta + len < length la
-  → i < length la
   → nth i
       (fold_left
          (λ la' k,
             map (λ j, nth (transposition k (k + 1) j) la' d)
               (seq 0 (length la')))
          (seq sta len) la) d =
-    if Nat.eq_dec i (sta + len) then nth sta la d
+    if le_dec (length la) i then d
+    else if Nat.eq_dec i (sta + len) then nth sta la d
     else
       nth (i + Nat.b2n ((sta <=? i) && (i <=? sta + len))) la d.
 Proof.
-intros * Hsl Hi.
+intros * Hsl.
+destruct (le_dec (length la) i) as [Hi| Hi]. {
+  rewrite nth_overflow; [ easy | ].
+  now rewrite length_fold_left_map_transp.
+}
+apply Nat.nle_gt in Hi.
 destruct (Nat.eq_dec i (sta + len)) as [Hisl| Hisl]. {
   subst i.
   clear Hsl.
@@ -2970,13 +2975,14 @@ unfold mat_el.
 rewrite fold_left_mat_fold_left_list_list; cbn.
 f_equal; clear j; symmetry.
 destruct (lt_dec (p + q) (length ll)) as [Hpql| Hpql]. {
-  rewrite nth_fold_left_map_transp; [ | easy | easy ].
+  rewrite nth_fold_left_map_transp; [ | easy ].
   destruct (Nat.eq_dec i (p + q)) as [H| H]; [ | clear H ]. {
     destruct Hpi as [Hpi| Hpi]; flia H Hpi.
   }
   unfold Nat.b2n.
   rewrite andb_if.
   do 2 rewrite if_leb_le_dec.
+  destruct (le_dec (length ll) i) as [Hli| Hli]; [ flia Hi Hli | ].
   destruct (le_dec p i) as [Hpi'| Hpi']; [ | now rewrite Nat.add_0_r ].
   destruct (le_dec i (p + q)) as [H| H]; [ | clear H ]. {
     destruct Hpi as [Hpi| Hpi]; flia H Hpi Hpi'.
