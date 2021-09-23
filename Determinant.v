@@ -3376,45 +3376,7 @@ destruct (le_dec (i + 1) (p - 1)) as [H| H]; [ flia Hpi H | clear H ].
 now rewrite Nat.add_0_r.
 Qed.
 
-...
-
-Theorem subm_mat_swap_rows_circ : ∀ n (M : matrix n n T) p q,
-  subm (mat_swap_rows 0 p M) 0 q =
-  subm (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 (p - 1)) M) p q.
-Proof.
-intros.
-apply matrix_eq.
-intros i j Hi Hj.
-cbn.
-destruct (Nat.eq_dec (i + 1) 0) as [H| H]; [ flia H | clear H ].
-remember (j + Nat.b2n (q <=? j)) as k eqn:Hk.
-assert (H : k < n). {
-  destruct (le_dec q j) as [Hqj| Hqj]. {
-    apply Nat.leb_le in Hqj; rewrite Hqj in Hk.
-    cbn in Hk.
-    flia Hj Hk.
-  } {
-    apply Nat.leb_nle in Hqj; rewrite Hqj in Hk.
-    cbn in Hk.
-    flia Hj Hk.
-  }
-}
-clear q j Hj Hk.
-rename k into j; move j before i.
-rename H into Hj.
-destruct (Nat.eq_dec (i + 1) p) as [Hip| Hip]. {
-  subst p.
-  rewrite Nat.add_sub.
-  assert (H : ¬ (i + 1 ≤ i)) by flia.
-  apply Nat.leb_nle in H; rewrite H; clear H; cbn.
-  rewrite Nat.add_0_r.
-  apply mat_el_circ_rot_rows.
-} {
-  now apply mat_el_circ_rot_rows_succ.
-}
-Qed.
-
-Theorem mat_swap_rows_fold_left : ∀ n (M : matrix n n T) i,
+Theorem mat_swap_rows_fold_left : ∀ (M : matrix T) i,
   mat_swap_rows i (S i)
     (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 i) M) =
    fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 (S i)) M.
@@ -3425,7 +3387,7 @@ rewrite fold_left_app; cbn.
 now rewrite Nat.add_1_r.
 Qed.
 
-Theorem subm_fold_left_lt : ∀ n (M : matrix n n T) i j m,
+Theorem subm_fold_left_lt : ∀ (M : matrix T) i j m,
   m < i
   → subm
       (fold_left (λ M' k, mat_swap_rows k (k + 1) M')
@@ -3451,18 +3413,37 @@ Theorem determinant_circular_shift_rows :
   rngl_has_1_neq_0 = true →
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
-  ∀ n (M : matrix n n T) i,
+  ∀ n (M : matrix T) i,
   i < n
-  → determinant (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 i) M) =
-    (minus_one_pow i * determinant M)%F.
+  → is_square_matrix n M = true
+  → determinant n (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 i) M) =
+    (minus_one_pow i * determinant n M)%F.
 Proof.
-intros Hic Hop Hiv Hit H10 Hde Hch * Hin.
-revert M.
+intros Hic Hop Hiv Hit H10 Hde Hch * Hin Hsm.
+revert M Hsm.
 induction i; intros; [ now cbn; rewrite rngl_mul_1_l | ].
 assert (H : i < n) by flia Hin.
 specialize (IHi H); clear H.
 rewrite seq_S; cbn.
 rewrite fold_left_app; cbn.
+rewrite determinant_alternating; try easy; [ | flia | flia Hin | flia Hin | ].
+  2: {
+...
+  apply is_sm_mat_iff.
+  rewrite mat_nrows_fold_left_swap.
+  split; [ easy | ].
+  split. {
+    intros Hc.
+    unfold mat_ncols in Hc.
+Search (mat_ncols _ = 0).
+...
+  split. {
+  unfold mat_nrows.
+Search (length (mat_list_list _) = _).
+  split. {
+Search (is_square_matrix _ (fold_left _ _ _) = true).
+Search is_square_matrix.
+...
 rewrite determinant_alternating; try easy; [ | flia | flia Hin | flia Hin ].
 rewrite IHi.
 rewrite minus_one_pow_succ; [ | easy ].
