@@ -2080,6 +2080,36 @@ Qed.
 
 (* end butn *)
 
+(* repeat_apply: applying a function n times *)
+
+Fixpoint repeat_apply A n (f : A → A) a :=
+  match n with
+  | 0 => a
+  | S n' => repeat_apply n' f (f a)
+  end.
+
+Theorem List_fold_left_nop_r : ∀ A B (a : A) (lb : list B) (f : A → _),
+  fold_left (λ c _, f c) lb a = repeat_apply (length lb) f a.
+Proof.
+intros.
+revert a.
+induction lb as [| b]; intros; [ easy | cbn ].
+apply IHlb.
+Qed.
+
+Theorem repeat_apply_id : ∀ A len f (a : A),
+  (∀ a, f a = a)
+  → repeat_apply len f a = a.
+Proof.
+intros * Hid.
+revert a.
+induction len; intros; [ easy | cbn ].
+rewrite IHlen.
+apply Hid.
+Qed.
+
+(* end repeat_apply *)
+
 (* replace in a list *)
 
 Definition replace_at {A} k (la : list A) e :=

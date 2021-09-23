@@ -2891,19 +2891,26 @@ flia Hi Hin.
 Qed.
 
 Theorem nth_fold_left_map_transp : ∀ A (la : list A) i sta len d,
-  sta + len < length la
-  → nth i
+  nth i
+    (fold_left
+       (λ la' k,
+          map (λ j, nth (transposition k (k + 1) j) la' d)
+            (seq 0 (length la')))
+       (seq sta len) la) d =
+  if le_dec (length la) i then d
+  else if Nat.eq_dec i (sta + len) then nth sta la d
+  else if le_dec (length la) (sta + len) then
+    nth i
       (fold_left
          (λ la' k,
             map (λ j, nth (transposition k (k + 1) j) la' d)
               (seq 0 (length la')))
-         (seq sta len) la) d =
-    if le_dec (length la) i then d
-    else if Nat.eq_dec i (sta + len) then nth sta la d
-    else
-      nth (i + Nat.b2n ((sta <=? i) && (i <=? sta + len))) la d.
+         (seq sta (length la - sta) ++
+          seq (length la) (sta + len - length la)) la) d
+  else
+    nth (i + Nat.b2n ((sta <=? i) && (i <=? sta + len))) la d.
 Proof.
-intros * Hsl.
+intros.
 destruct (le_dec (length la) i) as [Hi| Hi]. {
   rewrite nth_overflow; [ easy | ].
   now rewrite length_fold_left_map_transp.
@@ -2911,7 +2918,6 @@ destruct (le_dec (length la) i) as [Hi| Hi]. {
 apply Nat.nle_gt in Hi.
 destruct (Nat.eq_dec i (sta + len)) as [Hisl| Hisl]. {
   subst i.
-  clear Hsl.
   revert la sta d Hi.
   induction len; intros. {
     rewrite Nat.add_0_r in Hi |-*.
@@ -2927,6 +2933,57 @@ destruct (Nat.eq_dec i (sta + len)) as [Hisl| Hisl]. {
   now rewrite transposition_2.
 }
 unfold Nat.b2n, "&&", negb.
+destruct (le_dec (length la) (sta + len)) as [Hsl| Hsl]. {
+  destruct (le_dec sta (length la)) as [Hsla| Hlsa]. {
+    replace len with (length la - sta + (sta + len - length la)) at 1
+      by flia Hsla Hsl.
+    rewrite seq_app.
+    now rewrite Nat.add_comm, Nat.sub_add.
+  }
+  apply Nat.nle_gt in Hlsa.
+  rewrite (proj2 (Nat.sub_0_le (length la) sta)); [ | flia Hlsa ].
+  cbn.
+  rewrite List_fold_left_map_nth_len.
+  erewrite List_fold_left_ext_in. 2: {
+    intros j v Hj; apply in_seq in Hj.
+    erewrite map_ext_in. 2: {
+      intros k Hk; apply in_seq in Hk.
+      rewrite transposition_out; [ | flia Hlsa Hj Hk | flia Hlsa Hj Hk ].
+      easy.
+    }
+    easy.
+  }
+  rewrite List_fold_left_map_nth_len.
+  erewrite (List_fold_left_ext_in _ _ (seq (length la) _)). 2: {
+    intros j v Hj; apply in_seq in Hj.
+    erewrite map_ext_in. 2: {
+      intros k Hk; apply in_seq in Hk.
+      rewrite transposition_out; [ | flia Hlsa Hj Hk | flia Hlsa Hj Hk ].
+      easy.
+    }
+    easy.
+  }
+  f_equal.
+  rewrite <- (List_seq_shift' len).
+  rewrite <- (List_seq_shift' (sta + len - length la)).
+  rewrite List_fold_left_map.
+  rewrite List_fold_left_map.
+  rewrite <- List_fold_left_map_nth_len.
+  rewrite <- List_fold_left_map_nth_len.
+  rewrite List_fold_left_nop_r.
+  rewrite List_fold_left_nop_r.
+  do 2 rewrite seq_length.
+  rewrite repeat_apply_id. 2: {
+    intros u.
+    symmetry; apply List_map_nth_seq.
+  }
+  rewrite repeat_apply_id. 2: {
+    intros u.
+    symmetry; apply List_map_nth_seq.
+  }
+  easy.
+}
+apply Nat.nle_gt in Hsl.
 rewrite if_leb_le_dec.
 destruct (le_dec sta i) as [Hip| Hip]. 2: {
   apply Nat.nle_gt in Hip.
@@ -2961,6 +3018,8 @@ rewrite transposition_1.
 rewrite <- Nat.add_assoc, Nat.add_1_r.
 apply nth_fold_left_map_transp_1; [ easy | right; flia ].
 Qed.
+
+...
 
 Theorem mat_el_circ_rot_rows_succ_1 : ∀ (M : matrix T) i j p q,
   i < mat_nrows M
