@@ -3049,28 +3049,8 @@ destruct (le_dec (length ll) (p + q)) as [Hpql| Hpql]. 2: {
   now rewrite Nat.add_0_r.
 }
 destruct Hpi as [Hpi| Hpi]; [ | flia Hi Hpi Hpql ].
-...
-Search (nth _ (fold_left _ _ _)).
-...
-replace q with (length ll - p + (p + q - length ll)) by flia Hlp Hpql.
-rewrite seq_app.
-rewrite fold_left_app.
-rewrite Nat.add_sub_assoc; [ | flia Hlp ].
-rewrite Nat.add_comm, Nat.add_sub.
-rewrite List_fold_left_map_nth_len.
-erewrite List_fold_left_ext_in. 2: {
-  intros j ll' Hj; apply in_seq in Hj.
-  rewrite length_fold_left_map_transp.
-  erewrite map_ext_in. 2: {
-    intros k Hk; apply in_seq in Hk.
-    rewrite transposition_out; [ easy | flia Hk Hj | flia Hk Hj ].
-  }
-  easy.
-}
-rewrite List_fold_left_map_nth_len.
-remember (fold_left _ (seq p _) _) as x eqn:Hx.
-...
-now apply nth_fold_left_map_transp.
+rewrite <- List_fold_left_map_nth_len.
+rewrite nth_fold_left_map_transp_1; [ easy | easy | now left ].
 Qed.
 
 Theorem mat_el_circ_rot_rows : ∀ (M : matrix T) i j,
@@ -3092,27 +3072,6 @@ apply IHi.
 flia Hi.
 Qed.
 
-(*
-  butn 0 (map (λ i : nat, nth (transposition 0 p i) ll []) (seq 0 (length ll))) =
-  butn p
-    (fold_left
-       (λ (ll0 : list (list T)) (k : nat),
-          map (λ i : nat, nth (transposition k (k + 1) i) ll0 []) (seq 0 (length ll0)))
-       (seq 0 (p - 1)) ll)
-*)
-
-(*
-  Hi : i + 1 < length ll
-  Hi1p : i + 1 ≠ p
-  ============================
-  nth (i + 1) ll [] =
-  nth (i + Nat.b2n (p <=? i))
-    (fold_left
-       (λ (ll0 : list (list T)) (k : nat),
-          map (λ i0 : nat, nth (transposition k (k + 1) i0) ll0 []) (seq 0 (length ll0))) 
-       (seq 0 (p - 1)) ll) []
-*)
-
 Theorem nth_fold_left_map_transp' : ∀ A (la : list A) i len d,
   i + 1 < length la
   → i < len
@@ -3125,22 +3084,20 @@ Theorem nth_fold_left_map_transp' : ∀ A (la : list A) i len d,
     nth (i + 1) la d.
 Proof.
 intros * Hi Hpi.
-symmetry.
-...
-rewrite <- (@nth_fold_left_map_transp _ _ _ 0 i); [ | easy | flia ].
-remember (fold_left _ _ _) as B eqn:HB.
-replace len with (i + (len - i)) by flia Hpi.
-rewrite seq_app, fold_left_app; cbn.
-replace (len - i) with (S (len - i - 1)) by flia Hpi.
-rewrite <- cons_seq; cbn.
-rewrite length_fold_left_map_transp.
-rewrite nth_fold_left_map_transp; [ | | left; flia ]. 2: {
-  rewrite map_length, seq_length; flia Hi.
+rewrite nth_fold_left_map_transp; cbn.
+rewrite Nat.sub_0_r.
+destruct (le_dec (length la) i) as [H| H]; [ flia Hi H | clear H ].
+destruct (Nat.eq_dec i len) as [H| H]; [ flia Hpi H | clear H ].
+destruct (le_dec (length la) 0) as [H| H]; [ flia Hi H | clear H ].
+destruct (le_dec (length la) len) as [Hll| Hll]. 2: {
+  apply Nat.nle_gt in Hll.
+  unfold Nat.b2n.
+  rewrite if_leb_le_dec.
+  destruct (le_dec i len) as [H| H]; [ easy | flia Hpi H ].
 }
-rewrite List_nth_map_seq; [ | flia Hi ].
-rewrite Nat.add_0_l.
-rewrite transposition_1.
-now rewrite HB.
+clear len Hpi Hll.
+rewrite <- List_fold_left_map_nth_len.
+rewrite nth_fold_left_seq_gen; [ easy | easy | flia Hi ].
 Qed.
 
 ...
