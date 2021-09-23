@@ -2941,8 +2941,7 @@ destruct (le_dec (length la) (sta + len)) as [Hsl| Hsl]. {
     now rewrite Nat.add_comm, Nat.sub_add.
   }
   apply Nat.nle_gt in Hlsa.
-  rewrite (proj2 (Nat.sub_0_le (length la) sta)); [ | flia Hlsa ].
-  cbn.
+  rewrite (proj2 (Nat.sub_0_le (length la) sta)); [ cbn | flia Hlsa ].
   rewrite List_fold_left_map_nth_len.
   erewrite List_fold_left_ext_in. 2: {
     intros j v Hj; apply in_seq in Hj.
