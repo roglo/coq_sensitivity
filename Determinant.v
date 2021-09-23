@@ -3457,21 +3457,34 @@ rewrite determinant_alternating; try easy; [ | flia | flia Hin | flia Hin | ].
     }
     rewrite Nat.sub_0_r in Hc'.
     destruct (le_dec (mat_nrows M) i) as [Hri| Hri]. {
-Search (nth 0 (fold_left _ _ _)).
-...
-  Hc' : nth 0
-          (fold_left
-             (λ (ll : list (list T)) (k : nat),
-                map (λ i : nat, nth (transposition k (k + 1) i) ll []) (seq 0 (length ll)))
-             (seq 0 i) (mat_list_list M)) [] = []
-  Hc' : nth 0
-          (fold_left
-             (λ (la' : list (list T)) (k : nat),
-                map (λ j : nat, nth (transposition k (k + 1) j) la' []) (seq 0 (mat_nrows M)))
-             (seq 0 (mat_nrows M)) (mat_list_list M)) [] = []
-...
-Search (nth _ (fold_left _ _ _)).
-rewrite nth_0_fold_left_nth_transp in Hc'.
+      unfold mat_nrows in Hc'.
+      rewrite <- List_fold_left_map_nth_len in Hc'.
+      rewrite nth_fold_left_map_transp' in Hc'; cycle 1. {
+        rewrite fold_mat_nrows.
+        flia Hin Hr.
+      } {
+        now rewrite fold_mat_nrows.
+      }
+      cbn in Hc'.
+      apply (f_equal length) in Hc'.
+      rewrite Hc in Hc'. 2: {
+        apply nth_In.
+        rewrite fold_mat_nrows.
+        flia Hr Hin.
+      }
+      now rewrite Hr, Hc'.
+    }
+    apply Nat.nle_gt in Hri.
+    cbn in Hc'.
+    apply (f_equal length) in Hc'.
+    rewrite Hc in Hc'. 2: {
+      apply nth_In.
+      rewrite fold_mat_nrows.
+      flia Hr Hin.
+    }
+    now rewrite Hr, Hc'.
+  }
+  intros la Hla.
 ...
     apply Hcr.
 destruct i. {
