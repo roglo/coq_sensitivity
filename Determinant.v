@@ -2600,7 +2600,7 @@ Definition swap_in_permut n i j k :=
 
 (* comatrix *)
 
-Definition comatrix {n} (M : matrix T) : matrix T :=
+Definition comatrix n (M : matrix T) : matrix T :=
   mk_mat
     (map
       (λ i,
@@ -3556,10 +3556,6 @@ rewrite <- Nat.sub_succ_l; [ | flia Hin ].
 now rewrite Nat_sub_succ_1.
 Qed.
 
-Inspect 1.
-
-...
-
 (* Laplace formulas *)
 
 Theorem laplace_formula_on_rows :
@@ -3570,9 +3566,10 @@ Theorem laplace_formula_on_rows :
   rngl_has_1_neq_0 = true →
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
-  ∀ n (M : matrix n n T) i,
+  ∀ n (M : matrix T) i,
   i < n
-  → determinant M = ∑ (j = 0, n - 1), mat_el M i j * mat_el (comatrix M) i j.
+  → determinant n M =
+    ∑ (j = 0, n - 1), mat_el M i j * mat_el (comatrix n M) i j.
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hlin.
 destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
@@ -3583,6 +3580,8 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   apply rngl_summation_eq_compat.
   intros j Hj.
   rewrite rngl_mul_comm; [ | easy ].
+  rewrite rngl_mul_mul_swap; [ | easy ].
+...
   now rewrite rngl_mul_mul_swap.
 }
 move i before n.
