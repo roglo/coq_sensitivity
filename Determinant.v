@@ -3427,7 +3427,7 @@ specialize (IHi H); clear H.
 rewrite seq_S; cbn.
 rewrite fold_left_app; cbn.
 rewrite determinant_alternating; try easy; [ | flia | flia Hin | flia Hin | ].
-  2: {
+2: {
   specialize (square_matrix_ncols _ Hsm) as Hc1.
   apply is_sm_mat_iff.
   apply is_sm_mat_iff in Hsm.
@@ -3500,6 +3500,25 @@ rewrite determinant_alternating; try easy; [ | flia | flia Hin | flia Hin | ].
     rewrite fold_mat_nrows; flia Hj.
   }
   destruct (le_dec (mat_nrows M) 0) as [H| H]; [ flia Hj H | clear H ].
+  destruct (le_dec (mat_nrows M) i) as [H| H]; [ flia Hin Hr H | clear H ].
+  subst la.
+  unfold Nat.b2n.
+  rewrite andb_if.
+  do 2 rewrite if_leb_le_dec.
+  destruct (le_dec 0 j) as [Hjz| Hjz]. {
+    destruct (le_dec j i) as [Hji'| Hji']. {
+      apply Hc, nth_In.
+      rewrite fold_mat_nrows.
+      rewrite Hr in Hj |-*.
+      flia Hji' Hin.
+    }
+    apply Nat.nle_gt in Hji'.
+    rewrite Nat.add_0_r.
+    apply Hc, nth_In.
+    now rewrite fold_mat_nrows.
+  }
+  now apply Nat.nle_gt in Hjz.
+}
 ...
 rewrite List_fold_left_map_nth_len in Hla.
 Search (_ ∈ fold_left _ _ _).
