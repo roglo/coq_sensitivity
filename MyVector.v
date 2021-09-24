@@ -276,6 +276,7 @@ Arguments vect_el {T}%type {ro} V%V i%nat.
 Arguments vect_squ_norm {T}%type {ro} V%V.
 
 Arguments minus_one_pow {T}%type {ro} n%nat.
+Arguments minus_one_pow_add_r {T}%type {ro rp} Hop (i j)%nat.
 Arguments minus_one_pow_succ {T}%type {ro rp} _ i%nat.
 
 Notation "U + V" := (vect_add U V) : V_scope.

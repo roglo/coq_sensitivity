@@ -3576,6 +3576,22 @@ intros Hic Hop Hin Hit H10 Hde Hch * Hsm Hlin.
 destruct n; [ easy | ].
 cbn - [ comatrix ].
 rewrite Nat.sub_0_r.
+specialize (square_matrix_ncols M Hsm) as Hc.
+specialize (proj1 (is_sm_mat_iff (S n) M) Hsm) as H1.
+destruct H1 as (Hr & Hcr & Hc').
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj; cbn.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length, Hr ].
+  rewrite (List_map_nth' 0); [ | rewrite seq_length, Hc; flia Hj ].
+  rewrite seq_nth; [ | now rewrite Hr ].
+  rewrite seq_nth; [ | rewrite Hc; flia Hj ].
+  do 2 rewrite Nat.add_0_l.
+  rewrite rngl_mul_comm; [ | easy ].
+  rewrite rngl_mul_mul_swap; [ | easy ].
+...
+  rewrite minus_one_pow_add_r.
+...
 ...
 intros Hic Hop Hin Hit H10 Hde Hch * Hsm Hlin.
 destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
