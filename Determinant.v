@@ -3662,7 +3662,8 @@ intros Hic * Hnz Hσ.
 destruct n; [ easy | clear Hnz ].
 rewrite Nat_sub_succ_1.
 destruct Hσ as (H1, H2).
-induction n; cbn. {
+revert σ H1 H2.
+induction n; intros; cbn. {
   rewrite rngl_product_only_one.
   rewrite rngl_product_only_one.
   specialize (H1 0 Nat.lt_0_1) as H3.
@@ -3672,14 +3673,15 @@ induction n; cbn. {
 set
   (g :=
     λ i, if lt_dec i (vect_nat_el (permut_inv n σ) (S n)) then i else i + 1).
-...
-set (σ' := mk_vect (S n) (λ i, vect_nat_el σ (g i))).
+set (σ' := mk_vect (map (λ i, vect_nat_el σ (g i)) (seq 0 (S n)))).
 specialize (IHn σ').
-assert (H : ∀ i : nat, i < S n → vect_el σ' i < S n). {
+assert (H : ∀ i : nat, i < S n → vect_nat_el σ' i < S n). {
   intros i Hi.
-  unfold σ'; cbn.
-  unfold g; cbn.
-  destruct (Nat.eq_dec (vect_el σ (S n)) (S n)) as [Hσn| Hσn]. {
+  unfold σ'; cbn - [ seq ].
+  unfold g; cbn - [ seq ].
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+...
+  destruct (Nat.eq_dec (vect_nat_el σ (S n)) (S n)) as [Hσn| Hσn]. {
     destruct (lt_dec i (S n)) as [H| H]; [ clear H | flia Hi H ].
     specialize (H1 i).
     assert (H : i < S (S n)) by flia Hi.
