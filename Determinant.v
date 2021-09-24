@@ -3533,27 +3533,25 @@ Theorem determinant_subm_mat_swap_rows_0_i :
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
   ∀ n (M : matrix T) i j,
-  is_square_matrix n M = true
-  → 0 < i < n
-  → j < n
-  → determinant (n - 1) (subm (mat_swap_rows 0 i M) 0 j) =
-    (- minus_one_pow i * determinant (n - 1) (subm M i j))%F.
+  is_square_matrix (S n) M = true
+  → 0 < i ≤ n
+  → j ≤ n
+  → determinant n (subm (mat_swap_rows 0 i M) 0 j) =
+    (- minus_one_pow i * determinant n (subm M i j))%F.
 Proof.
 intros Hic Hop Hiv Hit H10 Hde Hch * Hsm (Hiz, Hin) Hjn.
 rewrite subm_mat_swap_rows_circ. 2: {
   apply is_sm_mat_iff in Hsm.
   destruct Hsm as (Hr, _).
-  now rewrite Hr.
+  rewrite Hr; flia Hin.
 }
 destruct i; [ flia Hiz | ].
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_opp_involutive; [ | easy ].
 rewrite Nat_sub_succ_1.
 rewrite subm_fold_left_lt; [ | flia ].
-apply determinant_circular_shift_rows; try easy; [ flia Hin | ].
-apply is_squ_mat_subm; [ flia Hin | flia Hin | flia Hjn | ].
-rewrite <- Nat.sub_succ_l; [ | flia Hin ].
-now rewrite Nat_sub_succ_1.
+apply determinant_circular_shift_rows; try easy.
+apply is_squ_mat_subm; [ flia Hin | flia Hin | flia Hjn | easy ].
 Qed.
 
 (* Laplace formulas *)
@@ -3586,7 +3584,8 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   rewrite rngl_mul_mul_swap; [ | easy ].
   rewrite rngl_mul_comm; [ | easy ].
   f_equal.
-Print comatrix.
+  remember (S n) as sn; cbn; subst sn.
+Inspect 1.
 ...
   specialize (square_matrix_ncols M Hsm) as Hc.
   specialize (proj1 (is_sm_mat_iff (S n) M) Hsm) as H1.
