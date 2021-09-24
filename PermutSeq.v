@@ -3412,35 +3412,15 @@ Qed.
 Definition permut_inv (n : nat) (σ : vector nat) :=
   mk_vect (map (permut_fun_inv (vect_nat_el σ) n) (seq 0 n)).
 
+(*
 Theorem permut_inv_is_permut : ∀ n (σ : vector nat),
   is_permut_vect n σ
   → is_permut_vect n (permut_inv n σ).
 Proof.
 intros * Hperm.
-destruct Hperm as (Hp1, Hp2).
-split. {
-  intros i Hi.
-Check fun_find_permut_fun_inv'.
-...
-  rewrite fun_find_permut_fun_inv'; [ | easy | easy ].
-...
-unfold permut_inv.
-unfold is_permut_vect.
-Check permut_fun_inv_is_permut.
-Print vect_nat_el.
-...
-unfold is_permut_vect.
-unfold permut_inv.
-unfold vect_nat_el.
-cbn.
-Check permut_fun_inv_is_permut.
-Print permut_fun_inv.
-...
-intros * Hperm.
 now apply permut_fun_inv_is_permut.
 Qed.
-
-...
+*)
 
 Theorem sym_gr_inv_upper_bound : ∀ n k j,
   k < fact n

@@ -3669,10 +3669,11 @@ induction n; cbn. {
   apply Nat.lt_1_r in H3.
   now rewrite H3.
 }
+set
+  (g :=
+    λ i, if lt_dec i (vect_nat_el (permut_inv n σ) (S n)) then i else i + 1).
 ...
-Check permut_inv.
-set (g := λ i, if lt_dec i (vect_el (permut_inv σ) (S n)) then i else i + 1).
-set (σ' := mk_vect (S n) (λ i, vect_el σ (g i))).
+set (σ' := mk_vect (S n) (λ i, vect_nat_el σ (g i))).
 specialize (IHn σ').
 assert (H : ∀ i : nat, i < S n → vect_el σ' i < S n). {
   intros i Hi.
