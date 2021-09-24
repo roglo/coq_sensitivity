@@ -3573,6 +3573,11 @@ Theorem laplace_formula_on_rows :
     ∑ (j = 0, n - 1), mat_el M i j * mat_el (comatrix n M) i j.
 Proof.
 intros Hic Hop Hin Hit H10 Hde Hch * Hsm Hlin.
+destruct n; [ easy | ].
+cbn - [ comatrix ].
+rewrite Nat.sub_0_r.
+...
+intros Hic Hop Hin Hit H10 Hde Hch * Hsm Hlin.
 destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   subst i.
   destruct n; [ easy | ].
