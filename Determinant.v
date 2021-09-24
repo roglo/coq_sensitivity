@@ -3567,20 +3567,32 @@ Theorem laplace_formula_on_rows :
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
   ∀ n (M : matrix T) i,
-  i < n
+  is_square_matrix n M = true
+  → i < n
   → determinant n M =
     ∑ (j = 0, n - 1), mat_el M i j * mat_el (comatrix n M) i j.
 Proof.
-intros Hic Hop Hin Hit H10 Hde Hch * Hlin.
+intros Hic Hop Hin Hit H10 Hde Hch * Hsm Hlin.
 destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   subst i.
-  destruct n; [ easy | cbn ].
-  rewrite Nat.sub_0_r at 1.
+  destruct n; [ easy | ].
+  rewrite Nat_sub_succ_1; cbn.
   symmetry.
   apply rngl_summation_eq_compat.
   intros j Hj.
   rewrite rngl_mul_comm; [ | easy ].
   rewrite rngl_mul_mul_swap; [ | easy ].
+  f_equal.
+  specialize (square_matrix_ncols M Hsm) as Hc.
+  specialize (proj1 (is_sm_mat_iff (S n) M) Hsm) as H1.
+  destruct H1 as (Hr & Hcr & Hc').
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hr ].
+  rewrite (List_map_nth' 0); [ | rewrite seq_length, Hc; flia Hj ].
+  rewrite seq_nth; [ | flia Hr ].
+  rewrite seq_nth; [ | flia Hc Hj ].
+  do 3 rewrite Nat.add_0_l.
+  f_equal.
+Print determinant.
 ...
   now rewrite rngl_mul_mul_swap.
 }
