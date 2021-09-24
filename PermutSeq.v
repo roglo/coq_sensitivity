@@ -3417,6 +3417,13 @@ Theorem permut_inv_is_permut : ∀ n (σ : vector nat),
   → is_permut_vect n (permut_inv n σ).
 Proof.
 intros * Hperm.
+destruct Hperm as (Hp1, Hp2).
+split. {
+  intros i Hi.
+Check fun_find_permut_fun_inv'.
+...
+  rewrite fun_find_permut_fun_inv'; [ | easy | easy ].
+...
 unfold permut_inv.
 unfold is_permut_vect.
 Check permut_fun_inv_is_permut.
