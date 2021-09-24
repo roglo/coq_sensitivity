@@ -3485,6 +3485,29 @@ rewrite determinant_alternating; try easy; [ | flia | flia Hin | flia Hin | ].
     now rewrite Hr, Hc'.
   }
   intros la Hla.
+  rewrite fold_left_mat_fold_left_list_list in Hla.
+  cbn in Hla.
+  apply In_nth with (d := []) in Hla.
+  rewrite length_fold_left_map_transp, fold_mat_nrows in Hla.
+  destruct Hla as (j & Hj & Hla).
+  rewrite nth_fold_left_map_transp in Hla.
+  rewrite fold_mat_nrows in Hla.
+  rewrite Nat.add_0_l in Hla.
+  destruct (le_dec (mat_nrows M) j) as [H| H]; [ flia Hj H | clear H ].
+  destruct (Nat.eq_dec j i) as [Hji| Hji]. {
+    subst la.
+    apply Hc, nth_In.
+    rewrite fold_mat_nrows; flia Hj.
+  }
+  destruct (le_dec (mat_nrows M) 0) as [H| H]; [ flia Hj H | clear H ].
+...
+rewrite List_fold_left_map_nth_len in Hla.
+Search (_ ∈ fold_left _ _ _).
+Search (fold_left (λ _ _, map _ _) (seq _ _)).
+...
+Search (_ ∈ mat_list_list _).
+...
+Search (fold_left (λ _ _, mat_swap_rows _ _ _)).
 ...
     apply Hcr.
 destruct i. {
