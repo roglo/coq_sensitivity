@@ -3524,10 +3524,6 @@ rewrite minus_one_pow_succ; [ | easy ].
 now symmetry; apply rngl_mul_opp_l.
 Qed.
 
-Inspect 1.
-
-..
-
 Theorem determinant_subm_mat_swap_rows_0_i :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -3536,22 +3532,33 @@ Theorem determinant_subm_mat_swap_rows_0_i :
   rngl_has_1_neq_0 = true →
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
-  ∀ n (M : matrix n n T) i j,
-  0 < i < n
-  → determinant (subm (mat_swap_rows 0 i M) 0 j) =
-    (- minus_one_pow i * determinant (subm M i j))%F.
+  ∀ n (M : matrix T) i j,
+  is_square_matrix n M = true
+  → 0 < i < n
+  → j < n
+  → determinant (n - 1) (subm (mat_swap_rows 0 i M) 0 j) =
+    (- minus_one_pow i * determinant (n - 1) (subm M i j))%F.
 Proof.
-intros Hic Hop Hiv Hit H10 Hde Hch * (Hiz, Hin).
-rewrite subm_mat_swap_rows_circ.
+intros Hic Hop Hiv Hit H10 Hde Hch * Hsm (Hiz, Hin) Hjn.
+rewrite subm_mat_swap_rows_circ. 2: {
+  apply is_sm_mat_iff in Hsm.
+  destruct Hsm as (Hr, _).
+  now rewrite Hr.
+}
 destruct i; [ flia Hiz | ].
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_opp_involutive; [ | easy ].
 rewrite Nat_sub_succ_1.
 rewrite subm_fold_left_lt; [ | flia ].
-remember (subm M (S i) j) as A eqn:HA.
-apply determinant_circular_shift_rows; try easy.
-flia Hin.
+apply determinant_circular_shift_rows; try easy; [ flia Hin | ].
+apply is_squ_mat_subm; [ flia Hin | flia Hin | flia Hjn | ].
+rewrite <- Nat.sub_succ_l; [ | flia Hin ].
+now rewrite Nat_sub_succ_1.
 Qed.
+
+Inspect 1.
+
+...
 
 (* Laplace formulas *)
 
