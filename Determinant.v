@@ -3600,17 +3600,6 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite seq_nth; [ | now rewrite Hr ].
   rewrite seq_nth; [ | rewrite Hc; flia Hj ].
   do 2 rewrite Nat.add_0_l.
-(*
-  rewrite rngl_mul_comm; [ | easy ].
-  rewrite rngl_mul_mul_swap; [ | easy ].
-  rewrite minus_one_pow_add_r; [ | easy ].
-  rewrite rngl_mul_comm; [ | easy ].
-  rewrite rngl_mul_mul_swap; [ | easy ].
-  do 2 rewrite <- rngl_mul_assoc.
-  remember (minus_one_pow i * _)%F as x eqn:Hx.
-  rewrite <- rngl_opp_involutive in Hx; [ | easy ].
-  rewrite <- rngl_mul_opp_l in Hx; [ | easy ].
-*)
   specialize determinant_subm_mat_swap_rows_0_i as H1.
   specialize (H1 Hic Hop Hin Hit H10 Hde Hch).
   specialize (H1 n M i j Hsm).
@@ -3623,9 +3612,34 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite minus_one_pow_add_r; [ | easy ].
   rewrite rngl_mul_mul_swap; [ | easy ].
   rewrite H1.
+  rewrite rngl_mul_assoc, rngl_mul_comm; [ | easy ].
+  rewrite rngl_mul_assoc.
   easy.
 }
 cbn.
+apply rngl_summation_eq_compat.
+intros j Hj.
+do 2 rewrite <- rngl_mul_assoc.
+f_equal.
+Search (determinant _ (subm _ _ _)).
+Search (subm (mat_swap_rows _ _ _)).
+...
+Check determinant_subm_mat_swap_rows_0_i.
+...
+rewrite determinant_subm_mat_swap_rows_0_i; try easy.
+Check determinant_subm_mat_swap_rows_0_i.
+...
+  rewrite determinant_subm_mat_swap_rows_0_i; try easy.
+  flia Hiz Hlin.
+}
+cbn.
+apply rngl_summation_eq_compat.
+intros j Hj.
+rewrite rngl_mul_opp_l; [ | easy ].
+rewrite rngl_opp_involutive; [ | easy ].
+do 2 rewrite <- rngl_mul_assoc.
+f_equal.
+Search (determinant _ (subm _ _ _)).
 ...
 intros Hic Hop Hin Hit H10 Hde Hch * Hsm Hlin.
 destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
