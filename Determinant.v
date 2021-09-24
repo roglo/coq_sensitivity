@@ -3519,63 +3519,14 @@ rewrite determinant_alternating; try easy; [ | flia | flia Hin | flia Hin | ].
   }
   now apply Nat.nle_gt in Hjz.
 }
-...
-rewrite List_fold_left_map_nth_len in Hla.
-Search (_ ∈ fold_left _ _ _).
-Search (fold_left (λ _ _, map _ _) (seq _ _)).
-...
-Search (_ ∈ mat_list_list _).
-...
-Search (fold_left (λ _ _, mat_swap_rows _ _ _)).
-...
-    apply Hcr.
-destruct i. {
-  cbn in Hc'.
-  destruct M as (ll).
-  unfold mat_ncols; cbn.
-  cbn in Hc' |-*.
-  unfold mat_ncols in Hc1.
-  cbn in Hc1.
-...
-rewrite List_fold_left_map_nth_len in Hc'.
-Search (nth _ (fold_left _ _ _)).
-rewrite nth_0_fold_left_nth_transp in Hc'.
-rewrite nth_fold_left_seq_gen in Hc'.
-...
-    cbn in Hc'.
-    apply length_zero_iff_nil in Hc'.
-    destruct M as (ll).
-    cbn in Hr, Hcr, Hc, Hc1, Hc' |-*.
-    unfold mat_ncols in Hcr, Hc1, Hc' |-*.
-    cbn in Hcr, Hc1, Hc' |-*.
-...
-    Search mat_list_list.
-Search (
-    unfold mat_ncols in Hc'.
-Search (mat_list_list (fold_left _ _ _)).
-    unfold mat_ncols.
-    rewrite Hc.
-...
-    rewrite List_hd_nth_0 in Hc'.
-Search (nth _ _ _ = []).
-Search (mat_ncols _ = 0).
-Search mat_ncols.
-    unfold mat_ncols in Hc.
-    apply is_sm_mat_iff.
-Search (mat_ncols _ = 0).
-...
-  split. {
-  unfold mat_nrows.
-Search (length (mat_list_list _) = _).
-  split. {
-Search (is_square_matrix _ (fold_left _ _ _) = true).
-Search is_square_matrix.
-...
-rewrite determinant_alternating; try easy; [ | flia | flia Hin | flia Hin ].
-rewrite IHi.
+rewrite IHi; [ | easy ].
 rewrite minus_one_pow_succ; [ | easy ].
-now rewrite rngl_mul_opp_l.
+now symmetry; apply rngl_mul_opp_l.
 Qed.
+
+Inspect 1.
+
+..
 
 Theorem determinant_subm_mat_swap_rows_0_i :
   rngl_is_comm = true →
