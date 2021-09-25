@@ -3673,20 +3673,32 @@ induction n; intros; cbn. {
 set
   (g :=
     λ i, if lt_dec i (vect_nat_el (permut_inv n σ) (S n)) then i else i + 1).
-set (σ' := mk_vect (map (λ i, vect_nat_el σ (g i)) (seq 0 (S n)))).
+set (σ' := mk_vect (map (λ i, vect_nat_el σ (g i)) (seq 0 (S (S n))))).
+(*
+set (g := λ i, if lt_dec i (vect_el (permut_inv σ) (S n)) then i else i + 1).
+set (σ' := mk_vect (S n) (λ i, vect_el σ (g i))).
+*)
+...
 specialize (IHn σ').
 assert (H : ∀ i : nat, i < S n → vect_nat_el σ' i < S n). {
   intros i Hi.
   unfold σ'; cbn - [ seq ].
   unfold g; cbn - [ seq ].
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-...
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
+  rewrite seq_nth; [ | flia Hi ].
+  rewrite Nat.add_0_l.
+  rewrite nth_overflow; [ | rewrite map_length, seq_length; flia ].
+  destruct (lt_dec i 0) as [H| H]; [ easy | clear H ].
+  rewrite Nat.add_1_r.
   destruct (Nat.eq_dec (vect_nat_el σ (S n)) (S n)) as [Hσn| Hσn]. {
     destruct (lt_dec i (S n)) as [H| H]; [ clear H | flia Hi H ].
     specialize (H1 i).
     assert (H : i < S (S n)) by flia Hi.
     specialize (H1 H); clear H.
-    destruct (Nat.eq_dec (vect_el σ i) (S n)) as [Hσ| Hσ]; [ | flia H1 Hσ ].
+    destruct (Nat.eq_dec (vect_nat_el σ i) (S n)) as [Hσ| Hσ]. 2: {
+...
+
+    destruct (Nat.eq_dec (vect_nat_el σ i) (S n)) as [Hσ| Hσ]; [ | flia H1 Hσ ].
     rewrite <- Hσn in Hσ.
     apply H2 in Hσ; [ flia Hi Hσ | flia Hi | flia ].
   }
