@@ -3838,7 +3838,11 @@ destruct (Nat.eq_dec k (S n)) as [Hksn| Hksn]. {
   rewrite Nat.add_0_l.
 *)
 destruct (Nat.eq_dec (vect_nat_el σ (S n)) (S n)) as [H3| H3]; [ easy | ].
-destruct (Nat.eq_dec (vect_nat_el σ n) (S n)) as [H4| H4]. {
+destruct (Nat.eq_dec (vect_nat_el σ n) (S n)) as [H4| H4]; [ flia Hksn Hk | ].
+rewrite <- Hk, Hksn.
+exfalso.
+Print permut_fun_inv.
+Check fun_permut_fun_inv.
 ...
   specialize (H1 (S n)).
   assert (H : S n < S (S n)) by flia.
