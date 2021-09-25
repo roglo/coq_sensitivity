@@ -3806,6 +3806,11 @@ assert
 }
 specialize (IHn H); clear H.
 remember (vect_nat_el (permut_inv (S (S n)) σ) (S n)) as k eqn:Hk.
+unfold permut_inv in Hk.
+cbn - [ map seq ] in Hk.
+rewrite (List_map_nth' 0) in Hk; [ | rewrite seq_length; flia ].
+rewrite seq_nth in Hk; [ | flia ].
+rewrite Nat.add_0_l in Hk.
 destruct (Nat.eq_dec k (S n)) as [Hksn| Hksn]. {
   erewrite rngl_product_eq_compat in IHn. 2: {
     intros i Hi.
@@ -3825,13 +3830,32 @@ destruct (Nat.eq_dec k (S n)) as [Hksn| Hksn]. {
   rewrite IHn; f_equal; f_equal.
   rewrite <- Hksn at 2.
   rewrite Hk.
+(*
   unfold permut_inv.
   cbn - [ permut_fun_inv map seq ].
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
   rewrite seq_nth; [ | flia ].
   rewrite Nat.add_0_l.
+*)
+destruct (Nat.eq_dec (vect_nat_el σ (S n)) (S n)) as [H3| H3]; [ easy | ].
+destruct (Nat.eq_dec (vect_nat_el σ n) (S n)) as [H4| H4]. {
+...
+  specialize (H1 (S n)).
+  assert (H : S n < S (S n)) by flia.
+  specialize (H1 H); clear H.
+  flia H1 H3.
+...
 Check fun_permut_fun_inv.
 Search permut_fun_inv.
+remember (vect_nat_el σ) as F.
+Check permut_fun_inv_fun'.
+unfold permut_inv in Hk.
+cbn - [ map seq ] in Hk.
+rewrite (List_map_nth' 0) in Hk.
+rewrite seq_nth in Hk.
+rewrite Nat.add_0_l in Hk.
+Search (permut_fun_inv (vect_nat_el _)).
+cbn.
 ...
   rewrite fun_permut_fun_inv; [ easy | easy | flia ].
 }
