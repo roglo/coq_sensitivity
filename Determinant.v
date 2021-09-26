@@ -3837,12 +3837,32 @@ destruct (Nat.eq_dec k (S n)) as [Hksn| Hksn]. {
   rewrite seq_nth; [ | flia ].
   rewrite Nat.add_0_l.
 *)
-destruct (Nat.eq_dec (vect_nat_el σ (S n)) (S n)) as [H3| H3]; [ easy | ].
-destruct (Nat.eq_dec (vect_nat_el σ n) (S n)) as [H4| H4]; [ flia Hksn Hk | ].
-rewrite <- Hk, Hksn.
-exfalso.
-Print permut_fun_inv.
+  destruct (Nat.eq_dec (vect_nat_el σ (S n)) (S n)) as [H3| H3]; [ easy | ].
+  destruct (Nat.eq_dec (vect_nat_el σ n) (S n)) as [H4| H4]; [ flia Hksn Hk | ].
+  rewrite <- Hk, Hksn.
 Check fun_permut_fun_inv.
+Print permut_fun_inv.
+Theorem permut_fun_inv_vect_nat_lt : ∀ σ i j,
+  vect_size σ < i → permut_fun_inv (vect_nat_el σ) i j < i.
+Proof.
+intros * Hσ.
+Print permut_fun_inv.
+...
+induction i; [ | cbn ].
+destruct (Nat.eq_dec (vect_nat_el σ i) j) as [H1| H1]; [ flia | ].
+apply (le_lt_trans _ i); [ | flia ].
+...
+apply IHi.
+...
+flia IHi.
+...
+specialize (permut_fun_inv_lt (vect_nat_el σ) n (S n)) as H5.
+rewrite <- Hk in H5.
+flia Hksn H5.
+...
+Search permut_fun_inv.
+...
+  exfalso.
 ...
   specialize (H1 (S n)).
   assert (H : S n < S (S n)) by flia.
