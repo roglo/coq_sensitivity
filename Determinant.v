@@ -3840,6 +3840,13 @@ destruct (Nat.eq_dec k (S n)) as [Hksn| Hksn]. {
   destruct (Nat.eq_dec (vect_nat_el σ (S n)) (S n)) as [H3| H3]; [ easy | ].
   destruct (Nat.eq_dec (vect_nat_el σ n) (S n)) as [H4| H4]; [ flia Hksn Hk | ].
   rewrite <- Hk, Hksn.
+  exfalso.
+  subst k.
+  apply (f_equal (vect_nat_el σ)) in Hksn.
+Check fun_permut_fun_inv.
+...
+  rewrite fun_permut_fun_inv in Hksn.
+...
 Check fun_permut_fun_inv.
 Print permut_fun_inv.
 Print is_permut.
@@ -3860,7 +3867,11 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   specialize (Hp1 0 Nat.lt_0_1).
   flia Hp1 Hjn H1.
 }
-specialize (IHn Hnz).
+specialize (IHn Hnz); cbn.
+destruct (Nat.eq_dec (f n) j) as [Hfnj| Hfnj]; [ flia | ].
+destruct (Nat.eq_dec j n) as [Hjn'| Hjn']. {
+  subst j; clear Hjn.
+  destruct Hp as (Hp1, Hp2).
 ...
 specialize (@permut_fun_inv_vect_nat_lt σ n (S (S n))) as H5.
 specialize (H5 (Nat.neq_succ_0 _)).
