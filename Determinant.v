@@ -3844,14 +3844,20 @@ Check fun_permut_fun_inv.
 Print permut_fun_inv.
 Print is_permut.
 About permut_fun_inv.
-...
-Theorem permut_fun_inv_vect_nat_lt : ∀ σ j n,
+Theorem permut_fun_inv_lt : ∀ f i j n,
   n ≠ 0
+  → n ≤ i
   → j < n
-  → is_permut (vect_nat_el σ) n
-  → permut_fun_inv (vect_nat_el σ) n j < n.
+  → is_permut f n
+  → permut_fun_inv f i j < n.
 Proof.
-intros * Hnz Hjn Hp.
+intros * Hnz Hni Hjn Hp.
+induction i; [ flia Hnz Hni | ].
+cbn.
+destruct (Nat.eq_dec (f i) j) as [H1| H1]. {
+(* ça va pas du tout, ça, parce que f n'est pas censé être défini pour i≥n *)
+...
+intros * Hnz Hni Hjn Hp.
 revert j Hjn.
 induction n; intros; [ flia Hnz | clear Hnz ].
 intros * Hnz Hjn Hp.
