@@ -3844,6 +3844,7 @@ Check fun_permut_fun_inv.
 Print permut_fun_inv.
 Print is_permut.
 About permut_fun_inv.
+...
 Theorem permut_fun_inv_vect_nat_lt : ∀ σ j n,
   n ≠ 0
   → j < n
@@ -3851,7 +3852,11 @@ Theorem permut_fun_inv_vect_nat_lt : ∀ σ j n,
   → permut_fun_inv (vect_nat_el σ) n j < n.
 Proof.
 intros * Hnz Hjn Hp.
-induction n; [ flia Hnz | clear Hnz ].
+revert j Hjn.
+induction n; intros; [ flia Hnz | clear Hnz ].
+intros * Hnz Hjn Hp.
+revert j Hjn.
+induction n; intros; [ flia Hnz | clear Hnz ].
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n; cbn.
   destruct (Nat.eq_dec (vect_nat_el σ 0) j) as [H1| H1]; [ flia | ].
@@ -3859,7 +3864,8 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   specialize (Hp1 0 Nat.lt_0_1).
   flia Hp1 Hjn H1.
 }
-Admitted.
+specialize (IHn Hnz).
+...
 specialize (@permut_fun_inv_vect_nat_lt σ n (S (S n))) as H5.
 specialize (H5 (Nat.neq_succ_0 _)).
 assert (H : n < S (S n)) by flia.
