@@ -3419,17 +3419,17 @@ Proof.
 intros * Hperm.
 specialize (permut_fun_inv_is_permut Hperm) as H1.
 unfold is_permut_vect.
-Search permut_fun_inv.
-Search permut_inv.
-...
-unfold is_permut_vect.
-unfold is_permut_vect in Hperm.
-specialize (permut_fun_inv_is_permut Hperm) as H1.
 unfold permut_inv.
-unfold vect_nat_el at 1.
-cbn.
-...
-now apply permut_fun_inv_is_permut.
+unfold vect_nat_el; cbn.
+eapply is_permut_eq_compat. {
+  intros i Hi.
+  symmetry.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
+  rewrite Nat.add_0_l.
+  easy.
+}
+easy.
 Qed.
 
 Theorem sym_gr_inv_upper_bound : ∀ n k j,
