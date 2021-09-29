@@ -3827,11 +3827,9 @@ destruct (Nat.eq_dec k (S n)) as [Hksn| Hksn]. {
 (* voir permut_fun_inv_fun et fun_find_prop : ils font pas double
    emploi, ceux-là ? *)
 (* et permut_fun_inv_fun' aussi !!! *)
-Check permut_fun_inv_is_permut.
-...
 specialize permut_inv_is_permut as H3.
-specialize (H3 _ σ).
-assert (H : is_permut_vect σ) by easy.
+specialize (H3 (S (S n)) σ).
+assert (H : is_permut_vect (S (S n)) σ) by easy.
 specialize (H3 H); clear H.
 rewrite rngl_product_split with (j := k) in IHn. 2: {
   split; [ flia | ].
@@ -3849,7 +3847,17 @@ destruct (Nat.eq_dec k 0) as [Hkz| Hkz]. {
   rewrite rngl_product_empty in IHn; [ | flia ].
   rewrite rngl_mul_1_l, Nat.add_0_l in IHn.
   unfold σ' in IHn at 1.
-  cbn in IHn.
+  cbn - [ seq ] in IHn.
+  rewrite (List_map_nth' 0) in IHn; [ | rewrite seq_length; flia ].
+  rewrite seq_nth in IHn; [ | flia ].
+  rewrite Nat.add_0_l in IHn.
+  erewrite rngl_product_eq_compat in IHn. 2: {
+    intros i Hi.
+    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
+    rewrite seq_nth; [ | flia Hi ].
+    rewrite Nat.add_0_l.
+    easy.
+  }
   symmetry.
   rewrite rngl_product_split_last; [ | flia ].
   rewrite rngl_product_succ_succ'.
@@ -3858,7 +3866,10 @@ destruct (Nat.eq_dec k 0) as [Hkz| Hkz]. {
   rewrite rngl_product_split_first; [ | flia ].
   rewrite Hk at 1.
   unfold permut_inv.
-  cbn - [ permut_fun_inv ].
+  cbn - [ permut_fun_inv seq ].
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
+  rewrite seq_nth; [ | flia ].
+  rewrite Nat.add_0_l.
   rewrite fun_permut_fun_inv; [ | easy | flia ].
   rewrite rngl_mul_comm; [ | easy ].
   f_equal.
@@ -3870,12 +3881,26 @@ destruct (Nat.eq_dec k 0) as [Hkz| Hkz]. {
 }
 erewrite rngl_product_eq_compat in IHn. 2: {
   intros i Hi.
-  unfold σ'; cbn.
+  unfold σ'; cbn - [ seq ].
+  assert (H : i - 1 < S n). {
+    rewrite Hk in Hi.
+    unfold is_permut_vect in H3.
+    destruct H3 as (H3, H4).
+    specialize (H3 (S n)).
+    assert (H : S n < S (S n)) by flia.
+    specialize (H3 H); clear H.
+    flia H3 Hi.
+  }
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
+  clear H.
+  rewrite Nat.add_0_l.
   unfold g.
   destruct (lt_dec (i - 1) k) as [H| H]; [ | flia Hi H ].
   easy.
 }
-cbn in IHn.
+cbn - [ seq ] in IHn.
+...
 destruct k; [ easy | clear Hkz ].
 rewrite rngl_product_succ_succ' with (g0 := λ i, f (vect_el σ i)) in IHn.
 unfold g in IHn.
