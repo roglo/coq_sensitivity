@@ -3815,98 +3815,20 @@ destruct (Nat.eq_dec k (S n)) as [Hksn| Hksn]. {
   rewrite rngl_product_succ_succ'.
   symmetry.
   rewrite IHn; f_equal; f_equal.
-(**)
-subst k.
-unfold permut_inv in Hksn.
-cbn - [ permut_fun_inv seq ] in Hksn.
-rewrite (List_map_nth' 0) in Hksn; [ | rewrite seq_length; flia ].
-rewrite seq_nth in Hksn; [ | flia ].
-rewrite Nat.add_0_l in Hksn.
-...
-Search permut_fun_inv.
-(* voir permut_fun_inv_fun et fun_find_prop : ils font pas double
-   emploi, ceux-là ? *)
-(* et permut_fun_inv_fun' aussi !!! *)
-Check fun_permut_fun_inv.
-Check fun_find_prop.
-generalize Hksn; intros H3.
-cbn in Hksn.
-  destruct (Nat.eq_dec (vect_nat_el σ (S n)) (S n)) as [Hσn| Hσn]; [ easy | ].
-  destruct (Nat.eq_dec (vect_nat_el σ n) (S n)) as [Hσs| Hσs]. {
-    flia Hksn.
-  }
-Search permut_fun_inv.
-...
-symmetry in H3.
-apply permut_fun_without_last in H3; [ | easy ].
-destruct H3 as (h & Hh & Hm).
-rewrite Nat.sub_diag in Hm.
-rewrite app_nil_r in Hm.
-...
-  cbn - [ seq ] in Hk.
-  rewrite (List_map_nth' 0) in Hk; [ | rewrite seq_length; flia ].
-  rewrite seq_nth in Hk; [ | flia ].
-  rewrite Nat.add_0_l in Hk.
-  destruct (Nat.eq_dec (vect_nat_el σ (S n)) (S n)) as [Hσn| Hσn]; [ easy | ].
-  destruct (Nat.eq_dec (vect_nat_el σ n) (S n)) as [Hσs| Hσs]. {
-    flia Hksn Hk.
-  }
-  subst k.
-...
-Search permut_fun_inv.
-...
-  rewrite <- Hksn at 2.
-  rewrite Hk.
+  rewrite Hk in Hksn.
+  rewrite <- Hksn at 1.
   unfold permut_inv.
-  cbn - [ seq ].
-  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
-  rewrite seq_nth; [ | flia ].
-  rewrite Nat.add_0_l.
-  destruct (Nat.eq_dec (vect_nat_el σ (S n)) (S n)) as [Hσn| Hσn]; [ easy | ].
-  destruct (Nat.eq_dec (vect_nat_el σ n) (S n)) as [Hσs| Hσs]. {
-...
-  destruct (Nat.eq_dec (vect_nat_el σ n) (S n)) as [H4| H4]; [ flia Hksn Hk | ].
-    admit.
-  }
-...
   cbn - [ permut_fun_inv seq ].
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
   rewrite seq_nth; [ | flia ].
   rewrite Nat.add_0_l.
-  cbn.
-...
-  rewrite fun_find_permut_fun_inv'; [ | easy | flia ].
-  unfold permut_fun_inv'.
-  remember (Pigeonhole.pigeonhole_fun _ _) as x eqn:Hx.
-  symmetry in Hx.
-  destruct x as (x, x').
-  destruct (Nat.eq_dec x (S (S n))) as [Hxn| Hxn]. {
-    subst x.
-    apply Pigeonhole.pigeonhole with (b := S (S n)) in Hx; [ | flia | ]. 2: {
-      intros i Hi.
-      destruct (Nat.eq_dec i (S (S n))) as [Hin| Hin]; [ flia | ].
-      apply H1; flia Hi Hin.
-    }
-    destruct Hx as (_ & Hx'n & Hnx' & Hx').
-    destruct (Nat.eq_dec (S (S n)) (S (S n))) as [H| H]; [ clear H | easy ].
-    destruct (Nat.eq_dec x' (S (S n))) as [H| H]; [ now symmetry in H | ].
-    clear H.
-    rewrite <- Hksn, Hk.
-    unfold vect_nat_el.
-    cbn - [ seq ].
-    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
-    rewrite seq_nth; [ | flia ].
-    rewrite Nat.add_0_l.
-    destruct (Nat.eq_dec (vect_nat_el σ (S n)) (S n)) as [Hsn| Hsn]. {
-unfold vect_nat_el in Hsn.
-rewrite Hsn.
-...
-    rewrite Hx'.
-...
-Check fun_permut_fun_inv.
-...
   rewrite fun_permut_fun_inv; [ easy | easy | flia ].
 }
+(* voir permut_fun_inv_fun et fun_find_prop : ils font pas double
+   emploi, ceux-là ? *)
+(* et permut_fun_inv_fun' aussi !!! *)
+Check permut_fun_inv_is_permut.
+...
 specialize permut_inv_is_permut as H3.
 specialize (H3 _ σ).
 assert (H : is_permut_vect σ) by easy.
