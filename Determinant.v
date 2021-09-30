@@ -3875,13 +3875,12 @@ destruct (Nat.eq_dec k 0) as [Hkz| Hkz]. {
   rewrite <- IHn.
   symmetry.
   rewrite rngl_product_split_first; [ | flia ].
-  rewrite Hk at 1.
+  rewrite Hk at 2.
   unfold permut_inv.
   cbn - [ permut_fun_inv seq ].
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
   rewrite seq_nth; [ | flia ].
   rewrite Nat.add_0_l.
-...
   rewrite fun_permut_fun_inv; [ | easy | flia ].
   rewrite rngl_mul_comm; [ | easy ].
   f_equal.
@@ -4068,7 +4067,8 @@ Fixpoint vect_eqb_loop A n (eqb : A → A → bool) d (u v : vector A) i :=
   match i with
   | 0 => true
   | S i' =>
-      if eqb (vect_el u i' d) (vect_el v i' d) then vect_eqb_loop eqb n d u v i'
+      if eqb (vect_el d u i') (vect_el d v i') then
+        vect_eqb_loop eqb n d u v i'
       else false
   end.
 
