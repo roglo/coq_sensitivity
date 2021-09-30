@@ -481,9 +481,7 @@ rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
 }
 rewrite (List_map_nth' 0%F); [ | now rewrite fold_vect_size, Hu ].
 rewrite (List_map_nth' 0%F); [ | now rewrite fold_vect_size, Hv ].
-(*
 do 2 rewrite fold_vect_el.
-*)
 (* elimination of the following term (q) *)
 remember
   (∏ (i0 = 2, p + 1), mat_el M (i0 - 2) (mk_canon_sym_gr n k (i0 - 2)))
