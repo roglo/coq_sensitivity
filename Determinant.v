@@ -948,10 +948,7 @@ erewrite rngl_summation_eq_compat. 2: {
       rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
       now cbn; rewrite map_length, seq_length.
     }
-...
-    cbn; rewrite map_length; apply seq_length.
-  } {
-    subst f; cbn.
+    unfold f; cbn.
     split; cbn. {
       intros i Hi.
       rewrite (List_map_nth' 0). 2: {
@@ -1004,7 +1001,7 @@ erewrite rngl_summation_eq_compat. 2: {
     }
     now apply transposition_injective in Hij.
   }
-  cbn.
+  split; [ now cbn; rewrite map_length, seq_length | ].
   split. {
     intros i Hi; cbn.
     rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
@@ -3666,8 +3663,8 @@ Proof.
 intros Hic * Hnz Hσ.
 destruct n; [ easy | clear Hnz ].
 rewrite Nat_sub_succ_1.
-destruct Hσ as (H1, H2).
-revert σ H1 H2.
+destruct Hσ as (Hs & H1 & H2).
+revert σ Hs H1 H2.
 induction n; intros. cbn. {
   rewrite rngl_product_only_one.
   rewrite rngl_product_only_one.
@@ -3680,6 +3677,11 @@ set
    if lt_dec i (vect_nat_el (permut_inv (S (S n)) σ) (S n)) then i else i + 1).
 set (σ' := mk_vect (map (λ i, vect_nat_el σ (g i)) (seq 0 (S n)))).
 specialize (IHn σ').
+assert (H : vect_size σ' = S n). {
+  unfold σ'; cbn.
+  now rewrite map_length, seq_length.
+}
+specialize (IHn H); clear H.
 assert (H : ∀ i : nat, i < S n → vect_nat_el σ' i < S n). {
   intros i Hi.
   unfold σ'; cbn - [ seq ].
@@ -3838,7 +3840,7 @@ assert (H : is_permut_vect (S (S n)) σ) by easy.
 specialize (H3 H); clear H.
 rewrite rngl_product_split with (j := k) in IHn. 2: {
   split; [ flia | ].
-  destruct H3 as (H3, H4).
+  destruct H3 as (Hsi & H3 & H4).
   apply -> Nat.succ_le_mono.
   specialize (H3 (S n)) as H5.
   assert (H : S n < S (S n)) by flia.
@@ -3890,7 +3892,7 @@ erewrite rngl_product_eq_compat in IHn. 2: {
   assert (H : i - 1 < S n). {
     rewrite Hk in Hi.
     unfold is_permut_vect in H3.
-    destruct H3 as (H3, H4).
+    destruct H3 as (Hsi, (H3, H4)).
     specialize (H3 (S n)).
     assert (H : S n < S (S n)) by flia.
     specialize (H3 H); clear H.
@@ -3907,10 +3909,6 @@ erewrite rngl_product_eq_compat in IHn. 2: {
 cbn - [ seq ] in IHn.
 destruct k; [ easy | clear Hkz ].
 rewrite rngl_product_succ_succ' with (g0 := λ i, f (vect_nat_el σ i)) in IHn.
-(*
-unfold g in IHn.
-destruct (lt_dec (S k) (S k)) as [H| H]; [ flia H | clear H ].
-*)
 erewrite rngl_product_eq_compat with (b := S k + 1) in IHn. 2: {
   intros i Hi.
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
@@ -3928,7 +3926,7 @@ rewrite <- IHn.
 symmetry.
 rewrite rngl_product_split with (j := k). 2: {
   split; [ flia | ].
-  destruct H3 as (H3, H4).
+  destruct H3 as (Hsi, (H3, H4)).
   rewrite Hk.
   apply Nat.lt_le_incl.
   apply H3; flia.
@@ -3938,7 +3936,7 @@ f_equal.
 rewrite rngl_product_split_last. 2: {
   rewrite Nat.add_1_r.
   rewrite Hk.
-  destruct H3 as (H3, H4).
+  destruct H3 as (Hsi, (H3, H4)).
   apply Nat.lt_succ_r.
   apply H3; flia.
 }
@@ -3946,7 +3944,7 @@ rewrite rngl_product_succ_succ' with (g0 := λ i, f (vect_nat_el σ i)).
 rewrite rngl_product_split_first. 2: {
   rewrite Nat.add_1_r.
   rewrite Hk.
-  destruct H3 as (H3, H4).
+  destruct H3 as (Hsi, (H3, H4)).
   specialize (H3 (S n) (Nat.lt_succ_diag_r _)).
   rewrite <- Hk in H3.
   rewrite (List_map_nth' 0) in IHn; [ | rewrite seq_length; flia Hksn H3 ].
@@ -3988,7 +3986,7 @@ destruct
 assert (Hkn : S (k + 1) ≤ n). {
   rewrite Nat.add_1_r.
   rewrite Hk.
-  destruct H3 as (H3, H4).
+  destruct H3 as (Hsi, (H3, H4)).
   apply Nat.le_succ_l.
   specialize (H3 (S n) (Nat.lt_succ_diag_r _)) as H5.
   destruct
@@ -4019,26 +4017,29 @@ rewrite Nat.sub_add; [ easy | flia Hi ].
 Qed.
 
 Theorem permut_comp_assoc : ∀ n (f g h : vector nat),
-  is_permut_vect n h
+  vect_size g = n
+  → is_permut_vect n h
   → (f ° (g ° h) = (f ° g) ° h)%F.
 Proof.
-intros n (f) (g) (h) Hh.
-cbn in Hh.
+intros n (f) (g) (h) Hsg Hh.
+cbn in Hsg, Hh.
 unfold "°", comp_list; cbn.
 rewrite map_map.
 f_equal.
 apply map_ext_in.
 intros i Hi.
 rewrite (List_map_nth' 0); [ easy | ].
-destruct Hh as (Hh1, Hh2).
-cbn in Hh1, Hh2.
-About is_permut_vect.
-Print is_permut.
-...
+destruct Hh as (Hsh, (Hh1, Hh2)).
+cbn in Hsh, Hh1, Hh2.
+apply (In_nth h i 0) in Hi.
+destruct Hi as (j & Hjh & Hj).
+subst i.
+rewrite Hsh in Hjh.
+rewrite Hsg.
+now apply Hh1.
+Qed.
 
-Theorem permut_comp_assoc : ∀ n (f g h : vector n nat),
-  (f ° (g ° h) = (f ° g) ° h)%F.
-Proof. easy. Qed.
+...
 
 Theorem comp_permut_inv_r : ∀ n f,
   is_permut_vect f
