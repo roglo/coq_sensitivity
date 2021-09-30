@@ -61,11 +61,8 @@ Proof. easy. Qed.
 Definition mat_permut_rows_fun (σ : nat → nat) (M : matrix T) :=
   mk_mat (map (λ i, nth (σ i) (mat_list_list M) []) (seq 0 (mat_nrows M))).
 
-...
-(* replace vect_nat_el with vect_el 0 *)
-
 Definition mat_permut_rows (σ : vector nat) (M : matrix T) :=
-  mat_permut_rows_fun (vect_nat_el σ) M.
+  mat_permut_rows_fun (vect_el 0 σ) M.
 
 (* the following versions of computing the determinant should
    (to be proven) be equivalent; perhaps could help for proving
@@ -102,7 +99,7 @@ Definition determinant' n (M : matrix T) :=
     ε n (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) *
     ∏ (i = 1, n),
     mat_el M (i - 1)
-      (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) (i - 1)).
+      (vect_el 0%nat (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) (i - 1)).
 
 Arguments determinant' n%nat M%M.
 
@@ -198,7 +195,7 @@ f_equal. {
   rewrite Nat.add_comm, Nat.add_sub.
   replace (2 + i - 1) with (S i) by flia.
   unfold mat_el.
-  unfold vect_nat_el, vect_vect_nat_el.
+  unfold vect_el, vect_vect_nat_el.
   cbn - [ subm fact ].
   rewrite (List_map_nth' 0). 2: {
     rewrite seq_length.
@@ -315,7 +312,7 @@ erewrite rngl_summation_eq_compat. 2: {
     } {
       now rewrite Hcn.
     }
-    unfold vect_nat_el, vect_vect_nat_el; cbn.
+    unfold vect_el, vect_vect_nat_el; cbn.
     rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
     cbn - [ nth ].
     rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
@@ -359,7 +356,7 @@ erewrite rngl_summation_eq_compat. 2: {
     } {
       now rewrite Hcn.
     }
-    unfold vect_nat_el, vect_vect_nat_el; cbn.
+    unfold vect_el, vect_vect_nat_el; cbn.
     rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
     cbn - [ nth ].
     rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
@@ -399,7 +396,7 @@ erewrite rngl_summation_eq_compat. 2: {
     } {
       now rewrite Hcn.
     }
-    unfold vect_nat_el, vect_vect_nat_el; cbn.
+    unfold vect_el, vect_vect_nat_el; cbn.
     rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
     cbn - [ nth ].
     rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
@@ -538,7 +535,8 @@ Definition determinant'_list n (M : matrix T) :=
     (ε_permut n k *
      ∏ (i = 1, n),
      mat_el M (i - 1)
-       (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) (i - 1)%nat))%F)
+       (vect_el 0%nat
+          (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) (i - 1)%nat))%F)
     (seq 0 n!).
 
 Arguments determinant'_list n%nat M%M.
@@ -600,13 +598,14 @@ Definition determinant'' p q n (M : matrix T) :=
   ∑ (k = 0, fact n - 1),
     ε_permut n k *
     ∏ (i = 1, n),
-    mat_el M (i - 1) (vect_nat_el (sym_gr_elem_swap_last p q n k) (i - 1)).
+    mat_el M (i - 1) (vect_el 0%nat (sym_gr_elem_swap_last p q n k) (i - 1)).
 
 Definition determinant''_list p q n (M : matrix T) :=
   map (λ k,
     (ε_permut n k *
      ∏ (i = 1, n),
-     mat_el M (i - 1) (vect_nat_el (sym_gr_elem_swap_last p q n k) (i - 1)))%F)
+     mat_el M (i - 1) (vect_el 0%nat
+       (sym_gr_elem_swap_last p q n k) (i - 1)))%F)
     (seq 0 (fact n)).
 
 Theorem determinant''_by_list : ∀ n p q (M : matrix T),
@@ -817,7 +816,7 @@ erewrite rngl_summation_eq_compat. 2: {
     intros i Hi.
     replace (mat_el _ _ _) with
       (mat_el M i
-         (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect n) k)
+         (vect_el 0 (vect_vect_nat_el (mk_canon_sym_gr_vect n) k)
             (transposition p q i))). 2: {
       cbn.
       rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
@@ -870,7 +869,7 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 set
   (f :=
-   λ k, vect_swap_elem (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) p q).
+   λ k, vect_swap_elem 0 (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) p q).
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   assert (Hkn : k < n!). {
@@ -892,7 +891,7 @@ erewrite rngl_summation_eq_compat. 2: {
       apply transposition_lt; [ easy | easy | flia Hi Hp ].
     }
     rewrite Nat.add_0_l.
-    replace (mk_canon_sym_gr _ _ _) with (vect_nat_el (f k) i). 2: {
+    replace (mk_canon_sym_gr _ _ _) with (vect_el 0 (f k) i). 2: {
       unfold f; cbn.
       rewrite (List_map_nth' 0). 2: {
         rewrite seq_length.
@@ -918,7 +917,7 @@ erewrite rngl_summation_eq_compat. 2: {
   cbn - [ f ].
   replace ({| vect_list := map (mk_canon_sym_gr n k) (seq 0 n) |}) with
     (mk_vect
-       (map (λ i, vect_nat_el (f k) (transposition p q i)) (seq 0 n))). 2: {
+       (map (λ i, vect_el 0 (f k) (transposition p q i)) (seq 0 n))). 2: {
     f_equal.
     apply map_ext_in.
     intros i Hi; cbn.
@@ -940,7 +939,7 @@ erewrite rngl_summation_eq_compat. 2: {
     easy.
   }
   replace
-    (mk_vect (map (λ i, vect_nat_el (f k) (transposition p q i)) (seq 0 n)))
+    (mk_vect (map (λ i, vect_el 0 (f k) (transposition p q i)) (seq 0 n)))
   with (f k ° mk_vect (map (λ i, transposition p q i) (seq 0 n))). 2: {
     unfold "°"; f_equal; cbn.
     now rewrite map_map.
@@ -1047,7 +1046,7 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
     rewrite seq_nth; [ | easy ].
     rewrite Nat.add_0_l.
     unfold vect_swap_elem; cbn.
-    unfold vect_nat_el; cbn.
+    unfold vect_el; cbn.
     rewrite List_map_seq_length.
     eapply is_permut_eq_compat. {
       intros i Hi; symmetry.
@@ -1055,7 +1054,7 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
       rewrite seq_nth; [ | easy ].
       rewrite Nat.add_0_l.
       rewrite (List_map_nth' 0). 2: {
-        unfold vect_nat_el.
+        unfold vect_el.
         rewrite seq_length.
         now apply transposition_lt.
       }
@@ -1076,7 +1075,7 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
   unfold vect_swap_elem; cbn.
   do 2 rewrite List_map_seq_length.
-  unfold vect_nat_el; cbn.
+  unfold vect_el; cbn.
   erewrite rank_of_permut_in_sym_gr_eq_compat. 2: {
     intros i Hi.
     rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
@@ -1149,10 +1148,12 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
   split. {
     intros i Hi.
     unfold rank_of_permut_in_sym_gr_vect.
-    unfold vect_nat_el; cbn.
+    unfold vect_el; cbn.
     erewrite rank_of_permut_in_sym_gr_eq_compat. 2: {
       intros u Hu.
-      rewrite (List_map_nth' 0); [ | now rewrite List_map_seq_length, seq_length ].
+      rewrite (List_map_nth' 0). 2: {
+        now rewrite List_map_seq_length, seq_length.
+      }
       rewrite List_map_seq_length.
       rewrite seq_nth; [ cbn | easy ].
       rewrite (List_map_nth' 0). 2: {
@@ -1169,7 +1170,7 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
     unfold vect_swap_elem in Hij.
     cbn in Hij.
     unfold rank_of_permut_in_sym_gr_vect in Hij.
-    unfold vect_nat_el in Hij.
+    unfold vect_el in Hij.
     cbn in Hij.
     erewrite rank_of_permut_in_sym_gr_eq_compat in Hij. 2: {
       intros u Hu.
@@ -1223,15 +1224,15 @@ erewrite rngl_summation_list_eq_compat. 2: {
   unfold g, f.
   unfold mk_canon_sym_gr_vect at 1.
   unfold vect_vect_nat_el at 1.
-  cbn - [ vect_vect_nat_el vect_nat_el ].
+  cbn - [ vect_vect_nat_el vect_el ].
   assert (Hps :
     is_permut
-      (vect_nat_el
-         (vect_swap_elem (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) p q))
+      (vect_el 0
+         (vect_swap_elem 0 (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) p q))
       n). {
     eapply is_permut_eq_compat. {
       intros i Hi; symmetry.
-      unfold vect_nat_el; cbn.
+      unfold vect_el; cbn.
       rewrite (List_map_nth' 0). 2: {
         rewrite seq_length.
         rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
@@ -1252,7 +1253,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   assert
   (Hrpq :
      rank_of_permut_in_sym_gr_vect n
-       (vect_swap_elem (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) p q) <
+       (vect_swap_elem 0 (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) p q) <
      n!). {
     unfold rank_of_permut_in_sym_gr_vect.
     now apply rank_of_permut_upper_bound.
@@ -1321,10 +1322,10 @@ cbn - [ vect_vect_nat_el ].
 assert
   (Hrg :
    rank_of_permut_in_sym_gr n
-     (vect_nat_el
-        (vect_swap_elem {| vect_list := map (mk_canon_sym_gr n k) (seq 0 n) |}
+     (vect_el 0
+        (vect_swap_elem 0 {| vect_list := map (mk_canon_sym_gr n k) (seq 0 n) |}
            p q)) < n!). {
-  unfold vect_nat_el.
+  unfold vect_el.
   apply rank_of_permut_upper_bound; cbn.
   rewrite List_map_seq_length.
   eapply is_permut_eq_compat. {
@@ -1375,7 +1376,7 @@ rewrite (List_map_nth' 0). 2: {
 rewrite seq_nth; [ cbn | easy ].
 rewrite seq_nth; [ cbn | now apply transposition_lt ].
 rewrite permut_in_sym_gr_of_its_rank; cycle 1. {
-  unfold vect_nat_el.
+  unfold vect_el.
   eapply is_permut_eq_compat. {
     intros j Hj; symmetry; cbn.
     rewrite (List_map_nth' 0); [ | now rewrite List_map_seq_length, seq_length ].
@@ -1556,7 +1557,7 @@ Fixpoint tlopf_loop it n (σ : nat → nat) :=
 Definition transp_list_of_permut_fun n (σ : nat → nat) := tlopf_loop n n σ.
 
 Definition transp_list_of_permut {n} (σ : vector nat) :=
-  transp_list_of_permut_fun n (vect_nat_el σ).
+  transp_list_of_permut_fun n (vect_el 0 σ).
 
 Theorem first_non_fixpoint_Some_iff : ∀ σ it i j,
   first_non_fixpoint it i σ = Some j
@@ -3661,7 +3662,7 @@ Theorem rngl_product_fun_permut :
   ∀ n (σ : vector nat) (f : nat → T),
   n ≠ 0
   → is_permut_vect n σ
-  → ∏ (i = 0, n - 1), f (vect_nat_el σ i) = ∏ (i = 0, n - 1), f i.
+  → ∏ (i = 0, n - 1), f (vect_el 0%nat σ i) = ∏ (i = 0, n - 1), f i.
 Proof.
 intros Hic * Hnz Hσ.
 destruct n; [ easy | clear Hnz ].
@@ -3677,15 +3678,15 @@ induction n; intros. cbn. {
 }
 set
   (g := λ i,
-   if lt_dec i (vect_nat_el (permut_inv (S (S n)) σ) (S n)) then i else i + 1).
-set (σ' := mk_vect (map (λ i, vect_nat_el σ (g i)) (seq 0 (S n)))).
+   if lt_dec i (vect_el 0 (permut_inv (S (S n)) σ) (S n)) then i else i + 1).
+set (σ' := mk_vect (map (λ i, vect_el 0 σ (g i)) (seq 0 (S n)))).
 specialize (IHn σ').
 assert (H : vect_size σ' = S n). {
   unfold σ'; cbn.
   now rewrite map_length, seq_length.
 }
 specialize (IHn H); clear H.
-assert (H : ∀ i : nat, i < S n → vect_nat_el σ' i < S n). {
+assert (H : ∀ i : nat, i < S n → vect_el 0 σ' i < S n). {
   intros i Hi.
   unfold σ'; cbn - [ seq ].
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
@@ -3695,21 +3696,21 @@ assert (H : ∀ i : nat, i < S n → vect_nat_el σ' i < S n). {
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
   rewrite seq_nth; [ | flia ].
   rewrite Nat.add_0_l.
-  destruct (Nat.eq_dec (vect_nat_el σ (S n)) (S n)) as [Hσn| Hσn]. {
+  destruct (Nat.eq_dec (vect_el 0 σ (S n)) (S n)) as [Hσn| Hσn]. {
     destruct (lt_dec i (S n)) as [H| H]; [ clear H | flia Hi H ].
     specialize (H1 i).
     assert (H : i < S (S n)) by flia Hi.
     specialize (H1 H); clear H.
-    destruct (Nat.eq_dec (vect_nat_el σ i) (S n)) as [Hσ| Hσ]; [ | flia H1 Hσ ].
+    destruct (Nat.eq_dec (vect_el 0 σ i) (S n)) as [Hσ| Hσ]; [ | flia H1 Hσ ].
     rewrite <- Hσn in Hσ.
     apply H2 in Hσ; [ flia Hi Hσ | flia Hi | flia ].
   }
-  destruct (Nat.eq_dec (vect_nat_el σ n) (S n)) as [Hσs| Hσs]. {
+  destruct (Nat.eq_dec (vect_el 0 σ n) (S n)) as [Hσs| Hσs]. {
     destruct (lt_dec i n) as [Hin| Hin]. {
       specialize (H1 i).
       assert (H : i < S (S n)) by flia Hi.
       specialize (H1 H); clear H.
-      destruct (Nat.eq_dec (vect_nat_el σ i) (S n)) as [Hσ| Hσ]. 2: {
+      destruct (Nat.eq_dec (vect_el 0 σ i) (S n)) as [Hσ| Hσ]. 2: {
         flia H1 Hσ.
       }
       rewrite <- Hσs in Hσ.
@@ -3720,8 +3721,8 @@ assert (H : ∀ i : nat, i < S n → vect_nat_el σ' i < S n). {
     specialize (H1 (S n) (Nat.lt_succ_diag_r (S n))).
     flia H1 Hσn.
   }
-  destruct (lt_dec i (permut_fun_inv (vect_nat_el σ) n (S n))) as [H3| H3]. {
-    destruct (Nat.eq_dec (vect_nat_el σ i) (S n)) as [H4| H4]. {
+  destruct (lt_dec i (permut_fun_inv (vect_el 0 σ) n (S n))) as [H3| H3]. {
+    destruct (Nat.eq_dec (vect_el 0 σ i) (S n)) as [H4| H4]. {
       exfalso.
       rewrite <- H4 in H3. (* at 2 *)
       rewrite permut_fun_inv_fun' in H3; [ flia H3 | | ]. 2: {
@@ -3740,7 +3741,7 @@ assert (H : ∀ i : nat, i < S n → vect_nat_el σ' i < S n). {
   specialize (H1 (S i)).
   assert (H : S i < S (S n)) by flia Hi.
   specialize (H1 H); clear H.
-  destruct (Nat.eq_dec (vect_nat_el σ (S i)) (S n)) as [H4| H4]. {
+  destruct (Nat.eq_dec (vect_el 0 σ (S i)) (S n)) as [H4| H4]. {
     exfalso.
     rewrite <- H4 in H3. (* at 2 *)
     rewrite permut_fun_inv_fun' in H3; [ flia H3 | | ]. 2: {
@@ -3758,7 +3759,7 @@ assert (H : ∀ i : nat, i < S n → vect_nat_el σ' i < S n). {
 specialize (IHn H); clear H.
 assert
   (H : ∀ i j, i < S n → j < S n →
-   vect_nat_el σ' i = vect_nat_el σ' j → i = j). {
+   vect_el 0 σ' i = vect_el 0 σ' j → i = j). {
   intros i j Hi Hj Hij; cbn - [ seq ] in Hij.
   rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
   rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
@@ -3769,12 +3770,12 @@ assert
   rewrite (List_map_nth' 0) in Hij; [ | rewrite seq_length; flia ].
   rewrite seq_nth in Hij; [ | flia ].
   rewrite Nat.add_0_l in Hij.
-  destruct (Nat.eq_dec (vect_nat_el σ (S n)) (S n)) as [H3| H3]. {
+  destruct (Nat.eq_dec (vect_el 0 σ (S n)) (S n)) as [H3| H3]. {
     destruct (lt_dec i (S n)) as [H| H]; [ clear H | flia Hi H ].
     destruct (lt_dec j (S n)) as [H| H]; [ clear H | flia Hj H ].
     apply H2; [ flia Hi | flia Hj | easy ].
   }
-  destruct (Nat.eq_dec (vect_nat_el σ n) (S n)) as [H4| H4]. {
+  destruct (Nat.eq_dec (vect_el 0 σ n) (S n)) as [H4| H4]. {
     destruct (lt_dec i n) as [Hin| Hin]. {
       destruct (lt_dec j n) as [Hjn| Hjn]. {
         apply H2; [ flia Hi | flia Hj | easy ].
@@ -3791,7 +3792,7 @@ assert
     }
     now replace j with n by flia Hj Hjn.
   }
-  remember (permut_fun_inv (vect_nat_el σ) n (S n)) as k eqn:Hk.
+  remember (permut_fun_inv (vect_el 0 σ) n (S n)) as k eqn:Hk.
   destruct (lt_dec i k) as [H5| H5]. {
     destruct (lt_dec j k) as [H6| H6]. {
       apply H2; [ flia Hi | flia Hj | easy ].
@@ -3807,7 +3808,7 @@ assert
   flia Hij.
 }
 specialize (IHn H); clear H.
-remember (vect_nat_el (permut_inv (S (S n)) σ) (S n)) as k eqn:Hk.
+remember (vect_el 0 (permut_inv (S (S n)) σ) (S n)) as k eqn:Hk.
 destruct (Nat.eq_dec k (S n)) as [Hksn| Hksn]. {
   erewrite rngl_product_eq_compat in IHn. 2: {
     intros i Hi.
@@ -3819,7 +3820,7 @@ destruct (Nat.eq_dec k (S n)) as [Hksn| Hksn]. {
   }
   cbn in IHn.
   rewrite rngl_product_split_last; [ | flia ].
-  rewrite rngl_product_succ_succ' with (g0 := λ i, f (vect_nat_el σ i)).
+  rewrite rngl_product_succ_succ' with (g0 := λ i, f (vect_el 0 σ i)).
   symmetry.
   rewrite rngl_product_split_last; [ | flia ].
   rewrite rngl_product_succ_succ'.
@@ -3880,6 +3881,7 @@ destruct (Nat.eq_dec k 0) as [Hkz| Hkz]. {
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
   rewrite seq_nth; [ | flia ].
   rewrite Nat.add_0_l.
+...
   rewrite fun_permut_fun_inv; [ | easy | flia ].
   rewrite rngl_mul_comm; [ | easy ].
   f_equal.
@@ -3911,7 +3913,7 @@ erewrite rngl_product_eq_compat in IHn. 2: {
 }
 cbn - [ seq ] in IHn.
 destruct k; [ easy | clear Hkz ].
-rewrite rngl_product_succ_succ' with (g0 := λ i, f (vect_nat_el σ i)) in IHn.
+rewrite rngl_product_succ_succ' with (g0 := λ i, f (vect_el 0 σ i)) in IHn.
 erewrite rngl_product_eq_compat with (b := S k + 1) in IHn. 2: {
   intros i Hi.
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
@@ -3943,7 +3945,7 @@ rewrite rngl_product_split_last. 2: {
   apply Nat.lt_succ_r.
   apply H3; flia.
 }
-rewrite rngl_product_succ_succ' with (g0 := λ i, f (vect_nat_el σ i)).
+rewrite rngl_product_succ_succ' with (g0 := λ i, f (vect_el 0 σ i)).
 rewrite rngl_product_split_first. 2: {
   rewrite Nat.add_1_r.
   rewrite Hk.
@@ -3953,14 +3955,14 @@ rewrite rngl_product_split_first. 2: {
   rewrite (List_map_nth' 0) in IHn; [ | rewrite seq_length; flia Hksn H3 ].
   rewrite seq_nth in IHn; [ | flia Hksn H3 ].
   destruct
-    (Nat.eq_dec (vect_nat_el (permut_inv (S (S n)) σ) (S n)) (S n))
+    (Nat.eq_dec (vect_el 0 (permut_inv (S (S n)) σ) (S n)) (S n))
     as [H5| H5]. {
     flia Hk Hksn H5.
   }
   rewrite <- Hk in H5 |-*.
   flia H3 H5.
 }
-replace (vect_nat_el σ (k + 1)) with (S n). 2: {
+replace (vect_el 0 σ (k + 1)) with (S n). 2: {
   rewrite Nat.add_1_r.
   rewrite Hk.
   unfold permut_inv.
@@ -3974,7 +3976,7 @@ rewrite rngl_mul_comm; [ | easy ].
 rewrite rngl_mul_assoc.
 f_equal.
 destruct
-  (Nat.eq_dec (vect_nat_el (permut_inv (S (S n)) σ) (S n)) n) as [H7| H7]. {
+  (Nat.eq_dec (vect_el 0 (permut_inv (S (S n)) σ) (S n)) n) as [H7| H7]. {
   rewrite H7 in Hk.
   rewrite Nat.add_1_r.
   rewrite Hk.
@@ -3993,7 +3995,7 @@ assert (Hkn : S (k + 1) ≤ n). {
   apply Nat.le_succ_l.
   specialize (H3 (S n) (Nat.lt_succ_diag_r _)) as H5.
   destruct
-    (Nat.eq_dec (vect_nat_el (permut_inv (S (S n)) σ) (S n)) (S n))
+    (Nat.eq_dec (vect_el 0 (permut_inv (S (S n)) σ) (S n)) (S n))
     as [H6| H6]. {
     flia Hk Hksn H6.
   }
