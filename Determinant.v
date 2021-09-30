@@ -4039,21 +4039,37 @@ rewrite Hsg.
 now apply Hh1.
 Qed.
 
-...
-
 Theorem comp_permut_inv_r : ∀ n f,
-  is_permut_vect f
-  → (f ° permut_inv f = mk_vect n id).
+  is_permut_vect n f
+  → (f ° permut_inv n f = mk_vect (seq 0 n)).
 Proof.
-intros * Hf.
-apply vector_eq; cbn.
-intros i Hi.
-unfold comp.
-now apply fun_permut_fun_inv.
+intros n (f) Hf.
+unfold "°"; cbn.
+f_equal.
+rewrite map_map.
+rewrite (List_map_nth_seq (seq 0 n)) with (d := 0) at 2.
+rewrite seq_length.
+apply map_ext_in.
+intros i Hi; apply in_seq in Hi.
+rewrite seq_nth; [ | easy ].
+destruct Hf as (Hs, Hf).
+now apply (@fun_permut_fun_inv (λ i, nth i f 0)).
 Qed.
 
 Theorem comp_id_l : ∀ A B (f : A → B), comp id f = f.
 Proof. easy. Qed.
+
+Check eqb.
+
+Fixpoint vect_eqb_loop A n (eqb : A → A → bool) (u v : vector A) i :=
+  match i with
+  | 0 => true
+  | S i' =>
+      if eqb (vect_el u i') (vect_el v i') then vect_eqb_loop eqb n u v i'
+      else false
+  end.
+
+...
 
 Fixpoint vect_eqb_loop A n (eqb : A → A → bool) (u v : vector n A) i :=
   match i with
