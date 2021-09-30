@@ -3900,13 +3900,18 @@ erewrite rngl_product_eq_compat in IHn. 2: {
   easy.
 }
 cbn - [ seq ] in IHn.
-...
 destruct k; [ easy | clear Hkz ].
-rewrite rngl_product_succ_succ' with (g0 := λ i, f (vect_el σ i)) in IHn.
+rewrite rngl_product_succ_succ' with (g0 := λ i, f (vect_nat_el σ i)) in IHn.
+(*
 unfold g in IHn.
 destruct (lt_dec (S k) (S k)) as [H| H]; [ flia H | clear H ].
+*)
 erewrite rngl_product_eq_compat with (b := S k + 1) in IHn. 2: {
   intros i Hi.
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
+  rewrite seq_nth; [ | flia Hi ].
+  rewrite Nat.add_0_l.
+  unfold g.
   destruct (lt_dec i (S k)) as [H| H]; [ flia Hi H | easy ].
 }
 cbn in IHn.
@@ -3932,13 +3937,14 @@ rewrite rngl_product_split_last. 2: {
   apply Nat.lt_succ_r.
   apply H3; flia.
 }
-rewrite rngl_product_succ_succ' with (g0 := λ i, f (vect_el σ i)).
+rewrite rngl_product_succ_succ' with (g0 := λ i, f (vect_nat_el σ i)).
 rewrite rngl_product_split_first. 2: {
   rewrite Nat.add_1_r.
   rewrite Hk.
   destruct H3 as (H3, H4).
   specialize (H3 (S n) (Nat.lt_succ_diag_r _)).
-  destruct (Nat.eq_dec (vect_el (permut_inv σ) (S n)) (S n)) as [H5| H5]. {
+...
+  destruct (Nat.eq_dec (vect_nat_el (permut_inv n σ) (S n)) (S n)) as [H5| H5]. {
     flia Hk Hksn H5.
   }
   flia H3 H5.
