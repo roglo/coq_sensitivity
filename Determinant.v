@@ -481,7 +481,9 @@ rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
 }
 rewrite (List_map_nth' 0%F); [ | now rewrite fold_vect_size, Hu ].
 rewrite (List_map_nth' 0%F); [ | now rewrite fold_vect_size, Hv ].
+(*
 do 2 rewrite fold_vect_el.
+*)
 (* elimination of the following term (q) *)
 remember
   (∏ (i0 = 2, p + 1), mat_el M (i0 - 2) (mk_canon_sym_gr n k (i0 - 2)))
@@ -4059,25 +4061,15 @@ Qed.
 Theorem comp_id_l : ∀ A B (f : A → B), comp id f = f.
 Proof. easy. Qed.
 
-Check eqb.
-
-Fixpoint vect_eqb_loop A n (eqb : A → A → bool) (u v : vector A) i :=
+Fixpoint vect_eqb_loop A n (eqb : A → A → bool) d (u v : vector A) i :=
   match i with
   | 0 => true
   | S i' =>
-      if eqb (vect_el u i') (vect_el v i') then vect_eqb_loop eqb n u v i'
+      if eqb (vect_el u i' d) (vect_el v i' d) then vect_eqb_loop eqb n d u v i'
       else false
   end.
 
 ...
-
-Fixpoint vect_eqb_loop A n (eqb : A → A → bool) (u v : vector n A) i :=
-  match i with
-  | 0 => true
-  | S i' =>
-      if eqb (vect_el u i') (vect_el v i') then vect_eqb_loop eqb u v i'
-      else false
-  end.
 
 Definition vect_eqb A n (eqb : A → A → bool) (u v : vector n A) : bool :=
   vect_eqb_loop eqb u v n.

@@ -415,7 +415,7 @@ Theorem mat_el_repl_vect : ∀ (M : matrix T) V i j k,
   → j < mat_ncols M
   → k < mat_ncols M
   → mat_el (mat_repl_vect k M V) i j =
-    if Nat.eq_dec j k then vect_el V i else mat_el M i j.
+    if Nat.eq_dec j k then vect_el V i 0%F else mat_el M i j.
 Proof.
 intros * Hm His Hir Hjc Hkc; cbn.
 rewrite map2_nth with (a := []) (b := 0%F); cycle 1. {
@@ -1514,10 +1514,10 @@ Theorem mat_vect_mul_assoc_as_sums :
   i < mat_nrows A
   → ∑ (j = 0, mat_ncols A - 1),
        mat_el A i j *
-       (∑ (k = 0, vect_size V - 1), mat_el B j k * vect_el V k) =
+       (∑ (k = 0, vect_size V - 1), mat_el B j k * vect_el V k 0%F) =
      ∑ (j = 0, vect_size V - 1),
        (∑ (k = 0, mat_ncols A - 1), mat_el A i k * mat_el B k j) *
-        vect_el V j.
+        vect_el V j 0%F.
 Proof.
 intros * Hi.
 erewrite rngl_summation_eq_compat. 2: {
@@ -1666,11 +1666,7 @@ rewrite rngl_summation_seq_summation. 2: {
   apply Harc in H.
   now rewrite H in Hi.
 }
-erewrite rngl_summation_eq_compat. 2: {
-  intros j Hj.
-  rewrite fold_mat_el.
-  now rewrite fold_vect_el.
-}
+erewrite rngl_summation_eq_compat; [ | easy ].
 rewrite map2_map2_seq_l with (d := 0%F).
 rewrite Ha. 2: {
   apply nth_In.
@@ -1687,11 +1683,7 @@ rewrite rngl_summation_seq_summation. 2: {
   now rewrite H in Hi.
 }
 symmetry.
-erewrite rngl_summation_eq_compat. 2: {
-  intros j Hj.
-  rewrite fold_mat_el.
-  now rewrite fold_vect_el.
-}
+erewrite rngl_summation_eq_compat; [ | easy ].
 symmetry.
 apply rngl_summation_eq_compat.
 intros j Hj.
@@ -1746,7 +1738,6 @@ rewrite rngl_summation_seq_summation; [ | easy ].
 rewrite rngl_summation_seq_summation; [ | easy ].
 apply rngl_summation_eq_compat.
 intros j Hj.
-rewrite fold_mat_el, fold_vect_el.
 do 2 rewrite rngl_mul_assoc.
 f_equal.
 now apply rngl_mul_comm.
