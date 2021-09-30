@@ -61,6 +61,9 @@ Proof. easy. Qed.
 Definition mat_permut_rows_fun (σ : nat → nat) (M : matrix T) :=
   mk_mat (map (λ i, nth (σ i) (mat_list_list M) []) (seq 0 (mat_nrows M))).
 
+...
+(* replace vect_nat_el with vect_el 0 *)
+
 Definition mat_permut_rows (σ : vector nat) (M : matrix T) :=
   mat_permut_rows_fun (vect_nat_el σ) M.
 

@@ -415,7 +415,7 @@ Theorem mat_el_repl_vect : ∀ (M : matrix T) V i j k,
   → j < mat_ncols M
   → k < mat_ncols M
   → mat_el (mat_repl_vect k M V) i j =
-    if Nat.eq_dec j k then vect_el V i 0%F else mat_el M i j.
+    if Nat.eq_dec j k then vect_el 0%F V i else mat_el M i j.
 Proof.
 intros * Hm His Hir Hjc Hkc; cbn.
 rewrite map2_nth with (a := []) (b := 0%F); cycle 1. {
@@ -1514,10 +1514,10 @@ Theorem mat_vect_mul_assoc_as_sums :
   i < mat_nrows A
   → ∑ (j = 0, mat_ncols A - 1),
        mat_el A i j *
-       (∑ (k = 0, vect_size V - 1), mat_el B j k * vect_el V k 0%F) =
+       (∑ (k = 0, vect_size V - 1), mat_el B j k * vect_el 0%F V k) =
      ∑ (j = 0, vect_size V - 1),
        (∑ (k = 0, mat_ncols A - 1), mat_el A i k * mat_el B k j) *
-        vect_el V j 0%F.
+        vect_el 0%F V j.
 Proof.
 intros * Hi.
 erewrite rngl_summation_eq_compat. 2: {

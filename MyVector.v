@@ -68,10 +68,10 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context {rp : ring_like_prop T}.
 
-Definition vect_el {A} (V : vector A) i d := nth i (vect_list V) d.
+Definition vect_el d (V : vector T) i := nth i (vect_list V) d.
 
 Theorem fold_vect_el : ∀ d (V : vector T) i,
-  nth i (vect_list V) d = vect_el V i d.
+  nth i (vect_list V) d = vect_el d V i.
 Proof. easy. Qed.
 
 Definition vect_zero n : vector T := mk_vect (repeat 0%F n).
@@ -192,7 +192,7 @@ destruct (lt_dec i (vect_size V)) as [Hiv| Hiv]. {
   specialize (H1 (nth i (vect_list V) 0%F)) as H2.
   assert (H : nth i (vect_list V) 0%F ∈ vect_list V) by now apply nth_In.
   specialize (H2 H); clear H.
-  destruct (rngl_eq_dec Hde (vect_el V i 0%F) 0%F) as [Hvi| Hvi]; [ easy | ].
+  destruct (rngl_eq_dec Hde (vect_el 0%F V i) 0%F) as [Hvi| Hvi]; [ easy | ].
   now apply rngl_mul_cancel_r in H2.
 }
 apply Nat.nlt_ge in Hiv.
@@ -272,7 +272,7 @@ Arguments vect_dot_mul {T}%type {ro} (U V)%V.
 Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hom Hic a%F (U V)%V.
 Arguments vect_scal_mul_dot_mul_comm {T}%type {ro rp} Hom a%F (U V)%V.
 Arguments vect_eq_dec {T}%type {ro rp} Hde U%V V%V.
-Arguments vect_el {A}%type V%V i%nat.
+Arguments vect_el {T}%type d V%V i%nat.
 Arguments vect_squ_norm {T}%type {ro} V%V.
 
 Arguments minus_one_pow {T}%type {ro} n%nat.

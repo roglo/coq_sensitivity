@@ -40,12 +40,14 @@ Definition is_permut f n :=
   (∀ i, i < n → f i < n) ∧
   (∀ i j, i < n → j < n → f i = f j → i = j).
 
+(*
 Definition vect_nat_el (V : vector nat) i := nth i (vect_list V) 0.
+*)
 Definition vect_vect_nat_el (V : vector (vector nat)) i : vector nat :=
   nth i (vect_list V) (mk_vect []).
 
 Definition is_permut_vect n (σ : vector nat) :=
-  vect_size σ = n ∧ is_permut (vect_nat_el σ) n.
+  vect_size σ = n ∧ is_permut (vect_el 0 σ) n.
 
 Fixpoint permut_fun_inv f i j :=
   match i with
@@ -59,9 +61,9 @@ Definition transposition i j k :=
 Definition swap_elem (f : nat → nat) i j k :=
   f (transposition i j k).
 
-Definition vect_swap_elem (v : vector nat) i j :=
+Definition vect_swap_elem {A} d (v : vector A) i j :=
   mk_vect
-    (map (λ k, vect_nat_el v (transposition i j k))
+    (map (λ k, vect_el d v (transposition i j k))
        (seq 0 (length (vect_list v)))).
 
 Theorem is_permut_eq_compat : ∀ n f g,
@@ -271,7 +273,7 @@ Definition is_sym_gr n (f : nat → nat → nat) :=
   (∀ i, i < n! → is_permut (f i) n).
 
 Definition is_sym_gr_vect n (σ : vector (vector nat)) :=
-  is_sym_gr n (λ i, vect_nat_el (nth i (vect_list σ) (mk_vect []))).
+  is_sym_gr n (λ i, vect_el 0 (nth i (vect_list σ) (mk_vect []))).
 
 Record sym_gr_vect n :=
   { sg_vect : vector (vector nat);
@@ -304,7 +306,7 @@ rewrite Hfg; [ f_equal | flia Hi ].
 Qed.
 
 Definition rank_of_permut_in_sym_gr_vect n (v : vector nat) : nat :=
-  rank_of_permut_in_sym_gr n (vect_nat_el v).
+  rank_of_permut_in_sym_gr n (vect_el 0 v).
 
 (*
 Theorem fold_rank_of_permut_in_sym_gr_vect' : ∀ n f,
@@ -505,7 +507,7 @@ unfold mk_canon_sym_gr_vect; cbn - [ fact map seq ].
 rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
 rewrite Nat.add_0_l.
-unfold is_permut_vect, vect_nat_el.
+unfold is_permut_vect, vect_el.
 cbn - [ seq fact nth ].
 split; [ now rewrite map_length, seq_length | ].
 split. {
@@ -804,7 +806,7 @@ Definition ε_fun f n :=
   ((∏ (i = 1, n), ∏ (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
    (∏ (i = 1, n), ∏ (j = 1, n), δ i j i j))%F.
 
-Definition ε n (p : vector nat) := ε_fun (vect_nat_el p) n.
+Definition ε n (p : vector nat) := ε_fun (vect_el 0 p) n.
 
 (* signature of the k-th permutation of the symmetric group *)
 
@@ -824,7 +826,7 @@ Definition ε_fun_ws f n :=
   (∏ (i = 1, n), ∏ (j = 1, n),
    if i <? j then sign_diff (f (j - 1)%nat) (f (i - 1)%nat) else 1)%F.
 
-Definition ε_ws n (p : vector nat) := ε_fun_ws (vect_nat_el p) n.
+Definition ε_ws n (p : vector nat) := ε_fun_ws (vect_el 0 p) n.
 
 (* equality of both definitions of ε: ε and ε_ws *)
 
@@ -2196,7 +2198,7 @@ Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hpq Hq.
 rewrite ε_ws_ε; try easy. 2: {
   split; cbn; [ now rewrite map_length, seq_length | ].
-  unfold vect_nat_el; cbn.
+  unfold vect_el; cbn.
   apply is_permut_map.
   apply transposition_is_permut; [ | easy ].
   now transitivity q.
@@ -2828,8 +2830,8 @@ Definition sym_gr_elem_swap_with_0 p n k :=
 (* k' such that permut_swap_with_0 p n k = permut n k' *)
 
 Definition sym_gr_elem_swap_last (p q : nat) n k :=
-  vect_swap_elem
-    (vect_swap_elem (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) p (n - 2))
+  vect_swap_elem 0
+    (vect_swap_elem 0 (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) p (n - 2))
     q (n - 1).
 
 (* *)
@@ -2865,8 +2867,8 @@ Qed.
 
 Theorem sym_gr_vect_succ_values : ∀ (n k : nat) (σ σ' : nat → nat),
   k < (S n)!
-  → σ = vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect (S n)) k)
-  → σ' = vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect n) (k mod n!))
+  → σ = vect_el 0 (vect_vect_nat_el (mk_canon_sym_gr_vect (S n)) k)
+  → σ' = vect_el 0 (vect_vect_nat_el (mk_canon_sym_gr_vect n) (k mod n!))
   → ∀ i : nat, i < S n →
     σ i =
       match i with
@@ -2881,7 +2883,7 @@ rewrite (List_map_nth' 0) in Hσ; [ | now rewrite seq_length ].
 rewrite seq_nth in Hσ; [ | easy ].
 rewrite Nat.add_0_l in Hσ.
 rewrite Hσ.
-unfold vect_nat_el.
+unfold vect_el.
 cbn - [ "<?" nth seq ].
 rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
@@ -2958,10 +2960,10 @@ f_equal. {
     easy.
   }
   cbn - [ mk_canon_sym_gr_vect ].
-  remember (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect (S n)) k))
+  remember (vect_el 0 (vect_vect_nat_el (mk_canon_sym_gr_vect (S n)) k))
     as σ eqn:Hσ.
   remember
-    (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect n) (k mod n!)))
+    (vect_el 0 (vect_vect_nat_el (mk_canon_sym_gr_vect n) (k mod n!)))
     as σ' eqn:Hσ'.
   specialize (sym_gr_vect_succ_values Hkn Hσ Hσ') as H1.
   unfold sign_diff.
@@ -3099,9 +3101,9 @@ intros j Hj.
 move j before i.
 do 2 rewrite if_ltb_lt_dec.
 destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
-remember (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect (S n)) k))
+remember (vect_el 0 (vect_vect_nat_el (mk_canon_sym_gr_vect (S n)) k))
   as σ eqn:Hσ.
-remember (vect_nat_el (vect_vect_nat_el (mk_canon_sym_gr_vect n) (k mod n!)))
+remember (vect_el 0 (vect_vect_nat_el (mk_canon_sym_gr_vect n) (k mod n!)))
   as σ' eqn:Hσ'.
 rewrite (sym_gr_vect_succ_values Hkn Hσ Hσ'); [ | flia Hj ].
 rewrite (sym_gr_vect_succ_values Hkn Hσ Hσ'); [ | flia Hi ].
@@ -3412,7 +3414,7 @@ apply fact_neq_0.
 Qed.
 
 Definition permut_inv (n : nat) (σ : vector nat) :=
-  mk_vect (map (permut_fun_inv (vect_nat_el σ) n) (seq 0 n)).
+  mk_vect (map (permut_fun_inv (vect_el 0 σ) n) (seq 0 n)).
 
 Theorem permut_inv_is_permut : ∀ n (σ : vector nat),
   is_permut_vect n σ
@@ -3421,7 +3423,7 @@ Proof.
 intros * (Hp1, Hp2).
 specialize (permut_fun_inv_is_permut Hp2) as H1.
 split; [ now cbn; rewrite map_length, seq_length | ].
-unfold permut_inv, vect_nat_el; cbn.
+unfold permut_inv, vect_el; cbn.
 eapply is_permut_eq_compat. {
   intros i Hi.
   symmetry.
