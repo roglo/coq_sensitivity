@@ -938,9 +938,8 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   replace
     (mk_vect (map (λ i, vect_nat_el (f k) (transposition p q i)) (seq 0 n)))
-  with
-    (mk_vect (f k ° mk_vect (map (λ i, transposition p q i) (seq 0 n)))). 2: {
-    f_equal; cbn.
+  with (f k ° mk_vect (map (λ i, transposition p q i) (seq 0 n))). 2: {
+    unfold "°"; f_equal; cbn.
     now rewrite map_map.
   }
   rewrite signature_comp; try easy. {
@@ -4013,8 +4012,22 @@ intros i Hi.
 rewrite Nat.sub_add; [ easy | flia Hi ].
 Qed.
 
-Inspect 1.
-
+Theorem permut_comp_assoc : ∀ n (f g h : vector nat),
+  is_permut_vect n h
+  → (f ° (g ° h) = (f ° g) ° h)%F.
+Proof.
+intros n (f) (g) (h) Hh.
+cbn in Hh.
+unfold "°", comp_list; cbn.
+rewrite map_map.
+f_equal.
+apply map_ext_in.
+intros i Hi.
+rewrite (List_map_nth' 0); [ easy | ].
+destruct Hh as (Hh1, Hh2).
+cbn in Hh1, Hh2.
+About is_permut_vect.
+Print is_permut.
 ...
 
 Theorem permut_comp_assoc : ∀ n (f g h : vector n nat),

@@ -17,7 +17,7 @@ Definition comp_list (la lb : list nat) :=
   map (λ i, nth i la 0) lb.
 
 Definition permut_comp (σ₁ σ₂ : vector nat) :=
-  comp_list (vect_list σ₁) (vect_list σ₂).
+  mk_vect (comp_list (vect_list σ₁) (vect_list σ₂)).
 
 (*
 Compute (comp_list [0;2;1] [2;1;0]).
@@ -2736,7 +2736,7 @@ Theorem signature_comp :
   vect_size σ₂ = n
   → is_permut_vect n σ₁
   → is_permut_vect n σ₂
-  → ε n (mk_vect (σ₁ ° σ₂)) = (ε n σ₁ * ε n σ₂)%F.
+  → ε n (σ₁ ° σ₂) = (ε n σ₁ * ε n σ₂)%F.
 Proof.
 intros Hop Hin Hic Hde H10 Hit Hch * Hv2 Hp1 Hp2.
 unfold ε.
