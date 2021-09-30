@@ -943,6 +943,12 @@ erewrite rngl_summation_eq_compat. 2: {
     now rewrite map_map.
   }
   rewrite signature_comp; try easy. {
+    split. {
+      cbn; rewrite map_length, seq_length.
+      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+      now cbn; rewrite map_length, seq_length.
+    }
+...
     cbn; rewrite map_length; apply seq_length.
   } {
     subst f; cbn.

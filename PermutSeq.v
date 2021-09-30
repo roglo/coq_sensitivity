@@ -45,7 +45,7 @@ Definition vect_vect_nat_el (V : vector (vector nat)) i : vector nat :=
   nth i (vect_list V) (mk_vect []).
 
 Definition is_permut_vect n (σ : vector nat) :=
-  is_permut (vect_nat_el σ) n.
+  vect_size σ = n ∧ is_permut (vect_nat_el σ) n.
 
 Fixpoint permut_fun_inv f i j :=
   match i with
@@ -507,7 +507,7 @@ rewrite seq_nth; [ | easy ].
 rewrite Nat.add_0_l.
 unfold is_permut_vect, vect_nat_el.
 cbn - [ seq fact nth ].
-(**)
+split; [ now rewrite map_length, seq_length | ].
 split. {
   intros i Hi.
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
@@ -2061,8 +2061,9 @@ Theorem ε_ws_ε :
   is_permut_vect n p
   → ε n p = ε_ws n p.
 Proof.
-intros Hic Hop Hin H10 Hit Hde Hch *.
-now apply ε_ws_ε_fun.
+intros Hic Hop Hin H10 Hit Hde Hch * Hp.
+apply ε_ws_ε_fun; try easy.
+now destruct Hp as (Hp1, Hp2).
 Qed.
 
 Definition permut_fun_swap (p q : nat) (σ : nat → nat) :=
@@ -2194,7 +2195,7 @@ Theorem transposition_signature_lt :
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hpq Hq.
 rewrite ε_ws_ε; try easy. 2: {
-  unfold is_permut_vect; cbn.
+  split; cbn; [ now rewrite map_length, seq_length | ].
   unfold vect_nat_el; cbn.
   apply is_permut_map.
   apply transposition_is_permut; [ | easy ].
@@ -2733,13 +2734,14 @@ Theorem signature_comp :
   rngl_is_integral = true →
   rngl_characteristic = 0 →
   ∀ n (σ₁ σ₂ : vector nat),
-  vect_size σ₂ = n
-  → is_permut_vect n σ₁
+  is_permut_vect n σ₁
   → is_permut_vect n σ₂
   → ε n (σ₁ ° σ₂) = (ε n σ₁ * ε n σ₂)%F.
 Proof.
-intros Hop Hin Hic Hde H10 Hit Hch * Hv2 Hp1 Hp2.
+intros Hop Hin Hic Hde H10 Hit Hch * Hp1 Hp2.
 unfold ε.
+destruct Hp1 as (Hp1, Hp'1).
+destruct Hp2 as (Hp2, Hp'2).
 rewrite <- signature_comp_fun; try easy.
 unfold comp, "°".
 unfold ε_fun; f_equal.
@@ -2748,8 +2750,8 @@ intros i Hi.
 apply rngl_product_eq_compat.
 intros j Hj.
 cbn; unfold comp_list.
-rewrite (List_map_nth' 0); [ | rewrite fold_vect_size; flia Hv2 Hi ].
-rewrite (List_map_nth' 0); [ | rewrite fold_vect_size; flia Hv2 Hj ].
+rewrite (List_map_nth' 0); [ | rewrite fold_vect_size; flia Hp2 Hi ].
+rewrite (List_map_nth' 0); [ | rewrite fold_vect_size; flia Hp2 Hj ].
 easy.
 Qed.
 
@@ -3416,11 +3418,10 @@ Theorem permut_inv_is_permut : ∀ n (σ : vector nat),
   is_permut_vect n σ
   → is_permut_vect n (permut_inv n σ).
 Proof.
-intros * Hperm.
-specialize (permut_fun_inv_is_permut Hperm) as H1.
-unfold is_permut_vect.
-unfold permut_inv.
-unfold vect_nat_el; cbn.
+intros * (Hp1, Hp2).
+specialize (permut_fun_inv_is_permut Hp2) as H1.
+split; [ now cbn; rewrite map_length, seq_length | ].
+unfold permut_inv, vect_nat_el; cbn.
 eapply is_permut_eq_compat. {
   intros i Hi.
   symmetry.
