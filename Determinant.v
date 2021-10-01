@@ -4210,15 +4210,34 @@ Theorem det_by_any_sym_gr :
   rngl_characteristic = 0 →
   ∀ n (M : matrix T) (σ : vector (vector nat)),
   n ≠ 0
+  → is_square_matrix n M = true
   → is_sym_gr_vect n σ
   → determinant n M =
     ∑ (k = 0, n! - 1),
     ε n (vect_el (mk_vect []) σ k) *
     ∏ (i = 1, n),
-    mat_el M (i - 1)%nat
-      (vect_el 0%nat (vect_el (mk_vect []) σ k) (i - 1)%nat).
+    mat_el M (i - 1) (vect_el 0%nat (vect_el (mk_vect []) σ k) (i - 1)).
 Proof.
-intros Hic Hop Hiv Hit H10 Hed Hch * Hnz Hσ.
+intros Hic Hop Hiv Hit H10 Hed Hch * Hnz Hsm Hσ.
+rewrite det_is_det_by_canon_permut; try easy.
+unfold determinant'.
+remember (mk_canon_sym_gr_vect n) as σ' eqn:Hσ'.
+specialize rngl_summation_change_var as H1.
+specialize (H1 nat 0 (n! - 1)).
+set
+  (f := λ k,
+   (ε n (vect_el (mk_vect []) σ' k) *
+    ∏ (i = 1, n),
+    mat_el M (i - 1) (vect_el 0%nat (vect_el (mk_vect []) σ' k) (i - 1)))%F).
+specialize (H1 f).
+unfold f in H1.
+...
+specialize fun_betw_sym_gr as H2.
+specialize (H2 n (mk_canon_sym_gr n) σ).
+specialize (H2 Hnz (canon_sym_gr_prop n) Hσ).
+rewrite <- Hσ' in H2.
+destruct H2 as (g, Hg).
+...
 ...
 
 Theorem det_by_any_sym_gr :
