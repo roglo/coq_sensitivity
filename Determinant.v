@@ -4200,6 +4200,28 @@ destruct Hσ' as (H3, H4).
 ...
 *)
 
+Print is_sym_gr_vect.
+
+Theorem det_by_any_sym_gr :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_integral = true →
+  rngl_has_1_neq_0 = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ n (M : matrix T) (σ : vector (vector nat)) (r : ring_like_op nat),
+  n ≠ 0
+  → is_sym_gr_vect n σ
+  → determinant n M =
+    ∑ (k = 0, n! - 1),
+    ε n (vect_el (vect_zero 0%nat) σ k) *
+    ∏ (i = 1, n),
+    mat_el M (i - 1)%nat
+      (vect_el 0%nat (vect_el (vect_zero 0%nat) σ k) (i - 1)%nat).
+Proof.
+intros Hic Hop Hiv Hit H10 Hed Hch * Hnz Hσ.
+Check ε.
 ...
 
 Theorem det_by_any_sym_gr :
