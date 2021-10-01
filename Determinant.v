@@ -4085,8 +4085,25 @@ Fixpoint vect_find_loop A (f : A → bool) d (u : vector A) i :=
 Definition vect_find A n (f : A → bool) d (u : vector A) : nat :=
   vect_find_loop f d u n.
 
-...
+(*
+Check is_permut_vect.
 
+Theorem sym_gr_surj : ∀ n (σ : vector (vector nat)) p,
+  n ≠ 0
+  → is_sym_gr_vect n! σ
+  → is_permut_vect n p
+  → { i | i < n! ∧ vect_el (vect_zero 0) σ i = p }.
+Proof.
+intros * Hnz Hσ Hp.
+destruct Hσ as (H1, H2).
+destruct Hp as (H3, H4).
+exists (vect_find (vect_eqb Nat.eqb p) σ - 1).
+split. {
+  unfold vect_find.
+...
+*)
+
+(*
 Theorem sym_gr_surj : ∀ n (σ : vector n! _) p,
   n ≠ 0
   → is_sym_gr_vect σ
@@ -4132,7 +4149,9 @@ intros * Hnz Hσ Hσ'.
 destruct Hσ as (H1, H2).
 destruct Hσ' as (H3, H4).
 ...
+*)
 
+(*
 Theorem fun_betw_sym_gr : ∀ n (σ σ' : vector n! _),
   n ≠ 0
   → is_sym_gr σ
@@ -4180,6 +4199,8 @@ destruct Hσ as (H1, H2).
 destruct Hσ' as (H3, H4).
 ...
 *)
+
+...
 
 Theorem det_by_any_sym_gr :
   rngl_is_comm = true →
