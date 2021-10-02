@@ -4157,7 +4157,6 @@ Theorem fun_betw_sym_gr : ∀ n (σ σ' : vector _),
   → is_sym_gr_vect n σ'
   → { f | ∀ i, i < n! → vect_el (mk_vect []) σ (f i) = vect_el (mk_vect []) σ' i }.
 Proof.
-...
 Admitted.
 
 (*
@@ -4246,10 +4245,13 @@ erewrite rngl_summation_eq_compat. 2: {
   now rewrite fold_vect_el.
 }
 cbn.
-Print mk_canon_sym_gr_vect.
 specialize fun_betw_sym_gr as H2.
 specialize (H2 n (mk_canon_sym_gr_vect n) σ).
 specialize (H2 Hnz).
+Check canon_sym_gr_prop.
+Search is_sym_gr_vect.
+...
+  H2 : is_sym_gr_vect n (mk_canon_sym_gr_vect n)
 ...
 specialize (H2 Hnz (canon_sym_gr_prop n) Hσ).
 ...

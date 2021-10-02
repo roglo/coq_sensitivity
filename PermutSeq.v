@@ -779,6 +779,25 @@ split. {
 }
 Qed.
 
+Theorem canon_sym_gr_vect_prop : ∀ n,
+  is_sym_gr_vect n (mk_canon_sym_gr_vect n).
+Proof.
+intros.
+unfold is_sym_gr_vect.
+split. {
+  intros i j Hi Hj Hij.
+  cbn in Hij.
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite seq_nth in Hij; [ | easy ].
+  rewrite seq_nth in Hij; [ | easy ].
+  do 2 rewrite Nat.add_0_l in Hij.
+  apply sym_gr_elem_injective with (n := n); [ easy | easy | ].
+...
+Search (vect_el _ _ = vect_el _ _).
+Search is_sym_gr.
+...
+
 Theorem rank_of_permut_injective : ∀ n f g,
   is_permut f n
   → is_permut g n
