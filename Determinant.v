@@ -4151,6 +4151,15 @@ destruct Hσ' as (H3, H4).
 ...
 *)
 
+Theorem fun_betw_sym_gr : ∀ n (σ σ' : vector _),
+  n ≠ 0
+  → is_sym_gr_vect n σ
+  → is_sym_gr_vect n σ'
+  → { f | ∀ i, i < n! → vect_el (mk_vect []) σ (f i) = vect_el (mk_vect []) σ' i }.
+Proof.
+...
+Admitted.
+
 (*
 Theorem fun_betw_sym_gr : ∀ n (σ σ' : vector n! _),
   n ≠ 0
@@ -4231,10 +4240,19 @@ set
     mat_el M (i - 1) (vect_el 0%nat (vect_el (mk_vect []) σ' k) (i - 1)))%F).
 specialize (H1 f).
 unfold f in H1.
-...
+unfold vect_vect_nat_el.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  now rewrite fold_vect_el.
+}
+cbn.
+Print mk_canon_sym_gr_vect.
 specialize fun_betw_sym_gr as H2.
-specialize (H2 n (mk_canon_sym_gr n) σ).
+specialize (H2 n (mk_canon_sym_gr_vect n) σ).
+specialize (H2 Hnz).
+...
 specialize (H2 Hnz (canon_sym_gr_prop n) Hσ).
+...
 rewrite <- Hσ' in H2.
 destruct H2 as (g, Hg).
 ...

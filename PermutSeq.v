@@ -346,21 +346,6 @@ apply Nat.div_lt_upper_bound; [ | easy ].
 apply fact_neq_0.
 Qed.
 
-(*
-Theorem sym_gr_elem_injective : ∀ n i j,
-  i < fact n
-  → j < fact n
-  → mk_canon_sym_gr n i = mk_canon_sym_gr n j
-  → i = j.
-Proof.
-intros * Hi Hj Hij.
-apply (f_equal (@rank_of_permut_in_sym_gr n)) in Hij.
-rewrite rank_of_permut_of_rank in Hij; [ | easy ].
-rewrite rank_of_permut_of_rank in Hij; [ | easy ].
-easy.
-Qed.
-*)
-
 Fixpoint sym_gr_inv n k (j : nat) :=
   match n with
   | 0 => 0
@@ -524,21 +509,6 @@ split. {
   now apply mk_canon_sym_gr_inj1 in Hij.
 }
 Qed.
-
-(*
-Theorem canon_sym_gr_prop : ∀ n, is_sym_gr n (mk_canon_sym_gr n).
-Proof.
-intros.
-split. {
-  intros i j Hi Hj Hij.
-  cbn in Hij.
-  now apply sym_gr_elem_injective in Hij.
-} {
-  intros i Hi.
-  now apply sym_gr_elem_is_permut.
-}
-Qed.
-*)
 
 (*
 Definition canon_sym_gr n :=
@@ -781,6 +751,32 @@ destruct x; [ easy | ].
 rewrite if_leb_le_dec.
 destruct (le_dec (k / n!) x) as [H| H]; [ | easy ].
 flia Hkc H.
+Qed.
+
+Theorem sym_gr_elem_injective : ∀ n i j,
+  i < fact n
+  → j < fact n
+  → mk_canon_sym_gr n i = mk_canon_sym_gr n j
+  → i = j.
+Proof.
+intros * Hi Hj Hij.
+apply (f_equal (@rank_of_permut_in_sym_gr n)) in Hij.
+rewrite rank_of_permut_of_rank in Hij; [ | easy ].
+rewrite rank_of_permut_of_rank in Hij; [ | easy ].
+easy.
+Qed.
+
+Theorem canon_sym_gr_prop : ∀ n, is_sym_gr n (mk_canon_sym_gr n).
+Proof.
+intros.
+split. {
+  intros i j Hi Hj Hij.
+  cbn in Hij.
+  now apply sym_gr_elem_injective in Hij.
+} {
+  intros i Hi.
+  now apply sym_gr_elem_is_permut.
+}
 Qed.
 
 Theorem rank_of_permut_injective : ∀ n f g,
