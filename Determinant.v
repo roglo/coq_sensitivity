@@ -4157,7 +4157,14 @@ Theorem fun_betw_sym_gr : ∀ n (σ σ' : vector _),
   → is_sym_gr_vect n σ'
   → { f | ∀ i, i < n! → vect_el (mk_vect []) σ (f i) = vect_el (mk_vect []) σ' i }.
 Proof.
-Admitted.
+intros * Hnz Hσ Hσ'.
+destruct n; [ easy | clear Hnz ].
+destruct Hσ as (H1, H2).
+destruct Hσ' as (H3, H4).
+...
+assert (Hσp : ∀ p, is_permut p n → { i | vect_el σ i = p }). {
+  intros p Hp.
+...
 
 (*
 Theorem fun_betw_sym_gr : ∀ n (σ σ' : vector n! _),
@@ -4246,12 +4253,14 @@ erewrite rngl_summation_eq_compat. 2: {
   now rewrite fold_vect_el.
 }
 cbn.
+...
 specialize fun_betw_sym_gr as H2.
 specialize (H2 n (mk_canon_sym_gr_vect n) σ).
 specialize (H2 Hnz (canon_sym_gr_vect_prop n) Hσ).
 rewrite <- Hσ' in H2.
 cbn in H2.
 destruct H2 as (g, Hg).
+erewrite H1 with (h := g).
 ...
 
 Theorem det_by_any_sym_gr :
