@@ -839,10 +839,6 @@ split. {
 }
 Qed.
 
-Inspect 1.
-
-...
-
 (* signatures *)
 
 Definition δ i j u v :=
