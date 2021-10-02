@@ -783,7 +783,6 @@ Theorem canon_sym_gr_vect_prop : ∀ n,
   is_sym_gr_vect n (mk_canon_sym_gr_vect n).
 Proof.
 intros.
-unfold is_sym_gr_vect.
 split. {
   intros i j Hi Hj Hij.
   cbn in Hij.
@@ -792,7 +791,18 @@ split. {
   rewrite seq_nth in Hij; [ | easy ].
   rewrite seq_nth in Hij; [ | easy ].
   do 2 rewrite Nat.add_0_l in Hij.
+  apply (f_equal (@rank_of_permut_in_sym_gr n)) in Hij.
+Check rank_of_permut_of_rank.
+...
+Check (vect_el 0 {| vect_list := map (mk_canon_sym_gr n i) (seq 0 n) |}).
+...
+Check rank_of_permut_of_rank.
+Print rank_of_permut_in_sym_gr.
+Print rank_of_permut_in_sym_gr_vect.
+
+...
   apply sym_gr_elem_injective with (n := n); [ easy | easy | ].
+Check (vect_el 0).
 ...
 Search (vect_el _ _ = vect_el _ _).
 Search is_sym_gr.
