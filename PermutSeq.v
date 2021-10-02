@@ -779,41 +779,6 @@ split. {
 }
 Qed.
 
-Theorem canon_sym_gr_vect_prop : ∀ n,
-  is_sym_gr_vect n (mk_canon_sym_gr_vect n).
-Proof.
-intros.
-split. {
-  intros i j Hi Hj Hij.
-  cbn in Hij.
-  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-  rewrite seq_nth in Hij; [ | easy ].
-  rewrite seq_nth in Hij; [ | easy ].
-  do 2 rewrite Nat.add_0_l in Hij.
-Search vect_el.
-...
-unfold vect_el in Hij.
-cbn in Hij.
-...
-  apply (f_equal (@rank_of_permut_in_sym_gr n)) in Hij.
-  unfold vect_el in Hij.
-  cbn in Hij.
-...
-Check (vect_el 0 {| vect_list := map (mk_canon_sym_gr n i) (seq 0 n) |}).
-...
-Check rank_of_permut_of_rank.
-Print rank_of_permut_in_sym_gr.
-Print rank_of_permut_in_sym_gr_vect.
-
-...
-  apply sym_gr_elem_injective with (n := n); [ easy | easy | ].
-Check (vect_el 0).
-...
-Search (vect_el _ _ = vect_el _ _).
-Search is_sym_gr.
-...
-
 Theorem rank_of_permut_injective : ∀ n f g,
   is_permut f n
   → is_permut g n
@@ -827,6 +792,56 @@ rewrite permut_in_sym_gr_of_its_rank in Hσσ; [ | easy | easy ].
 rewrite permut_in_sym_gr_of_its_rank in Hσσ; [ | easy | easy ].
 easy.
 Qed.
+
+Theorem canon_sym_gr_vect_prop : ∀ n,
+  is_sym_gr_vect n (mk_canon_sym_gr_vect n).
+Proof.
+intros.
+split. {
+  intros i j Hi Hj Hij.
+  cbn in Hij.
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite seq_nth in Hij; [ | easy ].
+  rewrite seq_nth in Hij; [ | easy ].
+  do 2 rewrite Nat.add_0_l in Hij.
+  apply (f_equal (@rank_of_permut_in_sym_gr n)) in Hij.
+  unfold vect_el in Hij.
+  cbn in Hij.
+  erewrite rank_of_permut_in_sym_gr_eq_compat in Hij. 2: {
+    intros k Hk.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    now rewrite seq_nth.
+  }
+  symmetry in Hij.
+  erewrite rank_of_permut_in_sym_gr_eq_compat in Hij. 2: {
+    intros k Hk.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    now rewrite seq_nth.
+  }
+  symmetry in Hij.
+  rewrite rank_of_permut_of_rank in Hij; [ | easy ].
+  rewrite rank_of_permut_of_rank in Hij; [ | easy ].
+  easy.
+} {
+  intros i Hi.
+  eapply is_permut_eq_compat. {
+    intros k Hk.
+    symmetry.
+    unfold vect_el; cbn.
+    rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
+    rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
+    rewrite seq_nth; [ | easy ].
+    rewrite seq_nth; [ | easy ].
+    now do 2 rewrite Nat.add_0_l.
+  }
+  now apply sym_gr_elem_is_permut.
+}
+Qed.
+
+Inspect 1.
+
+...
 
 (* signatures *)
 
