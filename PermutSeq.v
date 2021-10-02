@@ -791,8 +791,14 @@ split. {
   rewrite seq_nth in Hij; [ | easy ].
   rewrite seq_nth in Hij; [ | easy ].
   do 2 rewrite Nat.add_0_l in Hij.
+Search vect_el.
+...
+unfold vect_el in Hij.
+cbn in Hij.
+...
   apply (f_equal (@rank_of_permut_in_sym_gr n)) in Hij.
-Check rank_of_permut_of_rank.
+  unfold vect_el in Hij.
+  cbn in Hij.
 ...
 Check (vect_el 0 {| vect_list := map (mk_canon_sym_gr n i) (seq 0 n) |}).
 ...
