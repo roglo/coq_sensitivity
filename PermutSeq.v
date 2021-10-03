@@ -284,15 +284,15 @@ Record sym_gr_vect n :=
 Definition sub_permut (f : nat → nat) i :=
   f (S i) - Nat.b2n (f 0 <? f (S i)).
 
-Fixpoint rank_of_permut_in_sym_gr n (f : nat → nat) : nat :=
+Fixpoint rank_of_permut_in_canon_sym_gr n (f : nat → nat) : nat :=
   match n with
   | 0 => 0
-  | S n' => f 0 * n'! + rank_of_permut_in_sym_gr n' (sub_permut f)
+  | S n' => f 0 * n'! + rank_of_permut_in_canon_sym_gr n' (sub_permut f)
   end.
 
-Theorem rank_of_permut_in_sym_gr_eq_compat : ∀ n f g,
+Theorem rank_of_permut_in_canon_sym_gr_eq_compat : ∀ n f g,
   (∀ i, i < n → f i = g i)
-  → rank_of_permut_in_sym_gr n f = rank_of_permut_in_sym_gr n g.
+  → rank_of_permut_in_canon_sym_gr n f = rank_of_permut_in_canon_sym_gr n g.
 Proof.
 intros * Hfg.
 revert f g Hfg.
@@ -305,8 +305,8 @@ rewrite Hfg; [ f_equal | flia Hi ].
 rewrite Hfg; [ f_equal | flia Hi ].
 Qed.
 
-Definition rank_of_permut_in_sym_gr_vect n (v : vector nat) : nat :=
-  rank_of_permut_in_sym_gr n (vect_el 0 v).
+Definition rank_of_permut_in_canon_sym_gr_vect n (v : vector nat) : nat :=
+  rank_of_permut_in_canon_sym_gr n (vect_el 0 v).
 
 (*
 Theorem fold_rank_of_permut_in_sym_gr_vect' : ∀ n f,
@@ -346,21 +346,21 @@ apply Nat.div_lt_upper_bound; [ | easy ].
 apply fact_neq_0.
 Qed.
 
-Fixpoint sym_gr_inv n k (j : nat) :=
+Fixpoint canon_sym_gr_inv n k (j : nat) :=
   match n with
   | 0 => 0
   | S n' =>
       if lt_dec j (k / n'!) then
-        S (sym_gr_inv n' (k mod n'!) j)
+        S (canon_sym_gr_inv n' (k mod n'!) j)
       else if lt_dec (k / n'!) j then
-        S (sym_gr_inv n' (k mod n'!) (j - 1))
+        S (canon_sym_gr_inv n' (k mod n'!) (j - 1))
       else 0
   end.
 
-Theorem sym_gr_inv_sym_gr : ∀ n k i,
+Theorem canon_sym_gr_inv_sym_gr : ∀ n k i,
   i < n
   → k < fact n
-  → sym_gr_inv n k (mk_canon_sym_gr n k i) = i.
+  → canon_sym_gr_inv n k (mk_canon_sym_gr n k i) = i.
 Proof.
 intros * Hi Hkn.
 revert k i Hi Hkn.
@@ -408,9 +408,9 @@ Proof.
 intros * Hk Hi Hj Hij.
 cbn in Hij.
 assert (Hnz : n ≠ 0) by flia Hi.
-rewrite <- sym_gr_inv_sym_gr with (n := n) (k := k); [ | easy | easy ].
+rewrite <- canon_sym_gr_inv_sym_gr with (n := n) (k := k); [ | easy | easy ].
 symmetry.
-rewrite <- sym_gr_inv_sym_gr with (n := n) (k := k); [ | easy | easy ].
+rewrite <- canon_sym_gr_inv_sym_gr with (n := n) (k := k); [ | easy | easy ].
 now f_equal.
 Qed.
 
@@ -602,7 +602,7 @@ Qed.
 
 Theorem rank_of_permut_upper_bound : ∀ n f,
   is_permut f n
-  → rank_of_permut_in_sym_gr n f < n!.
+  → rank_of_permut_in_canon_sym_gr n f < n!.
 Proof.
 intros * (Hvn, Hn).
 revert f Hvn Hn.
@@ -622,10 +622,10 @@ specialize (Hvn 0 (Nat.lt_0_succ _)).
 flia Hvn.
 Qed.
 
-Theorem permut_in_sym_gr_of_its_rank : ∀ n f,
+Theorem permut_in_canon_sym_gr_of_its_rank : ∀ n f,
   is_permut f n
   → ∀ i, i < n
-  → mk_canon_sym_gr n (rank_of_permut_in_sym_gr n f) i = f i.
+  → mk_canon_sym_gr n (rank_of_permut_in_canon_sym_gr n f) i = f i.
 Proof.
 intros * (Hvn, Hn) * Hin.
 revert i f Hin Hvn Hn.
@@ -645,7 +645,7 @@ destruct i. {
   }
 }
 cbn.
-remember (rank_of_permut_in_sym_gr n (sub_permut f)) as k eqn:Hk.
+remember (rank_of_permut_in_canon_sym_gr n (sub_permut f)) as k eqn:Hk.
 symmetry in Hk.
 rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
 rewrite Nat_mod_add_l_mul_r; [ | apply fact_neq_0 ].
@@ -716,7 +716,7 @@ Qed.
 
 Theorem rank_of_permut_of_rank : ∀ n k,
   k < n!
-  → rank_of_permut_in_sym_gr n (mk_canon_sym_gr n k) = k.
+  → rank_of_permut_in_canon_sym_gr n (mk_canon_sym_gr n k) = k.
 Proof.
 intros * Hkn.
 revert k Hkn.
@@ -730,7 +730,7 @@ clear H1.
 rewrite <- (IHn (k mod fact n)) at 1. 2: {
   apply Nat.mod_upper_bound, fact_neq_0.
 }
-apply rank_of_permut_in_sym_gr_eq_compat.
+apply rank_of_permut_in_canon_sym_gr_eq_compat.
 intros i Hi.
 symmetry.
 cbn.
@@ -753,14 +753,14 @@ destruct (le_dec (k / n!) x) as [H| H]; [ | easy ].
 flia Hkc H.
 Qed.
 
-Theorem sym_gr_elem_injective : ∀ n i j,
+Theorem canon_sym_gr_elem_injective : ∀ n i j,
   i < fact n
   → j < fact n
   → mk_canon_sym_gr n i = mk_canon_sym_gr n j
   → i = j.
 Proof.
 intros * Hi Hj Hij.
-apply (f_equal (@rank_of_permut_in_sym_gr n)) in Hij.
+apply (f_equal (@rank_of_permut_in_canon_sym_gr n)) in Hij.
 rewrite rank_of_permut_of_rank in Hij; [ | easy ].
 rewrite rank_of_permut_of_rank in Hij; [ | easy ].
 easy.
@@ -772,7 +772,7 @@ intros.
 split. {
   intros i j Hi Hj Hij.
   cbn in Hij.
-  now apply sym_gr_elem_injective in Hij.
+  now apply canon_sym_gr_elem_injective in Hij.
 } {
   intros i Hi.
   now apply sym_gr_elem_is_permut.
@@ -782,14 +782,14 @@ Qed.
 Theorem rank_of_permut_injective : ∀ n f g,
   is_permut f n
   → is_permut g n
-  → rank_of_permut_in_sym_gr n f = rank_of_permut_in_sym_gr n g
+  → rank_of_permut_in_canon_sym_gr n f = rank_of_permut_in_canon_sym_gr n g
   → ∀ i, i < n → f i = g i.
 Proof.
 intros * Hσ₁ Hσ₂ Hσσ i Hi.
 apply (f_equal (mk_canon_sym_gr n)) in Hσσ.
 apply (f_equal (λ f, f i)) in Hσσ.
-rewrite permut_in_sym_gr_of_its_rank in Hσσ; [ | easy | easy ].
-rewrite permut_in_sym_gr_of_its_rank in Hσσ; [ | easy | easy ].
+rewrite permut_in_canon_sym_gr_of_its_rank in Hσσ; [ | easy | easy ].
+rewrite permut_in_canon_sym_gr_of_its_rank in Hσσ; [ | easy | easy ].
 easy.
 Qed.
 
@@ -805,16 +805,16 @@ split. {
   rewrite seq_nth in Hij; [ | easy ].
   rewrite seq_nth in Hij; [ | easy ].
   do 2 rewrite Nat.add_0_l in Hij.
-  apply (f_equal (@rank_of_permut_in_sym_gr n)) in Hij.
+  apply (f_equal (@rank_of_permut_in_canon_sym_gr n)) in Hij.
   unfold vect_el in Hij.
   cbn in Hij.
-  erewrite rank_of_permut_in_sym_gr_eq_compat in Hij. 2: {
+  erewrite rank_of_permut_in_canon_sym_gr_eq_compat in Hij. 2: {
     intros k Hk.
     rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
     now rewrite seq_nth.
   }
   symmetry in Hij.
-  erewrite rank_of_permut_in_sym_gr_eq_compat in Hij. 2: {
+  erewrite rank_of_permut_in_canon_sym_gr_eq_compat in Hij. 2: {
     intros k Hk.
     rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
     now rewrite seq_nth.
@@ -3477,10 +3477,10 @@ eapply is_permut_eq_compat. {
 easy.
 Qed.
 
-Theorem sym_gr_inv_upper_bound : ∀ n k j,
+Theorem canon_sym_gr_inv_upper_bound : ∀ n k j,
   k < fact n
   → j < n
-  → sym_gr_inv n k j < n.
+  → canon_sym_gr_inv n k j < n.
 Proof.
 intros * Hkn Hjn.
 revert k j Hkn Hjn.
@@ -3521,7 +3521,7 @@ Qed.
 Theorem sym_gr_sym_gr_inv : ∀ n k j,
   j < n
   → k < fact n
-  → mk_canon_sym_gr n k (sym_gr_inv n k j) = j.
+  → mk_canon_sym_gr n k (canon_sym_gr_inv n k j) = j.
 Proof.
 intros * Hjn Hkn.
 revert j k Hjn Hkn.
@@ -3576,13 +3576,13 @@ destruct (lt_dec j (k / fact n)) as [Hjkn| Hjkn]. {
 }
 Qed.
 
-Theorem sym_gr_surjective : ∀ n k j,
+Theorem canon_sym_gr_surjective : ∀ n k j,
   k < fact n
   → j < n
   → ∃ i : nat, i < n ∧ mk_canon_sym_gr n k i = j.
 Proof.
 intros * Hkn Hjn.
-exists (sym_gr_inv n k j).
+exists (canon_sym_gr_inv n k j).
 destruct n; [ easy | ].
 split. {
   cbn.
@@ -3601,7 +3601,7 @@ split. {
       apply Nat.div_lt_upper_bound; [ | easy ].
       apply fact_neq_0.
     }
-    apply sym_gr_inv_upper_bound; [ | flia Hjn Hjsn ].
+    apply canon_sym_gr_inv_upper_bound; [ | flia Hjn Hjsn ].
     apply Nat.mod_upper_bound, fact_neq_0.
   } {
     apply Nat.nlt_ge in Hjk.
@@ -3611,7 +3611,7 @@ split. {
       apply Nat.lt_1_r in Hkn; subst k.
       flia Hjn Hkj.
     }
-    apply sym_gr_inv_upper_bound; [ | flia Hjn Hkj ].
+    apply canon_sym_gr_inv_upper_bound; [ | flia Hjn Hkj ].
     apply Nat.mod_upper_bound, fact_neq_0.
   }
 }

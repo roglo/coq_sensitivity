@@ -420,7 +420,7 @@ assert (Hkn : k < fact n). {
   specialize (fact_neq_0 n) as Hnz.
   flia Hk Hnz.
 }
-specialize (sym_gr_surjective Hkn Hi) as Hp.
+specialize (canon_sym_gr_surjective Hkn Hi) as Hp.
 destruct Hp as (p & Hp & Hpp).
 rewrite (rngl_product_split (p + 1)); [ | flia Hp ].
 rewrite rngl_product_split_last; [ | flia ].
@@ -1030,7 +1030,7 @@ rewrite rngl_mul_opp_l; [ | easy ].
 f_equal.
 rewrite rngl_mul_1_l.
 symmetry.
-set (g := λ k, rank_of_permut_in_sym_gr_vect n (f k)).
+set (g := λ k, rank_of_permut_in_canon_sym_gr_vect n (f k)).
 rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
   intros k (_, Hk).
   assert (Hkn : k < n!). {
@@ -1038,7 +1038,7 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
     flia Hk Hn.
   }
   unfold g, f.
-  unfold rank_of_permut_in_sym_gr_vect; cbn.
+  unfold rank_of_permut_in_canon_sym_gr_vect; cbn.
   rewrite (List_map_nth' 0). 2: {
     rewrite seq_length.
     apply rank_of_permut_upper_bound.
@@ -1076,7 +1076,7 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
   unfold vect_swap_elem; cbn.
   do 2 rewrite List_map_seq_length.
   unfold vect_el; cbn.
-  erewrite rank_of_permut_in_sym_gr_eq_compat. 2: {
+  erewrite rank_of_permut_in_canon_sym_gr_eq_compat. 2: {
     intros i Hi.
     rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
     rewrite (List_map_nth' 0). 2: {
@@ -1101,7 +1101,7 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
       now apply is_permut_mk_canon_transp.
     }
     rewrite Nat.add_0_l.
-    erewrite rank_of_permut_in_sym_gr_eq_compat. 2: {
+    erewrite rank_of_permut_in_canon_sym_gr_eq_compat. 2: {
       intros j Hj.
       rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
       rewrite seq_nth; [ | easy ].
@@ -1120,14 +1120,14 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
     rewrite seq_nth; [ | easy ].
     now do 2 rewrite Nat.add_0_l.
   }
-  erewrite rank_of_permut_in_sym_gr_eq_compat. 2: {
+  erewrite rank_of_permut_in_canon_sym_gr_eq_compat. 2: {
     intros i Hi.
-    rewrite permut_in_sym_gr_of_its_rank; [ easy | | ]. 2: {
+    rewrite permut_in_canon_sym_gr_of_its_rank; [ easy | | ]. 2: {
       now apply transposition_lt.
     }
     now apply is_permut_mk_canon_transp.
   }
-  erewrite rank_of_permut_in_sym_gr_eq_compat. 2: {
+  erewrite rank_of_permut_in_canon_sym_gr_eq_compat. 2: {
     intros i Hi.
     now rewrite transposition_involutive.
   }
@@ -1147,9 +1147,9 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
   }
   split. {
     intros i Hi.
-    unfold rank_of_permut_in_sym_gr_vect.
+    unfold rank_of_permut_in_canon_sym_gr_vect.
     unfold vect_el; cbn.
-    erewrite rank_of_permut_in_sym_gr_eq_compat. 2: {
+    erewrite rank_of_permut_in_canon_sym_gr_eq_compat. 2: {
       intros u Hu.
       rewrite (List_map_nth' 0). 2: {
         now rewrite List_map_seq_length, seq_length.
@@ -1169,10 +1169,10 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
     intros i j Hi Hj Hij.
     unfold vect_swap_elem in Hij.
     cbn in Hij.
-    unfold rank_of_permut_in_sym_gr_vect in Hij.
+    unfold rank_of_permut_in_canon_sym_gr_vect in Hij.
     unfold vect_el in Hij.
     cbn in Hij.
-    erewrite rank_of_permut_in_sym_gr_eq_compat in Hij. 2: {
+    erewrite rank_of_permut_in_canon_sym_gr_eq_compat in Hij. 2: {
       intros u Hu.
       rewrite (List_map_nth' 0); [ | now rewrite List_map_seq_length, seq_length ].
       rewrite List_map_seq_length.
@@ -1185,7 +1185,7 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
       easy.
     }
     symmetry in Hij.
-    erewrite rank_of_permut_in_sym_gr_eq_compat in Hij. 2: {
+    erewrite rank_of_permut_in_canon_sym_gr_eq_compat in Hij. 2: {
       intros u Hu.
       rewrite (List_map_nth' 0); [ | now rewrite List_map_seq_length, seq_length ].
       rewrite List_map_seq_length.
@@ -1252,21 +1252,21 @@ erewrite rngl_summation_list_eq_compat. 2: {
   }
   assert
   (Hrpq :
-     rank_of_permut_in_sym_gr_vect n
+     rank_of_permut_in_canon_sym_gr_vect n
        (vect_swap_elem 0 (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) p q) <
      n!). {
-    unfold rank_of_permut_in_sym_gr_vect.
+    unfold rank_of_permut_in_canon_sym_gr_vect.
     now apply rank_of_permut_upper_bound.
   }
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
   rewrite seq_nth; [ | easy ].
   rewrite Nat.add_0_l.
-  unfold rank_of_permut_in_sym_gr_vect.
+  unfold rank_of_permut_in_canon_sym_gr_vect.
   erewrite map_ext_in. 2: {
     intros i Hi.
     apply in_seq in Hi.
-    unfold rank_of_permut_in_sym_gr_vect in Hrpq.
-    rewrite permut_in_sym_gr_of_its_rank; [ cbn | easy | easy ].
+    unfold rank_of_permut_in_canon_sym_gr_vect in Hrpq.
+    rewrite permut_in_canon_sym_gr_of_its_rank; [ cbn | easy | easy ].
     rewrite (List_map_nth' 0). 2: {
       rewrite seq_length.
       rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
@@ -1321,7 +1321,7 @@ unfold vect_swap_elem at 1.
 cbn - [ vect_vect_nat_el ].
 assert
   (Hrg :
-   rank_of_permut_in_sym_gr n
+   rank_of_permut_in_canon_sym_gr n
      (vect_el 0
         (vect_swap_elem 0 {| vect_list := map (mk_canon_sym_gr n k) (seq 0 n) |}
            p q)) < n!). {
@@ -1375,7 +1375,7 @@ rewrite (List_map_nth' 0). 2: {
 }
 rewrite seq_nth; [ cbn | easy ].
 rewrite seq_nth; [ cbn | now apply transposition_lt ].
-rewrite permut_in_sym_gr_of_its_rank; cycle 1. {
+rewrite permut_in_canon_sym_gr_of_its_rank; cycle 1. {
   unfold vect_el.
   eapply is_permut_eq_compat. {
     intros j Hj; symmetry; cbn.
@@ -4160,13 +4160,17 @@ Proof.
 intros * Hnz Hσ Hσ'.
 destruct Hσ as (H1, H2).
 destruct Hσ' as (H3, H4).
+Print rank_of_permut_in_canon_sym_gr_vect.
+Check rank_of_permut_of_rank.
+...
+λ i, rank_of_permut_in_canon_sym_gr_vect i
 ...
 destruct n; [ easy | clear Hnz ].
 Search (vector (vector nat)).
 Search is_sym_gr_vect.
 Search is_sym_gr.
 ...
-Print rank_of_permut_in_sym_gr_vect.
+Print rank_of_permut_in_canon_sym_gr_vect.
 ...
 Check (vect_el (mk_vect []) σ' 0).
 ...
