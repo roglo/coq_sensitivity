@@ -4167,6 +4167,7 @@ Check (vect_el (mk_vect []) σ' 0).
 assert (Hσp : ∀ p, is_permut p n → { i | vect_el σ i = p }). {
   intros p Hp.
 ...
+*)
 
 (*
 Theorem fun_betw_sym_gr : ∀ n (σ σ' : vector n! _),
