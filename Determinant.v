@@ -4159,9 +4159,12 @@ Theorem fun_betw_sym_gr : ∀ n (σ σ' : vector _),
 Proof.
 intros * Hnz Hσ Hσ'.
 destruct n; [ easy | clear Hnz ].
+Search (vector (vector nat)).
 destruct Hσ as (H1, H2).
 destruct Hσ' as (H3, H4).
+...
 Print rank_of_permut_in_sym_gr_vect.
+...
 Check (vect_el (mk_vect []) σ' 0).
 ...
 assert (Hσp : ∀ p, is_permut p n → { i | vect_el σ i = p }). {
