@@ -4158,10 +4158,13 @@ Theorem fun_betw_sym_gr : ∀ n (σ σ' : vector _),
   → { f | ∀ i, i < n! → vect_el (mk_vect []) σ (f i) = vect_el (mk_vect []) σ' i }.
 Proof.
 intros * Hnz Hσ Hσ'.
-destruct n; [ easy | clear Hnz ].
-Search (vector (vector nat)).
 destruct Hσ as (H1, H2).
 destruct Hσ' as (H3, H4).
+...
+destruct n; [ easy | clear Hnz ].
+Search (vector (vector nat)).
+Search is_sym_gr_vect.
+Search is_sym_gr.
 ...
 Print rank_of_permut_in_sym_gr_vect.
 ...
