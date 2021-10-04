@@ -281,6 +281,39 @@ Record sym_gr_vect n :=
 
 (* *)
 
+Fixpoint vect_find_nth_loop A (f : A → bool) i d (v : vector A) :=
+  match i with
+  | 0 => None
+  | S j => if f (vect_el d v j) then Some j else vect_find_nth_loop f j d v
+  end.
+
+Fixpoint list_eqb A (eqb : A → A → bool) la lb :=
+  match la with
+  | [] =>
+      match lb with
+      | [] => true
+      | b :: lb' => false
+      end
+  | a :: la' =>
+      match lb with
+      | [] => false
+      | b :: lb' => if eqb a b then list_eqb eqb la' lb' else false
+      end
+  end.
+
+Definition vect_eqb A eqb (u v : vector A) :=
+  list_eqb eqb (vect_list u) (vect_list v).
+
+Definition rank_of_permut_in_sym_gr (sg : vector (vector nat)) σ :=
+  match vect_find_nth_loop (vect_eqb Nat.eqb σ) 0 (mk_vect []) sg with
+  | Some i => i
+  | None => 0
+  end.
+
+...
+
+(* rank in canon symmetric group *)
+
 Definition sub_permut (f : nat → nat) i :=
   f (S i) - Nat.b2n (f 0 <? f (S i)).
 
