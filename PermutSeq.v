@@ -272,8 +272,10 @@ Definition is_sym_gr n (f : nat → nat → nat) :=
   (∀ i j, i < n! → j < n! → f i = f j → i = j) ∧
   (∀ i, i < n! → is_permut (f i) n).
 
-Definition is_sym_gr_vect n (σ : vector (vector nat)) :=
-  is_sym_gr n (λ i, vect_el 0 (nth i (vect_list σ) (mk_vect []))).
+Definition is_sym_gr_vect n (sg : vector (vector nat)) :=
+  vect_size sg = n! ∧
+  (∀ i, i < n! → vect_size (vect_el (mk_vect []) sg i) = n) ∧
+  is_sym_gr n (λ i, vect_el 0 (vect_el (mk_vect []) sg i)).
 
 Record sym_gr_vect n :=
   { sg_vect : vector (vector nat);
@@ -838,6 +840,14 @@ Theorem canon_sym_gr_vect_prop : ∀ n,
   is_sym_gr_vect n (mk_canon_sym_gr_vect n).
 Proof.
 intros.
+split. {
+  now cbn; rewrite map_length, seq_length.
+}
+split. {
+  intros i Hi; cbn.
+  rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
+  now rewrite map_length, seq_length.
+}
 split. {
   intros i j Hi Hj Hij.
   cbn in Hij.

@@ -4154,26 +4154,42 @@ destruct Hσ' as (H3, H4).
 ...
 *)
 
-Theorem fun_betw_sym_gr : ∀ n (σ σ' : vector _),
+Theorem fun_betw_sym_gr : ∀ n (sg sg' : vector _),
   n ≠ 0
-  → is_sym_gr_vect n σ
-  → is_sym_gr_vect n σ'
-  → { f | ∀ i, i < n! → vect_el (mk_vect []) σ (f i) = vect_el (mk_vect []) σ' i }.
+  → is_sym_gr_vect n sg
+  → is_sym_gr_vect n sg'
+  → { f | ∀ i, i < n! →
+      vect_el (mk_vect []) sg (f i) = vect_el (mk_vect []) sg' i }.
 Proof.
-intros * Hnz Hσ Hσ'.
-destruct Hσ as (H1, H2).
-destruct Hσ' as (H3, H4).
-exists (λ i, rank_of_permut_in_sym_gr σ (vect_el (mk_vect []) σ' i)).
+intros * Hnz Hsg Hsg'.
+exists (λ i, rank_of_permut_in_sym_gr sg (vect_el (mk_vect []) sg' i)).
 intros i Hi.
+induction i. {
+  unfold rank_of_permut_in_sym_gr.
+  destruct n; [ easy | clear Hnz ].
+  destruct Hsg as (Hsgs & Hsges & H1 & H2).
+  destruct Hsg' as (Hsgs' & Hsges' & H3 & H4).
+  move Hsgs' before Hsgs.
+  move Hsges' before Hsges.
+  rewrite Hsgs.
+  cbn.
+...
+revert sg sg' Hsg Hsg'.
+induction n; [ easy | clear Hnz ].
+...
+destruct Hsg as (Hsgs & Hsges & H1 & H2).
+destruct Hsg' as (Hsgs' & Hsges' & H3 & H4).
+move Hsgs' before Hsgs.
+move Hsges' before Hsges.
 unfold rank_of_permut_in_sym_gr.
+induction n; [ easy | clear Hnz ].
+...
 remember (vect_size σ) as m eqn:Hm.
 symmetry in Hm.
 induction m; intros; cbn. {
   unfold vect_el; cbn.
   unfold vect_size in Hm.
   rewrite nth_overflow; [ | flia Hm ].
-(* faut probab ajouter que σ et σ' sont de taille n! *)
-(* soit dans le théorème, soit dans la déf de is_sym_gr_vect *)
 ...
 
 (*
