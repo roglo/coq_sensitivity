@@ -4063,6 +4063,7 @@ Qed.
 Theorem comp_id_l : ∀ A B (f : A → B), comp id f = f.
 Proof. easy. Qed.
 
+(*
 Fixpoint vect_eqb_loop A (n : nat) (eqb : A → A → bool) d (u v : vector A) i :=
   match i with
   | 0 => true
@@ -4074,6 +4075,8 @@ Fixpoint vect_eqb_loop A (n : nat) (eqb : A → A → bool) d (u v : vector A) i
 
 Definition vect_eqb A (n : nat) (eqb : A → A → bool) d (u v : vector A) : bool :=
   vect_eqb_loop n eqb d u v n.
+
+*)
 
 Fixpoint vect_find_loop A (f : A → bool) d (u : vector A) i :=
   match i with
@@ -4160,24 +4163,18 @@ Proof.
 intros * Hnz Hσ Hσ'.
 destruct Hσ as (H1, H2).
 destruct Hσ' as (H3, H4).
-Print rank_of_permut_in_canon_sym_gr_vect.
-Check rank_of_permut_of_rank.
+exists (λ i, rank_of_permut_in_sym_gr σ (vect_el (mk_vect []) σ' i)).
+intros i Hi.
+unfold rank_of_permut_in_sym_gr.
+remember (vect_size σ) as m eqn:Hm.
+symmetry in Hm.
+induction m; intros; cbn. {
+  unfold vect_el; cbn.
+  unfold vect_size in Hm.
+  rewrite nth_overflow; [ | flia Hm ].
+(* faut probab ajouter que σ et σ' sont de taille n! *)
+(* soit dans le théorème, soit dans la déf de is_sym_gr_vect *)
 ...
-λ i, rank_of_permut_in_canon_sym_gr_vect i
-...
-destruct n; [ easy | clear Hnz ].
-Search (vector (vector nat)).
-Search is_sym_gr_vect.
-Search is_sym_gr.
-...
-Print rank_of_permut_in_canon_sym_gr_vect.
-...
-Check (vect_el (mk_vect []) σ' 0).
-...
-assert (Hσp : ∀ p, is_permut p n → { i | vect_el σ i = p }). {
-  intros p Hp.
-...
-*)
 
 (*
 Theorem fun_betw_sym_gr : ∀ n (σ σ' : vector n! _),

@@ -319,7 +319,6 @@ Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 4) (mk_vect [2;3;0;1])).
 Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 4) (mk_vect [2;3;0])).
 Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 0) (mk_vect [2;3;0])).
 *)
-...
 
 (* rank in canon symmetric group *)
 
