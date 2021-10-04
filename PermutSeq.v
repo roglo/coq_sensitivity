@@ -305,11 +305,20 @@ Definition vect_eqb A eqb (u v : vector A) :=
   list_eqb eqb (vect_list u) (vect_list v).
 
 Definition rank_of_permut_in_sym_gr (sg : vector (vector nat)) σ :=
-  match vect_find_nth_loop (vect_eqb Nat.eqb σ) 0 (mk_vect []) sg with
+  match
+    vect_find_nth_loop (vect_eqb Nat.eqb σ) (vect_size sg) (mk_vect []) sg
+  with
   | Some i => i
-  | None => 0
+  | None => vect_size sg
   end.
 
+(*
+Compute (mk_canon_sym_gr_vect 4).
+Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 4) (mk_vect [0;1;3;2])).
+Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 4) (mk_vect [2;3;0;1])).
+Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 4) (mk_vect [2;3;0])).
+Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 0) (mk_vect [2;3;0])).
+*)
 ...
 
 (* rank in canon symmetric group *)
