@@ -2133,6 +2133,36 @@ Qed.
 
 (* end replace_at *)
 
+(* list_eqb *)
+
+Fixpoint list_eqb A (eqb : A → A → bool) la lb :=
+  match la with
+  | [] =>
+      match lb with
+      | [] => true
+      | b :: lb' => false
+      end
+  | a :: la' =>
+      match lb with
+      | [] => false
+      | b :: lb' => if eqb a b then list_eqb eqb la' lb' else false
+      end
+  end.
+
+Theorem list_eqb_eq : ∀ la lb, list_eqb Nat.eqb la lb = true → la = lb.
+Proof.
+intros * Hab.
+revert lb Hab.
+induction la as [| a]; intros; [ now destruct lb | cbn ].
+destruct lb as [| b]; [ easy | cbn in Hab ].
+rewrite if_eqb_eq_dec in Hab.
+destruct (Nat.eq_dec a b) as [H1| H1]; [ | easy ].
+destruct H1; f_equal.
+now apply IHla.
+Qed.
+
+(* end list_eqb *)
+
 Theorem not_equiv_imp_False : ∀ P : Prop, (P → False) ↔ ¬ P.
 Proof. easy. Qed.
 

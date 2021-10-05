@@ -289,20 +289,6 @@ Fixpoint vect_find_nth_loop A (f : A → bool) i d (v : vector A) :=
   | S j => if f (vect_el d v j) then Some j else vect_find_nth_loop f j d v
   end.
 
-Fixpoint list_eqb A (eqb : A → A → bool) la lb :=
-  match la with
-  | [] =>
-      match lb with
-      | [] => true
-      | b :: lb' => false
-      end
-  | a :: la' =>
-      match lb with
-      | [] => false
-      | b :: lb' => if eqb a b then list_eqb eqb la' lb' else false
-      end
-  end.
-
 Definition vect_eqb A eqb (u v : vector A) :=
   list_eqb eqb (vect_list u) (vect_list v).
 
@@ -321,6 +307,16 @@ Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 4) (mk_vect [2;3;0;1])).
 Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 4) (mk_vect [2;3;0])).
 Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 0) (mk_vect [2;3;0])).
 *)
+
+Theorem vect_eqb_eq : ∀ u v, vect_eqb Nat.eqb u v = true → u = v.
+Proof.
+intros * Huv.
+unfold vect_eqb in Huv.
+destruct u as (u).
+destruct v as (v).
+cbn in Huv; f_equal.
+now apply list_eqb_eq.
+Qed.
 
 (* rank in canon symmetric group *)
 

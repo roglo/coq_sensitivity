@@ -4176,7 +4176,7 @@ remember
   (vect_eqb Nat.eqb (vect_el {| vect_list := [] |} sg' i)
      (vect_el {| vect_list := [] |} sg m))
   as b eqn:Hb; symmetry in Hb.
-destruct b. {
+destruct b; [ now apply vect_eqb_eq in Hb | ].
 ...
 induction i. {
   unfold rank_of_permut_in_sym_gr.
