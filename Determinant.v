@@ -4164,22 +4164,45 @@ Proof.
 intros * Hnz Hsg Hsg'.
 exists (λ i, rank_of_permut_in_sym_gr sg (vect_el (mk_vect []) sg' i)).
 intros i Hi.
+Theorem rank_of_permut_in_sym_gr_enough_iter : ∀ it sg σ,
+  vect_size sg ≤ it
+  → rank_of_permut_in_sym_gr sg σ =
+    match vect_find_nth_loop (vect_eqb Nat.eqb σ) it {| vect_list := [] |} sg with
+    | Some i => i
+    | None => 0
+    end.
+Admitted.
 unfold rank_of_permut_in_sym_gr.
-remember (vect_size sg) as m eqn:Hm; symmetry in Hm.
-revert sg Hsg Hm.
-induction m; intros. {
+remember (vect_size sg) as s eqn:Hs.
+replace (vect_size sg) with (vect_size sg + 0) in Hs by flia.
+remember 0 as m eqn:Hm in Hs.
+clear Hm; subst s.
+remember (vect_size sg) as s eqn:Hs; symmetry in Hs.
+revert m.
+induction s; intros. {
   destruct Hsg as (Hsgs & Hsges & H3 & H4).
-  rewrite Hsgs in Hm.
-  now apply fact_neq_0 in Hm.
+  rewrite Hsgs in Hs.
+  now apply fact_neq_0 in Hs.
 }
 cbn.
 remember
   (vect_eqb Nat.eqb (vect_el {| vect_list := [] |} sg' i)
-     (vect_el {| vect_list := [] |} sg m))
+     (vect_el {| vect_list := [] |} sg (s + m)))
   as b eqn:Hb; symmetry in Hb.
 destruct b; [ now apply vect_eqb_eq in Hb | ].
+rewrite <- rank_of_permut_in_sym_gr_enough_iter.
+unfold rank_of_permut_in_sym_gr.
 ...
-apply IHm.
+apply IHs.
+
+specialize (rank_of_permut_in_sym_gr_enough_iter) as H1.
+specialize (H1 (s + m) sg).
+remember (vect_el (mk_vect []) sg' i) as σ eqn:Hσ.
+specialize (H1 σ).
+...
+
+rewrite <- rank_of_permut_in_sym_gr_enough_iter.
+
 ...
 
 (*
