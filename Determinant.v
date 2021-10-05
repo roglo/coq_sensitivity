@@ -4166,7 +4166,8 @@ exists (λ i, rank_of_permut_in_sym_gr sg (vect_el (mk_vect []) sg' i)).
 intros i Hi.
 unfold rank_of_permut_in_sym_gr.
 remember (vect_size sg) as m eqn:Hm; symmetry in Hm.
-induction m. {
+revert sg Hsg Hm.
+induction m; intros. {
   destruct Hsg as (Hsgs & Hsges & H3 & H4).
   rewrite Hsgs in Hm.
   now apply fact_neq_0 in Hm.
@@ -4178,32 +4179,7 @@ remember
   as b eqn:Hb; symmetry in Hb.
 destruct b; [ now apply vect_eqb_eq in Hb | ].
 ...
-induction i. {
-  unfold rank_of_permut_in_sym_gr.
-  destruct n; [ easy | clear Hnz ].
-  destruct Hsg as (Hsgs & Hsges & H1 & H2).
-  destruct Hsg' as (Hsgs' & Hsges' & H3 & H4).
-  move Hsgs' before Hsgs.
-  move Hsges' before Hsges.
-  rewrite Hsgs.
-  cbn.
-...
-revert sg sg' Hsg Hsg'.
-induction n; [ easy | clear Hnz ].
-...
-destruct Hsg as (Hsgs & Hsges & H1 & H2).
-destruct Hsg' as (Hsgs' & Hsges' & H3 & H4).
-move Hsgs' before Hsgs.
-move Hsges' before Hsges.
-unfold rank_of_permut_in_sym_gr.
-induction n; [ easy | clear Hnz ].
-...
-remember (vect_size σ) as m eqn:Hm.
-symmetry in Hm.
-induction m; intros; cbn. {
-  unfold vect_el; cbn.
-  unfold vect_size in Hm.
-  rewrite nth_overflow; [ | flia Hm ].
+apply IHm.
 ...
 
 (*

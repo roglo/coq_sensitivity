@@ -297,7 +297,7 @@ Definition rank_of_permut_in_sym_gr (sg : vector (vector nat)) σ :=
     vect_find_nth_loop (vect_eqb Nat.eqb σ) (vect_size sg) (mk_vect []) sg
   with
   | Some i => i
-  | None => vect_size sg
+  | None => 0
   end.
 
 (*
