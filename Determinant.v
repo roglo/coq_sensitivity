@@ -4164,6 +4164,20 @@ Proof.
 intros * Hnz Hsg Hsg'.
 exists (λ i, rank_of_permut_in_sym_gr sg (vect_el (mk_vect []) sg' i)).
 intros i Hi.
+unfold rank_of_permut_in_sym_gr.
+remember (vect_size sg) as m eqn:Hm; symmetry in Hm.
+induction m. {
+  destruct Hsg as (Hsgs & Hsges & H3 & H4).
+  rewrite Hsgs in Hm.
+  now apply fact_neq_0 in Hm.
+}
+cbn.
+remember
+  (vect_eqb Nat.eqb (vect_el {| vect_list := [] |} sg' i)
+     (vect_el {| vect_list := [] |} sg m))
+  as b eqn:Hb; symmetry in Hb.
+destruct b. {
+...
 induction i. {
   unfold rank_of_permut_in_sym_gr.
   destruct n; [ easy | clear Hnz ].
