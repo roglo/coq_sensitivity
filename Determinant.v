@@ -4172,8 +4172,24 @@ Theorem rank_of_permut_in_sym_gr_enough_iter : ∀ it sg σ,
     | None => 0
     end.
 Proof.
-Admitted.
-unfold rank_of_permut_in_sym_gr.
+intros * Hit.
+induction it; cbn. {
+  apply Nat.le_0_r in Hit.
+  unfold rank_of_permut_in_sym_gr.
+  now rewrite Hit.
+}
+(**)
+destruct (Nat.eq_dec (vect_size sg) (S it)) as [Hs| Hs]. {
+  unfold rank_of_permut_in_sym_gr.
+  now rewrite Hs.
+}
+assert (H : vect_size sg ≤ it) by flia Hit Hs.
+specialize (IHit H); clear H.
+remember (vect_eqb Nat.eqb σ (vect_el (mk_vect []) sg it)) as b eqn:Hb.
+symmetry in Hb.
+destruct b; [ | apply IHit ].
+apply vect_eqb_eq in Hb.
+rewrite Hb.
 ...
 remember (vect_size sg) as s eqn:Hs.
 replace (vect_size sg) with (vect_size sg + 0) in Hs by flia.
