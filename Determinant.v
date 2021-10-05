@@ -4171,14 +4171,17 @@ Theorem rank_of_permut_in_sym_gr_enough_iter : ∀ it sg σ,
     | Some i => i
     | None => 0
     end.
+Proof.
 Admitted.
 unfold rank_of_permut_in_sym_gr.
+...
 remember (vect_size sg) as s eqn:Hs.
 replace (vect_size sg) with (vect_size sg + 0) in Hs by flia.
 remember 0 as m eqn:Hm in Hs.
 clear Hm; subst s.
-remember (vect_size sg) as s eqn:Hs; symmetry in Hs.
 revert m.
+remember (vect_size sg) as s eqn:Hs; symmetry in Hs.
+clear Hs.
 induction s; intros. {
   destruct Hsg as (Hsgs & Hsges & H3 & H4).
   rewrite Hsgs in Hs.
@@ -4192,8 +4195,10 @@ remember
 destruct b; [ now apply vect_eqb_eq in Hb | ].
 rewrite <- rank_of_permut_in_sym_gr_enough_iter.
 unfold rank_of_permut_in_sym_gr.
+rewrite Hs.
 ...
 apply IHs.
+...
 
 specialize (rank_of_permut_in_sym_gr_enough_iter) as H1.
 specialize (H1 (s + m) sg).
