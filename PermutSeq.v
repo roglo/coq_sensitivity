@@ -307,7 +307,7 @@ specialize (IHl (S i) j Hi).
 flia IHl.
 Qed.
 
-Theorem glop : ∀ A d f (l : list A) i j,
+Theorem find_nth_loop_Some : ∀ A d f (l : list A) i j,
   find_nth_loop i f l = Some j
   → f (nth (j - i) l d) = true.
 Proof.
@@ -321,52 +321,33 @@ clear j Hk.
 revert i l Hi.
 induction k; intros. {
   rewrite Nat.add_0_r in Hi.
-  destruct l as [| a]; [ easy | ].
+  revert i Hi.
+  induction l as [| a]; intros; [ easy | ].
   cbn in Hi |-*.
   remember (f a) as b eqn:Hb; symmetry in Hb.
   destruct b; [ easy | exfalso ].
-  cbn in Hi.
-...
-intros * Hi.
-remember (j - i) as k eqn:Hk.
-replace j with (i + k) in Hi. 2: {
-  specialize (@find_nth_loop_le _ f l i j Hi) as H1.
-  flia Hk H1.
+  specialize (@find_nth_loop_le _ f l (S i) i Hi) as H1.
+  flia H1.
 }
-clear j Hk.
-revert i k Hi.
-induction l as [| a]; intros; [ easy | ].
-cbn in Hi.
-...
-intros * Hi.
-revert i j Hi.
-induction l as [| a]; intros; [ easy | ].
-cbn in Hi.
+destruct l as [| a]; [ easy | ].
+cbn in Hi |-*.
 remember (f a) as b eqn:Hb; symmetry in Hb.
 destruct b. {
-  injection Hi; clear Hi; intros; subst i.
-  now rewrite Nat.sub_diag.
+  injection Hi; clear Hi; intros Hi; flia Hi.
 }
-cbn.
-...
+rewrite <- Nat.add_succ_comm in Hi.
+now apply (IHk (S i)).
+Qed.
 
-Theorem glop : ∀ A d f (l : list A) i,
+Theorem find_nth_Some : ∀ A d f (l : list A) i,
   find_nth f l = Some i → f (nth i l d) = true.
 Proof.
 intros * Hi.
-revert i Hi.
-induction l as [| a]; intros; [ easy | ].
-cbn in Hi.
-remember (f a) as b eqn:Hb; symmetry in Hb.
-destruct b. {
-  now injection Hi; clear Hi; intros; subst i.
-}
-destruct i. {
-  cbn.
-  destruct l as [| a1]; [ easy | ].
-  cbn in Hi.
-  remember (f a1) as b1 eqn:Hb1; symmetry in Hb1.
-  destruct b1; [ easy | ].
+unfold find_nth in Hi.
+apply find_nth_loop_Some with (d := d) in Hi.
+now rewrite Nat.sub_0_r in Hi.
+Qed.
+
 ...
 
 Fixpoint vect_find_nth_loop A (f : A → bool) i d (v : vector A) :=
