@@ -1738,72 +1738,23 @@ remember (p - i) as k eqn:Hk.
 replace p with (i + k) in Hp by flia Hp Hk.
 destruct Hp as (_, Hp).
 clear p Hk.
-...
-revert i l Hi.
+revert i j l Hi Hp.
 induction k; intros. {
-  rewrite Nat.add_0_r in Hi.
-  revert i Hi.
-  induction l as [| a]; intros; [ easy | ].
+  destruct l as [| a]; [ easy | ].
   cbn in Hi |-*.
-  remember (f a) as b eqn:Hb; symmetry in Hb.
-  destruct b. {
-    split; [ | easy ].
-    intros p Hp.
-    flia Hp.
-  }
-  exfalso.
-  specialize (List_find_nth_loop_le f l (S i) Hi) as H1.
-  flia H1.
-}
-destruct l as [| a]; [ easy | ].
-cbn in Hi.
-remember (f a) as b eqn:Hb; symmetry in Hb.
-destruct b. {
-  injection Hi; clear Hi; intros Hi; flia Hi.
-}
-rewrite <- Nat.add_succ_comm in Hi.
-specialize (IHk (S i) l Hi) as H1.
-destruct H1 as (H1, H2).
-split; [ | easy ].
-intros p Hp.
-destruct i. {
-  rewrite Nat.sub_0_r.
-  destruct p; [ easy | ].
-  cbn.
-...
-Qed.
-...
-split; [ | now apply List_find_nth_loop_Some ].
-intros p Hp.
-remember (j - i) as k eqn:Hk.
-replace j with (i + k) in Hi, Hp. 2: {
-  specialize (List_find_nth_loop_le f l i Hi) as H1.
-  flia Hk H1.
-}
-clear j Hk.
-revert i p l Hi Hp.
-induction k; intros. {
-  rewrite Nat.add_0_r in Hi, Hp.
-  revert i Hi Hp.
-  induction l as [| a]; intros; [ easy | ].
-  cbn in Hi |-*.
-  remember (f a) as b eqn:Hb; symmetry in Hb.
-  destruct b. {
-    replace (p - i) with 0 by flia Hp.
-...
-  destruct b; [ easy | exfalso ].
-  specialize (List_find_nth_loop_le f l (S i) Hi) as H1.
-  flia H1.
+  destruct (f a); [ injection Hi; intros; subst i; flia Hp | easy ].
 }
 destruct l as [| a]; [ easy | ].
 cbn in Hi |-*.
+rewrite <- Nat.add_succ_comm in Hp.
 remember (f a) as b eqn:Hb; symmetry in Hb.
 destruct b. {
-  injection Hi; clear Hi; intros Hi; flia Hi.
+  injection Hi; clear Hi; intros; subst j; flia Hp.
 }
-rewrite <- Nat.add_succ_comm in Hi.
-now apply (IHk (S i)).
+now apply IHk with (i := S i) (j := j).
 Qed.
+
+...
 
 Theorem List_find_nth_Some : ∀ A d f (l : list A) i,
   List_find_nth f l = Some i → f (nth i l d) = true.
