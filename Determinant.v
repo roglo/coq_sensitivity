@@ -4154,6 +4154,24 @@ destruct Hσ' as (H3, H4).
 ...
 *)
 
+Theorem glop : ∀ sg σ,
+  vect_el (mk_vect []) sg (rank_of_permut_in_sym_gr sg σ) = σ.
+Proof.
+intros.
+unfold rank_of_permut_in_sym_gr.
+Print vect_find_nth_loop.
+Theorem glop : ∀ A f d (v : vector A) i j,
+  vect_size v ≤ i
+  → vect_find_nth_loop f i d v = Some j
+  → f (vect_el d v j) = true.
+Proof.
+intros * Hvi Hj.
+induction i; [ easy | ].
+cbn in Hj.
+remember (f (vect_el d v i)) as b eqn:Hb; symmetry in Hb.
+destruct b; [ now injection Hj; clear Hj; intros; subst j | ].
+...
+
 Theorem fun_betw_sym_gr : ∀ n (sg sg' : vector _),
   n ≠ 0
   → is_sym_gr_vect n sg
