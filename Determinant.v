@@ -4176,7 +4176,32 @@ destruct (Nat.eq_dec (vect_size v) (S i)) as [Hvsi| Hvsi]. 2: {
   flia Hvi Hvsi.
 }
 clear Hvi.
-Print vect_find_nth_loop.
+...
+specialize (IHi (mk_vect (removelast (vect_list v)))) as H1.
+specialize (H1 j).
+cbn in H1.
+assert (H : length (removelast (vect_list v)) ≤ i). {
+  clear - Hvsi.
+  destruct v as (la); cbn in Hvsi |-*.
+  induction la using rev_ind; [ easy | ].
+  rewrite app_length, Nat.add_1_r in Hvsi.
+  apply Nat.succ_inj in Hvsi.
+  rewrite removelast_last.
+  now rewrite Hvsi.
+}
+specialize (H1 H); clear H.
+assert (H : vect_find_nth_loop f i d (mk_vect (removelast (vect_list v))) = Some j). {
+  clear - Hb Hj Hvsi.
+  induction i; [ easy | ].
+  cbn in Hj |-*.
+...
+destruct i; [ easy | ].
+cbn in Hj.
+remember (f (vect_el d v i)) as b1 eqn:Hb1.
+symmetry in Hb1.
+destruct b1. {
+  now injection Hj; clear Hj; intros; subst j.
+}
 ...
 
 Theorem fun_betw_sym_gr : ∀ n (sg sg' : vector _),
