@@ -1696,98 +1696,90 @@ Qed.
 
 Theorem List_find_nth_loop_Some : ∀ A d f (l : list A) i j,
   List_find_nth_loop i f l = Some j
-  → f (nth (j - i) l d) = true.
-Proof.
-intros * Hi.
-remember (j - i) as k eqn:Hk.
-replace j with (i + k) in Hi. 2: {
-  specialize (List_find_nth_loop_le f l i Hi) as H1.
-  flia Hk H1.
-}
-clear j Hk.
-revert i l Hi.
-induction k; intros. {
-  rewrite Nat.add_0_r in Hi.
-  revert i Hi.
-  induction l as [| a]; intros; [ easy | ].
-  cbn in Hi |-*.
-  remember (f a) as b eqn:Hb; symmetry in Hb.
-  destruct b; [ easy | exfalso ].
-  specialize (List_find_nth_loop_le f l (S i) Hi) as H1.
-  flia H1.
-}
-destruct l as [| a]; [ easy | ].
-cbn in Hi |-*.
-remember (f a) as b eqn:Hb; symmetry in Hb.
-destruct b. {
-  injection Hi; clear Hi; intros Hi; flia Hi.
-}
-rewrite <- Nat.add_succ_comm in Hi.
-now apply (IHk (S i)).
-Qed.
-
-Theorem List_find_nth_loop_Some' : ∀ A d f (l : list A) i j,
-  List_find_nth_loop i f l = Some j
   → (∀ k, i ≤ k < j → f (nth (k - i) l d) = false) ∧
     f (nth (j - i) l d) = true.
 Proof.
 intros * Hi.
-split; [ | now apply List_find_nth_loop_Some ].
-intros p Hp.
-remember (p - i) as k eqn:Hk.
-replace p with (i + k) in Hp by flia Hp Hk.
-destruct Hp as (_, Hp).
-clear p Hk.
-revert i j l Hi Hp.
-induction k; intros. {
+split. {
+  intros p Hp.
+  remember (p - i) as k eqn:Hk.
+  replace p with (i + k) in Hp by flia Hp Hk.
+  destruct Hp as (_, Hp).
+  clear p Hk.
+  revert i j l Hi Hp.
+  induction k; intros. {
+    destruct l as [| a]; [ easy | ].
+    cbn in Hi |-*.
+    destruct (f a); [ injection Hi; intros; subst i; flia Hp | easy ].
+  }
   destruct l as [| a]; [ easy | ].
   cbn in Hi |-*.
-  destruct (f a); [ injection Hi; intros; subst i; flia Hp | easy ].
+  rewrite <- Nat.add_succ_comm in Hp.
+  remember (f a) as b eqn:Hb; symmetry in Hb.
+  destruct b. {
+    injection Hi; clear Hi; intros; subst j; flia Hp.
+  }
+  now apply IHk with (i := S i) (j := j).
+} {
+  remember (j - i) as k eqn:Hk.
+  replace j with (i + k) in Hi. 2: {
+    specialize (List_find_nth_loop_le f l i Hi) as H1.
+    flia Hk H1.
+  }
+  clear j Hk.
+  revert i l Hi.
+  induction k; intros. {
+    rewrite Nat.add_0_r in Hi.
+    revert i Hi.
+    induction l as [| a]; intros; [ easy | ].
+    cbn in Hi |-*.
+    remember (f a) as b eqn:Hb; symmetry in Hb.
+    destruct b; [ easy | exfalso ].
+    specialize (List_find_nth_loop_le f l (S i) Hi) as H1.
+    flia H1.
+  }
+  destruct l as [| a]; [ easy | ].
+  cbn in Hi |-*.
+  remember (f a) as b eqn:Hb; symmetry in Hb.
+  destruct b. {
+    injection Hi; clear Hi; intros Hi; flia Hi.
+  }
+  rewrite <- Nat.add_succ_comm in Hi.
+  now apply (IHk (S i)).
 }
-destruct l as [| a]; [ easy | ].
-cbn in Hi |-*.
-rewrite <- Nat.add_succ_comm in Hp.
-remember (f a) as b eqn:Hb; symmetry in Hb.
-destruct b. {
-  injection Hi; clear Hi; intros; subst j; flia Hp.
-}
-now apply IHk with (i := S i) (j := j).
 Qed.
-
-...
 
 Theorem List_find_nth_Some : ∀ A d f (l : list A) i,
-  List_find_nth f l = Some i → f (nth i l d) = true.
-Proof.
-intros * Hi.
-unfold List_find_nth in Hi.
-apply List_find_nth_loop_Some with (d := d) in Hi.
-now rewrite Nat.sub_0_r in Hi.
-Qed.
-
-Theorem List_find_nth_Some' : ∀ A d f (l : list A) i,
   List_find_nth f l = Some i
   → (∀ j, j < i → f (nth j l d) = false) ∧
     f (nth i l d) = true.
 Proof.
 intros * Hi.
-unfold List_find_nth in Hi.
-split. 2: {
-  apply List_find_nth_loop_Some with (d := d) in Hi.
-  now rewrite Nat.sub_0_r in Hi.
-}
+apply List_find_nth_loop_Some with (d := d) in Hi.
+rewrite Nat.sub_0_r in Hi.
+destruct Hi as (Hk, Hi).
+split; [ | easy ].
 intros j Hj.
-...
+specialize (Hk j).
+assert (H : 0 ≤ j < i) by flia Hj.
+specialize (Hk H); clear H.
+now rewrite Nat.sub_0_r in Hk.
 Qed.
-
-...
-
-Print find.
 
 Theorem glop : ∀ A d f (l : list A) i,
   List_find_nth f l = Some i
   → find f l = Some (nth i l d).
 Proof.
+intros * Hi.
+specialize (List_find_nth_Some d f l Hi) as H1.
+destruct H1 as (H1, H2).
+remember (find f l) as r eqn:Hr.
+symmetry in Hr.
+destruct r as [| j]. {
+  apply find_some in Hr.
+  destruct Hr as (Ha, Hfa).
+  f_equal.
+...
 intros * Hi.
 remember (find f l) as r eqn:Hr.
 symmetry in Hr.
