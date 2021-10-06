@@ -4166,10 +4166,17 @@ Theorem glop : ∀ A f d (v : vector A) i j,
   → f (vect_el d v j) = true.
 Proof.
 intros * Hvi Hj.
-induction i; [ easy | ].
+revert v j Hvi Hj.
+induction i; intros; [ easy | ].
 cbn in Hj.
 remember (f (vect_el d v i)) as b eqn:Hb; symmetry in Hb.
 destruct b; [ now injection Hj; clear Hj; intros; subst j | ].
+destruct (Nat.eq_dec (vect_size v) (S i)) as [Hvsi| Hvsi]. 2: {
+  apply IHi; [ | easy ].
+  flia Hvi Hvsi.
+}
+clear Hvi.
+Print vect_find_nth_loop.
 ...
 
 Theorem fun_betw_sym_gr : ∀ n (sg sg' : vector _),
