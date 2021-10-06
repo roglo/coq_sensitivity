@@ -283,14 +283,67 @@ Record sym_gr_vect n :=
 
 (* *)
 
+Fixpoint find_nth_loop i A (f : A → bool) (l : list A) :=
+  match l with
+  | [] => None
+  | x :: tl => if f x then Some i else find_nth_loop (S i) f tl
+end.
+
+Definition find_nth := find_nth_loop 0.
+
+Theorem glop : ∀ A d f (l : list A) i j,
+  find_nth_loop i f l = Some j
+  → f (nth j l d) = true.
+Proof.
+intros * Hi.
+revert i j Hi.
+induction l as [| a]; intros; [ easy | ].
+cbn in Hi.
+remember (f a) as b eqn:Hb; symmetry in Hb.
+destruct b. {
+  injection Hi; clear Hi; intros; subst i.
+  destruct j; [ easy | ].
+  cbn.
+  eapply IHl.
+...
+
+Theorem glop : ∀ A d f (l : list A) i,
+  find_nth f l = Some i → f (nth i l d) = true.
+Proof.
+intros * Hi.
+revert i Hi.
+induction l as [| a]; intros; [ easy | ].
+cbn in Hi.
+remember (f a) as b eqn:Hb; symmetry in Hb.
+destruct b. {
+  now injection Hi; clear Hi; intros; subst i.
+}
+destruct i. {
+  cbn.
+  destruct l as [| a1]; [ easy | ].
+  cbn in Hi.
+  remember (f a1) as b1 eqn:Hb1; symmetry in Hb1.
+  destruct b1; [ easy | ].
+...
+
 Fixpoint vect_find_nth_loop A (f : A → bool) i d (v : vector A) :=
   match i with
   | 0 => None
   | S j => if f (vect_el d v j) then Some j else vect_find_nth_loop f j d v
   end.
 
+...
+
 Definition vect_eqb A eqb (u v : vector A) :=
   list_eqb eqb (vect_list u) (vect_list v).
+
+Definition rank_of_permut_in_sym_gr (sg : vector (vector nat)) σ :=
+  match find (vect_eqb Nat.eqb σ) (vect_list sg) with
+  | Some i => i
+  | None => 0
+  end.
+
+...
 
 Definition rank_of_permut_in_sym_gr (sg : vector (vector nat)) σ :=
   match

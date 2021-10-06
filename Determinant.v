@@ -4158,6 +4158,10 @@ Theorem glop : ∀ sg σ,
   vect_el (mk_vect []) sg (rank_of_permut_in_sym_gr sg σ) = σ.
 Proof.
 intros.
+Print rank_of_permut_in_sym_gr.
+Print vect_find_nth_loop.
+Print find.
+...
 unfold rank_of_permut_in_sym_gr.
 Print vect_find_nth_loop.
 Theorem glop : ∀ A f d (v : vector A) i j,
