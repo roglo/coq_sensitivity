@@ -291,9 +291,9 @@ end.
 
 Definition find_nth := find_nth_loop 0.
 
-Theorem glop : ∀ A d f (l : list A) i j,
+Theorem find_nth_loop_le : ∀ A f (l : list A) i j,
   find_nth_loop i f l = Some j
-  → f (nth j l d) = true.
+  → i ≤ j.
 Proof.
 intros * Hi.
 revert i j Hi.
@@ -301,10 +301,53 @@ induction l as [| a]; intros; [ easy | ].
 cbn in Hi.
 remember (f a) as b eqn:Hb; symmetry in Hb.
 destruct b. {
+  now injection Hi; clear Hi; intros; subst i.
+}
+specialize (IHl (S i) j Hi).
+flia IHl.
+Qed.
+
+Theorem glop : ∀ A d f (l : list A) i j,
+  find_nth_loop i f l = Some j
+  → f (nth (j - i) l d) = true.
+Proof.
+intros * Hi.
+remember (j - i) as k eqn:Hk.
+replace j with (i + k) in Hi. 2: {
+  specialize (@find_nth_loop_le _ f l i j Hi) as H1.
+  flia Hk H1.
+}
+clear j Hk.
+revert i l Hi.
+induction k; intros. {
+  rewrite Nat.add_0_r in Hi.
+  destruct l as [| a]; [ easy | ].
+  cbn in Hi |-*.
+  remember (f a) as b eqn:Hb; symmetry in Hb.
+  destruct b; [ easy | exfalso ].
+  cbn in Hi.
+...
+intros * Hi.
+remember (j - i) as k eqn:Hk.
+replace j with (i + k) in Hi. 2: {
+  specialize (@find_nth_loop_le _ f l i j Hi) as H1.
+  flia Hk H1.
+}
+clear j Hk.
+revert i k Hi.
+induction l as [| a]; intros; [ easy | ].
+cbn in Hi.
+...
+intros * Hi.
+revert i j Hi.
+induction l as [| a]; intros; [ easy | ].
+cbn in Hi.
+remember (f a) as b eqn:Hb; symmetry in Hb.
+destruct b. {
   injection Hi; clear Hi; intros; subst i.
-  destruct j; [ easy | ].
-  cbn.
-  eapply IHl.
+  now rewrite Nat.sub_diag.
+}
+cbn.
 ...
 
 Theorem glop : ∀ A d f (l : list A) i,
