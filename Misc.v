@@ -1778,7 +1778,15 @@ symmetry in Hr.
 destruct r as [| j]. {
   apply find_some in Hr.
   destruct Hr as (Ha, Hfa).
+  apply (In_nth l a d) in Ha.
+  destruct Ha as (j & Hjl & Hj).
+  subst a.
   f_equal.
+  destruct (lt_dec j i) as [Hji| Hji]. {
+    specialize (H1 j Hji).
+    now rewrite H1 in Hfa.
+  }
+  apply Nat.nlt_ge in Hji.
 ...
 intros * Hi.
 remember (find f l) as r eqn:Hr.
