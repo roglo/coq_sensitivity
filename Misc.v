@@ -1728,10 +1728,46 @@ Qed.
 
 Theorem List_find_nth_loop_Some' : ∀ A d f (l : list A) i j,
   List_find_nth_loop i f l = Some j
-  → (∀ k, k < j → f (nth (k - i) l d) = false) ∧
+  → (∀ k, i ≤ k < j → f (nth (k - i) l d) = false) ∧
     f (nth (j - i) l d) = true.
 Proof.
 intros * Hi.
+remember (j - i) as k eqn:Hk.
+replace j with (i + k) in Hi |-*. 2: {
+  specialize (List_find_nth_loop_le f l i Hi) as H1.
+  flia Hk H1.
+}
+clear j Hk.
+revert i l Hi.
+induction k; intros. {
+  rewrite Nat.add_0_r in Hi.
+  revert i Hi.
+  induction l as [| a]; intros; [ easy | ].
+  cbn in Hi |-*.
+  remember (f a) as b eqn:Hb; symmetry in Hb.
+  destruct b. {
+    split; [ | easy ].
+    intros p Hp.
+    flia Hp.
+  }
+  exfalso.
+  specialize (List_find_nth_loop_le f l (S i) Hi) as H1.
+  flia H1.
+}
+destruct l as [| a]; [ easy | ].
+cbn in Hi.
+remember (f a) as b eqn:Hb; symmetry in Hb.
+destruct b. {
+  injection Hi; clear Hi; intros Hi; flia Hi.
+}
+rewrite <- Nat.add_succ_comm in Hi.
+specialize (IHk (S i) l Hi) as H1.
+destruct H1 as (H1, H2).
+split; [ | easy ].
+intros p Hp.
+...
+Qed.
+...
 split; [ | now apply List_find_nth_loop_Some ].
 intros p Hp.
 remember (j - i) as k eqn:Hk.
