@@ -283,16 +283,16 @@ Record sym_gr_vect n :=
 
 (* *)
 
-Fixpoint find_nth_loop i A (f : A → bool) (l : list A) :=
+Fixpoint List_find_nth_loop i A (f : A → bool) (l : list A) :=
   match l with
   | [] => None
-  | x :: tl => if f x then Some i else find_nth_loop (S i) f tl
+  | x :: tl => if f x then Some i else List_find_nth_loop (S i) f tl
 end.
 
-Definition find_nth := find_nth_loop 0.
+Definition List_find_nth := List_find_nth_loop 0.
 
-Theorem find_nth_loop_le : ∀ A f (l : list A) i j,
-  find_nth_loop i f l = Some j
+Theorem List_find_nth_loop_le : ∀ A f (l : list A) i j,
+  List_find_nth_loop i f l = Some j
   → i ≤ j.
 Proof.
 intros * Hi.
@@ -307,14 +307,14 @@ specialize (IHl (S i) j Hi).
 flia IHl.
 Qed.
 
-Theorem find_nth_loop_Some : ∀ A d f (l : list A) i j,
-  find_nth_loop i f l = Some j
+Theorem List_find_nth_loop_Some : ∀ A d f (l : list A) i j,
+  List_find_nth_loop i f l = Some j
   → f (nth (j - i) l d) = true.
 Proof.
 intros * Hi.
 remember (j - i) as k eqn:Hk.
 replace j with (i + k) in Hi. 2: {
-  specialize (@find_nth_loop_le _ f l i j Hi) as H1.
+  specialize (List_find_nth_loop_le f l i Hi) as H1.
   flia Hk H1.
 }
 clear j Hk.
@@ -326,7 +326,7 @@ induction k; intros. {
   cbn in Hi |-*.
   remember (f a) as b eqn:Hb; symmetry in Hb.
   destruct b; [ easy | exfalso ].
-  specialize (@find_nth_loop_le _ f l (S i) i Hi) as H1.
+  specialize (List_find_nth_loop_le f l (S i) Hi) as H1.
   flia H1.
 }
 destruct l as [| a]; [ easy | ].
@@ -339,12 +339,12 @@ rewrite <- Nat.add_succ_comm in Hi.
 now apply (IHk (S i)).
 Qed.
 
-Theorem find_nth_Some : ∀ A d f (l : list A) i,
-  find_nth f l = Some i → f (nth i l d) = true.
+Theorem List_find_nth_Some : ∀ A d f (l : list A) i,
+  List_find_nth f l = Some i → f (nth i l d) = true.
 Proof.
 intros * Hi.
-unfold find_nth in Hi.
-apply find_nth_loop_Some with (d := d) in Hi.
+unfold List_find_nth in Hi.
+apply List_find_nth_loop_Some with (d := d) in Hi.
 now rewrite Nat.sub_0_r in Hi.
 Qed.
 
