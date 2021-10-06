@@ -1732,12 +1732,13 @@ Theorem List_find_nth_loop_Some' : ∀ A d f (l : list A) i j,
     f (nth (j - i) l d) = true.
 Proof.
 intros * Hi.
-remember (j - i) as k eqn:Hk.
-replace j with (i + k) in Hi |-*. 2: {
-  specialize (List_find_nth_loop_le f l i Hi) as H1.
-  flia Hk H1.
-}
-clear j Hk.
+split; [ | now apply List_find_nth_loop_Some ].
+intros p Hp.
+remember (p - i) as k eqn:Hk.
+replace p with (i + k) in Hp by flia Hp Hk.
+destruct Hp as (_, Hp).
+clear p Hk.
+...
 revert i l Hi.
 induction k; intros. {
   rewrite Nat.add_0_r in Hi.
@@ -1765,6 +1766,10 @@ specialize (IHk (S i) l Hi) as H1.
 destruct H1 as (H1, H2).
 split; [ | easy ].
 intros p Hp.
+destruct i. {
+  rewrite Nat.sub_0_r.
+  destruct p; [ easy | ].
+  cbn.
 ...
 Qed.
 ...
