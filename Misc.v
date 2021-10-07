@@ -1683,14 +1683,14 @@ Theorem List_find_nth_loop_le : ∀ A f (l : list A) i j,
   → i ≤ j.
 Proof.
 intros * Hi.
-revert i j Hi.
+revert i Hi.
 induction l as [| a]; intros; [ easy | ].
 cbn in Hi.
 remember (f a) as b eqn:Hb; symmetry in Hb.
 destruct b. {
   now injection Hi; clear Hi; intros; subst i.
 }
-specialize (IHl (S i) j Hi).
+specialize (IHl (S i) Hi).
 flia IHl.
 Qed.
 
@@ -1706,7 +1706,7 @@ split. {
   replace p with (i + k) in Hp by flia Hp Hk.
   destruct Hp as (_, Hp).
   clear p Hk.
-  revert i j l Hi Hp.
+  revert i l Hi Hp.
   induction k; intros. {
     destruct l as [| a]; [ easy | ].
     cbn in Hi |-*.
@@ -1719,7 +1719,7 @@ split. {
   destruct b. {
     injection Hi; clear Hi; intros; subst j; flia Hp.
   }
-  now apply IHk with (i := S i) (j := j).
+  now apply IHk with (i := S i).
 } {
   remember (j - i) as k eqn:Hk.
   replace j with (i + k) in Hi. 2: {
@@ -1749,6 +1749,8 @@ split. {
 }
 Qed.
 
+...
+
 Theorem List_find_nth_Some : ∀ A d f (l : list A) i,
   List_find_nth f l = Some i
   → (∀ j, j < i → f (nth j l d) = false) ∧
@@ -1776,6 +1778,9 @@ destruct H1 as (H1, H2).
 remember (find f l) as r eqn:Hr.
 symmetry in Hr.
 destruct r as [| j]. {
+  f_equal; symmetry.
+Search (find _ _ = Some _).
+...
   apply find_some in Hr.
   destruct Hr as (Ha, Hfa).
   apply (In_nth l a d) in Ha.
@@ -1787,6 +1792,7 @@ destruct r as [| j]. {
     now rewrite H1 in Hfa.
   }
   apply Nat.nlt_ge in Hji.
+Check find_some.
 ...
 intros * Hi.
 remember (find f l) as r eqn:Hr.
