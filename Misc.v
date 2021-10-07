@@ -1777,6 +1777,32 @@ remember (find f l) as r eqn:Hr.
 symmetry in Hr.
 destruct r as [| j]. {
   f_equal; symmetry.
+  clear Hi.
+  revert a i H1 H2 Hr.
+  induction l as [| a1]; intros; [ easy | ].
+  cbn in Hr.
+  remember (f a1) as b eqn:Hb; symmetry in Hb.
+  destruct b. {
+    injection Hr; clear Hr; intros; subst a1.
+    clear IHl.
+    revert l H2 H1.
+    induction i; intros; [ easy | ].
+    cbn in H2 |-*.
+    specialize (H1 i (Nat.lt_succ_diag_r _)) as H3.
+    destruct i; cbn in H3; [ now rewrite Hb in H3 | ].
+...
+    apply IHl; [ | easy | ]. {
+      intros j Hj.
+      assert (H : S j < S (S i)) by flia Hj.
+      now specialize (H1 (S j) H); clear H.
+    }
+...
+    specialize (H1 i (Nat.lt_succ_diag_r _)).
+    destruct i. {
+      cbn in H1.
+      now rewrite Hb in H1.
+    }
+    cbn in H1.
 Search (find _ _ = Some _).
 ...
   apply find_some in Hr.
