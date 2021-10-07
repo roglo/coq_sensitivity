@@ -1749,8 +1749,6 @@ split. {
 }
 Qed.
 
-...
-
 Theorem List_find_nth_Some : ∀ A d f (l : list A) i,
   List_find_nth f l = Some i
   → (∀ j, j < i → f (nth j l d) = false) ∧
