@@ -283,83 +283,20 @@ Record sym_gr_vect n :=
 
 (* *)
 
-Fixpoint List_find_nth_loop i A (f : A → bool) (l : list A) :=
-  match l with
-  | [] => None
-  | x :: tl => if f x then Some i else List_find_nth_loop (S i) f tl
-end.
+Definition vect_eqb A eqb (u v : vector A) :=
+  list_eqb eqb (vect_list u) (vect_list v).
 
-Definition List_find_nth := List_find_nth_loop 0.
-
-Theorem List_find_nth_loop_le : ∀ A f (l : list A) i j,
-  List_find_nth_loop i f l = Some j
-  → i ≤ j.
-Proof.
-intros * Hi.
-revert i j Hi.
-induction l as [| a]; intros; [ easy | ].
-cbn in Hi.
-remember (f a) as b eqn:Hb; symmetry in Hb.
-destruct b. {
-  now injection Hi; clear Hi; intros; subst i.
-}
-specialize (IHl (S i) j Hi).
-flia IHl.
-Qed.
-
-Theorem List_find_nth_loop_Some : ∀ A d f (l : list A) i j,
-  List_find_nth_loop i f l = Some j
-  → f (nth (j - i) l d) = true.
-Proof.
-intros * Hi.
-remember (j - i) as k eqn:Hk.
-replace j with (i + k) in Hi. 2: {
-  specialize (List_find_nth_loop_le f l i Hi) as H1.
-  flia Hk H1.
-}
-clear j Hk.
-revert i l Hi.
-induction k; intros. {
-  rewrite Nat.add_0_r in Hi.
-  revert i Hi.
-  induction l as [| a]; intros; [ easy | ].
-  cbn in Hi |-*.
-  remember (f a) as b eqn:Hb; symmetry in Hb.
-  destruct b; [ easy | exfalso ].
-  specialize (List_find_nth_loop_le f l (S i) Hi) as H1.
-  flia H1.
-}
-destruct l as [| a]; [ easy | ].
-cbn in Hi |-*.
-remember (f a) as b eqn:Hb; symmetry in Hb.
-destruct b. {
-  injection Hi; clear Hi; intros Hi; flia Hi.
-}
-rewrite <- Nat.add_succ_comm in Hi.
-now apply (IHk (S i)).
-Qed.
-
-Theorem List_find_nth_Some : ∀ A d f (l : list A) i,
-  List_find_nth f l = Some i → f (nth i l d) = true.
-Proof.
-intros * Hi.
-unfold List_find_nth in Hi.
-apply List_find_nth_loop_Some with (d := d) in Hi.
-now rewrite Nat.sub_0_r in Hi.
-Qed.
+Definition rank_of_permut_in_sym_gr (sg : vector (vector nat)) σ :=
+  List_find_nth (vect_eqb Nat.eqb σ) (vect_list sg).
 
 ...
 
+(*
 Fixpoint vect_find_nth_loop A (f : A → bool) i d (v : vector A) :=
   match i with
   | 0 => None
   | S j => if f (vect_el d v j) then Some j else vect_find_nth_loop f j d v
   end.
-
-...
-
-Definition vect_eqb A eqb (u v : vector A) :=
-  list_eqb eqb (vect_list u) (vect_list v).
 
 Definition rank_of_permut_in_sym_gr (sg : vector (vector nat)) σ :=
   match find (vect_eqb Nat.eqb σ) (vect_list sg) with
@@ -376,14 +313,13 @@ Definition rank_of_permut_in_sym_gr (sg : vector (vector nat)) σ :=
   | Some i => i
   | None => 0
   end.
+*)
 
-(*
 Compute (mk_canon_sym_gr_vect 4).
 Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 4) (mk_vect [0;1;3;2])).
 Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 4) (mk_vect [2;3;0;1])).
 Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 4) (mk_vect [2;3;0])).
 Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 0) (mk_vect [2;3;0])).
-*)
 
 Theorem vect_eqb_eq : ∀ u v, vect_eqb Nat.eqb u v = true → u = v.
 Proof.
