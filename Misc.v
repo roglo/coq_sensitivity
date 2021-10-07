@@ -1784,80 +1784,19 @@ destruct r as [| j]. {
   remember (f a1) as b eqn:Hb; symmetry in Hb.
   destruct b. {
     injection Hr; clear Hr; intros; subst a1.
-    clear IHl.
-    revert a l H2 H1 Hb.
-    induction i; intros; [ easy | ].
-    cbn in H2 |-*.
-    specialize (H1 i (Nat.lt_succ_diag_r _)) as H3.
-    destruct i; cbn in H3; [ now rewrite Hb in H3 | ].
-    destruct l as [| a1]. {
-      now destruct i; cbn in H2, H3; rewrite H2 in H3.
-    }
-    cbn in H2 |-*.
-    apply IHi; [ easy | | easy ].
-    intros j Hj.
-...
-    specialize (H1 (S j)).
-    remember (a1 :: l) as l'; cbn in H1; subst l'.
-    assert (H : S j < S (S i)) by flia Hj.
-    specialize (H1 H); clear H.
-    destruct j; [ | easy ].
-    cbn in H1 |-*.
-    destruct i. 2: {
-      cbn in H3.
-...
-    apply IHl; [ | easy | ]. {
-      intros j Hj.
-      assert (H : S j < S (S i)) by flia Hj.
-      now specialize (H1 (S j) H); clear H.
-    }
-...
-    specialize (H1 i (Nat.lt_succ_diag_r _)).
-    destruct i. {
-      cbn in H1.
-      now rewrite Hb in H1.
-    }
-    cbn in H1.
-Search (find _ _ = Some _).
-...
-  apply find_some in Hr.
-  destruct Hr as (Ha, Hfa).
-  apply (In_nth l a d) in Ha.
-  destruct Ha as (j & Hjl & Hj).
-  subst a.
-  f_equal.
-  destruct (lt_dec j i) as [Hji| Hji]. {
-    specialize (H1 j Hji).
-    now rewrite H1 in Hfa.
+    destruct i; [ easy | cbn ].
+    specialize (H1 0 (Nat.lt_0_succ _)) as H3.
+    cbn in H3.
+    now rewrite Hb in H3.
   }
-  apply Nat.nlt_ge in Hji.
-Check find_some.
-...
-intros * Hi.
-remember (find f l) as r eqn:Hr.
-symmetry in Hr.
-destruct r as [| j]. {
-  apply find_some in Hr.
-  destruct Hr as (Ha, Hfa).
-  f_equal.
-...
-  apply List_find_nth_Some with (d := d) in Hi.
-...
-intros * Hi.
-(*
-apply List_find_nth_Some with (d := d) in Hi.
-*)
-revert i Hi.
-induction l as [| a]; intros; [ easy | ].
-cbn in Hi.
-cbn - [ nth ].
-remember (f a) as b eqn:Hb; symmetry in Hb.
-destruct b. {
-  now injection Hi; clear Hi; intros; subst i.
+  destruct i; [ now cbn in H2; rewrite H2 in Hb | ].
+  cbn in H2 |-*.
+  apply IHl; [ | easy | easy ].
+  intros j Hj.
+  specialize (H1 (S j)).
+  assert (H : S j < S i) by flia Hj.
+  now specialize (H1 H); clear H.
 }
-destruct i. {
-  cbn.
-Search find.
 ...
 
 (* end List_find_nth *)
