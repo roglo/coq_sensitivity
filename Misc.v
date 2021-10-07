@@ -1767,27 +1767,44 @@ specialize (Hk H); clear H.
 now rewrite Nat.sub_0_r in Hk.
 Qed.
 
+Theorem List_find_nth_loop_None : ∀ A (d : A) f l i,
+  List_find_nth_loop i f l = None
+  → ∀ j, i ≤ j < i + length l
+  → f (nth (j - i) l d) = false.
+Proof.
+intros * Hi p Hp.
+remember (p - i) as k eqn:Hk.
+replace p with (i + k) in Hp by flia Hp Hk.
+destruct Hp as (_, Hp).
+Search (_ + _ < _ + _).
+apply Nat.add_lt_mono_l in Hp.
+clear p Hk.
+revert i l Hi Hp.
+induction k; intros. {
+  destruct l as [| a]; [ easy | ].
+  cbn in Hi |-*.
+  now destruct (f a).
+}
+destruct l as [| a]; [ easy | ].
+cbn in Hi, Hp |-*.
+apply Nat.succ_lt_mono in Hp.
+remember (f a) as b eqn:Hb; symmetry in Hb.
+destruct b; [ easy | ].
+now apply IHk with (i := S i).
+Qed.
+
 Theorem List_find_nth_None : ∀ A d f (l : list A),
   List_find_nth f l = None
   → ∀ j, j < length l
   → f (nth j l d) = false.
 Proof.
 intros * Hi j Hj.
-revert j Hj.
-induction l as [| a]; intros; [ easy | ].
-destruct j. {
-  cbn in Hi |-*.
-  now destruct (f a).
-}
-cbn in Hi, Hj |-*.
-apply Nat.succ_lt_mono in Hj.
-remember (f a) as b eqn:Hb; symmetry in Hb.
-destruct b; [ easy | ].
-...
-destruct l as [| b]; [ easy | ].
-cbn in Hi, Hj.
-apply IHl; [ | easy ].
-...
+specialize (List_find_nth_loop_None d f l Hi) as H1.
+specialize (H1 j).
+rewrite Nat.sub_0_r in H1.
+apply H1.
+split; [ flia | easy ].
+Qed.
 
 Theorem List_find_nth_find : ∀ A d f (l : list A) i,
   List_find_nth f l = Some i
