@@ -4167,6 +4167,21 @@ destruct i as [i| ]. {
   destruct H1 as (H1, H2).
   now apply vect_eqb_eq in H2.
 } {
+  specialize (List_find_nth_None (mk_vect []) (vect_eqb Nat.eqb σ)) as H1.
+  specialize (H1 (vect_list sg) Hi).
+...
+About vect_eqb_eq.
+Theorem vect_eqb_neq : ∀ u v : vector nat,
+  vect_eqb Nat.eqb u v = false → u ≠ v.
+Proof.
+Admitted.
+specialize (H1 0).
+assert (H : 0 < length (vect_list sg)) by admit.
+specialize (H1 H); clear H.
+apply vect_eqb_neq in H1.
+unfold vect_el.
+...
+  specialize (List_find_nth_None (mk_vect []) sg) as H1.
 ...
   apply List_find_nth_None in Hi.
 ...
