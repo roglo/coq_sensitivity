@@ -287,39 +287,15 @@ Definition vect_eqb A eqb (u v : vector A) :=
   list_eqb eqb (vect_list u) (vect_list v).
 
 Definition rank_of_permut_in_sym_gr (sg : vector (vector nat)) σ :=
-  List_find_nth (vect_eqb Nat.eqb σ) (vect_list sg).
-
-...
+  unsome 0 (List_find_nth (vect_eqb Nat.eqb σ) (vect_list sg)).
 
 (*
-Fixpoint vect_find_nth_loop A (f : A → bool) i d (v : vector A) :=
-  match i with
-  | 0 => None
-  | S j => if f (vect_el d v j) then Some j else vect_find_nth_loop f j d v
-  end.
-
-Definition rank_of_permut_in_sym_gr (sg : vector (vector nat)) σ :=
-  match find (vect_eqb Nat.eqb σ) (vect_list sg) with
-  | Some i => i
-  | None => 0
-  end.
-
-...
-
-Definition rank_of_permut_in_sym_gr (sg : vector (vector nat)) σ :=
-  match
-    vect_find_nth_loop (vect_eqb Nat.eqb σ) (vect_size sg) (mk_vect []) sg
-  with
-  | Some i => i
-  | None => 0
-  end.
-*)
-
 Compute (mk_canon_sym_gr_vect 4).
 Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 4) (mk_vect [0;1;3;2])).
 Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 4) (mk_vect [2;3;0;1])).
 Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 4) (mk_vect [2;3;0])).
 Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 0) (mk_vect [2;3;0])).
+*)
 
 Theorem vect_eqb_eq : ∀ u v, vect_eqb Nat.eqb u v = true → u = v.
 Proof.

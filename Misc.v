@@ -2311,6 +2311,12 @@ Qed.
 
 (* end list_eqb *)
 
+Definition unsome A (d : A) o :=
+  match o with
+  | Some x => x
+  | None => d
+  end.
+
 Theorem not_equiv_imp_False : ∀ P : Prop, (P → False) ↔ ¬ P.
 Proof. easy. Qed.
 
