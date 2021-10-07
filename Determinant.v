@@ -4181,8 +4181,6 @@ destruct i as [i| ]. {
   }
   clear H1.
   destruct Hsg as (Hsg & Hsg1 & Hsg2 & Hsg3).
-(* question subsidiaire : est-ce que Hsg3 n'impliquerait pas Hsg1,
-   par hasard ? *)
   destruct Hσ as (Hs & Hσ1 & Hσ2).
 ...
 cbn in H0.
