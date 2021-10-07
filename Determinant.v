@@ -4154,21 +4154,30 @@ destruct Hσ' as (H3, H4).
 ...
 *)
 
-Theorem glop : ∀ sg σ,
-  vect_el (mk_vect []) sg (rank_of_permut_in_sym_gr sg σ) = σ.
+Theorem glop : ∀ n sg σ,
+  is_sym_gr_vect n sg
+  → is_permut_vect n σ
+  → vect_el (mk_vect []) sg (rank_of_permut_in_sym_gr sg σ) = σ.
 Proof.
-intros.
+intros * Hsg Hσ.
 unfold rank_of_permut_in_sym_gr.
 unfold unsome.
 remember (List_find_nth _ _) as i eqn:Hi; symmetry in Hi.
 destruct i as [i| ]. {
+  clear Hsg Hσ.
   specialize (List_find_nth_Some (mk_vect []) (vect_eqb Nat.eqb σ)) as H1.
   specialize (H1 (vect_list sg) i Hi).
   destruct H1 as (H1, H2).
   now apply vect_eqb_eq in H2.
 } {
+  exfalso.
   specialize (List_find_nth_None (mk_vect []) (vect_eqb Nat.eqb σ)) as H1.
   specialize (H1 (vect_list sg) Hi).
+  destruct Hsg as (Hsg & Hsg1 & Hsg2).
+  destruct Hsg2 as (Hsg2, Hsg3).
+  destruct Hσ as (Hs & Hσ1 & Hσ2).
+...
+cbn in H0.
 ...
 About vect_eqb_eq.
 Theorem vect_eqb_neq : ∀ u v : vector nat,
