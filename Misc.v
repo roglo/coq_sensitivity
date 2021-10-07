@@ -1678,9 +1678,9 @@ end.
 
 Definition List_find_nth := List_find_nth_loop 0.
 
-Theorem List_find_nth_loop_le : ∀ A f (l : list A) i j,
+Theorem List_find_nth_loop_interv : ∀ A f (l : list A) i j,
   List_find_nth_loop i f l = Some j
-  → i ≤ j.
+  → i ≤ j < i + length l.
 Proof.
 intros * Hi.
 revert i Hi.
@@ -1688,10 +1688,11 @@ induction l as [| a]; intros; [ easy | ].
 cbn in Hi.
 remember (f a) as b eqn:Hb; symmetry in Hb.
 destruct b. {
-  now injection Hi; clear Hi; intros; subst i.
+  injection Hi; clear Hi; intros; subst i.
+  cbn; flia.
 }
 specialize (IHl (S i) Hi).
-flia IHl.
+cbn; flia IHl.
 Qed.
 
 Theorem List_find_nth_loop_Some : ∀ A d f (l : list A) i j,
@@ -1723,7 +1724,7 @@ split. {
 } {
   remember (j - i) as k eqn:Hk.
   replace j with (i + k) in Hi. 2: {
-    specialize (List_find_nth_loop_le f l i Hi) as H1.
+    specialize (List_find_nth_loop_interv f l i Hi) as H1.
     flia Hk H1.
   }
   clear j Hk.
@@ -1735,7 +1736,7 @@ split. {
     cbn in Hi |-*.
     remember (f a) as b eqn:Hb; symmetry in Hb.
     destruct b; [ easy | exfalso ].
-    specialize (List_find_nth_loop_le f l (S i) Hi) as H1.
+    specialize (List_find_nth_loop_interv f l (S i) Hi) as H1.
     flia H1.
   }
   destruct l as [| a]; [ easy | ].
@@ -1775,7 +1776,7 @@ specialize (List_find_nth_Some d f l Hi) as H1.
 destruct H1 as (H1, H2).
 remember (find f l) as r eqn:Hr.
 symmetry in Hr.
-destruct r as [| j]. {
+destruct r as [a| ]. {
   f_equal; symmetry.
   clear Hi.
   revert a i H1 H2 Hr.
@@ -1807,17 +1808,10 @@ destruct r as [| j]. {
   }
   apply Nat.nlt_ge in Hil.
   rewrite nth_overflow in H2; [ | easy ].
-Check List_find_nth_loop_le.
-  specialize (List_find_nth_loop_le _ _ _ Hi) as H4.
-...
-
-  destruct i. {
-    apply Nat.le_0_r in Hil.
-    now apply length_zero_iff_nil in Hil; subst l.
-  }
-
-specialize (H1 i (Nat.lt_succ_diag_r _)) as H4.
-...
+  specialize (List_find_nth_loop_interv _ _ _ Hi) as H4.
+  flia Hil H4.
+}
+Qed.
 
 (* end List_find_nth *)
 
