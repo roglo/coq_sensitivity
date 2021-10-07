@@ -1785,11 +1785,26 @@ destruct r as [| j]. {
   destruct b. {
     injection Hr; clear Hr; intros; subst a1.
     clear IHl.
-    revert l H2 H1.
+    revert a l H2 H1 Hb.
     induction i; intros; [ easy | ].
     cbn in H2 |-*.
     specialize (H1 i (Nat.lt_succ_diag_r _)) as H3.
     destruct i; cbn in H3; [ now rewrite Hb in H3 | ].
+    destruct l as [| a1]. {
+      now destruct i; cbn in H2, H3; rewrite H2 in H3.
+    }
+    cbn in H2 |-*.
+    apply IHi; [ easy | | easy ].
+    intros j Hj.
+...
+    specialize (H1 (S j)).
+    remember (a1 :: l) as l'; cbn in H1; subst l'.
+    assert (H : S j < S (S i)) by flia Hj.
+    specialize (H1 H); clear H.
+    destruct j; [ | easy ].
+    cbn in H1 |-*.
+    destruct i. 2: {
+      cbn in H3.
 ...
     apply IHl; [ | easy | ]. {
       intros j Hj.
