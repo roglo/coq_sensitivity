@@ -18,6 +18,8 @@ Definition vect_of_list {T} (l : list T) : vector T :=
 Definition list_of_vect {T} (v : vector T) :=
   vect_list v.
 
+Definition empty_vect {A} : vector A := mk_vect [].
+
 Definition vect_size {T} (v : vector T) := length (vect_list v).
 
 Theorem fold_vect_size {T} : ∀ (V : vector T),

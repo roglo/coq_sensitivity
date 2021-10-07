@@ -2348,6 +2348,14 @@ destruct H1; f_equal.
 now apply IHla.
 Qed.
 
+Theorem list_eqb_neq : ∀ la lb, list_eqb Nat.eqb la lb = false → la ≠ lb.
+Proof.
+intros * Hab H; subst lb.
+induction la as [| a]; [ easy | cbn in Hab ].
+rewrite Nat.eqb_refl in Hab.
+congruence.
+Qed.
+
 (* end list_eqb *)
 
 Definition unsome A (d : A) o :=

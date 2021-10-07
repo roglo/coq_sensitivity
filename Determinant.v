@@ -4157,7 +4157,7 @@ destruct Hσ' as (H3, H4).
 Theorem glop : ∀ n sg σ,
   is_sym_gr_vect n sg
   → is_permut_vect n σ
-  → vect_el (mk_vect []) sg (rank_of_permut_in_sym_gr sg σ) = σ.
+  → vect_el empty_vect sg (rank_of_permut_in_sym_gr sg σ) = σ.
 Proof.
 intros * Hsg Hσ.
 unfold rank_of_permut_in_sym_gr.
@@ -4165,14 +4165,22 @@ unfold unsome.
 remember (List_find_nth _ _) as i eqn:Hi; symmetry in Hi.
 destruct i as [i| ]. {
   clear Hsg Hσ.
-  specialize (List_find_nth_Some (mk_vect []) (vect_eqb Nat.eqb σ)) as H1.
+  specialize (List_find_nth_Some empty_vect (vect_eqb Nat.eqb σ)) as H1.
   specialize (H1 (vect_list sg) i Hi).
   destruct H1 as (H1, H2).
   now apply vect_eqb_eq in H2.
 } {
   exfalso.
-  specialize (List_find_nth_None (mk_vect []) (vect_eqb Nat.eqb σ)) as H1.
+  specialize (List_find_nth_None empty_vect (vect_eqb Nat.eqb σ)) as H1.
   specialize (H1 (vect_list sg) Hi).
+  assert
+    (Hjσ : ∀ j, j < length (vect_list sg) → σ ≠ vect_el empty_vect sg j). {
+    intros j Hj.
+    apply vect_eqb_neq.
+    now apply H1.
+  }
+  clear H1.
+...
   destruct Hsg as (Hsg & Hsg1 & Hsg2).
   destruct Hsg2 as (Hsg2, Hsg3).
   destruct Hσ as (Hs & Hσ1 & Hσ2).
@@ -4190,7 +4198,7 @@ specialize (H1 H); clear H.
 apply vect_eqb_neq in H1.
 unfold vect_el.
 ...
-  specialize (List_find_nth_None (mk_vect []) sg) as H1.
+  specialize (List_find_nth_None empty_vect sg) as H1.
 ...
   apply List_find_nth_None in Hi.
 ...
@@ -4244,10 +4252,10 @@ Theorem fun_betw_sym_gr : ∀ n (sg sg' : vector _),
   → is_sym_gr_vect n sg
   → is_sym_gr_vect n sg'
   → { f | ∀ i, i < n! →
-      vect_el (mk_vect []) sg (f i) = vect_el (mk_vect []) sg' i }.
+      vect_el empty_vect sg (f i) = vect_el empty_vect sg' i }.
 Proof.
 intros * Hnz Hsg Hsg'.
-exists (λ i, rank_of_permut_in_sym_gr sg (vect_el (mk_vect []) sg' i)).
+exists (λ i, rank_of_permut_in_sym_gr sg (vect_el empty_vect sg' i)).
 intros i Hi.
 Theorem rank_of_permut_in_sym_gr_enough_iter : ∀ it sg σ,
   vect_size sg ≤ it
@@ -4270,7 +4278,7 @@ destruct (Nat.eq_dec (vect_size sg) (S it)) as [Hs| Hs]. {
 }
 assert (H : vect_size sg ≤ it) by flia Hit Hs.
 specialize (IHit H); clear H.
-remember (vect_eqb Nat.eqb σ (vect_el (mk_vect []) sg it)) as b eqn:Hb.
+remember (vect_eqb Nat.eqb σ (vect_el empty_vect sg it)) as b eqn:Hb.
 symmetry in Hb.
 destruct b; [ | apply IHit ].
 apply vect_eqb_eq in Hb.
@@ -4303,7 +4311,7 @@ apply IHs.
 
 specialize (rank_of_permut_in_sym_gr_enough_iter) as H1.
 specialize (H1 (s + m) sg).
-remember (vect_el (mk_vect []) sg' i) as σ eqn:Hσ.
+remember (vect_el empty_vect sg' i) as σ eqn:Hσ.
 specialize (H1 σ).
 ...
 
@@ -4374,9 +4382,9 @@ Theorem det_by_any_sym_gr :
   → is_sym_gr_vect n σ
   → determinant n M =
     ∑ (k = 0, n! - 1),
-    ε n (vect_el (mk_vect []) σ k) *
+    ε n (vect_el empty_vect σ k) *
     ∏ (i = 1, n),
-    mat_el M (i - 1) (vect_el 0%nat (vect_el (mk_vect []) σ k) (i - 1)).
+    mat_el M (i - 1) (vect_el 0%nat (vect_el empty_vect σ k) (i - 1)).
 Proof.
 intros Hic Hop Hiv Hit H10 Hed Hch * Hnz Hsm Hσ.
 rewrite det_is_det_by_canon_permut; try easy.
@@ -4386,9 +4394,9 @@ specialize rngl_summation_change_var as H1.
 specialize (H1 nat 0 (n! - 1)).
 set
   (f := λ k,
-   (ε n (vect_el (mk_vect []) σ' k) *
+   (ε n (vect_el empty_vect σ' k) *
     ∏ (i = 1, n),
-    mat_el M (i - 1) (vect_el 0%nat (vect_el (mk_vect []) σ' k) (i - 1)))%F).
+    mat_el M (i - 1) (vect_el 0%nat (vect_el empty_vect σ' k) (i - 1)))%F).
 specialize (H1 f).
 subst f.
 cbn in H1.

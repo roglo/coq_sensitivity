@@ -44,7 +44,7 @@ Definition is_permut f n :=
 Definition vect_nat_el (V : vector nat) i := nth i (vect_list V) 0.
 *)
 Definition vect_vect_nat_el (V : vector (vector nat)) i : vector nat :=
-  nth i (vect_list V) (mk_vect []).
+  nth i (vect_list V) empty_vect.
 
 Definition is_permut_vect n (σ : vector nat) :=
   vect_size σ = n ∧ is_permut (vect_el 0 σ) n.
@@ -274,8 +274,8 @@ Definition is_sym_gr n (f : nat → nat → nat) :=
 
 Definition is_sym_gr_vect n (sg : vector (vector nat)) :=
   vect_size sg = n! ∧
-  (∀ i, i < n! → vect_size (vect_el (mk_vect []) sg i) = n) ∧
-  is_sym_gr n (λ i, vect_el 0 (vect_el (mk_vect []) sg i)).
+  (∀ i, i < n! → vect_size (vect_el empty_vect sg i) = n) ∧
+  is_sym_gr n (λ i, vect_el 0 (vect_el empty_vect sg i)).
 
 Record sym_gr_vect n :=
   { sg_vect : vector (vector nat);
@@ -305,6 +305,17 @@ destruct u as (u).
 destruct v as (v).
 cbn in Huv; f_equal.
 now apply list_eqb_eq.
+Qed.
+
+Theorem vect_eqb_neq : ∀ u v, vect_eqb Nat.eqb u v = false → u ≠ v.
+Proof.
+intros * Huv.
+destruct u as (u).
+destruct v as (v).
+intros H.
+injection H; clear H; intros H.
+revert H.
+now apply list_eqb_neq.
 Qed.
 
 (* rank in canon symmetric group *)
