@@ -4158,11 +4158,18 @@ Theorem glop : ∀ sg σ,
   vect_el (mk_vect []) sg (rank_of_permut_in_sym_gr sg σ) = σ.
 Proof.
 intros.
-Print rank_of_permut_in_sym_gr.
-Print vect_find_nth_loop.
-Print find.
-...
 unfold rank_of_permut_in_sym_gr.
+unfold unsome.
+remember (List_find_nth _ _) as i eqn:Hi; symmetry in Hi.
+destruct i as [i| ]. {
+  specialize (List_find_nth_Some (mk_vect []) (vect_eqb Nat.eqb σ)) as H1.
+  specialize (H1 (vect_list sg) i Hi).
+  destruct H1 as (H1, H2).
+  now apply vect_eqb_eq in H2.
+} {
+...
+  apply List_find_nth_None in Hi.
+...
 Print vect_find_nth_loop.
 Theorem glop : ∀ A f d (v : vector A) i j,
   vect_size v ≤ i

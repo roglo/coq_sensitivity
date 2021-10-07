@@ -1767,7 +1767,29 @@ specialize (Hk H); clear H.
 now rewrite Nat.sub_0_r in Hk.
 Qed.
 
-Theorem glop : ∀ A d f (l : list A) i,
+Theorem List_find_nth_None : ∀ A d f (l : list A),
+  List_find_nth f l = None
+  → ∀ j, j < length l
+  → f (nth j l d) = false.
+Proof.
+intros * Hi j Hj.
+revert j Hj.
+induction l as [| a]; intros; [ easy | ].
+destruct j. {
+  cbn in Hi |-*.
+  now destruct (f a).
+}
+cbn in Hi, Hj |-*.
+apply Nat.succ_lt_mono in Hj.
+remember (f a) as b eqn:Hb; symmetry in Hb.
+destruct b; [ easy | ].
+...
+destruct l as [| b]; [ easy | ].
+cbn in Hi, Hj.
+apply IHl; [ | easy ].
+...
+
+Theorem List_find_nth_find : ∀ A d f (l : list A) i,
   List_find_nth f l = Some i
   → find f l = Some (nth i l d).
 Proof.
