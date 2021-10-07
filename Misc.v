@@ -1796,7 +1796,27 @@ destruct r as [| j]. {
   specialize (H1 (S j)).
   assert (H : S j < S i) by flia Hj.
   now specialize (H1 H); clear H.
-}
+} {
+  exfalso.
+  specialize (find_none _ _ Hr) as H3.
+  destruct (lt_dec i (length l)) as [Hil| Hil]. {
+    specialize (H3 (nth i l d)).
+    apply nth_In with (d := d) in Hil.
+    specialize (H3 Hil).
+    now rewrite H2 in H3.
+  }
+  apply Nat.nlt_ge in Hil.
+  rewrite nth_overflow in H2; [ | easy ].
+Check List_find_nth_loop_le.
+  specialize (List_find_nth_loop_le _ _ _ Hi) as H4.
+...
+
+  destruct i. {
+    apply Nat.le_0_r in Hil.
+    now apply length_zero_iff_nil in Hil; subst l.
+  }
+
+specialize (H1 i (Nat.lt_succ_diag_r _)) as H4.
 ...
 
 (* end List_find_nth *)
