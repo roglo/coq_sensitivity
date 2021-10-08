@@ -4155,10 +4155,30 @@ destruct Hσ' as (H3, H4).
 *)
 
 Theorem length_filter_sym_gr : ∀ n sg i,
-  is_sym_gr_vect (S n) sg
+  i ≤ n
+  → is_sym_gr_vect (S n) sg
   → length (filter (λ v, vect_el 0 v 0 =? i) (vect_list sg)) = n!.
 Proof.
-intros * Hsg.
+intros * Hin Hsg.
+revert sg i Hsg Hin.
+induction n; intros. {
+  apply Nat.le_0_r in Hin; subst i.
+  destruct Hsg as (Hsg & Hsg1 & Hsg2 & Hsg3).
+  destruct sg as (ll); cbn in Hsg |-*.
+  destruct ll as [| la]; [ easy | ].
+  destruct ll; [ clear Hsg; cbn | easy ].
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (vect_el 0 la 0) 0) as [Hi| Hi]; [ easy | exfalso ].
+  apply Hi; clear Hi.
+  cbn - [ vect_el ] in Hsg1, Hsg2, Hsg3.
+  specialize (Hsg1 0 Nat.lt_0_1).
+  cbn in Hsg1.
+  specialize (Hsg3 0 Nat.lt_0_1).
+  cbn in Hsg3.
+  destruct Hsg3 as (H1, H2).
+  specialize (H1 0 Nat.lt_0_1).
+  now apply Nat.lt_1_r in H1.
+}
 ...
 
 Theorem glop : ∀ n sg σ,
