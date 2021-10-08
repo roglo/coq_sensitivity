@@ -1776,7 +1776,6 @@ intros * Hi p Hp.
 remember (p - i) as k eqn:Hk.
 replace p with (i + k) in Hp by flia Hp Hk.
 destruct Hp as (_, Hp).
-Search (_ + _ < _ + _).
 apply Nat.add_lt_mono_l in Hp.
 clear p Hk.
 revert i l Hi Hp.
