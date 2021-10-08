@@ -4187,6 +4187,10 @@ induction n; intros. {
 }
 (* create an sg of size n! from sg by removing all permutations but
    the ones starting with n, and removing in them this initial n *)
+set (ll1 := filter (λ v, vect_el 0 v 0 =? n) (vect_list sg)).
+set (ll2 := map (λ v, mk_vect (map (λ i, vect_el 0 v (S i)) (seq 0 n))) ll1).
+set (sg' := mk_vect ll2).
+specialize (IHn sg') as H1.
 ...
 destruct sg as (lv).
 cbn in Hsσg.
