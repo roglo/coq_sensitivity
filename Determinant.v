@@ -4188,9 +4188,18 @@ induction n; intros. {
 (* create an sg of size n! from sg by removing all permutations but
    the ones starting with n, and removing in them this initial n *)
 set (ll1 := filter (λ v, vect_el 0 v 0 =? n) (vect_list sg)).
-set (ll2 := map (λ v, mk_vect (map (λ i, vect_el 0 v (S i)) (seq 0 n))) ll1).
+set (ll2 := map (λ v, mk_vect (map (λ i, vect_el 0 v (S i)) (seq 0 n!))) ll1).
 set (sg' := mk_vect ll2).
 specialize (IHn sg') as H1.
+set (k := unsome 0 (List_find_nth (Nat.eqb n) (vect_list σ))).
+set (l := map (λ i, vect_el 0 σ (if lt_dec i n then i else S i)) (seq 0 n)).
+set (σ' := mk_vect l).
+specialize (H1 σ').
+assert (H : is_sym_gr_vect n sg'). {
+  split. {
+    unfold sg', ll2, ll1; cbn.
+    rewrite map_length.
+Search (length (filter _ _)).
 ...
 destruct sg as (lv).
 cbn in Hsσg.
