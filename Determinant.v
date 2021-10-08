@@ -4154,6 +4154,13 @@ destruct Hσ' as (H3, H4).
 ...
 *)
 
+Theorem length_filter_sym_gr : ∀ n sg i,
+  is_sym_gr_vect (S n) sg
+  → length (filter (λ v, vect_el 0 v 0 =? i) (vect_list sg)) = n!.
+Proof.
+intros * Hsg.
+...
+
 Theorem glop : ∀ n sg σ,
   is_sym_gr_vect n sg
   → is_permut_vect n σ
@@ -4200,6 +4207,9 @@ assert (H : is_sym_gr_vect n sg'). {
     unfold sg', ll2, ll1; cbn.
     rewrite map_length.
     destruct Hsg as (Hsg & Hsg1 & Hsg2 & Hsg3).
+...
+now apply length_filter_sym_gr.
+...
 Search (length (filter _ _)).
 ...
 destruct sg as (lv).
