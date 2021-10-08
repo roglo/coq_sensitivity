@@ -4199,6 +4199,7 @@ assert (H : is_sym_gr_vect n sg'). {
   split. {
     unfold sg', ll2, ll1; cbn.
     rewrite map_length.
+    destruct Hsg as (Hsg & Hsg1 & Hsg2 & Hsg3).
 Search (length (filter _ _)).
 ...
 destruct sg as (lv).
