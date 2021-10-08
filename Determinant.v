@@ -4162,6 +4162,15 @@ Theorem glop : ∀ n sg σ,
 Proof.
 intros * Hsg Hσ Hsσg.
 ...
+destruct sg as (lv).
+cbn in Hsσg.
+destruct Hsg as (Hsg & Hsg1 & Hsg2 & Hsg3).
+cbn in Hsg, Hsg1, Hsg2, Hsg3.
+destruct σ as (l).
+destruct Hσ as (Hs & Hσ1 & Hσ2).
+cbn in Hs, Hσ1, Hσ2.
+rewrite Hsg in Hsσg.
+...
 
 Theorem glop : ∀ n sg σ,
   is_sym_gr_vect n sg
