@@ -4161,6 +4161,32 @@ Theorem glop : ∀ n sg σ,
   → False.
 Proof.
 intros * Hsg Hσ Hsσg.
+revert sg σ Hsg Hσ Hsσg.
+induction n; intros. {
+  destruct Hsg as (Hsg & Hsg1 & Hsg2 & Hsg3).
+  destruct Hσ as (Hs & Hσ1 & Hσ2).
+  specialize (Hsg1 0 Nat.lt_0_1).
+  specialize (Hsσg 0).
+  assert (H : 0 < length (vect_list sg)). {
+    unfold vect_size in Hsg.
+    rewrite Hsg; cbn; flia.
+  }
+  specialize (Hsσg H); clear H.
+  apply Hsσg.
+  destruct σ as (l).
+  destruct sg as (lv).
+  cbn in Hsg, Hs |-*.
+  apply length_zero_iff_nil in Hs; subst l.
+  destruct lv as [| v]; [ easy | ].
+  destruct lv as [| v1]; [ | easy ].
+  cbn in Hsg1.
+  unfold vect_size in Hsg1.
+  apply length_zero_iff_nil in Hsg1.
+  destruct v as (l').
+  now cbn in Hsg1; subst l'.
+}
+(* create an sg of size n! from sg by removing all permutations but
+   the ones starting with n, and removing in them this initial n *)
 ...
 destruct sg as (lv).
 cbn in Hsσg.
