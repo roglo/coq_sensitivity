@@ -4179,6 +4179,8 @@ induction n; intros. {
   specialize (H1 0 Nat.lt_0_1).
   now apply Nat.lt_1_r in H1.
 }
+(* peut-être généraliser en considérant, non pas (n+1)! vers n! mais
+   m vers m/(n+1), quel que soit m ? *)
 ...
 
 Theorem glop : ∀ n sg σ,
