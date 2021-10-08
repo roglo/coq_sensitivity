@@ -4157,6 +4157,15 @@ destruct Hσ' as (H3, H4).
 Theorem glop : ∀ n sg σ,
   is_sym_gr_vect n sg
   → is_permut_vect n σ
+  → (∀ j, j < length (vect_list sg) → σ ≠ vect_el empty_vect sg j)
+  → False.
+Proof.
+intros * Hsg Hσ Hsσg.
+...
+
+Theorem glop : ∀ n sg σ,
+  is_sym_gr_vect n sg
+  → is_permut_vect n σ
   → vect_el empty_vect sg (rank_of_permut_in_sym_gr sg σ) = σ.
 Proof.
 intros * Hsg Hσ.
@@ -4180,6 +4189,8 @@ destruct i as [i| ]. {
     now apply H1.
   }
   clear H1.
+  clear Hi.
+...
   destruct Hsg as (Hsg & Hsg1 & Hsg2 & Hsg3).
   destruct Hσ as (Hs & Hσ1 & Hσ2).
 ...
