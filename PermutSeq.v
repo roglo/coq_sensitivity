@@ -270,8 +270,10 @@ Definition is_sym_gr n (f : nat → nat → nat) :=
   (∀ i, i < n! → is_permut_fun (f i) n).
 
 Definition is_sym_gr_vect n (vv : vector (vector nat)) :=
-  (∀ i, is_permut_vect n (vect_el empty_vect vv i)) ∧
-  (∀ i j, vect_el empty_vect vv i = vect_el empty_vect vv j → i = j) ∧
+  (∀ i, i < vect_size vv →
+   is_permut_vect n (vect_el empty_vect vv i)) ∧
+  (∀ i j, i < vect_size vv → j < vect_size vv →
+   vect_el empty_vect vv i = vect_el empty_vect vv j → i = j) ∧
   (∀ v, is_permut_vect n v → ∃ i, vect_el empty_vect vv i = v).
 
 Theorem glop : ∀ n vv,
@@ -294,18 +296,34 @@ destruct n. {
     destruct lv as [| v1]; [ easy | exfalso ].
     specialize (Hsg 1) as H1.
     cbn in H1.
+    assert (H : 1 < S (S (length lv))) by flia.
+    specialize (H1 H); clear H.
     destruct H1 as (H1, H2).
     destruct v1 as (l); cbn in H1.
     apply length_zero_iff_nil in H1; subst l.
-    now specialize (Hinj 0 1 eq_refl).
+    specialize (Hinj 0 1).
+    cbn in Hinj.
+    assert (H : 0 < S (S (length lv))) by flia.
+    specialize (Hinj H); clear H.
+    assert (H : 1 < S (S (length lv))) by flia.
+    specialize (Hinj H); clear H.
+    now specialize (Hinj eq_refl).
   }
   destruct lv as [| v1]; [ easy | exfalso ].
   remember (v1 :: lv) as x; cbn in Hi; subst x.
   specialize (Hinj 0 1).
   cbn in Hinj.
+  assert (H : 0 < S (S (length lv))) by flia.
+  specialize (Hinj H); clear H.
+  assert (H : 1 < S (S (length lv))) by flia.
+  specialize (Hinj H); clear H.
   specialize (Hsg 0) as H1.
   specialize (Hsg 1) as H2.
   cbn in H1, H2.
+  assert (H : 0 < S (S (length lv))) by flia.
+  specialize (H1 H); clear H.
+  assert (H : 1 < S (S (length lv))) by flia.
+  specialize (H2 H); clear H.
   destruct H2 as (H3, H4).
   destruct H1 as (H1, H2).
   assert (H : v = v1). {
@@ -323,13 +341,35 @@ revert vv Hsg.
 induction n; intros. {
   destruct Hsg as (Hsg & Hinj & Hsurj); cbn.
   destruct vv as (lv); cbn in *.
-  destruct lv as [| v]. {
+  destruct lv as [| v1]. {
+    specialize (Hsurj (mk_vect [0])).
+    assert (H : is_permut_vect 1 (mk_vect [0])). {
+      split; [ easy | ].
+      split. {
+        intros i Hi.
+        apply Nat.lt_1_r in Hi; subst i.
+        cbn; flia.
+      }
+      intros i j Hi Hj.
+      now apply Nat.lt_1_r in Hi, Hj; subst i j; cbn.
+    }
+    specialize (Hsurj H); clear H.
+    destruct Hsurj as (i, Hi); cbn in Hi.
+    now rewrite match_id in Hi.
+  }
+  destruct lv as [| v2]; [ easy | exfalso ].
+  cbn.
+...
     specialize (Hsg 0); cbn in Hsg.
     now destruct Hsg as (H1, H2).
   }
   destruct lv as [| v1]; [ easy | exfalso ].
   specialize (Hinj 0 1).
   cbn in Hinj.
+  assert (H : 0 < S (S (length lv))) by flia.
+  specialize (Hinj H); clear H.
+  assert (H : 1 < S (S (length lv))) by flia.
+  specialize (Hinj H); clear H.
   specialize (Hsg 0) as H1.
   specialize (Hsg 1) as H2.
   cbn in H1, H2.
@@ -354,6 +394,30 @@ induction n; intros. {
   }
   now specialize (Hinj H).
 }
+set (ll1 := filter (λ v, vect_el 0 v 0 =? n) (vect_list vv)).
+set (ll2 := map (λ v, mk_vect (map (λ i, vect_el 0 v (S i)) (seq 0 n!))) ll1).
+set (vv' := mk_vect ll2).
+specialize (IHn vv') as H1.
+assert (H : is_sym_gr_vect (S n) vv'). {
+  split. {
+    intros i; cbn.
+    split. {
+      unfold vv', ll2, ll1; cbn.
+      rewrite (List_map_nth' empty_vect). 2: {
+        destruct Hsg as (Hsg & Hinj & Hsurj).
+        destruct vv as (lv); cbn in Hsg, Hinj, Hsurj |-*.
+        destruct lv as [| v1]. {
+          specialize (Hsg 0); cbn in Hsg.
+          now destruct Hsg as (H2, H3).
+        }
+        destruct lv as [| v2]. {
+          specialize (Hsg 1); cbn in Hsg.
+          now destruct Hsg as (H2, H3).
+        }
+...
+destruct Hsg as (Hsg & Hinj & Hsurj).
+...
+destruct vv as (lv); cbn - [ fact ] in *.
 ...
     specialize (Hsurj empty_vect).
     assert (H : is_permut_vect 0 empty_vect) by easy.
