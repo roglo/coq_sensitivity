@@ -40,9 +40,6 @@ Definition is_permut_fun f n :=
   (∀ i, i < n → f i < n) ∧
   (∀ i j, i < n → j < n → f i = f j → i = j).
 
-(*
-Definition vect_nat_el (V : vector nat) i := nth i (vect_list V) 0.
-*)
 Definition vect_vect_nat_el (V : vector (vector nat)) i : vector nat :=
   nth i (vect_list V) empty_vect.
 
