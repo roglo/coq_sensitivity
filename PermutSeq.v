@@ -269,15 +269,41 @@ Definition is_sym_gr n (f : nat → nat → nat) :=
   (∀ i j, i < n! → j < n! → f i = f j → i = j) ∧
   (∀ i, i < n! → is_permut_fun (f i) n).
 
-Definition is_sym_gr_vect nn n (vv : vector (vector nat)) :=
-  (∀ i, i < nn → is_permut_vect n (vect_el empty_vect vv i)) ∧
-  (∀ i j, i < nn → j < nn → vect_el empty_vect vv i = vect_el empty_vect vv j → i = j) ∧
+Definition is_sym_gr_vect n (vv : vector (vector nat)) :=
+  (∀ i, is_permut_vect n (vect_el empty_vect vv i)) ∧
+  (∀ i j, vect_el empty_vect vv i = vect_el empty_vect vv j → i = j) ∧
   (∀ v, is_permut_vect n v → ∃ i, vect_el empty_vect vv i = v).
 
-Theorem glop : ∀ nn n vv,
-  is_sym_gr_vect nn n vv → nn = n!.
+Theorem glop : ∀ n vv,
+  is_sym_gr_vect n vv → vect_size vv = n! ∨ vect_size vv = 0.
 Proof.
 intros * Hsg.
+destruct n. {
+  destruct Hsg as (Hsg & Hinj & Hsurj).
+  specialize (Hsurj empty_vect).
+  assert (H : is_permut_vect 0 empty_vect) by easy.
+  specialize (Hsurj H); clear H.
+  destruct Hsurj as (i, Hi).
+  unfold vect_el in Hi.
+  destruct vv as (lv).
+  cbn in Hi, Hsg, Hinj |-*.
+  unfold empty_vect in Hi.
+  destruct lv as [| v]; [ now right | left ].
+  destruct i. {
+    cbn in Hi; subst v.
+    destruct lv as [| v1]; [ easy | exfalso ].
+    specialize (Hsg 1) as H1.
+    cbn in H1.
+    destruct H1 as (H1, H2).
+    destruct v1 as (l); cbn in H1.
+    apply length_zero_iff_nil in H1; subst l.
+    now specialize (Hinj 0 1 eq_refl).
+  }
+  destruct lv as [| v1]; [ easy | exfalso ].
+  remember (v1 :: lv) as x; cbn in Hi; subst x.
+  specialize (Hinj 0 1).
+  cbn in Hinj.
+...
 induction n. {
   destruct Hsg as (Hsg & Hinj & Hsurj).
   destruct nn. {
