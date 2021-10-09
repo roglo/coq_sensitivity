@@ -738,7 +738,7 @@ Theorem is_permut_mk_canon_transp : ∀ n k p q,
   k < n!
   → p < n
   → q < n
-  → is_permut (λ j : nat, mk_canon_sym_gr n k (transposition p q j)) n.
+  → is_permut_fun (λ j : nat, mk_canon_sym_gr n k (transposition p q j)) n.
 Proof.
 intros * Hkn Hpn Hqn.
 split. {
@@ -1226,7 +1226,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   unfold vect_vect_nat_el at 1.
   cbn - [ vect_vect_nat_el vect_el ].
   assert (Hps :
-    is_permut
+    is_permut_fun
       (vect_el 0
          (vect_swap_elem 0 (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) p q))
       n). {
@@ -1627,7 +1627,7 @@ Fixpoint nb_good_loop it i σ :=
 Definition nb_good n σ := nb_good_loop n 0 σ.
 
 Theorem nb_good_loop_comp_transp : ∀ n it σ i k,
-  is_permut σ n
+  is_permut_fun σ n
   → k < i ≤ n
   → σ k < i
   → n = i + it
@@ -1660,7 +1660,7 @@ split; [ flia Hkin | flia Hnit ].
 Qed.
 
 Theorem comp_transp_permut_id : ∀ n σ i j k,
-  is_permut σ n
+  is_permut_fun σ n
   → i < k
   → k < j < n
   → σ k = i
@@ -1680,7 +1680,7 @@ flia Hikn Hkp Hspi.
 Qed.
 
 Theorem nb_good_loop_comp_transp_permit_id : ∀ n it σ i k,
-  is_permut σ n
+  is_permut_fun σ n
   → i < n
   → k < n
   → n = k + it
@@ -1749,7 +1749,7 @@ apply Hj; flia Hkj.
 Qed.
 
 Theorem nb_good_loop_comp_transp2 : ∀ n it σ i,
-  is_permut σ n
+  is_permut_fun σ n
   → (∀ k, k < i → σ k = k)
   → σ i ≠ i
   → σ (σ i) ≠ i
@@ -1826,7 +1826,7 @@ apply IHit with (k := k); try easy; flia Hip.
 Qed.
 
 Theorem nb_good_loop_comp_transp' : ∀ n it σ i d,
-  is_permut σ n
+  is_permut_fun σ n
   → i < n
   → d ≠ 0
   → (∀ k, k < i → σ k = k)
@@ -1896,7 +1896,7 @@ flia Hk Hkd.
 Qed.
 
 Theorem nb_good_loop_comp_transp_eq : ∀ it n σ i k,
-  is_permut σ n
+  is_permut_fun σ n
   → first_non_fixpoint n 0 σ = Some i
   → k ≤ i
   → n = k + it
@@ -4135,7 +4135,7 @@ Print permut_fun_inv'.
 Print is_permut_fun.
 Search permut_fun_inv.
 ...
-unfold is_permut in H2.
+unfold is_permut_fun in H2.
 Print permut_fun_inv'.
 permut_fun = vect_el σ
 exists (permut_fun_inv n
@@ -4162,6 +4162,7 @@ Theorem glop : ∀ n sg,
 Proof.
 intros * Hsg * Hin Hjn.
 destruct Hsg as (Hsg & Hsg1 & Hsg2 & Hsg3).
+...
 destruct sg as (ll); cbn in Hsg, Hsg1, Hsg2, Hsg3 |-*.
 ...
 
@@ -4429,7 +4430,7 @@ intros * Hnz Hσ Hσ'.
 destruct n; [ easy | clear Hnz ].
 destruct Hσ as (H1, H2).
 destruct Hσ' as (H3, H4).
-assert (Hσp : ∀ p, is_permut p → { i | vect_el σ i = p }). {
+assert (Hσp : ∀ p, is_permut_fun p → { i | vect_el σ i = p }). {
   intros p Hp.
 ...
 intros * Hnz Hσ Hσ'.
@@ -4608,7 +4609,7 @@ destruct n. {
   rewrite <- Hf; cbn.
   destruct Hσ as (H1, H2).
   specialize (H2 0 Nat.lt_0_1).
-  unfold is_permut in H2.
+  unfold is_permut_fun in H2.
   destruct H2 as (H2, H3).
   specialize (H2 0 Nat.lt_0_1).
   apply Nat.lt_1_r in H2.
@@ -4655,13 +4656,13 @@ Theorem det_any_permut :
   rngl_characteristic = 0 →
   ∀ n (M : matrix n n T) (σ : vector n nat),
   n ≠ 0
-  → is_permut σ
+  → is_permut_fun σ
   → determinant M =
     (∑ (μ ∈ list_of_vect (mk_canon_sym_gr n)), ε μ * ε σ *
      ∏ (k = 0, n - 1), mat_el M (vect_el σ k) (vect_el μ k))%F.
 Proof.
 intros Hop Hiv Hic Hde H10 Hit Hch * Hnz Hσ.
-unfold is_permut in Hσ.
+unfold is_permut_fun in Hσ.
 destruct Hσ as (Hσ_lt, Hσ_inj).
 erewrite rngl_summation_list_eq_compat. 2: {
   intros μ Hμ.
@@ -4676,7 +4677,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   }
   subst ν.
   rewrite <- Hσν at 1.
-  assert (Hpμ : is_permut μ). {
+  assert (Hpμ : is_permut_fun μ). {
     unfold mk_canon_sym_gr in Hμ.
     apply in_map_iff in Hμ.
     destruct Hμ as (i & Hi & His).
@@ -4816,7 +4817,7 @@ apply rngl_product_permut.
 intros * Hnz Hσ Hg.
 destruct n; [ easy | clear Hnz ].
 rewrite Nat_sub_succ_1.
-unfold is_permut in Hσ.
+unfold is_permut_fun in Hσ.
 remember (vect_el σ) as u eqn:Hu; clear σ Hu.
 destruct Hσ as (H1, H2).
 ...

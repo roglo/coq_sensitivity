@@ -36,7 +36,7 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 
-Definition is_permut f n :=
+Definition is_permut_fun f n :=
   (∀ i, i < n → f i < n) ∧
   (∀ i j, i < n → j < n → f i = f j → i = j).
 
@@ -47,7 +47,7 @@ Definition vect_vect_nat_el (V : vector (vector nat)) i : vector nat :=
   nth i (vect_list V) empty_vect.
 
 Definition is_permut_vect n (σ : vector nat) :=
-  vect_size σ = n ∧ is_permut (vect_el 0 σ) n.
+  vect_size σ = n ∧ is_permut_fun (vect_el 0 σ) n.
 
 Fixpoint permut_fun_inv f i j :=
   match i with
@@ -68,8 +68,8 @@ Definition vect_swap_elem {A} d (v : vector A) i j :=
 
 Theorem is_permut_eq_compat : ∀ n f g,
   (∀ i, i < n → f i = g i)
-  → is_permut f n
-  → is_permut g n.
+  → is_permut_fun f n
+  → is_permut_fun g n.
 Proof.
 intros * Hfg (H1, H2).
 split. {
@@ -84,7 +84,7 @@ split. {
 Qed.
 
 Theorem permut_ub : ∀ n f i,
-  is_permut f n → i < n → f i < n.
+  is_permut_fun f n → i < n → f i < n.
 Proof.
 intros * Hp Hin.
 now apply Hp.
@@ -151,8 +151,8 @@ Qed.
 Theorem vect_swap_elem_is_permut : ∀ n σ p q,
   p < n
   → q < n
-  → is_permut σ n
-  → is_permut (swap_elem σ p q) n.
+  → is_permut_fun σ n
+  → is_permut_fun (swap_elem σ p q) n.
 Proof.
 intros * Hp Hq Hσ.
 split; cbn. {
@@ -270,7 +270,7 @@ Compute map (vect_list (T := nat)) (vect_list (mk_canon_sym_gr_vect 4)).
 
 Definition is_sym_gr n (f : nat → nat → nat) :=
   (∀ i j, i < n! → j < n! → f i = f j → i = j) ∧
-  (∀ i, i < n! → is_permut (f i) n).
+  (∀ i, i < n! → is_permut_fun (f i) n).
 
 Definition is_sym_gr_vect n (sg : vector (vector nat)) :=
   vect_size sg = n! ∧
@@ -510,7 +510,7 @@ Qed.
 
 Theorem sym_gr_elem_is_permut : ∀ n k,
   k < n!
-  → is_permut (mk_canon_sym_gr n k) n.
+  → is_permut_fun (mk_canon_sym_gr n k) n.
 Proof.
 intros * Hkn.
 split. {
@@ -564,7 +564,7 @@ Compute (rank_of_permut_in_sym_gr (vect_el (mk_canon_sym_gr 4) 12)).
 *)
 
 Theorem sub_permut_elem_ub : ∀ n f i,
-  is_permut f (S n)
+  is_permut_fun f (S n)
   → i < n
   → sub_permut f i < n.
 Proof.
@@ -586,7 +586,7 @@ flia Hb H1 H2 H3.
 Qed.
 
 Theorem sub_mk_canon_sym_gr_inj1 : ∀ n f i j,
-  is_permut f (S n)
+  is_permut_fun f (S n)
   → i < n
   → j < n
   → sub_permut f i = sub_permut f j
@@ -640,7 +640,7 @@ destruct bi; cbn. {
 Qed.
 
 Theorem rank_of_permut_upper_bound : ∀ n f,
-  is_permut f n
+  is_permut_fun f n
   → rank_of_permut_in_canon_sym_gr n f < n!.
 Proof.
 intros * (Hvn, Hn).
@@ -662,7 +662,7 @@ flia Hvn.
 Qed.
 
 Theorem permut_in_canon_sym_gr_of_its_rank : ∀ n f,
-  is_permut f n
+  is_permut_fun f n
   → ∀ i, i < n
   → mk_canon_sym_gr n (rank_of_permut_in_canon_sym_gr n f) i = f i.
 Proof.
@@ -819,8 +819,8 @@ split. {
 Qed.
 
 Theorem rank_of_permut_injective : ∀ n f g,
-  is_permut f n
-  → is_permut g n
+  is_permut_fun f n
+  → is_permut_fun g n
   → rank_of_permut_in_canon_sym_gr n f = rank_of_permut_in_canon_sym_gr n g
   → ∀ i, i < n → f i = g i.
 Proof.
@@ -1063,7 +1063,7 @@ apply Hp2; [ flia Hj | flia Hk | easy ].
 Qed.
 
 Theorem permut_fun_inv_fun : ∀ f n,
-  is_permut f n
+  is_permut_fun f n
   → ∀ i, i < n
   → permut_fun_inv f n (f i) = i.
 Proof.
@@ -1091,7 +1091,7 @@ Definition permut_fun_inv' f n i :=
   if Nat.eq_dec x n then x' else x.
 
 Theorem fun_find_permut_fun_inv' : ∀ f n,
-  is_permut f n
+  is_permut_fun f n
   → ∀ i, i < n
   → permut_fun_inv f n i = permut_fun_inv' f n i.
 Proof.
@@ -1230,7 +1230,7 @@ destruct (Nat.eq_dec x n) as [H2| H2]. {
 Qed.
 
 Theorem fun_permut_fun_inv : ∀ f n,
-  is_permut f n
+  is_permut_fun f n
   → ∀ i, i < n
   → f (permut_fun_inv f n i) = i.
 Proof.
@@ -1240,8 +1240,8 @@ apply (proj2 (pigeonhole' f Hp1 Hp2 Hin eq_refl)).
 Qed.
 
 Theorem permut_fun_inv_is_permut : ∀ n f,
-  is_permut f n
-  → is_permut (permut_fun_inv f n) n.
+  is_permut_fun f n
+  → is_permut_fun (permut_fun_inv f n) n.
 Proof.
 intros * Hp.
 destruct Hp as (Hp1, Hp2).
@@ -1376,10 +1376,10 @@ apply Hp1; flia Hk Hkn.
 Qed.
 
 Theorem permut_fun_without_last : ∀ n i (a : _ → nat),
-  is_permut a (S n)
+  is_permut_fun a (S n)
   → i = permut_fun_inv a (S n) n
   → ∃ b,
-     is_permut b n ∧
+     is_permut_fun b n ∧
      map a (seq 0 i ++ seq (S i) (n - i)) = map b (seq 0 n).
 Proof.
 intros * Hp Hi.
@@ -1499,7 +1499,7 @@ apply Hp in Hjk; [ flia Hjk | flia Hj | flia Hk ].
 Qed.
 
 Theorem permut_fun_Permutation : ∀ f n,
-  is_permut f n
+  is_permut_fun f n
   → Permutation (map f (seq 0 n)) (seq 0 n).
 Proof.
 intros a n * Hp.
@@ -1757,7 +1757,7 @@ Theorem permut_swap_mul_cancel : ∀ n σ f,
   rngl_is_comm = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
-  is_permut σ n
+  is_permut_fun σ n
   → (∀ i j, f i j = f j i)
   → (∀ i j, i < n → j < n → i ≠ j → f i j ≠ 0%F)
   → ∀ i j, i < n → j < n →
@@ -1835,7 +1835,7 @@ Theorem product_product_if_permut_div :
   rngl_has_1_neq_0 = true →
   rngl_has_inv = true →
   ∀ n σ f,
-  is_permut σ n
+  is_permut_fun σ n
   → (∀ i j, f i j = f j i)
   → (∀ i j, i < n → j < n → i ≠ j → f i j ≠ 0%F)
   → (∏ (i ∈ seq 0 n), ∏ (j ∈ seq 0 n),
@@ -1869,7 +1869,7 @@ Theorem product_product_if_permut :
   rngl_has_1_neq_0 = true →
   rngl_has_dec_eq = true →
   ∀ n σ f,
-  is_permut σ n
+  is_permut_fun σ n
   → (∀ i j, f i j = f j i)
   → (∀ i j, i < n → j < n → i ≠ j → f i j ≠ 0%F)
   → (∏ (i ∈ seq 0 n), (∏ (j ∈ seq 0 n), if σ i <? σ j then f i j else 1))%F =
@@ -1894,7 +1894,7 @@ Theorem ε_ws_ε_fun :
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
   ∀ σ n,
-  is_permut σ n
+  is_permut_fun σ n
   → ε_fun σ n = ε_fun_ws σ n.
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hp.
@@ -2168,8 +2168,8 @@ Definition permut_swap {n} (p q : nat) (σ : vector nat) :=
 Theorem permut_swap_fun_is_permut : ∀ p q σ n,
   p < n
   → q < n
-  → is_permut σ n
-  → is_permut (permut_fun_swap p q σ) n.
+  → is_permut_fun σ n
+  → is_permut_fun (permut_fun_swap p q σ) n.
 Proof.
 intros * Hp Hq Hσ.
 unfold permut_fun_swap.
@@ -2212,7 +2212,7 @@ split. {
 Qed.
 
 Theorem transposition_is_permut : ∀ p q n,
-  p < n → q < n → is_permut (transposition p q) n.
+  p < n → q < n → is_permut_fun (transposition p q) n.
 Proof.
 intros * Hp Hq.
 split. {
@@ -2251,8 +2251,8 @@ Qed.
 *)
 
 Theorem is_permut_map : ∀ f n,
-  is_permut f n
-  → is_permut (λ i, nth i (map f (seq 0 n)) 0) n.
+  is_permut_fun f n
+  → is_permut_fun (λ i, nth i (map f (seq 0 n)) 0) n.
 Proof.
 intros * Hf.
 destruct Hf as (Hf, Hff).
@@ -2473,7 +2473,7 @@ Theorem signature_comp_fun_expand_1 :
   rngl_is_integral = true →
   rngl_characteristic = 0 →
   ∀ n f g,
-  is_permut g n
+  is_permut_fun g n
   → (∏ (i = 1, n),
         (∏ (j = 1, n), δ i j (f (g (i - 1)%nat)) (f (g (j - 1)%nat))) /
       ∏ (i = 1, n), (∏ (j = 1, n), δ i j (g (i - 1)%nat) (g (j - 1)%nat)))%F =
@@ -2507,7 +2507,7 @@ Theorem signature_comp_fun_expand_2_1 :
   rngl_is_integral = true →
   rngl_characteristic = 0 →
   ∀ n f g,
-  is_permut g n
+  is_permut_fun g n
   → (∏ (i = 1, n),
       (∏ (j = 1, n), δ i j (f (g (i - 1)%nat)) (f (g (j - 1)%nat))) /
      ∏ (i = 1, n), (∏ (j = 1, n), δ i j (g (i - 1)%nat) (g (j - 1)%nat)))%F =
@@ -2647,8 +2647,8 @@ Theorem signature_comp_fun_changement_of_variable :
   rngl_is_integral = true →
   rngl_characteristic = 0 →
   ∀ n f g,
-  is_permut f n
-  → is_permut g n
+  is_permut_fun f n
+  → is_permut_fun g n
   → (∏ (i = 1, n),
      (∏ (j = 1, n),
       (if i <? j then
@@ -2805,8 +2805,8 @@ Theorem signature_comp_fun :
   rngl_is_integral = true →
   rngl_characteristic = 0 →
   ∀ n f g,
-  is_permut f n
-  → is_permut g n
+  is_permut_fun f n
+  → is_permut_fun g n
   → ε_fun (comp f g) n = (ε_fun f n * ε_fun g n)%F.
 Proof.
 intros Hop Hin Hic Hde H10 Hit Hch * Hp1 Hp2.
@@ -3079,12 +3079,12 @@ f_equal. {
     easy.
   }
   cbn - [ "<?" ].
-  assert (Hp' : is_permut σ' n). {
+  assert (Hp' : is_permut_fun σ' n). {
     rewrite Hσ'.
     apply mk_canon_is_permut_vect.
     apply Nat.mod_upper_bound, fact_neq_0.
   }
-  assert (Hp : is_permut σ (S n)). {
+  assert (Hp : is_permut_fun σ (S n)). {
     rewrite Hσ.
     now apply mk_canon_is_permut_vect.
   }
@@ -3324,13 +3324,13 @@ f_equal. {
     easy.
   }
   cbn - [ "<?" ].
-  assert (Hp' : is_permut σ' n). {
+  assert (Hp' : is_permut_fun σ' n). {
     rewrite Hσ'.
     apply sym_gr_elem_is_permut.
     apply Nat.mod_upper_bound.
     apply fact_neq_0.
   }
-  assert (Hp : is_permut σ (S n)). {
+  assert (Hp : is_permut_fun σ (S n)). {
     rewrite Hσ.
     now apply sym_gr_elem_is_permut.
   }
@@ -3666,9 +3666,9 @@ now apply sym_gr_sym_gr_inv.
 Qed.
 
 Theorem comp_is_permut : ∀ n (σ₁ σ₂ : nat → nat),
-  is_permut σ₁ n
-  → is_permut σ₂ n
-  → is_permut (comp σ₁ σ₂) n.
+  is_permut_fun σ₁ n
+  → is_permut_fun σ₂ n
+  → is_permut_fun (comp σ₁ σ₂) n.
 Proof.
 intros * Hp1 Hp2.
 split. {
@@ -3682,8 +3682,8 @@ split. {
 Qed.
 
 Theorem comp_list_is_permut : ∀ n l,
-  (∀ σ, σ ∈ l → is_permut σ n)
-  → is_permut (Comp (σ ∈ l), σ) n.
+  (∀ σ, σ ∈ l → is_permut_fun σ n)
+  → is_permut_fun (Comp (σ ∈ l), σ) n.
 Proof.
 intros * Hl.
 induction l as [| σ]; [ easy | ].
