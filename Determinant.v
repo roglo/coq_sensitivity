@@ -4162,7 +4162,7 @@ Theorem glop : ∀ n sg,
 Proof.
 intros * Hsg * Hin Hjn.
 destruct Hsg as (Hsg & Hsg1 & Hsg2 & Hsg3).
-destruct sg as (ll); cbn in Hsg |-*.
+destruct sg as (ll); cbn in Hsg, Hsg1, Hsg2, Hsg3 |-*.
 ...
 
 Theorem length_filter_sym_gr : ∀ n sg i,
