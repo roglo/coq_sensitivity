@@ -269,6 +269,31 @@ Definition is_sym_gr n (f : nat → nat → nat) :=
   (∀ i j, i < n! → j < n! → f i = f j → i = j) ∧
   (∀ i, i < n! → is_permut_fun (f i) n).
 
+Definition is_sym_gr_vect nn n (vv : vector (vector nat)) :=
+  (∀ i, i < nn → is_permut_vect n (vect_el empty_vect vv i)) ∧
+  (∀ i j, i < nn → j < nn → vect_el empty_vect vv i = vect_el empty_vect vv j → i = j) ∧
+  (∀ v, is_permut_vect n v → ∃ i, vect_el empty_vect vv i = v).
+
+Theorem glop : ∀ nn n vv,
+  is_sym_gr_vect nn n vv → nn = n!.
+Proof.
+intros * Hsg.
+induction n. {
+  destruct Hsg as (Hsg & Hinj & Hsurj).
+  destruct nn. {
+...
+    specialize (Hsurj empty_vect).
+    assert (H : is_permut_vect 0 empty_vect) by easy.
+    specialize (Hsurj H); clear H.
+    destruct Hsurj as (i, Hi).
+    unfold vect_el in Hi.
+    destruct vv as (lv).
+    cbn in Hi.
+    unfold empty_vect in Hi.
+    destruct lv as [| v]. {
+      cbn in Hi.
+...
+
 Definition is_sym_gr_vect n (vv : vector (vector nat)) :=
   vect_size vv = n! ∧
   (∀ i, i < n! → vect_size (vect_el empty_vect vv i) = n) ∧
