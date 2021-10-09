@@ -4154,6 +4154,15 @@ destruct Hσ' as (H3, H4).
 ...
 *)
 
+Theorem glop : ∀ n sg,
+  is_sym_gr_vect n sg
+  → ∀ i j k, i < n → j < n
+  → length (filter (λ v, vect_el 0 v i =? k) (vect_list sg)) =
+    length (filter (λ v, vect_el 0 v j =? k) (vect_list sg)).
+Proof.
+intros * Hsg * Hin Hjn.
+...
+
 Theorem length_filter_sym_gr : ∀ n sg i,
   i ≤ n
   → is_sym_gr_vect (S n) sg
