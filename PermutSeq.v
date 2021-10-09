@@ -303,6 +303,24 @@ destruct n. {
   remember (v1 :: lv) as x; cbn in Hi; subst x.
   specialize (Hinj 0 1).
   cbn in Hinj.
+  specialize (Hsg 0) as H1.
+  specialize (Hsg 1) as H2.
+  cbn in H1, H2.
+  destruct H2 as (H3, H4).
+  destruct H1 as (H1, H2).
+  assert (H : v = v1). {
+    destruct v as (la).
+    destruct v1 as (lb).
+    cbn in H1, H3.
+    apply length_zero_iff_nil in H1.
+    apply length_zero_iff_nil in H3.
+    now subst la lb.
+  }
+  now specialize (Hinj H).
+}
+left.
+induction n. {
+  destruct Hsg as (Hsg & Hinj & Hsurj); cbn.
 ...
 induction n. {
   destruct Hsg as (Hsg & Hinj & Hsurj).
