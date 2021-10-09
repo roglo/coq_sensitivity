@@ -269,10 +269,10 @@ Definition is_sym_gr n (f : nat → nat → nat) :=
   (∀ i j, i < n! → j < n! → f i = f j → i = j) ∧
   (∀ i, i < n! → is_permut_fun (f i) n).
 
-Definition is_sym_gr_vect n (sg : vector (vector nat)) :=
-  vect_size sg = n! ∧
-  (∀ i, i < n! → vect_size (vect_el empty_vect sg i) = n) ∧
-  is_sym_gr n (λ i, vect_el 0 (vect_el empty_vect sg i)).
+Definition is_sym_gr_vect n (vv : vector (vector nat)) :=
+  vect_size vv = n! ∧
+  (∀ i, i < n! → vect_size (vect_el empty_vect vv i) = n) ∧
+  is_sym_gr n (λ i, vect_el 0 (vect_el empty_vect vv i)).
 
 Record sym_gr_vect n :=
   { sg_vect : vector (vector nat);
