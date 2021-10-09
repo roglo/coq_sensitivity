@@ -4161,6 +4161,8 @@ Theorem glop : ∀ n sg,
     length (filter (λ v, vect_el 0 v j =? k) (vect_list sg)).
 Proof.
 intros * Hsg * Hin Hjn.
+destruct Hsg as (Hsg & Hsg1 & Hsg2 & Hsg3).
+destruct sg as (ll); cbn in Hsg |-*.
 ...
 
 Theorem length_filter_sym_gr : ∀ n sg i,
