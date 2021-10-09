@@ -319,12 +319,41 @@ destruct n. {
   now specialize (Hinj H).
 }
 left.
-induction n. {
+revert vv Hsg.
+induction n; intros. {
   destruct Hsg as (Hsg & Hinj & Hsurj); cbn.
-...
-induction n. {
-  destruct Hsg as (Hsg & Hinj & Hsurj).
-  destruct nn. {
+  destruct vv as (lv); cbn in *.
+  destruct lv as [| v]. {
+    specialize (Hsg 0); cbn in Hsg.
+    now destruct Hsg as (H1, H2).
+  }
+  destruct lv as [| v1]; [ easy | exfalso ].
+  specialize (Hinj 0 1).
+  cbn in Hinj.
+  specialize (Hsg 0) as H1.
+  specialize (Hsg 1) as H2.
+  cbn in H1, H2.
+  destruct H2 as (H3, H4).
+  destruct H1 as (H1, H2).
+  cbn in H1.
+  assert (H : v = v1). {
+    destruct v as (la).
+    destruct v1 as (lb).
+    cbn in H1, H3.
+    destruct la as [| a]; [ easy | ].
+    destruct lb as [| b]; [ easy | ].
+    cbn in H1, H3.
+    destruct la; [ | easy ].
+    destruct lb; [ | easy ].
+    clear H1 H3.
+    destruct H2 as (H1, H2).
+    destruct H4 as (H3, H4).
+    specialize (H1 0 Nat.lt_0_1); cbn in H1.
+    specialize (H3 0 Nat.lt_0_1); cbn in H3.
+    now apply Nat.lt_1_r in H1, H3; subst a b.
+  }
+  now specialize (Hinj H).
+}
 ...
     specialize (Hsurj empty_vect).
     assert (H : is_permut_vect 0 empty_vect) by easy.
