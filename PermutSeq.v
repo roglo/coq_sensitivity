@@ -380,8 +380,8 @@ induction n; intros. {
   now specialize (Hinj H).
 }
 (**)
-set (σ' :=
-set (φ := λ σ, (vect_el 0 σ (S n), σ')).
+set (σ' := λ σ, mk_vect (map (λ i, if i =? S n then S n else vect_el 0 σ i) (seq 0 (S (S n))))).
+set (φ := λ σ, (vect_el 0 σ (S n), σ' σ)).
 ...
 (* selecting all permutations of vv starting with "S n" *)
 set (ll1 := filter (λ v, vect_el 0 v 0 =? S n) (vect_list vv)).
