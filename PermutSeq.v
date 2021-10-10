@@ -379,14 +379,15 @@ induction n; intros. {
   }
   now specialize (Hinj H).
 }
-...
-set (ll1 := filter (λ v, vect_el 0 v 0 =? n) (vect_list vv)).
-set (ll2 := map (λ v, mk_vect (map (λ i, vect_el 0 v (S i)) (seq 0 n!))) ll1).
+(* selecting all permutations of vv starting with "S n" *)
+set (ll1 := filter (λ v, vect_el 0 v 0 =? S n) (vect_list vv)).
+(* removing this first element (which is "S n") *)
+set (ll2 := map (λ v, mk_vect (tl (vect_list v))) ll1).
 set (vv' := mk_vect ll2).
 specialize (IHn vv') as H1.
 assert (H : is_sym_gr_vect (S n) vv'). {
   split. {
-    intros i; cbn.
+    intros i Hi; cbn.
     split. {
       unfold vv', ll2, ll1; cbn.
       rewrite (List_map_nth' empty_vect). 2: {
@@ -397,9 +398,18 @@ assert (H : is_sym_gr_vect (S n) vv'). {
           now destruct Hsg as (H2, H3).
         }
         destruct lv as [| v2]. {
-          specialize (Hsg 1); cbn in Hsg.
-          now destruct Hsg as (H2, H3).
+          unfold vv', ll2, ll1 in Hi; cbn in Hi.
+          now rewrite map_length in Hi.
         }
+        unfold vv', ll2, ll1 in Hi; cbn in Hi.
+        now rewrite map_length in Hi.
+      }
+      cbn.
+      rewrite List_tl_length.
+      destruct Hsg as (Hsg & Hinj & Hsurj).
+      unfold vv', ll2, ll1 in Hi; cbn in Hi.
+      rewrite map_length in Hi.
+      remember (filter _ _) as lv eqn:Hlv.
 ...
 destruct Hsg as (Hsg & Hinj & Hsurj).
 ...
