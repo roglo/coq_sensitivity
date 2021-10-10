@@ -290,9 +290,9 @@ destruct n. {
   destruct vv as (lv).
   cbn in Hi, Hsg, Hinj |-*.
   unfold empty_vect in Hi.
-  destruct lv as [| v]; [ now right | left ].
+  destruct lv as [| v1]; [ now right | left ].
   destruct i. {
-    cbn in Hi; subst v.
+    cbn in Hi; subst v1.
     destruct lv as [| v1]; [ easy | exfalso ].
     specialize (Hsg 1) as H1.
     cbn in H1.
@@ -309,26 +309,21 @@ destruct n. {
     specialize (Hinj H); clear H.
     now specialize (Hinj eq_refl).
   }
-  destruct lv as [| v1]; [ easy | exfalso ].
-  remember (v1 :: lv) as x; cbn in Hi; subst x.
+  destruct lv as [| v2]; [ easy | exfalso ].
+  remember (v2 :: lv) as x; cbn in Hi; subst x.
   specialize (Hinj 0 1).
-  cbn in Hinj.
-  assert (H : 0 < S (S (length lv))) by flia.
-  specialize (Hinj H); clear H.
-  assert (H : 1 < S (S (length lv))) by flia.
-  specialize (Hinj H); clear H.
   specialize (Hsg 0) as H1.
   specialize (Hsg 1) as H2.
-  cbn in H1, H2.
+  cbn in Hinj, H1, H2.
   assert (H : 0 < S (S (length lv))) by flia.
-  specialize (H1 H); clear H.
+  specialize (Hinj H); specialize (H1 H); clear H.
   assert (H : 1 < S (S (length lv))) by flia.
-  specialize (H2 H); clear H.
+  specialize (Hinj H); specialize (H2 H); clear H.
   destruct H2 as (H3, H4).
   destruct H1 as (H1, H2).
-  assert (H : v = v1). {
-    destruct v as (la).
-    destruct v1 as (lb).
+  assert (H : v1 = v2). {
+    destruct v1 as (la).
+    destruct v2 as (lb).
     cbn in H1, H3.
     apply length_zero_iff_nil in H1.
     apply length_zero_iff_nil in H3.
@@ -358,42 +353,33 @@ induction n; intros. {
     now rewrite match_id in Hi.
   }
   destruct lv as [| v2]; [ easy | exfalso ].
-  cbn.
-...
-    specialize (Hsg 0); cbn in Hsg.
-    now destruct Hsg as (H1, H2).
-  }
-  destruct lv as [| v1]; [ easy | exfalso ].
   specialize (Hinj 0 1).
-  cbn in Hinj.
-  assert (H : 0 < S (S (length lv))) by flia.
-  specialize (Hinj H); clear H.
-  assert (H : 1 < S (S (length lv))) by flia.
-  specialize (Hinj H); clear H.
   specialize (Hsg 0) as H1.
   specialize (Hsg 1) as H2.
-  cbn in H1, H2.
+  cbn in Hinj, H1, H2.
+  assert (H : 0 < S (S (length lv))) by flia.
+  specialize (Hinj H); specialize (H1 H); clear H.
+  assert (H : 1 < S (S (length lv))) by flia.
+  specialize (Hinj H); specialize (H2 H); clear H.
   destruct H2 as (H3, H4).
   destruct H1 as (H1, H2).
-  cbn in H1.
-  assert (H : v = v1). {
-    destruct v as (la).
-    destruct v1 as (lb).
+  assert (H : v1 = v2). {
+    destruct v1 as (la).
+    destruct v2 as (lb).
     cbn in H1, H3.
     destruct la as [| a]; [ easy | ].
+    destruct la; [ clear H1 | easy ].
     destruct lb as [| b]; [ easy | ].
-    cbn in H1, H3.
-    destruct la; [ | easy ].
-    destruct lb; [ | easy ].
-    clear H1 H3.
-    destruct H2 as (H1, H2).
+    destruct lb; [ clear H3 | easy ].
     destruct H4 as (H3, H4).
+    destruct H2 as (H1, H2).
     specialize (H1 0 Nat.lt_0_1); cbn in H1.
     specialize (H3 0 Nat.lt_0_1); cbn in H3.
     now apply Nat.lt_1_r in H1, H3; subst a b.
   }
   now specialize (Hinj H).
 }
+...
 set (ll1 := filter (λ v, vect_el 0 v 0 =? n) (vect_list vv)).
 set (ll2 := map (λ v, mk_vect (map (λ i, vect_el 0 v (S i)) (seq 0 n!))) ll1).
 set (vv' := mk_vect ll2).
