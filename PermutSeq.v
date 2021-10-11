@@ -446,8 +446,6 @@ assert (Hσ : ∀ σ, is_permut_vect (S (S n)) σ → is_permut_vect (S n) (σ' 
   }
 }
 ...
-    destruct (Nat.eq_dec i (S n)) as [H| H]; [ flia Hi H | clear H ].
-...
 (* selecting all permutations of vv starting with "S n" *)
 set (ll1 := filter (λ v, vect_el 0 v 0 =? S n) (vect_list vv)).
 (* removing this first element (which is "S n") *)
