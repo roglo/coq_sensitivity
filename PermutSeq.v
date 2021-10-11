@@ -389,6 +389,8 @@ set (σ' := λ σ, mk_vect (map (λ i, if i =? S n then S n else vect_el 0 σ i)
 *)
 set (φ := λ σ, (vect_el 0 σ (S n), σ' σ)).
 ...
+assert (H : ∀ σ, is_sym_gr_vect (S (S n)) σ → is_sym_gr_vect (S n) (σ' σ)).
+...
 (* selecting all permutations of vv starting with "S n" *)
 set (ll1 := filter (λ v, vect_el 0 v 0 =? S n) (vect_list vv)).
 (* removing this first element (which is "S n") *)
