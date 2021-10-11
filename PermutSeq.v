@@ -381,15 +381,32 @@ induction n; intros. {
 }
 (**)
 (* https://fr.wikipedia.org/wiki/Groupe_sym%C3%A9trique#Propri%C3%A9t%C3%A9s *)
-Print vect_swap_elem.
-set (σ' := λ σ, vect_swap_elem 0 σ (S n) (vect_el 0 σ (S n)) ° σ).
 (*
-set (σ' := λ σ, mk_vect (map (λ i, vect_el 0 σ (if i =? S n then vect_el 0 σ (S n) else i)) (seq 0 (S n)))).
+set (σ' := λ σ, vect_swap_elem 0 σ (S n) (vect_el 0 σ (S n)) ° σ).
+*)
+set (σ' := λ σ, mk_vect (map (λ i, vect_el 0 σ (if vect_el 0 σ i =? S n then S n else i)) (seq 0 (S n)))).
+(*
 set (σ' := λ σ, mk_vect (map (λ i, if i =? S n then S n else vect_el 0 σ i) (seq 0 (S (S n))))).
 *)
 set (φ := λ σ, (vect_el 0 σ (S n), σ' σ)).
+assert (H : ∀ σ, is_permut_vect (S (S n)) σ → is_permut_vect (S n) (σ' σ)). {
+  intros σ Hσ.
+  split. {
+    unfold σ', vect_size; cbn - [ seq ].
+    now rewrite map_length, seq_length.
+  }
+  split. {
+    intros i Hi.
+    unfold σ'; cbn - [ seq ].
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ | easy ].
+    rewrite Nat.add_0_l.
+    rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec (vect_el 0 σ i) (S n)) as [H1| H1]. {
+      destruct Hσ as (H2 & H3 & H4).
+      specialize (H
 ...
-assert (H : ∀ σ, is_sym_gr_vect (S (S n)) σ → is_sym_gr_vect (S n) (σ' σ)).
+    destruct (Nat.eq_dec i (S n)) as [H| H]; [ flia Hi H | clear H ].
 ...
 (* selecting all permutations of vv starting with "S n" *)
 set (ll1 := filter (λ v, vect_el 0 v 0 =? S n) (vect_list vv)).
