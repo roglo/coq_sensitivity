@@ -445,6 +445,31 @@ assert (Hσ : ∀ σ, is_permut_vect (S (S n)) σ → is_permut_vect (S n) (σ' 
     apply H4; [ flia Hi | flia Hj | easy ].
   }
 }
+set
+  (φ' := λ a, let '(i, v) := a in
+    mk_vect
+      (map (λ j, if j =? S n then i else vect_el 0 v j) (seq 0 (S (S n))))).
+assert (H : FinFun.Bijective φ). {
+  exists φ'.
+  split. {
+    intros (l).
+    unfold φ', φ.
+    f_equal.
+    unfold σ'.
+    cbn - [ seq ].
+    rewrite (seq_S (S n)).
+    cbn - [ seq ].
+    rewrite map_app.
+    cbn - [ seq ].
+    rewrite Nat.eqb_refl.
+    erewrite map_ext_in. 2: {
+      intros i Hi; apply in_seq in Hi.
+      rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec i (S n)) as [H| H]; [ flia Hi H | ].
+      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+      rewrite seq_nth; [ cbn | easy ].
+      easy.
+    }
 ...
 (* selecting all permutations of vv starting with "S n" *)
 set (ll1 := filter (λ v, vect_el 0 v 0 =? S n) (vect_list vv)).
