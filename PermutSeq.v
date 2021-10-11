@@ -389,7 +389,7 @@ set (σ' := λ σ, mk_vect (map (λ i, vect_el 0 σ (if vect_el 0 σ i =? S n th
 set (σ' := λ σ, mk_vect (map (λ i, if i =? S n then S n else vect_el 0 σ i) (seq 0 (S (S n))))).
 *)
 set (φ := λ σ, (vect_el 0 σ (S n), σ' σ)).
-assert (H : ∀ σ, is_permut_vect (S (S n)) σ → is_permut_vect (S n) (σ' σ)). {
+assert (Hσ : ∀ σ, is_permut_vect (S (S n)) σ → is_permut_vect (S n) (σ' σ)). {
   intros σ Hσ.
   split. {
     unfold σ', vect_size; cbn - [ seq ].
@@ -404,7 +404,47 @@ assert (H : ∀ σ, is_permut_vect (S (S n)) σ → is_permut_vect (S n) (σ' σ
     rewrite if_eqb_eq_dec.
     destruct (Nat.eq_dec (vect_el 0 σ i) (S n)) as [H1| H1]. {
       destruct Hσ as (H2 & H3 & H4).
-      specialize (H
+      specialize (H4 (S n) i).
+      assert (H : i < S (S n)) by flia Hi.
+      specialize (H4 (Nat.lt_succ_diag_r _) H); clear H.
+      rewrite H1 in H4.
+      destruct (Nat.eq_dec (vect_el 0 σ (S n)) (S n)) as [H5| H5]. {
+        specialize (H4 H5).
+        rewrite H4 in Hi; flia Hi.
+      }
+      specialize (H3 (S n) (Nat.lt_succ_diag_r _)).
+      flia H3 H5.
+    } {
+      destruct Hσ as (H2 & H3 & H4).
+      specialize (H3 i).
+      assert (H : i < S (S n)) by flia Hi.
+      specialize (H3 H); clear H.
+      flia H3 H1.
+    }
+  }
+  intros * Hi Hj Hij.
+  unfold σ' in Hij; cbn - [ seq ] in Hij.
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite seq_nth in Hij; [ | easy ].
+  rewrite seq_nth in Hij; [ | easy ].
+  do 2 rewrite Nat.add_0_l in Hij.
+  do 2 rewrite if_eqb_eq_dec in Hij.
+  destruct Hσ as (H2 & H3 & H4).
+  destruct (Nat.eq_dec (vect_el 0 σ i) (S n)) as [Hisn| Hisn]. {
+    destruct (Nat.eq_dec (vect_el 0 σ j) (S n)) as [Hjsn| Hjsn]. {
+      apply H4; [ flia Hi | flia Hj | congruence ].
+    }
+    apply H4 in Hij; [ | flia | flia Hj ].
+    flia Hj Hij.
+  } {
+    destruct (Nat.eq_dec (vect_el 0 σ j) (S n)) as [Hjsn| Hjsn]. {
+      apply H4 in Hij; [ | flia Hi | flia ].
+      flia Hi Hij.
+    }
+    apply H4; [ flia Hi | flia Hj | easy ].
+  }
+}
 ...
     destruct (Nat.eq_dec i (S n)) as [H| H]; [ flia Hi H | clear H ].
 ...
