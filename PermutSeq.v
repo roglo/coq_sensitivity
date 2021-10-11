@@ -445,10 +445,17 @@ assert (Hσ : ∀ σ, is_permut_vect (S (S n)) σ → is_permut_vect (S n) (σ' 
     apply H4; [ flia Hi | flia Hj | easy ].
   }
 }
+Print permut_fun_inv.
+set
+  (φ' := λ a, let '(i, v) := a in
+    mk_vect
+      (map (λ j, if j =? S n then i else permut_fun_inv (vect_el 0 v) j) (seq 0 (S (S n))))).
+...
 set
   (φ' := λ a, let '(i, v) := a in
     mk_vect
       (map (λ j, if j =? S n then i else vect_el 0 v j) (seq 0 (S (S n))))).
+...
 assert (H : FinFun.Bijective φ). {
   exists φ'.
   split. {
