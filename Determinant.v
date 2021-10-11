@@ -1760,10 +1760,10 @@ Theorem nb_good_loop_comp_transp2 : ∀ n it σ i,
 Proof.
 intros * Hp Hi Hsii Hssii Hssisi Hnit.
 remember (σ i) as j eqn:Hj; symmetry in Hj.
-remember (permut_fun_inv σ n i) as k eqn:Hk.
+remember (permut_fun_inv_loop σ n i) as k eqn:Hk.
 assert (Hkd : σ k = i). {
   subst k.
-  apply fun_permut_fun_inv; [ easy | flia Hnit ].
+  apply fun_permut_fun_inv_loop; [ easy | flia Hnit ].
 }
 assert (Hik : i < k). {
   assert (H1 : i ≤ k). {
@@ -1787,7 +1787,7 @@ assert (Hij : i < j). {
 assert (Hkn : k < n). {
   rewrite Hk.
   apply permut_ub; [ | flia Hnit ].
-  now apply permut_fun_inv_is_permut.
+  now apply permut_fun_inv_loop_is_permut.
 }
 clear Hk.
 clear Hi.
@@ -3721,11 +3721,11 @@ assert (H : ∀ i : nat, i < S n → vect_el 0 σ' i < S n). {
     specialize (H1 (S n) (Nat.lt_succ_diag_r (S n))).
     flia H1 Hσn.
   }
-  destruct (lt_dec i (permut_fun_inv (vect_el 0 σ) n (S n))) as [H3| H3]. {
+  destruct (lt_dec i (permut_fun_inv_loop (vect_el 0 σ) n (S n))) as [H3| H3]. {
     destruct (Nat.eq_dec (vect_el 0 σ i) (S n)) as [H4| H4]. {
       exfalso.
       rewrite <- H4 in H3. (* at 2 *)
-      rewrite permut_fun_inv_fun' in H3; [ flia H3 | | ]. 2: {
+      rewrite permut_fun_inv_loop_fun' in H3; [ flia H3 | | ]. 2: {
         destruct (Nat.eq_dec i n) as [H5| H5]; [ now subst i | ].
         flia Hi H5.
       }
@@ -3744,7 +3744,7 @@ assert (H : ∀ i : nat, i < S n → vect_el 0 σ' i < S n). {
   destruct (Nat.eq_dec (vect_el 0 σ (S i)) (S n)) as [H4| H4]. {
     exfalso.
     rewrite <- H4 in H3. (* at 2 *)
-    rewrite permut_fun_inv_fun' in H3; [ flia H3 | | ]. 2: {
+    rewrite permut_fun_inv_loop_fun' in H3; [ flia H3 | | ]. 2: {
       destruct (Nat.eq_dec i n) as [H5| H5]; [ now subst i | ].
       destruct (Nat.eq_dec (S i) n) as [H6| H6]. {
         now rewrite H6 in H4.
@@ -3792,7 +3792,7 @@ assert
     }
     now replace j with n by flia Hj Hjn.
   }
-  remember (permut_fun_inv (vect_el 0 σ) n (S n)) as k eqn:Hk.
+  remember (permut_fun_inv_loop (vect_el 0 σ) n (S n)) as k eqn:Hk.
   destruct (lt_dec i k) as [H5| H5]. {
     destruct (lt_dec j k) as [H6| H6]. {
       apply H2; [ flia Hi | flia Hj | easy ].
@@ -3829,15 +3829,15 @@ destruct (Nat.eq_dec k (S n)) as [Hksn| Hksn]. {
   rewrite Hk in Hksn.
   rewrite <- Hksn at 1.
   unfold permut_inv.
-  cbn - [ permut_fun_inv seq ].
+  cbn - [ permut_fun_inv_loop seq ].
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
   rewrite seq_nth; [ | flia ].
   rewrite Nat.add_0_l.
-  rewrite fun_permut_fun_inv; [ easy | easy | flia ].
+  rewrite fun_permut_fun_inv_loop; [ easy | easy | flia ].
 }
-(* voir permut_fun_inv_fun et fun_find_prop : ils font pas double
+(* voir permut_fun_inv_loop_fun et fun_find_prop : ils font pas double
    emploi, ceux-là ? *)
-(* et permut_fun_inv_fun' aussi !!! *)
+(* et permut_fun_inv_loop_fun' aussi !!! *)
 specialize permut_inv_is_permut as H3.
 specialize (H3 (S (S n)) σ).
 assert (H : is_permut_vect (S (S n)) σ) by easy.
@@ -3877,11 +3877,11 @@ destruct (Nat.eq_dec k 0) as [Hkz| Hkz]. {
   rewrite rngl_product_split_first; [ | flia ].
   rewrite Hk at 2.
   unfold permut_inv.
-  cbn - [ permut_fun_inv seq ].
+  cbn - [ permut_fun_inv_loop seq ].
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
   rewrite seq_nth; [ | flia ].
   rewrite Nat.add_0_l.
-  rewrite fun_permut_fun_inv; [ | easy | flia ].
+  rewrite fun_permut_fun_inv_loop; [ | easy | flia ].
   rewrite rngl_mul_comm; [ | easy ].
   f_equal.
   rewrite rngl_product_succ_succ.
@@ -3965,10 +3965,10 @@ replace (vect_el 0 σ (k + 1)) with (S n). 2: {
   rewrite Nat.add_1_r.
   rewrite Hk.
   unfold permut_inv.
-  cbn - [ permut_fun_inv seq ].
+  cbn - [ permut_fun_inv_loop seq ].
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
   rewrite seq_nth; [ | flia ].
-  rewrite fun_permut_fun_inv; [ easy | easy | flia ].
+  rewrite fun_permut_fun_inv_loop; [ easy | easy | flia ].
 }
 rewrite <- rngl_mul_assoc.
 rewrite rngl_mul_comm; [ | easy ].
@@ -4057,7 +4057,7 @@ apply map_ext_in.
 intros i Hi; apply in_seq in Hi.
 rewrite seq_nth; [ | easy ].
 destruct Hf as (Hs, Hf).
-now apply (@fun_permut_fun_inv (λ i, nth i f 0)).
+now apply (@fun_permut_fun_inv_loop (λ i, nth i f 0)).
 Qed.
 
 Theorem comp_id_l : ∀ A B (f : A → B), comp id f = f.
@@ -4127,18 +4127,18 @@ Print vector_eq.
 Search (vector _ _ → vector _ _ → bool).
 Search (vector _ _ → vector _ _ → _).
 ...
-Check (permut_fun_inv (λ k, vect_el (vect_el σ k) n)).
-Print permut_fun_inv.
+Check (permut_fun_inv_loop (λ k, vect_el (vect_el σ k) n)).
+Print permut_fun_inv_loop.
 Check (λ k, vect_el (vect_el σ k)).
-Print permut_fun_inv.
-Print permut_fun_inv'.
+Print permut_fun_inv_loop.
+Print permut_fun_inv_loop'.
 Print is_permut_fun.
-Search permut_fun_inv.
+Search permut_fun_inv_loop.
 ...
 unfold is_permut_fun in H2.
-Print permut_fun_inv'.
+Print permut_fun_inv_loop'.
 permut_fun = vect_el σ
-exists (permut_fun_inv n
+exists (permut_fun_inv_loop n
 ...
 
 Theorem glop : ∀ n (σ σ' : vector n! _),
@@ -4673,7 +4673,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
     apply vector_eq.
     intros i Hi; cbn.
     unfold comp.
-    now rewrite permut_fun_inv_fun.
+    now rewrite permut_fun_inv_loop_fun.
   }
   subst ν.
   rewrite <- Hσν at 1.
@@ -4952,7 +4952,7 @@ symmetry.
   ε (permut_inv σ ° μ i) *
   ∏ (i0 = 1, n),
   mat_el M (vect_el σ (i0 - 1))
-    (comp (vect_el σ) (comp (permut_fun_inv (vect_el σ) n) (vect_el (μ i))) (i0 - 1)%nat)
+    (comp (vect_el σ) (comp (permut_fun_inv_loop (vect_el σ) n) (vect_el (μ i))) (i0 - 1)%nat)
 ...
 apply rngl_summation_eq_compat.
 intros i Hi.
