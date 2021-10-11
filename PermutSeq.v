@@ -43,14 +43,19 @@ Definition is_permut_fun f n :=
 Definition vect_vect_nat_el (V : vector (vector nat)) i : vector nat :=
   nth i (vect_list V) empty_vect.
 
-Definition is_permut_vect n (σ : vector nat) :=
-  vect_size σ = n ∧ is_permut_fun (vect_el 0 σ) n.
+Definition is_permut_vect (σ : vector nat) :=
+  is_permut_fun (vect_el 0 σ) (vect_size σ).
 
 Fixpoint permut_fun_inv_loop f i j :=
   match i with
   | 0 => 42
   | S i' => if Nat.eq_dec (f i') j then i' else permut_fun_inv_loop f i' j
   end.
+
+Definition permut_vect_inv (σ : vector nat) :=
+  mk_vect
+    (map (permut_fun_inv_loop (vect_el 0 σ) (vect_size σ))
+       (seq 0 (vect_size σ))).
 
 Definition transposition i j k :=
   if k =? i then j else if k =? j then i else k.
@@ -271,10 +276,11 @@ Definition is_sym_gr n (f : nat → nat → nat) :=
 
 Definition is_sym_gr_vect n (vv : vector (vector nat)) :=
   (∀ i, i < vect_size vv →
-   is_permut_vect n (vect_el empty_vect vv i)) ∧
+   vect_size (vect_el empty_vect vv i) = n ∧
+   is_permut_vect (vect_el empty_vect vv i)) ∧
   (∀ i j, i < vect_size vv → j < vect_size vv →
    vect_el empty_vect vv i = vect_el empty_vect vv j → i = j) ∧
-  (∀ v, is_permut_vect n v → ∃ i, vect_el empty_vect vv i = v).
+  (∀ v, is_permut_vect v → ∃ i, vect_el empty_vect vv i = v).
 
 Theorem glop : ∀ n vv,
   is_sym_gr_vect n vv → vect_size vv = n! ∨ vect_size vv = 0.
@@ -283,7 +289,7 @@ intros * Hsg.
 destruct n. {
   destruct Hsg as (Hsg & Hinj & Hsurj).
   specialize (Hsurj empty_vect).
-  assert (H : is_permut_vect 0 empty_vect) by easy.
+  assert (H : is_permut_vect empty_vect) by easy.
   specialize (Hsurj H); clear H.
   destruct Hsurj as (i, Hi).
   unfold vect_el in Hi.
@@ -338,14 +344,14 @@ induction n; intros. {
   destruct vv as (lv); cbn in *.
   destruct lv as [| v1]. {
     specialize (Hsurj (mk_vect [0])).
-    assert (H : is_permut_vect 1 (mk_vect [0])). {
-      split; [ easy | ].
+    assert (H : is_permut_vect (mk_vect [0])). {
       split. {
         intros i Hi.
         apply Nat.lt_1_r in Hi; subst i.
         cbn; flia.
       }
       intros i j Hi Hj.
+      cbn in Hi, Hj.
       now apply Nat.lt_1_r in Hi, Hj; subst i j; cbn.
     }
     specialize (Hsurj H); clear H.
@@ -382,29 +388,29 @@ induction n; intros. {
 (**)
 (* https://fr.wikipedia.org/wiki/Groupe_sym%C3%A9trique#Propri%C3%A9t%C3%A9s *)
 (*
-set (σ' := λ σ, vect_swap_elem 0 σ (S n) (vect_el 0 σ (S n)) ° σ).
 *)
-set (σ' := λ σ, mk_vect (map (λ i, vect_el 0 σ (if vect_el 0 σ i =? S n then S n else i)) (seq 0 (S n)))).
-(*
-set (σ' := λ σ, mk_vect (map (λ i, if i =? S n then S n else vect_el 0 σ i) (seq 0 (S (S n))))).
-*)
+set
+  (σ' := λ σ,
+   mk_vect
+     (map (λ i, vect_el 0 σ (if vect_el 0 σ i =? S n then S n else i))
+        (seq 0 (S n)))).
 set (φ := λ σ, (vect_el 0 σ (S n), σ' σ)).
-assert (Hσ : ∀ σ, is_permut_vect (S (S n)) σ → is_permut_vect (S n) (σ' σ)). {
+assert (Hσ : ∀ σ, is_permut_vect σ → is_permut_vect (σ' σ)). {
   intros σ Hσ.
   split. {
-    unfold σ', vect_size; cbn - [ seq ].
-    now rewrite map_length, seq_length.
-  }
-  split. {
     intros i Hi.
+    unfold σ' in Hi; cbn in Hi.
+    rewrite map_length, seq_length in Hi.
     unfold σ'; cbn - [ seq ].
+    rewrite map_length, seq_length.
     rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
     rewrite seq_nth; [ | easy ].
     rewrite Nat.add_0_l.
     rewrite if_eqb_eq_dec.
     destruct (Nat.eq_dec (vect_el 0 σ i) (S n)) as [H1| H1]. {
-      destruct Hσ as (H2 & H3 & H4).
-      specialize (H4 (S n) i).
+      destruct Hσ as (H2 & H3).
+      specialize (H3 (S n) i).
+...
       assert (H : i < S (S n)) by flia Hi.
       specialize (H4 (Nat.lt_succ_diag_r _) H); clear H.
       rewrite H1 in H4.
@@ -445,14 +451,16 @@ assert (Hσ : ∀ σ, is_permut_vect (S (S n)) σ → is_permut_vect (S n) (σ' 
     apply H4; [ flia Hi | flia Hj | easy ].
   }
 }
-Print permut_fun_inv_loop.
+Print permut_vect_inv.
+Print is_permut_vect.
+...
 set
   (φ' := λ a : (nat * vector nat), let '(i, v) := a in
     mk_vect
       (map
          (λ j,
           if j =? S n then i
-          else permut_fun_inv_loop (vect_el 0 v) (vect_size v) j)
+          else permut_vect_inv v (vect_size v) j)
          (seq 0 (S (S n))))).
 ...
 set
@@ -1447,7 +1455,7 @@ apply Hfub.
 flia Hj Hjn.
 Qed.
 
-(* the proof that "vect_el σ (vect_el (permut_inv σ) i) = i"
+(* the proof that "vect_el σ (vect_el (permut_vect_inv σ) i) = i"
    is proven by the pigeonhole principle *)
 
 Theorem pigeonhole' : ∀ f n,
@@ -3760,17 +3768,14 @@ apply Nat.mod_upper_bound.
 apply fact_neq_0.
 Qed.
 
-Definition permut_inv (n : nat) (σ : vector nat) :=
-  mk_vect (map (permut_fun_inv_loop (vect_el 0 σ) n) (seq 0 n)).
-
-Theorem permut_inv_is_permut : ∀ n (σ : vector nat),
+Theorem permut_vect_inv_is_permut : ∀ n (σ : vector nat),
   is_permut_vect n σ
-  → is_permut_vect n (permut_inv n σ).
+  → is_permut_vect n (permut_vect_inv n σ).
 Proof.
 intros * (Hp1, Hp2).
 specialize (permut_fun_inv_loop_is_permut Hp2) as H1.
 split; [ now cbn; rewrite map_length, seq_length | ].
-unfold permut_inv, vect_el; cbn.
+unfold permut_vect_inv, vect_el; cbn.
 eapply is_permut_eq_compat. {
   intros i Hi.
   symmetry.
