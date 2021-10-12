@@ -395,7 +395,33 @@ set
      (map (λ i, vect_el 0 σ (if vect_el 0 σ i =? S n then S n else i))
         (seq 0 (S n)))).
 set (φ := λ σ, (vect_el 0 σ (S n), σ' σ)).
-assert (Hσ : ∀ σ, is_permut_vect σ → is_permut_vect (σ' σ)). {
+assert
+  (Hσ : ∀ σ,
+   vect_size σ = S (S n) ∧ is_permut_vect σ
+   → vect_size (σ' σ) = S n ∧ is_permut_vect (σ' σ)). {
+  intros * (Hsσ, Hσ).
+  split. {
+    unfold σ'; cbn.
+    now rewrite map_length, seq_length.
+  }
+  split. {
+    intros i Hi.
+    unfold σ' in Hi; cbn in Hi.
+    rewrite map_length, seq_length in Hi.
+    unfold σ'; cbn - [ seq ].
+    rewrite map_length, seq_length.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ | easy ].
+    rewrite Nat.add_0_l.
+    rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec (vect_el 0 σ i) (S n)) as [H1| H1]. {
+      destruct Hσ as (H2 & H3).
+      specialize (H3 (S n) i).
+      assert (H : S n < vect_size σ) by flia Hsσ.
+      specialize (H3 H); clear H.
+      assert (H : i < vect_size σ) by flia Hsσ Hi.
+      specialize (H3 H); clear H.
+...
   intros σ Hσ.
   split. {
     intros i Hi.
@@ -409,6 +435,7 @@ assert (Hσ : ∀ σ, is_permut_vect σ → is_permut_vect (σ' σ)). {
     rewrite if_eqb_eq_dec.
     destruct (Nat.eq_dec (vect_el 0 σ i) (S n)) as [H1| H1]. {
       destruct Hσ as (H2 & H3).
+...
       specialize (H3 (S n) i).
       assert (H : S n < vect_size σ). {
         unfold vect_el in H1.
