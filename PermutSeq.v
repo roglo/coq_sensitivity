@@ -410,6 +410,28 @@ assert (Hσ : ∀ σ, is_permut_vect σ → is_permut_vect (σ' σ)). {
     destruct (Nat.eq_dec (vect_el 0 σ i) (S n)) as [H1| H1]. {
       destruct Hσ as (H2 & H3).
       specialize (H3 (S n) i).
+      assert (H : S n < vect_size σ). {
+        unfold vect_el in H1.
+        unfold vect_size.
+...
+        clear - Hi H1.
+        destruct σ as (l).
+        cbn in H1 |-*.
+        revert n l Hi H1.
+        induction i; intros. {
+          destruct l as [| a]; [ easy | ].
+          cbn in H1.
+          subst a; cbn.
+...
+        revert i n H1.
+        induction l as [| a]; intros. {
+          cbn in H1.
+          now rewrite match_id in H1.
+        }
+        cbn.
+        apply -> Nat.succ_lt_mono.
+        destruct i. {
+          cbn in H1.
 ...
       assert (H : i < S (S n)) by flia Hi.
       specialize (H4 (Nat.lt_succ_diag_r _) H); clear H.
