@@ -421,95 +421,50 @@ assert
       specialize (H3 H); clear H.
       assert (H : i < vect_size σ) by flia Hsσ Hi.
       specialize (H3 H); clear H.
-...
-  intros σ Hσ.
-  split. {
-    intros i Hi.
-    unfold σ' in Hi; cbn in Hi.
-    rewrite map_length, seq_length in Hi.
-    unfold σ'; cbn - [ seq ].
-    rewrite map_length, seq_length.
-    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-    rewrite seq_nth; [ | easy ].
-    rewrite Nat.add_0_l.
-    rewrite if_eqb_eq_dec.
-    destruct (Nat.eq_dec (vect_el 0 σ i) (S n)) as [H1| H1]. {
-      destruct Hσ as (H2 & H3).
-...
-      specialize (H3 (S n) i).
-      assert (H : S n < vect_size σ). {
-        unfold vect_el in H1.
-        unfold vect_size.
-...
-        clear - Hi H1.
-        destruct σ as (l).
-        cbn in H1 |-*.
-        revert n l Hi H1.
-        induction i; intros. {
-          destruct l as [| a]; [ easy | ].
-          cbn in H1.
-          subst a; cbn.
-...
-        revert i n H1.
-        induction l as [| a]; intros. {
-          cbn in H1.
-          now rewrite match_id in H1.
-        }
-        cbn.
-        apply -> Nat.succ_lt_mono.
-        destruct i. {
-          cbn in H1.
-...
-      assert (H : i < S (S n)) by flia Hi.
-      specialize (H4 (Nat.lt_succ_diag_r _) H); clear H.
-      rewrite H1 in H4.
-      destruct (Nat.eq_dec (vect_el 0 σ (S n)) (S n)) as [H5| H5]. {
-        specialize (H4 H5).
-        rewrite H4 in Hi; flia Hi.
+      rewrite H1 in H3.
+      rewrite Hsσ in H2.
+      specialize (H2 (S n) (Nat.lt_succ_diag_r _)).
+      assert (H : vect_el 0 σ (S n) ≠ S n). {
+        intros H; specialize (H3 H); flia H3 Hi.
       }
-      specialize (H3 (S n) (Nat.lt_succ_diag_r _)).
-      flia H3 H5.
+      flia H2 H.
     } {
-      destruct Hσ as (H2 & H3 & H4).
-      specialize (H3 i).
-      assert (H : i < S (S n)) by flia Hi.
-      specialize (H3 H); clear H.
-      flia H3 H1.
+      destruct Hσ as (H2 & H3).
+      specialize (H2 i).
+      assert (H : i < vect_size σ) by flia Hsσ Hi.
+      specialize (H2 H); clear H.
+      flia Hsσ H2 H1.
     }
-  }
-  intros * Hi Hj Hij.
-  unfold σ' in Hij; cbn - [ seq ] in Hij.
-  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-  rewrite seq_nth in Hij; [ | easy ].
-  rewrite seq_nth in Hij; [ | easy ].
-  do 2 rewrite Nat.add_0_l in Hij.
-  do 2 rewrite if_eqb_eq_dec in Hij.
-  destruct Hσ as (H2 & H3 & H4).
-  destruct (Nat.eq_dec (vect_el 0 σ i) (S n)) as [Hisn| Hisn]. {
-    destruct (Nat.eq_dec (vect_el 0 σ j) (S n)) as [Hjsn| Hjsn]. {
-      apply H4; [ flia Hi | flia Hj | congruence ].
-    }
-    apply H4 in Hij; [ | flia | flia Hj ].
-    flia Hj Hij.
   } {
-    destruct (Nat.eq_dec (vect_el 0 σ j) (S n)) as [Hjsn| Hjsn]. {
-      apply H4 in Hij; [ | flia Hi | flia ].
+    intros i j Hi Hj Hij.
+    unfold σ' in Hi, Hj, Hij; cbn - [ seq ] in Hi, Hj, Hij.
+    rewrite map_length, seq_length in Hi, Hj.
+    rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+    rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+    rewrite seq_nth in Hij; [ | easy ].
+    rewrite seq_nth in Hij; [ | easy ].
+    do 2 rewrite Nat.add_0_l, if_eqb_eq_dec in Hij.
+    apply Hσ; [ flia Hsσ Hi | flia Hsσ Hj | ].
+    destruct Hσ as (H2, H3).
+    rewrite Hsσ in H2.
+    destruct (Nat.eq_dec (vect_el 0 σ i) (S n)) as [Hin| Hin]. {
+      destruct (Nat.eq_dec (vect_el 0 σ j) (S n)) as [H| H]; [ congruence | ].
+      apply H3 in Hij; [ | flia Hsσ | flia Hj Hsσ ].
+      flia Hj Hij.
+    } {
+      destruct (Nat.eq_dec (vect_el 0 σ j) (S n)) as [H| H]; [ | congruence ].
+      apply H3 in Hij; [ | flia Hi Hsσ | flia Hsσ ].
       flia Hi Hij.
     }
-    apply H4; [ flia Hi | flia Hj | easy ].
   }
 }
-Print permut_vect_inv.
-Print is_permut_vect.
-...
 set
   (φ' := λ a : (nat * vector nat), let '(i, v) := a in
     mk_vect
       (map
          (λ j,
           if j =? S n then i
-          else permut_vect_inv v (vect_size v) j)
+          else vect_el 0 (permut_vect_inv v) j)
          (seq 0 (S (S n))))).
 ...
 set
