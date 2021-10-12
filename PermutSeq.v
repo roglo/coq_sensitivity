@@ -487,15 +487,11 @@ assert (H : (∀ x, vect_size x = S (S n) → φ' (φ x) = x) ∧ (∀ y, φ (φ
       cbn - [ seq Nat.eq_dec permut_fun_inv_loop ].
       easy.
     }
-Search permut_fun_inv_loop.
-...
-      rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
-      rewrite seq_nth; [ | flia ].
-      rewrite Nat.add_0_l.
-      rewrite if_eqb_eq_dec.
-      destruct (Nat.eq_dec (nth n l 0) (S n)) as [H2| H2]. {
-        destruct (Nat.eq_dec (nth (S n) l 0) i) as [H3| H3]. {
-          rewrite nth_overflow in H3; [ | flia Hv ].
+    replace (nth (S n) l 0) with (last l 0) by now rewrite List_last_nth, Hv.
+    rewrite app_removelast_last with (d := 0). 2: {
+      now intros H; rewrite H in Hv.
+    }
+    f_equal.
 ...
 (* selecting all permutations of vv starting with "S n" *)
 set (ll1 := filter (λ v, vect_el 0 v 0 =? S n) (vect_list vv)).
