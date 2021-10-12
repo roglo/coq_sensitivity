@@ -521,8 +521,6 @@ assert (H : (∀ x, vect_size x = S (S n) → φ' (φ x) = x) ∧ (∀ y, φ (φ
     apply map_ext_in.
     intros i Hi; apply in_seq in Hi.
     destruct Hi as (_, Hi); cbn in Hi.
-...
-    clear - Hv Hi.
     erewrite permut_fun_inv_loop_ext_in. 2: {
       intros j Hj.
       rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
@@ -531,6 +529,13 @@ assert (H : (∀ x, vect_size x = S (S n) → φ' (φ x) = x) ∧ (∀ y, φ (φ
       rewrite if_eqb_eq_dec.
       easy.
     }
+(*1*)
+    destruct i. {
+      cbn - [ Nat.eq_dec ].
+      destruct (Nat.eq_dec (nth n l 0) (S n)) as [H1| H1]. {
+        destruct (Nat.eq_dec (nth (S n) l 0) 0) as [H2| H2]. {
+...1
+    clear - Hv Hi.
     induction i. {
       cbn - [ Nat.eq_dec ].
       destruct (Nat.eq_dec (nth n l 0) (S n)) as [H1| H1]. {
