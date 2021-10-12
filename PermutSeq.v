@@ -463,11 +463,9 @@ set
     mk_vect
       (map (λ j, if j =? S n then i else vect_el 0 (permut_vect_inv v) j)
          (seq 0 (S (S n))))).
-assert (H : FinFun.Bijective φ). {
-  exists φ'.
+assert (H : (∀ x, vect_size x = S (S n) → φ' (φ x) = x) ∧ (∀ y, φ (φ' y) = y)).
   split. {
-...
-    intros (l).
+    intros (l) Hv; cbn in Hv.
     unfold φ', φ.
     f_equal.
     unfold σ'.
@@ -478,16 +476,26 @@ assert (H : FinFun.Bijective φ). {
     cbn - [ seq ].
     rewrite Nat.eqb_refl.
     rewrite map_length, seq_length.
-...
     erewrite map_ext_in. 2: {
       intros i Hi; apply in_seq in Hi.
       rewrite if_eqb_eq_dec.
-      destruct (Nat.eq_dec i (S n)) as [H| H]; [ flia Hi H | ].
+      destruct (Nat.eq_dec i (S n)) as [H1| H1]; [ flia Hi H1 | ].
       rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
       rewrite seq_nth; [ | easy ].
       rewrite Nat.add_0_l.
       unfold vect_el.
-      cbn - [ seq Nat.eq_dec ].
+      cbn - [ seq Nat.eq_dec permut_fun_inv_loop ].
+      easy.
+    }
+Search permut_fun_inv_loop.
+...
+      rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
+      rewrite seq_nth; [ | flia ].
+      rewrite Nat.add_0_l.
+      rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec (nth n l 0) (S n)) as [H2| H2]. {
+        destruct (Nat.eq_dec (nth (S n) l 0) i) as [H3| H3]. {
+          rewrite nth_overflow in H3; [ | flia Hv ].
 ...
 (* selecting all permutations of vv starting with "S n" *)
 set (ll1 := filter (λ v, vect_el 0 v 0 =? S n) (vect_list vv)).
