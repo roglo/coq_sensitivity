@@ -68,6 +68,25 @@ Definition vect_swap_elem {A} d (v : vector A) i j :=
     (map (λ k, vect_el d v (transposition i j k))
        (seq 0 (length (vect_list v)))).
 
+Theorem permut_fun_inv_loop_ext_in : ∀ f g i j,
+  (∀ k, k < i → f k = g k)
+  → permut_fun_inv_loop f i j = permut_fun_inv_loop g i j.
+Proof.
+intros * Hfg.
+revert j.
+induction i; intros; [ easy | cbn ].
+destruct (Nat.eq_dec (f i) j) as [Hf| Hf]. {
+  destruct (Nat.eq_dec (g i) j) as [Hg| Hg]; [ easy | ].
+  specialize (Hfg i (Nat.lt_succ_diag_r _)); congruence.
+}
+destruct (Nat.eq_dec (g i) j) as [Hg| Hg]. {
+  specialize (Hfg i (Nat.lt_succ_diag_r _)); congruence.
+}
+apply IHi.
+intros k Hk.
+apply Hfg; flia Hk.
+Qed.
+
 Theorem is_permut_eq_compat : ∀ n f g,
   (∀ i, i < n → f i = g i)
   → is_permut_fun f n
@@ -492,6 +511,25 @@ assert (H : (∀ x, vect_size x = S (S n) → φ' (φ x) = x) ∧ (∀ y, φ (φ
       now intros H; rewrite H in Hv.
     }
     f_equal.
+    rewrite List_map_nth_seq with (d := 0).
+    replace (length (removelast l)) with (S n). 2: {
+      destruct l using rev_ind; [ easy | ].
+      rewrite removelast_last.
+      rewrite app_length, Nat.add_1_r in Hv.
+      now apply Nat.succ_inj in Hv.
+    }
+    apply map_ext_in.
+    intros i Hi; apply in_seq in Hi.
+    destruct Hi as (_, Hi); cbn in Hi.
+    clear - Hv Hi.
+    erewrite permut_fun_inv_loop_ext_in. 2: {
+      intros j Hj.
+      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+      rewrite seq_nth; [ | easy ].
+      rewrite Nat.add_0_l.
+      rewrite if_eqb_eq_dec.
+      easy.
+    }
 ...
 (* selecting all permutations of vv starting with "S n" *)
 set (ll1 := filter (λ v, vect_el 0 v 0 =? S n) (vect_list vv)).
