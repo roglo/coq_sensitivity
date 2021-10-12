@@ -461,20 +461,12 @@ assert
 set
   (φ' := λ a : (nat * vector nat), let '(i, v) := a in
     mk_vect
-      (map
-         (λ j,
-          if j =? S n then i
-          else vect_el 0 (permut_vect_inv v) j)
+      (map (λ j, if j =? S n then i else vect_el 0 (permut_vect_inv v) j)
          (seq 0 (S (S n))))).
-...
-set
-  (φ' := λ a, let '(i, v) := a in
-    mk_vect
-      (map (λ j, if j =? S n then i else vect_el 0 v j) (seq 0 (S (S n))))).
-...
 assert (H : FinFun.Bijective φ). {
   exists φ'.
   split. {
+...
     intros (l).
     unfold φ', φ.
     f_equal.
@@ -485,14 +477,17 @@ assert (H : FinFun.Bijective φ). {
     rewrite map_app.
     cbn - [ seq ].
     rewrite Nat.eqb_refl.
+    rewrite map_length, seq_length.
+...
     erewrite map_ext_in. 2: {
       intros i Hi; apply in_seq in Hi.
       rewrite if_eqb_eq_dec.
       destruct (Nat.eq_dec i (S n)) as [H| H]; [ flia Hi H | ].
       rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-      rewrite seq_nth; [ cbn | easy ].
-      easy.
-    }
+      rewrite seq_nth; [ | easy ].
+      rewrite Nat.add_0_l.
+      unfold vect_el.
+      cbn - [ seq Nat.eq_dec ].
 ...
 (* selecting all permutations of vv starting with "S n" *)
 set (ll1 := filter (λ v, vect_el 0 v 0 =? S n) (vect_list vv)).
