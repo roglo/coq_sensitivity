@@ -482,9 +482,13 @@ set
     mk_vect
       (map (λ j, if j =? S n then i else vect_el 0 (permut_vect_inv v) j)
          (seq 0 (S (S n))))).
-assert (H : (∀ x, vect_size x = S (S n) → φ' (φ x) = x) ∧ (∀ y, φ (φ' y) = y)).
+assert (H : (∀ x, vect_size x = S (S n) → is_permut_vect x → φ' (φ x) = x) ∧ (∀ y, φ (φ' y) = y)).
   split. {
-    intros (l) Hv; cbn in Hv.
+    intros (l) Hv Hp; cbn in Hv.
+    unfold is_permut_vect in Hp; cbn in Hp.
+    unfold vect_el in Hp; cbn in Hp.
+    rewrite Hv in Hp; cbn in Hp.
+    destruct Hp as (Hp1, Hp2).
     unfold φ', φ.
     f_equal.
     unfold σ'.
