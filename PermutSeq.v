@@ -301,6 +301,23 @@ Definition is_sym_gr_vect n (vv : vector (vector nat)) :=
    vect_el empty_vect vv i = vect_el empty_vect vv j → i = j) ∧
   (∀ v, vect_size v = n → is_permut_vect v → v ∈ vect_list vv).
 
+Theorem sym_gr_vect_elem : ∀ n sg,
+  is_sym_gr_vect n sg →
+  (∀ σ, vect_size σ = n ∧ is_permut_vect σ ↔ σ ∈ vect_list sg).
+Proof.
+intros * Hsg σ.
+split. {
+  intros (Hs, Hp).
+  now apply Hsg.
+} {
+  intros Hσ.
+  apply In_nth with (d := empty_vect) in Hσ.
+  destruct Hσ as (i & Hi & Hσ).
+  subst σ.
+  now apply Hsg.
+}
+Qed.
+
 Theorem glop : ∀ n vv, is_sym_gr_vect n vv → vect_size vv = n!.
 Proof.
 intros * Hsg.
@@ -607,21 +624,6 @@ assert
   }
 }
 destruct H as (Hφ'φ, Hφφ').
-Theorem glop : ∀ σ n sg,
-  is_sym_gr_vect n sg →
-  (vect_size σ = n ∧ is_permut_vect σ ↔ σ ∈ vect_list sg).
-Proof.
-intros * Hsg.
-split. {
-  intros (Hs, Hp).
-  now apply Hsg.
-} {
-  intros Hσ.
-  apply In_nth with (d := empty_vect) in Hσ.
-  destruct Hσ as (i & Hi & Hσ).
-  subst σ.
-  now apply Hsg.
-}
 ...
 (* selecting all permutations of vv starting with "S n" *)
 set (ll1 := filter (λ v, vect_el 0 v 0 =? S n) (vect_list vv)).
