@@ -577,7 +577,18 @@ assert
     apply Nat.succ_inj in Hv.
     rewrite removelast_last.
     rewrite app_nth1; [ easy | flia Hv Hi ].
-  }
+  } {
+    intros (i, v).
+    unfold φ, φ', σ'.
+    cbn - [ seq ].
+    f_equal. {
+      rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
+      rewrite seq_nth; [ | flia ].
+      now rewrite Nat.eqb_refl.
+    } {
+      destruct v as (l).
+      f_equal.
+      rewrite List_map_nth_seq with (d := 0).
 ...
 (* selecting all permutations of vv starting with "S n" *)
 set (ll1 := filter (λ v, vect_el 0 v 0 =? S n) (vect_list vv)).
