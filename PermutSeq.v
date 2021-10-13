@@ -404,10 +404,6 @@ induction n; intros. {
   }
   now specialize (Hinj H).
 }
-(**)
-(* https://fr.wikipedia.org/wiki/Groupe_sym%C3%A9trique#Propri%C3%A9t%C3%A9s *)
-(*
-*)
 set
   (σ' := λ σ,
    mk_vect
@@ -477,13 +473,6 @@ assert
     }
   }
 }
-(*
-set
-  (φ' := λ a : (nat * vector nat), let '(i, v) := a in
-    mk_vect
-      (map (λ j, if j =? S n then i else vect_el 0 (permut_vect_inv v) j)
-         (seq 0 (S (S n))))).
-*)
 set
   (φ' := λ a : (nat * vector nat), let '(i, v) := a in
     mk_vect
@@ -499,6 +488,7 @@ subst n.
 Compute (φ (mk_vect [0;5;2;4;1;3])).
 Compute (φ' (3, {| vect_list := [0; 3; 2; 4; 1] |})).
 Compute (φ' (φ (mk_vect [0;5;2;4;1;3]))).
+Compute (φ' (φ (mk_vect [0;3;2;4;1;5]))).
 Compute (permut_vect_inv (permut_vect_inv (mk_vect [0;5;2;4;1;3]))).
 ...
 *)
@@ -521,9 +511,6 @@ assert
     rewrite map_app.
     cbn - [ seq ].
     rewrite Nat.eqb_refl.
-(*
-    rewrite map_length, seq_length.
-*)
     erewrite map_ext_in. 2: {
       intros i Hi; apply in_seq in Hi.
       rewrite if_eqb_eq_dec.
@@ -531,10 +518,6 @@ assert
       rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
       rewrite seq_nth; [ | easy ].
       rewrite Nat.add_0_l.
-(*
-      unfold vect_el.
-      cbn - [ seq Nat.eq_dec permut_fun_inv_loop ].
-*)
       easy.
     }
     replace (nth (S n) l 0) with (last l 0) by now rewrite List_last_nth, Hv.
@@ -551,7 +534,6 @@ assert
     }
     apply map_ext_in.
     intros i Hi; apply in_seq in Hi.
-(*2*)
     do 2 rewrite if_eqb_eq_dec.
     destruct (Nat.eq_dec (nth i l 0) (S n)) as [H1| H1]. {
       destruct (Nat.eq_dec (nth (S n) l 0) (last l 0)) as [H2| H2]. {
@@ -579,27 +561,23 @@ assert
       rewrite app_nth1 in H1; [ | now rewrite <- Hv in Hi ].
       rewrite app_nth1 in H2; [ | now rewrite <- Hv in Hi ].
       rewrite last_last in H2.
-...2
-    destruct Hi as (_, Hi); cbn in Hi.
-    erewrite permut_fun_inv_loop_ext_in. 2: {
-      intros j Hj.
-      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-      rewrite seq_nth; [ | easy ].
-      rewrite Nat.add_0_l.
-      rewrite if_eqb_eq_dec.
-      easy.
+      specialize (Hp2 i (S n)).
+      assert (H : i < S (S n)) by flia Hv Hi.
+      specialize (Hp2 H (Nat.lt_succ_diag_r _)); clear H.
+      rewrite app_nth1 in Hp2; [ | flia Hv Hi ].
+      rewrite app_nth2 in Hp2; [ | flia Hv ].
+      rewrite Hv, Nat.sub_diag in Hp2.
+      cbn in Hp2.
+      specialize (Hp2 H2).
+      flia Hp2 Hi.
     }
-(*1*)
-    destruct i. {
-      cbn - [ Nat.eq_dec ].
-      destruct (Nat.eq_dec (nth n l 0) (S n)) as [H1| H1]. {
-        destruct (Nat.eq_dec (nth (S n) l 0) 0) as [H2| H2]. {
-...1
-    clear - Hv Hi.
-    induction i. {
-      cbn - [ Nat.eq_dec ].
-      destruct (Nat.eq_dec (nth n l 0) (S n)) as [H1| H1]. {
-        destruct (Nat.eq_dec (nth (S n) l 0) 0) as [H2| H2]. {
+    destruct l as [| a] using rev_ind; [ easy | ].
+    rewrite app_length in Hv.
+    rewrite Nat.add_1_r in Hv.
+    apply Nat.succ_inj in Hv.
+    rewrite removelast_last.
+    rewrite app_nth1; [ easy | flia Hv Hi ].
+  }
 ...
 (* selecting all permutations of vv starting with "S n" *)
 set (ll1 := filter (λ v, vect_el 0 v 0 =? S n) (vect_list vv)).
