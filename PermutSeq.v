@@ -564,6 +564,12 @@ assert
         apply Nat.succ_inj in Hv.
         now rewrite Hv.
       }
+      destruct l as [| a] using rev_ind; [ easy | ].
+      rewrite app_length, Nat.add_1_r in Hv.
+      apply Nat.succ_inj in Hv.
+      rewrite app_nth2 in H2; [ | flia Hv ].
+      now rewrite Hv, Nat.sub_diag, last_last in H2.
+    }
 ...2
     destruct Hi as (_, Hi); cbn in Hi.
     erewrite permut_fun_inv_loop_ext_in. 2: {

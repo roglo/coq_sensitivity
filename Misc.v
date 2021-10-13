@@ -1167,18 +1167,12 @@ destruct lc as [| c]; [ | easy ].
 now destruct la.
 Qed.
 
-Theorem List_last_app {A} : ∀ l (d a : A), List.last (l ++ [a]) d = a.
-Proof.
-intros.
-now apply List_last_app_not_nil_r.
-Qed.
-
 Theorem List_rev_last : ∀ A l (d : A),
   last (rev l) d = hd d l.
 Proof.
 intros.
 induction l; [ easy | cbn ].
-apply List_last_app.
+apply last_last.
 Qed.
 
 Theorem List_map_fun : ∀ A B d l l' (f g : A → B),
