@@ -615,6 +615,17 @@ assert
         specialize (Hp1 Hj).
         flia Hp1.
       }
+      rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
+      rewrite seq_nth; [ | flia Hj ].
+      rewrite Nat.add_0_l.
+      rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec j (S n)) as [H| H]; [ flia Hj H | clear H ].
+      rewrite if_eqb_eq_dec.
+      now destruct (Nat.eq_dec (nth j l 0) i).
+    }
+  }
+}
+destruct H as (Hφ'φ, Hφφ').
 ...
 (* selecting all permutations of vv starting with "S n" *)
 set (ll1 := filter (λ v, vect_el 0 v 0 =? S n) (vect_list vv)).
