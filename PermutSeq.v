@@ -570,6 +570,15 @@ assert
       rewrite app_nth2 in H2; [ | flia Hv ].
       now rewrite Hv, Nat.sub_diag, last_last in H2.
     }
+    destruct (Nat.eq_dec (nth i l 0) (last l 0)) as [H2| H2]. {
+      destruct l as [| a] using rev_ind; [ easy | ].
+      rewrite app_length in Hv.
+      rewrite Nat.add_1_r in Hv.
+      apply Nat.succ_inj in Hv.
+      rewrite removelast_last.
+      rewrite app_nth1 in H1; [ | now rewrite <- Hv in Hi ].
+      rewrite app_nth1 in H2; [ | now rewrite <- Hv in Hi ].
+      rewrite last_last in H2.
 ...2
     destruct Hi as (_, Hi); cbn in Hi.
     erewrite permut_fun_inv_loop_ext_in. 2: {
