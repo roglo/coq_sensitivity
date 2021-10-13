@@ -628,6 +628,29 @@ assert
 destruct H as (Hφ'φ, Hφφ').
 Theorem glop : ∀ σ n sg,
   is_sym_gr_vect n sg →
+  (vect_size σ = n ∧ is_permut_vect σ ↔ σ ∈ vect_list sg).
+Proof.
+intros * Hsg.
+split. {
+  intros (Hs, Hp).
+  destruct Hsg as (Hsg & Hsg_inj & Hsg_surj).
+  specialize (Hsg_surj σ Hp) as H1.
+  destruct H1 as (i, Hi).
+  rewrite <- Hi.
+  unfold vect_el.
+  apply nth_In.
+  rewrite fold_vect_size.
+...
+  exists i; split; [ | easy ].
+  apply Nat.nle_gt; intros His.
+  unfold vect_el in Hi.
+  rewrite nth_overflow in Hi; [ | easy ].
+  rewrite <- Hi in Hs.
+  cbn in Hs; subst n.
+  clear i His.
+...
+Theorem glop : ∀ σ n sg,
+  is_sym_gr_vect n sg →
   (vect_size σ = n ∧ is_permut_vect σ ↔
    ∃ i, i < vect_size sg ∧ vect_el empty_vect sg i = σ).
 Proof.
@@ -644,6 +667,7 @@ split. {
   rewrite <- Hi in Hs.
   cbn in Hs; subst n.
   clear i His.
+Print is_sym_gr_vect.
 Print is_permut_vect.
 Print is_permut_fun.
 ...
