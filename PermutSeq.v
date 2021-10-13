@@ -301,71 +301,51 @@ Definition is_sym_gr_vect n (vv : vector (vector nat)) :=
    vect_el empty_vect vv i = vect_el empty_vect vv j → i = j) ∧
   (∀ v, vect_size v = n → is_permut_vect v → v ∈ vect_list vv).
 
-Theorem glop : ∀ n vv,
-  is_sym_gr_vect n vv → vect_size vv = n! ∨ vect_size vv = 0.
+Theorem glop : ∀ n vv, is_sym_gr_vect n vv → vect_size vv = n!.
 Proof.
 intros * Hsg.
 destruct n. {
   destruct Hsg as (Hsg & Hinj & Hsurj).
-  specialize (Hsurj empty_vect eq_refl).
+  specialize (Hsurj empty_vect eq_refl) as H1.
   assert (H : is_permut_vect empty_vect) by easy.
-  specialize (Hsurj H); clear H.
-  apply (In_nth _ _ empty_vect) in Hsurj.
-  destruct Hsurj as (i & Hil & Hi).
+  specialize (H1 H); clear H.
+  apply (In_nth _ _ empty_vect) in H1.
+  destruct H1 as (i & Hil & Hi).
   unfold vect_el in Hi.
   rewrite fold_vect_size in Hil.
-...
-  destruct vv as (lv).
-  cbn in Hi, Hsg, Hinj |-*.
-  unfold empty_vect in Hi.
-  destruct lv as [| v1]; [ now right | left ].
-  destruct i. {
-    cbn in Hi; subst v1.
-    destruct lv as [| v1]; [ easy | exfalso ].
-    specialize (Hsg 1) as H1.
-    cbn in H1.
-    assert (H : 1 < S (S (length lv))) by flia.
-    specialize (H1 H); clear H.
-    destruct H1 as (H1, H2).
-    destruct v1 as (l); cbn in H1.
-    apply length_zero_iff_nil in H1; subst l.
-    specialize (Hinj 0 1).
-    cbn in Hinj.
-    assert (H : 0 < S (S (length lv))) by flia.
-    specialize (Hinj H); clear H.
-    assert (H : 1 < S (S (length lv))) by flia.
-    specialize (Hinj H); clear H.
-    now specialize (Hinj eq_refl).
+  destruct (Nat.eq_dec (vect_size vv) 0) as [Hvz| Hvz]. {
+    now rewrite Hvz in Hil.
   }
-  destruct lv as [| v2]; [ easy | exfalso ].
-  remember (v2 :: lv) as x; cbn in Hi; subst x.
-  specialize (Hinj 0 1).
+  destruct (Nat.eq_dec (vect_size vv) 1) as [Hv1| Hv1]; [ easy | ].
   specialize (Hsg 0) as H1.
   specialize (Hsg 1) as H2.
-  cbn in Hinj, H1, H2.
-  assert (H : 0 < S (S (length lv))) by flia.
-  specialize (Hinj H); specialize (H1 H); clear H.
-  assert (H : 1 < S (S (length lv))) by flia.
-  specialize (Hinj H); specialize (H2 H); clear H.
-  destruct H2 as (H3, H4).
-  destruct H1 as (H1, H2).
-  assert (H : v1 = v2). {
-    destruct v1 as (la).
-    destruct v2 as (lb).
-    cbn in H1, H3.
-    apply length_zero_iff_nil in H1.
-    apply length_zero_iff_nil in H3.
-    now subst la lb.
+  specialize (Hinj 0 1) as H3.
+  assert (H : 0 < vect_size vv) by flia Hvz.
+  specialize (H1 H); specialize (H3 H); clear H.
+  assert (H : 1 < vect_size vv) by flia Hvz Hv1.
+  specialize (H2 H); specialize (H3 H); clear H.
+  destruct H1 as (H4, H5).
+  destruct H2 as (H6, H7).
+  enough (H : vect_el empty_vect vv 0 = vect_el empty_vect vv 1). {
+    now apply H3 in H.
   }
-  now specialize (Hinj H).
+  unfold vect_size in H4, H6.
+  apply length_zero_iff_nil in H4, H6.
+  unfold vect_el in H4, H6 |-*.
+  remember (nth 0 (vect_list vv) empty_vect) as x eqn:Hx.
+  remember (nth 1 (vect_list vv) empty_vect) as y eqn:Hy.
+  symmetry in Hx, Hy.
+  destruct x as (x).
+  destruct y as (y).
+  cbn in H4, H6.
+  now subst x y.
 }
-left.
 revert vv Hsg.
 induction n; intros. {
   destruct Hsg as (Hsg & Hinj & Hsurj); cbn.
   destruct vv as (lv); cbn in *.
   destruct lv as [| v1]. {
-    specialize (Hsurj (mk_vect [0])).
+    specialize (Hsurj (mk_vect [0]) eq_refl).
     assert (H : is_permut_vect (mk_vect [0])). {
       split. {
         intros i Hi.
@@ -376,9 +356,7 @@ induction n; intros. {
       cbn in Hi, Hj.
       now apply Nat.lt_1_r in Hi, Hj; subst i j; cbn.
     }
-    specialize (Hsurj H); clear H.
-    destruct Hsurj as (i, Hi); cbn in Hi.
-    now rewrite match_id in Hi.
+    now specialize (Hsurj H); clear H.
   }
   destruct lv as [| v2]; [ easy | exfalso ].
   specialize (Hinj 0 1).
@@ -636,50 +614,12 @@ Proof.
 intros * Hsg.
 split. {
   intros (Hs, Hp).
-  destruct Hsg as (Hsg & Hsg_inj & Hsg_surj).
-  specialize (Hsg_surj σ Hp) as H1.
-  destruct H1 as (i, Hi).
-  rewrite <- Hi.
-  unfold vect_el.
-  apply nth_In.
-  rewrite fold_vect_size.
-  apply Nat.nle_gt; intros His.
-  unfold vect_el in Hi.
-  rewrite nth_overflow in Hi; [ | easy ].
-  rewrite <- Hi in Hs.
-  cbn in Hs; subst n.
-  clear i His.
-  clear σ Hp Hi.
-...
-  exists i; split; [ | easy ].
-...
-Theorem glop : ∀ σ n sg,
-  is_sym_gr_vect n sg →
-  (vect_size σ = n ∧ is_permut_vect σ ↔
-   ∃ i, i < vect_size sg ∧ vect_el empty_vect sg i = σ).
-Proof.
-intros * Hsg.
-split. {
-  intros (Hs, Hp).
-  destruct Hsg as (Hsg & Hsg_inj & Hsg_surj).
-  specialize (Hsg_surj σ Hp) as H1.
-  destruct H1 as (i, Hi).
-  exists i; split; [ | easy ].
-  apply Nat.nle_gt; intros His.
-  unfold vect_el in Hi.
-  rewrite nth_overflow in Hi; [ | easy ].
-  rewrite <- Hi in Hs.
-  cbn in Hs; subst n.
-  clear i His.
-Print is_sym_gr_vect.
-Print is_permut_vect.
-Print is_permut_fun.
-...
-(*
   now apply Hsg.
-*)
 } {
-  intros (i & Hi & Hσ); subst σ.
+  intros Hσ.
+  apply In_nth with (d := empty_vect) in Hσ.
+  destruct Hσ as (i & Hi & Hσ).
+  subst σ.
   now apply Hsg.
 }
 ...
