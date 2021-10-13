@@ -482,6 +482,11 @@ set
     mk_vect
       (map (λ j, if j =? S n then i else vect_el 0 (permut_vect_inv v) j)
          (seq 0 (S (S n))))).
+enough (n = 4).
+subst n.
+Compute (φ (mk_vect [0;5;2;4;1;3])).
+Compute (φ' (φ (mk_vect [0;5;2;4;1;3]))).
+...
 assert
   (H :
      (∀ x, vect_size x = S (S n) → is_permut_vect x → φ' (φ x) = x) ∧
