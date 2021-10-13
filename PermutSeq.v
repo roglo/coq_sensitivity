@@ -644,12 +644,16 @@ split. {
   rewrite <- Hi in Hs.
   cbn in Hs; subst n.
   clear i His.
+Print is_permut_vect.
+Print is_permut_fun.
 ...
+(*
   now apply Hsg.
+*)
 } {
-  intros (i & Hi); subst σ.
-  destruct (lt_dec i (vect_size sg)) as [His| His]; [ now apply Hsg | ].
-  apply Nat.nlt_ge in His.
+  intros (i & Hi & Hσ); subst σ.
+  now apply Hsg.
+}
 ...
 (* selecting all permutations of vv starting with "S n" *)
 set (ll1 := filter (λ v, vect_el 0 v 0 =? S n) (vect_list vv)).
