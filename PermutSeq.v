@@ -495,7 +495,8 @@ Compute (permut_vect_inv (permut_vect_inv (mk_vect [0;5;2;4;1;3]))).
 assert
   (H :
      (∀ x, vect_size x = S (S n) → is_permut_vect x → φ' (φ x) = x) ∧
-     (∀ y, φ (φ' y) = y)). {
+     (∀ y, vect_size (snd y) = S n → is_permut_vect (snd y) → φ (φ' y) = y)).
+  {
   split. {
     intros (l) Hv Hp; cbn in Hv.
     unfold is_permut_vect in Hp; cbn in Hp.
@@ -578,7 +579,7 @@ assert
     rewrite removelast_last.
     rewrite app_nth1; [ easy | flia Hv Hi ].
   } {
-    intros (i, v).
+    intros (i, v) Hv Hp; cbn in Hv, Hp.
     unfold φ, φ', σ'.
     cbn - [ seq ].
     f_equal. {
@@ -586,9 +587,34 @@ assert
       rewrite seq_nth; [ | flia ].
       now rewrite Nat.eqb_refl.
     } {
-      destruct v as (l).
+      destruct v as (l); cbn in Hv.
       f_equal.
       rewrite List_map_nth_seq with (d := 0).
+      rewrite Hv.
+      apply map_ext_in.
+      intros j Hj; apply in_seq in Hj.
+      destruct Hj as (_, Hj); cbn in Hj.
+      cbn - [ seq ].
+      rewrite (@List_map_nth' _ _ 0 _ _ _ j). 2: {
+        rewrite seq_length; flia Hj.
+      }
+      rewrite seq_nth; [ | flia Hj ].
+      rewrite Nat.add_0_l.
+      do 3 rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec j (S n)) as [H| H]; [ flia Hj H | clear H ].
+      destruct (Nat.eq_dec (nth j l 0) i) as [H1| H1]. {
+        rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
+        rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
+        rewrite seq_nth; [ | flia ].
+        now rewrite Nat.eqb_refl.
+      }
+      destruct (Nat.eq_dec (nth j l 0) (S n)) as [H2| H2]. {
+        destruct Hp as (Hp1, Hp2); cbn in Hp1, Hp2.
+        specialize (Hp1 j).
+        rewrite Hv, H2 in Hp1.
+        specialize (Hp1 Hj).
+        flia Hp1.
+      }
 ...
 (* selecting all permutations of vv starting with "S n" *)
 set (ll1 := filter (λ v, vect_el 0 v 0 =? S n) (vect_list vv)).
