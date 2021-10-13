@@ -299,7 +299,7 @@ Definition is_sym_gr_vect n (vv : vector (vector nat)) :=
    is_permut_vect (vect_el empty_vect vv i)) ∧
   (∀ i j, i < vect_size vv → j < vect_size vv →
    vect_el empty_vect vv i = vect_el empty_vect vv j → i = j) ∧
-  (∀ v, is_permut_vect v → ∃ i, vect_el empty_vect vv i = v).
+  (∀ v, vect_size v = n → is_permut_vect v → v ∈ vect_list vv).
 
 Theorem glop : ∀ n vv,
   is_sym_gr_vect n vv → vect_size vv = n! ∨ vect_size vv = 0.
@@ -307,11 +307,14 @@ Proof.
 intros * Hsg.
 destruct n. {
   destruct Hsg as (Hsg & Hinj & Hsurj).
-  specialize (Hsurj empty_vect).
+  specialize (Hsurj empty_vect eq_refl).
   assert (H : is_permut_vect empty_vect) by easy.
   specialize (Hsurj H); clear H.
-  destruct Hsurj as (i, Hi).
+  apply (In_nth _ _ empty_vect) in Hsurj.
+  destruct Hsurj as (i & Hil & Hi).
   unfold vect_el in Hi.
+  rewrite fold_vect_size in Hil.
+...
   destruct vv as (lv).
   cbn in Hi, Hsg, Hinj |-*.
   unfold empty_vect in Hi.
@@ -640,14 +643,15 @@ split. {
   unfold vect_el.
   apply nth_In.
   rewrite fold_vect_size.
-...
-  exists i; split; [ | easy ].
   apply Nat.nle_gt; intros His.
   unfold vect_el in Hi.
   rewrite nth_overflow in Hi; [ | easy ].
   rewrite <- Hi in Hs.
   cbn in Hs; subst n.
   clear i His.
+  clear σ Hp Hi.
+...
+  exists i; split; [ | easy ].
 ...
 Theorem glop : ∀ σ n sg,
   is_sym_gr_vect n sg →
