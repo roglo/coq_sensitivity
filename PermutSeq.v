@@ -626,6 +626,30 @@ assert
   }
 }
 destruct H as (Hφ'φ, Hφφ').
+Theorem glop : ∀ σ n sg,
+  is_sym_gr_vect n sg →
+  (vect_size σ = n ∧ is_permut_vect σ ↔
+   ∃ i, i < vect_size sg ∧ vect_el empty_vect sg i = σ).
+Proof.
+intros * Hsg.
+split. {
+  intros (Hs, Hp).
+  destruct Hsg as (Hsg & Hsg_inj & Hsg_surj).
+  specialize (Hsg_surj σ Hp) as H1.
+  destruct H1 as (i, Hi).
+  exists i; split; [ | easy ].
+  apply Nat.nle_gt; intros His.
+  unfold vect_el in Hi.
+  rewrite nth_overflow in Hi; [ | easy ].
+  rewrite <- Hi in Hs.
+  cbn in Hs; subst n.
+  clear i His.
+...
+  now apply Hsg.
+} {
+  intros (i & Hi); subst σ.
+  destruct (lt_dec i (vect_size sg)) as [His| His]; [ now apply Hsg | ].
+  apply Nat.nlt_ge in His.
 ...
 (* selecting all permutations of vv starting with "S n" *)
 set (ll1 := filter (λ v, vect_el 0 v 0 =? S n) (vect_list vv)).
