@@ -477,16 +477,31 @@ assert
     }
   }
 }
+(*
 set
   (φ' := λ a : (nat * vector nat), let '(i, v) := a in
     mk_vect
       (map (λ j, if j =? S n then i else vect_el 0 (permut_vect_inv v) j)
          (seq 0 (S (S n))))).
+*)
+set
+  (φ' := λ a : (nat * vector nat), let '(i, v) := a in
+    mk_vect
+      (map
+         (λ j,
+          if j =? S n then i
+          else if vect_el 0 v j =? i then S n
+          else vect_el 0 v j)
+         (seq 0 (S (S n))))).
+(*
 enough (n = 4).
 subst n.
 Compute (φ (mk_vect [0;5;2;4;1;3])).
+Compute (φ' (3, {| vect_list := [0; 3; 2; 4; 1] |})).
 Compute (φ' (φ (mk_vect [0;5;2;4;1;3]))).
+Compute (permut_vect_inv (permut_vect_inv (mk_vect [0;5;2;4;1;3]))).
 ...
+*)
 assert
   (H :
      (∀ x, vect_size x = S (S n) → is_permut_vect x → φ' (φ x) = x) ∧
@@ -506,7 +521,9 @@ assert
     rewrite map_app.
     cbn - [ seq ].
     rewrite Nat.eqb_refl.
+(*
     rewrite map_length, seq_length.
+*)
     erewrite map_ext_in. 2: {
       intros i Hi; apply in_seq in Hi.
       rewrite if_eqb_eq_dec.
@@ -514,8 +531,10 @@ assert
       rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
       rewrite seq_nth; [ | easy ].
       rewrite Nat.add_0_l.
+(*
       unfold vect_el.
       cbn - [ seq Nat.eq_dec permut_fun_inv_loop ].
+*)
       easy.
     }
     replace (nth (S n) l 0) with (last l 0) by now rewrite List_last_nth, Hv.
@@ -532,6 +551,20 @@ assert
     }
     apply map_ext_in.
     intros i Hi; apply in_seq in Hi.
+(*2*)
+    do 2 rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec (nth i l 0) (S n)) as [H1| H1]. {
+      destruct (Nat.eq_dec (nth (S n) l 0) (last l 0)) as [H2| H2]. {
+        rewrite <- H1.
+        destruct l as [| a] using rev_ind; [ easy | ].
+        rewrite removelast_last.
+        rewrite app_nth1; [ easy | ].
+        rewrite app_length in Hv.
+        rewrite Nat.add_1_r in Hv.
+        apply Nat.succ_inj in Hv.
+        now rewrite Hv.
+      }
+...2
     destruct Hi as (_, Hi); cbn in Hi.
     erewrite permut_fun_inv_loop_ext_in. 2: {
       intros j Hj.
