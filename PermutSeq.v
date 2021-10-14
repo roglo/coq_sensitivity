@@ -624,6 +624,71 @@ assert
   }
 }
 destruct H as (Hφ'φ, Hφφ').
+assert
+  (φp :
+   {x : vector nat | vect_size x = S (S n) ∧ is_permut_vect x} →
+   {y : nat * vector nat | vect_size (snd y) = S n ∧ is_permut_vect (snd y)}). {
+  intros (x & Hx & Hp).
+  exists (φ x).
+  unfold φ.
+  cbn - [ vect_size ].
+  unfold σ'.
+  cbn - [ seq ].
+  rewrite map_length, seq_length.
+  split; [ easy | ].
+  unfold is_permut_vect.
+  cbn - [ seq ].
+  rewrite map_length, seq_length.
+  unfold vect_el.
+  cbn - [ seq ].
+  eapply is_permut_eq_compat. {
+    intros i Hi; symmetry.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ | easy ].
+    rewrite Nat.add_0_l.
+    easy.
+  }
+  split. {
+    intros i Hi.
+    rewrite if_eqb_eq_dec.
+    destruct Hp as (Hp1, Hp2).
+    rewrite Hx in Hp1, Hp2.
+    destruct (Nat.eq_dec (nth i (vect_list x) 0) (S n)) as [H1| H1].  {
+      specialize (Hp2 i (S n)) as H2.
+      assert (H : i < S (S n)) by flia Hi.
+      specialize (H2 H (Nat.lt_succ_diag_r _)); clear H.
+      assert (H3 : vect_el 0 x i ≠ vect_el 0 x (S n)). {
+        intros H; specialize (H2 H); flia Hi H2.
+      }
+      unfold vect_el in H3.
+      rewrite H1 in H3.
+      apply Nat.neq_sym in H3.
+      apply Nat_le_neq_lt; [ | easy ].
+      apply Nat.lt_succ_r.
+      apply Hp1, Nat.lt_succ_diag_r.
+    } {
+      apply Nat_le_neq_lt; [ | easy ].
+      apply Nat.lt_succ_r.
+      apply Hp1; flia Hi.
+    }
+  } {
+    intros i j Hi Hj Hij.
+    do 2 rewrite if_eqb_eq_dec in Hij.
+    destruct (Nat.eq_dec (nth i (vect_list x) 0) (S n)) as [H1| H1]. {
+      destruct (Nat.eq_dec (nth j (vect_list x) 0) (S n)) as [H2| H2]. {
+        apply Hp; [ flia Hx Hi | flia Hx Hj | ].
+        unfold vect_el; congruence.
+      }
+      apply Hp in Hij; [ flia Hj Hij | flia Hx | flia Hj Hx ].
+    }
+    destruct (Nat.eq_dec (nth j (vect_list x) 0) (S n)) as [H2| H2]. {
+      apply Hp in Hij; [ flia Hi Hij | flia Hx Hi | flia Hx ].
+    }
+    apply Hp; [ flia Hx Hi | flia Hx Hj | ].
+    unfold vect_el; congruence.
+  }
+}
+...
 assert (∀ x, x ∈ vect_list vv → φ' (φ x) = x). {
   intros x Hx.
   apply (sym_gr_vect_elem Hsg) in Hx.
