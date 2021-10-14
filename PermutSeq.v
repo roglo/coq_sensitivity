@@ -624,14 +624,16 @@ assert
   }
 }
 destruct H as (Hφ'φ, Hφφ').
-assert
-  (φp :
-   {x : vector nat | vect_size x = S (S n) ∧ is_permut_vect x} →
-   {y : nat * vector nat | vect_size (snd y) = S n ∧ is_permut_vect (snd y)}). {
-  intros (x & Hx & Hp).
-  exists (φ x).
-  unfold φ.
-  cbn - [ vect_size ].
+assert (H : ∀ x,
+  vect_size x = S (S n)
+  → is_permut_vect x
+  → vect_size (snd (φ x)) = S n ∧ is_permut_vect (snd (φ x))). {
+  intros x Hv Hp.
+  unfold is_permut_vect in Hp; cbn in Hp.
+  unfold vect_el in Hp; cbn in Hp.
+  rewrite Hv in Hp; cbn in Hp.
+  destruct Hp as (Hp1, Hp2).
+  unfold φ', φ.
   unfold σ'.
   cbn - [ seq ].
   rewrite map_length, seq_length.
@@ -651,8 +653,6 @@ assert
   split. {
     intros i Hi.
     rewrite if_eqb_eq_dec.
-    destruct Hp as (Hp1, Hp2).
-    rewrite Hx in Hp1, Hp2.
     destruct (Nat.eq_dec (nth i (vect_list x) 0) (S n)) as [H1| H1].  {
       specialize (Hp2 i (S n)) as H2.
       assert (H : i < S (S n)) by flia Hi.
@@ -676,18 +676,24 @@ assert
     do 2 rewrite if_eqb_eq_dec in Hij.
     destruct (Nat.eq_dec (nth i (vect_list x) 0) (S n)) as [H1| H1]. {
       destruct (Nat.eq_dec (nth j (vect_list x) 0) (S n)) as [H2| H2]. {
-        apply Hp; [ flia Hx Hi | flia Hx Hj | ].
+        apply Hp2; [ flia Hv Hi | flia Hv Hj | ].
         unfold vect_el; congruence.
       }
-      apply Hp in Hij; [ flia Hj Hij | flia Hx | flia Hj Hx ].
+      apply Hp2 in Hij; [ flia Hj Hij | flia Hv | flia Hj Hv ].
     }
     destruct (Nat.eq_dec (nth j (vect_list x) 0) (S n)) as [H2| H2]. {
-      apply Hp in Hij; [ flia Hi Hij | flia Hx Hi | flia Hx ].
+      apply Hp2 in Hij; [ flia Hi Hij | flia Hv Hi | flia Hv ].
     }
-    apply Hp; [ flia Hx Hi | flia Hx Hj | ].
+    apply Hp2; [ flia Hv Hi | flia Hv Hj | ].
     unfold vect_el; congruence.
   }
 }
+set
+  (φp :=
+   λ x : {x1 : vector nat | vect_size x1 = S (S n) ∧ is_permut_vect x1},
+   exist (λ y, vect_size (snd y) = S n ∧ is_permut_vect (snd y))
+     (φ (proj1_sig x))
+     (H (proj1_sig x) (proj1 (proj2_sig x)) (proj2 (proj2_sig x)))).
 ...
 assert (∀ x, x ∈ vect_list vv → φ' (φ x) = x). {
   intros x Hx.
