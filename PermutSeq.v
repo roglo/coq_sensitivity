@@ -490,12 +490,6 @@ Compute (φ' (φ (mk_vect [0;3;2;4;1;5]))).
 Compute (permut_vect_inv (permut_vect_inv (mk_vect [0;5;2;4;1;3]))).
 ...
 *)
-Record permut_vect :=
-  { pv_vect : vector nat;
-    pv_size : nat;
-    pv_prop : vect_size pv_vect = pv_size ∧ is_permut_vect pv_vect }.
-set (φp := λ pv, (vect_el 0 (pv_vect pv) (S n), σ' (pv_vect pv))).
-...
 assert
   (H :
      (∀ x, vect_size x = S (S n) → is_permut_vect x → φ' (φ x) = x) ∧
@@ -630,18 +624,12 @@ assert
   }
 }
 destruct H as (Hφ'φ, Hφφ').
-Require Import FinFun.
-Search FinFun.Bijective.
-Search Finite.
-Print Finite.
-Print Full.
-Print Bijective.
-set (φp := {...
-assert (H : Bijective φ). {
-  apply Injective_Surjective_Bijective. {
-    unfold Finite.
-    unfold Full.
-Check Injective_Surjective_Bijective.
+assert (∀ x, x ∈ vect_list vv → φ' (φ x) = x). {
+  intros x Hx.
+  apply (sym_gr_vect_elem Hsg) in Hx.
+  now apply Hφ'φ.
+}
+move H before Hφ'φ; clear Hφ'φ; rename H into Hφ'φ.
 ...
 (* selecting all permutations of vv starting with "S n" *)
 set (ll1 := filter (λ v, vect_el 0 v 0 =? S n) (vect_list vv)).
