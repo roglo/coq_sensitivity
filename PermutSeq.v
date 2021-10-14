@@ -624,7 +624,7 @@ assert
   }
 }
 destruct H as (Hφ'φ, Hφφ').
-assert (H : ∀ x,
+assert (Hφ : ∀ x,
   vect_size x = S (S n)
   → is_permut_vect x
   → vect_size (snd (φ x)) = S n ∧ is_permut_vect (snd (φ x))). {
@@ -693,7 +693,34 @@ set
    λ x : {x1 : vector nat | vect_size x1 = S (S n) ∧ is_permut_vect x1},
    exist (λ y, vect_size (snd y) = S n ∧ is_permut_vect (snd y))
      (φ (proj1_sig x))
-     (H (proj1_sig x) (proj1 (proj2_sig x)) (proj2 (proj2_sig x)))).
+     (Hφ (proj1_sig x) (proj1 (proj2_sig x)) (proj2 (proj2_sig x)))).
+assert
+  (Hφ' : ∀ i v,
+   vect_size v = S n
+   → is_permut_vect v
+   → vect_size (φ' (i, v)) = S (S n) ∧ is_permut_vect (φ' (i, v))). {
+  intros * Hv Hp.
+  unfold φ'.
+  cbn - [ seq ].
+  rewrite map_length, seq_length.
+  split; [ easy | ].
+  unfold is_permut_vect.
+  cbn - [ seq ].
+  rewrite map_length, seq_length.
+  unfold vect_el.
+  cbn - [ seq ].
+  eapply is_permut_eq_compat. {
+    intros j Hj; symmetry.
+...
+assert
+  (φp' :
+   {y : nat * vector nat | vect_size (snd y) = S n ∧ is_permut_vect (snd y)} →
+   {x1 : vector nat | vect_size x1 = S (S n) ∧ is_permut_vect x1}). {
+  intros ((i, v), (Hs, Hp)).
+  cbn in Hs, Hp.
+  exists (φ' (i, v)).
+...
+  now apply Hφ'.
 ...
 assert (∀ x, x ∈ vect_list vv → φ' (φ x) = x). {
   intros x Hx.
