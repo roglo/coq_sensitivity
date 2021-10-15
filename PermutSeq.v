@@ -627,7 +627,8 @@ destruct H as (Hφ'φ, Hφφ').
 assert (Hφ : ∀ x,
   vect_size x = S (S n)
   → is_permut_vect x
-  → vect_size (snd (φ x)) = S n ∧ is_permut_vect (snd (φ x))). {
+  → fst (φ x) < S (S n) ∧ vect_size (snd (φ x)) = S n ∧
+    is_permut_vect (snd (φ x))). {
   intros x Hv Hp.
   unfold is_permut_vect in Hp; cbn in Hp.
   unfold vect_el in Hp; cbn in Hp.
@@ -637,6 +638,7 @@ assert (Hφ : ∀ x,
   unfold σ'.
   cbn - [ seq ].
   rewrite map_length, seq_length.
+  split; [ apply Hp1; flia | ].
   split; [ easy | ].
   unfold is_permut_vect.
   cbn - [ seq ].
@@ -784,7 +786,9 @@ assert
 set
   (φp :=
    λ x : {u : vector nat | vect_size u = S (S n) ∧ is_permut_vect u},
-   exist (λ iv, vect_size (snd iv) = S n ∧ is_permut_vect (snd iv))
+   exist
+     (λ iv,
+      fst iv < S (S n) ∧ vect_size (snd iv) = S n ∧ is_permut_vect (snd iv))
      (φ (proj1_sig x))
      (Hφ (proj1_sig x) (proj1 (proj2_sig x)) (proj2 (proj2_sig x)))).
 set
@@ -796,6 +800,18 @@ set
      (φ' (fst (proj1_sig y), snd (proj1_sig y)))
      (Hφ' (fst (proj1_sig y)) (snd (proj1_sig y)) (proj1 (proj2_sig y))
         (proj1 (proj2 (proj2_sig y))) (proj2 (proj2 (proj2_sig y))))).
+assert (H : (∀ x, φp (φp' x) = x) ∧ (∀ y, φp' (φp y) = y)). {
+  split. {
+    intros.
+    unfold φp, φp'.
+    cbn - [ seq ].
+    destruct x as ((i & v) & Hi & Hv & Hp).
+    cbn - [ seq ] in Hi, Hv, Hp |-*.
+    eapply eq_exist_uncurried.
+    unfold φ.
+    cbn - [ seq ].
+    unfold σ'.
+    cbn - [ seq ].
 ...
 assert (∀ x, x ∈ vect_list vv → φ' (φ x) = x). {
   intros x Hx.
