@@ -807,7 +807,15 @@ assert (H : (∀ x, φp (φp' x) = x) ∧ (∀ y, φp' (φp y) = y)). {
     cbn - [ seq ].
     destruct x as ((i & v) & Hi & Hv & Hp).
     cbn - [ seq ] in Hi, Hv, Hp |-*.
-    eapply eq_exist_uncurried.
+    eapply eq_exist_curried.
+Search (exist _ _ _ = exist _ _ _).
+Print eq_rect.
+...
+apply EqdepFacts.eq_dep_eq_sig.
+Print EqdepFacts.eq_dep.
+...
+    apply eq_exist_uncurried.
+...
     unfold φ.
     cbn - [ seq ].
     unfold σ'.
