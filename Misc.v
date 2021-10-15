@@ -3473,3 +3473,11 @@ Notation "a ∨∨ b" := (sumbool_or a b) (at level 85).
 Notation "a ∧∧ b" := (sumbool_and a b) (at level 80).
 
 Arguments iter_list {A B}%type l%list f%function : simpl never.
+
+Notation "'⋀' ( i = b , e ) , g" :=
+  (iter_seq b e (λ c i, (c && g)%bool) true)
+  (at level 45, i at level 0, b at level 60, e at level 60).
+
+Notation "'⋀' ( i ∈ l ) , g" :=
+  (iter_list l (λ c i, (c && g)%bool) true)
+  (at level 45, i at level 0, l at level 60).

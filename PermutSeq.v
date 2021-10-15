@@ -48,17 +48,9 @@ Definition is_permut_vect (σ : vector nat) :=
 
 (**)
 
-Notation "'⋀' ( i = b , e ) , g" :=
-  (iter_seq b e (λ c i, (c && g)) true)
-  (at level 45, i at level 0, b at level 60, e at level 60).
-
-Notation "'⋀' ( i ∈ l ) , g" :=
-  (iter_list l (λ c i, (c && g)) true)
-  (at level 45, i at level 0, l at level 60).
-
 Definition is_permut_fun_bool f n :=
-  (⋀ (i = 0, n - 1), (f i <? n)) &&
-  (⋀ (i = 0, n - 1), ⋀ (j = i + 1, n - 1), negb (f i =? f j)).
+  (⋀ (i = 1, n), (f (i - 1) <? n)) &&
+  (⋀ (i = 1, n), ⋀ (j = i + 1, n), negb (f (i - 1) =? f (j - 1))).
 
 Check is_permut_fun.
 Check is_permut_fun_bool.
@@ -80,7 +72,8 @@ split. {
   split. {
     unfold iter_seq.
     unfold iter_list.
-    rewrite Nat.sub_0_r.
+    rewrite Nat_sub_succ_1.
+    destruct n; [ easy | ].
 ...
 
 ... (* faut faire une version de is_permut_vect rendant un bool, plutôt qu'un
