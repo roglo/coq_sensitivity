@@ -48,10 +48,39 @@ Definition is_permut_vect (σ : vector nat) :=
 
 (**)
 
-Definition is_permut_fun_bool f n :=
-  ⋀ (i = 0, n - 1), f i <? n.
-(* voir Matrix.v *)
+Notation "'⋀' ( i = b , e ) , g" :=
+  (iter_seq b e (λ c i, (c && g)) true)
+  (at level 45, i at level 0, b at level 60, e at level 60).
 
+Notation "'⋀' ( i ∈ l ) , g" :=
+  (iter_list l (λ c i, (c && g)) true)
+  (at level 45, i at level 0, l at level 60).
+
+Definition is_permut_fun_bool f n :=
+  (⋀ (i = 0, n - 1), (f i <? n)) &&
+  (⋀ (i = 0, n - 1), ⋀ (j = i + 1, n - 1), negb (f i =? f j)).
+
+Check is_permut_fun.
+Check is_permut_fun_bool.
+
+(*
+Definition is_permut_fun_bool f n :=
+  ⋀ (i = 0, n - 1), (f i <? n) &&
+  ⋀ (i = 0, n - 1), ⋀ (j = 0, n - 1), (negb (f i =? f j) || (i =? j)).
+*)
+
+Theorem if_permut_fun_is_permut_fun_bool : ∀ f n,
+  is_permut_fun f n ↔ is_permut_fun_bool f n = true.
+Proof.
+intros.
+split. {
+  intros (H1, H2).
+  unfold is_permut_fun_bool.
+  apply andb_true_intro.
+  split. {
+    unfold iter_seq.
+    unfold iter_list.
+    rewrite Nat.sub_0_r.
 ...
 
 ... (* faut faire une version de is_permut_vect rendant un bool, plutôt qu'un

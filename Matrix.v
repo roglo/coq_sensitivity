@@ -11,10 +11,6 @@ Require Import Misc.
 Require Import RingLike RLsummation RLproduct.
 Require Import MyVector.
 
-Notation "'⋀' ( i ∈ l ) , g" :=
-  (iter_list l (λ c i, (c && g)) true)
-  (at level 45, i at level 0, l at level 60).
-
 Definition nth_nth_error A (ll : list (list A)) (i j : nat) := 
   match nth_error ll i with
   | None => None
