@@ -46,6 +46,14 @@ Definition vect_vect_nat_el (V : vector (vector nat)) i : vector nat :=
 Definition is_permut_vect (σ : vector nat) :=
   is_permut_fun (vect_el 0 σ) (vect_size σ).
 
+(**)
+
+Definition is_permut_fun_bool f n :=
+  ⋀ (i = 0, n - 1), f i <? n.
+(* voir Matrix.v *)
+
+...
+
 ... (* faut faire une version de is_permut_vect rendant un bool, plutôt qu'un
        Prop *)
 
