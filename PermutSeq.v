@@ -787,6 +787,7 @@ assert
     apply Hp; [ rewrite Hv; flia Hj Hjn | rewrite Hv; flia Hk Hkn | easy ].
   }
 }
+move Hφ' before Hφ.
 assert
   (φp' :
    {y : nat * vector nat |
@@ -797,6 +798,49 @@ assert
   exists (φ' (i, v)).
   now apply Hφ'.
 }
+Set Printing Depth 100.
+Show Proof.
+set (φp'' :=
+                        λ H0 : {y : nat * vector nat
+                               | fst y < S (S n)
+                                 ∧ vect_size (snd y) = S n
+                                   ∧ is_permut_vect (snd y)},
+                          let (x1, p) := H0 in
+                          (λ x2 : nat * vector nat,
+                             let
+                               (a, b) as p0
+                                return
+                                  (fst p0 < S (S n)
+                                   ∧ vect_size (snd p0) = S n
+                                     ∧ is_permut_vect (snd p0)
+                                   → {x3 : vector nat
+                                     | vect_size x3 = S (S n)
+                                       ∧ is_permut_vect x3}) := x2 in
+                             (λ (v : vector nat) 
+                                (a0 : fst (a, v) < S (S n)
+                                      ∧ vect_size (snd (a, v)) = S n
+                                        ∧ is_permut_vect (snd (a, v))),
+                                match a0 with
+                                | conj x3 x4 =>
+                                    (λ (Hi : fst (a, v) < S (S n)) 
+                                       (H1 : vect_size (snd (a, v)) = S n
+                                             ∧ is_permut_vect (snd (a, v))),
+                                       match H1 with
+                                       | conj x5 x6 =>
+                                           (λ (Hs : 
+                                               vect_size (snd (a, v)) = 
+                                               S n) 
+                                              (Hp : 
+                                               is_permut_vect (snd (a, v))),
+                                              exist
+                                                (λ x7 : vector nat,
+                                                   vect_size x7 = S (S n)
+                                                   ∧ 
+                                                   is_permut_vect x7)
+                                                (φ' (a, v)) 
+                                                (Hφ' a v Hi Hs Hp)) x5 x6
+                                       end) x3 x4
+                                end) b) x1 p).
 ...
   now apply Hφ'.
 ...
