@@ -799,29 +799,11 @@ assert
   now apply Hφ'.
 }
 set (φp'' :=
-                        λ y : {iv : nat * vector nat
-                               | fst iv < S (S n)
-                                 ∧ vect_size (snd iv) = S n
-                                   ∧ is_permut_vect (snd iv)},
-                        (
-                             let (i, v) as p0
-                                return
-                                  (fst p0 < S (S n)
-                                   ∧ vect_size (snd p0) = S n
-                                     ∧ is_permut_vect (snd p0)
-                                   → {x3 : vector nat
-                                     | vect_size x3 = S (S n)
-                                       ∧ is_permut_vect x3}) := proj1_sig y in
-                             (λ
-                                (a0 : fst (i, v) < S (S n)
-                                      ∧ vect_size (snd (i, v)) = S n
-                                        ∧ is_permut_vect (snd (i, v))),
-                                match a0 with
-                                | conj Hi (conj Hs Hp) =>
-                                           exist (λ v, vect_size v = S (S n) ∧ is_permut_vect v)
-                                             (φ' (i, v)) (Hφ' i v Hi Hs Hp)
-                                end)
-                       ) (proj2_sig y)).
+  λ y : {iv : nat * vector nat | fst iv < S (S n) ∧ vect_size (snd iv) = S n ∧ is_permut_vect (snd iv)},
+            (let '(i, v) := proj1_sig y in
+             λ a0 : fst (i, v) < S (S n) ∧ vect_size (snd (i, v)) = S n ∧ is_permut_vect (snd (i, v)),
+             exist (λ v0 : vector nat, vect_size v0 = S (S n) ∧ is_permut_vect v0) 
+               (φ' (i, v)) (Hφ' i v (proj1 a0) (proj1 (proj2 a0)) (proj2 (proj2 a0)))) (proj2_sig y)).
 ...
   now apply Hφ'.
 ...
