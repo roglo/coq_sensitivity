@@ -800,10 +800,11 @@ assert
 }
 set (φp'' :=
   λ y : {iv : nat * vector nat | fst iv < S (S n) ∧ vect_size (snd iv) = S n ∧ is_permut_vect (snd iv)},
-            (let '(i, v) := proj1_sig y in
-             λ a0 : fst (i, v) < S (S n) ∧ vect_size (snd (i, v)) = S n ∧ is_permut_vect (snd (i, v)),
-             exist (λ v0 : vector nat, vect_size v0 = S (S n) ∧ is_permut_vect v0) 
-               (φ' (i, v)) (Hφ' i v (proj1 a0) (proj1 (proj2 a0)) (proj2 (proj2 a0)))) (proj2_sig y)).
+  (let '(i, v) := proj1_sig y in
+   λ a0 : fst (i, v) < S (S n) ∧ vect_size (snd (i, v)) = S n ∧ is_permut_vect (snd (i, v)),
+   exist (λ v0 : vector nat, vect_size v0 = S (S n) ∧ is_permut_vect v0) 
+    (φ' (i, v)) (Hφ' i v (proj1 a0) (proj1 (proj2 a0)) (proj2 (proj2 a0)))
+  ) (proj2_sig y)).
 ...
   now apply Hφ'.
 ...
