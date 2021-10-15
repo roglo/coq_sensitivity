@@ -690,7 +690,7 @@ assert (Hφ : ∀ x,
 }
 set
   (φp :=
-   λ x : {x1 : vector nat | vect_size x1 = S (S n) ∧ is_permut_vect x1},
+   λ x : {v : vector nat | vect_size v = S (S n) ∧ is_permut_vect v},
    exist (λ y, vect_size (snd y) = S n ∧ is_permut_vect (snd y))
      (φ (proj1_sig x))
      (Hφ (proj1_sig x) (proj1 (proj2_sig x)) (proj2 (proj2_sig x)))).
@@ -790,23 +790,21 @@ assert
 move Hφ' before Hφ.
 assert
   (φp' :
-   {y : nat * vector nat |
-    fst y < S (S n) ∧ vect_size (snd y) = S n ∧ is_permut_vect (snd y)} →
-   {x1 : vector nat | vect_size x1 = S (S n) ∧ is_permut_vect x1}). {
+   {iv : nat * vector nat |
+    fst iv < S (S n) ∧ vect_size (snd iv) = S n ∧ is_permut_vect (snd iv)} →
+   {u : vector nat | vect_size u = S (S n) ∧ is_permut_vect u}). {
   intros ((i, v), (Hi & Hs & Hp)).
   cbn in Hi, Hs, Hp.
   exists (φ' (i, v)).
   now apply Hφ'.
 }
-Set Printing Depth 100.
-Show Proof.
 set (φp'' :=
-                        λ H0 : {y : nat * vector nat
-                               | fst y < S (S n)
-                                 ∧ vect_size (snd y) = S n
-                                   ∧ is_permut_vect (snd y)},
-                          let (x1, p) := H0 in
-                          (λ x2 : nat * vector nat,
+                        λ y : {iv : nat * vector nat
+                               | fst iv < S (S n)
+                                 ∧ vect_size (snd iv) = S n
+                                   ∧ is_permut_vect (snd iv)},
+                          let (iv, p) := y in
+                          (
                              let
                                (i, v) as p0
                                 return
@@ -815,7 +813,7 @@ set (φp'' :=
                                      ∧ is_permut_vect (snd p0)
                                    → {x3 : vector nat
                                      | vect_size x3 = S (S n)
-                                       ∧ is_permut_vect x3}) := x2 in
+                                       ∧ is_permut_vect x3}) := iv in
                              (λ
                                 (a0 : fst (i, v) < S (S n)
                                       ∧ vect_size (snd (i, v)) = S n
@@ -840,7 +838,7 @@ set (φp'' :=
                                                 (φ' (i, v)) 
                                                 (Hφ' i v Hi Hs Hp)) x5 x6
                                        end) x3 x4
-                                end)) x1 p).
+                                end)) p).
 ...
   now apply Hφ'.
 ...
