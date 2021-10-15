@@ -46,6 +46,9 @@ Definition vect_vect_nat_el (V : vector (vector nat)) i : vector nat :=
 Definition is_permut_vect (σ : vector nat) :=
   is_permut_fun (vect_el 0 σ) (vect_size σ).
 
+... (* faut faire une version de is_permut_vect rendant un bool, plutôt qu'un
+       Prop *)
+
 Fixpoint permut_fun_inv_loop f i j :=
   match i with
   | 0 => 42
@@ -803,11 +806,29 @@ set
 assert (H : (∀ x, φp (φp' x) = x) ∧ (∀ y, φp' (φp y) = y)). {
   split. {
     intros.
+About is_permut_vect.
+Theorem glop : ∀ n,
+  ∀ x y : {iv : nat * vector nat | fst iv < S (S n) ∧ vect_size (snd iv) = S n ∧ is_permut_vect (snd iv)},
+  proj1_sig x = proj1_sig y → x = y.
+Proof.
+intros * Hxy.
+destruct x as (ivx, px).
+destruct y as (ivy, py).
+cbn in *.
+subst ivy.
+apply eq_exist_uncurried.
+exists eq_refl.
+cbn.
+(* ouais, faut que px et py soient de la forme truc = true *)
+Check (Eqdep_dec.UIP_dec Bool.bool_dec).
+...
     unfold φp, φp'.
     cbn - [ seq ].
     destruct x as ((i & v) & Hi & Hv & Hp).
     cbn - [ seq ] in Hi, Hv, Hp |-*.
-    eapply eq_exist_curried.
+Check UIP_nat.
+Check Eqdep_dec.UIP_dec.
+...
 Search (exist _ _ _ = exist _ _ _).
 Print eq_rect.
 ...
@@ -816,6 +837,8 @@ Print EqdepFacts.eq_dep.
 ...
     apply eq_exist_uncurried.
 ...
+...
+    apply eq_exist_uncurried.
     unfold φ.
     cbn - [ seq ].
     unfold σ'.
