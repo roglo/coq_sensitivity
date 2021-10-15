@@ -688,12 +688,6 @@ assert (Hφ : ∀ x,
     unfold vect_el; congruence.
   }
 }
-set
-  (φp :=
-   λ x : {v : vector nat | vect_size v = S (S n) ∧ is_permut_vect v},
-   exist (λ y, vect_size (snd y) = S n ∧ is_permut_vect (snd y))
-     (φ (proj1_sig x))
-     (Hφ (proj1_sig x) (proj1 (proj2_sig x)) (proj2 (proj2_sig x)))).
 assert
   (Hφ' : ∀ i v,
    i < S (S n)
@@ -787,26 +781,21 @@ assert
     apply Hp; [ rewrite Hv; flia Hj Hjn | rewrite Hv; flia Hk Hkn | easy ].
   }
 }
-move Hφ' before Hφ.
-assert
-  (φp' :
-   {iv : nat * vector nat |
-    fst iv < S (S n) ∧ vect_size (snd iv) = S n ∧ is_permut_vect (snd iv)} →
-   {u : vector nat | vect_size u = S (S n) ∧ is_permut_vect u}). {
-  intros ((i, v), (Hi & Hs & Hp)).
-  cbn in Hi, Hs, Hp.
-  exists (φ' (i, v)).
-  now apply Hφ'.
-}
-set (φp'' :=
-  λ y : {iv : nat * vector nat | fst iv < S (S n) ∧ vect_size (snd iv) = S n ∧ is_permut_vect (snd iv)},
-  (let '(i, v) := proj1_sig y in
-   λ a0 : fst (i, v) < S (S n) ∧ vect_size (snd (i, v)) = S n ∧ is_permut_vect (snd (i, v)),
-   exist (λ v0 : vector nat, vect_size v0 = S (S n) ∧ is_permut_vect v0) 
-    (φ' (i, v)) (Hφ' i v (proj1 a0) (proj1 (proj2 a0)) (proj2 (proj2 a0)))
-  ) (proj2_sig y)).
-...
-  now apply Hφ'.
+set
+  (φp :=
+   λ x : {u : vector nat | vect_size u = S (S n) ∧ is_permut_vect u},
+   exist (λ iv, vect_size (snd iv) = S n ∧ is_permut_vect (snd iv))
+     (φ (proj1_sig x))
+     (Hφ (proj1_sig x) (proj1 (proj2_sig x)) (proj2 (proj2_sig x)))).
+set
+  (φp' :=
+   λ y :
+     {iv : nat * vector nat |
+      fst iv < S (S n) ∧ vect_size (snd iv) = S n ∧ is_permut_vect (snd iv)},
+   exist (λ u : vector nat, vect_size u = S (S n) ∧ is_permut_vect u) 
+     (φ' (fst (proj1_sig y), snd (proj1_sig y)))
+     (Hφ' (fst (proj1_sig y)) (snd (proj1_sig y)) (proj1 (proj2_sig y))
+        (proj1 (proj2 (proj2_sig y))) (proj2 (proj2 (proj2_sig y))))).
 ...
 assert (∀ x, x ∈ vect_list vv → φ' (φ x) = x). {
   intros x Hx.
