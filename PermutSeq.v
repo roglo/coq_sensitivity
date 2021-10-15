@@ -773,15 +773,30 @@ assert
       rewrite Hjk in H1.
       flia H1.
     }
-...
+    destruct (Nat.eq_dec k (S n)) as [Hkn| Hkn]; [ easy | ].
+    destruct (Nat.eq_dec (nth k (vect_list v) 0) i) as [Hki| Hki]. {
+      destruct Hp as (Hp1, Hp2).
+      rewrite Hv in Hp1.
+      specialize (Hp1 j) as H1.
+      assert (H : j < S n) by flia Hj Hjn.
+      specialize (H1 H); clear H.
+      unfold vect_el in H1.
+      rewrite Hjk in H1.
+      flia H1.
+    }
+    apply Hp; [ rewrite Hv; flia Hj Hjn | rewrite Hv; flia Hk Hkn | easy ].
+  }
+}
 assert
   (φp' :
    {y : nat * vector nat |
-    fst y < S n ∧ vect_size (snd y) = S n ∧ is_permut_vect (snd y)} →
+    fst y < S (S n) ∧ vect_size (snd y) = S n ∧ is_permut_vect (snd y)} →
    {x1 : vector nat | vect_size x1 = S (S n) ∧ is_permut_vect x1}). {
   intros ((i, v), (Hi & Hs & Hp)).
   cbn in Hi, Hs, Hp.
   exists (φ' (i, v)).
+  now apply Hφ'.
+}
 ...
   now apply Hφ'.
 ...
