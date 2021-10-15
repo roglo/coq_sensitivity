@@ -803,42 +803,25 @@ set (φp'' :=
                                | fst iv < S (S n)
                                  ∧ vect_size (snd iv) = S n
                                    ∧ is_permut_vect (snd iv)},
-                          let (iv, p) := y in
-                          (
-                             let
-                               (i, v) as p0
+                        (
+                             let (i, v) as p0
                                 return
                                   (fst p0 < S (S n)
                                    ∧ vect_size (snd p0) = S n
                                      ∧ is_permut_vect (snd p0)
                                    → {x3 : vector nat
                                      | vect_size x3 = S (S n)
-                                       ∧ is_permut_vect x3}) := iv in
+                                       ∧ is_permut_vect x3}) := proj1_sig y in
                              (λ
                                 (a0 : fst (i, v) < S (S n)
                                       ∧ vect_size (snd (i, v)) = S n
                                         ∧ is_permut_vect (snd (i, v))),
                                 match a0 with
-                                | conj x3 x4 =>
-                                    (λ (Hi : fst (i, v) < S (S n)) 
-                                       (H1 : vect_size (snd (i, v)) = S n
-                                             ∧ is_permut_vect (snd (i, v))),
-                                       match H1 with
-                                       | conj x5 x6 =>
-                                           (λ (Hs : 
-                                               vect_size (snd (i, v)) = 
-                                               S n) 
-                                              (Hp : 
-                                               is_permut_vect (snd (i, v))),
-                                              exist
-                                                (λ x7 : vector nat,
-                                                   vect_size x7 = S (S n)
-                                                   ∧ 
-                                                   is_permut_vect x7)
-                                                (φ' (i, v)) 
-                                                (Hφ' i v Hi Hs Hp)) x5 x6
-                                       end) x3 x4
-                                end)) p).
+                                | conj Hi (conj Hs Hp) =>
+                                           exist (λ v, vect_size v = S (S n) ∧ is_permut_vect v)
+                                             (φ' (i, v)) (Hφ' i v Hi Hs Hp)
+                                end)
+                       ) (proj2_sig y)).
 ...
   now apply Hφ'.
 ...
