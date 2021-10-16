@@ -3492,7 +3492,14 @@ intros * Hb i Hi.
 unfold iter_seq, iter_list in Hb.
 remember (S e - b) as len eqn:Hlen.
 replace e with (b + len - 1) in Hi by flia Hlen Hi.
-replace i with (i - b + b) in Hi |-* by flia Hi.
+replace i with (b + (i - b)) in Hi |-* by flia Hi.
 remember (i - b) as j eqn:Hj.
 assert (H : j ≤ len - 1) by flia Hj Hi.
+...
+clear e i Hlen Hj Hi.
+rename H into Hlen.
+revert j Hlen.
+induction len; intros. {
+  cbn in Hb, Hlen.
+
 ...
