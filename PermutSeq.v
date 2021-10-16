@@ -70,12 +70,19 @@ split. {
   unfold is_permut_fun_bool.
   apply andb_true_intro.
   split. {
-    unfold iter_seq.
-    unfold iter_list.
-    rewrite Nat_sub_succ_1.
-    destruct n; [ easy | ].
+    rewrite iter_seq_all_d; [ easy | easy | | | ]. {
+      apply andb_true_r.
+    } {
+      apply andb_assoc.
+    } {
+      intros i Hi.
+      specialize (H1 (i - 1)) as H3.
+      assert (H : i - 1 < n) by flia Hi.
+      specialize (H3 H); clear H.
+      now apply Nat.ltb_lt in H3.
+    }
+  } {
 ...
-
 ... (* faut faire une version de is_permut_vect rendant un bool, plutôt qu'un
        Prop *)
 
