@@ -3494,12 +3494,17 @@ remember (S e - b) as len eqn:Hlen.
 replace e with (b + len - 1) in Hi by flia Hlen Hi.
 replace i with (b + (i - b)) in Hi |-* by flia Hi.
 remember (i - b) as j eqn:Hj.
-assert (H : j ≤ len - 1) by flia Hj Hi.
-...
+assert (H : j < len) by flia Hj Hi Hlen.
 clear e i Hlen Hj Hi.
 rename H into Hlen.
 revert j Hlen.
-induction len; intros. {
-  cbn in Hb, Hlen.
-
-...
+induction len; intros; [ easy | ].
+rewrite seq_S in Hb.
+rewrite fold_left_app in Hb; cbn in Hb.
+apply Bool.andb_true_iff in Hb.
+destruct Hb as (Hb, Hbl).
+destruct (Nat.eq_dec j len) as [Hjl| Hjl]; [ now subst j | ].
+specialize (IHlen Hb).
+apply IHlen.
+flia Hlen Hjl.
+Qed.

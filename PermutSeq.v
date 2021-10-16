@@ -114,9 +114,17 @@ split. {
   destruct Hb as (H1, H2).
   split. {
     intros i Hi.
-...
     specialize (and_seq_true_iff _ H1) as H3.
     cbn - [ "<?" ] in H3.
+    specialize (H3 (i + 1)).
+    assert (H : 1 ≤ i + 1 ≤ n) by flia Hi.
+    specialize (H3 H); clear H.
+    rewrite Nat.add_sub in H3.
+    now apply Nat.ltb_lt in H3.
+  } {
+    intros i j Hi Hj Hij.
+    specialize (and_seq_true_iff _ H2) as H3.
+    cbn in H3.
 ...
 Search iter_seq.
 ...
