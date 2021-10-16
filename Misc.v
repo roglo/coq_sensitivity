@@ -3474,6 +3474,8 @@ Notation "a ∧∧ b" := (sumbool_and a b) (at level 80).
 
 Arguments iter_list {A B}%type l%list f%function : simpl never.
 
+(* iterators of "and" *)
+
 Notation "'⋀' ( i = b , e ) , g" :=
   (iter_seq b e (λ c i, (c && g)%bool) true)
   (at level 45, i at level 0, b at level 60, e at level 60).
@@ -3481,3 +3483,16 @@ Notation "'⋀' ( i = b , e ) , g" :=
 Notation "'⋀' ( i ∈ l ) , g" :=
   (iter_list l (λ c i, (c && g)%bool) true)
   (at level 45, i at level 0, l at level 60).
+
+Theorem and_seq_true_iff : ∀ b e f,
+  ⋀ (i = b, e), f i = true →
+  ∀ i, b ≤ i ≤ e → f i = true.
+Proof.
+intros * Hb i Hi.
+unfold iter_seq, iter_list in Hb.
+remember (S e - b) as len eqn:Hlen.
+replace e with (b + len - 1) in Hi by flia Hlen Hi.
+replace i with (i - b + b) in Hi |-* by flia Hi.
+remember (i - b) as j eqn:Hj.
+assert (H : j ≤ len - 1) by flia Hj Hi.
+...

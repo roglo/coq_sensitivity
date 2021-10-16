@@ -68,7 +68,7 @@ intros.
 split. {
   intros (H1, H2).
   unfold is_permut_fun_bool.
-  apply andb_true_intro.
+  apply andb_true_iff.
   split. {
     rewrite iter_seq_all_d; [ easy | easy | | | ]. {
       apply andb_true_r.
@@ -108,6 +108,17 @@ split. {
     }
   }
 } {
+  intros Hb.
+  unfold is_permut_fun_bool in Hb.
+  apply andb_true_iff in Hb.
+  destruct Hb as (H1, H2).
+  split. {
+    intros i Hi.
+...
+    specialize (and_seq_true_iff _ H1) as H3.
+    cbn - [ "<?" ] in H3.
+...
+Search iter_seq.
 ...
 ... (* faut faire une version de is_permut_vect rendant un bool, plutôt qu'un
        Prop *)
