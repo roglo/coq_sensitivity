@@ -445,8 +445,7 @@ End a.
 Close Scope Z_scope.
 
 Definition bnat_square_free n :=
-  (negb (n =? 0) &&
-   forallb (λ d, negb (n mod (d * d) =? 0)) (seq 2 (n - 2)))%bool.
+  ((n ≠? 0) && forallb (λ d : nat, n mod (d * d) ≠? 0) (seq 2 (n - 2)))%bool.
 
 Definition nat_square_free n :=
   n ≠ 0 ∧ ∀ d, 2 ≤ d < n → n mod (d * d) ≠ 0.

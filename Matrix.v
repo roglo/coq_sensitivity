@@ -2862,11 +2862,11 @@ destruct IHn as [IHn| IHn]. {
 Qed.
 
 Theorem mat_1_neq_0 : ∀ n,
-  if rngl_has_1_neq_0 && negb (n =? 0) then @mI T ro n ≠ mZ n n
+  if rngl_has_1_neq_0 && (n ≠? 0) then @mI T ro n ≠ mZ n n
   else not_applicable.
 Proof.
 intros.
-remember (rngl_has_1_neq_0 && negb (n =? 0)) as b eqn:Hb.
+remember (rngl_has_1_neq_0 && n ≠? 0) as b eqn:Hb.
 symmetry in Hb.
 destruct b; [ | easy ].
 apply Bool.andb_true_iff in Hb.

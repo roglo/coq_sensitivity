@@ -57,7 +57,7 @@ Definition is_permut_fun_bool f n :=
 (*
 Definition is_permut_fun_bool f n :=
   (⋀ (i = 1, n), (f (i - 1) <? n)) &&
-  (⋀ (i = 1, n), ⋀ (j = i + 1, n), negb (f (i - 1) =? f (j - 1))).
+  (⋀ (i = 1, n), ⋀ (j = i + 1, n), (f (i - 1) ≠? f (j - 1))).
 *)
 
 Theorem if_permut_fun_is_permut_fun_bool : ∀ f n,
