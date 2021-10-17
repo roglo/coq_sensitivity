@@ -27,6 +27,8 @@ Notation "∃! x .. y , p" :=
     (at level 200, x binder, right associativity)
   : type_scope.
 
+Notation "x ≠? y" := (negb (Nat.eqb x y)) (at level 70) : nat_scope.
+
 Definition List_combine_all {A} (l1 l2 : list A) (d : A) :=
   let '(l'1, l'2) :=
     match List.length l1 ?= List.length l2 with

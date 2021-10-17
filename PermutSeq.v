@@ -50,15 +50,14 @@ Definition is_permut_vect (σ : vector nat) :=
 
 Definition is_permut_fun_bool f n :=
   (⋀ (i = 1, n), (f (i - 1) <? n)) &&
-  (⋀ (i = 1, n), ⋀ (j = i + 1, n), negb (f (i - 1) =? f (j - 1))).
+  (⋀ (i = 1, n), (⋀ (j = 1, n), ((f (i - 1) ≠? f (j - 1)) || (i =? j)))).
 
-Check is_permut_fun.
-Check is_permut_fun_bool.
+...
 
 (*
 Definition is_permut_fun_bool f n :=
-  ⋀ (i = 0, n - 1), (f i <? n) &&
-  ⋀ (i = 0, n - 1), ⋀ (j = 0, n - 1), (negb (f i =? f j) || (i =? j)).
+  (⋀ (i = 1, n), (f (i - 1) <? n)) &&
+  (⋀ (i = 1, n), ⋀ (j = i + 1, n), negb (f (i - 1) =? f (j - 1))).
 *)
 
 Theorem if_permut_fun_is_permut_fun_bool : ∀ f n,
@@ -125,6 +124,14 @@ split. {
     intros i j Hi Hj Hij.
     specialize (and_seq_true_iff _ H2) as H3.
     cbn in H3.
+    specialize (H3 (i + 1)).
+    assert (H : 1 ≤ i + 1 ≤ n) by flia Hi.
+    specialize (H3 H); clear H.
+    rewrite Nat.add_sub, Hij in H3.
+...
+    rewrite iter_seq_all_d in H3.
+...
+    specialize (and_seq_true_iff - H3).
 ...
 Search iter_seq.
 ...
