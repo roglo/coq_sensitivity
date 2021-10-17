@@ -53,7 +53,7 @@ Definition is_permut_fun_bool f n :=
 Definition is_permut_vect_bool (σ : vector nat) :=
   is_permut_fun_bool (vect_el 0 σ) (vect_size σ).
 
-Theorem if_permut_fun_is_permut_fun_bool : ∀ f n,
+Theorem is_permut_fun_is_permut_fun_bool : ∀ f n,
   is_permut_fun f n ↔ is_permut_fun_bool f n = true.
 Proof.
 intros.
@@ -416,6 +416,29 @@ split. {
   now apply Hsg.
 }
 Qed.
+
+Definition φ'_prop n '(i, v) :=
+  i < S n ∧ vect_size v = n ∧ is_permut_vect v.
+
+Definition φ'_prop_bool n '(i, v) :=
+   (i <? S n) && (vect_size v =? n) && is_permut_vect_bool v.
+
+Theorem φ'_prop_φ'_prop_bool : ∀ n iv,
+  φ'_prop n iv ↔ φ'_prop_bool n iv = true.
+Proof.
+intros n (i, v).
+split; intros Hφ'. {
+  destruct Hφ' as (H1 & H2 & H3).
+  unfold φ'_prop_bool.
+  apply andb_true_iff.
+  split. {
+    apply andb_true_iff.
+    split; [ now apply Nat.ltb_lt | now apply Nat.eqb_eq ].
+  } {
+    now apply is_permut_fun_is_permut_fun_bool.
+  }
+} {
+...
 
 Theorem glop : ∀ n vv, is_sym_gr_vect n vv → vect_size vv = n!.
 Proof.
@@ -790,11 +813,12 @@ assert (Hφ : ∀ x,
   }
 }
 assert
-  (Hφ' : ∀ i v,
-   i < S (S n)
-   → vect_size v = S n
-   → is_permut_vect v
+  (Hφ' : ∀ i v, φ_prop_bool (S n) (i, v) = true
    → vect_size (φ' (i, v)) = S (S n) ∧ is_permut_vect (φ' (i, v))). {
+  intros * Hp.
+...
+  apply φ_prop_φ_prop_bool in Hp.
+...
   intros * Hi Hv Hp.
   unfold φ'.
   cbn - [ seq ].
@@ -891,10 +915,7 @@ set
      (φ (proj1_sig x))
      (Hφ (proj1_sig x) (proj1 (proj2_sig x)) (proj2 (proj2_sig x)))).
 set
-  (φp' :=
-   λ y :
-     {iv : nat * vector nat |
-      fst iv < S (S n) ∧ vect_size (snd iv) = S n ∧ is_permut_vect (snd iv)},
+  (φp' := λ y : {iv : nat * vector nat | φ_prop_bool (S n) iv = true},
    exist (λ u : vector nat, vect_size u = S (S n) ∧ is_permut_vect u) 
      (φ' (fst (proj1_sig y), snd (proj1_sig y)))
      (Hφ' (fst (proj1_sig y)) (snd (proj1_sig y)) (proj1 (proj2_sig y))
@@ -902,12 +923,8 @@ set
 assert (H : (∀ x, φp (φp' x) = x) ∧ (∀ y, φp' (φp y) = y)). {
   split. {
     intros.
-About is_permut_vect.
 Theorem glop : ∀ n,
-  ∀ x y :
-  {iv : nat * vector nat |
-   (fst iv <? S (S n)) && (vect_size (snd iv) =? S n) &&
-   is_permut_vect_bool (snd iv) = true},
+  ∀ x y : {iv : nat * vector nat | φ_prop_bool n iv = true},
   proj1_sig x = proj1_sig y → x = y.
 Proof.
 intros * Hxy.
@@ -918,13 +935,6 @@ apply eq_exist_uncurried.
 exists Hxy.
 destruct Hxy; cbn.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
-(* ouais, faut que px et py soient de la forme truc = true *)
-Definition glop n '(i, v) :=
-  i < S n ∧ vect_size v = n ∧ is_permut_vect v.
-Definition glip n '(i, v) :=
-   (i <? S n) && (vect_size v =? n) && is_permut_vect_bool v.
-Print glop.
-Print glip.
 ...
 Theorem glop : ∀ n,
   ∀ x y :
