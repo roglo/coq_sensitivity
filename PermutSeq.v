@@ -438,6 +438,20 @@ split; intros Hφ'. {
     now apply is_permut_fun_is_permut_fun_bool.
   }
 } {
+  apply andb_true_iff in Hφ'.
+  destruct Hφ' as (H1, H3).
+  apply andb_true_iff in H1.
+  destruct H1 as (H1, H2).
+  apply Nat.ltb_lt in H1.
+  apply Nat.eqb_eq in H2.
+  split; [ easy | ].
+  split; [ easy | ].
+  now apply is_permut_fun_is_permut_fun_bool.
+}
+Qed.
+
+Inspect 2.
+
 ...
 
 Theorem glop : ∀ n vv, is_sym_gr_vect n vv → vect_size vv = n!.
