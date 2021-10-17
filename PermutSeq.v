@@ -46,17 +46,12 @@ Definition vect_vect_nat_el (V : vector (vector nat)) i : vector nat :=
 Definition is_permut_vect (σ : vector nat) :=
   is_permut_fun (vect_el 0 σ) (vect_size σ).
 
-(**)
-
 Definition is_permut_fun_bool f n :=
   (⋀ (i = 1, n), (f (i - 1) <? n)) &&
   (⋀ (i = 1, n), (⋀ (j = 1, n), ((f (i - 1) ≠? f (j - 1)) || (i =? j)))).
 
-(*
-Definition is_permut_fun_bool f n :=
-  (⋀ (i = 1, n), (f (i - 1) <? n)) &&
-  (⋀ (i = 1, n), ⋀ (j = i + 1, n), (f (i - 1) ≠? f (j - 1))).
-*)
+Definition is_permut_vect_bool (σ : vector nat) :=
+  is_permut_fun_bool (vect_el 0 σ) (vect_size σ).
 
 Theorem if_permut_fun_is_permut_fun_bool : ∀ f n,
   is_permut_fun f n ↔ is_permut_fun_bool f n = true.
@@ -149,11 +144,6 @@ split. {
   }
 }
 Qed.
-
-...
-
-... (* ça permet d'avoir une version de is_permut_vect rendant un bool,
-       plutôt qu'un Prop *)
 
 Fixpoint permut_fun_inv_loop f i j :=
   match i with
@@ -914,41 +904,33 @@ assert (H : (∀ x, φp (φp' x) = x) ∧ (∀ y, φp' (φp y) = y)). {
     intros.
 About is_permut_vect.
 Theorem glop : ∀ n,
-  ∀ x y : {iv : nat * vector nat | fst iv < S (S n) ∧ vect_size (snd iv) = S n ∧ is_permut_vect (snd iv)},
+  ∀ x y :
+  {iv : nat * vector nat |
+   (fst iv <? S (S n)) && (vect_size (snd iv) =? S n) &&
+   is_permut_vect_bool (snd iv) = true},
   proj1_sig x = proj1_sig y → x = y.
 Proof.
 intros * Hxy.
 destruct x as (ivx, px).
 destruct y as (ivy, py).
 cbn in *.
-subst ivy.
 apply eq_exist_uncurried.
-exists eq_refl.
-cbn.
+exists Hxy.
+destruct Hxy; cbn.
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 (* ouais, faut que px et py soient de la forme truc = true *)
-Check (Eqdep_dec.UIP_dec Bool.bool_dec).
+Definition glop n '(i, v) :=
+  i < S n ∧ vect_size v = n ∧ is_permut_vect v.
+Definition glip n '(i, v) :=
+   (i <? S n) && (vect_size v =? n) && is_permut_vect_bool v.
+Print glop.
+Print glip.
 ...
-    unfold φp, φp'.
-    cbn - [ seq ].
-    destruct x as ((i & v) & Hi & Hv & Hp).
-    cbn - [ seq ] in Hi, Hv, Hp |-*.
-Check UIP_nat.
-Check Eqdep_dec.UIP_dec.
-...
-Search (exist _ _ _ = exist _ _ _).
-Print eq_rect.
-...
-apply EqdepFacts.eq_dep_eq_sig.
-Print EqdepFacts.eq_dep.
-...
-    apply eq_exist_uncurried.
-...
-...
-    apply eq_exist_uncurried.
-    unfold φ.
-    cbn - [ seq ].
-    unfold σ'.
-    cbn - [ seq ].
+Theorem glop : ∀ n,
+  ∀ x y :
+  {iv : nat * vector nat |
+   fst iv < S (S n) ∧ vect_size (snd iv) = S n ∧ is_permut_vect (snd iv)},
+  proj1_sig x = proj1_sig y → x = y.
 ...
 assert (∀ x, x ∈ vect_list vv → φ' (φ x) = x). {
   intros x Hx.
