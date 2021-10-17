@@ -450,10 +450,6 @@ split; intros Hφ'. {
 }
 Qed.
 
-Inspect 2.
-
-...
-
 Theorem glop : ∀ n vv, is_sym_gr_vect n vv → vect_size vv = n!.
 Proof.
 intros * Hsg.
@@ -827,13 +823,11 @@ assert (Hφ : ∀ x,
   }
 }
 assert
-  (Hφ' : ∀ i v, φ_prop_bool (S n) (i, v) = true
+  (Hφ' : ∀ i v, φ'_prop_bool (S n) (i, v) = true
    → vect_size (φ' (i, v)) = S (S n) ∧ is_permut_vect (φ' (i, v))). {
   intros * Hp.
-...
-  apply φ_prop_φ_prop_bool in Hp.
-...
-  intros * Hi Hv Hp.
+  apply φ'_prop_φ'_prop_bool in Hp.
+  destruct Hp as (Hi & Hv & Hp).
   unfold φ'.
   cbn - [ seq ].
   rewrite map_length, seq_length.
@@ -928,8 +922,18 @@ set
       fst iv < S (S n) ∧ vect_size (snd iv) = S n ∧ is_permut_vect (snd iv))
      (φ (proj1_sig x))
      (Hφ (proj1_sig x) (proj1 (proj2_sig x)) (proj2 (proj2_sig x)))).
+Check Hφ'.
 set
-  (φp' := λ y : {iv : nat * vector nat | φ_prop_bool (S n) iv = true},
+  (φp' := λ y : {iv : nat * vector nat | φ'_prop_bool (S n) iv = true},
+   exist (λ u : vector nat, vect_size u = S (S n) ∧ is_permut_vect u) 
+     (φ' (fst (proj1_sig y), snd (proj1_sig y)))
+     (Hφ' (fst (proj1_sig y)) (snd (proj1_sig y))
+        (proj2_sig y))).
+        (proj1 (proj2_sig y))
+        (proj1 (proj2 (proj2_sig y))) (proj2 (proj2 (proj2_sig y))))).
+...
+set
+  (φp' := λ y : {iv : nat * vector nat | φ'_prop_bool (S n) iv = true},
    exist (λ u : vector nat, vect_size u = S (S n) ∧ is_permut_vect u) 
      (φ' (fst (proj1_sig y), snd (proj1_sig y)))
      (Hφ' (fst (proj1_sig y)) (snd (proj1_sig y)) (proj1 (proj2_sig y))
