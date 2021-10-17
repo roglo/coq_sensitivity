@@ -156,9 +156,8 @@ Qed.
 (* square_matrix *)
 
 Definition is_square_matrix {T} n (M : matrix T) :=
-  (mat_nrows M =? n) &&
-  ((negb (mat_ncols M =? 0)) || (mat_nrows M =? 0)) &&
-  ⋀ (l ∈ mat_list_list M), (length l =? n).
+  (mat_nrows M =? n) && ((mat_ncols M ≠? 0) || (mat_nrows M =? 0)) &&
+  (⋀ (l ∈ mat_list_list M), (length l =? n)).
 
 Record square_matrix n T :=
   { sm_mat : matrix T;
@@ -3115,7 +3114,7 @@ apply mat_mul_add_distr_r. {
 Qed.
 
 Theorem squ_mat_opt_1_neq_0 {n} :
-  if rngl_has_1_neq_0 && negb (n =? 0) then
+  if rngl_has_1_neq_0 && (n ≠? 0) then
     @rngl_one (square_matrix n T) (mat_ring_like_op n) ≠
     @rngl_zero (square_matrix n T) (mat_ring_like_op n)
   else not_applicable.
@@ -3123,7 +3122,7 @@ Theorem squ_mat_opt_1_neq_0 {n} :
   if rngl_has_1_neq_0 && negb (n =? 0) then 1%F ≠ 0%F else not_applicable.
 *)
 Proof.
-remember (rngl_has_1_neq_0 && negb (n =? 0)) as b eqn:Hb.
+remember (rngl_has_1_neq_0 && (n ≠? 0)) as b eqn:Hb.
 symmetry in Hb.
 destruct b; [ | easy ].
 apply Bool.andb_true_iff in Hb.
@@ -3612,7 +3611,7 @@ Definition mat_ring_like_prop (n : nat) :
   {| rngl_is_comm := false;
      rngl_has_dec_eq := @rngl_has_dec_eq T ro rp;
      rngl_has_dec_le := false;
-     rngl_has_1_neq_0 := (rngl_has_1_neq_0 && negb (Nat.eqb n 0))%bool;
+     rngl_has_1_neq_0 := rngl_has_1_neq_0 && (n ≠? 0);
      rngl_is_ordered := false;
      rngl_is_integral := false;
      rngl_characteristic := if n =? 0 then 1 else rngl_characteristic;
