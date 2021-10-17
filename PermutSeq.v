@@ -52,8 +52,6 @@ Definition is_permut_fun_bool f n :=
   (⋀ (i = 1, n), (f (i - 1) <? n)) &&
   (⋀ (i = 1, n), (⋀ (j = 1, n), ((f (i - 1) ≠? f (j - 1)) || (i =? j)))).
 
-...
-
 (*
 Definition is_permut_fun_bool f n :=
   (⋀ (i = 1, n), (f (i - 1) <? n)) &&
@@ -93,16 +91,21 @@ split. {
         apply andb_assoc.
       } {
         intros j Hj.
+        apply orb_true_iff.
         specialize (H2 (i - 1) (j - 1)) as H3.
         assert (H : i - 1 < n) by flia Hi.
         specialize (H3 H); clear H.
         assert (H : j - 1 < n) by flia Hj.
         specialize (H3 H); clear H.
-        apply negb_true_iff.
-        apply Nat.eqb_neq.
-        intros H.
-        specialize (H3 H).
-        flia Hi Hj H3.
+        destruct (Nat.eq_dec (f (i - 1)) (f (j - 1))) as [H4| H4]. {
+          specialize (H3 H4); right.
+          apply Nat.eqb_eq.
+          flia Hi Hj H3.
+        } {
+          left.
+          apply negb_true_iff.
+          now apply Nat.eqb_neq.
+        }
       }
     }
   }
@@ -128,15 +131,29 @@ split. {
     assert (H : 1 ≤ i + 1 ≤ n) by flia Hi.
     specialize (H3 H); clear H.
     rewrite Nat.add_sub, Hij in H3.
+    specialize (and_seq_true_iff _ H3) as H4.
+    cbn in H4.
+    specialize (H4 (j + 1)).
+    assert (H : 1 ≤ j + 1 ≤ n) by flia Hj.
+    specialize (H4 H); clear H.
+    apply orb_true_iff in H4.
+    rewrite Nat.add_sub in H4.
+    destruct H4 as [H4| H4]. {
+      apply negb_true_iff in H4.
+      now apply Nat.eqb_neq in H4.
+    } {
+      apply Nat.eqb_eq in H4.
+      do 2 rewrite Nat.add_1_r in H4.
+      now apply Nat.succ_inj in H4.
+    }
+  }
+}
+Qed.
+
 ...
-    rewrite iter_seq_all_d in H3.
-...
-    specialize (and_seq_true_iff - H3).
-...
-Search iter_seq.
-...
-... (* faut faire une version de is_permut_vect rendant un bool, plutôt qu'un
-       Prop *)
+
+... (* ça permet d'avoir une version de is_permut_vect rendant un bool,
+       plutôt qu'un Prop *)
 
 Fixpoint permut_fun_inv_loop f i j :=
   match i with
