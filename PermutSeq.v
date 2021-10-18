@@ -977,6 +977,10 @@ assert (H : (∀ x, φp (φp' x) = x) ∧ (∀ y, φp' (φp y) = y)). {
 }
 destruct H as (Hx, Hy).
 assert (H1 : FinFun.Bijective φp) by now exists φp'.
+move IHn at bottom.
+unfold φ_prop_bool in Hy.
+Print is_sym_gr_vect.
+...
 Search FinFun.Bijective.
 Search FinFun.Injective.
 Search FinFun.Surjective.
