@@ -417,11 +417,32 @@ split. {
 }
 Qed.
 
+Definition φ_prop n v := vect_size v = n ∧ is_permut_vect v.
+
+Definition φ_prop_bool n v := (vect_size v =? n) && is_permut_vect_bool v.
+
 Definition φ'_prop n '(i, v) :=
   i < S n ∧ vect_size v = n ∧ is_permut_vect v.
 
 Definition φ'_prop_bool n '(i, v) :=
    (i <? S n) && (vect_size v =? n) && is_permut_vect_bool v.
+
+Theorem φ_prop_φ_prop_bool : ∀ n v,
+  φ_prop n v ↔ φ_prop_bool n v = true.
+Proof.
+intros.
+split; intros Hφ. {
+  destruct Hφ as (H1 & H2).
+  apply andb_true_iff.
+  apply Nat.eqb_eq in H1.
+  now apply is_permut_fun_is_permut_fun_bool in H2.
+} {
+  apply andb_true_iff in Hφ.
+  destruct Hφ as (H1, H2).
+  apply Nat.eqb_eq in H1.
+  now apply is_permut_fun_is_permut_fun_bool in H2.
+}
+Qed.
 
 Theorem φ'_prop_φ'_prop_bool : ∀ n iv,
   φ'_prop n iv ↔ φ'_prop_bool n iv = true.
@@ -823,12 +844,13 @@ assert (Hφ : ∀ x,
   }
 }
 assert
-  (Hφ' : ∀ iv, φ'_prop_bool (S n) iv = true
-   → vect_size (φ' iv) = S (S n) ∧ is_permut_vect (φ' iv)). {
+  (Hφ' : ∀ iv,
+   φ'_prop_bool (S n) iv = true → φ_prop_bool (S (S n)) (φ' iv) = true). {
   intros (i, v) Hp.
+  apply φ_prop_φ_prop_bool.
   apply φ'_prop_φ'_prop_bool in Hp.
   destruct Hp as (Hi & Hv & Hp).
-  unfold φ'.
+  unfold φ_prop, φ'.
   cbn - [ seq ].
   rewrite map_length, seq_length.
   split; [ easy | ].
@@ -925,8 +947,8 @@ set
 set
   (φp' :=
    λ y : {iv : nat * vector nat | φ'_prop_bool (S n) iv = true},
-   exist (λ u : vector nat, vect_size u = S (S n) ∧ is_permut_vect u) 
-     (φ' (proj1_sig y)) (Hφ' (proj1_sig y) (proj2_sig y))).
+   exist (λ u : vector nat, φ_prop_bool (S (S n)) u = true)
+      (φ' (proj1_sig y)) (Hφ' (proj1_sig y) (proj2_sig y))).
 ...
 assert (H : (∀ x, φp (φp' x) = x) ∧ (∀ y, φp' (φp y) = y)). {
   split. {
