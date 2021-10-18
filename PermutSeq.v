@@ -964,6 +964,18 @@ assert (H : (∀ x, φp (φp' x) = x) ∧ (∀ y, φp' (φp y) = y)). {
     apply (Eqdep_dec.UIP_dec Bool.bool_dec).
   } {
     intros y.
+    unfold φp, φp'.
+    specialize (proj2 (φ_prop_φ_prop_bool (S (S n)) (proj1_sig y))) as H1.
+    destruct y as (u, Hp); cbn in H1 |-*.
+    specialize (H1 Hp).
+    unfold φ_prop in H1.
+    destruct H1 as (H1 & H2).
+    apply eq_exist_uncurried.
+    exists (Hφ'φ u H1 H2).
+    apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+  }
+}
+destruct H as (Hx, Hy).
 ...
 Theorem glop : ∀ n,
   ∀ x y : {iv : nat * vector nat | φ_prop_bool n iv = true},
