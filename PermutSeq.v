@@ -1130,13 +1130,6 @@ assert (H : is_sym_gr_vect (S n) vv'). {
       now rewrite map_length in Hi.
     }
 ...
-    unfold is_permut_vect.
-    cbn.
-...
-      unfold ll1.
-      rewrite List_length_filter_negb.
-      rewrite fold_vect_size.
-...
   }
 ...
 }
