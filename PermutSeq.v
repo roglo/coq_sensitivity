@@ -1129,6 +1129,10 @@ assert (H : is_sym_gr_vect (S n) vv'). {
       unfold vv', ll2 in Hi; cbn in Hi.
       now rewrite map_length in Hi.
     }
+    unfold ll1.
+Search (nth _ (filter _ _)).
+Search (tl (vect_list _)).
+Search (nth _ (vect_list _)).
 ...
   }
 ...
