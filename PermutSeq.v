@@ -1064,12 +1064,42 @@ assert (H : is_sym_gr_vect (S n) vv'). {
         remember (vect_list vv) as ll; clear vv Heqll.
         now apply NoDup_nth in Hinj.
       }
-      unfold vect_el, empty_vect.
+      unfold vect_el.
       cbn.
 Search (vect_list (nth _ _ _)).
 Theorem φoifejofie : ∀ A (ll : list (list A)) n f,
 (∀ j, j < length ll → length (nth j ll []) = n) →
 ∀ i, i < length (filter f ll) → length (nth i (filter f ll) []) = n.
+Admitted.
+specialize φoifejofie as H2.
+specialize (H2 nat).
+specialize (H2 (map (@vect_list nat) (vect_list vv))).
+specialize (H2 (S (S n))).
+rewrite map_length in H2.
+rewrite fold_vect_size in H2.
+specialize (H2 (λ l, nth 0 l 0 =? S n)).
+assert (H : ∀ j : nat, j < vect_size vv → length (nth j (map (vect_list (T:=nat)) (vect_list vv)) []) = S (S n)). {
+  intros j Hj.
+  specialize (Hs j Hj).
+  now rewrite (List_map_nth' empty_vect).
+}
+specialize (H2 H); clear H.
+specialize (H2 i).
+assert (H : i < length (filter (λ l : list nat, nth 0 l 0 =? S n) (map (vect_list (T:=nat)) (vect_list vv)))). {
+unfold ll1 in Hi.
+unfold vect_el in Hi.
+Theorem List_filter_map : ∀ A (l : list A) f g,
+  filter f (map g l) = filter (λ i, f (g i)) l.
+Proof.
+Admitted.
+Check List_filter_map.
+move Hi at bottom.
+specialize List_filter_map as H3.
+specialize (H3 (vector nat)).
+specialize (H3 (vect_list vv)).
+specialize (H3 (λ v : vector nat, nth 0 (vect_list v) 0 =? S n)).
+specialize (H3 id).
+unfold id in H3; cbn in H3.
 ...
       assert (H : i < vect_size vv) by flia Hi Hlv.
       specialize (Hs _ H); clear H.
