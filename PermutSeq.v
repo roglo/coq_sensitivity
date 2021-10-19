@@ -555,6 +555,8 @@ induction n; intros. {
   }
   now specialize (Hinj H).
 }
+(* méthode wikipédia... *)
+(*
 set
   (σ' := λ σ,
    mk_vect
@@ -1013,6 +1015,8 @@ assert (∀ x, x ∈ vect_list vv → φ' (φ x) = x). {
 }
 move H before Hφ'φ; clear Hφ'φ; rename H into Hφ'φ.
 ...
+*)
+(* ma méthode *)
 (* selecting all permutations of vv starting with "S n" *)
 set (ll1 := filter (λ v, vect_el 0 v 0 =? S n) (vect_list vv)).
 (* removing this first element (which is "S n") *)
@@ -1044,6 +1048,22 @@ assert (H : is_sym_gr_vect (S n) vv'). {
       unfold vv', ll2, ll1 in Hi; cbn in Hi.
       rewrite map_length in Hi.
       remember (filter _ _) as lv eqn:Hlv.
+...
+    }
+...
+  }
+...
+}
+specialize (H1 H); clear H.
+unfold vv', ll2, ll1 in H1.
+cbn - [ fact ] in H1.
+rewrite map_length in H1.
+Theorem glkdfjsfl :
+  ∀ n vv i j, is_sym_gr_vect n vv → i < n → j < n →
+  length (filter (λ v, vect_el 0 v 0 =? i) (vect_list vv)) =
+  length (filter (λ v, vect_el 0 v 0 =? j) (vect_list vv)).
+...
+  H1 : length (filter (λ v : vector nat, vect_el 0 v 0 =? S n) (vect_list vv)) = (S n)!
 ...
 destruct Hsg as (Hsg & Hinj & Hsurj).
 ...
