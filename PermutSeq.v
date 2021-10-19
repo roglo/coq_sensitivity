@@ -979,6 +979,8 @@ destruct H as (Hx, Hy).
 assert (H1 : FinFun.Bijective φp) by now exists φp'.
 move IHn at bottom.
 unfold φ_prop_bool in Hy.
+unfold φ'_prop_bool in Hx.
+move Hsg at bottom.
 Print is_sym_gr_vect.
 ...
 Search FinFun.Bijective.
