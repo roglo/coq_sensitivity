@@ -1130,6 +1130,23 @@ assert (H : is_sym_gr_vect (S n) vv'). {
       now rewrite map_length in Hi.
     }
     unfold ll1.
+    unfold vv', ll2 in Hi.
+    cbn in Hi.
+    rewrite map_length in Hi.
+    unfold ll1 in Hi.
+Theorem glop : ∀ A (d : A) l f i,
+i < length (filter f l)
+→ ∃ j, j < length l ∧ nth i (filter f l) d = nth j l d.
+Admitted.
+specialize glop as H2.
+specialize (H2 (vector nat)).
+specialize (H2 empty_vect).
+specialize (H2 (vect_list vv)).
+specialize (H2 _ _ Hi).
+destruct H2 as (j & Hj & Hij).
+rewrite Hij.
+rewrite fold_vect_size in Hj.
+rewrite fold_vect_el in Hij.
 Search (nth _ (filter _ _)).
 Search (tl (vect_list _)).
 Search (nth _ (vect_list _)).
