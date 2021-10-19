@@ -1047,11 +1047,25 @@ assert (H : is_sym_gr_vect (S n) vv'). {
       destruct Hsg as (Hsg & Hinj & Hsurj).
       unfold vv', ll2 in Hi; cbn in Hi.
       rewrite map_length in Hi.
-assert (∀ j, j < vect_size vv → length (vect_list (nth j (vect_list vv) empty_vect)) = S (S n)). {
-  intros j Hj.
-  now specialize (Hsg j Hj) as H2.
-}
-unfold ll1.
+      assert
+        (Hs : ∀ j, j < vect_size vv →
+         length (vect_list (nth j (vect_list vv) empty_vect)) = S (S n)). {
+        intros j Hj.
+        now specialize (Hsg j Hj) as H2.
+      }
+      unfold ll1.
+      assert (Hlv : length ll1 ≤ vect_size vv). {
+        unfold ll1.
+        rewrite List_length_filter_negb; [ rewrite fold_vect_size; flia | ].
+        clear - Hinj.
+(* faudrait peut-être que j'utilise NoDup, tout simplement, dans ma définition
+   de Hinj ? *)
+        unfold vect_el, vect_size in Hinj.
+        remember (vect_list vv) as ll; clear vv Heqll.
+        now apply NoDup_nth in Hinj.
+      }
+      assert (H : i < vect_size vv) by flia Hi Hlv.
+      specialize (Hs _ H); clear H.
 ...
     }
 ...
