@@ -1027,7 +1027,7 @@ assert (H : is_sym_gr_vect (S n) vv'). {
   split. {
     intros i Hi; cbn.
     split. {
-      unfold vv', ll2, ll1; cbn.
+      unfold vv', ll2; cbn.
       rewrite (List_map_nth' empty_vect). 2: {
         destruct Hsg as (Hsg & Hinj & Hsurj).
         destruct vv as (lv); cbn in Hsg, Hinj, Hsurj |-*.
@@ -1045,9 +1045,13 @@ assert (H : is_sym_gr_vect (S n) vv'). {
       cbn.
       rewrite List_tl_length.
       destruct Hsg as (Hsg & Hinj & Hsurj).
-      unfold vv', ll2, ll1 in Hi; cbn in Hi.
+      unfold vv', ll2 in Hi; cbn in Hi.
       rewrite map_length in Hi.
-      remember (filter _ _) as lv eqn:Hlv.
+assert (∀ j, j < vect_size vv → length (vect_list (nth j (vect_list vv) empty_vect)) = S (S n)). {
+  intros j Hj.
+  now specialize (Hsg j Hj) as H2.
+}
+unfold ll1.
 ...
     }
 ...
