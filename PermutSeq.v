@@ -1094,10 +1094,11 @@ assert (H : is_sym_gr_vect (S n) vv'). {
       unfold vv', ll2 in Hi; cbn in Hi.
       now rewrite map_length in Hi.
     }
-    unfold ll1.
     unfold vv', ll2 in Hi.
     cbn in Hi.
     rewrite map_length in Hi.
+...
+    unfold ll1.
     unfold ll1 in Hi.
 Theorem glop : ∀ A (d : A) l f i,
 i < length (filter f l)
