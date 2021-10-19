@@ -485,8 +485,7 @@ assert (H : ∀ j, j < length ll → length (nth j ll []) = n). {
   apply (Hll (S j) Hj).
 }
 specialize (IHll H); clear H.
-remember (f la) as b eqn:Hb; symmetry in Hb.
-destruct b. {
+destruct (f la). {
   destruct i. {
     cbn in Hi |-*.
     apply (Hll 0); cbn; flia.
@@ -501,7 +500,11 @@ Qed.
 Theorem List_filter_map : ∀ A B (l : list A) (f : B → bool) (g : A → B),
   filter f (map g l) = map g (filter (λ i, f (g i)) l).
 Proof.
-...
+intros.
+induction l as [| a]; [ easy | cbn ].
+destruct (f (g a)); [ now rewrite IHl | ].
+apply IHl.
+Qed.
 
 Theorem glop : ∀ n vv, is_sym_gr_vect n vv → vect_size vv = n!.
 Proof.
@@ -1104,14 +1107,14 @@ assert (H : is_sym_gr_vect (S n) vv'). {
       specialize (H2 (λ l, nth 0 l 0 =? S n)).
       assert
         (H : ∀ j, j < vect_size vv →
-         length (nth j (map (vect_list (T:=nat)) (vect_list vv)) []) = S (S n)). {
+         length (nth j (map (vect_list (T:=nat)) (vect_list vv)) []) =
+         S (S n)). {
         intros j Hj.
         specialize (Hs j Hj).
         now rewrite (List_map_nth' empty_vect).
       }
       specialize (H2 H); clear H.
       specialize (H2 i).
-...
       rewrite List_filter_map in H2.
       rewrite map_length in H2.
       unfold vect_el in ll1.
@@ -1120,6 +1123,19 @@ assert (H : is_sym_gr_vect (S n) vv'). {
       rewrite (List_map_nth' empty_vect) in H2; [ | flia Hi Hlv ].
       now rewrite H2, Nat_sub_succ_1.
     }
+    destruct Hsg as (Hsg & Hinj & Hsurj).
+    unfold ll2.
+    rewrite (List_map_nth' empty_vect). 2: {
+      unfold vv', ll2 in Hi; cbn in Hi.
+      now rewrite map_length in Hi.
+    }
+...
+    unfold is_permut_vect.
+    cbn.
+...
+      unfold ll1.
+      rewrite List_length_filter_negb.
+      rewrite fold_vect_size.
 ...
   }
 ...
