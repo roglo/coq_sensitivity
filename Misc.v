@@ -1290,6 +1290,15 @@ subst start; f_equal.
 rewrite <- Hl; apply IHn.
 Qed.
 
+Theorem List_filter_map : ∀ A B (l : list A) (f : B → bool) (g : A → B),
+  filter f (map g l) = map g (filter (λ i, f (g i)) l).
+Proof.
+intros.
+induction l as [| a]; [ easy | cbn ].
+destruct (f (g a)); [ now rewrite IHl | ].
+apply IHl.
+Qed.
+
 Theorem List_filter_all_true {A} : ∀ f (l : list A),
   (∀ a, a ∈ l → f a = true) → filter f l = l.
 Proof.
@@ -1379,6 +1388,32 @@ induction al as [| a al]; intros; [ easy | ].
 cbn.
 rewrite <- IHal.
 now rewrite List_filter_filter_comm.
+Qed.
+
+Theorem List_list_length_nth_filter : ∀ A (ll : list (list A)) n f,
+  (∀ j, j < length ll → length (nth j ll []) = n) →
+  ∀ i, i < length (filter f ll) → length (nth i (filter f ll) []) = n.
+Proof.
+intros * Hll i Hi.
+revert i Hi.
+induction ll as [| la]; intros; [ easy | cbn ].
+cbn in Hi.
+assert (H : ∀ j, j < length ll → length (nth j ll []) = n). {
+  intros j Hj.
+  apply Nat.succ_lt_mono in Hj.
+  apply (Hll (S j) Hj).
+}
+specialize (IHll H); clear H.
+destruct (f la). {
+  destruct i. {
+    cbn in Hi |-*.
+    apply (Hll 0); cbn; flia.
+  }
+  cbn in Hi |-*.
+  apply Nat.succ_lt_mono in Hi.
+  now apply IHll.
+}
+now apply IHll.
 Qed.
 
 Theorem List_length_cons : ∀ A (a : A) la, length (a :: la) = S (length la).
