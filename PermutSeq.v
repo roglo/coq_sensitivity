@@ -1064,6 +1064,13 @@ assert (H : is_sym_gr_vect (S n) vv'). {
         remember (vect_list vv) as ll; clear vv Heqll.
         now apply NoDup_nth in Hinj.
       }
+      unfold vect_el, empty_vect.
+      cbn.
+Search (vect_list (nth _ _ _)).
+Theorem φoifejofie : ∀ A (ll : list (list A)) n f,
+(∀ j, j < length ll → length (nth j ll []) = n) →
+∀ i, i < length (filter f ll) → length (nth i (filter f ll) []) = n.
+...
       assert (H : i < vect_size vv) by flia Hi Hlv.
       specialize (Hs _ H); clear H.
 ...
