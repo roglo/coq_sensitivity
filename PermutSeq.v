@@ -1241,6 +1241,15 @@ assert (H : is_sym_gr_vect (S n) vv'). {
     now rewrite Hi', Hj', H3.
   } {
     intros v Hv Hp.
+    unfold vv'; cbn.
+    unfold ll2.
+    apply in_map_iff.
+    unfold ll1.
+    destruct Hp as (Hp1, Hp2).
+    rewrite Hv in Hp1, Hp2.
+    destruct Hsg as (Hsg & Hinj & Hsurj).
+Search (_ ∈ filter _ _).
+Search (_ ∈ map _ _).
 ...
 }
 specialize (H1 H); clear H.
