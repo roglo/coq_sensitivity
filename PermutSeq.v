@@ -1097,22 +1097,27 @@ assert (H : is_sym_gr_vect (S n) vv'). {
     unfold vv', ll2 in Hi.
     cbn in Hi.
     rewrite map_length in Hi.
+    unfold is_permut_vect; cbn.
+    rewrite List_tl_length.
+    split. {
+      intros j Hj.
+      cbn in Hj |-*.
+      assert (H : length (vect_list (nth i ll1 empty_vect)) = S (S n)). {
+        unfold ll1.
+        specialize List_length_filter_nth as H2.
+        specialize (H2 (vector nat)).
+        specialize (H2 empty_vect).
+        specialize (H2 (vect_list vv)).
+        specialize (H2 _ _ Hi).
+        destruct H2 as (k & Hk & Hik).
+        rewrite Hik.
+        rewrite fold_vect_size in Hj |-*.
+        rewrite fold_vect_el in Hik |-*.
+        now specialize (Hsg k Hk).
+      }
+      rewrite H in Hj |-*.
+      rewrite Nat_sub_succ_1 in Hj |-*.
 ...
-    unfold ll1.
-    unfold ll1 in Hi.
-Theorem glop : ∀ A (d : A) l f i,
-i < length (filter f l)
-→ ∃ j, j < length l ∧ nth i (filter f l) d = nth j l d.
-Admitted.
-specialize glop as H2.
-specialize (H2 (vector nat)).
-specialize (H2 empty_vect).
-specialize (H2 (vect_list vv)).
-specialize (H2 _ _ Hi).
-destruct H2 as (j & Hj & Hij).
-rewrite Hij.
-rewrite fold_vect_size in Hj.
-rewrite fold_vect_el in Hij.
 Search (nth _ (filter _ _)).
 Search (tl (vect_list _)).
 Search (nth _ (vect_list _)).

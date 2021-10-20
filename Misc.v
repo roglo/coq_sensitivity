@@ -1416,6 +1416,36 @@ destruct (f la). {
 now apply IHll.
 Qed.
 
+
+Theorem List_length_filter_nth : ∀ A (d : A) l f i,
+  i < length (filter f l)
+  → ∃ j, j < length l ∧ nth i (filter f l) d = nth j l d.
+Proof.
+intros * Hi.
+revert i Hi.
+induction l as [| a]; intros; [ easy | ].
+cbn - [ nth ].
+cbn in Hi.
+destruct (f a). {
+  cbn in Hi.
+  destruct i. {
+    exists 0.
+    split; [ flia | easy ].
+  }
+  rewrite List_nth_succ_cons.
+  apply Nat.succ_lt_mono in Hi.
+  specialize (IHl _ Hi) as H1.
+  destruct H1 as (j & Hj & Hnj).
+  exists (S j).
+  split; [ now apply Nat.succ_lt_mono in Hj | easy ].
+} {
+  specialize (IHl _ Hi) as H1.
+  destruct H1 as (j & Hj & Hnj).
+  exists (S j).
+  split; [ now apply Nat.succ_lt_mono in Hj | easy ].
+}
+Qed.
+
 Theorem List_length_cons : ∀ A (a : A) la, length (a :: la) = S (length la).
 Proof. easy. Qed.
 
