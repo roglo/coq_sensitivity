@@ -1117,6 +1117,8 @@ assert (H : is_sym_gr_vect (S n) vv'). {
       }
       rewrite Hl in Hj |-*.
       rewrite Nat_sub_succ_1 in Hj |-*.
+Check List_length_filter_nth.
+...
       specialize List_length_filter_nth as H2.
       specialize (H2 (vector nat)).
       specialize (H2 empty_vect).
@@ -1133,12 +1135,14 @@ assert (H : is_sym_gr_vect (S n) vv'). {
       remember (vect_el empty_vect vv k) as lv eqn:Hlv.
       unfold vect_el in H4.
       remember (vect_list lv) as la eqn:Hla.
+...
       destruct la as [| a]; [ easy | ].
       destruct j. {
         cbn.
         destruct la as [| b]; [ easy | ].
         cbn in Hl.
         do 2 apply Nat.succ_inj in Hl.
+        cbn.
 ...
       clear - Hl H4.
 ...

@@ -1419,14 +1419,18 @@ Qed.
 
 Theorem List_length_filter_nth : ∀ A (d : A) l f i,
   i < length (filter f l)
-  → ∃ j, j < length l ∧ nth i (filter f l) d = nth j l d.
+  → ∃ j,
+     j < length l ∧
+     nth i (filter f l) d = nth j l d ∧
+     i = length (filter f (firstn j l)).
 Proof.
 intros * Hi.
 revert i Hi.
 induction l as [| a]; intros; [ easy | ].
 cbn - [ nth ].
 cbn in Hi.
-destruct (f a). {
+remember (f a) as b eqn:Hb; symmetry in Hb.
+destruct b. {
   cbn in Hi.
   destruct i. {
     exists 0.
@@ -1435,14 +1439,20 @@ destruct (f a). {
   rewrite List_nth_succ_cons.
   apply Nat.succ_lt_mono in Hi.
   specialize (IHl _ Hi) as H1.
-  destruct H1 as (j & Hj & Hnj).
+  destruct H1 as (j & Hj & Hnj & Hij).
   exists (S j).
-  split; [ now apply Nat.succ_lt_mono in Hj | easy ].
+  split; [ now apply Nat.succ_lt_mono in Hj | ].
+  split; [ easy | cbn ].
+  rewrite Hb; cbn.
+  now f_equal.
 } {
   specialize (IHl _ Hi) as H1.
-  destruct H1 as (j & Hj & Hnj).
+  destruct H1 as (j & Hj & Hnj & Hij).
   exists (S j).
-  split; [ now apply Nat.succ_lt_mono in Hj | easy ].
+  split; [ now apply Nat.succ_lt_mono in Hj | ].
+  split; [ easy | cbn ].
+  rewrite Hb; cbn.
+  now f_equal.
 }
 Qed.
 
