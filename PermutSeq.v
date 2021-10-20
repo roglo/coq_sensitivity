@@ -1102,7 +1102,7 @@ assert (H : is_sym_gr_vect (S n) vv'). {
     split. {
       intros j Hj.
       cbn in Hj |-*.
-      assert (H : length (vect_list (nth i ll1 empty_vect)) = S (S n)). {
+      assert (Hl : length (vect_list (nth i ll1 empty_vect)) = S (S n)). {
         unfold ll1.
         specialize List_length_filter_nth as H2.
         specialize (H2 (vector nat)).
@@ -1115,10 +1115,50 @@ assert (H : is_sym_gr_vect (S n) vv'). {
         rewrite fold_vect_el in Hik |-*.
         now specialize (Hsg k Hk).
       }
-      rewrite H in Hj |-*.
+      rewrite Hl in Hj |-*.
       rewrite Nat_sub_succ_1 in Hj |-*.
+      specialize List_length_filter_nth as H2.
+      specialize (H2 (vector nat)).
+      specialize (H2 empty_vect).
+      specialize (H2 (vect_list vv)).
+      specialize (H2 _ _ Hi).
+      destruct H2 as (k & Hk & Hik).
+      unfold ll1 in Hl |-*.
+      rewrite Hik in Hl |-*.
+      rewrite fold_vect_el in Hl |-*.
+      specialize (Hsg k Hk) as H2.
+      destruct H2 as (H2, H3).
+      destruct H3 as (H4, H5).
+      rewrite H2 in H4, H5.
+      unfold vect_el in H4.
+      specialize (H4 (S j)) as H6.
+      assert (H : S j < S (S n)) by flia Hj.
+      specialize (H6 H); clear H.
 ...
+      clear - H6.
+      unfold vect_el.
+      remember (vect_list (nth _ _ _)) as la eqn:Hla.
+      clear vv Hla.
+      induction la as [| a]; [ cbn; rewrite match_id; flia | ].
+      cbn in H6 |-*.
+...
+      destruct j. {
+        destruct la as [| b]; [ cbn; flia | ].
+        cbn.
+        cbn in IHla.
+cbn.
+...
+      do 2 rewrite fold_vect_el in H6.
+      remember (vect_el empty_vect vv k) as lv eqn:Hlv.
+      clear Hla vv.
+      unfold vect_el in H6.
+      remember (vect_list
+
+Search (tl (vect_list _)).
+
+        now specialize (Hsg k Hk).
 Search (nth _ (filter _ _)).
+...
 Search (tl (vect_list _)).
 Search (nth _ (vect_list _)).
 ...
