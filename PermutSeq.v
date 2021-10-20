@@ -1033,6 +1033,10 @@ assert (Hll1v : length ll1 ≤ vect_size vv). {
   remember (vect_list vv) as ll; clear vv Heqll.
   now apply NoDup_nth in Hinj.
 }
+assert (Hvvv : vect_size vv' = length ll1). {
+  unfold vv', ll2; cbn.
+  now rewrite map_length.
+}
 specialize (IHn vv') as H1.
 assert (H : is_sym_gr_vect (S n) vv'). {
   split. {
@@ -1182,6 +1186,27 @@ assert (H : is_sym_gr_vect (S n) vv'). {
   }
   split. {
     intros i j Hi Hj Hij.
+    unfold vv' in Hij.
+    cbn in Hij.
+    unfold ll2 in Hij.
+    rewrite (List_map_nth' empty_vect) in Hij; [ | now rewrite <- Hvvv ].
+    rewrite (List_map_nth' empty_vect) in Hij; [ | now rewrite <- Hvvv ].
+    injection Hij; clear Hij; intros Hij.
+    destruct Hsg as (Hsg & Hinj & Hsurj).
+    specialize List_length_filter_nth as H2.
+    specialize (H2 (vector nat)).
+    specialize (H2 empty_vect).
+    specialize (H2 (vect_list vv)).
+    specialize (H2 (λ v, vect_el 0 v 0 =? S n)).
+    fold ll1 in H2; cbn in H2.
+    rewrite Hvvv in Hi, Hj.
+    specialize (H2 _ Hi) as H3.
+    specialize (H2 _ Hj) as H4.
+    destruct H3 as (i' & Hil & Hin & Hii' & Hi').
+    destruct H4 as (j' & Hjl & Hjn & Hjj' & Hj').
+    rewrite Hii', Hjj' in Hij.
+    do 2 rewrite fold_vect_el in Hij.
+    specialize (Hinj i' j' Hil Hjl) as H3.
 ...
 }
 specialize (H1 H); clear H.
