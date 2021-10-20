@@ -1421,6 +1421,7 @@ Theorem List_length_filter_nth : ∀ A (d : A) l f i,
   i < length (filter f l)
   → ∃ j,
      j < length l ∧
+     f (nth j l d) = true ∧
      nth i (filter f l) d = nth j l d ∧
      i = length (filter f (firstn j l)).
 Proof.
@@ -1439,17 +1440,19 @@ destruct b. {
   rewrite List_nth_succ_cons.
   apply Nat.succ_lt_mono in Hi.
   specialize (IHl _ Hi) as H1.
-  destruct H1 as (j & Hj & Hnj & Hij).
+  destruct H1 as (j & Hjl & Hj & Hnj & Hij).
   exists (S j).
-  split; [ now apply Nat.succ_lt_mono in Hj | ].
+  split; [ now apply Nat.succ_lt_mono in Hjl | ].
+  split; [ easy | cbn ].
   split; [ easy | cbn ].
   rewrite Hb; cbn.
   now f_equal.
 } {
   specialize (IHl _ Hi) as H1.
-  destruct H1 as (j & Hj & Hnj & Hij).
+  destruct H1 as (j & Hjl & Hj & Hnj & Hij).
   exists (S j).
-  split; [ now apply Nat.succ_lt_mono in Hj | ].
+  split; [ now apply Nat.succ_lt_mono in Hjl | ].
+  split; [ easy | cbn ].
   split; [ easy | cbn ].
   rewrite Hb; cbn.
   now f_equal.

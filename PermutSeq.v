@@ -1109,11 +1109,11 @@ assert (H : is_sym_gr_vect (S n) vv'). {
         specialize (H2 empty_vect).
         specialize (H2 (vect_list vv)).
         specialize (H2 _ _ Hi).
-        destruct H2 as (k & Hk & Hik & Hij).
+        destruct H2 as (k & Hkl & Hk & Hik & Hij).
         rewrite Hik.
         rewrite fold_vect_size in Hj |-*.
         rewrite fold_vect_el in Hik |-*.
-        now specialize (Hsg k Hk).
+        now specialize (Hsg k Hkl).
       }
       rewrite Hl in Hj |-*.
       rewrite Nat_sub_succ_1 in Hj |-*.
@@ -1122,74 +1122,44 @@ assert (H : is_sym_gr_vect (S n) vv'). {
       specialize (H2 empty_vect).
       specialize (H2 (vect_list vv)).
       specialize (H2 _ _ Hi).
-      destruct H2 as (k & Hk & Hik & Hij).
+      destruct H2 as (k & Hkl & Hk & Hik & Hij).
       unfold ll1 in Hl |-*.
       rewrite Hik in Hl |-*.
       rewrite fold_vect_el in Hl |-*.
-      specialize (Hsg k Hk) as H2.
+      specialize (Hsg k Hkl) as H2.
       destruct H2 as (H2, H3).
       destruct H3 as (H4, H5).
       rewrite H2 in H4, H5.
+      apply Nat.eqb_eq in Hk.
+      rewrite fold_vect_el in Hk.
       remember (vect_el empty_vect vv k) as lv eqn:Hlv.
       unfold vect_el in H4.
+      unfold vect_el in Hk, H5.
       remember (vect_list lv) as la eqn:Hla.
-...
+      clear - Hl H5 H4 Hk.
       destruct la as [| a]; [ easy | ].
-      destruct j. {
-        cbn.
-        destruct la as [| b]; [ easy | ].
-        cbn in Hl.
-        do 2 apply Nat.succ_inj in Hl.
-        cbn.
-...
-      clear - Hl H4.
-...
-      destruct la as [| a]; [ easy | ].
-      cbn in Hl; apply Nat.succ_inj in Hl.
-      destruct j. {
-        cbn.
-...
-      specialize (H4 (S j)) as H6.
-      assert (H : S j < S (S n)) by flia Hj.
-      specialize (H6 H); clear H.
-      rewrite fold_vect_el in H4, H6.
-      remember (vect_el empty_vect vv k) as lv eqn:Hlv.
-...
-      clear - H6 Hl.
-      remember (vect_list lv) as la eqn:Hla.
-      clear lv Hla.
-      revert j n Hl H6.
-      induction la as [| a]; intros; [ cbn; rewrite match_id; flia | ].
-      destruct j. {
-        cbn in Hl, H6 |-*.
-        apply Nat.succ_inj in Hl.
-        destruct n. {
-          clear a.
-          destruct la as [| a]; [ easy | ].
-          cbn in Hl, H6 |-*.
-          destruct la; [ clear Hl | easy ].
-      unfold vect_el.
-      remember (vect_list (nth _ _ _)) as la eqn:Hla.
-      clear vv Hla.
-      induction la as [| a]; [ cbn; rewrite match_id; flia | ].
-      cbn in H6 |-*.
-...
-      destruct j. {
-        destruct la as [| b]; [ cbn; flia | ].
-        cbn.
-        cbn in IHla.
-cbn.
-...
-      do 2 rewrite fold_vect_el in H6.
-      remember (vect_el empty_vect vv k) as lv eqn:Hlv.
-      clear Hla vv.
-      unfold vect_el in H6.
-      remember (vect_list
-
-Search (tl (vect_list _)).
-
-        now specialize (Hsg k Hk).
-Search (nth _ (filter _ _)).
+      cbn in Hl, Hk |-*; subst a.
+      apply Nat.succ_inj in Hl.
+      destruct la as [| a]; [ cbn; rewrite match_id; flia | ].
+      cbn in Hl.
+      apply Nat.succ_inj in Hl.
+      specialize (H5 0 (S j) (Nat.lt_0_succ _)) as H6.
+      destruct (lt_dec (S j) (S (S n))) as [Hjn| Hjn]. 2: {
+        apply Nat.nlt_ge in Hjn.
+        apply Nat.succ_le_mono in Hjn.
+        rewrite nth_overflow; [ flia | now cbn; rewrite Hl ].
+      }
+      specialize (H6 Hjn).
+      remember (a :: la) as lb; cbn in H6; subst lb.
+      destruct (Nat.eq_dec (nth j (a :: la) 0) (S n)) as [H| H]. {
+        now symmetry in H; specialize (H6 H).
+      }
+      specialize (H4 (S j) Hjn) as H1.
+      remember (a :: la) as lb; cbn in H1; subst lb.
+      flia H1 H.
+    } {
+      intros j k Hj Hk Hjk.
+      cbn in Hjk.
 ...
 Search (tl (vect_list _)).
 Search (nth _ (vect_list _)).
