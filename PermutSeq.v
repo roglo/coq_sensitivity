@@ -1130,12 +1130,42 @@ assert (H : is_sym_gr_vect (S n) vv'). {
       destruct H2 as (H2, H3).
       destruct H3 as (H4, H5).
       rewrite H2 in H4, H5.
+      remember (vect_el empty_vect vv k) as lv eqn:Hlv.
       unfold vect_el in H4.
+      remember (vect_list lv) as la eqn:Hla.
+      destruct la as [| a]; [ easy | ].
+      destruct j. {
+        cbn.
+        destruct la as [| b]; [ easy | ].
+        cbn in Hl.
+        do 2 apply Nat.succ_inj in Hl.
+...
+      clear - Hl H4.
+...
+      destruct la as [| a]; [ easy | ].
+      cbn in Hl; apply Nat.succ_inj in Hl.
+      destruct j. {
+        cbn.
+...
       specialize (H4 (S j)) as H6.
       assert (H : S j < S (S n)) by flia Hj.
       specialize (H6 H); clear H.
+      rewrite fold_vect_el in H4, H6.
+      remember (vect_el empty_vect vv k) as lv eqn:Hlv.
 ...
-      clear - H6.
+      clear - H6 Hl.
+      remember (vect_list lv) as la eqn:Hla.
+      clear lv Hla.
+      revert j n Hl H6.
+      induction la as [| a]; intros; [ cbn; rewrite match_id; flia | ].
+      destruct j. {
+        cbn in Hl, H6 |-*.
+        apply Nat.succ_inj in Hl.
+        destruct n. {
+          clear a.
+          destruct la as [| a]; [ easy | ].
+          cbn in Hl, H6 |-*.
+          destruct la; [ clear Hl | easy ].
       unfold vect_el.
       remember (vect_list (nth _ _ _)) as la eqn:Hla.
       clear vv Hla.
