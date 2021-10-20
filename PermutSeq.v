@@ -1160,33 +1160,28 @@ assert (H : is_sym_gr_vect (S n) vv'). {
       intros j k Hj Hk Hjk.
       cbn in Hjk.
       do 2 rewrite List_nth_tl in Hjk.
-      specialize (Hsg i) as H2.
-      assert (H : i < vect_size vv) by flia Hll1v Hi.
-      specialize (H2 H); clear H.
-      destruct H2 as (H2, H3).
-      destruct H3 as (H3, H4).
-      rewrite H2 in H3, H4.
-      unfold vect_el in H3, H4.
-      apply Nat.succ_lt_mono in Hj, Hk.
-      specialize (H4 _ _ Hj Hk) as H5.
-(* ah oui mais non *)
-...
       specialize List_length_filter_nth as H2.
       specialize (H2 (vector nat)).
       specialize (H2 empty_vect).
       specialize (H2 (vect_list vv)).
       specialize (H2 (λ v, vect_el 0 v 0 =? S n)).
-      fold ll1 in H2.
-      cbn in H2.
-...
-      specialize (H2 _ _ Hi).
+      fold ll1 in H2; cbn in H2.
+      specialize (H2 _ Hi).
       destruct H2 as (p & Hpl & Hp & Hip & Hij).
-      unfold ll1 in Hl |-*.
-...
-Search (tl (vect_list _)).
-Search (nth _ (vect_list _)).
-...
+      rewrite Hip in Hjk.
+      do 2 rewrite fold_vect_el in Hjk.
+      specialize (Hsg p) as H2.
+      specialize (H2 Hpl).
+      destruct H2 as (H2, H3).
+      destruct H3 as (H3, H4).
+      rewrite H2 in H3, H4.
+      apply Nat.succ_lt_mono in Hj, Hk.
+      specialize (H4 (S j) (S k) Hj Hk Hjk).
+      now apply Nat.succ_inj in H4.
+    }
   }
+  split. {
+    intros i j Hi Hj Hij.
 ...
 }
 specialize (H1 H); clear H.
