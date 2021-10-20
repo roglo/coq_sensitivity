@@ -1207,6 +1207,40 @@ assert (H : is_sym_gr_vect (S n) vv'). {
     rewrite Hii', Hjj' in Hij.
     do 2 rewrite fold_vect_el in Hij.
     specialize (Hinj i' j' Hil Hjl) as H3.
+    apply Nat.eqb_eq in Hin, Hjn.
+    assert
+      (H :
+       vect_list (vect_el empty_vect vv i') =
+       vect_list (vect_el empty_vect vv j')). {
+      rewrite List_map_nth_seq with (d := 0); symmetry.
+      rewrite List_map_nth_seq with (d := 0); symmetry.
+      do 2 rewrite fold_vect_size.
+      specialize (Hsg i' Hil) as H4.
+      destruct H4 as (H4, H5).
+      rewrite H4; clear H4 H5.
+      specialize (Hsg j' Hjl) as H4.
+      destruct H4 as (H4, H5).
+      rewrite H4; clear H4 H5.
+      apply map_ext_in.
+      intros k Hk; apply in_seq in Hk.
+      do 2 rewrite fold_vect_el.
+      rewrite fold_vect_el in Hin, Hjn.
+      destruct k; [ congruence | ].
+      move Hij at bottom.
+      unfold vect_el at 1 3.
+      do 2 rewrite <- List_nth_tl.
+      now rewrite Hij.
+    }
+    assert (H' : vect_el empty_vect vv i' = vect_el empty_vect vv j'). {
+      destruct (vect_el empty_vect vv i') as (la).
+      destruct (vect_el empty_vect vv j') as (lb).
+      cbn in H.
+      now f_equal.
+    }
+    specialize (H3 H').
+    now rewrite Hi', Hj', H3.
+  } {
+    intros v Hv Hp.
 ...
 }
 specialize (H1 H); clear H.
