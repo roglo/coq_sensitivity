@@ -1109,7 +1109,7 @@ assert (H : is_sym_gr_vect (S n) vv'). {
         specialize (H2 empty_vect).
         specialize (H2 (vect_list vv)).
         specialize (H2 _ _ Hi).
-        destruct H2 as (k & Hk & Hik).
+        destruct H2 as (k & Hk & Hik & Hij).
         rewrite Hik.
         rewrite fold_vect_size in Hj |-*.
         rewrite fold_vect_el in Hik |-*.
@@ -1117,14 +1117,12 @@ assert (H : is_sym_gr_vect (S n) vv'). {
       }
       rewrite Hl in Hj |-*.
       rewrite Nat_sub_succ_1 in Hj |-*.
-Check List_length_filter_nth.
-...
       specialize List_length_filter_nth as H2.
       specialize (H2 (vector nat)).
       specialize (H2 empty_vect).
       specialize (H2 (vect_list vv)).
       specialize (H2 _ _ Hi).
-      destruct H2 as (k & Hk & Hik).
+      destruct H2 as (k & Hk & Hik & Hij).
       unfold ll1 in Hl |-*.
       rewrite Hik in Hl |-*.
       rewrite fold_vect_el in Hl |-*.
