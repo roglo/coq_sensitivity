@@ -1022,6 +1022,17 @@ set (ll1 := filter (λ v, vect_el 0 v 0 =? S n) (vect_list vv)).
 (* removing this first element (which is "S n") *)
 set (ll2 := map (λ v, mk_vect (tl (vect_list v))) ll1).
 set (vv' := mk_vect ll2).
+assert (Hll1v : length ll1 ≤ vect_size vv). {
+  unfold ll1.
+  rewrite List_length_filter_negb; [ rewrite fold_vect_size; flia | ].
+(* faudrait peut-être que j'utilise NoDup, tout simplement, dans ma définition
+   de Hinj ? *)
+  destruct Hsg as (Hsg & Hinj & Hsurj).
+  clear - Hinj.
+  unfold vect_el, vect_size in Hinj.
+  remember (vect_list vv) as ll; clear vv Heqll.
+  now apply NoDup_nth in Hinj.
+}
 specialize (IHn vv') as H1.
 assert (H : is_sym_gr_vect (S n) vv'). {
   split. {
@@ -1054,16 +1065,6 @@ assert (H : is_sym_gr_vect (S n) vv'). {
         now specialize (Hsg j Hj) as H2.
       }
       unfold ll1.
-      assert (Hlv : length ll1 ≤ vect_size vv). {
-        unfold ll1.
-        rewrite List_length_filter_negb; [ rewrite fold_vect_size; flia | ].
-        clear - Hinj.
-(* faudrait peut-être que j'utilise NoDup, tout simplement, dans ma définition
-   de Hinj ? *)
-        unfold vect_el, vect_size in Hinj.
-        remember (vect_list vv) as ll; clear vv Heqll.
-        now apply NoDup_nth in Hinj.
-      }
       unfold vect_el.
       specialize List_list_length_nth_filter as H2.
       specialize (H2 _ (map (@vect_list nat) (vect_list vv))).
@@ -1085,7 +1086,7 @@ assert (H : is_sym_gr_vect (S n) vv'). {
       unfold vect_el in ll1.
       fold ll1 in H2 |-*.
       specialize (H2 Hi).
-      rewrite (List_map_nth' empty_vect) in H2; [ | flia Hi Hlv ].
+      rewrite (List_map_nth' empty_vect) in H2; [ | flia Hi Hll1v ].
       now rewrite H2, Nat_sub_succ_1.
     }
     destruct Hsg as (Hsg & Hinj & Hsurj).
@@ -1099,24 +1100,22 @@ assert (H : is_sym_gr_vect (S n) vv'). {
     rewrite map_length in Hi.
     unfold is_permut_vect; cbn.
     rewrite List_tl_length.
+    assert (Hl : length (vect_list (nth i ll1 empty_vect)) = S (S n)). {
+      unfold ll1.
+      specialize List_length_filter_nth as H2.
+      specialize (H2 (vector nat)).
+      specialize (H2 empty_vect).
+      specialize (H2 (vect_list vv)).
+      specialize (H2 _ _ Hi).
+      destruct H2 as (k & Hkl & Hk & Hik & Hij).
+      rewrite Hik.
+      rewrite fold_vect_size.
+      rewrite fold_vect_el in Hik |-*.
+      now specialize (Hsg k Hkl).
+    }
+    rewrite Hl, Nat_sub_succ_1.
     split. {
-      intros j Hj.
-      cbn in Hj |-*.
-      assert (Hl : length (vect_list (nth i ll1 empty_vect)) = S (S n)). {
-        unfold ll1.
-        specialize List_length_filter_nth as H2.
-        specialize (H2 (vector nat)).
-        specialize (H2 empty_vect).
-        specialize (H2 (vect_list vv)).
-        specialize (H2 _ _ Hi).
-        destruct H2 as (k & Hkl & Hk & Hik & Hij).
-        rewrite Hik.
-        rewrite fold_vect_size in Hj |-*.
-        rewrite fold_vect_el in Hik |-*.
-        now specialize (Hsg k Hkl).
-      }
-      rewrite Hl in Hj |-*.
-      rewrite Nat_sub_succ_1 in Hj |-*.
+      intros j Hj; cbn.
       specialize List_length_filter_nth as H2.
       specialize (H2 (vector nat)).
       specialize (H2 empty_vect).
@@ -1160,6 +1159,29 @@ assert (H : is_sym_gr_vect (S n) vv'). {
     } {
       intros j k Hj Hk Hjk.
       cbn in Hjk.
+      do 2 rewrite List_nth_tl in Hjk.
+      specialize (Hsg i) as H2.
+      assert (H : i < vect_size vv) by flia Hll1v Hi.
+      specialize (H2 H); clear H.
+      destruct H2 as (H2, H3).
+      destruct H3 as (H3, H4).
+      rewrite H2 in H3, H4.
+      unfold vect_el in H3, H4.
+      apply Nat.succ_lt_mono in Hj, Hk.
+      specialize (H4 _ _ Hj Hk) as H5.
+(* ah oui mais non *)
+...
+      specialize List_length_filter_nth as H2.
+      specialize (H2 (vector nat)).
+      specialize (H2 empty_vect).
+      specialize (H2 (vect_list vv)).
+      specialize (H2 (λ v, vect_el 0 v 0 =? S n)).
+      fold ll1 in H2.
+      cbn in H2.
+...
+      specialize (H2 _ _ Hi).
+      destruct H2 as (p & Hpl & Hp & Hip & Hij).
+      unfold ll1 in Hl |-*.
 ...
 Search (tl (vect_list _)).
 Search (nth _ (vect_list _)).
