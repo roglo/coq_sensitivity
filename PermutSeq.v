@@ -1154,33 +1154,78 @@ assert (H : ∀ s, s < S (S n) → is_sym_gr_vect (S n) (vv' s)). {
       }
       rewrite Hk in H6.
       specialize (H6 Hjn).
-      destruct (Nat.eq_dec (nth j la 0) (S n)) as [H| H]. {
-        symmetry in H; specialize (H6 H).
-        subst s.
+      destruct (Nat.eq_dec (nth j la 0) (S n)) as [Hjn'| Hjn']. {
+        symmetry in Hjn'; specialize (H6 Hjn'); clear Hjn' Hjn; subst s.
         rewrite app_nth2; [ | rewrite firstn_length; flia ].
         rewrite firstn_length.
         rewrite Nat.min_l; [ | rewrite Hl; flia Hs ].
         rewrite Nat.sub_diag.
-...
-        rewrite app_nth1. 2: {
-          rewrite firstn_length.
-          rewrite Nat.min_l; [ flia | rewrite Hl; flia Hjn ].
+        rewrite List_nth_skipn, Nat.add_0_l.
+        specialize (H4 (S j)) as H6.
+        destruct (Nat.eq_dec j (S n)) as [Hjn| Hjn]. {
+          subst j.
+          rewrite nth_overflow; [ flia | now rewrite Hl ].
         }
-        rewrite List_nth_firstn; [ | flia ].
-...
-        now symmetry in H; specialize (H6 H).
+        specialize (H5 j (S j) Hs) as H7.
+        assert (H : S j < S (S n)) by flia Hs Hjn.
+        specialize (H6 H); specialize (H7 H); clear H.
+        rewrite Hk in H7.
+        destruct (Nat.eq_dec (nth (S j) la 0) (S n)) as [H| H]. {
+          symmetry in H; specialize (H7 H); clear H; flia H7.
+        }
+        flia H6 H.
+      } {
+        specialize (H4 j Hjn) as H1.
+        destruct (lt_dec j s) as [Hjs| Hjs]. {
+          rewrite app_nth1. 2: {
+            rewrite firstn_length, Nat.min_l; [ easy | rewrite Hl; flia Hs ].
+          }
+          rewrite List_nth_firstn; [ | easy ].
+          flia H1 Hjn'.
+        }
+        destruct (lt_dec s j) as [Hsj| Hsj]. {
+          rewrite app_nth2. 2: {
+            rewrite firstn_length, Nat.min_l; [ flia Hsj | rewrite Hl; flia Hs ].
+          }
+          rewrite firstn_length, Nat.min_l; [ | rewrite Hl; flia Hs ].
+          rewrite List_nth_skipn.
+          replace (j - s + S s) with (S j) by flia Hjs.
+          destruct (Nat.eq_dec j (S n)) as [Hjsn| Hjsn]. {
+            subst j.
+            rewrite nth_overflow; [ flia | now rewrite Hl ].
+          }
+          specialize (H4 (S j)) as H7.
+          specialize (H5 s (S j) Hs) as H8.
+          assert (H : S j < S (S n)) by flia Hjn Hjsn.
+          specialize (H7 H); specialize (H8 H); clear H.
+          rewrite Hk in H8.
+          destruct (Nat.eq_dec (nth (S j) la 0) (S n)) as [Hsjsn| Hsjsn]. {
+            symmetry in Hsjsn; specialize (H8 Hsjsn); flia H8 Hsj.
+          }
+          flia H7 Hsjsn.
+        }
+        apply Nat.nlt_ge in Hjs, Hsj.
+        apply Nat.le_antisymm in Hjs; [ subst j | easy ].
+        rewrite app_nth2; [ | rewrite firstn_length; flia ].
+        rewrite firstn_length, Nat.min_l; [ | rewrite Hl; flia Hs ].
+        rewrite Nat.sub_diag.
+        rewrite List_nth_skipn, Nat.add_0_l.
+        destruct (Nat.eq_dec s (S n)) as [Hsn| Hsn]. {
+          subst s.
+          rewrite nth_overflow; [ easy | now rewrite Hl ].
+        }
+        assert (H : S s < S (S n)) by flia Hjn Hsn.
+        specialize (H4 (S s) H) as H7.
+        specialize (H5 s (S s) Hs H) as H8; clear H.
+        rewrite Hk in H8.
+        destruct (Nat.eq_dec (nth (S s) la 0) (S n)) as [Hssn| Hssn]. {
+          symmetry in Hssn; specialize (H8 Hssn); flia H8.
+        }
+        flia H7 Hssn.
       }
-...
-      remember (a :: la) as lb; cbn in H6; subst lb.
-      destruct (Nat.eq_dec (nth j (a :: la) 0) (S n)) as [H| H]. {
-        now symmetry in H; specialize (H6 H).
-      }
-      specialize (H4 (S j) Hjn) as H1.
-      remember (a :: la) as lb; cbn in H1; subst lb.
-      flia H1 H.
     } {
-      intros j k Hj Hk Hjk.
-      cbn in Hjk.
+      intros j k Hj Hk Hjk; cbn in Hjk.
+...
       do 2 rewrite List_nth_tl in Hjk.
       specialize List_length_filter_nth as H2.
       specialize (H2 (vector nat)).
