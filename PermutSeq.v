@@ -1248,8 +1248,8 @@ assert (H : is_sym_gr_vect (S n) vv'). {
     destruct Hp as (Hp1, Hp2).
     rewrite Hv in Hp1, Hp2.
     destruct Hsg as (Hsg & Hinj & Hsurj).
-Search (_ ∈ filter _ _).
-Search (_ ∈ map _ _).
+    exists (mk_vect (S n :: vect_list v)).
+    split; [ now destruct v | ].
 ...
 }
 specialize (H1 H); clear H.
