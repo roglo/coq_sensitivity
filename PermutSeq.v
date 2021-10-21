@@ -1250,6 +1250,48 @@ assert (H : is_sym_gr_vect (S n) vv'). {
     destruct Hsg as (Hsg & Hinj & Hsurj).
     exists (mk_vect (S n :: vect_list v)).
     split; [ now destruct v | ].
+    specialize (Hsurj (mk_vect (S n :: vect_list v))) as H2.
+    cbn in H2.
+    rewrite fold_vect_size, Hv in H2.
+    specialize (H2 eq_refl).
+    assert (H : is_permut_vect {| vect_list := S n :: vect_list v |}). {
+      unfold is_permut_vect, is_permut_fun.
+      cbn - [ vect_el ].
+      rewrite fold_vect_size, Hv.
+      split. {
+        intros i Hi.
+        destruct i; [ cbn; flia | ].
+        cbn.
+        rewrite fold_vect_el.
+        apply Nat.succ_lt_mono in Hi.
+        specialize (Hp1 i Hi) as H3.
+        flia H3.
+      } {
+        intros i j Hi Hj Hij.
+        destruct i. {
+          destruct j; [ easy | exfalso ].
+          cbn in Hij.
+          symmetry in Hij.
+          apply Nat.succ_lt_mono in Hj.
+          rewrite fold_vect_el in Hij.
+          specialize (Hp1 j Hj) as H3.
+          rewrite Hij in H3.
+          flia H3.
+        } {
+          apply Nat.succ_lt_mono in Hi.
+          destruct j; cbn in Hij. {
+            rewrite fold_vect_el in Hij.
+            specialize (Hp1 i Hi) as H3.
+            rewrite Hij in H3.
+            flia H3.
+          }
+          apply Nat.succ_lt_mono in Hj.
+          do 2 rewrite fold_vect_el in Hij.
+          f_equal.
+          now apply Hp2.
+        }
+      }
+    }
 ...
 }
 specialize (H1 H); clear H.
