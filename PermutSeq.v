@@ -1365,7 +1365,17 @@ assert (H : ∀ s, s < S (S n) → is_sym_gr_vect (S n) (vv' s)). {
     destruct Hp as (Hp1, Hp2).
     rewrite Hv in Hp1, Hp2.
     destruct Hsg as (Hsg & Hinj & Hsurj).
-    exists (mk_vect (S n :: vect_list v)).
+    remember (vect_list v) as l.
+    exists (mk_vect (firstn s l ++ S n :: skipn n l)); subst l.
+    cbn - [ skipn ].
+    split. {
+Search (butn _ (_ ++ _)).
+Search (butn _ _ = butn _ _).
+...
+unfold butn.
+Search (firstn (_ ++ _)).
+Search (firstn _ (firstn _ _)).
+rewrite firstn_firstn.
 ...
     split; [ now destruct v | ].
     specialize (Hsurj (mk_vect (S n :: vect_list v))) as H2.
