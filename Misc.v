@@ -2338,6 +2338,21 @@ destruct l as [| a]; [ easy | cbn ].
 now destruct l.
 Qed.
 
+Theorem List_split_at_pos : ∀ A n d (l : list A),
+  n < length l
+  → l = firstn n l ++ nth n l d :: skipn (S n) l.
+Proof.
+intros * Hn.
+revert n Hn.
+induction l as [| a]; intros; [ easy | ].
+destruct n; [ easy | ].
+rewrite firstn_cons, List_nth_succ_cons, skipn_cons.
+cbn - [ skipn ]; f_equal.
+cbn in Hn.
+apply Nat.succ_lt_mono in Hn.
+now apply IHl.
+Qed.
+
 (* end butn *)
 
 (* repeat_apply: applying a function n times *)
