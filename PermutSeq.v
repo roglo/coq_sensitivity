@@ -1281,10 +1281,9 @@ assert (H : ∀ s, s < S (S n) → is_sym_gr_vect (S n) (vv' s)). {
     specialize (H2 (vector nat)).
     specialize (H2 empty_vect).
     specialize (H2 (vect_list vv)).
-    specialize (H2 (λ v, vect_el 0 v 0 =? S n)).
-    fold ll1 in H2; cbn in H2.
+    specialize (H2 (λ v, vect_el 0 v s =? S n)).
+    fold (ll1 s) in H2; cbn in H2.
     rewrite Hvvv in Hi, Hj.
-...
     specialize (H2 _ Hi) as H3.
     specialize (H2 _ Hj) as H4.
     destruct H3 as (i' & Hil & Hin & Hii' & Hi').
@@ -1293,6 +1292,7 @@ assert (H : ∀ s, s < S (S n) → is_sym_gr_vect (S n) (vv' s)). {
     do 2 rewrite fold_vect_el in Hij.
     specialize (Hinj i' j' Hil Hjl) as H3.
     apply Nat.eqb_eq in Hin, Hjn.
+(*
     assert
       (H :
        vect_list (vect_el empty_vect vv i') =
@@ -1310,17 +1310,49 @@ assert (H : ∀ s, s < S (S n) → is_sym_gr_vect (S n) (vv' s)). {
       intros k Hk; apply in_seq in Hk.
       do 2 rewrite fold_vect_el.
       rewrite fold_vect_el in Hin, Hjn.
+      destruct k. {
+...
       destruct k; [ congruence | ].
       move Hij at bottom.
       unfold vect_el at 1 3.
       do 2 rewrite <- List_nth_tl.
       now rewrite Hij.
     }
+*)
     assert (H' : vect_el empty_vect vv i' = vect_el empty_vect vv j'). {
+      move Hin at bottom; move Hjn at bottom.
+      rewrite fold_vect_el in Hin, Hjn.
       destruct (vect_el empty_vect vv i') as (la).
       destruct (vect_el empty_vect vv j') as (lb).
-      cbn in H.
-      now f_equal.
+      cbn in Hin, Hjn.
+      f_equal.
+      cbn in Hij.
+      unfold butn in Hij.
+      rewrite (@List_split_at_pos _ s 0 la). 2: {
+        apply List_nth_neq_default with (d := 0).
+        now intros H; rewrite H in Hin.
+      }
+      rewrite (@List_split_at_pos _ s 0 lb). 2: {
+        apply List_nth_neq_default with (d := 0).
+        now intros H; rewrite H in Hjn.
+      }
+      rewrite Hin, Hjn.
+      apply List_app_eq_app' in Hij. 2: {
+        do 2 rewrite firstn_length.
+        rewrite Nat.min_l. 2: {
+          apply Nat.lt_le_incl.
+          apply List_nth_neq_default with (d := 0).
+          now intros H; rewrite H in Hin.
+        }
+        rewrite Nat.min_l. 2: {
+          apply Nat.lt_le_incl.
+          apply List_nth_neq_default with (d := 0).
+          now intros H; rewrite H in Hjn.
+        }
+        easy.
+      }
+      destruct Hij as (Hij1, Hij2).
+      now rewrite Hij1, Hij2.
     }
     specialize (H3 H').
     now rewrite Hi', Hj', H3.
@@ -1334,6 +1366,7 @@ assert (H : ∀ s, s < S (S n) → is_sym_gr_vect (S n) (vv' s)). {
     rewrite Hv in Hp1, Hp2.
     destruct Hsg as (Hsg & Hinj & Hsurj).
     exists (mk_vect (S n :: vect_list v)).
+...
     split; [ now destruct v | ].
     specialize (Hsurj (mk_vect (S n :: vect_list v))) as H2.
     cbn in H2.

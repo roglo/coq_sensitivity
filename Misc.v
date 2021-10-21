@@ -2767,6 +2767,20 @@ rewrite app_nth1; [ | rewrite List_map_seq_length; flia Hi Hil ].
 apply IHlen; flia Hi Hil.
 Qed.
 
+Theorem List_nth_neq_default : ∀ A (l : list A) i d,
+  nth i l d ≠ d → i < length l.
+Proof.
+intros * Hi.
+revert i Hi.
+induction l as [| a]; intros. {
+  now cbn in Hi; rewrite match_id in Hi.
+}
+destruct i; [ cbn; flia | ].
+cbn in Hi |-*.
+apply -> Nat.succ_lt_mono.
+now apply IHl.
+Qed.
+
 Theorem List_app_cons : ∀ A (l1 l2 : list A) a,
   l1 ++ a :: l2 = l1 ++ [a] ++ l2.
 Proof. easy. Qed.
