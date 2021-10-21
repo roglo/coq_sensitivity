@@ -1432,6 +1432,49 @@ assert (H : ∀ s, s < S (S n) → is_sym_gr_vect (S n) (vv' s)). {
         }
       } {
         intros i j Hi Hj Hij.
+        destruct (Nat.lt_trichotomy i s) as [His| [His| His]]. {
+          rewrite app_nth1 in Hij. 2: {
+            rewrite firstn_length, fold_vect_size, Hv.
+            rewrite Nat.min_l; [ easy | flia Hs ].
+          }
+          rewrite List_nth_firstn in Hij; [ | easy ].
+          rewrite fold_vect_el in Hij.
+          destruct (Nat.lt_trichotomy j s) as [Hjs| [Hjs| Hjs]]. {
+            rewrite app_nth1 in Hij. 2: {
+              rewrite firstn_length, fold_vect_size, Hv.
+              rewrite Nat.min_l; [ easy | flia Hs ].
+            }
+            rewrite List_nth_firstn in Hij; [ | easy ].
+            rewrite fold_vect_el in Hij.
+            apply Hp2; [ flia His Hs | flia Hjs Hs | easy ].
+          } {
+            subst j.
+            rewrite app_nth2 in Hij; [ | rewrite firstn_length; flia ].
+            rewrite firstn_length in Hij.
+            rewrite fold_vect_size in Hij.
+            rewrite Nat.min_l in Hij; [ | rewrite Hv; flia Hs ].
+            rewrite Nat.sub_diag in Hij; cbn in Hij.
+            specialize (Hp1 i) as H1.
+            assert (H : i < S n) by flia His Hs.
+            specialize (H1 H); clear H.
+            rewrite Hij in H1; flia H1.
+          } {
+            rewrite app_nth2 in Hij; [ | rewrite firstn_length; flia Hjs ].
+            rewrite firstn_length, fold_vect_size, Hv in Hij.
+            rewrite Nat.min_l in Hij; [ | flia Hjs Hj ].
+            replace (j - s) with (S (j - S s)) in Hij by flia Hjs.
+            cbn in Hij.
+            rewrite List_nth_skipn in Hij.
+            replace (j - S s + s) with (j - 1) in Hij by flia Hjs.
+            rewrite fold_vect_el in Hij.
+            apply Hp2 in Hij; [ | flia His Hs | flia Hj ].
+            flia Hij His Hjs.
+          }
+        } {
+          subst i.
+...
+Search (nth _ (_ ++ _)).
+...
         destruct i. {
           destruct j; [ easy | exfalso ].
           cbn in Hij.
