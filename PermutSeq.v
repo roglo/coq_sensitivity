@@ -1397,15 +1397,39 @@ assert (H : ∀ s, s < S (S n) → is_sym_gr_vect (S n) (vv' s)). {
           }
           rewrite List_nth_firstn; [ | easy ].
           rewrite fold_vect_el.
-...
-          specialize (Hp1 i Hi).
-...
-        destruct i; [ cbn; flia | ].
-        cbn.
-        rewrite fold_vect_el.
-        apply Nat.succ_lt_mono in Hi.
-        specialize (Hp1 i Hi) as H3.
-        flia H3.
+          specialize (Hp1 i) as H1.
+          assert (H : i < S n) by flia His Hs.
+          specialize (H1 H); clear H.
+          flia H1.
+        } {
+          subst i.
+          rewrite app_nth2; [ | rewrite firstn_length; flia ].
+          rewrite firstn_length.
+          rewrite Nat.min_l. 2: {
+            rewrite fold_vect_size, Hv; flia Hs.
+          }
+          rewrite Nat.sub_diag; cbn; flia.
+        } {
+          rewrite app_nth2. 2: {
+            rewrite firstn_length.
+            rewrite Nat.min_l. 2: {
+              rewrite fold_vect_size, Hv; flia Hs.
+            }
+            flia His.
+          }
+          rewrite firstn_length.
+          rewrite Nat.min_l. 2: {
+            rewrite fold_vect_size, Hv; flia Hs.
+          }
+          replace (i - s) with (S (i - S s)) by flia His; cbn.
+          rewrite List_nth_skipn.
+          replace (i - S s + s) with (i - 1) by flia His.
+          rewrite fold_vect_el.
+          specialize (Hp1 (i - 1)) as H1.
+          assert (H : i - 1 < S n) by flia Hi.
+          specialize (H1 H); clear H.
+          flia H1.
+        }
       } {
         intros i j Hi Hj Hij.
         destruct i. {
@@ -1413,6 +1437,7 @@ assert (H : ∀ s, s < S (S n) → is_sym_gr_vect (S n) (vv' s)). {
           cbn in Hij.
           symmetry in Hij.
           apply Nat.succ_lt_mono in Hj.
+...
           rewrite fold_vect_el in Hij.
           specialize (Hp1 j Hj) as H3.
           rewrite Hij in H3.
@@ -1430,6 +1455,7 @@ assert (H : ∀ s, s < S (S n) → is_sym_gr_vect (S n) (vv' s)). {
           f_equal.
           now apply Hp2.
         }
+      }
       }
     }
     apply filter_In.
