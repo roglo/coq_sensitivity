@@ -1292,12 +1292,17 @@ assert (H : is_sym_gr_vect (S n) vv'). {
         }
       }
     }
-...
+    apply filter_In.
+    split; [ | apply Nat.eqb_refl ].
+    apply Hsurj; [ now cbn; f_equal | easy ].
+  }
 }
 specialize (H1 H); clear H.
 unfold vv', ll2, ll1 in H1.
 cbn - [ fact ] in H1.
 rewrite map_length in H1.
+Search (length (filter _ _)).
+...
 Theorem glkdfjsfl :
   ∀ n vv i j, is_sym_gr_vect n vv → i < n → j < n →
   length (filter (λ v, vect_el 0 v 0 =? i) (vect_list vv)) =
