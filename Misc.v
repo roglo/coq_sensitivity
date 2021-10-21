@@ -2127,6 +2127,21 @@ rewrite butn_cons; cbn.
 now apply IHl.
 Qed.
 
+Theorem nth_butn : ∀ A (l : list A) i j d,
+  nth i (butn j l) d = nth (i + Nat.b2n (j <=? i)) l d.
+Proof.
+intros.
+remember (j <=? i) as b eqn:Hb; symmetry in Hb.
+destruct b. {
+  apply Nat.leb_le in Hb.
+  now rewrite nth_butn_before.
+} {
+  apply Nat.leb_gt in Hb.
+  rewrite nth_butn_after; [ | easy ].
+  now rewrite Nat.add_0_r.
+}
+Qed.
+
 Theorem map_butn_out : ∀ A (ll : list (list A)) i,
   (∀ l, l ∈ ll → length l ≤ i)
   → map (butn i) ll = ll.

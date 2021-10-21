@@ -1225,26 +1225,47 @@ assert (H : ∀ s, s < S (S n) → is_sym_gr_vect (S n) (vv' s)). {
       }
     } {
       intros j k Hj Hk Hjk; cbn in Hjk.
-...
-      do 2 rewrite List_nth_tl in Hjk.
       specialize List_length_filter_nth as H2.
       specialize (H2 (vector nat)).
       specialize (H2 empty_vect).
       specialize (H2 (vect_list vv)).
-      specialize (H2 (λ v, vect_el 0 v 0 =? S n)).
-      fold ll1 in H2; cbn in H2.
+      specialize (H2 (λ v, vect_el 0 v s =? S n)).
+      fold (ll1 s) in H2; cbn in H2.
       specialize (H2 _ Hi).
       destruct H2 as (p & Hpl & Hp & Hip & Hij).
       rewrite Hip in Hjk.
-      do 2 rewrite fold_vect_el in Hjk.
       specialize (Hsg p) as H2.
       specialize (H2 Hpl).
       destruct H2 as (H2, H3).
       destruct H3 as (H3, H4).
       rewrite H2 in H3, H4.
       apply Nat.succ_lt_mono in Hj, Hk.
-      specialize (H4 (S j) (S k) Hj Hk Hjk).
-      now apply Nat.succ_inj in H4.
+      do 2 rewrite nth_butn in Hjk.
+      remember (s <=? j) as bj eqn:Hbj; symmetry in Hbj.
+      remember (s <=? k) as bk eqn:Hbk; symmetry in Hbk.
+      move bk before bj.
+      do 3 rewrite fold_vect_el in Hjk; cbn in Hjk.
+      specialize (H4 (j + Nat.b2n bj) (k + Nat.b2n bk)).
+      assert (H : j + Nat.b2n bj < S (S n)). {
+        destruct bj; cbn; flia Hj.
+      }
+      specialize (H4 H); clear H.
+      assert (H : k + Nat.b2n bk < S (S n)). {
+        destruct bk; cbn; flia Hk.
+      }
+      specialize (H4 H); clear H.
+      specialize (H4 Hjk).
+      rewrite Nat.add_comm in H4; symmetry in H4.
+      rewrite Nat.add_comm in H4; symmetry in H4.
+      destruct bj, bk; [ now apply Nat.succ_inj | | | easy ]. {
+        apply Nat.leb_le in Hbj.
+        apply Nat.leb_gt in Hbk.
+        cbn in H4; flia Hbj Hbk H4.
+      } {
+        apply Nat.leb_gt in Hbj.
+        apply Nat.leb_le in Hbk.
+        cbn in H4; flia Hbj Hbk H4.
+      }
     }
   }
   split. {
@@ -1263,6 +1284,7 @@ assert (H : ∀ s, s < S (S n) → is_sym_gr_vect (S n) (vv' s)). {
     specialize (H2 (λ v, vect_el 0 v 0 =? S n)).
     fold ll1 in H2; cbn in H2.
     rewrite Hvvv in Hi, Hj.
+...
     specialize (H2 _ Hi) as H3.
     specialize (H2 _ Hj) as H4.
     destruct H3 as (i' & Hil & Hin & Hii' & Hi').
