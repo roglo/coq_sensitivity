@@ -1366,28 +1366,40 @@ assert (H : ∀ s, s < S (S n) → is_sym_gr_vect (S n) (vv' s)). {
     rewrite Hv in Hp1, Hp2.
     destruct Hsg as (Hsg & Hinj & Hsurj).
     remember (vect_list v) as l.
-    exists (mk_vect (firstn s l ++ S n :: skipn n l)); subst l.
+    exists (mk_vect (firstn s l ++ S n :: skipn s l)); subst l.
     cbn - [ skipn ].
     split. {
-Search (butn _ (_ ++ _)).
-Search (butn _ _ = butn _ _).
-...
-unfold butn.
-Search (firstn (_ ++ _)).
-Search (firstn _ (firstn _ _)).
-rewrite firstn_firstn.
-...
-    split; [ now destruct v | ].
-    specialize (Hsurj (mk_vect (S n :: vect_list v))) as H2.
-    cbn in H2.
+      rewrite butn_app. 2: {
+        rewrite firstn_length.
+        symmetry; apply Nat.min_l.
+        rewrite fold_vect_size, Hv; flia Hs.
+      }
+      cbn.
+      rewrite firstn_skipn.
+      now destruct v.
+    }
+    set (lv := firstn s (vect_list v) ++ S n :: skipn s (vect_list v)).
+    specialize (Hsurj (mk_vect lv)) as H2.
+    unfold lv in H2; cbn in H2.
+    rewrite app_length in H2; cbn in H2.
+    rewrite <- Nat.add_succ_comm in H2; cbn in H2.
+    rewrite <- app_length in H2.
+    rewrite firstn_skipn in H2.
     rewrite fold_vect_size, Hv in H2.
     specialize (H2 eq_refl).
-    assert (H : is_permut_vect {| vect_list := S n :: vect_list v |}). {
+    fold lv in H2.
+    assert (H : is_permut_vect (mk_vect lv)). {
       unfold is_permut_vect, is_permut_fun.
       cbn - [ vect_el ].
+      unfold lv.
+      rewrite app_length; cbn.
+      rewrite <- Nat.add_succ_comm; cbn.
+      rewrite <- app_length.
+      rewrite firstn_skipn.
       rewrite fold_vect_size, Hv.
       split. {
         intros i Hi.
+...
         destruct i; [ cbn; flia | ].
         cbn.
         rewrite fold_vect_el.

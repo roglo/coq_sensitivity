@@ -2226,54 +2226,18 @@ destruct (lt_dec (S n) (S len)) as [Hn| Hn]. {
 }
 Qed.
 
-(*
-Theorem map_butn_seq : ∀ A (f : _ → A) n sta len,
-  map f (butn n (seq sta len)) =
-  map (λ i, if lt_dec i (sta + n) then f i else f (i + 1))
-    (seq sta (len - Nat.b2n (n <? len))).
+Theorem butn_app : ∀ A (l1 l2 : list A) i,
+  i = length l1
+  → butn i (l1 ++ l2) = l1 ++ butn 0 l2.
 Proof.
-intros.
-revert n sta.
-induction len; intros; [ now rewrite butn_nil | ].
-destruct n. {
-  cbn; rewrite Nat.sub_0_r, Nat.add_0_r.
-  rewrite <- seq_shift.
-  rewrite map_map.
-  apply map_ext_in.
-  intros i Hi.
-  apply in_seq in Hi.
-  rewrite Nat.add_1_r.
-  destruct (lt_dec i sta) as [H| H]; [ | easy ].
-  flia Hi H.
-}
-unfold Nat.b2n.
-rewrite if_ltb_lt_dec.
-destruct (lt_dec (S n) (S len)) as [Hn| Hn]. {
-  cbn - [ butn ].
-  rewrite Nat.sub_0_r, butn_cons; cbn.
-  apply Nat.succ_lt_mono in Hn.
-  rewrite IHlen.
-  destruct len; [ easy | ].
-  unfold Nat.b2n.
-  rewrite if_ltb_lt_dec.
-  destruct (lt_dec n (S len)) as [H| H]; [ clear H | easy ].
-  cbn; rewrite Nat.sub_0_r.
-  destruct (lt_dec sta (sta + S n)) as [H| H]; [ clear H | flia H ].
-  f_equal.
-  apply map_ext_in.
-  intros i Hi.
-  now rewrite (Nat.add_succ_r sta).
-} {
-  apply Nat.nlt_ge in Hn.
-  rewrite Nat.sub_0_r.
-  rewrite butn_out; [ | now rewrite seq_length ].
-  apply map_ext_in.
-  intros i Hi.
-  apply in_seq in Hi.
-  destruct (lt_dec i (sta + S n)) as [H| H]; [ easy | flia Hn Hi H ].
-}
+intros * Hi.
+subst i.
+induction l1 as [| a]; [ easy | ].
+rewrite List_length_cons.
+do 2 rewrite <- app_comm_cons.
+rewrite butn_cons.
+now f_equal.
 Qed.
-*)
 
 Theorem butn_butn : ∀ A i j (la : list A),
   j ≤ i → butn i (butn j la) = butn j (butn (i + 1) la).
