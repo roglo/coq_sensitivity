@@ -1261,33 +1261,6 @@ assert (H : ∀ s, s < S (S n) → is_sym_gr_vect (S n) (vv' s)). {
     do 2 rewrite fold_vect_el in Hij.
     specialize (Hinj i' j' Hil Hjl) as H3.
     apply Nat.eqb_eq in Hin, Hjn.
-(*
-    assert
-      (H :
-       vect_list (vect_el empty_vect vv i') =
-       vect_list (vect_el empty_vect vv j')). {
-      rewrite List_map_nth_seq with (d := 0); symmetry.
-      rewrite List_map_nth_seq with (d := 0); symmetry.
-      do 2 rewrite fold_vect_size.
-      specialize (Hsg i' Hil) as H4.
-      destruct H4 as (H4, H5).
-      rewrite H4; clear H4 H5.
-      specialize (Hsg j' Hjl) as H4.
-      destruct H4 as (H4, H5).
-      rewrite H4; clear H4 H5.
-      apply map_ext_in.
-      intros k Hk; apply in_seq in Hk.
-      do 2 rewrite fold_vect_el.
-      rewrite fold_vect_el in Hin, Hjn.
-      destruct k. {
-...
-      destruct k; [ congruence | ].
-      move Hij at bottom.
-      unfold vect_el at 1 3.
-      do 2 rewrite <- List_nth_tl.
-      now rewrite Hij.
-    }
-*)
     assert (H' : vect_el empty_vect vv i' = vect_el empty_vect vv j'). {
       move Hin at bottom; move Hjn at bottom.
       rewrite fold_vect_el in Hin, Hjn.
@@ -1368,48 +1341,46 @@ assert (H : ∀ s, s < S (S n) → is_sym_gr_vect (S n) (vv' s)). {
       rewrite fold_vect_size, Hv.
       split. {
         intros i Hi.
-        destruct (Nat.lt_trichotomy i s) as [His| [His| His]]. {
-          rewrite app_nth1. 2: {
-            rewrite firstn_length, Nat.min_l; [ easy | ].
-            rewrite fold_vect_size, Hv; flia Hs.
-          }
-          rewrite List_nth_firstn; [ | easy ].
+        rewrite List_app_nth, firstn_length, fold_vect_size, Hv.
+        rewrite if_ltb_lt_dec.
+        destruct (lt_dec i (min s (S n))) as [Hisn| Hisn]. {
+          rewrite List_nth_firstn; [ | flia Hisn ].
           rewrite fold_vect_el.
-          specialize (Hp1 i) as H1.
-          assert (H : i < S n) by flia His Hs.
-          specialize (H1 H); clear H.
-          flia H1.
+          transitivity (S n); [ | flia ].
+          apply Hp1; flia Hisn.
         } {
-          subst i.
-          rewrite app_nth2; [ | rewrite firstn_length; flia ].
-          rewrite firstn_length.
-          rewrite Nat.min_l. 2: {
-            rewrite fold_vect_size, Hv; flia Hs.
-          }
-          rewrite Nat.sub_diag; cbn; flia.
-        } {
-          rewrite app_nth2. 2: {
-            rewrite firstn_length.
-            rewrite Nat.min_l. 2: {
-              rewrite fold_vect_size, Hv; flia Hs.
+          apply Nat.nlt_ge in Hisn.
+          apply Nat.min_le in Hisn.
+          destruct Hisn as [Hisn| Hisn]. {
+            rewrite Nat.min_l; [ | flia Hisn Hi ].
+            destruct (Nat.eq_dec i s) as [His| His]. {
+              subst s; rewrite Nat.sub_diag; cbn; flia.
             }
-            flia His.
+            replace (i - s) with (S (i - S s)) by flia Hisn His; cbn.
+            rewrite List_nth_skipn.
+            replace (i - S s + s) with (i - 1) by flia Hisn His.
+            rewrite fold_vect_el.
+            specialize (Hp1 (i - 1)) as H1.
+            assert (H : i - 1 < S n) by flia Hi.
+            specialize (H1 H); clear H.
+            flia H1.
+          } {
+            rewrite Nat.min_l; [ | flia Hs ].
+            replace i with (S n) by flia Hi Hisn.
+            destruct (Nat.eq_dec s (S n)) as [Hssn| Hssn]. {
+              subst s; rewrite Nat.sub_diag; cbn; flia.
+            }
+            rewrite Nat.sub_succ_l; [ cbn | flia Hs Hssn ].
+            rewrite List_nth_skipn.
+            rewrite Nat.sub_add; [ | flia Hs Hssn ].
+            rewrite fold_vect_el.
+            specialize (Hp1 n (Nat.lt_succ_diag_r _)) as H1.
+            flia H1.
           }
-          rewrite firstn_length.
-          rewrite Nat.min_l. 2: {
-            rewrite fold_vect_size, Hv; flia Hs.
-          }
-          replace (i - s) with (S (i - S s)) by flia His; cbn.
-          rewrite List_nth_skipn.
-          replace (i - S s + s) with (i - 1) by flia His.
-          rewrite fold_vect_el.
-          specialize (Hp1 (i - 1)) as H1.
-          assert (H : i - 1 < S n) by flia Hi.
-          specialize (H1 H); clear H.
-          flia H1.
         }
       } {
         intros i j Hi Hj Hij.
+...
         destruct (Nat.lt_trichotomy i s) as [His| [His| His]]. {
           rewrite app_nth1 in Hij. 2: {
             rewrite firstn_length, fold_vect_size, Hv.
