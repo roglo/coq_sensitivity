@@ -608,18 +608,24 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
       now cbn in Hnz; subst l.
     }
     move H at top; subst v; cbn in *.
-...
-    assert (H : 1 < S (S n)) by flia.
-    specialize (H2 H); clear H.
-
-...
-  specialize (Hsg 0) as H2.
-  assert (H : 0 < vect_size sg) by flia Hszg.
-  specialize (H2 H); clear H.
-  destruct H2 as (H2, H3).
-  unfold vect_size in H2.
-  apply length_zero_iff_nil in H2.
-  unfold vect_el in Hi.
+    specialize (Hsg 0 (Nat.lt_0_succ _)) as H1.
+    destruct H1 as (H1, H3).
+    unfold vect_size in H1.
+    apply length_zero_iff_nil in H1.
+    remember (vect_el empty_vect sg 0) as v eqn:Hv.
+    destruct v as (l).
+    cbn in H1; subst l.
+    easy.
+  }
+  unfold vect_size in Hsg1.
+  destruct sg as (lv).
+  cbn in Hsg1.
+  destruct lv as [| v']; [ easy | ].
+  destruct lv; [ | easy ].
+  clear Hsg1.
+  cbn in H1 |-*.
+  now destruct H1.
+}
 ...
 
 (* *)
