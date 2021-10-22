@@ -2774,6 +2774,16 @@ specialize (IHx1 x2 y1 y2 Hxy H1).
 now destruct IHx1; subst y1 y2.
 Qed.
 
+Theorem List_app_nth : ∀ A (l l' : list A) d n,
+  nth n (l ++ l') d =
+    if n <? length l then nth n l d else nth (n - length l) l' d.
+Proof.
+intros.
+rewrite if_ltb_lt_dec.
+destruct (lt_dec n (length l)); [ now apply app_nth1 | ].
+now apply app_nth2, Nat.nlt_ge.
+Qed.
+
 Theorem List_last_nth : ∀ A l (d : A), last l d = nth (length l - 1) l d.
 Proof.
 intros.
