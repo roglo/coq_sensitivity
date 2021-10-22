@@ -535,6 +535,43 @@ Search (⋀ (_ = _, _), _ = false).
 *)
 destruct b. {
   apply is_permut_vect_is_permut_vect_bool in Hb.
+(**)
+  unfold rank_of_permut_in_sym_gr.
+  unfold unsome.
+  remember (List_find_nth _ _) as i eqn:Hi; symmetry in Hi.
+  destruct i as [i| ]. {
+(*
+    apply List_find_nth_Some with (d := empty_vect) in Hi.
+Print List_find_nth_loop.
+*)
+...
+now apply List_find_nth_lt in Hi.
+
+...
+    destruct Hi as (Hji, Hi).
+    apply vect_eqb_eq in Hi.
+    rewrite fold_vect_el in Hi.
+    clear Hsg.
+    destruct sg as (lv).
+    cbn in Hi, Hji |-*.
+    subst v.
+    induction lv as [| v]. {
+      clear Hb; exfalso.
+...
+      destruct Hsg as (Hsg & Hinj & Hsurj).
+      specialize (Hsurj v Hvn Hb) as H1.
+      apply (In_nth _ _ empty_vect) in H1.
+      destruct H1 as (m & Hml & Hmv).
+      rewrite fold_vect_size in Hml.
+      rewrite fold_vect_el in Hmv.
+      destruct (lt_dec i (vect_size sg)) as [His| His]; [ easy | ].
+      exfalso; apply Nat.nlt_ge in His.
+      unfold vect_el in Hi.
+      rewrite nth_overflow in Hi; [ | easy ].
+      move Hi at top; subst v.
+      now cbn in Hvn; subst n.
+    } {
+...
   destruct (Nat.eq_dec (vect_size v) n) as [Hvn| Hvn]. {
     unfold rank_of_permut_in_sym_gr.
     unfold unsome.

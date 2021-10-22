@@ -1925,6 +1925,28 @@ destruct r as [a| ]. {
 }
 Qed.
 
+Theorem List_find_nth_loop_lt : ∀ A f (l : list A) i j,
+  List_find_nth_loop i f l = Some j → j < i + length l.
+Proof.
+intros * Hij.
+revert i Hij.
+induction l as [| a]; intros; [ easy | ].
+cbn in Hij, IHl |-*.
+remember (f a) as b eqn:Hb; symmetry in Hb.
+destruct b. {
+  injection Hij; clear Hij; intros; subst j; flia.
+}
+rewrite <- Nat.add_succ_comm.
+now apply IHl.
+Qed.
+
+Theorem List_find_nth_lt : ∀ A f (l : list A) i,
+  List_find_nth f l = Some i → i < length l.
+Proof.
+intros * Hi.
+now apply List_find_nth_loop_lt in Hi.
+Qed.
+
 (* end List_find_nth *)
 
 (* conversions if ...? into if ..._dec *)
