@@ -526,7 +526,7 @@ intros * Hnz Hsg.
 unfold rank_of_permut_in_sym_gr.
 unfold unsome.
 remember (List_find_nth _ _) as i eqn:Hi; symmetry in Hi.
-destruct i as [i| ]; [ now apply List_find_nth_lt in Hi | ].
+destruct i as [i| ]; [ now apply List_find_nth_Some_lt in Hi | ].
 clear Hi.
 destruct (lt_dec 0 (vect_size sg)) as [Hs| Hs]; [ easy | ].
 apply Nat.nlt_ge in Hs; exfalso.
@@ -550,10 +550,13 @@ apply length_zero_iff_nil in Hs.
 now rewrite Hs in H1.
 Qed.
 
-Theorem vect_el_rank_of_permut_in_sym_gr : ∀ vv v,
-  vect_el empty_vect vv (rank_of_permut_in_sym_gr vv v) = v.
+Theorem vect_el_rank_of_permut_in_sym_gr : ∀ sg v n,
+  is_sym_gr_vect n sg
+  → is_permut_vect v
+  → vect_size v = n
+  → vect_el empty_vect sg (rank_of_permut_in_sym_gr sg v) = v.
 Proof.
-intros.
+intros * Hsg Hp Hs.
 unfold rank_of_permut_in_sym_gr, unsome.
 remember (List_find_nth _ _) as i eqn:Hi; symmetry in Hi.
 destruct i as [i| ]. {
@@ -561,9 +564,36 @@ destruct i as [i| ]. {
   destruct Hi as (Hji, Hi).
   now apply vect_eqb_eq in Hi.
 }
-apply List_find_nth_None with (d := empty_vect) (j := 0) in Hi.
+apply List_find_nth_None with (d := empty_vect) (j := 0) in Hi. 2: {
+  rewrite fold_vect_size.
+  destruct Hsg as (Hsg & Hinj & Hsurj).
+  specialize (Hsurj v Hs Hp) as H1.
+  apply Nat.nle_gt.
+  intros H.
+  apply Nat.le_0_r in H.
+  unfold vect_size in H.
+  apply length_zero_iff_nil in H.
+  now rewrite H in H1.
+}
 apply vect_eqb_neq in Hi.
 rewrite fold_vect_el in Hi.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  rewrite Hnz in Hsg.
+  destruct Hsg as (Hsg & Hinj & Hsurj).
+  specialize (Hsurj v Hnz Hp) as H1.
+  destruct (Nat.eq_dec (vect_size sg) 0) as [Hszg| Hszg]. {
+    unfold vect_size in Hszg.
+    apply length_zero_iff_nil in Hszg.
+    now rewrite Hszg in H1.
+  }
+  specialize (Hsg 0) as H2.
+  assert (H : 0 < vect_size sg) by flia Hszg.
+  specialize (H2 H); clear H.
+  destruct H2 as (H2, H3).
+  unfold vect_size in H2.
+  apply length_zero_iff_nil in H2.
+  unfold vect_el in Hi.
 ...
 
 (* *)

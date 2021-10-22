@@ -1944,7 +1944,7 @@ Theorem List_find_nth_Some_lt : ∀ A f (l : list A) i,
   List_find_nth f l = Some i → i < length l.
 Proof.
 intros * Hi.
-now apply List_find_nth_loop_lt in Hi.
+now apply List_find_nth_loop_Some_lt in Hi.
 Qed.
 
 (* end List_find_nth *)
