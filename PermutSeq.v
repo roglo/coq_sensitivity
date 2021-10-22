@@ -471,6 +471,44 @@ split; intros Hφ'. {
 }
 Qed.
 
+
+(* *)
+
+Definition vect_eqb A eqb (u v : vector A) :=
+  list_eqb eqb (vect_list u) (vect_list v).
+
+Definition rank_of_permut_in_sym_gr (sg : vector (vector nat)) σ :=
+  unsome 0 (List_find_nth (vect_eqb Nat.eqb σ) (vect_list sg)).
+
+(*
+Compute (mk_canon_sym_gr_vect 4).
+Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 4) (mk_vect [0;1;3;2])).
+Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 4) (mk_vect [2;3;0;1])).
+Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 4) (mk_vect [2;3;0])).
+Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 0) (mk_vect [2;3;0])).
+*)
+
+Theorem vect_eqb_eq : ∀ u v, vect_eqb Nat.eqb u v = true → u = v.
+Proof.
+intros * Huv.
+unfold vect_eqb in Huv.
+destruct u as (u).
+destruct v as (v).
+cbn in Huv; f_equal.
+now apply list_eqb_eq.
+Qed.
+
+Theorem vect_eqb_neq : ∀ u v, vect_eqb Nat.eqb u v = false → u ≠ v.
+Proof.
+intros * Huv.
+destruct u as (u).
+destruct v as (v).
+intros H.
+injection H; clear H; intros H.
+revert H.
+now apply list_eqb_neq.
+Qed.
+
 Theorem glop : ∀ n vv, is_sym_gr_vect n vv → vect_size vv = n!.
 Proof.
 intros * Hsg.
@@ -1495,7 +1533,23 @@ assert
    → vect_size v = S n
    → mk_vect (insert (vect_list v) s) ∈ vect_list vv). {
   intros * Hv Hs.
+  remember (mk_vect (insert (vect_list v) s)) as v' eqn:Hv'.
+  remember (rank_of_permut_in_sym_gr vv v') as i eqn:Hi.
+  unfold rank_of_permut_in_sym_gr in Hi.
+  unfold unsome in Hi.
+  remember (List_find_nth (vect_eqb Nat.eqb v') (vect_list vv)) as j eqn:Hj.
+  symmetry in Hj.
+  destruct j as [j| ]. {
+    subst j.
+    apply List_find_nth_Some with (d := empty_vect) in Hj.
+    destruct Hj as (Hi1, Hi2).
+    apply vect_eqb_eq in Hi2.
+    rewrite Hi2.
+    apply nth_In.
+    rewrite fold_vect_size.
 ...
+
+(* *)
 
 Definition is_sym_gr_vect n (vv : vector (vector nat)) :=
   vect_size vv = n! ∧
@@ -1505,43 +1559,6 @@ Definition is_sym_gr_vect n (vv : vector (vector nat)) :=
 Record sym_gr_vect n :=
   { sg_vect : vector (vector nat);
     sg_prop : is_sym_gr_vect n sg_vect }.
-
-(* *)
-
-Definition vect_eqb A eqb (u v : vector A) :=
-  list_eqb eqb (vect_list u) (vect_list v).
-
-Definition rank_of_permut_in_sym_gr (sg : vector (vector nat)) σ :=
-  unsome 0 (List_find_nth (vect_eqb Nat.eqb σ) (vect_list sg)).
-
-(*
-Compute (mk_canon_sym_gr_vect 4).
-Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 4) (mk_vect [0;1;3;2])).
-Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 4) (mk_vect [2;3;0;1])).
-Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 4) (mk_vect [2;3;0])).
-Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 0) (mk_vect [2;3;0])).
-*)
-
-Theorem vect_eqb_eq : ∀ u v, vect_eqb Nat.eqb u v = true → u = v.
-Proof.
-intros * Huv.
-unfold vect_eqb in Huv.
-destruct u as (u).
-destruct v as (v).
-cbn in Huv; f_equal.
-now apply list_eqb_eq.
-Qed.
-
-Theorem vect_eqb_neq : ∀ u v, vect_eqb Nat.eqb u v = false → u ≠ v.
-Proof.
-intros * Huv.
-destruct u as (u).
-destruct v as (v).
-intros H.
-injection H; clear H; intros H.
-revert H.
-now apply list_eqb_neq.
-Qed.
 
 (* rank in canon symmetric group *)
 
