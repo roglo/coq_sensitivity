@@ -523,81 +523,36 @@ Theorem rank_of_permut_in_sym_gr_lt : ∀ n sg v,
   → rank_of_permut_in_sym_gr sg v < vect_size sg.
 Proof.
 intros * Hnz Hsg.
-remember (is_permut_vect_bool v) as b eqn:Hb.
-symmetry in Hb.
-destruct b. {
-  apply is_permut_vect_is_permut_vect_bool in Hb.
-  unfold rank_of_permut_in_sym_gr.
-  unfold unsome.
-  remember (List_find_nth _ _) as i eqn:Hi; symmetry in Hi.
-  destruct i as [i| ]; [ now apply List_find_nth_lt in Hi | ].
-  specialize (List_find_nth_None empty_vect _ _ Hi) as H1.
-  rewrite fold_vect_size in H1.
-  destruct (lt_dec 0 (vect_size sg)) as [Hs| Hs]; [ easy | ].
-  apply Nat.nlt_ge in Hs; exfalso.
-  apply Nat.le_0_r in Hs.
-  destruct Hsg as (Hsg & Hinj & Hsurj).
-...
-    destruct Hi as (Hji, Hi).
-    apply vect_eqb_eq in Hi.
-    rewrite fold_vect_el in Hi.
-    clear Hsg.
-    destruct sg as (lv).
-    cbn in Hi, Hji |-*.
-    subst v.
-    induction lv as [| v]. {
-      clear Hb; exfalso.
-...
-      destruct Hsg as (Hsg & Hinj & Hsurj).
-      specialize (Hsurj v Hvn Hb) as H1.
-      apply (In_nth _ _ empty_vect) in H1.
-      destruct H1 as (m & Hml & Hmv).
-      rewrite fold_vect_size in Hml.
-      rewrite fold_vect_el in Hmv.
-      destruct (lt_dec i (vect_size sg)) as [His| His]; [ easy | ].
-      exfalso; apply Nat.nlt_ge in His.
-      unfold vect_el in Hi.
-      rewrite nth_overflow in Hi; [ | easy ].
-      move Hi at top; subst v.
-      now cbn in Hvn; subst n.
-    } {
-...
-  destruct (Nat.eq_dec (vect_size v) n) as [Hvn| Hvn]. {
-    unfold rank_of_permut_in_sym_gr.
-    unfold unsome.
-    remember (List_find_nth _ _) as i eqn:Hi; symmetry in Hi.
-    destruct i as [i| ]. {
-      apply List_find_nth_Some with (d := empty_vect) in Hi.
-      destruct Hi as (Hji, Hi).
-      apply vect_eqb_eq in Hi.
-      rewrite fold_vect_el in Hi.
-      destruct Hsg as (Hsg & Hinj & Hsurj).
-      specialize (Hsurj v Hvn Hb) as H1.
-      apply (In_nth _ _ empty_vect) in H1.
-      destruct H1 as (m & Hml & Hmv).
-      rewrite fold_vect_size in Hml.
-      rewrite fold_vect_el in Hmv.
-      destruct (lt_dec i (vect_size sg)) as [His| His]; [ easy | ].
-      exfalso; apply Nat.nlt_ge in His.
-      unfold vect_el in Hi.
-      rewrite nth_overflow in Hi; [ | easy ].
-      move Hi at top; subst v.
-      now cbn in Hvn; subst n.
-    } {
-      destruct (lt_dec 0 (vect_size sg)) as [Hs| Hs]; [ easy | ].
-      exfalso; apply Nat.nlt_ge in Hs.
-      apply Nat.le_0_r in Hs.
-      apply length_zero_iff_nil in Hs.
-      destruct sg as (ll); cbn in Hs; subst ll.
-      destruct Hsg as (Hsg & Hinj & Hsurj).
-      cbn in Hsurj.
-      now specialize (Hsurj v Hvn Hb).
-    }
+unfold rank_of_permut_in_sym_gr.
+unfold unsome.
+remember (List_find_nth _ _) as i eqn:Hi; symmetry in Hi.
+destruct i as [i| ]; [ now apply List_find_nth_lt in Hi | ].
+clear Hi.
+destruct (lt_dec 0 (vect_size sg)) as [Hs| Hs]; [ easy | ].
+apply Nat.nlt_ge in Hs; exfalso.
+apply Nat.le_0_r in Hs.
+destruct Hsg as (Hsg & Hinj & Hsurj).
+specialize (Hsurj (mk_vect (seq 0 n))) as H1.
+cbn in H1; rewrite seq_length in H1.
+specialize (H1 eq_refl).
+assert (H : is_permut_vect (mk_vect (seq 0 n))). {
+  split; cbn; rewrite seq_length. {
+    intros i Hin.
+    now rewrite seq_nth.
+  } {
+    intros i j Hi Hj Hij.
+    rewrite seq_nth in Hij; [ | easy ].
+    now rewrite seq_nth in Hij.
   }
-  destruct Hsg as (Hsg & Hinj & Hsurj).
-...
-      rewrite Hi in Hmv.
-      apply Hinj in Hmv; [ now subst m | easy | ].
+}
+specialize (H1 H); clear H.
+apply length_zero_iff_nil in Hs.
+now rewrite Hs in H1.
+Qed.
+
+Theorem vect_el_rank_of_permut_in_sym_gr : ∀ vv v,
+  vect_el empty_vect vv (rank_of_permut_in_sym_gr vv v) = v.
+Proof.
 ...
 
 (* *)
@@ -1185,18 +1140,16 @@ assert
   intros * Hv Hs.
   remember (mk_vect (insert (vect_list v) s)) as v' eqn:Hv'.
   remember (rank_of_permut_in_sym_gr vv v') as i eqn:Hi.
-Theorem vect_el_rank_of_permut_in_sym_gr : ∀ vv v,
-  vect_el empty_vect vv (rank_of_permut_in_sym_gr vv v) = v.
-Admitted.
-specialize (vect_el_rank_of_permut_in_sym_gr vv v') as H1.
-rewrite <- Hi in H1.
-rewrite <- H1.
-unfold vect_el.
-apply nth_In.
-rewrite fold_vect_size.
-rewrite Hi.
 ...
-apply rank_of_permut_in_sym_gr_lt.
+  specialize (vect_el_rank_of_permut_in_sym_gr vv v') as H1.
+  rewrite <- Hi in H1.
+  rewrite <- H1.
+  unfold vect_el.
+  apply nth_In.
+  rewrite fold_vect_size.
+  rewrite Hi.
+  now apply rank_of_permut_in_sym_gr_lt with (n := S (S n)).
+}
 ...
   unfold rank_of_permut_in_sym_gr in Hi.
   unfold unsome in Hi.
