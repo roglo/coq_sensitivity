@@ -145,6 +145,14 @@ split. {
 }
 Qed.
 
+Theorem is_permut_vect_is_permut_vect_bool : ∀ v,
+  is_permut_vect v ↔ is_permut_vect_bool v = true.
+Proof.
+intros.
+unfold is_permut_vect.
+apply is_permut_fun_is_permut_fun_bool.
+Qed.
+
 Fixpoint permut_fun_inv_loop f i j :=
   match i with
   | 0 => 42
@@ -510,25 +518,59 @@ now apply list_eqb_neq.
 Qed.
 
 Theorem rank_of_permut_in_sym_gr_lt : ∀ n sg v,
-  is_sym_gr_vect n sg
+  n ≠ 0
+  → is_sym_gr_vect n sg
   → rank_of_permut_in_sym_gr sg v < vect_size sg.
 Proof.
-intros * Hsg.
+intros * Hnz Hsg.
 remember (is_permut_vect_bool v) as b eqn:Hb.
 symmetry in Hb.
-destruct b. {
+(*
+destruct b. 2: {
   unfold is_permut_vect_bool in Hb.
-  apply is_permut_fun_is_permut_fun_bool in Hb.
-  destruct Hb as (Hb1, Hb2).
-  unfold rank_of_permut_in_sym_gr.
-  unfold unsome.
-  remember (List_find_nth _ _) as i eqn:Hi; symmetry in Hi.
-  destruct i as [i| ]. {
-    apply List_find_nth_Some with (d := empty_vect) in Hi.
-    destruct Hi as (Hji, Hi).
-    apply vect_eqb_eq in Hi.
-    rewrite fold_vect_el in Hi.
-    destruct Hsg as (Hsg & Hinj & Hsurj).
+  unfold is_permut_fun_bool in Hb.
+  apply andb_false_iff in Hb.
+  destruct Hb as [Hb| Hb]. {
+Search (⋀ (_ = _, _), _ = false).
+*)
+destruct b. {
+  apply is_permut_vect_is_permut_vect_bool in Hb.
+  destruct (Nat.eq_dec (vect_size v) n) as [Hvn| Hvn]. {
+    unfold rank_of_permut_in_sym_gr.
+    unfold unsome.
+    remember (List_find_nth _ _) as i eqn:Hi; symmetry in Hi.
+    destruct i as [i| ]. {
+      apply List_find_nth_Some with (d := empty_vect) in Hi.
+      destruct Hi as (Hji, Hi).
+      apply vect_eqb_eq in Hi.
+      rewrite fold_vect_el in Hi.
+      destruct Hsg as (Hsg & Hinj & Hsurj).
+      specialize (Hsurj v Hvn Hb) as H1.
+      apply (In_nth _ _ empty_vect) in H1.
+      destruct H1 as (m & Hml & Hmv).
+      rewrite fold_vect_size in Hml.
+      rewrite fold_vect_el in Hmv.
+      destruct (lt_dec i (vect_size sg)) as [His| His]; [ easy | ].
+      exfalso; apply Nat.nlt_ge in His.
+      unfold vect_el in Hi.
+      rewrite nth_overflow in Hi; [ | easy ].
+      move Hi at top; subst v.
+      now cbn in Hvn; subst n.
+    } {
+      destruct (lt_dec 0 (vect_size sg)) as [Hs| Hs]; [ easy | ].
+      exfalso; apply Nat.nlt_ge in Hs.
+      apply Nat.le_0_r in Hs.
+      apply length_zero_iff_nil in Hs.
+      destruct sg as (ll); cbn in Hs; subst ll.
+      destruct Hsg as (Hsg & Hinj & Hsurj).
+      cbn in Hsurj.
+      now specialize (Hsurj v Hvn Hb).
+    }
+  }
+  destruct Hsg as (Hsg & Hinj & Hsurj).
+...
+      rewrite Hi in Hmv.
+      apply Hinj in Hmv; [ now subst m | easy | ].
 ...
 
 (* *)
