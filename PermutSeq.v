@@ -509,18 +509,26 @@ revert H.
 now apply list_eqb_neq.
 Qed.
 
-Theorem rank_of_permut_in_sym_gr_lt : ∀ sg v,
-  rank_of_permut_in_sym_gr sg v < vect_size sg.
+Theorem rank_of_permut_in_sym_gr_lt : ∀ n sg v,
+  is_sym_gr_vect n sg
+  → rank_of_permut_in_sym_gr sg v < vect_size sg.
 Proof.
-intros .
-unfold rank_of_permut_in_sym_gr.
-unfold unsome.
-remember (List_find_nth _ _) as i eqn:Hi; symmetry in Hi.
-destruct i as [i| ]. {
-  apply List_find_nth_Some with (d := empty_vect) in Hi.
-  destruct Hi as (Hji, Hi).
-  apply vect_eqb_eq in Hi.
-  rewrite fold_vect_el in Hi.
+intros * Hsg.
+remember (is_permut_vect_bool v) as b eqn:Hb.
+symmetry in Hb.
+destruct b. {
+  unfold is_permut_vect_bool in Hb.
+  apply is_permut_fun_is_permut_fun_bool in Hb.
+  destruct Hb as (Hb1, Hb2).
+  unfold rank_of_permut_in_sym_gr.
+  unfold unsome.
+  remember (List_find_nth _ _) as i eqn:Hi; symmetry in Hi.
+  destruct i as [i| ]. {
+    apply List_find_nth_Some with (d := empty_vect) in Hi.
+    destruct Hi as (Hji, Hi).
+    apply vect_eqb_eq in Hi.
+    rewrite fold_vect_el in Hi.
+    destruct Hsg as (Hsg & Hinj & Hsurj).
 ...
 
 (* *)
