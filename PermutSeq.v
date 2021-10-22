@@ -553,6 +553,17 @@ Qed.
 Theorem vect_el_rank_of_permut_in_sym_gr : ∀ vv v,
   vect_el empty_vect vv (rank_of_permut_in_sym_gr vv v) = v.
 Proof.
+intros.
+unfold rank_of_permut_in_sym_gr, unsome.
+remember (List_find_nth _ _) as i eqn:Hi; symmetry in Hi.
+destruct i as [i| ]. {
+  apply List_find_nth_Some with (d := empty_vect) in Hi.
+  destruct Hi as (Hji, Hi).
+  now apply vect_eqb_eq in Hi.
+}
+apply List_find_nth_None with (d := empty_vect) (j := 0) in Hi.
+apply vect_eqb_neq in Hi.
+rewrite fold_vect_el in Hi.
 ...
 
 (* *)
