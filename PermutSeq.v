@@ -1472,7 +1472,23 @@ assert (H : ∀ s, s < S (S n) → is_sym_gr_vect (S n) (vv' s)). {
           }
         } {
           subst i.
+          rewrite app_nth2 in Hij; [ | rewrite firstn_length; flia ].
+          rewrite firstn_length in Hij.
+          rewrite fold_vect_size in Hij.
+          rewrite Nat.min_l in Hij; [ | rewrite Hv; flia Hs ].
+          rewrite Nat.sub_diag in Hij; cbn in Hij.
+          destruct (Nat.lt_trichotomy j s) as [Hjs| [Hjs| Hjs]]. {
+            rewrite app_nth1 in Hij. 2: {
+              rewrite firstn_length, fold_vect_size, Hv.
+              rewrite Nat.min_l; [ easy | flia Hs ].
+            }
+            rewrite List_nth_firstn in Hij; [ | easy ].
+            rewrite fold_vect_el in Hij.
 ...
+            apply Hp2; [ flia His Hs | flia Hjs Hs | easy ].
+          } {
+            subst j.
+  ...
 Search (nth _ (_ ++ _)).
 ...
         destruct i. {
