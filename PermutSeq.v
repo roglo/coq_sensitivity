@@ -1020,10 +1020,7 @@ assert (Hvvv : ∀ s, vect_size (vv' s) = length (ll1 s)). {
   unfold vv', ll2; cbn.
   now rewrite map_length.
 }
-(*
-specialize (IHn vv') as H1.
-*)
-assert (H : ∀ s, s < S (S n) → is_sym_gr_vect (S n) (vv' s)). {
+assert (Hss : ∀ s, s < S (S n) → is_sym_gr_vect (S n) (vv' s)). {
   intros s Hs.
   split. {
     intros i Hi; cbn.
@@ -1430,144 +1427,67 @@ assert (H : ∀ s, s < S (S n) → is_sym_gr_vect (S n) (vv' s)). {
           }
           apply Nat.nlt_ge in Hjs.
           destruct (Nat.eq_dec i s) as [Hies| Hies]. {
-            subst s; rewrite Nat.sub_diag in Hij.
-            remember (nth (j - i)) as f; cbn in Hij; subst f.
-            destruct (Nat.eq_dec i j) as [Hiej| Hiej]; [ easy | ].
-            replace (j - i) with (S (j - S i)) in Hij by flia Hjs Hiej.
+            subst i; rewrite Nat.sub_diag in Hij.
+            remember (nth (j - s)) as f; cbn in Hij; subst f.
+            destruct (Nat.eq_dec s j) as [Hiej| Hiej]; [ easy | ].
+            replace (j - s) with (S (j - S s)) in Hij by flia Hjs Hiej.
             cbn in Hij.
             rewrite List_nth_skipn in Hij.
-            replace (j - S i + i) with (j - 1) in Hij by flia Hjs Hiej.
+            replace (j - S s + s) with (j - 1) in Hij by flia Hjs Hiej.
             rewrite fold_vect_el in Hij.
-...
-            specialize (Hp2 i (j - 1)) as H1.
-            assert (H : i < S n) by flia Hjs Hj Hiej.
-            specialize (H1 H); clear H.
+            specialize (Hp1 (j - 1)) as H1.
             assert (H : j - 1 < S n) by flia Hj.
             specialize (H1 H); clear H.
-            rewrite <- Hij in H1.
-...
-            apply Hp2 in Hij; [ | flia Hi | flia Hjs Hs ].
-            flia His Hjs Hij Hies.
-            remember (j - i) as x; cbn in Hij; subst x.
-...
-        destruct (Nat.lt_trichotomy i s) as [His| [His| His]]. {
-          rewrite app_nth1 in Hij. 2: {
-            rewrite firstn_length, fold_vect_size, Hv.
-            rewrite Nat.min_l; [ easy | flia Hs ].
+            rewrite <- Hij in H1; flia H1.
           }
-          rewrite List_nth_firstn in Hij; [ | easy ].
-          rewrite fold_vect_el in Hij.
-          destruct (Nat.lt_trichotomy j s) as [Hjs| [Hjs| Hjs]]. {
-            rewrite app_nth1 in Hij. 2: {
-              rewrite firstn_length, fold_vect_size, Hv.
-              rewrite Nat.min_l; [ easy | flia Hs ].
-            }
-            rewrite List_nth_firstn in Hij; [ | easy ].
-            rewrite fold_vect_el in Hij.
-            apply Hp2; [ flia His Hs | flia Hjs Hs | easy ].
-          } {
-            subst j.
-            rewrite app_nth2 in Hij; [ | rewrite firstn_length; flia ].
-            rewrite firstn_length in Hij.
-            rewrite fold_vect_size in Hij.
-            rewrite Nat.min_l in Hij; [ | rewrite Hv; flia Hs ].
-            rewrite Nat.sub_diag in Hij; cbn in Hij.
-            specialize (Hp1 i) as H1.
-            assert (H : i < S n) by flia His Hs.
-            specialize (H1 H); clear H.
-            rewrite Hij in H1; flia H1.
-          } {
-            rewrite app_nth2 in Hij; [ | rewrite firstn_length; flia Hjs ].
-            rewrite firstn_length, fold_vect_size, Hv in Hij.
-            rewrite Nat.min_l in Hij; [ | flia Hjs Hj ].
-            replace (j - s) with (S (j - S s)) in Hij by flia Hjs.
+          destruct (Nat.eq_dec j s) as [Hjes| Hjes]. {
+            subst j; rewrite Nat.sub_diag in Hij.
+            remember (nth (i - s)) as f; cbn in Hij; subst f.
+            destruct (Nat.eq_dec s i) as [Hiej| Hiej]; [ easy | ].
+            replace (i - s) with (S (i - S s)) in Hij by flia His Hiej.
             cbn in Hij.
             rewrite List_nth_skipn in Hij.
-            replace (j - S s + s) with (j - 1) in Hij by flia Hjs.
+            replace (i - S s + s) with (i - 1) in Hij by flia His Hiej.
             rewrite fold_vect_el in Hij.
-            apply Hp2 in Hij; [ | flia His Hs | flia Hj ].
-            flia Hij His Hjs.
+            specialize (Hp1 (i - 1)) as H1.
+            assert (H : i - 1 < S n) by flia Hi.
+            specialize (H1 H); clear H.
+            rewrite <- Hij in H1; flia H1.
           }
-        } {
-          subst i.
-          rewrite app_nth2 in Hij; [ | rewrite firstn_length; flia ].
-          rewrite firstn_length in Hij.
-          rewrite fold_vect_size in Hij.
-          rewrite Nat.min_l in Hij; [ | rewrite Hv; flia Hs ].
-          rewrite Nat.sub_diag in Hij; cbn in Hij.
-          destruct (Nat.lt_trichotomy j s) as [Hjs| [Hjs| Hjs]]. {
-            rewrite app_nth1 in Hij. 2: {
-              rewrite firstn_length, fold_vect_size, Hv.
-              rewrite Nat.min_l; [ easy | flia Hs ].
-            }
-            rewrite List_nth_firstn in Hij; [ | easy ].
-            rewrite fold_vect_el in Hij.
-Check app_nth2.
-...
-            apply Hp2; [ flia His Hs | flia Hjs Hs | easy ].
-          } {
-            subst j.
-  ...
-Search (nth _ (_ ++ _)).
-...
-        destruct i. {
-          destruct j; [ easy | exfalso ].
+          replace (i - s) with (S (i - S s)) in Hij by flia His Hies.
+          replace (j - s) with (S (j - S s)) in Hij by flia Hjs Hjes.
           cbn in Hij.
-          symmetry in Hij.
-          apply Nat.succ_lt_mono in Hj.
-...
-          rewrite fold_vect_el in Hij.
-          specialize (Hp1 j Hj) as H3.
-          rewrite Hij in H3.
-          flia H3.
-        } {
-          apply Nat.succ_lt_mono in Hi.
-          destruct j; cbn in Hij. {
-            rewrite fold_vect_el in Hij.
-            specialize (Hp1 i Hi) as H3.
-            rewrite Hij in H3.
-            flia H3.
-          }
-          apply Nat.succ_lt_mono in Hj.
+          do 2 rewrite List_nth_skipn in Hij.
+          replace (i - S s + s) with (i - 1) in Hij by flia His Hies.
+          replace (j - S s + s) with (j - 1) in Hij by flia Hjs Hjes.
           do 2 rewrite fold_vect_el in Hij.
-          f_equal.
-          now apply Hp2.
+          apply Hp2 in Hij; [ | flia Hi | flia Hj ].
+          flia Hij His Hjs Hies Hjes.
         }
-      }
       }
     }
     apply filter_In.
-    split; [ | apply Nat.eqb_refl ].
-    apply Hsurj; [ now cbn; f_equal | easy ].
+    unfold lv; cbn.
+    split. {
+      apply Hsurj; [ cbn | easy ].
+      rewrite app_length; cbn.
+      rewrite firstn_length, skipn_length.
+      rewrite fold_vect_size.
+      rewrite min_l; [ | flia Hs Hv ].
+      rewrite Hv; flia Hs.
+    } {
+      rewrite app_nth2; [ | rewrite firstn_length; flia ].
+      rewrite firstn_length, fold_vect_size, Hv.
+      rewrite Nat.min_l; [ | flia Hs ].
+      rewrite Nat.sub_diag; cbn.
+      apply Nat.eqb_refl.
+    }
   }
 }
-specialize (H1 H); clear H.
-unfold vv', ll2, ll1 in H1.
-cbn - [ fact ] in H1.
-rewrite map_length in H1.
-Search (length (filter _ _)).
-...
-Theorem glkdfjsfl :
-  ∀ n vv i j, is_sym_gr_vect n vv → i < n → j < n →
-  length (filter (λ v, vect_el 0 v 0 =? i) (vect_list vv)) =
-  length (filter (λ v, vect_el 0 v 0 =? j) (vect_list vv)).
-...
-  H1 : length (filter (λ v : vector nat, vect_el 0 v 0 =? S n) (vect_list vv)) = (S n)!
-...
-destruct Hsg as (Hsg & Hinj & Hsurj).
-...
-destruct vv as (lv); cbn - [ fact ] in *.
-...
-    specialize (Hsurj empty_vect).
-    assert (H : is_permut_vect 0 empty_vect) by easy.
-    specialize (Hsurj H); clear H.
-    destruct Hsurj as (i, Hi).
-    unfold vect_el in Hi.
-    destruct vv as (lv).
-    cbn in Hi.
-    unfold empty_vect in Hi.
-    destruct lv as [| v]. {
-      cbn in Hi.
+assert (Hsv : ∀ s, s < S (S n) → vect_size (vv' s) = (S n)!). {
+  intros s Hs.
+  now apply IHn, Hss.
+}
 ...
 
 Definition is_sym_gr_vect n (vv : vector (vector nat)) :=
