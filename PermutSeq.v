@@ -1488,6 +1488,13 @@ assert (Hsv : ∀ s, s < S (S n) → vect_size (vv' s) = (S n)!). {
   intros s Hs.
   now apply IHn, Hss.
 }
+set (insert := λ l s, firstn s l ++ S n :: skipn s l).
+assert
+  (H : ∀ v s,
+   is_permut_vect v
+   → vect_size v = S n
+   → mk_vect (insert (vect_list v) s) ∈ vect_list vv). {
+  intros * Hv Hs.
 ...
 
 Definition is_sym_gr_vect n (vv : vector (vector nat)) :=
