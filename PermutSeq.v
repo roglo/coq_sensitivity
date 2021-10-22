@@ -1380,6 +1380,75 @@ assert (H : ∀ s, s < S (S n) → is_sym_gr_vect (S n) (vv' s)). {
         }
       } {
         intros i j Hi Hj Hij.
+(**)
+        do 2 rewrite List_app_nth in Hij.
+        rewrite firstn_length, fold_vect_size, Hv in Hij.
+        rewrite Nat.min_l in Hij; [ | flia Hs ].
+        do 2 rewrite if_ltb_lt_dec in Hij.
+        destruct (lt_dec i s) as [His| His]. {
+          rewrite List_nth_firstn in Hij; [ | easy ].
+          destruct (lt_dec j s) as [Hjs| Hjs]. {
+            rewrite List_nth_firstn in Hij; [ | easy ].
+            do 2 rewrite fold_vect_el in Hij.
+            apply Hp2; [ flia His Hs | flia Hjs Hs | easy ].
+          }
+          apply Nat.nlt_ge in Hjs.
+          destruct (Nat.eq_dec j s) as [Hjes| Hjes]. {
+            subst s.
+            rewrite Nat.sub_diag in Hij; cbn in Hij.
+            rewrite fold_vect_el in Hij.
+            specialize (Hp1 i) as H1.
+            assert (H : i < S n) by flia His Hs.
+            specialize (H1 H); clear H.
+            rewrite Hij in H1; flia H1.
+          }
+          replace (j - s) with (S (j - S s)) in Hij by flia Hjs Hjes.
+          cbn in Hij.
+          rewrite List_nth_skipn in Hij.
+          replace (j - S s + s) with (j - 1) in Hij by flia Hjs Hjes.
+          apply Hp2 in Hij; [ | flia His Hs | flia Hj ].
+          flia His Hjs Hij Hjes.
+        } {
+          apply Nat.nlt_ge in His.
+          destruct (lt_dec j s) as [Hjs| Hjs]. {
+            rewrite List_nth_firstn in Hij; [ | easy ].
+            rewrite fold_vect_el in Hij.
+            destruct (Nat.eq_dec i s) as [Hies| Hies]. {
+              subst s; rewrite Nat.sub_diag in Hij; cbn in Hij.
+              specialize (Hp1 j) as H1.
+              assert (H : j < S n) by flia Hjs Hs.
+              specialize (H1 H); clear H.
+              rewrite <- Hij in H1; flia H1.
+            }
+            replace (i - s) with (S (i - S s)) in Hij by flia His Hies.
+            cbn in Hij.
+            rewrite List_nth_skipn in Hij.
+            replace (i - S s + s) with (i - 1) in Hij by flia His Hies.
+            rewrite fold_vect_el in Hij.
+            apply Hp2 in Hij; [ | flia Hi | flia Hjs Hs ].
+            flia His Hjs Hij Hies.
+          }
+          apply Nat.nlt_ge in Hjs.
+          destruct (Nat.eq_dec i s) as [Hies| Hies]. {
+            subst s; rewrite Nat.sub_diag in Hij.
+            remember (nth (j - i)) as f; cbn in Hij; subst f.
+            destruct (Nat.eq_dec i j) as [Hiej| Hiej]; [ easy | ].
+            replace (j - i) with (S (j - S i)) in Hij by flia Hjs Hiej.
+            cbn in Hij.
+            rewrite List_nth_skipn in Hij.
+            replace (j - S i + i) with (j - 1) in Hij by flia Hjs Hiej.
+            rewrite fold_vect_el in Hij.
+...
+            specialize (Hp2 i (j - 1)) as H1.
+            assert (H : i < S n) by flia Hjs Hj Hiej.
+            specialize (H1 H); clear H.
+            assert (H : j - 1 < S n) by flia Hj.
+            specialize (H1 H); clear H.
+            rewrite <- Hij in H1.
+...
+            apply Hp2 in Hij; [ | flia Hi | flia Hjs Hs ].
+            flia His Hjs Hij Hies.
+            remember (j - i) as x; cbn in Hij; subst x.
 ...
         destruct (Nat.lt_trichotomy i s) as [His| [His| His]]. {
           rewrite app_nth1 in Hij. 2: {
