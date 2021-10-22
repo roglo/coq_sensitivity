@@ -587,6 +587,32 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
     apply length_zero_iff_nil in Hszg.
     now rewrite Hszg in H1.
   }
+  destruct (Nat.eq_dec (vect_size sg) 1) as [Hsg1| Hsg1]. 2: {
+    remember (vect_size sg) as n eqn:Hn.
+    symmetry in Hn.
+    destruct n; [ easy | ].
+    destruct n; [ easy | ].
+    clear Hszg Hsg1.
+    apply In_nth with (d := empty_vect) in H1.
+    destruct H1 as (j & Hj & Hjv).
+    rewrite fold_vect_size in Hj.
+    rewrite Hn in Hj.
+    specialize (Hinj 0 j (Nat.lt_0_succ _) Hj) as H2.
+    rewrite fold_vect_el in Hjv.
+    destruct j; [ easy | ].
+    rewrite Hjv in H2.
+    assert (H : v = empty_vect). {
+      unfold vect_size in Hnz.
+      apply length_zero_iff_nil in Hnz.
+      destruct v as (l).
+      now cbn in Hnz; subst l.
+    }
+    move H at top; subst v; cbn in *.
+...
+    assert (H : 1 < S (S n)) by flia.
+    specialize (H2 H); clear H.
+
+...
   specialize (Hsg 0) as H2.
   assert (H : 0 < vect_size sg) by flia Hszg.
   specialize (H2 H); clear H.
