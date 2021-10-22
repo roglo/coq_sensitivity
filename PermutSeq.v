@@ -509,6 +509,22 @@ revert H.
 now apply list_eqb_neq.
 Qed.
 
+Theorem rank_of_permut_in_sym_gr_lt : ∀ sg v,
+  rank_of_permut_in_sym_gr sg v < vect_size sg.
+Proof.
+intros .
+unfold rank_of_permut_in_sym_gr.
+unfold unsome.
+remember (List_find_nth _ _) as i eqn:Hi; symmetry in Hi.
+destruct i as [i| ]. {
+  apply List_find_nth_Some with (d := empty_vect) in Hi.
+  destruct Hi as (Hji, Hi).
+  apply vect_eqb_eq in Hi.
+  rewrite fold_vect_el in Hi.
+...
+
+(* *)
+
 Theorem glop : ∀ n vv, is_sym_gr_vect n vv → vect_size vv = n!.
 Proof.
 intros * Hsg.
@@ -1079,7 +1095,6 @@ assert (Hss : ∀ s, s < S (S n) → is_sym_gr_vect (S n) (vv' s)). {
     }
   }
 }
-...
 assert (Hsv : ∀ s, s < S (S n) → vect_size (vv' s) = (S n)!). {
   intros s Hs.
   now apply IHn, Hss.
@@ -1093,6 +1108,19 @@ assert
   intros * Hv Hs.
   remember (mk_vect (insert (vect_list v) s)) as v' eqn:Hv'.
   remember (rank_of_permut_in_sym_gr vv v') as i eqn:Hi.
+Theorem vect_el_rank_of_permut_in_sym_gr : ∀ vv v,
+  vect_el empty_vect vv (rank_of_permut_in_sym_gr vv v) = v.
+Admitted.
+specialize (vect_el_rank_of_permut_in_sym_gr vv v') as H1.
+rewrite <- Hi in H1.
+rewrite <- H1.
+unfold vect_el.
+apply nth_In.
+rewrite fold_vect_size.
+rewrite Hi.
+...
+apply rank_of_permut_in_sym_gr_lt.
+...
   unfold rank_of_permut_in_sym_gr in Hi.
   unfold unsome in Hi.
   remember (List_find_nth (vect_eqb Nat.eqb v') (vect_list vv)) as j eqn:Hj.
@@ -1146,13 +1174,6 @@ Qed.
 
 Definition rank_of_permut_in_canon_sym_gr_vect n (v : vector nat) : nat :=
   rank_of_permut_in_canon_sym_gr n (vect_el 0 v).
-
-(*
-Theorem fold_rank_of_permut_in_sym_gr_vect' : ∀ n f,
-  rank_of_permut_in_sym_gr n f =
-  rank_of_permut_in_sym_gr_vect (mk_vect n f).
-Proof. easy. Qed.
-*)
 
 Theorem permut_elem_ub : ∀ n k i,
   k < n!
