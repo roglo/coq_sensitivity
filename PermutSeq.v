@@ -525,28 +525,18 @@ Proof.
 intros * Hnz Hsg.
 remember (is_permut_vect_bool v) as b eqn:Hb.
 symmetry in Hb.
-(*
-destruct b. 2: {
-  unfold is_permut_vect_bool in Hb.
-  unfold is_permut_fun_bool in Hb.
-  apply andb_false_iff in Hb.
-  destruct Hb as [Hb| Hb]. {
-Search (⋀ (_ = _, _), _ = false).
-*)
 destruct b. {
   apply is_permut_vect_is_permut_vect_bool in Hb.
-(**)
   unfold rank_of_permut_in_sym_gr.
   unfold unsome.
   remember (List_find_nth _ _) as i eqn:Hi; symmetry in Hi.
-  destruct i as [i| ]. {
-(*
-    apply List_find_nth_Some with (d := empty_vect) in Hi.
-Print List_find_nth_loop.
-*)
-...
-now apply List_find_nth_lt in Hi.
-
+  destruct i as [i| ]; [ now apply List_find_nth_lt in Hi | ].
+  specialize (List_find_nth_None empty_vect _ _ Hi) as H1.
+  rewrite fold_vect_size in H1.
+  destruct (lt_dec 0 (vect_size sg)) as [Hs| Hs]; [ easy | ].
+  apply Nat.nlt_ge in Hs; exfalso.
+  apply Nat.le_0_r in Hs.
+  destruct Hsg as (Hsg & Hinj & Hsurj).
 ...
     destruct Hi as (Hji, Hi).
     apply vect_eqb_eq in Hi.

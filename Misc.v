@@ -1925,7 +1925,7 @@ destruct r as [a| ]. {
 }
 Qed.
 
-Theorem List_find_nth_loop_lt : ∀ A f (l : list A) i j,
+Theorem List_find_nth_loop_Some_lt : ∀ A f (l : list A) i j,
   List_find_nth_loop i f l = Some j → j < i + length l.
 Proof.
 intros * Hij.
@@ -1940,7 +1940,7 @@ rewrite <- Nat.add_succ_comm.
 now apply IHl.
 Qed.
 
-Theorem List_find_nth_lt : ∀ A f (l : list A) i,
+Theorem List_find_nth_Some_lt : ∀ A f (l : list A) i,
   List_find_nth f l = Some i → i < length l.
 Proof.
 intros * Hi.
