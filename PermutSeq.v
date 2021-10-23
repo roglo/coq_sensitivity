@@ -1153,13 +1153,13 @@ assert (Hsv : ∀ s, s < S (S n) → vect_size (vv' s) = (S n)!). {
   now apply IHn, Hss.
 }
 set (insert := λ l s, firstn s l ++ S n :: skipn s l).
-...
 assert
   (H : ∀ v s,
-   is_permut_vect v
+   s < S (S n)
+   → is_permut_vect v
    → vect_size v = S n
    → mk_vect (insert (vect_list v) s) ∈ vect_list vv). {
-  intros * Hv Hs.
+  intros * Hsn Hv Hs.
   remember (mk_vect (insert (vect_list v) s)) as v' eqn:Hv'.
   remember (rank_of_permut_in_sym_gr vv v') as i eqn:Hi.
   assert (Hv'p : is_permut_vect v'). {
@@ -1169,8 +1169,7 @@ assert
       unfold insert.
       rewrite app_length; cbn.
       rewrite firstn_length, skipn_length.
-      rewrite fold_vect_size.
-Search s.
+      rewrite fold_vect_size, Hs.
 ...
 ... suite ok
   }
