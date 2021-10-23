@@ -1162,16 +1162,49 @@ assert
   intros * Hsn Hv Hs.
   remember (mk_vect (insert (vect_list v) s)) as v' eqn:Hv'.
   remember (rank_of_permut_in_sym_gr vv v') as i eqn:Hi.
+  assert (Hs' : vect_size v' = S (S n)). {
+    rewrite Hv'; cbn.
+    unfold insert.
+    rewrite app_length; cbn.
+    rewrite firstn_length, skipn_length.
+    rewrite fold_vect_size, Hs.
+    rewrite Nat.min_l; flia Hsn.
+  }
   assert (Hv'p : is_permut_vect v'). {
     split. {
-      intros j Hj.
-      rewrite Hv'; cbn.
-      unfold insert.
-      rewrite app_length; cbn.
-      rewrite firstn_length, skipn_length.
-      rewrite fold_vect_size, Hs.
+      intros j Hj; move j before i.
+      rewrite Hs' in Hj |-*.
+      rewrite Hv'.
+      unfold insert; cbn.
+      rewrite List_app_nth.
+      rewrite firstn_length, fold_vect_size, Hs.
       rewrite Nat.min_l; [ | flia Hsn ].
-      replace (s + S (S n - s)) with (S (S n)) by flia Hsn.
+      rewrite if_ltb_lt_dec.
+      destruct Hv as (Hv1, Hv2).
+      rewrite Hs in Hv1, Hv2.
+      destruct (lt_dec j s) as [Hjs| Hjs]. {
+        rewrite List_nth_firstn; [ | easy ].
+        rewrite fold_vect_el.
+        assert (H : j < S n) by flia Hjs Hsn.
+        specialize (Hv1 j H) as H1.
+        flia H1.
+      } {
+        apply Nat.nlt_ge in Hjs.
+        destruct (Nat.eq_dec s j) as [Hsj| Hsj]. {
+          subst j; rewrite Nat.sub_diag; cbn; flia.
+        }
+        replace (j - s) with (S (j - S s)) by flia Hjs Hsj; cbn.
+        rewrite List_nth_skipn.
+        replace (j - S s + s) with (j - 1) by flia Hjs Hsj.
+        rewrite fold_vect_el.
+        assert (H : j - 1 < S n) by flia Hj.
+        specialize (Hv1 (j - 1) H) as H1.
+        flia H1.
+      }
+    } {
+      intros j k Hj Hk Hjk.
+      rewrite Hs' in Hj, Hk.
+      rewrite Hv' in Hjk; cbn in Hjk.
 ...
 ... suite ok, à voir...
   }
