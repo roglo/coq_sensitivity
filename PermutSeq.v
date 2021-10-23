@@ -1293,6 +1293,11 @@ assert
   rewrite Hi.
   now apply rank_of_permut_in_sym_gr_lt with (n := S (S n)).
 }
+assert
+  (Hk : ∀ v s1 s2, s1 < S (S n) → s2 < S (S n) →
+   is_permut_vect v → vect_size v = S n →
+   mk_vect (insert (vect_list v) s1)...
+(* ouais, chais pas trop... *)
 ...
 
 (* *)
