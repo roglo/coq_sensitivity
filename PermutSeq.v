@@ -564,6 +564,14 @@ destruct i as [i| ]. {
   destruct Hi as (Hji, Hi).
   now apply vect_eqb_eq in Hi.
 }
+exfalso.
+assert (Hne : ∀ j, j < vect_size sg → v ≠ vect_el empty_vect sg j). {
+  intros j Hj.
+  specialize (List_find_nth_None empty_vect _ _ Hi Hj) as H.
+  now apply vect_eqb_neq in H.
+}
+clear Hi.
+...
 apply List_find_nth_None with (d := empty_vect) (j := 0) in Hi. 2: {
   rewrite fold_vect_size.
   destruct Hsg as (Hsg & Hinj & Hsurj).
