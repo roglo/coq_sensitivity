@@ -1170,8 +1170,10 @@ assert
       rewrite app_length; cbn.
       rewrite firstn_length, skipn_length.
       rewrite fold_vect_size, Hs.
+      rewrite Nat.min_l; [ | flia Hsn ].
+      replace (s + S (S n - s)) with (S (S n)) by flia Hsn.
 ...
-... suite ok
+... suite ok, à voir...
   }
   assert (Hv's : vect_size v' = S (S n)). {
 ...
