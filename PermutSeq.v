@@ -1205,8 +1205,87 @@ assert
       intros j k Hj Hk Hjk.
       rewrite Hs' in Hj, Hk.
       rewrite Hv' in Hjk; cbn in Hjk.
-...
-... suite ok, à voir...
+      unfold insert in Hjk.
+      do 2 rewrite List_app_nth in Hjk.
+      rewrite firstn_length, fold_vect_size, Hs in Hjk.
+      rewrite Nat.min_l in Hjk; [ | flia Hsn ].
+      do 2 rewrite if_ltb_lt_dec in Hjk.
+      destruct Hv as (Hv1, Hv2).
+      rewrite Hs in Hv1, Hv2.
+      destruct (lt_dec j s) as [Hjs| Hjs]. {
+        rewrite List_nth_firstn in Hjk; [ | easy ].
+        rewrite fold_vect_el in Hjk.
+(**)
+        destruct (lt_dec k s) as [Hks| Hks]. {
+          rewrite List_nth_firstn in Hjk; [ | easy ].
+          rewrite fold_vect_el in Hjk.
+          apply Hv2; [ flia Hjs Hsn | flia Hks Hsn | easy ].
+        } {
+          apply Nat.nlt_ge in Hks.
+          destruct (Nat.eq_dec k s) as [Hsk| Hsk]. {
+            subst k; rewrite Nat.sub_diag in Hjk; cbn in Hjk.
+            assert (H : j < S n) by flia Hjs Hsn.
+            specialize (Hv1 j H) as H1; clear H.
+            rewrite Hjk in H1; flia H1.
+          }
+          replace (k - s) with (S (k - S s)) in Hjk by flia Hks Hsk; cbn in Hjk.
+          rewrite List_nth_skipn in Hjk.
+          replace (k - S s + s) with (k - 1) in Hjk by flia Hks Hsk.
+          rewrite fold_vect_el in Hjk.
+          apply Hv2 in Hjk; [ | flia Hjs Hsn | flia Hk ].
+          flia Hjs Hks Hjk Hsk.
+        }
+      } {
+        apply Nat.nlt_ge in Hjs.
+        destruct (Nat.eq_dec j s) as [Hsj| Hsj]. {
+          subst j; rewrite Nat.sub_diag in Hjk.
+          remember (nth (k - s)) as f; cbn in Hjk; subst f.
+          symmetry in Hjk.
+          destruct (lt_dec k s) as [Hks| Hks]. {
+            rewrite List_nth_firstn in Hjk; [ | easy ].
+            rewrite fold_vect_el in Hjk.
+            assert (H : k < S n) by flia Hks Hsn.
+            specialize (Hv1 k H) as H1; clear H.
+            rewrite Hjk in H1; flia H1.
+          }
+          apply Nat.nlt_ge in Hks.
+          destruct (Nat.eq_dec s k) as [Hsk| Hsk]; [ easy | ].
+          replace (k - s) with (S (k - S s)) in Hjk by flia Hks Hsk.
+          cbn in Hjk.
+          rewrite List_nth_skipn in Hjk.
+          rewrite fold_vect_el in Hjk.
+          replace (k - S s + s) with (k - 1) in Hjk by flia Hks Hsk.
+          assert (H : k - 1 < S n) by flia Hk.
+          specialize (Hv1 (k - 1) H) as H1.
+          rewrite Hjk in H1; flia H1.
+        }
+        replace (j - s) with (S (j - S s)) in Hjk by flia Hjs Hsj.
+        remember (nth (k - s)) as f; cbn in Hjk; subst f.
+        rewrite List_nth_skipn in Hjk.
+        replace (j - S s + s) with (j - 1) in Hjk by flia Hjs Hsj.
+        rewrite fold_vect_el in Hjk.
+        destruct (lt_dec k s) as [Hks| Hks]. {
+          rewrite List_nth_firstn in Hjk; [ | easy ].
+          rewrite fold_vect_el in Hjk.
+          apply Hv2 in Hjk; [ | flia Hj | flia Hks Hsn ].
+          flia Hjs Hks Hjk Hsj.
+        } {
+          apply Nat.nlt_ge in Hks.
+          destruct (Nat.eq_dec k s) as [Hsk| Hsk]. {
+            subst k; rewrite Nat.sub_diag in Hjk; cbn in Hjk.
+            assert (H : j - 1 < S n) by flia Hj.
+            specialize (Hv1 (j - 1) H) as H1; clear H.
+            rewrite Hjk in H1; flia H1.
+          }
+          replace (k - s) with (S (k - S s)) in Hjk by flia Hks Hsk; cbn in Hjk.
+          rewrite List_nth_skipn in Hjk.
+          replace (k - S s + s) with (k - 1) in Hjk by flia Hks Hsk.
+          rewrite fold_vect_el in Hjk.
+          apply Hv2 in Hjk; [ | flia Hj | flia Hk ].
+          flia Hjk Hjs Hsj Hks Hsk.
+        }
+      }
+    }
   }
   assert (Hv's : vect_size v' = S (S n)). {
 ...
