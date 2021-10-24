@@ -1298,7 +1298,8 @@ Fixpoint Intersect A (la lb : list A) :=
   | [] => False
   end.
 Definition is_partition_of A (s : list A) (p : list (list A)) :=
-  Permutation (concat p) s ∧ ∀ i j d, Intersect (nth i p d) (nth j p d) → i = j.
+  Permutation (concat p) s ∧
+  ∀ i j d, Intersect (nth i p d) (nth j p d) → i = j.
 ...
 assert
   (∀ sg', is_sym_gr_vect (S n) sg' →
