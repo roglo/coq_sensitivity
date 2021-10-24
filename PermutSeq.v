@@ -1293,6 +1293,16 @@ assert
   rewrite Hi.
   now apply rank_of_permut_in_sym_gr_lt with (n := S (S n)).
 }
+Fixpoint Intersect A (la lb : list A) :=
+  match la with
+  | a :: la' => a ∈ lb ∨ Intersect la' lb
+  | [] => False
+  end.
+Definition is_partition_of A (s : list A) (p : list (list A)) :=
+  Permutation (concat p) s ∧ ∀ i j d, Intersect (nth i p d) (nth j p d) → i = j.
+assert
+  (is_partition_of (map vect_list (vect_list sg)) (map (λ i, insert (...
+...
 assert
   (Hk : ∀ v s1 s2, s1 < S (S n) → s2 < S (S n) →
    is_permut_vect v → vect_size v = S n →
