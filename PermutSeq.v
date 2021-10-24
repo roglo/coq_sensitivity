@@ -1301,7 +1301,7 @@ Fixpoint Intersect A (la lb : list A) :=
 Definition is_partition_of A (s : list A) (p : list (list A)) :=
   Permutation (concat p) s ∧ ∀ i j d, Intersect (nth i p d) (nth j p d) → i = j.
 assert
-  (is_partition_of (map vect_list (vect_list sg)) (map (λ i, insert (...
+  (is_partition_of (map vect_list (vect_list sg)) (map (λ i, insert (...))
 ...
 assert
   (Hk : ∀ v s1 s2, s1 < S (S n) → s2 < S (S n) →
