@@ -2409,6 +2409,12 @@ Qed.
 
 (* end replace_at *)
 
+(* insert in a list *)
+
+Definition insert_at A k (la : list A) e := firstn k la ++ e :: skipn k la.
+
+(* end insert_at *)
+
 (* list_eqb *)
 
 Fixpoint list_eqb A (eqb : A → A → bool) la lb :=

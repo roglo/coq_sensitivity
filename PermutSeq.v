@@ -1150,19 +1150,18 @@ assert (Hsv : ∀ s, s < S (S n) → vect_size (sg' s) = (S n)!). {
   intros s Hs.
   now apply IHn, Hss.
 }
-set (insert := λ l s, firstn s l ++ S n :: skipn s l).
 assert
   (Hvs : ∀ v s,
    s < S (S n)
    → is_permut_vect v
    → vect_size v = S n
-   → mk_vect (insert (vect_list v) s) ∈ vect_list sg). {
+   → mk_vect (insert_at s (vect_list v) (S n)) ∈ vect_list sg). {
   intros * Hsn Hv Hs.
-  remember (mk_vect (insert (vect_list v) s)) as v' eqn:Hv'.
+  remember (mk_vect (insert_at s (vect_list v) (S n))) as v' eqn:Hv'.
   remember (rank_of_permut_in_sym_gr sg v') as i eqn:Hi.
   assert (Hs' : vect_size v' = S (S n)). {
     rewrite Hv'; cbn.
-    unfold insert.
+    unfold insert_at.
     rewrite app_length; cbn.
     rewrite firstn_length, skipn_length.
     rewrite fold_vect_size, Hs.
@@ -1173,7 +1172,7 @@ assert
       intros j Hj; move j before i.
       rewrite Hs' in Hj |-*.
       rewrite Hv'.
-      unfold insert; cbn.
+      unfold insert_at; cbn.
       rewrite List_app_nth.
       rewrite firstn_length, fold_vect_size, Hs.
       rewrite Nat.min_l; [ | flia Hsn ].
@@ -1203,7 +1202,7 @@ assert
       intros j k Hj Hk Hjk.
       rewrite Hs' in Hj, Hk.
       rewrite Hv' in Hjk; cbn in Hjk.
-      unfold insert in Hjk.
+      unfold insert_at in Hjk.
       do 2 rewrite List_app_nth in Hjk.
       rewrite firstn_length, fold_vect_size, Hs in Hjk.
       rewrite Nat.min_l in Hjk; [ | flia Hsn ].
