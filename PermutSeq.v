@@ -669,7 +669,7 @@ induction n; intros. {
 set (ll2 := λ n lv s, map (λ v, mk_vect (butn s (vect_list v))) (select_in_list_vect n lv s)).
 set (sg' := λ n sg s, mk_vect (ll2 (S n) (vect_list sg) s)).
 assert
-  (Hselect_in_list_vectv : ∀ n sg s, is_sym_gr_vect (S (S n)) sg →
+  (Hll1 : ∀ n sg s, is_sym_gr_vect (S (S n)) sg →
    length (select_in_list_vect (S n) (vect_list sg) s) ≤ vect_size sg). {
   clear sg Hsg n IHn.
   intros * Hsg.
