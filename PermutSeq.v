@@ -1300,6 +1300,10 @@ Fixpoint Intersect A (la lb : list A) :=
 Definition is_partition_of A (s : list A) (p : list (list A)) :=
   Permutation (concat p) s ∧
   ∀ i j d, Intersect (nth i p d) (nth j p d) → i = j.
+Print remove.
+set (f := λ i, mk_vect (remove Nat.eq_dec (S n) (vect_list (vect_el empty_vect sg i)))).
+(* est-ce que tous ces "sg' s" ne sont pas égaux, quel que soit s, après tout ?
+   oui, bien sûr, à une permutation près *)
 ...
 assert
   (∀ sg', is_sym_gr_vect (S n) sg' →
