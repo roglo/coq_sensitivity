@@ -578,6 +578,9 @@ Qed.
 
 (* *)
 
+(* selecting all vectors in lv having "n" at some position "s" *)
+Definition select_in_list_vect n lv s := filter (λ v, vect_el 0 v s =? n) lv.
+
 Theorem glop : ∀ n sg, is_sym_gr_vect n sg → vect_size sg = n!.
 Proof.
 intros * Hsg.
@@ -662,17 +665,15 @@ induction n; intros. {
   }
   now specialize (Hinj H).
 }
-(* selecting all permutations of sg having "n" at some position "s" *)
-set (ll1 := λ n sg s, filter (λ v, vect_el 0 v s =? n) (vect_list sg)).
-(* removing that element (which is "n") *)
-set (ll2 := λ n sg s, map (λ v, mk_vect (butn s (vect_list v))) (ll1 n sg s)).
-set (sg' := λ n sg s, mk_vect (ll2 (S n) sg s)).
+(* selecting all vectors in lv, equal to "n" at position "s", and removing it *)
+set (ll2 := λ n lv s, map (λ v, mk_vect (butn s (vect_list v))) (select_in_list_vect n lv s)).
+set (sg' := λ n sg s, mk_vect (ll2 (S n) (vect_list sg) s)).
 assert
-  (Hll1v : ∀ n sg s, is_sym_gr_vect (S (S n)) sg →
-   length (ll1 (S n) sg s) ≤ vect_size sg). {
+  (Hselect_in_list_vectv : ∀ n sg s, is_sym_gr_vect (S (S n)) sg →
+   length (select_in_list_vect (S n) (vect_list sg) s) ≤ vect_size sg). {
   clear sg Hsg n IHn.
   intros * Hsg.
-  unfold ll1.
+  unfold select_in_list_vect.
   rewrite List_length_filter_negb; [ rewrite fold_vect_size; flia | ].
 (* faudrait peut-être que j'utilise NoDup, tout simplement, dans ma définition
    de Hinj ? *)
@@ -682,7 +683,7 @@ assert
   remember (vect_list sg) as ll; clear sg Heqll.
   now apply NoDup_nth in Hinj.
 }
-assert (Hsgv : ∀ n sg s, vect_size (sg' n sg s) = length (ll1 (S n) sg s)). {
+assert (Hsgv : ∀ n sg s, vect_size (sg' n sg s) = length (select_in_list_vect (S n) (vect_list sg) s)). {
   intros.
   unfold sg', ll2; cbn.
   now rewrite map_length.
@@ -704,10 +705,10 @@ assert
           now destruct Hsg as (H2, H3).
         }
         destruct lv as [| v2]. {
-          unfold sg', ll2, ll1 in Hi; cbn in Hi.
+          unfold sg', ll2, select_in_list_vect in Hi; cbn in Hi.
           now rewrite map_length in Hi.
         }
-        unfold sg', ll2, ll1 in Hi; cbn in Hi.
+        unfold sg', ll2, select_in_list_vect in Hi; cbn in Hi.
         now rewrite map_length in Hi.
       }
       cbn.
@@ -721,7 +722,7 @@ assert
         intros j Hj.
         now specialize (Hsg j Hj) as H2.
       }
-      unfold ll1.
+      unfold select_in_list_vect.
       unfold vect_el.
       specialize List_list_length_nth_filter as H2.
       specialize (H2 _ (map (@vect_list nat) (vect_list sg))).
@@ -740,8 +741,7 @@ assert
       specialize (H2 i).
       rewrite List_filter_map in H2.
       rewrite map_length in H2.
-      unfold vect_el in ll1.
-      fold (ll1 (S n) sg s) in H2 |-*.
+      fold (select_in_list_vect (S n) (vect_list sg) s) in H2 |-*.
       specialize (H2 Hi).
       rewrite (List_map_nth' empty_vect) in H2; [ | easy ].
       rewrite H2.
@@ -759,9 +759,9 @@ assert
     unfold is_permut_vect; cbn.
     rewrite butn_length.
     assert
-      (Hl : length (vect_list (nth i (ll1 (S n) sg s) empty_vect)) = S (S n)). {
+      (Hl : length (vect_list (nth i (select_in_list_vect (S n) (vect_list sg) s) empty_vect)) = S (S n)). {
       intros.
-      unfold ll1.
+      unfold select_in_list_vect.
       specialize List_length_filter_nth as H2.
       specialize (H2 (vector nat)).
       specialize (H2 empty_vect).
@@ -784,7 +784,7 @@ assert
       specialize (H2 (vect_list sg)).
       specialize (H2 _ _ Hi).
       destruct H2 as (k & Hkl & Hk & Hik & Hij).
-      unfold ll1 in Hl |-*.
+      unfold select_in_list_vect in Hl |-*.
       rewrite Hik in Hl |-*.
       rewrite fold_vect_el in Hl |-*.
       specialize (Hsg k Hkl) as H2.
@@ -866,7 +866,7 @@ assert
       specialize (H2 empty_vect).
       specialize (H2 (vect_list sg)).
       specialize (H2 (λ v, vect_el 0 v s =? S n)).
-      fold (ll1 (S n) sg s) in H2; cbn in H2.
+      fold (select_in_list_vect (S n) (vect_list sg) s) in H2; cbn in H2.
       specialize (H2 _ Hi).
       destruct H2 as (p & Hpl & Hp & Hip & Hij).
       rewrite Hip in Hjk.
@@ -918,7 +918,7 @@ assert
     specialize (H2 empty_vect).
     specialize (H2 (vect_list sg)).
     specialize (H2 (λ v, vect_el 0 v s =? S n)).
-    fold (ll1 (S n) sg s) in H2; cbn in H2.
+    fold (select_in_list_vect (S n) (vect_list sg) s) in H2; cbn in H2.
     rewrite Hsgv in Hi, Hj.
     specialize (H2 _ Hi) as H3.
     specialize (H2 _ Hj) as H4.
@@ -970,7 +970,7 @@ assert
     unfold sg'; cbn.
     unfold ll2.
     apply in_map_iff.
-    unfold ll1.
+    unfold select_in_list_vect.
     destruct Hp as (Hp1, Hp2).
     rewrite Hv in Hp1, Hp2.
     destruct Hsg as (Hsg & Hinj & Hsurj).
