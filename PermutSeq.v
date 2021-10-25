@@ -662,14 +662,14 @@ induction n; intros. {
   }
   now specialize (Hinj H).
 }
-(* selecting all permutations of sg having "S n" at some position "s" *)
-set (ll1 := λ n sg s, filter (λ v, vect_el 0 v s =? S n) (vect_list sg)).
-(* removing that element (which is "S n") *)
+(* selecting all permutations of sg having "n" at some position "s" *)
+set (ll1 := λ n sg s, filter (λ v, vect_el 0 v s =? n) (vect_list sg)).
+(* removing that element (which is "n") *)
 set (ll2 := λ n sg s, map (λ v, mk_vect (butn s (vect_list v))) (ll1 n sg s)).
-set (sg' := λ n sg s, mk_vect (ll2 n sg s)).
+set (sg' := λ n sg s, mk_vect (ll2 (S n) sg s)).
 assert
   (Hll1v : ∀ n sg s, is_sym_gr_vect (S (S n)) sg →
-   length (ll1 n sg s) ≤ vect_size sg). {
+   length (ll1 (S n) sg s) ≤ vect_size sg). {
   clear sg Hsg n IHn.
   intros * Hsg.
   unfold ll1.
@@ -682,7 +682,7 @@ assert
   remember (vect_list sg) as ll; clear sg Heqll.
   now apply NoDup_nth in Hinj.
 }
-assert (Hsgv : ∀ n sg s, vect_size (sg' n sg s) = length (ll1 n sg s)). {
+assert (Hsgv : ∀ n sg s, vect_size (sg' n sg s) = length (ll1 (S n) sg s)). {
   intros.
   unfold sg', ll2; cbn.
   now rewrite map_length.
@@ -741,7 +741,7 @@ assert
       rewrite List_filter_map in H2.
       rewrite map_length in H2.
       unfold vect_el in ll1.
-      fold ll1 in H2 |-*.
+      fold (ll1 (S n) sg s) in H2 |-*.
       specialize (H2 Hi).
       rewrite (List_map_nth' empty_vect) in H2; [ | easy ].
       rewrite H2.
@@ -759,7 +759,7 @@ assert
     unfold is_permut_vect; cbn.
     rewrite butn_length.
     assert
-      (Hl : length (vect_list (nth i (ll1 n sg s) empty_vect)) = S (S n)). {
+      (Hl : length (vect_list (nth i (ll1 (S n) sg s) empty_vect)) = S (S n)). {
       intros.
       unfold ll1.
       specialize List_length_filter_nth as H2.
@@ -866,7 +866,7 @@ assert
       specialize (H2 empty_vect).
       specialize (H2 (vect_list sg)).
       specialize (H2 (λ v, vect_el 0 v s =? S n)).
-      fold (ll1 n sg s) in H2; cbn in H2.
+      fold (ll1 (S n) sg s) in H2; cbn in H2.
       specialize (H2 _ Hi).
       destruct H2 as (p & Hpl & Hp & Hip & Hij).
       rewrite Hip in Hjk.
@@ -918,7 +918,7 @@ assert
     specialize (H2 empty_vect).
     specialize (H2 (vect_list sg)).
     specialize (H2 (λ v, vect_el 0 v s =? S n)).
-    fold (ll1 n sg s) in H2; cbn in H2.
+    fold (ll1 (S n) sg s) in H2; cbn in H2.
     rewrite Hsgv in Hi, Hj.
     specialize (H2 _ Hi) as H3.
     specialize (H2 _ Hj) as H4.
@@ -1299,6 +1299,7 @@ assert
   rewrite Hi.
   now apply rank_of_permut_in_sym_gr_lt with (n := S (S n)).
 }
+...
 Fixpoint Intersect A (la lb : list A) :=
   match la with
   | a :: la' => a ∈ lb ∨ Intersect la' lb
