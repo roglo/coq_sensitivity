@@ -663,11 +663,11 @@ induction n; intros. {
   now specialize (Hinj H).
 }
 (* selecting all permutations of sg having "S n" at some position "s" *)
-set (ll1 := λ sg s, filter (λ v, vect_el 0 v s =? S n) (vect_list sg)).
+set (ll1 := λ s, filter (λ v, vect_el 0 v s =? S n) (vect_list sg)).
 (* removing that element (which is "S n") *)
-set (ll2 := λ sg s, map (λ v, mk_vect (butn s (vect_list v))) (ll1 sg s)).
-set (sg' := λ sg s, mk_vect (ll2 sg s)).
-assert (Hll1v : ∀ s, length (ll1 sg s) ≤ vect_size sg). {
+set (ll2 := λ s, map (λ v, mk_vect (butn s (vect_list v))) (ll1 s)).
+set (sg' := λ s, mk_vect (ll2 s)).
+assert (Hll1v : ∀ s, length (ll1 s) ≤ vect_size sg). {
   intros.
   unfold ll1.
   rewrite List_length_filter_negb; [ rewrite fold_vect_size; flia | ].
@@ -679,12 +679,12 @@ assert (Hll1v : ∀ s, length (ll1 sg s) ≤ vect_size sg). {
   remember (vect_list sg) as ll; clear sg Heqll.
   now apply NoDup_nth in Hinj.
 }
-assert (Hsgv : ∀ s, vect_size (sg' sg s) = length (ll1 sg s)). {
+assert (Hsgv : ∀ s, vect_size (sg' s) = length (ll1 s)). {
   intros.
   unfold sg', ll2; cbn.
   now rewrite map_length.
 }
-assert (Hss : ∀ s, s < S (S n) → is_sym_gr_vect (S n) (sg' sg s)). {
+assert (Hss : ∀ s, s < S (S n) → is_sym_gr_vect (S n) (sg' s)). {
   intros s Hs.
   split. {
     intros i Hi; cbn.
@@ -753,7 +753,7 @@ assert (Hss : ∀ s, s < S (S n) → is_sym_gr_vect (S n) (sg' sg s)). {
     unfold is_permut_vect; cbn.
     rewrite butn_length.
     assert
-      (Hl : length (vect_list (nth i (ll1 sg s) empty_vect)) = S (S n)). {
+      (Hl : length (vect_list (nth i (ll1 s) empty_vect)) = S (S n)). {
       intros.
       unfold ll1.
       specialize List_length_filter_nth as H2.
@@ -860,7 +860,7 @@ assert (Hss : ∀ s, s < S (S n) → is_sym_gr_vect (S n) (sg' sg s)). {
       specialize (H2 empty_vect).
       specialize (H2 (vect_list sg)).
       specialize (H2 (λ v, vect_el 0 v s =? S n)).
-      fold (ll1 sg s) in H2; cbn in H2.
+      fold (ll1 s) in H2; cbn in H2.
       specialize (H2 _ Hi).
       destruct H2 as (p & Hpl & Hp & Hip & Hij).
       rewrite Hip in Hjk.
@@ -912,7 +912,7 @@ assert (Hss : ∀ s, s < S (S n) → is_sym_gr_vect (S n) (sg' sg s)). {
     specialize (H2 empty_vect).
     specialize (H2 (vect_list sg)).
     specialize (H2 (λ v, vect_el 0 v s =? S n)).
-    fold (ll1 sg s) in H2; cbn in H2.
+    fold (ll1 s) in H2; cbn in H2.
     rewrite Hsgv in Hi, Hj.
     specialize (H2 _ Hi) as H3.
     specialize (H2 _ Hj) as H4.
@@ -1147,7 +1147,7 @@ assert (Hss : ∀ s, s < S (S n) → is_sym_gr_vect (S n) (sg' sg s)). {
     }
   }
 }
-assert (Hsv : ∀ s, s < S (S n) → vect_size (sg' sg s) = (S n)!). {
+assert (Hsv : ∀ s, s < S (S n) → vect_size (sg' s) = (S n)!). {
   intros s Hs.
   now apply IHn, Hss.
 }
@@ -1304,14 +1304,15 @@ Definition is_partition_of A (s : list A) (p : list (list A)) :=
 Print remove.
 Print List_find_nth.
 set
-  (f := λ n sg i,
+  (f := λ n i,
    let s :=
      unsome 42
        (List_find_nth (Nat.eqb n)
           (vect_list (vect_el empty_vect sg i)))
    in
    s).
-Compute (let n := 2 in map (λ i, f n (mk_canon_sym_gr_vect (S n)) i) (seq 0 (n + 1)!)).
+...
+Compute (let n := 2 in map (λ i, f n i) (seq 0 (n + 1)!)).
 ...
 assert
   (∀ sg', is_sym_gr_vect (S n) sg' →
