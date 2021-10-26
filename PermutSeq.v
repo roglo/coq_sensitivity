@@ -665,15 +665,14 @@ induction n; intros. {
   }
   now specialize (Hinj H).
 }
-(* selecting all vectors in lv, equal to "n" at position "s", and removing it *)
+(* selecting all vectors in the symmetry group sg of order n+1, equal to "n"
+   at position "s", and removing it, returning a symmetric group of order n *)
 set
-  (ll2 := λ n lv s,
-   map (mk_vect (T:=nat))
-     (map (λ v, butn s (vect_list v)) (select_in_list_vect n lv s))).
-(*
-set (ll2 := λ n lv s, map (λ v, mk_vect (butn s (vect_list v))) (select_in_list_vect n lv s)).
-*)
-set (sg' := λ n sg s, mk_vect (ll2 (S n) (vect_list sg) s)).
+  (sg' := λ n sg s,
+   mk_vect
+     (map (mk_vect (T:=nat))
+        (map (λ v, butn s (vect_list v))
+           (select_in_list_vect (S n) (vect_list sg) s)))).
 assert
   (Hll1 : ∀ n sg s, is_sym_gr_vect (S (S n)) sg →
    length (select_in_list_vect (S n) (vect_list sg) s) ≤ vect_size sg). {
@@ -689,9 +688,12 @@ assert
   remember (vect_list sg) as ll; clear sg Heqll.
   now apply NoDup_nth in Hinj.
 }
-assert (Hsgv : ∀ n sg s, vect_size (sg' n sg s) = length (select_in_list_vect (S n) (vect_list sg) s)). {
+assert
+  (Hsgv : ∀ n sg s,
+   vect_size (sg' n sg s) =
+   length (select_in_list_vect (S n) (vect_list sg) s)). {
   intros.
-  unfold sg', ll2; cbn.
+  unfold sg'; cbn.
   rewrite map_map.
   now rewrite map_length.
 }
@@ -703,7 +705,7 @@ assert
   split. {
     intros i Hi; cbn.
     split. {
-      unfold sg', ll2; cbn; rewrite map_map.
+      unfold sg'; cbn; rewrite map_map.
       rewrite (List_map_nth' empty_vect). 2: {
         destruct Hsg as (Hsg & Hinj & Hsurj).
         destruct sg as (lv); cbn in Hsg, Hinj, Hsurj |-*.
@@ -712,16 +714,16 @@ assert
           now destruct Hsg as (H2, H3).
         }
         destruct lv as [| v2]. {
-          unfold sg', ll2, select_in_list_vect in Hi; cbn in Hi.
+          unfold sg', select_in_list_vect in Hi; cbn in Hi.
           now rewrite map_map, map_length in Hi.
         }
-        unfold sg', ll2, select_in_list_vect in Hi; cbn in Hi.
+        unfold sg', select_in_list_vect in Hi; cbn in Hi.
         now rewrite map_map, map_length in Hi.
       }
       cbn.
       rewrite butn_length.
       destruct Hsg as (Hsg & Hinj & Hsurj).
-      unfold sg', ll2 in Hi; cbn in Hi.
+      unfold sg' in Hi; cbn in Hi.
       rewrite map_length in Hi.
       assert
         (Hss : ∀ j, j < vect_size sg →
@@ -755,12 +757,12 @@ assert
       now apply Nat.ltb_lt in Hs; rewrite Hs.
     }
     destruct Hsg as (Hsg & Hinj & Hsurj).
-    unfold ll2; rewrite map_map.
+    rewrite map_map.
     rewrite (List_map_nth' empty_vect). 2: {
-      unfold sg', ll2 in Hi; cbn in Hi.
+      unfold sg' in Hi; cbn in Hi.
       now rewrite map_map, map_length in Hi.
     }
-    unfold sg', ll2 in Hi.
+    unfold sg' in Hi.
     cbn in Hi.
     rewrite map_map, map_length in Hi.
     unfold is_permut_vect; cbn.
@@ -919,7 +921,6 @@ assert
     intros i j Hi Hj Hij.
     unfold sg' in Hij.
     cbn in Hij.
-    unfold ll2 in Hij.
     rewrite map_map in Hij.
     rewrite (List_map_nth' empty_vect) in Hij; [ | now rewrite <- Hsgv ].
     rewrite (List_map_nth' empty_vect) in Hij; [ | now rewrite <- Hsgv ].
@@ -980,7 +981,7 @@ assert
   } {
     intros v Hv Hp.
     unfold sg'; cbn.
-    unfold ll2; rewrite map_map.
+    rewrite map_map.
     apply in_map_iff.
     unfold select_in_list_vect.
     destruct Hp as (Hp1, Hp2).
