@@ -1317,7 +1317,6 @@ assert
   rewrite Hi.
   now apply rank_of_permut_in_sym_gr_lt with (n := S (S n)).
 }
-set (f := λ k,
 ...
 Fixpoint Intersect A (la lb : list A) :=
   match la with
