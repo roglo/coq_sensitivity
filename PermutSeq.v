@@ -1331,6 +1331,8 @@ Compute (let n := 3 in mk_canon_sym_gr_vect (S n)).
 Compute (let n := 3 in f n (mk_canon_sym_gr_vect (S n)) 0).
 Compute (let n := 3 in f n (mk_canon_sym_gr_vect (S n)) 1).
 Compute (let n := 3 in f n (mk_canon_sym_gr_vect (S n)) 2).
+(* bof, pas une bijection, alors... *)
+...
 Compute (let n := 3 in f n (mk_canon_sym_gr_vect (S n)) 23).
 Compute (let n := 3 in f n (mk_canon_sym_gr_vect (S n)) 24).
 Compute (let n := 3 in map (λ i, List_find_nth (Nat.eqb n) (vect_list (vect_el empty_vect (mk_canon_sym_gr_vect (S n)) i))) (seq 0 (S n)!)).
