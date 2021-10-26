@@ -1323,8 +1323,8 @@ Print List_find_nth.
 set
   (f := λ n sg k,
    match List_find_nth (Nat.eqb n) (vect_list (vect_el empty_vect sg k)) with
-   | Some s => smaller_sym_gr_by_rem_biggest_at' n sg s
-   | None => empty_vect
+   | Some s => (s, smaller_sym_gr_by_rem_biggest_at' n sg s)
+   | None => (0, empty_vect)
    end).
 Compute (mk_canon_sym_gr_vect 4).
 Compute (let n := 3 in mk_canon_sym_gr_vect (S n)).
