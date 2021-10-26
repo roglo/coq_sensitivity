@@ -1334,11 +1334,11 @@ assert
      k = 15
     result = (2, 5)
    explanation of result: the 15th permutation of sg is [2; 1; 3; 0]
-   (starting from 0), the position of n+2 in that permutation is 2
-   (starting from 0). Therefore the "2" in (2, 5). The sub symmetric
+   (starting from 0), the position of n+1 (=3) in that permutation is
+   2 (starting from 0). Therefore the "2" in (2, 5). The sub symmetric
    group, sg', is
       [[0; 1; 2]; [0; 2; 1]; [1; 0; 2]; [1; 2; 0]; [2; 0; 1]; [2; 1; 0]]
-   and the "5" in (2, 5) is the position of [2; 0; 1] in sg'
+   and the "5" in (2, 5) is the position of [2; 0; 1] in sg'.
 *)
 (* should take a more general example: in that one, above, the symmetric
    group is the canonical one and, therefore, the sub symmetric group
