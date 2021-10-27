@@ -707,7 +707,7 @@ specialize (H1 k Hkn); cbn in H1.
 destruct H1 as (j & Hj & Hjsn & Hkj & Hk).
 rewrite fold_vect_size in Hj.
 apply Nat.eqb_eq in Hjsn.
-rewrite fold_vect_el in Hkj.
+rewrite fold_vect_el in Hjsn, Hkj.
 rewrite Hkj.
 rewrite insert_at_butn. 2: {
   rewrite fold_vect_size.
@@ -716,13 +716,20 @@ rewrite insert_at_butn. 2: {
   destruct H1 as (H1, H2).
   now rewrite <- H1 in Hsn.
 }
-...
-Theorem mk_vect_vect_list : ∀ A (v : vector A), mk_vect (vect_list v) = v.
-Proof. now intros; destruct v. Qed.
+remember (vect_el empty_vect sg j) as p eqn:Hp.
+unfold vect_el in Hjsn.
+remember (vect_list p) as ln eqn:Hln.
+rewrite <- Hjsn at 2.
+cbn - [ skipn ].
+rewrite <- List_split_at_pos. 2: {
+  rewrite Hln; rewrite fold_vect_size; rewrite Hp.
+  destruct Hsg as (Hsg & Hinj & Hsurj).
+  specialize (Hsg j Hj) as H1.
+  destruct H1 as (H1, H2).
+  now rewrite <- H1 in Hsn.
+}
+subst ln p.
 rewrite mk_vect_vect_list.
-unfold rank_of_permut_in_sym_gr.
-unfold sub_sg_rank_of_sg_rank; cbn.
-(* tu parles d'un bordel ! *)
 ...
 
 Theorem glop : ∀ n sg, is_sym_gr_vect n sg → vect_size sg = n!.

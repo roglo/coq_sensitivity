@@ -26,6 +26,9 @@ Theorem fold_vect_size {T} : ∀ (V : vector T),
   length (vect_list V) = vect_size V.
 Proof. easy. Qed.
 
+Theorem mk_vect_vect_list : ∀ A (v : vector A), mk_vect (vect_list v) = v.
+Proof. now intros; destruct v. Qed.
+
 (*
 Compute (list_of_vect (vect_of_list [3;7;2])).
 Compute (vect_of_list [3;7;2]).
