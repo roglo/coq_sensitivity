@@ -827,7 +827,7 @@ destruct i as [i| ]. {
     cbn in Hsg.
     now rewrite His in Hsg.
   }
-  f_equal. {
+  assert (Hsi : i = s). {
     rewrite <- Hjsn in Hi2.
     do 2 rewrite fold_vect_el in Hi2.
     apply Hsg in Hi2; [ easy | easy | | ]. {
@@ -841,6 +841,8 @@ destruct i as [i| ]. {
       now rewrite H2 in His.
     }
   }
+  subst i; f_equal.
+  remember (vect_el empty_vect sg j) as p eqn:Hp.
 ...
 
 Theorem glop : ∀ n sg, is_sym_gr_vect n sg → vect_size sg = n!.
