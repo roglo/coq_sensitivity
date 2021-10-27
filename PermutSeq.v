@@ -705,10 +705,12 @@ specialize (H1 (vect_list sg)).
 specialize (H1 (λ v, vect_el 0 v s =? n)).
 specialize (H1 k Hkn); cbn in H1.
 destruct H1 as (j & Hj & Hjsn & Hkj & Hk).
+rewrite fold_vect_size in Hj.
 apply Nat.eqb_eq in Hjsn.
+rewrite fold_vect_el in Hkj.
 rewrite Hkj.
 rewrite insert_at_butn. 2: {
-  rewrite fold_vect_size, fold_vect_el.
+  rewrite fold_vect_size.
   destruct Hsg as (Hsg & Hinj & Hsurj).
   specialize (Hsg j Hj) as H1.
   destruct H1 as (H1, H2).
