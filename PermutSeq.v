@@ -397,7 +397,7 @@ Compute map (vect_list (T := nat)) (vect_list (mk_canon_sym_gr_vect 4)).
 *)
 
 Definition is_sym_gr n (f : nat → nat → nat) :=
-  (∀ i j, i < n! → j < n! → f i = f j → i = j) ∧
+  (∀ i j, i < n! → j < n! → (∀ k, k < n → f i k = f j k) → i = j) ∧
   (∀ i, i < n! → is_permut_fun (f i) n).
 
 Definition is_sym_gr_vect n (vv : vector (vector nat)) :=
@@ -407,6 +407,12 @@ Definition is_sym_gr_vect n (vv : vector (vector nat)) :=
   (∀ i j, i < vect_size vv → j < vect_size vv →
    vect_el empty_vect vv i = vect_el empty_vect vv j → i = j) ∧
   (∀ v, vect_size v = n → is_permut_vect v → v ∈ vect_list vv).
+
+Definition is_sym_gr_bool n (f : nat → nat → nat) :=
+  ⋀ (i = 1, n!), ⋀ (j = 1, n!),
+     (negb (⋀ (k = 1, n), (f (i - 1) (k - 1) =? f (j - 1) (k - 1))) ||
+      (i =? j)) &&
+  ⋀ (i = 1, n!), is_permut_fun_bool (f (i - 1)) n.
 
 Theorem sym_gr_vect_elem : ∀ n sg,
   is_sym_gr_vect n sg →
@@ -1325,26 +1331,36 @@ assert
    at position s, where this n+1 is removed *)
 (* e.g.
      n = 2
-     sg = [[0; 1; 2; 3]; [0; 1; 3; 2]; [0; 2; 1; 3]; [0; 2; 3; 1];
-           [0; 3; 1; 2]; [0; 3; 2; 1]; [1; 0; 2; 3]; [1; 0; 3; 2];
-           [1; 2; 0; 3]; [1; 2; 3; 0]; [1; 3; 0; 2]; [1; 3; 2; 0];
-           [2; 0; 1; 3]; [2; 0; 3; 1]; [2; 1; 0; 3]; [2; 1; 3; 0];
-           [2; 3; 0; 1]; [2; 3; 1; 0]; [3; 0; 1; 2]; [3; 0; 2; 1];
-           [3; 1; 0; 2]; [3; 1; 2; 0]; [3; 2; 0; 1]; [3; 2; 1; 0]]
+     sg = [[0; 3; 2; 1]; [2; 1; 0; 3]; [2; 0; 1; 3]; [1; 3; 2; 0];
+           [1; 2; 0; 3]; [3; 0; 1; 2]; [0; 1; 2; 3]; [0; 1; 3; 2];
+           [2; 1; 3; 0]; [1; 0; 3; 2]; [0; 2; 1; 3]; [2; 3; 1; 0];
+           [2; 0; 3; 1]; [0; 2; 3; 1]; [2; 3; 0; 1]; [1; 2; 3; 0];
+           [3; 1; 2; 0]; [0; 3; 1; 2]; [1; 0; 2; 3]; [1; 3; 0; 2];
+           [3; 2; 1; 0]; [3; 1; 0; 2]; [3; 0; 2; 1]; [3; 2; 0; 1]].
      k = 15
     result = (2, 5)
-   explanation of result: the 15th permutation of sg is [2; 1; 3; 0]
+   explanation of result: the 15th permutation of sg is [1; 2; 3; 0]
    (starting from 0), the position of n+1 (=3) in that permutation is
    2 (starting from 0). Therefore the "2" in (2, 5). The sub symmetric
    group, sg', is
-      [[0; 1; 2]; [0; 2; 1]; [1; 0; 2]; [1; 2; 0]; [2; 0; 1]; [2; 1; 0]]
-   and the "5" in (2, 5) is the position of [2; 0; 1] in sg'.
+      [[0; 1; 2]; [2; 1; 0]; [1; 0; 2]; [2; 0; 1]; [0; 2; 1]; [1; 2; 0]]
+   and the "5" in (2, 5) is the position of [1; 2; 0] in sg'.
 *)
 (* should take a more general example: in that one, above, the symmetric
    group is the canonical one and, therefore, the sub symmetric group
    is always the canonical one; not general enough. I should take an
    arbitrary symmetric group, not the canonical one *)
-...
+Definition my_sg_list :=
+  [[0; 3; 2; 1]; [2; 1; 0; 3]; [2; 0; 1; 3]; [1; 3; 2; 0];
+   [1; 2; 0; 3]; [3; 0; 1; 2]; [0; 1; 2; 3]; [0; 1; 3; 2];
+   [2; 1; 3; 0]; [1; 0; 3; 2]; [0; 2; 1; 3]; [2; 3; 1; 0];
+   [2; 0; 3; 1]; [0; 2; 3; 1]; [2; 3; 0; 1]; [1; 2; 3; 0];
+   [3; 1; 2; 0]; [0; 3; 1; 2]; [1; 0; 2; 3]; [1; 3; 0; 2];
+   [3; 2; 1; 0]; [3; 1; 0; 2]; [3; 0; 2; 1]; [3; 2; 0; 1]].
+Definition my_sg := mk_vect (map (mk_vect (T:=nat)) my_sg_list).
+(*
+Compute (is_sym_gr_bool 4 (λ i j, nth j (nth i my_sg_list []) 0)).
+*)
 set
   (f := λ n sg k,
    let p := vect_el empty_vect sg k in
@@ -1355,6 +1371,14 @@ set
        (s, unsome 0 (List_find_nth (vect_eqb Nat.eqb p') (vect_list sg')))
    | None => (S n, n!)
    end).
+Compute (let n := 3 in f n my_sg 15).
+Compute (let n := 3 in map (vect_list (T:=nat)) (vect_list (smaller_sym_gr_by_rem_biggest_at n my_sg 2))).
+(*
+Compute (let n := 3 in f n my_sg 0).
+Compute ((let n := 3 in map (λ i, f n (mk_canon_sym_gr_vect (S n)) i) (seq 0 ((S n)! + 3))),
+(let n := 3 in map (λ i, f n my_sg i) (seq 0 ((S n)! + 3)))).
+Compute (let n := 3 in map (vect_list (T:=nat)) (vect_list (smaller_sym_gr_by_rem_biggest_at n (mk_canon_sym_gr_vect (S n)) 2))).
+Compute (let n := 3 in map (vect_list (T:=nat)) (vect_list (smaller_sym_gr_by_rem_biggest_at n my_sg 2))).
 Compute (mk_canon_sym_gr_vect 4).
 Compute (let n := 4 in map (vect_list (T:=nat)) (vect_list (mk_canon_sym_gr_vect n))).
 Compute (let n := 3 in mk_canon_sym_gr_vect (S n)).
@@ -1374,6 +1398,7 @@ Compute (let n := 2 in map (λ i, f n (mk_canon_sym_gr_vect (S n)) i) (seq 0 ((S
 Compute (let n := 3 in map (λ i, f n (mk_canon_sym_gr_vect (S n)) i) (seq 0 ((S n)! + 3))).
 (*
 Compute (let n := 4 in map (λ i, f n (mk_canon_sym_gr_vect (S n)) i) (seq 0 ((S n)! + 3))).
+*)
 *)
 ...
 Fixpoint Intersect A (la lb : list A) :=
