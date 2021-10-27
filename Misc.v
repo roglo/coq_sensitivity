@@ -2356,6 +2356,57 @@ Qed.
 
 (* end butn *)
 
+(* insert in a list (reverse of butn) *)
+
+Definition insert_at A k (la : list A) e :=
+  firstn k la ++ e :: skipn k la.
+
+Theorem insert_at_nil : ∀ A k e, insert_at k ([] : list A) e = [e].
+Proof.
+intros; cbn.
+unfold insert_at.
+now rewrite firstn_nil, skipn_nil.
+Qed.
+
+Theorem insert_at_butn : ∀ A (l : list A) n e,
+  n < length l
+  → insert_at n (butn n l) e = firstn n l ++ [e] ++ skipn (S n) l.
+Proof.
+intros * Hnl.
+revert n Hnl.
+induction l as [| a]; intros; [ easy | ].
+destruct n; [ easy | ].
+cbn in Hnl; apply Nat.succ_lt_mono in Hnl.
+rewrite butn_cons, firstn_cons, skipn_cons.
+cbn - [ skipn ]; f_equal.
+now apply IHl.
+Qed.
+
+(* end insert_at *)
+
+(* replace in a list *)
+
+Definition replace_at {A} k (la : list A) e :=
+  firstn k la ++ e :: skipn (S k) la.
+
+Theorem nth_replace_id : ∀ A i (la : list A) a d,
+  i ≤ length la
+  → nth i (replace_at i la a) d = a.
+Proof.
+intros * Hi.
+unfold replace_at.
+rewrite app_nth2. 2: {
+  unfold "≥".
+  rewrite firstn_length.
+  now rewrite Nat.min_l.
+}
+rewrite firstn_length.
+rewrite Nat.min_l; [ | easy ].
+now rewrite Nat.sub_diag.
+Qed.
+
+(* end replace_at *)
+
 (* repeat_apply: applying a function n times *)
 
 Fixpoint repeat_apply A n (f : A → A) a :=
@@ -2385,35 +2436,6 @@ apply Hid.
 Qed.
 
 (* end repeat_apply *)
-
-(* replace in a list *)
-
-Definition replace_at {A} k (la : list A) e :=
-  firstn k la ++ e :: skipn (S k) la.
-
-Theorem nth_replace_id : ∀ A i (la : list A) a d,
-  i ≤ length la
-  → nth i (replace_at i la a) d = a.
-Proof.
-intros * Hi.
-unfold replace_at.
-rewrite app_nth2. 2: {
-  unfold "≥".
-  rewrite firstn_length.
-  now rewrite Nat.min_l.
-}
-rewrite firstn_length.
-rewrite Nat.min_l; [ | easy ].
-now rewrite Nat.sub_diag.
-Qed.
-
-(* end replace_at *)
-
-(* insert in a list *)
-
-Definition insert_at A k (la : list A) e := firstn k la ++ e :: skipn k la.
-
-(* end insert_at *)
 
 (* list_eqb *)
 

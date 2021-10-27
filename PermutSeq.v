@@ -596,6 +596,133 @@ Definition smaller_sym_gr_by_rem_biggest_at n sg s :=
         (map (λ v, butn s (vect_list v))
            (select_in_list_vect n (vect_list sg) s))).
 
+(* [sub_sg_rank_of_sg_rank n sg k]
+   function taking an element p (which is a permutation) of a symmetric group
+   sg (of order n+1) at rank k, and returning the pair of the rank s of the
+   value n+1 in that permutation (its highest value) and the rank of the
+   permutation p where n+1 is removed in the symmetric group of order n,
+   obtained by selecting all permutations of the initial symmetric group
+   having n+1 at position s, where this n+1 is removed *)
+(* e.g.
+     n = 2
+     sg = [[0; 3; 2; 1]; [2; 1; 0; 3]; [2; 0; 1; 3]; [1; 3; 2; 0];
+           [1; 2; 0; 3]; [3; 0; 1; 2]; [0; 1; 2; 3]; [0; 1; 3; 2];
+           [2; 1; 3; 0]; [1; 0; 3; 2]; [0; 2; 1; 3]; [2; 3; 1; 0];
+           [2; 0; 3; 1]; [0; 2; 3; 1]; [2; 3; 0; 1]; [1; 2; 3; 0];
+           [3; 1; 2; 0]; [0; 3; 1; 2]; [1; 0; 2; 3]; [1; 3; 0; 2];
+           [3; 2; 1; 0]; [3; 1; 0; 2]; [3; 0; 2; 1]; [3; 2; 0; 1]].
+     k = 15
+    result = (2, 5)
+   explanation of result: the 15th permutation of sg is [1; 2; 3; 0]
+   (starting from 0), the position of n+1 (=3) in that permutation is
+   2 (starting from 0). Therefore the "2" in (2, 5). The sub symmetric
+   group, sg', is
+      [[0; 1; 2]; [2; 1; 0]; [1; 0; 2]; [2; 0; 1]; [0; 2; 1]; [1; 2; 0]]
+   and the "5" in (2, 5) is the position of [1; 2; 0] in sg'.
+
+   If k = 14, the result is (1, 3). The "1" is the rank of "3" in
+   [2; 3; 0; 1] and the "3" is the rank of [2; 0; 1] in
+   [[0; 2; 1]; [1; 2; 0]; [2; 1; 0]; [2; 0; 1]; [0; 1; 2]; [1; 0; 2]]
+*)
+
+Definition sub_sg_rank_of_sg_rank n sg k :=
+   let p := vect_el empty_vect sg k in
+   match List_find_nth (Nat.eqb n) (vect_list p) with
+   | Some s =>
+       let p' := mk_vect (butn s (vect_list p)) in
+       let sg' := smaller_sym_gr_by_rem_biggest_at n sg s in
+       (s, unsome 0 (List_find_nth (vect_eqb Nat.eqb p') (vect_list sg')))
+   | None => (S n, n!)
+   end.
+
+(* reverse function *)
+
+Definition sg_rank_of_sub_sg_rank n sg '(s, k) :=
+  let sg' := smaller_sym_gr_by_rem_biggest_at n sg s in
+  let p' := vect_el empty_vect sg' k in
+  let p := insert_at s (vect_list p') n in
+  rank_of_permut_in_sym_gr sg (mk_vect p).
+
+(* test
+Definition my_sg_list :=
+  [[0; 3; 2; 1]; [2; 1; 0; 3]; [2; 0; 1; 3]; [1; 3; 2; 0];
+   [1; 2; 0; 3]; [3; 0; 1; 2]; [0; 1; 2; 3]; [0; 1; 3; 2];
+   [2; 1; 3; 0]; [1; 0; 3; 2]; [0; 2; 1; 3]; [2; 3; 1; 0];
+   [2; 0; 3; 1]; [0; 2; 3; 1]; [2; 3; 0; 1]; [1; 2; 3; 0];
+   [3; 1; 2; 0]; [0; 3; 1; 2]; [1; 0; 2; 3]; [1; 3; 0; 2];
+   [3; 2; 1; 0]; [3; 1; 0; 2]; [3; 0; 2; 1]; [3; 2; 0; 1]].
+Definition my_sg := mk_vect (map (mk_vect (T:=nat)) my_sg_list).
+Compute (is_sym_gr_bool 4 (λ i j, nth j (nth i my_sg_list []) 0)).
+Compute (let n := 3 in sub_sg_rank_of_sg_rank n my_sg 15).
+Compute (let n := 3 in sg_rank_of_sub_sg_rank n my_sg (2, 5)).
+Compute (let n := 3 in sub_sg_rank_of_sg_rank n my_sg 14).
+Compute (let n := 3 in sg_rank_of_sub_sg_rank n my_sg (1, 3)).
+
+Compute (let n := 3 in map (vect_list (T:=nat)) (vect_list (smaller_sym_gr_by_rem_biggest_at n my_sg 2))).
+Compute (let n := 3 in map (vect_list (T:=nat)) (vect_list (smaller_sym_gr_by_rem_biggest_at n my_sg 1))).
+...
+Compute (let n := 3 in map (vect_list (T:=nat)) (vect_list (smaller_sym_gr_by_rem_biggest_at n my_sg 2))).
+Compute (let n := 3 in sub_sg_rank_of_sg_rank n my_sg 0).
+Compute ((let n := 3 in map (λ i, sub_sg_rank_of_sg_rank n (mk_canon_sym_gr_vect (S n)) i) (seq 0 ((S n)! + 3))),
+(let n := 3 in map (λ i, sub_sg_rank_of_sg_rank n my_sg i) (seq 0 ((S n)! + 3)))).
+Compute (let n := 3 in map (vect_list (T:=nat)) (vect_list (smaller_sym_gr_by_rem_biggest_at n (mk_canon_sym_gr_vect (S n)) 2))).
+Compute (let n := 3 in map (vect_list (T:=nat)) (vect_list (smaller_sym_gr_by_rem_biggest_at n my_sg 2))).
+Compute (mk_canon_sym_gr_vect 4).
+Compute (let n := 4 in map (vect_list (T:=nat)) (vect_list (mk_canon_sym_gr_vect n))).
+Compute (let n := 3 in mk_canon_sym_gr_vect (S n)).
+Compute (let n := 3 in sub_sg_rank_of_sg_rank n (mk_canon_sym_gr_vect (S n)) 0).
+Compute (let n := 3 in sub_sg_rank_of_sg_rank n (mk_canon_sym_gr_vect (S n)) 1).
+Compute (let n := 3 in sub_sg_rank_of_sg_rank n (mk_canon_sym_gr_vect (S n)) 2).
+Compute (let n := 3 in mk_canon_sym_gr_vect (S n)).
+Compute (let n := 3 in sub_sg_rank_of_sg_rank n (mk_canon_sym_gr_vect (S n)) 15).
+Compute (let n := 3 in map (vect_list (T:=nat)) (vect_list (smaller_sym_gr_by_rem_biggest_at n (mk_canon_sym_gr_vect (S n)) 2))).
+...
+Compute (let n := 3 in sub_sg_rank_of_sg_rank n (mk_canon_sym_gr_vect (S n)) 23).
+Compute (let n := 3 in sub_sg_rank_of_sg_rank n (mk_canon_sym_gr_vect (S n)) 24).
+Compute (let n := 4 in sub_sg_rank_of_sg_rank n (mk_canon_sym_gr_vect (S n)) 24).
+Compute (let n := 4 in sub_sg_rank_of_sg_rank n (mk_canon_sym_gr_vect (S n)) 119).
+Compute (let n := 4 in sub_sg_rank_of_sg_rank n (mk_canon_sym_gr_vect (S n)) 120).
+Compute (let n := 2 in map (λ i, sub_sg_rank_of_sg_rank n (mk_canon_sym_gr_vect (S n)) i) (seq 0 ((S n)! + 3))).
+Compute (let n := 3 in map (λ i, sub_sg_rank_of_sg_rank n (mk_canon_sym_gr_vect (S n)) i) (seq 0 ((S n)! + 3))).
+(*
+Compute (let n := 4 in map (λ i, sub_sg_rank_of_sg_rank n (mk_canon_sym_gr_vect (S n)) i) (seq 0 ((S n)! + 3))).
+*)
+*)
+
+Theorem sub_sr_sgr_sgr_sr : ∀ n sg s k,
+  is_sym_gr_vect (S n) sg
+  → k < length (select_in_list_vect n (vect_list sg) s)
+  → s < S n
+  → sub_sg_rank_of_sg_rank n sg (sg_rank_of_sub_sg_rank n sg (s, k)) = (s, k).
+Proof.
+intros * Hsg Hkn Hsn; cbn.
+rewrite map_map.
+rewrite (List_map_nth' empty_vect); [ cbn | easy ].
+unfold select_in_list_vect.
+specialize List_length_filter_nth as H1.
+specialize (H1 (vector nat) empty_vect).
+specialize (H1 (vect_list sg)).
+specialize (H1 (λ v, vect_el 0 v s =? n)).
+specialize (H1 k Hkn); cbn in H1.
+destruct H1 as (j & Hj & Hjsn & Hkj & Hk).
+apply Nat.eqb_eq in Hjsn.
+rewrite Hkj.
+rewrite insert_at_butn. 2: {
+  rewrite fold_vect_size, fold_vect_el.
+  destruct Hsg as (Hsg & Hinj & Hsurj).
+  specialize (Hsg j Hj) as H1.
+  destruct H1 as (H1, H2).
+  now rewrite <- H1 in Hsn.
+}
+...
+Theorem mk_vect_vect_list : ∀ A (v : vector A), mk_vect (vect_list v) = v.
+Proof. now intros; destruct v. Qed.
+rewrite mk_vect_vect_list.
+unfold rank_of_permut_in_sym_gr.
+unfold sub_sg_rank_of_sg_rank; cbn.
+(* tu parles d'un bordel ! *)
+...
+
 Theorem glop : ∀ n sg, is_sym_gr_vect n sg → vect_size sg = n!.
 Proof.
 intros * Hsg.
@@ -1323,83 +1450,8 @@ assert
   rewrite Hi.
   now apply rank_of_permut_in_sym_gr_lt with (n := S (S n)).
 }
-(* function taking an element p (which is a permutation) of a symmetric group
-   (of order n+1) at rank k, and returning the pair of the rank s of n+1 in
-   that permutation (its highest value) and the rank of the permutation p
-   where n+1 is removed in the symmetric group of order n, obtained by
-   selecting all permutations of the initial symmetric group having n+1
-   at position s, where this n+1 is removed *)
-(* e.g.
-     n = 2
-     sg = [[0; 3; 2; 1]; [2; 1; 0; 3]; [2; 0; 1; 3]; [1; 3; 2; 0];
-           [1; 2; 0; 3]; [3; 0; 1; 2]; [0; 1; 2; 3]; [0; 1; 3; 2];
-           [2; 1; 3; 0]; [1; 0; 3; 2]; [0; 2; 1; 3]; [2; 3; 1; 0];
-           [2; 0; 3; 1]; [0; 2; 3; 1]; [2; 3; 0; 1]; [1; 2; 3; 0];
-           [3; 1; 2; 0]; [0; 3; 1; 2]; [1; 0; 2; 3]; [1; 3; 0; 2];
-           [3; 2; 1; 0]; [3; 1; 0; 2]; [3; 0; 2; 1]; [3; 2; 0; 1]].
-     k = 15
-    result = (2, 5)
-   explanation of result: the 15th permutation of sg is [1; 2; 3; 0]
-   (starting from 0), the position of n+1 (=3) in that permutation is
-   2 (starting from 0). Therefore the "2" in (2, 5). The sub symmetric
-   group, sg', is
-      [[0; 1; 2]; [2; 1; 0]; [1; 0; 2]; [2; 0; 1]; [0; 2; 1]; [1; 2; 0]]
-   and the "5" in (2, 5) is the position of [1; 2; 0] in sg'.
-*)
-(* should take a more general example: in that one, above, the symmetric
-   group is the canonical one and, therefore, the sub symmetric group
-   is always the canonical one; not general enough. I should take an
-   arbitrary symmetric group, not the canonical one *)
-Definition my_sg_list :=
-  [[0; 3; 2; 1]; [2; 1; 0; 3]; [2; 0; 1; 3]; [1; 3; 2; 0];
-   [1; 2; 0; 3]; [3; 0; 1; 2]; [0; 1; 2; 3]; [0; 1; 3; 2];
-   [2; 1; 3; 0]; [1; 0; 3; 2]; [0; 2; 1; 3]; [2; 3; 1; 0];
-   [2; 0; 3; 1]; [0; 2; 3; 1]; [2; 3; 0; 1]; [1; 2; 3; 0];
-   [3; 1; 2; 0]; [0; 3; 1; 2]; [1; 0; 2; 3]; [1; 3; 0; 2];
-   [3; 2; 1; 0]; [3; 1; 0; 2]; [3; 0; 2; 1]; [3; 2; 0; 1]].
-Definition my_sg := mk_vect (map (mk_vect (T:=nat)) my_sg_list).
-(*
-Compute (is_sym_gr_bool 4 (λ i j, nth j (nth i my_sg_list []) 0)).
-*)
-set
-  (f := λ n sg k,
-   let p := vect_el empty_vect sg k in
-   match List_find_nth (Nat.eqb n) (vect_list p) with
-   | Some s =>
-       let p' := mk_vect (butn s (vect_list p)) in
-       let sg' := smaller_sym_gr_by_rem_biggest_at n sg s in
-       (s, unsome 0 (List_find_nth (vect_eqb Nat.eqb p') (vect_list sg')))
-   | None => (S n, n!)
-   end).
-Compute (let n := 3 in f n my_sg 15).
-Compute (let n := 3 in map (vect_list (T:=nat)) (vect_list (smaller_sym_gr_by_rem_biggest_at n my_sg 2))).
-(*
-Compute (let n := 3 in f n my_sg 0).
-Compute ((let n := 3 in map (λ i, f n (mk_canon_sym_gr_vect (S n)) i) (seq 0 ((S n)! + 3))),
-(let n := 3 in map (λ i, f n my_sg i) (seq 0 ((S n)! + 3)))).
-Compute (let n := 3 in map (vect_list (T:=nat)) (vect_list (smaller_sym_gr_by_rem_biggest_at n (mk_canon_sym_gr_vect (S n)) 2))).
-Compute (let n := 3 in map (vect_list (T:=nat)) (vect_list (smaller_sym_gr_by_rem_biggest_at n my_sg 2))).
-Compute (mk_canon_sym_gr_vect 4).
-Compute (let n := 4 in map (vect_list (T:=nat)) (vect_list (mk_canon_sym_gr_vect n))).
-Compute (let n := 3 in mk_canon_sym_gr_vect (S n)).
-Compute (let n := 3 in f n (mk_canon_sym_gr_vect (S n)) 0).
-Compute (let n := 3 in f n (mk_canon_sym_gr_vect (S n)) 1).
-Compute (let n := 3 in f n (mk_canon_sym_gr_vect (S n)) 2).
-Compute (let n := 3 in mk_canon_sym_gr_vect (S n)).
-Compute (let n := 3 in f n (mk_canon_sym_gr_vect (S n)) 15).
-Compute (let n := 3 in map (vect_list (T:=nat)) (vect_list (smaller_sym_gr_by_rem_biggest_at n (mk_canon_sym_gr_vect (S n)) 2))).
 ...
-Compute (let n := 3 in f n (mk_canon_sym_gr_vect (S n)) 23).
-Compute (let n := 3 in f n (mk_canon_sym_gr_vect (S n)) 24).
-Compute (let n := 4 in f n (mk_canon_sym_gr_vect (S n)) 24).
-Compute (let n := 4 in f n (mk_canon_sym_gr_vect (S n)) 119).
-Compute (let n := 4 in f n (mk_canon_sym_gr_vect (S n)) 120).
-Compute (let n := 2 in map (λ i, f n (mk_canon_sym_gr_vect (S n)) i) (seq 0 ((S n)! + 3))).
-Compute (let n := 3 in map (λ i, f n (mk_canon_sym_gr_vect (S n)) i) (seq 0 ((S n)! + 3))).
-(*
-Compute (let n := 4 in map (λ i, f n (mk_canon_sym_gr_vect (S n)) i) (seq 0 ((S n)! + 3))).
-*)
-*)
+Check sub_sg_rank_of_sg_rank.
 ...
 Fixpoint Intersect A (la lb : list A) :=
   match la with
