@@ -843,6 +843,20 @@ destruct i as [i| ]. {
   }
   subst i; f_equal.
   remember (vect_el empty_vect sg j) as p eqn:Hp.
+  remember (mk_vect (butn s (vect_list p))) as q eqn:Hq.
+  remember
+    (List_find_nth (vect_eqb Nat.eqb q)
+       (map (λ x : vector nat, {| vect_list := butn s (vect_list x) |})
+          (filter (λ v : vector nat, vect_el 0 v s =? n) (vect_list sg))))
+    as i eqn:Hi; symmetry in Hi.
+  destruct i as [i| ]. {
+    apply List_find_nth_Some with (d := empty_vect) in Hi.
+    destruct Hi as (Hi3, Hi4).
+    apply vect_eqb_eq in Hi4.
+    rewrite (List_map_nth' empty_vect) in Hi4. 2: {
+...
+    rewrite Hq in Hi4.
+    injection Hi4; clear Hi4; intros Hi4.
 ...
 
 Theorem glop : ∀ n sg, is_sym_gr_vect n sg → vect_size sg = n!.
