@@ -773,6 +773,8 @@ destruct i as [i| ]. {
     rewrite nth_overflow in Hi2; [ | easy ].
     move Hi2 at top; subst n.
     apply Nat.lt_1_r in Hsn; subst s.
+    unfold select_in_list_vect in Hkn.
+    destruct Hsg as (Hsg & Hinj & Hsurj).
 ...
   f_equal. {
     rewrite <- Hjsn in Hi2.
