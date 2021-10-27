@@ -582,6 +582,34 @@ exfalso; apply H.
 now apply Hsg.
 Qed.
 
+Theorem rank_of_permut_in_sym_gr_vect_el : ∀ n sg i,
+  n ≠ 0
+  → is_sym_gr_vect n sg
+  → i < vect_size sg
+  → rank_of_permut_in_sym_gr sg (vect_el empty_vect sg i) = i.
+Proof.
+intros * Hnz Hsg Hi.
+unfold rank_of_permut_in_sym_gr, unsome.
+remember (List_find_nth _ _) as j eqn:Hj; symmetry in Hj.
+destruct j as [j| ]. {
+  apply List_find_nth_Some with (d := empty_vect) in Hj.
+  destruct Hj as (Hji, Hj).
+  apply vect_eqb_eq in Hj.
+  rewrite fold_vect_el in Hj.
+  destruct Hsg as (Hsg & Hinj & Hsurj).
+  apply Hinj; [ | easy | easy ].
+  destruct (lt_dec j (vect_size sg)) as [Hjs| Hjs]; [ easy | exfalso ].
+  apply Nat.nlt_ge in Hjs.
+  unfold vect_el in Hj at 2.
+  rewrite nth_overflow in Hj; [ | easy ].
+  specialize (Hsg i Hi) as H1.
+  destruct H1 as (H1, H2).
+  now rewrite Hj in H1; cbn in H1; subst n.
+}
+specialize (List_find_nth_None empty_vect _ _ Hj Hi) as H1.
+now apply vect_eqb_neq in H1.
+Qed.
+
 (* *)
 
 (* selecting all vectors in lv having "n" at some position "s" *)
@@ -730,6 +758,33 @@ rewrite <- List_split_at_pos. 2: {
 }
 subst ln p.
 rewrite mk_vect_vect_list.
+rewrite rank_of_permut_in_sym_gr_vect_el with (n := S n); try easy.
+unfold sub_sg_rank_of_sg_rank, unsome; cbn.
+remember (List_find_nth (Nat.eqb n) (vect_list (vect_el empty_vect sg j)))
+  as i eqn:Hi; symmetry in Hi.
+destruct i as [i| ]. {
+  cbn; rewrite map_map; cbn.
+  apply List_find_nth_Some with (d := 0) in Hi.
+  destruct Hi as (Hi1, Hi2).
+  apply Nat.eqb_eq in Hi2.
+  unfold select_in_list_vect.
+  destruct (lt_dec i (vect_size (vect_el empty_vect sg j))) as [His| His]. 2: {
+    apply Nat.nlt_ge in His.
+    rewrite nth_overflow in Hi2; [ | easy ].
+    move Hi2 at top; subst n.
+    apply Nat.lt_1_r in Hsn; subst s.
+...
+  f_equal. {
+    rewrite <- Hjsn in Hi2.
+    do 2 rewrite fold_vect_el in Hi2.
+    apply Hsg in Hi2; [ easy | easy | | ]. {
+      destruct Hsg as (Hsg & Hinj & Hsurj).
+      specialize (Hsg j Hj) as H2.
+      now destruct H2 as (H2, H3); rewrite H2.
+    } {
+      destruct Hsg as (Hsg & Hinj & Hsurj).
+      specialize (Hsg j Hj) as H2.
+      destruct H2 as (H2, H3); rewrite H2.
 ...
 
 Theorem glop : ∀ n sg, is_sym_gr_vect n sg → vect_size sg = n!.
