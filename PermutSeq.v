@@ -775,7 +775,58 @@ destruct i as [i| ]. {
     apply Nat.lt_1_r in Hsn; subst s.
     unfold select_in_list_vect in Hkn.
     destruct Hsg as (Hsg & Hinj & Hsurj).
-...
+    destruct (Nat.eq_dec (vect_size sg) 0) as [Hsz| Hsz]; [ flia Hj Hsz | ].
+    destruct (Nat.eq_dec (vect_size sg) 1) as [Hs1| Hs1]. 2: {
+      specialize (Hinj 0 1) as H5.
+      specialize (Hsg 0) as H1.
+      assert (H : 0 < vect_size sg) by flia Hsz.
+      specialize (H1 H); specialize (H5 H); clear H.
+      destruct H1 as (H1, H2).
+      specialize (Hsg 1) as H3.
+      assert (H : 1 < vect_size sg) by flia Hsz Hs1.
+      specialize (H3 H); specialize (H5 H); clear H.
+      destruct H3 as (H3, H4).
+      destruct H2 as (H2, H6).
+      rewrite H1 in H2; clear H6.
+      destruct H4 as (H4, H6).
+      rewrite H3 in H4; clear H6.
+      specialize (H2 0 Nat.lt_0_1).
+      specialize (H4 0 Nat.lt_0_1).
+      apply Nat.lt_1_r in H2, H4.
+      remember (vect_el empty_vect sg 0) as u eqn:Hu; symmetry in Hu.
+      remember (vect_el empty_vect sg 1) as v eqn:Hv; symmetry in Hv.
+      destruct u as (la).
+      destruct v as (lb).
+      cbn in Hu, Hv, H5, H1, H2, H3, H4.
+      destruct la as [| a]; [ easy | ].
+      destruct la; [ | easy ].
+      destruct lb as [| b]; [ easy | ].
+      destruct lb; [ | easy ].
+      clear H1 H3.
+      cbn in H2, H4.
+      subst a b.
+      now specialize (H5 eq_refl).
+    }
+    clear Hsz Hinj.
+    rewrite Hs1 in Hj.
+    apply Nat.lt_1_r in Hj; subst j.
+    cbn in Hk; subst k.
+    destruct sg as (lv); cbn in *.
+    destruct i. 2: {
+      specialize (Hi1 0 (Nat.lt_0_succ _)).
+      now rewrite Hjsn in Hi1.
+    }
+    destruct lv as [| v]; [ easy | ].
+    destruct lv; [ | easy ].
+    clear Hs1 Hi1.
+    cbn in Hjsn, Hkj, His.
+    apply Nat.le_0_r in His.
+    rewrite fold_vect_el in Hjsn.
+    clear Hkj.
+    specialize (Hsg 0 Nat.lt_0_1).
+    cbn in Hsg.
+    now rewrite His in Hsg.
+  }
   f_equal. {
     rewrite <- Hjsn in Hi2.
     do 2 rewrite fold_vect_el in Hi2.
@@ -787,6 +838,9 @@ destruct i as [i| ]. {
       destruct Hsg as (Hsg & Hinj & Hsurj).
       specialize (Hsg j Hj) as H2.
       destruct H2 as (H2, H3); rewrite H2.
+      now rewrite H2 in His.
+    }
+  }
 ...
 
 Theorem glop : ∀ n sg, is_sym_gr_vect n sg → vect_size sg = n!.
