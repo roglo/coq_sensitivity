@@ -1414,6 +1414,26 @@ assert (H : ListDec.decidable_eq (vector_1 (S (S n)))). {
 specialize (proj1 (H2 H φp) Hinj) as H3; clear H H2.
 unfold vector_1 in H3.
 Search FinFun.Injective.
+Theorem glop : ∀ m n (f : Fin.t m → Fin.t n), FinFun.Bijective f → m = n.
+Proof.
+intros * Hf.
+destruct Hf as (g & Hgf & Hfg).
+...
+intros * Hf.
+destruct Hf as (g & Hgf & Hfg).
+revert m f g Hgf Hfg.
+induction n; intros; cbn. {
+  destruct m; [ easy | exfalso ].
+  now remember (f Fin.F1).
+}
+destruct m. {
+  exfalso.
+  now remember (g Fin.F1).
+}
+f_equal.
+assert (f' : Fin.t m → Fin.t n). {
+  intros x.
+Search (Fin.t (S _)).
 ...
 assert (H1 : FinFun.Bijective φp) by now exists φp'.
 move IHn at bottom.
