@@ -1414,11 +1414,36 @@ assert (H : ListDec.decidable_eq (vector_1 (S (S n)))). {
 specialize (proj1 (H2 H φp) Hinj) as H3; clear H H2.
 unfold vector_1 in H3.
 Search FinFun.Injective.
-Theorem glop : ∀ m n (f : Fin.t m → Fin.t n), FinFun.Bijective f → m = n.
+Definition myfin n := {a : nat | a < n}.
+Theorem glop : ∀ m n (f : myfin m → myfin n), FinFun.Bijective f → m = n.
 Proof.
 intros * Hf.
 destruct Hf as (g & Hgf & Hfg).
+revert m f g Hgf Hfg.
+induction n; intros; cbn. {
+  destruct m; [ easy | exfalso ].
+  assert (x : myfin (S m)) by (exists 0; flia).
+  remember (f x) as y.
+  now destruct y.
+}
+destruct m. {
+  exfalso.
+  assert (y : myfin (S n)) by (exists 0; flia).
+  remember (g y) as x.
+  now destruct x.
+}
+f_equal.
 ...
+assert (f' : myfin m → myfin n). {
+  intros (x, px).
+  apply Nat.succ_lt_mono in px.
+  specialize (f (exist _ (S x) px)) as y.
+  destruct y as (y, py).
+...
+  destruct y. {
+...
+Theorem glop : ∀ m n (f : Fin.t m → Fin.t n), FinFun.Bijective f → m = n.
+Proof.
 intros * Hf.
 destruct Hf as (g & Hgf & Hfg).
 revert m f g Hgf Hfg.
@@ -1431,6 +1456,17 @@ destruct m. {
   now remember (g Fin.F1).
 }
 f_equal.
+Search (Fin.t (S _)).
+Print Fin.t.
+...
+Definition glop n (x : Fin.t (S n)) :=
+  match x with
+  | F1 =>
+Definition glop : ∀ n, Fin.t (S n) → Fin.t n + True.
+intros * Hn.
+destruct Hn as [m| ]; [ left | right; apply I ].
+Show Proof.
+...
 assert (f' : Fin.t m → Fin.t n). {
   intros x.
 Search (Fin.t (S _)).
