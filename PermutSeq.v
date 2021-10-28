@@ -1419,6 +1419,46 @@ Theorem glop : ∀ m n (f : myfin m → myfin n), FinFun.Bijective f → m = n.
 Proof.
 intros * Hf.
 destruct Hf as (g & Hgf & Hfg).
+destruct (Nat.lt_trichotomy m n) as [Hmn| [Hmn| Hmn]]; [ | easy | ]. {
+  exfalso.
+Check Pigeonhole.pigeonhole_fun.
+Check pigeonhole_fun.
+Search pigeonhole_fun.
+specialize (pigeonhole) as H1.
+specialize (H1 n m).
+assert (f' : nat → nat). {
+  intros x.
+...
+  destruct (lt_dec x n) as [Hxn| Hxn]; [ | apply 0 ].
+  specialize (g (exist _ x Hxn)) as y.
+  destruct y as (y, py).
+  apply y.
+Show Proof.
+}
+*)
+set (f' :=
+                             λ x4 : nat,
+                               let s := lt_dec x4 n in
+                               match s with
+                               | left a =>
+                                   (λ Hxn : x4 < n,
+                                      let y := g (exist (λ a0 : nat, a0 < n) x4 Hxn) in
+                                      let (x5, p) := y in (λ (y0 : nat) (_ : y0 < m), y0) x5 p) a
+                               | right b => (λ _ : ¬ x4 < n, 0) b
+                               end).
+specialize (H1 f' Hmn).
+assert (H : ∀ x, x < n → f' x < m). {
+  intros x px; unfold f'.
+  destruct (lt_dec x n) as [Hxn| Hxn]; [ | flia px Hxn ].
+  cbn.
+
+
+  specialize (g (exist _ x px)) as y.
+  destruct y as (y, py).
+
+
+...
+destruct Hf as (g & Hgf & Hfg).
 revert m f g Hgf Hfg.
 induction n; intros; cbn. {
   destruct m; [ easy | exfalso ].
@@ -1433,6 +1473,18 @@ destruct m. {
   now destruct x.
 }
 f_equal.
+assert (f' : myfin m → myfin n). {
+  intros (x, px).
+  apply Nat.succ_lt_mono in px.
+...
+
+  destruct m; [ flia px | ].
+  apply Nat.succ_lt_mono in px.
+  specialize (f (exist _ (S x) px)) as y.
+  destruct y as (y, py).
+
+  destruct y as (y, py).
+...
 ...
 eapply IHn. {
   intros (x, px).
