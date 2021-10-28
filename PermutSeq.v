@@ -612,6 +612,7 @@ Qed.
 
 (* *)
 
+(*
 (* selecting all vectors in lv having "n" at some position "s" *)
 Definition select_in_list_vect n lv s := filter (λ v, vect_el 0 v s =? n) lv.
 
@@ -862,6 +863,7 @@ destruct i as [i| ]. {
     rewrite Hq in Hi4.
     injection Hi4; clear Hi4; intros Hi4.
 ...
+*)
 
 Theorem glop : ∀ n sg, is_sym_gr_vect n sg → vect_size sg = n!.
 Proof.
@@ -947,6 +949,455 @@ induction n; intros. {
   }
   now specialize (Hinj H).
 }
+(* méthode wikipédia... *)
+set
+  (σ' := λ σ,
+   mk_vect
+     (map (λ i, vect_el 0 σ (if vect_el 0 σ i =? S n then S n else i))
+        (seq 0 (S n)))).
+set (φ := λ σ, (vect_el 0 σ (S n), σ' σ)).
+assert
+  (Hσ : ∀ σ,
+   vect_size σ = S (S n) ∧ is_permut_vect σ
+   → vect_size (σ' σ) = S n ∧ is_permut_vect (σ' σ)). {
+  intros * (Hsσ, Hσ).
+  split. {
+    unfold σ'; cbn.
+    now rewrite map_length, seq_length.
+  }
+  split. {
+    intros i Hi.
+    unfold σ' in Hi; cbn in Hi.
+    rewrite map_length, seq_length in Hi.
+    unfold σ'; cbn - [ seq ].
+    rewrite map_length, seq_length.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ | easy ].
+    rewrite Nat.add_0_l.
+    rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec (vect_el 0 σ i) (S n)) as [H1| H1]. {
+      destruct Hσ as (H2 & H3).
+      specialize (H3 (S n) i).
+      assert (H : S n < vect_size σ) by flia Hsσ.
+      specialize (H3 H); clear H.
+      assert (H : i < vect_size σ) by flia Hsσ Hi.
+      specialize (H3 H); clear H.
+      rewrite H1 in H3.
+      rewrite Hsσ in H2.
+      specialize (H2 (S n) (Nat.lt_succ_diag_r _)).
+      assert (H : vect_el 0 σ (S n) ≠ S n). {
+        intros H; specialize (H3 H); flia H3 Hi.
+      }
+      flia H2 H.
+    } {
+      destruct Hσ as (H2 & H3).
+      specialize (H2 i).
+      assert (H : i < vect_size σ) by flia Hsσ Hi.
+      specialize (H2 H); clear H.
+      flia Hsσ H2 H1.
+    }
+  } {
+    intros i j Hi Hj Hij.
+    unfold σ' in Hi, Hj, Hij; cbn - [ seq ] in Hi, Hj, Hij.
+    rewrite map_length, seq_length in Hi, Hj.
+    rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+    rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+    rewrite seq_nth in Hij; [ | easy ].
+    rewrite seq_nth in Hij; [ | easy ].
+    do 2 rewrite Nat.add_0_l, if_eqb_eq_dec in Hij.
+    apply Hσ; [ flia Hsσ Hi | flia Hsσ Hj | ].
+    destruct Hσ as (H2, H3).
+    rewrite Hsσ in H2.
+    destruct (Nat.eq_dec (vect_el 0 σ i) (S n)) as [Hin| Hin]. {
+      destruct (Nat.eq_dec (vect_el 0 σ j) (S n)) as [H| H]; [ congruence | ].
+      apply H3 in Hij; [ | flia Hsσ | flia Hj Hsσ ].
+      flia Hj Hij.
+    } {
+      destruct (Nat.eq_dec (vect_el 0 σ j) (S n)) as [H| H]; [ | congruence ].
+      apply H3 in Hij; [ | flia Hi Hsσ | flia Hsσ ].
+      flia Hi Hij.
+    }
+  }
+}
+set
+  (φ' := λ a : (nat * vector nat), let '(i, v) := a in
+    mk_vect
+      (map
+         (λ j,
+          if j =? S n then i
+          else if vect_el 0 v j =? i then S n
+          else vect_el 0 v j)
+         (seq 0 (S (S n))))).
+(*
+enough (n = 4).
+subst n.
+Compute (φ (mk_vect [0;5;2;4;1;3])).
+Compute (φ' (3, {| vect_list := [0; 3; 2; 4; 1] |})).
+Compute (φ' (φ (mk_vect [0;5;2;4;1;3]))).
+Compute (φ' (φ (mk_vect [0;3;2;4;1;5]))).
+Compute (permut_vect_inv (permut_vect_inv (mk_vect [0;5;2;4;1;3]))).
+...
+*)
+assert
+  (H :
+     (∀ x, vect_size x = S (S n) → is_permut_vect x → φ' (φ x) = x) ∧
+     (∀ y, vect_size (snd y) = S n → is_permut_vect (snd y) → φ (φ' y) = y)).
+  {
+  split. {
+    intros (l) Hv Hp; cbn in Hv.
+    unfold is_permut_vect in Hp; cbn in Hp.
+    unfold vect_el in Hp; cbn in Hp.
+    rewrite Hv in Hp; cbn in Hp.
+    destruct Hp as (Hp1, Hp2).
+    unfold φ', φ.
+    f_equal.
+    unfold σ'.
+    cbn - [ seq ].
+    rewrite (seq_S (S n)).
+    cbn - [ seq ].
+    rewrite map_app.
+    cbn - [ seq ].
+    rewrite Nat.eqb_refl.
+    erewrite map_ext_in. 2: {
+      intros i Hi; apply in_seq in Hi.
+      rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec i (S n)) as [H1| H1]; [ flia Hi H1 | ].
+      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+      rewrite seq_nth; [ | easy ].
+      rewrite Nat.add_0_l.
+      easy.
+    }
+    replace (nth (S n) l 0) with (last l 0) by now rewrite List_last_nth, Hv.
+    rewrite app_removelast_last with (d := 0). 2: {
+      now intros H; rewrite H in Hv.
+    }
+    f_equal.
+    rewrite List_map_nth_seq with (d := 0).
+    replace (length (removelast l)) with (S n). 2: {
+      destruct l using rev_ind; [ easy | ].
+      rewrite removelast_last.
+      rewrite app_length, Nat.add_1_r in Hv.
+      now apply Nat.succ_inj in Hv.
+    }
+    apply map_ext_in.
+    intros i Hi; apply in_seq in Hi.
+    do 2 rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec (nth i l 0) (S n)) as [H1| H1]. {
+      destruct (Nat.eq_dec (nth (S n) l 0) (last l 0)) as [H2| H2]. {
+        rewrite <- H1.
+        destruct l as [| a] using rev_ind; [ easy | ].
+        rewrite removelast_last.
+        rewrite app_nth1; [ easy | ].
+        rewrite app_length in Hv.
+        rewrite Nat.add_1_r in Hv.
+        apply Nat.succ_inj in Hv.
+        now rewrite Hv.
+      }
+      destruct l as [| a] using rev_ind; [ easy | ].
+      rewrite app_length, Nat.add_1_r in Hv.
+      apply Nat.succ_inj in Hv.
+      rewrite app_nth2 in H2; [ | flia Hv ].
+      now rewrite Hv, Nat.sub_diag, last_last in H2.
+    }
+    destruct (Nat.eq_dec (nth i l 0) (last l 0)) as [H2| H2]. {
+      destruct l as [| a] using rev_ind; [ easy | ].
+      rewrite app_length in Hv.
+      rewrite Nat.add_1_r in Hv.
+      apply Nat.succ_inj in Hv.
+      rewrite removelast_last.
+      rewrite app_nth1 in H1; [ | now rewrite <- Hv in Hi ].
+      rewrite app_nth1 in H2; [ | now rewrite <- Hv in Hi ].
+      rewrite last_last in H2.
+      specialize (Hp2 i (S n)).
+      assert (H : i < S (S n)) by flia Hv Hi.
+      specialize (Hp2 H (Nat.lt_succ_diag_r _)); clear H.
+      rewrite app_nth1 in Hp2; [ | flia Hv Hi ].
+      rewrite app_nth2 in Hp2; [ | flia Hv ].
+      rewrite Hv, Nat.sub_diag in Hp2.
+      cbn in Hp2.
+      specialize (Hp2 H2).
+      flia Hp2 Hi.
+    }
+    destruct l as [| a] using rev_ind; [ easy | ].
+    rewrite app_length in Hv.
+    rewrite Nat.add_1_r in Hv.
+    apply Nat.succ_inj in Hv.
+    rewrite removelast_last.
+    rewrite app_nth1; [ easy | flia Hv Hi ].
+  } {
+    intros (i, v) Hv Hp; cbn in Hv, Hp.
+    unfold φ, φ', σ'.
+    cbn - [ seq ].
+    f_equal. {
+      rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
+      rewrite seq_nth; [ | flia ].
+      now rewrite Nat.eqb_refl.
+    } {
+      destruct v as (l); cbn in Hv.
+      f_equal.
+      rewrite List_map_nth_seq with (d := 0).
+      rewrite Hv.
+      apply map_ext_in.
+      intros j Hj; apply in_seq in Hj.
+      destruct Hj as (_, Hj); cbn in Hj.
+      cbn - [ seq ].
+      rewrite (@List_map_nth' _ _ 0 _ _ _ j). 2: {
+        rewrite seq_length; flia Hj.
+      }
+      rewrite seq_nth; [ | flia Hj ].
+      rewrite Nat.add_0_l.
+      do 3 rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec j (S n)) as [H| H]; [ flia Hj H | clear H ].
+      destruct (Nat.eq_dec (nth j l 0) i) as [H1| H1]. {
+        rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
+        rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
+        rewrite seq_nth; [ | flia ].
+        now rewrite Nat.eqb_refl.
+      }
+      destruct (Nat.eq_dec (nth j l 0) (S n)) as [H2| H2]. {
+        destruct Hp as (Hp1, Hp2); cbn in Hp1, Hp2.
+        specialize (Hp1 j).
+        rewrite Hv, H2 in Hp1.
+        specialize (Hp1 Hj).
+        flia Hp1.
+      }
+      rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
+      rewrite seq_nth; [ | flia Hj ].
+      rewrite Nat.add_0_l.
+      rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec j (S n)) as [H| H]; [ flia Hj H | clear H ].
+      rewrite if_eqb_eq_dec.
+      now destruct (Nat.eq_dec (nth j l 0) i).
+    }
+  }
+}
+destruct H as (Hφ'φ, Hφφ').
+assert
+  (Hφ : ∀ u, φ_prop_bool (S (S n)) u = true
+  → φ'_prop_bool (S n) (φ u) = true). {
+  intros v Hv.
+  apply φ'_prop_φ'_prop_bool.
+  apply φ_prop_φ_prop_bool in Hv.
+  unfold φ_prop in Hv.
+  unfold φ'_prop.
+  destruct Hv as (Hv, Hp).
+  unfold is_permut_vect in Hp; cbn in Hp.
+  unfold vect_el in Hp; cbn in Hp.
+  rewrite Hv in Hp; cbn in Hp.
+  destruct Hp as (Hp1, Hp2).
+  unfold φ', φ.
+  unfold σ'.
+  cbn - [ seq ].
+  rewrite map_length, seq_length.
+  split; [ apply Hp1; flia | ].
+  split; [ easy | ].
+  unfold is_permut_vect.
+  cbn - [ seq ].
+  rewrite map_length, seq_length.
+  unfold vect_el.
+  cbn - [ seq ].
+  eapply is_permut_eq_compat. {
+    intros i Hi; symmetry.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ | easy ].
+    rewrite Nat.add_0_l.
+    easy.
+  }
+  split. {
+    intros i Hi.
+    rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec (nth i (vect_list v) 0) (S n)) as [H1| H1].  {
+      specialize (Hp2 i (S n)) as H2.
+      assert (H : i < S (S n)) by flia Hi.
+      specialize (H2 H (Nat.lt_succ_diag_r _)); clear H.
+      assert (H3 : vect_el 0 v i ≠ vect_el 0 v (S n)). {
+        intros H; specialize (H2 H); flia Hi H2.
+      }
+      unfold vect_el in H3.
+      rewrite H1 in H3.
+      apply Nat.neq_sym in H3.
+      apply Nat_le_neq_lt; [ | easy ].
+      apply Nat.lt_succ_r.
+      apply Hp1, Nat.lt_succ_diag_r.
+    } {
+      apply Nat_le_neq_lt; [ | easy ].
+      apply Nat.lt_succ_r.
+      apply Hp1; flia Hi.
+    }
+  } {
+    intros i j Hi Hj Hij.
+    do 2 rewrite if_eqb_eq_dec in Hij.
+    destruct (Nat.eq_dec (nth i (vect_list v) 0) (S n)) as [H1| H1]. {
+      destruct (Nat.eq_dec (nth j (vect_list v) 0) (S n)) as [H2| H2]. {
+        apply Hp2; [ flia Hv Hi | flia Hv Hj | ].
+        unfold vect_el; congruence.
+      }
+      apply Hp2 in Hij; [ flia Hj Hij | flia Hv | flia Hj Hv ].
+    }
+    destruct (Nat.eq_dec (nth j (vect_list v) 0) (S n)) as [H2| H2]. {
+      apply Hp2 in Hij; [ flia Hi Hij | flia Hv Hi | flia Hv ].
+    }
+    apply Hp2; [ flia Hv Hi | flia Hv Hj | ].
+    unfold vect_el; congruence.
+  }
+}
+assert
+  (Hφ' : ∀ iv,
+   φ'_prop_bool (S n) iv = true → φ_prop_bool (S (S n)) (φ' iv) = true). {
+  intros (i, v) Hp.
+  apply φ_prop_φ_prop_bool.
+  apply φ'_prop_φ'_prop_bool in Hp.
+  destruct Hp as (Hi & Hv & Hp).
+  unfold φ_prop, φ'.
+  cbn - [ seq ].
+  rewrite map_length, seq_length.
+  split; [ easy | ].
+  unfold is_permut_vect.
+  cbn - [ seq ].
+  rewrite map_length, seq_length.
+  unfold vect_el.
+  cbn - [ seq ].
+  eapply is_permut_eq_compat. {
+    intros j Hj; symmetry.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ | easy ].
+    rewrite Nat.add_0_l.
+    do 2 rewrite if_eqb_eq_dec.
+    easy.
+  }
+  split. {
+    intros j Hj.
+    destruct (Nat.eq_dec j (S n)) as [Hjn| Hjn]; [ easy | ].
+    destruct (Nat.eq_dec (nth j (vect_list v) 0) i) as [H1| H1]; [ flia | ].
+    destruct Hp as (Hp1, Hp2).
+    rewrite Hv in Hp1, Hp2.
+    unfold vect_el in Hp1.
+    assert (H : j < S n) by flia Hj Hjn.
+    specialize (Hp1 j H) as H2; clear H.
+    flia H2.
+  } {
+    intros j k Hj Hk Hjk.
+    destruct (Nat.eq_dec j (S n)) as [Hjn| Hjn]. {
+      destruct (Nat.eq_dec k (S n)) as [Hkn| Hkn]; [ congruence | ].
+      symmetry in Hjk.
+      destruct (Nat.eq_dec (nth k (vect_list v) 0) i) as [H| H]; [ | easy ].
+      rename H into Hki.
+      move Hjk at top; subst i; clear Hi.
+      subst j; clear Hj.
+      destruct Hp as (Hp1, Hp2).
+      rewrite Hv in Hp1.
+      specialize (Hp1 k) as H1.
+      assert (H : k < S n) by flia Hk Hkn.
+      specialize (H1 H); clear H.
+      unfold vect_el in H1.
+      rewrite Hki in H1.
+      flia H1.
+    }
+    destruct (Nat.eq_dec (nth j (vect_list v) 0) i) as [Hji| Hji]. {
+      destruct (Nat.eq_dec k (S n)) as [Hkn| Hkn]. {
+        move Hjk at top; subst i.
+        destruct Hp as (Hp1, Hp2).
+        rewrite Hv in Hp1.
+        specialize (Hp1 j) as H1.
+        assert (H : j < S n) by flia Hj Hjn.
+        specialize (H1 H); clear H.
+        unfold vect_el in H1.
+        rewrite Hji in H1.
+        flia H1.
+      }
+      destruct (Nat.eq_dec (nth k (vect_list v) 0) i) as [Hki| Hki]. {
+        destruct Hp as (Hp1, Hp2).
+        rewrite Hv in Hp1, Hp2.
+        apply Hp2; [ flia Hj Hjn | flia Hk Hkn | unfold vect_el; congruence ].
+      }
+      symmetry in Hjk.
+      destruct Hp as (Hp1, Hp2).
+      rewrite Hv in Hp1.
+      specialize (Hp1 k) as H1.
+      assert (H : k < S n) by flia Hk Hkn.
+      specialize (H1 H); clear H.
+      unfold vect_el in H1.
+      rewrite Hjk in H1.
+      flia H1.
+    }
+    destruct (Nat.eq_dec k (S n)) as [Hkn| Hkn]; [ easy | ].
+    destruct (Nat.eq_dec (nth k (vect_list v) 0) i) as [Hki| Hki]. {
+      destruct Hp as (Hp1, Hp2).
+      rewrite Hv in Hp1.
+      specialize (Hp1 j) as H1.
+      assert (H : j < S n) by flia Hj Hjn.
+      specialize (H1 H); clear H.
+      unfold vect_el in H1.
+      rewrite Hjk in H1.
+      flia H1.
+    }
+    apply Hp; [ rewrite Hv; flia Hj Hjn | rewrite Hv; flia Hk Hkn | easy ].
+  }
+}
+set
+  (φp :=
+   λ x : {u : vector nat | φ_prop_bool (S (S n)) u = true},
+   exist (λ iv : nat * vector nat, φ'_prop_bool (S n) iv = true)
+     (φ (proj1_sig x)) (Hφ (proj1_sig x) (proj2_sig x))).
+set
+  (φp' :=
+   λ y : {iv : nat * vector nat | φ'_prop_bool (S n) iv = true},
+   exist (λ u : vector nat, φ_prop_bool (S (S n)) u = true)
+      (φ' (proj1_sig y)) (Hφ' (proj1_sig y) (proj2_sig y))).
+assert (H : (∀ x, φp (φp' x) = x) ∧ (∀ y, φp' (φp y) = y)). {
+  split. {
+    intros x.
+    unfold φp, φp'.
+    specialize (proj2 (φ'_prop_φ'_prop_bool (S n) (proj1_sig x))) as H1.
+    destruct x as (iv, Hp); cbn in H1 |-*.
+    specialize (H1 Hp).
+    destruct iv as (i, v).
+    unfold φ'_prop in H1.
+    destruct H1 as (H1 & H2 & H3).
+    apply eq_exist_uncurried.
+    exists (Hφφ' (i, v) H2 H3).
+    apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+  } {
+    intros y.
+    unfold φp, φp'.
+    specialize (proj2 (φ_prop_φ_prop_bool (S (S n)) (proj1_sig y))) as H1.
+    destruct y as (u, Hp); cbn in H1 |-*.
+    specialize (H1 Hp).
+    unfold φ_prop in H1.
+    destruct H1 as (H1 & H2).
+    apply eq_exist_uncurried.
+    exists (Hφ'φ u H1 H2).
+    apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+  }
+}
+destruct H as (Hx, Hy).
+Definition nat_vector_1 n := {iv : nat * vector nat | φ'_prop_bool n iv = true}.
+Definition vector_1 n := {u : vector nat | φ_prop_bool n u = true}.
+fold (nat_vector_1 (S n)) in *.
+fold (vector_1 (S (S n))) in *.
+Definition size A P (S : {y : A | P y = true}) := 0.
+Print size.
+...
+assert (H1 : FinFun.Bijective φp) by now exists φp'.
+move IHn at bottom.
+unfold φ_prop_bool in Hy.
+unfold φ'_prop_bool in Hx.
+move Hsg at bottom.
+Print is_sym_gr_vect.
+...
+Search FinFun.Bijective.
+Search FinFun.Injective.
+Search FinFun.Surjective.
+...
+assert (∀ x, x ∈ vect_list vv → φ' (φ x) = x). {
+  intros x Hx.
+  apply (sym_gr_vect_elem Hsg) in Hx.
+  now apply Hφ'φ.
+}
+move H before Hφ'φ; clear Hφ'φ; rename H into Hφ'φ.
+...
+(* ma méthode *)
+...
 assert
   (Hll1 : ∀ n sg s, is_sym_gr_vect (S (S n)) sg →
    length (select_in_list_vect (S n) (vect_list sg) s) ≤ vect_size sg). {
