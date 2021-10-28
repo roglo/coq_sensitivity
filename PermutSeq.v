@@ -1421,31 +1421,63 @@ intros * Hf.
 destruct Hf as (g & Hgf & Hfg).
 destruct (Nat.lt_trichotomy m n) as [Hmn| [Hmn| Hmn]]; [ | easy | ]. {
   exfalso.
-Check Pigeonhole.pigeonhole_fun.
-Check pigeonhole_fun.
-Search pigeonhole_fun.
-specialize (pigeonhole) as H1.
-specialize (H1 (S n) (S m)).
-assert (f' : nat → nat). {
-  intros x.
-...
-  destruct (lt_dec x m) as [Hxm| Hxm]; [ | apply 0 ].
-  specialize (f (exist _ x Hxm)) as y.
-  destruct y as (y, py).
-  apply y.
-Show Proof.
-}
-*)
-set (f' :=
+(*
+  assert (f' : nat → nat). {
+    intros x.
+    destruct (lt_dec x m) as [Hxm| Hxm]; [ | apply 0 ].
+    specialize (f (exist _ x Hxm)) as y.
+    destruct y as (y, py).
+    apply y.
+    Show Proof.
+  }
+  set (f' :=
                              λ x4 : nat,
                                let s := lt_dec x4 m in
                                match s with
                                | left a =>
                                    (λ Hxm : x4 < m,
-                                      let y := f (exist (λ a0 : nat, a0 < m) x4 Hxm) in
-                                      let (x5, p) := y in (λ (y0 : nat) (_ : y0 < n), y0) x5 p) a
+                                      let y :=
+                                        f (exist (λ a0 : nat, a0 < m) x4 Hxm)
+                                        in
+                                      let (x5, p) := y in
+                                      (λ (y0 : nat) (_ : y0 < n), y0) x5 p) a
                                | right b => (λ _ : ¬ x4 < m, 0) b
                                end).
+*)
+  specialize (pigeonhole) as H1.
+  specialize (H1 n m).
+(*
+assert (f' : nat → nat). {
+  intros x.
+  destruct (lt_dec x n) as [Hxn| Hxn]; [ | apply 0 ].
+  specialize (g (exist _ x Hxn)) as y.
+  destruct y as (y, py); apply y.
+Show Proof.
+*)
+set (f' :=
+                             λ x4 : nat,
+                               let s := lt_dec x4 n in
+                               match s with
+                               | left a =>
+                                   (λ Hxn : x4 < n,
+                                      let y :=
+                                        g (exist (λ a0 : nat, a0 < n) x4 Hxn)
+                                        in
+                                      let (x5, p) := y in
+                                      (λ (y0 : nat) (_ : y0 < m), y0) x5 p) a
+                               | right b => (λ _ : ¬ x4 < n, 0) b
+                               end).
+specialize (H1 f' Hmn).
+assert (H : ∀ x, x < n → f' x < m). {
+  intros x Hx; unfold f'; cbn.
+  destruct (lt_dec x n) as [H| H]; [ | flia Hx H ].
+  remember (g _) as y eqn:Hy.
+  now destruct y as (y, py).
+}
+specialize (H1 H); clear H.
+specialize (H1 0 1).
+unfold pigeonhole_fun in H1.
+...
 apply Nat.succ_lt_mono in Hmn.
 specialize (H1 f' Hmn).
 assert (H : ∀ x, x < S n → f' x < S m). {
