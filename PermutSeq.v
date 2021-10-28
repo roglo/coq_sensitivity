@@ -1434,6 +1434,12 @@ destruct m. {
 }
 f_equal.
 ...
+eapply IHn. {
+  intros (x, px).
+  apply Nat.succ_lt_mono in px.
+  assert (px : S x < S m). {
+  specialize (f (exist _ (S x) px)) as y.
+...
 assert (f' : myfin m → myfin n). {
   intros (x, px).
   apply Nat.succ_lt_mono in px.
