@@ -1472,6 +1472,11 @@ destruct x as [(n1, n2)| ]. {
   move py before px.
   assert (H : px = py). {
 ...
+    clear Hx' Hy'.
+    exfalso.
+    apply Nat.ltb_lt in px.
+    apply Nat.ltb_lt in py.
+...
   }
   destruct H.
   rewrite Hy' in Hx'.
