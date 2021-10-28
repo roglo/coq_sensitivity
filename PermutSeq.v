@@ -1377,6 +1377,43 @@ fold (nat_vector_1 (S n)) in *.
 fold (vector_1 (S (S n))) in *.
 Definition size A P (S : {y : A | P y = true}) := 0.
 Print size.
+assert (Hinj : FinFun.Injective φp). {
+  unfold FinFun.Injective.
+  intros x y Hxy.
+  apply (f_equal φp') in Hxy.
+  now do 2 rewrite Hy in Hxy.
+}
+assert (Hsurj : FinFun.Surjective φp). {
+  unfold FinFun.Surjective.
+  intros y.
+  exists (φp' y).
+  apply Hx.
+}
+specialize (proj1 (FinFun.Surjective_list_carac φp) Hsurj) as H1.
+specialize FinFun.Injective_list_carac as H2.
+specialize (H2 (vector_1 (S (S n))) (nat_vector_1 (S n))).
+assert (H : ListDec.decidable_eq (vector_1 (S (S n)))). {
+  intros x y.
+  unfold vector_1 in x, y.
+  unfold Decidable.decidable.
+  destruct x as (x, Px).
+  destruct y as (y, Py).
+  remember (vect_eqb Nat.eqb x y) as b eqn:Hb; symmetry in Hb.
+  destruct b; [ left | right ]. {
+    apply vect_eqb_eq in Hb.
+    subst y.
+    apply eq_exist_uncurried.
+    exists eq_refl; cbn.
+    apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+  } {
+    apply vect_eqb_neq in Hb.
+    intros H; apply Hb; clear Hb; rename H into Hb.
+    now injection Hb.
+  }
+}
+specialize (proj1 (H2 H φp) Hinj) as H3; clear H H2.
+unfold vector_1 in H3.
+Search FinFun.Injective.
 ...
 assert (H1 : FinFun.Bijective φp) by now exists φp'.
 move IHn at bottom.
