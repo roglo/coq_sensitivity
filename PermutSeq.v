@@ -855,6 +855,9 @@ destruct i as [i| ]. {
     destruct Hi as (Hi3, Hi4).
     apply vect_eqb_eq in Hi4.
     rewrite (List_map_nth' empty_vect) in Hi4. 2: {
+      apply Nat.nle_gt; intros H.
+      rewrite nth_overflow in Hi4; [ | now rewrite map_length ].
+      subst q.
 ...
     rewrite Hq in Hi4.
     injection Hi4; clear Hi4; intros Hi4.
