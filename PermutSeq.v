@@ -842,6 +842,7 @@ destruct i as [i| ]. {
     }
   }
   subst i; f_equal.
+  clear Hi2.
   remember (vect_el empty_vect sg j) as p eqn:Hp.
   remember (mk_vect (butn s (vect_list p))) as q eqn:Hq.
   remember
