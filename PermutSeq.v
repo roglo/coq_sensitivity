@@ -1421,51 +1421,28 @@ intros * Hf.
 destruct Hf as (g & Hgf & Hfg).
 destruct (Nat.lt_trichotomy m n) as [Hmn| [Hmn| Hmn]]; [ | easy | ]. {
   exfalso.
-(*
-  assert (f' : nat → nat). {
-    intros x.
-    destruct (lt_dec x m) as [Hxm| Hxm]; [ | apply 0 ].
-    specialize (f (exist _ x Hxm)) as y.
-    destruct y as (y, py).
-    apply y.
-    Show Proof.
-  }
-  set (f' :=
-                             λ x4 : nat,
-                               let s := lt_dec x4 m in
-                               match s with
-                               | left a =>
-                                   (λ Hxm : x4 < m,
-                                      let y :=
-                                        f (exist (λ a0 : nat, a0 < m) x4 Hxm)
-                                        in
-                                      let (x5, p) := y in
-                                      (λ (y0 : nat) (_ : y0 < n), y0) x5 p) a
-                               | right b => (λ _ : ¬ x4 < m, 0) b
-                               end).
-*)
   specialize (pigeonhole) as H1.
   specialize (H1 n m).
 (*
-assert (f' : nat → nat). {
-  intros x.
-  destruct (lt_dec x n) as [Hxn| Hxn]; [ | apply 0 ].
-  specialize (g (exist _ x Hxn)) as y.
-  destruct y as (y, py); apply y.
-Show Proof.
+  assert (f' : nat → nat). {
+    intros y.
+    destruct (lt_dec y n) as [Hyn| Hyn]; [ | apply 0 ].
+    specialize (g (exist _ y Hyn)) as x.
+    destruct x as (x, px).
+    apply x.
+    Show Proof.
 *)
 set (f' :=
-                             λ x4 : nat,
-                               let s := lt_dec x4 n in
+                             λ y : nat,
+                               let s := lt_dec y n in
                                match s with
                                | left a =>
-                                   (λ Hxn : x4 < n,
-                                      let y :=
-                                        g (exist (λ a0 : nat, a0 < n) x4 Hxn)
-                                        in
-                                      let (x5, p) := y in
-                                      (λ (y0 : nat) (_ : y0 < m), y0) x5 p) a
-                               | right b => (λ _ : ¬ x4 < n, 0) b
+                                   (λ Hyn : y < n,
+                                      let x4 :=
+                                        g (exist (λ a0 : nat, a0 < n) y Hyn) in
+                                      let (x5, p) := x4 in
+                                      (λ (x6 : nat) (_ : x6 < m), x6) x5 p) a
+                               | right b => (λ _ : ¬ y < n, 0) b
                                end).
 specialize (H1 f' Hmn).
 assert (H : ∀ x, x < n → f' x < m). {
@@ -1475,8 +1452,48 @@ assert (H : ∀ x, x < n → f' x < m). {
   now destruct y as (y, py).
 }
 specialize (H1 H); clear H.
-specialize (H1 0 1).
 unfold pigeonhole_fun in H1.
+remember (find_dup f' (seq 0 n)) as x eqn:Hx; symmetry in Hx.
+destruct x as [(n1, n2)| ]. {
+(*
+  apply find_dup_some in Hx.
+  destruct Hx as (H2 & la1 & la2 & la3 & Hla).
+*)
+  specialize (H1 n1 n2 eq_refl).
+  destruct H1 as (Hn1n & Hn2n & Hnn & Hfnn).
+  unfold f' in Hfnn.
+  destruct (lt_dec n1 n) as [H1| H]; [ | flia Hn1n H ].
+  destruct (lt_dec n2 n) as [H2| H]; [ | flia Hn2n H ].
+  remember (g _) as x eqn:Hx' in Hfnn.
+  remember (g _) as y eqn:Hy' in Hfnn.
+  destruct x as (x, px).
+  destruct y as (y, py).
+  subst y.
+  move py before px.
+  assert (H : px = py). {
+...
+  }
+  destruct H.
+  rewrite Hy' in Hx'.
+  apply (f_equal f) in Hx'.
+  do 2 rewrite Hfg in Hx'.
+  injection Hx'; intros H; symmetry in H.
+  easy.
+}
+...
+    apply (Eqdep_dec.UIP_dec lt_dec).
+...
+
+  unfold f' in H2.
+  destruct (lt_dec n1 n) as [Hn1n| Hn1n]. {
+    destruct (lt_dec n2 n) as [Hn2n| Hn2n]. {
+      remember (g _) as y eqn:Hy in H2.
+      destruct y as (y, py).
+      remember (g _) as z eqn:Hz in H2.
+      destruct z as (z, pz).
+      subst z.
+      apply (f_equal f) in Hy.
+      rewrite Hfg in Hy.
 ...
 apply Nat.succ_lt_mono in Hmn.
 specialize (H1 f' Hmn).
