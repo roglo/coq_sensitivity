@@ -1414,7 +1414,7 @@ assert (H : ListDec.decidable_eq (vector_1 (S (S n)))). {
 specialize (proj1 (H2 H φp) Hinj) as H3; clear H H2.
 unfold vector_1 in H3.
 Search FinFun.Injective.
-Definition myfin n := {a : nat & a < n}.
+Definition myfin n := {a : nat & (a <? n) = true}.
 Theorem glop : ∀ m n (f : myfin m → myfin n), FinFun.Bijective f → m = n.
 Proof.
 intros * Hf.
@@ -1427,6 +1427,7 @@ destruct (Nat.lt_trichotomy m n) as [Hmn| [Hmn| Hmn]]; [ | easy | ]. {
   assert (f' : nat → nat). {
     intros y.
     destruct (lt_dec y n) as [Hyn| Hyn]; [ | apply 0 ].
+    apply Nat.ltb_lt in Hyn.
     specialize (g (existT _ y Hyn)) as x.
     destruct x as (x, px).
     apply x.
@@ -1434,31 +1435,30 @@ destruct (Nat.lt_trichotomy m n) as [Hmn| [Hmn| Hmn]]; [ | easy | ]. {
 *)
 set (f' := λ y : nat,
   match lt_dec y n with
-  | left Hyn => projT1 (g (existT (λ a0 : nat, a0 < n) y Hyn))
+  | left Hyn =>
+      let H := proj2 (Nat.ltb_lt y n) Hyn in
+      projT1 (g (existT (λ a, (a <? n) = true) y H))
   | right b => 0
   end).
 (*
 set (f' := λ y : nat,
   match lt_dec y n with
-  | left Hyn => proj1_sig (g (existT (λ a0 : nat, a0 < n) y Hyn))
+  | left Hyn => projT1 (g (existT (λ a0 : nat, a0 < n) y Hyn))
   | right b => 0
   end).
 *)
 specialize (H1 f' Hmn).
 assert (H : ∀ x, x < n → f' x < m). {
-  intros x Hx; unfold f'; cbn.
+  intros x Hx; unfold f'; cbn - [ "<?" ].
   destruct (lt_dec x n) as [H| H]; [ | flia Hx H ].
   remember (g _) as y eqn:Hy.
-  now destruct y as (y, py).
+  destruct y as (y, py).
+  now apply Nat.ltb_lt.
 }
 specialize (H1 H); clear H.
 unfold pigeonhole_fun in H1.
 remember (find_dup f' (seq 0 n)) as x eqn:Hx; symmetry in Hx.
 destruct x as [(n1, n2)| ]. {
-(*
-  apply find_dup_some in Hx.
-  destruct Hx as (H2 & la1 & la2 & la3 & Hla).
-*)
   specialize (H1 n1 n2 eq_refl).
   destruct H1 as (Hn1n & Hn2n & Hnn & Hfnn).
   unfold f' in Hfnn.
@@ -1473,11 +1473,7 @@ destruct x as [(n1, n2)| ]. {
   move py before px.
   assert (H : px = py). {
     clear - px py.
-...
-    exfalso.
-    apply Nat.ltb_lt in px.
-    apply Nat.ltb_lt in py.
-...
+    apply (Eqdep_dec.UIP_dec Bool.bool_dec).
   }
   destruct H.
   rewrite Hy' in Hx'.
@@ -1485,6 +1481,8 @@ destruct x as [(n1, n2)| ]. {
   do 2 rewrite Hfg in Hx'.
   injection Hx'; intros H; symmetry in H.
   easy.
+}
+now specialize (H1 0 0 eq_refl).
 }
 ...
     apply (Eqdep_dec.UIP_dec lt_dec).
