@@ -1470,6 +1470,7 @@ destruct x as [(n1, n2)| ]. {
   destruct y as (y, py).
   subst y.
   move py before px.
+...
   assert (H : px = py). {
     clear - px py.
 ...
