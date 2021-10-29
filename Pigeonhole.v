@@ -365,60 +365,22 @@ do 2 rewrite Hfg in Hx'.
 now injection Hx'; intros H; symmetry in H.
 Qed.
 
-...
-
 Theorem bijective_fin_t : ∀ m n (f : fin_t m → fin_t n),
   FinFun.Bijective f → m = n.
 Proof.
 intros * Hf.
 destruct (Nat.lt_trichotomy m n) as [Hmn| [Hmn| Hmn]]; [ | easy | ]. {
   exfalso.
-...
+  apply Nat.nle_gt in Hmn; apply Hmn; clear Hmn.
+  now apply bijective_fin_t_le in Hf.
+} {
+  exfalso.
+  apply Nat.nle_gt in Hmn; apply Hmn; clear Hmn.
   destruct Hf as (g & Hgf & Hfg).
-  specialize (pigeonhole) as H1.
-  specialize (H1 n m).
-  set (f' := λ y : nat,
-    match lt_dec y n with
-    | left Hyn =>
-        let H := proj2 (Nat.ltb_lt y n) Hyn in
-        projT1 (g (existT (λ a, (a <? n) = true) y H))
-    | right b => 0
-    end).
-  specialize (H1 f' Hmn).
-  assert (H : ∀ x, x < n → f' x < m). {
-    intros x Hx; unfold f'; cbn - [ "<?" ].
-    destruct (lt_dec x n) as [H| H]; [ | flia Hx H ].
-    remember (g _) as y eqn:Hy.
-    destruct y as (y, py).
-    now apply Nat.ltb_lt.
-  }
-  specialize (H1 H); clear H.
-  unfold pigeonhole_fun in H1.
-  remember (find_dup f' (seq 0 n)) as x eqn:Hx; symmetry in Hx.
-  destruct x as [(n1, n2)| ]; [ | now apply (H1 0 0 eq_refl) ].
-  specialize (H1 n1 n2 eq_refl).
-  destruct H1 as (Hn1n & Hn2n & Hnn & Hfnn).
-  unfold f' in Hfnn.
-  destruct (lt_dec n1 n) as [H1| H]; [ | flia Hn1n H ].
-  destruct (lt_dec n2 n) as [H2| H]; [ | flia Hn2n H ].
-  remember (g _) as x eqn:Hx' in Hfnn.
-  remember (g _) as y eqn:Hy' in Hfnn.
-  destruct x as (x, px).
-  destruct y as (y, py).
-  cbn in Hfnn.
-  subst y.
-  move py before px.
-  assert (H : px = py). {
-    clear - px py.
-    apply (Eqdep_dec.UIP_dec Bool.bool_dec).
-  }
-  destruct H.
-  rewrite Hy' in Hx'.
-  apply (f_equal f) in Hx'.
-  do 2 rewrite Hfg in Hx'.
-  injection Hx'; intros H; symmetry in H.
-  easy.
+  assert (H : FinFun.Bijective g) by now exists f.
+  now apply bijective_fin_t_le in H.
 }
+Qed.
 
 (* end fin_t *)
 
