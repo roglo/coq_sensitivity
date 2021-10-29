@@ -1388,6 +1388,25 @@ set (gv := λ vpv : vector_1 (S (S n)),
     (rank_of_permut_in_sym_gr sg v)
     (proj2 (Nat.ltb_lt (rank_of_permut_in_sym_gr sg v) (vect_size sg))
        (rank_of_permut_in_sym_gr_lt v (Nat.neq_succ_0 (S n)) Hsg))).
+fold (vector_1 (S (S n))) in fv.
+fold (fin_t (vect_size sg)) in gv.
+assert (Hfgv : ∀ x, fv (gv x) = x). {
+  intros (v, pv).
+  unfold fv, gv.
+  specialize (proj2 (φ_prop_φ_prop_bool (S (S n)) v) pv) as H1.
+  destruct H1 as (Hv, Hp).
+  apply eq_exist_uncurried.
+  exists (vect_el_rank_of_permut_in_sym_gr Hsg Hp Hv).
+  apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+}
+assert (Hgfv : ∀ y, gv (fv y) = y). {
+  intros (k, pk).
+  unfold fv, gv.
+  specialize (proj1 (Nat.ltb_lt k (vect_size sg)) pk) as H1.
+  apply eq_exist_uncurried.
+  exists (rank_of_permut_in_sym_gr_vect_el (Nat.neq_succ_0 (S n)) Hsg H1).
+  apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+}
 ...
 assert (fnv : fin_t (S (S n))! → nat_vector_1 (S n)). {
   intros x.
