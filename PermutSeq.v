@@ -1432,18 +1432,11 @@ destruct (Nat.lt_trichotomy m n) as [Hmn| [Hmn| Hmn]]; [ | easy | ]. {
     apply x.
     Show Proof.
 *)
-set (f' :=
-                             λ y : nat,
-                               let s := lt_dec y n in
-                               match s with
-                               | left a =>
-                                   (λ Hyn : y < n,
-                                      let x4 :=
-                                        g (exist (λ a0 : nat, a0 < n) y Hyn) in
-                                      let (x5, p) := x4 in
-                                      (λ (x6 : nat) (_ : x6 < m), x6) x5 p) a
-                               | right b => (λ _ : ¬ y < n, 0) b
-                               end).
+set (f' := λ y : nat,
+  match lt_dec y n with
+  | left Hyn => proj1_sig (g (exist (λ a0 : nat, a0 < n) y Hyn))
+  | right b => 0
+  end).
 specialize (H1 f' Hmn).
 assert (H : ∀ x, x < n → f' x < m). {
   intros x Hx; unfold f'; cbn.
@@ -1468,6 +1461,7 @@ destruct x as [(n1, n2)| ]. {
   remember (g _) as y eqn:Hy' in Hfnn.
   destruct x as (x, px).
   destruct y as (y, py).
+  cbn in Hfnn.
   subst y.
   move py before px.
 ...
