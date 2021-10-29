@@ -316,10 +316,13 @@ Qed.
 Definition fin_t n := {a : nat | (a <? n) = true}.
 
 Theorem bijective_fin_t_le : ∀ m n (f : fin_t m → fin_t n),
+  (∀ y, f (g y) = y) → ...
+...
   FinFun.Bijective f → n ≤ m.
 Proof.
 intros * Hf.
 destruct Hf as (g & Hgf & Hfg).
+clear Hgf.
 specialize (pigeonhole) as H1.
 specialize (H1 n m).
 apply Nat.nlt_ge; intros Hmn.
@@ -364,6 +367,8 @@ apply (f_equal f) in Hx'.
 do 2 rewrite Hfg in Hx'.
 now injection Hx'; intros H; symmetry in H.
 Qed.
+
+...
 
 Theorem bijective_fin_t : ∀ m n (f : fin_t m → fin_t n),
   FinFun.Bijective f → m = n.
