@@ -1375,8 +1375,6 @@ Definition nat_vector_1 n := {iv : nat * vector nat | φ'_prop_bool n iv = true}
 Definition vector_1 n := {u : vector nat | φ_prop_bool n u = true}.
 fold (nat_vector_1 (S n)) in *.
 fold (vector_1 (S (S n))) in *.
-Definition size A P (S : {y : A | P y = true}) := 0.
-Print size.
 assert (Hinj : FinFun.Injective φp). {
   unfold FinFun.Injective.
   intros x y Hxy.
@@ -1414,8 +1412,9 @@ assert (H : ListDec.decidable_eq (vector_1 (S (S n)))). {
 specialize (proj1 (H2 H φp) Hinj) as H3; clear H H2.
 unfold vector_1 in H3.
 Search FinFun.Injective.
-Definition myfin n := {a : nat & (a <? n) = true}.
-Theorem glop : ∀ m n (f : myfin m → myfin n), FinFun.Bijective f → m = n.
+Definition fin_t n := {a : nat & (a <? n) = true}.
+Theorem bijective_fin_t : ∀ m n (f : fin_t m → fin_t n),
+  FinFun.Bijective f → m = n.
 Proof.
 intros * Hf.
 destruct Hf as (g & Hgf & Hfg).
@@ -1423,42 +1422,25 @@ destruct (Nat.lt_trichotomy m n) as [Hmn| [Hmn| Hmn]]; [ | easy | ]. {
   exfalso.
   specialize (pigeonhole) as H1.
   specialize (H1 n m).
-(*
-  assert (f' : nat → nat). {
-    intros y.
-    destruct (lt_dec y n) as [Hyn| Hyn]; [ | apply 0 ].
-    apply Nat.ltb_lt in Hyn.
-    specialize (g (existT _ y Hyn)) as x.
-    destruct x as (x, px).
-    apply x.
-    Show Proof.
-*)
-set (f' := λ y : nat,
-  match lt_dec y n with
-  | left Hyn =>
-      let H := proj2 (Nat.ltb_lt y n) Hyn in
-      projT1 (g (existT (λ a, (a <? n) = true) y H))
-  | right b => 0
-  end).
-(*
-set (f' := λ y : nat,
-  match lt_dec y n with
-  | left Hyn => projT1 (g (existT (λ a0 : nat, a0 < n) y Hyn))
-  | right b => 0
-  end).
-*)
-specialize (H1 f' Hmn).
-assert (H : ∀ x, x < n → f' x < m). {
-  intros x Hx; unfold f'; cbn - [ "<?" ].
-  destruct (lt_dec x n) as [H| H]; [ | flia Hx H ].
-  remember (g _) as y eqn:Hy.
-  destruct y as (y, py).
-  now apply Nat.ltb_lt.
-}
-specialize (H1 H); clear H.
-unfold pigeonhole_fun in H1.
-remember (find_dup f' (seq 0 n)) as x eqn:Hx; symmetry in Hx.
-destruct x as [(n1, n2)| ]. {
+  set (f' := λ y : nat,
+    match lt_dec y n with
+    | left Hyn =>
+        let H := proj2 (Nat.ltb_lt y n) Hyn in
+        projT1 (g (existT (λ a, (a <? n) = true) y H))
+    | right b => 0
+    end).
+  specialize (H1 f' Hmn).
+  assert (H : ∀ x, x < n → f' x < m). {
+    intros x Hx; unfold f'; cbn - [ "<?" ].
+    destruct (lt_dec x n) as [H| H]; [ | flia Hx H ].
+    remember (g _) as y eqn:Hy.
+    destruct y as (y, py).
+    now apply Nat.ltb_lt.
+  }
+  specialize (H1 H); clear H.
+  unfold pigeonhole_fun in H1.
+  remember (find_dup f' (seq 0 n)) as x eqn:Hx; symmetry in Hx.
+  destruct x as [(n1, n2)| ]; [ | now apply (H1 0 0 eq_refl) ].
   specialize (H1 n1 n2 eq_refl).
   destruct H1 as (Hn1n & Hn2n & Hnn & Hfnn).
   unfold f' in Hfnn.
@@ -1482,107 +1464,6 @@ destruct x as [(n1, n2)| ]. {
   injection Hx'; intros H; symmetry in H.
   easy.
 }
-now specialize (H1 0 0 eq_refl).
-}
-...
-    apply (Eqdep_dec.UIP_dec lt_dec).
-...
-
-  unfold f' in H2.
-  destruct (lt_dec n1 n) as [Hn1n| Hn1n]. {
-    destruct (lt_dec n2 n) as [Hn2n| Hn2n]. {
-      remember (g _) as y eqn:Hy in H2.
-      destruct y as (y, py).
-      remember (g _) as z eqn:Hz in H2.
-      destruct z as (z, pz).
-      subst z.
-      apply (f_equal f) in Hy.
-      rewrite Hfg in Hy.
-...
-apply Nat.succ_lt_mono in Hmn.
-specialize (H1 f' Hmn).
-assert (H : ∀ x, x < S n → f' x < S m). {
-  intros x px; unfold f'.
-  destruct (lt_dec x m) as [Hxm| Hxm]; [ | flia ].
-  remember (f (exist _ x Hxm)) as y eqn:Hy.
-  apply (f_equal g) in Hy.
-  rewrite Hgf in Hy.
-  destruct y as (y, py).
-...
-  cbn.
-  specialize (g (exist _ x px)) as y.
-  destruct y as (y, py).
-...
-destruct Hf as (g & Hgf & Hfg).
-revert m f g Hgf Hfg.
-induction n; intros; cbn. {
-  destruct m; [ easy | exfalso ].
-  assert (x : myfin (S m)) by (exists 0; flia).
-  remember (f x) as y.
-  now destruct y.
-}
-destruct m. {
-  exfalso.
-  assert (y : myfin (S n)) by (exists 0; flia).
-  remember (g y) as x.
-  now destruct x.
-}
-f_equal.
-assert (f' : myfin m → myfin n). {
-  intros (x, px).
-  apply Nat.succ_lt_mono in px.
-...
-
-  destruct m; [ flia px | ].
-  apply Nat.succ_lt_mono in px.
-  specialize (f (exist _ (S x) px)) as y.
-  destruct y as (y, py).
-
-  destruct y as (y, py).
-...
-...
-eapply IHn. {
-  intros (x, px).
-  apply Nat.succ_lt_mono in px.
-  assert (px : S x < S m). {
-  specialize (f (exist _ (S x) px)) as y.
-...
-assert (f' : myfin m → myfin n). {
-  intros (x, px).
-  apply Nat.succ_lt_mono in px.
-  specialize (f (exist _ (S x) px)) as y.
-  destruct y as (y, py).
-...
-  destruct y. {
-...
-Theorem glop : ∀ m n (f : Fin.t m → Fin.t n), FinFun.Bijective f → m = n.
-Proof.
-intros * Hf.
-destruct Hf as (g & Hgf & Hfg).
-revert m f g Hgf Hfg.
-induction n; intros; cbn. {
-  destruct m; [ easy | exfalso ].
-  now remember (f Fin.F1).
-}
-destruct m. {
-  exfalso.
-  now remember (g Fin.F1).
-}
-f_equal.
-Search (Fin.t (S _)).
-Print Fin.t.
-...
-Definition glop n (x : Fin.t (S n)) :=
-  match x with
-  | F1 =>
-Definition glop : ∀ n, Fin.t (S n) → Fin.t n + True.
-intros * Hn.
-destruct Hn as [m| ]; [ left | right; apply I ].
-Show Proof.
-...
-assert (f' : Fin.t m → Fin.t n). {
-  intros x.
-Search (Fin.t (S _)).
 ...
 assert (H1 : FinFun.Bijective φp) by now exists φp'.
 move IHn at bottom.
