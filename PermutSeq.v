@@ -1407,10 +1407,18 @@ assert (Hgfv : ∀ y, gv (fv y) = y). {
   exists (rank_of_permut_in_sym_gr_vect_el (Nat.neq_succ_0 (S n)) Hsg H1).
   apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 }
-...
+destruct Hsg as (Hsg & Hinj & Hsurj).
 assert (fnv : fin_t (S (S n))! → nat_vector_1 (S n)). {
-  intros x.
-  unfold nat_vector_r.
+  intros (i, pi).
+  apply Nat.ltb_lt in pi.
+  unfold nat_vector_1.
+  exists (φ (vect_el empty_vect sg i)).
+  apply φ'_prop_φ'_prop_bool.
+  split. {
+    specialize (
+...
+  unfold φ; cbn.
+  rewrite map_length.
 ...
 assert (Hinj : FinFun.Injective φp). {
   unfold FinFun.Injective.
