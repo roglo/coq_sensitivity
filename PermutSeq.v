@@ -1414,7 +1414,7 @@ assert (H : ListDec.decidable_eq (vector_1 (S (S n)))). {
 specialize (proj1 (H2 H φp) Hinj) as H3; clear H H2.
 unfold vector_1 in H3.
 Search FinFun.Injective.
-Definition myfin n := {a : nat | a < n}.
+Definition myfin n := {a : nat & a < n}.
 Theorem glop : ∀ m n (f : myfin m → myfin n), FinFun.Bijective f → m = n.
 Proof.
 intros * Hf.
@@ -1427,16 +1427,23 @@ destruct (Nat.lt_trichotomy m n) as [Hmn| [Hmn| Hmn]]; [ | easy | ]. {
   assert (f' : nat → nat). {
     intros y.
     destruct (lt_dec y n) as [Hyn| Hyn]; [ | apply 0 ].
-    specialize (g (exist _ y Hyn)) as x.
+    specialize (g (existT _ y Hyn)) as x.
     destruct x as (x, px).
     apply x.
     Show Proof.
 *)
 set (f' := λ y : nat,
   match lt_dec y n with
-  | left Hyn => proj1_sig (g (exist (λ a0 : nat, a0 < n) y Hyn))
+  | left Hyn => projT1 (g (existT (λ a0 : nat, a0 < n) y Hyn))
   | right b => 0
   end).
+(*
+set (f' := λ y : nat,
+  match lt_dec y n with
+  | left Hyn => proj1_sig (g (existT (λ a0 : nat, a0 < n) y Hyn))
+  | right b => 0
+  end).
+*)
 specialize (H1 f' Hmn).
 assert (H : ∀ x, x < n → f' x < m). {
   intros x Hx; unfold f'; cbn.
@@ -1464,7 +1471,6 @@ destruct x as [(n1, n2)| ]. {
   cbn in Hfnn.
   subst y.
   move py before px.
-...
   assert (H : px = py). {
     clear - px py.
 ...
