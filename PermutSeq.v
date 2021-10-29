@@ -865,6 +865,9 @@ destruct i as [i| ]. {
 ...
 *)
 
+Definition nat_vector_1 n := {iv : nat * vector nat | φ'_prop_bool n iv = true}.
+Definition vector_1 n := {u : vector nat | φ_prop_bool n u = true}.
+
 Theorem glop : ∀ n sg, is_sym_gr_vect n sg → vect_size sg = n!.
 Proof.
 intros * Hsg.
@@ -1371,10 +1374,25 @@ assert (H : (∀ x, φp (φp' x) = x) ∧ (∀ y, φp' (φp y) = y)). {
   }
 }
 destruct H as (Hx, Hy).
-Definition nat_vector_1 n := {iv : nat * vector nat | φ'_prop_bool n iv = true}.
-Definition vector_1 n := {u : vector nat | φ_prop_bool n u = true}.
 fold (nat_vector_1 (S n)) in *.
 fold (vector_1 (S (S n))) in *.
+set (fv := λ kpk : fin_t (vect_size sg),
+  let (k, pk) := kpk in
+  exist (λ u, φ_prop_bool (S (S n)) u = true)
+    (vect_el empty_vect sg k)
+    (proj1 (φ_prop_φ_prop_bool (S (S n)) (vect_el empty_vect sg k))
+       (proj1 Hsg k (proj1 (Nat.ltb_lt k (vect_size sg)) pk)))).
+set (gv := λ vpv : vector_1 (S (S n)),
+  let (v, _) := vpv in
+  exist (λ a, (a <? vect_size sg) = true)
+    (rank_of_permut_in_sym_gr sg v)
+    (proj2 (Nat.ltb_lt (rank_of_permut_in_sym_gr sg v) (vect_size sg))
+       (rank_of_permut_in_sym_gr_lt v (Nat.neq_succ_0 (S n)) Hsg))).
+...
+assert (fnv : fin_t (S (S n))! → nat_vector_1 (S n)). {
+  intros x.
+  unfold nat_vector_r.
+...
 assert (Hinj : FinFun.Injective φp). {
   unfold FinFun.Injective.
   intros x y Hxy.
@@ -1410,60 +1428,9 @@ assert (H : ListDec.decidable_eq (vector_1 (S (S n)))). {
   }
 }
 specialize (proj1 (H2 H φp) Hinj) as H3; clear H H2.
+...
 unfold vector_1 in H3.
 Search FinFun.Injective.
-Definition fin_t n := {a : nat & (a <? n) = true}.
-Theorem bijective_fin_t : ∀ m n (f : fin_t m → fin_t n),
-  FinFun.Bijective f → m = n.
-Proof.
-intros * Hf.
-destruct Hf as (g & Hgf & Hfg).
-destruct (Nat.lt_trichotomy m n) as [Hmn| [Hmn| Hmn]]; [ | easy | ]. {
-  exfalso.
-  specialize (pigeonhole) as H1.
-  specialize (H1 n m).
-  set (f' := λ y : nat,
-    match lt_dec y n with
-    | left Hyn =>
-        let H := proj2 (Nat.ltb_lt y n) Hyn in
-        projT1 (g (existT (λ a, (a <? n) = true) y H))
-    | right b => 0
-    end).
-  specialize (H1 f' Hmn).
-  assert (H : ∀ x, x < n → f' x < m). {
-    intros x Hx; unfold f'; cbn - [ "<?" ].
-    destruct (lt_dec x n) as [H| H]; [ | flia Hx H ].
-    remember (g _) as y eqn:Hy.
-    destruct y as (y, py).
-    now apply Nat.ltb_lt.
-  }
-  specialize (H1 H); clear H.
-  unfold pigeonhole_fun in H1.
-  remember (find_dup f' (seq 0 n)) as x eqn:Hx; symmetry in Hx.
-  destruct x as [(n1, n2)| ]; [ | now apply (H1 0 0 eq_refl) ].
-  specialize (H1 n1 n2 eq_refl).
-  destruct H1 as (Hn1n & Hn2n & Hnn & Hfnn).
-  unfold f' in Hfnn.
-  destruct (lt_dec n1 n) as [H1| H]; [ | flia Hn1n H ].
-  destruct (lt_dec n2 n) as [H2| H]; [ | flia Hn2n H ].
-  remember (g _) as x eqn:Hx' in Hfnn.
-  remember (g _) as y eqn:Hy' in Hfnn.
-  destruct x as (x, px).
-  destruct y as (y, py).
-  cbn in Hfnn.
-  subst y.
-  move py before px.
-  assert (H : px = py). {
-    clear - px py.
-    apply (Eqdep_dec.UIP_dec Bool.bool_dec).
-  }
-  destruct H.
-  rewrite Hy' in Hx'.
-  apply (f_equal f) in Hx'.
-  do 2 rewrite Hfg in Hx'.
-  injection Hx'; intros H; symmetry in H.
-  easy.
-}
 ...
 assert (H1 : FinFun.Bijective φp) by now exists φp'.
 move IHn at bottom.

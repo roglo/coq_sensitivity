@@ -315,14 +315,10 @@ Qed.
 
 Definition fin_t n := {a : nat | (a <? n) = true}.
 
-Theorem bijective_fin_t_le : ∀ m n (f : fin_t m → fin_t n),
-  (∀ y, f (g y) = y) → ...
-...
-  FinFun.Bijective f → n ≤ m.
+Theorem fin_t_fun_le : ∀ m n (f : fin_t m → fin_t n) g,
+  (∀ y, f (g y) = y) → n ≤ m.
 Proof.
-intros * Hf.
-destruct Hf as (g & Hgf & Hfg).
-clear Hgf.
+intros * Hfg.
 specialize (pigeonhole) as H1.
 specialize (H1 n m).
 apply Nat.nlt_ge; intros Hmn.
@@ -368,25 +364,20 @@ do 2 rewrite Hfg in Hx'.
 now injection Hx'; intros H; symmetry in H.
 Qed.
 
-...
-
 Theorem bijective_fin_t : ∀ m n (f : fin_t m → fin_t n),
   FinFun.Bijective f → m = n.
 Proof.
 intros * Hf.
+destruct Hf as (g & Hgf & Hfg).
 destruct (Nat.lt_trichotomy m n) as [Hmn| [Hmn| Hmn]]; [ | easy | ]. {
   exfalso.
   apply Nat.nle_gt in Hmn; apply Hmn; clear Hmn.
-  now apply bijective_fin_t_le in Hf.
+  now apply fin_t_fun_le in Hfg.
 } {
   exfalso.
   apply Nat.nle_gt in Hmn; apply Hmn; clear Hmn.
-  destruct Hf as (g & Hgf & Hfg).
-  assert (H : FinFun.Bijective g) by now exists f.
-  now apply bijective_fin_t_le in H.
+  now apply fin_t_fun_le in Hgf.
 }
 Qed.
 
 (* end fin_t *)
-
-...
