@@ -1412,10 +1412,41 @@ assert (fnv : fin_t (S (S n))! → nat_vector_1 (S n)). {
   intros (i, pi).
   apply Nat.ltb_lt in pi.
   unfold nat_vector_1.
+...
   exists (φ (vect_el empty_vect sg i)).
-  apply φ'_prop_φ'_prop_bool.
+  apply Hφ.
+  apply φ_prop_φ_prop_bool.
   split. {
-    specialize (
+...
+    destruct (lt_dec i (vect_size sg)) as [His| His]. 2: {
+      apply Nat.nlt_ge in His.
+      unfold vect_el.
+      rewrite nth_overflow; [ | easy ].
+...
+      rewrite fold_vect_size; cbn; flia.
+    }
+    specialize (Hsg i His) as H1.
+    destruct H1 as (H1, H2).
+    destruct H2 as (H2, H3).
+    rewrite H1 in H2.
+    apply (H2 (S n)); flia.
+  }
+  apply Hσ.
+  split. {
+    destruct (lt_dec i (vect_size sg)) as [His| His]; [ now apply Hsg | ].
+    apply Nat.nlt_ge in His.
+...
+      unfold vect_el.
+...
+      rewrite nth_overflow; [ | easy ].
+      cbn.
+...
+...
+  split. {
+    unfold σ'; cbn.
+    now rewrite map_length, seq_length.
+  } {
+    apply Hσ.
 ...
   unfold φ; cbn.
   rewrite map_length.
