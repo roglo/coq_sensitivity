@@ -708,6 +708,7 @@ Definition permut_but_highest n σ :=
     (map (λ i, vect_el 0 σ (if vect_el 0 σ i =? n then n else i))
        (seq 0 n)).
 
+(* seems useless... *)
 Theorem permut_but_highest_prop : ∀ n σ,
    vect_size σ = S (S n) ∧ is_permut_vect σ
    → vect_size (permut_but_highest (S n) σ) = S n ∧
@@ -772,7 +773,10 @@ split. {
     flia Hi Hij.
   }
 }
-Abort.
+Qed.
+
+Definition last_and_permut_but_highest n σ :=
+  (vect_el 0 σ n, permut_but_highest n σ).
 
 Theorem glop : ∀ n sg, is_sym_gr_vect n sg → vect_size sg = n!.
 Proof.
@@ -780,8 +784,7 @@ intros * Hsg.
 destruct n; [ now apply vect_size_of_empty_sym_gr | ].
 revert sg Hsg.
 induction n; intros; [ now apply vect_size_of_sym_gr_1 | ].
-set (φ := λ σ, (vect_el 0 σ (S n), permut_but_highest (S n) σ)).
-...
+set (φ := λ σ, last_and_permut_but_highest (S n) σ).
 set
   (φ' := λ a : (nat * vector nat), let '(i, v) := a in
     mk_vect
@@ -813,8 +816,9 @@ assert
     rewrite Hv in Hp; cbn in Hp.
     destruct Hp as (Hp1, Hp2).
     unfold φ', φ.
-    f_equal.
+    unfold last_and_permut_but_highest.
     unfold permut_but_highest.
+    f_equal.
     cbn - [ seq ].
     rewrite (seq_S (S n)).
     cbn - [ seq ].
@@ -889,7 +893,7 @@ assert
     rewrite app_nth1; [ easy | flia Hv Hi ].
   } {
     intros (i, v) Hv Hp; cbn in Hv, Hp.
-    unfold φ, φ', permut_but_highest.
+    unfold φ, φ', last_and_permut_but_highest, permut_but_highest.
     cbn - [ seq ].
     f_equal. {
       rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
@@ -969,6 +973,7 @@ assert
   split. {
     intros i Hi.
     rewrite if_eqb_eq_dec.
+    unfold vect_el.
     destruct (Nat.eq_dec (nth i (vect_list v) 0) (S n)) as [H1| H1].  {
       specialize (Hp2 i (S n)) as H2.
       assert (H : i < S (S n)) by flia Hi.
@@ -990,6 +995,7 @@ assert
   } {
     intros i j Hi Hj Hij.
     do 2 rewrite if_eqb_eq_dec in Hij.
+    unfold vect_el in Hij.
     destruct (Nat.eq_dec (nth i (vect_list v) 0) (S n)) as [H1| H1]. {
       destruct (Nat.eq_dec (nth j (vect_list v) 0) (S n)) as [H2| H2]. {
         apply Hp2; [ flia Hv Hi | flia Hv Hj | ].
