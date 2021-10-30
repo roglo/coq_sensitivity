@@ -1531,6 +1531,20 @@ assert (Hzφ' : φ'_prop_bool (S n) (φ (vect_el empty_vect sg 0)) = true). {
   split. {
     specialize (Hsg 0 Hsz) as H1.
     destruct H1 as (H1 & H2 & H3).
+    rewrite H1 in H2, H3.
+    apply H2; flia.
+  }
+  split. {
+    unfold σ'; cbn.
+    now rewrite map_length, seq_length.
+  } {
+    unfold σ'.
+    split. {
+      cbn - [ seq ]; rewrite map_length, seq_length.
+      intros i Hi.
+      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+      rewrite seq_nth; [ | easy ].
+      rewrite Nat.add_0_l.
 ...
   split; [ flia | ].
   split. {
