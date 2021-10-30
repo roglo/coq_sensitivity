@@ -784,7 +784,6 @@ intros * Hsg.
 destruct n; [ now apply vect_size_of_empty_sym_gr | ].
 revert sg Hsg.
 induction n; intros; [ now apply vect_size_of_sym_gr_1 | ].
-set (φ := λ σ, last_and_permut_but_highest (S n) σ).
 set
   (φ' := λ a : (nat * vector nat), let '(i, v) := a in
     mk_vect
@@ -806,8 +805,10 @@ Compute (permut_vect_inv (permut_vect_inv (mk_vect [0;5;2;4;1;3]))).
 *)
 assert
   (H :
-     (∀ x, vect_size x = S (S n) → is_permut_vect x → φ' (φ x) = x) ∧
-     (∀ y, vect_size (snd y) = S n → is_permut_vect (snd y) → φ (φ' y) = y)).
+     (∀ x, vect_size x = S (S n) → is_permut_vect x →
+      φ' (last_and_permut_but_highest (S n) x) = x) ∧
+     (∀ y, vect_size (snd y) = S n → is_permut_vect (snd y) →
+      last_and_permut_but_highest (S n) (φ' y) = y)).
   {
   split. {
     intros (l) Hv Hp; cbn in Hv.
@@ -815,7 +816,7 @@ assert
     unfold vect_el in Hp; cbn in Hp.
     rewrite Hv in Hp; cbn in Hp.
     destruct Hp as (Hp1, Hp2).
-    unfold φ', φ.
+    unfold φ'.
     unfold last_and_permut_but_highest.
     unfold permut_but_highest.
     f_equal.
@@ -893,7 +894,7 @@ assert
     rewrite app_nth1; [ easy | flia Hv Hi ].
   } {
     intros (i, v) Hv Hp; cbn in Hv, Hp.
-    unfold φ, φ', last_and_permut_but_highest, permut_but_highest.
+    unfold φ', last_and_permut_but_highest, permut_but_highest.
     cbn - [ seq ].
     f_equal. {
       rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
@@ -941,7 +942,7 @@ assert
 destruct H as (Hφ'φ, Hφφ').
 assert
   (Hφ : ∀ u, φ_prop_bool (S (S n)) u = true
-  → φ'_prop_bool (S n) (φ u) = true). {
+  → φ'_prop_bool (S n) (last_and_permut_but_highest (S n) u) = true). {
   intros v Hv.
   apply φ'_prop_φ'_prop_bool.
   apply φ_prop_φ_prop_bool in Hv.
@@ -952,8 +953,7 @@ assert
   unfold vect_el in Hp; cbn in Hp.
   rewrite Hv in Hp; cbn in Hp.
   destruct Hp as (Hp1, Hp2).
-  unfold φ', φ.
-  unfold permut_but_highest.
+  unfold φ', last_and_permut_but_highest, permut_but_highest.
   cbn - [ seq ].
   rewrite map_length, seq_length.
   split; [ apply Hp1; flia | ].
@@ -1107,7 +1107,8 @@ set
   (φp :=
    λ x : {u : vector nat | φ_prop_bool (S (S n)) u = true},
    exist (λ iv : nat * vector nat, φ'_prop_bool (S n) iv = true)
-     (φ (proj1_sig x)) (Hφ (proj1_sig x) (proj2_sig x))).
+     (last_and_permut_but_highest (S n) (proj1_sig x))
+     (Hφ (proj1_sig x) (proj2_sig x))).
 set
   (φp' :=
    λ y : {iv : nat * vector nat | φ'_prop_bool (S n) iv = true},
@@ -1174,7 +1175,10 @@ assert (Hgfv : ∀ y, gv (fv y) = y). {
   apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 }
 destruct Hsg as (Hsg & Hinj & Hsurj).
-assert (Hiφ' : ∀ i, i < vect_size sg → φ'_prop_bool (S n) (φ (vect_el empty_vect sg i)) = true). {
+assert
+  (Hiφ' : ∀ i, i < vect_size sg →
+   φ'_prop_bool (S n)
+     (last_and_permut_but_highest (S n) (vect_el empty_vect sg i)) = true). {
   intros i His.
   apply φ'_prop_φ'_prop_bool.
   split. {
@@ -1266,7 +1270,9 @@ assert (Hiφ' : ∀ i, i < vect_size sg → φ'_prop_bool (S n) (φ (vect_el emp
     }
   }
 }
-assert (Hzφ' : φ'_prop_bool (S n) (φ (vect_el empty_vect sg 0)) = true). {
+assert (Hzφ' :
+  φ'_prop_bool (S n)
+    (last_and_permut_but_highest (S n) (vect_el empty_vect sg 0)) = true). {
   destruct (Nat.eq_dec (vect_size sg) 0) as [Hsz| Hsz]. {
     exfalso.
     specialize (Hsurj (mk_vect (seq 0 (S (S n))))) as H1.
@@ -1389,10 +1395,11 @@ set (fnv := λ H1 : fin_t (S (S n))!,
   match lt_dec i (vect_size sg) with
   | left His =>
       exist (λ iv : nat * vector nat, φ'_prop_bool (S n) iv = true)
-        (φ (vect_el empty_vect sg i)) (Hiφ' i His)
+        (last_and_permut_but_highest (S n) (vect_el empty_vect sg i))
+        (Hiφ' i His)
   | right _ =>
       exist (λ iv : nat * vector nat, φ'_prop_bool (S n) iv = true)
-        (φ (vect_el empty_vect sg 0)) Hzφ'
+        (last_and_permut_but_highest (S n) (vect_el empty_vect sg 0)) Hzφ'
   end).
 ...
 assert (Hinj : FinFun.Injective φp). {
