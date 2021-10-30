@@ -1412,11 +1412,17 @@ assert (fnv : fin_t (S (S n))! → nat_vector_1 (S n)). {
   intros (i, pi).
   apply Nat.ltb_lt in pi.
   unfold nat_vector_1.
+  exists (i mod S (S n), empty_vect).
+  apply φ'_prop_φ'_prop_bool.
+  split. {
+    now apply Nat.mod_upper_bound.
+  }
+Search sg.
+...
 (*
   φ := λ σ : vector nat, (vect_el 0 σ (S n), σ' σ)
    : vector nat → nat * vector nat
 *)
-...
   exists (φ (vect_el empty_vect sg i)).
   apply Hφ.
   apply φ_prop_φ_prop_bool.
