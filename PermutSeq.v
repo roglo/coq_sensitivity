@@ -794,13 +794,13 @@ intros * Hsg.
 destruct n; [ now apply vect_size_of_empty_sym_gr | ].
 revert sg Hsg.
 induction n; intros; [ now apply vect_size_of_sym_gr_1 | ].
-set (φ' := vect_of_last_and_permut (S n)).
 assert
   (H :
      (∀ x, vect_size x = S (S n) → is_permut_vect x →
-      φ' (last_and_permut_of_vect (S n) x) = x) ∧
+      vect_of_last_and_permut (S n) (last_and_permut_of_vect (S n) x) = x) ∧
      (∀ y, vect_size (snd y) = S n → is_permut_vect (snd y) →
-      last_and_permut_of_vect (S n) (φ' y) = y)).
+      last_and_permut_of_vect (S n)
+        (vect_of_last_and_permut (S n) y) = y)).
   {
   split. {
     intros (l) Hv Hp; cbn in Hv.
@@ -808,7 +808,7 @@ assert
     unfold vect_el in Hp; cbn in Hp.
     rewrite Hv in Hp; cbn in Hp.
     destruct Hp as (Hp1, Hp2).
-    unfold φ', vect_of_last_and_permut.
+    unfold vect_of_last_and_permut.
     unfold last_and_permut_of_vect.
     unfold permut_but_highest.
     f_equal.
@@ -886,7 +886,8 @@ assert
     rewrite app_nth1; [ easy | flia Hv Hi ].
   } {
     intros (i, v) Hv Hp; cbn in Hv, Hp.
-    unfold φ', last_and_permut_of_vect, permut_but_highest.
+    unfold vect_of_last_and_permut.
+    unfold last_and_permut_of_vect, permut_but_highest.
     cbn - [ seq ].
     f_equal. {
       rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
@@ -945,7 +946,8 @@ assert
   unfold vect_el in Hp; cbn in Hp.
   rewrite Hv in Hp; cbn in Hp.
   destruct Hp as (Hp1, Hp2).
-  unfold φ', last_and_permut_of_vect, permut_but_highest.
+  unfold vect_of_last_and_permut.
+  unfold last_and_permut_of_vect, permut_but_highest.
   cbn - [ seq ].
   rewrite map_length, seq_length.
   split; [ apply Hp1; flia | ].
@@ -1004,12 +1006,13 @@ assert
 }
 assert
   (Hφ' : ∀ iv,
-   φ'_prop_bool (S n) iv = true → φ_prop_bool (S (S n)) (φ' iv) = true). {
+   φ'_prop_bool (S n) iv = true
+   → φ_prop_bool (S (S n)) (vect_of_last_and_permut (S n) iv) = true). {
   intros (i, v) Hp.
   apply φ_prop_φ_prop_bool.
   apply φ'_prop_φ'_prop_bool in Hp.
   destruct Hp as (Hi & Hv & Hp).
-  unfold φ_prop, φ'.
+  unfold φ_prop, vect_of_last_and_permut.
   cbn - [ seq ].
   rewrite map_length, seq_length.
   split; [ easy | ].
@@ -1105,7 +1108,8 @@ set
   (φp' :=
    λ y : {iv : nat * vector nat | φ'_prop_bool (S n) iv = true},
    exist (λ u : vector nat, φ_prop_bool (S (S n)) u = true)
-      (φ' (proj1_sig y)) (Hφ' (proj1_sig y) (proj2_sig y))).
+      (vect_of_last_and_permut (S n) (proj1_sig y))
+      (Hφ' (proj1_sig y) (proj2_sig y))).
 assert (H : (∀ x, φp (φp' x) = x) ∧ (∀ y, φp' (φp y) = y)). {
   split. {
     intros x.
