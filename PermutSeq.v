@@ -703,33 +703,33 @@ assert (H : v1 = v2). {
 now specialize (Hinj H).
 Qed.
 
+Definition permut_but_highest n σ :=
+  mk_vect
+    (map (λ i, vect_el 0 σ (if vect_el 0 σ i =? n then n else i))
+       (seq 0 n)).
+
 Theorem glop : ∀ n sg, is_sym_gr_vect n sg → vect_size sg = n!.
 Proof.
 intros * Hsg.
 destruct n; [ now apply vect_size_of_empty_sym_gr | ].
 revert sg Hsg.
 induction n; intros; [ now apply vect_size_of_sym_gr_1 | ].
-...
-set
-  (σ' := λ σ,
-   mk_vect
-     (map (λ i, vect_el 0 σ (if vect_el 0 σ i =? S n then S n else i))
-        (seq 0 (S n)))).
-set (φ := λ σ, (vect_el 0 σ (S n), σ' σ)).
+set (φ := λ σ, (vect_el 0 σ (S n), permut_but_highest (S n) σ)).
 assert
   (Hσ : ∀ σ,
    vect_size σ = S (S n) ∧ is_permut_vect σ
-   → vect_size (σ' σ) = S n ∧ is_permut_vect (σ' σ)). {
+   → vect_size (permut_but_highest (S n) σ) = S n ∧
+      is_permut_vect (permut_but_highest (S n) σ)). {
   intros * (Hsσ, Hσ).
   split. {
-    unfold σ'; cbn.
+    unfold permut_but_highest; cbn.
     now rewrite map_length, seq_length.
   }
   split. {
     intros i Hi.
-    unfold σ' in Hi; cbn in Hi.
+    unfold permut_but_highest in Hi; cbn in Hi.
     rewrite map_length, seq_length in Hi.
-    unfold σ'; cbn - [ seq ].
+    unfold permut_but_highest; cbn - [ seq ].
     rewrite map_length, seq_length.
     rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
     rewrite seq_nth; [ | easy ].
@@ -758,7 +758,8 @@ assert
     }
   } {
     intros i j Hi Hj Hij.
-    unfold σ' in Hi, Hj, Hij; cbn - [ seq ] in Hi, Hj, Hij.
+    unfold permut_but_highest in Hi, Hj, Hij.
+    cbn - [ seq ] in Hi, Hj, Hij.
     rewrite map_length, seq_length in Hi, Hj.
     rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
     rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
@@ -811,7 +812,7 @@ assert
     destruct Hp as (Hp1, Hp2).
     unfold φ', φ.
     f_equal.
-    unfold σ'.
+    unfold permut_but_highest.
     cbn - [ seq ].
     rewrite (seq_S (S n)).
     cbn - [ seq ].
@@ -886,7 +887,7 @@ assert
     rewrite app_nth1; [ easy | flia Hv Hi ].
   } {
     intros (i, v) Hv Hp; cbn in Hv, Hp.
-    unfold φ, φ', σ'.
+    unfold φ, φ', permut_but_highest.
     cbn - [ seq ].
     f_equal. {
       rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
@@ -946,7 +947,7 @@ assert
   rewrite Hv in Hp; cbn in Hp.
   destruct Hp as (Hp1, Hp2).
   unfold φ', φ.
-  unfold σ'.
+  unfold permut_but_highest.
   cbn - [ seq ].
   rewrite map_length, seq_length.
   split; [ apply Hp1; flia | ].
@@ -1177,17 +1178,17 @@ assert (Hiφ' : ∀ i, i < vect_size sg → φ'_prop_bool (S n) (φ (vect_el emp
     apply H2; flia.
   }
   split. {
-    unfold σ'; cbn; f_equal.
+    unfold permut_but_highest; cbn; f_equal.
     now rewrite map_length, seq_length.
   } {
     unfold is_permut_vect.
     unfold is_permut_fun.
-    replace (vect_size (σ' _)) with (S n). 2: {
+    replace (vect_size (permut_but_highest _ _)) with (S n). 2: {
       now cbn; rewrite map_length, seq_length.
     }
     split. {
       intros j Hj.
-      unfold σ'; cbn - [ seq ].
+      unfold permut_but_highest; cbn - [ seq ].
       rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
       rewrite seq_nth; [ | easy ].
       rewrite Nat.add_0_l.
@@ -1219,7 +1220,7 @@ assert (Hiφ' : ∀ i, i < vect_size sg → φ'_prop_bool (S n) (φ (vect_el emp
       flia Hvn H2.
     } {
       intros j k Hj Hk Hjk.
-      unfold σ' in Hjk.
+      unfold permut_but_highest in Hjk.
       cbn - [ seq ] in Hjk.
       rewrite (List_map_nth' 0) in Hjk; [ | now rewrite seq_length ].
       rewrite (List_map_nth' 0) in Hjk; [ | now rewrite seq_length ].
@@ -1292,10 +1293,10 @@ assert (Hzφ' : φ'_prop_bool (S n) (φ (vect_el empty_vect sg 0)) = true). {
     apply H2; flia.
   }
   split. {
-    unfold σ'; cbn.
+    unfold permut_but_highest; cbn.
     now rewrite map_length, seq_length.
   } {
-    unfold σ'.
+    unfold permut_but_highest.
     split. {
       cbn - [ seq ]; rewrite map_length, seq_length.
       intros i Hi.
