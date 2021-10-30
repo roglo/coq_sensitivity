@@ -1541,20 +1541,24 @@ assert (∀ i, φ'_prop_bool (S n) (φ (vect_el empty_vect sg i)) = true). {
           apply H3; [ flia Hj | flia Hk | easy ].
         }
         apply Nat.nlt_ge in His.
-...
-        unfold vect_el in Hjk at 2 4.
-        rewrite nth_overflow in Hjk; [ | easy ].
-...
-        rewrite nth_overflow in Hjk; [ | easy ].
-        cbn in Hjn.
-        now rewrite match_id in Hjn.
-...
+        admit.
+      }
+    }
+  }
+}
 assert (fnv : fin_t (S (S n))! → nat_vector_1 (S n)). {
   intros (i, pi).
-  exists (φ (vect_el empty_vect sg i)).
-...
-  apply Nat.ltb_lt in pi.
+  destruct (lt_dec i (vect_size sg)) as [His| His]. {
+    exists (φ (vect_el empty_vect sg i)).
+    apply H.
+  }
+  apply Nat.nlt_ge in His.
+  unfold nat_vector_1.
+  exists (0, vect_el empty_vect sg 0).
   apply φ'_prop_φ'_prop_bool.
+  split; [ flia | ].
+  split. {
+...
   split. {
     destruct (lt_dec i (vect_size sg)) as [His| His]. 2: {
       apply Nat.nlt_ge in His.
