@@ -1545,93 +1545,89 @@ assert (Hzφ' : φ'_prop_bool (S n) (φ (vect_el empty_vect sg 0)) = true). {
       rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
       rewrite seq_nth; [ | easy ].
       rewrite Nat.add_0_l.
-...
-  split; [ flia | ].
-  split. {
-    specialize (Hsg 0) as H1.
-...
-*)
-assert (fnv : fin_t (S (S n))! → nat_vector_1 (S n)). {
-  intros (i, pi).
-  destruct (lt_dec i (vect_size sg)) as [His| His]. {
-    exists (φ (vect_el empty_vect sg i)).
-    now apply Hiφ'.
-  }
-  unfold nat_vector_1.
-  apply Nat.nlt_ge in His.
-  exists (φ (vect_el empty_vect sg 0)).
-...
-  apply φ'_prop_φ'_prop_bool.
-  split. {
-    specialize (Hsg 0) as H1.
-...
-  unfold φ; cbn.
-  exists (0, vect_el empty_vect sg 0).
-...
-  split. {
-    destruct (lt_dec i (vect_size sg)) as [His| His]. 2: {
-      apply Nat.nlt_ge in His.
-      unfold vect_el.
-      rewrite nth_overflow; [ flia | ].
-      rewrite fold_vect_size.
-      rewrite nth_overflow; [ cbn; flia | easy ].
-    }
-    specialize (Hsg i His) as H1.
-    destruct H1 as (H1, H2).
-    unfold is_permut_vect in H2.
-    rewrite H1 in H2.
-    destruct H2 as (H2, H3).
-    apply H2; flia.
-  }
-  split. {
-    unfold σ'; cbn; f_equal.
-    now rewrite map_length, seq_length.
-  } {
-    split. {
-      replace (vect_size (σ' _)) with (S n). 2: {
-        now cbn; rewrite map_length, seq_length.
+      rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec _ _) as [Hsi| Hsi]. {
+        specialize (Hsg 0 Hsz) as H1.
+        destruct H1 as (H1 & H2 & H3).
+        rewrite H1 in H2, H3.
+        specialize (H2 (S n) (Nat.lt_succ_diag_r _)).
+        specialize (H3 i (S n)).
+        assert (H : i < S (S n)) by flia Hi.
+        specialize (H3 H); clear H.
+        assert (H : S n < S (S n)) by flia.
+        specialize (H3 H); clear H.
+        rewrite Hsi in H3.
+        apply Nat.nle_gt; intros H4.
+        assert (H : S n = vect_el 0 (vect_el empty_vect sg 0) (S n)). {
+          flia H4 H2.
+        }
+        specialize (H3 H); clear H.
+        rewrite H3 in Hi; flia Hi.
+      } {
+        specialize (Hsg 0 Hsz) as H1.
+        destruct H1 as (H1 & H2 & H3).
+        rewrite H1 in H2, H3.
+        specialize (H2 i).
+        assert (H : i < S (S n)) by flia Hi.
+        specialize (H2 H).
+        flia H2 Hsi.
       }
-      intros j Hj.
-      unfold σ'; cbn - [ seq ].
-      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-      rewrite seq_nth; [ | easy ].
-      rewrite Nat.add_0_l.
-...
-  apply Hφ.
-  apply φ_prop_φ_prop_bool.
-  split. {
-    destruct (lt_dec i (vect_size sg)) as [His| His]. 2: {
-      apply Nat.nlt_ge in His.
-      unfold vect_el.
-      rewrite nth_overflow; [ | easy ].
-...
-      rewrite fold_vect_size; cbn; flia.
+    } {
+      cbn - [ seq ]; rewrite map_length, seq_length.
+      intros i j Hi Hj Hij.
+      rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+      rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+      rewrite seq_nth in Hij; [ | easy ].
+      rewrite seq_nth in Hij; [ | easy ].
+      do 2 rewrite Nat.add_0_l in Hij.
+      do 2 rewrite if_eqb_eq_dec in Hij.
+      destruct (Nat.eq_dec _ _) as [Hjn| Hjn] in Hij. {
+        destruct (Nat.eq_dec _ _) as [Hkn| Hkn] in Hij. {
+          specialize (Hsg 0 Hsz) as H1.
+          destruct H1 as (H1 & H2 & H3).
+          rewrite H1 in H2, H3.
+          apply H3; [ flia Hi | flia Hj | ].
+          congruence.
+        }
+        specialize (Hsg 0 Hsz) as H1.
+        destruct H1 as (H1 & H2 & H3).
+        rewrite H1 in H2, H3.
+        specialize (H3 (S n) j).
+        assert (H : S n < S (S n)) by flia.
+        specialize (H3 H); clear H.
+        assert (H : j < S (S n)) by flia Hj.
+        specialize (H3 H Hij); clear H.
+        rewrite H3 in Hj; flia Hj.
+      } {
+        destruct (Nat.eq_dec _ _) as [Hkn| Hkn] in Hij. {
+          specialize (Hsg 0 Hsz) as H1.
+          destruct H1 as (H1 & H2 & H3).
+          rewrite H1 in H2, H3.
+          specialize (H3 i (S n)).
+          assert (H : i < S (S n)) by flia Hi.
+          specialize (H3 H); clear H.
+          assert (H : S n < S (S n)) by flia.
+          specialize (H3 H Hij); clear H.
+          rewrite H3 in Hi; flia Hi.
+        }
+        specialize (Hsg 0 Hsz) as H1.
+        destruct H1 as (H1 & H2 & H3).
+        rewrite H1 in H2, H3.
+        apply H3; [ flia Hi | flia Hj | easy ].
+      }
     }
-    specialize (Hsg i His) as H1.
-    destruct H1 as (H1, H2).
-    destruct H2 as (H2, H3).
-    rewrite H1 in H2.
-    apply (H2 (S n)); flia.
   }
-  apply Hσ.
-  split. {
-    destruct (lt_dec i (vect_size sg)) as [His| His]; [ now apply Hsg | ].
-    apply Nat.nlt_ge in His.
-...
-      unfold vect_el.
-...
-      rewrite nth_overflow; [ | easy ].
-      cbn.
-...
-...
-  split. {
-    unfold σ'; cbn.
-    now rewrite map_length, seq_length.
-  } {
-    apply Hσ.
-...
-  unfold φ; cbn.
-  rewrite map_length.
+}
+set (fnv := λ H1 : fin_t (S (S n))!,
+  let (i, p) := H1 in
+  match lt_dec i (vect_size sg) with
+  | left His =>
+      exist (λ iv : nat * vector nat, φ'_prop_bool (S n) iv = true)
+        (φ (vect_el empty_vect sg i)) (Hiφ' i His)
+  | right _ =>
+      exist (λ iv : nat * vector nat, φ'_prop_bool (S n) iv = true)
+        (φ (vect_el empty_vect sg 0)) Hzφ'
+  end).
 ...
 assert (Hinj : FinFun.Injective φp). {
   unfold FinFun.Injective.
