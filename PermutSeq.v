@@ -1412,6 +1412,10 @@ assert (fnv : fin_t (S (S n))! → nat_vector_1 (S n)). {
   intros (i, pi).
   apply Nat.ltb_lt in pi.
   unfold nat_vector_1.
+(*
+  φ := λ σ : vector nat, (vect_el 0 σ (S n), σ' σ)
+   : vector nat → nat * vector nat
+*)
 ...
   exists (φ (vect_el empty_vect sg i)).
   apply Hφ.
