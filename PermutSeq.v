@@ -708,6 +708,72 @@ Definition permut_but_highest n σ :=
     (map (λ i, vect_el 0 σ (if vect_el 0 σ i =? n then n else i))
        (seq 0 n)).
 
+Theorem permut_but_highest_prop : ∀ n σ,
+   vect_size σ = S (S n) ∧ is_permut_vect σ
+   → vect_size (permut_but_highest (S n) σ) = S n ∧
+      is_permut_vect (permut_but_highest (S n) σ).
+Proof.
+intros * (Hsσ, Hσ).
+split. {
+  unfold permut_but_highest; cbn.
+  now rewrite map_length, seq_length.
+}
+split. {
+  intros i Hi.
+  unfold permut_but_highest in Hi; cbn in Hi.
+  rewrite map_length, seq_length in Hi.
+  unfold permut_but_highest; cbn - [ seq ].
+  rewrite map_length, seq_length.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
+  rewrite Nat.add_0_l.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (vect_el 0 σ i) (S n)) as [H1| H1]. {
+    destruct Hσ as (H2 & H3).
+    specialize (H3 (S n) i).
+    assert (H : S n < vect_size σ) by flia Hsσ.
+    specialize (H3 H); clear H.
+    assert (H : i < vect_size σ) by flia Hsσ Hi.
+    specialize (H3 H); clear H.
+    rewrite H1 in H3.
+    rewrite Hsσ in H2.
+    specialize (H2 (S n) (Nat.lt_succ_diag_r _)).
+    assert (H : vect_el 0 σ (S n) ≠ S n). {
+      intros H; specialize (H3 H); flia H3 Hi.
+    }
+    flia H2 H.
+  } {
+    destruct Hσ as (H2 & H3).
+    specialize (H2 i).
+    assert (H : i < vect_size σ) by flia Hsσ Hi.
+    specialize (H2 H); clear H.
+    flia Hsσ H2 H1.
+  }
+} {
+  intros i j Hi Hj Hij.
+  unfold permut_but_highest in Hi, Hj, Hij.
+  cbn - [ seq ] in Hi, Hj, Hij.
+  rewrite map_length, seq_length in Hi, Hj.
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite seq_nth in Hij; [ | easy ].
+  rewrite seq_nth in Hij; [ | easy ].
+  do 2 rewrite Nat.add_0_l, if_eqb_eq_dec in Hij.
+  apply Hσ; [ flia Hsσ Hi | flia Hsσ Hj | ].
+  destruct Hσ as (H2, H3).
+  rewrite Hsσ in H2.
+  destruct (Nat.eq_dec (vect_el 0 σ i) (S n)) as [Hin| Hin]. {
+    destruct (Nat.eq_dec (vect_el 0 σ j) (S n)) as [H| H]; [ congruence | ].
+    apply H3 in Hij; [ | flia Hsσ | flia Hj Hsσ ].
+    flia Hj Hij.
+  } {
+    destruct (Nat.eq_dec (vect_el 0 σ j) (S n)) as [H| H]; [ | congruence ].
+    apply H3 in Hij; [ | flia Hi Hsσ | flia Hsσ ].
+    flia Hi Hij.
+  }
+}
+Abort.
+
 Theorem glop : ∀ n sg, is_sym_gr_vect n sg → vect_size sg = n!.
 Proof.
 intros * Hsg.
@@ -715,71 +781,7 @@ destruct n; [ now apply vect_size_of_empty_sym_gr | ].
 revert sg Hsg.
 induction n; intros; [ now apply vect_size_of_sym_gr_1 | ].
 set (φ := λ σ, (vect_el 0 σ (S n), permut_but_highest (S n) σ)).
-assert
-  (Hσ : ∀ σ,
-   vect_size σ = S (S n) ∧ is_permut_vect σ
-   → vect_size (permut_but_highest (S n) σ) = S n ∧
-      is_permut_vect (permut_but_highest (S n) σ)). {
-  intros * (Hsσ, Hσ).
-  split. {
-    unfold permut_but_highest; cbn.
-    now rewrite map_length, seq_length.
-  }
-  split. {
-    intros i Hi.
-    unfold permut_but_highest in Hi; cbn in Hi.
-    rewrite map_length, seq_length in Hi.
-    unfold permut_but_highest; cbn - [ seq ].
-    rewrite map_length, seq_length.
-    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-    rewrite seq_nth; [ | easy ].
-    rewrite Nat.add_0_l.
-    rewrite if_eqb_eq_dec.
-    destruct (Nat.eq_dec (vect_el 0 σ i) (S n)) as [H1| H1]. {
-      destruct Hσ as (H2 & H3).
-      specialize (H3 (S n) i).
-      assert (H : S n < vect_size σ) by flia Hsσ.
-      specialize (H3 H); clear H.
-      assert (H : i < vect_size σ) by flia Hsσ Hi.
-      specialize (H3 H); clear H.
-      rewrite H1 in H3.
-      rewrite Hsσ in H2.
-      specialize (H2 (S n) (Nat.lt_succ_diag_r _)).
-      assert (H : vect_el 0 σ (S n) ≠ S n). {
-        intros H; specialize (H3 H); flia H3 Hi.
-      }
-      flia H2 H.
-    } {
-      destruct Hσ as (H2 & H3).
-      specialize (H2 i).
-      assert (H : i < vect_size σ) by flia Hsσ Hi.
-      specialize (H2 H); clear H.
-      flia Hsσ H2 H1.
-    }
-  } {
-    intros i j Hi Hj Hij.
-    unfold permut_but_highest in Hi, Hj, Hij.
-    cbn - [ seq ] in Hi, Hj, Hij.
-    rewrite map_length, seq_length in Hi, Hj.
-    rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-    rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-    rewrite seq_nth in Hij; [ | easy ].
-    rewrite seq_nth in Hij; [ | easy ].
-    do 2 rewrite Nat.add_0_l, if_eqb_eq_dec in Hij.
-    apply Hσ; [ flia Hsσ Hi | flia Hsσ Hj | ].
-    destruct Hσ as (H2, H3).
-    rewrite Hsσ in H2.
-    destruct (Nat.eq_dec (vect_el 0 σ i) (S n)) as [Hin| Hin]. {
-      destruct (Nat.eq_dec (vect_el 0 σ j) (S n)) as [H| H]; [ congruence | ].
-      apply H3 in Hij; [ | flia Hsσ | flia Hj Hsσ ].
-      flia Hj Hij.
-    } {
-      destruct (Nat.eq_dec (vect_el 0 σ j) (S n)) as [H| H]; [ | congruence ].
-      apply H3 in Hij; [ | flia Hi Hsσ | flia Hsσ ].
-      flia Hi Hij.
-    }
-  }
-}
+...
 set
   (φ' := λ a : (nat * vector nat), let '(i, v) := a in
     mk_vect
