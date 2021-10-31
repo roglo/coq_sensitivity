@@ -431,18 +431,25 @@ split. {
 }
 Qed.
 
-Definition φ_prop n v := vect_size v = n ∧ is_permut_vect v.
+(* *)
 
-Definition φ_prop_bool n v := (vect_size v =? n) && is_permut_vect_bool v.
+Definition permut_prop n v :=
+  vect_size v = n ∧ is_permut_vect v.
+Definition permut_prop_bool n v :=
+  (vect_size v =? n) && is_permut_vect_bool v.
 
-Definition φ'_prop n '(i, v) :=
+Definition nat_and_permut_prop n '(i, v) :=
   i < S n ∧ vect_size v = n ∧ is_permut_vect v.
-
-Definition φ'_prop_bool n '(i, v) :=
+Definition nat_and_permut_prop_bool n '(i, v) :=
    (i <? S n) && (vect_size v =? n) && is_permut_vect_bool v.
 
-Theorem φ_prop_φ_prop_bool : ∀ n v,
-  φ_prop n v ↔ φ_prop_bool n v = true.
+Definition permut n :=
+  {u : vector nat | permut_prop_bool n u = true}.
+Definition nat_and_permut n :=
+  {iv : nat * vector nat | nat_and_permut_prop_bool n iv = true}.
+
+Theorem permut_prop_permut_prop_bool : ∀ n v,
+  permut_prop n v ↔ permut_prop_bool n v = true.
 Proof.
 intros.
 split; intros Hφ. {
@@ -458,13 +465,13 @@ split; intros Hφ. {
 }
 Qed.
 
-Theorem φ'_prop_φ'_prop_bool : ∀ n iv,
-  φ'_prop n iv ↔ φ'_prop_bool n iv = true.
+Theorem nat_and_permut_prop_nat_and_permut_prop_bool : ∀ n iv,
+  nat_and_permut_prop n iv ↔ nat_and_permut_prop_bool n iv = true.
 Proof.
 intros n (i, v).
 split; intros Hφ'. {
   destruct Hφ' as (H1 & H2 & H3).
-  unfold φ'_prop_bool.
+  unfold nat_and_permut_prop_bool.
   apply andb_true_iff.
   split. {
     apply andb_true_iff.
@@ -611,9 +618,6 @@ now apply vect_eqb_neq in H1.
 Qed.
 
 (* *)
-
-Definition nat_vector_1 n := {iv : nat * vector nat | φ'_prop_bool n iv = true}.
-Definition vector_1 n := {u : vector nat | φ_prop_bool n u = true}.
 
 Theorem vect_size_of_empty_sym_gr : ∀ sg,
   is_sym_gr_vect 0 sg → vect_size sg = 1.
@@ -938,13 +942,13 @@ destruct n; [ now apply vect_size_of_empty_sym_gr | ].
 revert sg Hsg.
 induction n; intros; [ now apply vect_size_of_sym_gr_1 | ].
 assert
-  (Hφ : ∀ u, φ_prop_bool (S (S n)) u = true
-  → φ'_prop_bool (S n) (last_and_permut_of_vect (S n) u) = true). {
+  (Hφ : ∀ u, permut_prop_bool (S (S n)) u = true
+  → nat_and_permut_prop_bool (S n) (last_and_permut_of_vect (S n) u) = true). {
   intros v Hv.
-  apply φ'_prop_φ'_prop_bool.
-  apply φ_prop_φ_prop_bool in Hv.
-  unfold φ_prop in Hv.
-  unfold φ'_prop.
+  apply nat_and_permut_prop_nat_and_permut_prop_bool.
+  apply permut_prop_permut_prop_bool in Hv.
+  unfold permut_prop in Hv.
+  unfold nat_and_permut_prop.
   destruct Hv as (Hv, Hp).
   unfold is_permut_vect in Hp; cbn in Hp.
   unfold vect_el in Hp; cbn in Hp.
@@ -1010,13 +1014,14 @@ assert
 }
 assert
   (Hφ' : ∀ iv,
-   φ'_prop_bool (S n) iv = true
-   → φ_prop_bool (S (S n)) (vect_of_last_and_permut (S n) iv) = true). {
+   nat_and_permut_prop_bool (S n) iv = true
+   → permut_prop_bool (S (S n)) (vect_of_last_and_permut (S n) iv) =
+        true). {
   intros (i, v) Hp.
-  apply φ_prop_φ_prop_bool.
-  apply φ'_prop_φ'_prop_bool in Hp.
+  apply permut_prop_permut_prop_bool.
+  apply nat_and_permut_prop_nat_and_permut_prop_bool in Hp.
   destruct Hp as (Hi & Hv & Hp).
-  unfold φ_prop, vect_of_last_and_permut.
+  unfold permut_prop, vect_of_last_and_permut.
   cbn - [ seq ].
   rewrite map_length, seq_length.
   split; [ easy | ].
@@ -1104,25 +1109,25 @@ assert
 }
 set
   (φp :=
-   λ x : {u : vector nat | φ_prop_bool (S (S n)) u = true},
-   exist (λ iv : nat * vector nat, φ'_prop_bool (S n) iv = true)
+   λ x : {u : vector nat | permut_prop_bool (S (S n)) u = true},
+   exist (λ iv : nat * vector nat, nat_and_permut_prop_bool (S n) iv = true)
      (last_and_permut_of_vect (S n) (proj1_sig x))
      (Hφ (proj1_sig x) (proj2_sig x))).
 set
   (φp' :=
-   λ y : {iv : nat * vector nat | φ'_prop_bool (S n) iv = true},
-   exist (λ u : vector nat, φ_prop_bool (S (S n)) u = true)
+   λ y : {iv : nat * vector nat | nat_and_permut_prop_bool (S n) iv = true},
+   exist (λ u : vector nat, permut_prop_bool (S (S n)) u = true)
       (vect_of_last_and_permut (S n) (proj1_sig y))
       (Hφ' (proj1_sig y) (proj2_sig y))).
 assert (H : (∀ x, φp (φp' x) = x) ∧ (∀ y, φp' (φp y) = y)). {
   split. {
     intros x.
     unfold φp, φp'.
-    specialize (proj2 (φ'_prop_φ'_prop_bool (S n) (proj1_sig x))) as H1.
+    specialize (proj2 (nat_and_permut_prop_nat_and_permut_prop_bool (S n) (proj1_sig x))) as H1.
     destruct x as (iv, Hp); cbn in H1 |-*.
     specialize (H1 Hp).
     destruct iv as (i, v).
-    unfold φ'_prop in H1.
+    unfold nat_and_permut_prop in H1.
     destruct H1 as (H1 & H2 & H3).
     apply eq_exist_uncurried.
     exists (last_and_permut_of_vect_el_of_its_inverse (i, v) H2 H3).
@@ -1130,10 +1135,10 @@ assert (H : (∀ x, φp (φp' x) = x) ∧ (∀ y, φp' (φp y) = y)). {
   } {
     intros y.
     unfold φp, φp'.
-    specialize (proj2 (φ_prop_φ_prop_bool (S (S n)) (proj1_sig y))) as H1.
+    specialize (proj2 (permut_prop_permut_prop_bool (S (S n)) (proj1_sig y))) as H1.
     destruct y as (u, Hp); cbn in H1 |-*.
     specialize (H1 Hp).
-    unfold φ_prop in H1.
+    unfold permut_prop in H1.
     destruct H1 as (H1 & H2).
     apply eq_exist_uncurried.
     exists (vect_of_last_and_permut_of_its_inverse H1 H2).
@@ -1141,26 +1146,26 @@ assert (H : (∀ x, φp (φp' x) = x) ∧ (∀ y, φp' (φp y) = y)). {
   }
 }
 destruct H as (Hx, Hy).
-fold (nat_vector_1 (S n)) in *.
-fold (vector_1 (S (S n))) in *.
+fold (nat_and_permut (S n)) in *.
+fold (permut (S (S n))) in *.
 set (fv := λ kpk : fin_t (vect_size sg),
   let (k, pk) := kpk in
-  exist (λ u, φ_prop_bool (S (S n)) u = true)
+  exist (λ u, permut_prop_bool (S (S n)) u = true)
     (vect_el empty_vect sg k)
-    (proj1 (φ_prop_φ_prop_bool (S (S n)) (vect_el empty_vect sg k))
+    (proj1 (permut_prop_permut_prop_bool (S (S n)) (vect_el empty_vect sg k))
        (proj1 Hsg k (proj1 (Nat.ltb_lt k (vect_size sg)) pk)))).
-set (gv := λ vpv : vector_1 (S (S n)),
+set (gv := λ vpv : permut (S (S n)),
   let (v, _) := vpv in
   exist (λ a, (a <? vect_size sg) = true)
     (rank_of_permut_in_sym_gr sg v)
     (proj2 (Nat.ltb_lt (rank_of_permut_in_sym_gr sg v) (vect_size sg))
        (rank_of_permut_in_sym_gr_lt v (Nat.neq_succ_0 (S n)) Hsg))).
-fold (vector_1 (S (S n))) in fv.
+fold (permut (S (S n))) in fv.
 fold (fin_t (vect_size sg)) in gv.
 assert (Hfgv : ∀ x, fv (gv x) = x). {
   intros (v, pv).
   unfold fv, gv.
-  specialize (proj2 (φ_prop_φ_prop_bool (S (S n)) v) pv) as H1.
+  specialize (proj2 (permut_prop_permut_prop_bool (S (S n)) v) pv) as H1.
   destruct H1 as (Hv, Hp).
   apply eq_exist_uncurried.
   exists (vect_el_rank_of_permut_in_sym_gr Hsg Hp Hv).
@@ -1177,10 +1182,10 @@ assert (Hgfv : ∀ y, gv (fv y) = y). {
 destruct Hsg as (Hsg & Hinj & Hsurj).
 assert
   (Hiφ' : ∀ i, i < vect_size sg →
-   φ'_prop_bool (S n)
+   nat_and_permut_prop_bool (S n)
      (last_and_permut_of_vect (S n) (vect_el empty_vect sg i)) = true). {
   intros i His.
-  apply φ'_prop_φ'_prop_bool.
+  apply nat_and_permut_prop_nat_and_permut_prop_bool.
   split. {
     specialize (Hsg i His) as H1.
     destruct H1 as (H1, H2).
@@ -1271,7 +1276,7 @@ assert
   }
 }
 assert (Hzφ' :
-  φ'_prop_bool (S n)
+  nat_and_permut_prop_bool (S n)
     (last_and_permut_of_vect (S n) (vect_el empty_vect sg 0)) = true). {
   destruct (Nat.eq_dec (vect_size sg) 0) as [Hsz| Hsz]. {
     exfalso.
@@ -1298,7 +1303,7 @@ assert (Hzφ' :
     apply length_zero_iff_nil in Hsz.
     now rewrite Hsz in H1.
   }
-  apply φ'_prop_φ'_prop_bool.
+  apply nat_and_permut_prop_nat_and_permut_prop_bool.
   apply Nat.neq_0_lt_0 in Hsz.
   split. {
     specialize (Hsg 0 Hsz) as H1.
@@ -1394,11 +1399,11 @@ set (fnv := λ H1 : fin_t (S (S n))!,
   let (i, p) := H1 in
   match lt_dec i (vect_size sg) with
   | left His =>
-      exist (λ iv : nat * vector nat, φ'_prop_bool (S n) iv = true)
+      exist (λ iv : nat * vector nat, nat_and_permut_prop_bool (S n) iv = true)
         (last_and_permut_of_vect (S n) (vect_el empty_vect sg i))
         (Hiφ' i His)
   | right _ =>
-      exist (λ iv : nat * vector nat, φ'_prop_bool (S n) iv = true)
+      exist (λ iv : nat * vector nat, nat_and_permut_prop_bool (S n) iv = true)
         (last_and_permut_of_vect (S n) (vect_el empty_vect sg 0)) Hzφ'
   end).
 ...
@@ -1416,7 +1421,7 @@ assert (Hsurj : FinFun.Surjective φp). {
 }
 specialize (proj1 (FinFun.Surjective_list_carac φp) Hsurj) as H1.
 specialize FinFun.Injective_list_carac as H2.
-specialize (H2 (vector_1 (S (S n))) (nat_vector_1 (S n))).
+specialize (H2 (vector_1 (S (S n))) (nat_and_permut (S n))).
 assert (H : ListDec.decidable_eq (vector_1 (S (S n)))). {
   intros x y.
   unfold vector_1 in x, y.
@@ -1444,7 +1449,7 @@ Search FinFun.Injective.
 assert (H1 : FinFun.Bijective φp) by now exists φp'.
 move IHn at bottom.
 unfold φ_prop_bool in Hy.
-unfold φ'_prop_bool in Hx.
+unfold nat_and_permut_prop_bool in Hx.
 move Hsg at bottom.
 Print is_sym_gr_vect.
 ...
