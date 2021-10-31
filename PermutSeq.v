@@ -1321,6 +1321,28 @@ now rewrite Hsz in H1.
 Qed.
 
 Definition nat_and_permut_of_fin_t n sg (Hsg : is_sym_gr_vect (S n) sg)
+    (kpk : fin_t (S n)!) : nat_and_permut n.
+refine (let (k, pk) := kpk in _).
+apply Nat.ltb_lt in pk.
+unfold nat_and_permut.
+Print nat_and_permut_prop.
+Print mk_canon_sym_gr_vect.
+Search mk_canon_sym_gr_vect.
+...
+(*
+i = k mod S n
+v = vector of size n! ; because we have k / S n < (S n)! / S n
+    by induction hypothesis, if is_sym_gr_vect n sg' then
+    vect_size sg' = n!
+      but, how to make a sym group of size n! ?
+      well, I can take the canonic one
+      its size is n! by definition
+      I think I proved further it is a sym group: I must put this
+      theorem before here
+*)
+...
+
+Definition nat_and_permut_of_fin_t n sg (Hsg : is_sym_gr_vect (S n) sg)
     (kpk : fin_t (S n)!) : nat_and_permut n :=
   let (k, pk) := kpk in
   match lt_dec k (vect_size sg) with
