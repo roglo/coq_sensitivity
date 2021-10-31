@@ -616,7 +616,7 @@ specialize (List_find_nth_None empty_vect _ _ Hj Hi) as H1.
 now apply vect_eqb_neq in H1.
 Qed.
 
-(* *)
+(* proving that the size of a symmetric group of order n is factorial(n) *)
 
 Theorem vect_size_of_empty_sym_gr : ∀ sg,
   is_sym_gr_vect 0 sg → vect_size sg = 1.
