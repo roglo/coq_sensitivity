@@ -1008,6 +1008,101 @@ split. {
 }
 Qed.
 
+Theorem vect_of_last_and_permut_is_permut_proop_bool : ∀ n iv,
+  nat_and_permut_prop_bool n iv = true
+ → permut_prop_bool (S n) (vect_of_last_and_permut n iv) = true.
+Proof.
+intros n (i, v) Hp.
+apply permut_prop_permut_prop_bool.
+apply nat_and_permut_prop_nat_and_permut_prop_bool in Hp.
+destruct Hp as (Hi & Hv & Hp).
+unfold permut_prop, vect_of_last_and_permut.
+cbn - [ seq ].
+rewrite map_length, seq_length.
+split; [ easy | ].
+unfold is_permut_vect.
+cbn - [ seq ].
+rewrite map_length, seq_length.
+unfold vect_el.
+cbn - [ seq ].
+eapply is_permut_eq_compat. {
+  intros j Hj; symmetry.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
+  rewrite Nat.add_0_l.
+  do 2 rewrite if_eqb_eq_dec.
+  easy.
+}
+split. {
+  intros j Hj.
+  destruct (Nat.eq_dec j n) as [Hjn| Hjn]; [ easy | ].
+  destruct (Nat.eq_dec (nth j (vect_list v) 0) i) as [H1| H1]; [ flia | ].
+  destruct Hp as (Hp1, Hp2).
+  rewrite Hv in Hp1, Hp2.
+  unfold vect_el in Hp1.
+  assert (H : j < n) by flia Hj Hjn.
+  specialize (Hp1 j H) as H2; clear H.
+  flia H2.
+} {
+  intros j k Hj Hk Hjk.
+  destruct (Nat.eq_dec j n) as [Hjn| Hjn]. {
+    destruct (Nat.eq_dec k n) as [Hkn| Hkn]; [ congruence | ].
+    symmetry in Hjk.
+    destruct (Nat.eq_dec (nth k (vect_list v) 0) i) as [H| H]; [ | easy ].
+    rename H into Hki.
+    move Hjk at top; subst i; clear Hi.
+    subst j; clear Hj.
+    destruct Hp as (Hp1, Hp2).
+    rewrite Hv in Hp1.
+    specialize (Hp1 k) as H1.
+    assert (H : k < n) by flia Hk Hkn.
+    specialize (H1 H); clear H.
+    unfold vect_el in H1.
+    rewrite Hki in H1.
+    flia H1.
+  }
+  destruct (Nat.eq_dec (nth j (vect_list v) 0) i) as [Hji| Hji]. {
+    destruct (Nat.eq_dec k n) as [Hkn| Hkn]. {
+      move Hjk at top; subst i.
+      destruct Hp as (Hp1, Hp2).
+      rewrite Hv in Hp1.
+      specialize (Hp1 j) as H1.
+      assert (H : j < n) by flia Hj Hjn.
+      specialize (H1 H); clear H.
+      unfold vect_el in H1.
+      rewrite Hji in H1.
+      flia H1.
+    }
+    destruct (Nat.eq_dec (nth k (vect_list v) 0) i) as [Hki| Hki]. {
+      destruct Hp as (Hp1, Hp2).
+      rewrite Hv in Hp1, Hp2.
+      apply Hp2; [ flia Hj Hjn | flia Hk Hkn | unfold vect_el; congruence ].
+    }
+    symmetry in Hjk.
+    destruct Hp as (Hp1, Hp2).
+    rewrite Hv in Hp1.
+    specialize (Hp1 k) as H1.
+    assert (H : k < n) by flia Hk Hkn.
+    specialize (H1 H); clear H.
+    unfold vect_el in H1.
+    rewrite Hjk in H1.
+    flia H1.
+  }
+  destruct (Nat.eq_dec k n) as [Hkn| Hkn]; [ easy | ].
+  destruct (Nat.eq_dec (nth k (vect_list v) 0) i) as [Hki| Hki]. {
+    destruct Hp as (Hp1, Hp2).
+    rewrite Hv in Hp1.
+    specialize (Hp1 j) as H1.
+    assert (H : j < n) by flia Hj Hjn.
+    specialize (H1 H); clear H.
+    unfold vect_el in H1.
+    rewrite Hjk in H1.
+    flia H1.
+  }
+  apply Hp; [ rewrite Hv; flia Hj Hjn | rewrite Hv; flia Hk Hkn | easy ].
+}
+Qed.
+
 Theorem glop : ∀ n sg, is_sym_gr_vect n sg → vect_size sg = n!.
 Proof.
 intros * Hsg.
@@ -1015,101 +1110,6 @@ destruct n; [ now apply vect_size_of_empty_sym_gr | ].
 revert sg Hsg.
 induction n; intros; [ now apply vect_size_of_sym_gr_1 | ].
 (**)
-assert
-  (Hφ' : ∀ iv,
-   nat_and_permut_prop_bool (S n) iv = true
-   → permut_prop_bool (S (S n)) (vect_of_last_and_permut (S n) iv) =
-        true). {
-  intros (i, v) Hp.
-  apply permut_prop_permut_prop_bool.
-  apply nat_and_permut_prop_nat_and_permut_prop_bool in Hp.
-  destruct Hp as (Hi & Hv & Hp).
-  unfold permut_prop, vect_of_last_and_permut.
-  cbn - [ seq ].
-  rewrite map_length, seq_length.
-  split; [ easy | ].
-  unfold is_permut_vect.
-  cbn - [ seq ].
-  rewrite map_length, seq_length.
-  unfold vect_el.
-  cbn - [ seq ].
-  eapply is_permut_eq_compat. {
-    intros j Hj; symmetry.
-    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-    rewrite seq_nth; [ | easy ].
-    rewrite Nat.add_0_l.
-    do 2 rewrite if_eqb_eq_dec.
-    easy.
-  }
-  split. {
-    intros j Hj.
-    destruct (Nat.eq_dec j (S n)) as [Hjn| Hjn]; [ easy | ].
-    destruct (Nat.eq_dec (nth j (vect_list v) 0) i) as [H1| H1]; [ flia | ].
-    destruct Hp as (Hp1, Hp2).
-    rewrite Hv in Hp1, Hp2.
-    unfold vect_el in Hp1.
-    assert (H : j < S n) by flia Hj Hjn.
-    specialize (Hp1 j H) as H2; clear H.
-    flia H2.
-  } {
-    intros j k Hj Hk Hjk.
-    destruct (Nat.eq_dec j (S n)) as [Hjn| Hjn]. {
-      destruct (Nat.eq_dec k (S n)) as [Hkn| Hkn]; [ congruence | ].
-      symmetry in Hjk.
-      destruct (Nat.eq_dec (nth k (vect_list v) 0) i) as [H| H]; [ | easy ].
-      rename H into Hki.
-      move Hjk at top; subst i; clear Hi.
-      subst j; clear Hj.
-      destruct Hp as (Hp1, Hp2).
-      rewrite Hv in Hp1.
-      specialize (Hp1 k) as H1.
-      assert (H : k < S n) by flia Hk Hkn.
-      specialize (H1 H); clear H.
-      unfold vect_el in H1.
-      rewrite Hki in H1.
-      flia H1.
-    }
-    destruct (Nat.eq_dec (nth j (vect_list v) 0) i) as [Hji| Hji]. {
-      destruct (Nat.eq_dec k (S n)) as [Hkn| Hkn]. {
-        move Hjk at top; subst i.
-        destruct Hp as (Hp1, Hp2).
-        rewrite Hv in Hp1.
-        specialize (Hp1 j) as H1.
-        assert (H : j < S n) by flia Hj Hjn.
-        specialize (H1 H); clear H.
-        unfold vect_el in H1.
-        rewrite Hji in H1.
-        flia H1.
-      }
-      destruct (Nat.eq_dec (nth k (vect_list v) 0) i) as [Hki| Hki]. {
-        destruct Hp as (Hp1, Hp2).
-        rewrite Hv in Hp1, Hp2.
-        apply Hp2; [ flia Hj Hjn | flia Hk Hkn | unfold vect_el; congruence ].
-      }
-      symmetry in Hjk.
-      destruct Hp as (Hp1, Hp2).
-      rewrite Hv in Hp1.
-      specialize (Hp1 k) as H1.
-      assert (H : k < S n) by flia Hk Hkn.
-      specialize (H1 H); clear H.
-      unfold vect_el in H1.
-      rewrite Hjk in H1.
-      flia H1.
-    }
-    destruct (Nat.eq_dec k (S n)) as [Hkn| Hkn]; [ easy | ].
-    destruct (Nat.eq_dec (nth k (vect_list v) 0) i) as [Hki| Hki]. {
-      destruct Hp as (Hp1, Hp2).
-      rewrite Hv in Hp1.
-      specialize (Hp1 j) as H1.
-      assert (H : j < S n) by flia Hj Hjn.
-      specialize (H1 H); clear H.
-      unfold vect_el in H1.
-      rewrite Hjk in H1.
-      flia H1.
-    }
-    apply Hp; [ rewrite Hv; flia Hj Hjn | rewrite Hv; flia Hk Hkn | easy ].
-  }
-}
 set
   (φp :=
    λ x : {u : vector nat | permut_prop_bool (S (S n)) u = true},
@@ -1122,7 +1122,8 @@ set
    λ y : {iv : nat * vector nat | nat_and_permut_prop_bool (S n) iv = true},
    exist (λ u : vector nat, permut_prop_bool (S (S n)) u = true)
       (vect_of_last_and_permut (S n) (proj1_sig y))
-      (Hφ' (proj1_sig y) (proj2_sig y))).
+      (vect_of_last_and_permut_is_permut_proop_bool (S n) (proj1_sig y)
+        (proj2_sig y))).
 assert (H : (∀ x, φp (φp' x) = x) ∧ (∀ y, φp' (φp y) = y)). {
   split. {
     intros x.
