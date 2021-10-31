@@ -1109,6 +1109,12 @@ Definition nat_and_permut_of_permut n (x : permut (S n)) : nat_and_permut n :=
     (last_and_permut_of_vect_is_nat_and_permut_prop_bool n (proj1_sig x)
        (proj2_sig x)).
 
+Definition permut_of_nat_and_permut n (y : nat_and_permut n) : permut (S n) :=
+  exist (λ u : vector nat, permut_prop_bool (S n) u = true)
+     (vect_of_last_and_permut n (proj1_sig y))
+     (vect_of_last_and_permut_is_permut_proop_bool n (proj1_sig y)
+       (proj2_sig y)).
+
 Theorem glop : ∀ n sg, is_sym_gr_vect n sg → vect_size sg = n!.
 Proof.
 intros * Hsg.
@@ -1116,20 +1122,13 @@ destruct n; [ now apply vect_size_of_empty_sym_gr | ].
 revert sg Hsg.
 induction n; intros; [ now apply vect_size_of_sym_gr_1 | ].
 (**)
-set
-  (φp' :=
-   λ y : {iv : nat * vector nat | nat_and_permut_prop_bool (S n) iv = true},
-   exist (λ u : vector nat, permut_prop_bool (S (S n)) u = true)
-      (vect_of_last_and_permut (S n) (proj1_sig y))
-      (vect_of_last_and_permut_is_permut_proop_bool (S n) (proj1_sig y)
-        (proj2_sig y))).
 assert
   (H :
-     (∀ x, nat_and_permut_of_permut (φp' x) = x) ∧
-     (∀ y, φp' (nat_and_permut_of_permut y) = y)). {
+     (∀ x, @nat_and_permut_of_permut (S n) (permut_of_nat_and_permut x) = x) ∧
+     (∀ y, @permut_of_nat_and_permut (S n) (nat_and_permut_of_permut y) = y)). {
   split. {
     intros x.
-    unfold nat_and_permut_of_permut, φp'.
+    unfold nat_and_permut_of_permut, permut_of_nat_and_permut.
     specialize (proj2 (nat_and_permut_prop_nat_and_permut_prop_bool (S n) (proj1_sig x))) as H1.
     destruct x as (iv, Hp); cbn in H1 |-*.
     specialize (H1 Hp).
@@ -1141,7 +1140,7 @@ assert
     apply (Eqdep_dec.UIP_dec Bool.bool_dec).
   } {
     intros y.
-    unfold nat_and_permut_of_permut, φp'.
+    unfold nat_and_permut_of_permut, permut_of_nat_and_permut.
     specialize (proj2 (permut_prop_permut_prop_bool (S (S n)) (proj1_sig y))) as H1.
     destruct y as (u, Hp); cbn in H1 |-*.
     specialize (H1 Hp).
