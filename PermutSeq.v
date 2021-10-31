@@ -1158,7 +1158,8 @@ Definition permut_of_fin_t n sg (Hsg : is_sym_gr_vect (S n) sg)
     (proj1 (permut_prop_permut_prop_bool (S n) (vect_el empty_vect sg k))
        (proj1 Hsg k (proj1 (Nat.ltb_lt k (vect_size sg)) pk))).
 
-Theorem glop : ∀ n sg, is_sym_gr_vect n sg → vect_size sg = n!.
+Theorem sym_gr_size_factorial : ∀ n sg,
+  is_sym_gr_vect n sg → vect_size sg = n!.
 Proof.
 intros * Hsg.
 destruct n; [ now apply vect_size_of_empty_sym_gr | ].
