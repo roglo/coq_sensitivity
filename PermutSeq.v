@@ -1195,12 +1195,12 @@ assert (Hgfv : ∀ y, fin_t_of_permut Hsg (permut_of_fin_t Hsg y) = y). {
   exists (rank_of_permut_in_sym_gr_vect_el (Nat.neq_succ_0 (S n)) Hsg H1).
   apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 }
-destruct Hsg as (Hsg & Hinj & Hsurj).
 assert
   (Hiφ' : ∀ i, i < vect_size sg →
    nat_and_permut_prop_bool (S n)
      (last_and_permut_of_vect (S n) (vect_el empty_vect sg i)) = true). {
   intros i His.
+  destruct Hsg as (Hsg & Hinj & Hsurj).
   apply nat_and_permut_prop_nat_and_permut_prop_bool.
   split. {
     specialize (Hsg i His) as H1.
@@ -1294,6 +1294,7 @@ assert
 assert (Hzφ' :
   nat_and_permut_prop_bool (S n)
     (last_and_permut_of_vect (S n) (vect_el empty_vect sg 0)) = true). {
+  destruct Hsg as (Hsg & Hinj & Hsurj).
   destruct (Nat.eq_dec (vect_size sg) 0) as [Hsz| Hsz]. {
     exfalso.
     specialize (Hsurj (mk_vect (seq 0 (S (S n))))) as H1.
