@@ -1166,6 +1166,7 @@ Definition fin_t_of_permut n sg Hsg
     (proj2 (Nat.ltb_lt (rank_of_permut_in_sym_gr sg v) (vect_size sg))
        (rank_of_permut_in_sym_gr_lt v (Nat.neq_succ_0 n) Hsg)).
 
+(* not sure it is useful *)
 Theorem permut_of_fin_t_of_its_inverse :
   ∀ n sg (Hsg : is_sym_gr_vect (S n) sg) x,
   permut_of_fin_t Hsg (fin_t_of_permut Hsg x) = x.
@@ -1179,6 +1180,19 @@ exists (vect_el_rank_of_permut_in_sym_gr Hsg Hp Hv).
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
+(* not sure it is useful *)
+Theorem fin_t_of_permut_of_its_inverse :
+  ∀ n sg (Hsg : is_sym_gr_vect (S n) sg) y,
+  fin_t_of_permut Hsg (permut_of_fin_t Hsg y) = y.
+Proof.
+intros n sg Hsg (k, pk).
+unfold permut_of_fin_t, fin_t_of_permut.
+specialize (proj1 (Nat.ltb_lt k (vect_size sg)) pk) as H1.
+apply eq_exist_uncurried.
+exists (rank_of_permut_in_sym_gr_vect_el (Nat.neq_succ_0 n) Hsg H1).
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+Qed.
+
 Theorem sym_gr_size_factorial : ∀ n sg,
   is_sym_gr_vect n sg → vect_size sg = n!.
 Proof.
@@ -1186,15 +1200,6 @@ intros * Hsg.
 destruct n; [ now apply vect_size_of_empty_sym_gr | ].
 revert sg Hsg.
 induction n; intros; [ now apply vect_size_of_sym_gr_1 | ].
-(**)
-assert (Hgfv : ∀ y, fin_t_of_permut Hsg (permut_of_fin_t Hsg y) = y). {
-  intros (k, pk).
-  unfold permut_of_fin_t, fin_t_of_permut.
-  specialize (proj1 (Nat.ltb_lt k (vect_size sg)) pk) as H1.
-  apply eq_exist_uncurried.
-  exists (rank_of_permut_in_sym_gr_vect_el (Nat.neq_succ_0 (S n)) Hsg H1).
-  apply (Eqdep_dec.UIP_dec Bool.bool_dec).
-}
 assert
   (Hiφ' : ∀ i, i < vect_size sg →
    nat_and_permut_prop_bool (S n)
