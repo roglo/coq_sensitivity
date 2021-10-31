@@ -1290,6 +1290,36 @@ split. {
 }
 Qed.
 
+Theorem sym_gr_vect_succ_not_empty : ∀ n sg,
+  is_sym_gr_vect (S n) sg → 0 < vect_size sg.
+Proof.
+intros * Hsg.
+apply Nat.neq_0_lt_0; intros Hsz.
+destruct Hsg as (Hsg & Hinj & Hsurj).
+specialize (Hsurj (mk_vect (seq 0 (S n)))) as H1.
+cbn - [ seq ] in H1.
+rewrite seq_length in H1.
+specialize (H1 eq_refl).
+assert (H : is_permut_vect (mk_vect (seq 0 (S n)))). {
+  split. {
+    intros i Hi; cbn in Hi; rewrite seq_length in Hi.
+    cbn - [ seq ].
+    rewrite seq_length.
+    now rewrite seq_nth.
+  } {
+    intros i j Hi Hj Hij.
+    cbn - [ seq ] in Hi, Hj, Hij.
+    rewrite seq_length in Hi, Hj.
+    now do 2 rewrite seq_nth in Hij.
+  }
+}
+specialize (H1 H); clear H.
+destruct sg as (lv).
+cbn - [ seq ] in Hsz, H1.
+apply length_zero_iff_nil in Hsz.
+now rewrite Hsz in H1.
+Qed.
+
 Theorem sym_gr_size_factorial : ∀ n sg,
   is_sym_gr_vect n sg → vect_size sg = n!.
 Proof.
@@ -1297,128 +1327,6 @@ intros * Hsg.
 destruct n; [ now apply vect_size_of_empty_sym_gr | ].
 revert sg Hsg.
 induction n; intros; [ now apply vect_size_of_sym_gr_1 | ].
-(**)
-assert (Hzφ' :
-  nat_and_permut_prop_bool (S n)
-    (last_and_permut_of_vect (S n) (vect_el empty_vect sg 0)) = true). {
-  destruct Hsg as (Hsg & Hinj & Hsurj).
-  destruct (Nat.eq_dec (vect_size sg) 0) as [Hsz| Hsz]. {
-    exfalso.
-    specialize (Hsurj (mk_vect (seq 0 (S (S n))))) as H1.
-    cbn - [ seq ] in H1.
-    rewrite seq_length in H1.
-    specialize (H1 eq_refl).
-    assert (H : is_permut_vect (mk_vect (seq 0 (S (S n))))). {
-      split. {
-        intros i Hi; cbn in Hi; rewrite seq_length in Hi.
-        cbn - [ seq ].
-        rewrite seq_length.
-        now rewrite seq_nth.
-      } {
-        intros i j Hi Hj Hij.
-        cbn - [ seq ] in Hi, Hj, Hij.
-        rewrite seq_length in Hi, Hj.
-        now do 2 rewrite seq_nth in Hij.
-      }
-    }
-    specialize (H1 H); clear H.
-    destruct sg as (lv).
-    cbn - [ seq ] in Hsz, H1.
-    apply length_zero_iff_nil in Hsz.
-    now rewrite Hsz in H1.
-  }
-  apply nat_and_permut_prop_nat_and_permut_prop_bool.
-  apply Nat.neq_0_lt_0 in Hsz.
-  split. {
-    specialize (Hsg 0 Hsz) as H1.
-    destruct H1 as (H1 & H2 & H3).
-    rewrite H1 in H2, H3.
-    apply H2; flia.
-  }
-  split. {
-    unfold permut_but_highest; cbn.
-    now rewrite map_length, seq_length.
-  } {
-    unfold permut_but_highest.
-    split. {
-      cbn - [ seq ]; rewrite map_length, seq_length.
-      intros i Hi.
-      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-      rewrite seq_nth; [ | easy ].
-      rewrite Nat.add_0_l.
-      rewrite if_eqb_eq_dec.
-      destruct (Nat.eq_dec _ _) as [Hsi| Hsi]. {
-        specialize (Hsg 0 Hsz) as H1.
-        destruct H1 as (H1 & H2 & H3).
-        rewrite H1 in H2, H3.
-        specialize (H2 (S n) (Nat.lt_succ_diag_r _)).
-        specialize (H3 i (S n)).
-        assert (H : i < S (S n)) by flia Hi.
-        specialize (H3 H); clear H.
-        assert (H : S n < S (S n)) by flia.
-        specialize (H3 H); clear H.
-        rewrite Hsi in H3.
-        apply Nat.nle_gt; intros H4.
-        assert (H : S n = vect_el 0 (vect_el empty_vect sg 0) (S n)). {
-          flia H4 H2.
-        }
-        specialize (H3 H); clear H.
-        rewrite H3 in Hi; flia Hi.
-      } {
-        specialize (Hsg 0 Hsz) as H1.
-        destruct H1 as (H1 & H2 & H3).
-        rewrite H1 in H2, H3.
-        specialize (H2 i).
-        assert (H : i < S (S n)) by flia Hi.
-        specialize (H2 H).
-        flia H2 Hsi.
-      }
-    } {
-      cbn - [ seq ]; rewrite map_length, seq_length.
-      intros i j Hi Hj Hij.
-      rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-      rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-      rewrite seq_nth in Hij; [ | easy ].
-      rewrite seq_nth in Hij; [ | easy ].
-      do 2 rewrite Nat.add_0_l in Hij.
-      do 2 rewrite if_eqb_eq_dec in Hij.
-      destruct (Nat.eq_dec _ _) as [Hjn| Hjn] in Hij. {
-        destruct (Nat.eq_dec _ _) as [Hkn| Hkn] in Hij. {
-          specialize (Hsg 0 Hsz) as H1.
-          destruct H1 as (H1 & H2 & H3).
-          rewrite H1 in H2, H3.
-          apply H3; [ flia Hi | flia Hj | ].
-          congruence.
-        }
-        specialize (Hsg 0 Hsz) as H1.
-        destruct H1 as (H1 & H2 & H3).
-        rewrite H1 in H2, H3.
-        specialize (H3 (S n) j).
-        assert (H : S n < S (S n)) by flia.
-        specialize (H3 H); clear H.
-        assert (H : j < S (S n)) by flia Hj.
-        specialize (H3 H Hij); clear H.
-        rewrite H3 in Hj; flia Hj.
-      } {
-        destruct (Nat.eq_dec _ _) as [Hkn| Hkn] in Hij. {
-          specialize (Hsg 0 Hsz) as H1.
-          destruct H1 as (H1 & H2 & H3).
-          rewrite H1 in H2, H3.
-          specialize (H3 i (S n)).
-          assert (H : i < S (S n)) by flia Hi.
-          specialize (H3 H); clear H.
-          assert (H : S n < S (S n)) by flia.
-          specialize (H3 H Hij); clear H.
-          rewrite H3 in Hi; flia Hi.
-        }
-        specialize (Hsg 0 Hsz) as H1.
-        destruct H1 as (H1 & H2 & H3).
-        rewrite H1 in H2, H3.
-        apply H3; [ flia Hi | flia Hj | easy ].
-      }
-    }
-  }
-}
 set (fnv := λ H1 : fin_t (S (S n))!,
   let (i, p) := H1 in
   match lt_dec i (vect_size sg) with
@@ -1428,8 +1336,11 @@ set (fnv := λ H1 : fin_t (S (S n))!,
         (last_and_permut_in_sym_gr_is_nat_and_permut Hsg His)
   | right _ =>
       exist (λ iv : nat * vector nat, nat_and_permut_prop_bool (S n) iv = true)
-        (last_and_permut_of_vect (S n) (vect_el empty_vect sg 0)) Hzφ'
+        (last_and_permut_of_vect (S n) (vect_el empty_vect sg 0))
+        (last_and_permut_in_sym_gr_is_nat_and_permut Hsg
+           (sym_gr_vect_succ_not_empty Hsg))
   end).
+fold (nat_and_permut (S n)) in fnv.
 ...
 assert (Hinj : FinFun.Injective φp). {
   unfold FinFun.Injective.
