@@ -1342,13 +1342,9 @@ remember (vect_of_last_and_permut n (i, v)) as v1 eqn:Hv1.
 unfold vect_of_last_and_permut in Hv1.
 exists (rank_of_permut_in_sym_gr sg v1).
 apply Nat.ltb_lt.
-(* ouais, non, ça va pas, c'est justement ce que je veux prouver.
-   il faut que je regarde comment je peux inverser la définition
-   précédente *)
 ...
-refine (let (iv, pv) := nppv in let (i, v) := iv in _).
-refine (let (iv, pv) := nppv in let (i, v) := iv in _).
-...
+Search rank_of_permut_in_sym_gr.
+Abort.
 
 Theorem sym_gr_size_factorial : ∀ n sg,
   is_sym_gr_vect n sg → vect_size sg = n!.
@@ -1356,6 +1352,9 @@ Proof.
 intros * Hsg.
 revert sg Hsg.
 induction n; intros; [ now apply vect_size_of_empty_sym_gr | ].
+...
+fin_t_of_nat_and_permut n sg Hsg : nat_of_permut n → fin_t (S n)!
+apply bijective_fin_t.
 ...
 assert (Hinj : FinFun.Injective φp). {
   unfold FinFun.Injective.
