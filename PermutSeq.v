@@ -1320,27 +1320,38 @@ apply length_zero_iff_nil in Hsz.
 now rewrite Hsz in H1.
 Qed.
 
+Definition nat_and_permut_of_fin_t n sg (Hsg : is_sym_gr_vect (S n) sg)
+    (kpk : fin_t (S n)!) : nat_and_permut n :=
+  let (k, pk) := kpk in
+  match lt_dec k (vect_size sg) with
+  | left His =>
+      exist (λ iv : nat * vector nat, nat_and_permut_prop_bool n iv = true)
+        (last_and_permut_of_vect n (vect_el empty_vect sg k))
+        (last_and_permut_in_sym_gr_is_nat_and_permut Hsg His)
+  | right _ =>
+      exist (λ iv : nat * vector nat, nat_and_permut_prop_bool n iv = true)
+        (last_and_permut_of_vect n (vect_el empty_vect sg 0))
+        (last_and_permut_in_sym_gr_is_nat_and_permut Hsg
+           (sym_gr_vect_succ_not_empty Hsg))
+  end.
+
+Definition fin_t_of_nat_and_permut n sg (Hsg : is_sym_gr_vect (S n) sg)
+    (nppv : nat_and_permut n) : fin_t (S n)!.
+destruct nppv as ((i, v) & pv).
+remember (vect_of_last_and_permut n (i, v)) as v1 eqn:Hv1.
+unfold vect_of_last_and_permut in Hv1.
+(* à voir... *)
+...
+refine (let (iv, pv) := nppv in let (i, v) := iv in _).
+refine (let (iv, pv) := nppv in let (i, v) := iv in _).
+...
+
 Theorem sym_gr_size_factorial : ∀ n sg,
   is_sym_gr_vect n sg → vect_size sg = n!.
 Proof.
 intros * Hsg.
-destruct n; [ now apply vect_size_of_empty_sym_gr | ].
 revert sg Hsg.
-induction n; intros; [ now apply vect_size_of_sym_gr_1 | ].
-set (fnv := λ H1 : fin_t (S (S n))!,
-  let (i, p) := H1 in
-  match lt_dec i (vect_size sg) with
-  | left His =>
-      exist (λ iv : nat * vector nat, nat_and_permut_prop_bool (S n) iv = true)
-        (last_and_permut_of_vect (S n) (vect_el empty_vect sg i))
-        (last_and_permut_in_sym_gr_is_nat_and_permut Hsg His)
-  | right _ =>
-      exist (λ iv : nat * vector nat, nat_and_permut_prop_bool (S n) iv = true)
-        (last_and_permut_of_vect (S n) (vect_el empty_vect sg 0))
-        (last_and_permut_in_sym_gr_is_nat_and_permut Hsg
-           (sym_gr_vect_succ_not_empty Hsg))
-  end).
-fold (nat_and_permut (S n)) in fnv.
+induction n; intros; [ now apply vect_size_of_empty_sym_gr | ].
 ...
 assert (Hinj : FinFun.Injective φp). {
   unfold FinFun.Injective.
