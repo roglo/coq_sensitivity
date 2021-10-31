@@ -788,144 +788,146 @@ Definition vect_of_last_and_permut n a :=
           else vect_el 0 v j)
          (seq 0 (S n))).
 
-Theorem last_and_permut_of_vect_is_bijective : ∀ n,
-   (∀ x, vect_size x = S n → is_permut_vect x →
-    vect_of_last_and_permut n (last_and_permut_of_vect n x) = x) ∧
-   (∀ y, vect_size (snd y) = n → is_permut_vect (snd y) →
-    last_and_permut_of_vect n (vect_of_last_and_permut n y) = y).
+Theorem vect_of_last_and_permut_of_its_inverse : ∀ n x,
+  vect_size x = S n
+  → is_permut_vect x
+  → vect_of_last_and_permut n (last_and_permut_of_vect n x) = x.
 Proof.
-intros.
-split. {
-  intros (l) Hv Hp; cbn in Hv.
-  unfold is_permut_vect in Hp; cbn in Hp.
-  unfold vect_el in Hp; cbn in Hp.
-  rewrite Hv in Hp; cbn in Hp.
-  destruct Hp as (Hp1, Hp2).
-  unfold vect_of_last_and_permut.
-  unfold last_and_permut_of_vect.
-  unfold permut_but_highest.
-  f_equal.
-  cbn - [ seq ].
-  rewrite (seq_S n).
-  cbn - [ seq ].
-  rewrite map_app.
-  cbn - [ seq ].
-  rewrite Nat.eqb_refl.
-  erewrite map_ext_in. 2: {
-    intros i Hi; apply in_seq in Hi.
-    rewrite if_eqb_eq_dec.
-    destruct (Nat.eq_dec i (S n)) as [H1| H1]; [ flia Hi H1 | ].
-    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-    rewrite seq_nth; [ | easy ].
-    rewrite Nat.add_0_l.
-    easy.
-  }
-  replace (nth n l 0) with (last l 0). 2: {
-    now rewrite List_last_nth, Hv, Nat_sub_succ_1.
-  }
-  rewrite app_removelast_last with (d := 0). 2: {
-    now intros H; rewrite H in Hv.
-  }
-  f_equal.
-  rewrite List_map_nth_seq with (d := 0).
-  replace (length (removelast l)) with n. 2: {
-    destruct l using rev_ind; [ easy | ].
-    rewrite removelast_last.
-    rewrite app_length, Nat.add_1_r in Hv.
-    now apply Nat.succ_inj in Hv.
-  }
-  apply map_ext_in.
+intros n (l) Hv Hp; cbn in Hv.
+unfold is_permut_vect in Hp; cbn in Hp.
+unfold vect_el in Hp; cbn in Hp.
+rewrite Hv in Hp; cbn in Hp.
+destruct Hp as (Hp1, Hp2).
+unfold vect_of_last_and_permut.
+unfold last_and_permut_of_vect.
+unfold permut_but_highest.
+f_equal.
+cbn - [ seq ].
+rewrite (seq_S n).
+cbn - [ seq ].
+rewrite map_app.
+cbn - [ seq ].
+rewrite Nat.eqb_refl.
+erewrite map_ext_in. 2: {
   intros i Hi; apply in_seq in Hi.
-  do 2 rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec i n) as [H| H]; [ flia Hi H | clear H ].
-  destruct (Nat.eq_dec (nth i l 0) n) as [H1| H1]. {
-    destruct (Nat.eq_dec (nth n l 0) (last l 0)) as [H2| H2]. {
-      rewrite <- H1.
-      destruct l as [| a] using rev_ind; [ easy | ].
-      rewrite removelast_last.
-      rewrite app_nth1; [ easy | ].
-      rewrite app_length in Hv.
-      rewrite Nat.add_1_r in Hv.
-      apply Nat.succ_inj in Hv.
-      now rewrite Hv.
-    }
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i (S n)) as [H1| H1]; [ flia Hi H1 | ].
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
+  rewrite Nat.add_0_l.
+  easy.
+}
+replace (nth n l 0) with (last l 0). 2: {
+  now rewrite List_last_nth, Hv, Nat_sub_succ_1.
+}
+rewrite app_removelast_last with (d := 0). 2: {
+  now intros H; rewrite H in Hv.
+}
+f_equal.
+rewrite List_map_nth_seq with (d := 0).
+replace (length (removelast l)) with n. 2: {
+  destruct l using rev_ind; [ easy | ].
+  rewrite removelast_last.
+  rewrite app_length, Nat.add_1_r in Hv.
+  now apply Nat.succ_inj in Hv.
+}
+apply map_ext_in.
+intros i Hi; apply in_seq in Hi.
+do 2 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec i n) as [H| H]; [ flia Hi H | clear H ].
+destruct (Nat.eq_dec (nth i l 0) n) as [H1| H1]. {
+  destruct (Nat.eq_dec (nth n l 0) (last l 0)) as [H2| H2]. {
+    rewrite <- H1.
     destruct l as [| a] using rev_ind; [ easy | ].
-    rewrite app_length, Nat.add_1_r in Hv.
-    apply Nat.succ_inj in Hv.
-    rewrite app_nth2 in H2; [ | flia Hv ].
-    now rewrite Hv, Nat.sub_diag, last_last in H2.
-  }
-  destruct (Nat.eq_dec (nth i l 0) (last l 0)) as [H2| H2]. {
-    destruct l as [| a] using rev_ind; [ easy | ].
+    rewrite removelast_last.
+    rewrite app_nth1; [ easy | ].
     rewrite app_length in Hv.
     rewrite Nat.add_1_r in Hv.
     apply Nat.succ_inj in Hv.
-    rewrite removelast_last.
-    rewrite app_nth1 in H1; [ | now rewrite <- Hv in Hi ].
-    rewrite app_nth1 in H2; [ | now rewrite <- Hv in Hi ].
-    rewrite last_last in H2.
-    specialize (Hp2 i n).
-    assert (H : i < S n) by flia Hv Hi.
-    specialize (Hp2 H (Nat.lt_succ_diag_r _)); clear H.
-    rewrite app_nth1 in Hp2; [ | flia Hv Hi ].
-    rewrite app_nth2 in Hp2; [ | flia Hv ].
-    rewrite Hv, Nat.sub_diag in Hp2.
-    cbn in Hp2.
-    specialize (Hp2 H2).
-    flia Hp2 Hi.
+    now rewrite Hv.
   }
+  destruct l as [| a] using rev_ind; [ easy | ].
+  rewrite app_length, Nat.add_1_r in Hv.
+  apply Nat.succ_inj in Hv.
+  rewrite app_nth2 in H2; [ | flia Hv ].
+  now rewrite Hv, Nat.sub_diag, last_last in H2.
+}
+destruct (Nat.eq_dec (nth i l 0) (last l 0)) as [H2| H2]. {
   destruct l as [| a] using rev_ind; [ easy | ].
   rewrite app_length in Hv.
   rewrite Nat.add_1_r in Hv.
   apply Nat.succ_inj in Hv.
   rewrite removelast_last.
-  rewrite app_nth1; [ easy | flia Hv Hi ].
+  rewrite app_nth1 in H1; [ | now rewrite <- Hv in Hi ].
+  rewrite app_nth1 in H2; [ | now rewrite <- Hv in Hi ].
+  rewrite last_last in H2.
+  specialize (Hp2 i n).
+  assert (H : i < S n) by flia Hv Hi.
+  specialize (Hp2 H (Nat.lt_succ_diag_r _)); clear H.
+  rewrite app_nth1 in Hp2; [ | flia Hv Hi ].
+  rewrite app_nth2 in Hp2; [ | flia Hv ].
+  rewrite Hv, Nat.sub_diag in Hp2.
+  cbn in Hp2.
+  specialize (Hp2 H2).
+  flia Hp2 Hi.
+}
+destruct l as [| a] using rev_ind; [ easy | ].
+rewrite app_length in Hv.
+rewrite Nat.add_1_r in Hv.
+apply Nat.succ_inj in Hv.
+rewrite removelast_last.
+rewrite app_nth1; [ easy | flia Hv Hi ].
+Qed.
+
+Theorem last_and_permut_of_vect_el_of_its_inverse : ∀ n y,
+  vect_size (snd y) = n
+  → is_permut_vect (snd y)
+  → last_and_permut_of_vect n (vect_of_last_and_permut n y) = y.
+Proof.
+intros n (i, v) Hv Hp; cbn in Hv, Hp.
+unfold vect_of_last_and_permut.
+unfold last_and_permut_of_vect, permut_but_highest.
+cbn - [ seq ].
+f_equal. {
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
+  rewrite seq_nth; [ | flia ].
+  now rewrite Nat.eqb_refl.
 } {
-  intros (i, v) Hv Hp; cbn in Hv, Hp.
-  unfold vect_of_last_and_permut.
-  unfold last_and_permut_of_vect, permut_but_highest.
+  destruct v as (l); cbn in Hv.
+  f_equal.
+  rewrite List_map_nth_seq with (d := 0).
+  rewrite Hv.
+  apply map_ext_in.
+  intros j Hj; apply in_seq in Hj.
+  destruct Hj as (_, Hj); cbn in Hj.
   cbn - [ seq ].
-  f_equal. {
+  rewrite (@List_map_nth' _ _ 0 _ _ _ j). 2: {
+    rewrite seq_length; flia Hj.
+  }
+  rewrite seq_nth; [ | flia Hj ].
+  rewrite Nat.add_0_l.
+  do 3 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec j n) as [H| H]; [ flia Hj H | clear H ].
+  destruct (Nat.eq_dec (nth j l 0) i) as [H1| H1]. {
+    rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
     rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
     rewrite seq_nth; [ | flia ].
     now rewrite Nat.eqb_refl.
-  } {
-    destruct v as (l); cbn in Hv.
-    f_equal.
-    rewrite List_map_nth_seq with (d := 0).
-    rewrite Hv.
-    apply map_ext_in.
-    intros j Hj; apply in_seq in Hj.
-    destruct Hj as (_, Hj); cbn in Hj.
-    cbn - [ seq ].
-    rewrite (@List_map_nth' _ _ 0 _ _ _ j). 2: {
-      rewrite seq_length; flia Hj.
-    }
-    rewrite seq_nth; [ | flia Hj ].
-    rewrite Nat.add_0_l.
-    do 3 rewrite if_eqb_eq_dec.
-    destruct (Nat.eq_dec j n) as [H| H]; [ flia Hj H | clear H ].
-    destruct (Nat.eq_dec (nth j l 0) i) as [H1| H1]. {
-      rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
-      rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
-      rewrite seq_nth; [ | flia ].
-      now rewrite Nat.eqb_refl.
-    }
-    destruct (Nat.eq_dec (nth j l 0) n) as [H2| H2]. {
-      destruct Hp as (Hp1, Hp2); cbn in Hp1, Hp2.
-      specialize (Hp1 j).
-      rewrite Hv, H2 in Hp1.
-      specialize (Hp1 Hj).
-      flia Hp1.
-    }
-    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
-    rewrite seq_nth; [ | flia Hj ].
-    rewrite Nat.add_0_l.
-    rewrite if_eqb_eq_dec.
-    destruct (Nat.eq_dec j n) as [H| H]; [ flia Hj H | clear H ].
-    rewrite if_eqb_eq_dec.
-    now destruct (Nat.eq_dec (nth j l 0) i).
   }
+  destruct (Nat.eq_dec (nth j l 0) n) as [H2| H2]. {
+    destruct Hp as (Hp1, Hp2); cbn in Hp1, Hp2.
+    specialize (Hp1 j).
+    rewrite Hv, H2 in Hp1.
+    specialize (Hp1 Hj).
+    flia Hp1.
+  }
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
+  rewrite seq_nth; [ | flia Hj ].
+  rewrite Nat.add_0_l.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec j n) as [H| H]; [ flia Hj H | clear H ].
+  rewrite if_eqb_eq_dec.
+  now destruct (Nat.eq_dec (nth j l 0) i).
 }
 Qed.
 
@@ -935,9 +937,6 @@ intros * Hsg.
 destruct n; [ now apply vect_size_of_empty_sym_gr | ].
 revert sg Hsg.
 induction n; intros; [ now apply vect_size_of_sym_gr_1 | ].
-specialize (last_and_permut_of_vect_is_bijective (S n)) as H.
-(**)
-destruct H as (Hφ'φ, Hφφ').
 assert
   (Hφ : ∀ u, φ_prop_bool (S (S n)) u = true
   → φ'_prop_bool (S n) (last_and_permut_of_vect (S n) u) = true). {
@@ -1126,7 +1125,7 @@ assert (H : (∀ x, φp (φp' x) = x) ∧ (∀ y, φp' (φp y) = y)). {
     unfold φ'_prop in H1.
     destruct H1 as (H1 & H2 & H3).
     apply eq_exist_uncurried.
-    exists (Hφφ' (i, v) H2 H3).
+    exists (last_and_permut_of_vect_el_of_its_inverse (i, v) H2 H3).
     apply (Eqdep_dec.UIP_dec Bool.bool_dec).
   } {
     intros y.
@@ -1137,7 +1136,7 @@ assert (H : (∀ x, φp (φp' x) = x) ∧ (∀ y, φp' (φp y) = y)). {
     unfold φ_prop in H1.
     destruct H1 as (H1 & H2).
     apply eq_exist_uncurried.
-    exists (Hφ'φ u H1 H2).
+    exists (vect_of_last_and_permut_of_its_inverse H1 H2).
     apply (Eqdep_dec.UIP_dec Bool.bool_dec).
   }
 }
