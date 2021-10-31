@@ -1156,8 +1156,6 @@ intros * Hsg.
 destruct n; [ now apply vect_size_of_empty_sym_gr | ].
 revert sg Hsg.
 induction n; intros; [ now apply vect_size_of_sym_gr_1 | ].
-fold (nat_and_permut (S n)) in *.
-fold (permut (S (S n))) in *.
 set (fv := λ kpk : fin_t (vect_size sg),
   let (k, pk) := kpk in
   exist (λ u, permut_prop_bool (S (S n)) u = true)
