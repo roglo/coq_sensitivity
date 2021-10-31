@@ -1150,38 +1150,40 @@ exists (vect_of_last_and_permut_of_its_inverse H1 H2).
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
+Definition permut_of_fin_t n sg (Hsg : is_sym_gr_vect (S n) sg)
+    (kpk : fin_t (vect_size sg)) : permut (S n) :=
+  let (k, pk) := kpk in
+  exist (λ u, permut_prop_bool (S n) u = true)
+    (vect_el empty_vect sg k)
+    (proj1 (permut_prop_permut_prop_bool (S n) (vect_el empty_vect sg k))
+       (proj1 Hsg k (proj1 (Nat.ltb_lt k (vect_size sg)) pk))).
+
 Theorem glop : ∀ n sg, is_sym_gr_vect n sg → vect_size sg = n!.
 Proof.
 intros * Hsg.
 destruct n; [ now apply vect_size_of_empty_sym_gr | ].
 revert sg Hsg.
 induction n; intros; [ now apply vect_size_of_sym_gr_1 | ].
-set (fv := λ kpk : fin_t (vect_size sg),
-  let (k, pk) := kpk in
-  exist (λ u, permut_prop_bool (S (S n)) u = true)
-    (vect_el empty_vect sg k)
-    (proj1 (permut_prop_permut_prop_bool (S (S n)) (vect_el empty_vect sg k))
-       (proj1 Hsg k (proj1 (Nat.ltb_lt k (vect_size sg)) pk)))).
+(**)
 set (gv := λ vpv : permut (S (S n)),
   let (v, _) := vpv in
   exist (λ a, (a <? vect_size sg) = true)
     (rank_of_permut_in_sym_gr sg v)
     (proj2 (Nat.ltb_lt (rank_of_permut_in_sym_gr sg v) (vect_size sg))
        (rank_of_permut_in_sym_gr_lt v (Nat.neq_succ_0 (S n)) Hsg))).
-fold (permut (S (S n))) in fv.
 fold (fin_t (vect_size sg)) in gv.
-assert (Hfgv : ∀ x, fv (gv x) = x). {
+assert (Hfgv : ∀ x, permut_of_fin_t Hsg (gv x) = x). {
   intros (v, pv).
-  unfold fv, gv.
+  unfold permut_of_fin_t, gv.
   specialize (proj2 (permut_prop_permut_prop_bool (S (S n)) v) pv) as H1.
   destruct H1 as (Hv, Hp).
   apply eq_exist_uncurried.
   exists (vect_el_rank_of_permut_in_sym_gr Hsg Hp Hv).
   apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 }
-assert (Hgfv : ∀ y, gv (fv y) = y). {
+assert (Hgfv : ∀ y, gv (permut_of_fin_t Hsg y) = y). {
   intros (k, pk).
-  unfold fv, gv.
+  unfold permut_of_fin_t, gv.
   specialize (proj1 (Nat.ltb_lt k (vect_size sg)) pk) as H1.
   apply eq_exist_uncurried.
   exists (rank_of_permut_in_sym_gr_vect_el (Nat.neq_succ_0 (S n)) Hsg H1).
