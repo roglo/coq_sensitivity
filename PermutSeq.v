@@ -492,7 +492,6 @@ split; intros Hφ'. {
 }
 Qed.
 
-
 (* *)
 
 Definition vect_eqb A eqb (u v : vector A) :=
@@ -935,83 +934,87 @@ f_equal. {
 }
 Qed.
 
+
+Theorem last_and_permut_of_vect_is_nat_and_permut_prop_bool : ∀ n v,
+  permut_prop_bool (S n) v = true
+  → nat_and_permut_prop_bool n (last_and_permut_of_vect n v) = true.
+Proof.
+intros * Hv.
+apply nat_and_permut_prop_nat_and_permut_prop_bool.
+apply permut_prop_permut_prop_bool in Hv.
+unfold permut_prop in Hv.
+unfold nat_and_permut_prop.
+destruct Hv as (Hv, Hp).
+unfold is_permut_vect in Hp; cbn in Hp.
+unfold vect_el in Hp; cbn in Hp.
+rewrite Hv in Hp; cbn in Hp.
+destruct Hp as (Hp1, Hp2).
+unfold vect_of_last_and_permut.
+unfold last_and_permut_of_vect, permut_but_highest.
+cbn - [ seq ].
+rewrite map_length, seq_length.
+split; [ apply Hp1; flia | ].
+split; [ easy | ].
+unfold is_permut_vect.
+cbn - [ seq ].
+rewrite map_length, seq_length.
+unfold vect_el.
+cbn - [ seq ].
+eapply is_permut_eq_compat. {
+  intros i Hi; symmetry.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
+  rewrite Nat.add_0_l.
+  easy.
+}
+split. {
+  intros i Hi.
+  rewrite if_eqb_eq_dec.
+  unfold vect_el.
+  destruct (Nat.eq_dec (nth i (vect_list v) 0) n) as [H1| H1].  {
+    specialize (Hp2 i n) as H2.
+    assert (H : i < S n) by flia Hi.
+    specialize (H2 H (Nat.lt_succ_diag_r _)); clear H.
+    assert (H3 : vect_el 0 v i ≠ vect_el 0 v n). {
+      intros H; specialize (H2 H); flia Hi H2.
+    }
+    unfold vect_el in H3.
+    rewrite H1 in H3.
+    apply Nat.neq_sym in H3.
+    apply Nat_le_neq_lt; [ | easy ].
+    apply Nat.lt_succ_r.
+    apply Hp1, Nat.lt_succ_diag_r.
+  } {
+    apply Nat_le_neq_lt; [ | easy ].
+    apply Nat.lt_succ_r.
+    apply Hp1; flia Hi.
+  }
+} {
+  intros i j Hi Hj Hij.
+  do 2 rewrite if_eqb_eq_dec in Hij.
+  unfold vect_el in Hij.
+  destruct (Nat.eq_dec (nth i (vect_list v) 0) n) as [H1| H1]. {
+    destruct (Nat.eq_dec (nth j (vect_list v) 0) n) as [H2| H2]. {
+      apply Hp2; [ flia Hv Hi | flia Hv Hj | ].
+      unfold vect_el; congruence.
+    }
+    apply Hp2 in Hij; [ flia Hj Hij | flia Hv | flia Hj Hv ].
+  }
+  destruct (Nat.eq_dec (nth j (vect_list v) 0) n) as [H2| H2]. {
+    apply Hp2 in Hij; [ flia Hi Hij | flia Hv Hi | flia Hv ].
+  }
+  apply Hp2; [ flia Hv Hi | flia Hv Hj | ].
+  unfold vect_el; congruence.
+}
+Qed.
+
 Theorem glop : ∀ n sg, is_sym_gr_vect n sg → vect_size sg = n!.
 Proof.
 intros * Hsg.
 destruct n; [ now apply vect_size_of_empty_sym_gr | ].
 revert sg Hsg.
 induction n; intros; [ now apply vect_size_of_sym_gr_1 | ].
-assert
-  (Hφ : ∀ u, permut_prop_bool (S (S n)) u = true
-  → nat_and_permut_prop_bool (S n) (last_and_permut_of_vect (S n) u) = true). {
-  intros v Hv.
-  apply nat_and_permut_prop_nat_and_permut_prop_bool.
-  apply permut_prop_permut_prop_bool in Hv.
-  unfold permut_prop in Hv.
-  unfold nat_and_permut_prop.
-  destruct Hv as (Hv, Hp).
-  unfold is_permut_vect in Hp; cbn in Hp.
-  unfold vect_el in Hp; cbn in Hp.
-  rewrite Hv in Hp; cbn in Hp.
-  destruct Hp as (Hp1, Hp2).
-  unfold vect_of_last_and_permut.
-  unfold last_and_permut_of_vect, permut_but_highest.
-  cbn - [ seq ].
-  rewrite map_length, seq_length.
-  split; [ apply Hp1; flia | ].
-  split; [ easy | ].
-  unfold is_permut_vect.
-  cbn - [ seq ].
-  rewrite map_length, seq_length.
-  unfold vect_el.
-  cbn - [ seq ].
-  eapply is_permut_eq_compat. {
-    intros i Hi; symmetry.
-    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-    rewrite seq_nth; [ | easy ].
-    rewrite Nat.add_0_l.
-    easy.
-  }
-  split. {
-    intros i Hi.
-    rewrite if_eqb_eq_dec.
-    unfold vect_el.
-    destruct (Nat.eq_dec (nth i (vect_list v) 0) (S n)) as [H1| H1].  {
-      specialize (Hp2 i (S n)) as H2.
-      assert (H : i < S (S n)) by flia Hi.
-      specialize (H2 H (Nat.lt_succ_diag_r _)); clear H.
-      assert (H3 : vect_el 0 v i ≠ vect_el 0 v (S n)). {
-        intros H; specialize (H2 H); flia Hi H2.
-      }
-      unfold vect_el in H3.
-      rewrite H1 in H3.
-      apply Nat.neq_sym in H3.
-      apply Nat_le_neq_lt; [ | easy ].
-      apply Nat.lt_succ_r.
-      apply Hp1, Nat.lt_succ_diag_r.
-    } {
-      apply Nat_le_neq_lt; [ | easy ].
-      apply Nat.lt_succ_r.
-      apply Hp1; flia Hi.
-    }
-  } {
-    intros i j Hi Hj Hij.
-    do 2 rewrite if_eqb_eq_dec in Hij.
-    unfold vect_el in Hij.
-    destruct (Nat.eq_dec (nth i (vect_list v) 0) (S n)) as [H1| H1]. {
-      destruct (Nat.eq_dec (nth j (vect_list v) 0) (S n)) as [H2| H2]. {
-        apply Hp2; [ flia Hv Hi | flia Hv Hj | ].
-        unfold vect_el; congruence.
-      }
-      apply Hp2 in Hij; [ flia Hj Hij | flia Hv | flia Hj Hv ].
-    }
-    destruct (Nat.eq_dec (nth j (vect_list v) 0) (S n)) as [H2| H2]. {
-      apply Hp2 in Hij; [ flia Hi Hij | flia Hv Hi | flia Hv ].
-    }
-    apply Hp2; [ flia Hv Hi | flia Hv Hj | ].
-    unfold vect_el; congruence.
-  }
-}
+(**)
 assert
   (Hφ' : ∀ iv,
    nat_and_permut_prop_bool (S n) iv = true
@@ -1112,7 +1115,8 @@ set
    λ x : {u : vector nat | permut_prop_bool (S (S n)) u = true},
    exist (λ iv : nat * vector nat, nat_and_permut_prop_bool (S n) iv = true)
      (last_and_permut_of_vect (S n) (proj1_sig x))
-     (Hφ (proj1_sig x) (proj2_sig x))).
+     (last_and_permut_of_vect_is_nat_and_permut_prop_bool (S n) (proj1_sig x)
+        (proj2_sig x))).
 set
   (φp' :=
    λ y : {iv : nat * vector nat | nat_and_permut_prop_bool (S n) iv = true},
