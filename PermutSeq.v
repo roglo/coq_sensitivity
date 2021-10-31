@@ -1115,43 +1115,47 @@ Definition permut_of_nat_and_permut n (y : nat_and_permut n) : permut (S n) :=
      (vect_of_last_and_permut_is_permut_proop_bool n (proj1_sig y)
        (proj2_sig y)).
 
+(* not sure it is useful *)
+Theorem nat_and_permut_of_permut_of_its_inverse : ∀ n x,
+  @nat_and_permut_of_permut n (permut_of_nat_and_permut x) = x.
+Proof.
+intros.
+unfold nat_and_permut_of_permut, permut_of_nat_and_permut.
+specialize
+  (proj2 (nat_and_permut_prop_nat_and_permut_prop_bool n (proj1_sig x)))
+  as H1.
+destruct x as (iv, Hp); cbn in H1 |-*.
+specialize (H1 Hp).
+destruct iv as (i, v).
+unfold nat_and_permut_prop in H1.
+destruct H1 as (H1 & H2 & H3).
+apply eq_exist_uncurried.
+exists (last_and_permut_of_vect_el_of_its_inverse (i, v) H2 H3).
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+Qed.
+
+(* not sure it is useful *)
+Theorem permut_of_nat_and_permut_of_its_inverse : ∀ n y,
+  @permut_of_nat_and_permut n (nat_and_permut_of_permut y) = y.
+Proof.
+intros.
+unfold nat_and_permut_of_permut, permut_of_nat_and_permut.
+specialize (proj2 (permut_prop_permut_prop_bool (S n) (proj1_sig y))) as H1.
+destruct y as (u, Hp); cbn in H1 |-*.
+specialize (H1 Hp).
+unfold permut_prop in H1.
+destruct H1 as (H1 & H2).
+apply eq_exist_uncurried.
+exists (vect_of_last_and_permut_of_its_inverse H1 H2).
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+Qed.
+
 Theorem glop : ∀ n sg, is_sym_gr_vect n sg → vect_size sg = n!.
 Proof.
 intros * Hsg.
 destruct n; [ now apply vect_size_of_empty_sym_gr | ].
 revert sg Hsg.
 induction n; intros; [ now apply vect_size_of_sym_gr_1 | ].
-(**)
-assert
-  (H :
-     (∀ x, @nat_and_permut_of_permut (S n) (permut_of_nat_and_permut x) = x) ∧
-     (∀ y, @permut_of_nat_and_permut (S n) (nat_and_permut_of_permut y) = y)). {
-  split. {
-    intros x.
-    unfold nat_and_permut_of_permut, permut_of_nat_and_permut.
-    specialize (proj2 (nat_and_permut_prop_nat_and_permut_prop_bool (S n) (proj1_sig x))) as H1.
-    destruct x as (iv, Hp); cbn in H1 |-*.
-    specialize (H1 Hp).
-    destruct iv as (i, v).
-    unfold nat_and_permut_prop in H1.
-    destruct H1 as (H1 & H2 & H3).
-    apply eq_exist_uncurried.
-    exists (last_and_permut_of_vect_el_of_its_inverse (i, v) H2 H3).
-    apply (Eqdep_dec.UIP_dec Bool.bool_dec).
-  } {
-    intros y.
-    unfold nat_and_permut_of_permut, permut_of_nat_and_permut.
-    specialize (proj2 (permut_prop_permut_prop_bool (S (S n)) (proj1_sig y))) as H1.
-    destruct y as (u, Hp); cbn in H1 |-*.
-    specialize (H1 Hp).
-    unfold permut_prop in H1.
-    destruct H1 as (H1 & H2).
-    apply eq_exist_uncurried.
-    exists (vect_of_last_and_permut_of_its_inverse H1 H2).
-    apply (Eqdep_dec.UIP_dec Bool.bool_dec).
-  }
-}
-destruct H as (Hx, Hy).
 fold (nat_and_permut (S n)) in *.
 fold (permut (S (S n))) in *.
 set (fv := λ kpk : fin_t (vect_size sg),
