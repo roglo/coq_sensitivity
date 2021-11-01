@@ -1881,6 +1881,66 @@ Definition rank_in_canon_sym_gr_of_rank_in_sym_gr n sg
   rank_of_permut_in_canon_sym_gr_vect n
     (vect_el empty_vect sg k).
 
+Theorem rank_in_sym_gr_of_rank_in_canon_sym_gr_of_its_inverse : ∀ n sg
+    (Hsg : is_sym_gr_vect n sg) k,
+  k < vect_size sg
+  → rank_in_sym_gr_of_rank_in_canon_sym_gr Hsg
+      (rank_in_canon_sym_gr_of_rank_in_sym_gr Hsg k) = k.
+Proof.
+intros * Hks.
+unfold rank_in_canon_sym_gr_of_rank_in_sym_gr.
+unfold rank_in_sym_gr_of_rank_in_canon_sym_gr.
+unfold rank_of_permut_in_canon_sym_gr_vect.
+cbn.
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  apply rank_of_canon_permut_upper_bound.
+  destruct Hsg as (Hsg & Hinj & Hsurj).
+  unfold is_permut_vect in Hsg.
+  cbn in Hsg.
+  specialize (Hsg k Hks) as H1.
+  destruct H1 as (H1, H2).
+  now rewrite H1 in H2.
+}
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  remember (vect_el 0 (vect_el empty_vect sg k)) as f eqn:Hf.
+...
+Search mk_canon_sym_gr.
+Check canon_sym_gr_inv_sym_gr.
+...
+Search rank_of_permut_in_sym_gr.
+Search rank_of_permut_in_canon_sym_gr.
+Theorem rank_of_permut_of_rank : ∀ n k,
+  k < n!
+  → rank_of_permut_in_canon_sym_gr n (mk_canon_sym_gr n k) = k.
+Proof.
+intros * Hkn.
+Admitted.
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  rewrite rank_of_permut_of_rank.
+...
+  split; [ flia | ].
+  intros i j Hi Hj H.
+
+Search (is_permut_fun (vect_el _ _)).
+Search is_permut_fun.
+  apply Hsg.
+
+Search (_ < _ !).
+Search (vect_el _ (mk_canon_sym_gr_vect _)).
+apply rank_of_permut_in_canon_up
+...
+Search rank_of_permut_in_canon_sym_gr.
+Print mk_canon_sym_gr.
+  → rank_of_permut_in_canon_sym_gr n (mk_canon_sym_gr n k) = k.
+...
+Search rank_of_permut_in_sym_gr.
+...
+rewrite rank_of_permut_in_sym_gr_vect_el.
+...
+
 ...
 Print mk_canon_sym_gr_vect.
 Search mk_canon_sym_gr_vect.
