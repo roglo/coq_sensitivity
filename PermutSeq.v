@@ -1903,8 +1903,29 @@ rewrite (List_map_nth' 0). 2: {
   now rewrite H1 in H2.
 }
 erewrite map_ext_in. 2: {
-  intros i Hi.
+  intros i Hi; apply in_seq in Hi.
   remember (vect_el 0 (vect_el empty_vect sg k)) as f eqn:Hf.
+  rewrite seq_nth. 2: {
+    apply rank_of_canon_permut_upper_bound.
+    destruct Hsg as (Hsg & Hinj & Hsurj).
+    subst f.
+    specialize (Hsg k Hks).
+    destruct Hsg as (H1 & H2 & H3).
+    rewrite H1 in H2, H3.
+    split. {
+      intros j Hj.
+      now apply H2.
+    } {
+      intros u v Hu Hv Huv.
+      now apply H3.
+    }
+  }
+  rewrite Nat.add_0_l.
+...
+Search rank_of_permut_in_canon_sym_gr.
+Search (nth _ (seq _ _)).
+Print mk_canon_sym_gr.
+Search (mk_canon_sym_gr _ (
 ...
 Search mk_canon_sym_gr.
 Check canon_sym_gr_inv_sym_gr.
