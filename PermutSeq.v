@@ -1861,6 +1861,31 @@ apply Nat.mul_lt_mono; [ easy | ].
 now apply rank_of_canon_permut_upper_bound.
 Qed.
 
+(* une autre solution, pour montrer que tout groupe symétrique d'ordre n
+   est de taille n!, est de montrer que tout groupe symétrique est en
+   bijection avec le groupe symétrique canonique, qui est bien un groupe
+   symétrique et qui est de taille n! par construction *)
+
+Check canon_sym_gr_vect_prop.
+
+Theorem canon_sym_gr_vect_size : ∀ n, vect_size (mk_canon_sym_gr_vect n) = n!.
+Proof. now intros; cbn; rewrite map_length, seq_length. Qed.
+
+Definition rank_in_sym_gr_of_rank_in_canon_sym_gr n sg
+    (Hsg : is_sym_gr_vect n sg) (k : nat) : nat :=
+  rank_of_permut_in_sym_gr sg
+    (vect_el empty_vect (mk_canon_sym_gr_vect n) k).
+
+Definition rank_in_canon_sym_gr_of_rank_in_sym_gr n sg
+    (Hsg : is_sym_gr_vect n sg) (k : nat) : nat :=
+  rank_of_permut_in_canon_sym_gr_vect n
+    (vect_el empty_vect sg k).
+
+...
+Print mk_canon_sym_gr_vect.
+Search mk_canon_sym_gr_vect.
+Search mk_canon_sym_gr.
+
 ...
 
 canon_sym_gr_vect_prop : ∀ n : nat, is_sym_gr_vect n (mk_canon_sym_gr_vect n)
