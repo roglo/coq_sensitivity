@@ -1883,11 +1883,12 @@ Definition rank_in_canon_sym_gr_of_rank_in_sym_gr n sg
 
 Theorem rank_in_sym_gr_of_rank_in_canon_sym_gr_of_its_inverse : ∀ n sg
     (Hsg : is_sym_gr_vect n sg) k,
-  k < vect_size sg
+  n ≠ 0
+  → k < vect_size sg
   → rank_in_sym_gr_of_rank_in_canon_sym_gr Hsg
       (rank_in_canon_sym_gr_of_rank_in_sym_gr Hsg k) = k.
 Proof.
-intros * Hks.
+intros * Hnz Hks.
 unfold rank_in_canon_sym_gr_of_rank_in_sym_gr.
 unfold rank_in_sym_gr_of_rank_in_canon_sym_gr.
 unfold rank_of_permut_in_canon_sym_gr_vect.
@@ -1934,83 +1935,13 @@ rewrite <- List_map_nth_seq.
 subst la; cbn.
 rewrite mk_vect_vect_list.
 rewrite fold_vect_el.
-apply rank_of_permut_in_sym_gr_vect_el with (n := n); [ | easy | easy ].
-intros H; move H at top; subst n.
-specialize (vect_size_of_empty_sym_gr Hsg) as H1.
-rewrite H1 in Hks.
-apply Nat.lt_1_r in Hks; subst k.
-apply length_zero_iff_nil in Hln.
-unfold vect_size in H1.
-remember (vect_list sg) as lv eqn:Hlv; symmetry in Hlv.
-destruct lv as [| v]; [ easy | ].
-destruct lv; [ | easy ].
-clear H1; cbn in Hln.
-...
-rewrite Hlv in Hln; cbn in Hln.
-destruct (vect_list sg); [ easy | ].
-cbn in Hln.
+now apply rank_of_permut_in_sym_gr_vect_el with (n := n).
+Qed.
 
-
-rewrite fold_vect_el in Hln.
-...
-; subst n.
-
-...
-rewrite (List_map_seq' 0).
-
-...
-  reflexivity.
-  easy.
-...
-Search (nth _ (seq _ _)).
-Print mk_canon_sym_gr.
-Search (mk_canon_sym_gr _ (
-...
-Search mk_canon_sym_gr.
-Check canon_sym_gr_inv_sym_gr.
-...
-Search rank_of_permut_in_sym_gr.
-Search rank_of_permut_in_canon_sym_gr.
-Theorem rank_of_permut_of_rank : ∀ n k,
-  k < n!
-  → rank_of_permut_in_canon_sym_gr n (mk_canon_sym_gr n k) = k.
-Proof.
-intros * Hkn.
-Admitted.
-erewrite map_ext_in. 2: {
-  intros i Hi.
-  rewrite rank_of_permut_of_rank.
-...
-  split; [ flia | ].
-  intros i j Hi Hj H.
-
-Search (is_permut_fun (vect_el _ _)).
-Search is_permut_fun.
-  apply Hsg.
-
-Search (_ < _ !).
-Search (vect_el _ (mk_canon_sym_gr_vect _)).
-apply rank_of_permut_in_canon_up
-...
-Search rank_of_permut_in_canon_sym_gr.
-Print mk_canon_sym_gr.
-  → rank_of_permut_in_canon_sym_gr n (mk_canon_sym_gr n k) = k.
-...
-Search rank_of_permut_in_sym_gr.
-...
-rewrite rank_of_permut_in_sym_gr_vect_el.
-...
-
-...
-Print mk_canon_sym_gr_vect.
-Search mk_canon_sym_gr_vect.
-Search mk_canon_sym_gr.
+Inspect 1.
 
 ...
 
-canon_sym_gr_vect_prop : ∀ n : nat, is_sym_gr_vect n (mk_canon_sym_gr_vect n)
-...
-...
 (*
 i = k mod S n
 v = vector of size n! ; because we have k / S n < (S n)! / S n
