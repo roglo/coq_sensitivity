@@ -1902,27 +1902,66 @@ rewrite (List_map_nth' 0). 2: {
   destruct H1 as (H1, H2).
   now rewrite H1 in H2.
 }
+remember (vect_el 0 (vect_el empty_vect sg k)) as f eqn:Hf.
+assert (Hp : is_permut_fun f n). {
+  subst f.
+  destruct Hsg as (Hsg & Hinj & Hsurj).
+  specialize (Hsg k Hks).
+  destruct Hsg as (H1 & H2 & H3).
+  rewrite H1 in H2, H3.
+  split; [ now intros; apply H2 | now intros; apply H3 ].
+}
 erewrite map_ext_in. 2: {
   intros i Hi; apply in_seq in Hi.
-  remember (vect_el 0 (vect_el empty_vect sg k)) as f eqn:Hf.
   rewrite seq_nth. 2: {
-    apply rank_of_canon_permut_upper_bound.
-    destruct Hsg as (Hsg & Hinj & Hsurj).
-    subst f.
-    specialize (Hsg k Hks).
-    destruct Hsg as (H1 & H2 & H3).
-    rewrite H1 in H2, H3.
-    split. {
-      intros j Hj.
-      now apply H2.
-    } {
-      intros u v Hu Hv Huv.
-      now apply H3.
-    }
+    now apply rank_of_canon_permut_upper_bound.
   }
   rewrite Nat.add_0_l.
+  now rewrite permut_in_canon_sym_gr_of_its_rank.
+}
+rewrite Hf.
+unfold  vect_el.
+remember (vect_list _) as la eqn:Hla.
+assert (Hln : length la = n). {
+  subst la.
+  rewrite fold_vect_el.
+  rewrite fold_vect_size.
+  destruct Hsg as (Hsg & Hinj & Hsurj).
+  now apply Hsg.
+}
+rewrite <- Hln.
+rewrite <- List_map_nth_seq.
+subst la; cbn.
+rewrite mk_vect_vect_list.
+rewrite fold_vect_el.
+apply rank_of_permut_in_sym_gr_vect_el with (n := n); [ | easy | easy ].
+intros H; move H at top; subst n.
+specialize (vect_size_of_empty_sym_gr Hsg) as H1.
+rewrite H1 in Hks.
+apply Nat.lt_1_r in Hks; subst k.
+apply length_zero_iff_nil in Hln.
+unfold vect_size in H1.
+remember (vect_list sg) as lv eqn:Hlv; symmetry in Hlv.
+destruct lv as [| v]; [ easy | ].
+destruct lv; [ | easy ].
+clear H1; cbn in Hln.
 ...
-Search rank_of_permut_in_canon_sym_gr.
+rewrite Hlv in Hln; cbn in Hln.
+destruct (vect_list sg); [ easy | ].
+cbn in Hln.
+
+
+rewrite fold_vect_el in Hln.
+...
+; subst n.
+
+...
+rewrite (List_map_seq' 0).
+
+...
+  reflexivity.
+  easy.
+...
 Search (nth _ (seq _ _)).
 Print mk_canon_sym_gr.
 Search (mk_canon_sym_gr _ (
