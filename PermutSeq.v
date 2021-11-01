@@ -1891,8 +1891,7 @@ Proof.
 intros * Hnz Hks.
 unfold rank_in_canon_sym_gr_of_rank_in_sym_gr.
 unfold rank_in_sym_gr_of_rank_in_canon_sym_gr.
-unfold rank_of_permut_in_canon_sym_gr_vect.
-cbn.
+unfold rank_of_permut_in_canon_sym_gr_vect; cbn.
 rewrite (List_map_nth' 0). 2: {
   rewrite seq_length.
   apply rank_of_canon_permut_upper_bound.
@@ -1938,8 +1937,53 @@ rewrite fold_vect_el.
 now apply rank_of_permut_in_sym_gr_vect_el with (n := n).
 Qed.
 
-Inspect 1.
-
+Theorem rank_in_canon_sym_gr_of_rank_in_sym_gr_of_its_inverse : ∀ n sg
+    (Hsg : is_sym_gr_vect n sg) k,
+  k < n!
+  → rank_in_canon_sym_gr_of_rank_in_sym_gr Hsg
+      (rank_in_sym_gr_of_rank_in_canon_sym_gr Hsg k) = k.
+Proof.
+intros * Hkn.
+unfold rank_in_canon_sym_gr_of_rank_in_sym_gr.
+unfold rank_in_sym_gr_of_rank_in_canon_sym_gr.
+unfold rank_of_permut_in_canon_sym_gr_vect; cbn.
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ cbn | easy ].
+...
+remember (vect_el 0 (vect_el empty_vect sg k)) as f eqn:Hf.
+assert (Hp : is_permut_fun f n). {
+  subst f.
+  destruct Hsg as (Hsg & Hinj & Hsurj).
+  specialize (Hsg k Hks).
+  destruct Hsg as (H1 & H2 & H3).
+  rewrite H1 in H2, H3.
+  split; [ now intros; apply H2 | now intros; apply H3 ].
+}
+erewrite map_ext_in. 2: {
+  intros i Hi; apply in_seq in Hi.
+  rewrite seq_nth. 2: {
+    now apply rank_of_canon_permut_upper_bound.
+  }
+  rewrite Nat.add_0_l.
+  now rewrite permut_in_canon_sym_gr_of_its_rank.
+}
+rewrite Hf.
+unfold  vect_el.
+remember (vect_list _) as la eqn:Hla.
+assert (Hln : length la = n). {
+  subst la.
+  rewrite fold_vect_el.
+  rewrite fold_vect_size.
+  destruct Hsg as (Hsg & Hinj & Hsurj).
+  now apply Hsg.
+}
+rewrite <- Hln.
+rewrite <- List_map_nth_seq.
+subst la; cbn.
+rewrite mk_vect_vect_list.
+rewrite fold_vect_el.
+now apply rank_of_permut_in_sym_gr_vect_el with (n := n).
+Qed.
 ...
 
 (*
