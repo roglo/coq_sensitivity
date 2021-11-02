@@ -2080,84 +2080,21 @@ exists p.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
-Definition has_cardinal T n (x : T) := ∃ f : T → fin_t n, FinFun.Bijective f.
-
-Theorem vect_has_cardinal : ∀ A n (v : vector A),
-  has_cardinal n v ↔ vect_size v = n.
-Proof.
-intros.
-split. {
-  intros (f & g & Hgf & Hfg).
-(*
-  assert (FinFun.Bijective
-  apply bijective_fin_t with (f := f).
-  unfold FinFun.Bijective.
-...
-*)
-  assert (f' : fin_t n → fin_t (vect_size v)). {
-    intros a.
-    Check (g a).
-...
-    assert (vect_size v = vect_size (g a)). {
-      unfold vect_size.
-      destruct v as (lv); cbn.
-      remember (g a) as u eqn:Hu.
-      destruct u as (lu); cbn.
-      apply (f_equal f) in Hu.
-      rewrite Hfg in Hu.
-      destruct a as (a, pa).
-      cbn - [ "<?" ] in Hu.
-...
-    specialize (Hfg u) as H1.
-    specialize (Hgf v) as H2.
-    exists (proj1_sig u).
-    destruct u as (u, pu); cbn - [ "<?" ].
-    specialize (proj1 (Nat.ltb_lt _ _) pu) as H3.
-    apply Nat.ltb_lt.
-    rewrite <- H2.
-...
-    exists u.
-    apply Nat.ltb_lt; cbn.
-...
-unfold fin_t.
-...
-    apply bijective_fin_t.
-
-    destruct a as (a, pa).
-    apply Nat.ltb_lt in pa.
-    apply Nat.ltb_lt.
-...
-  eapply bijective_fin_t.
-  unfold FinFun.Bijective.
-Search fin_t.
-...
-  assert (f' : vector A → fin_t (vect_size v)). {
-    exists (vect_size v).
-    apply Nat.ltb_lt.
-...
-
-Theorem sym_gr_cardinal : ∀ n sg,
-  is_sym_gr_vect n sg → has_cardinal n! sg.
-Proof.
-...
-
 Theorem sym_gr_size_factorial : ∀ n sg,
-  is_sym_gr_vect n sg → vect_size sg = n!.
+  n ≠ 0 → is_sym_gr_vect n sg → vect_size sg = n!.
 Proof.
+intros * Hnz Hsg.
+apply (bijective_fin_t _ _ (rank_in_canon_sym_gr_of_rank_in_sym_gr Hsg)).
+exists (rank_in_sym_gr_of_rank_in_canon_sym_gr Hnz Hsg).
+split. {
+  intros x.
+  apply rank_in_sym_gr_of_rank_in_canon_sym_gr_of_its_inverse.
+} {
+  intros y.
+  apply rank_in_canon_sym_gr_of_rank_in_sym_gr_of_its_inverse.
+}
+Qed.
 
-...
-
-(*
-i = k mod S n
-v = vector of size n! ; because we have k / S n < (S n)! / S n
-    by induction hypothesis, if is_sym_gr_vect n sg' then
-    vect_size sg' = n!
-      but, how to make a sym group of size n! ?
-      well, I can take the canonic one
-      its size is n! by definition
-      I think I proved further it is a sym group: I must put this
-      theorem before here
-*)
 ...
 
 Definition nat_and_permut_of_fin_t n sg (Hsg : is_sym_gr_vect (S n) sg)
