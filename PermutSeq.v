@@ -404,6 +404,7 @@ Definition is_sym_gr_vect n (vv : vector (vector nat)) :=
    vect_el empty_vect vv i = vect_el empty_vect vv j → i = j) ∧
   (∀ v, vect_size v = n → is_permut_vect v → v ∈ vect_list vv).
 
+(*
 Theorem sym_gr_vect_elem : ∀ n sg,
   is_sym_gr_vect n sg →
   (∀ σ, vect_size σ = n ∧ is_permut_vect σ ↔ σ ∈ vect_list sg).
@@ -481,6 +482,7 @@ split; intros Hφ'. {
   now apply is_permut_fun_is_permut_fun_bool.
 }
 Qed.
+*)
 
 (* *)
 
@@ -598,6 +600,7 @@ specialize (List_find_nth_None empty_vect _ _ Hj Hi) as H1.
 now apply vect_eqb_neq in H1.
 Qed.
 
+(*
 (* proving that the size of a symmetric group of order n is factorial(n) *)
 
 Theorem vect_size_of_empty_sym_gr : ∀ sg,
@@ -1332,6 +1335,7 @@ rewrite Nat_fact_succ, Nat.mul_comm in Hkn.
 apply Nat.div_lt_upper_bound; [ | easy ].
 apply fact_neq_0.
 Qed.
+*)
 
 Fixpoint canon_sym_gr_inv n k (j : nat) :=
   match n with
@@ -1401,7 +1405,7 @@ rewrite <- canon_sym_gr_inv_sym_gr with (n := n) (k := k); [ | easy | easy ].
 now f_equal.
 Qed.
 
-
+(*
 Theorem mk_canon_sym_gr_inj2 : ∀ n i j,
   i < n!
   → j < n!
@@ -1483,6 +1487,7 @@ split. {
   now apply mk_canon_sym_gr_inj1 in Hij.
 }
 Qed.
+*)
 
 (* rank in canon symmetric group *)
 
@@ -1688,6 +1693,7 @@ destruct (le_dec (f 0) (mk_canon_sym_gr n k i)) as [Hb| Hb]. {
 }
 Qed.
 
+(*
 Theorem canon_sym_gr_vect_prop : ∀ n,
   is_sym_gr_vect n (mk_canon_sym_gr_vect n).
 Proof.
@@ -1744,6 +1750,7 @@ split. {
   now apply rank_of_canon_permut_upper_bound.
 }
 Qed.
+*)
 
 Theorem canon_permut_elem_ub : ∀ n k i,
   k < n!
@@ -1790,6 +1797,7 @@ split. {
 }
 Qed.
 
+(*
 Theorem nat_and_permut_of_fin_t_prop : ∀ n k,
   k < (S n)!
   → nat_and_permut_prop_bool n
@@ -1851,6 +1859,7 @@ Qed.
 
 Theorem canon_sym_gr_vect_size : ∀ n, vect_size (mk_canon_sym_gr_vect n) = n!.
 Proof. now intros; cbn; rewrite map_length, seq_length. Qed.
+*)
 
 Theorem rank_of_permut_in_canon_sym_gr_eq_compat : ∀ n f g,
   (∀ i, i < n → f i = g i)
