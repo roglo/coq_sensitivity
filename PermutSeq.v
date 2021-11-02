@@ -1123,7 +1123,7 @@ exists p.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
-Theorem sym_gr_size_factorial : ∀ n sg, is_sym_gr n sg → vect_size sg = n!.
+Theorem sym_gr_size : ∀ n sg, is_sym_gr n sg → vect_size sg = n!.
 Proof.
 intros * Hsg.
 apply (bijective_fin_t _ _ (rank_in_canon_sym_gr_of_rank_in_sym_gr Hsg)).
