@@ -396,10 +396,6 @@ Definition mk_canon_sym_gr_vect n : vector (vector nat) :=
 Compute map (vect_list (T := nat)) (vect_list (mk_canon_sym_gr_vect 4)).
 *)
 
-Definition is_sym_gr n (f : nat → nat → nat) :=
-  (∀ i j, i < n! → j < n! → (∀ k, k < n → f i k = f j k) → i = j) ∧
-  (∀ i, i < n! → is_permut_fun (f i) n).
-
 Definition is_sym_gr_vect n (vv : vector (vector nat)) :=
   (∀ i, i < vect_size vv →
    vect_size (vect_el empty_vect vv i) = n ∧
@@ -407,12 +403,6 @@ Definition is_sym_gr_vect n (vv : vector (vector nat)) :=
   (∀ i j, i < vect_size vv → j < vect_size vv →
    vect_el empty_vect vv i = vect_el empty_vect vv j → i = j) ∧
   (∀ v, vect_size v = n → is_permut_vect v → v ∈ vect_list vv).
-
-Definition is_sym_gr_bool n (f : nat → nat → nat) :=
-  ⋀ (i = 1, n!), ⋀ (j = 1, n!),
-     (negb (⋀ (k = 1, n), (f (i - 1) (k - 1) =? f (j - 1) (k - 1))) ||
-      (i =? j)) &&
-  ⋀ (i = 1, n!), is_permut_fun_bool (f (i - 1)) n.
 
 Theorem sym_gr_vect_elem : ∀ n sg,
   is_sym_gr_vect n sg →
@@ -499,14 +489,6 @@ Definition vect_eqb A eqb (u v : vector A) :=
 
 Definition rank_of_permut_in_sym_gr (sg : vector (vector nat)) σ :=
   unsome 0 (List_find_nth (vect_eqb Nat.eqb σ) (vect_list sg)).
-
-(*
-Compute (mk_canon_sym_gr_vect 4).
-Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 4) (mk_vect [0;1;3;2])).
-Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 4) (mk_vect [2;3;0;1])).
-Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 4) (mk_vect [2;3;0])).
-Compute (rank_of_permut_in_sym_gr (mk_canon_sym_gr_vect 0) (mk_vect [2;3;0])).
-*)
 
 Theorem vect_eqb_eq : ∀ u v, vect_eqb Nat.eqb u v = true → u = v.
 Proof.
@@ -1861,10 +1843,11 @@ apply Nat.mul_lt_mono; [ easy | ].
 now apply rank_of_canon_permut_upper_bound.
 Qed.
 
-(* une autre solution, pour montrer que tout groupe symétrique d'ordre n
-   est de taille n!, est de montrer que tout groupe symétrique est en
-   bijection avec le groupe symétrique canonique, qui est bien un groupe
-   symétrique et qui est de taille n! par construction *)
+(* Proof that any symmetric group of order n (i.e. sg : vector (vector nat)
+   such as "is_sym_gr_vect n sg") has size n! (factorial n).
+     For that, make a bijection between "sg" and the canonical symmetric
+   group of order n, made by "mk_canon_sym_gr_vect n", which is itself of
+   size n! by construction. *)
 
 Theorem canon_sym_gr_vect_size : ∀ n, vect_size (mk_canon_sym_gr_vect n) = n!.
 Proof. now intros; cbn; rewrite map_length, seq_length. Qed.
