@@ -1925,10 +1925,29 @@ destruct (le_dec (k / n!) x) as [H| H]; [ | easy ].
 flia Hkc H.
 Qed.
 
+Definition rank_in_sym_gr_of_rank_in_canon_sym_gr_prop
+    n sg (Hnz : n ≠ 0) (Hsg : is_sym_gr_vect n sg) (k : fin_t n!) :=
+   proj2
+     (Nat.ltb_lt
+       (rank_of_permut_in_sym_gr sg
+          (vect_el empty_vect (mk_canon_sym_gr_vect n) (proj1_sig k)))
+       (vect_size sg))
+     (rank_of_permut_in_sym_gr_lt
+        (vect_el empty_vect (mk_canon_sym_gr_vect n) (proj1_sig k)) Hnz Hsg).
+
+Definition rank_in_sym_gr_of_rank_in_canon_sym_gr n sg (Hnz : n ≠ 0)
+    (Hsg : is_sym_gr_vect n sg) (k : fin_t n!) : fin_t (vect_size sg) :=
+  exist (λ a : nat, (a <? vect_size sg) = true)
+    (rank_of_permut_in_sym_gr sg
+      (vect_el empty_vect (mk_canon_sym_gr_vect n) (proj1_sig k)))
+    (rank_in_sym_gr_of_rank_in_canon_sym_gr_prop Hnz Hsg k).
+
+...
+
 Definition rank_in_sym_gr_of_rank_in_canon_sym_gr n sg
-    (Hsg : is_sym_gr_vect n sg) (k : nat) : nat :=
+    (Hsg : is_sym_gr_vect n sg) (k : fin_t n!) : fin_t (vect_size sg) :=
   rank_of_permut_in_sym_gr sg
-    (vect_el empty_vect (mk_canon_sym_gr_vect n) k).
+    (vect_el empty_vect (mk_canon_sym_gr_vect n) (proj1_sig k)).
 
 Definition rank_in_canon_sym_gr_of_rank_in_sym_gr n sg
     (Hsg : is_sym_gr_vect n sg) (k : nat) : nat :=
