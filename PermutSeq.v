@@ -1965,101 +1965,175 @@ Definition rank_in_canon_sym_gr_of_rank_in_sym_gr  n sg
        (vect_el empty_vect sg (proj1_sig k)))
     (rank_in_canon_sym_gr_of_rank_in_sym_gr_prop Hsg k).
 
-...
-
 Theorem rank_in_sym_gr_of_rank_in_canon_sym_gr_of_its_inverse : ∀ n sg
-    (Hsg : is_sym_gr_vect n sg) k,
-  n ≠ 0
-  → k < vect_size sg
-  → rank_in_sym_gr_of_rank_in_canon_sym_gr Hsg
-      (rank_in_canon_sym_gr_of_rank_in_sym_gr Hsg k) = k.
+    (Hnz : n ≠ 0) (Hsg : is_sym_gr_vect n sg) k,
+  rank_in_sym_gr_of_rank_in_canon_sym_gr Hnz Hsg
+    (rank_in_canon_sym_gr_of_rank_in_sym_gr Hsg k) = k.
 Proof.
-intros * Hnz Hks.
-unfold rank_in_canon_sym_gr_of_rank_in_sym_gr.
-unfold rank_in_sym_gr_of_rank_in_canon_sym_gr.
-unfold rank_of_permut_in_canon_sym_gr_vect; cbn.
-rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length.
-  apply rank_of_canon_permut_upper_bound.
-  destruct Hsg as (Hsg & Hinj & Hsurj).
-  unfold is_permut_vect in Hsg.
-  cbn in Hsg.
-  specialize (Hsg k Hks) as H1.
-  destruct H1 as (H1, H2).
-  now rewrite H1 in H2.
-}
-remember (vect_el 0 (vect_el empty_vect sg k)) as f eqn:Hf.
-assert (Hp : is_permut_fun f n). {
-  subst f.
-  destruct Hsg as (Hsg & Hinj & Hsurj).
-  specialize (Hsg k Hks).
-  destruct Hsg as (H1 & H2 & H3).
-  rewrite H1 in H2, H3.
-  split; [ now intros; apply H2 | now intros; apply H3 ].
-}
-erewrite map_ext_in. 2: {
-  intros i Hi; apply in_seq in Hi.
-  rewrite seq_nth. 2: {
-    now apply rank_of_canon_permut_upper_bound.
+intros.
+destruct k as (k, pk); cbn - [ "<?" ].
+apply eq_exist_uncurried.
+assert
+  (p :
+   rank_of_permut_in_sym_gr sg
+     (vect_el empty_vect (mk_canon_sym_gr_vect n)
+        (proj1_sig
+           (rank_in_canon_sym_gr_of_rank_in_sym_gr Hsg (exist _ k pk)))) =
+    k). {
+  specialize (proj1 (Nat.ltb_lt _ _) pk) as Hks.
+  cbn; unfold rank_of_permut_in_canon_sym_gr_vect.
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    apply rank_of_canon_permut_upper_bound.
+    destruct Hsg as (Hsg & Hinj & Hsurj).
+    unfold is_permut_vect in Hsg.
+    cbn in Hsg.
+    specialize (Hsg k Hks) as H1.
+    destruct H1 as (H1, H2).
+    now rewrite H1 in H2.
   }
-  rewrite Nat.add_0_l.
-  now rewrite permut_in_canon_sym_gr_of_its_rank.
-}
-rewrite Hf.
-unfold  vect_el.
-remember (vect_list _) as la eqn:Hla.
-assert (Hln : length la = n). {
-  subst la.
+  remember (vect_el 0 (vect_el empty_vect sg k)) as f eqn:Hf.
+  assert (Hp : is_permut_fun f n). {
+    subst f.
+    destruct Hsg as (Hsg & Hinj & Hsurj).
+    specialize (Hsg k Hks).
+    destruct Hsg as (H1 & H2 & H3).
+    rewrite H1 in H2, H3.
+    split; [ now intros; apply H2 | now intros; apply H3 ].
+  }
+  erewrite map_ext_in. 2: {
+    intros i Hi; apply in_seq in Hi.
+    destruct Hi as (_, Hi); cbn in Hi.
+    rewrite seq_nth. 2: {
+      now apply rank_of_canon_permut_upper_bound.
+    }
+    rewrite Nat.add_0_l.
+    now rewrite permut_in_canon_sym_gr_of_its_rank.
+  }
+  rewrite Hf.
+  unfold  vect_el.
+  remember (vect_list _) as la eqn:Hla.
+  assert (Hln : length la = n). {
+    subst la.
+    rewrite fold_vect_el.
+    rewrite fold_vect_size.
+    destruct Hsg as (Hsg & Hinj & Hsurj).
+    now apply Hsg.
+  }
+  rewrite <- Hln.
+  rewrite <- List_map_nth_seq.
+  subst la; cbn.
+  rewrite mk_vect_vect_list.
   rewrite fold_vect_el.
-  rewrite fold_vect_size.
-  destruct Hsg as (Hsg & Hinj & Hsurj).
-  now apply Hsg.
+  now apply rank_of_permut_in_sym_gr_vect_el with (n := n).
 }
-rewrite <- Hln.
-rewrite <- List_map_nth_seq.
-subst la; cbn.
-rewrite mk_vect_vect_list.
-rewrite fold_vect_el.
-now apply rank_of_permut_in_sym_gr_vect_el with (n := n).
+exists p.
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
 Theorem rank_in_canon_sym_gr_of_rank_in_sym_gr_of_its_inverse : ∀ n sg
-    (Hsg : is_sym_gr_vect n sg) k,
-  k < n!
-  → rank_in_canon_sym_gr_of_rank_in_sym_gr Hsg
-      (rank_in_sym_gr_of_rank_in_canon_sym_gr Hsg k) = k.
+    (Hnz : n ≠ 0) (Hsg : is_sym_gr_vect n sg) k,
+  rank_in_canon_sym_gr_of_rank_in_sym_gr Hsg
+    (rank_in_sym_gr_of_rank_in_canon_sym_gr Hnz Hsg k) = k.
 Proof.
-intros * Hkn.
-unfold rank_in_canon_sym_gr_of_rank_in_sym_gr.
-unfold rank_in_sym_gr_of_rank_in_canon_sym_gr.
-unfold rank_of_permut_in_canon_sym_gr_vect; cbn.
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite seq_nth; [ cbn | easy ].
-rewrite (@vect_el_rank_of_permut_in_sym_gr _ _ n); [ | easy | | ]; cycle 1. {
-  unfold is_permut_vect.
-  cbn; rewrite map_length, seq_length.
-  unfold vect_el at 1; cbn.
-  eapply is_permut_eq_compat. {
-    intros i Hi; symmetry.
+intros.
+destruct k as (k, pk); cbn - [ "<?" ].
+apply eq_exist_uncurried.
+assert
+  (p :
+   rank_of_permut_in_canon_sym_gr_vect n
+     (vect_el empty_vect sg
+       (proj1_sig
+          (rank_in_sym_gr_of_rank_in_canon_sym_gr Hnz Hsg (exist _ k pk)))) =
+    k). {
+  specialize (proj1 (Nat.ltb_lt _ _) pk) as Hkn.
+  unfold rank_in_sym_gr_of_rank_in_canon_sym_gr.
+  unfold rank_of_permut_in_canon_sym_gr_vect; cbn.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ cbn | easy ].
+  rewrite (@vect_el_rank_of_permut_in_sym_gr _ _ n); cycle 1. {
+    easy.
+  } {
+    unfold is_permut_vect.
+    cbn; rewrite map_length, seq_length.
+    unfold vect_el at 1; cbn.
+    eapply is_permut_eq_compat. {
+      intros i Hi; symmetry.
+      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+      rewrite seq_nth; [ cbn | easy ].
+      easy.
+    }
+    now apply canon_sym_gr_elem_is_permut.
+  } {
+    now cbn; rewrite map_length, seq_length.
+  }
+  unfold vect_el; cbn.
+  erewrite rank_of_permut_in_canon_sym_gr_eq_compat. 2: {
+    intros i Hi.
     rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
     rewrite seq_nth; [ cbn | easy ].
     easy.
   }
-  now apply canon_sym_gr_elem_is_permut.
-} {
-  now cbn; rewrite map_length, seq_length.
+  now apply rank_of_canon_permut_of_canon_rank.
 }
-unfold vect_el; cbn.
-erewrite rank_of_permut_in_canon_sym_gr_eq_compat. 2: {
-  intros i Hi.
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  rewrite seq_nth; [ cbn | easy ].
-  easy.
-}
-now apply rank_of_canon_permut_of_canon_rank.
+exists p.
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
-Inspect 2.
+Definition has_cardinal T n (x : T) := ∃ f : T → fin_t n, FinFun.Bijective f.
+
+Theorem vect_has_cardinal : ∀ A n (v : vector A),
+  has_cardinal n v ↔ vect_size v = n.
+Proof.
+intros.
+split. {
+  intros (f & g & Hgf & Hfg).
+(*
+  assert (FinFun.Bijective
+  apply bijective_fin_t with (f := f).
+  unfold FinFun.Bijective.
+...
+*)
+  assert (f' : fin_t n → fin_t (vect_size v)). {
+    intros u.
+    remember (g u) as w eqn:Hw.
+...
+    specialize (Hfg u) as H1.
+    specialize (Hgf v) as H2.
+    exists (proj1_sig u).
+    destruct u as (u, pu); cbn - [ "<?" ].
+    specialize (proj1 (Nat.ltb_lt _ _) pu) as H3.
+    apply Nat.ltb_lt.
+    rewrite <- H2.
+...
+    exists u.
+    apply Nat.ltb_lt; cbn.
+...
+unfold fin_t.
+...
+    apply bijective_fin_t.
+
+    destruct a as (a, pa).
+    apply Nat.ltb_lt in pa.
+    apply Nat.ltb_lt.
+...
+  eapply bijective_fin_t.
+  unfold FinFun.Bijective.
+Search fin_t.
+...
+  assert (f' : vector A → fin_t (vect_size v)). {
+    exists (vect_size v).
+    apply Nat.ltb_lt.
+...
+
+Theorem sym_gr_cardinal : ∀ n sg,
+  is_sym_gr_vect n sg → has_cardinal n! sg.
+Proof.
+...
+
+Theorem sym_gr_size_factorial : ∀ n sg,
+  is_sym_gr_vect n sg → vect_size sg = n!.
+Proof.
 
 ...
 
