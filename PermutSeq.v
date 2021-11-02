@@ -1871,16 +1871,6 @@ Check canon_sym_gr_vect_prop.
 Theorem canon_sym_gr_vect_size : ∀ n, vect_size (mk_canon_sym_gr_vect n) = n!.
 Proof. now intros; cbn; rewrite map_length, seq_length. Qed.
 
-Definition rank_in_sym_gr_of_rank_in_canon_sym_gr n sg
-    (Hsg : is_sym_gr_vect n sg) (k : nat) : nat :=
-  rank_of_permut_in_sym_gr sg
-    (vect_el empty_vect (mk_canon_sym_gr_vect n) k).
-
-Definition rank_in_canon_sym_gr_of_rank_in_sym_gr n sg
-    (Hsg : is_sym_gr_vect n sg) (k : nat) : nat :=
-  rank_of_permut_in_canon_sym_gr_vect n
-    (vect_el empty_vect sg k).
-
 Theorem rank_of_permut_in_canon_sym_gr_eq_compat : ∀ n f g,
   (∀ i, i < n → f i = g i)
   → rank_of_permut_in_canon_sym_gr n f = rank_of_permut_in_canon_sym_gr n g.
@@ -1934,6 +1924,16 @@ rewrite if_leb_le_dec.
 destruct (le_dec (k / n!) x) as [H| H]; [ | easy ].
 flia Hkc H.
 Qed.
+
+Definition rank_in_sym_gr_of_rank_in_canon_sym_gr n sg
+    (Hsg : is_sym_gr_vect n sg) (k : nat) : nat :=
+  rank_of_permut_in_sym_gr sg
+    (vect_el empty_vect (mk_canon_sym_gr_vect n) k).
+
+Definition rank_in_canon_sym_gr_of_rank_in_sym_gr n sg
+    (Hsg : is_sym_gr_vect n sg) (k : nat) : nat :=
+  rank_of_permut_in_canon_sym_gr_vect n
+    (vect_el empty_vect sg k).
 
 Theorem rank_in_sym_gr_of_rank_in_canon_sym_gr_of_its_inverse : ∀ n sg
     (Hsg : is_sym_gr_vect n sg) k,
