@@ -1284,6 +1284,47 @@ split. {
   split; [ flia | easy ].
 } {
   intros v Hv Hp.
+  revert v Hv Hp.
+  induction n; intros. {
+    cbn in Hv.
+    destruct v as (l).
+    cbn in Hv.
+    apply length_zero_iff_nil in Hv; subst l.
+    now left.
+  }
+  cbn - [ fact ].
+  apply in_map_iff.
+  exists (rank_of_permut_in_canon_sym_gr_vect n v).
+  split. {
+    destruct v as (l).
+    unfold is_permut_vect in Hp.
+    cbn in Hv, Hp.
+    rewrite Hv in Hp.
+    f_equal.
+    rewrite List_map_nth_seq with (d := 0).
+    rewrite Hv; cbn.
+    f_equal. {
+      destruct l as [| a]; [ easy | ].
+      cbn.
+      unfold rank_of_permut_in_canon_sym_gr_vect.
+      erewrite rank_of_permut_in_canon_sym_gr_eq_compat. 2: {
+        intros i Hi.
+        unfold vect_el.
+        cbn - [ nth ].
+        easy.
+      }
+Search rank_of_permut_in_canon_sym_gr.
+...
+      unfold vect_el in Hp |-*.
+      cbn - [ nth ] in Hp |-*.
+      destruct Hp as (H1, H2).
+...
+      unfold rank_of_permut_in_canon_sym_gr.
+      cbn.
+...
+Search (_ ∈ _ ↔ _).
+...
+  specialize canon_sym_gr_elem_is_permut as H1.
 ...
 } {
   intros i Hi.
