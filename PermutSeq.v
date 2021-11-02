@@ -1866,8 +1866,6 @@ Qed.
    bijection avec le groupe symétrique canonique, qui est bien un groupe
    symétrique et qui est de taille n! par construction *)
 
-Check canon_sym_gr_vect_prop.
-
 Theorem canon_sym_gr_vect_size : ∀ n, vect_size (mk_canon_sym_gr_vect n) = n!.
 Proof. now intros; cbn; rewrite map_length, seq_length. Qed.
 
