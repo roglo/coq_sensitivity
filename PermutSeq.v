@@ -628,6 +628,61 @@ rewrite <- canon_sym_gr_inv_sym_gr with (n := n) (k := k); [ | easy | easy ].
 now f_equal.
 Qed.
 
+Theorem mk_canon_sym_gr_inj2 : ∀ n i j,
+  i < n!
+  → j < n!
+  → (∀ k, k < n → mk_canon_sym_gr n i k = mk_canon_sym_gr n j k)
+  → i = j.
+Proof.
+intros * Hin Hjn Hij.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  apply Nat.lt_1_r in Hin, Hjn; congruence.
+}
+revert i j Hin Hjn Hij.
+induction n; intros; [ easy | clear Hnz ].
+destruct (Nat.eq_dec (i / n!) (j / n!)) as [Hijd| Hijd]. 2: {
+  now specialize (Hij 0 (Nat.lt_0_succ _)).
+}
+destruct (Nat.eq_dec (i mod n!) (j mod n!)) as [Hijm| Hijm]. {
+  specialize (Nat.div_mod i n! (fact_neq_0 _)) as Hi.
+  specialize (Nat.div_mod j n! (fact_neq_0 _)) as Hj.
+  congruence.
+}
+destruct n; [ now do 2 rewrite Nat.div_1_r in Hijd | ].
+specialize (IHn (Nat.neq_succ_0 _)).
+exfalso; apply Hijm; clear Hijm.
+apply IHn. {
+  apply Nat.mod_upper_bound, fact_neq_0.
+} {
+  apply Nat.mod_upper_bound, fact_neq_0.
+}
+intros k Hk.
+cbn - [ fact ] in Hij |-*.
+specialize (Hij (S k)) as H1.
+assert (H : S k < S (S n)) by flia Hk.
+specialize (H1 H); clear H.
+cbn - [ fact ] in H1.
+rewrite Hijd in H1.
+unfold Nat.b2n in H1.
+do 2 rewrite if_leb_le_dec in H1.
+remember (sym_gr_fun n (mk_canon_sym_gr n) (i mod (S n)!) k) as x eqn:Hx.
+remember (sym_gr_fun n (mk_canon_sym_gr n) (j mod (S n)!) k) as y eqn:Hy.
+destruct (le_dec (j / (S n)!) x) as [Hjx| Hjx]. {
+  destruct (le_dec (j / (S n)!) y) as [Hjy| Hjy]. {
+    now apply Nat.add_cancel_r in H1.
+  }
+  apply Nat.nle_gt in Hjy.
+  flia Hjx Hjy H1.
+} {
+  destruct (le_dec (j / (S n)!) y) as [Hjy| Hjy]. {
+    apply Nat.nle_gt in Hjx.
+    flia Hjx Hjy H1.
+  }
+  now apply Nat.add_cancel_r in H1.
+}
+Qed.
+
 (* rank in canon symmetric group *)
 
 Definition sub_permut (f : nat → nat) i :=
@@ -1219,14 +1274,17 @@ split. {
   rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
   rewrite seq_nth in Hij; [ | easy ].
   rewrite seq_nth in Hij; [ | easy ].
+  do 2 rewrite Nat.add_0_l in Hij.
   injection Hij; clear Hij; intros Hij.
   specialize (ext_in_map Hij) as H1.
-  apply canon_sym_gr_elem_injective with (n := n); [ easy | easy | ].
-...
+  apply (mk_canon_sym_gr_inj2 Hi Hj).
+  intros k Hk.
   apply H1.
-Check canon_sym_gr_elem_injective.
+  apply in_seq.
+  split; [ flia | easy ].
+} {
+  intros v Hv Hp.
 ...
-  apply canon_sym_gr_elem_injective in Hij.
 } {
   intros i Hi.
   now apply sym_gr_elem_is_permut.

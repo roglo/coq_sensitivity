@@ -65,8 +65,6 @@ intros i.
 now specialize (Huv (S i)).
 Qed.
 
-(* (-1) ^ n *)
-
 Section a.
 
 Context {T : Type}.
