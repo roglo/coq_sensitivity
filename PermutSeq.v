@@ -1941,6 +1941,38 @@ Definition rank_in_sym_gr_of_rank_in_canon_sym_gr n sg (Hnz : n ≠ 0)
 Inspect 1.
 
 Definition rank_in_canon_sym_gr_of_rank_in_sym_gr n sg
+    (Hsg : is_sym_gr_vect n sg) (k : fin_t (vect_size sg)) : nat :=
+  rank_of_permut_in_canon_sym_gr_vect n
+    (vect_el empty_vect sg (proj1_sig k)).
+
+Theorem pouet : ∀ n sg (Hsg : is_sym_gr_vect n sg) (k : fin_t (vect_size sg)),
+  (rank_in_canon_sym_gr_of_rank_in_sym_gr Hsg k <? n!) = true.
+Proof.
+intros.
+apply Nat.ltb_lt.
+unfold rank_in_canon_sym_gr_of_rank_in_sym_gr.
+unfold rank_of_permut_in_canon_sym_gr_vect.
+apply rank_of_canon_permut_upper_bound.
+destruct Hsg as (Hsg & Hinj & Hsurj).
+destruct k as (k, kp); cbn.
+specialize (proj1 (Nat.ltb_lt _ _) kp) as H1.
+specialize (Hsg k H1).
+destruct Hsg as (H2, H3).
+unfold is_permut_vect in H3.
+now rewrite H2 in H3.
+Qed.
+
+Definition glop n sg (Hsg : is_sym_gr_vect n sg) (k : fin_t (vect_size sg)) :
+    fin_t n! :=
+  exist (λ a : nat, (a <? n!) = true)
+    (rank_in_canon_sym_gr_of_rank_in_sym_gr Hsg k)
+    (pouet Hsg k).
+
+Check glop.
+
+...
+
+Definition rank_in_canon_sym_gr_of_rank_in_sym_gr n sg
     (Hsg : is_sym_gr_vect n sg) (k : nat) : nat :=
   rank_of_permut_in_canon_sym_gr_vect n
     (vect_el empty_vect sg k).
