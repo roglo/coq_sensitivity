@@ -1925,25 +1925,26 @@ destruct (le_dec (k / n!) x) as [H| H]; [ | easy ].
 flia Hkc H.
 Qed.
 
-Definition rank_in_sym_gr_of_rank_in_canon_sym_gr n sg (Hnz : n ≠ 0)
-    (Hsg : is_sym_gr_vect n sg) (k : fin_t n!) : fin_t (vect_size sg) :=
-  exist (λ a : nat, (a <? vect_size sg) = true)
-    (rank_of_permut_in_sym_gr sg
-      (vect_el empty_vect (mk_canon_sym_gr_vect n) (proj1_sig k)))
-   (proj2
-     (Nat.ltb_lt
-       (rank_of_permut_in_sym_gr sg
-          (vect_el empty_vect (mk_canon_sym_gr_vect n) (proj1_sig k)))
-       (vect_size sg))
-     (rank_of_permut_in_sym_gr_lt
-        (vect_el empty_vect (mk_canon_sym_gr_vect n) (proj1_sig k)) Hnz Hsg)).
-
-Theorem rank_in_canon_sym_gr_of_rank_in_sym_gr_prop : ∀ n sg
-     (Hsg : is_sym_gr_vect n sg) (k : fin_t (vect_size sg)),
-  (rank_of_permut_in_canon_sym_gr_vect n
-    (vect_el empty_vect sg (proj1_sig k)) <? n!) = true.
+Theorem rank_in_sym_gr_of_rank_in_canon_sym_gr_prop : ∀ n sg,
+  n ≠ 0
+  → is_sym_gr_vect n sg
+  → ∀ k : fin_t n!,
+      (rank_of_permut_in_sym_gr sg
+         (vect_el empty_vect (mk_canon_sym_gr_vect n) (proj1_sig k)) <?
+       vect_size sg) = true.
 Proof.
-intros.
+intros * Hnz Hsg k.
+apply Nat.ltb_lt.
+now apply rank_of_permut_in_sym_gr_lt with (n := n).
+Qed.
+
+Theorem rank_in_canon_sym_gr_of_rank_in_sym_gr_prop : ∀ n sg,
+  is_sym_gr_vect n sg
+  → ∀ k : fin_t (vect_size sg),
+      (rank_of_permut_in_canon_sym_gr_vect n
+         (vect_el empty_vect sg (proj1_sig k)) <? n!) = true.
+Proof.
+intros * Hsg k.
 apply Nat.ltb_lt, rank_of_canon_permut_upper_bound.
 specialize (proj1 Hsg (proj1_sig k) (proj1 (Nat.ltb_lt _ _) (proj2_sig k)))
   as H1.
@@ -1952,7 +1953,12 @@ unfold is_permut_vect in H2.
 now rewrite H1 in H2.
 Qed.
 
-Print rank_in_canon_sym_gr_of_rank_in_sym_gr_prop.
+Definition rank_in_sym_gr_of_rank_in_canon_sym_gr n sg (Hnz : n ≠ 0)
+    (Hsg : is_sym_gr_vect n sg) (k : fin_t n!) : fin_t (vect_size sg) :=
+  exist (λ a : nat, (a <? vect_size sg) = true)
+    (rank_of_permut_in_sym_gr sg
+      (vect_el empty_vect (mk_canon_sym_gr_vect n) (proj1_sig k)))
+    (rank_in_sym_gr_of_rank_in_canon_sym_gr_prop Hnz Hsg k).
 
 Definition rank_in_canon_sym_gr_of_rank_in_sym_gr  n sg
     (Hsg : is_sym_gr_vect n sg) (k : fin_t (vect_size sg)) : fin_t n! :=
@@ -1960,15 +1966,6 @@ Definition rank_in_canon_sym_gr_of_rank_in_sym_gr  n sg
     (rank_of_permut_in_canon_sym_gr_vect n
        (vect_el empty_vect sg (proj1_sig k)))
     (rank_in_canon_sym_gr_of_rank_in_sym_gr_prop Hsg k).
-
-Inspect 3.
-
-...
-
-Definition rank_in_canon_sym_gr_of_rank_in_sym_gr n sg
-    (Hsg : is_sym_gr_vect n sg) (k : nat) : nat :=
-  rank_of_permut_in_canon_sym_gr_vect n
-    (vect_el empty_vect sg k).
 
 ...
 
