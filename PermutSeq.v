@@ -1143,25 +1143,22 @@ Record sym_gr_vect n :=
   { sg_vect : vector (vector nat);
     sg_prop : is_sym_gr n sg_vect }.
 
-...
-
-Theorem mk_canon_is_permut_vect : ∀ n k,
+Theorem canon_is_permut_vect : ∀ n k,
   k < n!
-  → is_permut_vect n (vect_vect_nat_el (canon_sym_gr n) k).
+  → is_permut_vect (vect_vect_nat_el (canon_sym_gr n) k).
 Proof.
 intros * Hkn.
 unfold canon_sym_gr; cbn - [ fact map seq ].
 rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
 rewrite Nat.add_0_l.
-unfold is_permut_vect, vect_el.
-cbn - [ seq fact nth ].
-split; [ now rewrite map_length, seq_length | ].
+unfold is_permut_vect, vect_el; cbn.
+rewrite map_length, seq_length.
 split. {
   intros i Hi.
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
   rewrite seq_nth; [ cbn | easy ].
-  now apply permut_elem_ub.
+  now apply canon_permut_elem_ub.
 } {
   intros * Hi Hj Hij.
   rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
@@ -1172,22 +1169,6 @@ split. {
 }
 Qed.
 
-(*
-Definition canon_sym_gr n :=
-  {| sg_vect := canon_sym_gr n;
-     sg_prop := canon_sym_gr_prop n |}.
-*)
-
-(*
-Compute map list_of_vect (list_of_vect (mk_canon_sym_gr 4)).
-*)
-
-(*
-Compute (rank_of_permut_in_sym_gr (vect_el (mk_canon_sym_gr 4) 12)).
-*)
-
-.........
-
 Theorem canon_sym_gr_elem_injective : ∀ n i j,
   i < fact n
   → j < fact n
@@ -1196,18 +1177,56 @@ Theorem canon_sym_gr_elem_injective : ∀ n i j,
 Proof.
 intros * Hi Hj Hij.
 apply (f_equal (@rank_of_permut_in_canon_sym_gr n)) in Hij.
-rewrite rank_of_permut_of_rank in Hij; [ | easy ].
-rewrite rank_of_permut_of_rank in Hij; [ | easy ].
+Search rank_of_permut_in_canon_sym_gr.
+rewrite rank_of_canon_permut_of_canon_rank in Hij; [ | easy ].
+rewrite rank_of_canon_permut_of_canon_rank in Hij; [ | easy ].
 easy.
 Qed.
 
-Theorem canon_sym_gr_prop : ∀ n, is_sym_gr n (mk_canon_sym_gr n).
+Theorem canon_sym_gr_size : ∀ n, vect_size (canon_sym_gr n) = n!.
+Proof.
+intros; cbn.
+now rewrite map_length, seq_length.
+Qed.
+
+Theorem canon_sym_gr_prop : ∀ n, is_sym_gr n (canon_sym_gr n).
 Proof.
 intros.
 split. {
+  intros i Hi; cbn in Hi |-*.
+  rewrite map_length, seq_length in Hi.
+  rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
+  rewrite map_length, seq_length; cbn.
+  rewrite seq_nth; [ cbn | easy ].
+  split; [ easy | ].
+  unfold is_permut_vect; cbn.
+  rewrite map_length, seq_length.
+  unfold vect_el; cbn.
+  eapply is_permut_eq_compat. {
+    intros j Hj; symmetry.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ | easy ].
+    rewrite Nat.add_0_l.
+    easy.
+  }
+  now apply canon_sym_gr_elem_is_permut.
+}
+split. {
   intros i j Hi Hj Hij.
+  rewrite canon_sym_gr_size in Hi, Hj.
   cbn in Hij.
-  now apply canon_sym_gr_elem_injective in Hij.
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite seq_nth in Hij; [ | easy ].
+  rewrite seq_nth in Hij; [ | easy ].
+  injection Hij; clear Hij; intros Hij.
+  specialize (ext_in_map Hij) as H1.
+  apply canon_sym_gr_elem_injective with (n := n); [ easy | easy | ].
+...
+  apply H1.
+Check canon_sym_gr_elem_injective.
+...
+  apply canon_sym_gr_elem_injective in Hij.
 } {
   intros i Hi.
   now apply sym_gr_elem_is_permut.
