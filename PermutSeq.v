@@ -1944,16 +1944,15 @@ Theorem rank_in_canon_sym_gr_of_rank_in_sym_gr_prop : ∀ n sg
     (vect_el empty_vect sg (proj1_sig k)) <? n!) = true.
 Proof.
 intros.
-apply Nat.ltb_lt.
-unfold rank_of_permut_in_canon_sym_gr_vect.
-apply rank_of_canon_permut_upper_bound.
-destruct Hsg as (Hsg & Hinj & Hsurj).
-destruct k as (k, kp); cbn.
-specialize (Hsg k (proj1 (Nat.ltb_lt _ _) kp)).
-destruct Hsg as (H2, H3).
-unfold is_permut_vect in H3.
-now rewrite H2 in H3.
+apply Nat.ltb_lt, rank_of_canon_permut_upper_bound.
+specialize (proj1 Hsg (proj1_sig k) (proj1 (Nat.ltb_lt _ _) (proj2_sig k)))
+  as H1.
+destruct H1 as (H1, H2).
+unfold is_permut_vect in H2.
+now rewrite H1 in H2.
 Qed.
+
+Print rank_in_canon_sym_gr_of_rank_in_sym_gr_prop.
 
 Definition rank_in_canon_sym_gr_of_rank_in_sym_gr  n sg
     (Hsg : is_sym_gr_vect n sg) (k : fin_t (vect_size sg)) : fin_t n! :=
