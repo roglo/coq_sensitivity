@@ -2095,8 +2095,18 @@ split. {
 ...
 *)
   assert (f' : fin_t n → fin_t (vect_size v)). {
-    intros u.
-    remember (g u) as w eqn:Hw.
+    intros a.
+    Check (g a).
+...
+    assert (vect_size v = vect_size (g a)). {
+      unfold vect_size.
+      destruct v as (lv); cbn.
+      remember (g a) as u eqn:Hu.
+      destruct u as (lu); cbn.
+      apply (f_equal f) in Hu.
+      rewrite Hfg in Hu.
+      destruct a as (a, pa).
+      cbn - [ "<?" ] in Hu.
 ...
     specialize (Hfg u) as H1.
     specialize (Hgf v) as H2.
