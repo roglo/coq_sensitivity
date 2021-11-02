@@ -600,7 +600,6 @@ specialize (List_find_nth_None empty_vect _ _ Hj Hi) as H1.
 now apply vect_eqb_neq in H1.
 Qed.
 
-(*
 (* proving that the size of a symmetric group of order n is factorial(n) *)
 
 Theorem vect_size_of_empty_sym_gr : ∀ sg,
@@ -643,6 +642,7 @@ cbn in H4, H6.
 now subst x y.
 Qed.
 
+(*
 Theorem vect_size_of_sym_gr_1 : ∀ sg,
   is_sym_gr_vect 1 sg → vect_size sg = 1.
 Proof.
@@ -1850,6 +1850,7 @@ rewrite Hs in Hv.
 apply Nat.mul_lt_mono; [ easy | ].
 now apply rank_of_canon_permut_upper_bound.
 Qed.
+*)
 
 (* Proof that any symmetric group of order n (i.e. sg : vector (vector nat)
    such as "is_sym_gr_vect n sg") has size n! (factorial n).
@@ -1857,6 +1858,7 @@ Qed.
    group of order n, made by "mk_canon_sym_gr_vect n", which is itself of
    size n! by construction. *)
 
+(*
 Theorem canon_sym_gr_vect_size : ∀ n, vect_size (mk_canon_sym_gr_vect n) = n!.
 Proof. now intros; cbn; rewrite map_length, seq_length. Qed.
 *)
@@ -1916,15 +1918,29 @@ flia Hkc H.
 Qed.
 
 Theorem rank_in_sym_gr_of_rank_in_canon_sym_gr_prop : ∀ n sg,
-  n ≠ 0
-  → is_sym_gr_vect n sg
+  is_sym_gr_vect n sg
   → ∀ k : fin_t n!,
       (rank_of_permut_in_sym_gr sg
          (vect_el empty_vect (mk_canon_sym_gr_vect n) (proj1_sig k)) <?
        vect_size sg) = true.
 Proof.
-intros * Hnz Hsg k.
+intros * Hsg k.
 apply Nat.ltb_lt.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  destruct k as (k, pk); cbn.
+  apply Nat.ltb_lt, Nat.lt_1_r in pk; subst k.
+  specialize (vect_size_of_empty_sym_gr Hsg) as Hs.
+  destruct sg as (lv); cbn in Hs.
+  destruct lv as [| v]; [ easy | ].
+  destruct lv; [ clear Hs | easy ].
+  destruct Hsg as (Hsg & _ & _).
+  specialize (Hsg 0 Nat.lt_0_1); cbn in Hsg.
+  destruct Hsg as (H1, H2).
+  destruct v as (l); cbn in H1 |-*.
+  apply length_zero_iff_nil in H1; subst l.
+  apply Nat.lt_0_1.
+}
 now apply rank_of_permut_in_sym_gr_lt with (n := n).
 Qed.
 
@@ -1943,12 +1959,12 @@ unfold is_permut_vect in H2.
 now rewrite H1 in H2.
 Qed.
 
-Definition rank_in_sym_gr_of_rank_in_canon_sym_gr n sg (Hnz : n ≠ 0)
+Definition rank_in_sym_gr_of_rank_in_canon_sym_gr n sg
     (Hsg : is_sym_gr_vect n sg) (k : fin_t n!) : fin_t (vect_size sg) :=
   exist (λ a : nat, (a <? vect_size sg) = true)
     (rank_of_permut_in_sym_gr sg
       (vect_el empty_vect (mk_canon_sym_gr_vect n) (proj1_sig k)))
-    (rank_in_sym_gr_of_rank_in_canon_sym_gr_prop Hnz Hsg k).
+    (rank_in_sym_gr_of_rank_in_canon_sym_gr_prop Hsg k).
 
 Definition rank_in_canon_sym_gr_of_rank_in_sym_gr  n sg
     (Hsg : is_sym_gr_vect n sg) (k : fin_t (vect_size sg)) : fin_t n! :=
@@ -1958,13 +1974,34 @@ Definition rank_in_canon_sym_gr_of_rank_in_sym_gr  n sg
     (rank_in_canon_sym_gr_of_rank_in_sym_gr_prop Hsg k).
 
 Theorem rank_in_sym_gr_of_rank_in_canon_sym_gr_of_its_inverse : ∀ n sg
-    (Hnz : n ≠ 0) (Hsg : is_sym_gr_vect n sg) k,
-  rank_in_sym_gr_of_rank_in_canon_sym_gr Hnz Hsg
+    (Hsg : is_sym_gr_vect n sg) k,
+  rank_in_sym_gr_of_rank_in_canon_sym_gr Hsg
     (rank_in_canon_sym_gr_of_rank_in_sym_gr Hsg k) = k.
 Proof.
 intros.
 destruct k as (k, pk); cbn - [ "<?" ].
 apply eq_exist_uncurried.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n; cbn.
+  specialize (vect_size_of_empty_sym_gr Hsg) as Hs.
+  specialize (proj1 (Nat.ltb_lt _ _) pk) as Hk.
+  rewrite Hs in Hk.
+  apply Nat.lt_1_r in Hk; subst k.
+  assert (p : rank_of_permut_in_sym_gr sg {| vect_list := [] |} = 0). {
+    unfold rank_of_permut_in_sym_gr, unsome, vect_eqb; cbn.
+    destruct sg as (lv); cbn in Hs |-*.
+    destruct lv as [| v]; [ easy | ].
+    destruct lv; [ cbn | easy ].
+    cbn in Hsg.
+    destruct Hsg as (Hsg & _ & _).
+    specialize (Hsg 0 Nat.lt_0_1); cbn in Hsg.
+    destruct Hsg as (H1, H2).
+    destruct v as (l); cbn in H1 |-*.
+    now apply length_zero_iff_nil in H1; subst l.
+  }
+  exists p.
+  apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+}  
 assert
   (p :
    rank_of_permut_in_sym_gr sg
@@ -2024,9 +2061,9 @@ apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
 Theorem rank_in_canon_sym_gr_of_rank_in_sym_gr_of_its_inverse : ∀ n sg
-    (Hnz : n ≠ 0) (Hsg : is_sym_gr_vect n sg) k,
+    (Hsg : is_sym_gr_vect n sg) k,
   rank_in_canon_sym_gr_of_rank_in_sym_gr Hsg
-    (rank_in_sym_gr_of_rank_in_canon_sym_gr Hnz Hsg k) = k.
+    (rank_in_sym_gr_of_rank_in_canon_sym_gr Hsg k) = k.
 Proof.
 intros.
 destruct k as (k, pk); cbn - [ "<?" ].
@@ -2036,7 +2073,7 @@ assert
    rank_of_permut_in_canon_sym_gr_vect n
      (vect_el empty_vect sg
        (proj1_sig
-          (rank_in_sym_gr_of_rank_in_canon_sym_gr Hnz Hsg (exist _ k pk)))) =
+          (rank_in_sym_gr_of_rank_in_canon_sym_gr Hsg (exist _ k pk)))) =
     k). {
   specialize (proj1 (Nat.ltb_lt _ _) pk) as Hkn.
   unfold rank_in_sym_gr_of_rank_in_canon_sym_gr.
@@ -2073,11 +2110,11 @@ apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
 Theorem sym_gr_size_factorial : ∀ n sg,
-  n ≠ 0 → is_sym_gr_vect n sg → vect_size sg = n!.
+  is_sym_gr_vect n sg → vect_size sg = n!.
 Proof.
-intros * Hnz Hsg.
+intros * Hsg.
 apply (bijective_fin_t _ _ (rank_in_canon_sym_gr_of_rank_in_sym_gr Hsg)).
-exists (rank_in_sym_gr_of_rank_in_canon_sym_gr Hnz Hsg).
+exists (rank_in_sym_gr_of_rank_in_canon_sym_gr Hsg).
 split. {
   intros x.
   apply rank_in_sym_gr_of_rank_in_canon_sym_gr_of_its_inverse.
