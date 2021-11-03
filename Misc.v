@@ -3632,27 +3632,28 @@ Notation "'⋀' ( i ∈ l ) , g" :=
   (iter_list l (λ c i, (c && g)%bool) true)
   (at level 45, i at level 0, l at level 60).
 
-Theorem and_seq_true_iff : ∀ b e f,
+Theorem and_list_true_if : ∀ A (l : list A) f,
+  ⋀ (a ∈ l), f a = true →
+  ∀ a, a ∈ l → f a = true.
+Proof.
+intros * Hb a Ha.
+induction l as [| b]; [ easy | ].
+rewrite iter_list_cons in Hb; [ | easy | | ]; cycle 1. {
+  apply Bool.andb_true_r.
+} {
+  apply Bool.andb_assoc.
+}
+apply Bool.andb_true_iff in Hb.
+destruct Ha as [Ha| Ha]; [ now subst b | ].
+now apply IHl.
+Qed.
+
+Theorem and_seq_true_if : ∀ b e f,
   ⋀ (i = b, e), f i = true →
   ∀ i, b ≤ i ≤ e → f i = true.
 Proof.
 intros * Hb i Hi.
-unfold iter_seq, iter_list in Hb.
-remember (S e - b) as len eqn:Hlen.
-replace e with (b + len - 1) in Hi by flia Hlen Hi.
-replace i with (b + (i - b)) in Hi |-* by flia Hi.
-remember (i - b) as j eqn:Hj.
-assert (H : j < len) by flia Hj Hi Hlen.
-clear e i Hlen Hj Hi.
-rename H into Hlen.
-revert j Hlen.
-induction len; intros; [ easy | ].
-rewrite seq_S in Hb.
-rewrite fold_left_app in Hb; cbn in Hb.
-apply Bool.andb_true_iff in Hb.
-destruct Hb as (Hb, Hbl).
-destruct (Nat.eq_dec j len) as [Hjl| Hjl]; [ now subst j | ].
-specialize (IHlen Hb).
-apply IHlen.
-flia Hlen Hjl.
+unfold iter_seq in Hb.
+apply and_list_true_if with (l := seq b (S e - b)); [ easy | ].
+apply in_seq; flia Hi.
 Qed.
