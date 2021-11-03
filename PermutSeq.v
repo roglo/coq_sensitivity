@@ -36,6 +36,7 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 
+(*
 Definition is_permut_fun f n :=
   (∀ i, i < n → f i < n) ∧
   (∀ i j, i < n → j < n → f i = f j → i = j).
@@ -45,6 +46,14 @@ Definition vect_vect_nat_el (V : vector (vector nat)) i : vector nat :=
 
 Definition is_permut_vect (σ : vector nat) :=
   is_permut_fun (vect_el 0 σ) (vect_size σ).
+*)
+
+Definition is_permut_list l := Forall (λ a, a < length l) l ∧ NoDup l.
+
+Definition is_permut_vect (p : vector nat) := is_permut_list (vect_list p).
+
+
+...
 
 Definition is_permut_fun_bool f n :=
   (⋀ (i = 1, n), (f (i - 1) <? n)) &&
@@ -665,6 +674,7 @@ Qed.
 
 (* rank in canon symmetric group *)
 
+(*
 Definition sub_canon_permut_fun (f : nat → nat) i :=
   f (S i) - Nat.b2n (f 0 <? f (S i)).
 
@@ -676,6 +686,32 @@ Fixpoint rank_of_permut_in_canon_sym_gr n (f : nat → nat) : nat :=
 
 Definition rank_of_permut_in_canon_sym_gr_vect n (v : vector nat) : nat :=
   rank_of_permut_in_canon_sym_gr n (vect_el 0 v).
+*)
+
+(* *)
+
+Definition sub_canon_permut_list (l : list nat) :=
+  map (λ a, a - Nat.b2n (hd 0 l <? a)) (tl l).
+
+Fixpoint rank_of_permut_in_canon_sym_gr_list n (l : list nat) : nat :=
+  match n with
+  | 0 => 0
+  | S n' =>
+      hd 0 l * n'! +
+      rank_of_permut_in_canon_sym_gr_list n' (sub_canon_permut_list l)
+  end.
+
+Definition rank_of_permut_in_canon_sym_gr_vect n v :=
+  rank_of_permut_in_canon_sym_gr_list n (vect_list v).
+
+(*
+Compute (let n := 4 in map (λ i, let v := vect_el empty_vect (canon_sym_gr n) i in (rank_of_permut_in_canon_sym_gr_vect n v, rank_of_permut_in_canon_sym_gr_vect' n v)) (seq 0 (n! + 10))).
+*)
+
+Print is_permut_fun.
+Print is_permut_vect.
+
+...
 
 Theorem sub_canon_permut_fun_elem_ub : ∀ n f i,
   is_permut_fun f (S n)
@@ -752,6 +788,7 @@ destruct bi; cbn. {
   }
 }
 Qed.
+*)
 
 Theorem rank_of_canon_permut_upper_bound : ∀ n f,
   is_permut_fun f n
