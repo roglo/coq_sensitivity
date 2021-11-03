@@ -139,9 +139,15 @@ split. {
       }
       cbn - [ nth ] in H2.
       intros Ha.
+(* on peut séparer de 0 pour i dans H2. *)
+(* dans le truc obtenu, il doit se former un false *)
 ...
       destruct l as [| b]; [ easy | ].
       cbn - [ nth ] in H2.
+      destruct Ha as [Ha| Ha]. {
+        subst b.
+        admit.
+      }
 ...
   } {
     intros i j Hi Hj Hij.
