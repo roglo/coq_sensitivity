@@ -1313,6 +1313,13 @@ split. {
         cbn - [ nth ].
         easy.
       }
+...
+      unfold vect_el in Hp; cbn - [ nth ] in Hp.
+      destruct Hp as (H1, H2).
+Search (vect_el _ (mk_vect _)).
+      cbn in Hv.
+      apply Nat.succ_inj in Hv.
+Print rank_of_permut_in_canon_sym_gr.
 Search rank_of_permut_in_canon_sym_gr.
 ...
       unfold vect_el in Hp |-*.
