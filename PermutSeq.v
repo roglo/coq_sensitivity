@@ -1292,9 +1292,51 @@ split. {
     apply length_zero_iff_nil in Hv; subst l.
     now left.
   }
-  cbn - [ fact ].
+  cbn - [ fact seq ].
   apply in_map_iff.
-  exists (rank_of_permut_in_canon_sym_gr_vect n v).
+  exists (rank_of_permut_in_canon_sym_gr_vect (S n) v).
+  split. {
+    destruct v as (l).
+    unfold is_permut_vect in Hp.
+    cbn in Hv, Hp.
+    rewrite Hv in Hp.
+    f_equal.
+    rewrite List_map_nth_seq with (d := 0).
+    rewrite Hv.
+    apply map_ext_in.
+    intros i Hi.
+    unfold sym_gr_fun.
+    destruct i. {
+      cbn.
+      rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
+      rewrite <- Nat.add_0_r; f_equal.
+      apply Nat.div_small.
+      apply rank_of_canon_permut_upper_bound.
+      unfold sub_permut.
+      cbn - [ "<?" ].
+      destruct Hp as (Hp1, Hp2).
+      cbn in Hp1, Hp2.
+...
+Search (sym_gr_fun).
+...
+    rewrite Hv; cbn.
+    f_equal. {
+      destruct l as [| a]; [ easy | ].
+      cbn.
+      unfold rank_of_permut_in_canon_sym_gr_vect.
+      erewrite rank_of_permut_in_canon_sym_gr_eq_compat. 2: {
+        intros i Hi.
+        unfold vect_el.
+        cbn - [ nth ].
+        easy.
+      }
+...
+Search (_ ∈ map _ _ ↔ _).
+Print canon_sym_gr.
+Print mk_canon_sym_gr.
+Check canon_sym_gr_elem_is_permut.
+...
+Print sym_gr_fun.
   split. {
     destruct v as (l).
     unfold is_permut_vect in Hp.
