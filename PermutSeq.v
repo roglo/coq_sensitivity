@@ -1316,6 +1316,25 @@ split. {
       cbn - [ "<?" ].
       destruct Hp as (Hp1, Hp2).
       cbn in Hp1, Hp2.
+      clear Hi.
+      split. {
+        intros i Hi.
+        apply Nat.succ_lt_mono in Hi.
+        specialize (Hp1 (S i) Hi) as H1.
+        unfold Nat.b2n.
+        rewrite if_ltb_lt_dec.
+        destruct (lt_dec _ _) as [Hzi| Hzi]; [ flia H1 Hzi | ].
+        apply Nat.nlt_ge in Hzi.
+        rewrite Nat.sub_0_r.
+        destruct (Nat.eq_dec (nth (S i) l 0) n) as [Hin| Hin]; [ | flia H1 Hin ].
+        exfalso.
+        rewrite Hin in Hzi.
+        specialize (Hp1 0 (Nat.lt_0_succ _)) as H2.
+        assert (H3 : nth 0 l 0 = n) by flia Hzi H2.
+        rewrite <- Hin in H3.
+        apply Hp2 in H3; [ easy | flia | easy ].
+      } {
+        intros i j Hi Hj Hij.
 ...
 Search (sym_gr_fun).
 ...
