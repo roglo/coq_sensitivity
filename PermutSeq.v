@@ -665,27 +665,27 @@ Qed.
 
 (* rank in canon symmetric group *)
 
-Definition sub_permut (f : nat → nat) i :=
+Definition sub_canon_permut_fun (f : nat → nat) i :=
   f (S i) - Nat.b2n (f 0 <? f (S i)).
 
 Fixpoint rank_of_permut_in_canon_sym_gr n (f : nat → nat) : nat :=
   match n with
   | 0 => 0
-  | S n' => f 0 * n'! + rank_of_permut_in_canon_sym_gr n' (sub_permut f)
+  | S n' => f 0 * n'! + rank_of_permut_in_canon_sym_gr n' (sub_canon_permut_fun f)
   end.
 
 Definition rank_of_permut_in_canon_sym_gr_vect n (v : vector nat) : nat :=
   rank_of_permut_in_canon_sym_gr n (vect_el 0 v).
 
-Theorem sub_permut_elem_ub : ∀ n f i,
+Theorem sub_canon_permut_fun_elem_ub : ∀ n f i,
   is_permut_fun f (S n)
   → i < n
-  → sub_permut f i < n.
+  → sub_canon_permut_fun f i < n.
 Proof.
 intros * (Hvn, Hn) Hin.
 destruct n; [ easy | ].
 cbn - [ "<?" ].
-unfold sub_permut.
+unfold sub_canon_permut_fun.
 remember (f 0 <? f (S i)) as b eqn:Hb.
 symmetry in Hb.
 specialize (Hvn (S i)) as H1.
@@ -703,7 +703,7 @@ Theorem sub_canon_sym_gr_elem_inj1 : ∀ n f i j,
   is_permut_fun f (S n)
   → i < n
   → j < n
-  → sub_permut f i = sub_permut f j
+  → sub_canon_permut_fun f i = sub_canon_permut_fun f j
   → i = j.
 Proof.
 intros * (Hvn, Hn) Hin Hjn Hij.
@@ -711,7 +711,7 @@ destruct (Nat.eq_dec i j) as [H| H]; [ easy | exfalso ].
 revert Hij; rename H into Hij.
 destruct n; [ easy | ].
 cbn - [ "<?" ].
-unfold sub_permut.
+unfold sub_canon_permut_fun.
 remember (f 0 <? f (S i)) as bi eqn:Hbi.
 remember (f 0 <? f (S j)) as bj eqn:Hbj.
 symmetry in Hbi, Hbj.
@@ -764,7 +764,7 @@ rewrite Nat.add_comm.
 apply Nat.add_lt_le_mono. {
   apply IHn. {
     intros i Hi.
-    now apply sub_permut_elem_ub.
+    now apply sub_canon_permut_fun_elem_ub.
   } {
     intros i j Hi Hj.
     now apply sub_canon_sym_gr_elem_inj1 with (n := n).
@@ -791,14 +791,14 @@ destruct i. {
   apply rank_of_canon_permut_upper_bound.
   split. {
     intros i Hi.
-    now apply sub_permut_elem_ub.
+    now apply sub_canon_permut_fun_elem_ub.
   } {
     intros i j Hi Hj.
     now apply sub_canon_sym_gr_elem_inj1 with (n := n).
   }
 }
 cbn.
-remember (rank_of_permut_in_canon_sym_gr n (sub_permut f)) as k eqn:Hk.
+remember (rank_of_permut_in_canon_sym_gr n (sub_canon_permut_fun f)) as k eqn:Hk.
 symmetry in Hk.
 rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
 rewrite Nat_mod_add_l_mul_r; [ | apply fact_neq_0 ].
@@ -807,7 +807,7 @@ assert (Hkn : k < fact n). {
   apply rank_of_canon_permut_upper_bound.
   split. {
     intros j Hj.
-    now apply sub_permut_elem_ub.
+    now apply sub_canon_permut_fun_elem_ub.
   } {
     intros j m Hj Hm.
     now apply sub_canon_sym_gr_elem_inj1 with (n := n).
@@ -818,25 +818,25 @@ rewrite Nat.mod_small; [ | easy ].
 rewrite Nat.add_0_r.
 unfold Nat.b2n.
 rewrite if_leb_le_dec.
-assert (H1 : ∀ i, i < n → sub_permut f i < n). {
+assert (H1 : ∀ i, i < n → sub_canon_permut_fun f i < n). {
   intros j Hj.
-  now apply sub_permut_elem_ub.
+  now apply sub_canon_permut_fun_elem_ub.
 }
 assert
 (H2 : ∀ i j : nat,
     i < n
     → j < n
-    → sub_permut f i = sub_permut f j
+    → sub_canon_permut_fun f i = sub_canon_permut_fun f j
     → i = j). {
   intros j m Hi Hm Him.
   now apply sub_canon_sym_gr_elem_inj1 with (n := n) in Him.
 }
 destruct (le_dec (f 0) (canon_sym_gr_elem n k i)) as [Hb| Hb]. {
   rewrite <- Hk in Hb |-*.
-  unfold sub_permut in Hb.
+  unfold sub_canon_permut_fun in Hb.
   apply Nat.succ_lt_mono in Hin.
   rewrite IHn in Hb |-*; [ | easy | easy | easy | easy | easy | easy ].
-  unfold sub_permut.
+  unfold sub_canon_permut_fun.
   unfold Nat.b2n in Hb |-*.
   rewrite if_ltb_lt_dec in Hb |-*.
   destruct (lt_dec (f 0) (f (S i))) as [Hb1| Hb1]. {
@@ -855,10 +855,10 @@ destruct (le_dec (f 0) (canon_sym_gr_elem n k i)) as [Hb| Hb]. {
   apply Nat.nle_gt in Hb.
   rewrite Nat.add_0_r.
   rewrite <- Hk in Hb |-*.
-  unfold sub_permut in Hb.
+  unfold sub_canon_permut_fun in Hb.
   apply Nat.succ_lt_mono in Hin.
   rewrite IHn; [ | easy | easy | easy ].
-  unfold sub_permut, Nat.b2n.
+  unfold sub_canon_permut_fun, Nat.b2n.
   rewrite IHn in Hb; [ | easy | easy | easy ].
   unfold Nat.b2n in Hb.
   rewrite if_ltb_lt_dec in Hb |-*.
@@ -922,7 +922,7 @@ induction n; intros; [ easy | cbn ].
 rewrite Hfg; [ f_equal | flia ].
 apply IHn.
 intros i Hi.
-unfold sub_permut.
+unfold sub_canon_permut_fun.
 rewrite Hfg; [ f_equal | flia Hi ].
 rewrite Hfg; [ f_equal | flia Hi ].
 Qed.
@@ -1293,9 +1293,9 @@ split. {
     assert
       (Hr :
        rank_of_permut_in_canon_sym_gr n
-         (sub_permut (vect_el 0 (mk_vect l))) < n!). {
+         (sub_canon_permut_fun (vect_el 0 (mk_vect l))) < n!). {
       apply rank_of_canon_permut_upper_bound.
-      unfold sub_permut.
+      unfold sub_canon_permut_fun.
       cbn - [ "<?" ].
       destruct Hp as (Hp1, Hp2).
       cbn in Hp1, Hp2.
@@ -1367,11 +1367,12 @@ split. {
       cbn in Hp1, Hp2.
       remember
         (rank_of_permut_in_canon_sym_gr n
-           (sub_permut (vect_el 0 (mk_vect l)))) as k eqn:Hk.
-Search sub_permut.
+           (sub_canon_permut_fun (vect_el 0 (mk_vect l)))) as k eqn:Hk.
+Search sub_canon_permut_fun.
+Print sub_canon_permut_fun.
 ...
       apply rank_of_canon_permut_upper_bound.
-      unfold sub_permut.
+      unfold sub_canon_permut_fun.
 ...
 Search (_ ∈ map _ _ ↔ _).
 Print canon_sym_gr.
