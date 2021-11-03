@@ -1244,6 +1244,10 @@ intros; cbn.
 now rewrite map_length, seq_length.
 Qed.
 
+Theorem vect_el_mk_vect : ∀ A i d (l : list A),
+  vect_el d (mk_vect l) i = nth i l d.
+Proof. easy. Qed.
+
 Theorem canon_sym_gr_prop : ∀ n, is_sym_gr n (canon_sym_gr n).
 Proof.
 intros.
@@ -1306,17 +1310,16 @@ split. {
     apply map_ext_in.
     intros i Hi.
     unfold sym_gr_fun.
-    destruct i. {
-      cbn.
-      rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
-      rewrite <- Nat.add_0_r; f_equal.
-      apply Nat.div_small.
+    assert
+      (Hr :
+       rank_of_permut_in_canon_sym_gr n
+         (sub_permut (vect_el 0 (mk_vect l))) < n!). {
       apply rank_of_canon_permut_upper_bound.
       unfold sub_permut.
       cbn - [ "<?" ].
       destruct Hp as (Hp1, Hp2).
       cbn in Hp1, Hp2.
-      clear Hi.
+      clear i Hi.
       split. {
         intros i Hi.
         apply Nat.succ_lt_mono in Hi.
@@ -1335,20 +1338,60 @@ split. {
         apply Hp2 in H3; [ easy | flia | easy ].
       } {
         intros i j Hi Hj Hij.
-...
-Search (sym_gr_fun).
-...
-    rewrite Hv; cbn.
-    f_equal. {
-      destruct l as [| a]; [ easy | ].
-      cbn.
-      unfold rank_of_permut_in_canon_sym_gr_vect.
-      erewrite rank_of_permut_in_canon_sym_gr_eq_compat. 2: {
-        intros i Hi.
-        unfold vect_el.
-        cbn - [ nth ].
-        easy.
+        unfold Nat.b2n in Hij.
+        do 2 rewrite if_ltb_lt_dec in Hij.
+        destruct (lt_dec (nth 0 l 0) (nth (S i) l 0)) as [H1| H1]. {
+          destruct (lt_dec (nth 0 l 0) (nth (S j) l 0)) as [H2| H2]. {
+            assert (H3 : nth (S i) l 0 = nth (S j) l 0) by flia Hij H1 H2.
+            clear Hij.
+            apply Nat.succ_lt_mono in Hi, Hj.
+            apply Hp2 in H3; [ | easy | easy ].
+            now apply Nat.succ_inj in H3.
+          }
+          apply Nat.nlt_ge in H2.
+          rewrite Nat.sub_0_r in Hij.
+          assert (Hjz : nth (S j) l 0 = nth 0 l 0) by flia H1 H2 Hij.
+          apply Nat.succ_lt_mono in Hj.
+          apply Hp2 in Hjz; [ easy | easy | flia ].
+        } {
+          apply Nat.nlt_ge in H1.
+          rewrite Nat.sub_0_r in Hij.
+          destruct (lt_dec (nth 0 l 0) (nth (S j) l 0)) as [H2| H2]. {
+            assert (Hiz : nth (S i) l 0 = nth 0 l 0) by flia H1 H2 Hij.
+            apply Nat.succ_lt_mono in Hi.
+            apply Hp2 in Hiz; [ easy | easy | flia ].
+          }
+          rewrite Nat.sub_0_r in Hij.
+          apply Nat.succ_lt_mono in Hi, Hj.
+          apply Hp2 in Hij; [ | easy | easy ].
+          now apply Nat.succ_inj in Hij.
+        }
       }
+    }
+    destruct i. {
+      cbn.
+      rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
+      rewrite <- Nat.add_0_r; f_equal.
+      now apply Nat.div_small.
+    }
+    cbn.
+    rewrite Nat_mod_add_l_mul_r; [ | apply fact_neq_0 ].
+    rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
+    rewrite Nat.mod_small; [ | easy ].
+    rewrite Nat.div_small; [ | easy ].
+    rewrite Nat.add_0_r.
+    unfold Nat.b2n.
+    rewrite if_leb_le_dec.
+    destruct (le_dec _ _) as [H1| H1]. {
+      destruct Hp as (Hp1, Hp2).
+      cbn in Hp1, Hp2.
+      remember
+        (rank_of_permut_in_canon_sym_gr n
+           (sub_permut (vect_el 0 (mk_vect l)))) as j eqn:Hj.
+Search sub_permut.
+...
+      apply rank_of_canon_permut_upper_bound.
+      unfold sub_permut.
 ...
 Search (_ ∈ map _ _ ↔ _).
 Print canon_sym_gr.
