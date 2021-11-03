@@ -356,7 +356,7 @@ Definition sym_gr_fun n (σ_n : Fin.t n! → nat → nat) k j : nat :=
   end.
 *)
 
-Definition sym_gr_fun n (σ_n : nat → nat → nat) k j : nat :=
+Definition canon_sym_gr_fun n (σ_n : nat → nat → nat) k j : nat :=
   match j with
   | 0 => k / n!
   | S j' => σ_n (k mod n!) j' + Nat.b2n (k / n! <=? σ_n (k mod n!) j')
@@ -365,7 +365,7 @@ Definition sym_gr_fun n (σ_n : nat → nat → nat) k j : nat :=
 Fixpoint canon_sym_gr_elem n : nat → nat → nat :=
   match n with
   | 0 => λ _ _, 0
-  | S n' => sym_gr_fun n' (canon_sym_gr_elem n')
+  | S n' => canon_sym_gr_fun n' (canon_sym_gr_elem n')
   end.
 
 Definition canon_sym_gr n : vector (vector nat) :=
@@ -646,8 +646,8 @@ cbn - [ fact ] in H1.
 rewrite Hijd in H1.
 unfold Nat.b2n in H1.
 do 2 rewrite if_leb_le_dec in H1.
-remember (sym_gr_fun n (canon_sym_gr_elem n) (i mod (S n)!) k) as x eqn:Hx.
-remember (sym_gr_fun n (canon_sym_gr_elem n) (j mod (S n)!) k) as y eqn:Hy.
+remember (canon_sym_gr_fun n (canon_sym_gr_elem n) (i mod (S n)!) k) as x eqn:Hx.
+remember (canon_sym_gr_fun n (canon_sym_gr_elem n) (j mod (S n)!) k) as y eqn:Hy.
 destruct (le_dec (j / (S n)!) x) as [Hjx| Hjx]. {
   destruct (le_dec (j / (S n)!) y) as [Hjy| Hjy]. {
     now apply Nat.add_cancel_r in H1.
@@ -875,7 +875,7 @@ Proof.
 intros * Hkn Hin.
 revert k i Hkn Hin.
 induction n; intros; [ easy | cbn ].
-unfold sym_gr_fun.
+unfold canon_sym_gr_fun.
 destruct i. {
   rewrite Nat_fact_succ, Nat.mul_comm in Hkn.
   apply Nat.div_lt_upper_bound; [ | easy ].
@@ -1289,7 +1289,7 @@ split. {
     rewrite Hv.
     apply map_ext_in.
     intros i Hi.
-    unfold sym_gr_fun.
+    unfold canon_sym_gr_fun.
     assert
       (Hr :
        rank_of_permut_in_canon_sym_gr n
@@ -1378,7 +1378,7 @@ Print canon_sym_gr.
 Print canon_sym_gr_elem.
 Check canon_sym_gr_elem_is_permut.
 ...
-Print sym_gr_fun.
+Print canon_sym_gr_fun.
   split. {
     destruct v as (l).
     unfold is_permut_vect in Hp.
@@ -3537,7 +3537,7 @@ Theorem ε_permut_succ : ∀ n k,
 Proof. easy. Qed.
 
 Theorem sym_gr_succ_values : ∀ n k σ σ',
-  σ = sym_gr_fun n (canon_sym_gr_elem n) k
+  σ = canon_sym_gr_fun n (canon_sym_gr_elem n) k
   → σ' = canon_sym_gr_elem n (k mod n!)
   → ∀ i,
     σ i =
