@@ -37,50 +37,43 @@ Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 
 (*
-Definition is_permut_fun f n :=
-  (∀ i, i < n → f i < n) ∧
-  (∀ i j, i < n → j < n → f i = f j → i = j).
-
 Definition vect_vect_nat_el (V : vector (vector nat)) i : vector nat :=
   nth i (vect_list V) empty_vect.
-
-Definition is_permut_vect (σ : vector nat) :=
-  is_permut_fun (vect_el 0 σ) (vect_size σ).
 *)
 
 Definition is_permut_list l := Forall (λ a, a < length l) l ∧ NoDup l.
-
 Definition is_permut_vect (p : vector nat) := is_permut_list (vect_list p).
 
+Print NoDup.
+Print butn.
 
-...
+Definition is_permut_list_bool l :=
+  (⋀ (a ∈ l), (a <? length l)) &&
+  (⋀ (i = 1, length l),
+     (⋀ (j = 1, length l),
+        ((nth (i - 1) l 0 ≠? nth (j - 1) l 0) || (i =? j)))).
 
-Definition is_permut_fun_bool f n :=
-  (⋀ (i = 1, n), (f (i - 1) <? n)) &&
-  (⋀ (i = 1, n), (⋀ (j = 1, n), ((f (i - 1) ≠? f (j - 1)) || (i =? j)))).
+Definition is_permut_vect_bool (p : vector nat) :=
+  is_permut_list_bool (vect_list p).
 
-Definition is_permut_vect_bool (σ : vector nat) :=
-  is_permut_fun_bool (vect_el 0 σ) (vect_size σ).
-
-Theorem is_permut_fun_is_permut_fun_bool : ∀ f n,
-  is_permut_fun f n ↔ is_permut_fun_bool f n = true.
+Theorem is_permut_list_is_permut_list_bool : ∀ l,
+  is_permut_list l ↔ is_permut_list_bool l = true.
 Proof.
 intros.
 split. {
   intros (H1, H2).
-  unfold is_permut_fun_bool.
+  unfold is_permut_list_bool.
   apply andb_true_iff.
   split. {
-    rewrite iter_seq_all_d; [ easy | easy | | | ]. {
+    specialize (proj1 (Forall_forall _ _) H1) as H3; cbn in H3.
+    rewrite iter_list_all_d; [ easy | easy | | | ]. {
       apply andb_true_r.
     } {
       apply andb_assoc.
     } {
       intros i Hi.
-      specialize (H1 (i - 1)) as H3.
-      assert (H : i - 1 < n) by flia Hi.
-      specialize (H3 H); clear H.
-      now apply Nat.ltb_lt in H3.
+      apply Nat.ltb_lt.
+      now apply H3.
     }
   } {
     rewrite iter_seq_all_d; [ easy | easy | | | ]. {
@@ -96,12 +89,13 @@ split. {
       } {
         intros j Hj.
         apply orb_true_iff.
-        specialize (H2 (i - 1) (j - 1)) as H3.
-        assert (H : i - 1 < n) by flia Hi.
+        specialize (proj1 (NoDup_nth _ 0) H2 (i - 1) (j - 1)) as H3.
+        assert (H : i - 1 < length l) by flia Hi.
         specialize (H3 H); clear H.
-        assert (H : j - 1 < n) by flia Hj.
+        assert (H : j - 1 < length l) by flia Hj.
         specialize (H3 H); clear H.
-        destruct (Nat.eq_dec (f (i - 1)) (f (j - 1))) as [H4| H4]. {
+        destruct (Nat.eq_dec (nth (i - 1) l 0) (nth (j - 1) l 0))
+            as [H4| H4]. {
           specialize (H3 H4); right.
           apply Nat.eqb_eq.
           flia Hi Hj H3.
@@ -115,11 +109,13 @@ split. {
   }
 } {
   intros Hb.
-  unfold is_permut_fun_bool in Hb.
+  unfold is_permut_list_bool in Hb.
   apply andb_true_iff in Hb.
   destruct Hb as (H1, H2).
   split. {
+    apply Forall_forall.
     intros i Hi.
+...
     specialize (and_seq_true_iff _ H1) as H3.
     cbn - [ "<?" ] in H3.
     specialize (H3 (i + 1)).
