@@ -53,11 +53,6 @@ Definition is_permut_list_bool l :=
 Definition is_permut_vect_bool (p : vector nat) :=
   is_permut_list_bool (vect_list p).
 
-(* faudrait faire un RLand.v, comme il y a RLsummation.v et RLproduct.v,
-   plutôt que d'appeler les fonctions iter_seq de Misc.v qui rendent le
-   code lourd et difficile à lire.
-*)
-...
 Theorem is_permut_list_is_permut_list_bool : ∀ l,
   is_permut_list l ↔ is_permut_list_bool l = true.
 Proof.
@@ -68,16 +63,11 @@ split. {
   apply andb_true_iff.
   split. {
     specialize (proj1 (Forall_forall _ _) H1) as H3; cbn in H3.
-    rewrite iter_list_all_d; [ easy | easy | | | ]. {
-      apply andb_true_r.
-    } {
-      apply andb_assoc.
-    } {
-      intros i Hi.
-      apply Nat.ltb_lt.
-      now apply H3.
-    }
+    apply all_true_and_list_true_iff.
+    intros i Hi.
+    now apply Nat.ltb_lt, H3.
   } {
+...
     rewrite iter_seq_all_d; [ easy | easy | | | ]. {
       apply andb_true_r.
     } {
