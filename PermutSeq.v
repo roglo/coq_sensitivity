@@ -211,6 +211,13 @@ intros * Hp Hin.
 now apply Hp, nth_In.
 Qed.
 
+Theorem permut_vect_ub : ∀ v i,
+  is_permut_vect v → i < vect_size v → vect_el 0 v i < vect_size v.
+Proof.
+intros (l); cbn; intros * Hp Hin.
+now apply permut_list_ub.
+Qed.
+
 Theorem transposition_lt : ∀ i j k n,
   i < n
   → j < n
@@ -269,21 +276,25 @@ destruct (Nat.eq_dec k i) as [Hki| Hki]. {
 }
 Qed.
 
-...
-
-Theorem vect_swap_elem_is_permut : ∀ n σ p q,
-  p < n
-  → q < n
-  → is_permut_fun σ n
-  → is_permut_fun (swap_elem σ p q) n.
+Theorem vect_swap_elem_is_permut : ∀ σ p q,
+  p < vect_size σ
+  → q < vect_size σ
+  → is_permut_vect σ
+  → is_permut_vect (vect_swap_elem 0 σ p q).
 Proof.
 intros * Hp Hq Hσ.
 split; cbn. {
   intros i Hi.
-  unfold swap_elem.
-  apply permut_ub; [ easy | ].
+  unfold vect_swap_elem.
+  rewrite map_length, seq_length.
+  apply in_map_iff in Hi.
+  destruct Hi as (j & Hji & Hj).
+  apply in_seq in Hj.
+  rewrite <- Hji.
+  apply permut_vect_ub; [ easy | ].
   now apply transposition_lt.
 } {
+...
   intros * Hi Hj Hij.
   unfold swap_elem in Hij.
   unfold transposition in Hij.
