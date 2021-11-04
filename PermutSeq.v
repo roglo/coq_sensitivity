@@ -150,14 +150,7 @@ split. {
       easy.
     }
     cbn in H2.
-...
-    rewrite and_seq_distr in H2; cycle 1. {
-      apply Bool.andb_true_l.
-    } {
-      apply Bool.andb_comm.
-    } {
-      apply Bool.andb_assoc.
-    }
+    rewrite and_seq_distr in H2.
     now apply andb_true_iff in H2.
   }
 }

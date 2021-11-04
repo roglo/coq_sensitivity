@@ -103,7 +103,7 @@ intros b k g.
 apply iter_seq_succ_succ.
 Qed.
 
-Theorem and_list_and_distr : ∀ A g h (l : list A),
+Theorem and_list_distr : ∀ A g h (l : list A),
   (⋀ (i ∈ l), (g i && h i)) =
   (⋀ (i ∈ l), g i) && ⋀ (i ∈ l), h i.
 Proof.
@@ -117,7 +117,7 @@ apply iter_list_distr. {
 }
 Qed.
 
-Theorem and_seq_and_distr : ∀ g h b k,
+Theorem and_seq_distr : ∀ g h b k,
   ⋀ (i = b, k), (g i && h i) =
   (⋀ (i = b, k), g i) && ⋀ (i = b, k), h i.
 Proof.
