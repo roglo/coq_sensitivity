@@ -58,3 +58,18 @@ split. {
   apply in_seq; flia Hi.
 }
 Qed.
+
+Theorem and_seq_eq_compat : ∀ g h b k,
+  (∀ i, b ≤ i ≤ k → g i = h i)
+  → ⋀ (i = b, k), g i = ⋀ (i = b, k), h i.
+Proof.
+intros * Hgh.
+now apply iter_seq_eq_compat.
+Qed.
+
+Theorem and_seq_succ_succ : ∀ b k g,
+  ⋀ (i = S b, S k), g i = ⋀ (i = b, k), g (S i).
+Proof.
+intros b k g.
+apply iter_seq_succ_succ.
+Qed.

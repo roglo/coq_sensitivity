@@ -104,13 +104,12 @@ split. {
     induction l as [| a]; [ constructor | ].
     constructor. {
       cbn - [ nth ] in H2.
-...
-      rewrite iter_seq_succ_succ in H2.
-      erewrite iter_seq_eq_compat in H2. 2: {
+      rewrite and_seq_succ_succ in H2.
+      erewrite and_seq_eq_compat in H2. 2: {
         intros i Hi.
-        rewrite iter_seq_succ_succ.
+        rewrite and_seq_succ_succ.
         rewrite Nat_sub_succ_1.
-        erewrite iter_seq_eq_compat. 2: {
+        erewrite and_seq_eq_compat. 2: {
           intros j Hj.
           rewrite Nat_sub_succ_1.
           cbn - [ nth ].
@@ -121,6 +120,9 @@ split. {
       }
       cbn - [ nth ] in H2.
       intros Ha.
+...
+      rewrite and_seq_split_first in H2.
+...
       rewrite iter_seq_split_first in H2; [ | | | | flia ]; cycle 1. {
         apply Bool.andb_true_l.
       } {
