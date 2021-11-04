@@ -4,9 +4,7 @@ Set Nested Proofs Allowed.
 
 Require Import Utf8 (*Arith Permutation*).
 Require Import Misc (*RingLike*).
-(*
-Import List List.ListNotations.
-*)
+Import List (*List.ListNotations*).
 
 Notation "'⋀' ( i = b , e ) , g" :=
   (iter_seq b e (λ c i, (c && g)%bool) true)

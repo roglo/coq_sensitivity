@@ -8,7 +8,7 @@ Import List List.ListNotations.
 Require Import Init.Nat.
 
 Require Import Misc.
-Require Import RingLike RLsummation RLproduct.
+Require Import RingLike RLsummation RLproduct RLand.
 Require Import MyVector.
 
 Definition nth_nth_error A (ll : list (list A)) (i j : nat) := 
