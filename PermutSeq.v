@@ -41,7 +41,7 @@ Definition vect_vect_nat_el (V : vector (vector nat)) i : vector nat :=
   nth i (vect_list V) empty_vect.
 *)
 
-Definition is_permut_list l := (∀ a, a ∈ l → a < length l) ∧ NoDup l.
+Definition is_permut_list l := Forall (λ a, a < length l) l ∧ NoDup l.
 Definition is_permut_vect (p : vector nat) := is_permut_list (vect_list p).
 
 Definition is_permut_list_bool l :=
@@ -64,7 +64,8 @@ split. {
   split. {
     apply all_true_and_list_true_iff.
     intros i Hi.
-    now apply Nat.ltb_lt, H1.
+    apply Nat.ltb_lt.
+    now revert i Hi; apply Forall_forall.
   } {
     apply all_true_and_seq_true_iff.
     intros i Hi.
@@ -93,6 +94,7 @@ split. {
   apply andb_true_iff in Hb.
   destruct Hb as (H1, H2).
   split. {
+    apply Forall_forall.
     intros i Hi.
     specialize (proj2 (all_true_and_list_true_iff _ _ _) H1) as H3.
     specialize (H3 _ Hi).
@@ -208,7 +210,9 @@ Theorem permut_list_ub : ∀ l i,
   is_permut_list l → i < length l → nth i l 0 < length l.
 Proof.
 intros * Hp Hin.
-now apply Hp, nth_In.
+destruct Hp as (Hp1, Hp2).
+specialize (proj1 (Forall_forall _ _) Hp1) as H1.
+now apply H1, nth_In.
 Qed.
 
 Theorem permut_vect_ub : ∀ v i,
@@ -284,8 +288,8 @@ Theorem vect_swap_elem_is_permut : ∀ σ p q,
 Proof.
 intros * Hp Hq Hσ.
 split; cbn. {
+  apply Forall_forall.
   intros i Hi.
-  unfold vect_swap_elem.
   rewrite map_length, seq_length.
   apply in_map_iff in Hi.
   destruct Hi as (j & Hji & Hj).
