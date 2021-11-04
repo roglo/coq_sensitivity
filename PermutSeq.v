@@ -719,18 +719,60 @@ Definition rank_of_permut_in_canon_sym_gr_vect n v :=
   rank_of_permut_in_canon_sym_gr_list n (vect_list v).
 
 (*
-Compute (let n := 4 in map (λ i, let v := vect_el empty_vect (canon_sym_gr n) i in (rank_of_permut_in_canon_sym_gr_vect n v, rank_of_permut_in_canon_sym_gr_vect' n v)) (seq 0 (n! + 10))).
+Compute (let n := 4 in map (λ i, let v := vect_el empty_vect (canon_sym_gr n) i in (rank_of_permut_in_canon_sym_gr_vect n v, rank_of_permut_in_canon_sym_gr_vect n v)) (seq 0 (n! + 10))).
 *)
 
-Print is_permut_vect.
-
-...
-
+(*
 Theorem sub_canon_permut_fun_elem_ub : ∀ n f i,
   is_permut_fun f (S n)
   → i < n
   → sub_canon_permut_fun f i < n.
+*)
+
+...
+
+Theorem sub_canon_permut_list_elem_ub : ∀ l i,
+  is_permut_list l
+  → S i < length l
+  → nth (S i) (sub_canon_permut_list l) 0 < length l - 1.
 Proof.
+(*
+intros * Hp Hin.
+apply is_permut_list_is_permut_list_bool in Hp.
+unfold is_permut_list_bool in Hp.
+apply andb_true_iff in Hp.
+destruct Hp as (Hvn, Hn).
+  Hvn : ⋀ (a ∈ l), (a <? length l) = true
+  Hn : ⋀ (i = 1, length l), (⋀ (j = 1, length l), ((nth (i - 1) l 0 ≠? nth (j - 1) l 0) || (i =? j))) = true
+*)
+intros * (Hvn, Hn) Hin.
+destruct l as [| a]; [ easy | ].
+cbn - [ "<?" ] in Hin |-*.
+rewrite Nat.sub_0_r in Hin |-*.
+rewrite (List_map_nth' 0). 2: {
+...
+rewrite (List_map_nth' 0); [ | easy ].
+unfold Nat.b2n.
+rewrite if_ltb_lt_dec.
+destruct (lt_dec a (nth i l 0)) as [Hal| Hal]. {
+  unfold is_permut_list in Hvn.
+  specialize (proj1 (Forall_forall _ _) Hvn) as H1.
+  specialize (proj1 (NoDup_nth _ 0) Hn) as H2.
+(*
+  specialize (H1 (S i)); cbn - [ In ] in H1.
+  specialize (H2 0 (S i) (Nat.lt_0_succ _)); cbn in H2.
+*)
+  apply Nat.succ_lt_mono in Hin.
+  specialize (H2 Hin).
+...
+  assert (H : S i ∈ a :: l). {
+    destruct (Nat.eq_dec (S i) a) as [Hia| Hia]. {
+      now rewrite Hia; left.
+    }
+    right.
+
+  cbn in H1.
+...
 intros * (Hvn, Hn) Hin.
 destruct n; [ easy | ].
 cbn - [ "<?" ].
