@@ -96,8 +96,7 @@ split. {
   split. {
     apply Forall_forall.
     intros i Hi.
-...
-    specialize (and_list_true_if _ _ H1) as H3.
+    specialize (proj2 (all_true_and_list_true_iff _ _ _) H1) as H3.
     specialize (H3 _ Hi).
     now apply Nat.ltb_lt.
   } {
@@ -105,6 +104,7 @@ split. {
     induction l as [| a]; [ constructor | ].
     constructor. {
       cbn - [ nth ] in H2.
+...
       rewrite iter_seq_succ_succ in H2.
       erewrite iter_seq_eq_compat in H2. 2: {
         intros i Hi.
