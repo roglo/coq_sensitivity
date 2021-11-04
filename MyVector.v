@@ -7,7 +7,7 @@ Require Import Utf8 Arith.
 Import List List.ListNotations.
 
 Require Import Misc.
-Require Import RingLike RLsummation.
+Require Import RingLike IterAdd.
 
 Record vector T := mk_vect
   { vect_list : list T }.

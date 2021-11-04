@@ -59,19 +59,17 @@ split. {
 }
 Qed.
 
-...
-
 Theorem and_seq_split_first : ∀ b k g,
   b ≤ k
-  → ∑ (i = b, k), g i = (g b + ∑ (i = S b, k), g i)%F.
+  → ⋀ (i = b, k), g i = (g b && ⋀ (i = S b, k), g i)%bool.
 Proof.
 intros * Hbk.
 apply iter_seq_split_first; [ | | | easy ]. {
-  apply rngl_add_0_l.
+  apply Bool.andb_true_l.
 } {
-  apply rngl_add_0_r.
+  apply Bool.andb_true_r.
 } {
-  apply rngl_add_assoc.
+  apply Bool.andb_assoc.
 }
 Qed.
 

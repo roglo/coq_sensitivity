@@ -8,7 +8,7 @@ Require Import Permutation.
 Import List List.ListNotations.
 
 Require Import Misc RingLike MyVector.
-Require Import RLproduct RLand.
+Require Import IterMul IterAnd.
 Require Import Pigeonhole.
 
 Definition comp {A B C} (f : B → C) (g : A → B) x := f (g x).
@@ -120,19 +120,11 @@ split. {
       }
       cbn - [ nth ] in H2.
       intros Ha.
-...
-      rewrite and_seq_split_first in H2.
-...
-      rewrite iter_seq_split_first in H2; [ | | | | flia ]; cycle 1. {
-        apply Bool.andb_true_l.
-      } {
-        apply Bool.andb_true_r.
-      } {
-        apply Bool.andb_assoc.
-      }
+      rewrite and_seq_split_first in H2; [ | flia ].
       unfold nth in H2 at 1.
       apply (In_nth _ _ 0) in Ha.
       destruct Ha as (i & Hi & Ha).
+...
       rewrite iter_seq_split3 with (j := S i) in H2; cycle 1. {
         apply Bool.andb_true_l.
       } {
