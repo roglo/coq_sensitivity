@@ -56,6 +56,11 @@ Definition is_permut_list_bool l :=
 Definition is_permut_vect_bool (p : vector nat) :=
   is_permut_list_bool (vect_list p).
 
+(* faudrait faire un RLand.v, comme il y a RLsummation.v et RLproduct.v,
+   plutôt que d'appeler les fonctions iter_seq de Misc.v qui rendent le
+   code lourd et difficile à lire.
+*)
+...
 Theorem is_permut_list_is_permut_list_bool : ∀ l,
   is_permut_list l ↔ is_permut_list_bool l = true.
 Proof.
@@ -165,69 +170,53 @@ split. {
     apply IHl.
     clear IHl.
     (* bon, c'est évident, mais c'est compliqué *)
-...
+    rewrite iter_seq_split_first in H2; [ | | | | cbn; flia ]; cycle 1. {
+      apply Bool.andb_true_l.
+    } {
+      apply Bool.andb_true_r.
+    } {
+      apply Bool.andb_assoc.
+    }
+    apply andb_true_iff in H2.
+    destruct H2 as (_, H2).
+    cbn - [ nth ] in H2.
+    rewrite iter_seq_succ_succ in H2.
     erewrite iter_seq_eq_compat in H2. 2: {
       intros i Hi.
-      cbn - [ nth ].
-      rewrite iter_seq_split_last; [ | flia ].
-      rewrite Nat.sub_succ, Nat.sub_0_r.
+      rewrite Nat.sub_succ_l; [ | easy ].
+      rewrite List_nth_succ_cons.
+      rewrite iter_seq_split_first; [ | | | | flia ]; cycle 1. {
+        apply Bool.andb_true_l.
+      } {
+        apply Bool.andb_true_r.
+      } {
+        apply Bool.andb_assoc.
+      }
       rewrite iter_seq_succ_succ.
       erewrite iter_seq_eq_compat. 2: {
         intros j Hj.
-        rewrite Nat.sub_succ, Nat.sub_0_r.
+        rewrite Nat.sub_succ_l; [ | easy ].
+        cbn - [ nth ].
         easy.
       }
       easy.
     }
-    cbn - [ nth ] in H2.
-    rewrite iter_seq_split_last in H2; [ | flia ].
-    rewrite Nat.sub_succ, Nat.sub_0_r in H2.
-    rewrite iter_seq_succ_succ in H2.
-    erewrite iter_seq_eq_compat in H2. 2: {
-      intros j Hj.
-      rewrite Nat.sub_succ, Nat.sub_0_r.
-      easy.
-    }
-    cbn - [ nth "=?" ] in H2.
-    rewrite andb_assoc in H2.
-    apply andb_true_iff in H2.
-    destruct H2 as (H2, _).
-    apply andb_true_iff in H2.
-    destruct H2 as (H2, _).
-...
-    apply andb_true_iff in H2.
-...
-      rewrite Nat_sub_succ_1.
-Print iter_seq.
-Search (iter_seq (S _) (S _)).
-      rewrite iter_seq_shift.
-...
-  } {
-    intros i j Hi Hj Hij.
-    specialize (and_seq_true_iff _ H2) as H3.
-    cbn in H3.
-    specialize (H3 (i + 1)).
-    assert (H : 1 ≤ i + 1 ≤ n) by flia Hi.
-    specialize (H3 H); clear H.
-    rewrite Nat.add_sub, Hij in H3.
-    specialize (and_seq_true_iff _ H3) as H4.
-    cbn in H4.
-    specialize (H4 (j + 1)).
-    assert (H : 1 ≤ j + 1 ≤ n) by flia Hj.
-    specialize (H4 H); clear H.
-    apply orb_true_iff in H4.
-    rewrite Nat.add_sub in H4.
-    destruct H4 as [H4| H4]. {
-      apply negb_true_iff in H4.
-      now apply Nat.eqb_neq in H4.
+    cbn in H2.
+    rewrite iter_seq_distr in H2; cycle 1. {
+      apply Bool.andb_true_l.
     } {
-      apply Nat.eqb_eq in H4.
-      do 2 rewrite Nat.add_1_r in H4.
-      now apply Nat.succ_inj in H4.
+      apply Bool.andb_comm.
+    } {
+      apply Bool.andb_assoc.
     }
+    now apply andb_true_iff in H2.
   }
 }
 Qed.
+
+Inspect 1.
+
+...
 
 Theorem is_permut_vect_is_permut_vect_bool : ∀ v,
   is_permut_vect v ↔ is_permut_vect_bool v = true.
