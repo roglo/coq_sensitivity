@@ -44,9 +44,6 @@ Definition vect_vect_nat_el (V : vector (vector nat)) i : vector nat :=
 Definition is_permut_list l := Forall (λ a, a < length l) l ∧ NoDup l.
 Definition is_permut_vect (p : vector nat) := is_permut_list (vect_list p).
 
-Print NoDup.
-Print butn.
-
 Definition is_permut_list_bool l :=
   (⋀ (a ∈ l), (a <? length l)) &&
   (⋀ (i = 1, length l),
