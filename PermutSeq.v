@@ -294,17 +294,25 @@ split; cbn. {
   apply permut_vect_ub; [ easy | ].
   now apply transposition_lt.
 } {
-...
-  intros * Hi Hj Hij.
-  unfold swap_elem in Hij.
+  apply (NoDup_nth _ 0).
+  rewrite map_length, seq_length, fold_vect_size.
+  intros i j Hi Hj Hij.
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite seq_nth in Hij; [ | easy ].
+  rewrite seq_nth in Hij; [ | easy ].
+  do 2 rewrite Nat.add_0_l in Hij.
   unfold transposition in Hij.
   do 4 rewrite if_eqb_eq_dec in Hij.
   destruct (Nat.eq_dec i p) as [Hip| Hip]. {
     destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ congruence | ].
     destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
       subst i j.
-      now apply Hσ.
+      destruct Hσ as (Hp1, Hp2).
+      now apply (proj1 (NoDup_nth _ 0) Hp2).
     }
+Check NoDup_nth.
+...
     apply Nat.neq_sym in Hjq.
     now apply Hσ in Hij.
   }
