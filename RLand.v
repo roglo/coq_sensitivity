@@ -59,6 +59,22 @@ split. {
 }
 Qed.
 
+...
+
+Theorem and_seq_split_first : ∀ b k g,
+  b ≤ k
+  → ∑ (i = b, k), g i = (g b + ∑ (i = S b, k), g i)%F.
+Proof.
+intros * Hbk.
+apply iter_seq_split_first; [ | | | easy ]. {
+  apply rngl_add_0_l.
+} {
+  apply rngl_add_0_r.
+} {
+  apply rngl_add_assoc.
+}
+Qed.
+
 Theorem and_seq_eq_compat : ∀ g h b k,
   (∀ i, b ≤ i ≤ k → g i = h i)
   → ⋀ (i = b, k), g i = ⋀ (i = b, k), h i.
