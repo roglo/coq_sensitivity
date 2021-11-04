@@ -164,7 +164,7 @@ unfold is_permut_vect.
 apply is_permut_list_is_permut_list_bool.
 Qed.
 
-(* à revoir pour utiliser des listes plutôt que des fonctions *)
+(* AFAIRE : utiliser des listes plutôt que des fonctions *)
 Fixpoint permut_fun_inv_loop f i j :=
   match i with
   | 0 => 42
