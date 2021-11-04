@@ -308,42 +308,54 @@ split; cbn. {
   do 2 rewrite Nat.add_0_l in Hij.
   unfold transposition in Hij.
   do 4 rewrite if_eqb_eq_dec in Hij.
+  destruct Hσ as (Hp1, Hp2).
   destruct (Nat.eq_dec i p) as [Hip| Hip]. {
+    subst i.
     destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ congruence | ].
     destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
-      subst i j.
-      destruct Hσ as (Hp1, Hp2).
+      subst j.
       now apply (proj1 (NoDup_nth _ 0) Hp2).
     }
-Check NoDup_nth.
-...
     apply Nat.neq_sym in Hjq.
-    now apply Hσ in Hij.
+    exfalso; apply Hjq.
+    now apply (proj1 (NoDup_nth _ 0) Hp2).
   }
   destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
     destruct (Nat.eq_dec j p) as [Hjp| Hjp]. {
       subst i j.
-      now apply Hσ.
+      now apply (proj1 (NoDup_nth _ 0) Hp2).
     }
     destruct (Nat.eq_dec j q) as [Hjq| Hjq]; [ congruence | ].
     apply Nat.neq_sym in Hjp.
-    now apply Hσ in Hij.
+    exfalso; apply Hjp.
+    now apply (proj1 (NoDup_nth _ 0) Hp2).
   }
   destruct (Nat.eq_dec j p) as [Hjp| Hjp]. {
-    now apply Hσ in Hij.
+    exfalso; apply Hiq.
+    now apply (proj1 (NoDup_nth _ 0) Hp2).
   }
   destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
-    now apply Hσ in Hij.
+    exfalso; apply Hip.
+    now apply (proj1 (NoDup_nth _ 0) Hp2).
   }
-  now apply Hσ in Hij.
+  now apply (proj1 (NoDup_nth _ 0) Hp2).
 }
 Qed.
 
 (*
-   Canonical Permutations.
+   Canonical Symmetric Group.
 
-   The symmetric group is built this way. The k-th permutation is a
-   vector of size n where
+   In set theory, there is one only symmetric group of order n.
+
+   Here, a symmetric group (of order n) is a list of n! permutations,
+   which can be ordered in any order. There are actually n!! (factorial
+   of factorial n) possible orders.
+
+   There is one that we call "canonical" because the generated permutation
+   are in alphabetic order.
+
+   The canonical symmetric group is built this way. The k-th permutation
+   is a vector of size n where
    - the first value is k/fact(n-1)
    - the rest is the (k mod fact(n-1))-th permutation of n-1 values
      (from 0 to n-2) where
@@ -359,20 +371,6 @@ Qed.
      0 and 1 are not shifted (both < 2), 2 is shifted, resulting 0;3;1
      final result: 2;0;3;1
   *)
-
-(*
-Definition fin_of_nat_mod_fact a n :=
-  @Fin.of_nat_lt (a mod n!) n!
-     (Nat.mod_upper_bound a n! (fact_neq_0 n)).
-
-Definition sym_gr_fun n (σ_n : Fin.t n! → nat → nat) k j : nat :=
-  match j with
-  | 0 => k / n!
-  | S j' =>
-      σ_n (fin_of_nat_mod_fact k n) j' +
-      Nat.b2n (k / n! <=? σ_n (fin_of_nat_mod_fact k n) j')
-  end.
-*)
 
 Definition canon_sym_gr_fun n (σ_n : nat → nat → nat) k j : nat :=
   match j with
@@ -450,13 +448,18 @@ specialize (Hsurj (mk_vect (seq 0 n))) as H1.
 cbn in H1; rewrite seq_length in H1.
 specialize (H1 eq_refl).
 assert (H : is_permut_vect (mk_vect (seq 0 n))). {
-  split; cbn; rewrite seq_length. {
+  split. {
+    cbn; rewrite seq_length.
+    apply Forall_forall.
     intros i Hin.
-    now rewrite seq_nth.
+    now rewrite in_seq in Hin.
   } {
+    apply (NoDup_nth _ 0).
+    cbn; rewrite seq_length.
     intros i j Hi Hj Hij.
     rewrite seq_nth in Hij; [ | easy ].
-    now rewrite seq_nth in Hij.
+    rewrite seq_nth in Hij; [ | easy ].
+    easy.
   }
 }
 specialize (H1 H); clear H.
@@ -524,6 +527,7 @@ Proof.
 intros * Hsg.
 destruct Hsg as (Hsg & Hinj & Hsurj).
 specialize (Hsurj empty_vect eq_refl) as H1.
+...
 assert (H : is_permut_vect empty_vect) by easy.
 specialize (H1 H); clear H.
 apply (In_nth _ _ empty_vect) in H1.
