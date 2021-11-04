@@ -41,7 +41,7 @@ Definition vect_vect_nat_el (V : vector (vector nat)) i : vector nat :=
   nth i (vect_list V) empty_vect.
 *)
 
-Definition is_permut_list l := Forall (λ a, a < length l) l ∧ NoDup l.
+Definition is_permut_list l := (∀ a, a ∈ l → a < length l) ∧ NoDup l.
 Definition is_permut_vect (p : vector nat) := is_permut_list (vect_list p).
 
 Definition is_permut_list_bool l :=
@@ -62,10 +62,9 @@ split. {
   unfold is_permut_list_bool.
   apply andb_true_iff.
   split. {
-    specialize (proj1 (Forall_forall _ _) H1) as H3; cbn in H3.
     apply all_true_and_list_true_iff.
     intros i Hi.
-    now apply Nat.ltb_lt, H3.
+    now apply Nat.ltb_lt, H1.
   } {
     apply all_true_and_seq_true_iff.
     intros i Hi.
@@ -94,7 +93,6 @@ split. {
   apply andb_true_iff in Hb.
   destruct Hb as (H1, H2).
   split. {
-    apply Forall_forall.
     intros i Hi.
     specialize (proj2 (all_true_and_list_true_iff _ _ _) H1) as H3.
     specialize (H3 _ Hi).
@@ -156,18 +154,15 @@ split. {
 }
 Qed.
 
-Inspect 1.
-
-...
-
 Theorem is_permut_vect_is_permut_vect_bool : ∀ v,
   is_permut_vect v ↔ is_permut_vect_bool v = true.
 Proof.
 intros.
 unfold is_permut_vect.
-apply is_permut_fun_is_permut_fun_bool.
+apply is_permut_list_is_permut_list_bool.
 Qed.
 
+(* à revoir pour utiliser des listes plutôt que des fonctions *)
 Fixpoint permut_fun_inv_loop f i j :=
   match i with
   | 0 => 42
@@ -209,28 +204,11 @@ intros k Hk.
 apply Hfg; flia Hk.
 Qed.
 
-Theorem is_permut_eq_compat : ∀ n f g,
-  (∀ i, i < n → f i = g i)
-  → is_permut_fun f n
-  → is_permut_fun g n.
-Proof.
-intros * Hfg (H1, H2).
-split. {
-  intros i Hi.
-  rewrite <- Hfg; [ now apply H1 | easy ].
-} {
-  intros i j Hi Hj Hgij.
-  apply H2; [ easy | easy | ].
-  rewrite Hfg; [ | easy ].
-  now rewrite Hfg.
-}
-Qed.
-
-Theorem permut_ub : ∀ n f i,
-  is_permut_fun f n → i < n → f i < n.
+Theorem permut_list_ub : ∀ l i,
+  is_permut_list l → i < length l → nth i l 0 < length l.
 Proof.
 intros * Hp Hin.
-now apply Hp.
+now apply Hp, nth_In.
 Qed.
 
 Theorem transposition_lt : ∀ i j k n,
@@ -290,6 +268,8 @@ destruct (Nat.eq_dec k i) as [Hki| Hki]. {
   destruct (Nat.eq_dec k j) as [Hkj| Hkj]; [ congruence | easy ].
 }
 Qed.
+
+...
 
 Theorem vect_swap_elem_is_permut : ∀ n σ p q,
   p < n
